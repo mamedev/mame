@@ -136,7 +136,7 @@ void avgdvg_device_base::vg_flush()
 				cx1 = cx0;
 				cx0 = t;
 			}
-			if (cy0 > cx1)
+			if (cy0 > cy1)
 			{
 				const int t = cy1;
 				cy1 = cy0;

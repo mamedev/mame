@@ -5308,11 +5308,11 @@ static void mac_image_info(imgtool::image &img, std::ostream &stream)
 	switch (image->format)
 	{
 	case L2I_MFS:
-		mac_to_c_strncpy(buffer, ARRAY_LENGTH(buffer), image->u.mfs.volname);
+		mac_to_c_strncpy(buffer, std::size(buffer), image->u.mfs.volname);
 		break;
 
 	case L2I_HFS:
-		mac_to_c_strncpy(buffer, ARRAY_LENGTH(buffer), image->u.hfs.volname);
+		mac_to_c_strncpy(buffer, std::size(buffer), image->u.hfs.volname);
 		break;
 	}
 
@@ -5397,7 +5397,7 @@ static imgtoolerr_t mfs_image_nextenum(mac_iterator *iter, imgtool_dirent &ent)
 	}
 
 	/* copy info */
-	mac_to_c_strncpy(ent.filename, ARRAY_LENGTH(ent.filename), cur_dir_entry->name);
+	mac_to_c_strncpy(ent.filename, std::size(ent.filename), cur_dir_entry->name);
 	ent.filesize = get_UINT32BE(cur_dir_entry->dataPhysicalSize)
 						+ get_UINT32BE(cur_dir_entry->rsrcPhysicalSize);
 
@@ -5489,7 +5489,7 @@ static imgtoolerr_t hfs_image_nextenum(mac_iterator *iter, imgtool_dirent &ent)
 	}
 
 	/* initialize file path buffer */
-	cur_name_head = ARRAY_LENGTH(ent.filename);
+	cur_name_head = std::size(ent.filename);
 	if (cur_name_head > 0)
 	{
 		cur_name_head--;
@@ -5497,8 +5497,8 @@ static imgtoolerr_t hfs_image_nextenum(mac_iterator *iter, imgtool_dirent &ent)
 	}
 
 	/* insert folder/file name in buffer */
-	mac_to_c_strncpy(ent.filename, ARRAY_LENGTH(ent.filename), catrec_key->cName);
-//  concat_fname(ent.filename, &cur_name_head, ARRAY_LENGTH(ent.filename) - 1, buf);
+	mac_to_c_strncpy(ent.filename, std::size(ent.filename), catrec_key->cName);
+//  concat_fname(ent.filename, &cur_name_head, std::size(ent.filename) - 1, buf);
 
 #if 0
 	/* extract parent directory ID */
@@ -5513,10 +5513,10 @@ static imgtoolerr_t hfs_image_nextenum(mac_iterator *iter, imgtool_dirent &ent)
 		if (err)
 		{
 			/* error */
-			concat_fname(ent.filename, &cur_name_head, ARRAY_LENGTH(ent.filename) - 1, ":");
-			concat_fname(ent.filename, &cur_name_head, ARRAY_LENGTH(ent.filename) - 1, "???");
+			concat_fname(ent.filename, &cur_name_head, std::size(ent.filename) - 1, ":");
+			concat_fname(ent.filename, &cur_name_head, std::size(ent.filename) - 1, "???");
 
-			memmove(ent.filename, ent.filename+cur_name_head, ARRAY_LENGTH(ent.filename) - cur_name_head);
+			memmove(ent.filename, ent.filename+cur_name_head, std::size(ent.filename) - cur_name_head);
 			ent.corrupt = 1;
 			return err;
 		}
@@ -5526,10 +5526,10 @@ static imgtoolerr_t hfs_image_nextenum(mac_iterator *iter, imgtool_dirent &ent)
 		if (dataRecType != hcrt_FolderThread)
 		{
 			/* error */
-			concat_fname(ent.filename, &cur_name_head, ARRAY_LENGTH(ent.filename)-1, ":");
-			concat_fname(ent.filename, &cur_name_head, ARRAY_LENGTH(ent.filename)-1, "???");
+			concat_fname(ent.filename, &cur_name_head, std::size(ent.filename)-1, ":");
+			concat_fname(ent.filename, &cur_name_head, std::size(ent.filename)-1, "???");
 
-			memmove(ent.filename, ent.filename+cur_name_head, ARRAY_LENGTH(ent.filename)-cur_name_head);
+			memmove(ent.filename, ent.filename+cur_name_head, std::size(ent.filename)-cur_name_head);
 			ent.corrupt = 1;
 			return IMGTOOLERR_CORRUPTIMAGE;
 		}
@@ -5537,13 +5537,13 @@ static imgtoolerr_t hfs_image_nextenum(mac_iterator *iter, imgtool_dirent &ent)
 		/* got folder thread record: insert the folder name at the start of
 		file path, then iterate */
 		mac_to_c_strncpy(buf, sizeof(buf), catrec_data->thread.nodeName);
-		concat_fname(ent.filename, &cur_name_head, ARRAY_LENGTH(ent.filename) - 1, ":");
-		concat_fname(ent.filename, &cur_name_head, ARRAY_LENGTH(ent.filename) - 1, buf);
+		concat_fname(ent.filename, &cur_name_head, std::size(ent.filename) - 1, ":");
+		concat_fname(ent.filename, &cur_name_head, std::size(ent.filename) - 1, buf);
 
 		/* extract parent directory ID */
 		parID = get_UINT32BE(catrec_data->thread.parID);
 	}
-	memmove(ent.filename, ent.filename+cur_name_head, ARRAY_LENGTH(ent.filename) -cur_name_head);
+	memmove(ent.filename, ent.filename+cur_name_head, std::size(ent.filename) -cur_name_head);
 #endif
 	return IMGTOOLERR_SUCCESS;
 }
@@ -6185,8 +6185,8 @@ static imgtoolerr_t mac_image_geticoninfo(imgtool::partition &partition, const c
 	const void *fref;
 	uint32_t resource_length;
 
-	assert((ARRAY_LENGTH(attrs) - 1)
-		== ARRAY_LENGTH(attr_values));
+	assert((std::size(attrs) - 1)
+		== std::size(attr_values));
 
 	/* first retrieve type and creator code */
 	err = mac_image_getattrs(partition, path, attrs, attr_values);

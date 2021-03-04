@@ -151,8 +151,6 @@ protected:
 
 	void common(machine_config &config);
 
-	//DECLARE_FLOPPY_FORMATS(floppy_formats);
-
 	void mcu_port1_w(u8 data);
 	void mcu_port2_w(u8 data);
 	void mcu_port3_w(u8 data);
@@ -272,12 +270,6 @@ template <bool SCC> void rtpc_state::iocc_pio_map(address_map &map)
 	map(0x01'0800, 0x01'0801).mirror(0x7fc).rw(m_iocc, FUNC(rtpc_iocc_device::csr_r<1>), FUNC(rtpc_iocc_device::csr_w));
 	map(0x01'0802, 0x01'0803).mirror(0x7fc).rw(m_iocc, FUNC(rtpc_iocc_device::csr_r<0>), FUNC(rtpc_iocc_device::csr_w));
 }
-
-/*
-FLOPPY_FORMATS_MEMBER(rtpc_state::floppy_formats)
-    FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
-*/
 
 void rtpc_state::mcu_port1_w(u8 data)
 {

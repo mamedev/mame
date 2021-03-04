@@ -470,7 +470,7 @@ void ivg09_state::ivg09(machine_config &config)
 	m_pia1->cb2_handler().set(m_beep, FUNC(beep_device::set_state));
 
 	WD2795(config, m_fdc, 8_MHz_XTAL / 8);
-	FLOPPY_CONNECTOR(config, "fdc:0", ifd09_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", ifd09_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 /* ROM definition */

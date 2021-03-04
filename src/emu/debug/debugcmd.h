@@ -107,6 +107,7 @@ private:
 	void execute_logerror(int ref, const std::vector<std::string> &params);
 	void execute_tracelog(int ref, const std::vector<std::string> &params);
 	void execute_tracesym(int ref, const std::vector<std::string> &params);
+	void execute_cls(int ref, const std::vector<std::string> &params);
 	void execute_quit(int ref, const std::vector<std::string> &params);
 	void execute_do(int ref, const std::vector<std::string> &params);
 	void execute_step(int ref, const std::vector<std::string> &params);

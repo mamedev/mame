@@ -229,9 +229,11 @@ static void plusd_floppies(device_slot_interface &device)
 //  floppy_format_type floppy_formats
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER(spectrum_plusd_device::floppy_formats)
-	FLOPPY_MGT_FORMAT
-FLOPPY_FORMATS_END
+void spectrum_plusd_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_MGT_FORMAT);
+}
 
 //-------------------------------------------------
 //  ROM( plusd )

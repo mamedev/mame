@@ -1387,7 +1387,7 @@ void a7800_state::a7800_ntsc(machine_config &config)
 	m_screen->set_screen_update("maria", FUNC(atari_maria_device::screen_update));
 	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(a7800_state::a7800_palette), ARRAY_LENGTH(a7800_colors));
+	PALETTE(config, "palette", FUNC(a7800_state::a7800_palette), std::size(a7800_colors));
 
 	ATARI_MARIA(config, m_maria, 0);
 	m_maria->set_dmacpu_tag(m_maincpu);

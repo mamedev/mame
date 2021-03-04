@@ -29,9 +29,9 @@
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
 
-#include "sound/2608intf.h"
 #include "sound/beep.h"
 #include "sound/spkrdev.h"
+#include "sound/ym2608.h"
 
 #include "video/upd7220.h"
 
@@ -271,7 +271,7 @@ private:
 	uint8_t ext2_video_ff_r();
 	void ext2_video_ff_w(uint8_t data);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 

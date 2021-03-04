@@ -1132,8 +1132,8 @@ void smc777_state::smc777(machine_config &config)
 	m_fdc->drq_wr_callback().set(FUNC(smc777_state::fdc_drq_w));
 
 	// does it really support 16 of them?
-	FLOPPY_CONNECTOR(config, "fdc:0", smc777_floppies, "ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", smc777_floppies, "ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", smc777_floppies, "ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", smc777_floppies, "ssdd", floppy_image_device::default_mfm_floppy_formats);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("smc777");
 	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(smc777_state::quickload_cb));

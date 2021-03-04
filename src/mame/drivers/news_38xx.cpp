@@ -115,8 +115,6 @@ protected:
 	void timer_w(u8 data);
 	void timer(void *ptr, s32 param);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
-
 	// devices
 //  required_device<r3000a_device> m_cpu;
 	required_device<m68030_device> m_iop;
@@ -150,10 +148,6 @@ protected:
 	bool m_int_state[3];
 	bool m_scc_irq_state;
 };
-
-FLOPPY_FORMATS_MEMBER(news_38xx_state::floppy_formats)
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
 
 void news_38xx_state::machine_start()
 {
@@ -273,7 +267,7 @@ void news_38xx_state::int_check()
 	static int const int_line[] = { INPUT_LINE_IRQ7, INPUT_LINE_IRQ4, INPUT_LINE_IRQ3 };
 	static u8 const int_mask[] = { 0x80, 0x78, 0x07 };
 
-	for (unsigned i = 0; i < ARRAY_LENGTH(m_int_state); i++)
+	for (unsigned i = 0; i < std::size(m_int_state); i++)
 	{
 		bool const int_state = m_intst & m_inten & int_mask[i];
 
@@ -376,7 +370,7 @@ void news_38xx_state::common(machine_config &config)
 	N82077AA(config, m_fdc, 16_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set(m_floppy_irq, FUNC(input_merger_any_high_device::in_w<0>));
 	m_fdc->drq_wr_callback().set(m_floppy_irq, FUNC(input_merger_any_high_device::in_w<1>));
-	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
 	// scsi bus 0 and devices
 	NSCSI_BUS(config, m_scsibus[0]);

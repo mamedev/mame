@@ -80,9 +80,6 @@ using util::iabs;
 using util::string_format;
 
 
-// genf is a generic function pointer; cast function pointers to this instead of void *
-typedef void genf(void);
-
 // pen_t is used to represent pixel values in bitmaps
 typedef u32 pen_t;
 

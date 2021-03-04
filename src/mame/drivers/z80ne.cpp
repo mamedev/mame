@@ -436,9 +436,11 @@ static const uint32_t lx388palette[] =
 };
 #endif
 
-FLOPPY_FORMATS_MEMBER( z80ne_state::floppy_formats )
-	FLOPPY_DMK_FORMAT
-FLOPPY_FORMATS_END
+void z80ne_state::floppy_formats(format_registration &fr)
+{
+	fr.add_fm_containers();
+	fr.add(FLOPPY_DMK_FORMAT);
+}
 
 static void z80ne_floppies(device_slot_interface &device)
 {

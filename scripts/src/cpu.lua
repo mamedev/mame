@@ -452,7 +452,27 @@ if (CPUS["COSMAC"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
--- National Semiconductor COP400 family
+-- National Semiconductor COPS(MM57) family
+--@src/devices/cpu/cops1/mm5799.h,CPUS["COPS1"] = true
+--------------------------------------------------
+
+if (CPUS["COPS1"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/cops1/cops1base.cpp",
+		MAME_DIR .. "src/devices/cpu/cops1/cops1base.h",
+		MAME_DIR .. "src/devices/cpu/cops1/mm5799.cpp",
+		MAME_DIR .. "src/devices/cpu/cops1/mm5799.h",
+		MAME_DIR .. "src/devices/cpu/cops1/mm5799op.cpp",
+	}
+end
+
+if (CPUS["COPS1"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cops1/cops1d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cops1/cops1d.h")
+end
+
+--------------------------------------------------
+-- National Semiconductor COPS(COP400) family
 --@src/devices/cpu/cop400/cop400.h,CPUS["COP400"] = true
 --------------------------------------------------
 
@@ -1235,7 +1255,7 @@ end
 
 if (CPUS["DIABLO"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/diablo/diablo1300dasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/ssem/diablo1300dasm.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/diablo/diablo1300dasm.h")
 end
 
 --------------------------------------------------
@@ -2158,7 +2178,7 @@ end
 
 --------------------------------------------------
 -- Panasonic MN1880
---@src/devices/cpu/mn1800/mn1880.h,CPUS["MN1880"] = true
+--@src/devices/cpu/mn1880/mn1880.h,CPUS["MN1880"] = true
 --------------------------------------------------
 
 if (CPUS["MN1880"]~=null) then
@@ -2851,6 +2871,26 @@ if (CPUS["PPS4"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- Rockwell PPS-4/1
+--@src/devices/cpu/pps41/mm76.h,CPUS["PPS41"] = true
+--------------------------------------------------
+
+if (CPUS["PPS41"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/pps41/pps41base.cpp",
+		MAME_DIR .. "src/devices/cpu/pps41/pps41base.h",
+		MAME_DIR .. "src/devices/cpu/pps41/mm76.cpp",
+		MAME_DIR .. "src/devices/cpu/pps41/mm76.h",
+		MAME_DIR .. "src/devices/cpu/pps41/mm76op.cpp",
+	}
+end
+
+if (CPUS["PPS41"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pps41/pps41d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pps41/pps41d.h")
+end
+
+--------------------------------------------------
 -- Hitachi HD61700
 --@src/devices/cpu/hd61700/hd61700.h,CPUS["HD61700"] = true
 --------------------------------------------------
@@ -3441,4 +3481,21 @@ end
 if (CPUS["LC57"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/lc57/lc57d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/lc57/lc57d.h")
+end
+
+--------------------------------------------------
+-- Mark I (Andrew Holme)
+--@src/devices/cpu/mk1/mk1.h,CPUS["MK1"] = true
+--------------------------------------------------
+
+if (CPUS["MK1"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/mk1/mk1.cpp",
+		MAME_DIR .. "src/devices/cpu/mk1/mk1.h",
+	}
+end
+
+if (CPUS["MK1"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mk1/mk1dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mk1/mk1dasm.h")
 end

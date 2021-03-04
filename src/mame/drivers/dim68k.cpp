@@ -436,8 +436,8 @@ void dim68k_state::dim68k(machine_config &config)
 
 	/* Devices */
 	UPD765A(config, m_fdc, 4'000'000, true, true); // these options unknown
-	FLOPPY_CONNECTOR(config, m_floppy[0], dim68k_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[1], dim68k_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], dim68k_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], dim68k_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 	m_fdc->intrq_wr_callback().set(FUNC(dim68k_state::fdc_irq_w));
 
 	MC6845(config, m_crtc, 1790000);

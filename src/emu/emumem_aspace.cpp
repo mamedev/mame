@@ -771,34 +771,18 @@ address_space::~address_space()
 
 
 //-------------------------------------------------
-//  prepare_map - allocate the address map and
-//  walk through it to find implicit memory regions
-//  and identify shared regions
+//  prepare_map_generic - walk through an address
+//  map to find implicit memory regions and
+//  identify shared regions
 //-------------------------------------------------
 
-void address_space::prepare_map()
+void address_space::prepare_map_generic(address_map &map, bool allow_alloc)
 {
 	memory_region *devregion = (m_spacenum == 0) ? m_device.memregion(DEVICE_SELF) : nullptr;
 	u32 devregionsize = (devregion != nullptr) ? devregion->bytes() : 0;
 
-	// allocate the address map
-	m_map = std::make_unique<address_map>(m_device, m_spacenum);
-
-	// merge in the submaps
-	m_map->import_submaps(m_manager.machine(), m_device.owner() ? *m_device.owner() : m_device, data_width(), endianness(), addr_shift());
-
-	// extract global parameters specified by the map
-	m_unmap = (m_map->m_unmapval == 0) ? 0 : ~0;
-	if (m_map->m_globalmask != 0)
-	{
-		if (m_map->m_globalmask & ~m_addrmask)
-			fatalerror("Can't set a global address mask of %08x on a %d-bits address width bus.\n", m_map->m_globalmask, addr_width());
-
-		m_addrmask = m_map->m_globalmask;
-	}
-
 	// make a pass over the address map, adjusting for the device and getting memory pointers
-	for (address_map_entry &entry : m_map->m_entrylist)
+	for (address_map_entry &entry : map.m_entrylist)
 	{
 		// computed adjusted addresses first
 		adjust_addresses(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror);
@@ -806,11 +790,13 @@ void address_space::prepare_map()
 		// if we have a share entry, add it to our map
 		if (entry.m_share != nullptr)
 		{
-			// if we can't find it, add it to our map
+			// if we can't find it, add it to our map if we're allowed to
 			std::string fulltag = entry.m_devbase.subtag(entry.m_share);
 			memory_share *share = m_manager.share_find(fulltag);
 			if (!share)
 			{
+				if (!allow_alloc)
+					fatalerror("Trying to create share '%s' too late\n", fulltag);
 				VPRINTF("Creating share '%s' of length 0x%X\n", fulltag, entry.m_addrend + 1 - entry.m_addrstart);
 				share = m_manager.share_alloc(m_device, fulltag, m_config.data_width(), address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), endianness());
 			}
@@ -865,8 +851,63 @@ void address_space::prepare_map()
 
 		// allocate anonymous ram when needed
 		if (!entry.m_memory && (entry.m_read.m_type == AMH_RAM || entry.m_write.m_type == AMH_RAM))
+		{
+			if (!allow_alloc)
+				fatalerror("Trying to create memory in range %X-%X too late\n", entry.m_addrstart, entry.m_addrend);
+
 			entry.m_memory = m_manager.anonymous_alloc(*this, address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), m_config.data_width(), entry.m_addrstart, entry.m_addrend);
+		}
 	}
+}
+
+
+//-------------------------------------------------
+//  prepare_map - allocate the address map and
+//  walk through it to find implicit memory regions
+//  and identify shared regions
+//-------------------------------------------------
+
+void address_space::prepare_map()
+{
+	// allocate the address map
+	m_map = std::make_unique<address_map>(m_device, m_spacenum);
+
+	// merge in the submaps
+	m_map->import_submaps(m_manager.machine(), m_device.owner() ? *m_device.owner() : m_device, data_width(), endianness(), addr_shift());
+
+	// extract global parameters specified by the map
+	m_unmap = (m_map->m_unmapval == 0) ? 0 : ~0;
+	if (m_map->m_globalmask != 0)
+	{
+		if (m_map->m_globalmask & ~m_addrmask)
+			fatalerror("Can't set a global address mask of %08x on a %d-bits address width bus.\n", m_map->m_globalmask, addr_width());
+
+		m_addrmask = m_map->m_globalmask;
+	}
+
+	prepare_map_generic(*m_map, true);
+}
+
+//-------------------------------------------------
+//  prepare_device_map - check and walk through a
+//  device-provided to to dynamically install to
+//  find implicit memory regions and identify
+//  shared regions
+//-------------------------------------------------
+
+void address_space::prepare_device_map(address_map &map)
+{
+	// Disable the test for now, some cleanup needed before
+	if(0) {
+		// device maps are not supposed to set global parameters
+		if (map.m_unmapval)
+			fatalerror("Device maps should not set the unmap value\n");
+
+		if (map.m_globalmask && map.m_globalmask != m_addrmask)
+			fatalerror("Device maps should not set the global mask\n");
+	}
+
+	prepare_map_generic(map, false);
 }
 
 
@@ -1059,6 +1100,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void address_
 	check_address("install_device_delegate", addrstart, addrend);
 	address_map map(*this, addrstart, addrend, unitmask, cswidth, m_device, delegate);
 	map.import_submaps(m_manager.machine(), device, data_width(), endianness(), addr_shift());
+	prepare_device_map(map);
 	populate_from_map(&map);
 }
 

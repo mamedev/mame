@@ -1006,10 +1006,6 @@ void next_state::next_2c_c_mem(address_map &map)
 static INPUT_PORTS_START( next )
 INPUT_PORTS_END
 
-FLOPPY_FORMATS_MEMBER( next_state::floppy_formats )
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
-
 static void next_floppies(device_slot_interface &device)
 {
 	device.option_add("35ed", FLOPPY_35_ED);
@@ -1086,7 +1082,7 @@ void next_state::next_fdc_config(machine_config &config)
 	N82077AA(config, fdc, 24'000'000, n82077aa_device::mode_t::PS2);
 	fdc->intrq_wr_callback().set(FUNC(next_state::fdc_irq));
 	fdc->drq_wr_callback().set(FUNC(next_state::fdc_drq));
-	FLOPPY_CONNECTOR(config, "fdc:0", next_floppies, "35ed", next_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", next_floppies, "35ed", floppy_image_device::default_pc_floppy_formats);
 
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("next");

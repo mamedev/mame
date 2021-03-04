@@ -313,7 +313,7 @@ The Amstrad Plus has a 4096 colour palette
 
 void amstrad_state::amstrad_plus_palette(palette_device &palette) const
 {
-	palette.set_pen_colors(0, amstrad_palette, ARRAY_LENGTH(amstrad_palette) / 3); // FIXME: isn't this overwritten by the loop?
+	palette.set_pen_colors(0, amstrad_palette, std::size(amstrad_palette) / 3); // FIXME: isn't this overwritten by the loop?
 	for (int i = 0; i < 0x1000; i++)
 	{
 		int const g = ( i >> 8 ) & 0x0f;
@@ -1068,12 +1068,13 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_de_changed)
 }
 
 
-VIDEO_START_MEMBER(amstrad_state,amstrad)
+void amstrad_state::video_start()
 {
 	amstrad_init_lookups();
 
 	m_gate_array.bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height() );
 	m_gate_array.hsync_after_vsync_counter = 3;
+	std::fill(std::begin(m_GateArray_render_colours), std::end(m_GateArray_render_colours), 0);
 }
 
 
@@ -3017,6 +3018,9 @@ void amstrad_state::amstrad_common_init()
 
 	m_aleste_mode = 0;
 
+	m_asic.enabled = 0;
+
+	m_gate_array.romdis = 0;
 	m_gate_array.mrer = 0;
 	m_gate_array.vsync = 0;
 	m_gate_array.hsync = 0;

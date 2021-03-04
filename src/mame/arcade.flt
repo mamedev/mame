@@ -232,6 +232,7 @@ cinemat.cpp
 circus.cpp
 circusc.cpp
 cirsa820xxx.cpp
+cirsa910510.cpp
 cischeat.cpp
 citycon.cpp
 clayshoo.cpp
@@ -953,6 +954,7 @@ phoenix.cpp
 photon.cpp
 photon2.cpp
 photoply.cpp
+photoplys.cpp
 photoplysx.cpp
 piggypas.cpp
 pinball2k.cpp
@@ -970,6 +972,7 @@ playmark.cpp
 play_1.cpp
 play_2.cpp
 play_3.cpp
+playcenter.cpp
 pluto5.cpp
 plygonet.cpp
 pntnpuzl.cpp
@@ -1150,6 +1153,7 @@ sigmab31.cpp
 sigmab52.cpp
 sigmab98.cpp
 silkroad.cpp
+silverball.cpp
 silvmil.cpp
 simpl156.cpp
 simple_st0016.cpp

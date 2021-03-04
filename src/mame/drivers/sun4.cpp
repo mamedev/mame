@@ -573,8 +573,6 @@ protected:
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
 	void ncr53c90a(device_t *device);
 
 	void debugger_map(address_map &map);
@@ -1340,10 +1338,6 @@ WRITE_LINE_MEMBER(sun4c_state::sbus_irq_w)
 	m_maincpu->set_input_line(Line, state);
 }
 
-FLOPPY_FORMATS_MEMBER( sun4_base_state::floppy_formats )
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
-
 static void sun_floppies(device_slot_interface &device)
 {
 	device.option_add("35hd", FLOPPY_35_HD);
@@ -1381,7 +1375,7 @@ void sun4_base_state::sun4_base(machine_config &config)
 	N82077AA(config, m_fdc, 24_MHz_XTAL);
 	m_fdc->set_ready_line_connected(false);
 	m_fdc->intrq_wr_callback().set(FUNC(sun4_base_state::fdc_irq));
-	FLOPPY_CONNECTOR(config, m_floppy, sun_floppies, "35hd", sun4_base_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy, sun_floppies, "35hd", floppy_image_device::default_pc_floppy_formats);
 
 	// Ethernet
 	AM79C90(config, m_lance);

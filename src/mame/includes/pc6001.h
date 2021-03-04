@@ -13,7 +13,7 @@
 #include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/upd7752.h"
-//#include "sound/2203intf.h"
+//#include "sound/ym2203.h"
 #include "video/mc6847.h"
 
 #include "bus/generic/slot.h"
@@ -231,6 +231,34 @@ public:
 		m_sr_irq_vectors(*this, "irq_vectors")
 	{ }
 
+	void pc6001sr(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+	virtual void machine_reset() override;
+
+private:
+	uint8_t m_sr_bank_r[8];
+	uint8_t m_sr_bank_w[8];
+	uint8_t m_kludge;
+	bool m_sr_text_mode;
+	uint8_t m_sr_text_rows;
+	std::unique_ptr<uint8_t []> m_gvram;
+	uint8_t m_bitmap_yoffs,m_bitmap_xoffs;
+
+	enum{
+		SUB_CPU_IRQ = 0,
+		JOYSTICK_IRQ,
+		TIMER_IRQ,
+		VOICE_IRQ,
+		VRTC_IRQ,
+		RS232_IRQ,
+		PRINTER_IRQ,
+		EXT_IRQ
+	};
+
+	required_shared_ptr<uint8_t> m_sr_irq_vectors;
+
 	uint8_t hw_rev_r();
 	uint8_t sr_bank_rn_r(offs_t offset);
 	void sr_bank_rn_w(offs_t offset, uint8_t data);
@@ -255,35 +283,8 @@ public:
 
 	uint32_t screen_update_pc6001sr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void pc6001sr(machine_config &config);
-
 	void pc6001sr_io(address_map &map);
 	void pc6001sr_map(address_map &map);
-protected:
-	virtual void video_start() override;
-	virtual void machine_reset() override;
-
-private:
-	uint8_t m_sr_bank_r[8];
-	uint8_t m_sr_bank_w[8];
-	uint8_t m_kludge;
-	bool m_sr_text_mode;
-	uint8_t m_sr_text_rows;
-	uint8_t *m_gvram;
-	uint8_t m_bitmap_yoffs,m_bitmap_xoffs;
-
-	enum{
-		SUB_CPU_IRQ = 0,
-		JOYSTICK_IRQ,
-		TIMER_IRQ,
-		VOICE_IRQ,
-		VRTC_IRQ,
-		RS232_IRQ,
-		PRINTER_IRQ,
-		EXT_IRQ
-	};
-
-	required_shared_ptr<uint8_t> m_sr_irq_vectors;
 };
 
 #endif

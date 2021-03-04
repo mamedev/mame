@@ -68,6 +68,9 @@
 #include "softlist_dev.h"
 #include "hp9k_3xx.lh"
 
+
+namespace {
+
 #define MAINCPU_TAG "maincpu"
 #define PTM6840_TAG "ptm"
 
@@ -90,13 +93,14 @@ public:
 	void hp9k380(machine_config &config);
 	void hp9k382(machine_config &config);
 
-private:
-	void hp9k300(machine_config &config);
-	required_device<m68000_base_device> m_maincpu;
-
+protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void driver_start() override;
+
+private:
+	void hp9k300(machine_config &config);
+	required_device<m68000_base_device> m_maincpu;
 
 	output_finder<8> m_diag_led;
 
@@ -230,6 +234,7 @@ void hp9k3xx_state::machine_reset()
 void hp9k3xx_state::machine_start()
 {
 	m_bus_error_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp9k3xx_state::bus_error_timeout), this));
+	m_bus_error = false;
 	save_item(NAME(m_bus_error));
 }
 
@@ -511,6 +516,9 @@ ROM_START( hp9k382 )
 	ROM_REGION( 0x2000, "unknown", ROMREGION_ERASEFF | ROMREGION_BE | ROMREGION_32BIT )
 	ROM_LOAD( "1818-5282_8ce61e951207_28c64.bin", 0x000000, 0x002000, CRC(740442f3) SHA1(ab65bd4eec1024afb97fc2dd3bd3f017e90f49ae) )
 ROM_END
+
+} // Anonymous namespace
+
 
 /*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY            FULLNAME      FLAGS */
 COMP( 1985, hp9k310, 0,       0,      hp9k310, hp9k330, hp9k3xx_state, empty_init, "Hewlett-Packard", "HP9000/310", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)

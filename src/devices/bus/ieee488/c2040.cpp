@@ -420,30 +420,33 @@ static void c2040_floppies(device_slot_interface &device)
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( c2040_device::floppy_formats )
-	FLOPPY_C3040_FORMAT,
-	FLOPPY_G64_FORMAT
-FLOPPY_FORMATS_END
+void c2040_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_C3040_FORMAT);
+	fr.add(FLOPPY_G64_FORMAT);
+}
 
 
 //-------------------------------------------------
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( c3040_device::floppy_formats )
-	FLOPPY_C3040_FORMAT,
-	FLOPPY_G64_FORMAT
-FLOPPY_FORMATS_END
+void c3040_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_C3040_FORMAT);
+	fr.add(FLOPPY_G64_FORMAT);
+}
 
 
 //-------------------------------------------------
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( c4040_device::floppy_formats )
-	FLOPPY_C4040_FORMAT,
-	FLOPPY_G64_FORMAT
-FLOPPY_FORMATS_END
+void c4040_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_C4040_FORMAT);
+	fr.add(FLOPPY_G64_FORMAT);
+}
 
 
 //-------------------------------------------------

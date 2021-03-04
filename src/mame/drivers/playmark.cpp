@@ -1044,12 +1044,12 @@ void playmark_state::bigtwin(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &playmark_state::bigtwin_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(playmark_state::irq2_line_hold));
 
-	PIC16C57(config, m_audiocpu, 12000000);
-	m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w));
-	m_audiocpu->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
-	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
-	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
-	m_audiocpu->write_c().set(FUNC(playmark_state::playmark_snd_control_w));
+	PIC16C57(config, m_audio_pic, 12000000);
+	m_audio_pic->write_a().set(FUNC(playmark_state::playmark_oki_banking_w));
+	m_audio_pic->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
+	m_audio_pic->write_b().set(FUNC(playmark_state::playmark_oki_w));
+	m_audio_pic->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
+	m_audio_pic->write_c().set(FUNC(playmark_state::playmark_snd_control_w));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1080,12 +1080,12 @@ void playmark_state::bigtwinb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &playmark_state::bigtwinb_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(playmark_state::irq2_line_hold));
 
-	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);
-	m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w));
-	m_audiocpu->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
-	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
-	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
-	m_audiocpu->write_c().set(FUNC(playmark_state::playmark_snd_control_w));
+	PIC16C57(config, m_audio_pic, XTAL(24'000'000)/2);
+	m_audio_pic->write_a().set(FUNC(playmark_state::playmark_oki_banking_w));
+	m_audio_pic->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
+	m_audio_pic->write_b().set(FUNC(playmark_state::playmark_oki_w));
+	m_audio_pic->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
+	m_audio_pic->write_c().set(FUNC(playmark_state::playmark_snd_control_w));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1109,20 +1109,12 @@ void playmark_state::bigtwinb(machine_config &config)
 	m_oki->set_addrmap(0, &playmark_state::oki_map);
 }
 
-void playmark_state::wbeachvl(machine_config &config)
+void playmark_state::wbeachvl_base(machine_config &config)
 {
 	// basic machine hardware
 	M68000(config, m_maincpu, 12000000);   // 12 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &playmark_state::wbeachvl_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(playmark_state::irq2_line_hold));
-
-	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);    // 12MHz with internal 4x divisor
-	m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // wrong?
-	m_audiocpu->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
-	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
-	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
-	m_audiocpu->write_c().set(FUNC(playmark_state::playmark_snd_control_w));
-//  m_audiocpu->write_c().set(FUNC(playmark_state::hrdtimes_snd_control_w)); // probably closer to this, but this only supports 2 sample bank bits
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_value(0);
 
@@ -1148,6 +1140,28 @@ void playmark_state::wbeachvl(machine_config &config)
 	m_oki->set_addrmap(0, &playmark_state::oki_map);
 }
 
+void playmark_state::wbeachvl_pic(machine_config &config)
+{
+	wbeachvl_base(config);
+
+	PIC16C57(config, m_audio_pic, XTAL(24'000'000)/2);    // 12MHz with internal 4x divisor
+	m_audio_pic->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // wrong?
+	m_audio_pic->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
+	m_audio_pic->write_b().set(FUNC(playmark_state::playmark_oki_w));
+	m_audio_pic->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
+	m_audio_pic->write_c().set(FUNC(playmark_state::playmark_snd_control_w));
+//  m_audio_pic->write_c().set(FUNC(playmark_state::hrdtimes_snd_control_w)); // probably closer to this, but this only supports 2 sample bank bits
+}
+
+void playmark_state::wbeachvl_mcs(machine_config &config)
+{
+	wbeachvl_base(config);
+
+	I87C51(config, m_audio_mcs, 24'000'000 / 2); // actually S87C751, clock unverified, near a 24 MHz XTAL
+
+	I87C51(config, "extracpu", 12'000'000); // actually S87C751, clock unverified, on a sub PCB near a 12 MHz XTAL
+}
+
 void playmark_state::excelsr(machine_config &config)
 {
 	// basic machine hardware
@@ -1155,12 +1169,12 @@ void playmark_state::excelsr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &playmark_state::excelsr_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(playmark_state::irq2_line_hold));
 
-	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);    // 12MHz with internal 4x divisor
-	m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w));
-	m_audiocpu->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
-	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
-	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
-	m_audiocpu->write_c().set(FUNC(playmark_state::playmark_snd_control_w));
+	PIC16C57(config, m_audio_pic, XTAL(24'000'000)/2);    // 12MHz with internal 4x divisor
+	m_audio_pic->write_a().set(FUNC(playmark_state::playmark_oki_banking_w));
+	m_audio_pic->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
+	m_audio_pic->write_b().set(FUNC(playmark_state::playmark_oki_w));
+	m_audio_pic->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
+	m_audio_pic->write_c().set(FUNC(playmark_state::playmark_snd_control_w));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1191,13 +1205,13 @@ void playmark_state::hrdtimes(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &playmark_state::hrdtimes_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(playmark_state::irq6_line_hold));
 
-	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);    // verified on pcb
-//  m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // Banking data output but not wired. Port C is wired to the OKI banking instead
-	m_audiocpu->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
-	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
-	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
-	m_audiocpu->write_c().set(FUNC(playmark_state::hrdtimes_snd_control_w));
-	m_audiocpu->set_disable();       // Internal code is not dumped yet
+	PIC16C57(config, m_audio_pic, XTAL(24'000'000)/2);    // verified on pcb
+//  m_audio_pic->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // Banking data output but not wired. Port C is wired to the OKI banking instead
+	m_audio_pic->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
+	m_audio_pic->write_b().set(FUNC(playmark_state::playmark_oki_w));
+	m_audio_pic->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
+	m_audio_pic->write_c().set(FUNC(playmark_state::hrdtimes_snd_control_w));
+	m_audio_pic->set_disable();       // Internal code is not dumped yet
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1228,12 +1242,12 @@ void playmark_state::hotmind(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &playmark_state::hotmind_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(playmark_state::irq6_line_hold)); // irq 2 and 6 point to the same location on hotmind
 
-	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);    // verified on pcb
-//  m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // Banking data output but not wired. Port C is wired to the OKI banking instead
-	m_audiocpu->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
-	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
-	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
-	m_audiocpu->write_c().set(FUNC(playmark_state::hrdtimes_snd_control_w));
+	PIC16C57(config, m_audio_pic, XTAL(24'000'000)/2);    // verified on pcb
+//  m_audio_pic->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // Banking data output but not wired. Port C is wired to the OKI banking instead
+	m_audio_pic->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
+	m_audio_pic->write_b().set(FUNC(playmark_state::playmark_oki_w));
+	m_audio_pic->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
+	m_audio_pic->write_c().set(FUNC(playmark_state::hrdtimes_snd_control_w));
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_value(0);
 
@@ -1269,12 +1283,12 @@ void playmark_state::luckboomh(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &playmark_state::luckboomh_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(playmark_state::irq6_line_hold));
 
-	PIC16C57(config, m_audiocpu, XTAL(24'000'000)/2);    // verified on pcb
-//  m_audiocpu->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // Banking data output but not wired. Port C is wired to the OKI banking instead
-	m_audiocpu->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
-	m_audiocpu->write_b().set(FUNC(playmark_state::playmark_oki_w));
-	m_audiocpu->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
-	m_audiocpu->write_c().set(FUNC(playmark_state::hrdtimes_snd_control_w));
+	PIC16C57(config, m_audio_pic, XTAL(24'000'000)/2);    // verified on pcb
+//  m_audio_pic->write_a().set(FUNC(playmark_state::playmark_oki_banking_w)); // Banking data output but not wired. Port C is wired to the OKI banking instead
+	m_audio_pic->read_b().set(FUNC(playmark_state::playmark_snd_command_r));
+	m_audio_pic->write_b().set(FUNC(playmark_state::playmark_oki_w));
+	m_audio_pic->read_c().set(FUNC(playmark_state::playmark_snd_flag_r));
+	m_audio_pic->write_c().set(FUNC(playmark_state::hrdtimes_snd_control_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1315,7 +1329,7 @@ ROM_START( bigtwin )
 	ROM_LOAD16_BYTE( "2.302",        0x000000, 0x80000, CRC(e6767f60) SHA1(ec0ba1c786e6fde04601c2f3f619e3c6545f9239) )
 	ROM_LOAD16_BYTE( "3.301",        0x000001, 0x80000, CRC(5aba6990) SHA1(4f664a91819fdd27821fa607425701d83fcbd8ce) )
 
-	ROM_REGION( 0x1000, "audiocpu", ROMREGION_ERASE00 ) // sound (PIC16C57)
+	ROM_REGION( 0x1000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
 //  ROM_LOAD( "16c57hs.bin",  0x0000, 0x1000, CRC(b4c95cc3) SHA1(7fc9b141e7782aa5c17310ee06db99d884537c30) )
 	// ROM will be copied here by the init code from "user1"
 
@@ -1343,7 +1357,7 @@ ROM_START( bigtwinb )
 	ROM_LOAD16_BYTE( "2.u67", 0x00000, 0x20000, CRC(f5cdf1a9) SHA1(974328cf2b4ec5834a519e3300ee1ad8bc4d5c04) )
 	ROM_LOAD16_BYTE( "3.u66", 0x00001, 0x20000, CRC(084e990f) SHA1(d7c2e08c7f7c7b453dd19dcf1f30bad46d943c8a) )
 
-	ROM_REGION( 0x1000, "audiocpu", ROMREGION_ERASE00 ) // sound (PIC16C57)
+	ROM_REGION( 0x1000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
 //  ROM_LOAD( "16c57hs.bin",  0x0000, 0x1000, CRC(b4c95cc3) SHA1(7fc9b141e7782aa5c17310ee06db99d884537c30) )
 	// ROM will be copied here by the init code from "user1"
 
@@ -1375,9 +1389,40 @@ ROM_START( wbeachvl )
 	ROM_LOAD16_BYTE( "wbv_02.bin",   0x000000, 0x40000, CRC(c7cca29e) SHA1(03af361081d688c4204a95f7f5babcc598b72c23) )
 	ROM_LOAD16_BYTE( "wbv_03.bin",   0x000001, 0x40000, CRC(db4e69d5) SHA1(119bf35a463d279ddde67ab08f6f1bab9f05cf0c) )
 
-	ROM_REGION( 0x1009, "audiocpu", ROMREGION_ERASE00 ) // sound (PIC16C57)
+	ROM_REGION( 0x1009, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
 	// 0x1000 rom data (actually 0x800 12-bit words), + 0x9 config bytes
 	ROM_LOAD( "pic16c57",       0x00000, 0x1009, CRC(35439064) SHA1(ab0c5bafd76a2cb2a2e5ddb9d0578fd7e2241e43) )
+
+	ROM_REGION( 0x600000, "gfx1", 0 )
+	ROM_LOAD( "wbv_10.bin",   0x000000, 0x80000, CRC(50680f0b) SHA1(ed76ef6ced70ba7e9558162aa94bbe9f19bbabe6) )
+	ROM_LOAD( "wbv_04.bin",   0x080000, 0x80000, CRC(df9cbff1) SHA1(7197939d9c4e8666d37266b6326134cfb4c761da) )
+	ROM_LOAD( "wbv_11.bin",   0x100000, 0x80000, CRC(e59ad0d1) SHA1(70dfc1ea45246fc8e24c96550563ab7a983f3824) )
+	ROM_LOAD( "wbv_05.bin",   0x180000, 0x80000, CRC(51245c3c) SHA1(5ac27d6fc22555766b4cdd532210199f4d7bd8bb) )
+	ROM_LOAD( "wbv_12.bin",   0x200000, 0x80000, CRC(36b87d0b) SHA1(702b8139d150c7cc9399dfa38536567aab40dcef) )
+	ROM_LOAD( "wbv_06.bin",   0x280000, 0x80000, CRC(9eb808ef) SHA1(0e46557665f1acef0606f22f043a391d1086cfce) )
+	ROM_LOAD( "wbv_13.bin",   0x300000, 0x80000, CRC(7021107b) SHA1(088fe3060dbb196e8000a3b4db1cfa3cb0c4b677) )
+	ROM_LOAD( "wbv_07.bin",   0x380000, 0x80000, CRC(4fff9fe8) SHA1(e29d3b4895692fd8559c9018432f32170aecdcc3) )
+	ROM_LOAD( "wbv_14.bin",   0x400000, 0x80000, CRC(0595e675) SHA1(82aebaedc919fa51b71f5519ee765ce9953d613a) )
+	ROM_LOAD( "wbv_08.bin",   0x480000, 0x80000, CRC(07e4b416) SHA1(a780ef0bd11897ab437359985f6e4852030ddbbf) )
+	ROM_LOAD( "wbv_15.bin",   0x500000, 0x80000, CRC(4e1a82d2) SHA1(9e66b52ba8e8144f772183396fc1a2fbb37ed2bc) )
+	ROM_LOAD( "wbv_09.bin",   0x580000, 0x20000, CRC(894ce354) SHA1(331aeabbe10cd645776da2dc0829acc2275e72dc) )
+	// 5a0000-5fffff is empty
+
+	// $00000-$20000 stays the same in all sound banks, the second half of the bank is what gets switched
+	ROM_REGION( 0x100000, "oki", 0 ) // Samples
+	ROM_LOAD( "wbv_01.bin",   0x00000, 0x100000, CRC(ac33f25f) SHA1(5d9ed16650aeb297d565376a99b31c88ab611668) )
+ROM_END
+
+ROM_START( wbeachvla ) // same as wbeachvl but with S87C751 audio CPU
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "wbv_02.bin",   0x000000, 0x40000, CRC(c7cca29e) SHA1(03af361081d688c4204a95f7f5babcc598b72c23) )
+	ROM_LOAD16_BYTE( "wbv_03.bin",   0x000001, 0x40000, CRC(db4e69d5) SHA1(119bf35a463d279ddde67ab08f6f1bab9f05cf0c) )
+
+	ROM_REGION( 0x1000, "audiomcs", ROMREGION_ERASE00 ) // sound (S87C751)
+	ROM_LOAD( "s87c751.u36",   0x000, 0x800, CRC(bc4daa35) SHA1(89f64cfdf1c2318d263ac08bf510aac11e0f85b4) )
+
+	ROM_REGION( 0x1000, "extracpu", ROMREGION_ERASE00 ) // on a small sub PCB with the second JAMMA connector
+	ROM_LOAD( "s87c751.u5",   0x000, 0x800, CRC(54a6004f) SHA1(b7b24e5a812f284099946fcbddd3cf804332f230) )
 
 	ROM_REGION( 0x600000, "gfx1", 0 )
 	ROM_LOAD( "wbv_10.bin",   0x000000, 0x80000, CRC(50680f0b) SHA1(ed76ef6ced70ba7e9558162aa94bbe9f19bbabe6) )
@@ -1404,7 +1449,7 @@ ROM_START( wbeachvl2 )
 	ROM_LOAD16_BYTE( "2.bin",   0x000000, 0x40000, CRC(8993487e) SHA1(c927ae655807f9046f66ff96a30bd2c6fa671566) )
 	ROM_LOAD16_BYTE( "3.bin",   0x000001, 0x40000, CRC(15904789) SHA1(640c80bbf7302529e1a39c2ae60e018ecb176478) )
 
-	ROM_REGION( 0x1009, "audiocpu", ROMREGION_ERASE00 ) // sound (PIC16C57)
+	ROM_REGION( 0x1009, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
 	// 0x1000 rom data (actually 0x800 12-bit words), + 0x9 config bytes
 	ROM_LOAD( "pic16c57",       0x00000, 0x1009, CRC(35439064) SHA1(ab0c5bafd76a2cb2a2e5ddb9d0578fd7e2241e43) )
 
@@ -1433,7 +1478,7 @@ ROM_START( wbeachvl3 ) // PCB marked PM285
 	ROM_LOAD16_BYTE( "2.u16",   0x000000, 0x40000, CRC(f0f4c282) SHA1(94850b45368c3d09629852adc8ca08164b7a7a94) )
 	ROM_LOAD16_BYTE( "3.u15",   0x000001, 0x40000, CRC(99775c21) SHA1(fa80a81c59142abcf751352d7a7f9e0d3b5172c9) )
 
-	ROM_REGION( 0x1009, "audiocpu", ROMREGION_ERASE00 ) // sound (PIC16C57)
+	ROM_REGION( 0x1009, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
 	// 0x1000 rom data (actually 0x800 12-bit words), + 0x9 config bytes
 	ROM_LOAD( "pic16c57",       0x00000, 0x1009, CRC(35439064) SHA1(ab0c5bafd76a2cb2a2e5ddb9d0578fd7e2241e43) )
 
@@ -1466,7 +1511,7 @@ ROM_START( excelsr ) // PCB marked EXC
 	ROM_LOAD16_BYTE( "20.u305", 0x200001, 0x80000, CRC(8692afe9) SHA1(b4411bad64a9a6efd8eb13dcf7c5eebfb5681f3d) )
 	ROM_LOAD16_BYTE( "17.u306", 0x200000, 0x80000, CRC(978f9a6b) SHA1(9514b97f071fd20740218a58af877765beffedad) )
 
-	ROM_REGION( 0x1000, "audiocpu", ROMREGION_ERASE00 ) // sound (PIC16C57)
+	ROM_REGION( 0x1000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
 	// ROM will be copied here by the init code from "user1"
 
 	ROM_REGION( 0x3000, "user1", 0 )
@@ -1498,7 +1543,7 @@ ROM_START( excelsra )
 	ROM_LOAD16_BYTE( "20.u305", 0x200001, 0x80000, CRC(8692afe9) SHA1(b4411bad64a9a6efd8eb13dcf7c5eebfb5681f3d) )
 	ROM_LOAD16_BYTE( "17.u306", 0x200000, 0x80000, CRC(978f9a6b) SHA1(9514b97f071fd20740218a58af877765beffedad) )
 
-	ROM_REGION( 0x1000, "audiocpu", ROMREGION_ERASE00 ) // sound (PIC16C57)
+	ROM_REGION( 0x1000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
 	// ROM will be copied here by the init code from "user1"
 
 	ROM_REGION( 0x3000, "user1", 0 )
@@ -1526,7 +1571,7 @@ ROM_START( hrdtimes ) // PCB marked Hard Times 28-06-94
 	ROM_LOAD16_BYTE( "31.u67",       0x00000, 0x80000, CRC(53eb041b) SHA1(7437da1ceb26e9518a3085560b8a42f37e77ace9) )
 	ROM_LOAD16_BYTE( "32.u66",       0x00001, 0x80000, CRC(f2c6b382) SHA1(d73affed091a261c4bfe17f409657e0a46b6c163) )
 
-	ROM_REGION( 0x1000, "audiocpu", ROMREGION_ERASE00 ) // sound (PIC16C57)
+	ROM_REGION( 0x1000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
 	// ROM will be copied here by the init code from "user1"
 
 	ROM_REGION( 0x3000, "user1", 0 )
@@ -1556,7 +1601,7 @@ ROM_START( hrdtimesa )
 	ROM_LOAD16_BYTE( "u67.bin",       0x00000, 0x80000, CRC(3e1334cb) SHA1(9523c04f92371a35c297280b42b1604e23790a1e) )
 	ROM_LOAD16_BYTE( "u66.bin",       0x00001, 0x80000, CRC(041ec30a) SHA1(00476ebd0a64cbd027be159cae7666d2df6d11ba) )
 
-	ROM_REGION( 0x1000, "audiocpu", ROMREGION_ERASE00 ) // sound (PIC16C57)
+	ROM_REGION( 0x1000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
 	// ROM will be copied here by the init code from "user1"
 
 	ROM_REGION( 0x3000, "user1", 0 )
@@ -1623,7 +1668,7 @@ ROM_START( hotmind ) // PCB marked Hard Times 28-06-94
 	ROM_LOAD16_BYTE( "21.u67",       0x00000, 0x20000, CRC(e9000f7f) SHA1(c19fee7b774d3f30f4d4025a63ec396ec119c855) )
 	ROM_LOAD16_BYTE( "22.u66",       0x00001, 0x20000, CRC(2c518ec5) SHA1(6d9e81ddb5793d64e22dc0254519b947f6ec6954) )
 
-	ROM_REGION( 0x1000, "audiocpu", ROMREGION_ERASE00 ) // sound (PIC16C57)
+	ROM_REGION( 0x1000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
 	// ROM will be copied here by the init code from "user1"
 
 	ROM_REGION( 0x3000, "user1", 0 )
@@ -1663,7 +1708,7 @@ ROM_START( luckboomh )
 	ROM_LOAD16_BYTE( "21.u67",       0x00000, 0x20000, CRC(5578dd75) SHA1(ed3c2ea302f8bfe49ab5d8c33e572492daa651ae) )
 	ROM_LOAD16_BYTE( "22.u66",       0x00001, 0x20000, CRC(1eb72a39) SHA1(d7ea9985013fd8cb89389829dbff2f2710a2297d) )
 
-	ROM_REGION( 0x2000, "audiocpu", ROMREGION_ERASE00 ) // sound (PIC16C57)
+	ROM_REGION( 0x2000, "audiopic", ROMREGION_ERASE00 ) // sound (PIC16C57)
 	// ROM will be copied here by the init code from "user1"
 	ROM_LOAD( "luckyboom_pic16c57-hs_io15.bin",  0x00000, 0x2000, BAD_DUMP CRC(c4b9c78e) SHA1(e85766383b22a62f19bf272d86d53c7fb1eb5ac4) ) // protected, contains upper nibble?
 
@@ -1706,7 +1751,7 @@ u8 playmark_state::playmark_asciitohex(u8 data)
 void playmark_state::playmark_decode_pic_hex_dump(void)
 {
 	u8 *playmark_PICROM_HEX = memregion("user1")->base();
-	u16 *playmark_PICROM = (u16 *)memregion("audiocpu")->base();
+	u16 *playmark_PICROM = (u16 *)memregion("audiopic")->base();
 	int32_t offs, data;
 	u16 src_pos = 0;
 	u16 dst_pos = 0;
@@ -1758,7 +1803,7 @@ void playmark_state::playmark_decode_pic_hex_dump(void)
 			data_lo = playmark_asciitohex((playmark_PICROM_HEX[src_pos + 3]));
 			data |= (data_hi << 12) | (data_lo << 8);
 
-			m_audiocpu->set_config(data);
+			m_audio_pic->set_config(data);
 
 			src_pos = 0x7fff;       // Force Exit
 		}
@@ -1774,14 +1819,15 @@ void playmark_state::init_pic_decode()
 
 
 
-GAME( 1995, bigtwin,   0,        bigtwin,   bigtwin,   playmark_state, init_pic_decode, ROT0, "Playmark", "Big Twin", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, bigtwinb,  bigtwin,  bigtwinb,  bigtwinb,  playmark_state, init_pic_decode, ROT0, "Playmark", "Big Twin (No Girls Conversion)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wbeachvl,  0,        wbeachvl,  wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wbeachvl2, wbeachvl, wbeachvl,  wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wbeachvl3, wbeachvl, wbeachvl,  wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, excelsr,   0,        excelsr,   excelsr,   playmark_state, init_pic_decode, ROT0, "Playmark", "Excelsior (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, excelsra,  excelsr,  excelsr,   excelsr,   playmark_state, init_pic_decode, ROT0, "Playmark", "Excelsior (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, hrdtimes,  0,        hrdtimes,  hrdtimes,  playmark_state, empty_init,      ROT0, "Playmark", "Hard Times (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, hrdtimesa, hrdtimes, hrdtimes,  hrdtimes,  playmark_state, empty_init,      ROT0, "Playmark", "Hard Times (set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, hotmind,   0,        hotmind,   hotmind,   playmark_state, init_pic_decode, ROT0, "Playmark", "Hot Mind (Hard Times hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, luckboomh, luckboom, luckboomh, luckboomh, playmark_state, init_pic_decode, ROT0, "Playmark", "Lucky Boom (Hard Times hardware)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, bigtwin,   0,        bigtwin,      bigtwin,   playmark_state, init_pic_decode, ROT0, "Playmark", "Big Twin", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, bigtwinb,  bigtwin,  bigtwinb,     bigtwinb,  playmark_state, init_pic_decode, ROT0, "Playmark", "Big Twin (No Girls Conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wbeachvl,  0,        wbeachvl_pic, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 1, PIC16C57 audio CPU)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // no music due to incorrect OKI banking / PIC hookup
+GAME( 1995, wbeachvla, wbeachvl, wbeachvl_mcs, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 1, S87C751 audio CPU)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // S87C751 not hooked up
+GAME( 1995, wbeachvl2, wbeachvl, wbeachvl_pic, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wbeachvl3, wbeachvl, wbeachvl_pic, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, excelsr,   0,        excelsr,      excelsr,   playmark_state, init_pic_decode, ROT0, "Playmark", "Excelsior (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, excelsra,  excelsr,  excelsr,      excelsr,   playmark_state, init_pic_decode, ROT0, "Playmark", "Excelsior (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, hrdtimes,  0,        hrdtimes,     hrdtimes,  playmark_state, empty_init,      ROT0, "Playmark", "Hard Times (set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, hrdtimesa, hrdtimes, hrdtimes,     hrdtimes,  playmark_state, empty_init,      ROT0, "Playmark", "Hard Times (set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, hotmind,   0,        hotmind,      hotmind,   playmark_state, init_pic_decode, ROT0, "Playmark", "Hot Mind (Hard Times hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, luckboomh, luckboom, luckboomh,    luckboomh, playmark_state, init_pic_decode, ROT0, "Playmark", "Lucky Boom (Hard Times hardware)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

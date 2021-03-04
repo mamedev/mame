@@ -89,9 +89,11 @@ const tiny_rom_entry *ep64_exdos_device::device_rom_region() const
 //  SLOT_INTERFACE( ep64_exdos_floppies )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( ep64_exdos_device::floppy_formats )
-	FLOPPY_EP64_FORMAT
-FLOPPY_FORMATS_END
+void ep64_exdos_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_EP64_FORMAT);
+}
 
 static void ep64_exdos_floppies(device_slot_interface &device)
 {

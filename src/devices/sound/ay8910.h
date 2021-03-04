@@ -137,11 +137,9 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
-	// trampolines for callbacks from fm.cpp
-	static void psg_set_clock(device_t *device, int clock) { downcast<ay8910_device *>(device)->ay_set_clock(clock); }
-	static void psg_write(device_t *device, int address, int data) { downcast<ay8910_device *>(device)->ay8910_write_ym(address, data); }
-	static int psg_read(device_t *device) { return downcast<ay8910_device *>(device)->ay8910_read_ym(); }
-	static void psg_reset(device_t *device) { downcast<ay8910_device *>(device)->ay8910_reset_ym(); }
+	void ay8910_write_ym(int addr, u8 data);
+	u8 ay8910_read_ym();
+	void ay8910_reset_ym();
 
 private:
 	static constexpr unsigned NUM_CHANNELS = 3;
@@ -280,10 +278,6 @@ private:
 	void ay8910_write_reg(int r, int v);
 	void build_mixer_table();
 	void ay8910_statesave();
-
-	void ay8910_write_ym(int addr, u8 data);
-	u8 ay8910_read_ym();
-	void ay8910_reset_ym();
 
 	// internal state
 	psg_type_t m_type;

@@ -384,7 +384,7 @@ int utf8_from_uchar(char *utf8string, size_t count, char32_t uchar)
 std::string utf8_from_uchar(char32_t uchar)
 {
 	char buffer[UTF8_CHAR_MAX];
-	auto len = utf8_from_uchar(buffer, ARRAY_LENGTH(buffer), uchar);
+	auto len = utf8_from_uchar(buffer, std::size(buffer), uchar);
 	return std::string(buffer, len);
 }
 

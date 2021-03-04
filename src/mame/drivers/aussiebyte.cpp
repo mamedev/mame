@@ -492,6 +492,8 @@ void aussiebyte_state::machine_start()
 	m_bank1->configure_entries(0, 16, m_p_mram, 0x4000);
 	m_bank2->configure_entries(0, 16, m_p_mram, 0x4000);
 	m_bankr0->configure_entry(16, memregion("roms")->base());
+
+	m_cnt = 0;
 }
 
 
@@ -577,8 +579,8 @@ void aussiebyte_state::aussiebyte(machine_config &config)
 	WD2797(config, m_fdc, 16_MHz_XTAL / 16);
 	m_fdc->intrq_wr_callback().set(FUNC(aussiebyte_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(aussiebyte_state::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", aussiebyte_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", aussiebyte_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", aussiebyte_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", aussiebyte_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	/* devices */
 	SY6545_1(config, m_crtc, 16_MHz_XTAL / 8);

@@ -124,8 +124,8 @@ mw-9.rom = ST M27C1001 / GFX
 #include "machine/kabuki.h"  // needed for decoding functions only
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
-#include "sound/ym2413.h"
 #include "sound/msm5205.h"
+#include "sound/ym2413.h"
 #include "screen.h"
 #include "speaker.h"
 

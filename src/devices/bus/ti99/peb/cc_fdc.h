@@ -68,7 +68,7 @@ protected:
 
 	void common_config(machine_config& config);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	// Link to the WD controller on the board.
 	required_device<wd_fdc_device_base>   m_wdc;

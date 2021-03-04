@@ -295,7 +295,7 @@ void jpmimpct_state::volume_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		int changed = m_volume_latch^(data&0xf0);
 		m_upd7759->set_rom_bank((data >> 1) & 3);
 		m_upd7759->reset_w(BIT(data, 0));
-		
+
 		if ( changed & 0x10)
 		{ // digital volume clock line changed
 			if ( !(data & 0x10) )

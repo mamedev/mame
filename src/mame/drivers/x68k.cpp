@@ -1601,10 +1601,12 @@ void x68030_state::driver_init()
 	m_is_32bit = true;
 }
 
-FLOPPY_FORMATS_MEMBER( x68k_state::floppy_formats )
-	FLOPPY_XDF_FORMAT,
-	FLOPPY_DIM_FORMAT
-FLOPPY_FORMATS_END
+void x68k_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_XDF_FORMAT);
+	fr.add(FLOPPY_DIM_FORMAT);
+}
 
 static void x68k_floppies(device_slot_interface &device)
 {

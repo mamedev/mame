@@ -528,8 +528,8 @@ void cosmac_device::device_reset()
 	m_df = 0;
 	m_p = 0;
 
-	for (int i = 0; i < ARRAY_LENGTH(m_r); i++)
-		m_r[i] = machine().rand() & 0xffff;
+	for (uint16_t &r : m_r)
+		r = machine().rand() & 0xffff;
 }
 
 

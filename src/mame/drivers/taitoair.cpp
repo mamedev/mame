@@ -201,7 +201,7 @@ perhaps? The two writes seem to take only two values.
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/2610intf.h"
+#include "sound/ym2610.h"
 #include "speaker.h"
 
 
@@ -784,14 +784,14 @@ ROM_START( topland )
 	ROM_LOAD64_BYTE( "b62-31.29",  0x000001, 0x20000, CRC(3feebfe3) SHA1(5b014d7d6fa1daf400ac1a437f551281debfdba6) )
 	ROM_LOAD64_BYTE( "b62-32.30",  0x000000, 0x20000, CRC(66806646) SHA1(d8e0c37b5227d8583d523164ffc6828b4508d5a3) )
 
-	ROM_REGION( 0xa0000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0xa0000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b62-17.5",  0x00000, 0x20000, CRC(36447066) SHA1(91c8cc4e99534b2d533895a342abb22766a20090) )
 	ROM_LOAD( "b62-16.4",  0x20000, 0x20000, CRC(203a5c27) SHA1(f6fc9322dea8d82bfec3be3fdc8616dc6adf666e) )
 	ROM_LOAD( "b62-15.3",  0x40000, 0x20000, CRC(e35ffe81) SHA1(f35afdd7cfd4c09907fb062beb5ae46c2286a381) )
 	ROM_LOAD( "b62-14.2",  0x60000, 0x20000, CRC(617948a3) SHA1(4660570fa6263c28cfae7ccdf154763cc6144896) )
 	ROM_LOAD( "b62-13.1",  0x80000, 0x20000, CRC(b37dc3ea) SHA1(198d4f828132316c624da998e49b1873b9886bf0) )
 
-	ROM_REGION( 0x20000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x20000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b62-18.31", 0x00000, 0x20000, CRC(3a4e687a) SHA1(43f07fe19dec351e851defdf9c7810fb9df04736) )
 
 	ROM_REGION( 0x02000, "user1", 0 )   /* unknown */
@@ -833,14 +833,14 @@ ROM_START( toplandj )
 	ROM_LOAD64_BYTE( "b62-31.29",  0x000001, 0x20000, CRC(3feebfe3) SHA1(5b014d7d6fa1daf400ac1a437f551281debfdba6) )
 	ROM_LOAD64_BYTE( "b62-32.30",  0x000000, 0x20000, CRC(66806646) SHA1(d8e0c37b5227d8583d523164ffc6828b4508d5a3) )
 
-	ROM_REGION( 0xa0000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0xa0000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b62-17.5",  0x00000, 0x20000, CRC(36447066) SHA1(91c8cc4e99534b2d533895a342abb22766a20090) )
 	ROM_LOAD( "b62-16.4",  0x20000, 0x20000, CRC(203a5c27) SHA1(f6fc9322dea8d82bfec3be3fdc8616dc6adf666e) )
 	ROM_LOAD( "b62-15.3",  0x40000, 0x20000, CRC(e35ffe81) SHA1(f35afdd7cfd4c09907fb062beb5ae46c2286a381) )
 	ROM_LOAD( "b62-14.2",  0x60000, 0x20000, CRC(617948a3) SHA1(4660570fa6263c28cfae7ccdf154763cc6144896) )
 	ROM_LOAD( "b62-13.1",  0x80000, 0x20000, CRC(b37dc3ea) SHA1(198d4f828132316c624da998e49b1873b9886bf0) )
 
-	ROM_REGION( 0x20000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x20000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b62-18.31", 0x00000, 0x20000, CRC(3a4e687a) SHA1(43f07fe19dec351e851defdf9c7810fb9df04736) )
 
 	ROM_REGION( 0x02000, "user1", 0 )   /* unknown */
@@ -883,14 +883,14 @@ ROM_START( ainferno )
 	ROM_LOAD64_BYTE( "c45-14.31", 0x000001, 0x20000, CRC(481b6f29) SHA1(0b047e805663b144dc2388c86438950fcdc29658) )
 	ROM_LOAD64_BYTE( "c45-18.43", 0x000000, 0x20000, CRC(ba7ecf3b) SHA1(dd073b7bfbf2f88432337027ae9fb6c4f02a538f) )
 
-	ROM_REGION( 0xa0000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0xa0000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c45-01.5",  0x00000, 0x20000, CRC(052997b2) SHA1(3aa8b4f759a1c196de39754a9ccdf4fabdbab388) )
 	ROM_LOAD( "c45-02.4",  0x20000, 0x20000, CRC(2fc0a88e) SHA1(6a635671fa2518f74015429ce580d7b7f00299ad) )
 	ROM_LOAD( "c45-03.3",  0x40000, 0x20000, CRC(0e1e5b5f) SHA1(a53d5ba01825f825e31a014cb4808f59ef86f0c9) )
 	ROM_LOAD( "c45-04.2",  0x60000, 0x20000, CRC(6d081044) SHA1(2d98bde55621762509dfc645d9ca5e267b1757ae) )
 	ROM_LOAD( "c45-05.1",  0x80000, 0x20000, CRC(6c59a808) SHA1(6264bbe4d7ad3070c6441859eb704a42910a82f0) )
 
-	ROM_REGION( 0x20000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x20000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c45-06.31", 0x00000, 0x20000, CRC(6a7976d4) SHA1(a465f9bb874b1eff08742b33cc3c364703b281ca) )
 
 	ROM_REGION( 0x1c00, "plds", 0 )
@@ -938,14 +938,14 @@ ROM_START( ainfernoj )
 	ROM_LOAD64_BYTE( "c45-14.31", 0x000001, 0x20000, CRC(481b6f29) SHA1(0b047e805663b144dc2388c86438950fcdc29658) )
 	ROM_LOAD64_BYTE( "c45-18.43", 0x000000, 0x20000, CRC(ba7ecf3b) SHA1(dd073b7bfbf2f88432337027ae9fb6c4f02a538f) )
 
-	ROM_REGION( 0xa0000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0xa0000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c45-01.5",  0x00000, 0x20000, CRC(052997b2) SHA1(3aa8b4f759a1c196de39754a9ccdf4fabdbab388) )
 	ROM_LOAD( "c45-02.4",  0x20000, 0x20000, CRC(2fc0a88e) SHA1(6a635671fa2518f74015429ce580d7b7f00299ad) )
 	ROM_LOAD( "c45-03.3",  0x40000, 0x20000, CRC(0e1e5b5f) SHA1(a53d5ba01825f825e31a014cb4808f59ef86f0c9) )
 	ROM_LOAD( "c45-04.2",  0x60000, 0x20000, CRC(6d081044) SHA1(2d98bde55621762509dfc645d9ca5e267b1757ae) )
 	ROM_LOAD( "c45-05.1",  0x80000, 0x20000, CRC(6c59a808) SHA1(6264bbe4d7ad3070c6441859eb704a42910a82f0) )
 
-	ROM_REGION( 0x20000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x20000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c45-06.31", 0x00000, 0x20000, CRC(6a7976d4) SHA1(a465f9bb874b1eff08742b33cc3c364703b281ca) )
 
 	ROM_REGION( 0x1c00, "plds", 0 )

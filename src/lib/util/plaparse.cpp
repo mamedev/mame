@@ -12,8 +12,6 @@
 
 #include "plaparse.h"
 
-#include "osdcomm.h"
-
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -214,11 +212,11 @@ static bool process_field(jed_data *data, const uint8_t **src, const uint8_t *sr
 
 	// find keyword
 	char dest[0x10];
-	memset(dest, 0, ARRAY_LENGTH(dest));
+	memset(dest, 0, sizeof(dest));
 	const uint8_t *seek = *src;
 	int destptr = 0;
 
-	while (seek < srcend && isalpha(*seek) && destptr < ARRAY_LENGTH(dest) - 1)
+	while (seek < srcend && isalpha(*seek) && destptr < sizeof(dest) - 1)
 	{
 		dest[destptr] = tolower(*seek);
 		seek++;

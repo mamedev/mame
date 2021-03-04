@@ -85,10 +85,10 @@ TODO:
 #include "cpu/z80/tmpz84c015.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
-#include "sound/ay8910.h"
-#include "sound/2203intf.h"
-#include "sound/ym2413.h"
 #include "sound/3812intf.h"
+#include "sound/ay8910.h"
+#include "sound/ym2203.h"
+#include "sound/ym2413.h"
 
 #include "layout/generic.h"
 #include "speaker.h"
@@ -1711,7 +1711,7 @@ INPUT_PORTS_START( HANAFUDA_KEYS_BET )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG ) PORT_PLAYER(2)         // "b"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)       // "s"
 INPUT_PORTS_END
-
+/*
 [[maybe_unused]] static INPUT_PORTS_START( HANAFUDA_KEYS_BET_ALT )
 	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(1)
@@ -1797,7 +1797,7 @@ INPUT_PORTS_END
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
-
+*/
 static INPUT_PORTS_START( cdracula )
 	PORT_START("P1")
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -4162,7 +4162,7 @@ MACHINE_RESET_MEMBER(dynax_state,dynax)
 	m_gekisha_val[0] = 0;
 	m_gekisha_val[1] = 0;
 
-	memset(m_palette_ram, 0, ARRAY_LENGTH(m_palette_ram));
+	std::fill(std::begin(m_palette_ram), std::end(m_palette_ram), 0);
 }
 
 MACHINE_START_MEMBER(dynax_state,hjingi)

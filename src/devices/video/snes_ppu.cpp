@@ -251,15 +251,12 @@ void snes_ppu_device::device_start()
 		}
 	}
 
-	for (int i = 0; i < ARRAY_LENGTH(m_scanlines); i++)
-	{
-		save_item(NAME(m_scanlines[i].enable), i);
-		save_item(NAME(m_scanlines[i].clip), i);
-		save_item(NAME(m_scanlines[i].buffer), i);
-		save_item(NAME(m_scanlines[i].priority), i);
-		save_item(NAME(m_scanlines[i].layer), i);
-		save_item(NAME(m_scanlines[i].blend_exception), i);
-	}
+	save_item(STRUCT_MEMBER(m_scanlines, enable));
+	save_item(STRUCT_MEMBER(m_scanlines, clip));
+	save_item(STRUCT_MEMBER(m_scanlines, buffer));
+	save_item(STRUCT_MEMBER(m_scanlines, priority));
+	save_item(STRUCT_MEMBER(m_scanlines, layer));
+	save_item(STRUCT_MEMBER(m_scanlines, blend_exception));
 
 	save_item(STRUCT_MEMBER(m_layer, window1_enabled));
 	save_item(STRUCT_MEMBER(m_layer, window1_invert));
@@ -283,8 +280,7 @@ void snes_ppu_device::device_start()
 	save_item(STRUCT_MEMBER(m_layer, mosaic_counter));
 	save_item(STRUCT_MEMBER(m_layer, mosaic_offset));
 
-	for (int i = 0; i < ARRAY_LENGTH(m_clipmasks); i++)
-		save_item(NAME(m_clipmasks[i]), i);
+	save_item(NAME(m_clipmasks));
 
 	save_item(NAME(m_oam.address));
 	save_item(NAME(m_oam.base_address));

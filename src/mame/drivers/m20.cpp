@@ -118,7 +118,7 @@ private:
 	uint8_t m_port21;
 	void install_memory();
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 	uint16_t viack_r();
 	uint16_t nviack_r();
 };
@@ -735,10 +735,11 @@ static void m20_floppies(device_slot_interface &device)
 	device.option_add("5dd", FLOPPY_525_DD);
 }
 
-FLOPPY_FORMATS_MEMBER( m20_state::floppy_formats )
-	FLOPPY_M20_FORMAT,
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
+void m20_state::floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_M20_FORMAT);
+}
 
 static void keyboard(device_slot_interface &device)
 {

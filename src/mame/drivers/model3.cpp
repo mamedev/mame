@@ -1364,7 +1364,16 @@ void model3_state::model3_init(int step)
 	m_sound_irq_enable = 0;
 	m_sound_timer->adjust(attotime::never);
 
+	m_irq_enable = 0;
+
+	m_pci_bus = 0;
+	m_pci_device = 0;
+	m_pci_function = 0;
+	m_pci_reg = 0;
+
 	m_dma_busy = 0;
+	m_dma_irq = 0;
+	m_dma_endian = 0;
 	m_real3d_dma_timer->adjust(attotime::never);
 
 	m_bank_crom->set_base(memregion( "user1" )->base() + 0x800000 ); /* banked CROM */
@@ -6140,6 +6149,7 @@ void model3_state::getbass_iocpu_mem(address_map &map)
 void model3_state::getbass_iocpu_io(address_map &map)
 {
 	map.global_mask(0xff);
+	//map(0x40, 0x47).w("iodac", FUNC(ad7805_device::write8));
 	map(0x60, 0x6f).rw("io60", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write));
 	map(0x70, 0x7f).rw("io70", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write));
 }
@@ -6151,9 +6161,17 @@ void model3_state::getbass(machine_config &config)
 	kl5c80a16_device &iocpu(KL5C80A16(config, "iocpu", 32_MHz_XTAL / 2));
 	iocpu.set_addrmap(AS_PROGRAM, &model3_state::getbass_iocpu_mem);
 	iocpu.set_addrmap(AS_IO, &model3_state::getbass_iocpu_io);
+	iocpu.in_p2_callback().set("ioeeprom", FUNC(eeprom_serial_93cxx_device::do_read)).lshift(3);
+	iocpu.out_p2_callback().set("ioeeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(4);
+	iocpu.out_p2_callback().set("ioeeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(5);
+	iocpu.out_p2_callback().set("ioeeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(6);
 
 	SEGA_315_5296(config, "io60", 32_MHz_XTAL);
 	SEGA_315_5649(config, "io70", 0);
+
+	EEPROM_93C46_16BIT(config, "ioeeprom"); // AK93C45
+
+	//AD7805(config, "iodac");
 }
 
 void model3_state::model3_15(machine_config &config)

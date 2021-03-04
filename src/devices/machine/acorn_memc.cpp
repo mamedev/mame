@@ -485,7 +485,8 @@ void acorn_memc_device::logical_w(offs_t offset, uint32_t data, uint32_t mem_mas
 uint32_t acorn_memc_device::high_mem_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t addr = offset << 2;
-	m_latchrom = false;
+	if (!machine().side_effects_disabled())
+		m_latchrom = false;
 
 	if (!m_spvmd)
 		return invalid_access(false, addr, 0, mem_mask);

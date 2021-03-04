@@ -48,13 +48,21 @@ ROM_START( applesurance )
 	ROM_LOAD( "applesurance 3.0 - 2732.bin", 0x000000, 0x001000, CRC(64eafec7) SHA1(723dc6cd32de5a0f27af7503764185ac58904c05) )
 ROM_END
 
-FLOPPY_FORMATS_MEMBER( diskiing_device::floppy_formats )
-	FLOPPY_A216S_FORMAT, FLOPPY_RWTS18_FORMAT, FLOPPY_EDD_FORMAT, FLOPPY_WOZ_FORMAT, FLOPPY_NIB_FORMAT
-FLOPPY_FORMATS_END
+void diskiing_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_A216S_FORMAT);
+	fr.add(FLOPPY_RWTS18_FORMAT);
+	fr.add(FLOPPY_EDD_FORMAT);
+	fr.add(FLOPPY_WOZ_FORMAT);
+	fr.add(FLOPPY_NIB_FORMAT);
+}
 
-FLOPPY_FORMATS_MEMBER( a2bus_diskiing13_device::floppy_formats )
-	FLOPPY_EDD_FORMAT, FLOPPY_WOZ_FORMAT, FLOPPY_NIB_FORMAT
-FLOPPY_FORMATS_END
+void a2bus_diskiing13_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_EDD_FORMAT);
+	fr.add(FLOPPY_WOZ_FORMAT);
+	fr.add(FLOPPY_NIB_FORMAT);
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration

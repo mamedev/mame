@@ -156,7 +156,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_hld_w);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -861,9 +861,11 @@ void oric_state::prav8d(machine_config &config)
 	oric(config, true);
 }
 
-FLOPPY_FORMATS_MEMBER( telestrat_state::floppy_formats )
-	FLOPPY_ORIC_DSK_FORMAT
-FLOPPY_FORMATS_END
+void telestrat_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ORIC_DSK_FORMAT);
+}
 
 static void telestrat_floppies(device_slot_interface &device)
 {

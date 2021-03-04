@@ -116,7 +116,7 @@ void cvs_state::cvs_scroll_w(uint8_t data)
 }
 
 
-VIDEO_START_MEMBER(cvs_state,cvs)
+void cvs_state::video_start()
 {
 	cvs_init_stars();
 

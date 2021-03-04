@@ -40,7 +40,7 @@ namespace
 			: device_t(mconfig, COCO_SYM12, tag, owner, clock)
 			, device_cococart_interface(mconfig, *this)
 			, m_pia(*this, "s12_pia")
-			, m_ay8910(*this, "s12_ay8910-%u", 1)
+			, m_ay8910(*this, "s12_ay8910.%u", 1)
 		{
 		}
 

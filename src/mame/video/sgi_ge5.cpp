@@ -342,17 +342,17 @@ void sgi_ge5_device::execute_run()
 					 */
 					if (space(1).read_dword(0x50b) == 0x004d0003)
 					{
-						if (token < ARRAY_LENGTH(token_puc))
+						if (token < std::size(token_puc))
 							string = token_puc[token];
 					}
 					else if (space(1).read_dword(0x50d) == 0x004d0005
 						|| space(1).read_dword(0x536) == 0x12345678
 						|| space(1).read_dword(0x540) == 0x12345678)
 					{
-						if (token < ARRAY_LENGTH(token_gl))
+						if (token < std::size(token_gl))
 							string = token_gl[token];
 					}
-					else if (token < ARRAY_LENGTH(token_diag))
+					else if (token < std::size(token_diag))
 						string = token_diag[token];
 
 					if (string)

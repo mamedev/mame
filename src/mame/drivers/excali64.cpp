@@ -92,7 +92,7 @@ private:
 	void porte4_w(u8 data);
 	u8 porte8_r();
 	void portec_w(u8 data);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 	DECLARE_WRITE_LINE_MEMBER(cent_busy_w);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 	u8 memory_read_byte(offs_t offset);
@@ -245,9 +245,11 @@ WRITE_LINE_MEMBER( excali64_state::cent_busy_w )
 	m_centronics_busy = state;
 }
 
-FLOPPY_FORMATS_MEMBER( excali64_state::floppy_formats )
-	FLOPPY_EXCALI64_FORMAT
-FLOPPY_FORMATS_END
+void excali64_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_EXCALI64_FORMAT);
+}
 
 static void excali64_floppies(device_slot_interface &device)
 {

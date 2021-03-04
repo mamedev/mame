@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<!--
+	Not dumped:
+	
+	The Princess and the Frog
+	Toy Story 3
+
+	(it also needs confirming if US / UK cartridges are different, dumps are all from UK cartridges)
+	
+-->
+<softwarelist name="leapfrog_zippity_cart" description="LeapFrog Zippity Cartridges">
+
+	<software name="cars" supported="no">
+		<description>The World of Cars - Driven to Learn (500-13589-B) (UK)</description>
+		<year>2009</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_zippity_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="500-13589-B - The World of Cars - Driven to Learn.bin" size="0x4200000" crc="f52e613e" sha1="81da432cbdf6f80ac1a42656978d4027b50e0587" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="disprin" supported="no">
+		<description>Disney Princess - Magical Movement &amp; Learning (500-13590-A) (UK)</description>
+		<year>2009</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_zippity_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="500-13590-A - DisneyPrincess - Magical Movement &amp; Learning.bin" size="0x4200000" crc="d060a223" sha1="00f454b629d7bcc7f58a43dd453d410a8ed60a99" />
+			</dataarea>
+		</part>
+	</software>
+	
+</softwarelist>

@@ -266,16 +266,6 @@ namespace {
 *  Structures
 *************************************/
 
-struct widget_data
-{
-	// ethernet register address
-	uint8_t           ethernet_addr;
-
-	// IRQ information
-	uint8_t           irq_num;
-	uint8_t           irq_mask;
-};
-
 class seattle_state : public driver_device
 {
 public:
@@ -343,6 +333,10 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(i40_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gearshift_r);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<nvram_device> m_nvram;
 	required_device<mips3_device> m_maincpu;
@@ -368,6 +362,16 @@ private:
 	output_finder<24> m_leds;
 
 	static const uint8_t translate49[7];
+
+	struct widget_data
+	{
+		// ethernet register address
+		uint8_t           ethernet_addr;
+
+		// IRQ information
+		uint8_t           irq_num;
+		uint8_t           irq_mask;
+	};
 
 	widget_data m_widget;
 	uint32_t m_interrupt_enable;
@@ -423,9 +427,6 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(ethernet_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(ioasic_irq);
@@ -483,6 +484,13 @@ void seattle_state::machine_start()
 	m_wheel_driver.resolve();
 	m_lamps.resolve();
 	m_leds.resolve();
+
+	m_pending_analog_read = 0;
+	m_ethernet_irq_state = 0;
+
+	m_widget.ethernet_addr = 0;
+	m_widget.irq_num = 0;
+	m_widget.irq_mask = 0;
 }
 
 

@@ -130,17 +130,16 @@ void device_image_interface::interface_config_complete()
 
 
 //-------------------------------------------------
-//  find_device_type - search trough list of
+//  find_device_type - search through list of
 //  device types to extract data
 //-------------------------------------------------
 
 const image_device_type_info *device_image_interface::find_device_type(iodevice_t type)
 {
-	int i;
-	for (i = 0; i < ARRAY_LENGTH(device_image_interface::m_device_info_array); i++)
+	for (const image_device_type_info &info : m_device_info_array)
 	{
-		if (m_device_info_array[i].m_type == type)
-			return &m_device_info_array[i];
+		if (info.m_type == type)
+			return &info;
 	}
 	return nullptr;
 }
@@ -172,11 +171,10 @@ const char *device_image_interface::device_brieftypename(iodevice_t type)
 
 iodevice_t device_image_interface::device_typeid(const char *name)
 {
-	int i;
-	for (i = 0; i < ARRAY_LENGTH(device_image_interface::m_device_info_array); i++)
+	for (const image_device_type_info &info : m_device_info_array)
 	{
-		if (!core_stricmp(name, m_device_info_array[i].m_name) || !core_stricmp(name, m_device_info_array[i].m_shortname))
-			return m_device_info_array[i].m_type;
+		if (!core_stricmp(name, info.m_name) || !core_stricmp(name, info.m_shortname))
+			return info.m_type;
 	}
 	return (iodevice_t)-1;
 }
@@ -333,7 +331,7 @@ void device_image_interface::message(const char *format, ...)
 
 	/* format the message */
 	va_start(args, format);
-	vsnprintf(buffer, ARRAY_LENGTH(buffer), format, args);
+	vsnprintf(buffer, std::size(buffer), format, args);
 	va_end(args);
 
 	/* display the popup for a standard amount of time */

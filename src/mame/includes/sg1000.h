@@ -121,7 +121,7 @@ private:
 	uint8_t ppi_pa_r();
 	void ppi_pc_w(uint8_t data);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 	void sf7000_io_map(address_map &map);
 	void sf7000_map(address_map &map);
 };

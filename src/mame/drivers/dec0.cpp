@@ -81,8 +81,13 @@ startup), $07 (same function as Bad Dudes) and $09 (same function as Bad Dudes).
 Most of the MCU program isn't utilised.
 
 
-Guru-Readme for Data East 16 bit games (Updated 7-Feb-2017)
 
+***************************************************************************
+
+Data East 16 bit games (Updated 19-Feb-2021)
+Hardware info by Guru
+
+The games that use this hardware include....
 Heavy Barrel
 Bad Dudes vs. Dragonninja
 Dragonninja
@@ -319,6 +324,69 @@ Notes:
       CN4       - 6-pin cable joining to Main Board
       ROMs      - All ROMs are 27512/27256 EPROM/maskROM
 
+
+Single PCB Types
+----------------
+
+Midnight Resistance
+Hardware info by Guru
+
+DE-0323-4
+|--------------------------------------------------------------------------|
+|   RCDM-I1          TMM2018  MB7114.22F |---------|              FH-11.21A|
+|J  RCDM-I1          TMM2018             |L7B0072  |  TMM2018     FH-10.20A|
+|A  RCDM-I1  FK15.18K  TB-6              |DATAEAST |  TMM2018     FH-09.18A|
+|M  RCDM-I1            TB-1-1            |BAC 06   |                       |
+|M  RCDM-I1  FK14.17K           |-----|  |---------|              FH-08.16A|
+|A   SW1                        | 6   |  |---------|                       |
+|    SW2     FK13.15K           | 8   |  |L7B0072  |              FH-07.15A|
+|                               | 0   |  |DATAEAST |  TMM2018              |
+|   RCDM-I1  FK12.13K  TB-5     | 0   |  |BAC 06   |  TMM2018     FH-05.13A|
+|   RCDM-I1                     | 0   |  |---------|                       |
+|   RCDM-I1                     | P   |                           FH05-.11A|
+|   RCDM-I1            TB-2     | 1   |  |---------|                       |
+|   RCDM-I1  TMM2063   TB-3     | 2   |  |L7B0072  |  TMM2063     FH04-.10A|
+|   RCDM-I1  TMM2063   TB-4     |-----|  |DATAEAST |  TMM2063              |
+|CN2         20MHz                       |BAC 06   |              FH-03.8A |
+|                                        |---------|                       |
+|CN3         24MHz     36       TMM2018               |---------| FH-02.6A |
+|                               TMM2018               |L7B0073  |          |
+|VOL     YM3014     1.056MHz    FH16-.5F   TMM2018    |DATAEAST | FH-01.4A |
+|UPC3403          YM3812        TMM2063    TMM2018    |MXC 06   |          |
+|        YM3014   YM2203          |-----|             |---------| FH-00.2A |
+|MB3730  UPC3403  M6295  FH17-.1H | 45  |                                  |
+|---------------------------------|-----|----------------------------------|
+Notes:
+      68000   - Clock input 10.000MHz [20/2]
+      YM2203  - Clock input 1.500MHz [24/8/2]
+      YM3812  - Clock input 3.000MHz [24/4/2]
+      M6295   - Clock 1.056MHz, pin 7 HIGH
+      45      - HuC6280 sound CPU in disguise as Data East custom chip 45. Clock input 6.000MHz [24/4] on pin 10
+      36      - Mysterious unknown SOP28 chip (possibly protection-related?)
+      UPC3403 - NEC uPC3403 quad operational amplifier
+      TMM2018 - 2k x8 SRAM, equivalent to 6116
+      TMM2063 - 8k x8 SRAM, equivalent to 6264
+      MB7114  - 256b x4-bit bipolar PROM marked 'TB-7', compatible with 82S129
+      RCDM-I1 - Custom resistor array
+      SW1/SW2 - 8-position DIP switch
+      CN2/CN3 - 13-pin connector for rotary joystick
+      L7B007x - DECO custom graphics chips (QFP160)
+                MXC 06 = Sprite Generator
+                BAC 06 = Tile Generator
+      TB-*    - PALs
+                TB1-1 = MMI PAL16R4
+                Other PALs are MMI PAL16L8
+      ROMs    - FK* = 27C010 EPROM
+                FH04/FH05 = 64kB Mask ROM (compatible with 27C512)
+                FH17 = 27C010 EPROM
+                Other FH-xx ROMs are 128kB Mask ROM (compatible with 27C010)
+                Labels on some ROMs FL & FH seem to be used interchangeably on different ROM sets but the contents is the same.
+
+      Measurements
+      ------------
+      VSync - 57.44530Hz
+      HSync - 15.1438kHz
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -329,9 +397,9 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m68705.h"
 #include "machine/upd4701.h"
-#include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "sound/ym2203.h"
 #include "speaker.h"
 
 
@@ -2212,6 +2280,8 @@ void dec0_state::midres(machine_config &config)
 	m_spritegen->set_colpri_callback(FUNC(dec0_state::midres_colpri_cb));
 
 	m_gfxdecode->set_info(gfx_midres);
+
+	subdevice<okim6295_device>("oki")->set_clock(XTAL(1'056'000));
 }
 
 void dec0_state::midresb(machine_config &config)

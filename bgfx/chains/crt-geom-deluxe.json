@@ -12,6 +12,15 @@
           "format": "%1.2f",
           "screen": "raster" },
         { "type": "float",
+          "name": "aperture_brightboost",
+          "text": "Shadow mask brightness boost",
+          "default":  0.4,
+          "max"    :  1.0,
+          "min"    :  0.0,
+          "step"   :  0.05,
+          "format": "%1.2f",
+          "screen": "raster" },
+        { "type": "float",
           "name": "phosphor_power",
           "text": "Phosphor decay power",
           "default":  1.2,
@@ -28,6 +37,24 @@
           "min"    :  0.0,
           "step"   :  0.01,
           "format": "%1.2f",
+          "screen": "raster" },
+        { "type": "float",
+          "name": "rasterbloom_smooth",
+          "text": "Raster bloom temporal smoothing",
+          "default":  0.5,
+          "max"    :  0.99,
+          "min"    :  0.0,
+          "step"   :  0.01,
+          "format": "%1.2f",
+          "screen": "raster" },
+        { "type": "float",
+          "name": "rasterbloom",
+          "text": "Raster bloom amplitude",
+          "default":  0.01,
+          "max"    :  0.1,
+          "min"    :  0.0,
+          "step"   :  0.001,
+          "format": "%1.3f",
           "screen": "raster" },
         { "type": "float",
           "name": "halation",
@@ -74,15 +101,15 @@
           "step"   :  0.1,
           "format": "%1.1f",
           "screen": "raster" },
-	{ "type": "vec2",
-	  "name": "angle",
-	  "text": "Tilt ",
-	  "default": [ 0.0, 0.0 ],
-	  "max"    : [ 1.0, 1.0 ],
-	  "min"    : [-1.0,-1.0 ],
-	  "step"   : 0.01,
-	  "format": "%1.2f",
-	  "screen": "raster" },
+        { "type": "vec2",
+          "name": "angle",
+          "text": "Tilt ",
+          "default": [ 0.0, 0.0 ],
+          "max"    : [ 1.0, 1.0 ],
+          "min"    : [-1.0,-1.0 ],
+          "step"   : 0.01,
+          "format": "%1.2f",
+          "screen": "raster" },
         { "type": "float",
           "name": "cornersize",
           "text": "Rounded corner size",
@@ -101,15 +128,15 @@
           "step"   :  100,
           "format": "%1.0f",
           "screen": "raster" },
-	{ "type": "vec2",
-	  "name": "overscan",
-	  "text": "Overscan ",
-	  "default": [ 1.0, 1.0 ],
-	  "max"    : [ 1.2, 1.2 ],
-	  "min"    : [ 0.8, 0.8 ],
-	  "step"   : 0.02,
-	  "format": "%1.2f",
-	  "screen": "raster" },
+        { "type": "vec2",
+          "name": "overscan",
+          "text": "Overscan ",
+          "default": [ 1.0, 1.0 ],
+          "max"    : [ 1.2, 1.2 ],
+          "min"    : [ 0.8, 0.8 ],
+          "step"   : 0.02,
+          "format": "%1.2f",
+          "screen": "raster" },
         { "type": "float",
           "name": "CRTgamma",
           "text": "Gamma of simulated CRT",
@@ -128,112 +155,128 @@
           "step"   :  0.05,
           "format": "%1.2f",
           "screen": "raster" },
-	{ "type": "vec2",
-	  "name": "aspect",
-	  "text": "Aspect ratio ",
-	  "default": [ 1.0, 0.75 ],
-	  "max"    : [ 1.0, 1.0 ],
-	  "min"    : [ 0.3, 0.3 ],
-	  "step"   : 0.01,
-	  "format": "%1.2f",
-	  "screen": "raster" }
+        { "type": "vec2",
+          "name": "aspect",
+          "text": "Aspect ratio ",
+          "default": [ 1.0, 0.75 ],
+          "max"    : [ 1.0, 1.0 ],
+          "min"    : [ 0.3, 0.3 ],
+          "step"   : 0.01,
+          "format": "%1.2f",
+          "screen": "raster" }
     ],
-	"targets": [
-		{	"name": "internal1",
-			"mode": "guest"
-		},
-		{	"name": "internal2",
-			"mode": "guest"
-		},
-		{	"name": "blur",
-			"mode": "guest"
-		},
-		{	"name": "phosphor",
-			"mode": "guest"
-		}
-
-	],
-	"passes": [
-		{
-			"effect": "crt-geom/phosphor_apply",
-			"applytint": true,
-			"name": "phosphor apply",
-			"uniforms": [
-			    { "uniform": "u_phosphor_power",    "slider": "phosphor_power" },
-			    { "uniform": "u_phosphor_amplitude","slider": "phosphor_amplitude" },
-			    { "uniform": "u_gamma",             "slider": "CRTgamma" }
-			],
-			"input": [
-			    { "sampler": "s_screen",   "target": "screen" },
-			    { "sampler": "s_phosphor", "target": "phosphor" }
-			],
-			"output": "internal1"
-		},
-		{
-			"effect": "crt-geom/phosphor_update",
-			"name": "phosphor update",
-			"uniforms": [
-			    { "uniform": "u_phosphor_power",    "slider": "phosphor_power" },
-			    { "uniform": "u_phosphor_amplitude","slider": "phosphor_amplitude" },
-			    { "uniform": "u_gamma",             "slider": "CRTgamma" }
-			],
-			"input": [
-			    { "sampler": "s_screen",   "target": "screen" },
-			    { "sampler": "s_phosphor", "target": "phosphor" }
-			],
-			"output": "phosphor"
-		},
-		{
-			"effect": "crt-geom/gaussx",
-			"name": "Gaussian blur x",
-			"uniforms": [
-			    { "uniform": "u_width", "slider": "blurwidth" },
-			    { "uniform": "u_aspect","slider": "aspect" },
-			    { "uniform": "u_gamma", "slider": "CRTgamma" }
-			],
-			"input": [
-			    { "sampler": "s_tex",   "target": "internal1" }
-			],
-			"output": "internal2"
-		},
-		{
-			"effect": "crt-geom/gaussy",
-			"name": "Gaussian blur y",
-			"uniforms": [
-			    { "uniform": "u_width", "slider": "blurwidth" },
-			    { "uniform": "u_aspect","slider": "aspect" },
-			    { "uniform": "u_gamma", "slider": "CRTgamma" }
-			],
-			"input": [
-			    { "sampler": "s_tex",   "target": "internal2" }
-			],
-			"output": "blur"
-		},
-		{
-			"effect": "crt-geom/crt-geom-deluxe",
-			"name": "CRT",
-			"uniforms": [
-			    { "uniform": "curvature",   "slider": "curvature" },
-			    { "uniform": "R",           "slider": "R" },
-			    { "uniform": "d",           "slider": "d" },
-			    { "uniform": "angle",       "slider": "angle" },
-			    { "uniform": "cornersize",  "slider": "cornersize" },
-			    { "uniform": "cornersmooth","slider": "cornersmooth" },
-			    { "uniform": "overscan",    "slider": "overscan" },
-			    { "uniform": "aspect",      "slider": "aspect" },
-			    { "uniform": "CRTgamma",    "slider": "CRTgamma" },
-			    { "uniform": "monitorgamma","slider": "monitorgamma" },
-			    { "uniform": "aperture_strength","slider": "aperture_strength" },
-			    { "uniform": "halation",    "slider": "halation" }
-			],
-		    
-			"input": [
-			    { "sampler": "mpass_texture", "target": "internal1" },
-			    { "sampler": "mask_texture", "texture": "bgfx/chains/crt-geom/aperture_1_2_bgr.png", "selection": "Shadow mask" },
-			    { "sampler": "blur_texture", "target": "blur" }
-			],
-
-			"output": "output"
-		}
-	]
+    "targets": [
+        { "name": "internal1",
+          "mode": "guest"
+        },
+        { "name": "internal2",
+          "mode": "guest"
+        },
+        { "name": "mipmap",
+          "mode": "guest"
+        },
+        { "name": "blur",
+          "mode": "guest"
+        },
+        { "name": "phosphor",
+          "mode": "guest"
+        }
+    ],
+    "passes": [
+        {
+            "effect": "crt-geom/phosphor_apply",
+            "applytint": true,
+            "name": "phosphor apply",
+            "uniforms": [
+                { "uniform": "u_phosphor_power",    "slider": "phosphor_power" },
+                { "uniform": "u_phosphor_amplitude","slider": "phosphor_amplitude" },
+                { "uniform": "u_gamma",             "slider": "CRTgamma" }
+            ],
+            "input": [
+                { "sampler": "s_screen",   "target": "screen" },
+                { "sampler": "s_phosphor", "target": "phosphor" }
+            ],
+            "output": "internal1"
+        },
+        {
+            "effect": "crt-geom/mipmap8",
+            "name": "mipmap",
+            "uniforms": [
+                { "uniform": "u_smooth",   "slider": "rasterbloom_smooth" }
+            ],
+            "input": [
+                { "sampler": "s_screen",   "target": "internal1" },
+                { "sampler": "s_mipmap",   "target": "mipmap" }
+            ],
+            "output": "mipmap"
+        },
+        {
+            "effect": "crt-geom/phosphor_update",
+            "name": "phosphor update",
+            "uniforms": [
+                { "uniform": "u_phosphor_power",    "slider": "phosphor_power" },
+                { "uniform": "u_phosphor_amplitude","slider": "phosphor_amplitude" },
+                { "uniform": "u_gamma",             "slider": "CRTgamma" }
+            ],
+            "input": [
+                { "sampler": "s_screen",   "target": "screen" },
+                { "sampler": "s_phosphor", "target": "phosphor" }
+            ],
+            "output": "phosphor"
+        },
+        {
+            "effect": "crt-geom/gaussx",
+            "name": "Gaussian blur x",
+            "uniforms": [
+                { "uniform": "u_width", "slider": "blurwidth" },
+                { "uniform": "u_aspect","slider": "aspect" },
+                { "uniform": "u_gamma", "slider": "CRTgamma" }
+            ],
+            "input": [
+                { "sampler": "s_tex",   "target": "internal1" }
+            ],
+            "output": "internal2"
+        },
+        {
+            "effect": "crt-geom/gaussy",
+            "name": "Gaussian blur y",
+            "uniforms": [
+                { "uniform": "u_width", "slider": "blurwidth" },
+                { "uniform": "u_aspect","slider": "aspect" },
+                { "uniform": "u_gamma", "slider": "CRTgamma" }
+            ],
+            "input": [
+                { "sampler": "s_tex",   "target": "internal2" }
+            ],
+            "output": "blur"
+        },
+        {
+            "effect": "crt-geom/crt-geom-deluxe",
+            "name": "CRT",
+            "uniforms": [
+                { "uniform": "curvature",   "slider": "curvature" },
+                { "uniform": "R",           "slider": "R" },
+                { "uniform": "d",           "slider": "d" },
+                { "uniform": "angle",       "slider": "angle" },
+                { "uniform": "cornersize",  "slider": "cornersize" },
+                { "uniform": "cornersmooth","slider": "cornersmooth" },
+                { "uniform": "overscan",    "slider": "overscan" },
+                { "uniform": "aspect",      "slider": "aspect" },
+                { "uniform": "CRTgamma",    "slider": "CRTgamma" },
+                { "uniform": "monitorgamma","slider": "monitorgamma" },
+                { "uniform": "aperture_strength","slider": "aperture_strength" },
+                { "uniform": "aperture_brightboost","slider": "aperture_brightboost" },
+                { "uniform": "halation",    "slider": "halation" },
+                { "uniform": "blurwidth",   "slider": "blurwidth" },
+                { "uniform": "rasterbloom", "slider": "rasterbloom" }
+            ],
+            "input": [
+                { "sampler": "mpass_texture", "target": "internal1" },
+                { "sampler": "mask_texture", "texture": "bgfx/chains/crt-geom/aperture_1_2_bgr.png", "selection": "Shadow mask" },
+                { "sampler": "blur_texture", "target": "blur" },
+                { "sampler": "mipmap_texture", "target": "mipmap" }
+            ],
+            "output": "output"
+        }
+    ]
 }

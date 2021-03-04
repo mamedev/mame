@@ -604,8 +604,8 @@ eof:
 
 		get_dirent_fname(fname, &rsent);
 
-		snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", fname);
-		snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%d %c", (int) rsent.ftype, (char) (rsent.asciiflag + 'B'));
+		snprintf(ent.filename, std::size(ent.filename), "%s", fname);
+		snprintf(ent.attr, std::size(ent.attr), "%d %c", (int) rsent.ftype, (char) (rsent.asciiflag + 'B'));
 	}
 	return IMGTOOLERR_SUCCESS;
 }

@@ -379,10 +379,12 @@ void ti_fdc_device::device_config_complete()
 	if (subdevice("2")!=nullptr) m_floppy[2] = static_cast<floppy_image_device*>(subdevice("2")->subdevices().first());
 }
 
-FLOPPY_FORMATS_MEMBER(ti_fdc_device::floppy_formats)
-	FLOPPY_TI99_SDF_FORMAT,
-	FLOPPY_TI99_TDF_FORMAT
-FLOPPY_FORMATS_END
+void ti_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_TI99_SDF_FORMAT);
+	fr.add(FLOPPY_TI99_TDF_FORMAT);
+}
 
 static void tifdc_floppies(device_slot_interface &device)
 {

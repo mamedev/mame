@@ -284,8 +284,8 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "machine/adc0808.h"
 #include "machine/eepromser.h"
-#include "sound/2610intf.h"
 #include "sound/flt_vol.h"
+#include "sound/ym2610.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -673,10 +673,10 @@ ROM_START( othunder )
 	ROM_REGION16_LE( 0x80000, "sprmap_rom", 0 )
 	ROM_LOAD16_WORD( "b67-05.ic43", 0x00000, 0x80000, CRC(9593e42b) SHA1(54b5538c302a1734ff4b752ab87a8c45d5c6b23d) )  /* index used to create 64x64 sprites on the fly */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b67-08.ic67", 0x00000, 0x80000, CRC(458f41fb) SHA1(acca7c95acd1ae7a1cc51fb7fe644ad6d00ff5ac) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b67-07.ic44", 0x00000, 0x80000, CRC(4f834357) SHA1(f34705ce64870a8b24ec2639505079cc031fb719) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
@@ -711,10 +711,10 @@ ROM_START( othundero )
 	ROM_REGION16_LE( 0x80000, "sprmap_rom", 0 )
 	ROM_LOAD16_WORD( "b67-05.ic43", 0x00000, 0x80000, CRC(9593e42b) SHA1(54b5538c302a1734ff4b752ab87a8c45d5c6b23d) )  /* index used to create 64x64 sprites on the fly */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b67-08.ic67", 0x00000, 0x80000, CRC(458f41fb) SHA1(acca7c95acd1ae7a1cc51fb7fe644ad6d00ff5ac) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b67-07.ic44", 0x00000, 0x80000, CRC(4f834357) SHA1(f34705ce64870a8b24ec2639505079cc031fb719) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
@@ -749,10 +749,10 @@ ROM_START( othunderu )
 	ROM_REGION16_LE( 0x80000, "sprmap_rom", 0 )
 	ROM_LOAD16_WORD( "b67-05.ic43", 0x00000, 0x80000, CRC(9593e42b) SHA1(54b5538c302a1734ff4b752ab87a8c45d5c6b23d) )  /* index used to create 64x64 sprites on the fly */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b67-08.ic67", 0x00000, 0x80000, CRC(458f41fb) SHA1(acca7c95acd1ae7a1cc51fb7fe644ad6d00ff5ac) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b67-07.ic44", 0x00000, 0x80000, CRC(4f834357) SHA1(f34705ce64870a8b24ec2639505079cc031fb719) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
@@ -787,10 +787,10 @@ ROM_START( othunderuo )
 	ROM_REGION16_LE( 0x80000, "sprmap_rom", 0 )
 	ROM_LOAD16_WORD( "b67-05.ic43", 0x00000, 0x80000, CRC(9593e42b) SHA1(54b5538c302a1734ff4b752ab87a8c45d5c6b23d) )  /* index used to create 64x64 sprites on the fly */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b67-08.ic67", 0x00000, 0x80000, CRC(458f41fb) SHA1(acca7c95acd1ae7a1cc51fb7fe644ad6d00ff5ac) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b67-07.ic44", 0x00000, 0x80000, CRC(4f834357) SHA1(f34705ce64870a8b24ec2639505079cc031fb719) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
@@ -825,10 +825,10 @@ ROM_START( othunderj )
 	ROM_REGION16_LE( 0x80000, "sprmap_rom", 0 )
 	ROM_LOAD16_WORD( "b67-05.ic43", 0x00000, 0x80000, CRC(9593e42b) SHA1(54b5538c302a1734ff4b752ab87a8c45d5c6b23d) )  /* index used to create 64x64 sprites on the fly */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b67-08.ic67", 0x00000, 0x80000, CRC(458f41fb) SHA1(acca7c95acd1ae7a1cc51fb7fe644ad6d00ff5ac) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b67-07.ic44", 0x00000, 0x80000, CRC(4f834357) SHA1(f34705ce64870a8b24ec2639505079cc031fb719) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
@@ -863,10 +863,10 @@ ROM_START( othunderjsc ) // SC stands for Shopping Center. It was put in a small
 	ROM_REGION16_LE( 0x80000, "sprmap_rom", 0 )
 	ROM_LOAD16_WORD( "b67-05.ic43", 0x00000, 0x80000, CRC(9593e42b) SHA1(54b5538c302a1734ff4b752ab87a8c45d5c6b23d) )  /* index used to create 64x64 sprites on the fly */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b67-08.ic67", 0x00000, 0x80000, CRC(458f41fb) SHA1(acca7c95acd1ae7a1cc51fb7fe644ad6d00ff5ac) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b67-07.ic44", 0x00000, 0x80000, CRC(4f834357) SHA1(f34705ce64870a8b24ec2639505079cc031fb719) )
 
 	ROM_REGION( 0x0800, "plds", 0 )

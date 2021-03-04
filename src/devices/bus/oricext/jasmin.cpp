@@ -11,9 +11,11 @@ ROM_START( jasmin )
 	ROM_LOAD("jasmin.rom", 0, 0x800, CRC(37220e89) SHA1(70e59b8abd67092f050462abc6cb5271e4c15f01) )
 ROM_END
 
-FLOPPY_FORMATS_MEMBER( oric_jasmin_device::floppy_formats )
-	FLOPPY_ORIC_DSK_FORMAT
-FLOPPY_FORMATS_END
+void oric_jasmin_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ORIC_DSK_FORMAT);
+}
 
 static void jasmin_floppies(device_slot_interface &device)
 {

@@ -712,7 +712,7 @@ void state_s::set_o(unsigned char v)
 	assert(oy < 256);
 
 	unsigned char a = v;
-	for (int i = 0; i < ARRAY_LENGTH(colour); i++)
+	for (int i = 0; i < std::size(colour); i++)
 	{
 		unsigned char b = colour[i];
 		colour[i] = a;

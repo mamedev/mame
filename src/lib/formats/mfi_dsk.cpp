@@ -115,9 +115,13 @@ bool mfi_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 	io_generic_read(io, &h, 0, sizeof(header));
 	int resolution = h.cyl_count >> RESOLUTION_SHIFT;
 	h.cyl_count &= CYLINDER_MASK;
+
 	io_generic_read(io, &entries, sizeof(header), (h.cyl_count << resolution)*h.head_count*sizeof(entry));
 
-	image->set_variant(h.variant);
+	image->set_form_variant(h.form_factor, h.variant);
+
+	if(!h.cyl_count)
+		return true;
 
 	std::vector<uint8_t> compressed;
 

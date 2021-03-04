@@ -85,7 +85,7 @@ private:
 };
 
 
-template <uint8_t Which> 
+template <uint8_t Which>
 TILE_GET_INFO_MEMBER(koftball_state::get_tile_info)
 {
 	int data = m_videoram[Which][tile_index];

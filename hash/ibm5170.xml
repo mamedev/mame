@@ -10927,6 +10927,7 @@ license:CC0
 	</software>
 
 	<software name="epdeepsea">
+		<!-- bad dump - Modified root and OEM ID -->
 		<description>Epic Pinball: Deep Sea</description>
 		<year>1994</year>
 		<publisher>B&amp;N Companies</publisher>
@@ -10934,11 +10935,10 @@ license:CC0
 		<info name="version" value="2.1" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Pinball Deep Sea [B&amp;N Companies] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="caae0723" sha1="625694111fc8cf946d2009caa3c6ca927e0c6779"/>
+				<rom name="Pinball Deep Sea [B&amp;N Companies] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="caae0723" sha1="625694111fc8cf946d2009caa3c6ca927e0c6779" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
-
 
 	<software name="epenigma">
 		<description>Epic Pinball: Enigma</description>
@@ -13716,6 +13716,29 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mixupft">
+		<description>Mixed-Up Fairy Tales</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="1.000" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Mixed-Up Fairy Tales [Sierra] [1991] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="90175ae9" sha1="5a7dfe8b259f698a7ecd2380154c9b23f3df7509"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Mixed-Up Fairy Tales [Sierra] [1991] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="6b1a9fd0" sha1="69d515b27a199e0e330208453267b39880493412"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Mixed-Up Fairy Tales [Sierra] [1991] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="16701afa" sha1="d098b4719c367098da905d018fe5781bb9241707"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="monkey2">
 		<description>Monkey Island 2: LeChuck's Revenge (3.5")</description>
 		<year>1991</year>
@@ -16468,6 +16491,18 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Wolfenstein 3-D (v1.4) [Mindscape] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="281c99b0" sha1="584daa625862c0d1e380eeabef569fcf24d639d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wolf3dsw" cloneof="wolf3d">
+		<description>Wolfenstein 3-D (shareware, Titanium Seal release)</description>
+		<year>1994</year>
+		<publisher>Titanium Seal</publisher>
+		<info name="developer" value="id Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wolfenstein 3D (shareware) [Titanium Seal] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7b233ee7" sha1="ce2bbf3c5b52602ebea2b78a8d4b0a839820ce44"/>
 			</dataarea>
 		</part>
 	</software>

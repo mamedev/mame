@@ -276,8 +276,8 @@ void shine_state::shine(machine_config &config)
 
 	FD1771(config, m_fdc, 1000000);
 
-	FLOPPY_CONNECTOR(config, m_floppy[0], "525qd", FLOPPY_525_QD, true, floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[1], "525qd", FLOPPY_525_QD, false, floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], "525qd", FLOPPY_525_QD, true, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], "525qd", FLOPPY_525_QD, false, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);

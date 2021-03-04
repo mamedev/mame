@@ -51,7 +51,8 @@ private:
 		SR_WINDOW_EDGE_1,
 		SW_WINDOW_LOAD,
 		SW_WINDOW_MIDDLE,
-		SW_WINDOW_END
+		SW_WINDOW_END,
+		SW_UNDERRUN,
 	};
 
 	// ism buffered byte marks
@@ -108,6 +109,7 @@ private:
 	u8 m_iwm_data, m_iwm_whd, m_iwm_mode, m_iwm_status, m_iwm_control, m_iwm_rw_bit_count;
 	u8 m_iwm_rsh, m_iwm_wsh;
 	u8 m_iwm_to_ism_counter;
+	u8 m_iwm_devsel;
 
 	u64 time_to_cycles(const attotime &tm) const;
 	attotime cycles_to_time(u64 cycles) const;

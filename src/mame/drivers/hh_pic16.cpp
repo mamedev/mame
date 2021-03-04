@@ -1121,7 +1121,8 @@ ROM_END
   * PIC 1655A-51
   * 2 7seg LEDs + 21 other LEDs, 1-bit sound
 
-  The ROM is nearly identical to hccbaskb, the shell/overlay is the same as
+  It is a clone of Mattel Basketball, but at lower speed.
+  The ROM is nearly identical to hccbaskb, the housing/overlay is the same as
   U.S. Games/Tandy Trick Shot Basketball.
 
 ***************************************************************************/
@@ -1204,7 +1205,7 @@ INPUT_PORTS_END
 void tbaskb_state::tbaskb(machine_config &config)
 {
 	/* basic machine hardware */
-	PIC1655(config, m_maincpu, 950000); // approximation - RC osc. R=18K, C=47pF
+	PIC1655(config, m_maincpu, 800000); // approximation - RC osc. R=18K, C=47pF
 	m_maincpu->read_a().set(FUNC(tbaskb_state::read_a));
 	m_maincpu->write_b().set(FUNC(tbaskb_state::write_b));
 	m_maincpu->read_c().set_constant(0xff);
@@ -1443,7 +1444,7 @@ INPUT_PORTS_END
 void hccbaskb_state::hccbaskb(machine_config &config)
 {
 	/* basic machine hardware */
-	PIC1655(config, m_maincpu, 950000); // approximation - RC osc. R=15K, C=47pF
+	PIC1655(config, m_maincpu, 800000); // approximation - RC osc. R=15K, C=47pF
 	m_maincpu->read_a().set(FUNC(hccbaskb_state::read_a));
 	m_maincpu->write_b().set(FUNC(hccbaskb_state::write_b));
 	m_maincpu->read_c().set_constant(0xff);

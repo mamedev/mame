@@ -184,6 +184,7 @@ public:
 		m_adpcm_select(*this, "adpcm_select%u", 1U),
 		m_soundbank(*this, "soundbank")
 	{
+		std::fill(std::begin(m_automat_scroll_regs), std::end(m_automat_scroll_regs), 0);
 	}
 
 	void secretab(machine_config &config);

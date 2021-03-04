@@ -9,6 +9,17 @@
 #include "emu.h"
 #include "floppy.h"
 
+#include "formats/d88_dsk.h"
+#include "formats/dfi_dsk.h"
+#include "formats/hxchfe_dsk.h"
+#include "formats/hxcmfm_dsk.h"
+#include "formats/imd_dsk.h"
+#include "formats/mfi_dsk.h"
+#include "formats/td0_dsk.h"
+#include "formats/cqm_dsk.h"
+#include "formats/dsk_dsk.h"
+#include "formats/pc_dsk.h"
+
 #include "speaker.h"
 #include "formats/imageutl.h"
 #include "zippath.h"
@@ -124,19 +135,55 @@ DEFINE_DEVICE_TYPE(MFD51W, mfd51w_device,  "mfd51w",  "Apple/Sony 3.5 DD (400/80
 DEFINE_DEVICE_TYPE(MFD75W, mfd75w_device,  "mfd75w",  "Apple/Sony 3.5 HD (Superdrive)")
 
 
-const floppy_format_type floppy_image_device::default_floppy_formats[] = {
-	FLOPPY_D88_FORMAT,
-	FLOPPY_DFI_FORMAT,
-	FLOPPY_HFE_FORMAT,
-	FLOPPY_IMD_FORMAT,
-	FLOPPY_IPF_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_MFM_FORMAT,
-	FLOPPY_TD0_FORMAT,
-	FLOPPY_CQM_FORMAT,
-	FLOPPY_DSK_FORMAT,
-	nullptr
-};
+format_registration::format_registration()
+{
+	add(FLOPPY_MFI_FORMAT); // Our generic format
+	add(FLOPPY_DFI_FORMAT); // Flux format, dying
+}
+
+void format_registration::add_fm_containers()
+{
+	add(FLOPPY_HFE_FORMAT);
+	add(FLOPPY_MFM_FORMAT);
+	add(FLOPPY_TD0_FORMAT);
+	add(FLOPPY_IMD_FORMAT);
+}
+
+void format_registration::add_mfm_containers()
+{
+	add_fm_containers();
+
+	add(FLOPPY_D88_FORMAT);
+	add(FLOPPY_CQM_FORMAT);
+	add(FLOPPY_DSK_FORMAT);
+}
+
+void format_registration::add_pc_formats()
+{
+	add_mfm_containers();
+
+	add(FLOPPY_PC_FORMAT);
+}
+
+void format_registration::add(floppy_format_type format)
+{
+	m_formats.push_back(format);
+}
+
+void floppy_image_device::default_fm_floppy_formats(format_registration &fr)
+{
+	fr.add_fm_containers();
+}
+
+void floppy_image_device::default_mfm_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+}
+
+void floppy_image_device::default_pc_floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+}
 
 floppy_connector::floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, FLOPPY_CONNECTOR, tag, owner, clock),
@@ -150,7 +197,7 @@ floppy_connector::~floppy_connector()
 {
 }
 
-void floppy_connector::set_formats(const floppy_format_type _formats[])
+void floppy_connector::set_formats(std::function<void (format_registration &fr)> _formats)
 {
 	formats = _formats;
 }
@@ -252,14 +299,18 @@ void floppy_image_device::setup_led_cb(led_cb cb)
 	cur_led_cb = cb;
 }
 
-void floppy_image_device::set_formats(const floppy_format_type *formats)
+void floppy_image_device::set_formats(std::function<void (format_registration &fr)> formats)
 {
+	format_registration fr;
+	if(formats)
+		formats(fr);
+
 	extension_list[0] = '\0';
 	fif_list = nullptr;
-	for(int cnt=0; formats[cnt]; cnt++)
+	for(floppy_format_type fft : fr.m_formats)
 	{
 		// allocate a new format
-		floppy_image_format_t *fif = formats[cnt]();
+		floppy_image_format_t *fif = fft();
 		if(!fif_list)
 			fif_list = fif;
 		else
@@ -1132,7 +1183,7 @@ void floppy_image_device::write_zone(uint32_t *buf, int &cells, int &index, uint
 
 void floppy_image_device::set_write_splice(const attotime &when)
 {
-	if(image) {
+	if(image && !mon) {
 		image_dirty = true;
 		attotime base;
 		int splice_pos = find_position(base, when);
@@ -2633,6 +2684,14 @@ bool oa_d34v_device::is_2m() const
 	return false;
 }
 
+void oa_d34v_device::track_changed()
+{
+	// Skip the rpm-setting mac generic version, the single-sided
+	// drive's rpm is externally controlled through a PWM signal.
+
+	floppy_image_device::track_changed();
+}
+
 mfd51w_device::mfd51w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : mac_floppy_device(mconfig, MFD51W, tag, owner, clock)
 {
 }
@@ -2671,5 +2730,11 @@ void mfd75w_device::setup_characteristics()
 
 bool mfd75w_device::is_2m() const
 {
+	if(!image)
+		return false;
+
+	if(image->get_variant() == floppy_image::SSDD || image->get_variant() == floppy_image::DSDD)
+		return true;
+
 	return false;
 }

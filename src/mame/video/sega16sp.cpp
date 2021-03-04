@@ -41,7 +41,7 @@ sega_16bit_sprite_device::sega_16bit_sprite_device(const machine_config &mconfig
 	, m_flip(false)
 {
 	// default to 1:1 bank mapping
-	for (int bank = 0; bank < ARRAY_LENGTH(m_bank); bank++)
+	for (int bank = 0; bank < std::size(m_bank); bank++)
 		m_bank[bank] = bank;
 }
 

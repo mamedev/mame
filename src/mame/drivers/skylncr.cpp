@@ -170,7 +170,7 @@ public:
 	READ_LINE_MEMBER(mbutrfly_prot_r);
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); save_item(NAME(m_nmi_enable)); }
+	virtual void machine_start() override;
 	virtual void video_start() override;
 
 private:
@@ -248,6 +248,15 @@ TILE_GET_INFO_MEMBER(skylncr_state::get_reel_tile_info)
 	tileinfo.set(1, Which == 0 ? code & 0x7fff : code, pal^1, TILE_FLIPYX( 0 ));
 }
 
+
+void skylncr_state::machine_start()
+{
+	m_lamps.resolve();
+
+	save_item(NAME(m_nmi_enable));
+
+	m_nmi_enable = 0;
+}
 
 void skylncr_state::video_start()
 {

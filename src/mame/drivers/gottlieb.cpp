@@ -268,17 +268,6 @@ void gottlieb_state::machine_reset()
 	/* if we have a laserdisc, reset our philips code callback for the next line 17 */
 	if (m_laserdisc != nullptr)
 		m_laserdisc_philips_timer->adjust(m_screen->time_until_pos(17), 17);
-
-	if (m_ramrom_config)
-	{
-		switch (m_ramrom_config->read() & 0x03)
-		{
-			case 0x00: m_view_1000.select(0); m_view_2000.select(0); break;
-			case 0x01: m_view_1000.select(0); m_view_2000.select(1); break;
-			case 0x02: m_view_1000.select(1); m_view_2000.select(0); break; // no sets uses this but physically possible
-			case 0x03: m_view_1000.select(1); m_view_2000.select(1); break;
-		}
-	}
 }
 
 
@@ -784,16 +773,10 @@ void gottlieb_state::reactor_map(address_map &map)
 }
 
 
-void gottlieb_state::gottlieb_map(address_map &map)
+void gottlieb_state::gottlieb_base_map(address_map &map)
 {
 	map.global_mask(0xffff);
 	map(0x0000, 0x0fff).ram().share("nvram");
-	map(0x1000, 0x1fff).view(m_view_1000);
-	m_view_1000[0](0x1000, 0x1fff).ram();
-	m_view_1000[1](0x1000, 0x1fff).rom().region("maincpu", 0x1000);
-	map(0x2000, 0x2fff).view(m_view_2000);
-	m_view_2000[0](0x2000, 0x2fff).ram();
-	m_view_2000[1](0x2000, 0x2fff).rom().region("maincpu", 0x2000);
 	map(0x3000, 0x30ff).mirror(0x0700).writeonly().share("spriteram");                           /* FRSEL */
 	map(0x3800, 0x3bff).mirror(0x0400).ram().w(FUNC(gottlieb_state::videoram_w)).share("videoram");       /* BRSEL */
 	map(0x4000, 0x4fff).ram().w(FUNC(gottlieb_state::charram_w)).share("charram");               /* BOJRSEL1 */
@@ -809,6 +792,31 @@ void gottlieb_state::gottlieb_map(address_map &map)
 	map(0x5803, 0x5803).mirror(0x07f8).portr("IN3");                                      /* trackball V */
 	map(0x5804, 0x5804).mirror(0x07f8).portr("IN4");                                      /* IP40-47 */
 	map(0x6000, 0xffff).rom();
+}
+
+
+void gottlieb_state::gottlieb_ram_map(address_map &map)
+{
+	gottlieb_base_map(map);
+
+	map(0x1000, 0x2fff).ram();
+}
+
+
+void gottlieb_state::gottlieb_ram_rom_map(address_map &map)
+{
+	gottlieb_base_map(map);
+
+	map(0x1000, 0x1fff).ram();
+	map(0x2000, 0x2fff).rom().region("maincpu", 0x2000);
+}
+
+
+void gottlieb_state::gottlieb_rom_map(address_map &map)
+{
+	gottlieb_base_map(map);
+
+	map(0x1000, 0x2fff).rom().region("maincpu", 0x1000);
 }
 
 
@@ -920,14 +928,6 @@ static INPUT_PORTS_START( qbert )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-
-	PORT_START("ROMRAM_CONFIG")
-	PORT_CONFNAME( 0x03, 0x00, "ROM/RAM configuration" )
-	PORT_CONFSETTING(    0x00, "RAM/RAM" )
-	PORT_CONFSETTING(    0x01, "RAM/ROM" )
-	PORT_CONFSETTING(    0x02, "ROM/RAM" )
-	PORT_CONFSETTING(    0x03, "ROM/ROM" )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -982,14 +982,6 @@ static INPUT_PORTS_START( insector )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-
-	PORT_START("ROMRAM_CONFIG")
-	PORT_CONFNAME( 0x03, 0x00, "ROM/RAM configuration" )
-	PORT_CONFSETTING(    0x00, "RAM/RAM" )
-	PORT_CONFSETTING(    0x01, "RAM/ROM" )
-	PORT_CONFSETTING(    0x02, "ROM/RAM" )
-	PORT_CONFSETTING(    0x03, "ROM/ROM" )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1041,14 +1033,6 @@ static INPUT_PORTS_START( tylz )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("ROMRAM_CONFIG")
-	PORT_CONFNAME( 0x03, 0x00, "ROM/RAM configuration" )
-	PORT_CONFSETTING(    0x00, "RAM/RAM" )
-	PORT_CONFSETTING(    0x01, "RAM/ROM" )
-	PORT_CONFSETTING(    0x02, "ROM/RAM" )
-	PORT_CONFSETTING(    0x03, "ROM/ROM" )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1104,14 +1088,6 @@ static INPUT_PORTS_START( argusg )
 
 	PORT_START("TRACKY")
 	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(15) PORT_KEYDELTA(20)
-
-	PORT_START("ROMRAM_CONFIG")
-	PORT_CONFNAME( 0x03, 0x03, "ROM/RAM configuration" )
-	PORT_CONFSETTING(    0x00, "RAM/RAM" )
-	PORT_CONFSETTING(    0x01, "RAM/ROM" )
-	PORT_CONFSETTING(    0x02, "ROM/RAM" )
-	PORT_CONFSETTING(    0x03, "ROM/ROM" )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1165,14 +1141,6 @@ static INPUT_PORTS_START( mplanets )
 
 	PORT_START("TRACKY")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(5) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
-
-	PORT_START("ROMRAM_CONFIG")
-	PORT_CONFNAME( 0x03, 0x00, "ROM/RAM configuration" )
-	PORT_CONFSETTING(    0x00, "RAM/RAM" )
-	PORT_CONFSETTING(    0x01, "RAM/ROM" )
-	PORT_CONFSETTING(    0x02, "ROM/RAM" )
-	PORT_CONFSETTING(    0x03, "ROM/ROM" )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1226,14 +1194,6 @@ static INPUT_PORTS_START( krull )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY
-
-	PORT_START("ROMRAM_CONFIG")
-	PORT_CONFNAME( 0x03, 0x03, "ROM/RAM configuration" )
-	PORT_CONFSETTING(    0x00, "RAM/RAM" )
-	PORT_CONFSETTING(    0x01, "RAM/ROM" )
-	PORT_CONFSETTING(    0x02, "ROM/RAM" )
-	PORT_CONFSETTING(    0x03, "ROM/ROM" )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1278,14 +1238,6 @@ static INPUT_PORTS_START( kngtmare )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
-
-	PORT_START("ROMRAM_CONFIG")
-	PORT_CONFNAME( 0x03, 0x00, "ROM/RAM configuration" )
-	PORT_CONFSETTING(    0x00, "RAM/RAM" )
-	PORT_CONFSETTING(    0x01, "RAM/ROM" )
-	PORT_CONFSETTING(    0x02, "ROM/RAM" )
-	PORT_CONFSETTING(    0x03, "ROM/ROM" )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1346,14 +1298,6 @@ static INPUT_PORTS_START( qbertqub )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("ROMRAM_CONFIG")
-	PORT_CONFNAME( 0x03, 0x00, "ROM/RAM configuration" )
-	PORT_CONFSETTING(    0x00, "RAM/RAM" )
-	PORT_CONFSETTING(    0x01, "RAM/ROM" )
-	PORT_CONFSETTING(    0x02, "ROM/RAM" )
-	PORT_CONFSETTING(    0x03, "ROM/ROM" )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1413,14 +1357,6 @@ static INPUT_PORTS_START( curvebal )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Bunt") PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("ROMRAM_CONFIG")
-	PORT_CONFNAME( 0x03, 0x00, "ROM/RAM configuration" )
-	PORT_CONFSETTING(    0x00, "RAM/RAM" )
-	PORT_CONFSETTING(    0x01, "RAM/ROM" )
-	PORT_CONFSETTING(    0x02, "ROM/RAM" )
-	PORT_CONFSETTING(    0x03, "ROM/ROM" )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1475,14 +1411,6 @@ static INPUT_PORTS_START( screwloo )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Start 1P") PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("ROMRAM_CONFIG")
-	PORT_CONFNAME( 0x03, 0x00, "ROM/RAM configuration" )
-	PORT_CONFSETTING(    0x00, "RAM/RAM" )
-	PORT_CONFSETTING(    0x01, "RAM/ROM" )
-	PORT_CONFSETTING(    0x02, "ROM/RAM" )
-	PORT_CONFSETTING(    0x03, "ROM/ROM" )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1537,14 +1465,6 @@ static INPUT_PORTS_START( mach3 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("ROMRAM_CONFIG")
-	PORT_CONFNAME( 0x03, 0x00, "ROM/RAM configuration" )
-	PORT_CONFSETTING(    0x00, "RAM/RAM" )
-	PORT_CONFSETTING(    0x01, "RAM/ROM" )
-	PORT_CONFSETTING(    0x02, "ROM/RAM" )
-	PORT_CONFSETTING(    0x03, "ROM/ROM" )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cobram3 )
@@ -1598,14 +1518,6 @@ static INPUT_PORTS_START( cobram3 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("ROMRAM_CONFIG")
-	PORT_CONFNAME( 0x03, 0x00, "ROM/RAM configuration" )
-	PORT_CONFSETTING(    0x00, "RAM/RAM" )
-	PORT_CONFSETTING(    0x01, "RAM/ROM" )
-	PORT_CONFSETTING(    0x02, "ROM/RAM" )
-	PORT_CONFSETTING(    0x03, "ROM/ROM" )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1651,14 +1563,6 @@ static INPUT_PORTS_START( usvsthem )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("ROMRAM_CONFIG")
-	PORT_CONFNAME( 0x03, 0x00, "ROM/RAM configuration" )
-	PORT_CONFSETTING(    0x00, "RAM/RAM" )
-	PORT_CONFSETTING(    0x01, "RAM/ROM" )
-	PORT_CONFSETTING(    0x02, "ROM/RAM" )
-	PORT_CONFSETTING(    0x03, "ROM/ROM" )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1725,14 +1629,6 @@ static INPUT_PORTS_START( 3stooges )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
-
-	PORT_START("ROMRAM_CONFIG")
-	PORT_CONFNAME( 0x03, 0x01, "ROM/RAM configuration" )
-	PORT_CONFSETTING(    0x00, "RAM/RAM" )
-	PORT_CONFSETTING(    0x01, "RAM/ROM" )
-	PORT_CONFSETTING(    0x02, "ROM/RAM" )
-	PORT_CONFSETTING(    0x03, "ROM/ROM" )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1784,14 +1680,6 @@ static INPUT_PORTS_START( vidvince )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("ROMRAM_CONFIG")
-	PORT_CONFNAME( 0x03, 0x01, "ROM/RAM configuration" )
-	PORT_CONFSETTING(    0x00, "RAM/RAM" )
-	PORT_CONFSETTING(    0x01, "RAM/ROM" )
-	PORT_CONFSETTING(    0x02, "ROM/RAM" )
-	PORT_CONFSETTING(    0x03, "ROM/ROM" )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1844,14 +1732,6 @@ static INPUT_PORTS_START( wizwarz )
 
 	PORT_START("TRACKY")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
-
-	PORT_START("ROMRAM_CONFIG")
-	PORT_CONFNAME( 0x03, 0x00, "ROM/RAM configuration" )
-	PORT_CONFSETTING(    0x00, "RAM/RAM" )
-	PORT_CONFSETTING(    0x01, "RAM/ROM" )
-	PORT_CONFSETTING(    0x02, "ROM/RAM" )
-	PORT_CONFSETTING(    0x03, "ROM/ROM" )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1904,7 +1784,7 @@ void gottlieb_state::gottlieb_core(machine_config &config)
 {
 	/* basic machine hardware */
 	I8088(config, m_maincpu, CPU_CLOCK/3);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gottlieb_state::gottlieb_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gottlieb_state::gottlieb_ram_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gottlieb_state::interrupt));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
@@ -1929,10 +1809,22 @@ void gottlieb_state::gottlieb1(machine_config &config)
 	GOTTLIEB_SOUND_REV1(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
+void gottlieb_state::gottlieb1_rom(machine_config &config)
+{
+	gottlieb1(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gottlieb_state::gottlieb_rom_map);
+}
+
 void gottlieb_state::gottlieb2(machine_config &config)
 {
 	gottlieb_core(config);
 	GOTTLIEB_SOUND_REV2(config, m_r2_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
+
+void gottlieb_state::gottlieb2_ram_rom(machine_config &config)
+{
+	gottlieb2(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gottlieb_state::gottlieb_ram_rom_map);
 }
 
 void gottlieb_state::g2laser(machine_config &config)
@@ -2783,33 +2675,33 @@ void gottlieb_state::init_vidvince()
  *************************************/
 
 /* games using rev 1 sound board */
-GAME( 1982, reactor,    0,        reactor,   reactor,  gottlieb_state, init_ramtiles, ROT0,   "Gottlieb",                  "Reactor", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, qbert,      0,        qbert,     qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 1)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, qberta,     qbert,    qbert,     qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 2)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, qbertj,     qbert,    qbert,     qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, myqbert,    qbert,    qbert,     qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Mello Yello Q*bert", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, qberttst,   qbert,    qbert,     qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (early test version)", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, qbtrktst,   qbert,    qbert,     qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert Board Input Test Rom", MACHINE_IMPERFECT_SOUND )
-GAME( 1982, insector,   0,        gottlieb1, insector, gottlieb_state, init_romtiles, ROT0,   "Gottlieb",                  "Insector (prototype)", 0 )
-GAME( 1982, tylz,       0,        tylz,      tylz,     gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Tylz (prototype)", MACHINE_IMPERFECT_SOUND ) // modified sound hw?
-GAME( 1984, argusg,     0,        gottlieb1, argusg,   gottlieb_state, init_ramtiles, ROT0,   "Gottlieb",                  "Argus (Gottlieb, prototype)" , 0) // aka Guardian / Protector?
-GAME( 1983, mplanets,   0,        gottlieb1, mplanets, gottlieb_state, init_romtiles, ROT270, "Gottlieb",                  "Mad Planets", 0 )
-GAME( 1983, mplanetsuk, mplanets, gottlieb1, mplanets, gottlieb_state, init_romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", 0 )
-GAME( 1983, krull,      0,        gottlieb1, krull,    gottlieb_state, init_ramtiles, ROT270, "Gottlieb",                  "Krull", 0 )
-GAME( 1983, kngtmare,   0,        gottlieb1, kngtmare, gottlieb_state, init_romtiles, ROT0,   "Gottlieb",                  "Knightmare (prototype)", MACHINE_NO_SOUND ) // Missing sound ROMs
-GAME( 1983, sqbert,     0,        qbert,     qbert,    gottlieb_state, init_qbert,    ROT270, "Mylstar",                   "Faster, Harder, More Challenging Q*bert (prototype)", MACHINE_IMPERFECT_SOUND )
-GAME( 1983, qbertqub,   0,        qbert,     qbertqub, gottlieb_state, init_qbertqub, ROT270, "Mylstar",                   "Q*bert's Qubes", MACHINE_IMPERFECT_SOUND )
-GAME( 1984, curvebal,   0,        gottlieb1, curvebal, gottlieb_state, init_romtiles, ROT270, "Mylstar",                   "Curve Ball", 0 )
+GAME( 1982, reactor,    0,        reactor,           reactor,  gottlieb_state, init_ramtiles, ROT0,   "Gottlieb",                  "Reactor", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, qbert,      0,        qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 1)", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, qberta,     qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (US set 2)", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, qbertj,     qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, myqbert,    qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Mello Yello Q*bert", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, qberttst,   qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert (early test version)", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, qbtrktst,   qbert,    qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Gottlieb",                  "Q*bert Board Input Test Rom", MACHINE_IMPERFECT_SOUND )
+GAME( 1982, insector,   0,        gottlieb1,         insector, gottlieb_state, init_romtiles, ROT0,   "Gottlieb",                  "Insector (prototype)", 0 )
+GAME( 1982, tylz,       0,        tylz,              tylz,     gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Tylz (prototype)", MACHINE_IMPERFECT_SOUND ) // modified sound hw?
+GAME( 1984, argusg,     0,        gottlieb1_rom,     argusg,   gottlieb_state, init_ramtiles, ROT0,   "Gottlieb",                  "Argus (Gottlieb, prototype)" , 0) // aka Guardian / Protector?
+GAME( 1983, mplanets,   0,        gottlieb1,         mplanets, gottlieb_state, init_romtiles, ROT270, "Gottlieb",                  "Mad Planets", 0 )
+GAME( 1983, mplanetsuk, mplanets, gottlieb1,         mplanets, gottlieb_state, init_romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", 0 )
+GAME( 1983, krull,      0,        gottlieb1_rom,     krull,    gottlieb_state, init_ramtiles, ROT270, "Gottlieb",                  "Krull", 0 )
+GAME( 1983, kngtmare,   0,        gottlieb1,         kngtmare, gottlieb_state, init_romtiles, ROT0,   "Gottlieb",                  "Knightmare (prototype)", MACHINE_NO_SOUND ) // Missing sound ROMs
+GAME( 1983, sqbert,     0,        qbert,             qbert,    gottlieb_state, init_qbert,    ROT270, "Mylstar",                   "Faster, Harder, More Challenging Q*bert (prototype)", MACHINE_IMPERFECT_SOUND )
+GAME( 1983, qbertqub,   0,        qbert,             qbertqub, gottlieb_state, init_qbertqub, ROT270, "Mylstar",                   "Q*bert's Qubes", MACHINE_IMPERFECT_SOUND )
+GAME( 1984, curvebal,   0,        gottlieb1,         curvebal, gottlieb_state, init_romtiles, ROT270, "Mylstar",                   "Curve Ball", 0 )
 
 /* games using rev 2 sound board */
-GAME( 1983, screwloo,   0,        screwloo,  screwloo, gottlieb_state, init_screwloo, ROT0,   "Mylstar",                   "Screw Loose (prototype)", 0 )
-GAME( 1983, mach3,      0,        g2laser,   mach3,    gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 1)", 0 )
-GAME( 1983, mach3a,     mach3,    g2laser,   mach3,    gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 2)", 0 )
-GAME( 1983, mach3b,     mach3,    g2laser,   mach3,    gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 3)", 0 )
-GAME( 1984, cobram3,    cobra,    cobram3,   cobram3,  gottlieb_state, init_romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware, set 1)", 0 )
-GAME( 1984, cobram3a,   cobra,    cobram3,   cobram3,  gottlieb_state, init_romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware, set 2)", 0 )
-GAME( 1984, usvsthem,   0,        g2laser,   usvsthem, gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Us vs. Them", 0 )
-GAME( 1984, 3stooges,   0,        gottlieb2, 3stooges, gottlieb_state, init_stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 1)", 0 )
-GAME( 1984, 3stoogesa,  3stooges, gottlieb2, 3stooges, gottlieb_state, init_stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 2)", 0 )
-GAME( 1984, vidvince,   0,        gottlieb2, vidvince, gottlieb_state, init_vidvince, ROT0,   "Mylstar",                   "Video Vince and the Game Factory (prototype)", MACHINE_IMPERFECT_GRAPHICS ) // sprite wrapping issues
-GAME( 1984, wizwarz,    0,        gottlieb2, wizwarz,  gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Wiz Warz (prototype)", 0 )
+GAME( 1983, screwloo,   0,        screwloo,          screwloo, gottlieb_state, init_screwloo, ROT0,   "Mylstar",                   "Screw Loose (prototype)", 0 )
+GAME( 1983, mach3,      0,        g2laser,           mach3,    gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 1)", 0 )
+GAME( 1983, mach3a,     mach3,    g2laser,           mach3,    gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 2)", 0 )
+GAME( 1983, mach3b,     mach3,    g2laser,           mach3,    gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "M.A.C.H. 3 (set 3)", 0 )
+GAME( 1984, cobram3,    cobra,    cobram3,           cobram3,  gottlieb_state, init_romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware, set 1)", 0 )
+GAME( 1984, cobram3a,   cobra,    cobram3,           cobram3,  gottlieb_state, init_romtiles, ROT0,   "Data East",                 "Cobra Command (M.A.C.H. 3 hardware, set 2)", 0 )
+GAME( 1984, usvsthem,   0,        g2laser,           usvsthem, gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Us vs. Them", 0 )
+GAME( 1984, 3stooges,   0,        gottlieb2_ram_rom, 3stooges, gottlieb_state, init_stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 1)", 0 )
+GAME( 1984, 3stoogesa,  3stooges, gottlieb2_ram_rom, 3stooges, gottlieb_state, init_stooges,  ROT0,   "Mylstar",                   "The Three Stooges In Brides Is Brides (set 2)", 0 )
+GAME( 1984, vidvince,   0,        gottlieb2_ram_rom, vidvince, gottlieb_state, init_vidvince, ROT0,   "Mylstar",                   "Video Vince and the Game Factory (prototype)", MACHINE_IMPERFECT_GRAPHICS ) // sprite wrapping issues
+GAME( 1984, wizwarz,    0,        gottlieb2,         wizwarz,  gottlieb_state, init_romtiles, ROT0,   "Mylstar",                   "Wiz Warz (prototype)", 0 )

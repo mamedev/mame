@@ -2566,7 +2566,7 @@ license:CC0
 
 	<software name="fireice">
 		<description>Fire &amp; Ice (Bra)</description>
-		<year>1993</year>
+		<year>1995</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="027.360"/>
 		<part name="cart" interface="sms_cart">

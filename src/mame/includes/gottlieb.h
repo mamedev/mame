@@ -46,22 +46,21 @@ public:
 		, m_paletteram(*this, "paletteram")
 		, m_track_x(*this, "TRACKX")
 		, m_track_y(*this, "TRACKY")
-		, m_ramrom_config(*this, "ROMRAM_CONFIG")
 		, m_leds(*this, "led%u", 0U)
-		, m_view_1000(*this, "view_1000")
-		, m_view_2000(*this, "view_2000")
 	{ }
 
 	void gottlieb_core(machine_config &config);
 	void cobram3(machine_config &config);
 	void screwloo(machine_config &config);
 	void gottlieb2(machine_config &config);
+	void gottlieb2_ram_rom(machine_config &config);
 	void reactor(machine_config &config);
 	void tylz(machine_config &config);
 	void g2laser(machine_config &config);
 	void qbert(machine_config &config);
 	void qbert_knocker(machine_config &config);
 	void gottlieb1(machine_config &config);
+	void gottlieb1_rom(machine_config &config);
 	void gottlieb1_votrax(machine_config &config);
 
 	void init_romtiles();
@@ -122,7 +121,10 @@ private:
 	void audio_handle_zero_crossing(const attotime &zerotime, bool logit);
 	void laserdisc_audio_process(int samplerate, int samples, const int16_t *ch0, const int16_t *ch1);
 
-	void gottlieb_map(address_map &map);
+	void gottlieb_base_map(address_map &map);
+	void gottlieb_ram_map(address_map &map);
+	void gottlieb_ram_rom_map(address_map &map);
+	void gottlieb_rom_map(address_map &map);
 	void reactor_map(address_map &map);
 
 	// devices
@@ -143,11 +145,7 @@ private:
 
 	optional_ioport m_track_x;
 	optional_ioport m_track_y;
-	optional_ioport m_ramrom_config;
 	output_finder<3> m_leds;  // only used by reactor
-
-	memory_view m_view_1000;
-	memory_view m_view_2000;
 
 	u8 m_knocker_prev;
 	u8 m_joystick_select;

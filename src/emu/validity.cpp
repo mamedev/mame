@@ -1844,7 +1844,7 @@ void validity_checker::validate_dip_settings(ioport_field &field)
 	if (coin_error)
 	{
 		output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "   Note proper coin sort order should be:\n");
-		for (int entry = 0; entry < ARRAY_LENGTH(coin_list); entry++)
+		for (int entry = 0; entry < std::size(coin_list); entry++)
 			if (coin_list[entry])
 				output_via_delegate(OSD_OUTPUT_CHANNEL_ERROR, "      %s\n", ioport_string_from_index(__input_string_coinage_start + entry));
 	}
@@ -2087,6 +2087,7 @@ void validity_checker::validate_devices(machine_config &config)
 				{
 					m_current_device = &card_dev;
 					card_dev.findit(this);
+					validate_tag(card_dev.basetag());
 					card_dev.validity_check(*this);
 					m_current_device = nullptr;
 				}

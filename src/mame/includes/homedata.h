@@ -8,7 +8,7 @@
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "sound/sn76496.h"
-#include "sound/2203intf.h"
+#include "sound/ym2203.h"
 #include "emupal.h"
 #include "tilemap.h"
 

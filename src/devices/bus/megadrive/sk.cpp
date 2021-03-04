@@ -60,7 +60,7 @@ uint16_t md_rom_sk_device::read(offs_t offset)
 
 void md_rom_sk_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-// should there be anything here?
+	// TODO: implement pass-through NVRAM accessing for Sonic 3 cart, for Sonic 3 & Knuckles saving feature
 }
 
 

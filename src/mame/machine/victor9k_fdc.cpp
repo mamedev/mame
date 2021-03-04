@@ -118,7 +118,7 @@ void victor_9000_fdc_device::add_floppy_drive(machine_config &config, const char
 	connector.option_add("525ssqd", FLOPPY_525_SSQD); // Tandon TM100-3 with custom electronics
 	connector.option_add("525qd", FLOPPY_525_QD); // Tandon TM100-4 with custom electronics
 	connector.set_default_option("525qd");
-	connector.set_formats(victor_9000_fdc_device::floppy_formats);
+	connector.set_formats(floppy_formats);
 }
 
 image_init_result victor_9000_fdc_device::load0_cb(floppy_image_device *device)
@@ -149,10 +149,10 @@ void victor_9000_fdc_device::unload1_cb(floppy_image_device *device)
 	m_via4->write_cb1(1);
 }
 
-FLOPPY_FORMATS_MEMBER( victor_9000_fdc_device::floppy_formats )
-	FLOPPY_VICTOR_9000_FORMAT
-FLOPPY_FORMATS_END
-
+void victor_9000_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_VICTOR_9000_FORMAT);
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration

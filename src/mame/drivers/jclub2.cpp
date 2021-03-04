@@ -105,6 +105,7 @@
 #include "machine/ticket.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
+#include "sound/setapcm.h"
 #include "sound/okim6295.h"
 #include "video/st0020.h"
 #include "emupal.h"
@@ -751,9 +752,9 @@ void jclub2_state::jclub2_map(address_map &map)
 	map(0x880000, 0x89ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x8a0000, 0x8bffff).ram();   // this should still be palette ram!
 	map(0x8c0000, 0x8c00ff).rw(m_st0020, FUNC(st0020_device::regs_r), FUNC(st0020_device::regs_w));
-	map(0x8e0000, 0x8e01ff).ram(); // sound?
-	map(0x8e0200, 0x8e0203).ram();
-	map(0x8e0210, 0x8e0213).ram();
+	map(0x8e0000, 0x8e01ff).rw("st0032_snd", FUNC(st0032_sound_device::snd_r), FUNC(st0032_sound_device::snd_w));
+	map(0x8e0200, 0x8e0201).rw("st0032_snd", FUNC(st0032_sound_device::key_r), FUNC(st0032_sound_device::key_w));
+	map(0x8e0210, 0x8e0213).ram(); // sound?
 	map(0x900000, 0x9fffff).rw(m_st0020, FUNC(st0020_device::gfxram_r), FUNC(st0020_device::gfxram_w));
 }
 
@@ -1212,6 +1213,15 @@ void jclub2_state::jclub2(machine_config &config)
 
 	// layout
 	config.set_default_layout(layout_jclub2o);
+
+	// sound hardware
+	// TODO: Mono?
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	st0032_sound_device &st0032_snd(ST0032_SOUND(config, "st0032_snd", XTAL(42'954'545) / 3)); // 14.318181MHz (42.954545MHz / 3)
+	st0032_snd.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	st0032_snd.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
 
@@ -1387,7 +1397,7 @@ Provided to you by Belgium Dump Team Gerald (COY) on 18/01/2007.
 ***************************************************************************/
 
 #define JCLUB2_OTHER_ROMS \
-	ROM_REGION( 0x100000, "samples", 0 ) \
+	ROM_REGION( 0x100000, "st0032_snd", 0 ) \
 	ROM_LOAD( "m88-02.u6", 0x00000, 0x100000, CRC(0dd3436a) SHA1(809d3b7a26d36f71da04036fd8ab5d0c5089392a) ) \
 	\
 	ROM_REGION( 0x117, "pld", 0 ) \
@@ -1548,10 +1558,10 @@ GAME( 1996, jclub2v110, jclub2v112, jclub2o,  jclub2v100, jclub2o_state,  init_j
 GAME( 1996, jclub2v112, 0,          jclub2o,  jclub2v112, jclub2o_state,  init_jclub2o,  ROT0, "Seta",    "Jockey Club II (v1.12X, older hardware)",               MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, jclub2v203, jclub2v112, jclub2o,  jclub2v112, jclub2o_state,  init_jclub2o,  ROT0, "Seta",    "Jockey Club II (v2.03X RC, older hardware, prototype)", MACHINE_IMPERFECT_GRAPHICS )
 // Newer hardware (ST-0032)
-GAME( 1996, jclub2v200, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.00, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1996, jclub2v201, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.01X, newer hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1997, jclub2v204, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.04, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1997, jclub2v205, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.05, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1998, jclub2v220, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.20X, newer hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 1996, jclub2v200, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.00, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, jclub2v201, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.01X, newer hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, jclub2v204, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.04, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, jclub2v205, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.05, newer hardware)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, jclub2v220, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.20X, newer hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // Bootleg hardware
 GAME( 2001, darkhors,   jclub2v112, darkhors, darkhors,   darkhors_state, init_darkhors, ROT0, "bootleg", "Dark Horse (USA v4.00, bootleg of Jockey Club II)",     MACHINE_IMPERFECT_GRAPHICS )

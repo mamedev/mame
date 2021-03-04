@@ -759,6 +759,7 @@ void ksys573_state::konami573_map(address_map &map)
 	map(0x1f400008, 0x1f40000b).r(FUNC(ksys573_state::port_in2_jvs_r));
 	map(0x1f40000c, 0x1f40000f).portr("IN3");
 	map(0x1f480000, 0x1f48000f).rw(m_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w));
+	map(0x1f4c0000, 0x1f4c000f).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w));
 	map(0x1f500000, 0x1f500001).rw(FUNC(ksys573_state::control_r), FUNC(ksys573_state::control_w));    // Konami can't make a game without a "control" register.
 	map(0x1f560000, 0x1f560001).w(FUNC(ksys573_state::atapi_reset_w));
 	map(0x1f5c0000, 0x1f5c0003).nopw();                // watchdog?
@@ -3679,7 +3680,7 @@ ROM_START( ddr2mc2 )
 	DISK_IMAGE_READONLY( "ge984a01,ddr", 0, SHA1(badd15656f2316f81b0a45026b5ef10287d1480b) )
 
 	DISK_REGION( "cdrom1" )
-	DISK_IMAGE_READONLY( "895jaa02", 0, BAD_DUMP SHA1(cfe3a6f3ed62ba388b07045e29e22472d17dcfe4) )
+	DISK_IMAGE_READONLY( "885jaa02", 0, SHA1(f02bb09f41533c6ec496a662d815e85b304fcc72) )
 ROM_END
 
 ROM_START( ddr2ml )

@@ -42,7 +42,7 @@ protected:
 	virtual void write(offs_t offset, uint8_t data) override;
 
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	DECLARE_WRITE_LINE_MEMBER(intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(drq_w);

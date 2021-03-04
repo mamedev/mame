@@ -98,6 +98,8 @@ ToDo:
 #include "speaker.h"
 
 
+namespace {
+
 class apf_state : public driver_device
 {
 public:
@@ -123,6 +125,10 @@ public:
 	void apfm1000(machine_config &config);
 	void apfimag(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	uint8_t videoram_r(offs_t offset);
 	uint8_t pia0_porta_r();
@@ -144,8 +150,6 @@ private:
 	uint8_t m_portb;
 	bool m_ca2;
 	bool m_has_cart_ram;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	required_device<m6800_cpu_device> m_maincpu;
 	optional_device<ram_device> m_ram;
 	required_device<mc6847_base_device> m_crtc;
@@ -280,6 +284,8 @@ void apf_state::machine_start()
 	save_item(NAME(m_portb));
 	save_item(NAME(m_ca2));
 	save_item(NAME(m_has_cart_ram));
+
+	m_latch = 0;
 }
 
 
@@ -591,8 +597,8 @@ void apf_state::apfimag(machine_config &config)
 	m_cass->set_interface("apf_cass");
 
 	FD1771(config, m_fdc, 1000000); // guess
-	FLOPPY_CONNECTOR(config, "fdc:0", apf_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", apf_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", apf_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", apf_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	SOFTWARE_LIST(config, "cass_list").set_original("apfimag_cass");
 }
@@ -621,6 +627,9 @@ ROM_END
 
 // old rom, has a bad byte at 0087.
 //ROMX_LOAD("apf_4000.rom", 0x0000, 0x0800, CRC(2a331a33) SHA1(387b90882cd0b66c192d9cbaa3bec250f897e4f1), ROM_BIOS(0) )
+
+} // Anonymous namespace
+
 
 /***************************************************************************
 

@@ -224,7 +224,7 @@ bool upd765_format::load(io_generic *io, uint32_t form_factor, const std::vector
 			generate_track(desc, track, head, sectors, f.sector_count, total_size, image);
 		}
 
-	image->set_variant(f.variant);
+	image->set_form_variant(f.form_factor, f.variant);
 
 	return true;
 }
@@ -418,13 +418,14 @@ void upd765_format::extract_sectors(floppy_image *image, const format &f, desc_s
 
 	for(int i=0; i<f.sector_count; i++) {
 		desc_s &ds = sdesc[i];
-		const auto &data = sectors[ds.sector_id];
-		if(data.empty())
+		if(ds.sector_id >= sectors.size() || sectors[ds.sector_id].empty())
 			memset((void *)ds.data, 0, ds.size);
-		else if(data.size() < ds.size) {
-			memcpy((void *)ds.data, data.data(), data.size());
-			memset((uint8_t *)ds.data + data.size(), 0, data.size() - ds.size);
+
+		else if(sectors[ds.sector_id].size() < ds.size) {
+			memcpy((void *)ds.data, sectors[ds.sector_id].data(), sectors[ds.sector_id].size());
+			memset((uint8_t *)ds.data + sectors[ds.sector_id].size(), 0, sectors[ds.sector_id].size() - ds.size);
+
 		} else
-			memcpy((void *)ds.data, data.data(), ds.size);
+			memcpy((void *)ds.data, sectors[ds.sector_id].data(), ds.size);
 	}
 }

@@ -535,6 +535,16 @@ std::basic_string_view<CharT, Traits> buf_to_string_view(basic_ovectorstream<Cha
 }
 
 
+// For declaring an array of the same dimensions as another array (including multi-dimensional arrays)
+template <typename T, typename U> struct equivalent_array_or_type { typedef T type; };
+template <typename T, typename U, std::size_t N> struct equivalent_array_or_type<T, U[N]> { typedef typename equivalent_array_or_type<T, U>::type type[N]; };
+template <typename T, typename U> using equivalent_array_or_type_t = typename equivalent_array_or_type<T, U>::type;
+template <typename T, typename U> struct equivalent_array { };
+template <typename T, typename U, std::size_t N> struct equivalent_array<T, U[N]> { typedef equivalent_array_or_type_t<T, U> type[N]; };
+template <typename T, typename U> using equivalent_array_t = typename equivalent_array<T, U>::type;
+#define EQUIVALENT_ARRAY(a, T) util::equivalent_array_t<T, std::remove_reference_t<decltype(a)> >
+
+
 template <typename E>
 using enable_enum_t = typename std::enable_if_t<std::is_enum<E>::value, typename std::underlying_type_t<E> >;
 
