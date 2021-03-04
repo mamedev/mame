@@ -17,110 +17,44 @@
 #include <ctime>
 #include <cstdarg>
 #include <cassert>
+#include <map>
 
 #include "corestr.h"
 #include "osdcomm.h"
 
-#include "formats/mfi_dsk.h"
-#include "formats/dfi_dsk.h"
-#include "formats/ipf_dsk.h"
+#include "formats/all.h"
 
-#include "formats/hxcmfm_dsk.h"
-#include "formats/ami_dsk.h"
+std::map<std::string, std::vector<floppy_image_format_t *>> formats_by_category;
+std::map<std::string, floppy_image_format_t *> formats_by_key;
 
-#include "formats/st_dsk.h"
-#include "formats/pasti_dsk.h"
+struct enumerator : public mame_formats_enumerator {
+	virtual ~enumerator() = default;
+	virtual void add(const cassette_image::Format *const *formats) {}
 
-#include "formats/dsk_dsk.h"
+	std::vector<floppy_image_format_t *> *cf = nullptr;
+	virtual void category(const char *name) {
+		auto i = formats_by_category.find(name);
+		if(i != formats_by_category.end()) {
+			fprintf(stderr, "Collision on category name %s\n", name);
+			exit(1);
+		}
+		cf = &formats_by_category[name];
+	}
 
-#include "formats/d88_dsk.h"
-#include "formats/imd_dsk.h"
-#include "formats/td0_dsk.h"
-#include "formats/cqm_dsk.h"
-#include "formats/pc_dsk.h"
-#include "formats/naslite_dsk.h"
-#include "formats/ibmxdf_dsk.h"
-
-#include "formats/ap_dsk35.h"
-#include "formats/ap2_dsk.h"
-
-#include "formats/atom_dsk.h"
-#include "formats/acorn_dsk.h"
-
-#include "formats/oric_dsk.h"
-
-#include "formats/applix_dsk.h"
-
-#include "formats/hpi_dsk.h"
-#include "formats/img_dsk.h"
-
-#include "formats/dvk_mx_dsk.h"
-#include "formats/aim_dsk.h"
-#include "formats/m20_dsk.h"
-
-#include "formats/os9_dsk.h"
-
-#include "formats/flex_dsk.h"
-#include "formats/uniflex_dsk.h"
-
-#include "formats/mdos_dsk.h"
-
-
-static floppy_format_type floppy_formats[] = {
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_DFI_FORMAT,
-	FLOPPY_IPF_FORMAT,
-
-	FLOPPY_MFM_FORMAT,
-	FLOPPY_ADF_FORMAT,
-
-	FLOPPY_ST_FORMAT,
-	FLOPPY_MSA_FORMAT,
-	FLOPPY_PASTI_FORMAT,
-
-	FLOPPY_DSK_FORMAT,
-
-	FLOPPY_D88_FORMAT,
-	FLOPPY_IMD_FORMAT,
-	FLOPPY_TD0_FORMAT,
-	FLOPPY_CQM_FORMAT,
-	FLOPPY_PC_FORMAT,
-	FLOPPY_NASLITE_FORMAT,
-	FLOPPY_IBMXDF_FORMAT,
-
-	FLOPPY_DC42_FORMAT,
-	FLOPPY_APPLE_GCR_FORMAT,
-	FLOPPY_APPLE_2MG_FORMAT,
-	FLOPPY_A216S_FORMAT,
-	FLOPPY_RWTS18_FORMAT,
-	FLOPPY_EDD_FORMAT,
-	FLOPPY_WOZ_FORMAT,
-	FLOPPY_NIB_FORMAT,
-
-	FLOPPY_ATOM_FORMAT,
-	FLOPPY_ACORN_SSD_FORMAT,
-	FLOPPY_ACORN_DSD_FORMAT,
-	FLOPPY_ACORN_DOS_FORMAT,
-	FLOPPY_ACORN_ADFS_OLD_FORMAT,
-	FLOPPY_ACORN_ADFS_NEW_FORMAT,
-
-	FLOPPY_ORIC_DSK_FORMAT,
-
-	FLOPPY_APPLIX_FORMAT,
-
-	FLOPPY_HPI_FORMAT,
-	FLOPPY_IMG_FORMAT,
-
-	FLOPPY_DVK_MX_FORMAT,
-	FLOPPY_AIM_FORMAT,
-	FLOPPY_M20_FORMAT,
-
-	FLOPPY_OS9_FORMAT,
-
-	FLOPPY_FLEX_FORMAT,
-	FLOPPY_UNIFLEX_FORMAT,
-
-	FLOPPY_MDOS_FORMAT
+	virtual void add(floppy_format_type format) {
+		auto f = format();
+		std::string key = f->name();
+		auto i = formats_by_key.find(key);
+		if(i != formats_by_key.end()) {
+			fprintf(stderr, "Collision on key %s between \"%s\" and \"%s\".\n",
+					key.c_str(),
+					i->second->description(),
+					f->description());
+			exit(1);
+		}
+		cf->push_back(f);
+		formats_by_key[key] = f;
+	}
 };
 
 void CLIB_DECL ATTR_PRINTF(1,2) logerror(const char *format, ...)
@@ -131,24 +65,20 @@ void CLIB_DECL ATTR_PRINTF(1,2) logerror(const char *format, ...)
 	va_end(arg);
 }
 
-static constexpr size_t FORMAT_COUNT = std::size(floppy_formats);
-
-static floppy_image_format_t *formats[FORMAT_COUNT];
 static std::vector<uint32_t> variants;
-
 
 static void init_formats()
 {
-	for(int i=0; i != FORMAT_COUNT; i++)
-		formats[i] = floppy_formats[i]();
+	enumerator en;
+	mame_formats_full_list(en);
 }
 
 static floppy_image_format_t *find_format_by_name(const char *name)
 {
-	for(int i=0; i != FORMAT_COUNT; i++)
-		if(!core_stricmp(name, formats[i]->name()))
-			return formats[i];
-	return nullptr;
+	auto i = formats_by_key.find(name);
+	if(i == formats_by_key.end())
+		return nullptr;
+	return i->second;
 }
 
 static floppy_image_format_t *find_format_by_identify(io_generic *image)
@@ -156,8 +86,8 @@ static floppy_image_format_t *find_format_by_identify(io_generic *image)
 	int best = 0;
 	floppy_image_format_t *best_fif = nullptr;
 
-	for(int i = 0; i != FORMAT_COUNT; i++) {
-		floppy_image_format_t *fif = formats[i];
+	for(const auto &e : formats_by_key) {
+		floppy_image_format_t *fif = e.second;
 		int score = fif->identify(image, floppy_image::FF_UNKNOWN, variants);
 		if(score > best) {
 			best = score;
@@ -176,12 +106,20 @@ static void display_usage()
 
 static void display_formats()
 {
-	fprintf(stderr, "Supported formats:\n\n");
-	for(int i = 0; i != FORMAT_COUNT; i++)
-	{
-		floppy_image_format_t *fif = formats[i];
-		fprintf(stderr, "%15s - %s [%s]\n", fif->name(), fif->description(), fif->extensions());
+	int sk = 0;
+	for(const auto &e : formats_by_key) {
+		int sz = e.first.size();
+		if(sz > sk)
+			sk = sz;
 	}
+
+	fprintf(stderr, "Supported formats:\n\n");
+	for(const auto &e : formats_by_category)
+		if(!e.second.empty()) {
+			fprintf(stderr, "%s:\n", e.first.c_str());
+			for(floppy_image_format_t *fif : e.second)
+				fprintf(stderr, "  %-*s - %s [%s]\n", sk, fif->name(), fif->description(), fif->extensions());
+		}
 }
 
 static void display_full_usage()
