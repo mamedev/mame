@@ -44,3 +44,7 @@ void mm76_device::op_illegal()
 void mm76_device::op_nop()
 {
 }
+
+void mm76_device::op_ios()
+{
+}

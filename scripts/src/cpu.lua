@@ -2878,6 +2878,7 @@ end
 
 --------------------------------------------------
 -- Rockwell PPS-4/1
+--@src/devices/cpu/pps41/mm75.h,CPUS["PPS41"] = true
 --@src/devices/cpu/pps41/mm76.h,CPUS["PPS41"] = true
 --------------------------------------------------
 
@@ -2885,6 +2886,9 @@ if CPUS["PPS41"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/pps41/pps41base.cpp",
 		MAME_DIR .. "src/devices/cpu/pps41/pps41base.h",
+		MAME_DIR .. "src/devices/cpu/pps41/mm75.cpp",
+		MAME_DIR .. "src/devices/cpu/pps41/mm75.h",
+		MAME_DIR .. "src/devices/cpu/pps41/mm75op.cpp",
 		MAME_DIR .. "src/devices/cpu/pps41/mm76.cpp",
 		MAME_DIR .. "src/devices/cpu/pps41/mm76.h",
 		MAME_DIR .. "src/devices/cpu/pps41/mm76op.cpp",

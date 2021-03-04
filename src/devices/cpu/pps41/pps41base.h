@@ -69,6 +69,7 @@ protected:
 	u8 m_prev2_op;
 	int m_stack_levels;
 	u16 m_stack[2]; // max 2
+	int m_d_pins;
 
 	u8 m_a;
 	u8 m_b;

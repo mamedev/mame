@@ -12,8 +12,8 @@ Part numbers:
 - A76xx = MM76   - 42 pin spider
 - A77xx = MM77   - 42 pin spider
 - A78xx = MM78   - 42 pin spider
-- A79xx = MM76C  - 52 pin spider
-- A86xx = MM76E  - 42 pin spider
+- A79xx = MM76C  - 52 pin spider - counter
+- A86xx = MM76E  - 42 pin spider - extended ROM
 - B76xx = MM76L  - 40 pin dip
 - B77xx = MM77L  - 40 pin dip
 - B78xx = MM78L  - 40 pin dip
@@ -21,7 +21,7 @@ Part numbers:
 - B90xx = MM78LA - 42 pin spider
 
 "spider" = 2 rows of pins on each side, just like standard PPS-4 CPUs.
-"L" only difference is low-power
+"L" main difference is low-power
 
 References:
 - Series MM76 Product Description

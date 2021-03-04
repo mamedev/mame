@@ -12,13 +12,14 @@
 
 #include "emu.h"
 
+#include "cpu/pps41/mm75.h"
 #include "cpu/pps41/mm76.h"
 #include "video/pwm.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
 // internal artwork
-//#include "mastmind.lh"
+#include "mastmind.lh"
 
 //#include "hh_pps41_test.lh" // common test-layout - use external artwork
 
@@ -127,12 +128,12 @@ INPUT_PORTS_END
 void mastmind_state::mastmind(machine_config &config)
 {
 	/* basic machine hardware */
-	MM76(config, m_maincpu, 100000); // approximation
+	MM75(config, m_maincpu, 100000); // approximation
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(3, 0xff);
-	//config.set_default_layout(layout_mastmind);
+	config.set_default_layout(layout_mastmind);
 
 	/* no sound! */
 }
