@@ -52,7 +52,7 @@ public:
 	void dgnalpha(machine_config &config);
 
 private:
-	DECLARE_FLOPPY_FORMATS(dragon_formats);
+	static void dragon_formats(format_registration &fr);
 
 	/* pia2 */
 	void pia2_pa_w(uint8_t data);

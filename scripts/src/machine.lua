@@ -4614,7 +4614,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/applefdc.h,MACHINES["APPLE_FDINTF"] = true
+--@src/devices/machine/applefdintf.h,MACHINES["APPLE_FDINTF"] = true
 ---------------------------------------------------
 if (MACHINES["APPLE_FDINTF"]~=null) then
 	files {
@@ -4624,10 +4624,10 @@ if (MACHINES["APPLE_FDINTF"]~=null) then
 end
 
 ---------------------------------------------------
- --
- --@src/devices/machine/iwm.h,MACHINES["IWM"] = true
- ---------------------------------------------------
- if (MACHINES["IWM"]~=null) then
+--
+--@src/devices/machine/iwm.h,MACHINES["IWM"] = true
+---------------------------------------------------
+if (MACHINES["IWM"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/iwm.cpp",
 		MAME_DIR .. "src/devices/machine/iwm.h",

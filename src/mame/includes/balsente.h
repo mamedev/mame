@@ -94,6 +94,11 @@ public:
 	void init_nametune();
 	void init_gghost();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	void random_reset_w(uint8_t data);
 	uint8_t random_num_r();
@@ -126,9 +131,6 @@ private:
 	void paletteram_w(offs_t offset, uint8_t data);
 	void shrike_sprite_select_w(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_balsente(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(update_analog_inputs);
 	TIMER_CALLBACK_MEMBER(irq_off);

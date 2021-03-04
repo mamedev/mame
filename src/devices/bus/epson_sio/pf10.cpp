@@ -71,7 +71,7 @@ void epson_pf10_device::device_add_mconfig(machine_config &config)
 	m_cpu->out_ser_tx_cb().set(FUNC(epson_pf10_device::hd6303_tx_w));
 
 	UPD765A(config, m_fdc, 4'000'000, false, true);
-	FLOPPY_CONNECTOR(config, m_floppy, pf10_floppies, "smd165", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy, pf10_floppies, "smd165", floppy_image_device::default_mfm_floppy_formats);
 
 	EPSON_SIO(config, m_sio_output, nullptr);
 	m_sio_output->rx_callback().set(DEVICE_SELF, FUNC(epson_pf10_device::rxc_w));

@@ -29,7 +29,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w) { m_intrq = state; update_lines(); }
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w) { m_drq = state; update_lines(); }
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 protected:
 	// construction/destruction

@@ -18,13 +18,14 @@ DEFINE_DEVICE_TYPE(MM76, mm76_device, "mm76", "Rockwell MM76")
 // internal memory maps
 void mm76_device::program_map(address_map &map)
 {
-	map(0x0000, 0x01ff).rom();
-	map(0x0380, 0x03ff).rom();
+	map(0x000, 0x17f).mirror(0x200).rom();
+	map(0x180, 0x1ff).rom();
+	map(0x380, 0x3ff).rom();
 }
 
 void mm76_device::data_map(address_map &map)
 {
-	map(0x00, 0x02f).ram();
+	map(0x00, 0x2f).ram();
 }
 
 

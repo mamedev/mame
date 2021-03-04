@@ -132,7 +132,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(kbcin_w);
 	DECLARE_WRITE_LINE_MEMBER(int_w);
 	DECLARE_WRITE_LINE_MEMBER(halt_i86_w);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	static void cfg_m20_format(device_t *device);
 	void kbc_map(address_map &map);
@@ -519,11 +519,12 @@ static INPUT_PORTS_START( m24 )
 	PORT_DIPSETTING(    0xc000, "4" )
 INPUT_PORTS_END
 
-FLOPPY_FORMATS_MEMBER( m24_state::floppy_formats )
-	FLOPPY_PC_FORMAT,
-	FLOPPY_NASLITE_FORMAT,
-	FLOPPY_M20_FORMAT
-FLOPPY_FORMATS_END
+void m24_state::floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_NASLITE_FORMAT);
+	fr.add(FLOPPY_M20_FORMAT);
+}
 
 void m24_state::cfg_m20_format(device_t *device)
 {

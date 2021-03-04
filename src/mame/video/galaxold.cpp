@@ -372,12 +372,15 @@ void galaxold_state::video_start_common()
 	m_background_red = 0;
 	m_background_green = 0;
 
+	m_stars_on = 0;
 	m_draw_stars = &galaxold_state::noop_draw_stars;
 
 	m_flipscreen_x = 0;
 	m_flipscreen_y = 0;
 
 	m_spriteram2_present = 0;
+
+	std::fill(std::begin(m_gfxbank), std::end(m_gfxbank), 0);
 
 	state_save_register();
 }
@@ -725,6 +728,7 @@ VIDEO_START_MEMBER(galaxold_state,dambustr)
 	m_dambustr_bg_color_2 = 0;
 	m_dambustr_bg_priority = 0;
 	m_dambustr_char_bank = 0;
+	m_stars_scrollpos = 0;
 
 	m_draw_background = &galaxold_state::dambustr_draw_background;
 

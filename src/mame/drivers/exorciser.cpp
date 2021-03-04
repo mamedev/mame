@@ -240,7 +240,7 @@ private:
 
 	static void exorciser_rs232_devices(device_slot_interface &device);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
@@ -581,10 +581,11 @@ uint8_t exorciser_state::pia_lpt_pb_r()
 }
 
 
-FLOPPY_FORMATS_MEMBER( exorciser_state::floppy_formats )
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_MDOS_FORMAT
-FLOPPY_FORMATS_END
+void exorciser_state::floppy_formats(format_registration &fr)
+{
+	fr.add_fm_containers();
+	fr.add(FLOPPY_MDOS_FORMAT);
+}
 
 
 static void mdos_floppies(device_slot_interface &device)

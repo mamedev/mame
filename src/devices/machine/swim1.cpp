@@ -768,6 +768,8 @@ void swim1_device::iwm_sync()
 					m_flux_write_start = 0;
 					m_iwm_whd &= ~0x40;
 					m_last_sync = next_sync;
+					m_iwm_rw_state = SW_UNDERRUN;
+
 				} else {
 					m_iwm_wsh = m_iwm_data;
 					m_iwm_rw_state = SW_WINDOW_MIDDLE;
@@ -801,6 +803,10 @@ void swim1_device::iwm_sync()
 					m_iwm_next_state_change = m_last_sync + iwm_half_window_size();
 					m_iwm_rw_state = SW_WINDOW_MIDDLE;
 				}
+				break;
+
+			case SW_UNDERRUN:
+				m_last_sync = next_sync;
 				break;
 			}
 		}

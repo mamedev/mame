@@ -399,7 +399,7 @@ public:
 	void set_memory_modified(bool memory_modified) { m_memory_modified = memory_modified; }
 	void set_execution_stopped() { m_execution_state = exec_state::STOPPED; }
 	void set_execution_running() { m_execution_state = exec_state::RUNNING; }
-	void set_wpinfo(offs_t address, u64 data) { m_wpaddr = address; m_wpdata = data; }
+	void set_wpinfo(offs_t address, u64 data, offs_t size) { m_wpaddr = address; m_wpdata = data; m_wpsize = size; }
 
 	// device_debug helpers
 	// [TODO] [RH]: Look into this more later, can possibly merge these two classes
@@ -437,6 +437,7 @@ private:
 
 	u64         m_wpdata;
 	u64         m_wpaddr;
+	u64         m_wpsize;
 	std::unique_ptr<u64[]> m_tempvar;
 
 	osd_ticks_t m_last_periodic_update_time;

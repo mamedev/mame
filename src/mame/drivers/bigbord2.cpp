@@ -627,8 +627,8 @@ void bigbord2_state::bigbord2(machine_config &config)
 
 	MB8877(config, m_fdc, 16_MHz_XTAL / 8); // U10 : 2MHz for 8 inch, or 1MHz otherwise (jumper-selectable)
 	//m_fdc->intrq_wr_callback().set_inputline(m_maincpu, ??); // info missing from schematic
-	FLOPPY_CONNECTOR(config, "fdc:0", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", bigbord2_floppies, "8dsdd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", bigbord2_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", bigbord2_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	mc6845_device &crtc(MC6845(config, "crtc", 16_MHz_XTAL / 8));  // U30
 	crtc.set_screen("screen");

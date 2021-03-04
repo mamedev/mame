@@ -235,11 +235,6 @@ static INPUT_PORTS_START( mbc55x )
 INPUT_PORTS_END
 
 
-FLOPPY_FORMATS_MEMBER( mbc55x_state::floppy_formats )
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
-
-
 // MBC-550 : 1 x 5.25" disk-drive (160 KB)
 // MBC-555 : 2 x 5.25" disk-drive (160 KB)
 // MBC-555-2 : 2 x 5.25" disk-drive (360 KB)
@@ -331,10 +326,10 @@ void mbc55x_state::mbc55x(machine_config &config)
 	FD1793(config, m_fdc, 14.318181_MHz_XTAL / 14); // M5W1793-02P (clock is nominally 1 MHz)
 	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy[0], mbc55x_floppies, "qd", mbc55x_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[1], mbc55x_floppies, "qd", mbc55x_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[2], mbc55x_floppies, nullptr, mbc55x_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[3], mbc55x_floppies, nullptr, mbc55x_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], mbc55x_floppies, "qd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], mbc55x_floppies, "qd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[2], mbc55x_floppies, nullptr, floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[3], mbc55x_floppies, nullptr, floppy_image_device::default_pc_floppy_formats);
 
 	/* Software list */
 	SOFTWARE_LIST(config, "disk_list").set_original("mbc55x");

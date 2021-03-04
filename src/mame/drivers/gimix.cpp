@@ -103,7 +103,7 @@ private:
 	uint8_t pia_pb_r();
 	void pia_pb_w(uint8_t data);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	void gimix_banked_mem(address_map &map);
 	void gimix_mem(address_map &map);
@@ -535,11 +535,12 @@ void gimix_state::driver_start()
 {
 }
 
-FLOPPY_FORMATS_MEMBER( gimix_state::floppy_formats )
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_FLEX_FORMAT,
-	FLOPPY_OS9_FORMAT
-FLOPPY_FORMATS_END
+void gimix_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_FLEX_FORMAT);
+	fr.add(FLOPPY_OS9_FORMAT);
+}
 
 static void gimix_floppies(device_slot_interface &device)
 {

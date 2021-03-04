@@ -68,6 +68,9 @@ private:
 	// RTC type
 	int m_rtctype;
 
+	// Genmod decoding. If not used, the AME line is pulled up, and the AMD line is pulled down
+	bool m_genmod;
+
 	DECLARE_WRITE_LINE_MEMBER(clock_interrupt_callback);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt_callback);
 	DECLARE_WRITE_LINE_MEMBER(resetdr_callback);

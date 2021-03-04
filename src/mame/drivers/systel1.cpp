@@ -209,7 +209,7 @@ void systel1_state::systel1(machine_config &config)
 	FD1797(config, m_fdc, 2_MHz_XTAL / 2);
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(i8257_device::dreq1_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy, systel1_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy, systel1_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 	m_floppy->set_fixed(true);
 	m_floppy->enable_sound(true);
 

@@ -230,8 +230,6 @@ SAMPLES_START_CB_MEMBER(tmnt_state::tmnt_decode_sample)
 	int i;
 	uint8_t *source = memregion("title")->base();
 
-	save_item(NAME(m_sampledata));
-
 	/*  Sound sample for TMNT.D05 is stored in the following mode (ym3012 format):
 	 *
 	 *  Bit 15-13:  Exponent (2 ^ x)
@@ -248,7 +246,7 @@ SAMPLES_START_CB_MEMBER(tmnt_state::tmnt_decode_sample)
 		val = (val >> 3) & (0x3ff); /* 10 bit, Max Amplitude 0x400 */
 		val -= 0x200;                   /* Centralize value */
 
-		val <<= (expo - 3);
+		val = (val << expo) >> 3;
 
 		m_sampledata[i] = val;
 	}

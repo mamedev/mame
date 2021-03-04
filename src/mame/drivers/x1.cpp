@@ -2147,9 +2147,11 @@ void x1_state::machine_start()
 	m_gfxdecode->set_gfx(3, std::make_unique<gfx_element>(m_palette, x1_pcg_8x8, m_pcg_ram.get(), 0, 1, 0));
 }
 
-FLOPPY_FORMATS_MEMBER( x1_state::floppy_formats )
-	FLOPPY_2D_FORMAT
-FLOPPY_FORMATS_END
+void x1_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_2D_FORMAT);
+}
 
 static void x1_floppies(device_slot_interface &device)
 {

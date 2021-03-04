@@ -1062,17 +1062,17 @@ FORMATS["H8_CAS"] = true
 FORMATS["HECTOR_MINIDISC"] = true
 FORMATS["HECT_DSK"] = true
 FORMATS["HECT_TAP"] = true
-FORMATS["HTI_TAP"] = true
 FORMATS["HPI_DSK"] = true
 FORMATS["HP_IPC_DSK"] = true
+FORMATS["HTI_TAP"] = true
 FORMATS["IBMXDF_DSK"] = true
 FORMATS["IMG_DSK"] = true
+FORMATS["IPF_DSK"] = true
 FORMATS["IQ151_DSK"] = true
 FORMATS["ITT3030_DSK"] = true
 FORMATS["JFD_DSK"] = true
 FORMATS["JUKU_DSK"] = true
 FORMATS["JVC_DSK"] = true
-FORMATS["OS9_DSK"] = true
 FORMATS["KAYPRO_DSK"] = true
 FORMATS["KC85_DSK"] = true
 FORMATS["KC_CAS"] = true
@@ -1097,20 +1097,21 @@ FORMATS["OPD_DSK"] = true
 FORMATS["ORAO_CAS"] = true
 FORMATS["ORIC_DSK"] = true
 FORMATS["ORIC_TAP"] = true
+FORMATS["OS9_DSK"] = true
 FORMATS["P2000T_CAS"] = true
 FORMATS["P6001_CAS"] = true
 FORMATS["PASTI_DSK"] = true
 FORMATS["PC98FDI_DSK"] = true
 FORMATS["PC98_DSK"] = true
-FORMATS["PC_DSK"] = true
 FORMATS["PHC25_CAS"] = true
 FORMATS["PK8020_DSK"] = true
+FORMATS["PMD_CAS"] = true
 FORMATS["POLY_DSK"] = true
 FORMATS["PPG_DSK"] = true
-FORMATS["PMD_CAS"] = true
 FORMATS["PRIMOPTP"] = true
 FORMATS["PYLDIN_DSK"] = true
 FORMATS["QL_DSK"] = true
+FORMATS["RC759"] = true
 FORMATS["RK_CAS"] = true
 FORMATS["RX50_DSK"] = true
 FORMATS["SC3000_BIT"] = true
@@ -1139,7 +1140,6 @@ FORMATS["TVC_DSK"] = true
 FORMATS["TZX_CAS"] = true
 FORMATS["UEF_CAS"] = true
 FORMATS["UNIFLEX_DSK"] = true
-FORMATS["UPD765_DSK"] = true
 FORMATS["VDK_DSK"] = true
 FORMATS["VECTOR06_DSK"] = true
 FORMATS["VG5K_CAS"] = true
@@ -4066,6 +4066,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "tvgames")
 files {
+	MAME_DIR .. "src/mame/drivers/elan_ep3a19a.cpp",
 	MAME_DIR .. "src/mame/drivers/elan_eu3a14.cpp",
 	MAME_DIR .. "src/mame/drivers/elan_eu3a05.cpp",
 	MAME_DIR .. "src/mame/audio/elan_eu3a05.cpp",
@@ -4074,6 +4075,8 @@ files {
 	MAME_DIR .. "src/mame/machine/elan_eu3a05gpio.h",
 	MAME_DIR .. "src/mame/machine/elan_eu3a05commonsys.cpp",
 	MAME_DIR .. "src/mame/machine/elan_eu3a05commonsys.h",
+	MAME_DIR .. "src/mame/machine/elan_ep3a19asys.cpp",
+	MAME_DIR .. "src/mame/machine/elan_ep3a19asys.h",
 	MAME_DIR .. "src/mame/machine/elan_eu3a05sys.cpp",
 	MAME_DIR .. "src/mame/machine/elan_eu3a05sys.h",
 	MAME_DIR .. "src/mame/machine/elan_eu3a14sys.cpp",

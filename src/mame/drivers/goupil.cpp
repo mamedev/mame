@@ -547,8 +547,8 @@ void goupil_base_state::base(machine_config &config)
 
 	/* Floppy */
 	FD1791(config, m_fdc, 8_MHz_XTAL);
-	FLOPPY_CONNECTOR(config, m_floppy0, goupil_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, goupil_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, goupil_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, goupil_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 
 	i8279_device &i8279_kb1(I8279(config, "i8279_kb1", CPU_CLOCK));
 	i8279_kb1.out_sl_callback().set(FUNC(goupil_g1_state::scanlines_kbd1_w));   // scan SL lines

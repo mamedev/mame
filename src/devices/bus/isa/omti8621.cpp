@@ -204,11 +204,12 @@ static void pc_hd_floppies(device_slot_interface &device)
 	device.option_add("35dd", FLOPPY_35_DD);
 }
 
-FLOPPY_FORMATS_MEMBER( omti8621_device::floppy_formats )
-	FLOPPY_APOLLO_FORMAT,
-	FLOPPY_PC_FORMAT,
-	FLOPPY_NASLITE_FORMAT
-FLOPPY_FORMATS_END
+void omti8621_device::floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_APOLLO_FORMAT);
+	fr.add(FLOPPY_NASLITE_FORMAT);
+}
 
 // this card has two EPROMs: a program for the on-board Z8 CPU,
 // and a PC BIOS to make the card bootable on a PC.

@@ -78,7 +78,7 @@ public:
 		m_kanji_rom(*this, "kanji")
 	{ }
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	required_device<z80_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;

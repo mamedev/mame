@@ -964,9 +964,9 @@ void abc1600_state::abc1600(machine_config &config)
 	m_fdc->intrq_wr_callback().set(m_cio, FUNC(z8536_device::pb7_w));
 	m_fdc->drq_wr_callback().set(FUNC(abc1600_state::update_drdy0));
 
-	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":0", abc1600_floppies, nullptr, floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":1", abc1600_floppies, nullptr, floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":2", abc1600_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":0", abc1600_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":1", abc1600_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":2", abc1600_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 
 	ABCBUS_SLOT(config, m_bus0i, 64_MHz_XTAL / 16, abc1600bus_cards, nullptr);
 	m_bus0i->irq_callback().set(m_cio, FUNC(z8536_device::pa7_w));

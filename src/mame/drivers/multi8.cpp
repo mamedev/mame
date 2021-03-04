@@ -667,7 +667,7 @@ void multi8_state::multi8(machine_config &config)
 	PIC8259(config, "pic", 0);
 
 	//UPD765A(config, "fdc", false, true);
-	//FLOPPY_CONNECTOR(config, "fdc:0", multi8_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	//FLOPPY_CONNECTOR(config, "fdc:0", multi8_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats);
 }
 
 /* ROM definition */

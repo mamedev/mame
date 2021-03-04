@@ -424,8 +424,8 @@ void pwrview_state::pwrview(machine_config &config)
 	UPD765A(config, "fdc", 8'000'000, true, true); // Rockwell R7675P
 	//fdc.intrq_wr_callback().set("pic1", FUNC(pic8259_device::ir6_w));
 	//fdc.drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", pwrview_floppies, "525dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", pwrview_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", pwrview_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", pwrview_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	I8251(config, "uart", 0);
 

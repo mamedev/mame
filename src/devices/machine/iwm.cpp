@@ -469,6 +469,8 @@ void iwm_device::sync()
 					m_flux_write_start = 0;
 					m_whd &= ~0x40;
 					m_last_sync = next_sync;
+					m_rw_state = SW_UNDERRUN;
+
 				} else {
 					m_wsh = m_data;
 					m_rw_state = SW_WINDOW_MIDDLE;
@@ -490,7 +492,7 @@ void iwm_device::sync()
 
 			case SW_WINDOW_END:
 				if(m_flux_write_count == m_flux_write.size())
-					flush_write(next_sync);
+					flush_write();
 				if(m_mode & 0x02) {
 					m_rw_bit_count --;
 					if(m_rw_bit_count == 0) {
@@ -508,6 +510,10 @@ void iwm_device::sync()
 						m_next_state_change = m_last_sync + half_window_size();
 					m_rw_state = SW_WINDOW_MIDDLE;
 				}
+				break;
+
+			case SW_UNDERRUN:
+				m_last_sync = next_sync;
 				break;
 			}
 		}

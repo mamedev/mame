@@ -1017,16 +1017,18 @@ static INPUT_PORTS_START(ltmpm)
 INPUT_PORTS_END
 
 
-FLOPPY_FORMATS_MEMBER( bbc_state::floppy_formats )
-	FLOPPY_ACORN_SSD_FORMAT,
-	FLOPPY_ACORN_DSD_FORMAT,
-	FLOPPY_ACORN_ADFS_OLD_FORMAT,
-	FLOPPY_ACORN_DOS_FORMAT,
-	FLOPPY_OPUS_DDOS_FORMAT,
-	FLOPPY_OPUS_DDCPM_FORMAT,
-	FLOPPY_FSD_FORMAT,
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
+void bbc_state::floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+
+	fr.add(FLOPPY_ACORN_SSD_FORMAT);
+	fr.add(FLOPPY_ACORN_DSD_FORMAT);
+	fr.add(FLOPPY_ACORN_ADFS_OLD_FORMAT);
+	fr.add(FLOPPY_ACORN_DOS_FORMAT);
+	fr.add(FLOPPY_OPUS_DDOS_FORMAT);
+	fr.add(FLOPPY_OPUS_DDCPM_FORMAT);
+	fr.add(FLOPPY_FSD_FORMAT);
+}
 
 static void bbc_floppies(device_slot_interface &device)
 {

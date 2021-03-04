@@ -473,9 +473,10 @@ static void c8050_floppies(device_slot_interface &device)
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( c8050_device::floppy_formats )
-	FLOPPY_D80_FORMAT
-FLOPPY_FORMATS_END
+void c8050_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_D80_FORMAT);
+}
 
 
 //-------------------------------------------------
@@ -502,30 +503,33 @@ static void sfd1001_floppies(device_slot_interface &device)
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( c8250_device::floppy_formats )
-	FLOPPY_D80_FORMAT,
-	FLOPPY_D82_FORMAT
-FLOPPY_FORMATS_END
+void c8250_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_D80_FORMAT);
+	fr.add(FLOPPY_D82_FORMAT);
+}
 
 
 //-------------------------------------------------
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( c8250lp_device::floppy_formats )
-	FLOPPY_D80_FORMAT,
-	FLOPPY_D82_FORMAT
-FLOPPY_FORMATS_END
+void c8250lp_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_D80_FORMAT);
+	fr.add(FLOPPY_D82_FORMAT);
+}
 
 
 //-------------------------------------------------
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( sfd1001_device::floppy_formats )
-	FLOPPY_D80_FORMAT,
-	FLOPPY_D82_FORMAT
-FLOPPY_FORMATS_END
+void sfd1001_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_D80_FORMAT);
+	fr.add(FLOPPY_D82_FORMAT);
+}
 
 
 void c8050_device::add_common_devices(machine_config &config)

@@ -178,7 +178,8 @@ nouspikel_ide_card_device::nouspikel_ide_card_device(const machine_config &mconf
 	m_ideint(false),
 	m_mode(MODE_OFF),
 	m_page(0),
-	m_rtctype(0)
+	m_rtctype(0),
+	m_genmod(false)
 {
 }
 
@@ -474,6 +475,9 @@ void nouspikel_ide_card_device::decode(offs_t offset, bool& mmap, bool& sramsel,
 {
 	bool inspace = false;
 
+	// In a normal Geneve, assume AME=1, AMD=0
+	if (!m_genmod) offset = ((offset & 0x07ffff) | 0x100000);
+
 	// A0=0
 	if (m_mode == MODE_TI) inspace = ((offset & 0x8000)==0);
 	else
@@ -666,6 +670,7 @@ void nouspikel_ide_card_device::device_reset()
 	m_mode = ioport("MODE")->read();
 	m_srammap = (ioport("MAPMODE")->read()!=0);
 	m_rtctype = rtype[ioport("RTC")->read()];
+	m_genmod = (ioport("GENMOD")->read() != 0);
 
 	// The 65271 option does not support buffered SRAM; only the BQ4847
 	// can drive a buffered external RAM; the other two chips have internal SRAM
@@ -689,11 +694,17 @@ INPUT_CHANGED_MEMBER( nouspikel_ide_card_device::mode_changed )
 INPUT_PORTS_START( tn_ide )
 
 	PORT_START("RTC")
-	PORT_CONFNAME(0x03, 0, "RTC chip")
+	PORT_CONFNAME(0x03, 1, "RTC chip")
 		PORT_CONFSETTING(0, "RTC-65271")
 		PORT_CONFSETTING(1, "BQ4847 (ext SRAM)")
 		PORT_CONFSETTING(2, "BQ4842 (128K)")
 		PORT_CONFSETTING(3, "BQ4852 (512K)")
+
+	// When used in a normal Geneve, AME/AMD lines are set to (1,0)
+	PORT_START("GENMOD")
+	PORT_CONFNAME(0x01, 0, "Genmod decoding")
+		PORT_CONFSETTING(0, DEF_STR( Off ))
+		PORT_CONFSETTING(1, DEF_STR( On ))
 
 	// The switch should be open (1) on powerup for BQ clock chips
 	PORT_START("MAPMODE")

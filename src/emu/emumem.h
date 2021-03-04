@@ -1844,6 +1844,7 @@ public:
 	};
 
 	memory_view(device_t &device, std::string name);
+	~memory_view();
 
 	memory_view_entry &operator[](int slot);
 

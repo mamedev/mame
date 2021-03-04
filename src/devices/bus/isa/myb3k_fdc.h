@@ -75,9 +75,6 @@ protected:
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
-
-private:
-	DECLARE_FLOPPY_FORMATS( myb3k_floppy_formats );
 };
 
 class isa8_myb3k_fdc4711_device : public isa8_myb3k_fdc471x_device_base
@@ -92,9 +89,6 @@ protected:
 
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
-
-private:
-	DECLARE_FLOPPY_FORMATS( myb3k_floppy_formats );
 };
 
 class isa8_myb3k_fdc4712_device : public isa8_myb3k_fdc471x_device_base
@@ -114,9 +108,6 @@ protected:
 	virtual uint8_t myb3k_fdc_status() override;
 
 	uint8_t selected_drive;
-
-private:
-	DECLARE_FLOPPY_FORMATS( myb3k_floppy_formats );
 };
 
 // device type definition

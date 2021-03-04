@@ -15,11 +15,6 @@
 #include "flopimg.h"
 #include "upd765_dsk.h"
 
-/**************************************************************************/
-
-LEGACY_FLOPPY_OPTIONS_EXTERN(pc);
-
-
 class pc_format : public upd765_format
 {
 public:

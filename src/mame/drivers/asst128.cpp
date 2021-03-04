@@ -54,7 +54,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_fdc_xt_device> m_fdc;
 
-	DECLARE_FLOPPY_FORMATS(asst128_formats);
+	static void asst128_formats(format_registration &fr);
 	void asst128_fdc_dor_w(uint8_t data);
 
 	void machine_start() override;
@@ -95,9 +95,11 @@ static void asst128_floppies(device_slot_interface &device)
 	device.option_add("525ssqd", FLOPPY_525_SSQD);
 }
 
-FLOPPY_FORMATS_MEMBER( asst128_state::asst128_formats )
-	FLOPPY_ASST128_FORMAT
-FLOPPY_FORMATS_END
+void asst128_state::asst128_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ASST128_FORMAT);
+}
 
 static DEVICE_INPUT_DEFAULTS_START( asst128 )
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x30, 0x20)

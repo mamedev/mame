@@ -139,7 +139,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(mo_irq);
 	DECLARE_WRITE_LINE_MEMBER(mo_drq);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 	void ncr5390(device_t *device);

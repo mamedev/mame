@@ -64,7 +64,7 @@ msgstr "Marquises"
 
 #: src/frontend/mame/ui/videoopt.cpp:228
 msgid "View"
-msgstr "Vista"
+msgstr "Visualizar"
 
 #: src/frontend/mame/ui/videoopt.cpp:228
 msgid "Cropped"
@@ -132,7 +132,7 @@ msgstr "Títulos"
 
 #: src/frontend/mame/ui/dirmenu.cpp:49 src/frontend/mame/ui/selmenu.cpp:77
 msgid "Ends"
-msgstr "Ends"
+msgstr "Finais"
 
 #: src/frontend/mame/ui/dirmenu.cpp:50 src/frontend/mame/ui/selmenu.cpp:74
 msgid "PCBs"
@@ -144,11 +144,11 @@ msgstr "Painéis de Controle"
 
 #: src/frontend/mame/ui/dirmenu.cpp:53
 msgid "Crosshairs"
-msgstr "Mira"
+msgstr "Miras"
 
 #: src/frontend/mame/ui/dirmenu.cpp:54
 msgid "Artworks"
-msgstr "Arte"
+msgstr "Obras de arte"
 
 #: src/frontend/mame/ui/dirmenu.cpp:55 src/frontend/mame/ui/selmenu.cpp:79
 msgid "Bosses"
@@ -261,7 +261,7 @@ msgstr "Pausar/Parar"
 
 #: src/frontend/mame/ui/tapectrl.cpp:98
 msgid "Play"
-msgstr "Tocar"
+msgstr "Jogar"
 
 #: src/frontend/mame/ui/tapectrl.cpp:101
 msgid "Record"
@@ -407,7 +407,7 @@ msgstr "Leitor de código de barras"
 
 #: src/frontend/mame/ui/mainmenu.cpp:103
 msgid "Network Devices"
-msgstr "Dispositivos de rede"
+msgstr "Dispositivos de redes"
 
 #: src/frontend/mame/ui/mainmenu.cpp:106
 msgid "Keyboard Mode"
@@ -447,7 +447,7 @@ msgstr "Remover dos Favoritos"
 
 #: src/frontend/mame/ui/mainmenu.cpp:135
 msgid "Select New Machine"
-msgstr "Escolher uma Nova Máquina"
+msgstr "Escolher Nova Máquina"
 
 #: src/frontend/mame/ui/barcode.cpp:74
 msgid "New Barcode:"
@@ -459,7 +459,7 @@ msgstr "Digite o Código"
 
 #: src/frontend/mame/ui/barcode.cpp:119
 msgid "Barcode length invalid!"
-msgstr "O tamanho do código de barras é inválido"
+msgstr "Tamanho do código de barras inválido"
 
 #: src/frontend/mame/ui/info_pty.cpp:39
 msgid "[failed]"
@@ -513,11 +513,11 @@ msgid ""
 "If this is your first time using %2$s, please see the config.txt file in the "
 "docs directory for information on configuring %2$s."
 msgstr ""
-"Nenhuma máquina encontrada. Por favor, verifique o caminho rompath definido "
+"Nenhuma máquina encontrada. Por favor, verifique o caminho rompath especificado "
 "no arquivo %1$s.ini .\n"
 "\n"
 "Se esta é a sua primeira vez usando %2$s, por favor, veja o arquivo config."
-"txt no diretório de documentos para informação em configurar o %2$s."
+"txt no diretório de documentos para informação sobre a configuração do %2$s."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:277
 #: src/frontend/mame/ui/selgame.cpp:606
@@ -563,7 +563,7 @@ msgstr "Geral: Proteção Não Emulada"
 #: src/frontend/mame/ui/simpleselgame.cpp:340
 #: src/frontend/mame/ui/selmenu.cpp:671
 msgid "Overall: Working"
-msgstr "Geral: Funciona"
+msgstr "Geral: Funcionando"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:344
 #: src/frontend/mame/ui/selmenu.cpp:675
@@ -583,7 +583,7 @@ msgstr "Gráficos: OK, "
 #: src/frontend/mame/ui/simpleselgame.cpp:351
 #: src/frontend/mame/ui/selmenu.cpp:682
 msgid "Sound: None"
-msgstr "Som: Sem"
+msgstr "Som: Nenhum"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:353
 #: src/frontend/mame/ui/selmenu.cpp:684
@@ -648,7 +648,7 @@ msgstr "IU:   Desativado"
 
 #: src/frontend/mame/ui/ui.cpp:1249
 msgid "Autofire can't be enabled"
-msgstr "Autodisparo não pode ser ativado"
+msgstr "Fogo automático não pode ser ativado"
 
 #: src/frontend/mame/ui/ui.cpp:1302
 #, c-format
@@ -866,7 +866,7 @@ msgstr "Todas as trapaças foram recarregadas"
 
 #: src/frontend/mame/ui/cheatopt.cpp:136
 msgid "Autofire Settings"
-msgstr "Configurações do Autodisparo"
+msgstr "Configurações do Fogo automático"
 
 #: src/frontend/mame/ui/cheatopt.cpp:157 plugins/cheat/init.lua:599
 msgid "Reset All"
@@ -878,7 +878,7 @@ msgstr "Recarregar Tudo"
 
 #: src/frontend/mame/ui/cheatopt.cpp:273
 msgid "Autofire Status"
-msgstr "Estado do Autodisparo"
+msgstr "Estado do Fogo automático"
 
 #: src/frontend/mame/ui/cheatopt.cpp:306
 msgid "No buttons found on this machine!"
@@ -886,7 +886,7 @@ msgstr "Nenhum botão encontrado nesta máquina!"
 
 #: src/frontend/mame/ui/cheatopt.cpp:317 src/frontend/mame/ui/cheatopt.cpp:321
 msgid "Autofire Delay"
-msgstr "Atraso do Autodisparo"
+msgstr "Atraso do Fogo automático"
 
 #: src/frontend/mame/ui/selsoft.cpp:228 src/frontend/mame/ui/selgame.cpp:464
 #, c-format
@@ -913,7 +913,7 @@ msgid ""
 "different software.\n"
 "\n"
 msgstr ""
-"Está faltando uma ou mais arquivos necessários no programa selecionado. Por "
+"Está faltando um ou mais arquivos necessários no programa selecionado. Por "
 "favor, escolha outro.\n"
 "\n"
 
@@ -924,7 +924,7 @@ msgstr "Pressione qualquer tecla para continuar"
 #: src/frontend/mame/ui/selsoft.cpp:637
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
-msgstr "%1$s %2$s ( %3$d / %4$d pacotes de programas )"
+msgstr "%1$s %2$s ( %3$d / %4$d pacotes do programa )"
 
 #: src/frontend/mame/ui/selsoft.cpp:638
 #, c-format
@@ -955,11 +955,11 @@ msgstr "Não Disponível"
 
 #: src/frontend/mame/ui/utils.cpp:63
 msgid "Working"
-msgstr "Funciona"
+msgstr "Funcionando"
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgid "Not Working"
-msgstr "Não Funciona"
+msgstr "Não está funcionando"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgid "Mechanical"
@@ -987,7 +987,7 @@ msgstr "Sem BIOS"
 
 #: src/frontend/mame/ui/utils.cpp:71 src/frontend/mame/ui/utils.cpp:88
 msgid "Parents"
-msgstr "Pai"
+msgstr "Pais"
 
 #: src/frontend/mame/ui/utils.cpp:72 src/frontend/mame/ui/utils.cpp:89
 msgid "Clones"
@@ -1011,11 +1011,11 @@ msgstr "Sem Suporte a Salvamento"
 
 #: src/frontend/mame/ui/utils.cpp:77
 msgid "CHD Required"
-msgstr "Precisa de CHD"
+msgstr "CHD requerido"
 
 #: src/frontend/mame/ui/utils.cpp:78
 msgid "No CHD Required"
-msgstr "Não Precisa de CHD"
+msgstr "Nenhum CHD requerido"
 
 #: src/frontend/mame/ui/utils.cpp:79
 msgid "Vertical Screen"
@@ -1239,7 +1239,7 @@ msgstr "Linhas"
 
 #: src/frontend/mame/ui/custui.cpp:348
 msgid "Infos text size"
-msgstr "Tamanho do texto de informação"
+msgstr "Tamanho do texto de informações"
 
 #: src/frontend/mame/ui/custui.cpp:362
 msgid "UI Fonts Settings"
@@ -1550,7 +1550,7 @@ msgstr "Entradas do Teclado\tSim\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1052
 msgid "Overall\tNOT WORKING\n"
-msgstr "Geral\tNÃO FUNCIONA\n"
+msgstr "Geral\tNÃO FUNCIONANDO\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1054
 msgid "Overall\tUnemulated Protection\n"
@@ -1558,7 +1558,7 @@ msgstr "Geral\tProteção não Emulada\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1056
 msgid "Overall\tWorking\n"
-msgstr "Geral\tFunciona\n"
+msgstr "Geral\tFuncionando\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1059
 msgid "Graphics\tUnimplemented\n"
@@ -1582,7 +1582,7 @@ msgstr "Gráficos\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1070
 msgid "Sound\tNone\n"
-msgstr "Som\tSem\n"
+msgstr "Som\tNenhum\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1072
 msgid "Sound\tUnimplemented\n"
@@ -1590,7 +1590,7 @@ msgstr "Som\tNão Implementado\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1074
 msgid "Sound\tImperfect\n"
-msgstr "Som\tImperfeitos\n"
+msgstr "Som\tImperfeito\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1076
 msgid "Sound\tOK\n"
@@ -1598,7 +1598,7 @@ msgstr "Som\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1079
 msgid "Capture\tUnimplemented\n"
-msgstr "Captura\tNão Implementado\n"
+msgstr "Captura\tNão Implementada\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1081
 msgid "Capture\tImperfect\n"
@@ -1702,11 +1702,11 @@ msgstr "(EP)ROM\tImperfeito\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1144
 msgid "Communications\tUnimplemented\n"
-msgstr "Communicações\tNão Implementado\n"
+msgstr "Comunicações\tNão Implementadas\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1146
 msgid "Communications\tImperfect\n"
-msgstr "Communicações\tImperfeito\n"
+msgstr "Comunicações\tImperfeitas\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1149
 msgid "LAN\tUnimplemented\n"
@@ -1746,11 +1746,11 @@ msgstr "Precisa de Arte\tSim\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1164
 msgid "Requires Artwork\tNo\n"
-msgstr "Precisa de Arte\tNão\n"
+msgstr "Arte Requerida\tNão\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1165
 msgid "Requires Clickable Artwork\tYes\n"
-msgstr "Necessita de Arte Selecionável\tSim\n"
+msgstr "Necessita Arte Selecionável\tSim\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1165
 msgid "Requires Clickable Artwork\tNo\n"
@@ -1810,7 +1810,7 @@ msgstr "Condição das Amostras\tNenhuma Necessária\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1199
 msgid "Samples Audit Result\tOK\n"
-msgstr "Condição das Amostras\tBOA\n"
+msgstr "Condição das Amostras\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1201
 msgid "Samples Audit Result\tBAD\n"
@@ -1863,11 +1863,11 @@ msgstr "Usar Amostras Externas"
 
 #: src/frontend/mame/ui/submenu.cpp:22
 msgid "Miscellaneous Options"
-msgstr "Opções Diversas"
+msgstr "Diversas Opções"
 
 #: src/frontend/mame/ui/submenu.cpp:23
 msgid "Re-select last machine played"
-msgstr "Re-selecione a última máquina jogada"
+msgstr "Selecione novamente a última máquina jogada"
 
 #: src/frontend/mame/ui/submenu.cpp:24
 msgid "Enlarge images in the right panel"
@@ -1895,7 +1895,7 @@ msgstr "Usar imagem como plano de fundo"
 
 #: src/frontend/mame/ui/submenu.cpp:31
 msgid "Skip BIOS selection menu"
-msgstr "Omitir a tela de seleção de BIOS"
+msgstr "Omitir a tela de seleção da BIOS"
 
 #: src/frontend/mame/ui/submenu.cpp:32
 msgid "Skip software parts selection menu"
@@ -1971,7 +1971,7 @@ msgstr "Giro Y"
 
 #: src/frontend/mame/ui/submenu.cpp:56
 msgid "Artwork Options"
-msgstr "Opções da Artwork"
+msgstr "Opções de Obra de arte"
 
 #: src/frontend/mame/ui/submenu.cpp:57
 msgid "Artwork Crop"
@@ -2115,7 +2115,7 @@ msgstr "Atribuição do Dispositivo Mouse"
 
 #: src/frontend/mame/ui/submenu.cpp:102
 msgid "Video Mode"
-msgstr "Modo do Vídeo"
+msgstr "Modo de Vídeo"
 
 #: src/frontend/mame/ui/submenu.cpp:103
 msgid "Number Of Screens"
@@ -2143,7 +2143,7 @@ msgstr "Pré-escala de Bitmap"
 
 #: src/frontend/mame/ui/submenu.cpp:111
 msgid "Window Mode"
-msgstr "Modo Janelado"
+msgstr "Modo de janela"
 
 #: src/frontend/mame/ui/submenu.cpp:112
 msgid "Enforce Aspect Ratio"
@@ -2308,7 +2308,7 @@ msgstr "  Entradas Analógicas    [%1$d entradas]\n"
 #: src/frontend/mame/ui/devopt.cpp:250
 #, c-format
 msgid "  Adjuster inputs    [%1$d inputs]\n"
-msgstr "  Entradas Adjuster    [%1$d entradas]\n"
+msgstr "  Entradas Reguladoras    [%1$d entradas]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:252
 #, c-format
@@ -2655,7 +2655,7 @@ msgstr "Painéis de Controle"
 
 #: src/frontend/mame/ui/selmenu.cpp:78
 msgid "Artwork Preview"
-msgstr "Visualização da Arte"
+msgstr "Visualização da Obra de arte"
 
 #: src/frontend/mame/ui/selmenu.cpp:82
 msgid "Game Over"
@@ -2679,7 +2679,7 @@ msgstr "Seleção por parte de Programa"
 
 #: src/frontend/mame/ui/selmenu.cpp:367
 msgid "BIOS selection:"
-msgstr "Seleção de BIOS:"
+msgstr "Seleção da BIOS:"
 
 #: src/frontend/mame/ui/selmenu.cpp:622
 #, c-format
@@ -2771,7 +2771,7 @@ msgstr "Pressione uma tecla para criar um atalho ou aguarde para limpar"
 
 #: plugins/cheat/init.lua:546
 msgid "None"
-msgstr "Sem"
+msgstr "Nenhum"
 
 #: plugins/cheat/init.lua:551
 msgid "Done"
@@ -2812,7 +2812,7 @@ msgstr "%s adicionado"
 
 #: plugins/data/data_command.lua:19
 msgid "Command"
-msgstr "Command"
+msgstr "Comando"
 
 #: plugins/data/data_hiscore.lua:770 plugins/data/data_hiscore.lua:818
 msgid "High Scores"
@@ -3010,7 +3010,7 @@ msgstr "Qualquer"
 
 #: plugins/cheatfind/init.lua:725
 msgid "Data Format"
-msgstr "Formato do dado"
+msgstr "Formato de dados"
 
 #: plugins/cheatfind/init.lua:731
 msgid "Test/Write Poke Value"

@@ -41,7 +41,7 @@ public:
 	void d15_o_b(uint8_t data);
 	void d15_o_c(uint8_t data);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 protected:
 	// construction/destruction

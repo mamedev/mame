@@ -952,10 +952,10 @@ void einstein_state::einstein(machine_config &config)
 	/* floppy */
 	WD1770(config, m_fdc, XTAL_X002);
 
-	FLOPPY_CONNECTOR(config, IC_I042 ":0", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, IC_I042 ":1", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, IC_I042 ":2", einstein_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, IC_I042 ":3", einstein_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, IC_I042 ":0", einstein_floppies, "3ss", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, IC_I042 ":1", einstein_floppies, "3ss", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, IC_I042 ":2", einstein_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, IC_I042 ":3", einstein_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "disk_list").set_original("einstein").set_filter("TC01");

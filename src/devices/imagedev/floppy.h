@@ -12,46 +12,27 @@
 #pragma once
 
 #include "formats/flopimg.h"
-#include "formats/d88_dsk.h"
-#include "formats/dfi_dsk.h"
-#include "formats/hxchfe_dsk.h"
-#include "formats/hxcmfm_dsk.h"
-#include "formats/imd_dsk.h"
-#include "formats/ipf_dsk.h"
-#include "formats/mfi_dsk.h"
-#include "formats/td0_dsk.h"
-#include "formats/cqm_dsk.h"
-#include "formats/dsk_dsk.h"
 #include "sound/samples.h"
 #include "softlist_dev.h"
-
-#define DECLARE_FLOPPY_FORMATS(_name) \
-	static const floppy_format_type _name []
-
-#define FLOPPY_FORMATS_MEMBER(_member) \
-	const floppy_format_type _member [] = {
-#define FLOPPY_FORMATS_END0 \
-		, \
-		nullptr };
-#define FLOPPY_FORMATS_END \
-		, \
-		FLOPPY_D88_FORMAT, \
-		FLOPPY_DFI_FORMAT, \
-		FLOPPY_HFE_FORMAT, \
-		FLOPPY_IMD_FORMAT, \
-		FLOPPY_IPF_FORMAT, \
-		FLOPPY_MFI_FORMAT, \
-		FLOPPY_MFM_FORMAT, \
-		FLOPPY_TD0_FORMAT, \
-		FLOPPY_CQM_FORMAT, \
-		FLOPPY_DSK_FORMAT \
-	FLOPPY_FORMATS_END0
 
 class floppy_sound_device;
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+
+class format_registration {
+public:
+	format_registration();
+
+	void add(floppy_format_type format);
+
+	void add_fm_containers();
+	void add_mfm_containers();
+	void add_pc_formats();
+
+	std::vector<floppy_format_type> m_formats;
+};
 
 class floppy_image_device : public device_t,
 							public device_image_interface
@@ -67,7 +48,7 @@ public:
 	// construction/destruction
 	virtual ~floppy_image_device();
 
-	void set_formats(const floppy_format_type *formats);
+	void set_formats(std::function<void (format_registration &fr)> formats);
 	floppy_image_format_t *get_formats() const;
 	floppy_image_format_t *get_load_format() const;
 	floppy_image_format_t *identify(std::string filename);
@@ -131,7 +112,9 @@ public:
 	uint32_t get_form_factor() const;
 	uint32_t get_variant() const;
 
-	static const floppy_format_type default_floppy_formats[];
+	static void default_fm_floppy_formats(format_registration &fr);
+	static void default_mfm_floppy_formats(format_registration &fr);
+	static void default_pc_floppy_formats(format_registration &fr);
 
 	// Enable sound
 	void    enable_sound(bool doit) { m_make_sound = doit; }
@@ -388,7 +371,7 @@ class floppy_connector: public device_t,
 {
 public:
 	template <typename T>
-	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, const floppy_format_type formats[], bool fixed = false)
+	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, std::function<void (format_registration &fr)> formats, bool fixed = false)
 		: floppy_connector(mconfig, tag, owner, 0)
 	{
 		option_reset();
@@ -397,7 +380,7 @@ public:
 		set_fixed(fixed);
 		set_formats(formats);
 	}
-	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, const char *option, const device_type &devtype, bool is_default, const floppy_format_type formats[])
+	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, const char *option, const device_type &devtype, bool is_default, std::function<void (format_registration &fr)> formats)
 		: floppy_connector(mconfig, tag, owner, 0)
 	{
 		option_reset();
@@ -410,7 +393,7 @@ public:
 	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~floppy_connector();
 
-	void set_formats(const floppy_format_type formats[]);
+	void set_formats(std::function<void (format_registration &fr)> formats);
 	floppy_image_device *get_device();
 	void enable_sound(bool doit) { m_enable_sound = doit; }
 
@@ -419,7 +402,7 @@ protected:
 	virtual void device_config_complete() override;
 
 private:
-	const floppy_format_type *formats;
+	std::function<void (format_registration &fr)> formats;
 	bool m_enable_sound;
 };
 

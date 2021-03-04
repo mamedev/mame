@@ -244,10 +244,10 @@ void ampro_state::ampro(machine_config &config)
 	//m_fdc->intrq_wr_callback().set(m_ctc, FUNC(z80ctc_device::trg3)); // only if JMP2-3 shorted
 	//m_fdc->drq_wr_callback().set(m_dart, FUNC(z80dart_device::ria_w)); // only if JMP7 shorted
 	m_fdc->ready_wr_callback().set(m_dart, FUNC(z80dart_device::dcdb_w)); // actually from the drive, and not used by the FDC at all
-	FLOPPY_CONNECTOR(config, "fdc:0", ampro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", ampro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:2", ampro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:3", ampro_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", ampro_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", ampro_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:2", ampro_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", ampro_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	SOFTWARE_LIST(config, "flop_list").set_original("ampro");
 
 	NSCSI_BUS(config, "scsi");

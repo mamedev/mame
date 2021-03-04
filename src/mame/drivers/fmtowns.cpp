@@ -2762,6 +2762,10 @@ void towns_state::machine_start()
 		m_flop[0]->get_device()->set_rpm(360);
 	if (m_flop[1]->get_device())
 		m_flop[1]->get_device()->set_rpm(360);
+
+	m_timer0 = 0;
+	m_timer1 = 0;
+	m_serial_irq_enable = 0;
 }
 
 void towns_state::machine_reset()
@@ -2804,9 +2808,11 @@ uint8_t towns_state::get_slave_ack(offs_t offset)
 	return 0x00;
 }
 
-FLOPPY_FORMATS_MEMBER( towns_state::floppy_formats )
-	FLOPPY_FMTOWNS_FORMAT
-FLOPPY_FORMATS_END
+void towns_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_FMTOWNS_FORMAT);
+}
 
 static void towns_floppies(device_slot_interface &device)
 {

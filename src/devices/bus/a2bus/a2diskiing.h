@@ -47,7 +47,7 @@ protected:
 	const uint8_t *m_rom;
 
 private:
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 };
 
 class a2bus_diskiing_device: public diskiing_device
@@ -66,7 +66,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 };
 
 class a2bus_applesurance_device: public diskiing_device
