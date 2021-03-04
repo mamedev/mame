@@ -156,7 +156,6 @@
 #include "video/k057714.h"
 
 #include "imagedev/floppy.h"
-#include "formats/pc_dsk.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -675,8 +674,6 @@ private:
 	required_ioport_array<7> m_io_effects;
 
 	DECLARE_WRITE_LINE_MEMBER(floppy_irq_callback);
-
-	static void floppy_formats(format_registration &fr);
 };
 
 class firebeat_popn_state : public firebeat_spu_state
@@ -1429,12 +1426,6 @@ static void pc_hd_floppies(device_slot_interface &device)
 	device.option_add("35hd", FLOPPY_35_HD);
 }
 
-void firebeat_bm3_state::floppy_formats(format_registration &fr)
-{
-	fr.add_mfm_containers();
-	fr.add(FLOPPY_PC_FORMAT);
-}
-
 WRITE_LINE_MEMBER(firebeat_bm3_state::floppy_irq_callback)
 {
 	if (BIT(m_extend_board_irq_enable, 2) == 0 && state)
@@ -1468,7 +1459,7 @@ void firebeat_bm3_state::firebeat_bm3(machine_config &config)
 	FDC37C665GT(config, m_fdc, 24_MHz_XTAL, upd765_family_device::mode_t::PS2);
 	m_fdc->fintr().set(FUNC(firebeat_bm3_state::floppy_irq_callback));
 
-	FLOPPY_CONNECTOR(config, m_floppy, pc_hd_floppies, "35hd", firebeat_bm3_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy, pc_hd_floppies, "35hd", floppy_image_device::default_pc_floppy_formats);
 
 	PC16552D(config, m_duart_midi, 0);
 	NS16550(config, "duart_midi:chan0", XTAL(24'000'000));
