@@ -331,6 +331,8 @@ void elan_ep3a19a_state::init_tvbg()
 	}
 }
 
+// The TV Board Game units have "Programmed by E.I. HK Development LTD." in the graphics
+
 CONS( 2007, tvbg6a, 0, 0, elan_ep3a19a, tvbg6, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 6-in-1: Silly 6 Pins, Candy Land, Hungry Hungry Hippos, Match 'em, Mixin' Pics, Checkers", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=zajzQo47YYA
 CONS( 2007, tvbg6b, 0, 0, elan_ep3a19a, tvbg6, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 6-in-1: Simon, Battleship, Mouse Trap, Checkers, Link-a-Line, Roll Over", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=JbrR67kY8MI
 
