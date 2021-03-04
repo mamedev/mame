@@ -49,7 +49,7 @@
  *   - 10x Motorola MCM67A618FN12 SRAMs (secondary cache?): not emulated
  *  Motherboard:
  *   - Sony CXD8490G, CXD8491G, CXD8492G, CXD8489G (unknown ASICs): not emulated
- *   - Main memory: partially emulated (monitor ROM cannot enumerate the emulated RAM correctly)
+ *   - Main memory: partially emulated (hack required for the monitor ROM to enumerate RAM correctly)
  *  I/O board:
  *   - Sony CXD8409Q Parallel Interface: not emulated
  *   - National Semi PC8477B Floppy Controller: partially emulated (MAME only has the -A version currently)
@@ -213,7 +213,6 @@ protected:
     // std::unique_ptr<u16[]> m_net_ram;
 
     // National Semiconductor PC8477B floppy controller
-    DECLARE_FLOPPY_FORMATS(floppy_formats);
     required_device<pc8477a_device> m_fdc;
 
     // NEWS keyboard and mouse
@@ -265,10 +264,6 @@ protected:
     void debug_ram_w(offs_t offset, uint8_t data);
 };
 
-FLOPPY_FORMATS_MEMBER(news_r4k_state::floppy_formats)
-FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
-
 static void news_scsi_devices(device_slot_interface &device)
 {
     device.option_add("harddisk", NSCSI_HARDDISK);
@@ -319,7 +314,7 @@ void news_r4k_state::machine_common(machine_config &config)
     m_fdc->intrq_wr_callback().set(m_dmac, FUNC(dmac3_device::irq<1>));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(dmac3_device::drq<1>));
     */
-    FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_formats).enable_sound(false);
+    FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
     // DMA controller
     DMAC3(config, m_dmac, 0);
