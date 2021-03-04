@@ -155,6 +155,9 @@
 #include "sound/ymz280b.h"
 #include "video/k057714.h"
 
+#include "imagedev/floppy.h"
+#include "formats/pc_dsk.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
