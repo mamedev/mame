@@ -676,7 +676,7 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(floppy_irq_callback);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 };
 
 class firebeat_popn_state : public firebeat_spu_state
@@ -1429,9 +1429,11 @@ static void pc_hd_floppies(device_slot_interface &device)
 	device.option_add("35hd", FLOPPY_35_HD);
 }
 
-FLOPPY_FORMATS_MEMBER(firebeat_bm3_state::floppy_formats)
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
+void firebeat_bm3_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_PC_FORMAT);
+}
 
 WRITE_LINE_MEMBER(firebeat_bm3_state::floppy_irq_callback)
 {
