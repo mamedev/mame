@@ -305,6 +305,14 @@ ROM_START( tvbg6b )
 	ROM_RELOAD(0x200000,0x200000)
 ROM_END
 
+ROM_START( tvbg3a )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hhhssp.bin", 0x00000, 0x100000, CRC(7e23a5a0) SHA1(2cd0f7572df30d2565b64fa0936715f71312ab1a) )
+	ROM_RELOAD(0x100000,0x100000)
+	ROM_RELOAD(0x200000,0x100000)
+	ROM_RELOAD(0x300000,0x100000)
+ROM_END
+
 ROM_START( tvbg3c )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "boggle_connect4.bin", 0x00000, 0x100000, CRC(c2374eea) SHA1(c6971cb5108828bc72fd1cf7edeb53915d196db7) )
@@ -326,7 +334,7 @@ void elan_ep3a19a_state::init_tvbg()
 CONS( 2007, tvbg6a, 0, 0, elan_ep3a19a, tvbg6, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 6-in-1: Silly 6 Pins, Candy Land, Hungry Hungry Hippos, Match 'em, Mixin' Pics, Checkers", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=zajzQo47YYA
 CONS( 2007, tvbg6b, 0, 0, elan_ep3a19a, tvbg6, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 6-in-1: Simon, Battleship, Mouse Trap, Checkers, Link-a-Line, Roll Over", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=JbrR67kY8MI
 
-// TV Board Games 3-in-1: Silly 6 Pins, Hungry Hungry Hippos, Match 'em
+CONS( 2007, tvbg3a, 0, 0, elan_ep3a19a, tvbg6, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 3-in-1: Silly 6 Pins, Hungry Hungry Hippos, Match 'em", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // TV Board Games 3-in-1: Simon, Battleship, Checkers    https://www.youtube.com/watch?v=Q7nwKJfVavU
 CONS( 2007, tvbg3c, 0, 0, elan_ep3a19a, tvbg3, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 3-in-1: Boggle, Connect 4, Roll Over", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=SoKKIKSDGhY
 
