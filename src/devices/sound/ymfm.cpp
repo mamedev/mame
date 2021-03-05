@@ -1149,7 +1149,10 @@ void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 &lsum
 	else if (noise_state != 0)
 		opout[4] = m_op[3]->compute_noise_volume(noise_state, am_offset);
 	else
-		opout[4] = m_op[3]->compute_volume(opout[BIT(algorithm_inputs, 4, 3)] >> 1, am_offset);
+	{
+		opin = opout[BIT(algorithm_inputs, 4, 3)] >> 1;
+		opout[4] = m_op[3]->compute_volume(opin, am_offset);
+	}
 
 	// all algorithms consume OP4 output
 	s16 result = opout[4] >> rshift;
