@@ -59,7 +59,7 @@ void mm76e_device::program_1k(address_map &map)
 
 void mm76_device::data_48x4(address_map &map)
 {
-	//map(0x00, 0x2f).ram();
+	map(0x00, 0x2f).ram();
 }
 
 
@@ -99,6 +99,7 @@ void mm76_device::execute_one()
 {
 	if (op_is_tr(m_prev_op))
 	{
+		// 2-byte opcodes
 		switch (m_op & 0xf0)
 		{
 			case 0x20: op_skbei(); break;
@@ -112,6 +113,7 @@ void mm76_device::execute_one()
 	}
 	else
 	{
+		// standard opcodes
 		switch (m_op & 0xf0)
 		{
 			case 0x20: op_lb(); break;
