@@ -21,6 +21,8 @@ public:
 		virtual void add_raw(const filesystem_manager_t *manager, const char *name, u32 key, const char *description) = 0;
 	};
 
+	virtual ~filesystem_manager_t() = default;
+
 	virtual void enumerate(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const;
 
 	// Floppy image initialization
