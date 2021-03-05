@@ -1522,7 +1522,7 @@ bool apple_2mg_format::load(io_generic *io, uint32_t form_factor, const std::vec
 	uint32_t blocks = header[0x14] | (header[0x15] << 8) | (header[0x16] << 16) | (header[0x17] << 24);
 	uint32_t pos_data = header[0x18] | (header[0x19] << 8) | (header[0x1a] << 16) | (header[0x1b] << 24);
 
-	if(blocks != 1600)
+	if(blocks != 1600 && blocks != 16390)
 		return false;
 
 	for(int track=0; track < 80; track++) {
