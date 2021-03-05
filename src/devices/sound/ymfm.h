@@ -102,30 +102,39 @@ protected:
 	}
 
 public:
+	// family type
+	enum family_type : u8
+	{
+		FAMILY_OPM,
+		FAMILY_OPN,
+		FAMILY_OPL
+	};
+
 	// system-wide registers that aren't universally supported
-	u8 noise_frequency() const    /*  5 bits */ { return 0; } // not on OPN,OPNA
-	u8 noise_enabled() const      /*  1 bit  */ { return 0; } // not on OPN,OPNA
-	u8 lfo_enabled() const        /*  1 bit  */ { return 0; } // not on OPM,OPN
-	u8 lfo_rate() const           /*3-8 bits */ { return 0; } // not on OPN
-	u8 lfo_waveform() const       /*  2 bits */ { return 0; } // not on OPN,OPNA
+	u8 noise_frequency() const    /*  5 bits */ { return 0; } // not on OPN,OPNA,OPL
+	u8 noise_enabled() const      /*  1 bit  */ { return 0; } // not on OPN,OPNA,OPL
+	u8 lfo_enabled() const        /*  1 bit  */ { return 0; } // not on OPM,OPN,OPL
+	u8 lfo_rate() const           /*3-8 bits */ { return 0; } // not on OPN,OPL
+	u8 lfo_waveform() const       /*  2 bits */ { return 0; } // not on OPN,OPNA,OPL
 	u8 lfo_pm_depth() const       /*  7 bits */ { return 0; } // not on OPN,OPNA
 	u8 lfo_am_depth() const       /*  7 bits */ { return 0; } // not on OPN,OPNA
-	u8 multi_freq() const         /*  1 bit  */ { return 0; } // not on OPM
-	u16 multi_block_freq0() const /* 14 bits */ { return 0; } // not on OPM
-	u16 multi_block_freq1() const /* 14 bits */ { return 0; } // not on OPM
-	u16 multi_block_freq2() const /* 14 bits */ { return 0; } // not on OPM
+	u8 multi_freq() const         /*  1 bit  */ { return 0; } // not on OPM,OPL
+	u16 multi_block_freq0() const /* 14 bits */ { return 0; } // not on OPM,OPL
+	u16 multi_block_freq1() const /* 14 bits */ { return 0; } // not on OPM,OPL
+	u16 multi_block_freq2() const /* 14 bits */ { return 0; } // not on OPM,OPL
 
 	// per-channel registers that aren't universally supported
-	u8 pan_right() const          /*  1 bit  */ { return 1; } // not on OPN
-	u8 pan_left() const           /*  1 bit  */ { return 1; } // not on OPN
-	u8 lfo_pm_sensitivity() const /*  3 bits */ { return 0; } // not on OPN
-	u8 lfo_am_sensitivity() const /*  2 bits */ { return 0; } // not on OPN
+	u8 pan_right() const          /*  1 bit  */ { return 1; } // not on OPN,OPL
+	u8 pan_left() const           /*  1 bit  */ { return 1; } // not on OPN,OPL
+	u8 lfo_pm_sensitivity() const /*  3 bits */ { return 0; } // not on OPN,OPL
+	u8 lfo_am_sensitivity() const /*  2 bits */ { return 0; } // not on OPN,OPL
 
 	// per-operator registers that aren't universally supported
 	u8 lfo_am_enabled() const     /*  1 bit  */ { return 0; } // not on OPN
-	u8 detune2() const            /*  2 bits */ { return 0; } // not on OPN,OPN2
-	u8 ssg_eg_enabled() const     /*  1 bit  */ { return 0; } // not on OPM
-	u8 ssg_eg_mode() const        /*  1 bit  */ { return 0; } // not on OPM
+	u8 lfo_pm_enabled() const     /*  1 bit  */ { return 0; } // not on OPM,OPN,OPN2
+	u8 detune2() const            /*  2 bits */ { return 0; } // not on OPN,OPN2,OPL
+	u8 ssg_eg_enabled() const     /*  1 bit  */ { return 0; } // not on OPM,OPL
+	u8 ssg_eg_mode() const        /*  1 bit  */ { return 0; } // not on OPM,OPL
 
 protected:
 	// return a bitfield extracted from a byte
@@ -207,12 +216,12 @@ class ymopm_registers : public ymfm_registers_base
 {
 public:
 	// constants
+	static constexpr family_type FAMILY = FAMILY_OPM;
 	static constexpr u8 DEFAULT_PRESCALE = 2;
 	static constexpr u8 CHANNELS = 8;
-	static constexpr u8 CSM_TRIGGER_MASK = 0xff;
+	static constexpr u32 CSM_TRIGGER_MASK = 0xff;
 	static constexpr u16 REGISTERS = 0x100;
 	static constexpr u16 REG_MODE = 0x14;
-	static constexpr u16 REG_KEYON = 0x08;
 
 	// constructor
 	ymopm_registers(std::vector<u8> &regdata, u16 chbase = 0, u16 opbase = 0) :
@@ -249,8 +258,6 @@ public:
 
 	// system-wide registers
 	u8 test() const               /*  8 bits */ { return sysbyte(0x01, 0, 8); }
-	u8 keyon_states() const       /*  4 bits */ { return sysbyte(0x08, 3, 4); }
-	u8 keyon_channel() const      /*  3 bits */ { return sysbyte(0x08, 0, 3); }
 	u8 noise_frequency() const    /*  5 bits */ { return sysbyte(0x0f, 0, 5); }
 	u8 noise_enabled() const      /*  1 bit  */ { return sysbyte(0x0f, 7, 1); }
 	u16 timer_a_value() const     /* 10 bits */ { return sysword(0x10, 0, 8, 0x11, 0, 2); }
@@ -302,6 +309,18 @@ public:
 		// release encodes 4 bits and expands them
 		else
 			return opbyte(0xe0, 0, 4) * 2 + 1;
+	}
+
+	// determine if a given write is a keyon, and if so, for which channel/operators
+	static bool is_keyon(u16 regindex, u8 data, u8 &channel, u8 &opmask)
+	{
+		if (regindex == 0x08)
+		{
+			channel = BIT(data, 0, 3);
+			opmask = BIT(data, 3, 4);
+			return true;
+		}
+		return false;
 	}
 
 protected:
@@ -366,12 +385,12 @@ class ymopn_registers : public ymfm_registers_base
 {
 public:
 	// constants
+	static constexpr family_type FAMILY = FAMILY_OPN;
 	static constexpr u8 DEFAULT_PRESCALE = 6;
 	static constexpr u8 CHANNELS = 3;
-	static constexpr u8 CSM_TRIGGER_MASK = 1 << 2;
+	static constexpr u32 CSM_TRIGGER_MASK = 1 << 2;
 	static constexpr u16 REGISTERS = 0x100;
 	static constexpr u16 REG_MODE = 0x27;
-	static constexpr u16 REG_KEYON = 0x28;
 
 	// constructor
 	ymopn_registers(std::vector<u8> &regdata, u16 chbase = 0, u16 opbase = 0) :
@@ -429,8 +448,6 @@ public:
 	u8 enable_timer_a() const     /*  1 bit  */ { return sysbyte(0x27, 2, 1); }
 	u8 load_timer_b() const       /*  1 bit  */ { return sysbyte(0x27, 1, 1); }
 	u8 load_timer_a() const       /*  1 bit  */ { return sysbyte(0x27, 0, 1); }
-	u8 keyon_states() const       /*  4 bits */ { return sysbyte(0x28, 4, 4); }
-	u8 keyon_channel() const      /*  2 bits */ { return sysbyte(0x28, 0, 2); }
 	u16 multi_block_freq0() const /* 14 bits */ { return sysword(0xac, 0, 6, 0xa8, 0, 8); }
 	u16 multi_block_freq1() const /* 14 bits */ { return sysword(0xad, 0, 6, 0xa9, 0, 8); }
 	u16 multi_block_freq2() const /* 14 bits */ { return sysword(0xae, 0, 6, 0xaa, 0, 8); }
@@ -463,6 +480,18 @@ public:
 		// release encodes 4 bits and expands them
 		else
 			return opbyte(0x80, 0, 4) * 2 + 1;
+	}
+
+	// determine if a given write is a keyon, and if so, for which channel/operators
+	static bool is_keyon(u16 regindex, u8 data, u8 &channel, u8 &opmask)
+	{
+		if (regindex == 0x28)
+		{
+			channel = BIT(data, 0, 2);
+			opmask = BIT(data, 4, 4);
+			return true;
+		}
+		return false;
 	}
 
 protected:
@@ -562,12 +591,6 @@ public:
 	// OPNA-specific system-wide registers
 	u8 lfo_enabled() const        /*  3 bits */ { return sysbyte(0x22, 3, 1); }
 	u8 lfo_rate() const           /*  3 bits */ { return sysbyte(0x22, 0, 3); }
-	u8 keyon_channel() const      /*  3 bits */
-	{
-		// ensure that both 3 and 7 return out-of-range values
-		u8 temp = sysbyte(0x28, 0, 3);
-		return (temp == 3) ? 6 : temp - BIT(temp, 2);
-	}
 
 	// OPNA-specific per-channel registers
 	u8 pan_left() const           /*  1 bit  */ { return chbyte(0xb4, 7, 1); }
@@ -577,6 +600,21 @@ public:
 
 	// OPNA-specific per-operator registers
 	u8 lfo_am_enabled() const     /*  1 bit  */ { return opbyte(0x60, 7, 1); }
+
+	// determine if a given write is a keyon, and if so, for which channel/operators
+	static bool is_keyon(u16 regindex, u8 data, u8 &channel, u8 &opmask)
+	{
+		if (regindex == 0x28)
+		{
+			channel = BIT(data, 0, 2);
+			if (channel == 3)
+				return false;
+			channel += BIT(data, 2, 1) * 3;
+			opmask = BIT(data, 4, 4);
+			return true;
+		}
+		return false;
+	}
 
 protected:
 	// convert a channel number into a register offset
@@ -658,12 +696,6 @@ private:
 	RegisterType m_regs;             // operator-specific registers
 };
 
-template<>
-u8 ymfm_operator<ymopm_registers>::block_freq_to_keycode(u16 block_freq);
-
-template<>
-void ymfm_operator<ymopm_registers>::clock_phase(s8 lfo_raw_pm, u16 block_freq);
-
 
 // ======================> ymfm_channel
 
@@ -706,9 +738,6 @@ private:
 	RegisterType m_regs;                  // channel-specific registers
 };
 
-template<>
-u16 ymfm_channel<ymopm_registers>::lfo_am_offset(u8 lfo_raw_am) const;
-
 
 // ======================> ymfm_engine_base
 
@@ -733,10 +762,10 @@ public:
 	void reset();
 
 	// master clocking function
-	u32 clock(u8 chanmask);
+	u32 clock(u32 chanmask);
 
 	// compute sum of channel outputs
-	void output(s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax, u8 chanmask) const;
+	void output(s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax, u32 chanmask) const;
 
 	// write to the OPN registers
 	void write(u16 regnum, u8 data);
@@ -813,12 +842,6 @@ private:
 	std::vector<u8> m_regdata;       // raw register data
 	RegisterType m_regs;             // register accessor
 };
-
-template<>
-s8 ymfm_engine_base<ymopm_registers>::clock_lfo();
-
-template<>
-void ymfm_engine_base<ymopm_registers>::clock_noise();
 
 
 // ======================> template instantiations

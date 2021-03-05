@@ -573,30 +573,30 @@ s16 ymfm_operator<RegisterType>::compute_noise_volume(u8 noise_state, u16 am_off
 //  block+frequency value, return the 5-bit keycode
 //-------------------------------------------------
 
-// OPM version
-template<>
-u8 ymfm_operator<ymopm_registers>::block_freq_to_keycode(u16 block_freq)
-{
-	// block_freq is block(3b):keycode(4b):keyfrac(6b); the 5-bit keycode
-	// we want is just the top 5 bits here
-	return BIT(block_freq, 8, 5);
-}
-
 // OPN/OPNA version
 template<class RegisterType>
 u8 ymfm_operator<RegisterType>::block_freq_to_keycode(u16 block_freq)
 {
-	// block_freq is block(3b):fnum(11b); the 5-bit keycode uses the top
-	// 4 bits plus a magic formula for the final bit
-	u8 keycode = BIT(block_freq, 10, 4) << 1;
+	if (RegisterType::FAMILY == RegisterType::FAMILY_OPM)
+	{
+		// OPM: block_freq is block(3b):keycode(4b):keyfrac(6b); the 5-bit keycode
+		// we want is just the top 5 bits here
+		return BIT(block_freq, 8, 5);
+	}
+	else
+	{
+		// OPN/OPL: block_freq is block(3b):fnum(11b); the 5-bit keycode uses the top
+		// 4 bits plus a magic formula for the final bit
+		u8 keycode = BIT(block_freq, 10, 4) << 1;
 
-	// lowest bit is determined by a mix of next lower FNUM bits
-	// according to this equation from the YM2608 manual:
-	//
-	//   (F11 & (F10 | F9 | F8)) | (!F11 & F10 & F9 & F8)
-	//
-	// for speed, we just look it up in a 16-bit constant
-	return keycode | BIT(0xfe80, BIT(block_freq, 7, 4));
+		// lowest bit is determined by a mix of next lower FNUM bits
+		// according to this equation from the YM2608 manual:
+		//
+		//   (F11 & (F10 | F9 | F8)) | (!F11 & F10 & F9 & F8)
+		//
+		// for speed, we just look it up in a 16-bit constant
+		return keycode | BIT(0xfe80, BIT(block_freq, 7, 4));
+	}
 }
 
 
@@ -850,77 +850,76 @@ void ymfm_operator<RegisterType>::clock_envelope(u16 env_counter, u8 keycode)
 //  against the Nuked phase generator
 //-------------------------------------------------
 
-// OPM version
-template<>
-void ymfm_operator<ymopm_registers>::clock_phase(s8 lfo_raw_pm, u16 block_freq)
-{
-	// start with coarse detune delta; table uses cents value from
-	// manual, converted into 1/64ths
-	static const s16 s_detune2_delta[4] = { 0, (600*64+50)/100, (781*64+50)/100, (950*64+50)/100 };
-	s16 delta = s_detune2_delta[m_regs.detune2()];
-
-	// add in the PM delta
-	u8 pm_sensitivity = m_regs.lfo_pm_sensitivity();
-	if (pm_sensitivity != 0)
-	{
-		// raw PM value is -127..128 which is +/- 200 cents
-		// manual gives these magnitudes in cents:
-		//    0, +/-5, +/-10, +/-20, +/-50, +/-100, +/-400, +/-700
-		// this roughly corresponds to shifting the 200-cent value:
-		//    0  >> 5,  >> 4,  >> 3,  >> 2,  >> 1,   << 1,   << 2
-		if (pm_sensitivity < 6)
-			delta += lfo_raw_pm >> (6 - pm_sensitivity);
-		else
-			delta += lfo_raw_pm << (pm_sensitivity - 5);
-	}
-
-	// apply delta and convert to a frequency number
-	u32 phase_step = opm_keycode_to_phase_step(block_freq, delta);
-
-	// apply detune based on the keycode
-	phase_step += detune_adjustment(m_regs.detune(), block_freq_to_keycode(block_freq));
-
-	// QUESTION: do we clamp to 17 bits like YM2612?
-
-	// apply frequency multiplier (0 means 0.5, other values are as-is)
-	u8 multiple = m_regs.multiple();
-	if (multiple == 0)
-		phase_step >>= 1;
-	else
-		phase_step *= multiple;
-
-	// finally apply the step to the current phase value
-	m_phase += phase_step;
-}
-
 template<class RegisterType>
 void ymfm_operator<RegisterType>::clock_phase(s8 lfo_raw_pm, u16 block_freq)
 {
-	// extract frequency number (low 11 bits of block_freq)
-	u16 fnum = BIT(block_freq, 0, 11) << 1;
+	u32 phase_step;
 
-	// if there's a non-zero PM sensitivity, compute the adjustment
-	u8 pm_sensitivity = m_regs.lfo_pm_sensitivity();
-	if (pm_sensitivity != 0)
+	if (RegisterType::FAMILY == RegisterType::FAMILY_OPM)
 	{
-		// apply the phase adjustment based on the upper 7 bits
-		// of FNUM and the PM depth parameters
-		fnum += opn_lfo_pm_phase_adjustment(BIT(block_freq, 4, 7), pm_sensitivity, lfo_raw_pm);
+		// OPM logic is rather different here, due to extra detune
+		// and the use of keycodes
 
-		// keep fnum to 12 bits
-		fnum &= 0xfff;
+		// start with coarse detune delta; table uses cents value from
+		// manual, converted into 1/64ths
+		static const s16 s_detune2_delta[4] = { 0, (600*64+50)/100, (781*64+50)/100, (950*64+50)/100 };
+		s16 delta = s_detune2_delta[m_regs.detune2()];
+
+		// add in the PM delta
+		u8 pm_sensitivity = m_regs.lfo_pm_sensitivity();
+		if (pm_sensitivity != 0)
+		{
+			// raw PM value is -127..128 which is +/- 200 cents
+			// manual gives these magnitudes in cents:
+			//    0, +/-5, +/-10, +/-20, +/-50, +/-100, +/-400, +/-700
+			// this roughly corresponds to shifting the 200-cent value:
+			//    0  >> 5,  >> 4,  >> 3,  >> 2,  >> 1,   << 1,   << 2
+			if (pm_sensitivity < 6)
+				delta += lfo_raw_pm >> (6 - pm_sensitivity);
+			else
+				delta += lfo_raw_pm << (pm_sensitivity - 5);
+		}
+
+		// apply delta and convert to a frequency number
+		phase_step = opm_keycode_to_phase_step(block_freq, delta);
+
+		// apply detune based on the keycode
+		phase_step += detune_adjustment(m_regs.detune(), block_freq_to_keycode(block_freq));
+	}
+	else
+	{
+		// OPN/OPL phase calculation has only a single detune parameter
+		// and uses FNUMs instead of keycodes
+
+		// extract frequency number (low 11 bits of block_freq)
+		u16 fnum = BIT(block_freq, 0, 11) << 1;
+
+		// if there's a non-zero PM sensitivity, compute the adjustment
+		u8 pm_sensitivity = m_regs.lfo_pm_sensitivity();
+		if (pm_sensitivity != 0)
+		{
+			// apply the phase adjustment based on the upper 7 bits
+			// of FNUM and the PM depth parameters
+			fnum += opn_lfo_pm_phase_adjustment(BIT(block_freq, 4, 7), pm_sensitivity, lfo_raw_pm);
+
+			// keep fnum to 12 bits
+			fnum &= 0xfff;
+		}
+
+		// apply block shift to compute phase step
+		u8 block = BIT(block_freq, 11, 3);
+		phase_step = (fnum << block) >> 2;
+
+		// apply detune based on the keycode
+		phase_step += detune_adjustment(m_regs.detune(), block_freq_to_keycode(block_freq));
+
+		// clamp to 17 bits in case detune overflows
+		// QUESTION: is this specific to the YM2612/3438?
+		phase_step &= 0x1ffff;
 	}
 
-	// apply block shift to compute phase step
-	u8 block = BIT(block_freq, 11, 3);
-	u32 phase_step = (fnum << block) >> 2;
-
-	// apply detune based on the keycode
-	phase_step += detune_adjustment(m_regs.detune(), block_freq_to_keycode(block_freq));
-
-	// clamp to 17 bits in case detune overflows
-	// QUESTION: is this specific to the YM2612/3438?
-	phase_step &= 0x1ffff;
+	// once the step is computed, the final stage is common
+	// between all variants
 
 	// apply frequency multiplier (0 means 0.5, other values are as-is)
 	u8 multiple = m_regs.multiple();
@@ -1204,41 +1203,42 @@ void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 &lsum
 //  into an amplitude offset based on sensitivity
 //-------------------------------------------------
 
-// OPM version
-template<>
-u16 ymfm_channel<ymopm_registers>::lfo_am_offset(u8 lfo_raw_am) const
-{
-	// shift value for AM sensitivity is [*, 0, 1, 2],
-	// mapping to values of [0, 23.9, 47.8, and 95.6dB]
-	u8 am_sensitivity = m_regs.lfo_am_sensitivity();
-	if (am_sensitivity == 0)
-		return 0;
-
-	// QUESTION: see OPN note below for the dB range mapping; it applies
-	// here as well
-
-	// raw LFO AM value on OPM is 0-FF, which is already a factor of 2
-	// larger than the OPN below, putting our staring point at 2x theirs;
-	// this works out since our minimum is 2x their maximum
-	return lfo_raw_am << (am_sensitivity - 1);
-}
-
-// OPN/OPNA version
 template<class RegisterType>
 u16 ymfm_channel<RegisterType>::lfo_am_offset(u8 lfo_raw_am) const
 {
-	// shift value for AM sensitivity is [7, 3, 1, 0],
-	// mapping to values of [0, 1.4, 5.9, and 11.8dB]
-	u8 am_shift = (1 << (m_regs.lfo_am_sensitivity() ^ 3)) - 1;
+	if (RegisterType::FAMILY == RegisterType::FAMILY_OPM)
+	{
+		// OPM maps AM quite differently from OPN
 
-	// QUESTION: max sensitivity should give 11.8dB range, but this value
-	// is directly added to an x.8 attenuation value, which will only give
-	// 126/256 or ~4.9dB range -- what am I missing? The calculation below
-	// matches several other emulators, including the Nuked implemenation.
+		// shift value for AM sensitivity is [*, 0, 1, 2],
+		// mapping to values of [0, 23.9, 47.8, and 95.6dB]
+		u8 am_sensitivity = m_regs.lfo_am_sensitivity();
+		if (am_sensitivity == 0)
+			return 0;
 
-	// raw LFO AM value on OPN is 0-3F, scale that up by a factor of 2
-	// (giving 7 bits) before applying the final shift
-	return (lfo_raw_am << 1) >> am_shift;
+		// QUESTION: see OPN note below for the dB range mapping; it applies
+		// here as well
+
+		// raw LFO AM value on OPM is 0-FF, which is already a factor of 2
+		// larger than the OPN below, putting our staring point at 2x theirs;
+		// this works out since our minimum is 2x their maximum
+		return lfo_raw_am << (am_sensitivity - 1);
+	}
+	else
+	{
+		// shift value for AM sensitivity is [7, 3, 1, 0],
+		// mapping to values of [0, 1.4, 5.9, and 11.8dB]
+		u8 am_shift = (1 << (m_regs.lfo_am_sensitivity() ^ 3)) - 1;
+
+		// QUESTION: max sensitivity should give 11.8dB range, but this value
+		// is directly added to an x.8 attenuation value, which will only give
+		// 126/256 or ~4.9dB range -- what am I missing? The calculation below
+		// matches several other emulators, including the Nuked implemenation.
+
+		// raw LFO AM value on OPN is 0-3F, scale that up by a factor of 2
+		// (giving 7 bits) before applying the final shift
+		return (lfo_raw_am << 1) >> am_shift;
+	}
 }
 
 
@@ -1344,7 +1344,7 @@ void ymfm_engine_base<RegisterType>::reset()
 //-------------------------------------------------
 
 template<class RegisterType>
-u32 ymfm_engine_base<RegisterType>::clock(u8 chanmask)
+u32 ymfm_engine_base<RegisterType>::clock(u32 chanmask)
 {
 	// increment the envelope count; low two bits are the subcount, which
 	// only counts to 3, so if it reaches 3, count one more time
@@ -1374,7 +1374,7 @@ u32 ymfm_engine_base<RegisterType>::clock(u8 chanmask)
 //-------------------------------------------------
 
 template<class RegisterType>
-void ymfm_engine_base<RegisterType>::output(s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax, u8 chanmask) const
+void ymfm_engine_base<RegisterType>::output(s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax, u32 chanmask) const
 {
 	// sum over all the desired channels
 	for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
@@ -1406,13 +1406,12 @@ void ymfm_engine_base<RegisterType>::write(u16 regnum, u8 data)
 	// most writes are passive, consumed only when needed
 	m_regs.write(regnum, data);
 
-	// handle writes to the keyon registers
-	if (regnum == RegisterType::REG_KEYON)
-	{
-		u8 chnum = m_regs.keyon_channel();
-		if (chnum < RegisterType::CHANNELS)
-			m_channel[chnum]->keyonoff(m_regs.keyon_states());
-	}
+	// handle writes to the keyon register(s)
+	u8 keyon_channel;
+	u8 keyon_opmask;
+	if (RegisterType::is_keyon(regnum, data, keyon_channel, keyon_opmask))
+		if (keyon_channel < RegisterType::CHANNELS)
+			m_channel[keyon_channel]->keyonoff(keyon_opmask);
 }
 
 
@@ -1438,101 +1437,100 @@ u8 ymfm_engine_base<RegisterType>::status() const
 //  division, depth, and waveform computations
 //-------------------------------------------------
 
-// OPM implementation
-template<>
-s8 ymfm_engine_base<ymopm_registers>::clock_lfo()
-{
-	// treat the rate as a 4.4 floating-point step value with implied
-	// leading 1; this matches exactly the frequencies in the application
-	// manual, though it might not be implemented exactly this way on chip
-	u8 rate = m_regs.lfo_rate();
-	u32 prev_counter = m_lfo_counter;
-	m_lfo_counter += (0x10 | BIT(rate, 0, 4)) << BIT(rate, 4, 4);
-	u8 lfo = BIT(m_lfo_counter, 22, 8);
-
-	// compute the AM and PM values based on the waveform
-	// AM is 8-bit unsigned; PM is 8-bit signed; waveforms are adjusted
-	// to match the pictures in the application manual
-	u8 am;
-	s8 pm;
-	switch (m_regs.lfo_waveform())
-	{
-		// sawtooth
-		default:
-		case 0:
-			am = lfo ^ 0xff;
-			pm = lfo;
-			break;
-
-		// square wave
-		case 1:
-			am = BIT(lfo, 7) ? 0 : 0xff;
-			pm = am ^ 0x80;
-			break;
-
-		// triangle wave
-		case 2:
-			am = BIT(lfo, 7) ? (lfo << 1) : (~lfo << 1);
-			pm = BIT(lfo, 6) ? am : ~am;
-			break;
-
-		// noise:
-		case 3:
-			// QUESTION: this behavior is surmised but not yet verified:
-			// LFO noise value is accumulated over 8 bits of LFSR and
-			// clocked as the LFO value transitions
-			if (BIT(m_lfo_counter ^ prev_counter, 22, 8) != 0)
-				m_noise_lfo = m_noise_lfsr & 0xff;
-			am = m_noise_lfo;
-			pm = am ^ 0x80;
-			break;
-	}
-
-	// apply depth to the AM value and store for later
-	m_lfo_am = (am * m_regs.lfo_am_depth()) >> 7;
-
-	// apply depth to the PM value and return it
-	return (pm * m_regs.lfo_pm_depth()) >> 7;
-}
-
-// OPN/OPNA implementation
 template<class RegisterType>
 s8 ymfm_engine_base<RegisterType>::clock_lfo()
 {
-	// if not enabled, quick exit with 0s
-	if (!m_regs.lfo_enabled())
+	if (RegisterType::FAMILY == RegisterType::FAMILY_OPM)
 	{
-		m_lfo_counter = 0;
-		m_lfo_am = 0;
-		return 0;
+		// OPM: treat the rate as a 4.4 floating-point step value with implied
+		// leading 1; this matches exactly the frequencies in the application
+		// manual, though it might not be implemented exactly this way on chip
+		u8 rate = m_regs.lfo_rate();
+		u32 prev_counter = m_lfo_counter;
+		m_lfo_counter += (0x10 | BIT(rate, 0, 4)) << BIT(rate, 4, 4);
+		u8 lfo = BIT(m_lfo_counter, 22, 8);
+
+		// compute the AM and PM values based on the waveform
+		// AM is 8-bit unsigned; PM is 8-bit signed; waveforms are adjusted
+		// to match the pictures in the application manual
+		u8 am;
+		s8 pm;
+		switch (m_regs.lfo_waveform())
+		{
+			// sawtooth
+			default:
+			case 0:
+				am = lfo ^ 0xff;
+				pm = lfo;
+				break;
+
+			// square wave
+			case 1:
+				am = BIT(lfo, 7) ? 0 : 0xff;
+				pm = am ^ 0x80;
+				break;
+
+			// triangle wave
+			case 2:
+				am = BIT(lfo, 7) ? (lfo << 1) : (~lfo << 1);
+				pm = BIT(lfo, 6) ? am : ~am;
+				break;
+
+			// noise:
+			case 3:
+				// QUESTION: this behavior is surmised but not yet verified:
+				// LFO noise value is accumulated over 8 bits of LFSR and
+				// clocked as the LFO value transitions
+				if (BIT(m_lfo_counter ^ prev_counter, 22, 8) != 0)
+					m_noise_lfo = m_noise_lfsr & 0xff;
+				am = m_noise_lfo;
+				pm = am ^ 0x80;
+				break;
+		}
+
+		// apply depth to the AM value and store for later
+		m_lfo_am = (am * m_regs.lfo_am_depth()) >> 7;
+
+		// apply depth to the PM value and return it
+		return (pm * m_regs.lfo_pm_depth()) >> 7;
 	}
+	else
+	{
+		// OPN/OPL: if not enabled, quick exit with 0s
+		if (!m_regs.lfo_enabled())
+		{
+			m_lfo_counter = 0;
+			m_lfo_am = 0;
+			return 0;
+		}
 
-	// this table is based on converting the frequencies in the applications
-	// manual to clock dividers, based on the assumption of a 7-bit LFO value
-	static u8 const lfo_max_count[8] = { 109, 78, 72, 68, 63, 45, 9, 6 };
-	u8 subcount = u8(m_lfo_counter++);
+		// this table is based on converting the frequencies in the applications
+		// manual to clock dividers, based on the assumption of a 7-bit LFO value
+		static u8 const lfo_max_count[8] = { 109, 78, 72, 68, 63, 45, 9, 6 };
+		u8 subcount = u8(m_lfo_counter++);
 
-	// when we cross the divider count, add enough to zero it and cause an
-	// increment at bit 8; the 7-bit value lives from bits 8-14
-	if (subcount >= lfo_max_count[m_regs.lfo_rate()])
-		m_lfo_counter += subcount ^ 0xff;
+		// when we cross the divider count, add enough to zero it and cause an
+		// increment at bit 8; the 7-bit value lives from bits 8-14
+		if (subcount >= lfo_max_count[m_regs.lfo_rate()])
+			m_lfo_counter += subcount ^ 0xff;
 
-	// AM value is 7 bits, staring at bit 8; grab the low 6 directly
-	m_lfo_am = BIT(m_lfo_counter, 8, 6);
+		// AM value is 7 bits, staring at bit 8; grab the low 6 directly
+		m_lfo_am = BIT(m_lfo_counter, 8, 6);
 
-	// first half of the AM period (bit 6 == 0) is inverted
-	if (BIT(m_lfo_counter, 8+6) == 0)
-		m_lfo_am ^= 0x3f;
+		// first half of the AM period (bit 6 == 0) is inverted
+		if (BIT(m_lfo_counter, 8+6) == 0)
+			m_lfo_am ^= 0x3f;
 
-	// PM value is 5 bits, starting at bit 10; grab the low 3 directly
-	s8 pm = BIT(m_lfo_counter, 10, 3);
+		// PM value is 5 bits, starting at bit 10; grab the low 3 directly
+		s8 pm = BIT(m_lfo_counter, 10, 3);
 
-	// PM is reflected based on bit 3
-	if (BIT(m_lfo_counter, 10+3))
-		pm ^= 7;
+		// PM is reflected based on bit 3
+		if (BIT(m_lfo_counter, 10+3))
+			pm ^= 7;
 
-	// PM is negated based on bit 4
-	return BIT(m_lfo_counter, 10+4) ? -pm : pm;
+		// PM is negated based on bit 4
+		return BIT(m_lfo_counter, 10+4) ? -pm : pm;
+	}
 }
 
 
@@ -1540,36 +1538,33 @@ s8 ymfm_engine_base<RegisterType>::clock_lfo()
 //  clock_noise - clock the noise generator
 //-------------------------------------------------
 
-// OPM implementation
-template<>
-void ymfm_engine_base<ymopm_registers>::clock_noise()
-{
-	// base noise frequency is measured at 2x 1/2 FM frequency; this means
-	// each tick counts as two steps against the noise counter
-	u8 freq = m_regs.noise_frequency();
-	for (int rep = 0; rep < 2; rep++)
-	{
-		// evidence seems to suggest the LFSR is clocked continually and just
-		// sampled at the noise frequency for output purposes; clock it here
-		// twice; note that the low 8 bits are the most recent 8 bits of history
-		// while bits 8-24 contain the 17 bit LFSR state
-		m_noise_lfsr >>= 1;
-		m_noise_lfsr |= (BIT(m_noise_lfsr, 7) ^ BIT(m_noise_lfsr, 10) ^ 1) << 24;
-
-		// compare against the frequency and latch when we exceed it
-		if (m_noise_counter++ >= freq)
-		{
-			m_noise_counter = 0;
-			m_noise_state = BIT(m_noise_lfsr, 7);
-		}
-	}
-}
-
-// OPN/OPNA implementation
 template<class RegisterType>
 void ymfm_engine_base<RegisterType>::clock_noise()
 {
-	// OPN does not have a noise generator
+	if (RegisterType::FAMILY == RegisterType::FAMILY_OPM)
+	{
+		// OPM: base noise frequency is measured at 2x 1/2 FM frequency; this
+		// means each tick counts as two steps against the noise counter
+		u8 freq = m_regs.noise_frequency();
+		for (int rep = 0; rep < 2; rep++)
+		{
+			// evidence seems to suggest the LFSR is clocked continually and just
+			// sampled at the noise frequency for output purposes; note that the
+			// low 8 bits are the most recent 8 bits of history while bits 8-24
+			// contain the 17 bit LFSR state
+			m_noise_lfsr >>= 1;
+			m_noise_lfsr |= (BIT(m_noise_lfsr, 7) ^ BIT(m_noise_lfsr, 10) ^ 1) << 24;
+
+			// compare against the frequency and latch when we exceed it
+			if (m_noise_counter++ >= freq)
+			{
+				m_noise_counter = 0;
+				m_noise_state = BIT(m_noise_lfsr, 7);
+			}
+		}
+	}
+
+	// OPN/OPL does not have a noise generator, so nothing to do
 }
 
 
