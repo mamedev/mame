@@ -644,7 +644,7 @@ save_error ram_state::load()
 		return STATERR_ILLEGAL_REGISTRATIONS;
 
 	// get the save manager to load state
-	return m_save.write_stream(m_data);
+	return m_save.read_stream(m_data);
 }
 
 
