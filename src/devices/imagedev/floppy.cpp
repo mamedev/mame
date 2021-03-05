@@ -398,17 +398,24 @@ void floppy_image_device::commit_image()
 	output_format->save(&io, variants, image.get());
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void floppy_image_device::device_start()
+void floppy_image_device::device_config_complete()
 {
 	rpm = 0;
 	motor_always_on = false;
 	dskchg_writable = false;
 	has_trk00_sensor = true;
 
+	setup_characteristics();
+	register_formats();
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void floppy_image_device::device_start()
+{
 	// better would be an extra parameter in the MCFG macro
 	drive_index = atoi(owner()->basetag());
 
@@ -431,8 +438,6 @@ void floppy_image_device::device_start()
 	ready_counter = 0;
 	phases = 0;
 
-	setup_characteristics();
-	register_formats();
 
 	if (m_make_sound) m_sound_out = subdevice<floppy_sound_device>(FLOPSND_TAG);
 
