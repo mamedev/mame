@@ -972,10 +972,7 @@ template<class RegisterType>
 ymfm_channel<RegisterType>::ymfm_channel(RegisterType regs) :
 	m_feedback{ 0, 0 },
 	m_feedback_in(0),
-	m_op1(regs.operator_registers(0)),
-	m_op2(regs.operator_registers(1)),
-	m_op3(regs.operator_registers(2)),
-	m_op4(regs.operator_registers(3)),
+	m_op{ nullptr, nullptr, nullptr, nullptr },
 	m_regs(regs)
 {
 }
@@ -991,12 +988,6 @@ void ymfm_channel<RegisterType>::save(device_t &device, u8 index)
 	// save our data
 	device.save_item(YMFM_NAME(m_feedback), index);
 	device.save_item(YMFM_NAME(m_feedback_in), index);
-
-	// save operator data
-	m_op1.save(device, index * 4 + 0);
-	m_op2.save(device, index * 4 + 1);
-	m_op3.save(device, index * 4 + 2);
-	m_op4.save(device, index * 4 + 3);
 }
 
 
@@ -1010,12 +1001,6 @@ void ymfm_channel<RegisterType>::reset()
 	// reset our data
 	m_feedback[0] = m_feedback[1] = 0;
 	m_feedback_in = 0;
-
-	// reset the operators
-	m_op1.reset();
-	m_op2.reset();
-	m_op3.reset();
-	m_op4.reset();
 }
 
 
@@ -1026,10 +1011,9 @@ void ymfm_channel<RegisterType>::reset()
 template<class RegisterType>
 void ymfm_channel<RegisterType>::keyonoff(u8 states)
 {
-	m_op1.keyonoff(BIT(states, 0));
-	m_op2.keyonoff(BIT(states, 1));
-	m_op3.keyonoff(BIT(states, 2));
-	m_op4.keyonoff(BIT(states, 3));
+	for (int opnum = 0; opnum < std::size(m_op); opnum++)
+		if (m_op[opnum] != nullptr)
+			m_op[opnum]->keyonoff(BIT(states, opnum));
 }
 
 
@@ -1040,10 +1024,9 @@ void ymfm_channel<RegisterType>::keyonoff(u8 states)
 template<class RegisterType>
 void ymfm_channel<RegisterType>::keyon_csm()
 {
-	m_op1.keyon_csm();
-	m_op2.keyon_csm();
-	m_op3.keyon_csm();
-	m_op4.keyon_csm();
+	for (int opnum = 0; opnum < std::size(m_op); opnum++)
+		if (m_op[opnum] != nullptr)
+			m_op[opnum]->keyon_csm();
 }
 
 
@@ -1062,23 +1045,22 @@ void ymfm_channel<RegisterType>::clock(u32 env_counter, s8 lfo_raw_pm, bool is_m
 	m_feedback[1] = m_feedback_in;
 
 	// in multi-frequency mode, the first 3 channels use independent block/fnum values
-	if (is_multi_freq)
+	if (RegisterType::FAMILY == RegisterType::FAMILY_OPN && is_multi_freq)
 	{
-		m_op1.clock(env_counter, lfo_raw_pm, m_regs.multi_block_freq1());
-		m_op2.clock(env_counter, lfo_raw_pm, m_regs.multi_block_freq2());
-		m_op3.clock(env_counter, lfo_raw_pm, m_regs.multi_block_freq0());
+		assert(m_op[0] != nullptr && m_op[1] != nullptr && m_op[2] != nullptr && m_op[3] != nullptr);
+		m_op[0]->clock(env_counter, lfo_raw_pm, m_regs.multi_block_freq1());
+		m_op[1]->clock(env_counter, lfo_raw_pm, m_regs.multi_block_freq2());
+		m_op[2]->clock(env_counter, lfo_raw_pm, m_regs.multi_block_freq0());
+		m_op[3]->clock(env_counter, lfo_raw_pm, block_freq);
 	}
 
 	// otherwise, all channels use the common block/fnum
 	else
 	{
-		m_op1.clock(env_counter, lfo_raw_pm, block_freq);
-		m_op2.clock(env_counter, lfo_raw_pm, block_freq);
-		m_op3.clock(env_counter, lfo_raw_pm, block_freq);
+		for (int opnum = 0; opnum < std::size(m_op); opnum++)
+			if (m_op[opnum] != nullptr)
+				m_op[opnum]->clock(env_counter, lfo_raw_pm, block_freq);
 	}
-
-	// operator 3 uses the common values in all cases
-	m_op4.clock(env_counter, lfo_raw_pm, block_freq);
 }
 
 
@@ -1136,13 +1118,13 @@ void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 &lsum
 	opout[0] = 0;
 
 	// operator 1 has optional self-feedback
-	s16 modulation = 0;
+	s16 opin = 0;
 	u8 feedback = m_regs.feedback();
 	if (feedback != 0)
-		modulation = (m_feedback[0] + m_feedback[1]) >> (10 - feedback);
+		opin = (m_feedback[0] + m_feedback[1]) >> (10 - feedback);
 
 	// compute the 14-bit volume/value of operator 1 and update the feedback
-	opout[1] = m_feedback_in = m_op1.compute_volume(modulation, am_offset);
+	opout[1] = m_feedback_in = (m_op[0] != nullptr) ? m_op[0]->compute_volume(opin, am_offset) : 0;
 
 	// no that the feedback has been computed, skip the rest if both pans are clear;
 	// no need to do all this work for nothing
@@ -1150,20 +1132,24 @@ void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 &lsum
 		return;
 
 	// compute the 14-bit volume/value of operator 2
-	opout[2] = m_op2.compute_volume(opout[BIT(algorithm_inputs, 0, 1)] >> 1, am_offset);
+	opin = opout[BIT(algorithm_inputs, 0, 1)] >> 1;
+	opout[2] = (m_op[1] != nullptr) ? m_op[1]->compute_volume(opin, am_offset) : 0;
 	opout[5] = opout[1] + opout[2];
 
 	// compute the 14-bit volume/value of operator 3
-	opout[3] = m_op3.compute_volume(opout[BIT(algorithm_inputs, 1, 3)] >> 1, am_offset);
+	opin = opout[BIT(algorithm_inputs, 1, 3)] >> 1;
+	opout[3] = (m_op[2] != nullptr) ? m_op[2]->compute_volume(opin, am_offset) : 0;
 	opout[6] = opout[1] + opout[3];
 	opout[7] = opout[2] + opout[3];
 
 	// compute the 14-bit volume/value of operator 4; this could be a noise
 	// value on the OPM
-	if (noise_state != 0)
-		opout[4] = m_op4.compute_noise_volume(noise_state, am_offset);
+	if (m_op[3] == nullptr)
+		opout[4] = 0;
+	else if (noise_state != 0)
+		opout[4] = m_op[3]->compute_noise_volume(noise_state, am_offset);
 	else
-		opout[4] = m_op4.compute_volume(opout[BIT(algorithm_inputs, 4, 3)] >> 1, am_offset);
+		opout[4] = m_op[3]->compute_volume(opout[BIT(algorithm_inputs, 4, 3)] >> 1, am_offset);
 
 	// all algorithms consume OP4 output
 	s16 result = opout[4] >> rshift;
@@ -1268,12 +1254,28 @@ ymfm_engine_base<RegisterType>::ymfm_engine_base(device_t &device) :
 	m_busy_end(attotime::zero),
 	m_timer{ nullptr, nullptr },
 	m_irq_handler(device),
-	m_regdata(RegisterType::REGISTERS),
-	m_regs(m_regdata)
+	m_regs(&m_regdata[0])
 {
 	// create the channels
 	for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
-		m_channel[chnum] = std::make_unique<ymfm_channel<RegisterType>>(m_regs.channel_registers(chnum));
+	{
+		RegisterType registers(&m_regdata[0]);
+		registers.set_chnum(chnum);
+		m_channel[chnum] = std::make_unique<ymfm_channel<RegisterType>>(registers);
+	}
+
+	// create the operators
+	for (int opnum = 0; opnum < RegisterType::OPERATORS; opnum++)
+	{
+		RegisterType registers(&m_regdata[0]);
+		registers.set_opnum(opnum);
+		m_operator[opnum] = std::make_unique<ymfm_operator<RegisterType>>(registers);
+
+		// perform a default assignment to the appropriate channel
+		auto mapping = RegisterType::opnum_to_chnum_and_index(opnum);
+		assert(m_channel[mapping.first] != nullptr);
+		m_channel[mapping.first]->assign(mapping.second, m_operator[opnum].get());
+	}
 }
 
 
@@ -1309,6 +1311,10 @@ void ymfm_engine_base<RegisterType>::save(device_t &device)
 	// save channel data
 	for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
 		m_channel[chnum]->save(device, chnum);
+
+	// save operator data
+	for (int opnum = 0; opnum < RegisterType::OPERATORS; opnum++)
+		m_operator[opnum]->save(device, opnum);
 }
 
 
@@ -1323,7 +1329,7 @@ void ymfm_engine_base<RegisterType>::reset()
 	set_reset_status(0, 0xff);
 
 	// clear all registers
-	std::fill_n(&m_regdata[0], m_regdata.size(), 0);
+	std::fill_n(&m_regdata[0], std::size(m_regdata), 0);
 
 	// explicitly write to the mode register since it has side-effects
 	// QUESTION: old cores initialize this to 0x30 -- who is right?
@@ -1335,6 +1341,10 @@ void ymfm_engine_base<RegisterType>::reset()
 	// reset the channels
 	for (auto &chan : m_channel)
 		chan->reset();
+
+	// reset the operators
+	for (auto &op : m_operator)
+		op->reset();
 }
 
 

@@ -94,10 +94,10 @@ class ymfm_registers_base
 {
 protected:
 	// constructor
-	ymfm_registers_base(std::vector<u8> &regdata, u16 chbase = 0, u16 opbase = 0) :
-		m_chbase(chbase),
-		m_opbase(opbase),
-		m_regdata(regdata)
+	ymfm_registers_base(u8 *regdata) :
+		m_regdata(regdata),
+		m_chdata(nullptr),
+		m_opdata(nullptr)
 	{
 	}
 
@@ -138,24 +138,24 @@ public:
 
 protected:
 	// return a bitfield extracted from a byte
-	u8 sysbyte(u16 offset, u8 start, u8 count) const
-	{
-		return BIT(m_regdata[offset], start, count);
-	}
-	u8 chbyte(u16 offset, u8 start, u8 count) const { return sysbyte(offset + m_chbase, start, count); }
-	u8 opbyte(u16 offset, u8 start, u8 count) const { return sysbyte(offset + m_opbase, start, count); }
+	u8 sysbyte(u16 offset, u8 start, u8 count) const { return BIT(m_regdata[offset], start, count); }
+	u8 chbyte(u16 offset, u8 start, u8 count) const { return BIT(m_chdata[offset], start, count); }
+	u8 opbyte(u16 offset, u8 start, u8 count) const { return BIT(m_opdata[offset], start, count); }
 
 	// return a bitfield extracted from a pair of bytes, MSBs listed first
 	u16 sysword(u16 offset1, u8 start1, u8 count1, u16 offset2, u8 start2, u8 count2) const
 	{
 		return (sysbyte(offset1, start1, count1) << count2) | sysbyte(offset2, start2, count2);
 	}
-	u16 chword(u16 offset1, u8 start1, u8 count1, u16 offset2, u8 start2, u8 count2) const { return sysword(offset1 + m_chbase, start1, count1, offset2 + m_chbase, start2, count2); }
+	u16 chword(u16 offset1, u8 start1, u8 count1, u16 offset2, u8 start2, u8 count2) const
+	{
+		return (chbyte(offset1, start1, count1) << count2) | chbyte(offset2, start2, count2);
+	}
 
 	// internal state
-	u16 m_chbase;                  // base offset for channel-specific data
-	u16 m_opbase;                  // base offset for operator-specific data
-	std::vector<u8> &m_regdata;    // reference to the raw data
+	u8 *m_regdata;                 // pointer to the raw data
+	u8 *m_chdata;                  // pointer to channel-specific data
+	u8 *m_opdata;                  // pointer to operator-specific data
 };
 
 
@@ -211,27 +211,84 @@ protected:
 //        E0-FF xxxx---- Sustain level (0-15)
 //              ----xxxx Release rate (0-15)
 //
+// OPM channel and operator mapping:
+//
+//    Channels are numbered linearly, 0-7, as represented in the map
+//    Operators are numbered linearly, 0-31, as represented in the map
+//
+//    Operators are assigned to channels as follows:
+//        Operator 0 -> Channel 0, Index 0 (Modulator 1)
+//        Operator 1 -> Channel 1, Index 0
+//        ...
+//        Operator 7 -> Channel 7, Index 0
+//        --
+//        Operator 8 -> Channel 0, Index 2 (Modulator 2)
+//        Operator 9 -> Channel 1, Index 2
+//        ...
+//        Operator 15 -> Channel 7, Index 2
+//        --
+//        Operator 16 -> Channel 0, Index 1 (Carrier 1)
+//        Operator 17 -> Channel 1, Index 1
+//        ...
+//        Operator 23 -> Channel 7, Index 1
+//        --
+//        Operator 24 -> Channel 0, Index 3 (Carrier 2)
+//        Operator 25 -> Channel 1, Index 3
+//        ...
+//        Operator 31 -> Channel 7, Index 3
+//
 
 class ymopm_registers : public ymfm_registers_base
 {
 public:
 	// constants
 	static constexpr family_type FAMILY = FAMILY_OPM;
-	static constexpr u8 DEFAULT_PRESCALE = 2;
 	static constexpr u8 CHANNELS = 8;
-	static constexpr u32 CSM_TRIGGER_MASK = 0xff;
+	static constexpr u8 OPERATORS = 8*4;
 	static constexpr u16 REGISTERS = 0x100;
 	static constexpr u16 REG_MODE = 0x14;
+	static constexpr u8 DEFAULT_PRESCALE = 2;
+	static constexpr u32 CSM_TRIGGER_MASK = 0xff;
 
 	// constructor
-	ymopm_registers(std::vector<u8> &regdata, u16 chbase = 0, u16 opbase = 0) :
-		ymfm_registers_base(regdata, chbase, opbase)
+	ymopm_registers(u8 *regdata) :
+		ymfm_registers_base(regdata)
 	{
 	}
 
-	// return channel/operator number
-	u8 chnum() const { return BIT(m_chbase, 0, 3); }
-	u8 opnum() const { return BIT(m_opbase, 4) | (BIT(m_opbase, 3) << 1); }
+	// getters for channel and operator number
+	u8 chnum() const
+	{
+		assert(m_chdata != nullptr);
+		return m_chdata - m_regdata;
+	}
+	u8 opnum() const
+	{
+		assert(m_opdata != nullptr);
+		return m_opdata - m_regdata;
+	}
+
+	// setters for channel and operator base within the register file
+	void set_chnum(u8 chnum)
+	{
+		assert(chnum < CHANNELS);
+		m_chdata = m_regdata + chnum;
+	}
+	void set_opnum(u8 opnum)
+	{
+		assert(opnum < OPERATORS);
+		m_opdata = m_regdata + opnum;
+	}
+
+	// mapping of operator number to channel.opindex:
+	static constexpr std::pair<u8,u8> opnum_to_chnum_and_index(u8 opnum)
+	{
+		assert(opnum < OPERATORS);
+		u8 chnum = opnum % CHANNELS;
+		u8 index = opnum / CHANNELS;
+		index = BIT(index, 1) | (BIT(index, 0) << 1);
+		return std::make_pair(chnum, index);
+	}
 
 	// reset state to default values
 	void reset()
@@ -244,6 +301,8 @@ public:
 	// write access
 	void write(u16 index, u8 data)
 	{
+		assert(index < REGISTERS);
+
 		// LFO AM/PM depth are written to the same register (0x19);
 		// redirect the PM depth to an unused neighbor (0x1a)
 		if (index == 0x19)
@@ -252,9 +311,17 @@ public:
 			m_regdata[index] = data;
 	}
 
-	// create a new version of ourself with a different channel/operator base
-	ymopm_registers channel_registers(u8 chnum) { return ymopm_registers(m_regdata, channel_offset(chnum)); }
-	ymopm_registers operator_registers(u8 opnum) { return ymopm_registers(m_regdata, m_chbase, m_chbase + operator_offset(opnum)); }
+	// determine if a given write is a keyon, and if so, for which channel/operators
+	static bool is_keyon(u16 regindex, u8 data, u8 &channel, u8 &opmask)
+	{
+		if (regindex == 0x08)
+		{
+			channel = BIT(data, 0, 3);
+			opmask = BIT(data, 3, 4);
+			return true;
+		}
+		return false;
+	}
 
 	// system-wide registers
 	u8 test() const               /*  8 bits */ { return sysbyte(0x01, 0, 8); }
@@ -310,25 +377,6 @@ public:
 		else
 			return opbyte(0xe0, 0, 4) * 2 + 1;
 	}
-
-	// determine if a given write is a keyon, and if so, for which channel/operators
-	static bool is_keyon(u16 regindex, u8 data, u8 &channel, u8 &opmask)
-	{
-		if (regindex == 0x08)
-		{
-			channel = BIT(data, 0, 3);
-			opmask = BIT(data, 3, 4);
-			return true;
-		}
-		return false;
-	}
-
-protected:
-	// convert a channel number into a register offset; channel goes into the low 3 bits
-	static constexpr u8 channel_offset(u8 chnum) { return BIT(chnum, 0, 3); }
-
-	// convert an operator number into a register offset; operator goes into bits 3-4
-	static constexpr u8 operator_offset(u8 opnum) { return (BIT(opnum, 0) << 4) | (BIT(opnum, 1) << 3); }
 };
 
 
@@ -380,27 +428,79 @@ protected:
 //        AC-AF --xxx--- Block (0-7)
 //              -----xxx Frequency number upper 3 bits
 //
+// OPN channel and operator mapping:
+//
+//    Channels are numbered linearly, 0-2, as represented in the map
+//    Operators are numbered linearly, 0-11, as represented in the map, but there
+//        are gaps, since these are at address offsets 0,1,2, 4,5,6, 8,9,10, 12,13,14
+//
+//    Operators are assigned to channels as follows:
+//        Operator 0 -> Channel 0, Index 0 (Modulator 1)
+//        Operator 1 -> Channel 1, Index 0
+//        Operator 2 -> Channel 2, Index 0
+//        Operator 3 -> Channel 0, Index 2 (Modulator 2)
+//        Operator 4 -> Channel 1, Index 2
+//        Operator 5 -> Channel 2, Index 2
+//        Operator 6 -> Channel 0, Index 1 (Carrier 1)
+//        Operator 7 -> Channel 1, Index 1
+//        Operator 8 -> Channel 2, Index 1
+//        Operator 9 -> Channel 0, Index 3 (Carrier 2)
+//        Operator 10 -> Channel 1, Index 3
+//        Operator 11 -> Channel 2, Index 3
+//
 
 class ymopn_registers : public ymfm_registers_base
 {
 public:
 	// constants
 	static constexpr family_type FAMILY = FAMILY_OPN;
-	static constexpr u8 DEFAULT_PRESCALE = 6;
 	static constexpr u8 CHANNELS = 3;
-	static constexpr u32 CSM_TRIGGER_MASK = 1 << 2;
+	static constexpr u8 OPERATORS = 3*4;
 	static constexpr u16 REGISTERS = 0x100;
 	static constexpr u16 REG_MODE = 0x27;
+	static constexpr u8 DEFAULT_PRESCALE = 6;
+	static constexpr u32 CSM_TRIGGER_MASK = 1 << 2;
 
 	// constructor
-	ymopn_registers(std::vector<u8> &regdata, u16 chbase = 0, u16 opbase = 0) :
-		ymfm_registers_base(regdata, chbase, opbase)
+	ymopn_registers(u8 *regdata) :
+		ymfm_registers_base(regdata)
 	{
 	}
 
-	// return channel/operator number
-	u8 chnum() const { return BIT(m_chbase, 0, 2); }
-	u8 opnum() const { return BIT(m_opbase, 3) | (BIT(m_opbase, 2) << 1); }
+	// getters for channel and operator number
+	u8 chnum() const
+	{
+		assert(m_chdata != nullptr);
+		return m_chdata - m_regdata;
+	}
+	u8 opnum() const
+	{
+		assert(m_opdata != nullptr);
+		int temp = m_opdata - m_regdata;
+		return temp - (temp / 4);
+	}
+
+	// setters for channel and operator base within the register file
+	void set_chnum(u8 chnum)
+	{
+		assert(chnum < CHANNELS);
+		m_chdata = m_regdata + chnum;
+	}
+	void set_opnum(u8 opnum)
+	{
+		assert(opnum < OPERATORS);
+		m_opdata = m_regdata + opnum % 3 + 4 * (opnum / 3);
+	}
+
+	// mapping of operator number to channel.opindex:
+	static constexpr std::pair<u8,u8> opnum_to_chnum_and_index(u8 opnum)
+	{
+		assert(opnum < OPERATORS);
+		u8 chnum = opnum % CHANNELS;
+		u8 index = opnum / CHANNELS;
+		index = BIT(index, 1) | (BIT(index, 0) << 1);
+		return std::make_pair(chnum, index);
+	}
 
 	// reset state to default values
 	void reset()
@@ -410,6 +510,8 @@ public:
 	// write access
 	void write(u16 index, u8 data)
 	{
+		assert(index < REGISTERS);
+
 		// writes in the 0xa0-af/0x1a0-af region are handled as latched pairs
 		// borrow unused registers 0xb8-bf/0x1b8-bf as temporary holding locations
 		if ((index & 0xf0) == 0xa0)
@@ -432,9 +534,17 @@ public:
 		m_regdata[index] = data;
 	}
 
-	// create a new version of ourself with a different channel/operator base
-	ymopn_registers channel_registers(u8 chnum) { return ymopn_registers(m_regdata, channel_offset(chnum)); }
-	ymopn_registers operator_registers(u8 opnum) { return ymopn_registers(m_regdata, m_chbase, m_chbase + operator_offset(opnum)); }
+	// determine if a given write is a keyon, and if so, for which channel/operators
+	static bool is_keyon(u16 regindex, u8 data, u8 &channel, u8 &opmask)
+	{
+		if (regindex == 0x28)
+		{
+			channel = BIT(data, 0, 2);
+			opmask = BIT(data, 4, 4);
+			return true;
+		}
+		return false;
+	}
 
 	// system-wide registers
 	u8 test() const               /*  8 bits */ { return sysbyte(0x21, 0, 8); }
@@ -481,25 +591,6 @@ public:
 		else
 			return opbyte(0x80, 0, 4) * 2 + 1;
 	}
-
-	// determine if a given write is a keyon, and if so, for which channel/operators
-	static bool is_keyon(u16 regindex, u8 data, u8 &channel, u8 &opmask)
-	{
-		if (regindex == 0x28)
-		{
-			channel = BIT(data, 0, 2);
-			opmask = BIT(data, 4, 4);
-			return true;
-		}
-		return false;
-	}
-
-protected:
-	// convert a channel number into a register offset; channel goes in low 2 bits
-	static constexpr u16 channel_offset(u8 chnum) { return BIT(chnum, 0, 2); }
-
-	// convert an operator number into a register offset; operator goes into bits 2-3
-	static constexpr u8 operator_offset(u8 opnum) { return (BIT(opnum, 0) << 3) | (BIT(opnum, 1) << 2); }
 };
 
 
@@ -559,22 +650,91 @@ protected:
 //        AC-AF --xxx--- Block (0-7)
 //              -----xxx Frequency number upper 3 bits
 //
+// OPNA channel and operator mapping:
+//
+//    Channels and operators are mapped like two OPNs back-to-back
+//    This means all operators for channels 0-2 are assigned, followed by all
+//        operators for channels 3-5
+//
+//    Operators are assigned to channels as follows:
+//        Operator 0 -> Channel 0, Index 0 (Modulator 1)
+//        Operator 1 -> Channel 1, Index 0
+//        Operator 2 -> Channel 2, Index 0
+//        Operator 3 -> Channel 0, Index 2 (Modulator 2)
+//        Operator 4 -> Channel 1, Index 2
+//        Operator 5 -> Channel 2, Index 2
+//        Operator 6 -> Channel 0, Index 1 (Carrier 1)
+//        Operator 7 -> Channel 1, Index 1
+//        Operator 8 -> Channel 2, Index 1
+//        Operator 9 -> Channel 0, Index 3 (Carrier 2)
+//        Operator 10 -> Channel 1, Index 3
+//        Operator 11 -> Channel 2, Index 3
+//        --
+//        Operator 12 -> Channel 3, Index 0 (Modulator 1)
+//        Operator 13 -> Channel 4, Index 0
+//        Operator 14 -> Channel 5, Index 0
+//        Operator 15 -> Channel 3, Index 2 (Modulator 2)
+//        Operator 16 -> Channel 4, Index 2
+//        Operator 17 -> Channel 5, Index 2
+//        Operator 18 -> Channel 3, Index 1 (Carrier 1)
+//        Operator 19 -> Channel 4, Index 1
+//        Operator 20 -> Channel 5, Index 1
+//        Operator 21 -> Channel 3, Index 3 (Carrier 2)
+//        Operator 22 -> Channel 4, Index 3
+//        Operator 23 -> Channel 5, Index 3
+//
 
 class ymopna_registers : public ymopn_registers
 {
 public:
 	// constants
 	static constexpr u8 CHANNELS = 6;
+	static constexpr u8 OPERATORS = 6*4;
 	static constexpr u16 REGISTERS = 0x200;
 
 	// constructor
-	ymopna_registers(std::vector<u8> &regdata, u16 chbase = 0, u16 opbase = 0) :
-		ymopn_registers(regdata, chbase, opbase)
+	ymopna_registers(u8 *regdata) :
+		ymopn_registers(regdata)
 	{
 	}
 
-	// return channel/operator number
-	u8 chnum() const { return BIT(m_chbase, 0, 2) + 3 * BIT(m_chbase, 8); }
+	// getters for channel and operator number
+	u8 chnum() const
+	{
+		assert(m_chdata != nullptr);
+		int temp = m_chdata - m_regdata;
+		return BIT(temp, 0, 2) + 3 * BIT(temp, 8);
+	}
+	u8 opnum() const
+	{
+		assert(m_opdata != nullptr);
+		int temp = m_opdata - m_regdata;
+		int temp2 = BIT(temp, 0, 4);
+		return temp2 - (temp2 / 4) + 12 * BIT(temp, 8);
+	}
+
+	// setters for channel and operator base within the register file
+	void set_chnum(u8 chnum)
+	{
+		assert(chnum < CHANNELS);
+		m_chdata = m_regdata + chnum % 3 + 0x100 * (chnum / 3);
+	}
+	void set_opnum(u8 opnum)
+	{
+		assert(opnum < OPERATORS);
+		m_opdata = m_regdata + opnum % 3 + 4 * ((opnum % 12) / 3) + 0x100 * (opnum / 12);
+	}
+
+	// initial mapping of operator number to channel.opindex:
+	static constexpr std::pair<u8,u8> opnum_to_chnum_and_index(u8 opnum)
+	{
+		assert(opnum < OPERATORS);
+		u8 chnum = opnum % (CHANNELS/2);
+		u8 index = opnum / (CHANNELS/2);
+		chnum += 3 * BIT(index, 2);
+		index = BIT(index, 1) | (BIT(index, 0) << 1);
+		return std::make_pair(chnum, index);
+	}
 
 	// reset state to default values
 	void reset()
@@ -583,23 +743,6 @@ public:
 		m_regdata[0xb4] = m_regdata[0xb5] = m_regdata[0xb6] = 0xc0;
 		m_regdata[0x1b4] = m_regdata[0x1b5] = m_regdata[0x1b6] = 0xc0;
 	}
-
-	// create a new version of ourself with a different channel/operator base
-	ymopna_registers channel_registers(u8 chnum) { return ymopna_registers(m_regdata, channel_offset(chnum)); }
-	ymopna_registers operator_registers(u8 opnum) { return ymopna_registers(m_regdata, m_chbase, m_chbase + operator_offset(opnum)); }
-
-	// OPNA-specific system-wide registers
-	u8 lfo_enabled() const        /*  3 bits */ { return sysbyte(0x22, 3, 1); }
-	u8 lfo_rate() const           /*  3 bits */ { return sysbyte(0x22, 0, 3); }
-
-	// OPNA-specific per-channel registers
-	u8 pan_left() const           /*  1 bit  */ { return chbyte(0xb4, 7, 1); }
-	u8 pan_right() const          /*  1 bit  */ { return chbyte(0xb4, 6, 1); }
-	u8 lfo_am_sensitivity() const /*  2 bits */ { return chbyte(0xb4, 4, 2); }
-	u8 lfo_pm_sensitivity() const /*  3 bits */ { return chbyte(0xb4, 0, 3); }
-
-	// OPNA-specific per-operator registers
-	u8 lfo_am_enabled() const     /*  1 bit  */ { return opbyte(0x60, 7, 1); }
 
 	// determine if a given write is a keyon, and if so, for which channel/operators
 	static bool is_keyon(u16 regindex, u8 data, u8 &channel, u8 &opmask)
@@ -616,9 +759,18 @@ public:
 		return false;
 	}
 
-protected:
-	// convert a channel number into a register offset
-	static constexpr u16 channel_offset(u8 chnum) { return chnum % 3 + ((chnum / 3) << 8); }
+	// OPNA-specific system-wide registers
+	u8 lfo_enabled() const        /*  3 bits */ { return sysbyte(0x22, 3, 1); }
+	u8 lfo_rate() const           /*  3 bits */ { return sysbyte(0x22, 0, 3); }
+
+	// OPNA-specific per-channel registers
+	u8 pan_left() const           /*  1 bit  */ { return chbyte(0xb4, 7, 1); }
+	u8 pan_right() const          /*  1 bit  */ { return chbyte(0xb4, 6, 1); }
+	u8 lfo_am_sensitivity() const /*  2 bits */ { return chbyte(0xb4, 4, 2); }
+	u8 lfo_pm_sensitivity() const /*  3 bits */ { return chbyte(0xb4, 0, 3); }
+
+	// OPNA-specific per-operator registers
+	u8 lfo_am_enabled() const     /*  1 bit  */ { return opbyte(0x60, 7, 1); }
 };
 
 
@@ -649,6 +801,9 @@ public:
 
 	// reset the operator state
 	void reset();
+
+	// set the channel number
+	void set_chnum(u8 chnum) { m_regs.set_chnum(chnum); }
 
 	// master clocking function
 	void clock(u32 env_counter, s8 lfo_raw_pm, u16 block_freq);
@@ -712,6 +867,15 @@ public:
 	// reset the channel state
 	void reset();
 
+	// assign operators
+	void assign(int index, ymfm_operator<RegisterType> *op)
+	{
+		assert(index < std::size(m_op));
+		m_op[index] = op;
+		if (op != nullptr)
+			op->set_chnum(m_regs.chnum());
+	}
+
 	// signal key on/off to our operators
 	void keyonoff(u8 states);
 
@@ -731,10 +895,7 @@ private:
 	// internal state
 	s16 m_feedback[2];                    // feedback memory for operator 1
 	mutable s16 m_feedback_in;            // next input value for op 1 feedback (set in output)
-	ymfm_operator<RegisterType> m_op1;    // operator 1
-	ymfm_operator<RegisterType> m_op2;    // operator 2
-	ymfm_operator<RegisterType> m_op3;    // operator 3
-	ymfm_operator<RegisterType> m_op4;    // operator 4
+	ymfm_operator<RegisterType> *m_op[4]; // up to 4 operators
 	RegisterType m_regs;                  // channel-specific registers
 };
 
@@ -838,9 +999,10 @@ private:
 	attotime m_busy_end;             // end of the busy time
 	emu_timer *m_timer[2];           // our two timers
 	devcb_write_line m_irq_handler;  // IRQ callback
- 	std::unique_ptr<ymfm_channel<RegisterType>> m_channel[RegisterType::CHANNELS]; // channel pointers
-	std::vector<u8> m_regdata;       // raw register data
 	RegisterType m_regs;             // register accessor
+ 	std::unique_ptr<ymfm_channel<RegisterType>> m_channel[RegisterType::CHANNELS]; // channel pointers
+ 	std::unique_ptr<ymfm_operator<RegisterType>> m_operator[RegisterType::OPERATORS]; // operator pointers
+	u8 m_regdata[RegisterType::REGISTERS]; // raw register data
 };
 
 
