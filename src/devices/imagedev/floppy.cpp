@@ -630,16 +630,13 @@ image_init_result floppy_image_device::call_create(int format_type, util::option
 			output_format = i;
 			break;
 		}
+
+		// Use MFI as a default.
+		if (!strcmp(i->name(), "mfi"))
+			output_format = i;
 	}
 
-	// did we find a suitable format?
-	if (output_format == nullptr)
-	{
-		seterror(IMAGE_ERROR_INVALIDIMAGE, "Unable to identify the image format");
-		return image_init_result::FAIL;
-	}
-
-	init_floppy_load(output_format != nullptr);
+	init_floppy_load(true);
 
 	return image_init_result::PASS;
 }

@@ -54,23 +54,39 @@ void fs_prodos::enumerate(floppy_enumerator &fe, uint32_t form_factor, const std
 
 void fs_prodos::floppy_instantiate(u32 key, std::vector<u8> &image) const
 {
-	if(key == 800) {
-		copy(image, 0x000, boot, 512);
-		w8  (image, 0x402, 0x03);
-		w8  (image, 0x404, 0xf8);
-		wstr(image, 0x405, "UNTITLED");
-		w32b(image, 0x416, 0x642a250d);
-		w16b(image, 0x41a, 0x80ff);
-		w32b(image, 0x41c, 0x642a250d);
-		w32b(image, 0x420, 0x0500c327);
-		w32b(image, 0x424, 0x0d000006);
-		w32b(image, 0x428, 0x00400600);
-		w32b(image, 0x600, 0x02000400);
-		w32b(image, 0x800, 0x03000500);
-		w8  (image, 0xa00, 0x04);
-		w8  (image, 0xc00, 0x01);
-		fill(image, 0xc01, 0xff, 199);	
-	}
+	std::string volume_name = "UNTITLED";
+	u32 blocks = key * 2;
+
+	copy(image, 0x000, boot, 0x200);               // Standard ProDOS boot sector as written by a 2gs
+
+	fill(image, 0x200, 0x00, 0x200);               // No SOS boot sector
+
+	w16l(image, 0x400, 0x0000);                    // Backwards key block pointer (null)
+	w16l(image, 0x402, 0x0003);                    // Forwards key block pointer
+	w8  (image, 0x404, 0xf0 | volume_name.size()); // Block type (f, key block) and name size
+	wstr(image, 0x405, volume_name);               // Volume name, up to 15 characters
+	w32b(image, 0x416, 0x642a250d);                // ??? date & time
+	w16b(image, 0x41a, 0x80ff);                    // ???
+	w32b(image, 0x41c, 0x642a250d);                // Creation date & time
+	w8  (image, 0x420, 0x05);                      // ProDOS version (2gs)
+	w8  (image, 0x421, 0x00);                      // ProDOS minimum version
+	w8  (image, 0x422, 0xc3);                      // Allowed access (destroy, rename, !backup, 3x0, write read)
+	w8  (image, 0x423, 0x27);                      // Directory entry length (fixed)
+	w8  (image, 0x424, 0x0d);                      // Entries per block (fixed)
+	w16l(image, 0x425, 0x0000);                    // Number of file entries in the directory
+	w16l(image, 0x427, 0x0006);                    // Bitmap block pointer
+	w16l(image, 0x429, blocks);                    // Number of blocks
+
+	w16l(image, 0x600, 0x0002);                    // Backwards block pointer of the second volume block
+	w16l(image, 0x602, 0x0004);                    // Forwards block pointer of the second volume block
+	w16l(image, 0x800, 0x0003);                    // Backwards block pointer of the third volume block
+	w16l(image, 0x802, 0x0005);                    // Forwards block pointer of the third volume block
+	w16l(image, 0xa00, 0x0004);                    // Backwards block pointer of the fourth volume block
+	w16l(image, 0xa02, 0x0000);                    // Forwards block pointer of the fourth volume block (nmull)
+
+	// Mark blocks 7 to max as free
+	for(u32 i = 7; i != blocks; i++)
+		image[0xc00 + (i >> 3)] |= 0x80 >> (i & 7);
 }
 
 const filesystem_manager_type FS_PRODOS = &filesystem_manager_creator<fs_prodos>;;

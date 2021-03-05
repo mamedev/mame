@@ -42,9 +42,9 @@ void filesystem_manager_t::fill(std::vector<u8> &image, u32 offset, u8 data, u32
 	memset(image.data() + offset, data, size);
 }
 
-void filesystem_manager_t::wstr(std::vector<u8> &image, u32 offset, const char *str)
+void filesystem_manager_t::wstr(std::vector<u8> &image, u32 offset, const std::string &str)
 {
-	memcpy(image.data() + offset, str, strlen(str)+1);
+	memcpy(image.data() + offset, str.data(), str.size());
 }
 
 void filesystem_manager_t::w8(std::vector<u8> &image, u32 offset, u8 data)

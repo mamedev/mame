@@ -36,7 +36,7 @@ protected:
 
 	static void copy(std::vector<u8> &image, u32 offset, const u8 *src, u32 size);
 	static void fill(std::vector<u8> &image, u32 offset, u8 data, u32 size);
-	static void wstr(std::vector<u8> &image, u32 offset, const char *str);
+	static void wstr(std::vector<u8> &image, u32 offset, const std::string &str);
 	static void w8(std::vector<u8> &image, u32 offset, u8 data);
 	static void w16b(std::vector<u8> &image, u32 offset, u16 data);
 	static void w32b(std::vector<u8> &image, u32 offset, u32 data);
