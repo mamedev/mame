@@ -461,6 +461,7 @@ ymfm_operator<RegisterType>::ymfm_operator(RegisterType regs) :
 ALLOW_SAVE_TYPE(ymfm_operator<ymopm_registers>::envelope_state);
 ALLOW_SAVE_TYPE(ymfm_operator<ymopn_registers>::envelope_state);
 ALLOW_SAVE_TYPE(ymfm_operator<ymopna_registers>::envelope_state);
+ALLOW_SAVE_TYPE(ymfm_operator<ymopl_registers>::envelope_state);
 
 template<class RegisterType>
 void ymfm_operator<RegisterType>::save(device_t &device, u8 index)
@@ -510,7 +511,7 @@ void ymfm_operator<RegisterType>::clock(u32 env_counter, s8 lfo_raw_pm, u16 bloc
 	if (m_regs.ssg_eg_enabled())
 		clock_ssg_eg_state(keycode);
 
-	// clock the envelope if on an envelope cycle
+	// clock the envelope if on an envelope cycle; env_counter is a x.2 value
 	if (BIT(env_counter, 0, 2) == 0)
 		clock_envelope(env_counter >> 2, keycode);
 
@@ -793,7 +794,7 @@ void ymfm_operator<RegisterType>::clock_envelope(u16 env_counter, u8 keycode)
 
 		// bring current attenuation down to 5 bits and compare
 		if ((m_env_attenuation >> 5) >= target)
-			m_env_state = ENV_SUSTAIN;
+			m_env_state = m_regs.eg_sustain() ? ENV_SUSTAIN : ENV_RELEASE;
 	}
 
 	// determine our raw 5-bit rate value
@@ -1044,8 +1045,8 @@ void ymfm_channel<RegisterType>::clock(u32 env_counter, s8 lfo_raw_pm, bool is_m
 	m_feedback[0] = m_feedback[1];
 	m_feedback[1] = m_feedback_in;
 
-	// in multi-frequency mode, the first 3 channels use independent block/fnum values
-	if (RegisterType::FAMILY == RegisterType::FAMILY_OPN && is_multi_freq)
+	// in multi-frequency mode (OPN only), the first 3 channels use independent block/fnum values
+	if (is_multi_freq)
 	{
 		assert(m_op[0] != nullptr && m_op[1] != nullptr && m_op[2] != nullptr && m_op[3] != nullptr);
 		m_op[0]->clock(env_counter, lfo_raw_pm, m_regs.multi_block_freq1());
@@ -1359,11 +1360,12 @@ void ymfm_engine_base<RegisterType>::reset()
 template<class RegisterType>
 u32 ymfm_engine_base<RegisterType>::clock(u32 chanmask)
 {
-	// increment the envelope count; low two bits are the subcount, which
-	// only counts to 3, so if it reaches 3, count one more time
-	m_env_counter++;
-	if (BIT(m_env_counter, 0, 2) == 3)
-		m_env_counter++;
+	// if the envelope clock divider is 1, just increment by 4;
+	// otherwise, increment by 1 and manually wrap when we reach the divide count
+	if (RegisterType::EG_CLOCK_DIVIDER == 1)
+		m_env_counter += 4;
+	else if (BIT(++m_env_counter, 0, 2) == RegisterType::EG_CLOCK_DIVIDER)
+		m_env_counter += 4 - RegisterType::EG_CLOCK_DIVIDER;
 
 	// clock the noise generator
 	clock_noise();
@@ -1696,3 +1698,4 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::synced_mode_w)
 template class ymfm_engine_base<ymopm_registers>;
 template class ymfm_engine_base<ymopn_registers>;
 template class ymfm_engine_base<ymopna_registers>;
+template class ymfm_engine_base<ymopl_registers>;

@@ -132,9 +132,12 @@ public:
 	// per-operator registers that aren't universally supported
 	u8 lfo_am_enabled() const     /*  1 bit  */ { return 0; } // not on OPN
 	u8 lfo_pm_enabled() const     /*  1 bit  */ { return 0; } // not on OPM,OPN,OPN2
+	u8 detune() const             /*  3 bits */ { return 0; } // not on OPL
 	u8 detune2() const            /*  2 bits */ { return 0; } // not on OPN,OPN2,OPL
+	u8 eg_sustain() const         /*  1 bit  */ { return 1; } // not on OPM,OPN,OPN2
 	u8 ssg_eg_enabled() const     /*  1 bit  */ { return 0; } // not on OPM,OPL
 	u8 ssg_eg_mode() const        /*  1 bit  */ { return 0; } // not on OPM,OPL
+	u8 sustain_rate() const       /*  4 bits */ { return 0; } // not on OPL
 
 protected:
 	// return a bitfield extracted from a byte
@@ -248,6 +251,7 @@ public:
 	static constexpr u16 REGISTERS = 0x100;
 	static constexpr u16 REG_MODE = 0x14;
 	static constexpr u8 DEFAULT_PRESCALE = 2;
+	static constexpr u8 EG_CLOCK_DIVIDER = 3;
 	static constexpr u32 CSM_TRIGGER_MASK = 0xff;
 
 	// constructor
@@ -459,6 +463,7 @@ public:
 	static constexpr u16 REGISTERS = 0x100;
 	static constexpr u16 REG_MODE = 0x27;
 	static constexpr u8 DEFAULT_PRESCALE = 6;
+	static constexpr u8 EG_CLOCK_DIVIDER = 3;
 	static constexpr u32 CSM_TRIGGER_MASK = 1 << 2;
 
 	// constructor
@@ -774,6 +779,220 @@ public:
 };
 
 
+// ======================> ymopl_registers
+
+//
+// OPL/OPL2 register map:
+//
+//      System-wide registers:
+//           01 xxxxxxxx Test register
+//              --x----- Enable OPL compatibility mode (1 = enable)
+//           02 xxxxxxxx Timer A value (4 * OPN)
+//           03 xxxxxxxx Timer B value
+//           04 x------- RST
+//              -x------ Mask timer A
+//              --x----- Mask timer B
+//              ------x- Load timer B
+//              -------x Load timer A
+//           08 x------- CSM mode
+//              -x------ Note select
+//           BD x------- AM depth
+//              -x------ PM depth
+//              --x----- Rhythm enable
+//              ---x---- Bass drum key on
+//              ----x--- Snare drum key on
+//              -----x-- Tom key on
+//              ------x- Top cymbal key on
+//              -------x High hat key on
+//
+//     Per-channel registers (channel in address bits 0-3)
+//        A0-A8 xxxxxxxx F-number (low 8 bits)
+//        B0-B8 --x----- Key on
+//              ---xxx-- Block (octvate, 0-7)
+//              ------xx F-number (high two bits)
+//        C0-C8 ----xxx- Feedback level for operator 1 (0-7)
+//              -------x Operator connection algorithm
+//
+//     Per-operator registers (operator in bits 0-5)
+//        20-35 x------- AM enable
+//              -x------ PM enable (VIB)
+//              --x----- EG type
+//              ---x---- Key scale rate
+//              ----xxxx Multiple value (0-15)
+//        40-55 xx------ Key scale level (0-3)
+//              --xxxxxx Total level (0-63)
+//        60-75 xxxx---- Attack rate (0-15)
+//              ----xxxx Decay rate (0-15)
+//        80-95 xxxx---- Sustain level (0-15)
+//              ----xxxx Release rate (0-15)
+//        E0-F5 ------xx Wave select (0-3) [OPL2+]
+//
+// OPL channel and operator mapping:
+//
+//    Channels are numbered linearly, 0-8, as represented in the map
+//    Operators are numbered linearly, 0-17, as represented in the map
+//
+//    Operators are assigned to channels as follows:
+//        Operator 0 -> Channel 0, Index 0
+//        Operator 1 -> Channel 1, Index 0
+//        Operator 2 -> Channel 2, Index 0
+//        Operator 3 -> Channel 0, Index 1
+//        Operator 4 -> Channel 1, Index 1
+//        Operator 5 -> Channel 2, Index 1
+//        Operator 6 -> Channel 3, Index 0
+//        Operator 7 -> Channel 4, Index 0
+//        Operator 8 -> Channel 5, Index 0
+//        Operator 9 -> Channel 3, Index 1
+//        Operator 10 -> Channel 4, Index 1
+//        Operator 11 -> Channel 5, Index 1
+//        Operator 12 -> Channel 6, Index 0
+//        Operator 13 -> Channel 7, Index 0
+//        Operator 14 -> Channel 8, Index 0
+//        Operator 15 -> Channel 6, Index 1
+//        Operator 16 -> Channel 7, Index 1
+//        Operator 17 -> Channel 8, Index 1
+//
+// Note that many of the registers in OPL are trimmed down from their
+// OPM/OPN counterparts. For better engine code re-used, we expand the
+// OPL values into their equivalents.
+//
+
+class ymopl_registers : public ymfm_registers_base
+{
+public:
+	// constants
+	static constexpr family_type FAMILY = FAMILY_OPL;
+	static constexpr u8 CHANNELS = 9;
+	static constexpr u8 OPERATORS = 9*2;
+	static constexpr u16 REGISTERS = 0x100;
+	static constexpr u16 REG_MODE = 0x04;
+	static constexpr u8 DEFAULT_PRESCALE = 2;
+	static constexpr u8 EG_CLOCK_DIVIDER = 1;
+	static constexpr u32 CSM_TRIGGER_MASK = 0x1ff;
+
+	// constructor
+	ymopl_registers(u8 *regdata) :
+		ymfm_registers_base(regdata)
+	{
+	}
+
+	// getters for channel and operator number
+	u8 chnum() const
+	{
+		assert(m_chdata != nullptr);
+		return m_chdata - m_regdata;
+	}
+	u8 opnum() const
+	{
+		assert(m_opdata != nullptr);
+		int temp = m_opdata - m_regdata;
+		return temp - 2 * (temp / 8);
+	}
+
+	// setters for channel and operator base within the register file
+	void set_chnum(u8 chnum)
+	{
+		assert(chnum < CHANNELS);
+		m_chdata = m_regdata + chnum;
+	}
+	void set_opnum(u8 opnum)
+	{
+		assert(opnum < OPERATORS);
+		m_opdata = m_regdata + opnum % 6 + 8 * (opnum / 6);
+	}
+
+	// mapping of operator number to channel.opindex:
+	static constexpr std::pair<u8,u8> opnum_to_chnum_and_index(u8 opnum)
+	{
+		assert(opnum < OPERATORS);
+		u8 chnum = opnum % (CHANNELS/3);
+		u8 index = opnum / (CHANNELS/3);
+		chnum += (CHANNELS/3) * BIT(index, 1, 2);
+		return std::make_pair(chnum, BIT(index, 0));
+	}
+
+	// reset state to default values
+	void reset()
+	{
+	}
+
+	// write access
+	void write(u16 index, u8 data)
+	{
+		assert(index < REGISTERS);
+
+		// writes to the mode register with high bit set ignore the low bits
+		if (index == REG_MODE && BIT(data, 7) != 0)
+			m_regdata[index] |= 0x80;
+		m_regdata[index] = data;
+	}
+
+	// determine if a given write is a keyon, and if so, for which channel/operators
+	static bool is_keyon(u16 regindex, u8 data, u8 &channel, u8 &opmask)
+	{
+		if ((regindex & 0xf0) == 0xb0)
+		{
+			channel = BIT(regindex, 0, 3);
+			opmask = 0xff;
+			return true;
+		}
+		return false;
+	}
+
+	// system-wide registers
+	u8 test() const               /*  8 bits */ { return sysbyte(0x01, 0, 8); }
+	u16 timer_a_value() const     /*  8 bits */ { return 4 * sysbyte(0x02, 0, 8); }
+	u8 timer_b_value() const      /*  8 bits */ { return sysbyte(0x03, 0, 8); }
+	u8 reset_timer_b() const      /*  1 bit  */ { return sysbyte(0x04, 7, 1); }
+	u8 reset_timer_a() const      /*  1 bit  */ { return sysbyte(0x04, 7, 1); }
+	u8 enable_timer_b() const     /*  1 bit  */ { return sysbyte(0x04, 5, 1) ^ 1; } // verify mapping
+	u8 enable_timer_a() const     /*  1 bit  */ { return sysbyte(0x04, 6, 1) ^ 1; }
+	u8 load_timer_b() const       /*  1 bit  */ { return sysbyte(0x04, 1, 1); }
+	u8 load_timer_a() const       /*  1 bit  */ { return sysbyte(0x04, 0, 1); }
+	u8 csm() const                /*  1 bit  */ { return sysbyte(0x08, 7, 1); }
+	u8 note_select() const        /*  1 bit  */ { return sysbyte(0x08, 6, 1); } // new
+	u8 lfo_am_depth() const       /*  1 bit  */ { return sysbyte(0xbd, 7, 1); } // needs mapping
+	u8 lfo_pm_depth() const       /*  1 bit  */ { return sysbyte(0xbd, 6, 1); } // needs mapping
+	u8 rhythm_enable() const      /*  1 bit  */ { return sysbyte(0xbd, 5, 1); } // new
+	u8 rhythm_keyon() const       /*  5 bits */ { return sysbyte(0xbd, 4, 0); } // new
+
+	// per-channel registers
+	u16 block_freq() const        /* 13 bits */ { return chword(0xb0, 0, 5, 0xa0, 0, 8); } // needs mapping
+	u8 feedback() const           /*  3 bits */ { return chbyte(0xc0, 1, 3); } // verify mapping
+	u8 algorithm() const          /*  1 bit  */ { return chbyte(0xc0, 0, 1); } // needs mapping
+
+	// per-operator registers
+	u8 lfo_am_enabled() const     /*  1 bit  */ { return opbyte(0x20, 7, 1); }
+	u8 lfo_pm_enabled() const     /*  1 bit  */ { return opbyte(0x20, 6, 1); } // new
+	u8 eg_sustain() const         /*  1 bit  */ { return opbyte(0x20, 5, 1); }
+	u8 ksr() const                /*  1 bit  */ { return opbyte(0x20, 4, 1) * 2 + 1; } // 1->2 bits
+	u8 multiple() const           /*  4 bits */ { return opbyte(0x20, 0, 4); }
+	u8 key_scale_level() const    /*  2 bits */ { return opbyte(0x40, 6, 2); } // new
+	u8 total_level() const        /*  6 bits */ { return opbyte(0x40, 0, 6); } // needs mapping
+	u8 attack_rate() const        /*  4 bits */ { return 2 * opbyte(0x60, 4, 4); } // 4->5 bits
+	u8 decay_rate() const         /*  4 bits */ { return 2 * opbyte(0x60, 0, 4); } // 4->5 bits
+	u8 sustain_level() const      /*  4 bits */ { return opbyte(0x80, 4, 4); } // needs mapping
+	u8 release_rate() const       /*  4 bits */ { return opbyte(0x80, 0, 4); }
+
+	// LFO is always enabled
+	u8 lfo_enabled() const { return 1; }
+
+	// special helper for generically getting the attack/decay/statain/release rates
+	u8 adsr_rate(u8 state) const
+	{
+		// attack/decay are 4 bits, expanded to 5 to match OPM/OPN
+		if (state < 2)
+			return opbyte(0x60, (state ^ 1) * 4, 4) * 2;
+
+		// sustain rate doesn't exist in OPL, so effectively 0
+		else if (state == 3)
+			return 0;
+
+		// release is 4 bits,  expanded as with OPM/OPN
+		return opbyte(0x80, 0, 4) * 2 + 1;
+	}
+};
+
 
 //*********************************************************
 //  CORE ENGINE CLASSES
@@ -1011,9 +1230,11 @@ private:
 extern template class ymfm_engine_base<ymopm_registers>;
 extern template class ymfm_engine_base<ymopn_registers>;
 extern template class ymfm_engine_base<ymopna_registers>;
+extern template class ymfm_engine_base<ymopl_registers>;
 
 using ymopm_engine = ymfm_engine_base<ymopm_registers>;
 using ymopn_engine = ymfm_engine_base<ymopn_registers>;
 using ymopna_engine = ymfm_engine_base<ymopna_registers>;
+using ymopl_engine = ymfm_engine_base<ymopl_registers>;
 
 #endif // MAME_SOUND_YMFM_H
