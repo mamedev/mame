@@ -1603,10 +1603,10 @@ end
 
 --------------------------------------------------
 --
---@src/lib/formats/rc759_dsk.h,FORMATS["RC759"] = true
+--@src/lib/formats/rc759_dsk.h,FORMATS["RC759_DSK"] = true
 --------------------------------------------------
 
-if (FORMATS["APRIDISK"]~=null  or _OPTIONS["with-tools"]) then
+if opt_tool(FORMATS, "RC759_DSK") then
 	files {
 		MAME_DIR.. "src/lib/formats/rc759_dsk.cpp",
 		MAME_DIR.. "src/lib/formats/rc759_dsk.h",

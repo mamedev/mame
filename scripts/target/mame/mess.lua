@@ -981,7 +981,6 @@ BUSES["X68K"] = true
 BUSES["Z29_KBD"] = true
 BUSES["Z88"] = true
 BUSES["ZORRO"] = true
-BUSES["THOMSON"] = true
 
 --------------------------------------------------
 -- specify used file formats
@@ -1112,7 +1111,7 @@ FORMATS["PPG_DSK"] = true
 FORMATS["PRIMOPTP"] = true
 FORMATS["PYLDIN_DSK"] = true
 FORMATS["QL_DSK"] = true
-FORMATS["RC759"] = true
+FORMATS["RC759_DSK"] = true
 FORMATS["RK_CAS"] = true
 FORMATS["RX50_DSK"] = true
 FORMATS["SC3000_BIT"] = true
@@ -3930,6 +3929,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/thomson.cpp",
 	MAME_DIR .. "src/mame/includes/thomson.h",
 	MAME_DIR .. "src/mame/machine/thomson.cpp",
+	MAME_DIR .. "src/mame/machine/thomflop.cpp",
+	MAME_DIR .. "src/mame/machine/thomflop.h",
 	MAME_DIR .. "src/mame/video/thomson.cpp",
 }
 
