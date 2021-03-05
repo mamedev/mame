@@ -11514,6 +11514,9 @@ ROM_END
 
   Tiger/Yeno also published an LCD handheld called Sub Wars, it's not related.
 
+  This handheld was modified and used as a prop in the 1981 movie Escape from
+  New York, Snake Plissken uses it as a homing device.
+
 ***************************************************************************/
 
 class subwars_state : public hh_tms1k_state
