@@ -670,7 +670,7 @@ static int ram_seekproc(void *file, int64_t offset, int whence)
 static size_t ram_readproc(void *file, void *buffer, size_t length)
 {
 	auto f = (iofile_ram *)file;
-	size_t l = std::min(length, f->data->size() - f->pos);
+	size_t l = std::min(length, size_t(f->data->size() - f->pos));
 	memcpy(buffer, f->data->data() + f->pos, l);
 	return l;
 }
@@ -678,7 +678,7 @@ static size_t ram_readproc(void *file, void *buffer, size_t length)
 static size_t ram_writeproc(void *file, const void *buffer, size_t length)
 {
 	auto f = (iofile_ram *)file;
-	size_t l = std::min(length, f->data->size() - f->pos);
+	size_t l = std::min(length, size_t(f->data->size() - f->pos));
 	memcpy(f->data->data() + f->pos, buffer, l);
 	return l;
 }
