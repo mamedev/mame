@@ -776,12 +776,7 @@ std::pair<handler_entry *, handler_entry *> memory_view::make_handlers(address_s
 		m_space = &space;
 
 		offs_t span = addrstart ^ addrend;
-		u32 awidth = 0;
-		if (span) {
-			for(awidth = 1; awidth != 32; awidth++)
-				if ((1 << awidth) >= span)
-					break;
-		}
+		u32 awidth = 32 - count_leading_zeros(span);
 
 		h_make(awidth, m_config->data_width(), m_config->addr_shift(), m_config->endianness(), space, *this, m_handler_read, m_handler_write);
 		m_handler_read->ref();
