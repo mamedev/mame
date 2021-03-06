@@ -819,6 +819,7 @@ BUSES["SMS_EXP"] = true
 --BUSES["SPC1000"] = true
 BUSES["SUNKBD"] = true
 --BUSES["TI99PEB"] = true
+BUSES["THOMSON"] = true
 --BUSES["TVC"] = true
 --BUSES["VBOY"] = true
 --BUSES["VC4000"] = true
@@ -852,6 +853,7 @@ FORMATS["WD177X_DSK"] = true
 FORMATS["NASLITE_DSK"] = true
 FORMATS["BASICDSK"] = true
 FORMATS["IBMXDF_DSK"] = true
+FORMATS["IPF_DSK"] = true
 
 --------------------------------------------------
 -- this is the list of driver libraries that
