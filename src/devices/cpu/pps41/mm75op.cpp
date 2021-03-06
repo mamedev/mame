@@ -9,6 +9,12 @@
 
 // opcodes (differences with mm76_device)
 
+void mm75_device::op_ibm()
+{
+	// IBM: does not PI5-8 pins
+	op_illegal();
+}
+
 void mm75_device::op_ios()
 {
 	// IOS: does not have serial I/O

@@ -32,7 +32,15 @@ References:
 TODO:
 - add extended opcodes to disasm? it's easy to add there, but the emulation goes
   through prefixes 1 cycle at the time which means the live disasm gets messy
-- WIP
+- documentation discourages long jumps to the subroutine pages, but does not
+  explain what would happen
+- documentation discourages use of some extended opcodes when in subroutine pages,
+  but again does not explain why
+- documentation is conflicting whether or not MM76/MM75 can (re)set interrupt flip-
+  flops with SOS/ROS opcodes
+- add serial i/o
+- add pseudo interrupts
+- add MM78
 
 */
 
@@ -49,6 +57,9 @@ pps41_base_device::pps41_base_device(const machine_config &mconfig, device_type 
 	m_prgwidth(prgwidth),
 	m_datawidth(datawidth),
 	m_opla(*this, "opla"),
+	m_read_p(*this),
+	m_read_d(*this),
+	m_write_d(*this),
 	m_read_r(*this),
 	m_write_r(*this)
 { }
@@ -71,7 +82,10 @@ void pps41_base_device::device_start()
 	m_datamask = (1 << m_datawidth) - 1;
 
 	// resolve callbacks
-	m_read_r.resolve_safe(0);
+	m_read_p.resolve_safe(0xff);
+	m_read_d.resolve_safe(0);
+	m_write_d.resolve_safe();
+	m_read_r.resolve_safe(0xff);
 	m_write_r.resolve_safe();
 
 	// zerofill
@@ -98,8 +112,10 @@ void pps41_base_device::device_start()
 	m_skip = false;
 	m_skip_count = 0;
 
-	m_cha = 0;
-	m_chb = 0;
+	m_d_pins = 10;
+	m_d_mask = (1 << m_d_pins) - 1;
+	m_d_output = 0;
+	m_r_output = 0;
 
 	// register for savestates
 	save_item(NAME(m_pc));
@@ -125,8 +141,8 @@ void pps41_base_device::device_start()
 	save_item(NAME(m_skip));
 	save_item(NAME(m_skip_count));
 
-	save_item(NAME(m_cha));
-	save_item(NAME(m_chb));
+	save_item(NAME(m_d_output));
+	save_item(NAME(m_r_output));
 
 	// register state for debugger
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%03X").noshow();
@@ -156,14 +172,14 @@ device_memory_interface::space_config_vector pps41_base_device::memory_space_con
 
 void pps41_base_device::device_reset()
 {
-	m_op = m_prev_op = 0;
+	m_op = m_prev_op = m_prev2_op = 0;
 	m_pc = m_prgmask >> 1 & ~0x3f;
 	m_skip = false;
 	m_skip_count = 0;
 
 	// clear outputs
-	m_cha = m_chb = 0xf;
-	m_write_r(0);
+	m_write_r(m_r_output = 0xff);
+	m_write_d(m_d_output = 0);
 }
 
 

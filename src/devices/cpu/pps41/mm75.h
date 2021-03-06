@@ -43,6 +43,7 @@ protected:
 	virtual void device_start() override;
 
 	// opcode handlers
+	virtual void op_ibm() override;
 	virtual void op_ios() override;
 };
 
