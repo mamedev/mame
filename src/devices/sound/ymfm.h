@@ -138,6 +138,7 @@ public:
 	u8 ssg_eg_enabled() const     /*  1 bit  */ { return 0; } // not on OPM,OPL
 	u8 ssg_eg_mode() const        /*  1 bit  */ { return 0; } // not on OPM,OPL
 	u8 sustain_rate() const       /*  4 bits */ { return 0; } // not on OPL
+	u8 key_scale_level() const    /*  2 bits */ { return 0; } // not on OPM,OPN,OPN2
 
 protected:
 	// return a bitfield extracted from a byte
@@ -957,7 +958,7 @@ public:
 		if ((regindex & 0xf0) == 0xb0)
 		{
 			channel = BIT(regindex, 0, 3);
-			opmask = 0xff;
+			opmask = 3;
 			return true;
 		}
 		return false;
@@ -978,14 +979,14 @@ public:
 	u8 timer_b_value() const      /*  8 bits */ { return sysbyte(0x03, 0, 8); }
 	u8 reset_timer_b() const      /*  1 bit  */ { return sysbyte(0x04, 7, 1); }
 	u8 reset_timer_a() const      /*  1 bit  */ { return sysbyte(0x04, 7, 1); }
-	u8 enable_timer_b() const     /*  1 bit  */ { return sysbyte(0x04, 5, 1) ^ 1; } // verify mapping
+	u8 enable_timer_b() const     /*  1 bit  */ { return sysbyte(0x04, 5, 1) ^ 1; }
 	u8 enable_timer_a() const     /*  1 bit  */ { return sysbyte(0x04, 6, 1) ^ 1; }
 	u8 load_timer_b() const       /*  1 bit  */ { return sysbyte(0x04, 1, 1); }
 	u8 load_timer_a() const       /*  1 bit  */ { return sysbyte(0x04, 0, 1); }
 	u8 csm() const                /*  1 bit  */ { return sysbyte(0x08, 7, 1); }
-	u8 note_select() const        /*  1 bit  */ { return sysbyte(0x08, 6, 1); } // new
-	u8 lfo_am_depth() const       /*  1 bit  */ { return sysbyte(0xbd, 7, 1); } // needs mapping
-	u8 lfo_pm_depth() const       /*  1 bit  */ { return sysbyte(0xbd, 6, 1); } // needs mapping
+	u8 note_select() const        /*  1 bit  */ { return sysbyte(0x08, 6, 1); }
+	u8 lfo_am_depth() const       /*  1 bit  */ { return sysbyte(0xbd, 7, 1); }
+	u8 lfo_pm_depth() const       /*  1 bit  */ { return sysbyte(0xbd, 6, 1); }
 	u8 rhythm_enable() const      /*  1 bit  */ { return sysbyte(0xbd, 5, 1); } // new
 	u8 rhythm_keyon() const       /*  5 bits */ { return sysbyte(0xbd, 4, 0); } // new
 
@@ -996,11 +997,11 @@ public:
 
 	// per-operator registers
 	u8 lfo_am_enabled() const     /*  1 bit  */ { return opbyte(0x20, 7, 1); }
-	u8 lfo_pm_enabled() const     /*  1 bit  */ { return opbyte(0x20, 6, 1); } // new
+	u8 lfo_pm_enabled() const     /*  1 bit  */ { return opbyte(0x20, 6, 1); }
 	u8 eg_sustain() const         /*  1 bit  */ { return opbyte(0x20, 5, 1); }
 	u8 ksr() const                /*  1 bit  */ { return opbyte(0x20, 4, 1) * 2 + 1; } // 1->2 bits
 	u8 multiple() const           /*  4 bits */ { return opbyte(0x20, 0, 4); }
-	u8 key_scale_level() const    /*  2 bits */ { return opbyte(0x40, 6, 2); } // new
+	u8 key_scale_level() const    /*  2 bits */ { return opbyte(0x40, 6, 2); }
 	u8 total_level() const        /*  6 bits */ { return opbyte(0x40, 0, 6); } // 6->7 bits
 	u8 attack_rate() const        /*  4 bits */ { return 2 * opbyte(0x60, 4, 4); } // 4->5 bits
 	u8 decay_rate() const         /*  4 bits */ { return 2 * opbyte(0x60, 0, 4); } // 4->5 bits

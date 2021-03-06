@@ -431,6 +431,31 @@ inline u32 opm_key_code_to_phase_step(u16 block_freq, s16 delta)
 }
 
 
+//-------------------------------------------------
+//  opl_key_scale_atten - converts an
+//  OPL concatenated block (3 bits) and fnum
+//  (10 bits) into an attenuation offset; values
+//  here are for 6dB/octave, in 0.75dB units
+//  (matching total level LSB)
+//-------------------------------------------------
+
+inline u8 opl_key_scale_atten(u16 block_freq)
+{
+	static u8 const fnum_to_atten[8*16] =
+	{
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 7, 8,
+		0, 0, 0, 0, 0, 3, 5, 7, 8,10,11,12,13,14,15,16,
+		0, 0, 0, 5, 8,11,13,15,16,18,19,20,21,22,23,24,
+		0, 0, 8,13,16,19,21,23,24,26,27,28,29,30,31,32,
+		0, 8,16,21,24,27,29,31,32,34,35,36,37,38,39,40,
+		0,16,24,29,32,35,37,39,40,42,43,44,45,46,47,48,
+		0,24,32,37,40,43,45,47,48,50,51,52,53,54,55,56
+	};
+	return fnum_to_atten[BIT(block_freq, 7, 7)];
+}
+
+
 
 //*********************************************************
 //  YMFM OPERATOR
@@ -855,9 +880,9 @@ void ymfm_operator<RegisterType>::clock_phase(s8 lfo_raw_pm, u16 block_freq, u8 
 		// apply detune based on the keycode
 		phase_step += detune_adjustment(m_regs.detune(), keycode);
 	}
-	else
+	else if (RegisterType::FAMILY == RegisterType::FAMILY_OPN)
 	{
-		// OPN/OPL phase calculation has only a single detune parameter
+		// OPN phase calculation has only a single detune parameter
 		// and uses FNUMs instead of keycodes
 
 		// extract frequency number (low 11 bits of block_freq)
@@ -885,6 +910,29 @@ void ymfm_operator<RegisterType>::clock_phase(s8 lfo_raw_pm, u16 block_freq, u8 
 		// clamp to 17 bits in case detune overflows
 		// QUESTION: is this specific to the YM2612/3438?
 		phase_step &= 0x1ffff;
+	}
+	else if (RegisterType::FAMILY == RegisterType::FAMILY_OPL)
+	{
+		// OPL phase calculation has no detuning, but uses FNUMs like
+		// the OPN version, and computes PM a bit differently
+
+		// extract frequency number (low 11 bits of block_freq)
+		u16 fnum = BIT(block_freq, 0, 11) << 1;
+
+		// if there's a non-zero PM sensitivity, compute the adjustment
+		if (m_regs.lfo_pm_enabled())
+		{
+			// apply the phase adjustment based on the upper 7 bits
+			// of FNUM and the PM depth parameters
+			fnum += (lfo_raw_pm * BIT(block_freq, 8, 3)) >> 3;
+
+			// keep fnum to 12 bits
+			fnum &= 0xfff;
+		}
+
+		// apply block shift to compute phase step
+		u8 block = BIT(block_freq, 11, 3);
+		phase_step = (fnum << block) >> 2;
 	}
 
 	// once the step is computed, the final stage is common
@@ -919,6 +967,12 @@ u16 ymfm_operator<RegisterType>::envelope_attenuation(u8 am_offset) const
 	// add in LFO AM modulation
 	if (m_regs.lfo_am_enabled())
 		result += am_offset;
+
+	// add in key scale level (OPL only)
+	// note that it's safe to use block_freq() because multi mode is not supported on OPL
+	u8 ksl = m_regs.key_scale_level();
+	if (ksl != 0)
+		result += opl_key_scale_atten(m_regs.block_freq()) << (BIT(ksl, 1) | (BIT(ksl, 0) << 1));
 
 	// add in total level
 	result += m_regs.total_level() << 3;
@@ -1182,7 +1236,7 @@ u16 ymfm_channel<RegisterType>::lfo_am_offset(u8 lfo_raw_am) const
 		// this works out since our minimum is 2x their maximum
 		return lfo_raw_am << (am_sensitivity - 1);
 	}
-	else
+	else if (RegisterType::FAMILY == RegisterType::FAMILY_OPN)
 	{
 		// shift value for AM sensitivity is [7, 3, 1, 0],
 		// mapping to values of [0, 1.4, 5.9, and 11.8dB]
@@ -1196,6 +1250,12 @@ u16 ymfm_channel<RegisterType>::lfo_am_offset(u8 lfo_raw_am) const
 		// raw LFO AM value on OPN is 0-3F, scale that up by a factor of 2
 		// (giving 7 bits) before applying the final shift
 		return (lfo_raw_am << 1) >> am_shift;
+	}
+	else if (RegisterType::FAMILY == RegisterType::FAMILY_OPL)
+	{
+		// OPL only has enable/disable, which is handled elsewhere, so
+		// just return the raw value
+		return lfo_raw_am;
 	}
 }
 
@@ -1417,7 +1477,9 @@ u8 ymfm_engine_base<RegisterType>::status() const
 
 //-------------------------------------------------
 //  clock_lfo - clock the LFO, handling clock
-//  division, depth, and waveform computations
+//  division, depth, and waveform computations;
+//  note each each family (OPM/OPN/OPL) has unique
+//  LFO behavior
 //-------------------------------------------------
 
 template<class RegisterType>
@@ -1477,9 +1539,9 @@ s8 ymfm_engine_base<RegisterType>::clock_lfo()
 		// apply depth to the PM value and return it
 		return (pm * m_regs.lfo_pm_depth()) >> 7;
 	}
-	else
+	else if (RegisterType::FAMILY == RegisterType::FAMILY_OPN)
 	{
-		// OPN/OPL: if not enabled, quick exit with 0s
+		// OPN: if not enabled, quick exit with 0s
 		if (!m_regs.lfo_enabled())
 		{
 			m_lfo_counter = 0;
@@ -1513,6 +1575,30 @@ s8 ymfm_engine_base<RegisterType>::clock_lfo()
 
 		// PM is negated based on bit 4
 		return BIT(m_lfo_counter, 10+4) ? -pm : pm;
+	}
+	else if (RegisterType::FAMILY == RegisterType::FAMILY_OPL)
+	{
+		// OPL: two fixed-frequency LFOs, one for AM, one for PM
+
+		// increment AM LFO, which has 210*64 steps; at a nominal 50kHz output,
+		// this equates to a period of 50000/(210*64) = 3.72Hz
+		u16 am_lfo_counter = BIT(m_lfo_counter, 0, 16) + 1;
+		if (am_lfo_counter >= 210*64)
+			am_lfo_counter = 0;
+
+		// low 8 bits are fractional; depth 0 is divided by 4, while depth 1 is normal
+		int shift = 10 - 2 * m_regs.lfo_am_depth();
+
+		// AM value is the upper bits of the value
+		m_lfo_am = ((am_lfo_counter < 105*64) ? am_lfo_counter : (210*64+63 - am_lfo_counter)) >> shift;
+
+		// increment PM LFO, which has 8192 steps, or a nominal period of 6.1Hz
+		u16 pm_lfo_counter = BIT(m_lfo_counter, 16, 16) + 1;
+		m_lfo_counter = am_lfo_counter | (pm_lfo_counter << 16);
+
+		// PM LFO is broken into 8 chunks, each lasting 1024 steps
+		static s8 const pm_scale[8] = { 8, 4, 0, -4, -8, -4, 0, 4 };
+		return pm_scale[BIT(pm_lfo_counter, 10, 3)] >> (m_regs.lfo_pm_depth() ^ 1);
 	}
 }
 
