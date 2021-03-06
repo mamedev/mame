@@ -307,13 +307,13 @@ inline s16 opn_lfo_pm_phase_adjustment(u8 fnum_bits, u8 pm_sensitivity, s8 lfo_r
 
 
 //-------------------------------------------------
-//  opm_keycode_to_phase_step - converts an
+//  opm_key_code_to_phase_step - converts an
 //  OPM concatenated block (3 bits), keycode
 //  (4 bits) and key fraction (6 bits) to a 0.10
 //  phase step, after applying the given delta
 //-------------------------------------------------
 
-inline u32 opm_keycode_to_phase_step(u16 block_freq, s16 delta)
+inline u32 opm_key_code_to_phase_step(u16 block_freq, s16 delta)
 {
 	// The phase step is essentially the fnum in OPN-speak. To compute this table,
 	// we used the standard formula for computing the frequency of a note, and
@@ -503,7 +503,7 @@ template<class RegisterType>
 void ymfm_operator<RegisterType>::clock(u32 env_counter, s8 lfo_raw_pm, u16 block_freq)
 {
 	// clock the key state
-	u8 keycode = block_freq_to_keycode(block_freq);
+	u8 keycode = m_regs.block_freq_to_keycode(block_freq);
 	clock_keystate(m_keyon | m_csm_triggered, keycode);
 	m_csm_triggered = 0;
 
@@ -516,7 +516,7 @@ void ymfm_operator<RegisterType>::clock(u32 env_counter, s8 lfo_raw_pm, u16 bloc
 		clock_envelope(env_counter >> 2, keycode);
 
 	// clock the phase
-	clock_phase(lfo_raw_pm, block_freq);
+	clock_phase(lfo_raw_pm, block_freq, keycode);
 }
 
 
@@ -566,38 +566,6 @@ s16 ymfm_operator<RegisterType>::compute_noise_volume(u8 noise_state, u16 am_off
 
 	// negate based on the noise state
 	return BIT(noise_state, 0) ? -result : result;
-}
-
-
-//-------------------------------------------------
-//  block_freq_to_keycode - given a concatenated
-//  block+frequency value, return the 5-bit keycode
-//-------------------------------------------------
-
-// OPN/OPNA version
-template<class RegisterType>
-u8 ymfm_operator<RegisterType>::block_freq_to_keycode(u16 block_freq)
-{
-	if (RegisterType::FAMILY == RegisterType::FAMILY_OPM)
-	{
-		// OPM: block_freq is block(3b):keycode(4b):keyfrac(6b); the 5-bit keycode
-		// we want is just the top 5 bits here
-		return BIT(block_freq, 8, 5);
-	}
-	else
-	{
-		// OPN/OPL: block_freq is block(3b):fnum(11b); the 5-bit keycode uses the top
-		// 4 bits plus a magic formula for the final bit
-		u8 keycode = BIT(block_freq, 10, 4) << 1;
-
-		// lowest bit is determined by a mix of next lower FNUM bits
-		// according to this equation from the YM2608 manual:
-		//
-		//   (F11 & (F10 | F9 | F8)) | (!F11 & F10 & F9 & F8)
-		//
-		// for speed, we just look it up in a 16-bit constant
-		return keycode | BIT(0xfe80, BIT(block_freq, 7, 4));
-	}
 }
 
 
@@ -852,14 +820,14 @@ void ymfm_operator<RegisterType>::clock_envelope(u16 env_counter, u8 keycode)
 //-------------------------------------------------
 
 template<class RegisterType>
-void ymfm_operator<RegisterType>::clock_phase(s8 lfo_raw_pm, u16 block_freq)
+void ymfm_operator<RegisterType>::clock_phase(s8 lfo_raw_pm, u16 block_freq, u8 keycode)
 {
 	u32 phase_step;
 
 	if (RegisterType::FAMILY == RegisterType::FAMILY_OPM)
 	{
 		// OPM logic is rather different here, due to extra detune
-		// and the use of keycodes
+		// and the use of key codes (not to be confused with keycode)
 
 		// start with coarse detune delta; table uses cents value from
 		// manual, converted into 1/64ths
@@ -882,10 +850,10 @@ void ymfm_operator<RegisterType>::clock_phase(s8 lfo_raw_pm, u16 block_freq)
 		}
 
 		// apply delta and convert to a frequency number
-		phase_step = opm_keycode_to_phase_step(block_freq, delta);
+		phase_step = opm_key_code_to_phase_step(block_freq, delta);
 
 		// apply detune based on the keycode
-		phase_step += detune_adjustment(m_regs.detune(), block_freq_to_keycode(block_freq));
+		phase_step += detune_adjustment(m_regs.detune(), keycode);
 	}
 	else
 	{
@@ -912,7 +880,7 @@ void ymfm_operator<RegisterType>::clock_phase(s8 lfo_raw_pm, u16 block_freq)
 		phase_step = (fnum << block) >> 2;
 
 		// apply detune based on the keycode
-		phase_step += detune_adjustment(m_regs.detune(), block_freq_to_keycode(block_freq));
+		phase_step += detune_adjustment(m_regs.detune(), keycode);
 
 		// clamp to 17 bits in case detune overflows
 		// QUESTION: is this specific to the YM2612/3438?

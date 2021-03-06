@@ -327,6 +327,14 @@ public:
 		return false;
 	}
 
+	// compute the keycode from the given block_freq value
+	// block_freq is block(3b):keycode(4b):keyfrac(6b); the 5-bit keycode
+	// we want is just the top 5 bits here
+	u8 block_freq_to_keycode(u16 block_freq)
+	{
+		return BIT(block_freq, 8, 5);
+	}
+
 	// system-wide registers
 	u8 test() const               /*  8 bits */ { return sysbyte(0x01, 0, 8); }
 	u8 noise_frequency() const    /*  5 bits */ { return sysbyte(0x0f, 0, 5); }
@@ -549,6 +557,22 @@ public:
 			return true;
 		}
 		return false;
+	}
+
+	// compute the keycode from the given block_freq value
+	// block_freq is block(3b):fnum(11b); the 5-bit keycode uses the top
+	// 4 bits plus a magic formula for the final bit
+	u8 block_freq_to_keycode(u16 block_freq)
+	{
+		u8 keycode = BIT(block_freq, 10, 4) << 1;
+
+		// lowest bit is determined by a mix of next lower FNUM bits
+		// according to this equation from the YM2608 manual:
+		//
+		//   (F11 & (F10 | F9 | F8)) | (!F11 & F10 & F9 & F8)
+		//
+		// for speed, we just look it up in a 16-bit constant
+		return keycode | BIT(0xfe80, BIT(block_freq, 7, 4));
 	}
 
 	// system-wide registers
@@ -939,6 +963,15 @@ public:
 		return false;
 	}
 
+	// compute the keycode from the given block_freq value
+	// block_freq is block(3b):fnum(10b):0; the 4-bit keycode uses the top
+	// 3 bits plus either the MSB or MSB-1 of fnum, depending on note_select
+	u8 block_freq_to_keycode(u16 block_freq)
+	{
+		u8 keycode = BIT(block_freq, 11, 3) << 1;
+		return keycode | BIT(block_freq, 10 - note_select(), 1);
+	}
+
 	// system-wide registers
 	u8 test() const               /*  8 bits */ { return sysbyte(0x01, 0, 8); }
 	u16 timer_a_value() const     /*  8 bits */ { return 4 * sysbyte(0x02, 0, 8); }
@@ -957,9 +990,9 @@ public:
 	u8 rhythm_keyon() const       /*  5 bits */ { return sysbyte(0xbd, 4, 0); } // new
 
 	// per-channel registers
-	u16 block_freq() const        /* 13 bits */ { return chword(0xb0, 0, 5, 0xa0, 0, 8); } // needs mapping
-	u8 feedback() const           /*  3 bits */ { return chbyte(0xc0, 1, 3); } // verify mapping
-	u8 algorithm() const          /*  1 bit  */ { return chbyte(0xc0, 0, 1); } // needs mapping
+	u16 block_freq() const        /* 13 bits */ { return chword(0xb0, 0, 5, 0xa0, 0, 8) * 2; } // 13->14 bits
+	u8 feedback() const           /*  3 bits */ { return chbyte(0xc0, 1, 3); } // matches OPN
+	u8 algorithm() const          /*  1 bit  */ { return chbyte(0xc0, 0, 1) + 6; } // 1->3 bits
 
 	// per-operator registers
 	u8 lfo_am_enabled() const     /*  1 bit  */ { return opbyte(0x20, 7, 1); }
@@ -968,11 +1001,11 @@ public:
 	u8 ksr() const                /*  1 bit  */ { return opbyte(0x20, 4, 1) * 2 + 1; } // 1->2 bits
 	u8 multiple() const           /*  4 bits */ { return opbyte(0x20, 0, 4); }
 	u8 key_scale_level() const    /*  2 bits */ { return opbyte(0x40, 6, 2); } // new
-	u8 total_level() const        /*  6 bits */ { return opbyte(0x40, 0, 6); } // needs mapping
+	u8 total_level() const        /*  6 bits */ { return opbyte(0x40, 0, 6); } // 6->7 bits
 	u8 attack_rate() const        /*  4 bits */ { return 2 * opbyte(0x60, 4, 4); } // 4->5 bits
 	u8 decay_rate() const         /*  4 bits */ { return 2 * opbyte(0x60, 0, 4); } // 4->5 bits
-	u8 sustain_level() const      /*  4 bits */ { return opbyte(0x80, 4, 4); } // needs mapping
-	u8 release_rate() const       /*  4 bits */ { return opbyte(0x80, 0, 4); }
+	u8 sustain_level() const      /*  4 bits */ { return opbyte(0x80, 4, 4); } // matches OPN
+	u8 release_rate() const       /*  4 bits */ { return opbyte(0x80, 0, 4); } // matches OPN
 
 	// LFO is always enabled
 	u8 lfo_enabled() const { return 1; }
@@ -1054,7 +1087,7 @@ private:
 	void clock_keystate(u8 keystate, u8 keycode);
 	void clock_ssg_eg_state(u8 keycode);
 	void clock_envelope(u16 env_counter, u8 keycode);
-	void clock_phase(s8 lfo_raw_pm, u16 block_freq);
+	void clock_phase(s8 lfo_raw_pm, u16 block_freq, u8 keycode);
 
 	// return effective attenuation of the envelope
 	u16 envelope_attenuation(u8 am_offset) const;
