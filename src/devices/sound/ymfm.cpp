@@ -965,7 +965,7 @@ u16 ymfm_operator<RegisterType>::envelope_attenuation(u8 am_offset) const
 	// note that it's safe to use block_freq() because multi mode is not supported on OPL
 	u8 ksl = m_regs.key_scale_level();
 	if (ksl != 0)
-		result += opl_key_scale_atten(m_regs.block_freq()) << (BIT(ksl, 1) | (BIT(ksl, 0) << 1));
+		result += opl_key_scale_atten(m_regs.block_freq()) << ksl;
 
 	// add in total level
 	result += m_regs.total_level() << 3;

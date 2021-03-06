@@ -1012,7 +1012,7 @@ public:
 	u8 eg_sustain() const         /*  1 bit  */ { return opbyte(0x20, 5, 1); }
 	u8 ksr() const                /*  1 bit  */ { return opbyte(0x20, 4, 1) * 2 + 1; } // 1->2 bits
 	u8 multiple() const           /*  4 bits */ { return opl_multiple_map(opbyte(0x20, 0, 4)); }
-	u8 key_scale_level() const    /*  2 bits */ { return opbyte(0x40, 6, 2); }
+	u8 key_scale_level() const    /*  2 bits */ { return opbyte(0x40, 7, 1) | (opbyte(0x40, 6, 1) << 1); }
 	u8 total_level() const        /*  6 bits */ { return opbyte(0x40, 0, 6); } // 6->7 bits
 	u8 attack_rate() const        /*  4 bits */ { return opbyte(0x60, 4, 4) * 2; } // 4->5 bits
 	u8 decay_rate() const         /*  4 bits */ { return opbyte(0x60, 0, 4) * 2; } // 4->5 bits
