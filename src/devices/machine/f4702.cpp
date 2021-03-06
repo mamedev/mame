@@ -152,12 +152,6 @@ void f4702_device::reset_counters()
 WRITE_LINE_MEMBER(f4702_device::im_w)
 {
 	m_im = state;
-
-	if (m_s == 0 || m_s == 1)
-	{
-		// Ensure Im input is propagated even when device is not "executing"
-		m_z_callback(m_main_counter & 0x007, m_im);
-	}
 }
 
 

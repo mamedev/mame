@@ -98,8 +98,8 @@ private:
 	uint8_t get_hs_input() const;
 	DECLARE_WRITE_LINE_MEMBER(rxc_w);
 	DECLARE_WRITE_LINE_MEMBER(txc_w);
-	TIMER_CALLBACK_MEMBER(sync_rxc_w);
-	TIMER_CALLBACK_MEMBER(sync_txc_w);
+	TIMER_CALLBACK_MEMBER(sync_rx_im_w);
+	TIMER_CALLBACK_MEMBER(sync_tx_im_w);
 };
 
 // device type definitions
