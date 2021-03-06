@@ -266,7 +266,7 @@ u32 momoko_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	if (m_bg_mask == 0)
 		draw_bg_romtilemap(screen, bitmap, cliprect, flip, false);
 	else
-	bitmap.fill(256, cliprect);
+		bitmap.fill(256, cliprect);
 
 	/* draw sprites (momoko) */
 	draw_sprites(screen, bitmap, cliprect, 0, 9 * 4, flip);
