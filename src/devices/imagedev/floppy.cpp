@@ -800,10 +800,10 @@ void floppy_image_device::index_resync()
 	}
 	int position = int(delta.as_double()*angular_speed + 0.5);
 
-	int new_idx = position < 20000;
+	int new_idx = position < 2000000;
 
 	if(new_idx) {
-		attotime index_up_time = attotime::from_double(20000/angular_speed);
+		attotime index_up_time = attotime::from_double(2000000/angular_speed);
 		index_timer->adjust(index_up_time - delta);
 	} else
 		index_timer->adjust(rev_time - delta);
@@ -2631,8 +2631,8 @@ bool mac_floppy_device::wpt_r()
 		return !dskchg;
 
 	case 0x4:
-	case 0xc: // Index pulse, probably only on the superdrive though
-		return !m_has_mfm ? false : !image || mon ? true : idx;
+	case 0xc: // Index pulse, probably only in mfm mode and while writing though
+		return !m_has_mfm ? false : !image || mon ? true : !idx;
 
 	case 0x5: // Is it a superdrive (supports 1.4M MFM) ?
 		return m_has_mfm;
