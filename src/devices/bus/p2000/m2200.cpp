@@ -70,7 +70,7 @@ WRITE_LINE_MEMBER(p2000_fdc_device::fdc_interrupt)
 void p2000_fdc_device::device_add_mconfig(machine_config &config)
 {
     Z80CTC(config, m_ctc, 4_MHz_XTAL);
-    m_ctc->intr_callback().set(FUNC(fdc_interrupt));
+    m_ctc->intr_callback().set(FUNC(p2000_fdc_device::fdc_interrupt));
     
     z80_device *maincpu = nullptr;
     maincpu = config.root_device().subdevice<z80_device>("maincpu");
@@ -81,9 +81,9 @@ void p2000_fdc_device::device_add_mconfig(machine_config &config)
 
     // The floppy drive driver
     UPD765A(config, m_fdc, 4_MHz_XTAL, true, true);
-    m_fdc->intrq_wr_callback().set(FUNC(fdc_irq_trigger));
-    m_fdc->idx_wr_callback().set(FUNC(fdc_index_trigger));
-    m_fdc->hdl_wr_callback().set(FUNC(fdc_hdl_wr_trigger));
+    m_fdc->intrq_wr_callback().set(FUNC(p2000_fdc_device::fdc_irq_trigger));
+    m_fdc->idx_wr_callback().set(FUNC(p2000_fdc_device::fdc_index_trigger));
+    m_fdc->hdl_wr_callback().set(FUNC(p2000_fdc_device::fdc_hdl_wr_trigger));
     
     // Drive 0 is not connected so start with drive 1
     for (int i = 1; i < m_num_of_drives; i++)
@@ -95,7 +95,7 @@ void p2000_fdc_device::device_add_mconfig(machine_config &config)
 void p2000_m2200_multipurpose_device::device_add_mconfig(machine_config &config)
 {
     Z80CTC(config, m_ctc, 2.5_MHz_XTAL);
-    m_ctc->intr_callback().set(FUNC(fdc_interrupt));
+    m_ctc->intr_callback().set(FUNC(p2000_m2200_multipurpose_device::fdc_interrupt));
     
     z80_device *maincpu = nullptr;
     maincpu = config.root_device().subdevice<z80_device>("maincpu");
@@ -106,9 +106,9 @@ void p2000_m2200_multipurpose_device::device_add_mconfig(machine_config &config)
 
     /* The floppy drive driver */
     UPD765A(config, m_fdc, 4_MHz_XTAL, true, true);
-    m_fdc->intrq_wr_callback().set(FUNC(fdc_irq_trigger));
-    m_fdc->idx_wr_callback().set(FUNC(fdc_index_trigger));
-    m_fdc->hdl_wr_callback().set(FUNC(fdc_hdl_wr_trigger));
+    m_fdc->intrq_wr_callback().set(FUNC(p2000_m2200_multipurpose_device::fdc_irq_trigger));
+    m_fdc->idx_wr_callback().set(FUNC(p2000_m2200_multipurpose_device::fdc_index_trigger));
+    m_fdc->hdl_wr_callback().set(FUNC(p2000_m2200_multipurpose_device::fdc_hdl_wr_trigger));
     
     // Drive 0 is not supported so start with drive 1
     for (int i = 1; i < m_num_of_drives; i++)
@@ -122,7 +122,7 @@ void p2000_m2200_multipurpose_device::device_add_mconfig(machine_config &config)
 
     /* Set up RS232/RS422 port */
     Z80CTC(config, m_ctc2, 2.5_MHz_XTAL);
-    m_ctc2->intr_callback().set(FUNC(fdc_interrupt));
+    m_ctc2->intr_callback().set(FUNC(p2000_m2200_multipurpose_device::fdc_interrupt));
     m_ctc2->set_clk<0>(2.5_MHz_XTAL);
 	m_ctc2->set_clk<1>(2.5_MHz_XTAL);
 	m_ctc2->set_clk<2>(2.5_MHz_XTAL);
@@ -134,7 +134,7 @@ void p2000_m2200_multipurpose_device::device_add_mconfig(machine_config &config)
 	sio_clock.signal_handler().set("sio", FUNC(z80sio_device::rxtxcb_w));
 	
     z80sio_device &sio(Z80SIO(config, "sio", 2.5_MHz_XTAL));
-    sio.out_int_callback().set(FUNC(fdc_interrupt));
+    sio.out_int_callback().set(FUNC(p2000_m2200_multipurpose_device::fdc_interrupt));
     sio.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	sio.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
 	sio.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
@@ -196,12 +196,12 @@ p2000_m2200d_multipurpose_device::p2000_m2200d_multipurpose_device(const machine
 void p2000_fdc_device::device_start()
 {
     // FDC Init ready control logic timer
-	m_ready_control_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ready_timer_cb), this));
+	m_ready_control_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(p2000_fdc_device::ready_timer_cb), this));
     
     m_slot->io_space().install_readwrite_handler(0x88, 0x8b, read8sm_delegate(*m_ctc, FUNC(z80ctc_device::read)), write8sm_delegate(*m_ctc, FUNC(z80ctc_device::write)));
     m_slot->io_space().install_read_handler(0x8c, 0x8c, read8smo_delegate(*m_fdc, FUNC(upd765a_device::msr_r)));
-    m_slot->io_space().install_readwrite_handler(0x8d, 0x8d, read8smo_delegate(*this, FUNC(fdc_read)), write8smo_delegate(*this, FUNC(fdc_write)));
-    m_slot->io_space().install_readwrite_handler(0x90, 0x90, read8smo_delegate(*this, FUNC(fdc_fcdr)), write8smo_delegate(*this, FUNC(fdc_control)));
+    m_slot->io_space().install_readwrite_handler(0x8d, 0x8d, read8smo_delegate(*this, FUNC(p2000_fdc_device::fdc_read)), write8smo_delegate(*this, FUNC(p2000_fdc_device::fdc_write)));
+    m_slot->io_space().install_readwrite_handler(0x90, 0x90, read8smo_delegate(*this, FUNC(p2000_fdc_device::fdc_fcdr)), write8smo_delegate(*this, FUNC(p2000_fdc_device::fdc_control)));
 }
 
 void p2000_m2200_multipurpose_device::device_start()
@@ -210,7 +210,7 @@ void p2000_m2200_multipurpose_device::device_start()
 	m_ramdisk = std::make_unique<uint8_t[]>(get_ramdrive_size());
     
     // FDC Init ready control logic timer
-	m_ready_control_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ready_timer_cb), this));
+	m_ready_control_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(p2000_m2200_multipurpose_device::ready_timer_cb), this));
 
     // SIO - RS232/RS422 handlers
     m_slot->io_space().install_readwrite_handler(0x80, 0x83, read8sm_delegate(*m_ctc2, FUNC(z80ctc_device::read)), write8sm_delegate(*m_ctc2, FUNC(z80ctc_device::write)));
@@ -219,22 +219,22 @@ void p2000_m2200_multipurpose_device::device_start()
     // FDC - handlers
     m_slot->io_space().install_readwrite_handler(0x88, 0x8b, read8sm_delegate(*m_ctc, FUNC(z80ctc_device::read)), write8sm_delegate(*m_ctc, FUNC(z80ctc_device::write)));
     m_slot->io_space().install_read_handler(0x8c, 0x8c, read8smo_delegate(*m_fdc, FUNC(upd765a_device::msr_r)));
-    m_slot->io_space().install_readwrite_handler(0x8d, 0x8d, read8smo_delegate(*this, FUNC(fdc_read)), write8smo_delegate(*this, FUNC(fdc_write)));
-    m_slot->io_space().install_readwrite_handler(0x90, 0x90, read8smo_delegate(*this, FUNC(fdc_fcdr)), write8smo_delegate(*this, FUNC(fdc_control)));
+    m_slot->io_space().install_readwrite_handler(0x8d, 0x8d, read8smo_delegate(*this, FUNC(p2000_m2200_multipurpose_device::fdc_read)), write8smo_delegate(*this, FUNC(p2000_m2200_multipurpose_device::fdc_write)));
+    m_slot->io_space().install_readwrite_handler(0x90, 0x90, read8smo_delegate(*this, FUNC(p2000_m2200_multipurpose_device::fdc_fcdr)), write8smo_delegate(*this, FUNC(p2000_m2200_multipurpose_device::fdc_control)));
     
     // RAM disk handlers
-    m_slot->io_space().install_readwrite_handler(0x95, 0x95, read8smo_delegate(*this, FUNC(port_95_r)), write8smo_delegate(*this, FUNC(port_95_w)));
-    m_slot->io_space().install_readwrite_handler(0x96, 0x96, read8smo_delegate(*this, FUNC(port_96_r)), write8smo_delegate(*this, FUNC(port_96_w)));
-    m_slot->io_space().install_readwrite_handler(0x97, 0x97, read8smo_delegate(*this, FUNC(port_97_r)), write8smo_delegate(*this, FUNC(port_97_w)));
+    m_slot->io_space().install_readwrite_handler(0x95, 0x95, read8smo_delegate(*this, FUNC(p2000_m2200_multipurpose_device::port_95_r)), write8smo_delegate(*this, FUNC(p2000_m2200_multipurpose_device::port_95_w)));
+    m_slot->io_space().install_readwrite_handler(0x96, 0x96, read8smo_delegate(*this, FUNC(p2000_m2200_multipurpose_device::port_96_r)), write8smo_delegate(*this, FUNC(p2000_m2200_multipurpose_device::port_96_w)));
+    m_slot->io_space().install_readwrite_handler(0x97, 0x97, read8smo_delegate(*this, FUNC(p2000_m2200_multipurpose_device::port_97_r)), write8smo_delegate(*this, FUNC(p2000_m2200_multipurpose_device::port_97_w)));
 
     // Real time clock handlers
     m_slot->io_space().install_readwrite_handler(0x9c, 0x9d, read8sm_delegate(*m_rtc, FUNC(mc146818_device::read)), write8sm_delegate(*m_rtc, FUNC(mc146818_device::write)));
     
     // Centronics handlers
-    m_slot->io_space().install_write_handler(0x98, 0x98, write8smo_delegate(*this, FUNC(port_98_w)));
-    m_slot->io_space().install_read_handler(0x99, 0x99, read8smo_delegate(*this, FUNC(port_99_r)));
-    m_slot->io_space().install_readwrite_handler(0x9a, 0x9a, read8smo_delegate(*this, FUNC(port_9a_r)), write8smo_delegate(*this, FUNC(port_9a_w)));
-    m_slot->io_space().install_readwrite_handler(0x9b, 0x9b, read8smo_delegate(*this, FUNC(port_9b_r)), write8smo_delegate(*this, FUNC(port_9b_w)));
+    m_slot->io_space().install_write_handler(0x98, 0x98, write8smo_delegate(*this, FUNC(p2000_m2200_multipurpose_device::port_98_w)));
+    m_slot->io_space().install_read_handler(0x99, 0x99, read8smo_delegate(*this, FUNC(p2000_m2200_multipurpose_device::port_99_r)));
+    m_slot->io_space().install_readwrite_handler(0x9a, 0x9a, read8smo_delegate(*this, FUNC(p2000_m2200_multipurpose_device::port_9a_r)), write8smo_delegate(*this, FUNC(p2000_m2200_multipurpose_device::port_9a_w)));
+    m_slot->io_space().install_readwrite_handler(0x9b, 0x9b, read8smo_delegate(*this, FUNC(p2000_m2200_multipurpose_device::port_9b_r)), write8smo_delegate(*this, FUNC(p2000_m2200_multipurpose_device::port_9b_w)));
 }
 
 //-------------------------------------------------

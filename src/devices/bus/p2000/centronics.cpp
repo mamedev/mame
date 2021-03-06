@@ -46,8 +46,8 @@ void p2000_mw102_centronics_device::device_add_mconfig(machine_config &config)
 void p2000_mw102_centronics_device::device_start()
 {
     // Centronics handler
-    m_slot->io_space().install_write_handler(0x4e, 0x4e, write8smo_delegate(*this, FUNC(port_4e_w)));
-    m_slot->io_space().install_readwrite_handler(0x4f, 0x4f, read8smo_delegate(*this, FUNC(port_4f_r)), write8smo_delegate(*this, FUNC(port_4f_w)));
+    m_slot->io_space().install_write_handler(0x4e, 0x4e, write8smo_delegate(*this, FUNC(p2000_mw102_centronics_device::port_4e_w)));
+    m_slot->io_space().install_readwrite_handler(0x4f, 0x4f, read8smo_delegate(*this, FUNC(p2000_mw102_centronics_device::port_4f_r)), write8smo_delegate(*this, FUNC(p2000_mw102_centronics_device::port_4f_w)));
 }
 
 //-------------------------------------------------
@@ -146,8 +146,8 @@ void p2000_p2gg_centronics_device::device_add_mconfig(machine_config &config)
 void p2000_p2gg_centronics_device::device_start()
 {
     // Centronics handler
-    m_slot->io_space().install_write_handler(0x46, 0x46, write8smo_delegate(*this, FUNC(port_46_w)));
-    m_slot->io_space().install_read_handler(0x47, 0x47, read8smo_delegate(*this, FUNC(port_47_r)));
+    m_slot->io_space().install_write_handler(0x46, 0x46, write8smo_delegate(*this, FUNC(p2000_p2gg_centronics_device::port_46_w)));
+    m_slot->io_space().install_read_handler(0x47, 0x47, read8smo_delegate(*this, FUNC(p2000_p2gg_centronics_device::port_47_r)));
 }
 
 //-------------------------------------------------
@@ -251,10 +251,10 @@ p2000_m2003_centronics_device::p2000_m2003_centronics_device(const machine_confi
 void p2000_m2003_centronics_device::device_start()
 {
     // Centronics handler
-    m_slot->io_space().install_write_handler(0x46, 0x46, write8smo_delegate(*this, FUNC(port_46_w)));
-    m_slot->io_space().install_read_handler(0x47, 0x47, read8smo_delegate(*this, FUNC(port_47_r)));
-    m_slot->io_space().install_readwrite_handler(0x48, 0x48, read8smo_delegate(*this, FUNC(port_48_r)), write8smo_delegate(*this, FUNC(port_48_w)));
-    m_slot->io_space().install_readwrite_handler(0x49, 0x49, read8smo_delegate(*this, FUNC(port_49_r)), write8smo_delegate(*this, FUNC(port_49_w)));
+    m_slot->io_space().install_write_handler(0x46, 0x46, write8smo_delegate(*this, FUNC(p2000_m2003_centronics_device::port_46_w)));
+    m_slot->io_space().install_read_handler(0x47, 0x47, read8smo_delegate(*this, FUNC(p2000_m2003_centronics_device::port_47_r)));
+    m_slot->io_space().install_readwrite_handler(0x48, 0x48, read8smo_delegate(*this, FUNC(p2000_m2003_centronics_device::port_48_r)), write8smo_delegate(*this, FUNC(p2000_m2003_centronics_device::port_48_w)));
+    m_slot->io_space().install_readwrite_handler(0x49, 0x49, read8smo_delegate(*this, FUNC(p2000_m2003_centronics_device::port_49_r)), write8smo_delegate(*this, FUNC(p2000_m2003_centronics_device::port_49_w)));
 }
 
 //-------------------------------------------------

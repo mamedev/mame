@@ -58,7 +58,7 @@ protected:
     virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-    TIMER_CALLBACK_MEMBER(m2009_dial_pulse_timer_cb);
+    TIMER_CALLBACK_MEMBER(dial_pulse_timer_cb);
     
     required_device<scc8530_device> m_scc;
     
@@ -74,7 +74,7 @@ protected:
     void port_44_w(uint8_t data);
     uint8_t port_44_r();
 
-    void m2009_phone_on_hook();
+    void phone_on_hook();
 
 private:
 

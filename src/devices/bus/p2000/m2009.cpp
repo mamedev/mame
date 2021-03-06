@@ -75,17 +75,15 @@ void p2000_m2009_modem_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 void p2000_m2009_modem_device::device_start()
 {
-    //m_slot->io_space().install_readwrite_handler(0x40, 0x43, read8sm_delegate(*m_scc, FUNC(z80scc_device::ab_dc_r)), write8sm_delegate(*m_scc, FUNC(z80scc_device::ab_dc_w)));
-
-    m_slot->io_space().install_readwrite_handler(0x40, 0x40, read8smo_delegate(*this, FUNC(port_40_r)), write8smo_delegate(*this, FUNC(port_40_w)));
-    m_slot->io_space().install_readwrite_handler(0x41, 0x41, read8smo_delegate(*this, FUNC(port_41_r)), write8smo_delegate(*this, FUNC(port_41_w)));
-    m_slot->io_space().install_readwrite_handler(0x42, 0x42, read8smo_delegate(*this, FUNC(port_42_r)), write8smo_delegate(*this, FUNC(port_42_w)));
-    m_slot->io_space().install_readwrite_handler(0x43, 0x43, read8smo_delegate(*this, FUNC(port_43_r)), write8smo_delegate(*this, FUNC(port_43_w)));
+    m_slot->io_space().install_readwrite_handler(0x40, 0x40, read8smo_delegate(*this, FUNC(p2000_m2009_modem_device::port_40_r)), write8smo_delegate(*this, FUNC(p2000_m2009_modem_device::port_40_w)));
+    m_slot->io_space().install_readwrite_handler(0x41, 0x41, read8smo_delegate(*this, FUNC(p2000_m2009_modem_device::port_41_r)), write8smo_delegate(*this, FUNC(p2000_m2009_modem_device::port_41_w)));
+    m_slot->io_space().install_readwrite_handler(0x42, 0x42, read8smo_delegate(*this, FUNC(p2000_m2009_modem_device::port_42_r)), write8smo_delegate(*this, FUNC(p2000_m2009_modem_device::port_42_w)));
+    m_slot->io_space().install_readwrite_handler(0x43, 0x43, read8smo_delegate(*this, FUNC(p2000_m2009_modem_device::port_43_r)), write8smo_delegate(*this, FUNC(p2000_m2009_modem_device::port_43_w)));
     
-    m_slot->io_space().install_read_handler(0x44, 0x47, read8smo_delegate(*this, FUNC(port_44_r)));
-    m_slot->io_space().install_write_handler(0x44, 0x47, write8smo_delegate(*this, FUNC(port_44_w)));
+    m_slot->io_space().install_read_handler(0x44, 0x47, read8smo_delegate(*this, FUNC(p2000_m2009_modem_device::port_44_r)));
+    m_slot->io_space().install_write_handler(0x44, 0x47, write8smo_delegate(*this, FUNC(p2000_m2009_modem_device::port_44_w)));
  
-    m_dial_pulse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m2009_dial_pulse_timer_cb), this));
+    m_dial_pulse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(p2000_m2009_modem_device::dial_pulse_timer_cb), this));
 }
 
 //-------------------------------------------------
@@ -95,7 +93,7 @@ void p2000_m2009_modem_device::device_reset()
 {
     m_port_44 = 0;
     m_scc->syncb_w(0);
-    m2009_phone_on_hook();
+    phone_on_hook();
 }
 
 void p2000_m2009_modem_device::port_40_w(uint8_t data)
@@ -234,7 +232,7 @@ void p2000_m2009_modem_device::port_44_w(uint8_t data)
         // Hook was off now on phone --> so reset all dial/connections activities
         if (BIT(m_port_44, M2009_PHONE_HOOK))
         {
-            m2009_phone_on_hook();
+            phone_on_hook();
         }
     }
     
@@ -247,7 +245,7 @@ uint8_t p2000_m2009_modem_device::port_44_r()
     return m_port_44;
 }
 
-TIMER_CALLBACK_MEMBER(p2000_m2009_modem_device::m2009_dial_pulse_timer_cb)
+TIMER_CALLBACK_MEMBER(p2000_m2009_modem_device::dial_pulse_timer_cb)
 {
     LOG("Number dialed: %s\n", m_phone_number);
     // TODO: Stop modem connection sound
@@ -255,7 +253,7 @@ TIMER_CALLBACK_MEMBER(p2000_m2009_modem_device::m2009_dial_pulse_timer_cb)
     m_scc->dcdb_w(0);
 }
 
-void p2000_m2009_modem_device::m2009_phone_on_hook()
+void p2000_m2009_modem_device::phone_on_hook()
 {
     // reset all dial/connections activities
     LOG("-- On hook --\n");

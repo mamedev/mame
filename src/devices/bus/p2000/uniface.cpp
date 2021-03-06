@@ -104,8 +104,8 @@ void p2000_uniface_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 void p2000_uniface_device::device_start()
 {
-    m_slot->io_space().install_readwrite_handler(0x60, 0x60, read8smo_delegate(*this, FUNC(port_60_r)), write8smo_delegate(*this, FUNC(port_60_w)));
-    m_slot->io_space().install_readwrite_handler(0x61, 0x61, read8smo_delegate(*this, FUNC(port_61_r)), write8smo_delegate(*this, FUNC(port_61_w)));
+    m_slot->io_space().install_readwrite_handler(0x60, 0x60, read8smo_delegate(*this, FUNC(p2000_uniface_device::port_60_r)), write8smo_delegate(*this, FUNC(p2000_uniface_device::port_60_w)));
+    m_slot->io_space().install_readwrite_handler(0x61, 0x61, read8smo_delegate(*this, FUNC(p2000_uniface_device::port_61_r)), write8smo_delegate(*this, FUNC(p2000_uniface_device::port_61_w)));
 }
 
 //-------------------------------------------------

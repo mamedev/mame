@@ -21,7 +21,6 @@
 #include "machine/p2000t_mdcr.h"
 #include "machine/ram.h"
 #include "emupal.h"
-//#include "schedule.h"
 #include "screen.h"
 #include "softlist.h"
 

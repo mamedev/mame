@@ -79,6 +79,7 @@ Philips P2000T Memory map
 #include "emu.h"
 #include "includes/p2000t.h"
 #include "formats/dsk_dsk.h"
+#include "bus/rs232/rs232.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -367,16 +368,16 @@ void p2000t_state::p2000t(machine_config &config)
     
     P2000_EXPANSION_SLOT(config, m_slot2, 0, p2000_slot2_devices, nullptr);
     m_slot2->set_io_space(m_maincpu, AS_IO);
-    m_slot2->irq().set(FUNC(p2000_slot_interrupt));
+    m_slot2->irq().set(FUNC(p2000t_state::p2000_slot_interrupt));
 
     P2000_EXPANSION_SLOT(config, m_ext1, 0, p2000_ext1_devices, nullptr);
     m_ext1->set_io_space(m_maincpu, AS_IO);
-    m_ext1->irq().set(FUNC(p2000_slot_interrupt));
+    m_ext1->irq().set(FUNC(p2000t_state::p2000_slot_interrupt));
     
     P2000_EXPANSION_SLOT(config, m_ext2, 0, p2000_ext2_devices, nullptr);
     m_ext2->set_io_space(m_maincpu, AS_IO);
-    m_ext2->irq().set(FUNC(p2000_slot_interrupt));
-    m_ext2->in_mode80().set(FUNC(in_80char_mode));
+    m_ext2->irq().set(FUNC(p2000t_state::p2000_slot_interrupt));
+    m_ext2->in_mode80().set(FUNC(p2000t_state::in_80char_mode));
 
     /* internal ram */
     RAM(config, m_ram).set_default_size("16K").set_extra_options("16K,32K,48K,64K,80K,104K");
@@ -422,19 +423,19 @@ void p2000m_state::p2000m(machine_config &config)
 	
     /* Extention Slots 1 + 2, ext 1 + 2 */
     GENERIC_CARTSLOT(config, m_slot1, generic_plain_slot, "p2000_cart", "bin,rom");
-    m_slot1->set_device_load(FUNC(card_load));
+    m_slot1->set_device_load(FUNC(p2000m_state::card_load));
 
     P2000_EXPANSION_SLOT(config, m_slot2, 0, p2000_slot2_devices, nullptr);
     m_slot2->set_io_space(m_maincpu, AS_IO);
-    m_slot2->irq().set(FUNC(p2000_slot_interrupt));
+    m_slot2->irq().set(FUNC(p2000m_state::p2000_slot_interrupt));
 
     P2000_EXPANSION_SLOT(config, m_ext1, 0, p2000_ext1_devices, nullptr);
     m_ext1->set_io_space(m_maincpu, AS_IO);
-    m_slot2->irq().set(FUNC(p2000_slot_interrupt));
+    m_slot2->irq().set(FUNC(p2000m_state::p2000_slot_interrupt));
 
 	P2000_EXPANSION_SLOT(config, m_ext2, 0, p2000_ext2_devices, nullptr);
     m_ext2->set_io_space(m_maincpu, AS_IO);
-    m_slot2->irq().set(FUNC(p2000_slot_interrupt));
+    m_slot2->irq().set(FUNC(p2000m_state::p2000_slot_interrupt));
 
     /* internal ram */
     RAM(config, m_ram).set_default_size("16K").set_extra_options("16K,32K,48K,64K,80K,96K,102K");
