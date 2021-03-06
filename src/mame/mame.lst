@@ -32985,7 +32985,6 @@ p112                            //
 @source:p2000t.cpp
 p2000m                          // 1980 P2000M
 p2000t                          // 1980 P2000T
-p2000h                          // 1980 P2000T-Hires
 
 @source:p8k.cpp
 p8000                           //

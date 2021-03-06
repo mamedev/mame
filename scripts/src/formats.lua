@@ -1433,6 +1433,17 @@ if (FORMATS["P2000T_CAS"]~=null  or _OPTIONS["with-tools"]) then
 	}
 end
 
+--------------------------------------------------
+--
+--@src/lib/formats/p2000t_dsk.h,FORMATS["P2000T_DSK"] = true
+--------------------------------------------------
+
+if (FORMATS["P2000T_DSK"]~=null  or _OPTIONS["with-tools"]) then
+	files {
+		MAME_DIR.. "src/lib/formats/p2000t_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/p2000t_dsk.h",
+	}
+end
 
 --------------------------------------------------
 --

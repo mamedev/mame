@@ -1784,6 +1784,34 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/p2000/bus.h,BUSES["P2000"] = true
+---------------------------------------------------
+
+if (BUSES["P2000"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/p2000/exp.cpp",
+		MAME_DIR .. "src/devices/bus/p2000/exp.h",
+        MAME_DIR .. "src/devices/bus/p2000/m2200.cpp",
+		MAME_DIR .. "src/devices/bus/p2000/m2200.h",
+        MAME_DIR .. "src/devices/bus/p2000/hires.cpp",
+        MAME_DIR .. "src/devices/bus/p2000/hires.h",
+        MAME_DIR .. "src/devices/bus/p2000/mouse.cpp",
+        MAME_DIR .. "src/devices/bus/p2000/mouse.h",
+        MAME_DIR .. "src/devices/bus/p2000/serial.cpp",
+        MAME_DIR .. "src/devices/bus/p2000/serial.h",
+        MAME_DIR .. "src/devices/bus/p2000/centronics.cpp",
+        MAME_DIR .. "src/devices/bus/p2000/centronics.h",
+        MAME_DIR .. "src/devices/bus/p2000/m2009.cpp",
+        MAME_DIR .. "src/devices/bus/p2000/m2009.h",
+        MAME_DIR .. "src/devices/bus/p2000/uniface.cpp",
+        MAME_DIR .. "src/devices/bus/p2000/uniface.h",
+	}
+    
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/pc_joy/pc_joy.h,BUSES["PC_JOY"] = true
 ---------------------------------------------------
 

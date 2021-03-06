@@ -511,7 +511,13 @@ void upd765_family_device::set_rate(int rate)
 
 uint8_t upd765_family_device::fifo_r()
 {
-	uint8_t r = 0xff;
+	uint8_t r = 0;
+    if(!BIT(dor, 2))
+    {
+        LOGWARN("%s: fifo_r() in reset\n", machine().describe_context());
+        r = 0xff;
+    }
+		
 	switch(main_phase) {
 	case PHASE_EXEC:
 		if(machine().side_effects_disabled())
@@ -1681,7 +1687,7 @@ void upd765_family_device::read_data_start(floppy_info &fi)
 				command[0] & 0x80 ? " mt" : "",
 				command[0] & 0x40 ? " mfm" : "",
 				command[0] & 0x20 ? " sk" : "",
-				fifocfg & 0x40 ? " seek" : "",
+				fifocfg & FIF_EIS ? " seek" : "",
 				command[0],
 				command[1],
 				command[2],
@@ -1725,7 +1731,7 @@ void upd765_family_device::scan_start(floppy_info &fi)
 				command[0] & 0x80 ? " mt" : "",
 				command[0] & 0x40 ? " mfm" : "",
 				command[0] & 0x20 ? " sk" : "",
-				fifocfg & 0x40 ? " seek" : "",
+				fifocfg & FIF_EIS ? " seek" : "",
 				command[0],
 				command[1],
 				command[2],
@@ -1770,7 +1776,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 			break;
 		case HEAD_LOAD_DONE:
 			LOGSTATE("HEAD_LOAD_DONE\n");
-			if(fi.pcn == command[2] || !(fifocfg & 0x40)) {
+            if(fi.pcn == command[2] || !(fifocfg & FIF_EIS)) {
 				fi.sub_state = SEEK_DONE;
 				break;
 			}
@@ -2125,7 +2131,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 			break;
 		case HEAD_LOAD_DONE:
 			LOGSTATE("HEAD_LOAD_DONE\n");
-			if(fi.pcn == command[2] || !(fifocfg & 0x40)) {
+            if(fi.pcn == command[2] || !(fifocfg & FIF_EIS)) {
 				fi.sub_state = SEEK_DONE;
 				break;
 			}
@@ -2225,10 +2231,12 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 			bool done = tc_done;
 			sectors_read++;
 			if(sectors_read == command[6]) {
+                /* command termination (tc) not mandatory here, just regular finish is good enough
 				if(!tc_done) {
 					fi.st0 |= ST0_FAIL;
 					st1 |= ST1_EN;
 				}
+                */
 				done = true;
 			}
 			if(!done) {
@@ -2686,11 +2694,12 @@ void upd765_family_device::live_write_fm(uint8_t fm)
 
 bool upd765_family_device::sector_matches() const
 {
-	LOGMATCH("matching %02x %02x %02x %02x - %02x %02x %02x %02x\n",
+	LOGMATCH("matching %02x %02x %02x %02x - %02x %02x %02x %02x%s\n",
 				cur_live.idbuf[0], cur_live.idbuf[1], cur_live.idbuf[2], cur_live.idbuf[3],
-				command[2], command[3], command[4], command[5]);
+				command[2], command[3], command[4], command[5], (fifocfg & FIF_EIS) ? "" : " ignore track #" );
+    // Since logical track number can differ from physical track number, do not always match track number (commmand[2])
 	return
-		cur_live.idbuf[0] == command[2] &&
+		((cur_live.idbuf[0] == command[2]) || !(fifocfg & FIF_EIS)) &&
 		cur_live.idbuf[1] == command[3] &&
 		cur_live.idbuf[2] == command[4] &&
 		cur_live.idbuf[3] == command[5];

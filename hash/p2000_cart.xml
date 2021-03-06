@@ -1,0 +1,272 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="p2000_cart" description="P2000T/M ROM cartridges">
+
+	<software name="basic">
+		<description>Philips Cassette basic V1.1 P2305</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="basic.rom" size="16384" crc="9d9d38f9" sha1="fb5100436c99634a2592a10dff867f85bcff7aec"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="basic24">
+		<description>Philips Disk Basic V2.4 P2306/P2311</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="Basic-24.BIN" size="16384" crc="6CB8E392" sha1="A2A0956C409ED1143604941F601D32372C0E04FB"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jwsbasic">
+		<description>Philips Cassette basic with JWS boot loader</description>
+		<year>1986</year>
+		<publisher>J.W.Strikkers</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="jwsbasic.rom" size="16384" crc="7b7aedab" sha1="f5a0c98c2794b1288ab39ce2f25623fa425bbf6d"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="zemon">
+		<description>Zemon Z80 Assembler V1.4</description>
+		<year>1985</year>
+		<publisher>F.Jalvingh &amp; L.Hilgersom</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="Zemon 1.4.bin" size="16384" crc="912c7455" sha1="53bf77ff64a113c289fcba0529195e1cfc3e383e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="text2000v2">
+		<description>Text 2000 tekstverwerker V2.0</description>
+		<year>1984</year>
+		<publisher>Philips Gebruikersgroep</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="Text2000 2.bin" size="12288" crc="2B6B56D8" sha1="D2626E88AEDD1651E25791498A72CD31CF47FDF6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="text2000">
+		<description>Text 2000 tekstverwerker V3.0</description>
+		<year>1984</year>
+		<publisher>Philips Gebruikersgroep</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="Text2000 3.bin" size="16384" crc="C05E0473" sha1="5919B18B7DAF830377C84D1FFFF553D821A7960F"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="familiegeheugenV2">
+		<description>Philips Familiegeheugen 2.0 NL P2304</description>
+		<year>1984</year>
+		<publisher>Philips</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="familiegeheugen 2.bin" size="16384" crc="7B1D922A" sha1="CF8501C679952FCE06ACCAFD6ECE2591F68CD70D"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="familiegeheugenV3">
+		<description>Philips Familiegeheugen 3.L NL P2304</description>
+		<year>1986</year>
+		<publisher>Philips</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="familiegeheugen 3.bin" size="16384" crc="A4C5D1C1" sha1="8FB8EB7A34662C7888878B6E05AED64559E37A79"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="familiegeheugen">
+		<description>Philips Familiegeheugen 4.L NL P2304</description>
+		<year>1987</year>
+		<publisher>Philips</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="familiegeheugen 4.bin" size="16384" crc="AE114624" sha1="3AEBCD396A1870FF21E574B46A8E67FABC67624D"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="assemblerV56">
+		<description>Assembler V5.6</description>
+		<year>1984</year>
+		<publisher>Ron Eijnthoven</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="assembler 5.6.bin" size="16384" crc="1AB4F488" sha1="4606C775B333D394A304986FFFCA82FE6CFA0C98"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="assembler">
+		<description>Assembler V5.9</description>
+		<year>1987</year>
+		<publisher>Ron Eijnthoven</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="assembler 5.9.bin" size="16384" crc="A50E0E68" sha1="89AE3BAFACF8E7109E7B8ACD0BC9D346161D0D15"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="bis">
+		<description>BIS Terminal Program</description>
+		<year>1981</year>
+		<publisher>Philips</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="BIS.bin" size="16384" crc="B9E6B089" sha1="415EBE69E953FEB56A7132E0E66478ED82797902"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="cpm">
+		<description>CPM Nater</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="CPM Nater.bin" size="16384" crc="3B1F4D1E" sha1="73DE7C2D9B9144E48A1171C233B3B84BB849CC30"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="dagmarkt">
+		<description>Dagmarkt P2000 Databank programma voor M2009</description>
+		<year>1986</year>
+		<publisher>F.L. van der Markt</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="dagmarkt.bin" size="16384" crc="BA8BA3CE" sha1="6E8E85609EBFC6F0D698CA25126150A6E2416D15"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="programmer">
+		<description>EEPROM-programmer</description>
+		<year>198?</year>
+		<publisher>NA</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="EPROM-programmer.bin" size="12288" crc="64112DBE" sha1="8ECDF7FD65D06C6E1931720E141315C2C17E44FB"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="flexbase">
+		<description>Flexbase 2.1</description>
+		<year>198?</year>
+		<publisher>NA</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="flexbase.bin" size="16384" crc="6C7B788B" sha1="2F82A760A64B551A82FD2F7264BED3762F21C510"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="forth">
+		<description>Forth-3.0 V1.4</description>
+		<year>1986</year>
+		<publisher>F.L.van der Markt</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="Forth.bin" size="10496" crc="345DF79C" sha1="73EF669E06522673102488A92DDFD2D0F3239B39"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="maintenance1">
+		<description>Maintenance 1</description>
+		<year>198?</year>
+		<publisher>NA</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="Maintenance 1.bin" size="12288" crc="711E96D4" sha1="FD8D9EDA5941179D3F4DAD831F636E5036AFC958"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="maintenance2">
+		<description>Maintenance v2.2</description>
+		<year>198?</year>
+		<publisher>NA</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="Maintenance 2.bin" size="16384" crc="3EABA205" sha1="022A4C8C5E18F2566CC12A6304F5800CA95D613E"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="nebocalc">
+		<description>NeboCalc</description>
+		<year>1980</year>
+		<publisher>Regents of the University of California</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="NeboCalc.bin" size="16384" crc="1359824A" sha1="85FF8F90C7DCDBE8C5FC0AF1F31324C1196D8683"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="tekstverwerker">
+		<description>Tekstverwerker TV1.0</description>
+		<year>198?</year>
+		<publisher>NA</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="tekst 1.bin" size="16384" crc="66B2BC1E" sha1="AA1A231DEC43B187225D735D0FF9C031AD0A0ABB"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="pascal">
+		<description>UCSD Pascal</description>
+		<year>1980</year>
+		<publisher>Regents of the University of California</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="UCSD Pascal.bin" size="16384" crc="58A11897" sha1="50C405F39C084BC7346206907B3F8BCEC2A2B8A0"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="wordprocessor1">
+		<description>WordProcessor WP1.2</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="WordProcessor 1.bin" size="16384" crc="563BAFC9" sha1="93A13CA028966583B960DAFA758B9FF5E2980E17"/>
+			</dataarea>
+		</part>
+	</software>
+
+    <software name="wordprocessor">
+		<description>WordProcessor WP2</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="slot1" interface="p2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="WordProcessor 2.bin" size="16384" crc="3B89EE86" sha1="DA8EC1A9B78660139EBD5C405A350210F0529644"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
