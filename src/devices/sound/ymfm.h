@@ -976,9 +976,17 @@ public:
 		return keycode | BIT(block_freq, 10 - note_select(), 1);
 	}
 
+	// OPL-specific helper to handle the weird multiple mapping
+	static constexpr u8 opl_multiple_map(u8 raw)
+	{
+		// replace the low bit with a table lookup; the equivalent
+		// OPM/OPN values are: 0,1,2,3,4,5,6,7,8,9,10,10,12,12,15,15
+		return (raw & 0xe) | BIT(0xc2aa, raw);
+	}
+
 	// system-wide registers
 	u8 test() const               /*  8 bits */ { return sysbyte(0x01, 0, 8); }
-	u16 timer_a_value() const     /*  8 bits */ { return 4 * sysbyte(0x02, 0, 8); } // 8->10 bits
+	u16 timer_a_value() const     /*  8 bits */ { return sysbyte(0x02, 0, 8) * 4; } // 8->10 bits
 	u8 timer_b_value() const      /*  8 bits */ { return sysbyte(0x03, 0, 8); }
 	u8 reset_timer_b() const      /*  1 bit  */ { return sysbyte(0x04, 7, 1); }
 	u8 reset_timer_a() const      /*  1 bit  */ { return sysbyte(0x04, 7, 1); }
@@ -995,7 +1003,7 @@ public:
 
 	// per-channel registers
 	u16 block_freq() const        /* 13 bits */ { return chword(0xb0, 0, 5, 0xa0, 0, 8) * 2; } // 13->14 bits
-	u8 feedback() const           /*  3 bits */ { return chbyte(0xc0, 1, 3); } // matches OPN
+	u8 feedback() const           /*  3 bits */ { return chbyte(0xc0, 1, 3); }
 	u8 algorithm() const          /*  1 bit  */ { return chbyte(0xc0, 0, 1) + 6; } // 1->3 bits
 
 	// per-operator registers
@@ -1003,13 +1011,13 @@ public:
 	u8 lfo_pm_enabled() const     /*  1 bit  */ { return opbyte(0x20, 6, 1); }
 	u8 eg_sustain() const         /*  1 bit  */ { return opbyte(0x20, 5, 1); }
 	u8 ksr() const                /*  1 bit  */ { return opbyte(0x20, 4, 1) * 2 + 1; } // 1->2 bits
-	u8 multiple() const           /*  4 bits */ { return opbyte(0x20, 0, 4); }
+	u8 multiple() const           /*  4 bits */ { return opl_multiple_map(opbyte(0x20, 0, 4)); }
 	u8 key_scale_level() const    /*  2 bits */ { return opbyte(0x40, 6, 2); }
 	u8 total_level() const        /*  6 bits */ { return opbyte(0x40, 0, 6); } // 6->7 bits
-	u8 attack_rate() const        /*  4 bits */ { return 2 * opbyte(0x60, 4, 4); } // 4->5 bits
-	u8 decay_rate() const         /*  4 bits */ { return 2 * opbyte(0x60, 0, 4); } // 4->5 bits
-	u8 sustain_level() const      /*  4 bits */ { return opbyte(0x80, 4, 4); } // matches OPN
-	u8 release_rate() const       /*  4 bits */ { return opbyte(0x80, 0, 4); } // matches OPN
+	u8 attack_rate() const        /*  4 bits */ { return opbyte(0x60, 4, 4) * 2; } // 4->5 bits
+	u8 decay_rate() const         /*  4 bits */ { return opbyte(0x60, 0, 4) * 2; } // 4->5 bits
+	u8 sustain_level() const      /*  4 bits */ { return opbyte(0x80, 4, 4); }
+	u8 release_rate() const       /*  4 bits */ { return opbyte(0x80, 0, 4); }
 
 	// LFO is always enabled
 	u8 lfo_enabled() const { return 1; }

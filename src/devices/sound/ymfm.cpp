@@ -1468,18 +1468,18 @@ u8 ymfm_engine_base<RegisterType>::status() const
 {
 	if (RegisterType::FAMILY != RegisterType::FAMILY_OPL)
 	{
+		// OPM/OPN have a traditional status register with a BUSY flag
 		u8 result = m_status & ~STATUS_BUSY;
-
-		// synthesize the busy flag if we're still busy
 		if (m_device.machine().time() < m_busy_end)
 			result |= STATUS_BUSY;
 		return result;
 	}
 	else
 	{
-		u8 result = (m_status & STATUS_TIMERA) ? 0x40 : 0;
-		result |= (m_status & STATUS_TIMERB) ? 0x20 : 0;
-		result |= (m_status & (STATUS_TIMERA | STATUS_TIMERB)) ? 0x80 : 0;
+		// OPL has no busy flag, just the two timer statuses plus a
+		// combined status in the MSB
+		u8 result = (m_status & STATUS_TIMERA) ? 0xc0 : 0;
+		result |= (m_status & STATUS_TIMERB) ? 0xa0 : 0;
 		return result;
 	}
 }
@@ -1590,23 +1590,29 @@ s8 ymfm_engine_base<RegisterType>::clock_lfo()
 	{
 		// OPL: two fixed-frequency LFOs, one for AM, one for PM
 
-		// increment AM LFO, which has 210*64 steps; at a nominal 50kHz output,
+		// we keep the two counters running in the lower/upper 16 bits
+		// of m_lfo_counter; increment them both now
+		m_lfo_counter += 0x10001;
+
+		// the AM LFO has 210*64 steps; at a nominal 50kHz output,
 		// this equates to a period of 50000/(210*64) = 3.72Hz
-		u16 am_lfo_counter = BIT(m_lfo_counter, 0, 16) + 1;
+		u16 am_lfo_counter = BIT(m_lfo_counter, 0, 16);
 		if (am_lfo_counter >= 210*64)
-			am_lfo_counter = 0;
+			am_lfo_counter = 0, m_lfo_counter &= 0xffff0000;
 
 		// low 8 bits are fractional; depth 0 is divided by 4, while depth 1 is normal
 		int shift = 10 - 2 * m_regs.lfo_am_depth();
 
-		// AM value is the upper bits of the value
+		// AM value is the upper bits of the value, inverted across
+		// the midpoint to produce a triangle
 		m_lfo_am = ((am_lfo_counter < 105*64) ? am_lfo_counter : (210*64+63 - am_lfo_counter)) >> shift;
 
-		// increment PM LFO, which has 8192 steps, or a nominal period of 6.1Hz
-		u16 pm_lfo_counter = BIT(m_lfo_counter, 16, 16) + 1;
-		m_lfo_counter = am_lfo_counter | (pm_lfo_counter << 16);
+		// the PM LFO has 8192 steps, or a nominal period of 6.1Hz
+		u16 pm_lfo_counter = BIT(m_lfo_counter, 16, 16);
 
-		// PM LFO is broken into 8 chunks, each lasting 1024 steps
+		// PM LFO is broken into 8 chunks, each lasting 1024 steps; the PM value
+		// depends on the upper bits of FNUM, so this value is a fraction and
+		// sign to apply to that value, as a 1.3 value
 		static s8 const pm_scale[8] = { 8, 4, 0, -4, -8, -4, 0, 4 };
 		return pm_scale[BIT(pm_lfo_counter, 10, 3)] >> (m_regs.lfo_pm_depth() ^ 1);
 	}
