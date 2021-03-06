@@ -441,20 +441,13 @@ inline u32 opm_key_code_to_phase_step(u16 block_freq, s16 delta)
 
 inline u8 opl_key_scale_atten(u16 block_freq)
 {
-	static u8 const fnum_to_atten[8*16] =
-	{
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 7, 8,
-		0, 0, 0, 0, 0, 3, 5, 7, 8,10,11,12,13,14,15,16,
-		0, 0, 0, 5, 8,11,13,15,16,18,19,20,21,22,23,24,
-		0, 0, 8,13,16,19,21,23,24,26,27,28,29,30,31,32,
-		0, 8,16,21,24,27,29,31,32,34,35,36,37,38,39,40,
-		0,16,24,29,32,35,37,39,40,42,43,44,45,46,47,48,
-		0,24,32,37,40,43,45,47,48,50,51,52,53,54,55,56
-	};
-	return fnum_to_atten[BIT(block_freq, 7, 7)];
+	// this table uses the top 4 bits of FNUM and are the maximal values
+	// (for when block == 7). Values for other blocks can be computed by
+	// subtracting 8 for each block below 7.
+	static u8 const fnum_to_atten[16] = { 0,24,32,37,40,43,45,47,48,50,51,52,53,54,55,56 };
+	s8 result = fnum_to_atten[BIT(block_freq, 7, 4)] - 8 * BIT(~block_freq, 11, 3);
+	return std::max<s8>(0, result);
 }
-
 
 
 //*********************************************************
