@@ -66,7 +66,6 @@ ym3526_device::ym3526_device(const machine_config &mconfig, const char *tag, dev
 	device_sound_interface(mconfig, *this),
 	m_opl(*this),
 	m_stream(nullptr),
-	m_busy_duration(m_opl.compute_busy_duration()),
 	m_address(0)
 {
 }
@@ -111,12 +110,8 @@ void ym3526_device::write(offs_t offset, u8 value)
 			// force an update
 			m_stream->update();
 
-			// write to OPM
-//printf("3526_w: %02X = %02X\n", m_address, value);
+			// write to OPL
 			m_opl.write(m_address, value);
-
-			// mark busy for a bit
-			m_opl.set_busy_end(machine().time() + m_busy_duration);
 			break;
 	}
 }
@@ -160,7 +155,6 @@ void ym3526_device::device_reset()
 void ym3526_device::device_clock_changed()
 {
 	m_stream->set_sample_rate(clock() / (ymopl_registers::DEFAULT_PRESCALE * ymopl_registers::OPERATORS));
-	m_busy_duration = m_opl.compute_busy_duration();
 }
 
 
@@ -178,7 +172,7 @@ void ym3526_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 		// update the OPL content; clipping is unknown
 		s32 lsum = 0, rsum = 0;
-		m_opl.output(lsum, rsum, 0, 32767, 0x1ff);
+		m_opl.output(lsum, rsum, 1, 32767, 0x1ff);
 
 		// convert to 10.3 floating point value for the DAC and back
 		// OPL is mono
