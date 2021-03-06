@@ -1257,9 +1257,33 @@ bool dc42_format::load(io_generic *io, uint32_t form_factor, const std::vector<u
 	uint8_t encoding = h[0x50];
 	uint8_t format = h[0x51];
 
-	if((encoding != 0x00 || format != 0x02) && (encoding != 0x01 || format != 0x22)) {
+	if((encoding != 0x00 || format != 0x02) && (encoding != 0x01 || (format != 0x22 && format != 0x24))) {
 		osd_printf_error("dc42: Unsupported encoding/format combination %02x/%02x\n", encoding, format);
 		return false;
+	}
+
+	switch (dsize)
+	{
+		case 409600:    // Mac 400K
+			image->set_form_variant(floppy_image::FF_35, floppy_image::SSDD);
+			break;
+
+		case 737280:    // PC 720K
+		case 819200:    // Mac/A2 800K
+			image->set_form_variant(floppy_image::FF_35, floppy_image::DSDD);
+			break;
+
+		case 1474560:   // PC or Mac 1.44M
+			image->set_form_variant(floppy_image::FF_35, floppy_image::DSHD);
+			break;
+
+		case 871424:    // Apple Twiggy 851KiB
+			image->set_form_variant(floppy_image::FF_525, floppy_image::DSHD);
+			break;
+
+		default:
+			osd_printf_error("dc42: dsize is %d, unknown form factor\n");
+			break;
 	}
 
 	uint8_t sector_data[(512+12)*12];
@@ -1524,6 +1548,8 @@ bool apple_2mg_format::load(io_generic *io, uint32_t form_factor, const std::vec
 
 	if(blocks != 1600 && blocks != 16390)
 		return false;
+
+	image->set_form_variant(floppy_image::FF_35, (blocks > 800) ? floppy_image::DSDD : floppy_image::SSDD);
 
 	for(int track=0; track < 80; track++) {
 		for(int head=0; head < 2; head++) {
