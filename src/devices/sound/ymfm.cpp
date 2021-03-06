@@ -323,11 +323,11 @@ inline u32 opm_key_code_to_phase_step(u16 block_freq, s16 delta)
 	// However, the YM2608 manual describes everything in terms of a nominal 8MHz
 	// clock, which produces an FM clock of:
 	//
-	//    8000000 / 6(channels) / 4(operators) / 6(prescale) = 55555Hz FM clock
+	//    8000000 / 24(operators) / 6(prescale) = 55555Hz FM clock
 	//
 	// Whereas the descriptions for the YM2151 use a nominal 3.579545MHz clock:
 	//
-	//    3579545 / 8(channels) / 4(operators) / 2(prescale) = 55930Hz FM clock
+	//    3579545 / 32(operators) / 2(prescale) = 55930Hz FM clock
 	//
 	// To correct for this, the YM2608 formula was adjusted to use a clock of
 	// 8053920Hz, giving this equation for the fnum:
@@ -635,9 +635,9 @@ void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 		m_env_attenuation = 0;
 
 	// log key on events under certain conditions
-	if (m_regs.lfo_waveform() == 3 && m_regs.lfo_enabled() && ((m_regs.lfo_am_enabled() && m_regs.lfo_am_sensitivity() != 0) || m_regs.lfo_pm_sensitivity() != 0))
+//	if (m_regs.lfo_waveform() == 3 && m_regs.lfo_enabled() && ((m_regs.lfo_am_enabled() && m_regs.lfo_am_sensitivity() != 0) || m_regs.lfo_pm_sensitivity() != 0))
 	{
-		LOG("KeyOn %d.%d: freq=%04X dt2=%d fb=%d alg=%d dt=%d mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X pan=%c%c",
+		LOG("KeyOn %2d.%2d: freq=%04X dt2=%d fb=%d alg=%d dt=%d mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X pan=%c%c",
 			m_regs.chnum(), m_regs.opnum(),
 			m_regs.block_freq(),
 			m_regs.detune2(),
@@ -787,7 +787,7 @@ void ymfm_operator<RegisterType>::clock_envelope(u16 env_counter, u8 keycode)
 
 		// bring current attenuation down to 5 bits and compare
 		if ((m_env_attenuation >> 5) >= target)
-			m_env_state = m_regs.eg_sustain() ? ENV_SUSTAIN : ENV_RELEASE;
+			m_env_state = ENV_SUSTAIN;
 	}
 
 	// determine our raw 5-bit rate value
@@ -1466,12 +1466,22 @@ void ymfm_engine_base<RegisterType>::write(u16 regnum, u8 data)
 template<class RegisterType>
 u8 ymfm_engine_base<RegisterType>::status() const
 {
-	u8 result = m_status & ~STATUS_BUSY;
+	if (RegisterType::FAMILY != RegisterType::FAMILY_OPL)
+	{
+		u8 result = m_status & ~STATUS_BUSY;
 
-	// synthesize the busy flag if we're still busy
-	if (m_device.machine().time() < m_busy_end)
-		result |= STATUS_BUSY;
-	return result;
+		// synthesize the busy flag if we're still busy
+		if (m_device.machine().time() < m_busy_end)
+			result |= STATUS_BUSY;
+		return result;
+	}
+	else
+	{
+		u8 result = (m_status & STATUS_TIMERA) ? 0x40 : 0;
+		result |= (m_status & STATUS_TIMERB) ? 0x20 : 0;
+		result |= (m_status & (STATUS_TIMERA | STATUS_TIMERB)) ? 0x80 : 0;
+		return result;
+	}
 }
 
 
@@ -1648,8 +1658,8 @@ void ymfm_engine_base<RegisterType>::update_timer(u8 tnum, u8 enable)
 	// if the timer is live, but not currently enabled, set the timer
 	if (enable && !m_timer[tnum]->enabled())
 	{
-		// each timer clock is n channels * 4 operators * prescale factor (2/3/6)
-		u32 clockscale = RegisterType::CHANNELS * 4 * m_clock_prescale;
+		// each timer clock is n operators * prescale factor (2/3/6)
+		u32 clockscale = RegisterType::OPERATORS * m_clock_prescale;
 
 		// period comes from the registers, and is different for each
 		u32 period = (tnum == 0) ? (1024 - m_regs.timer_a_value()) : 16 * (256 - m_regs.timer_b_value());

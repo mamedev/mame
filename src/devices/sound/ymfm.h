@@ -891,7 +891,7 @@ public:
 	static constexpr u8 OPERATORS = 9*2;
 	static constexpr u16 REGISTERS = 0x100;
 	static constexpr u16 REG_MODE = 0x04;
-	static constexpr u8 DEFAULT_PRESCALE = 2;
+	static constexpr u8 DEFAULT_PRESCALE = 4;
 	static constexpr u8 EG_CLOCK_DIVIDER = 1;
 	static constexpr u32 CSM_TRIGGER_MASK = 0x1ff;
 
@@ -957,9 +957,12 @@ public:
 	{
 		if ((regindex & 0xf0) == 0xb0)
 		{
-			channel = BIT(regindex, 0, 3);
-			opmask = 3;
-			return true;
+			channel = BIT(regindex, 0, 4);
+			if (channel < CHANNELS)
+			{
+				opmask = BIT(data, 5) ? 3 : 0;
+				return true;
+			}
 		}
 		return false;
 	}
@@ -975,7 +978,7 @@ public:
 
 	// system-wide registers
 	u8 test() const               /*  8 bits */ { return sysbyte(0x01, 0, 8); }
-	u16 timer_a_value() const     /*  8 bits */ { return 4 * sysbyte(0x02, 0, 8); }
+	u16 timer_a_value() const     /*  8 bits */ { return 4 * sysbyte(0x02, 0, 8); } // 8->10 bits
 	u8 timer_b_value() const      /*  8 bits */ { return sysbyte(0x03, 0, 8); }
 	u8 reset_timer_b() const      /*  1 bit  */ { return sysbyte(0x04, 7, 1); }
 	u8 reset_timer_a() const      /*  1 bit  */ { return sysbyte(0x04, 7, 1); }
@@ -1018,11 +1021,11 @@ public:
 		if (state < 2)
 			return opbyte(0x60, (state ^ 1) * 4, 4) * 2;
 
-		// sustain rate doesn't exist in OPL, so effectively 0
-		else if (state == 3)
+		// sustain rate doesn't exist in OPL, so effectively 0, unless in percussion mode
+		else if (state == 3 && eg_sustain() != 0)
 			return 0;
 
-		// release is 4 bits,  expanded as with OPM/OPN
+		// release is 4 bits, expanded as with OPM/OPN
 		return opbyte(0x80, 0, 4) * 2 + 1;
 	}
 };

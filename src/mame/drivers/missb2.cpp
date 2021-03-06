@@ -18,8 +18,8 @@ written, so it may be normal behaviour.
 #include "includes/bublbobl.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/3526intf.h"
 #include "sound/okim6295.h"
+#include "sound/ym3526.h"
 #include "machine/watchdog.h"
 #include "emupal.h"
 #include "screen.h"
