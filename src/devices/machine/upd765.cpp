@@ -679,8 +679,8 @@ uint8_t upd765_family_device::fifo_pop(bool internal)
 	memmove(fifo, fifo+1, fifo_pos);
 	if(!fifo_write && !fifo_pos)
 		disable_transfer();
-	int thr = fifocfg & 15;
-	if(fifo_write && fifo_expected && (fifo_pos <= thr || (fifocfg & 0x20)))
+	int thr = fifocfg & FIF_THR;
+	if(fifo_write && fifo_expected && (fifo_pos <= thr || (fifocfg & FIF_DIS)))
 		enable_transfer();
 	return r;
 }
@@ -975,6 +975,13 @@ void upd765_family_device::live_run(attotime limit)
 			if(cur_live.data_reg != 0xfb && cur_live.data_reg != 0xf8) {
 				live_delay(SEARCH_ADDRESS_MARK_DATA_FAILED);
 				return;
+			}
+
+			if (
+				((command[0] & 0x08) == 0 && cur_live.data_reg == 0xf8) // Encountered deleted sector during read data
+				|| ((command[0] & 0x08) != 0 && cur_live.data_reg == 0xfb) // Encountered normal sector during read deleted data
+			) {
+				st2 |= ST2_CM;
 			}
 
 			cur_live.bit_counter = 0;
@@ -1882,6 +1889,15 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 				fi.sub_state = COMMAND_DONE;
 				break;
 			}
+
+			if ((st2 & ST2_CM) && !(command[0] & 0x20)) {
+				// Encountered terminating sector while in non-skip mode.
+				// This will stop reading when a normal data sector is encountered during read deleted data,
+				// or when a deleted sector is encountered during a read data command.
+				fi.sub_state = COMMAND_DONE;
+				break;
+			}
+
 			bool done = tc_done;
 			if(command[4] == command[6]) {
 				if(command[0] & 0x80) {

@@ -662,7 +662,7 @@ void swim1_device::iwm_sync()
 	if(!m_iwm_active)
 		return;
 
-	u64 next_sync = machine().time().as_ticks(clock());
+	u64 next_sync = time_to_cycles(machine().time());
 	switch(m_iwm_rw) {
 	case MODE_IDLE:
 		m_last_sync = next_sync;
@@ -768,6 +768,8 @@ void swim1_device::iwm_sync()
 					m_flux_write_start = 0;
 					m_iwm_whd &= ~0x40;
 					m_last_sync = next_sync;
+					m_iwm_rw_state = SW_UNDERRUN;
+
 				} else {
 					m_iwm_wsh = m_iwm_data;
 					m_iwm_rw_state = SW_WINDOW_MIDDLE;
@@ -801,6 +803,10 @@ void swim1_device::iwm_sync()
 					m_iwm_next_state_change = m_last_sync + iwm_half_window_size();
 					m_iwm_rw_state = SW_WINDOW_MIDDLE;
 				}
+				break;
+
+			case SW_UNDERRUN:
+				m_last_sync = next_sync;
 				break;
 			}
 		}
@@ -880,7 +886,7 @@ void swim1_device::ism_sync()
 					ism_crc_clear();
 			}
 			m_ism_current_bit --;
-			bool bit = (m_ism_sr >> m_ism_current_bit) & 1;
+			int bit = (m_ism_sr >> m_ism_current_bit) & 1;
 			if(!(m_ism_sr & M_MARK))
 				ism_crc_update(bit);
 			m_ism_tss_sr = (m_ism_tss_sr << 1) | bit;

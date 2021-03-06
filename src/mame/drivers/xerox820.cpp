@@ -651,8 +651,8 @@ void xerox820_state::xerox820(machine_config &config)
 	FD1771(config, m_fdc, 20_MHz_XTAL / 20);
 	m_fdc->intrq_wr_callback().set(FUNC(xerox820_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(xerox820_state::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, FD1771_TAG":0", xerox820_floppies, "sa400l", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, FD1771_TAG":1", xerox820_floppies, "sa400l", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1771_TAG":0", xerox820_floppies, "sa400l", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1771_TAG":1", xerox820_floppies, "sa400l", floppy_image_device::default_mfm_floppy_formats);
 
 	Z80SIO(config, m_sio, 20_MHz_XTAL / 8); // MK3884 (SIO/0)
 	m_sio->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
@@ -748,8 +748,8 @@ void xerox820ii_state::xerox820ii(machine_config &config)
 	FD1797(config, m_fdc, 16_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(xerox820_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(xerox820_state::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, FD1797_TAG":0", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, FD1797_TAG":1", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1797_TAG":0", xerox820_floppies, "sa450", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1797_TAG":1", xerox820_floppies, "sa450", floppy_image_device::default_mfm_floppy_formats);
 
 	Z80SIO(config, m_sio, 16_MHz_XTAL / 4); // MK3884 (SIO/0)
 	m_sio->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));

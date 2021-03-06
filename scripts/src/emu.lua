@@ -268,10 +268,9 @@ files {
 }
 
 pchsource(MAME_DIR .. "src/emu/main.cpp")
--- 4 files do not include emu.h
+-- 3 files do not include emu.h
 nopch(MAME_DIR .. "src/emu/emualloc.cpp")
 nopch(MAME_DIR .. "src/emu/attotime.cpp")
-nopch(MAME_DIR .. "src/emu/fileio.cpp")
 nopch(MAME_DIR .. "src/emu/debug/textbuf.cpp")
 
 dependency {

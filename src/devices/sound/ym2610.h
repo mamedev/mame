@@ -48,7 +48,6 @@ private:
 	// internal state
 	address_space_config const m_adpcm_a_config; // address space 0 config (ADPCM-A)
 	address_space_config const m_adpcm_b_config; // address space 1 config (ADPCM-B)
-	std::string const m_adpcm_b_region_name; // name of ADPCM-B memory region
 	optional_memory_region m_adpcm_a_region; // ADPCM-A memory region
 	optional_memory_region m_adpcm_b_region; // ADPCM-B memory region
 	ymopna_engine m_opn;             // core OPNA engine

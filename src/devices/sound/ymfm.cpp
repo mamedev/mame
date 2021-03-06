@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "ymfm.h"
 
-//#define VERBOSE 1
+#define VERBOSE 1
 #define LOG_OUTPUT_FUNC osd_printf_verbose
 #include "logmacro.h"
 
@@ -640,31 +640,34 @@ void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 	if (effective_rate(m_regs.attack_rate(), keycode) >= 62)
 		m_env_attenuation = 0;
 
-	// log keys
-	LOG("KeyOn %d.%d: freq=%04X dt2=%d fb=%d alg=%d dt=%d mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X pan=%c%c",
-		m_regs.chnum(), m_regs.opnum(),
-		m_regs.block_freq(),
-		m_regs.detune2(),
-		m_regs.feedback(),
-		m_regs.algorithm(),
-		m_regs.detune(),
-		m_regs.multiple(),
-		m_regs.total_level(),
-		m_regs.ksr(),
-		m_regs.attack_rate(),
-		m_regs.decay_rate(),
-		m_regs.sustain_rate(),
-		m_regs.release_rate(),
-		m_regs.sustain_level(),
-		m_regs.pan_left() ? 'L' : '-',
-		m_regs.pan_right() ? 'R' : '-');
-	if (m_regs.ssg_eg_enabled())
-		LOG(" ssg=%X", m_regs.ssg_eg_mode());
-	if (m_regs.lfo_enabled() && ((m_regs.lfo_am_enabled() && m_regs.lfo_am_sensitivity() != 0) || m_regs.lfo_pm_sensitivity() != 0))
-		LOG(" am=%d pm=%d w=%d", m_regs.lfo_am_enabled() ? m_regs.lfo_am_sensitivity() : 0, m_regs.lfo_pm_sensitivity(), m_regs.lfo_waveform());
-	if (m_regs.noise_enabled() && m_regs.opnum() == 3 && m_regs.chnum() == 7)
-		LOG(" noise=1");
-	LOG("\n");
+	// log key on events under certain conditions
+	if (m_regs.lfo_waveform() == 3 && m_regs.lfo_enabled() && ((m_regs.lfo_am_enabled() && m_regs.lfo_am_sensitivity() != 0) || m_regs.lfo_pm_sensitivity() != 0))
+	{
+		LOG("KeyOn %d.%d: freq=%04X dt2=%d fb=%d alg=%d dt=%d mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X pan=%c%c",
+			m_regs.chnum(), m_regs.opnum(),
+			m_regs.block_freq(),
+			m_regs.detune2(),
+			m_regs.feedback(),
+			m_regs.algorithm(),
+			m_regs.detune(),
+			m_regs.multiple(),
+			m_regs.total_level(),
+			m_regs.ksr(),
+			m_regs.attack_rate(),
+			m_regs.decay_rate(),
+			m_regs.sustain_rate(),
+			m_regs.release_rate(),
+			m_regs.sustain_level(),
+			m_regs.pan_left() ? 'L' : '-',
+			m_regs.pan_right() ? 'R' : '-');
+		if (m_regs.ssg_eg_enabled())
+			LOG(" ssg=%X", m_regs.ssg_eg_mode());
+		if (m_regs.lfo_enabled() && ((m_regs.lfo_am_enabled() && m_regs.lfo_am_sensitivity() != 0) || m_regs.lfo_pm_sensitivity() != 0))
+			LOG(" am=%d pm=%d w=%d", m_regs.lfo_am_enabled() ? m_regs.lfo_am_sensitivity() : 0, m_regs.lfo_pm_sensitivity(), m_regs.lfo_waveform());
+		if (m_regs.noise_enabled() && m_regs.opnum() == 3 && m_regs.chnum() == 7)
+			LOG(" noise=1");
+		LOG("\n");
+	}
 }
 
 
@@ -1255,6 +1258,8 @@ ymfm_engine_base<RegisterType>::ymfm_engine_base(device_t &device) :
 	m_lfo_counter(0),
 	m_noise_lfsr(0),
 	m_noise_counter(0),
+	m_noise_state(0),
+	m_noise_lfo(0),
 	m_lfo_am(0),
 	m_status(0),
 	m_clock_prescale(RegisterType::DEFAULT_PRESCALE),
@@ -1291,6 +1296,8 @@ void ymfm_engine_base<RegisterType>::save(device_t &device)
 	device.save_item(YMFM_NAME(m_lfo_counter));
 	device.save_item(YMFM_NAME(m_noise_lfsr));
 	device.save_item(YMFM_NAME(m_noise_counter));
+	device.save_item(YMFM_NAME(m_noise_state));
+	device.save_item(YMFM_NAME(m_noise_lfo));
 	device.save_item(YMFM_NAME(m_lfo_am));
 	device.save_item(YMFM_NAME(m_status));
 	device.save_item(YMFM_NAME(m_clock_prescale));
@@ -1375,7 +1382,7 @@ void ymfm_engine_base<RegisterType>::output(s32 &lsum, s32 &rsum, u8 rshift, s16
 		{
 			// noise must be non-zero to use noise on OP4, so if it is enabled,
 			// OR with 2 (since only the LSB is actually checked for the noise state)
-			u8 noise = (chnum == 7 && m_regs.noise_enabled()) ? (m_noise_lfsr | 2) : 0;
+			u8 noise = (chnum == 7 && m_regs.noise_enabled()) ? (m_noise_state | 2) : 0;
 			m_channel[chnum]->output(m_lfo_am, noise, lsum, rsum, rshift, clipmax);
 		}
 }
@@ -1388,25 +1395,19 @@ void ymfm_engine_base<RegisterType>::output(s32 &lsum, s32 &rsum, u8 rshift, s16
 template<class RegisterType>
 void ymfm_engine_base<RegisterType>::write(u16 regnum, u8 data)
 {
+	// special case: writes to the mode register can impact IRQs;
+	// schedule these writes to ensure ordering with timers
+	if (regnum == RegisterType::REG_MODE)
+	{
+		m_device.machine().scheduler().synchronize(timer_expired_delegate(FUNC(ymfm_engine_base<RegisterType>::synced_mode_w), this), data);
+		return;
+	}
+
 	// most writes are passive, consumed only when needed
 	m_regs.write(regnum, data);
 
-	// handle writes to the mode register
-	if (regnum == RegisterType::REG_MODE)
-	{
-		// reset timer status
-		if (m_regs.reset_timer_b())
-			set_reset_status(0, STATUS_TIMERB);
-		if (m_regs.reset_timer_a())
-			set_reset_status(0, STATUS_TIMERA);
-
-		// load timers
-		update_timer(1, m_regs.load_timer_b());
-		update_timer(0, m_regs.load_timer_a());
-	}
-
 	// handle writes to the keyon registers
-	else if (regnum == RegisterType::REG_KEYON)
+	if (regnum == RegisterType::REG_KEYON)
 	{
 		u8 chnum = m_regs.keyon_channel();
 		if (chnum < RegisterType::CHANNELS)
@@ -1445,6 +1446,7 @@ s8 ymfm_engine_base<ymopm_registers>::clock_lfo()
 	// leading 1; this matches exactly the frequencies in the application
 	// manual, though it might not be implemented exactly this way on chip
 	u8 rate = m_regs.lfo_rate();
+	u32 prev_counter = m_lfo_counter;
 	m_lfo_counter += (0x10 | BIT(rate, 0, 4)) << BIT(rate, 4, 4);
 	u8 lfo = BIT(m_lfo_counter, 22, 8);
 
@@ -1476,11 +1478,12 @@ s8 ymfm_engine_base<ymopm_registers>::clock_lfo()
 
 		// noise:
 		case 3:
-			// QUESTION: totally random guess here; does the LFO counter
-			// play into this? Is there a separate LFSR for the LFO noise?
-			// Do we sample & hold the noise at a certain point based on
-			// the LFO counter?
-			am = BIT(m_noise_lfsr, 0) ? 0xff : 0;
+			// QUESTION: this behavior is surmised but not yet verified:
+			// LFO noise value is accumulated over 8 bits of LFSR and
+			// clocked as the LFO value transitions
+			if (BIT(m_lfo_counter ^ prev_counter, 22, 8) != 0)
+				m_noise_lfo = m_noise_lfsr & 0xff;
+			am = m_noise_lfo;
 			pm = am ^ 0x80;
 			break;
 	}
@@ -1543,18 +1546,22 @@ void ymfm_engine_base<ymopm_registers>::clock_noise()
 {
 	// base noise frequency is measured at 2x 1/2 FM frequency; this means
 	// each tick counts as two steps against the noise counter
-	m_noise_counter += 2;
-
-	// compare against the frequency
-	u8 freq = m_regs.noise_frequency() + 1;
-	while (m_noise_counter >= freq)
+	u8 freq = m_regs.noise_frequency();
+	for (int rep = 0; rep < 2; rep++)
 	{
-		m_noise_counter -= freq;
-
-		// note that the LFSR here contains the output bit in bit 0, with
-		// the current LFSR state in bits 1-17
+		// evidence seems to suggest the LFSR is clocked continually and just
+		// sampled at the noise frequency for output purposes; clock it here
+		// twice; note that the low 8 bits are the most recent 8 bits of history
+		// while bits 8-24 contain the 17 bit LFSR state
 		m_noise_lfsr >>= 1;
-		m_noise_lfsr |= (BIT(m_noise_lfsr, 0) ^ BIT(m_noise_lfsr, 3) ^ 1) << 17;
+		m_noise_lfsr |= (BIT(m_noise_lfsr, 7) ^ BIT(m_noise_lfsr, 10) ^ 1) << 24;
+
+		// compare against the frequency and latch when we exceed it
+		if (m_noise_counter++ >= freq)
+		{
+			m_noise_counter = 0;
+			m_noise_state = BIT(m_noise_lfsr, 7);
+		}
 	}
 }
 
@@ -1619,12 +1626,30 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::timer_handler)
 
 
 //-------------------------------------------------
+//  schedule_check_interrupts - schedule an
+//  interrupt check via timer
+//-------------------------------------------------
+
+template<class RegisterType>
+void ymfm_engine_base<RegisterType>::schedule_check_interrupts()
+{
+	// if we're currently executing a CPU, schedule the interrupt check;
+	// otherwise, do it directly
+	auto &scheduler = m_device.machine().scheduler();
+	if (scheduler.currently_executing())
+		scheduler.synchronize(timer_expired_delegate(FUNC(ymfm_engine_base<RegisterType>::check_interrupts), this), 0);
+	else
+		check_interrupts(nullptr, 0);
+}
+
+
+//-------------------------------------------------
 //  check_interrupts - check the interrupt sources
 //  for interrupts
 //-------------------------------------------------
 
 template<class RegisterType>
-void ymfm_engine_base<RegisterType>::check_interrupts()
+TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::check_interrupts)
 {
 	// update the state
 	u8 old_state = m_irq_state;
@@ -1633,6 +1658,29 @@ void ymfm_engine_base<RegisterType>::check_interrupts()
 	// if changed, signal the new state
 	if (old_state != m_irq_state && !m_irq_handler.isnull())
 		m_irq_handler(m_irq_state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+//-------------------------------------------------
+//  synced_mode_w - handle a mode register write
+//  via timer callback
+//-------------------------------------------------
+
+template<class RegisterType>
+TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::synced_mode_w)
+{
+	// actually write the mode register now
+	m_regs.write(RegisterType::REG_MODE, param);
+
+	// reset timer status
+	if (m_regs.reset_timer_b())
+		set_reset_status(0, STATUS_TIMERB);
+	if (m_regs.reset_timer_a())
+		set_reset_status(0, STATUS_TIMERA);
+
+	// load timers
+	update_timer(1, m_regs.load_timer_b());
+	update_timer(0, m_regs.load_timer_a());
 }
 
 

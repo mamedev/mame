@@ -745,10 +745,10 @@ public:
 	u8 status() const;
 
 	// set/reset bits in the status register, updating the IRQ status
-	void set_reset_status(u8 set, u8 reset) { m_status = (m_status | set) & ~reset; check_interrupts(); }
+	void set_reset_status(u8 set, u8 reset) { m_status = (m_status | set) & ~reset; schedule_check_interrupts(); }
 
 	// set the IRQ mask
-	void set_irq_mask(u8 mask) { m_irq_mask = mask; check_interrupts(); }
+	void set_irq_mask(u8 mask) { m_irq_mask = mask; schedule_check_interrupts(); }
 
 	// helper to compute the busy duration
 	attotime compute_busy_duration(u32 cycles = 32)
@@ -784,8 +784,14 @@ private:
 	// timer callback
 	TIMER_CALLBACK_MEMBER(timer_handler);
 
+	// schedule an interrupt check
+	void schedule_check_interrupts();
+
 	// check interrupts
-	void check_interrupts();
+	TIMER_CALLBACK_MEMBER(check_interrupts);
+
+	// handle a mode register write
+	TIMER_CALLBACK_MEMBER(synced_mode_w);
 
 	// internal state
 	device_t &m_device;              // reference to the owning device
@@ -793,6 +799,8 @@ private:
 	u32 m_lfo_counter;               // LFO counter
 	u32 m_noise_lfsr;                // noise LFSR state
 	u8 m_noise_counter;              // noise counter
+	u8 m_noise_state;                // latched noise state
+	u8 m_noise_lfo;                  // latched LFO noise value
 	u8 m_lfo_am;                     // current LFO AM value
 	u8 m_status;                     // current status register
 	u8 m_clock_prescale;             // prescale factor (2/3/6)

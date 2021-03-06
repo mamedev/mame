@@ -473,9 +473,11 @@ static INPUT_PORTS_START( pioner )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 INPUT_PORTS_END
 
-FLOPPY_FORMATS_MEMBER( special_state::specimx_floppy_formats )
-	FLOPPY_SMX_FORMAT
-FLOPPY_FORMATS_END
+void special_state::specimx_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_SMX_FORMAT);
+}
 
 static void specimx_floppies(device_slot_interface &device)
 {

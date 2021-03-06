@@ -625,10 +625,12 @@ WRITE_LINE_MEMBER( hx5102_device::fdc_drq_w )
 /*
     Define the floppy formats.
 */
-FLOPPY_FORMATS_MEMBER(hx5102_device::floppy_formats)
-	FLOPPY_TI99_SDF_FORMAT,
-	FLOPPY_TI99_TDF_FORMAT
-FLOPPY_FORMATS_END
+void hx5102_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_TI99_SDF_FORMAT);
+	fr.add(FLOPPY_TI99_TDF_FORMAT);
+}
 
 /*
     Only one fixed floppy drive in the device.

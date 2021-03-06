@@ -588,7 +588,7 @@ protected:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(hd_motor_tick);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	uint16_t vram_r(offs_t offset);
@@ -872,12 +872,11 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_base_state::hgdc_display_pixels )
 	}
 }
 
-FLOPPY_FORMATS_MEMBER(rainbow_base_state::floppy_formats)
-FLOPPY_RX50IMG_FORMAT,
-FLOPPY_TD0_FORMAT,
-FLOPPY_IMD_FORMAT,
-FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
+void rainbow_base_state::floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_RX50IMG_FORMAT);
+}
 
 static void rainbow_floppies(device_slot_interface &device)
 {

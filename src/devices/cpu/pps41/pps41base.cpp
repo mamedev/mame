@@ -12,8 +12,8 @@ Part numbers:
 - A76xx = MM76   - 42 pin spider
 - A77xx = MM77   - 42 pin spider
 - A78xx = MM78   - 42 pin spider
-- A79xx = MM76C  - 52 pin spider
-- A86xx = MM76E  - 42 pin spider
+- A79xx = MM76C  - 52 pin spider - counter
+- A86xx = MM76E  - 42 pin spider - extended ROM
 - B76xx = MM76L  - 40 pin dip
 - B77xx = MM77L  - 40 pin dip
 - B78xx = MM78L  - 40 pin dip
@@ -21,7 +21,7 @@ Part numbers:
 - B90xx = MM78LA - 42 pin spider
 
 "spider" = 2 rows of pins on each side, just like standard PPS-4 CPUs.
-"L" only difference is low-power
+"L" main difference is low-power
 
 References:
 - Series MM76 Product Description
@@ -48,7 +48,9 @@ pps41_base_device::pps41_base_device(const machine_config &mconfig, device_type 
 	m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data),
 	m_prgwidth(prgwidth),
 	m_datawidth(datawidth),
-	m_opla(*this, "opla")
+	m_opla(*this, "opla"),
+	m_read_r(*this),
+	m_write_r(*this)
 { }
 
 
@@ -58,7 +60,7 @@ pps41_base_device::pps41_base_device(const machine_config &mconfig, device_type 
 
 enum
 {
-	PPS41_PC=1, PPS41_A, PPS41_C, PPS41_B
+	PPS41_PC=1, PPS41_A, PPS41_C, PPS41_B, PPS41_S
 };
 
 void pps41_base_device::device_start()
@@ -69,7 +71,8 @@ void pps41_base_device::device_start()
 	m_datamask = (1 << m_datawidth) - 1;
 
 	// resolve callbacks
-	//..
+	m_read_r.resolve_safe(0);
+	m_write_r.resolve_safe();
 
 	// zerofill
 	m_pc = 0;
@@ -77,6 +80,7 @@ void pps41_base_device::device_start()
 	m_op = 0;
 	m_prev_op = 0;
 	m_prev2_op = 0;
+	m_prev3_op = 0;
 	memset(m_stack, 0, sizeof(m_stack));
 
 	m_a = 0;
@@ -90,8 +94,12 @@ void pps41_base_device::device_start()
 	m_prev_c = 0;
 	m_c_in = 0;
 	m_c_delay = false;
+	m_s = 0;
 	m_skip = false;
 	m_skip_count = 0;
+
+	m_cha = 0;
+	m_chb = 0;
 
 	// register for savestates
 	save_item(NAME(m_pc));
@@ -99,6 +107,7 @@ void pps41_base_device::device_start()
 	save_item(NAME(m_op));
 	save_item(NAME(m_prev_op));
 	save_item(NAME(m_prev2_op));
+	save_item(NAME(m_prev3_op));
 	save_item(NAME(m_stack));
 
 	save_item(NAME(m_a));
@@ -112,8 +121,12 @@ void pps41_base_device::device_start()
 	save_item(NAME(m_prev_c));
 	save_item(NAME(m_c_in));
 	save_item(NAME(m_c_delay));
+	save_item(NAME(m_s));
 	save_item(NAME(m_skip));
 	save_item(NAME(m_skip_count));
+
+	save_item(NAME(m_cha));
+	save_item(NAME(m_chb));
 
 	// register state for debugger
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%03X").noshow();
@@ -123,6 +136,7 @@ void pps41_base_device::device_start()
 	state_add(PPS41_A, "A", m_a).formatstr("%01X");
 	state_add(PPS41_C, "C", m_c_in).formatstr("%01X");
 	state_add(PPS41_B, "B", m_b).formatstr("%02X");
+	state_add(PPS41_S, "S", m_s).formatstr("%01X");
 
 	set_icountptr(m_icount);
 }
@@ -148,7 +162,8 @@ void pps41_base_device::device_reset()
 	m_skip_count = 0;
 
 	// clear outputs
-	//..
+	m_cha = m_chb = 0xf;
+	m_write_r(0);
 }
 
 
@@ -174,6 +189,7 @@ void pps41_base_device::execute_run()
 	while (m_icount > 0)
 	{
 		// remember previous state
+		m_prev3_op = m_prev2_op;
 		m_prev2_op = m_prev_op;
 		m_prev_op = m_op;
 		m_prev_pc = m_pc;
@@ -193,7 +209,7 @@ void pps41_base_device::execute_run()
 		if (m_skip)
 		{
 			// still skip through prefix(es)
-			m_skip = op_is_prefix(m_op);
+			m_skip = op_is_tr(m_op);
 			m_op = 0; // fake nop
 		}
 		else if (m_skip_count)
@@ -203,6 +219,7 @@ void pps41_base_device::execute_run()
 			// restore opcode state
 			m_op = m_prev_op;
 			m_prev_op = m_prev2_op;
+			m_prev2_op = m_prev3_op;
 		}
 		else
 			execute_one();

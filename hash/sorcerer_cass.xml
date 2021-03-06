@@ -792,7 +792,6 @@ Compiled by Robbbert
 			</dataarea>
 		</part>
 	</software>
-	<!-- Added 2018-05-25 -->
 	<software name="fruit">
 		<description>The Sorcerers Fruit Machine</description>
 		<year>1980</year>
@@ -920,7 +919,6 @@ Compiled by Robbbert
 			</dataarea>
 		</part>
 	</software>
-	<!-- Added 2018-05-31 -->
 	<software name="checkers">
 		<description>Checkers</description>
 		<year>198?</year>
@@ -1002,7 +1000,6 @@ Compiled by Robbbert
 			</dataarea>
 		</part>
 	</software>
-	<!-- Added 2018-07-24 -->
 	<software name="adv5">
 		<description>The Count</description>
 		<year>1979</year>
@@ -1062,7 +1059,6 @@ Compiled by Robbbert
 			</dataarea>
 		</part>
 	</software>
-	<!-- Added 2018-10-13 -->
 	<software name="crash">
 		<description>Head-on Collision</description>
 		<year>1980</year>
@@ -1075,7 +1071,6 @@ Compiled by Robbbert
 			</dataarea>
 		</part>
 	</software>
-	<!-- Added 2018-10-22 -->
 	<software name="landarc">
 		<description>Lander Arcade</description>
 		<year>1982</year>
@@ -1088,7 +1083,6 @@ Compiled by Robbbert
 			</dataarea>
 		</part>
 	</software>
-	<!-- Added 2019-02-22 -->
 	<software name="adv2">
 		<description>Pirate Adventure</description>
 		<year>1979</year>
@@ -1184,7 +1178,6 @@ Compiled by Robbbert
 			</dataarea>
 		</part>
 	</software>
-	<!-- Added 2019-08-25 -->
 	<software name="misil">
 		<description>Defense</description>
 		<year>1981</year>
@@ -1197,7 +1190,6 @@ Compiled by Robbbert
 			</dataarea>
 		</part>
 	</software>
-	<!-- Added 2020-04-19 -->
 	<software name="kilopede">
 		<description>Kilopede (with sound)</description>
 		<year>1982</year>
@@ -1210,7 +1202,6 @@ Compiled by Robbbert
 			</dataarea>
 		</part>
 	</software>
-	<!-- Added 2020-04-22 -->
 	<software name="starf">
 		<description>Starfighter</description>
 		<year>1981</year>
@@ -1223,7 +1214,6 @@ Compiled by Robbbert
 			</dataarea>
 		</part>
 	</software>
-	<!-- Added 2020-10-08 -->
 	<software name="atc1">
 		<description>Air Traffic Controller (Mt Purscent)</description>
 		<year>19??</year>
@@ -1446,7 +1436,6 @@ Compiled by Robbbert
 			</dataarea>
 		</part>
 	</software>
-	<!-- Added 2020-12-02 -->
 	<software name="defcm">
 		<description>Defense Command (ported from TRS-80)</description>
 		<year>19??</year>
@@ -1468,6 +1457,18 @@ Compiled by Robbbert
 		<part name="cass" interface="sorcerer_cass">
 			<dataarea name="cass" size="0xba942c">
 				<rom name="killerg.wav" size="0xba942c" crc="38b7e929" sha1="cf22f87b9f494daa19e4175ddbfb25879d75b1e4" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="cosmc">
+		<description>Cosmic Fighter (ported from TRS-80)</description>
+		<year>1980</year>
+		<publisher>Big Five Software</publisher>
+		<info name="developer" value="Bill Hogue and Jeff Konyu"/>
+		<info name="usage" value="Boot to Monitor, LOG" />
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="0xa2b02c">
+				<rom name="defcm.wav" size="0xa2b02c" crc="24bd0b6f" sha1="5aaa0f01ed86d8db22871fb456c3c795a6495291" />
 			</dataarea>
 		</part>
 	</software>

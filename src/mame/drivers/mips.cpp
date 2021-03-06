@@ -444,10 +444,6 @@ private:
 	int m_int1_state;
 };
 
-FLOPPY_FORMATS_MEMBER(mips_floppy_formats)
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
-
 void rx2030_state::machine_start()
 {
 	save_item(NAME(m_mmu));
@@ -810,7 +806,7 @@ void rx2030_state::rx2030(machine_config &config)
 	WD37C65C(config, m_fdc, 16_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set_inputline(m_iop, INPUT_LINE_IRQ6);
 	//m_fdc->drq_wr_callback().set();
-	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, mips_floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
 	// scsi bus and devices
 	NSCSI_BUS(config, m_scsibus);
@@ -1081,7 +1077,7 @@ void rx3230_state::rx3230(machine_config &config)
 	I82072(config, m_fdc, 16_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set_inputline(m_cpu, INPUT_LINE_IRQ4);
 	//m_fdc->drq_wr_callback().set();
-	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, mips_floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
 	// keyboard connector
 	PC_KBDC(config, m_kbd, pc_at_keyboards, nullptr);

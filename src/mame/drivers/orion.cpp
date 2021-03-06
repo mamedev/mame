@@ -89,9 +89,11 @@ void orion_pro_state::io_map(address_map &map)
 	map(0x0000, 0xffff).rw(FUNC(orion_pro_state::orionpro_io_r), FUNC(orion_pro_state::orionpro_io_w));
 }
 
-FLOPPY_FORMATS_MEMBER( orion_state::orion_floppy_formats )
-	FLOPPY_SMX_FORMAT
-FLOPPY_FORMATS_END
+void orion_state::orion_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_SMX_FORMAT);
+}
 
 /* Machine driver */
 void orion_state::orion128(machine_config &config)

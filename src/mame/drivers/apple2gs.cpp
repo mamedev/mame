@@ -127,6 +127,9 @@
 
 #include "bus/a2gameio/gameio.h"
 
+
+namespace {
+
 // various timing standards
 #define A2GS_MASTER_CLOCK (XTAL(28'636'363))
 #define A2GS_14M    (A2GS_MASTER_CLOCK/2)
@@ -223,6 +226,17 @@ public:
 		m_diskreg = 0;
 	}
 
+	void apple2gs(machine_config &config);
+	void apple2gsr1(machine_config &config);
+
+	void rom1_init() { m_is_rom3 = false; }
+	void rom3_init() { m_is_rom3 = true; }
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	required_device<g65816_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<timer_device> m_scantimer, m_acceltimer;
@@ -377,14 +391,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(accel_timer);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	void palette_init(palette_device &palette);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	void apple2gs(machine_config &config);
-	void apple2gsr1(machine_config &config);
 
 	void apple2gs_map(address_map &map);
 	void vectors_map(address_map &map);
@@ -415,12 +423,8 @@ public:
 
 	floppy_image_device *m_cur_floppy;
 	int m_devsel;
-	u8 m_diskreg;  // move into private when we can
+	u8 m_diskreg;
 
-	void rom1_init() { m_is_rom3 = false; }
-	void rom3_init() { m_is_rom3 = true; }
-
-private:
 	u8 ram0000_r(offs_t offset);
 	void ram0000_w(offs_t offset, u8 data);
 	u8 auxram0000_r(offs_t offset);
@@ -496,8 +500,8 @@ private:
 
 	u8 keyglu_mcu_read(u8 offset);
 	void keyglu_mcu_write(u8 offset, u8 data);
-	u8 keyglu_816_read(u8 offset);
-	void keyglu_816_write(u8 offset, u8 data);
+	[[maybe_unused]] u8 keyglu_816_read(u8 offset);
+	[[maybe_unused]] void keyglu_816_write(u8 offset, u8 data);
 	void keyglu_regen_irqs();
 
 	u8 adbmicro_p0_in();
@@ -512,7 +516,6 @@ private:
 	offs_t dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 	void wdm_trampoline(offs_t offset, u8 data) { }; //m_a2host->wdm_w(space, offset, data); }
 
-private:
 	bool m_is_rom3;
 	int m_speaker_state;
 
@@ -1364,6 +1367,9 @@ void apple2gs_state::machine_start()
 	m_b0_2000bank->set_bank(0);
 	m_b0_4000bank->set_bank(0);
 	m_inh_bank = 0;
+	m_transchar = 0;
+	m_anykeydown = false;
+	std::fill(std::begin(m_megaii_ram), std::end(m_megaii_ram), 0);
 
 	m_nvram->set_base(m_clock_bram, sizeof(m_clock_bram));
 
@@ -5101,6 +5107,9 @@ ROM_START(apple2gsr0p2)  // 3/10/1986 Cortland prototype, boots as "Apple //'ing
 	ROM_REGION( 0x800, "keyboard", 0 )
 	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
 ROM_END
+
+} // Anonymous namespace
+
 
 /*    YEAR  NAME            PARENT    COMPAT    MACHINE     INPUT     CLASS        INIT  COMPANY           FULLNAME */
 COMP( 1989, apple2gs,     0,        apple2, apple2gs,   apple2gs, apple2gs_state, rom3_init, "Apple Computer", "Apple IIgs (ROM03)", MACHINE_SUPPORTS_SAVE )

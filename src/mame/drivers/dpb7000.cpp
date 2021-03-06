@@ -2427,13 +2427,6 @@ uint32_t dpb7000_state::store_screen_update(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-static const floppy_format_type dpb7000_floppy_formats[] =
-{
-	FLOPPY_HFE_FORMAT,
-	FLOPPY_MFM_FORMAT,
-	nullptr
-};
-
 static void dpb7000_floppies(device_slot_interface &device)
 {
 	device.option_add("8", FLOPPY_8_DSDD);
@@ -2522,7 +2515,7 @@ void dpb7000_state::dpb7000(machine_config &config)
 	m_fddcpu->in_p2_cb().set(FUNC(dpb7000_state::fddcpu_p2_r));
 	m_fddcpu->out_p2_cb().set(FUNC(dpb7000_state::fddcpu_p2_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, dpb7000_floppies, "8", dpb7000_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, dpb7000_floppies, "8", floppy_image_device::default_mfm_floppy_formats);
 
 	RS232_PORT(config, m_fdd_serial, default_rs232_devices, nullptr);
 	m_fdd_serial->rxd_handler().set(FUNC(dpb7000_state::fddcpu_debug_rx));

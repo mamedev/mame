@@ -1226,6 +1226,7 @@ altos8600
 @source:alvg.cpp
 agsoccer                        //
 agsoccer07                      //
+agsoccera                       //
 dinoeggs                        //
 mystcast                        //
 mystcasta                       //
@@ -11089,6 +11090,7 @@ megaman2h                       // 12/07/1996 (c) 1996 (Hispanic)
 megamn2d                        //
 mmancp2u                        // 06/10/1995 (c) 1995 (USA)
 mmancp2ur1                      // 26/09/1995 (c) 1995 (USA)
+mmancp2ur2                      // 25/09/1995 (c) 1995 (USA)
 mmatrix                         // 12/04/2000 (c) 2000 Takumi (USA)
 mmatrixd                        //
 mmatrixj                        // 12/04/2000 (c) 2000 Takumi (Japan)
@@ -12518,13 +12520,13 @@ dvk_kcgd                        //
 dvk_ksm                         //
 
 @source:dwarfd.cpp
-dwarfd                          // (c) 198? Electro-Sports
-dwarfda                         // (c) 198? Electro-Sports
-pokeresp                        // (c) 198? Electro-Sports
+dwarfd                          // (c) 198? Electro-Sport
+dwarfda                         // (c) 198? Electro-Sport
+pokeresp                        // (c) 198? Electro-Sport
 qc                              // (c) 1995 ArJay Exports/Prestige Games
-quarterh                        // (c) 1983 Electro-Sports
-quarterha                       // (c) 1983 Electro-Sports
-quarterhb                       // (c) 1983 Electro-Sports
+quarterh                        // (c) 1983 Electro-Sport
+quarterha                       // (c) 1983 Electro-Sport
+quarterhb                       // (c) 1983 Electro-Sport
 
 @source:dynadice.cpp
 dynadice                        // ?
@@ -13103,6 +13105,13 @@ egghunt                         // (c) 1995 Invi Image
 einst256                        //
 einstein                        //
 
+@source:elan_ep3a19a.cpp
+tvbg3a
+tvbg3b
+tvbg3c
+tvbg6a
+tvbg6b
+
 @source:elan_eu3a14.cpp
 rad_gtg
 rad_rsg
@@ -13674,7 +13683,7 @@ checkc4                         //
 @source:fidel_cc7.cpp
 backgamc                        //
 cc7                             //
-cc7o                            //
+cc7a                            //
 
 @source:fidel_chesster.cpp
 chesster                        //
@@ -16370,6 +16379,7 @@ starwbc                         // Kenner
 starwbcp                        // Kenner (patent)
 stopthief                       // Parker Bros
 stopthiefp                      // Parker Bros (patent)
+subwars                         // Tiger Electronics
 tandy12                         // Tandy Corporation
 tbreakup                        // Tomy
 tc4                             // Coleco
@@ -19546,6 +19556,7 @@ lc80_2                          //
 
 @source:lckydraw.cpp
 lckydraw                        // (c) 1979 Mirco
+lckydrawa                       // (c) 1979 Mirco
 
 @source:lcmate2.cpp
 lcmate2                         //
@@ -22865,8 +22876,9 @@ realbroda                       // (c) 1995 Merit
 spitboss                        // (c) 1988 Merit
 
 @source:merits.cpp
-scrpiond                        //
-scrpionda                       //
+scrpiond                        // (c) 1999 Merit Industries, Inc.
+scrpionda                       // (c) 1997 Merit Industries, Inc.
+scrpiondb                       // (c) 1993 Merit Industries, Inc.
 
 @source:meritsdx.cpp
 scrpndx                        //
@@ -23541,11 +23553,13 @@ vs215                           // 1997.06 Virtua Striker 2
 vs215o                          // 1997.06 Virtua Striker 2
 vs298                           // 1998.05 Virtua Striker 2 ver.98
 vs29815                         // 1998.05 Virtua Striker 2 ver.98
-vs299                           // 1998.12 Virtual Striker 2 ver.99
-vs29915                         // 1999.?? Virtual Striker 2 ver.99 (Step 1.5)
-vs299a                          // 1999.?? Virtual Striker 2 ver.99 (rev A)
-vs299b                          // 1999.?? Virtual Striker 2 ver.99 (rev B)
-vs2v991                         // 1999.?? Virtual Striker 2 ver.99.1
+vs299                           // 1998.12 Virtual Striker 2 ver.99 (Export / USA, )
+vs29915                         // 1999.?? Virtual Striker 2 ver.99.1 (Step 1.5, Export / USA, rev B)
+vs29915a                        // 1999.?? Virtual Striker 2 ver.99 (Step 1.5)
+vs29915j                        // 1999.?? Virtual Striker 2 ver.99.1 (Step 1.5, Japan, rev B)
+vs299a                          // 1999.?? Virtual Striker 2 ver.99 (Export / USA, rev A)
+vs299j                          // 1999.?? Virtual Striker 2 ver.99.1 (Japan, rev B)
+vs2v991                         // 1999.?? Virtual Striker 2 ver.99.1 (Export / USA, rev B)
 
 @source:modellot.cpp
 modellot                        //
@@ -31716,6 +31730,7 @@ monkeyba                        // 2001.05 Monkey Ball
 mslug6                          // 2006.02 Metal Slug 6
 mushi2k4                        // 2004.?? MushiKing The King Of Beetles 2004 Second (Japan)
 mushi2k5                        // 2005.?? MushiKing The King Of Beetles 2005 First (Japan)
+mushi2k61                       // 2006.?? MushiKing The King Of Beetles 2006 First (Japan)
 mushi2k62                       // 2006.?? MushiKing The King Of Beetles 2006 Second (Japan)
 mushike                         // 2004.?? MushiKing The King Of Beetle (2K3 2ND Ver. 1.003-, World)
 mushikeo                        // 2004.?? MushiKing The King Of Beetle (2K3 2ND Ver. 1.002-, World)
@@ -32405,6 +32420,7 @@ npssr2                          //
 npusagif                        //
 
 @source:neptunp2.cpp
+ccorsario                       // (c) 2002 Cirsa / Unidesa
 neptunp2                        // (c) 2003 Cirsa / Unidesa
 rockroll                        // (c) 1999 Cirsa / Unidesa
 unk960606                       // (c) 2001? Cirsa / Unidesa
@@ -32880,6 +32896,7 @@ pkunwar                         // UPL-????? (c) 1985 (Arcade Game TV List - P.9
 pkunwarj                        // UPL-????? (c) 1985 (Arcade Game TV List - P.98, Left, 22 from top)
 raiders5                        // UPL-85004 (c) 1985
 raiders5t                       // UPL-85004 (c) 1985 Taito license
+raiders5ta                      //
 
 @source:novag_cexpert.cpp
 cexpert
@@ -33871,6 +33888,8 @@ pepp0417                        // (c) 1987 IGT - International Game Technology
 pepp0417a                       // (c) 1987 IGT - International Game Technology
 pepp0418                        // (c) 1987 IGT - International Game Technology
 pepp0419                        // (c) 1987 IGT - International Game Technology
+pepp0419a                       // (c) 1987 IGT - International Game Technology
+pepp0419b                       // (c) 1987 IGT - International Game Technology
 pepp0420                        // (c) 1987 IGT - International Game Technology
 pepp0423                        // (c) 1987 IGT - International Game Technology
 pepp0423a                       // (c) 1987 IGT - International Game Technology
@@ -36009,6 +36028,7 @@ pb_l5                           //
 pb_p4                           //
 
 @source:s11b.cpp
+bcats_g4                        //
 bcats_l2                        //
 bcats_l5                        //
 bguns_l7                        //
@@ -42702,6 +42722,7 @@ corv_px3                        //
 corv_px4                        //
 dh_lf2                          //
 dh_lx2                          //
+fs_la5                          //
 fs_lx2                          //
 fs_lx3                          //
 fs_lx4                          //
@@ -42716,6 +42737,7 @@ jb_10r                          //
 jm_05r                          //
 jm_12b                          //
 jm_12r                          //
+nf_08x                          //
 nf_10                           //
 nf_20                           //
 nf_22                           //
@@ -42733,6 +42755,7 @@ tfs_12                          //
 tom_06                          //
 tom_10f                         //
 tom_12                          //
+tom_12a                         //
 tom_13                          //
 tom_14h                         //
 ts_la2                          //

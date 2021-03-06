@@ -125,7 +125,7 @@ private:
 	uint8_t disc2_io50_port_r();
 	void disc2_io50_port_w(uint8_t data);
 
-	DECLARE_FLOPPY_FORMATS(minidisc_formats);
+	static void minidisc_formats(format_registration &fr);
 
 	bool m_hector_flag_hr;
 	bool m_hector_flag_80c;

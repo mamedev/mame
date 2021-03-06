@@ -234,8 +234,8 @@ void microdec_state::microdec(machine_config &config)
 
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, true, true);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	FLOPPY_CONNECTOR(config, "fdc:0", microdec_floppies, "525hd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	//FLOPPY_CONNECTOR(config, "fdc:1", microdec_floppies, "525hd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", microdec_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	//FLOPPY_CONNECTOR(config, "fdc:1", microdec_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("md2_flop");

@@ -1440,12 +1440,6 @@ void nc100_state::nc100(machine_config &config)
 	rtc.out_alarm_callback().set(FUNC(nc100_state::nc100_tc8521_alarm_callback));
 }
 
-static const floppy_format_type ibmpc_floppy_formats[] = {
-	FLOPPY_PC_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	nullptr
-};
-
 static void ibmpc_floppies(device_slot_interface &device)
 {
 	device.option_add("525dd", FLOPPY_525_DD);
@@ -1476,8 +1470,8 @@ void nc200_state::nc200(machine_config &config)
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(nc200_state::nc200_fdc_interrupt));
-	FLOPPY_CONNECTOR(config, "upd765:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:0", ibmpc_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", ibmpc_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
 
 	MC146818(config, "mc", 4.194304_MHz_XTAL);
 

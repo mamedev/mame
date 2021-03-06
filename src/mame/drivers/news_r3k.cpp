@@ -127,8 +127,6 @@ protected:
 	u8 debug_r() { return m_debug; }
 	void debug_w(u8 data);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
-
 	// devices
 	required_device<r3000a_device> m_cpu;
 	required_device<ram_device> m_ram;
@@ -160,10 +158,6 @@ protected:
 	bool m_lcd_enable;
 	bool m_lcd_dim;
 };
-
-FLOPPY_FORMATS_MEMBER(news_r3k_state::floppy_formats)
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
 
 void news_r3k_state::machine_start()
 {
@@ -455,7 +449,7 @@ void news_r3k_state::common(machine_config &config)
 	UPD72067(config, m_fdc, 16_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set(m_dma, FUNC(dmac_0448_device::irq<1>));
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(dmac_0448_device::drq<1>));
-	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
 	// scsi bus and devices
 	NSCSI_BUS(config, m_scsibus);

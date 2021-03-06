@@ -121,7 +121,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(bebox_keyboard_interrupt);
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_interrupt );
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	uint32_t scsi_fetch(uint32_t dsp);
 	void scsi_irq_callback(int state);

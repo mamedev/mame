@@ -36,7 +36,6 @@
 
     Known to exist but dumps needed
         * Ms Pac Plus
-        * Ms Pac Man Twin
         * MTV Rock-N-Roll Trivia (Part 2), 1 bad rom. It's not a bad dump, the rom is bad.
 
 ****************************************************************************
@@ -285,7 +284,7 @@ Easter eggs:
   Masaya Nakamura is the founder of Namco who originally produced Pac-Man in Japan.
   General Computer Corporation designed Ms. Pac-Man and licensed it to Midway for manufacture in North America.
 
-- Super ABC shows developer credits at boot if IN1 is diconnected.
+- Super ABC shows developer credits at boot if IN1 is disconnected.
 
 Boards:
 -------

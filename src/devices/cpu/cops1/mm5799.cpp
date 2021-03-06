@@ -15,6 +15,12 @@
 DEFINE_DEVICE_TYPE(MM5799, mm5799_device, "mm5799", "National Semiconductor MM5799")
 
 
+// constructor
+mm5799_device::mm5799_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	cops1_base_device(mconfig, MM5799, tag, owner, clock, 11, address_map_constructor(FUNC(mm5799_device::program_map), this), 7, address_map_constructor(FUNC(mm5799_device::data_map), this))
+{ }
+
+
 // internal memory maps
 void mm5799_device::program_map(address_map &map)
 {
@@ -39,12 +45,6 @@ void mm5799_device::data_map(address_map &map)
 			map(i | 0x00, i | 0x07).ram().mirror(0x08);
 	}
 }
-
-
-// device definitions
-mm5799_device::mm5799_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	cops1_base_device(mconfig, MM5799, tag, owner, clock, 11, address_map_constructor(FUNC(mm5799_device::program_map), this), 7, address_map_constructor(FUNC(mm5799_device::data_map), this))
-{ }
 
 
 // disasm

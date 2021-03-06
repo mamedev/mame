@@ -76,7 +76,6 @@ private:
 	uint16_t mem_r(address_space &space, offs_t offset);
 	void mem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_bsy);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_cd);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_io);
@@ -460,10 +459,6 @@ static void pcd_floppies(device_slot_interface &device)
 	device.option_add("55g", TEAC_FD_55G); // 77 tracks
 }
 
-FLOPPY_FORMATS_MEMBER( pcd_state::floppy_formats )
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
-
 static INPUT_PORTS_START(pcx)
 	PORT_START("mmu")
 	PORT_CONFNAME(0x03, 0x00, "MMU Type")
@@ -502,8 +497,8 @@ void pcd_state::pcd(machine_config &config)
 	m_fdc->enmf_rd_callback().set_constant(0);
 
 	// floppy drives
-	FLOPPY_CONNECTOR(config, "fdc:0", pcd_floppies, "55f", pcd_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", pcd_floppies, "55f", pcd_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", pcd_floppies, "55f", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", pcd_floppies, "55f", floppy_image_device::default_pc_floppy_formats);
 
 	// usart
 	SCN2661B(config, m_usart[0], 4.9152_MHz_XTAL);

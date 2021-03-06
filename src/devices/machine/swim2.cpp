@@ -111,6 +111,7 @@ void swim2_device::flush_write(u64 when)
 		m_flux_write_count = 0;
 		if(last_on_edge)
 			m_flux_write[m_flux_write_count++] = when;
+		m_flux_write_start = when;
 	} else
 		m_flux_write_count = 0;
 }
@@ -448,7 +449,7 @@ void swim2_device::sync()
 					crc_clear();
 			}
 			m_current_bit --;
-			bool bit = (m_sr >> m_current_bit) & 1;
+			int bit = (m_sr >> m_current_bit) & 1;
 			if(!(m_sr & M_MARK))
 				crc_update(bit);
 			m_tss_sr = (m_tss_sr << 1) | bit;

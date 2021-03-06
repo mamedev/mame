@@ -2418,9 +2418,15 @@ void viper_state::machine_start()
 	save_item(STRUCT_MEMBER(m_epic.global_timer, base_count));
 	save_item(STRUCT_MEMBER(m_epic.global_timer, enable));
 
+	m_unk_serial_bit_w = 0;
+	std::fill(std::begin(m_unk_serial_regs), std::end(m_unk_serial_regs), 0);
+
 	m_ds2430_data_count = 0;
 	m_ds2430_state = 0;
 	m_ds2430_reset = 0;
+
+	std::fill(std::begin(m_voodoo3_pci_reg), std::end(m_voodoo3_pci_reg), 0);
+	std::fill(std::begin(m_mpc8240_regs), std::end(m_mpc8240_regs), 0);
 }
 
 void viper_state::machine_reset()

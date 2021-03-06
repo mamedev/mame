@@ -228,9 +228,11 @@ static void abc_fd2_floppies(device_slot_interface &device)
 	device.option_add("525sssd", FLOPPY_525_SSSD);
 }
 
-FLOPPY_FORMATS_MEMBER( abc_fd2_device::floppy_formats )
-	FLOPPY_ABC_FD2_FORMAT
-FLOPPY_FORMATS_END
+void abc_fd2_device::floppy_formats(format_registration &fr)
+{
+	fr.add_fm_containers();
+	fr.add(FLOPPY_ABC_FD2_FORMAT);
+}
 
 
 //-------------------------------------------------

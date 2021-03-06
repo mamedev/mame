@@ -56,19 +56,6 @@ void isa8_myb3k_fdc471x_device_base::map(address_map &map)
 	map(0x05, 0x05).r(FUNC(isa8_myb3k_fdc471x_device_base::myb3k_fdc_status));
 }
 
-FLOPPY_FORMATS_MEMBER( isa8_myb3k_fdc4710_device::myb3k_floppy_formats )
-	FLOPPY_IMD_FORMAT
-FLOPPY_FORMATS_END
-
-FLOPPY_FORMATS_MEMBER( isa8_myb3k_fdc4711_device::myb3k_floppy_formats )
-	FLOPPY_PC_FORMAT,
-	FLOPPY_IMD_FORMAT
-FLOPPY_FORMATS_END
-
-FLOPPY_FORMATS_MEMBER( isa8_myb3k_fdc4712_device::myb3k_floppy_formats )
-	FLOPPY_IMD_FORMAT
-FLOPPY_FORMATS_END
-
 static void myb3k_sd_floppies(device_slot_interface &device)
 {
 	device.option_add("525sd", FLOPPY_525_SD);
@@ -97,8 +84,8 @@ void isa8_myb3k_fdc471x_device_base::device_add_mconfig(machine_config &config)
 void isa8_myb3k_fdc4710_device::device_add_mconfig(machine_config &config)
 {
 	MB8876(config, m_fdc, XTAL(15'974'400) / 8); /* From StepOne schematics */
-	FLOPPY_CONNECTOR(config, m_floppy_connectors[0], myb3k_sd_floppies, "525sd", isa8_myb3k_fdc4710_device::myb3k_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy_connectors[1], myb3k_sd_floppies, "525sd", isa8_myb3k_fdc4710_device::myb3k_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy_connectors[0], myb3k_sd_floppies, "525sd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy_connectors[1], myb3k_sd_floppies, "525sd", floppy_image_device::default_mfm_floppy_formats);
 
 	isa8_myb3k_fdc471x_device_base::device_add_mconfig(config);
 }
@@ -107,10 +94,10 @@ void isa8_myb3k_fdc4710_device::device_add_mconfig(machine_config &config)
 void isa8_myb3k_fdc4711_device::device_add_mconfig(machine_config &config)
 {
 	FD1791(config, m_fdc, XTAL(15'974'400) / 16);
-	FLOPPY_CONNECTOR(config, m_floppy_connectors[0], myb3k_qd_floppies, "525qd", isa8_myb3k_fdc4711_device::myb3k_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy_connectors[1], myb3k_qd_floppies, "525qd", isa8_myb3k_fdc4711_device::myb3k_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy_connectors[2], myb3k_qd_floppies, "525qd", isa8_myb3k_fdc4711_device::myb3k_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy_connectors[3], myb3k_qd_floppies, "525qd", isa8_myb3k_fdc4711_device::myb3k_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy_connectors[0], myb3k_qd_floppies, "525qd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy_connectors[1], myb3k_qd_floppies, "525qd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy_connectors[2], myb3k_qd_floppies, "525qd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy_connectors[3], myb3k_qd_floppies, "525qd", floppy_image_device::default_pc_floppy_formats);
 
 	isa8_myb3k_fdc471x_device_base::device_add_mconfig(config);
 }
@@ -118,10 +105,10 @@ void isa8_myb3k_fdc4711_device::device_add_mconfig(machine_config &config)
 void isa8_myb3k_fdc4712_device::device_add_mconfig(machine_config &config)
 {
 	MB8876(config, m_fdc, XTAL(15'974'400) / 8);
-	FLOPPY_CONNECTOR(config, m_floppy_connectors[0], myb3k_8inch_floppies, "8dsdd", isa8_myb3k_fdc4712_device::myb3k_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy_connectors[1], myb3k_8inch_floppies, "8dsdd", isa8_myb3k_fdc4712_device::myb3k_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy_connectors[2], myb3k_8inch_floppies, "8dsdd", isa8_myb3k_fdc4712_device::myb3k_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy_connectors[3], myb3k_8inch_floppies, "8dsdd", isa8_myb3k_fdc4712_device::myb3k_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy_connectors[0], myb3k_8inch_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy_connectors[1], myb3k_8inch_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy_connectors[2], myb3k_8inch_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy_connectors[3], myb3k_8inch_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats);
 
 	isa8_myb3k_fdc471x_device_base::device_add_mconfig(config);
 }

@@ -20,7 +20,9 @@ public:
 	// configuration helpers
 	// I/O ports:
 
-	//..
+	// 8-bit R I/O
+	auto read_r() { return m_read_r.bind(); }
+	auto write_r() { return m_write_r.bind(); }
 
 	// set MCU mask options:
 
@@ -59,7 +61,8 @@ protected:
 	optional_device<pla_device> m_opla; // segment output PLA
 
 	// i/o handlers
-	//..
+	devcb_read8 m_read_r;
+	devcb_write8 m_write_r;
 
 	// internal state, regs
 	u16 m_pc;
@@ -67,8 +70,10 @@ protected:
 	u8 m_op;
 	u8 m_prev_op;
 	u8 m_prev2_op;
+	u8 m_prev3_op;
 	int m_stack_levels;
 	u16 m_stack[2]; // max 2
+	int m_d_pins;
 
 	u8 m_a;
 	u8 m_b;
@@ -81,11 +86,15 @@ protected:
 	int m_prev_c;
 	int m_c_in;
 	bool m_c_delay;
+	u8 m_s;
 	bool m_skip;
 	int m_skip_count;
 
+	u8 m_cha;
+	u8 m_chb;
+
 	// misc handlers
-	virtual bool op_is_prefix(u8 op) = 0;
+	virtual bool op_is_tr(u8 op) = 0;
 	void cycle();
 	void increment_pc();
 };

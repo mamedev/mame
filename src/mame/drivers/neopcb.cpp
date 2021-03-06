@@ -147,7 +147,7 @@ ROM_START( ms5pcb ) /* Encrypted Set, JAMMA PCB */
 
 	ROM_Y_ZOOM
 
-	ROM_REGION( 0x1000000, "ymsnd", 0 )
+	ROM_REGION( 0x1000000, "ymsnd:adpcma", 0 )
 	/* Encrypted */
 	ROM_LOAD( "268-v1.v1", 0x000000, 0x1000000, CRC(8458afe5) SHA1(62b4c6e7db763e9ff2697bbcdb43dc5a56b48c68) )
 
@@ -185,7 +185,7 @@ ROM_START( svcpcb ) /* Encrypted Set, JAMMA PCB */
 
 	ROM_Y_ZOOM
 
-	ROM_REGION( 0x1000000, "ymsnd", 0 )
+	ROM_REGION( 0x1000000, "ymsnd:adpcma", 0 )
 	/* Encrypted */
 	ROM_LOAD( "269-v1.v1", 0x000000, 0x800000, CRC(c659b34c) SHA1(1931e8111ef43946f68699f8707334c96f753a1e) )
 	ROM_LOAD( "269-v2.v2", 0x800000, 0x800000, CRC(dd903835) SHA1(e58d38950a7a8697bb22a1cc7a371ae6664ae8f9) )
@@ -224,7 +224,7 @@ ROM_START( svcpcba ) /* Encrypted Set, JAMMA PCB */
 
 	ROM_Y_ZOOM
 
-	ROM_REGION( 0x1000000, "ymsnd", 0 )
+	ROM_REGION( 0x1000000, "ymsnd:adpcma", 0 )
 	/* Encrypted */
 	ROM_LOAD( "269-v1a.v1", 0x000000, 0x1000000, CRC(a6af4753) SHA1(ec4f61a526b707a7faec4653b773beb3bf3a17ba) )
 
@@ -263,7 +263,7 @@ ROM_START( kf2k3pcb ) /* Encrypted Set, JAMMA PCB */
 
 	ROM_Y_ZOOM
 
-	ROM_REGION( 0x1000000, "ymsnd", 0 )
+	ROM_REGION( 0x1000000, "ymsnd:adpcma", 0 )
 	/* Encrypted */
 	ROM_LOAD( "271-v1.v1", 0x000000, 0x1000000, CRC(1d96154b) SHA1(1d4e262b0d30cee79a4edc83bb9706023c736668) )
 
@@ -441,8 +441,8 @@ void neopcb_state::kf2k3pcb_sp1_decrypt()
 #define spr_region_size memregion("sprites")->bytes()
 #define fix_region memregion("fixed")->base()
 #define fix_region_size memregion("fixed")->bytes()
-#define ym_region memregion("ymsnd")->base()
-#define ym_region_size memregion("ymsnd")->bytes()
+#define ym_region memregion("ymsnd:adpcma")->base()
+#define ym_region_size memregion("ymsnd:adpcma")->bytes()
 #define audiocpu_region memregion("audiocpu")->base()
 #define audio_region_size memregion("audiocpu")->bytes()
 #define audiocrypt_region memregion("audiocrypt")->base()

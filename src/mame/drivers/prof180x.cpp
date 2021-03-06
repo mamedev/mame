@@ -246,10 +246,10 @@ void prof180x_state::prof180x(machine_config &config)
 
 	/* devices */
 	UPD765A(config, FDC9268_TAG, 8'000'000, false, true);
-	FLOPPY_CONNECTOR(config, FDC9268_TAG ":0", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, FDC9268_TAG ":1", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, FDC9268_TAG ":2", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, FDC9268_TAG ":3", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC9268_TAG ":0", prof180x_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC9268_TAG ":1", prof180x_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC9268_TAG ":2", prof180x_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC9268_TAG ":3", prof180x_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats);
 
 	//RTC8583(config, MK3835_TAG, rtc_intf);
 

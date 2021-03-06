@@ -2391,7 +2391,8 @@ std::vector<uint8_t> floppy_image_format_t::generate_nibbles_from_bitstream(cons
 		}
 		pos += 8;
 	}
-	pos -= bitstream.size();
+	while(pos >= bitstream.size())
+		pos -= bitstream.size();
 	while(pos < bitstream.size() && bitstream[pos] == 0)
 		pos++;
  found:

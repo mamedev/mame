@@ -12,13 +12,14 @@
 
 #include "emu.h"
 
+#include "cpu/pps41/mm75.h"
 #include "cpu/pps41/mm76.h"
 #include "video/pwm.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
 // internal artwork
-//#include "mastmind.lh"
+#include "mastmind.lh"
 
 //#include "hh_pps41_test.lh" // common test-layout - use external artwork
 
@@ -127,12 +128,12 @@ INPUT_PORTS_END
 void mastmind_state::mastmind(machine_config &config)
 {
 	/* basic machine hardware */
-	MM76(config, m_maincpu, 100000); // approximation
+	MM75(config, m_maincpu, 100000); // approximation
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(3, 0xff);
-	//config.set_default_layout(layout_mastmind);
+	config.set_default_layout(layout_mastmind);
 
 	/* no sound! */
 }
@@ -141,11 +142,11 @@ void mastmind_state::mastmind(machine_config &config)
 
 ROM_START( mastmind )
 	ROM_REGION( 0x0400, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "mm75_a7525-11", 0x0000, 0x0200, BAD_DUMP CRC(d144ee6b) SHA1(1e0b521b1e79f94377780470a52e22ee2deaf1d4) ) // wrong byte/bit ordering
+	ROM_LOAD( "mm75_a7525-11", 0x0000, 0x0200, CRC(39dbdd50) SHA1(72fa5781e9df62d91d57437ded2931fab8253c3c) )
 	ROM_CONTINUE(              0x0380, 0x0080 )
 
-	ROM_REGION( 100, "maincpu:opla", 0 )
-	ROM_LOAD( "mm76_mastmind_output.pla", 0, 100, NO_DUMP ) // that's a lie
+	ROM_REGION( 314, "maincpu:opla", 0 )
+	ROM_LOAD( "mm76_mastmind_output.pla", 0, 314, CRC(84a3a6f2) SHA1(a3baf9a174a02d186769a1a2d81982e6dbdcf1ed) )
 ROM_END
 
 

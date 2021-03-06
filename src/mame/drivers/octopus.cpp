@@ -975,8 +975,8 @@ void octopus_state::octopus(machine_config &config)
 	FD1793(config, m_fdc, 16_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(m_pic1, FUNC(pic8259_device::ir5_w));
 	m_fdc->drq_wr_callback().set(m_dma2, FUNC(am9517a_device::dreq1_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", octopus_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", octopus_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 	SOFTWARE_LIST(config, "fd_list").set_original("octopus");
 
 	PIT8253(config, m_pit, 0);

@@ -6,28 +6,34 @@
 #include "formats/ap2_dsk.h"
 #include "formats/ap_dsk35.h"
 #include "formats/pc_dsk.h"
+#include "formats/fs_prodos.h"
 
-FLOPPY_FORMATS_MEMBER(applefdintf_device::formats_525_13)
-	FLOPPY_EDD_FORMAT,
-	FLOPPY_WOZ_FORMAT,
-	FLOPPY_NIB_FORMAT
-FLOPPY_FORMATS_END
+void applefdintf_device::formats_525_13(format_registration &fr)
+{
+	fr.add(FLOPPY_EDD_FORMAT);
+	fr.add(FLOPPY_WOZ_FORMAT);
+	fr.add(FLOPPY_NIB_FORMAT);
+}
 
-FLOPPY_FORMATS_MEMBER(applefdintf_device::formats_525)
-	FLOPPY_A216S_FORMAT,
-	FLOPPY_RWTS18_FORMAT,
-	FLOPPY_EDD_FORMAT,
-	FLOPPY_WOZ_FORMAT,
-	FLOPPY_NIB_FORMAT
-FLOPPY_FORMATS_END
+void applefdintf_device::formats_525(format_registration &fr)
+{
+	fr.add(FLOPPY_A216S_FORMAT);
+	fr.add(FLOPPY_RWTS18_FORMAT);
+	fr.add(FLOPPY_EDD_FORMAT);
+	fr.add(FLOPPY_WOZ_FORMAT);
+	fr.add(FLOPPY_NIB_FORMAT);
+}
 
-FLOPPY_FORMATS_MEMBER(applefdintf_device::formats_35)
-	FLOPPY_DC42_FORMAT,
-	FLOPPY_WOZ_FORMAT,
-	FLOPPY_APPLE_GCR_FORMAT,
-	FLOPPY_APPLE_2MG_FORMAT,
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
+void applefdintf_device::formats_35(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_DC42_FORMAT);
+	fr.add(FLOPPY_WOZ_FORMAT);
+	fr.add(FLOPPY_APPLE_GCR_FORMAT);
+	fr.add(FLOPPY_APPLE_2MG_FORMAT);
+
+	fr.add(FS_PRODOS);
+}
 
 void applefdintf_device::floppies_525(device_slot_interface &device)
 {

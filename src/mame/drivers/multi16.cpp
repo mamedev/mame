@@ -178,8 +178,8 @@ void multi16_state::multi16(machine_config &config)
 	// floppy
 	MB8866(config, m_fdc, 2000000);
 
-	FLOPPY_CONNECTOR(config, m_floppy[0], multi16_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[1], multi16_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], multi16_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], multi16_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 }
 
 /* ROM definition */

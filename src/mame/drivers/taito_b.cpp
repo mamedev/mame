@@ -3398,7 +3398,7 @@ ROM_START( ryujin ) /* Silkscreened PCB number ET910000B */
 	ROM_LOAD( "ryujin-07.ic28", 0x000000, 0x100000, CRC(34f50980) SHA1(432384bd283389bca17611602eb310726c9d78a4) )
 	ROM_LOAD( "ryujin-06.ic39", 0x100000, 0x100000, CRC(1b85ff34) SHA1(5ad259e6f7aa4a0c08975da73bf41400495f2e61) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "ryujin-08.ic1", 0x00000, 0x80000, CRC(480d040d) SHA1(50add2f304ef34f7f45f25a2a2cf0568d58259ad) )
 
 	ROM_REGION( 0x00400, "plds", 0 )

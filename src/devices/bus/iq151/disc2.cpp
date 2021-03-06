@@ -15,9 +15,11 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-FLOPPY_FORMATS_MEMBER( iq151_disc2_device::floppy_formats )
-	FLOPPY_IQ151_FORMAT
-FLOPPY_FORMATS_END
+void iq151_disc2_device::floppy_formats(format_registration &fr)
+{
+	fr.add_fm_containers();
+	fr.add(FLOPPY_IQ151_FORMAT);
+}
 
 static void iq151_disc2_floppies(device_slot_interface &device)
 {

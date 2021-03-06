@@ -612,8 +612,8 @@ void elwro800_state::elwro800(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	FLOPPY_CONNECTOR(config, "upd765:0", elwro800jr_floppies, "525hd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", elwro800jr_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:0", elwro800jr_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", elwro800jr_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");

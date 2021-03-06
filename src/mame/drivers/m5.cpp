@@ -367,7 +367,7 @@ private:
 	void fd5_ctrl_w(u8 data);
 	void fd5_tc_w(u8 data);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 
@@ -428,7 +428,7 @@ private:
 	void romsel_w(u8 data);
 	void fd_w(u8 data);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	DECLARE_SNAPSHOT_LOAD_MEMBER(brno);
 
@@ -1122,13 +1122,15 @@ void m5_state::ppi_pc_w(u8 data)
 //  upd765_interface fdc_intf
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( m5_state::floppy_formats )
-	FLOPPY_M5_FORMAT
-FLOPPY_FORMATS_END
+void m5_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_M5_FORMAT);
+}
 
 static void m5_floppies(device_slot_interface &device)
 {
-		device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525dd", FLOPPY_525_DD);
 }
 
 static void m5_cart(device_slot_interface &device)
@@ -1294,13 +1296,9 @@ void brno_state::fd_w(u8 data)
 
 
 
-FLOPPY_FORMATS_MEMBER( brno_state::floppy_formats )
-	FLOPPY_DSK_FORMAT
-FLOPPY_FORMATS_END
-
 static void brno_floppies(device_slot_interface &device)
 {
-		device.option_add("35hd", FLOPPY_35_DD);
+	device.option_add("35hd", FLOPPY_35_DD);
 }
 
 
@@ -1629,8 +1627,8 @@ void brno_state::brno(machine_config &config)
 
 	// floppy
 	WD2797(config, m_wdfdc, 4_MHz_XTAL / 4);
-	FLOPPY_CONNECTOR(config, m_floppy0, brno_floppies, "35hd", brno_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, brno_floppies, "35hd", brno_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy0, brno_floppies, "35hd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, brno_floppies, "35hd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	// only one floppy drive
 	//config.device_remove("wd:1");
 

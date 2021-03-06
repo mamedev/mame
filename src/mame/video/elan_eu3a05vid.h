@@ -7,6 +7,7 @@
 #include "elan_eu3a05commonvid.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/bankdev.h"
+#include "screen.h"
 
 class elan_eu3a05vid_device : public elan_eu3a05commonvid_device, public device_memory_interface
 {
@@ -23,6 +24,8 @@ public:
 	void set_is_sudoku();
 	void set_is_pvmilfin();
 	void set_use_spritepages() { m_use_spritepages = true; };
+	void set_force_transpen_ff() { m_force_transpen_ff = true; };
+	void set_force_basic_scroll() { m_force_basic_scroll = true; };
 
 protected:
 	// device-level overrides
@@ -51,7 +54,9 @@ private:
 
 	bool get_tile_data(int base, int drawpri, int& tile, int &attr, int &unk2);
 	void draw_tilemaps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int drawpri);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect);
+	void draw_tilemaps_tileline(int drawpri, int tile, int attr, int unk2, int tilexsize, int tileline, int xpos, uint16_t *row);
+	uint16_t get_tilemapindex_from_xy(uint16_t x, uint16_t y);
 
 	uint8_t read_spriteram(int offset);
 	uint8_t read_vram(int offset);
@@ -84,6 +89,8 @@ private:
 	int m_vrambase;
 	int m_spritebase;
 	bool m_use_spritepages;
+	bool m_force_transpen_ff;
+	bool m_force_basic_scroll;
 };
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A05_VID, elan_eu3a05vid_device)

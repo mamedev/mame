@@ -42,7 +42,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( drq_w );
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;

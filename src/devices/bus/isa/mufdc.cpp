@@ -28,10 +28,11 @@
 DEFINE_DEVICE_TYPE(ISA8_FDC344, fdc344_device, "fdc344", "Ably-Tech FDC-344")
 DEFINE_DEVICE_TYPE(ISA8_FDCMAG, fdcmag_device, "fdcmag", "Magitronic Multi Floppy Controller Card")
 
-FLOPPY_FORMATS_MEMBER( mufdc_device::floppy_formats )
-	FLOPPY_PC_FORMAT,
-	FLOPPY_NASLITE_FORMAT
-FLOPPY_FORMATS_END
+void mufdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_NASLITE_FORMAT);
+}
 
 static void drives(device_slot_interface &device)
 {

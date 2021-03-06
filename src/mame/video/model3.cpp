@@ -197,6 +197,8 @@ void model3_state::video_start()
 
 	m_vid_reg0 = 0;
 
+	std::fill_n(&m_texcache[0][0][0], 2 * (1024 / 32) * (2048 / 32), nullptr);
+
 	m_layer4[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(model3_state::tile_info_layer0_4bit)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_layer8[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(model3_state::tile_info_layer0_8bit)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_layer4[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(model3_state::tile_info_layer1_4bit)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);

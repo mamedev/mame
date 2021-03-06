@@ -1025,10 +1025,12 @@ INPUT_PORTS_START( ti99_hfdc )
 		PORT_DIPSETTING( 0x30, "80 track HD, 2 ms")
 INPUT_PORTS_END
 
-FLOPPY_FORMATS_MEMBER(myarc_hfdc_device::floppy_formats)
-	FLOPPY_TI99_SDF_FORMAT,
-	FLOPPY_TI99_TDF_FORMAT
-FLOPPY_FORMATS_END
+void myarc_hfdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_TI99_SDF_FORMAT);
+	fr.add(FLOPPY_TI99_TDF_FORMAT);
+}
 
 static void hfdc_floppies(device_slot_interface &device)
 {

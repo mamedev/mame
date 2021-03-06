@@ -11,6 +11,9 @@
 #include "cpu/mcs48/mcs48.h"
 #include "machine/nvram.h"
 
+
+namespace {
+
 class lckydraw_state : public genpin_class
 {
 public:
@@ -54,8 +57,17 @@ ROM_START(lckydraw)
 	ROM_LOAD( "lckydrw1.rom", 0x0000, 0x0400, CRC(58ebb50f) SHA1(016ed66b4ee9979aa109c0ce085597a62d33bf8d) )
 	ROM_LOAD( "lckydrw2.rom", 0x0400, 0x0400, CRC(816b9e20) SHA1(0dd8acc633336f250960ebe89cc707fd115afeee) )
 	ROM_LOAD( "lckydrw3.rom", 0x0800, 0x0400, CRC(464155bb) SHA1(5bbf784dba9149575444e6b1250ac9b5c2bced87) )
-
 ROM_END
 
+ROM_START(lckydrawa)
+	ROM_REGION( 0xc00, "maincpu", 0)
+	ROM_LOAD( "lckydrw1.rom", 0x0000, 0x0400, CRC(58ebb50f) SHA1(016ed66b4ee9979aa109c0ce085597a62d33bf8d) )
+	ROM_LOAD( "lckydrw2.rom", 0x0400, 0x0400, CRC(816b9e20) SHA1(0dd8acc633336f250960ebe89cc707fd115afeee) )
+	ROM_LOAD( "lckydrw3b.rom",0x0800, 0x0400, CRC(810de93e) SHA1(0740241f437657f04fbc103a90d25ff6b6db0af5) )
+ROM_END
 
-GAME( 1979, lckydraw, 0, lckydraw, lckydraw, lckydraw_state, empty_init, ROT0, "Mirco", "Lucky Draw (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )
+} // Anonymous namespace
+
+
+GAME( 1979, lckydraw,  0,        lckydraw, lckydraw, lckydraw_state, empty_init, ROT0, "Mirco", "Lucky Draw (pinball, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, lckydrawa, lckydraw, lckydraw, lckydraw, lckydraw_state, empty_init, ROT0, "Mirco", "Lucky Draw (pinball, set 2)", MACHINE_IS_SKELETON_MECHANICAL )

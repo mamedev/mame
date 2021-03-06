@@ -503,11 +503,11 @@ void alphatpc16_state::alphatpc16(machine_config &config)
 	m_z80->set_addrmap(AS_PROGRAM, &alphatpc16_state::apc16_z80_map);
 	m_z80->set_addrmap(AS_IO, &alphatpc16_state::apc16_z80_io);
 	WD1770(config, m_wdfdc, 8_MHz_XTAL);
-	FLOPPY_CONNECTOR(config, m_flop0, atpc16_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_flop0, atpc16_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 	dynamic_cast<device_slot_interface *>(m_flop0.target())->set_fixed(true);
-	FLOPPY_CONNECTOR(config, m_flop1, atpc16_floppies, "525dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_flop2, atpc16_floppies, "525dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_flop3, atpc16_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_flop1, atpc16_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_flop2, atpc16_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_flop3, atpc16_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	i8741a_device& i8741(I8741A(config, "i8741", 4.608_MHz_XTAL));
 	i8741.p1_in_cb().set(FUNC(alphatpc16_state::p1_r));

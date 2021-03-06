@@ -1551,6 +1551,11 @@ void x68k_state::machine_start()
 	m_mouse.irqactive = false;
 	m_current_ipl = 0;
 	m_adpcm.rate = 0;
+	m_adpcm.clock = 0;
+	m_sysport.sram_writeprotect = 0;
+	m_sysport.monitor = 0;
+	m_bus_error = false;
+	m_led_state = 0;
 }
 
 void x68k_state::driver_init()
@@ -1601,10 +1606,12 @@ void x68030_state::driver_init()
 	m_is_32bit = true;
 }
 
-FLOPPY_FORMATS_MEMBER( x68k_state::floppy_formats )
-	FLOPPY_XDF_FORMAT,
-	FLOPPY_DIM_FORMAT
-FLOPPY_FORMATS_END
+void x68k_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_XDF_FORMAT);
+	fr.add(FLOPPY_DIM_FORMAT);
+}
 
 static void x68k_floppies(device_slot_interface &device)
 {

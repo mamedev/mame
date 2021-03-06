@@ -1062,7 +1062,7 @@ void ccs_state::ccs2422(machine_config &config)
 	rs232.cts_handler().set(m_ins8250, FUNC(ins8250_device::cts_w));
 
 	MB8877(config, m_fdc, 16_MHz_XTAL / 8); // UB1793 or MB8877
-	FLOPPY_CONNECTOR(config, "fdc:0", ccs_floppies, "8sssd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", ccs_floppies, "8sssd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 void ccs300_state::ccs300(machine_config & config)
@@ -1111,7 +1111,7 @@ void ccs300_state::ccs300(machine_config & config)
 	dma.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MB8877(config, m_fdc, 16_MHz_XTAL / 8); // UB1793 or MB8877
-	FLOPPY_CONNECTOR(config, "fdc:0", ccs_floppies, "8sssd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", ccs_floppies, "8sssd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 

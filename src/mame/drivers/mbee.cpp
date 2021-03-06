@@ -782,8 +782,8 @@ void mbee_state::mbee56(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(mbee_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(mbee_state::fdc_drq_w));
 	m_fdc->enmf_rd_callback().set_constant(0);
-	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 void mbee_state::mbee128(machine_config &config)
@@ -806,8 +806,8 @@ void mbee_state::mbee128p(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(mbee_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(mbee_state::fdc_drq_w));
 	m_fdc->enmf_rd_callback().set_constant(0);
-	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 void mbee_state::mbee256(machine_config &config)
@@ -818,8 +818,8 @@ void mbee_state::mbee256(machine_config &config)
 
 	config.device_remove("fdc:0");
 	config.device_remove("fdc:1");
-	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "35dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "35dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	TIMER(config, "newkb_timer").configure_periodic(FUNC(mbee_state::newkb_timer), attotime::from_hz(50));
 }
 
