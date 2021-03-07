@@ -175,6 +175,17 @@
             Hold down the 1P START (the 1 key) while it says INSERT COIN.
             Then insert a coin and play. You will start at level 5.
 
+    - Crash Road (crashrd)
+        * Seems slightly buggy. On the odd occasion it can freeze followed by watchdog reset.
+        * The "hard" level has the same bugs as noted for schaser. It should not be used.
+        * The cocktail mode doesn't work correctly and also should not be used. The directional
+          controls are not scanned during play. The flipscreen signal occurs once at the start
+          of player 2's level, then turns off.
+        * The enemy never goes faster in the inner loop, so the game is much easier to play.
+          It also means that the missing yellow band is never needed.
+        * The "effect" sound (the continuous clunking noise) doesn't seem to be supported, but
+          we'd need a schematic or real machine to find out for sure.
+
     - Space War (Sanritsu)
       * I seem to recall that the flashing ufo had its own sample
         sound, a sort of rattling noise. Unable to find evidence
@@ -1976,6 +1987,8 @@ MACHINE_START_MEMBER(_8080bw_state,polaris)
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
 	save_item(NAME(m_polaris_cloud_speed));
 	save_item(NAME(m_polaris_cloud_pos));
+
+	m_polaris_cloud_pos = m_polaris_cloud_speed = 0;
 }
 
 uint8_t _8080bw_state::polaris_port00_r()

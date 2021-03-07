@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: Dirk Best
+// copyright-holders:Nathan Woods, Dirk Best
 /*************************************************************************
 
     RAM device

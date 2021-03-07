@@ -142,10 +142,10 @@ protected:
 	std::unique_ptr<uint8_t[]> m_c2l;
 	std::unique_ptr<uint8_t[]> m_c2h;
 
-	size_t m_c1l_mask;
-	size_t m_c1h_mask;
-	size_t m_c2l_mask;
-	size_t m_c2h_mask;
+	size_t m_c1l_size;
+	size_t m_c1h_size;
+	size_t m_c2l_size;
+	size_t m_c2h_size;
 
 	plus4_expansion_slot_device *m_slot;
 };

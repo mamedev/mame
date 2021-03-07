@@ -181,6 +181,8 @@
 #include <cstdio>
 
 
+namespace {
+
 #define GENERIC (0)
 #define EPS     (1)
 #define SQ1     (2)
@@ -215,6 +217,8 @@ public:
 		, m_panel(*this, "panel")
 		, m_dmac(*this, "mc68450")
 		, m_mdout(*this, "mdout")
+		, m_rom(*this, "osrom")
+		, m_ram(*this, "osram")
 	{ }
 
 	void sq1(machine_config &config);
@@ -231,6 +235,10 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(esq5505_otis_irq);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<m68000_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
@@ -241,9 +249,8 @@ private:
 	required_device<esqpanel_device> m_panel;
 	optional_device<hd63450_device> m_dmac;
 	required_device<midi_port_device> m_mdout;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	required_region_ptr<uint16_t> m_rom;
+	required_shared_ptr<uint16_t> m_ram;
 
 	uint16_t lower_r(offs_t offset);
 	void lower_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -260,13 +267,13 @@ private:
 
 	int m_system_type;
 	uint8_t m_duart_io;
-	uint8_t otis_irq_state;
-	uint8_t dmac_irq_state;
-	uint8_t duart_irq_state;
+	uint8_t m_otis_irq_state;
+	uint8_t m_dmac_irq_state;
+	uint8_t m_duart_irq_state;
 
 	void update_irq_to_maincpu();
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	void eps_map(address_map &map);
 	void sq1_map(address_map &map);
@@ -276,16 +283,17 @@ private:
 	void cpu_space_map(address_map &map);
 	void eps_cpu_space_map(address_map &map);
 
-	uint16_t  *m_rom, *m_ram;
 	uint16_t m_analog_values[8];
 
 	//dmac
 	DECLARE_WRITE_LINE_MEMBER(dma_irq);
 };
 
-FLOPPY_FORMATS_MEMBER( esq5505_state::floppy_formats )
-	FLOPPY_ESQIMG_FORMAT
-FLOPPY_FORMATS_END
+void esq5505_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ESQIMG_FORMAT);
+}
 
 void esq5505_state::cpu_space_map(address_map &map)
 {
@@ -301,10 +309,9 @@ void esq5505_state::eps_cpu_space_map(address_map &map)
 
 void esq5505_state::machine_start()
 {
-	driver_device::machine_start();
-
-	m_rom = (uint16_t *)(void *)memregion("osrom")->base();
-	m_ram = (uint16_t *)(void *)memshare("osram")->ptr();
+	m_otis_irq_state = 0;
+	m_dmac_irq_state = 0;
+	m_duart_irq_state = 0;
 }
 
 void esq5505_state::machine_reset()
@@ -345,20 +352,20 @@ void esq5505_state::machine_reset()
 
 void esq5505_state::update_irq_to_maincpu()
 {
-	// printf("updating IRQ state: have OTIS=%d, DMAC=%d, DUART=%d\n", otis_irq_state, dmac_irq_state, duart_irq_state);
-	if (duart_irq_state)
+	// printf("updating IRQ state: have OTIS=%d, DMAC=%d, DUART=%d\n", m_otis_irq_state, m_dmac_irq_state, m_duart_irq_state);
+	if (m_duart_irq_state)
 	{
 		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
 	}
-	else if (dmac_irq_state)
+	else if (m_dmac_irq_state)
 	{
 		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
 	}
-	else if (otis_irq_state)
+	else if (m_otis_irq_state)
 	{
 		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
@@ -375,13 +382,6 @@ void esq5505_state::update_irq_to_maincpu()
 uint16_t esq5505_state::lower_r(offs_t offset)
 {
 	offset &= 0x7fff;
-
-	// get pointers when 68k resets
-	if (!m_rom)
-	{
-		m_rom = (uint16_t *)(void *)memregion("osrom")->base();
-		m_ram = (uint16_t *)(void *)memshare("osram")->ptr();
-	}
 
 	if (!machine().side_effects_disabled() && m_maincpu->get_fc() == 0x6)  // supervisor mode = ROM
 	{
@@ -461,7 +461,7 @@ void esq5505_state::sq1_map(address_map &map)
 
 WRITE_LINE_MEMBER(esq5505_state::esq5505_otis_irq)
 {
-	otis_irq_state = (state != 0);
+	m_otis_irq_state = (state != 0);
 	update_irq_to_maincpu();
 }
 
@@ -486,11 +486,11 @@ WRITE_LINE_MEMBER(esq5505_state::duart_irq_handler)
 //    printf("\nDUART IRQ: state %d vector %d\n", state, vector);
 	if (state == ASSERT_LINE)
 	{
-		duart_irq_state = 1;
+		m_duart_irq_state = 1;
 	}
 	else
 	{
-		duart_irq_state = 0;
+		m_duart_irq_state = 0;
 	}
 	update_irq_to_maincpu();
 }
@@ -566,11 +566,11 @@ WRITE_LINE_MEMBER(esq5505_state::dma_irq)
 	if (state != CLEAR_LINE)
 	{
 		logerror("DMAC error, vector = %x\n", m_dmac->iack());
-		dmac_irq_state = 1;
+		m_dmac_irq_state = 1;
 	}
 	else
 	{
-		dmac_irq_state = 0;
+		m_dmac_irq_state = 0;
 	}
 
 	update_irq_to_maincpu();
@@ -1060,6 +1060,9 @@ void esq5505_state::init_denib()
 		pNibbles++;
 	}
 }
+
+} // Anonymous namespace
+
 
 CONS( 1988, eps,    0,   0, eps,   vfx, esq5505_state, init_eps,    "Ensoniq", "EPS",             MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
 CONS( 1989, vfx,    0,   0, vfx,   vfx, esq5505_state, init_denib,  "Ensoniq", "VFX",             MACHINE_NOT_WORKING )  // 2x40 VFD

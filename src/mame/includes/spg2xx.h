@@ -335,6 +335,26 @@ private:
 	required_ioport m_io_p1_extra;
 };
 
+class spg2xx_game_doraphone_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_doraphone_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_portb_data(0),
+		m_io_p1_rows(*this, "P1_ROW%u", 1U)
+	{ }
+
+	void doraphone(machine_config &config);
+
+private:
+	uint16_t porta_r(offs_t offset, uint16_t mem_mask = ~0);
+
+	void portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	uint16_t m_portb_data;
+
+	required_ioport_array<6> m_io_p1_rows;
+};
+
 
 
 #endif // MAME_INCLUDES_SPG2XX_H

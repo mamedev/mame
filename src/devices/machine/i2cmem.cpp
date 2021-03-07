@@ -61,6 +61,7 @@ static inline void ATTR_PRINTF( 3, 4 ) verboselog( device_t *device, int n_level
 
 // device type definition
 DEFINE_DEVICE_TYPE(I2C_24C01,  i2c_24c01_device,  "24c01",  "24C01 I2C Memory")
+DEFINE_DEVICE_TYPE(I2C_PCF8570, i2c_pcf8570_device, "pcf8570",  "PCF8570 I2C Memory")
 DEFINE_DEVICE_TYPE(I2C_PCD8572, i2c_pcd8572_device, "pcd8572",  "PCD8572 I2C Memory")
 DEFINE_DEVICE_TYPE(I2C_PCF8582, i2c_pcf8582_device, "pcf8582",  "PCF8582 I2C Memory")
 DEFINE_DEVICE_TYPE(I2C_24C02,  i2c_24c02_device,  "24c02",  "24C02 I2C Memory")
@@ -117,6 +118,11 @@ i2cmem_device::i2cmem_device(
 
 i2c_24c01_device::i2c_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	i2cmem_device(mconfig, I2C_24C01, tag, owner, clock, 0, 8, 0x80)
+{
+}
+
+i2c_pcf8570_device::i2c_pcf8570_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	i2cmem_device(mconfig, I2C_PCF8570, tag, owner, clock, 0, 0, 0x100)
 {
 }
 

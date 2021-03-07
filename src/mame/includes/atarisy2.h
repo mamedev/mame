@@ -13,9 +13,9 @@
 #include "machine/slapstic.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
-#include "sound/ym2151.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
+#include "sound/ym2151.h"
 #include "video/atarimo.h"
 #include "emupal.h"
 #include "screen.h"
@@ -32,7 +32,6 @@ public:
 		, m_screen(*this, "screen")
 		, m_mob(*this, "mob")
 		, m_slapstic_region(*this, "maincpu")
-		, m_vrambank(*this, "vrambank")
 		, m_playfield_tilemap(*this, "playfield")
 		, m_alpha_tilemap(*this, "alpha")
 		, m_xscroll(*this, "xscroll")
@@ -44,6 +43,9 @@ public:
 		, m_tms5220(*this, "tms")
 		, m_rombank(*this, "rombank%u", 1U)
 		, m_slapstic(*this, "slapstic")
+		, m_vmmu(*this, "vmmu")
+		, m_playfieldt(*this, "playfieldt")
+		, m_playfieldb(*this, "playfieldb")
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
@@ -75,7 +77,6 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<atari_motion_objects_device> m_mob;
 	required_region_ptr<uint16_t> m_slapstic_region;
-	required_device<address_map_bank_device> m_vrambank;
 
 	uint8_t           m_interrupt_enable;
 
@@ -99,6 +100,9 @@ private:
 
 	required_memory_bank_array<2> m_rombank;
 	required_device<atari_slapstic_device> m_slapstic;
+	memory_view m_vmmu;
+	required_shared_ptr<uint16_t> m_playfieldt;
+	required_shared_ptr<uint16_t> m_playfieldb;
 
 	uint8_t           m_sound_reset_state;
 
@@ -146,15 +150,14 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_int);
 	TIMER_CALLBACK_MEMBER(delayed_int_enable_w);
 	TIMER_CALLBACK_MEMBER(reset_yscroll_callback);
-	uint16_t slapstic_r(offs_t offset);
-	void slapstic_w(offs_t offset, uint16_t data);
 	void yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void xscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void playfieldt_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void playfieldb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	static rgb_t RRRRGGGGBBBBIIII(uint32_t raw);
 
 	static const atari_motion_objects_config s_mob_config;
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
-	void vrambank_map(address_map &map);
 };

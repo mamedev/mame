@@ -204,19 +204,23 @@ void special_state::specimx_disk_ctrl_w(offs_t offset, uint8_t data)
 		floppy = con->get_device();
 
 	m_fdc->set_floppy(floppy);
-	floppy->mon_w(0);
 
-	switch(offset)
+	if (floppy)
 	{
-		case 0 :
+		floppy->mon_w(0);
+
+		switch(offset)
+		{
+			case 0 :
 				m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 				break;
-		case 2 :
+			case 2 :
 				floppy->ss_w(data & 1);
 				break;
-		case 3 :
+			case 3 :
 				m_drive = data & 1;
 				break;
+		}
 	}
 }
 

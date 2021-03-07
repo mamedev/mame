@@ -48,11 +48,11 @@
 
 ***************************************************************************/
 
-#define RUN_ADB_MICRO (0)
-#define LOG_ADB (0)
-
 #include "emu.h"
 #include "video/apple2.h"
+
+#define RUN_ADB_MICRO (0)
+#define LOG_ADB (0)
 
 #include "screen.h"
 #include "softlist.h"
@@ -69,10 +69,8 @@
 #include "machine/kb3600.h"
 #include "machine/nvram.h"
 
-#include "machine/applefdc.h"
-#include "machine/sonydriv.h"
-#include "machine/appldriv.h"
-#include "imagedev/flopdrv.h"
+#include "machine/applefdintf.h"
+#include "machine/iwm.h"
 #include "formats/ap2_dsk.h"
 #include "formats/ap_dsk35.h"
 
@@ -128,6 +126,9 @@
 #include "bus/a2bus/uthernet.h"
 
 #include "bus/a2gameio/gameio.h"
+
+
+namespace {
 
 // various timing standards
 #define A2GS_MASTER_CLOCK (XTAL(28'636'363))
@@ -210,7 +211,8 @@ public:
 		  m_bank1_atc(*this, A2GS_B1CXXX_TAG),
 		  m_scc(*this, SCC_TAG),
 		  m_doc(*this, A2GS_DOC_TAG),
-		  m_iwm(*this, A2GS_IWM_TAG),
+		  m_iwm(*this, "fdc"),
+		  m_floppy(*this, "fdc:%d", 0U),
 		  m_kbd(*this, "Y%d", 0),
 		  m_kbspecial(*this, A2GS_KBD_SPEC_TAG),
 		  m_sysconfig(*this, "a2_config"),
@@ -218,8 +220,23 @@ public:
 		  m_kbdrom(*this, "keyboard"),
 		  m_adb_mousex(*this, "adb_mouse_x"),
 		  m_adb_mousey(*this, "adb_mouse_y")
-	{ }
+	{
+		m_cur_floppy = nullptr;
+		m_devsel = 0;
+		m_diskreg = 0;
+	}
 
+	void apple2gs(machine_config &config);
+	void apple2gsr1(machine_config &config);
+
+	void rom1_init() { m_is_rom3 = false; }
+	void rom3_init() { m_is_rom3 = true; }
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	required_device<g65816_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<timer_device> m_scantimer, m_acceltimer;
@@ -240,7 +257,8 @@ public:
 	required_device<address_map_bank_device> m_lcbank, m_lcaux, m_lc00, m_lc01, m_bank0_atc, m_bank1_atc;
 	required_device<z80scc_device> m_scc;
 	required_device<es5503_device> m_doc;
-	required_device<applefdc_base_device> m_iwm;
+	required_device<applefdintf_device> m_iwm;
+	required_device_array<floppy_connector, 4> m_floppy;
 	optional_ioport_array<10> m_kbd;
 	required_ioport m_kbspecial, m_sysconfig;
 	optional_device<ay3600_device> m_ay3600;
@@ -373,14 +391,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(accel_timer);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	void palette_init(palette_device &palette);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	void apple2gs(machine_config &config);
-	void apple2gsr1(machine_config &config);
 
 	void apple2gs_map(address_map &map);
 	void vectors_map(address_map &map);
@@ -404,17 +416,15 @@ public:
 	void rb4000bank_map(address_map &map);
 	void a2gs_es5503_map(address_map &map);
 
-	// temp old IWM hookup
-	int apple2_fdc_has_35();
-	int apple2_fdc_has_525();
-	void apple2_iwm_setdiskreg(u8 data);
+	void phases_w(uint8_t phases);
+	void sel35_w(int sel35);
+	void devsel_w(uint8_t devsel);
+	void hdsel_w(int hdsel);
 
-	u8 m_diskreg;  // move into private when we can
+	floppy_image_device *m_cur_floppy;
+	int m_devsel;
+	u8 m_diskreg;
 
-	void rom1_init() { m_is_rom3 = false; }
-	void rom3_init() { m_is_rom3 = true; }
-
-private:
 	u8 ram0000_r(offs_t offset);
 	void ram0000_w(offs_t offset, u8 data);
 	u8 auxram0000_r(offs_t offset);
@@ -490,8 +500,8 @@ private:
 
 	u8 keyglu_mcu_read(u8 offset);
 	void keyglu_mcu_write(u8 offset, u8 data);
-	u8 keyglu_816_read(u8 offset);
-	void keyglu_816_write(u8 offset, u8 data);
+	[[maybe_unused]] u8 keyglu_816_read(u8 offset);
+	[[maybe_unused]] void keyglu_816_write(u8 offset, u8 data);
 	void keyglu_regen_irqs();
 
 	u8 adbmicro_p0_in();
@@ -506,7 +516,6 @@ private:
 	offs_t dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 	void wdm_trampoline(offs_t offset, u8 data) { }; //m_a2host->wdm_w(space, offset, data); }
 
-private:
 	bool m_is_rom3;
 	int m_speaker_state;
 
@@ -597,6 +606,7 @@ private:
 	void adb_post_response(const u8 *bytes, size_t length);
 	void adb_post_response_1(u8 b);
 	void adb_post_response_2(u8 b1, u8 b2);
+	void adb_post_response_3(u8 b1, u8 b2, u8 b3);
 	void adb_do_command();
 	void adb_write_datareg(u8 data);
 	void adb_write_kmstatus(u8 data);
@@ -688,7 +698,7 @@ private:
 
 #define slow_cycle() \
 {   \
-	if (m_last_speed) \
+	if (!machine().side_effects_disabled() && m_last_speed) \
 	{\
 		m_slow_counter += 0x0001999a; \
 		int cycles = (m_slow_counter >> 16) & 0xffff; \
@@ -853,10 +863,18 @@ WRITE_LINE_MEMBER(apple2gs_state::ay3600_data_ready_w)
 		trans |= (m_kbspecial->read() & 0x08) ? 0x00 : 0x02;    // control is bit 2 (active low)
 		trans |= (m_kbspecial->read() & 0x01) ? 0x0000 : 0x0200;    // caps lock is bit 9 (active low)
 
-		m_transchar = decode[trans];
+		// hack in keypad equals because we can't find it in the IIe keymap (Sather doesn't show it in the matrix, but it's clearly on real platinum IIes)
+		if (m_lastchar == 0x146)
+		{
+			m_transchar = '=';
+		}
+		else
+		{
+			m_transchar = decode[trans];
+		}
 		m_strobe = 0x80;
 
-		//printf("new char = %04x (%02x)\n", m_lastchar, m_transchar);
+//      printf("new char = %04x (%02x)\n", m_lastchar, m_transchar);
 	}
 }
 
@@ -888,7 +906,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::ay3600_repeat)
 
 u8 apple2gs_state::adb_read_memory(u32 address)
 {
-	if (address < ARRAY_LENGTH(m_adb_memory))
+	if (address < std::size(m_adb_memory))
 		return m_adb_memory[address];
 	else
 		return 0x00;
@@ -896,7 +914,7 @@ u8 apple2gs_state::adb_read_memory(u32 address)
 
 void apple2gs_state::adb_write_memory(u32 address, u8 data)
 {
-	if (address < ARRAY_LENGTH(m_adb_memory))
+	if (address < std::size(m_adb_memory))
 		m_adb_memory[address] = data;
 }
 
@@ -912,7 +930,7 @@ void apple2gs_state::adb_set_config(u8 b1, u8 b2, u8 b3)
 
 void apple2gs_state::adb_post_response(const u8 *bytes, size_t length)
 {
-	assert(length < ARRAY_LENGTH(m_adb_response_bytes));
+	assert(length < std::size(m_adb_response_bytes));
 	memcpy(m_adb_response_bytes, bytes, length);
 
 	m_adb_state = ADBSTATE_INRESPONSE;
@@ -933,6 +951,15 @@ void apple2gs_state::adb_post_response_2(u8 b1, u8 b2)
 	adb_post_response(b, 2);
 }
 
+void apple2gs_state::adb_post_response_3(u8 b1, u8 b2, u8 b3)
+{
+	u8 b[3];
+	b[0] = b1;
+	b[1] = b2;
+	b[2] = b3;
+	adb_post_response(b, 3);
+}
+
 void apple2gs_state::adb_do_command()
 {
 	int device;
@@ -946,6 +973,12 @@ void apple2gs_state::adb_do_command()
 	switch(m_adb_command)
 	{
 		case 0x00:  /* ??? */
+			break;
+
+		case 0x01: /* abort */
+			break;
+
+		case 0x02: /* reset keyboard uC */
 			break;
 
 		case 0x03:  /* flush keyboard buffer */
@@ -979,12 +1012,20 @@ void apple2gs_state::adb_do_command()
 			adb_post_response_1(adb_read_memory(address));
 			break;
 
-		case 0x0a: /* ??? */
-		case 0x0b: /* ??? */
+		case 0x0a: /* read modes */
+			adb_post_response_1(m_adb_mode);
+			break;
+
+		case 0x0b: /* read config */
+			adb_post_response_3(0, 0, 0); /* ignored for now */
+			break;
+
+		case 0x0c: /* read adb error */
+			adb_post_response_1(0);
 			break;
 
 		case 0x0d:  /* get version */
-			adb_post_response_1(0x06);
+			adb_post_response_1(m_is_rom3 ? 0x06 : 0x05); /* rom0 0x04 */
 			break;
 
 		case 0x0e:  /* read available charsets */
@@ -995,9 +1036,24 @@ void apple2gs_state::adb_do_command()
 			adb_post_response_2(0x01, 0x00);
 			break;
 
-		case 0x12:  /* mystery command 0x12 */
-		case 0x13:  /* mystery command 0x13 */
+		case 0x10: /* reset system */
 			break;
+
+		case 0x11: /* send adb keycode */
+			break;
+
+		case 0x12:  /* mystery command 0x12 - mouse key parameters */
+		case 0x13:  /* mystery command 0x13 - disk key parameters */
+			break;
+
+		case 0x40: /* reset adb */
+			break;
+
+		case 0x49: case 0x4a: case 0x4b: case 0x4c:
+		case 0x4d: case 0x4e: case 0x4f:
+			/* transmit adb bytes. first byte is adb device command */
+			break;
+
 
 		case 0x84:  // ACS demo disk #2 has a bug and writes this accidentally to $C026
 			break;
@@ -1069,6 +1125,7 @@ void apple2gs_state::adb_write_datareg(u8 data)
 			{
 				case 0x00:  /* ??? */
 				case 0x01:  /* abort */
+				case 0x02:  /* reset keyboard uC */
 					/* do nothing for now */
 					break;
 
@@ -1097,28 +1154,50 @@ void apple2gs_state::adb_write_datareg(u8 data)
 					m_adb_command_length = 2;
 					break;
 
-				case 0x0a:  /* ??? */
-				case 0x0b:  /* ??? */
-					m_adb_command_length = 0;
-					break;
-
+				case 0x0a:  /* read modes */
+				case 0x0b:  /* read config */
+				case 0x0c:  /* read adb error */
 				case 0x0d:  /* get version */
-					m_adb_command_length = 0;
-					break;
-
 				case 0x0e:  /* read available charsets */
-					m_adb_command_length = 0;
-					m_adb_state = ADBSTATE_INCOMMAND;    /* HACK */
-					break;
-
 				case 0x0f:  /* read available layouts */
 					m_adb_command_length = 0;
 					m_adb_state = ADBSTATE_INCOMMAND;    /* HACK */
 					break;
 
-				case 0x12:  /* mystery command 0x12 */
-				case 0x13:  /* mystery command 0x13 */
+				case 0x10: /* reset system */
+					/* do nothing for now */
+					break;
+
+				case 0x11: /* send adb keycode */
+					m_adb_command_length = 1;
+					break;
+
+				case 0x12:  /* mystery command 0x12 - mouse key parameters? */
+				case 0x13:  /* mystery command 0x13 - disk eject parameters? */
 					m_adb_command_length = 2;
+					break;
+
+				case 0x40: /* reset ADB */
+					break;
+
+				/* 0x49 - 0x4f - transmit ADB bytes where length = command & 0xf - 6*/
+				case 0x49: case 0x4a: case 0x4b: case 0x4c:
+				case 0x4d: case 0x4e: case 0x4f:
+					m_adb_command_length = (m_adb_command & 0x0f) - 6;
+					break;
+
+				case 0x50:  /* enable SRQ device 0 */
+				case 0x51:  /* enable SRQ device 1 */
+				case 0x52:  /* enable SRQ device 2 */
+				case 0x53:  /* enable SRQ device 3 */
+					/* ignore for now */
+					break;
+
+				case 0x60:  /* flush adb buffer device 0 */
+				case 0x61:  /* flush adb buffer device 1 */
+				case 0x62:  /* flush adb buffer device 2 */
+				case 0x63:  /* flush adb buffer device 3 */
+					/* ignore for now */
 					break;
 
 				case 0x70:  /* disable SRQ device 0 */
@@ -1159,7 +1238,7 @@ void apple2gs_state::adb_write_datareg(u8 data)
 			break;
 
 		case ADBSTATE_INCOMMAND:
-			assert(m_adb_command_pos < ARRAY_LENGTH(m_adb_command_bytes));
+			assert(m_adb_command_pos < std::size(m_adb_command_bytes));
 //          printf("ADB param %02x\n", data);
 			m_adb_command_bytes[m_adb_command_pos++] = data;
 			break;
@@ -1288,6 +1367,9 @@ void apple2gs_state::machine_start()
 	m_b0_2000bank->set_bank(0);
 	m_b0_4000bank->set_bank(0);
 	m_inh_bank = 0;
+	m_transchar = 0;
+	m_anykeydown = false;
+	std::fill(std::begin(m_megaii_ram), std::end(m_megaii_ram), 0);
 
 	m_nvram->set_base(m_clock_bram, sizeof(m_clock_bram));
 
@@ -2343,7 +2425,11 @@ u8 apple2gs_state::c000_r(offs_t offset)
 				{
 					ret |= 0x10;
 				}
-				else if (m_lastchar >= 0x32 && m_lastchar <= 0x3f)
+				else if (m_lastchar >= 0x32 && m_lastchar <= 0x37)
+				{
+					ret |= 0x10;
+				}
+				else if (m_lastchar >= 0x3c && m_lastchar <= 0x3f)
 				{
 					ret |= 0x10;
 				}
@@ -2351,7 +2437,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 				{
 					ret |= 0x10;
 				}
-				else if (m_lastchar >= 0x109 && m_lastchar <= 0x10a)
+				else if ((m_lastchar >= 0x109 && m_lastchar <= 0x10a) || (m_lastchar == 0x146))
 				{
 					ret |= 0x10;
 				}
@@ -2705,10 +2791,44 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 		case 0x2d:  // SLOTROMSEL
 			m_slotromsel = data;
 			break;
-
 		case 0x31:  // DISKREG
+			if (BIT(m_diskreg, 6) != BIT(data, 6))
+			{
+				if (m_devsel == 1)
+				{
+					if (!BIT(data, 6))
+					{
+						m_cur_floppy = m_floppy[0]->get_device();
+					}
+					else
+					{
+						m_cur_floppy = m_floppy[2]->get_device();
+					}
+				}
+				else if (m_devsel == 2)
+				{
+					if (!BIT(data, 6))
+					{
+						m_cur_floppy = m_floppy[1]->get_device();
+					}
+					else
+					{
+						m_cur_floppy = m_floppy[3]->get_device();
+					}
+				}
+				else
+				{
+					m_cur_floppy = nullptr;
+				}
+
+				m_iwm->set_floppy(m_cur_floppy);
+			}
+
+			if (m_cur_floppy)
+			{
+				m_cur_floppy->ss_w(BIT(data, 7));
+			}
 			m_diskreg = data;
-			apple2_iwm_setdiskreg(m_diskreg);
 			break;
 
 		case 0x32:  // VGCINTCLEAR
@@ -4284,164 +4404,53 @@ u8 apple2gs_state::doc_adc_read()
 	return 0x80;
 }
 
-// temporary hookup of old IWM
-
-int apple2gs_state::apple2_fdc_has_35()
+void apple2gs_state::phases_w(uint8_t phases)
 {
-	return device_type_enumerator<sonydriv_floppy_image_device>(*this).count(); // - apple525_get_count(machine)) > 0;
-}
-
-int apple2gs_state::apple2_fdc_has_525()
-{
-	return 1; //apple525_get_count(machine) > 0;
-}
-
-static void apple2_fdc_set_lines(device_t *device, u8 lines)
-{
-	apple2gs_state *state = device->machine().driver_data<apple2gs_state>();
-	if (state->m_diskreg & 0x40)
+	if (m_cur_floppy)
 	{
-		if (state->apple2_fdc_has_35())
+		m_cur_floppy->seek_phase_w(phases);
+	}
+}
+
+void apple2gs_state::devsel_w(uint8_t devsel)
+{
+	m_devsel = devsel;
+	if (m_devsel == 1)
+	{
+		if (!BIT(m_diskreg, 6))
 		{
-			/* slot 5: 3.5" disks */
-			sony_set_lines(device,lines);
+			m_cur_floppy = m_floppy[0]->get_device();
+		}
+		else
+		{
+			m_cur_floppy = m_floppy[2]->get_device();
+		}
+	}
+	else if (m_devsel == 2)
+	{
+		if (!BIT(m_diskreg, 6))
+		{
+			m_cur_floppy = m_floppy[1]->get_device();
+		}
+		else
+		{
+			m_cur_floppy = m_floppy[3]->get_device();
 		}
 	}
 	else
 	{
-		if (state->apple2_fdc_has_525())
-		{
-			/* slot 6: 5.25" disks */
-			apple525_set_lines(device,lines);
-		}
+		m_cur_floppy = nullptr;
+	}
+	m_iwm->set_floppy(m_cur_floppy);
+	if (m_cur_floppy)
+	{
+		m_cur_floppy->ss_w(BIT(m_diskreg, 7));
 	}
 }
 
-static void apple2_fdc_set_enable_lines(device_t *device,int enable_mask)
+void apple2gs_state::sel35_w(int sel35)
 {
-	apple2gs_state *state = device->machine().driver_data<apple2gs_state>();
-	int slot5_enable_mask = 0;
-	int slot6_enable_mask = 0;
-
-	if (state->m_diskreg & 0x40)
-		slot5_enable_mask = enable_mask;
-	else
-		slot6_enable_mask = enable_mask;
-
-	if (state->apple2_fdc_has_35())
-	{
-		/* set the 3.5" enable lines */
-		sony_set_enable_lines(device,slot5_enable_mask);
-	}
-
-	if (state->apple2_fdc_has_525())
-	{
-		/* set the 5.25" enable lines */
-		apple525_set_enable_lines(device,slot6_enable_mask);
-	}
 }
-
-static u8 apple2_fdc_read_data(device_t *device)
-{
-	apple2gs_state *state = device->machine().driver_data<apple2gs_state>();
-	u8 result = 0x00;
-
-	if (state->m_diskreg & 0x40)
-	{
-		if (state->apple2_fdc_has_35())
-		{
-			/* slot 5: 3.5" disks */
-			result = sony_read_data(device);
-		}
-	}
-	else
-	{
-		if (state->apple2_fdc_has_525())
-		{
-			/* slot 6: 5.25" disks */
-			result = apple525_read_data(device);
-		}
-	}
-	return result;
-}
-
-static void apple2_fdc_write_data(device_t *device, u8 data)
-{
-	apple2gs_state *state = device->machine().driver_data<apple2gs_state>();
-	if (state->m_diskreg & 0x40)
-	{
-		if (state->apple2_fdc_has_35())
-		{
-			/* slot 5: 3.5" disks */
-			sony_write_data(device,data);
-		}
-	}
-	else
-	{
-		if (state->apple2_fdc_has_525())
-		{
-			/* slot 6: 5.25" disks */
-			apple525_write_data(device,data);
-		}
-	}
-}
-
-static int apple2_fdc_read_status(device_t *device)
-{
-	apple2gs_state *state = device->machine().driver_data<apple2gs_state>();
-	int result = 0;
-
-	if (state->m_diskreg & 0x40)
-	{
-		if (state->apple2_fdc_has_35())
-		{
-			/* slot 5: 3.5" disks */
-			result = sony_read_status(device);
-		}
-	}
-	else
-	{
-		if (state->apple2_fdc_has_525())
-		{
-			/* slot 6: 5.25" disks */
-			result = apple525_read_status(device);
-		}
-	}
-	return result;
-}
-
-void apple2gs_state::apple2_iwm_setdiskreg(u8 data)
-{
-	if (apple2_fdc_has_35())
-	{
-		sony_set_sel_line(m_iwm, m_diskreg & 0x80);
-	}
-}
-
-const applefdc_interface apple2_fdc_interface =
-{
-	apple2_fdc_set_lines,           /* set_lines */
-	apple2_fdc_set_enable_lines,    /* set_enable_lines */
-
-	apple2_fdc_read_data,           /* read_data */
-	apple2_fdc_write_data,          /* write_data */
-	apple2_fdc_read_status          /* read_status */
-};
-
-static const floppy_interface apple2gs_floppy35_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(apple35_iigs),
-	"floppy_3_5"
-};
-
-static const floppy_interface apple2gs_floppy525_floppy_interface =
-{
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(apple2),
-	"floppy_5_25"
-};
-
 
 /***************************************************************************
     INPUT PORTS
@@ -4658,7 +4667,7 @@ INPUT_PORTS_START( apple2gs )
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)  PORT_CHAR('\'') PORT_CHAR('\"')
 
 	PORT_START("X7")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS_PAD) PORT_CHAR(UCHAR_MAMEKEY(EQUALS_PAD))
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS_PAD)   PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
@@ -4935,18 +4944,19 @@ void apple2gs_state::apple2gs(machine_config &config)
 	A2BUS_SLOT(config, "sl6", m_a2bus, apple2_cards, nullptr);
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
-	LEGACY_IWM(config, m_iwm, &apple2_fdc_interface);
+	IWM(config, m_iwm, A2GS_7M, 1021800*2);
+	m_iwm->phases_cb().set(FUNC(apple2gs_state::phases_w));
+	m_iwm->sel35_cb().set(FUNC(apple2gs_state::sel35_w));
+	m_iwm->devsel_cb().set(FUNC(apple2gs_state::devsel_w));
 
-	FLOPPY_APPLE(config, FLOPPY_0, &apple2gs_floppy525_floppy_interface, 15, 16);
-	FLOPPY_APPLE(config, FLOPPY_1, &apple2gs_floppy525_floppy_interface, 15, 16);
-
-	FLOPPY_SONY(config, FLOPPY_2, &apple2gs_floppy35_floppy_interface);
-	FLOPPY_SONY(config, FLOPPY_3, &apple2gs_floppy35_floppy_interface);
+	applefdintf_device::add_525(config, m_floppy[0]);
+	applefdintf_device::add_525(config, m_floppy[1]);
+	applefdintf_device::add_35(config, m_floppy[2]);
+	applefdintf_device::add_35(config, m_floppy[3]);
 
 	SOFTWARE_LIST(config, "flop35_list").set_original("apple2gs");
 	SOFTWARE_LIST(config, "flop525_clean").set_compatible("apple2_flop_clcracked"); // No filter on clean cracks yet.
-	// As WOZ images won't load in the 2GS driver yet, comment out the softlist entry.
-	//SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2GS");  // Filter list to compatible disks for this machine.
+	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2GS");  // Filter list to compatible disks for this machine.
 	SOFTWARE_LIST(config, "flop525_misc").set_compatible("apple2_flop_misc");
 }
 
@@ -5097,6 +5107,9 @@ ROM_START(apple2gsr0p2)  // 3/10/1986 Cortland prototype, boots as "Apple //'ing
 	ROM_REGION( 0x800, "keyboard", 0 )
 	ROM_LOAD( "341-0132-d.e12", 0x000, 0x800, CRC(c506efb9) SHA1(8e14e85c645187504ec9d162b3ea614a0c421d32) )
 ROM_END
+
+} // Anonymous namespace
+
 
 /*    YEAR  NAME            PARENT    COMPAT    MACHINE     INPUT     CLASS        INIT  COMPANY           FULLNAME */
 COMP( 1989, apple2gs,     0,        apple2, apple2gs,   apple2gs, apple2gs_state, rom3_init, "Apple Computer", "Apple IIgs (ROM03)", MACHINE_SUPPORTS_SAVE )

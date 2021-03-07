@@ -14,10 +14,10 @@
 #pragma once
 
 #include "cpu/m6502/m6502.h"
-#include "sound/tms5220.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "sound/pokey.h"
+#include "sound/tms5220.h"
+#include "sound/ym2151.h"
 #include "machine/atariscom.h"
 
 

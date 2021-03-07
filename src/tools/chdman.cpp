@@ -504,8 +504,8 @@ public:
 				uint32_t samples = (uint64_t(m_info.rate) * uint64_t(effframe + 1) * uint64_t(1000000) + m_info.fps_times_1million - 1) / uint64_t(m_info.fps_times_1million) - first_sample;
 
 				// loop over channels and read the samples
-				int channels = unsigned((std::min<std::size_t>)(m_info.channels, ARRAY_LENGTH(m_audio)));
-				EQUIVALENT_ARRAY(m_audio, int16_t *) samplesptr;
+				int channels = unsigned((std::min<std::size_t>)(m_info.channels, std::size(m_audio)));
+				int16_t *samplesptr[std::size(m_audio)];
 				for (int chnum = 0; chnum < channels; chnum++)
 				{
 					// read the sound samples
@@ -886,7 +886,7 @@ static int print_help(const std::string &argv0, const command_description &desc,
 	// print usage for this command
 	printf("Usage:\n");
 	printf("   %s %s [options], where valid options are:\n", argv0.c_str(), desc.name);
-	for (int valid = 0; valid < ARRAY_LENGTH(desc.valid_options); valid++)
+	for (int valid = 0; valid < std::size(desc.valid_options); valid++)
 	{
 		// determine whether we are required
 		const char *option = desc.valid_options[valid];
@@ -1527,8 +1527,8 @@ static void do_info(parameters_map &params)
 						codec = CHD_CODEC_MINI + 1 + comptype;
 						break;
 					}
-			if (codec > ARRAY_LENGTH(compression_types))
-				codec = ARRAY_LENGTH(compression_types) - 1;
+			if (codec >= std::size(compression_types))
+				codec = std::size(compression_types) - 1;
 
 			// count stats
 			compression_types[codec]++;
@@ -1538,7 +1538,7 @@ static void do_info(parameters_map &params)
 		printf("\n");
 		printf("     Hunks  Percent  Name\n");
 		printf("----------  -------  ------------------------------------\n");
-		for (int comptype = 0; comptype < ARRAY_LENGTH(compression_types); comptype++)
+		for (int comptype = 0; comptype < std::size(compression_types); comptype++)
 			if (compression_types[comptype] != 0)
 			{
 				// determine the name
@@ -1847,7 +1847,7 @@ static void do_create_hd(parameters_map &params)
 	{
 		uint32_t id = parse_number(template_str->second->c_str());
 
-		if (id >= ARRAY_LENGTH(s_hd_templates))
+		if (id >= std::size(s_hd_templates))
 			report_error(1, "Template '%d' is invalid\n", id);
 
 		cylinders = s_hd_templates[id].cylinders;
@@ -2668,7 +2668,7 @@ static void do_extract_ld(parameters_map &params)
 		avconfig.video = &avvideo;
 		avconfig.maxsamples = max_samples_per_frame;
 		avconfig.actsamples = &actsamples;
-		for (int chnum = 0; chnum < ARRAY_LENGTH(audio_data); chnum++)
+		for (int chnum = 0; chnum < std::size(audio_data); chnum++)
 		{
 			audio_data[chnum].resize(std::max(1U,max_samples_per_frame));
 			avconfig.audio[chnum] = &audio_data[chnum][0];
@@ -2928,7 +2928,7 @@ static void do_list_templates(parameters_map &params)
 	printf("ID  Manufacturer  Model           Cylinders  Heads  Sectors  Sector Size  Total Size\n");
 	printf("------------------------------------------------------------------------------------\n");
 
-	for (int id = 0; id < ARRAY_LENGTH(s_hd_templates); id++)
+	for (int id = 0; id < std::size(s_hd_templates); id++)
 	{
 		printf("%2d  %-13s %-15s %9d  %5d  %7d  %11d  %7d MB\n",
 			id,
@@ -2990,7 +2990,7 @@ int CLIB_DECL main(int argc, char *argv[])
 
 				// iterate over valid options
 				int valid;
-				for (valid = 0; valid < ARRAY_LENGTH(desc.valid_options); valid++)
+				for (valid = 0; valid < std::size(desc.valid_options); valid++)
 				{
 					// reduce to the option name
 					const char *validname = desc.valid_options[valid];
@@ -3001,10 +3001,10 @@ int CLIB_DECL main(int argc, char *argv[])
 
 					// find the matching option description
 					int optnum;
-					for (optnum = 0; optnum < ARRAY_LENGTH(s_options); optnum++)
+					for (optnum = 0; optnum < std::size(s_options); optnum++)
 						if (strcmp(s_options[optnum].name, validname) == 0)
 							break;
-					assert(optnum != ARRAY_LENGTH(s_options));
+					assert(optnum != std::size(s_options));
 
 					// do we match?
 					const option_description &odesc = s_options[optnum];
@@ -3028,12 +3028,12 @@ int CLIB_DECL main(int argc, char *argv[])
 				}
 
 				// if not valid, error
-				if (valid == ARRAY_LENGTH(desc.valid_options))
+				if (valid == std::size(desc.valid_options))
 					return print_help(args[0], desc, "Option not valid for this command");
 			}
 
 			// make sure we got all our required parameters
-			for (int valid = 0; valid < ARRAY_LENGTH(desc.valid_options); valid++)
+			for (int valid = 0; valid < std::size(desc.valid_options); valid++)
 			{
 				const char *validname = desc.valid_options[valid];
 				if (validname == nullptr)

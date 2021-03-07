@@ -383,7 +383,7 @@ void tms9995_device::state_string_export(const device_state_entry &entry, std::s
 {
 	static char const statestr[] = "LAECOPX-----IIII";
 	char flags[17];
-	memset(flags, 0x00, ARRAY_LENGTH(flags));
+	std::fill(std::begin(flags), std::end(flags), 0x00);
 	uint16_t val = 0x8000;
 	if (entry.index()==STATE_GENFLAGS)
 	{

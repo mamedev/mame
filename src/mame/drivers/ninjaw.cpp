@@ -321,7 +321,7 @@ rumbling on a subwoofer in the cabinet.)
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/2610intf.h"
+#include "sound/ym2610.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -959,12 +959,12 @@ ROM_START( ninjaw )
 	ROM_LOAD16_WORD_SWAP( "b31-01.28", 0x00000, 0x80000, CRC(8e8237a7) SHA1(3e181a153d9b4b7f6a620614ea9022285583a5b5) ) /* SCR (screen 3) */
 	ROM_LOAD16_WORD_SWAP( "b31-02.29", 0x80000, 0x80000, CRC(4c3b4e33) SHA1(f99b379be1af085bf102d4d7cf35803e002fe80b) )
 
-	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x180000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "b31-09.18", 0x000000, 0x80000, CRC(60a73382) SHA1(0ddeb86fcd4d19a58e62bf8564f996d17e36e5c5) )
 	ROM_LOAD( "b31-10.17", 0x080000, 0x80000, CRC(c6434aef) SHA1(3348ce87882e3f668aa85bbb517975ec1fc9b6fd) )
 	ROM_LOAD( "b31-11.16", 0x100000, 0x80000, CRC(8da531d4) SHA1(525dfab0a0729e9fb6f0e4c8187bf4ce16321b20) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b31-08.19", 0x000000, 0x80000, CRC(a0a1f87d) SHA1(6b0f8094f3a3ef1ced76984e333e22a17c51af29) )
 
 	ROM_REGION( 0x01000, "user1", 0 )   /* unknown roms */
@@ -1013,12 +1013,12 @@ ROM_START( ninjaw1 )
 	ROM_LOAD16_WORD_SWAP( "b31-01.28", 0x00000, 0x80000, CRC(8e8237a7) SHA1(3e181a153d9b4b7f6a620614ea9022285583a5b5) ) /* SCR (screen 3) */
 	ROM_LOAD16_WORD_SWAP( "b31-02.29", 0x80000, 0x80000, CRC(4c3b4e33) SHA1(f99b379be1af085bf102d4d7cf35803e002fe80b) )
 
-	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x180000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "b31-09.18", 0x000000, 0x80000, CRC(60a73382) SHA1(0ddeb86fcd4d19a58e62bf8564f996d17e36e5c5) )
 	ROM_LOAD( "b31-10.17", 0x080000, 0x80000, CRC(c6434aef) SHA1(3348ce87882e3f668aa85bbb517975ec1fc9b6fd) )
 	ROM_LOAD( "b31-11.16", 0x100000, 0x80000, CRC(8da531d4) SHA1(525dfab0a0729e9fb6f0e4c8187bf4ce16321b20) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b31-08.19", 0x000000, 0x80000, CRC(a0a1f87d) SHA1(6b0f8094f3a3ef1ced76984e333e22a17c51af29) )
 
 	ROM_REGION( 0x01000, "user1", 0 )   /* unknown roms */
@@ -1067,12 +1067,12 @@ ROM_START( ninjawu )
 	ROM_LOAD16_WORD_SWAP( "b31-01.28", 0x00000, 0x80000, CRC(8e8237a7) SHA1(3e181a153d9b4b7f6a620614ea9022285583a5b5) ) /* SCR (screen 3) */
 	ROM_LOAD16_WORD_SWAP( "b31-02.29", 0x80000, 0x80000, CRC(4c3b4e33) SHA1(f99b379be1af085bf102d4d7cf35803e002fe80b) )
 
-	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x180000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "b31-09.18", 0x000000, 0x80000, CRC(60a73382) SHA1(0ddeb86fcd4d19a58e62bf8564f996d17e36e5c5) )
 	ROM_LOAD( "b31-10.17", 0x080000, 0x80000, CRC(c6434aef) SHA1(3348ce87882e3f668aa85bbb517975ec1fc9b6fd) )
 	ROM_LOAD( "b31-11.16", 0x100000, 0x80000, CRC(8da531d4) SHA1(525dfab0a0729e9fb6f0e4c8187bf4ce16321b20) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b31-08.19", 0x000000, 0x80000, CRC(a0a1f87d) SHA1(6b0f8094f3a3ef1ced76984e333e22a17c51af29) )
 
 	ROM_REGION( 0x01000, "user1", 0 )   /* unknown roms */
@@ -1121,12 +1121,12 @@ ROM_START( ninjawj )
 	ROM_LOAD16_WORD_SWAP( "b31-01.28", 0x00000, 0x80000, CRC(8e8237a7) SHA1(3e181a153d9b4b7f6a620614ea9022285583a5b5) ) /* SCR (screen 3) */
 	ROM_LOAD16_WORD_SWAP( "b31-02.29", 0x80000, 0x80000, CRC(4c3b4e33) SHA1(f99b379be1af085bf102d4d7cf35803e002fe80b) )
 
-	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x180000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "b31-09.18", 0x000000, 0x80000, CRC(60a73382) SHA1(0ddeb86fcd4d19a58e62bf8564f996d17e36e5c5) )
 	ROM_LOAD( "b31-10.17", 0x080000, 0x80000, CRC(c6434aef) SHA1(3348ce87882e3f668aa85bbb517975ec1fc9b6fd) )
 	ROM_LOAD( "b31-11.16", 0x100000, 0x80000, CRC(8da531d4) SHA1(525dfab0a0729e9fb6f0e4c8187bf4ce16321b20) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b31-08.19", 0x000000, 0x80000, CRC(a0a1f87d) SHA1(6b0f8094f3a3ef1ced76984e333e22a17c51af29) )
 
 	ROM_REGION( 0x01000, "user1", 0 )   /* unknown roms */
@@ -1172,11 +1172,11 @@ ROM_START( darius2 )
 	ROM_REGION( 0x100000, "tc0100scn_3", 0 )
 	ROM_COPY( "tc0100scn_1", 0x000000, 0x000000, 0x100000 )    /* SCR (screen 3) */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c07-10.95", 0x00000, 0x80000, CRC(4bbe0ed9) SHA1(081b73c4e4d4fa548445e5548573099bcb1e9213) )
 	ROM_LOAD( "c07-11.96", 0x80000, 0x80000, CRC(3c815699) SHA1(0471ff5b0c0da905267f2cee52fd68c8661cccc9) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c07-12.107", 0x00000, 0x80000, CRC(e0b71258) SHA1(0258e308b643d723475824752ebffc4ea29d1ac4) )
 ROM_END
 

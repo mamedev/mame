@@ -217,7 +217,7 @@ void emu3_state::emu3(machine_config &config)
 	m_fdc->intrq_wr_callback().set(*this, FUNC(emu3_state::irq_w<FDCINT>));
 	m_fdc->set_disable_motor_control(true);
 
-	FLOPPY_CONNECTOR(config, "fdc:0", emu3_floppies, "35dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", emu3_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	PIT8254(config, m_pit); // 8254-2
 	m_pit->set_clk<0>(20_MHz_XTAL / 2);

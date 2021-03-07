@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /***************************************************************************
 
-	Philips UDA1344 Stereo Audio Codec skeleton
+    Philips UDA1344 Stereo Audio Codec skeleton
 
 ****************************************************************************/
 
@@ -41,41 +41,41 @@ protected:
 
 	enum : uint8_t
 	{
-		CHIP_ADDR_MASK		= 0xfc,
-		CHIP_ADDR			= 0x14,
+		CHIP_ADDR_MASK      = 0xfc,
+		CHIP_ADDR           = 0x14,
 
-		REG_TYPE_MASK		= 0xc0,
-		REG_TYPE_BIT		= 6,
+		REG_TYPE_MASK       = 0xc0,
+		REG_TYPE_BIT        = 6,
 
-		VOLUME_REG			= 0x00,
-		VOLUME_REG_MASK		= 0x3f,
+		VOLUME_REG          = 0x00,
+		VOLUME_REG_MASK     = 0x3f,
 
-		EQUALIZER_REG		= 0x01,
-		EQUALIZER_REG_MASK	= 0x3f,
-		EQUALIZER_BB_MASK	= 0x3c,
-		EQUALIZER_BB_BIT	= 2,
-		EQUALIZER_TR_MASK	= 0x03,
-		EQUALIZER_TR_BIT	= 0,
+		EQUALIZER_REG       = 0x01,
+		EQUALIZER_REG_MASK  = 0x3f,
+		EQUALIZER_BB_MASK   = 0x3c,
+		EQUALIZER_BB_BIT    = 2,
+		EQUALIZER_TR_MASK   = 0x03,
+		EQUALIZER_TR_BIT    = 0,
 
-		FILTER_REG			= 0x02,
-		FILTER_REG_MASK		= 0x1f,
-		FILTER_DE_MASK		= 0x18,
-		FILTER_DE_BIT		= 3,
-		FILTER_MT_BIT		= 2,
-		FILTER_MODE_MASK	= 0x03,
-		FILTER_MODE_BIT		= 0,
+		FILTER_REG          = 0x02,
+		FILTER_REG_MASK     = 0x1f,
+		FILTER_DE_MASK      = 0x18,
+		FILTER_DE_BIT       = 3,
+		FILTER_MT_BIT       = 2,
+		FILTER_MODE_MASK    = 0x03,
+		FILTER_MODE_BIT     = 0,
 
-		POWER_REG			= 0x03,
-		POWER_REG_MASK		= 0x03,
-		POWER_ADC_BIT		= 1,
-		POWER_DAC_BIT		= 0,
+		POWER_REG           = 0x03,
+		POWER_REG_MASK      = 0x03,
+		POWER_ADC_BIT       = 1,
+		POWER_DAC_BIT       = 0,
 
-		STATUS_REG_MASK		= 0x3f,
-		STATUS_SC_MASK		= 0x30,
-		STATUS_SC_BIT		= 4,
-		STATUS_IF_MASK		= 0x0e,
-		STATUS_IF_BIT		= 1,
-		STATUS_DC_BIT		= 0
+		STATUS_REG_MASK     = 0x3f,
+		STATUS_SC_MASK      = 0x30,
+		STATUS_SC_BIT       = 4,
+		STATUS_IF_MASK      = 0x0e,
+		STATUS_IF_BIT       = 1,
+		STATUS_DC_BIT       = 0
 	};
 
 	sound_stream *m_stream;

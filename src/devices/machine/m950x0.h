@@ -4,7 +4,7 @@
 
     m950x0.h
 
-	STmicro M95010/20/40 SPI-bus EEPROM
+    STmicro M95010/20/40 SPI-bus EEPROM
 
 ***************************************************************************/
 
@@ -46,21 +46,21 @@ protected:
 
 	enum : uint8_t
 	{
-		INSN_WRSR0		= 0x01,
-		INSN_WRITE0		= 0x02,
-		INSN_READ0		= 0x03,
-		INSN_WRDI0		= 0x04,
-		INSN_RDSR0		= 0x05,
-		INSN_WREN0		= 0x06,
+		INSN_WRSR0      = 0x01,
+		INSN_WRITE0     = 0x02,
+		INSN_READ0      = 0x03,
+		INSN_WRDI0      = 0x04,
+		INSN_RDSR0      = 0x05,
+		INSN_WREN0      = 0x06,
 
-		INSN_WRSR1		= 0x09,
-		INSN_WRITE1		= 0x0a,
-		INSN_READ1		= 0x0b,
-		INSN_WRDI1		= 0x0c,
-		INSN_RDSR1		= 0x0d,
-		INSN_WREN1		= 0x0e,
+		INSN_WRSR1      = 0x09,
+		INSN_WRITE1     = 0x0a,
+		INSN_READ1      = 0x0b,
+		INSN_WRDI1      = 0x0c,
+		INSN_RDSR1      = 0x0d,
+		INSN_WREN1      = 0x0e,
 
-		STATUS_WEL_BIT	= 1
+		STATUS_WEL_BIT  = 1
 	};
 
 	const bool m_check_a8;

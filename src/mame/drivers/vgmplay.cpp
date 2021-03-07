@@ -14,15 +14,11 @@
 #include "cpu/m6502/n2a03.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/sh/sh2.h"
-#include "sound/2203intf.h"
-#include "sound/2608intf.h"
-#include "sound/2610intf.h"
-#include "sound/2612intf.h"
 #include "sound/262intf.h"
 #include "sound/3526intf.h"
 #include "sound/3812intf.h"
-#include "sound/ay8910.h"
 #include "sound/8950intf.h"
+#include "sound/ay8910.h"
 #include "sound/c140.h"
 #include "sound/c352.h"
 #include "sound/c6280.h"
@@ -47,7 +43,11 @@
 #include "sound/vgm_visualizer.h"
 #include "sound/x1_010.h"
 #include "sound/ym2151.h"
+#include "sound/ym2203.h"
 #include "sound/ym2413.h"
+#include "sound/ym2608.h"
+#include "sound/ym2610.h"
+#include "sound/ym2612.h"
 #include "sound/ymf271.h"
 #include "sound/ymf278b.h"
 #include "sound/ymz280b.h"
@@ -1329,7 +1329,7 @@ void vgmplay_device::execute_run()
 				uint8_t id = m_file->read_byte(m_pc + 1);
 				if (id == 0xff)
 					for (int i = 0; i < 0xff; i++)
-						m_streams[id].timer->enable(false);
+						m_streams[i].timer->enable(false);
 				else
 					m_streams[id].timer->enable(false);
 

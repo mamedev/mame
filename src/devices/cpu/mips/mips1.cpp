@@ -160,7 +160,7 @@ void mips1core_device_base::device_start()
 	state_add(MIPS1_PC,                   "PC",        m_pc);
 	state_add(MIPS1_COP0 + COP0_Status,   "SR",        m_cop0[COP0_Status]);
 
-	for (unsigned i = 0; i < ARRAY_LENGTH(m_r); i++)
+	for (unsigned i = 0; i < std::size(m_r); i++)
 		state_add(MIPS1_R0 + i, util::string_format("R%d", i).c_str(), m_r[i]);
 
 	state_add(MIPS1_HI, "HI", m_hi);
@@ -751,17 +751,17 @@ void mips1core_device_base::generate_exception(u32 exception, bool refill)
 			{
 			case 1049: // msgsys
 				LOGMASKED(LOG_RISCOS, "asid %d syscall msgsys:%s() (%s)\n",
-					asid, (m_r[5] < ARRAY_LENGTH(msg_syscalls)) ? msg_syscalls[m_r[5]] : "unknown", machine().describe_context());
+					asid, (m_r[5] < std::size(msg_syscalls)) ? msg_syscalls[m_r[5]] : "unknown", machine().describe_context());
 				break;
 
 			case 1052: // shmsys
 				LOGMASKED(LOG_RISCOS, "asid %d syscall shmsys:%s() (%s)\n",
-					asid, (m_r[5] < ARRAY_LENGTH(shm_syscalls)) ? shm_syscalls[m_r[5]] : "unknown", machine().describe_context());
+					asid, (m_r[5] < std::size(shm_syscalls)) ? shm_syscalls[m_r[5]] : "unknown", machine().describe_context());
 				break;
 
 			case 1053: // semsys
 				LOGMASKED(LOG_RISCOS, "asid %d syscall semsys:%s() (%s)\n",
-					asid, (m_r[5] < ARRAY_LENGTH(sem_syscalls)) ? sem_syscalls[m_r[5]] : "unknown", machine().describe_context());
+					asid, (m_r[5] < std::size(sem_syscalls)) ? sem_syscalls[m_r[5]] : "unknown", machine().describe_context());
 				break;
 
 			case 2151: // bsd_sysmips
@@ -773,7 +773,7 @@ void mips1core_device_base::generate_exception(u32 exception, bool refill)
 					break;
 
 				default:
-					if ((m_r[5] > 0x100) && (m_r[5] - 0x100) < ARRAY_LENGTH(mips_syscalls))
+					if ((m_r[5] > 0x100) && (m_r[5] - 0x100) < std::size(mips_syscalls))
 						LOGMASKED(LOG_RISCOS, "asid %d syscall bsd_sysmips:%s() (%s)\n",
 							asid, mips_syscalls[m_r[5] - 0x100], machine().describe_context());
 					else
@@ -784,7 +784,7 @@ void mips1core_device_base::generate_exception(u32 exception, bool refill)
 				break;
 
 			default:
-				if ((m_r[4] > 2000) && (m_r[4] - 2000 < ARRAY_LENGTH(bsd_syscalls)) && bsd_syscalls[m_r[4] - 2000])
+				if ((m_r[4] > 2000) && (m_r[4] - 2000 < std::size(bsd_syscalls)) && bsd_syscalls[m_r[4] - 2000])
 					LOGMASKED(LOG_RISCOS, "asid %d syscall bsd_%s() (%s)\n",
 						asid, bsd_syscalls[m_r[4] - 2000], machine().describe_context());
 				else
@@ -833,7 +833,7 @@ void mips1core_device_base::generate_exception(u32 exception, bool refill)
 			break;
 
 		default:
-			if ((m_r[2] > 1000) && (m_r[2] - 1000 < ARRAY_LENGTH(sysv_syscalls)) && sysv_syscalls[m_r[2] - 1000])
+			if ((m_r[2] > 1000) && (m_r[2] - 1000 < std::size(sysv_syscalls)) && sysv_syscalls[m_r[2] - 1000])
 				LOGMASKED(LOG_RISCOS, "asid %d syscall %s() (%s)\n", asid, sysv_syscalls[m_r[2] - 1000], machine().describe_context());
 			else
 				LOGMASKED(LOG_RISCOS, "asid %d syscall unknown %d (%s)\n", asid, m_r[2], machine().describe_context());
@@ -1245,7 +1245,7 @@ void mips1_device_base::device_start()
 	if (m_fcr0)
 	{
 		state_add(MIPS1_FCR31, "FCSR", m_fcr31);
-		for (unsigned i = 0; i < ARRAY_LENGTH(m_f); i++)
+		for (unsigned i = 0; i < std::size(m_f); i++)
 			state_add(MIPS1_F0 + i, util::string_format("F%d", i * 2).c_str(), m_f[i]);
 	}
 
@@ -1267,7 +1267,7 @@ void mips1_device_base::device_reset()
 	m_reset_time = total_cycles();
 
 	// initialize tlb mru index with identity mapping
-	for (unsigned i = 0; i < ARRAY_LENGTH(m_tlb); i++)
+	for (unsigned i = 0; i < std::size(m_tlb); i++)
 	{
 		m_tlb_mru[TRANSLATE_READ][i] = i;
 		m_tlb_mru[TRANSLATE_WRITE][i] = i;
@@ -1979,7 +1979,7 @@ bool mips1_device_base::memory_translate(int spacenum, int intention, offs_t &ad
 	bool refill = !BIT(address, 31);
 	bool modify = false;
 
-	for (unsigned i = 0; i < ARRAY_LENGTH(m_tlb); i++)
+	for (unsigned i = 0; i < std::size(m_tlb); i++)
 	{
 		unsigned const index = mru[i];
 		u32 const *const entry = m_tlb[index];

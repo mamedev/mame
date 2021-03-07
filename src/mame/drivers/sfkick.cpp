@@ -158,7 +158,7 @@ DIPSW-2
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
-#include "sound/2203intf.h"
+#include "sound/ym2203.h"
 #include "screen.h"
 #include "speaker.h"
 

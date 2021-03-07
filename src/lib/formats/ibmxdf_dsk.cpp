@@ -39,7 +39,7 @@ ibmxdf_format::ibmxdf_format() : wd177x_format(formats)
 
 const char *ibmxdf_format::name() const
 {
-	return "xdf";
+	return "ibmxdf";
 }
 
 const char *ibmxdf_format::description() const

@@ -272,9 +272,9 @@ Notes:
 #include "machine/rp5c01.h"
 #include "machine/te7750.h"
 #include "machine/watchdog.h"
-#include "sound/2203intf.h"
-#include "sound/2610intf.h"
 #include "sound/okim6295.h"
+#include "sound/ym2203.h"
+#include "sound/ym2610.h"
 #include "speaker.h"
 
 
@@ -695,6 +695,16 @@ void taitof2_state::cameltry_map(address_map &map)
 	map(0xa00000, 0xa01fff).rw(m_tc0280grd, FUNC(tc0280grd_device::tc0280grd_word_r), FUNC(tc0280grd_device::tc0280grd_word_w));    /* ROZ tilemap */
 	map(0xa02000, 0xa0200f).w(m_tc0280grd, FUNC(tc0280grd_device::tc0280grd_ctrl_word_w));
 	map(0xd00000, 0xd0001f).w(m_tc0360pri, FUNC(tc0360pri_device::write)).umask16(0x00ff);  /* ?? */
+}
+
+void taitof2_state::driftoutct_map(address_map &map)
+{
+	cameltry_map(map);
+
+	map(0x040000, 0x07ffff).rom();
+	map(0x300018, 0x30001f).unmapr();
+	map(0x300018, 0x300019).portr("PADDLE1");
+	map(0x30001a, 0x30001b).portr("PADDLE2");
 }
 
 void taitof2_state::cameltrya_map(address_map &map)
@@ -2009,6 +2019,16 @@ static INPUT_PORTS_START( driftout )
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( driftoutct )
+	PORT_INCLUDE(driftout)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( gunfront )
 	PORT_START("DSWA")
 	TAITO_MACHINE_NO_COCKTAIL_LOC(SW1)
@@ -2963,6 +2983,13 @@ void taitof2_state::cameltry(machine_config &config)
 	TC0360PRI(config, m_tc0360pri, 0);
 }
 
+void taitof2_state::driftoutct(machine_config &config)
+{
+	cameltry(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitof2_state::driftoutct_map);
+}
+
 void taitof2_state::qtorimon(machine_config &config)
 {
 	taito_f2_tc0220ioc(config);
@@ -3622,10 +3649,10 @@ ROM_START( finalb )
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "b82_10.16",   0x00000, 0x10000, CRC(a38aaaed) SHA1(d476ea516a797e71e0306da54c17ed1759fe1ccd) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b82-02.1",    0x00000, 0x80000, CRC(5dd06bdd) SHA1(6eeaec6743805ba429b0ef58a530bc0740646324) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b82-01.2",    0x00000, 0x80000, CRC(f0eb6846) SHA1(4697c3fd61ac0d55c0d2a4354ff74719947397c5) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -3660,10 +3687,10 @@ ROM_START( finalbj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "b82_10.16",   0x00000, 0x10000, CRC(a38aaaed) SHA1(d476ea516a797e71e0306da54c17ed1759fe1ccd) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b82-02.1",    0x00000, 0x80000, CRC(5dd06bdd) SHA1(6eeaec6743805ba429b0ef58a530bc0740646324) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b82-01.2",    0x00000, 0x80000, CRC(f0eb6846) SHA1(4697c3fd61ac0d55c0d2a4354ff74719947397c5) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -3699,10 +3726,10 @@ ROM_START( finalbu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "b82_10.16",   0x00000, 0x10000, CRC(a38aaaed) SHA1(d476ea516a797e71e0306da54c17ed1759fe1ccd) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b82-02.1",    0x00000, 0x80000, CRC(5dd06bdd) SHA1(6eeaec6743805ba429b0ef58a530bc0740646324) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b82-01.2",    0x00000, 0x80000, CRC(f0eb6846) SHA1(4697c3fd61ac0d55c0d2a4354ff74719947397c5) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -3732,7 +3759,7 @@ ROM_START( dondokod )
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "b95-08.bin",  0x00000, 0x10000, CRC(b5aa49e1) SHA1(83b0a3434e0d0b9aa581c1acdd0c70308362b923) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b95-04.bin",  0x00000, 0x80000, CRC(ac4c1716) SHA1(06a9def7fa3bd739438f4a1d7b55f70eb904bf54) )
 
 	/* no Delta-T samples */
@@ -3757,7 +3784,7 @@ ROM_START( dondokodu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "b95-08.bin",  0x00000, 0x10000, CRC(b5aa49e1) SHA1(83b0a3434e0d0b9aa581c1acdd0c70308362b923) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b95-04.bin",  0x00000, 0x80000, CRC(ac4c1716) SHA1(06a9def7fa3bd739438f4a1d7b55f70eb904bf54) )
 
 	/* no Delta-T samples */
@@ -3782,7 +3809,7 @@ ROM_START( dondokodj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "b95-08.bin",  0x00000, 0x10000, CRC(b5aa49e1) SHA1(83b0a3434e0d0b9aa581c1acdd0c70308362b923) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b95-04.bin",  0x00000, 0x80000, CRC(ac4c1716) SHA1(06a9def7fa3bd739438f4a1d7b55f70eb904bf54) )
 
 	/* no Delta-T samples */
@@ -3808,10 +3835,10 @@ ROM_START( megablst )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c11-12.3", 0x00000, 0x10000, CRC(b11094f1) SHA1(a01e9f7d1f616bb379eaa85ad81b94173b067782) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c11-01.29", 0x00000, 0x80000, CRC(fd1ea532) SHA1(481698b747a421a17bfb8cef96065712d4f3997f) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c11-02.30", 0x00000, 0x80000, CRC(451cc187) SHA1(a682f70bbe6cba2fe2c0a6791e8d33db34eb2cee) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -3843,10 +3870,10 @@ ROM_START( megablstu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c11-12.3", 0x00000, 0x10000, CRC(b11094f1) SHA1(a01e9f7d1f616bb379eaa85ad81b94173b067782) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c11-01.29", 0x00000, 0x80000, CRC(fd1ea532) SHA1(481698b747a421a17bfb8cef96065712d4f3997f) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c11-02.30", 0x00000, 0x80000, CRC(451cc187) SHA1(a682f70bbe6cba2fe2c0a6791e8d33db34eb2cee) )
 ROM_END
 
@@ -3870,10 +3897,10 @@ ROM_START( megablstj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c11-12.3", 0x00000, 0x10000, CRC(b11094f1) SHA1(a01e9f7d1f616bb379eaa85ad81b94173b067782) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c11-01.29", 0x00000, 0x80000, CRC(fd1ea532) SHA1(481698b747a421a17bfb8cef96065712d4f3997f) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c11-02.30", 0x00000, 0x80000, CRC(451cc187) SHA1(a682f70bbe6cba2fe2c0a6791e8d33db34eb2cee) )
 ROM_END
 
@@ -3897,10 +3924,10 @@ ROM_START( thundfox )       /* Thunder Fox */
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c28-14.3",  0x00000, 0x10000, CRC(45ef3616) SHA1(97bf1de7fd32a378839df1845f7522dae776d997) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c28-06.41", 0x00000, 0x80000, CRC(db6983db) SHA1(b72541aa35c48624478060e7453f01956ff1ceb2) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c28-05.42", 0x00000, 0x80000, CRC(d3b238fa) SHA1(b4a0cdd7174e60527e7a47018d6117adc5518da1) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -3932,10 +3959,10 @@ ROM_START( thundfoxu )      /* Thunder Fox */
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c28-14.3",  0x00000, 0x10000, CRC(45ef3616) SHA1(97bf1de7fd32a378839df1845f7522dae776d997) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c28-06.41", 0x00000, 0x80000, CRC(db6983db) SHA1(b72541aa35c48624478060e7453f01956ff1ceb2) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c28-05.42", 0x00000, 0x80000, CRC(d3b238fa) SHA1(b4a0cdd7174e60527e7a47018d6117adc5518da1) )
 
 // Pals: c28-09.25  c28-10.26  c28-11.35  b89-01.19  b89-03.37  b89-04.33
@@ -3961,10 +3988,10 @@ ROM_START( thundfoxj )      /* Thunder Fox */
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c28-14.3",  0x00000, 0x10000, CRC(45ef3616) SHA1(97bf1de7fd32a378839df1845f7522dae776d997) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c28-06.41", 0x00000, 0x80000, CRC(db6983db) SHA1(b72541aa35c48624478060e7453f01956ff1ceb2) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c28-05.42", 0x00000, 0x80000, CRC(d3b238fa) SHA1(b4a0cdd7174e60527e7a47018d6117adc5518da1) )
 ROM_END
 
@@ -3988,7 +4015,7 @@ ROM_START( cameltry )
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c38-08.bin", 0x00000, 0x10000, CRC(7ff78873) SHA1(6574f1c707b8911fa957dd057e1cddc7a1cea99b) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c38-03.bin", 0x000000, 0x020000, CRC(59fa59a7) SHA1(161f11b96a47c8431c33e300f6a509bf804309af) )
 	/* no Delta-T samples */
 ROM_END
@@ -4013,7 +4040,7 @@ ROM_START( cameltryj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c38-08.bin", 0x00000, 0x10000, CRC(7ff78873) SHA1(6574f1c707b8911fa957dd057e1cddc7a1cea99b) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c38-03.bin", 0x000000, 0x020000, CRC(59fa59a7) SHA1(161f11b96a47c8431c33e300f6a509bf804309af) )
 
 	/* no Delta-T samples */
@@ -4084,7 +4111,7 @@ ROM_START( qtorimon )   /* Quiz Torimonochou */
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c41-06.bin",    0x00000, 0x10000, CRC(753a98d8) SHA1(a832a4789194a67a2201da4e4484ab08210e5ccc) )
 
-	ROM_REGION( 0x080000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c41-03.bin",  0x000000, 0x020000, CRC(b2c18e89) SHA1(32eca1721cd8f47e9a6dcb553208ddd0daa67f83) )
 
 	/* no Delta-T samples */
@@ -4107,7 +4134,7 @@ ROM_START( liquidk )
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "c49-08.ic32", 0x00000, 0x10000, CRC(413c310c) SHA1(cecb1c0c9fe3c8b744f95ce29009650a289107ab) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c49-04.ic33",  0x00000, 0x80000, CRC(474d45a4) SHA1(20cb818d753a185973098007e645f1aa75c5528d) )
 
 	/* no Delta-T samples */
@@ -4130,7 +4157,7 @@ ROM_START( liquidku )
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "c49-08.ic32", 0x00000, 0x10000, CRC(413c310c) SHA1(cecb1c0c9fe3c8b744f95ce29009650a289107ab) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c49-04.ic33",  0x00000, 0x80000, CRC(474d45a4) SHA1(20cb818d753a185973098007e645f1aa75c5528d) )
 
 	/* no Delta-T samples */
@@ -4153,7 +4180,7 @@ ROM_START( mizubaku )
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "c49-08.ic32", 0x00000, 0x10000, CRC(413c310c) SHA1(cecb1c0c9fe3c8b744f95ce29009650a289107ab) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c49-04.ic33",  0x00000, 0x80000, CRC(474d45a4) SHA1(20cb818d753a185973098007e645f1aa75c5528d) )
 
 	/* no Delta-T samples */
@@ -4178,7 +4205,7 @@ ROM_START( quizhq ) /* Quiz HQ */
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c53-08.bin",    0x00000, 0x10000, CRC(25187e81) SHA1(c549fbfff6963be93aaf349b240f15b1d578d1f1) )
 
-	ROM_REGION( 0x080000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c53-04.bin",  0x000000, 0x020000, CRC(99890ad4) SHA1(c9be9d21dc72059c39de81e1b73849cc77d6b95d) )
 
 	/* no Delta-T samples */
@@ -4198,7 +4225,7 @@ ROM_START( ssi )
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "c64-09.13",    0x00000, 0x10000, CRC(88d7f65c) SHA1(d6383bf8fd035772fa3c57b26b727eefe1aadd93) )
 
-	ROM_REGION( 0x20000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x20000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c64-02.2",     0x00000, 0x20000, CRC(3cb0b907) SHA1(7cbe437fe584575a2f26a582095fd49665c7003e) )
 
 	/* no Delta-T samples */
@@ -4222,7 +4249,7 @@ ROM_START( ssia )
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "c64-09.13",    0x00000, 0x10000, CRC(88d7f65c) SHA1(d6383bf8fd035772fa3c57b26b727eefe1aadd93) )
 
-	ROM_REGION( 0x20000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x20000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c64-02.2",     0x00000, 0x20000, CRC(3cb0b907) SHA1(7cbe437fe584575a2f26a582095fd49665c7003e) )
 
 	/* no Delta-T samples */
@@ -4246,7 +4273,7 @@ ROM_START( ssib ) // this is identical to majest12u, but the region-defining byt
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "c64-09.ic38",    0x00000, 0x10000, CRC(88d7f65c) SHA1(d6383bf8fd035772fa3c57b26b727eefe1aadd93) )
 
-	ROM_REGION( 0x20000, "ymsnd", 0 )   // ADPCM samples
+	ROM_REGION( 0x20000, "ymsnd:adpcma", 0 )   // ADPCM samples
 	ROM_LOAD( "c64-02.ic1",     0x00000, 0x20000, CRC(3cb0b907) SHA1(7cbe437fe584575a2f26a582095fd49665c7003e) )
 
 	// no Delta-T samples
@@ -4270,7 +4297,7 @@ ROM_START( majest12u )
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "c64-09.13",    0x00000, 0x10000, CRC(88d7f65c) SHA1(d6383bf8fd035772fa3c57b26b727eefe1aadd93) )
 
-	ROM_REGION( 0x20000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x20000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c64-02.2",     0x00000, 0x20000, CRC(3cb0b907) SHA1(7cbe437fe584575a2f26a582095fd49665c7003e) )
 
 	/* no Delta-T samples */
@@ -4296,7 +4323,7 @@ ROM_START( majest12j )
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "c64-09.13",    0x00000, 0x10000, CRC(88d7f65c) SHA1(d6383bf8fd035772fa3c57b26b727eefe1aadd93) )
 
-	ROM_REGION( 0x20000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x20000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c64-02.2",     0x00000, 0x20000, CRC(3cb0b907) SHA1(7cbe437fe584575a2f26a582095fd49665c7003e) )
 
 	/* no Delta-T samples */
@@ -4390,7 +4417,7 @@ ROM_START( gunfront )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c71-12.ic49", 0x00000, 0x10000, CRC(0038c7f8) SHA1(405def36e67949219b6f9394333278ec60ad5783) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c71-01.ic29", 0x000000, 0x100000, CRC(0e73105a) SHA1(c5c9743f68a43273e16f5e5179557f2392505a1e) )
 
 	/* no Delta-T samples */
@@ -4416,7 +4443,7 @@ ROM_START( gunfrontj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c71-12.ic49", 0x00000, 0x10000, CRC(0038c7f8) SHA1(405def36e67949219b6f9394333278ec60ad5783) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c71-01.ic29", 0x000000, 0x100000, CRC(0e73105a) SHA1(c5c9743f68a43273e16f5e5179557f2392505a1e) )
 
 	/* no Delta-T samples */
@@ -4439,10 +4466,10 @@ ROM_START( growl )
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c74-12.ic62", 0x00000, 0x10000, CRC(bb6ed668) SHA1(e8c3a15ccbc788ac57d42bd2cabcdb2db6305489) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c74-04.ic28",   0x000000, 0x100000, CRC(2d97edf2) SHA1(d3a995303facdad4f8e1fdda04eaaec4440ff371) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* Delta-T samples */
 	ROM_LOAD( "c74-05.ic29",   0x000000, 0x080000, CRC(e29c0828) SHA1(f541d724f118130bb7a8f9e790582c68779cc6b6) )
 
 //Pals c74-06.48  c74-07.47
@@ -4465,10 +4492,10 @@ ROM_START( growla )
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c74-12.ic62", 0x00000, 0x10000, CRC(bb6ed668) SHA1(e8c3a15ccbc788ac57d42bd2cabcdb2db6305489) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c74-04.ic28",   0x000000, 0x100000, CRC(2d97edf2) SHA1(d3a995303facdad4f8e1fdda04eaaec4440ff371) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* Delta-T samples */
 	ROM_LOAD( "c74-05.ic29",   0x000000, 0x080000, CRC(e29c0828) SHA1(f541d724f118130bb7a8f9e790582c68779cc6b6) )
 ROM_END
 
@@ -4489,10 +4516,10 @@ ROM_START( growlu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c74-12.ic62", 0x00000, 0x10000, CRC(bb6ed668) SHA1(e8c3a15ccbc788ac57d42bd2cabcdb2db6305489) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c74-04.ic28",   0x000000, 0x100000, CRC(2d97edf2) SHA1(d3a995303facdad4f8e1fdda04eaaec4440ff371) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* Delta-T samples */
 	ROM_LOAD( "c74-05.ic29",   0x000000, 0x080000, CRC(e29c0828) SHA1(f541d724f118130bb7a8f9e790582c68779cc6b6) )
 ROM_END
 
@@ -4513,10 +4540,10 @@ ROM_START( runark )
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c74-12.ic62", 0x00000, 0x10000, CRC(bb6ed668) SHA1(e8c3a15ccbc788ac57d42bd2cabcdb2db6305489) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c74-04.ic28",   0x000000, 0x100000, CRC(2d97edf2) SHA1(d3a995303facdad4f8e1fdda04eaaec4440ff371) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* Delta-T samples */
 	ROM_LOAD( "c74-05.ic29",   0x000000, 0x080000, CRC(e29c0828) SHA1(f541d724f118130bb7a8f9e790582c68779cc6b6) )
 ROM_END
 
@@ -4547,13 +4574,13 @@ ROM_START( growlp )
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "growl_ic3_snd.bin",   0x00000, 0x10000, CRC(f75929e0) SHA1(2dc278f4253d76853bbc3af099784545cfac65ce) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "growl_ic23_ch-a-0_b5d9.bin",   0x00000, 0x40000, CRC(cc9ffbf8) SHA1(834892ce0d40d1b016d202144e683fe98ef374ac) )
 	ROM_LOAD( "growl_ic24_ch-a-1_3c70.bin",   0x40000, 0x40000, CRC(7177b4ad) SHA1(4603893588aba0261b9d50bf70f46c7dad8592a2) )
 	ROM_LOAD( "growl_ic25_ch-a-2_9614.bin",   0x80000, 0x40000, CRC(7c9b1423) SHA1(a8d0d7340bf54d9792e21bd0e4be5edd1bcfbbd4) )
 	ROM_LOAD( "growl_ic26_ch-a-3_fca6.bin",   0xc0000, 0x40000, CRC(db1ecefe) SHA1(7f7c40a9c9aceb41ba799249e57df5f38715d571) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* Delta-T samples */
 	ROM_LOAD( "growl_ic21_ch-b-0_d743.bin",   0x00000, 0x40000, CRC(7a7eab62) SHA1(268d900f84162ba655cb652a1c1865dfc25da4de) )
 	ROM_LOAD( "growl_ic22_ch-b-1_a5f1.bin",   0x40000, 0x40000, CRC(567df833) SHA1(1ad019a9f938ebe2f09bc68b57b6c2623ecd9f46) )
 
@@ -4575,7 +4602,7 @@ ROM_START( mjnquest )   /* Mahjong Quest */
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c77-10",    0x00000, 0x10000, CRC(f16b2c1e) SHA1(f6f13429a0b4e0e4c64991f1acc4ecf85dc64364) )
 
-	ROM_REGION( 0x080000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c77-03",  0x000000, 0x080000, CRC(312f17b1) SHA1(3b45eeb6c6721c532451cb113e6a38da4d8a8cbf) )
 
 	/* no Delta-T samples */
@@ -4597,7 +4624,7 @@ ROM_START( mjnquestb )  /* Mahjong Quest (No Nudity) */
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c77-10",    0x00000, 0x10000, CRC(f16b2c1e) SHA1(f6f13429a0b4e0e4c64991f1acc4ecf85dc64364) )
 
-	ROM_REGION( 0x080000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c77-03",  0x000000, 0x080000, CRC(312f17b1) SHA1(3b45eeb6c6721c532451cb113e6a38da4d8a8cbf) )
 
 	/* no Delta-T samples */
@@ -4621,7 +4648,7 @@ ROM_START( footchmp )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for Z80 code */
 	ROM_LOAD( "c80-15.70", 0x00000, 0x10000, CRC(05aa7fd7) SHA1(7eb10964ea9f43abcda8444f13733a0753a04580) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )     /* YM2610 samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )     /* YM2610 samples */
 	ROM_LOAD( "c80-03.57", 0x000000, 0x100000, CRC(609938d5) SHA1(54c7a7265dee5cb031fd402f4c74858d73bec652) )
 
 	/* no Delta-T samples */
@@ -4649,7 +4676,7 @@ ROM_START( hthero )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c80-15.70", 0x00000, 0x10000, CRC(05aa7fd7) SHA1(7eb10964ea9f43abcda8444f13733a0753a04580) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c80-03.57", 0x000000, 0x100000, CRC(609938d5) SHA1(54c7a7265dee5cb031fd402f4c74858d73bec652) )
 
 	/* no Delta-T samples */
@@ -4673,7 +4700,7 @@ ROM_START( euroch92 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for Z80 code */
 	ROM_LOAD( "ec92_27.rom", 0x00000, 0x10000, CRC(2db48e65) SHA1(43a47ebc91c043a996e966cf808d71256e158494) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* YM2610 samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* YM2610 samples */
 	ROM_LOAD( "c80-03.57", 0x000000, 0x100000, CRC(609938d5) SHA1(54c7a7265dee5cb031fd402f4c74858d73bec652) )   // ec92_03.rom
 
 	/* no Delta-T samples */
@@ -4710,7 +4737,7 @@ ROM_START( footchmpbl )
 	ROM_LOAD( "so7.rom12", 0x00000, 0x07800, CRC(5bf4ca7a) SHA1(dd8b9008eaeef2792cc07828d10b44d9b3e10508) )
 	ROM_CONTINUE(          0x00000, 0x00800 )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )     /* samples (oki?) */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )     /* samples (oki?) */
 	ROM_LOAD( "so3.rom5", 0x000000, 0x80000, CRC(f00fca27) SHA1(9a3c8f99c35604a3df43cc8ff55f50407a358cd7) )
 ROM_END
 
@@ -4731,10 +4758,10 @@ ROM_START( koshien )    /* Ah Eikou no Koshien */
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c81-12.bin", 0x00000, 0x10000, CRC(6e8625b6) SHA1(212d384aa6ed43f5389739863afecbf0ad68af14) )
 
-	ROM_REGION( 0x080000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c81-05.bin",  0x00000, 0x80000, CRC(9c3d71be) SHA1(79f1bb40d8356d9fc93b569c20be15e7fbf34580) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* Delta-T samples */
 	ROM_LOAD( "c81-06.bin",  0x00000, 0x80000, CRC(927833b4) SHA1(c09240e4885d2eace1c64fa6425faeeea0296d98) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
@@ -4762,7 +4789,7 @@ ROM_START( yuyugogo )   /* Yuuyu no QUIZ de GO!GO! */
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "c83-11.1"  , 0x00000, 0x10000, CRC(461e702a) SHA1(f1f4294a7e8acc50473df15a167ba84595c9eb15) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c83-04.5",  0x000000, 0x100000, CRC(2600093a) SHA1(824fde078e0ded58037bd06f888eac4e7487ac82) )
 
 	/* no Delta-T samples */
@@ -4786,10 +4813,10 @@ ROM_START( ninjak )
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c85-14.ic54",     0x00000, 0x10000, CRC(f2a52a51) SHA1(951793c65a3436a7fb36f3058bc7a3b4265a90bb) ) /* SND */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c85-04.ic31",    0x00000, 0x80000, CRC(5afb747e) SHA1(e4f03582221f3a97f0e24693aa77264663eb1b47) ) /* SCH-B */
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c85-05.ic33",    0x00000, 0x80000, CRC(3c1b0ed0) SHA1(08920dc55d695debae3eea5a8ff1d17bb11afd45) ) /* SCH-A */
 ROM_END
 
@@ -4811,10 +4838,10 @@ ROM_START( ninjakj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c85-14.ic54",     0x00000, 0x10000, CRC(f2a52a51) SHA1(951793c65a3436a7fb36f3058bc7a3b4265a90bb) ) /* SND */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c85-04.ic31",    0x00000, 0x80000, CRC(5afb747e) SHA1(e4f03582221f3a97f0e24693aa77264663eb1b47) ) /* SCH-B */
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c85-05.ic33",    0x00000, 0x80000, CRC(3c1b0ed0) SHA1(08920dc55d695debae3eea5a8ff1d17bb11afd45) ) /* SCH-A */
 ROM_END
 
@@ -4836,10 +4863,10 @@ ROM_START( ninjaku )
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c85-14.ic54",     0x00000, 0x10000, CRC(f2a52a51) SHA1(951793c65a3436a7fb36f3058bc7a3b4265a90bb) ) /* SND */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c85-04.ic31",    0x00000, 0x80000, CRC(5afb747e) SHA1(e4f03582221f3a97f0e24693aa77264663eb1b47) ) /* SCH-B */
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c85-05.ic33",    0x00000, 0x80000, CRC(3c1b0ed0) SHA1(08920dc55d695debae3eea5a8ff1d17bb11afd45) ) /* SCH-A */
 ROM_END
 
@@ -4858,7 +4885,7 @@ ROM_START( solfigtr )   /* Solitary Fighter */
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c91-07.62", 0x00000, 0x10000, CRC(e471a05a) SHA1(4d9c2b734aac27819673094dc1843e1ca5fe6994) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c91-04.28", 0x00000, 0x80000, CRC(390b1065) SHA1(ee7ba77634854e4896528ff1bbc308de92a5815b) ) /* Channel A */
 
 	/* no Delta-T samples */
@@ -4882,7 +4909,7 @@ ROM_START( qzquest )    /* Quiz Quest */
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c92-07.5",  0x00000, 0x10000, CRC(3e313db9) SHA1(44f781c7d3df8eacd745dc0af180cec9e1164b89) )
 
-	ROM_REGION( 0x080000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c92-04.9",  0x000000, 0x080000, CRC(e421bb43) SHA1(a89157e65b537b31f5837435dae848adde8a86d1) )
 
 	/* no Delta-T samples */
@@ -4908,7 +4935,7 @@ ROM_START( pulirula )
 	ROM_REGION( 0x20000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c98-14.rom", 0x00000, 0x20000, CRC(a858e17c) SHA1(4389f43035a94e776a25350a8989dcfdb3e4675a) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c98-01.rom", 0x000000, 0x100000, CRC(197f66f5) SHA1(cc5d104033f9ab7d614afd47eeb61a22ef5714ea) )
 
 	/* no Delta-T samples */
@@ -4934,7 +4961,7 @@ ROM_START( pulirulaj )
 	ROM_REGION( 0x20000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "c98-14.rom", 0x00000, 0x20000, CRC(a858e17c) SHA1(4389f43035a94e776a25350a8989dcfdb3e4675a) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c98-01.rom", 0x000000, 0x100000, CRC(197f66f5) SHA1(cc5d104033f9ab7d614afd47eeb61a22ef5714ea) )
 
 	/* no Delta-T samples */
@@ -4960,7 +4987,7 @@ ROM_START( pulirulaa ) // dumped from an original PCB without original ROM label
 	ROM_REGION( 0x20000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "ic50.bin", 0x00000, 0x20000, CRC(e8b68cb8) SHA1(e2ff9df8ae635ffaa3056a97e308b9f0396bdfc6) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c98-01.rom", 0x000000, 0x100000, CRC(197f66f5) SHA1(cc5d104033f9ab7d614afd47eeb61a22ef5714ea) )
 
 	/* no Delta-T samples */
@@ -4983,10 +5010,10 @@ ROM_START( metalb )
 	ROM_REGION( 0x20000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "d12-13.5", 0x00000, 0x20000, CRC(bcca2649) SHA1(d932134416c951d849ae41598f75609d453ed520) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d12-02.10", 0x000000, 0x100000, CRC(79263e74) SHA1(f9ef222239855d593b5855dbf9ea0376ea349c4b) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* Delta-T samples */
 	ROM_LOAD( "d12-05.16", 0x000000, 0x080000, CRC(7fd036c5) SHA1(f412c6302cfba73df110943d7d6679dc908479f7) )
 ROM_END
 
@@ -5007,10 +5034,10 @@ ROM_START( metalbj )
 	ROM_REGION( 0x20000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "d12-13.5", 0x00000, 0x20000, CRC(bcca2649) SHA1(d932134416c951d849ae41598f75609d453ed520) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d12-02.10", 0x000000, 0x100000, CRC(79263e74) SHA1(f9ef222239855d593b5855dbf9ea0376ea349c4b) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* Delta-T samples */
 	ROM_LOAD( "d12-05.16", 0x000000, 0x080000, CRC(7fd036c5) SHA1(f412c6302cfba73df110943d7d6679dc908479f7) )
 ROM_END
 
@@ -5029,7 +5056,7 @@ ROM_START( qzchikyu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "d19-07.5",   0x00000, 0x10000, CRC(a8935f84) SHA1(6f264cf7a52dfb8248b8aeb4ff34477d7ccb0b6d) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d19-04.9",   0x000000, 0x080000, CRC(d3c44905) SHA1(d00bd4f11523b2123383dd852ee5484d907ff904) )
 
 	/* no Delta-T samples */
@@ -5055,7 +5082,7 @@ ROM_START( yesnoj ) /* Yes/No Sinri Tokimeki Chart */
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "d20-06.5",  0x00000, 0x10000, CRC(3eb537dc) SHA1(368a03fc265157faf50612b823a78c820b2519f1) )
 
-	ROM_REGION( 0x100000, "ymsnd", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100000, "ymsnd:adpcma", ROMREGION_ERASE00 )
 	/* no ADPCM samples */
 
 	/* no Delta-T samples */
@@ -5079,7 +5106,7 @@ ROM_START( deadconx )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "d28-10.6", 0x00000, 0x10000, CRC(40805d74) SHA1(172114be692c766622d1235e5c4aa83ad438d9d9) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d28-03.10", 0x000000, 0x100000, CRC(a1804b52) SHA1(f252c473a71a4cf80d9f984fec08e5ae7524a620) )
 
 	/* no Delta-T samples */
@@ -5103,7 +5130,7 @@ ROM_START( deadconxj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "d28-10.6", 0x00000, 0x10000, CRC(40805d74) SHA1(172114be692c766622d1235e5c4aa83ad438d9d9) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d28-03.10", 0x000000, 0x100000, CRC(a1804b52) SHA1(f252c473a71a4cf80d9f984fec08e5ae7524a620) )
 
 	/* no Delta-T samples */
@@ -5127,10 +5154,10 @@ ROM_START( dinorex )
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "d39-12.5",   0x00000, 0x10000, CRC(8292c7c1) SHA1(2ff20726f6cc6d98d860d96b8eb3c10f46b87d58) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d39-07.10",  0x000000, 0x100000, CRC(28262816) SHA1(6df9a31a2edf1dfc23070b41b1da2c0a9e91d1b0) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* Delta-T samples */
 	ROM_LOAD( "d39-08.4",   0x000000, 0x080000, CRC(377b8b7b) SHA1(4905ac3b9b52c70afe5f451f860fb9acd81a1dbb) )
 ROM_END
 
@@ -5152,10 +5179,10 @@ ROM_START( dinorexj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "d39-12.5",   0x00000, 0x10000, CRC(8292c7c1) SHA1(2ff20726f6cc6d98d860d96b8eb3c10f46b87d58) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d39-07.10",  0x000000, 0x100000, CRC(28262816) SHA1(6df9a31a2edf1dfc23070b41b1da2c0a9e91d1b0) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* Delta-T samples */
 	ROM_LOAD( "d39-08.4",   0x000000, 0x080000, CRC(377b8b7b) SHA1(4905ac3b9b52c70afe5f451f860fb9acd81a1dbb) )
 ROM_END
 
@@ -5177,10 +5204,10 @@ ROM_START( dinorexu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "d39-12.5",   0x00000, 0x10000, CRC(8292c7c1) SHA1(2ff20726f6cc6d98d860d96b8eb3c10f46b87d58) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d39-07.10",  0x000000, 0x100000, CRC(28262816) SHA1(6df9a31a2edf1dfc23070b41b1da2c0a9e91d1b0) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* Delta-T samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* Delta-T samples */
 	ROM_LOAD( "d39-08.4",   0x000000, 0x080000, CRC(377b8b7b) SHA1(4905ac3b9b52c70afe5f451f860fb9acd81a1dbb) )
 ROM_END
 
@@ -5200,7 +5227,7 @@ ROM_START( qjinsei )    /* Quiz Jinsei Gekijoh */
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "d48-11",    0x00000, 0x10000, CRC(656c5b54) SHA1(650bcc5920838db5c6613bcf30468d6e296ea017) )
 
-	ROM_REGION( 0x080000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d48-05",  0x000000, 0x080000, CRC(3fefd058) SHA1(338c35c3a086041d28708d4b17e208b590c926d5) )
 
 	/* no Delta-T samples */
@@ -5225,7 +5252,7 @@ ROM_START( qcrayon )    /* Quiz Crayon */
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
 	ROM_LOAD( "d55-15",  0x00000, 0x10000, CRC(ba782eff) SHA1(ce24654db49b9694e444e93b9a8d529a86729e03) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d55-01",  0x000000, 0x100000, CRC(a8309af4) SHA1(dc30b2e019003c58aecaf899668b36dea6e1274e) )
 
 	/* no Delta-T samples */
@@ -5249,7 +5276,7 @@ ROM_START( qcrayon2 )   /* Quiz Crayon 2 */
 	ROM_REGION( 0x10000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "d63-11",    0x00000, 0x10000, CRC(2c7ac9e5) SHA1(2477fb4415781afddc2f4084eca52f53b7d40480) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d63-02",  0x000000, 0x100000, CRC(162ae165) SHA1(8b503d096640ec91cf55e05374b293937965c672) )
 
 	/* no Delta-T samples */
@@ -5272,7 +5299,7 @@ ROM_START( driftout )
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "do_50.rom",  0x00000, 0x10000, CRC(ffe10124) SHA1(a47dfedfa7b352a5db39e7e1ccc666d3c5fb0d75) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "do_snd.rom", 0x00000, 0x80000, CRC(f2deb82b) SHA1(55e39173a475f5ab0b5f573a678a493fb6eefe64) )
 
 	/* no Delta-T samples */
@@ -5295,10 +5322,39 @@ ROM_START( driftoutj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu */
 	ROM_LOAD( "do_50.rom",  0x00000, 0x10000, CRC(ffe10124) SHA1(a47dfedfa7b352a5db39e7e1ccc666d3c5fb0d75) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "do_snd.rom", 0x00000, 0x80000, CRC(f2deb82b) SHA1(55e39173a475f5ab0b5f573a678a493fb6eefe64) )
 
 	/* no Delta-T samples */
+ROM_END
+
+ROM_START( driftoutct ) // conversion on Cameltry hardware
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "l.ic10",  0x00000, 0x80000, CRC(d1f779d3) SHA1(d70a52b74bed88e33da6bdaf34467c0353bef9a8) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "h.ic11",  0x00001, 0x80000, CRC(6ff1c660) SHA1(54e86795a166e49bf472577faddad5c640434414) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x080000, "tc0100scn_1", ROMREGION_ERASEFF )
+	// empty
+
+	ROM_REGION( 0x080000, "sprites", 0 )
+	ROM_LOAD( "do_obj.ic1", 0x00000, 0x80000, CRC(5491f1c4) SHA1(a2e92a9a1e77d9f683f6720947e0622dde48287f) )
+
+	ROM_REGION( 0x080000, "tc0280grd", 0 ) // two identical ROMs here, probably one for each ROZ layer, load them both to reflect this even if MAME only uses one
+	ROM_LOAD( "do_piv.ic27", 0x00000, 0x80000, CRC(c4f012f7) SHA1(4ad6a88f6a7f89b2b4c62c2b376d4e7b43c3d442) )
+	ROM_LOAD( "do_piv.ic29", 0x00000, 0x80000, CRC(c4f012f7) SHA1(4ad6a88f6a7f89b2b4c62c2b376d4e7b43c3d442) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "do_50.ic25",  0x00000, 0x10000, CRC(ffe10124) SHA1(a47dfedfa7b352a5db39e7e1ccc666d3c5fb0d75) )
+
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
+	ROM_LOAD( "do_snd.ic2", 0x00000, 0x80000, CRC(f2deb82b) SHA1(55e39173a475f5ab0b5f573a678a493fb6eefe64) )
+
+	// no Delta-T samples
+
+	ROM_REGION( 0x600, "plds", 0 ) // brute-forced
+	ROM_LOAD( "pal16l8b.ic8",         0x0000, 0x0117, CRC(b2c1d05f) SHA1(163dcf1615098d7ecbd9725f9e679817b51175ba) )
+	ROM_LOAD( "pal16l8b.ic9",         0x0200, 0x0117, CRC(0dd34b78) SHA1(c6f3483b3b3091332f4919a269a727b3809ab12a) )
+	ROM_LOAD( "pal16l8b.c38-07.ic24", 0x0400, 0x0117, CRC(47fc77a9) SHA1(82372b7d60ccffbc4a5ec18d240e473a08940643) )
 ROM_END
 
 ROM_START( driveout )
@@ -5494,5 +5550,6 @@ GAME( 1993, qcrayon,    0,        qcrayon,   qcrayon,    taitof2_state, empty_in
 GAME( 1993, qcrayon2,   0,        qcrayon2,  qcrayon2,   taitof2_state, empty_init,    ROT0,   "Taito Corporation",         "Crayon Shinchan Orato Asobo (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, driftout,   0,        driftout,  driftout,   taitof2_state, empty_init,    ROT270, "Visco",                     "Drift Out (Europe)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, driftoutct, driftout, driftoutct,driftoutct, taitof2_state, empty_init,    ROT270, "Visco",                     "Drift Out (Europe, Cameltry conversion)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, driftoutj,  driftout, driftout,  driftout,   taitof2_state, empty_init,    ROT270, "Visco",                     "Drift Out (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, driveout,   driftout, driveout,  driftout,   taitof2_state, init_driveout, ROT270, "bootleg",                   "Drive Out (bootleg)", MACHINE_SUPPORTS_SAVE )

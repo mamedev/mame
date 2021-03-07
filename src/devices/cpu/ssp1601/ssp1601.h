@@ -45,6 +45,8 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	virtual tiny_rom_entry const *device_rom_region() const override;
+
 private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;

@@ -41661,7 +41661,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Densha Daisuki (Japan) [SLPS-01753].bin" size="233473632" crc="abaf63a4" sha1="a5afc173700c8fc15d5f1efc307f51603b30f313"/>
 		<rom name="Densha Daisuki (Japan) [SLPS-01753].cue" size="367" crc="9f71930c" sha1="711fad6b3a92f738711baa1b05d4b9f62999c672"/>
 		-->
-		<description>Densha Daisuki - Play Rail ga Ippai (Jpn)</description>
+		<description>Densha Daisuki - Plarail ga Ippai (Jpn)</description>
 		<year>1998</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="SLPS-01753" />
@@ -44007,11 +44007,12 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Galeoz (Japan) [SLPS-00621].bin" size="416543904" crc="b2087c38" sha1="972e1d727ea5d808ba15607e02cfd1c2b62df53c"/>
 		<rom name="Galeoz (Japan) [SLPS-00621].cue" size="442" crc="a1b335fb" sha1="e6eba67248f4ae4b829b55fd343c02866184a2f4"/>
 		-->
-		<description>ΓΑΛΕΟΖ (Jpn)</description>
+		<description>GALEOZ (Jpn)</description>
 		<year>1996</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="SLPS-00621" />
 		<info name="release" value="19961220" />
+		<info name="alt_title" value="ΓΑΛΕΟΖ"/>
 		<info name="alt_title" value="ガレオス"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -44092,7 +44093,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Gunbare! Game Tengoku 2 (Japan) (Track 2) [SLPS-01322].bin" size="8742384" crc="f082a565" sha1="5a574c15b2713fe5aae9dcb07d6124c2547f9363"/>
 		<rom name="Gunbare! Game Tengoku 2 (Japan) [SLPS-01322].cue" size="233" crc="0d05f602" sha1="405b9db2a63f93593dd75ee200dbb5efb40cfdf9"/>
 		-->
-		<description>Gunbare! Game Tengoku - The Game Paradise 2 (Jpn)</description>
+		<description>GUNbare! Game Tengoku - The Game Paradise 2 (Jpn)</description>
 		<year>1998</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="SLPS-01322" />
@@ -47651,11 +47652,12 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Kukuro Sea Toro - Eternal Eyes (Japan) [SLPS-02385].bin" size="382350528" crc="f7ae75a6" sha1="e0d1894ef9caa250c1a5f4f16e41ea075c179286"/>
 		<rom name="Kukuro Sea Toro - Eternal Eyes (Japan) [SLPS-02385].cue" size="117" crc="4ab2c164" sha1="0b410503a84da819ccd67478da5f4003c414e6f7"/>
 		-->
-		<description>Koukλoθεαtρo - Yuukyuu no Hitomi (Jpn)</description>
+		<description>Kouklotheatro - Yuukyuu no Hitomi (Jpn)</description>
 		<year>1999</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SLPS-02385" />
 		<info name="release" value="19991202" />
+		<info name="alt_title" value="Κουκλοθεατρο 悠久の瞳"/>
 		<info name="alt_title" value="ククロセアトロ 悠久の瞳"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
@@ -55476,7 +55478,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Simple 1500 Series Vol.071 - The Renai Simulation 2 (Japan) [SLPM-86870].bin" size="457358160" crc="42119dd6" sha1="df53b442ae2471711f9e88499b20576e789c905c"/>
 		<rom name="Simple 1500 Series Vol.071 - The Renai Simulation 2 (Japan) [SLPM-86870].cue" size="138" crc="65a4dbb6" sha1="8de9f5cbe5f99115783f68253d601c674de35cfd"/>
 		-->
-		<description>Simple 1500 Series vol.71 - The Renai Simulation 2 (Jpn)</description>
+		<description>Simple 1500 Series vol.71 - The Ren'ai Simulation 2 (Jpn)</description>
 		<year>2001</year>
 		<publisher>D3 Publisher</publisher>
 		<info name="serial" value="SLPM-86870" />
@@ -56977,7 +56979,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Toca Touring Car Championship (Japan) [SLPS-01410].bin" size="451593408" crc="1e32795b" sha1="13482e77d47ece248f7a8ef88658aa75195cac38"/>
 		<rom name="Toca Touring Car Championship (Japan) [SLPS-01410].cue" size="403" crc="e8468861" sha1="236e15d87818ac3a9e8a70f051879ba864f4e913"/>
 		-->
-		<description>Toca Touring Car Championship (Jpn)</description>
+		<description>TOCA Touring Car Championship (Jpn)</description>
 		<year>1998</year>
 		<publisher>Upstar</publisher>
 		<info name="serial" value="SLPS-01410" />

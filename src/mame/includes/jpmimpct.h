@@ -76,7 +76,7 @@ public:
 	void impact_nonvideo_altreels(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed);
-	template <unsigned N> DECLARE_READ_LINE_MEMBER( coinsense_r ) {	return (m_coinstate >> N) & 1; }
+	template <unsigned N> DECLARE_READ_LINE_MEMBER( coinsense_r ) { return (m_coinstate >> N) & 1; }
 
 	DECLARE_READ_LINE_MEMBER(hopper_b_0_r);
 	DECLARE_READ_LINE_MEMBER(hopper_b_3_r);
@@ -151,6 +151,8 @@ private:
 	int m_slidesout;
 	int m_hopper[3];
 	int m_motor[3];
+	int m_volume_latch;
+	int m_global_volume;
 	uint16_t m_coinstate;
 	required_device_array<timer_device, 6> m_cointimer;
 

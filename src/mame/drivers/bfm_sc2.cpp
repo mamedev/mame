@@ -150,8 +150,8 @@ Adder hardware:
 
 #include "video/bfm_adr2.h"
 
-#include "sound/ym2413.h"
 #include "sound/upd7759.h"
+#include "sound/ym2413.h"
 
 /* fruit machines only */
 #include "video/awpvid.h"
@@ -996,6 +996,7 @@ void bfm_sc2_state::payout_triac_w(uint8_t data)
 
 		if ( slide )
 		{
+			slide--;  // slide_pay_sensor index is 0 to 5, so decrement now.
 			if ( data == 0x4D )
 			{
 				if ( !m_slide_states[slide] )

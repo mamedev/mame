@@ -17,13 +17,12 @@
 #include <string>
 
 #include "../frontend/mame/ui/menuitem.h"
-#include "../frontend/mame/ui/sliderchangednotifier.h"
 
 struct slider_state;
 class bgfx_effect;
 class chain_manager;
 
-class bgfx_input_pair : public slider_changed_notifier
+class bgfx_input_pair
 {
 public:
 	bgfx_input_pair(int index, std::string sampler, std::string texture, std::vector<std::string> available_textures, std::string selection, chain_manager& chains, uint32_t screen_index);
@@ -39,7 +38,6 @@ public:
 	std::vector<ui::menu_item> get_slider_list();
 
 private:
-	virtual int32_t slider_changed(running_machine &machine, void *arg, int /*id*/, std::string *str, int32_t newval) override;
 	void create_selection_slider(uint32_t screen_index);
 	bool needs_sliders();
 

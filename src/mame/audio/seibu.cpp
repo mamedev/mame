@@ -82,8 +82,10 @@ seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char
 		m_rom_bank(*this, finder_base::DUMMY_TAG),
 		m_main2sub_pending(0),
 		m_sub2main_pending(0),
-		m_rst10_irq(0xff),
-		m_rst18_irq(0xff)
+		m_rst10_irq(false),
+		m_rst18_irq(false),
+		m_rst10_service(false),
+		m_rst18_service(false)
 {
 }
 
@@ -118,6 +120,8 @@ void seibu_sound_device::device_start()
 	save_item(NAME(m_sub2main_pending));
 	save_item(NAME(m_rst10_irq));
 	save_item(NAME(m_rst18_irq));
+	save_item(NAME(m_rst10_service));
+	save_item(NAME(m_rst18_service));
 }
 
 //-------------------------------------------------
@@ -136,37 +140,63 @@ void seibu_sound_device::update_irq_lines(int param)
 
 TIMER_CALLBACK_MEMBER(seibu_sound_device::update_irq_synced)
 {
-	// note: we use 0xff here for inactive irqline
-
 	switch (param)
 	{
-		case VECTOR_INIT:
-			m_rst10_irq = m_rst18_irq = 0xff;
-			break;
+	case VECTOR_INIT:
+		m_rst10_irq = m_rst18_irq = false;
+		m_rst10_service = m_rst18_service = false;
+		break;
 
-		case RST10_ASSERT:
-			m_rst10_irq = 0xd7;
-			break;
+	case RST10_ASSERT:
+		m_rst10_irq = true;
+		break;
 
-		case RST10_CLEAR:
-			m_rst10_irq = 0xff;
-			break;
+	case RST10_CLEAR:
+		m_rst10_irq = false;
+		break;
 
-		case RST18_ASSERT:
-			m_rst18_irq = 0xdf;
-			break;
+	case RST10_ACKNOWLEDGE:
+		m_rst10_service = true;
+		break;
 
-		case RST18_CLEAR:
-			m_rst18_irq = 0xff;
-			break;
+	case RST10_EOI:
+		m_rst10_service = false;
+		break;
+
+	case RST18_ASSERT:
+		m_rst18_irq = true;
+		break;
+
+	case RST18_ACKNOWLEDGE:
+		m_rst18_service = true;
+		m_rst18_irq = false;
+		break;
+
+	case RST18_EOI:
+		m_rst18_service = false;
+		break;
 	}
 
-	m_int_cb((m_rst10_irq & m_rst18_irq) == 0xff ? CLEAR_LINE : ASSERT_LINE);
+	m_int_cb((m_rst10_irq && !m_rst10_service) || (m_rst18_irq && !m_rst18_service) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 IRQ_CALLBACK_MEMBER(seibu_sound_device::im0_vector_cb)
 {
-	return m_rst10_irq & m_rst18_irq;
+	if (m_rst18_irq && !m_rst18_service)
+	{
+		update_irq_lines(RST18_ACKNOWLEDGE);
+		return 0xdf;
+	}
+	else if (m_rst10_irq && !m_rst10_service)
+	{
+		update_irq_lines(RST10_ACKNOWLEDGE);
+		return 0xd7;
+	}
+	else
+	{
+		logerror("Spurious interrupt taken\n");
+		return 0x00;
+	}
 }
 
 
@@ -174,16 +204,18 @@ void seibu_sound_device::irq_clear_w(u8)
 {
 	/* Denjin Makai and SD Gundam doesn't like this, it's tied to the rst18 ack ONLY so it could be related to it. */
 	//update_irq_lines(VECTOR_INIT);
+
+	update_irq_lines(RST18_EOI);
 }
 
 void seibu_sound_device::rst10_ack_w(u8)
 {
-	/* Unused for now */
+	update_irq_lines(RST10_EOI);
 }
 
 void seibu_sound_device::rst18_ack_w(u8)
 {
-	update_irq_lines(RST18_CLEAR);
+	update_irq_lines(RST18_EOI);
 }
 
 WRITE_LINE_MEMBER( seibu_sound_device::fm_irqhandler )

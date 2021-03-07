@@ -859,8 +859,8 @@ void squale_state::squale(machine_config &config)
 
 	/* Floppy */
 	WD1770(config, m_fdc, 8_MHz_XTAL);
-	FLOPPY_CONNECTOR(config, "wd1770:0", squale_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "wd1770:1", squale_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1770:0", squale_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1770:1", squale_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 	//SOFTWARE_LIST(config, "flop525_list").set_original("squale_flop");   // list does not exist
 
 	/* Cartridge slot */

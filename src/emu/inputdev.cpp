@@ -329,7 +329,7 @@ input_item_id input_device::add_item(const char *name, input_item_id itemid, ite
 //  substring search
 //-------------------------------------------------
 
-bool input_device::match_device_id(const char *deviceid) const
+bool input_device::match_device_id(std::string_view deviceid) const
 {
 	std::string deviceidupper(strmakeupper(deviceid));
 	std::string idupper(strmakeupper(m_id));
@@ -684,8 +684,7 @@ input_device_item::input_device_item(input_device &device, const char *name, voi
 	else
 	{
 		// otherwise, create a tokenized name
-		m_token.assign(name);
-		strmakeupper(m_token);
+		m_token.assign(strmakeupper(name));
 		strdelchr(m_token, ' ');
 		strdelchr(m_token, '_');
 	}

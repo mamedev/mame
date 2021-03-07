@@ -273,12 +273,12 @@ void hng64_state::setCameraProjectionMatrix(const uint16_t* packet)
 	// [1]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.
 	// [2]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.
 	// [3]  - ???? ... ? Contains a value
-	// [4]  - xxxx ... Camera projection near   - confirmed by sams64_2
-	// [5]  - xxxx ... Camera projection near   - confirmed by sams64_2
-	// [6]  - xxxx ... Camera projection near   - confirmed by sams64_2
-	// [7]  - xxxx ... Camera projection far (?)
-	// [8]  - xxxx ... Camera projection far (?)
-	// [9]  - xxxx ... Camera projection far (?)
+	// [4]  - xxxx ... Camera projection Z scale
+	// [5]  - xxxx ... Camera projection near Z
+	// [6]  - xxxx ... Camera projection screen Z
+	// [7]  - xxxx ... Camera projection (?)
+	// [8]  - xxxx ... Camera projection (?)
+	// [9]  - xxxx ... Camera projection (?)
 	// [10] - xxxx ... Camera projection right  - confirmed by sams64_2
 	// [11] - xxxx ... Camera projection left   - confirmed by sams64_2
 	// [12] - xxxx ... Camera projection top    - confirmed by sams64_2
@@ -288,33 +288,37 @@ void hng64_state::setCameraProjectionMatrix(const uint16_t* packet)
 	////////////*/
 
 	// Heisted from GLFrustum - 6 parameters...
+	// Gives the x,y extents for the projection plane at screenZ
 	const float left    = uToF(packet[11]);
 	const float right   = uToF(packet[10]);
 	const float top     = uToF(packet[12]);
 	const float bottom  = uToF(packet[13]);
 
-	// TODO: It's unclear how the 3 values combine to make a near clipping plane
-	const float near_   = uToF(packet[6]) + (uToF(packet[6]) * uToF(packet[4]));
-	const float far_    = 0.9f;             // uToF(packet[9]) + (uToF(packet[9]) * uToF(packet[7]));
+	// Mapping to a canonical view volume of the cube from (-1,-1,-1) to (1,1,1)
+	// near maps to z value -1, screenZ (the projection plane) maps to z value 0
+	// and far (which can be determined from near and screenZ) maps to z value of +1
+	const float screenZ = uToF(packet[6]) * uToF(packet[4]) + uToF(packet[6]);
+	const float near    = uToF(packet[5]) * uToF(packet[4]) + uToF(packet[5]);
+	const float far     = -(screenZ * near)/(screenZ - 2.0f*near);
 
-	m_projectionMatrix[0]  = (2.0f*near_)/(right-left);
+	m_projectionMatrix[0]  = (2.0f*screenZ)/(right-left);
 	m_projectionMatrix[1]  = 0.0f;
 	m_projectionMatrix[2]  = 0.0f;
 	m_projectionMatrix[3]  = 0.0f;
 
 	m_projectionMatrix[4]  = 0.0f;
-	m_projectionMatrix[5]  = (2.0f*near_)/(top-bottom);
+	m_projectionMatrix[5]  = (2.0f*screenZ)/(top-bottom);
 	m_projectionMatrix[6]  = 0.0f;
 	m_projectionMatrix[7]  = 0.0f;
 
 	m_projectionMatrix[8]  = (right+left)/(right-left);
 	m_projectionMatrix[9]  = (top+bottom)/(top-bottom);
-	m_projectionMatrix[10] = -((far_+near_)/(far_-near_));
+	m_projectionMatrix[10] = -((far+near)/(far-near));
 	m_projectionMatrix[11] = -1.0f;
 
 	m_projectionMatrix[12] = 0.0f;
 	m_projectionMatrix[13] = 0.0f;
-	m_projectionMatrix[14] = -((2.0f*far_*near_)/(far_-near_));
+	m_projectionMatrix[14] = -((2.0f*far*near)/(far-near));
 	m_projectionMatrix[15] = 0.0f;
 }
 

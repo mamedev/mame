@@ -23,7 +23,7 @@
 // ======================> databoard_4106_device
 
 class databoard_4106_device : public device_t,
-						  	  public device_abcbus_card_interface
+							  public device_abcbus_card_interface
 {
 public:
 	// construction/destruction

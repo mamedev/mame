@@ -275,11 +275,14 @@ private:
 
 	floppy_image_device *m_cur_floppy;
 	int m_hdsel;
+	int m_pwm_count_total, m_pwm_count_1;
+	float m_pwm_current_rpm[2];
 
 	void phases_w(uint8_t phases);
 	void sel35_w(int sel35);
 	void devsel_w(uint8_t devsel);
 	void hdsel_w(int hdsel);
+	void pwm_push(uint8_t data);
 
 	mac128model_t m_model;
 
@@ -340,6 +343,9 @@ void mac128_state::machine_start()
 	save_item(NAME(m_adb_irq_pending));
 	save_item(NAME(m_drive_select));
 	save_item(NAME(m_scsiirq_enable));
+	save_item(NAME(m_pwm_count_total));
+	save_item(NAME(m_pwm_count_1));
+	save_item(NAME(m_pwm_current_rpm));
 
 	m_mouse_bit[0] = m_mouse_bit[1] = 0;
 	m_mouse_last[0] = m_mouse_last[1] = 0;
@@ -361,6 +367,10 @@ void mac128_state::machine_reset()
 	m_adb_irq_pending = 0;
 	m_drive_select = 0;
 	m_scsiirq_enable = 0;
+	m_pwm_count_total = 0;
+	m_pwm_count_1 = 0;
+	m_pwm_current_rpm[0] = 302.5; // Speed for 0% duty cycle
+	m_pwm_current_rpm[1] = 302.5;
 
 	const int next_vpos = m_screen->vpos() + 1;
 	m_scan_timer->adjust(m_screen->time_until_pos(next_vpos), next_vpos);
@@ -512,12 +522,85 @@ TIMER_CALLBACK_MEMBER(mac128_state::mac_scanline)
 	}
 
 	m_dac->write(mac_snd_buf_ptr[scanline] >> 8);
+	pwm_push(mac_snd_buf_ptr[scanline] & 0xff);
 	m_scan_timer->adjust(m_screen->time_until_pos(scanline+1), (scanline+1) % m_screen->height());
 }
 
 TIMER_CALLBACK_MEMBER(mac128_state::mac_hblank)
 {
 	m_via->write_pb6(0);
+}
+
+void mac128_state::pwm_push(uint8_t data)
+{
+	// The PWM works by sending pulses with a specific duty cycle.
+	// The lengths sent by the firmware are in the range 1-40, which
+	// means the total number of time slots is probably 42, to ensure
+	// at least one edge always happens.  To get a better precision
+	// the firmware dithers between two values over a cycle of 10
+	// pulses, giving internally a 0-399 possible range mapping to a
+	// 11-410 real length out of 420 total, with a duty cycle ranging
+	// from 2.6% to 97.6%.  The firmware calibrates from the drive
+	// actual rpm as measured through the tachometer with indexes 128
+	// and 256 at startup and keeps an eye on the actual rpm
+	// afterwards to avoid temperature drift.
+
+	// The length counter is a 6-bits lfsr with taps on bits 0 and 1
+	// and insertion on bit 5.  The firmware writes a value so that
+	// the length is reached when the counter hits 0x20.
+
+	static const uint8_t value_to_length[64] = {
+		 0,  1, 59,  2, 60, 40, 54,  3,
+		61, 32, 49, 41, 55, 19, 35,  4,
+		62, 52, 30, 33, 50, 12, 14, 42,
+		56, 16, 27, 20, 36, 23, 44,  5,
+		63, 58, 39, 53, 31, 48, 18, 34,
+		51, 29, 11, 13, 15, 26, 22, 43,
+		57, 38, 47, 17, 28, 10, 25, 21,
+		37, 46,  9, 24, 45,  8,  7,  6
+	};
+
+	m_pwm_count_1 += value_to_length[data & 0x3f];
+
+	m_pwm_count_total ++;
+
+	if (m_pwm_count_total == 100)
+	{
+		// The documentation requires:
+		// - duty cycle of 9.4%, 305 < rpm < 380 (middle 342.5)
+		// - duty cycle of 91%,  625 < rpm < 780 (middle 702.5)
+		// - linear between these two points
+
+		int internal_index = m_pwm_count_1 / (m_pwm_count_total/10) - 11;
+		if(internal_index < 0)
+			internal_index = 0;
+		if(internal_index > 399)
+			internal_index = 399;
+
+		float duty_cycle = internal_index / 419.0;
+		float rpm = (duty_cycle - 0.094) * (702.5 - 342.5) / (0.91 - 0.094) + 342.5;
+
+
+		// Only change when you get the same value twice consecutively
+		// to avoid changing multiple times when in transition.
+		if (rpm == m_pwm_current_rpm[1] && m_pwm_current_rpm[1] != m_pwm_current_rpm[0])
+		{
+			logerror("PWM index %3d duty cycle %5.1f%% rpm %f\n", internal_index, 100*duty_cycle, rpm);
+
+#if NEW_IWM
+			if (m_cur_floppy && m_cur_floppy->type() == OAD34V)
+			{
+				m_iwm->sync();
+				m_cur_floppy->set_rpm(rpm);
+			}
+#endif
+		}
+
+		m_pwm_current_rpm[0] = m_pwm_current_rpm[1];
+		m_pwm_current_rpm[1] = rpm;
+		m_pwm_count_1 = 0;
+		m_pwm_count_total = 0;
+	}
 }
 
 WRITE_LINE_MEMBER(mac128_state::mac_scsi_irq)
@@ -910,7 +993,11 @@ void mac128_state::devsel_w(uint8_t devsel)
 
 	m_iwm->set_floppy(m_cur_floppy);
 	if (m_cur_floppy)
+	{
 		m_cur_floppy->ss_w(m_hdsel);
+		if (m_cur_floppy->type() == OAD34V)
+			m_cur_floppy->set_rpm(m_pwm_current_rpm[1]);
+	}
 }
 
 void mac128_state::hdsel_w(int hdsel)
@@ -1024,7 +1111,7 @@ void mac128_state::mac512ke(machine_config &config)
 	/* devices */
 	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
 	#if NEW_IWM
-	IWM(config, m_iwm, C7M, 1021800*2, true);
+	IWM(config, m_iwm, C7M);
 	m_iwm->phases_cb().set(FUNC(mac128_state::phases_w));
 	m_iwm->sel35_cb().set(FUNC(mac128_state::sel35_w));
 	m_iwm->devsel_cb().set(FUNC(mac128_state::devsel_w));
@@ -1040,7 +1127,7 @@ void mac128_state::mac512ke(machine_config &config)
 	m_scc->configure_channels(C3_7M, 0, C3_7M, 0);
 	m_scc->out_int_callback().set(FUNC(mac128_state::set_scc_interrupt));
 
-	MOS6522(config, m_via, 1000000);
+	MOS6522(config, m_via, C7M/10);
 	m_via->readpa_handler().set(FUNC(mac128_state::mac_via_in_a));
 	m_via->readpb_handler().set(FUNC(mac128_state::mac_via_in_b));
 	m_via->writepa_handler().set(FUNC(mac128_state::mac_via_out_a));
@@ -1108,7 +1195,7 @@ void mac128_state::macse(machine_config &config)
 	m_macadb->via_data_callback().set(m_via, FUNC(via6522_device::write_cb2));
 	m_macadb->adb_irq_callback().set(FUNC(mac128_state::adb_irq_w));
 
-	R65NC22(config.replace(), m_via, 1000000);
+	R65NC22(config.replace(), m_via, C7M/10);
 	m_via->readpa_handler().set(FUNC(mac128_state::mac_via_in_a));
 	m_via->readpb_handler().set(FUNC(mac128_state::mac_via_in_b_se));
 	m_via->writepa_handler().set(FUNC(mac128_state::mac_via_out_a_se));

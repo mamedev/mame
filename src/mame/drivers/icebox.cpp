@@ -312,7 +312,6 @@ static void floppies(device_slot_interface &device)
 static DEVICE_INPUT_DEFAULTS_START( terminal ) // we need to remove bit 7 which is on the last character of each message
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
@@ -355,8 +354,8 @@ void icebox_state::icebox(machine_config &config)
 	FD1771(config, m_fdc, 4_MHz_XTAL / 2);
 	m_fdc->drq_wr_callback().set(FUNC(icebox_state::drq_w));
 	m_fdc->intrq_wr_callback().set(FUNC(icebox_state::intrq_w));
-	FLOPPY_CONNECTOR(config, m_floppy0, floppies, "flop", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, floppies, "flop", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy0, floppies, "flop", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy1, floppies, "flop", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 /* ROM definition */

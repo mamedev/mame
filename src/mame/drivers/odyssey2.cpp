@@ -53,7 +53,12 @@ XTAL notes (differs per model):
 
 TODO:
 - backgamm doesn't draw all the chars/sprites, it does multiple screen updates
-  and writes to the ptr/color registers, but does not increment the Y regs
+  and writes to the ptr/color registers, but does not increment the Y regs.
+  Does it (ab)use an undocumented 8245 feature?
+- g7400 helicopt sometimes locks up at the sea level, timing or IRQ related?
+- volley has a sprite-char collision detection problem, causing the team on the
+  right to never serve the ball. Sprite positions are correct so it's not that,
+  and as seen on videos of other games, transparent pixels don't cause a collision.
 - screen resolution is not strictly defined, height(243) is correct, but
   horizontal overscan differs depending on monitor/tv? see syracuse for overscan
 - 824x on the real console, overlapping major system characters with eachother
@@ -73,7 +78,6 @@ TODO:
   * gtwallst turns the display on too soon, the middle scroller is partially
     visible when it's not supposed to (also a bit glitchy on NTSC but not as bad)
 - g7400 probably has different video timing too (not same as g7000)
-- g7400 helicopt sometimes locks up at the sea level, timing related?
 - 4in1 and musician are not supposed to work on g7400, but work fine on MAME,
   caused by bus conflict or because they write to P2?
 - according to tests, 8244 does not have a sound interrupt, but the Philips

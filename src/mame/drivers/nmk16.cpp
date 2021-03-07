@@ -204,10 +204,10 @@ Reference of music tempo:
 #include "cpu/z80/z80.h"
 #include "machine/nmk004.h"
 #include "machine/nmk112.h"
-#include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
+#include "sound/ym2203.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -7633,6 +7633,14 @@ ROM_START( redhawks )
 
 	ROM_REGION( 0x40000, "oki1", 0 )    // Samples
 	ROM_LOAD( "5.bin", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
+
+	ROM_REGION( 0x300, "proms", 0 )    // Bipolar PROMs, not dumped
+	ROM_LOAD( "n82s147an.bin", 0x000, 0x200, NO_DUMP )
+	ROM_LOAD( "n82s129n.bin",  0x200, 0x100, NO_DUMP )
+
+	ROM_REGION( 0x26e, "plds", 0 )    // PLDs, not dumped
+	ROM_LOAD( "gal16v8d.bin", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal20v8b.bin", 0x117, 0x157, NO_DUMP )
 ROM_END
 
 void afega_state::init_redhawkg()
@@ -8658,7 +8666,7 @@ GAME( 1995, dolmen,     0,        twinactn,     dolmen,       nmk16_state, init_
 GAME( 1998, stagger1,   0,        stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega",                             "Stagger I (Japan)", 0 )
 GAME( 1997, redhawk,    stagger1, stagger1,     stagger1,     afega_state, init_redhawk,         ROT270,             "Afega (New Vision Ent. license)",   "Red Hawk (USA, Canada & South America)", 0 )
 GAME( 1997, redhawki,   stagger1, redhawki,     stagger1,     afega_state, init_redhawki,        ROT0,               "Afega (Hae Dong Corp license)",     "Red Hawk (horizontal, Italy)", 0 ) // bootleg? strange scroll regs
-GAME( 1997, redhawks,   stagger1, stagger1,     stagger1,     afega_state, empty_init,           ROT0,               "Afega (Hae Dong Corp license)",     "Red Hawk (horizontal, Spain)", 0 )
+GAME( 1997, redhawks,   stagger1, redhawki,     stagger1,     afega_state, empty_init,           ROT0,               "Afega (Hae Dong Corp license)",     "Red Hawk (horizontal, Spain)", 0 )
 GAME( 1997, redhawkg,   stagger1, redhawki,     stagger1,     afega_state, init_redhawkg,        ROT0,               "Afega",                             "Red Hawk (horizontal, Greece)", 0 )
 GAME( 1997, redhawke,   stagger1, stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega (Excellent Co. license)",     "Red Hawk (Excellent Co., Ltd)", 0 ) // earlier revision? different afega logo and score and credit number fonts compared to other sets
 GAME( 1997, redhawkk,   stagger1, stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega",                             "Red Hawk (Korea)", 0 )

@@ -23,6 +23,6 @@ void main()
   cphos *= vec3_splat( u_phosphor_amplitude.x * pow(t,-u_phosphor_power.x) );
 
   vec3 col = pow(cscrn + cphos, vec3_splat(1.0/u_gamma.x));
-  
+
   gl_FragColor = vec4(col, 1.0);
 }

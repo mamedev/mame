@@ -442,7 +442,7 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 		// is it a size we already have?
 		scaled_texture *scaled = nullptr;
 		int scalenum;
-		for (scalenum = 0; scalenum < ARRAY_LENGTH(m_scaled); scalenum++)
+		for (scalenum = 0; scalenum < std::size(m_scaled); scalenum++)
 		{
 			scaled = &m_scaled[scalenum];
 
@@ -452,12 +452,12 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 		}
 
 		// did we get one?
-		if (scalenum == ARRAY_LENGTH(m_scaled))
+		if (scalenum == std::size(m_scaled))
 		{
 			int lowest = -1;
 
 			// didn't find one -- take the entry with the lowest seqnum
-			for (scalenum = 0; scalenum < ARRAY_LENGTH(m_scaled); scalenum++)
+			for (scalenum = 0; scalenum < std::size(m_scaled); scalenum++)
 				if ((lowest == -1 || m_scaled[scalenum].seqid < m_scaled[lowest].seqid) && !primlist.has_reference(m_scaled[scalenum].bitmap.get()))
 					lowest = scalenum;
 			if (-1 == lowest)
@@ -697,7 +697,7 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, u32 &out_length, 
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:
 		case TEXFORMAT_YUY16:
-			out_length = ARRAY_LENGTH(m_bcglookup256);
+			out_length = std::size(m_bcglookup256);
 			return m_bcglookup256;
 
 		default:
@@ -1216,8 +1216,8 @@ void render_target::compute_visible_area(s32 target_width, s32 target_height, fl
 			// now apply desired scale mode and aspect correction
 			if (m_keepaspect && target_aspect > src_aspect) xscale *= src_aspect / target_aspect * (maxyscale / yscale);
 			if (m_keepaspect && target_aspect < src_aspect) yscale *= target_aspect / src_aspect * (maxxscale / xscale);
-			if (x_is_integer) xscale = std::min(maxxscale, std::max(1.0f, render_round_nearest(xscale)));
-			if (y_is_integer) yscale = std::min(maxyscale, std::max(1.0f, render_round_nearest(yscale)));
+			if (x_is_integer) xscale = std::clamp(render_round_nearest(xscale), 1.0f, maxxscale);
+			if (y_is_integer) yscale = std::clamp(render_round_nearest(yscale), 1.0f, maxyscale);
 
 			// check if we have user defined scale factors, if so use them instead
 			int user_scale_x = target_is_portrait? m_int_scale_y : m_int_scale_x;
@@ -1318,7 +1318,7 @@ render_primitive_list &render_target::get_primitives()
 
 	// switch to the next primitive list
 	render_primitive_list &list = m_primlist[m_listindex];
-	m_listindex = (m_listindex + 1) % ARRAY_LENGTH(m_primlist);
+	m_listindex = (m_listindex + 1) % std::size(m_primlist);
 	list.acquire_lock();
 
 	// free any previous primitives

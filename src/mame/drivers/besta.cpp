@@ -14,6 +14,8 @@
 #include "machine/terminal.h"
 
 
+namespace {
+
 class besta_state : public driver_device
 {
 public:
@@ -29,11 +31,14 @@ public:
 	void besta(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	void besta_mem(address_map &map);
 	uint8_t mpcc_reg_r(offs_t offset);
 	void mpcc_reg_w(offs_t offset, uint8_t data);
 	void kbd_put(u8 data);
-	virtual void machine_reset() override;
 
 	uint8_t m_term_data;
 	uint8_t m_mpcc_regs[32];
@@ -103,6 +108,13 @@ void besta_state::besta_mem(address_map &map)
 static INPUT_PORTS_START( besta )
 INPUT_PORTS_END
 
+void besta_state::machine_start()
+{
+	m_term_data = 0;
+
+	save_item(NAME(m_term_data));
+	save_item(NAME(m_mpcc_regs));
+}
 
 void besta_state::machine_reset()
 {
@@ -142,6 +154,9 @@ ROM_START( besta88 )
 	ROM_SYSTEM_BIOS(2, "cp31os9", "CP31 OS9")
 	ROMX_LOAD( "cp31os9.27c512",      0x0000, 0x10000, CRC(607a0a55) SHA1(c257a88672ab39d2f3fad681d22e062182b0236d), ROM_BIOS(2))
 ROM_END
+
+} // Anonymous namespace
+
 
 /* Driver */
 

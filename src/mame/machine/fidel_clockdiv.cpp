@@ -7,7 +7,8 @@ Used to compensate slow memory chips in chess computer models: SC12, AS12, PC, E
 
 TODO:
 - improve clock divider? it seems a little bit slower than the real machine.
-  Currently, a dummy timer workaround is needed, or it's much worse.
+  Currently, a dummy timer workaround is needed, or it's much worse (doing it with
+  a synchronize() will make it even worse).
   Is the problem here due to timing of CPU addressbus changes? We can only 'sense'
   the addressbus at read or write accesses.
 
@@ -17,24 +18,12 @@ TODO:
 #include "machine/fidel_clockdiv.h"
 
 
-// machine start/reset
+// machine start
 
 void fidel_clockdiv_state::machine_start()
 {
-	// zerofill/register for savestates
-	m_div_config = 0;
-
-	save_item(NAME(m_div_status));
-	save_item(NAME(m_div_config));
-	save_item(NAME(m_div_scale));
-
 	// dummy timer for cpu divider
 	m_div_timer = machine().scheduler().timer_alloc(timer_expired_delegate(), this);
-}
-
-void fidel_clockdiv_state::machine_reset()
-{
-	div_refresh();
 }
 
 
@@ -71,27 +60,6 @@ void fidel_clockdiv_state::div_set_cpu_freq(offs_t offset)
 	}
 }
 
-void fidel_clockdiv_state::div_trampoline_w(offs_t offset, u8 data)
-{
-	if (m_div_config)
-		div_set_cpu_freq(offset & 0x6000);
-
-	m_mainmap->write8(offset, data);
-}
-
-u8 fidel_clockdiv_state::div_trampoline_r(offs_t offset)
-{
-	if (m_div_config && !machine().side_effects_disabled())
-		div_set_cpu_freq(offset & 0x6000);
-
-	return m_mainmap->read8(offset);
-}
-
-void fidel_clockdiv_state::div_trampoline(address_map &map)
-{
-	map(0x0000, 0xffff).rw(FUNC(fidel_clockdiv_state::div_trampoline_r), FUNC(fidel_clockdiv_state::div_trampoline_w));
-}
-
 void fidel_clockdiv_state::div_refresh(ioport_value val)
 {
 	if (val == 0xff)
@@ -106,10 +74,35 @@ void fidel_clockdiv_state::div_refresh(ioport_value val)
 
 	m_maincpu->set_clock_scale(1.0);
 	m_div_status = ~0;
-	m_div_config = val;
-	m_div_scale = (m_div_config & 1) ? 0.25 : 0.5;
+	m_div_scale = (val & 1) ? 0.25 : 0.5;
 
 	// stop high frequency background timer if cpu divider is disabled
 	attotime period = (val) ? attotime::from_hz(m_maincpu->clock()) : attotime::never;
 	m_div_timer->adjust(period, 0, period);
+
+	// set up memory passthroughs
+	if (m_read_tap)
+	{
+		m_read_tap->remove();
+		m_write_tap->remove();
+		m_read_tap = nullptr;
+		m_write_tap = nullptr;
+	}
+
+	if (val)
+	{
+		address_space &program = m_maincpu->space(AS_PROGRAM);
+
+		m_read_tap = program.install_read_tap(0x0000, 0xffff, "program_div_r",[this](offs_t offset, u8 &data, u8 mem_mask)
+		{
+			if (!machine().side_effects_disabled())
+				div_set_cpu_freq(offset & 0x6000);
+			return data;
+		});
+		m_write_tap = program.install_write_tap(0x0000, 0xffff, "program_div_w",[this](offs_t offset, u8 &data, u8 mem_mask)
+		{
+			div_set_cpu_freq(offset & 0x6000);
+			return data;
+		});
+	}
 }

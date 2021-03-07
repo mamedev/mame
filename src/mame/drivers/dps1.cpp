@@ -224,8 +224,8 @@ void dps1_state::dps1(machine_config &config)
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 2, false, true);
 	//m_fdc->intrq_wr_callback().set(FUNC(dps1_state::fdc_int_w)); // doesn't appear to be used
 	m_fdc->drq_wr_callback().set(FUNC(dps1_state::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "floppy0", floppy_image_device::default_floppy_formats).enable_sound(true);
-	//FLOPPY_CONNECTOR(config, "fdc:1", floppies, "floppy1", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "floppy0", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	//FLOPPY_CONNECTOR(config, "fdc:1", floppies, "floppy1", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("dps1");

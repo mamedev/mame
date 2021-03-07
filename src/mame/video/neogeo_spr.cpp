@@ -183,7 +183,7 @@ void neosprite_base_device::draw_fixed_layer(bitmap_rgb32 &bitmap, int scanline)
 	uint16_t *video_data = &m_videoram_drawsource[0x7000 | (scanline >> 3)];
 	uint32_t *pixel_addr = &bitmap.pix(scanline, NEOGEO_HBEND);
 
-	int garouoffsets[32];
+	int garouoffsets[34];
 	int banked = m_fixed_layer_source && (addr_mask > 0x1ffff);
 
 	/* thanks to Mr K for the garou & kof2000 banking info */

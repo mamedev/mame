@@ -1776,6 +1776,9 @@ void hp86_state::machine_start()
 	save_item(NAME(m_emc_mult));
 	save_item(NAME(m_emc_mode));
 	save_item(NAME(m_rulite));
+
+	m_emc_ptr1 = 0;
+	m_emc_ptr2 = 0;
 }
 
 void hp86_state::machine_reset()

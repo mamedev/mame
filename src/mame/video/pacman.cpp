@@ -203,6 +203,21 @@ WRITE_LINE_MEMBER(pacman_state::flipscreen_w)
 }
 
 
+void mspactwin_state::mspactwin_videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset );
+	m_screen->update_partial(m_screen->vpos());
+}
+
+WRITE_LINE_MEMBER(mspactwin_state::flipscreen_w)
+{
+	m_flipscreen = state;
+	m_bg_tilemap->set_flip(m_flipscreen * ( TILEMAP_FLIPX + TILEMAP_FLIPY ) );
+//  logerror("Flip: %02x\n", state);
+}
+
+
 uint32_t pacman_state::screen_update_pacman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_bgpriority != 0)

@@ -204,6 +204,8 @@ void astrocorp_state::video_start()
 	save_item(NAME(m_bitmap));
 	save_item(NAME(m_screen_enable));
 	save_item(NAME(m_sprite_dma));
+
+	m_sprite_dma = 0;
 }
 
 /***************************************************************************
@@ -660,6 +662,8 @@ static const u16 showhand_default_eeprom[15] =   {0x0001,0x0007,0x000a,0x0003,0x
 void astrocorp_state::machine_start()
 {
 	m_lamps.resolve();
+
+	m_screen_enable = 0;
 }
 
 void astrocorp_state::showhand(machine_config &config)

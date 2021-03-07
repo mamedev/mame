@@ -19,17 +19,12 @@
 #include "speaker.h"
 
 
+namespace {
+
 //#define JUICEBOX_ENTER_DEBUG_MENU
 //#define JUICEBOX_DISPLAY_ROM_ID
 
 #define VERBOSE_LEVEL ( 0 )
-
-struct jb_smc_t
-{
-	int add_latch;
-	int cmd_latch;
-	int busy;
-};
 
 class juicebox_state : public driver_device
 {
@@ -39,6 +34,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_s3c44b0(*this, "s3c44b0")
 		, m_smartmedia(*this, "smartmedia")
+		, m_port_g(*this, "PORTG")
 	{ }
 
 	void juicebox(machine_config &config);
@@ -47,11 +43,25 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<s3c44b0_device> m_s3c44b0;
 	required_device<smartmedia_image_device> m_smartmedia;
+	required_ioport m_port_g;
+
 	uint32_t port[9];
+
+	struct jb_smc_t
+	{
+		int add_latch;
+		int cmd_latch;
+		int busy;
+	};
+
 	jb_smc_t smc;
 
 	#if defined(JUICEBOX_ENTER_DEBUG_MENU) || defined(JUICEBOX_DISPLAY_ROM_ID)
@@ -59,8 +69,6 @@ private:
 	#endif
 	uint32_t juicebox_nand_r(offs_t offset, uint32_t mem_mask = ~0);
 	void juicebox_nand_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	void smc_reset();
 	void smc_init();
@@ -98,6 +106,7 @@ void juicebox_state::smc_reset( )
 	verboselog(5, "smc_reset\n");
 	smc.add_latch = 0;
 	smc.cmd_latch = 0;
+	smc.busy = 0;
 }
 
 void juicebox_state::smc_init( )
@@ -191,7 +200,7 @@ uint32_t juicebox_state::s3c44b0_gpio_port_r(offs_t offset)
 		case S3C44B0_GPIO_PORT_G :
 		{
 			data = 0x0000009F;
-			data = (data & ~0x1F) | (ioport( "PORTG")->read() & 0x1F);
+			data = (data & ~0x1F) | (m_port_g->read() & 0x1F);
 			#if defined(JUICEBOX_ENTER_DEBUG_MENU)
 			if (port_g_read_count++ < 1)
 			{
@@ -358,5 +367,8 @@ ROM_START( juicebox )
 	ROM_SYSTEM_BIOS( 2, "uclinux", "uClinux 2.4.24-uc0" )
 	ROMX_LOAD( "image.rom", 0, 0x19E400, CRC(6c0308bf) SHA1(5fe21a38a4cd0d86bb60920eb100138b0e924d90), ROM_BIOS(2) )
 ROM_END
+
+} // Anonymous namespace
+
 
 COMP(2004, juicebox, 0, 0, juicebox, juicebox, juicebox_state, init_juicebox, "Mattel", "Juice Box", 0)

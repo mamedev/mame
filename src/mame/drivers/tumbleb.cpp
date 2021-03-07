@@ -307,9 +307,9 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "cpu/mcs51/mcs51.h" // for semicom mcu
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/decocrpt.h"
-#include "sound/ym2151.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "sound/ym2151.h"
 #include "speaker.h"
 
 
@@ -2115,6 +2115,7 @@ MACHINE_RESET_MEMBER(tumbleb_state,tumbleb)
 	m_music_is_playing = 0;
 	m_tilebank = 0;
 	memset(m_control_0, 0, sizeof(m_control_0));
+	m_semicom_prot_offset = 0;
 }
 
 void tumbleb_state::tumblepb(machine_config &config)

@@ -193,7 +193,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
 	CRT9021_DRAW_CHARACTER_MEMBER( vac_draw_character );
 	TIMER_DEVICE_CALLBACK_MEMBER( vidldsh_tick );
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 	static rgb_t IRGB(uint32_t raw);
 
 	enum

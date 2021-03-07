@@ -30,7 +30,9 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	virtual void cart_init() override;
 
@@ -54,7 +56,9 @@ private:
 	void homecomp_io(address_map &map);
 	void homecomp_mem(address_map &map);
 
+	std::unique_ptr<u8[]> m_ram;
 	u8 m_control = 0;
+	bool m_installed = false;
 };
 
 // device type definition

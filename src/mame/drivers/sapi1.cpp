@@ -52,6 +52,9 @@ ZPS stands for "Základní Počítačová Sestava" (basic computer system).
 #include "machine/timer.h"
 #include "speaker.h"
 
+
+namespace {
+
 class sapi_state : public driver_device
 {
 public:
@@ -78,6 +81,10 @@ public:
 	void init_sapizps3a();
 	void init_sapizps3b();
 
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
 private:
 	optional_shared_ptr<uint8_t> m_p_videoram;
 	void kbd_put(u8 data);
@@ -100,8 +107,7 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	DECLARE_READ_LINE_MEMBER(si);
 	DECLARE_WRITE_LINE_MEMBER(so);
-	void machine_reset() override;
-	void machine_start() override;
+
 	uint32_t screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sapi3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -747,6 +753,8 @@ void sapi_state::machine_start()
 	save_item(NAME(m_cassold));
 	save_item(NAME(m_ier));
 	save_item(NAME(m_iet));
+
+	m_term_data = 0;
 }
 
 void sapi_state::init_sapizps3()
@@ -858,7 +866,6 @@ void sapi_state::sapi3b(machine_config &config)
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 ) // high bit stripped off in software
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
@@ -939,6 +946,8 @@ ROM_START( sapizps3b )
 	// This BIOS uses a 6845
 	ROM_LOAD("pkt1.bin",       0x10000, 0x0800, CRC(ed5a2725) SHA1(3383c15f87f976400b8d0f31829e2a95236c4b6c))
 ROM_END
+
+} // Anonymous namespace
 
 
 /* Driver */

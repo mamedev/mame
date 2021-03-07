@@ -16,10 +16,10 @@
 
 
   Special thanks to Grull Osgo for his exhaustive reverse engineering that allowed to recreate
-  the original default serial EEPROM contents for the english set, critical to get it working. 
+  the original default serial EEPROM contents for the english set, critical to get it working.
 
   Special thanks to Rob Ragon for dump the spanish set, and all the tests on the real hardware.
-  
+
 -------------------------------------------------------------------------------------------------
 
   Notes:
@@ -601,7 +601,7 @@ possible hopper registers
   D1DC ---- ---x (inv)
   D1EA ---- ---x
   D1EC ---- ---x
-  
+
 */
 
 
@@ -701,7 +701,7 @@ GFXDECODE_END
 
 void fortecrd_state::machine_reset()
 {
-    // apparently there's a random fill in there (checked thru trojan)
+	// apparently there's a random fill in there (checked thru trojan)
 	for (int i = 0; i < m_vram.bytes(); i++)
 		m_vram[i] = machine().rand();
 }
@@ -753,7 +753,7 @@ void fortecrd_state::fortecrd(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));    //	1.5 MHz, measured
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));    //  1.5 MHz, measured
 	aysnd.port_a_write_callback().set(FUNC(fortecrd_state::ayporta_w));
 	aysnd.port_b_write_callback().set(FUNC(fortecrd_state::ayportb_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);

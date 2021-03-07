@@ -412,7 +412,7 @@ void d6800_state::d6800(machine_config &config)
 	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "bin,c8", attotime::from_seconds(2)));
 	quickload.set_load_callback(FUNC(d6800_state::quickload_cb));
 	quickload.set_interface("chip8quik");
-	SOFTWARE_LIST(config, "quik_list").set_original("chip8").set_filter("D");
+	SOFTWARE_LIST(config, "quik_list").set_original("chip8_quik").set_filter("D");
 }
 
 /* ROMs */

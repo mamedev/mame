@@ -18,17 +18,14 @@
 
 TILE_GET_INFO_MEMBER(centiped_state::centiped_get_tile_info)
 {
-	uint8_t *videoram = m_videoram;
-
-	int data = videoram[tile_index];
+	int data = m_videoram[tile_index];
 	tileinfo.set(0, (data & 0x3f) + 0x40, 0, TILE_FLIPYX(data >> 6));
 }
 
 
 TILE_GET_INFO_MEMBER(centiped_state::warlords_get_tile_info)
 {
-	uint8_t *videoram = m_videoram;
-	int data = videoram[tile_index];
+	int data = m_videoram[tile_index];
 	int color = ((tile_index & 0x10) >> 4) | ((tile_index & 0x200) >> 8) | (m_flipscreen >> 5);
 
 	tileinfo.set(0, data & 0x3f, color, TILE_FLIPYX(data >> 6));
@@ -37,8 +34,7 @@ TILE_GET_INFO_MEMBER(centiped_state::warlords_get_tile_info)
 
 TILE_GET_INFO_MEMBER(centiped_state::milliped_get_tile_info)
 {
-	uint8_t *videoram = m_videoram;
-	int data = videoram[tile_index];
+	int data = m_videoram[tile_index];
 	int bank = ((data >> 6) & 1) | (m_gfx_bank << 1);
 	int color = (data >> 6) & 3;
 	/* Flip both x and y if flipscreen is non-zero */
@@ -50,8 +46,7 @@ TILE_GET_INFO_MEMBER(centiped_state::milliped_get_tile_info)
 
 TILE_GET_INFO_MEMBER(centiped_state::bullsdrt_get_tile_info)
 {
-	uint8_t *videoram = m_videoram;
-	int data = videoram[tile_index];
+	int data = m_videoram[tile_index];
 	int bank = m_bullsdrt_tiles_bankram[tile_index & 0x1f] & 0x0f;
 
 	tileinfo.set(0, (data & 0x3f) + 0x40 * bank, 0, TILE_FLIPYX(data >> 6));
@@ -67,9 +62,7 @@ TILE_GET_INFO_MEMBER(centiped_state::bullsdrt_get_tile_info)
 
 void centiped_state::init_penmask()
 {
-	int i;
-
-	for (i = 0; i < 64; i++)
+	for (int i = 0; i < 64; i++)
 	{
 		uint8_t mask = 1;
 		if (((i >> 0) & 3) == 0) mask |= 2;
@@ -317,7 +310,7 @@ void centiped_state::warlords_palette(palette_device &palette) const
 /***************************************************************************
 
     Millipede doesn't have a color PROM, it uses RAM.
-    The RAM seems to be conncted to the video output this way:
+    The RAM seems to be connected to the video output this way:
 
     bit 7 red
           red
@@ -375,13 +368,11 @@ void centiped_state::milliped_set_color(offs_t offset, uint8_t data)
 	/* sprite colors - set all the applicable ones */
 	else
 	{
-		int i;
-
 		int base = offset & 0x0c;
 
 		offset = offset & 0x03;
 
-		for (i = (base << 6); i < (base << 6) + 0x100; i += 4)
+		for (int i = (base << 6); i < (base << 6) + 0x100; i += 4)
 		{
 			if (offset == ((i >> 2) & 0x03))
 				m_palette->set_pen_color(i + 0x10 + 1, color);
@@ -422,9 +413,7 @@ void centiped_state::mazeinv_paletteram_w(offs_t offset, uint8_t data)
 
 uint32_t centiped_state::screen_update_centiped(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *spriteram = m_spriteram;
 	rectangle spriteclip = cliprect;
-	int offs;
 
 	/* draw the background */
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -436,16 +425,16 @@ uint32_t centiped_state::screen_update_centiped(screen_device &screen, bitmap_in
 		spriteclip.max_x -= 8;
 
 	/* draw the sprites */
-	for (offs = 0; offs < 0x10; offs++)
+	for (int offs = 0; offs < 0x10; offs++)
 	{
-		int code = ((spriteram[offs] & 0x3e) >> 1) | ((spriteram[offs] & 0x01) << 6);
-		int color = spriteram[offs + 0x30];
-		int flipx = (spriteram[offs] >> 6) & 1;
-		int flipy = (spriteram[offs] >> 7) & 1;
-		int x = spriteram[offs + 0x20];
-		int y = 240 - spriteram[offs + 0x10];
+		int code = ((m_spriteram[offs] & 0x3e) >> 1) | ((m_spriteram[offs] & 0x01) << 6);
+		int color = m_spriteram[offs + 0x30];
+		int flipx = (m_spriteram[offs] >> 6) & 1;
+		int flipy = (m_spriteram[offs] >> 7) & 1;
+		int x = m_spriteram[offs + 0x20];
+		int y = 240 - m_spriteram[offs + 0x10];
 
-		m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip, code, color, flipx, flipy, x, y, m_penmask[color & 0x3f]);
+		m_gfxdecode->gfx(1)->transmask(bitmap, spriteclip, code, color, flipx, flipy, x, y, m_penmask[color & 0x3f]);
 	}
 	return 0;
 }
@@ -453,9 +442,7 @@ uint32_t centiped_state::screen_update_centiped(screen_device &screen, bitmap_in
 
 uint32_t centiped_state::screen_update_warlords(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *spriteram = m_spriteram;
 	int upright_mode = ioport("IN0")->read() & 0x80;
-	int offs;
 
 	/* if the cocktail/upright switch flipped, force refresh */
 	if (m_flipscreen != upright_mode)
@@ -469,13 +456,13 @@ uint32_t centiped_state::screen_update_warlords(screen_device &screen, bitmap_in
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* draw the sprites */
-	for (offs = 0; offs < 0x10; offs++)
+	for (int offs = 0; offs < 0x10; offs++)
 	{
-		int code = spriteram[offs] & 0x3f;
-		int flipx = (spriteram[offs] >> 6) & 1;
-		int flipy = (spriteram[offs] >> 7) & 1;
-		int x = spriteram[offs + 0x20];
-		int y = 248 - spriteram[offs + 0x10];
+		int code = m_spriteram[offs] & 0x3f;
+		int flipx = (m_spriteram[offs] >> 6) & 1;
+		int flipy = (m_spriteram[offs] >> 7) & 1;
+		int x = m_spriteram[offs + 0x20];
+		int y = 248 - m_spriteram[offs + 0x10];
 
 		/* The four quadrants have different colors. This is not 100% accurate,
 		   because right on the middle the sprite could actually have two or more
@@ -490,7 +477,7 @@ uint32_t centiped_state::screen_update_warlords(screen_device &screen, bitmap_in
 			flipx = !flipx;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, flipx, flipy, x, y, 0);
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect, code, color, flipx, flipy, x, y, 0);
 	}
 	return 0;
 }
@@ -498,10 +485,7 @@ uint32_t centiped_state::screen_update_warlords(screen_device &screen, bitmap_in
 
 uint32_t centiped_state::screen_update_bullsdrt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *spriteram = m_spriteram;
 	rectangle spriteclip = cliprect;
-
-	int offs;
 
 	/* draw the background */
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -513,15 +497,15 @@ uint32_t centiped_state::screen_update_bullsdrt(screen_device &screen, bitmap_in
 		spriteclip.max_x -= 8;
 
 	/* draw the sprites */
-	for (offs = 0; offs < 0x10; offs++)
+	for (int offs = 0; offs < 0x10; offs++)
 	{
-		int code = ((spriteram[offs] & 0x3e) >> 1) | ((spriteram[offs] & 0x01) << 6) | (m_bullsdrt_sprites_bank * 0x20);
-		int color = spriteram[offs + 0x30];
-		int flipy = (spriteram[offs] >> 7) & 1;
-		int x = spriteram[offs + 0x20];
-		int y = 240 - spriteram[offs + 0x10];
+		int code = ((m_spriteram[offs] & 0x3e) >> 1) | ((m_spriteram[offs] & 0x01) << 6) | (m_bullsdrt_sprites_bank * 0x20);
+		int color = m_spriteram[offs + 0x30];
+		int flipy = (m_spriteram[offs] >> 7) & 1;
+		int x = m_spriteram[offs + 0x20];
+		int y = 240 - m_spriteram[offs + 0x10];
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,spriteclip, code, color & 0x3f, 1, flipy, x, y, 0);
+		m_gfxdecode->gfx(1)->transpen(bitmap, spriteclip, code, color & 0x3f, 1, flipy, x, y, 0);
 	}
 	return 0;
 }
@@ -532,9 +516,7 @@ uint32_t centiped_state::screen_update_bullsdrt(screen_device &screen, bitmap_in
  */
 uint32_t centiped_state::screen_update_milliped(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *spriteram = m_spriteram;
 	rectangle spriteclip = cliprect;
-	int offs;
 
 	/* draw the background */
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -546,19 +528,19 @@ uint32_t centiped_state::screen_update_milliped(screen_device &screen, bitmap_in
 		spriteclip.max_x -= 8;
 
 	/* draw the sprites */
-	for (offs = 0; offs < 0x10; offs++)
+	for (int offs = 0; offs < 0x10; offs++)
 	{
-		int code = ((spriteram[offs] & 0x3e) >> 1) | ((spriteram[offs] & 0x01) << 6) | (m_gfx_bank << 7);
-		int color = spriteram[offs + 0x30];
+		int code = ((m_spriteram[offs] & 0x3e) >> 1) | ((m_spriteram[offs] & 0x01) << 6) | (m_gfx_bank << 7);
+		int color = m_spriteram[offs + 0x30];
 		int flipx = m_flipscreen;
-		int flipy = (spriteram[offs] & 0x80);
-		int x = spriteram[offs + 0x20];
-		int y = 240 - spriteram[offs + 0x10];
+		int flipy = (m_spriteram[offs] & 0x80);
+		int x = m_spriteram[offs + 0x20];
+		int y = 240 - m_spriteram[offs + 0x10];
 		if (flipx) {
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip, code, color, flipx, flipy, x, y, m_penmask[color & 0x3f]);
+		m_gfxdecode->gfx(1)->transmask(bitmap, spriteclip, code, color, flipx, flipy, x, y, m_penmask[color & 0x3f]);
 	}
 	return 0;
 }

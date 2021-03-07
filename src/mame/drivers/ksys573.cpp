@@ -759,6 +759,7 @@ void ksys573_state::konami573_map(address_map &map)
 	map(0x1f400008, 0x1f40000b).r(FUNC(ksys573_state::port_in2_jvs_r));
 	map(0x1f40000c, 0x1f40000f).portr("IN3");
 	map(0x1f480000, 0x1f48000f).rw(m_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w));
+	map(0x1f4c0000, 0x1f4c000f).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w));
 	map(0x1f500000, 0x1f500001).rw(FUNC(ksys573_state::control_r), FUNC(ksys573_state::control_w));    // Konami can't make a game without a "control" register.
 	map(0x1f560000, 0x1f560001).w(FUNC(ksys573_state::atapi_reset_w));
 	map(0x1f5c0000, 0x1f5c0003).nopw();                // watchdog?
@@ -815,7 +816,7 @@ void ksys573_state::gbbchmp_map(address_map& map)
 
 bool ksys573_state::jvs_is_valid_packet()
 {
-    if (m_jvs_input_idx_w < 5) {
+	if (m_jvs_input_idx_w < 5) {
 		// A valid packet will have at the very least
 		//  - sync (0xe0)
 		//  - node number (non-zero)
@@ -823,35 +824,35 @@ bool ksys573_state::jvs_is_valid_packet()
 		//  - at least 1 byte in the request message
 		//  - checksum
 		return false;
-    }
+	}
 
 	if (m_jvs_input_buffer[0] != 0xe0  || m_jvs_input_buffer[1] == 0x00) {
 		return false;
 	}
 
-    int command_size = m_jvs_input_buffer[2] + 3;
-    if (m_jvs_input_idx_w < command_size) {
+	int command_size = m_jvs_input_buffer[2] + 3;
+	if (m_jvs_input_idx_w < command_size) {
 		return false;
-    }
+	}
 
-    uint8_t checksum = 0;
-    for (int i = 1; i < command_size - 1; i++) {
+	uint8_t checksum = 0;
+	for (int i = 1; i < command_size - 1; i++) {
 		checksum += m_jvs_input_buffer[i];
-    }
+	}
 
-    return checksum == m_jvs_input_buffer[command_size - 1];
+	return checksum == m_jvs_input_buffer[command_size - 1];
 }
 
 void ksys573_state::jvs_input_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-    m_jvs_input_buffer[m_jvs_input_idx_w++] = data & 0xff;
-    m_jvs_input_buffer[m_jvs_input_idx_w++] = data >> 8;
+	m_jvs_input_buffer[m_jvs_input_idx_w++] = data & 0xff;
+	m_jvs_input_buffer[m_jvs_input_idx_w++] = data >> 8;
 
 	if (m_jvs_input_buffer[0] != 0xe0) {
 		m_jvs_input_idx_w = 0;
 	}
 
-    if (jvs_is_valid_packet()) {
+	if (jvs_is_valid_packet()) {
 		LOGJVS("jvs_input_w( %08x, %08x, %02x %02x )\n", offset, mem_mask, data & 0xff, data >> 8 );
 		for (int i = 0; i < m_jvs_input_idx_w; i++)
 			LOGJVS("%02x ", m_jvs_input_buffer[i]);
@@ -864,15 +865,15 @@ void ksys573_state::jvs_input_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_jvs_input_idx_r = 0;
 
 		m_jvs_input_buffer[0] = 0;
-    }
+	}
 }
 
 uint16_t ksys573_state::jvs_input_r(offs_t offset, uint16_t mem_mask)
 {
-    uint16_t data = m_jvs_input_buffer[m_jvs_input_idx_r++];
-    data |= m_jvs_input_buffer[m_jvs_input_idx_r++] << 8;
+	uint16_t data = m_jvs_input_buffer[m_jvs_input_idx_r++];
+	data |= m_jvs_input_buffer[m_jvs_input_idx_r++] << 8;
 
-    return data;
+	return data;
 }
 
 uint16_t ksys573_state::port_in2_jvs_r(offs_t offset, uint16_t mem_mask)
@@ -882,21 +883,21 @@ uint16_t ksys573_state::port_in2_jvs_r(offs_t offset, uint16_t mem_mask)
 		return m_in2->read();
 	}
 
-    if (m_jvs_output_len_w <= 0) {
+	if (m_jvs_output_len_w <= 0) {
 		return 0;
-    }
+	}
 
-    uint16_t data = m_jvs_output_buffer[m_jvs_output_idx_w] | (m_jvs_output_buffer[m_jvs_output_idx_w+1] << 8);
-    m_jvs_output_idx_w += 2;
+	uint16_t data = m_jvs_output_buffer[m_jvs_output_idx_w] | (m_jvs_output_buffer[m_jvs_output_idx_w+1] << 8);
+	m_jvs_output_idx_w += 2;
 
-    if (m_jvs_output_idx_w >= m_jvs_output_len_w) {
+	if (m_jvs_output_idx_w >= m_jvs_output_len_w) {
 		m_jvs_output_idx_w = 0;
 		m_jvs_output_len_w = 0;
-    }
+	}
 
-    LOGJVS("m_jvs_output_r %08x %08x | %02x %02x | %02x\n", offset, mem_mask, data & 0xff, data >> 8, m_jvs_output_idx_w);
+	LOGJVS("m_jvs_output_r %08x %08x | %02x %02x | %02x\n", offset, mem_mask, data & 0xff, data >> 8, m_jvs_output_idx_w);
 
-    return data;
+	return data;
 }
 
 READ_LINE_MEMBER( ksys573_state::jvs_rx_r )
@@ -1034,6 +1035,8 @@ void ksys573_state::driver_start()
 
 	save_item( NAME( m_n_security_control ) );
 	save_item( NAME( m_control ) );
+
+	m_h8_index = 0;
 }
 
 void ksys573_state::machine_reset()
@@ -3677,7 +3680,7 @@ ROM_START( ddr2mc2 )
 	DISK_IMAGE_READONLY( "ge984a01,ddr", 0, SHA1(badd15656f2316f81b0a45026b5ef10287d1480b) )
 
 	DISK_REGION( "cdrom1" )
-	DISK_IMAGE_READONLY( "895jaa02", 0, BAD_DUMP SHA1(cfe3a6f3ed62ba388b07045e29e22472d17dcfe4) )
+	DISK_IMAGE_READONLY( "885jaa02", 0, SHA1(f02bb09f41533c6ec496a662d815e85b304fcc72) )
 ROM_END
 
 ROM_START( ddr2ml )
@@ -5592,7 +5595,7 @@ GAME( 2000, ddr4mps,   sys573,   ddr4ms,     ddrsolo,   ksys573_state, empty_ini
 GAME( 2000, dmx2m,     sys573,   dmx,        dmx,       ksys573_state, empty_init,    ROT0,  "Konami", "Dance Maniax 2nd Mix (G*A39 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, pcnfrk4m,  sys573,   drmn4m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "Percussion Freaks 4th Mix (G*A25 VER. AAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, drmn4m,    pcnfrk4m, drmn4m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 4th Mix (G*A25 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
-GAME( 2001, pcnfrk4mk, pcnfrk4m, drmn4m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "DrumMania 4th Mix (G*A25 VER. KAA)", MACHINE_IMPERFECT_SOUND ) /* BOOT VER 1.9 */
+GAME( 2001, pcnfrk4mk, pcnfrk4m, drmn4m,     drmn,      ksys573_state, empty_init,    ROT0,  "Konami", "Percussion Freaks 4th Mix (G*A25 VER. KAA)", MACHINE_IMPERFECT_SOUND ) /* BOOT VER 1.9 */
 GAME( 2001, gtrfrk5m,  sys573,   gtrfrk5m,   gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks 5th Mix (G*A26 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, ddr5m,     sys573,   ddr5m,      ddr,       ksys573_state, empty_init,    ROT0,  "Konami", "Dance Dance Revolution 5th Mix (G*A27 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, dmx2majp,  sys573,   dmx,        dmx,       ksys573_state, empty_init,    ROT0,  "Konami", "Dance Maniax 2nd Mix Append J-Paradise (G*A38 VER. JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* BOOT VER 1.9 */

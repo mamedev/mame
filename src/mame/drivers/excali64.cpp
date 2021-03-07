@@ -54,6 +54,8 @@ ToDo:
 #include "formats/excali64_dsk.h"
 
 
+namespace {
+
 class excali64_state : public driver_device
 {
 public:
@@ -75,9 +77,11 @@ public:
 
 	void excali64(machine_config &config);
 
-private:
+protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
+
+private:
 	void excali64_palette(palette_device &palette);
 	void ppib_w(u8 data);
 	u8 ppic_r();
@@ -88,7 +92,7 @@ private:
 	void porte4_w(u8 data);
 	u8 porte8_r();
 	void portec_w(u8 data);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 	DECLARE_WRITE_LINE_MEMBER(cent_busy_w);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 	u8 memory_read_byte(offs_t offset);
@@ -241,9 +245,11 @@ WRITE_LINE_MEMBER( excali64_state::cent_busy_w )
 	m_centronics_busy = state;
 }
 
-FLOPPY_FORMATS_MEMBER( excali64_state::floppy_formats )
-	FLOPPY_EXCALI64_FORMAT
-FLOPPY_FORMATS_END
+void excali64_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_EXCALI64_FORMAT);
+}
 
 static void excali64_floppies(device_slot_interface &device)
 {
@@ -440,6 +446,8 @@ void excali64_state::machine_start()
 	save_item(NAME(m_crtc_hs));
 	save_item(NAME(m_motor));
 	save_item(NAME(m_centronics_busy));
+
+	m_sys_status = 0;
 }
 WRITE_LINE_MEMBER( excali64_state::crtc_hs )
 {
@@ -666,6 +674,9 @@ ROM_START( excali64 )
 	ROM_LOAD( "genex_3.ic43", 0x0000, 0x1000, CRC(b91619a9) SHA1(2ced636cb7b94ba9d329868d7ecf79963cefe9d9) )
 	ROM_LOAD( "hm7603.ic55",  0x1000, 0x0020, CRC(c74f47dc) SHA1(331ff3c913846191ddd97cacb80bd19438c1ff71) )
 ROM_END
+
+} // Anonymous namespace
+
 
 /* Driver */
 

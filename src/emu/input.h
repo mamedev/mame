@@ -512,7 +512,7 @@ public:
 	input_code code_from_itemid(input_item_id itemid) const;
 	std::string code_name(input_code code) const;
 	std::string code_to_token(input_code code) const;
-	input_code code_from_token(const char *_token);
+	input_code code_from_token(std::string_view _token);
 	const char *standard_token(input_item_id itemid) const;
 
 	// input sequence readers
@@ -523,7 +523,7 @@ public:
 	input_seq seq_clean(const input_seq &seq) const;
 	std::string seq_name(const input_seq &seq) const;
 	std::string seq_to_tokens(const input_seq &seq) const;
-	void seq_from_tokens(input_seq &seq, const char *_token);
+	void seq_from_tokens(input_seq &seq, std::string_view _token);
 
 	// misc
 	bool map_device_to_controller(const devicemap_table_type *devicemap_table = nullptr);

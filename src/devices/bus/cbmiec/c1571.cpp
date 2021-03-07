@@ -574,11 +574,12 @@ void c1571_device::wpt_callback(floppy_image_device *floppy, int state)
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( c1571_device::floppy_formats )
-	FLOPPY_D64_FORMAT,
-	FLOPPY_G64_FORMAT,
-	FLOPPY_D71_FORMAT
-FLOPPY_FORMATS_END
+void c1571_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_D64_FORMAT);
+	fr.add(FLOPPY_G64_FORMAT);
+	fr.add(FLOPPY_D71_FORMAT);
+}
 
 
 //-------------------------------------------------

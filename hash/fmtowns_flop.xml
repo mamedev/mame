@@ -114,7 +114,6 @@ Kiwame Jouseki Shuu                                           Log               
 LiveMotion Support Library                                    Fujitsu                           1993/1     FD
 Loop Eraser                                                   Nikkonren Kikaku                  1994/9     FD×02
 Loop: Izanahi no Kaikiten                                     Grocer                            1995/10    FD×05
-Lord Monarch                                                  Nihon Falcom                      1991/11    FD×03
 LPACK                                                         Kansai Denki                      1991/10    FD
 Lucid ASM & Debugger Ver. 1.1                                 Kansai Denki                      1990/4     FD
 Magic Ayako Suzume                                            Cosmos Computer                   1992/5     FDx03
@@ -152,7 +151,6 @@ Nihongo MS-DOS V5.0 (Extended)                                Fujitsu           
 Nihongo MS-DOS V6.2 (Basic)                                   Fujitsu                           1994/2     FD
 Nihongo MS-DOS V6.2 (Extended)                                Fujitsu                           1994/2     FD
 Nihongo MS-Windows V3.0                                       Fujitsu                           1992/12    FD
-Nonomura Byouin no Hitobito                                   Silky's                           1994/7     FD×05
 Orihime V1.0                                                  Yoshikawa Systec                  1993/8     FD
 Otoko to Onna no Aishou Shindan                               System House Space                1993/6     FD
 PC Globe 5.0                                                  Hiro                              1995/3     FD×04
@@ -583,6 +581,20 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!-- Cracked by cyo.the.vile -->
+	<software name="cameltryc" cloneof="cameltry">
+		<description>Cameltry (cracked)</description>
+		<year>1994</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="alt_title" value="キャメルトライ" />
+		<info name="release" value="199411xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="cameltry_fixed.bin" size="1261568" crc="8d98efc1" sha1="1537ea0addb4398b846a7582b54895533a984dd1"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Recreated protection by hand -->
 	<software name="columns">
 		<description>Columns</description>
@@ -593,6 +605,20 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1282512">
 				<rom name="columns.d88" size="1282512" crc="ee75f23b" sha1="a6f5593b2ad2b763455784d403fa50ec4f8f64c5" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cracked by cyo.the.vile -->
+	<software name="columnsc" cloneof="columns">
+		<description>Columns (cracked)</description>
+		<year>1990</year>
+		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<info name="alt_title" value="コラムス" />
+		<info name="release" value="199012xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="columns.hdm" size="1261568" crc="312d2c79" sha1="1c60aaa0028eb6570ecd2303e63e86598362226e" />
 			</dataarea>
 		</part>
 	</software>
@@ -1636,6 +1662,36 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
+	<!--
+	    Dumped from the original disks. Track 15 side 0 of the program disk and track 10 side 0 of the ending disk are protected (overlapped sectors).
+	    The game includes a pre-formatted user disk but it can also save to any generic blank disk.
+	-->
+	<software name="lordmon">
+		<description>Lord Monarch</description>
+		<year>1991</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<info name="alt_title" value="ロードモナーク" />
+		<info name="release" value="199111xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Program Disk" />
+			<dataarea name="flop" size="3444631">
+				<rom name="lord_monarch_program_disk.mfm" size="3444631" crc="bb147cdd" sha1="4fef91880ac4d2a17baf534caa02d3b29f71afc6" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Ending Disk" />
+			<dataarea name="flop" size="3444648">
+				<rom name="lord_monarch_ending_disk.mfm" size="3444648" crc="9bb132e0" sha1="ed720bb07be36e6706d0f42b685bfb2864fce1e3"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="User Disk" />
+			<dataarea name="flop" size="3444637">
+				<rom name="lord_monarch_user_disk.mfm" size="3444637" crc="3a6a8f2a" sha1="29d57156beecb7e6b974b64c2f6fcec7233d23d2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Dumped from the original disks. Track 3 side 0 of Disk A is protected (overlapped sectors). -->
 	<software name="maririndx">
 		<description>Super Ultra Mucchin Puripuri Cyborg Maririn DX</description>
@@ -1710,6 +1766,46 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="music pro-towns (1989)(musical plan)(jp).hdm" size="1261568" crc="f5f61d98" sha1="2abb5e9042d8aae0480b551568ac2f8053126209"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Dumped from the original disks, no protection -->
+	<software name="nonomura">
+		<description>Nonomura Byouin no Hitobito</description>
+		<year>1994</year>
+		<publisher>シルキーズ (Silky's)</publisher>
+		<info name="alt_title" value="野々村病院の人々" />
+		<info name="release" value="199407xx" />
+		<info name="usage" value="Boot TownsOS V2.1L10 or later, then run the icon on floppy drive A:" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="nonomura_disk_a.hdm" size="1261568" crc="92e67249" sha1="3a5c8484b74e7f24a9d93cc90abc597bbddb2402"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="nonomura_disk_b.hdm" size="1261568" crc="4f7f180d" sha1="113474c38941d262cbf6144ce4d01bff82f6ae82"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
+			<dataarea name="flop" size="1261568">
+				<rom name="nonomura_disk_c.hdm" size="1261568" crc="985a0f09" sha1="80bbc3da7ca04191ab6eefdbf29e25c75807d782"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D" />
+			<dataarea name="flop" size="1261568">
+				<rom name="nonomura_disk_d.hdm" size="1261568" crc="733bc317" sha1="d9f3a126c0d6899a9efd66fd350c01b4d3102b8b"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk E" />
+			<dataarea name="flop" size="1261568">
+				<rom name="nonomura_disk_e.hdm" size="1261568" crc="1640d960" sha1="94994e390163db4f0bbda2f36c0eddec1c0fc662"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2218,82 +2314,45 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="alt_title" value="闘神都市" />
 		<info name="release" value="199012xx" />
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 1).hdm" size="1261568" crc="a003c2f4" sha1="cc0f908542051f011d9f620ed9cb9632c60a46f1"/>
+				<rom name="toushin toshi (disk a).hdm" size="1261568" crc="f60163e6" sha1="07a98fe3abf515ebada8c2f29d54d6bd43ed6e7d"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 2).hdm" size="1261568" crc="092e59ef" sha1="509adda6a0260e2da433af8305f6c360175fd5e2"/>
+				<rom name="toushin toshi (disk b).hdm" size="1261568" crc="092e59ef" sha1="509adda6a0260e2da433af8305f6c360175fd5e2"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 3).hdm" size="1261568" crc="ff4377b2" sha1="0ea45b4a9cf6be8bcabe394c46fab6fb96497d4f"/>
+				<rom name="toushin toshi (disk c).hdm" size="1261568" crc="ff4377b2" sha1="0ea45b4a9cf6be8bcabe394c46fab6fb96497d4f"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 4).hdm" size="1261568" crc="37d5d673" sha1="9297cc507996bd48c533e51ac1a7a6ecdeddfc90"/>
+				<rom name="toushin toshi (disk d).hdm" size="1261568" crc="37d5d673" sha1="9297cc507996bd48c533e51ac1a7a6ecdeddfc90"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 5).hdm" size="1261568" crc="e7511be5" sha1="efda6d406431ac838acc50d18a0aa05d63782bd5"/>
+				<rom name="toushin toshi (disk e).hdm" size="1261568" crc="5e0b762d" sha1="a256a0c8117ea84edbe66b19f3337752d31781c7"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk F" />
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 6).hdm" size="1261568" crc="d4d0f12e" sha1="d0d09ff3f5215797672bcb6d78b1d11a04588f1f"/>
+				<rom name="toushin toshi (disk f).hdm" size="1261568" crc="d4d0f12e" sha1="d0d09ff3f5215797672bcb6d78b1d11a04588f1f"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk G" />
 			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 7).hdm" size="1261568" crc="32cc36a0" sha1="db3a14ac9f389f8ba75d775023d8c7d297b7f2f3"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Runs too fast -->
-	<software name="toshintoa" cloneof="toshinto" supported="partial">
-		<description>Toushin Toshi (Alt Disk 2)</description>
-		<year>1991</year>
-		<publisher>アリスソフト (AliceSoft)</publisher>
-		<info name="alt_title" value="闘神都市" />
-		<info name="release" value="199012xx" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 1).hdm" size="1261568" crc="a003c2f4" sha1="cc0f908542051f011d9f620ed9cb9632c60a46f1"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 2) [alt 1].hdm" size="1261568" crc="e7881beb" sha1="438bce9cb6ffd117642269344e3ba719519c94bf"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 3).hdm" size="1261568" crc="ff4377b2" sha1="0ea45b4a9cf6be8bcabe394c46fab6fb96497d4f"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 4).hdm" size="1261568" crc="37d5d673" sha1="9297cc507996bd48c533e51ac1a7a6ecdeddfc90"/>
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 5).hdm" size="1261568" crc="e7511be5" sha1="efda6d406431ac838acc50d18a0aa05d63782bd5"/>
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 6).hdm" size="1261568" crc="d4d0f12e" sha1="d0d09ff3f5215797672bcb6d78b1d11a04588f1f"/>
-			</dataarea>
-		</part>
-		<part name="flop7" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="toushin toshi (disk 7).hdm" size="1261568" crc="32cc36a0" sha1="db3a14ac9f389f8ba75d775023d8c7d297b7f2f3"/>
+				<rom name="toushin toshi (disk g).hdm" size="1261568" crc="32cc36a0" sha1="db3a14ac9f389f8ba75d775023d8c7d297b7f2f3"/>
 			</dataarea>
 		</part>
 	</software>

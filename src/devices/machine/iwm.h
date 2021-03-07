@@ -22,10 +22,9 @@ class iwm_device: public applefdintf_device
 {
 public:
 	// construction/destruction
-	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t q3_clock, bool disable_mon = false);
-	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, XTAL q3_clock, bool disable_mon = false) :
-		iwm_device(mconfig, tag, owner, clock, q3_clock.value(), disable_mon) {}
+	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t q3_clock = 0);
+	iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, XTAL q3_clock) :
+		iwm_device(mconfig, tag, owner, clock, q3_clock.value()) {}
 
 	virtual u8 read(offs_t offset) override;
 	virtual void write(offs_t offset, u8 data) override;
@@ -52,8 +51,10 @@ private:
 		S_IDLE,
 		SR_WINDOW_EDGE_0,
 		SR_WINDOW_EDGE_1,
+		SW_WINDOW_LOAD,
 		SW_WINDOW_MIDDLE,
-		SW_WINDOW_END
+		SW_WINDOW_END,
+		SW_UNDERRUN,
 	};
 
 	floppy_image_device *m_floppy;
@@ -65,9 +66,9 @@ private:
 	u32 m_flux_write_count;
 	u32 m_q3_clock;
 	int m_active, m_rw, m_rw_state;
-	u8 m_data, m_whd, m_mode, m_status, m_control;
+	u8 m_data, m_whd, m_mode, m_status, m_control, m_rw_bit_count;
 	u8 m_rsh, m_wsh;
-	bool m_disable_mon;
+	u8 m_devsel;
 
 	u8 control(int offset, u8 data);
 	u64 time_to_cycles(const attotime &tm) const;
@@ -83,7 +84,7 @@ private:
 	u64 read_register_update_delay() const;
 	u64 write_sync_half_window_size() const;
 	inline bool is_sync() const;
-	void flush_write();
+	void flush_write(u64 when = 0);
 };
 
 DECLARE_DEVICE_TYPE(IWM, iwm_device)

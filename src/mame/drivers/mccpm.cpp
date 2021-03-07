@@ -212,12 +212,12 @@ void mccpm_state::mccpm(machine_config &config)
 
 	/* Devices */
 	// clock supplied by pair of HD4702 baud rate generators
-	F4702(config, m_brg[0], 2.4576_MHz_XTAL);
+	F4702(config, m_brg[0], 2.4576_MHz_XTAL); // XTAL connected to Ix/Ox
 	m_brg[0]->s_callback().set_ioport("BAUD1");
 	m_brg[0]->z_callback().set("sio", FUNC(z80sio_device::rxtxcb_w));
 	m_brg[0]->z_callback().append(FUNC(mccpm_state::bd_q_w<0>));
 
-	F4702(config, m_brg[1], 2.4576_MHz_XTAL);
+	F4702(config, m_brg[1], 2.4576_MHz_XTAL); // Cp connected to first BRG's CO
 	m_brg[1]->s_callback().set_ioport("BAUD2");
 	m_brg[1]->z_callback().set("sio", FUNC(z80sio_device::txca_w));
 	m_brg[1]->z_callback().append("sio", FUNC(z80sio_device::rxca_w));
@@ -248,8 +248,8 @@ void mccpm_state::mccpm(machine_config &config)
 	FD1797(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set([this] (bool state) { mccpm_state::fdc_irq(state); });
 	m_fdc->drq_wr_callback().set([this] (u8 state) { m_fdc_status = (m_fdc_status & 0xfe) | (state ? 1 : 0); });
-	FLOPPY_CONNECTOR(config, "fdc:0", flop_types, "flop", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", flop_types, "flop", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", flop_types, "flop", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", flop_types, "flop", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 /* ROM definition */

@@ -69,7 +69,7 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="-8.99" right="392.99" top="-104" bottom="186" />
 
-	<!-- element -->
+	<!-- bezel -->
 
 		<element ref="static_green"><bounds left="-9" right="393" top="-110" bottom="-60" /></element>
 		<element ref="static_green"><bounds left="-9" right="393" top="111" bottom="200" /></element>

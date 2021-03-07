@@ -228,9 +228,9 @@ To Do:
 #include "machine/nvram.h"
 #include "machine/subsino.h"
 #include "machine/ticket.h"
+#include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
-#include "sound/3812intf.h"
 #include "video/ramdac.h"
 #include "emupal.h"
 #include "screen.h"
@@ -245,6 +245,9 @@ To Do:
 #include "smoto.lh"
 #include "tisub.lh"
 #include "stisub.lh"
+
+
+namespace {
 
 class subsino_state : public driver_device
 {
@@ -3737,6 +3740,10 @@ void subsino_state::init_victor5()
 {
 	subsino_decrypt(machine(), victor5_bitswaps, victor5_xors, 0xc000);
 
+	m_flash_packet = 0;
+	m_flash_packet_start = 0;
+	m_flash_val = 0;
+
 	save_item(NAME(m_flash_packet));
 	save_item(NAME(m_flash_packet_start));
 	save_item(NAME(m_flash_val));
@@ -3750,6 +3757,10 @@ void subsino_state::init_victor21()
 void subsino_state::init_crsbingo()
 {
 	subsino_decrypt(machine(), crsbingo_bitswaps, crsbingo_xors, 0xc000);
+
+	m_flash_packet = 0;
+	m_flash_packet_start = 0;
+	m_flash_val = 0;
 
 	save_item(NAME(m_flash_packet));
 	save_item(NAME(m_flash_packet_start));
@@ -3879,6 +3890,9 @@ void subsino_state::init_mtrainnv()
 		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
 	}
 }
+
+} // Anonymous namespace
+
 
 /***************************************************************************
 *                               Game Drivers                               *

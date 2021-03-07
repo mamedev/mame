@@ -733,7 +733,7 @@ MACHINE_START_MEMBER(liberate_state,liberate)
 
 MACHINE_RESET_MEMBER(liberate_state,liberate)
 {
-	memset(m_io_ram, 0, ARRAY_LENGTH(m_io_ram));
+	std::fill(std::begin(m_io_ram), std::end(m_io_ram), 0);
 
 	m_background_disable = 0;
 	m_background_color = 0;
@@ -876,6 +876,17 @@ void liberate_state::prosport(machine_config &config)
  *
  *************************************/
 
+// top PCB is marked: "DATA EAST DECO SSI-16" and "DE-0148-1 MADE IN JAPAN" on component side
+// mid PCB is marked: "DECO DE-0157-1 CHB-01 MADE IN JAPAN" on component side
+// bottom PCB is marked: "DATA EAST DECO DSP-17A DE-0188-1 MADE IN JAPAN" on component side
+// label format is:
+// ---
+// --------------
+// | PRO SOCCER | -> game name
+// | AM 10-3    | -> rom number
+// | C 1983     | -> copyright
+// | DATA EAST  | -> copyright
+// --------------
 ROM_START( prosoccr )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "am08.9e",  0xa000, 0x2000, CRC(73d45d0d) SHA1(07736286087478af404bd9c6b279d631a01cf4e2) )

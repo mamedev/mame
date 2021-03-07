@@ -372,8 +372,8 @@ protected:
 
 	/*! @brief Test if a variant is present in the variant vector
 	    @param variants the variant vector
-        @param variant the variant to test
-        @result true if variant is in variants
+	    @param variant the variant to test
+	    @result true if variant is in variants
 	*/
 	static bool has_variant(const std::vector<uint32_t> &variants, uint32_t variant);
 
@@ -750,6 +750,8 @@ public:
 	uint32_t get_variant() const { return variant; }
 	//! @param v the variant.
 	void set_variant(uint32_t v) { variant = v; }
+	//! @param v the variant.
+	void set_form_variant(uint32_t f, uint32_t v) { if(form_factor == FF_UNKNOWN) form_factor = f; variant = v; }
 
 	/*!
 	  @param track
@@ -782,6 +784,9 @@ public:
 
 	//! @return the track resolution (0=full track, 1 = half-track, 2 = quarter track)
 	int get_resolution() const;
+
+	//! @return whether a given track is formatted
+	bool track_is_formatted(int track, int head, int subtrack = 0);
 
 	//! Returns the variant name for the particular disk form factor/variant
 	//! @param form_factor

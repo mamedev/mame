@@ -105,8 +105,8 @@ void spc1000_fdd_exp_device::device_add_mconfig(machine_config &config)
 	m_fdc->intrq_wr_callback().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 
 	// floppy drives
-	FLOPPY_CONNECTOR(config, "upd765:0", sd725_floppies, "sd320", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", sd725_floppies, "sd320", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:0", sd725_floppies, "sd320", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", sd725_floppies, "sd320", floppy_image_device::default_mfm_floppy_formats);
 }
 
 ROM_START( spc1000_fdd )

@@ -757,10 +757,10 @@ void wicat_state::wicat(machine_config &config)
 	wd1kcpu.set_addrmap(AS_IO, &wicat_state::wd1000_io);
 
 	FD1795(config, m_fdc, 8_MHz_XTAL);
-	FLOPPY_CONNECTOR(config, "fdc:0", wicat_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:2", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:3", wicat_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", wicat_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", wicat_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:2", wicat_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", wicat_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("wicat");
 

@@ -434,10 +434,10 @@ void jpmsys5_state::jpm_sys5_common_map(address_map &map)
 	map(0x046080, 0x046083).rw("acia6850_1", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 
 	map(0x046084, 0x046085).r(FUNC(jpmsys5_state::unknown_port_r));
-//	map(0x04608c, 0x04608f).r(FUNC(jpmsys5_state::unk_r));
+//  map(0x04608c, 0x04608f).r(FUNC(jpmsys5_state::unk_r));
 
 	map(0x04608c, 0x04608f).rw("acia6850_2", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
-	
+
 	map(0x0460c0, 0x0460c1).nopw();
 
 	map(0x048000, 0x048001).rw(FUNC(jpmsys5_state::unk_48000_r), FUNC(jpmsys5_state::unk_48000_w));

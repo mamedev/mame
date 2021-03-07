@@ -126,7 +126,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(irq7_w)       { update_irqs(6, state); }
 	DECLARE_WRITE_LINE_MEMBER(irq7a_w)      { update_irqs(7, state); }
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	uint8_t program_read(int cas, offs_t offset);
@@ -747,9 +747,11 @@ WRITE_LINE_MEMBER( dmv_state::fdc_irq )
 }
 
 
-FLOPPY_FORMATS_MEMBER( dmv_state::floppy_formats )
-	FLOPPY_DMV_FORMAT
-FLOPPY_FORMATS_END
+void dmv_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_DMV_FORMAT);
+}
 
 
 static void dmv_slot1(device_slot_interface &device)

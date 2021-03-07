@@ -35,9 +35,9 @@
     TODO:
 
     - sas/format/format in abcenix tries to access the SASI card using a memory location mapped for task 0, when the process is run as task 1
-		- MAC task/page/segment addressing failure?
-		- MAC page/segment RAM write strobe decoding failure?
-		- CPU does not enter supervisor mode when needed?
+        - MAC task/page/segment addressing failure?
+        - MAC page/segment RAM write strobe decoding failure?
+        - CPU does not enter supervisor mode when needed?
 
         [:mac] ':3f' (0009E) ff800:4f TASK 0 SEGMENT 15 PAGE 15 MEM 7f800-7ffff 1ff800
         [:mac] ':3f' (0009E) ff801:ff TASK 0 SEGMENT 15 PAGE 15 MEM 7f800-7ffff 1ff800
@@ -964,9 +964,9 @@ void abc1600_state::abc1600(machine_config &config)
 	m_fdc->intrq_wr_callback().set(m_cio, FUNC(z8536_device::pb7_w));
 	m_fdc->drq_wr_callback().set(FUNC(abc1600_state::update_drdy0));
 
-	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":0", abc1600_floppies, nullptr, floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":1", abc1600_floppies, nullptr, floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":2", abc1600_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":0", abc1600_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":1", abc1600_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, SAB1797_02P_TAG":2", abc1600_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 
 	ABCBUS_SLOT(config, m_bus0i, 64_MHz_XTAL / 16, abc1600bus_cards, nullptr);
 	m_bus0i->irq_callback().set(m_cio, FUNC(z8536_device::pa7_w));

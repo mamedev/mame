@@ -166,6 +166,8 @@ VIDEO_START_MEMBER(sauro_state,trckydoc)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sauro_state::get_tile_info_bg)), TILEMAP_SCAN_COLS,
 			8, 8, 32, 32);
+
+	m_palette_bank = 0;
 }
 
 void sauro_state::trckydoc_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)

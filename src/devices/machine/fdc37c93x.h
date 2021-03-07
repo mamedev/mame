@@ -100,7 +100,7 @@ public:
 	uint8_t keybc_status_r();
 	void keybc_command_w(uint8_t data);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 protected:
 	// device-level overrides

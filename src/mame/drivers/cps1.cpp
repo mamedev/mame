@@ -247,9 +247,9 @@ Stephh's log (2006.09.20) :
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/upd4701.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "sound/qsound.h"
+#include "sound/ym2151.h"
 #include "machine/kabuki.h"
 #include "speaker.h"
 
@@ -8202,12 +8202,85 @@ ROM_START( sf2re ) // combines sf2m8 program ROMs with sf2cems6a ROMs for most G
 	ROM_LOAD( "27c020.u210", 0x00000, 0x40000, CRC(6cfffb11) SHA1(995526183ffd35f92e9096500a3fe6237faaa2dd) )
 ROM_END
 
+// PCB is marked: "100P003" and "054-034" on solder side
+// PCB is labelled: "10037SI 7", "STREET FIGHTER 2" and "STREET FIGHTER II MAGIC TURBO" on component side
+ROM_START( sf2mkot )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "u222.bin", 0x000000, 0x80000, CRC(b01a94b6) SHA1(a23682ccb463d766fd81a53cbc29b31f3fd4e5e0) )
+	ROM_LOAD16_BYTE( "u196.bin", 0x000001, 0x80000, CRC(20461c47) SHA1(485aa19d4d0a4a849f81b0d3e29137e461129fd6) )
+	ROM_LOAD16_BYTE( "u221.bin", 0x100000, 0x20000, CRC(64e6e091) SHA1(32ec05db955e538d4ada26d19ee50926f74b684f) )
+	ROM_LOAD16_BYTE( "u195.bin", 0x100001, 0x20000, CRC(c95e4443) SHA1(28417dee9ccdfa65b0f4a92aa29b90279fe8cd85) )
+
+	ROM_REGION( 0x600000, "gfx", 0 )
+	ROM_LOAD64_WORD( "d21.u70", 0x000000, 0x80000, CRC(baa0f81f) SHA1(5e55a5c4ad64be17089670a3d73c1c0d9082351b) )
+	ROM_CONTINUE(               0x000004, 0x80000)
+	ROM_LOAD64_WORD( "d24.u68", 0x000002, 0x80000, CRC(8edff95a) SHA1(8db35c5940dcc1f09f11be26051b2f98445d10e7) )
+	ROM_CONTINUE(               0x000006, 0x80000)
+	ROM_LOAD64_WORD( "d22.u69", 0x200000, 0x80000, CRC(468962b1) SHA1(fdfd2a7cbbcafaa37e972da425446d471e1e1dae) )
+	ROM_CONTINUE(               0x200004, 0x80000)
+	ROM_LOAD64_WORD( "d25.u64", 0x200002, 0x80000, CRC(8165f536) SHA1(8178fe2240c73c7283592aa31dd24aec5bf9429b) )
+	ROM_CONTINUE(               0x200006, 0x80000)
+	ROM_LOAD64_WORD( "d23.u19", 0x400000, 0x80000, CRC(39d763d3) SHA1(a2a0bddecaca6046785ccddfd20b8356a6ec36f0) )
+	ROM_CONTINUE(               0x400004, 0x80000)
+	ROM_LOAD64_WORD( "d26.u18", 0x400002, 0x80000, CRC(93ec42ae) SHA1(7c8b481d61a4e9977cac35236835f4aa5badf992) )
+	ROM_CONTINUE(               0x400006, 0x80000)
+	// extra gfx layer roms loaded over the former ones
+	ROM_LOAD64_WORD( "moon-1.c173.u30", 0x400004, 0x20000, CRC(7e36ec84) SHA1(ab6ad48726ca3649db77b9971105374a10e0aa22) )
+	ROM_CONTINUE(                       0x400000, 0x20000)
+	ROM_LOAD64_WORD( "moon-2.c132.u29", 0x400006, 0x20000, CRC(66403570) SHA1(fbd276784df8754bf4f2c6a72060e14af4cc5729) )
+	ROM_CONTINUE(                       0x400002, 0x20000)
+	// end of extra gfx layer roms
+
+	ROM_REGION( 0x18000, "audiocpu", 0 )
+	ROM_LOAD( "conv2.u191", 0x00000, 0x08000, CRC(08f6b60e) SHA1(8258fcaca4ac419312531eec67079b97f471179c) )
+	ROM_CONTINUE(                  0x10000, 0x08000 )
+
+	ROM_REGION( 0x20000, "user1", 0 ) // unknown (bootleg priority?)
+	ROM_LOAD( "u133.bin", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "voice.u210", 0x00000, 0x40000, CRC(6cfffb11) SHA1(995526183ffd35f92e9096500a3fe6237faaa2dd) )
+
+	ROM_REGION( 0x4000, "plds", ROMREGION_ERASE00 ) // all read-protected
+	ROM_LOAD( "gal16v8a-25lp.u6",   0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u15",  0x0200, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.n03",  0x0400, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.n04",  0x0600, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.n05",  0x0800, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.n06",  0x0a00, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u95",  0x0c00, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u96",  0x0e00, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u107", 0x1000, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u125", 0x1200, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u139", 0x1400, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u151", 0x1600, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u173", 0x1800, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u176", 0x1a00, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u177", 0x1c00, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u178", 0x1e00, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u183", 0x2000, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u198", 0x2200, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal16v8a-25lp.u218", 0x2400, 0x0117, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.u20",  0x2600, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.u21",  0x2800, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.u34",  0x2a00, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.u35",  0x2c00, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.u39",  0x2e00, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.n07",  0x3000, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.n08",  0x3200, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.u104", 0x3400, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.u131", 0x3600, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.u135", 0x3800, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal20v8a-25lp.u140", 0x3a00, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal22v10-25lp.u134", 0x3c00, 0x02e5, NO_DUMP )
+ROM_END
+
 ROM_START( sf2rk )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "w6.u222", 0x000000, 0x80000, CRC(49422b6f) SHA1(69fe9147c7ee3f6fa29077df16f4ef1224495be3) )
 	ROM_LOAD16_BYTE( "w5.u196", 0x000001, 0x80000, CRC(7e9c8c2f) SHA1(3d34a3920a771e1d62a41c104c8b16e3c6ac9405) )
 
-	/* The dark screen issue is present on the real pcb, although much less noticable than in mame.
+	/* The dark screen issue is present on the real pcb, although much less noticeable than in mame.
 	   The bootleggers have patched out the code which modifies the brightness/fade component of the palette word.
 	   This is somewhat strange as unlike some bootlegs, this board DOES have the brightness circuitry (2x 7407's, 12x resistor dac) populated!
 	   The below patch fixes the issue:   (for pcb fix burn a 27c040 of w6.u222 with 0x8f7=0x6b)
@@ -11626,7 +11699,7 @@ ROM_START( varthb2 )
 	// pcb picture shows 4x 42-pin mask roms which suggests 4x 27c800 (4MB) for gfx vs originals 4x 27c400 (2MB)
 	// roms u18,19 might just be duplicates of u68,70 (although markings are different?) or just half empty
 	// games expects sprites to start at 0x8000 so reloading in upper region
-	ROM_REGION( 0x600000, "gfx", 0 )
+	ROM_REGION( 0x600000, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "va-5m.7a", 0x000000, 0x80000, BAD_DUMP CRC(b1fb726e) SHA1(5ac0876b6c49d0a99710dda68653664f4d8c1167) )
 	ROM_RELOAD(                  0x400000, 0x80000)
 	ROM_LOAD64_WORD( "va-7m.9a", 0x000002, 0x80000, BAD_DUMP CRC(4c6588cd) SHA1(d14e8cf051ac934ccc989d8c571c6cc9eed34af5) )
@@ -14148,6 +14221,7 @@ GAME( 1992, sf2cems6b,   sf2ce,    sf2cems6,   sf2bhh,   cps_state, init_cps1,  
 GAME( 1992, sf2cems6c,   sf2ce,    sf2cems6,   sf2bhh,   cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Mstreet-6, bootleg, set 3)", MACHINE_SUPPORTS_SAVE ) // 920322 USA
 GAME( 1992, sf2ceds6,    sf2ce,    sf2cems6,   sf2,      cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Dstreet-6, bootleg)", MACHINE_SUPPORTS_SAVE ) // 920313 USA
 GAME( 1992, sf2re,       sf2,      sf2m3,      sf2,      cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (RE, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )    // 920313 - based on USA version, glitch on title screen confirmed not to happen on PCB so MIG
+GAME( 1992, sf2mkot,     sf2,      cps1_10MHz, sf2hack,  cps_state, init_sf2hack,  ROT0,   "bootleg", "Street Fighter II': Magic KO Turbo!! - Nightmare Crack", MACHINE_SUPPORTS_SAVE ) // 920313 - based on World version
 GAME( 1992, cworld2j,    0,        cps1_12MHz, cworld2j, cps_state, init_cps1,     ROT0,   "Capcom", "Adventure Quiz Capcom World 2 (Japan 920611)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, cworld2ja,   cworld2j, cps1_12MHz, cworld2j, cps_state, init_cps1,     ROT0,   "Capcom", "Adventure Quiz Capcom World 2 (Japan 920611, B-Board 90629B-3, no battery)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, cworld2jb,   cworld2j, cps1_12MHz, cworld2j, cps_state, init_cps1,     ROT0,   "Capcom", "Adventure Quiz Capcom World 2 (Japan 920611, B-Board 91634B-2)", MACHINE_SUPPORTS_SAVE )

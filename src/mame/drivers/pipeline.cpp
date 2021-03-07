@@ -74,7 +74,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "machine/i8255.h"
 #include "machine/z80ctc.h"
 
-#include "sound/2203intf.h"
+#include "sound/ym2203.h"
 
 #include "emupal.h"
 #include "screen.h"

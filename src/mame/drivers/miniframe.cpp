@@ -238,7 +238,7 @@ void miniframe_state::miniframe(machine_config &config)
 	WD2797(config, m_wd2797, 1000000);
 //  m_wd2797->intrq_wr_callback().set(FUNC(miniframe_state::wd2797_intrq_w));
 //  m_wd2797->drq_wr_callback().set(FUNC(miniframe_state::wd2797_drq_w));
-	FLOPPY_CONNECTOR(config, "wd2797:0", miniframe_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd2797:0", miniframe_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	// 8263s
 	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));

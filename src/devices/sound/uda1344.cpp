@@ -2,21 +2,21 @@
 // copyright-holders:Ryan Holtz
 /***************************************************************************
 
-	Philips UDA1344 Stereo Audio Codec skeleton
+    Philips UDA1344 Stereo Audio Codec skeleton
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "sound/uda1344.h"
 
-#define LOG_ADDR			(1 << 1)
-#define LOG_STATUS_REG		(1 << 2)
-#define LOG_DATA_REG		(1 << 3)
-#define LOG_INPUT			(1 << 4)
-#define LOG_OVERRUNS		(1 << 5)
-#define LOG_ALL				(LOG_ADDR | LOG_STATUS_REG | LOG_DATA_REG | LOG_INPUT | LOG_OVERRUNS)
+#define LOG_ADDR            (1 << 1)
+#define LOG_STATUS_REG      (1 << 2)
+#define LOG_DATA_REG        (1 << 3)
+#define LOG_INPUT           (1 << 4)
+#define LOG_OVERRUNS        (1 << 5)
+#define LOG_ALL             (LOG_ADDR | LOG_STATUS_REG | LOG_DATA_REG | LOG_INPUT | LOG_OVERRUNS)
 
-#define VERBOSE				(0)
+#define VERBOSE             (0)
 #include "logmacro.h"
 
 

@@ -263,7 +263,7 @@ u16 wswan_sound_device::port_r(offs_t offset, u16 mem_mask)
 				(m_audio4_noise ? 0x80 : 0x00) |
 				(m_mono ? 0x0100 : 0x00) | (m_output_volume << 9) |
 				(m_external_stereo ? 0x0800 : 0x00) |
-				(m_external_speaker ? 0x00 : 0x00);	// TODO 0x80 is set when external speaker is connected
+				(m_external_speaker ? 0x00 : 0x00); // TODO 0x80 is set when external speaker is connected
 		case 0x92 / 2:
 			return m_noise_shift;
 		case 0x94 / 2:

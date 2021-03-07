@@ -591,7 +591,7 @@ void i8244_device::char_pixel(u8 index, int x, int y, u8 pixel, u16 color, bitma
 void i8244_device::draw_major(int scanline, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// quad objects
-	for (int i = ARRAY_LENGTH(m_vdc.s.quad) - 1; i >= 0; i--)
+	for (int i = std::size(m_vdc.s.quad) - 1; i >= 0; i--)
 	{
 		int y = m_vdc.s.quad[i].single[0].y;
 		if (is_ntsc() && y < 0xe)
@@ -605,7 +605,7 @@ void i8244_device::draw_major(int scanline, bitmap_ind16 &bitmap, const rectangl
 		{
 			int x = (m_vdc.s.quad[i].single[0].x + 5) * 2;
 
-			for (int j = 0; j < ARRAY_LENGTH(m_vdc.s.quad[0].single); j++, x += 16)
+			for (int j = 0; j < std::size(m_vdc.s.quad[0].single); j++, x += 16)
 			{
 				int offset = (m_vdc.s.quad[i].single[j].ptr | ((m_vdc.s.quad[i].single[j].color & 0x01) << 8)) + (y >> 1) + ((scanline - y) >> 1);
 
@@ -617,7 +617,7 @@ void i8244_device::draw_major(int scanline, bitmap_ind16 &bitmap, const rectangl
 	}
 
 	// regular foreground objects
-	for (int i = ARRAY_LENGTH(m_vdc.s.foreground) - 1; i >= 0; i--)
+	for (int i = std::size(m_vdc.s.foreground) - 1; i >= 0; i--)
 	{
 		int y = m_vdc.s.foreground[i].y;
 		if (is_ntsc() && y < 0xe)
@@ -642,7 +642,7 @@ void i8244_device::draw_major(int scanline, bitmap_ind16 &bitmap, const rectangl
 void i8244_device::draw_minor(int scanline, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// minor system (sprites)
-	for (int i = ARRAY_LENGTH(m_vdc.s.sprites) - 1; i >= 0; i--)
+	for (int i = std::size(m_vdc.s.sprites) - 1; i >= 0; i--)
 	{
 		int y = m_vdc.s.sprites[i].y;
 		int height = 8;

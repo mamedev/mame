@@ -331,7 +331,7 @@ void nt7534_device::data_write(uint8_t data)
 
 	LOG("RAM write %x %x '%c'\n", m_page*132 + m_column, m_dr, isprint(m_dr) ? m_dr : '.');
 
-	if (m_page*132 + m_column < ARRAY_LENGTH(m_ddram))
+	if (m_page*132 + m_column < std::size(m_ddram))
 		m_ddram[m_page*132 + m_column] = m_dr;
 
 	if (m_column < 131)
@@ -342,7 +342,7 @@ void nt7534_device::data_write(uint8_t data)
 
 uint8_t nt7534_device::data_read()
 {
-	if (m_page*132 + m_column >= ARRAY_LENGTH(m_ddram))
+	if (m_page*132 + m_column >= std::size(m_ddram))
 		return 0;
 
 	uint8_t data = m_ddram[m_page*132 + m_column];

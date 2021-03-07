@@ -20,7 +20,6 @@
 
 /* Tags */
 
-#define MAINCPU_TAG "maincpu"
 #define DMACPU_TAG  "dmacpu"
 #define PIA_0_TAG   "pia_0"
 #define PIA_1_TAG   "pia_1"
@@ -99,13 +98,18 @@ public:
 		m_floppy1(*this, FDC_TAG ":1"),
 		m_floppy2(*this, FDC_TAG ":2"),
 		m_floppy3(*this, FDC_TAG ":3"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_system_rom(*this, "maincpu")
 	{ }
 
 	void dgnbeta(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	required_device<mc6845_device> m_mc6845;
 	required_device<cpu_device> m_maincpu;
@@ -121,7 +125,7 @@ private:
 	required_device<floppy_connector> m_floppy3;
 	required_device<palette_device> m_palette;
 
-	uint8_t *m_system_rom;
+	required_region_ptr<uint8_t> m_system_rom;
 	int m_LogDatWrites;
 	int m_Keyboard[NoKeyrows];
 	int m_RowShifter;
@@ -138,7 +142,7 @@ private:
 	int m_PIATaskReg;
 	int m_EnableMapRegs;
 	PageReg m_PageRegs[MaxTasks+1][MaxPage+1];
-	int m_beta_6845_RA;
+	int m_beta_6845_RA; // TODO: most of the variables from here on aren't used anywhere. Left-over or reminder of things to be implemented?
 	int m_beta_scr_x;
 	int m_beta_scr_y;
 	int m_beta_HSync;
@@ -171,8 +175,6 @@ private:
 	int m_ColourRAM[4];
 	int m_Field;
 	int m_DrawInterlace;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	void dgn_beta_palette(palette_device &palette) const;
 
 	uint8_t d_pia0_pa_r();

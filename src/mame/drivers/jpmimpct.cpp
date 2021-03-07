@@ -19,9 +19,6 @@
     ROMS wanted:
         * Snakes and Ladders
 
-    Known issues:
-        * Digital volume control is not emulated.
-
     Mechanical games note:
 
     Anything writing to 4800a0 within the first few instructions is guessed
@@ -292,10 +289,31 @@ void jpmimpct_state::machine_reset()
  *************************************/
 void jpmimpct_state::volume_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+
 	if (ACCESSING_BITS_0_7)
 	{
+		int changed = m_volume_latch^(data&0xf0);
 		m_upd7759->set_rom_bank((data >> 1) & 3);
 		m_upd7759->reset_w(BIT(data, 0));
+
+		if ( changed & 0x10)
+		{ // digital volume clock line changed
+			if ( !(data & 0x10) )
+			{ // changed from high to low,
+				if ( !(data & 0x20) )//down
+				{
+					if ( m_global_volume > 0  ) m_global_volume--;
+				}
+				else
+				{
+					if ( m_global_volume < 99 ) m_global_volume++;
+				}
+
+				float percent = (m_global_volume)/99.0;
+				m_upd7759->set_output_gain(0, percent);
+			}
+		}
+		m_volume_latch = (data & 0xf0);
 	}
 }
 
@@ -515,7 +533,7 @@ void jpmimpct_video_state::slides_video_w(offs_t offset, uint16_t data, uint16_t
 
 /*
    Some Input Switch numbers according to test modes
- 
+
    DSW 0x01 = Switch 0
    DSW 0x02 = 1
    DSW 0x04 = 1
@@ -562,7 +580,7 @@ void jpmimpct_state::common_map(address_map& map)
 	map(0x00480032, 0x00480033).portr("COIN_SENSE");
 	map(0x00480034, 0x00480035).r(FUNC(jpmimpct_state::ump_r));
 
-	map(0x00480060, 0x00480067).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); 
+	map(0x00480060, 0x00480067).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 
 	map(0x00480080, 0x00480081).w(FUNC(jpmimpct_state::upd7759_w));
 	map(0x00480082, 0x00480083).w(FUNC(jpmimpct_state::volume_w));
@@ -606,7 +624,7 @@ void jpmimpct_state::impact_non_video_map(address_map &map)
 	common_map(map);
 
 	map(0x00480040, 0x00480041).r(FUNC(jpmimpct_state::optos_r));
-	
+
 	// are these genuine reads, or just code going wrong prior to them happening?
 	map(0x00480086, 0x0048009f).r(FUNC(jpmimpct_state::prot_1_r));
 	map(0x004801dc, 0x004801dd).r(FUNC(jpmimpct_state::prot_1_r));
@@ -738,7 +756,7 @@ INPUT_PORTS_START( jpmimpct_inputs )
 	// others show error "5.5 MODE OF PLAY INVALID", or "91 00 Illegal Mode"
 	// games that don't require keys either expect them not to be fitted
 	// or will simply ignore them
-	PORT_START("J10_0") 
+	PORT_START("J10_0")
 	PORT_CONFNAME( 0x0f, 0x08, "Jackpot / Prize Key" )
 	PORT_CONFSETTING(    0x0f, "Not Fitted"  )
 	PORT_CONFSETTING(    0x0e, "0x0e"  )
@@ -746,7 +764,7 @@ INPUT_PORTS_START( jpmimpct_inputs )
 	PORT_CONFSETTING(    0x0c, "0x0c"  )
 	PORT_CONFSETTING(    0x0b, "0x0b"  )
 	PORT_CONFSETTING(    0x0a, "8 GBP Cash"  )
-	PORT_CONFSETTING(    0x09, "8 GBP Token"  ) 
+	PORT_CONFSETTING(    0x09, "8 GBP Token"  )
 	PORT_CONFSETTING(    0x08, "10 GBP Cash"  )
 	PORT_CONFSETTING(    0x07, "5 GBP"  )
 	PORT_CONFSETTING(    0x06, "15 GBP"  )
@@ -921,8 +939,8 @@ INPUT_PORTS_START( jpmimpct_inputs )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, "PAYCOIN_LEVEL: 0x80 (100p cash full)")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )	
-		
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
 	PORT_START("TEST_DEMO")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( "Test/Demo" )
 

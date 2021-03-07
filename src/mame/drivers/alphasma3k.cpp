@@ -20,6 +20,11 @@ AlphaSmart 3000 PCB:
      | |__|    /     | HC132A     HC74A  on/off                                       ____________________|
      |________/      |_______________________________________________________________/
 
+The later AlphaSmart models' firmware can be updated using the Manager application (Windows / Mac) and a USB cable.
+Each update comprises two files, the "os" and the "smallos". Those files do not include the full Operating System image.
+Two version updaters known:
+- System 3 Neo Jul 11 2013, 09:44:53 + OS 3KNeo Small ROM, included with Manager 3.93
+- System 3 Neo Jan 27 2010, 13:44:00 + OS 3KNeo Small ROM, included with Manager 3.60
 
     TODO:
     - Everything

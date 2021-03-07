@@ -29,6 +29,8 @@ TODO:
 #include "quizshow.lh"
 
 
+namespace {
+
 static constexpr XTAL MASTER_CLOCK  = 12.096_MHz_XTAL;
 static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK / 2;
 
@@ -395,6 +397,7 @@ void quizshow_state::machine_reset()
 {
 	m_category_enable = 0;
 	m_tape_head_pos = 0;
+	m_clocks = 0;
 }
 
 void quizshow_state::quizshow(machine_config &config)
@@ -470,6 +473,8 @@ void quizshow_state::init_quizshow()
 		}
 	}
 }
+
+} // Anonymous namespace
 
 
 GAMEL( 1976, quizshow, 0, quizshow, quizshow, quizshow_state, init_quizshow, ROT0, "Atari (Kee Games)", "Quiz Show", MACHINE_NOT_WORKING, layout_quizshow )

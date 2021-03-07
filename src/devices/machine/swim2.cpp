@@ -97,17 +97,23 @@ void swim2_device::flush_write(u64 when)
 		when = m_last_sync;
 
 	if(m_floppy && when > m_flux_write_start) {
-		if(m_flux_write_count && m_flux_write[m_flux_write_count-1] == when)
+		bool last_on_edge = m_flux_write_count && m_flux_write[m_flux_write_count-1] == when;
+		if(last_on_edge)
 			m_flux_write_count--;
+
 		attotime start = cycles_to_time(m_flux_write_start);
 		attotime end = cycles_to_time(when);
 		std::vector<attotime> fluxes(m_flux_write_count);
 		for(u32 i=0; i != m_flux_write_count; i++)
 			fluxes[i] = cycles_to_time(m_flux_write[i]);
 		m_floppy->write_flux(start, end, m_flux_write_count, m_flux_write_count ? &fluxes[0] : nullptr);
-	}
-	m_flux_write_count = 0;
-	m_flux_write_start = when;
+
+		m_flux_write_count = 0;
+		if(last_on_edge)
+			m_flux_write[m_flux_write_count++] = when;
+		m_flux_write_start = when;
+	} else
+		m_flux_write_count = 0;
 }
 
 void swim2_device::show_mode() const
@@ -149,7 +155,7 @@ u8 swim2_device::read(offs_t offset)
 		return r;
 	}
 
-	case 0x2: { // errpr
+	case 0x2: { // error
 		u8 err = m_error;
 		m_error = 0;
 		return err;
@@ -157,7 +163,7 @@ u8 swim2_device::read(offs_t offset)
 
 	case 0x3: { // param
 		u8 r = m_param[m_param_idx];
-		m_param_idx = (m_param_idx + 1) & 15;
+		m_param_idx = (m_param_idx + 1) & 3;
 		return r;
 	}
 
@@ -231,7 +237,7 @@ void swim2_device::write(offs_t offset, u8 data)
 		if(fifo_push(M_CRC) && !m_error)
 			m_error |= 0x04;
 		break;
-		
+
 	case 3: { // param
 		static const char *const pname[4] = {
 			"late", "time0", "early", "time1"
@@ -394,7 +400,7 @@ void swim2_device::sync()
 					cycles = 0;
 					break;
 				}
-			}			
+			}
 
 			if(m_tss_output & 0xc) {
 				bool bit;
@@ -443,7 +449,7 @@ void swim2_device::sync()
 					crc_clear();
 			}
 			m_current_bit --;
-			bool bit = (m_sr >> m_current_bit) & 1;
+			int bit = (m_sr >> m_current_bit) & 1;
 			if(!(m_sr & M_MARK))
 				crc_update(bit);
 			m_tss_sr = (m_tss_sr << 1) | bit;
@@ -478,12 +484,10 @@ void swim2_device::sync()
 		} else {
 			// MFM mode
 			for(;;) {
-				static u16 xinf = 0xffff;
 				attotime when;
 				int bit = m_pll.get_next_bit(when, m_floppy, limit);
 				if(bit == -1)
 					break;
-				xinf = (xinf << 1) | bit;
 				if(m_mfm_sync_counter < 64) {
 					if(bit != (m_mfm_sync_counter & 1))
 						m_mfm_sync_counter ++;
@@ -525,7 +529,7 @@ void swim2_device::sync()
 						}
 					}
 				}
-			}				
+			}
 		}
 	}
 

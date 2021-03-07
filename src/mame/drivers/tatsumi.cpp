@@ -272,7 +272,7 @@ void apache3_state::apache3_v20_map(address_map &map)
 	map(0x00000, 0x01fff).ram();
 	map(0x04000, 0x04003).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x06000, 0x06001).portr("IN0"); // esw
-	map(0x08000, 0x08001).r(FUNC(apache3_state::tatsumi_hack_ym2151_r)).w(m_ym2151, FUNC(ym2151_device::write));
+	map(0x08000, 0x08001).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x0a000, 0x0a000).r(m_oki, FUNC(okim6295_device::read)).w(m_oki, FUNC(okim6295_device::write));
 	map(0x0e000, 0x0e007).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w));
 	map(0xf0000, 0xfffff).rom().region("sound_rom", 0);
@@ -320,7 +320,7 @@ void roundup5_state::roundup5_z80_map(address_map &map)
 {
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xffef).ram();
-	map(0xfff0, 0xfff1).r(FUNC(roundup5_state::tatsumi_hack_ym2151_r)).w(m_ym2151, FUNC(ym2151_device::write));
+	map(0xfff0, 0xfff1).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xfff4, 0xfff4).r(m_oki, FUNC(okim6295_device::read)).w(m_oki, FUNC(okim6295_device::write));
 	map(0xfff8, 0xfffb).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfffc, 0xfffc).portr("STICKX");
@@ -379,7 +379,7 @@ void cyclwarr_state::sound_map(address_map &map)
 {
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xffef).ram();
-	map(0xfff0, 0xfff1).r(FUNC(cyclwarr_state::tatsumi_hack_ym2151_r)).w(m_ym2151, FUNC(ym2151_device::write));
+	map(0xfff0, 0xfff1).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xfff4, 0xfff4).r(FUNC(cyclwarr_state::oki_status_xor_r)).w(m_oki, FUNC(okim6295_device::write));
 	map(0xfffc, 0xfffc).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xfffe, 0xfffe).nopw();

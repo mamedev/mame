@@ -7,7 +7,7 @@ MAME's purpose is to preserve decades of software history. As electronic technol
 
 |
 | **MAME®**
-| **Copyright © 1997-2020 by Nicola Salmoria and the MAME team**
+| **Copyright © 1997-2021 by Nicola Salmoria and the MAME team**
 | **MAME is a registered trademark owned by Gregory Ember**
 |
 

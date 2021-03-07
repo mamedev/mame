@@ -144,6 +144,9 @@ public:
 	void init_lamachin();
 	void init_model3_15();
 
+protected:
+	virtual void video_start() override;
+
 private:
 	required_device<ppc_device> m_maincpu;
 	optional_device<lsi53c810_device> m_lsi53c810;
@@ -332,7 +335,6 @@ private:
 	void set_irq_line(uint8_t bit, int line);
 	void model3_init(int step);
 	// video
-	virtual void video_start() override;
 	uint32_t screen_update_model3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(tile_info_layer0_4bit);
 	TILE_GET_INFO_MEMBER(tile_info_layer1_4bit);

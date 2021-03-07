@@ -59,7 +59,7 @@ Note : there is an ingame typo bug that doesn't display the bonus life values
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/2203intf.h"
+#include "sound/ym2203.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -53,15 +53,17 @@ DEFINE_DEVICE_TYPE(BBC_OPUSA, bbc_opusa_device, "bbc_opusa", "Opus Challenger AD
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER(bbc_opus3_device::floppy_formats)
-	FLOPPY_ACORN_SSD_FORMAT,
-	FLOPPY_ACORN_DSD_FORMAT,
-	FLOPPY_ACORN_ADFS_OLD_FORMAT,
-	FLOPPY_ACORN_DOS_FORMAT,
-	FLOPPY_FSD_FORMAT,
-	FLOPPY_OPUS_DDOS_FORMAT,
-	FLOPPY_OPUS_DDCPM_FORMAT
-FLOPPY_FORMATS_END
+void bbc_opus3_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ACORN_SSD_FORMAT);
+	fr.add(FLOPPY_ACORN_DSD_FORMAT);
+	fr.add(FLOPPY_ACORN_ADFS_OLD_FORMAT);
+	fr.add(FLOPPY_ACORN_DOS_FORMAT);
+	fr.add(FLOPPY_FSD_FORMAT);
+	fr.add(FLOPPY_OPUS_DDOS_FORMAT);
+	fr.add(FLOPPY_OPUS_DDCPM_FORMAT);
+}
 
 void bbc_floppies(device_slot_interface &device)
 {

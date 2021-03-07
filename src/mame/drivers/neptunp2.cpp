@@ -38,6 +38,7 @@ Unidesa Cirsa Las Llaves del Tesoro
 Unidesa Cirsa Secreto de la Pirámide
 Unidesa Cirsa Filón
 Unidesa Cirsa Multi Points
+Unidesa Cirsa Corsario
 
  CIRSA / UNIDESA 960606-5 CPU BOARD
  _________________________________________________________________
@@ -172,13 +173,13 @@ INPUT_PORTS_END
 #if 0
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8*8 characters */
-	RGN_FRAC(1,3),  /* 1024 characters */
-	3,  /* 3 bits per pixel */
-	{ RGN_FRAC(1,3), RGN_FRAC(2,3), RGN_FRAC(0,3) },    /* the bitplanes are separated */
+	8,8,    // 8*8 characters
+	RGN_FRAC(1,3),  // 1024 characters
+	3,  // 3 bits per pixel
+	{ RGN_FRAC(1,3), RGN_FRAC(2,3), RGN_FRAC(0,3) },    // The bitplanes are separated
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 /* every char takes 8 consecutive bytes */
+	8*8 // Every char takes 8 consecutive bytes
 };
 #endif
 
@@ -238,6 +239,25 @@ ROM_END
 Games on Cirsa "960606-5" PCB
 ***************************************************************************/
 
+// No battery on the PCB for this game. PLD "PAT-062", CPLD "PD03" (Xilinx XC9536).
+ROM_START( ccorsario ) // PCB serigraphed 'CB1 (CS4)' and '960606-5 CPU'. It was found with most sockets unpopulated. This is mechanical.
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "u2", 0x000000, 0x100000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "prg_data", 0 )
+	ROM_LOAD( "u3", 0x000000, 0x100000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "cirsa_corsario_b-2057-a_s127_1.0.u14", 0x00000, 0x80000, CRC(f15ccc6b) SHA1(08f2f0129634075297d4a6b9697ba5bd0c8455ce) )
+	ROM_LOAD( "cirsa_corsario_b-2057-a_s128_1.0.u15", 0x80000, 0x80000, CRC(061dc7c8) SHA1(a9c8da9c2e7cecd8800974ce70546cc60391cfe8) )
+
+	ROM_REGION( 0x800, "eeprom", 0 )
+	ROM_LOAD( "24lc16b.u10", 0x000, 0x800, CRC(0212ae8f) SHA1(d1db767bd4314894e0cbf8063290fe3260646843) )
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "pat_062_tibpal16l8-25cn.bin", 0x000, 0x104, NO_DUMP ) // Protected
+ROM_END
+
 ROM_START( rockroll ) // PCB serigraphed 'CB1 (CS4)' and '960606-5 CPU'. It was found with most sockets unpopulated. This is mechanical, no GFX but a Samsung VFD.
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "u2", 0x000000, 0x100000, NO_DUMP )
@@ -280,5 +300,6 @@ ROM_END
 GAME( 2003,  neptunp2,  0, neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa / Cirsa", "Neptune's Pearls 2",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Year from legal registry date
 
 // Games on Cirsa "960606-5" PCB
+GAME( 2002,  ccorsario, 0, neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa / Cirsa", "Corsario (Cirsa slot machine)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Year from legal registry date
 GAME( 1999,  rockroll,  0, neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa / Cirsa", "Rock 'n' Roll",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Year taken from parts' manual and sticker on PCB
 GAME( 2001?, unk960606, 0, neptunp2, neptunp2, neptunp2_state, empty_init, ROT0, "Unidesa / Cirsa", "unknown 960606-5 based machine", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Year taken from sticker on PCB

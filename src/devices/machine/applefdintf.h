@@ -48,38 +48,44 @@ public:
 
 	// Floppy formats
 	//   13-sector 5.25
-	DECLARE_FLOPPY_FORMATS(formats_525_13);
+	static void formats_525_13(format_registration &fr);
 
 	//   5.25
-	DECLARE_FLOPPY_FORMATS(formats_525);
+	static void formats_525(format_registration &fr);
 
 	//   3.5
-	DECLARE_FLOPPY_FORMATS(formats_35);
+	static void formats_35(format_registration &fr);
 
 	// Floppy drives slot-level
 	//   5.25
 	static void floppies_525(device_slot_interface &device);
 	template<typename T> static void add_525_13(machine_config &config, T &floppy) {
-		FLOPPY_CONNECTOR(config, floppy, floppies_525, "525", formats_525_13);
+		FLOPPY_CONNECTOR(config, floppy, floppies_525, "525", formats_525_13).enable_sound(true);
 	}
 	template<typename T> static void add_525_13_nc(machine_config &config, T &floppy) {
-		FLOPPY_CONNECTOR(config, floppy, floppies_525, nullptr, formats_525_13);
+		FLOPPY_CONNECTOR(config, floppy, floppies_525, nullptr, formats_525_13).enable_sound(true);
 	}
 
 	template<typename T> static void add_525(machine_config &config, T &floppy) {
-		FLOPPY_CONNECTOR(config, floppy, floppies_525, "525", formats_525);
+		FLOPPY_CONNECTOR(config, floppy, floppies_525, "525", formats_525).enable_sound(true);
 	}
 	template<typename T> static void add_525_nc(machine_config &config, T &floppy) {
-		FLOPPY_CONNECTOR(config, floppy, floppies_525, nullptr, formats_525);
+		FLOPPY_CONNECTOR(config, floppy, floppies_525, nullptr, formats_525).enable_sound(true);
 	}
 
 	//   3.5
 	static void floppies_35(device_slot_interface &device);
 	template<typename T> static void add_35(machine_config &config, T &floppy) {
-		FLOPPY_CONNECTOR(config, floppy, floppies_35, "35dd", formats_35);
+		FLOPPY_CONNECTOR(config, floppy, floppies_35, "35dd", formats_35).enable_sound(true);
+	}
+	template<typename T> static void add_35_sd(machine_config &config, T &floppy) {
+		FLOPPY_CONNECTOR(config, floppy, floppies_35, "35sd", formats_35).enable_sound(true);
+	}
+	template<typename T> static void add_35_hd(machine_config &config, T &floppy) {
+		FLOPPY_CONNECTOR(config, floppy, floppies_35, "35hd", formats_35).enable_sound(true);
 	}
 	template<typename T> static void add_35_nc(machine_config &config, T &floppy) {
-		FLOPPY_CONNECTOR(config, floppy, floppies_35, nullptr, formats_35);
+		FLOPPY_CONNECTOR(config, floppy, floppies_35, nullptr, formats_35).enable_sound(true);
 	}
 
 	// Sync the state when something external is going to change, like

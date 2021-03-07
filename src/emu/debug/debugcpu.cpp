@@ -48,6 +48,7 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	, m_rpindex(1)
 	, m_wpdata(0)
 	, m_wpaddr(0)
+	, m_wpsize(0)
 	, m_last_periodic_update_time(0)
 	, m_comments_loaded(false)
 {
@@ -57,9 +58,10 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	m_symtable = std::make_unique<symbol_table>(machine);
 	m_symtable->set_memory_modified_func([this]() { set_memory_modified(true); });
 
-	/* add "wpaddr", "wpdata" to the global symbol table */
+	/* add "wpaddr", "wpdata", "wpsize" to the global symbol table */
 	m_symtable->add("wpaddr", symbol_table::READ_ONLY, &m_wpaddr);
 	m_symtable->add("wpdata", symbol_table::READ_ONLY, &m_wpdata);
+	m_symtable->add("wpsize", symbol_table::READ_ONLY, &m_wpsize);
 
 	screen_device_enumerator screen_enumerator = screen_device_enumerator(m_machine.root_device());
 	screen_device_enumerator::iterator iter = screen_enumerator.begin();
@@ -825,6 +827,7 @@ void device_debug::instruction_hook(offs_t curpc)
 			if (debugcpu.memory_modified())
 			{
 				machine.debug_view().update_all(DVT_DISASSEMBLY);
+				machine.debug_view().update_all(DVT_STATE);
 				machine.debugger().refresh_display();
 			}
 
@@ -1379,7 +1382,7 @@ offs_t device_debug::history_pc(int index) const
 		index = 0;
 	if (index <= -HISTORY_SIZE)
 		index = -HISTORY_SIZE + 1;
-	return m_pc_history[(m_pc_history_index + ARRAY_LENGTH(m_pc_history) - 1 + index) % ARRAY_LENGTH(m_pc_history)];
+	return m_pc_history[(m_pc_history_index + std::size(m_pc_history) - 1 + index) % std::size(m_pc_history)];
 }
 
 

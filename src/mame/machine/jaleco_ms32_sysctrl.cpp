@@ -94,7 +94,7 @@ void jaleco_ms32_sysctrl_device::amap(address_map& map)
 
 //-------------------------------------------------
 //  device_add_mconfig - device-specific machine
-//  configuration addiitons
+//  configuration additions
 //-------------------------------------------------
 
 void jaleco_ms32_sysctrl_device::device_add_mconfig(machine_config &config)
@@ -128,6 +128,7 @@ void jaleco_ms32_sysctrl_device::device_start()
 	save_item(NAME(m_crtc.vert_display));
 	save_item(NAME(m_flip_screen_state));
 	save_item(NAME(m_timer.irq_enable));
+	save_item(NAME(m_timer.interval));
 
 	m_timer.prg_irq = timer_alloc(PRG_TIMER);
 	m_timer_scanline = timer_alloc(SCANLINE_TIMER);

@@ -156,26 +156,26 @@ protected:
 	// register offsets
 	enum
 	{
-		UDC_BASE_ADDR	= 0x80000000,
-		REG_UDCCR		= (0x00000000 >> 2),
-		REG_UDCAR		= (0x00000004 >> 2),
-		REG_UDCOMP		= (0x00000008 >> 2),
-		REG_UDCIMP		= (0x0000000c >> 2),
-		REG_UDCCS0		= (0x00000010 >> 2),
-		REG_UDCCS1		= (0x00000014 >> 2),
-		REG_UDCCS2		= (0x00000018 >> 2),
-		REG_UDCD0		= (0x0000001c >> 2),
-		REG_UDCWC		= (0x00000020 >> 2),
-		REG_UDCDR		= (0x00000028 >> 2),
-		REG_UDCSR		= (0x00000030 >> 2),
+		UDC_BASE_ADDR   = 0x80000000,
+		REG_UDCCR       = (0x00000000 >> 2),
+		REG_UDCAR       = (0x00000004 >> 2),
+		REG_UDCOMP      = (0x00000008 >> 2),
+		REG_UDCIMP      = (0x0000000c >> 2),
+		REG_UDCCS0      = (0x00000010 >> 2),
+		REG_UDCCS1      = (0x00000014 >> 2),
+		REG_UDCCS2      = (0x00000018 >> 2),
+		REG_UDCD0       = (0x0000001c >> 2),
+		REG_UDCWC       = (0x00000020 >> 2),
+		REG_UDCDR       = (0x00000028 >> 2),
+		REG_UDCSR       = (0x00000030 >> 2),
 
-		ICP_BASE_ADDR	= 0x80030000,
-		REG_UTCR4		= (0x00000010 >> 2),
-		REG_HSCR0		= (0x00000060 >> 2),
-		REG_HSCR1		= (0x00000064 >> 2),
-		REG_HSDR		= (0x0000006c >> 2),
-		REG_HSSR0		= (0x00000074 >> 2),
-		REG_HSSR1		= (0x00000078 >> 2),
+		ICP_BASE_ADDR   = 0x80030000,
+		REG_UTCR4       = (0x00000010 >> 2),
+		REG_HSCR0       = (0x00000060 >> 2),
+		REG_HSCR1       = (0x00000064 >> 2),
+		REG_HSDR        = (0x0000006c >> 2),
+		REG_HSSR0       = (0x00000074 >> 2),
+		REG_HSSR1       = (0x00000078 >> 2),
 
 		UART_BASE_ADDR  = 0x80050000,
 		REG_UTCR0       = (0x00000000 >> 2),
@@ -247,73 +247,73 @@ protected:
 		REG_ICFP        = (0x00000010 >> 2),
 		REG_ICPR        = (0x00000020 >> 2),
 
-		PPC_BASE_ADDR	= 0x90060000,
-		REG_PPDR		= (0x00000000 >> 2),
-		REG_PPSR		= (0x00000004 >> 2),
-		REG_PPAR		= (0x00000008 >> 2),
-		REG_PSDR		= (0x0000000c >> 2),
-		REG_PPFR		= (0x00000010 >> 2),
+		PPC_BASE_ADDR   = 0x90060000,
+		REG_PPDR        = (0x00000000 >> 2),
+		REG_PPSR        = (0x00000004 >> 2),
+		REG_PPAR        = (0x00000008 >> 2),
+		REG_PSDR        = (0x0000000c >> 2),
+		REG_PPFR        = (0x00000010 >> 2),
 
-		DMA_BASE_ADDR	= 0xb0000000,
-		REG_DDAR		= (0x00000000 >> 2),
-		REG_DSSR		= (0x00000004 >> 2),
-		REG_DCSR		= (0x00000008 >> 2),
-		REG_DSR			= (0x0000000c >> 2),
-		REG_DBSA		= (0x00000010 >> 2),
-		REG_DBTA		= (0x00000014 >> 2),
-		REG_DBSB		= (0x00000018 >> 2),
-		REG_DBTB		= (0x0000001c >> 2)
+		DMA_BASE_ADDR   = 0xb0000000,
+		REG_DDAR        = (0x00000000 >> 2),
+		REG_DSSR        = (0x00000004 >> 2),
+		REG_DCSR        = (0x00000008 >> 2),
+		REG_DSR         = (0x0000000c >> 2),
+		REG_DBSA        = (0x00000010 >> 2),
+		REG_DBTA        = (0x00000014 >> 2),
+		REG_DBSB        = (0x00000018 >> 2),
+		REG_DBTB        = (0x0000001c >> 2)
 	};
 
 	// register contents
 	enum : uint32_t
 	{
-		UDCCR_UDD_BIT		= 0,
-		UDCCR_UDA_BIT		= 1,
-		UDCCR_RESM_BIT		= 2,
-		UDCCR_EIM_BIT		= 3,
-		UDCCR_RIM_BIT		= 4,
-		UDCCR_TIM_BIT		= 5,
-		UDCCR_SUSM_BIT		= 6,
-		UDCCR_WRITE_MASK	= 0x7d,
+		UDCCR_UDD_BIT       = 0,
+		UDCCR_UDA_BIT       = 1,
+		UDCCR_RESM_BIT      = 2,
+		UDCCR_EIM_BIT       = 3,
+		UDCCR_RIM_BIT       = 4,
+		UDCCR_TIM_BIT       = 5,
+		UDCCR_SUSM_BIT      = 6,
+		UDCCR_WRITE_MASK    = 0x7d,
 
-		UDCAR_WRITE_MASK	= 0x7f,
+		UDCAR_WRITE_MASK    = 0x7f,
 
-		UDCOMP_WRITE_MASK	= 0xff,
+		UDCOMP_WRITE_MASK   = 0xff,
 
-		UDCIMP_WRITE_MASK	= 0xff,
+		UDCIMP_WRITE_MASK   = 0xff,
 
-		UDCCS0_OPR_BIT		= 0,
-		UDCCS0_IPR_BIT		= 1,
-		UDCCS0_SST_BIT		= 2,
-		UDCCS0_FST_BIT		= 3,
-		UDCCS0_DE_BIT		= 4,
-		UDCCS0_SE_BIT		= 5,
-		UDCCS0_SO_BIT		= 6,
-		UDCCS0_SSE_BIT		= 7,
+		UDCCS0_OPR_BIT      = 0,
+		UDCCS0_IPR_BIT      = 1,
+		UDCCS0_SST_BIT      = 2,
+		UDCCS0_FST_BIT      = 3,
+		UDCCS0_DE_BIT       = 4,
+		UDCCS0_SE_BIT       = 5,
+		UDCCS0_SO_BIT       = 6,
+		UDCCS0_SSE_BIT      = 7,
 
-		UDCCS1_RFS_BIT		= 0,
-		UDCCS1_RPC_BIT		= 1,
-		UDCCS1_RPE_BIT		= 2,
-		UDCCS1_SST_BIT		= 3,
-		UDCCS1_FST_BIT		= 4,
-		UDCCS1_RNE_BIT		= 5,
+		UDCCS1_RFS_BIT      = 0,
+		UDCCS1_RPC_BIT      = 1,
+		UDCCS1_RPE_BIT      = 2,
+		UDCCS1_SST_BIT      = 3,
+		UDCCS1_FST_BIT      = 4,
+		UDCCS1_RNE_BIT      = 5,
 
-		UDCCS2_TFS_BIT		= 0,
-		UDCCS2_TPC_BIT		= 1,
-		UDCCS2_TPE_BIT		= 2,
-		UDCCS2_TUR_BIT		= 3,
-		UDCCS2_SST_BIT		= 4,
-		UDCCS2_FST_BIT		= 5,
+		UDCCS2_TFS_BIT      = 0,
+		UDCCS2_TPC_BIT      = 1,
+		UDCCS2_TPE_BIT      = 2,
+		UDCCS2_TUR_BIT      = 3,
+		UDCCS2_SST_BIT      = 4,
+		UDCCS2_FST_BIT      = 5,
 
-		UDCWC_WRITE_MASK	= 0x0f,
+		UDCWC_WRITE_MASK    = 0x0f,
 
-		UDCSR_EIR_BIT		= 0,
-		UDCSR_RIR_BIT		= 1,
-		UDCSR_TIR_BIT		= 2,
-		UDCSR_SUSIR_BIT		= 3,
-		UDCSR_RESIR_BIT		= 4,
-		UDCSR_RSTIR_BIT		= 5,
+		UDCSR_EIR_BIT       = 0,
+		UDCSR_RIR_BIT       = 1,
+		UDCSR_TIR_BIT       = 2,
+		UDCSR_SUSIR_BIT     = 3,
+		UDCSR_RESIR_BIT     = 4,
+		UDCSR_RSTIR_BIT     = 5,
 
 		UART3_FIFO_PRE  = 8,
 		UART3_FIFO_FRE  = 9,
@@ -326,8 +326,8 @@ protected:
 		UTCR3_TIE_BIT   = 4,
 		UTCR3_LBM_BIT   = 5,
 
-		UTCR4_HSE_BIT	= 0,
-		UTCR4_LPM_BIT	= 1,
+		UTCR4_HSE_BIT   = 0,
+		UTCR4_LPM_BIT   = 1,
 
 		UTSR0_TFS_BIT   = 0,
 		UTSR0_RFS_BIT   = 1,
@@ -343,36 +343,36 @@ protected:
 		UTSR1_FRE_BIT   = 4,
 		UTSR1_ROR_BIT   = 5,
 
-		HSCR0_ITR_BIT	= 0,
-		HSCR0_LBM_BIT	= 1,
-		HSCR0_TUS_BIT	= 2,
-		HSCR0_TXE_BIT	= 3,
-		HSCR0_RXE_BIT	= 4,
-		HSCR0_RIE_BIT	= 5,
-		HSCR0_TIE_BIT	= 6,
-		HSCR0_AME_BIT	= 7,
+		HSCR0_ITR_BIT   = 0,
+		HSCR0_LBM_BIT   = 1,
+		HSCR0_TUS_BIT   = 2,
+		HSCR0_TXE_BIT   = 3,
+		HSCR0_RXE_BIT   = 4,
+		HSCR0_RIE_BIT   = 5,
+		HSCR0_TIE_BIT   = 6,
+		HSCR0_AME_BIT   = 7,
 
-		HSCR2_TXP_BIT	= 18,
-		HSCR2_RXP_BIT	= 19,
+		HSCR2_TXP_BIT   = 18,
+		HSCR2_RXP_BIT   = 19,
 
-		HSDR_EOF_BIT	= 8,
-		HSDR_CRE_BIT	= 9,
-		HSDR_ROR_BIT	= 10,
+		HSDR_EOF_BIT    = 8,
+		HSDR_CRE_BIT    = 9,
+		HSDR_ROR_BIT    = 10,
 
-		HSSR0_EIF_BIT	= 0,
-		HSSR0_TUR_BIT	= 1,
-		HSSR0_RAB_BIT	= 2,
-		HSSR0_TFS_BIT	= 3,
-		HSSR0_RFS_BIT	= 4,
-		HSSR0_FRE_BIT	= 5,
+		HSSR0_EIF_BIT   = 0,
+		HSSR0_TUR_BIT   = 1,
+		HSSR0_RAB_BIT   = 2,
+		HSSR0_TFS_BIT   = 3,
+		HSSR0_RFS_BIT   = 4,
+		HSSR0_FRE_BIT   = 5,
 
-		HSSR1_RSY_BIT	= 0,
-		HSSR1_TBY_BIT	= 1,
-		HSSR1_RNE_BIT	= 2,
-		HSSR1_TNF_BIT	= 3,
-		HSSR1_EOF_BIT	= 4,
-		HSSR1_CRE_BIT	= 5,
-		HSSR1_ROR_BIT	= 6,
+		HSSR1_RSY_BIT   = 0,
+		HSSR1_TBY_BIT   = 1,
+		HSSR1_RNE_BIT   = 2,
+		HSSR1_TNF_BIT   = 3,
+		HSSR1_EOF_BIT   = 4,
+		HSSR1_CRE_BIT   = 5,
+		HSSR1_ROR_BIT   = 6,
 
 		MCCR0_ASD_BIT   = 0,
 		MCCR0_ASD_MASK  = 0x0000007f,
@@ -443,25 +443,25 @@ protected:
 		RTSR_HZE_BIT    = 3,
 		RTSR_HZE_MASK   = (1 << RTSR_HZE_BIT),
 
-		DDAR_RW_BIT		= 0,
-		DDAR_E_BIT		= 1,
-		DDAR_BS_BIT		= 2,
-		DDAR_DW_BIT		= 3,
-		DDAR_DA0_BIT	= 4,
-		DDAR_DA0_MASK	= 0x000000f0,
-		DDAR_DA8_BIT	= 8,
-		DDAR_DA8_MASK	= 0xffffff00,
+		DDAR_RW_BIT     = 0,
+		DDAR_E_BIT      = 1,
+		DDAR_BS_BIT     = 2,
+		DDAR_DW_BIT     = 3,
+		DDAR_DA0_BIT    = 4,
+		DDAR_DA0_MASK   = 0x000000f0,
+		DDAR_DA8_BIT    = 8,
+		DDAR_DA8_MASK   = 0xffffff00,
 
-		DSR_RUN_BIT		= 0,
-		DSR_IE_BIT		= 1,
-		DSR_ERROR_BIT	= 2,
-		DSR_DONEA_BIT	= 3,
-		DSR_STRTA_BIT	= 4,
-		DSR_DONEB_BIT	= 5,
-		DSR_STRTB_BIT	= 6,
-		DSR_BIU_BIT		= 7,
+		DSR_RUN_BIT     = 0,
+		DSR_IE_BIT      = 1,
+		DSR_ERROR_BIT   = 2,
+		DSR_DONEA_BIT   = 3,
+		DSR_STRTA_BIT   = 4,
+		DSR_DONEB_BIT   = 5,
+		DSR_STRTB_BIT   = 6,
+		DSR_BIU_BIT     = 7,
 
-		DBT_MASK		= 0x00001fff
+		DBT_MASK        = 0x00001fff
 	};
 
 	// interrupt bits
@@ -715,9 +715,9 @@ protected:
 		uint32_t dbt[2];
 	};
 
-	udc_regs		m_udc_regs;
+	udc_regs        m_udc_regs;
 	uart_regs       m_uart_regs;
-	icp_regs		m_icp_regs;
+	icp_regs        m_icp_regs;
 	mcp_regs        m_mcp_regs;
 	ssp_regs        m_ssp_regs;
 	ostimer_regs    m_ostmr_regs;
@@ -726,9 +726,9 @@ protected:
 	uint32_t        m_rcsr;
 	gpio_regs       m_gpio_regs;
 	intc_regs       m_intc_regs;
-	ppc_regs		m_ppc_regs;
-	dma_regs		m_dma_regs[6];
-	uint8_t			m_dma_active_mask;
+	ppc_regs        m_ppc_regs;
+	dma_regs        m_dma_regs[6];
+	uint8_t         m_dma_active_mask;
 
 	required_device<sa1110_cpu_device> m_maincpu;
 	required_device<input_merger_device> m_uart3_irqs;

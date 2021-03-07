@@ -77,7 +77,6 @@ private:
 	void m68k_dma_w(uint8_t data);
 
 	void fdc_irq(int state);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	uint8_t p0_7_r(offs_t offset);
 	void p0_7_w(offs_t offset, uint8_t data);

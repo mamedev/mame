@@ -28,7 +28,7 @@
  * uint32_t | Bits                                    | Use
  *        | 3322 2222 2222 1111 1111 11             |
  * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
- *   0    | ssss z--f b--- -aap ---- ---- ---- ---- | s = unknown, samsho  z = zooming mode, f = depthfilter mode (unset set in roadedge ingame) b = bpp select a = always, p = post, disable?
+ *   0    | ssss z--f b--- -aap ---- ---- ---- ---- | s = unknown, samsho  z = zooming mode, f = priority sort mode (unset set in roadedge ingame) b = bpp select a = always, p = post, disable?
  *   1    | yyyy yyyy yyyy yyyy xxxx xxxx xxxx xxxx | global sprite offset (ss64 rankings in attract, roadedge HUD scroll when starting game)
  *   2    | ---- ---- ---- uuuu uuuu uuuu uuuu uuuu | u = unknown, set to 0x000fffff in roadedge ingame, bbust2, samsho - also possible depthfilter related
  *   3    | ---- ---- ---- ---- ---- ---- ---- ---- |
@@ -50,25 +50,57 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	int spriteoffsx = (m_spriteregs[1]>>0)&0xffff;
 	int spriteoffsy = (m_spriteregs[1]>>16)&0xffff;
 
+	// This flips between ingame and other screens for roadedge, where the sprites which are filtered definitely needs to change and the game explicitly swaps the values in the sprite list at the same time.
+	// m_spriteregs[2] could also play a part as it also flips between 0x00000000 and 0x000fffff at the same time
+	// Samsho games also set the upper 3 bits which could be related, samsho games still have some unwanted sprites (but also use the other 'sprite clear' mechanism)
+	// Could also be draw order related, check if it inverts the z value?
+	bool zsort = !(m_spriteregs[0] & 0x01000000);
+
 #if 0
 	for (int iii = 0; iii < 0x0f; iii++)
 		osd_printf_debug("%.8x ", m_videoregs[iii]);
 	osd_printf_debug("\n");
 #endif
 
-	while( source<finish )
+	// start with empty list
+	m_spritelist.clear();
+
+	while(source < finish)
 	{
+		if (source[4]&0x04000000) // disable bit, ss64 rankings ?
+		{
+			source += 8;
+		}
+		else
+		{
+			if ((!zsort && (source[2]&0x07ff0000) != 0x07ff0000) || (zsort && (source[2]&0x07ff0000) != 0))
+			{
+				m_spritelist.emplace_back((source[2]&0x7ff0000)>>16, source);
+				if (source[2]&0x00000100) // inline chain mode
+					source += 8 * (1 + (source[2]&0x0000000f)) * (1 + ((source[2]&0x000000f0)>>4));
+				else
+					source += 8;
+			}
+			else
+				source += 8;
+		}
+	}
+
+	if (zsort)
+		std::stable_sort(m_spritelist.begin(), m_spritelist.end(), [] (auto const &a, auto const &b) { return a.first > b.first; });
+
+	for(auto it : m_spritelist)
+	{
+		source = it.second;
+		
 		int tileno,chainx,chainy,xflip;
 		int pal,xinc,yinc,yflip;
 		uint16_t xpos, ypos;
 		int xdrw,ydrw;
 		int chaini;
-		int zbuf;
 		uint32_t zoomx,zoomy;
 		float foomX, foomY;
 		int blend;
-		int disable;
-
 
 		ypos = (source[0]&0xffff0000)>>16;
 		xpos = (source[0]&0x0000ffff)>>0;
@@ -79,38 +111,15 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		blend=  (source[4]&0x00800000);
 		yflip=  (source[4]&0x01000000)>>24;
 		xflip=  (source[4]&0x02000000)>>25;
-		disable=(source[4]&0x04000000)>>26; // ss64 rankings?
 
 		pal =(source[3]&0x00ff0000)>>16;
 
 		chainy=(source[2]&0x0000000f);
 		chainx=(source[2]&0x000000f0)>>4;
 		chaini=(source[2]&0x00000100);
-		zbuf = (source[2]&0x07ff0000)>>16; //?
 
 		zoomy = (source[1]&0xffff0000)>>16;
 		zoomx = (source[1]&0x0000ffff)>>0;
-
-		int filtervalue = 0x000;
-
-		// This flips between ingame and other screens for roadedge, where the sprites which are filtered definitely needs to change and the game explicitly swaps the values in the sprite list at the same time.
-		// m_spriteregs[2] could also play a part as it also flips between 0x00000000 and 0x000fffff at the same time
-		// Samsho games also set the upper 3 bits which could be related, samsho games still have some unwanted sprites (but also use the other 'sprite clear' mechanism)
-		// Could also be draw order related, check if it inverts the z value?
-		if (m_spriteregs[0] & 0x01000000)
-			filtervalue = 0x7ff;
-
-		if(zbuf == filtervalue)
-		{
-			source+=8;
-			continue;
-		}
-
-		if(disable)
-		{
-			source+=8;
-			continue;
-		}
 
 #if 0
 		if (!(source[4] == 0x00000000 || source[4] == 0x000000aa))
@@ -218,10 +227,7 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 					else gfx->prio_zoom_transpen_additive(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
 					source +=8;
 				}
-
 			}
 		}
-
-		if (!chaini) source +=8;
 	}
 }

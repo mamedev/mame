@@ -1837,6 +1837,8 @@ void inferno_state::inferno(machine_config &config)
 	m_pia[0]->readpa_handler().set("mux", FUNC(ls157_x2_device::output_r));
 	m_pia[0]->ca2_handler().set("mux", FUNC(ls157_x2_device::select_w));
 
+	m_pia[2]->set_port_a_input_overrides_output_mask(0xff);
+
 	LS157_X2(config, m_mux, 0); // IC45 (for PA4-PA7) + IC46 (for PA0-PA3) on CPU board
 	m_mux->a_in_callback().set_ioport("INP1");
 	m_mux->b_in_callback().set_ioport("INP2");
@@ -2145,6 +2147,28 @@ ROM_START( defence )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "defcmnda.snd", 0xf800, 0x0800, CRC(f122d9c9) SHA1(70092fc354a2efbe7365be922fa36309b50d5c6f) )
+ROM_END
+
+// 2-PCB stack: BB10A + BB10B
+ROM_START( defenseb )
+	ROM_REGION( 0x19000, "maincpu", 0 ) // All ROMs but 2 identical to defenderj
+	ROM_LOAD( "1.d9",  0x0d000, 0x1000, CRC(8c04602b) SHA1(a8ed5afd0b276cebb479b1717666eaabbf75c6a5) )
+	ROM_LOAD( "2.c9",  0x0e000, 0x1000, CRC(89b75984) SHA1(a9481478da38f99efb67f0ecf82d084e14b93b42) )
+	ROM_LOAD( "3.d8",  0x0f000, 0x1000, CRC(94f51e9b) SHA1(a24cfc55de56a72758c76fe2a55f1ec6c353b16f) )
+	ROM_LOAD( "10.c4", 0x10000, 0x0800, CRC(12e2bd1c) SHA1(c2fdf2fced003a0acf037aa6fab141b04c1c81bd) )
+	ROM_LOAD( "7.d5",  0x10800, 0x0800, CRC(88881cc6) SHA1(5fd39a8596aeffc4ba279f9e680ac0ceaa2a179d) ) // unique
+	ROM_LOAD( "9.d4",  0x11000, 0x0800, CRC(252605c9) SHA1(74d5a1f66b45193824f496b954d449d7acd68251) ) // unique
+	ROM_LOAD( "6.c6",  0x11800, 0x0800, CRC(9deaf6d9) SHA1(59b018ba0f3fe6eadfd387dc180ac281460358bc) )
+	ROM_LOAD( "8.c5",  0x12000, 0x0800, CRC(339e092e) SHA1(2f89951dbe55d80df43df8dcf497171f73e726d3) )
+	ROM_LOAD( "5.d6",  0x12800, 0x0800, CRC(a543b167) SHA1(9292b94b0d74e57e03aada4852ad1997c34122ff) )
+	ROM_LOAD( "4.c7",  0x16000, 0x0800, CRC(65f4efd1) SHA1(a960fd1559ed74b81deba434391e49fc6ec389ca) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "12.f3.snd", 0xf800, 0x0800, CRC(f122d9c9) SHA1(70092fc354a2efbe7365be922fa36309b50d5c6f) )
+
+	ROM_REGION( 0x0400, "proms", 0 ) // same PROMs as colony7
+	ROM_LOAD( "mmi6341.a1", 0x0000, 0x0200, CRC(25de5d85) SHA1(826f78c2fe847f594d261c280dd10b9e776bf4fd) )
+	ROM_LOAD( "mmi6341.l1", 0x0200, 0x0200, CRC(c3f45f70) SHA1(d19036cbc46b130548873597b44b8b70758f25c4) )
 ROM_END
 
 // The dumps of ROMs 1, 2, 3 were bad, but the dumper observed that using the defenderb ROMs the emulation behaves identically to the PCB.
@@ -3774,6 +3798,7 @@ GAME( 1980, zero,       defender, defender,       defender, defndjeu_state,     
 GAME( 1980, zero2,      defender, defender,       defender, defndjeu_state,       empty_init,    ROT0,   "bootleg (Amtec)",                      "Zero (set 2, Defender bootleg)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1980, defcmnd,    defender, defender,       defender, defender_state,       empty_init,    ROT0,   "bootleg",                              "Defense Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, defence,    defender, defender,       defender, defender_state,       empty_init,    ROT0,   "bootleg (Outer Limits)",               "Defence Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, defenseb,   defender, defender,       defender, defender_state,       empty_init,    ROT0,   "bootleg",                              "Defense (Defender bootleg)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1981, startrkd,   defender, defender,       defender, defender_state,       empty_init,    ROT0,   "bootleg",                              "Star Trek (Defender bootleg)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1980, attackf,    defender, defender,       defender, defender_state,       empty_init,    ROT0,   "bootleg (Famaresa)",                   "Attack (Defender bootleg)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1981, galwars2,   defender, defender,       defender, defender_state,       empty_init,    ROT0,   "bootleg (Sonic)",                      "Galaxy Wars II (Defender bootleg)",  MACHINE_SUPPORTS_SAVE ) // Sega Sonic - Sega S.A., only displays Sonic on title screen

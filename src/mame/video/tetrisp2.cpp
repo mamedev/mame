@@ -248,6 +248,9 @@ VIDEO_START_MEMBER(tetrisp2_state,nndmseal)
 {
 	VIDEO_START_CALL_MEMBER( tetrisp2 );
 	m_tilemap_bg->set_scrolldx(-4,-4);
+
+	m_bank_hi = 0;
+	m_bank_lo = 0;
 }
 
 VIDEO_START_MEMBER(tetrisp2_state,rockntread)

@@ -38,9 +38,11 @@ void cgenie_fdc_device::mmio(address_map &map)
 	map(0xef, 0xef).mirror(0x10).rw("wd2793", FUNC(wd2793_device::data_r), FUNC(wd2793_device::data_w));
 }
 
-FLOPPY_FORMATS_MEMBER( cgenie_fdc_device::floppy_formats )
-	FLOPPY_CGENIE_FORMAT
-FLOPPY_FORMATS_END
+void cgenie_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_CGENIE_FORMAT);
+}
 
 static void cgenie_floppies(device_slot_interface &device)
 {

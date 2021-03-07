@@ -10251,10 +10251,11 @@ license:CC0
 
 	<software name="descsw" cloneof="descent">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
-		<description>Descent (Shareware, 1.0)</description>
+		<description>Descent (shareware, 1.0)</description>
 		<year>1994</year>
 		<publisher>Interplay</publisher>
-		<info name="version" value="1.0" />
+		<info name="developer" value="Parallax Software" />
+		<info name="version" value="Version 1.0 12/15/94" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="descent disk1.img" size="1474560" crc="5d3a21e6" sha1="bac18f7fc016c438e0ab14893fd417958e99f500"/>
@@ -10263,6 +10264,24 @@ license:CC0
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="descent disk2.img" size="1474560" crc="07674313" sha1="59bdf205c6b3e3b2de5a08daaa3b67004618baa7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="descswa" cloneof="descent">
+		<description>Descent (shareware, v1.1)</description>
+		<year>1995</year>
+		<publisher>Interplay</publisher>
+		<info name="developer" value="Parallax Software" />
+		<info name="version" value="Version 1.1 1/6/95" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Descent (shareware v1.1) [Interplay] [1995] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="edddb515" sha1="66b2eb9ad770893a96f3461f7f6511af0a368e28"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Descent (shareware v1.1) [Interplay] [1995] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="e4479266" sha1="2ff4ff7565c56c43fb4fdc5f3e76e3f89c14b0c5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10908,6 +10927,7 @@ license:CC0
 	</software>
 
 	<software name="epdeepsea">
+		<!-- bad dump - Modified root and OEM ID -->
 		<description>Epic Pinball: Deep Sea</description>
 		<year>1994</year>
 		<publisher>B&amp;N Companies</publisher>
@@ -10915,11 +10935,10 @@ license:CC0
 		<info name="version" value="2.1" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Pinball Deep Sea [B&amp;N Companies] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="caae0723" sha1="625694111fc8cf946d2009caa3c6ca927e0c6779"/>
+				<rom name="Pinball Deep Sea [B&amp;N Companies] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="caae0723" sha1="625694111fc8cf946d2009caa3c6ca927e0c6779" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
-
 
 	<software name="epenigma">
 		<description>Epic Pinball: Enigma</description>
@@ -12493,9 +12512,11 @@ license:CC0
 	</software>
 
 	<software name="kingqst5">
-		<description>King's Quest V - Absence Makes the Heart Go Yonder!</description>
-		<year>1990</year>
+		<description>King's Quest V: Absence Makes the Heart Go Yonder! (3.5"HD, v0.000.062)</description>
+		<year>1991</year>
 		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="0.000.062" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Startup Disk" />
 			<dataarea name="flop" size = "1474560">
@@ -12548,9 +12569,11 @@ license:CC0
 	</software>
 
 	<software name="kingqst5_525" cloneof="kingqst5">
-		<description>King's Quest V - Absence Makes the Heart Go Yonder! (Re-release)</description>
-		<year>1990</year>
+		<description>King's Quest V: Absence Makes the Heart Go Yonder! (5.25", v0.000.062, VGA Re-release)</description>
+		<year>1991</year>
 		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="0.000.062" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Startup Disk" />
 			<dataarea name="flop" size = "1228800">
@@ -12603,6 +12626,150 @@ license:CC0
 			<feature name="part_id" value="Disk 8" />
 			<dataarea name="flop" size = "1228800">
 				<rom name="King's Quest V - Absence Makes the Heart Go Yonder (USA) (Re-release) (Disk 8).img" size="1228800" crc="99a71113" sha1="3d68e348c5412b78174c54c558a4cca11de053ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingqst5a_525" cloneof="kingqst5">
+		<description>King's Quest V: Absence Makes the Heart Go Yonder! (5.25", v0.000.051, VGA release)</description>
+		<year>1990</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="0.000.051" />
+		<part name="flop10" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V (v0.000.051) [Sierra] [1990] [5.25HD] [Disk 1 of 9] [Startup Disk].img" size="1228800" crc="787f1fd8" sha1="f67e26a15501d104db11e336700b7c3164f8bcaa"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V (v0.000.051) [Sierra] [1990] [5.25HD] [Disk 2 of 9] [Disk 1].img" size="1228800" crc="fa6c245c" sha1="855b590ca281b3f2402ce4bf22eee18dd5dd78ac"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V (v0.000.051) [Sierra] [1990] [5.25HD] [Disk 3 of 9] [Disk 2].img" size="1228800" crc="dd306811" sha1="6d0782460687ba78aad19cc62c9801dc6d1928e5"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V (v0.000.051) [Sierra] [1990] [5.25HD] [Disk 4 of 9] [Disk 3].img" size="1228800" crc="e752b689" sha1="5ddb171d78bd105ac593cdba3bf04b1c6190bdf7"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V (v0.000.051) [Sierra] [1990] [5.25HD] [Disk 5 of 9] [Disk 4].img" size="1228800" crc="fc8178e2" sha1="e4a5607fe775bd1a15f8402fceb79c1f8771998c"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V (v0.000.051) [Sierra] [1990] [5.25HD] [Disk 6 of 9] [Disk 5].img" size="1228800" crc="fe8670f3" sha1="00009a8e7367f0343a7119343fa860968a8c70a4"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V (v0.000.051) [Sierra] [1990] [5.25HD] [Disk 7 of 9] [Disk 6].img" size="1228800" crc="b70fc834" sha1="a9b0f8788638a827b3b22a978f5eccc02b2c56e0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V (v0.000.051) [Sierra] [1990] [5.25HD] [Disk 8 of 9] [Disk 7].img" size="1228800" crc="e3231b8a" sha1="6dd6f7d7cf4df0205ff9dd248b1c3e23a47f29a4"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V (v0.000.051) [Sierra] [1990] [5.25HD] [Disk 9 of 9] [Disk 8].img" size="1228800" crc="71f1a7af" sha1="851a07bb64e4cc310cb950dc6a7c9353409e726c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingqst5b_525" cloneof="kingqst5">
+		<description>King's Quest V: Absence Makes the Heart Go Yonder! (5.25", v0.000.062, EGA release)</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="0.000.062" />
+		<part name="flop10" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V (v0.000.062) [Sierra] [1991] [5.25HD] [Disk 1 of 5] [Startup Disk].img" size="1228800" crc="b084311c" sha1="5bfdfb0a947ab2e6d0f95db4f5f32bdfc461ea62"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V (v0.000.062) [Sierra] [1991] [5.25HD] [Disk 2 of 5] [Disk 1].img" size="1228800" crc="855250ab" sha1="bf632f873ee1198e727d08fc4608ffe708691461"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V (v0.000.062) [Sierra] [1991] [5.25HD] [Disk 3 of 5] [Disk 2].img" size="1228800" crc="9f249969" sha1="23419c6c566e9ca23b854dd9d316b51064b0af53"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V (v0.000.062) [Sierra] [1991] [5.25HD] [Disk 4 of 5] [Disk 3].img" size="1228800" crc="1b190031" sha1="95c7ee3ea7d2ba4931ffe2f8cfb0677d550f8007"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="King's Quest V (v0.000.062) [Sierra] [1991] [5.25HD] [Disk 5 of 5] [Disk 4].img" size="1228800" crc="04108ff2" sha1="8b737f0fc72b91eef4795fa0137839ee87b6a17f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingqst5a" cloneof="kingqst5">
+		<description>King's Quest V: Absence Makes the Heart Go Yonder! (3.5"DD, v0.000.055, EGA release)</description>
+		<year>1990</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="0.000.055" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="King's Quest V (v0.000.055) [Sierra] [1990] [3.5DD] [Disk 01 of 10] [Secondary Startup Disk].img" size="737280" crc="e6337628" sha1="6100dee0094d246d1a5103b03232c55d850ea956"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="King's Quest V (v0.000.055) [Sierra] [1990] [3.5DD] [Disk 02 of 10] [Disk 1].img" size="737280" crc="dae9e930" sha1="747208ba94f9409b039d90d6a097c6033b7d8054"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="King's Quest V (v0.000.055) [Sierra] [1990] [3.5DD] [Disk 03 of 10] [Disk 2].img" size="737280" crc="c00ca5b5" sha1="25b7d8e8a8b8b92e8cb9a3d95d61fe296d42fc56"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="King's Quest V (v0.000.055) [Sierra] [1990] [3.5DD] [Disk 04 of 10] [Disk 3].img" size="737280" crc="ffd19c57" sha1="75c73a9d1bd08eadc610965512b245c50329c166"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="King's Quest V (v0.000.055) [Sierra] [1990] [3.5DD] [Disk 05 of 10] [Disk 4].img" size="737280" crc="a4a6791d" sha1="0fcd354c211861bc454491096a9b233443fbd9ce"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="King's Quest V (v0.000.055) [Sierra] [1990] [3.5DD] [Disk 06 of 10] [Disk 5].img" size="737280" crc="c2713ad6" sha1="0994effd5032376257da07018c862d802123b917"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="King's Quest V (v0.000.055) [Sierra] [1990] [3.5DD] [Disk 07 of 10] [Disk 6].img" size="737280" crc="9cd3246e" sha1="53139a2d41590d4e1a9bf70a75e99aefaf7f7a79"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="King's Quest V (v0.000.055) [Sierra] [1990] [3.5DD] [Disk 08 of 10] [Disk 7].img" size="737280" crc="dee4407e" sha1="7d9a66b4824802fb2cbd13104ac9e39aa4eaef85"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="King's Quest V (v0.000.055) [Sierra] [1990] [3.5DD] [Disk 09 of 10] [Disk 8].img" size="737280" crc="7de7f687" sha1="fe21e3b9b26c42b7da87d77d4fb99cdfdca7abe1"/>
+			</dataarea>
+		</part>
+		<part name="flop19" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="King's Quest V (v0.000.055) [Sierra] [1990] [3.5DD] [Disk 10 of 10] [Disk 9].img" size="737280" crc="04348571" sha1="587da91db4c4301641ded6152bcbc7f5354039a0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13549,6 +13716,29 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mixupft">
+		<description>Mixed-Up Fairy Tales</description>
+		<year>1991</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="1.000" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Mixed-Up Fairy Tales [Sierra] [1991] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="90175ae9" sha1="5a7dfe8b259f698a7ecd2380154c9b23f3df7509"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Mixed-Up Fairy Tales [Sierra] [1991] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="6b1a9fd0" sha1="69d515b27a199e0e330208453267b39880493412"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Mixed-Up Fairy Tales [Sierra] [1991] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="16701afa" sha1="d098b4719c367098da905d018fe5781bb9241707"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="monkey2">
 		<description>Monkey Island 2: LeChuck's Revenge (3.5")</description>
 		<year>1991</year>
@@ -13994,7 +14184,7 @@ license:CC0
 	<!-- Installation File Date: 1993-09-39 / 1993-07-15 -->
 	<!-- Multi-Language Readme File: English;French;German / English -->
 	<!-- Readme.txt File: include "GAME PLAY" chapter / doesn't include "GAME PLAY" chapter -->
-	<!-- Hardware Configuration Setup: include Sound Speech / doesn't Sound Speech -->
+	<!-- Hardware Configuration Setup: include Sound Speech / doesn't include Sound Speech -->
 	<!-- Installation Process - 256 colors to 16 color convertion: include 430 files / include 415 files -->
 	<software name="piratesa" cloneof="pirates">
 		<description>Pirates! Gold (older)</description>
@@ -14186,6 +14376,7 @@ license:CC0
 		<description>Raptor - Call of the Shadows (v1.2)</description>
 		<year>1994</year>
 		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Cygnus Software" />
 		<info name="version" value="1.2" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -14205,9 +14396,10 @@ license:CC0
 	</software>
 
 	<software name="raptorsw" cloneof="raptor">
-		<description>Raptor - Call of the Shadows (v1.1, Shareware, Euro poWer pack)</description>
+		<description>Raptor - Call of the Shadows (shareware, v1.1, Euro poWer pack)</description>
 		<year>1994</year>
 		<publisher>Apogee Software</publisher>
+		<info name="developer" value="Cygnus Software" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Raptor - Call of the Shadows (Europe) (Shareware v1.1) (Disk 1).img" size="1474560" crc="30b61263" sha1="7f85139261d828c660934f97c371537e51f8eccd"/>
@@ -14216,6 +14408,24 @@ license:CC0
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Raptor - Call of the Shadows (Europe) (Shareware v1.1) (Disk 2).img" size="1474560" crc="d20af54f" sha1="efcfa13d0c787647338b21b2e78185bb75aa1b54"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raptorswa" cloneof="raptor">
+		<description>Raptor - Call of the Shadows (shareware, v1.0, Titanium Seal release)</description>
+		<year>1994</year>
+		<publisher>Titanium Seal</publisher>
+		<info name="developer" value="Cygnus Software" />
+		<info name="version" value="V1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Raptor (Titanium Seal) (shareware 1.0) [Apogee] [1994] [3.5DD] [Disk 1 of 2].img" size="1474560" crc="3042d025" sha1="54ea21eb3e6848837dbe1129766d39b4d4c21140"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Raptor (Titanium Seal) (shareware 1.0) [Apogee] [1994] [3.5DD] [Disk 2 of 2].img" size="1474560" crc="f49c4eaa" sha1="60bc4e503cfc8c70258ac2e54045e15f035b8cef"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15635,6 +15845,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="tubworld">
+		<description>Tubular Worlds</description>
+		<year>1994</year>
+		<publisher>Dongleware</publisher>
+		<info name="developer" value="Creative Game Design" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Tubular Worlds [Creative Game Design] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="fbc3ed63" sha1="f8be843aea26d3525a326fc3b279714296be223b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ufoeu">
 		<description>UFO - Enemy Unknown (Euro)</description>
 		<year>1994</year>
@@ -15892,6 +16114,47 @@ license:CC0
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="[PC] Warcraft Orcs and Humans [3.5HD] [Disk 4 of 4].img" size="1474560" crc="ac4678fc" sha1="dc1c6d4fdc220016416bd0a5799505fa31f271b6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="warlords2">
+		<description>Warlords II</description>
+		<year>1993</year>
+		<publisher>Stategic Studies Group</publisher>
+		<info name="developer" value="Stategic Studies Group" />
+		<info name="version" value="Version 1.02" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Warlords II [SSG] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="07cd0e60" sha1="671ac1ed7183cdf1cfbfb147a244a8ad25830cca"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Warlords II [SSG] [1993] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="2be69942" sha1="676653577412ea58f68f9b9fda37f1f2e809aa08"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="warlords2sb">
+		<description>Warlords II - Scenario Builder</description>
+		<year>1994</year>
+		<publisher>Stategic Studies Group</publisher>
+		<info name="developer" value="Stategic Studies Group" />
+		<info name="version" value="Version 1.01a" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Warlords II - Scenario Builder [SSG] [1994] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="088a8774" sha1="f65d6ca03466d862ff0a5c3ab526f06f67faf03d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Warlords II - Scenario Builder [SSG] [1994] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="9dd66e74" sha1="6f0a1a3b1b9476cc264624d3d616dfb4a57a14fc"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Warlords II - Scenario Builder [SSG] [1994] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="9181c3ea" sha1="00724a3f800f82a176ab9242cd42a87042f97b54"/>
 			</dataarea>
 		</part>
 	</software>
@@ -16228,6 +16491,18 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Wolfenstein 3-D (v1.4) [Mindscape] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="281c99b0" sha1="584daa625862c0d1e380eeabef569fcf24d639d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wolf3dsw" cloneof="wolf3d">
+		<description>Wolfenstein 3-D (shareware, Titanium Seal release)</description>
+		<year>1994</year>
+		<publisher>Titanium Seal</publisher>
+		<info name="developer" value="id Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wolfenstein 3D (shareware) [Titanium Seal] [1994] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7b233ee7" sha1="ce2bbf3c5b52602ebea2b78a8d4b0a839820ce44"/>
 			</dataarea>
 		</part>
 	</software>

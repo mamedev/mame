@@ -213,7 +213,7 @@ private:
 		uint32_t base_addr;
 
 		/* Memory-mapped */
-		uint32_t as_regs[19];
+		uint32_t as_regs[0x200]; // was 19, increased to 0x200 for coverity 315123, needed for zr36120_r/w, to stop crash at start.
 	} m_zr36120;
 
 

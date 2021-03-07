@@ -101,7 +101,7 @@ is required to use the "MAME" name, logo, or wordmark.
 <img align="right" src="http://opensource.org/trademarks/opensource/OSI-Approved-License-100x137.png">
 </a>
 
-    Copyright (C) 1997-2020  MAMEDev and contributors
+    Copyright (C) 1997-2021  MAMEDev and contributors
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License version 2, as provided in

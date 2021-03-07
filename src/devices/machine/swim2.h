@@ -51,7 +51,7 @@ private:
 	u16 m_fifo[2], m_sr;
 	u16 m_crc, m_mfm_sync_counter;
 	u32 m_half_cycles_before_change;
-	
+
 	u64 m_last_sync;
 	u64 m_flux_write_start;
 	std::array<u64, 32> m_flux_write;
@@ -61,7 +61,7 @@ private:
 
 	u64 time_to_cycles(const attotime &tm) const;
 	attotime cycles_to_time(u64 cycles) const;
-	
+
 	void fifo_clear();
 	bool fifo_push(u16 data);
 	u16 fifo_pop();

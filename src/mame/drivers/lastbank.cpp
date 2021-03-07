@@ -19,9 +19,9 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
 #include "sound/es8712.h"
 #include "sound/okim6295.h"
+#include "sound/ym2203.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/tc009xlvc.h"
@@ -40,7 +40,6 @@ public:
 	lastbank_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_vdp(*this, "tc0091lvc")
 		, m_oki(*this, "oki")
 		, m_essnd(*this, "essnd")
 	{ }
@@ -53,8 +52,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	required_device<cpu_device> m_maincpu;
-	required_device<tc0091lvc_device> m_vdp;
+	required_device<tc0091lvc_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<es8712_device> m_essnd;
 
@@ -86,7 +84,7 @@ WRITE_LINE_MEMBER(lastbank_state::screen_vblank)
 {
 	if (state)
 	{
-		m_vdp->screen_eof();
+		m_maincpu->screen_eof();
 	}
 }
 
@@ -149,15 +147,13 @@ CUSTOM_INPUT_MEMBER(lastbank_state::sound_status_r)
 
 void lastbank_state::tc0091lvc_map(address_map &map)
 {
-	map(0x0000, 0xfdff).m(m_vdp, FUNC(tc0091lvc_device::cpu_map));
-
 	map(0x8000, 0x9fff).ram().share("nvram");
 
-	map(0xfe00, 0xfeff).rw(m_vdp, FUNC(tc0091lvc_device::vregs_r), FUNC(tc0091lvc_device::vregs_w));
-	map(0xff00, 0xff02).rw(m_vdp, FUNC(tc0091lvc_device::irq_vector_r), FUNC(tc0091lvc_device::irq_vector_w));
-	map(0xff03, 0xff03).rw(m_vdp, FUNC(tc0091lvc_device::irq_enable_r), FUNC(tc0091lvc_device::irq_enable_w));
-	map(0xff04, 0xff07).rw(m_vdp, FUNC(tc0091lvc_device::ram_bank_r), FUNC(tc0091lvc_device::ram_bank_w));
-	map(0xff08, 0xff08).rw(m_vdp, FUNC(tc0091lvc_device::rom_bank_r), FUNC(tc0091lvc_device::rom_bank_w));
+	map(0xfe00, 0xfeff).rw(m_maincpu, FUNC(tc0091lvc_device::vregs_r), FUNC(tc0091lvc_device::vregs_w));
+	map(0xff00, 0xff02).rw(m_maincpu, FUNC(tc0091lvc_device::irq_vector_r), FUNC(tc0091lvc_device::irq_vector_w));
+	map(0xff03, 0xff03).rw(m_maincpu, FUNC(tc0091lvc_device::irq_enable_r), FUNC(tc0091lvc_device::irq_enable_w));
+	map(0xff04, 0xff07).rw(m_maincpu, FUNC(tc0091lvc_device::ram_bank_r), FUNC(tc0091lvc_device::ram_bank_w));
+	map(0xff08, 0xff08).rw(m_maincpu, FUNC(tc0091lvc_device::rom_bank_r), FUNC(tc0091lvc_device::rom_bank_w));
 }
 
 void lastbank_state::lastbank_map(address_map &map)
@@ -382,22 +378,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::irq_scanline)
 {
 	int scanline = param;
 
-	if (scanline == 240 && (m_vdp->irq_enable() & 4))
+	if (scanline == 240 && (m_maincpu->irq_enable() & 4))
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_vdp->irq_vector(2)); // TC0091LVC
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_maincpu->irq_vector(2)); // TC0091LVC
 	}
 
-	if (scanline == 0 && (m_vdp->irq_enable() & 2))
+	if (scanline == 0 && (m_maincpu->irq_enable() & 2))
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_vdp->irq_vector(1)); // TC0091LVC
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_maincpu->irq_vector(1)); // TC0091LVC
 	}
 }
 
 void lastbank_state::lastbank(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, MASTER_CLOCK/4); //!!! TC0091LVC !!!
+	TC0091LVC(config, m_maincpu, MASTER_CLOCK/4); //!!! TC0091LVC !!!
 	m_maincpu->set_addrmap(AS_PROGRAM, &lastbank_state::lastbank_map);
+	m_maincpu->set_tilemap_xoffs(0,192); // TODO: correct?
+
 	TIMER(config, "scantimer").configure_scanline(FUNC(lastbank_state::irq_scanline), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -415,12 +413,9 @@ void lastbank_state::lastbank(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	screen.set_screen_update("tc0091lvc", FUNC(tc0091lvc_device::screen_update));
+	screen.set_screen_update("maincpu", FUNC(tc0091lvc_device::screen_update));
 	screen.screen_vblank().set(FUNC(lastbank_state::screen_vblank));
-	screen.set_palette("tc0091lvc:palette");
-
-	TC0091LVC(config, m_vdp, 0);
-	m_vdp->set_tilemap_xoffs(0,192); // TODO: correct?
+	screen.set_palette("maincpu:palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -451,13 +446,13 @@ void lastbank_state::lastbank(machine_config &config)
 ***************************************************************************/
 
 ROM_START( lastbank )
-	ROM_REGION( 0x40000, "tc0091lvc", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "3.u9", 0x00000, 0x40000, CRC(f430e1f0) SHA1(dd5b697f5c2250d98911f4c7d3e7d4cc16b0b40f) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "8.u48", 0x00000, 0x10000, CRC(3a7bfe10) SHA1(7dc543e11d3c0b9872fcc622339ade25383a1eb3) )
 
-	ROM_REGION( 0x120000, "tc0091lvc:gfx", 0 )
+	ROM_REGION( 0x120000, "maincpu:gfx", 0 )
 	ROM_LOAD( "u11",   0x000000, 0x100000, CRC(2588d82d) SHA1(426f6821862d54123e53410e2776586ddf6b21e7) )
 	ROM_LOAD( "5.u10", 0x100000, 0x020000, CRC(51f3c5a7) SHA1(73d4c8817fe96d75be32c43e816e93c52b5d2b27) )
 

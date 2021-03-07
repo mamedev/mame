@@ -33,9 +33,11 @@ void compucolor_floppy_port_devices(device_slot_interface &device)
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( compucolor_floppy_device::floppy_formats )
-	FLOPPY_CCVF_FORMAT
-FLOPPY_FORMATS_END
+void compucolor_floppy_device::floppy_formats(format_registration &fr)
+{
+	fr.add_fm_containers();
+	fr.add(FLOPPY_CCVF_FORMAT);
+}
 
 
 //-------------------------------------------------

@@ -174,7 +174,7 @@ private:
 
 	virtual void poly_bank(address_map &map) override;
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	required_device<fd1771_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;

@@ -52,6 +52,11 @@ public:
 
 	void init_triplhnt();
 
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
 private:
 	enum
 	{
@@ -67,15 +72,12 @@ private:
 	uint8_t da_latch_r(offs_t offset);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void video_start() override;
 	void triplhnt_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_collision(int code);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual void machine_start() override;
 	void triplhnt_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;

@@ -4,12 +4,12 @@
 
     HP Jornada PDA skeleton driver
 
-	To boot:
-	- Start MAME with the debugger enabled
-	- Use the following breakpoint command: bp 13E2C,R3==3 && R1==10
-	- Close the debugger and allow the machine to run
-	- When the breakpoint is hit, use the following command: R3=0
-	- Close the debugger, booting will proceed
+    To boot:
+    - Start MAME with the debugger enabled
+    - Use the following breakpoint command: bp 13E2C,R3==3 && R1==10
+    - Close the debugger and allow the machine to run
+    - When the breakpoint is hit, use the following command: R3=0
+    - Close the debugger, booting will proceed
 
 ***************************************************************************/
 
@@ -59,8 +59,8 @@ public:
 
 	enum : uint8_t
 	{
-		MCU_TXDUMMY		= 0x11,
-		MCU_TXDUMMY2	= 0x88
+		MCU_TXDUMMY     = 0x11,
+		MCU_TXDUMMY2    = 0x88
 	};
 
 

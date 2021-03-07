@@ -42,7 +42,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	uint8_t fdc_read_byte();
 	void fdc_write_byte(uint8_t data);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	uint16_t bootvect_r(offs_t offset);
 	uint8_t tcr_r();

@@ -225,7 +225,7 @@ int apple35_sectors_per_track(floppy_image_legacy *image, int track)
 	int sectors;
 
 	assert(track >= 0);
-	assert(track < ARRAY_LENGTH(apple35_tracklen_800kb));
+	assert(track < std::size(apple35_tracklen_800kb));
 
 	if (get_apple35_tag(image)->is_1440k)
 		sectors = 18;
@@ -454,7 +454,7 @@ static uint32_t apple35_get_offset(floppy_image_legacy *floppy, int head, int tr
 
 	tag = get_apple35_tag(floppy);
 
-	if (track >= ARRAY_LENGTH(apple35_tracklen_800kb))
+	if (track >= std::size(apple35_tracklen_800kb))
 		return ~0;
 	if (head >= tag->sides)
 		return ~0;
@@ -616,7 +616,7 @@ static floperr_t apple35_read_track(floppy_image_legacy *floppy, int head, int t
 
 	tag = get_apple35_tag(floppy);
 
-	if (track >= ARRAY_LENGTH(apple35_tracklen_800kb))
+	if (track >= std::size(apple35_tracklen_800kb))
 		return FLOPPY_ERROR_SEEKERROR;
 	if (offset != 0)
 		return FLOPPY_ERROR_UNSUPPORTED;
@@ -628,7 +628,7 @@ static floperr_t apple35_read_track(floppy_image_legacy *floppy, int head, int t
 	for (sector = 0; sector < sector_count; sector++)
 	{
 		/* read the sector */
-		err = apple35_read_sector_td(floppy, head, track, sector, sector_data, ARRAY_LENGTH(sector_data));
+		err = apple35_read_sector_td(floppy, head, track, sector, sector_data, std::size(sector_data));
 		if (err)
 		{
 			return err;
@@ -636,7 +636,7 @@ static floperr_t apple35_read_track(floppy_image_legacy *floppy, int head, int t
 
 		sony_nibblize35(sector_data, nibble_data, checksum);
 
-		for (i = 0; i < ARRAY_LENGTH(blk1); i++)
+		for (i = 0; i < std::size(blk1); i++)
 			sony_filltrack((uint8_t*)buffer, buflen, &pos, blk1[i]);
 
 		sum = (track ^ sector ^ side ^ tag->format_byte) & 0x3F;
@@ -647,18 +647,18 @@ static floperr_t apple35_read_track(floppy_image_legacy *floppy, int head, int t
 		sony_filltrack((uint8_t*)buffer, buflen, &pos, diskbytes[tag->format_byte]);
 		sony_filltrack((uint8_t*)buffer, buflen, &pos, diskbytes[sum]);
 
-		for (i = 0; i < ARRAY_LENGTH(blk2); i++)
+		for (i = 0; i < std::size(blk2); i++)
 			sony_filltrack((uint8_t*)buffer, buflen, &pos, blk2[i]);
 
 		sony_filltrack((uint8_t*)buffer, buflen, &pos, diskbytes[sector]);
 
-		for (i = 0; i < ARRAY_LENGTH(nibble_data); i++)
+		for (i = 0; i < std::size(nibble_data); i++)
 			sony_filltrack((uint8_t*)buffer, buflen, &pos, diskbytes[nibble_data[i]]);
 
 		for (i = 3; i >= 0; i--)
 			sony_filltrack((uint8_t*)buffer, buflen, &pos, diskbytes[checksum[i]]);
 
-		for (i = 0; i < ARRAY_LENGTH(blk3); i++)
+		for (i = 0; i < std::size(blk3); i++)
 			sony_filltrack((uint8_t*)buffer, buflen, &pos, blk3[i]);
 	}
 
@@ -681,7 +681,7 @@ static floperr_t apple35_write_track(floppy_image_legacy *floppy, int head, int 
 
 	tag = get_apple35_tag(floppy);
 
-	if (track >= ARRAY_LENGTH(apple35_tracklen_800kb))
+	if (track >= std::size(apple35_tracklen_800kb))
 		return FLOPPY_ERROR_SEEKERROR;
 	if (offset != 0)
 		return FLOPPY_ERROR_UNSUPPORTED;
@@ -756,7 +756,7 @@ static floperr_t apple35_write_track(floppy_image_legacy *floppy, int head, int 
 			continue;
 		j++;
 
-		for (i = 0; i < ARRAY_LENGTH(nibble_data); i++)
+		for (i = 0; i < std::size(nibble_data); i++)
 		{
 			nibble_data[i] = rev_diskbytes[sony_fetchtrack((uint8_t*)buffer, buflen, &pos)];
 			j++;
@@ -778,7 +778,7 @@ static floperr_t apple35_write_track(floppy_image_legacy *floppy, int head, int 
 			sony_denibblize35(sector_data, nibble_data, checksum);
 
 			/* write the sector */
-			err = apple35_write_sector_td(floppy, head, track, sector, sector_data, ARRAY_LENGTH(sector_data), 0);
+			err = apple35_write_sector_td(floppy, head, track, sector, sector_data, std::size(sector_data), 0);
 			if (err)
 				return err;
 
@@ -1257,9 +1257,33 @@ bool dc42_format::load(io_generic *io, uint32_t form_factor, const std::vector<u
 	uint8_t encoding = h[0x50];
 	uint8_t format = h[0x51];
 
-	if((encoding != 0x00 || format != 0x02) && (encoding != 0x01 || format != 0x22)) {
+	if((encoding != 0x00 || format != 0x02) && (encoding != 0x01 || (format != 0x22 && format != 0x24))) {
 		osd_printf_error("dc42: Unsupported encoding/format combination %02x/%02x\n", encoding, format);
 		return false;
+	}
+
+	switch (dsize)
+	{
+		case 409600:    // Mac 400K
+			image->set_form_variant(floppy_image::FF_35, floppy_image::SSDD);
+			break;
+
+		case 737280:    // PC 720K
+		case 819200:    // Mac/A2 800K
+			image->set_form_variant(floppy_image::FF_35, floppy_image::DSDD);
+			break;
+
+		case 1474560:   // PC or Mac 1.44M
+			image->set_form_variant(floppy_image::FF_35, floppy_image::DSHD);
+			break;
+
+		case 871424:    // Apple Twiggy 851KiB
+			image->set_form_variant(floppy_image::FF_525, floppy_image::DSHD);
+			break;
+
+		default:
+			osd_printf_error("dc42: dsize is %d, unknown form factor\n");
+			break;
 	}
 
 	uint8_t sector_data[(512+12)*12];
@@ -1403,8 +1427,9 @@ bool apple_gcr_format::supports_save() const
 int apple_gcr_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t size = io_generic_size(io);
-	if(size == 409600 || size == 819200)
+	if(size == 409600 || (size == 819200 && (variants.empty() || has_variant(variants, floppy_image::DSDD))))
 		return 50;
+
 	return 0;
 }
 
@@ -1415,12 +1440,16 @@ bool apple_gcr_format::load(io_generic *io, uint32_t form_factor, const std::vec
 
 	int pos_data = 0;
 
+	uint8_t header[64];
+	io_generic_read(io, header, 0, 64);
+
 	uint64_t size = io_generic_size(io);
 	int head_count = size == 409600 ? 1 : size == 819200 ? 2 : 0;
 
+	image->set_form_variant(floppy_image::FF_35, head_count == 2 ? floppy_image::DSDD : floppy_image::SSDD);
+
 	if(!head_count)
 		return false;
-
 	for(int track=0; track < 80; track++) {
 		for(int head=0; head < head_count; head++) {
 			int ns = 12 - (track/16);
@@ -1431,10 +1460,10 @@ bool apple_gcr_format::load(io_generic *io, uint32_t form_factor, const std::vec
 			for(int i=0; i<ns; i++) {
 				sectors[si].track = track;
 				sectors[si].head = head;
-				sectors[si].sector = si;
+				sectors[si].sector = i;
 				sectors[si].info = head_count == 2 ? 0x22 : 0x02;
 				sectors[si].tag = nullptr;
-				sectors[si].data = sdata + 512*si;
+				sectors[si].data = sdata + 512*i;
 				si = (si + 2) % ns;
 				if(si == 0)
 					si++;
@@ -1471,3 +1500,118 @@ bool apple_gcr_format::save(io_generic *io, const std::vector<uint32_t> &variant
 }
 
 const floppy_format_type FLOPPY_APPLE_GCR_FORMAT = &floppy_image_format_creator<apple_gcr_format>;
+
+// .2MG format
+apple_2mg_format::apple_2mg_format() : floppy_image_format_t()
+{
+}
+
+const char *apple_2mg_format::name() const
+{
+	return "apple_2mg";
+}
+
+const char *apple_2mg_format::description() const
+{
+	return "Apple II .2MG image";
+}
+
+const char *apple_2mg_format::extensions() const
+{
+	return "2mg";
+}
+
+bool apple_2mg_format::supports_save() const
+{
+	return true;
+}
+
+int apple_2mg_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+{
+	uint8_t signature[4];
+	io_generic_read(io, signature, 0, 4);
+	if (!strncmp(reinterpret_cast<char *>(signature), "2IMG", 4))
+	{
+		return 100;
+	}
+
+	return 0;
+}
+
+bool apple_2mg_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+{
+	desc_gcr_sector sectors[12];
+	uint8_t sdata[512*12], header[64];
+	io_generic_read(io, header, 0, 64);
+	uint32_t blocks = header[0x14] | (header[0x15] << 8) | (header[0x16] << 16) | (header[0x17] << 24);
+	uint32_t pos_data = header[0x18] | (header[0x19] << 8) | (header[0x1a] << 16) | (header[0x1b] << 24);
+
+	if(blocks != 1600 && blocks != 16390)
+		return false;
+
+	image->set_form_variant(floppy_image::FF_35, (blocks > 800) ? floppy_image::DSDD : floppy_image::SSDD);
+
+	for(int track=0; track < 80; track++) {
+		for(int head=0; head < 2; head++) {
+			int ns = 12 - (track/16);
+			io_generic_read(io, sdata, pos_data, 512*ns);
+			pos_data += 512*ns;
+
+			int si = 0;
+			for(int i=0; i<ns; i++) {
+				sectors[si].track = track;
+				sectors[si].head = head;
+				sectors[si].sector = i;
+				sectors[si].info = 0x22;
+				sectors[si].tag = nullptr;
+				sectors[si].data = sdata + 512*i;
+				si = (si + 2) % ns;
+				if(si == 0)
+					si++;
+			}
+			build_mac_track_gcr(track, head, image, sectors);
+		}
+	}
+	return true;
+}
+
+bool apple_2mg_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+{
+	uint8_t header[0x40];
+	int pos_data = 0x40;
+
+	memset(header, 0, sizeof(header));
+	// file ID
+	header[0] = '2'; header[1] = 'I'; header[2] = 'M'; header[3] = 'G';
+	// creator program
+	header[4] = 'M'; header[5] = 'A'; header[6] = 'M'; header[7] = 'E';
+	// header size
+	header[8] = 0x40;
+	// version
+	header[0xa] = 1;
+	// flags
+	header[0xc] = 1;    // ProDOS sector order
+	// number of ProDOS blocks
+	header[0x14] = 0x40; header[0x15] = 0x06;   // 0x640 (1600)
+	// offset to sector data
+	header[0x18] = 0x40;
+	// bytes of disk data
+	header[0x1c] = 0x00; header[0x1d] = 0x80; header[0x1e] = 0x0c;  // 0xC8000 (819200)
+	io_generic_write(io, header, 0, 0x40);
+
+	for(int track=0; track < 80; track++) {
+		for(int head=0; head < 2; head++) {
+			auto sectors = extract_sectors_from_track_mac_gcr6(head, track, image);
+			for(unsigned int i=0; i < sectors.size(); i++) {
+				auto &sdata = sectors[i];
+				sdata.resize(512+12);
+				io_generic_write(io, &sdata[12], pos_data, 512);
+				pos_data += 512;
+			}
+		}
+	}
+
+	return true;
+}
+
+const floppy_format_type FLOPPY_APPLE_2MG_FORMAT = &floppy_image_format_creator<apple_2mg_format>;

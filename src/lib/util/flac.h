@@ -13,14 +13,16 @@
 
 #pragma once
 
-#include "corefile.h"
-
 #include <FLAC/all.h>
+
+#include <cstdint>
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+namespace util { class core_file; }
 
 // ======================> flac_encoder
 
@@ -64,18 +66,18 @@ private:
 	// internal state
 	FLAC__StreamEncoder *   m_encoder;              // actual encoder
 	util::core_file *       m_file;                 // output file
-	uint32_t                  m_compressed_offset;    // current offset with the compressed stream
+	uint32_t                m_compressed_offset;    // current offset with the compressed stream
 	FLAC__byte *            m_compressed_start;     // start of compressed data
-	uint32_t                  m_compressed_length;    // length of the compressed stream
+	uint32_t                m_compressed_length;    // length of the compressed stream
 
 	// parameters
-	uint32_t                  m_sample_rate;          // sample rate
-	uint8_t                   m_channels;             // number of channels
-	uint32_t                  m_block_size;           // block size
+	uint32_t                m_sample_rate;          // sample rate
+	uint8_t                 m_channels;             // number of channels
+	uint32_t                m_block_size;           // block size
 
 	// header stripping
 	bool                    m_strip_metadata;       // strip the metadata?
-	uint32_t                  m_ignore_bytes;         // how many bytes to ignore when writing
+	uint32_t                m_ignore_bytes;         // how many bytes to ignore when writing
 	bool                    m_found_audio;          // have we hit the audio yet?
 };
 

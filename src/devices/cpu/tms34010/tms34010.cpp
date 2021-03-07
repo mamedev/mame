@@ -755,7 +755,7 @@ void tms340x0_device::device_start()
 	save_item(NAME(m_convmp));
 	save_item(NAME(m_pixelshift));
 	save_item(NAME(m_gfxcycles));
-	save_pointer(NAME(&m_regs[0].reg), ARRAY_LENGTH(m_regs));
+	save_pointer(NAME(&m_regs[0].reg), std::size(m_regs));
 
 	set_icountptr(m_icount);
 }

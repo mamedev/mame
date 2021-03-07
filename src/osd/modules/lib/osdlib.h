@@ -34,7 +34,7 @@
         None.
 -----------------------------------------------------------------------------*/
 
-void osd_process_kill(void);
+void osd_process_kill();
 
 
 /*-----------------------------------------------------------------------------
@@ -57,7 +57,8 @@ int osd_setenv(const char *name, const char *value, int overwrite);
 /*-----------------------------------------------------------------------------
     osd_get_clipboard_text: retrieves text from the clipboard
 -----------------------------------------------------------------------------*/
-std::string osd_get_clipboard_text(void);
+std::string osd_get_clipboard_text();
+
 
 namespace osd {
 
@@ -74,16 +75,17 @@ public:
 		WRITE = 0x02,
 		EXECUTE = 0x04,
 		READ_WRITE = READ | WRITE,
-		READ_EXECUTE = READ | EXECUTE
+		READ_EXECUTE = READ | EXECUTE,
+		READ_WRITE_EXECUTE = READ | WRITE | EXECUTE
 	};
 
 	virtual_memory_allocation(virtual_memory_allocation const &) = delete;
 	virtual_memory_allocation &operator=(virtual_memory_allocation const &) = delete;
 
 	virtual_memory_allocation() { }
-	virtual_memory_allocation(std::initializer_list<std::size_t> blocks)
+	virtual_memory_allocation(std::initializer_list<std::size_t> blocks, unsigned intent)
 	{
-		m_memory = do_alloc(blocks, m_size, m_page_size);
+		m_memory = do_alloc(blocks, intent, m_size, m_page_size);
 	}
 	virtual_memory_allocation(virtual_memory_allocation &&that) : m_memory(that.m_memory), m_size(that.m_size), m_page_size(that.m_page_size)
 	{
@@ -134,7 +136,7 @@ public:
 	}
 
 private:
-	static void *do_alloc(std::initializer_list<std::size_t> blocks, std::size_t &size, std::size_t &page_size);
+	static void *do_alloc(std::initializer_list<std::size_t> blocks, unsigned intent, std::size_t &size, std::size_t &page_size);
 	static void do_free(void *start, std::size_t size);
 	static bool do_set_access(void *start, std::size_t size, unsigned access);
 

@@ -641,7 +641,7 @@ uint16_t highvdeo_state::grancapi_status_r(offs_t offset)
 		resetpulse^=0x20;
 
 		return 3 | resetpulse;
-		case 2: return (m_grancapi_prot_latch & 3)|0x17; //and 0x3f
+		case 2: return (m_grancapi_prot_latch & 3)|0x17; //and 0x3f  // This will always return 0x17: Coverity 316053
 	}
 
 	return 0;

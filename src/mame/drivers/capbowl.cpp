@@ -93,8 +93,8 @@
 #include "machine/rescap.h"
 #include "machine/ticket.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/2203intf.h"
 #include "sound/dac.h"
+#include "sound/ym2203.h"
 #include "speaker.h"
 
 #define MASTER_CLOCK        XTAL(8'000'000)

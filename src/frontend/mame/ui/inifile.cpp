@@ -99,7 +99,7 @@ void inifile_manager::init_category(std::string &&filename, emu_file &file)
 	categoryindex index;
 	char rbuf[MAX_CHAR_INFO];
 	std::string name;
-	while (file.gets(rbuf, ARRAY_LENGTH(rbuf)))
+	while (file.gets(rbuf, std::size(rbuf)))
 	{
 		if ('[' == rbuf[0])
 		{
@@ -143,7 +143,7 @@ bool favorite_manager::favorite_compare::operator()(ui_software_info const &lhs,
 		return true;
 	}
 
-	return 0 > std::strncmp(lhs.driver->name, rhs.driver->name, ARRAY_LENGTH(lhs.driver->name));
+	return 0 > std::strncmp(lhs.driver->name, rhs.driver->name, std::size(lhs.driver->name));
 }
 
 bool favorite_manager::favorite_compare::operator()(ui_software_info const &lhs, game_driver const &rhs) const
@@ -153,7 +153,7 @@ bool favorite_manager::favorite_compare::operator()(ui_software_info const &lhs,
 	if (!lhs.startempty)
 		return false;
 	else
-		return 0 > std::strncmp(lhs.driver->name, rhs.name, ARRAY_LENGTH(rhs.name));
+		return 0 > std::strncmp(lhs.driver->name, rhs.name, std::size(rhs.name));
 }
 
 bool favorite_manager::favorite_compare::operator()(game_driver const &lhs, ui_software_info const &rhs) const
@@ -163,7 +163,7 @@ bool favorite_manager::favorite_compare::operator()(game_driver const &lhs, ui_s
 	if (!rhs.startempty)
 		return true;
 	else
-		return 0 > std::strncmp(lhs.name, rhs.driver->name, ARRAY_LENGTH(lhs.name));
+		return 0 > std::strncmp(lhs.name, rhs.driver->name, std::size(lhs.name));
 }
 
 bool favorite_manager::favorite_compare::operator()(ui_software_info const &lhs, running_software_key const &rhs) const
@@ -182,7 +182,7 @@ bool favorite_manager::favorite_compare::operator()(ui_software_info const &lhs,
 	else if (lhs.shortname > std::get<2>(rhs))
 		return false;
 	else
-		return 0 > std::strncmp(lhs.driver->name, std::get<0>(rhs).name, ARRAY_LENGTH(lhs.driver->name));
+		return 0 > std::strncmp(lhs.driver->name, std::get<0>(rhs).name, std::size(lhs.driver->name));
 }
 
 bool favorite_manager::favorite_compare::operator()(running_software_key const &lhs, ui_software_info const &rhs) const
@@ -201,7 +201,7 @@ bool favorite_manager::favorite_compare::operator()(running_software_key const &
 	else if (std::get<2>(lhs) > rhs.shortname)
 		return false;
 	else
-		return 0 > std::strncmp(std::get<0>(lhs).name, rhs.driver->name, ARRAY_LENGTH(rhs.driver->name));
+		return 0 > std::strncmp(std::get<0>(lhs).name, rhs.driver->name, std::size(rhs.driver->name));
 }
 
 

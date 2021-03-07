@@ -14,6 +14,7 @@
  *   modifiers for 'OP a, ri' and ((ri)) are ignored (not used by VR)
  *   loop repeat mode when destination is (ri) is ignored
  *   ops not used by VR are not implemented
+ *   internal ROM has been dumped but isn't used yet
  */
 
 #include "emu.h"
@@ -215,6 +216,15 @@ std::unique_ptr<util::disasm_interface> ssp1601_device::create_disassembler()
 	return std::make_unique<ssp1601_disassembler>();
 }
 
+ROM_START( ssp1601 )
+	ROM_REGION(0x800, "internal_rom", 0)
+	ROM_LOAD("ssp1601.bin", 0x000, 0x800, CRC(2421ec7e) SHA1(0b951ea9c6094b3c34e4f0b64d031c75c237564f))
+ROM_END
+
+tiny_rom_entry const *ssp1601_device::device_rom_region() const
+{
+	return ROM_NAME(ssp1601);
+}
 
 // -----------------------------------------------------
 // register i/o handlers

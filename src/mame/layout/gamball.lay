@@ -301,6 +301,7 @@ license:CC0
 	</led16segsc>
 	</element>
 
+
 	<view name="Gamball AWP Simulated Video (No Artwork)">
 		<element name="lamp8" ref="reellamp" state="0">
 			<bounds x="85" y="491.3333" width="49" height="29.3333"/>
@@ -461,53 +462,17 @@ license:CC0
 		<element name="CREDIT" ref="credit" state="0">
 			<bounds x="332" y="280" width="20" height="12"/>
 		</element>
-		<element name="vfd0" ref="vfd0" state="0">
-			<bounds x="17" y="280" width="7" height="24"/>
-		</element>
-		<element name="vfd1" ref="vfd0" state="0">
-			<bounds x="24" y="280" width="7" height="24"/>
-		</element>
-		<element name="vfd2" ref="vfd0" state="0">
-			<bounds x="31" y="280" width="7" height="24"/>
-		</element>
-		<element name="vfd3" ref="vfd0" state="0">
-			<bounds x="38" y="280" width="7" height="24"/>
-		</element>
-		<element name="vfd4" ref="vfd0" state="0">
-			<bounds x="45" y="280" width="7" height="24"/>
-		</element>
-		<element name="vfd5" ref="vfd0" state="0">
-			<bounds x="52" y="280" width="7" height="24"/>
-		</element>
-		<element name="vfd6" ref="vfd0" state="0">
-			<bounds x="59" y="280" width="7" height="24"/>
-		</element>
-		<element name="vfd7" ref="vfd0" state="0">
-			<bounds x="66" y="280" width="7" height="24"/>
-		</element>
-		<element name="vfd8" ref="vfd0" state="0">
-			<bounds x="73" y="280" width="7" height="24"/>
-		</element>
-		<element name="vfd9" ref="vfd0" state="0">
-			<bounds x="80" y="280" width="7" height="24"/>
-		</element>
-		<element name="vfd10" ref="vfd0" state="0">
-			<bounds x="87" y="280" width="7" height="24"/>
-		</element>
-		<element name="vfd11" ref="vfd0" state="0">
-			<bounds x="94" y="280" width="7" height="24"/>
-		</element>
-		<element name="vfd12" ref="vfd0" state="0">
-			<bounds x="101" y="280" width="7" height="24"/>
-		</element>
-		<element name="vfd13" ref="vfd0" state="0">
-			<bounds x="108" y="280" width="7" height="24"/>
-		</element>
-		<element name="vfd14" ref="vfd0" state="0">
-			<bounds x="115" y="280" width="7" height="24"/>
-		</element>
-		<element name="vfd15" ref="vfd0" state="0">
-			<bounds x="122" y="280" width="7" height="24"/>
-		</element>
+
+		<repeat count="16">
+			<param name="n" start="15" increment="-1" />
+			<param name="x" start="17" increment="7" />
+			<element name="vfd~n~" ref="vfd0" state="0">
+				<animate name="vfdduty0" />
+				<color state="0" red="0.00" green="0.6" blue="1.00" alpha="0.0"></color>
+				<color state="31" red="0.00" green="0.6" blue="1.00" alpha="1.0"></color>
+				<bounds x="~x~" y="0" width="7" height="24"/>
+			</element>
+		</repeat>
+
 	</view>
 </mamelayout>

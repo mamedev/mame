@@ -547,7 +547,7 @@ int generic_axis_get_state(void *device_internal, void *item_internal)
 inline static const char *default_button_name(int which)
 {
 	static char buffer[20];
-	snprintf(buffer, ARRAY_LENGTH(buffer), "B%d", which);
+	snprintf(buffer, std::size(buffer), "B%d", which);
 	return buffer;
 }
 
@@ -558,7 +558,7 @@ inline static const char *default_button_name(int which)
 inline static const char *default_pov_name(int which)
 {
 	static char buffer[20];
-	snprintf(buffer, ARRAY_LENGTH(buffer), "POV%d", which);
+	snprintf(buffer, std::size(buffer), "POV%d", which);
 	return buffer;
 }
 

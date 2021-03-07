@@ -155,7 +155,7 @@ void path_iterator::reset()
 //  in the search path
 //-------------------------------------------------
 
-const osd::directory::entry *file_enumerator::next()
+const osd::directory::entry *file_enumerator::next(const char *subdir)
 {
 	// loop over potentially empty directories
 	while (true)
@@ -164,7 +164,7 @@ const osd::directory::entry *file_enumerator::next()
 		while (!m_curdir)
 		{
 			// if we fail to get anything more, we're done
-			if (!m_iterator.next(m_pathbuffer))
+			if (!m_iterator.next(m_pathbuffer, subdir))
 				return nullptr;
 
 			// open the path
@@ -719,12 +719,12 @@ osd_file::error emu_file::attempt_zipped()
 {
 	typedef util::archive_file::error (*open_func)(const std::string &filename, util::archive_file::ptr &result);
 	char const *const suffixes[] = { ".zip", ".7z" };
-	open_func const open_funcs[ARRAY_LENGTH(suffixes)] = { &util::archive_file::open_zip, &util::archive_file::open_7z };
+	open_func const open_funcs[std::size(suffixes)] = { &util::archive_file::open_zip, &util::archive_file::open_7z };
 
 	// loop over archive types
 	std::string const savepath(m_fullpath);
 	std::string filename;
-	for (unsigned i = 0; i < ARRAY_LENGTH(suffixes); i++, m_fullpath = savepath, filename.clear())
+	for (unsigned i = 0; i < std::size(suffixes); i++, m_fullpath = savepath, filename.clear())
 	{
 		// loop over directory parts up to the start of filename
 		while (1)

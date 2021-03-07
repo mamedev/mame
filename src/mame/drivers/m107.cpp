@@ -32,8 +32,8 @@ confirmed for m107 games as well.
 #include "cpu/nec/nec.h"
 #include "machine/gen_latch.h"
 #include "machine/irem_cpu.h"
-#include "sound/ym2151.h"
 #include "sound/iremga20.h"
+#include "sound/ym2151.h"
 #include "speaker.h"
 
 /*****************************************************************************/

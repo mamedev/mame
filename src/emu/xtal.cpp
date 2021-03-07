@@ -199,6 +199,7 @@ const double XTAL::known_xtals[] = {
 	 12'472'500, /* 12.4725_MHz_XTAL       Bonanza's Mini Boy 7 */
 	 12'480'000, /* 12.48_MHz_XTAL         TRS-80 Model II */
 	 12'500'000, /* 12.5_MHz_XTAL          Red Alert audio board */
+	 12'638'000, /* 12.638_MHz_XTAL        Exidy Sorcerer */
 	 12'672'000, /* 12.672_MHz_XTAL        TRS-80 Model 4 80*24 video */
 	 12'800'000, /* 12.8_MHz_XTAL          Cave CV1000 */
 	 12'854'400, /* 12.8544_MHz_XTAL       Alphatronic P3 */
@@ -319,6 +320,7 @@ const double XTAL::known_xtals[] = {
 	 22'248'000, /* 22.248_MHz_XTAL        Quantel DPB-7000 */
 	 22'321'000, /* 22.321_MHz_XTAL        Apple LaserWriter II NT */
 	 22'464'000, /* 22.464_MHz_XTAL        CIT-101 132-column display clock */
+	 22'579'000, /* 22.579_MHz_XTAL        Sega System H1 SCSP clock */
 	 22'656'000, /* 22.656_MHz_XTAL        Super Pinball Action (~1440x NTSC line rate) */
 	 22'896'000, /* 22.896_MHz_XTAL        DEC VT220 132-column display clock */
 	 23'200'000, /* 23.2_MHz_XTAL          Roland JV-80 & JV-880 PCM clock */
@@ -357,7 +359,7 @@ const double XTAL::known_xtals[] = {
 	 27'562'000, /* 27.562_MHz_XTAL        Visual 220 */
 	 27'720'000, /* 27.72_MHz_XTAL         AT&T 610 132-column display clock */
 	 27'956'000, /* 27.956_MHz_XTAL        CIT-101e 132-column display clock */
-	 28'000'000, /* 28_MHz_XTAL            - */
+	 28'000'000, /* 28_MHz_XTAL            Sega System H1 SH2 clock */
 	 28'224'000, /* 28.224_MHz_XTAL        Roland JD-800 */
 	 28'322'000, /* 28.322_MHz_XTAL        Saitek RISC 2500, Mephisto Montreux */
 	 28'375'160, /* 28.37516_MHz_XTAL      Amiga PAL systems */

@@ -268,7 +268,7 @@ READ_LINE_MEMBER( rtc4543_device::data_r )
 
 void rtc4543_device::load_bit(int reg)
 {
-	assert(reg < ARRAY_LENGTH(m_regs));
+	assert(reg < std::size(m_regs));
 	int bit = m_curbit & 7;
 
 	// reload data?
@@ -289,7 +289,7 @@ void rtc4543_device::load_bit(int reg)
 
 void rtc4543_device::store_bit(int reg)
 {
-	assert(reg < ARRAY_LENGTH(m_regs));
+	assert(reg < std::size(m_regs));
 	int bit = m_curbit & 7;
 
 	m_regs[reg] &= ~(1 << bit);

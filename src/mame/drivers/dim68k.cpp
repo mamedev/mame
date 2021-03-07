@@ -27,23 +27,23 @@
         OUTPUT:
         all bits = Centronics data
 
-		Colors (from COLORDEM.BAS)
-		0 = black
-		1 = dark blue
-		2 = red
-		3 = magenta
-		4 = brown
-		5 = grey
-		6 = orange
-		7 = pink
-		8 = dark aqua
-		9 = blue
-		A = grey 2
-		B = light blue
-		C = green
-		D = aqua
-		E = yellow
-		F = white
+        Colors (from COLORDEM.BAS)
+        0 = black
+        1 = dark blue
+        2 = red
+        3 = magenta
+        4 = brown
+        5 = grey
+        6 = orange
+        7 = pink
+        8 = dark aqua
+        9 = blue
+        A = grey 2
+        B = light blue
+        C = green
+        D = aqua
+        E = yellow
+        F = white
 
 ****************************************************************************/
 
@@ -134,7 +134,7 @@ void dim68k_state::dim68k_palette(palette_device &palette)
 	palette.set_pen_color(12, rgb_t(0x19, 0xd7, 0x00)); /* Light Green */
 	palette.set_pen_color(13, rgb_t(0x58, 0xf4, 0xbf)); /* Aquamarine */
 	palette.set_pen_color(14, rgb_t(0xbf, 0xe3, 0x08)); /* Yellow */
-	palette.set_pen_color(15, rgb_t(0xff, 0xff, 0xff));	 /* White */
+	palette.set_pen_color(15, rgb_t(0xff, 0xff, 0xff));  /* White */
 };
 
 u16 dim68k_state::dim68k_fdc_r()
@@ -409,7 +409,6 @@ void dim68k_state::machine_start()
 static DEVICE_INPUT_DEFAULTS_START(keyboard)
 	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_300)
 	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_300)
-	DEVICE_INPUT_DEFAULTS("RS232_STARTBITS", 0xff, RS232_STARTBITS_1)
 	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
 	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
@@ -437,8 +436,8 @@ void dim68k_state::dim68k(machine_config &config)
 
 	/* Devices */
 	UPD765A(config, m_fdc, 4'000'000, true, true); // these options unknown
-	FLOPPY_CONNECTOR(config, m_floppy[0], dim68k_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[1], dim68k_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], dim68k_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], dim68k_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 	m_fdc->intrq_wr_callback().set(FUNC(dim68k_state::fdc_irq_w));
 
 	MC6845(config, m_crtc, 1790000);

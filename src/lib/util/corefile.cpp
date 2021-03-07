@@ -462,7 +462,7 @@ int core_text_file::getc()
 		{
 			// place the new character in the ring buffer
 			m_back_char_head = 0;
-			m_back_char_tail = utf8_from_uchar(m_back_chars, ARRAY_LENGTH(m_back_chars), uchar);
+			m_back_char_tail = utf8_from_uchar(m_back_chars, std::size(m_back_chars), uchar);
 			//assert(file->back_char_tail != -1);
 		}
 	}
@@ -473,7 +473,7 @@ int core_text_file::getc()
 	else
 	{
 		result = m_back_chars[m_back_char_head++];
-		m_back_char_head %= ARRAY_LENGTH(m_back_chars);
+		m_back_char_head %= std::size(m_back_chars);
 	}
 
 	return result;
@@ -488,7 +488,7 @@ int core_text_file::getc()
 int core_text_file::ungetc(int c)
 {
 	m_back_chars[m_back_char_tail++] = char(c);
-	m_back_char_tail %= ARRAY_LENGTH(m_back_chars);
+	m_back_char_tail %= std::size(m_back_chars);
 	return c;
 }
 
@@ -577,7 +577,7 @@ int core_text_file::puts(std::string_view s)
 			*pconvbuf++ = ch;
 
 		// if we overflow, break into chunks
-		if (pconvbuf >= convbuf + ARRAY_LENGTH(convbuf) - 10)
+		if (pconvbuf >= convbuf + std::size(convbuf) - 10)
 		{
 			count += write(convbuf, pconvbuf - convbuf);
 			pconvbuf = convbuf;
@@ -1260,6 +1260,8 @@ std::string_view core_filename_extract_base(std::string_view name, bool strip_ex
 {
 	// find the start of the basename
 	auto const start = std::find_if(name.rbegin(), name.rend(), &util::is_directory_separator);
+	if (start == name.rbegin())
+		return std::string_view();
 
 	// find the end of the basename
 	auto const chop_position = strip_extension
