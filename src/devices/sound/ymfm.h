@@ -951,7 +951,8 @@ public:
 		// writes to the mode register with high bit set ignore the low bits
 		if (index == REG_MODE && BIT(data, 7) != 0)
 			m_regdata[index] |= 0x80;
-		m_regdata[index] = data;
+		else
+			m_regdata[index] = data;
 	}
 
 	// determine if a given write is a keyon, and if so, for which channel/operators
