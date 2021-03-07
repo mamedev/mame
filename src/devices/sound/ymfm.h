@@ -124,6 +124,7 @@ public:
 	u16 multi_block_freq2() const /* 14 bits */ { return 0; } // not on OPM,OPL
 	u8 rhythm_enable() const      /*  1 bit  */ { return 0; } // not on OPM,OPN,OPN2
 	u8 rhythm_keyon() const       /*  5 bits */ { return 0; } // not on OPM,OPN,OPN2
+	u8 waveform_enable() const    /*  1 bits */ { return 0; } // not on OPM,OPN,OPNA,OPL
 
 	// per-channel registers that aren't universally supported
 	u8 pan_right() const          /*  1 bit  */ { return 1; } // not on OPN,OPL
@@ -133,14 +134,15 @@ public:
 
 	// per-operator registers that aren't universally supported
 	u8 lfo_am_enabled() const     /*  1 bit  */ { return 0; } // not on OPN
-	u8 lfo_pm_enabled() const     /*  1 bit  */ { return 0; } // not on OPM,OPN,OPN2
+	u8 lfo_pm_enabled() const     /*  1 bit  */ { return 0; } // not on OPM,OPN,OPNA
 	u8 detune() const             /*  3 bits */ { return 0; } // not on OPL
-	u8 detune2() const            /*  2 bits */ { return 0; } // not on OPN,OPN2,OPL
-	u8 eg_sustain() const         /*  1 bit  */ { return 1; } // not on OPM,OPN,OPN2
+	u8 detune2() const            /*  2 bits */ { return 0; } // not on OPN,OPNA,OPL
+	u8 eg_sustain() const         /*  1 bit  */ { return 1; } // not on OPM,OPN,OPNA
 	u8 ssg_eg_enabled() const     /*  1 bit  */ { return 0; } // not on OPM,OPL
 	u8 ssg_eg_mode() const        /*  1 bit  */ { return 0; } // not on OPM,OPL
 	u8 sustain_rate() const       /*  4 bits */ { return 0; } // not on OPL
-	u8 key_scale_level() const    /*  2 bits */ { return 0; } // not on OPM,OPN,OPN2
+	u8 key_scale_level() const    /*  2 bits */ { return 0; } // not on OPM,OPN,OPNA
+	u8 waveform() const           /*  3 bits */ { return 0; } // not on OPM,OPN,OPNA,OPL
 
 protected:
 	// return a bitfield extracted from a byte
@@ -806,14 +808,14 @@ public:
 };
 
 
-// ======================> ymopl_registers
+// ======================> ymopl_registers, ymopl2_registers
 
 //
 // OPL/OPL2 register map:
 //
 //      System-wide registers:
 //           01 xxxxxxxx Test register
-//              --x----- Enable OPL compatibility mode (1 = enable)
+//              --x----- Enable OPL compatibility mode [OPL2 only] (1 = enable)
 //           02 xxxxxxxx Timer A value (4 * OPN)
 //           03 xxxxxxxx Timer B value
 //           04 x------- RST
@@ -852,7 +854,7 @@ public:
 //              ----xxxx Decay rate (0-15)
 //        80-95 xxxx---- Sustain level (0-15)
 //              ----xxxx Release rate (0-15)
-//        E0-F5 ------xx Wave select (0-3) [OPL2+]
+//        E0-F5 ------xx Wave select (0-3) [OPL2 only]
 //
 // OPL channel and operator mapping:
 //
@@ -1044,6 +1046,22 @@ public:
 		// release is 4 bits, expanded as with OPM/OPN
 		return opbyte(0x80, 0, 4) * 2 + 1;
 	}
+};
+
+class ymopl2_registers : public ymopl_registers
+{
+public:
+	// constructor
+	ymopl2_registers(u8 *regdata) :
+		ymopl_registers(regdata)
+	{
+	}
+
+	// system-wide registers
+	u8 waveform_enable() const    /*  1 bits */ { return sysbyte(0x01, 5, 1); }
+
+	// per-operator registers
+	u8 waveform() const           /*  2 bits */ { return opbyte(0xe0, 0, 2); }
 };
 
 
@@ -1292,10 +1310,12 @@ extern template class ymfm_engine_base<ymopm_registers>;
 extern template class ymfm_engine_base<ymopn_registers>;
 extern template class ymfm_engine_base<ymopna_registers>;
 extern template class ymfm_engine_base<ymopl_registers>;
+extern template class ymfm_engine_base<ymopl2_registers>;
 
 using ymopm_engine = ymfm_engine_base<ymopm_registers>;
 using ymopn_engine = ymfm_engine_base<ymopn_registers>;
 using ymopna_engine = ymfm_engine_base<ymopna_registers>;
 using ymopl_engine = ymfm_engine_base<ymopl_registers>;
+using ymopl2_engine = ymfm_engine_base<ymopl2_registers>;
 
 #endif // MAME_SOUND_YMFM_H

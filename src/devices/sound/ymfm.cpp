@@ -550,8 +550,44 @@ s16 ymfm_operator<RegisterType>::compute_volume(u16 phase, u16 am_offset) const
 	// the low 10 bits of phase represents a full 2*PI period over
 	// the full sin wave
 
+	// adjust the phase for the different waveforms
+	u16 invert = 0;
+	if (m_regs.waveform_enable())
+	{
+		// per-quadrant behaviors:
+		//   bits  0-11 = mask to AND with
+		//   bits 12-13 = shift value: 0: <<1, 1:0, 2: >>1
+		//   bit     14 = set bit 0x100
+		//   bit     15 = invert the output
+		static u16 const waveform_mask_shift[8*4] =
+		{
+			// OPL2 waveforms:
+			0x13ff, 0x13ff, 0x13ff, 0x13ff, // 0: no shift
+			0x13ff, 0x13ff, 0x0000, 0x0000, // 1: no shift, mask to 0 in Q3/Q4
+			0x11ff, 0x11ff, 0x11ff, 0x11ff, // 2: no shift, mask off sign bit
+			0x11ff, 0x0000, 0x11ff, 0x0000, // 3: no shift, mask off sign bit in Q1/Q3, mask to 0 in Q2/Q4
+
+			// OPL3 waveforms:
+			0x03ff, 0x03ff, 0x0000, 0x0000, // 4: lshift 1, mask to 0 in Q3/Q4
+			0x01ff, 0x01ff, 0x0000, 0x0000, // 5: lshift 1, mask off sign bit in Q1/Q2, mask to 0 in Q2/Q4
+			0x5200, 0x5200, 0x5200, 0x5200, // 6: no shift, sign bit only, OR with 0x100
+			0xa3ff, 0xa3ff, 0xa3ff, 0xa3ff  // 7: rshift 1 and invert the output
+		};
+		u16 mask_shift = waveform_mask_shift[m_regs.waveform() * 4 + BIT(phase, 8, 2)];
+
+		// apply the shift, preserving the sign bit for the right shift case
+		phase = s16(phase << 6) >> (5 + BIT(mask_shift, 12, 2));
+
+		// next apply the mask and set the 0x100 bit if needed
+		phase &= mask_shift;
+		phase |= BIT(mask_shift, 14) << 8;
+
+		// the invert state comes from the top bit
+		invert = (s16(mask_shift) >> 15) & 0xfff;
+	}
+
 	// get the absolute value of the sin, as attenuation, as a 4.8 fixed point value
-	u16 sin_attenuation = abs_sin_attenuation(phase);
+	u16 sin_attenuation = abs_sin_attenuation(phase) ^ invert;
 
 	// get the attenuation from the evelope generator as a 4.6 value, shifted up to 4.8
 	u16 env_attenuation = envelope_attenuation(am_offset) << 2;
@@ -627,7 +663,7 @@ void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 
 	// log key on events under certain conditions
 //	if (m_regs.lfo_waveform() == 3 && m_regs.lfo_enabled() && ((m_regs.lfo_am_enabled() && m_regs.lfo_am_sensitivity() != 0) || m_regs.lfo_pm_sensitivity() != 0))
-	if (m_regs.rhythm_enable() && m_regs.chnum() >= 6)
+//	if (m_regs.rhythm_enable() && m_regs.chnum() >= 6)
 	{
 		LOG("KeyOn %2d.%2d: freq=%04X dt2=%d fb=%d alg=%d dt=%d mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X pan=%c%c",
 			m_regs.chnum(), m_regs.opnum(),
