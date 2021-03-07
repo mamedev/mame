@@ -38,8 +38,8 @@ TODO:
   but again does not explain why
 - documentation is conflicting whether or not MM76/MM75 can (re)set interrupt flip-
   flops with SOS/ROS opcodes
+- add MCU mask options, there's one for inverting interrupts
 - add serial i/o
-- add pseudo interrupts
 - add MM78
 
 */
@@ -88,6 +88,10 @@ void pps41_base_device::device_start()
 	m_read_r.resolve_safe(0xff);
 	m_write_r.resolve_safe();
 
+	// init RAM with 0xf
+	for (int i = 0; i <= m_datamask; i++)
+		m_data->write_byte(i, 0xf);
+
 	// zerofill
 	m_pc = 0;
 	m_prev_pc = 0;
@@ -116,6 +120,8 @@ void pps41_base_device::device_start()
 	m_d_mask = (1 << m_d_pins) - 1;
 	m_d_output = 0;
 	m_r_output = 0;
+	m_int_line[0] = m_int_line[1] = 1;
+	m_int_ff[0] = m_int_ff[1] = 0;
 
 	// register for savestates
 	save_item(NAME(m_pc));
@@ -143,6 +149,8 @@ void pps41_base_device::device_start()
 
 	save_item(NAME(m_d_output));
 	save_item(NAME(m_r_output));
+	save_item(NAME(m_int_line));
+	save_item(NAME(m_int_ff));
 
 	// register state for debugger
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%03X").noshow();
@@ -180,6 +188,37 @@ void pps41_base_device::device_reset()
 	// clear outputs
 	m_write_r(m_r_output = 0xff);
 	m_write_d(m_d_output = 0);
+}
+
+
+//-------------------------------------------------
+//  inputline handling
+//-------------------------------------------------
+
+void pps41_base_device::execute_set_input(int line, int state)
+{
+	// negative voltage, Vdd=0, Vss(GND)=1
+	state = (state) ? 0 : 1;
+
+	switch (line)
+	{
+		case PPS41_INPUT_LINE_INT0:
+			// reset flip-flop on rising edge
+			if (state && !m_int_line[0])
+				m_int_ff[0] = 0;
+			m_int_line[0] = state;
+			break;
+
+		case PPS41_INPUT_LINE_INT1:
+			// reset flip-flop on falling edge
+			if (!state && m_int_line[1])
+				m_int_ff[1] = 0;
+			m_int_line[1] = state;
+			break;
+
+		default:
+			break;
+	}
 }
 
 

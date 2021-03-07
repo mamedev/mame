@@ -428,25 +428,27 @@ void mm76_device::op_i2c()
 void mm76_device::op_int1h()
 {
 	// INT1H: skip on INT1
-	op_todo();
+	m_skip = bool(m_int_line[1]);
 }
 
 void mm76_device::op_din1()
 {
 	// DIN1: test INT1 flip-flop
-	op_todo();
+	m_skip = !m_int_ff[1];
+	m_int_ff[1] = 1;
 }
 
 void mm76_device::op_int0l()
 {
-	// INT1H: skip on INT0
-	op_todo();
+	// INT0L: skip on INT0
+	m_skip = !m_int_line[0];
 }
 
 void mm76_device::op_din0()
 {
 	// DIN0: test INT0 flip-flop
-	op_todo();
+	m_skip = !m_int_ff[0];
+	m_int_ff[0] = 1;
 }
 
 void mm76_device::op_seg1()
