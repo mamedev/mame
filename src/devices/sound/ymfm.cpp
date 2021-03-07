@@ -1369,7 +1369,7 @@ ymfm_engine_base<RegisterType>::ymfm_engine_base(device_t &device) :
 	m_device(device),
 	m_env_counter(0),
 	m_lfo_counter(0),
-	m_noise_lfsr(0),
+	m_noise_lfsr(2),
 	m_noise_counter(0),
 	m_noise_state(0),
 	m_noise_lfo(0),
