@@ -2,10 +2,10 @@
 // copyright-holders:Aaron Giles
 
 #include "emu.h"
-#include "ym3526.h"
+#include "ym3812.h"
 
 
-DEFINE_DEVICE_TYPE(YM3526, ym3526_device, "ym3526", "YM3526 OPL")
+DEFINE_DEVICE_TYPE(YM3812, ym3812_device, "ym3812", "YM3812 OPL2")
 
 
 //*********************************************************
@@ -54,14 +54,14 @@ inline s32 fp_to_linear(s16 value)
 
 
 //*********************************************************
-//  YM3526 DEVICE
+//  YM3812 DEVICE
 //*********************************************************
 
 //-------------------------------------------------
-//  ym3526_device - constructor
+//  ym3812_device - constructor
 //-------------------------------------------------
 
-ym3526_device::ym3526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
+ym3812_device::ym3812_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_opl(*this),
@@ -75,7 +75,7 @@ ym3526_device::ym3526_device(const machine_config &mconfig, const char *tag, dev
 //  read - handle a read from the device
 //-------------------------------------------------
 
-u8 ym3526_device::read(offs_t offset)
+u8 ym3812_device::read(offs_t offset)
 {
 	u8 result = 0xff;
 	switch (offset & 1)
@@ -85,7 +85,7 @@ u8 ym3526_device::read(offs_t offset)
 			break;
 
 		case 1:	// data port (unused)
-			logerror("Unexpected read from YM3526 offset %d\n", offset & 3);
+			logerror("Unexpected read from YM3812 offset %d\n", offset & 3);
 			break;
 	}
 	return result;
@@ -97,7 +97,7 @@ u8 ym3526_device::read(offs_t offset)
 //  interface
 //-------------------------------------------------
 
-void ym3526_device::write(offs_t offset, u8 value)
+void ym3812_device::write(offs_t offset, u8 value)
 {
 	switch (offset & 1)
 	{
@@ -111,8 +111,6 @@ void ym3526_device::write(offs_t offset, u8 value)
 			m_stream->update();
 
 			// write to OPL
-//			if (m_address == 4)
-//				printf("Control = %02X\n", value);
 			m_opl.write(m_address, value);
 			break;
 	}
@@ -123,7 +121,7 @@ void ym3526_device::write(offs_t offset, u8 value)
 //  device_start - start of emulation
 //-------------------------------------------------
 
-void ym3526_device::device_start()
+void ym3812_device::device_start()
 {
 	// create our stream
 	m_stream = stream_alloc(0, 1, clock() / (ymopl_registers::DEFAULT_PRESCALE * ymopl_registers::OPERATORS));
@@ -143,7 +141,7 @@ void ym3526_device::device_start()
 //  device_reset - start of emulation
 //-------------------------------------------------
 
-void ym3526_device::device_reset()
+void ym3812_device::device_reset()
 {
 	// reset the engines
 	m_opl.reset();
@@ -154,7 +152,7 @@ void ym3526_device::device_reset()
 //  device_clock_changed - update if clock changes
 //-------------------------------------------------
 
-void ym3526_device::device_clock_changed()
+void ym3812_device::device_clock_changed()
 {
 	m_stream->set_sample_rate(clock() / (ymopl_registers::DEFAULT_PRESCALE * ymopl_registers::OPERATORS));
 }
@@ -164,7 +162,7 @@ void ym3526_device::device_clock_changed()
 //  sound_stream_update - update the sound stream
 //-------------------------------------------------
 
-void ym3526_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void ym3812_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// iterate over all target samples
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)

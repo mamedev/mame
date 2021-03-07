@@ -204,10 +204,10 @@ Reference of music tempo:
 #include "cpu/z80/z80.h"
 #include "machine/nmk004.h"
 #include "machine/nmk112.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 #include "sound/ym2203.h"
+#include "sound/ym3812.h"
 
 #include "screen.h"
 #include "speaker.h"

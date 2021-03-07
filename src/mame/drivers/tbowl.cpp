@@ -18,7 +18,7 @@ Might be some priority glitches
 #include "includes/tbowl.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/3812intf.h"
+#include "sound/ym3812.h"
 
 #include "layout/generic.h"
 #include "screen.h"

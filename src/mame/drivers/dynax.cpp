@@ -85,10 +85,10 @@ TODO:
 #include "cpu/z80/tmpz84c015.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
-#include "sound/3812intf.h"
 #include "sound/ay8910.h"
 #include "sound/ym2203.h"
 #include "sound/ym2413.h"
+#include "sound/ym3812.h"
 
 #include "layout/generic.h"
 #include "speaker.h"

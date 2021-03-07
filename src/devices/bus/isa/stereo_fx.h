@@ -8,7 +8,7 @@
 #include "isa.h"
 #include "bus/pc_joy/pc_joy.h"
 #include "cpu/mcs51/mcs51.h"
-#include "sound/3812intf.h"
+#include "sound/ym3812.h"
 
 //*********************************************************************
 //   TYPE DEFINITIONS

@@ -95,7 +95,7 @@ chip at location ic50   28 pin dip  stamped     Hitachi logo? 1A1 R
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
 #include "machine/nvram.h"
-#include "sound/3812intf.h"
+#include "sound/ym3812.h"
 #include "speaker.h"
 
 

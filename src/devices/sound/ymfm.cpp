@@ -480,6 +480,7 @@ ALLOW_SAVE_TYPE(ymfm_operator<ymopm_registers>::envelope_state);
 ALLOW_SAVE_TYPE(ymfm_operator<ymopn_registers>::envelope_state);
 ALLOW_SAVE_TYPE(ymfm_operator<ymopna_registers>::envelope_state);
 ALLOW_SAVE_TYPE(ymfm_operator<ymopl_registers>::envelope_state);
+ALLOW_SAVE_TYPE(ymfm_operator<ymopl2_registers>::envelope_state);
 
 template<class RegisterType>
 void ymfm_operator<RegisterType>::save(device_t &device, u8 index)
@@ -664,6 +665,7 @@ void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 	// log key on events under certain conditions
 //	if (m_regs.lfo_waveform() == 3 && m_regs.lfo_enabled() && ((m_regs.lfo_am_enabled() && m_regs.lfo_am_sensitivity() != 0) || m_regs.lfo_pm_sensitivity() != 0))
 //	if (m_regs.rhythm_enable() && m_regs.chnum() >= 6)
+	if (m_regs.waveform_enable() && m_regs.waveform() != 0)
 	{
 		LOG("KeyOn %2d.%2d: freq=%04X dt2=%d fb=%d alg=%d dt=%d mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X pan=%c%c",
 			m_regs.chnum(), m_regs.opnum(),
@@ -1944,3 +1946,4 @@ template class ymfm_engine_base<ymopm_registers>;
 template class ymfm_engine_base<ymopn_registers>;
 template class ymfm_engine_base<ymopna_registers>;
 template class ymfm_engine_base<ymopl_registers>;
+template class ymfm_engine_base<ymopl2_registers>;

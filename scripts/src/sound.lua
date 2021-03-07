@@ -1175,8 +1175,8 @@ end
 --@src/devices/sound/ym2608.h,SOUNDS["YM2608"] = true
 --@src/devices/sound/ym2610.h,SOUNDS["YM2610"] = true
 --@src/devices/sound/ym2612.h,SOUNDS["YM2612"] = true
---@src/devices/sound/3812intf.h,SOUNDS["YM3812"] = true
 --@src/devices/sound/ym3526.h,SOUNDS["YM3526"] = true
+--@src/devices/sound/ym3812.h,SOUNDS["YM3812"] = true
 --@src/devices/sound/8950intf.h,SOUNDS["Y8950"] = true
 --@src/devices/sound/ymf262.h,SOUNDS["YMF262"] = true
 --@src/devices/sound/ymf271.h,SOUNDS["YMF271"] = true
@@ -1252,12 +1252,10 @@ end
 if (SOUNDS["YM3812"]~=null or SOUNDS["YM3526"]~=null or SOUNDS["Y8950"]~=null) then
 --if (SOUNDS["YM3812"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/sound/3812intf.cpp",
-		MAME_DIR .. "src/devices/sound/3812intf.h",
-		MAME_DIR .. "src/devices/sound/fmopl.cpp",
-		MAME_DIR .. "src/devices/sound/fmopl.h",
-		MAME_DIR .. "src/devices/sound/ymdeltat.cpp",
-		MAME_DIR .. "src/devices/sound/ymdeltat.h",
+		MAME_DIR .. "src/devices/sound/ym3812.cpp",
+		MAME_DIR .. "src/devices/sound/ym3812.h",
+		MAME_DIR .. "src/devices/sound/ymfm.cpp",
+		MAME_DIR .. "src/devices/sound/ymfm.h",
 	}
 --end
 

@@ -40,10 +40,10 @@ Notes:
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "sound/3812intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/ym2203.h"
+#include "sound/ym3812.h"
 #include "speaker.h"
 
 

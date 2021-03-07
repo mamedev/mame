@@ -1,23 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 
-#ifndef MAME_SOUND_YM3526_H
-#define MAME_SOUND_YM3526_H
+#ifndef MAME_SOUND_YM3812_H
+#define MAME_SOUND_YM3812_H
 
 #pragma once
 
 #include "ymfm.h"
 
 
-// ======================> ym3526_device
+// ======================> ym3812_device
 
-DECLARE_DEVICE_TYPE(YM3526, ym3526_device);
+DECLARE_DEVICE_TYPE(YM3812, ym3812_device);
 
-class ym3526_device : public device_t, public device_sound_interface
+class ym3812_device : public device_t, public device_sound_interface
 {
 public:
 	// constructor
-	ym3526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type = YM3526);
+	ym3812_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type = YM3812);
 
 	// configuration helpers
 	auto irq_handler() { return m_opl.irq_handler(); }
@@ -41,11 +41,11 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// internal state
-	ymopl_engine m_opl;              // core OPL engine
+	ymopl2_engine m_opl;             // core OPL engine
 	sound_stream *m_stream;          // sound stream
 	attotime m_busy_duration;        // precomputed busy signal duration
 	u8 m_address;                    // address register
 };
 
 
-#endif // MAME_SOUND_YM3526_H
+#endif // MAME_SOUND_YM3812_H
