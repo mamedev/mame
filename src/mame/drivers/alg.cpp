@@ -4,7 +4,7 @@
 
     American Laser Game Hardware
 
-    Amiga 500 + sony laserdisc player LDP-1450
+    Amiga 500 + Sony laserdisc player LDP-1450
     (LDP-3300P for Zorton Brothers, LDP-1500 for Marbella Vice)
 
     Games Supported:
