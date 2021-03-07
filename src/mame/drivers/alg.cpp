@@ -844,7 +844,7 @@ ROM_START( marvice100hz )
 ROM_END
 
 /* Tierras Salvajes 100Hz 
-  PCB sinkscreened PICMATIC S.A. 27-11-1992
+  PCB silkscreened PICMATIC S.A. 27-11-1992
   ______________________________________________
   |        ________                      ····  |
   |___     |_______|    __________  __________ |
