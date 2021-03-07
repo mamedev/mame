@@ -1038,7 +1038,7 @@ public:
 			return opbyte(0x60, (state ^ 1) * 4, 4) * 2;
 
 		// sustain rate doesn't exist in OPL, so effectively 0, unless in percussion mode
-		else if (state == 3 && eg_sustain() != 0)
+		else if (state == 2 && eg_sustain() != 0)
 			return 0;
 
 		// release is 4 bits, expanded as with OPM/OPN
