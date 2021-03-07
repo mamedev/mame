@@ -78,11 +78,11 @@ function portname.startplugin()
 				local parent
 				for tag, image in pairs(manager.machine.images) do
 					parent = image.software_parent
-					if parent ~= "" then
+					if parent then
 						break
 					end
 				end
-				if parent ~= "" then
+				if parent then
 					ret = file:open(emu.romname() .. "_" .. parent:match("([^:]*)$")  .. ".json")
 				end
 			end
