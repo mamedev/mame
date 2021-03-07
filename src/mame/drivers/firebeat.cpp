@@ -255,8 +255,8 @@ void firebeat_extend_spectrum_analyzer_device::sound_stream_update(sound_stream 
 	// and does not affect gameplay in any way.
 
 	// Band values taken directly from NJU7507 data sheet.
-	double notches[] = { 95, 240, 600, 1500, 3400, 8200, 18000 };
-	int last_notch = std::end(notches) - std::begin(notches);
+	constexpr double NOTCHES[] = { 95, 240, 600, 1500, 3400, 8200, 18000 };
+	constexpr int LAST_NOTCH = 7;
 
 	auto srate = stream.sample_rate();
 	auto order = WDL_fft_permute_tab(FFT_LENGTH / 2);
@@ -267,15 +267,15 @@ void firebeat_extend_spectrum_analyzer_device::sound_stream_update(sound_stream 
 		for (int i = 0; i <= FFT_LENGTH / 2; i++) {
 			const double freq = (double)i / FFT_LENGTH * srate;
 
-			if (freq < notches[cur_notch]) {
+			if (freq < NOTCHES[cur_notch]) {
 				continue;
 			}
 
-			if (freq > notches[cur_notch+1]) {
+			if (freq > NOTCHES[cur_notch+1]) {
 				cur_notch++;
 			}
 
-			if (cur_notch >= last_notch) {
+			if (cur_notch >= LAST_NOTCH) {
 				// Don't need to calculate anything above this frequency
 				break;
 			}
@@ -286,7 +286,7 @@ void firebeat_extend_spectrum_analyzer_device::sound_stream_update(sound_stream 
 			const double im = bin->im;
 			const double mag = sqrt(re*re + im*im);
 
-			if (notch_max[cur_notch] == -1 && freq >= notches[cur_notch] && freq < notches[cur_notch+1]) {
+			if (notch_max[cur_notch] == -1 && freq >= NOTCHES[cur_notch] && freq < NOTCHES[cur_notch+1]) {
 				notch_max[cur_notch] = mag;
 			}
 		}
