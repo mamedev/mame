@@ -227,13 +227,9 @@ void firebeat_extend_spectrum_analyzer_device::device_reset()
 		}
 
 		std::fill(std::begin(m_fft_buf[ch]), std::end(m_fft_buf[ch]), 0);
+		std::fill(std::begin(m_bars[ch]), std::end(m_bars[ch]), 0);
 
 		m_audio_count[ch] = 0;
-
-		for (int i = 0; i < TOTAL_BARS; i++)
-		{
-			m_bars[ch][i] = 0;
-		}
 	}
 
 	m_audio_fill_index = 0;
