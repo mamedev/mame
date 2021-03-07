@@ -781,6 +781,39 @@ ROM_START( aplatoon )
 	DISK_IMAGE_READONLY( "platoon", 0, NO_DUMP )
 ROM_END
 
+
+ROM_START( zortonbr_100 )
+	ALG_BIOS
+
+	ROM_REGION16_BE( 0x40000, "game_program", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "zb_u2.bin", 0x00001, 0x10000, CRC(938b25cb) SHA1(d0114bbc588dcfce6a469013d0e35afb93e38af5) )
+	ROM_LOAD16_BYTE( "zb_u3.bin", 0x00000, 0x10000, CRC(f59cfc4a) SHA1(9fadf7f1e23d6b4e828bf2b3de919d087c690a3f) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "zortonbr", 0, NO_DUMP )
+ROM_END
+
+/* zortonbr v1.01
+   ROM board labeled "PICMATIC LM6 04-01-92"
+   Uses Sony LaserMax LDP-3300P, a separate video encoder PCB with a Motorola MC1378B and a standard A500+ PCB.
+   ROM contains text: "Marbella Vice CopyRight 1994 Picmatic S.A. Program chief Brian Meitiner" (but it's Zorton Brothers)
+   References to linked libraries: Audio Master IV, AMAS II Version 1.1
+   Has a blacklist for high scores:
+     "FUCK SHIT CUNT PRICK PENUS BALLS PUTA JODER POLLA PUTO MAMON PICHA COJON TETA TETAS TITS CHULO CULO PENE PIJO LEFA LISTO" */
+ROM_START( zortonbr )
+	ALG_BIOS
+
+	ROM_REGION16_BE( 0x40000, "game_program", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "zort_1-01_23-3-94_odd.u2",  0x00001, 0x10000, CRC(21e63949) SHA1(0a62ad108f8cfa00dc8f03dea2ff6f1b277e8d5d) )
+	ROM_LOAD16_BYTE( "zort_1-01_23-3-94_even.u3", 0x00000, 0x10000, CRC(6a051c6a) SHA1(f8daafab068fef57e47287bd72be860b84e2e75c) )
+
+	ROM_REGION( 0x00800, "unused_nvram", ROMREGION_ERASEFF ) // NVRAM, unused
+	ROM_LOAD( "zort_mk48z02b.u13", 0x0000, 0x0800, CRC(45b064a9) SHA1(f446be2b0e3929e182b9f97989c30b3ee308c103) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "zortonbr", 0, NO_DUMP )
+ROM_END
+
 // Uses a Sony "LaserMax" LDP-1500
 ROM_START( marvice )
 	ALG_BIOS
@@ -857,38 +890,6 @@ ROM_START( tierras100hz )
 	DISK_IMAGE_READONLY( "tierras_salvajes_1995_spanish_english", 0, NO_DUMP )
 ROM_END
 
-/* zortonbr v1.01
-   ROM board labeled "PICMATIC LM6 04-01-92"
-   Uses Sony LaserMax LDP-3300P, a separate video encoder PCB with a Motorola MC1378B and a standard A500+ PCB.
-   ROM contains text: "Marbella Vice CopyRight 1994 Picmatic S.A. Program chief Brian Meitiner" (but it's Zorton Brothers)
-   References to linked libraries: Audio Master IV, AMAS II Version 1.1
-   Has a blacklist for high scores:
-     "FUCK SHIT CUNT PRICK PENUS BALLS PUTA JODER POLLA PUTO MAMON PICHA COJON TETA TETAS TITS CHULO CULO PENE PIJO LEFA LISTO" */
-ROM_START( zortonbr )
-	ALG_BIOS
-
-	ROM_REGION16_BE( 0x40000, "game_program", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "zort_1-01_23-3-94_odd.u2",  0x00001, 0x10000, CRC(21e63949) SHA1(0a62ad108f8cfa00dc8f03dea2ff6f1b277e8d5d) )
-	ROM_LOAD16_BYTE( "zort_1-01_23-3-94_even.u3", 0x00000, 0x10000, CRC(6a051c6a) SHA1(f8daafab068fef57e47287bd72be860b84e2e75c) )
-
-	ROM_REGION( 0x00800, "unused_nvram", ROMREGION_ERASEFF ) // NVRAM, unused
-	ROM_LOAD( "zort_mk48z02b.u13", 0x0000, 0x0800, CRC(45b064a9) SHA1(f446be2b0e3929e182b9f97989c30b3ee308c103) )
-
-	DISK_REGION( "laserdisc" )
-	DISK_IMAGE_READONLY( "zortonbr", 0, NO_DUMP )
-ROM_END
-
-ROM_START( zortonbr_100 )
-	ALG_BIOS
-
-	ROM_REGION16_BE( 0x40000, "game_program", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "zb_u2.bin", 0x00001, 0x10000, CRC(938b25cb) SHA1(d0114bbc588dcfce6a469013d0e35afb93e38af5) )
-	ROM_LOAD16_BYTE( "zb_u3.bin", 0x00000, 0x10000, CRC(f59cfc4a) SHA1(9fadf7f1e23d6b4e828bf2b3de919d087c690a3f) )
-
-	DISK_REGION( "laserdisc" )
-	DISK_IMAGE_READONLY( "zortonbr", 0, NO_DUMP )
-ROM_END
-
 
 } // Anonymous namespace
 
@@ -946,8 +947,8 @@ GAME( 1995, fastdraw_130, fastdraw, alg_r2,   alg_2p, alg_state, init_palr6,    
 GAME( 199?, aplatoon,     alg_bios, alg_r2,   alg,    alg_state, init_aplatoon, ROT0,  "Nova?", "Platoon V.3.1 US", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Web Picmatic games PAL TV standard or 100Hz, own ROM board
+GAME( 1993, zortonbr_100, zortonbr, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Zorton Brothers v1.00 (Los Justicieros)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, zortonbr,     alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Zorton Brothers v1.01 (Los Justicieros)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, marvice,      alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Marbella Vice",                           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, marvice100hz, alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Marbella Vice (100Hz display)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, tierras100hz, alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Tierras Salvajes (100Hz display)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, zortonbr,     alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Zorton Brothers v1.01 (Los Justicieros)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, zortonbr_100, zortonbr, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Zorton Brothers v1.00 (Los Justicieros)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
