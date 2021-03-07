@@ -690,6 +690,8 @@ void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 			LOG(" am=%d pm=%d w=%d", m_regs.lfo_am_enabled() ? m_regs.lfo_am_sensitivity() : 0, m_regs.lfo_pm_sensitivity(), m_regs.lfo_waveform());
 		if (m_regs.noise_enabled() && m_regs.opnum() == 3 && m_regs.chnum() == 7)
 			LOG(" noise=1");
+		if (m_regs.waveform_enable() && m_regs.waveform() != 0)
+			LOG(" wf=%d", m_regs.waveform());
 		LOG("\n");
 	}
 }

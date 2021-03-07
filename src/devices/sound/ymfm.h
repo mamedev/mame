@@ -882,8 +882,11 @@ public:
 //        Operator 17 -> Channel 8, Index 1
 //
 // Note that many of the registers in OPL are trimmed down from their
-// OPM/OPN counterparts. For better engine code re-used, we expand the
+// OPM/OPN counterparts. For better engine code re-use, we expand the
 // OPL values into their equivalents.
+//
+// Also timers behave a bit differently, so the flags are adjusted
+// to tease out the equivalent behavior.
 //
 
 class ymopl_registers : public ymfm_registers_base
@@ -998,8 +1001,8 @@ public:
 	u8 test() const               /*  8 bits */ { return sysbyte(0x01, 0, 8); }
 	u16 timer_a_value() const     /*  8 bits */ { return sysbyte(0x02, 0, 8) * 4; } // 8->10 bits
 	u8 timer_b_value() const      /*  8 bits */ { return sysbyte(0x03, 0, 8); }
-	u8 reset_timer_b() const      /*  1 bit  */ { return sysbyte(0x04, 7, 1); }
-	u8 reset_timer_a() const      /*  1 bit  */ { return sysbyte(0x04, 7, 1); }
+	u8 reset_timer_b() const      /*  1 bit  */ { return sysbyte(0x04, 7, 1) | sysbyte(0x04, 5, 1); }
+	u8 reset_timer_a() const      /*  1 bit  */ { return sysbyte(0x04, 7, 1) | sysbyte(0x04, 6, 1); }
 	u8 enable_timer_b() const     /*  1 bit  */ { return sysbyte(0x04, 5, 1) ^ 1; }
 	u8 enable_timer_a() const     /*  1 bit  */ { return sysbyte(0x04, 6, 1) ^ 1; }
 	u8 load_timer_b() const       /*  1 bit  */ { return sysbyte(0x04, 1, 1); }
