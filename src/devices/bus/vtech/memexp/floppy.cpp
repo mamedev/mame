@@ -53,8 +53,8 @@ static void laser_floppies(device_slot_interface &device)
 void vtech_floppy_controller_device::device_add_mconfig(machine_config &config)
 {
 	VTECH_MEMEXP_SLOT(config, m_memexp);
-	FLOPPY_CONNECTOR(config, m_floppy0, laser_floppies, "525", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, laser_floppies, "525", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, laser_floppies, "525", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, laser_floppies, "525", floppy_image_device::default_mfm_floppy_formats);
 }
 
 
@@ -191,7 +191,7 @@ void vtech_floppy_controller_device::latch_w(uint8_t data)
 		}
 	}
 	if(!(m_latch & 0x40) && (diff & 0x20)) {
-		if(m_write_position == ARRAY_LENGTH(m_write_buffer)) {
+		if(m_write_position == std::size(m_write_buffer)) {
 			update_latching_inverter();
 			flush_writes(true);
 		}

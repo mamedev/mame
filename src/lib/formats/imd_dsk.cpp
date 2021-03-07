@@ -409,7 +409,7 @@ void imd_format::fixnum(char *start, char *end) const
 	};
 }
 
-int imd_format::identify(io_generic *io, uint32_t form_factor)
+int imd_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	char h[4];
 
@@ -420,13 +420,13 @@ int imd_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool imd_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool imd_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint64_t size = io_generic_size(io);
 	std::vector<uint8_t> img(size);
 	io_generic_read(io, &img[0], 0, size);
 
-	uint64_t pos;
+	uint64_t pos, savepos;
 	for(pos=0; pos < size && img[pos] != 0x1a; pos++) {};
 	pos++;
 
@@ -444,7 +444,67 @@ bool imd_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	m_head.clear();
 	m_sector_count.clear();
 	m_ssize.clear();
+	m_trackmult = 1;
 
+	// we have to walk the whole file to find out the number of tracks
+	savepos = pos;
+	uint8_t maxtrack = 0;
+	while(pos < size)
+	{
+		pos++;   // skip mode
+		uint8_t track = img[pos++];
+		uint8_t head = img[pos++];
+		uint8_t sector_count = img[pos++];
+		uint8_t sector_size = img[pos++];
+		int actual_size = sector_size < 7 ? 128 << sector_size : 8192;
+
+		if (track > maxtrack)
+		{
+			maxtrack = track;
+		}
+
+		pos += sector_count;
+		if (head & 0x80)
+		{
+			pos += sector_count;
+		}
+		if (head & 0x40)
+		{
+			pos += sector_count;
+		}
+
+		for (int i = 0; i < sector_count; i++)
+		{
+			uint8_t stype = img[pos++];
+			if (stype == 0 || stype > 8)
+			{
+			}
+			else
+			{
+				if (stype == 2 || stype == 4 || stype == 6 || stype == 8)
+				{
+					pos++;
+				}
+				else
+				{
+					pos += actual_size;
+				}
+			}
+		}
+	}
+
+	// Check if the drive is QD or HD but we're a 40 track image.
+	// If so, put the image on even tracks.
+	if ((has_variant(variants, floppy_image::DSQD)) ||
+		(has_variant(variants, floppy_image::DSHD)))
+	{
+		if (maxtrack <= 39)
+		{
+			m_trackmult = 2;
+		}
+	}
+
+	pos = savepos;
 	while(pos < size) {
 		m_mode.push_back(img[pos++]);
 		m_track.push_back(img[pos++]);
@@ -539,9 +599,9 @@ bool imd_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 
 		if(m_sector_count.back()) {
 			if(fm) {
-				build_pc_track_fm(m_track.back(), head, image, cell_count, m_sector_count.back(), sects, gap_3);
+				build_pc_track_fm(m_track.back()*m_trackmult, head, image, cell_count, m_sector_count.back(), sects, gap_3);
 			} else {
-				build_pc_track_mfm(m_track.back(), head, image, cell_count, m_sector_count.back(), sects, gap_3);
+				build_pc_track_mfm(m_track.back()*m_trackmult, head, image, cell_count, m_sector_count.back(), sects, gap_3);
 			}
 		}
 
@@ -561,7 +621,7 @@ bool can_compress(const uint8_t* buffer, uint8_t ptrn, uint64_t size)
 	return true;
 }
 
-bool imd_format::save(io_generic* io, floppy_image* image)
+bool imd_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint64_t pos = 0;
 	io_generic_write(io, &m_comment[0], pos, m_comment.size());
@@ -595,34 +655,32 @@ bool imd_format::save(io_generic* io, floppy_image* image)
 
 		bool fm = m_mode[i]< 3;
 
-		uint8_t bitstream[500000 / 8];
-		uint8_t sector_data[50000];
-		desc_xs sectors[256];
-		int track_size;
-		generate_bitstream_from_track(m_track[i], head, 2000, bitstream, track_size, image);
+		auto bitstream = generate_bitstream_from_track(m_track[i]*m_trackmult, head, 2000, image);
+		std::vector<std::vector<uint8_t>> sectors;
+
 		if (fm)
-			extract_sectors_from_bitstream_fm_pc(bitstream, track_size, sectors, sector_data, sizeof(sector_data));
+			sectors = extract_sectors_from_bitstream_fm_pc(bitstream);
 		else
-			extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sector_data, sizeof(sector_data));
+			sectors = extract_sectors_from_bitstream_mfm_pc(bitstream);
 
 		uint8_t sdata[8192];
 		for (int j = 0; j < m_sector_count[i]; j++) {
 
-			desc_xs& xs = sectors[m_snum[i][j]];
+			const auto &data = sectors[m_snum[i][j]];
 
 			uint8_t mode;
-			if (!xs.data)
+			if (data.empty())
 			{
 				mode = 0;
 				io_generic_write(io, &mode, pos++, 1);
 				continue;
 			}
-			else if (xs.size < actual_size) {
-				memcpy((void*)sdata, xs.data, xs.size);
-				memset((uint8_t*)sdata + xs.size, 0, xs.size - actual_size);
+			else if (data.size() < actual_size) {
+				memcpy((void*)sdata, data.data(), data.size());
+				memset((uint8_t*)sdata + data.size(), 0, data.size() - actual_size);
 			}
 			else
-				memcpy((void*)sdata, xs.data, actual_size);
+				memcpy((void*)sdata, data.data(), actual_size);
 
 			if (can_compress(sdata, sdata[0], actual_size))
 			{

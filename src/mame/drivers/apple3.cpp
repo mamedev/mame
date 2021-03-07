@@ -54,9 +54,14 @@ static void a3_floppies(device_slot_interface &device)
 	device.option_add("525", FLOPPY_525_SD);
 }
 
-FLOPPY_FORMATS_MEMBER( apple3_state::floppy_formats )
-	FLOPPY_A216S_FORMAT, FLOPPY_RWTS18_FORMAT, FLOPPY_EDD_FORMAT, FLOPPY_WOZ_FORMAT
-FLOPPY_FORMATS_END
+void apple3_state::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_A216S_FORMAT);
+	fr.add(FLOPPY_RWTS18_FORMAT);
+	fr.add(FLOPPY_EDD_FORMAT);
+	fr.add(FLOPPY_WOZ_FORMAT);
+	fr.add(FLOPPY_NIB_FORMAT);
+}
 
 void apple3_state::apple3(machine_config &config)
 {
@@ -141,12 +146,12 @@ void apple3_state::apple3(machine_config &config)
 	m_rtc->irq().set(m_via[1], FUNC(via6522_device::write_ca1));
 
 	/* via */
-	VIA6522(config, m_via[0], 14.318181_MHz_XTAL / 14);
+	MOS6522(config, m_via[0], 14.318181_MHz_XTAL / 14);
 	m_via[0]->writepa_handler().set(FUNC(apple3_state::apple3_via_0_out_a));
 	m_via[0]->writepb_handler().set(FUNC(apple3_state::apple3_via_0_out_b));
 	m_via[0]->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
-	VIA6522(config, m_via[1], 14.318181_MHz_XTAL / 14);
+	MOS6522(config, m_via[1], 14.318181_MHz_XTAL / 14);
 	m_via[1]->writepa_handler().set(FUNC(apple3_state::apple3_via_1_out_a));
 	m_via[1]->writepb_handler().set(FUNC(apple3_state::apple3_via_1_out_b));
 	m_via[1]->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));

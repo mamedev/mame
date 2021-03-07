@@ -299,7 +299,7 @@ bool dsk_format::supports_save() const
 	return false;
 }
 
-int dsk_format::identify(io_generic *io, uint32_t form_factor)
+int dsk_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t header[16];
 
@@ -344,7 +344,7 @@ struct sector_header
 
 #pragma pack()
 
-bool dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool dsk_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t header[0x100];
 	bool extendformat = false;

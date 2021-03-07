@@ -293,6 +293,11 @@ hp_taco_device::hp_taco_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+void hp_taco_device::set_name(const std::string& name)
+{
+	m_tape->set_name(name);
+}
+
 void hp_taco_device::reg_w(offs_t offset, uint16_t data)
 {
 	LOG_REG("wr R%u = %04x\n", 4 + offset , data);
@@ -538,7 +543,7 @@ void hp_taco_device::device_add_mconfig(machine_config &config)
 	m_tape->set_acceleration(ACCELERATION);
 	m_tape->set_set_points(SLOW_SPEED , FAST_SPEED);
 	m_tape->set_tick_size(TACH_TICK_LEN);
-	m_tape->set_bits_per_word(16);
+	m_tape->set_image_format(hti_format_t::HTI_DELTA_MOD_16_BITS);
 	m_tape->set_go_threshold(MOVING_THRESHOLD);
 	m_tape->cart_out().set(FUNC(hp_taco_device::cart_out_w));
 	m_tape->hole().set(FUNC(hp_taco_device::hole_w));

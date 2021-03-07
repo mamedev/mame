@@ -41,6 +41,9 @@
 
 #include "cops.lh"
 
+
+namespace {
+
 #define LOG_CDROM   1
 #define LOG_DACIA   1
 
@@ -60,19 +63,14 @@ public:
 		, m_irq(0)
 	{ }
 
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<sn76489_device> m_sn;
-	required_device<sony_ldp1450_device> m_ld;
-
-	// screen updates
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void revlatns(machine_config &config);
 	void base(machine_config &config);
 	void cops(machine_config &config);
 	void cops_map(address_map &map);
 	void revlatns_map(address_map &map);
+
+	void init_cops();
+
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -80,14 +78,22 @@ protected:
 
 	virtual void video_start() override;
 
-public:
+private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<sn76489_device> m_sn;
+	required_device<sony_ldp1450_device> m_ld;
+
+	// screen updates
+	[[maybe_unused]] uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void io1_w(offs_t offset, uint8_t data);
 	uint8_t io1_r(offs_t offset);
 	uint8_t io1_lm_r(offs_t offset);
 	void io2_w(offs_t offset, uint8_t data);
 	uint8_t io2_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(dacia_irq);
-	DECLARE_WRITE_LINE_MEMBER(ld_w);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(ld_w);
 	DECLARE_WRITE_LINE_MEMBER(via1_irq);
 	DECLARE_WRITE_LINE_MEMBER(via2_irq);
 	void dacia_receive(uint8_t data);
@@ -99,7 +105,6 @@ public:
 	void cdrom_data_w(uint8_t data);
 	void cdrom_ctrl_w(uint8_t data);
 	uint8_t cdrom_data_r();
-	void init_cops();
 	int m_irq;
 
 	uint8_t m_lcd_addr_l, m_lcd_addr_h;
@@ -158,8 +163,8 @@ public:
 
 	uint8_t m_ld_command_to_send[8];
 	uint8_t m_ld_command_current_byte;
-	uint8_t ldcount=0;
-	uint8_t lddata;
+	uint8_t m_ldcount=0;
+	uint8_t m_lddata;
 	uint8_t generate_isr();
 	uint8_t generate_isr2();
 //  void laserdisc_w(uint8_t data);
@@ -246,15 +251,15 @@ TIMER_CALLBACK_MEMBER(cops_state::ld_timer_callback)
 
 WRITE_LINE_MEMBER(cops_state::ld_w)
 {
-	lddata <<= 1;
+	m_lddata <<= 1;
 
-	if ( state ) lddata |= 1;
+	if ( state ) m_lddata |= 1;
 
-	if ( ++ldcount >= 8 )
+	if ( ++m_ldcount >= 8 )
 	{
-		ldcount = 0;
-		lddata  = 0;
-		printf("LDBYTE %d",lddata);
+		m_ldcount = 0;
+		m_lddata  = 0;
+		printf("LDBYTE %d", m_lddata);
 	}
 
 	printf("LDBIT %d",state);
@@ -874,6 +879,10 @@ void cops_state::machine_start()
 	m_ld_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cops_state::ld_timer_callback),this));
 
 	m_ld_timer->adjust(attotime::from_hz(167*5), 0, attotime::from_hz(167*5));
+
+	m_dacia_cmpval1 = m_dacia_cmpval2 = 0;
+	m_ld_command_current_byte = 0;
+	std::fill(std::begin(m_ld_command_to_send), std::end(m_ld_command_to_send), 0);
 }
 
 void cops_state::machine_reset()
@@ -915,7 +924,7 @@ void cops_state::base(machine_config &config)
 	screen.set_screen_update("laserdisc", FUNC(laserdisc_device::screen_update));
 
 	/* via */
-	via6522_device &via1(VIA6522(config, "via6522_1", MAIN_CLOCK/2));
+	via6522_device &via1(MOS6522(config, "via6522_1", MAIN_CLOCK/2));
 	via1.irq_handler().set(FUNC(cops_state::via1_irq));
 	via1.writepb_handler().set(FUNC(cops_state::via1_b_w));
 	via1.cb1_handler().set(FUNC(cops_state::via1_cb1_w));
@@ -934,10 +943,10 @@ void cops_state::cops(machine_config &config)
 	base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cops_state::cops_map);
 
-	via6522_device &via2(VIA6522(config, "via6522_2", MAIN_CLOCK/2));
+	via6522_device &via2(MOS6522(config, "via6522_2", MAIN_CLOCK/2));
 	via2.irq_handler().set(FUNC(cops_state::via2_irq));
 
-	via6522_device &via3(VIA6522(config, "via6522_3", MAIN_CLOCK/2));
+	via6522_device &via3(MOS6522(config, "via6522_3", MAIN_CLOCK/2));
 	via3.readpa_handler().set(FUNC(cops_state::cdrom_data_r));
 	via3.writepa_handler().set(FUNC(cops_state::cdrom_data_w));
 	via3.writepb_handler().set(FUNC(cops_state::cdrom_ctrl_w));
@@ -995,6 +1004,8 @@ ROM_START( revlatns )
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "revlatns", 0, NO_DUMP )
 ROM_END
+
+} // Anonymous namespace
 
 
 GAMEL( 1994, cops,     0,    cops,     cops,     cops_state, init_cops, ROT0, "Atari Games",                      "Cops (USA)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )

@@ -107,7 +107,6 @@ protected:
 
 	void trigger_fdc_int();
 	DECLARE_WRITE_LINE_MEMBER( fdc_interrupt );
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	inline void pcw16_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 	void pcw16_vh_decode_mode0(bitmap_ind16 &bitmap, int x, int y, uint8_t byte);
 	void pcw16_vh_decode_mode1(bitmap_ind16 &bitmap, int x, int y, uint8_t byte);

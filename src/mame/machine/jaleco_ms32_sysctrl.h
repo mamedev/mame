@@ -42,7 +42,7 @@ public:
 	auto sound_ack_cb() { return m_sound_ack_cb.bind(); }
 	auto sound_reset_cb() { return m_sound_reset_cb.bind(); }
 	void set_invert_vblank_lines(bool enable) { m_invert_vblank_lines = enable; }
-//	template <typename T> void set_screen(T &&screen_tag) { m_screen.set_tag(std::forward<T>(screen_tag)); printf("xxx"); }
+//  template <typename T> void set_screen(T &&screen_tag) { m_screen.set_tag(std::forward<T>(screen_tag)); printf("xxx"); }
 
 protected:
 	// device-level overrides
@@ -92,7 +92,7 @@ private:
 		u16 interval;
 		emu_timer *prg_irq;
 	}m_timer;
-	
+
 	emu_timer *m_timer_scanline;
 	enum timer_id
 	{
@@ -102,7 +102,7 @@ private:
 
 	inline void flush_prg_timer();
 	inline void flush_scanline_timer(int current_scanline);
-	
+
 	bool m_invert_vblank_lines;
 };
 

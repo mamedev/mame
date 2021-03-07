@@ -8283,7 +8283,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 <!-- Only USA is confirmed -->
 	<software name="term2">
 		<description>T2 - Terminator 2 - Judgment Day (Euro, USA)</description>
-		<year>1991</year>
+		<year>1993</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="670100 REV 10"/>

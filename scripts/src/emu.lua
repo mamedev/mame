@@ -253,7 +253,7 @@ files {
 	MAME_DIR .. "src/emu/debug/textbuf.cpp",
 	MAME_DIR .. "src/emu/debug/textbuf.h",
 	MAME_DIR .. "src/emu/drivers/empty.cpp",
-	MAME_DIR .. "src/emu/drivers/xtal.h",
+	MAME_DIR .. "src/emu/layout/generic.h",
 	MAME_DIR .. "src/emu/video/generic.cpp",
 	MAME_DIR .. "src/emu/video/generic.h",
 	MAME_DIR .. "src/emu/video/resnet.cpp",
@@ -268,7 +268,7 @@ files {
 }
 
 pchsource(MAME_DIR .. "src/emu/main.cpp")
--- 3 files do not inlcude emu.h
+-- 3 files do not include emu.h
 nopch(MAME_DIR .. "src/emu/emualloc.cpp")
 nopch(MAME_DIR .. "src/emu/attotime.cpp")
 nopch(MAME_DIR .. "src/emu/debug/textbuf.cpp")

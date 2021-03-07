@@ -794,7 +794,7 @@ template <unsigned Count> using required_memory_bank_array = memory_bank_array_f
 ///
 /// Creates a memory bank or finds an existing one instantiated via an
 /// address map.
-class memory_bank_creator : finder_base
+class memory_bank_creator : public finder_base
 {
 public:
 	/// \brief Memory bank creator constructor
@@ -1249,7 +1249,7 @@ template <typename PointerType, unsigned Count> using required_shared_ptr_array 
 /// share.  If an existing memory share is found, it is an error if it
 /// doesn't match the requested width, length and endianness.
 template <typename PointerType>
-class memory_share_creator : finder_base
+class memory_share_creator : public finder_base
 {
 public:
 	/// \brief Memory share creator constructor

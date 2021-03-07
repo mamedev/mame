@@ -19,11 +19,11 @@
 
 #pragma once
 
-#include "osdcore.h"
-
 #include <string>
 #include <string_view>
 
+#include <cstddef>
+#include <cstdint>
 #include <cstdlib>
 
 

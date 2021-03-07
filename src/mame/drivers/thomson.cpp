@@ -616,9 +616,11 @@ static const floppy_interface thomson_floppy_interface =
 	"thom_flop"
 };
 
-FLOPPY_FORMATS_MEMBER( thomson_state::cd90_640_formats )
-	FLOPPY_CD90_640_FORMAT
-FLOPPY_FORMATS_END
+void thomson_state::cd90_640_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_CD90_640_FORMAT);
+}
 
 static void cd90_640_floppies(device_slot_interface &device)
 {

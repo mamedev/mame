@@ -212,21 +212,21 @@ protected:
 
 	enum : uint8_t
 	{
-		PSC_MASK				= 0x7f,
+		PSC_MASK                = 0x7f,
 
-		TSCR_PS_BIT				= 0,
-		TSCR_PS_MASK			= 0x07,
-		TSCR_PSI_BIT			= 3,
-		TSCR_DOUT_BIT			= 4,
-		TSCR_TOUT_BIT			= 5,
-		TSCR_ETI_BIT			= 6,
-		TSCR_TMZ_BIT			= 7,
+		TSCR_PS_BIT             = 0,
+		TSCR_PS_MASK            = 0x07,
+		TSCR_PSI_BIT            = 3,
+		TSCR_DOUT_BIT           = 4,
+		TSCR_TOUT_BIT           = 5,
+		TSCR_ETI_BIT            = 6,
+		TSCR_TMZ_BIT            = 7,
 
-		TSCR_MODE_MASK			= (1 << TSCR_DOUT_BIT) | (1 << TSCR_TOUT_BIT),
-		TSCR_MODE_EVENT			= 0x00,
-		TSCR_MODE_GATED			= (1 << TSCR_DOUT_BIT),
-		TSCR_MODE_OUTPUT_0		= (1 << TSCR_TOUT_BIT),
-		TSCR_MODE_OUTPUT_1		= (1 << TSCR_DOUT_BIT) | (1 << TSCR_TOUT_BIT)
+		TSCR_MODE_MASK          = (1 << TSCR_DOUT_BIT) | (1 << TSCR_TOUT_BIT),
+		TSCR_MODE_EVENT         = 0x00,
+		TSCR_MODE_GATED         = (1 << TSCR_DOUT_BIT),
+		TSCR_MODE_OUTPUT_0      = (1 << TSCR_TOUT_BIT),
+		TSCR_MODE_OUTPUT_1      = (1 << TSCR_DOUT_BIT) | (1 << TSCR_TOUT_BIT)
 	};
 
 	enum

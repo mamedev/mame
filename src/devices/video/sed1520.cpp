@@ -4,6 +4,7 @@
 
         SED1520 LCD controller
         SED1560 LCD controller
+        EPL43102 LCD controller
 
         TODO:
         - busy flag
@@ -20,8 +21,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(SED1520, sed1520_device, "sed1520", "Epson SED1520")
-DEFINE_DEVICE_TYPE(SED1560, sed1560_device, "sed1560", "Epson SED1560")
+DEFINE_DEVICE_TYPE(SED1520, sed1520_device, "sed1520", "Epson SED1520 LCD Driver")
+DEFINE_DEVICE_TYPE(SED1560, sed1560_device, "sed1560", "Epson SED1560 LCD Driver")
+DEFINE_DEVICE_TYPE(EPL43102, epl43102_device, "epl43102", "Elan EPL43102 LCD Driver")
 
 
 //**************************************************************************
@@ -55,9 +57,19 @@ sed1520_device::sed1520_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-sed1560_device::sed1560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sed15xx_device_base(mconfig, SED1560, tag, owner, clock, 1349, 166)   // 166 × 65-bit display RAM
+sed1560_device::sed1560_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t ddr_size, uint32_t page_size)
+	: sed15xx_device_base(mconfig, type, tag, owner, clock, ddr_size, page_size)
 	, m_screen_update_cb(*this)
+{
+}
+
+sed1560_device::sed1560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sed1560_device(mconfig, SED1560, tag, owner, clock, 1349, 166)   // 166 × 65-bit display RAM
+{
+}
+
+epl43102_device::epl43102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sed1560_device(mconfig, EPL43102, tag, owner, clock, 455, 102)   // 102 × 43-bit display RAM (TODO: page map is not straightforward)
 {
 }
 
@@ -154,6 +166,14 @@ void sed1560_device::device_start()
 	save_item(NAME(m_line_inv_num));
 }
 
+void epl43102_device::device_start()
+{
+	sed1560_device::device_start();
+
+	// state saving
+	save_item(NAME(m_last_command));
+}
+
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
@@ -169,6 +189,13 @@ void sed1560_device::device_reset()
 	m_fill = false;
 	m_line_inv_num = 16;
 	m_line_inv = false;
+}
+
+void epl43102_device::device_reset()
+{
+	sed1560_device::device_reset();
+
+	m_last_command = 0;
 }
 
 //**************************************************************************
@@ -207,7 +234,7 @@ uint8_t sed15xx_device_base::data_read()
 {
 	uint8_t data = m_data;
 	m_data = m_ddr[(m_page * m_page_size + m_column) % m_ddr_size];
-	if (!m_modify_write && m_column < m_page_size)
+	if (!machine().side_effects_disabled() && !m_modify_write && m_column < m_page_size)
 		m_column++;
 
 	return data;
@@ -246,7 +273,7 @@ void sed1520_device::control_write(uint8_t data)
 		m_page = 3;
 	}
 	else
-		logerror("%s: invalid SED1520 command: %x\n", tag(), data);
+		logerror("%s: invalid SED1520 command: %x\n", machine().describe_context(), data);
 }
 
 
@@ -297,15 +324,67 @@ void sed1560_device::control_write(uint8_t data)
 		m_column = m_old_column;
 	}
 	else if (data == 0xed)               // Power-on completion
-		logerror("%s: Power-on completion\n", tag());
+		logerror("%s: Power-on completion\n", machine().describe_context());
 	else if ((data & 0xf0) == 0xc0)      // Output status set
-		logerror("%s: Output status set %x\n", tag(), data & 0x0f);
+		logerror("%s: Output status set %x\n", machine().describe_context(), data & 0x0f);
 	else if ((data & 0xfe) == 0x24)      // LCD power supply ON/OFF
-		logerror("%s: LCD power supply %d\n", tag(), data & 0x01);
+		logerror("%s: LCD power supply %d\n", machine().describe_context(), data & 0x01);
 	else if ((data & 0xe0) == 0x80)      // Software contrast setting
 		m_contrast = data;
 	else
-		logerror("%s: invalid SED1560 command: %x\n", tag(), data);
+		logerror("%s: invalid SED1560 command: %x\n", machine().describe_context(), data);
+}
+
+
+void epl43102_device::control_write(uint8_t data)
+{
+	switch (m_last_command)
+	{
+	case 0x81:
+		m_contrast = data & 0x3f;
+		m_last_command = 0;
+		break;
+
+	case 0x82:
+		logerror("%s: CL frequency = fOSC / %d\n", machine().describe_context(), BIT(data, 4) ? 32 : (data & 0x0f) + 1);
+		m_last_command = 0;
+		break;
+
+	case 0x84:
+		logerror("%s: Duty ratio = %d%s\n", machine().describe_context(), ((data & 0x07) + 1) * 8, BIT(data, 3) ? " + ICON" : "");
+		m_duty = data & 0x07;
+		m_last_command = 0;
+		break;
+
+	case 0x85:
+		logerror("%s: LCD bias = %d%s\n", machine().describe_context(), ((data & 0x0e) >> 1) + 3, BIT(data, 0) ? ".5" : "");
+		m_last_command = 0;
+		break;
+
+	case 0xad:
+		if ((data & 0x03) == 0)
+			logerror("%s: Status indicator off\n", machine().describe_context());
+		else
+			logerror("%s: Status indicator on (%s)\n", machine().describe_context(), (data & 0x03) == 0x01 ? "4-frame blinking" : (data & 0x03) == 0x02 ? "2-frame blinking" : "continuously");
+		m_last_command = 0;
+		break;
+
+	default:
+		if (data == 0x81 || data == 0x82 || data == 0x84 || data == 0x85 || data == 0xad)
+		{
+			// 2-byte instructions
+			m_last_command = data;
+		}
+		else if ((data & 0xf0) == 0xc0)
+			logerror("%s: COM output direction = %s\n", machine().describe_context(), BIT(data, 3) ? "reverse" : "normal");
+		else if ((data & 0xf8) == 0x28)
+			logerror("%s: Voltage converter %s, regulator %s, follower %s\n", machine().describe_context(), BIT(data, 2) ? "on" : "off", BIT(data, 1) ? "on" : "off", BIT(data, 0) ? "on" : "off");
+		else if ((data & 0xf8) == 0x20)
+			logerror("%s: Regulator resistor select = %d\n", machine().describe_context(), data & 0x07);
+		else
+			sed1560_device::control_write(data);
+		break;
+	}
 }
 
 

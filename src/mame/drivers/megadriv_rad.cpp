@@ -113,7 +113,7 @@ void megadriv_ra145_state::write_a1630a(offs_t offset, uint16_t data, uint16_t m
 	case 0x21: m_bank = 0x1640000; break;// = Altered Beast                          21
 	case 0x22: m_bank = 0x16c0000; break;// = Captain Planet                         22
 	case 0x23: m_bank = 0x1740000; break;// = Bimimi Run                             23
-	case 0x24: m_bank = 0x17c0000; break;// = Osomatsu                               24 
+	case 0x24: m_bank = 0x17c0000; break;// = Osomatsu                               24
 	case 0x25: m_bank = 0x1840000; break;// = Castle of Illusion                     25
 	case 0x26: m_bank = 0x18c0000; break;// = Crackdown                              26
 	case 0x27: m_bank = 0x1940000; break;// = Crossfire                              27
@@ -532,7 +532,7 @@ ROM_START( ra145 )
 
 	The unit also includes a duplicate copy of Thunder Force II instead of Revenge of Shinobi, this however
 	is not a dump issue, nor is Wacky Worlds being swapped with Fun and Games in the menu
-	*/	
+	*/
 
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "ra145.bin", 0x000000, 0x8000000, BAD_DUMP CRC(30583950) SHA1(855eae232e3830a505f9bc1a26edb3a7d15ce4d1) )
@@ -564,7 +564,7 @@ void megadriv_dgunl_state::init_dgunl3227()
 	size_t len = memregion("rom")->bytes();
 
 	std::vector<u8> buffer(len);
-	
+
 	for (int i = 0; i < len; i++)
 		buffer[i] = rom[i ^ 3];
 

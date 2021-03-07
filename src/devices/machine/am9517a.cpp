@@ -853,15 +853,11 @@ void am9517a_device::write(offs_t offset, uint8_t data)
 
 				if (BIT(data, 2))
 				{
-					m_request |= (1 << (channel + 4));
-					if (COMMAND_MEM_TO_MEM)
-					{
-						m_request |= (1 << channel);
-					}
+					m_request |= (1 << channel);
 				}
 				else
 				{
-					m_request &= ~(1 << (channel + 4));
+					m_request &= ~(1 << channel);
 				}
 
 				LOG("AM9517A Request Register: %01x\n", m_request);

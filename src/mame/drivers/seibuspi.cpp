@@ -1233,7 +1233,7 @@ CUSTOM_INPUT_MEMBER(seibuspi_state::ejanhs_encode)
 	static const u8 encoding[] = { 6, 5, 4, 3, 2, 7 };
 	ioport_value state = ~m_key[N]->read();
 
-	for (int bit = 0; bit < ARRAY_LENGTH(encoding); bit++)
+	for (int bit = 0; bit < std::size(encoding); bit++)
 		if (state & (1 << bit))
 			return encoding[bit];
 	return 0;

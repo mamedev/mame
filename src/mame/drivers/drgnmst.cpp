@@ -36,6 +36,55 @@ Notes:
       HSync: 15.625kHz
   68K clock: 12MHz
 
+***********************************************************
+
+Master's Fury (c)1996 Unico
+
+PCB Layout
++---------------------------------------------------------+
+|               MF-01       MCM2018                       |
+|                           MCM2018                M  M   |
+|  VOL          M6295       MCM2018                F  F   |
+|                           MCM2018                0  0   |
+|    YM3012     YM2151                             4  5   |
+|                                      6116               |
+|                                      6116               |
+|                 GM76C28K             6116               |
+|J                GM76C28K             6116     +-------+ |
+|A                                              |  AMD  | |
+|M                                              |MACH210| |
+|M                                              +-------+ |
+|A     KM62256BPL KM62256BPL      +--------+  +--------+  |
+|                                 |  ACTEL |  |  ACTEL |  |
+|          MF-02   MF-03          | A1020B |  |A40MX04F|  |
+| DIP-SW   +----------+           | PLCC84 |  | PLCC84 |  |
+|          |MC68000P12|           +--------+  +--------+  |
+| DIP-SW   +----------+                            M  M   |
+|                                                  F  F   |
+|LED      14.31818MHz   32.000MHz KM62256BPL       0  0   |
+|                       20.000MHz KM62256BPL       6  7   |
++---------------------------------------------------------+
+
+  CPU: MC68000P12
+Sound: OKI M6295 & YM3012/YM2151 rebaged as 7105/BS901
+  OSC: 14.31818MHz, 20.000MHz & 32.000MHz
+  DSW: 8-switch dipswitch x 2
+  VOL: Volume pot
+  LED: Power on LED
+Other: Actel A1020B (labeled LOGIC-A), Actel A40MX04-F (labeled LOGIC-B)
+       AMD MACH210 (labeled LOGIC-C)
+
+ROMS:
+MF-01 - UNICO 1        - Sound sample       - 27C020
+MF-02 - UNICO 2        - Program ROM (Even) - 27C040
+MF-03 - UNICO 3        - Program ROM (Odd)  - 27C040
+MF-04 - MF0032-1 UNICO - Sprites            - mask ROM read as 27C322
+MF-05 - MF0032-2 UNICO - Sprites            - mask ROM read as 27C322
+MF-06 - MF0016-3 UNICO - Background         - mask ROM read as 27C160
+MF-07 - MF0016-4 UNICO - Background         - mask ROM read as 27C160
+
+MF-0x are locations silkscreened on the PCB
+
 */
 
 #include "emu.h"

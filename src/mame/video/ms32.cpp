@@ -122,7 +122,7 @@ void ms32_state::update_color(int color)
 	// bnstars gameplay: 0x0000 0x0000 0x8080 0x0080
 	// desertwr ranking: 0x8080 0xff80 0x0000 0x0000
 	// gametngk: sets upper words of first two regs as 0x0100xxxx (discarded?)
-	//			gameplay:0x0000 0x0000 0x2020 0x0020
+	//          gameplay:0x0000 0x0000 0x2020 0x0020
 	//          continue:0x5050 0x0050 0x2020 0x0020
 	// hayaosi3 title:   0x7070 0x0070 0x0000 0x0000
 	// p47aces: bomb on stage clear fade out (untested, tbd)
@@ -154,7 +154,7 @@ void ms32_state::ms32_brightness_w(offs_t offset, u32 data, u32 mem_mask)
 	int oldword = m_brt[offset];
 	COMBINE_DATA(&m_brt[offset]);
 
-	
+
 	if (m_brt[offset] != oldword)
 	{
 		// TODO: bank "1" is for sprite colors
@@ -180,7 +180,7 @@ void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, con
 	const size_t sprite_tail = m_objectram_size - 8; //(0x20000 - 0x10) / 2;
 	u16 *source = sprram_top;
 	u16 *finish = sprram_top + sprite_tail;
-	// TODO: sprite control 0x10 also uses bits 0-11 for sprite start address? 
+	// TODO: sprite control 0x10 also uses bits 0-11 for sprite start address?
 	// akiss uses it for double buffer animations, flips between 0 and 0x800 (and is ugly for latter)
 	const bool reverseorder = (m_sprite_ctrl[0x10/4] & 0x8000) == 0x0000;
 
@@ -200,7 +200,7 @@ void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, con
 		u16 xsize, ysize;
 		s32 sx, sy;
 		u16 xzoom, yzoom;
-		
+
 		m_sprite->extract_parameters(source, disable, pri, flipx, flipy, code, color, tx, ty, xsize, ysize, sx, sy, xzoom, yzoom);
 
 		if (disable || !xzoom || !yzoom)
@@ -222,21 +222,21 @@ void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, con
 void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority)
 {
 	// TODO: registers 0x40 / 0x44 and 0x50 / 0x54 are used, unknown meaning
-    // Given how this works out it is most likely that 0x*0 controls X axis while 0x*4 Y,
-    // nothing is known to diverge between settings so far (i.e. bbbxing sets 0xffff to 0x4* and 0x0000 to 0x5*).
-    //             0x4*   0x5*  ROZ should wrap?
-    // bbbxing:  0xffff 0x0000  0 (match presentation)
-    // gratia:   0x0000 0x0000  1 (sky in stage 2)
-    // p47aces:  0xffff 0x0651  0 (title screen)
-    // desertwr: 0xffff 0x0651  1 (any stage)
-    // f1superb: 0xffff 0x0000  ?
-    // suchie2:  0x0000 0x0000  0?
-    // bnstars:  0x0000 0x0000  ?
-    // hayaosi3: 0x0000 0x0000  ?
-    // akiss:    0xffff 0x0000  0 (gal riichi, cfr. attract mode)
-    // Maybe wrapping is done by limit boundaries rather than individual bits, so that bbbxing and p47aces abuses of this behaviour?
-    // Are we missing a ROZ plane size as well?
-    
+	// Given how this works out it is most likely that 0x*0 controls X axis while 0x*4 Y,
+	// nothing is known to diverge between settings so far (i.e. bbbxing sets 0xffff to 0x4* and 0x0000 to 0x5*).
+	//             0x4*   0x5*  ROZ should wrap?
+	// bbbxing:  0xffff 0x0000  0 (match presentation)
+	// gratia:   0x0000 0x0000  1 (sky in stage 2)
+	// p47aces:  0xffff 0x0651  0 (title screen)
+	// desertwr: 0xffff 0x0651  1 (any stage)
+	// f1superb: 0xffff 0x0000  ?
+	// suchie2:  0x0000 0x0000  0?
+	// bnstars:  0x0000 0x0000  ?
+	// hayaosi3: 0x0000 0x0000  ?
+	// akiss:    0xffff 0x0000  0 (gal riichi, cfr. attract mode)
+	// Maybe wrapping is done by limit boundaries rather than individual bits, so that bbbxing and p47aces abuses of this behaviour?
+	// Are we missing a ROZ plane size as well?
+
 	if (m_roz_ctrl[0x5c/4] & 1)  /* "super" mode */
 	{
 		rectangle my_clip;
@@ -323,28 +323,28 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	int rot_pri;
 
 	/*
-		sprite control regs
-			    0x1c 0x20 0x40 <prihack>
-		akiss      0    0    0     0  
-		bbbxing    0    0    0     0  
-		bnstars    1    0    0     1
-		bnstars1   ?    ?    ?     1
-		desertwr   1    0    0     0
-		f1superb   0    0    0     0
-		gametngk   0 0140    0     0
-		gratia     0    0    0     0
-		hayaosi2   0    0    0     0
-		hayaosi3   0 0140    0     1
-		kirarast   0    0    0     1
-		p47aces    1    0    0     0
-		suchie2    0    0    0     1
-		tetrisp    0    0    0     0
-		tp2m32     0 0140    0     1
-		wpksocv2   0 0140    0     1
+	    sprite control regs
+	            0x1c 0x20 0x40 <prihack>
+	    akiss      0    0    0     0
+	    bbbxing    0    0    0     0
+	    bnstars    1    0    0     1
+	    bnstars1   ?    ?    ?     1
+	    desertwr   1    0    0     0
+	    f1superb   0    0    0     0
+	    gametngk   0 0140    0     0
+	    gratia     0    0    0     0
+	    hayaosi2   0    0    0     0
+	    hayaosi3   0 0140    0     1
+	    kirarast   0    0    0     1
+	    p47aces    1    0    0     0
+	    suchie2    0    0    0     1
+	    tetrisp    0    0    0     0
+	    tp2m32     0 0140    0     1
+	    wpksocv2   0 0140    0     1
 	*/
-//	popmessage("%04x %04x %04x",m_sprite_ctrl[0x1c/4], m_sprite_ctrl[0x20/4], m_sprite_ctrl[0x40/4]);
-//	popmessage("%04x %04x %04x %04x|%04x %04x %04x",m_sprite_ctrl[0x00/4],m_sprite_ctrl[0x04/4],m_sprite_ctrl[0x08/4],m_sprite_ctrl[0x0c/4]
-//					 ,m_sprite_ctrl[0x10/4],m_sprite_ctrl[0x14/4],m_sprite_ctrl[0x18/4]);
+//  popmessage("%04x %04x %04x",m_sprite_ctrl[0x1c/4], m_sprite_ctrl[0x20/4], m_sprite_ctrl[0x40/4]);
+//  popmessage("%04x %04x %04x %04x|%04x %04x %04x",m_sprite_ctrl[0x00/4],m_sprite_ctrl[0x04/4],m_sprite_ctrl[0x08/4],m_sprite_ctrl[0x0c/4]
+//                   ,m_sprite_ctrl[0x10/4],m_sprite_ctrl[0x14/4],m_sprite_ctrl[0x18/4]);
 	/* TODO: registers 0x04/4 and 0x10/4 are used too; the most interesting case
 	   is gametngk, where they are *usually*, but not always, copies of 0x00/4
 	   and 0x0c/4 (used for scrolling).
@@ -432,13 +432,13 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	// TODO: spaghetti code
 	// TODO: complete guesswork and missing many spots
 	// TODO: move to a reusable function
-	/* it should be using ALL the data in the priority ram, probably for 
-	   per-pixel / pen mixing, or more levels than are supported here..  
+	/* it should be using ALL the data in the priority ram, probably for
+	   per-pixel / pen mixing, or more levels than are supported here..
 	   I don't know, it will need hw tests I think */
 	{
 		pen_t const *const paldata = m_palette->pens();
 		bitmap.fill(0, cliprect);
-		
+
 		for (int yy = cliprect.min_y; yy <= cliprect.max_y; yy++)
 		{
 			u16 const *const srcptr_tile =     &m_temp_bitmap_tilemaps.pix(yy);
@@ -446,7 +446,7 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 			u16 const *const srcptr_spri =     &m_temp_bitmap_sprites.pix(yy);
 			//u8 const *const  srcptr_spripri =  &m_temp_bitmap_sprites_pri.pix(yy);
 			u32 *const       dstptr_bitmap  =  &bitmap.pix(yy);
-			
+
 			for (int xx = cliprect.min_x; xx <= cliprect.max_x; xx++)
 			{
 				u16 src_tile  = srcptr_tile[xx];

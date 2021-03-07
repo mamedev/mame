@@ -43,7 +43,7 @@ enum software_compatibility
 class software_list_loader
 {
 public:
-	virtual bool load_software(device_image_interface &image, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const = 0;
+	virtual bool load_software(device_image_interface &image, software_list_device &swlist, std::string_view swname, const rom_entry *start_entry) const = 0;
 };
 
 
@@ -52,7 +52,7 @@ public:
 class false_software_list_loader : public software_list_loader
 {
 public:
-	virtual bool load_software(device_image_interface &image, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
+	virtual bool load_software(device_image_interface &image, software_list_device &swlist, std::string_view swname, const rom_entry *start_entry) const override;
 	static const software_list_loader &instance() { return s_instance; }
 
 private:
@@ -65,7 +65,7 @@ private:
 class rom_software_list_loader : public software_list_loader
 {
 public:
-	virtual bool load_software(device_image_interface &image, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
+	virtual bool load_software(device_image_interface &image, software_list_device &swlist, std::string_view swname, const rom_entry *start_entry) const override;
 	static const software_list_loader &instance() { return s_instance; }
 
 private:
@@ -78,7 +78,7 @@ private:
 class image_software_list_loader : public software_list_loader
 {
 public:
-	virtual bool load_software(device_image_interface &image, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
+	virtual bool load_software(device_image_interface &image, software_list_device &swlist, std::string_view swname, const rom_entry *start_entry) const override;
 	static const software_list_loader &instance() { return s_instance; }
 
 private:
@@ -125,13 +125,13 @@ public:
 
 	// operations
 	const software_info *find(const std::string &look_for);
-	void find_approx_matches(const std::string &name, int matches, const software_info **list, const char *interface);
+	void find_approx_matches(std::string_view name, int matches, const software_info **list, const char *interface);
 	void release();
 	software_compatibility is_compatible(const software_part &part) const;
 
 	// static helpers
-	static software_list_device *find_by_name(const machine_config &mconfig, const std::string &name);
-	static void display_matches(const machine_config &config, const char *interface, const std::string &name);
+	static software_list_device *find_by_name(const machine_config &mconfig, std::string_view name);
+	static void display_matches(const machine_config &config, const char *interface, std::string_view name);
 	static device_image_interface *find_mountable_image(const machine_config &mconfig, const software_part &part, std::function<bool (const device_image_interface &)> filter);
 	static device_image_interface *find_mountable_image(const machine_config &mconfig, const software_part &part);
 

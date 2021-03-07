@@ -12,8 +12,12 @@
 #include <cctype>
 #include <new>
 #include <cassert>
-#include "osdcore.h"
+#include "corefile.h"
+#include "corestr.h"
+#include "osdcomm.h"
 #include "png.h"
+
+using util::string_format;
 
 
 /***************************************************************************
@@ -694,7 +698,7 @@ static void output_report(std::string &dirname, std::string &tempheader, std::st
 	}
 
 	/* iterate over buckets and output them */
-	for (bucknum = 0; bucknum < ARRAY_LENGTH(bucket_output_order); bucknum++)
+	for (bucknum = 0; bucknum < std::size(bucket_output_order); bucknum++)
 	{
 		int curbucket = bucket_output_order[bucknum];
 

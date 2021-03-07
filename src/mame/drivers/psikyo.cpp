@@ -84,9 +84,9 @@ This was pointed out by Bart Puype
 #include "cpu/z80/lz8420m.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
-#include "sound/2610intf.h"
-#include "sound/ymf278b.h"
 #include "sound/okim6295.h"
+#include "sound/ym2610.h"
+#include "sound/ymf278b.h"
 #include "speaker.h"
 
 
@@ -1238,7 +1238,7 @@ ROM_START( samuraia )
 	ROM_LOAD16_WORD_SWAP( "u34.bin",  0x000000, 0x100000, CRC(e6a75bd8) SHA1(1aa84ea54584b6c8b2846194b48bf6d2afa67fee) )
 	ROM_LOAD16_WORD_SWAP( "u35.bin",  0x100000, 0x100000, CRC(c4ca0164) SHA1(c75422de2e0127cdc23d8c223b674a5bd85b00fb) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* Samples */
 	ROM_LOAD( "u68.bin",  0x000000, 0x100000, CRC(9a7f6c34) SHA1(c549b209bce1d2c6eeb512db198ad20c3f5fb0ea) )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
@@ -1261,7 +1261,7 @@ ROM_START( sngkace )
 	ROM_LOAD16_WORD_SWAP( "u34.bin",  0x000000, 0x100000, CRC(e6a75bd8) SHA1(1aa84ea54584b6c8b2846194b48bf6d2afa67fee) )
 	ROM_LOAD16_WORD_SWAP( "u35.bin",  0x100000, 0x100000, CRC(c4ca0164) SHA1(c75422de2e0127cdc23d8c223b674a5bd85b00fb) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* Samples */
 	ROM_LOAD( "u68.bin",  0x000000, 0x100000, CRC(9a7f6c34) SHA1(c549b209bce1d2c6eeb512db198ad20c3f5fb0ea) )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
@@ -1284,7 +1284,7 @@ ROM_START( sngkacea ) // the roms have a very visible "." symbol after the numbe
 	ROM_LOAD16_WORD_SWAP( "u34.bin",  0x000000, 0x100000, CRC(e6a75bd8) SHA1(1aa84ea54584b6c8b2846194b48bf6d2afa67fee) )
 	ROM_LOAD16_WORD_SWAP( "u35.bin",  0x100000, 0x100000, CRC(c4ca0164) SHA1(c75422de2e0127cdc23d8c223b674a5bd85b00fb) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* Samples */
 	ROM_LOAD( "u68.bin",  0x000000, 0x100000, CRC(9a7f6c34) SHA1(c549b209bce1d2c6eeb512db198ad20c3f5fb0ea) )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
@@ -1327,10 +1327,10 @@ ROM_START( gunbird )
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layers 0 + 1 */
 	ROM_LOAD16_WORD_SWAP( "u33.bin",  0x000000, 0x200000, CRC(54494e6b) SHA1(f5d090d2d34d908b56b53a246def194929eba990) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(9e07104d) SHA1(3bc54cb755bb3194197706965b532d62b48c4d12) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(e187ed4f) SHA1(05060723d89b1d05714447a14b5f5888ff3c2306) )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
@@ -1358,10 +1358,10 @@ ROM_START( gunbirdk )
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layers 0 + 1 */
 	ROM_LOAD16_WORD_SWAP( "u33.bin",  0x000000, 0x200000, CRC(54494e6b) SHA1(f5d090d2d34d908b56b53a246def194929eba990) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(9e07104d) SHA1(3bc54cb755bb3194197706965b532d62b48c4d12) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(e187ed4f) SHA1(05060723d89b1d05714447a14b5f5888ff3c2306) )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
@@ -1385,10 +1385,10 @@ ROM_START( gunbirdj )
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layers 0 + 1 */
 	ROM_LOAD16_WORD_SWAP( "u33.bin",  0x000000, 0x200000, CRC(54494e6b) SHA1(f5d090d2d34d908b56b53a246def194929eba990) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(9e07104d) SHA1(3bc54cb755bb3194197706965b532d62b48c4d12) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(e187ed4f) SHA1(05060723d89b1d05714447a14b5f5888ff3c2306) )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
@@ -1413,10 +1413,10 @@ ROM_START( btlkroad )
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layers 0 + 1 */
 	ROM_LOAD16_WORD_SWAP( "u33.bin",  0x000000, 0x200000, CRC(4c8577f1) SHA1(d27043514632954a06667ac63f4a4e4a31870511) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(51d73682) SHA1(562038d08e9a4389ffa39f3a659b2a29b94dc156) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(0f33049f) SHA1(ca4fd5f3906685ace1af40b75f5678231d7324e8) )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
@@ -1445,10 +1445,10 @@ ROM_START( btlkroadk )
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layers 0 + 1 */
 	ROM_LOAD16_WORD_SWAP( "u33.bin",  0x000000, 0x200000, CRC(4c8577f1) SHA1(d27043514632954a06667ac63f4a4e4a31870511) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(51d73682) SHA1(562038d08e9a4389ffa39f3a659b2a29b94dc156) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(0f33049f) SHA1(ca4fd5f3906685ace1af40b75f5678231d7324e8) )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* Sprites LUT */
@@ -1492,10 +1492,10 @@ ROM_START( s1945n )
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 0 + 1 */
 	ROM_LOAD16_WORD_SWAP( "u34.bin",  0x000000, 0x200000, CRC(aaf83e23) SHA1(1c75d09ff42c0c215f8c66c699ca75688c95a05e) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(fe1312c2) SHA1(8339a96a0885518d6e22cb3bdb9c2f82d011d86d) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(a44a4a9b) SHA1(5378256752d709daed0b5f4199deebbcffe84e10) )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* */
@@ -1519,10 +1519,10 @@ ROM_START( s1945nj )
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 0 + 1 */
 	ROM_LOAD16_WORD_SWAP( "u34.bin",  0x000000, 0x200000, CRC(aaf83e23) SHA1(1c75d09ff42c0c215f8c66c699ca75688c95a05e) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM Samples */
 	ROM_LOAD( "u56.bin",  0x000000, 0x100000, CRC(fe1312c2) SHA1(8339a96a0885518d6e22cb3bdb9c2f82d011d86d) )
 
-	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )   /* DELTA-T Samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcmb", 0 )   /* DELTA-T Samples */
 	ROM_LOAD( "u64.bin",  0x000000, 0x080000, CRC(a44a4a9b) SHA1(5378256752d709daed0b5f4199deebbcffe84e10) )
 
 	ROM_REGION16_LE( 0x040000, "spritelut", 0 )  /* */
@@ -1832,8 +1832,8 @@ ROM_END
 void psikyo_state::init_sngkace()
 {
 	{
-		u8 *RAM = memregion("ymsnd")->base();
-		int len = memregion("ymsnd")->bytes();
+		u8 *RAM = memregion("ymsnd:adpcma")->base();
+		int len = memregion("ymsnd:adpcma")->bytes();
 
 		/* Bit 6&7 of the samples are swapped. Naughty, naughty... */
 		for (int i = 0; i < len; i++)

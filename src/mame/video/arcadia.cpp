@@ -311,6 +311,7 @@ void arcadia_state::video_start()
 
 	m_line = 0;
 	std::fill(std::begin(m_reg.d.pal), std::end(m_reg.d.pal), 0);
+	m_shift = 0;
 }
 
 uint8_t arcadia_state::video_r(offs_t offset)

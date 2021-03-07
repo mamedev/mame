@@ -874,10 +874,9 @@ static void hp9895_floppies(device_slot_interface &device)
 	device.option_add("8dsdd" , FLOPPY_8_DSDD);
 }
 
-static const floppy_format_type hp9895_floppy_formats[] = {
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_HPI_FORMAT,
-	nullptr
+static void hp9895_floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_HPI_FORMAT);
 };
 
 const tiny_rom_entry *hp9895_device::device_rom_region() const

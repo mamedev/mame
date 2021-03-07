@@ -1183,7 +1183,7 @@ static imgtoolerr_t prodos_lookup_path(imgtool::image &image, const char *path,
 			ent->key_pointer[0] = new_file_block;
 			ent->file_type = 0x3F3F3F3F;
 			ent->file_creator = 0x3F3F3F3F;
-			strncpy(ent->filename, old_path, ARRAY_LENGTH(ent->filename));
+			strncpy(ent->filename, old_path, std::size(ent->filename));
 
 			/* and place it */
 			err = prodos_put_dirent(image, direnum, ent);

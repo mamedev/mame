@@ -39,12 +39,14 @@
 #include "emu.h"
 #include "render.h"
 
+#include "corestr.h"
 #include "emuopts.h"
 #include "rendfont.h"
 #include "rendlay.h"
 #include "rendutil.h"
 #include "config.h"
 #include "drivenum.h"
+#include "layout/generic.h"
 
 #include "ui/uimain.h"
 
@@ -440,7 +442,7 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 		// is it a size we already have?
 		scaled_texture *scaled = nullptr;
 		int scalenum;
-		for (scalenum = 0; scalenum < ARRAY_LENGTH(m_scaled); scalenum++)
+		for (scalenum = 0; scalenum < std::size(m_scaled); scalenum++)
 		{
 			scaled = &m_scaled[scalenum];
 
@@ -450,12 +452,12 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 		}
 
 		// did we get one?
-		if (scalenum == ARRAY_LENGTH(m_scaled))
+		if (scalenum == std::size(m_scaled))
 		{
 			int lowest = -1;
 
 			// didn't find one -- take the entry with the lowest seqnum
-			for (scalenum = 0; scalenum < ARRAY_LENGTH(m_scaled); scalenum++)
+			for (scalenum = 0; scalenum < std::size(m_scaled); scalenum++)
 				if ((lowest == -1 || m_scaled[scalenum].seqid < m_scaled[lowest].seqid) && !primlist.has_reference(m_scaled[scalenum].bitmap.get()))
 					lowest = scalenum;
 			if (-1 == lowest)
@@ -695,7 +697,7 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, u32 &out_length, 
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:
 		case TEXFORMAT_YUY16:
-			out_length = ARRAY_LENGTH(m_bcglookup256);
+			out_length = std::size(m_bcglookup256);
 			return m_bcglookup256;
 
 		default:
@@ -891,6 +893,7 @@ render_target::render_target(render_manager &manager, util::xml::data_node const
 template <typename T> render_target::render_target(render_manager &manager, T &&layout, u32 flags, constructor_impl_t)
 	: m_next(nullptr)
 	, m_manager(manager)
+	, m_filelist(std::make_unique<std::list<layout_file>>())
 	, m_curview(0U)
 	, m_flags(flags)
 	, m_listindex(0)
@@ -947,7 +950,7 @@ template <typename T> render_target::render_target(render_manager &manager, T &&
 
 	// load the layout files
 	load_layout_files(std::forward<T>(layout), flags & RENDER_CREATE_SINGLE_FILE);
-	for (layout_file &file : m_filelist)
+	for (layout_file &file : *m_filelist)
 		for (layout_view &view : file.views())
 			if (!(m_flags & RENDER_CREATE_NO_ART) || !view.has_art())
 				m_views.emplace_back(view, view.default_visibility_mask());
@@ -1042,7 +1045,7 @@ void render_target::set_max_texture_size(int maxwidth, int maxheight)
 
 void render_target::set_visibility_toggle(unsigned index, bool enable)
 {
-	assert(visibility_toggles().size() > index);
+	assert(current_view().visibility_toggles().size() > index);
 	if (enable)
 		m_views[m_curview].second |= u32(1) << index;
 	else
@@ -1061,14 +1064,14 @@ unsigned render_target::configured_view(const char *viewname, int targetindex, i
 {
 	layout_view *view = nullptr;
 
-	// auto view just selects the nth view
-	if (strcmp(viewname, "auto") != 0)
+	// if it isn't "auto" or an empty string, try to match it as a view name prefix
+	if (viewname && *viewname && strcmp(viewname, "auto"))
 	{
 		// scan for a matching view name
 		size_t const viewlen = strlen(viewname);
 		for (unsigned i = 0; !view && (m_views.size() > i); ++i)
-			if (!core_strnicmp(m_views[i].first.get().name().c_str(), viewname, viewlen))
-				view = &m_views[i].first.get();
+			if (!core_strnicmp(m_views[i].first.name().c_str(), viewname, viewlen))
+				view = &m_views[i].first;
 	}
 
 	// if we don't have a match, default to the nth view
@@ -1084,12 +1087,12 @@ unsigned render_target::configured_view(const char *viewname, int targetindex, i
 			screen_device const &screen = screens[index() % screens.size()];
 			for (unsigned i = 0; !view && (m_views.size() > i); ++i)
 			{
-				for (layout_view::item &viewitem : m_views[i].first.get().items())
+				for (layout_view::item &viewitem : m_views[i].first.items())
 				{
 					screen_device const *const viewscreen(viewitem.screen());
 					if (viewscreen == &screen)
 					{
-						view = &m_views[i].first.get();
+						view = &m_views[i].first;
 					}
 					else if (viewscreen)
 					{
@@ -1123,12 +1126,7 @@ unsigned render_target::configured_view(const char *viewname, int targetindex, i
 
 const char *render_target::view_name(unsigned viewindex)
 {
-	return (m_views.size() > viewindex) ? m_views[viewindex].first.get().name().c_str() : nullptr;
-}
-
-layout_view::visibility_toggle_vector const &render_target::visibility_toggles()
-{
-	return current_view().visibility_toggles();
+	return (m_views.size() > viewindex) ? m_views[viewindex].first.name().c_str() : nullptr;
 }
 
 
@@ -1218,8 +1216,8 @@ void render_target::compute_visible_area(s32 target_width, s32 target_height, fl
 			// now apply desired scale mode and aspect correction
 			if (m_keepaspect && target_aspect > src_aspect) xscale *= src_aspect / target_aspect * (maxyscale / yscale);
 			if (m_keepaspect && target_aspect < src_aspect) yscale *= target_aspect / src_aspect * (maxxscale / xscale);
-			if (x_is_integer) xscale = std::min(maxxscale, std::max(1.0f, render_round_nearest(xscale)));
-			if (y_is_integer) yscale = std::min(maxyscale, std::max(1.0f, render_round_nearest(yscale)));
+			if (x_is_integer) xscale = std::clamp(render_round_nearest(xscale), 1.0f, maxxscale);
+			if (y_is_integer) yscale = std::clamp(render_round_nearest(yscale), 1.0f, maxyscale);
 
 			// check if we have user defined scale factors, if so use them instead
 			int user_scale_x = target_is_portrait? m_int_scale_y : m_int_scale_x;
@@ -1262,7 +1260,7 @@ void render_target::compute_minimum_size(s32 &minwidth, s32 &minheight)
 	// scan the current view for all screens
 	for (layout_view::item &curitem : current_view().items())
 	{
-		screen_device *const screen = curitem.screen();
+		screen_device const *const screen = curitem.screen();
 		if (screen)
 		{
 			// use a hard-coded default visible area for vector screens
@@ -1320,7 +1318,7 @@ render_primitive_list &render_target::get_primitives()
 
 	// switch to the next primitive list
 	render_primitive_list &list = m_primlist[m_listindex];
-	m_listindex = (m_listindex + 1) % ARRAY_LENGTH(m_primlist);
+	m_listindex = (m_listindex + 1) % std::size(m_primlist);
 	list.acquire_lock();
 
 	// free any previous primitives
@@ -1615,7 +1613,7 @@ void render_target::debug_append(render_container &container)
 
 void render_target::resolve_tags()
 {
-	for (layout_file &file : m_filelist)
+	for (layout_file &file : *m_filelist)
 		file.resolve_tags();
 
 	current_view().recompute(visibility_mask(), m_layerconfig.zoom_to_screen());
@@ -1780,7 +1778,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 	auto const nth_view =
 		[this] (unsigned n) -> layout_view *
 		{
-			for (layout_file &file : m_filelist)
+			for (layout_file &file : *m_filelist)
 				for (layout_view &view : file.views())
 					if (!(m_flags & RENDER_CREATE_NO_ART) || !view.has_art())
 						if (n-- == 0)
@@ -1793,7 +1791,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 		if (!nth_view(0))
 		{
 			load_layout_file(nullptr, layout_noscreens);
-			if (m_filelist.empty())
+			if (m_filelist->empty())
 				throw emu_fatalerror("Couldn't parse default layout??");
 		}
 	}
@@ -2200,7 +2198,7 @@ bool render_target::load_layout_file(device_t &device, util::xml::data_node cons
 	// parse and catch any errors
 	try
 	{
-		m_filelist.emplace_back(device, rootnode, searchpath, dirname);
+		m_filelist->emplace_back(device, rootnode, searchpath, dirname);
 	}
 	catch (emu_fatalerror &err)
 	{
@@ -2570,7 +2568,7 @@ std::pair<float, float> render_target::map_point_internal(s32 target_x, s32 targ
 
 layout_view *render_target::view_by_index(unsigned index)
 {
-	return (m_views.size() > index) ? &m_views[index].first.get() : nullptr;
+	return (m_views.size() > index) ? &m_views[index].first : nullptr;
 }
 
 
@@ -2584,7 +2582,7 @@ int render_target::view_index(layout_view &targetview) const
 	// return index of view, or zero if not found
 	for (int index = 0; m_views.size() > index; ++index)
 	{
-		if (&m_views[index].first.get() == &targetview)
+		if (&m_views[index].first == &targetview)
 			return index;
 	}
 	return 0;
@@ -2648,7 +2646,7 @@ void render_target::config_load(util::xml::data_node const &targetnode)
 		if (!viewname)
 			continue;
 
-		auto const view = std::find_if(m_views.begin(), m_views.end(), [viewname] (auto const &x) { return x.first.get().name() == viewname; });
+		auto const view = std::find_if(m_views.begin(), m_views.end(), [viewname] (auto const &x) { return x.first.name() == viewname; });
 		if (m_views.end() == view)
 			continue;
 
@@ -2658,7 +2656,7 @@ void render_target::config_load(util::xml::data_node const &targetnode)
 			if (!vistogglename)
 				continue;
 
-			auto const &vistoggles = view->first.get().visibility_toggles();
+			auto const &vistoggles = view->first.visibility_toggles();
 			auto const vistoggle = std::find_if(vistoggles.begin(), vistoggles.end(), [vistogglename] (auto const &x) { return x.name() == vistogglename; });
 			if (vistoggles.end() == vistoggle)
 				continue;
@@ -2673,7 +2671,7 @@ void render_target::config_load(util::xml::data_node const &targetnode)
 			}
 		}
 
-		if (&current_view() == &view->first.get())
+		if (&current_view() == &view->first)
 		{
 			current_view().recompute(visibility_mask(), m_layerconfig.zoom_to_screen());
 			current_view().preload();
@@ -2726,19 +2724,19 @@ bool render_target::config_save(util::xml::data_node &targetnode)
 	// output layer configuration
 	for (auto const &view : m_views)
 	{
-		u32 const defvismask = view.first.get().default_visibility_mask();
+		u32 const defvismask = view.first.default_visibility_mask();
 		if (defvismask != view.second)
 		{
 			util::xml::data_node *viewnode = nullptr;
 			unsigned i = 0;
-			for (layout_view::visibility_toggle const &toggle : view.first.get().visibility_toggles())
+			for (layout_view::visibility_toggle const &toggle : view.first.visibility_toggles())
 			{
 				if (BIT(defvismask, i) != BIT(view.second, i))
 				{
 					if (!viewnode)
 					{
 						viewnode = targetnode.add_child("view", nullptr);
-						viewnode->set_attribute("name", view.first.get().name().c_str());
+						viewnode->set_attribute("name", view.first.name().c_str());
 					}
 					util::xml::data_node *const vistogglenode = viewnode->add_child("collection", nullptr);
 					vistogglenode->set_attribute("name", toggle.name().c_str());
@@ -3315,7 +3313,7 @@ void render_manager::config_load(config_type cfg_type, util::xml::data_node cons
 	for (util::xml::data_node const *targetnode = parentnode->get_child("target"); targetnode; targetnode = targetnode->get_next_sibling("target"))
 	{
 		render_target *const target = target_by_index(targetnode->get_attribute_int("index", -1));
-		if (target)
+		if (target && !target->hidden())
 			target->config_load(*targetnode);
 	}
 
@@ -3366,17 +3364,21 @@ void render_manager::config_save(config_type cfg_type, util::xml::data_node *par
 	}
 
 	// iterate over targets
-	for (int targetnum = 0; targetnum < 1000; targetnum++)
+	for (int targetnum = 0; ; ++targetnum)
 	{
 		// get this target and break when we fail
 		render_target *target = target_by_index(targetnum);
-		if (target == nullptr)
+		if (!target)
+		{
 			break;
-
-		// create a node
-		util::xml::data_node *const targetnode = parentnode->add_child("target", nullptr);
-		if (targetnode && !target->config_save(*targetnode))
-			targetnode->delete_node();
+		}
+		else if (!target->hidden())
+		{
+			// create a node
+			util::xml::data_node *const targetnode = parentnode->add_child("target", nullptr);
+			if (targetnode && !target->config_save(*targetnode))
+				targetnode->delete_node();
+		}
 	}
 
 	// iterate over screen containers

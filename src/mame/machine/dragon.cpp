@@ -182,18 +182,19 @@ uint8_t d64plus_state::d64plus_6845_disp_r()
 
 void d64plus_state::d64plus_bank_w(uint8_t data)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	switch (data & 0x06)
 	{
 	case 0:  // Standard Dragon 32 Dynamic bank
-		space.install_write_bank(0x0000, 0x7fff, membank(":sam:bank0000_w"));
-		space.install_read_bank(0x0000, 0x7fff, membank(":sam:bank0000_r"));
+		m_pram_bank->set_entry(0);
+		m_vram_bank->set_entry(0);
 		break;
 	case 2:  // First extra 32K bank (A)
-		space.install_ram(0x0000, 0x7fff, m_plus_ram + 0x0000);
+		m_pram_bank->set_entry(1);
+		m_vram_bank->set_entry(1);
 		break;
 	case 6:  // Second extra 32K bank (B)
-		space.install_ram(0x0000, 0x7fff, m_plus_ram + 0x8000);
+		m_pram_bank->set_entry(2);
+		m_vram_bank->set_entry(2);
 		break;
 	default:
 		logerror("unknown bank register $FFE2 = %02x\n", data);
@@ -201,7 +202,7 @@ void d64plus_state::d64plus_bank_w(uint8_t data)
 	}
 	if (data & 0x01)
 	{
-		space.install_ram(0x0000, 0x07ff, m_video_ram);  // Video RAM bank (C)
+		m_vram_bank->set_entry(3);  // Video RAM bank (C)
 	}
 }
 
@@ -237,6 +238,16 @@ void d64plus_state::device_start()
 {
 	dragon64_state::device_start();
 
+	m_sam->space(0).install_readwrite_bank(0x0000, 0x7fff, m_pram_bank);
+	m_sam->space(0).install_readwrite_bank(0x0000, 0x07ff, m_vram_bank);
+
+	m_pram_bank->configure_entry(0, m_ram->pointer());
+	m_pram_bank->configure_entries(1, 2, m_plus_ram, 0x8000);
+
+	m_vram_bank->configure_entry(0, m_ram->pointer());
+	m_vram_bank->configure_entries(1, 2, m_plus_ram, 0x8000);
+	m_vram_bank->configure_entry(3, m_video_ram);
+
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_readwrite_handler(0xffe0, 0xffe0, read8smo_delegate(*m_crtc, FUNC(mc6845_device::status_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::address_w)));
 	space.install_readwrite_handler(0xffe1, 0xffe1, read8smo_delegate(*m_crtc, FUNC(mc6845_device::register_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::register_w)));
@@ -251,4 +262,7 @@ void d64plus_state::device_start()
 void d64plus_state::device_reset()
 {
 	dragon64_state::device_reset();
+
+	m_pram_bank->set_entry(0);
+	m_vram_bank->set_entry(0);
 }

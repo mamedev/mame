@@ -123,7 +123,7 @@ public:
 	void u32_w(uint8_t data);
 
 	void init();
-	
+
 protected:
 	required_memory_bank m_bank;
 	required_device<ram_device> m_ram;

@@ -24,7 +24,7 @@ function autofire.startplugin()
 	local current_rom = nil
 
 	local function process_button(button)
-		local pressed = manager:machine():input():seq_pressed(button.key)
+		local pressed = manager.machine.input:seq_pressed(button.key)
 		if pressed then
 			local state = button.counter < button.on_frames and 1 or 0
 			button.counter = (button.counter + 1) % (button.on_frames + button.off_frames)
@@ -59,7 +59,7 @@ function autofire.startplugin()
 	local function reinit_buttons()
 		for i, button in ipairs(buttons) do
 			button.counter = 0
-			button.button = manager:machine():ioport().ports[button.port].fields[button.field]
+			button.button = manager.machine.ioport.ports[button.port].fields[button.field]
 		end
 	end
 

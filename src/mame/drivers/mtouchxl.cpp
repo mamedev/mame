@@ -234,7 +234,7 @@ void mtxl_state::at486(machine_config &config)
 #ifndef REAL_PCI_CHIPSET
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	AT_MB(config, "mb", 0);
+	AT_MB(config, "mb");
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// on board devices
@@ -255,7 +255,6 @@ void mtxl_state::at486(machine_config &config)
 
 	// remove the keyboard controller and use the HLE one which allow keys to be unmapped
 	config.device_remove("mb:keybc");
-	config.device_remove("mb:pc_kbdc");
 	kbdc8042_device &kbdc(KBDC8042(config, "kbdc"));
 	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	kbdc.system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
@@ -294,7 +293,7 @@ void mtxl_state::at486hd(machine_config &config)
 #ifndef REAL_PCI_CHIPSET
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	AT_MB(config, "mb", 0);
+	AT_MB(config, "mb");
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// on board devices
@@ -315,7 +314,6 @@ void mtxl_state::at486hd(machine_config &config)
 
 	// remove the keyboard controller and use the HLE one which allow keys to be unmapped
 	config.device_remove("mb:keybc");
-	config.device_remove("mb:pc_kbdc");
 	kbdc8042_device &kbdc(KBDC8042(config, "kbdc"));
 	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	kbdc.system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);

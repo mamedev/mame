@@ -5,7 +5,7 @@ require('lfs')
 _G._ = emu.lang_translate
 _G.emu.plugin = {} -- table to contain plugin interfaces
 -- substitute environment variables in the plugins path from options
-local dirs = emu.subst_env(manager:options().entries.pluginspath:value())
+local dirs = emu.subst_env(manager.options.entries.pluginspath:value())
 
 -- and split the paths apart and make them suitable for package.path
 package.path = ""
@@ -16,7 +16,7 @@ for dir in string.gmatch(dirs, "([^;]+)") do
 	package.path = package.path .. dir .. "/?.lua;" .. dir .. "/?/init.lua"
 end
 
-for _,entry in pairs(manager:plugins()) do
+for _,entry in pairs(manager.plugins) do
 	if (entry.type == "plugin" and entry.start) then
 		emu.print_verbose("Starting plugin " .. entry.name .. "...")
 		plugin = require(entry.name)

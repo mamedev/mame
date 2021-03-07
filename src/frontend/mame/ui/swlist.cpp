@@ -14,6 +14,7 @@
 #include "ui/swlist.h"
 #include "ui/utils.h"
 
+#include "corestr.h"
 #include "softlist_dev.h"
 
 

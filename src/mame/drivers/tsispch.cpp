@@ -121,8 +121,6 @@
 #include "sound/dac.h"
 #include "speaker.h"
 
-namespace {
-
 // defines
 
 //#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
@@ -132,6 +130,8 @@ namespace {
 #define VERBOSE (LOG_GENERAL | LOG_PARAM)
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
+
+namespace {
 
 #define LOGGEN(...) LOGMASKED(LOG_GENERAL, __VA_ARGS__)
 #define LOGPRM(...) LOGMASKED(LOG_PARAM, __VA_ARGS__)

@@ -77,9 +77,11 @@ static void ql_trump_card_floppies(device_slot_interface &device)
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( ql_trump_card_device::floppy_formats )
-	FLOPPY_QL_FORMAT
-FLOPPY_FORMATS_END
+void ql_trump_card_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_QL_FORMAT);
+}
 
 
 //-------------------------------------------------

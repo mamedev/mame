@@ -28,7 +28,7 @@ public:
 private:
 	void sio_out_w(uint8_t data);
 	void drive_sel_w(uint8_t data);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 	static void ncr5380(device_t *device);
 	void lb186_io(address_map &map);
 	void lb186_map(address_map &map);
@@ -113,10 +113,11 @@ static void scsi_devices(device_slot_interface &device)
 	device.option_add_internal("ncr5380", NCR5380N);
 }
 
-FLOPPY_FORMATS_MEMBER( lb186_state::floppy_formats )
-	FLOPPY_PC_FORMAT,
-	FLOPPY_NASLITE_FORMAT
-FLOPPY_FORMATS_END
+void lb186_state::floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_NASLITE_FORMAT);
+}
 
 void lb186_state::lb186(machine_config &config)
 {

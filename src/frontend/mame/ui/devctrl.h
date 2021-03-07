@@ -84,8 +84,8 @@ int menu_device_control<DeviceType>::current_index()
 template<class DeviceType>
 void menu_device_control<DeviceType>::previous()
 {
-	// left arrow - rotate left through cassette devices
-	if (m_device != nullptr)
+	// left arrow - rotate left through devices
+	if (m_device && (1 < m_count))
 	{
 		enumerator iter(machine().root_device());
 		int index = iter.indexof(*m_device);
@@ -94,6 +94,7 @@ void menu_device_control<DeviceType>::previous()
 		else
 			index = m_count - 1;
 		m_device = iter.byindex(index);
+		reset(reset_options::REMEMBER_POSITION);
 	}
 }
 
@@ -106,7 +107,7 @@ template<class DeviceType>
 void menu_device_control<DeviceType>::next()
 {
 	// right arrow - rotate right through cassette devices
-	if (m_device != nullptr)
+	if (m_device && (1 < m_count))
 	{
 		enumerator iter(machine().root_device());
 		int index = iter.indexof(*m_device);
@@ -115,6 +116,7 @@ void menu_device_control<DeviceType>::next()
 		else
 			index = 0;
 		m_device = iter.byindex(index);
+		reset(reset_options::REMEMBER_POSITION);
 	}
 }
 
@@ -129,7 +131,7 @@ std::string menu_device_control<DeviceType>::current_display_name()
 	std::string display_name;
 	display_name.assign(current_device()->name());
 	if (count() > 1)
-		display_name.append(string_format("%d", current_index() + 1));
+		display_name.append(string_format(" %d", current_index() + 1));
 	return display_name;
 }
 

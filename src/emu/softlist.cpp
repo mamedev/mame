@@ -24,7 +24,7 @@
 //  STATIC VARIABLES
 //**************************************************************************
 
-static std::regex s_potenial_softlist_regex("\\w+(\\:\\w+)*");
+static std::regex s_potential_softlist_regex("\\w+(\\:\\w+)*");
 
 
 //**************************************************************************
@@ -848,10 +848,10 @@ void softlist_parser::parse_soft_end(const char *tagname)
 //  case.
 //-------------------------------------------------
 
-bool software_name_parse(const std::string &identifier, std::string *list_name, std::string *software_name, std::string *part_name)
+bool software_name_parse(std::string_view identifier, std::string *list_name, std::string *software_name, std::string *part_name)
 {
 	// first, sanity check the arguments
-	if (!std::regex_match(identifier, s_potenial_softlist_regex))
+	if (!std::regex_match(identifier.begin(), identifier.end(), s_potential_softlist_regex))
 		return false;
 
 	// reset all output parameters (if specified of course)
@@ -864,7 +864,7 @@ bool software_name_parse(const std::string &identifier, std::string *list_name, 
 
 	// if no colon, this is the swname by itself
 	auto split1 = identifier.find_first_of(':');
-	if (split1 == std::string::npos)
+	if (split1 == std::string_view::npos)
 	{
 		if (software_name != nullptr)
 			*software_name = identifier;
@@ -873,7 +873,7 @@ bool software_name_parse(const std::string &identifier, std::string *list_name, 
 
 	// if one colon, it is the swname and swpart alone
 	auto split2 = identifier.find_first_of(':', split1 + 1);
-	if (split2 == std::string::npos)
+	if (split2 == std::string_view::npos)
 	{
 		if (software_name != nullptr)
 			*software_name = identifier.substr(0, split1);

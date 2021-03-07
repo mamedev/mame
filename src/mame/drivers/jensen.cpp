@@ -182,13 +182,9 @@ void jensen_state::jensen(machine_config &config)
 	INTEL_E28F008SA(config, m_feprom[1]);
 
 	// keyboard connector
-	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd_con", 0));
+	[[maybe_unused]] pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
 	//kbd_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
 	//kbd_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
-
-	// keyboard port
-	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
-	kbd.set_pc_kbdc_slot(&kbd_con);
 
 	// TODO: VL82C106 (rtc, dual serial, parallel, dual ps/2)
 	// TODO: 18.432 MHz crystal

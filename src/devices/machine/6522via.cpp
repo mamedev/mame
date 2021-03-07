@@ -165,8 +165,11 @@ void via6522_device::counter2_decrement()
 //  LIVE DEVICE
 //**************************************************************************
 
-// device type definition
-DEFINE_DEVICE_TYPE(VIA6522, via6522_device, "via6522", "6522 VIA")
+// device type definitions
+DEFINE_DEVICE_TYPE(MOS6522, mos6522_device, "mos6522", "MOS 6522 VIA")
+DEFINE_DEVICE_TYPE(R65C22, r65c22_device, "r65c22", "Rockwell R65C22 VIA")
+DEFINE_DEVICE_TYPE(R65NC22, r65nc22_device, "r65nc22", "Rockwell R65NC22 VIA")
+DEFINE_DEVICE_TYPE(W65C22S, w65c22s_device, "w65c22s", "WDC W65C22S VIA")
 
 void via6522_device::map(address_map &map)
 {
@@ -177,8 +180,8 @@ void via6522_device::map(address_map &map)
 //  via6522_device - constructor
 //-------------------------------------------------
 
-via6522_device::via6522_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VIA6522, tag, owner, clock),
+via6522_device::via6522_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		m_in_a_handler(*this),
 		m_in_b_handler(*this),
 		m_out_a_handler(*this),
@@ -198,6 +201,46 @@ via6522_device::via6522_device(const machine_config &mconfig, const char *tag, d
 		m_acr(0),
 		m_ier(0),
 		m_ifr(0)
+{
+}
+
+
+//-------------------------------------------------
+//  mos6522_device - constructor
+//-------------------------------------------------
+
+mos6522_device::mos6522_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: via6522_device(mconfig, MOS6522, tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+//  r65c22_device - constructor
+//-------------------------------------------------
+
+r65c22_device::r65c22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: via6522_device(mconfig, R65C22, tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+//  r65c22_device - constructor
+//-------------------------------------------------
+
+r65nc22_device::r65nc22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: via6522_device(mconfig, R65NC22, tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+//  w65c22s_device - constructor
+//-------------------------------------------------
+
+w65c22s_device::w65c22s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: via6522_device(mconfig, W65C22S, tag, owner, clock)
 {
 }
 
@@ -533,6 +576,11 @@ void via6522_device::output_pa()
 	m_out_a_handler(pa);
 }
 
+uint8_t via6522_device::read_pa() const
+{
+	return (m_out_a & m_ddr_a) | ~m_ddr_a;
+}
+
 uint8_t via6522_device::input_pb()
 {
 	uint8_t pb = m_in_b & ~m_ddr_b;
@@ -559,6 +607,16 @@ void via6522_device::output_pb()
 		pb = (pb & 0x7f) | (m_t1_pb7 << 7);
 
 	m_out_b_handler(pb);
+}
+
+uint8_t via6522_device::read_pb() const
+{
+	uint8_t pb = (m_out_b & m_ddr_b) | ~m_ddr_b;
+
+	if (T1_SET_PB7(m_acr))
+		pb = (pb & 0x7f) | (m_t1_pb7 << 7);
+
+	return pb;
 }
 
 /*-------------------------------------------------

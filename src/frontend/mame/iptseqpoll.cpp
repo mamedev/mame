@@ -11,7 +11,8 @@
 
 
 input_code_poller::input_code_poller(input_manager &manager) noexcept :
-	m_manager(manager)
+	m_manager(manager),
+	m_axis_memory()
 {
 }
 
@@ -24,26 +25,31 @@ input_code_poller::~input_code_poller()
 void input_code_poller::reset()
 {
 	// iterate over device classes and devices
+	m_axis_memory.clear();
 	for (input_device_class classno = DEVICE_CLASS_FIRST_VALID; DEVICE_CLASS_LAST_VALID >= classno; ++classno)
 	{
 		input_class &devclass(m_manager.device_class(classno));
-		for (int devnum = 0; devclass.maxindex() >= devnum; ++devnum)
+		if (devclass.enabled())
 		{
-			// fetch the device; ignore if nullptr
-			input_device *const device(devclass.device(devnum));
-			if (device)
+			for (int devnum = 0; devclass.maxindex() >= devnum; ++devnum)
 			{
-				// iterate over items within each device
-				for (input_item_id itemid = ITEM_ID_FIRST_VALID; device->maxitem() >= itemid; ++itemid)
+				// fetch the device; ignore if nullptr
+				input_device *const device(devclass.device(devnum));
+				if (device)
 				{
-					// for any non-switch items, set memory to the current value
-					input_device_item *const item(device->item(itemid));
-					if (item && (item->itemclass() != ITEM_CLASS_SWITCH))
-						item->set_memory(m_manager.code_value(item->code()));
+					// iterate over items within each device
+					for (input_item_id itemid = ITEM_ID_FIRST_VALID; device->maxitem() >= itemid; ++itemid)
+					{
+						// for any non-switch items, set memory to the current value
+						input_device_item *const item(device->item(itemid));
+						if (item && (item->itemclass() != ITEM_CLASS_SWITCH))
+							m_axis_memory.emplace_back(item, m_manager.code_value(item->code()));
+					}
 				}
 			}
 		}
 	}
+	std::sort(m_axis_memory.begin(), m_axis_memory.end());
 }
 
 
@@ -62,7 +68,7 @@ void switch_code_poller_base::reset()
 }
 
 
-bool switch_code_poller_base::code_pressed_once(input_code code)
+bool switch_code_poller_base::code_pressed_once(input_code code, bool moved)
 {
 	// look for the code in the memory
 	bool const pressed(m_manager.code_pressed(code));
@@ -78,7 +84,7 @@ bool switch_code_poller_base::code_pressed_once(input_code code)
 	}
 
 	// if we get here, we were not previously pressed; if still not pressed, return false
-	if (!pressed)
+	if (!pressed || !moved)
 		return false;
 
 	// otherwise, add the code to the memory and return true
@@ -96,31 +102,14 @@ axis_code_poller::axis_code_poller(input_manager &manager) noexcept :
 
 input_code axis_code_poller::poll()
 {
-	// iterate over device classes and devices, skipping disabled classes
-	for (input_device_class classno = DEVICE_CLASS_FIRST_VALID; DEVICE_CLASS_LAST_VALID >= classno; ++classno)
+	// iterate over the axis items we found
+	for (auto memory = m_axis_memory.begin(); m_axis_memory.end() != memory; ++memory)
 	{
-		input_class &devclass(m_manager.device_class(classno));
-		if (devclass.enabled())
+		input_code const code = memory->first->code();
+		if (memory->first->check_axis(code.item_modifier(), memory->second))
 		{
-			for (int devnum = 0; devclass.maxindex() >= devnum; ++devnum)
-			{
-				// fetch the device; ignore if nullptr
-				input_device *const device(devclass.device(devnum));
-				if (device)
-				{
-					// iterate over items within each device
-					for (input_item_id itemid = ITEM_ID_FIRST_VALID; device->maxitem() >= itemid; ++itemid)
-					{
-						input_device_item *const item(device->item(itemid));
-						if (item && (item->itemclass() != ITEM_CLASS_SWITCH))
-						{
-							input_code const code = item->code();
-							if (item->check_axis(code.item_modifier()))
-								return code;
-						}
-					}
-				}
-			}
+			m_axis_memory.erase(memory);
+			return code;
 		}
 	}
 
@@ -142,64 +131,73 @@ input_code switch_code_poller::poll()
 	for (input_device_class classno = DEVICE_CLASS_FIRST_VALID; DEVICE_CLASS_LAST_VALID >= classno; ++classno)
 	{
 		input_class &devclass(m_manager.device_class(classno));
-		if (devclass.enabled())
+		if (!devclass.enabled())
+			continue;
+
+		for (int devnum = 0; devclass.maxindex() >= devnum; ++devnum)
 		{
-			for (int devnum = 0; devclass.maxindex() >= devnum; ++devnum)
+			// fetch the device; ignore if nullptr
+			input_device *const device(devclass.device(devnum));
+			if (!device)
+				continue;
+
+			// iterate over items within each device
+			for (input_item_id itemid = ITEM_ID_FIRST_VALID; device->maxitem() >= itemid; ++itemid)
 			{
-				// fetch the device; ignore if nullptr
-				input_device *const device(devclass.device(devnum));
-				if (device)
+				input_device_item *const item(device->item(itemid));
+				if (!item)
+					continue;
+
+				input_code code = item->code();
+				if (item->itemclass() == ITEM_CLASS_SWITCH)
 				{
-					// iterate over items within each device
-					for (input_item_id itemid = ITEM_ID_FIRST_VALID; device->maxitem() >= itemid; ++itemid)
-					{
-						input_device_item *const item(device->item(itemid));
-						if (item)
-						{
-							input_code code = item->code();
-							if (item->itemclass() == ITEM_CLASS_SWITCH)
-							{
-								// item is natively a switch, poll it
-								if (code_pressed_once(code))
-									return code;
-							}
-							else if (item->check_axis(code.item_modifier()))
-							{
-								// poll axes digitally
-								code.set_item_class(ITEM_CLASS_SWITCH);
-								if ((classno == DEVICE_CLASS_JOYSTICK) && (code.item_id() == ITEM_ID_XAXIS))
-								{
-									// joystick X axis - check with left/right modifiers
-									code.set_item_modifier(ITEM_MODIFIER_LEFT);
-									if (code_pressed_once(code))
-										return code;
-									code.set_item_modifier(ITEM_MODIFIER_RIGHT);
-									if (code_pressed_once(code))
-										return code;
-								}
-								else if ((classno == DEVICE_CLASS_JOYSTICK) && (code.item_id() == ITEM_ID_YAXIS))
-								{
-									// if this is a joystick Y axis, check with up/down modifiers
-									code.set_item_modifier(ITEM_MODIFIER_UP);
-									if (code_pressed_once(code))
-										return code;
-									code.set_item_modifier(ITEM_MODIFIER_DOWN);
-									if (code_pressed_once(code))
-										return code;
-								}
-								else
-								{
-									// any other axis, check with pos/neg modifiers
-									code.set_item_modifier(ITEM_MODIFIER_POS);
-									if (code_pressed_once(code))
-										return code;
-									code.set_item_modifier(ITEM_MODIFIER_NEG);
-									if (code_pressed_once(code))
-										return code;
-								}
-							}
-						}
-					}
+					// item is natively a switch, poll it
+					if (code_pressed_once(code, true))
+						return code;
+					else
+						continue;
+				}
+
+				auto const memory(std::lower_bound(
+							m_axis_memory.begin(),
+							m_axis_memory.end(),
+							item,
+							[] (auto const &x, auto const &y) { return x.first < y; }));
+				if ((m_axis_memory.end() == memory) || (item != memory->first))
+					continue;
+
+				// poll axes digitally
+				bool const moved(item->check_axis(code.item_modifier(), memory->second));
+				code.set_item_class(ITEM_CLASS_SWITCH);
+				if ((classno == DEVICE_CLASS_JOYSTICK) && (code.item_id() == ITEM_ID_XAXIS))
+				{
+					// joystick X axis - check with left/right modifiers
+					code.set_item_modifier(ITEM_MODIFIER_LEFT);
+					if (code_pressed_once(code, moved))
+						return code;
+					code.set_item_modifier(ITEM_MODIFIER_RIGHT);
+					if (code_pressed_once(code, moved))
+						return code;
+				}
+				else if ((classno == DEVICE_CLASS_JOYSTICK) && (code.item_id() == ITEM_ID_YAXIS))
+				{
+					// if this is a joystick Y axis, check with up/down modifiers
+					code.set_item_modifier(ITEM_MODIFIER_UP);
+					if (code_pressed_once(code, moved))
+						return code;
+					code.set_item_modifier(ITEM_MODIFIER_DOWN);
+					if (code_pressed_once(code, moved))
+						return code;
+				}
+				else
+				{
+					// any other axis, check with pos/neg modifiers
+					code.set_item_modifier(ITEM_MODIFIER_POS);
+					if (code_pressed_once(code, moved))
+						return code;
+					code.set_item_modifier(ITEM_MODIFIER_NEG);
+					if (code_pressed_once(code, moved))
+						return code;
 				}
 			}
 		}
@@ -237,7 +235,7 @@ input_code keyboard_code_poller::poll()
 					if (item && (item->itemclass() == ITEM_CLASS_SWITCH))
 					{
 						input_code const code = item->code();
-						if (code_pressed_once(code))
+						if (code_pressed_once(code, true))
 							return code;
 					}
 				}

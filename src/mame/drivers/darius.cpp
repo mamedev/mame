@@ -136,9 +136,9 @@ sounds.
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "sound/2203intf.h"
 #include "sound/flt_vol.h"
 #include "sound/msm5205.h"
+#include "sound/ym2203.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -677,7 +677,7 @@ void darius_state::machine_reset()
 	m_adpcm_command = 0;
 	m_nmi_enable = 0;
 
-	machine().sound().system_enable(true);  /* mixer enabled */
+	machine().sound().system_mute(false);  /* mixer enabled */
 
 	for (auto & elem : m_vol)
 		elem = 0x00;    /* min volume */

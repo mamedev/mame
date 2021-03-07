@@ -477,9 +477,9 @@ void psx1_state::parallel_w(offs_t offset, uint16_t data)
 
 QUICKLOAD_LOAD_MEMBER(psx1_state::quickload_exe)
 {
-	m_exe_buffer.resize(quickload_size);
+	m_exe_buffer.resize(image.length());
 
-	if (image.fread(reinterpret_cast<void *>(&m_exe_buffer[0]), quickload_size) != quickload_size)
+	if (image.fread(reinterpret_cast<void *>(&m_exe_buffer[0]), image.length()) != image.length())
 	{
 		m_exe_buffer.resize(0);
 		return image_init_result::FAIL;

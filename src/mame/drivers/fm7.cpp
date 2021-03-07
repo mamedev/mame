@@ -45,8 +45,8 @@
 #include "cpu/z80/z80.h"
 
 #include "sound/ay8910.h"
-#include "sound/2203intf.h"
 #include "sound/beep.h"
+#include "sound/ym2203.h"
 
 #include "bus/centronics/dsjoy.h"
 
@@ -1914,8 +1914,8 @@ void fm7_state::fm7(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_mfm_floppy_formats);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("fm7_disk");
 
@@ -1964,8 +1964,8 @@ void fm7_state::fm8(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_mfm_floppy_formats);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(fm7_state::write_centronics_busy));
@@ -2024,8 +2024,8 @@ void fm77_state::fm77av(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(fm77_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(fm77_state::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_mfm_floppy_formats);
 
 	SOFTWARE_LIST(config, "av_flop_list").set_original("fm77av");
 	SOFTWARE_LIST(config, "flop_list").set_compatible("fm7_disk");
@@ -2083,8 +2083,8 @@ void fm11_state::fm11(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(fm11_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(fm11_state::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_mfm_floppy_formats);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(fm11_state::write_centronics_busy));
@@ -2130,8 +2130,8 @@ void fm7_state::fm16beta(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(fm7_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(fm7_state::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, fm7_floppies, "qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, fm7_floppies, "qd", floppy_image_device::default_mfm_floppy_formats);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(fm7_state::write_centronics_busy));

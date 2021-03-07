@@ -2,7 +2,7 @@
 // copyright-holders:Ryan Holtz
 /***************************************************************************
 
-	Sharp Scoop peripheral chip emulation skeleton
+    Sharp Scoop peripheral chip emulation skeleton
 
 ***************************************************************************/
 

@@ -39,7 +39,7 @@ DAC               -26.6860Mhz
 
 #include "cpu/m68000/m68000.h"
 #include "machine/taitoio.h"
-#include "sound/2610intf.h"
+#include "sound/ym2610.h"
 #include "speaker.h"
 
 
@@ -391,7 +391,7 @@ ROM_START( 2mindril )
 	ROM_LOAD16_BYTE( "d58-38.ic11", 0x00000, 0x40000, CRC(c58e8e4f) SHA1(648db679c3bfb5de1cd6c1b1217773a2fe56f11b) ) // Ver 2.93A 1994/02/16 09:45:00
 	ROM_LOAD16_BYTE( "d58-37.ic9",  0x00001, 0x40000, CRC(19e5cc3c) SHA1(04ac0eef893c579fe90d91d7fd55c5741a2b7460) )
 
-	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "d58-11.ic31", 0x000000, 0x200000,  CRC(dc26d58d) SHA1(cffb18667da18f5367b02af85a2f7674dd61ae97) )
 
 	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASE00 )

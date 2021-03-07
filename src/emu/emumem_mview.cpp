@@ -503,20 +503,13 @@ memory_view::memory_view_entry::memory_view_entry(const address_space_config &co
 	m_map = std::make_unique<address_map>(m_view);
 }
 
-template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_view_entry_specific<Level, Width, AddrShift, Endian>::populate_from_map(address_map *map)
+void memory_view::memory_view_entry::prepare_map_generic(address_map &map, bool allow_alloc)
 {
-	// no map specified, use the space-specific one
-	if (map == nullptr)
-		map = m_map.get();
-
 	memory_region *devregion = (m_view.m_space->spacenum() == 0) ? m_view.m_device.memregion(DEVICE_SELF) : nullptr;
 	u32 devregionsize = (devregion != nullptr) ? devregion->bytes() : 0;
 
-	// merge in the submaps
-	map->import_submaps(m_manager.machine(), m_view.m_device.owner() ? *m_view.m_device.owner() : m_view.m_device, data_width(), endianness(), addr_shift());
-
 	// make a pass over the address map, adjusting for the device and getting memory pointers
-	for (address_map_entry &entry : map->m_entrylist)
+	for (address_map_entry &entry : map.m_entrylist)
 	{
 		// computed adjusted addresses first
 		adjust_addresses(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror);
@@ -524,17 +517,19 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 		// if we have a share entry, add it to our map
 		if (entry.m_share != nullptr)
 		{
-			// if we can't find it, add it to our map
+			// if we can't find it, add it to our map if we're allowed to
 			std::string fulltag = entry.m_devbase.subtag(entry.m_share);
 			memory_share *share = m_manager.share_find(fulltag);
 			if (!share)
 			{
+				if (!allow_alloc)
+					fatalerror("Trying to create share '%s' too late\n", fulltag);
 				VPRINTF("Creating share '%s' of length 0x%X\n", fulltag, entry.m_addrend + 1 - entry.m_addrstart);
-				share = m_manager.share_alloc(m_view.m_device, fulltag, data_width(), address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), endianness());
+				share = m_manager.share_alloc(m_view.m_device, fulltag, m_config.data_width(), address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), endianness());
 			}
 			else
 			{
-				std::string result = share->compare(data_width(), address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), endianness());
+				std::string result = share->compare(m_config.data_width(), address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), endianness());
 				if (!result.empty())
 					fatalerror("%s\n", result);
 			}
@@ -561,14 +556,14 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 			// find the region
 			memory_region *region = m_manager.machine().root_device().memregion(fulltag);
 			if (region == nullptr)
-				fatalerror("device '%s' %s view memory map entry %X-%X references nonexistent region \"%s\"\n", m_view.m_device.tag(), m_view.m_name, entry.m_addrstart, entry.m_addrend, entry.m_region);
+				fatalerror("device '%s' %s space memory map entry %X-%X references nonexistent region \"%s\"\n", m_view.m_device.tag(), m_view.m_space->name(), entry.m_addrstart, entry.m_addrend, entry.m_region);
 
 			// validate the region
 			if (entry.m_rgnoffs + m_config.addr2byte(entry.m_addrend - entry.m_addrstart + 1) > region->bytes())
-				fatalerror("device '%s' %s view memory map entry %X-%X extends beyond region \"%s\" size (%X)\n", m_view.m_device.tag(), m_view.m_name, entry.m_addrstart, entry.m_addrend, entry.m_region, region->bytes());
+				fatalerror("device '%s' %s space memory map entry %X-%X extends beyond region \"%s\" size (%X)\n", m_view.m_device.tag(), m_view.m_space->name(), entry.m_addrstart, entry.m_addrend, entry.m_region, region->bytes());
 
 			if (entry.m_share != nullptr)
-				fatalerror("device '%s' %s view memory map entry %X-%X has both .region() and .share()\n", m_view.m_device.tag(), m_view.m_name, entry.m_addrstart, entry.m_addrend);
+				fatalerror("device '%s' %s space memory map entry %X-%X has both .region() and .share()\n", m_view.m_device.tag(), m_view.m_space->name(), entry.m_addrstart, entry.m_addrend);
 		}
 
 		// convert any region-relative entries to their memory pointers
@@ -583,11 +578,42 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 
 		// allocate anonymous ram when needed
 		if (!entry.m_memory && (entry.m_read.m_type == AMH_RAM || entry.m_write.m_type == AMH_RAM))
-			entry.m_memory = m_manager.anonymous_alloc(*m_view.m_space, address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), m_config.data_width(), entry.m_addrstart, entry.m_addrend, key());
+		{
+			if (!allow_alloc)
+				fatalerror("Trying to create memory in range %X-%X too late\n", entry.m_addrstart, entry.m_addrend);
+
+			entry.m_memory = m_manager.anonymous_alloc(*m_view.m_space, address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), m_config.data_width(), entry.m_addrstart, entry.m_addrend);
+		}
+	}
+}
+
+void memory_view::memory_view_entry::prepare_device_map(address_map &map)
+{
+	// Disable the test for now, some cleanup needed before
+	if(0) {
+		// device maps are not supposed to set global parameters
+		if (map.m_unmapval)
+			fatalerror("Device maps should not set the unmap value\n");
+
+		if (map.m_globalmask && map.m_globalmask != m_view.m_space->addrmask())
+			fatalerror("Device maps should not set the global mask\n");
 	}
 
+	prepare_map_generic(map, false);
+}
+
+
+template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_view_entry_specific<Level, Width, AddrShift, Endian>::populate_from_map(address_map *map)
+{
+	// no map specified, use the space-specific one
+	if (map == nullptr)
+		map = m_map.get();
+
+	prepare_map_generic(*map, true);
+
 	// Force the slot to exist, in case the map is empty
-	m_view.m_select_u(m_id);
+	r()->select_u(m_id);
+	w()->select_u(m_id);
 
 	// install the handlers, using the original, unadjusted memory map
 	for(const address_map_entry &entry : map->m_entrylist) {
@@ -608,13 +634,30 @@ std::string memory_view::memory_view_entry::key() const
 
 memory_view::memory_view(device_t &device, std::string name) : m_device(device), m_name(name), m_config(nullptr), m_addrstart(0), m_addrend(0), m_space(nullptr), m_handler_read(nullptr), m_handler_write(nullptr), m_cur_id(-1), m_cur_slot(-1)
 {
+	device.view_register(this);
+}
+
+memory_view::~memory_view()
+{
+	if (m_handler_read) {
+		m_handler_read->unref();
+		m_handler_write->unref();
+	}
+}
+
+void memory_view::register_state()
+{
+	m_device.machine().save().save_item(&m_device, "view", m_name.c_str(), 0, NAME(m_cur_slot));
+	m_device.machine().save().save_item(&m_device, "view", m_name.c_str(), 0, NAME(m_cur_id));
+	m_device.machine().save().register_postload(save_prepost_delegate(NAME([this]() { m_handler_read->select_a(m_cur_id); m_handler_write->select_a(m_cur_id); })));
 }
 
 void memory_view::disable()
 {
 	m_cur_slot = -1;
 	m_cur_id = -1;
-	m_select_a(-1);
+	m_handler_read->select_a(-1);
+	m_handler_write->select_a(-1);
 }
 
 void memory_view::select(int slot)
@@ -625,7 +668,8 @@ void memory_view::select(int slot)
 
 	m_cur_slot = slot;
 	m_cur_id = i->second;
-	m_select_a(m_cur_id);
+	m_handler_read->select_a(m_cur_id);
+	m_handler_write->select_a(m_cur_id);
 }
 
 int memory_view::id_to_slot(int id) const
@@ -647,78 +691,68 @@ void memory_view::initialize_from_address_map(offs_t addrstart, offs_t addrend, 
 }
 
 namespace {
-	template<int HighBits, int Width, int AddrShift, endianness_t Endian> void h_make_1(address_space &space, memory_view &view, handler_entry *&r, handler_entry *&w, std::function<void (int)> &sa, std::function<void (int)> &su) {
-		auto rx = new handler_entry_read_dispatch <HighBits, Width, AddrShift, Endian>(&space, view);
-		auto wx = new handler_entry_write_dispatch<HighBits, Width, AddrShift, Endian>(&space, view);
-		r = rx;
-		w = wx;
-
-		sa = [rx, wx](int s) { rx->select_a(s); wx->select_a(s); };
-		su = [rx, wx](int s) { rx->select_u(s); wx->select_u(s); };
-	}
-
-	template<int Width, int AddrShift, endianness_t Endian> void h_make_2(int HighBits, address_space &space, memory_view &view, handler_entry *&r, handler_entry *&w, std::function<void (int)> &sa, std::function<void (int)> &su) {
+	template<int Width, int AddrShift, endianness_t Endian> void h_make_1(int HighBits, address_space &space, memory_view &view, handler_entry *&r, handler_entry *&w) {
 		switch(HighBits) {
-		case  0: h_make_1<std::max(0, Width), Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case  1: h_make_1<std::max(1, Width), Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case  2: h_make_1<std::max(2, Width), Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case  3: h_make_1<std::max(3, Width), Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case  4: h_make_1< 4, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case  5: h_make_1< 5, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case  6: h_make_1< 6, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case  7: h_make_1< 7, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case  8: h_make_1< 8, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case  9: h_make_1< 9, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 10: h_make_1<10, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 11: h_make_1<11, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 12: h_make_1<12, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 13: h_make_1<13, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 14: h_make_1<14, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 15: h_make_1<15, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 16: h_make_1<16, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 17: h_make_1<17, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 18: h_make_1<18, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 19: h_make_1<19, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 20: h_make_1<20, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 21: h_make_1<21, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 22: h_make_1<22, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 23: h_make_1<23, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 24: h_make_1<24, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 25: h_make_1<25, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 26: h_make_1<26, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 27: h_make_1<27, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 28: h_make_1<28, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 29: h_make_1<29, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 30: h_make_1<20, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 31: h_make_1<31, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
-		case 32: h_make_1<32, Width, AddrShift, Endian>(space, view, r, w, sa, su); break;
+		case  0: r = new handler_entry_read_dispatch<std::max(0, Width), Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<std::max(0, Width), Width, AddrShift, Endian>(&space, view); break;
+		case  1: r = new handler_entry_read_dispatch<std::max(1, Width), Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<std::max(1, Width), Width, AddrShift, Endian>(&space, view); break;
+		case  2: r = new handler_entry_read_dispatch<std::max(2, Width), Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<std::max(2, Width), Width, AddrShift, Endian>(&space, view); break;
+		case  3: r = new handler_entry_read_dispatch<std::max(3, Width), Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<std::max(3, Width), Width, AddrShift, Endian>(&space, view); break;
+		case  4: r = new handler_entry_read_dispatch< 4, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch< 4, Width, AddrShift, Endian>(&space, view); break;
+		case  5: r = new handler_entry_read_dispatch< 5, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch< 5, Width, AddrShift, Endian>(&space, view); break;
+		case  6: r = new handler_entry_read_dispatch< 6, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch< 6, Width, AddrShift, Endian>(&space, view); break;
+		case  7: r = new handler_entry_read_dispatch< 7, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch< 7, Width, AddrShift, Endian>(&space, view); break;
+		case  8: r = new handler_entry_read_dispatch< 8, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch< 8, Width, AddrShift, Endian>(&space, view); break;
+		case  9: r = new handler_entry_read_dispatch< 9, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch< 9, Width, AddrShift, Endian>(&space, view); break;
+		case 10: r = new handler_entry_read_dispatch<10, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<10, Width, AddrShift, Endian>(&space, view); break;
+		case 11: r = new handler_entry_read_dispatch<11, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<11, Width, AddrShift, Endian>(&space, view); break;
+		case 12: r = new handler_entry_read_dispatch<12, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<12, Width, AddrShift, Endian>(&space, view); break;
+		case 13: r = new handler_entry_read_dispatch<13, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<13, Width, AddrShift, Endian>(&space, view); break;
+		case 14: r = new handler_entry_read_dispatch<14, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<14, Width, AddrShift, Endian>(&space, view); break;
+		case 15: r = new handler_entry_read_dispatch<15, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<15, Width, AddrShift, Endian>(&space, view); break;
+		case 16: r = new handler_entry_read_dispatch<16, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<16, Width, AddrShift, Endian>(&space, view); break;
+		case 17: r = new handler_entry_read_dispatch<17, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<17, Width, AddrShift, Endian>(&space, view); break;
+		case 18: r = new handler_entry_read_dispatch<18, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<18, Width, AddrShift, Endian>(&space, view); break;
+		case 19: r = new handler_entry_read_dispatch<19, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<19, Width, AddrShift, Endian>(&space, view); break;
+		case 20: r = new handler_entry_read_dispatch<20, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<20, Width, AddrShift, Endian>(&space, view); break;
+		case 21: r = new handler_entry_read_dispatch<21, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<21, Width, AddrShift, Endian>(&space, view); break;
+		case 22: r = new handler_entry_read_dispatch<22, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<22, Width, AddrShift, Endian>(&space, view); break;
+		case 23: r = new handler_entry_read_dispatch<23, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<23, Width, AddrShift, Endian>(&space, view); break;
+		case 24: r = new handler_entry_read_dispatch<24, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<24, Width, AddrShift, Endian>(&space, view); break;
+		case 25: r = new handler_entry_read_dispatch<25, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<25, Width, AddrShift, Endian>(&space, view); break;
+		case 26: r = new handler_entry_read_dispatch<26, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<26, Width, AddrShift, Endian>(&space, view); break;
+		case 27: r = new handler_entry_read_dispatch<27, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<27, Width, AddrShift, Endian>(&space, view); break;
+		case 28: r = new handler_entry_read_dispatch<28, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<28, Width, AddrShift, Endian>(&space, view); break;
+		case 29: r = new handler_entry_read_dispatch<29, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<29, Width, AddrShift, Endian>(&space, view); break;
+		case 30: r = new handler_entry_read_dispatch<30, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<30, Width, AddrShift, Endian>(&space, view); break;
+		case 31: r = new handler_entry_read_dispatch<31, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<31, Width, AddrShift, Endian>(&space, view); break;
+		case 32: r = new handler_entry_read_dispatch<32, Width, AddrShift, Endian>(&space, view); w = new handler_entry_write_dispatch<32, Width, AddrShift, Endian>(&space, view); break;
 		default: abort();
 		}
 	}
 
-	template<int Width, int AddrShift> void h_make_3(int HighBits, endianness_t Endian, address_space &space, memory_view &view, handler_entry *&r, handler_entry *&w, std::function<void (int)> &sa, std::function<void (int)> &su) {
+	template<int Width, int AddrShift> void h_make_2(int HighBits, endianness_t Endian, address_space &space, memory_view &view, handler_entry *&r, handler_entry *&w) {
 		switch(Endian) {
-		case ENDIANNESS_LITTLE: h_make_2<Width, AddrShift, ENDIANNESS_LITTLE>(HighBits, space, view, r, w, sa, su); break;
-		case ENDIANNESS_BIG:    h_make_2<Width, AddrShift, ENDIANNESS_BIG>   (HighBits, space, view, r, w, sa, su); break;
+		case ENDIANNESS_LITTLE: h_make_1<Width, AddrShift, ENDIANNESS_LITTLE>(HighBits, space, view, r, w); break;
+		case ENDIANNESS_BIG:    h_make_1<Width, AddrShift, ENDIANNESS_BIG>   (HighBits, space, view, r, w); break;
 		default: abort();
 		}
 	}
 
-	void h_make(int HighBits, int Width, int AddrShift, endianness_t Endian, address_space &space, memory_view &view, handler_entry *&r, handler_entry *&w, std::function<void (int)> &sa, std::function<void (int)> &su) {
+	void h_make(int HighBits, int Width, int AddrShift, endianness_t Endian, address_space &space, memory_view &view, handler_entry *&r, handler_entry *&w) {
 		switch (Width | (AddrShift + 4)) {
-		case  8|(4+1): h_make_3<0,  1>(HighBits, Endian, space, view, r, w, sa, su); break;
-		case  8|(4-0): h_make_3<0,  0>(HighBits, Endian, space, view, r, w, sa, su); break;
-		case 16|(4+3): h_make_3<1,  3>(HighBits, Endian, space, view, r, w, sa, su); break;
-		case 16|(4-0): h_make_3<1,  0>(HighBits, Endian, space, view, r, w, sa, su); break;
-		case 16|(4-1): h_make_3<1, -1>(HighBits, Endian, space, view, r, w, sa, su); break;
-		case 32|(4+3): h_make_3<2,  3>(HighBits, Endian, space, view, r, w, sa, su); break;
-		case 32|(4-0): h_make_3<2,  0>(HighBits, Endian, space, view, r, w, sa, su); break;
-		case 32|(4-1): h_make_3<2, -1>(HighBits, Endian, space, view, r, w, sa, su); break;
-		case 32|(4-2): h_make_3<2, -2>(HighBits, Endian, space, view, r, w, sa, su); break;
-		case 64|(4-0): h_make_3<3,  0>(HighBits, Endian, space, view, r, w, sa, su); break;
-		case 64|(4-1): h_make_3<3, -1>(HighBits, Endian, space, view, r, w, sa, su); break;
-		case 64|(4-2): h_make_3<3, -2>(HighBits, Endian, space, view, r, w, sa, su); break;
-		case 64|(4-3): h_make_3<3, -3>(HighBits, Endian, space, view, r, w, sa, su); break;
+		case  8|(4+1): h_make_2<0,  1>(HighBits, Endian, space, view, r, w); break;
+		case  8|(4-0): h_make_2<0,  0>(HighBits, Endian, space, view, r, w); break;
+		case 16|(4+3): h_make_2<1,  3>(HighBits, Endian, space, view, r, w); break;
+		case 16|(4-0): h_make_2<1,  0>(HighBits, Endian, space, view, r, w); break;
+		case 16|(4-1): h_make_2<1, -1>(HighBits, Endian, space, view, r, w); break;
+		case 32|(4+3): h_make_2<2,  3>(HighBits, Endian, space, view, r, w); break;
+		case 32|(4-0): h_make_2<2,  0>(HighBits, Endian, space, view, r, w); break;
+		case 32|(4-1): h_make_2<2, -1>(HighBits, Endian, space, view, r, w); break;
+		case 32|(4-2): h_make_2<2, -2>(HighBits, Endian, space, view, r, w); break;
+		case 64|(4-0): h_make_2<3,  0>(HighBits, Endian, space, view, r, w); break;
+		case 64|(4-1): h_make_2<3, -1>(HighBits, Endian, space, view, r, w); break;
+		case 64|(4-2): h_make_2<3, -2>(HighBits, Endian, space, view, r, w); break;
+		case 64|(4-3): h_make_2<3, -3>(HighBits, Endian, space, view, r, w); break;
 		default: abort();
 		}
 	}
@@ -742,14 +776,11 @@ std::pair<handler_entry *, handler_entry *> memory_view::make_handlers(address_s
 		m_space = &space;
 
 		offs_t span = addrstart ^ addrend;
-		u32 awidth = 0;
-		if (span) {
-			for(awidth = 1; awidth != 32; awidth++)
-				if ((1 << awidth) >= span)
-					break;
-		}
+		u32 awidth = 32 - count_leading_zeros(span);
 
-		h_make(awidth, m_config->data_width(), m_config->addr_shift(), m_config->endianness(), space, *this, m_handler_read, m_handler_write, m_select_a, m_select_u);
+		h_make(awidth, m_config->data_width(), m_config->addr_shift(), m_config->endianness(), space, *this, m_handler_read, m_handler_write);
+		m_handler_read->ref();
+		m_handler_write->ref();
 	}
 
 	return std::make_pair(m_handler_read, m_handler_write);
@@ -794,7 +825,8 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 	offs_t nstart, nend, nmask, nmirror;
 	check_range_optimize_mirror("install_ram_generic", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
-	m_view.m_select_u(m_id);
+	r()->select_u(m_id);
+	w()->select_u(m_id);
 
 	// map for read
 	if (readorwrite == read_or_write::READ || readorwrite == read_or_write::READWRITE)
@@ -826,7 +858,8 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 	offs_t nstart, nend, nmask, nmirror;
 	check_range_optimize_mirror("unmap_generic", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
-	m_view.m_select_u(m_id);
+	r()->select_u(m_id);
+	w()->select_u(m_id);
 
 	// read space
 	if (readorwrite == read_or_write::READ || readorwrite == read_or_write::READWRITE) {
@@ -850,7 +883,8 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 	offs_t nstart, nend, nmask, nmirror;
 	check_range_optimize_mirror("install_view", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
-	m_view.m_select_u(m_id);
+	r()->select_u(m_id);
+	w()->select_u(m_id);
 
 	auto handlers = view.make_handlers(*m_view.m_space, addrstart, addrend);
 	r()->populate(nstart, nend, nmirror, static_cast<handler_entry_read <Width, AddrShift, Endian> *>(handlers.first));
@@ -865,7 +899,8 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passth
 	if (!mph)
 		mph = m_view.m_space->make_mph();
 
-	m_view.m_select_u(m_id);
+	r()->select_u(m_id);
+	w()->select_u(m_id);
 
 	auto handler = new handler_entry_read_tap<Width, AddrShift, Endian>(m_view.m_space, *mph, name, tap);
 	r()->populate_passthrough(nstart, nend, nmirror, handler);
@@ -883,7 +918,8 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passth
 	if (!mph)
 		mph = m_view.m_space->make_mph();
 
-	m_view.m_select_u(m_id);
+	r()->select_u(m_id);
+	w()->select_u(m_id);
 
 	auto handler = new handler_entry_write_tap<Width, AddrShift, Endian>(m_view.m_space, *mph, name, tap);
 	w()->populate_passthrough(nstart, nend, nmirror, handler);
@@ -901,7 +937,8 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> memory_passth
 	if (!mph)
 		mph = m_view.m_space->make_mph();
 
-	m_view.m_select_u(m_id);
+	r()->select_u(m_id);
+	w()->select_u(m_id);
 
 	auto rhandler = new handler_entry_read_tap <Width, AddrShift, Endian>(m_view.m_space, *mph, name, tapr);
 	r() ->populate_passthrough(nstart, nend, nmirror, rhandler);
@@ -921,6 +958,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 	check_range_address("install_device_delegate", addrstart, addrend);
 	address_map map(*m_view.m_space, addrstart, addrend, unitmask, cswidth, m_view.m_device, delegate);
 	map.import_submaps(m_manager.machine(), device, data_width(), endianness(), addr_shift());
+	prepare_device_map(map);
 	populate_from_map(&map);
 }
 
@@ -934,13 +972,14 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 	offs_t nstart, nend, nmask, nmirror;
 	check_range_optimize_mirror("install_readwrite_port", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
-	m_view.m_select_u(m_id);
+	r()->select_u(m_id);
+	w()->select_u(m_id);
 
 	// read handler
 	if (rtag != "")
 	{
 		// find the port
-		ioport_port *port = m_view.m_device.owner()->ioport(rtag);
+		ioport_port *port = m_view.m_device.ioport(rtag);
 		if (port == nullptr)
 			throw emu_fatalerror("Attempted to map non-existent port '%s' for read in space %s of device '%s'\n", rtag, m_view.m_name, m_view.m_device.tag());
 
@@ -952,7 +991,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 	if (wtag != "")
 	{
 		// find the port
-		ioport_port *port = m_view.m_device.owner()->ioport(wtag);
+		ioport_port *port = m_view.m_device.ioport(wtag);
 		if (port == nullptr)
 			fatalerror("Attempted to map non-existent port '%s' for write in space %s of device '%s'\n", wtag, m_view.m_name, m_view.m_device.tag());
 
@@ -973,7 +1012,8 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 	offs_t nstart, nend, nmask, nmirror;
 	check_range_optimize_mirror("install_bank_generic", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
-	m_view.m_select_u(m_id);
+	r()->select_u(m_id);
+	w()->select_u(m_id);
 
 	// map the read bank
 	if (rbank != nullptr)

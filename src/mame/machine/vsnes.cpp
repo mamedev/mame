@@ -911,6 +911,8 @@ void vsnes_state::init_supxevs()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5678, 0x5678, read8smo_delegate(*this, FUNC(vsnes_state::supxevs_read_prot_2_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x578f, 0x578f, read8smo_delegate(*this, FUNC(vsnes_state::supxevs_read_prot_3_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5567, 0x5567, read8smo_delegate(*this, FUNC(vsnes_state::supxevs_read_prot_4_r)));
+
+	m_supxevs_prot_index = 0;
 }
 
 /* Vs. TKO Boxing */

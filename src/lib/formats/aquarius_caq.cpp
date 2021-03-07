@@ -52,19 +52,17 @@ static cassette_image::error aquarius_caq_load(cassette_image *cassette)
 {
 	cassette_image::error err;
 	uint64_t image_size = cassette->image_size();
-	uint64_t image_pos = 0;
 	double time_index = 0.0;
 	double time_displacement;
-	uint8_t data;
 
 	/* silence */
 	err = cassette->put_sample(0, time_index, 0.5, 0);
 	if (err != cassette_image::error::SUCCESS) return err;
 	time_index += 0.5;
 
-	while (image_pos < image_size)
+	for (uint64_t image_pos = 0; image_pos < image_size; image_pos++)
 	{
-		cassette->image_read(&data, image_pos, 1);
+		uint8_t data = cassette->image_read_byte(image_pos);
 
 		/* start bit */
 		MODULATE(0);
@@ -78,8 +76,6 @@ static cassette_image::error aquarius_caq_load(cassette_image *cassette)
 		/* stop bits */
 		MODULATE(1);
 		MODULATE(1);
-
-		image_pos++;
 	}
 
 	/* silence */

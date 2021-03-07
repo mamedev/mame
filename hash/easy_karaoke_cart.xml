@@ -15,7 +15,7 @@ license:CC0
 			</dataarea>
 			<dataarea name="mcu" size="0x2000">
 				<rom name="IC89LV52A-24PQ.U1" size="0x2000" status="nodump" />
-			</dataarea>						
+			</dataarea>
 		</part>
 	</software>
 
@@ -29,7 +29,7 @@ license:CC0
 			</dataarea>
 			<dataarea name="mcu" size="0x2000">
 				<rom name="IC89LV52A-24PQ.U1" size="0x2000" status="nodump" />
-			</dataarea>						
+			</dataarea>
 		</part>
 	</software>
 

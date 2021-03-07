@@ -6,6 +6,11 @@
 
     Apple II Super Serial Card
 
+    The Apricorn Super Serial Imager has separate "Modem" and
+    "Printer" pin headers, which carry different arrangements of the
+    same RS232 signals. Its GPI mode also features Videx VideoTerm
+    support when that card is installed in slot 3.
+
 *********************************************************************/
 
 #include "emu.h"
@@ -22,19 +27,21 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(A2BUS_SSC, a2bus_ssc_device, "a2ssc", "Apple Super Serial Card")
-
-#define SSC_ROM_REGION  "ssc_rom"
-#define SSC_ACIA_TAG    "ssc_acia"
-#define SSC_RS232_TAG   "ssc_rs232"
+DEFINE_DEVICE_TYPE(APRICORN_SSI, apricorn_ssi_device, "aprissi", "Apricorn Super Serial Imager")
 
 ROM_START( ssc )
-	ROM_REGION(0x000800, SSC_ROM_REGION, 0)
+	ROM_REGION(0x800, "program", 0)
 	ROM_LOAD( "341-0065-a.bin", 0x000000, 0x000800, CRC(b7539d4c) SHA1(6dab633470c6bc4cb3e81d09fda46597caf8ee57) )
+ROM_END
+
+ROM_START( ssi )
+	ROM_REGION(0x2000, "program", 0) // "SSI Version 1.1"
+	ROM_LOAD( "apricorn super serial imager - rom.bin", 0x0000, 0x2000, CRC(d251f7f1) SHA1(19f2bc1e60c3fd5e179c4a38f7ca4e3221553562) )
 ROM_END
 
 static INPUT_PORTS_START( ssc )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0xf0, 0xf0, "Baud rate" )
+	PORT_DIPNAME( 0xf0, 0xe0, "Baud Rate" ) PORT_DIPLOCATION("SW1:4,3,2,1")
 	PORT_DIPSETTING(    0x00, "Undefined/115200" )
 	PORT_DIPSETTING(    0x10, "50" )
 	PORT_DIPSETTING(    0x20, "75" )
@@ -51,36 +58,141 @@ static INPUT_PORTS_START( ssc )
 	PORT_DIPSETTING(    0xd0, "7200" )
 	PORT_DIPSETTING(    0xe0, "9600" )
 	PORT_DIPSETTING(    0xf0, "19200" )
-
-	PORT_DIPNAME( 0x0c, 0x00, "Mode" )
+	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x03, 0x00, "Mode" ) PORT_DIPLOCATION("SW1:6,5")
 	PORT_DIPSETTING(    0x00, "Communications Mode" )
-	PORT_DIPSETTING(    0x04, "SIC P8 Emulation Mode" )
-	PORT_DIPSETTING(    0x08, "Printer Mode" )
-	PORT_DIPSETTING(    0x0c, "SIC P8A Emulation Mode" )
-
-	PORT_DIPNAME( 0x01, 0x00, "Clear To Send" )
-	PORT_DIPSETTING(    0x00, "Normal Clear To Send" )
-	PORT_DIPSETTING(    0x01, "Secondary Clear To Send" )
+	PORT_DIPSETTING(    0x01, "SIC P8 Emulation Mode" )
+	PORT_DIPSETTING(    0x02, "Printer Mode" )
+	PORT_DIPSETTING(    0x03, "SIC P8A Emulation Mode" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0xc0, 0x00, "Format" )
-	PORT_DIPSETTING(    0x00, "8 data, 1 stop")
-	PORT_DIPSETTING(    0x40, "7 data, 1 stop")
-	PORT_DIPSETTING(    0x80, "8 data, 2 stop")
-	PORT_DIPSETTING(    0xc0, "7 data, 2 stop")
-
-	PORT_DIPNAME( 0x30, 0x00, "Parity" )
-	PORT_DIPSETTING(    0x00, "None")
-	PORT_DIPSETTING(    0x10, "Odd")
-	PORT_DIPSETTING(    0x30, "Even")
-
-	PORT_DIPNAME( 0x08, 0x08, "End of Line" )
+	PORT_DIPNAME( 0x80, 0x00, "Stop Bits" ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x00, "1")
+	PORT_DIPSETTING(    0x80, "2")
+	PORT_DIPNAME( 0x20, 0x00, "Data Bits" ) PORT_DIPLOCATION("SW2:2") PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x02)
+	PORT_DIPSETTING(    0x20, "7")
+	PORT_DIPSETTING(    0x00, "8")
+	PORT_DIPNAME( 0x20, 0x00, "Delay After CR" ) PORT_DIPLOCATION("SW2:2") PORT_CONDITION("DSW1", 0x03, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x20, DEF_STR(None))
+	PORT_DIPSETTING(    0x00, "1/4 sec")
+	PORT_BIT( 0x50, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0c, 0x00, "Parity" ) PORT_DIPLOCATION("SW2:4,3") PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, DEF_STR(None))
+	PORT_DIPSETTING(    0x08, "None (2)")
+	PORT_DIPSETTING(    0x04, "Odd")
+	PORT_DIPSETTING(    0x0c, "Even")
+	PORT_DIPNAME( 0x0c, 0x00, "Line Width" ) PORT_DIPLOCATION("SW2:4,3") PORT_CONDITION("DSW1", 0x03, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, "40 Characters")
+	PORT_DIPSETTING(    0x04, "72 Characters")
+	PORT_DIPSETTING(    0x08, "80 Characters")
+	PORT_DIPSETTING(    0x0c, "132 Characters")
+	PORT_DIPNAME( 0x02, 0x02, "End of Line" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, "Add LF after CR")
-	PORT_DIPSETTING(    0x08, "Don't add LF after CR")
+	PORT_DIPSETTING(    0x02, "Don't add LF after CR")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rs232", rs232_port_device, cts_r)
 
-	PORT_DIPNAME( 0x04, 0x04, "Interrupts" )
-	PORT_DIPSETTING(    0x00, "On")
-	PORT_DIPSETTING(    0x04, "Off")
+	PORT_START("DSWX") // Non-memory-mapped DIP switches
+	PORT_DIPNAME( 0x04, 0x04, "Interrupts" ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x04, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x02, 0x00, "DCD Connected" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x01, 0x01, "Secondary CTS Connected" ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x01, DEF_STR(Off))
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ssi )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x100, 0x100, "Emulation Mode" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(     0x100, "Off (GPI)" )
+	PORT_DIPSETTING(     0x000, "On (SSC)" )
+	PORT_DIPNAME( 0xf0, 0xe0, "Baud Rate" ) PORT_DIPLOCATION("SW1:4,3,2,1")
+	PORT_DIPSETTING(    0x00, "Undefined" )
+	PORT_DIPSETTING(    0x10, "50" )
+	PORT_DIPSETTING(    0x20, "75" )
+	PORT_DIPSETTING(    0x30, "110" )
+	PORT_DIPSETTING(    0x40, "135" )
+	PORT_DIPSETTING(    0x50, "150" )
+	PORT_DIPSETTING(    0x60, "300" )
+	PORT_DIPSETTING(    0x70, "600" )
+	PORT_DIPSETTING(    0x80, "1200" )
+	PORT_DIPSETTING(    0x90, "1800" )
+	PORT_DIPSETTING(    0xa0, "2400" )
+	PORT_DIPSETTING(    0xb0, "3600" )
+	PORT_DIPSETTING(    0xc0, "4800" )
+	PORT_DIPSETTING(    0xd0, "7200" )
+	PORT_DIPSETTING(    0xe0, "9600" )
+	PORT_DIPSETTING(    0xf0, "19200" )
+	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x03, 0x02, "SSC Mode" ) PORT_DIPLOCATION("SW1:6,5") PORT_CONDITION("DSW1", 0x100, EQUALS, 0x000)
+	PORT_DIPSETTING(    0x00, "Communications" )
+	PORT_DIPSETTING(    0x02, "Printer" )
+	PORT_DIPNAME( 0x02, 0x02, "XON/XOFF Handshaking" ) PORT_DIPLOCATION("SW1:5") PORT_CONDITION("DSW1", 0x100, EQUALS, 0x100)
+	PORT_DIPSETTING(    0x02, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x01, 0x00, "LF After CR" ) PORT_DIPLOCATION("SW1:6") PORT_CONDITION("DSW1", 0x100, EQUALS, 0x100)
+	PORT_DIPSETTING(    0x01, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x80, 0x80, "Stop Bits" ) PORT_DIPLOCATION("SW2:1") PORT_CONDITION("DSW1", 0x100, EQUALS, 0x000)
+	PORT_DIPSETTING(    0x00, "1")
+	PORT_DIPSETTING(    0x80, "2")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Unused)) PORT_DIPLOCATION("SW2:7") PORT_CONDITION("DSW1", 0x100, EQUALS, 0x000)
+	PORT_DIPSETTING(    0x40, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x20, 0x00, "Data Bits" ) PORT_DIPLOCATION("SW2:2") PORT_CONDITION("DSW1", 0x103, EQUALS, 0x000)
+	PORT_DIPSETTING(    0x20, "7")
+	PORT_DIPSETTING(    0x00, "8")
+	PORT_DIPNAME( 0x20, 0x00, "CR Delay" ) PORT_DIPLOCATION("SW2:2") PORT_CONDITION("DSW1", 0x103, EQUALS, 0x002)
+	PORT_DIPSETTING(    0x20, DEF_STR(None))
+	PORT_DIPSETTING(    0x00, "32 ms")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR(Unused)) PORT_DIPLOCATION("SW2:8") PORT_CONDITION("DSW1", 0x100, EQUALS, 0x000)
+	PORT_DIPSETTING(    0x10, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x0c, 0x08, "Parity" ) PORT_DIPLOCATION("SW2:4,3") PORT_CONDITION("DSW1", 0x103, EQUALS, 0x000)
+	PORT_DIPSETTING(    0x00, DEF_STR(None))
+	PORT_DIPSETTING(    0x08, "None (2)")
+	PORT_DIPSETTING(    0x04, "Odd")
+	PORT_DIPSETTING(    0x0c, "Even")
+	PORT_DIPNAME( 0x0c, 0x00, "Line Width" ) PORT_DIPLOCATION("SW2:4,3") PORT_CONDITION("DSW1", 0x103, EQUALS, 0x002)
+	PORT_DIPSETTING(    0x00, "40 Characters (Echo On)")
+	PORT_DIPSETTING(    0x04, "72 Characters (Echo Off)")
+	PORT_DIPSETTING(    0x08, "80 Characters (Echo Off)")
+	PORT_DIPSETTING(    0x0c, "132 Characters (Echo Off)")
+	PORT_DIPNAME( 0x02, 0x00, "LF After CR" ) PORT_DIPLOCATION("SW2:5") PORT_CONDITION("DSW1", 0x100, EQUALS, 0x000)
+	PORT_DIPSETTING(    0x02, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0xa8, 0x88, "Printer Type" ) PORT_DIPLOCATION("SW2:3,2,1") PORT_CONDITION("DSW1", 0x100, EQUALS, 0x100)
+	PORT_DIPSETTING(    0x08, "ImageWriter" )
+	PORT_DIPSETTING(    0x88, "Epson" )
+	PORT_DIPSETTING(    0x80, "Star Micronics" )
+	PORT_DIPSETTING(    0x20, "Okidata" )
+	PORT_DIPSETTING(    0x00, "C. Itoh" )
+	PORT_DIPSETTING(    0x28, "Unknown (1)" )
+	PORT_DIPSETTING(    0xa0, "Unknown (2)" )
+	PORT_DIPSETTING(    0xa8, "Unknown (3)" )
+	PORT_DIPNAME( 0x40, 0x40, "Video Echo" ) PORT_DIPLOCATION("SW2:7") PORT_CONDITION("DSW1", 0x100, EQUALS, 0x100)
+	PORT_DIPSETTING(    0x40, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x10, 0x10, "Transparent Mode" ) PORT_DIPLOCATION("SW2:8") PORT_CONDITION("DSW1", 0x100, EQUALS, 0x100)
+	PORT_DIPSETTING(    0x10, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR(Unused)) PORT_DIPLOCATION("SW2:4") PORT_CONDITION("DSW1", 0x100, EQUALS, 0x100)
+	PORT_DIPSETTING(    0x04, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x02, 0x00, "MSB Output" ) PORT_DIPLOCATION("SW2:5") PORT_CONDITION("DSW1", 0x100, EQUALS, 0x100)
+	PORT_DIPSETTING(    0x02, "Clear 8th Bit" )
+	PORT_DIPSETTING(    0x00, "Pass 8th Bit" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rs232", rs232_port_device, cts_r) // TBD: implemented on SSI or not?
+
+	PORT_START("DSWX")
+	PORT_DIPNAME( 0x04, 0x04, "Interrupts" ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x04, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x02, 0x00, "DCD Connected" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 //-------------------------------------------------
@@ -92,6 +204,11 @@ ioport_constructor a2bus_ssc_device::device_input_ports() const
 	return INPUT_PORTS_NAME( ssc );
 }
 
+ioport_constructor apricorn_ssi_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( ssi );
+}
+
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
@@ -101,9 +218,11 @@ void a2bus_ssc_device::device_add_mconfig(machine_config &config)
 	MOS6551(config, m_acia, 0);
 	m_acia->set_xtal(1.8432_MHz_XTAL);
 	m_acia->irq_handler().set(FUNC(a2bus_ssc_device::acia_irq_w));
-	m_acia->txd_handler().set(SSC_RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_acia->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
-	rs232_port_device &rs232(RS232_PORT(config, SSC_RS232_TAG, default_rs232_devices, nullptr));
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
 	rs232.dcd_handler().set(m_acia, FUNC(mos6551_device::write_dcd));
 	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
@@ -117,6 +236,11 @@ void a2bus_ssc_device::device_add_mconfig(machine_config &config)
 const tiny_rom_entry *a2bus_ssc_device::device_rom_region() const
 {
 	return ROM_NAME( ssc );
+}
+
+const tiny_rom_entry *apricorn_ssi_device::device_rom_region() const
+{
+	return ROM_NAME( ssi );
 }
 
 //**************************************************************************
@@ -133,8 +257,15 @@ a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, device_type ty
 		device_a2bus_card_interface(mconfig, *this),
 		m_dsw1(*this, "DSW1"),
 		m_dsw2(*this, "DSW2"),
-		m_acia(*this, SSC_ACIA_TAG), m_rom(nullptr),
-		m_started(false)
+		m_dswx(*this, "DSWX"),
+		m_acia(*this, "acia"),
+		m_rom(*this, "program")
+{
+}
+
+apricorn_ssi_device::apricorn_ssi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+		a2bus_ssc_device(mconfig, APRICORN_SSI, tag, owner, clock),
+		m_alt_bank(false)
 {
 }
 
@@ -144,12 +275,15 @@ a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, device_type ty
 
 void a2bus_ssc_device::device_start()
 {
-	m_rom = machine().root_device().memregion(this->subtag(SSC_ROM_REGION).c_str())->base();
+}
+
+void apricorn_ssi_device::device_start()
+{
+	save_item(NAME(m_alt_bank));
 }
 
 void a2bus_ssc_device::device_reset()
 {
-	m_started = true;
 }
 
 /*-------------------------------------------------
@@ -161,12 +295,34 @@ uint8_t a2bus_ssc_device::read_cnxx(uint8_t offset)
 	return m_rom[(offset&0xff)+0x700];
 }
 
+uint8_t apricorn_ssi_device::read_cnxx(uint8_t offset)
+{
+	if (!machine().side_effects_disabled())
+		m_alt_bank = false;
+	return m_rom[offset | (BIT(m_dsw1->read(), 8) ? 0x1700 : 0x0700)];
+}
+
+void apricorn_ssi_device::write_cnxx(uint8_t offset, uint8_t data)
+{
+	// TBD: behavior guessed
+	m_alt_bank = false;
+}
+
 /*-------------------------------------------------
     read_c800 - called for reads from this card's c800 space
 -------------------------------------------------*/
 
 uint8_t a2bus_ssc_device::read_c800(uint16_t offset)
 {
+	return m_rom[offset];
+}
+
+uint8_t apricorn_ssi_device::read_c800(uint16_t offset)
+{
+	if (BIT(m_dsw1->read(), 8))
+		offset |= 0x1000;
+	if (m_alt_bank)
+		offset |= 0x800;
 	return m_rom[offset];
 }
 
@@ -178,22 +334,17 @@ uint8_t a2bus_ssc_device::read_c0nx(uint8_t offset)
 {
 	// dips at C0n1/C0n2, ACIA at C0n8/9/A/B
 
-	switch (offset)
+	if (BIT(offset, 3))
+		return m_acia->read(offset & 3);
+	else
 	{
-		case 1:
-			return m_dsw1->read();
-		case 2:
-			return m_dsw2->read();
-
-		case 8:
-		case 9:
-		case 0xa:
-		case 0xb:
-			return m_acia->read(offset-8);
-
+		uint8_t buffer = 0xff;
+		if (!BIT(offset, 1))
+			buffer &= m_dsw1->read();
+		if (!BIT(offset, 0))
+			buffer &= m_dsw2->read();
+		return buffer;
 	}
-
-	return 0;
 }
 
 /*-------------------------------------------------
@@ -202,22 +353,23 @@ uint8_t a2bus_ssc_device::read_c0nx(uint8_t offset)
 
 void a2bus_ssc_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-	switch (offset)
-	{
-		case 8:
-		case 9:
-		case 0xa:
-		case 0xb:
-			m_acia->write(offset-8, data);
-			break;
-	}
+	if (BIT(offset, 3))
+		m_acia->write(offset & 3, data);
+}
+
+void apricorn_ssi_device::write_c0nx(uint8_t offset, uint8_t data)
+{
+	if (BIT(offset, 3))
+		m_acia->write(offset & 3, data);
+	else
+		m_alt_bank = true;
 }
 
 WRITE_LINE_MEMBER( a2bus_ssc_device::acia_irq_w )
 {
-	if (m_started)
+	if (machine().ioport().safe_to_read())
 	{
-		if (!(m_dsw2->read() & 4))
+		if (!(m_dswx->read() & 4))
 		{
 			if (state)
 			{

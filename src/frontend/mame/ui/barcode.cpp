@@ -74,8 +74,8 @@ void menu_barcode_reader::populate(float &customtop, float &custombottom)
 		item_append(_("New Barcode:"), new_barcode, 0, ITEMREF_NEW_BARCODE);
 
 		// finish up the menu
-		item_append(menu_item_type::SEPARATOR);
 		item_append(_("Enter Code"), 0, ITEMREF_ENTER_BARCODE);
+		item_append(menu_item_type::SEPARATOR);
 
 		customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
 	}
@@ -88,9 +88,6 @@ void menu_barcode_reader::populate(float &customtop, float &custombottom)
 
 void menu_barcode_reader::handle()
 {
-	// rebuild the menu (so to update the selected device, if the user has pressed L or R)
-	repopulate(reset_options::REMEMBER_POSITION);
-
 	// process the menu
 	const event *event = process(PROCESS_LR_REPEAT);
 
@@ -127,17 +124,20 @@ void menu_barcode_reader::handle()
 			}
 			break;
 
+		case IPT_UI_CLEAR:
+			if (get_selection_ref() == ITEMREF_NEW_BARCODE)
+			{
+				m_barcode_buffer.clear();
+				reset(reset_options::REMEMBER_POSITION);
+			}
+			break;
+
 		case IPT_SPECIAL:
 			if (get_selection_ref() == ITEMREF_NEW_BARCODE)
 			{
 				if (input_character(m_barcode_buffer, event->unichar, uchar_is_digit))
 					reset(reset_options::REMEMBER_POSITION);
 			}
-			break;
-
-		case IPT_UI_CANCEL:
-			// reset the char buffer also in this case
-			m_barcode_buffer.clear();
 			break;
 		}
 	}

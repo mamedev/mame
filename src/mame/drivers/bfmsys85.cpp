@@ -259,7 +259,7 @@ void bfmsys85_state::vfd_w(uint8_t data)
 
 	m_vfd->por(data & 0x20);//inverted?
 	m_vfd->sclk(data & 0x80);
-	m_vfd->data(data&0x40);
+	m_vfd->data(!(data & 0x40));
 }
 
 //////////////////////////////////////////////////////////////////////////////////

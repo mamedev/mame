@@ -85,7 +85,7 @@ private:
 	{
 	public:
 		item_proxy() = default;
-		void resolve(device_t &device, std::string const &name);
+		void resolve(device_t &device, std::string_view name);
 		operator s32() const { return m_item->get(); }
 		s32 operator=(s32 value) { m_item->set(value); return m_item->get(); }
 	private:
@@ -169,13 +169,16 @@ public:
 	running_machine &machine() const { return m_machine; }
 
 	// set the value for a given output
-	void set_value(const char *outname, s32 value);
+	void set_value(std::string_view outname, s32 value);
 
 	// return the current value for a given output
-	s32 get_value(const char *outname);
+	s32 get_value(std::string_view outname);
 
-	// set a notifier on a particular output, or globally if nullptr
-	void set_notifier(const char *outname, notifier_func callback, void *param);
+	// set a notifier on a particular output
+	void set_notifier(std::string_view outname, notifier_func callback, void *param);
+
+	// set a notifier globally
+	void set_global_notifier(notifier_func callback, void *param);
 
 	// immdediately call a notifier for all outputs
 	template <typename T> void notify_all(T &&notifier) const
@@ -185,15 +188,15 @@ public:
 	}
 
 	// map a name to a unique ID
-	u32 name_to_id(const char *outname);
+	u32 name_to_id(std::string_view outname);
 
 	// map a unique ID back to a name
 	const char *id_to_name(u32 id);
 
 private:
-	output_item *find_item(const char *string);
-	output_item &create_new_item(const char *outname, s32 value);
-	output_item &find_or_create_item(const char *outname, s32 value);
+	output_item *find_item(std::string_view string);
+	output_item &create_new_item(std::string_view outname, s32 value);
+	output_item &find_or_create_item(std::string_view outname, s32 value);
 
 	// event handlers
 	void pause();

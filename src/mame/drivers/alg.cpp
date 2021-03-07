@@ -14,7 +14,7 @@
         Mad Dog II: The Lost Gold [4 versions]
         Space Pirates [2 versions]
         Gallagher's Gallery [2 versions]
-        Crime Patrol [3 versions]
+        Crime Patrol [4 versions]
         Crime Patrol 2: Drug Wars [2 versions]
         The Last Bounty Hunter [2 versions]
         Fast Draw Showdown [2 versions]
@@ -32,6 +32,8 @@
 #include "machine/amigafdc.h"
 #include "speaker.h"
 
+
+namespace {
 
 class alg_state : public amiga_state
 {
@@ -57,20 +59,13 @@ public:
 	void init_ntsc();
 	void init_pal();
 
-	DECLARE_VIDEO_START(alg);
-
 	void alg_r2(machine_config &config);
 	void picmatic(machine_config &config);
 	void alg_r1(machine_config &config);
-	void a500_mem(address_map &map);
-	void main_map_picmatic(address_map &map);
-	void main_map_r1(address_map &map);
-	void main_map_r2(address_map &map);
-	void overlay_512kb_map(address_map &map);
+
 protected:
 	// amiga_state overrides
 	virtual void potgo_w(uint16_t data) override;
-	int get_lightgun_pos(int player, int *x, int *y);
 
 private:
 	required_device<sony_ldp1450_device> m_laserdisc;
@@ -81,6 +76,16 @@ private:
 	optional_ioport m_triggers;
 
 	uint16_t m_input_select;
+
+	int get_lightgun_pos(int player, int *x, int *y);
+
+	DECLARE_VIDEO_START(alg);
+
+	void a500_mem(address_map &map);
+	void main_map_picmatic(address_map &map);
+	void main_map_r1(address_map &map);
+	void main_map_r2(address_map &map);
+	void overlay_512kb_map(address_map &map);
 };
 
 
@@ -597,6 +602,17 @@ ROM_START( crimepat_12 )
 	DISK_IMAGE_READONLY( "crimepat", 0, NO_DUMP )
 ROM_END
 
+ROM_START( crimepat_10 )
+	ALG_BIOS
+
+	ROM_REGION16_BE( 0x40000, "game_program", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "cp_10_rom1.bin", 0x000001, 0x20000, CRC(aac76488) SHA1(fabf4700610480a28dad6e1483e58ec227e465ff) )
+	ROM_LOAD16_BYTE( "cp_10_rom2.bin", 0x000000, 0x20000, CRC(6e4614cd) SHA1(0f73f477e13b3f184e9a55f4be95474661c912d5) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "crimepat", 0, NO_DUMP )
+ROM_END
+
 ROM_START( crimep2 )
 	ALG_BIOS
 
@@ -816,7 +832,7 @@ void alg_state::init_aplatoon()
 	logerror("decrypt done\n ");
 }
 
-
+} // Anonymous namespace
 
 
 /*************************************
@@ -857,6 +873,7 @@ GAME( 1992, gallgall_21,  gallgall, alg_r2,   alg_2p, alg_state, init_palr6,    
 GAME( 1993, crimepat,     alg_bios, alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Crime Patrol v1.51", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, crimepat_14,  crimepat, alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Crime Patrol v1.4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, crimepat_12,  crimepat, alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Crime Patrol v1.2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, crimepat_10,  crimepat, alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Crime Patrol v1.0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1993, crimep2,      alg_bios, alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Crime Patrol 2: Drug Wars v1.3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, crimep2_11,   crimep2,  alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Crime Patrol 2: Drug Wars v1.1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )

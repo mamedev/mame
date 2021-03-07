@@ -950,7 +950,7 @@ void mediagx_state::report_speedups()
 
 void mediagx_state::install_speedups(const speedup_entry *entries, int count)
 {
-	assert(count < ARRAY_LENGTH(s_speedup_handlers));
+	assert(count < std::size(s_speedup_handlers));
 
 	m_speedup_table = entries;
 	m_speedup_count = count;
@@ -984,7 +984,7 @@ void mediagx_state::init_a51site4()
 	init_mediagx();
 
 #if SPEEDUP_HACKS
-	install_speedups(a51site4_speedups, ARRAY_LENGTH(a51site4_speedups));
+	install_speedups(a51site4_speedups, std::size(a51site4_speedups));
 #endif
 }
 

@@ -53,7 +53,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(field_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_reset_line_w);
-	
+
 	u16 rockn_adpcmbank_r();
 	void rockn_adpcmbank_w(u16 data);
 	void rockn2_adpcmbank_w(u16 data);
@@ -127,7 +127,7 @@ protected:
 class rocknms_state : public tetrisp2_state
 {
 public:
-	rocknms_state(const machine_config &mconfig, device_type type, const char *tag) 
+	rocknms_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tetrisp2_state(mconfig, type, tag)
 		, m_subcpu(*this, "sub")
 		, m_sub_sysctrl(*this, "sub_sysctrl")
@@ -143,7 +143,7 @@ public:
 		, m_sub_palette(*this, "sub_palette")
 		, m_sub_paletteram(*this, "sub_paletteram")
 	{ }
-	
+
 	void rocknms(machine_config &config);
 	void init_rocknms();
 	DECLARE_CUSTOM_INPUT_MEMBER(rocknms_main2sub_status_r);
@@ -177,7 +177,7 @@ private:
 	void rocknms_sub_vram_fg_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void rocknms_sub_vram_rot_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	DECLARE_VIDEO_START(rocknms);
-	
+
 	TILE_GET_INFO_MEMBER(get_tile_info_rocknms_sub_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_rocknms_sub_fg);
 	TILE_GET_INFO_MEMBER(get_tile_info_rocknms_sub_rot);

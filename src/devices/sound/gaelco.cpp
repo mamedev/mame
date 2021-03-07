@@ -37,6 +37,7 @@ Registers per channel:
 
 #include "emu.h"
 #include "gaelco.h"
+
 #include "wavwrite.h"
 
 #define VERBOSE_SOUND 0
@@ -47,7 +48,7 @@ Registers per channel:
 //#define ALT_MIX
 
 #define LOG_WAVE  0
-static wav_file* wavraw; // Raw waveform
+static util::wav_file_ptr wavraw; // Raw waveform
 
 
 /*============================================================================
@@ -182,7 +183,7 @@ void gaelco_gae1_device::sound_stream_update(sound_stream &stream, std::vector<r
 	}
 
 //  if (wavraw)
-//      wav_add_data_buffer(wavraw, outputs[0], outputs[1]);
+//      util::wav_add_data_buffer(*wavraw, outputs[0], outputs[1]);
 }
 
 /*============================================================================
@@ -261,15 +262,18 @@ void gaelco_gae1_device::device_start()
 			m_volume_table[vol][(j ^ 0x80) & 0xff] = (vol*j*256)/(VOLUME_LEVELS - 1);
 
 	if (LOG_WAVE)
-		wavraw = wav_open("gae1_snd.wav", rate, 2);
+		wavraw = util::wav_open("gae1_snd.wav", rate, 2);
 }
 
+void gaelco_gae1_device::device_reset()
+{
+	for (int ch = 0; ch < NUM_CHANNELS; ch++)
+		m_channel[ch].active = 0;
+}
 
 void gaelco_gae1_device::device_stop()
 {
-	if (wavraw)
-		wav_close(wavraw);
-	wavraw = nullptr;
+	wavraw.reset();
 }
 
 
@@ -283,11 +287,10 @@ void gaelco_gae1_device::device_clock_changed()
 {
 	u32 rate = clock() / 128;
 	m_stream->set_sample_rate(rate);
-	if (wavraw)
-		wav_close(wavraw);
+	wavraw.reset();
 
 	if (LOG_WAVE)
-		wavraw = wav_open("gae1_snd.wav", rate, 2);
+		wavraw = util::wav_open("gae1_snd.wav", rate, 2);
 }
 
 

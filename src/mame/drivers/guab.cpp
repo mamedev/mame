@@ -100,7 +100,7 @@ private:
 	uint8_t watchdog_r();
 	void watchdog_w(uint8_t data);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	void guab_map(address_map &map);
 
@@ -432,9 +432,11 @@ void guab_state::sn76489_buffer_w(uint8_t data)
 //  FLOPPY DRIVE
 //**************************************************************************
 
-FLOPPY_FORMATS_MEMBER( guab_state::floppy_formats )
-	FLOPPY_GUAB_FORMAT
-FLOPPY_FORMATS_END
+void guab_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_GUAB_FORMAT);
+}
 
 static void guab_floppies(device_slot_interface &device)
 {

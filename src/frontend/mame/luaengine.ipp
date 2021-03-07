@@ -89,7 +89,6 @@ int sol_lua_push(sol::types<buffer *>, lua_State *L, buffer *value);
 template <typename T> struct is_container<lua_engine::devenum<T> > : std::true_type { };
 template <typename T> struct is_container<lua_engine::simple_list_wrapper<T> > : std::true_type { };
 template <typename T> struct is_container<lua_engine::tag_object_ptr_map<T> > : std::true_type { };
-template <typename T> struct is_container<lua_engine::object_ptr_vector_wrapper<T> > : std::true_type { };
 
 
 template <typename T> struct usertype_container<lua_engine::devenum<T> >;
@@ -256,7 +255,6 @@ public:
 	static int ipairs(lua_State *L) { return start_pairs<true>(L); }
 };
 
-
 } // namespace sol
 
 
@@ -265,10 +263,10 @@ int sol_lua_push(sol::types<osd_file::error>, lua_State *L, osd_file::error &&va
 template <typename Handler>
 bool sol_lua_check(sol::types<osd_file::error>, lua_State *L, int index, Handler &&handler, sol::stack::record &tracking);
 
-// map_handler_type customisation
+// enums to automatically convert to strings
 int sol_lua_push(sol::types<map_handler_type>, lua_State *L, map_handler_type &&value);
-
-// endianness_t customisation
+int sol_lua_push(sol::types<image_init_result>, lua_State *L, image_init_result &&value);
+int sol_lua_push(sol::types<image_verify_result>, lua_State *L, image_verify_result &&value);
 int sol_lua_push(sol::types<endianness_t>, lua_State *L, endianness_t &&value);
 
 
@@ -351,6 +349,83 @@ protected:
 		}
 	};
 };
+
+
+template <typename T, typename C, typename I>
+struct lua_engine::immutable_sequence_helper : immutable_collection_helper<T, C, I>
+{
+protected:
+	template <bool Indexed>
+	static int next_pairs(lua_State *L)
+	{
+		auto &i(sol::stack::unqualified_get<sol::user<typename immutable_sequence_helper::indexed_iterator> >(L, 1));
+		if (i.src.end() == i.it)
+			return sol::stack::push(L, sol::lua_nil);
+		int result;
+		if constexpr (Indexed)
+			result = sol::stack::push(L, i.ix + 1);
+		else
+			result = T::push_key(L, i.it, i.ix);
+		result += sol::stack::push_reference(L, T::unwrap(i.it));
+		++i;
+		return result;
+	}
+
+	template <bool Indexed>
+	static int start_pairs(lua_State *L)
+	{
+		T &self(immutable_sequence_helper::get_self(L));
+		sol::stack::push(L, next_pairs<Indexed>);
+		sol::stack::push<sol::user<typename immutable_sequence_helper::indexed_iterator> >(L, self.items(), self.items().begin());
+		sol::stack::push(L, sol::lua_nil);
+		return 3;
+	}
+
+public:
+	static int at(lua_State *L)
+	{
+		T &self(immutable_sequence_helper::get_self(L));
+		std::ptrdiff_t const index(sol::stack::unqualified_get<std::ptrdiff_t>(L, 2));
+		if ((0 >= index) || (self.items().size() < index))
+			return sol::stack::push(L, sol::lua_nil);
+		else
+			return sol::stack::push_reference(L, T::unwrap(std::next(self.items().begin(), index - 1)));
+	}
+
+	static int index_of(lua_State *L)
+	{
+		T &self(immutable_sequence_helper::get_self(L));
+		auto it(self.items().begin());
+		std::ptrdiff_t ix(0);
+		auto const &item(sol::stack::unqualified_get<decltype(T::unwrap(it))>(L, 2));
+		while ((self.items().end() != it) && (&item != &T::unwrap(it)))
+		{
+			++it;
+			++ix;
+		}
+		if (self.items().end() == it)
+			return sol::stack::push(L, sol::lua_nil);
+		else
+			return sol::stack::push(L, ix + 1);
+	}
+
+	static int size(lua_State *L)
+	{
+		T &self(immutable_sequence_helper::get_self(L));
+		return sol::stack::push(L, self.items().size());
+	}
+
+	static int empty(lua_State *L)
+	{
+		T &self(immutable_sequence_helper::get_self(L));
+		return sol::stack::push(L, self.items().empty());
+	}
+
+	static int next(lua_State *L) { return sol::stack::push(L, next_pairs<false>); }
+	static int pairs(lua_State *L) { return start_pairs<false>(L); }
+	static int ipairs(lua_State *L) { return start_pairs<true>(L); }
+};
+
 
 
 struct lua_engine::addr_space

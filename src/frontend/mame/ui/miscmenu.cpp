@@ -24,8 +24,9 @@
 #include "pluginopts.h"
 #include "drivenum.h"
 #include "romload.h"
-
 #include "uiinput.h"
+
+#include "corestr.h"
 
 #include <algorithm>
 #include <cstring>
@@ -176,33 +177,23 @@ void menu_network_devices::handle()
     information menu
 -------------------------------------------------*/
 
-void menu_bookkeeping::handle()
-{
-	attotime curtime;
-
-	/* if the time has rolled over another second, regenerate */
-	curtime = machine().time();
-	if (prevtime.seconds() != curtime.seconds())
-	{
-		prevtime = curtime;
-		repopulate(reset_options::SELECT_FIRST);
-	}
-
-	/* process the menu */
-	process(0);
-}
-
-
-/*-------------------------------------------------
-    menu_bookkeeping - handle the bookkeeping
-    information menu
--------------------------------------------------*/
 menu_bookkeeping::menu_bookkeeping(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
 menu_bookkeeping::~menu_bookkeeping()
 {
+}
+
+void menu_bookkeeping::handle()
+{
+	/* process the menu */
+	process(0);
+
+	/* if the time has rolled over another second, regenerate */
+	attotime const curtime = machine().time();
+	if (prevtime.seconds() != curtime.seconds())
+		reset(reset_options::REMEMBER_POSITION);
 }
 
 void menu_bookkeeping::populate(float &customtop, float &custombottom)
@@ -212,6 +203,7 @@ void menu_bookkeeping::populate(float &customtop, float &custombottom)
 	int ctrnum;
 
 	/* show total time first */
+	prevtime = machine().time();
 	if (prevtime.seconds() >= (60 * 60))
 		util::stream_format(tempstring, _("Uptime: %1$d:%2$02d:%3$02d\n\n"), prevtime.seconds() / (60 * 60), (prevtime.seconds() / 60) % 60, prevtime.seconds() % 60);
 	else
@@ -649,7 +641,7 @@ void menu_export::handle()
 					// iterate through drivers and output the info
 					while (drvlist.next())
 						util::stream_format(buffer, "%-18s\"%s\"\n", drvlist.driver().name, drvlist.driver().type.fullname());
-					file.puts(buffer.str().c_str());
+					file.puts(buffer.str());
 					file.close();
 					machine().popmessage(_("%s.txt saved under ui folder."), filename);
 				}
@@ -737,7 +729,7 @@ void menu_machine_configure::handle()
 					if (filerr == osd_file::error::NONE)
 					{
 						std::string inistring = m_opts.output_ini();
-						file.puts(inistring.c_str());
+						file.puts(inistring);
 						ui().popup_time(2, "%s", _("\n    Configuration saved    \n\n"));
 					}
 				}
@@ -877,7 +869,7 @@ menu_plugins_configure::~menu_plugins_configure()
 		// throw emu_fatalerror("Unable to create file plugin.ini\n");
 		return;
 	// generate the updated INI
-	file_plugin.puts(mame_machine_manager::instance()->plugins().output_ini().c_str());
+	file_plugin.puts(mame_machine_manager::instance()->plugins().output_ini());
 }
 
 //-------------------------------------------------
@@ -895,7 +887,7 @@ void menu_plugins_configure::handle()
 	{
 		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT || menu_event->iptkey == IPT_UI_SELECT)
 		{
-			plugin *p = plugins.find((const char*)menu_event->itemref);
+			plugin_options::plugin *p = plugins.find((const char*)menu_event->itemref);
 			if (p)
 			{
 				p->m_start = !p->m_start;

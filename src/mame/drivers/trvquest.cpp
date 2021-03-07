@@ -177,17 +177,17 @@ void trvquest_state::trvquest(machine_config &config)
 	AY8910(config, "ay2", XTAL(6'000'000)/2).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* via */
-	VIA6522(config, m_via_0, XTAL(6'000'000)/4);
+	MOS6522(config, m_via_0, XTAL(6'000'000)/4);
 	m_via_0->writepa_handler().set(FUNC(trvquest_state::video_data_w));
 	m_via_0->writepb_handler().set(FUNC(trvquest_state::gameplan_video_command_w));
 	m_via_0->ca2_handler().set(FUNC(trvquest_state::video_command_trigger_w));
 
-	VIA6522(config, m_via_1, XTAL(6'000'000)/4);
+	MOS6522(config, m_via_1, XTAL(6'000'000)/4);
 	m_via_1->readpa_handler().set_ioport("IN0");
 	m_via_1->readpb_handler().set_ioport("IN1");
 	m_via_1->ca2_handler().set(FUNC(trvquest_state::coin_w));
 
-	VIA6522(config, m_via_2, XTAL(6'000'000)/4);
+	MOS6522(config, m_via_2, XTAL(6'000'000)/4);
 	m_via_2->readpa_handler().set_ioport("UNK");
 	m_via_2->readpb_handler().set_ioport("DSW");
 	m_via_2->ca2_handler().set(FUNC(trvquest_state::misc_w));

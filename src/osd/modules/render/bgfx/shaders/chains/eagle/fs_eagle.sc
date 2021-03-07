@@ -7,7 +7,7 @@ $input v_color0, texCoord, t1, t2, t3, t4, t5, t6, t7, t8
 /*  Copied from the Dosbox source code        */
 /*  Copyright (C) 2002-2007  The DOSBox Team  */
 /*  License: GNU-GPL                          */
-/*  Adapted by guest(r) on 16.4.2007          */    
+/*  Adapted by guest(r) on 16.4.2007          */
 
 #include "common.sh"
 
@@ -32,10 +32,10 @@ float GET_RESULT(float A, float B, float C, float D)
    float r = 0.0;
    if (A == C) x += 1.0; else if (B == C) y += 1.0;
    if (A == D) x += 1.0; else if (B == D) y += 1.0;
-   if (x <= 1.0) r += 1.0; 
+   if (x <= 1.0) r += 1.0;
    if (y <= 1.0) r -= 1.0;
    return r;
-} 
+}
 
 void main()
 {
@@ -43,7 +43,7 @@ void main()
 
 	// Reading the texels
 
-	vec3 C0 = texture2D(decal, t1.xy).xyz; 
+	vec3 C0 = texture2D(decal, t1.xy).xyz;
 	vec3 C1 = texture2D(decal, t1.zw).xyz;
 	vec3 C2 = texture2D(decal, t2.xy).xyz;
 	vec3 D3 = texture2D(decal, t2.zw).xyz;
@@ -62,7 +62,7 @@ void main()
 
 	vec3 p00,p10,p01,p11;
 
-	// reducing float3 to float	
+	// reducing float3 to float
 	float c0 = reduce(C0); float c1 = reduce(C1);
 	float c2 = reduce(C2); float c3 = reduce(C3);
 	float c4 = reduce(C4); float c5 = reduce(C5);
@@ -76,7 +76,7 @@ void main()
 	/*  Copied from the Dosbox source code        */
 	/*  Copyright (C) 2002-2007  The DOSBox Team  */
 	/*  License: GNU-GPL                          */
-	/*  Adapted by guest(r) on 16.4.2007          */       
+	/*  Adapted by guest(r) on 16.4.2007          */
 	if (c4 != c8)
 	{
 		if (c7 == c5)
@@ -158,8 +158,8 @@ void main()
 			}
 		}
 	}
-	
+
 	p10 = (fp.x < 0.50) ? (fp.y < 0.50 ? p00 : p10) : (fp.y < 0.50 ? p01: p11);
-	
+
 	gl_FragColor = vec4(p10.rgb, 1.0);
 }

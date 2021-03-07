@@ -183,6 +183,9 @@
 
 #include "logmacro.h"
 
+
+namespace {
+
 class ti99_2_state : public driver_device
 {
 public:
@@ -195,7 +198,7 @@ public:
 		m_ram(*this, TI992_RAM_TAG),
 		m_expport(*this, TI992_EXPPORT_TAG),
 		m_otherbank(false),
-		m_rom(nullptr),
+		m_rom(*this, TI992_ROM),
 		m_ram_start(0xf000),
 		m_first_ram_page(0)
 		{ }
@@ -235,14 +238,13 @@ private:
 
 	bool m_otherbank;
 
-	uint8_t*   m_rom;
+	required_region_ptr<uint8_t> m_rom;
 	int m_ram_start;
 	int m_first_ram_page;
 };
 
 void ti99_2_state::driver_start()
 {
-	m_rom = memregion(TI992_ROM)->base();
 	m_ram_start = 0xf000 - m_ram->default_size();
 	m_first_ram_page = m_ram_start >> 12;
 }
@@ -501,6 +503,9 @@ ROM_START(ti99_232)
 	ROM_LOAD("rom4000b.u2b", 0x10000, 0x2000, CRC(34dd52ed) SHA1(e01892b1b110d7d592a7e7f1f39f9f46ea0818db))
 ROM_END
 
+} // Anonymous namespace
+
+
 //      YEAR    NAME      PARENT    COMPAT  MACHINE   INPUT   CLASS         INIT        COMPANY              FULLNAME                               FLAGS
 COMP(   1983,   ti99_224, 0,        0,      ti99_224, 0, ti99_2_state, empty_init, "Texas Instruments", "TI-99/2 BASIC Computer (24 KiB ROM)" , MACHINE_NO_SOUND_HW )
-COMP(   1983,   ti99_232, 0,         0,      ti99_232, 0, ti99_2_state, empty_init, "Texas Instruments", "TI-99/2 BASIC Computer (32 KiB ROM)" , MACHINE_NO_SOUND_HW )
+COMP(   1983,   ti99_232, 0,        0,      ti99_232, 0, ti99_2_state, empty_init, "Texas Instruments", "TI-99/2 BASIC Computer (32 KiB ROM)" , MACHINE_NO_SOUND_HW )

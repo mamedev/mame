@@ -1684,7 +1684,7 @@ void tetrisp2_state::nndmseal(machine_config &config)
 	// but they replaced the xtal to a OSC1(42.9545MHz), I guess they compensated to not go out of ~60 Hz
 	constexpr XTAL pixel_clock = XTAL(42'954'545)/6;
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-    m_screen->set_raw(pixel_clock, 455, 0, 384, 262, 0, 240);
+	m_screen->set_raw(pixel_clock, 455, 0, 384, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(tetrisp2_state::screen_update_tetrisp2));
 	m_screen->set_palette(m_palette);
 
@@ -1716,7 +1716,7 @@ void tetrisp2_state::rockn(machine_config &config)
 	/* video hardware */
 	constexpr XTAL pixel_clock = XTAL(48'000'000)/8;
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-    m_screen->set_raw(pixel_clock, 384, 0, 320, 263, 0, 224);
+	m_screen->set_raw(pixel_clock, 384, 0, 320, 263, 0, 224);
 	m_screen->set_screen_update(FUNC(tetrisp2_state::screen_update_rockntread));
 	m_screen->set_palette(m_palette);
 
@@ -1751,7 +1751,7 @@ void tetrisp2_state::rockn2(machine_config &config)
 	/* video hardware */
 	constexpr XTAL pixel_clock = XTAL(48'000'000)/8;
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-    m_screen->set_raw(pixel_clock, 384, 0, 320, 263, 0, 224);
+	m_screen->set_raw(pixel_clock, 384, 0, 320, 263, 0, 224);
 	m_screen->set_screen_update(FUNC(tetrisp2_state::screen_update_rockntread));
 	m_screen->set_palette(m_palette);
 
@@ -1808,7 +1808,7 @@ void rocknms_state::rocknms(machine_config &config)
 	/* video hardware */
 
 	config.set_default_layout(layout_rocknms);
-	
+
 	constexpr XTAL pixel_clock = XTAL(48'000'000)/8;
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_orientation(ROT0);
@@ -1835,7 +1835,7 @@ void rocknms_state::rocknms(machine_config &config)
 	m_rocknms_sub_sprite->set_zoom(false);
 
 	setup_main_sysctrl(config, XTAL(48'000'000));
-	
+
 	JALECO_MS32_SYSCTRL(config, m_sub_sysctrl, XTAL(48'000'000), m_sub_screen);
 	m_sub_sysctrl->flip_screen_cb().set(FUNC(rocknms_state::sub_flipscreen_w));
 	m_sub_sysctrl->vblank_cb().set(FUNC(rocknms_state::sub_vblank_irq_w));
@@ -1844,7 +1844,7 @@ void rocknms_state::rocknms(machine_config &config)
 	m_sub_sysctrl->sound_reset_cb().set(FUNC(rocknms_state::sub_sound_reset_line_w));
 
 	MCFG_VIDEO_START_OVERRIDE(rocknms_state,rocknms)
-	
+
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1874,7 +1874,7 @@ void stepstag_state::stepstag(machine_config &config)
 	M68000(config, m_maincpu, XTAL(12'000'000)); // unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &stepstag_state::stepstag_map);
 
-	constexpr XTAL subxtal = XTAL(42'954'545); // unknown	
+	constexpr XTAL subxtal = XTAL(42'954'545); // unknown
 	constexpr XTAL sub_pixel_clock = subxtal/6;
 
 	M68000(config, m_subcpu, subxtal/3);
@@ -1888,8 +1888,8 @@ void stepstag_state::stepstag(machine_config &config)
 	// video hardware
 
 	// this screen arrangement is weird:
-	// it writes a regular 320x224 screen setup to the CRTC but none of these matches a 352 width, 
-	// we are either missing a bit from the config regs or those writes are null and 
+	// it writes a regular 320x224 screen setup to the CRTC but none of these matches a 352 width,
+	// we are either missing a bit from the config regs or those writes are null and
 	// these screens are driven by something else.
 	// Also note: main 68k tilemap/sprite/palette aren't even displayed with this arrangement,
 	// even tho usage is minimal (POST/test mode), maybe just a left-over ...
@@ -1970,7 +1970,7 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 	constexpr XTAL subxtal = XTAL(42'954'545); // unknown
 	constexpr XTAL main_pixel_clock = XTAL(48'000'000)/8;
 	constexpr XTAL sub_pixel_clock = subxtal/6;
-	
+
 	M68000(config, m_subcpu, subxtal/3);
 	m_subcpu->set_addrmap(AS_PROGRAM, &stepstag_state::stepstag_sub_map);
 	TIMER(config, "field_timer").configure_periodic(FUNC(stepstag_state::field_cb), attotime::from_hz(30));
@@ -1982,7 +1982,7 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 	// video hardware
 	// same as stepstag, we assume that this screen is effectively connected to the system CRTC
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-    m_screen->set_raw(main_pixel_clock, 384, 0, 320, 263, 0, 224);
+	m_screen->set_raw(main_pixel_clock, 384, 0, 320, 263, 0, 224);
 	m_screen->set_screen_update(FUNC(stepstag_state::screen_update_stepstag_main));
 	m_screen->set_palette(m_palette);
 

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+-->
+<softwarelist name="rx78_cass" description="Gundam RX-78 cassettes">
+
+	<software name="graphmaths">
+		<description>Graphics Mathematics</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<info name="usage" value="MON then L then GRM. After loading, RUN" />
+		<sharedfeat name="requirement" value="rx78_cart:basic"/>
+		<part name="cass" interface="rx78_cass">
+			<dataarea name="cass" size="0x23ca2c">
+				<rom name="graphmaths.wav" size="0x23ca2c" crc="e4411028" sha1="b03a855fe527c8a181b1c6e3d8daee6d637a97cc"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

@@ -565,10 +565,10 @@ CONS( 2004, jak_capb,  0,        0, spg110_base, jak_capb,  spg110_game_state, e
 CONS( 2004, jak_spdmo, jak_spdm, 0, spg110_spdmo, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Spider-Man (JAKKS Pacific TV Game) (older hardware, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // this is the smaller more 'square' style joystick that was originally released before the GameKey slot was added.
 CONS( 2004, jak_spdmoa,jak_spdm, 0, spg110_spdmo, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Spider-Man (JAKKS Pacific TV Game) (older hardware, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // this is the resdesigned stick, but before the GameKey release
 
-// this was sold by SDW Games for the US market, ROM not yet verified to be the same, also appears in some mutligames?
+// this was sold by SDW Games for the US market, ROM not yet verified to be the same, also appears in some multigames?
 CONS( 2003, conyteni,  0,        0, spg110_base, conyteni,  spg110_game_state, empty_init, "Conny",      "TV Virtual Tennis", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs motion inputs, and video fixes, setting to PAL
 
-// from a US SDW Games unit, has SDW Games banners in background so ROM might differ to other regsions
+// from a US SDW Games unit, has SDW Games banners in background so ROM might differ to other regions
 CONS( 2003, conyping,  0,        0, spg110_base, conyteni,  spg110_game_state, empty_init, "Conny / SDW Games",      "Virtual Ping Pong (Conny / SDW Games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // from a Big Ben 'TV Virtual Fighter' unit, although shows Free Fight Kung Fu on title screen

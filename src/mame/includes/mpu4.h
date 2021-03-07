@@ -9,8 +9,8 @@
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"
-#include "sound/ym2413.h"
 #include "sound/upd7759.h"
+#include "sound/ym2413.h"
 #include "machine/steppers.h"
 #include "machine/roc10937.h"
 #include "machine/meters.h"
@@ -132,6 +132,7 @@ public:
 		, m_mpu4leds(*this, "mpu4led%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
 		, m_triacs(*this, "triac%u", 0U)
+		, m_current_chr_table(nullptr)
 	 { }
 
 	void init_m4default_alt();
@@ -236,7 +237,6 @@ public:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	void mpu4_6809_map(address_map &map);
 	void mpu4_memmap(address_map &map);
 	void lamp_extend_small(int data);
 	void lamp_extend_large(int data,int column,int active);

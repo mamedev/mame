@@ -48,9 +48,9 @@ Note about version levels using Mutant Fighter as the example:
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/decocrpt.h"
-#include "sound/2203intf.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "sound/ym2151.h"
+#include "sound/ym2203.h"
 #include "speaker.h"
 
 /**********************************************************************************/
@@ -151,7 +151,7 @@ void cninja_state::cninjabl2_map(address_map &map)
 
 	map(0x180000, 0x18ffff).ram();
 	map(0x1b4000, 0x1b4001).r(FUNC(cninja_state::cninjabl2_sprite_dma_r));
-}	
+}
 
 uint16_t cninja_state::edrandy_protection_region_8_146_r(offs_t offset)
 {

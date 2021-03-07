@@ -402,13 +402,7 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
 };
-
-FLOPPY_FORMATS_MEMBER(mindset_state::floppy_formats)
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
 
 
 mindset_state::mindset_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -1350,8 +1344,8 @@ void mindset_state::mindset(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(mindset_state::fdc_int_w));
 	m_fdc->drq_wr_callback().set([this](int state) { m_fdc_drq = state; m_maincpu->drq1_w(m_fdc_drq || m_trap_drq); });
 	m_fdc->set_ready_line_connected(false);
-	FLOPPY_CONNECTOR(config, m_fdco[0], pc_dd_floppies, "525dd", mindset_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_fdco[1], pc_dd_floppies, "525dd", mindset_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_fdco[0], pc_dd_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_fdco[1], pc_dd_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
 
 	SPEAKER(config, "lspeaker").front_left();
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5);

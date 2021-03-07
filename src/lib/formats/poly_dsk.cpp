@@ -34,7 +34,7 @@ bool poly_cpm_format::supports_save() const
 	return true;
 }
 
-int poly_cpm_format::identify(io_generic *io, uint32_t form_factor)
+int poly_cpm_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t boot[16];
 	uint64_t size = io_generic_size(io);
@@ -52,7 +52,7 @@ int poly_cpm_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool poly_cpm_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool poly_cpm_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int total_tracks, spt, bps, head_num;
 

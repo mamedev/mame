@@ -5090,6 +5090,20 @@ ROM_START( mushi2k5 )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
 ROM_END
 
+ROM_START( mushi2k61 )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "fpr-24340.ic8", 0x0000000, 0x4000000, CRC(d348a3a7) SHA1(29561c6d565000249e8b9b00ccf43b82a4887011) )
+	ROM_LOAD( "fpr-24341.ic9", 0x4000000, 0x4000000, CRC(bde9547c) SHA1(f67b12d33163e65b2e53fcbc41a841679431805e) )
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0444-jpn.ic3", 0, 0x800, CRC(6ded35a2) SHA1(0bb12bf6b090b865abd04d26d65f28c661464514) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )
+ROM_END
+
 ROM_START( mushi2k62 )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -11615,6 +11629,7 @@ ROM_END
 /* 0035    */ GAME( 2000, sstrkfgta, sstrkfgt, naomim2, sstrkfgt,naomi_state, init_naomi,   ROT0, "Sega", "Sega Strike Fighter (Rev A, no training mode)", GAME_FLAGS )
 /* 0036    */ GAME( 2000, 18wheels,  18wheelr, naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler (standard)", GAME_FLAGS )
 /* 0037    */ GAME( 2000, 18wheelu,  18wheelr, naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler (upright)", GAME_FLAGS )
+// 0038 日テレ式未来予想スタジオ / NTV Future Forecast Studio
 /* 0039    */ GAME( 2000, gram2000,  naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Giant Gram 2000", GAME_FLAGS )
 /* 0040    */ GAME( 2000, wwfroyal,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "WWF Royal Rumble", GAME_FLAGS )
 /* 0041    */ GAME( 2000, slasho,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Slashout", GAME_FLAGS )
@@ -11634,6 +11649,9 @@ ROM_END
 /* 0064    */ GAME( 2001, wrungp,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "CRI / Sega", "Wave Runner GP", GAME_FLAGS )
 /* 0068    */ GAME( 2001, crakndj2,  naomi,    naomim2, crackndj,naomi_state, init_naomi,   ROT0, "Sega", "Crackin' DJ Part 2 (Japan)", GAME_FLAGS )
 /* 0073    */ GAME( 2001, inunoos,   naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Wow Entertainment / Sega", "Inu no Osanpo / Dog Walking (Japan, Export, Rev A)", GAME_FLAGS )
+// 0075 Star Horse 2001 (main screens)
+// 0076 Star Horse 2001 (sound)
+// 0077 Star Horse 2001 (live)
 /* 0078    */ GAME( 2002, shors2k1,  naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT270,"Sega", "Star Horse 2001 (satellite, Rev B)", GAME_FLAGS )
 /* 0083    */ GAME( 2001, derbyoc2,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Derby Owners Club II Ver.2.1 (Japan, Rev B)", GAME_FLAGS )
 /* 0084    */ GAME( 2001, vtenis2c,  naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua Tennis 2 / Power Smash 2 (Rev A)", GAME_FLAGS )
@@ -11665,7 +11683,7 @@ ROM_END
 /* 0164    */ GAME( 2005, mushi2eo,  mushik2e, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 1.001) (World)", GAME_FLAGS ) // not for Japan or Korea, version can be changed in secret menu, ~equivalent of Japanese 2K5 versions.
 /* 0164    */ GAME( 2005, mushik2e,  naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 2.001) (World)", GAME_FLAGS ) // not for Japan or Korea, version can be changed in secret menu, ~equivalent of Japanese 2K5 versions.
 /* 0166    */ GAME( 2006, zunou,     naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Touch De Zunou (Japan, Rev A)", GAME_FLAGS )
-// 0167 Mushiking 2K6 1ST (Japan)
+/* 0167    */ GAME( 2006, mushi2k61, naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2006 First (Japan)", GAME_FLAGS )
 /* 0170-01 */ GAME( 2007, manicpnc,  naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Manic Panic Ghosts! (USA, Export)", GAME_FLAGS )
 /* 0170    */ GAME( 2007, pokasuka,  manicpnc, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Pokasuka Ghost! (Japan)", GAME_FLAGS )
 /* 0171    */ GAME( 2006, mushi2k62, naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2006 Second (Japan)", GAME_FLAGS )
@@ -11673,6 +11691,7 @@ ROM_END
 /* 0175    */ GAME( 2007, asndynmt,  naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Asian Dynamite / Dynamite Deka EX", GAME_FLAGS )
 /* 0175    */ GAME( 2007, asndynmto, asndynmt, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Asian Dynamite / Dynamite Deka EX (older)", GAME_FLAGS ) // no revision stickers, presumably older revision but might be release for Asian market
 /* 0177    */ GAME( 2007, rhytngk,   naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega / Nintendo - J.P ROOM", "Rhythm Tengoku (Japan)", GAME_FLAGS )
+// 0178 ドライビングシミュレーター / Driving Simulator
 /* 0180    */ GAME( 2007, mushik4e,  naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking IV / V / VI (World)", GAME_FLAGS ) // not for Japan or Korea, version can be changed in secret menu, ~equivalent of Japanese 2K6 versions.
 /* 0183    */ GAME( 2009, shorseprvl,shorsepr, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress Returns (main screen left)", GAME_FLAGS )
 /* 0184    */ GAME( 2009, shorseprvr,shorsepr, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress Returns (main screen right)", GAME_FLAGS )
@@ -11685,7 +11704,6 @@ ROM_END
 // 01xx Mushiking 2K5 2ND (Japan)
 // note: Mushiking 2006 and 2007 versions was released for both NAOMI and SystemSP hardwares.
 // 0xxx Nittere Shiki! Mirai Yosou Studio
-// 0xxx Star Horse 2001 (main screens, server)
 // 0xxx Star Horse 2002 (whole set)
 
 /* Cartridge prototypes of games released on GD-ROM */

@@ -12,17 +12,19 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "ui/ui.h"
-#include "ui/menu.h"
 #include "ui/filemngr.h"
+
 #include "ui/filesel.h"
-#include "ui/miscmenu.h"
-#include "ui/imgcntrl.h"
 #include "ui/floppycntrl.h"
+#include "ui/imgcntrl.h"
+#include "ui/miscmenu.h"
+#include "ui/ui.h"
+
 #include "softlist.h"
 
 
 namespace ui {
+
 /***************************************************************************
     FILE MANAGER
 ***************************************************************************/
@@ -60,7 +62,7 @@ menu_file_manager::~menu_file_manager()
 void menu_file_manager::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	// access the path
-	std::string_view path = selected_device ? selected_device->filename() : std::string_view();
+	std::string_view path = selected_device && selected_device->exists() ? selected_device->filename() : std::string_view();
 	extra_text_render(top, bottom, origx1, origy1, origx2, origy2, std::string_view(), path);
 }
 
@@ -168,7 +170,7 @@ void menu_file_manager::handle()
 {
 	// process the menu
 	const event *event = process(0);
-	if (event != nullptr && event->itemref != nullptr && event->iptkey == IPT_UI_SELECT)
+	if (event && event->itemref && (event->iptkey == IPT_UI_SELECT))
 	{
 		if ((uintptr_t)event->itemref == 1)
 		{
@@ -177,18 +179,15 @@ void menu_file_manager::handle()
 		else
 		{
 			selected_device = (device_image_interface *) event->itemref;
-			if (selected_device != nullptr)
+			if (selected_device)
 			{
 				m_curr_selected = true;
 				floppy_image_device *floppy_device = dynamic_cast<floppy_image_device *>(selected_device);
-				if (floppy_device != nullptr)
-				{
+				if (floppy_device)
 					menu::stack_push<menu_control_floppy_image>(ui(), container(), *floppy_device);
-				}
 				else
-				{
 					menu::stack_push<menu_control_device_image>(ui(), container(), *selected_device);
-				}
+
 				// reset the existing menu
 				reset(reset_options::REMEMBER_POSITION);
 			}

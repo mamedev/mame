@@ -110,6 +110,8 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "speaker.h"
 
 
+namespace {
+
 class royalmah_state : public driver_device
 {
 public:
@@ -344,6 +346,8 @@ void royalmah_state::machine_start()
 	save_item(NAME(m_rombank));
 	save_item(NAME(m_palette_base));
 	save_item(NAME(m_flip_screen));
+
+	m_palette_base = 0;
 }
 
 void royalmah_state::royalmah_palette(palette_device &palette) const
@@ -5412,6 +5416,8 @@ void royalmah_state::init_mjsiyoub()
 {
 	m_mainbank->set_base(memregion("maincpu")->base() + 0x8000);
 }
+
+} // Anonymous namespace
 
 
 // the original Janputer (Sanritsu) is not yet dumped, basically Royal Mahjong but non-BET type

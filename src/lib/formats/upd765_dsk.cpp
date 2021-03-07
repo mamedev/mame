@@ -29,7 +29,7 @@ int upd765_format::find_size(io_generic *io, uint32_t form_factor) const
 	return -1;
 }
 
-int upd765_format::identify(io_generic *io, uint32_t form_factor)
+int upd765_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	int type = find_size(io, form_factor);
 
@@ -173,7 +173,7 @@ floppy_image_format_t::desc_e* upd765_format::get_desc_mfm(const format &f, int 
 	return desc;
 }
 
-bool upd765_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool upd765_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int type = find_size(io, form_factor);
 	if(type == -1)
@@ -224,7 +224,7 @@ bool upd765_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 			generate_track(desc, track, head, sectors, f.sector_count, total_size, image);
 		}
 
-	image->set_variant(f.variant);
+	image->set_form_variant(f.form_factor, f.variant);
 
 	return true;
 }
@@ -234,7 +234,7 @@ bool upd765_format::supports_save() const
 	return true;
 }
 
-bool upd765_format::save(io_generic *io, floppy_image *image)
+bool upd765_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	// Count the number of formats
 	int formats_count;
@@ -352,21 +352,17 @@ bool upd765_format::save(io_generic *io, floppy_image *image)
 
 void upd765_format::check_compatibility(floppy_image *image, std::vector<int> &candidates)
 {
-	uint8_t bitstream[500000/8];
-	uint8_t sectdata[50000];
-	desc_xs sectors[256];
-	int track_size;
-
 	// Extract the sectors
-	generate_bitstream_from_track(0, 0, formats[candidates[0]].cell_size, bitstream, track_size, image);
+	auto bitstream = generate_bitstream_from_track(0, 0, formats[candidates[0]].cell_size, image);
+	std::vector<std::vector<uint8_t>> sectors;
 
 	switch (formats[candidates[0]].encoding)
 	{
 	case floppy_image::FM:
-		extract_sectors_from_bitstream_fm_pc(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
+		sectors = extract_sectors_from_bitstream_fm_pc(bitstream);
 		break;
 	case floppy_image::MFM:
-		extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
+		sectors = extract_sectors_from_bitstream_mfm_pc(bitstream);
 		break;
 	}
 
@@ -375,8 +371,8 @@ void upd765_format::check_compatibility(floppy_image *image, std::vector<int> &c
 	for(unsigned int i=0; i != candidates.size(); i++) {
 		const format &f = formats[candidates[i]];
 		int ns = 0;
-		for(int j=0; j<256; j++)
-			if(sectors[j].data) {
+		for(unsigned int j=0; j != sectors.size(); j++)
+			if(!sectors[j].empty()) {
 				int sid;
 				if(f.sector_base_id == -1) {
 					for(sid=0; sid < f.sector_count; sid++)
@@ -387,10 +383,10 @@ void upd765_format::check_compatibility(floppy_image *image, std::vector<int> &c
 				if(sid < 0 || sid > f.sector_count)
 					goto fail;
 				if(f.sector_base_size) {
-					if(sectors[j].size != f.sector_base_size)
+					if(sectors[j].size() != f.sector_base_size)
 						goto fail;
 				} else {
-					if(sectors[j].size != f.per_sector_size[sid])
+					if(sectors[j].size() != f.per_sector_size[sid])
 						goto fail;
 				}
 				ns++;
@@ -406,33 +402,30 @@ void upd765_format::check_compatibility(floppy_image *image, std::vector<int> &c
 
 void upd765_format::extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head)
 {
-	uint8_t bitstream[500000/8];
-	uint8_t sectdata[50000];
-	desc_xs sectors[256];
-	int track_size;
-
 	// Extract the sectors
-	generate_bitstream_from_track(track, head, f.cell_size, bitstream, track_size, image);
+	auto bitstream = generate_bitstream_from_track(track, head, f.cell_size, image);
+	std::vector<std::vector<uint8_t>> sectors;
 
 	switch (f.encoding)
 	{
 	case floppy_image::FM:
-		extract_sectors_from_bitstream_fm_pc(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
+		sectors = extract_sectors_from_bitstream_fm_pc(bitstream);
 		break;
 	case floppy_image::MFM:
-		extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
+		sectors = extract_sectors_from_bitstream_mfm_pc(bitstream);
 		break;
 	}
 
 	for(int i=0; i<f.sector_count; i++) {
 		desc_s &ds = sdesc[i];
-		desc_xs &xs = sectors[ds.sector_id];
-		if(!xs.data)
+		if(ds.sector_id >= sectors.size() || sectors[ds.sector_id].empty())
 			memset((void *)ds.data, 0, ds.size);
-		else if(xs.size < ds.size) {
-			memcpy((void *)ds.data, xs.data, xs.size);
-			memset((uint8_t *)ds.data + xs.size, 0, xs.size - ds.size);
+
+		else if(sectors[ds.sector_id].size() < ds.size) {
+			memcpy((void *)ds.data, sectors[ds.sector_id].data(), sectors[ds.sector_id].size());
+			memset((uint8_t *)ds.data + sectors[ds.sector_id].size(), 0, sectors[ds.sector_id].size() - ds.size);
+
 		} else
-			memcpy((void *)ds.data, xs.data, ds.size);
+			memcpy((void *)ds.data, sectors[ds.sector_id].data(), ds.size);
 	}
 }

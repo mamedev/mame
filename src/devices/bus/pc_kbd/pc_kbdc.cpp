@@ -25,47 +25,18 @@ The following basic program can be useful for identifying scancodes:
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(PC_KBDC_SLOT, pc_kbdc_slot_device, "pc_kbdc_slot", "PC keyboard port")
+DEFINE_DEVICE_TYPE(PC_KBDC, pc_kbdc_device, "pc_kbdc", "PC keyboard connector")
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
 //-------------------------------------------------
-//  pc_kbdc_slot_device - constructor
-//-------------------------------------------------
-pc_kbdc_slot_device::pc_kbdc_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PC_KBDC_SLOT, tag, owner, clock),
-	device_single_card_slot_interface<device_pc_kbd_interface>(mconfig, *this),
-	m_kbdc_device(nullptr)
-{
-}
-
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void pc_kbdc_slot_device::device_start()
-{
-	device_pc_kbd_interface *const pc_kbd = get_card_device();
-	if (pc_kbd)
-		pc_kbd->set_pc_kbdc(m_kbdc_device);
-}
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(PC_KBDC, pc_kbdc_device, "pc_kbdc", "PC KBDC")
-
-
-//-------------------------------------------------
 //  pc_kbdc_device - constructor
 //-------------------------------------------------
 pc_kbdc_device::pc_kbdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PC_KBDC, tag, owner, clock),
+	device_single_card_slot_interface<device_pc_kbd_interface>(mconfig, *this),
 	m_out_clock_cb(*this),
 	m_out_data_cb(*this),
 	m_clock_state(-1),
@@ -87,6 +58,10 @@ void pc_kbdc_device::set_keyboard(device_pc_kbd_interface *keyboard)
 //-------------------------------------------------
 void pc_kbdc_device::device_resolve_objects()
 {
+	device_pc_kbd_interface *const pc_kbd = get_card_device();
+	if (pc_kbd)
+		pc_kbd->set_pc_kbdc(this);
+
 	m_out_clock_cb.resolve_safe();
 	m_out_data_cb.resolve_safe();
 }

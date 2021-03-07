@@ -27,7 +27,7 @@ Verified Dip locations and recommended settings with manual
 #include "includes/skyfox.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
+#include "sound/ym2203.h"
 #include "speaker.h"
 
 

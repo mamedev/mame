@@ -44,6 +44,7 @@
 
 // MAME headers
 #include "posixfile.h"
+#include "osdcore.h"
 #include "unicode.h"
 
 #include <cassert>
@@ -468,12 +469,22 @@ bool osd_is_absolute_path(std::string const &path)
 //  osd_get_volume_name
 //============================================================
 
-const char *osd_get_volume_name(int idx)
+std::string osd_get_volume_name(int idx)
 {
 	if (idx == 0)
 		return "/";
 	else
-		return nullptr;
+		return std::string();
+}
+
+
+//============================================================
+//  osd_get_volume_names
+//============================================================
+
+std::vector<std::string> osd_get_volume_names()
+{
+	return std::vector<std::string>{ "/" };
 }
 
 

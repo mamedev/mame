@@ -41,7 +41,7 @@ const char *dmk_format::extensions() const
 }
 
 
-int dmk_format::identify(io_generic *io, uint32_t form_factor)
+int dmk_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	const int header_size = 16;
 	uint8_t header[header_size];
@@ -81,7 +81,7 @@ int dmk_format::identify(io_generic *io, uint32_t form_factor)
 }
 
 
-bool dmk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool dmk_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	const int header_size = 16;
 	uint8_t header[header_size];
@@ -213,7 +213,7 @@ bool dmk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 }
 
 
-bool dmk_format::save(io_generic *io, floppy_image *image)
+bool dmk_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	return false;
 }

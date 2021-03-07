@@ -213,28 +213,46 @@ uint32_t drgnmst_base_state::screen_update(screen_device &screen, bitmap_ind16 &
 		m_bg_tilemap->set_scrollx(0, m_vidregs[0xa] - 18); // verify
 
 		// this reg seems to be more closely related to md_tilemap again? is it some kind of split pos?
-		//int bgys = m_vidregs[0xb] & 0x1ff; 
+		//int bgys = m_vidregs[0xb] & 0x1ff;
 
 		int bgys = m_vidregs[0x10]; // skyscraper lift stage confirms this reg?
-		m_bg_tilemap->set_scrolly(0, bgys); 
+		m_bg_tilemap->set_scrolly(0, bgys);
 	}
 
-	// todo: figure out which bits relate to the order
+	// TODO: figure out which bits relate to the order, like cps1?
+	// 23da mastfury before attract portraits, ending
+	// 12c8 mastfury power on
 	switch (m_vidregs2[0])
 	{
-		case 0x2451: // fg unsure
-		case 0x2d9a: // fg unsure
-		case 0x2440: // all ok
-		case 0x245a: // fg unsure, title screen
-			m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-			m_md_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-			m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-			break;
+
 		case 0x23c0: // all ok
-		case 0x38c0: // mastfury 
 			m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 			m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 			m_md_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+			break;
+		case 0x2cc0: // mastfury mr daeth stage all ok
+			m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			m_md_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+			m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+			break;
+		case 0x38c0: // mastfury Sakamoto stage, Sya Ki stage same as above? but see note
+			// should fg also go above sprites? (it partially obscures 'time over' and bonus stage items on Sakamoto stage
+			// but explicitly changes from 2cc0 to display scores, which indicates there is maybe a difference)
+			m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			m_md_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+			m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+			break;
+		case 0x2780: // mastfury skyscraper lift stage all ok
+		case 0x279a: // mastfury continue screen all ok
+			m_md_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+			m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+			break;
+		case 0x2d80: // all ok
+		case 0x2cda: // mastfury win quotes all ok
+			m_md_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+			m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 			break;
 		case 0x38da: // fg unsure
 		case 0x215a: // fg unsure (mastfury title)
@@ -243,30 +261,24 @@ uint32_t drgnmst_base_state::screen_update(screen_device &screen, bitmap_ind16 &
 			m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 			m_md_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 			break;
-		case 0x2780: // mastfury skyscraper lift stage
-		case 0x279a: // mastfury continue screen
-			m_md_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-			m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+		case 0x2451: // fg unsure
+		case 0x2d9a: // fg unsure
+		case 0x2440: // all ok
+		case 0x245a: // fg unsure, title screen
+			m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			m_md_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 			m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-			break;
-		case 0x2d80: // all ok
-			m_md_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-			m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-			m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 			break;
 		default:
 			m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 			m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 			m_md_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-			//popmessage("unknown video priority regs %04x\n", m_vidregs2[0]);
+			break;
 	}
 
 	draw_sprites(bitmap,cliprect);
 
-//  popmessage ("x %04x x %04x x %04x x %04x x %04x", m_vidregs2[0], m_vidregs[12], m_vidregs[13], m_vidregs[14], m_vidregs[15]);
-
-	//popmessage ("x objbase: %04x scr0base %04x scr1base %04x scr2base %04x otherbase %04x palbase %04x",m_vidregs[0],m_vidregs[1],m_vidregs[2],m_vidregs[3],m_vidregs[4],m_vidregs[5]);
-	//popmessage ("x fgx: %04x fgy: %04x 16x: %04x 16y: %04x 32x: %04x 32y: %04x",m_vidregs[0x6],m_vidregs[0x7],m_vidregs[0x8],m_vidregs[0x9],m_vidregs[0xa],m_vidregs[0xb]);
+	//popmessage("unknown video priority regs %04x\n", m_vidregs2[0]);
 
 	return 0;
 }

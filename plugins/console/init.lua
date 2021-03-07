@@ -216,8 +216,8 @@ return ln.linenoise('$PROMPT')
 	end
 
 	emu.register_start(function()
-		if not consolebuf and manager:machine():debugger() then
-			consolebuf = manager:machine():debugger().consolelog
+		if not consolebuf and manager.machine.debugger then
+			consolebuf = manager.machine.debugger.consolelog
 			lastindex = 0
 		end
 	end)

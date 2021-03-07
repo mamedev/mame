@@ -396,13 +396,13 @@ void sym1_state::sym1(machine_config &config)
 	m_ttl74145->output_line_callback<6>().set("speaker", FUNC(speaker_sound_device::level_w));
 	// lines 7-9 not connected
 
-	via6522_device &via1(VIA6522(config, "via1", SYM1_CLOCK));
+	via6522_device &via1(MOS6522(config, "via1", SYM1_CLOCK));
 	via1.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	via1.ca2_handler().set(FUNC(sym1_state::via1_ca2_w));
 
-	VIA6522(config, "via2", SYM1_CLOCK).irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	MOS6522(config, "via2", SYM1_CLOCK).irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	via6522_device &via3(VIA6522(config, "via3", SYM1_CLOCK));
+	via6522_device &via3(MOS6522(config, "via3", SYM1_CLOCK));
 	via3.writepa_handler().set(FUNC(sym1_state::via3_a_w));
 	via3.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 

@@ -833,11 +833,11 @@ ROM_START(suprnova)
 ROM_END
 
 // GP1 dips
-GAME( 1979, sshootep,  0,        gp_2, gp_1, gp_2_state, empty_init, ROT0, "Game Plan", "Sharpshooter",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1979, coneyis,   0,        gp_2, gp_1, gp_2_state, empty_init, ROT0, "Game Plan", "Old Coney Island!", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1980, lizard,    0,        gp_2, gp_1, gp_2_state, empty_init, ROT0, "Game Plan", "Pinball Lizard",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1982, suprnova,  0,        gp_2, gp_1, gp_2_state, empty_init, ROT0, "Game Plan", "Super Nova",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1983, sshootr2,  0,        gp_2, gp_1, gp_2_state, empty_init, ROT0, "Game Plan", "Sharp Shooter II",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, sshootep,  0,        gp_2, gp_1, gp_2_state, empty_init, ROT0, "Game Plan", "Sharpshooter (Game Plan)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, coneyis,   0,        gp_2, gp_1, gp_2_state, empty_init, ROT0, "Game Plan", "Old Coney Island!",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1980, lizard,    0,        gp_2, gp_1, gp_2_state, empty_init, ROT0, "Game Plan", "Pinball Lizard",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1982, suprnova,  0,        gp_2, gp_1, gp_2_state, empty_init, ROT0, "Game Plan", "Super Nova (Game Plan)",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, sshootr2,  0,        gp_2, gp_1, gp_2_state, empty_init, ROT0, "Game Plan", "Sharp Shooter II",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // GP2 dips
 GAME( 1981, gwarfare,  0,        gp_2, gp_2, gp_2_state, empty_init, ROT0, "Game Plan", "Global Warfare", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

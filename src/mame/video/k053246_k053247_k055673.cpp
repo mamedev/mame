@@ -1026,13 +1026,13 @@ void k055673_device::device_start()
 	m_z_rejection = -1;
 	m_gfx = gfx(gfx_index);
 	m_objcha_line = CLEAR_LINE;
-	m_ram = std::make_unique<u16[]>(0x1000/2);
+	m_ram = std::make_unique<u16[]>(0x4000/2);
 
-	memset(m_ram.get(),  0, 0x1000);
+	memset(m_ram.get(),  0, 0x4000);
 	std::fill(std::begin(m_kx46_regs), std::end(m_kx46_regs), 0);
 	std::fill(std::begin(m_kx47_regs), std::end(m_kx47_regs), 0);
 
-	save_pointer(NAME(m_ram), 0x800);
+	save_pointer(NAME(m_ram), 0x2000);
 	save_item(NAME(m_kx46_regs));
 	save_item(NAME(m_kx47_regs));
 	save_item(NAME(m_objcha_line));

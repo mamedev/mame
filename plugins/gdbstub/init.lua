@@ -36,12 +36,12 @@ function gdbstub.startplugin()
 	local running
 
 	emu.register_start(function ()
-		debugger = manager:machine():debugger()
+		debugger = manager.machine.debugger
 		if not debugger then
 			print("gdbstub: debugger not enabled")
 			return
 		end
-		cpu = manager:machine().devices[":maincpu"]
+		cpu = manager.machine.devices[":maincpu"]
 		if not cpu then
 			print("gdbstub: maincpu not found")
 		end
@@ -195,7 +195,7 @@ function gdbstub.startplugin()
 				end
 			elseif cmd == "s" then
 				if #packet == 1 then
-					cpu:debug():step()
+					cpu.debug:step()
 					socket:write("+$OK#9a")
 					socket:write("$S05#B8")
 					running = false
@@ -204,7 +204,7 @@ function gdbstub.startplugin()
 				end
 			elseif cmd == "c" then
 				if #packet == 1 then
-					cpu:debug():go()
+					cpu.debug:go()
 					socket:write("+$OK#9a")
 				else
 					socket:write("+$E00#a5")
@@ -219,7 +219,7 @@ function gdbstub.startplugin()
 						socket:write("+$E00#a5")
 						return
 					end
-					local idx = cpu:debug():bpset(addr)
+					local idx = cpu.debug:bpset(addr)
 					breaks.byaddr[addr] = idx
 					breaks.byidx[idx] = addr
 					socket:write("+$OK#9a")
@@ -228,7 +228,7 @@ function gdbstub.startplugin()
 						socket:write("+$E00#a5")
 						return
 					end
-					local idx = cpu:debug():wpset(cpu.spaces["program"], "w", addr, 1)
+					local idx = cpu.debug:wpset(cpu.spaces["program"], "w", addr, 1)
 					watches.byaddr[addr] = idx
 					watches.byidx[idx] = {addr = addr, type = "watch"}
 					socket:write("+$OK#9a")
@@ -237,7 +237,7 @@ function gdbstub.startplugin()
 						socket:write("+$E00#a5")
 						return
 					end
-					local idx = cpu:debug():wpset(cpu.spaces["program"], "r", addr, 1)
+					local idx = cpu.debug:wpset(cpu.spaces["program"], "r", addr, 1)
 					watches.byaddr[addr] = idx
 					watches.byidx[idx] = {addr = addr, type = "rwatch"}
 					socket:write("+$OK#9a")
@@ -246,7 +246,7 @@ function gdbstub.startplugin()
 						socket:write("+$E00#a5")
 						return
 					end
-					local idx = cpu:debug():wpset(cpu.spaces["program"], "rw", addr, 1)
+					local idx = cpu.debug:wpset(cpu.spaces["program"], "rw", addr, 1)
 					watches.byaddr[addr] = idx
 					watches.byidx[idx] = {addr = addr, type = "awatch"}
 					socket:write("+$OK#9a")
@@ -262,7 +262,7 @@ function gdbstub.startplugin()
 						return
 					end
 					local idx = breaks.byaddr[addr]
-					cpu:debug():bpclr(idx)
+					cpu.debug:bpclr(idx)
 					breaks.byaddr[addr] = nil
 					breaks.byidx[idx] = nil
 					socket:write("+$OK#9a")
@@ -272,7 +272,7 @@ function gdbstub.startplugin()
 						return
 					end
 					local idx = watches.byaddr[addr]
-					cpu:debug():wpclr(idx)
+					cpu.debug:wpclr(idx)
 					watches.byaddr[addr] = nil
 					watches.byidx[idx] = nil
 					socket:write("+$OK#9a")

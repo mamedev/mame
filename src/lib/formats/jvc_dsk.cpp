@@ -168,13 +168,13 @@ bool jvc_format::parse_header(io_generic *io, int &header_size, int &tracks, int
 	return tracks * heads * sectors * sector_size == (size - header_size);
 }
 
-int jvc_format::identify(io_generic *io, uint32_t form_factor)
+int jvc_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	int header_size, tracks, heads, sectors, sector_size, sector_base_id;
 	return parse_header(io, header_size, tracks, heads, sectors, sector_size, sector_base_id) ? 50 : 0;
 }
 
-bool jvc_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool jvc_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int header_size, track_count, head_count, sector_count, sector_size, sector_base_id;
 
@@ -223,11 +223,8 @@ bool jvc_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	return true;
 }
 
-bool jvc_format::save(io_generic *io, floppy_image *image)
+bool jvc_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
-	uint8_t bitstream[500000/8];
-	uint8_t sector_data[50000];
-	desc_xs sectors[256];
 	uint64_t file_offset = 0;
 
 	int track_count, head_count;
@@ -248,20 +245,19 @@ bool jvc_format::save(io_generic *io, floppy_image *image)
 	{
 		for (int head = 0; head < head_count; head++)
 		{
-			int track_size;
-			generate_bitstream_from_track(track, head, 2000, bitstream, track_size, image);
-			extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sector_data, sizeof(sector_data));
+			auto bitstream = generate_bitstream_from_track(track, head, 2000, image);
+			auto sectors = extract_sectors_from_bitstream_mfm_pc(bitstream);
 
 			for (int i = 0; i < 18; i++)
 			{
-				if (sectors[1 + i].size != 256)
+				if (sectors[1 + i].size() != 256)
 				{
-					osd_printf_error("jvc_format: invalid sector size: %d\n", sectors[1 + i].size);
+					osd_printf_error("jvc_format: invalid sector size: %d\n", sectors[1 + i].size());
 					return false;
 				}
 
-				io_generic_write(io, sectors[1 + i].data, file_offset, sectors[1 + i].size);
-				file_offset += sectors[1 + i].size;
+				io_generic_write(io, sectors[1 + i].data(), file_offset, 256);
+				file_offset += 256;
 			}
 		}
 	}

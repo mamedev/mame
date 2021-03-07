@@ -1466,14 +1466,14 @@ void midzeus_state::log_waveram(uint32_t length_and_base)
 	for (i = 0; i < numoctets; i++)
 		checksum += ptr[i*2] + ptr[i*2+1];
 
-	for (i = 0; i < ARRAY_LENGTH(recent_entries); i++)
+	for (i = 0; i < std::size(recent_entries); i++)
 		if (recent_entries[i].lab == length_and_base && recent_entries[i].checksum == checksum)
 		{
 			foundit = true;
 			break;
 		}
 
-	if (i == ARRAY_LENGTH(recent_entries))
+	if (i == std::size(recent_entries))
 		i--;
 	if (i != 0)
 	{

@@ -233,6 +233,7 @@ protected:
 
 	const bool m_is_multi32;
 
+	// internal states
 	uint8_t m_v60_irq_control[0x10];
 	timer_device *m_v60_irq_timer[2];
 	uint8_t m_sound_irq_control[4];
@@ -242,10 +243,14 @@ protected:
 	sys32_output_callback m_sw1_output;
 	sys32_output_callback m_sw2_output;
 	sys32_output_callback m_sw3_output;
+
+	// hardware specific
 	std::unique_ptr<uint16_t[]> m_system32_protram;
+	uint16_t m_arescue_dsp_io[6];
+
+	// video-related
 	uint16_t m_system32_displayenable[2];
 	uint16_t m_system32_tilebank_external;
-	uint16_t m_arescue_dsp_io[6];
 	std::unique_ptr<cache_entry[]> m_tmap_cache;
 	cache_entry *m_cache_head;
 	layer_info m_layer_data[11];
@@ -256,6 +261,9 @@ protected:
 	uint8_t m_sprite_control_latched[8];
 	uint8_t m_sprite_control[8];
 	std::unique_ptr<uint32_t[]> m_spriteram_32bit;
+	std::unique_ptr<int32_t[]> m_prev_bgstartx;
+	std::unique_ptr<int32_t[]> m_prev_bgendx;
+	std::unique_ptr<int32_t[]> m_bgcolor_line;
 	typedef void (segas32_state::*prot_vblank_func)();
 	prot_vblank_func m_system32_prot_vblank;
 	int m_print_count;

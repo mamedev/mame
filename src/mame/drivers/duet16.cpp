@@ -348,7 +348,6 @@ void duet16_keyboard_devices(device_slot_interface &device)
 
 static DEVICE_INPUT_DEFAULTS_START(keyboard)
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
@@ -418,8 +417,8 @@ void duet16_state::duet16(machine_config &config)
 	UPD765A(config, m_fdc, 8_MHz_XTAL, true, false);
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq0_w));
 	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir3_w)); // INT4
-	FLOPPY_CONNECTOR(config, "fdc:0", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats, true);
-	FLOPPY_CONNECTOR(config, "fdc:1", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats, true);
+	FLOPPY_CONNECTOR(config, "fdc:0", duet16_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats, true);
+	FLOPPY_CONNECTOR(config, "fdc:1", duet16_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats, true);
 
 	hd6845s_device &crtc(HD6845S(config, "crtc", 2000000)); // "46505S" on schematics
 	crtc.set_char_width(8);

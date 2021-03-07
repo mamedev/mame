@@ -21,36 +21,8 @@ jobs:
         TOOLS: 1
       run: make -j2
     - name: Validate
-      run: ./mame64 -validate
+      run: ./mame -validate
     - uses: actions/upload-artifact@master
       with:
-        name: mame64-windows-gcc-${{ github.sha }}
-        path: mame64.exe
-
-  build-windows-msvc:
-    runs-on: windows-latest
-    steps:
-    - uses: msys2/setup-msys2@v2
-      with:
-        install: git make mingw-w64-x86_64-gcc mingw-w64-x86_64-python
-    - uses: actions/checkout@master
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
-    - name: Generate build files
-      shell: msys2 {0}
-      env:
-        MINGW64: "/mingw64"
-        TOOLS: 1
-      run: make -j2 vs2019
-    - name: Build
-      shell: cmd
-      env:
-        PreferredToolArchitecture: x64
-      run: msbuild "build\projects\windows\mame\vs2019\mame.sln" /m:2 /p:ContinueOnError=false /p:StopOnFirstFailure=true /property:Configuration=Release /property:Platform=x64
-    - name: Validate
-      shell: cmd
-      run: mame64 -validate
-    - uses: actions/upload-artifact@master
-      with:
-        name: mame64-windows-msvc-${{ github.sha }}
-        path: mame64.exe
+        name: mame-windows-gcc-${{ github.sha }}
+        path: mame.exe

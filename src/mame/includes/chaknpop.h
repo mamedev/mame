@@ -20,9 +20,19 @@ public:
 		m_palette(*this, "palette"),
 		m_tx_ram(*this, "tx_ram"),
 		m_attr_ram(*this, "attr_ram"),
-		m_spr_ram(*this, "spr_ram")
+		m_spr_ram(*this, "spr_ram"),
+		m_vram_bank(*this, "vram_bank"),
+		m_vram(*this, "vram", 0x8000, ENDIANNESS_LITTLE)
 	{ }
 
+	void chaknpop(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<taito68705_mcu_device> m_bmcu;
@@ -33,13 +43,11 @@ public:
 	required_shared_ptr<uint8_t> m_tx_ram;
 	required_shared_ptr<uint8_t> m_attr_ram;
 	required_shared_ptr<uint8_t> m_spr_ram;
+	required_memory_bank m_vram_bank;
+	memory_share_creator<uint8_t> m_vram;
 
 	/* video-related */
 	tilemap_t  *m_tx_tilemap;
-	uint8_t    *m_vram1;
-	uint8_t    *m_vram2;
-	uint8_t    *m_vram3;
-	uint8_t    *m_vram4;
 	uint8_t    m_gfxmode;
 	uint8_t    m_flip_x;
 	uint8_t    m_flip_y;
@@ -55,9 +63,6 @@ public:
 	uint8_t mcu_status_r();
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	void chaknpop_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -65,8 +70,6 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void mcu_update_seed(uint8_t data);
-	void chaknpop(machine_config &config);
 	void chaknpop_map(address_map &map);
 };
 

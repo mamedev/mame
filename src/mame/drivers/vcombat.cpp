@@ -89,7 +89,7 @@ TODO :  This is a partially working driver.  Most of the memory maps for
 #include "sound/dac.h"
 #include "video/mc6845.h"
 #include "video/tlc34076.h"
-#include "rendlay.h"
+#include "layout/generic.h"
 #include "screen.h"
 #include "speaker.h"
 

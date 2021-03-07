@@ -10,6 +10,8 @@
 
 #include "xmlfile.h"
 
+#include "osdcore.h"
+
 #include <expat.h>
 
 #include <algorithm>
@@ -26,16 +28,16 @@ namespace util::xml {
 
 namespace {
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
 
 constexpr unsigned TEMP_BUFFER_SIZE(4096U);
 
 
-/***************************************************************************
-    UTILITY FUNCTIONS
-***************************************************************************/
+//**************************************************************************
+//  UTILITY FUNCTIONS
+//**************************************************************************
 
 void write_escaped(core_file &file, std::string const &str)
 {
@@ -67,9 +69,9 @@ void write_escaped(core_file &file, std::string const &str)
 
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
 struct parse_info
 {
@@ -81,11 +83,11 @@ struct parse_info
 
 
 
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
+//**************************************************************************
+//  PROTOTYPES
+//**************************************************************************
 
-/* expat interfaces */
+// expat interfaces
 static bool expat_setup_parser(parse_info &info, parse_options const *opts);
 static void expat_element_start(void *data, const XML_Char *name, const XML_Char **attributes);
 static void expat_data(void *data, const XML_Char *s, int len);
@@ -93,17 +95,17 @@ static void expat_element_end(void *data, const XML_Char *name);
 
 
 
-/***************************************************************************
-    XML FILE OBJECTS
-***************************************************************************/
+//**************************************************************************
+//  XML FILE OBJECTS
+//**************************************************************************
 
 file::file() { }
 file::~file() { }
 
 
-/*-------------------------------------------------
-    create - create a new, empty XML file
--------------------------------------------------*/
+//-------------------------------------------------
+//  create - create a new, empty XML file
+//-------------------------------------------------
 
 file::ptr file::create()
 {
@@ -112,29 +114,29 @@ file::ptr file::create()
 }
 
 
-/*-------------------------------------------------
-    read - parse an XML file into its nodes
--------------------------------------------------*/
+//-------------------------------------------------
+//  read - parse an XML file into its nodes
+//-------------------------------------------------
 
 file::ptr file::read(util::core_file &file, parse_options const *opts)
 {
 	parse_info info;
 	int done;
 
-	/* set up the parser */
+	// set up the parser
 	if (!expat_setup_parser(info, opts))
 		return ptr();
 
-	/* loop through the file and parse it */
+	// loop through the file and parse it
 	do
 	{
 		char tempbuf[TEMP_BUFFER_SIZE];
 
-		/* read as much as we can */
+		// read as much as we can
 		int bytes = file.read(tempbuf, sizeof(tempbuf));
 		done = file.eof();
 
-		/* parse the data */
+		// parse the data
 		if (XML_Parse(info.parser, tempbuf, bytes, done) == XML_STATUS_ERROR)
 		{
 			if (opts != nullptr && opts->error != nullptr)
@@ -151,29 +153,29 @@ file::ptr file::read(util::core_file &file, parse_options const *opts)
 	}
 	while (!done);
 
-	/* free the parser */
+	// free the parser
 	XML_ParserFree(info.parser);
 
-	/* return the root node */
+	// return the root node
 	return std::move(info.rootnode);
 }
 
 
-/*-------------------------------------------------
-    string_read - parse an XML string into its
-    nodes
--------------------------------------------------*/
+//-------------------------------------------------
+//  string_read - parse an XML string into its
+//  nodes
+//-------------------------------------------------
 
 file::ptr file::string_read(const char *string, parse_options const *opts)
 {
 	parse_info info;
 	int length = (int)strlen(string);
 
-	/* set up the parser */
+	// set up the parser
 	if (!expat_setup_parser(info, opts))
 		return ptr();
 
-	/* parse the data */
+	// parse the data
 	if (XML_Parse(info.parser, string, length, 1) == XML_STATUS_ERROR)
 	{
 		if (opts != nullptr && opts->error != nullptr)
@@ -188,36 +190,36 @@ file::ptr file::string_read(const char *string, parse_options const *opts)
 		return ptr();
 	}
 
-	/* free the parser */
+	// free the parser
 	XML_ParserFree(info.parser);
 
-	/* return the root node */
+	// return the root node
 	return std::move(info.rootnode);
 }
 
 
-/*-------------------------------------------------
-    file_write - write an XML tree to a file
--------------------------------------------------*/
+//-------------------------------------------------
+//  file_write - write an XML tree to a file
+//-------------------------------------------------
 
 void file::write(util::core_file &file) const
 {
-	/* ensure this is a root node */
+	// ensure this is a root node
 	assert(!get_name());
 
-	/* output a simple header */
+	// output a simple header
 	file.printf("<?xml version=\"1.0\"?>\n");
 	file.printf("<!-- This file is autogenerated; comments and unknown tags will be stripped -->\n");
 
-	/* loop over children of the root and output */
+	// loop over children of the root and output
 	write_recursive(0, file);
 }
 
 
 
-/***************************************************************************
-    XML NODE MANAGEMENT
-***************************************************************************/
+//**************************************************************************
+//  XML NODE MANAGEMENT
+//**************************************************************************
 
 data_node::data_node()
 	: line(0)
@@ -243,10 +245,10 @@ data_node::data_node(data_node *parent, const char *name, const char *value)
 }
 
 
-/*-------------------------------------------------
-    free_node_recursive - recursively free
-    the data allocated to an XML node
--------------------------------------------------*/
+//-------------------------------------------------
+//  free_node_recursive - recursively free
+//  the data allocated to an XML node
+//-------------------------------------------------
 
 data_node::~data_node()
 {
@@ -258,7 +260,7 @@ void data_node::free_children()
 {
 	for (data_node *nchild = nullptr; m_first_child; m_first_child = nchild)
 	{
-		/* note the next node and free this node */
+		// note the next node and free this node
 		nchild = m_first_child->get_next_sibling();
 		delete m_first_child;
 	}
@@ -279,13 +281,13 @@ void data_node::append_value(char const *value, int length)
 
 void data_node::trim_whitespace()
 {
-	/* first strip leading spaces */
+	// first strip leading spaces
 	std::string::iterator start = m_value.begin();
 	while ((m_value.end() != start) && std::isspace(uint8_t(*start)))
 		++start;
 	m_value.replace(m_value.begin(), start, 0U, '\0');
 
-	/* then strip trailing spaces */
+	// then strip trailing spaces
 	std::string::iterator end = m_value.end();
 	while ((m_value.begin() != end) && std::isspace(uint8_t(*std::prev(end))))
 		--end;
@@ -293,14 +295,14 @@ void data_node::trim_whitespace()
 }
 
 
-/*-------------------------------------------------
-    data_node::count_children - count the
-    number of child nodes
--------------------------------------------------*/
+//-------------------------------------------------
+//  data_node::count_children - count the
+//  number of child nodes
+//-------------------------------------------------
 
 std::size_t data_node::count_children() const
 {
-	/* loop over children and count */
+	// loop over children and count
 	std::size_t count = 0;
 	for (data_node const *node = get_first_child(); node; node = node->get_next_sibling())
 		count++;
@@ -308,10 +310,10 @@ std::size_t data_node::count_children() const
 }
 
 
-/*-------------------------------------------------
-    data_node::count_children - count the
-    number of child nodes
--------------------------------------------------*/
+//-------------------------------------------------
+//  data_node::count_children - count the
+//  number of child nodes
+//-------------------------------------------------
 
 std::size_t data_node::count_attributes() const
 {
@@ -319,11 +321,11 @@ std::size_t data_node::count_attributes() const
 }
 
 
-/*-------------------------------------------------
-    data_node::get_child - find the first
-    child of the specified node with the specified
-    tag
--------------------------------------------------*/
+//-------------------------------------------------
+//  data_node::get_child - find the first
+//  child of the specified node with the specified
+//  tag
+//-------------------------------------------------
 
 data_node *data_node::get_child(const char *name)
 {
@@ -336,11 +338,11 @@ data_node const *data_node::get_child(const char *name) const
 }
 
 
-/*-------------------------------------------------
-    find_first_matching_child - find the first
-    child of the specified node with the
-    specified tag or attribute/value pair
--------------------------------------------------*/
+//-------------------------------------------------
+//  find_first_matching_child - find the first
+//  child of the specified node with the
+//  specified tag or attribute/value pair
+//-------------------------------------------------
 
 data_node *data_node::find_first_matching_child(const char *name, const char *attribute, const char *matchval)
 {
@@ -353,11 +355,11 @@ data_node const *data_node::find_first_matching_child(const char *name, const ch
 }
 
 
-/*-------------------------------------------------
-    data_node::get_next_sibling - find the
-    next sibling of the specified node with the
-    specified tag
--------------------------------------------------*/
+//-------------------------------------------------
+//  data_node::get_next_sibling - find the
+//  next sibling of the specified node with the
+//  specified tag
+//-------------------------------------------------
 
 data_node *data_node::get_next_sibling(const char *name)
 {
@@ -370,11 +372,11 @@ data_node const *data_node::get_next_sibling(const char *name) const
 }
 
 
-/*-------------------------------------------------
-    find_next_matching_sibling - find the next
-    sibling of the specified node with the
-    specified tag or attribute/value pair
--------------------------------------------------*/
+//-------------------------------------------------
+//  find_next_matching_sibling - find the next
+//  sibling of the specified node with the
+//  specified tag or attribute/value pair
+//-------------------------------------------------
 
 data_node *data_node::find_next_matching_sibling(const char *name, const char *attribute, const char *matchval)
 {
@@ -387,17 +389,17 @@ data_node const *data_node::find_next_matching_sibling(const char *name, const c
 }
 
 
-/*-------------------------------------------------
-    add_child - add a new child node to the
-    given node
--------------------------------------------------*/
+//-------------------------------------------------
+//  add_child - add a new child node to the
+//  given node
+//-------------------------------------------------
 
 data_node *data_node::add_child(const char *name, const char *value)
 {
 	if (!name || !*name)
 		return nullptr;
 
-	/* new element: create a new node */
+	// new element: create a new node
 	data_node *node;
 	try { node = new data_node(this, name, value); }
 	catch (...) { return nullptr; }
@@ -408,7 +410,7 @@ data_node *data_node::add_child(const char *name, const char *value)
 		return nullptr;
 	}
 
-	/* add us to the end of the list of siblings */
+	// add us to the end of the list of siblings
 	data_node **pnode;
 	for (pnode = &m_first_child; *pnode; pnode = &(*pnode)->m_next) { }
 	*pnode = node;
@@ -417,19 +419,19 @@ data_node *data_node::add_child(const char *name, const char *value)
 }
 
 
-/*-------------------------------------------------
-    get_or_add_child - find a child node of
-    the specified type; if not found, add one
--------------------------------------------------*/
+//-------------------------------------------------
+//  get_or_add_child - find a child node of
+//  the specified type; if not found, add one
+//-------------------------------------------------
 
 data_node *data_node::get_or_add_child(const char *name, const char *value)
 {
-	/* find the child first */
+	// find the child first
 	data_node *const child = m_first_child->get_sibling(name);
 	if (child)
 		return child;
 
-	/* if not found, do a standard add child */
+	// if not found, do a standard add child
 	return add_child(name, value);
 }
 
@@ -471,17 +473,17 @@ data_node *data_node::copy_into(data_node &parent) const
 }
 
 
-/*-------------------------------------------------
-    delete_node - delete a node and its
-    children
--------------------------------------------------*/
+//-------------------------------------------------
+//  delete_node - delete a node and its
+//  children
+//-------------------------------------------------
 
 void data_node::delete_node()
 {
-	/* don't allow deletion of document root */
+	// don't allow deletion of document root
 	if (m_parent)
 	{
-		/* first unhook us from the list of children of our parent */
+		// first unhook us from the list of children of our parent
 		for (data_node **pnode = &m_parent->m_first_child; *pnode; pnode = &(*pnode)->m_next)
 		{
 			if (*pnode == this)
@@ -491,25 +493,25 @@ void data_node::delete_node()
 			}
 		}
 
-		/* now free ourselves and our children */
+		// now free ourselves and our children
 		delete this;
 	}
 	else
 	{
-		/* remove all children of document root */
+		// remove all children of document root
 		free_children();
 	}
 }
 
 
-/*-------------------------------------------------
-    get_next_sibling - find the next sibling of
-    the specified node with the specified tag
--------------------------------------------------*/
+//-------------------------------------------------
+//  get_next_sibling - find the next sibling of
+//  the specified node with the specified tag
+//-------------------------------------------------
 
 data_node *data_node::get_sibling(const char *name)
 {
-	/* loop over siblings and find a matching name */
+	// loop over siblings and find a matching name
 	for (data_node *node = this; node; node = node->get_next_sibling())
 		if (strcmp(node->get_name(), name) == 0)
 			return node;
@@ -518,7 +520,7 @@ data_node *data_node::get_sibling(const char *name)
 
 data_node const *data_node::get_sibling(const char *name) const
 {
-	/* loop over siblings and find a matching name */
+	// loop over siblings and find a matching name
 	for (data_node const *node = this; node; node = node->get_next_sibling())
 		if (strcmp(node->get_name(), name) == 0)
 			return node;
@@ -526,21 +528,21 @@ data_node const *data_node::get_sibling(const char *name) const
 }
 
 
-/*-------------------------------------------------
-    find_matching_sibling - find the next
-    sibling of the specified node with the
-    specified tag or attribute/value pair
--------------------------------------------------*/
+//-------------------------------------------------
+//  find_matching_sibling - find the next
+//  sibling of the specified node with the
+//  specified tag or attribute/value pair
+//-------------------------------------------------
 
 data_node *data_node::find_matching_sibling(const char *name, const char *attribute, const char *matchval)
 {
-	/* loop over siblings and find a matching attribute */
+	// loop over siblings and find a matching attribute
 	for (data_node *node = this; node; node = node->get_next_sibling())
 	{
-		/* can pass nullptr as a wildcard for the node name */
+		// can pass nullptr as a wildcard for the node name
 		if (!name || !strcmp(name, node->get_name()))
 		{
-			/* find a matching attribute */
+			// find a matching attribute
 			attribute_node const *const attr = node->get_attribute(attribute);
 			if (attr && !strcmp(attr->value.c_str(), matchval))
 				return node;
@@ -551,13 +553,13 @@ data_node *data_node::find_matching_sibling(const char *name, const char *attrib
 
 data_node const *data_node::find_matching_sibling(const char *name, const char *attribute, const char *matchval) const
 {
-	/* loop over siblings and find a matching attribute */
+	// loop over siblings and find a matching attribute
 	for (data_node const *node = this; node; node = node->get_next_sibling())
 	{
-		/* can pass nullptr as a wildcard for the node name */
+		// can pass nullptr as a wildcard for the node name
 		if (!name || !strcmp(name, node->get_name()))
 		{
-			/* find a matching attribute */
+			// find a matching attribute
 			attribute_node const *const attr = node->get_attribute(attribute);
 			if (attr && !strcmp(attr->value.c_str(), matchval))
 				return node;
@@ -568,9 +570,9 @@ data_node const *data_node::find_matching_sibling(const char *name, const char *
 
 
 
-/***************************************************************************
-    XML ATTRIBUTE MANAGEMENT
-***************************************************************************/
+//**************************************************************************
+//  XML ATTRIBUTE MANAGEMENT
+//**************************************************************************
 
 bool data_node::has_attribute(const char *attribute) const
 {
@@ -578,14 +580,14 @@ bool data_node::has_attribute(const char *attribute) const
 }
 
 
-/*-------------------------------------------------
-    get_attribute - get the value of the
-    specified attribute, or nullptr if not found
--------------------------------------------------*/
+//-------------------------------------------------
+//  get_attribute - get the value of the
+//  specified attribute, or nullptr if not found
+//-------------------------------------------------
 
 data_node::attribute_node *data_node::get_attribute(const char *attribute)
 {
-	/* loop over attributes and find a match */
+	// loop over attributes and find a match
 	for (attribute_node &anode : m_attributes)
 		if (strcmp(anode.name.c_str(), attribute) == 0)
 			return &anode;
@@ -594,7 +596,7 @@ data_node::attribute_node *data_node::get_attribute(const char *attribute)
 
 data_node::attribute_node const *data_node::get_attribute(const char *attribute) const
 {
-	/* loop over attributes and find a match */
+	// loop over attributes and find a match
 	for (attribute_node const &anode : m_attributes)
 		if (strcmp(anode.name.c_str(), attribute) == 0)
 			return &anode;
@@ -602,11 +604,24 @@ data_node::attribute_node const *data_node::get_attribute(const char *attribute)
 }
 
 
-/*-------------------------------------------------
-    get_attribute_string - get the string
-    value of the specified attribute; if not
-    found, return = the provided default
--------------------------------------------------*/
+//-------------------------------------------------
+//  get_attribute_string_ptr - get a pointer to
+//  the string value of the specified attribute;
+//  if not found, return = nullptr
+//-------------------------------------------------
+
+std::string const *data_node::get_attribute_string_ptr(const char *attribute) const
+{
+	attribute_node const *attr = get_attribute(attribute);
+	return attr ? &attr->value : nullptr;
+}
+
+
+//-------------------------------------------------
+//  get_attribute_string - get the string
+//  value of the specified attribute; if not
+//  found, return = the provided default
+//-------------------------------------------------
 
 const char *data_node::get_attribute_string(const char *attribute, const char *defvalue) const
 {
@@ -615,17 +630,18 @@ const char *data_node::get_attribute_string(const char *attribute, const char *d
 }
 
 
-/*-------------------------------------------------
-    get_attribute_int - get the integer
-    value of the specified attribute; if not
-    found, return = the provided default
--------------------------------------------------*/
+//-------------------------------------------------
+//  get_attribute_int - get the integer
+//  value of the specified attribute; if not
+//  found, return = the provided default
+//-------------------------------------------------
 
 long long data_node::get_attribute_int(const char *attribute, long long defvalue) const
 {
-	char const *const string = get_attribute_string(attribute, nullptr);
-	if (!string)
+	attribute_node const *attr = get_attribute(attribute);
+	if (!attr)
 		return defvalue;
+	std::string const &string = attr->value;
 
 	std::istringstream stream;
 	stream.imbue(std::locale::classic());
@@ -659,75 +675,77 @@ long long data_node::get_attribute_int(const char *attribute, long long defvalue
 }
 
 
-/*-------------------------------------------------
-    get_attribute_int_format - return the
-    format of the given integer attribute
--------------------------------------------------*/
+//-------------------------------------------------
+//  get_attribute_int_format - return the
+//  format of the given integer attribute
+//-------------------------------------------------
 
 data_node::int_format data_node::get_attribute_int_format(const char *attribute) const
 {
-	char const *const string = get_attribute_string(attribute, nullptr);
-	if (!string)
+	attribute_node const *attr = get_attribute(attribute);
+	if (!attr)
 		return int_format::DECIMAL;
-	else if (string[0] == '$')
+	std::string const &string = attr->value;
+
+	if (string[0] == '$')
 		return int_format::HEX_DOLLAR;
 	else if (string[0] == '0' && string[1] == 'x')
 		return int_format::HEX_C;
-	if (string[0] == '#')
+	else if (string[0] == '#')
 		return int_format::DECIMAL_HASH;
 	else
 		return int_format::DECIMAL;
 }
 
 
-/*-------------------------------------------------
-    get_attribute_float - get the float
-    value of the specified attribute; if not
-    found, return = the provided default
--------------------------------------------------*/
+//-------------------------------------------------
+//  get_attribute_float - get the float
+//  value of the specified attribute; if not
+//  found, return = the provided default
+//-------------------------------------------------
 
 float data_node::get_attribute_float(const char *attribute, float defvalue) const
 {
-	char const *const string = get_attribute_string(attribute, nullptr);
-	if (!string)
+	attribute_node const *attr = get_attribute(attribute);
+	if (!attr)
 		return defvalue;
 
-	std::istringstream stream(string);
+	std::istringstream stream(attr->value);
 	stream.imbue(std::locale::classic());
 	float result;
 	return (stream >> result) ? result : defvalue;
 }
 
 
-/*-------------------------------------------------
-    set_attribute - set a new attribute and
-    string value on the node
--------------------------------------------------*/
+//-------------------------------------------------
+//  set_attribute - set a new attribute and
+//  string value on the node
+//-------------------------------------------------
 
 void data_node::set_attribute(const char *name, const char *value)
 {
 	attribute_node *anode;
 
-	/* first find an existing one to replace */
+	// first find an existing one to replace
 	anode = get_attribute(name);
 
 	if (anode != nullptr)
 	{
-		/* if we found it, free the old value and replace it */
+		// if we found it, free the old value and replace it
 		anode->value = value;
 	}
 	else
 	{
-		/* otherwise, create a new node */
+		// otherwise, create a new node
 		add_attribute(name, value);
 	}
 }
 
 
-/*-------------------------------------------------
-    set_attribute_int - set a new attribute and
-    integer value on the node
--------------------------------------------------*/
+//-------------------------------------------------
+//  set_attribute_int - set a new attribute and
+//  integer value on the node
+//-------------------------------------------------
 
 void data_node::set_attribute_int(const char *name, long long value)
 {
@@ -735,10 +753,10 @@ void data_node::set_attribute_int(const char *name, long long value)
 }
 
 
-/*-------------------------------------------------
-    set_attribute_int - set a new attribute and
-    float value on the node
--------------------------------------------------*/
+//-------------------------------------------------
+//  set_attribute_int - set a new attribute and
+//  float value on the node
+//-------------------------------------------------
 
 void data_node::set_attribute_float(const char *name, float value)
 {
@@ -747,14 +765,14 @@ void data_node::set_attribute_float(const char *name, float value)
 
 
 
-/***************************************************************************
-    MISCELLANEOUS INTERFACES
-***************************************************************************/
+//**************************************************************************
+//  MISCELLANEOUS INTERFACES
+//**************************************************************************
 
-/*-------------------------------------------------
-    normalize_string - normalize a string
-    to ensure it doesn't contain embedded tags
--------------------------------------------------*/
+//-------------------------------------------------
+//  normalize_string - normalize a string
+//  to ensure it doesn't contain embedded tags
+//-------------------------------------------------
 
 const char *normalize_string(const char *string)
 {
@@ -783,16 +801,16 @@ const char *normalize_string(const char *string)
 
 
 
-/***************************************************************************
-    EXPAT INTERFACES
-***************************************************************************/
+//**************************************************************************
+//  EXPAT INTERFACES
+//**************************************************************************
 
-/*-------------------------------------------------
-    expat_malloc/expat_realloc/expat_free -
-    wrappers for memory allocation functions so
-    that they pass through out memory tracking
-    systems
--------------------------------------------------*/
+//-------------------------------------------------
+//  expat_malloc/expat_realloc/expat_free -
+//  wrappers for memory allocation functions so
+//  that they pass through out memory tracking
+//  systems
+//-------------------------------------------------
 
 static void *expat_malloc(size_t size)
 {
@@ -822,15 +840,15 @@ static void *expat_realloc(void *ptr, size_t size)
 }
 
 
-/*-------------------------------------------------
-    expat_setup_parser - set up expat for parsing
--------------------------------------------------*/
+//-------------------------------------------------
+//  expat_setup_parser - set up expat for parsing
+//-------------------------------------------------
 
 static bool expat_setup_parser(parse_info &info, parse_options const *opts)
 {
 	XML_Memory_Handling_Suite memcallbacks;
 
-	/* setup info structure */
+	// setup info structure
 	memset(&info, 0, sizeof(info));
 	if (opts != nullptr)
 	{
@@ -843,13 +861,13 @@ static bool expat_setup_parser(parse_info &info, parse_options const *opts)
 		}
 	}
 
-	/* create a root node */
+	// create a root node
 	info.rootnode = file::create();
 	if (!info.rootnode)
 		return false;
 	info.curnode = info.rootnode.get();
 
-	/* create the XML parser */
+	// create the XML parser
 	memcallbacks.malloc_fcn = expat_malloc;
 	memcallbacks.realloc_fcn = expat_realloc;
 	memcallbacks.free_fcn = expat_free;
@@ -860,22 +878,22 @@ static bool expat_setup_parser(parse_info &info, parse_options const *opts)
 		return false;
 	}
 
-	/* configure the parser */
+	// configure the parser
 	XML_SetElementHandler(info.parser, expat_element_start, expat_element_end);
 	XML_SetCharacterDataHandler(info.parser, expat_data);
 	XML_SetUserData(info.parser, &info);
 
-	/* optional parser initialization step */
+	// optional parser initialization step
 	if (opts != nullptr && opts->init_parser != nullptr)
 		(*opts->init_parser)(info.parser);
 	return true;
 }
 
 
-/*-------------------------------------------------
-    expat_element_start - expat callback for a new
-    element
--------------------------------------------------*/
+//------------------------------------------------
+//  expat_element_start - expat callback for a new
+//  element
+//------------------------------------------------
 
 static void expat_element_start(void *data, const XML_Char *name, const XML_Char **attributes)
 {
@@ -884,27 +902,27 @@ static void expat_element_start(void *data, const XML_Char *name, const XML_Char
 	data_node *newnode;
 	int attr;
 
-	/* add a new child node to the current node */
+	// add a new child node to the current node
 	newnode = (*curnode)->add_child(name, nullptr);
 	if (newnode == nullptr)
 		return;
 
-	/* remember the line number */
+	// remember the line number
 	newnode->line = XML_GetCurrentLineNumber(info->parser);
 
-	/* add all the attributes as well */
+	// add all the attributes as well
 	for (attr = 0; attributes[attr]; attr += 2)
 		newnode->add_attribute(attributes[attr+0], attributes[attr+1]);
 
-	/* set us up as the current node */
+	// set us up as the current node
 	*curnode = newnode;
 }
 
 
-/*-------------------------------------------------
-    expat_data - expat callback for an additional
-    element data
--------------------------------------------------*/
+//-------------------------------------------------
+//  expat_data - expat callback for an additional
+//  element data
+//-------------------------------------------------
 
 static void expat_data(void *data, const XML_Char *s, int len)
 {
@@ -914,34 +932,34 @@ static void expat_data(void *data, const XML_Char *s, int len)
 }
 
 
-/*-------------------------------------------------
-    expat_element_end - expat callback for the end
-    of an element
--------------------------------------------------*/
+//-------------------------------------------------
+//  expat_element_end - expat callback for the end
+//  of an element
+//-------------------------------------------------
 
 static void expat_element_end(void *data, const XML_Char *name)
 {
 	auto *info = (parse_info *) data;
 	data_node **curnode = &info->curnode;
 
-	/* strip leading/trailing spaces from the value data */
+	// strip leading/trailing spaces from the value data
 	if (!(info->flags & PARSE_FLAG_WHITESPACE_SIGNIFICANT))
 		(*curnode)->trim_whitespace();
 
-	/* back us up a node */
+	// back us up a node
 	*curnode = (*curnode)->get_parent();
 }
 
 
 
-/***************************************************************************
-    NODE/ATTRIBUTE ADDITIONS
-***************************************************************************/
+//**************************************************************************
+//  NODE/ATTRIBUTE ADDITIONS
+//**************************************************************************
 
-/*-------------------------------------------------
-    add_attribute - add a new attribute to the
-    given node
--------------------------------------------------*/
+//-------------------------------------------------
+//  add_attribute - add a new attribute to the
+//  given node
+//-------------------------------------------------
 
 void data_node::add_attribute(const char *name, const char *value)
 {
@@ -958,29 +976,29 @@ void data_node::add_attribute(const char *name, const char *value)
 
 
 
-/***************************************************************************
-    RECURSIVE TREE OPERATIONS
-***************************************************************************/
+//**************************************************************************
+//  RECURSIVE TREE OPERATIONS
+//**************************************************************************
 
-/*-------------------------------------------------
-    write_node_recursive - recursively write
-    an XML node and its children to a file
--------------------------------------------------*/
+//-------------------------------------------------
+//  write_node_recursive - recursively write
+//  an XML node and its children to a file
+//-------------------------------------------------
 
 void data_node::write_recursive(int indent, util::core_file &file) const
 {
 	if (!get_name())
 	{
-		/* root node doesn't generate tag */
+		// root node doesn't generate tag
 		for (data_node const *child = this->get_first_child(); child; child = child->get_next_sibling())
 			child->write_recursive(indent, file);
 	}
 	else
 	{
-		/* output this tag */
+		// output this tag
 		file.printf("%*s<%s", indent, "", get_name());
 
-		/* output any attributes, escaping as necessary */
+		// output any attributes, escaping as necessary
 		for (attribute_node const &anode : m_attributes)
 		{
 			file.printf(" %s=\"", anode.name);
@@ -990,15 +1008,15 @@ void data_node::write_recursive(int indent, util::core_file &file) const
 
 		if (!get_first_child() && !get_value())
 		{
-			/* if there are no children and no value, end the tag here */
+			// if there are no children and no value, end the tag here
 			file.printf(" />\n");
 		}
 		else
 		{
-			/* otherwise, close this tag and output more stuff */
+			// otherwise, close this tag and output more stuff
 			file.printf(">\n");
 
-			/* if there is a value, output that here */
+			// if there is a value, output that here
 			if (!m_value.empty())
 			{
 				file.printf("%*s", indent + 4, "");
@@ -1006,14 +1024,14 @@ void data_node::write_recursive(int indent, util::core_file &file) const
 				file.puts("\n");
 			}
 
-			/* loop over children and output them as well */
+			// loop over children and output them as well
 			if (get_first_child())
 			{
 				for (data_node const *child = this->get_first_child(); child; child = child->get_next_sibling())
 					child->write_recursive(indent + 4, file);
 			}
 
-			/* write a closing tag */
+			// write a closing tag
 			file.printf("%*s</%s>\n", indent, "", get_name());
 		}
 	}

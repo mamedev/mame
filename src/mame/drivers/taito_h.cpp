@@ -150,7 +150,7 @@ some kind of zoom table?
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/2610intf.h"
+#include "sound/ym2610.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -794,10 +794,10 @@ ROM_START( syvalion )
 	ROM_LOAD64_BYTE( "b51-05.bin", 0x100001, 0x20000, CRC(47976ae9) SHA1(a2b19a39d8968b886412a85c082806917e02d9fd) )
 	ROM_LOAD64_BYTE( "b51-01.bin", 0x100000, 0x20000, CRC(8dab004a) SHA1(1772cdcb9d0ca5ebf429f371c041b9ae12fafcd0) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* samples */
 	ROM_LOAD( "b51-18.bin", 0x00000, 0x80000, CRC(8b23ac83) SHA1(340b9e7f09c1809a332b41d3fb579f5f8cd6367f) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* samples */
 	ROM_LOAD( "b51-17.bin", 0x00000, 0x80000, CRC(d85096aa) SHA1(dac39ed182e9eda06575f1667c4c1ff9a4a56599) )
 ROM_END
 
@@ -829,10 +829,10 @@ ROM_START( syvalionu )
 	ROM_LOAD64_BYTE( "b51-05.bin", 0x100001, 0x20000, CRC(47976ae9) SHA1(a2b19a39d8968b886412a85c082806917e02d9fd) )
 	ROM_LOAD64_BYTE( "b51-01.bin", 0x100000, 0x20000, CRC(8dab004a) SHA1(1772cdcb9d0ca5ebf429f371c041b9ae12fafcd0) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* samples */
 	ROM_LOAD( "b51-18.bin", 0x00000, 0x80000, CRC(8b23ac83) SHA1(340b9e7f09c1809a332b41d3fb579f5f8cd6367f) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* samples */
 	ROM_LOAD( "b51-17.bin", 0x00000, 0x80000, CRC(d85096aa) SHA1(dac39ed182e9eda06575f1667c4c1ff9a4a56599) )
 ROM_END
 
@@ -864,10 +864,10 @@ ROM_START( syvalionw )
 	ROM_LOAD64_BYTE( "b51-05.bin", 0x100001, 0x20000, CRC(47976ae9) SHA1(a2b19a39d8968b886412a85c082806917e02d9fd) )
 	ROM_LOAD64_BYTE( "b51-01.bin", 0x100000, 0x20000, CRC(8dab004a) SHA1(1772cdcb9d0ca5ebf429f371c041b9ae12fafcd0) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* samples */
 	ROM_LOAD( "b51-18.bin", 0x00000, 0x80000, CRC(8b23ac83) SHA1(340b9e7f09c1809a332b41d3fb579f5f8cd6367f) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* samples */
 	ROM_LOAD( "b51-17.bin", 0x00000, 0x80000, CRC(d85096aa) SHA1(dac39ed182e9eda06575f1667c4c1ff9a4a56599) )
 ROM_END
 
@@ -899,13 +899,13 @@ ROM_START( syvalionp )
 	ROM_LOAD64_BYTE( "chr-16.ic5",  0x100001, 0x20000, CRC(a169194e) SHA1(1399c95fd32f93808b8f2cf95809c3bf15521729) )
 	ROM_LOAD64_BYTE( "chr-17.ic7",  0x100000, 0x20000, CRC(c259bd61) SHA1(cb17be30e2f330d979b3f2a4b691a3a0bb336a44) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* samples */
 	ROM_LOAD( "sb-00.ic6",      0x00000, 0x20000, CRC(5188f459) SHA1(261bdfe9f4200f0296f78c086934700df997875d) )
 	ROM_LOAD( "sb01.ic8",       0x20000, 0x20000, CRC(4dab7a6b) SHA1(7991313e10ee504454e391a4e6cf603ad2cfc0e4) )
 	ROM_LOAD( "sb-02.ic7",      0x40000, 0x20000, CRC(8f5cc936) SHA1(df76ab9a38eef0726d74fcb0d951b0b5065345a7) )
 	ROM_LOAD( "sb-03-e66a.ic9", 0x60000, 0x20000, CRC(9013b407) SHA1(eea010fa32fb3e5270246248083d4aa9449cf6b1) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* samples */
 	ROM_LOAD( "sa-00.ic1", 0x00000, 0x20000, CRC(27a97abc) SHA1(891cfafe9a460dbaa83711dcd7ab1bf6d8922b4d) )
 	ROM_LOAD( "sa-01.ic2", 0x20000, 0x20000, CRC(0140452b) SHA1(aa2e664ffc501b5c53fb3fe75b205f18cfe0f67e) )
 	ROM_LOAD( "sa-02.ic3", 0x40000, 0x20000, CRC(970cd4ee) SHA1(674ee5ec0c51e6303baef62c1c4582ef6d7a9590) )
@@ -937,10 +937,10 @@ ROM_START( recordbr )
 	ROM_LOAD64_BYTE( "b56-01.bin", 0x000001, 0x20000, CRC(766b7260) SHA1(f7d7176af614f06e8c66e890e4d194ffb6f7af73) )
 	ROM_LOAD64_BYTE( "b56-05.bin", 0x000000, 0x20000, CRC(ed390378) SHA1(0275e5ead206028bfcff7ecbe11c7ab961e648ea) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* samples */
 	ROM_LOAD( "b56-09.bin", 0x00000, 0x80000, CRC(7fd9ee68) SHA1(edc4455b3f6a6f30f418d03c6e53af875542a325) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* samples */
 	ROM_LOAD( "b56-10.bin", 0x00000, 0x80000, CRC(de1bce59) SHA1(aa3aea30d6f53e60d9a0d4ec767e1b261d5efc8a) )
 
 	ROM_REGION( 0x02000, "user1", 0 ) /* zoom table / mixing? */
@@ -967,10 +967,10 @@ ROM_START( gogold )
 	ROM_LOAD64_BYTE( "b56-01.bin", 0x000001, 0x20000, CRC(766b7260) SHA1(f7d7176af614f06e8c66e890e4d194ffb6f7af73) )
 	ROM_LOAD64_BYTE( "b56-05.bin", 0x000000, 0x20000, CRC(ed390378) SHA1(0275e5ead206028bfcff7ecbe11c7ab961e648ea) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* samples */
 	ROM_LOAD( "b56-09.bin", 0x00000, 0x80000, CRC(7fd9ee68) SHA1(edc4455b3f6a6f30f418d03c6e53af875542a325) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* samples */
 	ROM_LOAD( "b56-10.bin", 0x00000, 0x80000, CRC(de1bce59) SHA1(aa3aea30d6f53e60d9a0d4ec767e1b261d5efc8a) )
 
 	ROM_REGION( 0x02000, "user1", 0 ) /* zoom table / mixing? */
@@ -999,10 +999,10 @@ ROM_START( tetristh )
 	ROM_LOAD64_BYTE( "c26-01.ic48", 0x000001, 0x20000, CRC(7efc7311) SHA1(ee3357dfc77eb4b9af846deaf89c910fc25c9f12) )
 	ROM_LOAD64_BYTE( "c26-05.ic62", 0x000000, 0x20000, CRC(12718d97) SHA1(5c7a79d45ee38a16d7ed70fbe3303f415d6af986) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* samples */
 	ROM_LOAD( "b56-09.bin", 0x00000, 0x80000, CRC(7fd9ee68) SHA1(edc4455b3f6a6f30f418d03c6e53af875542a325) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* samples */
 	ROM_LOAD( "b56-10.bin", 0x00000, 0x80000, CRC(de1bce59) SHA1(aa3aea30d6f53e60d9a0d4ec767e1b261d5efc8a) )
 
 	ROM_REGION( 0x02000, "user1", 0 ) /* zoom table / mixing? */
@@ -1037,7 +1037,7 @@ ROM_START( dleague )
 	ROM_REGION( 0x02000, "user1", 0 ) /* zoom table / mixing? */
 	ROM_LOAD( "c02-18.22", 0x00000, 0x02000, CRC(c88f0bbe) SHA1(18c87c744fbeca35d13033e50f62e5383eb4ec2c) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* samples */
 	ROM_LOAD( "c02-01.31", 0x00000, 0x80000, CRC(d5a3d1aa) SHA1(544f807015b5d854a4d8cb73e4dbae4b953fd440) )
 ROM_END
 
@@ -1068,7 +1068,7 @@ ROM_START( dleaguej )
 	ROM_REGION( 0x02000, "user1", 0 ) /* zoom table / mixing? */
 	ROM_LOAD( "c02-18.22", 0x00000, 0x02000, CRC(c88f0bbe) SHA1(18c87c744fbeca35d13033e50f62e5383eb4ec2c) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* samples */
 	ROM_LOAD( "c02-01.31", 0x00000, 0x80000, CRC(d5a3d1aa) SHA1(544f807015b5d854a4d8cb73e4dbae4b953fd440) )
 ROM_END
 

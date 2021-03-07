@@ -324,7 +324,7 @@ static const struct io_procs my_stream_procs = {
 imgtoolerr_t tape_image_t::load_from_file(imgtool::stream *stream)
 {
 	hti_format_t inp_image;
-	inp_image.set_bits_per_word(16);
+	inp_image.set_image_format(hti_format_t::HTI_DELTA_MOD_16_BITS);
 
 	io_generic io;
 	io.file = (void *)stream;

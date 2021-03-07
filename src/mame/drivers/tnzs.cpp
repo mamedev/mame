@@ -625,8 +625,8 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 #include "includes/taitoipt.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
 #include "sound/ym2151.h"
+#include "sound/ym2203.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -703,17 +703,17 @@ void kageki_state::csport_w(uint8_t data)
 	}
 	else
 	{
-		if (data > MAX_SAMPLES)
-		{
-			// stop samples
-			m_samples->stop(0);
-			sprintf(mess, "VOICE:%02X STOP", data);
-		}
-		else
+		if (data < MAX_SAMPLES)
 		{
 			// play samples
 			m_samples->start_raw(0, m_sampledata[data].get(), m_samplesize[data], 7000);
 			sprintf(mess, "VOICE:%02X PLAY", data);
+		}
+		else
+		{
+			// stop samples
+			m_samples->stop(0);
+			sprintf(mess, "VOICE:%02X STOP", data);
 		}
 	//  popmessage(mess);
 	}

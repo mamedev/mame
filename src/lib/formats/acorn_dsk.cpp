@@ -93,7 +93,7 @@ int acorn_ssd_format::find_size(io_generic *io, uint32_t form_factor)
 	return -1;
 }
 
-int acorn_ssd_format::identify(io_generic *io, uint32_t form_factor)
+int acorn_ssd_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	int type = find_size(io, form_factor);
 
@@ -216,7 +216,7 @@ int acorn_dsd_format::find_size(io_generic *io, uint32_t form_factor)
 	return -1;
 }
 
-int acorn_dsd_format::identify(io_generic *io, uint32_t form_factor)
+int acorn_dsd_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	int type = find_size(io, form_factor);
 
@@ -311,7 +311,7 @@ int opus_ddos_format::find_size(io_generic *io, uint32_t form_factor)
 	return -1;
 }
 
-int opus_ddos_format::identify(io_generic *io, uint32_t form_factor)
+int opus_ddos_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	int type = find_size(io, form_factor);
 
@@ -399,7 +399,7 @@ int acorn_adfs_old_format::find_size(io_generic *io, uint32_t form_factor)
 	return -1;
 }
 
-int acorn_adfs_old_format::identify(io_generic *io, uint32_t form_factor)
+int acorn_adfs_old_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	int type = find_size(io, form_factor);
 
@@ -496,7 +496,7 @@ int acorn_adfs_new_format::find_size(io_generic *io, uint32_t form_factor)
 	return -1;
 }
 
-int acorn_adfs_new_format::identify(io_generic *io, uint32_t form_factor)
+int acorn_adfs_new_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	int type = find_size(io, form_factor);
 
@@ -567,7 +567,7 @@ int acorn_dos_format::find_size(io_generic *io, uint32_t form_factor)
 	return -1;
 }
 
-int acorn_dos_format::identify(io_generic *io, uint32_t form_factor)
+int acorn_dos_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	int type = find_size(io, form_factor);
 
@@ -618,7 +618,7 @@ bool opus_ddcpm_format::supports_save() const
 	return false;
 }
 
-int opus_ddcpm_format::identify(io_generic *io, uint32_t form_factor)
+int opus_ddcpm_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t h[8];
 
@@ -630,7 +630,7 @@ int opus_ddcpm_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool opus_ddcpm_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool opus_ddcpm_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 // Double density discs formatted with DDCPM :
 //
@@ -677,7 +677,7 @@ bool opus_ddcpm_format::load(io_generic *io, uint32_t form_factor, floppy_image 
 	return true;
 }
 
-bool opus_ddcpm_format::save(io_generic *io, floppy_image *image)
+bool opus_ddcpm_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	return false;
 }

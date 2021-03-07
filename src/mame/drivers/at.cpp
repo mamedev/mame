@@ -113,6 +113,7 @@ Variants: T denotes an active 8.4" display, C a passive 9.5" color display. 3560
 #include "bus/lpci/pci.h"
 #include "bus/lpci/vt82c505.h"
 #include "bus/pc_kbd/keyboards.h"
+#include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/i386/i386.h"
 #include "cpu/i86/i286.h"
 #include "machine/at.h"
@@ -502,17 +503,21 @@ void at_state::ibm5170(machine_config &config)
 	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 	maincpu.shutdown_callback().set("mb", FUNC(at_mb_device::shutdown));
 
-	AT_MB(config, m_mb, 0);
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	m_mb->at_softlists(config);
+	AT_MB(config, m_mb).at_softlists(config);
+	m_mb->kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_mb->kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	// FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "ega", false);
 	ISA16_SLOT(config, "isa2", 0, "mb:isabus", pc_isa16_cards, "fdc", false);
 	ISA16_SLOT(config, "isa3", 0, "mb:isabus", pc_isa16_cards, "comat", false);
 	ISA16_SLOT(config, "isa4", 0, "mb:isabus", pc_isa16_cards, "ide", false);
-	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84));
+	pc_kbdc.out_clock_cb().set(m_mb, FUNC(at_mb_device::kbd_clk_w));
+	pc_kbdc.out_data_cb().set(m_mb, FUNC(at_mb_device::kbd_data_w));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("1664K").set_extra_options("640K,1024K,2M,4M,8M,15M");
@@ -559,7 +564,7 @@ void at_vrom_fix_state::ibmps1(machine_config &config)
 
 	subdevice<isa16_slot_device>("isa1")->set_default_option("vga");
 	subdevice<isa16_slot_device>("isa1")->set_fixed(true);
-	subdevice<pc_kbdc_slot_device>("kbd")->set_default_option(STR_KBD_MICROSOFT_NATURAL);
+	subdevice<pc_kbdc_device>("kbd")->set_default_option(STR_KBD_MICROSOFT_NATURAL);
 }
 
 void at_state::atturbo(machine_config &config)
@@ -567,7 +572,7 @@ void at_state::atturbo(machine_config &config)
 	ibm5170(config);
 	m_maincpu->set_clock(12'000'000);
 	subdevice<isa16_slot_device>("isa1")->set_default_option("svga_et4k");
-	subdevice<pc_kbdc_slot_device>("kbd")->set_default_option(STR_KBD_MICROSOFT_NATURAL);
+	subdevice<pc_kbdc_device>("kbd")->set_default_option(STR_KBD_MICROSOFT_NATURAL);
 	ISA16_SLOT(config, "isa5", 0, "mb:isabus", pc_isa16_cards, nullptr, false); // FIXME: determine ISA bus clock
 }
 
@@ -592,7 +597,7 @@ void at_state::xb42639(machine_config &config)
 void at_state::k286i(machine_config &config)
 {
 	ibm5162(config);
-	subdevice<pc_kbdc_slot_device>("kbd")->set_default_option(STR_KBD_MICROSOFT_NATURAL);
+	subdevice<pc_kbdc_device>("kbd")->set_default_option(STR_KBD_MICROSOFT_NATURAL);
 	ISA16_SLOT(config, "isa5", 0, "mb:isabus", pc_isa16_cards, nullptr, false); // FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "isa6", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa7", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
@@ -606,9 +611,11 @@ void at_state::at386(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &at_state::at32_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	AT_MB(config, m_mb, 0).at_softlists(config);
-
 	config.set_maximum_quantum(attotime::from_hz(60));
+
+	AT_MB(config, m_mb).at_softlists(config);
+	m_mb->kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_mb->kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -623,7 +630,10 @@ void at_state::at386(machine_config &config)
 	ISA16_SLOT(config, "isa3", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa4", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa5", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
-	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
+	pc_kbdc.out_clock_cb().set(m_mb, FUNC(at_mb_device::kbd_clk_w));
+	pc_kbdc.out_data_cb().set(m_mb, FUNC(at_mb_device::kbd_data_w));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("1664K").set_extra_options("2M,4M,8M,15M,16M,32M,64M");
@@ -642,9 +652,11 @@ void at_state::at486(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &at_state::at32_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	AT_MB(config, m_mb, 0).at_softlists(config);
-
 	config.set_maximum_quantum(attotime::from_hz(60));
+
+	AT_MB(config, m_mb).at_softlists(config);
+	m_mb->kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_mb->kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -659,7 +671,10 @@ void at_state::at486(machine_config &config)
 	ISA16_SLOT(config, "isa3", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa4", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa5", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
-	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
+	pc_kbdc.out_clock_cb().set(m_mb, FUNC(at_mb_device::kbd_clk_w));
+	pc_kbdc.out_data_cb().set(m_mb, FUNC(at_mb_device::kbd_data_w));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("4M").set_extra_options("1M,2M,8M,16M,20M,32M,64M,128M");
@@ -764,13 +779,12 @@ void megapc_state::megapc(machine_config &config)
 	keybc.hot_res().set("wd7600", FUNC(wd7600_device::kbrst_w));
 	keybc.gate_a20().set("wd7600", FUNC(wd7600_device::gatea20_w));
 	keybc.kbd_irq().set("wd7600", FUNC(wd7600_device::irq01_w));
-	keybc.kbd_clk().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
-	keybc.kbd_data().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
+	keybc.kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	keybc.kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
-	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "pc_kbdc", 0));
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
 	pc_kbdc.out_clock_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_clk_w));
 	pc_kbdc.out_data_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_data_w));
-	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL).set_pc_kbdc_slot(subdevice("pc_kbdc"));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("4M").set_extra_options("1M,2M,8M,15M,16M");
@@ -802,9 +816,11 @@ void at_vrom_fix_state::megapcpla(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &at_vrom_fix_state::at32_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	AT_MB(config, m_mb, 0).at_softlists(config);
-
 	config.set_maximum_quantum(attotime::from_hz(60));
+
+	AT_MB(config, m_mb).at_softlists(config);
+	m_mb->kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_mb->kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -819,7 +835,10 @@ void at_vrom_fix_state::megapcpla(machine_config &config)
 	ISA16_SLOT(config, "isa3", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa4", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa5", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
-	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
+	pc_kbdc.out_clock_cb().set(m_mb, FUNC(at_mb_device::kbd_clk_w));
+	pc_kbdc.out_data_cb().set(m_mb, FUNC(at_mb_device::kbd_data_w));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("4M").set_extra_options("2M,8M,15M,16M,32M,64M,128M,256M");
@@ -835,8 +854,11 @@ void at_state::ficpio2(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &at_state::ficpio_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	AT_MB(config, m_mb, 0).at_softlists(config);
 	config.set_maximum_quantum(attotime::from_hz(60));
+
+	AT_MB(config, m_mb).at_softlists(config);
+	m_mb->kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_mb->kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	ds12885_device &rtc(DS12885(config.replace(), "mb:rtc"));
 	rtc.irq().set("mb:pic8259_slave", FUNC(pic8259_device::ir0_w)); // this is in :mb
@@ -860,7 +882,10 @@ void at_state::ficpio2(machine_config &config)
 	ISA16_SLOT(config, "isa2", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa4", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
-	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
+	pc_kbdc.out_clock_cb().set(m_mb, FUNC(at_mb_device::kbd_clk_w));
+	pc_kbdc.out_data_cb().set(m_mb, FUNC(at_mb_device::kbd_data_w));
 
 	vt82c496_device &chipset(VT82C496(config, "chipset"));
 	chipset.set_cputag(m_maincpu);
@@ -878,8 +903,11 @@ void at_state::comportiii(machine_config &config)
 	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 	maincpu.shutdown_callback().set("mb", FUNC(at_mb_device::shutdown));
 
-	AT_MB(config, m_mb, 0).at_softlists(config);
 	config.set_maximum_quantum(attotime::from_hz(60));
+
+	AT_MB(config, m_mb).at_softlists(config);
+	m_mb->kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_mb->kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	// FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdc", true).set_option_machine_config("fdc", cfg_single_1200K);
@@ -889,7 +917,9 @@ void at_state::comportiii(machine_config &config)
 	ISA16_SLOT(config, "isa1",   0, "mb:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa2",   0, "mb:isabus", pc_isa16_cards, nullptr, false);
 
-	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_84));
+	pc_kbdc.out_clock_cb().set(m_mb, FUNC(at_mb_device::kbd_clk_w));
+	pc_kbdc.out_data_cb().set(m_mb, FUNC(at_mb_device::kbd_data_w));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("1152K,1664K,2176K,2688K,4736K,6784K");
@@ -955,9 +985,11 @@ void at_state::pg750(machine_config &config)
 	maincpu.set_addrmap(AS_IO, &at_state::at32_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	AT_MB(config, m_mb, 0).at_softlists(config);
-
 	config.set_maximum_quantum(attotime::from_hz(60));
+
+	AT_MB(config, m_mb).at_softlists(config);
+	m_mb->kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_mb->kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -975,7 +1007,10 @@ void at_state::pg750(machine_config &config)
 	ISA16_SLOT(config, "isa3", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa4", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa5", 0, "mb:isabus", pc_isa16_cards, nullptr, false);
-	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
+	pc_kbdc.out_clock_cb().set(m_mb, FUNC(at_mb_device::kbd_clk_w));
+	pc_kbdc.out_data_cb().set(m_mb, FUNC(at_mb_device::kbd_data_w));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("3712K");

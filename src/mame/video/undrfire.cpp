@@ -14,6 +14,8 @@ void undrfire_state::video_start()
 
 	for (int i = 0; i < 16384; i++) /* Fix later - some weird colours in places */
 		m_palette->set_pen_color(i, rgb_t(0,0,0));
+
+	m_frame_counter = 0;
 }
 
 /***************************************************************
@@ -465,27 +467,27 @@ u32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind16 &
 
 
 /*
-	TC0360PRI Priority format for chase bombers
+    TC0360PRI Priority format for chase bombers
 
-	Offset Bits      Description
-	       7654 3210
-	00     0001 1100 Unknown
-	01     0000 1111 Unknown
-	04     xxxx ---- TC0480SCP Layer 3 Priority
-	       ---- xxxx TC0480SCP Layer 2 Priority
-	05     xxxx ---- TC0480SCP Layer 1 Priority
-	       ---- xxxx TC0480SCP Layer 0 Priority
-	06     xxxx ---- TC0480SCP Text Layer Priority
-	       ---- 0000 Unknown
-	07     xxxx ---- TC0620SCC Layer 0 Priority
-	       ---- xxxx TC0620SCC Layer 1 Priority
-	08     xxxx ---- Sprite Priority Bank 1
-	       ---- xxxx Sprite Priority Bank 0
-	09     xxxx ---- Sprite Priority Bank 3
-	       ---- xxxx Sprite Priority Bank 2
+    Offset Bits      Description
+           7654 3210
+    00     0001 1100 Unknown
+    01     0000 1111 Unknown
+    04     xxxx ---- TC0480SCP Layer 3 Priority
+           ---- xxxx TC0480SCP Layer 2 Priority
+    05     xxxx ---- TC0480SCP Layer 1 Priority
+           ---- xxxx TC0480SCP Layer 0 Priority
+    06     xxxx ---- TC0480SCP Text Layer Priority
+           ---- 0000 Unknown
+    07     xxxx ---- TC0620SCC Layer 0 Priority
+           ---- xxxx TC0620SCC Layer 1 Priority
+    08     xxxx ---- Sprite Priority Bank 1
+           ---- xxxx Sprite Priority Bank 0
+    09     xxxx ---- Sprite Priority Bank 3
+           ---- xxxx Sprite Priority Bank 2
 
-	Values are 0 (Bottommost) ... f (Topmost)
-	Other registers are unknown/unused
+    Values are 0 (Bottommost) ... f (Topmost)
+    Other registers are unknown/unused
 */
 
 u32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

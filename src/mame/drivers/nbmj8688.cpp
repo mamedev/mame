@@ -38,7 +38,6 @@ TODO:
 #include "sound/3812intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 

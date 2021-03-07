@@ -17,7 +17,6 @@
 #include "machine/wd_fdc.h"
 #include "video/msm6255.h"
 #include "emupal.h"
-#include "rendlay.h"
 
 #define Z80_TAG         "ic1"
 #define I8255A_TAG      "ic4"
@@ -75,7 +74,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( mtron_w );
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	// keyboard state
 	uint8_t m_kb;

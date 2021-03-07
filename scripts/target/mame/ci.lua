@@ -171,7 +171,6 @@ files{
 	MAME_DIR .. "src/mame/machine/gaelcrpt.cpp",
 	MAME_DIR .. "src/mame/drivers/wrally.cpp",
 	MAME_DIR .. "src/mame/includes/wrally.h",
-	MAME_DIR .. "src/mame/machine/wrally.cpp",
 	MAME_DIR .. "src/mame/video/wrally.cpp",
 	MAME_DIR .. "src/mame/video/gaelco_wrally_sprites.cpp",
 	MAME_DIR .. "src/mame/video/gaelco_wrally_sprites.h",

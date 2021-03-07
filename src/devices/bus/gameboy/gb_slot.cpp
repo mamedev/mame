@@ -17,7 +17,6 @@
 
  ***********************************************************************************************************/
 
-
 #include "emu.h"
 #include "gb_slot.h"
 
@@ -222,7 +221,7 @@ static int gb_get_pcb_id(const char *slot)
 {
 	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(elem.slot_option, slot))
+		if (!strcmp(elem.slot_option, slot))
 			return elem.pcb_id;
 	}
 
@@ -314,13 +313,13 @@ image_init_result gb_cart_slot_device_base::call_load()
 
 			if (get_feature("rumble"))
 			{
-				if (!core_stricmp(get_feature("rumble"), "yes"))
+				if (!strcmp(get_feature("rumble"), "yes"))
 					m_cart->set_has_rumble(true);
 			}
 
 			if (get_feature("rtc"))
 			{
-				if (!core_stricmp(get_feature("rtc"), "yes"))
+				if (!strcmp(get_feature("rtc"), "yes"))
 					m_cart->set_has_timer(true);
 			}
 		}
@@ -477,7 +476,7 @@ bool gb_cart_slot_device_base::is_mbc1col_game(const uint8_t *ROM, uint32_t len)
 		"SUPERCHINESE 123"
 	};
 
-	const uint8_t rows = ARRAY_LENGTH(internal_names);
+	const uint8_t rows = std::size(internal_names);
 
 	for (uint8_t i = 0x00; i < rows; ++i) {
 		if (0 == memcmp(&ROM[0x134], &internal_names[i][0], name_length))
@@ -804,10 +803,10 @@ void gb_cart_slot_device_base::internal_header_logging(uint8_t *ROM, uint32_t le
 	logerror("\tRAM Size:         %d kB [0x%02X]\n", ramsize[ROM[0x0149] & 0x07], ROM[0x0149]);
 	logerror("\tLicense code:     0x%02X%02X\n", ROM[0x0145], ROM[0x0144] );
 	tmp = (ROM[0x014b] << 8) + ROM[0x014a];
-	for (i = 0; i < ARRAY_LENGTH(companies); i++)
+	for (i = 0; i < std::size(companies); i++)
 		if (tmp == companies[i].code)
 			break;
-	logerror("\tManufacturer ID:  0x%02X [%s]\n", tmp, (i < ARRAY_LENGTH(companies)) ? companies[i].name : "?");
+	logerror("\tManufacturer ID:  0x%02X [%s]\n", tmp, (i < std::size(companies)) ? companies[i].name : "?");
 	logerror("\tVersion Number:   0x%02X\n", ROM[0x014c]);
 	logerror("\tComplement Check: 0x%02X\n", ROM[0x014d]);
 	logerror("\tChecksum:         0x%04X\n", ((ROM[0x014e] << 8) + ROM[0x014f]));

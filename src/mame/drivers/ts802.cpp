@@ -219,7 +219,7 @@ void ts802_state::ts802(machine_config &config)
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	FD1793(config, "fdc", 4'000'000 / 2);                  // unknown clock
-	FLOPPY_CONNECTOR(config, "fdc:0", ts802_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", ts802_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 /* ROM definition */

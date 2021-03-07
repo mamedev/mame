@@ -481,9 +481,9 @@ void hhtiger_state::hhtiger(machine_config &config)
 	RAM(config, m_ram).set_default_size("64K");
 
 	/* unknown fdc - floppy drives are housed with monitor so maybe fdc is external */
-	FLOPPY_CONNECTOR(config, "0", hhtiger_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "1", hhtiger_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "2", hhtiger_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "0", hhtiger_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "1", hhtiger_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "2", hhtiger_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	/* unknown sound hardware - maybe connected to square-wave timer output from via */
 	SPEAKER(config, "mono").front_center();
@@ -512,7 +512,7 @@ void hhtiger_state::hhtiger(machine_config &config)
 	m_gdc->set_draw_text(FUNC(hhtiger_state::draw_text));
 	m_gdc->set_screen(m_screen);
 
-	VIA6522(config, m_via[0], 16_MHz_XTAL / 16);
+	MOS6522(config, m_via[0], 16_MHz_XTAL / 16);
 	m_via[0]->readpa_handler().set(FUNC(hhtiger_state::via_0_in_a));
 	m_via[0]->writepa_handler().set(FUNC(hhtiger_state::via_0_out_a));
 	m_via[0]->writepb_handler().set(FUNC(hhtiger_state::via_0_out_b));
@@ -520,7 +520,7 @@ void hhtiger_state::hhtiger(machine_config &config)
 	m_via[0]->cb2_handler().set(FUNC(hhtiger_state::via_0_out_cb2));
 	m_via[0]->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 
-	VIA6522(config, m_via[1], 16_MHz_XTAL / 16);
+	MOS6522(config, m_via[1], 16_MHz_XTAL / 16);
 	m_via[1]->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_via[1]->writepa_handler().set(FUNC(hhtiger_state::via_1_out_a));
 	m_via[1]->writepb_handler().set(FUNC(hhtiger_state::via_1_out_b));

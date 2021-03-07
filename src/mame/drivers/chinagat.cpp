@@ -251,9 +251,9 @@ M2H   -  /%    \_____/  duty 1:1, 1.5MHz
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
-#include "sound/2203intf.h"
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
+#include "sound/ym2203.h"
 #include "speaker.h"
 
 

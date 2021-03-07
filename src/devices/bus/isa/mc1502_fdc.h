@@ -45,8 +45,6 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
-
 	DECLARE_WRITE_LINE_MEMBER(mc1502_fdc_irq_drq);
 
 	required_device<fd1793_device> m_fdc;

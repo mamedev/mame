@@ -24,7 +24,7 @@ ToDo:
 #include "cpu/m6800/m6800.h"
 #include "machine/6850acia.h"
 #include "bus/rs232/rs232.h"
-#include "machine/clock.h"
+#include "machine/f4702.h"
 
 
 class mits680b_state : public driver_device
@@ -62,20 +62,36 @@ void mits680b_state::mem_map(address_map &map)
 
 /* Input ports */
 static INPUT_PORTS_START( mits680b )
+	PORT_START("BAUD")
+	PORT_DIPNAME(0xf, 0x8, "Baud Rate") PORT_DIPLOCATION("0-3:1,2,3,4")
+	PORT_DIPSETTING(0x2, "50")
+	PORT_DIPSETTING(0x3, "75")
+	PORT_DIPSETTING(0xf, "110")
+	PORT_DIPSETTING(0x4, "134.5")
+	PORT_DIPSETTING(0xe, "150")
+	PORT_DIPSETTING(0x5, "200")
+	PORT_DIPSETTING(0xd, "300")
+	PORT_DIPSETTING(0x6, "600")
+	PORT_DIPSETTING(0xb, "1200")
+	PORT_DIPSETTING(0xa, "1800")
+	PORT_DIPSETTING(0x7, "2400")
+	PORT_DIPSETTING(0x9, "4800")
+	PORT_DIPSETTING(0x8, "9600")
 INPUT_PORTS_END
 
 
 void mits680b_state::mits680b(machine_config &config)
 {
 	/* basic machine hardware */
-	M6800(config, m_maincpu, XTAL(1'000'000) / 2);
+	M6800(config, m_maincpu, 2_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mits680b_state::mem_map);
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
-	uart_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
-	uart_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
+	f4702_device &brg(F4702(config, "brg", 2.4576_MHz_XTAL));
+	brg.s_callback().set_ioport("BAUD");
+	brg.z_callback().set("acia", FUNC(acia6850_device::write_txc));
+	brg.z_callback().append("acia", FUNC(acia6850_device::write_rxc));
 
-	acia6850_device &acia(ACIA6850(config, "acia", 0));
+	acia6850_device &acia(ACIA6850(config, "acia"));
 	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 

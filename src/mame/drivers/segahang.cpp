@@ -21,9 +21,9 @@
 
 #include "machine/fd1089.h"
 #include "machine/fd1094.h"
-#include "sound/2203intf.h"
-#include "sound/ym2151.h"
 #include "sound/segapcm.h"
+#include "sound/ym2151.h"
+#include "sound/ym2203.h"
 #include "speaker.h"
 
 
@@ -111,7 +111,7 @@ void segahang_state::tilemap_sound_w(uint8_t data)
 	m_segaic16vid->tilemap_set_rowscroll(0, ~data & 0x02);
 
 	// bit 0: sound mute
-	machine().sound().system_enable(data & 0x01);
+	machine().sound().system_mute(!BIT(data, 0));
 }
 
 

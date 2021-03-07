@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "emuopts.h"
 
+#include "corestr.h"
+
 #include <cstring>
 #include <memory>
 #include <new>

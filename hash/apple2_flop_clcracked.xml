@@ -26636,7 +26636,7 @@ license:CC0
 	</software>
 
 	<software name="stellar7">
-		<description>Stellar 7 (cleanly cracked)</description>
+		<description>Stellar 7 (Penguin Software) (cleanly cracked)</description>
 		<year>1983</year>
 		<publisher>Penguin Software</publisher>
 		<info name="release" value="2016-11-22"/>
@@ -36203,7 +36203,6 @@ license:CC0
 		<description>Geometry: Rectilinear Regions (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>Encyclopaedia Britannica</publisher>
-
 		<info name="release" value="2020-07-16"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -37325,7 +37324,7 @@ license:CC0
 	</software>
 
 	<software name="ootopss">
-		<description>Oo-Topos (Sentient Software) (cleanly cracked)</description>
+		<description>Oo-Topos (Sentient Software release) (cleanly cracked)</description>
 		<year>1981</year>
 		<publisher>Sentient Software</publisher>
 		<info name="release" value="2020-10-17"/>
@@ -37361,8 +37360,8 @@ license:CC0
 		<description>Fathoms 40 (cleanly cracked)</description>
 		<year>1982</year>
 		<publisher>Datasoft</publisher>
-
 		<info name="release" value="2020-10-17"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="fathoms 40 (4am crack).dsk" size="143360" crc="5f23866e" sha1="a4ea1b01fc84c822dc82b6e84ccccfec8da7aa2c"/>
@@ -37379,6 +37378,556 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="canyon climber (4am crack).dsk" size="143360" crc="9fc4be6c" sha1="bae5f73448c16e70c7936e913ff7d581a1449f1c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bezare">
+		<description>Bezare (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Southwest Data Systems</publisher>
+		<info name="release" value="2020-10-31"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bezare (4am crack).dsk" size="143360" crc="e03e5a8b" sha1="b5ef6e3431817b420075af0b2e766dcd8214a628"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="artsians">
+		<description>Artesians (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>RenoSoft</publisher>
+		<info name="release" value="2020-10-31"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="artesians (4am crack).dsk" size="143360" crc="582275f9" sha1="d2343fae43e5dbe38a5e4dd40bd913cfc476b74b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goblins">
+		<description>Goblins (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Highlands Computer Services</publisher>
+		<!-- Please refer to the following website for more details on the
+		history of this particular disk:
+		https://web.archive.org/web/http://gue.cgwmuseum.org/galleries/index.php?pub=5&item=27&id=2&key=0
+		-->
+
+		<info name="release" value="2020-10-31"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="goblins (4am crack).dsk" size="143360" crc="17805a8d" sha1="b220a7388039b4047eabc6f5aac9128f29bd7cfa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="coscom">
+		<description>Cosmic Combat (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Highlands Computer Services</publisher>
+		<info name="release" value="2020-11-01"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="cosmic combat (4am crack).dsk" size="143360" crc="aefa46a5" sha1="65fb92082ea477ee1f5288448fcd62dd45f8510e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vortex">
+		<description>Vortex (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Datamost</publisher>
+		<info name="release" value="2020-11-01"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="vortex (4am crack).dsk" size="143360" crc="f82bc31a" sha1="3ee47a454af5b10a923ccb3d37488e967985808d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="camptril">
+		<description>Campaign Trilogy (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Synergistic Software</publisher>
+		<info name="release" value="2020-11-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="campaign trilogy (4am crack) side a.dsk" size="143360" crc="2ac785e6" sha1="c377255bc975d5039739a79adcc87da3a23ff5ae"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="campaign trilogy (4am crack) side b.dsk" size="143360" crc="37137e35" sha1="3cbbfaa18e5ce4786d5ffaf53f58820156ce2276"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionshar">
+		<description>The Lion's Share (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Davka Corporation</publisher>
+		<info name="release" value="2020-11-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the lion's share (4am crack) side a.dsk" size="143360" crc="96d41c64" sha1="7d6fc61b0ab879cf0d6d773c1acb559228ef81c1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the lion's share (4am crack) side b.dsk" size="143360" crc="3c32d295" sha1="7bb2a4bae042f400c52a1953dd47d01c4c6ba25f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stel7sec">
+		<description>Stellar 7 (Software Entertainment Company release) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Software Entertainment Company</publisher>
+
+		<info name="release" value="2020-11-02"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="stellar 7 (software entertainment company) (4am crack).dsk" size="143360" crc="4068c80b" sha1="0e4ef0b16c1122bc03f8479f6b76112dbf12a721"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprcube">
+		<description>SuperCube (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Software Alternatives</publisher>
+		<info name="release" value="2020-11-03"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="supercube (4am crack).dsk" size="143360" crc="7169e89f" sha1="0e3f259cf84dc08388831dec228b5ef4147ab1bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kukulcan">
+		<description>Kukulcan (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>American Eagle</publisher>
+		<info name="release" value="2020-11-03"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="kukulcan (4am crack) side a.dsk" size="143360" crc="f0c9ac1e" sha1="fc61acd2fe5c65b704fc2ea5582351c703d8c5a7"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="kukulcan (4am crack) side b.dsk" size="143360" crc="12414c30" sha1="3a5850edff0d9f549d80404c1287f1af2f81d623"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dondrar2">
+		<description>Dondra: A New Beginning (Revision 2) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<info name="release" value="2020-12-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning rev. 2 (4am crack) disk 1a.dsk" size="143360" crc="8bc20698" sha1="be42d27bf4466d78da98188cf2fc1ee73dbd5fea"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning rev. 2 (4am crack) disk 1b.dsk" size="143360" crc="01a43225" sha1="899304bd0ebe95472901768d0fb321484ddbba3d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning rev. 2 (4am crack) disk 2a.dsk" size="143360" crc="8d1b21ff" sha1="45c7edd4f4afc90c6cc3a96057c8496e9cabe14e"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning rev. 2 (4am crack) disk 2b.dsk" size="143360" crc="f8117f5b" sha1="118c9a8ac340a9c6ee70c9bf5b73d1649ca7f7b4"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning rev. 2 (4am crack) disk 3a.dsk" size="143360" crc="b9d36f8f" sha1="4d4b3108e4cf809b58695853d7609a5b9d57d8d7"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="dondra - a new beginning rev. 2 (4am crack) disk 3b.dsk" size="143360" crc="6f67c489" sha1="c9cb59f9b170c8d8b372dea69922eb8dcc81b48f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcwrace">
+		<description>Space Waste Race: Storybooks Of The Future (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2020-12-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="space waste race- storybooks of the future (4am crack).dsk" size="143360" crc="45acb2d7" sha1="989f333bb3196547749134460010fec5b2551f59"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adp1v11">
+		<description>Algebra Drill and Practice I (version 1.1, June 1985 on disk label) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Conduit</publisher>
+		<info name="release" value="2020-12-05"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="algebra drill and practice i v1.1 (4am crack) disk 1.dsk" size="143360" crc="e7fe96d6" sha1="82777274df8c2c13cb21429538587d1d3a1b4d7b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="algebra drill and practice i v1.1 (4am crack) disk 2.dsk" size="143360" crc="214a3ab5" sha1="3b7418435fe9700e96af37d42c1a1ea7d3d1db55"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adp2v11">
+		<description>Algebra Drill and Practice II (Version 1.1, January 1985 on disk label) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Conduit</publisher>
+		<info name="release" value="2020-12-05"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="algebra drill and practice ii v1.1 (4am crack) disk 1.dsk" size="143360" crc="4c20de51" sha1="92323ffaaa38e7700c7c10f43c1b89de4f2d8ea2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="algebra drill and practice ii v1.1 (4am crack) disk 2.dsk" size="143360" crc="5e2c0e8b" sha1="ed5b7240cd71d1b4f9c2c0ccf9a40e1b6ecbe919"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhlngvwl">
+		<description>Hugo Hound's Vowel Sounds: Long Vowels (cleanly cracked)</description>
+		<year>1993</year>
+		<publisher>Micrograms</publisher>
+		<info name="release" value="2020-12-30"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="hugo hound's vowel sounds - long vowels (4am crack).dsk" size="143360" crc="b1b4cad8" sha1="bb6ea89ff429fcbb74665b587e551966fdf12709"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timcatfr">
+		<description>Tim and the Cat and Grog the Frog (cleanly cracked)</description>
+		<year>1992</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2020-12-31"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="tim and the cat and grog the frog (4am crack) disk 1a.dsk" size="143360" crc="20f92b22" sha1="ff5acd10bfad1e0b3d9c96150c764deb27843226"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="tim and the cat and grog the frog (4am crack) disk 1b.dsk" size="143360" crc="e7424f95" sha1="eea6681584be1f49535f290fabe25f7d7668a0ba"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="tim and the cat and grog the frog (4am crack) disk 2a.dsk" size="143360" crc="f69ad29c" sha1="bf74e1986be0908e378b12daa0ec02adfbf62ad3"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="tim and the cat and grog the frog (4am crack) disk 2b.dsk" size="143360" crc="9af4c87f" sha1="d5895fa59fa11e4bc6042bf79586aa89bc7354f8"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="tim and the cat and grog the frog (4am crack) disk 3a.dsk" size="143360" crc="bc3ed7ba" sha1="07c5366f8522ae268cb5af6ab7adfa7498868865"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="tim and the cat and grog the frog (4am crack) disk 3b.dsk" size="143360" crc="85724e52" sha1="1b04a1fa44a3a6f3404ffc760a787378f65fef03"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="tim and the cat and grog the frog (4am crack) disk 4a.dsk" size="143360" crc="9b976533" sha1="d19f3ae0bc405db88343ccd34f08149a9bafb035"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="tim and the cat and grog the frog (4am crack) disk 4b.dsk" size="143360" crc="9138fb30" sha1="d1a2b0832c1e5a8ec6b7ec1c96a6ed110b9c6084"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="tim and the cat and grog the frog (4am crack) disk 5a.dsk" size="143360" crc="e4cfdc60" sha1="349f56ba7e3ed65715c09ad4278c8580dbad07ba"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="tim and the cat and grog the frog (4am crack) disk 5b.dsk" size="143360" crc="7219dd6e" sha1="ad333036506d08b5d2962eed64d6eae3d9ee92d5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pwradspc">
+		<description>PlayWriter: Adventures in Space (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Woodbury Computer Associates</publisher>
+		<info name="release" value="2021-01-01"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - "/>
+			<dataarea name="flop" size="143360">
+				<rom name="playwriter - adventures in space (4am crack) disk 1 - program.dsk" size="143360" crc="5cec640f" sha1="bea9881dd3f32c6cd8f2f4525ccfc52ca1d48aff"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - "/>
+			<dataarea name="flop" size="143360">
+				<rom name="playwriter - adventures in space (4am crack) disk 2 - story disk.dsk" size="143360" crc="0c9f5920" sha1="f169fcb1b2421663f0aeac1c1b7017b1c2b09ad1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drjdino">
+		<description>Dr. Jessie's Dinosaur (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Grolier Publishing</publisher>
+		<info name="release" value="2021-01-08"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="dr. jessie's dinosaur (4am crack).dsk" size="143360" crc="eda0425b" sha1="367c3eebfa54221c58e3316d10ff9e32332e13ee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="islemem">
+		<description>The Isle of Mem (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Grolier Publishing</publisher>
+		<info name="release" value="2021-01-09"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the isle of mem (4am crack) side a.dsk" size="143360" crc="b501cc9d" sha1="8a9e70d28f73a1a611e375159c3ebf08046d3e23"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the isle of mem (4am crack) side b.dsk" size="143360" crc="ded2cc4b" sha1="bbf550d5d559689970acca25a336cd3b02fbb8f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthc1684">
+		<description>Math Concepts I (Version 06.29.84) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2021-01-09"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math concepts i v06.29.84 (4am crack).dsk" size="143360" crc="e56e5833" sha1="1264bbe828fc54d4780165dcf99fce72f8ef3975"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="osmprs11">
+		<description>Osmotic Pressure (Version 1.1, dated 04/1985) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Conduit</publisher>
+		<info name="release" value="2021-01-13"/>
+		<!-- Printed disk label says 04/1985 -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="osmotic pressure (4am crack).dsk" size="143360" crc="00c72625" sha1="ee7f66ef595e43486f4d8197774e081ae375bc8c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthc2684">
+		<description>Math Concepts II (Version 06.29.84) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2021-01-19"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="math concepts ii v06.29.84 (4am crack).dsk" size="143360" crc="2e297154" sha1="05d540f5d7482294a446e66011dcf6de1cdcbad7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="repprcs">
+		<description>Reproduction Process (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Micro Power and Light</publisher>
+		<info name="release" value="2021-01-30"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="reproduction process (4am crack).dsk" size="143360" crc="b4adb688" sha1="cdc0ea4d46d8813d7433f506cd71813a669e215a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="polcntrl">
+		<description>Pollution Control (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Focus Media</publisher>
+		<info name="release" value="2021-01-30"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Pollution Master"/>
+			<dataarea name="flop" size="143360">
+				<rom name="pollution control (4am crack) disk 1 - pollution master.dsk" size="143360" crc="de6226ef" sha1="784fdb8e1b66923ea98ffd3c5ec21d1839c6fb0a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Pollution One"/>
+			<dataarea name="flop" size="143360">
+				<rom name="pollution control (4am crack) disk 2 - pollution one.dsk" size="143360" crc="2f011729" sha1="5594969c51a835de3b27c2c6f7f7b597bc4a0a51"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Pollution Two"/>
+			<dataarea name="flop" size="143360">
+				<rom name="pollution control (4am crack) disk 3 - pollution two.dsk" size="143360" crc="11bd9d3c" sha1="ffadde8967a9bb361abc4c1754150040ae4b20ff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jigjnrtr">
+		<description>Jigsaw Jenerator (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Leslie Hoffenberg</publisher>
+		<info name="release" value="2021-02-06"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="jigsaw jenerator (4am crack).dsk" size="143360" crc="39b01230" sha1="e9e46a500db5c4037004b5ad5ee04ad7ad9f7ca7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pwrtrcac">
+		<description>PlayWriter: Castles and Creatures (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Woodbury Computer Associates</publisher>
+		<info name="release" value="2021-02-07"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="playwriter- castles and creatures (4am crack) disk 1 - program.dsk" size="143360" crc="b12561bd" sha1="94795954b339ebc1c953f9a114d4205e8db68e33"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Story Disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="playwriter- castles and creatures (4am crack) disk 2 - story disk.dsk" size="143360" crc="75ee41a3" sha1="af11ca63e3c5f9cc0a5fad72c93b4a0acacc58f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pipeline">
+		<description>Pipeline (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Learning Technologies</publisher>
+		<info name="release" value="2021-02-10"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pipeline (4am crack).dsk" size="143360" crc="e50c7c1c" sha1="47d65b3724944926b9762430693ff6b6c8b937d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frogrmsp">
+		<description>Frogger (Main Street Publishing re-release) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Main Street Publishing</publisher>
+		<info name="release" value="2021-02-10"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="frogger (main street publishing) (4am crack).dsk" size="143360" crc="091a2a9b" sha1="9c3cc01b39f75fe2aca11f0500e8f732ef8e470f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strshc11">
+		<description>Starship Commander (Version 1.1) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Voyager Software</publisher>
+		<info name="release" value="2021-02-10"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="starship commander (4am crack).dsk" size="143360" crc="10275bba" sha1="35fb4ec9c69cc8ddeb2b0aa02f94da70c5c59226"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uccsbc">
+		<description>Uncle Clyde's Consonant Slides: Beginning Consonants (cleanly cracked)</description>
+		<year>1993</year>
+		<publisher>Micrograms</publisher>
+		<info name="release" value="2021-02-10"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="uncle clyde's consonant slides - beginning consonants (4am crack).dsk" size="143360" crc="239d4daa" sha1="7b530d4f20e8275e767c6a23e37de3cb85f2fe4c"/>
 			</dataarea>
 		</part>
 	</software>

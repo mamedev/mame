@@ -632,9 +632,11 @@ WRITE_LINE_MEMBER( tiki100_state::bar2_w )
 
 /* FD1797 Interface */
 
-FLOPPY_FORMATS_MEMBER( tiki100_state::floppy_formats )
-	FLOPPY_TIKI100_FORMAT
-FLOPPY_FORMATS_END
+void tiki100_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_TIKI100_FORMAT);
+}
 
 static void tiki100_floppies(device_slot_interface &device)
 {

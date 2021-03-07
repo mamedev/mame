@@ -9,12 +9,14 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "ui/ui.h"
 #include "ui/devopt.h"
+
+#include "ui/ui.h"
 #include "romload.h"
 
 
 namespace ui {
+
 /*-------------------------------------------------
  device_config - handle the game information
  menu

@@ -14,13 +14,16 @@
 
 #include "ui/menu.h"
 
+#include "audit.h"
+
+#include "lrucache.h"
+
 #include <map>
 #include <memory>
 #include <mutex>
 #include <vector>
 
 
-class media_auditor;
 struct ui_software_info;
 
 namespace ui {
@@ -156,7 +159,12 @@ protected:
 		return (uintptr_t(selected_ref) > skip_main_items) ? selected_ref : m_prev_selected;
 	}
 
-	static std::string make_audit_fail_text(bool found, media_auditor const &auditor);
+	static std::string make_system_audit_fail_text(media_auditor const &auditor, media_auditor::summary summary);
+	static std::string make_software_audit_fail_text(media_auditor const &auditor, media_auditor::summary summary);
+	static constexpr bool audit_passed(media_auditor::summary summary)
+	{
+		return (media_auditor::CORRECT == summary) || (media_auditor::BEST_AVAILABLE == summary) || (media_auditor::NONE_NEEDED == summary);
+	}
 
 	int         m_available_items;
 	int         skip_main_items;
@@ -291,6 +299,7 @@ private:
 	// filter navigation
 	virtual void filter_selected() = 0;
 
+	static void make_audit_fail_text(std::ostream &str, media_auditor const &auditor, media_auditor::summary summary);
 	static void launch_system(mame_ui_manager &mui, game_driver const &driver, ui_software_info const *swinfo, std::string const *part, int const *bios);
 	static bool select_part(mame_ui_manager &mui, render_container &container, software_info const &info, ui_software_info const &ui_info);
 	static bool has_multiple_bios(ui_software_info const &swinfo, s_bios &biosname);

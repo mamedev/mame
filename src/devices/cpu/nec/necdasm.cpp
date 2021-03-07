@@ -1414,7 +1414,7 @@ void nec_disassembler::decode_opcode(std::ostream &stream, const NEC_I386_OPCODE
 
 		case GROUP:
 			handle_modrm( pc_base, pc, params );
-			for( i=0; i < ARRAY_LENGTH(group_op_table); i++ ) {
+			for( i=0; i < std::size(group_op_table); i++ ) {
 				if( strcmp(op->mnemonic, group_op_table[i].mnemonic) == 0 )
 				{
 					decode_opcode( stream, &group_op_table[i].opcode[MODRM_REG1], op1, pc_base, pc, opcodes, params );

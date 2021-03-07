@@ -79,12 +79,12 @@ license:CC0
 	<element name="text_hint">          <rect><color red="0.84" green="0.75" blue="0.50" /></rect>    <text string="HINT"         ><color red="0.17" green="0.15" blue="0.15" /></text> </element>
 	<element name="text_white">         <rect><color red="0.84" green="0.75" blue="0.50" /></rect>    <text string="WHITE"        align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
 	<element name="text_black">         <rect><color red="0.84" green="0.75" blue="0.50" /></rect>    <text string="BLACK"        align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
-	<element name="text_king" >         <image file="chess/bk.png"/></element>
-	<element name="text_queen" >        <image file="chess/bq.png"/></element>
-	<element name="text_rook" >         <image file="chess/br.png"/></element>
-	<element name="text_bishop" >       <image file="chess/bb.png"/></element>
-	<element name="text_knight" >       <image file="chess/bn.png"/></element>
-	<element name="text_pawn" >         <image file="chess/bp.png"/></element>
+	<element name="text_king" >         <image file="chess/bk.svg"/></element>
+	<element name="text_queen" >        <image file="chess/bq.svg"/></element>
+	<element name="text_rook" >         <image file="chess/br.svg"/></element>
+	<element name="text_bishop" >       <image file="chess/bb.svg"/></element>
+	<element name="text_knight" >       <image file="chess/bn.svg"/></element>
+	<element name="text_pawn" >         <image file="chess/bp.svg"/></element>
 	<element name="text_change">        <rect><color red="0.84" green="0.75" blue="0.50" /></rect>    <text string="CHANGE"       align="2"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
 	<element name="text_board1">        <rect><color red="0.84" green="0.75" blue="0.50" /></rect>    <text string="BOARD"        align="1"><color red="0.17" green="0.15" blue="0.15" /></text> </element>
 	<element name="text_halt">          <rect><color red="0.84" green="0.75" blue="0.50" /></rect>    <text string="HALT"         ><color red="0.17" green="0.15" blue="0.15" /></text> </element>
@@ -94,34 +94,34 @@ license:CC0
 	<element name="text_cms">           <rect><color red="0.84" green="0.75" blue="0.50" /></rect>    <text string="CM'S"         ><color red="0.17" green="0.15" blue="0.15" /></text> </element>
 
 	<element name="piece" defstate="0">
-		<image file="chess/wp.png" state="1"/>
-		<image file="chess/wn.png" state="2"/>
-		<image file="chess/wb.png" state="3"/>
-		<image file="chess/wr.png" state="4"/>
-		<image file="chess/wq.png" state="5"/>
-		<image file="chess/wk.png" state="6"/>
+		<image file="chess/wp.svg" state="1"/>
+		<image file="chess/wn.svg" state="2"/>
+		<image file="chess/wb.svg" state="3"/>
+		<image file="chess/wr.svg" state="4"/>
+		<image file="chess/wq.svg" state="5"/>
+		<image file="chess/wk.svg" state="6"/>
 
-		<image file="chess/bp.png" state="7"/>
-		<image file="chess/bn.png" state="8"/>
-		<image file="chess/bb.png" state="9"/>
-		<image file="chess/br.png" state="10"/>
-		<image file="chess/bq.png" state="11"/>
-		<image file="chess/bk.png" state="12"/>
+		<image file="chess/bp.svg" state="7"/>
+		<image file="chess/bn.svg" state="8"/>
+		<image file="chess/bb.svg" state="9"/>
+		<image file="chess/br.svg" state="10"/>
+		<image file="chess/bq.svg" state="11"/>
+		<image file="chess/bk.svg" state="12"/>
 
 		<!-- selected pieces -->
-		<image file="chess/wp.png" state="13"><color alpha="0.5" /></image>
-		<image file="chess/wn.png" state="14"><color alpha="0.5" /></image>
-		<image file="chess/wb.png" state="15"><color alpha="0.5" /></image>
-		<image file="chess/wr.png" state="16"><color alpha="0.5" /></image>
-		<image file="chess/wq.png" state="17"><color alpha="0.5" /></image>
-		<image file="chess/wk.png" state="18"><color alpha="0.5" /></image>
+		<image file="chess/wp.svg" state="13"><color alpha="0.5" /></image>
+		<image file="chess/wn.svg" state="14"><color alpha="0.5" /></image>
+		<image file="chess/wb.svg" state="15"><color alpha="0.5" /></image>
+		<image file="chess/wr.svg" state="16"><color alpha="0.5" /></image>
+		<image file="chess/wq.svg" state="17"><color alpha="0.5" /></image>
+		<image file="chess/wk.svg" state="18"><color alpha="0.5" /></image>
 
-		<image file="chess/bp.png" state="19"><color alpha="0.5" /></image>
-		<image file="chess/bn.png" state="20"><color alpha="0.5" /></image>
-		<image file="chess/bb.png" state="21"><color alpha="0.5" /></image>
-		<image file="chess/br.png" state="22"><color alpha="0.5" /></image>
-		<image file="chess/bq.png" state="23"><color alpha="0.5" /></image>
-		<image file="chess/bk.png" state="24"><color alpha="0.5" /></image>
+		<image file="chess/bp.svg" state="19"><color alpha="0.5" /></image>
+		<image file="chess/bn.svg" state="20"><color alpha="0.5" /></image>
+		<image file="chess/bb.svg" state="21"><color alpha="0.5" /></image>
+		<image file="chess/br.svg" state="22"><color alpha="0.5" /></image>
+		<image file="chess/bq.svg" state="23"><color alpha="0.5" /></image>
+		<image file="chess/bk.svg" state="24"><color alpha="0.5" /></image>
 	</element>
 
 

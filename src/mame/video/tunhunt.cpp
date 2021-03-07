@@ -365,7 +365,7 @@ uint32_t tunhunt_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		m_shl1st,  /* vstretch */
 		m_control&0x10 ); /* hstretch */
 
-	rectangle cr = cliprect;	
+	rectangle cr = cliprect;
 	if( cr.min_x < 192 )
 		cr.min_x = 192;
 

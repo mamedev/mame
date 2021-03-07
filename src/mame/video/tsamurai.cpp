@@ -79,6 +79,7 @@ void tsamurai_state::video_start()
 	m_numsprites = 32;
 
 	save_item(NAME(m_bgcolor));
+	save_item(NAME(m_textbank1));
 }
 
 void m660_state::video_start()

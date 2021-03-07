@@ -37,7 +37,7 @@ const char *dip_format::extensions() const
 	return "dip";
 }
 
-int dip_format::identify(io_generic *io, uint32_t form_factor)
+int dip_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t size = io_generic_size(io);
 
@@ -47,7 +47,7 @@ int dip_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool dip_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool dip_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int heads, tracks, spt, bps;
 

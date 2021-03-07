@@ -892,7 +892,7 @@ void address_map::import_submaps(running_machine &machine, device_t &owner, int 
 			{
 				mapdevice = owner.subdevice(entry->m_read.m_tag);
 				if (mapdevice == nullptr)
-					throw emu_fatalerror("Attempted to submap a non-existent device '%s' in space %d of device '%s'\n", owner.subtag(entry->m_read.m_tag).c_str(), m_spacenum, m_device->basetag());
+					throw emu_fatalerror("Attempted to submap a non-existent device '%s' in space %d of device '%s'\n", owner.subtag(entry->m_read.m_tag), m_spacenum, m_device->basetag());
 			}
 
 			// Grab the submap
@@ -1296,7 +1296,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 					break;
 			}
 			if (devtag.second && !devtag.first.get().subdevice(devtag.second))
-				osd_printf_error("%s space memory map entry reads from nonexistent device '%s'\n", spaceconfig.m_name, devtag.first.get().subtag(devtag.second).c_str());
+				osd_printf_error("%s space memory map entry reads from nonexistent device '%s'\n", spaceconfig.m_name, devtag.first.get().subtag(devtag.second));
 #ifndef MAME_DEBUG // assert will catch this earlier
 			(void)entry.unitmask_is_appropriate(entry.m_read.m_bits, entry.m_mask, entry.m_read.m_name);
 #endif
@@ -1368,7 +1368,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 					break;
 			}
 			if (devtag.second && !devtag.first.get().subdevice(devtag.second))
-				osd_printf_error("%s space memory map entry writes to nonexistent device '%s'\n", spaceconfig.m_name, devtag.first.get().subtag(devtag.second).c_str());
+				osd_printf_error("%s space memory map entry writes to nonexistent device '%s'\n", spaceconfig.m_name, devtag.first.get().subtag(devtag.second));
 #ifndef MAME_DEBUG // assert will catch this earlier
 			(void)entry.unitmask_is_appropriate(entry.m_write.m_bits, entry.m_mask, entry.m_write.m_name);
 #endif

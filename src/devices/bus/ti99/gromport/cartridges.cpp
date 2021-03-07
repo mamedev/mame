@@ -15,6 +15,8 @@
 #include "emu.h"
 #include "cartridges.h"
 
+#include "corestr.h"
+
 #define LOG_WARN         (1U<<1)   // Warnings
 #define LOG_CONFIG       (1U<<2)   // Configuration
 #define LOG_CHANGE       (1U<<3)   // Cart change
@@ -1128,6 +1130,7 @@ void ti99_paged379i_cartridge::write(offs_t offset, uint8_t data)
   Cartridge type: paged378
   This type is intended for high-capacity cartridges of up to 512 KiB
   plus GROM space of 120KiB (not supported yet)
+  For smaller ROMs, the ROM is automatically mirrored in the bank space.
 
   Due to its huge GROM space it is also called the "UberGROM"
 
@@ -1160,7 +1163,10 @@ void ti99_paged378_cartridge::write(offs_t offset, uint8_t data)
 	// x = don't care, bbbb = bank
 	if (m_romspace_selected)
 	{
-		m_rom_page = ((offset >> 1)&0x003f);
+		// Auto-adapt to the size of the ROM
+		int mask = ((m_rom_size / 8192) - 1) & 0x3f;
+		m_rom_page = ((offset >> 1)&mask);
+
 		if ((offset & 1)==0)
 			LOGMASKED(LOG_BANKSWITCH, "Set ROM page = %d (writing to %04x)\n", m_rom_page, (offset | 0x6000));
 	}
@@ -1485,7 +1491,7 @@ DTD:
 ****************************************************************************/
 
 #undef LOG_OUTPUT_FUNC
-#define LOG_OUTPUT_FUNC printf
+#define LOG_OUTPUT_FUNC osd_printf_info
 
 /****************************************
     RPK class
@@ -1606,43 +1612,36 @@ int ti99_cartridge_device::rpk_reader::find_file(util::archive_file &zip, const 
 */
 std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_reader::load_rom_resource(util::archive_file &zip, util::xml::data_node const* rom_resource_node, const char* socketname)
 {
-	const char* file;
-	const char* crcstr;
-	const char* sha1;
-	util::archive_file::error ziperr;
-	uint32_t crc;
-	int length;
-	std::unique_ptr<uint8_t []> contents;
-	int header;
-
 	// find the file attribute (required)
-	file = rom_resource_node->get_attribute_string("file", nullptr);
+	std::string const *const file = rom_resource_node->get_attribute_string_ptr("file");
 	if (file == nullptr) throw rpk_exception(RPK_INVALID_LAYOUT, "<rom> must have a 'file' attribute");
 
-	LOGMASKED(LOG_RPK, "[RPK handler] Loading ROM contents for socket '%s' from file %s\n", socketname, file);
+	LOGMASKED(LOG_RPK, "[RPK handler] Loading ROM contents for socket '%s' from file %s\n", socketname, *file);
 
 	// check for crc
-	crcstr = rom_resource_node->get_attribute_string("crc", nullptr);
+	std::string const *const crcstr = rom_resource_node->get_attribute_string_ptr("crc");
+	int header;
 	if (crcstr==nullptr)
 	{
 		// no CRC, just find the file in the RPK
-		header = find_file(zip, file, 0);
+		header = find_file(zip, file->c_str(), 0);
 	}
 	else
 	{
-		crc = strtoul(crcstr, nullptr, 16);
-		header = find_file(zip, file, crc);
+		uint32_t crc = strtoul(crcstr->c_str(), nullptr, 16);
+		header = find_file(zip, file->c_str(), crc);
 	}
 	if (header < 0) throw rpk_exception(RPK_INVALID_FILE_REF, "File not found or CRC check failed");
 
-	length = zip.current_uncompressed_length();
+	int length = zip.current_uncompressed_length();
 
 	// Allocate storage
+	std::unique_ptr<uint8_t []> contents;
 	try { contents = make_unique_clear<uint8_t []>(length); }
 	catch (std::bad_alloc const &) { throw rpk_exception(RPK_OUT_OF_MEMORY); }
 
 	// and unzip file from the zip file
-	ziperr = zip.decompress(contents.get(), length);
+	util::archive_file::error ziperr = zip.decompress(contents.get(), length);
 	if (ziperr != util::archive_file::error::NONE)
 	{
 		if (ziperr == util::archive_file::error::UNSUPPORTED) throw rpk_exception(RPK_ZIP_UNSUPPORTED);
@@ -1650,14 +1649,14 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_re
 	}
 
 	// check for sha1
-	sha1 = rom_resource_node->get_attribute_string("sha1", nullptr);
+	std::string const *const sha1 = rom_resource_node->get_attribute_string_ptr("sha1");
 	if (sha1 != nullptr)
 	{
 		util::hash_collection actual_hashes;
 		actual_hashes.compute(contents.get(), length, util::hash_collection::HASH_TYPES_CRC_SHA1);
 
 		util::hash_collection expected_hashes;
-		expected_hashes.add_from_string(util::hash_collection::HASH_SHA1, sha1, strlen(sha1));
+		expected_hashes.add_from_string(util::hash_collection::HASH_SHA1, *sha1);
 
 		if (actual_hashes != expected_hashes) throw rpk_exception(RPK_INVALID_FILE_REF, "SHA1 check failed");
 	}
@@ -1671,20 +1670,14 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_re
 */
 std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_reader::load_ram_resource(emu_options &options, util::xml::data_node const* ram_resource_node, const char* socketname, const char* system_name)
 {
-	const char* length_string;
-	const char* ram_type;
-	const char* ram_filename;
-	std::string ram_pname;
-	unsigned int length;
-	std::unique_ptr<uint8_t []> contents;
-
 	// find the length attribute
-	length_string = ram_resource_node->get_attribute_string("length", nullptr);
+	std::string const *const length_string = ram_resource_node->get_attribute_string_ptr("length");
 	if (length_string == nullptr) throw rpk_exception(RPK_MISSING_RAM_LENGTH);
 
 	// parse it
+	unsigned int length;
 	char suffix = '\0';
-	sscanf(length_string, "%u%c", &length, &suffix);
+	sscanf(length_string->c_str(), "%u%c", &length, &suffix);
 	switch(tolower(suffix))
 	{
 		case 'k': // kilobytes
@@ -1704,6 +1697,7 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_re
 	}
 
 	// Allocate memory for this resource
+	std::unique_ptr<uint8_t []> contents;
 	try { contents = make_unique_clear<uint8_t []>(length); }
 	catch (std::bad_alloc const &) { throw rpk_exception(RPK_OUT_OF_MEMORY); }
 
@@ -1712,17 +1706,18 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_re
 	// That's it for pure RAM. Now check whether the RAM is "persistent", i.e. NVRAM.
 	// In that case we must load it from the NVRAM directory.
 	// The file name is given in the RPK file; the subdirectory is the system name.
-	ram_type = ram_resource_node->get_attribute_string("type", nullptr);
+	std::string const *const ram_type = ram_resource_node->get_attribute_string_ptr("type");
+	std::string ram_pname;
 	if (ram_type != nullptr)
 	{
-		if (strcmp(ram_type, "persistent")==0)
+		if (*ram_type == "persistent")
 		{
 			// Get the file name (required if persistent)
-			ram_filename = ram_resource_node->get_attribute_string("file", nullptr);
+			std::string const *const ram_filename = ram_resource_node->get_attribute_string_ptr("file");
 			if (ram_filename==nullptr)
 				throw rpk_exception(RPK_INVALID_RAM_SPEC, "<ram type='persistent'> must have a 'file' attribute");
 
-			ram_pname = std::string(system_name).append(PATH_SEPARATOR).append(ram_filename);
+			ram_pname = std::string(system_name).append(PATH_SEPARATOR).append(*ram_filename);
 			// load, and fill rest with 00
 			LOGMASKED(LOG_RPK, "[RPK handler] Loading NVRAM contents from '%s'\n", ram_pname.c_str());
 
@@ -1809,14 +1804,14 @@ ti99_cartridge_device::rpk* ti99_cartridge_device::rpk_reader::open(emu_options 
 		if (!pcb_node) throw rpk_exception(RPK_INVALID_LAYOUT, "<configuration> must have a <pcb> child");
 
 		// We'll try to find the PCB type on the provided type list.
-		char const *const pcb_type = pcb_node->get_attribute_string("type", nullptr);
+		std::string const *const pcb_type = pcb_node->get_attribute_string_ptr("type");
 		if (!pcb_type) throw rpk_exception(RPK_INVALID_LAYOUT, "<pcb> must have a 'type' attribute");
-		LOGMASKED(LOG_RPK, "[RPK handler] Cartridge says it has PCB type '%s'\n", pcb_type);
+		LOGMASKED(LOG_RPK, "[RPK handler] Cartridge says it has PCB type '%s'\n", *pcb_type);
 
 		i=0;
 		do
 		{
-			if (strcmp(pcb_type, m_types[i].name)==0)
+			if (*pcb_type == m_types[i].name)
 			{
 				newrpk->m_type = m_types[i].id;
 				break;
@@ -1830,37 +1825,37 @@ ti99_cartridge_device::rpk* ti99_cartridge_device::rpk_reader::open(emu_options 
 		for (util::xml::data_node const *socket_node = pcb_node->get_first_child();  socket_node != nullptr; socket_node = socket_node->get_next_sibling())
 		{
 			if (strcmp(socket_node->get_name(), "socket")!=0) throw rpk_exception(RPK_INVALID_LAYOUT, "<pcb> element has only <socket> children");
-			char const *const id = socket_node->get_attribute_string("id", nullptr);
+			std::string const *const id = socket_node->get_attribute_string_ptr("id");
 			if (!id) throw rpk_exception(RPK_INVALID_LAYOUT, "<socket> must have an 'id' attribute");
-			char const *const uses_name = socket_node->get_attribute_string("uses", nullptr);
+			std::string const *const uses_name = socket_node->get_attribute_string_ptr("uses");
 			if (!uses_name) throw rpk_exception(RPK_INVALID_LAYOUT, "<socket> must have a 'uses' attribute");
 
 			bool found = false;
 			// Locate the resource node
 			for (util::xml::data_node const *resource_node = resources_node->get_first_child(); resource_node != nullptr; resource_node = resource_node->get_next_sibling())
 			{
-				char const *const resource_name = resource_node->get_attribute_string("id", nullptr);
+				std::string const *const resource_name = resource_node->get_attribute_string_ptr("id");
 				if (!resource_name) throw rpk_exception(RPK_INVALID_LAYOUT, "resource node must have an 'id' attribute");
 
-				if (strcmp(resource_name, uses_name)==0)
+				if (*resource_name == *uses_name)
 				{
 					// found it
 					if (strcmp(resource_node->get_name(), "rom")==0)
 					{
-						newrpk->add_socket(id, load_rom_resource(*zipfile, resource_node, id));
+						newrpk->add_socket(id->c_str(), load_rom_resource(*zipfile, resource_node, id->c_str()));
 					}
 					else
 					{
 						if (strcmp(resource_node->get_name(), "ram")==0)
 						{
-							newrpk->add_socket(id, load_ram_resource(options, resource_node, id, system_name));
+							newrpk->add_socket(id->c_str(), load_ram_resource(options, resource_node, id->c_str(), system_name));
 						}
 						else throw rpk_exception(RPK_INVALID_LAYOUT, "resource node must be <rom> or <ram>");
 					}
 					found = true;
 				}
 			}
-			if (!found) throw rpk_exception(RPK_INVALID_RESOURCE_REF, uses_name);
+			if (!found) throw rpk_exception(RPK_INVALID_RESOURCE_REF, uses_name->c_str());
 		}
 	}
 	catch (rpk_exception &)

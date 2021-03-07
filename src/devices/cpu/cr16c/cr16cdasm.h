@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 
 #ifndef MAME_CPU_CR16C_CR16CDASM_H
-#define MAME_CPU_CR16C_CR16CDASM_H 1
+#define MAME_CPU_CR16C_CR16CDASM_H
 
 #pragma once
 

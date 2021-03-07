@@ -47,15 +47,1124 @@ c:at(i)
     Returns the value at the 1-based index ``i``, or ``nil`` if it is out of
     range.
 c:find(v)
-    Returns the key for item ``v``, or ``nil`` if it is not in the collection.
-    The key is what you would pass to the index operator to get the value.
-c:find(v)
     Returns the key for item ``v``, or ``nil`` if it is not in the container.
     The key is what you would pass to the index operator to get the value.
 c:index_of(v)
     Returns the 1-based index for item ``v``, or ``nil`` if it is not in the
     container.  The index is what you would pass to the ``at`` method to get the
     value.
+
+
+.. _luareference-core:
+
+Core classes
+------------
+
+Many of MAME’s core classes used to implement an emulation session are available
+to Lua scripts.
+
+.. _luareference-core-mameman:
+
+MAME machine manager
+~~~~~~~~~~~~~~~~~~~~
+
+Wraps MAME’s ``mame_machine_manager`` class, which holds the running machine, UI
+manager, and other global components.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager
+    The MAME machine manager is available as a global variable in the Lua
+    environment.
+
+Properties
+^^^^^^^^^^
+
+manager.machine (read-only)
+    The :ref:`running machine <luareference-core-machine>` for the current
+    emulation session.
+manager.ui (read-only)
+    The :ref:`UI manager <luareference-core-uiman>` for the current session.
+manager.options (read-only)
+    The :ref:`emulation options <luareference-core-emuopts>` for the current
+    session.
+manager.plugins[] (read-only)
+    Gets information about the :ref:`Lua plugins <luareference-core-plugin>`
+    that are present, indexed by name.  The index get, ``at`` and ``index_of``
+    methods have O(n) complexity.
+
+.. _luareference-core-machine:
+
+Running machine
+~~~~~~~~~~~~~~~
+
+Wraps MAME’s ``running_machine`` class, which represents an emulation session.
+It provides access to the other core objects that implement an emulation session
+as well as the emulated device tree.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.machine
+    Gets the running machine instance for the current emulation session.
+
+Methods
+^^^^^^^
+
+machine:exit()
+    Schedules an exit from the current emulation session.  This will either
+    return to the system selection menu or exit the application, depending on
+    how it was started.  This method returns immediately, before the scheduled
+    exit takes place.
+machine:hard_reset()
+    Schedules a hard reset.  This is implemented by tearing down the emulation
+    session and starting another emulation session for the same system.  This
+    method returns immediately, before the scheduled reset takes place.
+machine:soft_reset()
+    Schedules a soft reset.  This is implemented by calling the reset method of
+    the root device, which is propagated down the device tree.  This method
+    returns immediately, before the scheduled reset takes place.
+machine:save(filename)
+    Schedules saving machine state to the specified file.  If the file name is a
+    relative path, it is considered to be relative to the first configured save
+    state directory.  This method returns immediately, before the machine state
+    is saved.  If this method is called when a save or load operation is already
+    pending, the previously pending operation will be cancelled.
+machine:load(filename)
+    Schedules loading machine state from the specified file.  If the file name
+    is a relative path, the configured save state directories will be searched.
+    This method returns immediately, before the machine state is saved.  If this
+    method is called when a save or load operation is already pending, the
+    previously pending operation will be cancelled.
+machine:popmessage([msg])
+    Displays a pop-up message to the user.  If the message is not provided, the
+    currently displayed pop-up message (if any) will be hidden.
+machine:logerror(msg)
+    Writes the message to the machine error log.  This may be displayed in a
+    debugger window, written to a file, or written to the standard error output.
+
+Properties
+^^^^^^^^^^
+
+machine.system (read-only)
+    The :ref:`driver metadata <luareference-core-driver>` for the current
+    system.
+machine.parameters (read-only)
+    The :ref:`parameters manager <luareference-core-paramman>` for the current
+    emulation session.
+machine.video (read-only)
+    The :ref:`video manager <luareference-core-videoman>` for the current
+    emulation session.
+machine.sound (read-only)
+    The :ref:`sound manager <luareference-core-soundman>` for the current
+    emulation session.
+machine.output (read-only)
+    The :ref:`output manager <luareference-core-outputman>` for the current
+    emulation session.
+machine.memory (read-only)
+    The :ref:`emulated memory manager <luareference-mem-manager>` for the
+    current emulation session.
+machine.ioport (read-only)
+    The :ref:`I/O port manager <luareference-input-ioportman>` for the current
+    emulation session.
+machine.input (read-only)
+    The :ref:`input manager <luareference-input-inputman>` for the current
+    emulation session.
+machine.natkeyboard (read-only)
+    Gets the :ref:`natural keyboard manager <luareference-input-natkbd>`, used
+    for controlling keyboard and keypad input to the emulated system.
+machine.uiinput (read-only)
+    The :ref:`UI input manager <luareference-input-uiinput>` for the current
+    emulation session.
+machine.render (read-only)
+    The :ref:`render manager <luareference-render-manager>` for the current
+    emulation session.
+machine.debugger (read-only)
+    The :ref:`debugger manager <luareference-debug-manager>` for the current
+    emulation session, or ``nil`` if the debugger is not enabled.
+machine.options (read-only)
+    The user-specified :ref:`options <luareference-core-emuopts>` for the
+    current emulation session.
+machine.samplerate (read-only)
+    The output audio sample rate in Hertz.
+machine.paused (read-only)
+    A Boolean indicating whether emulation is not currently running, usually
+    because the session has been paused or the emulated system has not completed
+    starting.
+machine.exit_pending (read-only)
+    A Boolean indicating whether the emulation session is scheduled to exit.
+machine.hard_reset_pending (read-only)
+    A Boolean indicating whether a hard reset of the emulated system is pending.
+machine.devices (read-only)
+    A :ref:`device enumerator <luareference-dev-enum>` that yields all
+    :ref:`devices <luareference-dev-device>` in the emulated system.
+machine.screens (read-only)
+    A :ref:`device enumerator <luareference-dev-enum>` that yields all
+    :ref:`screen devices <luareference-dev-screen>` in the emulated system.
+machine.cassettes (read-only)
+    A :ref:`device enumerator <luareference-dev-enum>` that yields all
+    :ref:`cassette image devices <luareference-dev-cass>` in the emulated
+    system.
+machine.images (read-only)
+    A :ref:`device enumerator <luareference-dev-enum>` that yields all
+    :ref:`media image devices <luareference-dev-diimage>` in the emulated system.
+machine.slots (read-only)
+    A :ref:`device enumerator <luareference-dev-enum>` that yields all
+    :ref:`slot devices <luareference-dev-dislot>` in the emulated system.
+
+.. _luareference-core-videoman:
+
+Video manager
+~~~~~~~~~~~~~
+
+Wraps MAME’s ``video_manager`` class, which is responsible for coordinating
+emulated video drawing, speed throttling, and reading host inputs.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.machine.video
+    Gets the video manager for the current emulation session.
+
+Methods
+^^^^^^^
+
+video:frame_update()
+    Updates emulated screens, reads host inputs, and updates video output.
+video:snapshot()
+    Saves snapshot files according to the current configuration.  If MAME is
+    configured to take native emulated screen snapshots, one snapshot will be
+    saved for each emulated screen that is visible in a host window/screen with
+    the current view configuration.  If MAME is not configured to use take
+    native emulated screen snapshots or if the system has no emulated screens, a
+    single snapshot will be saved using the currently selected snapshot view.
+video:begin_recording([filename], [format])
+    Stops any video recordings currently in progress and starts recording either
+    the visible emulated screens or the current snapshot view, depending on
+    whether MAME is configured to take native emulated screen snapshots.
+
+    If the file name is not supplied, the configured snapshot file name is used.
+    If the file name is a relative path, it is interpreted relative to the first
+    configured snapshot directory.  If the format is supplied, it must be
+    ``"avi"`` or ``"mng"``.  If the format is not supplied, it defaults to AVI.
+video:end_recording()
+    Stops any video recordings that are in progress.
+video:snapshot_size()
+    Returns the width and height in pixels of snapshots created with the current
+    snapshot target configuration and emulated screen state.  This may be
+    configured explicitly by the user, or calculated based on the selected
+    snapshot view and the resolution of any visible emulated screens.
+video:snapshot_pixels()
+    Returns the pixels of a snapshot created using the current snapshot target
+    configuration as 32-bit integers packed into a binary string in host Endian
+    order.  Pixels are organised in row-major order, from left to right then top
+    to bottom.  Pixel values are colours in RGB format packed into 32-bit
+    integers.
+
+Properties
+^^^^^^^^^^
+
+video.speed_factor (read-only)
+    Configured emulation speed adjustment in per mille (i.e. the ratio to normal
+    speed multiplied by 1,000).
+video.throttled (read/write)
+    A Boolean indicating whether MAME should wait before video updates to avoid
+    running faster than the target speed.
+video.throttle_rate (read/write)
+    The target emulation speed as a ratio of full speed adjusted by the speed
+    factor (i.e. 1 is normal speed adjusted by the speed factor, larger numbers
+    are faster, and smaller numbers are slower).
+video.frameskip (read/write)
+    The number of emulated video frames to skip drawing out of every twelve, or
+    -1 to automatically adjust the number of frames to skip to maintain the
+    target emulation speed.
+video.speed_percent (read-only)
+    The current emulated speed as a percentage of the full speed adjusted by the
+    speed factor.
+video.effective_frameskip (read-only)
+    The number of emulated frames that are skipped out of every twelve.
+video.skip_this_frame (read-only)
+    A Boolean indicating whether the video manager will skip drawing emulated
+    screens for the current frame.
+video.snap_native (read-only)
+    A Boolean indicating whether the video manager will take native emulated
+    screen snapshots.  In addition to the relevant configuration setting, the
+    emulated system must have at least one emulated screen.
+video.is_recording (read-only)
+    A Boolean indicating whether any video recordings are currently in progress.
+video.snapshot_target (read-only)
+    The :ref:`render target <luareference-render-target>` used to produce
+    snapshots and video recordings.
+
+.. _luareference-core-soundman:
+
+Sound manager
+~~~~~~~~~~~~~
+
+Wraps MAME’s ``sound_manager`` class, which manages the emulated sound stream
+graph and coordinates sound output.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.machine.sound
+    Gets the sound manager for the current emulation session.
+
+Methods
+^^^^^^^
+
+sound:start_recording([filename])
+    Starts recording to a WAV file.  Has no effect if currently recording.  If
+    the file name is not supplied, uses the configured WAV file name (from
+    command line or INI file), or has no effect if no WAV file name is
+    configured.  Returns ``true`` if recording started, or ``false`` if
+    recording is already in progress, opening the output file failed, or no file
+    name was supplied or configured.
+sound:stop_recording()
+    Stops recording and closes the file if currently recording to a WAV file.
+sound:get_samples()
+    Returns the current contents of the output sample buffer as a binary string.
+    Samples are 16-bit integers in host byte order.  Samples for left and right
+    stereo channels are interleaved.
+
+Properties
+^^^^^^^^^^
+
+sound.muted (read-only)
+    A Boolean indicating whether sound output is muted for any reason.
+sound.ui_mute (read/write)
+    A Boolean indicating whether sound output is muted at the request of the
+    user.
+sound.debugger_mute (read/write)
+    A Boolean indicating whether sound output is muted at the request of the
+    debugger.
+sound.system_mute (read/write)
+    A Boolean indicating whether sound output is muted at the request of the
+    emulated system.
+sound.attenuation (read/write)
+    The output volume attenuation in decibels.  Should generally be a negative
+    integer or zero.
+sound.recording (read-only)
+    A Boolean indicating whether sound output is currently being recorded to a
+    WAV file.
+
+.. _luareference-core-outputman:
+
+Output manager
+~~~~~~~~~~~~~~
+
+Wraps MAME’s ``output_manager`` class, providing access to system outputs that
+can be used for interactive artwork or consumed by external programs.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.machine.output
+    Gets the output manager for the current emulation session.
+
+Methods
+^^^^^^^
+
+output:set_value(name, val)
+    Sets the specified output value.  The value must be an integer.  The output
+    will be created if it does not already exist.
+output:set_indexed_value(prefix, index, val)
+    Appends the index (formatted as a decimal integer) to the prefix and sets
+    the value of the corresponding output.  The value must be an integer.  The
+    output will be created if it does not already exist.
+output:get_value(name)
+    Returns the value of the specified output, or zero if it doesn’t exist.
+output:get_indexed_value(prefix, index)
+    Appends the index (formatted as a decimal integer) to the prefix and returns
+    the value of the corresponding output, or zero if it doesn’t exist.
+output:name_to_id(name)
+    Gets the per-session unique integer ID for the specified output, or zero if
+    it doesn’t exist.
+output:id_to_name(id)
+    Gets the name for the output with the specified per-session unique ID, or
+    ``nil`` if it doesn’t exist.  This method has O(n) complexity, so avoid
+    calling it when performance is important.
+
+.. _luareference-core-paramman:
+
+Parameters manager
+~~~~~~~~~~~~~~~~~~
+
+Wraps MAME’s ``parameters_manager`` class, which provides a simple key-value
+store for metadata from system ROM definitions.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.machine.parameters
+    Gets the parameters manager for the current emulation session.
+
+Methods
+^^^^^^^
+
+parameters:lookup(tag)
+    Gets the value for the specified parameter if it is set, or an empty string
+    if it is not set.
+parameters:add(tag, value)
+    Sets the specified parameter if it is not set.  Has no effect if the
+    specified parameter is already set.
+
+.. _luareference-core-uiman:
+
+UI manager
+~~~~~~~~~~
+
+Wraps MAME’s ``mame_ui_manager`` class, which handles menus and other user
+interface functionality.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.ui
+    Gets the UI manager for the current session.
+
+Methods
+^^^^^^^
+
+ui:get_char_width(ch)
+    Gets the width of a Unicode character as a proportion of the width of the UI
+    container in the current font at the configured UI line height.
+ui:get_string_width(str)
+    Gets the width of a string as a proportion of the width of the UI container
+    in the current font at the configured UI line height.
+ui:set_aggressive_input_focus(enable)
+    On some platforms, this controls whether MAME should accept input focus in
+    more situations than when its windows have UI focus.
+
+Properties
+^^^^^^^^^^
+
+ui.options (read-only)
+    The UI :ref:`options <luareference-core-coreopts>` for the current session.
+ui.line_height (read-only)
+    The configured UI text line height as a proportion of the height of the UI
+    container.
+ui.menu_active (read-only)
+    A Boolean indicating whether an interactive UI element is currently active.
+    Examples include menus and slider controls.
+ui.single_step (read/write)
+    A Boolean controlling whether the emulated system should be automatically
+    paused when the next frame is drawn.  This property is automatically reset
+    when the automatic pause happens.
+ui.show_fps (read/write)
+    A Boolean controlling whether the current emulation speed and frame skipping
+    settings should be displayed.
+ui.show_profiler (read/write)
+    A Boolean controlling whether profiling statistics should be displayed.
+
+.. _luareference-core-driver:
+
+System driver metadata
+~~~~~~~~~~~~~~~~~~~~~~
+
+Provides some metadata for an emulated system.
+
+Instantiation
+^^^^^^^^^^^^^
+
+emu.driver_find(name)
+    Gets the driver metadata for the system with the specified short name, or
+    ``nil`` if no such system exists.
+manager.machine.system
+    Gets the driver metadata for the current system.
+
+Properties
+^^^^^^^^^^
+
+driver.name (read-only)
+    The short name of the system, as used on the command line, in configuration
+    files, and when searching for resources.
+driver.description (read-only)
+    The full display name for the system.
+driver.year (read-only)
+    The release year for the system.  May contain question marks if not known
+    definitively.
+driver.manufacturer (read-only)
+    The manufacturer, developer or distributor of the system.
+driver.parent (read-only)
+    The short name of parent system for organisation purposes, or ``"0"`` if the
+    system has no parent.
+driver.compatible_with (read-only)
+    The short name of a system that this system is compatible with software for,
+    or ``nil`` if the system is not listed as compatible with another system.
+driver.source_file (read-only)
+    The source file where this system driver is defined.  The path format
+    depends on the toolchain the emulator was built with.
+driver.rotation (read-only)
+    A string indicating the rotation applied to all screens in the system after
+    the screen orientation specified in the machine configuration is applied.
+    Will be one of ``"rot0"``, ``"rot90"``, ``"rot180"`` or ``"rot270"``.
+driver.type (read-only)
+    A string providing a system type.  Will be one of ``"arcade"``,
+    ``"console"``, ``"computer"`` or ``"other"``.  This is for informational
+    purposes only, and may not be supported in the future.
+driver.not_working (read-only)
+    A Boolean indicating whether the system is marked as not working.
+driver.supports_save (read-only)
+    A Boolean indicating whether the system supports save states.
+driver.no_cocktail (read-only)
+    A Boolean indicating whether screen flipping in cocktail mode is
+    unsupported.
+driver.is_bios_root (read-only)
+    A Boolean indicating whether this system represents a system that runs
+    software from removable media without media present.
+driver.requires_artwork (read-only)
+    A Boolean indicating whether the system requires external artwork to be
+    usable.
+driver.clickable_artwork (read-only)
+    A Boolean indicating whether the system requires clickable artwork features
+    to be usable.
+driver.unofficial (read-only)
+    A Boolean indicating whether this is an unofficial but common user
+    modification to a system.
+driver.no_sound_hw (read-only)
+    A Boolean indicating whether the system has no sound output hardware.
+driver.mechanical (read-only)
+    A Boolean indicating whether the system depends on mechanical features that
+    cannot be properly simulated.
+driver.is_incomplete (read-only)
+    A Boolean indicating whether the system is a prototype with incomplete
+    functionality.
+
+.. _luareference-core-plugin:
+
+Lua plugin
+~~~~~~~~~~
+
+Provides a description of an available Lua plugin.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.plugins[name]
+    Gets the description of the Lua plugin with the specified name, or ``nil``
+    if no such plugin is available
+
+Properties
+^^^^^^^^^^
+
+plugin.name (read-only)
+    The short name of the plugin, used in configuration and when accessing the
+    plugin programmatically.
+plugin.description (read-only)
+    The display name for the plugin.
+plugin.type (read-only)
+    The plugin type.  May be ``"plugin"`` for user-loadable plugins, or
+    ``"library"`` for libraries providing common functionality to multiple
+    plugins.
+plugin.directory (read-only)
+    The path to the directory containing the plugin’s files.
+plugin.start (read-only)
+    A Boolean indicating whether the plugin enabled.
+
+
+.. _luareference-dev:
+
+Devices
+-------
+
+Several device classes and device mix-ins classes are exposed to Lua.  Devices
+can be looked up by tag or enumerated.
+
+.. _luareference-dev-enum:
+
+Device enumerators
+~~~~~~~~~~~~~~~~~~
+
+Device enumerators are special containers that allow iterating over devices and
+looking up devices by tag.  A device enumerator can be created to find any kind
+of device, to find devices of a particular type, or to find devices that
+implement a particular interface.  When iterating using ``pairs`` or ``ipairs``,
+devices are returned by walking the device tree depth-first in creation order.
+
+The index get operator looks up a device by tag.  It returns ``nil`` if no
+device with the specified tag is found, or if the device with the specified tag
+does not meet the type/interface requirements of the device enumerator.  The
+complexity is O(1) if the result is cached, but an uncached device lookup is
+expensive.  The ``at`` method has O(n) complexity.
+
+If you create a device enumerator with a starting point other than the root
+machine device, passing an absolute tag or a tag containing parent references to
+the index operator may return a device that would not be discovered by
+iteration.  If you create a device enumerator with restricted depth, devices
+that would not be found due to being too deep in the hierarchy can still be
+looked up by tag.
+
+Creating a device enumerator with depth restricted to zero can be used to
+downcast a device or test whether a device implements a certain interface.  For
+example this will test whether a device implements the media image interface:
+
+.. code-block:: Lua
+
+    image_intf = emu.image_enumerator(device, 0):at(1)
+    if image_intf then
+        print(string.format("Device %s mounts images", device.tag))
+    end
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.machine.devices
+    Returns a device enumerator that will iterate over
+    :ref:`devices <luareference-dev-device>` in the system.
+manager.machine.screens
+    Returns a device enumerator that will iterate over
+    :ref:`screen devices <luareference-dev-screen>` in the system.
+manager.machine.cassettes
+    Returns a device enumerator that will iterate over
+    :ref:`cassette image devices <luareference-dev-cass>` in the system.
+manager.machine.images
+    Returns a device enumerator that will iterate over
+    :ref:`media image devices <luareference-dev-diimage>` in the system.
+manager.machine.slots
+    Returns a device enumerator that will iterate over
+    :ref:`slot devices <luareference-dev-dislot>` in the system.
+emu.device_enumerator(device, [depth])
+    Returns a device enumerator that will iterate over
+    :ref:`devices <luareference-dev-device>` in the sub-tree starting at the
+    specified device.  The specified device will be included.  If the depth is
+    provided, it must be an integer specifying the maximum number of levels to
+    iterate below the specified device (i.e. 1 will limit iteration to the
+    device and its immediate children).
+emu.screen_enumerator(device, [depth])
+    Returns a device enumerator that will iterate over
+    :ref:`screen devices <luareference-dev-screen>` in the sub-tree starting at
+    the specified device.  The specified device will be included if it is a
+    screen device.  If the depth is provided, it must be an integer specifying
+    the maximum number of levels to iterate below the specified device (i.e. 1
+    will limit iteration to the device and its immediate children).
+emu.cassette_enumerator(device, [depth])
+    Returns a device enumerator that will iterate over
+    :ref:`cassette image devices <luareference-dev-cass>` in the sub-tree
+    starting at the specified device.  The specified device will be included if
+    it is a cassette image device.  If the depth is provided, it must be an
+    integer specifying the maximum number of levels to iterate below the
+    specified device (i.e. 1 will limit iteration to the device and its
+    immediate children).
+emu.image_enumerator(device, [depth])
+    Returns a device enumerator that will iterate over
+    :ref:`media image devices <luareference-dev-diimage>` in the sub-tree
+    starting at the specified device.  The specified device will be included if
+    it is a media image device.  If the depth is provided, it must be an integer
+    specifying the maximum number of levels to iterate below the specified
+    device (i.e. 1 will limit iteration to the device and its immediate
+    children).
+emu.slot_enumerator(device, [depth])
+    Returns a device enumerator that will iterate over
+    :ref:`slot devices <luareference-dev-dislot>` in the sub-tree starting at
+    the specified device.  The specified device will be included if it is a
+    slot device.  If the depth is provided, it must be an integer specifying the
+    maximum number of levels to iterate below the specified device (i.e. 1 will
+    limit iteration to the device and its immediate children).
+
+.. _luareference-dev-device:
+
+Device
+~~~~~~
+
+Wraps MAME’s ``device_t`` class, which is a base of all device classes.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.machine.devices[tag]
+    Gets a device by tag relative to the root machine device, or ``nil`` if no
+    such device exists.
+manager.machine.devices[tag]:subdevice(tag)
+    Gets a device by tag relative to another arbitrary device, or ``nil`` if no
+    such device exists.
+
+Methods
+^^^^^^^
+
+device:subtag(tag)
+    Converts a tag relative to the device to an absolute tag.
+device:siblingtag(tag)
+    Converts a tag relative to the device’s parent device to an absolute tag.
+device:memshare(tag)
+    Gets a :ref:`memory share <luareference-mem-share>` by tag relative to the
+    device, or ``nil`` if no such memory share exists.
+device:membank(tag)
+    Gets a :ref:`memory bank <luareference-mem-bank>` by tag relative to the
+    device, or ``nil`` if no such memory bank exists.
+device:memregion(tag)
+    Gets a :ref:`memory region <luareference-mem-region>` by tag relative to the
+    device, or ``nil`` if no such memory region exists.
+device:ioport(tag)
+    Gets an :ref:`I/O port <luareference-input-ioport>` by tag relative to the
+    device, or ``nil`` if no such I/O port exists.
+device:subdevice(tag)
+    Gets a device by tag relative to the device.
+device:siblingdevice(tag)
+    Gets a device by tag relative to the device’s parent.
+device:parameter(tag)
+    Gets a parameter value by tag relative to the device, or an empty string if
+    the parameter is not set.
+
+Properties
+^^^^^^^^^^
+
+device.tag (read-only)
+    The device’s absolute tag in canonical form.
+device.basetag (read-only)
+    The last component of the device’s tag (i.e. its tag relative to its
+    immediate parent), or ``"root"`` for the root machine device.
+device.name (read-only)
+    The full display name for the device’s type.
+device.shortname (read-only)
+    The short name of the devices type (this is used, e.g. on the command line,
+    when looking for resource like ROMs or artwork, and in various data files).
+device.owner (read-only)
+    The device’s immediate parent in the device tree, or ``nil`` for the root
+    machine device.
+device.configured (read-only)
+    A Boolean indicating whether the device has completed configuration.
+device.started (read-only)
+    A Boolean indicating whether the device has completed starting.
+device.debug (read-only)
+    The :ref:`debugger interface <luareference-debug-devdebug>` to the device if
+    it is a CPU device, or ``nil`` if it is not a CPU device or the debugger is
+    not enabled.
+device.spaces[] (read-only)
+    A table of the device’s :ref:`address spaces <luareference-mem-space>`,
+    indexed by name.  Only valid for devices that implement the memory
+    interface.  Note that the names are specific to the device type and have no
+    special significance.
+
+.. _luareference-dev-screen:
+
+Screen device
+~~~~~~~~~~~~~
+
+Wraps MAME’s ``screen_device`` class, which represents an emulated video output.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.machine.screens[tag]
+    Gets a screen device by tag relative to the root machine device, or ``nil``
+    if no such device exists or it is not a screen device.
+
+Base classes
+^^^^^^^^^^^^
+
+* :ref:`luareference-dev-device`
+
+Methods
+^^^^^^^
+
+screen:orientation()
+    Returns the rotation angle in degrees (will be one of 0, 90, 180 or 270),
+    whether the screen is flipped left-to-right, and whether the screen is
+    flipped top-to-bottom.  This is the final screen orientation after the
+    screen orientation specified in the machine configuration and the rotation
+    for the system driver are applied.
+screen:time_until_pos(v, [h])
+    Gets the time remaining until the raster reaches the specified position.  If
+    the horizontal component of the position is not specified, it defaults to
+    zero (0, i.e. the beginning of the line).  The result is a floating-point
+    number in units of seconds.
+screen:time_until_vblank_start()
+    Gets the time remaining until the start of the vertical blanking interval.
+    The result is a floating-point number in units of seconds.
+screen:time_until_vblank_end()
+    Gets the time remaining until the end of the vertical blanking interval.
+    The result is a floating-point number in units of seconds.
+screen:snapshot([filename])
+    Saves a screen snapshot in PNG format.  If no filename is supplied, the
+    configured snapshot path and name format will be used.  If the supplied
+    filename is not an absolute path, it is interpreted relative to the first
+    configured snapshot path.  The filename may contain conversion specifiers
+    that will be replaced by the system name or an incrementing number.
+
+    Returns a file error if opening the snapshot file failed, or ``nil``
+    otherwise.
+screen:pixel(x, y)
+    Gets the pixel at the specified location.  Coordinates are in pixels, with
+    the origin at the top left corner of the visible area, increasing to the
+    right and down.  Returns either a palette index or a colour in RGB format
+    packed into a 32-bit integer.  Returns zero (0) if the specified point is
+    outside the visible area.
+screen:pixels()
+    Returns all visible pixels as 32-bit integers packed into a binary string in
+    host Endian order.  Pixels are organised in row-major order, from left to
+    right then top to bottom.  Pixels values are either palette indices or
+    colours in RGB format packed into 32-bit integers.
+screen:draw_box(left, top, right, bottom, [line], [fill])
+    Draws an outlined rectangle with edges at the specified positions.
+
+    Coordinates are floating-point numbers in units of screen pixels, with the
+    origin at (0, 0).  Note that screen pixels often aren’t square.  The
+    coordinate system is rotated if the screen is rotated, which is usually the
+    case for vertical-format screens.  Before rotation, the origin is at the top
+    left, and coordinates increase to the right and downwards.  Coordinates are
+    limited to the screen area.
+
+    The fill and line colours are in alpha/red/green/blue (ARGB) format.
+    Channel values are in the range 0 (transparent or off) to 255 (opaque or
+    full intensity), inclusive.  Colour channel values are not pre-multiplied by
+    the alpha value.  The channel values must be packed into the bytes of a
+    32-bit unsigned integer, in the order alpha, red, green, blue from
+    most-significant to least-significant byte.  If the line colour is not
+    provided, the UI text colour is used; if the fill colour is not provided,
+    the UI background colour is used.
+screen:draw_line(x1, y1, x2, y2, bottom, [color])
+    Draws a line from (x1, y1) to (x2, y2).
+
+    Coordinates are floating-point numbers in units of screen pixels, with the
+    origin at (0, 0).  Note that screen pixels often aren’t square.  The
+    coordinate system is rotated if the screen is rotated, which is usually the
+    case for vertical-format screens.  Before rotation, the origin is at the top
+    left, and coordinates increase to the right and downwards.  Coordinates are
+    limited to the screen area.
+
+    The line colour is in alpha/red/green/blue (ARGB) format.  Channel values
+    are in the range 0 (transparent or off) to 255 (opaque or full intensity),
+    inclusive.  Colour channel values are not pre-multiplied by the alpha value.
+    The channel values must be packed into the bytes of a 32-bit unsigned
+    integer, in the order alpha, red, green, blue from most-significant to
+    least-significant byte.  If the line colour is not provided, the UI text
+    colour is used.
+screen:draw_text(x|justify, y, text, [foreground], [background])
+    Draws text at the specified position.  If the screen is rotated the text
+    will be rotated.
+
+    If the first argument is a number, the text will be left-aligned at this X
+    coordinate.  If the first argument is a string, it must be ``"left"``,
+    ``"center"`` or ``"right"`` to draw the text left-aligned at the
+    left edge of the screen, horizontally centred on the screen, or
+    right-aligned at the right edge of the screen, respectively.  The second
+    argument specifies the Y coordinate of the maximum ascent of the text.
+
+    Coordinates are floating-point numbers in units of screen pixels, with the
+    origin at (0, 0).  Note that screen pixels often aren’t square.  The
+    coordinate system is rotated if the screen is rotated, which is usually the
+    case for vertical-format screens.  Before rotation, the origin is at the top
+    left, and coordinates increase to the right and downwards.  Coordinates are
+    limited to the screen area.
+
+    The foreground and background colours is in alpha/red/green/blue (ARGB)
+    format.  Channel values are in the range 0 (transparent or off) to 255 (opaque or full intensity),
+    inclusive.  Colour channel values are not pre-multiplied by the alpha value.
+    The channel values must be packed into the bytes of a 32-bit unsigned
+    integer, in the order alpha, red, green, blue from most-significant to
+    least-significant byte.  If the foreground colour is not provided, the UI
+    text colour is used; if the background colour is not provided, the UI
+    background colour is used.
+
+Properties
+^^^^^^^^^^
+
+screen.width (read-only)
+    The width of the bitmap produced by the emulated screen in pixels.
+screen.height (read-only)
+    The height of the bitmap produced by the emulated screen in pixels.
+screen.refresh (read-only)
+    The screen’s configured refresh rate in Hertz (this may not reflect the
+    current value).
+screen.refresh_attoseconds (read-only)
+    The screen’s configured refresh interval in attoseconds (this may not
+    reflect the current value).
+screen.xoffset (read-only)
+    The screen’s default X position offset.  This is a floating-point number
+    where one (1) corresponds to the X size of the screen’s container.  This may
+    be useful for restoring the default after adjusting the X offset via the
+    screen’s container.
+screen.yoffset (read-only)
+    The screen’s default Y position offset.  This is a floating-point number
+    where one (1) corresponds to the Y size of the screen’s container.  This may
+    be useful for restoring the default after adjusting the Y offset via the
+    screen’s container.
+screen.xscale (read-only)
+    The screen’s default X scale factor, as a floating-point number.  This may
+    be useful for restoring the default after adjusting the X scale via the
+    screen’s container.
+screen.yscale (read-only)
+    The screen’s default Y scale factor, as a floating-point number.  This may
+    be useful for restoring the default after adjusting the Y scale via the
+    screen’s container.
+screen.pixel_period (read-only)
+    The interval taken to draw a horizontal pixel, as a floating-point number in
+    units of seconds.
+screen.scan_period (read-only)
+    The interval taken to draw a scan line (including the horizontal blanking
+    interval), as a floating-point number in units of seconds.
+screen.frame_period (read-only)
+    The interval taken to draw a complete frame (including blanking intervals),
+    as a floating-point number in units of seconds.
+screen.frame_number (read-only)
+    The current frame number for the screen.  This increments monotonically each
+    frame interval.
+screen.container (read-only)
+    The :ref:`render container <luareference-render-container>` used to draw the
+    screen.
+
+.. _luareference-dev-cass:
+
+Cassette image device
+~~~~~~~~~~~~~~~~~~~~~
+
+Wraps MAME’s ``cassette_image_device`` class, representing a compact cassette
+mechanism typically used by a home computer for program storage.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.machine.cassettes[tag]
+    Gets a cassette image device by tag relative to the root machine device, or
+    ``nil`` if no such device exists or it is not a cassette image device.
+
+Base classes
+^^^^^^^^^^^^
+
+* :ref:`luareference-dev-device`
+* :ref:`luareference-dev-diimage`
+
+Methods
+^^^^^^^
+
+cassette:stop()
+    Disables playback.
+cassette:play()
+    Enables playback.  The cassette will play if the motor is enabled.
+cassette:forward()
+    Sets forward play direction.
+cassette:reverse()
+    Sets reverse play direction.
+cassette:seek(time, whence)
+    Jump to the specified position on the tape.  The time is a floating-point
+    number in units of seconds, relative to the point specified by the whence
+    argument.  The whence argument must be one of ``"set"``, ``"cur"`` or
+    ``"end"`` to seek relative to the start of the tape, the current position,
+    or the end of the tape, respectively.
+
+Properties
+^^^^^^^^^^
+
+cassette.is_stopped (read-only)
+    A Boolean indicating whether the cassette is stopped (i.e. not recording and
+    not playing).
+cassette.is_playing (read-only)
+    A Boolean indicating whether playback is enabled (i.e. the cassette will
+    play if the motor is enabled).
+cassette.is_recording (read-only)
+    A Boolean indicating whether recording is enabled (i.e. the cassette will
+    record if the motor is enabled).
+cassette.motor_state (read/write)
+    A Boolean indicating whether the cassette motor is enabled.
+cassette.speaker_state (read/write)
+    A Boolean indicating whether the cassette speaker is enabled.
+cassette.position (read-only)
+    The current position as a floating-point number in units of seconds relative
+    to the start of the tape.
+cassette.length (read-only)
+    The length of the tape as a floating-point number in units of seconds, or
+    zero (0) if no tape image is mounted.
+
+.. _luareference-dev-diimage:
+
+Image device interface
+~~~~~~~~~~~~~~~~~~~~~~
+
+Wraps MAME’s ``device_image_interface`` class which is a mix-in implemented by
+devices that can load media image files.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.machine.images[tag]
+    Gets an image device by tag relative to the root machine device, or ``nil``
+    if no such device exists or it is not a media image device.
+
+Methods
+^^^^^^^
+
+image:load(filename)
+    Loads the specified file as a media image.  Returns ``"pass"`` or
+    ``"fail"``.
+image:load_software(name)
+    Loads a media image described in a software list.  Returns ``"pass"`` or
+    ``"fail"``.
+image:unload()
+    Unloads the mounted image.
+image:create(filename)
+    Creates and mounts a media image file with the specified name.  Returns
+    ``"pass"`` or ``"fail"``.
+image:display()
+    Returns a “front panel display” string for the device, if supported.  This
+    can be used to show status information, like the current head position or
+    motor state.
+
+Properties
+^^^^^^^^^^
+
+image.is_readable (read-only)
+    A Boolean indicating whether the device supports reading.
+image.is_writeable (read-only)
+    A Boolean indicating whether the device supports writing.
+image.must_be_loaded (read-only)
+    A Boolean indicating whether the device requires a media image to be loaded
+    in order to start.
+image.is_reset_on_load (read-only)
+    A Boolean indicating whether the device requires a hard reset to change
+    media images (usually for cartridge slots that contain hardware in addition
+    to memory chips).
+image.image_type_name (read-only)
+    A string for categorising the media device.
+image.instance_name (read-only)
+    The instance name of the device in the current configuration.  This is used
+    for setting the media image to load on the command line or in INI files.
+    This is not stable, it may have a number appended that may change depending
+    on slot configuration.
+image.brief_instance_name (read-only)
+    The brief instance name of the device in the current configuration.  This is
+    used for setting the media image to load on the command line or in INI
+    files.  This is not stable, it may have a number appended that may change
+    depending on slot configuration.
+image.formatlist[] (read-only)
+    The :ref:`media image formats <luareference-dev-imagefmt>` supported by the
+    device, indexed by name.  The index operator and ``index_of`` methods have
+    O(n) complexity; all other supported operations have O(1) complexity.
+image.exists (read-only)
+    A Boolean indicating whether a media image file is mounted.
+image.readonly (read-only)
+    A Boolean indicating whether a media image file is mounted in read-only
+    mode.
+image.filename (read-only)
+    The full path to the mounted media image file, or ``nil`` if no media image
+    is mounted.
+image.crc (read-only)
+    The 32-bit cyclic redundancy check of the content of the mounted image file
+    if the mounted media image was not loaded from a software list, is mounted
+    read-only and is not a CD-ROM, or zero (0) otherwise.
+image.loaded_through_softlist (read-only)
+    A Boolean indicating whether the mounted media image was loaded from a
+    software list, or ``false`` if no media image is mounted.
+image.software_list_name (read-only)
+    The short name of the software list if the mounted media image was loaded
+    from a software list.
+image.software_longname (read-only)
+    The full name of the software item if the mounted media image was loaded
+    from a software list, or ``nil`` otherwise.
+image.software_publisher (read-only)
+    The publisher of the software item if the mounted media image was loaded
+    from a software list, or ``nil`` otherwise.
+image.software_year (read-only)
+    The release year of the software item if the mounted media image was loaded
+    from a software list, or ``nil`` otherwise.
+image.software_parent (read-only)
+    The short name of the parent software item if the mounted media image was
+    loaded from a software list, or ``nil`` otherwise.
+image.device (read-only)
+    The underlying :ref:`device <luareference-dev-device>`.
+
+.. _luareference-dev-dislot:
+
+Slot device interface
+~~~~~~~~~~~~~~~~~~~~~
+
+Wraps MAME’s ``device_slot_interface`` class which is a mix-in implemented by
+devices that instantiate a user-specified child device.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.machine.slots[tag]
+    Gets an slot device by tag relative to the root machine device, or ``nil``
+    if no such device exists or it is not a slot device.
+
+Properties
+^^^^^^^^^^
+
+slot.fixed (read-only)
+    A Boolean indicating whether this is a slot with a card specified in machine
+    configuration that cannot be changed by the user.
+slot.has_selectable_options (read-only)
+    A Boolean indicating whether the slot has any user-selectable options (as
+    opposed to options that can only be selected programmatically, typically for
+    fixed slots or to load media images).
+slot.options[] (read-only)
+    The :ref:`slot options <luareference-dev-slotopt>` describing the child
+    devices that can be instantiated by the slot, indexed by option value.  The
+    ``at`` and ``index_of`` methods have O(n) complexity; all other supported
+    operations have O(1) complexity.
+slot.device (read-only)
+    The underlying :ref:`device <luareference-dev-device>`.
+
+.. _luareference-dev-imagefmt:
+
+Media image format
+~~~~~~~~~~~~~~~~~~
+
+Wraps MAME’s ``image_device_format`` class, which describes a media file format
+supported by a :ref:`media image device <luareference-dev-diimage>`.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.machine.images[tag].formatlist[name]
+    Gets a media image format supported by a given device by name.
+
+Properties
+^^^^^^^^^^
+
+format.name (read-only)
+    An abbreviated name used to identify the format.  This often matches the
+    primary filename extension used for the format.
+format.description (read-only)
+    The full display name of the format.
+format.extensions[] (read-only)
+    Yields a table of filename extensions used for the format.
+format.option_spec (read-only)
+    A string describing options available when creating a media image using this
+    format.  The string is not intended to be human-readable.
+
+.. _luareference-dev-slotopt:
+
+Slot option
+~~~~~~~~~~~
+
+Wraps MAME’s ``device_slot_interface::slot_option`` class, which represents a
+child device that a :ref:`slot device <luareference-dev-dislot>` can be
+configured to instantiate.
+
+Instantiation
+^^^^^^^^^^^^^
+
+manager.machine.slots[tag].options[name]
+    Gets a slot option for a given :ref:`slot device <luareference-dev-dislot>`
+    by name (i.e. the value used to select the option).
+
+Properties
+^^^^^^^^^^
+
+option.name (read-only)
+    The name of the slot option.  This is the value used to select this option
+    on the command line or in an INI file.
+option.device_fullname (read-only)
+    The full display name of the device type instantiated by this option.
+option.device_shortname (read-only)
+    The short name of the device type instantiated by this option.
+option.selectable (read-only)
+    A Boolean indicating whether the option may be selected by the user (options
+    that are not user-selectable are typically used for fixed slots or to load
+    media images).
+option.default_bios (read-only)
+    The default BIOS setting for the device instantiated using this option, or
+    ``nil`` if the default BIOS specified in the device’s ROM definitions will
+    be used.
+option.clock (read-only)
+    The configured clock frequency for the device instantiated using this
+    option.  This is an unsigned 32-bit integer.  If the eight most-significant
+    bits are all set, it is a ratio of the parent device’s clock frequency, with
+    the numerator in bits 12-23 and the denominator in bits 0-11.  If the eight
+    most-significant bits are not all set, it is a frequency in Hertz.
 
 
 .. _luareference-mem:
@@ -78,7 +1187,7 @@ regions in a system to be enumerated.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():memory()
+manager.machine.memory
     Gets the global memory manager instance for the emulated system.
 
 Properties
@@ -108,7 +1217,7 @@ belonging to a device.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().devices[tag].spaces[name]
+manager.machine.devices[tag].spaces[name]
     Gets the address space with the specified name for a given device.  Note
     that names are specific to the device type.
 
@@ -172,7 +1281,7 @@ Properties
 space.name (read-only)
     The display name for the address space.
 space.shift (read-only)
-    The address address granularity for the address space specified as the shift
+    The address granularity for the address space specified as the shift
     required to translate a byte address to a native address.  Positive values
     shift towards the most significant bit (left) and negative values shift
     towards the least significant bit (right).
@@ -200,7 +1309,7 @@ space.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().devices[tag].spaces[name].map
+manager.machine.devices[tag].spaces[name].map
     Gets the configured address map for an address space, or ``nil`` if no map
     is configured.
 
@@ -208,7 +1317,7 @@ Properties
 ^^^^^^^^^^
 
 map.spacenum (read-only)
-    The address space number of the address space the map is associated with
+    The address space number of the address space the map is associated with.
 map.device (read-only)
     The device that owns the address space the map is associated with.
 map.unmap_value (read-only)
@@ -231,7 +1340,7 @@ address map.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().devices[tag].spaces[name].map.entries[index]
+manager.machine.devices[tag].spaces[name].map.entries[index]
     Gets an entry from the configured map for an address space.
 
 Properties
@@ -243,7 +1352,7 @@ entry.address_end (read-only)
     End address of the entry’s range (inclusive).
 entry.address_mirror (read-only)
     Address mirror bits.
-entry.address_end (read-only)
+entry.address_mask (read-only)
     Address mask bits.  Only valid for handlers.
 entry.mask (read-only)
     Lane mask, indicating which data lines on the bus are connected to the
@@ -258,8 +1367,9 @@ entry.write (read-only)
     handler.
 entry.share (read-only)
     Memory share tag for making RAM entries accessible or ``nil``.
-entry.address_end (read-only)
-    Explicit memory region tag for ROM entries, or ``nil``.
+entry.region (read-only)
+    Explicit memory region tag for ROM entries, or ``nil``.  For ROM entries,
+    ``nil`` infers the region from the device tag.
 entry.region_offset (read-only)
     Starting offset in memory region for ROM entries.
 
@@ -274,9 +1384,9 @@ handlers in address maps.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().devices[tag].spaces[name].map.entries[index].read
+manager.machine.devices[tag].spaces[name].map.entries[index].read
     Gets the read handler data for an address map entry.
-manager:machine().devices[tag].spaces[name].map.entries[index].write
+manager.machine.devices[tag].spaces[name].map.entries[index].write
     Gets the write handler data for an address map entry.
 
 Properties
@@ -304,10 +1414,10 @@ Wraps MAME’s ``memory_share`` class, representing a named allocated memory zon
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():memory().shares[tag]
+manager.machine.memory.shares[tag]
     Gets a memory share by absolute tag, or ``nil`` if no such memory share
     exists.
-manager:machine().devices[tag]:memshare(tag)
+manager.machine.devices[tag]:memshare(tag)
     Gets a memory share by tag relative to a device, or ``nil`` if no such
     memory share exists.
 
@@ -354,10 +1464,10 @@ indirection.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():memory().banks[tag]
+manager.machine.memory.banks[tag]
     Gets a memory region by absolute tag, or ``nil`` if no such memory bank
     exists.
-manager:machine().devices[tag]:membank(tag)
+manager.machine.devices[tag]:membank(tag)
     Gets a memory region by tag relative to a device, or ``nil`` if no such
     memory bank exists.
 
@@ -380,10 +1490,10 @@ read-only data like ROMs or the result of fixed decryptions.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():memory().regions[tag]
+manager.machine.memory.regions[tag]
     Gets a memory region by absolute tag, or ``nil`` if no such memory region
     exists.
-manager:machine().devices[tag]:memregion(tag)
+manager.machine.devices[tag]:memregion(tag)
     Gets a memory region by tag relative to a device, or ``nil`` if no such
     memory region exists.
 
@@ -439,7 +1549,7 @@ ports and handles input configuration.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():ioport()
+manager.machine.ioport
     Gets the global I/O port manager instance for the emulated machine.
 
 Methods
@@ -447,17 +1557,37 @@ Methods
 
 ioport:count_players()
     Returns the number of player controllers in the system.
+ioport:type_pressed(type, [player])
+    Returns a Boolean indicating whether the specified input is currently
+    pressed.  The input port type is an enumerated value.  The player number is
+    a zero-based index.  If the player number is not supplied, it is assumed to
+    be zero.
+ioport:type_name(type, [player])
+    Returns the display name for the specified input type and player number.
+    The input type is an enumerated value.  The player number is a zero-based
+    index.  If the player number is not supplied, it is assumed to be zero.
 ioport:type_group(type, player)
-    Returns the I/O port group for the specified I/O port type and player
-    number.  The I/O port type is an enumerated value.  The player number is a
-    zero-based index.  Returns an integer giving the grouping for the input.
+    Returns the input group for the specified input type and player number.  The
+    input type is an enumerated value.  The player number is a zero-based index.
+    Returns an integer giving the grouping for the input.  If the player number
+    is not supplied, it is assumed to be zero.
 
     This should be called with values obtained from I/O port fields to provide
     canonical grouping in an input configuration UI.
-ioport:type_seq(type, player, seqtype)
-    Get the configured input sequence for the specified input type, player and
-    sequence type.  The sequence type must be ``"standard"``, ``"increment"``
-    or ``"decrement"``.  This provides access to general input configuration.
+ioport:type_seq(type, [player], [seqtype])
+    Get the configured input sequence for the specified input type, player
+    number and sequence type.  The input type is an enumerated value.  The
+    player number is a zero-based index.  If the player number is not supplied,
+    it is assumed to be zero.  If the sequence type is supplied, it must be
+    ``"standard"``, ``"increment"`` or ``"decrement"``; if it is not supplied,
+    it is assumed to be ``"standard"``.
+
+    This provides access to general input configuration.
+ioport:token_to_input_type(string)
+    Returns the input type and player number for the specified input type token.
+ioport:input_type_to_token(type, [player])
+    Returns the token string for the specified input type and player number.  If
+    the player number is not supplied, it assumed to be zero.
 
 Properties
 ^^^^^^^^^^
@@ -466,9 +1596,6 @@ ioport.ports[]
     Gets the emulated :ref:`I/O ports <luareference-input-ioport>` in the
     system.  Keys are absolute tags.  The ``at`` and ``index_of`` methods have
     O(n) complexity; all other supported operations have O(1) complexity.
-ioport.natkeyboard
-    Gets the :ref:`natural keyboard manager <luareference-input-natkbd>`, used
-    for controlling keyboard and keypad input to the emulated system.
 
 .. _luareference-input-natkbd:
 
@@ -481,7 +1608,7 @@ keypad inputs.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():ioport().natkeyboard
+manager.machine.natkeyboard
     Gets the global natural keyboard manager instance for the emulated machine.
 
 Methods
@@ -545,7 +1672,7 @@ Represents a keyboard or keypad input device managed by the
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():ioport().natkeyboard.keyboards[tag]
+manager.machine.natkeyboard.keyboards[tag]
     Gets the keyboard input device with the specified tag, or ``nil`` if the tag
     does not correspond to a keyboard input device.
 
@@ -581,10 +1708,10 @@ Wraps MAME’s ``ioport_port`` class, representing an emulated I/O port.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():ioport().ports[tag]
+manager.machine.ioport.ports[tag]
     Gets an emulated I/O port by absolute tag, or ``nil`` if the tag does not
     correspond to an I/O port.
-manager:machine().devices[devtag]:ioport(porttag)
+manager.machine.devices[devtag]:ioport(porttag)
     Gets an emulated I/O port by tag relative to a device, or ``nil`` if no such
     I/O port exists.
 
@@ -627,9 +1754,9 @@ Wraps MAME’s ``ioport_field`` class, representing a field within an I/O port.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():ioport().ports[tag]:field[mask]
+manager.machine.ioport.ports[tag]:field[mask]
     Gets a field for the given port by bit mask.
-manager:machine():ioport().ports[tag].fields[name]
+manager.machine.ioport.ports[tag].fields[name]
     Gets a field for the given port by display name.
 
 Methods
@@ -750,7 +1877,7 @@ port field.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():ioport().ports[tag]:field(mask).live
+manager.machine.ioport.ports[tag]:field(mask).live
     Gets the live state for an I/O port field.
 
 Properties
@@ -770,7 +1897,7 @@ whether configured inputs are active.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():input()
+manager.machine.input
     Gets the global input manager instance for the emulated system.
 
 Methods
@@ -845,12 +1972,12 @@ activated.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():input():axis_code_poller()
+manager.machine.input:axis_code_poller()
     Returns an input code poller that polls for analog inputs being activated.
-manager:machine():input():switch_code_poller()
+manager.machine.input:switch_code_poller()
     Returns an input code poller that polls for host switch inputs being
     activated.
-manager:machine():input():keyboard_code_poller()
+manager.machine.input:keyboard_code_poller()
     Returns an input code poller that polls for host switch inputs being
     activated, only considering keyboard input devices.
 
@@ -876,10 +2003,10 @@ assign host input combinations to emulated inputs and other actions.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():input():axis_sequence_poller()
+manager.machine.input:axis_sequence_poller()
     Returns an input sequence poller for assigning host inputs to an analog
     input.
-manager:machine():input():switch_sequence_poller()
+manager.machine.input:switch_sequence_poller()
     Returns an input sequence poller for assigning host inputs to a switch
     input.
 
@@ -919,7 +2046,7 @@ devices (e.g. keyboards or joysticks).
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():input().device_classes[name]
+manager.machine.input.device_classes[name]
     Gets an input device class by name.
 
 Properties
@@ -947,7 +2074,7 @@ Wraps MAME’s ``input_device`` class, representing a host input device.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():input().device_classes[name].devices[index]
+manager.machine.input.device_classes[name].devices[index]
     Gets a specific host input device.
 
 Properties
@@ -976,7 +2103,7 @@ a key, button, or axis).
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():input().device_classes[name].devices[index].items[id]
+manager.machine.input.device_classes[name].devices[index].items[id]
     Gets an individual host input item.  The item ID is an enumerated value.
 
 Properties
@@ -1009,7 +2136,7 @@ Wraps MAME’s ``ui_input_manager`` class, which is used for high-level input.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():uiinput()
+manager.machine.uiinput
     Gets the global UI input manager instance for the machine.
 
 Methods
@@ -1177,7 +2304,7 @@ and textures.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():render()
+manager.machine.render
     Gets the global render manager instance for the emulation session.
 
 Properties
@@ -1210,12 +2337,14 @@ screenshots.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():render().targets[index]
-    Get a render target by index.
-manager:machine():render():ui_target()
-    Get the render target used to display the user interface (including menus,
+manager.machine.render.targets[index]
+    Gets a render target by index.
+manager.machine.render.ui_target
+    Gets the render target used to display the user interface (including menus,
     sliders and pop-up messages).  This is usually the first host window or
     screen.
+manager.machine.video.snapshot_target
+    Gets the render target used to produce snapshots and video recordings.
 
 Properties
 ^^^^^^^^^^
@@ -1272,10 +2401,10 @@ Wraps MAME’s ``render_container`` class.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():render().ui_container
+manager.machine.render.ui_container
     Gets the render container used to draw the user interface, including menus,
     sliders and pop-up messages.
-manager:machine().screens[tag].container
+manager.machine.screens[tag].container
     Gets the render container used to draw a given screen.
 
 Properties
@@ -1314,7 +2443,7 @@ adjustments applied to a
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().screens[tag].container
+manager.machine.screens[tag].container
     Gets the current container user settings for a given screen.
 
 Properties
@@ -1402,7 +2531,7 @@ Instantiation
 
 Layout scripts generally
 
-manager:machine():render().targets[index].current_view
+manager.machine.render.targets[index].current_view
     Gets the currently selected view for a given render target.
 
 Methods
@@ -1545,7 +2674,7 @@ item.bounds (read-only)
     coordinates.
 item.color (read-only)
     The item’s colour for the current state.  The colour of the screen or
-    element texture is multiplied by this colour.  This is a 
+    element texture is multiplied by this colour.  This is a
     :ref:`render colour <luareference-render-color>` object.
 item.blend_mode (read-only)
     Get the item’s blend mode.  This is an integer value, where 0 means no
@@ -1585,7 +2714,7 @@ the debugger.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine():debugger()
+manager.machine.debugger
     Returns the global debugger manager instance, or ``nil`` if the debugger is
     not enabled.
 
@@ -1624,7 +2753,7 @@ emulated CPU device.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().devices[tag]:debug()
+manager.machine.devices[tag]:debug()
     Returns the debugger interface for an emulated CPU device, or ``nil`` if the
     device is not a CPU.
 
@@ -1673,11 +2802,11 @@ debug:wpset(space, type, addr, len, [cond], [act])
 
     If specified, the condition must be a debugger expression that will be
     evaluated each time the breakpoint is hit.  Execution will only be stopped
-    if the expression evaluates to a non-zero value.  For all watchpoints, a
-    ``wpaddr`` variable is set to the address that triggered the watchpoint.
-    When a watchpoint is triggered by a write, a ``wpdata`` variable is set to
-    the data being written.  If the condition is not specified, it defaults to
-    always active.
+    if the expression evaluates to a non-zero value.  The variable 'wpaddr' is
+    set to the address that actually triggered the watchpoint, the variable
+    'wpdata' is set to the data that is being read or written, and the variable
+    'wpsize' is set to the size of the data in bytes.  If the condition is not
+    specified, it defaults to always active.
 debug:wpenable([wp])
     Enable the specified watchpoint, or all watchpoints for the device if no
     watchpoint number is specified.  Returns whether the specified number
@@ -1709,7 +2838,7 @@ emulated CPU device.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().devices[tag]:debug():bplist()[bp]
+manager.machine.devices[tag]:debug():bplist()[bp]
     Gets the specified breakpoint for an emulated CPU device, or ``nil`` if no
     breakpoint corresponds to the specified index.
 
@@ -1743,7 +2872,7 @@ emulated CPU device.
 Instantiation
 ^^^^^^^^^^^^^
 
-manager:machine().devices[tag]:debug():wplist(space)[wp]
+manager.machine.devices[tag]:debug():wplist(space)[wp]
     Gets the specified watchpoint for an address space of an emulated CPU
     device, or ``nil`` if no watchpoint in the address space corresponds to the
     specified index.

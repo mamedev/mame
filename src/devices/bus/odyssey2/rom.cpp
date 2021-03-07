@@ -9,7 +9,7 @@ Standard cartridges emulation, optionally bankswitched up to 8KB.
 #include "emu.h"
 #include "rom.h"
 
-DEFINE_DEVICE_TYPE(O2_ROM_STD, o2_rom_device, "o2_rom", "Odyssey 2 Standard Carts")
+DEFINE_DEVICE_TYPE(O2_ROM_STD, o2_rom_device, "o2_rom", "Odyssey 2 Standard Cartridge")
 
 
 //-------------------------------------------------

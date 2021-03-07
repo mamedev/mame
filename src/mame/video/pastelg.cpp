@@ -272,6 +272,8 @@ void pastelg_common_state::video_start()
 	save_item(NAME(m_palbank));
 	save_pointer(NAME(m_videoram), width*height);
 	save_item(NAME(m_flipscreen_old));
+
+	m_palbank = 0;
 }
 
 /******************************************************************************

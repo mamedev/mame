@@ -72,6 +72,8 @@ TODO:
 #include "speaker.h"
 
 
+namespace {
+
 class vamphalf_state : public driver_device
 {
 public:
@@ -737,6 +739,8 @@ Offset+3
 void vamphalf_state::video_start()
 {
 	save_item(NAME(m_flipscreen));
+
+	m_flipscreen = 0;
 }
 
 void vamphalf_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -3572,6 +3576,9 @@ void vamphalf_state::init_boonggab()
 	m_has_extra_gfx = true;
 	m_flip_bit = 1;
 }
+
+} // Anonymous namespace
+
 
 GAME( 1999, coolmini,   0,        coolmini,  common,   vamphalf_state,      init_coolmini,  ROT0,   "SemiCom",                       "Cool Minigame Collection", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, coolminii,  coolmini, coolmini,  common,   vamphalf_state,      init_coolminii, ROT0,   "SemiCom",                       "Cool Minigame Collection (Italy)", MACHINE_SUPPORTS_SAVE )

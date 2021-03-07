@@ -398,14 +398,14 @@ void alpha_device::cpu_execute(u32 const op)
 			// register variants
 		case 0x00: m_r[Rc(op)] = s64(s32(u32(m_r[Ra(op)]) * u32(m_r[Rb(op)]))); break; // mull
 		case 0x20: m_r[Rc(op)] = m_r[Ra(op)] * m_r[Rb(op)]; break; // mulq
-		case 0x30: mulu_64x64(m_r[Ra(op)], m_r[Rb(op)], &m_r[Rc(op)]); break; // umulh
+		case 0x30: mulu_64x64(m_r[Ra(op)], m_r[Rb(op)], m_r[Rc(op)]); break; // umulh
 		case 0x40: m_r[Rc(op)] = s64(s32(u32(m_r[Ra(op)]) * u32(m_r[Rb(op)]))); break; // mull/v
 		case 0x60: m_r[Rc(op)] = m_r[Ra(op)] * m_r[Rb(op)]; break; // mulq/v
 
 			// immediate variants
 		case 0x80: m_r[Rc(op)] = s64(s32(u32(m_r[Ra(op)]) * u32(Im(op)))); break; // mull
 		case 0xa0: m_r[Rc(op)] = m_r[Ra(op)] * Im(op); break; // mulq
-		case 0xb0: mulu_64x64(m_r[Ra(op)], Im(op), &m_r[Rc(op)]); break; // umulh
+		case 0xb0: mulu_64x64(m_r[Ra(op)], Im(op), m_r[Rc(op)]); break; // umulh
 		case 0xc0: m_r[Rc(op)] = s64(s32(u32(m_r[Ra(op)]) * u32(Im(op)))); break; // mull/v
 		case 0xe0: m_r[Rc(op)] = m_r[Ra(op)] * Im(op); break; // mulq/v
 		}

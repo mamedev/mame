@@ -43,6 +43,7 @@
 #include "coco_dcmodem.h"
 #include "coco_fdc.h"
 #include "coco_gmc.h"
+#include "coco_midi.h"
 #include "coco_multi.h"
 #include "coco_orch90.h"
 #include "coco_pak.h"
@@ -694,11 +695,12 @@ void coco_cart_add_basic_devices(device_slot_interface &device)
 {
 	// basic devices, on both the main slot and the Multi-Pak interface
 	device.option_add_internal("banked_16k", COCO_PAK_BANKED);
+	device.option_add_internal("pak", COCO_PAK);
 	device.option_add("ccpsg", COCO_PSG);
 	device.option_add("dcmodem", COCO_DCMODEM);
 	device.option_add("games_master", COCO_PAK_GMC);
+	device.option_add("midi", COCO_MIDI);
 	device.option_add("orch90", COCO_ORCH90);
-	device.option_add_internal("pak", COCO_PAK);
 	device.option_add("ram", COCO_PAK_RAM);
 	device.option_add("rs232", COCO_RS232);
 	device.option_add("ssc", COCO_SSC);

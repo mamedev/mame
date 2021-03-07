@@ -91,7 +91,7 @@ void mame_options::parse_standard_inis(emu_options &options, std::ostream &error
 	}
 
 	// next parse "source/<sourcefile>.ini"
-	std::string sourcename = core_filename_extract_base(cursystem->type.source(), true).insert(0, "source" PATH_SEPARATOR);
+	std::string sourcename = std::string(core_filename_extract_base(cursystem->type.source(), true)).insert(0, "source" PATH_SEPARATOR);
 	parse_one_ini(options, sourcename.c_str(), OPTION_PRIORITY_SOURCE_INI, &error_stream);
 
 	// then parse the grandparent, parent, and system-specific INIs
@@ -112,7 +112,7 @@ void mame_options::parse_standard_inis(emu_options &options, std::ostream &error
 
 const game_driver *mame_options::system(const emu_options &options)
 {
-	int index = driver_list::find(core_filename_extract_base(options.system_name(), true).c_str());
+	int index = driver_list::find(std::string(core_filename_extract_base(options.system_name(), true)).c_str());
 	return (index != -1) ? &driver_list::driver(index) : nullptr;
 }
 

@@ -6,7 +6,7 @@ $output v_texcoord0, v_texcoord1, v_texcoord2, v_texcoord3, v_texcoord4, v_texco
 
 /*
    Hyllian's 2xBR v3.8c+ReverseAA (squared) Shader - beta1
-   
+
    Copyright (C) 2011/2012 Hyllian/Jararaca - sergiogdb@gmail.com
 */
 
@@ -60,7 +60,7 @@ void main()
 	//    G5 H5 I5
 
 	// This line fix a bug in ATI cards.
-	vec2 texCoord = a_texcoord0 + vec2(0.0000001, 0.0000001);	
+	vec2 texCoord = a_texcoord0 + vec2(0.0000001, 0.0000001);
 	v_texcoord1 = v_texcoord0.xxxy + vec4(    -dx, 0.0,  dx,-2.0*dy); // A1 B1 C1
 	v_texcoord2 = v_texcoord0.xxxy + vec4(    -dx, 0.0,  dx,    -dy); //  A  B  C
 	v_texcoord3 = v_texcoord0.xxxy + vec4(    -dx, 0.0,  dx,    0.0); //  D  E  F

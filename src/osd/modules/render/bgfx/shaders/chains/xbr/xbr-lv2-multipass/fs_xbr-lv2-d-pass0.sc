@@ -5,7 +5,7 @@ $input v_texcoord0, v_texcoord1, v_texcoord2, v_texcoord3, v_texcoord4, v_texcoo
 
 /*
    Hyllian's xBR LV2 D (squared) - pass0 Shader
-   
+
    Copyright (C) 2011-2015 Hyllian - sergiogdb@gmail.com
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -149,7 +149,7 @@ void main()
 	vec4 interp_restriction_lv2_up   = (ne(e,c) * ne(b,c));
 
 	interp_restriction_lv1 = clamp(interp_restriction_lv1, 0.0, 1.0);
-	
+
 	vec4 edr      = lt(weighted_distance(e, c, g, i, h5, f4, h, f), weighted_distance(h, d, i5, f, i4, b, e, i)) * interp_restriction_lv1;
 	vec4 edr_left = le(coef * df(f,g), df(h,c)) * interp_restriction_lv2_left * edr;
 	vec4 edr_up   = ge(df(f,g), coef * df(h,c)) * interp_restriction_lv2_up   * edr;

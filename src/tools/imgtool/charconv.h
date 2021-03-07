@@ -14,6 +14,10 @@
 
 #include "unicode.h"
 
+#include <sstream>
+#include <utility>
+#include <vector>
+
 namespace imgtool
 {
 	// ======================> charconverter

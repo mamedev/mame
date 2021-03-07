@@ -56,8 +56,6 @@
 #include "sound/votrax.h"
 #include "speaker.h"
 
-namespace {
-
 #include "hc110.lh"
 
 // defines
@@ -70,6 +68,8 @@ namespace {
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
+
+namespace {
 
 #define LOGGEN(...) LOGMASKED(LOG_GENERAL, __VA_ARGS__)
 #define LOGINP(...) LOGMASKED(LOG_INPUT, __VA_ARGS__)
@@ -160,7 +160,7 @@ private:
 
 /* This memory map is for the CPU board which is shared between HC-110 and HC-120
   15 14 13 12   11 10  9  8    7  6  5  4    3  2  1  0
-   x  0  0  0    0  x  x  x    *  *  *  *    *  *  *  *    RW RAM (2x 2114 1kx4 SRAM, wired in parallel)
+   x  0  0  0    0  x  x  x    *  *  *  *    *  *  *  *    RW RAM (2x Harris MI-6561-9 256x4 SRAM, wired in parallel)
    x  0  0  0    1  x  x  x    x  x  x  x    x  x  x  x    open bus
    x  0  0  1    0  x  x  x    x  x  x  x    x  x  x  x    R Input Latch
    x  0  0  1    1  x  x  x    x  x  x  x    x  x  x  x    open bus

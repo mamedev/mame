@@ -9,7 +9,6 @@
 #include "video/mc6845.h"
 #include "audio/decobsmt.h"
 #include "video/decodmd2.h"
-#include "rendlay.h"
 
 class whitestar_state : public driver_device
 {

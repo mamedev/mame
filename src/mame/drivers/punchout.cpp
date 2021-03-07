@@ -121,9 +121,10 @@ DIP locations verified for:
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "layout/generic.h"
 
 
 /***************************************************************************

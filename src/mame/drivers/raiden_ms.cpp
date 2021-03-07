@@ -201,8 +201,8 @@ _|_  74LS86PC  74LS299N |RD4B3  | 74LS153PC|V||  _|_  74LS86PC  74LS299N |RD4A3 
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/2203intf.h"
 #include "sound/msm5205.h"
+#include "sound/ym2203.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -229,7 +229,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
 		m_videoram3(*this, "videoram3"),
-		m_soundlatch(*this, "soundlatch")
+		m_soundlatch(*this, "soundlatch%u", 1),
+		m_soundbank(*this, "sound_bank")
 	{ }
 
 	void raidenm(machine_config &config);
@@ -255,7 +256,8 @@ private:
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_videoram2;
 	required_shared_ptr<uint16_t> m_videoram3;
-	required_device<generic_latch_8_device> m_soundlatch;
+	required_device_array<generic_latch_8_device, 2> m_soundlatch;
+	required_memory_bank m_soundbank;
 
 	uint16_t pal_read16(offs_t offset, u16 mem_mask = ~0) { uint16_t data = m_palette->read16(offset); return ((data & 0xff00) >> 8) | ((data & 0x00ff) << 8); };
 	uint16_t pal_read16_ext(offs_t offset, u16 mem_mask = ~0) { uint16_t data = m_palette->read16_ext(offset); return ((data & 0xff00) >> 8) | ((data & 0x00ff) << 8);  };
@@ -268,13 +270,15 @@ private:
 	void raidenm_sub_map(address_map &map);
 
 	u8 sound_status_r();
-	void sound_command_w(u8 data);
 	void adpcm_w(u8 data);
+	void ym_w(offs_t offset, u8 data);
 	void audio_map(address_map& map);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	bool m_audio_select;
 	u8 m_adpcm_data;
 
 	void unk_snd_dffx_w(offs_t offset, u8 data);
+	void soundlatch_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
@@ -304,8 +308,8 @@ void raiden_ms_state::raidenm_map(address_map &map)
 	map(0x0b002, 0x0b003).portr("P2");
 	map(0x0b004, 0x0b005).portr("P3");
 	map(0x0b006, 0x0b007).nopw();
-	map(0x0b008, 0x0b009).rw(FUNC(raiden_ms_state::sound_status_r), FUNC(raiden_ms_state::sound_command_w)).umask16(0xff00);
-
+	map(0x0b008, 0x0b008).w(m_soundlatch[0], FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0x0b009, 0x0b009).r(FUNC(raiden_ms_state::sound_status_r)).w(m_soundlatch[1], FUNC(generic_latch_8_device::write)).umask16(0xff00);
 
 	map(0x0c000, 0x0cfff).ram().w(FUNC(raiden_ms_state::vram_w)).share("videoram");
 	map(0x0d800, 0x0dfff).ram().share("spriteram");
@@ -342,27 +346,40 @@ u8 raiden_ms_state::sound_status_r()
 	return 0;
 }
 
-void raiden_ms_state::sound_command_w(u8 data)
-{
-	m_soundlatch->write(data & 0xff);
-}
-
 
 void raiden_ms_state::adpcm_w(u8 data)
 {
-//  membank("sound_bank")->set_entry(((data & 0x10) >> 4) ^ 1);
+	m_audio_select = BIT(data, 7);
+	m_soundbank->set_entry(m_audio_select ? 1 : 0);
 	m_msm->reset_w(BIT(data, 4));
 
 	m_adpcm_data = data & 0xf;
-	//m_msm->data_w(data & 0xf);
-//  m_msm->vclk_w(BIT(data, 7));
-	//m_msm->vclk_w(1);
-	//m_msm->vclk_w(0);
+}
+
+void raiden_ms_state::ym_w(offs_t offset, u8 data)
+{
+	if (!m_audio_select)
+	{
+		if (!BIT(offset, 1))
+			m_ym1->write(offset & 1, data);
+		else
+			m_ym2->write(offset & 1, data);
+	}
+	else
+	{
+		// ??? (written during ADPCM IRQ)
+	}
 }
 
 void raiden_ms_state::unk_snd_dffx_w(offs_t offset, u8 data)
 {
 
+}
+
+void raiden_ms_state::soundlatch_w(u8 data)
+{
+	m_soundlatch[0]->clear_w(data);
+	m_soundlatch[1]->clear_w(data);
 }
 
 void raiden_ms_state::audio_map(address_map &map)
@@ -374,9 +391,10 @@ void raiden_ms_state::audio_map(address_map &map)
 	map(0xd000, 0xd7ff).ram();
 	// area 0xdff0-5 is never ever readback, applying a RAM mirror causes sound to go significantly worse,
 	// what they are even for?  (offset select bankswitch rather than data select?)
-	map(0xdff0, 0xdfff).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(FUNC(raiden_ms_state::unk_snd_dffx_w));
-	map(0xe000, 0xe001).w(m_ym1, FUNC(ym2203_device::write));
-	map(0xe002, 0xe003).w(m_ym2, FUNC(ym2203_device::write));
+	map(0xdff0, 0xdff7).w(FUNC(raiden_ms_state::unk_snd_dffx_w));
+	map(0xdff8, 0xdff8).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)).w(FUNC(raiden_ms_state::soundlatch_w));
+	map(0xdff9, 0xdff9).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
+	map(0xe000, 0xe003).w(FUNC(raiden_ms_state::ym_w));
 	map(0xe008, 0xe009).r(m_ym1, FUNC(ym2203_device::read));
 	map(0xe00a, 0xe00b).r(m_ym2, FUNC(ym2203_device::read));
 }
@@ -390,7 +408,7 @@ WRITE_LINE_MEMBER(raiden_ms_state::adpcm_int)
 
 void raiden_ms_state::machine_start()
 {
-	membank("sound_bank")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x4000);
+	m_soundbank->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x4000);
 }
 
 
@@ -658,7 +676,8 @@ void raiden_ms_state::raidenm(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_raiden_ms);
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -666,18 +685,18 @@ void raiden_ms_state::raidenm(machine_config &config)
 	m_ym1->add_route(0, "mono", 0.15);
 	m_ym1->add_route(1, "mono", 0.15);
 	m_ym1->add_route(2, "mono", 0.15);
-	m_ym1->add_route(3, "mono", 0.10);
+	m_ym1->add_route(3, "mono", 0.40);
 
 	YM2203(config, m_ym2, XTAL(4'000'000)/4); // unknown clock
 	m_ym2->add_route(0, "mono", 0.15);
 	m_ym2->add_route(1, "mono", 0.15);
 	m_ym2->add_route(2, "mono", 0.15);
-	m_ym2->add_route(3, "mono", 0.10);
+	m_ym2->add_route(3, "mono", 0.40);
 
 	MSM5205(config, m_msm, XTAL(384'000)); // unknown clock
 	m_msm->vck_legacy_callback().set(FUNC(raiden_ms_state::adpcm_int));
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B); // unverified
-	m_msm->add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B); // unverified
+	m_msm->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 }
 

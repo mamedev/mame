@@ -110,12 +110,13 @@ const tiny_rom_entry *abc1600_mac_device::device_rom_region() const
 abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ABC1600_MAC, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
-	m_space_config("program", ENDIANNESS_LITTLE, 8, 22, 0, address_map_constructor(FUNC(abc1600_mac_device::program_map), this)),
+	m_program_config("program", ENDIANNESS_BIG, 8, 21, 0, address_map_constructor(FUNC(abc1600_mac_device::program_map), this)),
 	m_rom(*this, "boot"),
 	m_segment_ram(*this, "segment_ram", 0x400, ENDIANNESS_LITTLE),
 	m_page_ram(*this, "page_ram", 0x800, ENDIANNESS_LITTLE),
 	m_watchdog(*this, "watchdog"),
-	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_read_fc(*this),
+	m_write_buserr(*this),
 	m_task(0),
 	m_cause(0)
 {
@@ -128,6 +129,10 @@ abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char
 
 void abc1600_mac_device::device_start()
 {
+	// resolve callbacks
+	m_read_fc.resolve_safe(0);
+	m_write_buserr.resolve_safe();
+
 	// HACK fill segment RAM or abcenix won't boot
 	memset(m_segment_ram, 0xcd, 0x400);
 	//memset(m_page_ram, 0xcd, 0x400);
@@ -159,7 +164,7 @@ void abc1600_mac_device::device_reset()
 device_memory_interface::space_config_vector abc1600_mac_device::memory_space_config() const
 {
 	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_space_config)
+		std::make_pair(AS_PROGRAM, &m_program_config)
 	};
 }
 
@@ -222,8 +227,8 @@ offs_t abc1600_mac_device::translate_address(offs_t offset, int *nonx, int *wp)
 	if (PAGE_NONX)
 	{
 		//logerror("Bus error %06x : %06x\n", offset, virtual_offset);
-		//m_cpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		//m_cpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+		//m_write_buserr(ASSERT_LINE);
+		//m_write_buserr(CLEAR_LINE);
 	}
 
 	*nonx = PAGE_NONX;
@@ -326,7 +331,7 @@ void abc1600_mac_device::write_supervisor_memory(offs_t offset, uint8_t data)
 
 int abc1600_mac_device::get_fc()
 {
-	uint16_t fc = m_cpu->get_fc();
+	uint16_t fc = m_read_fc();
 
 	m_ifc2 = !(!(MAGIC || FC0) || FC2);
 

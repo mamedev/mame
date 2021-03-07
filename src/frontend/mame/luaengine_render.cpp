@@ -12,6 +12,7 @@
 #include "luaengine.ipp"
 
 #include "render.h"
+#include "rendlay.h"
 
 #include <iterator>
 
@@ -21,6 +22,10 @@ namespace {
 struct layout_file_views
 {
 	layout_file_views(layout_file &f) : file(f) { }
+	layout_file::view_list &items() { return file.views(); }
+
+	static layout_view &unwrap(layout_file::view_list::iterator const &it) { return *it; }
+	static int push_key(lua_State *L, layout_file::view_list::iterator const &it, std::size_t ix) { return sol::stack::push_reference(L, it->unqualified_name()); }
 
 	layout_file &file;
 };
@@ -29,6 +34,10 @@ struct layout_file_views
 struct layout_view_items
 {
 	layout_view_items(layout_view &v) : view(v) { }
+	layout_view::item_list &items() { return view.items(); }
+
+	static layout_view::item &unwrap(layout_view::item_list::iterator const &it) { return *it; }
+	static int push_key(lua_State *L, layout_view::item_list::iterator const &it, std::size_t ix) { return sol::stack::push(L, ix + 1); }
 
 	layout_view &view;
 };
@@ -53,48 +62,9 @@ template <> struct is_container<render_target_view_names> : std::true_type { };
 
 
 template <>
-struct usertype_container<layout_file_views> : lua_engine::immutable_collection_helper<layout_file_views, layout_file::view_list>
+struct usertype_container<layout_file_views> : lua_engine::immutable_sequence_helper<layout_file_views, layout_file::view_list>
 {
-private:
-	using view_list = layout_file::view_list;
-
-	template <bool Indexed>
-	static int next_pairs(lua_State *L)
-	{
-		indexed_iterator &i(stack::unqualified_get<user<indexed_iterator> >(L, 1));
-		if (i.src.end() == i.it)
-			return stack::push(L, lua_nil);
-		int result;
-		if constexpr (Indexed)
-			result = stack::push(L, i.ix + 1);
-		else
-			result = stack::push_reference(L, i.it->unqualified_name());
-		result += stack::push_reference(L, *i.it);
-		++i;
-		return result;
-	}
-
-	template <bool Indexed>
-	static int start_pairs(lua_State *L)
-	{
-		layout_file_views &self(get_self(L));
-		stack::push(L, next_pairs<Indexed>);
-		stack::push<user<indexed_iterator> >(L, self.file.views(), self.file.views().begin());
-		stack::push(L, lua_nil);
-		return 3;
-	}
-
 public:
-	static int at(lua_State *L)
-	{
-		layout_file_views &self(get_self(L));
-		std::ptrdiff_t const index(stack::unqualified_get<std::ptrdiff_t>(L, 2));
-		if ((0 >= index) || (self.file.views().size() < index))
-			return stack::push(L, lua_nil);
-		else
-			return stack::push_reference(L, *std::next(self.file.views().begin(), index - 1));
-	}
-
 	static int get(lua_State *L)
 	{
 		layout_file_views &self(get_self(L));
@@ -113,72 +83,13 @@ public:
 	{
 		return get(L);
 	}
-
-	static int index_of(lua_State *L)
-	{
-		layout_file_views &self(get_self(L));
-		layout_view &view(stack::unqualified_get<layout_view>(L, 2));
-		auto it(self.file.views().begin());
-		std::ptrdiff_t ix(0);
-		while ((self.file.views().end() != it) && (&view != &*it))
-		{
-			++it;
-			++ix;
-		}
-		if (self.file.views().end() == it)
-			return stack::push(L, lua_nil);
-		else
-			return stack::push(L, ix + 1);
-	}
-
-	static int size(lua_State *L)
-	{
-		layout_file_views &self(get_self(L));
-		return stack::push(L, self.file.views().size());
-	}
-
-	static int empty(lua_State *L)
-	{
-		layout_file_views &self(get_self(L));
-		return stack::push(L, self.file.views().empty());
-	}
-
-	static int next(lua_State *L) { return stack::push(L, next_pairs<false>); }
-	static int pairs(lua_State *L) { return start_pairs<false>(L); }
-	static int ipairs(lua_State *L) { return start_pairs<true>(L); }
 };
 
 
 template <>
-struct usertype_container<layout_view_items> : lua_engine::immutable_collection_helper<layout_view_items, layout_view::item_list>
+struct usertype_container<layout_view_items> : lua_engine::immutable_sequence_helper<layout_view_items, layout_view::item_list>
 {
-private:
-	using item_list = layout_view::item_list;
-
-	static int next_pairs(lua_State *L)
-	{
-		indexed_iterator &i(stack::unqualified_get<user<indexed_iterator> >(L, 1));
-		if (i.src.end() == i.it)
-			return stack::push(L, lua_nil);
-		int result;
-		result = stack::push(L, i.ix + 1);
-		result += stack::push_reference(L, *i.it);
-		++i.it;
-		++i.ix;
-		return result;
-	}
-
 public:
-	static int at(lua_State *L)
-	{
-		layout_view_items &self(get_self(L));
-		std::ptrdiff_t const index(stack::unqualified_get<std::ptrdiff_t>(L, 2));
-		if ((0 >= index) || (self.view.items().size() < index))
-			return stack::push(L, lua_nil);
-		else
-			return stack::push_reference(L, *std::next(self.view.items().begin(), index - 1));
-	}
-
 	static int get(lua_State *L)
 	{
 		layout_view_items &self(get_self(L));
@@ -195,49 +106,9 @@ public:
 		return get(L);
 	}
 
-	static int index_of(lua_State *L)
-	{
-		layout_view_items &self(get_self(L));
-		layout_view::item &item(stack::unqualified_get<layout_view::item>(L, 2));
-		auto it(self.view.items().begin());
-		std::ptrdiff_t ix(0);
-		while ((self.view.items().end() != it) && (&item != &*it))
-		{
-			++it;
-			++ix;
-		}
-		if (self.view.items().end() == it)
-			return stack::push(L, lua_nil);
-		else
-			return stack::push(L, ix + 1);
-	}
-
-	static int size(lua_State *L)
-	{
-		layout_view_items &self(get_self(L));
-		return stack::push(L, self.view.items().size());
-	}
-
-	static int empty(lua_State *L)
-	{
-		layout_view_items &self(get_self(L));
-		return stack::push(L, self.view.items().empty());
-	}
-
-	static int next(lua_State *L) { return stack::push(L, next_pairs); }
-
 	static int pairs(lua_State *L)
 	{
 		return luaL_error(L, "sol: cannot call 'pairs' on type '%s': not iterable by ID", sol::detail::demangle<layout_view_items>().c_str());
-	}
-
-	static int ipairs(lua_State *L)
-	{
-		layout_view_items &self(get_self(L));
-		stack::push(L, next_pairs);
-		stack::push<user<indexed_iterator> >(L, self.view.items(), self.view.items().begin());
-		stack::push(L, lua_nil);
-		return 3;
 	}
 };
 
@@ -478,12 +349,12 @@ void lua_engine::initialize_render(sol::table &emu)
 			}
 		};
 	layout_view_item_type["id"] = sol::property(
-			[this] (layout_view::item &i) -> sol::object
+			[] (layout_view::item &i, sol::this_state s) -> sol::object
 			{
 				if (i.id().empty())
-					return sol::make_object(sol(), sol::lua_nil);
+					return sol::lua_nil;
 				else
-					return sol::make_object(sol(), i.id());
+					return sol::make_object(s, i.id());
 			});
 	layout_view_item_type["bounds_animated"] = sol::property(&layout_view::item::bounds_animated);
 	layout_view_item_type["color_animated"] = sol::property(&layout_view::item::color_animated);

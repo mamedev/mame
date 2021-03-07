@@ -22,8 +22,10 @@
 #include "luaengine.h"
 #include "mameopts.h"
 #include "pluginopts.h"
+#include "rendlay.h"
 #include "validity.h"
 
+#include "corestr.h"
 #include "xmlfile.h"
 
 #include "osdepend.h"
@@ -166,18 +168,18 @@ void mame_machine_manager::start_luaengine()
 		// process includes
 		for (const std::string &incl : split(options().plugin(), ','))
 		{
-			plugin *p = m_plugins->find(incl);
+			plugin_options::plugin *p = m_plugins->find(incl);
 			if (!p)
-				fatalerror("Fatal error: Could not load plugin: %s\n", incl.c_str());
+				fatalerror("Fatal error: Could not load plugin: %s\n", incl);
 			p->m_start = true;
 		}
 
 		// process excludes
 		for (const std::string &excl : split(options().no_plugin(), ','))
 		{
-			plugin *p = m_plugins->find(excl);
+			plugin_options::plugin *p = m_plugins->find(excl);
 			if (!p)
-				fatalerror("Fatal error: Unknown plugin: %s\n", excl.c_str());
+				fatalerror("Fatal error: Unknown plugin: %s\n", excl);
 			p->m_start = false;
 		}
 	}
@@ -185,7 +187,7 @@ void mame_machine_manager::start_luaengine()
 	// we have a special way to open the console plugin
 	if (options().console())
 	{
-		plugin *p = m_plugins->find(OPTION_CONSOLE);
+		plugin_options::plugin *p = m_plugins->find(OPTION_CONSOLE);
 		if (!p)
 			fatalerror("Fatal error: Console plugin not found.\n");
 

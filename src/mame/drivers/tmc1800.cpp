@@ -799,6 +799,12 @@ void tmc1800_state::tmc1800(machine_config &config)
 
 	// devices
 	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(tmc1800_base_state::quickload_cb));
+	// The following can be enabled when the missing bios rom is found
+	//quickload_image_device &quickload(QUICKLOAD(config, "quickload", "bin,c8", attotime::from_seconds(2)));
+	//quickload.set_load_callback(FUNC(tmc1800_base_state_state::quickload_cb));
+	//quickload.set_interface("chip8quik");
+	//SOFTWARE_LIST(config, "quik_list").set_original("chip8_quik").set_filter("T"); // filter unknown until it can be tested
+
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);

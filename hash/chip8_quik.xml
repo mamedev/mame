@@ -1,0 +1,924 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+Created by Robbbert in January 2021.
+
+This is mainly intended as a quickload list for the Dream 6800. However, the majority of the CHIP-8 software
+also works on the RCA VIP, so it also uses this list. Where software only works on one platform, it is
+distinguished with a compatibility feature flag.
+
+Many computers had a CHIP-8 interpreter available as a piece of software, however at this time it isn't
+possible to bundle a list to such software.
+
+-->
+<softwarelist name="chip8_quik" description="CHIP8 quickload">
+
+	<software name="fifteen">
+		<description>Fifteen Puzzle</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Roger Ivie"/>
+		<info name="usage" value="Use 2,4,6,8" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="384">
+				<rom name="15puzzle.c8" size="384" crc="4e8693f1" sha1="ea9af3c09b0d9e265fcd92bcc5d51a2939fdf27a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="addition">
+		<description>Addition Problems</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Paul C Moews"/>
+		<info name="usage" value="Type in 3-digit answer. Press any number for next." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="168">
+				<rom name="Addition.c8" size="168" crc="c20dc1ab" sha1="feaa2b999737630a6402e990df4d0558f79ba43e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airplane">
+		<description>Airplane</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Press 8 to drop bomb on smaller planes below." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="356">
+				<rom name="Airplane.c8" size="356" crc="6fd89b3d" sha1="fca71182a8838b686573e69b22aff945d79fe1d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="animal">
+		<description>Animal Race</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Brian Astle"/>
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="1194">
+				<rom name="Animal Race.c8" size="1194" crc="6465acef" sha1="a27dcf88a931f70c3ccf3c01a5410b263bac48bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="animalf">
+		<description>Animal Race (fix)</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Brian Astle"/>
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="1194">
+				<rom name="Animal Race (fix).c8" size="1194" crc="6465acef" sha1="a27dcf88a931f70c3ccf3c01a5410b263bac48bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astro">
+		<description>Astro Dodge</description>
+		<year>2009</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Revival Studios"/>
+		<info name="usage" value="4 left; 6 right" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="1337">
+				<rom name="Astro Dodge09.c8" size="1337" crc="50b589a2" sha1="0b1040d556cba3b8e086f44ea76f78e26fd28093"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrof">
+		<description>Astro Dodge (fix)</description>
+		<year>2008</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Revival Studios"/>
+		<info name="usage" value="4 left; 6 right" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="1119">
+				<rom name="Astro Dodge (fix).c8" size="1119" crc="13a1bdaa" sha1="048659b97e0cf9506eba85ef7baaf21ada22c6f2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bio">
+		<description>Biorhythm</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Jef Winsor"/>
+		<info name="usage" value="Enter birthday DDMMYYYY followed by enquiry date DDMMYYYY." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="910">
+				<rom name="Biorhythm.c8" size="910" crc="b197ce7a" sha1="3368d56efeb584c509bafb548f1ee5e71ac1bc70"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blackjack">
+		<description>Blackjack</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Andrew Modla"/>
+		<sharedfeat name="compatibility" value="V" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="1166">
+				<rom name="Blackjack.c8" size="1166" crc="daed7dc5" sha1="2b711cf58008f03168d0547063fe8e3c72f65ae3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blinky">
+		<description>Blinky (fix)</description>
+		<year>1991</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Hans Christian Egeberg"/>
+		<info name="usage" value="4 = left; 6 = right; 5 = down; 8 = up; F = restart" />
+		<sharedfeat name="compatibility" value="V" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="2388">
+				<rom name="Blinky (fix).c8" size="2388" crc="8156ea3f" sha1="5370ecf9ae444c71b63dab9b1f9968a4fe67c9dd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blitz">
+		<description>Blitz</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="David Winter"/>
+		<info name="usage" value="5 to drop bomb" />
+		<sharedfeat name="compatibility" value="V" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="391">
+				<rom name="blitz.c8" size="391" crc="d106c808" sha1="6f6509f38220e057a7e32ebb22dd353c1078e3e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bowling">
+		<description>Bowling</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Gooitzen van der Wal"/>
+		<info name="usage" value="5 to bowl" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="1194">
+				<rom name="Bowling.c8" size="1194" crc="0aeff5a0" sha1="b3fed4ed1eb0ed693c9731dbe53b29a76236c781"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakout">
+		<description>Breakout</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Carmelo Cortez"/>
+		<info name="usage" value="4 left; 6 right" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="232">
+				<rom name="Breakout.c8" size="232" crc="fe8c859b" sha1="193915dcde1365ae054c4eaa21a35baa27cd3356"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brick">
+		<description>Brick</description>
+		<year>1990</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="4 left; 6 right" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="286">
+				<rom name="Brick.c8" size="286" crc="3bfced42" sha1="91442577a6bbf8c3267f2df95fdfc50baebe176d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brix">
+		<description>Brix</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="4 left; 6 right" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="280">
+				<rom name="brix.c8" size="280" crc="aaa44d0b" sha1="f13766c14aeb02ad8d4d103cb5eadd282d20cddc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cave">
+		<description>Cave</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="2,4,6,8 to change direction" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="882">
+				<rom name="cave.c8" size="882" crc="3bc80ce8" sha1="5c82520906073287a3ef781746c67207ca084d93"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clock">
+		<description>Clock Program</description>
+		<year>1981</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Bill Fisher"/>
+		<info name="usage" value="type HHMMSS to set the time" />
+		<sharedfeat name="compatibility" value="V" /><!-- time doesn't increment on d6800 -->
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="280">
+				<rom name="Clock Program.c8" size="280" crc="04291dd8" sha1="016345d75eef34448840845a9590d41e6bfdf46a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="craps">
+		<description>Craps</description>
+		<year>1978</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Camerlo Cortez"/>
+		<info name="usage" value="Press any number" />
+		<sharedfeat name="compatibility" value="D" /><!-- runs on vip, but bad gfx -->
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="192">
+				<rom name="Craps.c8" size="192" crc="21a982fc" sha1="35158696bd94ea22ef34e899fff1f15f7154d4fd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deflect">
+		<description>Deflection</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="John Fort"/>
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="1024">
+				<rom name="Deflection.c8" size="1024" crc="3b2aea72" sha1="8e5f19d8ae9f3346779613359610967a5ed95fa8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="figures">
+		<description>Figures</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="290">
+				<rom name="Figures.c8" size="290" crc="67a9c567" sha1="3b2bf5dc7ffb5f3fbe168e802079f79730535ca8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="filter">
+		<description>Filter</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Catch ball with bat: 4 left; 6 right" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="198">
+				<rom name="Filter.c8" size="198" crc="fb592cc5" sha1="ae71a7b081a947f1760cdc147759803aea45e751"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guess">
+		<description>Guess</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="David Winter"/>
+		<info name="usage" value="Think of a number. Press 5 if it is on screen, some other key if not." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="148">
+				<rom name="guess.c8" size="148" crc="432e2fe1" sha1="5260f8931e0e9f41e555b382a14a88368e3ed886"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hilo">
+		<description>Hi-Lo</description>
+		<year>1978</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Jef Winsor"/>
+		<info name="usage" value="Type 2-digit number guess. Computer says if too high or low. Press any key, then next guess." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="170">
+				<rom name="Hi-Lo.c8" size="170" crc="6e9ccb66" sha1="dbb52193db4063149c3d8768ab47dd740d90955c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hidden">
+		<description>Hidden</description>
+		<year>1996</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="David Winter"/>
+		<info name="usage" value="Memory game. Use 2,4,6,8 to choose card, 5 to display it. Try to get a pair of matching ones." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="850">
+				<rom name="hidden.c8" size="850" crc="61861ae5" sha1="050f07a54371da79f924dd0227b89d07b4f2aed0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hiddenf">
+		<description>Hidden (fix)</description>
+		<year>1996</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="David Winter"/>
+		<info name="usage" value="Memory game. Use 2,4,6,8 to choose card, 5 to display it. Try to get a pair of matching ones." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="858">
+				<rom name="hiddenf.c8" size="858" crc="e89c05ab" sha1="9b72b6656cb714cd64de00ac78dc7bf8374adec6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kaleid">
+		<description>Kaleidoscope</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Use 2,4,6,8 to design kaleidoscope display" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="120">
+				<rom name="kaleid.c8" size="120" crc="08a93fae" sha1="d6fa9dc9005dc0496f39ba52fef56f9fd0a5a158"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kaleid2">
+		<description>Kaleidoscope (alt)</description>
+		<year>1978</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Joseph Weisbecker"/>
+		<info name="usage" value="Use 2,4,6,8 to design kaleidoscope display" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="122">
+				<rom name="Kaleidoscope.c8" size="122" crc="c73ba60c" sha1="fc724ae0125f5f1ac94a79fe3afc6318b1f57556"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="landing">
+		<description>Landing</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="8 to drop bomb" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="276">
+				<rom name="Landing.c8" size="276" crc="804d282c" sha1="72fb3e0a4572bdb81f484df7948a8bc736fe78d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="life">
+		<description>Life</description>
+		<year>1980</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="GV Samways"/>
+		<info name="usage" value="Enter coords of cells (0-7)(0-F). When finished designing, press F then 0. Quit when colony stabilises or dies." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="256">
+				<rom name="Life.c8" size="256" crc="fd978291" sha1="efa6bc8f1f35baaa16700d68a83dc4919797e2fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="llander">
+		<description>Lunar Lander</description>
+		<year>1979</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Udo Pernisz"/>
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="1792">
+				<rom name="Lunar Lander.c8" size="1792" crc="f0ec9a3d" sha1="72e8f3a10a32bd7fb91322ecab87249f95e81e57"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmind">
+		<description>Mastermind FourRow</description>
+		<year>1978</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Robert Lindley"/>
+		<info name="usage" value="Enter your 4-digit (1-6) guess. Bar = wrong position. Dots = correct position." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="292">
+				<rom name="Mastermind FourRow.c8" size="292" crc="2b450d6a" sha1="669e32b6f42f52da658e428f501aabcdfa37fb2e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="merlin">
+		<description>Merlin</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="David Winter"/>
+		<info name="usage" value="Simon game. Keys are 4,5,1,2" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="345">
+				<rom name="merlin.c8" size="345" crc="1096c3d5" sha1="d979858bb9ffd07b48f52f92a8bcac0199f3623e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="missile">
+		<description>Missile</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="8 to fire" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="180">
+				<rom name="missile.c8" size="180" crc="6e485c29" sha1="0d0cc129dad3c45ba672f85fec71a668232212cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdg">
+		<description>Most Dangerous Game</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Peter Maruhnic"/>
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="1010">
+				<rom name="Most Dangerous Game.c8" size="1010" crc="e941c6d7" sha1="fa7c04f68d78e0faf6d136a3babe3943fc2e02f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nim">
+		<description>Nim</description>
+		<year>1978</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Carmelo Cortez"/>
+		<info name="usage" value="F = go first or other key for computer first. Then press (1-3). Player who takes last one loses." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="182">
+				<rom name="Nim.c8" size="182" crc="1b459fa0" sha1="4031dae5c7545a1adc160a661be36f19fc1d47b2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="paddles">
+		<description>Paddles</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="F to start, then 4 = left; 6 = right." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="560">
+				<rom name="Paddles.c8" size="560" crc="5c786254" sha1="a18f1e3897416180b32e47ddc82cba9aca2c8d52"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pong1">
+		<description>Pong (1 player)</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="1 and 4 to move" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="246">
+				<rom name="Pong (1 player).c8" size="246" crc="841fde23" sha1="607c4f7f4e4dce9f99d96b3182bfe7e88bb090ee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ponga">
+		<description>Pong (alt)</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="1 and 4 to move" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="264">
+				<rom name="Pong (alt).c8" size="264" crc="69970ad2" sha1="a60611339661e3ab2d8af024ad1da5880a6f8665"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pong">
+		<description>Pong</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="1 and 4 to move" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="246">
+				<rom name="pong.c8" size="246" crc="7d75a857" sha1="b232ef880bd6060fb45fa6effed7edf0ae95670e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ps">
+		<description>Programmable Spacefighters</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Jef Winsor"/>
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="1020">
+				<rom name="Programmable Spacefighters.c8" size="1020" crc="cc8eec70" sha1="726cb39afa7e17725af7fab37d153277d86bff77"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puzzle">
+		<description>Puzzle</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Wait for it to finish shuffling. Press 2,4,6,8 to move." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="184">
+				<rom name="puzzle.c8" size="184" crc="040ca946" sha1="1293db0ccccbe7dd3fc5a09a2abc5d7b175e18e0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reversi">
+		<description>Reversi</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Philip Baltzer"/>
+		<info name="usage" value="2-player game. 2,4,6,8 to move cursor. 5 to choose it." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="578">
+				<rom name="Reversi.c8" size="578" crc="02393966" sha1="ff639eceaf221ae66151a03779b41fae7118d2d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rocket">
+		<description>Rocket</description>
+		<year>1978</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Joseph Weisbecker"/>
+		<info name="usage" value="F to fire" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="130">
+				<rom name="Rocket.c8" size="130" crc="428c1e4d" sha1="3d1d029d6e31206d245c0ba881c0d1f003953bad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rocketl">
+		<description>Rocket Launch</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Jonas Lindstedt"/>
+		<info name="usage" value="B to begin, then 4 = left; 6 = right" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="494">
+				<rom name="Rocket Launch.c8" size="494" crc="bb286fea" sha1="5e70f91ca08e9b9e9de61670492e3db2d7f7d57a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rushhour2">
+		<description>Rush Hour (alt)</description>
+		<year>2006</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Hap"/>
+		<info name="usage" value="Keys are 5,7,8,9,A,1" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="3582">
+				<rom name="Rush Hour (alt).c8" size="3582" crc="a423f9e7" sha1="29a41ab4d0aa3bc0d6a9d2fa71d533fe463344b3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rushhour">
+		<description>Rush Hour</description>
+		<year>2006</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Hap"/>
+		<sharedfeat name="compatibility" value="V" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="3582">
+				<rom name="Rush Hour.c8" size="3582" crc="050a0a72" sha1="4639f86beb0a203ae512b85d3b56d813b2dea7b4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rroul">
+		<description>Russian Roulette</description>
+		<year>1978</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Carmelo Cortez"/>
+		<info name="usage" value="Any key to fire." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="156">
+				<rom name="Russian Roulette.c8" size="156" crc="dd68f8d1" sha1="24960090b2afc9de2a4cb3ee7daf6a21456bb49b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sshoot">
+		<description>Sequence Shoot</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Joyce Weisbecker"/>
+		<info name="usage" value="Simon game. Targets are C,D,E,F." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="324">
+				<rom name="Sequence Shoot.c8" size="324" crc="5a83ff48" sha1="448f9d30d2157ab42679b809d4fb0b43d145f74f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sstars">
+		<description>Shooting Stars</description>
+		<year>1978</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Philip Baltzer"/>
+		<info name="usage" value="Use 2,4,6,8 to avoid being hit. Also avoid the big star." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="204">
+				<rom name="Shooting Stars.c8" size="204" crc="200382c1" sha1="443550abf646bc7f475ef0466f8e1232ec7474f3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slide">
+		<description>Slide</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Joyce Weisbecker"/>
+		<info name="usage" value="Hold 0 for power level then release. Ball must hit a square, and stay in play." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="388">
+				<rom name="Slide.c8" size="388" crc="746a9de0" sha1="7623fa0fa915979226566b24107360e7537735f4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snafu">
+		<description>Snafu</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="469">
+				<rom name="snafu.c8" size="469" crc="de286f9b" sha1="97a65f7c877f923a93e7b423ad39187e91e938fd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soccer">
+		<description>Soccer</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="1 and 4 to move" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="334">
+				<rom name="Soccer.c8" size="334" crc="017884e3" sha1="6df358d77961a0bf21e98876f9f616791cba31e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sflight">
+		<description>Space Flight</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="F to start, E to begin level, F to launch." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="716">
+				<rom name="Space Flight.c8" size="716" crc="dbc74090" sha1="aa4f1a282bd64a2364102abf5737a4205365a2b4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="squash">
+		<description>Squash</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="David Winter"/>
+		<info name="usage" value="1 and 4 to move" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="211">
+				<rom name="Squash.c8" size="211" crc="801843e0" sha1="a58ec7cc63707f9e7274026de27c15ec1d9945bd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="submarine">
+		<description>Submarine</description>
+		<year>1978</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Carmelo Cortez"/>
+		<info name="usage" value="Press 5 to drop a depth charge." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="288">
+				<rom name="Submarine.c8" size="288" crc="cb331b6a" sha1="89aadf7c28bcd1c11e71ad9bd6eeaf0e7be474f3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="syzygy">
+		<description>Syzygy</description>
+		<year>1990</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Roy Trevino"/>
+		<info name="usage" value="F to start." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="946">
+				<rom name="syzygy.c8" size="946" crc="67e4bf9c" sha1="1bdb4ddaa7049266fa3226851f28855a365cfd12"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tank">
+		<description>Tank</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="2,4,6,8 to move. 5 to fire." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="560">
+				<rom name="tank.c8" size="560" crc="a929cb73" sha1="18b9d15f4c159e1f0ed58c2d8ec1d89325d3a3b6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tapeworm">
+		<description>Tapeworm</description>
+		<year>1999</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="JDR"/>
+		<info name="usage" value="F to start. 2,4,6,8 to steer." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="284">
+				<rom name="Tapeworm.c8" size="284" crc="c77a1852" sha1="775e82a36c93f1b41b42eca94b55acbc4a48cebe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris">
+		<description>Tetris</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Fran Dachille"/>
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="494">
+				<rom name="tetris.c8" size="494" crc="0ce70772" sha1="5f518084744bf3cb8733f6e5454dfd1634320563"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tictactoef">
+		<description>Tic-Tac-Toe (fix)</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="David Winter"/>
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="490">
+				<rom name="Tic-Tac-Toe (fix).c8" size="490" crc="64225f6a" sha1="40329847cb898f9b34a6aea1095be0a1be0b4546"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timebomb">
+		<description>Timebomb</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="2 and 8 to set initial value. 5 to start countdown." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="144">
+				<rom name="Timebomb.c8" size="144" crc="4db1c26c" sha1="67996195539c0ddcd98533a01dffeec6a53a6da1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tron">
+		<description>Tron</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="F then 0 to start. Use 2,4,6,8 to steer." />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="382">
+				<rom name="Tron.c8" size="382" crc="e5b40a11" sha1="a6a6cb2351c20b8f904da07c0ce91bd8161e9317"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ufo">
+		<description>UFO</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Lutz V"/>
+		<info name="usage" value="4,5,6 to shoot" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="224">
+				<rom name="ufo.c8" size="224" crc="331413e7" sha1="bdb92475acfe11bc7814a2f5eade13fcd09b756a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sinter">
+		<description>Space Intercept</description>
+		<year>1978</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Joseph Weisbecker"/>
+		<info name="usage" value="4,5,6 to shoot" />
+		<sharedfeat name="compatibility" value="D" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="192">
+				<rom name="ufo.c8" size="192" crc="8c99c724" sha1="ed829190e37815771e7a8c675ba0074996a2ddb0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vbrix">
+		<description>V-brix</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="1 and 4 to move" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="507">
+				<rom name="vbrix.c8" size="507" crc="608c6ab0" sha1="da710f631f8e35534d0b9170bcf892a60f49c43d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vers">
+		<description>Vers</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Avoid hitting anything" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="230">
+				<rom name="vers.c8" size="230" crc="0dbf7208" sha1="ade839585ddeb0e3633177df03c1d91589e629eb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vddg">
+		<description>Video Display Drawing Game</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Joseph Weisbecker"/>
+		<sharedfeat name="compatibility" value="V" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="80">
+				<rom name="Video Display Drawing Game.c8" size="80" crc="1f91e53b" sha1="12fccf60004f685c112fe3db3d3bcfba104cbcb1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wipeoff">
+		<description>Wipeoff</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="4 = left; 6 = right" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="206">
+				<rom name="wipeoff.c8" size="206" crc="b2696048" sha1="d666688a8fce468a7d88b536bc1ef5f35ba12031"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wormv4">
+		<description>Worm V4</description>
+		<year>2007</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Revival Studios"/>
+		<sharedfeat name="compatibility" value="V" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="677">
+				<rom name="Worm V4.c8" size="677" crc="fcfbe07d" sha1="a1c1e0e7b01004be3ee77c69030e6b536cb316e6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmirror">
+		<description>X-Mirror</description>
+		<year>????</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Use 2,4,6,8" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="106">
+				<rom name="X-Mirror.c8" size="106" crc="15965766" sha1="bc158d819890f16f105b8a316eeeefe4a0bad875"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xrayf">
+		<description>X-Ray (fix)</description>
+		<year>1980</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Rand Miller"/>
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="3584">
+				<rom name="X-Ray (fix).c8" size="3584" crc="bf0da612" sha1="4701417c61d80d40fe6e3ae06d891cbe730c0dc7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dreaminv">
+		<description>Dream Invaders</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="4 = left; 5 = right; F = fire" />
+		<sharedfeat name="compatibility" value="D" />
+		<part name="quik" interface="chip8quik">
+			<dataarea name="quik" size="1280">
+				<rom name="dreaminvaders.bin" size="1280" crc="31462058" sha1="840078131513dbefc56f08124d5c54ac3ac8cdf5"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

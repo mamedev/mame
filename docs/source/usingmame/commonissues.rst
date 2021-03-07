@@ -70,7 +70,7 @@ There's still room for improvements in MAME's speed, but chances are that if you
 Why do my Neo Geo ROMs no longer work? How do I get the Humble Bundle Neo Geo sets working?
 -------------------------------------------------------------------------------------------
 
-Recently the Neo Geo BIOS was updated to add a new version of the Universal BIOS. This was done between 0.171 and 0.172, and results in an error trying to load Neo Geo games with an un-updated **neogeo.zip** set.
+Recently the Neo Geo BIOS was updated to add a new version of the Universe BIOS. This was done between 0.171 and 0.172, and results in an error trying to load Neo Geo games with an un-updated **neogeo.zip** set.
 
 This also affects the Humble Bundle set: the games themselves are correct and up to date as of MAME 0.173 (and most likely will remain so) though you'll have to pull the ROM set .ZIP files out of the package somehow yourself. However, the Neo Geo BIOS set (**neogeo.zip**) included in the Humble Bundle set is incomplete as of the 0.172 release of MAME.
 
@@ -252,7 +252,11 @@ Unofficial builds of MAME may have supported it for varying amounts of time as w
 What happened to the MAME support for autofire?
 -----------------------------------------------
 
-A Lua plugin with providing enhanced autofire support was added in MAME 0.210; the old built-in autofire functionality was removed in MAME 0.216. This new plugin has more functionality than the previous built-in autofire in older MAME revisions; for instance, you can specify an alternate button for the autofire.
+A Lua plugin with providing enhanced autofire support was added in MAME 0.210,
+and the old built-in autofire functionality was removed in MAME 0.216.  This
+new plugin has more functionality than the built-in autofire feature in older
+version of MAME; for example, you can configure an alternate buttons for
+different for autofire rates.
 
 You can enable and configure the new autofire system with the following steps:
 
@@ -262,13 +266,25 @@ You can enable and configure the new autofire system with the following steps:
 
 The setting will be automatically saved for future use.
 
-Once you're inside a system of your choice, bring up the MAME menu (typically the **tab** key) and go into *plugin options*. From there, depending on whether you have an existing autofire button set up or not, it will either show the existing entry/entries or it will ask you to select the input for the autofire.
+Once you’re running a system of your choice, bring up the MAME menu (using the
+**Tab** key by default), select *Plugin Options* and then select *Autofire*.
+From there, depending on whether you have an existing autofire button set up or
+not, it will either show the existing entry/entries or it will ask you to select
+the input for the autofire.
 
-Typically you'll be choosing *P1 Button 1* for systems like Galaga, Alcon, or the like. The *Hotkey* is the button you press for the autofire effect. This can be any keyboard key or joystick button that you wish. As of 0.216, mouse buttons are not yet supported.
+Typically you’ll be choosing *P1 Button 1* for systems like Galaga, Alcon, and
+the like.  The *Hotkey* is the button you press for the autofire effect.  This
+can be any keyboard key or joystick button you wish.  As of 0.216, mouse buttons
+are not yet supported.
 
-*On frames* and *Off frames* are how long to leave the button pressed and unpressed in number of frames. Some systems do not read the inputs fast enough for 1 and 1 to be usable. You may need to try 2 and 2 (e.g. Alcon) or other combinations. Try fine-tuning these to your taste.
+*On frames* and *Off frames* are how long to leave the button pressed and
+released in number of frames.  Some systems do not read the inputs fast enough
+for 1 and 1 to be usable.  You may need to try 2 and 2 (e.g. Alcon) or other
+combinations.  Try fine-tuning these to your taste.
 
-The autofire configuration for that system will be saved in a ``systemname.cfg`` (e.g. ``alcon.cfg``) file inside the Autofire folder for future use. Each system will have its own configuration.
+The autofire configuration for that system will be saved in a ``systemname.cfg``
+file (e.g. ``alcon.cfg``) inside the Autofire folder for future use.  Each
+system will have its own configuration.
 
 Note that if you set the autofire button to an input button that's also defined in MAME's inputs for the running system, you may get unexpected results-- Using Gradius as an example:
 

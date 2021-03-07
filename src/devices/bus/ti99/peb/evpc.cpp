@@ -499,6 +499,7 @@ void snug_enhanced_video_device::device_add_mconfig(machine_config& config)
 
 	m_video->int_cb().set(FUNC(snug_enhanced_video_device::video_interrupt_in));
 	m_video->set_screen(EVPC_SCREEN_TAG);
+	m_video->set_vram_size(0x20000); // gets changed at device_reset, but give it a default value to avoid assert
 	screen_device& screen(SCREEN(config, EVPC_SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(21'477'272),
 		v99x8_device::HTOTAL,

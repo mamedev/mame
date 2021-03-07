@@ -43,12 +43,14 @@
 /*
  * Hardware: 68000@11.16 MHz
              8530 SCC
-             65C22 VIA on newer pcbs (older pcbs might have a 6523/6525 TPI but the pinout is completely different?)
+             "6523" VIA (actually a custom-marked Rockwell R65NC22, not to be confused with the MOS 6523/65C23 TPI;
+                         may also be sourced as VLSI VL65C22V-02PC)
              2MB DRAM
              2KB SRAM
              X2804 EEPROM (custom marked as 335-0022) [note that technically a 2808 or 2816 can go here and will work too]
              1MB ROM
              MMI67L401 64x4 FIFO, x2
+             342-0440-A PIC (for ADB)
 
    +------------------------------------------------------------------------------------------------------------------------+=====+
    |      1           2            3           4            5          6          7          8        9        10     11    |     #
@@ -70,7 +72,7 @@
    |H   |511000|    | RP2H |   +--------+                      +-------+     |7705|                           +------+      |  N  #
    |    +------+    +------+   | F244   |                                    +----+     +-----------------+   |26LS30|      |     #
    |J   |511000|    | 0259 |   +--------+-+----------+                   o------o       | 338-6523        |   +------+      |  T  #
-   |    +------+    +------+   | TC531000 | TC531000 |                   | CONN |       | TPI             |   |26LS30|      |     #
+   |    +------+    +------+   | TC531000 | TC531000 |                   | CONN |       | VIA             |   |26LS30|      |     #
    |K   |511000|    +------+   |  ROM H3  |  ROM L3  |          +------+ |   == |       +-----------------+   +------+      |     #
    |    +------+    | RP2L |   +----------+----------+          | F02  | |   == |             +-------+                     |     #
    |L   |511000|    +------+   +----------+----------+          +------+ |   == |             | LS14  |                     |     #
@@ -89,18 +91,11 @@
    +------------------------------------------------------------------------------------------------------------------------+=====+
  */
 
-#define TPI 0  //The TPI is used on the original M6009 board but the first dump is from a newer that uses a VIA
-
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "bus/rs232/rs232.h"
-#include "machine/z80scc.h"
-
-#if TPI
-#include "machine/6525tpi.h"
-#else
 #include "machine/6522via.h"
-#endif
+#include "machine/z80scc.h"
 
 class lwriter_state : public driver_device
 {
@@ -135,13 +130,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<scc8530_device> m_scc;
-
-#if TPI
-#define tpi6523_device tpi6525_device/* TODO: define a type for the TPI6523 of its own in the device header file */
-	required_device<tpi6523_device> m_tpi;
-#else
 	required_device<via6522_device> m_via;
-#endif
 
 	uint16_t *m_dram_ptr, *m_sram_ptr, *m_rom_ptr;
 	bool m_overlay;
@@ -223,11 +212,7 @@ void lwriter_state::maincpu_map(address_map &map)
 	map(0xa00002, 0xa00002).r(m_scc, FUNC(scc8530_device::cb_r)).mirror(0x1ffff8);
 	map(0xa00006, 0xa00006).r(m_scc, FUNC(scc8530_device::db_r)).mirror(0x1ffff8);
 
-#if TPI
-	map(0xe00010, 0xe0001f).rw("tpi", FUNC(tpi6523_device::read), FUNC(tpi6523_device::write)).umask16(0x00ff).mirror(0x17ffe0); // Used on older boards, needs proper mapping
-#else
 	map(0xe00000, 0xe0001f).m(m_via, FUNC(via6522_device::map)).umask16(0x00ff).mirror(0x17ffe0);
-#endif
 }
 
 static INPUT_PORTS_START( lwriter )
@@ -382,10 +367,7 @@ void lwriter_state::lwriter(machine_config &config)
 	rs232b.rxd_handler().set("scc", FUNC(scc8530_device::rxb_w));
 	rs232b.cts_handler().set("scc", FUNC(scc8530_device::ctsb_w));
 
-#if TPI
-	TPI6525(config, "tpi", 0);
-#else
-	VIA6522(config, m_via, CPU_CLK/10); // 68000 E clock presumed
+	R65NC22(config, m_via, CPU_CLK/10); // 68000 E clock presumed
 	m_via->readpa_handler().set(FUNC(lwriter_state::via_pa_r));
 	m_via->readpb_handler().set(FUNC(lwriter_state::via_pb_r));
 	m_via->writepa_handler().set(FUNC(lwriter_state::via_pa_w));
@@ -394,7 +376,6 @@ void lwriter_state::lwriter(machine_config &config)
 	m_via->ca2_handler().set(FUNC(lwriter_state::via_ca2_w));
 	m_via->cb2_handler().set(FUNC(lwriter_state::via_cb2_w));
 	m_via->irq_handler().set(FUNC(lwriter_state::via_int_w));
-#endif
 }
 
 /* SCC init sequence

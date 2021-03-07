@@ -9,7 +9,6 @@
 *********************************************************************/
 
 #include "emu.h"
-
 #include "ui/menu.h"
 
 #include "ui/ui.h"
@@ -20,6 +19,7 @@
 #include "cheat.h"
 #include "mame.h"
 
+#include "corestr.h"
 #include "drivenum.h"
 #include "rendutil.h"
 #include "uiinput.h"
@@ -136,7 +136,6 @@ void menu::global_state::stack_push(std::unique_ptr<menu> &&menu)
 {
 	menu->m_parent = std::move(m_stack);
 	m_stack = std::move(menu);
-	m_stack->reset(reset_options::SELECT_FIRST);
 	m_stack->machine().ui_input().reset();
 }
 
@@ -289,26 +288,6 @@ void menu::reset(reset_options options)
 	m_items.clear();
 	m_visible_items = 0;
 	m_selected = 0;
-
-	// add an item to return
-	if (!m_parent)
-	{
-		item_append(_("Return to Machine"), 0, nullptr);
-	}
-	else if (m_parent->is_special_main_menu())
-	{
-		if (machine().options().ui() == emu_options::UI_SIMPLE)
-			item_append(_("Exit"), 0, nullptr);
-		else
-			item_append(_("Exit"), FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, nullptr);
-	}
-	else
-	{
-		if (machine().options().ui() != emu_options::UI_SIMPLE && stack_has_special_main_menu())
-			item_append(_("Return to Previous Menu"), FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, nullptr);
-		else
-			item_append(_("Return to Previous Menu"), 0, nullptr);
-	}
 }
 
 
@@ -399,17 +378,6 @@ void menu::item_append_on_off(const std::string &text, bool state, uint32_t flag
 		flags |= state ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW;
 
 	item_append(std::string(text), state ? _("On") : _("Off"), flags, ref, type);
-}
-
-
-//-------------------------------------------------
-//  repopulate - repopulate menu items
-//-------------------------------------------------
-
-void menu::repopulate(reset_options options)
-{
-	reset(options);
-	populate(m_customtop, m_custombottom);
 }
 
 
@@ -1201,8 +1169,31 @@ void menu::validate_selection(int scandir)
 
 void menu::do_handle()
 {
-	if (m_items.size() < 2)
+	if (m_items.empty())
+	{
+		// add an item to return - this is a really hacky way of doing this
+		if (!m_parent)
+		{
+			item_append(_("Return to Machine"), 0, nullptr);
+		}
+		else if (m_parent->is_special_main_menu())
+		{
+			if (machine().options().ui() == emu_options::UI_SIMPLE)
+				item_append(_("Exit"), 0, nullptr);
+			else
+				item_append(_("Exit"), FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, nullptr);
+		}
+		else
+		{
+			if (machine().options().ui() != emu_options::UI_SIMPLE && stack_has_special_main_menu())
+				item_append(_("Return to Previous Menu"), FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, nullptr);
+			else
+				item_append(_("Return to Previous Menu"), 0, nullptr);
+		}
+
+		// let implementation add other items
 		populate(m_customtop, m_custombottom);
+	}
 	handle();
 }
 

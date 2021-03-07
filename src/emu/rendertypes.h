@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 /***************************************************************************
 
-    render.h
+    rendertypes.h
 
     Core renderer constants and structures for MAME.
 

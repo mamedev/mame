@@ -167,7 +167,7 @@ namespace emu::detail {
 template <typename... T> struct void_wrapper { using type = void; };
 template <typename... T> using void_t = typename void_wrapper<T...>::type;
 
-template <typename D, typename T, typename Enable = void> struct rw_device_class  { };
+template <typename D, typename T, typename Enable = void> struct rw_device_class { };
 
 template <typename D, typename T, typename Ret, typename... Params>
 struct rw_device_class<D, Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<D, device_t &, const char *, Ret (T::*)(Params...), const char *>::value> > { using type = T; };
@@ -1649,6 +1649,7 @@ public:
 
 	// setup
 	void prepare_map();
+	void prepare_device_map(address_map &map);
 	void populate_from_map(address_map *map = nullptr);
 
 	template<int Width, int AddrShift, endianness_t Endian> handler_entry_read_unmapped <Width, AddrShift, Endian> *get_unmap_r() const { return static_cast<handler_entry_read_unmapped <Width, AddrShift, Endian> *>(m_unmap_r); }
@@ -1663,6 +1664,8 @@ protected:
 	// internal helpers
 	virtual std::pair<void *, void *> get_cache_info() = 0;
 	virtual std::pair<const void *, const void *> get_specific_info() = 0;
+
+	void prepare_map_generic(address_map &map, bool allow_alloc);
 
 	// private state
 	device_t &              m_device;           // reference to the owning device
@@ -1811,6 +1814,7 @@ class memory_view
 	friend class memory_view_entry;
 	friend class address_map_entry;
 	friend class address_map;
+	friend class device_t;
 
 	DISABLE_COPYING(memory_view);
 
@@ -1831,6 +1835,8 @@ public:
 		int m_id;
 
 		memory_view_entry(const address_space_config &config, memory_manager &manager, memory_view &view, int id);
+		void prepare_map_generic(address_map &map, bool allow_alloc);
+		void prepare_device_map(address_map &map);
 
 		void check_range_optimize_all(const char *function, int width, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, int cswidth, offs_t &nstart, offs_t &nend, offs_t &nmask, offs_t &nmirror, u64 &nunitmask, int &ncswidth);
 		void check_range_optimize_mirror(const char *function, offs_t addrstart, offs_t addrend, offs_t addrmirror, offs_t &nstart, offs_t &nend, offs_t &nmask, offs_t &nmirror);
@@ -1838,6 +1844,7 @@ public:
 	};
 
 	memory_view(device_t &device, std::string name);
+	~memory_view();
 
 	memory_view_entry &operator[](int slot);
 
@@ -1858,8 +1865,6 @@ private:
 	address_space *                                 m_space;
 	handler_entry *                                 m_handler_read;
 	handler_entry *                                 m_handler_write;
-	std::function<void (int)>                       m_select_a;
-	std::function<void (int)>                       m_select_u;
 	int                                             m_cur_id;
 	int                                             m_cur_slot;
 	std::string                                     m_context;
@@ -1868,6 +1873,7 @@ private:
 	std::pair<handler_entry *, handler_entry *> make_handlers(address_space &space, offs_t addrstart, offs_t addrend);
 	void make_subdispatch(std::string context);
 	int id_to_slot(int id) const;
+	void register_state();
 };
 
 
@@ -1918,10 +1924,9 @@ private:
 	running_machine &           m_machine;              // reference to the machine
 
 	std::vector<std::unique_ptr<void, stdlib_deleter>>               m_datablocks;           // list of memory blocks to free on exit
-	std::unordered_map<std::string, std::unique_ptr<memory_bank>>    m_banklist;             // data gathered for each bank
-	std::unordered_map<std::string, std::unique_ptr<memory_share>>   m_sharelist;            // map for share lookups
-	std::unordered_map<std::string, std::unique_ptr<memory_region>>  m_regionlist;           // list of memory regions
-
+	std::unordered_map<std::string, std::unique_ptr<memory_bank>>    m_banklist;             // map of banks
+	std::unordered_map<std::string, std::unique_ptr<memory_share>>   m_sharelist;            // map of shares
+	std::unordered_map<std::string, std::unique_ptr<memory_region>>  m_regionlist;           // map of memory regions
 
 	// Allocate the address spaces
 	void allocate(device_memory_interface &memory);

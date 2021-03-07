@@ -11,22 +11,11 @@
 
 #pragma once
 
+#include "softfloat3/source/include/softfloat.h"
+
 class mc88100_device : public cpu_device
 {
 public:
-	enum {
-		M88000_PC,
-		M88000_R1, M88000_R2, M88000_R3,
-		M88000_R4, M88000_R5, M88000_R6, M88000_R7,
-		M88000_R8, M88000_R9, M88000_R10, M88000_R11,
-		M88000_R12, M88000_R13, M88000_R14, M88000_R15,
-		M88000_R16, M88000_R17, M88000_R18, M88000_R19,
-		M88000_R20, M88000_R21, M88000_R22, M88000_R23,
-		M88000_R24, M88000_R25, M88000_R26, M88000_R27,
-		M88000_R28, M88000_R29, M88000_R30, M88000_R31,
-		M88000_PSR, M88000_VBR
-	};
-
 	// construction/destruction
 	mc88100_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
@@ -45,6 +34,21 @@ protected:
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
+	void execute(u32 const inst);
+	void exception(unsigned vector, bool const trap = false);
+
+	// integer helpers
+	void set_cr(unsigned const cr, u32 const data);
+	bool condition(unsigned const m5, u32 const src) const;
+	u32 cmp(u32 const src1, u32 const src2) const;
+	bool carry(u32 const src1, u32 const src2, u32 const dest) const;
+	bool overflow(u32 const src1, u32 const src2, u32 const dest) const;
+
+	// floating-point helpers
+	void set_fcr(unsigned const fcr, u32 const data);
+	u32 fcmp(float64_t const src1, float64_t const src2);
+	void fset(unsigned const td, unsigned const d, float64_t const data);
+
 private:
 	// address spaces
 	address_space_config m_code_config;
@@ -53,9 +57,20 @@ private:
 	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_data_space;
 
 	// register storage
-	u32 m_pc;
+	u32 m_xip; // execute instruction pointer
+	u32 m_nip; // next instruction pointer
+	u32 m_fip; // fetch instruction pointer
+	u32 m_sb; // scoreboard
+
 	u32 m_r[32];
-	u32 m_cr[21];
+	u32 m_cr[64];
+	u32 m_fcr[64];
+
+	u32 m_xop;
+	u32 m_nop;
+	u32 m_fop;
+
+	bool m_int_state;
 
 	s32 m_icount;
 };

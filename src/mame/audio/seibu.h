@@ -93,16 +93,21 @@ private:
 	uint8_t m_sub2main[2];
 	int m_main2sub_pending;
 	int m_sub2main_pending;
-	uint8_t m_rst10_irq;
-	uint8_t m_rst18_irq;
+	bool m_rst10_irq;
+	bool m_rst18_irq;
+	bool m_rst10_service;
+	bool m_rst18_service;
 
 	enum
 	{
 		VECTOR_INIT,
 		RST10_ASSERT,
 		RST10_CLEAR,
+		RST10_ACKNOWLEDGE,
+		RST10_EOI,
 		RST18_ASSERT,
-		RST18_CLEAR
+		RST18_ACKNOWLEDGE,
+		RST18_EOI
 	};
 };
 

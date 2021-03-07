@@ -491,10 +491,12 @@ static GFXDECODE_START(gfx_radionic)
 GFXDECODE_END
 
 
-FLOPPY_FORMATS_MEMBER( trs80_state::floppy_formats )
-	FLOPPY_TRS80_FORMAT,
-	FLOPPY_DMK_FORMAT
-FLOPPY_FORMATS_END
+void trs80_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_TRS80_FORMAT);
+	fr.add(FLOPPY_DMK_FORMAT);
+}
 
 static void trs80_floppies(device_slot_interface &device)
 {

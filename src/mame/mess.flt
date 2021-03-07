@@ -43,6 +43,7 @@ alesis_qs.cpp
 alfaskop41xx.cpp
 alphajuno.cpp
 alphasma.cpp
+alphasma3k.cpp
 alphatan.cpp
 alphatpc16.cpp
 alphatpx.cpp
@@ -99,6 +100,7 @@ attache.cpp
 aussiebyte.cpp
 ave_arb.cpp
 avigo.cpp
+aviion88k.cpp
 avrmax.cpp
 ax20.cpp
 b16.cpp
@@ -214,6 +216,7 @@ d6800.cpp
 d6809.cpp
 dai.cpp
 daruma.cpp
+datacast.cpp
 datum.cpp
 dbox.cpp
 dccons.cpp
@@ -256,6 +259,7 @@ ec65.cpp
 ec7915.cpp
 einstein.cpp
 eispc.cpp
+elan_ep3a19a.cpp
 elan_eu3a05.cpp
 elan_eu3a14.cpp
 electron.cpp
@@ -285,6 +289,7 @@ eurocom2.cpp
 europc.cpp
 eva.cpp
 evmbug.cpp
+ews4800.cpp
 excali64.cpp
 exelv.cpp
 exorciser.cpp
@@ -382,9 +387,11 @@ hektor.cpp
 hhtiger.cpp
 hh_amis2k.cpp
 hh_cop400.cpp
+hh_cops1.cpp
 hh_hmcs40.cpp
 hh_melps4.cpp
 hh_pic16.cpp
+hh_pps41.cpp
 hh_sm510.cpp
 hh_tms1k.cpp
 hh_ucom4.cpp
@@ -425,6 +432,7 @@ ibmpcjr.cpp
 icatel.cpp
 icebox.cpp
 ie15.cpp
+iez80.cpp
 if800.cpp
 ikt5a.cpp
 imds2.cpp
@@ -463,6 +471,7 @@ jade.cpp
 jazz.cpp
 jensen.cpp
 jonos.cpp
+jornada.cpp
 jr100.cpp
 jr200.cpp
 jtc.cpp
@@ -541,6 +550,7 @@ macquadra700.cpp
 magiceyes_pollux_vr3520f.cpp
 magnum.cpp
 mattelchess.cpp
+mbc020.cpp
 mbc200.cpp
 mbc55x.cpp
 mbee.cpp
@@ -605,6 +615,8 @@ miniframe.cpp
 minitel_2_rpic.cpp
 mips.cpp
 mits680b.cpp
+miuchiz.cpp
+mk1forth.cpp
 mk14.cpp
 mk85.cpp
 mk90.cpp
@@ -684,7 +696,7 @@ novag_micro.cpp
 novag_micro2.cpp
 novag_savant.cpp
 novag_sexpert.cpp
-novag_supremo.cpp
+novag_snova.cpp
 ns5652.cpp
 o2.cpp
 ob68k1a.cpp
@@ -845,6 +857,7 @@ roland_tr707.cpp
 roland_tr909.cpp
 roland_u20.cpp
 rt1715.cpp
+rtpc.cpp
 rvoice.cpp
 rx78.cpp
 rz1.cpp
@@ -948,7 +961,8 @@ spg2xx_zone.cpp
 squale.cpp
 ssem.cpp
 st17xx.cpp
-st22xx_bbl338.cpp
+st2302u_bbl_rom.cpp
+st2302u_bbl_spi.cpp
 storio.cpp
 studio2.cpp
 sun1.cpp
@@ -976,6 +990,7 @@ sys2900.cpp
 sys9002.cpp
 systec.cpp
 systel1.cpp
+tabe22.cpp
 talkingbb.cpp
 talkingfb.cpp
 tamag1.cpp
@@ -1066,7 +1081,6 @@ unior.cpp
 unistar.cpp
 univac.cpp
 unixpc.cpp
-unk6502_st2xxx.cpp
 ut88.cpp
 uzebox.cpp
 v100.cpp

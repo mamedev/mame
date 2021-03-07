@@ -33,7 +33,7 @@ void electron_ap5_device::device_add_mconfig(machine_config &config)
 	m_romslot[1]->set_device_load(FUNC(electron_ap5_device::rom2_load));
 
 	/* via */
-	VIA6522(config, m_via, DERIVED_CLOCK(1, 16));
+	MOS6522(config, m_via, DERIVED_CLOCK(1, 16));
 	m_via->readpb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_r));
 	m_via->writepb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_w));
 	m_via->cb1_handler().set(m_userport, FUNC(bbc_userport_slot_device::write_cb1));

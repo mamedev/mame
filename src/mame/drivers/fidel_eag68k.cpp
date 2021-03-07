@@ -643,6 +643,7 @@ void eag_state::eagv2(machine_config &config)
 	/* basic machine hardware */
 	RAM(config, m_ram).set_extra_options("128K, 512K, 1M");
 	m_ram->set_default_size("128K");
+	m_ram->set_default_value(0);
 }
 
 void eag_state::eagv3(machine_config &config)

@@ -100,9 +100,9 @@ private:
 
 void hitpoker_state::video_start()
 {
-	m_videoram = std::make_unique<uint8_t[]>(0x35ff);
-	m_paletteram = std::make_unique<uint8_t[]>(0x1000);
-	m_colorram = std::make_unique<uint8_t[]>(0x2000);
+	m_videoram = make_unique_clear<uint8_t[]>(0x3600);
+	m_paletteram = make_unique_clear<uint8_t[]>(0x1000);
+	m_colorram = make_unique_clear<uint8_t[]>(0x2000);
 }
 
 uint32_t hitpoker_state::screen_update_hitpoker(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

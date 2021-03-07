@@ -288,7 +288,7 @@ const char *next_state::dma_name(int slot)
 
 void next_state::dma_drq_w(int slot, bool state)
 {
-	//  fprintf(stderr, "DMA drq_w %d, %d\n", slot, state);
+	//  logerror("DMA drq_w %d, %d\n", slot, state);
 	dma_slot &ds = dma_slots[slot];
 	ds.drq = state;
 	if(state && (ds.state & DMA_ENABLE)) {
@@ -520,9 +520,9 @@ void next_state::dma_do_ctrl_w(int slot, uint8_t data)
 {
 	const char *name = dma_name(slot);
 #if 0
-	fprintf(stderr, "dma_ctrl_w %s %02x (%08x)\n", name, data, maincpu->pc());
+	logerror("dma_ctrl_w %s %02x (%08x)\n", name, data, maincpu->pc());
 
-	fprintf(stderr, "  ->%s%s%s%s%s%s%s\n",
+	logerror("  ->%s%s%s%s%s%s%s\n",
 			data & DMA_SETENABLE ? " enable" : "",
 			data & DMA_SETSUPDATE ? " supdate" : "",
 			data & DMA_SETREAD ? " read" : "",
@@ -553,7 +553,7 @@ void next_state::dma_do_ctrl_w(int slot, uint8_t data)
 	}
 	if(data & DMA_SETENABLE) {
 		ds.state |= DMA_ENABLE;
-		//      fprintf(stderr, "dma slot %d drq=%s\n", slot, ds.drq ? "on" : "off");
+		//      logerror("dma slot %d drq=%s\n", slot, ds.drq ? "on" : "off");
 		if(ds.drq)
 			dma_drq_w(slot, ds.drq);
 	}
@@ -813,13 +813,13 @@ void next_state::ramdac_w(offs_t offset, uint8_t data)
 			break;
 
 		default:
-			fprintf(stderr, "ramdac_w %d, %02x\n", offset, data);
+			logerror("ramdac_w %d, %02x\n", offset, data);
 			break;
 		}
 		break;
 
 	default:
-		fprintf(stderr, "ramdac_w %d, %02x\n", offset, data);
+		logerror("ramdac_w %d, %02x\n", offset, data);
 		break;
 	}
 }
@@ -1006,10 +1006,6 @@ void next_state::next_2c_c_mem(address_map &map)
 static INPUT_PORTS_START( next )
 INPUT_PORTS_END
 
-FLOPPY_FORMATS_MEMBER( next_state::floppy_formats )
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
-
 static void next_floppies(device_slot_interface &device)
 {
 	device.option_add("35ed", FLOPPY_35_ED);
@@ -1070,6 +1066,7 @@ void next_state::next_base(machine_config &config)
 	net->tx_drq().set(FUNC(next_state::net_tx_drq));
 	net->rx_drq().set(FUNC(next_state::net_rx_drq));
 
+	SOFTWARE_LIST(config, "cdrom_list").set_original("next_cdrom");
 	SOFTWARE_LIST(config, "hdd_list").set_original("next_hdd");
 }
 
@@ -1085,7 +1082,7 @@ void next_state::next_fdc_config(machine_config &config)
 	N82077AA(config, fdc, 24'000'000, n82077aa_device::mode_t::PS2);
 	fdc->intrq_wr_callback().set(FUNC(next_state::fdc_irq));
 	fdc->drq_wr_callback().set(FUNC(next_state::fdc_drq));
-	FLOPPY_CONNECTOR(config, "fdc:0", next_floppies, "35ed", next_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", next_floppies, "35ed", floppy_image_device::default_pc_floppy_formats);
 
 	// software list
 	SOFTWARE_LIST(config, "flop_list").set_original("next");

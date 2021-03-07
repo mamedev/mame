@@ -29,7 +29,7 @@ public:
 	// construction/destruction
 	spectrum_swiftdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_button) { m_rombank |= newval << 12; m_slot->nmi_w(newval ? ASSERT_LINE : CLEAR_LINE); };
 
 protected:

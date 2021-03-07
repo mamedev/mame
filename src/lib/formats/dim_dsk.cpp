@@ -132,7 +132,7 @@ const char *dim_format::extensions() const
 	return "dim";
 }
 
-int dim_format::identify(io_generic *io, uint32_t form_factor)
+int dim_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t h[16];
 
@@ -144,7 +144,7 @@ int dim_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool dim_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool dim_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int offset = 0x100;
 	uint8_t h;
@@ -223,7 +223,7 @@ bool dim_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 }
 
 
-bool dim_format::save(io_generic *io, floppy_image *image)
+bool dim_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	return false;
 }

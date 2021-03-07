@@ -716,6 +716,17 @@ static INPUT_PORTS_START( headons )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) /* no color/bw option */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( hocrash )
+	PORT_INCLUDE( headons )
+
+	PORT_MODIFY("IN0")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x03, "4" )
+INPUT_PORTS_END
+
 // e7f1: coin counter
 static INPUT_PORTS_START( headonsa )
 	PORT_INCLUDE( headons )
@@ -4105,7 +4116,7 @@ GAME( 1979, headons,    headon,   headons,   headons,   vicdual_state,  empty_in
 GAME( 1979, headonsa,   headon,   headons,   headonsa,  headonsa_state, empty_init, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headonmz,   headon,   headon,    headonmz,  vicdual_state,  empty_init, ROT0,   "bootleg", "Head On (bootleg, alt maze)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, supcrash,   headon,   headons,   supcrash,  vicdual_state,  empty_init, ROT0,   "bootleg (VGG)", "Super Crash (bootleg of Head On)", MACHINE_NO_SOUND  | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, hocrash,    headon,   headons,   headons,   vicdual_state,  empty_init, ROT0,   "bootleg (Fraber)", "Crash (bootleg of Head On)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, hocrash,    headon,   headons,   hocrash,   vicdual_state,  empty_init, ROT0,   "bootleg (Fraber)", "Crash (bootleg of Head On)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headon2,    0,        headon2,   headon2,   vicdual_state,  empty_init, ROT0,   "Sega", "Head On 2",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headon2s,   headon2,  headon2bw, headon2s,  headonsa_state, empty_init, ROT0,   "bootleg (Sidam)", "Head On 2 (Sidam bootleg)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, car2,       headon2,  headon2bw, car2,      vicdual_state,  empty_init, ROT0,   "bootleg (RZ Bologna)", "Car 2 (bootleg of Head On 2)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // title still says 'HeadOn 2'

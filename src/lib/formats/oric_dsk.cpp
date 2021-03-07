@@ -35,7 +35,7 @@ bool oric_dsk_format::supports_save() const
 	return true;
 }
 
-int oric_dsk_format::identify(io_generic *io, uint32_t form_factor)
+int oric_dsk_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t h[256];
 	io_generic_read(io, h, 0, 256);
@@ -54,7 +54,7 @@ int oric_dsk_format::identify(io_generic *io, uint32_t form_factor)
 	return 100;
 }
 
-bool oric_dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool oric_dsk_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t h[256];
 	uint8_t t[6250+3];
@@ -103,7 +103,7 @@ bool oric_dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *i
 	return true;
 }
 
-bool oric_dsk_format::save(io_generic *io, floppy_image *image)
+bool oric_dsk_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	return true;
 }

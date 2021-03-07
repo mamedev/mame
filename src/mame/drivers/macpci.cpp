@@ -129,7 +129,7 @@ void macpci_state::pippin(machine_config &config)
 	RAM(config, m_ram);
 	m_ram->set_default_size("32M");
 
-	VIA6522(config, m_via1, C7M/10);
+	R65NC22(config, m_via1, C7M/10);
 	m_via1->readpa_handler().set(FUNC(macpci_state::mac_via_in_a));
 	m_via1->readpb_handler().set(FUNC(macpci_state::mac_via_in_b));
 	m_via1->writepa_handler().set(FUNC(macpci_state::mac_via_out_a));

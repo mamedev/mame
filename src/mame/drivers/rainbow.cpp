@@ -588,7 +588,7 @@ protected:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(hd_motor_tick);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	uint16_t vram_r(offs_t offset);
@@ -872,12 +872,11 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_base_state::hgdc_display_pixels )
 	}
 }
 
-FLOPPY_FORMATS_MEMBER(rainbow_base_state::floppy_formats)
-FLOPPY_RX50IMG_FORMAT,
-FLOPPY_TD0_FORMAT,
-FLOPPY_IMD_FORMAT,
-FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
+void rainbow_base_state::floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_RX50IMG_FORMAT);
+}
 
 static void rainbow_floppies(device_slot_interface &device)
 {
@@ -3388,10 +3387,19 @@ void rainbow_modelb_state::rainbow_modelb(machine_config &config)
 ROM_START(rainbow100a)
 	ROM_REGION(0x100000, "maincpu", 0)
 
-	ROM_LOAD("23-176e4-00.e89", 0xfa000, 0x2000, CRC(405e9619) SHA1(86604dccea84b46e05d705abeda25b12f7cc8c59)) // ROM (FA000-FBFFF) (E89) 8 K
-	ROM_LOAD("23-177e4-00.e90", 0xfc000, 0x2000, CRC(1ec72a66) SHA1(ed19944ae711e97d6bec34c885be04c4c3c95852)) // ROM (FC000-FDFFF) (E90) 8 K
+	ROM_DEFAULT_BIOS("040311a")
+	// printer and comm. port error messages, keyboard works, machine boots
+	ROM_SYSTEM_BIOS(0, "040311a", "Version 04.03.11A")
+	ROMX_LOAD("23-176e4-00.e89", 0xfa000, 0x2000, CRC(405e9619) SHA1(86604dccea84b46e05d705abeda25b12f7cc8c59), ROM_BIOS(0)) // ROM (FA000-FBFFF) (E89) 8 K
+	ROMX_LOAD("23-177e4-00.e90", 0xfc000, 0x2000, CRC(1ec72a66) SHA1(ed19944ae711e97d6bec34c885be04c4c3c95852), ROM_BIOS(0)) // ROM (FC000-FDFFF) (E90) 8 K
 	ROM_FILL(0xfa26d, 1, 0x00) // [0xFA000 + 0x026d] disable CRC check   [100-A ROM]
 	ROM_FILL(0xfadea, 1, 0x00) // [0xFA000 + 0x0dea] Floppy workaround: in case of Z80 RESPONSE FAILURE ($80 bit set in AL), don't block floppy access
+
+	// printer, comm. and a third error message, no keyboard, doesn't boot
+	ROM_SYSTEM_BIOS(1, "010111a", "Version 01.01.11A")
+	ROMX_LOAD("23-090e4-0_11-24.bin", 0xfa000, 0x2000, CRC(08d83c93) SHA1(ee26c3162071ccc3f7dce1c2afb9933329a287de), ROM_BIOS(1)) // ROM (FA000-FBFFF) (E89) 8 K
+	ROMX_LOAD("23-091e4-0_11-24.bin", 0xfc000, 0x2000, CRC(387c50f2) SHA1(598f04ccbdf0e34826785992a56891d6674ac47e), ROM_BIOS(1)) // ROM (FC000-FDFFF) (E90) 8 K
+
 
 	// SOCKETED LANGUAGE ROM (E91) with 1 single localization per ROM -
 	ROM_LOAD("23-092e4-00.e91", 0xfe000, 0x2000, CRC(c269175a) SHA1(e82cf69b811f1e376621277f81db28e299fe06f0))  // ROM (FE000-FFFFF) (E91) 8 K - English (?)

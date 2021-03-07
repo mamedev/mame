@@ -80,7 +80,7 @@ void simpsons_state::simpsons_video_banking( int bank )
 	if(bank & 1)
 		m_palette_view.select(0);
 	else
-		m_palette_view.disable();	
+		m_palette_view.disable();
 	m_video_view.select((bank >> 1) & 1);
 }
 

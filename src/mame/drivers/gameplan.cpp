@@ -976,18 +976,18 @@ void gameplan_state::gameplan(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.33);
 
 	/* via */
-	VIA6522(config, m_via_0, GAMEPLAN_MAIN_CPU_CLOCK);
+	MOS6522(config, m_via_0, GAMEPLAN_MAIN_CPU_CLOCK);
 	m_via_0->writepa_handler().set(FUNC(gameplan_state::video_data_w));
 	m_via_0->writepb_handler().set(FUNC(gameplan_state::gameplan_video_command_w));
 	m_via_0->ca2_handler().set(FUNC(gameplan_state::video_command_trigger_w));
 	m_via_0->irq_handler().set(FUNC(gameplan_state::via_irq));
 
-	VIA6522(config, m_via_1, GAMEPLAN_MAIN_CPU_CLOCK);
+	MOS6522(config, m_via_1, GAMEPLAN_MAIN_CPU_CLOCK);
 	m_via_1->readpa_handler().set(FUNC(gameplan_state::io_port_r));
 	m_via_1->writepb_handler().set(FUNC(gameplan_state::io_select_w));
 	m_via_1->cb2_handler().set(FUNC(gameplan_state::coin_w));
 
-	VIA6522(config, m_via_2, GAMEPLAN_MAIN_CPU_CLOCK);
+	MOS6522(config, m_via_2, GAMEPLAN_MAIN_CPU_CLOCK);
 	m_via_2->readpb_handler().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	m_via_2->writepa_handler().set(FUNC(gameplan_state::audio_cmd_w));
 	m_via_2->ca2_handler().set(FUNC(gameplan_state::audio_trigger_w));

@@ -41,7 +41,7 @@ protected:
 
 private:
 	void wd1770_control_w(uint8_t data);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	required_device<wd1770_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;

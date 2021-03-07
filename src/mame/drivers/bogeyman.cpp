@@ -33,7 +33,7 @@ void bogeyman_state::ay8910_latch_w(uint8_t data)
 void bogeyman_state::ay8910_control_w(uint8_t data)
 {
 	// bit 0 is flipscreen
-	flip_screen_set(data & 0x01);
+	flip_screen_set(~data & 0x01);
 
 	// bit 5 goes to 8910 #0 BDIR pin
 	if ((m_last_write & 0x20) == 0x20 && (data & 0x20) == 0x00)
@@ -295,4 +295,5 @@ ROM_END
 
 /* Game Driver */
 
-GAME( 1985, bogeyman, 0, bogeyman, bogeyman, bogeyman_state, empty_init, ROT0, "Technos Japan", "Bogey Manor", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+// ROT180 confirmed by Kold
+GAME( 1985, bogeyman, 0, bogeyman, bogeyman, bogeyman_state, empty_init, ROT180, "Technos Japan", "Bogey Manor", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

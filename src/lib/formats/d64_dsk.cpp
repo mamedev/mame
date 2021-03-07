@@ -92,7 +92,7 @@ int d64_format::find_size(io_generic *io, uint32_t form_factor) const
 	return -1;
 }
 
-int d64_format::identify(io_generic *io, uint32_t form_factor)
+int d64_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	int type = find_size(io, form_factor);
 
@@ -206,7 +206,7 @@ void d64_format::fix_end_gap(floppy_image_format_t::desc_e* desc, int remaining_
 	desc[22].p1 >>= remaining_size & 0x01;
 }
 
-bool d64_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool d64_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int type = find_size(io, form_factor);
 	if(type == -1)
@@ -266,7 +266,7 @@ bool d64_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	return true;
 }
 
-bool d64_format::save(io_generic *io, floppy_image *image)
+bool d64_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	const format &f = formats[0];
 
@@ -289,27 +289,23 @@ bool d64_format::save(io_generic *io, floppy_image *image)
 
 void d64_format::extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head, int sector_count)
 {
-	uint8_t bitstream[500000/8];
-	uint8_t sectdata[50000];
-	desc_xs sectors[256];
 	int physical_track = this->get_physical_track(f, head, track);
 	int cell_size = this->get_cell_size(f, track);
-	int track_size;
 
 	// Extract the sectors
-	generate_bitstream_from_track(physical_track, head, cell_size, bitstream, track_size, image);
-	extract_sectors_from_bitstream_gcr5(bitstream, track_size, sectors, sectdata, sizeof(sectdata), head, f.track_count);
+	auto bitstream = generate_bitstream_from_track(physical_track, head, cell_size, image);
+	auto sectors = extract_sectors_from_bitstream_gcr5(bitstream, head, f.track_count);
 
 	for(int i=0; i<sector_count; i++) {
 		desc_s &ds = sdesc[i];
-		desc_xs &xs = sectors[ds.sector_id];
-		if(!xs.data)
+		const auto &data = sectors[ds.sector_id];
+		if(data.empty())
 			memset((void *)ds.data, 0, ds.size);
-		else if(xs.size < ds.size) {
-			memcpy((void *)ds.data, xs.data, xs.size);
-			memset((uint8_t *)ds.data + xs.size, 0, xs.size - ds.size);
+		else if(data.size() < ds.size) {
+			memcpy((void *)ds.data, data.data(), data.size());
+			memset((uint8_t *)ds.data + data.size(), 0, data.size() - ds.size);
 		} else
-			memcpy((void *)ds.data, xs.data, ds.size);
+			memcpy((void *)ds.data, data.data(), ds.size);
 	}
 }
 

@@ -78,13 +78,12 @@ Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/cxd1095.h"
-#include "rendlay.h"
 
 #include "includes/megadriv.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
-#include "softlist.h"
+#include "layout/generic.h"
 
 #define MASTER_CLOCK        53693100
 
@@ -334,14 +333,14 @@ uint8_t mtech_state::sms_ioport_dc_r()
 {
 	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
 	/* bit 4: TL-A; bit 5: TR-A */
-	return (machine().root_device().ioport("PAD1")->read() & 0x3f) | ((machine().root_device().ioport("PAD2")->read() & 0x03) << 6);
+	return (ioport("PAD1")->read() & 0x3f) | ((ioport("PAD2")->read() & 0x03) << 6);
 }
 
 uint8_t mtech_state::sms_ioport_dd_r()
 {
 	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
 	/* bit 2: TL-B; bit 3: TR-B; bit 4: RESET; bit 5: unused; bit 6: TH-A; bit 7: TH-B*/
-	return ((machine().root_device().ioport("PAD2")->read() & 0x3c) >> 2) | 0x10;
+	return ((ioport("PAD2")->read() & 0x3c) >> 2) | 0x10;
 }
 
 
@@ -749,12 +748,12 @@ image_init_result mtech_state::load_cart(device_image_interface &image, generic_
 		return image_init_result::FAIL;
 	else
 	{
-		if (!core_stricmp("genesis", pcb_name))
+		if (!strcmp("genesis", pcb_name))
 		{
 			osd_printf_debug("cart%d is genesis\n", gameno + 1);
 			m_cart_is_genesis[gameno] = 1;
 		}
-		else if (!core_stricmp("sms", pcb_name))
+		else if (!strcmp("sms", pcb_name))
 		{
 			osd_printf_debug("cart%d is sms\n", gameno + 1);
 			m_cart_is_genesis[gameno] = 0;

@@ -257,7 +257,7 @@ ROM_START( dogstdx )
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)
 	// Not dumped
 
-	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)    
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)
 	// Not dumped
 
 	DISK_REGION( "ide:0:hdd:image" )

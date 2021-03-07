@@ -113,7 +113,7 @@ void buggychl_state::sound_enable_w(uint8_t data)
 	// does this really only control the sound irq 'timer' enable state, rather than the entire sound system?
 	// this would be more in line with the (admittedly incorrect) schematic...
 	//logerror("Sound_enable_w written with data of %02x\n", data);
-	machine().sound().system_enable(data & 1);
+	machine().sound().system_mute(!BIT(data, 0));
 }
 
 uint8_t buggychl_state::mcu_status_r()
@@ -423,7 +423,7 @@ static INPUT_PORTS_START( buggychl )
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_NAME("P1 Pedal") PORT_SENSITIVITY(100) PORT_KEYDELTA(15)   /* accelerator */
 
 	PORT_START("WHEEL") /* wheel */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_REVERSE
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_REVERSE
 INPUT_PORTS_END
 
 

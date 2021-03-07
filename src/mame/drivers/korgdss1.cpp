@@ -446,8 +446,8 @@ void korg_dss1_state::klm780(machine_config &config)
 
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, true, true); // uPD765AC; clocked through SED9420C
 	m_fdc->intrq_wr_callback().set_inputline(m_cpu1, I8085_INTR_LINE);
-	FLOPPY_CONNECTOR(config, "fdc:0", dss1_floppies, "35dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", dss1_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", dss1_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", dss1_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	GENERIC_LATCH_8(config, m_latch[0]);
 	m_latch[0]->data_pending_callback().set_inputline(m_cpu1, I8085_RST65_LINE).invert();
@@ -513,7 +513,7 @@ void korg_dssmsrk_state::dssmsrk(machine_config &config)
 	m_msrkcpu->out_iow_cb<1>().set(m_scsic, FUNC(ncr53c80_device::dma_w));
 	m_msrkcpu->out_eop_cb().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 	//m_msrkcpu->out_eop_cb().append(m_scsic, FUNC(ncr53c80_device::eop_w));
-	m_msrkcpu->out_handler<1>().set(m_msrkcpu, FUNC(v40_device::tclk_w));
+	m_msrkcpu->tout1_cb().set(m_msrkcpu, FUNC(v40_device::tclk_w));
 
 	klm780(config);
 	config.device_remove("cpu1");

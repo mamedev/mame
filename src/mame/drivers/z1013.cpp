@@ -331,10 +331,10 @@ SNAPSHOT_LOAD_MEMBER(z1013_state::snapshot_cb)
 0020 up   - Program to load
 */
 
-	uint8_t* data= auto_alloc_array(machine(), uint8_t, snapshot_size);
+	std::vector<uint8_t> data(image.length());
 	uint16_t startaddr,endaddr,runaddr;
 
-	image.fread( data, snapshot_size);
+	image.fread(&data[0], image.length());
 
 	startaddr = data[0] + data[1]*256;
 	endaddr   = data[2] + data[3]*256;
@@ -350,7 +350,7 @@ SNAPSHOT_LOAD_MEMBER(z1013_state::snapshot_cb)
 	}
 
 	memcpy (m_maincpu->space(AS_PROGRAM).get_read_ptr(startaddr),
-			data+0x20, endaddr - startaddr + 1);
+			&data[0x20], endaddr - startaddr + 1);
 
 	if (runaddr)
 		m_maincpu->set_state_int(Z80_PC, runaddr);
