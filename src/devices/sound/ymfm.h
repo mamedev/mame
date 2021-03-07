@@ -122,6 +122,8 @@ public:
 	u16 multi_block_freq0() const /* 14 bits */ { return 0; } // not on OPM,OPL
 	u16 multi_block_freq1() const /* 14 bits */ { return 0; } // not on OPM,OPL
 	u16 multi_block_freq2() const /* 14 bits */ { return 0; } // not on OPM,OPL
+	u8 rhythm_enable() const      /*  1 bit  */ { return 0; } // not on OPM,OPN,OPN2
+	u8 rhythm_keyon() const       /*  5 bits */ { return 0; } // not on OPM,OPN,OPN2
 
 	// per-channel registers that aren't universally supported
 	u8 pan_right() const          /*  1 bit  */ { return 1; } // not on OPN,OPL
@@ -957,8 +959,13 @@ public:
 	{
 		if ((regindex & 0xf0) == 0xb0)
 		{
-			channel = BIT(regindex, 0, 4);
-			if (channel < CHANNELS)
+			channel = regindex & 0x0f;
+			if (channel == 13 && BIT(data, 5))
+			{
+				opmask = BIT(data, 0, 5);
+				return true;
+			}
+			else if (channel < CHANNELS)
 			{
 				opmask = BIT(data, 5) ? 3 : 0;
 				return true;
@@ -998,8 +1005,8 @@ public:
 	u8 note_select() const        /*  1 bit  */ { return sysbyte(0x08, 6, 1); }
 	u8 lfo_am_depth() const       /*  1 bit  */ { return sysbyte(0xbd, 7, 1); }
 	u8 lfo_pm_depth() const       /*  1 bit  */ { return sysbyte(0xbd, 6, 1); }
-	u8 rhythm_enable() const      /*  1 bit  */ { return sysbyte(0xbd, 5, 1); } // new
-	u8 rhythm_keyon() const       /*  5 bits */ { return sysbyte(0xbd, 4, 0); } // new
+	u8 rhythm_enable() const      /*  1 bit  */ { return sysbyte(0xbd, 5, 1); }
+	u8 rhythm_keyon() const       /*  5 bits */ { return sysbyte(0xbd, 4, 0); }
 
 	// per-channel registers
 	u16 block_freq() const        /* 13 bits */ { return chword(0xb0, 0, 5, 0xa0, 0, 8) * 2; } // 13->14 bits
@@ -1072,8 +1079,11 @@ public:
 	// master clocking function
 	void clock(u32 env_counter, s8 lfo_raw_pm, u16 block_freq);
 
+	// return the current phase value
+	u16 phase() const { return m_phase >> 10; }
+
 	// compute operator volume
-	s16 compute_volume(u16 modulation, u16 am_offset) const;
+	s16 compute_volume(u16 phase, u16 am_offset) const;
 
 	// compute volume for the OPM noise channel
 	s16 compute_noise_volume(u8 noise_state, u16 am_offset) const;
@@ -1150,7 +1160,12 @@ public:
 	void clock(u32 env_counter, s8 lfo_raw_pm, bool is_multi_freq);
 
 	// compute the channel output and add to the left/right output sums
-	void output(u8 lfo_raw_am, u8 noise_state, s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax) const;
+	void output(u8 lfo_raw_am, u8 noise_state, s32 &lsum, s32 &rsum, u8 rshift, s32 clipmax) const;
+
+	// compute the special OPL rhythm channel outputs
+	void output_rhythm_ch6(u8 lfo_raw_am, s32 &lsum, s32 &rsum, u8 rshift, s32 clipmax) const;
+	void output_rhythm_ch7(u8 lfo_raw_am, u8 noise_state, u8 phase_select, s32 &lsum, s32 &rsum, u8 rshift, s32 clipmax) const;
+	void output_rhythm_ch8(u8 lfo_raw_am, u8 phase_select, s32 &lsum, s32 &rsum, u8 rshift, s32 clipmax) const;
 
 private:
 	// convert a 6/8-bit raw AM value into an amplitude offset based on sensitivity
@@ -1190,7 +1205,7 @@ public:
 	u32 clock(u32 chanmask);
 
 	// compute sum of channel outputs
-	void output(s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax, u32 chanmask) const;
+	void output(s32 &lsum, s32 &rsum, u8 rshift, s32 clipmax, u32 chanmask) const;
 
 	// write to the OPN registers
 	void write(u16 regnum, u8 data);
