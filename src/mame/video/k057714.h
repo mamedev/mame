@@ -70,8 +70,15 @@ private:
 	uint32_t m_layer_select;
 	uint32_t m_reg_6c;
 
-	uint32_t m_display_width;
-	uint32_t m_display_height;
+	uint32_t m_display_h_visarea;
+	uint32_t m_display_h_frontporch;
+	uint32_t m_display_h_backporch;
+	uint32_t m_display_h_syncpulse;
+	uint32_t m_display_v_visarea;
+	uint32_t m_display_v_frontporch;
+	uint32_t m_display_v_backporch;
+	uint32_t m_display_v_syncpulse;
+	bool m_display_is_dirty;
 
 	devcb_write_line m_irq;
 };

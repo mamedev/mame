@@ -10,6 +10,8 @@
 
     GQ972 PWB(A2) 0000070609 Main board
     -----------------------------------
+        25.175 MHz clock (near GCUs and VGA connectors)
+        16.6666 MHz clock (near GCUs and VGA connectors)
         OSC 66.0000MHz
         IBM PowerPC 403GCX at 66MHz
         (2x) Konami 0000057714 (2D object processor)
@@ -538,10 +540,7 @@ void firebeat_state::firebeat(machine_config &config)
 	m_gcu->irq_callback().set(FUNC(firebeat_state::gcu_interrupt));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(512, 384);
-	screen.set_visarea(0, 511, 0, 383);
+	screen.set_raw(16.6666_MHz_XTAL, 685, 0, 512, 416, 0, 384);
 	screen.set_screen_update(FUNC(firebeat_state::screen_update_firebeat_0));
 	screen.set_palette("palette");
 
@@ -1203,9 +1202,7 @@ void firebeat_bm3_state::firebeat_bm3(machine_config &config)
 
 	// beatmania III is the only game on the Firebeat platform to use 640x480
 	screen_device *screen = subdevice<screen_device>("screen");
-	screen->set_size(640, 480);
-	screen->set_visarea(0, 639, 0, 479);
-	screen->screen_vblank().set(FUNC(firebeat_bm3_state::bm3_vblank));
+	screen->set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480);
 
 	ATA_INTERFACE(config, m_spuata).options(firebeat_ata_devices, "hdd", nullptr, true);
 	m_spuata->irq_handler().set(FUNC(firebeat_bm3_state::spu_ata_interrupt));
@@ -1617,18 +1614,12 @@ void firebeat_kbm_state::firebeat_kbm(machine_config &config)
 	m_gcu_sub->irq_callback().set(FUNC(firebeat_kbm_state::gcu_interrupt));
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
-	lscreen.set_refresh_hz(60);
-	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	lscreen.set_size(512, 384);
-	lscreen.set_visarea(0, 511, 0, 383);
+	lscreen.set_raw(16.6666_MHz_XTAL, 685, 0, 512, 416, 0, 384);
 	lscreen.set_screen_update(FUNC(firebeat_kbm_state::screen_update_firebeat_0));
 	lscreen.set_palette("palette");
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
-	rscreen.set_refresh_hz(60);
-	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	rscreen.set_size(512, 384);
-	rscreen.set_visarea(0, 511, 0, 383);
+	rscreen.set_raw(16.6666_MHz_XTAL, 685, 0, 512, 416, 0, 384);
 	rscreen.set_screen_update(FUNC(firebeat_kbm_state::screen_update_firebeat_1));
 	rscreen.set_palette("palette");
 
