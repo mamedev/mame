@@ -2957,7 +2957,7 @@
 		</reel>
 	</element>
 	<element name="reel3_viewright" defstate="0">
-		<reel reelreversed="0" stateoffset="-800" numsymbolsvisible="1" symbollist="9,8,7,6,5,4,3,2,A,K,Q,J">
+		<reel reelreversed="0" stateoffset="-1000" numsymbolsvisible="1" symbollist="9,8,7,6,5,4,3,2,A,K,Q,J">
 			<color red="0.0" green="0.0" blue="0.0"/>
 		</reel>
 	</element>
