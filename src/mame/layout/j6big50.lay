@@ -2947,8 +2947,8 @@
 			<color red="0.0" green="0.0" blue="0.0"/>
 		</reel>
 	</element>
-	<element name="reel3" defstate="0">
-		<reel reelreversed="0" stateoffset="8193" numsymbolsvisible="1" symbollist="3   9,2   8,A   7,K   6,Q   5,J   4,9   3,8   2,7   A,6   K,5   Q,4   J">
+	<element name="reel3" defstate="0"> <!-- should be a wheel, not a reel, technically all symbols are partially visible, and can be illuminated, not just the 2 at either edge used for gameplay -->
+		<reel reelreversed="0" stateoffset="-600" numsymbolsvisible="1" symbollist="3   9,2   8,A   7,K   6,Q   5,J   4,9   3,8   2,7   A,6   K,5   Q,4   J">
 			<color red="0.0" green="0.0" blue="0.0"/>
 		</reel>
 	</element>
