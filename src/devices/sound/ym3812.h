@@ -41,10 +41,9 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// internal state
-	ymopl2_engine m_opl;             // core OPL engine
-	sound_stream *m_stream;          // sound stream
-	attotime m_busy_duration;        // precomputed busy signal duration
 	u8 m_address;                    // address register
+	sound_stream *m_stream;          // sound stream
+	ymopl2_engine m_opl;             // core OPL engine
 };
 
 

@@ -1412,7 +1412,7 @@ ymfm_engine_base<RegisterType>::ymfm_engine_base(device_t &device) :
 	m_lfo_am(0),
 	m_status(0),
 	m_clock_prescale(RegisterType::DEFAULT_PRESCALE),
-	m_irq_mask(STATUS_TIMERA | STATUS_TIMERB),
+	m_irq_mask(RegisterType::STATUS_TIMERA | RegisterType::STATUS_TIMERB),
 	m_irq_state(0),
 	m_busy_end(attotime::zero),
 	m_timer{ nullptr, nullptr },
@@ -1638,22 +1638,10 @@ void ymfm_engine_base<RegisterType>::write(u16 regnum, u8 data)
 template<class RegisterType>
 u8 ymfm_engine_base<RegisterType>::status() const
 {
-	if (RegisterType::FAMILY != RegisterType::FAMILY_OPL)
-	{
-		// OPM/OPN have a traditional status register with a BUSY flag
-		u8 result = m_status & ~STATUS_BUSY;
-		if (m_device.machine().time() < m_busy_end)
-			result |= STATUS_BUSY;
-		return result;
-	}
-	else
-	{
-		// OPL has no busy flag, just the two timer statuses plus a
-		// combined status in the MSB
-		u8 result = (m_status & STATUS_TIMERA) ? 0xc0 : 0;
-		result |= (m_status & STATUS_TIMERB) ? 0xa0 : 0;
-		return result;
-	}
+	u8 result = m_status & ~RegisterType::STATUS_BUSY;
+	if (m_device.machine().time() < m_busy_end)
+		result |= RegisterType::STATUS_BUSY;
+	return result;
 }
 
 
@@ -1869,9 +1857,9 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::timer_handler)
 {
 	// update status
 	if (param == 0 && m_regs.enable_timer_a())
-		set_reset_status(STATUS_TIMERA, 0);
+		set_reset_status(RegisterType::STATUS_TIMERA, 0);
 	else if (param == 1 && m_regs.enable_timer_b())
-	 	set_reset_status(STATUS_TIMERB, 0);
+	 	set_reset_status(RegisterType::STATUS_TIMERB, 0);
 
 	// if timer A fired in CSM mode, trigger CSM on all relevant channels
 	if (param == 0 && m_regs.csm())
@@ -1914,6 +1902,12 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::check_interrupts)
 	u8 old_state = m_irq_state;
 	m_irq_state = ((m_status & m_irq_mask) != 0);
 
+	// set the IRQ status bit
+	if (m_irq_state)
+		m_status |= RegisterType::STATUS_IRQ;
+	else
+		m_status &= ~RegisterType::STATUS_IRQ;
+
 	// if changed, signal the new state
 	if (old_state != m_irq_state && !m_irq_handler.isnull())
 		m_irq_handler(m_irq_state ? ASSERT_LINE : CLEAR_LINE);
@@ -1933,9 +1927,9 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::synced_mode_w)
 
 	// reset timer status
 	if (m_regs.reset_timer_b())
-		set_reset_status(0, STATUS_TIMERB);
+		set_reset_status(0, RegisterType::STATUS_TIMERB);
 	if (m_regs.reset_timer_a())
-		set_reset_status(0, STATUS_TIMERA);
+		set_reset_status(0, RegisterType::STATUS_TIMERA);
 
 	// load timers
 	update_timer(1, m_regs.load_timer_b());

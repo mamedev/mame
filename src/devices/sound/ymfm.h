@@ -262,6 +262,12 @@ public:
 	static constexpr u8 EG_CLOCK_DIVIDER = 3;
 	static constexpr u32 CSM_TRIGGER_MASK = 0xff;
 
+	// status values
+	static constexpr u8 STATUS_TIMERA = 0x01;
+	static constexpr u8 STATUS_TIMERB = 0x02;
+	static constexpr u8 STATUS_BUSY = 0x80;
+	static constexpr u8 STATUS_IRQ = 0;
+
 	// constructor
 	ymopm_registers(u8 *regdata) :
 		ymfm_registers_base(regdata)
@@ -482,6 +488,12 @@ public:
 	static constexpr u8 DEFAULT_PRESCALE = 6;
 	static constexpr u8 EG_CLOCK_DIVIDER = 3;
 	static constexpr u32 CSM_TRIGGER_MASK = 1 << 2;
+
+	// status values
+	static constexpr u8 STATUS_TIMERA = 0x01;
+	static constexpr u8 STATUS_TIMERB = 0x02;
+	static constexpr u8 STATUS_BUSY = 0x80;
+	static constexpr u8 STATUS_IRQ = 0;
 
 	// constructor
 	ymopn_registers(u8 *regdata) :
@@ -908,6 +920,12 @@ public:
 	static constexpr u8 EG_CLOCK_DIVIDER = 1;
 	static constexpr u32 CSM_TRIGGER_MASK = 0x1ff;
 
+	// status values
+	static constexpr u8 STATUS_TIMERA = 0x40;
+	static constexpr u8 STATUS_TIMERB = 0x20;
+	static constexpr u8 STATUS_BUSY = 0;
+	static constexpr u8 STATUS_IRQ = 0x80;
+
 	// constructor
 	ymopl_registers(u8 *regdata) :
 		ymfm_registers_base(regdata)
@@ -1232,15 +1250,11 @@ template<class RegisterType>
 class ymfm_engine_base
 {
 public:
-	enum : u8
-	{
-		STATUS_TIMERA = 0x01,
-		STATUS_TIMERB = 0x02,
-		STATUS_BUSY = 0x80
-	};
-
 	// constructor
 	ymfm_engine_base(device_t &device);
+
+	// configuration helpers
+	auto irq_handler() { return m_irq_handler.bind(); }
 
 	// register for save states
 	void save(device_t &device);
@@ -1280,9 +1294,6 @@ public:
 
 	// set prescale factor (2/3/6)
 	void set_clock_prescale(u8 prescale) { m_clock_prescale = prescale; }
-
-	// configuration helpers
-	auto irq_handler() { return m_irq_handler.bind(); }
 
 	// reset the LFO state
 	void reset_lfo() { m_lfo_counter = 0; }

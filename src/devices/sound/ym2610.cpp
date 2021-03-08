@@ -57,7 +57,7 @@ u8 ym2610_device::read(offs_t offset)
 	switch (offset & 3)
 	{
 		case 0:	// status port, YM2203 compatible
-			result = m_opn.status() & (ymopna_engine::STATUS_TIMERA | ymopna_engine::STATUS_TIMERB | ymopna_engine::STATUS_BUSY);
+			result = m_opn.status() & (ymopna_registers::STATUS_TIMERA | ymopna_registers::STATUS_TIMERB | ymopna_registers::STATUS_BUSY);
 			break;
 
 		case 1: // data port (only SSG)

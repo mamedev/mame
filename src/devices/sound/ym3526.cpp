@@ -64,9 +64,9 @@ inline s32 fp_to_linear(s16 value)
 ym3526_device::ym3526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
-	m_opl(*this),
+	m_address(0),
 	m_stream(nullptr),
-	m_address(0)
+	m_opl(*this)
 {
 }
 
