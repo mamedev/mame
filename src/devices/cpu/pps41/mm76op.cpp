@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 
-// MM76 opcode handlers
+// MM76/shared opcode handlers
 
 #include "emu.h"
 #include "mm76.h"

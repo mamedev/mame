@@ -25,7 +25,7 @@ void mm75_device::op_i2c()
 }
 
 
-// slightly different opcodes
+// changed opcodes
 
 void mm75_device::op_ibm()
 {

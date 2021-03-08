@@ -62,6 +62,7 @@ protected:
 	address_space *m_data;
 
 	int m_icount;
+	int m_state_count;
 
 	// fixed settings or mask options
 	int m_prgwidth; // ROM/RAM address size
@@ -100,6 +101,7 @@ protected:
 	int m_c_in;
 	bool m_c_delay;
 	u8 m_s;
+	u8 m_x;
 	bool m_skip;
 	int m_skip_count;
 

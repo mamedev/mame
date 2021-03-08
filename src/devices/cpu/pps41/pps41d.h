@@ -28,8 +28,9 @@ protected:
 	// opcode mnemonics
 	enum e_mnemonics
 	{
-		em_ILL,
-		em_XAB, em_LBA, em_LB, em_EOB,
+		// MM76/shared
+		em_ILL /* 0! */,
+		em_XAB, em_LBA, em_LB, em_EOB2,
 		em_SB, em_RB, em_SKBF,
 		em_XAS, em_LSA,
 		em_L, em_X, em_XDSK, em_XNSK,
@@ -37,6 +38,11 @@ protected:
 		em_RT, em_RTSK, em_T, em_NOP, em_TL, em_TM, em_TML, em_TR,
 		em_SKMEA, em_SKBEI, em_SKAEI,
 		em_SOS, em_ROS, em_SKISL, em_IBM, em_OB, em_IAM, em_OA, em_IOS, em_I1, em_I2C, em_INT1H, em_DIN1, em_INT0L, em_DIN0, em_SEG1, em_SEG2,
+
+		// MM78 differences
+		em_INT0H, em_INT1L, em_SAG, em_EOB3, em_TAB,
+		em_I1SK, em_IX, em_OX, em_LXA, em_XAX, em_IOA,
+		em_TLB, em_TMLB
 	};
 
 	static const char *const s_name[];
@@ -60,6 +66,19 @@ public:
 
 private:
 	static const u8 mm76_opmap[0x100];
+
+};
+
+class mm78_disassembler : public pps41_common_disassembler
+{
+public:
+	mm78_disassembler() = default;
+	virtual ~mm78_disassembler() = default;
+
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+
+private:
+	static const u8 mm78_opmap[0x100];
 
 };
 

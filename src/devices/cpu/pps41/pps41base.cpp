@@ -40,7 +40,8 @@ TODO:
   flops with SOS/ROS opcodes
 - add MCU mask options, there's one for inverting interrupts
 - add serial i/o
-- add MM78
+- add MM78 opcodes
+- add MM78LA
 
 */
 
@@ -68,11 +69,6 @@ pps41_base_device::pps41_base_device(const machine_config &mconfig, device_type 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-
-enum
-{
-	PPS41_PC=1, PPS41_A, PPS41_C, PPS41_B, PPS41_S
-};
 
 void pps41_base_device::device_start()
 {
@@ -113,6 +109,7 @@ void pps41_base_device::device_start()
 	m_c_in = 0;
 	m_c_delay = false;
 	m_s = 0;
+	m_x = 0;
 	m_skip = false;
 	m_skip_count = 0;
 
@@ -144,6 +141,7 @@ void pps41_base_device::device_start()
 	save_item(NAME(m_c_in));
 	save_item(NAME(m_c_delay));
 	save_item(NAME(m_s));
+	save_item(NAME(m_x));
 	save_item(NAME(m_skip));
 	save_item(NAME(m_skip_count));
 
@@ -155,12 +153,13 @@ void pps41_base_device::device_start()
 	// register state for debugger
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%03X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_prev_pc).formatstr("%03X").noshow();
-	state_add(PPS41_PC, "PC", m_pc).formatstr("%03X");
 
-	state_add(PPS41_A, "A", m_a).formatstr("%01X");
-	state_add(PPS41_C, "C", m_c_in).formatstr("%01X");
-	state_add(PPS41_B, "B", m_b).formatstr("%02X");
-	state_add(PPS41_S, "S", m_s).formatstr("%01X");
+	m_state_count = 0;
+	state_add(++m_state_count, "PC", m_pc).formatstr("%03X");
+	state_add(++m_state_count, "A", m_a).formatstr("%01X");
+	state_add(++m_state_count, "C", m_c_in).formatstr("%01X");
+	state_add(++m_state_count, "B", m_b).formatstr("%02X");
+	state_add(++m_state_count, "S", m_s).formatstr("%01X");
 
 	set_icountptr(m_icount);
 }
@@ -197,8 +196,7 @@ void pps41_base_device::device_reset()
 
 void pps41_base_device::execute_set_input(int line, int state)
 {
-	// negative voltage, Vdd=0, Vss(GND)=1
-	state = (state) ? 0 : 1;
+	state = (state) ? 1 : 0;
 
 	switch (line)
 	{

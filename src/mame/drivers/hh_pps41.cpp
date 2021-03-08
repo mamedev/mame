@@ -261,8 +261,8 @@ void memoquiz_state::set_digits()
 {
 	// digits switch is tied to MCU interrupt pins
 	u8 inp = m_inputs[4]->read();
-	m_maincpu->set_input_line(0, (inp & 1) ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(1, (inp & 2) ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(0, (inp & 1) ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(1, (inp & 2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void memoquiz_state::update_display()
