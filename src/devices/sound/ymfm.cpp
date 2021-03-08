@@ -1420,7 +1420,7 @@ ymfm_engine_base<RegisterType>::ymfm_engine_base(device_t &device) :
 	m_device(device),
 	m_env_counter(0),
 	m_lfo_counter(0),
-	m_noise_lfsr(2),
+	m_noise_lfsr(1),
 	m_noise_counter(0),
 	m_noise_state(0),
 	m_noise_lfo(0),
@@ -1584,7 +1584,7 @@ void ymfm_engine_base<RegisterType>::output(s32 &lsum, s32 &rsum, u8 rshift, s32
 				if (chnum == 6)
 					m_channel[chnum]->output_rhythm_ch6(m_lfo_am, lsum, rsum, rshift, clipmax);
 				else if (chnum == 7)
-					m_channel[chnum]->output_rhythm_ch7(m_lfo_am, BIT(m_noise_lfsr, 0), phase_select, lsum, rsum, rshift, clipmax);
+					m_channel[chnum]->output_rhythm_ch7(m_lfo_am, BIT(m_noise_lfsr, 23), phase_select, lsum, rsum, rshift, clipmax);
 				else if (chnum == 8)
 					m_channel[chnum]->output_rhythm_ch8(m_lfo_am, phase_select, lsum, rsum, rshift, clipmax);
 				else
@@ -1724,7 +1724,7 @@ s8 ymfm_engine_base<RegisterType>::clock_lfo()
 				// LFO noise value is accumulated over 8 bits of LFSR and
 				// clocked as the LFO value transitions
 				if (BIT(m_lfo_counter ^ prev_counter, 22, 8) != 0)
-					m_noise_lfo = m_noise_lfsr & 0xff;
+					m_noise_lfo = BIT(m_noise_lfsr, 17, 8);
 				am = m_noise_lfo;
 				pm = am ^ 0x80;
 				break;
@@ -1824,14 +1824,14 @@ void ymfm_engine_base<RegisterType>::clock_noise()
 			// sampled at the noise frequency for output purposes; note that the
 			// low 8 bits are the most recent 8 bits of history while bits 8-24
 			// contain the 17 bit LFSR state
-			m_noise_lfsr >>= 1;
-			m_noise_lfsr |= (BIT(m_noise_lfsr, 7) ^ BIT(m_noise_lfsr, 10) ^ 1) << 24;
+			m_noise_lfsr <<= 1;
+			m_noise_lfsr |= BIT(m_noise_lfsr, 17) ^ BIT(m_noise_lfsr, 14) ^ 1;
 
 			// compare against the frequency and latch when we exceed it
 			if (m_noise_counter++ >= freq)
 			{
 				m_noise_counter = 0;
-				m_noise_state = BIT(m_noise_lfsr, 7);
+				m_noise_state = BIT(m_noise_lfsr, 17);
 			}
 		}
 	}
@@ -1839,8 +1839,8 @@ void ymfm_engine_base<RegisterType>::clock_noise()
 	{
 		// OPL: noise is a constant rate, used only for percussion input
 		// this noise is a 23-bit shift register
-		m_noise_lfsr >>= 1;
-		m_noise_lfsr |= (BIT(m_noise_lfsr, 0) ^ BIT(m_noise_lfsr, 14) ^ BIT(m_noise_lfsr, 15) ^ BIT(m_noise_lfsr, 22)) << 22;
+		m_noise_lfsr <<= 1;
+		m_noise_lfsr |= BIT(m_noise_lfsr, 23) ^ BIT(m_noise_lfsr, 9) ^ BIT(m_noise_lfsr, 8) ^ BIT(m_noise_lfsr, 1);
 	}
 
 	// OPN does not have a noise generator, so nothing to do
