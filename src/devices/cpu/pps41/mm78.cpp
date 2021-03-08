@@ -106,4 +106,111 @@ void mm78_device::device_reset()
 
 void mm78_device::execute_one()
 {
+	if (op_is_tr(m_prev_op) && op_is_tr(m_prev2_op))
+	{
+		// 3-byte opcodes
+		switch (m_op & 0xf0)
+		{
+			case 0x80: case 0x90: case 0xa0: case 0xb0: op_tmlb(); break;
+			case 0xc0: case 0xd0: case 0xe0: case 0xf0: op_tlb(); break;
+
+			default: op_illegal(); break;
+		}
+	}
+	else if (op_is_tr(m_prev_op))
+	{
+		// 2-byte opcodes
+		switch (m_op & 0xf0)
+		{
+			case 0x30: op_tr(); break;
+			case 0x40: op_skbei(); break;
+			case 0x60:
+				if (m_op != 0x60)
+					op_skaei();
+				else
+					op_illegal();
+				break;
+
+			case 0x80: case 0x90: case 0xa0: case 0xb0: op_tml(); break;
+			case 0xc0: case 0xd0: case 0xe0: case 0xf0: op_tl(); break;
+
+			default: op_illegal(); break;
+		}
+	}
+	else
+	{
+		// standard opcodes
+		switch (m_op & 0xf0)
+		{
+			case 0x10: op_lb(); break;
+			case 0x30: op_tr(); break;
+			case 0x40: op_lai(); break;
+			case 0x60:
+				if (m_op != 0x60)
+					op_aisk();
+				else
+					op_i1sk();
+				break;
+
+			case 0x80: case 0x90: case 0xa0: case 0xb0: op_tm(); break;
+			case 0xc0: case 0xd0: case 0xe0: case 0xf0: op_t(); break;
+
+			default:
+				switch (m_op & 0xfc)
+				{
+			case 0x08: case 0x0c: op_eob(); break;
+			case 0x20: op_sb(); break;
+			case 0x24: op_rb(); break;
+			case 0x28: op_skbf(); break;
+			case 0x50: op_l(); break;
+			case 0x54: op_xnsk(); break;
+			case 0x58: op_xdsk(); break;
+			case 0x5c: op_x(); break;
+
+			default:
+				switch (m_op)
+				{
+			case 0x00: op_nop(); break;
+			case 0x01: op_skisl(); break;
+			case 0x02: op_sknc(); break;
+			case 0x03: op_int0h(); break;
+			case 0x04: op_int1l(); break;
+			case 0x05: op_rc(); break;
+			case 0x06: op_sc(); break;
+			case 0x07: op_sag(); break;
+
+			case 0x2c: break; // TAB
+			case 0x2d: op_ios(); break;
+			case 0x2e: op_rtsk(); break;
+			case 0x2f: op_rt(); break;
+
+			case 0x70: op_sos(); break;
+			case 0x71: op_ros(); break;
+			case 0x72: op_ix(); break;
+			case 0x73: op_ox(); break;
+			case 0x74: op_xas(); break;
+			case 0x75: op_lxa(); break;
+			case 0x76: op_lba(); break;
+			case 0x77: op_com(); break;
+			case 0x78: op_i2c(); break;
+			case 0x79: op_xax(); break;
+			case 0x7a: op_xab(); break;
+			case 0x7b: op_ioa(); break;
+			case 0x7c: op_ac(); break;
+			case 0x7d: op_acsk(); break;
+			case 0x7e: op_a(); break;
+			case 0x7f: op_skmea(); break;
+
+			default: op_illegal(); break; // won't happen
+				}
+				break; // 0xff
+
+				}
+				break; // 0xfc
+		}
+	}
+
+	// TAB is delayed by 1 cycle
+	if (m_prev_op == 0x2c)
+		op_tab();
 }

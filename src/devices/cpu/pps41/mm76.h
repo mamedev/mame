@@ -68,7 +68,6 @@ protected:
 	void ram_w(u8 data);
 	void pop_pc();
 	void push_pc();
-	void op_tr();
 	void op_illegal();
 	void op_todo();
 
@@ -112,6 +111,7 @@ protected:
 	virtual void op_tl();
 	virtual void op_tm();
 	virtual void op_tml();
+	virtual void op_tr();
 	virtual void op_nop();
 
 	virtual void op_skmea();

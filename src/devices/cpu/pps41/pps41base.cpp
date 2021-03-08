@@ -38,9 +38,10 @@ TODO:
   but again does not explain why
 - documentation is conflicting whether or not MM76/MM75 can (re)set interrupt flip-
   flops with SOS/ROS opcodes
+- allowed opcodes after TAB should be limited
 - add MCU mask options, there's one for inverting interrupts
 - add serial i/o
-- add MM78 opcodes
+- finish MM78 opcodes
 - add MM78LA
 
 */

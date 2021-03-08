@@ -33,11 +33,6 @@ void mm76_device::push_pc()
 	m_stack[0] = m_pc;
 }
 
-void mm76_device::op_tr()
-{
-	// TR x: prefix for extended opcode
-}
-
 void mm76_device::op_illegal()
 {
 	logerror("unknown opcode $%02X at $%03X\n", m_op, m_prev_pc);
@@ -352,6 +347,11 @@ void mm76_device::op_tml()
 	m_pc = (~m_prev_op & 0xf) << 6 | (~m_op & 0x3f);
 }
 
+void mm76_device::op_tr()
+{
+	// TR x: prefix for extended opcode
+}
+
 void mm76_device::op_nop()
 {
 	// NOP: no operation
@@ -427,7 +427,7 @@ void mm76_device::op_i2c()
 
 void mm76_device::op_int1h()
 {
-	// INT1H: skip on INT1
+	// INT1H: skip on INT1 high
 	m_skip = bool(m_int_line[1]);
 }
 
@@ -440,7 +440,7 @@ void mm76_device::op_din1()
 
 void mm76_device::op_int0l()
 {
-	// INT0L: skip on INT0
+	// INT0L: skip on INT0 low
 	m_skip = !m_int_line[0];
 }
 

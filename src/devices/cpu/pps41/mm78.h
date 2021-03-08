@@ -69,6 +69,29 @@ protected:
 	virtual bool op_is_lai(u8 op) override { return (op & 0xf0) == 0x40; };
 
 	// opcode handlers
+	virtual void op_lba() override;
+	virtual void op_acsk() override;
+	virtual void op_aisk() override;
+	virtual void op_sb() override;
+	virtual void op_rb() override;
+	virtual void op_skbf() override;
+
+	virtual void op_sos();
+	virtual void op_ros();
+	virtual void op_skisl();
+
+	virtual void op_sag();
+	virtual void op_lxa();
+	virtual void op_xax();
+	virtual void op_tlb();
+	virtual void op_tmlb();
+	virtual void op_tab();
+	virtual void op_ix();
+	virtual void op_ox();
+	virtual void op_ioa();
+	virtual void op_i1sk();
+	virtual void op_int0h();
+	virtual void op_int1l();
 };
 
 class mm78l_device : public mm78_device
