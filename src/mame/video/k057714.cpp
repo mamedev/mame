@@ -503,7 +503,8 @@ void k057714_device::draw_frame(int frame, bitmap_ind16 &bitmap, const rectangle
 
 int k057714_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_display_is_dirty) {
+	if (m_display_is_dirty)
+	{
 		auto htotal = m_display_h_visarea + m_display_h_frontporch + m_display_h_backporch + m_display_h_syncpulse;
 		auto vtotal = m_display_v_visarea + m_display_v_frontporch + m_display_v_backporch + m_display_v_syncpulse;
 
