@@ -966,9 +966,9 @@ public:
 		if ((regindex & 0xf0) == 0xb0)
 		{
 			channel = regindex & 0x0f;
-			if (channel == 13 && BIT(data, 5))
+			if (channel == 13)
 			{
-				opmask = BIT(data, 0, 5);
+				opmask = BIT(data, 5) ? BIT(data, 0, 5) : 0;
 				return true;
 			}
 			else if (channel < CHANNELS)
@@ -1072,6 +1072,14 @@ public:
 //  CORE ENGINE CLASSES
 //*********************************************************
 
+enum ymfm_keyon_type : u8
+{
+	YMFM_KEYON_NORMAL = 0,
+	YMFM_KEYON_RHYTHM = 1,
+	YMFM_KEYON_CSM = 2
+};
+
+
 // ======================> ymfm_operator
 
 template<class RegisterType>
@@ -1111,8 +1119,10 @@ public:
 	s16 compute_noise_volume(u8 noise_state, u16 am_offset) const;
 
 	// key state control
-	void keyonoff(u8 on) { m_keyon = on; }
-	void keyon_csm() { m_csm_triggered = 1; }
+	void keyonoff(u8 on, ymfm_keyon_type type)
+	{
+		m_keyon_live = (m_keyon_live & ~(1 << int(type))) | (BIT(on, 0) << int(type));
+	}
 
 private:
 	// convert the generic block_freq into a 5-bit keycode
@@ -1142,8 +1152,7 @@ private:
 	envelope_state m_env_state;      // current envelope state
 	u8 m_ssg_inverted;               // non-zero if the output should be inverted (bit 0)
 	u8 m_key_state;                  // current key state: on or off (bit 0)
-	u8 m_keyon;                      // live key on state (bit 0)
-	u8 m_csm_triggered;              // true if a CSM key on has been triggered (bit 0)
+	u8 m_keyon_live;                 // live key on state (bit 0 = direct, bit 1 = rhythm, bit 2 = CSM)
 	RegisterType m_regs;             // operator-specific registers
 };
 
@@ -1173,10 +1182,7 @@ public:
 	}
 
 	// signal key on/off to our operators
-	void keyonoff(u8 states);
-
-	// signal CSM key on to our operators
-	void keyon_csm();
+	void keyonoff(u8 states, ymfm_keyon_type type);
 
 	// master clocking function
 	void clock(u32 env_counter, s8 lfo_raw_pm, bool is_multi_freq);

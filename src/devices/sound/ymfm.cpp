@@ -465,8 +465,7 @@ ymfm_operator<RegisterType>::ymfm_operator(RegisterType regs) :
 	m_env_state(ENV_RELEASE),
 	m_ssg_inverted(false),
 	m_key_state(0),
-	m_keyon(0),
-	m_csm_triggered(0),
+	m_keyon_live(0),
 	m_regs(regs)
 {
 }
@@ -491,8 +490,7 @@ void ymfm_operator<RegisterType>::save(device_t &device, u8 index)
 	device.save_item(YMFM_NAME(m_env_state), index);
 	device.save_item(YMFM_NAME(m_ssg_inverted), index);
 	device.save_item(YMFM_NAME(m_key_state), index);
-	device.save_item(YMFM_NAME(m_keyon), index);
-	device.save_item(YMFM_NAME(m_csm_triggered), index);
+	device.save_item(YMFM_NAME(m_keyon_live), index);
 }
 
 
@@ -509,8 +507,7 @@ void ymfm_operator<RegisterType>::reset()
 	m_env_state = ENV_RELEASE;
 	m_ssg_inverted = 0;
 	m_key_state = 0;
-	m_keyon = 0;
-	m_csm_triggered = 0;
+	m_keyon_live = 0;
 }
 
 
@@ -523,8 +520,8 @@ void ymfm_operator<RegisterType>::clock(u32 env_counter, s8 lfo_raw_pm, u16 bloc
 {
 	// clock the key state
 	u8 keycode = m_regs.block_freq_to_keycode(block_freq);
-	clock_keystate(m_keyon | m_csm_triggered, keycode);
-	m_csm_triggered = 0;
+	clock_keystate(u8(m_keyon_live != 0), keycode);
+	m_keyon_live &= ~(1 << YMFM_KEYON_CSM);
 
 	// clock the SSG-EG state (OPN/OPNA)
 	if (m_regs.ssg_eg_enabled())
@@ -664,8 +661,8 @@ void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 
 	// log key on events under certain conditions
 //	if (m_regs.lfo_waveform() == 3 && m_regs.lfo_enabled() && ((m_regs.lfo_am_enabled() && m_regs.lfo_am_sensitivity() != 0) || m_regs.lfo_pm_sensitivity() != 0))
-//	if (m_regs.rhythm_enable() && m_regs.chnum() >= 6)
-	if (m_regs.waveform_enable() && m_regs.waveform() != 0)
+	if ((m_regs.rhythm_enable() && m_regs.chnum() >= 6) ||
+	    (m_regs.waveform_enable() && m_regs.waveform() != 0))
 	{
 		LOG("KeyOn %2d.%2d: freq=%04X dt2=%d fb=%d alg=%d dt=%d mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X pan=%c%c",
 			m_regs.chnum(), m_regs.opnum(),
@@ -1064,24 +1061,11 @@ void ymfm_channel<RegisterType>::reset()
 //-------------------------------------------------
 
 template<class RegisterType>
-void ymfm_channel<RegisterType>::keyonoff(u8 states)
+void ymfm_channel<RegisterType>::keyonoff(u8 states, ymfm_keyon_type type)
 {
 	for (int opnum = 0; opnum < std::size(m_op); opnum++)
 		if (m_op[opnum] != nullptr)
-			m_op[opnum]->keyonoff(BIT(states, opnum));
-}
-
-
-//-------------------------------------------------
-//  keyon_csm - signal CSM key on to our operators
-//-------------------------------------------------
-
-template<class RegisterType>
-void ymfm_channel<RegisterType>::keyon_csm()
-{
-	for (int opnum = 0; opnum < std::size(m_op); opnum++)
-		if (m_op[opnum] != nullptr)
-			m_op[opnum]->keyon_csm();
+			m_op[opnum]->keyonoff(BIT(states, opnum), type);
 }
 
 
@@ -1619,12 +1603,16 @@ void ymfm_engine_base<RegisterType>::write(u16 regnum, u8 data)
 	if (RegisterType::is_keyon(regnum, data, keyon_channel, keyon_opmask))
 	{
 		if (keyon_channel < RegisterType::CHANNELS)
-			m_channel[keyon_channel]->keyonoff(keyon_opmask);
+		{
+			// normal channel on/off
+			m_channel[keyon_channel]->keyonoff(keyon_opmask, YMFM_KEYON_NORMAL);
+		}
 		else if (RegisterType::CHANNELS >= 9 && keyon_channel == 13)
 		{
-			m_channel[6]->keyonoff(BIT(keyon_opmask, 4) ? 3 : 0);
-			m_channel[7]->keyonoff(BIT(keyon_opmask, 0) | (BIT(keyon_opmask, 3) << 1));
-			m_channel[8]->keyonoff(BIT(keyon_opmask, 2) | (BIT(keyon_opmask, 1) << 1));
+			// special case for the OPL rhythm channels
+			m_channel[6]->keyonoff(BIT(keyon_opmask, 4) ? 3 : 0, YMFM_KEYON_RHYTHM);
+			m_channel[7]->keyonoff(BIT(keyon_opmask, 0) | (BIT(keyon_opmask, 3) << 1), YMFM_KEYON_RHYTHM);
+			m_channel[8]->keyonoff(BIT(keyon_opmask, 2) | (BIT(keyon_opmask, 1) << 1), YMFM_KEYON_RHYTHM);
 		}
 	}
 }
@@ -1877,7 +1865,7 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::timer_handler)
 	if (param == 0 && m_regs.csm())
 		for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
 			if (BIT(RegisterType::CSM_TRIGGER_MASK, chnum))
-				m_channel[chnum]->keyon_csm();
+				m_channel[chnum]->keyonoff(1, YMFM_KEYON_CSM);
 
 	// reset
 	update_timer(param, 1);
