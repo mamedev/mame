@@ -1113,6 +1113,16 @@ void ymfm_channel<RegisterType>::clock(u32 env_counter, s8 lfo_raw_pm, bool is_m
 template<class RegisterType>
 void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 &lsum, s32 &rsum, u8 rshift, s32 clipmax) const
 {
+	// if this channel has no operators, nothing to do
+	if (m_op[0] == nullptr)
+	{
+		m_feedback_in = 0;
+		return;
+	}
+
+	// always assume at least 2 live operators
+	assert(m_op[1] != nullptr);
+
 	// AM amount is the same across all operators; compute it once
 	u16 am_offset = lfo_am_offset(lfo_raw_am);
 
@@ -1163,57 +1173,74 @@ void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 &lsum
 		opin = (m_feedback[0] + m_feedback[1]) >> (10 - feedback);
 
 	// compute the 14-bit volume/value of operator 1 and update the feedback
-	opout[1] = m_feedback_in = (m_op[0] != nullptr) ? m_op[0]->compute_volume(m_op[0]->phase() + opin, am_offset) : 0;
+	opout[1] = m_feedback_in = m_op[0]->compute_volume(m_op[0]->phase() + opin, am_offset);
 
-	// no that the feedback has been computed, skip the rest if both pans are clear;
+	// now that the feedback has been computed, skip the rest if both pans are clear;
 	// no need to do all this work for nothing
 	if (m_regs.pan_left() == 0 && m_regs.pan_right() == 0)
 		return;
 
 	// compute the 14-bit volume/value of operator 2
 	opin = opout[BIT(algorithm_inputs, 0, 1)] >> 1;
-	opout[2] = (m_op[1] != nullptr) ? m_op[1]->compute_volume(m_op[1]->phase() + opin, am_offset) : 0;
-	opout[5] = opout[1] + opout[2];
+	opout[2] = m_op[1]->compute_volume(m_op[1]->phase() + opin, am_offset);
 
-	// compute the 14-bit volume/value of operator 3
-	opin = opout[BIT(algorithm_inputs, 1, 3)] >> 1;
-	opout[3] = (m_op[2] != nullptr) ? m_op[2]->compute_volume(m_op[2]->phase() + opin, am_offset) : 0;
-	opout[6] = opout[1] + opout[3];
-	opout[7] = opout[2] + opout[3];
-
-	// compute the 14-bit volume/value of operator 4; this could be a noise
-	// value on the OPM
-	if (m_op[3] == nullptr)
-		opout[4] = 0;
-	else if (noise_state != 0)
-		opout[4] = m_op[3]->compute_noise_volume(noise_state, am_offset);
+	// if only two operators, finish up
+	s32 result;
+	if (m_op[2] == nullptr)
+	{
+		// 2-operator case: algorithm will be either 6 or 7
+		result = opout[2] >> rshift;
+		if (algorithm == 7)
+		{
+			s32 clipmin = -clipmax - 1;
+			result += opout[1] >> rshift;
+			result = std::clamp(result, clipmin, clipmax);
+		}
+	}
 	else
 	{
-		opin = opout[BIT(algorithm_inputs, 4, 3)] >> 1;
-		opout[4] = m_op[3]->compute_volume(m_op[3]->phase() + opin, am_offset);
-	}
+		// 4-operator case: make sure op[3] is valid
+		assert(m_op[3] != nullptr);
+		opout[5] = opout[1] + opout[2];
 
-	// all algorithms consume OP4 output
-	s32 result = opout[4] >> rshift;
+		// compute the 14-bit volume/value of operator 3
+		opin = opout[BIT(algorithm_inputs, 1, 3)] >> 1;
+		opout[3] = m_op[2]->compute_volume(m_op[2]->phase() + opin, am_offset);
+		opout[6] = opout[1] + opout[3];
+		opout[7] = opout[2] + opout[3];
 
-	// algorithms 4-7 add in OP2 output
-	if (algorithm >= 4)
-	{
-		s32 clipmin = -clipmax - 1;
-		result += opout[2] >> rshift;
-		result = std::clamp(result, clipmin, clipmax);
-
-		// agorithms 5-7 add in OP3 output
-		if (algorithm >= 5)
+		// compute the 14-bit volume/value of operator 4; this could be a noise
+		// value on the OPM
+		if (noise_state != 0)
+			opout[4] = m_op[3]->compute_noise_volume(noise_state, am_offset);
+		else
 		{
-			result += opout[3] >> rshift;
+			opin = opout[BIT(algorithm_inputs, 4, 3)] >> 1;
+			opout[4] = m_op[3]->compute_volume(m_op[3]->phase() + opin, am_offset);
+		}
+
+		// all algorithms consume OP4 output
+		result = opout[4] >> rshift;
+
+		// algorithms 4-7 add in OP2 output
+		if (algorithm >= 4)
+		{
+			s32 clipmin = -clipmax - 1;
+			result += opout[2] >> rshift;
 			result = std::clamp(result, clipmin, clipmax);
 
-			// algorithm 7 adds in OP1 output
-			if (algorithm == 7)
+			// agorithms 5-7 add in OP3 output
+			if (algorithm >= 5)
 			{
-				result += opout[1] >> rshift;
+				result += opout[3] >> rshift;
 				result = std::clamp(result, clipmin, clipmax);
+
+				// algorithm 7 adds in OP1 output
+				if (algorithm == 7)
+				{
+					result += opout[1] >> rshift;
+					result = std::clamp(result, clipmin, clipmax);
+				}
 			}
 		}
 	}
