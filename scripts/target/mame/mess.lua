@@ -1687,6 +1687,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/akaiax80.cpp",
 	MAME_DIR .. "src/mame/drivers/akaivx600.cpp",
 	MAME_DIR .. "src/mame/drivers/mpc3000.cpp",
+	MAME_DIR .. "src/mame/drivers/mpc60.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "alesis")
