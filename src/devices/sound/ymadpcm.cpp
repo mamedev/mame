@@ -165,7 +165,7 @@ bool ymadpcm_a_channel::clock()
 //  panning applied
 //-------------------------------------------------
 
-void ymadpcm_a_channel::output(s32 &leftout, s32 &rightout) const
+void ymadpcm_a_channel::output(s32 outputs[2]) const
 {
 	// volume combined instrument and total levels
 	int vol = (m_regs.instrument_level() ^ 0x1f) + (m_regs.total_level() ^ 0x3f);
@@ -173,7 +173,7 @@ void ymadpcm_a_channel::output(s32 &leftout, s32 &rightout) const
 	// if combined is maximum, output 0
 	if (vol >= 63)
 	{
-		leftout = rightout = 0;
+		outputs[0] = outputs[1] = 0;
 		return;
 	}
 
@@ -188,9 +188,9 @@ void ymadpcm_a_channel::output(s32 &leftout, s32 &rightout) const
 
 	// apply to left/right as appropriate
 	if (m_regs.pan_left())
-		leftout += value;
+		outputs[0] += value;
 	if (m_regs.pan_right())
-		rightout += value;
+		outputs[1] += value;
 }
 
 
@@ -262,12 +262,12 @@ u8 ymadpcm_a_engine::clock(u8 chanmask)
 //  update - master update function
 //-------------------------------------------------
 
-void ymadpcm_a_engine::output(s32 &lsum, s32 &rsum, u8 chanmask)
+void ymadpcm_a_engine::output(s32 outputs[2], u8 chanmask)
 {
 	// compute the output of each channel
 	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
 		if (BIT(chanmask, chnum))
-			m_channel[chnum]->output(lsum, rsum);
+			m_channel[chnum]->output(outputs);
 }
 
 
@@ -436,7 +436,7 @@ void ymadpcm_b_channel::clock()
 //  panning applied
 //-------------------------------------------------
 
-void ymadpcm_b_channel::output(s32 &lsum, s32 &rsum, u8 rshift) const
+void ymadpcm_b_channel::output(s32 outputs[2], u8 rshift) const
 {
 	// do a linear interpolation between samples
 	s32 result = (m_prev_accum * ((m_position ^ 0xffff) + 1) + m_accumulator * m_position) >> 16;
@@ -446,9 +446,9 @@ void ymadpcm_b_channel::output(s32 &lsum, s32 &rsum, u8 rshift) const
 
 	// apply to left/right
 	if (m_regs.pan_left())
-		lsum += result;
+		outputs[0] += result;
 	if (m_regs.pan_right())
-		rsum += result;
+		outputs[1] += result;
 }
 
 
@@ -640,12 +640,12 @@ void ymadpcm_b_engine::clock(u8 chanmask)
 //  output - master output function
 //-------------------------------------------------
 
-void ymadpcm_b_engine::output(s32 &lsum, s32 &rsum, u8 rshift, u8 chanmask)
+void ymadpcm_b_engine::output(s32 outputs[2], u8 rshift, u8 chanmask)
 {
 	// compute the output of each channel
 	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
 		if (BIT(chanmask, chnum))
-			m_channel[chnum]->output(lsum, rsum, rshift);
+			m_channel[chnum]->output(outputs, rshift);
 }
 
 

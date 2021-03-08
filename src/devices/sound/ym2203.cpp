@@ -206,12 +206,12 @@ void ym2203_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		m_opn.clock(0x07);
 
 		// update the OPN content; OPN is full 14-bit with no intermediate clipping
-		s32 lsum = 0, rsum = 0;
-		m_opn.output(lsum, rsum, 0, 32767, 0x07);
+		s32 sum = 0;
+		m_opn.output(&sum, 0, 32767, 0x07);
 
 		// convert to 10.3 floating point value for the DAC and back
 		// OPN is mono, so only the left sum matters
-		outputs[0].put_int_clamp(sampindex, fp_to_linear(linear_to_fp(lsum)), 32768);
+		outputs[0].put_int_clamp(sampindex, fp_to_linear(linear_to_fp(sum)), 32768);
 	}
 }
 

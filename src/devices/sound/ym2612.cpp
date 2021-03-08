@@ -200,7 +200,7 @@ void ym2612_device::sound_stream_update_common(write_stream_view &outl, write_st
 	u32 const sample_divider = (discontinuity ? 260 : 256) * (MULTIPLEX_YM2612_YM3438_OUTPUT ? 1 : 6);
 
 	// iterate over all target samples
-	s32 lsum = 0, rsum = 0;
+	s32 sums[2] = { 0 };
 	for (int sampindex = 0; sampindex < outl.samples(); )
 	{
 		// clock the OPN when we hit channel 0
@@ -208,11 +208,11 @@ void ym2612_device::sound_stream_update_common(write_stream_view &outl, write_st
 			m_opn.clock(0x3f);
 
 		// update the current OPN channel; OPN2 is 9-bit with intermediate clipping
-		s32 lchan = 0, rchan = 0;
+		s32 outputs[2] = { 0 };
 		if (m_channel != 5 || !m_dac_enable)
-			m_opn.output(lchan, rchan, 5, 256, 1 << m_channel);
+			m_opn.output(outputs, 5, 256, 1 << m_channel);
 		else
-			lchan = rchan = s16(m_dac_data << 7) >> 7;
+			outputs[0] = outputs[1] = s16(m_dac_data << 7) >> 7;
 
 		// hiccup in the internal YM2612 DAC means that there is a rather large
 		// step between 0 and -1 (close to 6x the normal step); the approximation
@@ -220,38 +220,37 @@ void ym2612_device::sound_stream_update_common(write_stream_view &outl, write_st
 		// fixed in the YM3438
 		if (discontinuity)
 		{
-			if (lchan < 0)
-				lchan -= 2;
+			if (outputs[0] < 0)
+				outputs[0] -= 2;
 			else
-				lchan += 3;
-			if (rchan < 0)
-				rchan -= 2;
+				outputs[0] += 3;
+			if (outputs[1] < 0)
+				outputs[1] -= 2;
 			else
-				rchan += 3;
+				outputs[1] += 3;
 		}
 
 		// if multiplexing, just scale to 16 bits and output
 		if (MULTIPLEX_YM2612_YM3438_OUTPUT)
 		{
-			outl.put_int(sampindex, lchan, sample_divider);
-			outr.put_int(sampindex, rchan, sample_divider);
+			outl.put_int(sampindex, outputs[0], sample_divider);
+			outr.put_int(sampindex, outputs[1], sample_divider);
 			sampindex++;
-			lsum = rsum = 0;
 		}
 
 		// if not, accumulate the sums
 		else
 		{
-			lsum += lchan;
-			rsum += rchan;
+			sums[0] += outputs[0];
+			sums[1] += outputs[1];
 
 			// on the last channel, output the average and reset the sums
 			if (m_channel == 5)
 			{
-				outl.put_int(sampindex, lsum, sample_divider);
-				outr.put_int(sampindex, rsum, sample_divider);
+				outl.put_int(sampindex, sums[0], sample_divider);
+				outr.put_int(sampindex, sums[1], sample_divider);
 				sampindex++;
-				lsum = rsum = 0;
+				sums[0] = sums[1] = 0;
 			}
 		}
 
@@ -329,23 +328,23 @@ void ymf276_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		m_opn.clock(0x3f);
 
 		// update the OPN content; OPN2L is 14-bit with intermediate clipping
-		s32 lsum = 0, rsum = 0;
-		m_opn.output(lsum, rsum, 0, 8191, opn_mask);
+		s32 sums[2] = { 0 };
+		m_opn.output(sums, 0, 8191, opn_mask);
 
 		// shifted down 1 bit after mixer
-		lsum >>= 1;
-		rsum >>= 1;
+		sums[0] >>= 1;
+		sums[1] >>= 1;
 
 		// add in DAC if enabled
 		if (m_dac_enable)
 		{
-			lsum += s16(m_dac_data << 7) >> 3;
-			rsum += s16(m_dac_data << 7) >> 3;
+			sums[0] += s16(m_dac_data << 7) >> 3;
+			sums[1] += s16(m_dac_data << 7) >> 3;
 		}
 
 		// YMF3438 is stereo
-		outputs[0].put_int_clamp(sampindex, lsum, 32768);
-		outputs[1].put_int_clamp(sampindex, rsum, 32768);
+		outputs[0].put_int_clamp(sampindex, sums[0], 32768);
+		outputs[1].put_int_clamp(sampindex, sums[1], 32768);
 	}
 }
 

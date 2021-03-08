@@ -1111,7 +1111,7 @@ void ymfm_channel<RegisterType>::clock(u32 env_counter, s8 lfo_raw_pm, bool is_m
 //-------------------------------------------------
 
 template<class RegisterType>
-void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 &lsum, s32 &rsum, u8 rshift, s32 clipmax) const
+void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const
 {
 	// if this channel has no operators, nothing to do
 	if (m_op[0] == nullptr)
@@ -1246,10 +1246,7 @@ void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 &lsum
 	}
 
 	// add to the output
-	if (m_regs.pan_left())
-		lsum += result;
-	if (m_regs.pan_right())
-		rsum += result;
+	add_to_output(outputs, result);
 }
 
 
@@ -1260,7 +1257,7 @@ void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 &lsum
 //-------------------------------------------------
 
 template<class RegisterType>
-void ymfm_channel<RegisterType>::output_rhythm_ch6(u8 lfo_raw_am, s32 &lsum, s32 &rsum, u8 rshift, s32 clipmax) const
+void ymfm_channel<RegisterType>::output_rhythm_ch6(u8 lfo_raw_am, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const
 {
 	// AM amount is the same across all operators; compute it once
 	u16 am_offset = lfo_am_offset(lfo_raw_am);
@@ -1283,11 +1280,7 @@ void ymfm_channel<RegisterType>::output_rhythm_ch6(u8 lfo_raw_am, s32 &lsum, s32
 	s32 result = m_op[1]->compute_volume(m_op[1]->phase() + opin, am_offset) >> rshift;
 
 	// add to the output
-	result *= 2;
-	if (m_regs.pan_left())
-		lsum += result;
-	if (m_regs.pan_right())
-		rsum += result;
+	add_to_output(outputs, result * 2);
 }
 
 
@@ -1299,7 +1292,7 @@ void ymfm_channel<RegisterType>::output_rhythm_ch6(u8 lfo_raw_am, s32 &lsum, s32
 //-------------------------------------------------
 
 template<class RegisterType>
-void ymfm_channel<RegisterType>::output_rhythm_ch7(u8 lfo_raw_am, u8 noise_state, u8 phase_select, s32 &lsum, s32 &rsum, u8 rshift, s32 clipmax) const
+void ymfm_channel<RegisterType>::output_rhythm_ch7(u8 lfo_raw_am, u8 noise_state, u8 phase_select, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const
 {
 	// AM amount is the same across all operators; compute it once
 	u16 am_offset = lfo_am_offset(lfo_raw_am);
@@ -1318,11 +1311,7 @@ void ymfm_channel<RegisterType>::output_rhythm_ch7(u8 lfo_raw_am, u8 noise_state
 	result = std::clamp<s32>(result, -clipmax - 1, clipmax);
 
 	// add to the output
-	result *= 2;
-	if (m_regs.pan_left())
-		lsum += result;
-	if (m_regs.pan_right())
-		rsum += result;
+	add_to_output(outputs, result * 2);
 }
 
 
@@ -1333,7 +1322,7 @@ void ymfm_channel<RegisterType>::output_rhythm_ch7(u8 lfo_raw_am, u8 noise_state
 //-------------------------------------------------
 
 template<class RegisterType>
-void ymfm_channel<RegisterType>::output_rhythm_ch8(u8 lfo_raw_am, u8 phase_select, s32 &lsum, s32 &rsum, u8 rshift, s32 clipmax) const
+void ymfm_channel<RegisterType>::output_rhythm_ch8(u8 lfo_raw_am, u8 phase_select, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const
 {
 	// AM amount is the same across all operators; compute it once
 	u16 am_offset = lfo_am_offset(lfo_raw_am);
@@ -1348,11 +1337,7 @@ void ymfm_channel<RegisterType>::output_rhythm_ch8(u8 lfo_raw_am, u8 phase_selec
 	result = std::clamp<s32>(result, -clipmax - 1, clipmax);
 
 	// add to the output
-	result *= 2;
-	if (m_regs.pan_left())
-		lsum += result;
-	if (m_regs.pan_right())
-		rsum += result;
+	add_to_output(outputs, result * 2);
 }
 
 
@@ -1563,7 +1548,7 @@ u32 ymfm_engine_base<RegisterType>::clock(u32 chanmask)
 //-------------------------------------------------
 
 template<class RegisterType>
-void ymfm_engine_base<RegisterType>::output(s32 &lsum, s32 &rsum, u8 rshift, s32 clipmax, u32 chanmask) const
+void ymfm_engine_base<RegisterType>::output(s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax, u32 chanmask) const
 {
 	// handle the rhythm case, where some of the operators are dedicated
 	// to percussion (this is an OPL-specific feature)
@@ -1582,13 +1567,13 @@ void ymfm_engine_base<RegisterType>::output(s32 &lsum, s32 &rsum, u8 rshift, s32
 			if (BIT(chanmask, chnum))
 			{
 				if (chnum == 6)
-					m_channel[chnum]->output_rhythm_ch6(m_lfo_am, lsum, rsum, rshift, clipmax);
+					m_channel[chnum]->output_rhythm_ch6(m_lfo_am, outputs, rshift, clipmax);
 				else if (chnum == 7)
-					m_channel[chnum]->output_rhythm_ch7(m_lfo_am, BIT(m_noise_lfsr, 23), phase_select, lsum, rsum, rshift, clipmax);
+					m_channel[chnum]->output_rhythm_ch7(m_lfo_am, BIT(m_noise_lfsr, 23), phase_select, outputs, rshift, clipmax);
 				else if (chnum == 8)
-					m_channel[chnum]->output_rhythm_ch8(m_lfo_am, phase_select, lsum, rsum, rshift, clipmax);
+					m_channel[chnum]->output_rhythm_ch8(m_lfo_am, phase_select, outputs, rshift, clipmax);
 				else
-					m_channel[chnum]->output(m_lfo_am, 0, lsum, rsum, rshift, clipmax);
+					m_channel[chnum]->output(m_lfo_am, 0, outputs, rshift, clipmax);
 			}
 	}
 	else
@@ -1600,7 +1585,7 @@ void ymfm_engine_base<RegisterType>::output(s32 &lsum, s32 &rsum, u8 rshift, s32
 				// noise must be non-zero to use noise on OP4, so if it is enabled,
 				// OR with 2 (since only the LSB is actually checked for the noise state)
 				u8 noise = (chnum == 7 && m_regs.noise_enabled()) ? (m_noise_state | 2) : 0;
-				m_channel[chnum]->output(m_lfo_am, noise, lsum, rsum, rshift, clipmax);
+				m_channel[chnum]->output(m_lfo_am, noise, outputs, rshift, clipmax);
 			}
 	}
 }

@@ -318,18 +318,18 @@ void ym2608_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		m_adpcm_b.clock(0x01);
 
 		// update the OPN content; OPNA is 13-bit with no intermediate clipping
-		s32 lsum = 0, rsum = 0;
-		m_opn.output(lsum, rsum, 1, 32767, opnmask);
-		lsum <<= 1;
-		rsum <<= 1;
+		s32 sums[2] = { 0 };
+		m_opn.output(sums, 1, 32767, opnmask);
+		sums[0] <<= 1;
+		sums[1] <<= 1;
 
 		// mix in the ADPCM
-		m_adpcm_a.output(lsum, rsum, 0x3f);
-		m_adpcm_b.output(lsum, rsum, 2, 0x01);
+		m_adpcm_a.output(sums, 0x3f);
+		m_adpcm_b.output(sums, 2, 0x01);
 
 		// YM2608 is stereo
-		outputs[0].put_int_clamp(sampindex, lsum, 32768);
-		outputs[1].put_int_clamp(sampindex, rsum, 32768);
+		outputs[0].put_int_clamp(sampindex, sums[0], 32768);
+		outputs[1].put_int_clamp(sampindex, sums[1], 32768);
 	}
 }
 

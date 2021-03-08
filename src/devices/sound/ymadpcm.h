@@ -98,7 +98,7 @@ public:
 	bool clock();
 
 	// return the computed output value, with panning applied
-	void output(s32 &lsum, s32 &rsum) const;
+	void output(s32 outputs[2]) const;
 
 	// direct parameter setting for YM2608 ROM-based samples
 	void set_start_end(u16 start, u16 end) { m_regs.write_start(start); m_regs.write_end(end); }
@@ -137,7 +137,7 @@ public:
 	u8 clock(u8 chanmask);
 
 	// compute sum of channel outputs
-	void output(s32 &lsum, s32 &rsum, u8 chanmask);
+	void output(s32 outputs[2], u8 chanmask);
 
 	// write to the ADPCM-A registers
 	void write(u8 regnum, u8 data);
@@ -256,7 +256,7 @@ public:
 	void clock();
 
 	// return the computed output value, with panning applied
-	void output(s32 &lsum, s32 &rsum, u8 rshift) const;
+	void output(s32 outputs[2], u8 rshift) const;
 
 	// return the status register
 	u8 status() const { return m_status; }
@@ -317,7 +317,7 @@ public:
 	void clock(u8 chanmask);
 
 	// compute sum of channel outputs
-	void output(s32 &lsum, s32 &rsum, u8 rshift, u8 chanmask);
+	void output(s32 outputs[2], u8 rshift, u8 chanmask);
 
 	// read from the ADPCM-B registers
 	u8 read(u8 regnum) { return m_channel[0]->read(regnum); }

@@ -173,11 +173,11 @@ void ym3526_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		m_opl.clock(0x1ff);
 
 		// update the OPL content; clipping is unknown
-		s32 lsum = 0, rsum = 0;
-		m_opl.output(lsum, rsum, 1, 32767, 0x1ff);
+		s32 sum = 0;
+		m_opl.output(&sum, 1, 32767, 0x1ff);
 
 		// convert to 10.3 floating point value for the DAC and back
 		// OPL is mono
-		outputs[0].put_int_clamp(sampindex, fp_to_linear(linear_to_fp(lsum)), 32768);
+		outputs[0].put_int_clamp(sampindex, fp_to_linear(linear_to_fp(sum)), 32768);
 	}
 }

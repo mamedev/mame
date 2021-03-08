@@ -129,6 +129,8 @@ public:
 	// per-channel registers that aren't universally supported
 	u8 pan_right() const          /*  1 bit  */ { return 1; } // not on OPN,OPL
 	u8 pan_left() const           /*  1 bit  */ { return 1; } // not on OPN,OPL
+	u8 external0() const          /*  1 bit  */ { return 0; } // not on OPM,OPN,OPNA,OPL,OPL2
+	u8 external1() const          /*  1 bit  */ { return 0; } // not on OPM,OPN,OPNA,OPL,OPL2
 	u8 lfo_pm_sensitivity() const /*  3 bits */ { return 0; } // not on OPN,OPL
 	u8 lfo_am_sensitivity() const /*  2 bits */ { return 0; } // not on OPN,OPL
 
@@ -251,6 +253,7 @@ class ymopm_registers : public ymfm_registers_base
 public:
 	// constants
 	static constexpr family_type FAMILY = FAMILY_OPM;
+	static constexpr u8 OUTPUTS = 2;
 	static constexpr u8 CHANNELS = 8;
 	static constexpr u8 OPERATORS = 8*4;
 	static constexpr u16 REGISTERS = 0x100;
@@ -471,6 +474,7 @@ class ymopn_registers : public ymfm_registers_base
 public:
 	// constants
 	static constexpr family_type FAMILY = FAMILY_OPN;
+	static constexpr u8 OUTPUTS = 1;
 	static constexpr u8 CHANNELS = 3;
 	static constexpr u8 OPERATORS = 3*4;
 	static constexpr u16 REGISTERS = 0x100;
@@ -722,6 +726,7 @@ class ymopna_registers : public ymopn_registers
 {
 public:
 	// constants
+	static constexpr u8 OUTPUTS = 2;
 	static constexpr u8 CHANNELS = 6;
 	static constexpr u8 OPERATORS = 6*4;
 	static constexpr u16 REGISTERS = 0x200;
@@ -894,6 +899,7 @@ class ymopl_registers : public ymfm_registers_base
 public:
 	// constants
 	static constexpr family_type FAMILY = FAMILY_OPL;
+	static constexpr u8 OUTPUTS = 1;
 	static constexpr u8 CHANNELS = 9;
 	static constexpr u8 OPERATORS = 9*2;
 	static constexpr u16 REGISTERS = 0x100;
@@ -1188,16 +1194,29 @@ public:
 	void clock(u32 env_counter, s8 lfo_raw_pm, bool is_multi_freq);
 
 	// compute the channel output and add to the left/right output sums
-	void output(u8 lfo_raw_am, u8 noise_state, s32 &lsum, s32 &rsum, u8 rshift, s32 clipmax) const;
+	void output(u8 lfo_raw_am, u8 noise_state, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
 
 	// compute the special OPL rhythm channel outputs
-	void output_rhythm_ch6(u8 lfo_raw_am, s32 &lsum, s32 &rsum, u8 rshift, s32 clipmax) const;
-	void output_rhythm_ch7(u8 lfo_raw_am, u8 noise_state, u8 phase_select, s32 &lsum, s32 &rsum, u8 rshift, s32 clipmax) const;
-	void output_rhythm_ch8(u8 lfo_raw_am, u8 phase_select, s32 &lsum, s32 &rsum, u8 rshift, s32 clipmax) const;
+	void output_rhythm_ch6(u8 lfo_raw_am, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
+	void output_rhythm_ch7(u8 lfo_raw_am, u8 noise_state, u8 phase_select, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
+	void output_rhythm_ch8(u8 lfo_raw_am, u8 phase_select, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
 
 private:
 	// convert a 6/8-bit raw AM value into an amplitude offset based on sensitivity
 	u16 lfo_am_offset(u8 am_value) const;
+
+	// helper to add values to the outputs based on channel enables
+	void add_to_output(s32 *outputs, s32 value) const
+	{
+		if (RegisterType::OUTPUTS == 1 || m_regs.pan_left())
+			outputs[0] += value;
+		if (RegisterType::OUTPUTS >= 2 && m_regs.pan_right())
+			outputs[1] += value;
+		if (RegisterType::OUTPUTS >= 3 && m_regs.external0())
+			outputs[2] += value;
+		if (RegisterType::OUTPUTS >= 4 && m_regs.external1())
+			outputs[3] += value;
+	}
 
 	// internal state
 	s16 m_feedback[2];                    // feedback memory for operator 1
@@ -1233,7 +1252,7 @@ public:
 	u32 clock(u32 chanmask);
 
 	// compute sum of channel outputs
-	void output(s32 &lsum, s32 &rsum, u8 rshift, s32 clipmax, u32 chanmask) const;
+	void output(s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax, u32 chanmask) const;
 
 	// write to the OPN registers
 	void write(u16 regnum, u8 data);

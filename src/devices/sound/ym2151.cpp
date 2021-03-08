@@ -213,13 +213,13 @@ void ym2151_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		m_opm.clock(0xff);
 
 		// update the OPM content; OPM is full 14-bit with no intermediate clipping
-		s32 lsum = 0, rsum = 0;
-		m_opm.output(lsum, rsum, 0, 32767, 0xff);
+		s32 sums[2] = { 0 };
+		m_opm.output(sums, 0, 32767, 0xff);
 
 		// convert to 10.3 floating point value for the DAC and back
 		// OPM is stereo
-		outputs[0].put_int_clamp(sampindex, fp_to_linear(linear_to_fp(lsum)), 32768);
-		outputs[1].put_int_clamp(sampindex, fp_to_linear(linear_to_fp(rsum)), 32768);
+		outputs[0].put_int_clamp(sampindex, fp_to_linear(linear_to_fp(sums[0])), 32768);
+		outputs[1].put_int_clamp(sampindex, fp_to_linear(linear_to_fp(sums[1])), 32768);
 	}
 }
 
