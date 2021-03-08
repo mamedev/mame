@@ -2947,11 +2947,21 @@
 			<color red="0.0" green="0.0" blue="0.0"/>
 		</reel>
 	</element>
-	<element name="reel3" defstate="0"> <!-- should be a wheel, not a reel, technically all symbols are partially visible, and can be illuminated, not just the 2 at either edge used for gameplay -->
-		<reel reelreversed="0" stateoffset="-600" numsymbolsvisible="1" symbollist="3   9,2   8,A   7,K   6,Q   5,J   4,9   3,8   2,7   A,6   K,5   Q,4   J">
+
+	<!-- should be a single wheel, not a reel, technically all symbols are partially visible, and can be illuminated, not just the 2 at either edge used for gameplay -->
+	<!-- as the right hand side of the wheel appears to rotate in the opposite direction, this is currently handled with 2 views, with one being shifted -->
+	<!-- technically this illusion could be expanded to 12 views until a proper wheel type is available -->
+	<element name="reel3_viewleft" defstate="0">
+		<reel reelreversed="1" stateoffset="-1600" numsymbolsvisible="1" symbollist="3,4,5,6,7,8,9,J,Q,K,A,2">
 			<color red="0.0" green="0.0" blue="0.0"/>
 		</reel>
 	</element>
+	<element name="reel3_viewright" defstate="0">
+		<reel reelreversed="0" stateoffset="-800" numsymbolsvisible="1" symbollist="9,8,7,6,5,4,3,2,A,K,Q,J">
+			<color red="0.0" green="0.0" blue="0.0"/>
+		</reel>
+	</element>
+
 	<element name="led_background">
 		<rect>
 			<color red="0.4" green="0.0" blue="0.0"/>
@@ -3228,6 +3238,7 @@
 		<element name="sreel3" ref="reel2" state="0">
 			<bounds x="390" y="480" width="80" height="100"/>
 		</element>
+
 		<element ref="reel_background">
 			<bounds x="253" y="353" width="140" height="50"/>
 		</element>
@@ -3249,9 +3260,15 @@
 		<element name="lamp20" ref="reel_lamp_layer_5" state="0">
 			<bounds x="282.1667" y="363.4167" width="81.6667" height="29.1667"/>
 		</element>
-		<element name="sreel4" ref="reel3" state="0">
-			<bounds x="253" y="353" width="140" height="50"/>
+
+		<!-- 2 views into the same wheel -->
+		<element name="sreel4" ref="reel3_viewleft" state="0">
+			<bounds x="253" y="353" width="40" height="50"/>
 		</element>
+		<element name="sreel4" ref="reel3_viewright" state="0">
+			<bounds x="353" y="353" width="40" height="50"/>
+		</element>
+
 		<element name="lamp60" ref="lamp_60_1_border" state="0">
 			<bounds x="32" y="421" width="56" height="18"/>
 		</element>
