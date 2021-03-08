@@ -40,9 +40,10 @@ DEVICE_INPUT_DEFAULTS_END
 
 
 // Floppy formats 
-FLOPPY_FORMATS_MEMBER(p2000_fdc_device::floppy_formats)
-    FLOPPY_P2000T_FORMAT  
-FLOPPY_FORMATS_END
+void p2000_fdc_device::floppy_formats(format_registration &fr)
+{
+    fr.add(FLOPPY_P2000T_FORMAT);
+}
 
 //FLOPPY_DSK_FORMAT - FLOPPY_P2000T_FORMAT
 static void p2000t_floppies(device_slot_interface &device)

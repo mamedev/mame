@@ -107,7 +107,7 @@ protected:
         "525ds80"
     };
 
-    DECLARE_FLOPPY_FORMATS(floppy_formats);
+    static void floppy_formats(format_registration &fr);
 
     virtual const z80_daisy_config * get_z80_daisy_config() {
         static const z80_daisy_config m2200_daisy_chain[] =
