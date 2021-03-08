@@ -85,6 +85,116 @@
 
 
 //*********************************************************
+//  GLOBAL HELPERS
+//*********************************************************
+
+//
+// Many of the Yamaha FM chips emit a floating-point value,
+// which is sent to a DAC for processing. The exact format
+// of this floating-point value is documented below. This
+// description only makes sense if the "internal" format
+// treats 1=positive and 0=negative, so the helpers below
+// presume that.
+//
+// Internal OPx data      16-bit signed data     Exp Sign Mantissa
+// =================      =================      === ==== ========
+// 1 1xxxxxxxx------  ->  0 1xxxxxxxx------  ->  111   1  1xxxxxxx
+// 1 01xxxxxxxx-----  ->  0 01xxxxxxxx-----  ->  110   1  1xxxxxxx
+// 1 001xxxxxxxx----  ->  0 001xxxxxxxx----  ->  101   1  1xxxxxxx
+// 1 0001xxxxxxxx---  ->  0 0001xxxxxxxx---  ->  100   1  1xxxxxxx
+// 1 00001xxxxxxxx--  ->  0 00001xxxxxxxx--  ->  011   1  1xxxxxxx
+// 1 000001xxxxxxxx-  ->  0 000001xxxxxxxx-  ->  010   1  1xxxxxxx
+// 1 000000xxxxxxxxx  ->  0 000000xxxxxxxxx  ->  001   1  xxxxxxxx
+// 0 111111xxxxxxxxx  ->  1 111111xxxxxxxxx  ->  001   0  xxxxxxxx
+// 0 111110xxxxxxxx-  ->  1 111110xxxxxxxx-  ->  010   0  0xxxxxxx
+// 0 11110xxxxxxxx--  ->  1 11110xxxxxxxx--  ->  011   0  0xxxxxxx
+// 0 1110xxxxxxxx---  ->  1 1110xxxxxxxx---  ->  100   0  0xxxxxxx
+// 0 110xxxxxxxx----  ->  1 110xxxxxxxx----  ->  101   0  0xxxxxxx
+// 0 10xxxxxxxx-----  ->  1 10xxxxxxxx-----  ->  110   0  0xxxxxxx
+// 0 0xxxxxxxx------  ->  1 0xxxxxxxx------  ->  111   0  0xxxxxxx
+//
+
+//-------------------------------------------------
+//  ymfm_encode_fp - given a 32-bit signed input
+//  value, convert it to a signed 3.10 floating-
+//  point value
+//-------------------------------------------------
+
+inline s16 ymfm_encode_fp(s32 value)
+{
+	// handle overflows first
+	if (value < -32768)
+		return (1 << 10) | 0x200;
+	if (value > 32767)
+		return (1 << 10) | 0x1ff;
+
+	// we need to count the number of leading sign bits after the sign
+	// we can use count_leading_zeros if we invert negative values
+	s32 scanvalue = value ^ (s32(value) >> 31);
+
+	// exponent is related to the number of leading bits starting from bit 14
+	int exponent = 7 - count_leading_zeros(scanvalue << 17);
+
+	// smallest exponent value allowed is 1
+	exponent = std::max(exponent, 1);
+
+	// mantissa
+	s32 mantissa = value >> (exponent - 1);
+
+	// assemble into final form, inverting the sign
+	return ((exponent << 10) | (mantissa & 0x3ff)) ^ 0x200;
+}
+
+
+//-------------------------------------------------
+//  ymfm_decode_fp - given a 3.10 floating-point
+//  value, convert it to a signed 16-bit value
+//-------------------------------------------------
+
+inline s16 ymfm_decode_fp(s16 value)
+{
+	// invert the sign and the exponent
+	value ^= 0x1e00;
+
+	// shift mantissa up to 16 bits then apply inverted exponent
+	return s16(value << 6) >> BIT(value, 10, 3);
+}
+
+
+//-------------------------------------------------
+//  ymfm_roundtrip_fp - compute the result of a
+//  round trip through the encode/decode process
+//  above
+//-------------------------------------------------
+
+inline s16 ymfm_roundtrip_fp(s32 value)
+{
+	// handle overflows first
+	if (value < -32768)
+		return -32768;
+	if (value > 32767)
+		return 32767;
+
+	// we need to count the number of leading sign bits after the sign
+	// we can use count_leading_zeros if we invert negative values
+	s32 scanvalue = value ^ (s32(value) >> 31);
+
+	// exponent is related to the number of leading bits starting from bit 14
+	int exponent = 7 - count_leading_zeros(scanvalue << 17);
+
+	// smallest exponent value allowed is 1
+	exponent = std::max(exponent, 1);
+
+	// apply the shift back and forth to zero out bits that are lost
+	exponent -= 1;
+	return (value >> exponent) << exponent;
+}
+
+
+
+
+
+//*********************************************************
 //  REGISTER CLASSES
 //*********************************************************
 

@@ -11,51 +11,6 @@ DEFINE_DEVICE_TYPE(YM2414, ym2414_device, "ym2414", "YM2414 OPZ")
 
 
 //*********************************************************
-//  INLINE HELPERS
-//*********************************************************
-
-//-------------------------------------------------
-//  linear_to_fp - given a 32-bit signed input
-//  value, convert it to a signed 10.3 floating-
-//  point value
-//-------------------------------------------------
-
-inline s16 linear_to_fp(s32 value)
-{
-	// start with the absolute value
-	s32 avalue = std::abs(value);
-
-	// compute shift to fit in 9 bits (bit 10 is the sign)
-	int shift = (32 - 9) - count_leading_zeros(avalue);
-
-	// if out of range, just return maximum; note that YM3012 DAC does
-	// not support a shift count of 7, so we clamp at 6
-	if (shift >= 7)
-		shift = 6, avalue = 0x1ff;
-	else if (shift > 0)
-		avalue >>= shift;
-	else
-		shift = 0;
-
-	// encode with shift in low 3 bits and signed mantissa in upper
-	return shift | (((value < 0) ? -avalue : avalue) << 3);
-}
-
-
-//-------------------------------------------------
-//  fp_to_linear - given a 10.3 floating-point
-//  value, convert it to a signed 16-bit value,
-//  clamping
-//-------------------------------------------------
-
-inline s32 fp_to_linear(s16 value)
-{
-	return (value >> 3) << BIT(value, 0, 3);
-}
-
-
-
-//*********************************************************
 //  YM2151 DEVICE
 //*********************************************************
 
@@ -218,8 +173,8 @@ void ym2151_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 		// convert to 10.3 floating point value for the DAC and back
 		// OPM is stereo
-		outputs[0].put_int_clamp(sampindex, fp_to_linear(linear_to_fp(sums[0])), 32768);
-		outputs[1].put_int_clamp(sampindex, fp_to_linear(linear_to_fp(sums[1])), 32768);
+		outputs[0].put_int_clamp(sampindex, ymfm_roundtrip_fp(sums[0]), 32768);
+		outputs[1].put_int_clamp(sampindex, ymfm_roundtrip_fp(sums[1]), 32768);
 	}
 }
 
