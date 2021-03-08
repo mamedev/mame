@@ -166,7 +166,7 @@ void ym2203_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 		// convert to 10.3 floating point value for the DAC and back
 		// OPN is mono, so only the left sum matters
-		outputs[0].put_int_clamp(sampindex, ymfm_roundtrip_fp(sum), 32768);
+		outputs[0].put_int(sampindex, ymfm_roundtrip_fp(sum), 32768);
 	}
 }
 
