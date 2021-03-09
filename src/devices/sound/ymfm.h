@@ -1208,6 +1208,8 @@ public:
 //  CORE ENGINE CLASSES
 //*********************************************************
 
+template<class RegisterType> class ymfm_engine_base;
+
 enum ymfm_keyon_type : u8
 {
 	YMFM_KEYON_NORMAL = 0,
@@ -1231,7 +1233,7 @@ class ymfm_operator
 
 public:
 	// constructor
-	ymfm_operator(RegisterType regs);
+	ymfm_operator(ymfm_engine_base<RegisterType> &owner, RegisterType regs);
 
 	// register for save states
 	void save(device_t &device, u8 index);
@@ -1290,6 +1292,7 @@ private:
 	u8 m_key_state;                  // current key state: on or off (bit 0)
 	u8 m_keyon_live;                 // live key on state (bit 0 = direct, bit 1 = rhythm, bit 2 = CSM)
 	RegisterType m_regs;             // operator-specific registers
+	ymfm_engine_base<RegisterType> &m_owner; // reference to the owning engine
 };
 
 
@@ -1300,7 +1303,7 @@ class ymfm_channel
 {
 public:
 	// constructor
-	ymfm_channel(RegisterType regs);
+	ymfm_channel(ymfm_engine_base<RegisterType> &owner, RegisterType regs);
 
 	// register for save states
 	void save(device_t &device, u8 index);
@@ -1353,6 +1356,7 @@ private:
 	mutable s16 m_feedback_in;            // next input value for op 1 feedback (set in output)
 	ymfm_operator<RegisterType> *m_op[4]; // up to 4 operators
 	RegisterType m_regs;                  // channel-specific registers
+	ymfm_engine_base<RegisterType> &m_owner; // reference to the owning engine
 };
 
 
@@ -1413,6 +1417,9 @@ public:
 
 	// reset the LFO state
 	void reset_lfo() { m_lfo_counter = 0; }
+
+	// return the owning device
+	device_t &device() const { return m_device; }
 
 private:
 	// clock the LFO, updating m_lfo_am and return the signed PM value

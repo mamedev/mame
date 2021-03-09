@@ -459,14 +459,15 @@ inline u8 opl_key_scale_atten(u16 block_freq)
 //-------------------------------------------------
 
 template<class RegisterType>
-ymfm_operator<RegisterType>::ymfm_operator(RegisterType regs) :
+ymfm_operator<RegisterType>::ymfm_operator(ymfm_engine_base<RegisterType> &owner, RegisterType regs) :
 	m_phase(0),
 	m_env_attenuation(0x3ff),
 	m_env_state(ENV_RELEASE),
 	m_ssg_inverted(false),
 	m_key_state(0),
 	m_keyon_live(0),
-	m_regs(regs)
+	m_regs(regs),
+	m_owner(owner)
 {
 }
 
@@ -641,7 +642,6 @@ u8 ymfm_operator<RegisterType>::effective_rate(u8 rawrate, u8 keycode)
 //-------------------------------------------------
 
 // yuck, temporary...
-static device_t *device_ptr = nullptr;
 DECLARE_DEVICE_TYPE(Y8950, y8950_device);
 
 template<class RegisterType>
@@ -667,9 +667,9 @@ void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 //	if (m_regs.lfo_waveform() == 3 && m_regs.lfo_enabled() && ((m_regs.lfo_am_enabled() && m_regs.lfo_am_sensitivity() != 0) || m_regs.lfo_pm_sensitivity() != 0))
 //	if ((m_regs.rhythm_enable() && m_regs.chnum() >= 6) ||
 //	    (m_regs.waveform_enable() && m_regs.waveform() != 0))
-	if (device_ptr->type() == Y8950)
+	if (m_owner.device().type() == Y8950)
 	{
-		LOG("%s: %2d.%2d: freq=%04X", device_ptr->tag(), m_regs.chnum(), m_regs.opnum(), m_regs.block_freq());
+		LOG("%s: %2d.%2d: freq=%04X", m_owner.device().tag(), m_regs.chnum(), m_regs.opnum(), m_regs.block_freq());
 		if (RegisterType::FAMILY == RegisterType::FAMILY_OPM)
 			LOG(" dt2=%d", m_regs.detune2());
 		if (RegisterType::FAMILY != RegisterType::FAMILY_OPL)
@@ -735,8 +735,8 @@ void ymfm_operator<RegisterType>::clock_keystate(u8 keystate, u8 keycode)
 	{
 		m_key_state = keystate;
 
-		if (device_ptr->type() == Y8950)
-			LOG("%s: %2d.%2d: keystate=%d cur=%d\n", device_ptr->tag(), m_regs.chnum(), m_regs.opnum(), keystate, int(m_env_state));
+		if (m_owner.device().type() == Y8950)
+			LOG("%s: %2d.%2d: keystate=%d cur=%d\n", m_owner.device().tag(), m_regs.chnum(), m_regs.opnum(), keystate, int(m_env_state));
 
 		// if the key has turned on, start the attack
 		if (keystate != 0)
@@ -1031,11 +1031,12 @@ u16 ymfm_operator<RegisterType>::envelope_attenuation(u8 am_offset) const
 //-------------------------------------------------
 
 template<class RegisterType>
-ymfm_channel<RegisterType>::ymfm_channel(RegisterType regs) :
+ymfm_channel<RegisterType>::ymfm_channel(ymfm_engine_base<RegisterType> &owner, RegisterType regs) :
 	m_feedback{ 0, 0 },
 	m_feedback_in(0),
 	m_op{ nullptr, nullptr, nullptr, nullptr },
-	m_regs(regs)
+	m_regs(regs),
+	m_owner(owner)
 {
 }
 
@@ -1073,8 +1074,8 @@ void ymfm_channel<RegisterType>::reset()
 template<class RegisterType>
 void ymfm_channel<RegisterType>::keyonoff(u8 states, ymfm_keyon_type type)
 {
-	if (device_ptr->type() == Y8950)
-		LOG("%s: %2d.xx: keyon=%d\n", device_ptr->tag(), m_regs.chnum(), states);
+	if (m_owner.device().type() == Y8950)
+		LOG("%s: %2d.xx: keyon=%d\n", m_owner.device().tag(), m_regs.chnum(), states);
 	for (int opnum = 0; opnum < std::size(m_op); opnum++)
 		if (m_op[opnum] != nullptr)
 			m_op[opnum]->keyonoff(BIT(states, opnum), type);
@@ -1436,7 +1437,7 @@ ymfm_engine_base<RegisterType>::ymfm_engine_base(device_t &device) :
 	{
 		RegisterType registers(&m_regdata[0]);
 		registers.set_chnum(chnum);
-		m_channel[chnum] = std::make_unique<ymfm_channel<RegisterType>>(registers);
+		m_channel[chnum] = std::make_unique<ymfm_channel<RegisterType>>(*this, registers);
 	}
 
 	// create the operators
@@ -1444,7 +1445,7 @@ ymfm_engine_base<RegisterType>::ymfm_engine_base(device_t &device) :
 	{
 		RegisterType registers(&m_regdata[0]);
 		registers.set_opnum(opnum);
-		m_operator[opnum] = std::make_unique<ymfm_operator<RegisterType>>(registers);
+		m_operator[opnum] = std::make_unique<ymfm_operator<RegisterType>>(*this, registers);
 
 		// perform a default assignment to the appropriate channel
 		auto mapping = RegisterType::opnum_to_chnum_and_index(opnum);
@@ -1610,9 +1611,6 @@ void ymfm_engine_base<RegisterType>::output(s32 outputs[RegisterType::OUTPUTS], 
 template<class RegisterType>
 void ymfm_engine_base<RegisterType>::write(u16 regnum, u8 data)
 {
-	// yuck...
-	device_ptr = &m_device;
-
 	// special case: writes to the mode register can impact IRQs;
 	// schedule these writes to ensure ordering with timers
 	if (regnum == RegisterType::REG_MODE)
@@ -1875,9 +1873,6 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::timer_handler)
 		set_reset_status(RegisterType::STATUS_TIMERA, 0);
 	else if (param == 1 && m_regs.enable_timer_b())
 	 	set_reset_status(RegisterType::STATUS_TIMERB, 0);
-
-	// yuck...
-	device_ptr = &m_device;
 
 	// if timer A fired in CSM mode, trigger CSM on all relevant channels
 	if (param == 0 && m_regs.csm())
