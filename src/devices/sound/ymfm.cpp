@@ -640,6 +640,10 @@ u8 ymfm_operator<RegisterType>::effective_rate(u8 rawrate, u8 keycode)
 //  is complete and restarts
 //-------------------------------------------------
 
+// yuck, temporary...
+static device_t *device_ptr = nullptr;
+DECLARE_DEVICE_TYPE(Y8950, y8950_device);
+
 template<class RegisterType>
 void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 {
@@ -661,34 +665,37 @@ void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 
 	// log key on events under certain conditions
 //	if (m_regs.lfo_waveform() == 3 && m_regs.lfo_enabled() && ((m_regs.lfo_am_enabled() && m_regs.lfo_am_sensitivity() != 0) || m_regs.lfo_pm_sensitivity() != 0))
-	if ((m_regs.rhythm_enable() && m_regs.chnum() >= 6) ||
-	    (m_regs.waveform_enable() && m_regs.waveform() != 0))
+//	if ((m_regs.rhythm_enable() && m_regs.chnum() >= 6) ||
+//	    (m_regs.waveform_enable() && m_regs.waveform() != 0))
+	if (device_ptr->type() == Y8950)
 	{
-		LOG("KeyOn %2d.%2d: freq=%04X dt2=%d fb=%d alg=%d dt=%d mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X pan=%c%c",
-			m_regs.chnum(), m_regs.opnum(),
-			m_regs.block_freq(),
-			m_regs.detune2(),
-			m_regs.feedback(),
-			m_regs.algorithm(),
-			m_regs.detune(),
-			m_regs.multiple(),
-			m_regs.total_level(),
-			m_regs.ksr(),
-			m_regs.attack_rate(),
-			m_regs.decay_rate(),
-			m_regs.sustain_rate(),
-			m_regs.release_rate(),
-			m_regs.sustain_level(),
-			m_regs.pan_left() ? 'L' : '-',
-			m_regs.pan_right() ? 'R' : '-');
+		LOG("%s: %2d.%2d: freq=%04X", device_ptr->tag(), m_regs.chnum(), m_regs.opnum(), m_regs.block_freq());
+		if (RegisterType::FAMILY == RegisterType::FAMILY_OPM)
+			LOG(" dt2=%d", m_regs.detune2());
+		if (RegisterType::FAMILY != RegisterType::FAMILY_OPL)
+			LOG(" dt=%d", m_regs.detune());
+		LOG(" fb=%d alg=%d mul=%X tl=%02X ksr=%d", m_regs.feedback(), m_regs.algorithm(), m_regs.multiple(), m_regs.total_level(), m_regs.ksr());
+		if (RegisterType::FAMILY == RegisterType::FAMILY_OPL)
+			LOG(" ns=%d ksl=%d adr=%X/%X/%X sus=%d", m_regs.note_select(), m_regs.key_scale_level(), m_regs.attack_rate()/2, m_regs.decay_rate()/2, m_regs.release_rate(), m_regs.eg_sustain());
+		else
+			LOG(" adsr=%02X/%02X/%02X/%X", m_regs.attack_rate(), m_regs.decay_rate(), m_regs.sustain_rate(), m_regs.release_rate());
+		LOG(" sl=%X", m_regs.sustain_level());
+		if (RegisterType::OUTPUTS > 1)
+			LOG(" pan=%c%c", m_regs.pan_left() ? 'L' : '-', m_regs.pan_right() ? 'R' : '-');
 		if (m_regs.ssg_eg_enabled())
 			LOG(" ssg=%X", m_regs.ssg_eg_mode());
 		if (m_regs.lfo_enabled() && ((m_regs.lfo_am_enabled() && m_regs.lfo_am_sensitivity() != 0) || m_regs.lfo_pm_sensitivity() != 0))
-			LOG(" am=%d pm=%d w=%d", m_regs.lfo_am_enabled() ? m_regs.lfo_am_sensitivity() : 0, m_regs.lfo_pm_sensitivity(), m_regs.lfo_waveform());
+		{
+			LOG(" am=%d pm=%d", m_regs.lfo_am_enabled() ? m_regs.lfo_am_sensitivity() : 0, m_regs.lfo_pm_sensitivity());
+			if (RegisterType::FAMILY == RegisterType::FAMILY_OPM)
+				LOG(" w=%d", m_regs.lfo_waveform());
+		}
 		if (m_regs.noise_enabled() && m_regs.opnum() == 3 && m_regs.chnum() == 7)
 			LOG(" noise=1");
 		if (m_regs.waveform_enable() && m_regs.waveform() != 0)
 			LOG(" wf=%d", m_regs.waveform());
+		if (m_regs.rhythm_enable() && m_regs.chnum() >= 6)
+			LOG(" rhy=1");
 		LOG("\n");
 	}
 }
@@ -727,6 +734,9 @@ void ymfm_operator<RegisterType>::clock_keystate(u8 keystate, u8 keycode)
 	if ((keystate ^ m_key_state) != 0)
 	{
 		m_key_state = keystate;
+
+		if (device_ptr->type() == Y8950)
+			LOG("%s: %2d.%2d: keystate=%d cur=%d\n", device_ptr->tag(), m_regs.chnum(), m_regs.opnum(), keystate, int(m_env_state));
 
 		// if the key has turned on, start the attack
 		if (keystate != 0)
@@ -1063,6 +1073,8 @@ void ymfm_channel<RegisterType>::reset()
 template<class RegisterType>
 void ymfm_channel<RegisterType>::keyonoff(u8 states, ymfm_keyon_type type)
 {
+	if (device_ptr->type() == Y8950)
+		LOG("%s: %2d.xx: keyon=%d\n", device_ptr->tag(), m_regs.chnum(), states);
 	for (int opnum = 0; opnum < std::size(m_op); opnum++)
 		if (m_op[opnum] != nullptr)
 			m_op[opnum]->keyonoff(BIT(states, opnum), type);
@@ -1598,6 +1610,9 @@ void ymfm_engine_base<RegisterType>::output(s32 outputs[RegisterType::OUTPUTS], 
 template<class RegisterType>
 void ymfm_engine_base<RegisterType>::write(u16 regnum, u8 data)
 {
+	// yuck...
+	device_ptr = &m_device;
+
 	// special case: writes to the mode register can impact IRQs;
 	// schedule these writes to ensure ordering with timers
 	if (regnum == RegisterType::REG_MODE)
@@ -1861,6 +1876,9 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::timer_handler)
 	else if (param == 1 && m_regs.enable_timer_b())
 	 	set_reset_status(RegisterType::STATUS_TIMERB, 0);
 
+	// yuck...
+	device_ptr = &m_device;
+
 	// if timer A fired in CSM mode, trigger CSM on all relevant channels
 	if (param == 0 && m_regs.csm())
 		for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
@@ -1925,15 +1943,23 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::synced_mode_w)
 	// actually write the mode register now
 	m_regs.write(RegisterType::REG_MODE, param);
 
-	// reset timer status
-	if (m_regs.reset_timer_b())
-		set_reset_status(0, RegisterType::STATUS_TIMERB);
-	if (m_regs.reset_timer_a())
-		set_reset_status(0, RegisterType::STATUS_TIMERA);
+	// reset IRQ status -- when written, all other bits are ignored
+	// QUESTION: should this maybe just reset the IRQ bit and not all the bits?
+	//   That is, check_interrupts would only set, this would only clear?
+	if (m_regs.irq_reset())
+		set_reset_status(0, 0x78);
+	else
+	{
+		// reset timer status
+		if (m_regs.reset_timer_b())
+			set_reset_status(0, RegisterType::STATUS_TIMERB);
+		if (m_regs.reset_timer_a())
+			set_reset_status(0, RegisterType::STATUS_TIMERA);
 
-	// load timers
-	update_timer(1, m_regs.load_timer_b());
-	update_timer(0, m_regs.load_timer_a());
+		// load timers
+		update_timer(1, m_regs.load_timer_b());
+		update_timer(0, m_regs.load_timer_a());
+	}
 }
 
 

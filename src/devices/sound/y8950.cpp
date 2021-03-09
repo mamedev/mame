@@ -22,7 +22,6 @@ y8950_device::y8950_device(const machine_config &mconfig, const char *tag, devic
 	device_rom_interface(mconfig, *this),
 	m_address(0),
 	m_io_ddr(0),
-	m_full_irq_mask(ALL_IRQS),
 	m_stream(nullptr),
 	m_opl(*this),
 	m_adpcm_b(*this, read8sm_delegate(*this, FUNC(y8950_device::adpcm_b_read)), write8sm_delegate(*this, FUNC(y8950_device::adpcm_b_write))),
@@ -97,11 +96,6 @@ void y8950_device::write(offs_t offset, u8 value)
 			switch (m_address)
 			{
 				case 0x04:	// IRQ control
-					if (!BIT(value, 7))
-					{
-						m_full_irq_mask = ~value & ALL_IRQS;
-						m_opl.set_irq_mask(m_full_irq_mask);
-					}
 					m_opl.write(m_address, value);
 					combine_status();
 					break;
@@ -111,7 +105,7 @@ void y8950_device::write(offs_t offset, u8 value)
 					break;
 
 				case 0x08:	// split OPL/ADPCM-B
-					adpcm_w(m_address - 0x07, (value & 0x0f) | 0x80);
+					m_adpcm_b.write(m_address - 0x07, (value & 0x0f) | 0x80);
 					m_opl.write(m_address, value & 0xc0);
 					break;
 
@@ -128,7 +122,7 @@ void y8950_device::write(offs_t offset, u8 value)
 				case 0x15:
 				case 0x16:
 				case 0x17:
-					adpcm_w(m_address - 0x07, value);
+					m_adpcm_b.write(m_address - 0x07, value);
 					break;
 
 				case 0x18:	// I/O direction
@@ -168,7 +162,6 @@ void y8950_device::device_start()
 	// save our data
 	save_item(YMFM_NAME(m_address));
 	save_item(YMFM_NAME(m_io_ddr));
-	save_item(YMFM_NAME(m_full_irq_mask));
 
 	// save the engines
 	m_opl.save(*this);
@@ -190,10 +183,6 @@ void y8950_device::device_reset()
 	// reset the engines
 	m_opl.reset();
 	m_adpcm_b.reset();
-
-	// initialize our special interrupt states
-	m_full_irq_mask = ymopl2_registers::STATUS_TIMERA | ymopl2_registers::STATUS_TIMERB;
-	m_opl.set_irq_mask(m_full_irq_mask);
 }
 
 
@@ -249,22 +238,6 @@ void y8950_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 
 
 //-------------------------------------------------
-//  adpcm_w - write to the ADPCM chip, checking
-//  for status changes that need to be propagated
-//  to the OPL status register
-//-------------------------------------------------
-
-void y8950_device::adpcm_w(u8 offset, u8 data)
-{
-	u8 status0 = m_adpcm_b.status(0);
-	m_adpcm_b.write(offset, data);
-	u8 status1 = m_adpcm_b.status(0);
-	if (status0 ^ status1)
-		combine_status();
-}
-
-
-//-------------------------------------------------
 //  combine_status - combine status flags from
 //  OPN and ADPCM-B, masking out any indicated by
 //  the flag control register
@@ -280,7 +253,6 @@ u8 y8950_device::combine_status()
 		status |= STATUS_ADPCM_B_BRDY;
 	if ((adpcm_status & ymadpcm_b_channel::STATUS_PLAYING) != 0)
 		status |= STATUS_ADPCM_B_PLAYING;
-	status &= m_full_irq_mask;
 	m_opl.set_reset_status(status, ~status);
 	return status;
 }

@@ -221,41 +221,43 @@ public:
 	};
 
 	// system-wide registers that aren't universally supported
-	u8 noise_frequency() const    /*  5 bits */ { return 0; } // not on OPN,OPNA,OPL
-	u8 noise_enabled() const      /*  1 bit  */ { return 0; } // not on OPN,OPNA,OPL
-	u8 lfo_enabled() const        /*  1 bit  */ { return 0; } // not on OPM,OPN,OPL
-	u8 lfo_rate() const           /*3-8 bits */ { return 0; } // not on OPN,OPL
-	u8 lfo_waveform() const       /*  2 bits */ { return 0; } // not on OPN,OPNA,OPL
-	u8 lfo_pm_depth() const       /*  7 bits */ { return 0; } // not on OPN,OPNA
-	u8 lfo_am_depth() const       /*  7 bits */ { return 0; } // not on OPN,OPNA
-	u8 multi_freq() const         /*  1 bit  */ { return 0; } // not on OPM,OPL
-	u16 multi_block_freq0() const /* 14 bits */ { return 0; } // not on OPM,OPL
-	u16 multi_block_freq1() const /* 14 bits */ { return 0; } // not on OPM,OPL
-	u16 multi_block_freq2() const /* 14 bits */ { return 0; } // not on OPM,OPL
-	u8 note_select() const        /*  1 bit  */ { return 0; } // not on OPM,OPN,OPNA,OPL
-	u8 rhythm_enable() const      /*  1 bit  */ { return 0; } // not on OPM,OPN,OPN2
-	u8 rhythm_keyon() const       /*  5 bits */ { return 0; } // not on OPM,OPN,OPN2
-	u8 waveform_enable() const    /*  1 bits */ { return 0; } // not on OPM,OPN,OPNA,OPL
+	u8 status_mask() const        /*  8 bits */ { return 0; } // OPL only
+	u8 irq_reset() const          /*  8 bits */ { return 0; } // OPL only
+	u8 noise_frequency() const    /*  5 bits */ { return 0; } // OPM only
+	u8 noise_enabled() const      /*  1 bit  */ { return 0; } // OPM only
+	u8 lfo_enabled() const        /*  1 bit  */ { return 1; } // OPN(A) only
+	u8 lfo_rate() const           /*3-8 bits */ { return 0; } // OPM,OPNA
+	u8 lfo_waveform() const       /*  2 bits */ { return 0; } // OPM only
+	u8 lfo_pm_depth() const       /*  7 bits */ { return 0; } // OPM,OPL only
+	u8 lfo_am_depth() const       /*  7 bits */ { return 0; } // OPM,OPL only
+	u8 multi_freq() const         /*  1 bit  */ { return 0; } // OPN(A) only
+	u16 multi_block_freq0() const /* 14 bits */ { return 0; } // OPN(A) only
+	u16 multi_block_freq1() const /* 14 bits */ { return 0; } // OPN(A) only
+	u16 multi_block_freq2() const /* 14 bits */ { return 0; } // OPN(A) only
+	u8 note_select() const        /*  1 bit  */ { return 0; } // OPL only
+	u8 rhythm_enable() const      /*  1 bit  */ { return 0; } // OPL only
+	u8 rhythm_keyon() const       /*  5 bits */ { return 0; } // OPL only
+	u8 waveform_enable() const    /*  1 bits */ { return 0; } // OPL2+ only
 
 	// per-channel registers that aren't universally supported
-	u8 pan_right() const          /*  1 bit  */ { return 1; } // not on OPN,OPL
-	u8 pan_left() const           /*  1 bit  */ { return 1; } // not on OPN,OPL
-	u8 external0() const          /*  1 bit  */ { return 0; } // not on OPM,OPN,OPNA,OPL,OPL2
-	u8 external1() const          /*  1 bit  */ { return 0; } // not on OPM,OPN,OPNA,OPL,OPL2
-	u8 lfo_pm_sensitivity() const /*  3 bits */ { return 0; } // not on OPN,OPL
-	u8 lfo_am_sensitivity() const /*  2 bits */ { return 0; } // not on OPN,OPL
+	u8 pan_right() const          /*  1 bit  */ { return 1; } // OPM,OPNA,OPL3+ only
+	u8 pan_left() const           /*  1 bit  */ { return 1; } // OPM,OPNA,OPL3+ only
+	u8 external0() const          /*  1 bit  */ { return 0; } // OPL3+ only
+	u8 external1() const          /*  1 bit  */ { return 0; } // OPL3+ only
+	u8 lfo_pm_sensitivity() const /*  3 bits */ { return 0; } // OPM,OPNA only
+	u8 lfo_am_sensitivity() const /*  2 bits */ { return 0; } // OPM,OPNA only
 
 	// per-operator registers that aren't universally supported
-	u8 lfo_am_enabled() const     /*  1 bit  */ { return 0; } // not on OPN
-	u8 lfo_pm_enabled() const     /*  1 bit  */ { return 0; } // not on OPM,OPN,OPNA
-	u8 detune() const             /*  3 bits */ { return 0; } // not on OPL
-	u8 detune2() const            /*  2 bits */ { return 0; } // not on OPN,OPNA,OPL
-	u8 eg_sustain() const         /*  1 bit  */ { return 1; } // not on OPM,OPN,OPNA
-	u8 ssg_eg_enabled() const     /*  1 bit  */ { return 0; } // not on OPM,OPL
-	u8 ssg_eg_mode() const        /*  1 bit  */ { return 0; } // not on OPM,OPL
-	u8 sustain_rate() const       /*  4 bits */ { return 0; } // not on OPL
-	u8 key_scale_level() const    /*  2 bits */ { return 0; } // not on OPM,OPN,OPNA
-	u8 waveform() const           /*  3 bits */ { return 0; } // not on OPM,OPN,OPNA,OPL
+	u8 lfo_am_enabled() const     /*  1 bit  */ { return 0; } // OPM,OPNA,OPL only
+	u8 lfo_pm_enabled() const     /*  1 bit  */ { return 0; } // OPL only
+	u8 detune() const             /*  3 bits */ { return 0; } // OPM,OPN(A) only
+	u8 detune2() const            /*  2 bits */ { return 0; } // OPM only
+	u8 eg_sustain() const         /*  1 bit  */ { return 1; } // OPL only
+	u8 ssg_eg_enabled() const     /*  1 bit  */ { return 0; } // OPN(A) only
+	u8 ssg_eg_mode() const        /*  1 bit  */ { return 0; } // OPN(A) only
+	u8 sustain_rate() const       /*  4 bits */ { return 0; } // OPM,OPN(A) only
+	u8 key_scale_level() const    /*  2 bits */ { return 0; } // OPL only
+	u8 waveform() const           /*  3 bits */ { return 0; } // OPL2+ only
 
 protected:
 	// return a bitfield extracted from a byte
@@ -500,9 +502,6 @@ public:
 	u8 sustain_level() const      /*  4 bits */ { return opbyte(0xe0, 4, 4); }
 	u8 release_rate() const       /*  4 bits */ { return opbyte(0xe0, 0, 4); }
 
-	// LFO is always enabled
-	u8 lfo_enabled() const { return 1; }
-
 	// special helper for generically getting the attack/decay/statain/release rates
 	u8 adsr_rate(u8 state) const
 	{
@@ -740,6 +739,9 @@ public:
 	u8 release_rate() const       /*  4 bits */ { return opbyte(0x80, 0, 4); }
 	u8 ssg_eg_enabled() const     /*  1 bit  */ { return opbyte(0x90, 3, 1); }
 	u8 ssg_eg_mode() const        /*  3 bits */ { return opbyte(0x90, 0, 3); }
+
+	// no LFO on OPN
+	u8 lfo_enabled() const { return 0; }
 
 	// special helper for generically getting the attack/decay/statain/release rates
 	u8 adsr_rate(u8 state) const
@@ -1136,6 +1138,8 @@ public:
 	u8 test() const               /*  8 bits */ { return sysbyte(0x01, 0, 8); }
 	u16 timer_a_value() const     /*  8 bits */ { return sysbyte(0x02, 0, 8) * 4; } // 8->10 bits
 	u8 timer_b_value() const      /*  8 bits */ { return sysbyte(0x03, 0, 8); }
+	u8 status_mask() const        /*  8 bits */ { return sysbyte(0x04, 0, 8) & 0x78; }
+	u8 irq_reset() const          /*  1 bit  */ { return sysbyte(0x04, 7, 1); }
 	u8 reset_timer_b() const      /*  1 bit  */ { return sysbyte(0x04, 7, 1) | sysbyte(0x04, 5, 1); }
 	u8 reset_timer_a() const      /*  1 bit  */ { return sysbyte(0x04, 7, 1) | sysbyte(0x04, 6, 1); }
 	u8 enable_timer_b() const     /*  1 bit  */ { return sysbyte(0x04, 5, 1) ^ 1; }
@@ -1166,9 +1170,6 @@ public:
 	u8 decay_rate() const         /*  4 bits */ { return opbyte(0x60, 0, 4) * 2; } // 4->5 bits
 	u8 sustain_level() const      /*  4 bits */ { return opbyte(0x80, 4, 4); }
 	u8 release_rate() const       /*  4 bits */ { return opbyte(0x80, 0, 4); }
-
-	// LFO is always enabled
-	u8 lfo_enabled() const { return 1; }
 
 	// special helper for generically getting the attack/decay/statain/release rates
 	u8 adsr_rate(u8 state) const
@@ -1386,7 +1387,11 @@ public:
 	u8 status() const;
 
 	// set/reset bits in the status register, updating the IRQ status
-	void set_reset_status(u8 set, u8 reset) { m_status = (m_status | set) & ~reset; schedule_check_interrupts(); }
+	void set_reset_status(u8 set, u8 reset)
+	{
+		m_status = (m_status | set) & ~reset & ~m_regs.status_mask();
+		schedule_check_interrupts();
+	}
 
 	// set the IRQ mask
 	void set_irq_mask(u8 mask) { m_irq_mask = mask; schedule_check_interrupts(); }

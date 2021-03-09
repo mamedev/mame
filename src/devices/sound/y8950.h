@@ -54,9 +54,6 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
-	// internal write to ADPCM
-	void adpcm_w(u8 offset, u8 data);
-
 	// combine ADPCM and OPN statuses
 	u8 combine_status();
 
@@ -67,7 +64,6 @@ private:
 	// internal state
 	u8 m_address;                    // address register
 	u8 m_io_ddr;                     // data direction register for I/O
-	u8 m_full_irq_mask;              // current IRQ mask bits
 	sound_stream *m_stream;          // sound stream
 	ymopl_engine m_opl;              // core OPL engine
 	ymadpcm_b_engine m_adpcm_b;      // ADPCM-B engine
