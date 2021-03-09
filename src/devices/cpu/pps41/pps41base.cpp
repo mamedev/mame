@@ -41,7 +41,6 @@ TODO:
 - allowed opcodes after TAB should be limited
 - add MCU mask options, there's one for inverting interrupts
 - add serial i/o
-- finish MM78 opcodes
 - add MM78LA
 
 */

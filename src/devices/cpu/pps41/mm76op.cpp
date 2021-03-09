@@ -96,11 +96,12 @@ void mm76_device::op_sb()
 	// Bu falling or Bu == 3: SOS
 	if (((m_prev2_b & 0x30) == 0x30 && (m_prev_b & 0x30) != 0x30) || (m_prev_b & 0x30) == 0x30)
 	{
-		if ((m_ram_addr & 0xf) > m_d_pins)
-			logerror("SOS invalid pin %d at $%03X\n", m_ram_addr & 0xf, m_prev_pc);
+		u8 bl = m_ram_addr & 0xf;
+		if (bl > m_d_pins)
+			logerror("SOS invalid pin %d at $%03X\n", bl, m_prev_pc);
 		else
 		{
-			m_d_output = (m_d_output | (1 << (m_ram_addr & 0xf))) & m_d_mask;
+			m_d_output = (m_d_output | (1 << bl)) & m_d_mask;
 			m_write_d(m_d_output);
 		}
 	}
@@ -124,11 +125,12 @@ void mm76_device::op_rb()
 	// Bu falling or Bu == 3: ROS
 	if (((m_prev2_b & 0x30) == 0x30 && (m_prev_b & 0x30) != 0x30) || (m_prev_b & 0x30) == 0x30)
 	{
-		if ((m_ram_addr & 0xf) > m_d_pins)
-			logerror("ROS invalid pin %d at $%03X\n", m_ram_addr & 0xf, m_prev_pc);
+		u8 bl = m_ram_addr & 0xf;
+		if (bl > m_d_pins)
+			logerror("ROS invalid pin %d at $%03X\n", bl, m_prev_pc);
 		else
 		{
-			m_d_output = m_d_output & ~(1 << (m_ram_addr & 0xf));
+			m_d_output = m_d_output & ~(1 << bl);
 			m_write_d(m_d_output);
 		}
 	}
@@ -152,10 +154,11 @@ void mm76_device::op_skbf()
 	// Bu falling or Bu == 3: SKISL
 	if (((m_prev2_b & 0x30) == 0x30 && (m_prev_b & 0x30) != 0x30) || (m_prev_b & 0x30) == 0x30)
 	{
-		if ((m_ram_addr & 0xf) > m_d_pins)
-			logerror("SKISL invalid pin %d at $%03X\n", m_ram_addr & 0xf, m_prev_pc);
+		u8 bl = m_ram_addr & 0xf;
+		if (bl > m_d_pins)
+			logerror("SKISL invalid pin %d at $%03X\n", bl, m_prev_pc);
 		else
-			m_skip = !BIT((m_d_output | m_read_d()) & m_d_mask, m_ram_addr & 0xf);
+			m_skip = !BIT((m_d_output | m_read_d()) & m_d_mask, bl);
 	}
 
 	// Bu != 3: SKBF
