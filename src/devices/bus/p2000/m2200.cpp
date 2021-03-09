@@ -6,7 +6,7 @@
 
 **********************************************************************/
 
-#include "emu.h"
+
 #include "m2200.h"
 
 #define LOG_IRQ    (1U << 1)   // CTC / FDC interrupt
@@ -26,9 +26,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(P2000_FDC, p2000_fdc_device, "p2000_fdc", "P2000 Floppy Disk Controller")
-DEFINE_DEVICE_TYPE(P2000_M2200, p2000_m2200_multipurpose_device, "p2000_m2200", "P2000 Miniware M2200 Multi Purpose FDC - 256K RAM disk")
-DEFINE_DEVICE_TYPE(P2000_M2200D, p2000_m2200d_multipurpose_device, "p2000_m2200d", "P2000 Miniware M2200D Multi Purpose FDC - 64K RAM disk")
+DEFINE_DEVICE_TYPE(P2000_FDC,    p2000_fdc_device,                 "p2kfdc",    "P2000 Floppy Disk Controller")
+DEFINE_DEVICE_TYPE(P2000_M2200,  p2000_m2200_multipurpose_device,  "p2km2200",  "P2000 Miniware M2200 Multi Purpose FDC - 256K RAM disk")
+DEFINE_DEVICE_TYPE(P2000_M2200D, p2000_m2200d_multipurpose_device, "p2km2200d", "P2000 Miniware M2200D Multi Purpose FDC - 64K RAM disk")
 
 static DEVICE_INPUT_DEFAULTS_START( rs232 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_2400 )
@@ -74,11 +74,11 @@ void p2000_fdc_device::device_add_mconfig(machine_config &config)
     
     z80_device *maincpu = nullptr;
     maincpu = config.root_device().subdevice<z80_device>("maincpu");
-    if (maincpu == nullptr)
-        osd_printf_error("maincpu not found!");
-    else 
+    if (maincpu != nullptr)
+    {
         maincpu->set_daisy_config(get_z80_daisy_config());
-
+    }
+        
     // The floppy drive driver
     UPD765A(config, m_fdc, 4_MHz_XTAL, true, true);
     m_fdc->intrq_wr_callback().set(FUNC(p2000_fdc_device::fdc_irq_trigger));
@@ -99,10 +99,10 @@ void p2000_m2200_multipurpose_device::device_add_mconfig(machine_config &config)
     
     z80_device *maincpu = nullptr;
     maincpu = config.root_device().subdevice<z80_device>("maincpu");
-    if (maincpu == nullptr)
-        osd_printf_error("maincpu not found!");
-    else 
+    if (maincpu != nullptr)
+    {
         maincpu->set_daisy_config(get_z80_daisy_config());
+    }
 
     /* The floppy drive driver */
     UPD765A(config, m_fdc, 4_MHz_XTAL, true, true);
@@ -169,9 +169,9 @@ void p2000_m2200_multipurpose_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 //  Constructors
 //-------------------------------------------------
-
-p2000_fdc_device::p2000_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, P2000_M2200, tag, owner, clock)
+                    
+p2000_fdc_device::p2000_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
     , device_p2000_expansion_slot_card_interface(mconfig, *this)
         , m_ctc(*this, "ctc")
         , m_fdc(*this, "fdc")
@@ -179,8 +179,13 @@ p2000_fdc_device::p2000_fdc_device(const machine_config &mconfig, const char *ta
 {
 }
 
-p2000_m2200_multipurpose_device::p2000_m2200_multipurpose_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-    : p2000_fdc_device(mconfig, tag, owner, clock)
+p2000_fdc_device::p2000_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+    : p2000_fdc_device(mconfig, P2000_FDC, tag, owner, clock)
+{
+}
+
+p2000_m2200_multipurpose_device::p2000_m2200_multipurpose_device(const machine_config &mconfig, device_type type,  const char *tag, device_t *owner, uint32_t clock)
+    : p2000_fdc_device(mconfig, type, tag, owner, clock)
     , m_rtc(*this, "rtc")
     , m_ctc2(*this, "ctc2")
     , m_sio(*this, "sio")
@@ -188,8 +193,13 @@ p2000_m2200_multipurpose_device::p2000_m2200_multipurpose_device(const machine_c
 {
 }
 
+p2000_m2200_multipurpose_device::p2000_m2200_multipurpose_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+    : p2000_m2200_multipurpose_device(mconfig, P2000_M2200, tag, owner, clock)
+{
+}
+
 p2000_m2200d_multipurpose_device::p2000_m2200d_multipurpose_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-    : p2000_m2200_multipurpose_device(mconfig, tag, owner, clock)
+    : p2000_m2200_multipurpose_device(mconfig, P2000_M2200D, tag, owner, clock)
 {
 }
 

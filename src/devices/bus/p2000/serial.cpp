@@ -13,11 +13,10 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(P2000_P2174V24, p2000_p2174_serial_device,          "p2000_p2174v24",    "P2000 P2174 V.24 Serial Interface")
-DEFINE_DEVICE_TYPE(P2000_PTCV24,   p2000_v24serial_device,             "p2000_ptcv24",      "P2000 PTC V.24 Serial Interface")
-DEFINE_DEVICE_TYPE(P2000_M2001V24, p2000_m2001_serial_device,          "p2000_m2001serial", "P2000 Miniware M2001 V.24 Serial Interface")
-DEFINE_DEVICE_TYPE(P2000_VIEWDATA, p2000_p2171_viewdata_serial_device, "p2000_viewdata",    "P2000 P2171-1 Viewdata Communicator")
-
+DEFINE_DEVICE_TYPE(P2000_P2174V24, p2000_p2174_serial_device,          "p2kp2174", "P2000 P2174 V.24 Serial Interface")
+DEFINE_DEVICE_TYPE(P2000_PTCV24,   p2000_v24serial_device,             "p2kv24",   "P2000 PTC V.24 Serial Interface")
+DEFINE_DEVICE_TYPE(P2000_M2001V24, p2000_m2001_serial_device,          "p2km2001", "P2000 Miniware M2001 V.24 Serial Interface")
+DEFINE_DEVICE_TYPE(P2000_VIEWDATA, p2000_p2171_viewdata_serial_device, "p2kp2171", "P2000 P2171-1 Viewdata Communicator")
 
 static DEVICE_INPUT_DEFAULTS_START( v24 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
@@ -279,7 +278,7 @@ uint8_t p2000_p2174_serial_device::port_62_r()
 //**************************************************************************
 
 p2000_p2171_viewdata_serial_device::p2000_p2171_viewdata_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-   	: device_t(mconfig, P2000_P2174V24, tag, owner, clock)
+   	: device_t(mconfig, P2000_VIEWDATA, tag, owner, clock)
     , device_p2000_expansion_slot_card_interface(mconfig, *this)
         , m_usart(*this, "usart")
         , m_rs232(*this, "rs232")

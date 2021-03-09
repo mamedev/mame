@@ -24,7 +24,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(P2000_M2009, p2000_m2009_modem_device, "p2000_m2009modem", "P2000 Miniware M2009 Auto Dial/Answer modem")
+DEFINE_DEVICE_TYPE(P2000_M2009, p2000_m2009_modem_device, "p2km2009", "P2000 Miniware M2009 Auto Dial/Answer modem")
 
 // Viewdata settings as default
 static DEVICE_INPUT_DEFAULTS_START( modem  )

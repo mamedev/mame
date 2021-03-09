@@ -14,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(P2000_EXPANSION_SLOT, p2000_expansion_slot_device, "p2000_expansion_slot", "P2000 expansion slot")
+DEFINE_DEVICE_TYPE(P2000_EXPANSION_SLOT, p2000_expansion_slot_device, "p2kexpslot", "P2000 expansion slot")
 
 
 //**************************************************************************

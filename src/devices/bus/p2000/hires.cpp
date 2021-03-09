@@ -18,7 +18,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(P2000_HIRES, p2000_hires_device, "p2000_hires", "P2000 High Resolution Colour Graphics Card")
+DEFINE_DEVICE_TYPE(P2000_HIRES, p2000_hires_device, "p2khires", "P2000 High Resolution Colour Graphics Card")
 
 //-------------------------------------------------
 //  MAP IO devices on hires cpu

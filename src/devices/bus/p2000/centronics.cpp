@@ -13,9 +13,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(P2000_CENTRONICS, p2000_mw102_centronics_device, "p2000_centronics", "P2000 MW102 Centronics Interface")
-DEFINE_DEVICE_TYPE(P2000_M2003,      p2000_m2003_centronics_device, "p2000_m2003", "P2000 Miniware M2003 Centronics Interface")
-DEFINE_DEVICE_TYPE(P2000_P2GGCENT,   p2000_p2gg_centronics_device,  "p2000_p2ggcent", "P2000 P2000gg Centronics Interface")
+DEFINE_DEVICE_TYPE(P2000_CENTRONICS, p2000_mw102_centronics_device, "p2kcent", "P2000 MW102 Centronics Interface")
+DEFINE_DEVICE_TYPE(P2000_M2003,      p2000_m2003_centronics_device, "p2km2003", "P2000 Miniware M2003 Centronics Interface")
+DEFINE_DEVICE_TYPE(P2000_P2GGCENT,   p2000_p2gg_centronics_device,  "p2kggcent", "P2000 P2000gg Centronics Interface")
 
 //**************************************************************************
 //  P2000 MW102 Centronics Interface Cartridge
@@ -120,10 +120,16 @@ uint8_t p2000_mw102_centronics_device::port_4f_r()
 //-------------------------------------------------
 //  p2000_p2gg_centronics_device - constructor
 //-------------------------------------------------
-p2000_p2gg_centronics_device::p2000_p2gg_centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, P2000_CENTRONICS, tag, owner, clock)
+
+p2000_p2gg_centronics_device::p2000_p2gg_centronics_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
     , device_p2000_expansion_slot_card_interface(mconfig, *this)
     , m_centronics(*this, "centronics")
+{
+}
+
+p2000_p2gg_centronics_device::p2000_p2gg_centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+    : p2000_p2gg_centronics_device(mconfig, P2000_P2GGCENT, tag, owner, clock)
 {
 }
 
@@ -241,7 +247,7 @@ uint8_t p2000_p2gg_centronics_device::port_47_r()
 //  p2000_p2gg_centronics_device - constructor
 //-------------------------------------------------
 p2000_m2003_centronics_device::p2000_m2003_centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: p2000_p2gg_centronics_device(mconfig, tag, owner, clock)
+	: p2000_p2gg_centronics_device(mconfig, P2000_M2003, tag, owner, clock)
 {
 }
 

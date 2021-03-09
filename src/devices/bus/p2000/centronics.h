@@ -64,6 +64,8 @@ public:
 	p2000_p2gg_centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
     
 protected:
+    p2000_p2gg_centronics_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
     virtual void device_reset() override;
@@ -108,8 +110,8 @@ protected:
 
 // device type definition
 
-DECLARE_DEVICE_TYPE(P2000_M2003,      p2000_m2003_centronics_device)
 DECLARE_DEVICE_TYPE(P2000_CENTRONICS, p2000_mw102_centronics_device)
+DECLARE_DEVICE_TYPE(P2000_M2003,      p2000_m2003_centronics_device)
 DECLARE_DEVICE_TYPE(P2000_P2GGCENT,   p2000_p2gg_centronics_device)
 
 #endif // MAME_BUS_P2000_CENTRONICS_H

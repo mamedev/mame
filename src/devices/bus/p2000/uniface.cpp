@@ -16,7 +16,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(P2000_UNIFACE, p2000_uniface_device, "p2000_uniface", "P2000 Universal I/O Interface (uniface)")
+DEFINE_DEVICE_TYPE(P2000_UNIFACE, p2000_uniface_device, "p2kuface", "P2000 Universal I/O Interface (uniface)")
 
 //-------------------------------------------------
 //  p2000_uniface_device - constructor

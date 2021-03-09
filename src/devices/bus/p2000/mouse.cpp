@@ -27,7 +27,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(P2000_MOUSE, p2000_mouse_device, "p2000_mouse", "P2000 MSX Mouse Interface")
+DEFINE_DEVICE_TYPE(P2000_MOUSE, p2000_mouse_device, "p2kmouse", "P2000 MSX Mouse Interface")
 
 INPUT_PORTS_START( p2000_mouse )
 	PORT_START("mouse_b")  // mouse buttons

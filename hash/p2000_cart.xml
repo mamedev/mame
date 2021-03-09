@@ -71,7 +71,7 @@ license:CC0
 		</part>
 	</software>
 
-    <software name="familiegeheugenV2">
+    <software name="famgeheugen_v2">
 		<description>Philips Familiegeheugen 2.0 NL P2304</description>
 		<year>1984</year>
 		<publisher>Philips</publisher>
@@ -82,7 +82,7 @@ license:CC0
 		</part>
 	</software>
 
-    <software name="familiegeheugenV3">
+    <software name="famgeheugen_v3">
 		<description>Philips Familiegeheugen 3.L NL P2304</description>
 		<year>1986</year>
 		<publisher>Philips</publisher>
@@ -93,7 +93,7 @@ license:CC0
 		</part>
 	</software>
 
-    <software name="familiegeheugen">
+    <software name="famgeheugen">
 		<description>Philips Familiegeheugen 4.L NL P2304</description>
 		<year>1987</year>
 		<publisher>Philips</publisher>
@@ -104,7 +104,7 @@ license:CC0
 		</part>
 	</software>
 
-    <software name="assemblerV56">
+    <software name="assembler_v56">
 		<description>Assembler V5.6</description>
 		<year>1984</year>
 		<publisher>Ron Eijnthoven</publisher>

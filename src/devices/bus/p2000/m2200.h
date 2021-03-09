@@ -67,8 +67,10 @@ class p2000_fdc_device :
 public:
 	// construction/destruction
 	p2000_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-    
+
 protected:
+    p2000_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+    
 	// device-level overrides
 	virtual void device_start() override;
     virtual void device_reset() override;
@@ -138,6 +140,8 @@ public:
 	p2000_m2200_multipurpose_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+    p2000_m2200_multipurpose_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
     virtual void device_reset() override;
