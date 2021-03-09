@@ -215,6 +215,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void device_resolve_objects() override;
 
 	uint32_t screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -491,6 +492,13 @@ void firebeat_state::machine_start()
 	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x01ffffff, false, m_work_ram);
 }
 
+void firebeat_state::machine_reset()
+{
+	m_extend_board_irq_enable = 0x3f;
+	m_extend_board_irq_active = 0x00;
+	m_control = 0;
+}
+
 void firebeat_state::device_resolve_objects()
 {
 	m_status_leds.resolve();
@@ -499,11 +507,9 @@ void firebeat_state::device_resolve_objects()
 void firebeat_state::init_firebeat()
 {
 	uint8_t *rom = memregion("user2")->base();
+	set_ibutton(rom);
 
 //  pc16552d_init(machine(), 0, 19660800, comm_uart_irq_callback, 0);     // Network UART
-
-	m_extend_board_irq_enable = 0x3f;
-	m_extend_board_irq_active = 0x00;
 
 	// Set to defaults here, but overridden for most specific games. It represents various bits of
 	// data, such as the firebeat's ability to play certain games at all, whether the firebeat is
@@ -513,11 +519,7 @@ void firebeat_state::init_firebeat()
 	// Specifics of the bitmask are documented in the various game series init functions.
 	m_cabinet_info = 0;
 
-	m_control = 0;
-
 	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(firebeat_state::security_w)));
-
-	set_ibutton(rom);
 
 	init_lights(write32s_delegate(*this), write32s_delegate(*this), write32s_delegate(*this));
 }
@@ -999,11 +1001,13 @@ WRITE_LINE_MEMBER(firebeat_state::sound_irq_callback)
 
 void firebeat_spu_state::machine_start()
 {
+	firebeat_state::machine_start();
 	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(firebeat_spu_state::spu_dma_callback), this));
 }
 
 void firebeat_spu_state::machine_reset()
 {
+	firebeat_state::machine_reset();
 	m_spu_ata_dma = 0;
 	m_spu_ata_dmarq = 0;
 	m_wave_bank = 0;
