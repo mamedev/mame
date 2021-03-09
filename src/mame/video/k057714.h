@@ -9,8 +9,19 @@
 class k057714_device : public device_t
 {
 public:
+	// construction/destruction
+	template <typename T>
+	k057714_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock, T&& screen_tag)
+		: k057714_device(mconfig, tag, owner, clock)
+	{
+		m_screen.set_tag(std::forward<T>(screen_tag));
+	}
+
 	k057714_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 	auto irq_callback() { return m_irq.bind(); }
+
+	void set_pixclock(const XTAL &xtal);
 
 	int draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -39,6 +50,8 @@ private:
 		VRAM_SIZE_HALF = 0x2000000 / 2
 	};
 
+	inline void crtc_set_screen_params();
+
 	void execute_command(uint32_t *cmd);
 	void execute_display_list(uint32_t addr);
 	void draw_object(uint32_t *cmd);
@@ -47,6 +60,8 @@ private:
 	void fb_config(uint32_t *cmd);
 
 	void draw_frame(int frame, bitmap_ind16 &bitmap, const rectangle &cliprect, bool inverse_trans);
+
+	required_device<screen_device> m_screen;
 
 	std::unique_ptr<uint32_t[]> m_vram;
 	uint32_t m_vram_read_addr;
@@ -78,7 +93,8 @@ private:
 	uint32_t m_display_v_frontporch;
 	uint32_t m_display_v_backporch;
 	uint32_t m_display_v_syncpulse;
-	bool m_display_is_dirty;
+
+	uint32_t m_pixclock;
 
 	devcb_write_line m_irq;
 };

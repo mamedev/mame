@@ -205,6 +205,7 @@ public:
 		m_work_ram(*this, "work_ram"),
 		m_ata(*this, "ata"),
 		m_gcu(*this, "gcu"),
+		m_gcu_sub(*this, "gcu_sub"),
 		m_duart_com(*this, "duart_com"),
 		m_status_leds(*this, "status_led_%u", 0U),
 		m_io_inputs(*this, "IN%u", 0U)
@@ -242,6 +243,7 @@ protected:
 	required_shared_ptr<uint32_t> m_work_ram;
 	required_device<ata_interface_device> m_ata;
 	required_device<k057714_device> m_gcu;
+	optional_device<k057714_device> m_gcu_sub;
 
 private:
 	uint32_t cabinet_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -254,6 +256,8 @@ private:
 	void extend_board_irq_w(offs_t offset, uint8_t data);
 
 	uint8_t input_r(offs_t offset);
+
+	void control_w(offs_t offset, uint8_t data);
 
 	uint16_t ata_command_r(offs_t offset, uint16_t mem_mask = ~0);
 	void ata_command_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -274,6 +278,8 @@ private:
 	output_finder<8> m_status_leds;
 
 	required_ioport_array<4> m_io_inputs;
+
+	uint8_t m_control;
 };
 
 class firebeat_spu_state : public firebeat_state
@@ -381,7 +387,6 @@ public:
 		firebeat_state(mconfig, type, tag),
 		m_duart_midi(*this, "duart_midi"),
 		m_kbd(*this, "kbd%u", 0),
-		m_gcu_sub(*this, "gcu_sub"),
 		m_lamps(*this, "lamp_%u", 1U),
 		m_cab_led_door_lamp(*this, "door_lamp"),
 		m_cab_led_start1p(*this, "start1p"),
@@ -419,7 +424,6 @@ private:
 
 	required_device<pc16552_device> m_duart_midi;
 	required_device_array<midi_keyboard_device, 2> m_kbd;
-	required_device<k057714_device> m_gcu_sub;
 
 	output_finder<3> m_lamps;
 	output_finder<> m_cab_led_door_lamp;
@@ -509,6 +513,8 @@ void firebeat_state::init_firebeat()
 	// Specifics of the bitmask are documented in the various game series init functions.
 	m_cabinet_info = 0;
 
+	m_control = 0;
+
 	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(firebeat_state::security_w)));
 
 	set_ibutton(rom);
@@ -536,13 +542,13 @@ void firebeat_state::firebeat(machine_config &config)
 	/* video hardware */
 	PALETTE(config, "palette", palette_device::RGB_555);
 
-	K057714(config, m_gcu, 0);
-	m_gcu->irq_callback().set(FUNC(firebeat_state::gcu_interrupt));
-
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(16.6666_MHz_XTAL, 685, 0, 512, 416, 0, 384);
+	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480);
 	screen.set_screen_update(FUNC(firebeat_state::screen_update_firebeat_0));
 	screen.set_palette("palette");
+
+	K057714(config, m_gcu, 0, screen);
+	m_gcu->irq_callback().set(FUNC(firebeat_state::gcu_interrupt));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -567,6 +573,7 @@ void firebeat_state::firebeat_map(address_map &map)
 	map(0x74000000, 0x740003ff).noprw(); // SPU shared RAM
 	map(0x7d000200, 0x7d00021f).r(FUNC(firebeat_state::cabinet_r));
 	map(0x7d000400, 0x7d000401).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
+	map(0x7d000500, 0x7d000501).w(FUNC(firebeat_state::control_w));
 	map(0x7d000800, 0x7d000803).r(FUNC(firebeat_state::input_r));
 	map(0x7d400000, 0x7d5fffff).rw("flash_main", FUNC(fujitsu_29f016a_device::read), FUNC(fujitsu_29f016a_device::write));
 	map(0x7d800000, 0x7d9fffff).rw("flash_snd1", FUNC(fujitsu_29f016a_device::read), FUNC(fujitsu_29f016a_device::write));
@@ -802,6 +809,36 @@ uint8_t firebeat_state::input_r(offs_t offset)
 	}
 
 	return 0;
+}
+
+/*****************************************************************************/
+
+void firebeat_state::control_w(offs_t offset, uint8_t data)
+{
+	// 0x01 - 31kHz (25.175 MHz)/24kHz (16.6666 MHz) clock switch
+	// 0x02 - Unused?
+	// 0x04 - Set to 1 by all games except beatmania III, usage unknown. Screen related?
+	// 0x08 - Toggles screen mirroring when only one GCU is in use? Default 0
+	// 0x80 - Used by ParaParaParadise and Keyboardmania. Set to 1 when doing YMZ flash initialization?
+
+	if (BIT(data, 0) == 0 && BIT(m_control, 0) == 1)
+	{
+		// Set screen to 31kHz from 24kHz
+		m_gcu->set_pixclock(25.175_MHz_XTAL);
+
+		if (m_gcu_sub)
+			m_gcu_sub->set_pixclock(25.175_MHz_XTAL);
+	}
+	else if (BIT(data, 0) == 1 && BIT(m_control, 0) == 0)
+	{
+		// Set screen to 24kHz from 31kHz
+		m_gcu->set_pixclock(16.6666_MHz_XTAL);
+
+		if (m_gcu_sub)
+			m_gcu_sub->set_pixclock(16.6666_MHz_XTAL);
+	}
+
+	m_control = data;
 }
 
 /*****************************************************************************/
@@ -1199,10 +1236,6 @@ void firebeat_bm3_state::firebeat_bm3(machine_config &config)
 	firebeat_spu_base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_bm3_state::firebeat_bm3_map);
-
-	// beatmania III is the only game on the Firebeat platform to use 640x480
-	screen_device *screen = subdevice<screen_device>("screen");
-	screen->set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480);
 
 	ATA_INTERFACE(config, m_spuata).options(firebeat_ata_devices, "hdd", nullptr, true);
 	m_spuata->irq_handler().set(FUNC(firebeat_bm3_state::spu_ata_interrupt));
@@ -1607,21 +1640,21 @@ void firebeat_kbm_state::firebeat_kbm(machine_config &config)
 	/* video hardware */
 	PALETTE(config, "palette", palette_device::RGB_555);
 
-	K057714(config, m_gcu, 0);
-	m_gcu->irq_callback().set(FUNC(firebeat_kbm_state::gcu_interrupt));
-
-	K057714(config, m_gcu_sub, 0);
-	m_gcu_sub->irq_callback().set(FUNC(firebeat_kbm_state::gcu_interrupt));
-
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
-	lscreen.set_raw(16.6666_MHz_XTAL, 685, 0, 512, 416, 0, 384);
+	lscreen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480);
 	lscreen.set_screen_update(FUNC(firebeat_kbm_state::screen_update_firebeat_0));
 	lscreen.set_palette("palette");
 
+	K057714(config, m_gcu, 0, lscreen);
+	m_gcu->irq_callback().set(FUNC(firebeat_kbm_state::gcu_interrupt));
+
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
-	rscreen.set_raw(16.6666_MHz_XTAL, 685, 0, 512, 416, 0, 384);
+	rscreen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480);
 	rscreen.set_screen_update(FUNC(firebeat_kbm_state::screen_update_firebeat_1));
 	rscreen.set_palette("palette");
+
+	K057714(config, m_gcu_sub, 0, rscreen);
+	m_gcu_sub->irq_callback().set(FUNC(firebeat_kbm_state::gcu_interrupt));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

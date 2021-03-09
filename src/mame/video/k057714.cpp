@@ -29,6 +29,7 @@ DEFINE_DEVICE_TYPE(K057714, k057714_device, "k057714", "k057714_device GCU")
 
 k057714_device::k057714_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K057714, tag, owner, clock)
+	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_irq(*this)
 {
 }
@@ -72,7 +73,7 @@ void k057714_device::device_start()
 	save_item(NAME(m_display_v_frontporch));
 	save_item(NAME(m_display_v_backporch));
 	save_item(NAME(m_display_v_syncpulse));
-	save_item(NAME(m_display_is_dirty));
+	save_item(NAME(m_pixclock));
 }
 
 void k057714_device::device_reset()
@@ -98,7 +99,8 @@ void k057714_device::device_reset()
 	m_display_v_frontporch = 10;
 	m_display_v_backporch = 33;
 	m_display_v_syncpulse = 2;
-	m_display_is_dirty = true;
+	m_pixclock = 25'175'000; // 25.175_MHz_XTAL, default for Firebeat but maybe not other machiness. The value can be changed externally
+	crtc_set_screen_params();
 
 	m_vram_read_addr = 0;
 	m_command_fifo0_ptr = 0;
@@ -143,6 +145,20 @@ void k057714_device::device_stop()
 #endif
 }
 
+void k057714_device::set_pixclock(const XTAL &xtal)
+{
+	m_pixclock = xtal.value();
+	crtc_set_screen_params();
+}
+
+inline void k057714_device::crtc_set_screen_params()
+{
+	auto htotal = m_display_h_visarea + m_display_h_frontporch + m_display_h_backporch + m_display_h_syncpulse;
+	auto vtotal = m_display_v_visarea + m_display_v_frontporch + m_display_v_backporch + m_display_v_syncpulse;
+
+	rectangle visarea(0, m_display_h_visarea - 1, 0, m_display_v_visarea - 1);
+	m_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(m_pixclock) * htotal * vtotal);
+}
 
 uint32_t k057714_device::read(offs_t offset)
 {
@@ -183,7 +199,7 @@ void k057714_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 				m_display_h_frontporch = ((data >> 8) & 0xff) + 1;
 				m_display_h_backporch = (data & 0xff) + 1;
 			}
-			m_display_is_dirty = true;
+			crtc_set_screen_params();
 			break;
 
 		case 0x04:
@@ -196,7 +212,7 @@ void k057714_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 				m_display_v_frontporch = ((data >> 8) & 0xff) + 1;
 				m_display_v_backporch = (data & 0xff) + 1;
 			}
-			m_display_is_dirty = true;
+			crtc_set_screen_params();
 			break;
 
 		case 0x08:
@@ -204,7 +220,7 @@ void k057714_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 			{
 				m_display_h_syncpulse = ((data >> 24) & 0xff) + 1;
 				m_display_v_syncpulse = ((data >> 16) & 0xff) + 1;
-				m_display_is_dirty = true;
+				crtc_set_screen_params();
 			}
 			break;
 
@@ -503,17 +519,6 @@ void k057714_device::draw_frame(int frame, bitmap_ind16 &bitmap, const rectangle
 
 int k057714_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_display_is_dirty)
-	{
-		auto htotal = m_display_h_visarea + m_display_h_frontporch + m_display_h_backporch + m_display_h_syncpulse;
-		auto vtotal = m_display_v_visarea + m_display_v_frontporch + m_display_v_backporch + m_display_v_syncpulse;
-
-		rectangle visarea(0, m_display_h_visarea - 1, 0, m_display_v_visarea - 1);
-		screen.configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(screen.clock()) * htotal * vtotal);
-
-		m_display_is_dirty = false;
-	}
-
 	bitmap.fill(0, cliprect);
 
 	bool inverse_trans = false;
