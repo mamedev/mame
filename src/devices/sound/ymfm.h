@@ -232,6 +232,7 @@ public:
 	u16 multi_block_freq0() const /* 14 bits */ { return 0; } // not on OPM,OPL
 	u16 multi_block_freq1() const /* 14 bits */ { return 0; } // not on OPM,OPL
 	u16 multi_block_freq2() const /* 14 bits */ { return 0; } // not on OPM,OPL
+	u8 note_select() const        /*  1 bit  */ { return 0; } // not on OPM,OPN,OPNA,OPL
 	u8 rhythm_enable() const      /*  1 bit  */ { return 0; } // not on OPM,OPN,OPN2
 	u8 rhythm_keyon() const       /*  5 bits */ { return 0; } // not on OPM,OPN,OPN2
 	u8 waveform_enable() const    /*  1 bits */ { return 0; } // not on OPM,OPN,OPNA,OPL
@@ -1181,7 +1182,7 @@ public:
 			return 0;
 
 		// release is 4 bits, expanded as with OPM/OPN
-		return opbyte(0x80, 0, 4) * 2 + 1;
+		return opbyte(0x80, 0, 4) * 2;
 	}
 };
 
