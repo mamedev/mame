@@ -175,12 +175,14 @@ void mm76_device::op_xas()
 	u8 a = m_a;
 	m_a = m_s;
 	m_s = a;
+	m_write_sdo(BIT(m_s, 3));
 }
 
 void mm76_device::op_lsa()
 {
 	// LSA: load S from A
 	m_s = m_a;
+	m_write_sdo(BIT(m_s, 3));
 }
 
 
@@ -413,7 +415,7 @@ void mm76_device::op_oa()
 void mm76_device::op_ios()
 {
 	// IOS: start serial I/O
-	op_todo();
+	m_sclock_count = 8;
 }
 
 void mm76_device::op_i1()
