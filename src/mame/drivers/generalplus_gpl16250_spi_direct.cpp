@@ -5,9 +5,9 @@
     however the SPI ROM maps directly into CPU space, where you'd
     expect internal ROM to be?!
 
-	It has been confirmed that Pacman/Fix It Felix/Ms Pacman can
-	be swapped onto the same PCB, so either there is no internal
-	area (runs direct from SPI?) or it's the same between games.
+    It has been confirmed that Pacman/Fix It Felix/Ms Pacman can
+    be swapped onto the same PCB, so either there is no internal
+    area (runs direct from SPI?) or it's the same between games.
 */
 
 #include "emu.h"
