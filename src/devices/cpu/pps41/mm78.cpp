@@ -210,7 +210,7 @@ void mm78_device::execute_one()
 		}
 	}
 
-	// TAB is delayed by 1 cycle
+	// TAB is delayed by 1 opcode (including a single TR)
 	if (m_prev_op == 0x2c)
 		op_tab();
 }

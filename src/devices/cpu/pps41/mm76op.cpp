@@ -9,12 +9,12 @@
 
 // internal helpers
 
-inline u8 mm76_device::ram_r()
+u8 mm76_device::ram_r()
 {
 	return m_data->read_byte(m_ram_addr & m_datamask) & 0xf;
 }
 
-inline void mm76_device::ram_w(u8 data)
+void mm76_device::ram_w(u8 data)
 {
 	m_data->write_byte(m_ram_addr & m_datamask, data & 0xf);
 }

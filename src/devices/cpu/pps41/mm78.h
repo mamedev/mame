@@ -26,8 +26,8 @@
     Vss  7 |           | 36 DIO3        Vss  7 |           | 34 DIO3
     N/C  8 |           | 35 DIO2       TEST  8 |           | 33 DIO2
    TEST  9 |           | 34 DIO1        PI4  9 |           | 32 DIO1
-    PI4 10 |   MM78    | 33 DIO0        PI8 10 |   MM78L   | 31 DIO0
-    PI8 11 |   MM77    | 32 INT1        PI3 11 |   MM77L   | 30 INT1
+    PI4 10 |   MM77    | 33 DIO0        PI8 10 |   MM77L   | 31 DIO0
+    PI8 11 |   MM78    | 32 INT1        PI3 11 |   MM78L   | 30 INT1
     PI3 12 |           | 31 INT0        PI7 12 |           | 29 INT0
     PI7 13 |           | 30 DATAI       PI6 13 |           | 28 DATAI
     PI6 14 |           | 29 DATAO       PI2 14 |           | 27 DATAO

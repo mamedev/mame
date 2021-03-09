@@ -33,7 +33,7 @@ TODO:
 - add extended opcodes to disasm? it's easy to add there, but the emulation goes
   through prefixes 1 cycle at the time which means the live disasm gets messy
 - documentation discourages long jumps to the subroutine pages, but does not
-  explain what would happen
+  explain what would happen. Scrabble Sensor does it, so it's probably ok.
 - documentation discourages use of some extended opcodes when in subroutine pages,
   but again does not explain why
 - documentation is conflicting whether or not MM76/MM75 can (re)set interrupt flip-

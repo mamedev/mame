@@ -10,6 +10,7 @@
 #include "emu.h"
 
 #include "cpu/pps41/mm75.h"
+#include "cpu/pps41/mm76.h"
 #include "video/pwm.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
@@ -17,6 +18,7 @@
 // internal artwork
 #include "mastmind.lh"
 #include "memoquiz.lh"
+#include "scrabsen.lh"
 
 //#include "hh_pps41_test.lh" // common test-layout - use external artwork
 
@@ -36,7 +38,7 @@ public:
 	required_device<pps41_base_device> m_maincpu;
 	optional_device<pwm_display_device> m_display;
 	optional_device<speaker_sound_device> m_speaker;
-	optional_ioport_array<5> m_inputs; // max 5
+	optional_ioport_array<6> m_inputs; // max 6
 
 	u16 m_inp_mux = 0;
 
@@ -47,12 +49,15 @@ public:
 	u8 read_inputs(int columns);
 
 protected:
+	virtual void update_int() { ; }
+
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override { update_int(); }
+	virtual void device_post_load() override { update_int(); }
 };
 
 
-// machine start/reset
+// machine start
 
 void hh_pps41_state::machine_start()
 {
@@ -60,10 +65,6 @@ void hh_pps41_state::machine_start()
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_d));
 	save_item(NAME(m_r));
-}
-
-void hh_pps41_state::machine_reset()
-{
 }
 
 
@@ -183,7 +184,7 @@ INPUT_PORTS_END
 void mastmind_state::mastmind(machine_config &config)
 {
 	/* basic machine hardware */
-	MM75(config, m_maincpu, 100000); // approximation
+	MM75(config, m_maincpu, 90000); // approximation
 	m_maincpu->write_d().set(FUNC(mastmind_state::write_d));
 	m_maincpu->write_r().set(FUNC(mastmind_state::write_r));
 	m_maincpu->read_p().set(FUNC(mastmind_state::read_p));
@@ -236,28 +237,19 @@ public:
 		hh_pps41_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(digits_switch) { set_digits(); }
-	void set_digits();
+	DECLARE_INPUT_CHANGED_MEMBER(digits_switch) { update_int(); }
+	virtual void update_int() override;
 
 	void update_display();
 	void write_d(u16 data);
 	void write_r(u8 data);
 	u8 read_p();
 	void memoquiz(machine_config &config);
-
-protected:
-	virtual void machine_reset() override;
 };
-
-void memoquiz_state::machine_reset()
-{
-	hh_pps41_state::machine_reset();
-	set_digits();
-}
 
 // handlers
 
-void memoquiz_state::set_digits()
+void memoquiz_state::update_int()
 {
 	// digits switch is tied to MCU interrupt pins
 	u8 inp = m_inputs[4]->read();
@@ -277,7 +269,7 @@ void memoquiz_state::write_d(u16 data)
 	m_inp_mux = data;
 	update_display();
 
-	// DIO08: N/C, looks like they planned to add sound, but didn't
+	// DIO8: N/C, looks like they planned to add sound, but didn't
 }
 
 void memoquiz_state::write_r(u8 data)
@@ -330,7 +322,7 @@ INPUT_PORTS_END
 void memoquiz_state::memoquiz(machine_config &config)
 {
 	/* basic machine hardware */
-	MM75(config, m_maincpu, 100000); // approximation
+	MM75(config, m_maincpu, 90000); // approximation
 	m_maincpu->write_d().set(FUNC(memoquiz_state::write_d));
 	m_maincpu->write_r().set(FUNC(memoquiz_state::write_r));
 	m_maincpu->read_p().set(FUNC(memoquiz_state::read_p));
@@ -356,6 +348,162 @@ ROM_END
 
 
 
+
+
+/***************************************************************************
+
+  Selchow & Righter Scrabble Sensor
+  * MM76EL MCU (label B8610-11, die label B8610)
+  * 16 leds, 1-bit sound
+
+  The game concept is similar to Mastermind. Enter a word (or press AUTO.)
+  to start the game, then try to guess it.
+
+***************************************************************************/
+
+class scrabsen_state : public hh_pps41_state
+{
+public:
+	scrabsen_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_pps41_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_INPUT_CHANGED_MEMBER(players_switch) { update_int(); }
+	virtual void update_int() override;
+
+	void update_display();
+	void write_d(u16 data);
+	void write_r(u8 data);
+	u8 read_p();
+	void scrabsen(machine_config &config);
+};
+
+// handlers
+
+void scrabsen_state::update_int()
+{
+	// players switch is tied to MCU INT0
+	m_maincpu->set_input_line(0, (m_inputs[5]->read() & 1) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void scrabsen_state::update_display()
+{
+	m_display->matrix(m_inp_mux >> 6 & 3, ~m_r);
+}
+
+void scrabsen_state::write_d(u16 data)
+{
+	// DIO0-DIO4: input mux
+	// DIO6,DIO7: led select
+	m_inp_mux = data;
+	update_display();
+
+	// DIO8: speaker out
+	m_speaker->level_w(BIT(data, 8));
+}
+
+void scrabsen_state::write_r(u8 data)
+{
+	// RIO1-RIO8: led data
+	m_r = data;
+	update_display();
+}
+
+u8 scrabsen_state::read_p()
+{
+	// PI1-PI7: multiplexed inputs
+	return ~read_inputs(5);
+}
+
+// config
+
+static INPUT_PORTS_START( scrabsen )
+	PORT_START("IN.0") // DIO0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_NAME("Clear")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // DIO1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_NAME("Space")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // DIO4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // DIO3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_NAME("Auto.")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // DIO2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(13) PORT_NAME("Enter")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // INT0
+	PORT_CONFNAME( 0x01, 0x01, "Players" ) PORT_CHANGED_MEMBER(DEVICE_SELF, scrabsen_state, players_switch, 0)
+	PORT_CONFSETTING(    0x01, "1" ) // single
+	PORT_CONFSETTING(    0x00, "2" ) // double
+INPUT_PORTS_END
+
+void scrabsen_state::scrabsen(machine_config &config)
+{
+	/* basic machine hardware */
+	MM76EL(config, m_maincpu, 95000); // approximation
+	m_maincpu->write_d().set(FUNC(scrabsen_state::write_d));
+	m_maincpu->write_r().set(FUNC(scrabsen_state::write_r));
+	m_maincpu->read_p().set(FUNC(scrabsen_state::read_p));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(2, 8);
+	config.set_default_layout(layout_scrabsen);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( scrabsen )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "b8610-11", 0x0000, 0x0400, CRC(97c8a466) SHA1(ed5d2cddd2761ed6e3ddc47d97b2ed19a2aaeee9) )
+
+	ROM_REGION( 314, "maincpu:opla", 0 ) // unused
+	ROM_LOAD( "mm76_scrabsen_output.pla", 0, 314, CRC(410fa6d7) SHA1(d46aaf1ec2c942083cba7dbd59d4261dc238d4c8) )
+ROM_END
+
+
+
 } // anonymous namespace
 
 /***************************************************************************
@@ -368,3 +516,5 @@ ROM_END
 CONS( 1979, mastmind, 0,       0, mastmind, mastmind, mastmind_state, empty_init, "Invicta Plastics", "Electronic Master Mind (Invicta)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 CONS( 1978, memoquiz, 0,       0, memoquiz, memoquiz, memoquiz_state, empty_init, "M.E.M. Belgium", "Memoquiz", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+
+CONS( 1980, scrabsen, 0,       0, scrabsen, scrabsen, scrabsen_state, empty_init, "Selchow & Righter", "Scrabble Sensor - Electronic Word Game", MACHINE_SUPPORTS_SAVE )

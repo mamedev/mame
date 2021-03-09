@@ -116,19 +116,23 @@ void mm78_device::op_tab()
 void mm78_device::op_ix()
 {
 	// IX: input to X from channel X(aka B)
-	op_todo();
+	m_x = (m_read_r() & m_r_output) >> 4;
 }
 
 void mm78_device::op_ox()
 {
 	// OX: output from X to channel X(aka B)
-	op_todo();
+	m_r_output = (m_r_output & 0xf) | m_x << 4;
+	m_write_r(m_r_output);
 }
 
 void mm78_device::op_ioa()
 {
 	// IOA: exchange A with channel A
-	op_todo();
+	u8 a = m_read_r() & m_r_output & 0xf;
+	m_r_output = (m_r_output & ~0xf) | m_a;
+	m_write_r(m_r_output);
+	m_a = a;
 }
 
 void mm78_device::op_i1sk()
