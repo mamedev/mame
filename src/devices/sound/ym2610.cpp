@@ -68,6 +68,7 @@ u8 ym2610_device::read(offs_t offset)
 			break;
 
 		case 2:	// status port, extended
+			m_stream->update();
 			result = m_eos_status & m_flag_mask;
 			break;
 

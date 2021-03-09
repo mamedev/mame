@@ -66,6 +66,7 @@ u8 ym2608_device::read(offs_t offset)
 			break;
 
 		case 2:	// status port, extended
+			m_stream->update();
 			result = combine_status();
 			break;
 
