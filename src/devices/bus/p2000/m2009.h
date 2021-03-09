@@ -81,7 +81,6 @@ private:
     bool m_sync_toggle = true;
     uint8_t m_port_44 = 0;
     uint8_t m_cha_reg = 0;
-    uint8_t m_chb_reg = 0;
     
     const static unsigned int m_dialing_ready_delay = 2000;
     const static unsigned int m_number_size = 20;

@@ -139,7 +139,6 @@ uint8_t p2000_m2009_modem_device::port_41_r()
 void p2000_m2009_modem_device::port_42_w(uint8_t data)
 {
     LOGTXDRXD("Port write 42: %02x\n", data);
-    m_chb_reg = data;
     m_scc->ab_dc_w(2, data);
 }
 

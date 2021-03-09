@@ -87,8 +87,6 @@ protected:
     virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; };
 
     p2000_expansion_slot_device *m_slot;
-
-	std::unique_ptr<uint8_t[]> m_rom;
 };
 
 

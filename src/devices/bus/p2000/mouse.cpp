@@ -186,7 +186,6 @@ void p2000_mouse_device::pa_w_cb(uint8_t data)
         // No button status asked
         m_mouse_status = MOUSE_RESET;
     }
-    m_channel_a_data = data;
 }
 
 //-------------------------------------------------

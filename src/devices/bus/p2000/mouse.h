@@ -53,10 +53,8 @@ protected:
 
 private:
     TIMER_DEVICE_CALLBACK_MEMBER(mouse_timer_cb);
-    emu_timer *m_mouse_timer;
-
-	uint8_t m_channel_a_data;
-    uint8_t m_channel_b_data;
+    
+	uint8_t m_channel_b_data;
 
     /* mouse */
     uint8_t m_mouse_b;
