@@ -5,7 +5,7 @@
 #include "y8950.h"
 
 
-DEFINE_DEVICE_TYPE(Y8950, y8950_device, "y8950", "Y8950 OPL2 MSX")
+DEFINE_DEVICE_TYPE(Y8950, y8950_device, "y8950", "Y8950 OPL2 MSX-Audio")
 
 
 //*********************************************************
@@ -22,10 +22,10 @@ y8950_device::y8950_device(const machine_config &mconfig, const char *tag, devic
 	device_rom_interface(mconfig, *this),
 	m_address(0),
 	m_io_ddr(0),
-	m_irq_mask(ALL_IRQS),
+	m_full_irq_mask(ALL_IRQS),
 	m_stream(nullptr),
 	m_opl(*this),
-	m_adpcm_b(*this),
+	m_adpcm_b(*this, read8sm_delegate(*this, FUNC(y8950_device::adpcm_b_read)), write8sm_delegate(*this, FUNC(y8950_device::adpcm_b_write))),
 	m_keyboard_read_handler(*this),
 	m_keyboard_write_handler(*this),
 	m_io_read_handler(*this),
@@ -43,11 +43,7 @@ u8 y8950_device::read(offs_t offset)
 	u8 result = 0xff;
 	switch (offset & 1)
 	{
-		case 0: // status port
-			result = combine_status();
-			break;
-
-		case 1:	// data port
+		case 0:	// data port
 
 			switch (m_address)
 			{
@@ -68,6 +64,11 @@ u8 y8950_device::read(offs_t offset)
 					logerror("Unexpected read from Y8950 offset %d\n", offset & 3);
 					break;
 			}
+			break;
+
+		case 1: // status port
+			m_stream->update();
+			result = combine_status();
 			break;
 	}
 	return result;
@@ -96,8 +97,11 @@ void y8950_device::write(offs_t offset, u8 value)
 			switch (m_address)
 			{
 				case 0x04:	// IRQ control
-					m_irq_mask = ~value & ALL_IRQS;
-					m_opl.set_irq_mask(m_irq_mask);
+					if (!BIT(value, 7))
+					{
+						m_full_irq_mask = ~value & ALL_IRQS;
+						m_opl.set_irq_mask(m_full_irq_mask);
+					}
 					m_opl.write(m_address, value);
 					combine_status();
 					break;
@@ -107,7 +111,7 @@ void y8950_device::write(offs_t offset, u8 value)
 					break;
 
 				case 0x08:	// split OPL/ADPCM-B
-					m_adpcm_b.write(m_address - 0x07, value & 0x0f);
+					adpcm_w(m_address - 0x07, (value & 0x0f) | 0x80);
 					m_opl.write(m_address, value & 0xc0);
 					break;
 
@@ -124,7 +128,7 @@ void y8950_device::write(offs_t offset, u8 value)
 				case 0x15:
 				case 0x16:
 				case 0x17:
-					m_adpcm_b.write(m_address - 0x07, value);
+					adpcm_w(m_address - 0x07, value);
 					break;
 
 				case 0x18:	// I/O direction
@@ -158,20 +162,22 @@ void y8950_device::device_start()
 	m_io_read_handler.resolve_safe(0);
 	m_io_write_handler.resolve_safe();
 
-	// configure the engines
-	m_opl.set_irq_mask(ymopl2_registers::STATUS_TIMERA | ymopl2_registers::STATUS_TIMERB | STATUS_ADPCM_B_BRDY | STATUS_ADPCM_B_EOS);
-
 	// call this for the variants that need to adjust the rate
 	device_clock_changed();
 
 	// save our data
 	save_item(YMFM_NAME(m_address));
 	save_item(YMFM_NAME(m_io_ddr));
-	save_item(YMFM_NAME(m_irq_mask));
+	save_item(YMFM_NAME(m_full_irq_mask));
 
 	// save the engines
 	m_opl.save(*this);
 	m_adpcm_b.save(*this);
+
+	// configure ADPCM-B limit, since these registers are not
+	// directly accessible in the map
+	m_adpcm_b.write(0x0c, 0xff);
+	m_adpcm_b.write(0x0d, 0xff);
 }
 
 
@@ -185,8 +191,9 @@ void y8950_device::device_reset()
 	m_opl.reset();
 	m_adpcm_b.reset();
 
-	// initialize interrupts
-	combine_status();
+	// initialize our special interrupt states
+	m_full_irq_mask = ymopl2_registers::STATUS_TIMERA | ymopl2_registers::STATUS_TIMERB;
+	m_opl.set_irq_mask(m_full_irq_mask);
 }
 
 
@@ -227,16 +234,33 @@ void y8950_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 		m_adpcm_b.clock(0x01);
 
 		// update the OPL content; clipping is unknown
-		s32 sum = 0;
-		m_opl.output(&sum, 1, 32767, 0x1ff);
+		s32 sums[2] = { 0 };
+		m_opl.output(&sums[0], 1, 32767, 0x1ff);
 
-		// mix in the ADPCM
+		// mix in the ADPCM; ADPCM-B is stereo, but only one channel
+		// not sure how it's wired up internally
 		m_adpcm_b.output(sums, 2, 0x01);
 
 		// convert to 10.3 floating point value for the DAC and back
 		// OPL is mono
-		outputs[0].put_int_clamp(sampindex, ymfm_roundtrip_fp(sum), 32768);
+		outputs[0].put_int(sampindex, ymfm_roundtrip_fp(sums[0]), 32768);
 	}
+}
+
+
+//-------------------------------------------------
+//  adpcm_w - write to the ADPCM chip, checking
+//  for status changes that need to be propagated
+//  to the OPL status register
+//-------------------------------------------------
+
+void y8950_device::adpcm_w(u8 offset, u8 data)
+{
+	u8 status0 = m_adpcm_b.status(0);
+	m_adpcm_b.write(offset, data);
+	u8 status1 = m_adpcm_b.status(0);
+	if (status0 ^ status1)
+		combine_status();
 }
 
 
@@ -248,7 +272,7 @@ void y8950_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 
 u8 y8950_device::combine_status()
 {
-	u8 status = m_opn.status();
+	u8 status = m_opl.status() & ~(STATUS_ADPCM_B_EOS | STATUS_ADPCM_B_BRDY | STATUS_ADPCM_B_PLAYING);
 	u8 adpcm_status = m_adpcm_b.status(0);
 	if ((adpcm_status & ymadpcm_b_channel::STATUS_EOS) != 0)
 		status |= STATUS_ADPCM_B_EOS;
@@ -256,8 +280,8 @@ u8 y8950_device::combine_status()
 		status |= STATUS_ADPCM_B_BRDY;
 	if ((adpcm_status & ymadpcm_b_channel::STATUS_PLAYING) != 0)
 		status |= STATUS_ADPCM_B_PLAYING;
-	status &= m_irq_mask;
-	m_opn.set_reset_status(status, ~status);
+	status &= m_full_irq_mask;
+	m_opl.set_reset_status(status, ~status);
 	return status;
 }
 
@@ -270,7 +294,7 @@ u8 y8950_device::combine_status()
 
 u8 y8950_device::adpcm_b_read(offs_t offset)
 {
-	return space(0).read_byte(offset);
+	return read_byte(offset);
 }
 
 
@@ -282,5 +306,5 @@ u8 y8950_device::adpcm_b_read(offs_t offset)
 
 void y8950_device::adpcm_b_write(offs_t offset, u8 data)
 {
-	space(0).write_byte(offset, data);
+	space().write_byte(offset, data);
 }

@@ -578,7 +578,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/snkwave.h"
 #include "sound/ay8910.h"
-#include "sound/8950intf.h"
+#include "sound/y8950.h"
 #include "sound/ym3526.h"
 #include "sound/ym3812.h"
 #include "speaker.h"
@@ -4216,7 +4216,7 @@ void snk_state::victroad(machine_config &config)
 
 	/* sound hardware */
 	y8950_device &ym2(Y8950(config.replace(), "ym2", XTAL(8'000'000)/2)); /* verified on pcb */
-	ym2.irq().set(FUNC(snk_state::ymirq_callback_2));
+	ym2.irq_handler().set(FUNC(snk_state::ymirq_callback_2));
 	ym2.add_route(ALL_OUTPUTS, "mono", 2.0);
 }
 
@@ -4260,7 +4260,7 @@ void snk_state::bermudat(machine_config &config)
 	ym1.add_route(ALL_OUTPUTS, "mono", 2.0);
 
 	y8950_device &ym2(Y8950(config, "ym2", XTAL(8'000'000)/2)); /* verified on pcb */
-	ym2.irq().set(FUNC(snk_state::ymirq_callback_2));
+	ym2.irq_handler().set(FUNC(snk_state::ymirq_callback_2));
 	ym2.add_route(ALL_OUTPUTS, "mono", 2.0);
 }
 
@@ -4342,7 +4342,7 @@ void snk_state::tdfever(machine_config &config)
 	ym1.add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	y8950_device &ym2(Y8950(config, "ym2", 4000000));
-	ym2.irq().set(FUNC(snk_state::ymirq_callback_2));
+	ym2.irq_handler().set(FUNC(snk_state::ymirq_callback_2));
 	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 

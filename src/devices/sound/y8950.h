@@ -7,6 +7,7 @@
 #pragma once
 
 #include "ymfm.h"
+#include "ymadpcm.h"
 
 
 // ======================> y8950_device
@@ -46,24 +47,34 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
 
+	// ROM device overrides
 	virtual void rom_bank_updated() override;
 
 	// sound overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
+private:
+	// internal write to ADPCM
+	void adpcm_w(u8 offset, u8 data);
+
+	// combine ADPCM and OPN statuses
+	u8 combine_status();
+
+	// ADPCM read/write callbacks
+	u8 adpcm_b_read(offs_t address);
+	void adpcm_b_write(offs_t address, u8 data);
+
 	// internal state
 	u8 m_address;                    // address register
 	u8 m_io_ddr;                     // data direction register for I/O
-	u8 m_irq_mask;                   // current IRQ mask bits
+	u8 m_full_irq_mask;              // current IRQ mask bits
 	sound_stream *m_stream;          // sound stream
-	ymopl2_engine m_opl;             // core OPL engine
+	ymopl_engine m_opl;              // core OPL engine
 	ymadpcm_b_engine m_adpcm_b;      // ADPCM-B engine
-	address_space_config const m_adpcm_b_config; // address space config (ADPCM-B)
-	optional_memory_region m_adpcm_b_region; // ADPCM-B memory region
-	devcb_read8 m_keyboard_read_handler;
-	devcb_write8 m_keyboard_write_handler;
-	devcb_read8 m_io_read_handler;
-	devcb_write8 m_io_write_handler;
+	devcb_read8 m_keyboard_read_handler; // keyboard port read
+	devcb_write8 m_keyboard_write_handler; // keyboard port write
+	devcb_read8 m_io_read_handler;   // I/O port read
+	devcb_write8 m_io_write_handler; // I/O port write
 };
 
 
