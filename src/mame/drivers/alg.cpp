@@ -461,20 +461,13 @@ void alg_state::init_aplatoon()
 {
 	init_ntsc();
 
-	// NOT DONE TODO FIGURE OUT THE RIGHT ORDER!!!!
 	uint8_t *rom = memregion("game_program")->base();
-	std::unique_ptr<uint8_t[]> decrypted = std::make_unique<uint8_t[]>(0x40000);
+	std::vector<uint8_t> buffer(0x40000);
 
-	static const int shuffle[] =
-	{
-		0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,
-		32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63
-	};
+	memcpy(&buffer[0], rom, 0x40000);
 
-	for (int i = 0; i < 64; i++)
-		memcpy(decrypted.get() + i * 0x1000, rom + shuffle[i] * 0x1000, 0x1000);
-	memcpy(rom, decrypted.get(), 0x40000);
-	logerror("decrypt done\n ");
+	for (int i = 0; i < 0x40000; i++) // preliminary, believed ok but to be verified when the driver is fleshed out
+		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 13, 14, 15, 16, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
 }
 
 
@@ -843,7 +836,7 @@ ROM_START( marvice100hz )
 	DISK_IMAGE_READONLY( "marvice", 0, NO_DUMP )
 ROM_END
 
-/* Tierras Salvajes 100Hz 
+/* Tierras Salvajes 100Hz
   PCB silkscreened PICMATIC S.A. 27-11-1992
   ______________________________________________
   |        ________                      ····  |
@@ -868,7 +861,7 @@ ROM_END
   || | | EPROM EVEN |   _________    _________ |
   ||_| |____________|   |       |    |       | |
   |_____________________|       |____|       |_|
-                        |_______|    |_______|  
+                        |_______|    |_______|
 */
 ROM_START( tierras100hz )
 	ALG_BIOS
@@ -944,7 +937,7 @@ GAME( 1995, fastdraw_130, fastdraw, alg_r2,   alg_2p, alg_state, init_palr6,    
 	// Works OK but uses right player (2) controls only for trigger and holster
 
 // NOVA games on ALG hardware with own address scramble
-GAME( 199?, aplatoon,     alg_bios, alg_r2,   alg,    alg_state, init_aplatoon, ROT0,  "Nova?", "Platoon V.3.1 US", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, aplatoon,     alg_bios, alg_r2,   alg,    alg_state, init_aplatoon, ROT0,  "Nova?", "Platoon V.3.1 US", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Web Picmatic games PAL TV standard or 100Hz, own ROM board
 GAME( 1993, zortonbr_100, zortonbr, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Zorton Brothers v1.00 (Los Justicieros)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
