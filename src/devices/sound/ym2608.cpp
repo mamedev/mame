@@ -365,7 +365,7 @@ void ym2608_device::update_prescale(u8 newval)
 
 u8 ym2608_device::combine_status()
 {
-	u8 status = m_opn.status();
+	u8 status = m_opn.status() & ~(STATUS_ADPCM_B_EOS | STATUS_ADPCM_B_BRDY | STATUS_ADPCM_B_PLAYING);
 	u8 adpcm_status = m_adpcm_b.status(0);
 	if ((adpcm_status & ymadpcm_b_channel::STATUS_EOS) != 0)
 		status |= STATUS_ADPCM_B_EOS;

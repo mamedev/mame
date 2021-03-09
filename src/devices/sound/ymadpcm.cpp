@@ -500,6 +500,8 @@ void ymadpcm_b_channel::write(u8 regnum, u8 value)
 			load_start();
 			LOG("KeyOn ADPCM-B: repeat=%d speaker=%d pan=%d%d dac=%d 8bit=%d rom=%d start=%04X end=%04X prescale=%04X deltan=%04X level=%02X limit=%04X\n", m_regs.repeat(), m_regs.speaker(), m_regs.pan_left(), m_regs.pan_right(), m_regs.dac(), m_regs.dram_8bit(), m_regs.rom_ram(), m_regs.start(), m_regs.end(), m_regs.prescale(), m_regs.delta_n(), m_regs.level(), m_regs.limit());
 		}
+		else
+			m_status &= ~STATUS_EOS;
 		if (m_regs.reset())
 			reset();
 		if (m_regs.external())
