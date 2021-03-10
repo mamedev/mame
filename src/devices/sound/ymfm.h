@@ -192,8 +192,6 @@ inline s16 ymfm_roundtrip_fp(s32 value)
 
 
 
-
-
 //*********************************************************
 //  REGISTER CLASSES
 //*********************************************************
@@ -457,7 +455,7 @@ public:
 	// compute the keycode from the given block_freq value
 	// block_freq is block(3b):keycode(4b):keyfrac(6b); the 5-bit keycode
 	// we want is just the top 5 bits here
-	u8 block_freq_to_keycode(u16 block_freq)
+	u8 block_freq_to_keycode(u16 block_freq) const
 	{
 		return BIT(block_freq, 8, 5);
 	}
@@ -693,7 +691,7 @@ public:
 	// compute the keycode from the given block_freq value
 	// block_freq is block(3b):fnum(11b); the 5-bit keycode uses the top
 	// 4 bits plus a magic formula for the final bit
-	u8 block_freq_to_keycode(u16 block_freq)
+	u8 block_freq_to_keycode(u16 block_freq) const
 	{
 		u8 keycode = BIT(block_freq, 10, 4) << 1;
 
@@ -1120,7 +1118,7 @@ public:
 	// compute the keycode from the given block_freq value
 	// block_freq is block(3b):fnum(10b):0; the 4-bit keycode uses the top
 	// 3 bits plus either the MSB or MSB-1 of fnum, depending on note_select
-	u8 block_freq_to_keycode(u16 block_freq)
+	u8 block_freq_to_keycode(u16 block_freq) const
 	{
 		u8 keycode = BIT(block_freq, 11, 3) << 1;
 		return keycode | BIT(block_freq, 10 - note_select(), 1);
@@ -1148,7 +1146,7 @@ public:
 	u8 load_timer_a() const       /*  1 bit  */ { return sysbyte(0x04, 0, 1); }
 	u8 csm() const                /*  1 bit  */ { return sysbyte(0x08, 7, 1); }
 	u8 note_select() const        /*  1 bit  */ { return sysbyte(0x08, 6, 1); }
-	u8 lfo_am_depth() const       /*  1 bit  */ { return sysbyte(0xbd, 7, 1); }
+	u8 lfo_am_depth() const       /*  1 bit  */ { return sysbyte(0xbd, 7, 1) * 2; } // 1->2 bits
 	u8 lfo_pm_depth() const       /*  1 bit  */ { return sysbyte(0xbd, 6, 1); }
 	u8 rhythm_enable() const      /*  1 bit  */ { return sysbyte(0xbd, 5, 1); }
 	u8 rhythm_keyon() const       /*  5 bits */ { return sysbyte(0xbd, 4, 0); }
@@ -1204,6 +1202,276 @@ public:
 };
 
 
+// ======================> ymopl_registers, ymopl2_registers
+
+//
+// OPL/OPL2 register map:
+//
+//      System-wide registers:
+//           0E --x----- Rhythm enable
+//              ---x---- Bass drum key on
+//              ----x--- Snare drum key on
+//              -----x-- Tom key on
+//              ------x- Top cymbal key on
+//              -------x High hat key on
+//           0F xxxxxxxx Test register
+//
+//     Per-channel registers (channel in address bits 0-3)
+//        10-18 xxxxxxxx F-number (low 8 bits)
+//        20-28 --x----- Sustain on
+//              ---x---- Key on
+//              --- xxx- Block (octvate, 0-7)
+//              -------x F-number (high bit)
+//        30-38 xxxx---- Instrument selection
+//              ----xxxx Volume
+//
+//     User instrument registers (for carrier, modulator operators)
+//        00-01 x------- AM enable
+//              -x------ PM enable (VIB)
+//              --x----- EG type
+//              ---x---- Key scale rate
+//              ----xxxx Multiple value (0-15)
+//           02 xx------ Key scale level (carrier, 0-3)
+//              --xxxxxx Total level (modulator, 0-63)
+//           03 xx------ Key scale level (modulator, 0-3)
+//              ---x---- Rectified wave (carrier)
+//              ----x--- Rectified wave (modulator)
+//              -----xxx Feedback level for operator 1 (0-7)
+//        04-05 xxxx---- Attack rate (0-15)
+//              ----xxxx Decay rate (0-15)
+//        06-07 xxxx---- Sustain level (0-15)
+//              ----xxxx Release rate (0-15)
+//
+//     Internal states:
+//        40-48 xxxxxxxx Current instrument base address
+//        4E-5F xxxxxxxx Current instrument base address + operator slot (0/1)
+//        60-68 xxxxxxxx Index of volume, or 0 to use instrument total level
+//        70-FF xxxxxxxx ROM data for instruments (1-16 plus 3 drums)
+//
+// OPL channel and operator mapping:
+//
+
+class ymopll_registers : public ymopl_registers
+{
+public:
+	// constants
+	static constexpr u16 REGISTERS = 0x100;
+	static constexpr u16 REG_MODE = 0xff;
+
+	// status values
+	static constexpr u8 STATUS_TIMERA = 0;
+	static constexpr u8 STATUS_TIMERB = 0;
+	static constexpr u8 STATUS_BUSY = 0;
+	static constexpr u8 STATUS_IRQ = 0;
+
+	// constructor
+	ymopll_registers(u8 *regdata) :
+		ymopl_registers(regdata)
+	{
+	}
+
+	// getters for channel and operator number
+	u8 chnum() const
+	{
+		assert(m_chdata != nullptr);
+		return m_chdata - m_regdata;
+	}
+	u8 opnum() const
+	{
+		assert(m_opdata != nullptr);
+		return m_opdata - m_regdata;
+	}
+
+	// setters for channel and operator base within the register file
+	void set_chnum(u8 chnum)
+	{
+		assert(chnum < CHANNELS);
+		m_chdata = m_regdata + chnum;
+	}
+	void set_opnum(u8 opnum)
+	{
+		assert(opnum < OPERATORS);
+		m_opdata = m_regdata + opnum;
+	}
+
+	// mapping of operator number to channel.opindex:
+	static constexpr std::pair<u8,u8> opnum_to_chnum_and_index(u8 opnum)
+	{
+		assert(opnum < OPERATORS);
+		return std::make_pair(opnum / 2, opnum % 2);
+	}
+
+	// write access
+	void write(u16 index, u8 data)
+	{
+		assert(index < 0x40);
+
+		// writes to the user instrument get mirrored into the instrument area
+		if (index < 0x08)
+			m_regdata[0x60 | index] = data;
+
+		// write the new data
+		u8 old = m_regdata[index];
+		m_regdata[index] = data;
+
+		// look for instrument changes
+		if (index >= 0x30 && index <= 0x38 && BIT(old ^ data, 4, 4) != 0)
+			update_instrument(index - 0x30);
+
+		// also look for rhythm state change
+		else if (index == 0x0e && BIT(old ^ data, 5, 1) != 0)
+		{
+			update_instrument(6);
+			update_instrument(7);
+			update_instrument(8);
+		}
+	}
+
+	// determine if a given write is a keyon, and if so, for which channel/operators
+	static bool is_keyon(u16 regindex, u8 data, u8 &channel, u8 &opmask)
+	{
+		if ((regindex & 0xf0) == 0x20)
+		{
+			channel = regindex & 0x0f;
+			if (channel < CHANNELS)
+			{
+				opmask = BIT(data, 5) ? 3 : 0;
+				return true;
+			}
+		}
+		else if (regindex == 0x0e)
+		{
+			channel = 13;
+			opmask = BIT(data, 5) ? BIT(data, 0, 5) : 0;
+			return true;
+		}
+		return false;
+	}
+
+	// compute the keycode from the given block_freq value
+	// block_freq is block(3b):fnum(10b):0; the 4-bit keycode uses the top
+	// 3 bits plus the MSB of fnum
+	u8 block_freq_to_keycode(u16 block_freq) const
+	{
+		return BIT(block_freq, 10, 4);
+	}
+
+	// return either the total level or the volume
+	u8 total_level_or_volume() const
+	{
+		int op = BIT(opnum(), 0);
+		if (op == 1 || (rhythm_enable() && chnum() >= 7))
+			return chbyte(0x30, 4 * (op ^ 1), 4) * 4;
+		else
+			return instchbyte(0x02, 0, 6);
+	}
+
+	// system-wide registers
+	u8 rhythm_enable() const      /*  1 bit  */ { return sysbyte(0x0e, 5, 1); }
+	u8 rhythm_keyon() const       /*  5 bits */ { return sysbyte(0x0e, 4, 0); }
+	u8 test() const               /*  8 bits */ { return sysbyte(0x0f, 0, 8); }
+	u16 timer_a_value() const     /*  8 bits */ { return 0; }
+	u8 timer_b_value() const      /*  8 bits */ { return 0; }
+	u8 reset_timer_b() const      /*  1 bit  */ { return 0; }
+	u8 reset_timer_a() const      /*  1 bit  */ { return 0; }
+	u8 enable_timer_b() const     /*  1 bit  */ { return 0; }
+	u8 enable_timer_a() const     /*  1 bit  */ { return 0; }
+	u8 load_timer_b() const       /*  1 bit  */ { return 0; }
+	u8 load_timer_a() const       /*  1 bit  */ { return 0; }
+	u8 csm() const                /*  1 bit  */ { return 0; }
+	u8 lfo_am_depth() const       /*  1 bit  */ { return 1; } // 1->2 bits
+	u8 lfo_pm_depth() const       /*  1 bit  */ { return 0; }
+	u8 waveform_enable() const    /*  1 bits */ { return 1; }
+
+	// per-channel registers
+	u16 block_freq() const        /* 12 bits */ { return chword(0x10, 0, 4, 0x20, 0, 8) * 4; } // 12->14 bits
+	u8 sustain() const            /*  1 bit  */ { return chbyte(0x20, 5, 1); }
+	u8 feedback() const           /*  3 bits */ { return instchbyte(0x03, 0, 3); }
+	u8 algorithm() const          /*  1 bit  */ { return 6; }
+
+	// per-operator registers
+	u8 lfo_am_enabled() const     /*  1 bit  */ { return instopbyte(0x00, 7, 1); }
+	u8 lfo_pm_enabled() const     /*  1 bit  */ { return instopbyte(0x00, 6, 1); }
+	u8 eg_sustain() const         /*  1 bit  */ { return instopbyte(0x00, 5, 1); }
+	u8 ksr() const                /*  1 bit  */ { return instopbyte(0x00, 4, 1) * 2 + 1; } // 1->2 bits
+	u8 multiple() const           /*  4 bits */ { return opl_multiple_map(instopbyte(0x00, 0, 4)); }
+	u8 key_scale_level() const    /*  2 bits */ { return instopbyte(0x02, 6, 2); }
+	u8 total_level() const        /*  6 bits */ { return total_level_or_volume(); }
+	u8 waveform() const           /*  1 bit */  { return instchbyte(0x03, 4 - BIT(opnum(), 0), 1); }
+	u8 attack_rate() const        /*  4 bits */ { return instopbyte(0x04, 4, 4) * 2; } // 4->5 bits
+	u8 decay_rate() const         /*  4 bits */ { return instopbyte(0x04, 0, 4) * 2; } // 4->5 bits
+	u8 sustain_level() const      /*  4 bits */ { return instopbyte(0x06, 4, 4); }
+	u8 release_rate() const       /*  4 bits */ { return instopbyte(0x06, 0, 4); }
+
+	// special helper for generically getting the attack/decay/statain/release rates
+	u8 adsr_rate(u8 state) const
+	{
+		// attack/decay are 4 bits, expanded to 5 to match OPM/OPN
+		if (state < 2)
+			return instopbyte(0x60, (state ^ 1) * 4, 4) * 2;
+
+		// non-percussive case
+		else if (eg_sustain() != 0)
+		{
+			// no sustain
+			if (state == 2)
+				return 0;
+
+			// release is either at 5 or the release rate
+			else
+				return sustain() ? 5*2 : instopbyte(0x06, 0, 4) * 2;
+		}
+
+		// percussive case
+		else
+		{
+			// release rate during sustain
+			if (state == 2)
+				return instopbyte(0x06, 0, 4) * 2;
+
+			// otherwise a hard-coded value during release
+			else
+				return sustain() ? 5*2 : 7*2;
+		}
+	}
+
+	// set the ROM data
+	void set_rom_data(u8 const data[0x90])
+	{
+		memcpy(&m_regdata[0x70], data, 0x90);
+	}
+
+private:
+	// helper to compute the ROM address of an instrument number
+	static constexpr rom_address(int instrument)
+	{
+		return (instrument == 0) ? 0 : (0x70 + 8 * (instrument - 1));
+	}
+
+	// helper to update the instrument
+	void update_instrument(int chnum)
+	{
+		if (chnum >= 6 && rhythm_enable())
+		{
+			m_regdata[0x40 + chnum] = rom_address(16);
+			m_regdata[0x4e + chnum * 2 + 0] = m_regdata[0x40 + chnum];
+			m_regdata[0x4e + chnum * 2 + 1] = m_regdata[0x40 + chnum] + 1;
+		}
+		else
+		{
+			m_regdata[0x40 + chnum] = rom_address(sysbyte(0x30 + chnum, 4, 4));
+			m_regdata[0x4e + chnum * 2 + 0] = m_regdata[0x40 + chnum];
+			m_regdata[0x4e + chnum * 2 + 1] = m_regdata[0x40 + chnum] + 1;
+		}
+	}
+
+	// helpers to read from instrument channel/operator data
+	u8 instchbyte(u16 offset, u8 start, u8 count) const { return BIT(m_regdata[offset + m_chdata[0x40]], start, count); }
+	u8 instopbyte(u16 offset, u8 start, u8 count) const { return BIT(m_regdata[offset + m_opdata[0x4e]], start, count); }
+};
+
+
+
 //*********************************************************
 //  CORE ENGINE CLASSES
 //*********************************************************
@@ -1241,9 +1509,6 @@ public:
 	// reset the operator state
 	void reset();
 
-	// set the channel number
-	void set_chnum(u8 chnum) { m_regs.set_chnum(chnum); }
-
 	// master clocking function
 	void clock(u32 env_counter, s8 lfo_raw_pm, u16 block_freq);
 
@@ -1258,6 +1523,9 @@ public:
 
 	// key state control
 	void keyonoff(u8 on, ymfm_keyon_type type);
+
+	// return a pointer to our registers
+	RegisterType &regs() { return m_regs; }
 
 private:
 	// return the effective 6-bit ADSR rate after adjustments
@@ -1311,7 +1579,7 @@ public:
 		assert(index < std::size(m_op));
 		m_op[index] = op;
 		if (op != nullptr)
-			op->set_chnum(m_regs.chnum());
+			op->regs().set_chnum(m_regs.chnum());
 	}
 
 	// signal key on/off to our operators
@@ -1327,6 +1595,9 @@ public:
 	void output_rhythm_ch6(u8 lfo_raw_am, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
 	void output_rhythm_ch7(u8 lfo_raw_am, u8 noise_state, u8 phase_select, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
 	void output_rhythm_ch8(u8 lfo_raw_am, u8 phase_select, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
+
+	// return a pointer to our registers
+	RegisterType &regs() { return m_regs; }
 
 private:
 	// convert a 6/8-bit raw AM value into an amplitude offset based on sensitivity
@@ -1416,7 +1687,7 @@ public:
 	// return the owning device
 	device_t &device() const { return m_device; }
 
-private:
+protected:
 	// clock the LFO, updating m_lfo_am and return the signed PM value
 	s8 clock_lfo();
 
@@ -1474,5 +1745,16 @@ using ymopn_engine = ymfm_engine_base<ymopn_registers>;
 using ymopna_engine = ymfm_engine_base<ymopna_registers>;
 using ymopl_engine = ymfm_engine_base<ymopl_registers>;
 using ymopl2_engine = ymfm_engine_base<ymopl2_registers>;
+
+
+// ======================> ymopll_engine
+
+class ymopll_engine : public ymfm_engine_base<ymopll_registers>
+{
+public:
+	// constructor
+	ymopll_engine(device_t &device, u8 const romdata[0x90]);
+};
+
 
 #endif // MAME_SOUND_YMFM_H

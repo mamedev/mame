@@ -1776,7 +1776,8 @@ s8 ymfm_engine_base<RegisterType>::clock_lfo()
 			am_lfo_counter = 0, m_lfo_counter &= 0xffff0000;
 
 		// low 8 bits are fractional; depth 0 is divided by 4, while depth 1 is normal
-		int shift = 10 - 2 * m_regs.lfo_am_depth();
+		// on OPL, lfo_am_depth is 0 or 2; on OPLL, it is 1
+		int shift = 10 - m_regs.lfo_am_depth();
 
 		// AM value is the upper bits of the value, inverted across
 		// the midpoint to produce a triangle
@@ -1960,7 +1961,27 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::synced_mode_w)
 }
 
 
-// Explicit template instantiation
+
+//*********************************************************
+//  YMOPLL ENGINE
+//*********************************************************
+
+//-------------------------------------------------
+//  ymopll_engine - constructor
+//-------------------------------------------------
+
+ymopll_engine::ymopll_engine(device_t &device, u8 const romdata[0x90]) :
+	ymfm_engine_base<ymopll_registers>(device)
+{
+	m_regs.set_rom_data(romdata);
+}
+
+
+
+//*********************************************************
+//  EXPLICIT TEMPLATE INSTANTIATION
+//*********************************************************
+
 template class ymfm_engine_base<ymopm_registers>;
 template class ymfm_engine_base<ymopn_registers>;
 template class ymfm_engine_base<ymopna_registers>;
