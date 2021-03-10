@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "ymadpcm.h"
 
-#define VERBOSE 1
+//#define VERBOSE 1
 #define LOG_OUTPUT_FUNC osd_printf_verbose
 #include "logmacro.h"
 
@@ -391,6 +391,7 @@ void ymadpcm_b_channel::clock()
 				m_accumulator = 0;
 				m_prev_accum = 0;
 				m_status = (m_status & ~STATUS_PLAYING) | STATUS_EOS;
+				LOG("ADPCM EOS\n");
 				return;
 			}
 		}
@@ -472,7 +473,10 @@ u8 ymadpcm_b_channel::read(u8 regnum)
 
 		// did we hit the end? if so, signal EOS
 		if (at_end())
+		{
 			m_status = STATUS_EOS | STATUS_BRDY;
+			LOG("ADPCM EOS\n");
+		}
 
 		// otherwise, write the data and signal ready
 		else
@@ -491,6 +495,7 @@ u8 ymadpcm_b_channel::read(u8 regnum)
 
 void ymadpcm_b_channel::write(u8 regnum, u8 value)
 {
+	LOG("ADPCM %X = %02X\n", regnum, value);
 	// register 0 can do a reset; also use writes here to reset the
 	// dummy read counter
 	if (regnum == 0x00)
@@ -498,7 +503,7 @@ void ymadpcm_b_channel::write(u8 regnum, u8 value)
 		if (m_regs.execute())
 		{
 			load_start();
-			LOG("KeyOn ADPCM-B: repeat=%d speaker=%d pan=%d%d dac=%d 8bit=%d rom=%d start=%04X end=%04X prescale=%04X deltan=%04X level=%02X limit=%04X\n", m_regs.repeat(), m_regs.speaker(), m_regs.pan_left(), m_regs.pan_right(), m_regs.dac(), m_regs.dram_8bit(), m_regs.rom_ram(), m_regs.start(), m_regs.end(), m_regs.prescale(), m_regs.delta_n(), m_regs.level(), m_regs.limit());
+			LOG("KeyOn ADPCM-B: rep=%d spk=%d pan=%d%d dac=%d 8b=%d rom=%d ext=%d rec=%d start=%04X end=%04X pre=%04X dn=%04X lvl=%02X lim=%04X\n", m_regs.repeat(), m_regs.speaker(), m_regs.pan_left(), m_regs.pan_right(), m_regs.dac(), m_regs.dram_8bit(), m_regs.rom_ram(), m_regs.external(), m_regs.record(), m_regs.start(), m_regs.end(), m_regs.prescale(), m_regs.delta_n(), m_regs.level(), m_regs.limit());
 		}
 		else
 			m_status &= ~STATUS_EOS;
@@ -527,7 +532,10 @@ void ymadpcm_b_channel::write(u8 regnum, u8 value)
 
 			// did we hit the end? if so, signal EOS
 			if (at_end())
+			{
+				LOG("ADPCM EOS\n");
 				m_status = STATUS_EOS | STATUS_BRDY;
+			}
 
 			// otherwise, write the data and signal ready
 			else

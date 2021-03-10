@@ -110,6 +110,7 @@ void y8950_device::write(offs_t offset, u8 value)
 					break;
 
 				case 0x07:	// ADPCM-B registers
+				case 0x09:
 				case 0x0a:
 				case 0x0b:
 				case 0x0c:
@@ -234,6 +235,9 @@ void y8950_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 		// OPL is mono
 		outputs[0].put_int(sampindex, ymfm_roundtrip_fp(sums[0]), 32768);
 	}
+
+	// update the status in case of ADPCM EOS
+	combine_status();
 }
 
 
@@ -253,8 +257,7 @@ u8 y8950_device::combine_status()
 		status |= STATUS_ADPCM_B_BRDY;
 	if ((adpcm_status & ymadpcm_b_channel::STATUS_PLAYING) != 0)
 		status |= STATUS_ADPCM_B_PLAYING;
-	m_opl.set_reset_status(status, ~status);
-	return status;
+	return m_opl.set_reset_status(status, ~status);
 }
 
 

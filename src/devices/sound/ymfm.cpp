@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "ymfm.h"
 
-#define VERBOSE 1
+//#define VERBOSE 1
 #define LOG_OUTPUT_FUNC osd_printf_verbose
 #include "logmacro.h"
 
@@ -652,9 +652,6 @@ u8 ymfm_operator<RegisterType>::effective_rate(u8 rawrate, u8 keycode)
 //  is complete and restarts
 //-------------------------------------------------
 
-// yuck, temporary...
-DECLARE_DEVICE_TYPE(Y8950, y8950_device);
-
 template<class RegisterType>
 void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 {
@@ -678,7 +675,6 @@ void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 //	if (m_regs.lfo_waveform() == 3 && m_regs.lfo_enabled() && ((m_regs.lfo_am_enabled() && m_regs.lfo_am_sensitivity() != 0) || m_regs.lfo_pm_sensitivity() != 0))
 //	if ((m_regs.rhythm_enable() && m_regs.chnum() >= 6) ||
 //	    (m_regs.waveform_enable() && m_regs.waveform() != 0))
-	if (m_owner.device().type() == Y8950)
 	{
 		LOG("%s: %2d.%2d: freq=%04X", m_owner.device().tag(), m_regs.chnum(), m_regs.opnum(), m_regs.block_freq());
 		if (RegisterType::FAMILY == RegisterType::FAMILY_OPM)
@@ -745,9 +741,6 @@ void ymfm_operator<RegisterType>::clock_keystate(u8 keystate, u8 keycode)
 	if ((keystate ^ m_key_state) != 0)
 	{
 		m_key_state = keystate;
-
-		if (m_owner.device().type() == Y8950)
-			LOG("%s: %2d.%2d: keystate=%d cur=%d\n", m_owner.device().tag(), m_regs.chnum(), m_regs.opnum(), keystate, int(m_env_state));
 
 		// if the key has turned on, start the attack
 		if (keystate != 0)
@@ -1085,8 +1078,6 @@ void ymfm_channel<RegisterType>::reset()
 template<class RegisterType>
 void ymfm_channel<RegisterType>::keyonoff(u8 states, ymfm_keyon_type type)
 {
-	if (m_owner.device().type() == Y8950)
-		LOG("%s: %2d.xx: keyon=%d\n", m_owner.device().tag(), m_regs.chnum(), states);
 	for (int opnum = 0; opnum < std::size(m_op); opnum++)
 		if (m_op[opnum] != nullptr)
 			m_op[opnum]->keyonoff(BIT(states, opnum), type);

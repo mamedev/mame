@@ -1385,10 +1385,11 @@ public:
 	u8 status() const;
 
 	// set/reset bits in the status register, updating the IRQ status
-	void set_reset_status(u8 set, u8 reset)
+	u8 set_reset_status(u8 set, u8 reset)
 	{
 		m_status = (m_status | set) & ~reset & ~m_regs.status_mask();
 		schedule_check_interrupts();
+		return m_status;
 	}
 
 	// set the IRQ mask
