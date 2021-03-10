@@ -42,7 +42,12 @@ u8 y8950_device::read(offs_t offset)
 	u8 result = 0xff;
 	switch (offset & 1)
 	{
-		case 0:	// data port
+		case 0: // status port
+			m_stream->update();
+			result = combine_status();
+			break;
+
+		case 1:	// data port
 
 			switch (m_address)
 			{
@@ -63,11 +68,6 @@ u8 y8950_device::read(offs_t offset)
 					logerror("Unexpected read from Y8950 offset %d\n", offset & 3);
 					break;
 			}
-			break;
-
-		case 1: // status port
-			m_stream->update();
-			result = combine_status();
 			break;
 	}
 	return result;
@@ -228,7 +228,7 @@ void y8950_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 
 		// mix in the ADPCM; ADPCM-B is stereo, but only one channel
 		// not sure how it's wired up internally
-		m_adpcm_b.output(sums, 2, 0x01);
+		m_adpcm_b.output(sums, 3, 0x01);
 
 		// convert to 10.3 floating point value for the DAC and back
 		// OPL is mono

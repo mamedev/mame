@@ -1257,15 +1257,9 @@ public:
 	s16 compute_noise_volume(u8 noise_state, u16 am_offset) const;
 
 	// key state control
-	void keyonoff(u8 on, ymfm_keyon_type type)
-	{
-		m_keyon_live = (m_keyon_live & ~(1 << int(type))) | (BIT(on, 0) << int(type));
-	}
+	void keyonoff(u8 on, ymfm_keyon_type type);
 
 private:
-	// convert the generic block_freq into a 5-bit keycode
-	u8 block_freq_to_keycode(u16 block_freq);
-
 	// return the effective 6-bit ADSR rate after adjustments
 	u8 effective_rate(u8 rawrate, u8 keycode);
 

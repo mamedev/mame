@@ -36,8 +36,8 @@ public:
 	u8 read(offs_t offset);
 	virtual void write(offs_t offset, u8 data);
 
-	u8 read_port_r() { return read(0); }
-	u8 status_port_r() { return read(1); }
+	u8 status_port_r() { return read(0); }
+	u8 read_port_r() { return read(1); }
 	void control_port_w(u8 data) { write(0, data); }
 	void write_port_w(u8 data) { write(1, data); }
 

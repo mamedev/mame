@@ -1488,7 +1488,7 @@ void toaplan2_state::hd647180_io_map(address_map &map)
 	map(0x84, 0x84).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 
 	map(0x82, 0x82).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
-	map(0x83, 0x83).rw("ymsnd", FUNC(ym3812_device::read_port_r), FUNC(ym3812_device::write_port_w));
+	map(0x83, 0x83).w("ymsnd", FUNC(ym3812_device::write_port_w));
 }
 
 

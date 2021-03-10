@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "ymadpcm.h"
 
-//#define VERBOSE 1
+#define VERBOSE 1
 #define LOG_OUTPUT_FUNC osd_printf_verbose
 #include "logmacro.h"
 

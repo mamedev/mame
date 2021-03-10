@@ -621,6 +621,17 @@ s16 ymfm_operator<RegisterType>::compute_noise_volume(u8 noise_state, u16 am_off
 
 
 //-------------------------------------------------
+//  keyonoff - signal a key on/off event
+//-------------------------------------------------
+
+template<class RegisterType>
+void ymfm_operator<RegisterType>::keyonoff(u8 on, ymfm_keyon_type type)
+{
+	m_keyon_live = (m_keyon_live & ~(1 << int(type))) | (BIT(on, 0) << int(type));
+}
+
+
+//-------------------------------------------------
 //  effective_rate - return the effective 6-bit
 //  ADSR rate value after adjusting for keycode
 //-------------------------------------------------
