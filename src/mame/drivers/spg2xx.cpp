@@ -2202,7 +2202,7 @@ CONS( 2009, senwfit,    0,        0, gssytts,   senwfit,   spg2xx_game_senwfit_s
 CONS( 2006, vtechtvssp, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Station (VTech, Spain)",                                             MACHINE_NOT_WORKING )
 CONS( 2006, vtechtvsgr, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Learning Station (VTech, Germany)",                                  MACHINE_NOT_WORKING )
 
-CONS( 2007, itvphone,   0,        0, spg2xx,    itvphone,    spg2xx_game_state,        init_itvphone, "Oregon Scientific / V-Tac Technology Co Ltd.",           u8"Teléfono interactivo de TV (Spain)",                                    MACHINE_NOT_WORKING )
+CONS( 2007, itvphone,   0,        0, spg2xx_pal, itvphone, spg2xx_game_state,          init_itvphone, "Oregon Scientific / V-Tac Technology Co Ltd.",           u8"Teléfono interactivo de TV (Spain)",                                    MACHINE_NOT_WORKING )
 
 // "Boots's" is used on the title screen and in the manual, even if "Boots'" is usually used outside of this game.
 CONS( 2006, doraphon,   0,        0, doraphone, doraphone, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Explorer Phone / Boots's Special Day",      MACHINE_IMPERFECT_SOUND )
