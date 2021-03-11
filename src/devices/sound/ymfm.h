@@ -6,159 +6,6 @@
 
 #pragma once
 
-//
-// Implementation notes:
-//
-//
-// FAMILIES
-//
-// The Yamaha FM chips can be broadly categoried into families:
-//
-//   OPM (YM2151)
-//   OPN (YM2203)
-//     OPNA/OPNB/OPN2 (YM2608, YM2610, YM2610B, YM2612, YM3438, YMF276, YMF288)
-//   OPL (YM3526)
-//     OPL2 (YM3812)
-//     OPLL (YM2413, YM2423, YMF281, DS1001, and others)
-//     OPL3 (YMF262, YMF278)
-//
-// All of these families are very closely related, and the ymfm engine
-// implemented below is designed to be universal to work across all of
-// these families.
-//
-// Of course, each variant has its own register maps, features, and
-// implementation details which need to be sorted out. Thus, each
-// significant variant listed above is represented by a register class. The
-// register class contains:
-//
-//   * constants describing core parameters and features
-//   * mappers between operators and channels
-//   * generic fetchers that return normalized values across families
-//   * family-specific helper functions
-//
-//
-// CHANNELS AND OPERATORS
-//
-// The polyphony of a given chip is determined by the number of channels
-// it supports. This number ranges from as low as 3 to as high as 18.
-// Each channel has either 2 or 4 operators that can be combined in a
-// myriad of ways. On most chips the number of operators per channel is
-// fixed; however, some later OPL chips allow this to be toggled between
-// 2 and 4 at runtime.
-//
-// The base ymfm engine class maintains an array of channels and operators,
-// while the relationship between the two is described by the register
-// class.
-//
-//
-// REGISTERS
-//
-// Registers on the Yamaha chips are generally write-only, and can be divided
-// into three distinct categories:
-//
-//   * system-wide registers
-//   * channel-specific registers
-//   * operator-specific registers
-//
-// For maximum flexibility, most parameters can be configured at the operator
-// level, with channel-level registers controlling details such as how to
-// combine the operators into the final output. System-wide registers are
-// used to control chip-wide modes and manage onboard timer functions.
-//
-// Note that since registers are write-only, some implementations will use
-// "holes" in the register space to store additional values that may be
-// needed.
-//
-//
-// STATUS AND TIMERS
-//
-// Generically, all chips (except OPLL) support two timers that can be
-// programmed to fire and signal IRQs. These timers also set bits in the
-// status register. The behavior of these bits is shared across all
-// implementations, even if the exact bit positions shift (this is controlled
-// by constants in the registers class).
-//
-// In addition, several chips incorporate ADPCM decoders which also may set
-// bits in the same status register. For this reason, it is possible to
-// control various bits in the status register via the set_reset_status()
-// function directly. Any active bits that are set and which are not masked
-// (mask is controlled by set_irq_mask()), lead to an IRQ being signalled.
-//
-// Thus, it is possible for the chip-specific implementations to set the
-// mask and control the status register bits such that IRQs are signalled
-// via the same mechanism as timer signals.
-//
-// In addition, the OPM and OPN families have a "busy" flag, which is set
-// after each write, indicating that another write should not be performed.
-// Historically, the duration of this flag was constant and had nothing to
-// do with the internals of the chip. However, since the details can
-// potentially vary chip-to-chip, it is the chip's responsibility after any
-// operation to call set_busy_end() with the attotime of when the busy
-// signal should be released.
-//
-//
-// CLOCKING
-//
-// Each of the Yamaha chips works by cycling through all operators one at
-// a time. Thus, the effective output rate of the chips is related to the
-// input clock divided by the number of operators. In addition, the input
-// clock is prescaled by an amount. Generally, this is a fixed value, though
-// some early OPN chips allow this to be selected at runtime from a small
-// number of values.
-//
-//
-// CHANNEL FREQUENCIES
-//
-// One major difference between OPM and later families is in how frequencies
-// are specified. OPM specifies frequency via a 3-bit 'block' (aka octave),
-// combined with a 4-bit 'key code' (note number) and a 6-bit 'key fraction'.
-// The key code and fraction are converted on the chip into an x.11 fixed-
-// point value and then shifted by the block to produce the final step value
-// for the phase.
-//
-// Later families, on the other hand, specify frequencies via a 3-bit 'block'
-// just as on OPM, but combined with an 9, 10, or 11-bit 'frequency number'
-// or 'fnum', which is directly shifted by the block to produce the step
-// value. So essentially, OPN makes the user do the conversion from note value
-// to phase increment, while OPM is programmed in a more 'musical' way,
-// specifying notes and cents.
-//
-// Interally, this is abstracted away into a 'block_freq' value, which is a
-// 16-bit value containing the block and frequency info concatenated together
-// as follows:
-//
-//    OPM: [3-bit block]:[4-bit keycode]:[6-bit fraction] = 13 bits total
-//
-//    OPN:  [3-bit block]:[11-bit fnum]    = 14 bits total
-//    OPL:  [3-bit block]:[10-bit fnum]:0  = 14 bits total
-//    OPLL: [3-bit block]:[ 9-bit fnum]:00 = 14 bits total
-//
-// Template specialization in functions that interpret the 'block_freq' value
-// is used to deconstruct it appropriately (specifically, see clock_phase).
-//
-//
-// LOW FREQUENCY OSCILLATOR (LFO)
-//
-// The LFO engines are different in several key ways. The OPM LFO engine is
-// fairly intricate. It has a 4.4 floating-point rate which allows for a huge
-// range of frequencies, and can select between four different waveforms
-// (sawtooth, square, triangle, or noise). Separate 7-bit depth controls for
-// AM and PM control the amount of modulation applied in each case. This
-// global LFO value is then further controlled at the channel level by a 2-bit
-// AM sensitivity and a 3-bit PM sensitivity, and each operator has a 1-bit AM
-// on/off switch.
-//
-// For OPN the LFO engine was removed entirely, but a limited version was put
-// back in OPNA and later chips. This stripped-down version offered only a
-// 3-bit rate setting (versus the 4.4 floating-point rate in OPN), and no
-// depth control. It did bring back the channel-level sensitivity controls and
-// the operator-level on/off control.
-//
-// For OPL, the LFO is simplified again, with AM and PM running at fixed
-// frequencies, and simple enable flags at the operator level for each
-// controlling their application.
-//
-
 
 //*********************************************************
 //  MACROS
@@ -211,9 +58,9 @@ inline s16 ymfm_encode_fp(s32 value)
 {
 	// handle overflows first
 	if (value < -32768)
-		return (1 << 10) | 0x200;
+		return (7 << 10) | 0x000;
 	if (value > 32767)
-		return (1 << 10) | 0x1ff;
+		return (7 << 10) | 0x3ff;
 
 	// we need to count the number of leading sign bits after the sign
 	// we can use count_leading_zeros if we invert negative values
@@ -321,6 +168,7 @@ public:
 	//  u8 DEFAULT_PRESCALE: The starting clock prescale
 	//  u8 EG_CLOCK_DIVIDER: The clock divider of the envelope generator
 	//  bool EG_HAS_DEPRESS: True if the chip has a DP ("depress"?) envelope stage
+	// bool MODULATOR_DELAY: True if the modulator is delayed by 1 sample (OPL pre-OPL3)
 	// u32 CSM_TRIGGER_MASK: Mask of channels to trigger in CSM mode
 	//     u8 STATUS_TIMERA: Status bit to set when timer A fires
 	//     u8 STATUS_TIMERB: Status bit to set when tiemr B fires
@@ -503,6 +351,7 @@ public:
 	static constexpr u8 DEFAULT_PRESCALE = 2;
 	static constexpr u8 EG_CLOCK_DIVIDER = 3;
 	static constexpr bool EG_HAS_DEPRESS = false;
+	static constexpr bool MODULATOR_DELAY = false;
 	static constexpr u32 CSM_TRIGGER_MASK = 0xff;
 	static constexpr u8 STATUS_TIMERA = 0x01;
 	static constexpr u8 STATUS_TIMERB = 0x02;
@@ -698,6 +547,7 @@ public:
 	static constexpr u8 DEFAULT_PRESCALE = 6;
 	static constexpr u8 EG_CLOCK_DIVIDER = 3;
 	static constexpr bool EG_HAS_DEPRESS = false;
+	static constexpr bool MODULATOR_DELAY = false;
 	static constexpr u32 CSM_TRIGGER_MASK = 1 << 2;
 	static constexpr u8 STATUS_TIMERA = 0x01;
 	static constexpr u8 STATUS_TIMERB = 0x02;
@@ -1065,6 +915,7 @@ public:
 	static constexpr u8 DEFAULT_PRESCALE = 4;
 	static constexpr u8 EG_CLOCK_DIVIDER = 1;
 	static constexpr bool EG_HAS_DEPRESS = false;
+	static constexpr bool MODULATOR_DELAY = true;
 	static constexpr u32 CSM_TRIGGER_MASK = 0x1ff;
 	static constexpr u8 STATUS_TIMERA = 0x40;
 	static constexpr u8 STATUS_TIMERB = 0x20;
@@ -1198,7 +1049,7 @@ public:
 	// per-channel registers
 	u16 block_freq() const        /* 13 bits */ { return chword(0xb0, 0, 5, 0xa0, 0, 8) * 2; } // 13->14 bits
 	u8 feedback() const           /*  3 bits */ { return chbyte(0xc0, 1, 3); }
-	u8 algorithm() const          /*  1 bit  */ { return chbyte(0xc0, 0, 1) + 6; } // 1->3 bits
+	u8 algorithm() const          /*  1 bit  */ { return chbyte(0xc0, 0, 1); }
 
 	// per-operator registers
 	u8 lfo_am_enabled() const     /*  1 bit  */ { return opbyte(0x20, 7, 1); }
@@ -1426,7 +1277,7 @@ public:
 	u16 block_freq() const        /* 12 bits */ { return chword(0x20, 0, 4, 0x10, 0, 8) * 4; } // 12->14 bits
 	u8 sustain() const            /*  1 bit  */ { return chbyte(0x20, 5, 1); }
 	u8 feedback() const           /*  3 bits */ { return instchbyte(0x03, 0, 3); }
-	u8 algorithm() const          /*  1 bit  */ { return 6; }
+	u8 algorithm() const          /*  1 bit  */ { return 0; }
 	u8 instrument() const         /*  4 bits */ { return chbyte(0x30, 4, 4); }
 	u8 output0() const            /*  1 bit  */ { return is_rhythm() ? 0 : 1; }
 	u8 output1() const            /*  1 bit  */ { return is_rhythm() ? 1 : 0; }

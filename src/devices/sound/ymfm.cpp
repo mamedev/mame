@@ -9,6 +9,160 @@
 #include "logmacro.h"
 
 //
+// Implementation notes:
+//
+//
+// FAMILIES
+//
+// The Yamaha FM chips can be broadly categoried into families:
+//
+//   OPM (YM2151)
+//   OPN (YM2203)
+//     OPNA/OPNB/OPN2 (YM2608, YM2610, YM2610B, YM2612, YM3438, YMF276, YMF288)
+//   OPL (YM3526)
+//     OPL2 (YM3812)
+//     OPLL (YM2413, YM2423, YMF281, DS1001, and others)
+//     OPL3 (YMF262, YMF278)
+//
+// All of these families are very closely related, and the ymfm engine
+// implemented below is designed to be universal to work across all of
+// these families.
+//
+// Of course, each variant has its own register maps, features, and
+// implementation details which need to be sorted out. Thus, each
+// significant variant listed above is represented by a register class. The
+// register class contains:
+//
+//   * constants describing core parameters and features
+//   * mappers between operators and channels
+//   * generic fetchers that return normalized values across families
+//   * family-specific helper functions
+//
+//
+// CHANNELS AND OPERATORS
+//
+// The polyphony of a given chip is determined by the number of channels
+// it supports. This number ranges from as low as 3 to as high as 18.
+// Each channel has either 2 or 4 operators that can be combined in a
+// myriad of ways. On most chips the number of operators per channel is
+// fixed; however, some later OPL chips allow this to be toggled between
+// 2 and 4 at runtime.
+//
+// The base ymfm engine class maintains an array of channels and operators,
+// while the relationship between the two is described by the register
+// class.
+//
+//
+// REGISTERS
+//
+// Registers on the Yamaha chips are generally write-only, and can be divided
+// into three distinct categories:
+//
+//   * system-wide registers
+//   * channel-specific registers
+//   * operator-specific registers
+//
+// For maximum flexibility, most parameters can be configured at the operator
+// level, with channel-level registers controlling details such as how to
+// combine the operators into the final output. System-wide registers are
+// used to control chip-wide modes and manage onboard timer functions.
+//
+// Note that since registers are write-only, some implementations will use
+// "holes" in the register space to store additional values that may be
+// needed.
+//
+//
+// STATUS AND TIMERS
+//
+// Generically, all chips (except OPLL) support two timers that can be
+// programmed to fire and signal IRQs. These timers also set bits in the
+// status register. The behavior of these bits is shared across all
+// implementations, even if the exact bit positions shift (this is controlled
+// by constants in the registers class).
+//
+// In addition, several chips incorporate ADPCM decoders which also may set
+// bits in the same status register. For this reason, it is possible to
+// control various bits in the status register via the set_reset_status()
+// function directly. Any active bits that are set and which are not masked
+// (mask is controlled by set_irq_mask()), lead to an IRQ being signalled.
+//
+// Thus, it is possible for the chip-specific implementations to set the
+// mask and control the status register bits such that IRQs are signalled
+// via the same mechanism as timer signals.
+//
+// In addition, the OPM and OPN families have a "busy" flag, which is set
+// after each write, indicating that another write should not be performed.
+// Historically, the duration of this flag was constant and had nothing to
+// do with the internals of the chip. However, since the details can
+// potentially vary chip-to-chip, it is the chip's responsibility after any
+// operation to call set_busy_end() with the attotime of when the busy
+// signal should be released.
+//
+//
+// CLOCKING
+//
+// Each of the Yamaha chips works by cycling through all operators one at
+// a time. Thus, the effective output rate of the chips is related to the
+// input clock divided by the number of operators. In addition, the input
+// clock is prescaled by an amount. Generally, this is a fixed value, though
+// some early OPN chips allow this to be selected at runtime from a small
+// number of values.
+//
+//
+// CHANNEL FREQUENCIES
+//
+// One major difference between OPM and later families is in how frequencies
+// are specified. OPM specifies frequency via a 3-bit 'block' (aka octave),
+// combined with a 4-bit 'key code' (note number) and a 6-bit 'key fraction'.
+// The key code and fraction are converted on the chip into an x.11 fixed-
+// point value and then shifted by the block to produce the final step value
+// for the phase.
+//
+// Later families, on the other hand, specify frequencies via a 3-bit 'block'
+// just as on OPM, but combined with a 9, 10, or 11-bit 'frequency number'
+// or 'fnum', which is directly shifted by the block to produce the step
+// value. So essentially, later chips make the user do the conversion from
+// note value to phase increment, while OPM is programmed in a more 'musical'
+// way, specifying notes and cents.
+//
+// Interally, this is abstracted away into a 'block_freq' value, which is a
+// 16-bit value containing the block and frequency info concatenated together
+// as follows:
+//
+//    OPM:  [3-bit block]:[4-bit keycode]:[6-bit fraction] = 13 bits total
+//
+//    OPN:  [3-bit block]:[11-bit fnum]    = 14 bits total
+//    OPL:  [3-bit block]:[10-bit fnum]:0  = 14 bits total
+//    OPLL: [3-bit block]:[ 9-bit fnum]:00 = 14 bits total
+//
+// Template specialization in functions that interpret the 'block_freq' value
+// is used to deconstruct it appropriately (specifically, see clock_phase).
+//
+//
+// LOW FREQUENCY OSCILLATOR (LFO)
+//
+// The LFO engines are different in several key ways. The OPM LFO engine is
+// fairly intricate. It has a 4.4 floating-point rate which allows for a huge
+// range of frequencies, and can select between four different waveforms
+// (sawtooth, square, triangle, or noise). Separate 7-bit depth controls for
+// AM and PM control the amount of modulation applied in each case. This
+// global LFO value is then further controlled at the channel level by a 2-bit
+// AM sensitivity and a 3-bit PM sensitivity, and each operator has a 1-bit AM
+// on/off switch.
+//
+// For OPN the LFO engine was removed entirely, but a limited version was put
+// back in OPNA and later chips. This stripped-down version offered only a
+// 3-bit rate setting (versus the 4.4 floating-point rate in OPN), and no
+// depth control. It did bring back the channel-level sensitivity controls and
+// the operator-level on/off control.
+//
+// For OPL, the LFO is simplified again, with AM and PM running at fixed
+// frequencies, and simple enable flags at the operator level for each
+// controlling their application.
+//
+
+
+//
 // This emulator is written from the ground-up based on analysis and deduction
 // by Nemesis, particularly in this thread:
 //
@@ -1159,101 +1313,109 @@ void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 outpu
 	// AM amount is the same across all operators; compute it once
 	u16 am_offset = lfo_am_offset(lfo_raw_am);
 
-	// Algorithms:
-	//    0: O1 -> O2 -> O3 -> O4 -> out
-	//    1: (O1 + O2) -> O3 -> O4 -> out
-	//    2: (O1 + (O2 -> O3)) -> O4 -> out
-	//    3: ((O1 -> O2) + O3) -> O4 -> out
-	//    4: ((O1 -> O2) + (O3 -> O4)) -> out
-	//    5: ((O1 -> O2) + (O1 -> O3) + (O1 -> O4)) -> out
-	//    6: ((O1 -> O2) + O3 + O4) -> out
-	//    7: (O1 + O2 + O3 + O4) -> out
-	//
-	// The operators are computed in order, with the inputs pulled from
-	// an array of values that is populated as we go:
-	//    0 = 0
-	//    1 = O1
-	//    2 = O2
-	//    3 = O3
-	//    4 = O4
-	//    5 = O1+O2
-	//    6 = O1+O3
-	//    7 = O2+O3
-	//
-	// This table encodes for operators 2-4 which of the 8 input values
-	// above is used: 1 bit for O2 and 3 bits for O3 and O4
-	static u8 const s_algorithm_inputs[8] =
-	{
-	// OP2  OP3        OP4
-		1 | (2 << 1) | (3 << 4),
-		0 | (5 << 1) | (3 << 4),
-		0 | (2 << 1) | (6 << 4),
-		1 | (0 << 1) | (7 << 4),
-		1 | (0 << 1) | (3 << 4),
-		1 | (1 << 1) | (1 << 4),
-		1 | (0 << 1) | (0 << 4),
-		0 | (0 << 1) | (0 << 4)
-	};
-	u8 algorithm = m_regs.algorithm();
-	u8 algorithm_inputs = s_algorithm_inputs[algorithm];
-	s16 opout[8];
-	opout[0] = 0;
-
 	// operator 1 has optional self-feedback
-	s16 opin = 0;
+	s16 opmod = 0;
 	u8 feedback = m_regs.feedback();
 	if (feedback != 0)
-		opin = (m_feedback[0] + m_feedback[1]) >> (10 - feedback);
+		opmod = (m_feedback[0] + m_feedback[1]) >> (10 - feedback);
 
 	// compute the 14-bit volume/value of operator 1 and update the feedback
-	opout[1] = m_feedback_in = m_op[0]->compute_volume(m_op[0]->phase() + opin, am_offset);
+	s16 op1value = m_feedback_in = m_op[0]->compute_volume(m_op[0]->phase() + opmod, am_offset);
 
-	// now that the feedback has been computed, skip the rest if both pans are clear;
-	// no need to do all this work for nothing
-	if (m_regs.output0() == 0 && m_regs.output1() == 0)
+	// now that the feedback has been computed, skip the rest if all volumes
+	// are clear; no need to do all this work for nothing
+	if (m_regs.output0() == 0 && m_regs.output1() == 0 && m_regs.output2() == 0 && m_regs.output3() == 0)
 		return;
 
-	// compute the 14-bit volume/value of operator 2
-	opin = opout[BIT(algorithm_inputs, 0, 1)] >> 1;
-	opout[2] = m_op[1]->compute_volume(m_op[1]->phase() + opin, am_offset);
-
-	// if only two operators, finish up
+	// handle two-operator and four-operator cases separately
 	s32 result;
+	u8 algorithm = m_regs.algorithm();
 	if (m_op[2] == nullptr)
 	{
-		// 2-operator case: algorithm will be either 6 or 7
-		result = opout[2] >> rshift;
-		if (algorithm == 7)
+		// Algorithms for two-operator case:
+		//    0: O1 -> O2 -> out
+		//    1: (O1 + O2) -> out
+		if (BIT(algorithm, 0) == 0)
 		{
+			// some OPL chips use the previous sample for modulation instead of
+			// the current sample
+			opmod = (RegisterType::MODULATOR_DELAY ? m_feedback[1] : op1value) >> 1;
+			result = m_op[1]->compute_volume(m_op[1]->phase() + opmod, am_offset) >> rshift;
+		}
+		else
+		{
+			result = op1value + (m_op[1]->compute_volume(m_op[1]->phase(), am_offset) >> rshift);
 			s32 clipmin = -clipmax - 1;
-			result += opout[1] >> rshift;
-			result = std::clamp(result, clipmin, clipmax);
+			result = std::clamp(result, clipmin, clipmin);
 		}
 	}
 	else
 	{
+		// Algorithms for four-operator case:
+		//    0: O1 -> O2 -> O3 -> O4 -> out
+		//    1: (O1 + O2) -> O3 -> O4 -> out
+		//    2: (O1 + (O2 -> O3)) -> O4 -> out
+		//    3: ((O1 -> O2) + O3) -> O4 -> out
+		//    4: ((O1 -> O2) + (O3 -> O4)) -> out
+		//    5: ((O1 -> O2) + (O1 -> O3) + (O1 -> O4)) -> out
+		//    6: ((O1 -> O2) + O3 + O4) -> out
+		//    7: (O1 + O2 + O3 + O4) -> out
+		//
+		// The operators are computed in order, with the inputs pulled from
+		// an array of values that is populated as we go:
+		//    0 = 0
+		//    1 = O1
+		//    2 = O2
+		//    3 = O3
+		//    4 = O4
+		//    5 = O1+O2
+		//    6 = O1+O3
+		//    7 = O2+O3
+		//
+		// This table encodes for operators 2-4 which of the 8 input values
+		// above is used: 1 bit for O2 and 3 bits for O3 and O4
+		static u8 const s_algorithm_inputs[8] =
+		{
+		// OP2  OP3        OP4
+			1 | (2 << 1) | (3 << 4),
+			0 | (5 << 1) | (3 << 4),
+			0 | (2 << 1) | (6 << 4),
+			1 | (0 << 1) | (7 << 4),
+			1 | (0 << 1) | (3 << 4),
+			1 | (1 << 1) | (1 << 4),
+			1 | (0 << 1) | (0 << 4),
+			0 | (0 << 1) | (0 << 4)
+		};
+		u8 algorithm = m_regs.algorithm();
+		u8 algorithm_inputs = s_algorithm_inputs[algorithm];
+		s16 opout[8];
+		opout[0] = 0;
+		opout[1] = op1value;
+
 		// 4-operator case: make sure op[3] is valid
 		assert(m_op[3] != nullptr);
+
+		// compute the 14-bit volume/value of operator 2
+		opmod = opout[BIT(algorithm_inputs, 0, 1)] >> 1;
+		opout[2] = m_op[1]->compute_volume(m_op[1]->phase() + opmod, am_offset);
 		opout[5] = opout[1] + opout[2];
 
 		// compute the 14-bit volume/value of operator 3
-		opin = opout[BIT(algorithm_inputs, 1, 3)] >> 1;
-		opout[3] = m_op[2]->compute_volume(m_op[2]->phase() + opin, am_offset);
+		opmod = opout[BIT(algorithm_inputs, 1, 3)] >> 1;
+		opout[3] = m_op[2]->compute_volume(m_op[2]->phase() + opmod, am_offset);
 		opout[6] = opout[1] + opout[3];
 		opout[7] = opout[2] + opout[3];
 
 		// compute the 14-bit volume/value of operator 4; this could be a noise
-		// value on the OPM
+		// value on the OPM; all algorithms consume OP4 output at a minimum
 		if (noise_state != 0)
-			opout[4] = m_op[3]->compute_noise_volume(noise_state, am_offset);
+			result = m_op[3]->compute_noise_volume(noise_state, am_offset);
 		else
 		{
-			opin = opout[BIT(algorithm_inputs, 4, 3)] >> 1;
-			opout[4] = m_op[3]->compute_volume(m_op[3]->phase() + opin, am_offset);
+			opmod = opout[BIT(algorithm_inputs, 4, 3)] >> 1;
+			result = m_op[3]->compute_volume(m_op[3]->phase() + opmod, am_offset);
 		}
-
-		// all algorithms consume OP4 output
-		result = opout[4] >> rshift;
+		result >>= rshift;
 
 		// algorithms 4-7 add in OP2 output
 		if (algorithm >= 4)
@@ -1300,17 +1462,17 @@ void ymfm_channel<RegisterType>::output_rhythm_ch6(u8 lfo_raw_am, s32 outputs[Re
 	// the first operator is ignored instead of added in
 
 	// operator 1 has optional self-feedback
-	s16 opin = 0;
+	s16 opmod = 0;
 	u8 feedback = m_regs.feedback();
 	if (feedback != 0)
-		opin = (m_feedback[0] + m_feedback[1]) >> (10 - feedback);
+		opmod = (m_feedback[0] + m_feedback[1]) >> (10 - feedback);
 
 	// compute the 14-bit volume/value of operator 1 and update the feedback
-	s16 opout1 = m_feedback_in = m_op[0]->compute_volume(m_op[0]->phase() + opin, am_offset);
+	s16 opout1 = m_feedback_in = m_op[0]->compute_volume(m_op[0]->phase() + opmod, am_offset);
 
 	// compute the 14-bit volume/value of operator 2, which is the result
-	opin = BIT(m_regs.algorithm(), 0) ? 0 : (opout1 >> 1);
-	s32 result = m_op[1]->compute_volume(m_op[1]->phase() + opin, am_offset) >> rshift;
+	opmod = BIT(m_regs.algorithm(), 0) ? 0 : (opout1 >> 1);
+	s32 result = m_op[1]->compute_volume(m_op[1]->phase() + opmod, am_offset) >> rshift;
 
 	// add to the output
 	add_to_output(outputs, result * 2);
