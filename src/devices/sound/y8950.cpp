@@ -5,7 +5,7 @@
 #include "y8950.h"
 
 
-DEFINE_DEVICE_TYPE(Y8950, y8950_device, "y8950", "Y8950 OPL2 MSX-Audio")
+DEFINE_DEVICE_TYPE(Y8950, y8950_device, "y8950", "Y8950 OPL MSX-Audio")
 
 
 //*********************************************************
