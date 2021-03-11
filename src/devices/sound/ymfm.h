@@ -244,6 +244,8 @@ public:
 	u8 external1() const          /*  1 bit  */ { return 0; } // OPL3+ only
 	u8 lfo_pm_sensitivity() const /*  3 bits */ { return 0; } // OPM,OPNA only
 	u8 lfo_am_sensitivity() const /*  2 bits */ { return 0; } // OPM,OPNA only
+	u8 instrument() const         /*  4 bits */ { return 0; } // OPLL only
+	u8 sustain() const            /*  1 bit  */ { return 0; } // OPLL only
 
 	// per-operator registers that aren't universally supported
 	u8 lfo_am_enabled() const     /*  1 bit  */ { return 0; } // OPM,OPNA,OPL only
@@ -371,6 +373,7 @@ public:
 	static constexpr u16 REG_MODE = 0x14;
 	static constexpr u8 DEFAULT_PRESCALE = 2;
 	static constexpr u8 EG_CLOCK_DIVIDER = 3;
+	static constexpr bool EG_HAS_DEPRESS = false;
 	static constexpr u32 CSM_TRIGGER_MASK = 0xff;
 
 	// status values
@@ -423,6 +426,7 @@ public:
 	void reset()
 	{
 		// enable output on both channels by default
+		std::fill_n(&m_regdata[0], REGISTERS, 0);
 		m_regdata[0x20] = m_regdata[0x21] = m_regdata[0x22] = m_regdata[0x23] = 0xc0;
 		m_regdata[0x24] = m_regdata[0x25] = m_regdata[0x26] = m_regdata[0x27] = 0xc0;
 	}
@@ -595,6 +599,7 @@ public:
 	static constexpr u16 REG_MODE = 0x27;
 	static constexpr u8 DEFAULT_PRESCALE = 6;
 	static constexpr u8 EG_CLOCK_DIVIDER = 3;
+	static constexpr bool EG_HAS_DEPRESS = false;
 	static constexpr u32 CSM_TRIGGER_MASK = 1 << 2;
 
 	// status values
@@ -647,6 +652,7 @@ public:
 	// reset state to default values
 	void reset()
 	{
+		std::fill_n(&m_regdata[0], REGISTERS, 0);
 	}
 
 	// write access
@@ -902,6 +908,7 @@ public:
 	void reset()
 	{
 		// enable output on both channels by default
+		std::fill_n(&m_regdata[0], REGISTERS, 0);
 		m_regdata[0xb4] = m_regdata[0xb5] = m_regdata[0xb6] = 0xc0;
 		m_regdata[0x1b4] = m_regdata[0x1b5] = m_regdata[0x1b6] = 0xc0;
 	}
@@ -1029,6 +1036,7 @@ public:
 	static constexpr u16 REG_MODE = 0x04;
 	static constexpr u8 DEFAULT_PRESCALE = 4;
 	static constexpr u8 EG_CLOCK_DIVIDER = 1;
+	static constexpr bool EG_HAS_DEPRESS = false;
 	static constexpr u32 CSM_TRIGGER_MASK = 0x1ff;
 
 	// status values
@@ -1081,6 +1089,7 @@ public:
 	// reset state to default values
 	void reset()
 	{
+		std::fill_n(&m_regdata[0], REGISTERS, 0);
 	}
 
 	// write access
@@ -1202,10 +1211,10 @@ public:
 };
 
 
-// ======================> ymopl_registers, ymopl2_registers
+// ======================> ymopll_registers
 
 //
-// OPL/OPL2 register map:
+// OPLL register map:
 //
 //      System-wide registers:
 //           0E --x----- Rhythm enable
@@ -1245,8 +1254,7 @@ public:
 //     Internal states:
 //        40-48 xxxxxxxx Current instrument base address
 //        4E-5F xxxxxxxx Current instrument base address + operator slot (0/1)
-//        60-68 xxxxxxxx Index of volume, or 0 to use instrument total level
-//        70-FF xxxxxxxx ROM data for instruments (1-16 plus 3 drums)
+//        70-FF xxxxxxxx Data for instruments (1-16 plus 3 drums)
 //
 // OPL channel and operator mapping:
 //
@@ -1255,14 +1263,23 @@ class ymopll_registers : public ymopl_registers
 {
 public:
 	// constants
+	static constexpr u8 OUTPUTS = 2;
 	static constexpr u16 REGISTERS = 0x100;
 	static constexpr u16 REG_MODE = 0xff;
+	static constexpr bool EG_HAS_DEPRESS = true;
 
 	// status values
 	static constexpr u8 STATUS_TIMERA = 0;
 	static constexpr u8 STATUS_TIMERB = 0;
 	static constexpr u8 STATUS_BUSY = 0;
 	static constexpr u8 STATUS_IRQ = 0;
+
+	// internals
+	static constexpr u16 EXTERNAL_REGISTERS = 0x40;
+	static constexpr u16 CHANNEL_INSTBASE = 0x40;
+	static constexpr u16 OPERATOR_INSTBASE = 0x4e;
+	static constexpr u16 INSTDATA_BASE = 0x70;
+	static constexpr u16 INSTDATA_SIZE = 0x90;
 
 	// constructor
 	ymopll_registers(u8 *regdata) :
@@ -1301,14 +1318,16 @@ public:
 		return std::make_pair(opnum / 2, opnum % 2);
 	}
 
+	// reset state to default values
+	void reset()
+	{
+		std::fill_n(&m_regdata[0], EXTERNAL_REGISTERS, 0);
+	}
+
 	// write access
 	void write(u16 index, u8 data)
 	{
-		assert(index < 0x40);
-
-		// writes to the user instrument get mirrored into the instrument area
-		if (index < 0x08)
-			m_regdata[0x60 | index] = data;
+		assert(index < EXTERNAL_REGISTERS);
 
 		// write the new data
 		u8 old = m_regdata[index];
@@ -1335,7 +1354,7 @@ public:
 			channel = regindex & 0x0f;
 			if (channel < CHANNELS)
 			{
-				opmask = BIT(data, 5) ? 3 : 0;
+				opmask = BIT(data, 4) ? 3 : 0;
 				return true;
 			}
 		}
@@ -1349,7 +1368,7 @@ public:
 	}
 
 	// compute the keycode from the given block_freq value
-	// block_freq is block(3b):fnum(10b):0; the 4-bit keycode uses the top
+	// block_freq is block(3b):fnum(9b):00; the 4-bit keycode uses the top
 	// 3 bits plus the MSB of fnum
 	u8 block_freq_to_keycode(u16 block_freq) const
 	{
@@ -1384,10 +1403,13 @@ public:
 	u8 waveform_enable() const    /*  1 bits */ { return 1; }
 
 	// per-channel registers
-	u16 block_freq() const        /* 12 bits */ { return chword(0x10, 0, 4, 0x20, 0, 8) * 4; } // 12->14 bits
+	u16 block_freq() const        /* 12 bits */ { return chword(0x20, 0, 4, 0x10, 0, 8) * 4; } // 12->14 bits
 	u8 sustain() const            /*  1 bit  */ { return chbyte(0x20, 5, 1); }
 	u8 feedback() const           /*  3 bits */ { return instchbyte(0x03, 0, 3); }
 	u8 algorithm() const          /*  1 bit  */ { return 6; }
+	u8 instrument() const         /*  4 bits */ { return chbyte(0x30, 4, 4); }
+	u8 pan_left() const           /*  1 bit  */ { return (!rhythm_enable() || chnum() < 6) ? 1 : 0; }
+	u8 pan_right() const          /*  1 bit  */ { return (rhythm_enable() && chnum() >= 6) ? 1 : 0; }
 
 	// per-operator registers
 	u8 lfo_am_enabled() const     /*  1 bit  */ { return instopbyte(0x00, 7, 1); }
@@ -1397,7 +1419,7 @@ public:
 	u8 multiple() const           /*  4 bits */ { return opl_multiple_map(instopbyte(0x00, 0, 4)); }
 	u8 key_scale_level() const    /*  2 bits */ { return instopbyte(0x02, 6, 2); }
 	u8 total_level() const        /*  6 bits */ { return total_level_or_volume(); }
-	u8 waveform() const           /*  1 bit */  { return instchbyte(0x03, 4 - BIT(opnum(), 0), 1); }
+	u8 waveform() const           /*  1 bit */  { return instchbyte(0x03, 3 + BIT(opnum(), 0), 1); }
 	u8 attack_rate() const        /*  4 bits */ { return instopbyte(0x04, 4, 4) * 2; } // 4->5 bits
 	u8 decay_rate() const         /*  4 bits */ { return instopbyte(0x04, 0, 4) * 2; } // 4->5 bits
 	u8 sustain_level() const      /*  4 bits */ { return instopbyte(0x06, 4, 4); }
@@ -1406,68 +1428,71 @@ public:
 	// special helper for generically getting the attack/decay/statain/release rates
 	u8 adsr_rate(u8 state) const
 	{
+		// The envelope diagram in the YM2413 datasheet gives values for these
+		// in ms from 0->48dB. The attack/decay tables give values in ms from
+		// 0->96dB, so to pick an equivalent decay rate, we want to find the
+		// closest match that is 2x the 0->48dB value:
+		//
+		//     DP =   10ms (0->48db) ->   20ms (0->96db); decay of 12 gives   19.20ms
+		//     RR =  310ms (0->48db) ->  620ms (0->96db); decay of  7 gives  613.76ms
+		//     RS = 1200ms (0->48db) -> 2400ms (0->96db); decay of  5 gives 2455.04ms
+		//
+		// The envelope diagram for percussive sounds (eg_sustain() == 0) also uses
+		// "RR" to mean both the constant RR above and the Release Rate specified in
+		// the instrument data. In this case, Relief Pitcher's credit sound bears out
+		// that the Release Rate is used during sustain, and that the constant RR
+		// (or RS) is used during the release phase.
+		constexpr u8 DP = 12;
+		constexpr u8 RR = 7;
+		constexpr u8 RS = 5;
+
 		// attack/decay are 4 bits, expanded to 5 to match OPM/OPN
 		if (state < 2)
-			return instopbyte(0x60, (state ^ 1) * 4, 4) * 2;
+			return instopbyte(0x04, (state ^ 1) * 4, 4) * 2;
 
-		// non-percussive case
-		else if (eg_sustain() != 0)
-		{
-			// no sustain
-			if (state == 2)
-				return 0;
+		// sustain: depends on percussive state (EGTYP) specified by the instrument
+		else if (state == 2)
+			return eg_sustain() ? 0 : instopbyte(0x06, 0, 4) * 2;
 
-			// release is either at 5 or the release rate
-			else
-				return sustain() ? 5*2 : instopbyte(0x06, 0, 4) * 2;
-		}
+		// release: depends on sustain flag and percussive state
+		else if (state == 3)
+			return sustain() ? RS * 2 : (eg_sustain() ? instopbyte(0x06, 0, 4) * 2 : RR * 2);
 
-		// percussive case
+		// depress: hard-coded
 		else
-		{
-			// release rate during sustain
-			if (state == 2)
-				return instopbyte(0x06, 0, 4) * 2;
-
-			// otherwise a hard-coded value during release
-			else
-				return sustain() ? 5*2 : 7*2;
-		}
+			return DP * 2;
 	}
 
-	// set the ROM data
-	void set_rom_data(u8 const data[0x90])
+	// set the instrument data
+	void set_instrument_data(u8 const *data)
 	{
-		memcpy(&m_regdata[0x70], data, 0x90);
+		memcpy(&m_regdata[INSTDATA_BASE], data, INSTDATA_SIZE);
 	}
 
 private:
 	// helper to compute the ROM address of an instrument number
 	static constexpr rom_address(int instrument)
 	{
-		return (instrument == 0) ? 0 : (0x70 + 8 * (instrument - 1));
+		return (instrument == 0) ? 0 : (INSTDATA_BASE + 8 * (instrument - 1));
 	}
 
 	// helper to update the instrument
 	void update_instrument(int chnum)
 	{
+		u8 baseaddr;
 		if (chnum >= 6 && rhythm_enable())
-		{
-			m_regdata[0x40 + chnum] = rom_address(16);
-			m_regdata[0x4e + chnum * 2 + 0] = m_regdata[0x40 + chnum];
-			m_regdata[0x4e + chnum * 2 + 1] = m_regdata[0x40 + chnum] + 1;
-		}
+			baseaddr = rom_address(16 + (chnum - 6));
 		else
-		{
-			m_regdata[0x40 + chnum] = rom_address(sysbyte(0x30 + chnum, 4, 4));
-			m_regdata[0x4e + chnum * 2 + 0] = m_regdata[0x40 + chnum];
-			m_regdata[0x4e + chnum * 2 + 1] = m_regdata[0x40 + chnum] + 1;
-		}
+			baseaddr = rom_address(sysbyte(0x30 + chnum, 4, 4));
+
+		m_regdata[CHANNEL_INSTBASE + chnum] = baseaddr;
+		m_regdata[OPERATOR_INSTBASE + chnum * 2 + 0] = baseaddr + 0;
+		m_regdata[OPERATOR_INSTBASE + chnum * 2 + 1] = baseaddr + 1;
 	}
 
 	// helpers to read from instrument channel/operator data
-	u8 instchbyte(u16 offset, u8 start, u8 count) const { return BIT(m_regdata[offset + m_chdata[0x40]], start, count); }
-	u8 instopbyte(u16 offset, u8 start, u8 count) const { return BIT(m_regdata[offset + m_opdata[0x4e]], start, count); }
+	u8 instchbyte(u16 offset, u8 start, u8 count) const { return BIT(m_regdata[offset + m_chdata[CHANNEL_INSTBASE]], start, count); }
+	u8 instopbyte(u16 offset, u8 start, u8 count) const { return BIT(m_regdata[offset + m_opdata[OPERATOR_INSTBASE]], start, count); }
 };
 
 
@@ -1496,7 +1521,8 @@ class ymfm_operator
 		ENV_ATTACK = 0,
 		ENV_DECAY = 1,
 		ENV_SUSTAIN = 2,
-		ENV_RELEASE = 3
+		ENV_RELEASE = 3,
+		ENV_DEPRESS = 4
 	};
 
 public:
@@ -1753,7 +1779,16 @@ class ymopll_engine : public ymfm_engine_base<ymopll_registers>
 {
 public:
 	// constructor
-	ymopll_engine(device_t &device, u8 const romdata[0x90]);
+	ymopll_engine(device_t &device) :
+		ymfm_engine_base(device)
+	{
+	}
+
+	// set the instrument data
+	void set_instrument_data(u8 const *data)
+	{
+		m_regs.set_instrument_data(data);
+	}
 };
 
 

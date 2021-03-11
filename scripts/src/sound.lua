@@ -1193,10 +1193,12 @@ if (SOUNDS["YM2151"]~=null) then
 	}
 end
 
-if (SOUNDS["YM2413"]~=null) then
+if (SOUNDS["YM2413"]~=null or SOUNDS["YM2423"]~=null or SOUNDS["YMF281"]~=null or SOUNDS["DS1001"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/ym2413.cpp",
 		MAME_DIR .. "src/devices/sound/ym2413.h",
+		MAME_DIR .. "src/devices/sound/ymfm.cpp",
+		MAME_DIR .. "src/devices/sound/ymfm.h",
 	}
 end
 

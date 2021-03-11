@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "ymfm.h"
 
-//#define VERBOSE 1
+#define VERBOSE 1
 #define LOG_OUTPUT_FUNC osd_printf_verbose
 #include "logmacro.h"
 
@@ -481,6 +481,7 @@ ALLOW_SAVE_TYPE(ymfm_operator<ymopn_registers>::envelope_state);
 ALLOW_SAVE_TYPE(ymfm_operator<ymopna_registers>::envelope_state);
 ALLOW_SAVE_TYPE(ymfm_operator<ymopl_registers>::envelope_state);
 ALLOW_SAVE_TYPE(ymfm_operator<ymopl2_registers>::envelope_state);
+ALLOW_SAVE_TYPE(ymfm_operator<ymopll_registers>::envelope_state);
 
 template<class RegisterType>
 void ymfm_operator<RegisterType>::save(device_t &device, u8 index)
@@ -683,7 +684,7 @@ void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 			LOG(" dt=%d", m_regs.detune());
 		LOG(" fb=%d alg=%d mul=%X tl=%02X ksr=%d", m_regs.feedback(), m_regs.algorithm(), m_regs.multiple(), m_regs.total_level(), m_regs.ksr());
 		if (RegisterType::FAMILY == RegisterType::FAMILY_OPL)
-			LOG(" ns=%d ksl=%d adr=%X/%X/%X sus=%d", m_regs.note_select(), m_regs.key_scale_level(), m_regs.attack_rate()/2, m_regs.decay_rate()/2, m_regs.release_rate(), m_regs.eg_sustain());
+			LOG(" ns=%d ksl=%d adr=%X/%X/%X sus=%d/%d", m_regs.note_select(), m_regs.key_scale_level(), m_regs.attack_rate()/2, m_regs.decay_rate()/2, m_regs.release_rate(), m_regs.eg_sustain(), m_regs.sustain());
 		else
 			LOG(" adsr=%02X/%02X/%02X/%X", m_regs.attack_rate(), m_regs.decay_rate(), m_regs.sustain_rate(), m_regs.release_rate());
 		LOG(" sl=%X", m_regs.sustain_level());
@@ -691,7 +692,7 @@ void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 			LOG(" pan=%c%c", m_regs.pan_left() ? 'L' : '-', m_regs.pan_right() ? 'R' : '-');
 		if (m_regs.ssg_eg_enabled())
 			LOG(" ssg=%X", m_regs.ssg_eg_mode());
-		if (m_regs.lfo_enabled() && ((m_regs.lfo_am_enabled() && m_regs.lfo_am_sensitivity() != 0) || m_regs.lfo_pm_sensitivity() != 0))
+		if (m_regs.lfo_enabled() && (m_regs.lfo_am_enabled() || m_regs.lfo_pm_sensitivity() != 0))
 		{
 			LOG(" am=%d pm=%d", m_regs.lfo_am_enabled() ? m_regs.lfo_am_sensitivity() : 0, m_regs.lfo_pm_sensitivity());
 			if (RegisterType::FAMILY == RegisterType::FAMILY_OPM)
@@ -703,6 +704,8 @@ void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 			LOG(" wf=%d", m_regs.waveform());
 		if (m_regs.rhythm_enable() && m_regs.chnum() >= 6)
 			LOG(" rhy=1");
+		if (m_regs.instrument() != 0)
+			LOG(" inst=%d", m_regs.instrument());
 		LOG("\n");
 	}
 }
@@ -744,7 +747,14 @@ void ymfm_operator<RegisterType>::clock_keystate(u8 keystate, u8 keycode)
 
 		// if the key has turned on, start the attack
 		if (keystate != 0)
-			start_attack(keycode);
+		{
+			// OPLL has a DP ("depress"?) state to bring the volume
+			// down before starting the attack
+			if (RegisterType::EG_HAS_DEPRESS && m_env_attenuation < 0x200)
+				m_env_state = ENV_DEPRESS;
+			else
+				start_attack(keycode);
+		}
 
 		// otherwise, start the release
 		else
@@ -877,6 +887,10 @@ void ymfm_operator<RegisterType>::clock_envelope(u16 env_counter, u8 keycode)
 		// clamp the final attenuation
 		if (m_env_attenuation >= 0x400)
 			m_env_attenuation = 0x3ff;
+
+		// transition from depress to attack
+		if (RegisterType::EG_HAS_DEPRESS && m_env_state == ENV_DEPRESS && m_env_attenuation >= 0x200)
+			start_attack(keycode);
 	}
 }
 
@@ -1506,15 +1520,12 @@ void ymfm_engine_base<RegisterType>::reset()
 	// reset all status bits
 	set_reset_status(0, 0xff);
 
-	// clear all registers
-	std::fill_n(&m_regdata[0], std::size(m_regdata), 0);
+	// register type-specific initialization
+	m_regs.reset();
 
 	// explicitly write to the mode register since it has side-effects
 	// QUESTION: old cores initialize this to 0x30 -- who is right?
 	write(RegisterType::REG_MODE, 0);
-
-	// register type-specific initialization
-	m_regs.reset();
 
 	// reset the channels
 	for (auto &chan : m_channel)
@@ -1963,22 +1974,6 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::synced_mode_w)
 
 
 //*********************************************************
-//  YMOPLL ENGINE
-//*********************************************************
-
-//-------------------------------------------------
-//  ymopll_engine - constructor
-//-------------------------------------------------
-
-ymopll_engine::ymopll_engine(device_t &device, u8 const romdata[0x90]) :
-	ymfm_engine_base<ymopll_registers>(device)
-{
-	m_regs.set_rom_data(romdata);
-}
-
-
-
-//*********************************************************
 //  EXPLICIT TEMPLATE INSTANTIATION
 //*********************************************************
 
@@ -1987,3 +1982,4 @@ template class ymfm_engine_base<ymopn_registers>;
 template class ymfm_engine_base<ymopna_registers>;
 template class ymfm_engine_base<ymopl_registers>;
 template class ymfm_engine_base<ymopl2_registers>;
+template class ymfm_engine_base<ymopll_registers>;

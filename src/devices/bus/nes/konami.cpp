@@ -763,5 +763,5 @@ void nes_konami_vrc7_device::device_add_mconfig(machine_config &config)
 
 	// TODO: this is not how VRC7 clock signaling works!
 	// The board uses the CLK pin in reality, not hardcoded NTSC values!
-	VRC7(config, m_vrc7snd, XTAL(21'477'272)/6).add_route(0, "addon", 1.0).add_route(1, "addon", 0.0);
+	DS1001(config, m_vrc7snd, XTAL(21'477'272)/6).add_route(0, "addon", 1.0).add_route(1, "addon", 0.0);
 }
