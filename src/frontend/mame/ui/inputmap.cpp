@@ -38,7 +38,7 @@ void menu_input_groups::populate(float &customtop, float &custombottom)
 	item_append(_("User Interface"), 0, (void *)uintptr_t(IPG_UI + 1));
 	for (int player = 0; player < MAX_PLAYERS; player++)
 	{
-		auto s = string_format("Player %d Controls", player + 1);
+		auto s = string_format(_("Player %1$d Controls"), player + 1);
 		item_append(s, 0, (void *)uintptr_t(IPG_PLAYER1 + player + 1));
 	}
 	item_append(_("Other Controls"), 0, (void *)uintptr_t(IPG_OTHER + 1));

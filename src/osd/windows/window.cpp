@@ -921,9 +921,10 @@ void winwindow_ui_pause(running_machine &machine, int pause)
 
 	assert(GetCurrentThreadId() == main_threadid);
 
-	// if we're pausing, increment the pause counter
 	if (pause)
 	{
+		// if we're pausing, increment the pause counter
+
 		// if we're the first to pause, we have to actually initiate it
 		if (ui_temp_pause++ == 0)
 		{
@@ -935,10 +936,10 @@ void winwindow_ui_pause(running_machine &machine, int pause)
 			SetEvent(ui_pause_event);
 		}
 	}
-
-	// if we're resuming, decrement the pause counter
 	else
 	{
+		// if we're resuming, decrement the pause counter
+
 		// if we're the last to resume, unpause MAME
 		if (--ui_temp_pause == 0)
 		{
@@ -1273,18 +1274,26 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		return DefWindowProc(wnd, message, wparam, lparam);
 
 	case WM_ACTIVATE:
-		if (window->has_renderer() && window->fullscreen())
+		if (window->has_renderer())
 		{
+			if (window->fullscreen())
+			{
+				if ((wparam == WA_ACTIVE) || (wparam == WA_CLICKACTIVE))
+				{
+					for (const auto &w : osd_common_t::s_window_list)
+						ShowWindow(std::static_pointer_cast<win_window_info>(w)->platform_window(), SW_RESTORE);
+				}
+				else if ((wparam == WA_INACTIVE) && !is_mame_window(HWND(lparam)))
+				{
+					for (const auto &w : osd_common_t::s_window_list)
+						ShowWindow(std::static_pointer_cast<win_window_info>(w)->platform_window(), SW_MINIMIZE);
+				}
+			}
+
 			if ((wparam == WA_ACTIVE) || (wparam == WA_CLICKACTIVE))
-			{
-				for (const auto &w : osd_common_t::s_window_list)
-					ShowWindow(std::static_pointer_cast<win_window_info>(w)->platform_window(), SW_RESTORE);
-			}
-			else if ((wparam == WA_INACTIVE) && !is_mame_window(HWND(lparam)))
-			{
-				for (const auto &w : osd_common_t::s_window_list)
-					ShowWindow(std::static_pointer_cast<win_window_info>(w)->platform_window(), SW_MINIMIZE);
-			}
+				window->machine().ui_input().push_window_focus_event(window->target());
+			else if (wparam == WA_INACTIVE)
+				window->machine().ui_input().push_window_defocus_event(window->target());
 		}
 		return DefWindowProc(wnd, message, wparam, lparam);
 

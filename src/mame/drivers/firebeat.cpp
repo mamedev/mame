@@ -222,9 +222,8 @@ void firebeat_extend_spectrum_analyzer_device::device_reset()
 {
 	for (int ch = 0; ch < TOTAL_CHANNELS; ch++)
 	{
-		for (int i = 0; i < TOTAL_BUFFERS; i++) {
+		for (int i = 0; i < TOTAL_BUFFERS; i++)
 			std::fill(std::begin(m_audio_buf[i][ch]), std::end(m_audio_buf[i][ch]), 0);
-		}
 
 		std::fill(std::begin(m_fft_buf[ch]), std::end(m_fft_buf[ch]), 0);
 		std::fill(std::begin(m_bars[ch]), std::end(m_bars[ch]), 0);
@@ -260,38 +259,35 @@ void firebeat_extend_spectrum_analyzer_device::sound_stream_update(sound_stream 
 
 	auto srate = stream.sample_rate();
 	auto order = WDL_fft_permute_tab(FFT_LENGTH / 2);
-	for (int ch = 0; ch < TOTAL_CHANNELS; ch++) {
+	for (int ch = 0; ch < TOTAL_CHANNELS; ch++)
+	{
 		double notch_max[TOTAL_BARS] = { -1, -1, -1, -1, -1, -1 };
 		int cur_notch = 0;
 
 		for (int i = 0; i <= FFT_LENGTH / 2; i++) {
 			const double freq = (double)i / FFT_LENGTH * srate;
 
-			if (freq < NOTCHES[cur_notch]) {
+			if (freq < NOTCHES[cur_notch])
 				continue;
-			}
 
-			if (freq > NOTCHES[cur_notch+1]) {
+			if (freq > NOTCHES[cur_notch+1])
 				cur_notch++;
-			}
 
-			if (cur_notch >= LAST_NOTCH) {
-				// Don't need to calculate anything above this frequency
+			if (cur_notch >= LAST_NOTCH) // Don't need to calculate anything above this frequency
 				break;
-			}
 
-			WDL_FFT_COMPLEX* bin = (WDL_FFT_COMPLEX*)m_fft_buf[ch] + order[i];
+			WDL_FFT_COMPLEX *bin = (WDL_FFT_COMPLEX*)m_fft_buf[ch] + order[i];
 
 			const double re = bin->re;
 			const double im = bin->im;
 			const double mag = sqrt(re*re + im*im);
 
-			if (notch_max[cur_notch] == -1 && freq >= NOTCHES[cur_notch] && freq < NOTCHES[cur_notch+1]) {
+			if (notch_max[cur_notch] == -1 && freq >= NOTCHES[cur_notch] && freq < NOTCHES[cur_notch+1])
 				notch_max[cur_notch] = mag;
-			}
 		}
 
-		for (int i = 0; i < TOTAL_BARS; i++) {
+		for (int i = 0; i < TOTAL_BARS; i++)
+		{
 			double val = log10(notch_max[i] * 4096) * 20;
 			val = std::max<double>(0, val);
 			m_bars[ch][i] = uint32_t(std::min<double>(val, 255.0f));
@@ -312,12 +308,12 @@ void firebeat_extend_spectrum_analyzer_device::apply_fft(uint32_t buf_index)
 		*buf_r++ = *audio_r++;
 	}
 
-	for (int ch = 0; ch < TOTAL_CHANNELS; ch++) {
-		WDL_real_fft((WDL_FFT_REAL*)m_fft_buf[ch], FFT_LENGTH, 0);
+	for (int ch = 0; ch < TOTAL_CHANNELS; ch++)
+	{
+		WDL_real_fft((WDL_FFT_REAL *)m_fft_buf[ch], FFT_LENGTH, 0);
 
-		for (int i = 0; i < FFT_LENGTH; i++) {
+		for (int i = 0; i < FFT_LENGTH; i++)
 			m_fft_buf[ch][i] /= (WDL_FFT_REAL)FFT_LENGTH;
-		}
 	}
 }
 
@@ -352,11 +348,7 @@ uint8_t firebeat_extend_spectrum_analyzer_device::read(offs_t offset)
 
 	auto val = (ch < TOTAL_CHANNELS && notch >= 0 && notch < TOTAL_BARS) ? m_bars[ch][notch] : 0;
 
-	if (is_upper) {
-		return (val >> 8) & 0xff;
-	}
-
-	return val & 0xff;
+	return (is_upper ? (val >> 8) : val) & 0xff;
 }
 
 DEFINE_DEVICE_TYPE(KONAMI_FIREBEAT_EXTEND_SPECTRUM_ANALYZER, firebeat_extend_spectrum_analyzer_device, "firebeat_spectrum_analyzer", "Firebeat Spectrum Analyzer")
@@ -1004,7 +996,8 @@ void firebeat_state::extend_board_irq_w(offs_t offset, uint8_t data)
 	m_extend_board_irq_active &= ~(data & 0xff);
 	m_extend_board_irq_enable = data & 0xff;
 
-	if (BIT(m_extend_board_irq_enable, 2) != is_fdd_irq_enabled) {
+	if (BIT(m_extend_board_irq_enable, 2) != is_fdd_irq_enabled)
+	{
 		// Clearing the FDD IRQ here helps fix some issues with the FDD getting stuck
 		m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 	}
@@ -1277,10 +1270,10 @@ void firebeat_spu_state::rf5c400_map(address_map& map)
                 In another part of the program (0x363c for a21jca03.bin) is the following code for determining when to start and stop the DMA:
 
                 start_dma();
-                while (get_dma_timer() < dma_max_timer) {
-                    if (irq6_called_flag) {
+                while (get_dma_timer() < dma_max_timer)
+                {
+                    if (irq6_called_flag)
                         break;
-                    }
                 }
                 end_dma();
 
