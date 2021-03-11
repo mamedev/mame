@@ -1150,6 +1150,7 @@ FORMATS["X07_CAS"] = true
 FORMATS["X1_TAP"] = true
 FORMATS["XDF_DSK"] = true
 FORMATS["ZX81_P"] = true
+FORMATS["FS_PRODOS"] = true
 
 --------------------------------------------------
 -- this is the list of driver libraries that
@@ -1686,6 +1687,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/akaiax80.cpp",
 	MAME_DIR .. "src/mame/drivers/akaivx600.cpp",
 	MAME_DIR .. "src/mame/drivers/mpc3000.cpp",
+	MAME_DIR .. "src/mame/drivers/mpc60.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "alesis")

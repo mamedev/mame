@@ -4,6 +4,10 @@
     These seem to be GPL16250 related based on video register use
     however the SPI ROM maps directly into CPU space, where you'd
     expect internal ROM to be?!
+
+    It has been confirmed that Pacman/Fix It Felix/Ms Pacman can
+    be swapped onto the same PCB, so either there is no internal
+    area (runs direct from SPI?) or it's the same between games.
 */
 
 #include "emu.h"
@@ -93,6 +97,24 @@ ROM_START( wiwcs )
 	ROM_LOAD( "witw_eeprom.bin", 0x0000, 0x400, CRC(9426350b) SHA1(c481ded8b1f61fbf2403532dabb9c0a5c2a33fa2) )
 ROM_END
 
+ROM_START( bfpacman )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "basicfunpacman_25q80_c84014.bin", 0x0000, 0x100000, CRC(dd39fc64) SHA1(48c0e1eb729f61b7359e1fd52b7faab56817dfe8) )
+ROM_END
+
+ROM_START( bfmpac )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "mspacman_25q80_c84014.bin", 0x0000, 0x100000, CRC(c0c3f8ce) SHA1(30da9b14f1a2c966167c97da9b8329f2f7f73291) )
+ROM_END
+
+
+
 void generalplus_gpspi_direct_game_state::init_fif()
 {
 	uint16_t* spirom16 = (uint16_t*)memregion("maincpu:spidirect")->base();
@@ -103,5 +125,7 @@ void generalplus_gpspi_direct_game_state::init_fif()
 	}
 }
 
-CONS(2017, fixitflx, 0, 0, generalplus_gpspi_direct, gcm394, generalplus_gpspi_direct_game_state , init_fif, "Basic Fun", "Fix It Felix Jr. (Mini Arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2018, wiwcs,    0, 0, generalplus_gpspi_direct, gcm394, generalplus_gpspi_direct_game_state , init_fif, "Basic Fun", "Where in the World is Carmen Sandiego? (Handheld)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2017, fixitflx, 0, 0, generalplus_gpspi_direct, gcm394, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Fix It Felix Jr. (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2018, wiwcs,    0, 0, generalplus_gpspi_direct, gcm394, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Where in the World is Carmen Sandiego? (handheld)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2018, bfpacman, 0, 0, generalplus_gpspi_direct, gcm394, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Pac-Man (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2017, bfmpac,   0, 0, generalplus_gpspi_direct, gcm394, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Ms. Pac-Man (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

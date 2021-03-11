@@ -35,8 +35,11 @@ DEFINE_DEVICE_TYPE(MM58174, mm58174_device, "mm58174", "National Semiconductor M
 
 
 mm58174_device::mm58174_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MM58174, tag, owner, clock),
-		device_rtc_interface(mconfig, *this)
+	: device_t(mconfig, MM58174, tag, owner, clock)
+	, device_rtc_interface(mconfig, *this)
+	, m_control(0)
+	, m_int_ctl(0)
+	, m_tenths(0)
 {
 }
 
@@ -69,16 +72,6 @@ void mm58174_device::device_start()
 }
 
 //-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void mm58174_device::device_reset()
-{
-	m_tenths = 0;
-	m_control = 0;
-}
-
-//-------------------------------------------------
 //  rtc_clock_updated -
 //-------------------------------------------------
 
@@ -103,7 +96,7 @@ attotime mm58174_device::interrupt_period_table(int val)
 {
 	switch(val)
 	{
-		case 0: return attotime::from_msec(0);
+		case 0: return attotime::never;
 		case 1: return attotime::from_msec(500);
 		case 2: return attotime::from_seconds(5);
 		case 4: return attotime::from_seconds(60);

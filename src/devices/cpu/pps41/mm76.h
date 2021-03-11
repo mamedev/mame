@@ -69,12 +69,68 @@ protected:
 	void pop_pc();
 	void push_pc();
 	void op_illegal();
+	void op_todo();
 
-	virtual bool op_is_prefix(u8 op) override { return (op & 0xf0) == 0x30; };
+	virtual bool op_is_tr(u8 op) override { return (op & 0xf0) == 0x30; };
+	virtual bool op_is_eob(u8 op) { return (op & 0xfc) == 0x1c; };
+	virtual bool op_is_lb(u8 op) { return (op & 0xf0) == 0x20; };
+	virtual bool op_is_lai(u8 op) { return (op & 0xf0) == 0x70; };
 
 	// opcode handlers
-	void op_nop();
+	virtual void op_xab();
+	virtual void op_lba();
+	virtual void op_lb();
+	virtual void op_eob();
+
+	virtual void op_sb();
+	virtual void op_rb();
+	virtual void op_skbf();
+
+	virtual void op_xas();
+	virtual void op_lsa();
+
+	virtual void op_l();
+	virtual void op_x();
+	virtual void op_xdsk();
+	virtual void op_xnsk();
+
+	virtual void op_a();
+	virtual void op_ac();
+	virtual void op_acsk();
+	virtual void op_ask();
+	virtual void op_com();
+	virtual void op_rc();
+	virtual void op_sc();
+	virtual void op_sknc();
+	virtual void op_lai();
+	virtual void op_aisk();
+
+	virtual void op_rt();
+	virtual void op_rtsk();
+	virtual void op_t();
+	virtual void op_tl();
+	virtual void op_tm();
+	virtual void op_tml();
+	virtual void op_tr();
+	virtual void op_nop();
+
+	virtual void op_skmea();
+	virtual void op_skbei();
+	virtual void op_skaei();
+
+	virtual void op_ibm();
+	virtual void op_ob();
+	virtual void op_iam();
+	virtual void op_oa();
 	virtual void op_ios();
+	virtual void op_i1();
+	virtual void op_i2c();
+	virtual void op_int1h();
+	virtual void op_din1();
+	virtual void op_int0l();
+	virtual void op_din0();
+	virtual void op_seg1();
+	virtual void op_seg2();
 };
 
 class mm76l_device : public mm76_device

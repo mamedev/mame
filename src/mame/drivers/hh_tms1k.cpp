@@ -79,7 +79,7 @@
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
  @MP3320A  TMS1000   1979, Coleco Head to Head: Electronic Basketball
  @MP3321A  TMS1000   1979, Coleco Head to Head: Electronic Hockey
- *MP3352   TMS1200   1979, Tiger Sub Wars (model 7-490)
+ @MP3352   TMS1200   1979, Tiger Sub Wars (model 7-490)
  @M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
  *M32018   TMS1000   1990, unknown device (have decap/dump)
   M32045B  TMS1000   1983, Chrysler Electronic Voice Alert (11-function) -> eva.cpp
@@ -240,6 +240,7 @@
 #include "ssports4.lh"
 #include "starwbc.lh" // clickable
 #include "stopthief.lh" // clickable
+#include "subwars.lh"
 #include "tandy12.lh" // clickable
 #include "tbreakup.lh"
 #include "tc4.lh"
@@ -11506,6 +11507,103 @@ ROM_END
 
 /***************************************************************************
 
+  Tiger Sub Wars (model 7-490)
+  * PCB label CSG201A(main), CSG201B(leds)
+  * TMS1200N2LL MP3352 (die label 1000C, MP3352)
+  * 4-digit 7seg LED display + 55 other LEDs, 1-bit sound
+
+  Tiger/Yeno also published an LCD handheld called Sub Wars, it's not related.
+
+  This handheld was modified and used as a prop in the 1981 movie Escape from
+  New York, Snake Plissken uses it as a homing device.
+
+***************************************************************************/
+
+class subwars_state : public hh_tms1k_state
+{
+public:
+	subwars_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void update_display();
+	void write_r(u16 data);
+	void write_o(u16 data);
+	void subwars(machine_config &config);
+};
+
+// handlers
+
+void subwars_state::update_display()
+{
+	m_display->matrix(m_r, m_o);
+}
+
+void subwars_state::write_r(u16 data)
+{
+	// R0-R3: digit select
+	// R4-R12: led select
+	m_r = data;
+	update_display();
+}
+
+void subwars_state::write_o(u16 data)
+{
+	// O0-O6: led data
+	m_o = data;
+	update_display();
+
+	// O7: speaker out
+	m_speaker->level_w(BIT(data, 7));
+}
+
+// config
+
+static INPUT_PORTS_START( subwars )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+void subwars_state::subwars(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS1200(config, m_maincpu, 550000); // approximation - RC osc. R=24K, C=47pF
+	m_maincpu->k().set_ioport("IN.0");
+	m_maincpu->r().set(FUNC(subwars_state::write_r));
+	m_maincpu->o().set(FUNC(subwars_state::write_o));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(13, 7);
+	m_display->set_segmask(0xf, 0x7f);
+	config.set_default_layout(layout_subwars);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( subwars )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3352", 0x0000, 0x0400, CRC(5dece1e4) SHA1(65ef77b063c94ff4b6c83dace54ea2f75bd3d6a9) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common1_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_subwars_output.pla", 0, 365, CRC(372b9bbc) SHA1(06a875e114b7757c6f4f1727416d1739ebe60931) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Tiger Electronics Copy Cat (model 7-520)
   * PCB label CC REV B
   * TMS1000 MCU, label 69-11513 MP0919 (die label MP0919)
@@ -11799,7 +11897,7 @@ ROM_END
 
 /***************************************************************************
 
-  Tiger 7 in 1 Sports Stadium
+  Tiger 7 in 1 Sports Stadium (model 7-555)
   * TMS1400 MP7304 (die label TMS1400 MP7304A)
   * 2x2-digit 7seg LED display + 39 other LEDs, 1-bit sound
 
@@ -12697,6 +12795,7 @@ COMP( 1980, mathmarv,   0,         0, mathmarv,  mathmarv,  mathmarv_state,  emp
 CONS( 1979, timaze,     0,         0, timaze,    timaze,    timaze_state,    empty_init, "Texas Instruments", "unknown electronic maze game (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 CONS( 1979, tithermos,  0,         0, tithermos, tithermos, tithermos_state, empty_init, "Texas Instruments", "Electronic Digital Thermostat", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 
+CONS( 1979, subwars,    0,         0, subwars,   subwars,   subwars_state,   empty_init, "Tiger Electronics", "Sub Wars (LED version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, copycat,    0,         0, copycat,   copycat,   copycat_state,   empty_init, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1989, copycatm2,  copycat,   0, copycatm2, copycatm2, copycatm2_state, empty_init, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1981, ditto,      0,         0, ditto,     ditto,     ditto_state,     empty_init, "Tiger Electronics", "Ditto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

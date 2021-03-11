@@ -12,10 +12,10 @@
 #include "pps41d.h"
 
 
-DEFINE_DEVICE_TYPE(MM76, mm76_device, "mm76", "Rockwell MM76")
-DEFINE_DEVICE_TYPE(MM76L, mm76l_device, "mm76l", "Rockwell MM76L")
-DEFINE_DEVICE_TYPE(MM76E, mm76e_device, "mm76e", "Rockwell MM76E")
-DEFINE_DEVICE_TYPE(MM76EL, mm76el_device, "mm76el", "Rockwell MM76EL")
+DEFINE_DEVICE_TYPE(MM76, mm76_device, "mm76", "Rockwell MM76") // 640 bytes ROM, 48 nibbles RAM
+DEFINE_DEVICE_TYPE(MM76L, mm76l_device, "mm76l", "Rockwell MM76L") // low-power
+DEFINE_DEVICE_TYPE(MM76E, mm76e_device, "mm76e", "Rockwell MM76E") // ROM extended to 1KB
+DEFINE_DEVICE_TYPE(MM76EL, mm76el_device, "mm76el", "Rockwell MM76EL") // low-power
 
 
 // constructor
@@ -60,6 +60,7 @@ void mm76e_device::program_1k(address_map &map)
 void mm76_device::data_48x4(address_map &map)
 {
 	map(0x00, 0x2f).ram();
+	map(0x30, 0x3f).lr8(NAME([]() { return 0xf; })).nopw();
 }
 
 
@@ -82,7 +83,6 @@ void mm76_device::device_start()
 {
 	pps41_base_device::device_start();
 	m_stack_levels = 1;
-	m_d_pins = 10;
 }
 
 void mm76_device::device_reset()
@@ -97,5 +97,86 @@ void mm76_device::device_reset()
 
 void mm76_device::execute_one()
 {
-	op_nop();
+	if (op_is_tr(m_prev_op))
+	{
+		// 2-byte opcodes
+		switch (m_op & 0xf0)
+		{
+			case 0x20: op_skbei(); break;
+			case 0x60: op_skaei(); break;
+
+			case 0x80: case 0x90: case 0xa0: case 0xb0: op_tml(); break;
+			case 0xc0: case 0xd0: case 0xe0: case 0xf0: op_tl(); break;
+
+			default: op_illegal(); break;
+		}
+	}
+	else
+	{
+		// standard opcodes
+		switch (m_op & 0xf0)
+		{
+			case 0x20: op_lb(); break;
+			case 0x30: op_tr(); break;
+			case 0x60: op_aisk(); break;
+			case 0x70: op_lai(); break;
+
+			case 0x80: case 0x90: case 0xa0: case 0xb0: op_tm(); break;
+			case 0xc0: case 0xd0: case 0xe0: case 0xf0: op_t(); break;
+
+			default:
+				switch (m_op & 0xfc)
+				{
+			case 0x08: op_skbf(); break;
+			case 0x10: op_sb(); break;
+			case 0x14: op_rb(); break;
+			case 0x1c: op_eob(); break;
+			case 0x50: op_l(); break;
+			case 0x54: op_xnsk(); break;
+			case 0x58: op_x(); break;
+			case 0x5c: op_xdsk(); break;
+
+			default:
+				switch (m_op)
+				{
+			case 0x00: op_nop(); break;
+			case 0x01: op_sknc(); break;
+			case 0x02: op_rt(); break;
+			case 0x03: op_rtsk(); break;
+			case 0x04: op_int0l(); break;
+			case 0x05: op_int1h(); break;
+			case 0x06: op_din1(); break;
+			case 0x07: op_din0(); break;
+			case 0x0c: op_sc(); break;
+			case 0x0d: op_rc(); break;
+			case 0x0e: op_seg1(); break;
+			case 0x0f: op_seg2(); break;
+
+			case 0x18: op_oa(); break;
+			case 0x19: op_ob(); break;
+			case 0x1a: op_iam(); break;
+			case 0x1b: op_ibm(); break;
+
+			case 0x40: op_ac(); break;
+			case 0x41: op_acsk(); break;
+			case 0x42: op_a(); break;
+			case 0x43: op_ask(); break;
+			case 0x44: op_lba(); break;
+			case 0x45: op_com(); break;
+			case 0x46: op_xab(); break;
+			case 0x47: op_skmea(); break;
+			case 0x4a: op_i1(); break;
+			case 0x4b: op_i2c(); break;
+			case 0x4c: op_lsa(); break;
+			case 0x4d: op_ios(); break;
+			case 0x4e: op_xas(); break;
+
+			default: op_illegal(); break;
+				}
+				break; // 0xff
+
+				}
+				break; // 0xfc
+		}
+	}
 }

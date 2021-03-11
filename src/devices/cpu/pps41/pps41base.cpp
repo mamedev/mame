@@ -32,7 +32,15 @@ References:
 TODO:
 - add extended opcodes to disasm? it's easy to add there, but the emulation goes
   through prefixes 1 cycle at the time which means the live disasm gets messy
-- WIP
+- documentation discourages long jumps to the subroutine pages, but does not
+  explain what would happen. Scrabble Sensor does it, so it's probably ok.
+- documentation discourages use of some extended opcodes when in subroutine pages,
+  but again does not explain why
+- documentation is conflicting whether or not MM76/MM75 can (re)set interrupt flip-
+  flops with SOS/ROS opcodes
+- allowed opcodes after TAB should be limited
+- add MCU mask options, there's one for inverting interrupts
+- add MM78LA
 
 */
 
@@ -48,18 +56,20 @@ pps41_base_device::pps41_base_device(const machine_config &mconfig, device_type 
 	m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data),
 	m_prgwidth(prgwidth),
 	m_datawidth(datawidth),
-	m_opla(*this, "opla")
+	m_opla(*this, "opla"),
+	m_read_p(*this),
+	m_read_d(*this),
+	m_write_d(*this),
+	m_read_r(*this),
+	m_write_r(*this),
+	m_write_sdo(*this),
+	m_write_ssc(*this)
 { }
 
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-
-enum
-{
-	PPS41_PC=1, PPS41_A, PPS41_C, PPS41_B
-};
 
 void pps41_base_device::device_start()
 {
@@ -69,7 +79,17 @@ void pps41_base_device::device_start()
 	m_datamask = (1 << m_datawidth) - 1;
 
 	// resolve callbacks
-	//..
+	m_read_p.resolve_safe(0xff);
+	m_read_d.resolve_safe(0);
+	m_write_d.resolve_safe();
+	m_read_r.resolve_safe(0xff);
+	m_write_r.resolve_safe();
+	m_write_sdo.resolve_safe();
+	m_write_ssc.resolve_safe();
+
+	// init RAM with 0xf
+	for (int i = 0; i <= m_datamask; i++)
+		m_data->write_byte(i, 0xf);
 
 	// zerofill
 	m_pc = 0;
@@ -77,6 +97,7 @@ void pps41_base_device::device_start()
 	m_op = 0;
 	m_prev_op = 0;
 	m_prev2_op = 0;
+	m_prev3_op = 0;
 	memset(m_stack, 0, sizeof(m_stack));
 
 	m_a = 0;
@@ -90,8 +111,22 @@ void pps41_base_device::device_start()
 	m_prev_c = 0;
 	m_c_in = 0;
 	m_c_delay = false;
+	m_x = 0;
 	m_skip = false;
 	m_skip_count = 0;
+
+	m_s = 0;
+	m_sdi = 0;
+	m_sclock_in = 0;
+	m_sclock_count = 0;
+	m_ss_pending = false;
+
+	m_d_pins = 10;
+	m_d_mask = (1 << m_d_pins) - 1;
+	m_d_output = 0;
+	m_r_output = 0;
+	m_int_line[0] = m_int_line[1] = 0;
+	m_int_ff[0] = m_int_ff[1] = 0;
 
 	// register for savestates
 	save_item(NAME(m_pc));
@@ -99,6 +134,7 @@ void pps41_base_device::device_start()
 	save_item(NAME(m_op));
 	save_item(NAME(m_prev_op));
 	save_item(NAME(m_prev2_op));
+	save_item(NAME(m_prev3_op));
 	save_item(NAME(m_stack));
 
 	save_item(NAME(m_a));
@@ -112,17 +148,31 @@ void pps41_base_device::device_start()
 	save_item(NAME(m_prev_c));
 	save_item(NAME(m_c_in));
 	save_item(NAME(m_c_delay));
+	save_item(NAME(m_x));
 	save_item(NAME(m_skip));
 	save_item(NAME(m_skip_count));
+
+	save_item(NAME(m_s));
+	save_item(NAME(m_sdi));
+	save_item(NAME(m_sclock_in));
+	save_item(NAME(m_sclock_count));
+	save_item(NAME(m_ss_pending));
+
+	save_item(NAME(m_d_output));
+	save_item(NAME(m_r_output));
+	save_item(NAME(m_int_line));
+	save_item(NAME(m_int_ff));
 
 	// register state for debugger
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%03X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_prev_pc).formatstr("%03X").noshow();
-	state_add(PPS41_PC, "PC", m_pc).formatstr("%03X");
 
-	state_add(PPS41_A, "A", m_a).formatstr("%01X");
-	state_add(PPS41_C, "C", m_c_in).formatstr("%01X");
-	state_add(PPS41_B, "B", m_b).formatstr("%02X");
+	m_state_count = 0;
+	state_add(++m_state_count, "PC", m_pc).formatstr("%03X");
+	state_add(++m_state_count, "A", m_a).formatstr("%01X");
+	state_add(++m_state_count, "C", m_c_in).formatstr("%01X");
+	state_add(++m_state_count, "B", m_b).formatstr("%02X");
+	state_add(++m_state_count, "S", m_s).formatstr("%01X");
 
 	set_icountptr(m_icount);
 }
@@ -142,13 +192,60 @@ device_memory_interface::space_config_vector pps41_base_device::memory_space_con
 
 void pps41_base_device::device_reset()
 {
-	m_op = m_prev_op = 0;
+	m_op = m_prev_op = m_prev2_op = 0;
 	m_pc = m_prgmask >> 1 & ~0x3f;
 	m_skip = false;
 	m_skip_count = 0;
 
 	// clear outputs
-	//..
+	m_write_r(m_r_output = 0xff);
+	m_write_d(m_d_output = 0);
+
+	m_s = 0;
+	m_sclock_count = 0;
+	m_write_sdo(0);
+	m_write_ssc(0);
+}
+
+
+//-------------------------------------------------
+//  inputline handling
+//-------------------------------------------------
+
+void pps41_base_device::execute_set_input(int line, int state)
+{
+	state = (state) ? 1 : 0;
+
+	switch (line)
+	{
+		case PPS41_INPUT_LINE_INT0:
+			// reset flip-flop on rising edge
+			if (state && !m_int_line[0])
+				m_int_ff[0] = 0;
+			m_int_line[0] = state;
+			break;
+
+		case PPS41_INPUT_LINE_INT1:
+			// reset flip-flop on falling edge
+			if (!state && m_int_line[1])
+				m_int_ff[1] = 0;
+			m_int_line[1] = state;
+			break;
+
+		case PPS41_INPUT_LINE_SDI:
+			m_sdi = state;
+			break;
+
+		case PPS41_INPUT_LINE_SSC:
+			// serial shift pending on falling edge
+			if (!state && m_sclock_in)
+				m_ss_pending = true;
+			m_sclock_in = state;
+			break;
+
+		default:
+			break;
+	}
 }
 
 
@@ -159,6 +256,21 @@ void pps41_base_device::device_reset()
 void pps41_base_device::cycle()
 {
 	m_icount--;
+
+	// clock serial i/o
+	m_ss_pending = m_ss_pending || bool(m_sclock_count & 1);
+
+	if (m_sclock_count)
+	{
+		m_sclock_count--;
+		m_write_ssc(m_sclock_count & 1);
+	}
+	if (m_ss_pending)
+	{
+		m_ss_pending = false;
+		m_s = (m_s << 1 | m_sdi) & 0xf;
+		m_write_sdo(BIT(m_s, 3));
+	}
 }
 
 void pps41_base_device::increment_pc()
@@ -174,6 +286,7 @@ void pps41_base_device::execute_run()
 	while (m_icount > 0)
 	{
 		// remember previous state
+		m_prev3_op = m_prev2_op;
 		m_prev2_op = m_prev_op;
 		m_prev_op = m_op;
 		m_prev_pc = m_pc;
@@ -193,7 +306,7 @@ void pps41_base_device::execute_run()
 		if (m_skip)
 		{
 			// still skip through prefix(es)
-			m_skip = op_is_prefix(m_op);
+			m_skip = op_is_tr(m_op);
 			m_op = 0; // fake nop
 		}
 		else if (m_skip_count)
@@ -203,6 +316,7 @@ void pps41_base_device::execute_run()
 			// restore opcode state
 			m_op = m_prev_op;
 			m_prev_op = m_prev2_op;
+			m_prev2_op = m_prev3_op;
 		}
 		else
 			execute_one();

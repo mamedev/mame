@@ -10,6 +10,7 @@
 
 #include "cassimg.h"
 #include "flopimg.h"
+#include "fsmgr.h"
 
 struct mame_formats_enumerator {
 	virtual ~mame_formats_enumerator() = default;
@@ -17,6 +18,7 @@ struct mame_formats_enumerator {
 	virtual void category(const char *name) = 0;
 	virtual void add(const cassette_image::Format *const *formats) = 0;
 	virtual void add(floppy_format_type format) = 0;
+	virtual void add(filesystem_manager_type fs) = 0;
 };
 
 void mame_formats_full_list(mame_formats_enumerator &en);
