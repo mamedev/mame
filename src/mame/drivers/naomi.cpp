@@ -151,8 +151,21 @@ EPF8452AQC160-3 - Altera FLEX EPF8452AQC160-3 FPGA (QFP160)
 837-14351 (sticker)
 (C) SEGA 2001
 Later board revision, components layout more similar to Naomi 2, was added JP9-JP13 jumpers to configure CN8 serial port type, see below Naomi 2 description.
+However, CN8 serial lines uses TTL UART 3V3 voltage levels, not +-12V RS-232C like Naomi 2.
 
-Also known to exist later revison which have replaced Altera FLEX with Actel A54SX08A (315-6415) FPGA and have not populated IC69 93C46 (SN# EEPROM). Other details not known, there might be more differences.
+171-8183E
+837-14601 (sticker)
+(C) SEGA 2001
+Latest known revision, most notable difference - uses Actel FPGA instead of Altera FLEX.
+
+Main components are later revisions (same as was seen in Sega-made Atomiswave PCB):
+      HD6417091T - Hitachi SH4 CPU, CPU version register = 0x040206c8, where 06 means it should be 7750S type, but it's not and missing 7750S's expanded features like INTC "Interrupt priority D" register.
+       315-6318A - HOLLY chipset
+       315-6258A - video DAC/encoder, (QFP56)
+       315-6232A - Yamaha AICA SPU (QFP100)
+       315-6146A - custom Z80-based MCU (QFP176), was verified same firmware as 315-6146.
+        315-6415 - Actel A54SX08A FPGA
+
 
 Sega NAOMI 2 Mainboard PCB Layout
 ---------------------------------
