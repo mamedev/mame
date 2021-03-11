@@ -1471,7 +1471,7 @@ public:
 
 private:
 	// helper to compute the ROM address of an instrument number
-	static constexpr rom_address(int instrument)
+	static constexpr u8 rom_address(int instrument)
 	{
 		return (instrument == 0) ? 0 : (INSTDATA_BASE + 8 * (instrument - 1));
 	}
