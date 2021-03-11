@@ -689,7 +689,11 @@ void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 			LOG(" adsr=%02X/%02X/%02X/%X", m_regs.attack_rate(), m_regs.decay_rate(), m_regs.sustain_rate(), m_regs.release_rate());
 		LOG(" sl=%X", m_regs.sustain_level());
 		if (RegisterType::OUTPUTS > 1)
-			LOG(" pan=%c%c", m_regs.pan_left() ? 'L' : '-', m_regs.pan_right() ? 'R' : '-');
+		{
+			LOG(" out=%c%c", m_regs.output0() ? '0' : '-', m_regs.output1() ? '1' : '-');
+			if (RegisterType::OUTPUTS > 2)
+				LOG("%c%c", m_regs.output2() ? '0' : '-', m_regs.output3() ? '1' : '-');
+		}
 		if (m_regs.ssg_eg_enabled())
 			LOG(" ssg=%X", m_regs.ssg_eg_mode());
 		if (m_regs.lfo_enabled() && (m_regs.lfo_am_enabled() || m_regs.lfo_pm_sensitivity() != 0))
@@ -702,7 +706,7 @@ void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 			LOG(" noise=1");
 		if (m_regs.waveform_enable() && m_regs.waveform() != 0)
 			LOG(" wf=%d", m_regs.waveform());
-		if (m_regs.rhythm_enable() && m_regs.chnum() >= 6)
+		if (m_regs.is_rhythm())
 			LOG(" rhy=1");
 		if (m_regs.instrument() != 0)
 			LOG(" inst=%d", m_regs.instrument());
@@ -844,7 +848,7 @@ void ymfm_operator<RegisterType>::clock_envelope(u16 env_counter, u8 keycode)
 	}
 
 	// determine our raw 5-bit rate value
-	u8 rate = effective_rate(m_regs.adsr_rate(m_env_state), keycode);
+	u8 rate = effective_rate(m_regs.envelope_rate(m_env_state), keycode);
 
 	// compute the rate shift value; this is the shift needed to
 	// apply to the env_counter such that it becomes a 5.11 fixed
@@ -1206,7 +1210,7 @@ void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 outpu
 
 	// now that the feedback has been computed, skip the rest if both pans are clear;
 	// no need to do all this work for nothing
-	if (m_regs.pan_left() == 0 && m_regs.pan_right() == 0)
+	if (m_regs.output0() == 0 && m_regs.output1() == 0)
 		return;
 
 	// compute the 14-bit volume/value of operator 2
@@ -1645,7 +1649,7 @@ void ymfm_engine_base<RegisterType>::write(u16 regnum, u8 data)
 			// normal channel on/off
 			m_channel[keyon_channel]->keyonoff(keyon_opmask, YMFM_KEYON_NORMAL);
 		}
-		else if (RegisterType::CHANNELS >= 9 && keyon_channel == 13)
+		else if (RegisterType::CHANNELS >= 9 && keyon_channel == RegisterType::YMFM_RHYTHM_CHANNEL)
 		{
 			// special case for the OPL rhythm channels
 			m_channel[6]->keyonoff(BIT(keyon_opmask, 4) ? 3 : 0, YMFM_KEYON_RHYTHM);

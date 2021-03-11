@@ -10,65 +10,153 @@
 // Implementation notes:
 //
 //
-// REGISTER CLASSES
+// FAMILIES
 //
-// OPM and OPN are very closely related, and thus share a common engine
-// and implementation. Differentiation is provided by the various registers
-// classes, which are specified as template parameters to the shared
-// implementation.
+// The Yamaha FM chips can be broadly categoried into families:
 //
-// There are currently three register classes:
+//   OPM (YM2151)
+//   OPN (YM2203)
+//     OPNA/OPNB/OPN2 (YM2608, YM2610, YM2610B, YM2612, YM3438, YMF276, YMF288)
+//   OPL (YM3526)
+//     OPL2 (YM3812)
+//     OPLL (YM2413, YM2423, YMF281, DS1001, and others)
+//     OPL3 (YMF262, YMF278)
 //
-//    ymopm_registers: OPM (YM2151)
-//    ymopn_registers: OPN (YM2203)
-//    ymopna_registers: OPNA (YM2608) / OPNB (YM2610/B) / OPN2 (YM2612/YM3438)
+// All of these families are very closely related, and the ymfm engine
+// implemented below is designed to be universal to work across all of
+// these families.
+//
+// Of course, each variant has its own register maps, features, and
+// implementation details which need to be sorted out. Thus, each
+// significant variant listed above is represented by a register class. The
+// register class contains:
+//
+//   * constants describing core parameters and features
+//   * mappers between operators and channels
+//   * generic fetchers that return normalized values across families
+//   * family-specific helper functions
 //
 //
-// FREQUENCIES
+// CHANNELS AND OPERATORS
 //
-// One major difference between OPM and OPN is in how frequencies are
-// specified. OPM specifies frequency via a 3-bit 'block' (aka octave),
-// combined with a 4-bit 'key code' (note number) and a 6-bit 'key
-// fraction'. The key code and fraction are converted on the chip
-// into an x.11 fixed-point value and then shifted by the block to
-// produce the final step value for the phase.
+// The polyphony of a given chip is determined by the number of channels
+// it supports. This number ranges from as low as 3 to as high as 18.
+// Each channel has either 2 or 4 operators that can be combined in a
+// myriad of ways. On most chips the number of operators per channel is
+// fixed; however, some later OPL chips allow this to be toggled between
+// 2 and 4 at runtime.
 //
-// OPN, on the other hand, specifies frequencies via a 3-bit 'block'
-// just as on OPM, but combined with an 11-bit 'frequency number' or
-// 'fnum', which is directly shifted by the block to produce the step
-// value. So essentially, OPN makes the user do the conversion from
-// note value to phase increment, while OPM is programmed in a more
-// 'musical' way, specifying notes and cents.
+// The base ymfm engine class maintains an array of channels and operators,
+// while the relationship between the two is described by the register
+// class.
 //
-// Interally, this is abstracted away into a 'block_freq' value,
-// which is a 16-bit value containing the block and frequency info
-// concatenated together as follows:
+//
+// REGISTERS
+//
+// Registers on the Yamaha chips are generally write-only, and can be divided
+// into three distinct categories:
+//
+//   * system-wide registers
+//   * channel-specific registers
+//   * operator-specific registers
+//
+// For maximum flexibility, most parameters can be configured at the operator
+// level, with channel-level registers controlling details such as how to
+// combine the operators into the final output. System-wide registers are
+// used to control chip-wide modes and manage onboard timer functions.
+//
+// Note that since registers are write-only, some implementations will use
+// "holes" in the register space to store additional values that may be
+// needed.
+//
+//
+// STATUS AND TIMERS
+//
+// Generically, all chips (except OPLL) support two timers that can be
+// programmed to fire and signal IRQs. These timers also set bits in the
+// status register. The behavior of these bits is shared across all
+// implementations, even if the exact bit positions shift (this is controlled
+// by constants in the registers class).
+//
+// In addition, several chips incorporate ADPCM decoders which also may set
+// bits in the same status register. For this reason, it is possible to
+// control various bits in the status register via the set_reset_status()
+// function directly. Any active bits that are set and which are not masked
+// (mask is controlled by set_irq_mask()), lead to an IRQ being signalled.
+//
+// Thus, it is possible for the chip-specific implementations to set the
+// mask and control the status register bits such that IRQs are signalled
+// via the same mechanism as timer signals.
+//
+// In addition, the OPM and OPN families have a "busy" flag, which is set
+// after each write, indicating that another write should not be performed.
+// Historically, the duration of this flag was constant and had nothing to
+// do with the internals of the chip. However, since the details can
+// potentially vary chip-to-chip, it is the chip's responsibility after any
+// operation to call set_busy_end() with the attotime of when the busy
+// signal should be released.
+//
+//
+// CLOCKING
+//
+// Each of the Yamaha chips works by cycling through all operators one at
+// a time. Thus, the effective output rate of the chips is related to the
+// input clock divided by the number of operators. In addition, the input
+// clock is prescaled by an amount. Generally, this is a fixed value, though
+// some early OPN chips allow this to be selected at runtime from a small
+// number of values.
+//
+//
+// CHANNEL FREQUENCIES
+//
+// One major difference between OPM and later families is in how frequencies
+// are specified. OPM specifies frequency via a 3-bit 'block' (aka octave),
+// combined with a 4-bit 'key code' (note number) and a 6-bit 'key fraction'.
+// The key code and fraction are converted on the chip into an x.11 fixed-
+// point value and then shifted by the block to produce the final step value
+// for the phase.
+//
+// Later families, on the other hand, specify frequencies via a 3-bit 'block'
+// just as on OPM, but combined with an 9, 10, or 11-bit 'frequency number'
+// or 'fnum', which is directly shifted by the block to produce the step
+// value. So essentially, OPN makes the user do the conversion from note value
+// to phase increment, while OPM is programmed in a more 'musical' way,
+// specifying notes and cents.
+//
+// Interally, this is abstracted away into a 'block_freq' value, which is a
+// 16-bit value containing the block and frequency info concatenated together
+// as follows:
 //
 //    OPM: [3-bit block]:[4-bit keycode]:[6-bit fraction] = 13 bits total
 //
-//    OPN: [3-bit block]:[11-bit fnum] = 14 bits total
+//    OPN:  [3-bit block]:[11-bit fnum]    = 14 bits total
+//    OPL:  [3-bit block]:[10-bit fnum]:0  = 14 bits total
+//    OPLL: [3-bit block]:[ 9-bit fnum]:00 = 14 bits total
 //
-// Template specialization in functions that interpret the 'block_freq'
-// value is used to deconstruct it appropriately (specifically, see
-// clock_phase).
+// Template specialization in functions that interpret the 'block_freq' value
+// is used to deconstruct it appropriately (specifically, see clock_phase).
 //
 //
 // LOW FREQUENCY OSCILLATOR (LFO)
 //
-// The LFO engines are different in several key ways. The OPM LFO
-// engine is fairly intricate. It has a 4.4 floating-point rate which
-// allows for a huge range of frequencies, and can select between four
-// different waveforms (sawtooth, square, triangle, or noise). Separate
-// 7-bit depth controls for AM and PM control the amount of modulation
-// applied in each case. This global LFO value is then further controlled
-// at the channel level by a 2-bit AM sensitivity and a 3-bit PM
-// sensitivity, and each operator has a 1-bit AM on/off switch.
+// The LFO engines are different in several key ways. The OPM LFO engine is
+// fairly intricate. It has a 4.4 floating-point rate which allows for a huge
+// range of frequencies, and can select between four different waveforms
+// (sawtooth, square, triangle, or noise). Separate 7-bit depth controls for
+// AM and PM control the amount of modulation applied in each case. This
+// global LFO value is then further controlled at the channel level by a 2-bit
+// AM sensitivity and a 3-bit PM sensitivity, and each operator has a 1-bit AM
+// on/off switch.
 //
-// For OPN the LFO engine was removed entirely, but a limited version
-// was put back in OPNA and later chips. This stripped-down version
-// offered only a 3-bit rate setting (versus the 4.4 floating-point rate
-// in OPN), and no depth control. It did bring back the channel-level
-// sensitivity controls and the operator-level on/off control.
+// For OPN the LFO engine was removed entirely, but a limited version was put
+// back in OPNA and later chips. This stripped-down version offered only a
+// 3-bit rate setting (versus the 4.4 floating-point rate in OPN), and no
+// depth control. It did bring back the channel-level sensitivity controls and
+// the operator-level on/off control.
+//
+// For OPL, the LFO is simplified again, with AM and PM running at fixed
+// frequencies, and simple enable flags at the operator level for each
+// controlling their application.
 //
 
 
@@ -89,11 +177,10 @@
 //*********************************************************
 
 //
-// Many of the Yamaha FM chips emit a floating-point value,
-// which is sent to a DAC for processing. The exact format
-// of this floating-point value is documented below. This
-// description only makes sense if the "internal" format
-// treats 1=positive and 0=negative, so the helpers below
+// Many of the Yamaha FM chips emit a floating-point value, which is sent to
+// a DAC for processing. The exact format of this floating-point value is
+// documented below. This description only makes sense if the "internal"
+// format treats sign as 1=positive and 0=negative, so the helpers below
 // presume that.
 //
 // Internal OPx data      16-bit signed data     Exp Sign Mantissa
@@ -204,8 +291,10 @@ protected:
 	// constructor
 	ymfm_registers_base(u8 *regdata) :
 		m_regdata(regdata),
-		m_chdata(nullptr),
-		m_opdata(nullptr)
+		m_chnum(0),
+		m_opnum(0),
+		m_choffs(0),
+		m_opoffs(0)
 	{
 	}
 
@@ -218,9 +307,59 @@ public:
 		FAMILY_OPL
 	};
 
-	// system-wide registers that aren't universally supported
+	// this value is returned from the is_keyon() function for rhythm channels
+	static constexpr u8 YMFM_RHYTHM_CHANNEL = 15;
+
+	//
+	// the following constants need to be defined per family:
+	//   family_type FAMILY: One of the family_types above
+	//           u8 OUTPUTS: The number of outputs exposed (1-4)
+	//          u8 CHANNELS: The number of channels on the chip
+	//         u8 OPERATORS: The number of operators on the chip
+	//        u16 REGISTERS: The number of 8-bit registers allocated
+	//         u16 REG_MODE: The address of the "mode" register controlling timers
+	//  u8 DEFAULT_PRESCALE: The starting clock prescale
+	//  u8 EG_CLOCK_DIVIDER: The clock divider of the envelope generator
+	//  bool EG_HAS_DEPRESS: True if the chip has a DP ("depress"?) envelope stage
+	// u32 CSM_TRIGGER_MASK: Mask of channels to trigger in CSM mode
+	//     u8 STATUS_TIMERA: Status bit to set when timer A fires
+	//     u8 STATUS_TIMERB: Status bit to set when tiemr B fires
+	//       u8 STATUS_BUSY: Status bit to set when the chip is busy
+	//        u8 STATUS_IRQ: Status bit to set when an IRQ is signalled
+	//
+
+	// common getters for current channel and operator number
+	u8 chnum() const { return m_chnum; }
+	u8 opnum() const { return m_opnum; }
+
+	// default behavior is that operators and channels are mapped linearly
+	void set_chnum(u8 chnum) { m_chnum = m_choffs = chnum; }
+	void set_opnum(u8 opnum) { m_opnum = m_opoffs = opnum; }
+
+	// helper to determine if the this channel is an active rhythm channel
+	bool is_rhythm() const { return false; }
+
+	// the following functions must be overriden
+	static constexpr std::pair<u8,u8> opnum_to_chnum_and_index(u8 opnum) { assert(false); return std::make_pair(0, 0); }
+	void reset() { assert(false); }
+	void write(u16 index, u8 data) { assert(false); }
+	static bool is_keyon(u16 regindex, u8 data, u8 &channel, u8 &opmask) { assert(false); return false; }
+	u8 block_freq_to_keycode(u16 block_freq) const { assert(false); return 0; }
+	u8 envelope_rate(u8 state) const { assert(false); return 0; }
+
+	// system-wide register defaults
+	u8 test() const               /*  8 bits */ { return 0; }
 	u8 status_mask() const        /*  8 bits */ { return 0; } // OPL only
 	u8 irq_reset() const          /*  8 bits */ { return 0; } // OPL only
+	u16 timer_a_value() const     /* 10 bits */ { return 0; } // all but OPLL
+	u8 timer_b_value() const      /*  8 bits */ { return 0; } // all but OPLL
+	u8 reset_timer_a() const      /*  1 bit  */ { return 0; } // all but OPLL
+	u8 reset_timer_b() const      /*  1 bit  */ { return 0; } // all but OPLL
+	u8 enable_timer_a() const     /*  1 bit  */ { return 0; } // all but OPLL
+	u8 enable_timer_b() const     /*  1 bit  */ { return 0; } // all but OPLL
+	u8 load_timer_a() const       /*  1 bit  */ { return 0; } // all but OPLL
+	u8 load_timer_b() const       /*  1 bit  */ { return 0; } // all but OPLL
+	u8 csm() const                /*  1 bit  */ { return 0; } // all but OPL3
 	u8 noise_frequency() const    /*  5 bits */ { return 0; } // OPM only
 	u8 noise_enabled() const      /*  1 bit  */ { return 0; } // OPM only
 	u8 lfo_enabled() const        /*  1 bit  */ { return 1; } // OPN(A) only
@@ -232,26 +371,36 @@ public:
 	u16 multi_block_freq0() const /* 14 bits */ { return 0; } // OPN(A) only
 	u16 multi_block_freq1() const /* 14 bits */ { return 0; } // OPN(A) only
 	u16 multi_block_freq2() const /* 14 bits */ { return 0; } // OPN(A) only
-	u8 note_select() const        /*  1 bit  */ { return 0; } // OPL only
 	u8 rhythm_enable() const      /*  1 bit  */ { return 0; } // OPL only
 	u8 rhythm_keyon() const       /*  5 bits */ { return 0; } // OPL only
+	u8 note_select() const        /*  1 bit  */ { return 0; } // OPL only
 	u8 waveform_enable() const    /*  1 bits */ { return 0; } // OPL2+ only
 
-	// per-channel registers that aren't universally supported
-	u8 pan_right() const          /*  1 bit  */ { return 1; } // OPM,OPNA,OPL3+ only
-	u8 pan_left() const           /*  1 bit  */ { return 1; } // OPM,OPNA,OPL3+ only
-	u8 external0() const          /*  1 bit  */ { return 0; } // OPL3+ only
-	u8 external1() const          /*  1 bit  */ { return 0; } // OPL3+ only
+	// per-channel register defaults
+	u16 block_freq() const        /* 13 bits */ { return 0; }
+	u8 algorithm() const          /*  3 bits */ { return 0; }
+	u8 feedback() const           /*  3 bits */ { return 0; }
+	u8 output0() const            /*  1 bit  */ { return 1; } // OPM,OPNA,OPL3+ only
+	u8 output1() const            /*  1 bit  */ { return 0; } // OPM,OPNA,OPL3+ only
+	u8 output2() const            /*  1 bit  */ { return 0; } // OPL3+ only
+	u8 output3() const            /*  1 bit  */ { return 0; } // OPL3+ only
 	u8 lfo_pm_sensitivity() const /*  3 bits */ { return 0; } // OPM,OPNA only
 	u8 lfo_am_sensitivity() const /*  2 bits */ { return 0; } // OPM,OPNA only
 	u8 instrument() const         /*  4 bits */ { return 0; } // OPLL only
 	u8 sustain() const            /*  1 bit  */ { return 0; } // OPLL only
 
-	// per-operator registers that aren't universally supported
-	u8 lfo_am_enabled() const     /*  1 bit  */ { return 0; } // OPM,OPNA,OPL only
-	u8 lfo_pm_enabled() const     /*  1 bit  */ { return 0; } // OPL only
+	// per-operator register defaults
+	u8 attack_rate() const        /*  5 bits */ { return 0; }
+	u8 decay_rate() const         /*  5 bits */ { return 0; }
+	u8 sustain_level() const      /*  4 bits */ { return 0; }
+	u8 release_rate() const       /*  4 bits */ { return 0; }
+	u8 ksr() const                /*  2 bits */ { return 0; }
+	u8 multiple() const           /*  4 bits */ { return 0; }
+	u8 total_level() const        /*  7 bits */ { return 0; }
 	u8 detune() const             /*  3 bits */ { return 0; } // OPM,OPN(A) only
 	u8 detune2() const            /*  2 bits */ { return 0; } // OPM only
+	u8 lfo_am_enabled() const     /*  1 bit  */ { return 0; } // OPM,OPNA,OPL only
+	u8 lfo_pm_enabled() const     /*  1 bit  */ { return 0; } // OPL only
 	u8 eg_sustain() const         /*  1 bit  */ { return 1; } // OPL only
 	u8 ssg_eg_enabled() const     /*  1 bit  */ { return 0; } // OPN(A) only
 	u8 ssg_eg_mode() const        /*  1 bit  */ { return 0; } // OPN(A) only
@@ -262,8 +411,8 @@ public:
 protected:
 	// return a bitfield extracted from a byte
 	u8 sysbyte(u16 offset, u8 start, u8 count) const { return BIT(m_regdata[offset], start, count); }
-	u8 chbyte(u16 offset, u8 start, u8 count) const { return BIT(m_chdata[offset], start, count); }
-	u8 opbyte(u16 offset, u8 start, u8 count) const { return BIT(m_opdata[offset], start, count); }
+	u8 chbyte(u16 offset, u8 start, u8 count) const { return sysbyte(m_choffs + offset, start, count); }
+	u8 opbyte(u16 offset, u8 start, u8 count) const { return sysbyte(m_opoffs + offset, start, count); }
 
 	// return a bitfield extracted from a pair of bytes, MSBs listed first
 	u16 sysword(u16 offset1, u8 start1, u8 count1, u16 offset2, u8 start2, u8 count2) const
@@ -277,8 +426,10 @@ protected:
 
 	// internal state
 	u8 *m_regdata;                 // pointer to the raw data
-	u8 *m_chdata;                  // pointer to channel-specific data
-	u8 *m_opdata;                  // pointer to operator-specific data
+	u8 m_chnum;                    // channel index
+	u8 m_opnum;                    // operator index
+	u16 m_choffs;                  // channel offset for index
+	u16 m_opoffs;                  // operator offset for index
 };
 
 
@@ -334,31 +485,9 @@ protected:
 //        E0-FF xxxx---- Sustain level (0-15)
 //              ----xxxx Release rate (0-15)
 //
-// OPM channel and operator mapping:
-//
-//    Channels are numbered linearly, 0-7, as represented in the map
-//    Operators are numbered linearly, 0-31, as represented in the map
-//
-//    Operators are assigned to channels as follows:
-//        Operator 0 -> Channel 0, Index 0 (Modulator 1)
-//        Operator 1 -> Channel 1, Index 0
-//        ...
-//        Operator 7 -> Channel 7, Index 0
-//        --
-//        Operator 8 -> Channel 0, Index 2 (Modulator 2)
-//        Operator 9 -> Channel 1, Index 2
-//        ...
-//        Operator 15 -> Channel 7, Index 2
-//        --
-//        Operator 16 -> Channel 0, Index 1 (Carrier 1)
-//        Operator 17 -> Channel 1, Index 1
-//        ...
-//        Operator 23 -> Channel 7, Index 1
-//        --
-//        Operator 24 -> Channel 0, Index 3 (Carrier 2)
-//        Operator 25 -> Channel 1, Index 3
-//        ...
-//        Operator 31 -> Channel 7, Index 3
+//     Internal (fake) registers:
+//           19 -xxxxxxx AM depth
+//           1A -xxxxxxx PM depth
 //
 
 class ymopm_registers : public ymfm_registers_base
@@ -375,8 +504,6 @@ public:
 	static constexpr u8 EG_CLOCK_DIVIDER = 3;
 	static constexpr bool EG_HAS_DEPRESS = false;
 	static constexpr u32 CSM_TRIGGER_MASK = 0xff;
-
-	// status values
 	static constexpr u8 STATUS_TIMERA = 0x01;
 	static constexpr u8 STATUS_TIMERB = 0x02;
 	static constexpr u8 STATUS_BUSY = 0x80;
@@ -388,45 +515,32 @@ public:
 	{
 	}
 
-	// getters for channel and operator number
-	u8 chnum() const
-	{
-		assert(m_chdata != nullptr);
-		return m_chdata - m_regdata;
-	}
-	u8 opnum() const
-	{
-		assert(m_opdata != nullptr);
-		return m_opdata - m_regdata;
-	}
-
-	// setters for channel and operator base within the register file
-	void set_chnum(u8 chnum)
-	{
-		assert(chnum < CHANNELS);
-		m_chdata = m_regdata + chnum;
-	}
-	void set_opnum(u8 opnum)
-	{
-		assert(opnum < OPERATORS);
-		m_opdata = m_regdata + opnum;
-	}
-
-	// mapping of operator number to channel.opindex:
+	// return a mapping from linear operator to channel + index
 	static constexpr std::pair<u8,u8> opnum_to_chnum_and_index(u8 opnum)
 	{
+		//    Op: 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+		//    Ch: 0  1  2  3  4  5  6  7  0  1  2  3  4  5  6  7  0  1  2  3  4  5  6  7  0  1  2  3  4  5  6  7
+		// Index: 0  0  0  0  0  0  0  0  2  2  2  2  2  2  2  2  1  1  1  1  1  1  1  1  3  3  3  3  3  3  3  3
+		//
+		// Note that the channel index order is 0,2,1,3, so we bitswap the index.
+		//
+		// This is because the order in the map is:
+		//    carrier 1, carrier 2, modulator 1, modulator 2
+		//
+		// But when wiring up the connections, the more natural order is:
+		//    carrier 1, modulator 1, carrier 2, modulator 2
 		assert(opnum < OPERATORS);
 		u8 chnum = opnum % CHANNELS;
 		u8 index = opnum / CHANNELS;
-		index = BIT(index, 1) | (BIT(index, 0) << 1);
-		return std::make_pair(chnum, index);
+		return std::make_pair(chnum, bitswap(index, 0, 1));
 	}
 
 	// reset state to default values
 	void reset()
 	{
-		// enable output on both channels by default
 		std::fill_n(&m_regdata[0], REGISTERS, 0);
+
+		// enable output on both channels by default
 		m_regdata[0x20] = m_regdata[0x21] = m_regdata[0x22] = m_regdata[0x23] = 0xc0;
 		m_regdata[0x24] = m_regdata[0x25] = m_regdata[0x26] = m_regdata[0x27] = 0xc0;
 	}
@@ -457,11 +571,23 @@ public:
 	}
 
 	// compute the keycode from the given block_freq value
-	// block_freq is block(3b):keycode(4b):keyfrac(6b); the 5-bit keycode
-	// we want is just the top 5 bits here
 	u8 block_freq_to_keycode(u16 block_freq) const
 	{
+		// block_freq is block(3b):keycode(4b):keyfrac(6b); the 5-bit keycode
+		// we want is just the top 5 bits here
 		return BIT(block_freq, 8, 5);
+	}
+
+	// special helper for generically getting the envelope rates
+	u8 envelope_rate(u8 state) const
+	{
+		// attack/decay/sustain are identical
+		if (state < 3)
+			return opbyte(0x80 + (state << 5), 0, 5);
+
+		// release encodes 4 bits and expands them
+		else
+			return opbyte(0xe0, 0, 4) * 2 + 1;
 	}
 
 	// system-wide registers
@@ -483,8 +609,8 @@ public:
 	u8 lfo_waveform() const       /*  2 bits */ { return sysbyte(0x1b, 0, 2); }
 
 	// per-channel registers
-	u8 pan_right() const          /*  1 bit  */ { return chbyte(0x20, 7, 1); }
-	u8 pan_left() const           /*  1 bit  */ { return chbyte(0x20, 6, 1); }
+	u8 output1() const            /*  1 bit  */ { return chbyte(0x20, 7, 1); }
+	u8 output0() const            /*  1 bit  */ { return chbyte(0x20, 6, 1); }
 	u8 feedback() const           /*  3 bits */ { return chbyte(0x20, 3, 3); }
 	u8 algorithm() const          /*  3 bits */ { return chbyte(0x20, 0, 3); }
 	u16 block_freq() const        /* 13 bits */ { return chword(0x28, 0, 7, 0x30, 2, 6); }
@@ -503,18 +629,6 @@ public:
 	u8 sustain_rate() const       /*  5 bits */ { return opbyte(0xc0, 0, 5); }
 	u8 sustain_level() const      /*  4 bits */ { return opbyte(0xe0, 4, 4); }
 	u8 release_rate() const       /*  4 bits */ { return opbyte(0xe0, 0, 4); }
-
-	// special helper for generically getting the attack/decay/statain/release rates
-	u8 adsr_rate(u8 state) const
-	{
-		// attack/decay/sustain are identical
-		if (state < 3)
-			return opbyte(0x80 + (state << 5), 0, 5);
-
-		// release encodes 4 bits and expands them
-		else
-			return opbyte(0xe0, 0, 4) * 2 + 1;
-	}
 };
 
 
@@ -566,25 +680,9 @@ public:
 //        AC-AF --xxx--- Block (0-7)
 //              -----xxx Frequency number upper 3 bits
 //
-// OPN channel and operator mapping:
-//
-//    Channels are numbered linearly, 0-2, as represented in the map
-//    Operators are numbered linearly, 0-11, as represented in the map, but there
-//        are gaps, since these are at address offsets 0,1,2, 4,5,6, 8,9,10, 12,13,14
-//
-//    Operators are assigned to channels as follows:
-//        Operator 0 -> Channel 0, Index 0 (Modulator 1)
-//        Operator 1 -> Channel 1, Index 0
-//        Operator 2 -> Channel 2, Index 0
-//        Operator 3 -> Channel 0, Index 2 (Modulator 2)
-//        Operator 4 -> Channel 1, Index 2
-//        Operator 5 -> Channel 2, Index 2
-//        Operator 6 -> Channel 0, Index 1 (Carrier 1)
-//        Operator 7 -> Channel 1, Index 1
-//        Operator 8 -> Channel 2, Index 1
-//        Operator 9 -> Channel 0, Index 3 (Carrier 2)
-//        Operator 10 -> Channel 1, Index 3
-//        Operator 11 -> Channel 2, Index 3
+//     Internal (fake) registers:
+//        B8-BB --xxxxxx Latched frequency number upper bits (from A4-A7)
+//        BC-BF --xxxxxx Latched frequency number upper bits (from AC-AF)
 //
 
 class ymopn_registers : public ymfm_registers_base
@@ -601,8 +699,6 @@ public:
 	static constexpr u8 EG_CLOCK_DIVIDER = 3;
 	static constexpr bool EG_HAS_DEPRESS = false;
 	static constexpr u32 CSM_TRIGGER_MASK = 1 << 2;
-
-	// status values
 	static constexpr u8 STATUS_TIMERA = 0x01;
 	static constexpr u8 STATUS_TIMERB = 0x02;
 	static constexpr u8 STATUS_BUSY = 0x80;
@@ -614,39 +710,34 @@ public:
 	{
 	}
 
-	// getters for channel and operator number
-	u8 chnum() const
-	{
-		assert(m_chdata != nullptr);
-		return m_chdata - m_regdata;
-	}
-	u8 opnum() const
-	{
-		assert(m_opdata != nullptr);
-		int temp = m_opdata - m_regdata;
-		return temp - (temp / 4);
-	}
-
-	// setters for channel and operator base within the register file
-	void set_chnum(u8 chnum)
-	{
-		assert(chnum < CHANNELS);
-		m_chdata = m_regdata + chnum;
-	}
+	// setters for operator number
 	void set_opnum(u8 opnum)
 	{
 		assert(opnum < OPERATORS);
-		m_opdata = m_regdata + opnum % 3 + 4 * (opnum / 3);
+		m_opnum = opnum;
+
+		// operator offset has gaps so the default linear mapping won't work
+		m_opoffs = opnum % 3 + 4 * (opnum / 3);
 	}
 
-	// mapping of operator number to channel.opindex:
+	// return a mapping from linear operator to channel + index
 	static constexpr std::pair<u8,u8> opnum_to_chnum_and_index(u8 opnum)
 	{
+		//    Op: 0  1  2  3  4  5  6  7  8  9 10 11
+		//    Ch: 0  1  2  0  1  2  0  1  2  0  1  2
+		// Index: 0  0  0  2  2  2  1  1  1  3  3  3
+		//
+		// Note that the channel index order is 0,2,1,3, so we bitswap the index.
+		//
+		// This is because the order in the map is:
+		//    carrier 1, carrier 2, modulator 1, modulator 2
+		//
+		// But when wiring up the connections, the more natural order is:
+		//    carrier 1, modulator 1, carrier 2, modulator 2
 		assert(opnum < OPERATORS);
 		u8 chnum = opnum % CHANNELS;
 		u8 index = opnum / CHANNELS;
-		index = BIT(index, 1) | (BIT(index, 0) << 1);
-		return std::make_pair(chnum, index);
+		return std::make_pair(chnum, bitswap(index, 0, 1));
 	}
 
 	// reset state to default values
@@ -695,10 +786,10 @@ public:
 	}
 
 	// compute the keycode from the given block_freq value
-	// block_freq is block(3b):fnum(11b); the 5-bit keycode uses the top
-	// 4 bits plus a magic formula for the final bit
 	u8 block_freq_to_keycode(u16 block_freq) const
 	{
+		// block_freq is block(3b):fnum(11b); the 5-bit keycode uses the top
+		// 4 bits plus a magic formula for the final bit
 		u8 keycode = BIT(block_freq, 10, 4) << 1;
 
 		// lowest bit is determined by a mix of next lower FNUM bits
@@ -708,6 +799,18 @@ public:
 		//
 		// for speed, we just look it up in a 16-bit constant
 		return keycode | BIT(0xfe80, BIT(block_freq, 7, 4));
+	}
+
+	// special helper for generically getting the envelope rates
+	u8 envelope_rate(u8 state) const
+	{
+		// attack/decay/sustain are identical
+		if (state < 3)
+			return opbyte(0x50 + (state << 4), 0, 5);
+
+		// release encodes 4 bits and expands them
+		else
+			return opbyte(0x80, 0, 4) * 2 + 1;
 	}
 
 	// system-wide registers
@@ -746,18 +849,6 @@ public:
 
 	// no LFO on OPN
 	u8 lfo_enabled() const { return 0; }
-
-	// special helper for generically getting the attack/decay/statain/release rates
-	u8 adsr_rate(u8 state) const
-	{
-		// attack/decay/sustain are identical
-		if (state < 3)
-			return opbyte(0x50 + (state << 4), 0, 5);
-
-		// release encodes 4 bits and expands them
-		else
-			return opbyte(0x80, 0, 4) * 2 + 1;
-	}
 };
 
 
@@ -817,38 +908,9 @@ public:
 //        AC-AF --xxx--- Block (0-7)
 //              -----xxx Frequency number upper 3 bits
 //
-// OPNA channel and operator mapping:
-//
-//    Channels and operators are mapped like two OPNs back-to-back
-//    This means all operators for channels 0-2 are assigned, followed by all
-//        operators for channels 3-5
-//
-//    Operators are assigned to channels as follows:
-//        Operator 0 -> Channel 0, Index 0 (Modulator 1)
-//        Operator 1 -> Channel 1, Index 0
-//        Operator 2 -> Channel 2, Index 0
-//        Operator 3 -> Channel 0, Index 2 (Modulator 2)
-//        Operator 4 -> Channel 1, Index 2
-//        Operator 5 -> Channel 2, Index 2
-//        Operator 6 -> Channel 0, Index 1 (Carrier 1)
-//        Operator 7 -> Channel 1, Index 1
-//        Operator 8 -> Channel 2, Index 1
-//        Operator 9 -> Channel 0, Index 3 (Carrier 2)
-//        Operator 10 -> Channel 1, Index 3
-//        Operator 11 -> Channel 2, Index 3
-//        --
-//        Operator 12 -> Channel 3, Index 0 (Modulator 1)
-//        Operator 13 -> Channel 4, Index 0
-//        Operator 14 -> Channel 5, Index 0
-//        Operator 15 -> Channel 3, Index 2 (Modulator 2)
-//        Operator 16 -> Channel 4, Index 2
-//        Operator 17 -> Channel 5, Index 2
-//        Operator 18 -> Channel 3, Index 1 (Carrier 1)
-//        Operator 19 -> Channel 4, Index 1
-//        Operator 20 -> Channel 5, Index 1
-//        Operator 21 -> Channel 3, Index 3 (Carrier 2)
-//        Operator 22 -> Channel 4, Index 3
-//        Operator 23 -> Channel 5, Index 3
+//     Internal (fake) registers:
+//        B8-BB --xxxxxx Latched frequency number upper bits (from A4-A7)
+//        BC-BF --xxxxxx Latched frequency number upper bits (from AC-AF)
 //
 
 class ymopna_registers : public ymopn_registers
@@ -866,49 +928,47 @@ public:
 	{
 	}
 
-	// getters for channel and operator number
-	u8 chnum() const
-	{
-		assert(m_chdata != nullptr);
-		int temp = m_chdata - m_regdata;
-		return BIT(temp, 0, 2) + 3 * BIT(temp, 8);
-	}
-	u8 opnum() const
-	{
-		assert(m_opdata != nullptr);
-		int temp = m_opdata - m_regdata;
-		int temp2 = BIT(temp, 0, 4);
-		return temp2 - (temp2 / 4) + 12 * BIT(temp, 8);
-	}
-
 	// setters for channel and operator base within the register file
 	void set_chnum(u8 chnum)
 	{
 		assert(chnum < CHANNELS);
-		m_chdata = m_regdata + chnum % 3 + 0x100 * (chnum / 3);
+		m_chnum = chnum;
+		m_choffs = chnum % 3 + 0x100 * (chnum / 3);
 	}
 	void set_opnum(u8 opnum)
 	{
 		assert(opnum < OPERATORS);
-		m_opdata = m_regdata + opnum % 3 + 4 * ((opnum % 12) / 3) + 0x100 * (opnum / 12);
+		m_opnum = opnum;
+		m_opoffs = opnum % 3 + 4 * ((opnum % 12) / 3) + 0x100 * (opnum / 12);
 	}
 
 	// initial mapping of operator number to channel.opindex:
 	static constexpr std::pair<u8,u8> opnum_to_chnum_and_index(u8 opnum)
 	{
+		//    Op: 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
+		//    Ch: 0  1  2  0  1  2  0  1  2  0  1  2  3  4  5  3  4  5  3  4  5  3  4  5
+		// Index: 0  0  0  2  2  2  1  1  1  3  3  3  0  0  0  2  2  2  1  1  1  3  3  3
+		//
+		// Note that the channel index order is 0,2,1,3, so we bitswap the index.
+		//
+		// This is because the order in the map is:
+		//    carrier 1, carrier 2, modulator 1, modulator 2
+		//
+		// But when wiring up the connections, the more natural order is:
+		//    carrier 1, modulator 1, carrier 2, modulator 2
 		assert(opnum < OPERATORS);
 		u8 chnum = opnum % (CHANNELS/2);
 		u8 index = opnum / (CHANNELS/2);
 		chnum += 3 * BIT(index, 2);
-		index = BIT(index, 1) | (BIT(index, 0) << 1);
-		return std::make_pair(chnum, index);
+		return std::make_pair(chnum, bitswap(index, 0, 1));
 	}
 
 	// reset state to default values
 	void reset()
 	{
-		// enable output on both channels by default
 		std::fill_n(&m_regdata[0], REGISTERS, 0);
+
+		// enable output on both channels by default
 		m_regdata[0xb4] = m_regdata[0xb5] = m_regdata[0xb6] = 0xc0;
 		m_regdata[0x1b4] = m_regdata[0x1b5] = m_regdata[0x1b6] = 0xc0;
 	}
@@ -933,8 +993,8 @@ public:
 	u8 lfo_rate() const           /*  3 bits */ { return sysbyte(0x22, 0, 3); }
 
 	// OPNA-specific per-channel registers
-	u8 pan_left() const           /*  1 bit  */ { return chbyte(0xb4, 7, 1); }
-	u8 pan_right() const          /*  1 bit  */ { return chbyte(0xb4, 6, 1); }
+	u8 output0() const            /*  1 bit  */ { return chbyte(0xb4, 7, 1); }
+	u8 output1() const            /*  1 bit  */ { return chbyte(0xb4, 6, 1); }
 	u8 lfo_am_sensitivity() const /*  2 bits */ { return chbyte(0xb4, 4, 2); }
 	u8 lfo_pm_sensitivity() const /*  3 bits */ { return chbyte(0xb4, 0, 3); }
 
@@ -991,38 +1051,6 @@ public:
 //              ----xxxx Release rate (0-15)
 //        E0-F5 ------xx Wave select (0-3) [OPL2 only]
 //
-// OPL channel and operator mapping:
-//
-//    Channels are numbered linearly, 0-8, as represented in the map
-//    Operators are numbered linearly, 0-17, as represented in the map
-//
-//    Operators are assigned to channels as follows:
-//        Operator 0 -> Channel 0, Index 0
-//        Operator 1 -> Channel 1, Index 0
-//        Operator 2 -> Channel 2, Index 0
-//        Operator 3 -> Channel 0, Index 1
-//        Operator 4 -> Channel 1, Index 1
-//        Operator 5 -> Channel 2, Index 1
-//        Operator 6 -> Channel 3, Index 0
-//        Operator 7 -> Channel 4, Index 0
-//        Operator 8 -> Channel 5, Index 0
-//        Operator 9 -> Channel 3, Index 1
-//        Operator 10 -> Channel 4, Index 1
-//        Operator 11 -> Channel 5, Index 1
-//        Operator 12 -> Channel 6, Index 0
-//        Operator 13 -> Channel 7, Index 0
-//        Operator 14 -> Channel 8, Index 0
-//        Operator 15 -> Channel 6, Index 1
-//        Operator 16 -> Channel 7, Index 1
-//        Operator 17 -> Channel 8, Index 1
-//
-// Note that many of the registers in OPL are trimmed down from their
-// OPM/OPN counterparts. For better engine code re-use, we expand the
-// OPL values into their equivalents.
-//
-// Also timers behave a bit differently, so the flags are adjusted
-// to tease out the equivalent behavior.
-//
 
 class ymopl_registers : public ymfm_registers_base
 {
@@ -1038,8 +1066,6 @@ public:
 	static constexpr u8 EG_CLOCK_DIVIDER = 1;
 	static constexpr bool EG_HAS_DEPRESS = false;
 	static constexpr u32 CSM_TRIGGER_MASK = 0x1ff;
-
-	// status values
 	static constexpr u8 STATUS_TIMERA = 0x40;
 	static constexpr u8 STATUS_TIMERB = 0x20;
 	static constexpr u8 STATUS_BUSY = 0;
@@ -1051,39 +1077,31 @@ public:
 	{
 	}
 
-	// getters for channel and operator number
-	u8 chnum() const
-	{
-		assert(m_chdata != nullptr);
-		return m_chdata - m_regdata;
-	}
-	u8 opnum() const
-	{
-		assert(m_opdata != nullptr);
-		int temp = m_opdata - m_regdata;
-		return temp - 2 * (temp / 8);
-	}
-
-	// setters for channel and operator base within the register file
-	void set_chnum(u8 chnum)
-	{
-		assert(chnum < CHANNELS);
-		m_chdata = m_regdata + chnum;
-	}
+	// setters for operator number
 	void set_opnum(u8 opnum)
 	{
 		assert(opnum < OPERATORS);
-		m_opdata = m_regdata + opnum % 6 + 8 * (opnum / 6);
+		m_opnum = opnum;
+		m_opoffs = opnum % 6 + 8 * (opnum / 6);
 	}
 
-	// mapping of operator number to channel.opindex:
+	// return a mapping from linear operator to channel + index
 	static constexpr std::pair<u8,u8> opnum_to_chnum_and_index(u8 opnum)
 	{
+		//    Op: 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17
+		//    Ch: 0  1  2  0  1  2  3  4  5  3  4  5  6  7  8  6  7  8
+		// Index: 0  0  0  1  1  1  0  0  0  1  1  1  0  0  0  1  1  1
 		assert(opnum < OPERATORS);
 		u8 chnum = opnum % (CHANNELS/3);
 		u8 index = opnum / (CHANNELS/3);
 		chnum += (CHANNELS/3) * BIT(index, 1, 2);
 		return std::make_pair(chnum, BIT(index, 0));
+	}
+
+	// helper to determine if the this channel is an active rhythm channel
+	bool is_rhythm() const
+	{
+		return rhythm_enable() && (m_chnum >= 6);
 	}
 
 	// reset state to default values
@@ -1112,6 +1130,7 @@ public:
 			channel = regindex & 0x0f;
 			if (channel == 13)
 			{
+				channel = YMFM_RHYTHM_CHANNEL;
 				opmask = BIT(data, 5) ? BIT(data, 0, 5) : 0;
 				return true;
 			}
@@ -1125,11 +1144,12 @@ public:
 	}
 
 	// compute the keycode from the given block_freq value
-	// block_freq is block(3b):fnum(10b):0; the 4-bit keycode uses the top
-	// 3 bits plus either the MSB or MSB-1 of fnum, depending on note_select
 	u8 block_freq_to_keycode(u16 block_freq) const
 	{
 		u8 keycode = BIT(block_freq, 11, 3) << 1;
+
+		// block_freq is block(3b):fnum(10b):0; the 4-bit keycode uses the top
+		// 3 bits plus either the MSB or MSB-1 of fnum, depending on note_select
 		return keycode | BIT(block_freq, 10 - note_select(), 1);
 	}
 
@@ -1139,6 +1159,21 @@ public:
 		// replace the low bit with a table lookup; the equivalent
 		// OPM/OPN values are: 0,1,2,3,4,5,6,7,8,9,10,10,12,12,15,15
 		return (raw & 0xe) | BIT(0xc2aa, raw);
+	}
+
+	// special helper for generically getting the envelope rates
+	u8 envelope_rate(u8 state) const
+	{
+		// attack/decay are 4 bits, expanded to 5 to match OPM/OPN
+		if (state < 2)
+			return opbyte(0x60, (state ^ 1) * 4, 4) * 2;
+
+		// sustain rate doesn't exist in OPL, so effectively 0, unless in percussion mode
+		else if (state == 2 && eg_sustain() != 0)
+			return 0;
+
+		// release is 4 bits, expanded to 5
+		return opbyte(0x80, 0, 4) * 2;
 	}
 
 	// system-wide registers
@@ -1171,27 +1206,12 @@ public:
 	u8 eg_sustain() const         /*  1 bit  */ { return opbyte(0x20, 5, 1); }
 	u8 ksr() const                /*  1 bit  */ { return opbyte(0x20, 4, 1) * 2 + 1; } // 1->2 bits
 	u8 multiple() const           /*  4 bits */ { return opl_multiple_map(opbyte(0x20, 0, 4)); }
-	u8 key_scale_level() const    /*  2 bits */ { return opbyte(0x40, 7, 1) | (opbyte(0x40, 6, 1) << 1); }
+	u8 key_scale_level() const    /*  2 bits */ { return bitswap<2>(opbyte(0x40, 6, 2), 0, 1); }
 	u8 total_level() const        /*  6 bits */ { return opbyte(0x40, 0, 6); } // 6->7 bits
 	u8 attack_rate() const        /*  4 bits */ { return opbyte(0x60, 4, 4) * 2; } // 4->5 bits
 	u8 decay_rate() const         /*  4 bits */ { return opbyte(0x60, 0, 4) * 2; } // 4->5 bits
 	u8 sustain_level() const      /*  4 bits */ { return opbyte(0x80, 4, 4); }
 	u8 release_rate() const       /*  4 bits */ { return opbyte(0x80, 0, 4); }
-
-	// special helper for generically getting the attack/decay/statain/release rates
-	u8 adsr_rate(u8 state) const
-	{
-		// attack/decay are 4 bits, expanded to 5 to match OPM/OPN
-		if (state < 2)
-			return opbyte(0x60, (state ^ 1) * 4, 4) * 2;
-
-		// sustain rate doesn't exist in OPL, so effectively 0, unless in percussion mode
-		else if (state == 2 && eg_sustain() != 0)
-			return 0;
-
-		// release is 4 bits, expanded as with OPM/OPN
-		return opbyte(0x80, 0, 4) * 2;
-	}
 };
 
 class ymopl2_registers : public ymopl_registers
@@ -1251,30 +1271,24 @@ public:
 //        06-07 xxxx---- Sustain level (0-15)
 //              ----xxxx Release rate (0-15)
 //
-//     Internal states:
+//     Internal (fake) registers:
 //        40-48 xxxxxxxx Current instrument base address
 //        4E-5F xxxxxxxx Current instrument base address + operator slot (0/1)
 //        70-FF xxxxxxxx Data for instruments (1-16 plus 3 drums)
-//
-// OPL channel and operator mapping:
 //
 
 class ymopll_registers : public ymopl_registers
 {
 public:
-	// constants
 	static constexpr u8 OUTPUTS = 2;
-	static constexpr u16 REGISTERS = 0x100;
 	static constexpr u16 REG_MODE = 0xff;
 	static constexpr bool EG_HAS_DEPRESS = true;
-
-	// status values
 	static constexpr u8 STATUS_TIMERA = 0;
 	static constexpr u8 STATUS_TIMERB = 0;
 	static constexpr u8 STATUS_BUSY = 0;
 	static constexpr u8 STATUS_IRQ = 0;
 
-	// internals
+	// OPLL-specific constants
 	static constexpr u16 EXTERNAL_REGISTERS = 0x40;
 	static constexpr u16 CHANNEL_INSTBASE = 0x40;
 	static constexpr u16 OPERATOR_INSTBASE = 0x4e;
@@ -1287,33 +1301,21 @@ public:
 	{
 	}
 
-	// getters for channel and operator number
-	u8 chnum() const
-	{
-		assert(m_chdata != nullptr);
-		return m_chdata - m_regdata;
-	}
-	u8 opnum() const
-	{
-		assert(m_opdata != nullptr);
-		return m_opdata - m_regdata;
-	}
-
-	// setters for channel and operator base within the register file
-	void set_chnum(u8 chnum)
-	{
-		assert(chnum < CHANNELS);
-		m_chdata = m_regdata + chnum;
-	}
+	// setters for operator number
 	void set_opnum(u8 opnum)
 	{
 		assert(opnum < OPERATORS);
-		m_opdata = m_regdata + opnum;
+
+		// OPL overrides this so we need to put it back
+		m_opnum = m_opoffs = opnum;
 	}
 
-	// mapping of operator number to channel.opindex:
+	// return a mapping from linear operator to channel + index
 	static constexpr std::pair<u8,u8> opnum_to_chnum_and_index(u8 opnum)
 	{
+		//    Op: 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17
+		//    Ch: 0  0  1  1  2  2  3  3  4  4  5  5  6  6  7  7  8  8
+		// Index: 0  1  0  1  0  1  0  1  0  1  0  1  0  1  0  1  0  1
 		assert(opnum < OPERATORS);
 		return std::make_pair(opnum / 2, opnum % 2);
 	}
@@ -1360,7 +1362,7 @@ public:
 		}
 		else if (regindex == 0x0e)
 		{
-			channel = 13;
+			channel = YMFM_RHYTHM_CHANNEL;
 			opmask = BIT(data, 5) ? BIT(data, 0, 5) : 0;
 			return true;
 		}
@@ -1368,65 +1370,15 @@ public:
 	}
 
 	// compute the keycode from the given block_freq value
-	// block_freq is block(3b):fnum(9b):00; the 4-bit keycode uses the top
-	// 3 bits plus the MSB of fnum
 	u8 block_freq_to_keycode(u16 block_freq) const
 	{
+		// block_freq is block(3b):fnum(9b):00; the 4-bit keycode uses the top
+		// 3 bits plus the MSB of fnum
 		return BIT(block_freq, 10, 4);
 	}
 
-	// return either the total level or the volume
-	u8 total_level_or_volume() const
-	{
-		int op = BIT(opnum(), 0);
-		if (op == 1 || (rhythm_enable() && chnum() >= 7))
-			return chbyte(0x30, 4 * (op ^ 1), 4) * 4;
-		else
-			return instchbyte(0x02, 0, 6);
-	}
-
-	// system-wide registers
-	u8 rhythm_enable() const      /*  1 bit  */ { return sysbyte(0x0e, 5, 1); }
-	u8 rhythm_keyon() const       /*  5 bits */ { return sysbyte(0x0e, 4, 0); }
-	u8 test() const               /*  8 bits */ { return sysbyte(0x0f, 0, 8); }
-	u16 timer_a_value() const     /*  8 bits */ { return 0; }
-	u8 timer_b_value() const      /*  8 bits */ { return 0; }
-	u8 reset_timer_b() const      /*  1 bit  */ { return 0; }
-	u8 reset_timer_a() const      /*  1 bit  */ { return 0; }
-	u8 enable_timer_b() const     /*  1 bit  */ { return 0; }
-	u8 enable_timer_a() const     /*  1 bit  */ { return 0; }
-	u8 load_timer_b() const       /*  1 bit  */ { return 0; }
-	u8 load_timer_a() const       /*  1 bit  */ { return 0; }
-	u8 csm() const                /*  1 bit  */ { return 0; }
-	u8 lfo_am_depth() const       /*  1 bit  */ { return 1; } // 1->2 bits
-	u8 lfo_pm_depth() const       /*  1 bit  */ { return 0; }
-	u8 waveform_enable() const    /*  1 bits */ { return 1; }
-
-	// per-channel registers
-	u16 block_freq() const        /* 12 bits */ { return chword(0x20, 0, 4, 0x10, 0, 8) * 4; } // 12->14 bits
-	u8 sustain() const            /*  1 bit  */ { return chbyte(0x20, 5, 1); }
-	u8 feedback() const           /*  3 bits */ { return instchbyte(0x03, 0, 3); }
-	u8 algorithm() const          /*  1 bit  */ { return 6; }
-	u8 instrument() const         /*  4 bits */ { return chbyte(0x30, 4, 4); }
-	u8 pan_left() const           /*  1 bit  */ { return (!rhythm_enable() || chnum() < 6) ? 1 : 0; }
-	u8 pan_right() const          /*  1 bit  */ { return (rhythm_enable() && chnum() >= 6) ? 1 : 0; }
-
-	// per-operator registers
-	u8 lfo_am_enabled() const     /*  1 bit  */ { return instopbyte(0x00, 7, 1); }
-	u8 lfo_pm_enabled() const     /*  1 bit  */ { return instopbyte(0x00, 6, 1); }
-	u8 eg_sustain() const         /*  1 bit  */ { return instopbyte(0x00, 5, 1); }
-	u8 ksr() const                /*  1 bit  */ { return instopbyte(0x00, 4, 1) * 2 + 1; } // 1->2 bits
-	u8 multiple() const           /*  4 bits */ { return opl_multiple_map(instopbyte(0x00, 0, 4)); }
-	u8 key_scale_level() const    /*  2 bits */ { return instopbyte(0x02, 6, 2); }
-	u8 total_level() const        /*  6 bits */ { return total_level_or_volume(); }
-	u8 waveform() const           /*  1 bit */  { return instchbyte(0x03, 3 + BIT(opnum(), 0), 1); }
-	u8 attack_rate() const        /*  4 bits */ { return instopbyte(0x04, 4, 4) * 2; } // 4->5 bits
-	u8 decay_rate() const         /*  4 bits */ { return instopbyte(0x04, 0, 4) * 2; } // 4->5 bits
-	u8 sustain_level() const      /*  4 bits */ { return instopbyte(0x06, 4, 4); }
-	u8 release_rate() const       /*  4 bits */ { return instopbyte(0x06, 0, 4); }
-
-	// special helper for generically getting the attack/decay/statain/release rates
-	u8 adsr_rate(u8 state) const
+	// special helper for generically getting the envelope rates
+	u8 envelope_rate(u8 state) const
 	{
 		// The envelope diagram in the YM2413 datasheet gives values for these
 		// in ms from 0->48dB. The attack/decay tables give values in ms from
@@ -1463,6 +1415,36 @@ public:
 			return DP * 2;
 	}
 
+	// system-wide registers
+	u8 rhythm_enable() const      /*  1 bit  */ { return sysbyte(0x0e, 5, 1); }
+	u8 rhythm_keyon() const       /*  5 bits */ { return sysbyte(0x0e, 4, 0); }
+	u8 test() const               /*  8 bits */ { return sysbyte(0x0f, 0, 8); }
+	u8 lfo_am_depth() const       /*  1 bit  */ { return 1; } // 1->2 bits
+	u8 waveform_enable() const    /*  1 bits */ { return 1; }
+
+	// per-channel registers
+	u16 block_freq() const        /* 12 bits */ { return chword(0x20, 0, 4, 0x10, 0, 8) * 4; } // 12->14 bits
+	u8 sustain() const            /*  1 bit  */ { return chbyte(0x20, 5, 1); }
+	u8 feedback() const           /*  3 bits */ { return instchbyte(0x03, 0, 3); }
+	u8 algorithm() const          /*  1 bit  */ { return 6; }
+	u8 instrument() const         /*  4 bits */ { return chbyte(0x30, 4, 4); }
+	u8 output0() const            /*  1 bit  */ { return is_rhythm() ? 0 : 1; }
+	u8 output1() const            /*  1 bit  */ { return is_rhythm() ? 1 : 0; }
+
+	// per-operator registers
+	u8 lfo_am_enabled() const     /*  1 bit  */ { return instopbyte(0x00, 7, 1); }
+	u8 lfo_pm_enabled() const     /*  1 bit  */ { return instopbyte(0x00, 6, 1); }
+	u8 eg_sustain() const         /*  1 bit  */ { return instopbyte(0x00, 5, 1); }
+	u8 ksr() const                /*  1 bit  */ { return instopbyte(0x00, 4, 1) * 2 + 1; } // 1->2 bits
+	u8 multiple() const           /*  4 bits */ { return opl_multiple_map(instopbyte(0x00, 0, 4)); }
+	u8 key_scale_level() const    /*  2 bits */ { return instopbyte(0x02, 6, 2); }
+	u8 total_level() const        /*  6 bits */ { return total_level_or_volume(); }
+	u8 waveform() const           /*  1 bit */  { return instchbyte(0x03, 3 + BIT(opnum(), 0), 1); }
+	u8 attack_rate() const        /*  4 bits */ { return instopbyte(0x04, 4, 4) * 2; } // 4->5 bits
+	u8 decay_rate() const         /*  4 bits */ { return instopbyte(0x04, 0, 4) * 2; } // 4->5 bits
+	u8 sustain_level() const      /*  4 bits */ { return instopbyte(0x06, 4, 4); }
+	u8 release_rate() const       /*  4 bits */ { return instopbyte(0x06, 0, 4); }
+
 	// set the instrument data
 	void set_instrument_data(u8 const *data)
 	{
@@ -1470,6 +1452,16 @@ public:
 	}
 
 private:
+	// OPLL-specific helper to return either the total level or the volume
+	u8 total_level_or_volume() const
+	{
+		int op = BIT(m_opnum, 0);
+		if (op == 1 || is_rhythm())
+			return chbyte(0x30, 4 * (op ^ 1), 4) * 4;
+		else
+			return instchbyte(0x02, 0, 6);
+	}
+
 	// helper to compute the ROM address of an instrument number
 	static constexpr u8 rom_address(int instrument)
 	{
@@ -1480,7 +1472,7 @@ private:
 	void update_instrument(int chnum)
 	{
 		u8 baseaddr;
-		if (chnum >= 6 && rhythm_enable())
+		if (rhythm_enable() && chnum >= 6)
 			baseaddr = rom_address(16 + (chnum - 6));
 		else
 			baseaddr = rom_address(sysbyte(0x30 + chnum, 4, 4));
@@ -1491,8 +1483,8 @@ private:
 	}
 
 	// helpers to read from instrument channel/operator data
-	u8 instchbyte(u16 offset, u8 start, u8 count) const { return BIT(m_regdata[offset + m_chdata[CHANNEL_INSTBASE]], start, count); }
-	u8 instopbyte(u16 offset, u8 start, u8 count) const { return BIT(m_regdata[offset + m_opdata[OPERATOR_INSTBASE]], start, count); }
+	u8 instchbyte(u16 offset, u8 start, u8 count) const { return BIT(m_regdata[offset + m_regdata[m_choffs + CHANNEL_INSTBASE]], start, count); }
+	u8 instopbyte(u16 offset, u8 start, u8 count) const { return BIT(m_regdata[offset + m_regdata[m_opoffs + OPERATOR_INSTBASE]], start, count); }
 };
 
 
@@ -1632,13 +1624,13 @@ private:
 	// helper to add values to the outputs based on channel enables
 	void add_to_output(s32 *outputs, s32 value) const
 	{
-		if (RegisterType::OUTPUTS == 1 || m_regs.pan_left())
+		if (RegisterType::OUTPUTS == 1 || m_regs.output0())
 			outputs[0] += value;
-		if (RegisterType::OUTPUTS >= 2 && m_regs.pan_right())
+		if (RegisterType::OUTPUTS >= 2 && m_regs.output1())
 			outputs[1] += value;
-		if (RegisterType::OUTPUTS >= 3 && m_regs.external0())
+		if (RegisterType::OUTPUTS >= 3 && m_regs.output2())
 			outputs[2] += value;
-		if (RegisterType::OUTPUTS >= 4 && m_regs.external1())
+		if (RegisterType::OUTPUTS >= 4 && m_regs.output3())
 			outputs[3] += value;
 	}
 
