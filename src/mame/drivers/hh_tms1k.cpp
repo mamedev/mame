@@ -6295,10 +6295,8 @@ ROM_END
   This handheld is not a toy, read the manual for more information. In short,
   it is a device for predicting the winning chance of a gambling horserace.
 
-  known releases:
-  - USA: Thoroughbred Horse Race Analyzer
-  - China/Canada: Thoroughbred Horse Race Analyzer, published in 1994 by
-    Advanced Handicapping Technologies, Inc.
+  It was rereleased in 1994 in China/Canada by AHTI(Advanced Handicapping
+  Technologies, Inc.), on a Hitachi HD613901.
 
 ***************************************************************************/
 

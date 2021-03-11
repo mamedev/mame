@@ -11,6 +11,7 @@
 
 #include "cpu/pps41/mm75.h"
 #include "cpu/pps41/mm76.h"
+#include "cpu/pps41/mm78.h"
 #include "video/pwm.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
@@ -20,7 +21,7 @@
 #include "memoquiz.lh"
 #include "scrabsen.lh"
 
-//#include "hh_pps41_test.lh" // common test-layout - use external artwork
+#include "hh_pps41_test.lh" // common test-layout - use external artwork
 
 
 class hh_pps41_state : public driver_device
@@ -86,7 +87,8 @@ u8 hh_pps41_state::read_inputs(int columns)
 		if (m_inp_mux >> i & 1)
 			ret |= m_inputs[i]->read();
 
-	return ret;
+	// active low by default
+	return ~ret;
 }
 
 
@@ -98,6 +100,96 @@ u8 hh_pps41_state::read_inputs(int columns)
 ***************************************************************************/
 
 namespace {
+
+/***************************************************************************
+
+  Fonas Tri-1
+  * MM78 MCU variant with 40 pins (label ?, die label A7859)
+  * 4 7seg leds, 41 other leds, 1-bit sound
+
+***************************************************************************/
+
+class ftri1_state : public hh_pps41_state
+{
+public:
+	ftri1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_pps41_state(mconfig, type, tag)
+	{ }
+
+	void update_display();
+	void write_d(u16 data);
+	void write_r(u8 data);
+	void ftri1(machine_config &config);
+};
+
+// handlers
+
+void ftri1_state::update_display()
+{
+	m_display->matrix((m_d << 4 & 0x100) | (~m_r & 0xff), bitswap<8>(m_d, 2,5,8,0,1,3,7,6));
+}
+
+void ftri1_state::write_d(u16 data)
+{
+	// DIO0-DIO3, DIO5-DIO8: digit/led data
+	// DIO4: another led select
+	m_d = data;
+	update_display();
+
+	// DIO9: speaker out
+	m_speaker->level_w(BIT(data, 9));
+}
+
+void ftri1_state::write_r(u8 data)
+{
+	// RIO1-RIO8: digit/led select
+	m_r = data;
+	update_display();
+}
+
+// config
+
+static INPUT_PORTS_START( ftri1 )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8)
+INPUT_PORTS_END
+
+void ftri1_state::ftri1(machine_config &config)
+{
+	/* basic machine hardware */
+	MM78(config, m_maincpu, 600000); // approximation
+	m_maincpu->write_d().set(FUNC(ftri1_state::write_d));
+	m_maincpu->write_r().set(FUNC(ftri1_state::write_r));
+	m_maincpu->read_p().set_ioport("IN.0");
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0xff, 0x7f);
+	config.set_default_layout(layout_hh_pps41_test);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( ftri1 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "ftri1.bin", 0x0000, 0x0800, CRC(3c957f1d) SHA1(42db81a78bbef971a84e61a26d91f7411980d79c) )
+ROM_END
+
+
+
+
 
 /***************************************************************************
 
@@ -150,7 +242,7 @@ void mastmind_state::write_r(u8 data)
 u8 mastmind_state::read_p()
 {
 	// PI1-PI4: multiplexed inputs
-	return ~read_inputs(4);
+	return read_inputs(4);
 }
 
 // config
@@ -184,7 +276,7 @@ INPUT_PORTS_END
 void mastmind_state::mastmind(machine_config &config)
 {
 	/* basic machine hardware */
-	MM75(config, m_maincpu, 90000); // approximation
+	MM75(config, m_maincpu, 700000); // approximation
 	m_maincpu->write_d().set(FUNC(mastmind_state::write_d));
 	m_maincpu->write_r().set(FUNC(mastmind_state::write_r));
 	m_maincpu->read_p().set(FUNC(mastmind_state::read_p));
@@ -282,7 +374,7 @@ void memoquiz_state::write_r(u8 data)
 u8 memoquiz_state::read_p()
 {
 	// PI1-PI4: multiplexed inputs
-	return ~read_inputs(4);
+	return read_inputs(4);
 }
 
 // config
@@ -322,7 +414,7 @@ INPUT_PORTS_END
 void memoquiz_state::memoquiz(machine_config &config)
 {
 	/* basic machine hardware */
-	MM75(config, m_maincpu, 90000); // approximation
+	MM75(config, m_maincpu, 700000); // approximation
 	m_maincpu->write_d().set(FUNC(memoquiz_state::write_d));
 	m_maincpu->write_r().set(FUNC(memoquiz_state::write_r));
 	m_maincpu->read_p().set(FUNC(memoquiz_state::read_p));
@@ -412,7 +504,7 @@ void scrabsen_state::write_r(u8 data)
 u8 scrabsen_state::read_p()
 {
 	// PI1-PI7: multiplexed inputs
-	return ~read_inputs(5);
+	return read_inputs(5);
 }
 
 // config
@@ -477,7 +569,7 @@ INPUT_PORTS_END
 void scrabsen_state::scrabsen(machine_config &config)
 {
 	/* basic machine hardware */
-	MM76EL(config, m_maincpu, 95000); // approximation
+	MM76EL(config, m_maincpu, 750000); // approximation
 	m_maincpu->write_d().set(FUNC(scrabsen_state::write_d));
 	m_maincpu->write_r().set(FUNC(scrabsen_state::write_r));
 	m_maincpu->read_p().set(FUNC(scrabsen_state::read_p));
@@ -513,6 +605,8 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT  CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1979, ftri1,    0,       0, ftri1,    ftri1,    ftri1_state,    empty_init, "Fonas", "Tri-1 (Fonas)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+
 CONS( 1979, mastmind, 0,       0, mastmind, mastmind, mastmind_state, empty_init, "Invicta Plastics", "Electronic Master Mind (Invicta)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 CONS( 1978, memoquiz, 0,       0, memoquiz, memoquiz, memoquiz_state, empty_init, "M.E.M. Belgium", "Memoquiz", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

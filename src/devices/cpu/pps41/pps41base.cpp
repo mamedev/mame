@@ -23,6 +23,10 @@ Part numbers:
 "spider" = 2 rows of pins on each side, just like standard PPS-4 CPUs.
 "L" main difference is low-power
 
+Internal clock is 4-phase (4 subcycles per 1-byte opcode), and when running
+from an external oscillator, it is divided by 2 first. It also has an internal
+oscillator which can be enabled up with a resistor to VC.
+
 References:
 - Series MM76 Product Description
 - Series MM77 Product Description
@@ -117,7 +121,7 @@ void pps41_base_device::device_start()
 
 	m_s = 0;
 	m_sdi = 0;
-	m_sclock_in = 0;
+	m_sclock_in = 1;
 	m_sclock_count = 0;
 	m_ss_pending = false;
 
@@ -125,7 +129,7 @@ void pps41_base_device::device_start()
 	m_d_mask = (1 << m_d_pins) - 1;
 	m_d_output = 0;
 	m_r_output = 0;
-	m_int_line[0] = m_int_line[1] = 0;
+	m_int_line[0] = m_int_line[1] = 1; // GND = 1
 	m_int_ff[0] = m_int_ff[1] = 0;
 
 	// register for savestates
@@ -255,7 +259,7 @@ void pps41_base_device::execute_set_input(int line, int state)
 
 void pps41_base_device::cycle()
 {
-	m_icount--;
+	m_icount -= 4;
 
 	// clock serial i/o
 	m_ss_pending = m_ss_pending || bool(m_sclock_count & 1);
