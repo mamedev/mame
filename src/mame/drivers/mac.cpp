@@ -739,23 +739,26 @@ void mac_state::add_base_devices(machine_config &config, bool rtc, int woz_versi
 	switch (woz_version) {
 	case 0:
 		IWM(config, m_fdc, C15M);
+		m_fdc->devsel_cb().set(FUNC(mac_state::devsel_w));
 		break;
 	case 1:
 		SWIM1(config, m_fdc, C15M);
+		m_fdc->devsel_cb().set(FUNC(mac_state::devsel_w));
 		break;
 	case 2:
 		SWIM2(config, m_fdc, C15M);
 		m_fdc->hdsel_cb().set(FUNC(mac_state::hdsel_w));
+		m_fdc->devsel_cb().set(FUNC(mac_state::devsel_w));
 		break;
 	case 3:
 		SWIM3(config, m_fdc, C15M);
-		m_fdc->hdsel_cb().set(FUNC(mac_state::hdsel_w));
+		m_fdc->hdsel_cb().set(FUNC(mac_state::hdsel_s3_w));
+		m_fdc->devsel_cb().set(FUNC(mac_state::devsel_s3_w));
 		break;
 	}
 
 	m_fdc->phases_cb().set(FUNC(mac_state::phases_w));
 	m_fdc->sel35_cb().set(FUNC(mac_state::sel35_w));
-	m_fdc->devsel_cb().set(FUNC(mac_state::devsel_w));
 
 	if (woz_version == 0)
 	{
