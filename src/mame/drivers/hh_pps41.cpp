@@ -17,11 +17,12 @@
 #include "speaker.h"
 
 // internal artwork
+#include "ftri1.lh"
 #include "mastmind.lh"
 #include "memoquiz.lh"
 #include "scrabsen.lh"
 
-#include "hh_pps41_test.lh" // common test-layout - use external artwork
+//#include "hh_pps41_test.lh" // common test-layout - use external artwork
 
 
 class hh_pps41_state : public driver_device
@@ -48,6 +49,7 @@ public:
 	u8 m_r = ~0;
 
 	u8 read_inputs(int columns);
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 protected:
 	virtual void update_int() { ; }
@@ -91,6 +93,12 @@ u8 hh_pps41_state::read_inputs(int columns)
 	return ~ret;
 }
 
+INPUT_CHANGED_MEMBER(hh_pps41_state::reset_button)
+{
+	// when an input is directly wired to MCU PO pin
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
 
 
 /***************************************************************************
@@ -104,8 +112,16 @@ namespace {
 /***************************************************************************
 
   Fonas Tri-1
-  * MM78 MCU variant with 40 pins (label ?, die label A7859)
+  * PCB label: CASSIA CA010-F
+  * MM78 MCU variant with 40 pins (no label, die label A7859)
   * 4 7seg leds, 41 other leds, 1-bit sound
+
+  The game only uses 1.5KB ROM and seems it doesn't use all the RAM either,
+  as if it was programmed for MM77L.
+
+  Hold all 4 buttons at boot (not counting RESET) for a led test.
+  Cassia was Eric White/Ken Cohen's company, later named CXG, known for
+  their chess computers.
 
 ***************************************************************************/
 
@@ -126,13 +142,12 @@ public:
 
 void ftri1_state::update_display()
 {
-	m_display->matrix((m_d << 4 & 0x100) | (~m_r & 0xff), bitswap<8>(m_d, 2,5,8,0,1,3,7,6));
+	m_display->matrix(m_d, bitswap<8>(~m_r, 0,7,6,5,4,3,2,1));
 }
 
 void ftri1_state::write_d(u16 data)
 {
-	// DIO0-DIO3, DIO5-DIO8: digit/led data
-	// DIO4: another led select
+	// DIO0-DIO8: digit/led select
 	m_d = data;
 	update_display();
 
@@ -142,7 +157,7 @@ void ftri1_state::write_d(u16 data)
 
 void ftri1_state::write_r(u8 data)
 {
-	// RIO1-RIO8: digit/led select
+	// RIO1-RIO8: digit/led data
 	m_r = data;
 	update_display();
 }
@@ -151,14 +166,19 @@ void ftri1_state::write_r(u8 data)
 
 static INPUT_PORTS_START( ftri1 )
 	PORT_START("IN.0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x0c, 0x04, "Game" )
+	PORT_CONFSETTING(    0x08, "Star Chase" )
+	PORT_CONFSETTING(    0x04, "All Star Baseball" )
+	PORT_CONFSETTING(    0x00, "Batting Champs" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Score / S1 H")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Steal / S1 V")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Pitch / S2 H")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Swing / S2 V")
+
+	PORT_START("RESET")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_pps41_state, reset_button, 0) PORT_CODE(KEYCODE_F1) PORT_NAME("Game Reset")
 INPUT_PORTS_END
 
 void ftri1_state::ftri1(machine_config &config)
@@ -171,8 +191,8 @@ void ftri1_state::ftri1(machine_config &config)
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(9, 8);
-	m_display->set_segmask(0xff, 0x7f);
-	config.set_default_layout(layout_hh_pps41_test);
+	m_display->set_segmask(0x1e0, 0x7f);
+	config.set_default_layout(layout_ftri1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -184,7 +204,7 @@ void ftri1_state::ftri1(machine_config &config)
 
 ROM_START( ftri1 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "ftri1.bin", 0x0000, 0x0800, CRC(3c957f1d) SHA1(42db81a78bbef971a84e61a26d91f7411980d79c) )
+	ROM_LOAD( "a7859", 0x0000, 0x0800, CRC(3c957f1d) SHA1(42db81a78bbef971a84e61a26d91f7411980d79c) )
 ROM_END
 
 
@@ -605,7 +625,7 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT  CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, ftri1,    0,       0, ftri1,    ftri1,    ftri1_state,    empty_init, "Fonas", "Tri-1 (Fonas)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1979, ftri1,    0,       0, ftri1,    ftri1,    ftri1_state,    empty_init, "Fonas", "Tri-1 (Fonas)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1979, mastmind, 0,       0, mastmind, mastmind, mastmind_state, empty_init, "Invicta Plastics", "Electronic Master Mind (Invicta)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
