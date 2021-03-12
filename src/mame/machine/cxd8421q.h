@@ -3,6 +3,14 @@
 
 /*
  * Sony CXD8421Q WSC-ESCC1 Serial Controller AP-Bus Interface
+ *
+ * Only the direct passthrough to the ESCC is working. However, the monitor ROM only uses the
+ * passthrough capability, so this actually is all that is needed to get to the monitor ROM prompt.
+ *
+ * TODO:
+ *  - ESCC1 control and status registers
+ *  - FIFOs, timers, etc.
+ *  - Clock handling for the ESCC1 (the ESCC itself has a 9.8304MHz crystal)
  */
 
 #ifndef MAME_MACHINE_CXD8421Q_H

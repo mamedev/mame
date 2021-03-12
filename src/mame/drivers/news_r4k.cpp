@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Brice Onken, based on Patrick Mackinlay's NEWS 68k and r3k emulators
+// copyright-holders:Brice Onken
 // thanks-to:Patrick Mackinlay
 
 /*
@@ -11,7 +11,7 @@
  *   - https://web.archive.org/web/20170202100940/www3.videa.or.jp/NEWS/
  *   - https://github.com/NetBSD/src/tree/trunk/sys/arch/newsmips
  *   - https://github.com/briceonk/news-os
- * 
+ *
  *  CPU configuration:
  *	- CPU card has a 75MHz crystal, multiplier (if any) TBD
  *	- PRId = 0x450
@@ -37,7 +37,7 @@
  *  	[3]     CU = 1 (SC uses cacheable coherent update on write)
  *  	[2:0]   K0 = 7 (cache coherency algo, 7 is reserved)
  *	- Known R4400 config differences between this driver and the physical platform:
- *      - emulated R4400 sets revision to 40 instead of 50. The user manual warns against using the revision field of PRId 
+ *      - emulated R4400 sets revision to 40 instead of 50. The user manual warns against using the revision field of PRId
  *        in software, so hopefully that won't cause any deltas in behavior before that can be configured.
  *		- emulated SM (Dirty Shared state) is on by default - however, is SM actually being emulated?
  *		- emulated CU and K0 are all 0 instead of all 1 like on the physical platform. Unlike SM, software can set these.
@@ -97,7 +97,6 @@
 
 // MAME infra includes
 #include "debugger.h"
-#define VERBOSE 1
 #include "logmacro.h"
 
 // Uncomment to use "accurate" freerun_timer (too slow??)
@@ -185,6 +184,7 @@ protected:
     template <irq4_number Number>
     void irq_w(int state) { generic_irq_w(4, Number, state); }
     void int_check();
+
 #ifndef NO_MIPS3
     const int interrupt_map[6] = {MIPS3_IRQ0, MIPS3_IRQ1, MIPS3_IRQ2, MIPS3_IRQ3, MIPS3_IRQ4, MIPS3_IRQ5};
 #else
@@ -210,7 +210,6 @@ protected:
     // SONIC ethernet controller - a different rev, the DP83932C, is emulated in MAME
     // so it hopefully will work with just a little modification.
     // required_device<dp83932c_device> m_net;
-    // std::unique_ptr<u16[]> m_net_ram;
 
     // National Semiconductor PC8477B floppy controller
     required_device<pc8477a_device> m_fdc;
@@ -245,7 +244,7 @@ protected:
     uint32_t freerun_r(offs_t offset);
     void freerun_w(offs_t offset, uint32_t data);
 
-    // APBus control (will be split into a device eventually)
+    // APBus control (should be split into a device eventually)
     uint8_t apbus_cmd_r(offs_t offset);
     void apbus_cmd_w(offs_t offset, uint32_t data);
 
@@ -264,12 +263,22 @@ protected:
     void debug_ram_w(offs_t offset, uint8_t data);
 };
 
+/*
+ * news_scsi_devices
+ *
+ * Declares the SCSI devices supported by this driver.
+ */
 static void news_scsi_devices(device_slot_interface &device)
 {
     device.option_add("harddisk", NSCSI_HARDDISK);
     device.option_add("cdrom", NSCSI_CDROM);
 }
 
+/*
+ * machine_common
+ *
+ * Creates an emulated R4400-based NEWS platform.
+ */
 void news_r4k_state::machine_common(machine_config &config)
 {
     // CPU setup
@@ -308,24 +317,19 @@ void news_r4k_state::machine_common(machine_config &config)
     // TODO: find out the difference between B and A - only A is emulated in MAME ATM
     // TODO: frequency? datasheet implies only 24MHz is valid. There is a 24MHz crystal on the I/O board, so this is probably right
     //       but it needs to be confirmed before locking it in with the XTAL macro
+    // TODO: interrupts
     PC8477A(config, m_fdc, 24'000'000, pc8477a_device::mode_t::PS2);
-    /*
-    TODO: how does AP-bus/FIFO chip/etc deal with interrupts?
-    m_fdc->intrq_wr_callback().set(m_dmac, FUNC(dmac3_device::irq<1>));
-	m_fdc->drq_wr_callback().set(m_dmac, FUNC(dmac3_device::drq<1>));
-    */
     FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
     // DMA controller
+    // TODO: interrupts, join bus, etc.
     DMAC3(config, m_dmac, 0);
-    m_dmac->set_bus(m_cpu, 0);
-    m_dmac->out_int_cb().set(FUNC(news_r4k_state::irq_w<DMAC>));
 
     // Create SCSI buses
     NSCSI_BUS(config, m_scsibus0);
     NSCSI_BUS(config, m_scsibus1);
 
-    // Create SCSI connectors
+    // Create SCSI connectors (bus 0)
     NSCSI_CONNECTOR(config, "scsi0:0", news_scsi_devices, nullptr);
     NSCSI_CONNECTOR(config, "scsi0:1", news_scsi_devices, nullptr);
     NSCSI_CONNECTOR(config, "scsi0:2", news_scsi_devices, nullptr);
@@ -333,6 +337,8 @@ void news_r4k_state::machine_common(machine_config &config)
     NSCSI_CONNECTOR(config, "scsi0:4", news_scsi_devices, nullptr);
     NSCSI_CONNECTOR(config, "scsi0:5", news_scsi_devices, nullptr);
     NSCSI_CONNECTOR(config, "scsi0:6", news_scsi_devices, nullptr);
+
+    // Create SCSI connectors (bus 1)
     NSCSI_CONNECTOR(config, "scsi1:0", news_scsi_devices, nullptr);
     NSCSI_CONNECTOR(config, "scsi1:1", news_scsi_devices, nullptr);
     NSCSI_CONNECTOR(config, "scsi1:2", news_scsi_devices, nullptr);
@@ -342,20 +348,16 @@ void news_r4k_state::machine_common(machine_config &config)
     NSCSI_CONNECTOR(config, "scsi1:6", news_scsi_devices, nullptr);
 
     // Connect SPIFI3s to the buses
-    NSCSI_CONNECTOR(config, "scsi0:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config([this](device_t *device) {
-        // TODO: Actual clock and SCSI config (see news_r3k for what this might look like in the future)
-    });
-
-    NSCSI_CONNECTOR(config, "scsi1:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config([this](device_t *device) {
-        // TODO: Actual clock and SCSI config (see news_r3k for what this might look like in the future)
-    });
+    // TODO: Actual clock and SCSI config (see news_r3k for what this might look like in the future)
+    NSCSI_CONNECTOR(config, "scsi0:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config([this](device_t *device) { });
+    NSCSI_CONNECTOR(config, "scsi1:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config([this](device_t *device) { });
 }
 
 void news_r4k_state::nws5000x(machine_config &config) { machine_common(config); }
 
 /*
  * cpu_map
- * 
+ *
  * Assign the address map for the CPU
  * References:
  *  - https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/include/adrsmap.h
@@ -393,13 +395,8 @@ void news_r4k_state::cpu_map(address_map &map)
     // WSC-ESCC1 (CXD8421Q) serial controller
     map(0x1e940000, 0x1e94000f).rw(m_escc, FUNC(cxd8421q_device::ch_read<cxd8421q_device::CHB>), FUNC(cxd8421q_device::ch_write<cxd8421q_device::CHB>));
     map(0x1e950000, 0x1e95000f).rw(m_escc, FUNC(cxd8421q_device::ch_read<cxd8421q_device::CHA>), FUNC(cxd8421q_device::ch_write<cxd8421q_device::CHA>));
-    // TODO: FIFO mapping
 
-    // Sonic network controller
-    // Potential references: https://git.qemu.org/?p=qemu.git;a=blob;f=hw/net/dp8393x.c;h=674b04b3547cdf312620a13c2f183e0ecfab24fb;hb=HEAD
-    //                       https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/if_sn_ap.c
-    //                       https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/if_snreg.h
-    // map(0x1e600000, 0x1e600000);
+    // TODO: SONIC network controller (0x1e600000)
 
     // DMAC3 DMA Controller
     map(0x14c20000, 0x14c3ffff).m(m_dmac, FUNC(dmac3_device::map_dma_ram));
@@ -412,25 +409,21 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1e280000, 0x1e2800ff).m(m_scsi0, FUNC(spifi3_device::map)); // TODO: actual end address, need command buffer space too
     map(0x1e380000, 0x1e3800ff).m(m_scsi1, FUNC(spifi3_device::map)); // TODO: actual end address, need command buffer space too
 
-    // xb (Sony DSC-39 video card)
-    // map(0x14900000, 0x14900000);
+    // TODO: DSC-39 xb framebuffer/video card (0x14900000)
 
-    // sb (AIF5 audio + FIFO transfer + MB87077 volume)
-    // map(0x1ed00000, 0x1ed00000);
+    // TODO: sb sound subsystem (0x1ed00000)
 
     // HID (kb + ms)
     map(0x1f900000, 0x1f900027).m(m_hid, FUNC(news_hid_hle_device::map_apbus));
 
-    // lp (printer port??)
-    // map(0x1ed30000, 0x1ed30000);
+    // TODO: lp (0x1ed30000)
 
-    // fd (floppy disk) - note that the FIFO address is here.
-    // map(0x1ed20000, 0x1ed20000);
+    // TODO: fd (floppy disk) FIFO (0x1ed20000)
+
     // fd controller register mapping
-    // to be fully hardware accurate, these shouldn't be umasked.
+    // TODO: to be hardware accurate, these shouldn't be umasked.
     // instead, they should be duplicated across each 32-bit segment to emulate the open address lines
     // (i.e. status register A and B values of 56 c0 look like 56565656 c0c0c0c0)
-    // but, anything that uses these *should* just use the LSBs (famous last words)
     map(0x1ed60000, 0x1ed6001f).m(m_fdc, FUNC(pc8477a_device::map)).umask32(0x000000ff);
     map(0x1ed60200, 0x1ed6020f).noprw(); // TODO: Floppy aux registers
 
@@ -453,8 +446,10 @@ void news_r4k_state::cpu_map_debug(address_map &map)
     // (like `ss -r` not showing the register values if it is dumping them to memory before printing them perhaps)
     // that might be related. I also still don't know if there is actually some magic going on with the memory map,
     // or if I am just not smart enough to figure out the "real" mapping that would make everything just work.
-    // At least it is progress :)
     map(0x0, 0x7ffffff).rw(FUNC(news_r4k_state::debug_ram_r), FUNC(news_r4k_state::debug_ram_w));
+
+    // Data around this range might influence the memory configuration
+    // map(0x14400004, 0x14400007).lr32(NAME([this](offs_t offset) { return 0x3ff17; }));
     map(0x1440003c, 0x1440003f).lw32(NAME([this](offs_t offset, uint32_t data) {
         if (data == 0x10001)
         {
@@ -468,9 +463,6 @@ void news_r4k_state::cpu_map_debug(address_map &map)
         }
     }));
 
-    // I have suspicions about addresses near these playing into the memory configuration
-    //map(0x14400004, 0x14400007).lr32(NAME([this](offs_t offset) { return 0x3ff17; }));
-
     // APbus region
     map(0x1f520000, 0x1f520013).rw(FUNC(news_r4k_state::apbus_cmd_r), FUNC(news_r4k_state::apbus_cmd_w));
     // 0x14c00000-0x14c40000 also has APbus stuff
@@ -479,13 +471,20 @@ void news_r4k_state::cpu_map_debug(address_map &map)
                                        // It is also the only RAM avaliable if "no memory mode" is set (DIP switch #8)
 
     // More onboard devices that needs to be mapped for the platform to boot
-    map(0x1fe00000, 0x1fffffff).ram(); // determine mirror of this RAM - it is smaller than this size
+    map(0x1fe00000, 0x1fffffff).ram(); // determine mirror of this RAM - it is probably smaller than this size
     map(0x1f3e0000, 0x1f3efff0).lr8(NAME([this](offs_t offset) {
             if (offset % 4 == 2) { return 0x6f; }
             else if (offset % 4 == 3) { return 0xe0; }
-            else { return 0x0;} })); // monitor ROM doesn't boot without this
+            else { return 0x0;}
+    })); // monitor ROM doesn't boot without this
 }
 
+/*
+ * debug_ram_r
+ *
+ * Method that returns the byte at `offset` in main memory. Hopefully the need for this method will disappear once
+ * the memory mapping setup for the main memory is fully understood.
+ */
 uint8_t news_r4k_state::debug_ram_r(offs_t offset)
 {
     uint8_t result = 0xff;
@@ -500,6 +499,12 @@ uint8_t news_r4k_state::debug_ram_r(offs_t offset)
     return result;
 }
 
+/*
+ * debug_ram_w
+ *
+ * Method that writes the byte `data` at `offset` in main memory. Hopefully the need for this method will disappear once
+ * the memory mapping setup for the main memory is fully understood.
+ */
 void news_r4k_state::debug_ram_w(offs_t offset, uint8_t data)
 {
     if ((offset <= 0x1ffffff) || (map_shift && offset <= 0x3ffffff) || (!map_shift && offset >= 0x7f00000))
@@ -512,6 +517,11 @@ void news_r4k_state::debug_ram_w(offs_t offset, uint8_t data)
     }
 }
 
+/*
+ * machine_start
+ *
+ * Initialization method called when the machine first starts.
+ */
 void news_r4k_state::machine_start()
 {
     // Init front panel LEDs
@@ -527,27 +537,53 @@ void news_r4k_state::machine_start()
     m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
 }
 
-TIMER_CALLBACK_MEMBER(news_r4k_state::freerun_clock) { freerun_timer_val++; }
+/*
+ * freerun_clock
+ *
+ * Method to handle a tick of the freerunning clock.
+ */
+TIMER_CALLBACK_MEMBER(news_r4k_state::freerun_clock)
+{
+    freerun_timer_val++;
+}
 
+/*
+ * machine_reset
+ *
+ * Method called whenever the machine is reset.
+ */
 void news_r4k_state::machine_reset()
 {
     freerun_timer_val = 0;
     m_freerun_timer->adjust(attotime::zero, 0, attotime::from_hz(FREERUN_FREQUENCY));
 }
 
+/*
+ * init_common
+ *
+ * Initialization method called when the machine first starts.
+ */
 void news_r4k_state::init_common()
 {
     // map the configured ram (temporarily not using this)
     //m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
-    //m_cpu->space(0).install_ram(0x03f00000, 0x3f00000 + m_ram->mask(), m_ram->pointer());
-    //m_cpu->space(0).install_ram(0x07f00000, 0x7f00000 + m_ram->mask(), m_ram->pointer());
 }
 
+/*
+ * init_nws5000x
+ *
+ * Initialization method specific to the NWS-5000X emulation.
+ */
 void news_r4k_state::init_nws5000x()
 {
     init_common();
 }
 
+/*
+ * front_panel_r
+ *
+ * Method to read the state of the front panel DIP switches.
+ */
 uint64_t news_r4k_state::front_panel_r(offs_t offset)
 {
     ioport_value dipsw = this->ioport("FRONT_PANEL")->read();
@@ -555,6 +591,11 @@ uint64_t news_r4k_state::front_panel_r(offs_t offset)
     return ((uint64_t)dipsw << 32) | dipsw;
 }
 
+/*
+ * led_state_w
+ *
+ * Sets and logs the status of the front panel LEDs.
+ */
 void news_r4k_state::led_state_w(offs_t offset, uint32_t data)
 {
     if (m_led[offset] != data)
@@ -564,12 +605,15 @@ void news_r4k_state::led_state_w(offs_t offset, uint32_t data)
     }
 }
 
+/*
+ * apbus_cmd_r
+ *
+ * Emulates a call to the APbus controller (placeholder)
+ */
 uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
 {
     // Hack to get the monitor ROM to boot.
-    // This is pretending to be fully initialized.
-    // Needless to say, that might be causing problems with the monitor
-    // but this is enough for it to boot to the monitor shell
+    // Needless to say, that might be causing problems, but this is enough for it to boot to the monitor shell
     uint8_t value = 0x0;
     if (offset == 7)
     {
@@ -587,10 +631,16 @@ uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
     {
         value = 0x32;
     }
+
     LOG("APBus read triggered at offset 0x%x, returing 0x%x\n", offset, value);
     return value;
 }
 
+/*
+ * apbus_cmd_w
+ *
+ * Emulates a call to the APbus controller (placeholder)
+ */
 void news_r4k_state::apbus_cmd_w(offs_t offset, uint32_t data)
 {
     // map(0x1f520004, 0x1f520007); // WBFLUSH
@@ -606,11 +656,16 @@ void news_r4k_state::apbus_cmd_w(offs_t offset, uint32_t data)
     LOG("AP-Bus command called, offset 0x%x, set to 0x%x\n", offset, data);
 }
 
+/*
+ * freerun_r
+ *
+ * Get the current value of the freerunning clock
+ */
 uint32_t news_r4k_state::freerun_r(offs_t offset)
 {
     // With an unscientific method, I calculated the timer value to increment roughly once per us
     // NetBSD source code seems to corroborate this (https://github.com/NetBSD/src/blob/229cf3aa2cda57ba5f0c244a75ae83090e59c716/sys/arch/newsmips/newsmips/news5000.c#L259)
-    // The timer callback seemed to be too slow (although I could easily be doing something wrong)
+    // The timer callback seemed to be too slow (although this is likely a sign that there is something wrong with how this is handled)
 #ifdef USE_ACCURATE_FREERUN
     return freerun_timer_val;
 #else
@@ -618,12 +673,22 @@ uint32_t news_r4k_state::freerun_r(offs_t offset)
 #endif
 }
 
+/*
+ * freerun_w
+ *
+ * Set the current value of the freerunning clock
+ */
 void news_r4k_state::freerun_w(offs_t offset, uint32_t data)
 {
     LOG("freerun_w: Set freerun timer to 0x%x\n", data);
     freerun_timer_val = data;
 }
 
+/*
+ * inten_w
+ *
+ * Update the enable status of the interrupt indicated by `offset`.
+ */
 void news_r4k_state::inten_w(offs_t offset, uint32_t data)
 {
     LOG("inten_w: INTEN%d = 0x%x\n", offset, data);
@@ -631,18 +696,33 @@ void news_r4k_state::inten_w(offs_t offset, uint32_t data)
     int_check();
 }
 
+/*
+ * inten_r
+ *
+ * Get the enable status of the interrupt indicated by `offset`.
+ */
 uint32_t news_r4k_state::inten_r(offs_t offset)
 {
     LOG("inten_r: INTEN%d = 0x%x\n", offset, m_inten[offset]);
     return m_inten[offset];
 }
 
+/*
+ * intst_r
+ *
+ * Get the status of the interrupt indicated by `offset`.
+ */
 uint32_t news_r4k_state::intst_r(offs_t offset)
 {
     LOG("intst_r: INTST%d = 0x%x\n", offset, m_intst[offset]);
     return m_intst[offset];
 }
 
+/*
+ * generic_irq_w
+ *
+ * Set or clear the provided interrupt using `mask`.
+ */
 void news_r4k_state::generic_irq_w(uint32_t irq, uint32_t mask, int state)
 {
     LOG("generic_irq_w: INTST%d IRQ %d set to %d\n", irq, mask, state);
@@ -657,6 +737,11 @@ void news_r4k_state::generic_irq_w(uint32_t irq, uint32_t mask, int state)
     int_check();
 }
 
+/*
+ * intclr_w
+ *
+ * Set the clear trigger for the provided interrupt.
+ */
 void news_r4k_state::intclr_w(offs_t offset, uint32_t data)
 {
     LOG("intclr_w: INTCLR%d = 0x%x\n", offset, data);
@@ -664,6 +749,11 @@ void news_r4k_state::intclr_w(offs_t offset, uint32_t data)
     int_check();
 }
 
+/*
+ * int_check
+ *
+ * Observes the platform state and updates the R4400's interrupt lines if needed.
+ */
 void news_r4k_state::int_check()
 {
     // The R4000 has 6 hardware interrupt pins
@@ -683,7 +773,12 @@ void news_r4k_state::int_check()
     }
 }
 
-u32 news_r4k_state::bus_error()
+/*
+ * bus_error
+ *
+ * Allows ranges that trigger bus errors to be mapped.
+ */
+uint32_t news_r4k_state::bus_error()
 {
     LOG("bus_error: address access caused bus error\n");
 #ifndef NO_MIPS3 // Is there a mips3.h device equivalent?

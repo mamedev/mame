@@ -3,10 +3,13 @@
 
 /*
  * Sony CXD8421Q WSC-ESCC1 Serial Controller AP-Bus Interface
- * 
- * Only the direct passthrough to the ESCC is working. However, the monitor ROM only uses the 
+ *
+ * Only the direct passthrough to the ESCC is working. However, the monitor ROM only uses the
  * passthrough capability, so this actually is all that is needed to get to the monitor ROM prompt.
- * 
+ *
+ * Reference:
+ *  - https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/zs_ap.c
+ *
  * TODO:
  *  - ESCC1 control and status registers
  *  - FIFOs, timers, etc.
@@ -15,13 +18,12 @@
 
 #include "cxd8421q.h"
 
-#define VERBOSE 1
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(CXD8421Q, cxd8421q_device, "cxd8421q", "Sony CXD8421Q WSC-ESCC1")
 
-cxd8421q_device::cxd8421q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : 
-    device_t(mconfig, CXD8421Q, tag, owner, clock), 
+cxd8421q_device::cxd8421q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+    device_t(mconfig, CXD8421Q, tag, owner, clock),
     m_escc(*this, "escc"),
     m_serial(*this, "serial%u", 0U),
     out_irq(*this) {}
@@ -31,7 +33,7 @@ void cxd8421q_device::device_add_mconfig(machine_config &config)
     // General ESCC setup
     SCC85230(config, m_escc, 9.8304_MHz_XTAL); // 9.8304MHz per NetBSD source
     m_escc->out_int_callback().set(FUNC(cxd8421q_device::escc_irq_w));
-    
+
     RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
     m_serial[0]->cts_handler().set(m_escc, FUNC(z80scc_device::ctsa_w));
     m_serial[0]->dcd_handler().set(m_escc, FUNC(z80scc_device::dcda_w));
