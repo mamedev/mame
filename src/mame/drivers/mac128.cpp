@@ -588,7 +588,7 @@ void mac128_state::pwm_push(uint8_t data)
 			logerror("PWM index %3d duty cycle %5.1f%% rpm %f\n", internal_index, 100*duty_cycle, rpm);
 
 #if NEW_IWM
-			if (m_cur_floppy)
+			if (m_cur_floppy && m_cur_floppy->type() == OAD34V)
 			{
 				m_iwm->sync();
 				m_cur_floppy->set_rpm(rpm);
@@ -995,7 +995,8 @@ void mac128_state::devsel_w(uint8_t devsel)
 	if (m_cur_floppy)
 	{
 		m_cur_floppy->ss_w(m_hdsel);
-		m_cur_floppy->set_rpm(m_pwm_current_rpm[1]);
+		if (m_cur_floppy->type() == OAD34V)
+			m_cur_floppy->set_rpm(m_pwm_current_rpm[1]);
 	}
 }
 

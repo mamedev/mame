@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 #include "plib/pstring.h"
 #include "plib/pmain.h"
@@ -785,7 +785,7 @@ int nlwav_app::execute()
 		pout(
 			"nlwav (netlist) 0.1\n"
 			"Copyright (C) 2021 Couriersud\n"
-			"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
+			"License BSD-3-Clause\n"
 			"This is free software: you are free to change and redistribute it.\n"
 			"There is NO WARRANTY, to the extent permitted by law.\n\n"
 			"Written by Couriersud.\n");

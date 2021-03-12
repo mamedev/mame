@@ -27,11 +27,12 @@ public:
 	virtual ~menu_control_floppy_image() override;
 
 private:
-	enum { SELECT_FORMAT = LAST_ID, SELECT_MEDIA, SELECT_RW };
+	enum { SELECT_FORMAT = LAST_ID, SELECT_MEDIA, SELECT_INIT, SELECT_RW };
 
 	floppy_image_device &fd;
 	std::unique_ptr<floppy_image_format_t * []> format_array;
 	floppy_image_format_t *input_format, *output_format;
+	const floppy_image_device::fs_info *create_fs;
 	std::string input_filename, output_filename;
 
 	virtual void handle() override;

@@ -87,6 +87,9 @@ public:
 		m_digits(*this, "digit%u", 0U)
 	{ }
 
+	// turn on for hardcoded video debugging inputs
+	static constexpr bool DEBUG_KEYS = false;
+
 	//static constexpr XTAL CPU_CLOCK = XTAL(60'000'000);
 	static constexpr int BEAM_DY = 3;
 	static constexpr int BEAM_DX = 3;

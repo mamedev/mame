@@ -6956,7 +6956,7 @@ ROM_END
 
 /***************************************************************************
 
-  Tiger Home Alone (model 78-???)
+  Tiger Home Alone (model 78-502)
   * Sharp SM510 under epoxy (die label MC7)
   * lcd screen with custom segments, 1-bit sound
 

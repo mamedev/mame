@@ -1215,26 +1215,11 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 			machine().set_ui_active(!machine().ui_active());
 
 			// display a popup indicating the new status
+			std::string const name = machine().input().seq_name(machine().ioport().type_seq(IPT_UI_TOGGLE_UI));
 			if (machine().ui_active())
-			{
-				popup_time(2, "%s\n%s\n%s\n%s\n%s\n%s\n",
-					_("Keyboard Emulation Status"),
-					"-------------------------",
-					_("Mode: PARTIAL Emulation"),
-					_("UI:   Enabled"),
-					"-------------------------",
-					_("**Use ScrLock to toggle**"));
-			}
+				popup_time(2, _("UI controls enabled\nUse %1$s to toggle"), name);
 			else
-			{
-				popup_time(2, "%s\n%s\n%s\n%s\n%s\n%s\n",
-					_("Keyboard Emulation Status"),
-					"-------------------------",
-					_("Mode: FULL Emulation"),
-					_("UI:   Disabled"),
-					"-------------------------",
-					_("**Use ScrLock to toggle**"));
-			}
+				popup_time(2, _("UI controls disabled\nUse %1$s to toggle"), name);
 		}
 	}
 
@@ -1255,7 +1240,8 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	if (machine().ui_input().pressed(IPT_UI_TIMECODE))
 		machine().video().save_input_timecode();
 
-	if (ui_disabled) return ui_disabled;
+	if (ui_disabled)
+		return ui_disabled;
 
 	if (machine().ui_input().pressed(IPT_UI_CANCEL))
 	{

@@ -100,8 +100,8 @@ function cheat.startplugin()
 				filename = emu.softname():gsub(":", "/")
 			else
 				for name, image in pairs(manager.machine.images) do
-					if image:exists() and image:software_list_name() ~= "" then
-						filename = image:software_list_name() .. "/" .. emu.softname()
+					if image.exists and image.software_list_name ~= "" then
+						filename = image.software_list_name .. "/" .. emu.softname()
 					end
 				end
 			end

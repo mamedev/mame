@@ -78,6 +78,9 @@ void swim2_device::set_floppy(floppy_image_device *floppy)
 	if(m_floppy == floppy)
 		return;
 
+	sync();
+	flush_write();
+
 	m_floppy = floppy;
 	update_phases();
 	m_hdsel_cb((m_mode >> 5) & 1);
@@ -111,6 +114,7 @@ void swim2_device::flush_write(u64 when)
 		m_flux_write_count = 0;
 		if(last_on_edge)
 			m_flux_write[m_flux_write_count++] = when;
+		m_flux_write_start = when;
 	} else
 		m_flux_write_count = 0;
 }

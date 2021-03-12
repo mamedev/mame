@@ -1551,6 +1551,11 @@ void x68k_state::machine_start()
 	m_mouse.irqactive = false;
 	m_current_ipl = 0;
 	m_adpcm.rate = 0;
+	m_adpcm.clock = 0;
+	m_sysport.sram_writeprotect = 0;
+	m_sysport.monitor = 0;
+	m_bus_error = false;
+	m_led_state = 0;
 }
 
 void x68k_state::driver_init()

@@ -1257,9 +1257,33 @@ bool dc42_format::load(io_generic *io, uint32_t form_factor, const std::vector<u
 	uint8_t encoding = h[0x50];
 	uint8_t format = h[0x51];
 
-	if((encoding != 0x00 || format != 0x02) && (encoding != 0x01 || format != 0x22)) {
+	if((encoding != 0x00 || format != 0x02) && (encoding != 0x01 || (format != 0x22 && format != 0x24))) {
 		osd_printf_error("dc42: Unsupported encoding/format combination %02x/%02x\n", encoding, format);
 		return false;
+	}
+
+	switch (dsize)
+	{
+		case 409600:    // Mac 400K
+			image->set_form_variant(floppy_image::FF_35, floppy_image::SSDD);
+			break;
+
+		case 737280:    // PC 720K
+		case 819200:    // Mac/A2 800K
+			image->set_form_variant(floppy_image::FF_35, floppy_image::DSDD);
+			break;
+
+		case 1474560:   // PC or Mac 1.44M
+			image->set_form_variant(floppy_image::FF_35, floppy_image::DSHD);
+			break;
+
+		case 871424:    // Apple Twiggy 851KiB
+			image->set_form_variant(floppy_image::FF_525, floppy_image::DSHD);
+			break;
+
+		default:
+			osd_printf_error("dc42: dsize is %d, unknown form factor\n");
+			break;
 	}
 
 	uint8_t sector_data[(512+12)*12];
@@ -1403,7 +1427,7 @@ bool apple_gcr_format::supports_save() const
 int apple_gcr_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t size = io_generic_size(io);
-	if(size == 409600 || size == 819200)
+	if(size == 409600 || (size == 819200 && (variants.empty() || has_variant(variants, floppy_image::DSDD))))
 		return 50;
 
 	return 0;
@@ -1422,9 +1446,10 @@ bool apple_gcr_format::load(io_generic *io, uint32_t form_factor, const std::vec
 	uint64_t size = io_generic_size(io);
 	int head_count = size == 409600 ? 1 : size == 819200 ? 2 : 0;
 
+	image->set_form_variant(floppy_image::FF_35, head_count == 2 ? floppy_image::DSDD : floppy_image::SSDD);
+
 	if(!head_count)
 		return false;
-
 	for(int track=0; track < 80; track++) {
 		for(int head=0; head < head_count; head++) {
 			int ns = 12 - (track/16);
@@ -1521,8 +1546,10 @@ bool apple_2mg_format::load(io_generic *io, uint32_t form_factor, const std::vec
 	uint32_t blocks = header[0x14] | (header[0x15] << 8) | (header[0x16] << 16) | (header[0x17] << 24);
 	uint32_t pos_data = header[0x18] | (header[0x19] << 8) | (header[0x1a] << 16) | (header[0x1b] << 24);
 
-	if(blocks != 1600)
+	if(blocks != 1600 && blocks != 16390)
 		return false;
+
+	image->set_form_variant(floppy_image::FF_35, (blocks > 800) ? floppy_image::DSDD : floppy_image::SSDD);
 
 	for(int track=0; track < 80; track++) {
 		for(int head=0; head < 2; head++) {
