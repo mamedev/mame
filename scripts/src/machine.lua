@@ -4669,6 +4669,17 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/mv_sonora.h,MACHINES["MAC_VIDEO_SONORA"] = true
+---------------------------------------------------
+if (MACHINES["MAC_VIDEO_SONORA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mv_sonora.cpp",
+		MAME_DIR .. "src/devices/machine/mv_sonora.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/alpha_8921.h,MACHINES["ALPHA_8921"] = true
 ---------------------------------------------------
 if (MACHINES["ALPHA_8921"]~=null) then

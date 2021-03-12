@@ -65,7 +65,6 @@
 #include "machine/iwm.h"
 #include "machine/swim1.h"
 #include "machine/swim2.h"
-#include "machine/swim3.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsihd.h"
 #include "bus/scsi/scsicd.h"
@@ -644,33 +643,6 @@ void mac_state::maciifx_map(address_map &map)
 	map(0x50040000, 0x50041fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
 }
 
-void mac_state::pwrmac_map(address_map &map)
-{
-	map(0x00000000, 0x007fffff).ram().share("vram64"); // 8 MB standard
-
-	map(0x40000000, 0x403fffff).rom().region("bootrom", 0).mirror(0x0fc00000);
-
-	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
-	map(0x50004000, 0x50005fff).rw(FUNC(mac_state::mac_scc_r), FUNC(mac_state::mac_scc_2_w)).mirror(0x00f00000);
-	// 50008000 = ethernet ID PROM
-	// 5000a000 = MACE ethernet controller
-	map(0x50010000, 0x50011fff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
-	// 50014000 = sound registers (AWACS)
-	map(0x50014000, 0x50015fff).rw(m_awacs, FUNC(awacs_device::read), FUNC(awacs_device::write)).mirror(0x01f00000);
-	map(0x50016000, 0x50017fff).rw(FUNC(mac_state::mac_iwm_r), FUNC(mac_state::mac_iwm_w)).mirror(0x00f00000);
-	map(0x50024000, 0x50025fff).w(FUNC(mac_state::ariel_ramdac_w)).mirror(0x00f00000);
-	map(0x50026000, 0x50027fff).rw(FUNC(mac_state::mac_via2_r), FUNC(mac_state::mac_via2_w)).mirror(0x00f00000);
-	map(0x50028000, 0x50028007).rw(FUNC(mac_state::mac_sonora_vctl_r), FUNC(mac_state::mac_sonora_vctl_w)).mirror(0x00f00000);
-	// 5002a000 = interrupt controller
-	// 5002c000 = diagnostic registers
-	map(0x5002c000, 0x5002dfff).r(FUNC(mac_state::pmac_diag_r)).mirror(0x00f00000);
-	map(0x50031000, 0x50032fff).rw(FUNC(mac_state::amic_dma_r), FUNC(mac_state::amic_dma_w)).mirror(0x00f00000);
-	map(0x50040000, 0x5004000f).rw(FUNC(mac_state::hmc_r), FUNC(mac_state::hmc_w)).mirror(0x00f00000);
-	map(0x5ffffff8, 0x5fffffff).r(FUNC(mac_state::mac_read_id));
-
-	map(0xffc00000, 0xffffffff).rom().region("bootrom", 0);
-}
-
 /***************************************************************************
     DEVICE CONFIG
 ***************************************************************************/
@@ -749,11 +721,6 @@ void mac_state::add_base_devices(machine_config &config, bool rtc, int woz_versi
 		SWIM2(config, m_fdc, C15M);
 		m_fdc->hdsel_cb().set(FUNC(mac_state::hdsel_w));
 		m_fdc->devsel_cb().set(FUNC(mac_state::devsel_w));
-		break;
-	case 3:
-		SWIM3(config, m_fdc, C15M);
-		m_fdc->hdsel_cb().set(FUNC(mac_state::hdsel_s3_w));
-		m_fdc->devsel_cb().set(FUNC(mac_state::devsel_s3_w));
 		break;
 	}
 
@@ -1236,46 +1203,6 @@ void mac_state::maciisi(machine_config &config)
 	add_egret(config, EGRET_344S0100);
 }
 
-void mac_state::pwrmac(machine_config &config)
-{
-	PPC601(config, m_maincpu, 60000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::pwrmac_map);
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// dot clock, htotal, hstart, hend, vtotal, vstart, vend
-	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
-	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	m_screen->set_size(1024, 768);
-	m_screen->set_visarea(0, 640-1, 0, 480-1);
-	m_screen->set_screen_update(FUNC(mac_state::screen_update_pwrmac));
-
-	PALETTE(config, m_palette).set_entries(256);
-
-	MCFG_VIDEO_START_OVERRIDE(mac_state,macsonora)
-	MCFG_VIDEO_RESET_OVERRIDE(mac_state,macrbv)
-
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	AWACS(config, m_awacs, 44100);
-	m_awacs->add_route(0, "lspeaker", 1.0);
-	m_awacs->add_route(1, "rspeaker", 1.0);
-
-	add_scsi(config);
-	add_base_devices(config, false, 3);
-
-	add_via1_adb(config, false);
-	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b_cdadb));
-
-	add_via2(config);
-
-	RAM(config, m_ram);
-	m_ram->set_default_size("8M");
-	m_ram->set_extra_options("16M,32M,64M,128M");
-
-	MACADB(config, m_macadb, C15M);
-	add_cuda(config, CUDA_341S0060);
-}
-
 static INPUT_PORTS_START( macadb )
 INPUT_PORTS_END
 
@@ -1392,11 +1319,6 @@ ROM_START( maclc3 )
 		ROM_LOAD( "ecbbc41c.rom", 0x000000, 0x100000, CRC(e578f5f3) SHA1(c77df3220c861f37a2c553b6ee9241b202dfdffc) )
 ROM_END
 
-ROM_START( pmac6100 )
-	ROM_REGION64_BE(0x400000, "bootrom", 0)
-	ROM_LOAD( "9feb69b3.rom", 0x000000, 0x400000, CRC(a43fadbc) SHA1(6fac1c4e920a077c077b03902fef9199d5e8f2c3) )
-ROM_END
-
 ROM_START( maccclas )
 	ROM_REGION32_BE(0x100000, "bootrom", 0)
 	ROM_LOAD( "ecd99dc0.rom", 0x000000, 0x100000, CRC(c84c3aa5) SHA1(fd9e852e2d77fe17287ba678709b9334d4d74f1e) )
@@ -1425,4 +1347,3 @@ COMP( 1993, maclc3,    0,        0,      maclc3,   maciici, mac_state, init_macl
 COMP( 1993, maciivx,   0,        0,      maciivx,  maciici, mac_state, init_maciivx,       "Apple Computer", "Macintosh IIvx", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )
 COMP( 1993, maciivi,   maciivx,  0,      maciivi,  maciici, mac_state, init_maciivi,       "Apple Computer", "Macintosh IIvi", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )
 COMP( 1993, maclc520,  0,        0,      maclc520, maciici, mac_state, init_maclc520,      "Apple Computer", "Macintosh LC 520",  MACHINE_NOT_WORKING )
-COMP( 1994, pmac6100,  0,        0,      pwrmac,   macadb,  mac_state, init_macpm6100,     "Apple Computer", "Power Macintosh 6100/60",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

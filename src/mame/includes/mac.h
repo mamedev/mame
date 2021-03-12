@@ -406,8 +406,6 @@ private:
 	void sel35_w(int sel35);
 	void devsel_w(uint8_t devsel);
 	void hdsel_w(int hdsel);
-	void devsel_s3_w(uint8_t devsel);
-	void hdsel_s3_w(int hdsel);
 
 	DECLARE_VIDEO_START(mac);
 	DECLARE_VIDEO_START(macsonora);
