@@ -147,6 +147,7 @@ void k057714_device::device_stop()
 
 void k057714_device::set_pixclock(const XTAL &xtal)
 {
+	xtal.validate(std::string("Setting pixel clock for ") + tag());
 	m_pixclock = xtal.value();
 	crtc_set_screen_params();
 }
