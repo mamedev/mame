@@ -116,7 +116,7 @@ WRITE_LINE_MEMBER(ym2151_device::reset_w)
 void ym2151_device::device_start()
 {
 	// create our stream
-	m_stream = stream_alloc(0, 2, clock() / (2 * 4 * 8));
+	m_stream = stream_alloc(0, ymopm_registers::OUTPUTS, clock() / (ymopm_registers::DEFAULT_PRESCALE * ymopm_registers::OPERATORS));
 
 	// resolve the write callback
 	m_port_w.resolve_safe();
@@ -150,7 +150,7 @@ void ym2151_device::device_reset()
 
 void ym2151_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(clock() / (2 * 4 * 8));
+	m_stream->set_sample_rate(clock() / (ymopm_registers::DEFAULT_PRESCALE * ymopm_registers::OPERATORS));
 	m_busy_duration = m_opm.compute_busy_duration();
 }
 
@@ -161,20 +161,23 @@ void ym2151_device::device_clock_changed()
 
 void ym2151_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
+	// prepare for output
+	m_opm.prepare(ymopm_registers::ALL_CHANNELS);
+
 	// iterate over all target samples
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
 		// clock the system
-		m_opm.clock(0xff);
+		m_opm.clock(ymopm_registers::ALL_CHANNELS);
 
 		// update the OPM content; OPM is full 14-bit with no intermediate clipping
-		s32 sums[2] = { 0 };
-		m_opm.output(sums, 0, 32767, 0xff);
+		s32 sums[ymopm_registers::OUTPUTS] = { 0 };
+		m_opm.output(sums, 0, 32767, ymopm_registers::ALL_CHANNELS);
 
 		// convert to 10.3 floating point value for the DAC and back
 		// OPM is stereo
-		outputs[0].put_int(sampindex, ymfm_roundtrip_fp(sums[0]), 32768);
-		outputs[1].put_int(sampindex, ymfm_roundtrip_fp(sums[1]), 32768);
+		for (int index = 0; index < ymopm_registers::OUTPUTS; index++)
+			outputs[index].put_int(sampindex, ymfm_roundtrip_fp(sums[index]), 32768);
 	}
 }
 

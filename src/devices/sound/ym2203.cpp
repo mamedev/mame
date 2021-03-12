@@ -106,7 +106,7 @@ void ym2203_device::device_start()
 	ay8910_device::device_start();
 
 	// create our stream
-	m_stream = stream_alloc(0, 1, clock() / (4 * 3 * 6));
+	m_stream = stream_alloc(0, ymopn_registers::OUTPUTS, clock() / (ymopn_registers::DEFAULT_PRESCALE * ymopn_registers::OPERATORS));
 
 	// save our data
 	save_item(YMFM_NAME(m_address));
@@ -154,19 +154,23 @@ void ym2203_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		return;
 	}
 
+	// prepare for output
+	m_opn.prepare(ymopn_registers::ALL_CHANNELS);
+
 	// iterate over all target samples
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
 		// clock the system
-		m_opn.clock(0x07);
+		m_opn.clock(ymopn_registers::ALL_CHANNELS);
 
 		// update the OPN content; OPN is full 14-bit with no intermediate clipping
-		s32 sum = 0;
-		m_opn.output(&sum, 0, 32767, 0x07);
+		s32 sums[ymopn_registers::OUTPUTS] = { 0 };
+		m_opn.output(sums, 0, 32767, ymopn_registers::ALL_CHANNELS);
 
 		// convert to 10.3 floating point value for the DAC and back
-		// OPN is mono, so only the left sum matters
-		outputs[0].put_int(sampindex, ymfm_roundtrip_fp(sum), 32768);
+		// OPN is mono
+		for (int index = 0; index < ymopn_registers::OUTPUTS; index++)
+			outputs[index].put_int(sampindex, ymfm_roundtrip_fp(sums[index]), 32768);
 	}
 }
 
@@ -180,8 +184,8 @@ void ym2203_device::update_prescale(u8 newval)
 {
 	// inform the OPN engine and refresh our clock rate
 	m_opn.set_clock_prescale(newval);
-	m_stream->set_sample_rate(clock() / (4 * 3 * newval));
-	logerror("Prescale = %d; sample_rate = %d\n", newval, clock() / (4 * 3 * newval));
+	m_stream->set_sample_rate(clock() / (newval * ymopn_registers::OPERATORS));
+	logerror("Prescale = %d; sample_rate = %d\n", newval, clock() / (newval * ymopn_registers::OPERATORS));
 
 	// also scale the SSG streams
 	// mapping is (OPN->SSG): 6->4, 3->2, 2->1

@@ -17,6 +17,12 @@
 // names)
 #define YMFM_NAME(x) x, "ymfm." #x
 
+// macro to encode four operator numbers into a 32-bit value in the
+// operator maps for each register class
+#define YMFM_OP4(o1,o2,o3,o4) u32(o1 | (o2 << 8) | (o3 << 16) | (o4 <<24))
+#define YMFM_OP2(o1,o2) YMFM_OP4(o1,o2,0xff,0xff)
+#define YMFM_OP0() YMFM_OP4(0xff,0xff,0xff,0xff)
+
 
 
 //*********************************************************
@@ -162,7 +168,9 @@ public:
 	//   family_type FAMILY: One of the family_types above
 	//           u8 OUTPUTS: The number of outputs exposed (1-4)
 	//          u8 CHANNELS: The number of channels on the chip
+	//     u32 ALL_CHANNELS: A bitmask of all channels
 	//         u8 OPERATORS: The number of operators on the chip
+	//     bool DYNAMIC_OPS: True if ops/channel can be changed at runtime
 	//        u16 REGISTERS: The number of 8-bit registers allocated
 	//         u16 REG_MODE: The address of the "mode" register controlling timers
 	//  u8 DEFAULT_PRESCALE: The starting clock prescale
@@ -188,7 +196,6 @@ public:
 	bool is_rhythm() const { return false; }
 
 	// the following functions must be overriden
-	static constexpr std::pair<u8,u8> opnum_to_chnum_and_index(u8 opnum) { assert(false); return std::make_pair(0, 0); }
 	void reset() { assert(false); }
 	void write(u16 index, u8 data) { assert(false); }
 	static bool is_keyon(u16 regindex, u8 data, u8 &channel, u8 &opmask) { assert(false); return false; }
@@ -223,6 +230,7 @@ public:
 	u8 rhythm_keyon() const       /*  5 bits */ { return 0; } // OPL only
 	u8 note_select() const        /*  1 bit  */ { return 0; } // OPL only
 	u8 waveform_enable() const    /*  1 bits */ { return 0; } // OPL2+ only
+	u8 fourop() const             /*  6 bits */ { return 0; } // OPL3 only
 
 	// per-channel register defaults
 	u16 block_freq() const        /* 13 bits */ { return 0; }
@@ -345,7 +353,9 @@ public:
 	static constexpr family_type FAMILY = FAMILY_OPM;
 	static constexpr u8 OUTPUTS = 2;
 	static constexpr u8 CHANNELS = 8;
-	static constexpr u8 OPERATORS = 8*4;
+	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
+	static constexpr u8 OPERATORS = CHANNELS * 4;
+	static constexpr u8 DYNAMIC_OPS = false;
 	static constexpr u16 REGISTERS = 0x100;
 	static constexpr u16 REG_MODE = 0x14;
 	static constexpr u8 DEFAULT_PRESCALE = 2;
@@ -364,13 +374,10 @@ public:
 	{
 	}
 
-	// return a mapping from linear operator to channel + index
-	static constexpr std::pair<u8,u8> opnum_to_chnum_and_index(u8 opnum)
+	// return a mapping between operators and channel,index pairs
+	struct operator_mapping { u32 chan[CHANNELS]; };
+	void operator_map(operator_mapping &dest) const
 	{
-		//    Op: 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
-		//    Ch: 0  1  2  3  4  5  6  7  0  1  2  3  4  5  6  7  0  1  2  3  4  5  6  7  0  1  2  3  4  5  6  7
-		// Index: 0  0  0  0  0  0  0  0  2  2  2  2  2  2  2  2  1  1  1  1  1  1  1  1  3  3  3  3  3  3  3  3
-		//
 		// Note that the channel index order is 0,2,1,3, so we bitswap the index.
 		//
 		// This is because the order in the map is:
@@ -378,10 +385,18 @@ public:
 		//
 		// But when wiring up the connections, the more natural order is:
 		//    carrier 1, modulator 1, carrier 2, modulator 2
-		assert(opnum < OPERATORS);
-		u8 chnum = opnum % CHANNELS;
-		u8 index = opnum / CHANNELS;
-		return std::make_pair(chnum, bitswap(index, 0, 1));
+		static const operator_mapping s_fixed_map =
+		{ {
+			YMFM_OP4(  0, 16,  8, 24 ),  // Channel 0 operators
+			YMFM_OP4(  1, 17,  9, 25 ),  // Channel 1 operators
+			YMFM_OP4(  2, 18, 10, 26 ),  // Channel 2 operators
+			YMFM_OP4(  3, 19, 11, 27 ),  // Channel 3 operators
+			YMFM_OP4(  4, 20, 12, 28 ),  // Channel 4 operators
+			YMFM_OP4(  5, 21, 13, 29 ),  // Channel 5 operators
+			YMFM_OP4(  6, 22, 14, 30 ),  // Channel 6 operators
+			YMFM_OP4(  7, 23, 15, 31 ),  // Channel 7 operators
+		} };
+		dest = s_fixed_map;
 	}
 
 	// reset state to default values
@@ -504,6 +519,13 @@ public:
 //              ---x---- Key on/off operator 1
 //              ------xx Channel select
 //
+//     Per-channel registers (channel in address bits 0-1)
+//        A0-A3 xxxxxxxx Frequency number lower 8 bits
+//        A4-A7 --xxx--- Block (0-7)
+//              -----xxx Frequency number upper 3 bits
+//        B0-B3 --xxx--- Feedback level for operator 1 (0-7)
+//              -----xxx Operator connection algorithm (0-7)
+//
 //     Per-operator registers (channel in address bits 0-1, operator in bits 2-3)
 //        30-3F -xxx---- Detune value (0-7)
 //              ----xxxx Multiple value (0-15)
@@ -516,13 +538,6 @@ public:
 //              ----xxxx Release rate (0-15)
 //        90-9F ----x--- SSG-EG enable
 //              -----xxx SSG-EG envelope (0-7)
-//
-//     Per-channel registers (channel in address bits 0-1)
-//        A0-A3 xxxxxxxx Frequency number lower 8 bits
-//        A4-A7 --xxx--- Block (0-7)
-//              -----xxx Frequency number upper 3 bits
-//        B0-B3 --xxx--- Feedback level for operator 1 (0-7)
-//              -----xxx Operator connection algorithm (0-7)
 //
 //     Special multi-frequency registers (channel implicitly #2; operator in address bits 0-1)
 //        A8-AB xxxxxxxx Frequency number lower 8 bits
@@ -541,7 +556,9 @@ public:
 	static constexpr family_type FAMILY = FAMILY_OPN;
 	static constexpr u8 OUTPUTS = 1;
 	static constexpr u8 CHANNELS = 3;
-	static constexpr u8 OPERATORS = 3*4;
+	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
+	static constexpr u8 OPERATORS = CHANNELS * 4;
+	static constexpr u8 DYNAMIC_OPS = false;
 	static constexpr u16 REGISTERS = 0x100;
 	static constexpr u16 REG_MODE = 0x27;
 	static constexpr u8 DEFAULT_PRESCALE = 6;
@@ -570,13 +587,10 @@ public:
 		m_opoffs = opnum % 3 + 4 * (opnum / 3);
 	}
 
-	// return a mapping from linear operator to channel + index
-	static constexpr std::pair<u8,u8> opnum_to_chnum_and_index(u8 opnum)
+	// return a mapping between operators and channel,index pairs
+	struct operator_mapping { u32 chan[CHANNELS]; };
+	void operator_map(operator_mapping &dest) const
 	{
-		//    Op: 0  1  2  3  4  5  6  7  8  9 10 11
-		//    Ch: 0  1  2  0  1  2  0  1  2  0  1  2
-		// Index: 0  0  0  2  2  2  1  1  1  3  3  3
-		//
 		// Note that the channel index order is 0,2,1,3, so we bitswap the index.
 		//
 		// This is because the order in the map is:
@@ -584,10 +598,13 @@ public:
 		//
 		// But when wiring up the connections, the more natural order is:
 		//    carrier 1, modulator 1, carrier 2, modulator 2
-		assert(opnum < OPERATORS);
-		u8 chnum = opnum % CHANNELS;
-		u8 index = opnum / CHANNELS;
-		return std::make_pair(chnum, bitswap(index, 0, 1));
+		static const operator_mapping s_fixed_map =
+		{ {
+			YMFM_OP4(  0,  6,  3,  9 ),  // Channel 0 operators
+			YMFM_OP4(  1,  7,  4, 10 ),  // Channel 1 operators
+			YMFM_OP4(  2,  8,  5, 11 ),  // Channel 2 operators
+		} };
+		dest = s_fixed_map;
 	}
 
 	// reset state to default values
@@ -728,7 +745,8 @@ public:
 //              -----x-- Upper channel select (new for OPNA)
 //              ------xx Channel select
 //
-//     Per-operator registers (channel in address bits 0-1, operator in bits 2-3)
+//     Per-operator registers (channel in address bits 0-1,8, operator in bits 2-3)
+//     Note that all these apply to address+100 as well
 //        30-3F -xxx---- Detune value (0-7)
 //              ----xxxx Multiple value (0-15)
 //        40-4F -xxxxxxx Total level (0-127)
@@ -742,7 +760,8 @@ public:
 //        90-9F ----x--- SSG-EG enable
 //              -----xxx SSG-EG envelope (0-7)
 //
-//     Per-channel registers (channel in address bits 0-1)
+//     Per-channel registers (channel in address bits 0-1,8)
+//     Note that all these apply to address+100 as well
 //        A0-A3 xxxxxxxx Frequency number lower 8 bits
 //        A4-A7 --xxx--- Block (0-7)
 //              -----xxx Frequency number upper 3 bits
@@ -769,7 +788,8 @@ public:
 	// constants
 	static constexpr u8 OUTPUTS = 2;
 	static constexpr u8 CHANNELS = 6;
-	static constexpr u8 OPERATORS = 6*4;
+	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
+	static constexpr u8 OPERATORS = CHANNELS * 4;
 	static constexpr u16 REGISTERS = 0x200;
 
 	// constructor
@@ -792,13 +812,10 @@ public:
 		m_opoffs = opnum % 3 + 4 * ((opnum % 12) / 3) + 0x100 * (opnum / 12);
 	}
 
-	// initial mapping of operator number to channel.opindex:
-	static constexpr std::pair<u8,u8> opnum_to_chnum_and_index(u8 opnum)
+	// return a mapping between operators and channel,index pairs
+	struct operator_mapping { u32 chan[CHANNELS]; };
+	void operator_map(operator_mapping &dest) const
 	{
-		//    Op: 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
-		//    Ch: 0  1  2  0  1  2  0  1  2  0  1  2  3  4  5  3  4  5  3  4  5  3  4  5
-		// Index: 0  0  0  2  2  2  1  1  1  3  3  3  0  0  0  2  2  2  1  1  1  3  3  3
-		//
 		// Note that the channel index order is 0,2,1,3, so we bitswap the index.
 		//
 		// This is because the order in the map is:
@@ -806,11 +823,16 @@ public:
 		//
 		// But when wiring up the connections, the more natural order is:
 		//    carrier 1, modulator 1, carrier 2, modulator 2
-		assert(opnum < OPERATORS);
-		u8 chnum = opnum % (CHANNELS/2);
-		u8 index = opnum / (CHANNELS/2);
-		chnum += 3 * BIT(index, 2);
-		return std::make_pair(chnum, bitswap(index, 0, 1));
+		static const operator_mapping s_fixed_map =
+		{ {
+			YMFM_OP4(  0,  6,  3,  9 ),  // Channel 0 operators
+			YMFM_OP4(  1,  7,  4, 10 ),  // Channel 1 operators
+			YMFM_OP4(  2,  8,  5, 11 ),  // Channel 2 operators
+			YMFM_OP4( 12, 18, 15, 21 ),  // Channel 3 operators
+			YMFM_OP4( 13, 19, 16, 22 ),  // Channel 4 operators
+			YMFM_OP4( 14, 20, 17, 23 ),  // Channel 5 operators
+		} };
+		dest = s_fixed_map;
 	}
 
 	// reset state to default values
@@ -909,7 +931,9 @@ public:
 	static constexpr family_type FAMILY = FAMILY_OPL;
 	static constexpr u8 OUTPUTS = 1;
 	static constexpr u8 CHANNELS = 9;
-	static constexpr u8 OPERATORS = 9*2;
+	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
+	static constexpr u8 OPERATORS = CHANNELS * 2;
+	static constexpr u8 DYNAMIC_OPS = false;
 	static constexpr u16 REGISTERS = 0x100;
 	static constexpr u16 REG_MODE = 0x04;
 	static constexpr u8 DEFAULT_PRESCALE = 4;
@@ -936,17 +960,23 @@ public:
 		m_opoffs = opnum % 6 + 8 * (opnum / 6);
 	}
 
-	// return a mapping from linear operator to channel + index
-	static constexpr std::pair<u8,u8> opnum_to_chnum_and_index(u8 opnum)
+	// return a mapping between operators and channel,index pairs
+	struct operator_mapping { u32 chan[CHANNELS]; };
+	void operator_map(operator_mapping &dest) const
 	{
-		//    Op: 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17
-		//    Ch: 0  1  2  0  1  2  3  4  5  3  4  5  6  7  8  6  7  8
-		// Index: 0  0  0  1  1  1  0  0  0  1  1  1  0  0  0  1  1  1
-		assert(opnum < OPERATORS);
-		u8 chnum = opnum % (CHANNELS/3);
-		u8 index = opnum / (CHANNELS/3);
-		chnum += (CHANNELS/3) * BIT(index, 1, 2);
-		return std::make_pair(chnum, BIT(index, 0));
+		static const operator_mapping s_fixed_map =
+		{ {
+			YMFM_OP2(  0,  3 ),  // Channel 0 operators
+			YMFM_OP2(  1,  4 ),  // Channel 1 operators
+			YMFM_OP2(  2,  5 ),  // Channel 2 operators
+			YMFM_OP2(  6,  9 ),  // Channel 3 operators
+			YMFM_OP2(  7, 10 ),  // Channel 4 operators
+			YMFM_OP2(  8, 11 ),  // Channel 5 operators
+			YMFM_OP2( 12, 15 ),  // Channel 6 operators
+			YMFM_OP2( 13, 16 ),  // Channel 7 operators
+			YMFM_OP2( 14, 17 ),  // Channel 8 operators
+		} };
+		dest = s_fixed_map;
 	}
 
 	// helper to determine if the this channel is an active rhythm channel
@@ -979,7 +1009,7 @@ public:
 		if ((regindex & 0xf0) == 0xb0)
 		{
 			channel = regindex & 0x0f;
-			if (channel == 13)
+			if (regindex == 0xbd)
 			{
 				channel = YMFM_RHYTHM_CHANNEL;
 				opmask = BIT(data, 5) ? BIT(data, 0, 5) : 0;
@@ -1161,14 +1191,23 @@ public:
 		m_opnum = m_opoffs = opnum;
 	}
 
-	// return a mapping from linear operator to channel + index
-	static constexpr std::pair<u8,u8> opnum_to_chnum_and_index(u8 opnum)
+	// return a mapping between operators and channel,index pairs
+	struct operator_mapping { u32 chan[CHANNELS]; };
+	void operator_map(operator_mapping &dest) const
 	{
-		//    Op: 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17
-		//    Ch: 0  0  1  1  2  2  3  3  4  4  5  5  6  6  7  7  8  8
-		// Index: 0  1  0  1  0  1  0  1  0  1  0  1  0  1  0  1  0  1
-		assert(opnum < OPERATORS);
-		return std::make_pair(opnum / 2, opnum % 2);
+		static const operator_mapping s_fixed_map =
+		{ {
+			YMFM_OP2(  0,  1 ),  // Channel 0 operators
+			YMFM_OP2(  2,  3 ),  // Channel 1 operators
+			YMFM_OP2(  4,  5 ),  // Channel 2 operators
+			YMFM_OP2(  6,  7 ),  // Channel 3 operators
+			YMFM_OP2(  8,  9 ),  // Channel 4 operators
+			YMFM_OP2( 10, 11 ),  // Channel 5 operators
+			YMFM_OP2( 12, 13 ),  // Channel 6 operators
+			YMFM_OP2( 14, 15 ),  // Channel 7 operators
+			YMFM_OP2( 16, 17 ),  // Channel 8 operators
+		} };
+		dest = s_fixed_map;
 	}
 
 	// reset state to default values
@@ -1339,6 +1378,198 @@ private:
 };
 
 
+// ======================> ymopl3_registers
+
+//
+// OPL3 register map:
+//
+//      System-wide registers:
+//           01 xxxxxxxx Test register
+//           02 xxxxxxxx Timer A value (4 * OPN)
+//           03 xxxxxxxx Timer B value
+//           04 x------- RST
+//              -x------ Mask timer A
+//              --x----- Mask timer B
+//              ------x- Load timer B
+//              -------x Load timer A
+//           08 -x------ Note select
+//           BD x------- AM depth
+//              -x------ PM depth
+//              --x----- Rhythm enable
+//              ---x---- Bass drum key on
+//              ----x--- Snare drum key on
+//              -----x-- Tom key on
+//              ------x- Top cymbal key on
+//              -------x High hat key on
+//          101 --xxxxxx Test register 2
+//          104 --x----- Channel 6 4-operator mode
+//              ---x---- Channel 5 4-operator mode
+//              ----x--- Channel 4 4-operator mode
+//              -----x-- Channel 3 4-operator mode
+//              ------x- Channel 2 4-operator mode
+//              -------x Channel 1 4-operator mode
+//          105 -------x New
+//
+//     Per-channel registers (channel in address bits 0-3)
+//     Note that all these apply to address+100 as well
+//        A0-A8 xxxxxxxx F-number (low 8 bits)
+//        B0-B8 --x----- Key on
+//              ---xxx-- Block (octvate, 0-7)
+//              ------xx F-number (high two bits)
+//        C0-C8 x------- External output 1
+//              -x------ External output 0
+//              --x----- Stereo left
+//              ---x---- Stereo right
+//              ----xxx- Feedback level for operator 1 (0-7)
+//              -------x Operator connection algorithm
+//
+//     Per-operator registers (operator in bits 0-5)
+//     Note that all these apply to address+100 as well
+//        20-35 x------- AM enable
+//              -x------ PM enable (VIB)
+//              --x----- EG type
+//              ---x---- Key scale rate
+//              ----xxxx Multiple value (0-15)
+//        40-55 xx------ Key scale level (0-3)
+//              --xxxxxx Total level (0-63)
+//        60-75 xxxx---- Attack rate (0-15)
+//              ----xxxx Decay rate (0-15)
+//        80-95 xxxx---- Sustain level (0-15)
+//              ----xxxx Release rate (0-15)
+//        E0-F5 -----xxx Wave select (0-7)
+//
+
+class ymopl3_registers : public ymopl_registers
+{
+public:
+	// constants
+	static constexpr family_type FAMILY = FAMILY_OPL;
+	static constexpr u8 OUTPUTS = 4;
+	static constexpr u8 CHANNELS = 9*2;
+	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
+	static constexpr u8 OPERATORS = CHANNELS * 2;
+	static constexpr u8 DYNAMIC_OPS = true;
+	static constexpr u16 REGISTERS = 0x200;
+	static constexpr u8 DEFAULT_PRESCALE = 8;
+	static constexpr u32 CSM_TRIGGER_MASK = 0;
+
+	// constructor
+	ymopl3_registers(u8 *regdata) :
+		ymopl_registers(regdata)
+	{
+	}
+
+	// setters for operator number
+	void set_chnum(u8 chnum)
+	{
+		assert(chnum < CHANNELS);
+		m_chnum = chnum;
+		m_choffs = chnum % 9 + 0x100 * (chnum / 9);
+	}
+	void set_opnum(u8 opnum)
+	{
+		assert(opnum < OPERATORS);
+		m_opnum = opnum;
+		m_opoffs = opnum + opnum % 6 + 8 * ((opnum % 18) / 6) + 0x100 * (opnum % 18);
+	}
+
+	// return a mapping between operators and channel,index pairs
+	struct operator_mapping { u32 chan[CHANNELS]; };
+	void operator_map(operator_mapping &dest) const
+	{
+		u8 fourop = fourop_enable();
+
+		dest.chan[ 0] = BIT(fourop, 0) ? YMFM_OP4(  0,  3,  6,  9 ) : YMFM_OP2(  0,  3 );
+		dest.chan[ 1] = BIT(fourop, 1) ? YMFM_OP4(  1,  4,  7, 10 ) : YMFM_OP2(  1,  4 );
+		dest.chan[ 2] = BIT(fourop, 2) ? YMFM_OP4(  2,  5,  8, 12 ) : YMFM_OP2(  2,  5 );
+		dest.chan[ 3] = BIT(fourop, 0) ? YMFM_OP0() : YMFM_OP2(  6,  9 );
+		dest.chan[ 4] = BIT(fourop, 1) ? YMFM_OP0() : YMFM_OP2(  7, 10 );
+		dest.chan[ 5] = BIT(fourop, 2) ? YMFM_OP0() : YMFM_OP2(  8, 11 );
+		dest.chan[ 6] = YMFM_OP2( 12, 15 );
+		dest.chan[ 7] = YMFM_OP2( 13, 16 );
+		dest.chan[ 8] = YMFM_OP2( 14, 17 );
+
+		dest.chan[ 9] = BIT(fourop, 3) ? YMFM_OP4( 18, 21, 24, 27 ) : YMFM_OP2( 18, 21 );
+		dest.chan[10] = BIT(fourop, 4) ? YMFM_OP4( 19, 22, 25, 28 ) : YMFM_OP2( 19, 22 );
+		dest.chan[11] = BIT(fourop, 5) ? YMFM_OP4( 20, 23, 26, 29 ) : YMFM_OP2( 20, 23 );
+		dest.chan[12] = BIT(fourop, 3) ? YMFM_OP0() : YMFM_OP2( 24, 27 );
+		dest.chan[13] = BIT(fourop, 4) ? YMFM_OP0() : YMFM_OP2( 25, 28 );
+		dest.chan[14] = BIT(fourop, 5) ? YMFM_OP0() : YMFM_OP2( 26, 29 );
+		dest.chan[15] = YMFM_OP2( 30, 33 );
+		dest.chan[16] = YMFM_OP2( 31, 34 );
+		dest.chan[17] = YMFM_OP2( 32, 35 );
+	}
+
+	// helper to determine if the this channel is an active rhythm channel
+	bool is_rhythm() const
+	{
+		return rhythm_enable() && (m_chnum >= 6 && m_chnum <= 8);
+	}
+
+	// reset state to default values
+	void reset()
+	{
+		std::fill_n(&m_regdata[0], REGISTERS, 0);
+	}
+
+	// write access
+	void write(u16 index, u8 data)
+	{
+		assert(index < REGISTERS);
+
+		// writes to the mode register with high bit set ignore the low bits
+		if (index == REG_MODE && BIT(data, 7) != 0)
+			m_regdata[index] |= 0x80;
+		else
+			m_regdata[index] = data;
+	}
+
+	// determine if a given write is a keyon, and if so, for which channel/operators
+	static bool is_keyon(u16 regindex, u8 data, u8 &channel, u8 &opmask)
+	{
+		if ((regindex & 0xf0) == 0xb0)
+		{
+			channel = (regindex & 0x0f) + 9 * BIT(regindex, 8);
+			if (regindex == 0xbd)
+			{
+				channel = YMFM_RHYTHM_CHANNEL;
+				opmask = BIT(data, 5) ? BIT(data, 0, 5) : 0;
+				return true;
+			}
+			else if (channel < CHANNELS)
+			{
+				opmask = BIT(data, 5) ? 3 : 0;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// compute the keycode from the given block_freq value
+	u8 block_freq_to_keycode(u16 block_freq) const
+	{
+		u8 keycode = BIT(block_freq, 11, 3) << 1;
+
+		// block_freq is block(3b):fnum(10b):0; the 4-bit keycode uses the top
+		// 3 bits plus either the MSB or MSB-1 of fnum, depending on note_select
+		// NOTE: the YMF262 manual says this, should it be this way for OPL/OPL2 as well?
+		return keycode | BIT(block_freq, 9 + note_select(), 1);
+	}
+
+	// OPL3-specific system-wide registers
+	u8 csm() const                /*  1 bit  */ { return 0; }
+	u8 newflag() const            /*  1 bit  */ { return sysbyte(0x105, 0, 1); }
+	u8 fourop_enable() const      /*  6 bits */ { return sysbyte(0x104, 0, 6); }
+
+	// OPL3-specific per-channel registers
+	u8 algorithm() const          /*  2 bits */ { return chbyte(0xc0, 0, 1) | (chbyte(0xc3, 0, 1) << 1); }
+
+	// per-operator registers
+	u8 waveform_enable() const    /*  1 bits */ { return 1; }
+	u8 waveform() const           /*  2 bits */ { return opbyte(0xe0, 0, newflag() ? 3 : 2); }
+};
+
+
 
 //*********************************************************
 //  CORE ENGINE CLASSES
@@ -1377,6 +1608,9 @@ public:
 
 	// reset the operator state
 	void reset();
+
+	// prepare prior to clocking
+	void prepare();
 
 	// master clocking function
 	void clock(u32 env_counter, s8 lfo_raw_pm, u16 block_freq);
@@ -1454,6 +1688,9 @@ public:
 	// signal key on/off to our operators
 	void keyonoff(u8 states, ymfm_keyon_type type);
 
+	// prepare prior to clocking
+	void prepare();
+
 	// master clocking function
 	void clock(u32 env_counter, s8 lfo_raw_pm, bool is_multi_freq);
 
@@ -1512,6 +1749,9 @@ public:
 	// reset the overall state
 	void reset();
 
+	// prepare prior to clocking
+	void prepare(u32 chanmask);
+
 	// master clocking function
 	u32 clock(u32 chanmask);
 
@@ -1557,6 +1797,9 @@ public:
 	device_t &device() const { return m_device; }
 
 protected:
+	// assign the current set of operators to channels
+	void assign_operators();
+
 	// clock the LFO, updating m_lfo_am and return the signed PM value
 	s8 clock_lfo();
 
@@ -1608,12 +1851,14 @@ extern template class ymfm_engine_base<ymopn_registers>;
 extern template class ymfm_engine_base<ymopna_registers>;
 extern template class ymfm_engine_base<ymopl_registers>;
 extern template class ymfm_engine_base<ymopl2_registers>;
+extern template class ymfm_engine_base<ymopl3_registers>;
 
 using ymopm_engine = ymfm_engine_base<ymopm_registers>;
 using ymopn_engine = ymfm_engine_base<ymopn_registers>;
 using ymopna_engine = ymfm_engine_base<ymopna_registers>;
 using ymopl_engine = ymfm_engine_base<ymopl_registers>;
 using ymopl2_engine = ymfm_engine_base<ymopl2_registers>;
+using ymopl3_engine = ymfm_engine_base<ymopl3_registers>;
 
 
 // ======================> ymopll_engine

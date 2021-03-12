@@ -124,16 +124,19 @@ const tiny_rom_entry *ym2413_device::device_rom_region() const
 
 void ym2413_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
+	// prepare for output
+	m_opll.prepare(ymopll_registers::ALL_CHANNELS);
+
 	// iterate over all target samples
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
 		// clock the system
-		m_opll.clock(0x1ff);
+		m_opll.clock(ymopll_registers::ALL_CHANNELS);
 
 		// update the OPL; OPLL is 9-bit, unsure of clipping but guessing
 		// it is similar to YM2612
 		s32 sums[ymopll_registers::OUTPUTS] = { 0 };
-		m_opll.output(sums, 5, 256, 0x1ff);
+		m_opll.output(sums, 5, 256, ymopll_registers::ALL_CHANNELS);
 
 		// the OPLL is time multiplexed; just simulate this by summing all the
 		// channels and dividing down

@@ -81,7 +81,7 @@ void ym3526_device::write(offs_t offset, u8 value)
 void ym3526_device::device_start()
 {
 	// create our stream
-	m_stream = stream_alloc(0, 1, clock() / (ymopl_registers::DEFAULT_PRESCALE * ymopl_registers::OPERATORS));
+	m_stream = stream_alloc(0, ymopl_registers::OUTPUTS, clock() / (ymopl_registers::DEFAULT_PRESCALE * ymopl_registers::OPERATORS));
 
 	// call this for the variants that need to adjust the rate
 	device_clock_changed();
@@ -121,18 +121,22 @@ void ym3526_device::device_clock_changed()
 
 void ym3526_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
+	// prepare for output
+	m_opl.prepare(ymopl_registers::ALL_CHANNELS);
+
 	// iterate over all target samples
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
 		// clock the system
-		m_opl.clock(0x1ff);
+		m_opl.clock(ymopl_registers::ALL_CHANNELS);
 
 		// update the OPL content; clipping is unknown
-		s32 sum = 0;
-		m_opl.output(&sum, 1, 32767, 0x1ff);
+		s32 sums[ymopl_registers::OUTPUTS] = { 0 };
+		m_opl.output(sums, 1, 32767, ymopl_registers::ALL_CHANNELS);
 
 		// convert to 10.3 floating point value for the DAC and back
 		// OPL is mono
-		outputs[0].put_int(sampindex, ymfm_roundtrip_fp(sum), 32768);
+		for (int index = 0; index < ymopl_registers::OUTPUTS; index++)
+			outputs[index].put_int(sampindex, ymfm_roundtrip_fp(sums[index]), 32768);
 	}
 }

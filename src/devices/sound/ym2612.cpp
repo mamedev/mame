@@ -136,7 +136,7 @@ void ym2612_device::write(offs_t offset, u8 value)
 void ym2612_device::device_start()
 {
 	// create our stream
-	m_stream = stream_alloc(0, 2, clock() / (4 * 6 * 6));
+	m_stream = stream_alloc(0, ymopna_registers::OUTPUTS, clock() / (ymopna_registers::DEFAULT_PRESCALE * ymopna_registers::OPERATORS));
 
 	// call this for the variants that need to adjust the rate
 	device_clock_changed();
@@ -173,7 +173,8 @@ void ym2612_device::device_reset()
 
 void ym2612_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(clock() / (4 * 6 * (MULTIPLEX_YM2612_YM3438_OUTPUT ? 1 : 6)));
+	u32 const sample_divider = MULTIPLEX_YM2612_YM3438_OUTPUT ? ymopna_registers::CHANNELS : 1;
+	m_stream->set_sample_rate(clock() / (ymopna_registers::DEFAULT_PRESCALE * ymopna_registers::OPERATORS / sample_divider));
 
 	// recompute the busy duration
 	m_busy_duration = m_opn.compute_busy_duration();
@@ -197,7 +198,9 @@ void ym2612_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 void ym2612_device::sound_stream_update_common(write_stream_view &outl, write_stream_view &outr, bool discontinuity)
 {
-	u32 const sample_divider = (discontinuity ? 260 : 256) * (MULTIPLEX_YM2612_YM3438_OUTPUT ? 1 : 6);
+	u32 const sample_divider = (discontinuity ? 260 : 256) * (MULTIPLEX_YM2612_YM3438_OUTPUT ? 1 : ymopna_registers::CHANNELS);
+
+	m_opn.prepare(ymopna_registers::ALL_CHANNELS);
 
 	// iterate over all target samples
 	s32 sums[2] = { 0 };
@@ -205,7 +208,7 @@ void ym2612_device::sound_stream_update_common(write_stream_view &outl, write_st
 	{
 		// clock the OPN when we hit channel 0
 		if (m_channel == 0)
-			m_opn.clock(0x3f);
+			m_opn.clock(ymopna_registers::ALL_CHANNELS);
 
 		// update the current OPN channel; OPN2 is 9-bit with intermediate clipping
 		s32 outputs[2] = { 0 };
@@ -308,7 +311,7 @@ ymf276_device::ymf276_device(const machine_config &mconfig, const char *tag, dev
 
 void ymf276_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(clock() / (4 * 6 * 6));
+	m_stream->set_sample_rate(clock() / (ymopna_registers::DEFAULT_PRESCALE * ymopna_registers::OPERATORS));
 }
 
 
@@ -321,30 +324,31 @@ void ymf276_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 	// mask off channel 6 if DAC is enabled
 	u8 const opn_mask = m_dac_enable ? 0x1f : 0x3f;
 
+	// prepare for output
+	m_opn.prepare(ymopna_registers::ALL_CHANNELS);
+
 	// iterate over all target samples
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
 		// clock the OPN
-		m_opn.clock(0x3f);
+		m_opn.clock(ymopna_registers::ALL_CHANNELS);
 
 		// update the OPN content; OPN2L is 14-bit with intermediate clipping
-		s32 sums[2] = { 0 };
+		s32 sums[ymopna_registers::OUTPUTS] = { 0 };
 		m_opn.output(sums, 0, 8191, opn_mask);
 
 		// shifted down 1 bit after mixer
-		sums[0] >>= 1;
-		sums[1] >>= 1;
+		for (int index = 0; index < ymopna_registers::OUTPUTS; index++)
+			sums[index] >>= 1;
 
 		// add in DAC if enabled
 		if (m_dac_enable)
-		{
-			sums[0] += s16(m_dac_data << 7) >> 3;
-			sums[1] += s16(m_dac_data << 7) >> 3;
-		}
+			for (int index = 0; index < ymopna_registers::OUTPUTS; index++)
+				sums[index] += s16(m_dac_data << 7) >> 3;
 
 		// YMF3438 is stereo
-		outputs[0].put_int_clamp(sampindex, sums[0], 32768);
-		outputs[1].put_int_clamp(sampindex, sums[1], 32768);
+		for (int index = 0; index < ymopna_registers::OUTPUTS; index++)
+			outputs[index].put_int_clamp(sampindex, sums[0], 32768);
 	}
 }
 

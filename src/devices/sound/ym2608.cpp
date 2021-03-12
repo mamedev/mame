@@ -194,7 +194,7 @@ void ym2608_device::device_start()
 	ay8910_device::device_start();
 
 	// create our stream
-	m_stream = stream_alloc(0, 2, clock() / (4 * 6 * 6));
+	m_stream = stream_alloc(0, ymopna_registers::OUTPUTS, clock() / (ymopna_registers::DEFAULT_PRESCALE * ymopna_registers::OPERATORS));
 
 	// save our data
 	save_item(YMFM_NAME(m_address));
@@ -304,6 +304,9 @@ void ym2608_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 	// top bit of the IRQ enable flags controls 3-channel vs 6-channel mode
 	u8 opnmask = BIT(m_irq_enable, 7) ? 0x3f : 0x07;
 
+	// prepare for output
+	m_opn.prepare(opnmask);
+
 	// iterate over all target samples
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
@@ -319,18 +322,18 @@ void ym2608_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		m_adpcm_b.clock(0x01);
 
 		// update the OPN content; OPNA is 13-bit with no intermediate clipping
-		s32 sums[2] = { 0 };
+		s32 sums[ymopna_registers::OUTPUTS] = { 0 };
 		m_opn.output(sums, 1, 32767, opnmask);
-		sums[0] <<= 1;
-		sums[1] <<= 1;
+		for (int index = 0; index < ymopna_registers::OUTPUTS; index++)
+			sums[index] <<= 1;
 
 		// mix in the ADPCM
 		m_adpcm_a.output(sums, 0x3f);
 		m_adpcm_b.output(sums, 2, 0x01);
 
 		// YM2608 is stereo
-		outputs[0].put_int_clamp(sampindex, sums[0], 32768);
-		outputs[1].put_int_clamp(sampindex, sums[1], 32768);
+		for (int index = 0; index < ymopna_registers::OUTPUTS; index++)
+			outputs[index].put_int_clamp(sampindex, sums[index], 32768);
 	}
 }
 
@@ -344,8 +347,8 @@ void ym2608_device::update_prescale(u8 newval)
 {
 	// inform the OPN engine and refresh our clock rate
 	m_opn.set_clock_prescale(newval);
-	m_stream->set_sample_rate(clock() / (4 * 6 * newval));
-	logerror("Prescale = %d; sample_rate = %d\n", newval, clock() / (4 * 6 * newval));
+	m_stream->set_sample_rate(clock() / (newval * ymopna_registers::OPERATORS));
+	logerror("Prescale = %d; sample_rate = %d\n", newval, clock() / (newval * ymopna_registers::OPERATORS));
 
 	// also scale the SSG streams
 	// mapping is (OPN->SSG): 6->4, 3->2, 2->1

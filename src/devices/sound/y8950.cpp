@@ -149,7 +149,7 @@ void y8950_device::write(offs_t offset, u8 value)
 void y8950_device::device_start()
 {
 	// create our stream
-	m_stream = stream_alloc(0, 1, clock() / (ymopl_registers::DEFAULT_PRESCALE * ymopl_registers::OPERATORS));
+	m_stream = stream_alloc(0, ymopl_registers::OUTPUTS, clock() / (ymopl_registers::DEFAULT_PRESCALE * ymopl_registers::OPERATORS));
 
 	// resolve callbacks
 	m_keyboard_read_handler.resolve_safe(0);
@@ -214,18 +214,21 @@ void y8950_device::rom_bank_updated()
 
 void y8950_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
+	// prepare for output
+	m_opl.prepare(ymopl_registers::ALL_CHANNELS);
+
 	// iterate over all target samples
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
 		// clock the system
-		m_opl.clock(0x1ff);
+		m_opl.clock(ymopl_registers::ALL_CHANNELS);
 
 		// clock the ADPCM-B engine every cycle
 		m_adpcm_b.clock(0x01);
 
 		// update the OPL content; clipping is unknown
-		s32 sums[2] = { 0 };
-		m_opl.output(&sums[0], 1, 32767, 0x1ff);
+		s32 sums[std::max<int>(ymopl_registers::OUTPUTS, 2)] = { 0 };
+		m_opl.output(sums, 1, 32767, ymopl_registers::ALL_CHANNELS);
 
 		// mix in the ADPCM; ADPCM-B is stereo, but only one channel
 		// not sure how it's wired up internally
@@ -233,7 +236,8 @@ void y8950_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 
 		// convert to 10.3 floating point value for the DAC and back
 		// OPL is mono
-		outputs[0].put_int(sampindex, ymfm_roundtrip_fp(sums[0]), 32768);
+		for (int index = 0; index < ymopl_registers::OUTPUTS; index++)
+			outputs[index].put_int(sampindex, ymfm_roundtrip_fp(sums[index]), 32768);
 	}
 
 	// update the status in case of ADPCM EOS

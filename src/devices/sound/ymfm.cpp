@@ -636,6 +636,7 @@ ALLOW_SAVE_TYPE(ymfm_operator<ymopna_registers>::envelope_state);
 ALLOW_SAVE_TYPE(ymfm_operator<ymopl_registers>::envelope_state);
 ALLOW_SAVE_TYPE(ymfm_operator<ymopl2_registers>::envelope_state);
 ALLOW_SAVE_TYPE(ymfm_operator<ymopll_registers>::envelope_state);
+ALLOW_SAVE_TYPE(ymfm_operator<ymopl3_registers>::envelope_state);
 
 template<class RegisterType>
 void ymfm_operator<RegisterType>::save(device_t &device, u8 index)
@@ -664,6 +665,16 @@ void ymfm_operator<RegisterType>::reset()
 	m_ssg_inverted = 0;
 	m_key_state = 0;
 	m_keyon_live = 0;
+}
+
+
+//-------------------------------------------------
+//  prepare - prepare for clocking
+//-------------------------------------------------
+
+template<class RegisterType>
+void ymfm_operator<RegisterType>::prepare()
+{
 }
 
 
@@ -1257,6 +1268,19 @@ void ymfm_channel<RegisterType>::keyonoff(u8 states, ymfm_keyon_type type)
 
 
 //-------------------------------------------------
+//  prepare - prepare for clocking
+//-------------------------------------------------
+
+template<class RegisterType>
+void ymfm_channel<RegisterType>::prepare()
+{
+	for (int opnum = 0; opnum < std::size(m_op); opnum++)
+		if (m_op[opnum] != nullptr)
+			m_op[opnum]->prepare();
+}
+
+
+//-------------------------------------------------
 //  clock - master clock of all operators
 //-------------------------------------------------
 
@@ -1301,7 +1325,7 @@ template<class RegisterType>
 void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const
 {
 	// if this channel has no operators, nothing to do
-	if (m_op[0] == nullptr)
+	if (RegisterType::DYNAMIC_OPS && m_op[0] == nullptr)
 	{
 		m_feedback_in = 0;
 		return;
@@ -1330,7 +1354,8 @@ void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 outpu
 	// handle two-operator and four-operator cases separately
 	s32 result;
 	u8 algorithm = m_regs.algorithm();
-	if (m_op[2] == nullptr)
+	if ((!RegisterType::DYNAMIC_OPS && RegisterType::OPERATORS / RegisterType::CHANNELS == 2) ||
+		(RegisterType::DYNAMIC_OPS && m_op[2] == nullptr))
 	{
 		// Algorithms for two-operator case:
 		//    0: O1 -> O2 -> out
@@ -1349,45 +1374,51 @@ void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 outpu
 			result = std::clamp(result, clipmin, clipmax);
 		}
 	}
-	else
+	else if (RegisterType::DYNAMIC_OPS || RegisterType::OPERATORS / RegisterType::CHANNELS == 4)
 	{
-		// Algorithms for four-operator case:
-		//    0: O1 -> O2 -> O3 -> O4 -> out
-		//    1: (O1 + O2) -> O3 -> O4 -> out
-		//    2: (O1 + (O2 -> O3)) -> O4 -> out
-		//    3: ((O1 -> O2) + O3) -> O4 -> out
-		//    4: ((O1 -> O2) + (O3 -> O4)) -> out
-		//    5: ((O1 -> O2) + (O1 -> O3) + (O1 -> O4)) -> out
-		//    6: ((O1 -> O2) + O3 + O4) -> out
-		//    7: (O1 + O2 + O3 + O4) -> out
+		// OPM/OPN offer 8 different connection algorithms for 4 operators,
+		// and OPL3 offers 4 more, which we designate here as 8-11.
 		//
 		// The operators are computed in order, with the inputs pulled from
-		// an array of values that is populated as we go:
+		// an array of values (opout) that is populated as we go:
 		//    0 = 0
 		//    1 = O1
 		//    2 = O2
 		//    3 = O3
-		//    4 = O4
+		//    4 = (O4)
 		//    5 = O1+O2
 		//    6 = O1+O3
 		//    7 = O2+O3
 		//
-		// This table encodes for operators 2-4 which of the 8 input values
-		// above is used: 1 bit for O2 and 3 bits for O3 and O4
-		static u8 const s_algorithm_inputs[8] =
+		// The s_algorithm_ops table describes the inputs and outputs of each
+		// algorithm as follows:
+		//
+		//      ---------x use opout[x] as operator 2 input
+		//      ------xxx- use opout[x] as operator 3 input
+		//      ---xxx---- use opout[x] as operator 4 input
+		//      --x------- include opout[1] in final sum
+		//      -x-------- include opout[2] in final sum
+		//      x--------- include opout[3] in final sum
+		#define ALGORITHM(op2in, op3in, op4in, op1out, op2out, op3out) \
+			(op2in | (op3in << 1) | (op4in << 4) | (op1out << 7) | (op2out << 8) | (op3out << 9))
+		static u16 const s_algorithm_ops[8+4] =
 		{
-		// OP2  OP3        OP4
-			1 | (2 << 1) | (3 << 4),
-			0 | (5 << 1) | (3 << 4),
-			0 | (2 << 1) | (6 << 4),
-			1 | (0 << 1) | (7 << 4),
-			1 | (0 << 1) | (3 << 4),
-			1 | (1 << 1) | (1 << 4),
-			1 | (0 << 1) | (0 << 4),
-			0 | (0 << 1) | (0 << 4)
+			ALGORITHM(1,2,3, 0,0,0),	//  0: O1 -> O2 -> O3 -> O4 -> out (O4)
+			ALGORITHM(0,5,3, 0,0,0),	//  1: (O1 + O2) -> O3 -> O4 -> out (O4)
+			ALGORITHM(0,2,6, 0,0,0),	//  2: (O1 + (O2 -> O3)) -> O4 -> out (O4)
+			ALGORITHM(1,0,7, 0,0,0),	//  3: ((O1 -> O2) + O3) -> O4 -> out (O4)
+			ALGORITHM(1,0,3, 0,1,0),	//  4: ((O1 -> O2) + (O3 -> O4)) -> out (O2+O4)
+			ALGORITHM(1,1,1, 0,1,1),	//  5: ((O1 -> O2) + (O1 -> O3) + (O1 -> O4)) ->
+			ALGORITHM(1,0,0, 0,1,1),	//  6: ((O1 -> O2) + O3 + O4) -> out (O2+O3+O4)
+			ALGORITHM(0,0,0, 1,1,1),	//  7: (O1 + O2 + O3 + O4) -> out (O1+O2+O3+O4)
+			ALGORITHM(1,2,3, 0,0,0),	//  8: O1 -> O2 -> O3 -> O4 -> out (O4)         [same as 0]
+			ALGORITHM(1,0,3, 0,1,0),	//  9: ((O1 -> O2) + (O3 -> O4)) -> out (O2+O4) [same as 4]
+			ALGORITHM(0,2,3, 1,0,0),	// 10: (O1 + (O2 -> O3 -> O4)) -> out (O1+O4)   [unique]
+			ALGORITHM(0,2,0, 1,0,1)		// 11: (O1 + (O2 -> O3) + O4) -> out (O1+O3+O4) [unique]
 		};
-		u8 algorithm = m_regs.algorithm();
-		u8 algorithm_inputs = s_algorithm_inputs[algorithm];
+		u16 algorithm_ops = s_algorithm_ops[algorithm];
+
+		// populate the opout table
 		s16 opout[8];
 		opout[0] = 0;
 		opout[1] = op1value;
@@ -1396,12 +1427,12 @@ void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 outpu
 		assert(m_op[3] != nullptr);
 
 		// compute the 14-bit volume/value of operator 2
-		opmod = opout[BIT(algorithm_inputs, 0, 1)] >> 1;
+		opmod = opout[BIT(algorithm_ops, 0, 1)] >> 1;
 		opout[2] = m_op[1]->compute_volume(m_op[1]->phase() + opmod, am_offset);
 		opout[5] = opout[1] + opout[2];
 
 		// compute the 14-bit volume/value of operator 3
-		opmod = opout[BIT(algorithm_inputs, 1, 3)] >> 1;
+		opmod = opout[BIT(algorithm_ops, 1, 3)] >> 1;
 		opout[3] = m_op[2]->compute_volume(m_op[2]->phase() + opmod, am_offset);
 		opout[6] = opout[1] + opout[3];
 		opout[7] = opout[2] + opout[3];
@@ -1412,32 +1443,19 @@ void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 outpu
 			result = m_op[3]->compute_noise_volume(noise_state, am_offset);
 		else
 		{
-			opmod = opout[BIT(algorithm_inputs, 4, 3)] >> 1;
+			opmod = opout[BIT(algorithm_ops, 4, 3)] >> 1;
 			result = m_op[3]->compute_volume(m_op[3]->phase() + opmod, am_offset);
 		}
 		result >>= rshift;
 
-		// algorithms 4-7 add in OP2 output
-		if (algorithm >= 4)
-		{
-			s32 clipmin = -clipmax - 1;
-			result += opout[2] >> rshift;
-			result = std::clamp(result, clipmin, clipmax);
-
-			// agorithms 5-7 add in OP3 output
-			if (algorithm >= 5)
-			{
-				result += opout[3] >> rshift;
-				result = std::clamp(result, clipmin, clipmax);
-
-				// algorithm 7 adds in OP1 output
-				if (algorithm == 7)
-				{
-					result += opout[1] >> rshift;
-					result = std::clamp(result, clipmin, clipmax);
-				}
-			}
-		}
+		// optionally add OP1, OP2, OP3
+		s32 clipmin = -clipmax - 1;
+		if (BIT(algorithm_ops, 7) != 0)
+			result = std::clamp(result + (opout[1] >> rshift), clipmin, clipmax);
+		if (BIT(algorithm_ops, 8) != 0)
+			result = std::clamp(result + (opout[2] >> rshift), clipmin, clipmax);
+		if (BIT(algorithm_ops, 9) != 0)
+			result = std::clamp(result + (opout[3] >> rshift), clipmin, clipmax);
 	}
 
 	// add to the output
@@ -1628,12 +1646,10 @@ ymfm_engine_base<RegisterType>::ymfm_engine_base(device_t &device) :
 		RegisterType registers(&m_regdata[0]);
 		registers.set_opnum(opnum);
 		m_operator[opnum] = std::make_unique<ymfm_operator<RegisterType>>(*this, registers);
-
-		// perform a default assignment to the appropriate channel
-		auto mapping = RegisterType::opnum_to_chnum_and_index(opnum);
-		assert(m_channel[mapping.first] != nullptr);
-		m_channel[mapping.first]->assign(mapping.second, m_operator[opnum].get());
 	}
+
+	// do the initial operator assignment
+	assign_operators();
 }
 
 
@@ -1700,6 +1716,24 @@ void ymfm_engine_base<RegisterType>::reset()
 	// reset the operators
 	for (auto &op : m_operator)
 		op->reset();
+}
+
+
+//-------------------------------------------------
+//  prepare - prepare for clocking
+//-------------------------------------------------
+
+template<class RegisterType>
+void ymfm_engine_base<RegisterType>::prepare(u32 chanmask)
+{
+	// reassign operators to channels if dynamic
+	if (RegisterType::DYNAMIC_OPS)
+		assign_operators();
+
+	// call each channel to prepare
+	for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
+		if (BIT(chanmask, chnum))
+			m_channel[chnum]->prepare();
 }
 
 
@@ -1834,6 +1868,26 @@ u8 ymfm_engine_base<RegisterType>::status() const
 	if (m_device.machine().time() < m_busy_end)
 		result |= RegisterType::STATUS_BUSY;
 	return result;
+}
+
+
+//-------------------------------------------------
+//  assign_operators - get the current mapping of
+//  operators to channels and assign them all
+//-------------------------------------------------
+
+template<class RegisterType>
+void ymfm_engine_base<RegisterType>::assign_operators()
+{
+	typename RegisterType::operator_mapping curmap;
+	m_regs.operator_map(curmap);
+
+	for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
+		for (int index = 0; index < 4; index++)
+		{
+			u8 opnum = BIT(curmap.chan[chnum], 8 * index, 8);
+			m_channel[chnum]->assign(index, (opnum == 0xff) ? nullptr : m_operator[opnum].get());
+		}
 }
 
 
@@ -2149,3 +2203,4 @@ template class ymfm_engine_base<ymopna_registers>;
 template class ymfm_engine_base<ymopl_registers>;
 template class ymfm_engine_base<ymopl2_registers>;
 template class ymfm_engine_base<ymopll_registers>;
+template class ymfm_engine_base<ymopl3_registers>;

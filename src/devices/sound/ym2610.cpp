@@ -190,7 +190,7 @@ void ym2610_device::device_start()
 	ay8910_device::device_start();
 
 	// create our stream
-	m_stream = stream_alloc(0, 2, clock() / (4 * 6 * 6));
+	m_stream = stream_alloc(0, ymopna_registers::OUTPUTS, clock() / (ymopna_registers::DEFAULT_PRESCALE * ymopna_registers::OPERATORS));
 
 	// save our data
 	save_item(YMFM_NAME(m_address));
@@ -247,7 +247,7 @@ void ym2610_device::device_reset()
 
 void ym2610_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(clock() / (4 * 6 * 6));
+	m_stream->set_sample_rate(clock() / (ymopna_registers::DEFAULT_PRESCALE * ymopna_registers::OPERATORS));
 	ay_set_clock(clock() / 4);
 
 	// recompute the busy duration
@@ -268,6 +268,9 @@ void ym2610_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		return;
 	}
 
+	// prepare for output
+	m_opn.prepare(m_opn_mask);
+
 	// iterate over all target samples
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
@@ -284,18 +287,18 @@ void ym2610_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 			m_eos_status |= 0x80;
 
 		// update the OPN content; OPNB is 13-bit with no intermediate clipping
-		s32 sums[2] = { 0 };
+		s32 sums[ymopna_registers::OUTPUTS] = { 0 };
 		m_opn.output(sums, 1, 32767, m_opn_mask);
-		sums[0] <<= 1;
-		sums[1] <<= 1;
+		for (int index = 0; index < ymopna_registers::OUTPUTS; index++)
+			sums[index] <<= 1;
 
 		// mix in the ADPCM
 		m_adpcm_a.output(sums, 0x3f);
 		m_adpcm_b.output(sums, 2, 0x01);
 
 		// YM2608 is stereo
-		outputs[0].put_int_clamp(sampindex, sums[0], 32768);
-		outputs[1].put_int_clamp(sampindex, sums[1], 32768);
+		for (int index = 0; index < ymopna_registers::OUTPUTS; index++)
+			outputs[index].put_int_clamp(sampindex, sums[index], 32768);
 	}
 }
 
