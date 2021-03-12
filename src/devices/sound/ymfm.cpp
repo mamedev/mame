@@ -1346,7 +1346,7 @@ void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 outpu
 		{
 			result = op1value + (m_op[1]->compute_volume(m_op[1]->phase(), am_offset) >> rshift);
 			s32 clipmin = -clipmax - 1;
-			result = std::clamp(result, clipmin, clipmin);
+			result = std::clamp(result, clipmin, clipmax);
 		}
 	}
 	else
