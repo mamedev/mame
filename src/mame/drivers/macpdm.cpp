@@ -20,8 +20,8 @@
 #include "speaker.h"
 
 constexpr auto IO_CLOCK = 31.3344_MHz_XTAL;
-constexpr auto VGA_CLOCK = 25.1750_MHz_XTAL;
-constexpr auto DOT_CLOCK = 57.2832_MHz_XTAL;
+[[maybe_unused]] constexpr auto VGA_CLOCK = 25.1750_MHz_XTAL;
+[[maybe_unused]] constexpr auto DOT_CLOCK = 57.2832_MHz_XTAL;
 constexpr auto ENET_CLOCK = 20_MHz_XTAL;
 
 class macpdm_state : public driver_device
