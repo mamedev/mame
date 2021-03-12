@@ -19,7 +19,6 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <math.h>
 #include "mathlib.h"
 
 #ifndef MIN
