@@ -23,6 +23,7 @@ spifi3_device::spifi3_device(machine_config const &mconfig, char const *tag, dev
 	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
 {
 }
+
 void spifi3_device::map(address_map &map)
 {
 	// Ugly address map
@@ -70,25 +71,33 @@ void spifi3_device::map(address_map &map)
 	// TODO: command buffer
 }
 
-uint32_t spifi3_device::auxctrl_r() { LOG("read spifi_reg.auxctrl = 0x%x\n", spifi_reg.auxctrl); return spifi_reg.auxctrl; }
+uint32_t spifi3_device::auxctrl_r()
+{
+	LOG("read spifi_reg.auxctrl = 0x%x\n", spifi_reg.auxctrl);
+	return spifi_reg.auxctrl;
+}
 
 void spifi3_device::auxctrl_w(uint32_t data)
 {
 	LOG("write spifi_reg.auxctrl = 0x%x\n", data);
 	spifi_reg.auxctrl = data;
-	if(spifi_reg.auxctrl & AUXCTRL_SRST) {
+	if(spifi_reg.auxctrl & AUXCTRL_SRST)
+	{
 		// reset of some kind
 		LOG("SRST asserted\n");
 	}
-	if(spifi_reg.auxctrl & AUXCTRL_CRST) {
+	if(spifi_reg.auxctrl & AUXCTRL_CRST)
+	{
 		// chip reset?
 		LOG("CRST asserted\n");
 	}
-	if(spifi_reg.auxctrl & AUXCTRL_SETRST) {
+	if(spifi_reg.auxctrl & AUXCTRL_SETRST)
+	{
 		// bus reset?
 		LOG("SETRST asserted\n");
 	}
-	if(spifi_reg.auxctrl & AUXCTRL_DMAEDGE) {
+	if(spifi_reg.auxctrl & AUXCTRL_DMAEDGE)
+	{
 		// do we need to take action here?
 		LOG("DMAEDGE asserted\n");
 	}

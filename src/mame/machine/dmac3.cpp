@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Patrick Mackinlay, Brice Onken
+// copyright-holders:Brice Onken
+// thanks-to:Patrick Mackinlay
 
 /*
  * Sony NEWS DMAC3 DMA controller
