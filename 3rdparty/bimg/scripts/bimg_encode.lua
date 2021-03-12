@@ -42,4 +42,17 @@ project "bimg_encode"
 			"-fPIC",
 		}
 
+	configuration { "mingw* or linux* or osx*" }
+		buildoptions {
+			"-Wno-implicit-fallthrough",
+			"-Wno-shadow",
+			"-Wno-shift-negative-value",
+			"-Wno-undef",
+		}
+
+		buildoptions_cpp {
+			"-Wno-class-memaccess",
+			"-Wno-deprecated-copy",
+		}
+
 	configuration {}
