@@ -549,7 +549,7 @@ void firebeat_state::firebeat(machine_config &config)
 	screen.set_screen_update(FUNC(firebeat_state::screen_update_firebeat_0));
 	screen.set_palette("palette");
 
-	K057714(config, m_gcu, 0, screen);
+	K057714(config, m_gcu, 0).set_screen("screen");
 	m_gcu->irq_callback().set(FUNC(firebeat_state::gcu_interrupt));
 
 	/* sound hardware */
@@ -1649,7 +1649,7 @@ void firebeat_kbm_state::firebeat_kbm(machine_config &config)
 	lscreen.set_screen_update(FUNC(firebeat_kbm_state::screen_update_firebeat_0));
 	lscreen.set_palette("palette");
 
-	K057714(config, m_gcu, 0, lscreen);
+	K057714(config, m_gcu, 0).set_screen("lscreen");
 	m_gcu->irq_callback().set(FUNC(firebeat_kbm_state::gcu_interrupt));
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
@@ -1657,7 +1657,7 @@ void firebeat_kbm_state::firebeat_kbm(machine_config &config)
 	rscreen.set_screen_update(FUNC(firebeat_kbm_state::screen_update_firebeat_1));
 	rscreen.set_palette("palette");
 
-	K057714(config, m_gcu_sub, 0, rscreen);
+	K057714(config, m_gcu_sub, 0).set_screen("rscreen");
 	m_gcu_sub->irq_callback().set(FUNC(firebeat_kbm_state::gcu_interrupt));
 
 	/* sound hardware */

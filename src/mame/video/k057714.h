@@ -6,17 +6,10 @@
 #pragma once
 
 
-class k057714_device : public device_t
+class k057714_device : public device_t, public device_video_interface
 {
 public:
 	// construction/destruction
-	template <typename T>
-	k057714_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock, T&& screen_tag)
-		: k057714_device(mconfig, tag, owner, clock)
-	{
-		m_screen.set_tag(std::forward<T>(screen_tag));
-	}
-
 	k057714_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto irq_callback() { return m_irq.bind(); }
@@ -60,8 +53,6 @@ private:
 	void fb_config(uint32_t *cmd);
 
 	void draw_frame(int frame, bitmap_ind16 &bitmap, const rectangle &cliprect, bool inverse_trans);
-
-	required_device<screen_device> m_screen;
 
 	std::unique_ptr<uint32_t[]> m_vram;
 	uint32_t m_vram_read_addr;
