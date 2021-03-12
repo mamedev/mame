@@ -847,7 +847,7 @@ void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 			LOG(" dt2=%d", m_regs.detune2());
 		if (RegisterType::FAMILY != RegisterType::FAMILY_OPL)
 			LOG(" dt=%d", m_regs.detune());
-		LOG(" fb=%d alg=%d mul=%X tl=%02X ksr=%d", m_regs.feedback(), m_regs.algorithm(), m_regs.multiple(), m_regs.total_level(), m_regs.ksr());
+		LOG(" fb=%d alg=%X mul=%X tl=%02X ksr=%d", m_regs.feedback(), m_regs.algorithm(), m_regs.multiple(), m_regs.total_level(), m_regs.ksr());
 		if (RegisterType::FAMILY == RegisterType::FAMILY_OPL)
 			LOG(" ns=%d ksl=%d adr=%X/%X/%X sus=%d/%d", m_regs.note_select(), m_regs.key_scale_level(), m_regs.attack_rate()/2, m_regs.decay_rate()/2, m_regs.release_rate(), m_regs.eg_sustain(), m_regs.sustain());
 		else
@@ -875,6 +875,13 @@ void ymfm_operator<RegisterType>::start_attack(u8 keycode)
 			LOG(" rhy=1");
 		if (m_regs.instrument() != 0)
 			LOG(" inst=%d", m_regs.instrument());
+		if (RegisterType::DYNAMIC_OPS)
+		{
+			typename RegisterType::operator_mapping map;
+			m_regs.operator_map(map);
+			if (BIT(map.chan[m_regs.chnum()], 16, 8) != 0xff)
+				LOG(" 4op");
+		}
 		LOG("\n");
 	}
 }
@@ -1412,8 +1419,8 @@ void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 outpu
 			ALGORITHM(1,0,0, 0,1,1),	//  6: ((O1 -> O2) + O3 + O4) -> out (O2+O3+O4)
 			ALGORITHM(0,0,0, 1,1,1),	//  7: (O1 + O2 + O3 + O4) -> out (O1+O2+O3+O4)
 			ALGORITHM(1,2,3, 0,0,0),	//  8: O1 -> O2 -> O3 -> O4 -> out (O4)         [same as 0]
-			ALGORITHM(1,0,3, 0,1,0),	//  9: ((O1 -> O2) + (O3 -> O4)) -> out (O2+O4) [same as 4]
-			ALGORITHM(0,2,3, 1,0,0),	// 10: (O1 + (O2 -> O3 -> O4)) -> out (O1+O4)   [unique]
+			ALGORITHM(0,2,3, 1,0,0),	//  9: (O1 + (O2 -> O3 -> O4)) -> out (O1+O4)   [unique]
+			ALGORITHM(1,0,3, 0,1,0),	// 10: ((O1 -> O2) + (O3 -> O4)) -> out (O2+O4) [same as 4]
 			ALGORITHM(0,2,0, 1,0,1)		// 11: (O1 + (O2 -> O3) + O4) -> out (O1+O3+O4) [unique]
 		};
 		u16 algorithm_ops = s_algorithm_ops[algorithm];
@@ -1879,13 +1886,13 @@ u8 ymfm_engine_base<RegisterType>::status() const
 template<class RegisterType>
 void ymfm_engine_base<RegisterType>::assign_operators()
 {
-	typename RegisterType::operator_mapping curmap;
-	m_regs.operator_map(curmap);
+	typename RegisterType::operator_mapping map;
+	m_regs.operator_map(map);
 
 	for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
 		for (int index = 0; index < 4; index++)
 		{
-			u8 opnum = BIT(curmap.chan[chnum], 8 * index, 8);
+			u8 opnum = BIT(map.chan[chnum], 8 * index, 8);
 			m_channel[chnum]->assign(index, (opnum == 0xff) ? nullptr : m_operator[opnum].get());
 		}
 }

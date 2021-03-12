@@ -191,8 +191,8 @@ ae500w07.ad1 - M6295 Samples (23c4001)
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/262intf.h"
 #include "sound/okim6295.h"
+#include "sound/ymf262.h"
 #include "sound/ymz280b.h"
 #include "speaker.h"
 

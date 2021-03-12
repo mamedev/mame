@@ -6,6 +6,7 @@
 #pragma once
 
 #include "dirom.h"
+#include "sound/ymfm.h"
 
 class ymf278b_device : public device_t, public device_sound_interface, public device_rom_interface<22>
 {
@@ -20,10 +21,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_post_load() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_stop() override;
 	virtual void device_clock_changed() override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -89,12 +88,6 @@ private:
 	void precompute_rate_tables();
 	void register_save_state();
 
-	void update_request() { m_stream->update(); }
-
-	static void static_irq_handler(device_t *param, int irq) { }
-	static void static_timer_handler(device_t *param, int c, const attotime &period) { }
-	static void static_update_request(device_t *param, int interval) { downcast<ymf278b_device *>(param)->update_request(); }
-
 	// internal state
 	uint8_t m_pcmregs[256];
 	YMF278BSlot m_slots[24];
@@ -134,7 +127,7 @@ private:
 	uint8_t m_last_fm_data;
 
 	// ymf262
-	void *m_ymf262;
+	ymopl3_engine m_opl;
 };
 
 DECLARE_DEVICE_TYPE(YMF278B, ymf278b_device)

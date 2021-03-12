@@ -50,7 +50,6 @@
 
 #include "emu.h"
 #include "ymf278b.h"
-#include "ymf262.h"
 
 #include <algorithm>
 
@@ -221,17 +220,6 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	YMF278BSlot *slot;
 	int16_t sample = 0;
 	int32_t *mixp;
-	int32_t vl, vr;
-
-	ymf262_update_one(m_ymf262, outputs);
-	stream_buffer::sample_t fvl = stream_buffer::sample_t(m_mix_level[m_fm_l]) * (1.0 / 65536.0);
-	stream_buffer::sample_t fvr = stream_buffer::sample_t(m_mix_level[m_fm_r]) * (1.0 / 65536.0);
-	for (i = 0; i < outputs[0].samples(); i++)
-	{
-		// DO2 mixing
-		outputs[0].put(i, outputs[0].get(i) * fvl);
-		outputs[1].put(i, outputs[1].get(i) * fvr);
-	}
 
 	std::fill(m_mix_buffer.begin(), m_mix_buffer.end(), 0);
 
@@ -313,13 +301,31 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		}
 	}
 
+	m_opl.prepare(ymopl3_registers::ALL_CHANNELS);
+
 	mixp = &m_mix_buffer[0];
-	vl = m_mix_level[m_pcm_l];
-	vr = m_mix_level[m_pcm_r];
+	stream_buffer::sample_t wtl = stream_buffer::sample_t(m_mix_level[m_pcm_l]) / (65536.0f * 32768.0f);
+	stream_buffer::sample_t wtr = stream_buffer::sample_t(m_mix_level[m_pcm_r]) / (65536.0f * 32768.0f);
+	stream_buffer::sample_t fml = stream_buffer::sample_t(m_mix_level[m_fm_l]) / (65536.0f * 32768.0f);
+	stream_buffer::sample_t fmr = stream_buffer::sample_t(m_mix_level[m_fm_r]) / (65536.0f * 32768.0f);
 	for (i = 0; i < outputs[0].samples(); i++)
 	{
-		outputs[0].add_int(i, (*mixp++ * vl) >> 16, 32768);
-		outputs[1].add_int(i, (*mixp++ * vr) >> 16, 32768);
+		// clock the system
+		m_opl.clock(ymopl3_registers::ALL_CHANNELS);
+
+		// update the OPL content; clipping is unknown
+		s32 sums[ymopl3_registers::OUTPUTS] = { 0 };
+		m_opl.output(sums, 0, 32767, ymopl3_registers::ALL_CHANNELS);
+
+		// DO2 output: mixed FM channels 0+1 and wavetable channels 0+1
+		outputs[0].put(i, stream_buffer::sample_t(*mixp++) * wtl + stream_buffer::sample_t(sums[0] * fml));
+		outputs[1].put(i, stream_buffer::sample_t(*mixp++) * wtr + stream_buffer::sample_t(sums[1] * fmr));
+
+		// DO0 output: FM channels 2+3 only
+		outputs[2].put_int(i, sums[2], 32768);
+		outputs[3].put_int(i, sums[3], 32768);
+
+		// DO1 output: wavetable channels 2+3 only
 		outputs[4].put_int(i, *mixp++, 32768);
 		outputs[5].put_int(i, *mixp++, 32768);
 	}
@@ -702,7 +708,6 @@ void ymf278b_device::write(offs_t offset, u8 data)
 			timer_busy_start(0);
 			m_port_AB = data;
 			m_lastport = offset>>1 & 1;
-			ymf262_write(m_ymf262, offset, data);
 			break;
 
 		case 1:
@@ -711,7 +716,7 @@ void ymf278b_device::write(offs_t offset, u8 data)
 			if (m_lastport) B_w(m_port_AB, data);
 			else A_w(m_port_AB, data);
 			m_last_fm_data = data;
-			ymf262_write(m_ymf262, offset, data);
+			m_opl.write(m_port_AB | (m_lastport << 8), data);
 			break;
 
 		case 4:
@@ -798,15 +803,6 @@ u8 ymf278b_device::read(offs_t offset)
 /**************************************************************************/
 
 //-------------------------------------------------
-//  device_post_load - device-specific post load
-//-------------------------------------------------
-
-void ymf278b_device::device_post_load()
-{
-	ymf262_post_load(m_ymf262);
-}
-
-//-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
@@ -861,13 +857,7 @@ void ymf278b_device::device_reset()
 	if (!m_irq_handler.isnull())
 		m_irq_handler(0);
 
-	ymf262_reset_chip(m_ymf262);
-}
-
-void ymf278b_device::device_stop()
-{
-	ymf262_shutdown(m_ymf262);
-	m_ymf262 = nullptr;
+	m_opl.reset();
 }
 
 void ymf278b_device::device_clock_changed()
@@ -883,10 +873,6 @@ void ymf278b_device::device_clock_changed()
 	m_stream->set_sample_rate(m_rate);
 
 	m_timer_base = m_clock ? attotime::from_hz(m_clock) * (19 * 36) : attotime::zero;
-
-	// YMF262 related
-
-	ymf262_clock_changed(m_ymf262, clock(), m_rate);
 }
 
 void ymf278b_device::rom_bank_updated()
@@ -1037,16 +1023,7 @@ void ymf278b_device::device_start()
 	register_save_state();
 
 	// YMF262 related
-
-	/* stream system initialize */
-	m_ymf262 = ymf278b_init(this, clock(), m_rate);
-	if (!m_ymf262)
-		throw emu_fatalerror("ymf278b_device(%s): Error creating YMF262 chip", tag());
-
-	/* YMF262 setup */
-	ymf262_set_timer_handler (m_ymf262, ymf278b_device::static_timer_handler, this);
-	ymf262_set_irq_handler   (m_ymf262, ymf278b_device::static_irq_handler, this);
-	ymf262_set_update_handler(m_ymf262, ymf278b_device::static_update_request, this);
+	m_opl.save(*this);
 }
 
 
@@ -1058,5 +1035,6 @@ ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, d
 	, device_rom_interface(mconfig, *this)
 	, m_irq_handler(*this)
 	, m_last_fm_data(0)
+	, m_opl(*this)
 {
 }

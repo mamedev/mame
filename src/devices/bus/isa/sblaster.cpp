@@ -14,8 +14,8 @@
 #include "sblaster.h"
 
 #include "machine/pic8259.h"
-#include "sound/262intf.h"
 #include "sound/spkrdev.h"
+#include "sound/ymf262.h"
 
 #include "speaker.h"
 

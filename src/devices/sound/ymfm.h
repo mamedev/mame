@@ -161,7 +161,7 @@ public:
 	};
 
 	// this value is returned from the is_keyon() function for rhythm channels
-	static constexpr u8 YMFM_RHYTHM_CHANNEL = 15;
+	static constexpr u8 YMFM_RHYTHM_CHANNEL = 0xff;
 
 	//
 	// the following constants need to be defined per family:
@@ -1031,6 +1031,7 @@ public:
 
 		// block_freq is block(3b):fnum(10b):0; the 4-bit keycode uses the top
 		// 3 bits plus either the MSB or MSB-1 of fnum, depending on note_select
+		// NOTE: according to other sources, this is reversed from the manual
 		return keycode | BIT(block_freq, 10 - note_select(), 1);
 	}
 
@@ -1451,6 +1452,7 @@ public:
 	static constexpr u8 DYNAMIC_OPS = true;
 	static constexpr u16 REGISTERS = 0x200;
 	static constexpr u8 DEFAULT_PRESCALE = 8;
+	static constexpr bool MODULATOR_DELAY = false;
 	static constexpr u32 CSM_TRIGGER_MASK = 0;
 
 	// constructor
@@ -1470,7 +1472,7 @@ public:
 	{
 		assert(opnum < OPERATORS);
 		m_opnum = opnum;
-		m_opoffs = opnum + opnum % 6 + 8 * ((opnum % 18) / 6) + 0x100 * (opnum % 18);
+		m_opoffs = opnum % 6 + 8 * ((opnum % 18) / 6) + 0x100 * (opnum / 18);
 	}
 
 	// return a mapping between operators and channel,index pairs
@@ -1538,22 +1540,11 @@ public:
 			}
 			else if (channel < CHANNELS)
 			{
-				opmask = BIT(data, 5) ? 3 : 0;
+				opmask = BIT(data, 5) ? 0x0f : 0;
 				return true;
 			}
 		}
 		return false;
-	}
-
-	// compute the keycode from the given block_freq value
-	u8 block_freq_to_keycode(u16 block_freq) const
-	{
-		u8 keycode = BIT(block_freq, 11, 3) << 1;
-
-		// block_freq is block(3b):fnum(10b):0; the 4-bit keycode uses the top
-		// 3 bits plus either the MSB or MSB-1 of fnum, depending on note_select
-		// NOTE: the YMF262 manual says this, should it be this way for OPL/OPL2 as well?
-		return keycode | BIT(block_freq, 9 + note_select(), 1);
 	}
 
 	// OPL3-specific system-wide registers
@@ -1562,7 +1553,11 @@ public:
 	u8 fourop_enable() const      /*  6 bits */ { return sysbyte(0x104, 0, 6); }
 
 	// OPL3-specific per-channel registers
-	u8 algorithm() const          /*  2 bits */ { return chbyte(0xc0, 0, 1) | (chbyte(0xc3, 0, 1) << 1); }
+	u8 algorithm() const          /*  2 bits */ { return 8 | (chbyte(0xc3, 0, 1) << 1) | chbyte(0xc0, 0, 1); }
+	u8 output0() const            /*  1 bit  */ { return chbyte(0xc0, 5, 1); }
+	u8 output1() const            /*  1 bit  */ { return chbyte(0xc0, 4, 1); }
+	u8 output2() const            /*  1 bit  */ { return chbyte(0xc0, 6, 1); }
+	u8 output3() const            /*  1 bit  */ { return chbyte(0xc0, 7, 1); }
 
 	// per-operator registers
 	u8 waveform_enable() const    /*  1 bits */ { return 1; }
@@ -1627,7 +1622,7 @@ public:
 	// key state control
 	void keyonoff(u8 on, ymfm_keyon_type type);
 
-	// return a pointer to our registers
+	// return a reference to our registers
 	RegisterType &regs() { return m_regs; }
 
 private:
@@ -1702,7 +1697,7 @@ public:
 	void output_rhythm_ch7(u8 lfo_raw_am, u8 noise_state, u8 phase_select, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
 	void output_rhythm_ch8(u8 lfo_raw_am, u8 phase_select, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
 
-	// return a pointer to our registers
+	// return a reference to our registers
 	RegisterType &regs() { return m_regs; }
 
 private:
@@ -1795,6 +1790,9 @@ public:
 
 	// return the owning device
 	device_t &device() const { return m_device; }
+
+	// return a reference to our registers
+	RegisterType &regs() { return m_regs; }
 
 protected:
 	// assign the current set of operators to channels

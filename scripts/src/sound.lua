@@ -1181,7 +1181,6 @@ end
 --@src/devices/sound/ymf271.h,SOUNDS["YMF271"] = true
 --@src/devices/sound/ymf278b.h,SOUNDS["YMF278B"] = true
 --@src/devices/sound/y8950.h,SOUNDS["Y8950"] = true
---@src/devices/sound/262intf.h,SOUNDS["YMF262"] = true
 ---------------------------------------------------
 
 if (SOUNDS["YM2151"]~=null) then
@@ -1286,8 +1285,8 @@ if (SOUNDS["YMF262"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/ymf262.cpp",
 		MAME_DIR .. "src/devices/sound/ymf262.h",
-		MAME_DIR .. "src/devices/sound/262intf.cpp",
-		MAME_DIR .. "src/devices/sound/262intf.h",
+		MAME_DIR .. "src/devices/sound/ymfm.cpp",
+		MAME_DIR .. "src/devices/sound/ymfm.h",
 	}
 end
 
@@ -1302,6 +1301,8 @@ if (SOUNDS["YMF278B"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/ymf278b.cpp",
 		MAME_DIR .. "src/devices/sound/ymf278b.h",
+		MAME_DIR .. "src/devices/sound/ymfm.cpp",
+		MAME_DIR .. "src/devices/sound/ymfm.h",
 	}
 end
 
