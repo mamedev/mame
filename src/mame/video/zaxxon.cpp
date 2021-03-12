@@ -473,8 +473,9 @@ uint32_t zaxxon_state::screen_update_ixion(screen_device &screen, bitmap_ind16 &
 	// above them.
 	// 	   
 	// The Zaxxon and Congo Bongo schematics don't appear to show anything related to priority control
-	// (although the PCB here is closer to a Razzmatazz which already has a different hookup here) so
-	// this is most likely a hardwired change somewhere on the PCB.
+	// so this is most likely a hardwired change somewhere on the PCB.  There are additional bits set
+	// in the 2nd PROM, which are currently masked out as they're not used for palette.
+
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect, 0x140, 0x180);
 	return 0;
