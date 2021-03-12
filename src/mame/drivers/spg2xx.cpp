@@ -491,9 +491,10 @@ static INPUT_PORTS_START( itvphone ) // hold 8 and ENTER for Diagnostics mode
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad 0") PORT_CODE(KEYCODE_0_PAD)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad +") PORT_CODE(KEYCODE_PLUS_PAD)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Phone Pad *") PORT_CODE(KEYCODE_ASTERISK)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON5 )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON6 )
+	PORT_CONFNAME( 0x7000, 0x0000, "Non-TV Mode Game" )
+	PORT_CONFSETTING(      0x1000, "Learning Game" )
+	PORT_CONFSETTING(      0x2000, "Finding Game" )
+	PORT_CONFSETTING(      0x4000, "Memory Game" ) 
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2")
@@ -502,7 +503,7 @@ static INPUT_PORTS_START( itvphone ) // hold 8 and ENTER for Diagnostics mode
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Enter") // needed for DIAGNOSTICS mode
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Bell")
 	PORT_CONFNAME( 0x0040, 0x0000, "TV / Non-TV mode" ) // this is shown as a button in DIAGNOSTICS mode
 	PORT_CONFSETTING(      0x0000, "TV" )
 	PORT_CONFSETTING(      0x0040, "Non-TV" )
@@ -510,7 +511,7 @@ static INPUT_PORTS_START( itvphone ) // hold 8 and ENTER for Diagnostics mode
 
 	PORT_START("P3")
 	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) // reset? back?
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Reset") // reset? back?
 	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -2202,7 +2203,7 @@ CONS( 2009, senwfit,    0,        0, gssytts,   senwfit,   spg2xx_game_senwfit_s
 CONS( 2006, vtechtvssp, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Station (VTech, Spain)",                                             MACHINE_NOT_WORKING )
 CONS( 2006, vtechtvsgr, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          empty_init,    "VTech",                                                  "TV Learning Station (VTech, Germany)",                                  MACHINE_NOT_WORKING )
 
-CONS( 2007, itvphone,   0,        0, spg2xx_pal, itvphone, spg2xx_game_state,          init_itvphone, "Oregon Scientific / V-Tac Technology Co Ltd.",           u8"Teléfono interactivo de TV (Spain)",                                    MACHINE_NOT_WORKING )
+CONS( 2007, itvphone,   0,        0, spg2xx_pal, itvphone, spg2xx_game_state,          init_itvphone, "Taikee / Oregon Scientific / V-Tac Technology Co Ltd.",  u8"Teléfono interactivo de TV (Spain)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // "Boots's" is used on the title screen and in the manual, even if "Boots'" is usually used outside of this game.
 CONS( 2006, doraphon,   0,        0, doraphone, doraphone, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Explorer Phone / Boots's Special Day",      MACHINE_IMPERFECT_SOUND )
