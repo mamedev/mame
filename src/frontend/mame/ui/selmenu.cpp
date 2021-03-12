@@ -1851,6 +1851,8 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				stop = true;
 				break;
 			case ui_event::type::NONE:
+			case ui_event::type::WINDOW_FOCUS:
+			case ui_event::type::WINDOW_DEFOCUS:
 			case ui_event::type::MOUSE_MOVE:
 			case ui_event::type::MOUSE_LEAVE:
 			case ui_event::type::MOUSE_UP:
@@ -2503,7 +2505,7 @@ std::string menu_select_launch::make_system_audit_fail_text(media_auditor const 
 		osd_printf_info(str.str());
 		str.str("");
 	}
-	str << _("Required ROM/disk images for the selected system are missing or incorrect. Please select a different system.\n\n");
+	str << _("Required ROM/disk images for the selected system are missing or incorrect. Please acquire the correct files or select a different system.\n\n");
 	make_audit_fail_text(str, auditor, summary);
 	return str.str();
 }
@@ -2519,7 +2521,7 @@ std::string menu_select_launch::make_software_audit_fail_text(media_auditor cons
 		osd_printf_info(str.str());
 		str.str("");
 	}
-	str << _("Required ROM/disk images for the selected software are missing or incorrect. Please select a different software item.\n\n");
+	str << _("Required ROM/disk images for the selected software are missing or incorrect. Please acquire the correct files or select a different software item.\n\n");
 	make_audit_fail_text(str, auditor, summary);
 	return str.str();
 }

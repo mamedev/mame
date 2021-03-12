@@ -54,7 +54,7 @@ cc525dsdd_format::cc525dsdd_format()
 
 const char *cc525dsdd_format::name() const
 {
-	return "img";
+	return "concept";
 }
 
 const char *cc525dsdd_format::description() const

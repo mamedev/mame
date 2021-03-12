@@ -1837,6 +1837,8 @@ void inferno_state::inferno(machine_config &config)
 	m_pia[0]->readpa_handler().set("mux", FUNC(ls157_x2_device::output_r));
 	m_pia[0]->ca2_handler().set("mux", FUNC(ls157_x2_device::select_w));
 
+	m_pia[2]->set_port_a_input_overrides_output_mask(0xff);
+
 	LS157_X2(config, m_mux, 0); // IC45 (for PA4-PA7) + IC46 (for PA0-PA3) on CPU board
 	m_mux->a_in_callback().set_ioport("INP1");
 	m_mux->b_in_callback().set_ioport("INP2");

@@ -662,7 +662,7 @@ void swim1_device::iwm_sync()
 	if(!m_iwm_active)
 		return;
 
-	u64 next_sync = machine().time().as_ticks(clock());
+	u64 next_sync = time_to_cycles(machine().time());
 	switch(m_iwm_rw) {
 	case MODE_IDLE:
 		m_last_sync = next_sync;

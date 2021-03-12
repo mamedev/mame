@@ -1,10 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+// The TV Board Game units have "Programmed by E.I. HK Development LTD." in the graphics
+
+// To perform the hidden ROM check do Up + Button A while booting up, then on the black screen Down + Button B.
+// This is probably impossible on the single button units using real hardware as the 'B' input isn't connected
+// Currently these checksums fail in MAME due to the interrupt hack mapping over ROM, if you remove that hack they pass
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-//#include "cpu/m6502/m65c02.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -135,75 +139,29 @@ void elan_ep3a19a_state::elan_ep3a19a_bank_map(address_map &map)
 }
 
 
-static INPUT_PORTS_START( elan_ep3a19a )
+static INPUT_PORTS_START( tvbg_1button )
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x0001, 0x0001, "IN0" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x0001, 0x0001, "IN1" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_DIPNAME( 0x0020, 0x0020, "IN2" )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) // the 6-in-1 units have a single button marked with both A and B (unless it depends which side of the button you press?)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
 
+static INPUT_PORTS_START( tvbg_2button )
+	PORT_INCLUDE( tvbg_1button )
+	
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Boggle uses 2 buttons for gameplay, other units do read this to enter secret test mode, but none of the games need it?
 INPUT_PORTS_END
 
 
@@ -352,6 +310,30 @@ ROM_START( tvbg6b )
 	ROM_RELOAD(0x200000,0x200000)
 ROM_END
 
+ROM_START( tvbg3a )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hhhssp.bin", 0x00000, 0x100000, CRC(7e23a5a0) SHA1(2cd0f7572df30d2565b64fa0936715f71312ab1a) )
+	ROM_RELOAD(0x100000,0x100000)
+	ROM_RELOAD(0x200000,0x100000)
+	ROM_RELOAD(0x300000,0x100000)
+ROM_END
+
+ROM_START( tvbg3b )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "simonbship.bin", 0x00000, 0x100000, CRC(9b10a87a) SHA1(f2022ac07468d911cfb3d32887d6e59e60d48d51) )
+	ROM_RELOAD(0x100000,0x100000)
+	ROM_RELOAD(0x200000,0x100000)
+	ROM_RELOAD(0x300000,0x100000)
+ROM_END
+
+ROM_START( tvbg3c )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "boggle_connect4.bin", 0x00000, 0x100000, CRC(c2374eea) SHA1(c6971cb5108828bc72fd1cf7edeb53915d196db7) )
+	ROM_RELOAD(0x100000,0x100000)
+	ROM_RELOAD(0x200000,0x100000)
+	ROM_RELOAD(0x300000,0x100000)
+ROM_END
+
 void elan_ep3a19a_state::init_tvbg()
 {
 	// is this swapping internal to the ep3a19a type ELAN, or external; ROM glob had standard TSOP pinout pads that were used for dumping.
@@ -362,11 +344,11 @@ void elan_ep3a19a_state::init_tvbg()
 	}
 }
 
-CONS( 2007, tvbg6a, 0, 0, elan_ep3a19a, elan_ep3a19a, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 6-in-1: Silly 6 Pins, Candy Land, Hungry Hungry Hippos, Match 'em, Mixin' Pics, Checkers", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=zajzQo47YYA
-CONS( 2007, tvbg6b, 0, 0, elan_ep3a19a, elan_ep3a19a, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 6-in-1: Simon, Battleship, Mouse Trap, Checkers, Link-a-Line, Roll Over", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=JbrR67kY8MI
+CONS( 2007, tvbg6a, 0, 0, elan_ep3a19a, tvbg_1button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 6-in-1: Silly 6 Pins, Candy Land, Hungry Hungry Hippos, Match 'em, Mixin' Pics, Checkers", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=zajzQo47YYA
+CONS( 2007, tvbg6b, 0, 0, elan_ep3a19a, tvbg_1button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 6-in-1: Simon, Battleship, Mouse Trap, Checkers, Link-a-Line, Roll Over", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=JbrR67kY8MI
 
-// TV Board Games 3-in-1: Silly 6 Pins, Hungry Hungry Hippos, Match 'em
-// TV Board Games 3-in-1: Simon, Battleship, Checkers    https://www.youtube.com/watch?v=Q7nwKJfVavU
-// TV Board Games 3-in-1: Boggle, Connect 4, Roll Over   https://www.youtube.com/watch?v=SoKKIKSDGhY
+CONS( 2007, tvbg3a, 0, 0, elan_ep3a19a, tvbg_2button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 3-in-1: Silly 6 Pins, Hungry Hungry Hippos, Match 'em", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, tvbg3b, 0, 0, elan_ep3a19a, tvbg_2button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 3-in-1: Simon, Battleship, Checkers", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=Q7nwKJfVavU
+CONS( 2007, tvbg3c, 0, 0, elan_ep3a19a, tvbg_2button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 3-in-1: Boggle, Connect 4, Roll Over", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=SoKKIKSDGhY
 
 // The back of the Silly 6 Pins 3-in-1 packaging suggests a Monopoly TV Board Game device was planned, but this does not appear to have been released.

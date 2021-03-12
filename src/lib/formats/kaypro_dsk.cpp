@@ -26,7 +26,7 @@ kayproii_format::kayproii_format() : upd765_format(formats)
 
 const char *kayproii_format::name() const
 {
-	return "kaypro";
+	return "kaypro2";
 }
 
 const char *kayproii_format::description() const
@@ -53,7 +53,7 @@ kaypro2x_format::kaypro2x_format() : upd765_format(formats)
 
 const char *kaypro2x_format::name() const
 {
-	return "kaypro";
+	return "kaypro2x";
 }
 
 const char *kaypro2x_format::description() const

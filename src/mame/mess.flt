@@ -631,6 +631,7 @@ monkey_king_3b.cpp
 monon_color.cpp
 monty.cpp
 mpc3000.cpp
+mpc60.cpp
 mpf1.cpp
 mps1230.cpp
 mpz80.cpp

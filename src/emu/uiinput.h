@@ -15,12 +15,6 @@
 
 
 /***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-#define EVENT_QUEUE_SIZE        128
-
-/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
@@ -29,6 +23,8 @@ struct ui_event
 	enum class type
 	{
 		NONE,
+		WINDOW_FOCUS,
+		WINDOW_DEFOCUS,
 		MOUSE_MOVE,
 		MOUSE_LEAVE,
 		MOUSE_DOWN,
@@ -90,19 +86,24 @@ public:
 	running_machine &machine() const { return m_machine; }
 
 	// queueing events
-	void push_mouse_move_event(render_target* target, s32 x, s32 y);
-	void push_mouse_leave_event(render_target* target);
-	void push_mouse_down_event(render_target* target, s32 x, s32 y);
-	void push_mouse_up_event(render_target* target, s32 x, s32 y);
-	void push_mouse_rdown_event(render_target* target, s32 x, s32 y);
-	void push_mouse_rup_event(render_target* target, s32 x, s32 y);
-	void push_mouse_double_click_event(render_target* target, s32 x, s32 y);
-	void push_char_event(render_target* target, char32_t ch);
+	void push_window_focus_event(render_target *target);
+	void push_window_defocus_event(render_target *target);
+	void push_mouse_move_event(render_target *target, s32 x, s32 y);
+	void push_mouse_leave_event(render_target *target);
+	void push_mouse_down_event(render_target *target, s32 x, s32 y);
+	void push_mouse_up_event(render_target *target, s32 x, s32 y);
+	void push_mouse_rdown_event(render_target *target, s32 x, s32 y);
+	void push_mouse_rup_event(render_target *target, s32 x, s32 y);
+	void push_mouse_double_click_event(render_target *target, s32 x, s32 y);
+	void push_char_event(render_target *target, char32_t ch);
 	void push_mouse_wheel_event(render_target *target, s32 x, s32 y, short delta, int ucNumLines);
 
 	void mark_all_as_pressed();
 
 private:
+
+	// constants
+	constexpr static unsigned EVENT_QUEUE_SIZE = 128;
 
 	// internal state
 	running_machine &   m_machine;                  // reference to our machine

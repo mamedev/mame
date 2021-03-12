@@ -193,7 +193,7 @@ void sdl_osd_interface::window_exit()
 		window->destroy();
 	}
 
-	switch(video_config.mode)
+	switch (video_config.mode)
 	{
 		case VIDEO_MODE_SDL2ACCEL:
 			renderer_sdl1::exit();
@@ -528,11 +528,7 @@ osd_dim sdl_window_info::pick_best_mode()
 
 void sdl_window_info::update()
 {
-	osd_ticks_t     event_wait_ticks;
-
 	// adjust the cursor state
-	//sdlwindow_update_cursor_state(machine, window);
-
 	update_cursor_state();
 
 	// if we're visible and running and not in the middle of a resize, draw
@@ -558,6 +554,7 @@ void sdl_window_info::update()
 			}
 		}
 
+		osd_ticks_t event_wait_ticks;
 		if (video_config.waitvsync && video_config.syncrefresh)
 			event_wait_ticks = osd_ticks_per_second(); // block at most a second
 		else
@@ -585,20 +582,20 @@ void sdl_window_info::update()
 
 			m_primlist = &primlist;
 
-			// if no bitmap, just fill
 			if (m_primlist == nullptr)
 			{
+				// if no bitmap, just fill
 			}
-			// otherwise, render with our drawing system
 			else
 			{
-				if( video_config.perftest )
+				// otherwise, render with our drawing system
+				if (video_config.perftest)
 					measure_fps(update);
 				else
 					renderer().draw(update);
 			}
 
-			/* all done, ready for next */
+			// all done, ready for next
 			m_rendered_event.set();
 		}
 	}
@@ -768,8 +765,8 @@ int sdl_window_info::complete_create()
 		return 1;
 
 	// Make sure we have a consistent state
-	SDL_ShowCursor(0);
-	SDL_ShowCursor(1);
+	SDL_ShowCursor(SDL_DISABLE);
+	SDL_ShowCursor(SDL_ENABLE);
 
 	return 0;
 }

@@ -2464,6 +2464,14 @@ void mac_state::devsel_w(u8)
 void mac_state::hdsel_w(int)
 {
 }
+
+void mac_state::devsel_s3_w(u8)
+{
+}
+
+void mac_state::hdsel_s3_w(int)
+{
+}
 #else
 
 void mac_state::phases_w(uint8_t phases)
@@ -2492,6 +2500,23 @@ void mac_state::devsel_w(uint8_t devsel)
 
 void mac_state::hdsel_w(int hdsel)
 {
+}
+
+void mac_state::devsel_s3_w(uint8_t devsel)
+{
+	if(devsel == 1)
+		m_cur_floppy = m_floppy[0]->get_device();
+	else if(devsel == 2)
+		m_cur_floppy = m_floppy[1]->get_device();
+	else
+		m_cur_floppy = nullptr;
+	m_fdc->set_floppy(m_cur_floppy);
+}
+
+void mac_state::hdsel_s3_w(int hdsel)
+{
+	if(m_cur_floppy)
+		m_cur_floppy->ss_w(hdsel);
 }
 
 #endif

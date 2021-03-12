@@ -751,7 +751,7 @@ public:
 	//! @param v the variant.
 	void set_variant(uint32_t v) { variant = v; }
 	//! @param v the variant.
-	void set_form_variant(uint32_t f, uint32_t v) { if(form_factor == FF_UNKNOWN) form_factor = f, variant = v; }
+	void set_form_variant(uint32_t f, uint32_t v) { if(form_factor == FF_UNKNOWN) form_factor = f; variant = v; }
 
 	/*!
 	  @param track

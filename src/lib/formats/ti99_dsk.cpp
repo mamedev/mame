@@ -903,7 +903,7 @@ uint8_t ti99_floppy_format::get_data_from_encoding(uint16_t raw)
 */
 const char *ti99_sdf_format::name() const
 {
-	return "sdf";
+	return "ti99";
 }
 
 const char *ti99_sdf_format::description() const
