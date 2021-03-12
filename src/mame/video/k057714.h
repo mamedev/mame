@@ -50,7 +50,7 @@ private:
 		VRAM_SIZE_HALF = 0x2000000 / 2
 	};
 
-	inline void crtc_set_screen_params();
+	void crtc_set_screen_params();
 
 	void execute_command(uint32_t *cmd);
 	void execute_display_list(uint32_t addr);
