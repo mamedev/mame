@@ -88,7 +88,7 @@ Notes:
 
 TODO:
 - Support cartridge slot select function
-- Support camera, printer, lightpen emulation
+- Requires camera, printer, lightpen emulation
 
 ***************************************************************************/
 
@@ -142,7 +142,7 @@ private:
 	required_device<palette_device> m_bg15_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	optional_device_array<intelfsh8_device, 12> m_cart_flash;
+	required_device_array<intelfsh8_device, 12> m_cart_flash;
 	required_device<address_map_bank_device> m_cartflash_bankdev;
 	required_device<okim6295_device> m_oki;
 
