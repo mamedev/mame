@@ -5000,7 +5000,7 @@ void gpoker_state::gpoker(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 2405); // astable multivibrator - C1 and C2 are 0.003uF, R1 and R4 are 1K, R2 and R3 are 100K
+	BEEP(config, m_beeper, 2400); // astable multivibrator - C1 and C2 are 0.003uF, R1 and R4 are 1K, R2 and R3 are 100K
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 

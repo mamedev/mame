@@ -16179,7 +16179,10 @@ uspbball                        // US Games
 ftri1                           // Fonas
 mastmind                        // Invicta
 memoquiz                        // MEM
+mwcfootb                        // Mattel
+rdqa                            // Selchow & Righter
 scrabsen                        // Selchow & Righter
+smastmind                       // Invicta
 
 @source:hh_sm510.cpp
 auslalom                        // Elektronika
