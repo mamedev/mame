@@ -78,6 +78,9 @@ void swim2_device::set_floppy(floppy_image_device *floppy)
 	if(m_floppy == floppy)
 		return;
 
+	sync();
+	flush_write();
+
 	m_floppy = floppy;
 	update_phases();
 	m_hdsel_cb((m_mode >> 5) & 1);

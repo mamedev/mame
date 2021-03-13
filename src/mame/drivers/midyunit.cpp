@@ -1714,19 +1714,19 @@ ROM_END
 
 ROM_START( narc1 )
 	ROM_REGION( 0x90000, "narcsnd:cpu0", 0 )    /* sound CPU */
-	ROM_LOAD( "rev2_narc_sound_rom_u4.u4", 0x50000, 0x10000, CRC(450a591a) SHA1(bbda8061262738e5866f2707f69483a0a51d2910) ) // should these be REV1 ROMs with different data? - NOT verified correct for this set
+	ROM_LOAD( "rev1_narc_sound_rom_u4.u4", 0x50000, 0x10000, CRC(345b5b0b) SHA1(98918785b2c096ceec14a42199f1ad24149ef936) )
 	ROM_RELOAD(                            0x60000, 0x10000 )
-	ROM_LOAD( "rev2_narc_sound_rom_u5.u5", 0x70000, 0x10000, CRC(e551e5e3) SHA1(c8b4f53dbd4c534abb77d4dc07c4d12653b79894) )
+	ROM_LOAD( "rev1_narc_sound_rom_u5.u5", 0x70000, 0x10000, CRC(bfa112b7) SHA1(2156b52b6ad838e3c9ba33d27da4f753f8a26bef) )
 	ROM_RELOAD(                            0x80000, 0x10000 )
 
 	ROM_REGION( 0x90000, "narcsnd:cpu1", 0 )    /* slave sound CPU */
-	ROM_LOAD( "rev2_narc_sound_rom_u35.u35", 0x10000, 0x10000, CRC(81295892) SHA1(159664e5ee03c88d6e940e70e87e2150dc5b8b25) )
+	ROM_LOAD( "rev1_narc_sound_rom_u35.u35", 0x10000, 0x10000, CRC(c932e69f) SHA1(dca1113c63f997b5a779d6e3ca6c555cb266b8ab) )
 	ROM_RELOAD(                              0x20000, 0x10000 )
-	ROM_LOAD( "rev2_narc_sound_rom_u36.u36", 0x30000, 0x10000, CRC(16cdbb13) SHA1(2dfd961a5d909c1804f4fda34de33ee2664c4bc6) )
+	ROM_LOAD( "rev1_narc_sound_rom_u36.u36", 0x30000, 0x10000, CRC(974ad9f4) SHA1(5646099214d4e29ed529b66a5dedbaeca0ad375e) )
 	ROM_RELOAD(                              0x40000, 0x10000 )
-	ROM_LOAD( "rev2_narc_sound_rom_u37.u37", 0x50000, 0x10000, CRC(29dbeffd) SHA1(4cbdc619db34f9c552de1ed3d034f8c079987e03) )
+	ROM_LOAD( "rev1_narc_sound_rom_u37.u37", 0x50000, 0x10000, CRC(b6469f79) SHA1(58b59ac8466813def7f1f0c6d0f7cdd167500889) )
 	ROM_RELOAD(                              0x60000, 0x10000 )
-	ROM_LOAD( "rev2_narc_sound_rom_u38.u38", 0x70000, 0x10000, CRC(09b03b80) SHA1(a45782d29a426fac38299b56af0815e844e35ae4) )
+	ROM_LOAD( "rev1_narc_sound_rom_u38.u38", 0x70000, 0x10000, CRC(c535d11c) SHA1(b7e670669713bbf860c2025b9830bfc4d941651c) )
 	ROM_RELOAD(                              0x80000, 0x10000 )
 
 	ROM_REGION16_LE( 0x100000, "user1", 0 ) /* 34010 code */

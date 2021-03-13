@@ -73,7 +73,7 @@
  @MP3201   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A)
  @MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (Rev A)
- *MP3232   TMS1000   1979, Fonas 2-Player Baseball (no "MP" on chip label)
+ *MP3232   TMS1000   1979, Fonas 2 Player Baseball (no "MP" on chip label)
  @MP3260   TMS1000   1979, Electroplay Quickfire
  @MP3300   TMS1000   1979, Milton Bradley Simon (Rev F)
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
@@ -5000,7 +5000,7 @@ void gpoker_state::gpoker(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 2405); // astable multivibrator - C1 and C2 are 0.003uF, R1 and R4 are 1K, R2 and R3 are 100K
+	BEEP(config, m_beeper, 2400); // astable multivibrator - C1 and C2 are 0.003uF, R1 and R4 are 1K, R2 and R3 are 100K
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -6295,10 +6295,8 @@ ROM_END
   This handheld is not a toy, read the manual for more information. In short,
   it is a device for predicting the winning chance of a gambling horserace.
 
-  known releases:
-  - USA: Thoroughbred Horse Race Analyzer
-  - China/Canada: Thoroughbred Horse Race Analyzer, published in 1994 by
-    Advanced Handicapping Technologies, Inc.
+  It was rereleased in 1994 in China/Canada by AHTI(Advanced Handicapping
+  Technologies, Inc.), on a Hitachi HD613901.
 
 ***************************************************************************/
 

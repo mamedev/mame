@@ -44,6 +44,10 @@ protected:
 
 	// opcode handlers
 	virtual void op_ios() override;
+	virtual void op_i2c() override;
+
+	virtual void op_ibm() override;
+	virtual void op_int1h() override;
 };
 
 

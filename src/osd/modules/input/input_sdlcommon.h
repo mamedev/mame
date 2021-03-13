@@ -117,12 +117,10 @@ class sdl_event_manager : public event_manager_t<sdl_event_subscriber>
 {
 private:
 	bool                                 m_mouse_over_window;
-	bool                                 m_has_focus;
 	std::shared_ptr<sdl_window_info>     m_focus_window;
 
 	sdl_event_manager()
 		: m_mouse_over_window(true),
-		  m_has_focus(true),
 		  m_focus_window(nullptr)
 	{
 	}

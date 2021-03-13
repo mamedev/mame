@@ -4,7 +4,7 @@
 
     American Laser Game Hardware
 
-    Amiga 500 + sony laserdisc player LDP-1450
+    Amiga 500 + Sony laserdisc player LDP-1450
     (LDP-3300P for Zorton Brothers, LDP-1500 for Marbella Vice)
 
     Games Supported:
@@ -19,8 +19,9 @@
         The Last Bounty Hunter [2 versions]
         Fast Draw Showdown [2 versions]
         Platoon
+        Marbella Vice [2 versions]
+        Tierras Salvajes
         Zorton Brothers (Los Justicieros) [2 versions]
-        Marbella Vice
 
 **************************************************************************************/
 
@@ -90,8 +91,6 @@ private:
 
 
 
-
-
 /*************************************
  *
  *  Lightgun reading
@@ -115,7 +114,6 @@ int alg_state::get_lightgun_pos(int player, int *x, int *y)
 
 
 
-
 /*************************************
  *
  *  Video startup
@@ -124,14 +122,13 @@ int alg_state::get_lightgun_pos(int player, int *x, int *y)
 
 VIDEO_START_MEMBER(alg_state,alg)
 {
-	/* standard video start */
+	// Standard video start
 	VIDEO_START_CALL_MEMBER(amiga);
 
-	/* configure pen 4096 as transparent in the renderer and use it for the genlock color */
+	// Configure pen 4096 as transparent in the renderer and use it for the genlock color
 	m_palette->set_pen_color(4096, rgb_t(0,0,0,0));
 	set_genlock_color(4096);
 }
-
 
 
 
@@ -143,8 +140,8 @@ VIDEO_START_MEMBER(alg_state,alg)
 
 void alg_state::potgo_w(uint16_t data)
 {
-	/* bit 15 controls whether pin 9 is input/output */
-	/* bit 14 controls the value, which selects which player's controls to read */
+	// bit 15 controls whether pin 9 is input/output
+	// bit 14 controls the value, which selects which player's controls to read
 	m_input_select = (data & 0x8000) ? ((data >> 14) & 1) : 0;
 }
 
@@ -153,7 +150,7 @@ CUSTOM_INPUT_MEMBER(alg_state::lightgun_pos_r)
 {
 	int x = 0, y = 0;
 
-	/* get the position based on the input select */
+	// Get the position based on the input select
 	get_lightgun_pos(m_input_select, &x, &y);
 	return (y << 8) | (x >> 2);
 }
@@ -161,17 +158,16 @@ CUSTOM_INPUT_MEMBER(alg_state::lightgun_pos_r)
 
 READ_LINE_MEMBER(alg_state::lightgun_trigger_r)
 {
-	/* read the trigger control based on the input select */
+	// Read the trigger control based on the input select
 	return (m_triggers->read() >> m_input_select) & 1;
 }
 
 
 READ_LINE_MEMBER(alg_state::lightgun_holster_r)
 {
-	/* read the holster control based on the input select */
+	// Read the holster control based on the input select
 	return (m_triggers->read() >> (2 + m_input_select)) & 1;
 }
-
 
 
 
@@ -205,21 +201,21 @@ void alg_state::a500_mem(address_map &map)
 void alg_state::main_map_r1(address_map &map)
 {
 	a500_mem(map);
-	map(0xf00000, 0xf1ffff).rom().region("game_program", 0);           /* Custom ROM */
+	map(0xf00000, 0xf1ffff).rom().region("game_program", 0);           // Custom ROM
 	map(0xf54000, 0xf55fff).ram().share("nvram");
 }
 
 void alg_state::main_map_r2(address_map &map)
 {
 	a500_mem(map);
-	map(0xf00000, 0xf3ffff).rom().region("game_program", 0);           /* Custom ROM */
+	map(0xf00000, 0xf3ffff).rom().region("game_program", 0);           // Custom ROM
 	map(0xf7c000, 0xf7dfff).ram().share("nvram");
 }
 
 void alg_state::main_map_picmatic(address_map &map)
 {
 	a500_mem(map);
-	map(0xf00000, 0xf1ffff).rom().region("game_program", 0);           /* Custom ROM */
+	map(0xf00000, 0xf1ffff).rom().region("game_program", 0);           // Custom ROM
 	map(0xf40000, 0xf41fff).ram().share("nvram");
 //  TODO: both games accesses 0xf20000-0xf7ffff, what for?
 }
@@ -233,44 +229,44 @@ void alg_state::main_map_picmatic(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( alg )
-	PORT_START("joy_0_dat")   /* read by Amiga core */
+	PORT_START("joy_0_dat")   // Read by Amiga core
 	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(alg_state, amiga_joystick_convert<0>)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("joy_1_dat")   /* read by Amiga core */
+	PORT_START("joy_1_dat")   // Read by Amiga core
 	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(alg_state, amiga_joystick_convert<1>)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("potgo")     /* read by Amiga core */
+	PORT_START("potgo")     // Read by Amiga core
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xaaff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("HVPOS")     /* read by Amiga core */
+	PORT_START("HVPOS")     // Read by Amiga core
 	PORT_BIT( 0x1ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(alg_state, lightgun_pos_r)
 
 	PORT_START("FIRE")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("p1_joy")     /* referenced by JOY0DAT */
+	PORT_START("p1_joy")     // Referenced by JOY0DAT
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 
-	PORT_START("p2_joy")     /* referenced by JOY1DAT */
+	PORT_START("p2_joy")     // Referenced by JOY1DAT
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("GUN1X")     /* referenced by lightgun_pos_r */
+	PORT_START("GUN1X")     // Referenced by lightgun_pos_r
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START("GUN1Y")     /* referenced by lightgun_pos_r */
+	PORT_START("GUN1Y")     // Referenced by lightgun_pos_r
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
@@ -288,13 +284,13 @@ static INPUT_PORTS_START( alg_2p )
 	PORT_MODIFY("p2_joy")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(alg_state, lightgun_holster_r)
 
-	PORT_START("GUN2X")     /* referenced by lightgun_pos_r */
+	PORT_START("GUN2X")     // Referenced by lightgun_pos_r
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("GUN2Y")     /* referenced by lightgun_pos_r */
+	PORT_START("GUN2Y")     // Referenced by lightgun_pos_r
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START("TRIGGERS")  /* referenced by lightgun_trigger_r and lightgun_holster_r */
+	PORT_START("TRIGGERS")  // Referenced by lightgun_trigger_r and lightgun_holster_r
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -311,7 +307,7 @@ INPUT_PORTS_END
 
 void alg_state::alg_r1(machine_config &config)
 {
-	/* basic machine hardware */
+	// Basic machine hardware
 	M68000(config, m_maincpu, amiga_state::CLK_7M_NTSC);
 	m_maincpu->set_addrmap(AS_PROGRAM, &alg_state::main_map_r1);
 
@@ -319,7 +315,7 @@ void alg_state::alg_r1(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// Video hardware
 	ntsc_video(config);
 
 	SONY_LDP1450(config, m_laserdisc, 9600);
@@ -331,7 +327,7 @@ void alg_state::alg_r1(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(alg_state,alg)
 
-	/* sound hardware */
+	// Sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
@@ -346,7 +342,7 @@ void alg_state::alg_r1(machine_config &config)
 	m_laserdisc->add_route(0, "lspeaker", 1.0);
 	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
-	/* cia */
+	// cia
 	MOS8520(config, m_cia_0, amiga_state::CLK_E_NTSC);
 	m_cia_0->irq_wr_callback().set(FUNC(amiga_state::cia_0_irq));
 	m_cia_0->pa_rd_callback().set_ioport("FIRE");
@@ -374,7 +370,7 @@ void alg_state::alg_r2(machine_config &config)
 void alg_state::picmatic(machine_config &config)
 {
 	alg_r1(config);
-	/* adjust for PAL specs */
+	// Adjust for PAL specs
 	m_maincpu->set_clock(amiga_state::CLK_7M_PAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &alg_state::main_map_picmatic);
 
@@ -385,6 +381,93 @@ void alg_state::picmatic(machine_config &config)
 	m_cia_0->set_clock(amiga_state::CLK_E_PAL);
 	m_cia_1->set_clock(amiga_state::CLK_E_PAL);
 	m_fdc->set_clock(amiga_state::CLK_7M_PAL);
+}
+
+
+
+/*************************************
+ *
+ *  Per-game decryption
+ *
+ *************************************/
+
+void alg_state::init_ntsc()
+{
+	m_agnus_id = AGNUS_NTSC;
+	m_denise_id = DENISE;
+}
+
+void alg_state::init_pal()
+{
+	m_agnus_id = AGNUS_PAL;
+	m_denise_id = DENISE;
+}
+
+void alg_state::init_palr1()
+{
+	init_ntsc();
+
+	uint32_t length = memregion("game_program")->bytes();
+	uint8_t *rom = memregion("game_program")->base();
+	std::vector<uint8_t> original(length);
+
+	memcpy(&original[0], rom, length);
+	for (uint32_t srcaddr = 0; srcaddr < length; srcaddr++)
+	{
+		uint32_t dstaddr = srcaddr;
+		if (srcaddr & 0x2000) dstaddr ^= 0x1000;
+		if (srcaddr & 0x8000) dstaddr ^= 0x4000;
+		rom[dstaddr] = original[srcaddr];
+	}
+}
+
+void alg_state::init_palr3()
+{
+	init_ntsc();
+
+	uint32_t length = memregion("game_program")->bytes();
+	uint8_t *rom = memregion("game_program")->base();
+	std::vector<uint8_t> original(length);
+
+	memcpy(&original[0], rom, length);
+	for (uint32_t srcaddr = 0; srcaddr < length; srcaddr++)
+	{
+		uint32_t dstaddr = srcaddr;
+		if (srcaddr & 0x2000) dstaddr ^= 0x1000;
+		rom[dstaddr] = original[srcaddr];
+	}
+}
+
+void alg_state::init_palr6()
+{
+	init_ntsc();
+
+	uint32_t length = memregion("game_program")->bytes();
+	uint8_t *rom = memregion("game_program")->base();
+	std::vector<uint8_t> original(length);
+
+	memcpy(&original[0], rom, length);
+	for (uint32_t srcaddr = 0; srcaddr < length; srcaddr++)
+	{
+		uint32_t dstaddr = srcaddr;
+		if (~srcaddr & 0x2000) dstaddr ^= 0x1000;
+		if ( srcaddr & 0x8000) dstaddr ^= 0x4000;
+		dstaddr ^= 0x20000;
+		rom[dstaddr] = original[srcaddr];
+	}
+}
+
+void alg_state::init_aplatoon()
+{
+	init_ntsc();
+
+	uint8_t *rom = memregion("game_program")->base();
+	std::vector<uint8_t> buffer(0x40000);
+
+	memcpy(&buffer[0], rom, 0x40000);
+
+	for (int i = 0; i < 0x40000; i++) // preliminary, believed ok but to be verified when the driver is fleshed out
+		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 13, 14, 15, 16, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
 }
 
 
@@ -409,7 +492,7 @@ void alg_state::picmatic(machine_config &config)
 *
 *************************************/
 
-/* BIOS */
+// BIOS
 ROM_START( alg_bios )
 	ALG_BIOS
 
@@ -417,8 +500,8 @@ ROM_START( alg_bios )
 ROM_END
 
 
-/* Rev. A board */
-/* PAL R1 */
+// Rev. A board
+// PAL R1
 ROM_START( maddoga )
 	ALG_BIOS
 
@@ -431,8 +514,8 @@ ROM_START( maddoga )
 ROM_END
 
 
-/* PAL R3 */
-ROM_START( wsjr )  /* 1.6 */
+// PAL R3
+ROM_START( wsjr )  // 1.6
 	ALG_BIOS
 
 	ROM_REGION16_BE( 0x20000, "game_program", ROMREGION_ERASEFF )
@@ -443,7 +526,7 @@ ROM_START( wsjr )  /* 1.6 */
 	DISK_IMAGE_READONLY( "wsjr", 0, NO_DUMP )
 ROM_END
 
-ROM_START( wsjr_15 )  /* 1.5 */
+ROM_START( wsjr_15 )  // 1.5
 	ALG_BIOS
 
 	ROM_REGION16_BE( 0x20000, "game_program", ROMREGION_ERASEFF )
@@ -455,7 +538,7 @@ ROM_START( wsjr_15 )  /* 1.5 */
 ROM_END
 
 
-//REV.B
+// REV.B
 ROM_START( maddog )
 	ALG_BIOS
 
@@ -691,33 +774,34 @@ ROM_START( aplatoon )
 	DISK_IMAGE_READONLY( "platoon", 0, NO_DUMP )
 ROM_END
 
-// zortonbr v1.01
-// ROM board labeled "PICMATIC LM6 04-01-92"
-// Uses Sony LaserMax LDP-3300P, a separate video encoder PCB with a Motorola MC1378B and a standard A500+ PCB.
-// ROM contains text: "Marbella Vice CopyRight 1994 Picmatic S.A. Program chief Brian Meitiner" (but it's Zorton Brothers)
-// References to linked libraries: Audio Master IV, AMAS II Version 1.1
-// Has a blacklist for high scores:
-//   "FUCK SHIT CUNT PRICK PENUS BALLS PUTA JODER POLLA PUTO MAMON PICHA COJON TETA TETAS TITS CHULO CULO PENE PIJO LEFA LISTO"
-ROM_START( zortonbr )
-	ALG_BIOS
-
-	ROM_REGION16_BE( 0x40000, "game_program", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "zort_1-01_23-3-94_odd.u2",  0x000001, 0x10000, CRC(21e63949) SHA1(0a62ad108f8cfa00dc8f03dea2ff6f1b277e8d5d) )
-	ROM_LOAD16_BYTE( "zort_1-01_23-3-94_even.u3", 0x000000, 0x10000, CRC(6a051c6a) SHA1(f8daafab068fef57e47287bd72be860b84e2e75c) )
-
-	ROM_REGION( 0x00800, "unused_nvram", ROMREGION_ERASEFF ) //NVRAM, unused
-	ROM_LOAD( "zort_mk48z02b.u13", 0x0000, 0x0800, CRC(45b064a9) SHA1(f446be2b0e3929e182b9f97989c30b3ee308c103) )
-
-	DISK_REGION( "laserdisc" )
-	DISK_IMAGE_READONLY( "zortonbr", 0, NO_DUMP )
-ROM_END
 
 ROM_START( zortonbr_100 )
 	ALG_BIOS
 
 	ROM_REGION16_BE( 0x40000, "game_program", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "zb_u2.bin", 0x000001, 0x10000, CRC(938b25cb) SHA1(d0114bbc588dcfce6a469013d0e35afb93e38af5) )
-	ROM_LOAD16_BYTE( "zb_u3.bin", 0x000000, 0x10000, CRC(f59cfc4a) SHA1(9fadf7f1e23d6b4e828bf2b3de919d087c690a3f) )
+	ROM_LOAD16_BYTE( "zb_u2.bin", 0x00001, 0x10000, CRC(938b25cb) SHA1(d0114bbc588dcfce6a469013d0e35afb93e38af5) )
+	ROM_LOAD16_BYTE( "zb_u3.bin", 0x00000, 0x10000, CRC(f59cfc4a) SHA1(9fadf7f1e23d6b4e828bf2b3de919d087c690a3f) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "zortonbr", 0, NO_DUMP )
+ROM_END
+
+/* zortonbr v1.01
+   ROM board labeled "PICMATIC LM6 04-01-92"
+   Uses Sony LaserMax LDP-3300P, a separate video encoder PCB with a Motorola MC1378B and a standard A500+ PCB.
+   ROM contains text: "Marbella Vice CopyRight 1994 Picmatic S.A. Program chief Brian Meitiner" (but it's Zorton Brothers)
+   References to linked libraries: Audio Master IV, AMAS II Version 1.1
+   Has a blacklist for high scores:
+     "FUCK SHIT CUNT PRICK PENUS BALLS PUTA JODER POLLA PUTO MAMON PICHA COJON TETA TETAS TITS CHULO CULO PENE PIJO LEFA LISTO" */
+ROM_START( zortonbr )
+	ALG_BIOS
+
+	ROM_REGION16_BE( 0x40000, "game_program", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "zort_1-01_23-3-94_odd.u2",  0x00001, 0x10000, CRC(21e63949) SHA1(0a62ad108f8cfa00dc8f03dea2ff6f1b277e8d5d) )
+	ROM_LOAD16_BYTE( "zort_1-01_23-3-94_even.u3", 0x00000, 0x10000, CRC(6a051c6a) SHA1(f8daafab068fef57e47287bd72be860b84e2e75c) )
+
+	ROM_REGION( 0x00800, "unused_nvram", ROMREGION_ERASEFF ) // NVRAM, unused
+	ROM_LOAD( "zort_mk48z02b.u13", 0x0000, 0x0800, CRC(45b064a9) SHA1(f446be2b0e3929e182b9f97989c30b3ee308c103) )
 
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "zortonbr", 0, NO_DUMP )
@@ -728,111 +812,80 @@ ROM_START( marvice )
 	ALG_BIOS
 
 	ROM_REGION16_BE( 0x40000, "game_program", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "mspsl 200 odd 30394.u2",  0x000000, 0x10000, CRC(01c9a503) SHA1(f61ec2cd241b2bf8a982e81e5a18178601f0a0a0) )
-	ROM_LOAD16_BYTE( "mspsl 200 even 30394.u3", 0x000001, 0x10000, CRC(78eb6fd6) SHA1(e404818095f03b6e0746620f5ce48c3f7149b8a0) )
+	ROM_LOAD16_BYTE( "mspsl 200 odd 30394.u2",  0x00000, 0x10000, CRC(01c9a503) SHA1(f61ec2cd241b2bf8a982e81e5a18178601f0a0a0) )
+	ROM_LOAD16_BYTE( "mspsl 200 even 30394.u3", 0x00001, 0x10000, CRC(78eb6fd6) SHA1(e404818095f03b6e0746620f5ce48c3f7149b8a0) )
 
-	ROM_REGION( 0x800, "unk", ROMREGION_ERASEFF ) // nvram contents, should be x4 in size
+	ROM_REGION( 0x800, "unk", ROMREGION_ERASEFF ) // NVRAM contents, should be x4 in size
 	ROM_LOAD( "mk48z02b-20.u13", 0x0000, 0x0800, BAD_DUMP CRC(e6079615) SHA1(f528b2a600ab047ad7f87f4dbae65a7e4cd10f8c) )
 
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "marvice", 0, NO_DUMP )
 ROM_END
 
+ROM_START( marvice100hz )
+	ALG_BIOS
 
+	ROM_REGION16_BE( 0x40000, "game_program", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "marbella_vice_100hz_odd.bin",  0x00001, 0x10000, CRC(2c9ebccb) SHA1(4e8dcb8526a8debb70f3f56713903ba8bfbb3ed5) )
+	ROM_LOAD16_BYTE( "marbella_vice_100hz_even.bin", 0x00000, 0x10000, CRC(d2b5e5ca) SHA1(de76503961076acad405db9e83bd5334b02bf908) )
 
-/*************************************
- *
- *  Per-game decryption
- *
- *************************************/
+	ROM_REGION( 0x800, "unk", ROMREGION_ERASEFF )
+	ROM_LOAD( "mk48z02b-20.bin", 0x0000, 0x0800, BAD_DUMP CRC(e6079615) SHA1(f528b2a600ab047ad7f87f4dbae65a7e4cd10f8c) ) // From 'marvice'
 
-void alg_state::init_ntsc()
-{
-	m_agnus_id = AGNUS_NTSC;
-	m_denise_id = DENISE;
-}
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "marvice", 0, NO_DUMP )
+ROM_END
 
-void alg_state::init_pal()
-{
-	m_agnus_id = AGNUS_PAL;
-	m_denise_id = DENISE;
-}
+/* Tierras Salvajes 100Hz
+  PCB silkscreened PICMATIC S.A. 27-11-1992
+  ______________________________________________
+  |        ________                      ····  |
+  |___     |_______|    __________  __________ |
+  || |    ___________   F16L8-25CN  |74HC574E| |
+  || |    |74HC540P_|                          |
+  || |     __________   __________  __________ |
+  || |    |__8xDIPS_|  |74HC574E_| |74HC574E_| |
+  || |  _____________                          |
+  || | |MK48Z02B-20 |   __________  __________ |
+  || | |____________|  |74HC4040N| |74HC4040N| |
+  || |  _____________   __________  __________ |
+  || | | U7 EMPTY   |   F16L8-25CN  U14 EMPTY| |
+  || | |____________|   __________  __________ |
+  || |  _____________   F16L8-25CN  GAL16V8-20 |
+  || | | EPROM ODD  |   __________  ________   |
+  || | |____________|   |74HC574E|  Xtal 28.37516 MHz
+  || |  _____________                          |
+  || | | U6 EMPTY   |   __________  __________ |
+  || | |____________|   |74HC541N| |74HC132B1| |
+  || |  _____________                          |
+  || | | EPROM EVEN |   _________    _________ |
+  ||_| |____________|   |       |    |       | |
+  |_____________________|       |____|       |_|
+                        |_______|    |_______|
+*/
+ROM_START( tierras100hz )
+	ALG_BIOS
 
-void alg_state::init_palr1()
-{
-	init_ntsc();
+	ROM_REGION16_BE( 0x40000, "game_program", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "spilz0d4-odd-27-9-95-salvajes-displays-27c512.u4",  0x00001, 0x10000, CRC(d46dd5e0) SHA1(7d808c6ed88bf9a98cdb468ce71c0952b0b5d7b2) )
+	ROM_LOAD16_BYTE( "spilz0d4-even-27-9-95-salvajes-displays-27c512.u5", 0x00000, 0x10000, CRC(730e4696) SHA1(4db0cc7d160de5e70f1d1842fa94adb8ee7f954f) )
 
-	uint32_t length = memregion("game_program")->bytes();
-	uint8_t *rom = memregion("game_program")->base();
-	std::vector<uint8_t> original(length);
+	ROM_REGION( 0x00800, "unused_nvram", ROMREGION_ERASEFF ) // NVRAM, unused
+	ROM_LOAD( "mk48z02b-20.u8", 0x0000, 0x0800, CRC(18eb5a50) SHA1(9b626978350cda546aa4b890c68ddb28058adf75) )
 
-	memcpy(&original[0], rom, length);
-	for (uint32_t srcaddr = 0; srcaddr < length; srcaddr++)
-	{
-		uint32_t dstaddr = srcaddr;
-		if (srcaddr & 0x2000) dstaddr ^= 0x1000;
-		if (srcaddr & 0x8000) dstaddr ^= 0x4000;
-		rom[dstaddr] = original[srcaddr];
-	}
-}
+	ROM_REGION( 0x800, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "gal16v8.u19", 0x000,  0x117, CRC(f2864878) SHA1(f8f8e7604ece9c6437bc381170d891237fde1372) )
+	ROM_LOAD( "f16l8-25cn.1", 0x200, 0x117, NO_DUMP )
+	ROM_LOAD( "f16l8-25cn.2", 0x400, 0x117, NO_DUMP )
+	ROM_LOAD( "f16l8-25cn.3", 0x600, 0x117, NO_DUMP )
 
-void alg_state::init_palr3()
-{
-	init_ntsc();
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "tierras_salvajes_1995_spanish_english", 0, NO_DUMP )
+ROM_END
 
-	uint32_t length = memregion("game_program")->bytes();
-	uint8_t *rom = memregion("game_program")->base();
-	std::vector<uint8_t> original(length);
-
-	memcpy(&original[0], rom, length);
-	for (uint32_t srcaddr = 0; srcaddr < length; srcaddr++)
-	{
-		uint32_t dstaddr = srcaddr;
-		if (srcaddr & 0x2000) dstaddr ^= 0x1000;
-		rom[dstaddr] = original[srcaddr];
-	}
-}
-
-void alg_state::init_palr6()
-{
-	init_ntsc();
-
-	uint32_t length = memregion("game_program")->bytes();
-	uint8_t *rom = memregion("game_program")->base();
-	std::vector<uint8_t> original(length);
-
-	memcpy(&original[0], rom, length);
-	for (uint32_t srcaddr = 0; srcaddr < length; srcaddr++)
-	{
-		uint32_t dstaddr = srcaddr;
-		if (~srcaddr & 0x2000) dstaddr ^= 0x1000;
-		if ( srcaddr & 0x8000) dstaddr ^= 0x4000;
-		dstaddr ^= 0x20000;
-		rom[dstaddr] = original[srcaddr];
-	}
-}
-
-void alg_state::init_aplatoon()
-{
-	init_ntsc();
-
-	/* NOT DONE TODO FIGURE OUT THE RIGHT ORDER!!!! */
-	uint8_t *rom = memregion("game_program")->base();
-	std::unique_ptr<uint8_t[]> decrypted = std::make_unique<uint8_t[]>(0x40000);
-
-	static const int shuffle[] =
-	{
-		0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,
-		32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63
-	};
-
-	for (int i = 0; i < 64; i++)
-		memcpy(decrypted.get() + i * 0x1000, rom + shuffle[i] * 0x1000, 0x1000);
-	memcpy(rom, decrypted.get(), 0x40000);
-	logerror("decrypt done\n ");
-}
 
 } // Anonymous namespace
+
 
 
 /*************************************
@@ -841,52 +894,54 @@ void alg_state::init_aplatoon()
  *
  *************************************/
 
-/* BIOS */
+// BIOS
 GAME( 199?, alg_bios,     0,        alg_r1,   alg,    alg_state, init_ntsc,     ROT0,  "American Laser Games", "American Laser Games BIOS", MACHINE_IS_BIOS_ROOT )
 
-/* Rev. A board */
-/* PAL R1 */
+// Rev. A board
+// PAL R1
 GAME( 1990, maddoga,      maddog,   alg_r1,   alg,    alg_state, init_palr1,    ROT0,  "American Laser Games", "Mad Dog McCree v1C board rev.A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-/* PAL R3 */
+// PAL R3
 GAME( 1991, wsjr,         alg_bios, alg_r1,   alg,    alg_state, init_palr3,    ROT0,  "American Laser Games", "Who Shot Johnny Rock? v1.6", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1991, wsjr_15,      wsjr,     alg_r1,   alg,    alg_state, init_palr3,    ROT0,  "American Laser Games", "Who Shot Johnny Rock? v1.5", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-/* Rev. B board */
-/* PAL R6 */
+// Rev. B board
+// PAL R6
 
 GAME( 1990, maddog,       alg_bios, alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Mad Dog McCree v2.03 board rev.B", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1990, maddog_202,   maddog,   alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Mad Dog McCree v2.02 board rev.B", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-	/* works ok but uses right player (2) controls only for trigger and holster */
+	// Works OK but uses right player (2) controls only for trigger and holster
 GAME( 1992, maddog2,      alg_bios, alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Mad Dog II: The Lost Gold v2.04", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, maddog2_202,  maddog2,  alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Mad Dog II: The Lost Gold v2.02", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, maddog2_110,  maddog2,  alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Mad Dog II: The Lost Gold v1.10", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, maddog2_100,  maddog2,  alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Mad Dog II: The Lost Gold v1.00", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-	/* works ok but uses right player (2) controls only for trigger and holster */
+	// Works ok but uses right player (2) controls only for trigger and holster
 GAME( 1992, spacepir,     alg_bios, alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Space Pirates v2.2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, spacepir_14,  spacepir, alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Space Pirates v1.4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1992, gallgall,     alg_bios, alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Gallagher's Gallery v2.2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, gallgall_21,  gallgall, alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Gallagher's Gallery v2.1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-	/* all good, but no holster */
+	// All good, but no holster
 GAME( 1993, crimepat,     alg_bios, alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Crime Patrol v1.51", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, crimepat_14,  crimepat, alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Crime Patrol v1.4", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, crimepat_12,  crimepat, alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Crime Patrol v1.2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, crimepat_10,  crimepat, alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Crime Patrol v1.0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, crimepat_14,  crimepat, alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Crime Patrol v1.4",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, crimepat_12,  crimepat, alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Crime Patrol v1.2",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, crimepat_10,  crimepat, alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Crime Patrol v1.0",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1993, crimep2,      alg_bios, alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Crime Patrol 2: Drug Wars v1.3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, crimep2_11,   crimep2,  alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "Crime Patrol 2: Drug Wars v1.1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, lastbh,       alg_bios, alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "The Last Bounty Hunter v1.01", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, lastbh_006,   lastbh,   alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "The Last Bounty Hunter v0.06", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, fastdraw,     alg_bios, alg_r2,   alg_2p, alg_state, init_palr6,    ROT90, "American Laser Games", "Fast Draw Showdown v1.31", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, fastdraw_130, fastdraw, alg_r2,   alg_2p, alg_state, init_palr6,    ROT90, "American Laser Games", "Fast Draw Showdown v1.30", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-	/* works ok but uses right player (2) controls only for trigger and holster */
+GAME( 1994, lastbh,       alg_bios, alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "The Last Bounty Hunter v1.01",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, lastbh_006,   lastbh,   alg_r2,   alg_2p, alg_state, init_palr6,    ROT0,  "American Laser Games", "The Last Bounty Hunter v0.06",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, fastdraw,     alg_bios, alg_r2,   alg_2p, alg_state, init_palr6,    ROT90, "American Laser Games", "Fast Draw Showdown v1.31",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, fastdraw_130, fastdraw, alg_r2,   alg_2p, alg_state, init_palr6,    ROT90, "American Laser Games", "Fast Draw Showdown v1.30",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+	// Works OK but uses right player (2) controls only for trigger and holster
 
-/* NOVA games on ALG hardware with own address scramble */
-GAME( 199?, aplatoon,     alg_bios, alg_r2,   alg,    alg_state, init_aplatoon, ROT0,  "Nova?", "Platoon V.3.1 US", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// NOVA games on ALG hardware with own address scramble
+GAME( 1995, aplatoon,     alg_bios, alg_r2,   alg,    alg_state, init_aplatoon, ROT0,  "Nova?", "Platoon V.3.1 US", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-/* Web Picmatic games PAL tv standard, own rom board */
-GAME( 1994, zortonbr,     alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Zorton Brothers v1.01 (Los Justicieros)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// Web Picmatic games PAL TV standard or 100Hz, own ROM board
 GAME( 1993, zortonbr_100, zortonbr, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Zorton Brothers v1.00 (Los Justicieros)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, marvice,      alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Marbella Vice", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, zortonbr,     alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Zorton Brothers v1.01 (Los Justicieros)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, marvice,      alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Marbella Vice",                           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, marvice100hz, alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Marbella Vice (100Hz display)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, tierras100hz, alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Tierras Salvajes (100Hz display)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )

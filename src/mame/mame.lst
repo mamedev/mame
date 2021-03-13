@@ -1094,9 +1094,11 @@ maddog2_100                     // (c) 1992
 maddog2_110                     // (c) 1992
 maddog2_202                     // (c) 1992
 maddoga                         // (c) 1990
-marvice                         // (c) 1994
+marvice                         // (c) 1994 Web Picmatic
+marvice100hz                    // (c) 1994 Web Picmatic
 spacepir                        // (c) 1992
 spacepir_14                     // (c) 1992
+tierras100hz                    // (c) 1995 Web Picmatic
 wsjr                            // (c) 1991
 wsjr_15                         // (c) 1991
 zortonbr                        // (c) 1994 Web Picmatic
@@ -15016,6 +15018,8 @@ wrlshunt                        // Wireless: Hunting Video Game System
 bkrankp
 
 @source:generalplus_gpl16250_spi_direct.cpp
+bfmpac
+bfpacman
 fixitflx
 wiwcs
 
@@ -16172,7 +16176,13 @@ us2pfball                       // US Games
 uspbball                        // US Games
 
 @source:hh_pps41.cpp
+ftri1                           // Fonas
 mastmind                        // Invicta
+memoquiz                        // MEM
+mwcfootb                        // Mattel
+rdqa                            // Selchow & Righter
+scrabsen                        // Selchow & Righter
+smastmind                       // Invicta
 
 @source:hh_sm510.cpp
 auslalom                        // Elektronika
@@ -20120,6 +20130,8 @@ maclc2                          // 1991 Apple Macintosh LC II
 maclc3                          // 1993 Apple Macintosh LC III
 maclc520                        // 1993 Apple Macintosh LC 520
 macse30                         // 1989 Apple Macintosh SE/30
+
+@source:macpdm.cpp
 pmac6100                        // 1993 Apple Power Macintosh 6100
 
 @source:macquadra700.cpp
@@ -23620,6 +23632,9 @@ mouserc                         // UPL-83001 (c) 1983
 
 @source:mpc3000.cpp
 mpc3000
+
+@source:mpc60.cpp
+mpc60
 
 @source:mpf1.cpp
 mpf1                            // 1979 Multitech Micro Professor 1
@@ -31716,6 +31731,7 @@ manicpnc                        // 2007.07 Manic Panic Ghosts! (USA)
 marstv                          // 1999.12 Mars TV
 maxspeed                        // 2002.12 Maximum Speed
 mazan                           // 2002.07 Mazan: Flash of the Blade (World, MAZ2 Ver.A)
+mazanj                          // 2002.07 Mazan: Flash of the Blade (Japan, MAZ1 Ver.A)
 mazanu                          // 2002.07 Mazan: Flash of the Blade (US, MAZ3 Ver.A)
 mbaa                            // 2008.12 Melty Blood Actress Again Version A (Rev A)
 mbaao                           // 2008.09 Melty Blood Actress Again
@@ -38521,41 +38537,42 @@ lx_jg7425
 lx_aven
 
 @source:spg2xx.cpp
-rad_skat                        //
-rad_skatp                       //
-rad_crik                        //
-rad_fb2                         //
-mattelcs                        //
-hotwhl2p
-comil                           //
+ablkickb
 abltenni                        //
-totspies
-fordrace
-tvsprt10                        //
+comil                           //
 decathln
 decathlna
-ablkickb
-lxspidaj
+doraglob                        // (c) 2007 VTech
+doraphon                        // (c) 2006 VTech
+dreamlss
+fordrace
+gssytts
 guitarfv
 guitarss
 guitarssa
-tmntbftc
-gssytts
-senwfit
+hotwhl2p
+itvphone
 jjstrip
-doraglob                        // (c) 2007 VTech
-doraphon                        // (c) 2006 VTech
-vtechtvssp                      // (c) 2006 VTech
-vtechtvsgr                      // (c) 2006 VTech
-tmntmutm
-pballpup
-swclone
-dreamlss
-senspeed
-ordentv
-wfcentro
-tiktokmm
 jouet
+lxspidaj
+mattelcs                        //
+ordentv
+pballpup
+rad_crik                        //
+rad_fb2                         //
+rad_skat                        //
+rad_skatp                       //
+senspeed
+senwfit
+swclone
+tiktokmm
+tmntbftc
+tmntmutm
+totspies
+tvsprt10                        //
+vtechtvsgr                      // (c) 2006 VTech
+vtechtvssp                      // (c) 2006 VTech
+wfcentro
 
 @source:spg2xx_digimake.cpp
 rad_digi
@@ -41242,17 +41259,20 @@ bmiidx                          //
 bmiidx2                         //
 bmiidx3                         //
 bmiidx3a                        //
+bmiidx3b                        //
 bmiidx4                         //
 bmiidx5                         //
 bmiidx6                         //
 bmiidx6a                        //
 bmiidx7                         //
+bmiidx7a                        //
 bmiidx8                         //
 bmiidxa                         //
 bmiidxc                         //
 bmiidxc2                        //
 bmiidxca                        //
 bmiidxs                         //
+bmiidxsa                        //
 gq863                           //
 
 @source:twins.cpp

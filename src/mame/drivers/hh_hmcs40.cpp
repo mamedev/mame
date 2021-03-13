@@ -3518,14 +3518,14 @@ ROM_END
 
 /***************************************************************************
 
-  Mattel World Championship Baseball
+  Mattel World Championship Baseball (model 3201)
   * PCB label MEL-001 Baseball Rev. B
   * Hitachi QFP HD38820A09 MCU
   * cyan/red/green VFD display Futaba DM-24ZK 1G, with etched overlay
 
-  To start the game in 2-player mode, simply turn the game on. For 1-player,
-  turn the game on while holding the 1-key and use the visitor's side keypad
-  to play offsense.
+  It was patented under US4372557. To start the game in 2-player mode, simply
+  turn the game on. For 1-player, turn the game on while holding the 1-key
+  and use the visitor's side keypad to play offsense.
 
 ***************************************************************************/
 
@@ -3601,9 +3601,9 @@ u8 mwcbaseb_state::input_r()
     SLOW     CURVE    FAST                                    SLOW     CURVE    FAST
 */
 
-static INPUT_PORTS_START( mwcbaseb )
+static INPUT_PORTS_START( mwcbaseb ) // P1 = left/visitor, P2 = right/home
 	PORT_START("IN.0") // D9 port R4x
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("P2 4") // note: P1 = left/visitor, P2 = right/home
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("P2 4")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_NAME("P2 3")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_NAME("P2 2")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_NAME("P2 1")

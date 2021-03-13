@@ -10,6 +10,8 @@
 
     GQ972 PWB(A2) 0000070609 Main board
     -----------------------------------
+        25.175 MHz clock (near GCUs and VGA connectors)
+        16.6666 MHz clock (near GCUs and VGA connectors)
         OSC 66.0000MHz
         IBM PowerPC 403GCX at 66MHz
         (2x) Konami 0000057714 (2D object processor)
@@ -143,6 +145,7 @@
 #include "bus/ata/idehd.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
+#include "machine/fdc37c665gt.h"
 #include "machine/ins8250.h"
 #include "machine/intelfsh.h"
 #include "machine/mb8421.h"
@@ -154,14 +157,205 @@
 #include "sound/ymz280b.h"
 #include "video/k057714.h"
 
+#include "imagedev/floppy.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "osdcomm.h"
 
+#include "wdlfft/fft.h"
+
+#include <cmath>
+
 #include "firebeat.lh"
 
 
+/*****************************************************************************/
+DECLARE_DEVICE_TYPE(KONAMI_FIREBEAT_EXTEND_SPECTRUM_ANALYZER, firebeat_extend_spectrum_analyzer_device)
+
+class firebeat_extend_spectrum_analyzer_device : public device_t, public device_mixer_interface
+{
+public:
+	firebeat_extend_spectrum_analyzer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	uint8_t read(offs_t offset);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// device_sound_interface-level overrides
+	void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+
+private:
+	enum {
+		TOTAL_BUFFERS = 2,
+		TOTAL_CHANNELS = 2,
+		TOTAL_BARS = 6,
+
+		FFT_LENGTH = 512
+	};
+
+	void update_fft();
+	void apply_fft(uint32_t buf_index);
+
+	float m_audio_buf[TOTAL_BUFFERS][TOTAL_CHANNELS][FFT_LENGTH];
+	float m_fft_buf[TOTAL_CHANNELS][FFT_LENGTH];
+	int m_audio_fill_index;
+	int m_audio_count[TOTAL_CHANNELS];
+
+	int m_bars[TOTAL_CHANNELS][TOTAL_BARS];
+};
+
+firebeat_extend_spectrum_analyzer_device::firebeat_extend_spectrum_analyzer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, KONAMI_FIREBEAT_EXTEND_SPECTRUM_ANALYZER, tag, owner, clock),
+	device_mixer_interface(mconfig, *this, 2)
+{
+}
+
+void firebeat_extend_spectrum_analyzer_device::device_start()
+{
+	WDL_fft_init();
+}
+
+void firebeat_extend_spectrum_analyzer_device::device_reset()
+{
+	for (int ch = 0; ch < TOTAL_CHANNELS; ch++)
+	{
+		for (int i = 0; i < TOTAL_BUFFERS; i++)
+			std::fill(std::begin(m_audio_buf[i][ch]), std::end(m_audio_buf[i][ch]), 0);
+
+		std::fill(std::begin(m_fft_buf[ch]), std::end(m_fft_buf[ch]), 0);
+		std::fill(std::begin(m_bars[ch]), std::end(m_bars[ch]), 0);
+
+		m_audio_count[ch] = 0;
+	}
+
+	m_audio_fill_index = 0;
+}
+
+void firebeat_extend_spectrum_analyzer_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+{
+	device_mixer_interface::sound_stream_update(stream, inputs, outputs);
+
+	for (int pos = 0; pos < outputs[0].samples(); pos++)
+	{
+		for (int ch = 0; ch < outputs.size(); ch++)
+		{
+			const float sample = outputs[ch].get(pos);
+			m_audio_buf[m_audio_fill_index][ch][m_audio_count[m_audio_fill_index]] = sample;
+		}
+
+		update_fft();
+	}
+
+	// Bandpass filter + find peak
+	// The results aren't accurate to the real circuit used on the PCB but the feature is very minor
+	// and does not affect gameplay in any way.
+
+	// Band values taken directly from NJU7507 data sheet.
+	constexpr double NOTCHES[] = { 95, 240, 600, 1500, 3400, 8200, 18000 };
+	constexpr int LAST_NOTCH = 7;
+
+	auto srate = stream.sample_rate();
+	auto order = WDL_fft_permute_tab(FFT_LENGTH / 2);
+	for (int ch = 0; ch < TOTAL_CHANNELS; ch++)
+	{
+		double notch_max[TOTAL_BARS] = { -1, -1, -1, -1, -1, -1 };
+		int cur_notch = 0;
+
+		for (int i = 0; i <= FFT_LENGTH / 2; i++) {
+			const double freq = (double)i / FFT_LENGTH * srate;
+
+			if (freq < NOTCHES[cur_notch])
+				continue;
+
+			if (freq > NOTCHES[cur_notch+1])
+				cur_notch++;
+
+			if (cur_notch >= LAST_NOTCH) // Don't need to calculate anything above this frequency
+				break;
+
+			WDL_FFT_COMPLEX *bin = (WDL_FFT_COMPLEX*)m_fft_buf[ch] + order[i];
+
+			const double re = bin->re;
+			const double im = bin->im;
+			const double mag = sqrt(re*re + im*im);
+
+			if (notch_max[cur_notch] == -1 && freq >= NOTCHES[cur_notch] && freq < NOTCHES[cur_notch+1])
+				notch_max[cur_notch] = mag;
+		}
+
+		for (int i = 0; i < TOTAL_BARS; i++)
+		{
+			double val = log10(notch_max[i] * 4096) * 20;
+			val = std::max<double>(0, val);
+			m_bars[ch][i] = uint32_t(std::min<double>(val, 255.0f));
+		}
+	}
+}
+
+void firebeat_extend_spectrum_analyzer_device::apply_fft(uint32_t buf_index)
+{
+	float *audio_l = m_audio_buf[buf_index][0];
+	float *audio_r = m_audio_buf[buf_index][1];
+	float *buf_l = m_fft_buf[0];
+	float *buf_r = m_fft_buf[1];
+
+	for (int i = 0; i < FFT_LENGTH; i++)
+	{
+		*buf_l++ = *audio_l++;
+		*buf_r++ = *audio_r++;
+	}
+
+	for (int ch = 0; ch < TOTAL_CHANNELS; ch++)
+	{
+		WDL_real_fft((WDL_FFT_REAL *)m_fft_buf[ch], FFT_LENGTH, 0);
+
+		for (int i = 0; i < FFT_LENGTH; i++)
+			m_fft_buf[ch][i] /= (WDL_FFT_REAL)FFT_LENGTH;
+	}
+}
+
+void firebeat_extend_spectrum_analyzer_device::update_fft()
+{
+	m_audio_count[m_audio_fill_index]++;
+	if (m_audio_count[m_audio_fill_index] >= FFT_LENGTH)
+	{
+		apply_fft(m_audio_fill_index);
+
+		m_audio_fill_index = 1 - m_audio_fill_index;
+		m_audio_count[m_audio_fill_index] = 0;
+	}
+}
+
+uint8_t firebeat_extend_spectrum_analyzer_device::read(offs_t offset)
+{
+	// Visible in the sound test menu and used for the spectral analyzer game skin
+	// The actual data is coming from a circuit built on the extend board made up of NJU7507 x2 for each channel of audio.
+	// The spectrum analyzer circuit is only populated on the extend board used by beatmania III but the footprints and
+	// labels are still on the PCB for other games that use the extend board.
+
+	// Return values notes:
+	// - The values are based on the results of a chained NJU7507 which should give 14 bands worth of frequency data. However, only 6 bands are used in-game.
+	// - Anything <= 8 will not display anything in-game and seems unused in memory
+	// - It reads the upper and lower half of the register separately as bytes, but it the upper byte doesn't seem like it's actually used.
+	// - In-game the skin shows up to +9 dB but it actually caps out at -3 dB on the skin
+
+	int ch = offset >= 0x40; // 0 = Left, 1 = Right
+	int notch = 6 - (((offset >> 2) & 0x0f) >> 1);
+	int is_upper = BIT(offset, 2);
+
+	auto val = (ch < TOTAL_CHANNELS && notch >= 0 && notch < TOTAL_BARS) ? m_bars[ch][notch] : 0;
+
+	return (is_upper ? (val >> 8) : val) & 0xff;
+}
+
+DEFINE_DEVICE_TYPE(KONAMI_FIREBEAT_EXTEND_SPECTRUM_ANALYZER, firebeat_extend_spectrum_analyzer_device, "firebeat_spectrum_analyzer", "Firebeat Spectrum Analyzer")
+
+/*****************************************************************************/
 namespace {
 
 struct IBUTTON_SUBKEY
@@ -194,6 +388,7 @@ static void dvdrom_config(device_t *device)
 	downcast<atapi_cdrom_device &>(*device).set_ultra_dma_mode(0x0102);
 }
 
+/*****************************************************************************/
 class firebeat_state : public driver_device
 {
 public:
@@ -203,6 +398,7 @@ public:
 		m_work_ram(*this, "work_ram"),
 		m_ata(*this, "ata"),
 		m_gcu(*this, "gcu"),
+		m_gcu_sub(*this, "gcu_sub"),
 		m_duart_com(*this, "duart_com"),
 		m_status_leds(*this, "status_led_%u", 0U),
 		m_io_inputs(*this, "IN%u", 0U)
@@ -212,6 +408,7 @@ public:
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void device_resolve_objects() override;
 
 	uint32_t screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -240,6 +437,7 @@ protected:
 	required_shared_ptr<uint32_t> m_work_ram;
 	required_device<ata_interface_device> m_ata;
 	required_device<k057714_device> m_gcu;
+	optional_device<k057714_device> m_gcu_sub;
 
 private:
 	uint32_t cabinet_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -252,6 +450,8 @@ private:
 	void extend_board_irq_w(offs_t offset, uint8_t data);
 
 	uint8_t input_r(offs_t offset);
+
+	void control_w(offs_t offset, uint8_t data);
 
 	uint16_t ata_command_r(offs_t offset, uint16_t mem_mask = ~0);
 	void ata_command_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -272,6 +472,8 @@ private:
 	output_finder<8> m_status_leds;
 
 	required_ioport_array<4> m_io_inputs;
+
+	uint8_t m_control;
 };
 
 class firebeat_spu_state : public firebeat_state
@@ -280,9 +482,10 @@ public:
 	firebeat_spu_state(const machine_config &mconfig, device_type type, const char *tag) :
 		firebeat_state(mconfig, type, tag),
 		m_spuata(*this, "spu_ata"),
+		m_rf5c400(*this, "rf5c400"),
 		m_audiocpu(*this, "audiocpu"),
 		m_dpram(*this, "spuram"),
-		m_waveram(*this, "rf5c400"),
+		m_waveram(*this, "rf5c400_ram"),
 		m_spu_status_leds(*this, "spu_status_led_%u", 0U)
 	{ }
 
@@ -302,6 +505,7 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(spu_timer_callback);
 
 	required_device<ata_interface_device> m_spuata;
+	required_device<rf5c400_device> m_rf5c400;
 
 private:
 	void spu_status_led_w(uint16_t data);
@@ -379,7 +583,6 @@ public:
 		firebeat_state(mconfig, type, tag),
 		m_duart_midi(*this, "duart_midi"),
 		m_kbd(*this, "kbd%u", 0),
-		m_gcu_sub(*this, "gcu_sub"),
 		m_lamps(*this, "lamp_%u", 1U),
 		m_cab_led_door_lamp(*this, "door_lamp"),
 		m_cab_led_start1p(*this, "start1p"),
@@ -403,21 +606,21 @@ private:
 	void init_keyboard();
 
 	uint8_t keyboard_wheel_r(offs_t offset);
-	uint8_t midi_uart_r(offs_t offset);
-	void midi_uart_w(offs_t offset, uint8_t data);
 
 	void lamp_output_kbm_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
+	uint8_t midi_uart_r(offs_t offset);
+	void midi_uart_w(offs_t offset, uint8_t data);
+
 //  TIMER_CALLBACK_MEMBER(keyboard_timer_callback);
-	DECLARE_WRITE_LINE_MEMBER(midi_uart_ch0_irq_callback);
-	DECLARE_WRITE_LINE_MEMBER(midi_uart_ch1_irq_callback);
+	DECLARE_WRITE_LINE_MEMBER(midi_keyboard_right_irq_callback);
+	DECLARE_WRITE_LINE_MEMBER(midi_keyboard_left_irq_callback);
 
 //  emu_timer *m_keyboard_timer;
 //  int m_keyboard_state[2];
 
 	required_device<pc16552_device> m_duart_midi;
 	required_device_array<midi_keyboard_device, 2> m_kbd;
-	required_device<k057714_device> m_gcu_sub;
 
 	output_finder<3> m_lamps;
 	output_finder<> m_cab_led_door_lamp;
@@ -433,6 +636,10 @@ class firebeat_bm3_state : public firebeat_spu_state
 public:
 	firebeat_bm3_state(const machine_config &mconfig, device_type type, const char *tag) :
 		firebeat_spu_state(mconfig, type, tag),
+		m_fdc(*this, "fdc"),
+		m_floppy(*this, "fdc:fdc:0"),
+		m_spectrum_analyzer(*this, "spectrum_analyzer"),
+		m_duart_midi(*this, "duart_midi"),
 		m_io(*this, "IO%u", 1U),
 		m_io_turntables(*this, "TURNTABLE_P%u", 1U),
 		m_io_effects(*this, "EFFECT%u", 1U)
@@ -444,18 +651,24 @@ public:
 private:
 	void firebeat_bm3_map(address_map &map);
 
-	uint32_t spectrum_analyzer_r(offs_t offset);
+	uint8_t spectrum_analyzer_r(offs_t offset);
 	uint16_t sensor_r(offs_t offset);
 
-	// TODO: Floppy disk implementation
-	uint32_t fdd_unk_r(offs_t offset, uint32_t mem_mask = ~0);
-	void fdd_unk_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint8_t midi_uart_r(offs_t offset);
+	void midi_uart_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( bm3_vblank );
+	DECLARE_WRITE_LINE_MEMBER(midi_st224_irq_callback);
+
+	required_device<fdc37c665gt_device> m_fdc;
+	required_device<floppy_connector> m_floppy;
+	required_device<firebeat_extend_spectrum_analyzer_device> m_spectrum_analyzer;
+	required_device<pc16552_device> m_duart_midi;
 
 	required_ioport_array<4> m_io;
 	required_ioport_array<2> m_io_turntables;
 	required_ioport_array<7> m_io_effects;
+
+	DECLARE_WRITE_LINE_MEMBER(floppy_irq_callback);
 };
 
 class firebeat_popn_state : public firebeat_spu_state
@@ -485,6 +698,13 @@ void firebeat_state::machine_start()
 	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x01ffffff, false, m_work_ram);
 }
 
+void firebeat_state::machine_reset()
+{
+	m_extend_board_irq_enable = 0x3f;
+	m_extend_board_irq_active = 0x00;
+	m_control = 0;
+}
+
 void firebeat_state::device_resolve_objects()
 {
 	m_status_leds.resolve();
@@ -493,11 +713,9 @@ void firebeat_state::device_resolve_objects()
 void firebeat_state::init_firebeat()
 {
 	uint8_t *rom = memregion("user2")->base();
+	set_ibutton(rom);
 
 //  pc16552d_init(machine(), 0, 19660800, comm_uart_irq_callback, 0);     // Network UART
-
-	m_extend_board_irq_enable = 0x3f;
-	m_extend_board_irq_active = 0x00;
 
 	// Set to defaults here, but overridden for most specific games. It represents various bits of
 	// data, such as the firebeat's ability to play certain games at all, whether the firebeat is
@@ -508,8 +726,6 @@ void firebeat_state::init_firebeat()
 	m_cabinet_info = 0;
 
 	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(firebeat_state::security_w)));
-
-	set_ibutton(rom);
 
 	init_lights(write32s_delegate(*this), write32s_delegate(*this), write32s_delegate(*this));
 }
@@ -534,16 +750,13 @@ void firebeat_state::firebeat(machine_config &config)
 	/* video hardware */
 	PALETTE(config, "palette", palette_device::RGB_555);
 
-	K057714(config, m_gcu, 0);
-	m_gcu->irq_callback().set(FUNC(firebeat_state::gcu_interrupt));
-
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(512, 384);
-	screen.set_visarea(0, 511, 0, 383);
+	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480);
 	screen.set_screen_update(FUNC(firebeat_state::screen_update_firebeat_0));
 	screen.set_palette("palette");
+
+	K057714(config, m_gcu, 0).set_screen("screen");
+	m_gcu->irq_callback().set(FUNC(firebeat_state::gcu_interrupt));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -568,6 +781,7 @@ void firebeat_state::firebeat_map(address_map &map)
 	map(0x74000000, 0x740003ff).noprw(); // SPU shared RAM
 	map(0x7d000200, 0x7d00021f).r(FUNC(firebeat_state::cabinet_r));
 	map(0x7d000400, 0x7d000401).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
+	map(0x7d000500, 0x7d000501).w(FUNC(firebeat_state::control_w));
 	map(0x7d000800, 0x7d000803).r(FUNC(firebeat_state::input_r));
 	map(0x7d400000, 0x7d5fffff).rw("flash_main", FUNC(fujitsu_29f016a_device::read), FUNC(fujitsu_29f016a_device::write));
 	map(0x7d800000, 0x7d9fffff).rw("flash_snd1", FUNC(fujitsu_29f016a_device::read), FUNC(fujitsu_29f016a_device::write));
@@ -767,15 +981,14 @@ void firebeat_state::security_w(uint8_t data)
 		m_maincpu->ppc4xx_spu_receive_byte(r);
 }
 
-/*****************************************************************************/
-
 // Extend board IRQs
 // 0x01: MIDI UART channel 2
 // 0x02: MIDI UART channel 1
-// 0x04: ?
+// 0x04: FDD
 // 0x08: ?
 // 0x10: ?
 // 0x20: ?
+// 0x40: Used by spectrum analyzer feature in beatmania III. Audio related?
 
 uint8_t firebeat_state::extend_board_irq_r(offs_t offset)
 {
@@ -786,8 +999,16 @@ void firebeat_state::extend_board_irq_w(offs_t offset, uint8_t data)
 {
 //  printf("extend_board_irq_w: %08X, %08X\n", data, offset);
 
+	auto is_fdd_irq_enabled = BIT(m_extend_board_irq_enable, 2);
+
 	m_extend_board_irq_active &= ~(data & 0xff);
 	m_extend_board_irq_enable = data & 0xff;
+
+	if (BIT(m_extend_board_irq_enable, 2) != is_fdd_irq_enabled)
+	{
+		// Clearing the FDD IRQ here helps fix some issues with the FDD getting stuck
+		m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+	}
 }
 
 /*****************************************************************************/
@@ -803,6 +1024,36 @@ uint8_t firebeat_state::input_r(offs_t offset)
 	}
 
 	return 0;
+}
+
+/*****************************************************************************/
+
+void firebeat_state::control_w(offs_t offset, uint8_t data)
+{
+	// 0x01 - 31kHz (25.175 MHz)/24kHz (16.6666 MHz) clock switch
+	// 0x02 - Unused?
+	// 0x04 - Set to 1 by all games except beatmania III, usage unknown. Screen related?
+	// 0x08 - Toggles screen mirroring when only one GCU is in use? Default 0
+	// 0x80 - Used by ParaParaParadise and Keyboardmania. Set to 1 when doing YMZ flash initialization?
+
+	if (BIT(data, 0) == 0 && BIT(m_control, 0) == 1)
+	{
+		// Set screen to 31kHz from 24kHz
+		m_gcu->set_pixclock(25.175_MHz_XTAL);
+
+		if (m_gcu_sub)
+			m_gcu_sub->set_pixclock(25.175_MHz_XTAL);
+	}
+	else if (BIT(data, 0) == 1 && BIT(m_control, 0) == 0)
+	{
+		// Set screen to 24kHz from 31kHz
+		m_gcu->set_pixclock(16.6666_MHz_XTAL);
+
+		if (m_gcu_sub)
+			m_gcu_sub->set_pixclock(16.6666_MHz_XTAL);
+	}
+
+	m_control = data;
 }
 
 /*****************************************************************************/
@@ -963,11 +1214,13 @@ WRITE_LINE_MEMBER(firebeat_state::sound_irq_callback)
 
 void firebeat_spu_state::machine_start()
 {
+	firebeat_state::machine_start();
 	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(firebeat_spu_state::spu_dma_callback), this));
 }
 
 void firebeat_spu_state::machine_reset()
 {
+	firebeat_state::machine_reset();
 	m_spu_ata_dma = 0;
 	m_spu_ata_dmarq = 0;
 	m_wave_bank = 0;
@@ -994,10 +1247,12 @@ void firebeat_spu_state::firebeat_spu_base(machine_config &config)
 	m_dpram->intl_callback().set_inputline(m_audiocpu, INPUT_LINE_IRQ4); // address 0x3fe triggers M68K interrupt
 	m_dpram->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ3); // address 0x3ff triggers PPC interrupt
 
-	rf5c400_device &rf5c400(RF5C400(config, "rf5c400", XTAL(16'934'400)));
-	rf5c400.set_addrmap(0, &firebeat_spu_state::rf5c400_map);
-	rf5c400.add_route(0, "lspeaker", 0.5);
-	rf5c400.add_route(1, "rspeaker", 0.5);
+	RF5C400(config, m_rf5c400, XTAL(16'934'400));
+	m_rf5c400->set_addrmap(0, &firebeat_spu_state::rf5c400_map);
+
+	// Clean channel audio
+	m_rf5c400->add_route(0, "lspeaker", 0.5);
+	m_rf5c400->add_route(1, "rspeaker", 0.5);
 }
 
 void firebeat_spu_state::firebeat_spu_map(address_map &map)
@@ -1019,13 +1274,13 @@ void firebeat_spu_state::spu_map(address_map &map)
 	map(0x280000, 0x2807ff).rw(m_dpram, FUNC(cy7c131_device::left_r), FUNC(cy7c131_device::left_w)).umask16(0x00ff);
 	map(0x300000, 0x30000f).rw(m_spuata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w));
 	map(0x340000, 0x34000f).rw(m_spuata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w));
-	map(0x400000, 0x400fff).rw("rf5c400", FUNC(rf5c400_device::rf5c400_r), FUNC(rf5c400_device::rf5c400_w));
+	map(0x400000, 0x400fff).rw(m_rf5c400, FUNC(rf5c400_device::rf5c400_r), FUNC(rf5c400_device::rf5c400_w));
 	map(0x800000, 0xffffff).rw(FUNC(firebeat_spu_state::firebeat_waveram_r), FUNC(firebeat_spu_state::firebeat_waveram_w));
 }
 
 void firebeat_spu_state::rf5c400_map(address_map& map)
 {
-	map(0x0000000, 0x1ffffff).ram().share("rf5c400");
+	map(0x0000000, 0x1ffffff).ram().share("rf5c400_ram");
 }
 
 
@@ -1055,10 +1310,10 @@ void firebeat_spu_state::rf5c400_map(address_map& map)
                 In another part of the program (0x363c for a21jca03.bin) is the following code for determining when to start and stop the DMA:
 
                 start_dma();
-                while (get_dma_timer() < dma_max_timer) {
-                    if (irq6_called_flag) {
+                while (get_dma_timer() < dma_max_timer)
+                {
+                    if (irq6_called_flag)
                         break;
-                    }
                 }
                 end_dma();
 
@@ -1195,17 +1450,25 @@ TIMER_DEVICE_CALLBACK_MEMBER(firebeat_spu_state::spu_timer_callback)
 /*****************************************************************************
 * beatmania III
 ******************************************************************************/
+static void pc_hd_floppies(device_slot_interface &device)
+{
+	device.option_add("35hd", FLOPPY_35_HD);
+}
+
+WRITE_LINE_MEMBER(firebeat_bm3_state::floppy_irq_callback)
+{
+	if (BIT(m_extend_board_irq_enable, 2) == 0 && state)
+	{
+		m_extend_board_irq_active |= 0x04;
+		m_maincpu->set_input_line(INPUT_LINE_IRQ1, state);
+	}
+}
+
 void firebeat_bm3_state::firebeat_bm3(machine_config &config)
 {
 	firebeat_spu_base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_bm3_state::firebeat_bm3_map);
-
-	// beatmania III is the only game on the Firebeat platform to use 640x480
-	screen_device *screen = subdevice<screen_device>("screen");
-	screen->set_size(640, 480);
-	screen->set_visarea(0, 639, 0, 479);
-	screen->screen_vblank().set(FUNC(firebeat_bm3_state::bm3_vblank));
 
 	ATA_INTERFACE(config, m_spuata).options(firebeat_ata_devices, "hdd", nullptr, true);
 	m_spuata->irq_handler().set(FUNC(firebeat_bm3_state::spu_ata_interrupt));
@@ -1216,6 +1479,25 @@ void firebeat_bm3_state::firebeat_bm3(machine_config &config)
 	// Any higher makes things act weird.
 	// Lower doesn't have that huge of an effect compared to pop'n? (limited tested).
 	TIMER(config, "spu_timer").configure_periodic(FUNC(firebeat_bm3_state::spu_timer_callback), attotime::from_hz(500));
+
+	FDC37C665GT(config, m_fdc, 24_MHz_XTAL, upd765_family_device::mode_t::PS2);
+	m_fdc->fintr().set(FUNC(firebeat_bm3_state::floppy_irq_callback));
+
+	FLOPPY_CONNECTOR(config, m_floppy, pc_hd_floppies, "35hd", floppy_image_device::default_pc_floppy_formats);
+
+	PC16552D(config, m_duart_midi, 0);
+	NS16550(config, "duart_midi:chan0", XTAL(24'000'000));
+	NS16550(config, "duart_midi:chan1", XTAL(24'000'000)).out_int_callback().set(FUNC(firebeat_bm3_state::midi_st224_irq_callback));
+
+	// Effects audio channel, routed to ST-224's audio input
+	m_rf5c400->add_route(2, "lspeaker", 0.5);
+	m_rf5c400->add_route(3, "rspeaker", 0.5);
+
+	KONAMI_FIREBEAT_EXTEND_SPECTRUM_ANALYZER(config, m_spectrum_analyzer, 0);
+	m_rf5c400->add_route(0, m_spectrum_analyzer, 0.5, AUTO_ALLOC_INPUT, 0);
+	m_rf5c400->add_route(1, m_spectrum_analyzer, 0.5, AUTO_ALLOC_INPUT, 1);
+	m_rf5c400->add_route(2, m_spectrum_analyzer, 0.5, AUTO_ALLOC_INPUT, 0);
+	m_rf5c400->add_route(3, m_spectrum_analyzer, 0.5, AUTO_ALLOC_INPUT, 1);
 }
 
 void firebeat_bm3_state::init_bm3()
@@ -1233,42 +1515,11 @@ void firebeat_bm3_state::init_bm3()
 void firebeat_bm3_state::firebeat_bm3_map(address_map &map)
 {
 	firebeat_spu_map(map);
-
+	map(0x70000000, 0x70000fff).rw(FUNC(firebeat_bm3_state::midi_uart_r), FUNC(firebeat_bm3_state::midi_uart_w)).umask32(0xff000000);
+	map(0x70001000, 0x70001fff).rw(m_fdc, FUNC(fdc37c665gt_device::read), FUNC(fdc37c665gt_device::write)).umask32(0xff000000);
+	map(0x70008000, 0x7000807f).r(m_spectrum_analyzer, FUNC(firebeat_extend_spectrum_analyzer_device::read));
 	map(0x7d000330, 0x7d00033f).nopw(); // ?
 	map(0x7d000340, 0x7d00035f).r(FUNC(firebeat_bm3_state::sensor_r));
-	map(0x70001fc0, 0x70001fdf).rw(FUNC(firebeat_bm3_state::fdd_unk_r), FUNC(firebeat_bm3_state::fdd_unk_w));
-	map(0x70008000, 0x7000807f).r(FUNC(firebeat_bm3_state::spectrum_analyzer_r));
-}
-
-uint32_t firebeat_bm3_state::spectrum_analyzer_r(offs_t offset)
-{
-	// Visible in the sound test menu and most likely the spectral analyzer game skin
-	//
-	// Notes about where this could be coming from...
-	// - It's not the ST-224: Only sends audio in and out, with a MIDI in
-	// - It's not the RF5C400: There are no unimplemented registers or anything of that sort that could give this info
-	// - The memory address mapping is the same as Keyboardmania's wheel, which plugs into a connector on extend board
-	//   but there's nothing actually plugged into that spot on a beatmania III configuration, so it's not external
-	// - Any place where the audio is directed somewhere (amps, etc) does not have a way to get back to the PCBs
-	//   from what I can tell based on looking at the schematics in the beatmania III manual
-	// - I think it's probably calculated somewhere within one of the main boards (main/extend/SPU) but couldn't find any
-	//   potentially interesting chips at a glance of PCB pics
-	// - The manual does not seem to make mention of this feature *at all* much less troubleshooting it, so no leads there
-
-	// 6 notch spectrum analyzer
-	// No idea what frequency range each notch corresponds but it does not affect core gameplay in any way.
-	// Notch 1: 0x0c
-	// Notch 2: 0x0a
-	// Notch 3: 0x08
-	// Notch 4: 0x06
-	// Notch 5: 0x04
-	// Notch 6: 0x02
-
-	// TODO: Fill in logic (reuse vgm_visualizer in some way?)
-	// auto ch = offset & 0xf0; // 0 = Left, 1 = Right
-	auto data = 0;
-
-	return data;
 }
 
 uint16_t firebeat_bm3_state::sensor_r(offs_t offset)
@@ -1295,52 +1546,25 @@ uint16_t firebeat_bm3_state::sensor_r(offs_t offset)
 	return 0;
 }
 
-uint32_t firebeat_bm3_state::fdd_unk_r(offs_t offset, uint32_t mem_mask)
+WRITE_LINE_MEMBER(firebeat_bm3_state::midi_st224_irq_callback)
 {
-	// printf("%s: fdd_unk_r: %08X, %08X\n", machine().describe_context().c_str(), offset, mem_mask);
-
-	return 0;
+	if (BIT(m_extend_board_irq_enable, 0) == 0 && state != CLEAR_LINE)
+	{
+		m_extend_board_irq_active |= 0x01;
+		m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+	}
+	else
+		m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 }
 
-void firebeat_bm3_state::fdd_unk_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+uint8_t firebeat_bm3_state::midi_uart_r(offs_t offset)
 {
-	// printf("%s: fdd_unk_w: %08X, %08X, %08X\n", machine().describe_context().c_str(), data, offset, mem_mask);
+	return m_duart_midi->read(offset >> 6);
 }
 
-WRITE_LINE_MEMBER(firebeat_bm3_state::bm3_vblank)
+void firebeat_bm3_state::midi_uart_w(offs_t offset, uint8_t data)
 {
-	// Patch out FDD errors since the game otherwise runs fine without it
-	// and the FDD might not be implemented for a while
-	if (strcmp(machine().system().name, "bm3") == 0)
-	{
-		if (m_work_ram[0x918C / 4] == 0x4809202D) m_work_ram[0x918C / 4] = 0x38600000;
-		if (m_work_ram[0x3380C / 4] == 0x4BFFFD99) m_work_ram[0x3380C / 4] = 0x38600000;
-		if (m_work_ram[0x33834 / 4] == 0x4BFFFD71) m_work_ram[0x33834 / 4] = 0x38600000;
-	}
-	else if (strcmp(machine().system().name, "bm3core") == 0)
-	{
-		if (m_work_ram[0x91E4 / 4] == 0x480A19F5) m_work_ram[0x91E4 / 4] = 0x38600000;
-		if (m_work_ram[0x37BB0 / 4] == 0x4BFFFD71) m_work_ram[0x37BB0 / 4] = 0x38600000;
-		if (m_work_ram[0x37BD8 / 4] == 0x4BFFFD49) m_work_ram[0x37BD8 / 4] = 0x38600000;
-	}
-	else if (strcmp(machine().system().name, "bm36th") == 0)
-	{
-		if (m_work_ram[0x91E4 / 4] == 0x480BC8BD) m_work_ram[0x91E4 / 4] = 0x38600000;
-		if (m_work_ram[0x451D8 / 4] == 0x4BFFFD75) m_work_ram[0x451D8 / 4] = 0x38600000;
-		if (m_work_ram[0x45200 / 4] == 0x4BFFFD4D) m_work_ram[0x45200 / 4] = 0x38600000;
-	}
-	else if (strcmp(machine().system().name, "bm37th") == 0)
-	{
-		if (m_work_ram[0x91E4 / 4] == 0x480CF62D) m_work_ram[0x91E4 / 4] = 0x38600000;
-		if (m_work_ram[0x46A58 / 4] == 0x4BFFFD45) m_work_ram[0x46A58 / 4] = 0x38600000;
-		if (m_work_ram[0x46AB8 / 4] == 0x4BFFFCE5) m_work_ram[0x46AB8 / 4] = 0x38600000;
-	}
-	else if (strcmp(machine().system().name, "bm3final") == 0)
-	{
-		if (m_work_ram[0x47F8 / 4] == 0x480CEF91) m_work_ram[0x47F8 / 4] = 0x38600000;
-		if (m_work_ram[0x3FAF4 / 4] == 0x4BFFFD59) m_work_ram[0x3FAF4 / 4] = 0x38600000;
-		if (m_work_ram[0x3FB54 / 4] == 0x4BFFFCF9) m_work_ram[0x3FB54 / 4] = 0x38600000;
-	}
+	m_duart_midi->write(offset >> 6, data);
 }
 
 /*****************************************************************************
@@ -1360,6 +1584,10 @@ void firebeat_popn_state::firebeat_popn(machine_config &config)
 	// Any lower and sometimes you'll hear buzzing from certain keysounds, or fades take too long.
 	// Any higher and keysounds get cut short.
 	TIMER(config, "spu_timer").configure_periodic(FUNC(firebeat_popn_state::spu_timer_callback), attotime::from_hz(500));
+
+	// Effects audio channel, routed back to main (no external processing)
+	m_rf5c400->add_route(2, "lspeaker", 0.5);
+	m_rf5c400->add_route(3, "rspeaker", 0.5);
 }
 
 void firebeat_popn_state::init_popn_base()
@@ -1610,27 +1838,21 @@ void firebeat_kbm_state::firebeat_kbm(machine_config &config)
 	/* video hardware */
 	PALETTE(config, "palette", palette_device::RGB_555);
 
-	K057714(config, m_gcu, 0);
-	m_gcu->irq_callback().set(FUNC(firebeat_kbm_state::gcu_interrupt));
-
-	K057714(config, m_gcu_sub, 0);
-	m_gcu_sub->irq_callback().set(FUNC(firebeat_kbm_state::gcu_interrupt));
-
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
-	lscreen.set_refresh_hz(60);
-	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	lscreen.set_size(512, 384);
-	lscreen.set_visarea(0, 511, 0, 383);
+	lscreen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480);
 	lscreen.set_screen_update(FUNC(firebeat_kbm_state::screen_update_firebeat_0));
 	lscreen.set_palette("palette");
 
+	K057714(config, m_gcu, 0).set_screen("lscreen");
+	m_gcu->irq_callback().set(FUNC(firebeat_kbm_state::gcu_interrupt));
+
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
-	rscreen.set_refresh_hz(60);
-	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	rscreen.set_size(512, 384);
-	rscreen.set_visarea(0, 511, 0, 383);
+	rscreen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480);
 	rscreen.set_screen_update(FUNC(firebeat_kbm_state::screen_update_firebeat_1));
 	rscreen.set_palette("palette");
+
+	K057714(config, m_gcu_sub, 0).set_screen("rscreen");
+	m_gcu_sub->irq_callback().set(FUNC(firebeat_kbm_state::gcu_interrupt));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1642,18 +1864,20 @@ void firebeat_kbm_state::firebeat_kbm(machine_config &config)
 	ymz.add_route(1, "lspeaker", 1.0);
 	ymz.add_route(0, "rspeaker", 1.0);
 
+	// On the main PCB
 	PC16552D(config, "duart_com", 0);
 	NS16550(config, "duart_com:chan0", XTAL(19'660'800));
 	NS16550(config, "duart_com:chan1", XTAL(19'660'800));
 
-	PC16552D(config, "duart_midi", 0);
-	ns16550_device &midi_chan0(NS16550(config, "duart_midi:chan0", XTAL(24'000'000)));
-	midi_chan0.out_int_callback().set(FUNC(firebeat_kbm_state::midi_uart_ch0_irq_callback));
-	ns16550_device &midi_chan1(NS16550(config, "duart_midi:chan1", XTAL(24'000'000)));
-	midi_chan1.out_int_callback().set(FUNC(firebeat_kbm_state::midi_uart_ch1_irq_callback));
-
+	// On the extend board
+	PC16552D(config, m_duart_midi, 0);
+	auto &midi_chan1(NS16550(config, "duart_midi:chan1", XTAL(24'000'000)));
 	MIDI_KBD(config, m_kbd[0], 31250).tx_callback().set(midi_chan1, FUNC(ins8250_uart_device::rx_w));
+	midi_chan1.out_int_callback().set(FUNC(firebeat_kbm_state::midi_keyboard_left_irq_callback));
+
+	auto &midi_chan0(NS16550(config, "duart_midi:chan0", XTAL(24'000'000)));
 	MIDI_KBD(config, m_kbd[1], 31250).tx_callback().set(midi_chan0, FUNC(ins8250_uart_device::rx_w));
+	midi_chan0.out_int_callback().set(FUNC(firebeat_kbm_state::midi_keyboard_right_irq_callback));
 }
 
 void firebeat_kbm_state::firebeat_kbm_map(address_map &map)
@@ -1685,7 +1909,7 @@ void firebeat_kbm_state::midi_uart_w(offs_t offset, uint8_t data)
 	m_duart_midi->write(offset >> 6, data);
 }
 
-WRITE_LINE_MEMBER(firebeat_kbm_state::midi_uart_ch0_irq_callback)
+WRITE_LINE_MEMBER(firebeat_kbm_state::midi_keyboard_right_irq_callback)
 {
 	if (BIT(m_extend_board_irq_enable, 1) == 0 && state != CLEAR_LINE)
 	{
@@ -1696,7 +1920,7 @@ WRITE_LINE_MEMBER(firebeat_kbm_state::midi_uart_ch0_irq_callback)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(firebeat_kbm_state::midi_uart_ch1_irq_callback)
+WRITE_LINE_MEMBER(firebeat_kbm_state::midi_keyboard_left_irq_callback)
 {
 	if (BIT(m_extend_board_irq_enable, 0) == 0 && state != CLEAR_LINE)
 	{
@@ -1804,6 +2028,10 @@ void firebeat_kbm_state::lamp_output_kbm_w(offs_t offset, uint32_t data, uint32_
 
 static INPUT_PORTS_START( firebeat )
 	PORT_START("IN3")
+	// popn4/animelo:
+	//   DIPSW 1 = Auto play mode
+	// popn5:
+	//   DIPSW 5? = Network communication debug messages
 	// popn6/popn7/popn8/others?: Requires debug type dongle (not included in ROMs)
 	//   DIPSW 8 = Auto play mode
 	//   DIPSW 6 = Mute song BGM
@@ -2405,28 +2633,32 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME( 2000, ppp,    0,   firebeat_ppp, ppp, firebeat_ppp_state, init_ppp_jp, ROT0, "Konami", "ParaParaParadise", MACHINE_NOT_WORKING )
-GAME( 2000, ppd,    0,   firebeat_ppp, ppp, firebeat_ppp_state, init_ppp_overseas, ROT0, "Konami", "ParaParaDancing", MACHINE_NOT_WORKING )
-GAME( 2000, ppp11,  0,   firebeat_ppp, ppp, firebeat_ppp_state, init_ppp_jp, ROT0, "Konami", "ParaParaParadise v1.1", MACHINE_NOT_WORKING )
-GAME( 2000, ppp1mp, ppp, firebeat_ppp, ppp, firebeat_ppp_state, init_ppp_jp, ROT0, "Konami", "ParaParaParadise 1st Mix Plus", MACHINE_NOT_WORKING )
+GAME( 2000, ppp,    0,   firebeat_ppp, ppp, firebeat_ppp_state, init_ppp_jp, ROT0, "Konami", "ParaParaParadise", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, ppd,    0,   firebeat_ppp, ppp, firebeat_ppp_state, init_ppp_overseas, ROT0, "Konami", "ParaParaDancing", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, ppp11,  0,   firebeat_ppp, ppp, firebeat_ppp_state, init_ppp_jp, ROT0, "Konami", "ParaParaParadise v1.1", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, ppp1mp, ppp, firebeat_ppp, ppp, firebeat_ppp_state, init_ppp_jp, ROT0, "Konami", "ParaParaParadise 1st Mix Plus", MACHINE_IMPERFECT_SOUND )
 
-GAMEL( 2000, kbm,    0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm_jp, ROT270, "Konami", "Keyboardmania", MACHINE_NOT_WORKING, layout_firebeat )
-GAMEL( 2000, kbh,    kbm, firebeat_kbm, kbm, firebeat_kbm_state, init_kbm_overseas, ROT270, "Konami", "Keyboardheaven (Korea)", MACHINE_NOT_WORKING, layout_firebeat )
-GAMEL( 2000, kbm2nd, 0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm_jp, ROT270, "Konami", "Keyboardmania 2nd Mix", MACHINE_NOT_WORKING, layout_firebeat )
-GAMEL( 2001, kbm3rd, 0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm_jp, ROT270, "Konami", "Keyboardmania 3rd Mix", MACHINE_NOT_WORKING, layout_firebeat )
+// Keyboard sounds do not work: requires MU-100 emulation (ymu100.cpp) which is not in a fully working state yet
+GAMEL( 2000, kbm,    0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm_jp, ROT270, "Konami", "Keyboardmania", MACHINE_IMPERFECT_SOUND, layout_firebeat )
+GAMEL( 2000, kbh,    kbm, firebeat_kbm, kbm, firebeat_kbm_state, init_kbm_overseas, ROT270, "Konami", "Keyboardheaven (Korea)", MACHINE_IMPERFECT_SOUND, layout_firebeat )
+GAMEL( 2000, kbm2nd, 0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm_jp, ROT270, "Konami", "Keyboardmania 2nd Mix", MACHINE_IMPERFECT_SOUND, layout_firebeat )
+GAMEL( 2001, kbm3rd, 0,   firebeat_kbm, kbm, firebeat_kbm_state, init_kbm_jp, ROT270, "Konami", "Keyboardmania 3rd Mix", MACHINE_IMPERFECT_SOUND, layout_firebeat )
 
-GAME( 2000, popn4,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 4", MACHINE_NOT_WORKING )
-GAME( 2000, popn5,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 5", MACHINE_NOT_WORKING )
-GAME( 2001, popn6,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 6", MACHINE_NOT_WORKING )
-GAME( 2001, popn7,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 7", MACHINE_NOT_WORKING )
-GAME( 2002, popn8,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 8", MACHINE_NOT_WORKING )
-GAME( 2000, popnmt,   0,      firebeat_popn, popn, firebeat_popn_state, init_popn_rental, ROT0, "Konami", "Pop'n Music Mickey Tunes", MACHINE_NOT_WORKING )
-GAME( 2000, popnmt2,  popnmt, firebeat_popn, popn, firebeat_popn_state, init_popn_rental, ROT0, "Konami", "Pop'n Music Mickey Tunes!", MACHINE_NOT_WORKING )
-GAME( 2000, popnanm,  0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music Animelo", MACHINE_NOT_WORKING )
-GAME( 2001, popnanm2, 0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music Animelo 2", MACHINE_NOT_WORKING )
+// Requires DVD CHD support. Once DVD CHD support is implemented then MACHINE_NOT_WORKING can be removed
+GAME( 2000, popn4,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 4", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2000, popn5,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 5", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2001, popn6,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 6", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2001, popn7,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 7", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2002, popn8,    0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music 8", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2000, popnmt,   0,      firebeat_popn, popn, firebeat_popn_state, init_popn_rental, ROT0, "Konami", "Pop'n Music Mickey Tunes", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2000, popnmt2,  popnmt, firebeat_popn, popn, firebeat_popn_state, init_popn_rental, ROT0, "Konami", "Pop'n Music Mickey Tunes!", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2000, popnanm,  0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music Animelo", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2001, popnanm2, 0,      firebeat_popn, popn, firebeat_popn_state, init_popn_jp, ROT0, "Konami", "Pop'n Music Animelo 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-GAME( 2000, bm3,      0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III", MACHINE_NOT_WORKING )
-GAME( 2000, bm3core,  0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III Append Core Remix", MACHINE_NOT_WORKING )
-GAME( 2001, bm36th,   0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III Append 6th Mix", MACHINE_NOT_WORKING )
-GAME( 2002, bm37th,   0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III Append 7th Mix", MACHINE_NOT_WORKING )
-GAME( 2003, bm3final, 0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III The Final", MACHINE_NOT_WORKING )
+// Requires ST-224 emulation for optional toggleable external effects, but otherwise is fully playable
+// Core Remix and 6th Mix are marked as MACHINE_NOT_WORKING because of missing HDD dumps
+GAME( 2000, bm3,      0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, bm3core,  0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III Append Core Remix", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2001, bm36th,   0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III Append 6th Mix", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 2002, bm37th,   0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III Append 7th Mix", MACHINE_IMPERFECT_SOUND )
+GAME( 2003, bm3final, 0, firebeat_bm3, bm3, firebeat_bm3_state, init_bm3, ROT0, "Konami", "Beatmania III The Final", MACHINE_IMPERFECT_SOUND )

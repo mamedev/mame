@@ -3509,7 +3509,7 @@ ROM_END
 ROM_START( vs2v991 )    /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-13689 VS2 VER99 STEP 2, Security board ID# 837-13690-COM (317-0245-COM) */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
-	ROM_LOAD64_WORD_SWAP( "epr-21535b.17", 0x400006, 0x100000, CRC(76c5fa8e) SHA1(862438198cb7fdd20beeba53e707a7c59e618ad9) ) // shows Virtua Striker 2 Version '99.1 icon during demo, but not on title screem
+	ROM_LOAD64_WORD_SWAP( "epr-21535b.17", 0x400006, 0x100000, CRC(76c5fa8e) SHA1(862438198cb7fdd20beeba53e707a7c59e618ad9) ) // shows Virtua Striker 2 Version '99.1 icon during demo, but not on title screen
 	ROM_LOAD64_WORD_SWAP( "epr-21536b.18", 0x400004, 0x100000, CRC(1f2bd190) SHA1(19843e6c5626de03eba3cba79c03ce9f2471c183) )
 	ROM_LOAD64_WORD_SWAP( "epr-21537b.19", 0x400002, 0x100000, CRC(a8b3fa5c) SHA1(884042590da9eef0fc2557f715c5d6811edb4ce1) )
 	ROM_LOAD64_WORD_SWAP( "epr-21538b.20", 0x400000, 0x100000, CRC(b3f0ce2a) SHA1(940b76afe3e66bcd026e74f58a08b13c3925f449) )
@@ -3725,7 +3725,7 @@ ROM_END
 ROM_START( vs299j ) /* Step 2.0, Sega game ID# is 833-13688-01, ROM board ID# 834-13689-01 VS2 VER99 STEP2 JPN, Security board ID# 837-13690-COM (317-0245-COM) */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
-	ROM_LOAD64_WORD_SWAP( "epr-21550b.17",  0x400006, 0x100000, CRC(c508e488) SHA1(3134d418beaee9f824a0bd0e5441a997b5911d16) ) // shows Virtua Striker 2 Version '99.1 icon during demo, but not on title screem
+	ROM_LOAD64_WORD_SWAP( "epr-21550b.17",  0x400006, 0x100000, CRC(c508e488) SHA1(3134d418beaee9f824a0bd0e5441a997b5911d16) ) // shows Virtua Striker 2 Version '99.1 icon during demo, but not on title screen
 	ROM_LOAD64_WORD_SWAP( "epr-21551b.18",  0x400004, 0x100000, CRC(0bbc40f7) SHA1(4437c7eab621349b826dcc03d1377731260417e8) ) // adds (c) JFA 1996 to copyrights shown
 	ROM_LOAD64_WORD_SWAP( "epr-21552b.19",  0x400002, 0x100000, CRC(db31eaf6) SHA1(6fca932c0ccf4b613830f99c6046d4287ee071ef) )
 	ROM_LOAD64_WORD_SWAP( "epr-21553b.20",  0x400000, 0x100000, CRC(4f280a56) SHA1(f2bb815429353ee664d90dad27e0fb4194e8c420) )
@@ -3797,7 +3797,7 @@ ROM_END
 ROM_START( vs29915 )  /* Step 1.5, Sega game ID# is 833-13686-02 VS2 VER99 STEP 1.5 USA EXP */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
-	ROM_LOAD64_WORD_SWAP( "epr-21531b.17",  0x600006, 0x080000, CRC(62de9df5) SHA1(b0fd22c9f8cff8ef4addf667d0128ffe67d28032) ) // shows Virtua Striker 2 Version '99.1 icon during demo, but not on title screem
+	ROM_LOAD64_WORD_SWAP( "epr-21531b.17",  0x600006, 0x080000, CRC(62de9df5) SHA1(b0fd22c9f8cff8ef4addf667d0128ffe67d28032) ) // shows Virtua Striker 2 Version '99.1 icon during demo, but not on title screen
 	ROM_LOAD64_WORD_SWAP( "epr-21532b.18",  0x600004, 0x080000, CRC(bbeaa8c2) SHA1(cad00eb458cef76e69e3a1e9ce0917c3a6db9b03) )
 	ROM_LOAD64_WORD_SWAP( "epr-21533b.19",  0x600002, 0x080000, CRC(7b1c05a1) SHA1(79f563fe85cf6fb4396f98431397d8dce3fac400) )
 	ROM_LOAD64_WORD_SWAP( "epr-21534b.20",  0x600000, 0x080000, CRC(f38c3e61) SHA1(f105be07b9365490656e1d9c8cb251b46cc85280) )
@@ -3935,7 +3935,7 @@ ROM_END
 ROM_START( vs29915j )  /* Step 1.5, Sega game ID# is 833-13687-01 VS2 VER99 STEP 1.5 JPN */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
-	ROM_LOAD64_WORD_SWAP( "epr-21546b.17",  0x600006, 0x080000, CRC(712f2017) SHA1(c797fa9e5f77d54c773d313b0e67a79d0e4dda1c) ) // shows Virtua Striker 2 Version '99.1 icon during demo, but not on title screem
+	ROM_LOAD64_WORD_SWAP( "epr-21546b.17",  0x600006, 0x080000, CRC(712f2017) SHA1(c797fa9e5f77d54c773d313b0e67a79d0e4dda1c) ) // shows Virtua Striker 2 Version '99.1 icon during demo, but not on title screen
 	ROM_LOAD64_WORD_SWAP( "epr-21547b.18",  0x600004, 0x080000, CRC(9b904c47) SHA1(397b169da28df4f1da8e129466abdc953cfca098) ) // adds (c) JFA 1996 to copyrights shown
 	ROM_LOAD64_WORD_SWAP( "epr-21548b.19",  0x600002, 0x080000, CRC(6252b9b8) SHA1(1f6a1cf3b4b066b8c6681a17dd923b0efd926600) )
 	ROM_LOAD64_WORD_SWAP( "epr-21549b.20",  0x600000, 0x080000, CRC(3a65615d) SHA1(5eec87db7d2c067e5fa0b84bccfe4642c92800b3) )

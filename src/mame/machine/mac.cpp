@@ -820,6 +820,7 @@ uint8_t mac_state::mac_via_in_b()
 	}
 	else if (ADB_IS_CUDA)
 	{
+		logerror("%s cuda treq %d\n", machine().time().to_string(), m_cuda->get_treq());
 		val |= m_cuda->get_treq()<<3;
 	}
 
@@ -1241,15 +1242,6 @@ uint32_t mac_state::mac_read_id()
 		case MODEL_MAC_LC_575:
 			return 0xa55a222e;
 
-		case MODEL_MAC_POWERMAC_6100:
-			return 0xa55a3011;
-
-		case MODEL_MAC_POWERMAC_7100:
-			return 0xa55a3012;
-
-		case MODEL_MAC_POWERMAC_8100:
-			return 0xa55a3013;
-
 		case MODEL_MAC_PBDUO_210:
 			return 0xa55a1004;
 
@@ -1278,6 +1270,8 @@ uint32_t mac_state::mac_read_id()
 			return 0;
 	}
 }
+
+#include "cpu/powerpc/ppc.h"
 
 void mac_state::mac_driver_init(model_t model)
 {
@@ -2464,6 +2458,7 @@ void mac_state::devsel_w(u8)
 void mac_state::hdsel_w(int)
 {
 }
+
 #else
 
 void mac_state::phases_w(uint8_t phases)
