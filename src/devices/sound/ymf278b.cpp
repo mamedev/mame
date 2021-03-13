@@ -318,8 +318,8 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		m_opl.output(sums, 0, 32767, ymopl3_registers::ALL_CHANNELS);
 
 		// DO2 output: mixed FM channels 0+1 and wavetable channels 0+1
-		outputs[0].put(i, stream_buffer::sample_t(*mixp++) * wtl + stream_buffer::sample_t(sums[0] * fml));
-		outputs[1].put(i, stream_buffer::sample_t(*mixp++) * wtr + stream_buffer::sample_t(sums[1] * fmr));
+		outputs[0].put(i, stream_buffer::sample_t(*mixp++) * wtl + stream_buffer::sample_t(sums[0]) * fml);
+		outputs[1].put(i, stream_buffer::sample_t(*mixp++) * wtr + stream_buffer::sample_t(sums[1]) * fmr);
 
 		// DO0 output: FM channels 2+3 only
 		outputs[2].put_int(i, sums[2], 32768);

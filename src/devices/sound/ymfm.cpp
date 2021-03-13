@@ -9,7 +9,24 @@
 #include "logmacro.h"
 
 //
-// Implementation notes:
+// ONE FM CORE TO RULE THEM ALL
+//
+// This emulator is written from the ground-up using the analysis and deduction
+// by Nemesis as a starting point, particularly in this thread:
+//
+//    https://gendev.spritesmind.net/forum/viewtopic.php?f=24&t=386
+//
+// The core assumption is that these details apply to all FM variants unless
+// otherwise proven incorrect.
+//
+// The fine details of this implementation have also been cross-checked against
+// Nemesis' implementation in his Exodus emulator, as well as Alexey Khokholov's
+// "Nuked" implementations based off die shots.
+//
+// Operator and channel summing/mixing code is largely based off of research
+// done by David Viens and Hubert Lamontagne.
+//
+// Search for QUESTION to find areas where I am unsure.
 //
 //
 // FAMILIES
@@ -37,6 +54,54 @@
 //   * mappers between operators and channels
 //   * generic fetchers that return normalized values across families
 //   * family-specific helper functions
+//
+//
+// FAMILY HISTORY
+//
+// OPM started it all off, featuring:
+//   - 8 FM channels, 4 operators each
+//   - LFO and noise support
+//   - Stereo output
+//
+// OPM -> OPN changes:
+//   - Reduced to 3 FM channels, 4 operators each
+//   - Removed LFO and noise support
+//   - Mono output
+//   - Integrated AY-8910 compatible PSG
+//   - Added SSG-EG envelope mode
+//   - Added multi-frequency mode: ch. 3 operators can have separate frequencies
+//   - Software controlled clock divider
+//
+// OPN -> OPNA changes:
+//   - Increased to 6 FM channels, 4 operators each
+//   - Added back (a cut-down) LFO
+//   - Stereo output again
+//   - Removed software controlled divider on later versions (OPNB/OPN2)
+//   - Removed PSG on OPN2 models
+//
+// OPNA -> OPL changes:
+//   - Increased to 9 FM channels, but only 2 operators each
+//   - Even more simplified LFO
+//   - Mono output
+//   - Removed PSG
+//   - Removed SSG-EG envelope modes
+//   - Removed multi-frequency modes
+//   - Fixed clock divider
+//   - Built-in ryhthm generation
+//
+// OPL -> OPL2 changes:
+//   - Added 4 selectable waveforms
+//
+// OPL2 -> OPLL changes:
+//   - Vastly simplified register map
+//   - 15 built-in instruments, plus built-in rhythm instruments
+//   - 1 user-controlled instrument
+//
+// OPL2 -> OPL3 changes:
+//   - Increased to 18 FM channels, 2 operators each
+//   - 4 output channels
+//   - Increased to 8 selectable waveforms
+//   - 6 channels can be configured to use 4 operators
 //
 //
 // CHANNELS AND OPERATORS
@@ -160,98 +225,104 @@
 // frequencies, and simple enable flags at the operator level for each
 // controlling their application.
 //
-
-
 //
-// This emulator is written from the ground-up based on analysis and deduction
-// by Nemesis, particularly in this thread:
+// DIFFERENCES BETWEEN FAMILIES
 //
-//    https://gendev.spritesmind.net/forum/viewtopic.php?f=24&t=386
+// The table below provides some high level functional differences between the
+// differnet families:
 //
-// The core assumption is that these details apply to all OPN variants unless
-// otherwise proven incorrect.
+//              +--------++-----------------++-----------------------------------+
+//      family: |   OPM  ||       OPN       ||                OPL                |
+//              +--------++--------+--------++--------+--------+--------+--------+
+//   subfamily: |   OPM  ||   OPN  |  OPNA  ||   OPL  |  OPL2  |  OPLL  |  OPL3  |
+//              +--------++--------+--------++--------+--------+--------+--------+
+//     outputs: |    2   ||    1   |    2   ||    1   |    1   |    1   |    4   |
+//    channels: |    8   ||    3   |    6   ||    9   |    9   |    9   |   18   |
+//   operators: |   32   ||   12   |   24   ||   18   |   18   |   18   |   36   |
+//   waveforms: |    1   ||    1   |    1   ||    1   |    4   |    2   |    8   |
+// instruments: |   no   ||   no   |   no   ||   yes  |   yes  |   yes  |   yes  |
+//      ryhthm: |   no   ||   no   |   no   ||   no   |   no   |   yes  |   no   |
+// dynamic ops: |   no   ||   no   |   no   ||   no   |   no   |   no   |   yes  |
+//    prescale: |    2   ||  2/3/6 |  2/3/6 ||    4   |    4   |    4   |    8   |
+//  EG divider: |    3   ||    3   |    3   ||    1   |    1   |    1   |    1   |
+//       EG DP: |   no   ||   no   |   no   ||   no   |   no   |   yes  |   no   |
+//   mod delay: |   no   ||   no   |   no   ||   yes  |   yes  |   yes? |   no   |
+//         CSM: |   yes  ||  ch 2  |  ch 2  ||   yes  |   yes  |   yes  |   no   |
+//         LFO: |   yes  ||   no   |   yes  ||   yes  |   yes  |   yes  |   yes  |
+//       noise: |   yes  ||   no   |   no   ||   no   |   no   |   no   |   no   |
+//              +--------++--------+--------++--------+--------+--------+--------+
 //
-// The fine details of this implementation have also been cross-checked against
-// Nemesis' implementation in his Exodus emulator, as well as Alexey Khokholov's
-// "Nuked" implementation based off die shots.
+// Outputs represents the number of output channels: 1=mono, 2=stereo, 4=stereo+.
+// Channels represents the number of independent FM channels.
+// Operators represents the number of operators, or "slots" which are assembled
+//   into the channels.
+// Waveforms represents the number of different sine-derived waveforms available.
+// Instruments indicates whether the family has built-in instruments.
+// Rhythm indicates whether the family has a built-in rhythm
+// Dynamic ops indicates whether it is possible to switch between 2-operator and
+//   4-operator modes dynamically.
+// Prescale specifies the default clock divider; some chips allow this to be
+//   controlled via register writes.
+// EG divider represents the divider applied to the envelope generator clock.
+// EG DP indicates whether the envelope generator includes a DP (depress?) phase
+//   at the beginning of each key on.
+// Mod delay indicates whether the connection to the first modulator's input is
+//   delayed by 1 sample.
+// CSM indicates whether CSM mode is supported, triggered by timer A.
+// LFO indicates whether LFO is supported.
+// Noise indicates whether one of the operators can be replaced with a noise source.
 //
-// Operator and channel summing/mixing code is largely based off of research
-// done by David Viens and Hubert Lamontagne.
 //
-// Search for QUESTION to find areas where I am unsure.
+// CHIP SPECIFICS
 //
-// ===================================================================================
+// While OPM is its own thing, the OPN and OPL families have quite a few specific
+// implementations, with many differing details beyond the core FM parts. Here are
+// some details on the OPN family:
 //
-// OPN pedigree:
+//           +--------++--------+--------++--------+---------++--------+--------+--------+
+//  chip ID: | YM2203 || YM2608 | YMF288 || YM2610 | YM2610B || YM2612 | YM3438 | YMF276 |
+//           +--------++--------+--------++--------+---------++--------+--------+--------+
+//      aka: |   OPN  ||  OPNA  |  OPN3  ||  OPNB  |  OPNB2  ||  OPN2  |  OPN2C |  OPN2L |
+//       FM: |    3   ||    6   |    6   ||    4   |    6    ||    6   |    6   |    6   |
+//  AY-8910: |    3   ||    3   |    3   ||    3   |    3    ||    -   |    -   |    -   |
+//  ADPCM-A: |    -   ||  6 int |  6 int ||  6 ext |  6 ext  ||    -   |    -   |    -   |
+//  ADPCM-B: |    -   ||  1 ext |    -   ||  1 ext |  1 ext  ||    -   |    -   |    -   |
+//      DAC: |   no   ||   no   |   no   ||   no   |   no    ||   yes  |   yes  |   yes  |
+//   output: | 10.3fp || 16-bit | 16-bit || 16-bit |  16-bit ||  9-bit |  9-bit | 16-bit |
+//  summing: |  adder ||  adder |  adder ||  adder |  adder  ||  muxer |  muxer |  adder |
+//           +--------++--------+--------++--------+---------++--------+--------+--------+
 //
-//                    +--------++-----------------++------------------++--------------------------+
-//    broad catgeory: |   OPN  ||      OPNA       ||      OPNB        ||            OPN2          |
-//                    +--------++--------+--------++--------+---------++--------+--------+--------+
-//           chip ID: | YM2203 || YM2608 | YMF288 || YM2610 | YM2610B || YM2612 | YM3438 | YMF276 |
-//                    +--------++--------+--------++--------+---------++--------+--------+--------+
-//               aka: |   OPN  ||  OPNA  |  OPN3  ||  OPNB  |  OPNB2  ||  OPN2  |  OPN2C |  OPN2L |
-//       FM channels: |    3   ||    6   |    6   ||    4   |    6    ||    6   |    6   |    6   |
-//AY-3-8910 channels: |    3   ||    3   |    3   ||    3   |    3    ||    -   |    -   |    -   |
-//  ADPCM-A channels: |    -   ||  6 int |  6 int ||  6 ext |  6 ext  ||    -   |    -   |    -   |
-//  ADPCM-B channels: |    -   ||  1 ext |    -   ||  1 ext |  1 ext  ||    -   |    -   |    -   |
-//   Channel 6 "DAC": |   no   ||   no   |   no   ||   no   |   no    ||   yes  |   yes  |   yes  |
-//     Clock divider: |  6/3/2 ||  6/3/2 |  6/3/2 ||    6   |    6    ||    6   |    6   |    6   |
-//            Stereo: |   no   ||   yes  |   yes  ||   yes  |   yes   ||   yes  |   yes  |   yes  |
-//               DAC: | 10.3fp || 16-bit | 16-bit || 16-bit |  16-bit ||  9-bit |  9-bit | 16-bit |
-//           Summing: |  adder ||  adder |  adder ||  adder |  adder  ||  muxer |  muxer |  adder |
-//               LFO: |   no   ||   yes  |   yes  ||   yes  |   yes   ||   yes  |   yes  |   yes  |
-//                    +--------++--------+--------++--------+---------++--------+--------+--------+
+// FM represents the number of FM channels available.
+// AY-8910 represents the number of AY-8910-compatible channels that are built in.
+// ADPCM-A represents the number of internal/external ADPCM-A channels present.
+// ADPCM-B represents the number of internal/external ADPCM-B channels present.
+// DAC indicates if a directly-accessible DAC output exists, replacing one channel.
+// Output indicates the output format to the final DAC.
+// Summing indicates whether channels are added or time divided in the output.
 //
-// ===================================================================================
+// OPL has a similar trove of chip variants:
 //
-// From OPM to OPN:
-//   - FM Channels reduced from 8 to 3
-//   - Stereo removed, Hardware LFO removed, Channel 8 noise removed
-//   - Hardware pitch table removed, coarse detune removed, pitch calculation is different
-//   - 3 square wave channels added (GI AY-3–8910 compatible)
-//   - SSG-EG envelope mode added (lets you do AY style looping envelopes on FM ops)
-//   - Channel 3 can have different frequency for each op
-//   - CSM only applies to channel 3
-//   - Register map is different
-//   - Operator timing is different. Channel 1 and 2 have very different timing.
-//   - OPN’s hardware FM clock divider can be changed from /6 (default) to /2 or /3
+//              +--------+---------++--------++--------++--------++---------+
+//     chip ID: | YM3526 |  Y8950  || YM3812 || YM2413 || YMF262 || YMF278B |
+//              +--------+---------++--------++--------++--------++---------+
+//         aka: |   OPL  |MSX-AUDIO||  OPL2  ||  OPLL  ||  OPL3  ||   OPL4  |
+//          FM: |    9   |    9    ||    9   ||    9   ||   18   ||    18   |
+//     ADPCM-B: |    -   |  1 ext  ||    -   ||    -   ||    -   ||    -    |
+//   wavetable: |    -   |    -    ||    -   ||    -   ||    -   ||    24   |
+// instruments: |   no   |    no   ||   no   ||   yes  ||   no   ||    no   |
+//      output: | 10.3fp |  10.3fp || 10.3fp ||  9-bit || 16-bit || 16-bit  |
+//     summing: |  adder |  adder  ||  adder ||  muxer ||  adder ||  adder  |
+//              +--------+---------++--------++--------++--------++---------+
 //
-// From OPN to OPNA:
-//   - Channels doubled from 3 to 6
-//   - Added hardware LFO (different from OPM)
-//   - OPNA is stereo
-//   - OPNA uses a full 16bit dac instead of a 10:3bit dac.
-//   - 6 ADPCM-A drum channels added (play from built-in rom only)
-//      and 1 variable rate ADPCM-B channel (streaming from a small RAM).
-//   - Operator timing is different. All channels have the same timing on OPNA
-//      (roughly the same timing as Channel 3 on OPN), except for Channel 6 when
-//      set to algorithm 8.
-//   - Frequency calculation is 1 bit less precise and can wrap.
-//   - All carrier output values / 2 (this makes carrier output 13 bits instead
-//      of 14 bits)
+// FM represents the number of FM channels available.
+// ADPCM-B represents the number of external ADPCM-B channels present.
+// Wavetable indicates the number of wavetable channels present.
+// Instruments indicates that the chip has built-in instrument selection.
+// Output indicates the output format to the final DAC.
+// Summing indicates whether channels are added or time divided in the output.
 //
-// OPNB/OPNB2 is a OPNA that uses external ROM for the 6 ADPCM-A channels and the
-// ADPCM-B channel. ADPCM-A and ADPCM-B use different buses and different ADPCM
-// encodings. OPNB(2) doesn’t have a changeable divider (always /6). OPNB has 4 FM
-// channels only (ch. 1 and 4 removed), OPNB2 has 6 channels.
-//
-// From OPNA to OPN2:
-//   - Removed GI AY-3–8910 channels and drums and streaming ADPCM
-//   - Operator timing is different. All channels have the same timing on OPN2.
-//   - Removed changeable divider (always /6)
-//   - Carrier output values / 32 instead of / 2 (carriers output 9 bits, down
-//      from 13 bits)
-//   - Built-in 9bit dac, uses analog mixing (time division multiplexing). The
-//      dac has a large gap between values 0 and -1 (resulting in the ladder effect).
-//   - Ch6 “DAC” mode.
-//
-// From OPN2 to OPN2C:
-//   - The DAC is more linear (no gap between 0 and -1).
-//
-// From OPN2C to OPN2L:
-//   - Carrier output is different (full 14 bits instead of 9 bits, narrowed to
-//      13 on ch. mix)
-//   - Uses external DAC (16bit stereo), no analog mixing
+// There are several close variants of the YM2413 with different sets of built-
+// in instruments. These include the YM2423, YMF281, and DS1001 (aka Konami VRC7).
 //
 // ===================================================================================
 //

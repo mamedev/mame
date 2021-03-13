@@ -5,7 +5,7 @@
 #include "ymf262.h"
 
 
-DEFINE_DEVICE_TYPE(YMF262, ymf262_device, "YMF262", "YMF262 OPL3")
+DEFINE_DEVICE_TYPE(YMF262, ymf262_device, "ymf262", "YMF262 OPL3")
 
 
 //*********************************************************
@@ -32,11 +32,11 @@ ymf262_device::ymf262_device(const machine_config &mconfig, const char *tag, dev
 
 u8 ymf262_device::read(offs_t offset)
 {
-	u8 result = 0xff;
+	u8 result = 0x00;
 	switch (offset & 1)
 	{
 		case 0: // status port
-			result = m_opl.status() | 0x06;
+			result = m_opl.status();
 			break;
 
 		case 1:	// data port (unused)
