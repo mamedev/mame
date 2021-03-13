@@ -9,21 +9,21 @@ license:CC0
 	<element name="diamond_white">
 		<image><data><![CDATA[
 			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1414.21356" height="1414.21356">
-				<rect width="1000.0" height="1000.0" x="500.0" y="-500.0" transform="rotate(45.0)" style="opacity:1;fill:#cccccc;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+				<rect width="1000.0" height="1000.0" x="500.0" y="-500.0" transform="rotate(45.0)" fill="#cccccc" />
 			</svg>
 		]]></data></image>
 	</element>
 	<element name="diamond_black">
 		<image><data><![CDATA[
 			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1414.21356" height="1414.21356">
-				<rect width="1000.0" height="1000.0" x="500.0" y="-500.0" transform="rotate(45.0)" style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+				<rect width="1000.0" height="1000.0" x="500.0" y="-500.0" transform="rotate(45.0)" fill="#000000" />
 			</svg>
 		]]></data></image>
 	</element>
 	<element name="diamond_green">
 		<image><data><![CDATA[
 			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1414.21356" height="1414.21356">
-				<rect width="1000.0" height="1000.0" x="500.0" y="-500.0" transform="rotate(45.0)" style="opacity:1;fill:#006126;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1.0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+				<rect width="1000.0" height="1000.0" x="500.0" y="-500.0" transform="rotate(45.0)" fill="#006126" />
 			</svg>
 		]]></data></image>
 	</element>

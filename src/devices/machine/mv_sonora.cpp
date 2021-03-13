@@ -69,7 +69,7 @@ void mac_video_sonora_device::device_add_mconfig(machine_config &config)
 
 // The system starts by leaving everything undriven and reading the
 // result.  If it's not 7, it's the monitor type.  If it's 7, then it
-// needs the extended monitor sense.  It tend drives a 0 on each of
+// needs the extended monitor sense.  It then drives a 0 on each of
 // the 3 pins in sequence and records the result on the other two, and
 // that gives the signature.
 

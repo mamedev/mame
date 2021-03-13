@@ -820,7 +820,7 @@ uint8_t mac_state::mac_via_in_b()
 	}
 	else if (ADB_IS_CUDA)
 	{
-	logerror("%s cuda treq %d\n", machine().time().to_string(), m_cuda->get_treq());
+		logerror("%s cuda treq %d\n", machine().time().to_string(), m_cuda->get_treq());
 		val |= m_cuda->get_treq()<<3;
 	}
 
