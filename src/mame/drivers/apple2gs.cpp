@@ -2739,6 +2739,10 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x22:  // TEXTCOL
+			if (m_textcol != data)
+			{
+				m_screen->update_now();
+			}
 			m_textcol = data;
 			m_video->m_GSfg = (data >> 4) & 0xf;
 			m_video->m_GSbg = data & 0xf;
@@ -2858,6 +2862,10 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x34:  // CLOCKCTL
+			if ((data & 0xf) != m_video->m_GSborder)
+			{
+				m_screen->update_now();
+			}
 			m_clock_control = data & 0x7f;
 			m_video->m_GSborder = data & 0xf;
 			if (data & 0x80)
