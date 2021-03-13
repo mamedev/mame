@@ -280,7 +280,7 @@ void mystwarr_state::k053247_scattered_word_w(offs_t offset, uint16_t data, uint
 	if (offset & 0x0078)
 	{
 //      osd_printf_debug("spr write %x to %x (PC=%x)\n", data, offset, m_maincpu->pc());
-		COMBINE_DATA(m_spriteram+offset);
+		COMBINE_DATA(&m_spriteram[offset]);
 	}
 	else
 	{
@@ -398,7 +398,7 @@ void mystwarr_state::k053247_martchmp_word_w(offs_t offset, uint16_t data, uint1
 {
 	if (offset & 0x0018)
 	{
-		COMBINE_DATA(m_spriteram+offset);
+		COMBINE_DATA(&m_spriteram[offset]);
 	}
 	else
 	{

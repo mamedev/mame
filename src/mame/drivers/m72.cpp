@@ -648,10 +648,9 @@ void m72_state::install_protection_handler(const u8 *code,const u8 *crc)
 	m_protection_ram = std::make_unique<u16[]>(0x1000/2);
 	m_protection_code = code;
 	m_protection_crc =  crc;
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0xb0000, 0xb0fff, "bank1");
+	m_maincpu->space(AS_PROGRAM).install_rom(0xb0000, 0xb0fff, m_protection_ram.get());
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xb0ffa, 0xb0ffb, read16s_delegate(*this, FUNC(m72_state::protection_r)));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb0000, 0xb0fff, write16s_delegate(*this, FUNC(m72_state::protection_w)));
-	membank("bank1")->configure_entry(0, m_protection_ram.get());
 
 	save_pointer(NAME(m_protection_ram), 0x1000/2);
 }
@@ -802,7 +801,7 @@ void m72_state::dbreedm72_map(address_map &map)
 void m72_state::m81_cpu1_common_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).rom();
-	map(0xb0ffe, 0xb0fff).writeonly(); /* leftover from protection?? */
+	map(0xb0ffe, 0xb0fff).nopw(); /* leftover from protection?? */
 	map(0xc0000, 0xc03ff).ram().share("spriteram");
 	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
 	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share("paletteram2");
@@ -835,7 +834,7 @@ void m72_state::m84_cpu1_common_map(address_map &map)
 	map(0xb0000, 0xb0001).w(FUNC(m72_state::irq_line_w));
 	map(0xb4000, 0xb4001).nopw();  /* ??? */
 	map(0xbc000, 0xbc000).w(FUNC(m72_state::dmaon_w));
-	map(0xb0ffe, 0xb0fff).writeonly(); /* leftover from protection?? */
+	map(0xb0ffe, 0xb0fff).nopw(); /* leftover from protection?? */
 	map(0xc0000, 0xc03ff).ram().share("spriteram");
 	map(0xe0000, 0xe3fff).ram();   /* work RAM */
 	map(0xffff0, 0xfffff).rom();
@@ -881,7 +880,7 @@ void m72_state::m82_map(address_map &map)
 	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
 	map(0xd0000, 0xd3fff).ram();   /* work RAM */
 	map(0xe0000, 0xe0001).w(FUNC(m72_state::irq_line_w));
-	map(0xe4000, 0xe4001).writeonly(); /* playfield enable? 1 during screen transitions, 0 otherwise */
+	map(0xe4000, 0xe4001).nopw(); /* playfield enable? 1 during screen transitions, 0 otherwise */
 	map(0xec000, 0xec000).w(FUNC(m72_state::dmaon_w));
 	map(0xffff0, 0xfffff).rom();
 }

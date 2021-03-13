@@ -28,10 +28,8 @@
 
 // FIXME: separate handlers for inputs
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
+
 	NETLIB_OBJECT(74166)
 	{
 		NETLIB_CONSTRUCTOR(74166)
@@ -119,5 +117,4 @@ namespace netlist
 
 	NETLIB_DEVICE_IMPL(74166,    "TTL_74166", "+CLK,+CLKINH,+SH_LDQ,+SER,+A,+B,+C,+D,+E,+F,+G,+H,+CLRQ,@VCC,@GND")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

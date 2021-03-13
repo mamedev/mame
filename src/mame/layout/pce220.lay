@@ -1,0 +1,209 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="busy">
+		<rect>
+			<color red="0.541" green="0.573" blue="0.580"/>
+		</rect>
+		<text string="BUSY">
+			<color state="0" red="0.514" green="0.533" blue="0.545"/>
+			<color state="1" red="0.200" green="0.165" blue="0.169"/>
+		</text>
+	</element>
+	<element name="caps">
+		<rect>
+			<color red="0.541" green="0.573" blue="0.580"/>
+		</rect>
+		<text string="CAPS">
+			<color state="0" red="0.514" green="0.533" blue="0.545"/>
+			<color state="1" red="0.200" green="0.165" blue="0.169"/>
+		</text>
+	</element>
+	<element name="kana">
+		<rect>
+			<color red="0.541" green="0.573" blue="0.580"/>
+		</rect>
+		<!-- カナ -->
+		<text string="KANA">
+			<color state="0" red="0.514" green="0.533" blue="0.545"/>
+			<color state="1" red="0.200" green="0.165" blue="0.169"/>
+		</text>
+	</element>
+	<element name="small">
+		<rect>
+			<color red="0.541" green="0.573" blue="0.580"/>
+		</rect>
+		<!-- 小 -->
+		<text string="SHO">
+			<color state="0" red="0.514" green="0.533" blue="0.545"/>
+			<color state="1" red="0.200" green="0.165" blue="0.169"/>
+		</text>
+	</element>
+	<element name="2ndf">
+		<rect>
+			<color red="0.541" green="0.573" blue="0.580"/>
+		</rect>
+		<text string="2ndF">
+			<color state="0" red="0.514" green="0.533" blue="0.545"/>
+			<color state="1" red="0.200" green="0.165" blue="0.169"/>
+		</text>
+	</element>
+	<element name="text">
+		<rect>
+			<color red="0.541" green="0.573" blue="0.580"/>
+		</rect>
+		<text string="TEXT">
+			<color state="0" red="0.514" green="0.533" blue="0.545"/>
+			<color state="1" red="0.200" green="0.165" blue="0.169"/>
+		</text>
+	</element>
+	<element name="casl">
+		<rect>
+			<color red="0.541" green="0.573" blue="0.580"/>
+		</rect>
+		<text string="CASL">
+			<color state="0" red="0.514" green="0.533" blue="0.545"/>
+			<color state="1" red="0.200" green="0.165" blue="0.169"/>
+		</text>
+	</element>
+	<element name="pro">
+		<rect>
+			<color red="0.541" green="0.573" blue="0.580"/>
+		</rect>
+		<text string="PRO">
+			<color state="0" red="0.514" green="0.533" blue="0.545"/>
+			<color state="1" red="0.200" green="0.165" blue="0.169"/>
+		</text>
+	</element>
+	<element name="run">
+		<rect>
+			<color red="0.541" green="0.573" blue="0.580"/>
+		</rect>
+		<text string="RUN">
+			<color state="0" red="0.514" green="0.533" blue="0.545"/>
+			<color state="1" red="0.200" green="0.165" blue="0.169"/>
+		</text>
+	</element>
+	<element name="batt">
+		<rect>
+			<bounds x="-0.1" y="0.3" width="0.1" height="0.4"/>
+			<color state="0" red="0.514" green="0.533" blue="0.545"/>
+			<color state="1" red="0.200" green="0.165" blue="0.169"/>
+		</rect>
+		<rect>
+			<color state="0" red="0.514" green="0.533" blue="0.545"/>
+			<color state="1" red="0.200" green="0.165" blue="0.169"/>
+		</rect>
+		<text string="BATT">
+			<color red="0.541" green="0.573" blue="0.580"/>
+		</text>
+	</element>
+	<element name="e">
+		<rect>
+			<color red="0.541" green="0.573" blue="0.580"/>
+		</rect>
+		<text string="E">
+			<color state="0" red="0.514" green="0.533" blue="0.545"/>
+			<color state="1" red="0.200" green="0.165" blue="0.169"/>
+		</text>
+	</element>
+	<element name="m">
+		<rect>
+			<color state="0" red="0.514" green="0.533" blue="0.545"/>
+			<color state="1" red="0.200" green="0.165" blue="0.169"/>
+		</rect>
+		<text string="M">
+			<color red="0.541" green="0.573" blue="0.580"/>
+		</text>
+	</element>
+	<element name="const">
+		<rect>
+			<color red="0.541" green="0.573" blue="0.580"/>
+		</rect>
+		<text string="CONST">
+			<color state="0" red="0.514" green="0.533" blue="0.545"/>
+			<color state="1" red="0.200" green="0.165" blue="0.169"/>
+		</text>
+	</element>
+	<element name="rad">
+		<rect>
+			<color red="0.541" green="0.573" blue="0.580"/>
+		</rect>
+		<text string="RAD" align="1">
+			<color state="0" red="0.514" green="0.533" blue="0.545"/>
+			<color state="1" red="0.200" green="0.165" blue="0.169"/>
+		</text>
+	</element>
+	<element name="g">
+		<rect>
+			<color red="0.541" green="0.573" blue="0.580"/>
+		</rect>
+		<text string="G" align="1">
+			<color state="0" red="0.514" green="0.533" blue="0.545"/>
+			<color state="1" red="0.200" green="0.165" blue="0.169"/>
+		</text>
+	</element>
+	<element name="de" align="2">
+		<rect>
+			<color red="0.541" green="0.573" blue="0.580"/>
+		</rect>
+		<text string="DE">
+			<color state="0" red="0.514" green="0.533" blue="0.545"/>
+			<color state="1" red="0.200" green="0.165" blue="0.169"/>
+		</text>
+	</element>
+	<element name="stat">
+		<rect>
+			<color red="0.541" green="0.573" blue="0.580"/>
+		</rect>
+		<text string="STAT">
+			<color state="0" red="0.514" green="0.533" blue="0.545"/>
+			<color state="1" red="0.200" green="0.165" blue="0.169"/>
+		</text>
+	</element>
+	<element name="print">
+		<rect>
+			<color red="0.541" green="0.573" blue="0.580"/>
+		</rect>
+		<text string="PRINT">
+			<color state="0" red="0.514" green="0.533" blue="0.545"/>
+			<color state="1" red="0.200" green="0.165" blue="0.169"/>
+		</text>
+	</element>
+
+	<element name="background">
+		<rect>
+			<color red="0.541" green="0.573" blue="0.580"/>
+		</rect>
+	</element>
+
+	<view name="Internal Layout">
+		<element ref="background">
+			<bounds x="0" y="0" width="148" height="39.8"/>
+		</element>
+		<screen index="0">
+			<bounds x="2" y="4" width="144" height="32"/>
+		</screen>
+
+		<!-- top symbols -->
+		<element ref="busy"  name="sym.0">  <bounds x="5"    y="0.5"  width="8"   height="3"/>  </element>
+		<element ref="caps"  name="sym.1">  <bounds x="16"   y="0.5"  width="8"   height="3"/>  </element>
+		<element ref="kana"  name="sym.2">  <bounds x="28"   y="0.5"  width="8"   height="3"/>  </element>
+		<element ref="small" name="sym.3">  <bounds x="40"   y="0.5"  width="6"   height="3"/>  </element>
+		<element ref="2ndf"  name="sym.4">  <bounds x="63"   y="0.5"  width="8"   height="3"/>  </element>
+		<element ref="de"    name="sym.5">  <bounds x="75"   y="0.5"  width="3"   height="3"/>  </element>
+		<element ref="g"     name="sym.6">  <bounds x="78"   y="0.5"  width="1.5" height="3"/>  </element>
+		<element ref="rad"   name="sym.7">  <bounds x="79.5" y="0.5"  width="6"   height="3"/>  </element>
+		<element ref="const" name="sym.8">  <bounds x="100"  y="0.5"  width="10"  height="3"/>  </element>
+		<element ref="m"     name="sym.9">  <bounds x="112"  y="0.5"  width="2"   height="3"/>  </element>
+		<element ref="e"     name="sym.10"> <bounds x="124"  y="0.5"  width="2"   height="3"/>  </element>
+		<element ref="batt"  name="sym.11"> <bounds x="136"  y="0.5"  width="8"   height="3"/>  </element>
+
+		<!-- bottom symbols -->
+		<element ref="run"   name="sym.12"> <bounds x="14"   y="36.3" width="6"  height="3"/>  </element>
+		<element ref="pro"   name="sym.13"> <bounds x="22"   y="36.3" width="6"  height="3"/>  </element>
+		<element ref="casl"  name="sym.14"> <bounds x="30"   y="36.3" width="8"  height="3"/>  </element>
+		<element ref="text"  name="sym.15"> <bounds x="40"   y="36.3" width="8"  height="3"/>  </element>
+		<element ref="stat"  name="sym.16"> <bounds x="124"  y="36.3" width="8"  height="3"/>  </element>
+		<element ref="print" name="sym.17"> <bounds x="134"  y="36.3" width="10" height="3"/>  </element>
+	</view>
+</mamelayout>

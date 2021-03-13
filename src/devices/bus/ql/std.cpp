@@ -49,9 +49,9 @@ void ql_standard_rom_cartridge_device::device_start()
 
 uint8_t ql_standard_rom_cartridge_device::read(offs_t offset, uint8_t data)
 {
-	if (m_romoeh && m_rom.bytes())
+	if (m_romoeh && m_rom)
 	{
-		data = m_rom[offset & m_rom.mask()];
+		data = m_rom[offset];
 	}
 
 	return data;

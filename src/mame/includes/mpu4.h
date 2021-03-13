@@ -9,8 +9,8 @@
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"
-#include "sound/ym2413.h"
 #include "sound/upd7759.h"
+#include "sound/ym2413.h"
 #include "machine/steppers.h"
 #include "machine/roc10937.h"
 #include "machine/meters.h"
@@ -132,6 +132,7 @@ public:
 		, m_mpu4leds(*this, "mpu4led%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
 		, m_triacs(*this, "triac%u", 0U)
+		, m_current_chr_table(nullptr)
 	 { }
 
 	void init_m4default_alt();
@@ -236,7 +237,6 @@ public:
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	void mpu4_6809_map(address_map &map);
 	void mpu4_memmap(address_map &map);
 	void lamp_extend_small(int data);
 	void lamp_extend_large(int data,int column,int active);
@@ -390,14 +390,14 @@ protected:
 	int m_ic23_active;
 	int m_led_lamp;
 	int m_link7a_connected;
-	int m_low_volt_detect_disable;
+	int m_low_volt_detect_disable = 0;
 	int m_aux1_invert;
 	int m_aux2_invert;
 	int m_door_invert;
 	emu_timer *m_ic24_timer;
 	int m_expansion_latch;
 	int m_global_volume;
-	int m_input_strobe;
+	int m_input_strobe = 0;
 	uint8_t m_lamp_strobe;
 	uint8_t m_lamp_strobe2;
 	uint8_t m_lamp_strobe_ext;
@@ -407,7 +407,7 @@ protected:
 	int m_optic_pattern;
 
 	int m_active_reel;
-	int m_remote_meter;
+	int m_remote_meter = 0;
 	int m_reel_mux;
 	int m_lamp_extender;
 	int m_last_b7;
@@ -415,7 +415,7 @@ protected:
 	int m_lamp_sense;
 	int m_card_live;
 	int m_led_extender;
-	int m_bwb_bank;
+	int m_bwb_bank = 0;
 	int m_chr_state;
 	int m_chr_counter;
 	int m_chr_value;
@@ -423,12 +423,12 @@ protected:
 	int m_pageval;
 	int m_pageset;
 	int m_hopper;
-	int m_reels;
+	int m_reels = 0;
 	int m_chrdata;
 	int m_t1;
 	int m_t3l;
 	int m_t3h;
-	uint8_t m_numbanks;
+	uint8_t m_numbanks = 0;
 	mpu4_chr_table* m_current_chr_table;
 	const bwb_chr_table* m_bwb_chr_table1;
 };

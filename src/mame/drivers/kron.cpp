@@ -169,8 +169,7 @@ void kron180_state::kron180_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom().region("roms", 0x8000);
 	map(0x8000, 0x85ff).ram().mirror(0x6000);
-	map(0x8600, 0x95ff).ram().share(m_vram).mirror(0x6000);
-	map(0x9600, 0x9fff).ram().mirror(0x6000);
+	map(0x8600, 0x9fff).ram().share(m_vram).mirror(0x6000);
 }
 
 /*   IO decoding

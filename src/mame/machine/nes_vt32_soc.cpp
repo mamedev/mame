@@ -50,16 +50,16 @@ void nes_vt32_soc_device::vtfp_411e_w(uint8_t data)
 {
 	logerror("411e_w %02x\n", data);
 	if (data == 0x05)
-		dynamic_cast<m6502_vtscr&>(*m_maincpu).set_next_scramble(true);
+		downcast<m6502_vtscr &>(*m_maincpu).set_next_scramble(true);
 	else if (data == 0x00)
-		dynamic_cast<m6502_vtscr&>(*m_maincpu).set_next_scramble(false);
+		downcast<m6502_vtscr &>(*m_maincpu).set_next_scramble(false);
 }
 
 void nes_vt32_soc_device::vtfp_4a00_w(uint8_t data)
 {
 	logerror("4a00_w %02x\n", data);
 	//if(data == 0x80)
-	//  dynamic_cast<m6502_vtscr&>(*m_maincpu).set_scramble(false);
+	//  downcast<m6502_vtscr &>(*m_maincpu).set_scramble(false);
 }
 
 

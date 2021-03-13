@@ -261,7 +261,7 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		}
 
 		clipverts = zclip_if_less(4, v, clipv, 4, 10.0f);
-		assert(clipverts <= ARRAY_LENGTH(clipv));
+		assert(clipverts <= std::size(clipv));
 		if (clipverts < 3)
 			return;
 
@@ -1213,8 +1213,8 @@ void namcos22_state::slavesim_handle_bb0003(const s32 *src)
 	m_camera_vx = (s16)(src[0x5] >> 16);
 	m_camera_vy = (s16)(src[0x5] & 0xffff);
 	m_camera_zoom = dspfloat_to_nativefloat(src[0x6]);
-	m_camera_vl = dspfloat_to_nativefloat(src[0x7]) * m_camera_zoom + 0.5f;
-	m_camera_vr = dspfloat_to_nativefloat(src[0x8]) * m_camera_zoom + 0.5f;
+	m_camera_vr = dspfloat_to_nativefloat(src[0x7]) * m_camera_zoom + 0.5f;
+	m_camera_vl = dspfloat_to_nativefloat(src[0x8]) * m_camera_zoom + 0.5f;
 	m_camera_vu = dspfloat_to_nativefloat(src[0x9]) * m_camera_zoom + 0.5f;
 	m_camera_vd = dspfloat_to_nativefloat(src[0xa]) * m_camera_zoom + 0.5f;
 

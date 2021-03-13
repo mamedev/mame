@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(ADAM_RAM, adam_ram_expansion_device, "adam_ram", "Adam 64KB R
 adam_ram_expansion_device::adam_ram_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ADAM_RAM, tag, owner, clock),
 	device_adam_expansion_slot_card_interface(mconfig, *this),
-	m_ram(*this, "ram")
+	m_ram(*this, "ram", 0x10000, ENDIANNESS_LITTLE)
 {
 }
 
@@ -41,7 +41,6 @@ adam_ram_expansion_device::adam_ram_expansion_device(const machine_config &mconf
 
 void adam_ram_expansion_device::device_start()
 {
-	m_ram.allocate(0x10000);
 }
 
 

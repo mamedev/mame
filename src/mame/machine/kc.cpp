@@ -285,8 +285,7 @@ void kc_state::update_0x00000()
 		LOG(("ram0 enabled\n"));
 
 		/* yes; set address of bank */
-		space.install_read_bank(0x0000, 0x3fff, "bank1");
-		membank("bank1")->set_base(m_ram_base);
+		space.install_rom(0x0000, 0x3fff, m_ram_base);
 
 		/* write protect ram? */
 		if ((m_pio_data[0] & (1<<3)) == 0)
@@ -302,7 +301,7 @@ void kc_state::update_0x00000()
 			LOG(("ram0 write enabled\n"));
 
 			/* ram is enabled and write enabled */
-			space.install_write_bank(0x0000, 0x3fff, "bank1");
+			space.install_writeonly(0x0000, 0x3fff, m_ram_base);
 		}
 	}
 	else
@@ -337,8 +336,7 @@ void kc_state::update_0x0c000()
 		/* BASIC takes next priority */
 			LOG(("BASIC rom 0x0c000\n"));
 
-		membank("bank4")->set_base(memregion("basic")->base());
-		space.install_read_bank(0xc000, 0xdfff, "bank4");
+		space.install_rom(0xc000, 0xdfff, memregion("basic")->base());
 		space.unmap_write(0xc000, 0xdfff);
 	}
 	else
@@ -360,8 +358,7 @@ void kc_state::update_0x0e000()
 		/* enable CAOS rom in memory range 0x0e000-0x0ffff */
 		LOG(("CAOS rom 0x0e000\n"));
 		/* read will access the rom */
-		membank("bank5")->set_base(memregion("caos")->base() + 0x2000);
-		space.install_read_bank(0xe000, 0xffff, "bank5");
+		space.install_rom(0xe000, 0xffff, memregion("caos")->base() + 0x2000);
 		space.unmap_write(0xe000, 0xffff);
 	}
 	else
@@ -384,8 +381,7 @@ void kc_state::update_0x08000()
 		/* IRM enabled */
 		LOG(("IRM enabled\n"));
 
-		membank("bank3")->set_base(&m_video_ram[0]);
-		space.install_readwrite_bank(0x8000, 0xbfff, "bank3");
+		space.install_ram(0x8000, 0xbfff, &m_video_ram[0]);
 	}
 	else
 	{
@@ -408,9 +404,7 @@ void kc85_4_state::update_0x04000()
 		LOG(("RAM4 enabled\n"));
 
 		/* yes */
-		space.install_read_bank(0x4000, 0x7fff, "bank2");
-		/* set address of bank */
-		membank("bank2")->set_base(m_ram_base + 0x4000);
+		space.install_rom(0x4000, 0x7fff, m_ram_base + 0x4000);
 
 		/* write protect ram? */
 		if ((m_port_86_data & (1<<1)) == 0)
@@ -426,7 +420,7 @@ void kc85_4_state::update_0x04000()
 			LOG(("ram4 write enabled\n"));
 
 			/* ram is enabled and write enabled */
-			space.install_write_bank(0x4000, 0x7fff, "bank2");
+			space.install_writeonly(0x4000, 0x7fff, m_ram_base + 0x4000);
 		}
 	}
 	else
@@ -449,8 +443,7 @@ void kc85_4_state::update_0x0c000()
 		/* CAOS rom takes priority */
 		LOG(("CAOS rom 0x0c000\n"));
 
-		membank("bank4")->set_base(memregion("caos")->base());
-		space.install_read_bank(0xc000, 0xdfff, "bank4");
+		space.install_rom(0xc000, 0xdfff, memregion("caos")->base());
 		space.unmap_write(0xc000, 0xdfff);
 	}
 	else
@@ -462,8 +455,7 @@ void kc85_4_state::update_0x0c000()
 
 			int bank = memregion("basic")->bytes() == 0x8000 ? (m_port_86_data>>5) & 0x03 : 0;
 
-			membank("bank4")->set_base(memregion("basic")->base() + (bank << 13));
-			space.install_read_bank(0xc000, 0xdfff, "bank4");
+			space.install_rom(0xc000, 0xdfff, memregion("basic")->base() + (bank << 13));
 			space.unmap_write(0xc000, 0xdfff);
 		}
 		else
@@ -487,11 +479,8 @@ void kc85_4_state::update_0x08000()
 
 		uint8_t* ram_page = &m_video_ram[(BIT(m_port_84_data, 2)<<15) | (BIT(m_port_84_data, 1)<<14)];
 
-		membank("bank3")->set_base(ram_page);
-		space.install_readwrite_bank(0x8000, 0xa7ff, "bank3");
-
-		membank("bank6")->set_base(&m_video_ram[0x2800]);
-		space.install_readwrite_bank(0xa800, 0xbfff, "bank6");
+		space.install_ram(0x8000, 0xa7ff, ram_page);
+		space.install_ram(0xa800, 0xbfff, &m_video_ram[0x2800]);
 	}
 	else if (m_pio_data[1] & (1<<5))
 	{
@@ -515,10 +504,8 @@ void kc85_4_state::update_0x08000()
 			mem_ptr = m_ram_base + (ram8_block<<14);
 		}
 
-		membank("bank3")->set_base(mem_ptr);
-		membank("bank6")->set_base(mem_ptr + 0x2800);
-		space.install_read_bank(0x8000, 0xa7ff, "bank3");
-		space.install_read_bank(0xa800, 0xbfff, "bank6");
+		space.install_rom(0x8000, 0xa7ff, mem_ptr);
+		space.install_rom(0xa800, 0xbfff, mem_ptr + 0x2800);
 
 		/* write protect RAM8 ? */
 		if ((m_pio_data[1] & (1<<6)) == 0)
@@ -534,8 +521,8 @@ void kc85_4_state::update_0x08000()
 			LOG(("RAM8 write enabled\n"));
 
 			/* ram8 is enabled and write enabled */
-			space.install_write_bank(0x8000, 0xa7ff, "bank3");
-			space.install_write_bank(0xa800, 0xbfff, "bank6");
+			space.install_writeonly(0x8000, 0xa7ff, mem_ptr);
+			space.install_writeonly(0xa800, 0xbfff, mem_ptr + 0x2800);
 		}
 	}
 	else

@@ -224,9 +224,6 @@ void ravens2_state::port1b_w(u8 data)
 	if ((data == 0x0a && m_term_out == 0x20))
 		data = 0x0a; // LineFeed
 	else
-	if ((data == 0x01 && m_term_out == 0xc2))
-		data = 0x0d; // CarriageReturn
-	else
 		data = m_term_out;
 
 	m_terminal->write(data);

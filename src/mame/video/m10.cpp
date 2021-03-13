@@ -2,7 +2,7 @@
 // copyright-holders:Lee Taylor, Couriersud
 /***************************************************************************
 
-  video.c
+  m10.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -23,40 +23,40 @@ static const uint32_t extyoffs[] =
 
 static const gfx_layout backlayout =
 {
-	8,8*32, /* 8*(8*32) characters */
-	4,      /* 4 characters */
-	1,      /* 1 bit per pixel */
+	8,8*32, // 8*(8*32) characters
+	4,      // 4 characters
+	1,      // 1 bit per pixel
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	EXTENDED_YOFFS,
-	32*8*8, /* every char takes 8 consecutive bytes */
+	32*8*8, // every char takes 8 consecutive bytes
 	nullptr, extyoffs
 };
 
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8*8 characters */
-	256,    /* 256 characters */
-	1,      /* 1 bit per pixel */
+	8,8,    // 8*8 characters
+	256,    // 256 characters
+	1,      // 1 bit per pixel
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8 /* every char takes 8 consecutive bytes */
+	8*8 // every char takes 8 consecutive bytes
 };
 
-TILEMAP_MAPPER_MEMBER(m10_state::tilemap_scan)
+TILEMAP_MAPPER_MEMBER(m1x_state::tilemap_scan)
 {
 	return (31 - col) * 32 + row;
 }
 
 
-TILE_GET_INFO_MEMBER(m10_state::get_tile_info)
+TILE_GET_INFO_MEMBER(m1x_state::get_tile_info)
 {
 	tileinfo.set(0, m_videoram[tile_index], m_colorram[tile_index] & 0x07, 0);
 }
 
 
-void m10_state::m10_colorram_w(offs_t offset, uint8_t data)
+void m1x_state::colorram_w(offs_t offset, uint8_t data)
 {
 	if (m_colorram[offset] != data)
 	{
@@ -66,7 +66,7 @@ void m10_state::m10_colorram_w(offs_t offset, uint8_t data)
 }
 
 
-void m10_state::m10_chargen_w(offs_t offset, uint8_t data)
+void m10_state::chargen_w(offs_t offset, uint8_t data)
 {
 	if (m_chargen[offset] != data)
 	{
@@ -76,7 +76,7 @@ void m10_state::m10_chargen_w(offs_t offset, uint8_t data)
 }
 
 
-void m10_state::m15_chargen_w(offs_t offset, uint8_t data)
+void m15_state::chargen_w(offs_t offset, uint8_t data)
 {
 	if (m_chargen[offset] != data)
 	{
@@ -86,7 +86,7 @@ void m10_state::m15_chargen_w(offs_t offset, uint8_t data)
 }
 
 
-inline void m10_state::plot_pixel_m10(bitmap_ind16 &bm, int x, int y, int col)
+inline void m10_state::plot_pixel(bitmap_ind16 &bm, int x, int y, int col)
 {
 	if (!m_flip)
 		bm.pix(y, x) = col;
@@ -95,7 +95,7 @@ inline void m10_state::plot_pixel_m10(bitmap_ind16 &bm, int x, int y, int col)
 				(IREMM10_HBSTART - 1) - (x - IREMM10_HBEND)) = col; // only when flip_screen(?)
 }
 
-VIDEO_START_MEMBER(m10_state,m10)
+void m10_state::video_start()
 {
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m10_state::get_tile_info)), tilemap_mapper_delegate(*this, FUNC(m10_state::tilemap_scan)), 8, 8, 32, 32);
 	m_tx_tilemap->set_transparent_pen(0);
@@ -104,11 +104,11 @@ VIDEO_START_MEMBER(m10_state,m10)
 	m_back_gfx = m_gfxdecode->gfx(1);
 }
 
-VIDEO_START_MEMBER(m10_state,m15)
+void m15_state::video_start()
 {
 	m_gfxdecode->set_gfx(0,std::make_unique<gfx_element>(m_palette, charlayout, m_chargen, 0, 8, 0));
 
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m10_state::get_tile_info)), tilemap_mapper_delegate(*this, FUNC(m10_state::tilemap_scan)), 8, 8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m15_state::get_tile_info)), tilemap_mapper_delegate(*this, FUNC(m15_state::tilemap_scan)), 8, 8, 32, 32);
 }
 
 /***************************************************************************
@@ -117,16 +117,14 @@ VIDEO_START_MEMBER(m10_state,m15)
 
 ***************************************************************************/
 
-uint32_t m10_state::screen_update_m10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m10_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
 	static const int color[4]= { 3, 3, 5, 5 };
 	static const int xpos[4] = { 4*8, 26*8, 7*8, 6*8};
-	int i;
 
 	bitmap.fill(0, cliprect);
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 		if (m_flip)
 				m_back_gfx->opaque(bitmap,cliprect, i, color[i], 1, 1, 31 * 8 - xpos[i], 0);
 		else
@@ -134,13 +132,11 @@ uint32_t m10_state::screen_update_m10(screen_device &screen, bitmap_ind16 &bitma
 
 	if (m_bottomline)
 	{
-		int y;
-
-		for (y = IREMM10_VBEND; y < IREMM10_VBSTART; y++)
-			plot_pixel_m10(bitmap, 16, y, 1);
+		for (int y = IREMM10_VBEND; y < IREMM10_VBSTART; y++)
+			plot_pixel(bitmap, 16, y, 1);
 	}
 
-	for (offs = m_videoram.bytes() - 1; offs >= 0; offs--)
+	for (int offs = m_videoram.bytes() - 1; offs >= 0; offs--)
 		m_tx_tilemap->mark_tile_dirty(offs);
 
 	m_tx_tilemap->set_flip(m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
@@ -156,11 +152,9 @@ uint32_t m10_state::screen_update_m10(screen_device &screen, bitmap_ind16 &bitma
 
 ***************************************************************************/
 
-uint32_t m10_state::screen_update_m15(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m15_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs;
-
-	for (offs = m_videoram.bytes() - 1; offs >= 0; offs--)
+	for (int offs = m_videoram.bytes() - 1; offs >= 0; offs--)
 		m_tx_tilemap->mark_tile_dirty(offs);
 
 	//m_tx_tilemap->mark_all_dirty();

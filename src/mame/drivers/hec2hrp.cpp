@@ -320,7 +320,7 @@ MACHINE_START_MEMBER(hec2hrp_state,hec2hrx)
 
 	// Memory install for bank switching
 	m_bank[1]->configure_entry(HECTOR_BANK_PROG, r+0x10000);
-	m_bank[1]->configure_entry(HECTOR_BANK_VIDEO, m_hector_videoram_hrx); // Video RAM
+	m_bank[1]->configure_entry(HECTOR_BANK_VIDEO, m_hector_vram); // Video RAM
 
 	// Set bank HECTOR_BANK_PROG as basic bank
 	m_bank[1]->set_entry(HECTOR_BANK_PROG);
@@ -336,9 +336,6 @@ MACHINE_START_MEMBER(hec2hrp_state,hec2hrx)
 	m_bank[3]->configure_entry(DISCII_BANK_RAM, r); // RAM
 	m_bank[3]->set_entry(DISCII_BANK_ROM);
 
-	// As video HR ram is in bank, use external memory
-	m_hector_vram.set_target(m_hector_videoram_hrx,m_hector_vram.bytes());
-
 	hector_init();
 }
 /*****************************************************************************/
@@ -350,7 +347,7 @@ MACHINE_START_MEMBER(hec2hrp_state,hec2mdhrx)
 
 	// Memory install for bank switching
 	m_bank[1]->configure_entry(HECTOR_BANK_PROG, r+0x10000);
-	m_bank[1]->configure_entry(HECTOR_BANK_VIDEO, m_hector_videoram_hrx); // Video RAM
+	m_bank[1]->configure_entry(HECTOR_BANK_VIDEO, m_hector_vram); // Video RAM
 
 	// Set HECTOR_BANK_PROG as basic bank
 	m_bank[1]->set_entry(HECTOR_BANK_PROG);
@@ -360,9 +357,6 @@ MACHINE_START_MEMBER(hec2hrp_state,hec2mdhrx)
 	m_bank[2]->configure_entry(HECTOR_BANK_BASE, m_rom); // ROM base page
 	m_bank[2]->configure_entry(HECTOR_BANK_DISC, memregion("page2")->base() ); // ROM mini disc page
 	m_bank[2]->set_entry(HECTOR_BANK_BASE);
-
-	// As video HR ram is in bank, use external memory
-	m_hector_vram.set_target(m_hector_videoram_hrx,m_hector_vram.bytes());
 
 	hector_init();
 }
@@ -443,9 +437,11 @@ void hec2hrp_state::hector1(machine_config &config)
 
 // mini disk interface
 
-FLOPPY_FORMATS_MEMBER( hec2hrp_state::minidisc_formats )
-	FLOPPY_HMD_FORMAT
-FLOPPY_FORMATS_END
+void hec2hrp_state::minidisc_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_HMD_FORMAT);
+}
 
 static void minidisc_floppies(device_slot_interface &device)
 {
@@ -508,8 +504,8 @@ void hec2hrp_state::hec2hrx(machine_config &config)
 	m_upd_fdc->intrq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_interrupt));
 	m_upd_fdc->drq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_dma_irq));
 
-	FLOPPY_CONNECTOR(config, m_upd_connector[0], hector_floppies, "525hd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_upd_connector[1], hector_floppies, "525hd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_upd_connector[0], hector_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_upd_connector[1], hector_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
@@ -596,7 +592,6 @@ ROM_START( hec2mdhrx )
 	ROM_LOAD( "mdic1.bin" , 0x0000,0x2000, CRC(ddda1065) SHA1(e7bba14a72605238d2f8299da029b8320a563254))
 	ROM_LOAD( "mdicmb.bin" , 0x2000,0x2000, CRC(d8090747) SHA1(f2925b68002307562e2ea5e36b740e5458f0f0eb))
 
-	ROM_REGION( 0x4000, "page1", ROMREGION_ERASEFF )  // Page 1 = unused page
 	ROM_REGION( 0x4000, "page2", ROMREGION_ERASEFF )  // Page 2 = minidisc page
 	ROM_LOAD( "mdic3.bin"  , 0x0000,0x2000, CRC(87801816) SHA1(ddf441f40df014b237cdf17430d1989f3a452d04))
 	ROM_LOAD( "mdicmb.bin" , 0x2000,0x2000, CRC(d8090747) SHA1(f2925b68002307562e2ea5e36b740e5458f0f0eb))
@@ -608,6 +603,7 @@ ROM_START( hec2mx80 )
 	// option roms
 	ROM_REGION( 0x4000, "page1", ROMREGION_ERASEFF )
 	ROM_LOAD( "mx80c_page1.rom", 0x0000, 0x4000, CRC(4615f57c) SHA1(5de291bf3ae0320915133b99f1a088cb56c41658))
+
 	ROM_REGION( 0x4000, "page2", ROMREGION_ERASEFF )
 	ROM_LOAD( "mx80c_page2.rom" , 0x0000,0x4000, CRC(2d5d975e) SHA1(48307132e0f3fad0262859bb8142d108f694a436))
 	// 2nd cpu
@@ -621,6 +617,7 @@ ROM_START( hec2mx40 )
 	// option roms
 	ROM_REGION( 0x4000, "page1", ROMREGION_ERASEFF )
 	ROM_LOAD( "mx40c_page1.rom", 0x0000, 0x4000, CRC(192a76fa) SHA1(062aa6df0b554b85774d4b5edeea8496a4baca35))
+
 	ROM_REGION( 0x4000, "page2", ROMREGION_ERASEFF )
 	ROM_LOAD( "mx40c_page2.rom" , 0x0000,0x4000, CRC(ef1b2654) SHA1(66624ea040cb7ede4720ad2eca0738d0d3bad89a))
 	// 2nd cpu

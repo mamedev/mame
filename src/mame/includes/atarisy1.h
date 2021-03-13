@@ -34,6 +34,7 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 		, m_mainlatch(*this, "mainlatch")
 		, m_slapstic(*this, "slapstic")
+		, m_slapstic_bank(*this, "slapstic_bank")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_mob(*this, "mob")
@@ -75,6 +76,7 @@ protected:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_mainlatch;
 	required_device<atari_slapstic_device> m_slapstic;
+	required_memory_bank m_slapstic_bank;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -87,7 +89,7 @@ protected:
 	optional_device<adc0808_device> m_adc;
 	optional_device<input_merger_device> m_ajsint;
 
-	/* playfield parameters */
+	// playfield parameters
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
 	required_shared_ptr<uint16_t> m_xscroll;
@@ -97,19 +99,19 @@ protected:
 	uint16_t          m_playfield_priority_pens;
 	required_device<timer_device> m_yscroll_reset_timer;
 
-	/* INT3 tracking */
+	// INT3 tracking
 	int             m_next_timer_scanline;
 	required_device<timer_device> m_scanline_timer;
 	required_device<timer_device> m_int3off_timer;
 	uint8_t           m_scanline_int_state;
 
-	/* speech */
+	// speech
 	optional_device<tms5220_device> m_tms;
 
 	required_device<ls259_device> m_outlatch;
 	optional_device<via6522_device> m_via;
 
-	/* graphics bank tracking */
+	// graphics bank tracking
 	uint8_t           m_bank_gfx[3][8];
 	uint8_t           m_bank_color_shift[MAX_GFX_ELEMENTS];
 	uint8_t           m_bankselect;
@@ -150,6 +152,8 @@ protected:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_ext_map(address_map &map);
+
+	void init_slapstic();
 };
 
 class atarisy1r_state : public atarisy1_state

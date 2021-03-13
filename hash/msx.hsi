@@ -214,7 +214,7 @@ license:CC0
 	<hash crc32="15a0f98a" name="Animal Land Satsujin Jiken">
 		<year>1987</year>
 		<manufacturer>Enix</manufacturer>
-		<status> Not Playable</status>
+		<status>Not Playable</status>
 		<extrainfo>4</extrainfo>
 	</hash>
 	<hash crc32="aae7028b" name="Antarctic Adventure">
@@ -548,7 +548,7 @@ license:CC0
 	<hash crc32="8801b31e" name="Break In">
 		<year>1987</year>
 		<manufacturer>Jaleco</manufacturer>
-		<status> Not Playable</status>
+		<status>Not Playable</status>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="70113f76" name="Break Out">
@@ -957,7 +957,7 @@ license:CC0
 	<hash crc32="1fc65e80" name="Dawn Patrol">
 		<year>1987</year>
 		<manufacturer>Pony Canyon</manufacturer>
-		<status> Not Playable</status>
+		<status>Not Playable</status>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="cd016b93" name="Decathlon">
@@ -1003,13 +1003,13 @@ license:CC0
 	<hash crc32="4b673b29" name="Disk Basic 1.0 (For FS-FD1A)">
 		<year>1987</year>
 		<manufacturer>Panasonic</manufacturer>
-		<status> Not Playable</status>
+		<status>Not Playable</status>
 		<extrainfo>15</extrainfo>
 	</hash>
 	<hash crc32="006fba38" name="Disk Basic 1.0 (For FS-FD351)">
 		<year>1985</year>
 		<manufacturer>National</manufacturer>
-		<status> Not Playable</status>
+		<status>Not Playable</status>
 		<extrainfo>15</extrainfo>
 	</hash>
 	<hash crc32="a21f5266" name="Disk Basic 1.0 (For HB-F1XDJ)">
@@ -1393,7 +1393,7 @@ license:CC0
 	<hash crc32="a00526d0" name="Flight Deck 2">
 		<year>1986</year>
 		<manufacturer>Pony Canyon</manufacturer>
-		<status> Not Playable</status>
+		<status>Not Playable</status>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="a6165bd4" name="Flight Simulator">
@@ -1736,20 +1736,20 @@ license:CC0
 		<manufacturer>Ascii</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
-	<hash crc32="96b7faca" name="Harryfox MSX Special">
+	<hash crc32="96b7faca" name="Hurryfox MSX Special">
 		<year>1986</year>
 		<manufacturer>Micro Cabin</manufacturer>
 		<extrainfo>8</extrainfo>
 	</hash>
-	<hash crc32="a0d363d3" name="Harryfox Yki No Maou (hacked)">
+	<hash crc32="a0d363d3" name="Hurryfox Yuki No Maou (hacked)">
 		<manufacturer>Micro Cabin</manufacturer>
 		<year>1985</year>
 		<extrainfo>5</extrainfo>
 	</hash>
-	<hash crc32="c7fe3ee1" name="Harryfox Yuki No Maou">
+	<hash crc32="c7fe3ee1" name="Hurryfox Yuki No Maou">
 		<year>1985</year>
 		<manufacturer>Micro Cabin</manufacturer>
-		<status> Not Playable</status>
+		<status>Not Playable</status>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="f1637c31" name="Hayabusa - Moonsweeper">
@@ -2575,7 +2575,7 @@ license:CC0
 	<hash crc32="d34d74f7" name="Mashou No Yakata Gabalin">
 		<year>1987</year>
 		<manufacturer>Pony Canyon</manufacturer>
-		<status> Not Playable</status>
+		<status>Not Playable</status>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="b0b90a4d" name="Mayhem (hacked)">

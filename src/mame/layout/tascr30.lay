@@ -33,72 +33,72 @@ license:CC0
 	</element>
 
 	<element name="piece" defstate="0">
-		<image file="chess/wn.png" state="1"/>
-		<image file="chess/wn.png" state="2"/>
-		<image file="chess/bk.png" state="3"/>
-		<image file="chess/wk.png" state="4"/>
-		<image file="chess/bq.png" state="5"/>
-		<image file="chess/wq.png" state="6"/>
-		<image file="chess/br.png" state="7"/>
-		<image file="chess/br.png" state="8"/>
-		<image file="chess/wr.png" state="9"/>
-		<image file="chess/wr.png" state="10"/>
-		<image file="chess/bb.png" state="11"/>
-		<image file="chess/bb.png" state="12"/>
-		<image file="chess/wb.png" state="13"/>
-		<image file="chess/wb.png" state="14"/>
-		<image file="chess/bn.png" state="15"/>
-		<image file="chess/bn.png" state="16"/>
-		<image file="chess/wp.png" state="17"/>
-		<image file="chess/wp.png" state="18"/>
-		<image file="chess/wp.png" state="19"/>
-		<image file="chess/wp.png" state="20"/>
-		<image file="chess/wp.png" state="21"/>
-		<image file="chess/wp.png" state="22"/>
-		<image file="chess/wp.png" state="23"/>
-		<image file="chess/wp.png" state="24"/>
-		<image file="chess/bp.png" state="25"/>
-		<image file="chess/bp.png" state="26"/>
-		<image file="chess/bp.png" state="27"/>
-		<image file="chess/bp.png" state="28"/>
-		<image file="chess/bp.png" state="29"/>
-		<image file="chess/bp.png" state="30"/>
-		<image file="chess/bp.png" state="31"/>
-		<image file="chess/bp.png" state="32"/>
+		<image file="chess/wn.svg" state="1"/>
+		<image file="chess/wn.svg" state="2"/>
+		<image file="chess/bk.svg" state="3"/>
+		<image file="chess/wk.svg" state="4"/>
+		<image file="chess/bq.svg" state="5"/>
+		<image file="chess/wq.svg" state="6"/>
+		<image file="chess/br.svg" state="7"/>
+		<image file="chess/br.svg" state="8"/>
+		<image file="chess/wr.svg" state="9"/>
+		<image file="chess/wr.svg" state="10"/>
+		<image file="chess/bb.svg" state="11"/>
+		<image file="chess/bb.svg" state="12"/>
+		<image file="chess/wb.svg" state="13"/>
+		<image file="chess/wb.svg" state="14"/>
+		<image file="chess/bn.svg" state="15"/>
+		<image file="chess/bn.svg" state="16"/>
+		<image file="chess/wp.svg" state="17"/>
+		<image file="chess/wp.svg" state="18"/>
+		<image file="chess/wp.svg" state="19"/>
+		<image file="chess/wp.svg" state="20"/>
+		<image file="chess/wp.svg" state="21"/>
+		<image file="chess/wp.svg" state="22"/>
+		<image file="chess/wp.svg" state="23"/>
+		<image file="chess/wp.svg" state="24"/>
+		<image file="chess/bp.svg" state="25"/>
+		<image file="chess/bp.svg" state="26"/>
+		<image file="chess/bp.svg" state="27"/>
+		<image file="chess/bp.svg" state="28"/>
+		<image file="chess/bp.svg" state="29"/>
+		<image file="chess/bp.svg" state="30"/>
+		<image file="chess/bp.svg" state="31"/>
+		<image file="chess/bp.svg" state="32"/>
 
 		<!-- selected pieces -->
-		<image file="chess/wn.png" state="33"><color alpha="0.5" /></image>
-		<image file="chess/wn.png" state="34"><color alpha="0.5" /></image>
-		<image file="chess/bk.png" state="35"><color alpha="0.5" /></image>
-		<image file="chess/wk.png" state="36"><color alpha="0.5" /></image>
-		<image file="chess/bq.png" state="37"><color alpha="0.5" /></image>
-		<image file="chess/wq.png" state="38"><color alpha="0.5" /></image>
-		<image file="chess/br.png" state="39"><color alpha="0.5" /></image>
-		<image file="chess/br.png" state="40"><color alpha="0.5" /></image>
-		<image file="chess/wr.png" state="41"><color alpha="0.5" /></image>
-		<image file="chess/wr.png" state="42"><color alpha="0.5" /></image>
-		<image file="chess/bb.png" state="43"><color alpha="0.5" /></image>
-		<image file="chess/bb.png" state="44"><color alpha="0.5" /></image>
-		<image file="chess/wb.png" state="45"><color alpha="0.5" /></image>
-		<image file="chess/wb.png" state="46"><color alpha="0.5" /></image>
-		<image file="chess/bn.png" state="47"><color alpha="0.5" /></image>
-		<image file="chess/bn.png" state="48"><color alpha="0.5" /></image>
-		<image file="chess/wp.png" state="49"><color alpha="0.5" /></image>
-		<image file="chess/wp.png" state="50"><color alpha="0.5" /></image>
-		<image file="chess/wp.png" state="51"><color alpha="0.5" /></image>
-		<image file="chess/wp.png" state="52"><color alpha="0.5" /></image>
-		<image file="chess/wp.png" state="53"><color alpha="0.5" /></image>
-		<image file="chess/wp.png" state="54"><color alpha="0.5" /></image>
-		<image file="chess/wp.png" state="55"><color alpha="0.5" /></image>
-		<image file="chess/wp.png" state="56"><color alpha="0.5" /></image>
-		<image file="chess/bp.png" state="57"><color alpha="0.5" /></image>
-		<image file="chess/bp.png" state="58"><color alpha="0.5" /></image>
-		<image file="chess/bp.png" state="59"><color alpha="0.5" /></image>
-		<image file="chess/bp.png" state="60"><color alpha="0.5" /></image>
-		<image file="chess/bp.png" state="61"><color alpha="0.5" /></image>
-		<image file="chess/bp.png" state="62"><color alpha="0.5" /></image>
-		<image file="chess/bp.png" state="63"><color alpha="0.5" /></image>
-		<image file="chess/bp.png" state="64"><color alpha="0.5" /></image>
+		<image file="chess/wn.svg" state="33"><color alpha="0.5" /></image>
+		<image file="chess/wn.svg" state="34"><color alpha="0.5" /></image>
+		<image file="chess/bk.svg" state="35"><color alpha="0.5" /></image>
+		<image file="chess/wk.svg" state="36"><color alpha="0.5" /></image>
+		<image file="chess/bq.svg" state="37"><color alpha="0.5" /></image>
+		<image file="chess/wq.svg" state="38"><color alpha="0.5" /></image>
+		<image file="chess/br.svg" state="39"><color alpha="0.5" /></image>
+		<image file="chess/br.svg" state="40"><color alpha="0.5" /></image>
+		<image file="chess/wr.svg" state="41"><color alpha="0.5" /></image>
+		<image file="chess/wr.svg" state="42"><color alpha="0.5" /></image>
+		<image file="chess/bb.svg" state="43"><color alpha="0.5" /></image>
+		<image file="chess/bb.svg" state="44"><color alpha="0.5" /></image>
+		<image file="chess/wb.svg" state="45"><color alpha="0.5" /></image>
+		<image file="chess/wb.svg" state="46"><color alpha="0.5" /></image>
+		<image file="chess/bn.svg" state="47"><color alpha="0.5" /></image>
+		<image file="chess/bn.svg" state="48"><color alpha="0.5" /></image>
+		<image file="chess/wp.svg" state="49"><color alpha="0.5" /></image>
+		<image file="chess/wp.svg" state="50"><color alpha="0.5" /></image>
+		<image file="chess/wp.svg" state="51"><color alpha="0.5" /></image>
+		<image file="chess/wp.svg" state="52"><color alpha="0.5" /></image>
+		<image file="chess/wp.svg" state="53"><color alpha="0.5" /></image>
+		<image file="chess/wp.svg" state="54"><color alpha="0.5" /></image>
+		<image file="chess/wp.svg" state="55"><color alpha="0.5" /></image>
+		<image file="chess/wp.svg" state="56"><color alpha="0.5" /></image>
+		<image file="chess/bp.svg" state="57"><color alpha="0.5" /></image>
+		<image file="chess/bp.svg" state="58"><color alpha="0.5" /></image>
+		<image file="chess/bp.svg" state="59"><color alpha="0.5" /></image>
+		<image file="chess/bp.svg" state="60"><color alpha="0.5" /></image>
+		<image file="chess/bp.svg" state="61"><color alpha="0.5" /></image>
+		<image file="chess/bp.svg" state="62"><color alpha="0.5" /></image>
+		<image file="chess/bp.svg" state="63"><color alpha="0.5" /></image>
+		<image file="chess/bp.svg" state="64"><color alpha="0.5" /></image>
 	</element>
 
 	<element name="text_1">     <rect><color red="0.56" green="0.33" blue="0.12" /></rect>    <text string="1">         <color red="1" green="1" blue="1" /></text> </element>
@@ -331,34 +331,34 @@ license:CC0
 <!-- sb ui -->
 
 	<element name="piece_ui" defstate="0">
-		<image file="chess/wp.png" state="1"/>
-		<image file="chess/wn.png" state="2"/>
-		<image file="chess/wb.png" state="3"/>
-		<image file="chess/wr.png" state="4"/>
-		<image file="chess/wq.png" state="5"/>
-		<image file="chess/wk.png" state="6"/>
+		<image file="chess/wp.svg" state="1"/>
+		<image file="chess/wn.svg" state="2"/>
+		<image file="chess/wb.svg" state="3"/>
+		<image file="chess/wr.svg" state="4"/>
+		<image file="chess/wq.svg" state="5"/>
+		<image file="chess/wk.svg" state="6"/>
 
-		<image file="chess/bp.png" state="7"/>
-		<image file="chess/bn.png" state="8"/>
-		<image file="chess/bb.png" state="9"/>
-		<image file="chess/br.png" state="10"/>
-		<image file="chess/bq.png" state="11"/>
-		<image file="chess/bk.png" state="12"/>
+		<image file="chess/bp.svg" state="7"/>
+		<image file="chess/bn.svg" state="8"/>
+		<image file="chess/bb.svg" state="9"/>
+		<image file="chess/br.svg" state="10"/>
+		<image file="chess/bq.svg" state="11"/>
+		<image file="chess/bk.svg" state="12"/>
 
 		<!-- selected pieces -->
-		<image file="chess/wp.png" state="13"><color alpha="0.5" /></image>
-		<image file="chess/wn.png" state="14"><color alpha="0.5" /></image>
-		<image file="chess/wb.png" state="15"><color alpha="0.5" /></image>
-		<image file="chess/wr.png" state="16"><color alpha="0.5" /></image>
-		<image file="chess/wq.png" state="17"><color alpha="0.5" /></image>
-		<image file="chess/wk.png" state="18"><color alpha="0.5" /></image>
+		<image file="chess/wp.svg" state="13"><color alpha="0.5" /></image>
+		<image file="chess/wn.svg" state="14"><color alpha="0.5" /></image>
+		<image file="chess/wb.svg" state="15"><color alpha="0.5" /></image>
+		<image file="chess/wr.svg" state="16"><color alpha="0.5" /></image>
+		<image file="chess/wq.svg" state="17"><color alpha="0.5" /></image>
+		<image file="chess/wk.svg" state="18"><color alpha="0.5" /></image>
 
-		<image file="chess/bp.png" state="19"><color alpha="0.5" /></image>
-		<image file="chess/bn.png" state="20"><color alpha="0.5" /></image>
-		<image file="chess/bb.png" state="21"><color alpha="0.5" /></image>
-		<image file="chess/br.png" state="22"><color alpha="0.5" /></image>
-		<image file="chess/bq.png" state="23"><color alpha="0.5" /></image>
-		<image file="chess/bk.png" state="24"><color alpha="0.5" /></image>
+		<image file="chess/bp.svg" state="19"><color alpha="0.5" /></image>
+		<image file="chess/bn.svg" state="20"><color alpha="0.5" /></image>
+		<image file="chess/bb.svg" state="21"><color alpha="0.5" /></image>
+		<image file="chess/br.svg" state="22"><color alpha="0.5" /></image>
+		<image file="chess/bq.svg" state="23"><color alpha="0.5" /></image>
+		<image file="chess/bk.svg" state="24"><color alpha="0.5" /></image>
 	</element>
 
 	<element name="hlub" defstate="0">

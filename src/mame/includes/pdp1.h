@@ -398,6 +398,7 @@ public:
 		m_tape_puncher(*this, "punch"),
 		m_typewriter(*this, "typewriter"),
 		m_parallel_drum(*this, "drum"),
+		m_dpy_timer(nullptr),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_crt(*this, "crt"),

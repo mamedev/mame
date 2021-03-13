@@ -437,8 +437,6 @@ WRITE_LINE_MEMBER( trs80m2_state::vsync_w )
 
 void trs80m2_state::video_start()
 {
-	// allocate memory
-	m_video_ram.allocate(0x800);
 }
 
 uint32_t trs80m2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -725,10 +723,10 @@ void trs80m2_state::trs80m2(machine_config &config)
 	FD1791(config, m_fdc, 8_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(m_pio, FUNC(z80pio_device::port_a_write));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(z80dma_device::rdy_w));
-	FLOPPY_CONNECTOR(config, FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, FD1791_TAG":1", trs80m2_floppies, nullptr, floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, FD1791_TAG":2", trs80m2_floppies, nullptr, floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, FD1791_TAG":3", trs80m2_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1791_TAG":1", trs80m2_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1791_TAG":2", trs80m2_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1791_TAG":3", trs80m2_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	Z80CTC(config, m_ctc, 8_MHz_XTAL / 2);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -818,10 +816,10 @@ void trs80m16_state::trs80m16(machine_config &config)
 	FD1791(config, m_fdc, 8_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(m_pio, FUNC(z80pio_device::port_a_write));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(z80dma_device::rdy_w));
-	FLOPPY_CONNECTOR(config, FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, FD1791_TAG":1", trs80m2_floppies, nullptr, floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, FD1791_TAG":2", trs80m2_floppies, nullptr, floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, FD1791_TAG":3", trs80m2_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1791_TAG":0", trs80m2_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1791_TAG":1", trs80m2_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1791_TAG":2", trs80m2_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1791_TAG":3", trs80m2_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	Z80CTC(config, m_ctc, 8_MHz_XTAL / 2);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

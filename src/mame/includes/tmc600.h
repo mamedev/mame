@@ -41,7 +41,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_char_rom(*this, "chargen"),
 		m_page_ram(*this, "page_ram"),
-		m_color_ram(*this, "color_ram"),
+		m_color_ram(*this, "color_ram", TMC600_PAGE_RAM_SIZE, ENDIANNESS_LITTLE),
 		m_run(*this, "RUN"),
 		m_key_row(*this, "Y%u", 0)
 	{ }
@@ -59,7 +59,7 @@ private:
 	required_device<ram_device> m_ram;
 	required_region_ptr<uint8_t> m_char_rom;
 	required_shared_ptr<uint8_t> m_page_ram;
-	optional_shared_ptr<uint8_t> m_color_ram;
+	memory_share_creator<uint8_t> m_color_ram;
 	required_ioport m_run;
 	required_ioport_array<8> m_key_row;
 

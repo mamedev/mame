@@ -30,6 +30,7 @@ public:
 		: eolith_state(mconfig, type, tag)
 		, m_soundlatch(*this, "soundlatch")
 		, m_system_io(*this, "SYSTEM")
+		, m_qs1000_bank(*this, "qs1000_bank")
 	{
 	}
 
@@ -43,6 +44,7 @@ protected:
 private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_ioport m_system_io;
+	memory_bank_creator m_qs1000_bank;
 
 	std::unique_ptr<uint8_t[]> m_vram;
 	int m_vbuffer;
@@ -73,7 +75,7 @@ void vegaeo_state::qs1000_p3_w(uint8_t data)
 	// ...x .... - ?
 	// ..x. .... - /IRQ clear
 
-	membank("qs1000:bank")->set_entry(data & 0x07);
+	m_qs1000_bank->set_entry(data & 0x07);
 
 	if (!BIT(data, 5))
 		m_soundlatch->acknowledge_w();
@@ -290,8 +292,8 @@ ROM_END
 void vegaeo_state::init_vegaeo()
 {
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
-	m_qs1000->cpu().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
-	membank("qs1000:bank")->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
+	m_qs1000->cpu().space(AS_IO).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
+	m_qs1000_bank->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
 
 	init_speedup();
 }

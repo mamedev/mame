@@ -14,7 +14,6 @@
     Apple modes is different and pixel stretching is not done.
 
     To do (common):
-    - native keyboard (at least two variants)
     - video: use palette rom
     - video: text modes use 7x8 character cell and 224x256 raster
     - video: vertical raster splits (used at least by Rapira)
@@ -31,7 +30,7 @@
 
     To do (agat9):
     - accurate lc emulation (what do writes do? etc.)
-    - 840k floppy: support 2nd drive, writing, motor off, the rest of .aim format
+    - 840k floppy: support writing, motor off, the rest of .aim format
     - memory expansion boards, a2bus_inh_w
     - hw variant: video status readback ("Moscow")
     - hw variant: agat9a model (via http://agatcomp.ru/Images/case.shtml)
@@ -39,6 +38,7 @@
     - does cassette output work?
     - what do floating bus reads do?
     - why prodos does not boot?
+    - why spriteos does not see printer card?
 
     Slot devices -- 1st party:
     - agat7: apple2 video card -- decimal 3.089.121 -- http://agatcomp.ru/Images/new_j121.shtml
@@ -51,7 +51,6 @@
     - HDC, etc. via http://agatcomp.ru/Hard/losthard.shtml
     - network cards -- via http://agatcomp.ru/Images/new_net.shtml
     - sound cards (5-voice synth card, MIDI i/o card) via http://agatcomp.ru/Images/new_sound.shtml
-    - Nippel Clock (mc146818) -- https://archive.org/details/Nippel_Clock_Agat
     - Nippel Mouse -- http://agatcomp.ru/Images/new_mouse.shtml
     - Nippel ADC (digital oscilloscope) -- via http://agatcomp.ru/Images/new_IO.shtml
     - Nippel Co-processor (R65C02 clone + dual-ported RAM) -- via http://agatcomp.ru/Images/new_IO.shtml
@@ -78,7 +77,7 @@
 #include "imagedev/cassette.h"
 
 #include "machine/bankdev.h"
-#include "machine/kb3600.h"
+#include "machine/agatkeyb.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 
@@ -97,7 +96,6 @@
 
 
 #define A7_CPU_TAG "maincpu"
-#define A7_KBDC_TAG "ay3600"
 #define A7_SPEAKER_TAG "speaker"
 #define A7_CASSETTE_TAG "tape"
 #define A7_UPPERBANK_TAG "inhbank"
@@ -112,27 +110,18 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, A7_CPU_TAG)
 		, m_ram(*this, RAM_TAG)
-		, m_ay3600(*this, A7_KBDC_TAG)
 		, m_a2bus(*this, "a2bus")
 		, m_joy1x(*this, "joystick_1_x")
 		, m_joy1y(*this, "joystick_1_y")
 		, m_joy2x(*this, "joystick_2_x")
 		, m_joy2y(*this, "joystick_2_y")
 		, m_joybuttons(*this, "joystick_buttons")
-		, m_kbspecial(*this, "keyb_special")
-		, m_kbrepeat(*this, "keyb_repeat")
 		, m_speaker(*this, A7_SPEAKER_TAG)
 		, m_cassette(*this, A7_CASSETTE_TAG)
 		, m_upperbank(*this, A7_UPPERBANK_TAG)
 	{ }
 
 	INTERRUPT_GEN_MEMBER(agat_vblank);
-	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
-
-	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
-	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
 
 	uint8_t c080_r(offs_t offset);
 	void c080_w(offs_t offset, uint8_t data);
@@ -164,14 +153,14 @@ public:
 	uint8_t controller_strobe_r();
 	void controller_strobe_w(uint8_t data);
 
+	void kbd_put(u8 data);
+	DECLARE_WRITE_LINE_MEMBER( kbd_meta );
+
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	required_device<ay3600_device> m_ay3600;
 	required_device<a2bus_device> m_a2bus;
 	required_ioport m_joy1x, m_joy1y, m_joy2x, m_joy2y, m_joybuttons;
-	required_ioport m_kbspecial;
-	required_ioport m_kbrepeat;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<address_map_bank_device> m_upperbank;
@@ -188,9 +177,8 @@ protected:
 	double m_joystick_x2_time;
 	double m_joystick_y2_time;
 
-	uint16_t m_lastchar, m_strobe;
-	uint8_t m_transchar;
-	bool m_anykeydown;
+	uint8_t m_transchar, m_strobe;
+	bool m_meta;
 
 	int m_inh_slot;
 	int m_cnxx_slot;
@@ -365,6 +353,9 @@ void agat_base_state::machine_start()
 	m_cassette_state = 0;
 	m_cassette->output(-1.0f);
 	m_inh_bank = 0;
+	m_transchar = 0;
+	m_strobe = 0;
+	m_meta = false;
 
 	// precalculate joystick time constants
 	m_x_calibration = attotime::from_usec(12).as_double();
@@ -387,13 +378,11 @@ void agat_base_state::machine_start()
 	save_item(NAME(m_joystick_y1_time));
 	save_item(NAME(m_joystick_x2_time));
 	save_item(NAME(m_joystick_y2_time));
-	save_item(NAME(m_lastchar));
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_transchar));
 	save_item(NAME(m_inh_slot));
 	save_item(NAME(m_inh_bank));
 	save_item(NAME(m_cnxx_slot));
-	save_item(NAME(m_anykeydown));
 }
 
 void agat7_state::machine_start()
@@ -419,7 +408,6 @@ void agat9_state::machine_start()
 
 void agat_base_state::machine_reset()
 {
-	m_anykeydown = false;
 	m_agat_interrupts = false;
 }
 
@@ -466,6 +454,20 @@ void agat9_state::machine_reset()
     I/O
 ***************************************************************************/
 
+void agat_base_state::kbd_put(u8 data)
+{
+	if (!m_strobe)
+	{
+		m_transchar = data;
+		m_strobe = 0x80;
+	}
+}
+
+WRITE_LINE_MEMBER( agat_base_state::kbd_meta )
+{
+	m_meta = state;
+}
+
 uint8_t agat7_state::keyb_data_r()
 {
 	return m_strobe ? (m_transchar | m_strobe) : 0;
@@ -479,7 +481,7 @@ uint8_t agat9_state::keyb_data_r()
 uint8_t agat_base_state::keyb_strobe_r()
 {
 	// reads any key down, clears strobe
-	uint8_t rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
+	uint8_t rv = m_strobe;
 	if (!machine().side_effects_disabled())
 		m_strobe = 0;
 	return rv;
@@ -554,8 +556,8 @@ uint8_t agat_base_state::flags_r(offs_t offset)
 	case 2: // button 1
 		return (m_joybuttons->read() & 0x20) ? 0x80 : 0;
 
-	case 3: // button 2
-		return ((m_joybuttons->read() & 0x40) || !(m_kbspecial->read() & 0x06)) ? 0x80 : 0;
+	case 3: // meta key
+		return m_meta ? 0 : 0x80;
 
 	case 4: // joy 1 X axis
 		return (machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
@@ -1101,132 +1103,6 @@ void agat9_state::inhbank_map(address_map &map)
     KEYBOARD
 ***************************************************************************/
 
-READ_LINE_MEMBER(agat_base_state::ay3600_shift_r)
-{
-	// either shift key
-	if (m_kbspecial->read() & 0x06)
-	{
-		return ASSERT_LINE;
-	}
-
-	return CLEAR_LINE;
-}
-
-READ_LINE_MEMBER(agat_base_state::ay3600_control_r)
-{
-	if (m_kbspecial->read() & 0x08)
-	{
-		return ASSERT_LINE;
-	}
-
-	return CLEAR_LINE;
-}
-
-static const uint8_t a2_key_remap[0x40][4] =
-{
-/*    norm shft ctrl both */
-	{ 0x33,0x23,0x33,0x23 },    /* 3 #     00     */
-	{ 0x34,0x24,0x34,0x24 },    /* 4 $     01     */
-	{ 0x35,0x25,0x35,0x25 },    /* 5 %     02     */
-	{ 0x36,'&', 0x35,'&'  },    /* 6 &     03     */
-	{ 0x37,0x27,0x37,0x27 },    /* 7 '     04     */
-	{ 0x38,0x28,0x38,0x28 },    /* 8 (     05     */
-	{ 0x39,0x29,0x39,0x29 },    /* 9 )     06     */
-	{ 0x30,0x30,0x30,0x30 },    /* 0       07     */
-	{ 0x3a,0x2a,0x3b,0x2a },    /* : *     08     */
-	{ 0x2d,0x3d,0x2d,0x3d },    /* - =     09     */
-	{ 0x51,0x51,0x11,0x11 },    /* q Q     0a     */
-	{ 0x57,0x57,0x17,0x17 },    /* w W     0b     */
-	{ 0x45,0x45,0x05,0x05 },    /* e E     0c     */
-	{ 0x52,0x52,0x12,0x12 },    /* r R     0d     */
-	{ 0x54,0x54,0x14,0x14 },    /* t T     0e     */
-	{ 0x59,0x59,0x19,0x19 },    /* y Y     0f     */
-	{ 0x55,0x55,0x15,0x15 },    /* u U     10     */
-	{ 0x49,0x49,0x09,0x09 },    /* i I     11     */
-	{ 0x4f,0x4f,0x0f,0x0f },    /* o O     12     */
-	{ 0x50,0x50,0x10,0x10 },    /* p P     13     */
-	{ 0x44,0x44,0x04,0x04 },    /* d D     14     */
-	{ 0x46,0x46,0x06,0x06 },    /* f F     15     */
-	{ 0x47,0x47,0x07,0x07 },    /* g G     16     */
-	{ 0x48,0x48,0x08,0x08 },    /* h H     17     */
-	{ 0x4a,0x4a,0x0a,0x0a },    /* j J     18     */
-	{ 0x4b,0x4b,0x0b,0x0b },    /* k K     19     */
-	{ 0x4c,0x4c,0x0c,0x0c },    /* l L     1a     */
-	{ ';' ,0x2b,';' ,0x2b },    /* ; +     1b     */
-	{ 0x08,0x08,0x08,0x08 },    /* Left    1c     */
-	{ 0x15,0x15,0x15,0x15 },    /* Right   1d     */
-	{ 0x5a,0x5a,0x1a,0x1a },    /* z Z     1e     */
-	{ 0x58,0x58,0x18,0x18 },    /* x X     1f     */
-	{ 0x43,0x43,0x03,0x03 },    /* c C     20     */
-	{ 0x56,0x56,0x16,0x16 },    /* v V     21     */
-	{ 0x42,0x42,0x02,0x02 },    /* b B     22     */
-	{ 0x4e,0x4e,0x0e,0x0e },    /* n N     23     */
-	{ 0x4d,0x4d,0x0d,0x0d },    /* m M     24     */
-	{ 0x2c,0x3c,0x2c,0x3c },    /* , <     25     */
-	{ 0x2e,0x3e,0x2e,0x3e },    /* . >     26     */
-	{ 0x2f,0x3f,0x2f,0x3f },    /* / ?     27     */
-	{ 0x53,0x53,0x13,0x13 },    /* s S     28     */
-	{ 0x32,0x22,0x32,0x00 },    /* 2 "     29     */
-	{ 0x31,0x21,0x31,0x31 },    /* 1 !     2a     */
-	{ 0x1b,0x1b,0x1b,0x1b },    /* Escape  2b     */
-	{ 0x41,0x41,0x01,0x01 },    /* a A     2c     */
-	{ 0x20,0x20,0x20,0x20 },    /* Space   2d     */
-	{ 0x19,0x19,0x19,0x19 },    /* Up */
-	{ 0x1a,0x1a,0x1a,0x1a },    /* Down */
-	{ 0x10,0x10,0x10,0x10 },    /* KP1 */
-	{ 0x0d,0x0d,0x0d,0x0d },    /* Enter   31     */
-	{ 0x11,0x11,0x11,0x11 },    /* KP2 */
-	{ 0x12,0x12,0x12,0x12 },    /* KP3 */
-	{ 0x13,0x13,0x13,0x13 },    /* KP4 */
-	{ 0x14,0x14,0x14,0x14 },    /* KP5 */
-	{ 0x1c,0x1c,0x1c,0x1c },    /* KP6 */
-	{ 0x1d,0x1d,0x1d,0x1d },    /* KP7 */
-	{ 0x1e,0x1e,0x1e,0x1e },    /* KP8 */
-	{ 0x1f,0x1f,0x1f,0x1f },    /* KP9 */
-	{ 0x01,0x01,0x01,0x01 },    /* KP0 */
-	{ 0x02,0x02,0x02,0x02 },    /* KP. */
-	{ 0x03,0x03,0x03,0x03 },    /* KP= */
-	{ 0x04,0x04,0x04,0x04 },    /* PF1 */
-	{ 0x05,0x05,0x05,0x05 },    /* PF2 */
-	{ 0x06,0x06,0x06,0x06 },    /* PF3 */
-};
-
-WRITE_LINE_MEMBER(agat_base_state::ay3600_data_ready_w)
-{
-	if (state == ASSERT_LINE)
-	{
-		int mod = 0;
-		m_lastchar = m_ay3600->b_r();
-
-		mod = (m_kbspecial->read() & 0x06) ? 0x01 : 0x00;
-		mod |= (m_kbspecial->read() & 0x08) ? 0x02 : 0x00;
-
-		m_transchar = a2_key_remap[m_lastchar & 0x3f][mod];
-
-		if (m_transchar != 0)
-		{
-			m_strobe = 0x80;
-		}
-	}
-}
-
-WRITE_LINE_MEMBER(agat_base_state::ay3600_ako_w)
-{
-	m_anykeydown = (state == ASSERT_LINE) ? true : false;
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(agat_base_state::ay3600_repeat)
-{
-	// is the key still down?
-	if (m_anykeydown)
-	{
-		if (m_kbrepeat->read() & 1)
-		{
-			m_strobe = 0x80;
-		}
-	}
-}
-
 INTERRUPT_GEN_MEMBER(agat_base_state::agat_vblank)
 {
 	if (m_agat_interrupts)
@@ -1314,149 +1190,7 @@ static INPUT_PORTS_START( agat7_joystick )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1)  PORT_PLAYER(2)            PORT_CODE(JOYCODE_BUTTON1)
 INPUT_PORTS_END
 
-	/*
-	  Apple II / II Plus key matrix (from "The Apple II Circuit Description")
-
-	      | Y0  | Y1  | Y2  | Y3  | Y4  | Y5  | Y6  | Y7  | Y8  | Y9  |
-	      |     |     |     |     |     |     |     |     |     |     |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X0  |  3  |  4  |  5  |  6  |  7  |  8  |  9  |  0  | :*  |  -  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X1  |  Q  |  W  |  E  |  R  |  T  |  Y  |  U  |  I  |  O  |  P  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X2  |  D  |  F  |  G  |  H  |  J  |  K  |  L  | ;+  |LEFT |RIGHT|
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X3  |  Z  |  X  |  C  |  V  |  B  |  N  |  M  | ,<  | .>  |  /? |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X4  |  S  |  2  |  1  | ESC |  A  |SPACE|     |     |     |ENTER|
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	*/
-
-static INPUT_PORTS_START( agat7_common )
-	PORT_START("X0")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)  PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)  PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)  PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)  PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)  PORT_CHAR('7') PORT_CHAR('\'')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)  PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)  PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)  PORT_CHAR('0')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)  PORT_CHAR(':') PORT_CHAR('*')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('-') PORT_CHAR('=')
-
-	PORT_START("X1")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)  PORT_CHAR('Q') PORT_CHAR('q')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)  PORT_CHAR('W') PORT_CHAR('w')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)  PORT_CHAR('E') PORT_CHAR('e')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)  PORT_CHAR('R') PORT_CHAR('r')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)  PORT_CHAR('T') PORT_CHAR('t')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)  PORT_CHAR('Y') PORT_CHAR('y')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)  PORT_CHAR('U') PORT_CHAR('u')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)  PORT_CHAR('I') PORT_CHAR('i')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)  PORT_CHAR('O') PORT_CHAR('o')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P)  PORT_CHAR('P') PORT_CHAR('p')
-
-	PORT_START("X2")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)  PORT_CHAR('D') PORT_CHAR('d')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)  PORT_CHAR('F') PORT_CHAR('f')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G)  PORT_CHAR('G') PORT_CHAR('g')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)  PORT_CHAR('H') PORT_CHAR('h')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)  PORT_CHAR('J') PORT_CHAR('j')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)  PORT_CHAR('K') PORT_CHAR('k')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)  PORT_CHAR('L') PORT_CHAR('l')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)      PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)     PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
-
-	PORT_START("X3")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)  PORT_CHAR('Z') PORT_CHAR('z')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)  PORT_CHAR('X') PORT_CHAR('x')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)  PORT_CHAR('C') PORT_CHAR('c')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)  PORT_CHAR('V') PORT_CHAR('v')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)  PORT_CHAR('B') PORT_CHAR('b')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N)  PORT_CHAR('N') PORT_CHAR('n')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)  PORT_CHAR('M') PORT_CHAR('m')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)  PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)   PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)  PORT_CHAR('/') PORT_CHAR('?')
-
-	PORT_START("X4")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)  PORT_CHAR('S') PORT_CHAR('s')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)  PORT_CHAR('2') PORT_CHAR('\"')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)  PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")      PORT_CODE(KEYCODE_ESC)      PORT_CHAR(27)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)          PORT_CHAR('A') PORT_CHAR('a')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_UP)    PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_DOWN)  PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Num 1") PORT_CODE(KEYCODE_7_PAD) PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return")   PORT_CODE(KEYCODE_ENTER)    PORT_CHAR(13)
-
-	PORT_START("X5")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num 2") PORT_CODE(KEYCODE_8_PAD) PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num 3") PORT_CODE(KEYCODE_9_PAD) PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num 4") PORT_CODE(KEYCODE_4_PAD) PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num 5") PORT_CODE(KEYCODE_5_PAD) PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num 6") PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num 7") PORT_CODE(KEYCODE_1_PAD) PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num 8") PORT_CODE(KEYCODE_2_PAD) PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num 9") PORT_CODE(KEYCODE_3_PAD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num 0") PORT_CODE(KEYCODE_0_PAD) PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num .") PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
-
-	PORT_START("X6")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Num =") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PF1") PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PF2") PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PF3") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("X7")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("X8")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("keyb_special")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12) PORT_CHAR(UCHAR_MAMEKEY(F12))
-INPUT_PORTS_END
-
 static INPUT_PORTS_START(agat7)
-	PORT_INCLUDE(agat7_common)
-
-	PORT_START("keyb_repeat")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("REPT")         PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\')
-
 	/* other devices */
 	PORT_INCLUDE(agat7_joystick)
 INPUT_PORTS_END
@@ -1478,7 +1212,8 @@ static void agat9_cards(device_slot_interface &device)
 	device.option_add("a9fdc140", A2BUS_AGAT9_FDC); // Disk II clone -- decimal 3.089.173 (reworked for agat9)
 	device.option_add("a9fdchle", A2BUS_AGAT840K_HLE); // 840K floppy controller -- decimal 7.104.351 or 3.089.023?
 	device.option_add("a9fdc", A2BUS_AGAT_FDC); // 840K floppy controller LLE
-	device.option_add("a9nclock", A2BUS_NIPPELCLOCK); // Nippel Clock (mc146818)
+	device.option_add("a7ports", A2BUS_AGAT7_PORTS); // Serial-parallel card -- decimal 3.089.106
+	device.option_add("nclock", A2BUS_NIPPELCLOCK); // Nippel Clock (mc146818)
 }
 
 void agat7_state::agat7(machine_config &config)
@@ -1500,24 +1235,10 @@ void agat7_state::agat7(machine_config &config)
 	/* /INH banking */
 	ADDRESS_MAP_BANK(config, m_upperbank).set_map(&agat7_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
-	/* keyboard controller -- XXX must be replaced */
-	AY3600(config, m_ay3600, 0);
-	m_ay3600->x0().set_ioport("X0");
-	m_ay3600->x1().set_ioport("X1");
-	m_ay3600->x2().set_ioport("X2");
-	m_ay3600->x3().set_ioport("X3");
-	m_ay3600->x4().set_ioport("X4");
-	m_ay3600->x5().set_ioport("X5");
-	m_ay3600->x6().set_ioport("X6");
-	m_ay3600->x7().set_ioport("X7");
-	m_ay3600->x8().set_ioport("X8");
-	m_ay3600->shift().set(FUNC(agat_base_state::ay3600_shift_r));
-	m_ay3600->control().set(FUNC(agat_base_state::ay3600_control_r));
-	m_ay3600->data_ready().set(FUNC(agat_base_state::ay3600_data_ready_w));
-	m_ay3600->ako().set(FUNC(agat_base_state::ay3600_ako_w));
-
-	/* repeat timer.  10 Hz per Mymrin's book */
-	TIMER(config, "repttmr").configure_periodic(FUNC(agat_base_state::ay3600_repeat), attotime::from_hz(10));
+	agat_keyboard_device &keyboard(AGAT_KEYBOARD(config, "keyboard", 0));
+	keyboard.out_callback().set(FUNC(agat_base_state::kbd_put));
+	keyboard.out_meta_callback().set(FUNC(agat_base_state::kbd_meta));
+	keyboard.out_reset_callback().set([this](bool state) { m_maincpu->reset(); });
 
 	/*
 	 * slot 0 is reserved for SECAM encoder or Apple II compat card.
@@ -1560,24 +1281,10 @@ void agat9_state::agat9(machine_config &config)
 	/* /INH banking */
 	ADDRESS_MAP_BANK(config, m_upperbank).set_map(&agat9_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x10000);
 
-	/* keyboard controller -- XXX must be replaced */
-	AY3600(config, m_ay3600, 0);
-	m_ay3600->x0().set_ioport("X0");
-	m_ay3600->x1().set_ioport("X1");
-	m_ay3600->x2().set_ioport("X2");
-	m_ay3600->x3().set_ioport("X3");
-	m_ay3600->x4().set_ioport("X4");
-	m_ay3600->x5().set_ioport("X5");
-	m_ay3600->x6().set_ioport("X6");
-	m_ay3600->x7().set_ioport("X7");
-	m_ay3600->x8().set_ioport("X8");
-	m_ay3600->shift().set(FUNC(agat_base_state::ay3600_shift_r));
-	m_ay3600->control().set(FUNC(agat_base_state::ay3600_control_r));
-	m_ay3600->data_ready().set(FUNC(agat_base_state::ay3600_data_ready_w));
-	m_ay3600->ako().set(FUNC(agat_base_state::ay3600_ako_w));
-
-	/* repeat timer.  10 Hz per Mymrin's book */
-	TIMER(config, "repttmr").configure_periodic(FUNC(agat_base_state::ay3600_repeat), attotime::from_hz(10));
+	agat_keyboard_device &keyboard(AGAT_KEYBOARD(config, "keyboard", 0));
+	keyboard.out_callback().set(FUNC(agat_base_state::kbd_put));
+	keyboard.out_meta_callback().set(FUNC(agat_base_state::kbd_meta));
+	keyboard.out_reset_callback().set([this](bool state) { m_maincpu->reset(); });
 
 	A2BUS(config, m_a2bus, 0);
 	m_a2bus->set_space(m_maincpu, AS_PROGRAM);
@@ -1647,5 +1354,5 @@ ROM_START( agat9 )
 ROM_END
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME  FLAGS
-COMP( 1983, agat7, apple2, 0,      agat7,   agat7, agat7_state, empty_init, "Agat",  "Agat-7", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS)
+COMP( 1983, agat7, apple2, 0,      agat7,   agat7, agat7_state, empty_init, "Agat",  "Agat-7", MACHINE_IMPERFECT_GRAPHICS)
 COMP( 1988, agat9, apple2, 0,      agat9,   agat7, agat9_state, empty_init, "Agat",  "Agat-9", MACHINE_NOT_WORKING)

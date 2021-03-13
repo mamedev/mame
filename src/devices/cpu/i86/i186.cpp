@@ -566,7 +566,7 @@ void i80186_cpu_device::execute_run()
 						break;
 					}
 				}
-				// through to default
+				[[fallthrough]];
 			default:
 				if(!common_op(op))
 				{

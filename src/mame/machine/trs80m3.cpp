@@ -555,6 +555,8 @@ void trs80m3_state::machine_start()
 	m_nmi_data = 0;
 	m_timeout = 1;
 	m_wait = 0;
+	m_start_address = 0;
+	m_old_cassette_val = 0;
 
 	m_cassette_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(trs80m3_state::cassette_data_callback),this));
 	m_cassette_data_timer->adjust( attotime::zero, 0, attotime::from_hz(11025) );
@@ -612,6 +614,8 @@ void trs80m3_state::machine_reset()
 		port_9c_w(1);    // 4P - enable rom
 	if (m_model4 & 6)
 		port_84_w(0);    // 4 & 4P - switch in devices
+
+	m_floppy = nullptr;
 }
 
 

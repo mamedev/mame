@@ -132,7 +132,7 @@ protected:
 	required_shared_ptr<uint32_t> m_shared_ram;
 	required_shared_ptr<uint32_t> m_gpu_ram;
 	required_shared_ptr<uint32_t> m_gpu_clut;
-	optional_memory_region      m_romboard_region;
+	optional_memory_region        m_romboard_region;
 	optional_shared_ptr<uint32_t> m_mainram;
 	optional_shared_ptr<uint32_t> m_mainram2;
 
@@ -266,7 +266,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( dsp_cpu_int );
 	DECLARE_WRITE_LINE_MEMBER( external_int );
 
-	image_init_result quickload_cb(device_image_interface &image, const char *file_type, int quickload_size);
+	image_init_result quickload_cb(device_image_interface &image);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	void cpu_space_map(address_map &map);
 	void dsp_map(address_map &map);

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Mirko Buffoni
+// copyright-holders:Dan Boris, Mirko Buffoni, Aaron Giles, Couriersud
 /***************************************************************************
 
     Intel MCS-48/UPI-41 Portable Emulator
@@ -15,12 +15,11 @@
 #pragma once
 
 
-
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
-/* register access indexes */
+// register access indexes
 enum
 {
 	MCS48_PC,
@@ -46,7 +45,7 @@ enum
 };
 
 
-/* I/O port access indexes */
+// I/O port access indexes
 enum
 {
 	MCS48_INPUT_IRQ = 0,
@@ -71,32 +70,32 @@ enum
 ***************************************************************************/
 
 /* Official Intel MCS-48 parts */
-DECLARE_DEVICE_TYPE(I8021, i8021_device)    /* 1k internal ROM,      64 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8022, i8022_device)    /* 2k internal ROM,     128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8035, i8035_device)    /* external ROM,         64 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8048, i8048_device)    /* 1k internal ROM,      64 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8648, i8648_device)    /* 1k internal OTP ROM,  64 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8748, i8748_device)    /* 1k internal EEPROM,   64 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8039, i8039_device)    /* external ROM,        128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8049, i8049_device)    /* 2k internal ROM,     128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8749, i8749_device)    /* 2k internal EEPROM,  128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8040, i8040_device)    /* external ROM,        256 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8050, i8050_device)    /* 4k internal ROM,     256 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8021, i8021_device)    // 1k internal ROM,      64 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8022, i8022_device)    // 2k internal ROM,     128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8035, i8035_device)    // external ROM,         64 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8048, i8048_device)    // 1k internal ROM,      64 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8648, i8648_device)    // 1k internal OTP ROM,  64 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8748, i8748_device)    // 1k internal EEPROM,   64 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8039, i8039_device)    // external ROM,        128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8049, i8049_device)    // 2k internal ROM,     128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8749, i8749_device)    // 2k internal EEPROM,  128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8040, i8040_device)    // external ROM,        256 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8050, i8050_device)    // 4k internal ROM,     256 bytes internal RAM
 
 /* Official Intel UPI-41 parts */
-DECLARE_DEVICE_TYPE(I8041A,  i8041a_device)   /* 1k internal ROM,      64 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8741A,  i8741a_device)   /* 1k internal EEPROM,   64 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8041AH, i8041ah_device)  /* 1k internal ROM,     128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8741AH, i8741ah_device)  /* 1k internal EEPROM,  128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8042,   i8042_device)    /* 2k internal ROM,     128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8742,   i8742_device)    /* 2k internal EEPROM,  128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8042AH, i8042ah_device)  /* 2k internal ROM,     256 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8742AH, i8742ah_device)  /* 2k internal EEPROM,  256 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8041A,  i8041a_device)   // 1k internal ROM,      64 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8741A,  i8741a_device)   // 1k internal EEPROM,   64 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8041AH, i8041ah_device)  // 1k internal ROM,     128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8741AH, i8741ah_device)  // 1k internal EEPROM,  128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8042,   i8042_device)    // 2k internal ROM,     128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8742,   i8742_device)    // 2k internal EEPROM,  128 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8042AH, i8042ah_device)  // 2k internal ROM,     256 bytes internal RAM
+DECLARE_DEVICE_TYPE(I8742AH, i8742ah_device)  // 2k internal EEPROM,  256 bytes internal RAM
 
 /* Clones */
-DECLARE_DEVICE_TYPE(MB8884, mb8884_device)  /* 8035 clone */
-DECLARE_DEVICE_TYPE(N7751, n7751_device)    /* 8048 clone */
-DECLARE_DEVICE_TYPE(M58715, m58715_device)  /* 8049 clone */
+DECLARE_DEVICE_TYPE(MB8884, mb8884_device)  // 8035 clone
+DECLARE_DEVICE_TYPE(N7751, n7751_device)    // 8048 clone
+DECLARE_DEVICE_TYPE(M58715, m58715_device)  // 8049 clone
 
 
 
@@ -147,6 +146,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override { update_regptr(); }
 
 	// device_execute_interface overrides
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 15 - 1) / 15; }
@@ -182,48 +182,49 @@ protected:
 	clock_update_delegate m_t0_clk_func;
 	devcb_write_line m_prog_out_cb;
 
-	uint16_t      m_prevpc;             /* 16-bit previous program counter */
-	uint16_t      m_pc;                 /* 16-bit program counter */
+	uint16_t      m_prevpc;             // 16-bit previous program counter
+	uint16_t      m_pc;                 // 16-bit program counter
 
-	uint8_t       m_a;                  /* 8-bit accumulator */
-	uint8_t *     m_regptr;             /* pointer to r0-r7 */
-	uint8_t       m_psw;                /* 8-bit psw */
-	uint8_t       m_p1;                 /* 8-bit latched port 1 */
-	uint8_t       m_p2;                 /* 8-bit latched port 2 */
-	uint8_t       m_ea;                 /* 1-bit latched ea input */
-	uint8_t       m_timer;              /* 8-bit timer */
-	uint8_t       m_prescaler;          /* 5-bit timer prescaler */
-	uint8_t       m_t1_history;         /* 8-bit history of the T1 input */
-	uint8_t       m_sts;                /* 8-bit status register (UPI-41 only, except for F1) */
-	uint8_t       m_dbbi;               /* 8-bit input data buffer (UPI-41 only) */
-	uint8_t       m_dbbo;               /* 8-bit output data buffer (UPI-41 only) */
+	uint8_t       m_a;                  // 8-bit accumulator
+	uint8_t *     m_regptr;             // pointer to r0-r7
+	uint8_t       m_psw;                // 8-bit PSW
+	bool          m_f1;                 // F1 flag (F0 is in PSW)
+	uint8_t       m_p1;                 // 8-bit latched port 1
+	uint8_t       m_p2;                 // 8-bit latched port 2
+	uint8_t       m_ea;                 // 1-bit latched ea input
+	uint8_t       m_timer;              // 8-bit timer
+	uint8_t       m_prescaler;          // 5-bit timer prescaler
+	uint8_t       m_t1_history;         // 8-bit history of the T1 input
+	uint8_t       m_sts;                // 4-bit status register + OBF/IBF flags (UPI-41 only)
+	uint8_t       m_dbbi;               // 8-bit input data buffer (UPI-41 only)
+	uint8_t       m_dbbo;               // 8-bit output data buffer (UPI-41 only)
 
-	bool          m_irq_state;          /* true if the IRQ line is active */
-	bool          m_irq_polled;         /* true if last instruction was JNI (and not taken) */
-	bool          m_irq_in_progress;    /* true if an IRQ is in progress */
-	bool          m_timer_overflow;     /* true on a timer overflow; cleared by taking interrupt */
-	bool          m_timer_flag;         /* true on a timer overflow; cleared on JTF */
-	bool          m_tirq_enabled;       /* true if the timer IRQ is enabled */
-	bool          m_xirq_enabled;       /* true if the external IRQ is enabled */
-	uint8_t       m_timecount_enabled;  /* bitmask of timer/counter enabled */
-	bool          m_flags_enabled;      /* true if I/O flags have been enabled (UPI-41 only) */
-	bool          m_dma_enabled;        /* true if DMA has been enabled (UPI-41 only) */
+	bool          m_irq_state;          // true if the IRQ line is active
+	bool          m_irq_polled;         // true if last instruction was JNI (and not taken)
+	bool          m_irq_in_progress;    // true if an IRQ is in progress
+	bool          m_timer_overflow;     // true on a timer overflow; cleared by taking interrupt
+	bool          m_timer_flag;         // true on a timer overflow; cleared on JTF
+	bool          m_tirq_enabled;       // true if the timer IRQ is enabled
+	bool          m_xirq_enabled;       // true if the external IRQ is enabled
+	uint8_t       m_timecount_enabled;  // bitmask of timer/counter enabled
+	bool          m_flags_enabled;      // true if I/O flags have been enabled (UPI-41 only)
+	bool          m_dma_enabled;        // true if DMA has been enabled (UPI-41 only)
 
-	uint16_t      m_a11;                /* A11 value, either 0x000 or 0x800 */
+	uint16_t      m_a11;                // A11 value, either 0x000 or 0x800
 
 	int           m_icount;
 
-	/* Memory spaces */
+	// Memory spaces
 	memory_access<12, 0, 0, ENDIANNESS_LITTLE>::cache m_program;
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 
 	required_shared_ptr<uint8_t> m_dataptr;
 
-	uint8_t       m_feature_mask;       /* processor feature flags */
-	uint16_t      m_int_rom_size;       /* internal rom size */
+	uint8_t       m_feature_mask;       // processor feature flags
+	uint16_t      m_int_rom_size;       // internal rom size
 
-	uint8_t       m_rtemp;              /* temporary for import/export */
+	uint8_t       m_rtemp;              // temporary for import/export
 
 	static const mcs48_ophandler s_mcs48_opcodes[256];
 	static const mcs48_ophandler s_upi41_opcodes[256];
@@ -231,14 +232,14 @@ protected:
 	static const mcs48_ophandler s_i8022_opcodes[256];
 	const mcs48_ophandler *const m_opcode_table;
 
-	/* ROM is mapped to AS_PROGRAM */
+	// ROM is mapped to AS_PROGRAM
 	uint8_t program_r(offs_t a)         { return m_program.read_byte(a); }
 
-	/* RAM is mapped to AS_DATA */
+	// RAM is mapped to AS_DATA
 	uint8_t ram_r(offs_t a)             { return m_data.read_byte(a); }
 	void    ram_w(offs_t a, uint8_t v)  { m_data.write_byte(a, v); }
 
-	/* ports are mapped to AS_IO and callbacks */
+	// ports are mapped to AS_IO and callbacks
 	uint8_t ext_r(offs_t a)             { return m_io.read_byte(a); }
 	void    ext_w(offs_t a, uint8_t v)  { m_io.write_byte(a, v); }
 	uint8_t port_r(offs_t a)            { return m_port_in_cb[a - 1](); }
@@ -622,7 +623,7 @@ public:
 class upi41_cpu_device : public mcs48_cpu_device
 {
 public:
-	/* functions for talking to the input/output buffers on the UPI41-class chips */
+	// functions for talking to the input/output buffers on the UPI41-class chips
 	uint8_t upi41_master_r(offs_t offset);
 	void upi41_master_w(offs_t offset, uint8_t data);
 
@@ -690,4 +691,4 @@ public:
 };
 
 
-#endif  // MAME_CPU_MCS48_MCS48_H
+#endif // MAME_CPU_MCS48_MCS48_H

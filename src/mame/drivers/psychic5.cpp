@@ -334,7 +334,7 @@ Notes (23-Jan-2016 AS):
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/2203intf.h"
+#include "sound/ym2203.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -515,7 +515,7 @@ void psychic5_state::bombsa_sound_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
 	map(0xe000, 0xe000).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0xf000, 0xf000).writeonly();                               // Is this a confirm of some sort?
+	map(0xf000, 0xf000).nopw();                               // Is this a confirm of some sort?
 }
 
 void psychic5_state::bombsa_soundport_map(address_map &map)

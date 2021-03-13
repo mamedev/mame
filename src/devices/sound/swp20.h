@@ -26,6 +26,9 @@ protected:
 private:
 	u8 m_p3c_port;
 	bool m_p3c_address;
+	u8 m_voice;
+	u32 m_keyon;
+	u32 m_keyoff;
 
 	// Generic upload port
 	void p3c_w(u8 data);

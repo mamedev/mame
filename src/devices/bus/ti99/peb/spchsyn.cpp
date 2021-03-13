@@ -38,7 +38,7 @@
 
 DEFINE_DEVICE_TYPE_NS(TI99_SPEECH, bus::ti99::peb, ti_speech_synthesizer_device, "ti99_speech", "TI-99 Speech synthesizer (on adapter card)")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 /****************************************************************************/
 
@@ -189,5 +189,5 @@ const tiny_rom_entry *ti_speech_synthesizer_device::device_rom_region() const
 	return ROM_NAME( ti99_speech );
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 

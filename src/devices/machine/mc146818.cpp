@@ -39,12 +39,14 @@ mc146818_device::mc146818_device(const machine_config &mconfig, device_type type
 		m_index(0),
 		m_last_refresh(attotime::zero), m_clock_timer(nullptr), m_periodic_timer(nullptr),
 		m_write_irq(*this),
+		m_write_sqw(*this),
 		m_century_index(-1),
 		m_epoch(0),
 		m_use_utc(false),
 		m_binary(false),
 		m_hour(false),
-		m_binyear(false)
+		m_binyear(false),
+		m_sqw_state(false)
 {
 }
 
@@ -60,9 +62,11 @@ void mc146818_device::device_start()
 	m_periodic_timer = timer_alloc(TIMER_PERIODIC);
 
 	m_write_irq.resolve_safe();
+	m_write_sqw.resolve_safe();
 
 	save_pointer(NAME(m_data), data_size());
 	save_item(NAME(m_index));
+	save_item(NAME(m_sqw_state));
 }
 
 
@@ -74,6 +78,10 @@ void mc146818_device::device_reset()
 {
 	m_data[REG_B] &= ~(REG_B_UIE | REG_B_AIE | REG_B_PIE | REG_B_SQWE);
 	m_data[REG_C] = 0;
+
+	// square wave output is disabled
+	if (m_sqw_state)
+		m_write_sqw(CLEAR_LINE);
 
 	update_irq();
 }
@@ -87,8 +95,17 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	switch (id)
 	{
 	case TIMER_PERIODIC:
-		m_data[REG_C] |= REG_C_PF;
-		update_irq();
+		m_sqw_state = !m_sqw_state;
+
+		if (m_data[REG_B] & REG_B_SQWE)
+			m_write_sqw(m_sqw_state);
+
+		// periodic flag/interrupt on rising edge of periodic timer
+		if (m_sqw_state)
+		{
+			m_data[REG_C] |= REG_C_PF;
+			update_irq();
+		}
 		break;
 
 	case TIMER_CLOCK:
@@ -464,8 +481,9 @@ void mc146818_device::update_timer()
 			double periodic_hz = (double) clock() / (1 << shift);
 
 			// TODO: take the time since last timer into account
-			periodic_period = attotime::from_hz(periodic_hz * 2);
-			periodic_interval = attotime::from_hz(periodic_hz);
+			// periodic frequency is doubled to produce square wave output
+			periodic_period = attotime::from_hz(periodic_hz * 4);
+			periodic_interval = attotime::from_hz(periodic_hz * 2);
 		}
 	}
 
@@ -661,6 +679,9 @@ void mc146818_device::internal_write(offs_t offset, uint8_t data)
 	case REG_B:
 		if ((data & REG_B_SET) && !(m_data[REG_B] & REG_B_SET))
 			data &= ~REG_B_UIE;
+
+		if (!(data & REG_B_SQWE) && (m_data[REG_B] & REG_B_SQWE) && m_sqw_state)
+			m_write_sqw(CLEAR_LINE);
 
 		m_data[REG_B] = data;
 		update_irq();

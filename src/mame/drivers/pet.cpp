@@ -211,7 +211,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, M6502_TAG),
 		m_char_rom(*this, "charom"),
-		m_video_ram(*this, "video_ram"),
+		m_video_ram(*this, "video_ram", 0x800, ENDIANNESS_LITTLE),
 		m_row(*this, "ROW%u", 0),
 		m_lock(*this, "LOCK"),
 		m_sync_timer(nullptr),
@@ -294,7 +294,7 @@ protected:
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
-	optional_shared_ptr<uint8_t> m_video_ram;
+	memory_share_creator<uint8_t> m_video_ram;
 	required_ioport_array<10> m_row;
 	required_ioport m_lock;
 
@@ -469,7 +469,7 @@ static void cbm_pet_quick_sethiaddress( address_space &space, uint16_t hiaddress
 
 QUICKLOAD_LOAD_MEMBER(pet_state::quickload_pet)
 {
-	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_pet_quick_sethiaddress);
+	return general_cbm_loadsnap(image, m_maincpu->space(AS_PROGRAM), 0, cbm_pet_quick_sethiaddress);
 }
 
 
@@ -1518,9 +1518,6 @@ void cbm8296d_ieee488_devices(device_slot_interface &device)
 
 MACHINE_START_MEMBER( pet_state, pet )
 {
-	// allocate memory
-	m_video_ram.allocate(m_video_ram_size);
-
 	// initialize memory
 	uint8_t data = 0xff;
 
@@ -1666,7 +1663,7 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	VIA6522(config, m_via, XTAL(16'000'000)/16);
+	MOS6522(config, m_via, XTAL(16'000'000)/16);
 	m_via->readpb_handler().set(FUNC(pet_state::via_pb_r));
 	m_via->writepa_handler().set(FUNC(pet_state::via_pa_w));
 	m_via->writepb_handler().set(FUNC(pet_state::via_pb_w));

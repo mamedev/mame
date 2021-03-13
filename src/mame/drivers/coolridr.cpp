@@ -100,6 +100,7 @@ SYSTEM-H1 CPU BD
 171-6651A
 837-10389
 837-11481 (sticker)
+833-11483 COOL RIDERS (sticker)
 |--------------------------------------------------------------|
 |                                                EPR-17662.IC12|
 |                                                              |
@@ -288,7 +289,7 @@ to the same bank as defined through A20.
 #include "machine/315_5649.h"
 #include "sound/scsp.h"
 #include "emupal.h"
-#include "rendlay.h"
+#include "layout/generic.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -320,7 +321,7 @@ public:
 		m_workram_h(*this, "workrah"),
 		m_sound_dma(*this, "sound_dma"),
 		m_soundram(*this, "soundram%u", 1U),
-		m_rom(*this, "share1"),
+		m_rom(*this, "maincpu"),
 		m_compressedgfx(*this, "compressedgfx"),
 		m_io_config(*this, "CONFIG"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -358,7 +359,7 @@ public:
 	required_shared_ptr<uint32_t> m_workram_h;
 	required_shared_ptr<uint32_t> m_sound_dma;
 	required_shared_ptr_array<uint16_t, 2> m_soundram;
-	required_shared_ptr<uint32_t> m_rom;
+	required_region_ptr<uint32_t> m_rom;
 	required_region_ptr<uint8_t> m_compressedgfx;
 	required_ioport m_io_config;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -2779,7 +2780,7 @@ void coolridr_state::dma_w(address_space &space, offs_t offset, uint32_t data, u
 
 void coolridr_state::system_h1_map(address_map &map)
 {
-	map(0x00000000, 0x001fffff).rom().share("share1").nopw();
+	map(0x00000000, 0x001fffff).rom().nopw();
 	map(0x01000000, 0x01ffffff).rom().region("gfx_data", 0x0000000);
 
 	map(0x03f40000, 0x03f4ffff).ram().share("txt_vram");//text tilemap + "lineram"
@@ -2790,7 +2791,7 @@ void coolridr_state::system_h1_map(address_map &map)
 	map(0x0400001c, 0x0400001f).w(FUNC(coolridr_state::fb_data_w));
 
 	map(0x06000000, 0x060fffff).ram().share("workrah");
-	map(0x20000000, 0x201fffff).rom().share("share1");
+	map(0x20000000, 0x201fffff).rom().region("maincpu", 0);
 
 	map(0x60000000, 0x600003ff).nopw();
 }
@@ -3224,18 +3225,17 @@ WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
 		m_sound_data &= ~0x20;
 }
 
-#define MAIN_CLOCK XTAL(28'636'363)
 
 void coolridr_state::coolridr(machine_config &config)
 {
-	SH2(config, m_maincpu, MAIN_CLOCK);  // 28 MHz
+	SH2(config, m_maincpu, XTAL(28'000'000)); // 28 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &coolridr_state::coolridr_h1_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(coolridr_state::interrupt_main), "screen", 0, 1);
 
-	M68000(config, m_soundcpu, 22579000/2); // 22.579 MHz XTAL / 2 = 11.2895 MHz
+	M68000(config, m_soundcpu, XTAL(32'000'000)/2); // 16 MHz
 	m_soundcpu->set_addrmap(AS_PROGRAM, &coolridr_state::system_h1_sound_map);
 
-	SH1(config, m_subcpu, 16000000);  // SH7032 HD6417032F20!! 16 MHz
+	SH1(config, m_subcpu, XTAL(32'000'000)/2); // SH7032 HD6417032F20!! 16 MHz
 	m_subcpu->set_addrmap(AS_PROGRAM, &coolridr_state::coolridr_submap);
 	TIMER(config, "scantimer2").configure_scanline(FUNC(coolridr_state::interrupt_sub), "screen", 0, 1);
 
@@ -3256,14 +3256,14 @@ void coolridr_state::coolridr(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_coolridr);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
+	m_screen->set_refresh_hz(57); // measured at 57.0426Hz
 	m_screen->set_size(640, 512);
 	m_screen->set_visarea(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL);
 	m_screen->set_screen_update(FUNC(coolridr_state::screen_update<0>));
 	m_screen->set_palette(m_palette);
 
 	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
-	screen2.set_refresh_hz(60);
+	screen2.set_refresh_hz(57); // measured at 57.0426Hz
 	screen2.set_size(640, 512);
 	screen2.set_visarea(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL);
 	screen2.set_screen_update(FUNC(coolridr_state::screen_update<1>));
@@ -3276,14 +3276,14 @@ void coolridr_state::coolridr(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	scsp_device &scsp1(SCSP(config, "scsp1", 22579000)); // 22.579 MHz XTAL
+	scsp_device &scsp1(SCSP(config, "scsp1", XTAL(22'579'000))); // 22.579 MHz
 	scsp1.set_addrmap(0, &coolridr_state::scsp_map<0>);
 	scsp1.irq_cb().set(FUNC(coolridr_state::scsp_irq));
 	scsp1.main_irq_cb().set(FUNC(coolridr_state::scsp1_to_sh1_irq));
 	scsp1.add_route(0, "lspeaker", 1.0);
 	scsp1.add_route(1, "rspeaker", 1.0);
 
-	scsp_device &scsp2(SCSP(config, "scsp2", 22579000)); // 22.579 MHz XTAL
+	scsp_device &scsp2(SCSP(config, "scsp2", XTAL(22'579'000))); // 22.579 MHz
 	scsp2.set_addrmap(0, &coolridr_state::scsp_map<1>);
 	scsp2.main_irq_cb().set(FUNC(coolridr_state::scsp2_to_sh1_irq));
 	scsp2.add_route(0, "lspeaker", 1.0);

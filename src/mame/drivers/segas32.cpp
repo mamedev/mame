@@ -541,12 +541,11 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "machine/msm6253.h"
 #include "machine/upd4701.h"
 #include "machine/315_5296.h"
-#include "sound/2612intf.h"
 #include "sound/rf5c68.h"
-
-#include "rendlay.h"
+#include "sound/ym2612.h"
 #include "speaker.h"
 
+#include "layout/generic.h"
 #include "radr.lh"
 
 /*
@@ -566,10 +565,10 @@ segas32_state::segas32_state(const machine_config &mconfig, device_type type, co
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_z80_shared_ram(*this,"z80_shared_ram")
 	, m_system32_workram(*this,"workram")
-	, m_videoram(*this,"videoram", 0)
-	, m_spriteram(*this,"spriteram", 0)
+	, m_videoram(*this,"videoram", 0x20000, ENDIANNESS_LITTLE)
+	, m_spriteram(*this,"spriteram", 0x20000, ENDIANNESS_LITTLE)
 	, m_soundram(*this, "soundram")
-	, m_paletteram(*this,"paletteram.%u", 0, uint8_t(0))
+	, m_paletteram(*this,"paletteram.%u", 0U, 0x10000U, ENDIANNESS_LITTLE)
 	, m_maincpu(*this, "maincpu")
 	, m_soundcpu(*this, "soundcpu")
 	, m_multipcm(*this, "sega")
@@ -654,6 +653,8 @@ void sega_multi32_analog_state::device_start()
 {
 	sega_multi32_state::device_start();
 	m_analog_bank = 0;
+
+	save_item(NAME(m_analog_bank));
 }
 
 void segas32_state::device_reset()
@@ -1161,10 +1162,10 @@ void segas32_state::system32_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x20ffff).mirror(0x0f0000).ram().share("workram");
-	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::videoram_r), FUNC(segas32_state::videoram_w)).share("videoram");
-	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::spriteram_r), FUNC(segas32_state::spriteram_w)).share("spriteram");
+	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::videoram_r), FUNC(segas32_state::videoram_w));
+	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::spriteram_r), FUNC(segas32_state::spriteram_w));
 	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask16(0x00ff);
-	map(0x600000, 0x60ffff).mirror(0x0e0000).rw(FUNC(segas32_state::paletteram_r<0>), FUNC(segas32_state::paletteram_w<0>)).share("paletteram.0");
+	map(0x600000, 0x60ffff).mirror(0x0e0000).rw(FUNC(segas32_state::paletteram_r<0>), FUNC(segas32_state::paletteram_w<0>));
 	map(0x610000, 0x61007f).mirror(0x0eff80).rw(FUNC(segas32_state::mixer_r<0>), FUNC(segas32_state::mixer_w<0>));
 	map(0x700000, 0x701fff).mirror(0x0fe000).rw(FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
 	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask16(0x00ff);
@@ -1184,12 +1185,12 @@ void segas32_state::multi32_map(address_map &map)
 	map.global_mask(0xffffff);
 	map(0x000000, 0x1fffff).rom();
 	map(0x200000, 0x21ffff).mirror(0x0e0000).ram();
-	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::videoram_r), FUNC(segas32_state::videoram_w)).share("videoram");
-	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::spriteram_r), FUNC(segas32_state::spriteram_w)).share("spriteram");
+	map(0x300000, 0x31ffff).mirror(0x0e0000).rw(FUNC(segas32_state::videoram_r), FUNC(segas32_state::videoram_w));
+	map(0x400000, 0x41ffff).mirror(0x0e0000).rw(FUNC(segas32_state::spriteram_r), FUNC(segas32_state::spriteram_w));
 	map(0x500000, 0x50000f).mirror(0x0ffff0).rw(FUNC(segas32_state::sprite_control_r), FUNC(segas32_state::sprite_control_w)).umask32(0x00ff00ff);
-	map(0x600000, 0x60ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<0>), FUNC(segas32_state::paletteram_w<0>)).share("paletteram.0");
+	map(0x600000, 0x60ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<0>), FUNC(segas32_state::paletteram_w<0>));
 	map(0x610000, 0x61007f).mirror(0x06ff80).rw(FUNC(segas32_state::mixer_r<0>), FUNC(segas32_state::mixer_w<0>));
-	map(0x680000, 0x68ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<1>), FUNC(segas32_state::paletteram_w<1>)).share("paletteram.1");
+	map(0x680000, 0x68ffff).mirror(0x060000).rw(FUNC(segas32_state::paletteram_r<1>), FUNC(segas32_state::paletteram_w<1>));
 	map(0x690000, 0x69007f).mirror(0x06ff80).rw(FUNC(segas32_state::mixer_r<1>), FUNC(segas32_state::mixer_w<1>));
 	map(0x700000, 0x701fff).mirror(0x0fe000).rw(FUNC(segas32_state::shared_ram_r), FUNC(segas32_state::shared_ram_w));
 	map(0x800000, 0x800fff).rw("s32comm", FUNC(s32comm_device::share_r), FUNC(s32comm_device::share_w)).umask32(0x00ff00ff);
@@ -2625,7 +2626,7 @@ void sega_multi32_state::device_add_mconfig(machine_config &config)
 	ymsnd.add_route(1, "lspeaker", 0.40);
 	ymsnd.add_route(0, "rspeaker", 0.40);
 
-	MULTIPCM(config, m_multipcm, MASTER_CLOCK/4);
+	MULTIPCM(config, m_multipcm, MULTI32_CLOCK/4);
 	m_multipcm->set_addrmap(0, &sega_multi32_state::multipcm_map);
 	m_multipcm->add_route(1, "lspeaker", 1.0);
 	m_multipcm->add_route(0, "rspeaker", 1.0);
@@ -5205,6 +5206,7 @@ ROM_END
 
     Sega Game ID codes:
      Game: 833-10851 J. LEAGUE 1994
+ROM board: 834-10852 J.LEAGUE
 
 */
 ROM_START( jleague )
@@ -5714,6 +5716,8 @@ void segas32_state::init_arescue(int m_hasdsp)
 		elem = 0x00;
 
 	m_sw1_output = &segas32_state::arescue_sw1_output;
+
+	save_item(NAME(m_arescue_dsp_io));
 }
 
 
@@ -5731,6 +5735,8 @@ void segas32_state::init_brival()
 	m_system32_protram = std::make_unique<uint16_t[]>(0x1000/2);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20ba00, 0x20ba07, read16s_delegate(*this, FUNC(segas32_state::brival_protection_r)));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00000, 0xa00fff, write16sm_delegate(*this, FUNC(segas32_state::brival_protection_w)));
+
+	save_pointer(NAME(m_system32_protram), 0x1000/2);
 }
 
 

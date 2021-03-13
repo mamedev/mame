@@ -23,6 +23,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_slapstic(*this, "slapstic"),
+		m_slapstic_bank(*this, "slapstic_bank"),
 		m_jsa(*this, "jsa"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -33,7 +34,8 @@ public:
 
 	void xybots(machine_config &config);
 
-	void init_xybots();
+protected:
+	virtual void machine_start() override;
 
 private:
 	void video_int_ack_w(uint16_t data = 0);
@@ -45,6 +47,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<atari_slapstic_device> m_slapstic;
+	required_memory_bank m_slapstic_bank;
 	required_device<atari_jsa_i_device> m_jsa;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;

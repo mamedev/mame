@@ -122,6 +122,13 @@ void decocass_state::decocass_map(address_map &map)
 	map(0xf000, 0xffff).rom();
 }
 
+void decocass_state::decocrom_map(address_map &map)
+{
+	decocass_map(map);
+	map(0x6000, 0xafff).bankr("bank1").w(FUNC(decocass_state::decocass_de0091_w));
+	map(0xe900, 0xe900).w(FUNC(decocass_state::decocass_e900_w));
+}
+
 void decocass_state::decocass_sound_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
@@ -1001,6 +1008,12 @@ void decocass_state::decocass(machine_config &config)
 	AY8910(config, "ay2", HCLK2).add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
+void decocass_state::decocrom(machine_config &config)
+{
+	decocass(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &decocass_state::decocrom_map);
+}
+
 
 void decocass_type1_state::ctsttape(machine_config &config)
 {
@@ -1133,7 +1146,7 @@ void decocass_type1_state::cluckypo(machine_config &config)
 
 void decocass_type1_state::ctisland(machine_config &config)
 {
-	decocass(config);
+	decocrom(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,ctisland)
@@ -1141,7 +1154,7 @@ void decocass_type1_state::ctisland(machine_config &config)
 
 void decocass_type1_state::ctisland3(machine_config &config)
 {
-	decocass(config);
+	decocrom(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,ctisland3)
@@ -1149,7 +1162,7 @@ void decocass_type1_state::ctisland3(machine_config &config)
 
 void decocass_type1_state::cexplore(machine_config &config)
 {
-	decocass(config);
+	decocrom(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_type1_state,cexplore)
@@ -2073,15 +2086,10 @@ void decocass_state::init_decocrom()
 	init_decocass();
 
 	/* convert charram to a banked ROM */
-	m_maincpu->space(AS_PROGRAM).install_read_bank(0x6000, 0xafff, "bank1");
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0xafff, write8sm_delegate(*this, FUNC(decocass_state::decocass_de0091_w)));
 	membank("bank1")->configure_entry(0, m_charram);
 	membank("bank1")->configure_entry(1, memregion("user3")->base());
 	membank("bank1")->configure_entry(2, memregion("user3")->base()+0x5000);
 	membank("bank1")->set_entry(0);
-
-	/* install the bank selector */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe900, 0xe900, write8smo_delegate(*this, FUNC(decocass_state::decocass_e900_w)));
 }
 
 uint8_t decocass_state::cdsteljn_input_r(offs_t offset)

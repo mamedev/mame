@@ -278,7 +278,26 @@ license:CC0
 
 	<!-- Game: Final Fight Revenge -->
 	<software name="ffreveng" supported="no">
-		<description>Final Fight Revenge (JUET 990714 V1.000)</description>
+		<description>Final Fight Revenge / Final Revenge (JUET 990930 V1.100)</description>
+		<year>1999</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="stv_cart">
+			<dataarea name="rom" size="0x3000000">
+				<rom name="ffr110.ic35" size="0x100000" crc="3ffea541" sha1="715b070b1d574a99aeb12086de380b0b3aaa25a1" offset="0x000001" loadflag="load16_byte"/>
+				<!-- actual source ROM board have 21x 16Mbit FlashROMs instead -->
+				<rom name="opr21872.7"  size="0x200000" crc="32d36fee" sha1="441c4254ef2e9301e1006d69462a850ce339314b" offset="0x200000" loadflag="load16_word_swap"/>
+				<rom name="mpr21873.2"  size="0x400000" crc="dac5bd98" sha1="6102035ce9eb2f83d7d9b20f989a151f45087c67" offset="0x400000" loadflag="load16_word_swap"/>
+				<rom name="mpr21874.3"  size="0x400000" crc="0a7be2f1" sha1="e2d13f36e54d1e2cb9d584db829c04a6ff65108c" offset="0x800000" loadflag="load16_word_swap"/>
+				<rom name="mpr21875.4"  size="0x400000" crc="ccb75029" sha1="9611a08a2ad0e0e82137ded6205440a948a339a4" offset="0xc00000" loadflag="load16_word_swap"/>
+				<rom name="mpr21876.5"  size="0x400000" crc="bb92a7fc" sha1="d9e0fab1104a46adeb0a0cfc0d070d4c63a28d55" offset="0x1000000" loadflag="load16_word_swap"/>
+				<rom name="mpr21877.6"  size="0x400000" crc="c22a4a75" sha1="3276bc0628e71b432f21ba9a4f5ff7ccc8769cd9" offset="0x1400000" loadflag="load16_word_swap"/>
+				<rom name="opr21878.1"  size="0x200000" crc="2ea4a64d" sha1="928a973dce5eba0a1628d61ba56a530de990a946" offset="0x1800000" loadflag="load16_word_swap"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ffrevng10" supported="no" cloneof="ffreveng">
+		<description>Final Fight Revenge / Final Revenge (JUET 990714 V1.000)</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="stv_cart">

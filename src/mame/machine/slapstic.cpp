@@ -16,7 +16,8 @@
 
     The slapstic was a security chip made by Atari, which was used for
     bank switching and security in several coin-operated video games from
-    1984 through 1990.
+    1984 through 1990.  It means "SLA Protection from Software Thievery IC",
+    where SLA is a Storage/Logic Array, an early form of gate array.
 
 
     What is a SLOOP?
@@ -171,11 +172,24 @@
     independently. Later chips (111-118) provided a mechanism of adding
     1, 2, or 3 to the number of the current bank.
 
+    One important detail is that some accesses must be done with CS=0,
+    while others don't care.  CS=0 usually means the access is in the
+    slapstic banked region.  Specifically:
+      - on 101 and 102, the 2nd alt access must be done outside of
+        the bank region
+      - on 103 to 110, the 1st alt access can be done anywhere
+      - on 111 to 118, the 1st and 3rd alt access can be done anywhere
+
+    These out-of-range accesses pose technical difficulties we're not fully
+    handling yet.  Similarly, accesses that must be done in sequence get
+    broken by an out-of-range access.
+
     Surprisingly, the slapstic appears to have used DRAM cells to store
     the current bank. After 5 or 6 seconds without a clock, the chip
     reverts to the default bank, with the chip reset (bank select
-    addresses are enabled). Typically, the slapstic region is accessed
-    often enough to cause a problem.
+    addresses are enabled). Typically, the clock is connnected to the
+    cpu memory access line (AS on the 68000 for instance), accessing
+    often enough to avoid the problem.
 
     For full details, see the MAME source code.
 
@@ -187,88 +201,20 @@
 
 #include "cpu/m68000/m68000.h"
 
-
-/*************************************
- *
- *  Debugging
- *
- *************************************/
-
-#define LOG_SLAPSTIC    (0)
-
-
-
 DEFINE_DEVICE_TYPE(SLAPSTIC, atari_slapstic_device, "slapstic", "Atari Slapstic")
 
 atari_slapstic_device::atari_slapstic_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SLAPSTIC, tag, owner, clock),
-	state(0),
-	current_bank(0),
-	access_68k(-1),
-	alt_bank(0),
-	bit_bank(0),
-	add_bank(0),
-	bit_xor(0),
-	m_legacy_configured(false),
-	m_legacy_space(nullptr),
-	m_legacy_memptr(nullptr),
-	m_legacy_bank(0)
+	m_bank(*this, finder_base::DUMMY_TAG),
+	m_view(nullptr),
+	m_space(*this, finder_base::DUMMY_TAG, -1),
+	m_start(0),
+	m_end(0),
+	m_mirror(0),
+	m_saved_state(S_IDLE),
+	m_current_bank(0),
+	m_loaded_bank(0)
 {
-	slapstic.bankstart = 0;
-	slapstic.bank[0] = slapstic.bank[1] = slapstic.bank[2] = slapstic.bank[3] = 0;
-	slapstic.alt1.mask = 0;
-	slapstic.alt1.value = 0;
-	slapstic.alt2.mask = 0;
-	slapstic.alt2.value = 0;
-	slapstic.alt3.mask = 0;
-	slapstic.alt3.value = 0;
-	slapstic.alt4.mask = 0;
-	slapstic.alt4.value = 0;
-	slapstic.altshift = 0;
-	slapstic.bit1.mask = 0;
-	slapstic.bit1.value = 0;
-	slapstic.bit2c0.mask = 0;
-	slapstic.bit2c0.value = 0;
-	slapstic.bit2s0.mask = 0;
-	slapstic.bit2s0.value = 0;
-	slapstic.bit2c1.mask = 0;
-	slapstic.bit2c1.value = 0;
-	slapstic.bit2s1.mask = 0;
-	slapstic.bit2s1.value = 0;
-	slapstic.bit3.mask = 0;
-	slapstic.bit3.value = 0;
-	slapstic.add1.mask = 0;
-	slapstic.add1.value = 0;
-	slapstic.add2.mask = 0;
-	slapstic.add2.value = 0;
-	slapstic.addplus1.mask = 0;
-	slapstic.addplus1.value = 0;
-	slapstic.addplus2.mask = 0;
-	slapstic.addplus2.value = 0;
-	slapstic.add3.mask = 0;
-	slapstic.add3.value = 0;
-}
-
-
-
-void atari_slapstic_device::device_start()
-{
-}
-
-void atari_slapstic_device::device_reset()
-{
-	// reset the slapstic
-	if (m_legacy_configured)
-	{
-		slapstic_reset();
-		legacy_update_bank(slapstic_bank());
-	}
-}
-
-void atari_slapstic_device::device_post_load()
-{
-	if (m_legacy_configured)
-		legacy_update_bank(slapstic_bank());
 }
 
 /*************************************
@@ -277,41 +223,60 @@ void atari_slapstic_device::device_post_load()
  *
  *************************************/
 
-/* slapstic 137412-101: Empire Strikes Back/Tetris (NOT confirmed) */
-static const struct slapstic_data slapstic101 =
+#define UNKNOWN 0xffff
+#define NO_BITWISE          \
+	{ UNKNOWN,UNKNOWN },    \
+	{ UNKNOWN,UNKNOWN },    \
+	{ UNKNOWN,UNKNOWN },    \
+	{ UNKNOWN,UNKNOWN },    \
+	{ UNKNOWN,UNKNOWN },    \
+	{ UNKNOWN,UNKNOWN },    \
+	{ UNKNOWN,UNKNOWN }
+#define NO_ADDITIVE         \
+	{ UNKNOWN,UNKNOWN },    \
+	{ UNKNOWN,UNKNOWN },    \
+	{ UNKNOWN,UNKNOWN },    \
+	{ UNKNOWN,UNKNOWN },    \
+	{ UNKNOWN,UNKNOWN }
+
+
+/* slapstic 137412-101: Empire Strikes Back/Tetris */
+const atari_slapstic_device::slapstic_data atari_slapstic_device::slapstic101 =
 {
 	/* basic banking */
 	3,                              /* starting bank */
 	{ 0x0080,0x0090,0x00a0,0x00b0 },/* bank select values */
 
 	/* alternate banking */
-	{ 0x007f,UNKNOWN },             /* 1st mask/value in sequence */
-	{ 0x1fff,0x1dff },              /* 2nd mask/value in sequence */
+	{ 0x1f00,0x1e00 },              /* 1st mask/value in sequence */
+	{ 0x1fff,0x1fff },              /* 2nd mask/value in sequence, *outside* of the range */
 	{ 0x1ffc,0x1b5c },              /* 3rd mask/value in sequence */
 	{ 0x1fcf,0x0080 },              /* 4th mask/value in sequence */
 	0,                              /* shift to get bank from 3rd */
 
 	/* bitwise banking */
-	{ 0x1ff0,0x1540 },              /* 1st mask/value in sequence */
-	{ 0x1ff3,0x1540 },              /* clear bit 0 value */
-	{ 0x1ff3,0x1541 },              /*   set bit 0 value */
-	{ 0x1ff3,0x1542 },              /* clear bit 1 value */
-	{ 0x1ff3,0x1543 },              /*   set bit 1 value */
-	{ 0x1ff8,0x1550 },              /* final mask/value in sequence */
+	{ 0x1ff0,0x1540 },              /* 1st mask/value */
+	{ 0x1fcf,0x0080 },              /* 2nd mask/value */
+	{ 0x1ff3,0x1540 },              /* clear bit 0 value on odd /   set bit 1 on even */
+	{ 0x1ff3,0x1541 },              /*   set bit 0 value on odd / clear bit 1 on even */
+	{ 0x1ff3,0x1542 },              /* clear bit 1 value on odd /   set bit 0 on even */
+	{ 0x1ff3,0x1543 },              /*   set bit 1 value on odd / clear bit 0 on even */
+	{ 0x1ff8,0x1550 },              /* final mask/value */
 
 	/* additive banking */
 	NO_ADDITIVE
 };
 
 
-/* slapstic 137412-103: Marble Madness (confirmed) */
-static const struct slapstic_data slapstic103 =
+/* slapstic 137412-103: Marble Madness */
+const atari_slapstic_device::slapstic_data atari_slapstic_device::slapstic103 =
 {
 	/* basic banking */
 	3,                              /* starting bank */
 	{ 0x0040,0x0050,0x0060,0x0070 },/* bank select values */
 
 	/* alternate banking */
+	// Real values, to be worked on later
 	{ 0x007f,0x002d },              /* 1st mask/value in sequence */
 	{ 0x3fff,0x3d14 },              /* 2nd mask/value in sequence */
 	{ 0x3ffc,0x3d24 },              /* 3rd mask/value in sequence */
@@ -320,10 +285,11 @@ static const struct slapstic_data slapstic103 =
 
 	/* bitwise banking */
 	{ 0x3ff0,0x34c0 },              /* 1st mask/value in sequence */
-	{ 0x3ff3,0x34c0 },              /* clear bit 0 value */
-	{ 0x3ff3,0x34c1 },              /*   set bit 0 value */
-	{ 0x3ff3,0x34c2 },              /* clear bit 1 value */
-	{ 0x3ff3,0x34c3 },              /*   set bit 1 value */
+	{ 0x3fcf,0x0040 },              /* 2nd mask/value */
+	{ 0x3ff3,0x34c0 },              /* clear bit 0 value on odd /   set bit 1 on even */
+	{ 0x3ff3,0x34c1 },              /*   set bit 0 value on odd / clear bit 1 on even */
+	{ 0x3ff3,0x34c2 },              /* clear bit 1 value on odd /   set bit 0 on even */
+	{ 0x3ff3,0x34c3 },              /*   set bit 1 value on odd / clear bit 0 on even */
 	{ 0x3ff8,0x34d0 },              /* final mask/value in sequence */
 
 	/* additive banking */
@@ -331,8 +297,8 @@ static const struct slapstic_data slapstic103 =
 };
 
 
-/* slapstic 137412-104: Gauntlet (confirmed) */
-static const struct slapstic_data slapstic104 =
+/* slapstic 137412-104: Gauntlet */
+const atari_slapstic_device::slapstic_data atari_slapstic_device::slapstic104 =
 {
 	/* basic banking */
 	3,                              /* starting bank */
@@ -347,10 +313,11 @@ static const struct slapstic_data slapstic104 =
 
 	/* bitwise banking */
 	{ 0x3ff0,0x3d90 },              /* 1st mask/value in sequence */
-	{ 0x3ff3,0x3d90 },              /* clear bit 0 value */
-	{ 0x3ff3,0x3d91 },              /*   set bit 0 value */
-	{ 0x3ff3,0x3d92 },              /* clear bit 1 value */
-	{ 0x3ff3,0x3d93 },              /*   set bit 1 value */
+	{ 0x3fe7,0x0020 },              /* 2nd mask/value */
+	{ 0x3ff3,0x3d90 },              /* clear bit 0 value on odd /   set bit 1 on even */
+	{ 0x3ff3,0x3d91 },              /*   set bit 0 value on odd / clear bit 1 on even */
+	{ 0x3ff3,0x3d92 },              /* clear bit 1 value on odd /   set bit 0 on even */
+	{ 0x3ff3,0x3d93 },              /*   set bit 1 value on odd / clear bit 0 on even */
 	{ 0x3ff8,0x3da0 },              /* final mask/value in sequence */
 
 	/* additive banking */
@@ -358,8 +325,8 @@ static const struct slapstic_data slapstic104 =
 };
 
 
-/* slapstic 137412-105: Indiana Jones/Paperboy (confirmed) */
-static const struct slapstic_data slapstic105 =
+/* slapstic 137412-105: Indiana Jones/Paperboy */
+const atari_slapstic_device::slapstic_data atari_slapstic_device::slapstic105 =
 {
 	/* basic banking */
 	3,                              /* starting bank */
@@ -374,10 +341,11 @@ static const struct slapstic_data slapstic105 =
 
 	/* bitwise banking */
 	{ 0x3ff0,0x35b0 },              /* 1st mask/value in sequence */
-	{ 0x3ff3,0x35b0 },              /* clear bit 0 value */
-	{ 0x3ff3,0x35b1 },              /*   set bit 0 value */
-	{ 0x3ff3,0x35b2 },              /* clear bit 1 value */
-	{ 0x3ff3,0x35b3 },              /*   set bit 1 value */
+	{ 0x3ff3,0x0010 },              /* 2nd mask/value */
+	{ 0x3ff3,0x35b0 },              /* clear bit 0 value on odd /   set bit 1 on even */
+	{ 0x3ff3,0x35b1 },              /*   set bit 0 value on odd / clear bit 1 on even */
+	{ 0x3ff3,0x35b2 },              /* clear bit 1 value on odd /   set bit 0 on even */
+	{ 0x3ff3,0x35b3 },              /*   set bit 1 value on odd / clear bit 0 on even */
 	{ 0x3ff8,0x35c0 },              /* final mask/value in sequence */
 
 	/* additive banking */
@@ -385,8 +353,8 @@ static const struct slapstic_data slapstic105 =
 };
 
 
-/* slapstic 137412-106: Gauntlet II (confirmed) */
-static const struct slapstic_data slapstic106 =
+/* slapstic 137412-106: Gauntlet II */
+const atari_slapstic_device::slapstic_data atari_slapstic_device::slapstic106 =
 {
 	/* basic banking */
 	3,                              /* starting bank */
@@ -401,10 +369,11 @@ static const struct slapstic_data slapstic106 =
 
 	/* bitwise banking */
 	{ 0x3ff0,0x3da0 },              /* 1st mask/value in sequence */
-	{ 0x3ff3,0x3da0 },              /* clear bit 0 value */
-	{ 0x3ff3,0x3da1 },              /*   set bit 0 value */
-	{ 0x3ff3,0x3da2 },              /* clear bit 1 value */
-	{ 0x3ff3,0x3da3 },              /*   set bit 1 value */
+	{ 0x3ff9,0x0008 },              /* 2nd mask/value */
+	{ 0x3ff3,0x3da0 },              /* clear bit 0 value on odd /   set bit 1 on even */
+	{ 0x3ff3,0x3da1 },              /*   set bit 0 value on odd / clear bit 1 on even */
+	{ 0x3ff3,0x3da2 },              /* clear bit 1 value on odd /   set bit 0 on even */
+	{ 0x3ff3,0x3da3 },              /*   set bit 1 value on odd / clear bit 0 on even */
 	{ 0x3ff8,0x3db0 },              /* final mask/value in sequence */
 
 	/* additive banking */
@@ -412,8 +381,8 @@ static const struct slapstic_data slapstic106 =
 };
 
 
-/* slapstic 137412-107: Peter Packrat/Xybots/2p Gauntlet/720 (confirmed) */
-static const struct slapstic_data slapstic107 =
+/* slapstic 137412-107: Peter Packrat/Xybots/2p Gauntlet/720 */
+const atari_slapstic_device::slapstic_data atari_slapstic_device::slapstic107 =
 {
 	/* basic banking */
 	3,                              /* starting bank */
@@ -428,10 +397,11 @@ static const struct slapstic_data slapstic107 =
 
 	/* bitwise banking */
 	{ 0x3ff0,0x00a0 },              /* 1st mask/value in sequence */
-	{ 0x3ff3,0x00a0 },              /* clear bit 0 value */
-	{ 0x3ff3,0x00a1 },              /*   set bit 0 value */
-	{ 0x3ff3,0x00a2 },              /* clear bit 1 value */
-	{ 0x3ff3,0x00a3 },              /*   set bit 1 value */
+	{ 0x3ff9,0x0018 },              /* 2nd mask/value */
+	{ 0x3ff3,0x00a0 },              /* clear bit 0 value on odd /   set bit 1 on even */
+	{ 0x3ff3,0x00a1 },              /*   set bit 0 value on odd / clear bit 1 on even */
+	{ 0x3ff3,0x00a2 },              /* clear bit 1 value on odd /   set bit 0 on even */
+	{ 0x3ff3,0x00a3 },              /*   set bit 1 value on odd / clear bit 0 on even */
 	{ 0x3ff8,0x00b0 },              /* final mask/value in sequence */
 
 	/* additive banking */
@@ -439,8 +409,8 @@ static const struct slapstic_data slapstic107 =
 };
 
 
-/* slapstic 137412-108: Road Runner/Super Sprint (confirmed) */
-static const struct slapstic_data slapstic108 =
+/* slapstic 137412-108: Road Runner/Super Sprint */
+const atari_slapstic_device::slapstic_data atari_slapstic_device::slapstic108 =
 {
 	/* basic banking */
 	3,                              /* starting bank */
@@ -455,10 +425,11 @@ static const struct slapstic_data slapstic108 =
 
 	/* bitwise banking */
 	{ 0x3ff0,0x0060 },              /* 1st mask/value in sequence */
-	{ 0x3ff3,0x0060 },              /* clear bit 0 value */
-	{ 0x3ff3,0x0061 },              /*   set bit 0 value */
-	{ 0x3ff3,0x0062 },              /* clear bit 1 value */
-	{ 0x3ff3,0x0063 },              /*   set bit 1 value */
+	{ 0x3ff9,0x0028 },              /* 2nd mask/value */
+	{ 0x3ff3,0x0060 },              /* clear bit 0 value on odd /   set bit 1 on even */
+	{ 0x3ff3,0x0061 },              /*   set bit 0 value on odd / clear bit 1 on even */
+	{ 0x3ff3,0x0062 },              /* clear bit 1 value on odd /   set bit 0 on even */
+	{ 0x3ff3,0x0063 },              /*   set bit 1 value on odd / clear bit 0 on even */
 	{ 0x3ff8,0x0070 },              /* final mask/value in sequence */
 
 	/* additive banking */
@@ -466,8 +437,8 @@ static const struct slapstic_data slapstic108 =
 };
 
 
-/* slapstic 137412-109: Championship Sprint/Road Blasters (confirmed) */
-static const struct slapstic_data slapstic109 =
+/* slapstic 137412-109: Championship Sprint/Road Blasters */
+const atari_slapstic_device::slapstic_data atari_slapstic_device::slapstic109 =
 {
 	/* basic banking */
 	3,                              /* starting bank */
@@ -482,10 +453,11 @@ static const struct slapstic_data slapstic109 =
 
 	/* bitwise banking */
 	{ 0x3ff0,0x3da0 },              /* 1st mask/value in sequence */
-	{ 0x3ff3,0x3da0 },              /* clear bit 0 value */
-	{ 0x3ff3,0x3da1 },              /*   set bit 0 value */
-	{ 0x3ff3,0x3da2 },              /* clear bit 1 value */
-	{ 0x3ff3,0x3da3 },              /*   set bit 1 value */
+	{ 0x3ff9,0x0008 },              /* 2nd mask/value */
+	{ 0x3ff3,0x3da0 },              /* clear bit 0 value on odd /   set bit 1 on even */
+	{ 0x3ff3,0x3da1 },              /*   set bit 0 value on odd / clear bit 1 on even */
+	{ 0x3ff3,0x3da2 },              /* clear bit 1 value on odd /   set bit 0 on even */
+	{ 0x3ff3,0x3da3 },              /*   set bit 1 value on odd / clear bit 0 on even */
 	{ 0x3ff8,0x3db0 },              /* final mask/value in sequence */
 
 	/* additive banking */
@@ -493,8 +465,8 @@ static const struct slapstic_data slapstic109 =
 };
 
 
-/* slapstic 137412-110: Road Blasters/APB (confirmed) */
-static const struct slapstic_data slapstic110 =
+/* slapstic 137412-110: Road Blasters/APB */
+const atari_slapstic_device::slapstic_data atari_slapstic_device::slapstic110 =
 {
 	/* basic banking */
 	3,                              /* starting bank */
@@ -509,10 +481,11 @@ static const struct slapstic_data slapstic110 =
 
 	/* bitwise banking */
 	{ 0x3ff0,0x34c0 },              /* 1st mask/value in sequence */
-	{ 0x3ff3,0x34c0 },              /* clear bit 0 value */
-	{ 0x3ff3,0x34c1 },              /*   set bit 0 value */
-	{ 0x3ff3,0x34c2 },              /* clear bit 1 value */
-	{ 0x3ff3,0x34c3 },              /*   set bit 1 value */
+	{ 0x3fcf,0x0040 },              /* 2nd mask/value */
+	{ 0x3ff3,0x34c0 },              /* clear bit 0 value on odd /   set bit 1 on even */
+	{ 0x3ff3,0x34c1 },              /*   set bit 0 value on odd / clear bit 1 on even */
+	{ 0x3ff3,0x34c2 },              /* clear bit 1 value on odd /   set bit 0 on even */
+	{ 0x3ff3,0x34c3 },              /*   set bit 1 value on odd / clear bit 0 on even */
 	{ 0x3ff8,0x34d0 },              /* final mask/value in sequence */
 
 	/* additive banking */
@@ -527,8 +500,8 @@ static const struct slapstic_data slapstic110 =
  *
  *************************************/
 
-/* slapstic 137412-111: Pit Fighter (Aug 09, 1990 to Aug 22, 1990) (confirmed) */
-static const struct slapstic_data slapstic111 =
+/* slapstic 137412-111: Pit Fighter (Aug 09, 1990 to Aug 22, 1990) */
+const atari_slapstic_device::slapstic_data atari_slapstic_device::slapstic111 =
 {
 	/* basic banking */
 	0,                              /* starting bank */
@@ -553,8 +526,8 @@ static const struct slapstic_data slapstic111 =
 };
 
 
-/* slapstic 137412-112: Pit Fighter (Aug 22, 1990 to Oct 01, 1990) (confirmed) */
-static const struct slapstic_data slapstic112 =
+/* slapstic 137412-112: Pit Fighter (Aug 22, 1990 to Oct 01, 1990) */
+const atari_slapstic_device::slapstic_data atari_slapstic_device::slapstic112 =
 {
 	/* basic banking */
 	0,                              /* starting bank */
@@ -579,8 +552,8 @@ static const struct slapstic_data slapstic112 =
 };
 
 
-/* slapstic 137412-113: Pit Fighter (Oct 09, 1990 to Oct 12, 1990) (confirmed) */
-static const struct slapstic_data slapstic113 =
+/* slapstic 137412-113: Pit Fighter (Oct 09, 1990 to Oct 12, 1990) */
+const atari_slapstic_device::slapstic_data atari_slapstic_device::slapstic113 =
 {
 	/* basic banking */
 	0,                              /* starting bank */
@@ -605,8 +578,8 @@ static const struct slapstic_data slapstic113 =
 };
 
 
-/* slapstic 137412-114: Pit Fighter (Nov 01, 1990 and later) (confirmed) */
-static const struct slapstic_data slapstic114 =
+/* slapstic 137412-114: Pit Fighter (Nov 01, 1990 and later) */
+const atari_slapstic_device::slapstic_data atari_slapstic_device::slapstic114 =
 {
 	/* basic banking */
 	0,                              /* starting bank */
@@ -631,8 +604,8 @@ static const struct slapstic_data slapstic114 =
 };
 
 
-/* slapstic 137412-115: Race Drivin' DSK board (confirmed) */
-static const struct slapstic_data slapstic115 =
+/* slapstic 137412-115: Race Drivin' DSK board */
+const atari_slapstic_device::slapstic_data atari_slapstic_device::slapstic115 =
 {
 	/* basic banking */
 	0,                              /* starting bank */
@@ -657,8 +630,8 @@ static const struct slapstic_data slapstic115 =
 };
 
 
-/* slapstic 137412-116: Hydra (confirmed) */
-static const struct slapstic_data slapstic116 =
+/* slapstic 137412-116: Hydra */
+const atari_slapstic_device::slapstic_data atari_slapstic_device::slapstic116 =
 {
 	/* basic banking */
 	0,                              /* starting bank */
@@ -683,8 +656,8 @@ static const struct slapstic_data slapstic116 =
 };
 
 
-/* slapstic 137412-117: Race Drivin' main board (confirmed) */
-static const struct slapstic_data slapstic117 =
+/* slapstic 137412-117: Race Drivin' main board */
+const atari_slapstic_device::slapstic_data atari_slapstic_device::slapstic117 =
 {
 	/* basic banking */
 	0,                              /* starting bank */
@@ -709,8 +682,8 @@ static const struct slapstic_data slapstic117 =
 };
 
 
-/* slapstic 137412-118: Rampart/Vindicators II (confirmed) */
-static const struct slapstic_data slapstic118 =
+/* slapstic 137412-118: Rampart/Vindicators II */
+const atari_slapstic_device::slapstic_data atari_slapstic_device::slapstic118 =
 {
 	/* basic banking */
 	0,                              /* starting bank */
@@ -743,10 +716,10 @@ static const struct slapstic_data slapstic118 =
  *************************************/
 
 /* master table */
-static const struct slapstic_data *const slapstic_table[] =
+const atari_slapstic_device::slapstic_data *const atari_slapstic_device::slapstic_table[] =
 {
-	&slapstic101,   /* NOT confirmed! */
-	nullptr,           /* never seen */
+	&slapstic101,
+	nullptr,      /* never seen */
 	&slapstic103,
 	&slapstic104,
 	&slapstic105,
@@ -780,459 +753,546 @@ void atari_slapstic_device::device_validity_check(validity_checker &valid) const
  *
  *************************************/
 
-void atari_slapstic_device::slapstic_init()
+void atari_slapstic_device::device_start()
 {
-	/* set up the parameters */
-	slapstic = *slapstic_table[m_chipnum - 101];
-
-	/* reset the chip */
-	slapstic_reset();
-
-
 	/* save state */
-	save_item(NAME(state));
-	save_item(NAME(current_bank));
-	save_item(NAME(alt_bank));
-	save_item(NAME(bit_bank));
-	save_item(NAME(add_bank));
-	save_item(NAME(bit_xor));
+	save_item(NAME(m_current_bank));
+	save_item(NAME(m_loaded_bank));
+	save_item(NAME(m_saved_state));
+
+	/* Address space tap installation */
+	if(m_space->data_width() == 16)
+		m_space->install_readwrite_tap(0, m_space->addrmask(), 0, "slapstic",
+									   [this](offs_t offset, u16 &, u16) { if(!machine().side_effects_disabled()) m_state->test(offset); },
+									   [this](offs_t offset, u16 &, u16) { if(!machine().side_effects_disabled()) m_state->test(offset); });
+	else
+		m_space->install_readwrite_tap(0, m_space->addrmask(), 0, "slapstic",
+									   [this](offs_t offset, u8 &, u8) { if(!machine().side_effects_disabled()) m_state->test(offset); },
+									   [this](offs_t offset, u8 &, u8) { if(!machine().side_effects_disabled()) m_state->test(offset); });
+
+	checker check(m_start, m_end, m_mirror, m_space->data_width(), m_chipnum == 101 ? 13 : 14);
+	const auto *info = slapstic_table[m_chipnum - 101];
+
+	m_s_idle = std::make_unique<idle>(this, check, info);
+
+	if(m_chipnum <= 102) {
+		m_s_active = std::make_unique<active_101_102>(this, check, info);
+		m_s_alt_valid = std::make_unique<alt_valid_101_102>(this, check, info);
+
+	} else if(m_chipnum <= 110) {
+		m_s_active = std::make_unique<active_103_110>(this, check, info);
+		m_s_alt_valid = std::make_unique<alt_valid_103_110>(this, check, info);
+
+	} else {
+		m_s_active = std::make_unique<active_111_118>(this, check, info);
+		m_s_alt_valid = std::make_unique<alt_valid_111_118>(this, check, info);
+	}
+
+	if(m_chipnum <= 110)
+		m_s_alt_select = std::make_unique<alt_select_101_110>(this, check, info, m_space->data_width() == 16 ? 1 : 0);
+	else
+		m_s_alt_select = std::make_unique<alt_select_111_118>(this, check, info, m_space->data_width() == 16 ? 1 : 0);
+
+	m_s_alt_commit = std::make_unique<alt_commit>(this, check, info);
+
+	if(m_chipnum <= 110) {
+		m_s_bit_load = std::make_unique<bit_load>(this, check, info);
+		m_s_bit_set_odd  = std::make_unique<bit_set>(this, check, info, true);
+		m_s_bit_set_even = std::make_unique<bit_set>(this, check, info, false);
+	}
+
+	if(m_chipnum >= 111) {
+		m_s_add_load = std::make_unique<add_load>(this, check, info);
+		m_s_add_set  = std::make_unique<add_set> (this, check, info);
+	}
+
+	m_state = m_s_idle.get();
 }
 
 
-void atari_slapstic_device::slapstic_reset(void)
+void atari_slapstic_device::device_reset(void)
 {
 	/* reset the chip */
-	state = DISABLED;
+	m_state = m_s_idle.get();
 
 	/* the 111 and later chips seem to reset to bank 0 */
-	current_bank = slapstic.bankstart;
+	change_bank(slapstic_table[m_chipnum - 101]->bankstart);
+}
+
+void atari_slapstic_device::change_bank(int bank)
+{
+	logerror("current bank %d\n", bank);
+	m_current_bank = bank;
+	if(m_bank)
+		m_bank->set_entry(m_current_bank);
+	if(m_view)
+		m_view->select(m_current_bank);
+}
+
+void atari_slapstic_device::commit_bank()
+{
+	change_bank(m_loaded_bank);
 }
 
 
-
-/*************************************
- *
- *  Returns active bank without tweaking
- *
- *************************************/
-
-int atari_slapstic_device::slapstic_bank(void)
+atari_slapstic_device::checker::checker(offs_t start, offs_t end, offs_t mirror, int data_width, int address_lines)
 {
-	return current_bank;
+	m_range_mask = ~((end - start) | mirror);
+	m_range_value = start;
+	if(m_range_value & ~m_range_mask)
+		fatalerror("The slapstic range %x-%x mirror %x is not masking friendly", start, end, mirror);
+	m_shift = data_width == 16 ? 1 : 0;
+	m_input_mask = util::make_bitmask<offs_t>(address_lines) << m_shift;
+}
+
+atari_slapstic_device::test atari_slapstic_device::checker::test_in(const mask_value &mv) const
+{
+	return test(m_range_mask | (mv.mask << m_shift), m_range_value | (mv.value << m_shift));
+}
+
+atari_slapstic_device::test atari_slapstic_device::checker::test_any(const mask_value &mv) const
+{
+	return test(mv.mask << m_shift, mv.value << m_shift);
+}
+
+atari_slapstic_device::test atari_slapstic_device::checker::test_inside() const
+{
+	return test(m_range_mask, m_range_value);
+}
+
+atari_slapstic_device::test atari_slapstic_device::checker::test_reset() const
+{
+	return test(m_range_mask | m_input_mask, m_range_value);
+}
+
+atari_slapstic_device::test atari_slapstic_device::checker::test_bank(u16 b) const
+{
+	return test(m_range_mask | m_input_mask, m_range_value | (b << m_shift));
 }
 
 
+// Idle state, waits for a reset to go to active
 
-/*************************************
- *
- *  Kludge to catch alt seqeuences
- *
- *************************************/
-
-int atari_slapstic_device::alt2_kludge(address_space &space, offs_t offset)
+atari_slapstic_device::idle::idle(atari_slapstic_device *sl, const checker &check, const slapstic_data *data) : state(sl)
 {
-	/* Of the 3 alternate addresses, only the middle one needs to actually hit
-	   in the slapstic region; the first and third ones can be anywhere in the
-	   address space. For this reason, the read/write handlers usually only
-	   see the 2nd access. For the 68000-based games, we do the following
-	   kludge to examine the opcode that is executing and look for the 1st
-	   and 3rd accesses. */
-
-	if (access_68k)
-	{
-		/* first verify that the prefetched PC matches the first alternate */
-		if (MATCHES_MASK_VALUE(space.device().state().pc() >> 1, slapstic.alt1))
-		{
-			/* now look for a move.w (An),(An) or cmpm.w (An)+,(An)+ */
-			u16 opcode = space.read_word(space.device().state().pcbase() & 0xffffff);
-			if ((opcode & 0xf1f8) == 0x3090 || (opcode & 0xf1f8) == 0xb148)
-			{
-				/* fetch the value of the register for the second operand, and see */
-				/* if it matches the third alternate */
-				u32 regval = space.device().state().state_int(M68K_A0 + ((opcode >> 9) & 7)) >> 1;
-				if (MATCHES_MASK_VALUE(regval, slapstic.alt3))
-				{
-					alt_bank = (regval >> slapstic.altshift) & 3;
-					return ALTERNATE3;
-				}
-			}
-		}
-
-		/* if there's no second memory hit within this instruction, the next */
-		/* opcode fetch will botch the operation, so just fall back to */
-		/* the enabled state */
-		return ENABLED;
-	}
-
-	/* kludge for ESB */
-	return ALTERNATE2;
+	m_reset = check.test_reset();
 }
 
-
-
-/*************************************
- *
- *  Call this *after* every access
- *
- *************************************/
-
-int atari_slapstic_device::slapstic_tweak(address_space &space, offs_t offset)
+void atari_slapstic_device::idle::test(offs_t addr) const
 {
-	/* reset is universal */
-	if (offset == 0x0000)
-	{
-		state = ENABLED;
-	}
-
-	/* otherwise, use the state machine */
-	else
-	{
-		switch (state)
-		{
-			/* DISABLED state: everything is ignored except a reset */
-			case DISABLED:
-				break;
-
-			/* ENABLED state: the chip has been activated and is ready for a bankswitch */
-			case ENABLED:
-
-				/* check for request to enter bitwise state */
-				if (MATCHES_MASK_VALUE(offset, slapstic.bit1))
-				{
-					state = BITWISE1;
-				}
-
-				/* check for request to enter additive state */
-				else if (MATCHES_MASK_VALUE(offset, slapstic.add1))
-				{
-					state = ADDITIVE1;
-				}
-
-				/* check for request to enter alternate state */
-				else if (MATCHES_MASK_VALUE(offset, slapstic.alt1))
-				{
-					state = ALTERNATE1;
-				}
-
-				/* special kludge for catching the second alternate address if */
-				/* the first one was missed (since it's usually an opcode fetch) */
-				else if (MATCHES_MASK_VALUE(offset, slapstic.alt2))
-				{
-					state = alt2_kludge(space, offset);
-				}
-
-				/* check for standard bankswitches */
-				else if (offset == slapstic.bank[0])
-				{
-					state = DISABLED;
-					current_bank = 0;
-				}
-				else if (offset == slapstic.bank[1])
-				{
-					state = DISABLED;
-					current_bank = 1;
-				}
-				else if (offset == slapstic.bank[2])
-				{
-					state = DISABLED;
-					current_bank = 2;
-				}
-				else if (offset == slapstic.bank[3])
-				{
-					state = DISABLED;
-					current_bank = 3;
-				}
-				break;
-
-			/* ALTERNATE1 state: look for alternate2 offset, or else fall back to ENABLED */
-			case ALTERNATE1:
-				if (MATCHES_MASK_VALUE(offset, slapstic.alt2))
-				{
-					state = ALTERNATE2;
-				}
-				else
-				{
-					state = ENABLED;
-				}
-				break;
-
-			/* ALTERNATE2 state: look for altbank offset, or else fall back to ENABLED */
-			case ALTERNATE2:
-				if (MATCHES_MASK_VALUE(offset, slapstic.alt3))
-				{
-					state = ALTERNATE3;
-					alt_bank = (offset >> slapstic.altshift) & 3;
-				}
-				else
-				{
-					state = ENABLED;
-				}
-				break;
-
-			/* ALTERNATE3 state: wait for the final value to finish the transaction */
-			case ALTERNATE3:
-				if (MATCHES_MASK_VALUE(offset, slapstic.alt4))
-				{
-					state = DISABLED;
-					current_bank = alt_bank;
-				}
-				break;
-
-			/* BITWISE1 state: waiting for a bank to enter the BITWISE state */
-			case BITWISE1:
-				if (offset == slapstic.bank[0] || offset == slapstic.bank[1] ||
-					offset == slapstic.bank[2] || offset == slapstic.bank[3])
-				{
-					state = BITWISE2;
-					bit_bank = current_bank;
-					bit_xor = 0;
-				}
-				break;
-
-			/* BITWISE2 state: watch for twiddling and the escape mechanism */
-			case BITWISE2:
-
-				/* check for clear bit 0 case */
-				if (MATCHES_MASK_VALUE(offset ^ bit_xor, slapstic.bit2c0))
-				{
-					bit_bank &= ~1;
-					bit_xor ^= 3;
-				}
-
-				/* check for set bit 0 case */
-				else if (MATCHES_MASK_VALUE(offset ^ bit_xor, slapstic.bit2s0))
-				{
-					bit_bank |= 1;
-					bit_xor ^= 3;
-				}
-
-				/* check for clear bit 1 case */
-				else if (MATCHES_MASK_VALUE(offset ^ bit_xor, slapstic.bit2c1))
-				{
-					bit_bank &= ~2;
-					bit_xor ^= 3;
-				}
-
-				/* check for set bit 1 case */
-				else if (MATCHES_MASK_VALUE(offset ^ bit_xor, slapstic.bit2s1))
-				{
-					bit_bank |= 2;
-					bit_xor ^= 3;
-				}
-
-				/* check for escape case */
-				else if (MATCHES_MASK_VALUE(offset, slapstic.bit3))
-				{
-					state = BITWISE3;
-				}
-				break;
-
-			/* BITWISE3 state: waiting for a bank to seal the deal */
-			case BITWISE3:
-				if (offset == slapstic.bank[0] || offset == slapstic.bank[1] ||
-					offset == slapstic.bank[2] || offset == slapstic.bank[3])
-				{
-					state = DISABLED;
-					current_bank = bit_bank;
-				}
-				break;
-
-			/* ADDITIVE1 state: look for add2 offset, or else fall back to ENABLED */
-			case ADDITIVE1:
-				if (MATCHES_MASK_VALUE(offset, slapstic.add2))
-				{
-					state = ADDITIVE2;
-					add_bank = current_bank;
-				}
-				else
-				{
-					state = ENABLED;
-				}
-				break;
-
-			/* ADDITIVE2 state: watch for twiddling and the escape mechanism */
-			case ADDITIVE2:
-
-				/* check for add 1 case -- can intermix */
-				if (MATCHES_MASK_VALUE(offset, slapstic.addplus1))
-				{
-					add_bank = (add_bank + 1) & 3;
-				}
-
-				/* check for add 2 case -- can intermix */
-				if (MATCHES_MASK_VALUE(offset, slapstic.addplus2))
-				{
-					add_bank = (add_bank + 2) & 3;
-				}
-
-				/* check for escape case -- can intermix with the above */
-				if (MATCHES_MASK_VALUE(offset, slapstic.add3))
-				{
-					state = ADDITIVE3;
-				}
-				break;
-
-			/* ADDITIVE3 state: waiting for a bank to seal the deal */
-			case ADDITIVE3:
-				if (offset == slapstic.bank[0] || offset == slapstic.bank[1] ||
-					offset == slapstic.bank[2] || offset == slapstic.bank[3])
-				{
-					state = DISABLED;
-					current_bank = add_bank;
-				}
-				break;
-		}
-	}
-
-	/* log this access */
-	if (LOG_SLAPSTIC)
-		slapstic_log(machine(), offset);
-
-	/* return the active bank */
-	return current_bank;
-}
-
-
-
-/*************************************
- *
- *  Debugging
- *
- *************************************/
-
-void atari_slapstic_device::slapstic_log(running_machine &machine, offs_t offset)
-{
-	static attotime last_time;
-
-	if (!slapsticlog)
-		slapsticlog = fopen("slapstic.log", "w");
-	if (slapsticlog)
-	{
-		attotime time = machine.time();
-
-		if ((time - last_time) > attotime::from_seconds(1))
-			fprintf(slapsticlog, "------------------------------------\n");
-		last_time = time;
-
-		fprintf(slapsticlog, "%s: %04X B=%d ", machine.describe_context().c_str(), offset, current_bank);
-		switch (state)
-		{
-			case DISABLED:
-				fprintf(slapsticlog, "DISABLED\n");
-				break;
-			case ENABLED:
-				fprintf(slapsticlog, "ENABLED\n");
-				break;
-			case ALTERNATE1:
-				fprintf(slapsticlog, "ALTERNATE1\n");
-				break;
-			case ALTERNATE2:
-				fprintf(slapsticlog, "ALTERNATE2\n");
-				break;
-			case ALTERNATE3:
-				fprintf(slapsticlog, "ALTERNATE3\n");
-				break;
-			case BITWISE1:
-				fprintf(slapsticlog, "BITWISE1\n");
-				break;
-			case BITWISE2:
-				fprintf(slapsticlog, "BITWISE2\n");
-				break;
-			case BITWISE3:
-				fprintf(slapsticlog, "BITWISE3\n");
-				break;
-			case ADDITIVE1:
-				fprintf(slapsticlog, "ADDITIVE1\n");
-				break;
-			case ADDITIVE2:
-				fprintf(slapsticlog, "ADDITIVE2\n");
-				break;
-			case ADDITIVE3:
-				fprintf(slapsticlog, "ADDITIVE3\n");
-				break;
-		}
-		fflush(slapsticlog);
+	if(m_reset(addr)) {
+		m_sl->logerror("reset (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_active.get();
 	}
 }
 
 
-//**************************************************************************
-//  LEGACY HANDLING
-//**************************************************************************
+// Active state, 101-102, has direct, alt and bitwise, and alt must be done in-range
 
-void atari_slapstic_device::legacy_update_bank(int bank)
+atari_slapstic_device::active_101_102::active_101_102(atari_slapstic_device *sl, const checker &check, const slapstic_data *data) : state(sl)
 {
-	// if the bank has changed, copy the memory; Pit Fighter needs this
-	if (bank != m_legacy_bank)
-	{
-		// bank 0 comes from the copy we made earlier
-		if (bank == 0)
-			memcpy(m_legacy_memptr, &m_legacy_bank0[0], 0x2000);
-		else
-			memcpy(m_legacy_memptr, &m_legacy_memptr[bank * 0x1000], 0x2000);
+	for(int i=0; i != 4; i++)
+		m_bank[i] = check.test_bank(data->bank[i]);
+	m_alt = check.test_in(data->alt1);
+	m_bit = check.test_in(data->bit1);
+}
 
-		// remember the current bank
-		m_legacy_bank = bank;
+void atari_slapstic_device::active_101_102::test(offs_t addr) const
+{
+	if(m_bank[0](addr)) {
+		m_sl->logerror("direct switch bank 0 (%s)\n", m_sl->machine().describe_context());
+		m_sl->change_bank(0);
+		m_sl->m_state = m_sl->m_s_idle.get();
+	} else if(m_bank[1](addr)) {
+		m_sl->logerror("direct switch bank 1 (%s)\n", m_sl->machine().describe_context());
+		m_sl->change_bank(1);
+		m_sl->m_state = m_sl->m_s_idle.get();
+	} else if(m_bank[2](addr)) {
+		m_sl->logerror("direct switch bank 2 (%s)\n", m_sl->machine().describe_context());
+		m_sl->change_bank(2);
+		m_sl->m_state = m_sl->m_s_idle.get();
+	} else if(m_bank[3](addr)) {
+		m_sl->logerror("direct switch bank 3 (%s)\n", m_sl->machine().describe_context());
+		m_sl->change_bank(3);
+		m_sl->m_state = m_sl->m_s_idle.get();
+	} else if(m_alt(addr)) {
+		m_sl->logerror("alt start (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_alt_valid.get();
+	} else if(m_bit(addr)) {
+		m_sl->logerror("bitwise start (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_bit_load.get();
 	}
 }
 
 
-//-------------------------------------------------
-//  legacy_configure: Installs memory handlers for the
-//  slapstic
-//-------------------------------------------------
+// Active state, 103-110, has direct, alt and bitwise, and alt can be done anywhere
 
-void atari_slapstic_device::legacy_configure(cpu_device &device, offs_t base, offs_t mirror, u8 *mem)
+atari_slapstic_device::active_103_110::active_103_110(atari_slapstic_device *sl, const checker &check, const slapstic_data *data) : state(sl)
 {
-	// initialize the slapstic
-	m_legacy_configured = true;
-	slapstic_init();
-	save_item(NAME(m_legacy_bank));
-
-	// install the memory handlers
-	m_legacy_space = &device.space(AS_PROGRAM);
-	m_legacy_space->install_readwrite_handler(base, base + 0x7fff, 0, mirror, 0, read16s_delegate(*this, FUNC(atari_slapstic_device::slapstic_r)), write16s_delegate(*this, FUNC(atari_slapstic_device::slapstic_w)));
-	m_legacy_memptr = (u16 *)mem;
-
-	// allocate memory for a copy of bank 0
-	m_legacy_bank0.resize(0x2000);
-	memcpy(&m_legacy_bank0[0], m_legacy_memptr, 0x2000);
-
-	// ensure we recopy memory for the bank
-	m_legacy_bank = 0xff;
+	for(int i=0; i != 4; i++)
+		m_bank[i] = check.test_bank(data->bank[i]);
+	m_alt = check.test_any(data->alt1);
+	m_bit = check.test_in(data->bit1);
 }
 
-
-//-------------------------------------------------
-//  slapstic_w: Assuming that the slapstic sits in
-//  ROM memory space, we just simply tweak the slapstic at this
-//  address and do nothing more.
-//-------------------------------------------------
-
-void atari_slapstic_device::slapstic_w(offs_t offset, u16 data, u16 mem_mask)
+void atari_slapstic_device::active_103_110::test(offs_t addr) const
 {
-	assert(m_legacy_configured);
-
-	legacy_update_bank(slapstic_tweak(*m_legacy_space, offset));
-}
-
-
-//-------------------------------------------------
-//  slapstic_r: Tweaks the slapstic at the appropriate
-//  address and then reads a word from the underlying memory.
-//-------------------------------------------------
-
-u16 atari_slapstic_device::slapstic_r(offs_t offset, u16 mem_mask)
-{
-	assert(m_legacy_configured);
-
-	// fetch the result from the current bank first
-	u16 result = m_legacy_memptr[offset & 0xfff];
-
-	if (!machine().side_effects_disabled())
-	{
-		// then determine the new one
-		legacy_update_bank(slapstic_tweak(*m_legacy_space, offset));
+	if(m_bank[0](addr)) {
+		m_sl->logerror("direct switch bank 0 (%s)\n", m_sl->machine().describe_context());
+		m_sl->change_bank(0);
+		m_sl->m_state = m_sl->m_s_idle.get();
+	} else if(m_bank[1](addr)) {
+		m_sl->logerror("direct switch bank 1 (%s)\n", m_sl->machine().describe_context());
+		m_sl->change_bank(1);
+		m_sl->m_state = m_sl->m_s_idle.get();
+	} else if(m_bank[2](addr)) {
+		m_sl->logerror("direct switch bank 2 (%s)\n", m_sl->machine().describe_context());
+		m_sl->change_bank(2);
+		m_sl->m_state = m_sl->m_s_idle.get();
+	} else if(m_bank[3](addr)) {
+		m_sl->logerror("direct switch bank 3 (%s)\n", m_sl->machine().describe_context());
+		m_sl->change_bank(3);
+		m_sl->m_state = m_sl->m_s_idle.get();
+	} else if(m_alt(addr)) {
+		m_sl->logerror("alt start (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_alt_valid.get();
+	} else if(m_bit(addr)) {
+		m_sl->logerror("bitwise start (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_bit_load.get();
 	}
-	return result;
+}
+
+
+// Active state, 111-118, has direct, alt and add, and alt can be done anywhere
+
+atari_slapstic_device::active_111_118::active_111_118(atari_slapstic_device *sl, const checker &check, const slapstic_data *data) : state(sl)
+{
+	for(int i=0; i != 4; i++)
+		m_bank[i] = check.test_bank(data->bank[i]);
+	m_alt = check.test_any(data->alt1);
+	m_add = check.test_in(data->add1);
+}
+
+void atari_slapstic_device::active_111_118::test(offs_t addr) const
+{
+	if(m_bank[0](addr)) {
+		m_sl->logerror("direct switch bank 0 (%s)\n", m_sl->machine().describe_context());
+		m_sl->change_bank(0);
+		m_sl->m_state = m_sl->m_s_idle.get();
+	} else if(m_bank[1](addr)) {
+		m_sl->logerror("direct switch bank 1 (%s)\n", m_sl->machine().describe_context());
+		m_sl->change_bank(1);
+		m_sl->m_state = m_sl->m_s_idle.get();
+	} else if(m_bank[2](addr)) {
+		m_sl->logerror("direct switch bank 2 (%s)\n", m_sl->machine().describe_context());
+		m_sl->change_bank(2);
+		m_sl->m_state = m_sl->m_s_idle.get();
+	} else if(m_bank[3](addr)) {
+		m_sl->logerror("direct switch bank 3 (%s)\n", m_sl->machine().describe_context());
+		m_sl->change_bank(3);
+		m_sl->m_state = m_sl->m_s_idle.get();
+	} else if(m_alt(addr)) {
+		m_sl->logerror("alt start (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_alt_valid.get();
+	} else if(m_add(addr)) {
+		m_sl->logerror("add start (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_add_load.get();
+	}
+}
+
+
+// alt validation, 101-102 required to be outside of the range (hits a 6809 dummy vma access in practive)
+
+atari_slapstic_device::alt_valid_101_102::alt_valid_101_102(atari_slapstic_device *sl, const checker &check, const slapstic_data *data) : state(sl)
+{
+	m_reset = check.test_reset();
+	m_inside = check.test_inside();
+	m_valid = check.test_any(data->alt2);
+}
+
+void atari_slapstic_device::alt_valid_101_102::test(offs_t addr) const
+{
+	if(m_reset(addr)) {
+		m_sl->logerror("reset (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_active.get();
+	} else if(!m_inside(addr) && m_valid(addr)) {
+		m_sl->logerror("alt valid (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_alt_select.get();
+	} else {
+		m_sl->logerror("alt sequence break at valid (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_active.get();
+	}
+}
+
+
+// alt validation, 103-110, in-range
+
+atari_slapstic_device::alt_valid_103_110::alt_valid_103_110(atari_slapstic_device *sl, const checker &check, const slapstic_data *data) : state(sl)
+{
+	m_reset = check.test_reset();
+	m_valid = check.test_in(data->alt2);
+}
+
+void atari_slapstic_device::alt_valid_103_110::test(offs_t addr) const
+{
+	if(m_reset(addr)) {
+		m_sl->logerror("reset (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_active.get();
+	} else if(m_valid(addr)) {
+		m_sl->logerror("alt valid (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_alt_select.get();
+	} else {
+		m_sl->logerror("alt sequence break at valid (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_active.get();
+	}
+}
+
+
+// alt validation, 111-118, in-range, can also switch to add
+
+atari_slapstic_device::alt_valid_111_118::alt_valid_111_118(atari_slapstic_device *sl, const checker &check, const slapstic_data *data) : state(sl)
+{
+	m_reset = check.test_reset();
+	m_valid = check.test_in(data->alt2);
+	m_add   = check.test_in(data->add1);
+}
+
+void atari_slapstic_device::alt_valid_111_118::test(offs_t addr) const
+{
+	if(m_reset(addr)) {
+		m_sl->logerror("reset (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_active.get();
+	} else if(m_valid(addr)) {
+		m_sl->logerror("alt valid (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_alt_select.get();
+	} else if(m_add(addr)) {
+		m_sl->logerror("alt switch to add (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_add_load.get();
+	} else {
+		m_sl->logerror("alt sequence break at valid (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_active.get();
+	}
+}
+
+
+// alt selection, 101-110, access must be done in-range
+
+atari_slapstic_device::alt_select_101_110::alt_select_101_110(atari_slapstic_device *sl, const checker &check, const slapstic_data *data, int shift) : state(sl)
+{
+	m_reset  = check.test_reset();
+	m_select = check.test_in(data->alt3);
+	m_shift  = shift + data->altshift;
+}
+
+void atari_slapstic_device::alt_select_101_110::test(offs_t addr) const
+{
+	if(m_reset(addr)) {
+		m_sl->logerror("reset (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_active.get();
+	} else if(m_select(addr)) {
+		m_sl->logerror("alt select (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_loaded_bank = (addr >> m_shift) & 3;
+		m_sl->m_state = m_sl->m_s_alt_commit.get();
+	} else {
+		m_sl->logerror("alt sequence break at select (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_active.get();
+	}
+}
+
+
+// alt selection, 111-118, access can be done anywhere
+
+atari_slapstic_device::alt_select_111_118::alt_select_111_118(atari_slapstic_device *sl, const checker &check, const slapstic_data *data, int shift) : state(sl)
+{
+	m_reset  = check.test_reset();
+	m_select = check.test_any(data->alt3);
+	m_shift  = shift + data->altshift;
+}
+
+void atari_slapstic_device::alt_select_111_118::test(offs_t addr) const
+{
+	if(m_reset(addr)) {
+		m_sl->logerror("reset (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_active.get();
+	} else if(m_select(addr)) {
+		m_sl->logerror("alt select (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_loaded_bank = (addr >> m_shift) & 3;
+		m_sl->m_state = m_sl->m_s_alt_commit.get();
+	} else {
+		m_sl->logerror("alt sequence break at select (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_active.get();
+	}
+}
+
+
+// alt commit
+
+atari_slapstic_device::alt_commit::alt_commit(atari_slapstic_device *sl, const checker &check, const slapstic_data *data) : state(sl)
+{
+	m_reset  = check.test_reset();
+	m_commit = check.test_any(data->alt4);
+}
+
+void atari_slapstic_device::alt_commit::test(offs_t addr) const
+{
+	if(m_reset(addr)) {
+		m_sl->logerror("reset (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_active.get();
+	} else if(m_commit(addr)) {
+		m_sl->logerror("alt/add commit (%s)\n", m_sl->machine().describe_context());
+		m_sl->commit_bank();
+		m_sl->m_state = m_sl->m_s_idle.get();
+	}
+}
+
+
+// bitwise, load the current bank state
+
+atari_slapstic_device::bit_load::bit_load(atari_slapstic_device *sl, const checker &check, const slapstic_data *data) : state(sl)
+{
+	m_reset = check.test_reset();
+	m_load  = check.test_in(data->bit2);
+}
+
+void atari_slapstic_device::bit_load::test(offs_t addr) const
+{
+	if(m_reset(addr)) {
+		m_sl->logerror("reset (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_active.get();
+	} else if(m_load(addr)) {
+		m_sl->logerror("bitwise load (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_loaded_bank = m_sl->m_current_bank;
+		m_sl->m_state = m_sl->m_s_bit_set_odd.get();
+	}
+}
+
+// bitwise, change one bit
+
+atari_slapstic_device::bit_set::bit_set(atari_slapstic_device *sl, const checker &check, const slapstic_data *data, bool is_odd) : state(sl), m_is_odd(is_odd)
+{
+	m_reset  = check.test_reset();
+	m_clear0 = check.test_in(is_odd ? data->bit3c0 : data->bit3s1);
+	m_set0   = check.test_in(is_odd ? data->bit3s0 : data->bit3c1);
+	m_clear1 = check.test_in(is_odd ? data->bit3c1 : data->bit3s0);
+	m_set1   = check.test_in(is_odd ? data->bit3s1 : data->bit3c0);
+	m_commit = check.test_in(data->bit4);
+}
+
+void atari_slapstic_device::bit_set::test(offs_t addr) const
+{
+	if(m_reset(addr)) {
+		m_sl->logerror("reset (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_active.get();
+	} else if(m_clear0(addr)) {
+		m_sl->logerror("bitwise clear 0 (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_loaded_bank &= ~1;
+		m_sl->m_state = m_is_odd ? m_sl->m_s_bit_set_even.get() : m_sl->m_s_bit_set_odd.get();
+	} else if(m_set0(addr)) {
+		m_sl->logerror("bitwise set 0 (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_loaded_bank |= 1;
+		m_sl->m_state = m_is_odd ? m_sl->m_s_bit_set_even.get() : m_sl->m_s_bit_set_odd.get();
+	} else if(m_clear1(addr)) {
+		m_sl->logerror("bitwise clear 1 (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_loaded_bank &= ~2;
+		m_sl->m_state = m_is_odd ? m_sl->m_s_bit_set_even.get() : m_sl->m_s_bit_set_odd.get();
+	} else if(m_set1(addr)) {
+		m_sl->logerror("bitwise set 1 (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_loaded_bank |= 2;
+		m_sl->m_state = m_is_odd ? m_sl->m_s_bit_set_even.get() : m_sl->m_s_bit_set_odd.get();
+	} else if(m_commit(addr)) {
+		m_sl->logerror("bitwise commit %d (%s)\n", m_sl->m_loaded_bank, m_sl->machine().describe_context());
+		m_sl->commit_bank();
+		m_sl->m_state = m_sl->m_s_idle.get();
+	}
+}
+
+
+// add, load the current bank state
+
+atari_slapstic_device::add_load::add_load(atari_slapstic_device *sl, const checker &check, const slapstic_data *data) : state(sl)
+{
+	m_reset = check.test_reset();
+	m_load  = check.test_in(data->add2);
+}
+
+void atari_slapstic_device::add_load::test(offs_t addr) const
+{
+	if(m_reset(addr)) {
+		m_sl->logerror("reset (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_active.get();
+	} else if(m_load(addr)) {
+		m_sl->logerror("add load (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_loaded_bank = m_sl->m_current_bank;
+		m_sl->m_state = m_sl->m_s_add_set.get();
+	} else {
+		m_sl->logerror("add sequence break at load (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_active.get();
+	}
+}
+
+
+// add, change the bank number
+
+atari_slapstic_device::add_set::add_set(atari_slapstic_device *sl, const checker &check, const slapstic_data *data) : state(sl)
+{
+	m_reset = check.test_reset();
+	m_add1  = check.test_in(data->addplus1);
+	m_add2  = check.test_in(data->addplus2);
+	m_end   = check.test_in(data->add3);
+}
+
+void atari_slapstic_device::add_set::test(offs_t addr) const
+{
+	if(m_reset(addr)) {
+		m_sl->logerror("reset (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_active.get();
+	} else if(m_add1(addr)) {
+		m_sl->logerror("add +1 (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_loaded_bank = (m_sl->m_loaded_bank + 1) & 3;
+	} else if(m_add2(addr)) {
+		m_sl->logerror("add +2 (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_loaded_bank = (m_sl->m_loaded_bank + 2) & 3;
+	} else if(m_end(addr)) {
+		m_sl->logerror("add end (%s)\n", m_sl->machine().describe_context());
+		m_sl->m_state = m_sl->m_s_alt_commit.get();
+	}
+}
+
+
+// state saving management
+
+void atari_slapstic_device::device_pre_save()
+{
+	m_saved_state = m_state->state_id();
+}
+
+u8 atari_slapstic_device::idle              ::state_id() const { return S_IDLE; }
+u8 atari_slapstic_device::active_101_102    ::state_id() const { return S_ACTIVE; }
+u8 atari_slapstic_device::active_103_110    ::state_id() const { return S_ACTIVE; }
+u8 atari_slapstic_device::active_111_118    ::state_id() const { return S_ACTIVE; }
+u8 atari_slapstic_device::alt_valid_101_102 ::state_id() const { return S_ALT_VALID; }
+u8 atari_slapstic_device::alt_valid_103_110 ::state_id() const { return S_ALT_VALID; }
+u8 atari_slapstic_device::alt_valid_111_118 ::state_id() const { return S_ALT_VALID; }
+u8 atari_slapstic_device::alt_select_101_110::state_id() const { return S_ALT_SELECT; }
+u8 atari_slapstic_device::alt_select_111_118::state_id() const { return S_ALT_SELECT; }
+u8 atari_slapstic_device::alt_commit        ::state_id() const { return S_ALT_COMMIT; }
+u8 atari_slapstic_device::bit_load          ::state_id() const { return S_BIT_LOAD; }
+u8 atari_slapstic_device::bit_set           ::state_id() const { return m_is_odd ? S_BIT_SET_ODD : S_BIT_SET_EVEN; }
+u8 atari_slapstic_device::add_load          ::state_id() const { return S_ADD_LOAD; }
+u8 atari_slapstic_device::add_set           ::state_id() const { return S_ADD_SET; }
+
+void atari_slapstic_device::device_post_load()
+{
+	switch(m_saved_state) {
+	case S_IDLE:         m_state = m_s_idle.get(); break;
+	case S_ACTIVE:       m_state = m_s_active.get(); break;
+	case S_ALT_VALID:    m_state = m_s_alt_valid.get(); break;
+	case S_ALT_SELECT:   m_state = m_s_alt_select.get(); break;
+	case S_ALT_COMMIT:   m_state = m_s_alt_commit.get(); break;
+	case S_BIT_LOAD:     m_state = m_s_bit_load.get(); break;
+	case S_BIT_SET_ODD:  m_state = m_s_bit_set_odd.get(); break;
+	case S_BIT_SET_EVEN: m_state = m_s_bit_set_even.get(); break;
+	case S_ADD_LOAD:     m_state = m_s_add_load.get(); break;
+	case S_ADD_SET:      m_state = m_s_add_set.get(); break;
+	}
 }

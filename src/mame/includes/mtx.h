@@ -40,6 +40,12 @@ public:
 		, m_exp(*this, "exp")
 		, m_extrom(*this, "extrom")
 		, m_rompak(*this, "rompak")
+		, m_rammap_bank1(*this, "rammap_bank1")
+		, m_rammap_bank2(*this, "rammap_bank2")
+		, m_rammap_bank3(*this, "rammap_bank3")
+		, m_rommap_bank1(*this, "rommap_bank1")
+		, m_rommap_bank2(*this, "rommap_bank2")
+		, m_rommap_bank3(*this, "rommap_bank3")
 	{ }
 
 	void rs128(machine_config &config);
@@ -62,6 +68,12 @@ private:
 	required_device<mtx_exp_slot_device> m_exp;
 	required_device<generic_slot_device> m_extrom;
 	required_device<generic_slot_device> m_rompak;
+	memory_bank_creator m_rammap_bank1;
+	memory_bank_creator m_rammap_bank2;
+	memory_bank_creator m_rammap_bank3;
+	memory_bank_creator m_rommap_bank1;
+	memory_bank_creator m_rommap_bank2;
+	memory_bank_creator m_rommap_bank3;
 
 	/* keyboard state */
 	uint8_t m_key_sense;

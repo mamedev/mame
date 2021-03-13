@@ -20,9 +20,12 @@ class m6502_swap_op_d5_d6 : public m6502_device {
 public:
 	m6502_swap_op_d5_d6(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void set_encryption_state(bool state);
 protected:
 	class mi_decrypt : public mi_default {
 	public:
+
+		bool m_encryption_enabled;
 
 		virtual ~mi_decrypt() {}
 		virtual uint8_t read_sync(uint16_t adr) override;
@@ -49,9 +52,12 @@ class n2a03_core_swap_op_d5_d6 : public n2a03_core_device {
 public:
 	n2a03_core_swap_op_d5_d6(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void set_encryption_state(bool state);
 protected:
 	class mi_decrypt : public mi_default {
 	public:
+
+		bool m_encryption_enabled;
 
 		virtual ~mi_decrypt() {}
 		virtual uint8_t read_sync(uint16_t adr) override;

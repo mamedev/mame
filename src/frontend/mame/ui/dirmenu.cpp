@@ -18,6 +18,8 @@
 #include "emuopts.h"
 #include "mame.h"
 
+#include "corestr.h"
+
 
 namespace ui {
 static int ADDING = 1;
@@ -101,7 +103,7 @@ void menu_directory::handle()
 void menu_directory::populate(float &customtop, float &custombottom)
 {
 	for (auto & elem : s_folders)
-		item_append(_(elem.name), "", 0, (void *)(uintptr_t)elem.action);
+		item_append(_(elem.name), 0, (void *)(uintptr_t)elem.action);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
@@ -176,10 +178,10 @@ void menu_display_actual::populate(float &customtop, float &custombottom)
 	while (path.next(curpath, nullptr))
 		m_folders.push_back(curpath);
 
-	item_append((s_folders[m_ref].action == CHANGE) ? _("Change Folder") : _("Add Folder"), "", 0, (void *)ADD_CHANGE);
+	item_append((s_folders[m_ref].action == CHANGE) ? _("Change Folder") : _("Add Folder"), 0, (void *)ADD_CHANGE);
 
 	if (m_folders.size() > 1)
-		item_append(_("Remove Folder"), "", 0, (void *)REMOVE);
+		item_append(_("Remove Folder"), 0, (void *)REMOVE);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = (m_folders.size() + 1) * ui().get_line_height() + 6.0f * ui().box_tb_border();
@@ -253,7 +255,7 @@ void menu_add_change_folder::handle()
 			const menu_item &pitem = item(index);
 
 			// go up to the parent path
-			if (!strcmp(pitem.text.c_str(), ".."))
+			if (pitem.text == "..")
 			{
 				size_t first_sep = m_current_path.find_first_of(PATH_SEPARATOR[0]);
 				size_t last_sep = m_current_path.find_last_of(PATH_SEPARATOR[0]);
@@ -263,7 +265,7 @@ void menu_add_change_folder::handle()
 			else
 			{
 				// if isn't a drive, appends the directory
-				if (strcmp(pitem.subtext.c_str(), "[DRIVE]") != 0)
+				if (pitem.subtext != "[DRIVE]")
 				{
 					if (m_current_path[m_current_path.length() - 1] == PATH_SEPARATOR[0])
 						m_current_path.append(pitem.text);
@@ -290,7 +292,7 @@ void menu_add_change_folder::handle()
 				{
 					if (ui().options().exists(s_folders[m_ref].option))
 						ui().options().set_value(s_folders[m_ref].option, m_current_path, OPTION_PRIORITY_CMDLINE);
-					else if (strcmp(machine().options().value(s_folders[m_ref].option), m_current_path.c_str()) != 0)
+					else if (machine().options().value(s_folders[m_ref].option) != m_current_path)
 					{
 						machine().options().set_value(s_folders[m_ref].option, m_current_path, OPTION_PRIORITY_CMDLINE);
 					}
@@ -308,7 +310,7 @@ void menu_add_change_folder::handle()
 
 					if (ui().options().exists(s_folders[m_ref].option))
 						ui().options().set_value(s_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
-					else if (strcmp(machine().options().value(s_folders[m_ref].option), tmppath.c_str()) != 0)
+					else if (machine().options().value(s_folders[m_ref].option) != tmppath)
 					{
 						machine().options().set_value(s_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
 					}
@@ -384,13 +386,12 @@ void menu_add_change_folder::handle()
 void menu_add_change_folder::populate(float &customtop, float &custombottom)
 {
 	// open a path
-	const char *volume_name = nullptr;
 	file_enumerator path(m_current_path.c_str());
 	const osd::directory::entry *dirent;
 	int folders_count = 0;
 
 	// add the drives
-	for (int i = 0; (volume_name = osd_get_volume_name(i)) != nullptr; ++i)
+	for (std::string const &volume_name : osd_get_volume_names())
 		item_append(volume_name, "[DRIVE]", 0, (void *)(uintptr_t)++folders_count);
 
 	// add the directories
@@ -480,7 +481,7 @@ void menu_remove_folder::handle()
 
 		if (ui().options().exists(s_folders[m_ref].option))
 			ui().options().set_value(s_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
-		else if (strcmp(machine().options().value(s_folders[m_ref].option),tmppath.c_str())!=0)
+		else if (machine().options().value(s_folders[m_ref].option) != tmppath)
 		{
 			machine().options().set_value(s_folders[m_ref].option, tmppath, OPTION_PRIORITY_CMDLINE);
 		}
@@ -498,7 +499,7 @@ void menu_remove_folder::populate(float &customtop, float &custombottom)
 {
 	int folders_count = 0;
 	for (auto & elem : m_folders)
-		item_append(elem, "", 0, (void *)(uintptr_t)++folders_count);
+		item_append(elem, 0, (void *)(uintptr_t)++folders_count);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();

@@ -145,7 +145,7 @@ DEFINE_DEVICE_TYPE_NS(SUN_TYPE5_JP_HLE_KEYBOARD, bus::sunkbd, hle_type5_jp_devic
 
 
 
-namespace bus { namespace sunkbd {
+namespace bus::sunkbd {
 
 namespace {
 
@@ -985,6 +985,7 @@ void hle_device_base::received_byte(uint8_t byte)
 
 	default:
 		assert(m_rx_state == RX_IDLE);
+		[[fallthrough]];
 	case RX_IDLE:
 		switch (byte)
 		{
@@ -1279,4 +1280,4 @@ ioport_constructor hle_type5_jp_device::device_input_ports() const
 	return INPUT_PORTS_NAME(hle_type5_jp_device);
 }
 
-} } // namespace bus::sunkbd
+} // namespace bus::sunkbd

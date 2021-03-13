@@ -40,7 +40,7 @@ protected:
 	virtual void wangpcbus_aiowc_w(offs_t offset, uint16_t mem_mask, uint16_t data) override;
 
 private:
-	optional_shared_ptr<uint16_t> m_ram;
+	memory_share_creator<uint16_t> m_ram;
 	uint16_t m_option;
 	int m_parity_error;
 	int m_parity_odd;

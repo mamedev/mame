@@ -294,29 +294,29 @@ void lc80_state::machine_start()
 	membank("bank4")->configure_entry(0, &ROM[0x2000]);
 	membank("bank4")->set_entry(0);
 
-	program.install_readwrite_bank(0x0000, 0x07ff, "bank1");
-	program.install_readwrite_bank(0x0800, 0x0fff, "bank2");
-	program.install_readwrite_bank(0x1000, 0x17ff, "bank3");
+	program.install_readwrite_bank(0x0000, 0x07ff, membank("bank1"));
+	program.install_readwrite_bank(0x0800, 0x0fff, membank("bank2"));
+	program.install_readwrite_bank(0x1000, 0x17ff, membank("bank3"));
 
 	switch (m_ram->size())
 	{
 	case 1*1024:
-		program.install_readwrite_bank(0x2000, 0x23ff, "bank4");
+		program.install_readwrite_bank(0x2000, 0x23ff, membank("bank4"));
 		program.unmap_readwrite(0x2400, 0x2fff);
 		break;
 
 	case 2*1024:
-		program.install_readwrite_bank(0x2000, 0x27ff, "bank4");
+		program.install_readwrite_bank(0x2000, 0x27ff, membank("bank4"));
 		program.unmap_readwrite(0x2800, 0x2fff);
 		break;
 
 	case 3*1024:
-		program.install_readwrite_bank(0x2000, 0x2bff, "bank4");
+		program.install_readwrite_bank(0x2000, 0x2bff, membank("bank4"));
 		program.unmap_readwrite(0x2c00, 0x2fff);
 		break;
 
 	case 4*1024:
-		program.install_readwrite_bank(0x2000, 0x2fff, "bank4");
+		program.install_readwrite_bank(0x2000, 0x2fff, membank("bank4"));
 		break;
 	}
 

@@ -39,6 +39,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define SCREEN_TAG      "screen"
 #define Z80_TAG         "u13"
 #define AY8910_TAG      "u21"
@@ -66,7 +68,8 @@ public:
 		m_y(*this, "Y%u", 0),
 		m_joy(*this, "JOY%u", 0),
 		m_modifiers(*this, "MODIFIERS"),
-		m_joykeymap(*this, "JOYKEYMAP%u", 0)
+		m_joykeymap(*this, "JOYKEYMAP%u", 0),
+		m_banks(*this, "bank%u", 1U)
 	{ }
 
 	void mc1000(machine_config &config);
@@ -85,6 +88,7 @@ private:
 	required_ioport_array<2> m_joy;
 	required_ioport m_modifiers;
 	required_ioport_array<2> m_joykeymap;
+	required_memory_bank_array<5> m_banks;
 
 	std::unique_ptr<uint8_t[]> m_banked_ram;
 
@@ -109,8 +113,8 @@ private:
 
 	/* memory state */
 	int m_rom0000;
-	int m_mc6845_bank;
-	int m_mc6847_bank;
+	uint8_t m_mc6845_bank;
+	uint8_t m_mc6847_bank;
 
 	/* keyboard state */
 	int m_keylatch;
@@ -137,12 +141,12 @@ void mc1000_state::bankswitch()
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	/* MC6845 video RAM */
-	membank("bank2")->set_entry(m_mc6845_bank);
+	m_banks[1]->set_entry(m_mc6845_bank);
 
 	/* extended RAM */
 	if (m_ram->size() > 16*1024)
 	{
-		program.install_readwrite_bank(0x4000, 0x7fff, "bank3");
+		program.install_readwrite_bank(0x4000, 0x7fff, m_banks[2]);
 	}
 	else
 	{
@@ -154,7 +158,7 @@ void mc1000_state::bankswitch()
 	{
 		if (m_ram->size() > 16*1024)
 		{
-			program.install_readwrite_bank(0x8000, 0x97ff, "bank4");
+			program.install_readwrite_bank(0x8000, 0x97ff, m_banks[3]);
 		}
 		else
 		{
@@ -163,15 +167,15 @@ void mc1000_state::bankswitch()
 	}
 	else
 	{
-		program.install_readwrite_bank(0x8000, 0x97ff, "bank4");
+		program.install_readwrite_bank(0x8000, 0x97ff, m_banks[3]);
 	}
 
-	membank("bank4")->set_entry(m_mc6847_bank);
+	m_banks[3]->set_entry(m_mc6847_bank);
 
 	/* extended RAM */
 	if (m_ram->size() > 16*1024)
 	{
-		program.install_readwrite_bank(0x9800, 0xbfff, "bank5");
+		program.install_readwrite_bank(0x9800, 0xbfff, m_banks[4]);
 	}
 	else
 	{
@@ -441,7 +445,7 @@ uint8_t mc1000_state::keydata_r()
 
 uint8_t mc1000_state::rom_banking_r(offs_t offset)
 {
-	membank("bank1")->set_entry(0);
+	m_banks[0]->set_entry(0);
 	m_rom0000 = 0;
 	return m_rom->base()[offset];
 }
@@ -453,25 +457,27 @@ void mc1000_state::machine_start()
 	/* setup memory banking */
 	m_banked_ram = make_unique_clear<uint8_t[]>(0xc000);
 
-	membank("bank1")->configure_entry(0, m_banked_ram.get());
-	membank("bank1")->configure_entry(1, m_rom->base());
-	membank("bank1")->set_entry(1);
+	m_banks[0]->configure_entry(0, m_banked_ram.get());
+	m_banks[0]->configure_entry(1, m_rom->base());
+	m_banks[0]->set_entry(1);
 
 	m_rom0000 = 1;
+	m_mc6845_bank = 0;
+	m_mc6847_bank = 0;
 
-	membank("bank2")->configure_entry(0, m_banked_ram.get() + 0x2000);
-	membank("bank2")->configure_entry(1, m_mc6845_video_ram);
-	membank("bank2")->set_entry(0);
+	m_banks[1]->configure_entry(0, m_banked_ram.get() + 0x2000);
+	m_banks[1]->configure_entry(1, m_mc6845_video_ram);
+	m_banks[1]->set_entry(0);
 
-	membank("bank3")->configure_entry(0, m_banked_ram.get() + 0x4000);
-	membank("bank3")->set_entry(0);
+	m_banks[2]->configure_entry(0, m_banked_ram.get() + 0x4000);
+	m_banks[2]->set_entry(0);
 
-	membank("bank4")->configure_entry(0, m_mc6847_video_ram);
-	membank("bank4")->configure_entry(1, m_banked_ram.get() + 0x8000);
-	membank("bank4")->set_entry(0);
+	m_banks[3]->configure_entry(0, m_mc6847_video_ram);
+	m_banks[3]->configure_entry(1, m_banked_ram.get() + 0x8000);
+	m_banks[3]->set_entry(0);
 
-	membank("bank5")->configure_entry(0, m_banked_ram.get() + 0x9800);
-	membank("bank5")->set_entry(0);
+	m_banks[4]->configure_entry(0, m_banked_ram.get() + 0x9800);
+	m_banks[4]->set_entry(0);
 
 	bankswitch();
 
@@ -487,7 +493,7 @@ void mc1000_state::machine_start()
 
 void mc1000_state::machine_reset()
 {
-	membank("bank1")->set_entry(1);
+	m_banks[0]->set_entry(1);
 
 	m_rom0000 = 1;
 }
@@ -602,6 +608,8 @@ ROM_START( mc1000 )
 	ROM_LOAD( "mc1000.ic17", 0x0000, 0x2000, CRC(8e78d80d) SHA1(9480270e67a5db2e7de8bc5c8b9e0bb210d4142b) )
 	ROM_LOAD( "mc1000.ic12", 0x2000, 0x2000, CRC(750c95f0) SHA1(fd766f5ea4481ef7fd4df92cf7d8397cc2b5a6c4) )
 ROM_END
+
+} // Anonymous namespace
 
 
 /* System Drivers */

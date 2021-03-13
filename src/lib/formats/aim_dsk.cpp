@@ -40,7 +40,7 @@ const char *aim_format::extensions() const
 }
 
 
-int aim_format::identify(io_generic *io, uint32_t form_factor)
+int aim_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	if (io_generic_size(io) == 2068480)
 	{
@@ -51,7 +51,7 @@ int aim_format::identify(io_generic *io, uint32_t form_factor)
 }
 
 
-bool aim_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool aim_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	image->set_variant(floppy_image::DSQD);
 
@@ -111,6 +111,7 @@ bool aim_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 					raw_w(raw_track_data, 16, 0x8924);
 					raw_w(raw_track_data, 16, 0x5555);
 					data_count = 0;
+					break;
 
 				// TELETEXT.AIM and others
 				case 0xff:

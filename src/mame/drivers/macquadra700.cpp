@@ -14,13 +14,12 @@
 #include "machine/macrtc.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
-#include "machine/applefdc.h"
 #include "machine/ram.h"
-#include "machine/sonydriv.h"
-#include "machine/swim.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
 #include "machine/macadb.h"
+#include "machine/applefdintf.h"
+#include "machine/swim1.h"
 #include "machine/dp83932c.h"
 #include "machine/nscsi_bus.h"
 #include "machine/ncr5390.h"
@@ -65,7 +64,8 @@ public:
 		m_via2(*this, "via2"),
 		m_macadb(*this, "macadb"),
 		m_ram(*this, RAM_TAG),
-		m_iwm(*this, "fdc"),
+		m_swim(*this, "fdc"),
+		m_floppy(*this, "fdc:%d", 0U),
 		m_rtc(*this,"rtc"),
 		m_scsibus1(*this, "scsi1"),
 		m_ncr1(*this, "scsi1:7:ncr5394"),
@@ -74,7 +74,9 @@ public:
 		m_palette(*this, "palette"),
 		m_easc(*this, "easc"),
 		m_scc(*this, "scc"),
-		m_vram(*this, "vram")
+		m_vram(*this, "vram"),
+		m_cur_floppy(nullptr),
+		m_hdsel(0)
 	{
 	}
 
@@ -88,7 +90,8 @@ private:
 	required_device<via6522_device> m_via1, m_via2;
 	optional_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
-	required_device<applefdc_base_device> m_iwm;
+	required_device<applefdintf_device> m_swim;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<rtc3430042_device> m_rtc;
 	required_device<nscsi_bus_device> m_scsibus1;
 	required_device<ncr53cf94_device> m_ncr1;
@@ -101,6 +104,8 @@ private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void video_reset() override;
 
 	uint32_t screen_update_dafb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t dafb_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -111,8 +116,6 @@ private:
 
 	TIMER_CALLBACK_MEMBER(dafb_vbl_tick);
 	TIMER_CALLBACK_MEMBER(dafb_cursor_tick);
-	DECLARE_VIDEO_START(macdafb);
-	DECLARE_VIDEO_RESET(macdafb);
 
 	u32 *m_ram_ptr, *m_rom_ptr;
 	u32 m_ram_mask, m_ram_size, m_rom_size;
@@ -144,6 +147,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(drq_539x_1_w);
 	DECLARE_WRITE_LINE_MEMBER(drq_539x_2_w);
 
+	floppy_image_device *m_cur_floppy;
+	int m_hdsel;
+
 	uint16_t mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t mac_via2_r(offs_t offset);
@@ -156,12 +162,13 @@ private:
 	uint8_t mac_via2_in_b();
 	void mac_via2_out_a(uint8_t data);
 	void mac_via2_out_b(uint8_t data);
+	void mac_via_sync();
 	void field_interrupts();
 	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);
 	DECLARE_WRITE_LINE_MEMBER(mac_via2_irq);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 	WRITE_LINE_MEMBER(via_cb2_w) { m_macadb->adb_data_w(state); }
-	int m_via_cycles, m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
+	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
 	int m_irq_count, m_ca2_data;
 
 	uint32_t rom_switch_r(offs_t offset);
@@ -169,22 +176,31 @@ private:
 
 	uint16_t mac_scc_r(offs_t offset)
 	{
+		mac_via_sync();
 		uint16_t result = m_scc->dc_ab_r(offset);
 		return (result << 8) | result;
 	}
-	void mac_scc_2_w(offs_t offset, uint16_t data) { m_scc->dc_ab_w(offset, data >> 8); }
+	void mac_scc_2_w(offs_t offset, uint16_t data) { mac_via_sync(); m_scc->dc_ab_w(offset, data >> 8); }
 
-	uint16_t mac_iwm_r(offs_t offset, uint16_t mem_mask)
+	void phases_w(uint8_t phases);
+	void devsel_w(uint8_t devsel);
+
+	uint16_t swim_r(offs_t offset, u16 mem_mask)
 	{
-		uint16_t result = m_iwm->read(offset >> 8);
-		return (result << 8) | result;
+		if (!machine().side_effects_disabled())
+		{
+			m_maincpu->adjust_icount(-5);
+		}
+
+		u16 result = m_swim->read((offset >> 8) & 0xf);
+		return result << 8;
 	}
-	void mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+	void swim_w(offs_t offset, u16 data, u16 mem_mask)
 	{
 		if (ACCESSING_BITS_0_7)
-			m_iwm->write((offset >> 8), data & 0xff);
+			m_swim->write((offset >> 8) & 0xf, data & 0xff);
 		else
-			m_iwm->write((offset >> 8), data>>8);
+			m_swim->write((offset >> 8) & 0xf, data>>8);
 	}
 
 	uint8_t mac_5396_r(offs_t offset);
@@ -228,7 +244,6 @@ void macquadra_state::machine_start()
 	m_ram_mask = m_ram_size - 1;
 	m_rom_ptr = (u32*)memregion("bootrom")->base();
 	m_rom_size = memregion("bootrom")->bytes();
-	m_via_cycles = -50;
 	m_via_interrupt = m_via2_interrupt = m_scc_interrupt = 0;
 	m_last_taken_interrupt = -1;
 	m_irq_count = m_ca2_data = 0;
@@ -255,8 +270,7 @@ void macquadra_state::machine_reset()
 	offs_t memory_mirror = memory_end & ~(memory_size - 1);
 
 	space.unmap_write(0x00000000, memory_end);
-	space.install_read_bank(0x00000000, memory_end & ~memory_mirror, memory_mirror, "bank1");
-	membank("bank1")->set_base(m_rom_ptr);
+	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
 
 	// start 60.15 Hz timer
 	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
@@ -336,7 +350,7 @@ TIMER_CALLBACK_MEMBER(macquadra_state::dafb_cursor_tick)
 	m_cursor_timer->adjust(m_screen->time_until_pos(m_cursor_line, 0), 0);
 }
 
-VIDEO_START_MEMBER(macquadra_state,macdafb)
+void macquadra_state::video_start() // DAFB
 {
 	m_vbl_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macquadra_state::dafb_vbl_tick),this));
 	m_cursor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(macquadra_state::dafb_cursor_tick),this));
@@ -345,7 +359,7 @@ VIDEO_START_MEMBER(macquadra_state,macdafb)
 	m_cursor_timer->adjust(attotime::never);
 }
 
-VIDEO_RESET_MEMBER(macquadra_state,macdafb)
+void macquadra_state::video_reset() // DAFB
 {
 	m_dafb_count = 0;
 	m_dafb_clutoffs = 0;
@@ -640,9 +654,10 @@ uint16_t macquadra_state::mac_via_r(offs_t offset)
 	offset >>= 8;
 	offset &= 0x0f;
 
-	data = m_via1->read(offset);
+	if (!machine().side_effects_disabled())
+		mac_via_sync();
 
-	m_maincpu->adjust_icount(m_via_cycles);
+	data = m_via1->read(offset);
 
 	return (data & 0xff) | (data << 8);
 }
@@ -652,12 +667,12 @@ void macquadra_state::mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	offset >>= 8;
 	offset &= 0x0f;
 
+	mac_via_sync();
+
 	if (ACCESSING_BITS_0_7)
 		m_via1->write(offset, data & 0xff);
 	if (ACCESSING_BITS_8_15)
 		m_via1->write(offset, (data >> 8) & 0xff);
-
-	m_maincpu->adjust_icount(m_via_cycles);
 }
 
 WRITE_LINE_MEMBER(macquadra_state::mac_via_irq)
@@ -679,6 +694,9 @@ uint16_t macquadra_state::mac_via2_r(offs_t offset)
 	offset >>= 8;
 	offset &= 0x0f;
 
+	if (!machine().side_effects_disabled())
+		mac_via_sync();
+
 	data = m_via2->read(offset);
 	return (data & 0xff) | (data << 8);
 }
@@ -688,10 +706,35 @@ void macquadra_state::mac_via2_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	offset >>= 8;
 	offset &= 0x0f;
 
+	mac_via_sync();
+
 	if (ACCESSING_BITS_0_7)
 		m_via2->write(offset, data & 0xff);
 	if (ACCESSING_BITS_8_15)
 		m_via2->write(offset, (data >> 8) & 0xff);
+}
+
+void macquadra_state::mac_via_sync()
+{
+	// The via runs at 783.36KHz while the main cpu runs at 15MHz or
+	// more, so we need to sync the access with the via clock.  Plus
+	// the whole access takes half a (via) cycle and ends when synced
+	// with the main cpu again.
+
+	// Get the main cpu time
+	u64 cycle = m_maincpu->total_cycles();
+
+	// Get the number of the cycle the via is in at that time
+	u64 via_cycle = cycle * m_via1->clock() / m_maincpu->clock();
+
+	// The access is going to start at via_cycle+1 and end at
+	// via_cycle+1.5, compute what that means in maincpu cycles (the
+	// +1 rounds up, since the clocks are too different to ever be
+	// synced).
+	u64 main_cycle = (via_cycle * 2 + 3) * m_maincpu->clock() / (2 * m_via1->clock()) + 1;
+
+	// Finally adjust the main cpu icount as needed.
+	m_maincpu->adjust_icount(-int(main_cycle - cycle));
 }
 
 uint32_t macquadra_state::rom_switch_r(offs_t offset)
@@ -704,8 +747,7 @@ uint32_t macquadra_state::rom_switch_r(offs_t offset)
 		void *memory_data = m_ram->pointer();
 		offs_t memory_mirror = memory_end & ~memory_end;
 
-		space.install_readwrite_bank(0x00000000, memory_end & ~memory_mirror, memory_mirror, "bank1");
-		membank("bank1")->set_base(memory_data);
+		space.install_ram(0x00000000, memory_end & ~memory_mirror, memory_mirror, memory_data);
 		m_overlay = false;
 	}
 
@@ -771,7 +813,7 @@ void macquadra_state::quadra700_map(address_map &map)
 	map(0x5000f000, 0x5000f3ff).rw(FUNC(macquadra_state::mac_5396_r), FUNC(macquadra_state::mac_5396_w)).mirror(0x00fc0000);
 	map(0x5000c000, 0x5000dfff).rw(FUNC(macquadra_state::mac_scc_r), FUNC(macquadra_state::mac_scc_2_w)).mirror(0x00fc0000);
 	map(0x50014000, 0x50015fff).rw(m_easc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00fc0000);
-	map(0x5001e000, 0x5001ffff).rw(FUNC(macquadra_state::mac_iwm_r), FUNC(macquadra_state::mac_iwm_w)).mirror(0x00fc0000);
+	map(0x5001e000, 0x5001ffff).rw(FUNC(macquadra_state::swim_r), FUNC(macquadra_state::swim_w)).mirror(0x00fc0000);
 
 	// f9800000 = VDAC / DAFB
 	map(0xf9000000, 0xf91fffff).ram().share("vram");
@@ -801,8 +843,15 @@ uint8_t macquadra_state::mac_via_in_b()
 
 void macquadra_state::mac_via_out_a(uint8_t data)
 {
-//  printf("%s VIA1 OUT A: %02x\n", machine().describe_context().c_str(), data);
-	sony_set_sel_line(m_iwm.target(), (data & 0x20) >> 5);
+	int hdsel = BIT(data, 5);
+	if (hdsel != m_hdsel)
+	{
+		if (m_cur_floppy)
+		{
+			m_cur_floppy->ss_w(hdsel);
+		}
+	}
+	m_hdsel = hdsel;
 }
 
 void macquadra_state::mac_via_out_b(uint8_t data)
@@ -835,26 +884,29 @@ void macquadra_state::mac_via2_out_b(uint8_t data)
 	m_via1->write_ca1(data>>7);
 }
 
+void macquadra_state::phases_w(uint8_t phases)
+{
+	if (m_cur_floppy)
+		m_cur_floppy->seek_phase_w(phases);
+}
+
+void macquadra_state::devsel_w(uint8_t devsel)
+{
+	if (devsel == 1)
+		m_cur_floppy = m_floppy[0]->get_device();
+	else if (devsel == 2)
+		m_cur_floppy = m_floppy[1]->get_device();
+	else
+		m_cur_floppy = nullptr;
+
+	m_swim->set_floppy(m_cur_floppy);
+	if (m_cur_floppy)
+		m_cur_floppy->ss_w(m_hdsel);
+}
+
 /***************************************************************************
     DEVICE CONFIG
 ***************************************************************************/
-
-static const applefdc_interface mac_iwm_interface =
-{
-	sony_set_lines,
-	sony_set_enable_lines,
-
-	sony_read_data,
-	sony_write_data,
-	sony_read_status
-};
-
-static const floppy_interface mac_floppy_interface =
-{
-	FLOPPY_STANDARD_3_5_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(apple35_mac),
-	"floppy_3_5"
-};
 
 static INPUT_PORTS_START( macadb )
 INPUT_PORTS_END
@@ -903,15 +955,16 @@ void macquadra_state::macqd700(machine_config &config)
 	m_screen->set_visarea(0, 1152-1, 0, 870-1);
 	m_screen->set_screen_update(FUNC(macquadra_state::screen_update_dafb));
 
-	MCFG_VIDEO_START_OVERRIDE(macquadra_state,macdafb)
-	MCFG_VIDEO_RESET_OVERRIDE(macquadra_state,macdafb)
-
 	PALETTE(config, m_palette).set_entries(256);
 
 	RTC3430042(config, m_rtc, XTAL(32'768));
 
-	LEGACY_IWM(config, m_iwm, &mac_iwm_interface);
-	sonydriv_floppy_image_device::legacy_2_drives_add(config, &mac_floppy_interface);
+	SWIM1(config, m_swim, C15M);
+	m_swim->phases_cb().set(FUNC(macquadra_state::phases_w));
+	m_swim->devsel_cb().set(FUNC(macquadra_state::devsel_w));
+
+	applefdintf_device::add_35_hd(config, m_floppy[0]);
+	applefdintf_device::add_35_nc(config, m_floppy[1]);
 
 	SCC85C30(config, m_scc, C7M);
 //  m_scc->intrq_callback().set(FUNC(macquadra_state::set_scc_interrupt));
@@ -949,7 +1002,7 @@ void macquadra_state::macqd700(machine_config &config)
 	NUBUS_SLOT(config, "nbd", "nubus", mac_nubus_cards, nullptr);
 	NUBUS_SLOT(config, "nbe", "nubus", mac_nubus_cards, nullptr);
 
-	VIA6522(config, m_via1, C7M/10);
+	R65NC22(config, m_via1, C7M/10);
 	m_via1->readpa_handler().set(FUNC(macquadra_state::mac_via_in_a));
 	m_via1->readpb_handler().set(FUNC(macquadra_state::mac_via_in_b));
 	m_via1->writepa_handler().set(FUNC(macquadra_state::mac_via_out_a));
@@ -957,7 +1010,7 @@ void macquadra_state::macqd700(machine_config &config)
 	m_via1->irq_handler().set(FUNC(macquadra_state::mac_via_irq));
 	m_via1->cb2_handler().set(FUNC(macquadra_state::via_cb2_w));
 
-	VIA6522(config, m_via2, C7M/10);
+	R65NC22(config, m_via2, C7M/10);
 	m_via2->readpa_handler().set(FUNC(macquadra_state::mac_via2_in_a));
 	m_via2->readpb_handler().set(FUNC(macquadra_state::mac_via2_in_b));
 	m_via2->writepa_handler().set(FUNC(macquadra_state::mac_via2_out_a));

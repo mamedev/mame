@@ -117,21 +117,20 @@ void galaxy_state::setup_snapshot(const uint8_t * data, uint32_t size)
 
 SNAPSHOT_LOAD_MEMBER(galaxy_state::snapshot_cb)
 {
-	uint8_t* snapshot_data;
-
+	uint32_t snapshot_size = image.length();
 	switch (snapshot_size)
 	{
 		case GALAXY_SNAPSHOT_V1_SIZE:
 		case GALAXY_SNAPSHOT_V2_SIZE:
-			snapshot_data = auto_alloc_array(machine(), uint8_t, snapshot_size);
 			break;
 		default:
 			return image_init_result::FAIL;
 	}
 
-	image.fread( snapshot_data, snapshot_size);
+	std::vector<uint8_t> snapshot_data(snapshot_size);
+	image.fread(&snapshot_data[0], snapshot_size);
 
-	setup_snapshot(snapshot_data, snapshot_size);
+	setup_snapshot(&snapshot_data[0], snapshot_size);
 
 	return image_init_result::PASS;
 }
@@ -144,8 +143,7 @@ SNAPSHOT_LOAD_MEMBER(galaxy_state::snapshot_cb)
 void galaxy_state::init_galaxy()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_readwrite_bank( 0x2800, 0x2800 + m_ram->size() - 1, "bank1");
-	membank("bank1")->set_base(m_ram->pointer());
+	space.install_ram( 0x2800, 0x2800 + m_ram->size() - 1, m_ram->pointer());
 
 	if (m_ram->size() < (6 + 48) * 1024)
 		space.nop_readwrite( 0x2800 + m_ram->size(), 0xffff);

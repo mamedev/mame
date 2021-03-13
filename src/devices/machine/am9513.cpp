@@ -1304,7 +1304,7 @@ void am9513_device::command_write(u8 data)
 				m_write_prefetch = !BIT(data, 0);
 				break;
 			}
-			// else fall through
+			[[fallthrough]];
 		default:
 			logerror("Invalid command: %02X\n", data);
 			break;

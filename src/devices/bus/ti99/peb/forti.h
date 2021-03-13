@@ -20,7 +20,7 @@
 #include "sound/sn76496.h"
 #include "speaker.h"
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 class forti_device : public device_t, public device_ti99_peribox_card_interface
 {
@@ -45,7 +45,7 @@ private:
 	required_device<sn94624_device> m_generator4;
 };
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 
 DECLARE_DEVICE_TYPE_NS(TI99_FORTI, bus::ti99::peb, forti_device)
 

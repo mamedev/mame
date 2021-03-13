@@ -236,6 +236,8 @@ void kaypro_state::machine_start()
 	save_item(NAME(m_fdc_rq));
 	save_item(NAME(m_system_port));
 	save_item(NAME(m_mc6845_video_address));
+
+	m_framecnt = 0;
 }
 
 void kaypro_state::machine_reset()
@@ -273,10 +275,11 @@ QUICKLOAD_LOAD_MEMBER(kaypro_state::quickload_cb)
 	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
 		return image_init_result::FAIL;
 
-	if (quickload_size >= 0xfd00)
+	if (image.length() >= 0xfd00)
 		return image_init_result::FAIL;
 
 	/* Load image to the TPA (Transient Program Area) */
+	u16 quickload_size = image.length();
 	for (u16 i = 0; i < quickload_size; i++)
 	{
 		u8 data;

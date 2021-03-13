@@ -56,7 +56,7 @@ void avi_write::begin_avi_recording(const char *name)
 	m_frame = 0;
 	m_next_frame_time = m_machine.time();
 
-	const screen_device *primary_screen = screen_device_iterator(m_machine.root_device()).first();
+	const screen_device *primary_screen = screen_device_enumerator(m_machine.root_device()).first();
 	// build up information about this new movie
 	avi_file::movie_info info;
 	info.video_format = 0;

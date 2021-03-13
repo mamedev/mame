@@ -93,7 +93,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 	void fdc_drq_w(int state);
 	void fdc_cmd_w(uint8_t data);
 	uint8_t fdc_data_r();
@@ -315,9 +315,11 @@ uint32_t juku_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 //  FLOPPY DISK
 //**************************************************************************
 
-FLOPPY_FORMATS_MEMBER(juku_state::floppy_formats)
-	FLOPPY_JUKU_FORMAT
-FLOPPY_FORMATS_END
+void juku_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_JUKU_FORMAT);
+}
 
 static void juku_floppies(device_slot_interface &device)
 {

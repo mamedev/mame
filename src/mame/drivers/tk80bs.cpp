@@ -29,6 +29,9 @@ TODO:
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class tk80bs_state : public driver_device
 {
 public:
@@ -43,9 +46,11 @@ public:
 
 	void tk80bs(machine_config &config);
 
+protected:
+	 virtual void machine_start() override;
+
 private:
 	uint8_t ppi_custom_r(offs_t offse);
-	void machine_start() override;
 	void ppi_custom_w(offs_t offset, uint8_t data);
 	void kbd_put(u8 data);
 	uint8_t port_a_r();
@@ -157,6 +162,8 @@ void tk80bs_state::kbd_put(u8 data)
 void tk80bs_state::machine_start()
 {
 	save_item(NAME(m_term_data));
+
+	m_term_data = 0;
 }
 
 
@@ -229,6 +236,9 @@ ROM_START( tk80bs )
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "font.rom",    0x0000, 0x1000, BAD_DUMP CRC(94d95199) SHA1(9fe741eab866b0c520d4108bccc6277172fa190c))
 ROM_END
+
+} // Anonymous namespace
+
 
 /* Driver */
 

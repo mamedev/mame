@@ -47,7 +47,6 @@ public:
 	void tetrist(machine_config &config);
 	void pbobble(machine_config &config);
 	void masterw(machine_config &config);
-	void ryujin(machine_config &config);
 	void viofight(machine_config &config);
 	void crimec(machine_config &config);
 	void selfeena(machine_config &config);

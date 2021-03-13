@@ -405,12 +405,9 @@ void thomson_state::to7_5p14sd_reset()
 	LOG(( "to7_5p14sd_reset: CD 90-015 controller\n" ));
 	for (auto &img : m_floppy_image)
 	{
-		if (img.found())
-		{
-			img->floppy_drive_set_ready_state( FLOPPY_DRIVE_READY, 0 );
-			img->floppy_drive_set_rpm( 300. );
-			img->floppy_drive_seek( - img->floppy_drive_get_current_track() );
-		}
+		img->floppy_drive_set_ready_state( FLOPPY_DRIVE_READY, 0 );
+		img->floppy_drive_set_rpm( 300. );
+		img->floppy_drive_seek( - img->floppy_drive_get_current_track() );
 	}
 }
 
@@ -1464,11 +1461,8 @@ void thmfc1_device::floppy_reset()
 
 	for (auto &img : m_floppy_image)
 	{
-		if (img.found())
-		{
-			img->floppy_drive_set_ready_state( FLOPPY_DRIVE_READY, 0 );
-			img->floppy_drive_seek(  - img->floppy_drive_get_current_track() );
-		}
+		img->floppy_drive_set_ready_state( FLOPPY_DRIVE_READY, 0 );
+		img->floppy_drive_seek(  - img->floppy_drive_get_current_track() );
 	}
 
 	m_op = OP_RESET;

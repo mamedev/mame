@@ -41,6 +41,7 @@
 #include "machine/genpc.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
+#include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/i86/i86.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
@@ -56,6 +57,9 @@
 //#define VERBOSE (LOG_DEBUG)
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
+
+
+namespace {
 
 #define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
@@ -75,9 +79,10 @@ public:
 
 	void init_tosh1000();
 
-private:
-	DECLARE_MACHINE_RESET(tosh1000);
+protected:
+	virtual void machine_reset() override;
 
+private:
 	void romdos_bank_w(uint8_t data);
 
 	void bram_w(offs_t offset, uint8_t data);
@@ -106,7 +111,7 @@ void tosh1000_state::init_tosh1000()
 {
 }
 
-MACHINE_RESET_MEMBER(tosh1000_state, tosh1000)
+void tosh1000_state::machine_reset()
 {
 	m_bram_latch = false;
 	m_bram_offset = 0;
@@ -261,12 +266,12 @@ void tosh1000_state::tosh1000(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, "bankdev").set_map(&tosh1000_state::tosh1000_romdos).set_options(ENDIANNESS_LITTLE, 8, 20, 0x10000);
 
-	MCFG_MACHINE_RESET_OVERRIDE(tosh1000_state, tosh1000)
-
-	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb"));
 	mb.set_cputag(m_maincpu);
 	mb.int_callback().set_inputline(m_maincpu, 0);
 	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	TC8521(config, "rtc", XTAL(32'768));
 
@@ -280,8 +285,10 @@ void tosh1000_state::tosh1000(machine_config &config)
 
 //  SOFTWARE_LIST(config, "flop_list").set_original("tosh1000");
 
-	// uses a 80C50 instead of 8042 for KBDC
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+	// TODO: uses a 80C50 instead of 8042 for KBDC
+	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270));
+	kbd.out_clock_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_clock_w));
+	kbd.out_data_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_data_w));
 
 	RAM(config, RAM_TAG).set_default_size("512K");
 
@@ -301,6 +308,8 @@ ROM_START( tosh1000 )
 	ROM_REGION(0x2000, "gfx1", 0)
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
+
+} // Anonymous namespace
 
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  CLASS           INIT           COMPANY    FULLNAME         FLAGS

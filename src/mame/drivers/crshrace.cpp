@@ -132,7 +132,7 @@ Dip locations verified with Service Mode.
 #include "includes/crshrace.h"
 
 #include "cpu/m68000/m68000.h"
-#include "sound/2610intf.h"
+#include "sound/ym2610.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -167,7 +167,7 @@ void crshrace_state::main_map(address_map &map)
 	map(0xfff00a, 0xfff00b).portr("DSW1");
 	map(0xfff00e, 0xfff00f).portr("P3");
 	map(0xfff020, 0xfff03f).w(m_k053936, FUNC(k053936_device::ctrl_w));
-	map(0xfff044, 0xfff047).writeonly();   // ??? moves during race
+	map(0xfff044, 0xfff047).nopw();   // ??? moves during race
 }
 
 void crshrace_state::sound_map(address_map &map)
@@ -482,10 +482,10 @@ ROM_START( crshrace )
 	ROM_LOAD( "h897",         0x000000, 0x200000, CRC(e3230128) SHA1(758c65f113481cf25bf0359deecd6736a7c9ee7e) )
 	ROM_LOAD( "h896",         0x200000, 0x200000, CRC(fff60233) SHA1(56b4b708883a80761dc5f9184780477d72b80351) )
 
-	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) // sound samples
+	ROM_REGION( 0x100000, "ymsnd:adpcmb", 0 ) // sound samples
 	ROM_LOAD( "h894",         0x000000, 0x100000, CRC(d53300c1) SHA1(4c3ff7d3156791cb960c28845a5f1906605bce55) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) // sound samples
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) // sound samples
 	ROM_LOAD( "h893",         0x000000, 0x100000, CRC(32513b63) SHA1(c4ede4aaa2611cedb53d47448422a1926acf3052) )
 ROM_END
 
@@ -515,10 +515,10 @@ ROM_START( crshrace2 )
 	ROM_LOAD( "h897",         0x000000, 0x200000, CRC(e3230128) SHA1(758c65f113481cf25bf0359deecd6736a7c9ee7e) )    // IC29.BIN
 	ROM_LOAD( "h896",         0x200000, 0x200000, CRC(fff60233) SHA1(56b4b708883a80761dc5f9184780477d72b80351) )    // IC75.BIN
 
-	ROM_REGION( 0x100000, "ymsnd.deltat", 0 ) // sound samples
+	ROM_REGION( 0x100000, "ymsnd:adpcmb", 0 ) // sound samples
 	ROM_LOAD( "h894",         0x000000, 0x100000, CRC(d53300c1) SHA1(4c3ff7d3156791cb960c28845a5f1906605bce55) )    // IC73.BIN
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) // sound samples
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) // sound samples
 	ROM_LOAD( "h893",         0x000000, 0x100000, CRC(32513b63) SHA1(c4ede4aaa2611cedb53d47448422a1926acf3052) )    // IC69.BIN
 ROM_END
 

@@ -729,7 +729,7 @@ void smc91c9x_device::process_command(uint16_t data)
 			LOG("   REMOVE AND RELEASE FRAME FROM RX FIFO (PACK_NUM=%d)\n", curr_completed_rx());
 			// Release memory allocation
 			alloc_release(curr_completed_rx());
-			// Fall through
+			[[fallthrough]];
 		case ECMD_REMOVE_TOPFRAME_RX:
 			LOG("   REMOVE FRAME FROM RX FIFO\n");
 			// remove entry from rx completion queue

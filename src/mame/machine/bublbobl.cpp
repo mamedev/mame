@@ -153,6 +153,11 @@ uint8_t bublbobl_state::common_sound_semaphores_r()
 	return ret;
 }
 
+IRQ_CALLBACK_MEMBER(bublbobl_state::mcram_vect_r)
+{
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	return m_mcu_sharedram[0];
+}
 
 
 /***************************************************************************
@@ -222,8 +227,7 @@ void bublbobl_state::bublbobl_mcu_port1_w(uint8_t data)
 	if ((m_port1_out & 0x40) && (~data & 0x40))
 	{
 		// logerror("triggering IRQ on main CPU\n");
-		m_maincpu->set_input_line_vector(0, m_mcu_sharedram[0]); // Z80
-		m_maincpu->set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 
 	// bit 7: select read or write shared RAM
@@ -473,8 +477,7 @@ void bub68705_state::port_b_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 		/* hack to get random EXTEND letters (who is supposed to do this? 68705? PAL?) */
 		m_mcu_sharedram[0x7c] = machine().rand() % 6;
 
-		m_maincpu->set_input_line_vector(0, m_mcu_sharedram[0]); // Z80
-		m_maincpu->set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 
 	if (BIT(mem_mask, 6) && !BIT(data, 6) && BIT(m_port_b_out, 6))

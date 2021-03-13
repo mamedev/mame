@@ -76,6 +76,7 @@ public:
 		m_rtc(*this, "rtc"),
 		m_io(*this, "io"),
 		m_work_ram(*this, "work_ram"),
+		m_bank_crom(*this, "bank_crom"),
 		m_paletteram64(*this, "paletteram64"),
 		m_dsbz80(*this, DSBZ80_TAG),
 		m_uart(*this, "uart"),
@@ -83,7 +84,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_cryptdevice(*this, "315_5881"),
-		m_billboard(*this, "billboard")
+		m_billboard(*this, "billboard"),
+		m_bank2(*this, "bank2")
 	{
 		m_step15_with_mpc106 = false;
 		m_step20_with_old_real3d = false;
@@ -142,6 +144,9 @@ public:
 	void init_lamachin();
 	void init_model3_15();
 
+protected:
+	virtual void video_start() override;
+
 private:
 	required_device<ppc_device> m_maincpu;
 	optional_device<lsi53c810_device> m_lsi53c810;
@@ -153,6 +158,7 @@ private:
 	required_device<sega_315_5649_device> m_io;
 
 	required_shared_ptr<uint64_t> m_work_ram;
+	memory_bank_creator m_bank_crom;
 	required_shared_ptr<uint64_t> m_paletteram64;
 	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
 	optional_device<i8251_device> m_uart;
@@ -163,6 +169,7 @@ private:
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 
 	required_device<sega_billboard_device> m_billboard;
+	memory_bank_creator m_bank2;
 
 	tilemap_t *m_layer4[4];
 	tilemap_t *m_layer8[4];
@@ -328,7 +335,6 @@ private:
 	void set_irq_line(uint8_t bit, int line);
 	void model3_init(int step);
 	// video
-	virtual void video_start() override;
 	uint32_t screen_update_model3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(tile_info_layer0_4bit);
 	TILE_GET_INFO_MEMBER(tile_info_layer1_4bit);

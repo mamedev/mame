@@ -60,6 +60,7 @@ public:
 		, m_char_rom(*this, "chargen")
 		, m_video_ram(*this, "video_ram")
 		, m_modifiers(*this, "MODIFIERS")
+		, m_bank(*this, "bank")
 	{ }
 
 	void bw14(machine_config &config);
@@ -85,8 +86,8 @@ private:
 
 	void floppy_motor_on_off();
 	TIMER_DEVICE_CALLBACK_MEMBER(floppy_motor_off_tick);
-	DECLARE_FLOPPY_FORMATS( bw12_floppy_formats );
-	DECLARE_FLOPPY_FORMATS( bw14_floppy_formats );
+	static void bw12_floppy_formats(format_registration &fr);
+	static void bw14_floppy_formats(format_registration &fr);
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
@@ -118,9 +119,10 @@ protected:
 	required_memory_region m_char_rom;
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_ioport m_modifiers;
+	required_memory_bank m_bank;
 
 	/* memory state */
-	int m_bank;
+	int m_curbank;
 
 	/* PIT state */
 	int m_pit_out2;

@@ -112,32 +112,32 @@ void agat7video_device::do_io(int offset)
 	{
 	case 0:
 		m_video_mode = GRAPHICS_LORES;
-		m_start_address = (offset & 0x30) << 9;
-		logerror("offset %04X, video mode 0 (GRAPHICS_LORES)\n", m_start_address);
+		m_start_address = (offset & 0x3c) << 9;
+		logerror("offset %02X -> %04X, video mode 0 (GRAPHICS_LORES)\n", offset, m_start_address);
 		break;
 
 	case 1:
 		m_video_mode = GRAPHICS_HIRES;
-		m_start_address = ((offset & 0x3f) - 0x01) << 9;
-		logerror("offset %04X, video mode 1 (GRAPHICS_HIRES)\n", m_start_address);
+		m_start_address = ((offset & 0x31) - 0x01) << 9;
+		logerror("offset %02X -> %04X, video mode 1 (GRAPHICS_HIRES)\n", offset, m_start_address);
 		break;
 
 	case 2:
 		if (offset > 0x80) {
 			m_video_mode = TEXT_HIRES;
 			m_start_address = (offset - 0x82) << 9;
-			logerror("offset %04X, video mode 2 (TEXT_HIRES)\n", m_start_address);
+			logerror("offset %02X -> %04X, video mode 2 (TEXT_HIRES)\n", offset, m_start_address);
 		} else {
 			m_video_mode = TEXT_LORES;
 			m_start_address = (offset - 0x02) << 9;
-			logerror("offset %04X, video mode 2 (TEXT_LORES)\n", m_start_address);
+			logerror("offset %02X -> %04X, video mode 2 (TEXT_LORES)\n", offset, m_start_address);
 		}
 		break;
 
 	case 3:
 		m_video_mode = GRAPHICS_MONO;
 		m_start_address = ((offset - 0x03) & 0x30) << 9;
-		logerror("offset %04X, video mode 3 (GRAPHICS_MONO)\n", m_start_address);
+		logerror("offset %02X -> %04X, video mode 3 (GRAPHICS_MONO)\n", offset, m_start_address);
 		break;
 	}
 }

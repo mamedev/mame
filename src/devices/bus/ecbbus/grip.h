@@ -72,7 +72,7 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<palette_device> m_palette;
 	required_device<speaker_sound_device> m_speaker;
-	optional_shared_ptr<uint8_t> m_video_ram;
+	memory_share_creator<uint8_t> m_video_ram;
 	required_ioport m_j3a;
 	required_ioport m_j3b;
 	required_ioport m_j7;

@@ -323,10 +323,11 @@ void c1551_device::c1551_mem(address_map &map)
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( c1551_device::floppy_formats )
-	FLOPPY_D64_FORMAT,
-	FLOPPY_G64_FORMAT
-FLOPPY_FORMATS_END
+void c1551_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_D64_FORMAT);
+	fr.add(FLOPPY_G64_FORMAT);
+}
 
 
 //-------------------------------------------------

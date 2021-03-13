@@ -23,8 +23,8 @@
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "machine/timer.h"
-#include "sound/2203intf.h"
 #include "sound/spkrdev.h"
+#include "sound/ym2203.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 

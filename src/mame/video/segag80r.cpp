@@ -235,6 +235,8 @@ void segag80r_state::video_start()
 			break;
 	}
 
+	m_bg_scrollx = 0;
+
 	/* register for save states */
 	save_item(NAME(m_video_control));
 	save_item(NAME(m_video_flip));

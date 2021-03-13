@@ -819,7 +819,7 @@ const char *td0_format::extensions() const
 	return "td0";
 }
 
-int td0_format::identify(io_generic *io, uint32_t form_factor)
+int td0_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t h[7];
 
@@ -831,7 +831,7 @@ int td0_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool td0_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool td0_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int track_count = 0;
 	int head_count = 0;
@@ -874,7 +874,8 @@ bool td0_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 					return false; // single side hd?
 				break;
 			}
-			/* no break; could be qd, won't know until tracks are counted */
+			// could be qd, won't know until tracks are counted
+			[[fallthrough]];
 		case 1:
 			if(head_count == 2)
 				image->set_variant(floppy_image::DSDD);
@@ -891,7 +892,7 @@ bool td0_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 				break;
 			} else
 				image->set_variant(floppy_image::SSDD);
-			break;
+			break; // FIXME: comment below says "no break" but this is a breal
 			/* no break */
 		case 3:
 			if(head_count == 2)
@@ -1027,7 +1028,7 @@ bool td0_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 }
 
 
-bool td0_format::save(io_generic *io, floppy_image *image)
+bool td0_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	return false;
 }

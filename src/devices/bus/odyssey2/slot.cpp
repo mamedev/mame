@@ -5,8 +5,7 @@
     Magnavox Odyssey 2 cart emulation
     (through slot devices)
 
- ***********************************************************************************************************/
-
+***********************************************************************************************************/
 
 #include "emu.h"
 #include "slot.h"
@@ -27,9 +26,9 @@ DEFINE_DEVICE_TYPE(O2_CART_SLOT, o2_cart_slot_device, "o2_cart_slot", "Odyssey 2
 
 device_o2_cart_interface::device_o2_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "odyssey2cart")
-	, m_rom(*this, "rom")
-	, m_exrom(*this, "exrom")
-	, m_voice(*this, "voice")
+	, m_rom_size(0)
+	, m_exrom_size(0)
+	, m_voice_size(0)
 {
 }
 
@@ -50,6 +49,7 @@ device_o2_cart_interface::~device_o2_cart_interface()
 //-------------------------------------------------
 //  o2_cart_slot_device - constructor
 //-------------------------------------------------
+
 o2_cart_slot_device::o2_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, O2_CART_SLOT, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
@@ -98,6 +98,7 @@ static const o2_slot slot_list[] =
 	{ O2_KTAA,     "o2_ktaa" },
 	{ O2_CHESS,    "o2_chess" },
 	{ O2_HOMECOMP, "o2_homecomp" },
+	{ O2_TEST,     "o2_test" },
 	{ O2_VOICE,    "o2_voice" }
 };
 
@@ -106,7 +107,7 @@ static int o2_get_pcb_id(const char *slot)
 	if (slot)
 		for (auto & elem : slot_list)
 		{
-			if (!core_stricmp(elem.slot_option, slot))
+			if (!strcmp(elem.slot_option, slot))
 				return elem.pcb_id;
 		}
 
@@ -127,7 +128,7 @@ static const char *o2_get_slot(int type)
 
 /*-------------------------------------------------
  call load
- -------------------------------------------------*/
+-------------------------------------------------*/
 
 image_init_result o2_cart_slot_device::call_load()
 {
@@ -138,6 +139,9 @@ image_init_result o2_cart_slot_device::call_load()
 			load_software_region("rom", m_cart->m_rom);
 			load_software_region("exrom", m_cart->m_exrom);
 			load_software_region("voice", m_cart->m_voice);
+			m_cart->m_rom_size = get_software_region_length("rom");
+			m_cart->m_exrom_size = get_software_region_length("exrom");
+			m_cart->m_voice_size = get_software_region_length("voice");
 
 			m_type = o2_get_pcb_id(get_feature("slot"));
 
@@ -150,6 +154,11 @@ image_init_result o2_cart_slot_device::call_load()
 		{
 			u32 size = length();
 			fread(m_cart->m_rom, size);
+
+			m_cart->m_rom_size = size;
+			m_cart->m_exrom_size = 0;
+			m_cart->m_voice_size = 0;
+			m_b = 0;
 
 			m_type = (size == 0x4000) ? O2_RALLY : O2_STD;
 		}
@@ -167,7 +176,7 @@ image_init_result o2_cart_slot_device::call_load()
 
 /*-------------------------------------------------
  get default card software
- -------------------------------------------------*/
+-------------------------------------------------*/
 
 std::string o2_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
@@ -178,17 +187,16 @@ std::string o2_cart_slot_device::get_default_card_software(get_default_card_soft
 		int type = (size == 0x4000) ? O2_RALLY : O2_STD;
 		slot_string = o2_get_slot(type);
 
-		//printf("type: %s\n", slot_string);
-
 		return std::string(slot_string);
 	}
 
 	return software_get_default_slot("o2_rom");
 }
 
+
 /*-------------------------------------------------
  read_rom**
- -------------------------------------------------*/
+-------------------------------------------------*/
 
 u8 o2_cart_slot_device::read_rom04(offs_t offset)
 {
@@ -206,9 +214,10 @@ u8 o2_cart_slot_device::read_rom0c(offs_t offset)
 		return 0xff;
 }
 
+
 /*-------------------------------------------------
  io
- -------------------------------------------------*/
+-------------------------------------------------*/
 
 void o2_cart_slot_device::io_write(offs_t offset, u8 data)
 {
@@ -218,10 +227,23 @@ void o2_cart_slot_device::io_write(offs_t offset, u8 data)
 
 u8 o2_cart_slot_device::io_read(offs_t offset)
 {
+	return (m_cart) ? m_cart->io_read(offset) : 0xff;
+}
+
+void o2_cart_slot_device::bus_write(u8 data)
+{
 	if (m_cart)
-		return m_cart->io_read(offset);
-	else
-		return 0xff;
+		m_cart->bus_write(data);
+}
+
+u8 o2_cart_slot_device::bus_read()
+{
+	return (m_cart) ? m_cart->bus_read() : 0xff;
+}
+
+READ_LINE_MEMBER(o2_cart_slot_device::t0_read)
+{
+	return (m_cart) ? m_cart->t0_read() : 0;
 }
 
 int o2_cart_slot_device::b_read()
@@ -243,6 +265,7 @@ int o2_cart_slot_device::b_read()
 #include "bus/odyssey2/ktaa.h"
 #include "bus/odyssey2/chess.h"
 #include "bus/odyssey2/homecomp.h"
+#include "bus/odyssey2/test.h"
 #include "bus/odyssey2/voice.h"
 
 void o2_cart(device_slot_interface &device)
@@ -253,5 +276,6 @@ void o2_cart(device_slot_interface &device)
 	device.option_add_internal("o2_ktaa",     O2_ROM_KTAA);
 	device.option_add_internal("o2_chess",    O2_ROM_CHESS);
 	device.option_add_internal("o2_homecomp", O2_ROM_HOMECOMP);
+	device.option_add_internal("o2_test",     O2_ROM_TEST);
 	device.option_add_internal("o2_voice",    O2_ROM_VOICE);
 }

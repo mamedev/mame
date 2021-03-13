@@ -13,7 +13,7 @@
  * 3: MSB of pitch (ooooppppppppppxx) (o=octave (4 bit signed), p=pitch (10 bits), x=unused?
  * 4: voice control: top bit = 1 for key on, 0 for key off
  * 5: bit 0: 0: interpolate volume changes, 1: direct set volume,
-      bits 1-7 = volume attenuate (0=max, 7f=min)
+ *    bits 1-7 = volume attenuate (0=max, 7f=min)
  * 6: LFO frequency + Phase LFO depth
  * 7: Amplitude LFO size
  *
@@ -21,7 +21,9 @@
  * bytes per instrument sample. This is very similar to the YMF278B 'OPL4'.
  * This sample format might be derived from the one used by the older YM7138 'GEW6' chip.
  *
- * The first 3 bytes are the offset into the file (big endian). (0, 1, 2)
+ * The first 3 bytes are the offset into the file (big endian). (0, 1, 2).
+ * Bit 23 is the sample format flag: 0 for 8-bit linear, 1 for 12-bit linear.
+ * Bits 21 and 22 are used by the MU5 on some samples for as-yet unknown purposes.
  * The next 2 are the loop start point, in samples (big endian) (3, 4)
  * The next 2 are the 2's complement negation of of the total number of samples (big endian) (5, 6)
  * The next byte is LFO freq + depth (copied to reg 6 ?) (7, 8)
@@ -29,8 +31,7 @@
  * The next byte is Amplitude LFO size (copied to reg 7 ?)
  *
  * TODO
- * - http://dtech.lv/techarticles_yamaha_chips.html indicates FM and 12-bit sample support,
- *   which we don't have yet.
+ * - http://dtech.lv/techarticles_yamaha_chips.html indicates FM support, which we don't have yet.
  */
 
 #include "emu.h"
@@ -80,6 +81,7 @@ void multipcm_device::init_sample(sample_t *sample, uint32_t index)
 	uint32_t address = index * 12;
 
 	sample->m_start = (read_byte(address) << 16) | (read_byte(address + 1) << 8) | read_byte(address + 2);
+	sample->m_format = (sample->m_start>>20) & 0xfe;
 	sample->m_start &= 0x3fffff;
 	sample->m_loop = (read_byte(address + 3) << 8) | read_byte(address + 4);
 	sample->m_end = 0xffff - ((read_byte(address + 5) << 8) | read_byte(address + 6));
@@ -329,6 +331,7 @@ void multipcm_device::write_slot(slot_t &slot, int32_t reg, uint8_t data)
 		case 0: // PANPOT
 			slot.m_pan = (data >> 4) & 0xf;
 			break;
+
 		case 1: // Sample
 		{
 			//according to YMF278 sample write causes some base params written to the regs (envelope+lfos)
@@ -365,6 +368,7 @@ void multipcm_device::write_slot(slot_t &slot, int32_t reg, uint8_t data)
 				slot.m_offset = 0;
 				slot.m_prev_sample = 0;
 				slot.m_total_level = slot.m_dest_total_level << TL_SHIFT;
+				slot.m_format = slot.m_sample.m_format;
 
 				envelope_generator_calc(slot);
 				slot.m_envelope_gen.m_state = state_t::ATTACK;
@@ -476,7 +480,7 @@ multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag,
 
 void multipcm_device::device_start()
 {
-	const float clock_divider = 180.0f;
+	const float clock_divider = 224.0f;
 	m_rate = (float)clock() / clock_divider;
 
 	m_stream = stream_alloc(0, 2, m_rate);
@@ -587,6 +591,7 @@ void multipcm_device::device_start()
 	save_pointer(STRUCT_MEMBER(m_slots, m_dest_total_level), 28);
 	save_pointer(STRUCT_MEMBER(m_slots, m_total_level_step), 28);
 	save_pointer(STRUCT_MEMBER(m_slots, m_prev_sample), 28);
+	save_pointer(STRUCT_MEMBER(m_slots, m_format), 28);
 
 	for (int32_t slot = 0; slot < 28; ++slot)
 	{
@@ -616,7 +621,7 @@ void multipcm_device::device_start()
 
 void multipcm_device::device_clock_changed()
 {
-	const float clock_divider = 180.0f;
+	const float clock_divider = 224.0f;
 	m_rate = (float)clock() / clock_divider;
 	m_stream->set_sample_rate(m_rate);
 
@@ -680,10 +685,47 @@ void multipcm_device::sound_stream_update(sound_stream &stream, std::vector<read
 			if (slot.m_playing)
 			{
 				uint32_t vol = (slot.m_total_level >> TL_SHIFT) | (slot.m_pan << 7);
-				uint32_t adr = slot.m_offset >> TL_SHIFT;
+				uint32_t spos = slot.m_offset >> TL_SHIFT;
 				uint32_t step = slot.m_step;
-				int32_t csample = (int16_t) (read_byte(slot.m_base + adr) << 8);
+				int32_t csample = 0;
 				int32_t fpart = slot.m_offset & ((1 << TL_SHIFT) - 1);
+
+				if (slot.m_format & 8)  // 12-bit linear
+				{
+					offs_t adr = slot.m_base + (spos >> 2) * 6;
+					switch (spos & 3)
+					{
+						case 0:
+						{ // ab.c .... ....
+							s16 w0 = read_byte(adr) << 8 | ((read_byte(adr + 1) & 0xf) << 4);
+							csample = w0;
+							break;
+						}
+						case 1:
+						{ // ..C. AB.. ....
+							s16 w0 = (read_byte(adr + 2) << 8) | (read_byte(adr + 1) & 0xf0);
+							csample = w0;
+							break;
+						}
+						case 2:
+						{ // .... ..ab .c..
+							s16 w0 = read_byte(adr + 3) << 8 | ((read_byte(adr + 4) & 0xf) << 4);
+							csample = w0;
+							break;
+						}
+						case 3:
+						{ // .... .... C.AB
+							s16 w0 = (read_byte(adr + 5) << 8) | (read_byte(adr + 4) & 0xf0);
+							csample = w0;
+							break;
+						}
+					}
+				}
+				else
+				{
+					csample = (int16_t)(read_byte(slot.m_base + spos) << 8);
+				}
+
 				int32_t sample = (csample * fpart + slot.m_prev_sample * ((1 << TL_SHIFT) - fpart)) >> TL_SHIFT;
 
 				if (slot.m_regs[6] & 7) // Vibrato enabled
@@ -698,7 +740,7 @@ void multipcm_device::sound_stream_update(sound_stream &stream, std::vector<read
 					slot.m_offset = slot.m_sample.m_loop << TL_SHIFT;
 				}
 
-				if (adr ^ (slot.m_offset >> TL_SHIFT))
+				if (spos ^ (slot.m_offset >> TL_SHIFT))
 				{
 					slot.m_prev_sample = csample;
 				}

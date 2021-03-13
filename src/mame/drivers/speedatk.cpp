@@ -93,6 +93,8 @@ void speedatk_state::machine_start()
 	save_item(NAME(m_km_status));
 	save_item(NAME(m_coin_settings));
 	save_item(NAME(m_coin_impulse));
+
+	m_coin_impulse = 0;
 }
 
 uint8_t speedatk_state::iox_key_matrix_calc(uint8_t p_side)

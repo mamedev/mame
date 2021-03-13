@@ -404,7 +404,7 @@ void scc2698b_device::device_reset()
 
 void scc2698b_device::write_line_tx(int port, int value)
 {
-	if ((0 <= port) && (ARRAY_LENGTH(write_tx) > port))
+	if ((0 <= port) && (std::size(write_tx) > port))
 		write_tx[port](value);
 	else
 		logerror("Unsupported port %d in write_line_tx\n", port);
@@ -412,7 +412,7 @@ void scc2698b_device::write_line_tx(int port, int value)
 
 void scc2698b_device::write_line_mpp1(int port, int value)
 {
-	if ((0 <= port) && (ARRAY_LENGTH(write_mpp1) > port))
+	if ((0 <= port) && (std::size(write_mpp1) > port))
 		write_mpp1[port](value);
 	else
 		logerror("Unsupported port %d in write_line_mpp1\n", port);
@@ -420,7 +420,7 @@ void scc2698b_device::write_line_mpp1(int port, int value)
 
 void scc2698b_device::write_line_mpp2(int port, int value)
 {
-	if ((0 <= port) && (ARRAY_LENGTH(write_mpp2) > port))
+	if ((0 <= port) && (std::size(write_mpp2) > port))
 		write_mpp2[port](value);
 	else
 		logerror("Unsupported port %d in write_line_mpp2\n", port);
@@ -428,7 +428,7 @@ void scc2698b_device::write_line_mpp2(int port, int value)
 
 void scc2698b_device::write_line_mpo(int port, int value)
 {
-	if ((0 <= port) && (ARRAY_LENGTH(write_mpo) > port))
+	if ((0 <= port) && (std::size(write_mpo) > port))
 		write_mpo[port](value);
 	else
 		logerror("Unsupported port %d in write_line_mpo\n", port);

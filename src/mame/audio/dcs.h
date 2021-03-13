@@ -199,8 +199,8 @@ protected:
 
 	optional_device<address_map_bank_device> m_ram_map;
 	optional_memory_bank    m_data_bank;
-	memory_bank *           m_rom_page;
-	memory_bank *           m_dram_page;
+	memory_bank_creator     m_rom_page;
+	memory_bank_creator     m_dram_page;
 
 	/* I/O with the host */
 	uint8_t       m_auto_ack;

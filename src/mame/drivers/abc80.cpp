@@ -453,6 +453,11 @@ void abc80_state::machine_start()
 	save_item(NAME(m_motor));
 	save_item(NAME(m_tape_in));
 	save_item(NAME(m_tape_in_latch));
+
+	//zero-fill
+	m_key_data = 0;
+	m_key_strobe = 0;
+	m_blink = 0;
 }
 
 QUICKLOAD_LOAD_MEMBER(abc80_state::quickload_cb)
@@ -462,8 +467,8 @@ QUICKLOAD_LOAD_MEMBER(abc80_state::quickload_cb)
 	offs_t address = space.read_byte(BOFA + 1) << 8 | space.read_byte(BOFA);
 	if (LOG) logerror("BOFA %04x\n",address);
 
-	std::vector<u8> data;
-	data.resize(quickload_size);
+	int quickload_size = image.length();
+	std::vector<u8> data(quickload_size);
 	image.fread(&data[0], quickload_size);
 	for (int i = 1; i < quickload_size; i++)
 		space.write_byte(address++, data[i]);

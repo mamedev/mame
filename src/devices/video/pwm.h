@@ -21,7 +21,7 @@ public:
 	pwm_display_device &set_refresh(attotime duration) { m_framerate_set = duration; return *this; } // time between each outputs refresh
 	pwm_display_device &set_interpolation(double factor) { m_interpolation = factor; return *this; } // frame interpolation (0.0 - 1.0)
 	pwm_display_device &set_segmask(u64 digits, u64 mask); // mask for multi-state outputs, eg. 7seg led
-	pwm_display_device &reset_segmask() { std::fill_n(m_segmask, ARRAY_LENGTH(m_segmask), 0); return *this; }
+	pwm_display_device &reset_segmask() { std::fill(std::begin(m_segmask), std::end(m_segmask), 0); return *this; }
 	pwm_display_device &set_bri_levels(double l0, double l1 = 1.0, double l2 = 1.0, double l3 = 1.0); // brightness threshold per level (0.0 - 1.0)
 	pwm_display_device &set_bri_minimum(u8 i) { m_level_min = i; return *this; } // minimum level index for element to be considered "on"
 	pwm_display_device &set_bri_maximum(double b) { m_level_max = b; return *this; } // maximum brightness level, 0.0 for auto
@@ -31,7 +31,7 @@ public:
 	auto output_a() { return m_output_a_cb.bind(); }
 	auto output_digit() { return m_output_digit_cb.bind(); }
 
-	void reset_bri_levels() { std::fill_n(m_levels, ARRAY_LENGTH(m_levels), 1.0); }
+	void reset_bri_levels() { std::fill(std::begin(m_levels), std::end(m_levels), 1.0); }
 	void set_bri_one(u8 i, double level) { m_levels[i] = level; }
 	void segmask_one(u8 y, u64 mask) { m_segmask[y] = mask; }
 

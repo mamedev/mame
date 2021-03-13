@@ -352,7 +352,9 @@ public:
 		m_rx_state(0),
 		m_tx_state(0),
 		m_rx_previous(1)
-	{ }
+	{
+		std::fill(std::begin(m_custom_regs), std::end(m_custom_regs), 0);
+	}
 
 	/* chip RAM access */
 	uint16_t read_chip_ram(offs_t byteoffs)

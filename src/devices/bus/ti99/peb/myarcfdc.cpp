@@ -50,7 +50,7 @@
 DEFINE_DEVICE_TYPE_NS(TI99_DDCC1, bus::ti99::peb, myarc_fdc_device, "ti99_ddcc1", "Myarc Disk Controller Card")
 DEFINE_DEVICE_TYPE_NS(DDCC1_PAL, bus::ti99::peb, ddcc1_pal_device, PAL_TAG, "Myarc DDCC-1 PAL u1")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 // ----------------------------------
 
@@ -359,10 +359,12 @@ void myarc_fdc_device::device_config_complete()
 	if (subdevice("3")!=nullptr) m_floppy[3] = static_cast<floppy_image_device*>(subdevice("3")->subdevices().first());
 }
 
-FLOPPY_FORMATS_MEMBER(myarc_fdc_device::floppy_formats)
-	FLOPPY_TI99_SDF_FORMAT,
-	FLOPPY_TI99_TDF_FORMAT
-FLOPPY_FORMATS_END
+void myarc_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_TI99_SDF_FORMAT);
+	fr.add(FLOPPY_TI99_TDF_FORMAT);
+}
 
 static void ccfdc_floppies(device_slot_interface &device)
 {
@@ -494,4 +496,4 @@ void ddcc1_pal_device::device_config_complete()
 	m_board = static_cast<myarc_fdc_device*>(owner());
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

@@ -26,6 +26,7 @@ public:
 		m_colorram(*this, "colorram"),
 		m_colorram2(*this, "colorram2"),
 		m_spriteram(*this, "spriteram"),
+		m_share1(*this, "share1"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_daccpu(*this, "daccpu"),
@@ -45,6 +46,7 @@ private:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_colorram2;
 	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_share1;
 
 	/* video-related */
 	std::unique_ptr<bitmap_ind16>   m_tmpbitmap;

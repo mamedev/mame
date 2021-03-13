@@ -164,16 +164,13 @@ void m5074x_device::execute_set_input(int inputnum, int state)
 {
 	switch (inputnum)
 	{
-		case M5074X_INT1_LINE:
-			if (state == ASSERT_LINE)
-			{
-				m_intctrl |= IRQ_INTREQ;
-			}
-			else
-			{
-				m_intctrl &= ~IRQ_INTREQ;
-			}
-			break;
+	case M5074X_INT1_LINE:
+		// FIXME: edge-triggered
+		if (state == ASSERT_LINE)
+		{
+			m_intctrl |= IRQ_INTREQ;
+		}
+		break;
 	}
 
 	recalc_irqs();
@@ -442,12 +439,13 @@ void m5074x_device::tmrirq_w(offs_t offset, uint8_t data)
 			break;
 
 		case 5:
-			m_intctrl = data;
+			// Interrupt request bits can only be reset
+			m_intctrl = data & (m_intctrl | ~(IRQ_CNTRREQ | IRQ_INTREQ));
 			recalc_irqs();
 			break;
 
 		case 6:
-			m_tmrctrl = data;
+			m_tmrctrl = data & (m_tmrctrl | ~TMRC_TMRXREQ);
 			recalc_irqs();
 			break;
 	}
@@ -589,24 +587,18 @@ void m50753_device::execute_set_input(int inputnum, int state)
 	switch (inputnum)
 	{
 	case M50753_INT1_LINE:
+		// FIXME: edge-triggered
 		if (state == ASSERT_LINE)
 		{
 			m_intctrl |= IRQ_50753_INT1REQ;
 		}
-		else
-		{
-			m_intctrl &= ~IRQ_50753_INT1REQ;
-		}
 		break;
 
 	case M50753_INT2_LINE:
+		// FIXME: edge-triggered
 		if (state == ASSERT_LINE)
 		{
 			m_intctrl |= IRQ_50753_INT2REQ;
-		}
-		else
-		{
-			m_intctrl &= ~IRQ_50753_INT2REQ;
 		}
 		break;
 	}

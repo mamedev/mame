@@ -25,6 +25,7 @@
         * Golden Tee Golf 2K (5 sets)
         * Golden Tee Classic (3 sets)
         * Must Shoot TV (prototype) (1 set)
+        * Power Up Baseball (prototype) (1 set)
 
     Known issues:
         * volume controls do not work in the Golden Tee games
@@ -632,13 +633,13 @@ u16 drivedge_state::gas_r()
 
 u16 itech32_state::wcbowl_prot_result_r()
 {
-	return m_main_ram[0x111d/2];
+	return m_nvram16[0x111d/2];
 }
 
 
 u8 itech32_state::itech020_prot_result_r()
 {
-	u32 result = ((u32 *)m_main_ram.target())[m_itech020_prot_address >> 2];
+	u32 result = m_main_ram32[m_itech020_prot_address >> 2];
 	result >>= (~m_itech020_prot_address & 3) * 8;
 	return result & 0xff;
 }
@@ -850,7 +851,7 @@ u32 drivedge_state::tms2_speedup_r(address_space &space)
 void itech32_state::nvram_init(nvram_device &nvram, void *base, size_t length)
 {
 	// if nvram is the main RAM, don't overwrite exception vectors
-	int start = (base == m_main_ram) ? 0x80 : 0x00;
+	int start = (!m_main_ram32) && (base == m_nvram32 || base == m_nvram16) ? 0x80 : 0x00;
 	for (int i = start; i < length; i++)
 		((u8 *)base)[i] = machine().rand();
 }
@@ -860,7 +861,7 @@ void drivedge_state::nvram_init(nvram_device &nvram, void *base, size_t length)
 	itech32_state::nvram_init(nvram, base, length);
 
 	// due to accessing uninitialized RAM, we need this hack
-	((u32 *)m_main_ram.target())[0x2ce4/4] = 0x0000001e;
+	m_nvram32[0x2ce4/4] = 0x0000001e;
 }
 
 /*************************************
@@ -872,7 +873,7 @@ void drivedge_state::nvram_init(nvram_device &nvram, void *base, size_t length)
 /*------ Time Killers memory layout ------*/
 void itech32_state::timekill_map(address_map &map)
 {
-	map(0x000000, 0x003fff).ram().share("nvram");
+	map(0x000000, 0x003fff).ram().share("nvram16");
 	map(0x040000, 0x040001).portr("P1");
 	map(0x048000, 0x048001).portr("P2");
 	map(0x050000, 0x050001).portr("SYSTEM");
@@ -882,17 +883,17 @@ void itech32_state::timekill_map(address_map &map)
 	map(0x068000, 0x068003).w(FUNC(itech32_state::timekill_colorbc_w));
 	map(0x070000, 0x070001).nopw();    /* noisy */
 	map(0x078001, 0x078001).w(FUNC(itech32_state::sound_data_w));
-	map(0x080000, 0x08007f).rw(FUNC(itech32_state::video_r), FUNC(itech32_state::video_w)).share("video");
+	map(0x080000, 0x08007f).rw(FUNC(itech32_state::video_r), FUNC(itech32_state::video_w));
 	map(0x0a0000, 0x0a0001).w(FUNC(itech32_state::int1_ack_w));
 	map(0x0c0000, 0x0c7fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x100000, 0x17ffff).rom().region("user1", 0).share("main_rom");
+	map(0x100000, 0x17ffff).rom().region("user1", 0);
 }
 
 
 /*------ BloodStorm and later games memory layout ------*/
 void itech32_state::bloodstm_map(address_map &map)
 {
-	map(0x000000, 0x00ffff).ram().share("nvram");
+	map(0x000000, 0x00ffff).ram().share("nvram16");
 	map(0x080000, 0x080001).portr("P1").w(FUNC(itech32_state::int1_ack_w));
 	map(0x100000, 0x100001).portr("P2");
 	map(0x180000, 0x180001).portr("P3");
@@ -902,11 +903,11 @@ void itech32_state::bloodstm_map(address_map &map)
 	map(0x380001, 0x380001).w(FUNC(itech32_state::color_w<1>));
 	map(0x400000, 0x400001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x480001, 0x480001).w(FUNC(itech32_state::sound_data_w));
-	map(0x500000, 0x5000ff).rw(FUNC(itech32_state::bloodstm_video_r), FUNC(itech32_state::bloodstm_video_w)).share("video");
+	map(0x500000, 0x5000ff).rw(FUNC(itech32_state::bloodstm_video_r), FUNC(itech32_state::bloodstm_video_w));
 	map(0x580000, 0x59ffff).ram().w(FUNC(itech32_state::bloodstm_paletteram_w)).share("palette");
 	map(0x700001, 0x700001).w(FUNC(itech32_state::bloodstm_plane_w));
 	map(0x780000, 0x780001).portr("EXTRA");
-	map(0x800000, 0x87ffff).mirror(0x780000).rom().region("user1", 0).share("main_rom");
+	map(0x800000, 0x87ffff).mirror(0x780000).rom().region("user1", 0);
 }
 
 
@@ -920,7 +921,7 @@ u32 itech32_state::test1_r(offs_t offset, u32 mem_mask)
 	if (ACCESSING_BITS_16_23 && !m_written[0x100 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0x100 + offset*4+1);
 	if (ACCESSING_BITS_8_15 && !m_written[0x100 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0x100 + offset*4+2);
 	if (ACCESSING_BITS_0_7 && !m_written[0x100 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0x100 + offset*4+3);
-	return ((u32 *)m_main_ram)[0x100/4 + offset];
+	return ((u32 *)m_nvram)[0x100/4 + offset];
 }
 
 void itech32_state::test1_w(offs_t offset, u32 data, u32 mem_mask)
@@ -929,7 +930,7 @@ void itech32_state::test1_w(offs_t offset, u32 data, u32 mem_mask)
 	if (ACCESSING_BITS_16_23) m_written[0x100 + offset*4+1] = 1;
 	if (ACCESSING_BITS_8_15) m_written[0x100 + offset*4+2] = 1;
 	if (ACCESSING_BITS_0_7) m_written[0x100 + offset*4+3] = 1;
-	COMBINE_DATA(&((u32 *)m_main_ram)[0x100/4 + offset]);
+	COMBINE_DATA(&((u32 *)m_nvram)[0x100/4 + offset]);
 }
 
 u32 itech32_state::test2_r(offs_t offset, u32 mem_mask)
@@ -938,7 +939,7 @@ u32 itech32_state::test2_r(offs_t offset, u32 mem_mask)
 	if (ACCESSING_BITS_16_23 && !m_written[0xc00 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0xc00 + offset*4+1);
 	if (ACCESSING_BITS_8_15 && !m_written[0xc00 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0xc00 + offset*4+2);
 	if (ACCESSING_BITS_0_7 && !m_written[0xc00 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", m_maincpu->pc(), 0xc00 + offset*4+3);
-	return ((u32 *)m_main_ram)[0xc00/4 + offset];
+	return ((u32 *)m_nvram)[0xc00/4 + offset];
 }
 
 void itech32_state::test2_w(offs_t offset, u32 data, u32 mem_mask)
@@ -947,13 +948,13 @@ void itech32_state::test2_w(offs_t offset, u32 data, u32 mem_mask)
 	if (ACCESSING_BITS_16_23) m_written[0xc00 + offset*4+1] = 1;
 	if (ACCESSING_BITS_8_15) m_written[0xc00 + offset*4+2] = 1;
 	if (ACCESSING_BITS_0_7) m_written[0xc00 + offset*4+3] = 1;
-	COMBINE_DATA(&((u32 *)m_main_ram)[0xc00/4 + offset]);
+	COMBINE_DATA(&((u32 *)m_nvram)[0xc00/4 + offset]);
 }
 #endif
 
 void drivedge_state::main_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).mirror(0x40000).ram().share("nvram");
+	map(0x000000, 0x03ffff).mirror(0x40000).ram().share("nvram32");
 #if LOG_DRIVEDGE_UNINIT_RAM
 map(0x000100, 0x0003ff).mirror(0x40000).rw(FUNC(itech32_state::test1_r), FUNC(itech32_state::test1_w));
 map(0x000c00, 0x007fff).mirror(0x40000).rw(FUNC(itech32_state::test2_r), FUNC(itech32_state::test2_w));
@@ -971,14 +972,14 @@ map(0x000c00, 0x007fff).mirror(0x40000).rw(FUNC(itech32_state::test2_r), FUNC(it
 	map(0x180001, 0x180001).w(FUNC(drivedge_state::color_w<0>));
 	map(0x1a0000, 0x1bffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x1c0000, 0x1c0003).nopw();
-	map(0x1e0000, 0x1e0113).rw(FUNC(drivedge_state::bloodstm_video_r), FUNC(drivedge_state::bloodstm_video_w)).share("video");
+	map(0x1e0000, 0x1e0113).rw(FUNC(drivedge_state::bloodstm_video_r), FUNC(drivedge_state::bloodstm_video_w));
 	map(0x1e4000, 0x1e4003).w(FUNC(drivedge_state::tms_reset_assert_w));
 	map(0x1ec000, 0x1ec003).w(FUNC(drivedge_state::tms_reset_clear_w));
 	map(0x200000, 0x200003).portr("200000");
-	map(0x280000, 0x280fff).ram().w(FUNC(drivedge_state::tms1_68k_ram_w)).share("tms1_ram");
-	map(0x300000, 0x300fff).ram().w(FUNC(drivedge_state::tms2_68k_ram_w)).share("tms2_ram");
+	map(0x280000, 0x280fff).ram().lr32(NAME([this](offs_t offset) { return m_tms1_ram[offset]; })).w(FUNC(drivedge_state::tms1_68k_ram_w));
+	map(0x300000, 0x300fff).ram().lr32(NAME([this](offs_t offset) { return m_tms2_ram[offset]; })).w(FUNC(drivedge_state::tms2_68k_ram_w));
 	map(0x380000, 0x380003).nopw(); // .w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x600000, 0x607fff).rom().region("user1", 0).share("main_rom");
+	map(0x600000, 0x607fff).rom().region("user1", 0);
 }
 
 void drivedge_state::tms1_map(address_map &map)
@@ -1008,16 +1009,15 @@ void itech32_state::itech020_map(address_map &map)
 	map(0x380003, 0x380003).w(FUNC(itech32_state::color_w<0>));
 	map(0x400000, 0x400003).w("watchdog", FUNC(watchdog_timer_device::reset32_w));
 	map(0x480001, 0x480001).w(FUNC(itech32_state::sound_data_w));
-	map(0x500000, 0x5000ff).rw(FUNC(itech32_state::bloodstm_video_r), FUNC(itech32_state::bloodstm_video_w)).share("video");
+	map(0x500000, 0x5000ff).rw(FUNC(itech32_state::bloodstm_video_r), FUNC(itech32_state::bloodstm_video_w));
 	map(0x578000, 0x57ffff).nopr();             /* touched by protection */
 	map(0x580000, 0x59ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0x600000, 0x603fff).ram().share("nvram");
-/* ? */ map(0x61ff00, 0x61ffff).nopw();            /* Unknown Writes */
+	map(0x600000, 0x61ffff).ram().share("nvram32");
 	map(0x680002, 0x680002).r(FUNC(itech32_state::itech020_prot_result_r));
 	map(0x680000, 0x680003).nopw();
 /* ! */ map(0x680800, 0x68083f).readonly().nopw(); /* Serial DUART Channel A/B & Top LED sign - To Do! */
 	map(0x700002, 0x700002).w(FUNC(itech32_state::itech020_plane_w));
-	map(0x800000, 0xbfffff).rom().region("user1", 0).share("main_rom");
+	map(0x800000, 0xbfffff).rom().region("user1", 0);
 }
 
 void shoottv_state::shoottv_map(address_map &map)
@@ -1040,8 +1040,14 @@ void shoottv_state::shoottv_map(address_map &map)
 	map(0x280000, 0x280003).lr32(NAME([this]() { return m_dips->read() << 16; } ));
 	map(0x300003, 0x300003).w(FUNC(shoottv_state::color_w<0>));
 	map(0x380003, 0x380003).w(FUNC(shoottv_state::color_w<1>));
-	map(0x610000, 0x61ffff).ram().share("nvram_b");
 	map(0x680000, 0x680003).lr32(NAME([]() { return 0x00002000; } )); // Fake the security PIC response
+}
+
+void itech32_state::pubball_map(address_map &map)
+{
+	itech020_map(map);
+	map(0x300000, 0x300003).w(FUNC(itech32_state::color_w<0>)).umask32(0x00ff00ff);
+	map(0x380000, 0x380003).w(FUNC(itech32_state::color_w<1>)).umask32(0x00ff00ff);
 }
 
 
@@ -1708,6 +1714,39 @@ static INPUT_PORTS_START( aama )
 	PORT_DIPSETTING(          0x00200000, DEF_STR( Cocktail ) )                 /* Cocktail mode REQUIRES "Controls" to be set to "Two Trackballs" */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( pubball )
+	PORT_INCLUDE( itech32_base_32bit )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 First Base") PORT_PLAYER(1)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Second Base") PORT_PLAYER(1)
+	PORT_BIT( 0x00f00000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 First Base") PORT_PLAYER(2)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Second Base") PORT_PLAYER(2)
+	PORT_BIT( 0x00f00000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Third Base") PORT_PLAYER(1)
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 Third Base") PORT_PLAYER(2)
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Home") PORT_PLAYER(1)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P2 Home") PORT_PLAYER(2)
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Power Up") PORT_PLAYER(1)
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P2 Power Up") PORT_PLAYER(2)
+
+	PORT_START("TRACKX1")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)
+
+	PORT_START("TRACKY1")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
+
+	PORT_START("TRACKX2")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(2)
+
+	PORT_START("TRACKY2")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(2)
+INPUT_PORTS_END
 
 /*************************************
  *
@@ -1721,9 +1760,6 @@ void itech32_state::base_devices(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &itech32_state::sound_map);
 
 	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_IRQ0);
-
-	nvram_device &nvram(NVRAM(config, "nvram"));
-	nvram.set_custom_handler(FUNC(itech32_state::nvram_init));
 
 	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
@@ -1754,7 +1790,7 @@ void itech32_state::base_devices(machine_config &config)
 
 void itech32_state::via(machine_config &config)
 {
-	VIA6522(config, m_via, SOUND_CLOCK/8);
+	MOS6522(config, m_via, SOUND_CLOCK/8);
 	m_via->writepb_handler().set(FUNC(itech32_state::pia_portb_out));
 	m_via->irq_handler().set_inputline(m_soundcpu, M6809_FIRQ_LINE);
 }
@@ -1765,6 +1801,10 @@ void itech32_state::timekill(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &itech32_state::timekill_map);
 
 	base_devices(config);
+
+	nvram_device &nvram(NVRAM(config, "nvram16"));
+	nvram.set_custom_handler(FUNC(itech32_state::nvram_init));
+
 	via(config);
 }
 
@@ -1774,6 +1814,9 @@ void itech32_state::bloodstm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &itech32_state::bloodstm_map);
 
 	base_devices(config);
+
+	nvram_device &nvram(NVRAM(config, "nvram16"));
+	nvram.set_custom_handler(FUNC(itech32_state::nvram_init));
 
 	m_palette->set_format(palette_device::xBGR_888, 32768);
 	m_palette->set_endianness(ENDIANNESS_LITTLE);
@@ -1786,6 +1829,9 @@ void drivedge_state::drivedge(machine_config &config)
 	/* basic machine hardware */
 	M68EC020(config, m_maincpu, CPU020_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &drivedge_state::main_map);
+
+	nvram_device &nvram(NVRAM(config, "nvram32"));
+	nvram.set_custom_handler(FUNC(drivedge_state::nvram_init));
 
 	TMS32031(config, m_dsp[0], TMS_CLOCK);
 	m_dsp[0]->set_addrmap(AS_PROGRAM, &drivedge_state::tms1_map);
@@ -1818,8 +1864,6 @@ void shoottv_state::shoottv(machine_config &config)
 {
 	itech32_state::sftm(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &shoottv_state::shoottv_map);
-
-	NVRAM(config, "nvram_b");
 }
 
 void itech32_state::sftm(machine_config &config)
@@ -1828,6 +1872,9 @@ void itech32_state::sftm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &itech32_state::itech020_map);
 
 	base_devices(config);
+
+	nvram_device &nvram(NVRAM(config, "nvram32"));
+	nvram.set_custom_handler(FUNC(itech32_state::nvram_init));
 
 	m_soundcpu->set_addrmap(AS_PROGRAM, &itech32_state::sound_020_map);
 	m_soundcpu->set_periodic_int(FUNC(itech32_state::irq1_line_assert), attotime::from_hz(4*60));
@@ -1847,6 +1894,11 @@ void itech32_state::tourny(machine_config &config)
 	M48T02(config, m_timekeeper);
 }
 
+void itech32_state::pubball(machine_config &config)
+{
+	itech32_state::sftm(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &itech32_state::pubball_map);
+}
 
 
 /*************************************
@@ -4592,9 +4644,18 @@ ROM_START( gtclasscs )  /* Version 1.00S for the 3 tier type PCB with short ROM 
 	ROM_LOAD16_BYTE( "gtg3_srom2_nr+.srom2",  0x200000, 0x080000, CRC(1b3f18b6) SHA1(3b65de6a90c5ede183b5f8ca1875736bc1425772) ) /* actually labeled "GTG3 SROM2 NR*"  */
 ROM_END
 
+/***************************************************************************
+    The ROM images for both sets below were found by analyzing the contents
+    of archived source-code CDs acquired at auction. This is why the ROM
+    definitions in question are not sized to a power of two, as most ROM
+    dumps typically are.
+    However, the provided dump of Power Up Baseball has been proven to
+    work as-is on a properly-configured itech32 board, and passes all
+    relevant ROM tests, and so can be considered authoritative.
+****************************************************************************/
 
 ROM_START( shoottv )
-	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
+	ROM_REGION32_BE( CODE_SIZE, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD32_BYTE( "gun_0.bin", 0x00000, 0xc5f9, CRC(1086b219) SHA1(a9e9545911e427e819d4c98885cbfe871ce7e83a) ) // from GUN/roms
 	ROM_LOAD32_BYTE( "gun_1.bin", 0x00001, 0xc5f9, CRC(a0f0e5ea) SHA1(39560d76759d17c34c353dbe202ec22af234238d) )
 	ROM_LOAD32_BYTE( "gun_2.bin", 0x00002, 0xc5f9, CRC(1b84cf05) SHA1(8f4b816ab2808258399072545f5dda0316e554ea) )
@@ -4620,6 +4681,44 @@ ROM_START( shoottv )
 ROM_END
 
 
+ROM_START( pubball )
+	ROM_REGION32_BE( CODE_SIZE, "user1", ROMREGION_ERASEFF )
+	ROM_LOAD32_BYTE( "bb0.bin", 0x00000, 0x25a91, CRC(f9350590) SHA1(91352373fb6a41495bb04db01d097e76770c5419) ) // from SOURCE
+	ROM_LOAD32_BYTE( "bb1.bin", 0x00001, 0x25a91, CRC(5711f503) SHA1(94765a5e9311fffbf0bc386c3b531c79acd7cada) )
+	ROM_LOAD32_BYTE( "bb2.bin", 0x00002, 0x25a91, CRC(3e202dc6) SHA1(a1a9fdff1957a8e43f002883666f1cd489879258) )
+	ROM_LOAD32_BYTE( "bb3.bin", 0x00003, 0x25a91, CRC(e6d1ba8d) SHA1(c07fe0f9093422505079785ef8e019d1ba69e2ff) )
+
+	ROM_REGION( 0x28000, "soundcpu", 0 )
+	ROM_LOAD( "bball.bim", 0x10000, 0x18000, CRC(915a9116) SHA1(54dbb9f8eb358c5dbe2022fad86cdd411c893b83) ) // from SOUNDS
+	ROM_CONTINUE(          0x08000, 0x08000 )
+
+	ROM_REGION( 0xE00000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "grom00_0.bin", 0x000000, 0x100000, CRC(46822b0f) SHA1(0b9758a1ccad252973a1fc61dc1a4eb1d0eb1636) ) // from ART
+	ROM_LOAD32_BYTE( "grom00_1.bin", 0x000001, 0x100000, CRC(c11236ce) SHA1(1459646b4d947aa63b037c7c5ab19d3261cbaa19) )
+	ROM_LOAD32_BYTE( "grom00_2.bin", 0x000002, 0x100000, CRC(e6be30f3) SHA1(832aff7b9a42fa57ccff09554c9f65f469e1045d) )
+	ROM_LOAD32_BYTE( "grom00_3.bin", 0x000003, 0x100000, CRC(e0d454fb) SHA1(26ca842682ad618619d4311f7ecd1bb326771c2e) )
+	ROM_LOAD32_BYTE( "grom01_0.bin", 0x400000, 0x100000, CRC(115a66f2) SHA1(9f514c82943d3a779bd44c93618a396b1f9184b9) )
+	ROM_LOAD32_BYTE( "grom01_1.bin", 0x400001, 0x100000, CRC(1dfc8dbd) SHA1(2e3018d61b1c7acec4a2f5da8184da33764e7965) )
+	ROM_LOAD32_BYTE( "grom01_2.bin", 0x400002, 0x100000, CRC(23386483) SHA1(9198b9d7e45d0a276947ebfbdda844113aa71928) )
+	ROM_LOAD32_BYTE( "grom01_3.bin", 0x400003, 0x100000, CRC(ac0123ce) SHA1(c6fe79ca8c3efdfaf9310dfab3e0142042319b11) )
+	ROM_LOAD32_BYTE( "grom02_0.bin", 0x800000, 0x100000, CRC(06cd3cca) SHA1(501b0be9388c5a6b89d453f3287217dd286eecff) )
+	ROM_LOAD32_BYTE( "grom02_1.bin", 0x800001, 0x100000, CRC(3df38e91) SHA1(f3adf29598481d050258d266a360d5b40d86f665) )
+	ROM_LOAD32_BYTE( "grom02_2.bin", 0x800002, 0x100000, CRC(7c47dde9) SHA1(654656878676278e0ea73e367337eaac5f1f1d50) )
+	ROM_LOAD32_BYTE( "grom02_3.bin", 0x800003, 0x100000, CRC(e6eb01bf) SHA1(f0e7f2372dfd072e005fbf7489f54242523b4a28) )
+	ROM_LOAD32_BYTE( "grom3_0.bin",  0xC00000, 0x080000, CRC(376beb10) SHA1(2dcea69b5e81d010b4c660df189a560742719ce6) )
+	ROM_LOAD32_BYTE( "grom3_1.bin",  0xC00001, 0x080000, CRC(3b3cb8ba) SHA1(eabac9e381dd652a4575f159dac45499406b2702) )
+	ROM_LOAD32_BYTE( "grom3_2.bin",  0xC00002, 0x080000, CRC(3bdfac73) SHA1(64777cdf92bbdfbfb6806039421a28f9810b6b03) )
+	ROM_LOAD32_BYTE( "grom3_3.bin",  0xC00003, 0x080000, CRC(1de04025) SHA1(25ba2fa49cc2423642020e05586662f67943381b) )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "bbsrom0.bin",  0x000000, 0x0f8b8e, CRC(2a69f77e) SHA1(c98ccdb0d79e77bf87077ac29626d84a811d1326) ) // from SOUNDS
+	ROM_LOAD16_BYTE( "bbsrom1.bin",  0x200000, 0x0fe442, CRC(4af8c871) SHA1(fe4b0ed0a4ef77147fe150c0cd70dff1929e9aff) )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "bbsrom2.bin",  0x000000, 0x0fe62d, CRC(e4f9ad52) SHA1(c8bf590de35155937bd656b39658880d9a40f5c3) )
+	ROM_LOAD16_BYTE( "bbsrom3.bin",  0x200000, 0x0f90b3, CRC(b37e2906) SHA1(f8c2fd54fe8579eb2875c77630efa8d715eae022) )
+ROM_END
+
 
 /*************************************
  *
@@ -4629,9 +4728,12 @@ ROM_END
 
 void itech32_state::init_program_rom()
 {
-	if (m_main_ram == nullptr)
-		m_main_ram.set_target(m_nvram, m_nvram.bytes());
-	memcpy(m_main_ram, m_main_rom, 0x80);
+	if(m_main_ram32)
+		memcpy(m_main_ram32, m_main_rom32, 0x80);
+	else if(m_nvram16)
+		memcpy(m_nvram16, m_main_rom16, 0x80);
+	else
+		memcpy(m_nvram32, m_main_rom32, 0x80);
 }
 
 
@@ -4907,6 +5009,18 @@ Label1  bne.s       Label1          ; Infinite loop if result isn't 0x80
 }
 
 
+void itech32_state::init_pubball()
+{
+	init_program_rom();
+	m_vram_height = 1024;
+	m_planes = 2;
+
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x300000, 0x300003, write8smo_delegate(*this, FUNC(itech32_state::color_w<0>)), 0x000000ff);
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x380000, 0x380003, write8smo_delegate(*this, FUNC(itech32_state::color_w<1>)), 0x000000ff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x180800, 0x180803, read32smo_delegate(*this, FUNC(itech32_state::trackball32_4bit_p1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x181000, 0x181003, read32smo_delegate(*this, FUNC(itech32_state::trackball32_4bit_p2_r)));
+}
+
 
 /*************************************
  *
@@ -5044,3 +5158,5 @@ GAME( 2001, gtclasscp, gtclassc, sftm,   aama,  itech32_state, init_gtclasscp, R
 GAME( 2001, gtclasscs, gtclassc, sftm,   s_ver, itech32_state, init_s_ver,     ROT0, "Incredible Technologies", "Golden Tee Classic (v1.00S)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITGFCL-M */
 
 GAME( 199?, shoottv,  0,         shoottv, shoottv, shoottv_state, empty_init,  ROT0, "Incredible Technologies", "Must Shoot TV (prototype)" , MACHINE_SUPPORTS_SAVE )
+GAME( 1996, pubball,  0,         pubball, pubball, itech32_state, init_pubball,ROT0, "Midway / Incredible Technologies", "Power Up Baseball (prototype)" , MACHINE_SUPPORTS_SAVE )
+

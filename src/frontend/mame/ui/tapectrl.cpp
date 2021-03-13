@@ -92,19 +92,19 @@ void menu_tape_control::populate(float &customtop, float &custombottom)
 						TAPECMD_SLIDER);
 
 			// pause or stop
-			item_append(_("Pause/Stop"), "", 0, TAPECMD_STOP);
+			item_append(_("Pause/Stop"), 0, TAPECMD_STOP);
 
 			// play
-			item_append(_("Play"), "", 0, TAPECMD_PLAY);
+			item_append(_("Play"), 0, TAPECMD_PLAY);
 
 			// record
-			item_append(_("Record"), "", 0, TAPECMD_RECORD);
+			item_append(_("Record"), 0, TAPECMD_RECORD);
 
 			// rewind
-			item_append(_("Rewind"), "", 0, TAPECMD_REWIND);
+			item_append(_("Rewind"), 0, TAPECMD_REWIND);
 
 			// fast forward
-			item_append(_("Fast Forward"), "", 0, TAPECMD_FAST_FORWARD);
+			item_append(_("Fast Forward"), 0, TAPECMD_FAST_FORWARD);
 		}
 	}
 }
@@ -116,14 +116,11 @@ void menu_tape_control::populate(float &customtop, float &custombottom)
 
 void menu_tape_control::handle()
 {
-	// rebuild the menu (so to update the selected device, if the user has pressed L or R, and the tape counter)
-	repopulate(reset_options::REMEMBER_POSITION);
-
 	// process the menu
 	const event *event = process(PROCESS_LR_REPEAT);
 	if (event != nullptr)
 	{
-		switch(event->iptkey)
+		switch (event->iptkey)
 		{
 		case IPT_UI_LEFT:
 			if (event->itemref == TAPECMD_SLIDER)
@@ -155,6 +152,9 @@ void menu_tape_control::handle()
 			break;
 		}
 	}
+
+	// hacky way to update the tape counter by repopulating every frame
+	reset(reset_options::REMEMBER_POSITION);
 }
 
 

@@ -678,7 +678,7 @@ void osd_common_t::init_subsystems()
 
 	m_output = select_module_options<output_module *>(options(), OSD_OUTPUT_PROVIDER);
 	m_output->set_machine(&machine());
-	machine().output().set_notifier(nullptr, output_notifier_callback, this);
+	machine().output().set_global_notifier(output_notifier_callback, this);
 
 	m_mod_man.init(options());
 

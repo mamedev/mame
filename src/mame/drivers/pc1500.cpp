@@ -96,13 +96,13 @@ private:
 void pc1500_state::pc1500_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x3fff).rom();    //module ROM/RAM
+	//  map(0x0000, 0x3fff).rom();    //module ROM/RAM
 	map(0x4000, 0x47ff).ram();    //user RAM
 	map(0x4800, 0x6fff).ram();    //expansion RAM
 	map(0x7000, 0x71ff).ram().mirror(0x0600).share("lcd_data");
-	map(0x7800, 0x7bff).ram().region("maincpu", 0x7800).mirror(0x0400);
-	map(0xa000, 0xbfff).rom();    //expansion ROM
-	map(0xc000, 0xffff).rom();    //system ROM
+	map(0x7800, 0x7bff).ram().mirror(0x0400);
+	//  map(0xa000, 0xbfff).rom();    //expansion ROM
+	map(0xc000, 0xffff).rom().region("maincpu", 0);    //system ROM
 }
 
 void pc1500_state::pc1500_mem_io(address_map &map)
@@ -350,9 +350,9 @@ void pc1500_state::pc1500(machine_config &config)
 
 
 ROM_START( pc1500 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "sys1500.rom", 0xc000, 0x4000, CRC(d480b50d) SHA1(4bf748ba4d7c2b7cd7da7f3fdefcdd2e4cd41c4e))
-	ROM_REGION( 0x10000, "ce150", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "sys1500.rom", 0x0000, 0x4000, CRC(d480b50d) SHA1(4bf748ba4d7c2b7cd7da7f3fdefcdd2e4cd41c4e))
+	ROM_REGION( 0x2000, "ce150", ROMREGION_ERASEFF )
 	ROM_LOAD( "ce-150.rom", 0x0000, 0x2000, CRC(8fa1df6d) SHA1(a3aa02a641a46c27c0d4c0dc025b0dbe9b5b79c8))
 ROM_END
 

@@ -102,9 +102,6 @@ void exerion_state::exerion_palette(palette_device &palette) const
 
 void exerion_state::video_start()
 {
-	int i;
-	uint8_t *gfx;
-
 	/* get pointers to the mixing and lookup PROMs */
 	m_background_mixer = memregion("proms")->base() + 0x320;
 
@@ -118,6 +115,8 @@ void exerion_state::video_start()
 	save_pointer(NAME(m_background_gfx[1]), 256 * 256);
 	save_pointer(NAME(m_background_gfx[2]), 256 * 256);
 	save_pointer(NAME(m_background_gfx[3]), 256 * 256);
+
+	m_cocktail_flip = 0;
 
 	/*---------------------------------
 	 * Decode the background graphics
@@ -134,15 +133,13 @@ void exerion_state::video_start()
 	 * Where AA,BB,CC,DD are the 2bpp data for the pixel,and a,b,c,d are the OR
 	 * of these two bits together.
 	 */
-	gfx = memregion("gfx3")->base();
-	for (i = 0; i < 4; i++)
+	uint8_t *gfx = memregion("gfx3")->base();
+	for (int i = 0; i < 4; i++)
 	{
-		int y;
-
 		uint8_t *src = gfx + i * 0x2000;
 		uint16_t *dst = m_background_gfx[i].get();
 
-		for (y = 0; y < 0x100; y++)
+		for (int y = 0; y < 0x100; y++)
 		{
 			int x;
 

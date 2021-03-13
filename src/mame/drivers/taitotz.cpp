@@ -506,6 +506,9 @@ Notes:
     0x10000105:
 */
 
+
+namespace {
+
 #define LOG_PPC_TO_TLCS_COMMANDS        1
 #define LOG_TLCS_TO_PPC_COMMANDS        1
 
@@ -545,7 +548,9 @@ public:
 		m_iocpu(*this, "iocpu"),
 		m_work_ram(*this, "work_ram"),
 		m_mbox_ram(*this, "mbox_ram"),
-		m_ata(*this, "ata")
+		m_ata(*this, "ata"),
+		m_scr_base(0),
+		m_hdd_serial_number(nullptr)
 	{
 	}
 
@@ -564,6 +569,11 @@ public:
 	void init_styphp();
 
 	required_device<screen_device> m_screen;
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_device<ppc_device> m_maincpu;
@@ -609,9 +619,6 @@ private:
 
 	std::unique_ptr<taitotz_renderer> m_renderer;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_taitotz(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(taitotz_vbi);
 	uint16_t tlcs_ide0_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -781,6 +788,8 @@ void taitotz_state::video_start()
 	m_renderer = std::make_unique<taitotz_renderer>(*this, width, height, m_screen_ram.get(), m_texture_ram.get());
 
 	//machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&taitotz_exit, &machine()));
+
+	m_video_reg = 0;
 }
 
 static const float dot3_tex_table[32] =
@@ -2991,6 +3000,9 @@ ROM_START( dendego3 )
 	DISK_REGION( "ata:0:hdd:image" ) // Fujitsu MPF3102AT
 	DISK_IMAGE( "ddg3", 0, SHA1(468d699e02ef0a0242de4e7038613cc5d0545591) )
 ROM_END
+
+} // Anonymous namespace
+
 
 GAME( 1999, taitotz,   0,        taitotz,  taitotz,  taitotz_state, empty_init,    ROT0, "Taito", "Type Zero BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
 GAME( 1998, batlgear,  taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgear, ROT0, "Taito", "Battle Gear (Ver 2.40 A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )

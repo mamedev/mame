@@ -616,7 +616,7 @@ void gamecom_state::init_gamecom()
 	m_sound1_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamecom_state::gamecom_sound1_timer_callback),this));
 	m_sound0_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 	m_sound1_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
-	m_p_ram = m_region_maincpu->base(); // required here because pio_w gets called before machine_reset
+	m_p_ram = m_share_maincpu; // required here because pio_w gets called before machine_reset
 }
 
 image_init_result gamecom_state::common_load(device_image_interface &image, generic_slot_device *slot)

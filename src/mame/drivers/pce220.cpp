@@ -8,40 +8,38 @@
     improvements by Sandro Ronco
 
     Notes:
-    - NVRAM works only if the machine is turned off (with OFF key) before closing MESS
+    - NVRAM works only if the machine is turned off (with OFF key) before closing MAME
+    - Holding SHIFT + COMMA on boot loads the Test Menu
 
     TODO:
-    - ON key doesn't work.
-    - Fix the PC-G850V keyboard, that sometimes is too slow.
+    - 11 pin interface for extensions (printer, cassette).
     - LCD contrast.
-    - Add an artwork for the LCD symbols.
     - Add other models that have a similar hardware.
 
     More info:
       http://wwwhomes.uni-bielefeld.de/achim/pc-e220.html
       http://www.akiyan.com/pc-g850_technical_data (in Japanese)
 
-    PC-G815 added 2016-05-14, not working at all. Needs new IO map.
-    Looks like base.rom runs first, then rom00 is at 0x8000 and rom01 is at 0xc000.
-
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "machine/pce220_ser.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/beep.h"
+#include "video/hd61202.h"
+#include "video/sed1520.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+#include "pce220.lh"
+#include "pcg850v.lh"
 
-// Interrupt flags
-#define IRQ_FLAG_KEY        0x01
-#define IRQ_FLAG_ON         0x02
-#define IRQ_FLAG_TIMER      0x04
+namespace {
 
 class pce220_state : public driver_device
 {
@@ -49,29 +47,17 @@ public:
 	pce220_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_ram(*this, RAM_TAG)
+		, m_banks(*this, "bank%u", 1)
 		, m_beep(*this, "beeper")
+		, m_lcdc(*this, "hd61202")
+		, m_input_merger(*this, "input_merger")
 		, m_serial(*this, PCE220SERIAL_TAG)
 		, m_keyboard(*this, "LINE%u", 0)
 		, m_io_on(*this, "ON")
-		, m_busy(*this, "BUSY")
-		, m_caps(*this, "CAPS")
-		, m_kana(*this, "KANA")
-		, m_syo(*this, "SYO")
-		, m_2ndf(*this, "2ndF")
-		, m_text(*this, "TEXT")
-		, m_casl(*this, "CASL")
-		, m_pro(*this, "PRO")
-		, m_run(*this, "RUN")
-		, m_batt(*this, "BATT")
-		, m_e(*this, "E")
-		, m_m(*this, "M")
-		, m_const(*this, "CONST")
-		, m_rad(*this, "RAD")
-		, m_g(*this, "G")
-		, m_de(*this, "DE")
-		, m_stat(*this, "STAT")
-		, m_print(*this, "PRINT")
+		, m_battery(*this, "BATTERY")
+		, m_lcd_symbols(*this, "sym.%u", 0U)
 	{ }
 
 	void pce220(machine_config &config);
@@ -80,38 +66,29 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(on_irq);
 
 protected:
+
+	// Interrupt flags
+	enum : uint8_t
+	{
+		IRQ_FLAG_KEY   = 0x01,
+		IRQ_FLAG_ON    = 0x02,
+		IRQ_FLAG_TIMER = 0x04,
+	};
+
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<ram_device> m_ram;
+	required_memory_bank_array<4> m_banks;
 	required_device<beep_device> m_beep;
+	optional_device<hd61202_device> m_lcdc;
+	required_device<input_merger_device> m_input_merger;
 	required_device<pce220_serial_device> m_serial;
 
 	required_ioport_array<10> m_keyboard;
 	required_ioport m_io_on;
+	required_ioport m_battery;
 
-	output_finder<> m_busy;
-	output_finder<> m_caps;
-	output_finder<> m_kana;
-	output_finder<> m_syo;
-	output_finder<> m_2ndf;
-	output_finder<> m_text;
-	output_finder<> m_casl;
-	output_finder<> m_pro;
-	output_finder<> m_run;
-	output_finder<> m_batt;
-	output_finder<> m_e;
-	output_finder<> m_m;
-	output_finder<> m_const;
-	output_finder<> m_rad;
-	output_finder<> m_g;
-	output_finder<> m_de;
-	output_finder<> m_stat;
-	output_finder<> m_print;
-
-	// HD61202 LCD controller
-	uint8_t m_lcd_index_row;
-	uint8_t m_lcd_index_col;
-	uint8_t m_lcd_start_line;
-	uint8_t m_lcd_on;
+	output_finder<18> m_lcd_symbols;
 
 	//basic machine
 	uint8_t m_bank_num;
@@ -119,10 +96,11 @@ protected:
 	uint8_t m_irq_flag;
 	uint8_t m_timer_status;
 	uint16_t m_kb_matrix;
-	uint8_t *m_vram;
+	uint8_t m_power_state;
 
 	uint8_t m_port15;
 	uint8_t m_port18;
+	uint8_t m_battery_sel;
 
 	virtual void device_resolve_objects() override;
 	virtual void machine_start() override;
@@ -132,11 +110,7 @@ protected:
 
 	void pce220_palette(palette_device &palette) const;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint8_t lcd_status_r();
-	void lcd_control_w(uint8_t data);
-	uint8_t lcd_data_r();
-	void lcd_data_w(uint8_t data);
+	HD61202_UPDATE_CB(hd61202_update);
 	uint8_t rom_bank_r();
 	void rom_bank_w(uint8_t data);
 	void ram_bank_w(uint8_t data);
@@ -147,16 +121,44 @@ protected:
 	void port15_w(uint8_t data);
 	uint8_t port18_r();
 	void port18_w(uint8_t data);
+	void battery_w(uint8_t data);
+	uint8_t battery_r();
 	uint8_t port1f_r();
 	void kb_matrix_w(offs_t offset, uint8_t data);
 	uint8_t kb_r();
 	uint8_t irq_status_r();
 	void irq_ack_w(uint8_t data);
 	void irq_mask_w(uint8_t data);
+	void install_bootrom();
 
+	void pce220_io_common(address_map &map);
 	void pce220_io(address_map &map);
 	void pce220_mem(address_map &map);
 };
+
+
+class pcg815_state : public pce220_state
+{
+public:
+	pcg815_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pce220_state(mconfig, type, tag)
+		, m_lcdc2(*this, "hd61202_2")
+		{ }
+
+	void pcg815(machine_config &config);
+
+private:
+	required_device<hd61202_device> m_lcdc2;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void lcdc_control_w(uint8_t data);
+	void lcdc_data_w(uint8_t data);
+	HD61202_UPDATE_CB(hd61202_1_update);
+	HD61202_UPDATE_CB(hd61202_2_update);
+	void pcg815_io(address_map &map);
+};
+
 
 class pcg850v_state : public pce220_state
 {
@@ -166,7 +168,6 @@ public:
 		{ }
 
 	void pcg850v(machine_config &config);
-	void pcg815(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -174,200 +175,165 @@ protected:
 
 private:
 	uint8_t m_g850v_bank_num;
-	uint8_t m_lcd_effects;
-	uint8_t m_lcd_contrast;
-	uint8_t m_lcd_read_mode;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	SED1560_UPDATE_CB(sed1560_update);
 	uint8_t g850v_bank_r();
+	void g850v_rom_bank_w(uint8_t data);
 	void g850v_bank_w(uint8_t data);
-	uint8_t g850v_lcd_status_r();
-	void g850v_lcd_control_w(uint8_t data);
-	uint8_t g850v_lcd_data_r();
-	void g850v_lcd_data_w(uint8_t data);
 	void pcg850v_io(address_map &map);
 };
 
-uint32_t pce220_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+
+HD61202_UPDATE_CB(pce220_state::hd61202_update)
 {
-	uint8_t lcd_symbols[4];
-
-	if (m_lcd_on)
+	if (lcd_on)
 	{
-		for (int y = 0; y < 4; y++)
+		bitmap.fill(2, cliprect);
+		for (int y = 0; y < 4 * 8; y++)
 		{
-			int row_pos = 0;
+			if ((y & 7) == 7)
+				continue;
 
-			for (int x = 0; x < 12; x++)
+			int ys = start_line + y;
+			for (int x = 0; x < 12 * 5; x++)
 			{
-				for (int xi = 0; xi < 5; xi++)
-				{
-					for (int yi = 0; yi < 8; yi++)
-					{
-						//first 12 columns
-						int panel1_addr = ((m_lcd_start_line>>3) + y)*0x40 + row_pos;
-						bitmap.pix(y*8 + yi, x*6 + xi) = (m_vram[panel1_addr & 0x1ff] >> yi) & 1;
+				int xdest = x + (x / 5);
+				int bitpos = (ys & ~7) * 64 + x * 8 + (ys & 7);
 
-						//last 12 columns
-						int panel2_addr = ((m_lcd_start_line>>3) + y + 4)*0x40 + (59-row_pos);
-						bitmap.pix(y*8 + yi, (x+12)*6 + xi) = (m_vram[panel2_addr & 0x1ff] >> yi) & 1;
-					}
+				//first 12 columns
+				bitmap.pix(y, xdest) = BIT(ddr[(bitpos / 8) & 0x1ff], bitpos & 7);
 
-					row_pos++;
-				}
+				//last 12 columns
+				bitmap.pix(y, 142 - xdest) = BIT(ddr[(0x100 + bitpos / 8) & 0x1ff], bitpos & 7);
 			}
 		}
-
-		lcd_symbols[0] = m_vram[((m_lcd_start_line>>3)*0x40 + 0x03c) & 0x1ff];
-		lcd_symbols[1] = m_vram[((m_lcd_start_line>>3)*0x40 + 0x0fc) & 0x1ff];
-		lcd_symbols[2] = m_vram[((m_lcd_start_line>>3)*0x40 + 0x13c) & 0x1ff];
-		lcd_symbols[3] = m_vram[((m_lcd_start_line>>3)*0x40 + 0x1fc) & 0x1ff];
 	}
 	else
-	{
 		bitmap.fill(0, cliprect);
-		memset(lcd_symbols, 0, sizeof(lcd_symbols));
-	}
 
-	m_busy = (lcd_symbols[0] & 0x01) ? 1 : 0;
-	m_caps = (lcd_symbols[0] & 0x02) ? 1 : 0;
-	m_kana = (lcd_symbols[0] & 0x04) ? 1 : 0;
-	m_syo  = (lcd_symbols[0] & 0x08) ? 1 : 0;
-	m_2ndf = (lcd_symbols[0] & 0x10) ? 1 : 0;
-	m_text = (lcd_symbols[1] & 0x08) ? 1 : 0;
-	m_casl = (lcd_symbols[1] & 0x10) ? 1 : 0;
-	m_pro  = (lcd_symbols[1] & 0x20) ? 1 : 0;
-	m_run  = (lcd_symbols[1] & 0x40) ? 1 : 0;
-	m_batt = (lcd_symbols[2] & 0x01) ? 1 : 0;
-	m_e    = (lcd_symbols[2] & 0x02) ? 1 : 0;
-	m_m    = (lcd_symbols[2] & 0x04) ? 1 : 0;
-	m_const= (lcd_symbols[2] & 0x08) ? 1 : 0;
-	m_rad  = (lcd_symbols[2] & 0x10) ? 1 : 0;
-	m_g    = (lcd_symbols[2] & 0x20) ? 1 : 0;
-	m_de   = (lcd_symbols[2] & 0x40) ? 1 : 0;
-	m_stat = (lcd_symbols[3] & 0x20) ? 1 : 0;
-	m_print= (lcd_symbols[3] & 0x40) ? 1 : 0;
+
+	static const uint16_t lcd_symbol_bits[] =
+	{
+		//BUSY  CAPS  KANA  SHO   2ndF   DE     G     RAD    CONST   M     E     BATT   RUN    PRO    CASL   TEXT   STAT   PRINT
+		480,    481,  482,  483,  484,  2534,  2533,  2532,  2531, 2530,  2529,  2528,  2022,  2021,  2020,  2019,  4069,  4070
+	};
+
+	for (int i=0; i<18; i++)
+	{
+		int bitpos = ((start_line & ~7) * 64 + lcd_symbol_bits[i]) + (start_line & 7);
+		m_lcd_symbols[i] = !lcd_on ? 0 : BIT(ddr[(bitpos / 8) & 0x1ff], bitpos & 7);
+	}
 
 	return 0;
 }
 
-uint32_t pcg850v_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+HD61202_UPDATE_CB(pcg815_state::hd61202_1_update)
 {
-	uint8_t lcd_symbols[6];
-	int color0 = 0;
-	int color1 = 1;
-
-	if (m_lcd_on)
+	if (lcd_on)
 	{
-		switch (m_lcd_effects)
+		for (int y = 0; y < 4 * 8; y++)
 		{
-		case 0x01:      //mirror effect
-			//TODO
-			break;
-		case 0x05:      //black mask effect
-			color0 = color1 = 1;
-			break;
-		case 0x07:      //reverse effect
-			color0 = 1;
-			color1 = 0;
-			break;
-		case 0x08:      //contrast effect
-			//TODO: use the max contrast value
-			break;
-		case 0x0e:      //white mask effect
-			color0 = color1 = 0;
-			break;
-		}
-
-		for (int y = 0; y < 6; y++)
-		{
-			int row_pos = 0;
-
-			for (int x = 0; x < 24; x++)
+			int ys = start_line + y;
+			for (int x = 0; x < 2 * 6; x++)
 			{
-				for (int xi = 0; xi < 6; xi++)
-				{
-					for (int yi = 0; yi < 8; yi++)
-					{
-						int addr = ((m_lcd_start_line>>3) + y)*0x100 + row_pos;
-						bitmap.pix(y*8 + yi, x*6 + xi) = ((m_vram[addr & 0x7ff] >> yi) & 1 ) ? color1 : color0;
-					}
-
-					row_pos++;
-				}
+				int bitpos = (ys & ~7) * 64 + x * 8 + (ys & 7);
+				bitmap.pix(y, 60 + x) = BIT(ddr[(bitpos / 8) & 0x1ff], bitpos & 7);
+				bitmap.pix(y, 83 - x) = BIT(ddr[(0x100 + bitpos / 8) & 0x1ff], bitpos & 7);
 			}
 		}
-
-		lcd_symbols[0] = m_vram[((m_lcd_start_line>>3)*0x100 + 0x090) & 0x7ff];
-		lcd_symbols[1] = m_vram[((m_lcd_start_line>>3)*0x100 + 0x190) & 0x7ff];
-		lcd_symbols[2] = m_vram[((m_lcd_start_line>>3)*0x100 + 0x290) & 0x7ff];
-		lcd_symbols[3] = m_vram[((m_lcd_start_line>>3)*0x100 + 0x390) & 0x7ff];
-		lcd_symbols[4] = m_vram[((m_lcd_start_line>>3)*0x100 + 0x490) & 0x7ff];
-		lcd_symbols[5] = m_vram[((m_lcd_start_line>>3)*0x100 + 0x590) & 0x7ff];
 	}
-	else
+
+	static const uint16_t lcd_symbol_bits[] =
 	{
-		bitmap.fill(0, cliprect);
-		memset(lcd_symbols, 0, sizeof(lcd_symbols));
-	}
+		//BUSY  CAPS   KANA   SHO    2ndF    DE     G     RAD    CONST   M      E     BATT   RUN   PRO   CASL  TEXT  STAT  PRINT
+		504,    2555,  2553,  2552,  2556,  3068,  3067,  3066,  2554,  3065,  1529,  3576,  505,  506,  507,  510,  509,  3064
+	};
 
-	m_run  = (lcd_symbols[0] & 0x02) ? 1 : 0;
-	m_pro  = (lcd_symbols[0] & 0x08) ? 1 : 0;
-	m_text = (lcd_symbols[0] & 0x40) ? 1 : 0;
-	m_casl = (lcd_symbols[1] & 0x08) ? 1 : 0;
-	m_stat = (lcd_symbols[2] & 0x01) ? 1 : 0;
-	m_2ndf = (lcd_symbols[2] & 0x20) ? 1 : 0;
-	m_m    = (lcd_symbols[2] & 0x80) ? 1 : 0;
-	m_caps = (lcd_symbols[3] & 0x04) ? 1 : 0;
-	m_kana = (lcd_symbols[3] & 0x80) ? 1 : 0;
-	m_syo  = (lcd_symbols[4] & 0x02) ? 1 : 0;
-	m_de   = (lcd_symbols[4] & 0x10) ? 1 : 0;
-	m_g    = (lcd_symbols[4] & 0x40) ? 1 : 0;
-	m_rad  = (lcd_symbols[5] & 0x01) ? 1 : 0;
-	m_const= (lcd_symbols[5] & 0x04) ? 1 : 0;
-	m_print= (lcd_symbols[5] & 0x10) ? 1 : 0;
-	m_busy = (lcd_symbols[5] & 0x40) ? 1 : 0;
-	m_batt = (lcd_symbols[5] & 0x80) ? 1 : 0;
+	for (int i=0; i<18; i++)
+	{
+		int bitpos = ((start_line & ~7) * 64 + lcd_symbol_bits[i]) + (start_line & 7);
+		m_lcd_symbols[i] = !lcd_on ? 0 : BIT(ddr[(bitpos / 8) & 0x1ff], bitpos & 7);
+	}
 
 	return 0;
 }
 
-uint8_t pce220_state::lcd_status_r()
+
+HD61202_UPDATE_CB(pcg815_state::hd61202_2_update)
 {
-	/*
-	x--- ---- Busy (not emulated)
-	--x- ---- LCD on/off
-	---x ---- Reset
-	*/
-	uint8_t data = 0;
+	if (lcd_on)
+	{
+		for (int y = 0; y < 4 * 8; y++)
+		{
+			int ys = start_line + y;
+			for (int x = 0; x < 10 * 6; x++)
+			{
+				int bitpos = (ys & ~7) * 64 + x * 8 + (ys & 7);
+				bitmap.pix(y, x) = BIT(ddr[(bitpos / 8) & 0x1ff], bitpos & 7);
+				bitmap.pix(y, 143 - x) = BIT(ddr[(0x100 + bitpos / 8) & 0x1ff], bitpos & 7);
+			}
+		}
+	}
 
-	data &= (m_lcd_on<<5);
-
-	return data;
+	return 0;
 }
 
-void pce220_state::lcd_control_w(uint8_t data)
+
+uint32_t pcg815_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if((data & 0xfe) == 0x3e)       //Display on/off
-		m_lcd_on = data & 0x01;
-	if((data & 0xb8) == 0xb8)       //Set page
-		m_lcd_index_row = data & 0x07;
-	if((data & 0xc0) == 0x40)       //Set address
-		m_lcd_index_col = data & 0x3f;
-	if((data & 0xc0) == 0xc0)       //Set display start line
-		m_lcd_start_line = data & 0x3f;
+	bitmap.fill(0, cliprect);
+	m_lcdc->screen_update(screen, bitmap, cliprect);
+	m_lcdc2->screen_update(screen, bitmap, cliprect);
+	return 0;
 }
 
-uint8_t pce220_state::lcd_data_r()
+
+SED1560_UPDATE_CB(pcg850v_state::sed1560_update)
 {
-	return m_vram[(m_lcd_index_row*0x40 + m_lcd_index_col - 1) & 0x1ff];
+	if (lcd_on)
+	{
+		uint16_t color0 = reverse ? 1 : 0;
+		uint16_t color1 = reverse ? 0 : 1;
+
+		for (int y = 0; y < 6 * 8; y++)
+		{
+			int ys = start_line + y;
+			for (int x = 0; x < 24 * 6; x++)
+			{
+				int bitpos = ((ys & ~7) * 166 + x * 8 + (ys & 7)) % (64 * 166);
+				bitmap.pix(y, x) = BIT(dram[bitpos / 8], bitpos & 7) ? color1 : color0;
+			}
+		}
+	}
+	else
+		bitmap.fill(0, cliprect);
+
+
+	static const uint16_t lcd_symbol_bits[] =
+	{
+		//BUSY   BATT   RUN    PRO    TEXT   CASL   STAT   2ndF    M     CAPS   KANA   SHO     DE     G     RAD    CONST  PRINT
+		7798,    7799,  1153,  1155,  1158,  2483,  3808,  3813,  3815,  5138,  5143,  6465,  6468,  6470,  7792,  7795,  7796,
+	};
+
+	for (int i=0; i<17; i++)
+	{
+		int bitpos = (((start_line & ~7) * 166 + lcd_symbol_bits[i]) + (start_line & 7)) % (64 * 166);
+		m_lcd_symbols[i] = !lcd_on ? 0 : BIT(dram[bitpos / 8], bitpos & 7);
+	}
+
+	return 0;
 }
 
-void pce220_state::lcd_data_w(uint8_t data)
+void pcg815_state::lcdc_control_w(uint8_t data)
 {
-	m_vram[(m_lcd_index_row*0x40 + m_lcd_index_col) & 0x1ff] = data;
+	m_lcdc->control_w(data);
+	m_lcdc2->control_w(data);
+}
 
-	m_lcd_index_col++;
+void pcg815_state::lcdc_data_w(uint8_t data)
+{
+	m_lcdc->data_w(data);
+	m_lcdc2->data_w(data);
 }
 
 uint8_t pce220_state::rom_bank_r()
@@ -377,21 +343,24 @@ uint8_t pce220_state::rom_bank_r()
 
 void pce220_state::rom_bank_w(uint8_t data)
 {
-	uint8_t bank4 = data & 0x07; // bits 0,1,2
-	uint8_t bank3 = (data & 0x70) >> 4; // bits 4,5,6
-
 	m_bank_num = data;
 
-	membank("bank3")->set_entry(bank3);
-	membank("bank4")->set_entry(bank4);
+	m_banks[2]->set_entry((data & 0x70) >> 4);  // bits 4,5,6
+	m_banks[3]->set_entry(data & 0x0f);         // bits 0,1,2,3
+}
+
+void pcg850v_state::g850v_rom_bank_w(uint8_t data)
+{
+	pce220_state::rom_bank_w(data);
+	m_g850v_bank_num = m_bank_num & 0x0f;
 }
 
 void pce220_state::ram_bank_w(uint8_t data)
 {
 	uint8_t bank = BIT(data,2);
 
-	membank("bank1")->set_entry(bank);
-	membank("bank2")->set_entry(bank);
+	m_banks[0]->set_entry(bank);
+	m_banks[1]->set_entry(bank);
 }
 
 uint8_t pce220_state::timer_r()
@@ -401,7 +370,8 @@ uint8_t pce220_state::timer_r()
 
 void pce220_state::timer_w(uint8_t data)
 {
-	m_timer_status = data & 1;
+	m_input_merger->in_w<2>(CLEAR_LINE);
+	m_timer_status = 0;
 }
 
 void pce220_state::boot_bank_w(uint8_t data)
@@ -410,8 +380,8 @@ void pce220_state::boot_bank_w(uint8_t data)
 	if (data & 0x01)
 	{
 		address_space &space_prg = m_maincpu->space(AS_PROGRAM);
-		space_prg.install_write_bank(0x0000, 0x3fff, "bank1");
-		membank("bank1")->set_entry(0);
+		space_prg.install_readwrite_bank(0x0000, 0x3fff, m_banks[0]);
+		m_banks[0]->set_entry(0);
 	}
 }
 
@@ -453,6 +423,21 @@ void pce220_state::port18_w(uint8_t data)
 	m_port18 = data;
 }
 
+void pce220_state::battery_w(uint8_t data)
+{
+	m_battery_sel = data;
+}
+
+uint8_t pce220_state::battery_r()
+{
+	if (m_battery_sel & 2)
+		return BIT(m_battery->read(), 1);
+	if (m_battery_sel & 1)
+		return BIT(m_battery->read(), 0);
+
+	return 0;
+}
+
 uint8_t pce220_state::port1f_r()
 {
 	/*
@@ -475,7 +460,7 @@ uint8_t pce220_state::port1f_r()
 
 void pce220_state::kb_matrix_w(offs_t offset, uint8_t data)
 {
-	switch(offset)
+	switch (offset)
 	{
 	case 0:
 		m_kb_matrix = (m_kb_matrix & 0x300) | data;
@@ -528,8 +513,8 @@ void pcg850v_state::g850v_bank_w(uint8_t data)
 
 	if (data < 0x16)
 	{
-		space_prg.install_read_bank(0xc000, 0xffff, "bank4");
-		membank("bank4")->set_entry(data);
+		space_prg.install_read_bank(0xc000, 0xffff, m_banks[3]);
+		m_banks[3]->set_entry(data);
 	}
 	else
 	{
@@ -537,81 +522,9 @@ void pcg850v_state::g850v_bank_w(uint8_t data)
 	}
 
 	m_g850v_bank_num = data;
+
+	m_bank_num = (m_bank_num & 0xf0) | (m_g850v_bank_num & 0x0f);
 }
-
-uint8_t pcg850v_state::g850v_lcd_status_r()
-{
-	/*
-	x--- ---- Busy (not emulated)
-	--x- ---- LCD on/off
-	*/
-	uint8_t data = 0;
-
-	data &= (m_lcd_on<<5);
-
-	return data;
-}
-
-void pcg850v_state::g850v_lcd_control_w(uint8_t data)
-{
-	if ((data & 0xf0) == 0x00)          // LCD column LSB
-	{
-		m_lcd_index_col = (m_lcd_index_col & 0xf0) | (data & 0x0f);
-	}
-	else if ((data & 0xf0) == 0x10)     // LCD column MSB
-	{
-		m_lcd_index_col = (m_lcd_index_col & 0x0f) | ((data<<4) & 0xf0);
-	}
-	else if ((data & 0xf0) == 0x20)     // LCD on/off
-	{
-		m_lcd_on = BIT(data, 0);
-	}
-	else if ((data & 0xc0) == 0x40)     // display start line
-	{
-		m_lcd_start_line = data & 0x3f;
-	}
-	else if ((data & 0xe0) == 0x80)     // contrast level
-	{
-		m_lcd_contrast = data;
-	}
-	else if ((data & 0xf0) == 0xa0)     // display effects
-	{
-		m_lcd_effects = data & 0x0f;
-	}
-	else if ((data & 0xf0) == 0xb0)     // set row
-	{
-		m_lcd_index_row = data & 0x07;
-	}
-	else if ((data & 0xf0) == 0xe0)     // display controls
-	{
-		if (BIT(data, 1))
-			m_lcd_contrast = 0;
-
-		m_lcd_read_mode = BIT(data, 2);
-	}
-	else
-	{
-		logerror( "PC-G850V: Unknown LCD command 0x%02x\n", data );
-	}
-}
-
-uint8_t pcg850v_state::g850v_lcd_data_r()
-{
-	uint8_t data = m_vram[(m_lcd_index_row*0x100 + m_lcd_index_col - 1) & 0x7ff];
-
-	if (m_lcd_read_mode == 1)
-		m_lcd_index_col++;
-
-	return data;
-}
-
-void pcg850v_state::g850v_lcd_data_w(uint8_t data)
-{
-	m_vram[(m_lcd_index_row*0x100 + m_lcd_index_col) & 0x7ff] = data;
-
-	m_lcd_index_col++;
-}
-
 
 void pce220_state::pce220_mem(address_map &map)
 {
@@ -621,7 +534,7 @@ void pce220_state::pce220_mem(address_map &map)
 	map(0xc000, 0xffff).bankr("bank4");
 }
 
-void pce220_state::pce220_io(address_map &map)
+void pce220_state::pce220_io_common(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -636,45 +549,50 @@ void pce220_state::pce220_io(address_map &map)
 	map(0x19, 0x19).rw(FUNC(pce220_state::rom_bank_r), FUNC(pce220_state::rom_bank_w));
 	map(0x1a, 0x1a).w(FUNC(pce220_state::boot_bank_w));
 	map(0x1b, 0x1b).w(FUNC(pce220_state::ram_bank_w));
-	map(0x1c, 0x1c).nopw(); //peripheral reset
-	map(0x1d, 0x1d).portr("BATTERY");
-	map(0x1e, 0x1e).nopw(); //???
+	map(0x1c, 0x1c).lw8(NAME([this](uint32_t data) { m_power_state = data; })); //peripheral reset
+	map(0x1d, 0x1d).r(FUNC(pce220_state::battery_r));
+	map(0x1e, 0x1e).w(FUNC(pce220_state::battery_w));
 	map(0x1f, 0x1f).r(FUNC(pce220_state::port1f_r));
-	map(0x58, 0x58).w(FUNC(pce220_state::lcd_control_w));
-	map(0x59, 0x59).r(FUNC(pce220_state::lcd_status_r));
-	map(0x5a, 0x5a).w(FUNC(pce220_state::lcd_data_w));
-	map(0x5b, 0x5b).r(FUNC(pce220_state::lcd_data_r));
+}
+
+void pce220_state::pce220_io(address_map &map)
+{
+	pce220_io_common(map);
+	map(0x58, 0x58).w(m_lcdc, FUNC(hd61202_device::control_w));
+	map(0x59, 0x59).r(m_lcdc, FUNC(hd61202_device::status_r));
+	map(0x5a, 0x5a).w(m_lcdc, FUNC(hd61202_device::data_w));
+	map(0x5b, 0x5b).r(m_lcdc, FUNC(hd61202_device::data_r));
+}
+
+void pcg815_state::pcg815_io(address_map &map)
+{
+	pce220_io_common(map);
+	map(0x50, 0x50).w(FUNC(pcg815_state::lcdc_control_w));
+	map(0x52, 0x52).w(FUNC(pcg815_state::lcdc_data_w));
+	map(0x54, 0x54).w(m_lcdc2, FUNC(hd61202_device::control_w));
+	map(0x55, 0x55).r(m_lcdc2, FUNC(hd61202_device::status_r));
+	map(0x56, 0x56).w(m_lcdc2, FUNC(hd61202_device::data_w));
+	map(0x57, 0x57).r(m_lcdc2, FUNC(hd61202_device::data_r));
+	map(0x58, 0x58).w(m_lcdc, FUNC(hd61202_device::control_w));
+	map(0x59, 0x59).r(m_lcdc, FUNC(hd61202_device::status_r));
+	map(0x5a, 0x5a).w(m_lcdc, FUNC(hd61202_device::data_w));
+	map(0x5b, 0x5b).r(m_lcdc, FUNC(hd61202_device::data_r));
 }
 
 void pcg850v_state::pcg850v_io(address_map &map)
 {
-	map.unmap_value_high();
-	map.global_mask(0xff);
-	map(0x10, 0x10).r(FUNC(pcg850v_state::kb_r));
-	map(0x11, 0x12).w(FUNC(pcg850v_state::kb_matrix_w));
-	map(0x13, 0x13).portr("SHIFT");
-	map(0x14, 0x14).rw(FUNC(pcg850v_state::timer_r), FUNC(pcg850v_state::timer_w));
-	map(0x15, 0x15).rw(FUNC(pcg850v_state::port15_r), FUNC(pcg850v_state::port15_w));
-	map(0x16, 0x16).rw(FUNC(pcg850v_state::irq_status_r), FUNC(pcg850v_state::irq_ack_w));
-	map(0x17, 0x17).w(FUNC(pcg850v_state::irq_mask_w));
-	map(0x18, 0x18).rw(FUNC(pcg850v_state::port18_r), FUNC(pcg850v_state::port18_w));
-	map(0x19, 0x19).rw(FUNC(pcg850v_state::rom_bank_r), FUNC(pcg850v_state::rom_bank_w));
-	map(0x1a, 0x1a).w(FUNC(pcg850v_state::boot_bank_w));
-	map(0x1b, 0x1b).w(FUNC(pcg850v_state::ram_bank_w));
-	map(0x1c, 0x1c).nopw(); //peripheral reset
-	map(0x1d, 0x1d).portr("BATTERY");
-	map(0x1e, 0x1e).nopw(); //???
-	map(0x1f, 0x1f).r(FUNC(pcg850v_state::port1f_r));
-	map(0x40, 0x40).rw(FUNC(pcg850v_state::g850v_lcd_status_r), FUNC(pcg850v_state::g850v_lcd_control_w));
-	map(0x41, 0x41).rw(FUNC(pcg850v_state::g850v_lcd_data_r), FUNC(pcg850v_state::g850v_lcd_data_w));
+	pce220_io_common(map);
+	map(0x19, 0x19).rw(FUNC(pcg850v_state::rom_bank_r), FUNC(pcg850v_state::g850v_rom_bank_w));
+	map(0x40, 0x41).mirror(0x1e).rw("sed1560", FUNC(sed1560_device::read), FUNC(sed1560_device::write));
 	map(0x69, 0x69).rw(FUNC(pcg850v_state::g850v_bank_r), FUNC(pcg850v_state::g850v_bank_w));
+	map(0x74, 0x74).nopr();
 }
 
 INPUT_CHANGED_MEMBER(pce220_state::kb_irq)
 {
 	if (m_irq_mask & IRQ_FLAG_KEY)
 	{
-		m_maincpu->set_input_line(0, newval ? ASSERT_LINE : CLEAR_LINE );
+		m_input_merger->in_w<0>(newval ? ASSERT_LINE : CLEAR_LINE);
 
 		m_irq_flag = (m_irq_flag & 0xfe) | (newval & 0x01);
 	}
@@ -684,7 +602,13 @@ INPUT_CHANGED_MEMBER(pce220_state::on_irq)
 {
 	if (m_irq_mask & IRQ_FLAG_ON)
 	{
-		m_maincpu->set_input_line(0, newval ? ASSERT_LINE : CLEAR_LINE );
+		if (!(m_power_state & 1))
+		{
+			install_bootrom();
+			m_maincpu->reset();
+		}
+
+		m_input_merger->in_w<1>(newval ? ASSERT_LINE : CLEAR_LINE);
 
 		m_irq_flag = (m_irq_flag & 0xfd) | ((newval & 0x01)<<1);
 	}
@@ -693,9 +617,10 @@ INPUT_CHANGED_MEMBER(pce220_state::on_irq)
 /* Input ports */
 static INPUT_PORTS_START( pce220 )
 	PORT_START("BATTERY")
-	PORT_CONFNAME( 0x01, 0x00, "Battery Status" )
+	PORT_CONFNAME( 0x03, 0x00, "Battery Status" )
 	PORT_CONFSETTING( 0x00, DEF_STR( Normal ) )
-	PORT_CONFSETTING( 0x01, "Low Battery" )
+	PORT_CONFSETTING( 0x01, "Low" )
+	PORT_CONFSETTING( 0x02, "Empty" )
 
 	PORT_START("LINE0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_F10)          PORT_NAME("OFF")        PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )
@@ -713,7 +638,7 @@ static INPUT_PORTS_START( pce220 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_F)            PORT_NAME("F")          PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR('F')  PORT_CHAR('}')
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_G)            PORT_NAME("G")          PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR('G')  PORT_CHAR('\\')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_H)            PORT_NAME("H")          PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR('H')  PORT_CHAR('|')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_J)            PORT_NAME("J")          PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR('J')  PORT_CHAR('`')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_J)            PORT_NAME("J")          PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR('J')  PORT_CHAR('~')
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_K)            PORT_NAME("K")          PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR('K')  PORT_CHAR('_')
 	PORT_START("LINE2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_Z)            PORT_NAME("Z")          PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR('Z')
@@ -762,7 +687,7 @@ static INPUT_PORTS_START( pce220 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_F6)           PORT_NAME("RM")         PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )
 	PORT_START("LINE7")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_P)            PORT_NAME("P")          PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR('P')  PORT_CHAR('@')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_BACKSPACE)    PORT_NAME("BS")         PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE))
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_BACKSPACE)    PORT_NAME("BS")         PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE),8)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_F7)           PORT_NAME("n!")         PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_7)            PORT_NAME("7")          PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR('7')
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_8)            PORT_NAME("8")          PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR('8')
@@ -786,18 +711,19 @@ static INPUT_PORTS_START( pce220 )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_F8)           PORT_NAME("log")        PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_F9)           PORT_NAME("tan")        PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_F11)          PORT_NAME("FSE")        PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_ESC)          PORT_NAME("CCE")        PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_ESC)          PORT_NAME("CCE")        PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR(27)
 	PORT_START("SHIFT")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_LSHIFT)       PORT_NAME("Shift")      PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)     PORT_NAME("Shift")      PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_START("ON")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_PGUP)         PORT_NAME("ON")         PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  on_irq, 0 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pcg850v )
 	PORT_START("BATTERY")
-	PORT_CONFNAME( 0x01, 0x00, "Battery Status" )
+	PORT_CONFNAME( 0x03, 0x00, "Battery Status" )
 	PORT_CONFSETTING( 0x00, DEF_STR( Normal ) )
-	PORT_CONFSETTING( 0x01, "Low Battery" )
+	PORT_CONFSETTING( 0x01, "Low" )
+	PORT_CONFSETTING( 0x02, "Empty" )
 
 	PORT_START("LINE0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_F10)          PORT_NAME("OFF")        PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )
@@ -815,7 +741,7 @@ static INPUT_PORTS_START( pcg850v )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_F)            PORT_NAME("F")          PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR('F')  PORT_CHAR('}')
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_G)            PORT_NAME("G")          PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR('G')
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_H)            PORT_NAME("H")          PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR('H')  PORT_CHAR('|')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_J)            PORT_NAME("J")          PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR('J')  PORT_CHAR('`')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_J)            PORT_NAME("J")          PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR('J')  PORT_CHAR('~')
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_K)            PORT_NAME("K")          PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR('K')  PORT_CHAR('_')
 	PORT_START("LINE2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_Z)            PORT_NAME("Z")          PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR('Z')
@@ -864,7 +790,7 @@ static INPUT_PORTS_START( pcg850v )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_F6)           PORT_NAME("RM")         PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )
 	PORT_START("LINE7")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_P)            PORT_NAME("P")          PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR('P')  PORT_CHAR('@')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_BACKSPACE)    PORT_NAME("BS")         PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE))
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_BACKSPACE)    PORT_NAME("BS")         PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR(UCHAR_MAMEKEY(BACKSPACE),8)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_F7)           PORT_NAME("pi")         PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_7)            PORT_NAME("7")          PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR('7')
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_8)            PORT_NAME("8")          PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR('8')
@@ -888,33 +814,16 @@ static INPUT_PORTS_START( pcg850v )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_F8)           PORT_NAME("log")        PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_F9)           PORT_NAME("tan")        PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_F11)          PORT_NAME("FSE")        PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_ESC)          PORT_NAME("CCE")        PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_ESC)          PORT_NAME("CCE")        PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR(27)
 	PORT_START("SHIFT")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_LSHIFT)       PORT_NAME("Shift")      PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)     PORT_NAME("Shift")      PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  kb_irq, 0 )  PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_START("ON")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)    PORT_CODE(KEYCODE_PGUP)         PORT_NAME("ON")         PORT_CHANGED_MEMBER(DEVICE_SELF, pce220_state,  on_irq, 0 )
 INPUT_PORTS_END
 
 void pce220_state::device_resolve_objects()
 {
-	m_busy.resolve();
-	m_caps.resolve();
-	m_kana.resolve();
-	m_syo.resolve();
-	m_2ndf.resolve();
-	m_text.resolve();
-	m_casl.resolve();
-	m_pro.resolve();
-	m_run.resolve();
-	m_batt.resolve();
-	m_e.resolve();
-	m_m.resolve();
-	m_const.resolve();
-	m_rad.resolve();
-	m_g.resolve();
-	m_de.resolve();
-	m_stat.resolve();
-	m_print.resolve();
+	m_lcd_symbols.resolve();
 }
 
 void pce220_state::machine_start()
@@ -922,47 +831,55 @@ void pce220_state::machine_start()
 	uint8_t *rom = memregion("user1")->base();
 	uint8_t *ram = m_ram->pointer();
 
-	membank("bank1")->configure_entries(0, 2, ram + 0x0000, 0x8000);
-	membank("bank2")->configure_entries(0, 2, ram + 0x4000, 0x8000);
-	membank("bank3")->configure_entries(0, 8, rom, 0x4000);
-	membank("bank4")->configure_entries(0, 8, rom, 0x4000);
-
-	m_vram = (uint8_t*)memregion("lcd_vram")->base();
+	m_banks[0]->configure_entries(0, 2, ram + 0x0000, 0x8000);
+	m_banks[1]->configure_entries(0, 2, ram + 0x4000, 0x8000);
+	m_banks[2]->configure_entries(0, 8, rom, 0x4000);
+	m_banks[3]->configure_entries(0, 16, rom, 0x4000);
 
 	subdevice<nvram_device>("nvram")->set_base(ram, m_ram->size());
+
+	save_item(NAME(m_bank_num));
+	save_item(NAME(m_irq_mask));
+	save_item(NAME(m_irq_flag));
+	save_item(NAME(m_timer_status));
+	save_item(NAME(m_kb_matrix));
+	save_item(NAME(m_power_state));
+	save_item(NAME(m_port15));
+	save_item(NAME(m_port18));
+	save_item(NAME(m_battery_sel));
 }
 
 void pcg850v_state::machine_start()
 {
+	pce220_state::machine_start();
+
 	uint8_t *rom = memregion("user1")->base();
-	uint8_t *ram = m_ram->pointer();
+	m_banks[3]->configure_entries(0, 22, rom, 0x4000);
 
-	membank("bank1")->configure_entries(0, 2, ram + 0x0000, 0x8000);
-	membank("bank2")->configure_entries(0, 2, ram + 0x4000, 0x8000);
-	membank("bank3")->configure_entries(0, 22, rom, 0x4000);
-	membank("bank4")->configure_entries(0, 22, rom, 0x4000);
-
-	m_vram = (uint8_t*)memregion("lcd_vram")->base();
-	subdevice<nvram_device>("nvram")->set_base(ram, m_ram->size());
+	save_item(NAME(m_g850v_bank_num));
 }
 
-void pce220_state::machine_reset()
+void pce220_state::install_bootrom()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.unmap_write(0x0000, 0x3fff);
 
 	// install the boot code into the first bank
-	membank("bank1")->set_base(memregion("user1")->base() + 0x0000);
+	space.install_rom(0x0000, 0x3fff, memregion("user1")->base() + 0x0000);
+}
 
-	m_lcd_index_row = 0;
-	m_lcd_index_col = 0;
-	m_lcd_start_line = 0;
-	m_lcd_on = 0;
+void pce220_state::machine_reset()
+{
+	install_bootrom();
 	m_bank_num = 0;
 	m_irq_mask = 0;
 	m_irq_flag = 0;
 	m_timer_status = 0;
 	m_kb_matrix = 0;
+	m_power_state = 0;
+	m_port15 = 0;
+	m_port18 = 0;
+	m_battery_sel = 0;
 }
 
 void pcg850v_state::machine_reset()
@@ -970,18 +887,14 @@ void pcg850v_state::machine_reset()
 	pce220_state::machine_reset();
 
 	m_g850v_bank_num = 0;
-	m_lcd_effects = 0;
-	m_lcd_contrast = 0;
-	m_lcd_read_mode = 0;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(pce220_state::pce220_timer_callback)
 {
-	m_timer_status = !m_timer_status;
-
+	m_timer_status = 1;
 	if (m_irq_mask & IRQ_FLAG_TIMER)
 	{
-		m_maincpu->set_input_line(0, HOLD_LINE );
+		m_input_merger->in_w<2>(ASSERT_LINE);
 
 		m_irq_flag = (m_irq_flag & 0xfb) | (m_timer_status<<2);
 	}
@@ -989,29 +902,36 @@ TIMER_DEVICE_CALLBACK_MEMBER(pce220_state::pce220_timer_callback)
 
 void pce220_state::pce220_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(138, 146, 148));
-	palette.set_pen_color(1, rgb_t(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(131, 136, 139)); // lcd pixel off
+	palette.set_pen_color(1, rgb_t( 51,  42,  43)); // lcd pixel on
+	palette.set_pen_color(2, rgb_t(138, 146, 148)); // background
 }
 
 
 void pce220_state::pce220(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 3072000); // CMOS-SC7852
+	Z80(config, m_maincpu, 3.072_MHz_XTAL); // CMOS-SC7852
 	m_maincpu->set_addrmap(AS_PROGRAM, &pce220_state::pce220_mem);
 	m_maincpu->set_addrmap(AS_IO, &pce220_state::pce220_io);
 
+	INPUT_MERGER_ANY_HIGH(config, m_input_merger);
+	m_input_merger->output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
 	/* video hardware */
 	// 4 lines x 24 characters, resp. 144 x 32 pixel
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update(FUNC(pce220_state::screen_update));
-	screen.set_size(24*6, 4*8);
-	screen.set_visarea(0, 24*6-1, 0, 4*8-1);
-	screen.set_palette("palette");
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_screen_update(m_lcdc, FUNC(hd61202_device::screen_update));
+	m_screen->set_size(24*6, 4*8);
+	m_screen->set_visarea_full();
+	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(pce220_state::pce220_palette), 2);
+	PALETTE(config, "palette", FUNC(pce220_state::pce220_palette), 3);
+
+	HD61202(config, m_lcdc);
+	m_lcdc->set_screen_update_cb(FUNC(pce220_state::hd61202_update));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1025,78 +945,51 @@ void pce220_state::pce220(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
 
 	PCE220SERIAL(config, m_serial, 0);
+	config.set_default_layout(layout_pce220);
 }
 
-void pcg850v_state::pcg815(machine_config &config)
+void pcg815_state::pcg815(machine_config &config)
 {
+	pce220(config);
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(4'000'000)); // 3.54MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &pcg850v_state::pce220_mem);
-	m_maincpu->set_addrmap(AS_IO, &pcg850v_state::pcg850v_io);
+	m_maincpu->set_addrmap(AS_IO, &pcg815_state::pcg815_io);
 
 	/* video hardware */
 	// 4 lines x 24 characters, resp. 144 x 32 pixel
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update(FUNC(pcg850v_state::screen_update));
-	screen.set_size(144, 32);
-	screen.set_visarea(0, 144-1, 0, 32-1);
-	screen.set_palette("palette");
+	m_screen->set_screen_update(FUNC(pcg815_state::screen_update));
 
-	PALETTE(config, "palette", FUNC(pcg850v_state::pce220_palette), 2);
+	m_lcdc->set_screen_update_cb(FUNC(pcg815_state::hd61202_1_update));
 
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 0.50);
-
-	TIMER(config, "pce220_timer").configure_periodic(FUNC(pcg850v_state::pce220_timer_callback), attotime::from_msec(468));
-
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-
-	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
-
-	PCE220SERIAL(config, m_serial, 0);
+	HD61202(config, m_lcdc2);
+	m_lcdc2->set_screen_update_cb(FUNC(pcg815_state::hd61202_2_update));
 }
 
 void pcg850v_state::pcg850v(machine_config &config)
 {
+	pce220(config);
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(8'000'000)); // CMOS-SC7852
-	m_maincpu->set_addrmap(AS_PROGRAM, &pcg850v_state::pce220_mem);
+	m_maincpu->set_clock(8_MHz_XTAL); // CMOS-SC7852
 	m_maincpu->set_addrmap(AS_IO, &pcg850v_state::pcg850v_io);
 
 	/* video hardware */
 	// 6 lines x 24 characters, resp. 144 x 48 pixel
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update(FUNC(pcg850v_state::screen_update));
-	screen.set_size(144, 48);
-	screen.set_visarea(0, 144-1, 0, 48-1);
-	screen.set_palette("palette");
+	m_screen->set_screen_update("sed1560", FUNC(sed1560_device::screen_update));
+	m_screen->set_size(144, 48);
+	m_screen->set_visarea_full();
 
-	PALETTE(config, "palette", FUNC(pcg850v_state::pce220_palette), 2);
+	config.device_remove("hd61202");
 
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 0.50);
+	sed1560_device &lcdc(SED1560(config, "sed1560"));
+	lcdc.set_screen_update_cb(FUNC(pcg850v_state::sed1560_update));
 
-	TIMER(config, "pce220_timer").configure_periodic(FUNC(pcg850v_state::pce220_timer_callback), attotime::from_msec(468));
-
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-
-	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("64K"); // 32K internal + 32K external card
-
-	PCE220SERIAL(config, m_serial, 0);
+	config.set_default_layout(layout_pcg850v);
 }
 
 /* ROM definition */
 ROM_START( pce220 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_REGION( 0x20000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION( 0x40000, "user1", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v1", "v 0.1")
 	ROM_SYSTEM_BIOS( 1, "v2", "v 0.2")
 	ROM_LOAD(  "bank0.bin",      0x0000, 0x4000, CRC(1fa94d11) SHA1(24c54347dbb1423388360a359aa09db47d2057b7))
@@ -1110,13 +1003,10 @@ ROM_START( pce220 )
 	ROMX_LOAD( "bank6_0.1.bin", 0x18000, 0x4000, CRC(e2cda7a6) SHA1(01b1796d9485fde6994cb5afbe97514b54cfbb3a), ROM_BIOS(0))
 	ROMX_LOAD( "bank7.bin",     0x1c000, 0x4000, CRC(5e98b5b6) SHA1(f22d74d6a24f5929efaf2983caabd33859232a94), ROM_BIOS(1))
 	ROMX_LOAD( "bank7_0.1.bin", 0x1c000, 0x4000, CRC(d8e821b2) SHA1(18245a75529d2f496cdbdc28cdf40def157b20c0), ROM_BIOS(0))
-
-	ROM_REGION( 0x200, "lcd_vram", ROMREGION_ERASE00)   //HD61202 internal RAM (4096 bits)
 ROM_END
 
 ROM_START( pcg815 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_REGION( 0x58000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION( 0x40000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "rom00.bin",    0x000000, 0x004000, CRC(43767d51) SHA1(0d8b8b88a5d084f750daffc0abbb6b868fd3f144) )
 	ROM_LOAD( "rom01.bin",    0x004000, 0x004000, CRC(b0e32ace) SHA1(e84c84c18c09dd2920fa38e77d8049b980692d29) )
 	ROM_LOAD( "rom02.bin",    0x008000, 0x004000, CRC(f5cb78ba) SHA1(dfb2e415a5603a820b960d810995dd1109d84547) )
@@ -1128,13 +1018,12 @@ ROM_START( pcg815 )
 	ROM_LOAD( "rom08.bin",    0x020000, 0x004000, CRC(d8ba21a9) SHA1(a5580f22864afee8d4a8f1ecf6231acbde16b612) )
 	ROM_LOAD( "rom09.bin",    0x024000, 0x004000, CRC(f6f49677) SHA1(e0d70a11b7dd21662cb444ac93d4b43f584909b5) )
 	ROM_LOAD( "rom0a.bin",    0x028000, 0x004000, CRC(ecbabb64) SHA1(14beef60dfd1f18375459e9acb9527589e09e3ce) )
-	ROM_LOAD( "base.bin",     0x02c000, 0x000040, CRC(1a8b2044) SHA1(8576c69532d138eb78ff7a59f668a1a62a670447) )
-
-	ROM_REGION( 0x1000, "lcd_vram", ROMREGION_ERASE00)
+	ROM_LOAD( "rom0b.bin",    0x02c000, 0x004000, CRC(b4000f62) SHA1(eb12db023ff4b3946ab4aa9481a7e96695af0e4c) )
+	ROM_LOAD( "rom0c.bin",    0x030000, 0x004000, CRC(e2d40305) SHA1(262aa749ed39fdfa1204297dd6e6c3d4abb9fd65) )
+	ROM_LOAD( "rom0d.bin",    0x034000, 0x004000, CRC(3bb1dc8e) SHA1(ee9831e07f028b37b9acdb807becafccfb15d583) )
 ROM_END
 
 ROM_START( pcg850v )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_REGION( 0x58000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD( "rom00.bin", 0x00000, 0x4000, CRC(c41a7a3e) SHA1(8b85d07e6f2fa048f8a958c261ab3344df750bd2))
 	ROM_LOAD( "rom01.bin", 0x04000, 0x4000, CRC(45cafcaf) SHA1(e6142ac2ddb50c90bf1afd03ee2d2741abde8b76))
@@ -1158,13 +1047,13 @@ ROM_START( pcg850v )
 	ROM_LOAD( "rom13.bin", 0x4c000, 0x4000, CRC(9bca873b) SHA1(4ce43553fb15c0ca866e9582a3ef8dc22a2795b4))
 	ROM_LOAD( "rom14.bin", 0x50000, 0x4000, CRC(a2938c40) SHA1(d2c24401eea5e56268ef6eadcc612c8bbaa3342a))
 	ROM_LOAD( "rom15.bin", 0x54000, 0x4000, CRC(53a0bf0a) SHA1(bf27baeaf208628fbe3c959d623cc08de21cf9f8))
-
-	ROM_REGION( 0x1000, "lcd_vram", ROMREGION_ERASE00)
 ROM_END
+
+} // anonymous namespace
 
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME    FLAGS
-COMP( 1991, pce220,  0,      0,      pce220,  pce220,  pce220_state,  empty_init, "Sharp", "PC-E220",  MACHINE_NOT_WORKING )
-COMP( 1992, pcg815,  0,      0,      pcg815,  pcg850v, pcg850v_state, empty_init, "Sharp", "PC-G815",  MACHINE_NOT_WORKING )
+COMP( 1991, pce220,  0,      0,      pce220,  pce220,  pce220_state,  empty_init, "Sharp", "PC-E220",  MACHINE_SUPPORTS_SAVE )
+COMP( 1992, pcg815,  0,      0,      pcg815,  pcg850v, pcg815_state,  empty_init, "Sharp", "PC-G815",  MACHINE_SUPPORTS_SAVE )
 COMP( 2001, pcg850v, 0,      0,      pcg850v, pcg850v, pcg850v_state, empty_init, "Sharp", "PC-G850V", MACHINE_NOT_WORKING )

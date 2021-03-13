@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "unzip.h"
-#include "osdcore.h"
+#include "osdfile.h"
 #include "osdcomm.h"
 #include "hash.h"
 
@@ -120,9 +120,22 @@ static bool is_ascii_char(int ch)
 	return (ch >= 0x20 && ch < 0x7f) || (ch == '\n') || (ch == '\r') || (ch == '\t');
 }
 
-static void checkintegrity(const fileinfo *file, int side)
+static void checkintegrity(const fileinfo *file, int side, bool all_hashes)
 {
 	if (file->buf == nullptr) return;
+
+	if (all_hashes)
+	{
+		util::crc32_creator crc32;
+		util::sha1_creator sha1;
+		util::sum16_creator sum16;
+		crc32.append(file->buf, file->size);
+		sha1.append(file->buf, file->size);
+		sum16.append(file->buf, file->size);
+		printf("%-23s %-23s [0x%x] CRC(%s) SHA1(%s) SUM(%s)\n", (side & 1) ? file->name : "", (side & 2) ? file->name : "", file->size,
+				crc32.finish().as_string().c_str(), sha1.finish().as_string().c_str(), sum16.finish().as_string().c_str());
+		side = 0;
+	}
 
 	/* check for bad data lines */
 	unsigned mask0 = 0x0000;
@@ -145,7 +158,7 @@ static void checkintegrity(const fileinfo *file, int side)
 
 	if (is_ascii && mask0 == 0x7f7f && mask1 == 0)
 	{
-		printf("%-23s %-23s ASCII TEXT FILE\n", side ? "" : file->name, side ? file->name : "");
+		printf("%-23s %-23s ASCII TEXT FILE\n", (side & 1) ? file->name : "", (side & 2) ? file->name : "");
 		return;
 	}
 
@@ -160,7 +173,7 @@ static void checkintegrity(const fileinfo *file, int side)
 			bits = 8;
 		else bits = 16;
 
-		printf("%-23s %-23s FIXED BITS (",side ? "" : file->name,side ? file->name : "");
+		printf("%-23s %-23s FIXED BITS (", (side & 1) ? file->name : "", (side & 2) ? file->name : "");
 		for (int i = 0; i < bits; i++)
 		{
 			if (~mask0 & 0x8000) printf("0");
@@ -198,16 +211,16 @@ static void checkintegrity(const fileinfo *file, int side)
 	{
 		if (addrmirror == file->size/2)
 		{
-			printf("%-23s %-23s 1ST AND 2ND HALF IDENTICAL\n", side ? "" : file->name, side ? file->name : "");
+			printf("%-23s %-23s 1ST AND 2ND HALF IDENTICAL\n", (side & 1) ? file->name : "", (side & 2) ? file->name : "");
 			util::hash_collection hash;
 			hash.begin();
 			hash.buffer(file->buf, file->size / 2);
 			hash.end();
-			printf("%-23s %-23s                  %s\n", side ? "" : file->name, side ? file->name : "", hash.attribute_string().c_str());
+			printf("%-23s %-23s                  %s\n", (side & 1) ? file->name : "", (side & 2) ? file->name : "", hash.attribute_string().c_str());
 		}
 		else
 		{
-			printf("%-23s %-23s BADADDR",side ? "" : file->name,side ? file->name : "");
+			printf("%-23s %-23s BADADDR", (side & 1) ? file->name : "", (side & 2) ? file->name : "");
 			for (int i = 0; i < 24; i++)
 			{
 				if (file->size <= (1<<(23-i))) printf(" ");
@@ -238,7 +251,7 @@ static void checkintegrity(const fileinfo *file, int side)
 
 	if (mask0 != sizemask || mask1 != 0x00)
 	{
-		printf("%-23s %-23s ",side ? "" : file->name,side ? file->name : "");
+		printf("%-23s %-23s ", (side & 1) ? file->name : "", (side & 2) ? file->name : "");
 		for (int i = 0; i < 24; i++)
 		{
 			if (file->size <= (1<<(23-i))) printf(" ");
@@ -268,7 +281,7 @@ static void checkintegrity(const fileinfo *file, int side)
 
 	if (mask0 != sizemask || mask1 != 0x00)
 	{
-		printf("%-23s %-23s ",side ? "" : file->name,side ? file->name : "");
+		printf("%-23s %-23s ", (side & 1) ? file->name : "", (side & 2) ? file->name : "");
 		for (int i = 0; i < 24; i++)
 		{
 			if (file->size <= (1<<(23-i))) printf(" ");
@@ -296,14 +309,14 @@ static void checkintegrity(const fileinfo *file, int side)
 		if (file->buf[file->size/2 + 2*i+1] != 0xff) mask0 &= ~0x80;
 	}
 
-	if (mask0 & 0x01) printf("%-23s %-23s 1ST HALF = 00xx\n",side ? "" : file->name,side ? file->name : "");
-	if (mask0 & 0x02) printf("%-23s %-23s 1ST HALF = FFxx\n",side ? "" : file->name,side ? file->name : "");
-	if (mask0 & 0x04) printf("%-23s %-23s 1ST HALF = xx00\n",side ? "" : file->name,side ? file->name : "");
-	if (mask0 & 0x08) printf("%-23s %-23s 1ST HALF = xxFF\n",side ? "" : file->name,side ? file->name : "");
-	if (mask0 & 0x10) printf("%-23s %-23s 2ND HALF = 00xx\n",side ? "" : file->name,side ? file->name : "");
-	if (mask0 & 0x20) printf("%-23s %-23s 2ND HALF = FFxx\n",side ? "" : file->name,side ? file->name : "");
-	if (mask0 & 0x40) printf("%-23s %-23s 2ND HALF = xx00\n",side ? "" : file->name,side ? file->name : "");
-	if (mask0 & 0x80) printf("%-23s %-23s 2ND HALF = xxFF\n",side ? "" : file->name,side ? file->name : "");
+	if (mask0 & 0x01) printf("%-23s %-23s 1ST HALF = 00xx\n", (side & 1) ? file->name : "", (side & 2) ? file->name : "");
+	if (mask0 & 0x02) printf("%-23s %-23s 1ST HALF = FFxx\n", (side & 1) ? file->name : "", (side & 2) ? file->name : "");
+	if (mask0 & 0x04) printf("%-23s %-23s 1ST HALF = xx00\n", (side & 1) ? file->name : "", (side & 2) ? file->name : "");
+	if (mask0 & 0x08) printf("%-23s %-23s 1ST HALF = xxFF\n", (side & 1) ? file->name : "", (side & 2) ? file->name : "");
+	if (mask0 & 0x10) printf("%-23s %-23s 2ND HALF = 00xx\n", (side & 1) ? file->name : "", (side & 2) ? file->name : "");
+	if (mask0 & 0x20) printf("%-23s %-23s 2ND HALF = FFxx\n", (side & 1) ? file->name : "", (side & 2) ? file->name : "");
+	if (mask0 & 0x40) printf("%-23s %-23s 2ND HALF = xx00\n", (side & 1) ? file->name : "", (side & 2) ? file->name : "");
+	if (mask0 & 0x80) printf("%-23s %-23s 2ND HALF = xxFF\n", (side & 1) ? file->name : "", (side & 2) ? file->name : "");
 }
 
 
@@ -576,18 +589,25 @@ int CLIB_DECL main(int argc,char *argv[])
 {
 	int err;
 	int total_modes = MODE_NIB2;    /* by default, use only MODE_A, MODE_NIB1 and MODE_NIB2 */
+	bool all_hashes = false;
 
-	if (argc >= 2 && strcmp(argv[1],"-d") == 0)
+	while (argc >= 2)
 	{
+		if (strcmp(argv[1], "-d") == 0)
+			total_modes = TOTAL_MODES;
+		else if (strcmp(argv[1], "-h") == 0)
+			all_hashes = true;
+		else
+			break;
 		argc--;
 		argv++;
-		total_modes = TOTAL_MODES;
 	}
 
 	if (argc < 2)
 	{
-		printf("usage: romcmp [-d] [dir1 | zip1] [dir2 | zip2]\n");
+		printf("usage: romcmp [-d] [-h] [dir1 | zip1] [dir2 | zip2]\n");
 		printf("-d enables a slower, more comprehensive comparison.\n");
+		printf("-h prints hashes and sums for all files.\n");
 		return 0;
 	}
 
@@ -613,14 +633,12 @@ int CLIB_DECL main(int argc,char *argv[])
 		else
 			printf("%d files\n",found[0]);
 
-		for (i = 0;i < found[0];i++)
+		for (i = 0; i < 2; i++)
 		{
-			checkintegrity(&files[0][i],0);
-		}
-
-		for (j = 0;j < found[1];j++)
-		{
-			checkintegrity(&files[1][j],1);
+			for (j = 0; j < found[i]; j++)
+			{
+				checkintegrity(&files[i][j], 1 << i, all_hashes);
+			}
 		}
 
 		if (argc < 3)

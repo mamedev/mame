@@ -64,7 +64,7 @@ bool mgt_format::supports_save() const
 	return true;
 }
 
-int mgt_format::identify(io_generic *io, uint32_t form_factor)
+int mgt_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t size = io_generic_size(io);
 
@@ -74,7 +74,7 @@ int mgt_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool mgt_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool mgt_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint64_t size = io_generic_size(io);
 	int sector_count = size == 737280 ? 9 : 10;
@@ -99,7 +99,7 @@ bool mgt_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	return true;
 }
 
-bool mgt_format::save(io_generic *io, floppy_image *image)
+bool mgt_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int track_count, head_count, sector_count;
 	get_geometry_mfm_pc(image, 2000, track_count, head_count, sector_count);

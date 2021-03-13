@@ -68,6 +68,8 @@ TILE_GET_INFO_MEMBER(malzak_state::get_tile_info)
 
 void malzak_state::video_start()
 {
+	m_scrollx = 0;
+
 	int width = m_screen->width();
 	int height = m_screen->height();
 	m_trom_bitmap = std::make_unique<bitmap_rgb32>(width, height);

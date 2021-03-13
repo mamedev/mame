@@ -48,7 +48,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "sound/sn76496.h"
-#include "sound/2612intf.h"
+#include "sound/ym2612.h"
 
 #include "includes/megadriv.h"
 #include "includes/megadriv_acbl.h"
@@ -283,8 +283,6 @@ void md_boot_state::puckpkmn(machine_config &config)
 	md_ntsc(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &md_boot_state::puckpkmn_map);
-
-	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_bootleg)
 
 	config.device_remove("genesis_snd_z80");
 

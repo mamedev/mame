@@ -323,10 +323,33 @@ void deniam_state::deniam16c(machine_config &config)
 
 ***************************************************************************/
 
-ROM_START( logicpro )
+ROM_START( croquis )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // ROM names are the PCB locations silkscreened under chip socket
+	ROM_LOAD16_BYTE( "sys_e0", 0x00000, 0x40000, CRC(b74cd4a9) SHA1(350557377bc5815d0e7f48a96898eba6374f65dd) ) // 27C020
+	ROM_LOAD16_BYTE( "sys_o0", 0x00001, 0x40000, CRC(346e18f4) SHA1(0107ef7b5843a654f393d6f22ef6d52b5bf45fc0) ) // 27C020
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
+	ROM_LOAD( "logicpro.r2", 0x0000, 0x10000, CRC(000d624b) SHA1(c0da218ee81d01b3dcef2159bbaaff5d3ddb7619) ) // 27C512 - silkscreened: DSS
+
+	ROM_REGION( 0x180000, "gfx1", 0 )   /* chars */
+	ROM_LOAD( "logicpro.r5", 0x000000, 0x080000, CRC(dedf18c9) SHA1(9725e096427f03ed5fd81584c0aa85a53f9681c9) ) // 27C040 - silkscreened: BG(00)
+	ROM_LOAD( "logicpro.r6", 0x080000, 0x080000, CRC(3ecbd1c2) SHA1(dd6afacd58eaaa2562e007a92b6667ecc968377d) ) // 27C040 - silkscreened: BG(01)
+	ROM_LOAD( "logicpro.r7", 0x100000, 0x080000, CRC(47135521) SHA1(ee6a93332190fc966f8e820430d652942f030b00) ) // 27C040 - silkscreened: BG(02)
+
+	ROM_REGION( 0x400000, "spritegfx", 0 )   /* sprites, used at run time */
+	ROM_LOAD16_BYTE( "logicpro.r9", 0x000000, 0x080000, CRC(a98bc1d2) SHA1(f4aed07cccca892f3d3a91546b3a98fbe3e66d9c) ) // 27C040 - silkscreened: OBJ(E0)
+	ROM_LOAD16_BYTE( "logicpro.r8", 0x000001, 0x080000, CRC(1de46298) SHA1(3385a2956d9a427c85554f39c8d85922bbeb1ce1) ) // 27C040 - silkscreened: OBJ(O0)
+	// OBJ(E1), OBJ(E2), OBJ(O1) & OBJ(O2) not populated
+
+	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
+	ROM_LOAD( "logicpro.r1", 0x0000, 0x080000, CRC(a1fec4d4) SHA1(4390cd18b4a7de2d8cb68270180ea3de42fd2282) ) // 27C040 - silkscreened: V_ROM0
+	// V_ROM1 not populated
+ROM_END
+
+ROM_START( croquisg )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "logicpro.r4", 0x00000, 0x40000, CRC(c506d484) SHA1(5d662b109e1d2e09556bc4ecbc11bbf5ccb639d3) )
-	ROM_LOAD16_BYTE( "logicpro.r3", 0x00001, 0x40000, CRC(d5a4cf62) SHA1(138ea4f1629e453c1a00410eda7086d3633240e3) )
+	ROM_LOAD16_BYTE( "r4.bin", 0x00000, 0x40000, CRC(03c9055e) SHA1(b1fa8e7a272887decca30eefe73ac782f296f0dd) )
+	ROM_LOAD16_BYTE( "r3.bin", 0x00001, 0x40000, CRC(a98ae4f6) SHA1(80fcedb4ee0f35eb2d0b4a248c15f872af2e08f2) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "logicpro.r2", 0x0000, 0x10000, CRC(000d624b) SHA1(c0da218ee81d01b3dcef2159bbaaff5d3ddb7619) )
@@ -344,10 +367,10 @@ ROM_START( logicpro )
 	ROM_LOAD( "logicpro.r1", 0x0000, 0x080000, CRC(a1fec4d4) SHA1(4390cd18b4a7de2d8cb68270180ea3de42fd2282) )
 ROM_END
 
-ROM_START( croquis )
+ROM_START( logicpro )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "r4.bin", 0x00000, 0x40000, CRC(03c9055e) SHA1(b1fa8e7a272887decca30eefe73ac782f296f0dd) )
-	ROM_LOAD16_BYTE( "r3.bin", 0x00001, 0x40000, CRC(a98ae4f6) SHA1(80fcedb4ee0f35eb2d0b4a248c15f872af2e08f2) )
+	ROM_LOAD16_BYTE( "logicpro.r4", 0x00000, 0x40000, CRC(c506d484) SHA1(5d662b109e1d2e09556bc4ecbc11bbf5ccb639d3) )
+	ROM_LOAD16_BYTE( "logicpro.r3", 0x00001, 0x40000, CRC(d5a4cf62) SHA1(138ea4f1629e453c1a00410eda7086d3633240e3) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "logicpro.r2", 0x0000, 0x10000, CRC(000d624b) SHA1(c0da218ee81d01b3dcef2159bbaaff5d3ddb7619) )
@@ -409,7 +432,8 @@ ROM_END
 
 
 
-GAME( 1996, logicpro, 0,        deniam16b, logicpr2, deniam_state, init_logicpro, ROT0, "Deniam", "Logic Pro (Japan)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, croquis,  logicpro, deniam16b, logicpr2, deniam_state, init_logicpro, ROT0, "Deniam", "Croquis (Germany)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, croquis,  0,        deniam16b, logicpr2, deniam_state, init_logicpro, ROT0, "Deniam", "Croquis (Korea)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1996, croquisg, croquis,  deniam16b, logicpr2, deniam_state, init_logicpro, ROT0, "Deniam", "Croquis (Germany)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, logicpro, croquis,  deniam16b, logicpr2, deniam_state, init_logicpro, ROT0, "Deniam", "Logic Pro (Japan)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, karianx,  0,        deniam16b, karianx,  deniam_state, init_karianx,  ROT0, "Deniam", "Karian Cross (Rev. 1.0)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, logicpr2, 0,        deniam16c, logicpr2, deniam_state, init_logicpro, ROT0, "Deniam", "Logic Pro 2 (Japan)",     MACHINE_SUPPORTS_SAVE )

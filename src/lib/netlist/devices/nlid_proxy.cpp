@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 /*
  * nlid_proxy.cpp
@@ -12,10 +12,7 @@
 
 #include <array>
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
 
 	// -----------------------------------------------------------------------------
 	// nld_base_proxy
@@ -184,6 +181,4 @@ namespace netlist
 		}
 	}
 
-
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

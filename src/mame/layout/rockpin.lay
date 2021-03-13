@@ -54,7 +54,7 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="2.01" right="21.99" top="10.25" bottom="49.99" />
 
-	<!-- element -->
+	<!-- bezel -->
 
 		<element ref="disk_white"><bounds x="2" y="6" width="20" height="25" /></element>
 		<element ref="disk_orange"><bounds x="2.5" y="6.5" width="19" height="24" /></element>

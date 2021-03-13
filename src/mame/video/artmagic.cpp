@@ -42,6 +42,9 @@ inline uint16_t *artmagic_state::address_to_vram(offs_t *address)
 
 void artmagic_state::video_start()
 {
+	// assumes it can make an address mask from m_blitter_base.length() - 1
+	assert(!(m_blitter_base.length() & (m_blitter_base.length() - 1)));
+
 	save_item(NAME(m_xor));
 	save_item(NAME(m_is_stoneball));
 	save_item(NAME(m_blitter_data));
@@ -219,7 +222,7 @@ void artmagic_state::execute_blit()
 				}
 				else    /* following lines */
 				{
-					int val = m_blitter_base[offset & m_blitter_base.mask()];
+					int val = m_blitter_base[offset & (m_blitter_base.length() - 1)];
 
 					/* ultennis, stonebal */
 					last ^= 4;
@@ -234,7 +237,7 @@ void artmagic_state::execute_blit()
 
 				for (j = 0; j < w; j += 4)
 				{
-					uint16_t val = m_blitter_base[(offset + j/4) & m_blitter_base.mask()];
+					uint16_t val = m_blitter_base[(offset + j/4) & (m_blitter_base.length() - 1)];
 					if (sx < 508)
 					{
 						if (h == 1 && m_is_stoneball)

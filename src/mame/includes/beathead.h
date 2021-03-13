@@ -30,7 +30,7 @@ public:
 		m_vram_bulk_latch(*this, "vram_bulk_latch"),
 		m_palette_select(*this, "palette_select"),
 		m_ram_base(*this, "ram_base"),
-		m_rom_base(*this, "rom_base")
+		m_rom_base(*this, "user1")
 	{ }
 
 	void beathead(machine_config &config);
@@ -80,7 +80,7 @@ private:
 	uint8_t           m_hsyncram[0x800];
 
 	required_shared_ptr<uint32_t> m_ram_base;
-	required_shared_ptr<uint32_t> m_rom_base;
+	required_region_ptr<uint32_t> m_rom_base;
 
 	attotime        m_hblank_offset;
 

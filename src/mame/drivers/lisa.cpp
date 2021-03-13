@@ -33,7 +33,7 @@ void lisa_state::lisa_fdc_map(address_map &map)
 	map(0x0000, 0x03ff).ram().share("fdc_ram");             /* RAM (shared with 68000) */
 	map(0x0400, 0x07ff).rw(FUNC(lisa_state::lisa_fdc_io_r), FUNC(lisa_state::lisa_fdc_io_w)); /* disk controller (IWM and TTL logic) */
 	map(0x0800, 0x0fff).noprw();
-	map(0x1000, 0x1fff).rom().region("fdccpu", 0x1000).share("fdc_rom");     /* ROM */
+	map(0x1000, 0x1fff).rom().region("fdccpu", 0x1000);     /* ROM */
 }
 
 void lisa_state::lisa210_fdc_map(address_map &map)
@@ -43,7 +43,7 @@ void lisa_state::lisa210_fdc_map(address_map &map)
 	map(0x0400, 0x07ff).noprw();                                     /* nothing, or RAM wrap-around ??? */
 	map(0x0800, 0x0bff).rw(FUNC(lisa_state::lisa_fdc_io_r), FUNC(lisa_state::lisa_fdc_io_w)); /* disk controller (IWM and TTL logic) */
 	map(0x0c00, 0x0fff).noprw();                                     /* nothing, or IO port wrap-around ??? */
-	map(0x1000, 0x1fff).rom().region("fdccpu", 0x1000).share("fdc_rom");         /* ROM */
+	map(0x1000, 0x1fff).rom().region("fdccpu", 0x1000);         /* ROM */
 }
 
 
@@ -154,14 +154,14 @@ void lisa_state::lisa(machine_config &config)
 	SOFTWARE_LIST(config, "disk_list").set_original("lisa");
 
 	/* via */
-	VIA6522(config, m_via0, 20.37504_MHz_XTAL / 40); // CPU E clock (nominally 500 kHz)
+	MOS6522(config, m_via0, 20.37504_MHz_XTAL / 40); // CPU E clock (nominally 500 kHz)
 	m_via0->writepa_handler().set(FUNC(lisa_state::COPS_via_out_a));
 	m_via0->writepb_handler().set(FUNC(lisa_state::COPS_via_out_b));
 	m_via0->ca2_handler().set(FUNC(lisa_state::COPS_via_out_ca2));
 	m_via0->cb2_handler().set(FUNC(lisa_state::COPS_via_out_cb2));
 	m_via0->irq_handler().set(FUNC(lisa_state::COPS_via_irq_func));
 
-	VIA6522(config, m_via1, 20.37504_MHz_XTAL / 40); // CPU E clock (nominally 500 kHz)
+	MOS6522(config, m_via1, 20.37504_MHz_XTAL / 40); // CPU E clock (nominally 500 kHz)
 
 	SCC8530(config, m_scc, 7833600);
 }

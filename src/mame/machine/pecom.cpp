@@ -23,8 +23,8 @@ void pecom_state::machine_reset()
 	m_bank1->set_entry(1);
 
 	space.unmap_write(0xf000, 0xffff);
-	space.install_read_bank (0xf000, 0xf7ff, "bank3");
-	space.install_read_bank (0xf800, 0xffff, "bank4");
+	space.install_read_bank (0xf000, 0xf7ff, m_bank3);
+	space.install_read_bank (0xf800, 0xffff, m_bank4);
 	m_bank3->set_base(m_rom + 0x7000);
 	m_bank4->set_base(m_rom + 0x7800);
 
@@ -68,8 +68,8 @@ void pecom_state::bank_w(uint8_t data)
 	else
 	{
 		space.unmap_write(0xf000, 0xffff);
-		space.install_read_bank (0xf000, 0xf7ff, "bank3");
-		space.install_read_bank (0xf800, 0xffff, "bank4");
+		space.install_read_bank (0xf000, 0xf7ff, m_bank3);
+		space.install_read_bank (0xf800, 0xffff, m_bank4);
 		m_bank3->set_base(m_rom + 0x7000);
 		m_bank4->set_base(m_rom + 0x7800);
 	}

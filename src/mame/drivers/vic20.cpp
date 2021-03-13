@@ -164,7 +164,7 @@ private:
 
 QUICKLOAD_LOAD_MEMBER(vic20_state::quickload_vc20)
 {
-	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
+	return general_cbm_loadsnap(image, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
 }
 
 //**************************************************************************
@@ -861,7 +861,7 @@ void vic20_state::add_clocked_devices(machine_config &config, uint32_t clock)
 	M6502(config, m_maincpu, clock);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vic20_state::vic20_mem);
 
-	VIA6522(config, m_via1, clock);
+	MOS6522(config, m_via1, clock);
 	m_via1->readpa_handler().set(FUNC(vic20_state::via1_pa_r));
 	m_via1->writepa_handler().set(FUNC(vic20_state::via1_pa_w));
 	m_via1->writepb_handler().set(FUNC(vic20_state::via1_pb_w));
@@ -870,7 +870,7 @@ void vic20_state::add_clocked_devices(machine_config &config, uint32_t clock)
 	m_via1->cb2_handler().set(m_user, FUNC(pet_user_port_device::write_m));
 	m_via1->irq_handler().set_inputline(m_maincpu, M6502_NMI_LINE);
 
-	VIA6522(config, m_via2, clock);
+	MOS6522(config, m_via2, clock);
 	m_via2->readpa_handler().set(FUNC(vic20_state::via2_pa_r));
 	m_via2->readpb_handler().set(FUNC(vic20_state::via2_pb_r));
 	m_via2->writepb_handler().set(FUNC(vic20_state::via2_pb_w));

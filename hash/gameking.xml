@@ -364,12 +364,23 @@ S1: is on some carts directly connected to VCC
 	</software>
 
 	<software name="mc_4v07" supported="partial">
-		<description>4 in 1 - TrojanLegend (Trojan) + HappyBall + Supermotor (Motor) + Lanneret (Hawk)</description>
+		<description>4 in 1 - TrojanLegend (Trojan) + HappyBall + Supermotor (Motor) + Lanneret (Hawk) (1MB cartridge)</description>
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="gk_4in1_trojanlegend_happyball_supermotor_lanneret.bin" size="0x100000" crc="99d8b18a" sha1="3154016d3e57a96f657b533a9d7b0c4bbaf04654"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4v07a" cloneof="mc_4v07" supported="partial">
+		<description>4 in 1 - TrojanLegend (Trojan) + HappyBall + Supermotor (Motor) + Lanneret (Hawk) (512KB cartridge)</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="4in1 - Hawk - Trojan - Motor - Happyball.bin" size="0x80000" crc="843e5a2f" sha1="bbbc5c324ac501ee901e9bb7122519eda3adc3e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -476,12 +487,23 @@ S1: is on some carts directly connected to VCC
 	</software>
 
 	<software name="mc_4v16" supported="partial">
-		<description>4 in 1 - Manhunt + Bobby + Tantivy + Racing Car</description>
+		<description>4 in 1 - Manhunt + Bobby + Tantivy + Racing Car (1MB cartridge)</description>
 		<year>200?</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="4in1 - manhunt, bobby, tantivy, racing car.bin" size="0x100000" crc="80f1bf46" sha1="e6f496e299589a3974be176d4b4215ad4aa0583c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4v16a" cloneof="mc_4v16" supported="partial">
+		<description>4 in 1 - Manhunt + Bobby + Tantivy + Racing Car (512KB cartridge)</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="0x80000">
+				<rom name="4in1 - Manhunt - Bobby - Tantivy - Racing Car.bin" size="0x80000" crc="120c3e35" sha1="9990c1c6a3bcbe4b9def092c7c0552f6643d3e2f"/>
 			</dataarea>
 		</part>
 	</software>

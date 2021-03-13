@@ -37,7 +37,7 @@ x2212_device::x2212_device(const machine_config &mconfig, device_type type, cons
 	, m_store(false)
 	, m_array_recall(false)
 	, m_size_data(size_data)
-	, m_default_data(*this, DEVICE_SELF, size_data)
+	, m_default_data(*this, DEVICE_SELF)
 {
 }
 

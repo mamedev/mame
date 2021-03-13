@@ -383,7 +383,7 @@ aha1542cp_device::aha1542cp_device(const machine_config &mconfig, const char *ta
 void aha1542c_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_rom(this, 0xdc000, 0xdffff, "aha1542", "aha1542");
+	m_isa->install_rom(this, 0xdc000, 0xdffff, "aha1542");
 	m_isa->install_device(0x330, 0x333,
 			read8sm_delegate(*this, FUNC(aha1542cf_device::aha1542_r)),
 			write8sm_delegate(*this, FUNC(aha1542cf_device::aha1542_w)));

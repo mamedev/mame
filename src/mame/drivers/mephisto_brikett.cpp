@@ -589,11 +589,23 @@ ROM_END
 
 ROM_START( mephisto3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("101", 0x0000, 0x4000, CRC(923de04f) SHA1(ca7cb3e29aeb3432a815c9d58bb0ed45e7302581) ) // HN4827128G-45
+	ROM_LOAD("101", 0x0000, 0x4000, CRC(923de04f) SHA1(ca7cb3e29aeb3432a815c9d58bb0ed45e7302581) ) // HN4827128G-45 or D27128-4
 	ROM_LOAD("201", 0x4000, 0x4000, CRC(0c3cb8fa) SHA1(31449422142c19fc71474a057fc5d6af8a86be7d) ) // "
 ROM_END
 
+ROM_START( mephisto3a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("107", 0x0000, 0x4000, CRC(52c072b8) SHA1(938dfaa18d751f06f42be16dedb7d32d010023b2) ) // HN4827128G-25
+	ROM_LOAD("207", 0x4000, 0x4000, CRC(9b45c350) SHA1(96a11f740c657a915a9ce3fa417a59f4e064a10b) ) // "
+ROM_END
+
 ROM_START( mephisto3b )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("109", 0x0000, 0x4000, CRC(02f9e37d) SHA1(1911d45c0c8db030d129c4d2b25572678835112a) ) // D27128-4
+	ROM_LOAD("209", 0x4000, 0x4000, CRC(0f217caf) SHA1(5aa77157af51a73e0654c344636ea2887bc45d42) ) // "
+ROM_END
+
+ROM_START( mephisto3c )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("g81", 0x0000, 0x8000, CRC(7b49475d) SHA1(30193153f0c259294b47e95d3e33834e40a94821) ) // HN613256P
 ROM_END
@@ -616,5 +628,7 @@ CONS( 1981, mephisto2,  0,         0, mephisto2,  mephisto,   brikett_state, emp
 CONS( 1981, mephisto2a, mephisto2, 0, mephisto2,  mephisto,   brikett_state, empty_init, "Hegener + Glaser", "Mephisto II (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1981, mephisto2e, mephisto2, 0, mephisto2e, mephisto2e, brikett_state, empty_init, "Hegener + Glaser", "Mephisto ESB II", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1983, mephisto3,  0,         0, mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (ver. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1983, mephisto3b, mephisto3, 0, mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (ver. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, mephisto3,  0,         0, mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, mephisto3a, mephisto3, 0, mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, mephisto3b, mephisto3, 0, mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1983, mephisto3c, mephisto3, 0, mephisto3,  mephisto3,  brikett_state, empty_init, "Hegener + Glaser", "Mephisto III (set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -337,7 +337,7 @@ static const nes_pcb *nes_pcb_lookup( const char *slot )
 {
 	for (auto & elem : pcb_list)
 	{
-		if (!core_stricmp(elem.slot_opt, slot))
+		if (!strcmp(elem.slot_opt, slot))
 			return &elem;
 	}
 	return nullptr;

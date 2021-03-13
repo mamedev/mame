@@ -31,27 +31,12 @@ void kaneko16_state::video_start()
 template<class BitmapClass>
 void kaneko16_state::fill_bitmap(BitmapClass &bitmap, const rectangle &cliprect)
 {
-	int pen = 0;
+	const int pen = (m_kaneko_spr->get_sprite_type() == 1) ? 0x7f00 : 0;
 
-	if (m_kaneko_spr.found())
-	{
-		if (m_kaneko_spr->get_sprite_type() == 1)
-		{
-			pen = 0x7f00;
-		}
-	}
-
-	typename BitmapClass::pixel_t *dest;
-	(void)dest; // shut up Visual Studio
-	if (sizeof(*dest) == 2)
-	{
+	if (sizeof(typename BitmapClass::pixel_t) == 2)
 		bitmap.fill(pen, cliprect);
-	}
 	else
-	{
-		const pen_t *pal = m_palette->pens();
-		bitmap.fill(pal[pen], cliprect);
-	}
+		bitmap.fill(m_palette->pens()[pen], cliprect);
 }
 
 

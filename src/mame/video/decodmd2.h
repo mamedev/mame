@@ -54,8 +54,7 @@ private:
 	required_device<mc6845_device> m_mc6845;
 	required_memory_bank m_rombank1;
 	required_memory_bank m_rombank2;
-	required_memory_bank m_rambank;
-	required_device<ram_device> m_ram;
+	required_shared_ptr<uint8_t> m_ram;
 	required_region_ptr<uint8_t> m_rom;
 
 	uint8_t m_crtc_index;

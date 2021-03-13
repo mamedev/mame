@@ -727,7 +727,7 @@ uint32_t gba_state::gba_io_r(offs_t offset, uint32_t mem_mask)
 			break;
 	}
 
-//  assert_always(offset < ARRAY_LENGTH(reg_names) / 2, "Not enough register names in gba_state");
+//  assert_always(offset < std::size(reg_names) / 2, "Not enough register names in gba_state");
 
 	if (ACCESSING_BITS_0_15)
 	{
@@ -749,7 +749,7 @@ void gba_state::gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 	COMBINE_DATA(&m_regs[offset]);
 
-//  assert_always(offset < ARRAY_LENGTH(reg_names) / 2, "Not enough register names in gba_state");
+//  assert_always(offset < std::size(reg_names) / 2, "Not enough register names in gba_state");
 
 	if (ACCESSING_BITS_0_15)
 	{
@@ -1331,17 +1331,14 @@ void gba_state::machine_start()
 	// install the cart ROM & SRAM into the address map, if present
 	if (m_cart->exists())
 	{
-		m_maincpu->space(AS_PROGRAM).install_read_bank(0x08000000, 0x09ffffff, "rom1");
-		m_maincpu->space(AS_PROGRAM).install_read_bank(0x0a000000, 0x0bffffff, "rom2");
-		m_maincpu->space(AS_PROGRAM).install_read_bank(0x0c000000, 0x0cffffff, "rom3");
 
 		std::string region_tag;
 		memory_region *cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GBASLOT_ROM_REGION_TAG));
 
 		// install ROM accesses
-		membank("rom1")->set_base(cart_rom->base());
-		membank("rom2")->set_base(cart_rom->base());
-		membank("rom3")->set_base(cart_rom->base());
+		m_maincpu->space(AS_PROGRAM).install_rom(0x08000000, 0x09ffffff, cart_rom->base());
+		m_maincpu->space(AS_PROGRAM).install_rom(0x0a000000, 0x0bffffff, cart_rom->base());
+		m_maincpu->space(AS_PROGRAM).install_rom(0x0c000000, 0x0cffffff, cart_rom->base());
 
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000c4, 0x80000cb, read32s_delegate(*m_cart, FUNC(gba_cart_slot_device::read_gpio)));
 		m_maincpu->space(AS_PROGRAM).install_write_handler(0x80000c4, 0x80000cb, write32s_delegate(*m_cart, FUNC(gba_cart_slot_device::write_gpio)));
@@ -1387,7 +1384,7 @@ void gba_state::machine_start()
 		{
 			m_maincpu->space(AS_PROGRAM).install_write_handler(0x08800000, 0x088001ff, write32sm_delegate(*m_cart, FUNC(gba_cart_slot_device::write_mapper)));
 			memory_region *cart_romhlp = memregion(region_tag.assign(m_cart->tag()).append(GBAHELP_ROM_REGION_TAG));
-			membank("rom1")->set_base(cart_romhlp->base());
+			m_maincpu->space(AS_PROGRAM).install_rom(0x08000000, 0x09ffffff, cart_romhlp->base());
 		}
 
 	}

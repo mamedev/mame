@@ -288,8 +288,7 @@ void e0c6200_cpu_device::execute_one()
 		case 0x100:
 			m_icount -= 7;
 			pop_pc();
-			// fall through!
-
+			[[fallthrough]];
 		// LBPX MX,e: load memory with 8-bit immediate data, increment X by 2
 		case 0x900:
 			write_mx(m_op & 0xf); inc_x();
@@ -840,7 +839,7 @@ void e0c6200_cpu_device::execute_one()
 
 		// illegal opcode
 		default:
-			logerror("%s unknown opcode $%03X at $%04X\n", tag(), m_op, m_prev_pc);
+			logerror("unknown opcode $%03X at $%04X\n", m_op, m_prev_pc);
 			break;
 
 			} // 0xff0

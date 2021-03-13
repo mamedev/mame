@@ -18,10 +18,10 @@
 #include "machine/wd_fdc.h"
 #include "machine/i8251.h"
 #include "machine/msm58321.h"
-#include "sound/2612intf.h"
 #include "sound/cdda.h"
 #include "sound/rf5c68.h"
 #include "sound/spkrdev.h"
+#include "sound/ym2612.h"
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
@@ -160,6 +160,9 @@ protected:
 	void ux_mem(address_map &map);
 
 	virtual void driver_start() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	required_device<ram_device> m_ram;
 	required_device<cpu_device> m_maincpu;
@@ -167,7 +170,7 @@ protected:
 	required_device_array<upd71071_device, 2> m_dma;
 	optional_device<fmscsi_device> m_scsi;
 	required_device_array<floppy_connector, 2> m_flop;
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	DECLARE_WRITE_LINE_MEMBER(towns_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(towns_scsi_drq);
@@ -276,9 +279,6 @@ private:
 	optional_shared_ptr<uint32_t> m_nvram;
 	optional_shared_ptr<uint16_t> m_nvram16;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -457,8 +457,10 @@ class marty_state : public towns_state
 		: towns_state(mconfig, type, tag)
 	{ }
 
-	virtual void driver_start() override;
 	void marty(machine_config &config);
+
+protected:
+	virtual void driver_start() override;
 };
 
 #endif // MAME_INCLUDES_FMTOWNS_H

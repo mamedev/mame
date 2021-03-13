@@ -6872,7 +6872,19 @@ This cart features a RTC, currently unemulated
 	</software>
 
 <!--
-This cart features two SmartMedia slots to import pictures to manipulate in the game, currently unemulated
+This cart features two SmartMedia slots to import pictures to manipulate in the game, currently unemulated.
+Known SmartMedia cards:
+Dumped Title                                                Japanese title                          Notes
+  YES  Illust-shuu - Postcard 1                             イラスト集 ポストカード 1
+  YES  Illust-shuu - Omoshiro Accessory 1                   イラスト集 おもしろアクセサリー 1
+  YES  Character-shuu - Yoshi's Story                       キャラクター集 ヨッシーストーリー
+  YES  Character-shuu - Sylvanian Families                  キャラクター集 シルバニアファミリー
+  YES  Character-shuu - Bomberman                           キャラクター集 ボンバーマン
+   NO  Character-shuu - Zelda no Densetsu - Toki no Ocarina キャラクター集 ゼルダの伝説 - 時のオカリナ
+   NO  Character-shuu - Himitsu no Akko-chan                キャラクター集 ひみつのアッコちゃん
+   NO  Character-shuu - Hello Kitty                         キャラクター集 Hello Kitty
+   NO  Character-shuu - Card Captor Sakura                  キャラクター集 カードキャプターさくら
+   NO  Character-shuu - Medarot                             キャラクター集 メダロット                  Unreleased?
 -->
 	<software name="mariopho">
 		<description>Mario no Photopie (Japan)</description>

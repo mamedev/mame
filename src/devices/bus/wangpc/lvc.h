@@ -48,7 +48,7 @@ private:
 	inline void set_irq(int state);
 
 	required_device<mc6845_device> m_crtc;
-	optional_shared_ptr<uint16_t> m_video_ram;
+	memory_share_creator<uint16_t> m_video_ram;
 
 	rgb_t m_palette[16];
 	uint8_t m_option;

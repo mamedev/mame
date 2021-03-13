@@ -84,7 +84,7 @@
 
 DEFINE_DEVICE_TYPE_NS(TI99_DATAMUX, bus::ti99::internal, datamux_device, "ti99_datamux", "TI-99 Databus multiplexer")
 
-namespace bus { namespace ti99 { namespace internal {
+namespace bus::ti99::internal {
 
 /*
     Constructor
@@ -632,5 +632,4 @@ ioport_constructor datamux_device::device_input_ports() const
 	return INPUT_PORTS_NAME(datamux);
 }
 
-} } } // end namespace bus::ti99::internal
-
+} // end namespace bus::ti99::internal

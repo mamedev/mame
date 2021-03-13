@@ -81,7 +81,7 @@ DEFINE_DEVICE_TYPE_NS(MSYSTEMS_HLE_SERIAL_MOUSE,  bus::rs232, hle_msystems_mouse
 DEFINE_DEVICE_TYPE_NS(ROTATABLE_HLE_SERIAL_MOUSE, bus::rs232, hle_rotatable_mouse_device, "rs232_mouse_hle_rotatable", "Mouse Systems Rotatable Mouse (HLE)")
 DEFINE_DEVICE_TYPE_NS(SGI_HLE_SERIAL_MOUSE,       bus::rs232, hle_sgi_mouse_device,       "rs232_mouse_hle_sgi",       "SGI IRIS Indigo Mouse (HLE)")
 
-namespace bus { namespace rs232 {
+namespace bus::rs232 {
 
 namespace {
 
@@ -720,4 +720,4 @@ void hle_sgi_mouse_device::device_start()
 	transmit_register_reset();
 }
 
-} } // namespace bus::rs232
+} // namespace bus::rs232

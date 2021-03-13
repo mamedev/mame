@@ -8,7 +8,7 @@
 DEFINE_DEVICE_TYPE_NS(INTELLEC4_PROM_MEMORY, bus::intellec4, imm6_26_device, "intlc4_imm6_26", "Intel imm6-26 PROM Memory Module")
 
 
-namespace bus { namespace intellec4 {
+namespace bus::intellec4 {
 
 imm6_26_device::imm6_26_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, INTELLEC4_PROM_MEMORY, tag, owner, clock)
@@ -64,4 +64,4 @@ void imm6_26_device::unmap()
 	rom_space().unmap_read(0x1000U, 0x1fffU);
 }
 
-} } // namespace bus::intellec4
+} // namespace bus::intellec4

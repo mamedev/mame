@@ -81,6 +81,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	memory_bank_creator m_bank;
 	std::vector<uint8_t> m_ram;
 };
 

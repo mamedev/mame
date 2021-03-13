@@ -437,7 +437,7 @@ void ssv_state::drifto94_map(address_map &map)
 {
 	ssv_map(map, 0xc00000);
 //  map(0x210002, 0x210003).nopw();                                      // ? 1 at the start
-	map(0x400000, 0x47ffff).writeonly();                                       // ?
+	map(0x400000, 0x47ffff).nopw();                                       // ?
 	map(0x480000, 0x480001).rw(FUNC(ssv_state::dsp_dr_r), FUNC(ssv_state::dsp_dr_w));
 	map(0x482000, 0x482fff).rw(FUNC(ssv_state::dsp_r), FUNC(ssv_state::dsp_w));
 	map(0x483000, 0x485fff).nopw();                                        // ?
@@ -579,7 +579,7 @@ void ssv_state::keithlcy_map(address_map &map)
 //  map(0x210002, 0x210003).nopw();  // ? 1 at the start
 	map(0x210010, 0x210011).nopw();    //
 	map(0x21000e, 0x21000f).nopr(); //
-	map(0x400000, 0x47ffff).writeonly();   // ?
+	map(0x400000, 0x47ffff).nopw();   // ?
 }
 
 
@@ -618,7 +618,7 @@ void ssv_state::mslider_map(address_map &map)
 	ssv_map(map, 0xf00000);
 	map(0x010000, 0x01ffff).rw(FUNC(ssv_state::mainram_r), FUNC(ssv_state::mainram_w)); // RAM Mirror
 //  map(0x210002, 0x210003).nopw();                          // ? 1 at the start
-	map(0x400000, 0x47ffff).writeonly();                           // ?
+	map(0x400000, 0x47ffff).nopw();                           // ?
 //  map(0x500000, 0x500001).nopw();                          // ? ff at the start
 }
 

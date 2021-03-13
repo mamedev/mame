@@ -528,7 +528,7 @@ int drcbe_c::execute(code_handle &entry)
 				newinst = (const drcbec_instruction *)m_hash.get_codeptr(PARAM0, PARAM1);
 				if (newinst == nullptr)
 				{
-					assert(sp < ARRAY_LENGTH(callstack));
+					assert(sp < std::size(callstack));
 					m_state.exp = PARAM1;
 					newinst = (const drcbec_instruction *)inst[2].handle->codeptr();
 					callstack[sp++] = inst;
@@ -540,7 +540,7 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_EXIT, 4, 1):      // EXIT    src1[,c]
 				if (OPCODE_FAIL_CONDITION(opcode, flags))
 					break;
-				// fall through...
+				[[fallthrough]];
 
 			case MAKE_OPCODE_SHORT(OP_EXIT, 4, 0):
 				return PARAM0;
@@ -548,7 +548,7 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_JMP, 4, 1):       // JMP     imm[,c]
 				if (OPCODE_FAIL_CONDITION(opcode, flags))
 					break;
-				// fall through...
+				[[fallthrough]];
 
 			case MAKE_OPCODE_SHORT(OP_JMP, 4, 0):
 				newinst = inst[0].inst;
@@ -559,10 +559,10 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_CALLH, 4, 1):     // CALLH   handle[,c]
 				if (OPCODE_FAIL_CONDITION(opcode, flags))
 					break;
-				// fall through...
+				[[fallthrough]];
 
 			case MAKE_OPCODE_SHORT(OP_CALLH, 4, 0):
-				assert(sp < ARRAY_LENGTH(callstack));
+				assert(sp < std::size(callstack));
 				newinst = (const drcbec_instruction *)inst[0].handle->codeptr();
 				assert_in_cache(m_cache, newinst);
 				callstack[sp++] = inst + OPCODE_GET_PWORDS(opcode);
@@ -572,7 +572,7 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_RET, 4, 1):       // RET     [c]
 				if (OPCODE_FAIL_CONDITION(opcode, flags))
 					break;
-				// fall through...
+				[[fallthrough]];
 
 			case MAKE_OPCODE_SHORT(OP_RET, 4, 0):
 				assert(sp > 0);
@@ -584,10 +584,10 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_EXH, 4, 1):       // EXH     handle,param[,c]
 				if (OPCODE_FAIL_CONDITION(opcode, flags))
 					break;
-				// fall through...
+				[[fallthrough]];
 
 			case MAKE_OPCODE_SHORT(OP_EXH, 4, 0):
-				assert(sp < ARRAY_LENGTH(callstack));
+				assert(sp < std::size(callstack));
 				newinst = (const drcbec_instruction *)inst[0].handle->codeptr();
 				assert_in_cache(m_cache, newinst);
 				m_state.exp = PARAM1;
@@ -598,7 +598,7 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_CALLC, 4, 1):     // CALLC   func,ptr[,c]
 				if (OPCODE_FAIL_CONDITION(opcode, flags))
 					break;
-				// fall through...
+				[[fallthrough]];
 
 			case MAKE_OPCODE_SHORT(OP_CALLC, 4, 0):
 				(*inst[0].cfunc)(inst[1].v);
@@ -833,7 +833,7 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_MOV, 4, 1):       // MOV     dst,src[,c]
 				if (OPCODE_FAIL_CONDITION(opcode, flags))
 					break;
-				// fall through...
+				[[fallthrough]];
 
 			case MAKE_OPCODE_SHORT(OP_MOV, 4, 0):
 				PARAM0 = PARAM1;
@@ -1466,7 +1466,7 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_MOV, 8, 1):       // DMOV    dst,src[,c]
 				if (OPCODE_FAIL_CONDITION(opcode, flags))
 					break;
-				// fall through...
+				[[fallthrough]];
 
 			case MAKE_OPCODE_SHORT(OP_MOV, 8, 0):
 				DPARAM0 = DPARAM1;
@@ -1837,7 +1837,7 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_FMOV, 4, 1):      // FSMOV   dst,src[,c]
 				if (OPCODE_FAIL_CONDITION(opcode, flags))
 					break;
-				// fall through...
+				[[fallthrough]];
 
 			case MAKE_OPCODE_SHORT(OP_FMOV, 4, 0):
 				FSPARAM0 = FSPARAM1;
@@ -1980,7 +1980,7 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_FMOV, 8, 1):      // FDMOV   dst,src[,c]
 				if (OPCODE_FAIL_CONDITION(opcode, flags))
 					break;
-				// fall through...
+				[[fallthrough]];
 
 			case MAKE_OPCODE_SHORT(OP_FMOV, 8, 0):
 				FDPARAM0 = FDPARAM1;

@@ -48,7 +48,7 @@ void aussiebyte_state::mem_map(address_map &map)
 	map(0x0000, 0x3fff).bankr("bankr0").bankw("bankw0");
 	map(0x4000, 0x7fff).bankrw("bank1");
 	map(0x8000, 0xbfff).bankrw("bank2");
-	map(0xc000, 0xffff).bankrw("bank3");
+	map(0xc000, 0xffff).ram();
 }
 
 void aussiebyte_state::io_map(address_map &map)
@@ -99,7 +99,7 @@ INPUT_PORTS_END
 ************************************************************/
 void aussiebyte_state::port15_w(u8 data)
 {
-	membank("bankr0")->set_entry(m_port15); // point at ram
+	m_bankr0->set_entry(m_port15); // point at ram
 	m_port15 = true;
 }
 
@@ -175,34 +175,34 @@ void aussiebyte_state::port1a_w(u8 data)
 		case 4:
 			m_port1a = data*3+1;
 			if (m_port15)
-				membank("bankr0")->set_entry(data*3+1);
-			membank("bankw0")->set_entry(data*3+1);
-			membank("bank1")->set_entry(data*3+2);
-			membank("bank2")->set_entry(data*3+3);
+				m_bankr0->set_entry(data*3+1);
+			m_bankw0->set_entry(data*3+1);
+			m_bank1->set_entry(data*3+2);
+			m_bank2->set_entry(data*3+3);
 			break;
 		case 5:
 			m_port1a = 1;
 			if (m_port15)
-				membank("bankr0")->set_entry(1);
-			membank("bankw0")->set_entry(1);
-			membank("bank1")->set_entry(2);
-			membank("bank2")->set_entry(13);
+				m_bankr0->set_entry(1);
+			m_bankw0->set_entry(1);
+			m_bank1->set_entry(2);
+			m_bank2->set_entry(13);
 			break;
 		case 6:
 			m_port1a = 14;
 			if (m_port15)
-				membank("bankr0")->set_entry(14);
-			membank("bankw0")->set_entry(14);
-			membank("bank1")->set_entry(15);
-			//membank("bank2")->set_entry(0); // open bus
+				m_bankr0->set_entry(14);
+			m_bankw0->set_entry(14);
+			m_bank1->set_entry(15);
+			//m_bank2->set_entry(0); // open bus
 			break;
 		case 7:
 			m_port1a = 1;
 			if (m_port15)
-				membank("bankr0")->set_entry(1);
-			membank("bankw0")->set_entry(1);
-			membank("bank1")->set_entry(4);
-			membank("bank2")->set_entry(13);
+				m_bankr0->set_entry(1);
+			m_bankw0->set_entry(1);
+			m_bank1->set_entry(4);
+			m_bank2->set_entry(13);
 			break;
 	}
 }
@@ -406,14 +406,14 @@ QUICKLOAD_LOAD_MEMBER(aussiebyte_state::quickload_cb)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
-	if (quickload_size >= 0xfd00)
+	if (image.length() >= 0xfd00)
 		return image_init_result::FAIL;
 
 	/* RAM must be banked in */
 	m_port15 = true;    // disable boot rom
 	m_port1a = 4;
-	membank("bankr0")->set_entry(m_port1a); /* enable correct program bank */
-	membank("bankw0")->set_entry(m_port1a);
+	m_bankr0->set_entry(m_port1a); /* enable correct program bank */
+	m_bankw0->set_entry(m_port1a);
 
 	/* Avoid loading a program if CP/M-80 is not in memory */
 	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
@@ -423,6 +423,7 @@ QUICKLOAD_LOAD_MEMBER(aussiebyte_state::quickload_cb)
 	}
 
 	/* Load image to the TPA (Transient Program Area) */
+	u16 quickload_size = image.length();
 	for (u16 i = 0; i < quickload_size; i++)
 	{
 		u8 data;
@@ -454,11 +455,10 @@ void aussiebyte_state::machine_reset()
 	m_port1a = 1;
 	m_alpha_address = 0;
 	m_graph_address = 0;
-	membank("bankr0")->set_entry(16); // point at rom
-	membank("bankw0")->set_entry(1); // always write to ram
-	membank("bank1")->set_entry(2);
-	membank("bank2")->set_entry(3);
-	membank("bank3")->set_entry(0);
+	m_bankr0->set_entry(16); // point at rom
+	m_bankw0->set_entry(1); // always write to ram
+	m_bank1->set_entry(2);
+	m_bank2->set_entry(3);
 	m_maincpu->reset();
 }
 
@@ -486,15 +486,14 @@ void aussiebyte_state::machine_start()
 
 	// Main ram is divided into 16k blocks (0-15). The boot rom is block number 16.
 	// For convenience, bank 0 is permanently assigned to C000-FFFF
-	u8 *main = memregion("roms")->base();
-	u8 *ram = m_ram.get();
 
-	membank("bankr0")->configure_entries(0, 16, ram, 0x4000);
-	membank("bankw0")->configure_entries(0, 16, ram, 0x4000);
-	membank("bank1")->configure_entries(0, 16, ram, 0x4000);
-	membank("bank2")->configure_entries(0, 16, ram, 0x4000);
-	membank("bank3")->configure_entries(0, 1, ram, 0x4000);
-	membank("bankr0")->configure_entry(16, &main[0x0000]);
+	m_bankr0->configure_entries(0, 16, m_p_mram, 0x4000);
+	m_bankw0->configure_entries(0, 16, m_p_mram, 0x4000);
+	m_bank1->configure_entries(0, 16, m_p_mram, 0x4000);
+	m_bank2->configure_entries(0, 16, m_p_mram, 0x4000);
+	m_bankr0->configure_entry(16, memregion("roms")->base());
+
+	m_cnt = 0;
 }
 
 
@@ -580,8 +579,8 @@ void aussiebyte_state::aussiebyte(machine_config &config)
 	WD2797(config, m_fdc, 16_MHz_XTAL / 16);
 	m_fdc->intrq_wr_callback().set(FUNC(aussiebyte_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(aussiebyte_state::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", aussiebyte_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", aussiebyte_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", aussiebyte_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", aussiebyte_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	/* devices */
 	SY6545_1(config, m_crtc, 16_MHz_XTAL / 8);

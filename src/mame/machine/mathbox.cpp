@@ -143,6 +143,7 @@ void mathbox_device::go_w(offs_t offset, uint8_t data)
 		REG7 += REG2;
 
 		/* fall into command 12 */
+		[[fallthrough]];
 
 	case 0x12:
 
@@ -174,6 +175,7 @@ void mathbox_device::go_w(offs_t offset, uint8_t data)
 		REG9 &= 0xff00;
 
 		/* fall into command 13 */
+		[[fallthrough]];
 
 	case 0x13:
 		LOG(("\nR7: %04x  R8: %04x  R9: %04x\n", REG7, REG8, REG9));
@@ -264,6 +266,7 @@ void mathbox_device::go_w(offs_t offset, uint8_t data)
 			REG3 = -REG3;
 
 		/* fall into command 1e */
+		[[fallthrough]];
 
 	case 0x1e:
 		/* result = max (REG2, REG3) + 3/8 * min (REG2, REG3) */

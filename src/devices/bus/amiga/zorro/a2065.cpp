@@ -27,7 +27,7 @@
 DEFINE_DEVICE_TYPE_NS(ZORRO_A2065, bus::amiga::zorro, a2065_device, "zorro_a2065", "CBM A2065 Ethernet Card")
 
 
-namespace bus { namespace amiga { namespace zorro {
+namespace bus::amiga::zorro {
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -164,4 +164,4 @@ WRITE_LINE_MEMBER( a2065_device::lance_irq_w )
 	m_slot->int2_w(!state);
 }
 
-} } } // namespace bus::amiga::zorro
+} // namespace bus::amiga::zorro

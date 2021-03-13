@@ -980,7 +980,7 @@ int ddenlovr_state::blit_draw( int src, int sx )
 
 			default:
 				log_draw_error(src, cmd);
-			// fall through
+				[[fallthrough]];
 			case BLIT_STOP:
 				return ((bit_addr + m_ddenlovr_blit_rom_bits - 1) / m_ddenlovr_blit_rom_bits) & 0xffffff;
 		}
@@ -2031,7 +2031,7 @@ void ddenlovr_state::quiz365_map(address_map &map)
 
 	map(0x200c02, 0x200c03).r(FUNC(ddenlovr_state::quiz365_protection_r));                          // Protection
 	map(0x200e0a, 0x200e0d).w(FUNC(ddenlovr_state::quiz365_protection_w));                         // Protection
-//  map(0x201000, 0x2017ff).writeonly();                                      // ?
+//  map(0x201000, 0x2017ff).nopw();                                      // ?
 
 	map(0x300201, 0x300201).w(FUNC(ddenlovr_state::ddenlovr_select2_w));
 	map(0x300203, 0x300203).w(FUNC(ddenlovr_state::quiz365_coincounter_w));                        // Coin Counters + more stuff written on startup
@@ -2085,7 +2085,7 @@ void ddenlovr_state::ddenlovj_map(address_map &map)
 	map(0x000000, 0x07ffff).rom(); // ROM
 
 	map(0x200000, 0x2003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
-//  map(0x201000, 0x2017ff).writeonly();                                      // ? B0 on startup, then 00
+//  map(0x201000, 0x2017ff).nopq();                                      // ? B0 on startup, then 00
 
 	map(0x300040, 0x300047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
 	map(0x300048, 0x30004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
@@ -2255,7 +2255,7 @@ void ddenlovr_state::nettoqc_map(address_map &map)
 	map(0x200000, 0x2003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
 	map(0x200c02, 0x200c03).r(FUNC(ddenlovr_state::nettoqc_protection1_r));                             // Protection 1
 	map(0x200e0a, 0x200e0d).writeonly().share("protection1");                       // ""
-	map(0x201000, 0x2017ff).writeonly();                                               // ?
+	map(0x201000, 0x2017ff).nopw();                                               // ?
 
 	map(0x300040, 0x300047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
 	map(0x300048, 0x30004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
@@ -2310,7 +2310,7 @@ void ddenlovr_state::ultrchmp_map(address_map &map)
 	map(0xd00c02, 0xd00c03).r(FUNC(ddenlovr_state::nettoqc_protection1_r));                             // Protection 1
 	map(0xd00e0a, 0xd00e0d).writeonly().share("protection1");                       // ""
 
-	map(0xd01000, 0xd017ff).writeonly();                                               // ?
+	map(0xd01000, 0xd017ff).nopw();                                               // ?
 
 	map(0xe00040, 0xe00047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
 	map(0xe00048, 0xe0004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
@@ -2520,7 +2520,7 @@ void mmpanic_state::mmpanic_map(address_map &map)
 	map(0x0000, 0x5fff).rom();                                             // ROM
 	map(0x0051, 0x0051).r(FUNC(mmpanic_state::magic_r));                                   // ?
 	map(0x6000, 0x6fff).ram();                                             // RAM
-	map(0x7000, 0x7fff).bankrw("bank2");                                // RAM (Banked)
+	map(0x7000, 0x7fff).ram();                                             // RAM (Banked)
 	map(0x8000, 0xffff).bankr("bank1");                                // ROM (Banked)
 	map(0x8000, 0x81ff).w(FUNC(mmpanic_state::ddenlovr_palette_w));
 }
@@ -2867,11 +2867,6 @@ uint8_t ddenlovr_state::hanakanz_rand_r()
 void hanakanz_state::hanakanz_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::hanakanz_busy_r), FUNC(hanakanz_state::hanakanz_oki_bank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::hanakanz_dsw_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x80, 0x80).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
 	map(0x81, 0x81).w(FUNC(hanakanz_state::hanakanz_palette_w));
 	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
@@ -2889,11 +2884,6 @@ void hanakanz_state::hanakanz_portmap(address_map &map)
 void hanakanz_state::hkagerou_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::hanakanz_busy_r), FUNC(hanakanz_state::hanakanz_oki_bank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::hanakanz_dsw_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x80, 0x80).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
 	map(0x81, 0x81).w(FUNC(hanakanz_state::hanakanz_palette_w));
 	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
@@ -2912,11 +2902,6 @@ void hanakanz_state::hkagerou_portmap(address_map &map)
 void hanakanz_state::kotbinyo_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::hanakanz_busy_r), FUNC(hanakanz_state::hanakanz_oki_bank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::hanakanz_dsw_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x80, 0x80).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
 	map(0x81, 0x81).w(FUNC(hanakanz_state::hanakanz_palette_w));
 	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
@@ -2937,11 +2922,6 @@ void hanakanz_state::kotbinyo_portmap(address_map &map)
 void hanakanz_state::kotbinsp_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::hanakanz_busy_r), FUNC(hanakanz_state::hanakanz_oki_bank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::hanakanz_dsw_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x80, 0x80).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
 	map(0x81, 0x81).w(FUNC(hanakanz_state::hanakanz_palette_w));
 	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
@@ -2971,11 +2951,6 @@ uint8_t hanakanz_state::mjreach1_protection_r()
 void hanakanz_state::mjreach1_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::hanakanz_busy_r), FUNC(hanakanz_state::hanakanz_oki_bank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::hanakanz_dsw_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x80, 0x80).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
 	map(0x81, 0x81).w(FUNC(hanakanz_state::hanakanz_palette_w));
 	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
@@ -3966,11 +3941,6 @@ uint8_t hanakanz_state::jongtei_busy_r()
 void hanakanz_state::jongtei_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::jongtei_busy_r), FUNC(hanakanz_state::jongtei_okibank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::jongtei_dsw_keyb_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x40, 0x40).portr("SYSTEM");
 	map(0x41, 0x42).r(FUNC(hanakanz_state::hanakanz_keyb_r));
 	map(0x43, 0x43).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
@@ -4023,11 +3993,6 @@ uint8_t hanakanz_state::mjgnight_protection_r()
 void hanakanz_state::mjgnight_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::jongtei_busy_r), FUNC(hanakanz_state::jongtei_okibank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::jongtei_dsw_keyb_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x40, 0x40).portr("SYSTEM");
 	map(0x41, 0x42).r(FUNC(hanakanz_state::hanakanz_keyb_r));
 	map(0x46, 0x46).w(FUNC(hanakanz_state::mjgnight_coincounter_w));
@@ -4334,6 +4299,7 @@ void htengoku_state::htengoku_coin_w(uint8_t data)
 //          popmessage("COINS %02x",data);
 #endif
 			m_coins = data;
+			break;
 
 		case 0x0d:  break;  // ff resets input port sequence?
 
@@ -4599,11 +4565,6 @@ uint8_t hanakanz_state::daimyojn_year_hack_r(offs_t offset)
 void hanakanz_state::daimyojn_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::jongtei_busy_r), FUNC(hanakanz_state::daimyojn_okibank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::daimyojn_palette_sel_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::jongtei_dsw_keyb_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x40, 0x40).w(FUNC(hanakanz_state::daimyojn_blitter_data_palette_w));
 	map(0x42, 0x44).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
 	map(0x80, 0x8f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
@@ -9700,7 +9661,7 @@ MACHINE_RESET_MEMBER(ddenlovr_state,ddenlovr)
 	m_quiz365_protection[0] = 0;
 	m_quiz365_protection[1] = 0;
 
-	memset(m_palram, 0, ARRAY_LENGTH(m_palram));
+	std::fill(std::begin(m_palram), std::end(m_palram), 0);
 
 	m_blitter_irq_handler(1);
 }
@@ -10091,9 +10052,15 @@ void mmpanic_state::mmpanic(machine_config &config)
 void hanakanz_state::hanakanz(machine_config &config)
 {
 	/* basic machine hardware */
-	KL5C80A12(config, m_maincpu, 20'000'000); // KL5C80A12
-	m_maincpu->set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
-	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::hanakanz_portmap);
+	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, 20'000'000));
+	maincpu.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
+	maincpu.set_addrmap(AS_IO, &hanakanz_state::hanakanz_portmap);
+	maincpu.in_p0_callback().set(FUNC(hanakanz_state::hanakanz_busy_r));
+	maincpu.out_p0_callback().set(FUNC(hanakanz_state::hanakanz_oki_bank_w));
+	maincpu.out_p1_callback().set(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
+	maincpu.out_p2_callback().set(FUNC(hanakanz_state::hanakanz_rombank_w));
+	maincpu.out_p3_callback().set(FUNC(hanakanz_state::hanakanz_dsw_w));
+	maincpu.in_p4_callback().set(FUNC(hanakanz_state::hanakanz_dsw_r));
 
 	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)
@@ -10136,9 +10103,15 @@ void hanakanz_state::hkagerou(machine_config &config)
 void hanakanz_state::kotbinyo(machine_config &config)
 {
 	/* basic machine hardware */
-	KL5C80A12(config, m_maincpu, XTAL(20'000'000)); // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
-	m_maincpu->set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
-	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::kotbinyo_portmap);
+	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, XTAL(20'000'000))); // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
+	maincpu.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
+	maincpu.set_addrmap(AS_IO, &hanakanz_state::kotbinyo_portmap);
+	maincpu.in_p0_callback().set(FUNC(hanakanz_state::hanakanz_busy_r));
+	maincpu.out_p0_callback().set(FUNC(hanakanz_state::hanakanz_oki_bank_w));
+	maincpu.out_p1_callback().set(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
+	maincpu.out_p2_callback().set(FUNC(hanakanz_state::hanakanz_rombank_w));
+	maincpu.out_p3_callback().set(FUNC(hanakanz_state::hanakanz_dsw_w));
+	maincpu.in_p4_callback().set(FUNC(hanakanz_state::hanakanz_dsw_r));
 
 	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)
@@ -10539,9 +10512,15 @@ void ddenlovr_state::hparadis(machine_config &config)
 void hanakanz_state::jongtei(machine_config &config)
 {
 	/* basic machine hardware */
-	KL5C80A12(config, m_maincpu, XTAL(20'000'000)); // KL5C80A12
-	m_maincpu->set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
-	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::jongtei_portmap);
+	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, XTAL(20'000'000)));
+	maincpu.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
+	maincpu.set_addrmap(AS_IO, &hanakanz_state::jongtei_portmap);
+	maincpu.in_p0_callback().set(FUNC(hanakanz_state::jongtei_busy_r));
+	maincpu.out_p0_callback().set(FUNC(hanakanz_state::jongtei_okibank_w));
+	maincpu.out_p1_callback().set(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
+	maincpu.out_p2_callback().set(FUNC(hanakanz_state::hanakanz_rombank_w));
+	maincpu.out_p3_callback().set(FUNC(hanakanz_state::jongtei_dsw_keyb_w));
+	maincpu.in_p4_callback().set(FUNC(hanakanz_state::hanakanz_dsw_r));
 
 	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)
@@ -10753,9 +10732,15 @@ void ddenlovr_state::seljan2(machine_config &config)
 void hanakanz_state::daimyojn(machine_config &config)
 {
 	/* basic machine hardware */
-	KL5C80A12(config, m_maincpu, XTAL(20'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
-	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::daimyojn_portmap);
+	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, XTAL(20'000'000)));
+	maincpu.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
+	maincpu.set_addrmap(AS_IO, &hanakanz_state::daimyojn_portmap);
+	maincpu.in_p0_callback().set(FUNC(hanakanz_state::jongtei_busy_r));
+	maincpu.out_p0_callback().set(FUNC(hanakanz_state::daimyojn_okibank_w));
+	maincpu.out_p1_callback().set(FUNC(hanakanz_state::daimyojn_palette_sel_w));
+	maincpu.out_p2_callback().set(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
+	maincpu.out_p3_callback().set(FUNC(hanakanz_state::jongtei_dsw_keyb_w));
+	maincpu.in_p4_callback().set(FUNC(hanakanz_state::hanakanz_dsw_r));
 
 	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,mjflove)
 	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)

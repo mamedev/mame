@@ -51,6 +51,8 @@ ToDo:
 #include "s6a.lh"
 
 
+namespace {
+
 class s6a_state : public genpin_class
 {
 public:
@@ -75,6 +77,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
+protected:
+	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 private:
 	uint8_t sound_r();
 	void dig0_w(uint8_t data);
@@ -95,7 +101,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { }; //ST4
 	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { }; //ST3
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
-	DECLARE_MACHINE_RESET(s6a);
 
 	void s6a_audio_map(address_map &map);
 	void s6a_main_map(address_map &map);
@@ -105,9 +110,7 @@ private:
 	uint8_t m_switch_col;
 	bool m_data_ok;
 	emu_timer* m_irq_timer;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_IRQ = 0;
-	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<hc55516_device> m_hc55516;
@@ -387,10 +390,6 @@ void s6a_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	}
 }
 
-MACHINE_RESET_MEMBER( s6a_state, s6a )
-{
-}
-
 void s6a_state::init_s6a()
 {
 	m_irq_timer = timer_alloc(TIMER_IRQ);
@@ -402,7 +401,6 @@ void s6a_state::s6a(machine_config &config)
 	/* basic machine hardware */
 	M6808(config, m_maincpu, 3580000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &s6a_state::s6a_main_map);
-	MCFG_MACHINE_RESET_OVERRIDE(s6a_state, s6a)
 
 	/* Video */
 	config.set_default_layout(layout_s6a);
@@ -523,6 +521,8 @@ ROM_START(alpok_f6)
 	ROM_LOAD("5t5017fr.dat", 0x3000, 0x1000, CRC(7e546dc1) SHA1(58f8286403978b0d929987189089881d754a9a83))
 	ROM_LOAD("sound3.716",   0x4800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
 ROM_END
+
+} // Anonymous namespace
 
 
 GAME( 1980, algar_l1, 0,        s6a, s6a, s6a_state, init_s6a, ROT0, "Williams", "Algar (L-1)",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

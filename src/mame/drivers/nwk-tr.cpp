@@ -644,9 +644,9 @@ void nwktr_state::lanc2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	{
 		// TODO: The data below would normally be present on the serialflash at 2G.
 
-		if (core_stricmp(machine().system().name, "thrilld") == 0 ||
-			core_stricmp(machine().system().name, "thrilldb") == 0 ||
-			core_stricmp(machine().system().name, "thrilldbe") == 0)
+		if (strcmp(machine().system().name, "thrilld") == 0 ||
+			strcmp(machine().system().name, "thrilldb") == 0 ||
+			strcmp(machine().system().name, "thrilldbe") == 0)
 		{
 			m_work_ram[(0x3ffed0/4) + 0] = 0x472a3731;      // G*71
 			m_work_ram[(0x3ffed0/4) + 1] = 0x33202020;      // 3
@@ -658,7 +658,7 @@ void nwktr_state::lanc2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			m_work_ram[(0x3fff40/4) + 2] = 0x19994a41;      //   JA
 			m_work_ram[(0x3fff40/4) + 3] = 0x4100a9b1;      // A
 		}
-		else if (core_stricmp(machine().system().name, "racingj2") == 0)
+		else if (strcmp(machine().system().name, "racingj2") == 0)
 		{
 			m_work_ram[(0x3ffc80/4) + 0] = 0x47453838;      // GE88
 			m_work_ram[(0x3ffc80/4) + 1] = 0x38003030;      // 8 00
@@ -729,9 +729,9 @@ void nwktr_state::nwktr_map(address_map &map)
 	map(0x7d030000, 0x7d03000f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x7d040000, 0x7d04ffff).rw(FUNC(nwktr_state::lanc1_r), FUNC(nwktr_state::lanc1_w));
 	map(0x7d050000, 0x7d05ffff).rw(FUNC(nwktr_state::lanc2_r), FUNC(nwktr_state::lanc2_w));
-	map(0x7e000000, 0x7e7fffff).rom().region("user2", 0); // Data ROM
-	map(0x7f000000, 0x7f1fffff).rom().share("share2");
-	map(0x7fe00000, 0x7fffffff).rom().region("user1", 0).share("share2"); // Program ROM
+	map(0x7e000000, 0x7e7fffff).rom().region("user2", 0);   /* Data ROM */
+	map(0x7f000000, 0x7f1fffff).rom().region("user1", 0);
+	map(0x7fe00000, 0x7fffffff).rom().region("user1", 0);    /* Program ROM */
 }
 
 /*****************************************************************************/

@@ -105,7 +105,7 @@ vic20_final_expansion_3_device::vic20_final_expansion_3_device(const machine_con
 	device_t(mconfig, VIC20_FE3, tag, owner, clock),
 	device_vic20_expansion_card_interface(mconfig, *this),
 	m_flash_rom(*this, AM29F040_TAG),
-	m_ram(*this, "sram"), m_reg1(0), m_reg2(0), m_lockbit(0)
+	m_ram(*this, "sram", 0x80000, ENDIANNESS_LITTLE), m_reg1(0), m_reg2(0), m_lockbit(0)
 {
 }
 
@@ -116,8 +116,6 @@ vic20_final_expansion_3_device::vic20_final_expansion_3_device(const machine_con
 
 void vic20_final_expansion_3_device::device_start()
 {
-	m_ram.allocate(0x80000);
-
 	// state saving
 	save_item(NAME(m_reg1));
 	save_item(NAME(m_reg2));

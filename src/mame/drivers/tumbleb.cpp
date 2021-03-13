@@ -307,9 +307,9 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "cpu/mcs51/mcs51.h" // for semicom mcu
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/decocrpt.h"
-#include "sound/ym2151.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "sound/ym2151.h"
 #include "speaker.h"
 
 
@@ -638,7 +638,7 @@ void tumbleb_state::tumblepopb_main_map(address_map &map)
 	map(0x120000, 0x123fff).ram().share("mainram");
 	map(0x140000, 0x1407ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x160000, 0x1607ff).ram().share("spriteram"); /* Bootleg sprite buffer */
-	map(0x160800, 0x160807).writeonly(); /* writes past the end of spriteram */
+	map(0x160800, 0x160807).nopw(); /* writes past the end of spriteram */
 	map(0x180000, 0x18000f).r(FUNC(tumbleb_state::tumblepopb_controls_r));
 	map(0x18000c, 0x18000d).nopw();
 	map(0x1a0000, 0x1a07ff).ram();
@@ -697,7 +697,7 @@ void tumbleb_state::unico_base_map(address_map &map)
 	map(0x100005, 0x100005).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x160000, 0x1607ff).ram().share("spriteram"); /* sprites */
-	map(0x160800, 0x16080f).writeonly(); /* goes slightly past the end of spriteram? */
+	map(0x160800, 0x16080f).nopw(); /* goes slightly past the end of spriteram? */
 	map(0x180000, 0x18000f).r(FUNC(tumbleb_state::tumblepopb_controls_r));
 	map(0x18000c, 0x18000d).nopw();
 	map(0x1a0000, 0x1a07ff).ram();
@@ -783,7 +783,7 @@ void tumbleb_state::pangpang_main_map(address_map &map)
 	map(0x120000, 0x123fff).ram().share("mainram");
 	map(0x140000, 0x1407ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x160000, 0x1607ff).ram().share("spriteram"); /* Bootleg sprite buffer */
-	map(0x160800, 0x160807).writeonly(); // writes past the end of spriteram
+	map(0x160800, 0x160807).nopw(); // writes past the end of spriteram
 	map(0x180000, 0x18000f).r(FUNC(tumbleb_state::tumblepopb_controls_r));
 	map(0x1a0000, 0x1a07ff).ram();
 	map(0x300000, 0x30000f).w(FUNC(tumbleb_state::tumblepb_control_0_w));
@@ -886,7 +886,7 @@ void tumbleb_state::jumpkids_main_map(address_map &map)
 	map(0x120000, 0x123fff).ram().share("mainram");
 	map(0x140000, 0x1407ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x160000, 0x1607ff).ram().share("spriteram"); /* Bootleg sprite buffer */
-	map(0x160800, 0x160807).writeonly(); /* writes past the end of spriteram */
+	map(0x160800, 0x160807).nopw(); /* writes past the end of spriteram */
 	map(0x180000, 0x18000f).r(FUNC(tumbleb_state::tumblepopb_controls_r));
 	map(0x18000c, 0x18000d).nopw();
 	map(0x1a0000, 0x1a07ff).ram();
@@ -2115,6 +2115,7 @@ MACHINE_RESET_MEMBER(tumbleb_state,tumbleb)
 	m_music_is_playing = 0;
 	m_tilebank = 0;
 	memset(m_control_0, 0, sizeof(m_control_0));
+	m_semicom_prot_offset = 0;
 }
 
 void tumbleb_state::tumblepb(machine_config &config)

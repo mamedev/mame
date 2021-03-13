@@ -538,7 +538,7 @@ void vis_vga_device::vga_w(offs_t offset, uint8_t data)
 			break;
 		case 0x05:
 		case 0x25:
-			assert(vga.crtc.index < ARRAY_LENGTH(m_crtc_regs));
+			assert(vga.crtc.index < std::size(m_crtc_regs));
 			m_crtc_regs[vga.crtc.index] = data;
 			switch(vga.crtc.index)
 			{
@@ -903,10 +903,9 @@ void vis_state::vis(machine_config &config)
 	maincpu.shutdown_callback().set("mb", FUNC(at_mb_device::shutdown));
 	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	AT_MB(config, "mb", 0);
+	AT_MB(config, "mb");
 	// the vis doesn't have a real keyboard controller
 	config.device_remove("mb:keybc");
-	config.device_remove("mb:pc_kbdc");
 
 	kbdc8042_device &kbdc(KBDC8042(config, "kbdc"));
 	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);

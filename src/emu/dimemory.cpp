@@ -50,9 +50,10 @@ device_memory_interface::~device_memory_interface()
 
 void device_memory_interface::set_addrmap(int spacenum, address_map_constructor map)
 {
+	assert(0 <= spacenum);
 	if (spacenum >= int(m_address_map.size()))
-		m_address_map.resize(spacenum+1);
-	m_address_map[spacenum] = map;
+		m_address_map.resize(spacenum + 1);
+	m_address_map[spacenum] = std::move(map);
 }
 
 

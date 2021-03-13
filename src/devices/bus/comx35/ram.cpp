@@ -37,7 +37,7 @@ DEFINE_DEVICE_TYPE(COMX_RAM, comx_ram_device, "comx_ram", "COMX-35 RAM Card")
 comx_ram_device::comx_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, COMX_RAM, tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
-	m_ram(*this, "ram"),
+	m_ram(*this, "ram", RAM_SIZE, ENDIANNESS_LITTLE),
 	m_bank(0)
 {
 }
@@ -49,7 +49,6 @@ comx_ram_device::comx_ram_device(const machine_config &mconfig, const char *tag,
 
 void comx_ram_device::device_start()
 {
-	m_ram.allocate(RAM_SIZE);
 }
 
 

@@ -72,6 +72,7 @@
 #include "eis_sad8852.h"
 #include "eis_twib.h"
 #include "np600.h"
+#include "3xtwin.h"
 
 // communication ports
 #include "lpt.h"
@@ -138,6 +139,7 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("epc_twib", ISA8_EIS_TWIB);
 	device.option_add("babyblue2", ISA8_BABYBLUE2);
 	device.option_add("acb2072", ACB2072);
+	device.option_add("3xtwin", ISA8_3XTWIN);
 }
 
 void pc_isa16_cards(device_slot_interface &device)
@@ -183,6 +185,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("epc_twib", ISA8_EIS_TWIB);
 	device.option_add("babyblue2", ISA8_BABYBLUE2);
 	device.option_add("acb2072", ACB2072);
+	device.option_add("3xtwin", ISA8_3XTWIN);
 	// 16-bit
 	device.option_add("ide", ISA16_IDE);
 	device.option_add("ne2000", NE2000);

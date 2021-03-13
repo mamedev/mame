@@ -131,8 +131,8 @@ vic20_video_pak_device::vic20_video_pak_device(const machine_config &mconfig, co
 	m_crtc(*this, MC6845_TAG),
 	m_palette(*this, "palette"),
 	m_char_rom(*this, MC6845_TAG),
-	m_videoram(*this, "videoram"),
-	m_ram(*this, "ram")
+	m_videoram(*this, "videoram", VIDEORAM_SIZE, ENDIANNESS_LITTLE),
+	m_ram(*this, "ram", RAM_SIZE, ENDIANNESS_LITTLE)
 {
 }
 
@@ -143,9 +143,6 @@ vic20_video_pak_device::vic20_video_pak_device(const machine_config &mconfig, co
 
 void vic20_video_pak_device::device_start()
 {
-	// allocate memory
-	m_videoram.allocate(VIDEORAM_SIZE);
-	m_ram.allocate(RAM_SIZE);
 }
 
 

@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    drivers/dgn_beta.c
+    drivers/dgn_beta.cpp
 
     Dragon Beta prototype, based on two 68B09E processors, WD2797, 6845.
 
@@ -142,22 +142,6 @@ static constexpr rgb_t dgnbeta_pens[] =
 
 void dgn_beta_state::dgnbeta_map(address_map &map)
 {
-	map(0x0000, 0x0FFF).bankrw("bank1");
-	map(0x1000, 0x1FFF).bankrw("bank2");
-	map(0x2000, 0x2FFF).bankrw("bank3");
-	map(0x3000, 0x3FFF).bankrw("bank4");
-	map(0x4000, 0x4FFF).bankrw("bank5");
-	map(0x5000, 0x5FFF).bankrw("bank6");
-	map(0x6000, 0x6FFF).bankrw("bank7").share("videoram");
-	map(0x7000, 0x7FFF).bankrw("bank8");
-	map(0x8000, 0x8FFF).bankrw("bank9");
-	map(0x9000, 0x9FFF).bankrw("bank10");
-	map(0xA000, 0xAFFF).bankrw("bank11");
-	map(0xB000, 0xBFFF).bankrw("bank12");
-	map(0xC000, 0xCFFF).bankrw("bank13");
-	map(0xD000, 0xDFFF).bankrw("bank14");
-	map(0xE000, 0xEFFF).bankrw("bank15");
-	map(0xF000, 0xFBFF).bankrw("bank16");
 	map(0xfC00, 0xfC1F).noprw();
 	map(0xFC20, 0xFC23).rw(m_pia_0, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xFC24, 0xFC27).rw(m_pia_1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -172,8 +156,6 @@ void dgn_beta_state::dgnbeta_map(address_map &map)
 	map(0xfce4, 0xfdff).noprw();
 	map(0xFE00, 0xFE0F).rw(FUNC(dgn_beta_state::dgn_beta_page_r), FUNC(dgn_beta_state::dgn_beta_page_w));
 	map(0xfe10, 0xfEff).noprw();
-	map(0xFF00, 0xFFFF).bankrw("bank17");
-
 }
 
 
@@ -307,10 +289,12 @@ static GFXDECODE_START( gfx_dgnbeta )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, dgnbeta_charlayout, 0, 8 )
 GFXDECODE_END
 
-FLOPPY_FORMATS_MEMBER(dgn_beta_state::floppy_formats )
-	FLOPPY_VDK_FORMAT,
-	FLOPPY_DMK_FORMAT
-FLOPPY_FORMATS_END
+void dgn_beta_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_VDK_FORMAT);
+	fr.add(FLOPPY_DMK_FORMAT);
+}
 
 static void dgnbeta_floppies(device_slot_interface &device)
 {
@@ -338,7 +322,7 @@ void dgn_beta_state::dgnbeta(machine_config &config)
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_dgnbeta);
-	PALETTE(config, m_palette, FUNC(dgn_beta_state::dgn_beta_palette), ARRAY_LENGTH(dgnbeta_pens));
+	PALETTE(config, m_palette, FUNC(dgn_beta_state::dgn_beta_palette), std::size(dgnbeta_pens));
 
 	/* PIA 0 at $FC20-$FC23 I46 */
 	PIA6821(config, m_pia_0, 0);
@@ -399,7 +383,7 @@ void dgn_beta_state::dgnbeta(machine_config &config)
 }
 
 ROM_START(dgnbeta)
-	ROM_REGION(0x4000,MAINCPU_TAG,0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "bootrom", "Dragon Beta OS-9 Boot ROM (15.6.84)" )
 	ROMX_LOAD("beta_bt.rom"     ,0x0000 ,0x4000 ,CRC(4c54c1de) SHA1(141d9fcd2d187c305dff83fce2902a30072aed76), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "testrom", "Dragon Beta Test ROM (1984?)" )

@@ -23,35 +23,22 @@ public:
 	{
 	}
 
-	void phoenix_videoram_w(offs_t offset, uint8_t data);
-	void phoenix_videoreg_w(uint8_t data);
-	void pleiads_videoreg_w(uint8_t data);
-	void phoenix_scroll_w(uint8_t data);
-	uint8_t survival_input_port_0_r();
 	DECLARE_CUSTOM_INPUT_MEMBER(player_input_r);
 	DECLARE_READ_LINE_MEMBER(pleiads_protection_r);
-	void init_oneprom();
-	void init_coindsw();
-	void init_oneprom_coindsw();
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_MACHINE_RESET(phoenix);
-	DECLARE_VIDEO_START(phoenix);
-	void phoenix_palette(palette_device &palette) const;
-	void survival_palette(palette_device &palette) const;
-	void pleiads_palette(palette_device &palette) const;
-	uint32_t screen_update_phoenix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint8_t survival_protection_r();
-	DECLARE_READ_LINE_MEMBER(survival_sid_callback);
 
 	void condor(machine_config &config);
 	void phoenix(machine_config &config);
 	void survival(machine_config &config);
 	void pleiads(machine_config &config);
-	void phoenix_memory_map(address_map &map);
-	void pleiads_memory_map(address_map &map);
-	void survival_memory_map(address_map &map);
+
+	void init_oneprom();
+	void init_coindsw();
+	void init_oneprom_coindsw();
+
 protected:
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device>             m_maincpu;
 	optional_device<pleiads_sound_device>   m_pleiads_custom;
 	required_device<gfxdecode_device>       m_gfxdecode;
@@ -69,6 +56,23 @@ protected:
 	int m_survival_sid_value;
 	uint8_t m_survival_input_latches[2];
 	uint8_t m_survival_input_readc;
+
+	void phoenix_videoram_w(offs_t offset, uint8_t data);
+	void phoenix_videoreg_w(uint8_t data);
+	void pleiads_videoreg_w(uint8_t data);
+	void phoenix_scroll_w(uint8_t data);
+	uint8_t survival_input_port_0_r();
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void phoenix_palette(palette_device &palette) const;
+	void survival_palette(palette_device &palette) const;
+	void pleiads_palette(palette_device &palette) const;
+	uint32_t screen_update_phoenix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint8_t survival_protection_r();
+	DECLARE_READ_LINE_MEMBER(survival_sid_callback);
+	void phoenix_memory_map(address_map &map);
+	void pleiads_memory_map(address_map &map);
+	void survival_memory_map(address_map &map);
 };
 
 

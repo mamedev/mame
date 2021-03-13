@@ -724,15 +724,12 @@ void sraider_state::machine_reset()
 void ladybug_state::ladybug(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);   /* 4 MHz */
+	Z80(config, m_maincpu, 4_MHz_XTAL);   /* 4 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &ladybug_state::ladybug_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(1*8, 31*8-1, 4*8, 28*8-1);
+	screen.set_raw(9.828_MHz_XTAL / 2, 312, 8, 248, 262, 32, 224);
 	screen.set_screen_update(FUNC(ladybug_state::screen_update_ladybug));
 	screen.set_palette("palette");
 
@@ -747,8 +744,8 @@ void ladybug_state::ladybug(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SN76489(config, "sn1", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
-	SN76489(config, "sn2", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn1", 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn2", 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void dorodon_state::dorodon(machine_config &config)
@@ -772,10 +769,7 @@ void sraider_state::sraider(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(1*8, 31*8-1, 4*8, 28*8-1);
+	screen.set_raw(9'828'000 / 2, 312, 8, 248, 262, 32, 224);
 	screen.set_screen_update(FUNC(sraider_state::screen_update_sraider));
 	screen.screen_vblank().set(FUNC(sraider_state::screen_vblank_sraider));
 	screen.set_palette(m_palette);

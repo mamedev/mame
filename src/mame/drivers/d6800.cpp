@@ -84,13 +84,13 @@ private:
 	void d6800_keyboard_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( d6800_screen_w );
 	uint32_t screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(rtc_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void d6800_map(address_map &map);
 
-	uint8_t m_rtc;
 	bool m_cb2;
 	bool m_cassold;
 	uint8_t m_cass_data[4];
@@ -125,19 +125,19 @@ static INPUT_PORTS_START( d6800 )
 	PORT_START("X0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_NAME("0") // ee
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_NAME("1") // ed
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("2") // eb
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_UP) PORT_NAME("2") // eb
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("3") // e7
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("4") // de
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_LEFT) PORT_NAME("4") // de
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("5") // dd
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_NAME("6") // db
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("6") // db
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_NAME("7") // d7
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_NAME("8") // be
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_DOWN) PORT_NAME("8") // be
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_NAME("9") // bd
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_NAME("A") // bb
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_NAME("B") // b7
@@ -217,18 +217,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::kansas_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::kansas_r)
 {
-	m_rtc++;
-	if (m_rtc > 159)
-		m_rtc = 0;
-
 	uint8_t data = m_io_keyboard[0]->read() & m_io_keyboard[1]->read() & m_io_keyboard[2]->read() & m_io_keyboard[3]->read();
 	int ca1 = (data == 255) ? 0 : 1;
 	int ca2 = m_io_shift->read();
-	int cb1 = (m_rtc) ? 1 : 0;
 
 	m_pia->ca1_w(ca1);
 	m_pia->ca2_w(ca2);
-	m_pia->cb1_w(cb1);
 
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
@@ -246,6 +240,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::kansas_r)
 WRITE_LINE_MEMBER( d6800_state::d6800_screen_w )
 {
 	m_cb2 = state;
+	m_maincpu->set_unscaled_clock(state ? 589744 : 1e6); // effective clock is ~590kHz while screen is on
 }
 
 uint8_t d6800_state::d6800_cassette_r()
@@ -315,11 +310,16 @@ void d6800_state::d6800_keyboard_w(uint8_t data)
 
 }
 
+INTERRUPT_GEN_MEMBER(d6800_state::rtc_interrupt)
+{
+	m_pia->cb1_w(1);
+	m_pia->cb1_w(0);
+}
+
 /* Machine Initialization */
 
 void d6800_state::machine_start()
 {
-	save_item(NAME(m_rtc));
 	save_item(NAME(m_cb2));
 	save_item(NAME(m_cassold));
 	save_item(NAME(m_cass_data));
@@ -329,7 +329,6 @@ void d6800_state::machine_start()
 void d6800_state::machine_reset()
 {
 	m_beeper->set_state(0);
-	m_rtc = 0;
 	m_cass_data[0] = 0;
 	m_cass_data[1] = 0;
 	m_cass_data[2] = 128;
@@ -341,41 +340,33 @@ void d6800_state::machine_reset()
 QUICKLOAD_LOAD_MEMBER(d6800_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	int i;
-	int quick_addr = 0x200;
-	int exec_addr = 0xc000;
-	int quick_length;
-	std::vector<uint8_t> quick_data;
-	int read_;
-	image_init_result result = image_init_result::FAIL;
-
-	quick_length = image.length();
-	quick_data.resize(quick_length);
-	read_ = image.fread( &quick_data[0], quick_length);
-	if (read_ != quick_length)
+	u8 ch;
+	u16 quick_addr = 0x200;
+	u16 exec_addr = 0xc000;
+	u32 quick_length = image.length();
+	if (quick_length > 0xe00)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
-		image.message(" Cannot read the file");
-	}
-	else
-	{
-		for (i = 0; i < quick_length; i++)
-			if ((quick_addr + i) < 0x1000)
-				space.write_byte(i + quick_addr, quick_data[i]);
-
-		/* display a message about the loaded quickload */
-		image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length,quick_addr,quick_addr+quick_length,exec_addr);
-
-		// Start the quickload
-		if (image.is_filetype("bin"))
-			m_maincpu->set_pc(quick_addr);
-		else
-			m_maincpu->set_pc(exec_addr);
-
-		result = image_init_result::PASS;
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File exceeds 3584 bytes");
+		image.message(" File exceeds 3584 bytes");
+		return image_init_result::FAIL;
 	}
 
-	return result;
+	for (u32 i = 0; i < quick_length; i++)
+	{
+		image.fread(&ch, 1);
+		space.write_byte(i + quick_addr, ch);
+	}
+
+	if (image.is_filetype("bin"))
+		exec_addr = quick_addr;
+
+	/* display a message about the loaded quickload */
+	image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length,quick_addr,quick_addr+quick_length,exec_addr);
+
+	// Start the quickload
+	m_maincpu->set_pc(exec_addr);
+
+	return image_init_result::PASS;
 }
 
 void d6800_state::d6800(machine_config &config)
@@ -383,6 +374,7 @@ void d6800_state::d6800(machine_config &config)
 	/* basic machine hardware */
 	M6800(config, m_maincpu, XTAL(4'000'000)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &d6800_state::d6800_map);
+	m_maincpu->set_vblank_int("screen", FUNC(d6800_state::rtc_interrupt));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -390,7 +382,7 @@ void d6800_state::d6800(machine_config &config)
 	screen.set_size(64, 32);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(d6800_state::screen_update_d6800));
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(25));
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(300)); // verified
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
@@ -417,7 +409,10 @@ void d6800_state::d6800(machine_config &config)
 	TIMER(config, "kansas_r").configure_periodic(FUNC(d6800_state::kansas_r), attotime::from_hz(40000));
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "bin,c8,ch8", attotime::from_seconds(1)).set_load_callback(FUNC(d6800_state::quickload_cb));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "bin,c8", attotime::from_seconds(2)));
+	quickload.set_load_callback(FUNC(d6800_state::quickload_cb));
+	quickload.set_interface("chip8quik");
+	SOFTWARE_LIST(config, "quik_list").set_original("chip8_quik").set_filter("D");
 }
 
 /* ROMs */

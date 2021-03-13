@@ -65,21 +65,20 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void line_update();
-	uint32_t screen_update_uzebox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	void uzebox_data_map(address_map &map);
-	void uzebox_io_map(address_map &map);
-	void uzebox_prg_map(address_map &map);
+	void data_map(address_map &map);
+	void prg_map(address_map &map);
 
-	int             m_vpos;
+	int               m_vpos;
 	uint64_t          m_line_start_cycles;
 	uint32_t          m_line_pos_cycles;
 	uint8_t           m_port_a;
 	uint8_t           m_port_b;
 	uint8_t           m_port_c;
 	uint8_t           m_port_d;
-	bitmap_rgb32    m_bitmap;
+	bitmap_rgb32      m_bitmap;
 };
 
 void uzebox_state::machine_start()
@@ -201,22 +200,14 @@ uint8_t uzebox_state::port_d_r()
 * Address maps                                       *
 \****************************************************/
 
-void uzebox_state::uzebox_prg_map(address_map &map)
+void uzebox_state::prg_map(address_map &map)
 {
 	map(0x0000, 0xffff).rom(); // 64 KB internal eprom  ATmega644
 }
 
-void uzebox_state::uzebox_data_map(address_map &map)
+void uzebox_state::data_map(address_map &map)
 {
 	map(0x0100, 0x10ff).ram(); //  4KB RAM
-}
-
-void uzebox_state::uzebox_io_map(address_map &map)
-{
-	map(AVR8_REG_A, AVR8_REG_A).rw(FUNC(uzebox_state::port_a_r), FUNC(uzebox_state::port_a_w));
-	map(AVR8_REG_B, AVR8_REG_B).rw(FUNC(uzebox_state::port_b_r), FUNC(uzebox_state::port_b_w));
-	map(AVR8_REG_C, AVR8_REG_C).rw(FUNC(uzebox_state::port_c_r), FUNC(uzebox_state::port_c_w));
-	map(AVR8_REG_D, AVR8_REG_D).rw(FUNC(uzebox_state::port_d_r), FUNC(uzebox_state::port_d_w));
 }
 
 /****************************************************\
@@ -251,7 +242,7 @@ void uzebox_state::line_update()
 	m_line_pos_cycles = cycles;
 }
 
-uint32_t uzebox_state::screen_update_uzebox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t uzebox_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -288,18 +279,24 @@ void uzebox_state::uzebox(machine_config &config)
 {
 	/* basic machine hardware */
 	ATMEGA644(config, m_maincpu, MASTER_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &uzebox_state::uzebox_prg_map);
-	m_maincpu->set_addrmap(AS_DATA, &uzebox_state::uzebox_data_map);
-	m_maincpu->set_addrmap(AS_IO, &uzebox_state::uzebox_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &uzebox_state::prg_map);
+	m_maincpu->set_addrmap(AS_DATA, &uzebox_state::data_map);
 	m_maincpu->set_eeprom_tag("eeprom");
-
+	m_maincpu->gpio_in<AVR8_IO_PORTA>().set(FUNC(uzebox_state::port_a_r));
+	m_maincpu->gpio_in<AVR8_IO_PORTB>().set(FUNC(uzebox_state::port_b_r));
+	m_maincpu->gpio_in<AVR8_IO_PORTC>().set(FUNC(uzebox_state::port_c_r));
+	m_maincpu->gpio_in<AVR8_IO_PORTD>().set(FUNC(uzebox_state::port_d_r));
+	m_maincpu->gpio_out<AVR8_IO_PORTA>().set(FUNC(uzebox_state::port_a_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTB>().set(FUNC(uzebox_state::port_b_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTC>().set(FUNC(uzebox_state::port_c_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTD>().set(FUNC(uzebox_state::port_d_w));
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(59.99);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1395));
 	m_screen->set_size(870, 525);
 	m_screen->set_visarea(150, 870-1, 40, 488-1);
-	m_screen->set_screen_update(FUNC(uzebox_state::screen_update_uzebox));
+	m_screen->set_screen_update(FUNC(uzebox_state::screen_update));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

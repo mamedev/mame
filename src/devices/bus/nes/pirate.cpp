@@ -1204,7 +1204,7 @@ void nes_cityfight_device::write_h(offs_t offset, uint8_t data)
 		case 0x4008:
 		case 0x400c:
 			m_prg_mode = data & 1;
-
+			[[fallthrough]];
 		case 0x7000:
 			m_irq_count = (m_irq_count & 0x1e0) | ((data & 0x0f) << 1);
 			break;

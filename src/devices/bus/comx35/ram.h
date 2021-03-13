@@ -39,7 +39,7 @@ protected:
 	virtual void comx_io_w(offs_t offset, uint8_t data) override;
 
 private:
-	optional_shared_ptr<uint8_t> m_ram;
+	memory_share_creator<uint8_t> m_ram;
 
 	int m_bank;
 };

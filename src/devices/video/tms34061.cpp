@@ -182,7 +182,7 @@ void tms34061_device::register_w(offs_t offset, u8 data)
 		screen().update_partial(screen().vpos());
 
 	/* store the hi/lo half */
-	if (regnum < ARRAY_LENGTH(m_regs))
+	if (regnum < std::size(m_regs))
 	{
 		if (offset & 0x02)
 			m_regs[regnum] = (m_regs[regnum] & 0x00ff) | (data << 8);
@@ -248,7 +248,7 @@ u8 tms34061_device::register_r(offs_t offset)
 	u16 result;
 
 	/* extract the correct portion of the register */
-	if (regnum < ARRAY_LENGTH(m_regs))
+	if (regnum < std::size(m_regs))
 		result = m_regs[regnum];
 	else
 		result = 0xffff;

@@ -116,6 +116,10 @@ public:
 
 	void init_optiger();
 
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_device<ppc603e_device> m_maincpu;
 	required_device<tmp95c063_device> m_iocpu;
@@ -142,8 +146,6 @@ private:
 	uint16_t dsp_rom_r();
 	void dsp_roml_w(uint16_t data);
 	void dsp_romh_w(uint16_t data);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_taitopjc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(taitopjc_vbi);
 	uint32_t videochip_r(offs_t address);
@@ -838,6 +840,9 @@ ROM_START( optiger )
 	ROM_LOAD32_BYTE( "e63-32-1_p-hl.22", 0x000001, 0x080000, CRC(cca8bacc) SHA1(e5a081f5c12a52601745f5b67fe3412033581b00) )
 	ROM_LOAD32_BYTE( "e63-31-1_p-lh.8",  0x000002, 0x080000, CRC(ad69e649) SHA1(9fc853d2cb6e7cac87dc06bad91048f191b799c5) )
 	ROM_LOAD32_BYTE( "e63-30-1_p-ll.7",  0x000003, 0x080000, CRC(a6183479) SHA1(e556c3edf100342079e680ec666f018fca7a82b0) )
+
+	ROM_REGION( 0x8000, "dsp", 0 )
+	ROM_LOAD( "tms320bc53.bin", 0x0000, 0x8000, CRC(4b8e7fd6) SHA1(07d354a2e4d7554e215fa8d91b5eeeaf573766b0) ) // decapped. TODO: believed to be a generic TI part, verify if it is and if dump is good, if so move in the CPU core
 
 	ROM_REGION16_LE( 0x20000, "dspdata", 0 )
 	ROM_LOAD16_BYTE( "e63-04_l.29",  0x000000, 0x010000, CRC(eccae391) SHA1(e5293c16342cace54dc4b6dfb827558e18ac25a4) )

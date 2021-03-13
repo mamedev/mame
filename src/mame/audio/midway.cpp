@@ -674,8 +674,8 @@ void midway_sounds_good_device::device_timer(emu_timer &timer, device_timer_id i
 //-------------------------------------------------
 
 midway_turbo_cheap_squeak_device::midway_turbo_cheap_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MIDWAY_TURBO_CHEAP_SQUEAK, tag, owner, clock),
-		device_mixer_interface(mconfig, *this)
+	: device_t(mconfig, MIDWAY_TURBO_CHEAP_SQUEAK, tag, owner, clock)
+		, device_mixer_interface(mconfig, *this)
 		, m_cpu(*this, "cpu")
 		, m_pia(*this, "pia")
 		, m_dac(*this, "dac")

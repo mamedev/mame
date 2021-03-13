@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 /*
  * nld_4017.cpp
@@ -40,10 +40,7 @@
 #include "nl_base.h"
 #include "nl_factory.h"
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
 
 	template <std::size_t MaxCount>
 	NETLIB_OBJECT(CD4017_base)
@@ -113,5 +110,4 @@ namespace netlist
 	NETLIB_DEVICE_IMPL(CD4017, "CD4017", "")
 	NETLIB_DEVICE_IMPL(CD4022, "CD4022", "")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

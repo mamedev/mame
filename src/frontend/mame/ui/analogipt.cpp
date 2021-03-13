@@ -207,7 +207,7 @@ void menu_analog::populate(float &customtop, float &custombottom)
 					first_entry = false;
 				else
 					item_append(menu_item_type::SEPARATOR);
-				item_append(string_format("[root%s]", prev_owner->tag()), "", 0, nullptr);
+				item_append(string_format("[root%s]", prev_owner->tag()), 0, nullptr);
 			}
 		}
 

@@ -16,63 +16,68 @@
 -- drivers referenced in tiny.lst.
 --------------------------------------------------
 
-CPUS["Z80"] = true
+CPUS["COP400"] = true
 CPUS["M6502"] = true
-CPUS["MCS48"] = true
-CPUS["MCS51"] = true
 CPUS["M6800"] = true
 CPUS["M6805"] = true
 CPUS["M6809"] = true
 CPUS["M680X0"] = true
+CPUS["MCS48"] = true
+CPUS["MCS51"] = true
 CPUS["TMS9900"] = true
-CPUS["COP400"] = true
+CPUS["Z80"] = true
 
 --------------------------------------------------
 -- Specify all the sound cores necessary for the
 -- drivers referenced in tiny.lst.
 --------------------------------------------------
 
-SOUNDS["SAMPLES"] = true
+SOUNDS["ASTROCADE"] = true
+SOUNDS["AY8910"] = true
+SOUNDS["CEM3394"] = true
 SOUNDS["DAC"] = true
 SOUNDS["DISCRETE"] = true
-SOUNDS["AY8910"] = true
-SOUNDS["YM2151"] = true
-SOUNDS["ASTROCADE"] = true
-SOUNDS["TMS5220"] = true
-SOUNDS["OKIM6295"] = true
 SOUNDS["HC55516"] = true
-SOUNDS["YM3812"] = true
-SOUNDS["CEM3394"] = true
+SOUNDS["OKIM6295"] = true
+SOUNDS["SAMPLES"] = true
+SOUNDS["TMS5220"] = true
 SOUNDS["VOTRAX"] = true
+SOUNDS["YM2151"] = true
+SOUNDS["YM3812"] = true
+
 
 --------------------------------------------------
 -- specify available video cores
 --------------------------------------------------
+
+VIDEOS["MC6845"] = true
+
 
 --------------------------------------------------
 -- specify available machine cores
 --------------------------------------------------
 
 MACHINES["6821PIA"] = true
-MACHINES["ADC0808"] = true
-MACHINES["TTL74148"] = true
-MACHINES["TTL74153"] = true
-MACHINES["TTL74157"] = true
-MACHINES["TTL7474"] = true
-MACHINES["TTL74259"] = true
-MACHINES["RIOT6532"] = true
-MACHINES["PIT8253"] = true
-MACHINES["Z80CTC"] = true
-MACHINES["Z80PIO"] = true
 MACHINES["68681"] = true
+MACHINES["ADC0808"] = true
 MACHINES["BANKDEV"] = true
 MACHINES["GEN_LATCH"] = true
 MACHINES["INPUT_MERGER"] = true
-MACHINES["OUTPUT_LATCH"] = true
-MACHINES["TICKET"] = true
-MACHINES["WATCHDOG"] = true
-MACHINES["Z80DAISY"] = true
 MACHINES["NETLIST"] = true
+MACHINES["OUTPUT_LATCH"] = true
+MACHINES["PIT8253"] = true
+MACHINES["RIOT6532"] = true
+MACHINES["TICKET"] = true
+MACHINES["TIMEKPR"] = true
+MACHINES["TTL74148"] = true
+MACHINES["TTL74153"] = true
+MACHINES["TTL74157"] = true
+MACHINES["TTL74259"] = true
+MACHINES["TTL7474"] = true
+MACHINES["WATCHDOG"] = true
+MACHINES["Z80CTC"] = true
+MACHINES["Z80DAISY"] = true
+MACHINES["Z80PIO"] = true
 
 
 --------------------------------------------------
@@ -80,6 +85,7 @@ MACHINES["NETLIST"] = true
 --------------------------------------------------
 
 BUSES["CENTRONICS"] = true
+
 
 --------------------------------------------------
 -- This is the list of files that are necessary
@@ -138,7 +144,6 @@ files{
 	MAME_DIR .. "src/mame/drivers/victory.cpp",
 	MAME_DIR .. "src/mame/includes/victory.h",
 	MAME_DIR .. "src/mame/video/victory.cpp",
-	MAME_DIR .. "src/mame/audio/targ.cpp",
 	MAME_DIR .. "src/mame/drivers/astrocde.cpp",
 	MAME_DIR .. "src/mame/includes/astrocde.h",
 	MAME_DIR .. "src/mame/video/astrocde.cpp",
@@ -160,7 +165,6 @@ files{
 	MAME_DIR .. "src/mame/machine/gaelcrpt.cpp",
 	MAME_DIR .. "src/mame/drivers/wrally.cpp",
 	MAME_DIR .. "src/mame/includes/wrally.h",
-	MAME_DIR .. "src/mame/machine/wrally.cpp",
 	MAME_DIR .. "src/mame/video/wrally.cpp",
 	MAME_DIR .. "src/mame/video/gaelco_wrally_sprites.cpp",
 	MAME_DIR .. "src/mame/video/gaelco_wrally_sprites.h",
@@ -168,6 +172,7 @@ files{
 	MAME_DIR .. "src/mame/machine/gaelco_ds5002fp.h",
 	MAME_DIR .. "src/mame/drivers/looping.cpp",
 	MAME_DIR .. "src/mame/drivers/supertnk.cpp",
+	MAME_DIR .. "src/mame/drivers/goldnpkr.cpp",
 }
 end
 

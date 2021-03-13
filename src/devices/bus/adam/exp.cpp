@@ -36,8 +36,7 @@ DEFINE_DEVICE_TYPE(ADAM_EXPANSION_SLOT, adam_expansion_slot_device, "adam_expans
 //-------------------------------------------------
 
 device_adam_expansion_slot_card_interface::device_adam_expansion_slot_card_interface(const machine_config &mconfig, device_t &device) :
-	device_interface(device, "adamexp"),
-	m_rom(*this, "rom")
+	device_interface(device, "adamexp")
 {
 	m_slot = dynamic_cast<adam_expansion_slot_device *>(device.owner());
 }

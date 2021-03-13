@@ -60,8 +60,8 @@ private:
 	required_device<i8088_cpu_device> m_cpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_commarea;
 
-	uint8_t *m_commarea;
 	std::unique_ptr<uint8_t[]> m_vram;
 	std::unique_ptr<uint8_t[]> m_eram;
 	uint8_t m_stateparam[16];

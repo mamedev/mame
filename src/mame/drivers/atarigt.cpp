@@ -113,6 +113,7 @@ void atarigt_state::machine_start()
 
 	m_scanline_int_state = false;
 	m_video_int_state = false;
+	m_ignore_writes = false;
 
 	save_item(NAME(m_scanline_int_state));
 	save_item(NAME(m_video_int_state));
@@ -592,13 +593,13 @@ uint32_t atarigt_state::colorram_protection_r(address_space &space, offs_t offse
 
 	if (ACCESSING_BITS_16_31)
 	{
-		result = atarigt_colorram_r(address);
+		result = colorram_r(address);
 		(this->*m_protection_r)(space, address, &result);
 		result32 |= result << 16;
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		result = atarigt_colorram_r(address + 2);
+		result = colorram_r(address + 2);
 		(this->*m_protection_r)(space, address + 2, &result);
 		result32 |= result;
 	}
@@ -614,13 +615,13 @@ void atarigt_state::colorram_protection_w(address_space &space, offs_t offset, u
 	if (ACCESSING_BITS_16_31)
 	{
 		if (!m_ignore_writes)
-			atarigt_colorram_w(address, data >> 16, mem_mask >> 16);
+			colorram_w(address, data >> 16, mem_mask >> 16);
 		(this->*m_protection_w)(space, address, data >> 16);
 	}
 	if (ACCESSING_BITS_0_15)
 	{
 		if (!m_ignore_writes)
-			atarigt_colorram_w(address + 2, data, mem_mask);
+			colorram_w(address + 2, data, mem_mask);
 		(this->*m_protection_w)(space, address + 2, data);
 	}
 }
@@ -648,7 +649,7 @@ void atarigt_state::main_map(address_map &map)
 	map(0xd79000, 0xd7a1ff).ram();
 	map(0xd7a200, 0xd7a203).ram().w(FUNC(atarigt_state::mo_command_w)).share("mo_command");
 	map(0xd7a204, 0xd7ffff).ram();
-	map(0xd80000, 0xdfffff).rw(FUNC(atarigt_state::colorram_protection_r), FUNC(atarigt_state::colorram_protection_w)).share("colorram");
+	map(0xd80000, 0xdfffff).rw(FUNC(atarigt_state::colorram_protection_r), FUNC(atarigt_state::colorram_protection_w));
 	map(0xe04000, 0xe04003).w(FUNC(atarigt_state::led_w));
 	map(0xe08000, 0xe08003).w(FUNC(atarigt_state::latch_w));
 	map(0xe0a000, 0xe0a003).w(FUNC(atarigt_state::scanline_int_ack_w));
@@ -846,7 +847,7 @@ void atarigt_state::atarigt(machine_config &config)
 	PALETTE(config, m_palette).set_entries(MRAM_ENTRIES);
 
 	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8,8);
-	m_playfield_tilemap->set_layout(FUNC(atarigt_state::atarigt_playfield_scan), 128,64);
+	m_playfield_tilemap->set_layout(FUNC(atarigt_state::playfield_scan), 128,64);
 	m_playfield_tilemap->set_info_callback(FUNC(atarigt_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64, 32).set_info_callback(FUNC(atarigt_state::get_alpha_tile_info));
 
@@ -857,8 +858,6 @@ void atarigt_state::atarigt(machine_config &config)
 	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(atarigt_state::screen_update_atarigt));
 	m_screen->screen_vblank().set(FUNC(atarigt_state::video_int_write_line));
-
-	MCFG_VIDEO_START_OVERRIDE(atarigt_state,atarigt)
 
 	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc);
 

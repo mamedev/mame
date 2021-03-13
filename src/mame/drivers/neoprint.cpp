@@ -26,7 +26,7 @@
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/upd1990a.h"
-#include "sound/2610intf.h"
+#include "sound/ym2610.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -600,7 +600,7 @@ ROM_START( neoprint ) // NP 1.21 19961210 string
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
 	ROM_LOAD( "m1- tc571000.bin", 0x00000, 0x20000, CRC(d720f53e) SHA1(7a20200065d3da43fcf7d5922d1808dc896b0da8) ) // possible bad dump? (although looks ok, just mostly empty?)
 
-	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "v1.bin", 0x00000, 0x200000, CRC(c1984fa9) SHA1(9702d253ad75e0b0f0182d8da449328648ff1a2f) )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
@@ -618,7 +618,7 @@ ROM_START( npcartv1 ) // NP 1.11 19961018 string
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
 	ROM_LOAD( "m1.bin", 0x00000, 0x20000, CRC(b2d38e12) SHA1(ab96c5d3d22eb71ed6e0a03f3ff5d4b23e72fad8) )
 
-	ROM_REGION( 0x080000, "ymsnd", 0 ) /* Samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "v1.bin", 0x00000, 0x80000, CRC(2d6608f9) SHA1(7dbde1c305ab3438b7fe7417816427c682371bd4) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASE00 )
@@ -633,7 +633,7 @@ ROM_START( npsprgv4 ) // NP 1.30 19970228 string
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
 	ROM_LOAD( "p004-m1 neo-pstm cha136.m1", 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) ) // same as 98best44
 
-	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "p004-v1 neo-mvs progbk1.v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) ) // same as 98best44
 
 	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 )
@@ -654,7 +654,7 @@ ROM_START( 98best44 ) // NP 1.30 19970430 string
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
 	ROM_LOAD( "pt004-m1", 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) )
 
-	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "pt004-v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
@@ -669,7 +669,7 @@ ROM_START( npsprg98 ) // NP 1.30 19970430 string
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
 	ROM_LOAD( "pt004-m1 neo-pstm cha136.m1", 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) ) // same as 98best44
 
-	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "pt004-v1 neo-mvs progbk1.v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) ) // same as 98best44
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
@@ -684,7 +684,7 @@ ROM_START( npskv ) // NP 1.30 19970430 string
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
 	ROM_LOAD( "p004-m1 neo-pstm cha136.m1", 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) ) // same as 98best44
 
-	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "p04-v1 neo-mvs progbk1.v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) ) // same as 98best44
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
@@ -699,7 +699,7 @@ ROM_START( npusagif ) // NP 1.30 19970430 string
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
 	ROM_LOAD( "pt004-m1 neo-pstm cha136.m1", 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) ) // same as 98best44
 
-	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "pt004-v1 neo-mvs progbk1.v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) ) // same as 98best44
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
@@ -714,7 +714,7 @@ ROM_START( npotogib ) // NP 1.30 19970430 string
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
 	ROM_LOAD( "pt004-m1 neo-pstm cha136.m1", 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) ) // same as 98best44
 
-	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "pt004-v1 neo-mvs progbk1.v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) ) // same as 98best44
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
@@ -731,7 +731,7 @@ ROM_START( npfpit ) // NP 1.30 19990225 string
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
 	ROM_LOAD( "pt004-m1 neo-pstm cha136.m1", 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) ) // same as 98best44
 
-	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "pt004-v1 neo-mvs progbk1.v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) ) // same as 98best44
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
@@ -749,7 +749,7 @@ ROM_START( nprsp ) // STAFYAMA19980925 string
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
 	ROM_LOAD( "s001-m1.bin", 0x00000, 0x20000, CRC(ea8111c1) SHA1(69e6bb7ad9a8d61db4513a762c0ce9e9da2a1785) )
 
-	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "s001-v1.bin", 0x000000, 0x100000, CRC(13d63625) SHA1(4a9e3b1192a4a7e405becfd5d2a95ffc14ae6e79)  )
 
 	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 )
@@ -767,7 +767,7 @@ ROM_START( npssr2 ) // STAFYAMA19980925 string
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
 	ROM_LOAD( "s001-m1 neo-pstm cha64c.m1", 0x00000, 0x20000, CRC(ea8111c1) SHA1(69e6bb7ad9a8d61db4513a762c0ce9e9da2a1785) )
 
-	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "s001-v1 nps-prg1.v1", 0x000000, 0x100000, CRC(13d63625) SHA1(4a9e3b1192a4a7e405becfd5d2a95ffc14ae6e79)  )
 
 	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 )
@@ -786,7 +786,7 @@ ROM_START( npmillen ) // NP 1.30 19990225 string
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "p016-m1.bin", 0x00000, 0x20000, CRC(f40cf036) SHA1(63041318d8bec144a4688cc5f45107f8331809bf) )
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "p016-v1.bin", 0x000000, 0x200000, CRC(400ca9ce) SHA1(f8636a4600200ef9000a25e80cf20f252703ad37) )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
@@ -803,7 +803,7 @@ ROM_START( npscv1 ) // NP 1.10 19961015 string
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
 	ROM_LOAD( "np-m1 pstm-romc.m1", 0x00000, 0x20000, CRC(adbcad85) SHA1(76ebecea081a47b9fb133ef7793b48b51ef2f5c5) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 ) /* Samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "np-v1 neo-mvs progbk1.v1", 0x000000, 0x80000, CRC(99d414e8) SHA1(5aecb09c7f18fca18f61e67047dfca06744928ed) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASE00 )
@@ -818,7 +818,7 @@ ROM_START( npcramen ) // ? string
 	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* Z80 program */
 	// empty (removed or never populated)?
 
-	ROM_REGION( 0x80000, "ymsnd", ROMREGION_ERASEFF ) /* Samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", ROMREGION_ERASEFF ) /* Samples */
 	// empty (removed or never populated)?
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASE00 )

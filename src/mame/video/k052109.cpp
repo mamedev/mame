@@ -210,6 +210,9 @@ void k052109_device::set_char_ram(bool ram)
 
 void k052109_device::device_start()
 {
+	// assumes it can make an address mask with m_char_rom.length() - 1
+	assert(!m_char_rom.found() || !(m_char_rom.length() & (m_char_rom.length() - 1)));
+
 	if (has_screen())
 	{
 		// make sure our screen is started
@@ -353,7 +356,7 @@ u8 k052109_device::read(offs_t offset)
 		m_k052109_cb(0, bank, &code, &color, &flags, &priority);
 
 	addr = (code << 5) + (offset & 0x1f);
-	addr &= m_char_rom.mask();
+	addr &= m_char_rom.length() - 1;
 
 //      logerror("%s: off = %04x sub = %02x (bnk = %x) adr = %06x\n", m_maincpu->pc(), offset, m_romsubbank, bank, addr);
 

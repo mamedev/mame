@@ -246,6 +246,12 @@ VIDEO_START_MEMBER(tmnt_state,lgtnfght)/* also tmnt2, ssriders */
 
 	m_dim_c = m_dim_v = m_lastdim = m_lasten = 0;
 
+	for (int i = 0; i < 3; i++)
+	{
+		m_layer_colorbase[i] = 0;
+		m_sorted_layer[i] = 0;
+	}
+
 	save_item(NAME(m_dim_c));
 	save_item(NAME(m_dim_v));
 	save_item(NAME(m_lastdim));

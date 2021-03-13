@@ -151,9 +151,6 @@ uint8_t a2bus_scsi_device::read_c0nx(uint8_t offset)
 		case 9:     // our SCSI ID (normally 0x80 = 7)
 			return (1<<7);
 
-		case 0xa:   // RAM/ROM bank
-			return m_bank;
-
 		case 0xe:   // DRQ status in bit 7
 			return m_drq;
 

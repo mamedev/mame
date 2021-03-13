@@ -374,6 +374,8 @@ void _20pacgal_state::machine_start()
 {
 	common_save_state();
 
+	m_game_selected = 0;
+
 	// membank currently used only by 20pacgal
 	m_mainbank->configure_entry(0, memregion("maincpu")->base() + 0x08000);
 	m_mainbank->configure_entry(1, m_ram_48000.get());
@@ -382,10 +384,7 @@ void _20pacgal_state::machine_start()
 void _25pacman_state::machine_start()
 {
 	common_save_state();
-}
 
-void _20pacgal_state::machine_reset()
-{
 	m_game_selected = 0;
 }
 

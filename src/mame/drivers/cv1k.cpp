@@ -194,7 +194,7 @@ public:
 		m_serflash(*this, "game"),
 		m_eeprom(*this, "eeprom"),
 		m_ram(*this, "mainram"),
-		m_rombase(*this, "rombase"),
+		m_rombase(*this, "maincpu"),
 		m_blitrate(*this, "BLITRATE"),
 		m_eepromout(*this, "EEPROMOUT"),
 		m_idleramoffs(0),
@@ -207,7 +207,7 @@ public:
 	required_device<rtc9701_device> m_eeprom;
 
 	required_shared_ptr<uint64_t> m_ram;
-	required_shared_ptr<uint64_t> m_rombase;
+	required_region_ptr<uint64_t> m_rombase;
 
 	uint8_t flash_io_r(offs_t offset);
 	void flash_io_w(offs_t offset, uint8_t data);
@@ -342,7 +342,7 @@ void cv1k_state::serial_rtc_eeprom_w(offs_t offset, uint8_t data)
 
 void cv1k_state::cv1k_map(address_map &map)
 {
-	map(0x00000000, 0x003fffff).rom().region("maincpu", 0).nopw().share("rombase"); // mmmbanc writes here on startup for some reason..
+	map(0x00000000, 0x003fffff).rom().region("maincpu", 0).nopw(); // mmmbanc writes here on startup for some reason..
 	map(0x0c000000, 0x0c7fffff).ram().share("mainram");// work RAM
 	map(0x10000000, 0x10000007).rw(FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
 	map(0x10400000, 0x10400007).w("ymz770", FUNC(ymz770_device::write));
@@ -353,7 +353,7 @@ void cv1k_state::cv1k_map(address_map &map)
 
 void cv1k_state::cv1k_d_map(address_map &map)
 {
-	map(0x00000000, 0x003fffff).rom().region("maincpu", 0).nopw().share("rombase"); // mmmbanc writes here on startup for some reason..
+	map(0x00000000, 0x003fffff).rom().region("maincpu", 0).nopw(); // mmmbanc writes here on startup for some reason..
 	map(0x0c000000, 0x0cffffff).ram().share("mainram"); // work RAM
 	map(0x10000000, 0x10000007).rw(FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
 	map(0x10400000, 0x10400007).w("ymz770", FUNC(ymz770_device::write));
@@ -477,7 +477,7 @@ void cv1k_state::cv1k(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh(HZ_TO_ATTOSECONDS(60.02)); // measured from ibara PCB rates - 60.02Hz, 262 total lines
+	screen.set_refresh(HZ_TO_ATTOSECONDS(60.024)); // measured from ibara PCB rates - 60.024Hz, 262 total lines
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 512);
 	screen.set_visarea(0, 320-1, 0, 240-1);

@@ -164,10 +164,9 @@ void a2bus_pcxporter_device::device_add_mconfig(machine_config &config)
 	m_isabus->drq2_callback().set(m_dma8237, FUNC(am9517a_device::dreq2_w));
 	m_isabus->drq3_callback().set(m_dma8237, FUNC(am9517a_device::dreq3_w));
 
-	PC_KBDC(config, m_pc_kbdc, 0);
+	PC_KBDC(config, m_pc_kbdc, pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270);
 	m_pc_kbdc->out_clock_cb().set(FUNC(a2bus_pcxporter_device::keyboard_clock_w));
 	m_pc_kbdc->out_data_cb().set(FUNC(a2bus_pcxporter_device::keyboard_data_w));
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270).set_pc_kbdc_slot(m_pc_kbdc);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -190,7 +189,7 @@ a2bus_pcxporter_device::a2bus_pcxporter_device(const machine_config &mconfig, de
 	m_pit8253(*this, "pit8253"),
 	m_speaker(*this, "speaker"),
 	m_isabus(*this, "isa"),
-	m_pc_kbdc(*this, "pc_kbdc")
+	m_pc_kbdc(*this, "kbd")
 {
 }
 

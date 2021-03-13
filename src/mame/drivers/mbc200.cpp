@@ -166,8 +166,8 @@ void mbc200_state::main_io(address_map &map)
 void mbc200_state::sub_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x2fff).rom();
-	map(0x3000, 0x7fff).ram();
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x7fff).ram();
 	map(0x8000, 0xffff).ram().share("vram");
 }
 
@@ -346,8 +346,8 @@ void mbc200_state::mbc200(machine_config &config)
 	I8251(config, "uart2", 0); // INS8251A
 
 	MB8876(config, m_fdc, 8_MHz_XTAL / 8); // guess
-	FLOPPY_CONNECTOR(config, "fdc:0", mbc200_floppies, "qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", mbc200_floppies, "qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", mbc200_floppies, "qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", mbc200_floppies, "qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	/* Keyboard */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));

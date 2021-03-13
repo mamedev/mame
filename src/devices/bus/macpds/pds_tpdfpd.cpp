@@ -109,8 +109,7 @@ void macpds_sedisplay_device::device_start()
 
 	m_vram = std::make_unique<uint8_t[]>(VRAM_SIZE);
 
-	static const char bankname[] = { "radpds_ram" };
-	m_macpds->install_bank(0xc40000, 0xc40000+VRAM_SIZE-1, bankname, m_vram.get());
+	m_macpds->install_bank(0xc40000, 0xc40000+VRAM_SIZE-1, m_vram.get());
 
 	m_macpds->install_device(0x770000, 0x77000f, read16s_delegate(*this, FUNC(macpds_sedisplay_device::ramdac_r)), write16s_delegate(*this, FUNC(macpds_sedisplay_device::ramdac_w)));
 	m_macpds->install_device(0xc10000, 0xc2ffff, read16sm_delegate(*this, FUNC(macpds_sedisplay_device::sedisplay_r)), write16sm_delegate(*this, FUNC(macpds_sedisplay_device::sedisplay_w)));

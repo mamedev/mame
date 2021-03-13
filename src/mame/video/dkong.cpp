@@ -901,6 +901,7 @@ VIDEO_START_MEMBER(dkong_state,dkong_base)
 	m_palette_bank = 0;
 	m_sprite_bank = 0;
 	m_vidhw = -1;
+	m_grid_col = 0;
 
 	save_item(NAME(m_vidhw));
 	save_item(NAME(m_gfx_bank));
@@ -945,7 +946,7 @@ VIDEO_START_MEMBER(dkong_state,dkong)
 			m_screen->register_screen_bitmap(m_bg_bits);
 			m_gfx3 = memregion("gfx3")->base();
 			m_gfx3_len = memregion("gfx3")->bytes();
-			/* fall through */
+			[[fallthrough]];
 		case HARDWARE_TKG04:
 		case HARDWARE_TKG02:
 			m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dkong_state::dkong_bg_tile_info)), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);

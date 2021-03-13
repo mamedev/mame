@@ -145,6 +145,8 @@ something wrong in the disk geometry reported by calchase.chd (20,255,63) since 
 #include "speaker.h"
 
 
+namespace {
+
 class calchase_state : public pcat_base_state
 {
 public:
@@ -157,6 +159,10 @@ public:
 	void hostinv(machine_config &config);
 	void init_calchase();
 	void init_hostinv();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
@@ -178,8 +184,6 @@ private:
 	uint32_t calchase_idle_skip_r();
 	void calchase_idle_skip_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	void intel82439tx_init();
 	void calchase_io(address_map &map);
 	void calchase_map(address_map &map);
@@ -407,7 +411,7 @@ void calchase_state::calchase_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
 	map(0x000a0000, 0x000bffff).rw("vga", FUNC(trident_vga_device::mem_r), FUNC(trident_vga_device::mem_w)); // VGA VRAM
-	map(0x000c0000, 0x000c7fff).ram().region("video_bios", 0);
+	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
 	map(0x000c8000, 0x000cffff).noprw();
 	//map(0x000d0000, 0x000d0003).ram();  // XYLINX - Sincronus serial communication
 	map(0x000d0004, 0x000d0005).r(FUNC(calchase_state::calchase_iocard1_r));
@@ -619,6 +623,9 @@ void calchase_state::machine_start()
 
 	m_nvram_data = std::make_unique<uint8_t[]>(0x800);
 	subdevice<nvram_device>("nvram")->set_base(m_nvram_data.get(), 0x800);
+
+	for (int i = 0; i < 4; i++)
+		std::fill(std::begin(m_piix4_config_reg[i]), std::end(m_piix4_config_reg[i]), 0);
 }
 
 void calchase_state::machine_reset()
@@ -763,6 +770,9 @@ ROM_START( eggsplc )
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE_READONLY( "eggsplc", 0, SHA1(fa38dd6b0d25cde644f68cf639768f137c607eb5) )
 ROM_END
+
+} // Anonymous namespace
+
 
 GAME( 1998, hostinv,  0, hostinv,  calchase, calchase_state, init_hostinv,  ROT0, "The Game Room", "Host Invaders",        MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, calchase, 0, calchase, calchase, calchase_state, init_calchase, ROT0, "The Game Room", "California Chase",     MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

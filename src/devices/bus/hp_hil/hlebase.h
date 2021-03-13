@@ -9,8 +9,7 @@
 #include "machine/keyboard.h"
 
 
-namespace bus {
-	namespace hp_hil {
+namespace bus::hp_hil {
 
 class hle_device_base
 	: public device_t
@@ -41,6 +40,5 @@ private:
 };
 
 } // namespace bus::hp_hil
-} // namespace bus
 
 #endif // MAME_DEVICES_HP_HIL_HLEBASE_H

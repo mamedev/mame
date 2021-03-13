@@ -39,7 +39,7 @@ private:
 
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	void mem_map(address_map &map);
 

@@ -48,11 +48,8 @@ void harddriv_state::device_start()
 
 void  harddriv_state::device_reset()
 {
-	/* generic reset */
-	if (m_slapstic_device.found()) m_slapstic_device->slapstic_reset();
-
 	/* halt several of the DSPs to start */
-	if (m_adsp.found()) m_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	if (m_dsp32.found()) m_dsp32->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	m_last_gsp_shiftreg = 0;
@@ -427,8 +424,7 @@ void harddriv_state::hd68k_nwr_w(offs_t offset, uint16_t data)
 			break;
 		case 6: /* /GSPRES */
 			logerror("Write to /GSPRES(%d)\n", data);
-			if (m_gsp.found())
-				m_gsp->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+			m_gsp->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 			break;
 		case 7: /* /MSPRES */
 			logerror("Write to /MSPRES(%d)\n", data);
@@ -1697,26 +1693,6 @@ void harddriv_state::hddspcom_control_w(offs_t offset, uint16_t data)
 
 /*************************************
  *
- *  Race Drivin' slapstic handling
- *
- *************************************/
-
-void harddriv_state::rd68k_slapstic_w(address_space &space, offs_t offset, uint16_t data)
-{
-	m_slapstic_device->slapstic_tweak(space, offset & 0x3fff);
-}
-
-
-uint16_t harddriv_state::rd68k_slapstic_r(address_space &space, offs_t offset)
-{
-	int bank = m_slapstic_device->slapstic_tweak(space, offset & 0x3fff) * 0x4000;
-	return m_m68k_slapstic_base[bank + (offset & 0x3fff)];
-}
-
-
-
-/*************************************
- *
  *  Steel Talons SLOOP handling
  *
  *************************************/
@@ -1757,7 +1733,7 @@ void harddriv_state::st68k_sloop_w(offs_t offset, uint16_t data)
 uint16_t harddriv_state::st68k_sloop_r(offs_t offset)
 {
 	int bank = st68k_sloop_tweak(offset) * 0x4000;
-	return m_m68k_slapstic_base[bank + (offset & 0x3fff)];
+	return m_m68k_sloop_base[bank + (offset & 0x3fff)];
 }
 
 
@@ -1822,7 +1798,7 @@ void harddriv_state::st68k_protosloop_w(offs_t offset, uint16_t data)
 uint16_t harddriv_state::st68k_protosloop_r(offs_t offset)
 {
 	int bank = st68k_protosloop_tweak(offset) * 0x4000;
-	return m_m68k_slapstic_base[bank + (offset & 0x3fff)];
+	return m_m68k_sloop_base[bank + (offset & 0x3fff)];
 }
 
 

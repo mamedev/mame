@@ -106,7 +106,7 @@
 
 DEFINE_DEVICE_TYPE_NS(TI99_GROMPORT_GK, bus::ti99::gromport, ti99_gkracker_device,         "ti99_gkracker",  "Miller's Graphics GRAM Kracker")
 
-namespace bus { namespace ti99 { namespace gromport {
+namespace bus::ti99::gromport {
 
 enum
 {
@@ -470,5 +470,6 @@ ioport_constructor ti99_gkracker_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(gkracker);
 }
-} } } // end namespace bus::ti99::gromport
+
+} // end namespace bus::ti99::gromport
 

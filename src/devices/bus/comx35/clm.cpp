@@ -173,7 +173,7 @@ comx_clm_device::comx_clm_device(const machine_config &mconfig, const char *tag,
 	m_palette(*this, "palette"),
 	m_rom(*this, "c000"),
 	m_char_rom(*this, MC6845_TAG),
-	m_video_ram(*this, "video_ram")
+	m_video_ram(*this, "video_ram", VIDEORAM_SIZE, ENDIANNESS_LITTLE)
 {
 }
 
@@ -184,9 +184,6 @@ comx_clm_device::comx_clm_device(const machine_config &mconfig, const char *tag,
 
 void comx_clm_device::device_start()
 {
-	// allocate memory
-	m_video_ram.allocate(VIDEORAM_SIZE);
-
 	// state saving
 	save_item(NAME(m_ds));
 }

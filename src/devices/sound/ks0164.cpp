@@ -13,6 +13,8 @@ ks0164_device::ks0164_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, KS0164, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
 	  device_memory_interface(mconfig, *this),
+	  device_serial_interface(mconfig, *this),
+	  m_midi_tx(*this),
 	  m_mem_region(*this, DEVICE_SELF),
 	  m_cpu(*this, "cpu"),
 	  m_mem_config("mem", ENDIANNESS_BIG, 16, 23)
@@ -54,6 +56,11 @@ void ks0164_device::device_start()
 	space().cache(m_mem_cache);
 	m_timer = timer_alloc(0);
 
+	m_midi_tx.resolve_safe();
+
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	set_rate(clock(), 542);
+
 	save_item(NAME(m_bank1_base));
 	save_item(NAME(m_bank1_select));
 	save_item(NAME(m_bank2_base));
@@ -85,6 +92,8 @@ void ks0164_device::device_reset()
 	m_mpu_in = 0x00;
 	m_mpu_out = 0x00;
 	m_mpu_status = 0x00;
+	m_midi_in = 0x00;
+	m_midi_in_active = false;
 
 	m_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 }
@@ -95,6 +104,50 @@ void ks0164_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	if(m_irqen_76 & 0x40)
 		m_cpu->set_input_line(14, ASSERT_LINE);
 }
+
+void ks0164_device::tra_complete()
+{
+	logerror("transmit done\n");
+}
+
+void ks0164_device::rcv_complete()
+{
+	receive_register_extract();
+	m_midi_in = get_received_char();
+	m_midi_in_active = true;
+	m_cpu->set_input_line(6, ASSERT_LINE);
+
+	logerror("recieved %02x\n", m_midi_in);
+}
+
+void ks0164_device::tra_callback()
+{
+	m_midi_tx(transmit_register_get_data_bit());
+}
+
+u8 ks0164_device::midi_r()
+{
+	m_midi_in_active = false;
+	m_cpu->set_input_line(6, CLEAR_LINE);
+	return m_midi_in;
+}
+
+void ks0164_device::midi_w(u8 data)
+{
+	logerror("want to transmit %02x\n", data);
+}
+
+u8 ks0164_device::midi_status_r()
+{
+	// transmit done/tx empty on bit 1
+	return m_midi_in_active ? 1 : 0;
+}
+
+void ks0164_device::midi_status_w(u8 data)
+{
+	logerror("midi status_w %02x\n", data);
+}
+
 
 void ks0164_device::mpuin_set(bool control, u8 data)
 {
@@ -233,7 +286,7 @@ void ks0164_device::voice_w(offs_t offset, u16 data, u16 mem_mask)
 		if(m_cpu->pc() < 0x5f94 || m_cpu->pc() > 0x5fc0)
 			logerror("voice %02x.%02x = %04x @ %04x (%04x)\n", m_voice_select & 0x1f, offset, m_sregs[m_voice_select & 0x1f][offset], mem_mask, m_cpu->pc());
 	if(offset == 0 && (data & 1) && !(old & 1))
-		logerror("keyon %02x mode=%04x (%s %c %c %c) cur=%02x%04x.%04x loop=%02x%04x.%04x end=%02x%04x.%04x pitch=%04x 10=%02x/%02x:%02x/%02x 14=%03x/%03x:%03x/%03x 18=%04x/%04x c=%04x   %04x %04x %04x %04x %04x  %04x %04x %04x %04x %04x\n",
+		logerror("keyon %02x mode=%04x (%s %c %c %c) cur=%02x%04x.%04x loop=%02x%04x.%04x end=%02x%04x.%04x pitch=%02x.%03x 10=%02x/%02x:%02x/%02x 14=%03x/%03x:%03x/%03x 18=%04x/%04x c=%04x   %04x %04x %04x %04x %04x  %04x %04x %04x %04x %04x\n",
 				 m_voice_select,
 
 				 m_sregs[m_voice_select & 0x1f][0x00],
@@ -255,7 +308,8 @@ void ks0164_device::voice_w(offs_t offset, u16 data, u16 mem_mask)
 				 m_sregs[m_voice_select & 0x1f][0x0e],
 				 m_sregs[m_voice_select & 0x1f][0x0f],
 
-				 m_sregs[m_voice_select & 0x1f][0x08], // pitch
+				 m_sregs[m_voice_select & 0x1f][0x08] & 0x1f, // pitch
+				 m_sregs[m_voice_select & 0x1f][0x08] >> 5,
 
 				 m_sregs[m_voice_select & 0x1f][0x10] >> 9,
 				 m_sregs[m_voice_select & 0x1f][0x12] >> 9,
@@ -289,6 +343,7 @@ u8 ks0164_device::irqen_76_r()
 	return m_irqen_76;
 }
 
+// alternates 1e/5e
 void ks0164_device::irqen_76_w(u8 data)
 {
 	m_irqen_76 = data;
@@ -348,6 +403,8 @@ void ks0164_device::cpu_map(address_map &map)
 
 	map(0x0068, 0x0068).rw(FUNC(ks0164_device::mpu401_r), FUNC(ks0164_device::mpu401_w));
 	map(0x0069, 0x0069).rw(FUNC(ks0164_device::mpu401_istatus_r), FUNC(ks0164_device::mpu401_istatus_w));
+	map(0x006c, 0x006c).rw(FUNC(ks0164_device::midi_r), FUNC(ks0164_device::midi_w));
+	map(0x006d, 0x006d).rw(FUNC(ks0164_device::midi_status_r), FUNC(ks0164_device::midi_status_w));
 
 	map(0x0076, 0x0076).rw(FUNC(ks0164_device::irqen_76_r), FUNC(ks0164_device::irqen_76_w));
 	map(0x0077, 0x0077).rw(FUNC(ks0164_device::irqen_77_r), FUNC(ks0164_device::irqen_77_w));
@@ -375,9 +432,10 @@ void ks0164_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		for(int voice = 0; voice < 0x20; voice++) {
 			u16 *regs = m_sregs[voice];
 			if(regs[0] & 0x0001) {
-				u64 current = (u64(regs[1]) << 32) | (regs[2] << 16) | regs[3];
 
-				if(current & 0xc00000000000)
+				u64 current = (u64(regs[1]) << 32) | (u64(regs[2]) << 16) | regs[3];
+
+				if(current & 0xc000000000)
 					continue;
 
 				u32 adr = current >> 16;
@@ -400,8 +458,14 @@ void ks0164_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 				}
 
 				s16 samp = samp0 + (((samp1 - samp0) * (current & 0xffff)) >> 16);
-				current += regs[8];
-				u64 end = (u64(regs[0xd]) << 32) | (regs[0xe] << 16) | regs[0xf];
+				u32 step = 0x10000 | (regs[8] & ~0x1f);
+				u32 shift = regs[8] & 0x1f;
+				if(shift > 0x10)
+					step >>= 0x20 - shift;
+				else if(shift)
+					step <<= shift;
+				current += step;
+				u64 end = (u64(regs[0xd]) << 32) | (u64(regs[0xe]) << 16) | regs[0xf];
 				if(current >= end) {
 					// Is there a loop enabled flag?
 					u64 loop = (u64(regs[9]) << 32) | (regs[0xa] << 16) | regs[0xb];

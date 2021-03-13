@@ -55,12 +55,6 @@ namespace {
 	}
 }
 
-// Timers
-enum {
-	TMR_ID_RXC,
-	TMR_ID_TXC
-};
-
 // device type definition
 DEFINE_DEVICE_TYPE(HP98046_IO_CARD, hp98046_io_card_device , "hp98046" , "HP98046 card")
 
@@ -70,6 +64,8 @@ hp98046_io_card_device::hp98046_io_card_device(const machine_config &mconfig, co
 	, m_cpu(*this, "cpu")
 	, m_sio(*this, "sio")
 	, m_rs232(*this, "rs232")
+	, m_tx_brg(*this , "tx_brg")
+	, m_rx_brg(*this , "rx_brg")
 	, m_loopback_en(*this, "loop")
 {
 }
@@ -195,7 +191,16 @@ void hp98046_io_card_device::device_add_mconfig(machine_config &config)
 	m_rs232->dcd_handler().set(FUNC(hp98046_io_card_device::rs232_dcd_w));
 	m_rs232->dsr_handler().set(FUNC(hp98046_io_card_device::rs232_dsr_w));
 	m_rs232->cts_handler().set(FUNC(hp98046_io_card_device::rs232_cts_w));
-	config.set_maximum_quantum(attotime::from_hz(5000));
+	m_rs232->rxc_handler().set(FUNC(hp98046_io_card_device::rs232_rxc_w));
+	m_rs232->txc_handler().set(FUNC(hp98046_io_card_device::rs232_txc_w));
+	// There's just one 2.4576 MHz xtal, Tx BRG gets its clock from Rx BRG
+	F4702(config , m_tx_brg , 2.4576_MHz_XTAL);
+	m_tx_brg->s_callback().set([this]() { return m_txc_sel; });
+	m_tx_brg->z_callback().set(FUNC(hp98046_io_card_device::txc_w));
+	F4702(config , m_rx_brg , 2.4576_MHz_XTAL);
+	m_rx_brg->s_callback().set([this]() { return m_rxc_sel; });
+	m_rx_brg->z_callback().set(FUNC(hp98046_io_card_device::rxc_w));
+	config.set_maximum_quantum(attotime::from_hz(307200));
 }
 
 static INPUT_PORTS_START(hp98046_port)
@@ -233,9 +238,6 @@ void hp98046_io_card_device::device_start()
 {
 	m_ram = std::make_unique<uint8_t[]>(1024);
 	save_pointer(NAME(m_ram) , 1024);
-
-	m_rxc_timer = timer_alloc(TMR_ID_RXC);
-	m_txc_timer = timer_alloc(TMR_ID_TXC);
 }
 
 void hp98046_io_card_device::device_reset()
@@ -247,36 +249,6 @@ void hp98046_io_card_device::device_reset()
 	update_sts();
 	update_irq();
 	m_loopback = m_loopback_en->read() != 0;
-	// Ensure timers are loaded the 1st time BRGs are configured
-	m_rxc_sel = ~0;
-	m_txc_sel = ~0;
-	m_rxc_timer->reset();
-	m_txc_timer->reset();
-}
-
-void hp98046_io_card_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id) {
-	case TMR_ID_RXC:
-		m_rxc = !m_rxc;
-		m_sio->rxca_w(m_rxc);
-		if (m_loopback && (m_txc_sel == 0 || m_txc_sel == 1)) {
-			m_sio->txca_w(m_rxc);
-			m_sio->txcb_w(m_rxc);
-			m_sio->rxcb_w(m_rxc);
-		}
-		break;
-
-	case TMR_ID_TXC:
-		m_txc = !m_txc;
-		m_sio->txca_w(m_txc);
-		m_sio->txcb_w(m_txc);
-		m_sio->rxcb_w(m_txc);
-		if (m_loopback && (m_rxc_sel == 0 || m_rxc_sel == 1)) {
-			m_sio->rxca_w(m_txc);
-		}
-		break;
-	}
 }
 
 void hp98046_io_card_device::cpu_program_map(address_map &map)
@@ -405,7 +377,8 @@ void hp98046_io_card_device::cpu_w(offs_t offset, uint8_t data)
 
 		case 3:
 			// xxxx'x111: write to BRGs
-			set_brgs(data);
+			m_rxc_sel = (data >> 4) & 0xf;
+			m_txc_sel = data & 0xf;
 			break;
 		}
 	} else {
@@ -516,6 +489,20 @@ WRITE_LINE_MEMBER(hp98046_io_card_device::rs232_cts_w)
 {
 	if (!m_loopback) {
 		m_sio->ctsa_w(state);
+	}
+}
+
+WRITE_LINE_MEMBER(hp98046_io_card_device::rs232_rxc_w)
+{
+	if (!m_loopback) {
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(hp98046_io_card_device::sync_rx_im_w) , this) , state);
+	}
+}
+
+WRITE_LINE_MEMBER(hp98046_io_card_device::rs232_txc_w)
+{
+	if (!m_loopback) {
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(hp98046_io_card_device::sync_tx_im_w) , this) , state);
 	}
 }
 
@@ -643,43 +630,36 @@ uint8_t hp98046_io_card_device::get_hs_input() const
 	return res;
 }
 
-// Frequencies of HD4702 BRGs
-// All frequencies are doubled here because the timers expire twice per RxC/TxC period
-static const unsigned brg_freq[] = {
-			// Sel: frequency       Divisor
-			// ============================
-	0,      // 0: external clock    -
-	0,      // 1: external clock    -
-	1600,   // 2: 50 x16            /3072
-	2400,   // 3: 75 x16            /2048
-	4267,   // 4: ~134.5 x16        /1152
-	6400,   // 5: 200 x16           /768
-	19200,  // 6: 600 x16           /256
-	76800,  // 7: 2400 x16          /64
-	307200, // 8: 9600 x16          /16
-	153600, // 9: 4800 x16          /32
-	57600,  // 10: 1800 x16         / 256/3
-	38400,  // 11: 1200 x16         /128
-	76800,  // 12: 2400 x16         /64
-	9600,   // 13: 300 x16          /512
-	4800,   // 14: 150 x16          /1024
-	3491    // 15: ~110 x16         /1408
-};
-
-void hp98046_io_card_device::set_brgs(uint8_t sel)
+WRITE_LINE_MEMBER(hp98046_io_card_device::rxc_w)
 {
-	LOG_MCU("BRG=%02x\n" , sel);
-	uint8_t new_rxc_sel = (sel >> 4) & 0xf;
-	uint8_t new_txc_sel = sel & 0xf;
+	if (m_last_rxc != bool(state)) {
+		m_last_rxc = bool(state);
+		m_sio->rxca_w(m_last_rxc);
+		if (m_loopback) {
+			machine().scheduler().synchronize(timer_expired_delegate(FUNC(hp98046_io_card_device::sync_tx_im_w) , this) , state);
+		}
+	}
+}
 
-	if (new_rxc_sel != m_rxc_sel) {
-		m_rxc_sel = new_rxc_sel;
-		auto period = attotime::from_hz(brg_freq[ m_rxc_sel ]);
-		m_rxc_timer->adjust(period , 0 , period);
+WRITE_LINE_MEMBER(hp98046_io_card_device::txc_w)
+{
+	if (m_last_txc != bool(state)) {
+		m_last_txc = bool(state);
+		m_sio->txca_w(m_last_txc);
+		m_sio->txcb_w(m_last_txc);
+		m_sio->rxcb_w(m_last_txc);
+		if (m_loopback) {
+			machine().scheduler().synchronize(timer_expired_delegate(FUNC(hp98046_io_card_device::sync_rx_im_w) , this) , state);
+		}
 	}
-	if (new_txc_sel != m_txc_sel) {
-		m_txc_sel = new_txc_sel;
-		auto period = attotime::from_hz(brg_freq[ m_txc_sel ]);
-		m_txc_timer->adjust(period , 0 , period);
-	}
+}
+
+TIMER_CALLBACK_MEMBER(hp98046_io_card_device::sync_rx_im_w)
+{
+	m_rx_brg->im_w(param);
+}
+
+TIMER_CALLBACK_MEMBER(hp98046_io_card_device::sync_tx_im_w)
+{
+	m_tx_brg->im_w(param);
 }

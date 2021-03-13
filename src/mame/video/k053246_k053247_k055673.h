@@ -40,7 +40,7 @@ Callback procedures for non-standard shadows:
 	#define GX_ZBUFSIZE  0x600000
 #else
 	#define GX_ZBUFW     576
-	#define GX_ZBUFH     224
+	#define GX_ZBUFH     256
 	#define GX_ZPAGESIZE (GX_ZBUFW*GX_ZBUFH)
 	#define GX_ZBUFSIZE  ((GX_ZBUFW*GX_ZBUFH)*2)
 #endif
@@ -109,9 +109,9 @@ public:
 
 	/* alt implementation - to be collapsed */
 	void zdrawgfxzoom32GP(
-		bitmap_rgb32 &bitmap, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, int sx, int sy,
-		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, u8* gx_objzbuf, u8* gx_shdzbuf);
+			bitmap_rgb32 &bitmap, const rectangle &cliprect,
+			u32 code, u32 color, int flipx, int flipy, int sx, int sy,
+			int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, u8* gx_objzbuf, u8* gx_shdzbuf);
 
 	void zdrawgfxzoom32GP(
 			bitmap_ind16 &bitmap, const rectangle &cliprect,
@@ -119,10 +119,10 @@ public:
 			int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, u8* gx_objzbuf, u8* gx_shdzbuf);
 
 	template<class BitmapClass>
-	inline void k053247_draw_single_sprite_gxcore(BitmapClass &bitmap , rectangle const &cliprect,
-		u8* gx_objzbuf, u8* gx_shdzbuf, int code, u16* gx_spriteram, int offs,
-		int color, int alpha, int drawmode, int zcode, int pri,
-		int primask, int shadow, u8* drawmode_table, u8* shadowmode_table, int shdmask)
+	void k053247_draw_single_sprite_gxcore(BitmapClass &bitmap , rectangle const &cliprect,
+			u8* gx_objzbuf, u8* gx_shdzbuf, int code, u16* gx_spriteram, int offs,
+			int color, int alpha, int drawmode, int zcode, int pri,
+			int primask, int shadow, u8* drawmode_table, u8* shadowmode_table, int shdmask)
 	{
 		int xa,ya,ox,oy,flipx,flipy,mirrorx,mirrory,zoomx,zoomy,scalex,scaley,nozoom;
 		int temp, temp4;
@@ -294,22 +294,21 @@ public:
 
 	template<class BitmapClass>
 	void k053247_draw_yxloop_gx(BitmapClass &bitmap, const rectangle &cliprect,
-		int code,
-		int color,
-		int height, int width,
-		int zoomx, int zoomy, int flipx, int flipy,
-		int ox, int oy,
-		int xa, int ya,
-		int mirrorx, int mirrory,
-		int nozoom,
-		/* gx specifics */
-		int pri,
-		int zcode, int alpha, int drawmode,
-		u8* gx_objzbuf, u8* gx_shdzbuf,
-		/* non-gx specifics */
-		int primask,
-		u8* whichtable
-		)
+			int code,
+			int color,
+			int height, int width,
+			int zoomx, int zoomy, int flipx, int flipy,
+			int ox, int oy,
+			int xa, int ya,
+			int mirrorx, int mirrory,
+			int nozoom,
+			/* gx specifics */
+			int pri,
+			int zcode, int alpha, int drawmode,
+			u8* gx_objzbuf, u8* gx_shdzbuf,
+			/* non-gx specifics */
+			int primask,
+			u8* whichtable)
 	{
 		static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
 		static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };

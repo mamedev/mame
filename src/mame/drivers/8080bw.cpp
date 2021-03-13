@@ -105,7 +105,7 @@
             Capable of running all romsets.
 
        * The following Romsets are known, ROUGHLY from oldest to newest:
-         SV01, SV02, SV03, SV04, SV05, SV06 - undumped (rev 1), If this exists at all this would be the very first Japanese release of space invaders (Andy W may call this 'SV0'?)
+         SV01, SV02, SV03, SV04, SV05, SV06 - undumped, this has never been seen in the wild and may never have existed.
          SV01, SV02, SV10, SV04, SV09, SV06 - sisv2 (rev 2) (Andy W calls this 'SV1', and the midway 'invaders' set is based on this romset)
          SV0H, SV02, SV10, SV04, SV09, SV06 - sisv3 (rev 3) (Andy W calls this 'SV2')
          SV0H, SV11, SV12, SV04, SV13, SV14 - sisv (rev 4, 5-digit scoring) (Andy W calls this 'SV3') (this set is likely newer than the TV0x sets)
@@ -174,6 +174,17 @@
          2. In the Hard difficulty setting, you normally start at level 4.
             Hold down the 1P START (the 1 key) while it says INSERT COIN.
             Then insert a coin and play. You will start at level 5.
+
+    - Crash Road (crashrd)
+        * Seems slightly buggy. On the odd occasion it can freeze followed by watchdog reset.
+        * The "hard" level has the same bugs as noted for schaser. It should not be used.
+        * The cocktail mode doesn't work correctly and also should not be used. The directional
+          controls are not scanned during play. The flipscreen signal occurs once at the start
+          of player 2's level, then turns off.
+        * The enemy never goes faster in the inner loop, so the game is much easier to play.
+          It also means that the missing yellow band is never needed.
+        * The "effect" sound (the continuous clunking noise) doesn't seem to be supported, but
+          we'd need a schematic or real machine to find out for sure.
 
     - Space War (Sanritsu)
       * I seem to recall that the flashing ufo had its own sample
@@ -954,13 +965,13 @@ void _8080bw_state::invrvnge(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	// CPU E-pin connects to AY clock pin
-	ay8910_device &psg(AY8910(config, "psg", XTAL(4'000'000)/2));
+	ay8910_device &psg(AY8910(config, "psg", XTAL(4'000'000)/4));
 	psg.port_a_read_callback().set([this] () { return m_sound_data >> 1; });
 	psg.port_b_read_callback().set_constant(0xff);
 	psg.add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	// CPU E-pin also connects to a 4040 divider. The Q8 output goes to the CPU's NMI pin.
-	TIMER(config, "nmi").configure_periodic(FUNC(_8080bw_state::nmi_timer), attotime::from_hz((XTAL(4'000'000)/2)/512));
+	TIMER(config, "nmi").configure_periodic(FUNC(_8080bw_state::nmi_timer), attotime::from_hz((XTAL(4'000'000)/4)/256));
 }
 
 void _8080bw_state::init_invrvnge()
@@ -1976,6 +1987,8 @@ MACHINE_START_MEMBER(_8080bw_state,polaris)
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
 	save_item(NAME(m_polaris_cloud_speed));
 	save_item(NAME(m_polaris_cloud_pos));
+
+	m_polaris_cloud_pos = m_polaris_cloud_speed = 0;
 }
 
 uint8_t _8080bw_state::polaris_port00_r()
@@ -2226,7 +2239,7 @@ void _8080bw_state::yosakdon_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).ram().share("main_ram");
-	map(0x4000, 0x43ff).writeonly(); /* what's this? */
+	map(0x4000, 0x43ff).nopw(); /* what's this? */
 }
 
 void _8080bw_state::yosakdon_io_map(address_map &map)
@@ -3892,13 +3905,13 @@ void cane_state::cane_unknown_port0_w(u8 data)
 
 ***********************************************************************************************************************************/
 
-u8 orbite_state::orbite_scattered_colorram_r(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 mem_mask)
+u8 orbite_state::orbite_scattered_colorram_r(address_space &space, offs_t offset, u8 mem_mask)
 {
 	return m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f80) >> 2)];
 }
 
 
-void orbite_state::orbite_scattered_colorram_w(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 data, ATTR_UNUSED u8 mem_mask)
+void orbite_state::orbite_scattered_colorram_w(address_space &space, offs_t offset, u8 data, u8 mem_mask)
 {
 	m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f80) >> 2)] = data;
 }
@@ -5651,8 +5664,8 @@ GAMEL(1978, invadernc,   invaders, invaders,  sicv,      mw8080bw_state, empty_i
 GAMEL(1978, spcewars,    invaders, spcewars,  spcewars,  _8080bw_state,  empty_init,    ROT270, "Taito / Sanritsu", "Space War (Sanritsu)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAME( 1979, spcewarla,   invaders, spcewarla, spcewars,  _8080bw_state,  empty_init,    ROT270, "bootleg (Leisure and Allied)", "Space War (Leisure and Allied)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // unclassified, licensed or bootleg?
 GAMEL(1978, spceking,    invaders, invaders,  sicv,      mw8080bw_state, empty_init,    ROT270, "Taito / Leijac Corporation", "Space King", MACHINE_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
-GAMEL(1979, cosmicmo,    invaders, cosmicmo,  cosmicmo,  _8080bw_state,  empty_init,    ROT270, "Taito / Universal", "Cosmic Monsters (version II)", MACHINE_SUPPORTS_SAVE, layout_cosmicm ) // unclassified, licensed or bootleg?
-GAMEL(1979, cosmicm2,    invaders, cosmicmo,  cosmicmo,  _8080bw_state,  empty_init,    ROT270, "Taito / Universal", "Cosmic Monsters 2", MACHINE_SUPPORTS_SAVE, layout_cosmicm ) // unclassified, licensed or bootleg?
+GAMEL(1979, cosmicmo,    invaders, cosmicmo,  cosmicmo,  _8080bw_state,  empty_init,    ROT270, "bootleg (Universal)", "Cosmic Monsters (version II)", MACHINE_SUPPORTS_SAVE, layout_cosmicm ) // Taito sued, and as settlement they were allowed to sell Universal's Galaxy Wars
+GAMEL(1979, cosmicm2,    invaders, cosmicmo,  cosmicmo,  _8080bw_state,  empty_init,    ROT270, "bootleg (Universal)", "Cosmic Monsters 2", MACHINE_SUPPORTS_SAVE, layout_cosmicm ) // "
 GAMEL(1980?,sinvzen,     invaders, invaders,  sinvzen,   mw8080bw_state, empty_init,    ROT270, "Taito / Zenitone-Microsec Ltd.", "Super Invaders (Zenitone-Microsec)", MACHINE_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1980, ultrainv,    invaders, invaders,  sicv,      mw8080bw_state, empty_init,    ROT270, "Taito / Konami", "Ultra Invaders", MACHINE_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1978, spaceatt,    invaders, invaders,  sicv,      mw8080bw_state, empty_init,    ROT270, "bootleg (Video Games GmbH)", "Space Attack (bootleg of Space Invaders)", MACHINE_SUPPORTS_SAVE, layout_invaders )

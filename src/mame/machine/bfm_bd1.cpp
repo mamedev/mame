@@ -6,6 +6,8 @@
 
     TODO: Implement flashing (our only datasheet has that section
     completely illegible)
+
+    This is a simulation of code running on an NEC D78042GF-090
 **********************************************************************/
 
 #include "emu.h"

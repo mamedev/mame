@@ -192,7 +192,7 @@ void abc890_device::device_reset()
 
 void abc890_device::abcbus_cs(uint8_t data)
 {
-	for (abcbus_slot_device &slot : abcbus_slot_device_iterator(*this))
+	for (abcbus_slot_device &slot : abcbus_slot_device_enumerator(*this))
 		slot.write_cs(data);
 }
 
@@ -205,7 +205,7 @@ uint8_t abc890_device::abcbus_inp()
 {
 	uint8_t data = 0xff;
 
-	for (abcbus_slot_device &slot : abcbus_slot_device_iterator(*this))
+	for (abcbus_slot_device &slot : abcbus_slot_device_enumerator(*this))
 		data &= slot.read_inp();
 
 	return data;
@@ -218,7 +218,7 @@ uint8_t abc890_device::abcbus_inp()
 
 void abc890_device::abcbus_out(uint8_t data)
 {
-	for (abcbus_slot_device &slot : abcbus_slot_device_iterator(*this))
+	for (abcbus_slot_device &slot : abcbus_slot_device_enumerator(*this))
 		slot.write_out(data);
 }
 
@@ -231,7 +231,7 @@ uint8_t abc890_device::abcbus_stat()
 {
 	uint8_t data = 0xff;
 
-	for (abcbus_slot_device &slot : abcbus_slot_device_iterator(*this))
+	for (abcbus_slot_device &slot : abcbus_slot_device_enumerator(*this))
 		data &= slot.read_stat();
 
 	return data;
@@ -244,7 +244,7 @@ uint8_t abc890_device::abcbus_stat()
 
 void abc890_device::abcbus_c1(uint8_t data)
 {
-	for (abcbus_slot_device &slot : abcbus_slot_device_iterator(*this))
+	for (abcbus_slot_device &slot : abcbus_slot_device_enumerator(*this))
 		slot.write_c1(data);
 }
 
@@ -255,7 +255,7 @@ void abc890_device::abcbus_c1(uint8_t data)
 
 void abc890_device::abcbus_c2(uint8_t data)
 {
-	for (abcbus_slot_device &slot : abcbus_slot_device_iterator(*this))
+	for (abcbus_slot_device &slot : abcbus_slot_device_enumerator(*this))
 		slot.write_c2(data);
 }
 
@@ -266,7 +266,7 @@ void abc890_device::abcbus_c2(uint8_t data)
 
 void abc890_device::abcbus_c3(uint8_t data)
 {
-	for (abcbus_slot_device &slot : abcbus_slot_device_iterator(*this))
+	for (abcbus_slot_device &slot : abcbus_slot_device_enumerator(*this))
 		slot.write_c3(data);
 }
 
@@ -277,7 +277,7 @@ void abc890_device::abcbus_c3(uint8_t data)
 
 void abc890_device::abcbus_c4(uint8_t data)
 {
-	for (abcbus_slot_device &slot : abcbus_slot_device_iterator(*this))
+	for (abcbus_slot_device &slot : abcbus_slot_device_enumerator(*this))
 		slot.write_c4(data);
 }
 
@@ -290,7 +290,7 @@ uint8_t abc890_device::abcbus_xmemfl(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	for (abcbus_slot_device &slot : abcbus_slot_device_iterator(*this))
+	for (abcbus_slot_device &slot : abcbus_slot_device_enumerator(*this))
 	{
 		data &= slot.xmemfl_r(offset);
 	}
@@ -305,7 +305,7 @@ uint8_t abc890_device::abcbus_xmemfl(offs_t offset)
 
 void abc890_device::abcbus_xmemw(offs_t offset, uint8_t data)
 {
-	for (abcbus_slot_device &slot : abcbus_slot_device_iterator(*this))
+	for (abcbus_slot_device &slot : abcbus_slot_device_enumerator(*this))
 	{
 		slot.xmemw_w(offset, data);
 	}

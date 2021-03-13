@@ -9,7 +9,7 @@
 #include "sound/spkrdev.h"
 
 
-namespace bus { namespace ti8x {
+namespace bus::ti8x {
 
 class stereo_speaker_device : public device_t, public device_ti8x_link_port_interface
 {
@@ -46,7 +46,7 @@ private:
 	bool m_tip_state, m_ring_state;
 };
 
-} } // namespace bus::ti8x
+} // namespace bus::ti8x
 
 
 DECLARE_DEVICE_TYPE_NS(TI8X_SPEAKER_STEREO, bus::ti8x, stereo_speaker_device)

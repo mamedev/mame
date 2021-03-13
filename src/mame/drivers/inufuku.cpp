@@ -78,7 +78,7 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
-#include "sound/2610intf.h"
+#include "sound/ym2610.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -416,7 +416,7 @@ ROM_START( inufuku )
 	ROM_LOAD16_WORD_SWAP( "lhmn5kua.u36", 0x0400000, 0x400000, CRC(1ac4402a) SHA1(c15acc6fce4fe0b54e92d14c31a1bd78acf2c8fc) )
 	ROM_LOAD16_WORD_SWAP( "lhmn5ku9.u38", 0x0800000, 0x400000, CRC(e4e9b1b6) SHA1(4d4ad85fbe6a442d4f8cafad748bcae4af6245b7) )
 
-	ROM_REGION( 0x0400000, "ymsnd", 0 ) // adpcm data
+	ROM_REGION( 0x0400000, "ymsnd:adpcma", 0 ) // adpcm data
 	ROM_LOAD( "lhmn5ku6.u53", 0x0000000, 0x400000, CRC(b320c5c9) SHA1(7c99da2d85597a3c008ed61a3aa5f47ad36186ec) )
 ROM_END
 
@@ -443,10 +443,10 @@ ROM_START( 3on3dunk )
 	/*               0x0e00000, 0x200000 empty */
 	ROM_LOAD( "lh536pnm.u32", 0x1000000, 0x400000, CRC(bc39e449) SHA1(5aea90b66ee03c70797ddc42dbcb064d83ce8cc7) )
 
-	ROM_REGION( 0x0400000, "ymsnd", 0 ) // ADPCM data
+	ROM_REGION( 0x0400000, "ymsnd:adpcma", 0 ) // ADPCM data
 	ROM_LOAD( "lh5388r1.u53", 0x0000000, 0x100000, CRC(765d892f) SHA1(9b078c879d0437d1669bf4301fd52a768aa4d293) )
 
-	ROM_REGION( 0x400000, "ymsnd.deltat", 0 ) // speech
+	ROM_REGION( 0x400000, "ymsnd:adpcmb", 0 ) // speech
 	ROM_LOAD( "lh536pkl.u51", 0x0000000, 0x300000, CRC(e4919abf) SHA1(d6af4b9c6ff62f92216c9927027d3b2376416bae) )
 ROM_END
 

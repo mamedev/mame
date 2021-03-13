@@ -292,8 +292,9 @@ void c140_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 
 				if (cnt)
 				{
+					const u16 sample = read_word((sampleData + pos) << 1) & 0xfff0; // 12bit
 					prevdt = lastdt;
-					lastdt = ((ch_mulaw(v)) ? m_pcmtbl[read_byte((sampleData + pos) << 1)] : s16(read_word((sampleData + pos) << 1) & 0xfff0)) >> 4; // 12bit
+					lastdt = ((ch_mulaw(v)) ? m_pcmtbl[(sample >> 8) & 0xff] : s16(sample)) >> 4;
 					dltdt = (lastdt - prevdt);
 				}
 

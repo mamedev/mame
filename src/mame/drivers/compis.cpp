@@ -694,15 +694,15 @@ void compis_state::machine_start()
 	switch (m_ram->size())
 	{
 	case 256*1024:
-		m_maincpu->space(AS_PROGRAM).install_ram(0x20000, 0x3ffff, nullptr);
+		m_maincpu->space(AS_PROGRAM).install_ram(0x20000, 0x3ffff, m_ram->pointer());
 		break;
 
 	case 512*1024:
-		m_maincpu->space(AS_PROGRAM).install_ram(0x20000, 0x7ffff, nullptr);
+		m_maincpu->space(AS_PROGRAM).install_ram(0x20000, 0x7ffff, m_ram->pointer());
 		break;
 
 	case 768*1024:
-		m_maincpu->space(AS_PROGRAM).install_ram(0x20000, 0xbffff, nullptr);
+		m_maincpu->space(AS_PROGRAM).install_ram(0x20000, 0xbffff, m_ram->pointer());
 		break;
 	}
 

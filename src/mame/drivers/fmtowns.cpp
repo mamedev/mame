@@ -1204,9 +1204,9 @@ uint8_t towns_state::towns_cmos_low_r(offs_t offset)
 		return m_ram->pointer()[offset + 0xd8000];
 
 	if(m_nvram)
-		return m_nvram[offset];
+		return m_nvram[offset >> 2] >> ((offset & 3) << 3);
 	else
-		return m_nvram16[offset];
+		return m_nvram16[offset >> 1] >> ((offset & 1) << 3);
 }
 
 void towns_state::towns_cmos_low_w(offs_t offset, uint8_t data)
@@ -1215,25 +1215,41 @@ void towns_state::towns_cmos_low_w(offs_t offset, uint8_t data)
 		m_ram->pointer()[offset+0xd8000] = data;
 	else
 		if(m_nvram)
-			m_nvram[offset] = data;
+		{
+			uint8_t shift = (offset & 3) << 3;
+			m_nvram[offset >> 2] &= ~(0xff << shift);
+			m_nvram[offset >> 2] |= (uint32_t)data << shift;
+		}
 		else
-			m_nvram16[offset] = data;
+		{
+			uint8_t shift = (offset & 1) << 3;
+			m_nvram16[offset >> 1] &= ~(0xff << shift);
+			m_nvram16[offset >> 1] |= (uint16_t)data << shift;
+		}
 }
 
 uint8_t towns_state::towns_cmos_r(offs_t offset)
 {
 	if(m_nvram)
-		return m_nvram[offset];
+		return m_nvram[offset >> 2] >> ((offset & 3) << 3);
 	else
-		return m_nvram16[offset];
+		return m_nvram16[offset >> 1] >> ((offset & 1) << 3);
 }
 
 void towns_state::towns_cmos_w(offs_t offset, uint8_t data)
 {
 	if(m_nvram)
-		m_nvram[offset] = data;
+	{
+		uint8_t shift = (offset & 3) << 3;
+		m_nvram[offset >> 2] &= ~(0xff << shift);
+		m_nvram[offset >> 2] |= (uint32_t)data << shift;
+	}
 	else
-		m_nvram16[offset] = data;
+	{
+		uint8_t shift = (offset & 1) << 3;
+		m_nvram16[offset >> 1] &= ~(0xff << shift);
+		m_nvram16[offset >> 1] |= (uint16_t)data << shift;
+	}
 }
 
 void towns_state::towns_update_video_banks()
@@ -1896,6 +1912,7 @@ uint8_t towns_state::towns_cdrom_r(offs_t offset)
 			{
 				return towns_cdrom_read_byte_software();
 			}
+			[[fallthrough]];
 		default:
 			return 0x00;
 	}
@@ -2729,7 +2746,7 @@ void towns_state::driver_start()
 	save_pointer(m_video.towns_video_reg,"Video registers",2);
 
 	if (m_ram->size() > 0x100000)
-		m_maincpu->space(AS_PROGRAM).install_ram(0x100000,m_ram->size()-1,nullptr);
+		m_maincpu->space(AS_PROGRAM).install_ram(0x100000,m_ram->size()-1,m_ram->pointer() + 0x100000);
 }
 
 void marty_state::driver_start()
@@ -2745,6 +2762,10 @@ void towns_state::machine_start()
 		m_flop[0]->get_device()->set_rpm(360);
 	if (m_flop[1]->get_device())
 		m_flop[1]->get_device()->set_rpm(360);
+
+	m_timer0 = 0;
+	m_timer1 = 0;
+	m_serial_irq_enable = 0;
 }
 
 void towns_state::machine_reset()
@@ -2787,9 +2808,11 @@ uint8_t towns_state::get_slave_ack(offs_t offset)
 	return 0x00;
 }
 
-FLOPPY_FORMATS_MEMBER( towns_state::floppy_formats )
-	FLOPPY_FMTOWNS_FORMAT
-FLOPPY_FORMATS_END
+void towns_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_FMTOWNS_FORMAT);
+}
 
 static void towns_floppies(device_slot_interface &device)
 {

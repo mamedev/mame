@@ -73,6 +73,7 @@ acorn_32k_device::acorn_32k_device(const machine_config &mconfig, const char *ta
 
 void acorn_32k_device::device_start()
 {
+	save_item(NAME(m_ram));
 }
 
 //-------------------------------------------------
@@ -85,11 +86,11 @@ void acorn_32k_device::device_reset()
 
 	if (m_links->read())
 	{
-		space.install_ram(0x8000, 0xbfff);
+		space.install_ram(0x8000, 0xbfff, m_ram);
 	}
 	else
 	{
-		space.install_ram(0x2000, 0x7fff);
-		space.install_ram(0xc000, 0xdfff);
+		space.install_ram(0x2000, 0x7fff, m_ram);
+		space.install_ram(0xc000, 0xdfff, m_ram + 0x6000);
 	}
 }

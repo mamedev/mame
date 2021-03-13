@@ -195,6 +195,7 @@ void konamigx_state::K053990_martchmp_word_w(offs_t offset, uint16_t data, uint1
 		{
 			case 0xffff: // word copy
 				element_size = 2;
+				[[fallthrough]];
 			case 0xff00: // byte copy
 				src_addr  = m_prot_data[0x0];
 				src_addr |= m_prot_data[0x1]<<16 & 0xff0000;

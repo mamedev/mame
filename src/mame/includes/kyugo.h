@@ -36,8 +36,6 @@ public:
 	void legend(machine_config &config);
 	void gyrodine(machine_config &config);
 
-	void init_srdmissn();
-
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -65,6 +63,7 @@ private:
 	void gyrodine_sub_portmap(address_map &map);
 	void kyugo_main_map(address_map &map);
 	void kyugo_main_portmap(address_map &map);
+	void srdmissn_main_map(address_map &map);
 	void legend_sub_map(address_map &map);
 	void repulse_sub_map(address_map &map);
 	void repulse_sub_portmap(address_map &map);

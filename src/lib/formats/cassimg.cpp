@@ -11,6 +11,8 @@
 #include "cassimg.h"
 #include "imageutl.h"
 
+#include "corealloc.h" // make_unique_clear
+
 #include <algorithm>
 #include <cassert>
 #include <cstring>
@@ -92,12 +94,12 @@ const int8_t *choose_wave(const cassette_image::Modulation &modulation, size_t &
 
 	if (modulation.flags & cassette_image::MODULATION_SINEWAVE)
 	{
-		wave_bytes_length = ARRAY_LENGTH(sine_wave);
+		wave_bytes_length = std::size(sine_wave);
 		return sine_wave;
 	}
 	else
 	{
-		wave_bytes_length = ARRAY_LENGTH(square_wave);
+		wave_bytes_length = std::size(square_wave);
 		return square_wave;
 	}
 }
@@ -351,6 +353,15 @@ void cassette_image::change(void *file, const io_procs *procs, const Format *for
 void cassette_image::image_read(void *buffer, uint64_t offset, size_t length)
 {
 	io_generic_read(&m_io, buffer, offset, length);
+}
+
+
+
+uint8_t cassette_image::image_read_byte(uint64_t offset)
+{
+	uint8_t data;
+	io_generic_read(&m_io, &data, offset, 1);
+	return data;
 }
 
 

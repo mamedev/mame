@@ -44,6 +44,8 @@ protected:
 
 	virtual uint8_t nrdi_r(offs_t offset) override;
 	virtual void nwri_w(offs_t offset, uint8_t data) override;
+
+	memory_share_creator<uint8_t> m_nvram;
 };
 
 

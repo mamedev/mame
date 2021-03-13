@@ -505,11 +505,10 @@
 #include "cpu/z80/z80.h"
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
-#include "machine/nvram.h"
-#include "sound/2203intf.h"
-#include "sound/2608intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "sound/ym2203.h"
+#include "sound/ym2608.h"
 
 #include "speaker.h"
 
@@ -955,8 +954,8 @@ void itech8_state::gtg2_map(address_map &map)
 /*------ Ninja Clowns layout ------*/
 void itech8_state::ninclown_map(address_map &map)
 {
-	map(0x000000, 0x00007f).ram().region("maincpu", 0);
-	map(0x000080, 0x003fff).ram().share("nvram");
+	map(0x000000, 0x003fff).ram().share("nvram");
+	map(0x000000, 0x000007).rom();
 	map(0x004000, 0x03ffff).rom();
 	map(0x040000, 0x07ffff).r(FUNC(itech8_state::rom_constant_r));
 	map(0x100080, 0x100080).w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -1723,7 +1722,7 @@ WRITE_LINE_MEMBER(itech8_state::generate_tms34061_interrupt)
 
 void itech8_state::itech8_core_devices(machine_config &config)
 {
-	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_RANDOM);
 
 	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
@@ -1745,7 +1744,7 @@ void itech8_state::itech8_core_devices(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch, 0);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, M6809_IRQ_LINE);
 
-	via6522_device &via(VIA6522(config, "via6522_0", CLOCK_8MHz/4));
+	via6522_device &via(MOS6522(config, "via6522_0", CLOCK_8MHz/4));
 	via.writepb_handler().set(FUNC(itech8_state::pia_portb_out));
 	via.irq_handler().set_inputline(m_soundcpu, M6809_FIRQ_LINE);
 }
@@ -1954,6 +1953,8 @@ void itech8_state::ninclown(machine_config &config)
 	itech8_core_devices(config);
 	itech8_sound_ym3812_external(config);
 
+	//  m_nvram->set_custom_handler([this](nvram_device &, void *p, size_t s) { memcpy(p, memregion("maincpu")->base(), s); }, "vectors");
+
 	M68000(config, m_maincpu, CLOCK_12MHz);
 	m_maincpu->set_addrmap(AS_PROGRAM, &itech8_state::ninclown_map);
 
@@ -2032,7 +2033,7 @@ ROM_START( grmatch )
 	ROM_LOAD( "grom5.bin", 0xa0000, 0x20000, CRC(37b47b2e) SHA1(352204d3e95e6db556aacf053c42d0d5871245a7) )
 	ROM_LOAD( "grom6.bin", 0xc0000, 0x20000, CRC(860ee822) SHA1(2ca821c2fa220065b99b99b7487fe9666f338c75) )
 
-	ROM_REGION( 0x20000, "ymsnd", 0 )
+	ROM_REGION( 0x20000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(49bce954) SHA1(68a8b11c03722349d673f7383288c63054f0d6f6) )
 ROM_END
 

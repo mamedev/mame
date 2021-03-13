@@ -212,7 +212,6 @@ MACHINE_RESET_MEMBER(gaelco3d_state,common)
 void gaelco3d_state::machine_reset()
 {
 	MACHINE_RESET_CALL_MEMBER( common );
-	m_tms_offset_xor = 0;
 	m_soundlatch->acknowledge_w();
 }
 
@@ -220,7 +219,6 @@ void gaelco3d_state::machine_reset()
 MACHINE_RESET_MEMBER(gaelco3d_state,gaelco3d2)
 {
 	MACHINE_RESET_CALL_MEMBER( common );
-	m_tms_offset_xor = BYTE_XOR_BE(0);
 	m_fp_clock = 27;
 	m_fp_state = 0;
 }
@@ -378,13 +376,23 @@ WRITE_LINE_MEMBER(gaelco3d_state::fp_analog_clock_w)
 uint32_t gaelco3d_state::tms_m68k_ram_r(offs_t offset)
 {
 //  logerror("%s:tms_m68k_ram_r(%04X) = %08X\n", machine().describe_context(), offset, !(offset & 1) ? ((int32_t)m_m68k_ram_base[offset/2] >> 16) : (int)(int16_t)m_m68k_ram_base[offset/2]);
-	return (int32_t)(int16_t)m_m68k_ram_base[offset ^ m_tms_offset_xor];
+	if (m_m68k_ram_base16)
+		return (int32_t)(int16_t)m_m68k_ram_base16[offset];
+	else if (offset & 1)
+		return (int32_t)(int16_t)m_m68k_ram_base32[offset >> 1];
+	else
+		return (int32_t)(int16_t)(m_m68k_ram_base32[offset >> 1] >> 16);
 }
 
 
 void gaelco3d_state::tms_m68k_ram_w(offs_t offset, uint32_t data)
 {
-	m_m68k_ram_base[offset ^ m_tms_offset_xor] = data;
+	if (m_m68k_ram_base16)
+		m_m68k_ram_base16[offset] = data;
+	else if (offset & 1)
+		m_m68k_ram_base32[offset >> 1] = (m_m68k_ram_base32[offset >> 1] & 0xffff0000) | (data & 0xffff);
+	else
+		m_m68k_ram_base32[offset >> 1] = (m_m68k_ram_base32[offset >> 1] & 0xffff) | (data << 16);
 }
 
 
@@ -660,7 +668,7 @@ void gaelco3d_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).rom();
-	map(0x400000, 0x40ffff).ram().w(FUNC(gaelco3d_state::gaelco3d_paletteram_w)).share("paletteram");
+	map(0x400000, 0x40ffff).ram().w(FUNC(gaelco3d_state::gaelco3d_paletteram_w)).share("paletteram16");
 	map(0x51000c, 0x51000d).portr("IN0");
 	map(0x51001c, 0x51001d).portr("IN1");
 	map(0x51002c, 0x51002d).portr("IN2");
@@ -672,14 +680,14 @@ void gaelco3d_state::main_map(address_map &map)
 	map(0x510103, 0x510103).select(0x000038).lw8(NAME([this] (offs_t offset, u8 data) { m_mainlatch->write_d0(offset >> 3, data); }));
 	map(0x510105, 0x510105).w(m_serial, FUNC(gaelco_serial_device::data_w));
 	map(0x510107, 0x510107).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
-	map(0xfe0000, 0xfeffff).ram().share("m68k_ram_base");
+	map(0xfe0000, 0xfeffff).ram().share("m68k_ram_base16");
 }
 
 
 void gaelco3d_state::main020_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
-	map(0x400000, 0x40ffff).ram().w(FUNC(gaelco3d_state::gaelco3d_paletteram_020_w)).share("paletteram");
+	map(0x400000, 0x40ffff).ram().w(FUNC(gaelco3d_state::gaelco3d_paletteram_020_w)).share("paletteram32");
 	map(0x51000c, 0x51000f).portr("IN0");
 	map(0x51001c, 0x51001f).portr("IN1");
 	map(0x51002c, 0x51002f).portr("IN2");
@@ -691,7 +699,7 @@ void gaelco3d_state::main020_map(address_map &map)
 	map(0x510103, 0x510103).select(0x000038).lw8(NAME([this] (offs_t offset, u8 data) { m_mainlatch->write_d0(offset >> 3, data); }));
 	map(0x510105, 0x510105).w(m_serial, FUNC(gaelco_serial_device::data_w));
 	map(0x510107, 0x510107).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
-	map(0xfe0000, 0xfeffff).ram().share("m68k_ram_base");
+	map(0xfe0000, 0xfeffff).ram().share("m68k_ram_base32");
 }
 
 void gaelco3d_state::tms_map(address_map &map)

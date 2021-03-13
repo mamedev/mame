@@ -558,7 +558,7 @@ void mu100_state::p2_w(u16 data)
 				m_lcd->control_write(cur_p1);
 		}
 	}
-	m_lcd->set_contrast((8 - ((cur_p2 >> 3) & 7))/8.0);
+	m_lcd->set_contrast((data >> 3) & 7);
 	cur_p2 = data;
 }
 

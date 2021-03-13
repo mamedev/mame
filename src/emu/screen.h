@@ -320,7 +320,7 @@ public:
 
 	/// \brief Set visible area to full area
 	///
-	/// Set visible screen area to the full screen area (i.e. noi
+	/// Set visible screen area to the full screen area (i.e. no
 	/// horizontal or vertical blanking period).  This is generally not
 	/// possible for raster displays, but is useful for other display
 	/// simulations.  Must be called after calling #set_size.
@@ -550,7 +550,7 @@ private:
 DECLARE_DEVICE_TYPE(SCREEN, screen_device)
 
 // iterator helper
-typedef device_type_iterator<screen_device> screen_device_iterator;
+typedef device_type_enumerator<screen_device> screen_device_enumerator;
 
 /*!
  @defgroup Screen device configuration functions

@@ -64,7 +64,7 @@ p1_rom_device::p1_rom_device(const machine_config &mconfig, const char *tag, dev
 void p1_rom_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_rom(this, 0xc0000, 0xc1fff, "XXX", "p1_rom");
+	m_isa->install_rom(this, 0xc0000, 0xc1fff, "p1_rom");
 }
 
 

@@ -224,6 +224,7 @@ void mcd_isa_device::cmd_w(uint8_t data)
 				{
 					case 5:
 						m_readmsf = 0;
+						[[fallthrough]];
 					case 4:
 					case 3:
 						m_readmsf |= bcd_2_dec(data) << ((m_cmdrd_count - 3) * 8);

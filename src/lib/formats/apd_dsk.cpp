@@ -85,7 +85,7 @@ const char *apd_format::extensions() const
 	return "apd";
 }
 
-int apd_format::identify(io_generic *io, uint32_t form_factor)
+int apd_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t size = io_generic_size(io);
 	std::vector<uint8_t> img(size);
@@ -123,7 +123,7 @@ int apd_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool apd_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool apd_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint64_t size = io_generic_size(io);
 	std::vector<uint8_t> img(size);

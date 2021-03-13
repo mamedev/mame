@@ -14,7 +14,7 @@
 #include "keyboard.h"
 
 
-namespace bus { namespace amiga { namespace keyboard {
+namespace bus::amiga::keyboard {
 
 //**************************************************************************
 //  TYPE DECLARATIONS
@@ -110,7 +110,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 };
 
-} } } // namespace bus::amiga::keyboard
+} // namespace bus::amiga::keyboard
 
 
 //**************************************************************************

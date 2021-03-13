@@ -12,7 +12,6 @@
 
 #include <portmidi.h>
 #include "osdcore.h"
-#include "corealloc.h"
 #include "modules/osdmodule.h"
 #include "midi_module.h"
 
@@ -20,8 +19,7 @@ class pm_module : public osd_module, public midi_module
 {
 public:
 
-	pm_module()
-	: osd_module(OSD_MIDI_PROVIDER, "pm"), midi_module()
+	pm_module() : osd_module(OSD_MIDI_PROVIDER, "pm"), midi_module()
 	{
 	}
 	virtual ~pm_module() { }

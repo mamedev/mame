@@ -850,6 +850,7 @@ void i80286_cpu_device::code_descriptor(uint16_t selector, uint16_t offset, int 
 					if (SEGDESC(r) || (GATE(r) != TSSDESCIDLE))
 						throw TRAP(FAULT_GP,IDXTBL(selector));
 
+					[[fallthrough]];
 				case TSSDESCIDLE:
 					switch_task(selector, gate);
 					load_flags(CompressFlags(), CPL);
@@ -1888,7 +1889,7 @@ reg.base = BASE(desc); (void)(r); reg.limit = LIMIT(desc); }
 						break;
 					}
 				}
-
+				[[fallthrough]];
 				default:
 					if(!common_op(op))
 					{

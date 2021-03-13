@@ -140,6 +140,7 @@ void cdp1879_device::write(offs_t offset, uint8_t data)
 				m_regs[offset + 6] = data;
 				break;
 			}
+			[[fallthrough]];
 		case R_CNT_DAYOFMONTH:
 		case R_CNT_MONTH:
 			m_regs[offset] = data;

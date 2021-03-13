@@ -25,7 +25,7 @@ ROM_END
 
 DEFINE_DEVICE_TYPE_NS(HPDIO_98550, bus::hp_dio, dio32_98550_device, "dio98550", "HP98550A high-res color DIO video card")
 
-namespace bus { namespace hp_dio {
+namespace bus::hp_dio {
 
 void dio32_98550_device::device_add_mconfig(machine_config &config)
 {
@@ -76,7 +76,9 @@ dio32_98550_device::dio32_98550_device(const machine_config &mconfig, device_typ
 	m_catseye(*this, "catseye%d", 0),
 	m_space_config("vram", ENDIANNESS_BIG, 8, 23, 0, address_map_constructor(FUNC(dio32_98550_device::map), this)),
 	m_rom(*this, "hp98550a_rom"),
-	m_vram(*this, { "vram_video", "vram_overlay"})
+	m_vram(*this, { "vram_video", "vram_overlay"}),
+	m_intreg(0),
+	m_ints(0)
 {
 }
 
@@ -231,4 +233,3 @@ uint32_t dio32_98550_device::screen_update(screen_device &screen, bitmap_rgb32 &
 }
 
 } // namespace bus::hp_dio
-} // namespace bus

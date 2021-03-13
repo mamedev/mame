@@ -104,8 +104,3 @@ int namcofl_state::FLobjcode2tile(int code)
 
 	return code;
 }
-
-VIDEO_START_MEMBER(namcofl_state,namcofl)
-{
-}
-

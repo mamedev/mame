@@ -145,13 +145,13 @@ void special_state::specimx_set_bank(offs_t i, uint8_t data)
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint8_t *ram = m_ram->pointer();
 
-	space.install_write_bank(0xc000, 0xffbf, "bank3");
-	space.install_write_bank(0xffc0, 0xffdf, "bank4");
+	space.install_write_bank(0xc000, 0xffbf, m_bank3);
+	space.install_write_bank(0xffc0, 0xffdf, m_bank4);
 	m_bank4->set_base(ram + 0xffc0);
 	switch(i)
 	{
 		case 0 :
-			space.install_write_bank(0x0000, 0x8fff, "bank1");
+			space.install_write_bank(0x0000, 0x8fff, m_bank1);
 			space.install_write_handler(0x9000, 0xbfff, write8sm_delegate(*this, FUNC(special_state::video_memory_w)));
 
 			m_bank1->set_base(ram);
@@ -159,8 +159,8 @@ void special_state::specimx_set_bank(offs_t i, uint8_t data)
 			m_bank3->set_base(ram + 0xc000);
 			break;
 		case 1 :
-			space.install_write_bank(0x0000, 0x8fff, "bank1");
-			space.install_write_bank(0x9000, 0xbfff, "bank2");
+			space.install_write_bank(0x0000, 0x8fff, m_bank1);
+			space.install_write_bank(0x9000, 0xbfff, m_bank2);
 
 			m_bank1->set_base(ram + 0x10000);
 			m_bank2->set_base(ram + 0x19000);
@@ -204,19 +204,23 @@ void special_state::specimx_disk_ctrl_w(offs_t offset, uint8_t data)
 		floppy = con->get_device();
 
 	m_fdc->set_floppy(floppy);
-	floppy->mon_w(0);
 
-	switch(offset)
+	if (floppy)
 	{
-		case 0 :
+		floppy->mon_w(0);
+
+		switch(offset)
+		{
+			case 0 :
 				m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 				break;
-		case 2 :
+			case 2 :
 				floppy->ss_w(data & 1);
 				break;
-		case 3 :
+			case 3 :
 				m_drive = data & 1;
 				break;
+		}
 	}
 }
 
@@ -233,12 +237,12 @@ void special_state::erik_set_bank()
 	uint8_t *ram = m_ram->pointer();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	space.install_write_bank(0x0000, 0x3fff, "bank1");
-	space.install_write_bank(0x4000, 0x8fff, "bank2");
-	space.install_write_bank(0x9000, 0xbfff, "bank3");
-	space.install_write_bank(0xc000, 0xefff, "bank4");
-	space.install_write_bank(0xf000, 0xf7ff, "bank5");
-	space.install_write_bank(0xf800, 0xffff, "bank6");
+	space.install_write_bank(0x0000, 0x3fff, m_bank1);
+	space.install_write_bank(0x4000, 0x8fff, m_bank2);
+	space.install_write_bank(0x9000, 0xbfff, m_bank3);
+	space.install_write_bank(0xc000, 0xefff, m_bank4);
+	space.install_write_bank(0xf000, 0xf7ff, m_bank5);
+	space.install_write_bank(0xf800, 0xffff, m_bank6);
 
 	switch(bank1)
 	{

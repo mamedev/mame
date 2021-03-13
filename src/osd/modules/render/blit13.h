@@ -119,9 +119,9 @@ FUNCTOR(op_yuv16pal_argb32rot, return pixel_ycc_to_rgb_pal(&src, palbase); )
 //  Copy and rotation
 //============================================================
 
-struct blit_base {
-	blit_base(int dest_bpp, bool is_rot, bool is_passthrough)
-	: m_dest_bpp(dest_bpp), m_is_rot(is_rot), m_is_passthrough(is_passthrough)
+struct blit_base
+{
+	blit_base(int dest_bpp, bool is_rot, bool is_passthrough) : m_dest_bpp(dest_bpp), m_is_rot(is_rot), m_is_passthrough(is_passthrough)
 	{ }
 	virtual ~blit_base() { }
 
@@ -137,13 +137,12 @@ struct blit_texcopy : public blit_base
 	blit_texcopy() : blit_base(sizeof(_dest_type) / _len_div, false, false) { }
 	void texop(const texture_info *texture, const render_texinfo *texsource) const override
 	{
-		ATTR_UNUSED const rgb_t *palbase = texsource->palette;
-		int x, y;
+		const rgb_t *palbase = texsource->palette;
 		/* loop over Y */
-		for (y = 0; y < texsource->height; y++) {
+		for (int y = 0; y < texsource->height; y++) {
 			_src_type *src = (_src_type *)texsource->base + y * texsource->rowpixels / (_len_div);
 			_dest_type *dst = (_dest_type *)((uint8_t *)texture->m_pixels + y * texture->m_pitch);
-			x = texsource->width / (_len_div);
+			int x = texsource->width / (_len_div);
 			while (x > 0) {
 				*dst++ = m_op.op(*src, palbase);
 				++src;
@@ -164,17 +163,16 @@ struct blit_texrot : public blit_base
 	blit_texrot() : blit_base(sizeof(_dest_type), true, false) { }
 	void texop(const texture_info *texture, const render_texinfo *texsource) const override
 	{
-		ATTR_UNUSED const rgb_t *palbase = texsource->palette;
-		int x, y;
+		const rgb_t *palbase = texsource->palette;
 		const quad_setup_data *setup = &texture->m_setup;
 		int dudx = setup->dudx;
 		int dvdx = setup->dvdx;
 		/* loop over Y */
-		for (y = 0; y < setup->rotheight; y++) {
+		for (int y = 0; y < setup->rotheight; y++) {
 			int32_t curu = setup->startu + y * setup->dudy;
 			int32_t curv = setup->startv + y * setup->dvdy;
 			_dest_type *dst = (_dest_type *)((uint8_t *)texture->m_pixels + y * texture->m_pitch);
-			x = setup->rotwidth;
+			int x = setup->rotwidth;
 			while (x>0) {
 				_src_type *src = (_src_type *) texsource->base + (curv >> 16) * texsource->rowpixels + (curu >> 16);
 				*dst++ = m_op.op(*src, palbase);

@@ -24,7 +24,7 @@
 DEFINE_DEVICE_TYPE_NS(ZORRO_A2232, bus::amiga::zorro, a2232_device, "zorro_a2232", "CBM A2232 Serial Card")
 
 
-namespace bus { namespace amiga { namespace zorro {
+namespace bus::amiga::zorro {
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -488,4 +488,4 @@ void a2232_device::iocpu_map(address_map &map)
 	map(0xc000, 0xffff).ram().share("shared");
 }
 
-} } } // namespace bus::amiga::zorro
+} // namespace bus::amiga::zorro

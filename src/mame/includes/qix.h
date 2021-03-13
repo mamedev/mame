@@ -49,7 +49,7 @@ public:
 		m_sn2(*this, "sn2"),
 		m_discrete(*this, "discrete"),
 		m_paletteram(*this, "paletteram"),
-		m_videoram(*this, "videoram"),
+		m_videoram(*this, "videoram", 0x10000, ENDIANNESS_BIG),
 		m_videoram_address(*this, "videoram_addr"),
 		m_videoram_mask(*this, "videoram_mask"),
 		m_scanline_latch(*this, "scanline_latch"),
@@ -90,7 +90,7 @@ protected:
 
 	/* video state */
 	required_shared_ptr<uint8_t> m_paletteram;
-	optional_shared_ptr<uint8_t> m_videoram;
+	memory_share_creator<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_videoram_address;
 	optional_shared_ptr<uint8_t> m_videoram_mask;
 	required_shared_ptr<uint8_t> m_scanline_latch;

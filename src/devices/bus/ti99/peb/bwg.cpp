@@ -65,7 +65,7 @@
 
 DEFINE_DEVICE_TYPE_NS(TI99_BWG, bus::ti99::peb, snug_bwg_device, "ti99_bwg", "SNUG BwG Floppy Controller")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 // ----------------------------------
 
@@ -588,10 +588,12 @@ INPUT_PORTS_START( bwg_fdc )
 		PORT_DIPSETTING( 0x03, "DSK1-DSK4")
 INPUT_PORTS_END
 
-FLOPPY_FORMATS_MEMBER(snug_bwg_device::floppy_formats)
-	FLOPPY_TI99_SDF_FORMAT,
-	FLOPPY_TI99_TDF_FORMAT
-FLOPPY_FORMATS_END
+void snug_bwg_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_TI99_SDF_FORMAT);
+	fr.add(FLOPPY_TI99_TDF_FORMAT);
+}
 
 static void bwg_floppies(device_slot_interface &device)
 {
@@ -653,4 +655,4 @@ const tiny_rom_entry *snug_bwg_device::device_rom_region() const
 	return ROM_NAME( bwg_fdc );
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

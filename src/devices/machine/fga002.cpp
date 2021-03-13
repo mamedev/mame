@@ -682,7 +682,7 @@ void fga002_device::write(offs_t offset, uint8_t data){
 	case FGA_DMA_GENERAL    : LOG("FGA_DMA_GENERAL - not implemented\n"); m_fga002[FGA_DMA_GENERAL] = data; break;
 	case FGA_CTL12          : LOG("FGA_CTL12 - not implemented\n"); m_fga002[FGA_CTL12] = data; break;
 	case FGA_LIOTIMING      : LOG("FGA_LIOTIMING - not implemented\n"); m_fga002[FGA_LIOTIMING] = data; break;
-	case FGA_LOCALIACK      : do_fga002reg_localiack_w(data);
+	case FGA_LOCALIACK      : do_fga002reg_localiack_w(data); break;
 	case FGA_FMBCTL         : LOG("FGA_FMBCTL - not implemented\n"); m_fga002[FGA_FMBCTL] = data; break;
 	case FGA_FMBAREA        : LOG("FGA_FMBAREA - not implemented\n"); m_fga002[FGA_FMBAREA] = data; break;
 	case FGA_AUXSRCSTART    : LOG("FGA_AUXSRCSTART - not implemented\n"); m_fga002[FGA_AUXSRCSTART] = data; break;

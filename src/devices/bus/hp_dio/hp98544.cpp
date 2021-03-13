@@ -21,8 +21,7 @@
 
 DEFINE_DEVICE_TYPE_NS(HPDIO_98544, bus::hp_dio, dio16_98544_device, "dio98544", "HP98544 high-res monochrome DIO video card")
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 ROM_START( hp98544 )
 	ROM_REGION( 0x2000, HP98544_ROM_REGION, 0 )
@@ -78,7 +77,8 @@ dio16_98544_device::dio16_98544_device(const machine_config &mconfig, device_typ
 	m_topcat(*this, "topcat"),
 	m_space_config("vram", ENDIANNESS_BIG, 8, 20, 0, address_map_constructor(FUNC(dio16_98544_device::map), this)),
 	m_rom(*this, HP98544_ROM_REGION),
-	m_vram(*this, "vram")
+	m_vram(*this, "vram"),
+	m_intreg(0)
 {
 }
 
@@ -119,6 +119,7 @@ void dio16_98544_device::device_start()
 
 void dio16_98544_device::device_reset()
 {
+	m_intreg = 0;
 }
 
 uint16_t dio16_98544_device::rom_r(offs_t offset)
@@ -184,4 +185,3 @@ uint32_t dio16_98544_device::screen_update(screen_device &screen, bitmap_rgb32 &
 }
 
 } // namespace bus::hp_dio
-} // namespace bus

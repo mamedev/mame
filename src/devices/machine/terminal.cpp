@@ -220,7 +220,7 @@ void generic_terminal_device::term_write(uint8_t data)
 		case 0x0d: // carriage return
 			m_x_pos = 0;
 			if (!(options & 0x080)) break;
-
+			[[fallthrough]];
 		case 0x0a: // linefeed
 			m_y_pos++;
 			if (m_y_pos >= m_height)

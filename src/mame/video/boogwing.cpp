@@ -156,26 +156,23 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 			switch (priority)
 			{
 				case 0x02:
-					{
-						// Sprite vs playfield
-						if ((pix2 & 0x600) == 0x600)
-							pri2 = 4;
-						else if ((pix2 & 0x600) == 0x400)
-							pri2 = 16;
-						else
-							pri2 = 64;
-					}
+					// Sprite vs playfield
+					if ((pix2 & 0x600) == 0x600)
+						pri2 = 4;
+					else if ((pix2 & 0x600) == 0x400)
+						pri2 = 16;
+					else
+						pri2 = 64;
 					break;
 
 				case 0x03:
 					pri3 = 32;
+					[[fallthrough]];
 				default:
-					{
-						if ((pix2 & 0x400) == 0x400)
-							pri2 = 16;
-						else
-							pri2 = 64;
-					}
+					if ((pix2 & 0x400) == 0x400)
+						pri2 = 16;
+					else
+						pri2 = 64;
 					break;
 			}
 

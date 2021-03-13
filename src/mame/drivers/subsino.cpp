@@ -228,9 +228,9 @@ To Do:
 #include "machine/nvram.h"
 #include "machine/subsino.h"
 #include "machine/ticket.h"
+#include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
-#include "sound/3812intf.h"
 #include "video/ramdac.h"
 #include "emupal.h"
 #include "screen.h"
@@ -246,6 +246,9 @@ To Do:
 #include "tisub.lh"
 #include "stisub.lh"
 
+
+namespace {
+
 class subsino_state : public driver_device
 {
 public:
@@ -253,7 +256,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
-		m_reel_scroll(*this, "reel_scroll.%u", 0U),
+		m_reel_scroll(*this, "reel_scroll.%u", 0U, 0x40U, ENDIANNESS_LITTLE),
 		m_reel_ram(*this, "reel_ram.%u", 0U),
 		m_stbsub_out_c(*this, "stbsub_out_c"),
 		m_maincpu(*this, "maincpu"),
@@ -293,7 +296,7 @@ protected:
 private:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_videoram;
-	optional_shared_ptr_array<uint8_t, 3> m_reel_scroll;
+	memory_share_array_creator<uint8_t, 3> m_reel_scroll;
 	optional_shared_ptr_array<uint8_t, 3> m_reel_ram;
 	optional_shared_ptr<uint8_t> m_stbsub_out_c;
 	required_device<cpu_device> m_maincpu;
@@ -3737,6 +3740,10 @@ void subsino_state::init_victor5()
 {
 	subsino_decrypt(machine(), victor5_bitswaps, victor5_xors, 0xc000);
 
+	m_flash_packet = 0;
+	m_flash_packet_start = 0;
+	m_flash_val = 0;
+
 	save_item(NAME(m_flash_packet));
 	save_item(NAME(m_flash_packet_start));
 	save_item(NAME(m_flash_val));
@@ -3750,6 +3757,10 @@ void subsino_state::init_victor21()
 void subsino_state::init_crsbingo()
 {
 	subsino_decrypt(machine(), crsbingo_bitswaps, crsbingo_xors, 0xc000);
+
+	m_flash_packet = 0;
+	m_flash_packet_start = 0;
+	m_flash_val = 0;
 
 	save_item(NAME(m_flash_packet));
 	save_item(NAME(m_flash_packet_start));
@@ -3813,8 +3824,6 @@ void subsino_state::init_stbsub()
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{
-		m_reel_scroll[reel].allocate(0x40);
-
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
 		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
@@ -3829,8 +3838,6 @@ void subsino_state::init_stisub()
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{
-		m_reel_scroll[reel].allocate(0x40);
-
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
 		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
@@ -3849,8 +3856,6 @@ void subsino_state::init_tesorone()
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{
-		m_reel_scroll[reel].allocate(0x40);
-
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
 		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
@@ -3869,8 +3874,6 @@ void subsino_state::init_tesorone230()
 
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{
-		m_reel_scroll[reel].allocate(0x40);
-
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
 		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
@@ -3882,13 +3885,14 @@ void subsino_state::init_mtrainnv()
 {
 	for (uint8_t reel = 0; reel < 3; reel++)
 	{
-		m_reel_scroll[reel].allocate(0x40);
-
 		m_reel_attr[reel] = std::make_unique<uint8_t[]>(0x200);
 
 		save_pointer(NAME(m_reel_attr[reel]), 0x200, reel);
 	}
 }
+
+} // Anonymous namespace
+
 
 /***************************************************************************
 *                               Game Drivers                               *

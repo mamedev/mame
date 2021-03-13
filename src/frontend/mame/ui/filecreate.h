@@ -14,6 +14,7 @@
 #pragma once
 
 #include "ui/menu.h"
+#include "imagedev/floppy.h"
 
 class floppy_image_format_t;
 
@@ -75,6 +76,24 @@ private:
 	int                         m_ext_match;
 	int                         m_total_usable;
 	int *                       m_result;
+};
+
+// ======================> menu_select_floppy_init
+
+class menu_select_floppy_init : public menu
+{
+public:
+	menu_select_floppy_init(mame_ui_manager &mui, render_container &container,
+		const std::vector<floppy_image_device::fs_info> &fs, int *result);
+	virtual ~menu_select_floppy_init() override;
+
+private:
+	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void handle() override;
+
+	// internal state
+	const std::vector<floppy_image_device::fs_info> &m_fs;
+	int *                                            m_result;
 };
 
 

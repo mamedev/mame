@@ -95,6 +95,7 @@ public:
 	cyberbal_state(const machine_config &mconfig, device_type type, const char *tag) :
 		cyberbal_base_state(mconfig, type, tag),
 		m_slapstic(*this, "slapstic"),
+		m_slapstic_bank(*this, "slapstic_bank"),
 		m_extracpu(*this, "extra"),
 		m_sac(*this, "sac"),
 		m_playfield2(*this, "playfield2"),
@@ -123,6 +124,7 @@ protected:
 
 	// memory maps
 	void main_map(address_map &map);
+	void tournament_map(address_map &map);
 	void extra_map(address_map &map);
 
 private:
@@ -132,6 +134,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);
 
 	optional_device<atari_slapstic_device> m_slapstic;
+	optional_memory_bank m_slapstic_bank;
 	required_device<cpu_device> m_extracpu;
 	required_device<atari_sac_device> m_sac;
 	required_device<tilemap_device> m_playfield2;

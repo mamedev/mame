@@ -194,7 +194,7 @@ void mbc55x_state::set_ram_size()
 		if(bankno<nobanks)
 		{
 			membank(bank)->set_base(map_base);
-			space.install_readwrite_bank(bank_base, bank_base+(RAM_BANK_SIZE-1), bank);
+			space.install_readwrite_bank(bank_base, bank_base+(RAM_BANK_SIZE-1), membank(bank));
 			logerror("Mapping bank %d at %05X to RAM\n",bankno,bank_base);
 		}
 		else
@@ -206,9 +206,9 @@ void mbc55x_state::set_ram_size()
 
 	// Graphics red and blue plane memory mapping, green is in main memory
 	membank(RED_PLANE_TAG)->set_base(&m_video_mem[RED_PLANE_OFFSET]);
-	space.install_readwrite_bank(RED_PLANE_MEMBASE, RED_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), RED_PLANE_TAG);
+	space.install_readwrite_bank(RED_PLANE_MEMBASE, RED_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), membank(RED_PLANE_TAG));
 	membank(BLUE_PLANE_TAG)->set_base(&m_video_mem[BLUE_PLANE_OFFSET]);
-	space.install_readwrite_bank(BLUE_PLANE_MEMBASE, BLUE_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), BLUE_PLANE_TAG);
+	space.install_readwrite_bank(BLUE_PLANE_MEMBASE, BLUE_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), membank(BLUE_PLANE_TAG));
 }
 
 void mbc55x_state::machine_reset()
@@ -233,11 +233,6 @@ void mbc55x_state::machine_start()
 
 static INPUT_PORTS_START( mbc55x )
 INPUT_PORTS_END
-
-
-FLOPPY_FORMATS_MEMBER( mbc55x_state::floppy_formats )
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
 
 
 // MBC-550 : 1 x 5.25" disk-drive (160 KB)
@@ -331,10 +326,10 @@ void mbc55x_state::mbc55x(machine_config &config)
 	FD1793(config, m_fdc, 14.318181_MHz_XTAL / 14); // M5W1793-02P (clock is nominally 1 MHz)
 	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy[0], mbc55x_floppies, "qd", mbc55x_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[1], mbc55x_floppies, "qd", mbc55x_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[2], mbc55x_floppies, nullptr, mbc55x_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[3], mbc55x_floppies, nullptr, mbc55x_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], mbc55x_floppies, "qd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], mbc55x_floppies, "qd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[2], mbc55x_floppies, nullptr, floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[3], mbc55x_floppies, nullptr, floppy_image_device::default_pc_floppy_formats);
 
 	/* Software list */
 	SOFTWARE_LIST(config, "disk_list").set_original("mbc55x");

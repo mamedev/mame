@@ -111,10 +111,10 @@ void s100_dj2db_device::device_add_mconfig(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(s100_dj2db_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(s100_dj2db_device::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy0, s100_dj2db_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, s100_dj2db_floppies, nullptr, floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy2, s100_dj2db_floppies, nullptr, floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy3, s100_dj2db_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, s100_dj2db_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, s100_dj2db_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy2, s100_dj2db_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy3, s100_dj2db_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 }
 
 
@@ -254,7 +254,7 @@ s100_dj2db_device::s100_dj2db_device(const machine_config &mconfig, const char *
 	m_floppy3(*this, MB8866_TAG":3"),
 	m_floppy(nullptr),
 	m_rom(*this, "dj2db"),
-	m_ram(*this, "ram"),
+	m_ram(*this, "ram", 0x400, ENDIANNESS_LITTLE),
 	m_j1a(*this, "J1A"),
 	m_j3a(*this, "J3A"),
 	m_j4(*this, "J4"),
@@ -275,9 +275,6 @@ s100_dj2db_device::s100_dj2db_device(const machine_config &mconfig, const char *
 
 void s100_dj2db_device::device_start()
 {
-	// allocate memory
-	m_ram.allocate(0x400);
-
 	// state saving
 	save_item(NAME(m_drive));
 	save_item(NAME(m_head));

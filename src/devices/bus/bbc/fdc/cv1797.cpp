@@ -28,11 +28,13 @@ DEFINE_DEVICE_TYPE(BBC_CV1797, bbc_cv1797_device,  "bbc_cv1797", "Computer Villa
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( bbc_cv1797_device::floppy_formats )
-	FLOPPY_ACORN_SSD_FORMAT,
-	FLOPPY_ACORN_DSD_FORMAT,
-	FLOPPY_FSD_FORMAT
-FLOPPY_FORMATS_END
+void bbc_cv1797_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ACORN_SSD_FORMAT);
+	fr.add(FLOPPY_ACORN_DSD_FORMAT);
+	fr.add(FLOPPY_FSD_FORMAT);
+}
 
 static void bbc_floppies_525(device_slot_interface &device)
 {

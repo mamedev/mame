@@ -19,7 +19,7 @@
 #include "sound/tms5220.h"
 #include "machine/tms6100.h"
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 class ti_speech_synthesizer_device : public device_t, public device_ti99_peribox_card_interface
 {
@@ -48,7 +48,7 @@ private:
 	bool m_dec_high;     // Decode the AMA/AMB/ABC address lines
 };
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 
 DECLARE_DEVICE_TYPE_NS(TI99_SPEECH, bus::ti99::peb, ti_speech_synthesizer_device)
 

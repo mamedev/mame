@@ -168,6 +168,7 @@ protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
 
+private:
 	void vectrex_map(address_map &map);
 };
 
@@ -182,13 +183,12 @@ public:
 
 	void raaspec(machine_config &config);
 
-protected:
+private:
 	void raaspec_led_w(uint8_t data);
 	uint8_t vectrex_s1_via_pb_r();
 
 	void raaspec_map(address_map &map);
 
-private:
 	required_ioport m_io_coin;
 };
 

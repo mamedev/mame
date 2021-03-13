@@ -28,7 +28,7 @@
 #include "machine/watchdog.h"
 #include "speaker.h"
 
-#include "rendlay.h"
+#include "layout/generic.h"
 
 
 /*************************************
@@ -141,6 +141,12 @@ void cyberbal_state::main_map(address_map &map)
 	map(0xff7800, 0xff9fff).ram().share("sharedram");
 	map(0xffa000, 0xffbfff).readonly().nopw().share("extraram");
 	map(0xffc000, 0xffffff).ram().share("mainram");
+}
+
+void cyberbal_state::tournament_map(address_map &map)
+{
+	main_map(map);
+	map(0x018000, 0x019fff).mirror(0x6000).bankr(m_slapstic_bank);
 }
 
 
@@ -414,7 +420,10 @@ void cyberbal_state::cyberbalt(machine_config &config)
 	cyberbal_base(config);
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	SLAPSTIC(config, m_slapstic, 116, true);
+	SLAPSTIC(config, m_slapstic, 116);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0x18000, 0x1ffff, 0);
+	m_slapstic->set_bank(m_slapstic_bank);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cyberbal_state::tournament_map);
 }
 
 void cyberbal2p_state::cyberbal2p(machine_config &config)
@@ -993,7 +1002,7 @@ ROM_END
 
 void cyberbal_state::init_cyberbalt()
 {
-	m_slapstic->legacy_configure(*m_maincpu, 0x018000, 0, memregion("maincpu")->base() + 0x18000);
+	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x18000, 0x2000);
 }
 
 

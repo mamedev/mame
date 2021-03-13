@@ -85,6 +85,8 @@ TODO:
 #include "speaker.h"
 
 
+namespace {
+
 class vega_state : public driver_device
 {
 public:
@@ -778,6 +780,11 @@ uint8_t vega_state::randomizer()
 
 void vega_state::machine_start()
 {
+	m_p2_data = 0;
+	m_ext_offset_w = 0;
+	m_ext_offset_r = 0;
+
+	m_tilemap_offset_x = m_tilemap_offset_y = m_tilemap_flags = m_tilemap_top = 0;
 }
 
 
@@ -872,5 +879,7 @@ void vega_state::init_vega()
 	uint8_t *ROM = memregion("mb0")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0], 0x800);
 }
+
+} // anonymous namespace
 
 GAME( 1982, vega,   0, vega, vega, vega_state, init_vega, ROT270, "Olympia", "Vega", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

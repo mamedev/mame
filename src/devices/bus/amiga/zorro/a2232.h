@@ -24,7 +24,7 @@
 #include "bus/rs232/rs232.h"
 
 
-namespace bus { namespace amiga { namespace zorro {
+namespace bus::amiga::zorro {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -106,7 +106,7 @@ private:
 	uint8_t m_cia_port_b;
 };
 
-} } } // namespace bus::amiga::zorro
+} // namespace bus::amiga::zorro
 
 // device type definition
 DECLARE_DEVICE_TYPE_NS(ZORRO_A2232, bus::amiga::zorro, a2232_device)

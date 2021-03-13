@@ -2,7 +2,7 @@
 // copyright-holders:Kevin Thacker
 /***************************************************************************
 
-  spectrum.c
+  spectrum.cpp
 
   Functions to emulate the video hardware of the ZX Spectrum.
 
@@ -22,7 +22,7 @@
 /***************************************************************************
   Start the video hardware emulation.
 ***************************************************************************/
-VIDEO_START_MEMBER(spectrum_state,spectrum)
+void spectrum_state::video_start()
 {
 	m_frame_invert_count = 16;
 	m_frame_number = 0;
@@ -44,7 +44,7 @@ VIDEO_START_MEMBER(spectrum_state,spectrum)
 	m_scanline_timer->adjust(m_maincpu->cycles_to_attotime(m_CyclesPerLine));
 }
 
-VIDEO_START_MEMBER(spectrum_state,spectrum_128)
+void spectrum_128_state::video_start()
 {
 	m_frame_invert_count = 16;
 	m_frame_number = 0;

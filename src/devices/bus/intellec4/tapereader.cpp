@@ -8,7 +8,7 @@
 DEFINE_DEVICE_TYPE_NS(INTELLEC4_TAPE_READER, bus::intellec4, imm4_90_device, "intlc4_imm4_90", "Intel imm4-90 High-Speed Paper Tape Reader")
 
 
-namespace bus { namespace intellec4 {
+namespace bus::intellec4 {
 
 imm4_90_device::imm4_90_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, INTELLEC4_TAPE_READER, tag, owner, clock)
@@ -83,4 +83,4 @@ TIMER_CALLBACK_MEMBER(imm4_90_device::step)
 	}
 }
 
-} } // namespace bus::intellec4
+} // namespace bus::intellec4

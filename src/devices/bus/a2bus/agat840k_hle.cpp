@@ -150,12 +150,9 @@ void a2bus_agat840k_hle_device::device_reset()
 
 	for (auto &img : m_floppy_image)
 	{
-		if (img.found())
-		{
-			img->floppy_drive_set_ready_state(FLOPPY_DRIVE_READY, 0);
-			img->floppy_drive_set_rpm(300.);
-			img->floppy_drive_seek(-img->floppy_drive_get_current_track());
-		}
+		img->floppy_drive_set_ready_state(FLOPPY_DRIVE_READY, 0);
+		img->floppy_drive_set_rpm(300.);
+		img->floppy_drive_seek(-img->floppy_drive_get_current_track());
 	}
 	m_floppy = m_floppy_image[0].target();
 

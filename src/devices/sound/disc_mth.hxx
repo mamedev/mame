@@ -1057,6 +1057,7 @@ DISCRETE_STEP(dst_mixer)
 										break;
 									}
 									/* else, fall through and just use the resistor value */
+									[[fallthrough]];
 								case DISC_MIXER_IS_OP_AMP:
 									rTemp2 = rTemp;
 									break;
@@ -1219,6 +1220,7 @@ DISCRETE_RESET(dst_mixer)
 						break;
 					}
 					/* else, fall through and just use the resistor value */
+					[[fallthrough]];
 				case DISC_MIXER_IS_OP_AMP:
 					rTemp = info->r[bit];
 					break;

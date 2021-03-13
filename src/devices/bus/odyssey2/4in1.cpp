@@ -15,7 +15,7 @@ Used in:
 #include "emu.h"
 #include "4in1.h"
 
-DEFINE_DEVICE_TYPE(O2_ROM_4IN1, o2_4in1_device, "o2_4in1", "Odyssey 2 Videopac 40")
+DEFINE_DEVICE_TYPE(O2_ROM_4IN1, o2_4in1_device, "o2_4in1", "Videopac 40 Cartridge")
 
 
 //-------------------------------------------------
@@ -35,7 +35,7 @@ void o2_4in1_device::device_start()
 
 void o2_4in1_device::cart_init()
 {
-	if (m_rom.bytes() != 0x1000)
+	if (m_rom_size != 0x1000)
 		fatalerror("o2_4in1_device: ROM size must be 4KB\n");
 }
 

@@ -193,8 +193,7 @@ void as12_state::as12(machine_config &config)
 {
 	/* basic machine hardware */
 	R65C02(config, m_maincpu, 4_MHz_XTAL); // R65C02P4
-	m_maincpu->set_addrmap(AS_PROGRAM, &as12_state::div_trampoline);
-	ADDRESS_MAP_BANK(config, m_mainmap).set_map(&as12_state::main_map).set_options(ENDIANNESS_LITTLE, 8, 16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &as12_state::main_map);
 
 	const attotime irq_period = attotime::from_hz(600); // from 556 timer (22nF, 110K, 1K), ideal frequency is 600Hz
 	TIMER(config, m_irq_on).configure_periodic(FUNC(as12_state::irq_on<M6502_IRQ_LINE>), irq_period);
@@ -225,7 +224,7 @@ void as12_state::as12(machine_config &config)
 ******************************************************************************/
 
 ROM_START( feleg ) // model AS12(or 6085)
-	ROM_REGION( 0x10000, "mainmap", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("feleg.1", 0x8000, 0x2000, CRC(e9df31e8) SHA1(31c52bb8f75580c82093eb950959c1bc294189a8) ) // TMM2764, no label
 	ROM_LOAD("feleg.2", 0xc000, 0x2000, CRC(bed9c84b) SHA1(c12f39765b054d2ad81f747e698715ad4246806d) ) // "
 	ROM_LOAD("feleg.3", 0xe000, 0x2000, CRC(b1fb49aa) SHA1(d8c9687dd564f0fa603e6d684effb1d113ac64b4) ) // "

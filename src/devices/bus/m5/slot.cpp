@@ -7,7 +7,6 @@
 
  ***********************************************************************************************************/
 
-
 #include "emu.h"
 #include "slot.h"
 
@@ -121,9 +120,9 @@ static const m5_slot slot_list[] =
 
 static int m5_get_pcb_id(const char *slot)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (int i = 0; i < std::size(slot_list); i++)
 	{
-		if (!core_stricmp(slot_list[i].slot_option, slot))
+		if (!strcmp(slot_list[i].slot_option, slot))
 			return slot_list[i].pcb_id;
 	}
 
@@ -132,7 +131,7 @@ static int m5_get_pcb_id(const char *slot)
 
 static const char *m5_get_slot(int type)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (int i = 0; i < std::size(slot_list); i++)
 	{
 		if (slot_list[i].pcb_id == type)
 			return slot_list[i].slot_option;

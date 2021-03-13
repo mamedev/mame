@@ -426,7 +426,7 @@ void vc4000_state::vc4000_sprite_update(bitmap_ind16 &bitmap, uint8_t *collision
 	case 0:
 		if (m_video.line != This->y + 2) break;
 		This->state++;
-
+		[[fallthrough]];
 	case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:case 9:case 10:
 
 		vc4000_collision_plot(collision+This->data->x1, This->data->bitmap[This->state-1],This->mask,This->size);
@@ -471,7 +471,7 @@ void vc4000_state::vc4000_sprite_update(bitmap_ind16 &bitmap, uint8_t *collision
 
 		This->delay=0;
 		This->state++;
-
+		[[fallthrough]];
 	case 12:
 		if (This->y!=0)
 		{
@@ -479,7 +479,7 @@ void vc4000_state::vc4000_sprite_update(bitmap_ind16 &bitmap, uint8_t *collision
 			break;
 		}
 		This->state++;
-
+		[[fallthrough]];
 	case 13: case 14: case 15: case 16: case 17: case 18: case 19:case 20:case 21:case 22:
 
 		vc4000_collision_plot(collision+This->data->x2,This->data->bitmap[This->state-13],This->mask,This->size);
@@ -574,7 +574,7 @@ INTERRUPT_GEN_MEMBER(vc4000_state::vc4000_video_line)
 {
 	uint8_t collision[400]={0}; // better alloca or gcc feature of non constant long automatic arrays
 	const rectangle &visarea = m_screen->visible_area();
-	assert(ARRAY_LENGTH(collision) >= m_screen->width());
+	assert(std::size(collision) >= m_screen->width());
 
 	m_video.line++;
 	if (m_irq_pause) m_irq_pause++;

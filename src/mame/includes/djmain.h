@@ -40,11 +40,17 @@ public:
 	void init_hmcompm2();
 	void init_bm5thmix();
 	void init_bm4thmix();
+	void init_bs4thmix();
 	void init_beatmania();
 	void init_bmdct();
 	void init_bmcompm2();
 	void init_bmcorerm();
 	void init_bmclubmx();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	void sndram_bank_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -75,10 +81,6 @@ private:
 	void maincpu_djmaina(address_map &map);
 	void maincpu_djmainj(address_map &map);
 	void maincpu_djmainu(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 	required_shared_ptr<uint32_t> m_obj_ram;
 	required_device<cpu_device> m_maincpu;

@@ -137,7 +137,7 @@ DEFINE_DEVICE_TYPE_NS(IO99232, bus::ti99::internal, io992_32_device, "io992_32",
 DEFINE_DEVICE_TYPE_NS(TI992_EXPPORT, bus::ti99::internal, ti992_expport_device, "ti992_expport", "TI-99/2 Expansion Port")
 DEFINE_DEVICE_TYPE_NS(TI992_RAM32K, bus::ti99::internal, ti992_expram_device, "ti992_ram32k", "TI-99/2 RAM Expansion 32K")
 
-namespace bus { namespace ti99 { namespace internal {
+namespace bus::ti99::internal {
 
 video992_device::video992_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
@@ -521,7 +521,7 @@ void io992_device::cruwrite(offs_t offset, uint8_t data)
 			LOGMASKED(LOG_BANK, "set bank = %d\n", data);
 			m_set_rom_bank(data==1);
 		}
-		// no break
+		[[fallthrough]];
 	case 0xe002:
 	case 0xe004:
 	case 0xe006:
@@ -676,7 +676,7 @@ void ti992_expram_device::device_add_mconfig(machine_config &config)
 	m_ram->set_default_value(0);
 }
 
-}   }   }
+} // namespace bus::ti99::internal
 
 void ti992_expport_options(device_slot_interface &device)
 {

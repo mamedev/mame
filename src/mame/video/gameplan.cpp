@@ -278,9 +278,9 @@ void gameplan_state::leprechn_video(machine_config &config)
 	m_screen->set_screen_update(FUNC(gameplan_state::screen_update_leprechn));
 }
 
-void gameplan_state::trvquest_video(machine_config &config)
+void trvquest_state::trvquest_video(machine_config &config)
 {
 	gameplan_video(config);
-	m_screen->set_screen_update(FUNC(gameplan_state::screen_update_gameplan));
+	m_screen->set_screen_update(FUNC(trvquest_state::screen_update_gameplan));
 	m_screen->screen_vblank().set(m_via_2, FUNC(via6522_device::write_ca1));
 }

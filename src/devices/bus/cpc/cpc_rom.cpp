@@ -109,12 +109,12 @@ image_init_result cpc_rom_image_device::call_load()
 	m_base = std::make_unique<uint8_t[]>(16384);
 	if(size <= 16384)
 	{
-		image->fread(m_base.get(),size);
+		image->fread(m_base,size);
 	}
 	else
 	{
 		image->fseek(size-16384,SEEK_SET);
-		image->fread(m_base.get(),16384);
+		image->fread(m_base,16384);
 	}
 
 	return image_init_result::PASS;

@@ -26,7 +26,7 @@ const tms7000_disassembler::oprandinfo tms7000_disassembler::of[] = {
 /* 11 */ { {" R%u",     "",         "",         ""},        {UI8, DONE, DONE, DONE} },
 /* 12 */ { {" @>%04X(B)","",        "",         ""},        {UI16, DONE, DONE, DONE} },
 
-/* 13 */ { {" B,A",     ",%s",      "",         ""},        {NONE, PCREL, DONE, DONE} },
+/* 13 */ { {" B,A,%s",  "",         "",         ""},        {PCREL, DONE, DONE, DONE} },
 /* 14 */ { {" R%u,A",   ",%s",      "",         ""},        {UI8, PCREL, DONE, DONE} },
 /* 15 */ { {" R%u,B",   ",%s",      "",         ""},        {UI8, PCREL, DONE, DONE} },
 /* 16 */ { {" R%u",     ",R%u",     ",%s",      ""},        {UI8, UI8, PCREL, DONE} },
@@ -197,7 +197,7 @@ const tms7000_disassembler::tms7000_opcodeinfo tms7000_disassembler::opcs[] = {
 	{0xE1, "JN", 28, 0 },
 	{0xE6, "JNZ", 28, 0 },
 	{0xE4, "JP", 28, 0 },
-	{0xE5, "JPI", 28, 0 },
+	{0xE5, "JPZ", 28, 0 },
 
 	{0x8A, "LDA", 10, 0 },
 	{0x9A, "LDA", 45, 0 },

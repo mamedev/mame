@@ -42,10 +42,12 @@ public:
 		m_timekeeper(*this, "m48t02"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
-		m_main_ram(*this, "main_ram", 0),
-		m_nvram(*this, "nvram", 0),
-		m_video(*this, "video", 0),
-		m_main_rom(*this, "main_rom", 0),
+		m_nvram16(*this, "nvram16"),
+		m_nvram32(*this, "nvram32"),
+		m_main_ram32(*this, "main_ram"),
+		m_video(*this, "video", 0x200, ENDIANNESS_BIG),
+		m_main_rom16(*this, "user1"),
+		m_main_rom32(*this, "user1"),
 		m_grom(*this, "gfx1"),
 		m_soundbank(*this, "soundbank")
 	{ }
@@ -56,6 +58,7 @@ public:
 	void sftm(machine_config &config);
 	void bloodstm(machine_config &config);
 	void timekill(machine_config &config);
+	void pubball(machine_config &config);
 
 	void init_gtclasscp();
 	void init_shufshot();
@@ -74,6 +77,7 @@ public:
 	void init_timekill();
 	void init_gt3d();
 	void init_gt3dl();
+	void init_pubball();
 
 	DECLARE_READ_LINE_MEMBER(special_port_r);
 
@@ -89,10 +93,12 @@ protected:
 	required_device<generic_latch_8_device> m_soundlatch;
 	optional_device<generic_latch_8_device> m_soundlatch2;
 
-	optional_shared_ptr<u16> m_main_ram;
-	optional_shared_ptr<u16> m_nvram;
-	optional_shared_ptr<u16> m_video;
-	optional_shared_ptr<u16> m_main_rom;
+	optional_shared_ptr<u16> m_nvram16;
+	optional_shared_ptr<u32> m_nvram32;
+	optional_shared_ptr<u32> m_main_ram32;
+	memory_share_creator<u16> m_video;
+	optional_region_ptr<u16> m_main_rom16;
+	optional_region_ptr<u32> m_main_rom32;
 
 	required_region_ptr<u8> m_grom;
 	required_memory_bank m_soundbank;
@@ -186,6 +192,7 @@ protected:
 	virtual void logblit(const char *tag);
 	void update_interrupts(int fast);
 	void draw_raw(u16 *base, u16 color);
+	void draw_raw_widthpix(u16 *base, u16 color);
 	virtual void command_blit_raw();
 	virtual void command_shift_reg();
 	inline void draw_rle_fast(u16 *base, u16 color);
@@ -200,6 +207,7 @@ protected:
 	void sound_020_map(address_map &map);
 	void sound_map(address_map &map);
 	void timekill_map(address_map &map);
+	void pubball_map(address_map &map);
 };
 
 class drivedge_state : public itech32_state
@@ -274,7 +282,6 @@ public:
 		m_dips(*this, "DIPS"),
 		m_gun_x(*this, "GUNX%u", 1U),
 		m_gun_y(*this, "GUNY%u", 1U),
-		m_nvram_b(*this, "nvram_b", 0),
 		m_gun_timer(nullptr)
 	{ }
 
@@ -294,7 +301,6 @@ private:
 	required_ioport m_dips;
 	required_ioport_array<2> m_gun_x;
 	required_ioport_array<2> m_gun_y;
-	optional_shared_ptr<u16> m_nvram_b;
 	emu_timer *m_gun_timer;
 };
 

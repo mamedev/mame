@@ -13,13 +13,14 @@
 -- specify available CPU cores
 --------------------------------------------------
 
-CPUS["M6502"] = true
+CPUS["DSP16"] = true -- for qsound
 CPUS["H6280"] = true
+CPUS["KS0164"] = true
+CPUS["M6502"] = true
 CPUS["M680X0"] = true
 CPUS["MCS48"] = true
 CPUS["SH"] = true
 CPUS["Z80"] = true
-CPUS["DSP16"] = true -- for qsound
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -37,6 +38,7 @@ SOUNDS["IREMGA20"] = true
 SOUNDS["K051649"] = true
 SOUNDS["K053260"] = true
 SOUNDS["K054539"] = true
+SOUNDS["KS0164"] = true
 SOUNDS["MULTIPCM"] = true
 SOUNDS["NES_APU"] = true
 SOUNDS["OKIM6258"] = true
@@ -83,6 +85,7 @@ MACHINES["Z80DAISY"] = true
 --------------------------------------------------
 -- specify available bus cores
 --------------------------------------------------
+BUSES["MIDI"] = true
 
 
 --------------------------------------------------
@@ -124,6 +127,7 @@ function createProjects_mame_virtual(_target, _subtarget)
 	createVirtualProjects(_target, _subtarget, "virtual")
 	files {
 		MAME_DIR .. "src/mame/drivers/vgmplay.cpp",
+		MAME_DIR .. "src/mame/drivers/wavesynth.cpp",
 		MAME_DIR .. "src/mame/drivers/ldplayer.cpp",
 		MAME_DIR .. "src/mame/machine/mega32x.cpp",
 		MAME_DIR .. "src/mame/machine/mega32x.h",

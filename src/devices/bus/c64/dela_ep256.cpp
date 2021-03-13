@@ -24,14 +24,8 @@ DEFINE_DEVICE_TYPE(C64_DELA_EP256, c64_dela_ep256_cartridge_device, "c64_dela_ep
 
 void c64_dela_ep256_cartridge_device::device_add_mconfig(machine_config &config)
 {
-	GENERIC_SOCKET(config, "rom1", generic_linear_slot, nullptr, "bin,rom");
-	GENERIC_SOCKET(config, "rom2", generic_linear_slot, nullptr, "bin,rom");
-	GENERIC_SOCKET(config, "rom3", generic_linear_slot, nullptr, "bin,rom");
-	GENERIC_SOCKET(config, "rom4", generic_linear_slot, nullptr, "bin,rom");
-	GENERIC_SOCKET(config, "rom5", generic_linear_slot, nullptr, "bin,rom");
-	GENERIC_SOCKET(config, "rom6", generic_linear_slot, nullptr, "bin,rom");
-	GENERIC_SOCKET(config, "rom7", generic_linear_slot, nullptr, "bin,rom");
-	GENERIC_SOCKET(config, "rom8", generic_linear_slot, nullptr, "bin,rom");
+	for (auto &rom : m_eproms)
+		GENERIC_SOCKET(config, rom, generic_linear_slot, nullptr, "bin,rom");
 }
 
 
@@ -46,14 +40,9 @@ void c64_dela_ep256_cartridge_device::device_add_mconfig(machine_config &config)
 
 c64_dela_ep256_cartridge_device::c64_dela_ep256_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, C64_DELA_EP256, tag, owner, clock),
-	device_c64_expansion_card_interface(mconfig, *this)
+	device_c64_expansion_card_interface(mconfig, *this),
+	m_eproms(*this, "rom%u", 1U)
 {
-	for (int i = 0; i < 8; i++)
-	{
-		char str[6];
-		sprintf(str, "rom%i", i + 1);
-		m_eproms[i] = subdevice<generic_slot_device>(str);
-	}
 }
 
 

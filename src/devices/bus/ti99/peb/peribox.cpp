@@ -228,7 +228,7 @@ DEFINE_DEVICE_TYPE_NS(TI99_PERIBOX_GENMOD,  bus::ti99::peb, peribox_genmod_devic
 // Single slot of the PEB
 DEFINE_DEVICE_TYPE_NS(TI99_PERIBOX_SLOT, bus::ti99::peb, peribox_slot_device, "peribox_slot", "TI P-Box slot")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 #define PEBSLOT2 "slot2"
 #define PEBSLOT3 "slot3"
@@ -800,4 +800,4 @@ bool device_ti99_peribox_card_interface::in_cart_space(offs_t offset, bool amade
 		return (offset & 0x0e000)==0x06000;
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

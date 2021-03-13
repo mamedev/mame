@@ -36,12 +36,15 @@ aid80f.cpp
 aim65.cpp
 aim65_40.cpp
 akaiax80.cpp
+akaivx600.cpp
 alcat7100.cpp
 alesis.cpp
 alesis_qs.cpp
 alfaskop41xx.cpp
 alphajuno.cpp
 alphasma.cpp
+alphasma3k.cpp
+alphatan.cpp
 alphatpc16.cpp
 alphatpx.cpp
 alphatro.cpp
@@ -97,6 +100,7 @@ attache.cpp
 aussiebyte.cpp
 ave_arb.cpp
 avigo.cpp
+aviion88k.cpp
 avrmax.cpp
 ax20.cpp
 b16.cpp
@@ -119,6 +123,7 @@ binbug.cpp
 bitel.cpp
 bitgraph.cpp
 bk.cpp
+blit.cpp
 blw700i.cpp
 bmjr.cpp
 bml3.cpp
@@ -211,6 +216,7 @@ d6800.cpp
 d6809.cpp
 dai.cpp
 daruma.cpp
+datacast.cpp
 datum.cpp
 dbox.cpp
 dccons.cpp
@@ -220,6 +226,7 @@ debut.cpp
 decstation.cpp
 dectalk.cpp
 decwritr.cpp
+design.cpp
 dfs500.cpp
 dg680.cpp
 dgn_beta.cpp
@@ -246,11 +253,13 @@ dvk_ksm.cpp
 e100.cpp
 e9161.cpp
 eacc.cpp
+easy_karaoke.cpp
 ec184x.cpp
 ec65.cpp
 ec7915.cpp
 einstein.cpp
 eispc.cpp
+elan_ep3a19a.cpp
 elan_eu3a05.cpp
 elan_eu3a14.cpp
 electron.cpp
@@ -280,6 +289,7 @@ eurocom2.cpp
 europc.cpp
 eva.cpp
 evmbug.cpp
+ews4800.cpp
 excali64.cpp
 exelv.cpp
 exorciser.cpp
@@ -342,6 +352,7 @@ generalplus_gpl16250_nand.cpp
 generalplus_gpl16250_rom.cpp
 generalplus_gpl16250_romram.cpp
 generalplus_gpl16250_spi.cpp
+generalplus_gpl16250_spi_direct.cpp
 generalplus_gpl32612.cpp
 geneve.cpp
 geniusiq.cpp
@@ -376,9 +387,11 @@ hektor.cpp
 hhtiger.cpp
 hh_amis2k.cpp
 hh_cop400.cpp
+hh_cops1.cpp
 hh_hmcs40.cpp
 hh_melps4.cpp
 hh_pic16.cpp
+hh_pps41.cpp
 hh_sm510.cpp
 hh_tms1k.cpp
 hh_ucom4.cpp
@@ -419,6 +432,7 @@ ibmpcjr.cpp
 icatel.cpp
 icebox.cpp
 ie15.cpp
+iez80.cpp
 if800.cpp
 ikt5a.cpp
 imds2.cpp
@@ -429,6 +443,7 @@ indy_indigo2.cpp
 informer_207_100.cpp
 informer_207_376.cpp
 informer_213.cpp
+innotv_innotabmax.cpp
 instruct.cpp
 inteladv.cpp
 intellec4.cpp
@@ -456,6 +471,7 @@ jade.cpp
 jazz.cpp
 jensen.cpp
 jonos.cpp
+jornada.cpp
 jr100.cpp
 jr200.cpp
 jtc.cpp
@@ -498,6 +514,7 @@ lb186.cpp
 lbpc.cpp
 lc80.cpp
 lcmate2.cpp
+leapfrog_iquest.cpp
 leapfrog_leappad.cpp
 leapster.cpp
 learnwin.cpp
@@ -533,6 +550,7 @@ macquadra700.cpp
 magiceyes_pollux_vr3520f.cpp
 magnum.cpp
 mattelchess.cpp
+mbc020.cpp
 mbc200.cpp
 mbc55x.cpp
 mbee.cpp
@@ -547,6 +565,8 @@ mdisk.cpp
 mdt60.cpp
 megadriv.cpp
 megadriv_rad.cpp
+megadriv_sunplus_hybrid.cpp
+megadriv_vt_hybrid.cpp
 mekd1.cpp
 mekd2.cpp
 mekd3.cpp
@@ -595,6 +615,8 @@ miniframe.cpp
 minitel_2_rpic.cpp
 mips.cpp
 mits680b.cpp
+miuchiz.cpp
+mk1forth.cpp
 mk14.cpp
 mk85.cpp
 mk90.cpp
@@ -609,6 +631,7 @@ monkey_king_3b.cpp
 monon_color.cpp
 monty.cpp
 mpc3000.cpp
+mpc60.cpp
 mpf1.cpp
 mps1230.cpp
 mpz80.cpp
@@ -674,7 +697,7 @@ novag_micro.cpp
 novag_micro2.cpp
 novag_savant.cpp
 novag_sexpert.cpp
-novag_supremo.cpp
+novag_snova.cpp
 ns5652.cpp
 o2.cpp
 ob68k1a.cpp
@@ -733,6 +756,7 @@ pdt3100.cpp
 pecom.cpp
 pegasus.cpp
 pencil2.cpp
+pensebem.cpp
 pentagon.cpp
 peoplepc.cpp
 perq.cpp
@@ -834,6 +858,7 @@ roland_tr707.cpp
 roland_tr909.cpp
 roland_u20.cpp
 rt1715.cpp
+rtpc.cpp
 rvoice.cpp
 rx78.cpp
 rz1.cpp
@@ -925,6 +950,7 @@ spg2xx_pdc.cpp
 spg2xx_playvision.cpp
 spg2xx_senario.cpp
 spg2xx_senario_poker.cpp
+spg2xx_senca.cpp
 spg2xx_shredmjr.cpp
 spg2xx_skannerztv.cpp
 spg2xx_smarttv.cpp
@@ -933,10 +959,11 @@ spg2xx_tvgogo.cpp
 spg2xx_vii.cpp
 spg2xx_wiwi.cpp
 spg2xx_zone.cpp
-spg2xx_zone_32bit.cpp
 squale.cpp
 ssem.cpp
 st17xx.cpp
+st2302u_bbl_rom.cpp
+st2302u_bbl_spi.cpp
 storio.cpp
 studio2.cpp
 sun1.cpp
@@ -964,6 +991,7 @@ sys2900.cpp
 sys9002.cpp
 systec.cpp
 systel1.cpp
+tabe22.cpp
 talkingbb.cpp
 talkingfb.cpp
 tamag1.cpp
@@ -1054,7 +1082,6 @@ unior.cpp
 unistar.cpp
 univac.cpp
 unixpc.cpp
-unk6502_st2xxx.cpp
 ut88.cpp
 uzebox.cpp
 v100.cpp
@@ -1105,6 +1132,7 @@ vtech2.cpp
 vtech_eu3a12.cpp
 wangpc.cpp
 wicat.cpp
+wizard.cpp
 wrinkles.cpp
 wswan.cpp
 wxstar4000.cpp
@@ -1129,8 +1157,10 @@ xerox820.cpp
 xor100.cpp
 ymdx11.cpp
 ymmu100.cpp
+ymmu5.cpp
 ymmu50.cpp
 ymmu80.cpp
+ympsr340.cpp
 ymtx81z.cpp
 ymvl70.cpp
 z100.cpp

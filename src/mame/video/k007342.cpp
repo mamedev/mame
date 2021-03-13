@@ -153,6 +153,7 @@ void k007342_device::vreg_w(offs_t offset, uint8_t data)
 		case 0x01:  /* used for banking in Rock'n'Rage */
 			if (data != m_regs[1])
 				machine().tilemap().mark_all_dirty();
+			[[fallthrough]];
 		case 0x02:
 			m_scrollx[0] = (m_scrollx[0] & 0xff) | ((data & 0x01) << 8);
 			m_scrollx[1] = (m_scrollx[1] & 0xff) | ((data & 0x02) << 7);
@@ -168,6 +169,7 @@ void k007342_device::vreg_w(offs_t offset, uint8_t data)
 			break;
 		case 0x06:  /* scroll y (register 1) */
 			m_scrolly[1] = data;
+			break;
 		case 0x07:  /* unused */
 			break;
 	}

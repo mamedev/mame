@@ -33,7 +33,7 @@
 
 DEFINE_DEVICE_TYPE_NS(TI99_SIDMASTER, bus::ti99::peb, sidmaster_device, "ti99_sidmaster", "SID Master 99")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 sidmaster_device::sidmaster_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TI99_SIDMASTER, tag, owner, clock),
@@ -95,4 +95,4 @@ void sidmaster_device::device_reset()
 }
 
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

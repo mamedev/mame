@@ -236,6 +236,8 @@ void hyhoo_state::video_start()
 	save_item(NAME(m_highcolorflag));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_tmpbitmap));
+
+	m_blitter_src_addr = 0;
 }
 
 

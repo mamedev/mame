@@ -702,7 +702,7 @@ void z8_device::t1_trigger()
 	case Z8_TMR_TIN_TRIGGER:
 		if (m_internal_timer[1]->enabled())
 			break;
-
+		[[fallthrough]];
 	case Z8_TMR_TIN_RETRIGGER:
 		if ((m_tmr & Z8_TMR_ENABLE_T1) != 0)
 		{

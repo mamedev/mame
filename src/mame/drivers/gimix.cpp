@@ -83,6 +83,8 @@ public:
 		, m_rombank1(*this, "rombank1")
 		, m_rombank2(*this, "rombank2")
 		, m_fixedrombank(*this, "fixedrombank")
+		, m_lowerram(*this, "lower_ram")
+		, m_upperram(*this, "upper_ram")
 		, m_dma_dip(*this, "dma_s2")
 	{}
 
@@ -101,7 +103,7 @@ private:
 	uint8_t pia_pb_r();
 	void pia_pb_w(uint8_t data);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	void gimix_banked_mem(address_map &map);
 	void gimix_mem(address_map &map);
@@ -152,6 +154,8 @@ private:
 	required_memory_bank m_rombank1;
 	required_memory_bank m_rombank2;
 	required_memory_bank m_fixedrombank;
+	required_memory_bank m_lowerram;
+	memory_bank_creator m_upperram;
 
 	required_ioport m_dma_dip;
 };
@@ -494,9 +498,9 @@ void gimix_state::machine_reset()
 	m_floppy1_ready = false;
 	m_floppy2_ready = false;
 	m_floppy3_ready = false;
-	membank("lower_ram")->set_base(m_ram->pointer());
+	m_lowerram->set_base(m_ram->pointer());
 	if(m_ram->size() > 65536)
-		membank("upper_ram")->set_base(m_ram->pointer()+0x10000);
+		m_upperram->set_base(m_ram->pointer()+0x10000);
 
 	// initialise FDC clock based on DIP Switch S2-9 (5.25"/8" drive select)
 	if(m_dma_dip->read() & 0x00000100)
@@ -520,7 +524,7 @@ void gimix_state::machine_start()
 	{
 		for (int bank = 0; bank < 16; bank++)
 		{
-			m_bank[bank]->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,"upper_ram");
+			m_bank[bank]->space(AS_PROGRAM).install_readwrite_bank(0x10000,m_ram->size()-1,m_upperram);
 		}
 	}
 	m_floppy0->get_device()->set_rpm(300);
@@ -531,11 +535,12 @@ void gimix_state::driver_start()
 {
 }
 
-FLOPPY_FORMATS_MEMBER( gimix_state::floppy_formats )
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_FLEX_FORMAT,
-	FLOPPY_OS9_FORMAT
-FLOPPY_FORMATS_END
+void gimix_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_FLEX_FORMAT);
+	fr.add(FLOPPY_OS9_FORMAT);
+}
 
 static void gimix_floppies(device_slot_interface &device)
 {
@@ -717,7 +722,7 @@ offs_t gimix_state::os9_dasm_override(std::ostream &stream, offs_t pc, const uti
 	if ((opcodes.r8(pc) == 0x10) && (opcodes.r8(pc+1) == 0x3F))
 	{
 		call = opcodes.r8(pc+2);
-		if ((call < ARRAY_LENGTH(os9syscalls)) && (os9syscalls[call] != nullptr))
+		if ((call < std::size(os9syscalls)) && (os9syscalls[call] != nullptr))
 		{
 			util::stream_format(stream, "OS9   %s", os9syscalls[call]);
 			result = 3;

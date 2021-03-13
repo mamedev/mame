@@ -33,8 +33,10 @@ jobs:
           TOOLS: 1
         run: make -j2
       - name: Validate
-        run: ./mame64 -validate
+        run: ./mame -validate
+      - name: ORM check
+        run: python scripts/minimaws/minimaws.py load --executable ./mame --softwarepath hash
       - uses: actions/upload-artifact@master
         with:
-          name: mame64-linux-${{ matrix.compiler }}-${{ github.sha }}
-          path: mame64
+          name: mame-linux-${{ matrix.compiler }}-${{ github.sha }}
+          path: mame

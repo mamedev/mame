@@ -491,7 +491,6 @@ TIMER_CALLBACK_MEMBER(bally_cheap_squeak_device::sound_int_sync)
 void bally_cheap_squeak_device::cheap_squeak_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0080, 0x00ff).ram();
 	map(0x8000, 0x9fff).mirror(0x2000).rom();
 	map(0xc000, 0xdfff).mirror(0x2000).rom();
 }

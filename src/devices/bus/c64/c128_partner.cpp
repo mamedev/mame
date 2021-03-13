@@ -80,7 +80,8 @@ ioport_constructor c128_partner_cartridge_device::device_input_ports() const
 c128_partner_cartridge_device::c128_partner_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, C128_PARTNER, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
-	m_ram(*this, "ram"), t_joyb2(nullptr),
+	m_ram(*this, "ram", 0x2000, ENDIANNESS_LITTLE),
+	t_joyb2(nullptr),
 	m_ram_a12_a7(0),
 	m_ls74_cd(0),
 	m_ls74_q1(0),
@@ -96,9 +97,6 @@ c128_partner_cartridge_device::c128_partner_cartridge_device(const machine_confi
 
 void c128_partner_cartridge_device::device_start()
 {
-	// allocate memory
-	m_ram.allocate(0x2000);
-
 	// simulate the 16.7ms pulse from CIA1 PB2 that would arrive thru the joystick port dongle
 	t_joyb2 = timer_alloc();
 	t_joyb2->adjust(attotime::from_msec(16), 0, attotime::from_msec(16));

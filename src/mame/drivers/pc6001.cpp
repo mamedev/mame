@@ -186,7 +186,7 @@ void pc6001_state::system_latch_w(uint8_t data)
 {
 	static const uint16_t startaddr[] = {0xC000, 0xE000, 0x8000, 0xA000 };
 
-	m_video_ram =  m_ram + startaddr[(data >> 1) & 0x03] - 0x8000;
+	m_video_ram =  &m_ram[startaddr[(data >> 1) & 0x03] - 0x8000];
 
 	cassette_latch_control((data & 8) == 8);
 	m_sys_latch = data;
@@ -1406,6 +1406,8 @@ void pc6001sr_state::machine_reset()
 	// default to bitmap mode
 	m_sr_text_mode = false;
 	m_sr_text_rows = 20;
+
+	m_kludge = 0;
 
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());

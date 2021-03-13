@@ -127,7 +127,7 @@ uint16_t tmnt_state::k053245_scattered_word_r(offs_t offset)
 
 void tmnt_state::k053245_scattered_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(m_spriteram + offset);
+	COMBINE_DATA(&m_spriteram[offset]);
 
 	if (!(offset & 0x0031))
 	{
@@ -230,8 +230,6 @@ SAMPLES_START_CB_MEMBER(tmnt_state::tmnt_decode_sample)
 	int i;
 	uint8_t *source = memregion("title")->base();
 
-	save_item(NAME(m_sampledata));
-
 	/*  Sound sample for TMNT.D05 is stored in the following mode (ym3012 format):
 	 *
 	 *  Bit 15-13:  Exponent (2 ^ x)
@@ -248,7 +246,7 @@ SAMPLES_START_CB_MEMBER(tmnt_state::tmnt_decode_sample)
 		val = (val >> 3) & (0x3ff); /* 10 bit, Max Amplitude 0x400 */
 		val -= 0x200;                   /* Centralize value */
 
-		val <<= (expo - 3);
+		val = (val << expo) >> 3;
 
 		m_sampledata[i] = val;
 	}
@@ -714,7 +712,7 @@ void tmnt_state::tmnt2_1c0800_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	uint16_t src[4], mod[24];
 	uint8_t keepaspect, xlock, ylock, zlock;
 
-	COMBINE_DATA(m_tmnt2_1c0800 + offset);
+	COMBINE_DATA(&m_tmnt2_1c0800[offset]);
 
 	if (offset != 0x18/2 || !ACCESSING_BITS_8_15)
 		return;
@@ -915,7 +913,7 @@ logerror("copy command %04x sprite %08x data %08x: %04x%04x %04x%04x  modifiers 
 
 void tmnt_state::tmnt2_main_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom().share("tmnt2_rom");
+	map(0x000000, 0x0fffff).rom();
 	map(0x104000, 0x107fff).ram().share("sunset_104000");   /* main RAM */
 	map(0x140000, 0x140fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x180000, 0x183fff).ram().w(FUNC(tmnt_state::k053245_scattered_word_w)).share("spriteram");   // k053245_scattered_word_r
@@ -2540,6 +2538,8 @@ void tmnt_state::sunsetbl(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
 	m_palette->enable_hilights();
+
+	MCFG_VIDEO_START_OVERRIDE(tmnt_state,lgtnfght)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);

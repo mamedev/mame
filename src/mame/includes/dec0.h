@@ -158,6 +158,7 @@ private:
 	void dec0_i8751_reset();
 	void h6280_decrypt(const char *cputag);
 	void dec0_map(address_map &map);
+	void ffantasybl_map(address_map &map);
 	void dec0_tb_map(address_map &map);
 	void dec0_s_map(address_map &map);
 	void hippodrm_map(address_map &map);
@@ -183,6 +184,7 @@ public:
 		m_adpcm_select(*this, "adpcm_select%u", 1U),
 		m_soundbank(*this, "soundbank")
 	{
+		std::fill(std::begin(m_automat_scroll_regs), std::end(m_automat_scroll_regs), 0);
 	}
 
 	void secretab(machine_config &config);

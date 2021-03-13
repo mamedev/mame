@@ -69,6 +69,7 @@ public:
 	pda600_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_video_ram(*this, "videoram")
 	{
 	}
 
@@ -76,12 +77,12 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_video_ram;
 
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	uint8_t *     m_video_ram;
 	void pda600_io(address_map &map);
 	void pda600_mem(address_map &map);
 };
@@ -92,8 +93,8 @@ void pda600_state::pda600_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x00000, 0x1ffff).rom();
 	//map(0x20000, 0x9ffff).ram(); // PCMCIA Card
-	map(0xa0000, 0xa7fff).ram().region("videoram", 0);
-	map(0xe0000, 0xfffff).ram().region("mainram", 0).share("nvram");
+	map(0xa0000, 0xa7fff).ram().share("videoram");
+	map(0xe0000, 0xfffff).ram().share("nvram");
 }
 
 void pda600_state::pda600_io(address_map &map)
@@ -120,7 +121,6 @@ void pda600_state::machine_reset()
 
 void pda600_state::video_start()
 {
-	m_video_ram = memregion("videoram")->base();
 }
 
 uint32_t pda600_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -233,12 +233,6 @@ void pda600_state::pda600(machine_config &config)
 ROM_START( pda600 )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "pdarom.bin", 0x00000, 0x20000, CRC(f793a6c5) SHA1(ab14b0fdcedb927c66357368a2bfff605ba758fb))
-
-	// 128KB RAM
-	ROM_REGION( 0x20000, "mainram", ROMREGION_ERASE )
-
-	// 32KB Video RAM
-	ROM_REGION( 0x8000, "videoram", ROMREGION_ERASE )
 ROM_END
 
 /* Driver */

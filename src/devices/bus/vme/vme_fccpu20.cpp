@@ -246,7 +246,6 @@ void vme_fccpu20_device::cpu20_mem(address_map &map)
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
@@ -505,8 +504,8 @@ uint32_t vme_fccpu20_device::bootvect_r(offs_t offset)
 void vme_fccpu20_device::bootvect_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOG("%s\n", FUNCNAME);
-	m_sysram[offset % ARRAY_LENGTH(m_sysram)] &= ~mem_mask;
-	m_sysram[offset % ARRAY_LENGTH(m_sysram)] |= (data & mem_mask);
+	m_sysram[offset % std::size(m_sysram)] &= ~mem_mask;
+	m_sysram[offset % std::size(m_sysram)] |= (data & mem_mask);
 	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
 }
 

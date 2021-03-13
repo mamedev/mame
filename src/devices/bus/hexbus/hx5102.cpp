@@ -109,7 +109,7 @@
 
 DEFINE_DEVICE_TYPE_NS(HX5102, bus::hexbus, hx5102_device, "ti_hx5102", "TI Hexbus Floppy Drive")
 
-namespace bus { namespace hexbus {
+namespace bus::hexbus {
 
 void hx5102_device::memmap(address_map &map)
 {
@@ -625,10 +625,12 @@ WRITE_LINE_MEMBER( hx5102_device::fdc_drq_w )
 /*
     Define the floppy formats.
 */
-FLOPPY_FORMATS_MEMBER(hx5102_device::floppy_formats)
-	FLOPPY_TI99_SDF_FORMAT,
-	FLOPPY_TI99_TDF_FORMAT
-FLOPPY_FORMATS_END
+void hx5102_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_TI99_SDF_FORMAT);
+	fr.add(FLOPPY_TI99_TDF_FORMAT);
+}
 
 /*
     Only one fixed floppy drive in the device.
@@ -744,5 +746,5 @@ ioport_constructor hx5102_device::device_input_ports() const
 	return INPUT_PORTS_NAME( hx5102 );
 }
 
-}   }  // end namespace bus::hexbus
+}  // end namespace bus::hexbus
 

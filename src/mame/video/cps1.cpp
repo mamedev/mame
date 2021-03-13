@@ -29,6 +29,7 @@ Forgotten Worlds (USA, B-Board 88618B-2, Rev. AA)                  88618B-2   LW
 Forgotten Worlds (USA, B-Board 88618B-2, Rev. C)                   88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Forgotten Worlds (USA, B-Board 88618B-2, Rev. E)                   88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Forgotten Worlds (USA, B-Board 88621B-2, Rev. C)                   88621B-2   LW621            LWIO  None         CPS-B-01  DL-0411-10001  N/A
+Forgotten Worlds (Japan)                                           88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Lost Worlds (Japan Old Ver.)                                       88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Lost Worlds (Japan)                                                88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 
@@ -1685,6 +1686,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"forgottnuc",  CPS_B_01,     mapper_LWCHR },
 	{"forgottnua",  CPS_B_01,     mapper_LWCHR },
 	{"forgottnuaa", CPS_B_01,     mapper_LWCHR },
+	{"forgottnj",   CPS_B_01,     mapper_LWCHR },
 	{"lostwrld",    CPS_B_01,     mapper_LWCHR },
 	{"lostwrldo",   CPS_B_01,     mapper_LWCHR },
 	{"ghouls",      CPS_B_01,     mapper_DM620 },
@@ -1865,6 +1867,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2cems6b",   HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"sf2cems6c",   HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"sf2re",       HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
+	{"sf2mkot",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"varth",       CPS_B_04,     mapper_VA24B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
 	{"varthb",      CPS_B_04,     mapper_VA63B, 0, 0, 0, 0x0F },
 	{"varthb2",     HACK_B_3,     mapper_sfzch, 0, 0, 0, 0x80 },  // unknown gal, other varth mappers don't work (game looks for sprites in >0x8000 unmapped region)
@@ -3249,10 +3252,10 @@ void cps_state::render_layers(screen_device &screen, bitmap_ind16 &bitmap, const
 {
 	/* Draw layers (0 = sprites, 1-3 = tilemaps) */
 	int layercontrol = m_cps_b_regs[m_game_config->layer_control / 2];
-	int l0 = (layercontrol >> 0x06) & 03;
-	int l1 = (layercontrol >> 0x08) & 03;
-	int l2 = (layercontrol >> 0x0a) & 03;
-	int l3 = (layercontrol >> 0x0c) & 03;
+	int l0 = (layercontrol >> 0x06) & 0x03;
+	int l1 = (layercontrol >> 0x08) & 0x03;
+	int l2 = (layercontrol >> 0x0a) & 0x03;
+	int l3 = (layercontrol >> 0x0c) & 0x03;
 	screen.priority().fill(0, cliprect);
 
 	if (BIT(m_game_config->bootleg_kludge, 7))
@@ -3280,10 +3283,10 @@ void cps2_state::render_layers(screen_device &screen, bitmap_ind16 &bitmap, cons
 {
 	/* Draw layers (0 = sprites, 1-3 = tilemaps) */
 	int layercontrol = m_cps_b_regs[m_game_config->layer_control / 2];
-	int l0 = (layercontrol >> 0x06) & 03;
-	int l1 = (layercontrol >> 0x08) & 03;
-	int l2 = (layercontrol >> 0x0a) & 03;
-	int l3 = (layercontrol >> 0x0c) & 03;
+	int l0 = (layercontrol >> 0x06) & 0x03;
+	int l1 = (layercontrol >> 0x08) & 0x03;
+	int l2 = (layercontrol >> 0x0a) & 0x03;
+	int l3 = (layercontrol >> 0x0c) & 0x03;
 	screen.priority().fill(0, cliprect);
 
 	int primasks[8], i;

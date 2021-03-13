@@ -86,7 +86,8 @@ void bdsm_state::machine_start()
 		m_cartslot_region = memregion(region_tag.assign(m_cartslot->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 		m_bank->configure_entries(0, (m_cartslot_region->bytes() / 0x8000), m_cartslot_region->base(), 0x8000);
 		m_bank->set_entry(0); // only the first bank seems to contain a valid reset vector '0x50' which points at the first code in the ROM.  The other banks contain 0x5a00 as the reset vector.  IRQ vector seems valid in all banks.
-	}
+	} else
+		m_bank->set_base(memregion("roms")->base());
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(bdsm_state::cart_load_bdesignm)

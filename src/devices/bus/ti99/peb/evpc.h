@@ -24,7 +24,7 @@
 #include "bus/ti99/colorbus/colorbus.h"
 #include "bus/ti99/internal/evpcconn.h"
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 class snug_enhanced_video_device : public device_t, public device_ti99_peribox_card_interface, public device_nvram_interface
 {
@@ -88,7 +88,7 @@ private:
 	optional_device<bus::ti99::internal::evpc_clock_connector>   m_console_conn;
 };
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 
 DECLARE_DEVICE_TYPE_NS(TI99_EVPC, bus::ti99::peb, snug_enhanced_video_device)
 

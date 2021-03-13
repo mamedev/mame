@@ -104,6 +104,7 @@ public:
 	void cninjabl2(machine_config &config);
 	void mutantf(machine_config &config);
 	void cninja_map(address_map &map);
+	void cninjabl2_map(address_map &map);
 	void cninjabl2_oki_map(address_map &map);
 	void cninjabl2_s_map(address_map &map);
 	void cninjabl_map(address_map &map);

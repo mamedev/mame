@@ -136,9 +136,7 @@ WRITE_LINE_MEMBER(palm_state::palm_spim_exchange)
 void palm_state::machine_start()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_bank (0x000000, m_ram->size() - 1, "bank1");
-	space.install_write_bank(0x000000, m_ram->size() - 1, "bank1");
-	membank("bank1")->set_base(m_ram->pointer());
+	space.install_ram(0x000000, m_ram->size() - 1, m_ram->pointer());
 
 	save_item(NAME(m_port_f_latch));
 	save_item(NAME(m_spim_data));

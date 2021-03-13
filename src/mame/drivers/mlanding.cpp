@@ -64,6 +64,7 @@
 #include "speaker.h"
 
 
+namespace {
 
 /*************************************
  *
@@ -225,6 +226,8 @@ void mlanding_state::machine_reset()
 
 	m_dsp_hold_signal = 0;
 
+	m_msm_pos[0] = 0;
+	m_msm_pos[1] = 0;
 	m_msm_reset[0] = 0;
 	m_msm_reset[1] = 0;
 	m_msm[0]->reset_w(1);
@@ -765,7 +768,7 @@ void mlanding_state::sub_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x040000, 0x043fff).ram();
-	map(0x050000, 0x0503ff).ram().share("dsp_prog");
+	map(0x050000, 0x0507ff).ram().share("dsp_prog");
 	map(0x060000, 0x060001).w(FUNC(mlanding_state::dsp_control_w));
 	map(0x1c0000, 0x1c3fff).bankrw(m_dma_bank);
 	map(0x1c4000, 0x1cffff).ram().share("sub_com_ram");
@@ -1069,6 +1072,9 @@ ROM_START( mlandingj )
 	ROM_REGION( 0x2000, "adpcm2", 0 )
 	ROM_LOAD( "b09_36.ic111", 0x00000, 0x02000, CRC(51fd3a77) SHA1(1fcbadf1877e25848a1d1017322751560a4823c0) )
 ROM_END
+
+} // Anonymous namespace
+
 
 /*************************************
  *

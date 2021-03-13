@@ -40,14 +40,10 @@ struct mouse_state
 class wininput_module : public input_module_base
 {
 protected:
-	bool  m_global_inputs_enabled;
+	bool  m_global_inputs_enabled = false;
 
 public:
-	wininput_module(const char * type, const char * name)
-		: input_module_base(type, name),
-			m_global_inputs_enabled(false)
-	{
-	}
+	wininput_module(const char *type, const char *name) : input_module_base(type, name) { }
 
 	virtual ~wininput_module() { }
 

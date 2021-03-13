@@ -92,7 +92,7 @@ void jangou_blitter_device::device_start()
 
 void jangou_blitter_device::device_reset()
 {
-	memset(m_pen_data, 0, ARRAY_LENGTH(m_pen_data));
+	std::fill(std::begin(m_pen_data), std::end(m_pen_data), 0);
 	m_bltflip = false;
 	m_src_addr = 0;
 }

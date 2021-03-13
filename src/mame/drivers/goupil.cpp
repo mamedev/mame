@@ -537,18 +537,18 @@ void goupil_base_state::base(machine_config &config)
 	ACIA6850(config, m_acia, 0);
 
 	// TODO: Is this specific to the G1?
-	VIA6522(config, m_via_video, CPU_CLOCK / 4);
+	MOS6522(config, m_via_video, CPU_CLOCK / 4);
 
-	VIA6522(config, m_via_keyb, CPU_CLOCK / 4);
+	MOS6522(config, m_via_keyb, CPU_CLOCK / 4);
 	m_via_keyb->irq_handler().set_inputline(m_maincpu, M6808_IRQ_LINE);
 
-	VIA6522(config, m_via_modem, CPU_CLOCK / 4);
+	MOS6522(config, m_via_modem, CPU_CLOCK / 4);
 	m_via_modem->irq_handler().set_inputline(m_maincpu, M6808_IRQ_LINE);
 
 	/* Floppy */
 	FD1791(config, m_fdc, 8_MHz_XTAL);
-	FLOPPY_CONNECTOR(config, m_floppy0, goupil_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, goupil_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, goupil_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, goupil_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 
 	i8279_device &i8279_kb1(I8279(config, "i8279_kb1", CPU_CLOCK));
 	i8279_kb1.out_sl_callback().set(FUNC(goupil_g1_state::scanlines_kbd1_w));   // scan SL lines
@@ -578,6 +578,7 @@ void goupil_g1_state::goupil_g1(machine_config &config)
 	EF9364(config, m_ef9364, VIDEO_CLOCK);
 	m_ef9364->set_palette_tag("palette");
 	m_ef9364->set_nb_of_pages(1);
+	m_ef9364->set_erase(0x7f);
 
 	m_via_video->writepa_handler().set(FUNC(goupil_g1_state::via_video_pba_w));
 	m_via_video->writepb_handler().set(FUNC(goupil_g1_state::via_video_pbb_w));

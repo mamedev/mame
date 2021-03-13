@@ -686,7 +686,7 @@ uint32_t tubep_state::screen_update_tubep(screen_device &screen, bitmap_ind16 &b
 
 ***************************************************************************/
 
-void tubep_state::rjammer_palette(palette_device &palette) const
+void rjammer_state::rjammer_palette(palette_device &palette) const
 {
 	uint8_t const *color_prom = memregion("proms")->base();
 
@@ -726,19 +726,19 @@ void tubep_state::rjammer_palette(palette_device &palette) const
 }
 
 
-void tubep_state::rjammer_background_LS377_w(uint8_t data)
+void rjammer_state::rjammer_background_LS377_w(uint8_t data)
 {
 	m_ls377_data = data & 0xff;
 }
 
 
-void tubep_state::rjammer_background_page_w(uint8_t data)
+void rjammer_state::rjammer_background_page_w(uint8_t data)
 {
 	m_page = (data & 1) * 0x200;
 }
 
 
-uint32_t tubep_state::screen_update_rjammer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rjammer_state::screen_update_rjammer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int DISP_ = m_DISP^1;
 

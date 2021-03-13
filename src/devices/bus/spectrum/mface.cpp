@@ -141,25 +141,23 @@ ioport_constructor spectrum_mface1_device::device_input_ports() const
 ROM_START(mface1)
 	ROM_REGION(0x2000, "rom", 0)
 	ROM_DEFAULT_BIOS("mu21e7")
-	ROM_SYSTEM_BIOS(0, "mu20fe", "MU 2.0 FE")  // pokes only (no toolkit)
-	ROMX_LOAD("mf1_20_fe.rom", 0x0000, 0x2000, CRC(fa1b8b0d) SHA1(20cd508b0143166558a7238c7a9ccfbe37b90b0d), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "mu2167", "MU 2.1 67")  // Kempston Disc support, no Beta support
-	ROMX_LOAD("mf1_21_67.rom", 0x0000, 0x2000, CRC(d720ec1b) SHA1(91a40d8f503ef825df3e2ed712897dbf4ca3671d), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(2, "mu21e4", "MU 2.1 E4")  // the most common version
-	ROMX_LOAD("mf1_21_e4.rom", 0x0000, 0x2000, CRC(4b31a971) SHA1(ba28754a3cc31a4ca579829ed4310c313409cf5d), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(3, "mu21e7", "MU 2.1 E7")  // last known version?
-	ROMX_LOAD("mf1_21_e7.rom", 0x0000, 0x2000, CRC(670f0ec2) SHA1(50fba2d628f3a2e9219f72980e4efd62fc9ec1f8), ROM_BIOS(3))
-	ROM_SYSTEM_BIOS(4, "bc96", "Brazilian clone 96")  // Brazilian clone, unknown pcb version
-	ROMX_LOAD("mf1_bc_96.rom", 0x0000, 0x2000, CRC(e6fe4507) SHA1(a7e03e7fee3aa05ce1501072aab4534ea7bae257), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(0, "mu12cb", "MU12 CB")  // Very early version, 2KB RAM, page out port 0x5F
+	ROMX_LOAD("mf1_12_cb.rom", 0x0000, 0x2000, CRC(c88fbf9f) SHA1(c3018d1b495b8bc0a135038db0987de7091c9d4c), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "mu2023", "MU 2.0 23")  // pokes only (no toolkit), page out port 0x5F
+	ROMX_LOAD("mf1_20_23.rom", 0x0000, 0x2000, CRC(d4ae8953) SHA1(b442eb634a72fb63f1ccbbd0021a7a581152888d), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "mu20fe", "MU 2.0 FE")  // pokes only (no toolkit)
+	ROMX_LOAD("mf1_20_fe.rom", 0x0000, 0x2000, CRC(fa1b8b0d) SHA1(20cd508b0143166558a7238c7a9ccfbe37b90b0d), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "mu2167", "MU 2.1 67")  // Kempston Disc support, no Beta support
+	ROMX_LOAD("mf1_21_67.rom", 0x0000, 0x2000, CRC(d720ec1b) SHA1(91a40d8f503ef825df3e2ed712897dbf4ca3671d), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(4, "mu21e4", "MU 2.1 E4")  // the most common version
+	ROMX_LOAD("mf1_21_e4.rom", 0x0000, 0x2000, CRC(4b31a971) SHA1(ba28754a3cc31a4ca579829ed4310c313409cf5d), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(5, "mu21e7", "MU 2.1 E7")  // last known version?
+	ROMX_LOAD("mf1_21_e7.rom", 0x0000, 0x2000, CRC(670f0ec2) SHA1(50fba2d628f3a2e9219f72980e4efd62fc9ec1f8), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(6, "bc96", "Brazilian clone 96")  // Brazilian clone, unknown pcb version
+	ROMX_LOAD("mf1_bc_96.rom", 0x0000, 0x2000, CRC(e6fe4507) SHA1(a7e03e7fee3aa05ce1501072aab4534ea7bae257), ROM_BIOS(6))
 ROM_END
 
 /* Todo ...
-
-    ROM_SYSTEM_BIOS(?, "mu12cb", "MU12 CB")  // Very early version, 2KB RAM, page out port 0x5F
-    ROMX_LOAD("mf1_12_cb.rom", 0x0000, 0x2000, CRC(c88fbf9f) SHA1(c3018d1b495b8bc0a135038db0987de7091c9d4c), ROM_BIOS(?))
-
-    ROM_SYSTEM_BIOS(?, "mu2023", "MU 2.0 23")  // pokes only (no toolkit), page out port 0x5F
-    ROMX_LOAD("mf1_20_23.rom", 0x0000, 0x2000, CRC(d4ae8953) SHA1(b442eb634a72fb63f1ccbbd0021a7a581152888d), ROM_BIOS(?))
 
     ROM_SYSTEM_BIOS(?, "mu2090", "MU 2.0, 90")  // pokes only or full toolkit?       NO DUMP?
     ROMX_LOAD("mf1_20_90.rom", 0x0000, 0x2000, CRC(2eaf8e41) SHA1(?), ROM_BIOS(?))
@@ -171,8 +169,14 @@ ROM_END
 ROM_START(mface128)
 	ROM_REGION(0x2000, "rom", 0)
 	ROM_DEFAULT_BIOS("v363c")
-	ROM_SYSTEM_BIOS(0, "v363c", "87.2 V36 3C")
-	ROMX_LOAD("mf128_36_3c.rom", 0x0000, 0x2000, CRC(78ec8cfd) SHA1(8df204ab490b87c389971ce0c7fb5f9cbd281f14), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(0, "v340d", "87.1 V34 0D")
+	ROMX_LOAD("mf128_34_0d.rom", 0x0000, 0x2000, CRC(8d8cfd39) SHA1(2104962bb6097e58fcab63969bbaca424a872bb5), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v350d", "87.12 V35 0F")
+	ROMX_LOAD("mf128_35_0f.rom", 0x0000, 0x2000, CRC(cfefd560) SHA1(6cd6fd2c0fbb40a989a568db9d08ba8eed49cbbd), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "vxx0f", "87.2 Vxx 1D") // unknown PCB version
+	ROMX_LOAD("mf128_xx_1d.rom", 0x0000, 0x2000, CRC(f473991e) SHA1(f03f4ecbcf4a654f4775d16bda0d4cc47f884379), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "v363c", "87.2 V36 3C")
+	ROMX_LOAD("mf128_36_3c.rom", 0x0000, 0x2000, CRC(78ec8cfd) SHA1(8df204ab490b87c389971ce0c7fb5f9cbd281f14), ROM_BIOS(3))
 ROM_END
 
 ROM_START(mface3)
@@ -182,6 +186,9 @@ ROM_START(mface3)
 	ROMX_LOAD("mf3_50_13.rom", 0x0000, 0x2000, CRC(2d594640) SHA1(5d74d2e2e5a537639da92ff120f8a6d86f474495), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v50fe", "V50 FE")
 	ROMX_LOAD("mf3_50_fe.rom", 0x0000, 0x2000, CRC(b5c00f28) SHA1(983699a07665186f498f5827f9b35c442c2178ba), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "vxx9a", "Hard Micro Multiface 3 clone Vxx 9a")
+	ROMX_LOAD("mf3_hm_9a.rom", 0x0000, 0x2000, CRC(2ce53095) SHA1(5fa286f1552f26575a14ab32125d59c26ce95978), ROM_BIOS(2))
+	ROM_IGNORE(0x2000) // ROM is 16K, but contains two identical 8K halves
 ROM_END
 
 ROM_START(mprint)

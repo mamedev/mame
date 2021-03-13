@@ -24,10 +24,7 @@
 
 #include "nl_base.h"
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
 
 	/* FIXME: This should be a single device, i.e. one tristate buffer only.
 	 *
@@ -71,5 +68,4 @@ namespace netlist
 
 	NETLIB_DEVICE_IMPL(74365, "TTL_74365", "+G1Q,+G2Q,+A1,+A2,+A3,+A4,+A5,+A6,@VCC,@GND")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

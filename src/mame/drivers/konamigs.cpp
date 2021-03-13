@@ -21,12 +21,13 @@
      Muscle Ranking Struck Out
      Neratte Don Don
      Pikkari Chance
-     Run Run Puppy
+    *Run Run Puppy / らんらんぱぴぃ
      Soreike! Hanapuu
 
     * denotes these games are archived
 
     TODO:
+     - proper ROZ, runpuppy uses rotation at juming dog animation
      - currently implemented very basic set of Q2SD GPU features, required/used by dumped games, should be improved if more games will be found.
      - hook IRQs from GPU and SPU (not used by dumped games), possible controlled by one MMIO registers in 140010xx area.
      - fix/improve timings, currently DDR Kids have notable desync with music.
@@ -59,9 +60,9 @@ public:
 		, m_rtc_r(*this, "RTCR")
 		, m_rtc_w(*this, "RTCW")
 		, m_dipsw_r(*this, "DSW")
-		, m_vram(*this, "vram", 0)
-		, m_gpuregs(*this, "gpu_regs", 0)
-		, m_ymzram(*this, "ymz_ram", 0)
+		, m_vram(*this, "vram", 0x800000, ENDIANNESS_LITTLE)
+		, m_gpuregs(*this, "gpu_regs", 0x800, ENDIANNESS_LITTLE)
+		, m_ymzram(*this, "ymz_ram")
 		, m_screen(*this, "screen")
 		, m_hopper(*this, "hopper")
 	{ }
@@ -77,8 +78,8 @@ protected:
 	required_ioport m_rtc_r;
 	required_ioport m_rtc_w;
 	required_ioport m_dipsw_r;
-	required_shared_ptr<u16> m_vram;
-	required_shared_ptr<u16> m_gpuregs;
+	memory_share_creator<u16> m_vram;
+	memory_share_creator<u16> m_gpuregs;
 	required_shared_ptr<u8> m_ymzram;
 	required_device<screen_device> m_screen;
 	optional_device<hopper_device> m_hopper;
@@ -760,7 +761,7 @@ void gsan_state::main_map_common(address_map &map)
 {
 	map(0x00000000, 0x0000ffff).rom().region("maincpu", 0);
 	map(0x0c000000, 0x0c3fffff).ram().share("main_ram");
-	map(0x10000000, 0x100007ff).rw(FUNC(gsan_state::gpu_r), FUNC(gsan_state::gpu_w)).share("gpu_regs");
+	map(0x10000000, 0x100007ff).rw(FUNC(gsan_state::gpu_r), FUNC(gsan_state::gpu_w));
 	// misc I/O
 	map(0x14000800, 0x14000807).rw(FUNC(gsan_state::cf_regs_r), FUNC(gsan_state::cf_regs_w));
 	map(0x14000c00, 0x14000c03).rw(FUNC(gsan_state::cf_data_r), FUNC(gsan_state::cf_data_w));
@@ -776,8 +777,8 @@ void gsan_state::main_map_common(address_map &map)
 void gsan_state::main_map(address_map &map)
 {
 	main_map_common(map);
-	map(0x08000000, 0x087fffff).rw(FUNC(gsan_state::vram_r), FUNC(gsan_state::vram_w)).share("vram");
-	map(0x18800000, 0x18ffffff).rw(FUNC(gsan_state::ymzram_r), FUNC(gsan_state::ymzram_w)).share("ymz_ram");
+	map(0x08000000, 0x087fffff).rw(FUNC(gsan_state::vram_r), FUNC(gsan_state::vram_w));
+	map(0x18800000, 0x18ffffff).rw(FUNC(gsan_state::ymzram_r), FUNC(gsan_state::ymzram_w));
 }
 
 void gsan_state::main_port(address_map &map)
@@ -797,8 +798,8 @@ void gsan_state::ymz280b_map(address_map &map)
 void gsan_state::main_map_medal(address_map &map)
 {
 	main_map_common(map);
-	map(0x08000000, 0x083fffff).rw(FUNC(gsan_state::vram_r), FUNC(gsan_state::vram_w)).share("vram");
-	map(0x18800000, 0x18bfffff).rw(FUNC(gsan_state::ymzram_r), FUNC(gsan_state::ymzram_w)).share("ymz_ram");
+	map(0x08000000, 0x083fffff).rw(FUNC(gsan_state::vram_r), FUNC(gsan_state::vram_w));
+	map(0x18800000, 0x18bfffff).rw(FUNC(gsan_state::ymzram_r), FUNC(gsan_state::ymzram_w));
 }
 
 void gsan_state::main_port_medal(address_map &map)
@@ -975,6 +976,17 @@ static INPUT_PORTS_START( muscl )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( runpuppy )
+	PORT_INCLUDE( muscl )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x3000, 0x0000, "Play Timer" ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(      0x3000, "8" )
+	PORT_DIPSETTING(      0x2000, "12" )
+	PORT_DIPSETTING(      0x1000, "16" )
+	PORT_DIPSETTING(      0x0000, "20" )
+INPUT_PORTS_END
+
 //**************************************************************************
 //  MACHINE DRIVERS
 //**************************************************************************
@@ -1101,6 +1113,16 @@ ROM_START( musclhit )
 	DISK_IMAGE( "gsan6_a-213", 0, SHA1(d9e7a350428d1621fc70e81561390c01837a94c0) )
 ROM_END
 
+ROM_START( runpuppy )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "gsan1-a.u17", 0x00000, 0x08000, CRC(515da4bf) SHA1(72062296077db26d6bd1bc47556c2af00d5952e6) )
+
+	ROM_REGION( 0x0f, "rtc", 0 )
+	ROM_LOAD( "nvram.u9", 0x00, 0x0f, CRC(907eb7d3) SHA1(bdbe3618a2c6dd3fb66f8e4c0226c5d827e38d67) )
+
+	DISK_REGION( "ata:0:cfcard:image" )
+	DISK_IMAGE( "an10311003", 0, SHA1(5f972e29c201cdd6697f25140b37a11f02b605f5) )
+ROM_END
 
 
 //**************************************************************************
@@ -1109,3 +1131,4 @@ ROM_END
 
 GAME( 2000, ddrkids,       0, gsan,     ddrkids, gsan_state, init_gsan, ROT0, "Konami",       "Dance Dance Revolution Kids (GQAN4 JAA)", MACHINE_IMPERFECT_TIMING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_SUPPORTS_SAVE )
 GAME( 2000, musclhit,      0, gs_medal, muscl,   gsan_state, init_gsan, ROT0, "Konami / TBS", "Muscle Ranking Kinniku Banzuke Spray Hitter", MACHINE_IMPERFECT_GRAPHICS|MACHINE_SUPPORTS_SAVE )
+GAME( 2000, runpuppy,      0, gs_medal, runpuppy,gsan_state, init_gsan, ROT0, "Konami",       "Run Run Puppy", MACHINE_IMPERFECT_GRAPHICS|MACHINE_SUPPORTS_SAVE )

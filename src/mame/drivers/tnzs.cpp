@@ -625,8 +625,8 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 #include "includes/taitoipt.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
 #include "sound/ym2151.h"
+#include "sound/ym2203.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -703,17 +703,17 @@ void kageki_state::csport_w(uint8_t data)
 	}
 	else
 	{
-		if (data > MAX_SAMPLES)
-		{
-			// stop samples
-			m_samples->stop(0);
-			sprintf(mess, "VOICE:%02X STOP", data);
-		}
-		else
+		if (data < MAX_SAMPLES)
 		{
 			// play samples
 			m_samples->start_raw(0, m_sampledata[data].get(), m_samplesize[data], 7000);
 			sprintf(mess, "VOICE:%02X PLAY", data);
+		}
+		else
+		{
+			// stop samples
+			m_samples->stop(0);
+			sprintf(mess, "VOICE:%02X STOP", data);
 		}
 	//  popmessage(mess);
 	}
@@ -1544,8 +1544,9 @@ void tnzs_base_state::tnzs_base(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
-	SETA001_SPRITE(config, m_seta001, 0);
-	m_seta001->set_gfxdecode_tag("gfxdecode");
+	SETA001_SPRITE(config, m_seta001, 12'000'000, m_palette, gfx_tnzs);
+	m_seta001->set_fg_yoffsets( -0x12, 0x0e );
+	m_seta001->set_bg_yoffsets( 0x1, -0x1 );
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -1556,7 +1557,6 @@ void tnzs_base_state::tnzs_base(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(tnzs_base_state::screen_vblank_tnzs));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tnzs);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 512);
 
 	/* sound hardware */
@@ -1628,7 +1628,7 @@ void insectx_state::insectx(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &insectx_state::insectx_sub_map);
 
 	/* video hardware */
-	m_gfxdecode->set_info(gfx_insectx);
+	m_seta001->set_info(gfx_insectx);
 
 	/* sound hardware */
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/4)); /* verified on pcb */

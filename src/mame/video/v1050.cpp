@@ -98,9 +98,6 @@ WRITE_LINE_MEMBER( v1050_state::crtc_vs_w )
 
 void v1050_state::video_start()
 {
-	/* allocate memory */
-	m_attr_ram.allocate(V1050_VIDEORAM_SIZE);
-
 	/* register for state saving */
 	save_item(NAME(m_attr));
 }

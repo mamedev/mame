@@ -13,7 +13,7 @@
 
 #define TI99_EVPC_CONN_TAG   "evpc_conn"
 
-namespace bus { namespace ti99 { namespace internal {
+namespace bus::ti99::internal {
 
 class evpc_clock_connector : public device_t
 {
@@ -29,7 +29,7 @@ private:
 	devcb_write_line m_vdpint;
 };
 
-} } } // end namespace bus::ti99::internal
+} // end namespace bus::ti99::internal
 
 DECLARE_DEVICE_TYPE_NS(TI99_EVPCCONN, bus::ti99::internal, evpc_clock_connector)
 

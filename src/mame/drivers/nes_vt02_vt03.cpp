@@ -72,6 +72,7 @@ public:
 		m_soc(*this, "soc")
 	{ }
 
+	void nes_vt_pal_1mb(machine_config& config);
 	void nes_vt_pal_2mb(machine_config& config);
 	void nes_vt_pal_4mb(machine_config& config);
 	void nes_vt_pal_8mb(machine_config& config);
@@ -539,6 +540,13 @@ void nes_vt_state::nes_vt_32mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_32mbyte);
 }
 
+void nes_vt_state::nes_vt_pal_1mb(machine_config& config)
+{
+	NES_VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	configure_soc(m_soc);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_1mbyte);
+}
+
 void nes_vt_state::nes_vt_pal_2mb(machine_config& config)
 {
 	NES_VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
@@ -981,6 +989,11 @@ ROM_START( mc_dgear )
 	ROM_LOAD( "dreamgear 75-in-1.prg", 0x00000, 0x400000, CRC(9aabcb8f) SHA1(aa9446b7777fa64503871225fcaf2a17aafd9af1) )
 ROM_END
 
+ROM_START( sudo6in1 )
+	ROM_REGION( 0x100000, "mainrom", 0 )
+	ROM_LOAD( "6n1sudoku.bin", 0x00000, 0x100000, CRC(31089cd4) SHA1(dbfe41d327278dbfa46c7ad7ef327c20648562c1) )
+ROM_END
+
 ROM_START( sen101 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "101n1.bin", 0x00000, 0x400000, CRC(b03e1824) SHA1(c9ac4e16220414c1aa679133191140ced9986e9c) )
@@ -1011,9 +1024,19 @@ ROM_START( vsmaxx17 )
 	ROM_LOAD( "vsmaxx17.bin", 0x00000, 0x200000, CRC(f3fccbb9) SHA1(8b70b10d28f03e72f6b35199001955033a65fd5d) )  // M6MG3D641RB
 ROM_END
 
+ROM_START( vsmax25v )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "vsmaxx25n1_2.bin", 0x00000, 0x400000, CRC(e17e076d) SHA1(0f4e3b6b33ab75dcc12dc02d3347ddb53275c777) )
+ROM_END
+
 ROM_START( dgun851 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "dgun851.bin", 0x00000, 0x400000, CRC(9d51c9fc) SHA1(6f49ea3343eb6e90938aabc9660783f1fc7f6084) )
+ROM_END
+
+ROM_START( dgun853 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "dgpnp50n1dgun853.bin", 0x00000, 0x800000, CRC(118f7286) SHA1(0f4ad7141e887bddba1ab37e75de08e9d56ad841) )
 ROM_END
 
 ROM_START( vsmaxx77 )
@@ -1076,14 +1099,9 @@ ROM_START( pjoys60 )
 	ROM_LOAD( "power joy supermax 60-in-1.prg", 0x00000, 0x400000, CRC(1ab45228) SHA1(d148924afc39fc588235331a1a30df6e0d8e1e18) )
 ROM_END
 
-ROM_START( sarc110 )
+ROM_START( joysti30 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "ic1.prg", 0x00000, 0x400000, CRC(de76f71f) SHA1(ff6b37a76c6463af7ae901918fc008b4a2863951) )
-ROM_END
-
-ROM_START( sarc110a )
-	ROM_REGION( 0x400000, "mainrom", 0 )
-	ROM_LOAD( "ic1_ver2.prg", 0x00000, 0x400000, CRC(b97a0dc7) SHA1(bace32d73184df914113de5336e29a7a6f4c03fa) )
+	ROM_LOAD( "joystick30.bin", 0x00000, 0x400000, CRC(b3f089af) SHA1(478d53d38eeffdbc4a1271d0e060aeb29e919502) )
 ROM_END
 
 // CoolBoy AEF-390 8bit Console, B8VPCBVer03 20130703 0401E2015897A
@@ -1256,6 +1274,13 @@ ROM_START( ppgc200g )
 	ROM_LOAD( "m29dw641.u2", 0x00000, 0x800000, CRC(b16dc677) SHA1(c1984fde4caf9345d41d127db946d1c21ec43ae0) )
 ROM_END
 
+ROM_START( dgun2869 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "myarcaderetromicro_s29gl128p11tfiv1_0001227e.bin", 0x00000, 0x1000000, CRC(5e7fded2) SHA1(cf55ae7a128e3254a22933150caf94e269303ffb) ) // 29GL128
+	ROM_IGNORE(0x100)
+ROM_END
+
+
 
 void nes_vt_state::init_protpp()
 {
@@ -1313,6 +1338,7 @@ CONS( 200?, wldsoctv,  0,  0,  nes_vt_pal_4mb,        nes_vt,  nes_vt_wldsoctv_s
 // for testing 'Shark', 'Octopus', 'Harbor', and 'Earth Fighter' use the extended colour modes, other games just seem to use standard NES modes
 CONS( 200?, mc_dgear,  0,  0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "dreamGEAR", "dreamGEAR 75-in-1", MACHINE_IMPERFECT_GRAPHICS )
 
+CONS( 200?, sudo6in1,  0,  0,  nes_vt_pal_1mb,    nes_vt, nes_vt_state, empty_init, "Nice Code", "6-in-1 Sudoku Plug & Play", MACHINE_IMPERFECT_GRAPHICS ) // no manufacturer info on packaging, games seem to be from Nice Code, although this isn't certain
 
 
 // small black unit, dpad on left, 4 buttons (A,B,X,Y) on right, Start/Reset/Select in middle, unit text "Sudoku Plug & Play TV Game"
@@ -1340,11 +1366,16 @@ CONS( 200?, majgnc,    0, 0,  nes_vt_1mb, majgnc, nes_vt_state,  empty_init, "Ma
 
 // CPU die is marked 'VH2009' There's also a 62256 RAM chip on the PCB, some scrambled opcodes
 CONS( 2004, vsmaxx17,  0,  0,  nes_vt_vh2009_2mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx 17-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // from a Green unit, '17 Classic & Racing Game'
+CONS( 200?, vsmax25v,  0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx 25-in-1 (VT03 hardware)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2004, polmega,   0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Polaroid / JungleTac",  "TV MegaMax active power game system 30-in-1 (MegaMax GPD001SDG)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, dgun851,   0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "dreamGEAR / JungleTac", "Plug 'N' Play 30-in-1 (DGUN-851)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, dgun853,   0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "dreamGEAR / JungleTac", "Plug 'N' Play 50-in-1 (DGUN-853)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, silv35,    0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "SilverLit / JungleTac", "35 in 1 Super Twins", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2004, vsmaxxvd,  0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx Video Extreme 50-in-1 (with Speed Racer and Snood)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, vsmaxx77,  0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx Wireless 77-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, joysti30,  0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "WinFun / JungleTac",    "Joystick 30", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // doesn't show WinFun onscreen, but packaging does
+
+
 // die is marked as VH2009, as above, but no scrambled opcodes here
 CONS( 201?, techni4,   0,  0,  nes_vt_pal_2mb,           nes_vt, nes_vt_state,               empty_init, "Technigame", "Technigame Super 4-in-1 Sports (PAL)", MACHINE_IMPERFECT_GRAPHICS )
 
@@ -1370,9 +1401,6 @@ CONS( 200?, zdog,      0,  0,  nes_vt_hummer_4mb,    nes_vt, nes_vt_hum_state, e
 CONS( 200?, pjoyn50,    0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "PowerJoy Navigator 50 in 1", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, pjoys30,    0,        0,  nes_vt_pjoy_4mb,    nes_vt, nes_vt_pjoy_state, empty_init, "<unknown>", "PowerJoy Supermax 30 in 1", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, pjoys60,    0,        0,  nes_vt_pjoy_4mb,    nes_vt, nes_vt_pjoy_state, empty_init, "<unknown>", "PowerJoy Supermax 60 in 1", MACHINE_IMPERFECT_GRAPHICS )
-// has a non-enhanced version of 'Octopus' as game 30
-CONS( 200?, sarc110,    0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Super Arcade 110 (set 1)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, sarc110a,   sarc110,  0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Super Arcade 110 (set 2)", MACHINE_IMPERFECT_GRAPHICS )
 // both offer chinese or english menus
 CONS( 200?, mc_110cb,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "CoolBoy", "110 in 1 CoolBaby (CoolBoy RS-1S)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, mc_138cb,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "CoolBoy", "138 in 1 CoolBaby (CoolBoy RS-5, PCB060-10009011V1.3)", MACHINE_IMPERFECT_GRAPHICS )
@@ -1428,3 +1456,6 @@ CONS( 200?, dgun2500,  0,  0,  nes_vt_16mb, nes_vt, nes_vt_state, empty_init, "d
 // Also available in handheld form where Supreme 200 is also shown on the main menu background
 // unclear if this is VT03 or VT09, the boot logo needs either VT09 or PAL mode for the DMA to be correct, dump is from a PAL unit
 CONS( 201?, ppgc200g,   0,         0,  nes_vt_pal_8mb, nes_vt, nes_vt_state, empty_init, "Fizz Creations", "Plug & Play Game Controller with 200 Games (Supreme 200)", MACHINE_IMPERFECT_GRAPHICS )
+
+// unknown tech level, it's most likely a vt09 or vt369 but isn't using any of the extended features
+CONS( 201?, dgun2869,  0,         0,  nes_vt_16mb,     nes_vt, nes_vt_state, empty_init, "dreamGEAR", "My Arcade Retro Micro Controller - 220 Built-In Video Games (DGUN-2869)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

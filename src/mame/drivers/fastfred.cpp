@@ -251,7 +251,7 @@ void fastfred_state::sound_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
 	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(FUNC(fastfred_state::sound_nmi_mask_w));
-	map(0x4000, 0x4000).writeonly();  // Reset PSG's
+	map(0x4000, 0x4000).nopw();  // Reset PSG's
 	map(0x5000, 0x5001).w("ay8910.1", FUNC(ay8910_device::address_data_w));
 	map(0x6000, 0x6001).w("ay8910.2", FUNC(ay8910_device::address_data_w));
 	map(0x7000, 0x7000).nopr(); // only for Imago, read but not used

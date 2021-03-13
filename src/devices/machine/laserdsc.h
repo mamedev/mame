@@ -327,7 +327,7 @@ private:
 };
 
 // iterator - interface iterator works for subclasses too
-typedef device_interface_iterator<laserdisc_device> laserdisc_device_iterator;
+typedef device_interface_enumerator<laserdisc_device> laserdisc_device_enumerator;
 
 
 

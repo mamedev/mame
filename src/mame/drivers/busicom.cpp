@@ -2,9 +2,11 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-        Busicom 141-PF
+Busicom 141-PF
 
-        04/08/2009 Initial driver by Miodrag Milanovic
+2009-08-04 Initial driver by Miodrag Milanovic
+
+Multiply and divide work; addition and subtraction do not.
 
 ****************************************************************************/
 
@@ -79,9 +81,9 @@ void busicom_state::printer_w(uint8_t data)
 
 	if (BIT(data, 3))
 	{
-		for (u8 j = 0; j < (ARRAY_LENGTH(m_printer_line) - 1); j++)
+		for (u8 j = 0; j < (std::size(m_printer_line) - 1); j++)
 			std::copy(std::begin(m_printer_line[j + 1]), std::end(m_printer_line[j + 1]), std::begin(m_printer_line[j]));
-		std::copy_n(&m_printer_line_color[1], ARRAY_LENGTH(m_printer_line_color) - 1, &m_printer_line_color[0]);
+		std::copy_n(&m_printer_line_color[1], std::size(m_printer_line_color) - 1, &m_printer_line_color[0]);
 
 		std::fill(std::begin(m_printer_line[10]), std::end(m_printer_line[10]), 0);
 		m_printer_line_color[10] = 0;
@@ -219,11 +221,12 @@ void busicom_state::machine_start()
 
 void busicom_state::machine_reset()
 {
+	m_timer = 0;
 	m_drum_index = 0;
 	m_keyboard_shifter = 0;
 	m_printer_shifter = 0;
 
-	for (int i = 0; i < ARRAY_LENGTH(m_printer_line); i++)
+	for (int i = 0; i < std::size(m_printer_line); i++)
 		std::fill(std::begin(m_printer_line[i]), std::end(m_printer_line[i]), 0);
 	std::fill(std::begin(m_printer_line_color), std::end(m_printer_line_color), 0);
 }
@@ -265,4 +268,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY                          FULLNAME          FLAGS
-COMP( 1974, busicom, 0,      0,      busicom, busicom, busicom_state, empty_init, "Business Computer Corporation", "Busicom 141-PF", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1974, busicom, 0,      0,      busicom, busicom, busicom_state, empty_init, "Business Computer Corporation", "Busicom 141-PF", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

@@ -9,8 +9,9 @@
 #pragma once
 
 #include "cpu/ks0164/ks0164.h"
+#include "diserial.h"
 
-class ks0164_device : public device_t, public device_sound_interface, public device_memory_interface
+class ks0164_device : public device_t, public device_sound_interface, public device_memory_interface, public device_serial_interface
 {
 public:
 	ks0164_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 16934400);
@@ -20,6 +21,9 @@ public:
 	u8 mpu401_data_r();
 	u8 mpu401_status_r();
 
+	void midi_rx(int state) { rx_w(state); }
+	auto midi_tx() { return m_midi_tx.bind(); }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -27,6 +31,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual space_config_vector memory_space_config() const override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
+	virtual void rcv_complete() override;
 
 private:
 	enum {
@@ -36,6 +44,8 @@ private:
 		MPUS_TX_INT  = 0x40,
 		MPUS_RX_INT  = 0x80
 	};
+
+	devcb_write_line m_midi_tx;
 
 	optional_memory_region m_mem_region;
 	required_device<ks0164_cpu_device> m_cpu;
@@ -52,6 +62,9 @@ private:
 	u8 m_mpu_in;
 	u8 m_mpu_out;
 	u8 m_mpu_status;
+
+	u8 m_midi_in;
+	bool m_midi_in_active;
 
 	u8 m_unk60;
 	u8 m_voice_select;
@@ -87,6 +100,11 @@ private:
 	void mpu401_w(u8 data);
 	u8 mpu401_istatus_r();
 	void mpu401_istatus_w(u8 data);
+
+	u8 midi_r();
+	void midi_w(u8 data);
+	u8 midi_status_r();
+	void midi_status_w(u8 data);
 
 	static inline u16 uncomp_8_16(u8 value);
 };

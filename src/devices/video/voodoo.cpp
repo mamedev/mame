@@ -1141,11 +1141,11 @@ void voodoo_device::tmu_state::init(uint8_t vdt, tmu_shared_state &share, voodoo
 void voodoo_device::voodoo_postload()
 {
 	fbi.clut_dirty = true;
-	for (int index = 0; index < ARRAY_LENGTH(tmu); index++)
+	for (tmu_state &tm : tmu)
 	{
-		tmu[index].regdirty = true;
-		for (int subindex = 0; subindex < ARRAY_LENGTH(tmu[index].ncc); subindex++)
-			tmu[index].ncc[subindex].dirty = true;
+		tm.regdirty = true;
+		for (tmu_state::ncc_table &ncc : tm.ncc)
+			ncc.dirty = true;
 	}
 
 	/* recompute video memory to get the FBI FIFO base recomputed */
@@ -1160,7 +1160,7 @@ void voodoo_device::init_save_state(voodoo_device *vd)
 
 	/* register states: core */
 	vd->save_item(NAME(vd->extra_cycles));
-	vd->save_pointer(NAME(&vd->reg[0].u), ARRAY_LENGTH(vd->reg));
+	vd->save_pointer(NAME(&vd->reg[0].u), std::size(vd->reg));
 	vd->save_item(NAME(vd->alt_regmap));
 
 	/* register states: pci */
@@ -1264,7 +1264,7 @@ void voodoo_device::init_save_state(voodoo_device *vd)
 	vd->save_item(NAME(vd->fbi.clut));
 
 	/* register states: tmu */
-	for (int index = 0; index < ARRAY_LENGTH(vd->tmu); index++)
+	for (int index = 0; index < std::size(vd->tmu); index++)
 	{
 		tmu_state *tmu = &vd->tmu[index];
 		if (tmu->ram == nullptr)
@@ -1630,7 +1630,7 @@ void voodoo_device::recompute_video_memory()
 	{
 		case 3: /* reserved */
 			logerror("VOODOO.ERROR:Unexpected memory configuration in recompute_video_memory!\n");
-
+			[[fallthrough]];
 		case 0: /* 2 color buffers, 1 aux buffer */
 			fbi.rgboffs[2] = ~0;
 			fbi.auxoffs = 2 * buffer_pages * 0x1000;
@@ -2751,36 +2751,42 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		/* Vertex data is 12.4 formatted fixed point */
 		case fvertexAx:
 			data = float_to_int32(data, 4);
+			[[fallthrough]];
 		case vertexAx:
 			if (chips & 1) vd->fbi.ax = (int16_t)data;
 			break;
 
 		case fvertexAy:
 			data = float_to_int32(data, 4);
+			[[fallthrough]];
 		case vertexAy:
 			if (chips & 1) vd->fbi.ay = (int16_t)data;
 			break;
 
 		case fvertexBx:
 			data = float_to_int32(data, 4);
+			[[fallthrough]];
 		case vertexBx:
 			if (chips & 1) vd->fbi.bx = (int16_t)data;
 			break;
 
 		case fvertexBy:
 			data = float_to_int32(data, 4);
+			[[fallthrough]];
 		case vertexBy:
 			if (chips & 1) vd->fbi.by = (int16_t)data;
 			break;
 
 		case fvertexCx:
 			data = float_to_int32(data, 4);
+			[[fallthrough]];
 		case vertexCx:
 			if (chips & 1) vd->fbi.cx = (int16_t)data;
 			break;
 
 		case fvertexCy:
 			data = float_to_int32(data, 4);
+			[[fallthrough]];
 		case vertexCy:
 			if (chips & 1) vd->fbi.cy = (int16_t)data;
 			break;
@@ -2788,72 +2794,84 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		/* RGB data is 12.12 formatted fixed point */
 		case fstartR:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case startR:
 			if (chips & 1) vd->fbi.startr = (int32_t)(data << 8) >> 8;
 			break;
 
 		case fstartG:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case startG:
 			if (chips & 1) vd->fbi.startg = (int32_t)(data << 8) >> 8;
 			break;
 
 		case fstartB:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case startB:
 			if (chips & 1) vd->fbi.startb = (int32_t)(data << 8) >> 8;
 			break;
 
 		case fstartA:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case startA:
 			if (chips & 1) vd->fbi.starta = (int32_t)(data << 8) >> 8;
 			break;
 
 		case fdRdX:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case dRdX:
 			if (chips & 1) vd->fbi.drdx = (int32_t)(data << 8) >> 8;
 			break;
 
 		case fdGdX:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case dGdX:
 			if (chips & 1) vd->fbi.dgdx = (int32_t)(data << 8) >> 8;
 			break;
 
 		case fdBdX:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case dBdX:
 			if (chips & 1) vd->fbi.dbdx = (int32_t)(data << 8) >> 8;
 			break;
 
 		case fdAdX:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case dAdX:
 			if (chips & 1) vd->fbi.dadx = (int32_t)(data << 8) >> 8;
 			break;
 
 		case fdRdY:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case dRdY:
 			if (chips & 1) vd->fbi.drdy = (int32_t)(data << 8) >> 8;
 			break;
 
 		case fdGdY:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case dGdY:
 			if (chips & 1) vd->fbi.dgdy = (int32_t)(data << 8) >> 8;
 			break;
 
 		case fdBdY:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case dBdY:
 			if (chips & 1) vd->fbi.dbdy = (int32_t)(data << 8) >> 8;
 			break;
 
 		case fdAdY:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case dAdY:
 			if (chips & 1) vd->fbi.dady = (int32_t)(data << 8) >> 8;
 			break;
@@ -2861,18 +2879,21 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		/* Z data is 20.12 formatted fixed point */
 		case fstartZ:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case startZ:
 			if (chips & 1) vd->fbi.startz = (int32_t)data;
 			break;
 
 		case fdZdX:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case dZdX:
 			if (chips & 1) vd->fbi.dzdx = (int32_t)data;
 			break;
 
 		case fdZdY:
 			data = float_to_int32(data, 12);
+			[[fallthrough]];
 		case dZdY:
 			if (chips & 1) vd->fbi.dzdy = (int32_t)data;
 			break;
@@ -3207,7 +3228,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		case fbiInit6:
 			if (vd->vd_type < TYPE_VOODOO_2)
 				break;
-			/* else fall through... */
+			[[fallthrough]];
 
 		/* fbiInitX can only be written if initEnable says we can -- Voodoo/Voodoo2 only */
 		/* most of these affect memory layout, so always recompute that when done */
@@ -3437,8 +3458,7 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 		case clipLowYHighY:
 		case clipLeftRight:
 			poly_wait(vd->poly, vd->regnames[regnum]);
-			/* fall through to default implementation */
-
+			[[fallthrough]];
 		/* by default, just feed the data to the chips */
 		default:
 default_case:
@@ -4571,6 +4591,7 @@ uint32_t voodoo_device::register_r(voodoo_device *vd, offs_t offset)
 		case fbiAfuncFail:
 		case fbiPixelsOut:
 			vd->update_statistics(true);
+			[[fallthrough]];
 		case fbiTrianglesOut:
 			result = vd->reg[regnum].u & 0xffffff;
 			break;
@@ -4851,7 +4872,7 @@ u8 voodoo_banshee_device::banshee_vga_r(offs_t offset)
 	{
 		/* attribute access */
 		case 0x3c0:
-			if (banshee.vga[0x3c1 & 0x1f] < ARRAY_LENGTH(banshee.att))
+			if (banshee.vga[0x3c1 & 0x1f] < std::size(banshee.att))
 				result = banshee.att[banshee.vga[0x3c1 & 0x1f]];
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_att_r(%X)\n", machine().describe_context(), banshee.vga[0x3c1 & 0x1f]);
@@ -4872,7 +4893,7 @@ u8 voodoo_banshee_device::banshee_vga_r(offs_t offset)
 
 		/* Sequencer access */
 		case 0x3c5:
-			if (banshee.vga[0x3c4 & 0x1f] < ARRAY_LENGTH(banshee.seq))
+			if (banshee.vga[0x3c4 & 0x1f] < std::size(banshee.seq))
 				result = banshee.seq[banshee.vga[0x3c4 & 0x1f]];
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_seq_r(%X)\n", machine().describe_context(), banshee.vga[0x3c4 & 0x1f]);
@@ -4895,7 +4916,7 @@ u8 voodoo_banshee_device::banshee_vga_r(offs_t offset)
 
 		/* Graphics controller access */
 		case 0x3cf:
-			if (banshee.vga[0x3ce & 0x1f] < ARRAY_LENGTH(banshee.gc))
+			if (banshee.vga[0x3ce & 0x1f] < std::size(banshee.gc))
 				result = banshee.gc[banshee.vga[0x3ce & 0x1f]];
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_gc_r(%X)\n", machine().describe_context(), banshee.vga[0x3ce & 0x1f]);
@@ -4903,7 +4924,7 @@ u8 voodoo_banshee_device::banshee_vga_r(offs_t offset)
 
 		/* CRTC access */
 		case 0x3d5:
-			if (banshee.vga[0x3d4 & 0x1f] < ARRAY_LENGTH(banshee.crtc))
+			if (banshee.vga[0x3d4 & 0x1f] < std::size(banshee.crtc))
 				result = banshee.crtc[banshee.vga[0x3d4 & 0x1f]];
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_crtc_r(%X)\n", machine().describe_context(), banshee.vga[0x3d4 & 0x1f]);
@@ -5419,7 +5440,7 @@ void voodoo_banshee_device::banshee_vga_w(offs_t offset, u8 data)
 			}
 			else
 			{
-				if (banshee.vga[0x3c1 & 0x1f] < ARRAY_LENGTH(banshee.att))
+				if (banshee.vga[0x3c1 & 0x1f] < std::size(banshee.att))
 					banshee.att[banshee.vga[0x3c1 & 0x1f]] = data;
 				if (LOG_REGISTERS)
 					logerror("%s:banshee_att_w(%X) = %02X\n", machine().describe_context(), banshee.vga[0x3c1 & 0x1f], data);
@@ -5429,7 +5450,7 @@ void voodoo_banshee_device::banshee_vga_w(offs_t offset, u8 data)
 
 		/* Sequencer access */
 		case 0x3c5:
-			if (banshee.vga[0x3c4 & 0x1f] < ARRAY_LENGTH(banshee.seq))
+			if (banshee.vga[0x3c4 & 0x1f] < std::size(banshee.seq))
 				banshee.seq[banshee.vga[0x3c4 & 0x1f]] = data;
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_seq_w(%X) = %02X\n", machine().describe_context(), banshee.vga[0x3c4 & 0x1f], data);
@@ -5437,7 +5458,7 @@ void voodoo_banshee_device::banshee_vga_w(offs_t offset, u8 data)
 
 		/* Graphics controller access */
 		case 0x3cf:
-			if (banshee.vga[0x3ce & 0x1f] < ARRAY_LENGTH(banshee.gc))
+			if (banshee.vga[0x3ce & 0x1f] < std::size(banshee.gc))
 				banshee.gc[banshee.vga[0x3ce & 0x1f]] = data;
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_gc_w(%X) = %02X\n", machine().describe_context(), banshee.vga[0x3ce & 0x1f], data);
@@ -5445,7 +5466,7 @@ void voodoo_banshee_device::banshee_vga_w(offs_t offset, u8 data)
 
 		/* CRTC access */
 		case 0x3d5:
-			if (banshee.vga[0x3d4 & 0x1f] < ARRAY_LENGTH(banshee.crtc))
+			if (banshee.vga[0x3d4 & 0x1f] < std::size(banshee.crtc))
 				banshee.crtc[banshee.vga[0x3d4 & 0x1f]] = data;
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_crtc_w(%X) = %02X\n", machine().describe_context(), banshee.vga[0x3d4 & 0x1f], data);
@@ -5501,7 +5522,7 @@ void voodoo_banshee_device::banshee_io_w(offs_t offset, u32 data, u32 mem_mask)
 				fbi.width = data & 0xfff;
 			if (data & 0xfff000)
 				fbi.height = (data >> 12) & 0xfff;
-			/* fall through */
+			[[fallthrough]];
 		case io_vidOverlayDudx:
 		case io_vidOverlayDvdy:
 		{
@@ -5703,7 +5724,7 @@ void voodoo_device::device_start()
 
 	/* set the type, and initialize the chip mask */
 	index = 0;
-	for (device_t &scan : device_iterator(machine().root_device()))
+	for (device_t &scan : device_enumerator(machine().root_device()))
 		if (scan.type() == this->type())
 		{
 			if (&scan == this)
@@ -5819,7 +5840,6 @@ int32_t voodoo_device::fastfill(voodoo_device *vd)
 	uint16_t dithermatrix[16];
 	uint16_t *drawbuf = nullptr;
 	uint32_t pixels = 0;
-	int extnum, x, y;
 
 	/* if we're not clearing either, take no time */
 	if (!FBZMODE_RGB_BUFFER_MASK(vd->reg[fbzMode].u) && !FBZMODE_AUX_BUFFER_MASK(vd->reg[fbzMode].u))
@@ -5845,11 +5865,11 @@ int32_t voodoo_device::fastfill(voodoo_device *vd)
 		}
 
 		/* determine the dither pattern */
-		for (y = 0; y < 4; y++)
+		for (int y = 0; y < 4; y++)
 		{
 			DECLARE_DITHER_POINTERS_NO_DITHER_VAR;
 			COMPUTE_DITHER_POINTERS_NO_DITHER_VAR(vd->reg[fbzMode].u, y);
-			for (x = 0; x < 4; x++)
+			for (int x = 0; x < 4; x++)
 			{
 				int r = vd->reg[color1].rgb.r;
 				int g = vd->reg[color1].rgb.g;
@@ -5864,14 +5884,13 @@ int32_t voodoo_device::fastfill(voodoo_device *vd)
 	/* fill in a block of extents */
 	extents[0].startx = sx;
 	extents[0].stopx = ex;
-	for (extnum = 1; extnum < ARRAY_LENGTH(extents); extnum++)
-		extents[extnum] = extents[0];
+	std::fill(std::begin(extents) + 1, std::end(extents), extents[0]);
 
 	/* iterate over blocks of extents */
-	for (y = sy; y < ey; y += ARRAY_LENGTH(extents))
+	for (int y = sy; y < ey; y += std::size(extents))
 	{
 		poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(vd->poly);
-		int count = (std::min)(ey - y, int(ARRAY_LENGTH(extents)));
+		int count = (std::min)(ey - y, int(std::size(extents)));
 
 		extra->device = vd;
 		memcpy(extra->dither, dithermatrix, sizeof(extra->dither));

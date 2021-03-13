@@ -165,14 +165,14 @@ uint16_t md_jcart_device::read(offs_t offset)
 
 		if (m_jcart_io_data[0] & 0x40)
 		{
-			joy[0] = m_jcart3.read_safe(0);
-			joy[1] = m_jcart4.read_safe(0);
+			joy[0] = m_jcart3->read();
+			joy[1] = m_jcart4->read();
 			return (m_jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 		}
 		else
 		{
-			joy[0] = ((m_jcart3.read_safe(0) & 0xc0) >> 2) | (m_jcart3.read_safe(0) & 0x03);
-			joy[1] = ((m_jcart4.read_safe(0) & 0xc0) >> 2) | (m_jcart4.read_safe(0) & 0x03);
+			joy[0] = ((m_jcart3->read() & 0xc0) >> 2) | (m_jcart3->read() & 0x03);
+			joy[1] = ((m_jcart4->read() & 0xc0) >> 2) | (m_jcart4->read() & 0x03);
 			return (m_jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 		}
 	}
@@ -208,14 +208,14 @@ uint16_t md_seprom_codemast_device::read(offs_t offset)
 
 		if (m_jcart_io_data[0] & 0x40)
 		{
-			joy[0] = m_jcart3.read_safe(0);
-			joy[1] = m_jcart4.read_safe(0);
+			joy[0] = m_jcart3->read();
+			joy[1] = m_jcart4->read();
 			return (m_jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 		}
 		else
 		{
-			joy[0] = ((m_jcart3.read_safe(0) & 0xc0) >> 2) | (m_jcart3.read_safe(0) & 0x03);
-			joy[1] = ((m_jcart4.read_safe(0) & 0xc0) >> 2) | (m_jcart4.read_safe(0) & 0x03);
+			joy[0] = ((m_jcart3->read() & 0xc0) >> 2) | (m_jcart3->read() & 0x03);
+			joy[1] = ((m_jcart4->read() & 0xc0) >> 2) | (m_jcart4->read() & 0x03);
 			return (m_jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 		}
 	}

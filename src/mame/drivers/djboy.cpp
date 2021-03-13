@@ -142,8 +142,8 @@ Notes:
 #include "includes/djboy.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
 #include "sound/okim6295.h"
+#include "sound/ym2203.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -206,9 +206,7 @@ void djboy_state::mastercpu_am(address_map &map)
 	map(0x8000, 0xafff).bankr("master_bank_l");
 	map(0xb000, 0xbfff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_r), FUNC(kaneko_pandora_device::spriteram_w));
 	map(0xc000, 0xdfff).bankr("master_bank");
-	map(0xe000, 0xefff).ram().share("share1");
-	map(0xf000, 0xf7ff).ram();
-	map(0xf800, 0xffff).ram();
+	map(0xe000, 0xffff).ram().share("share1");
 }
 
 void djboy_state::mastercpu_port_am(address_map &map)

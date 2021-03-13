@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 #ifndef NLID_SYSTEM_H_
 #define NLID_SYSTEM_H_
@@ -16,10 +16,8 @@
 
 #include <random>
 
-namespace netlist
-{
-namespace devices
-{
+namespace netlist::devices {
+
 	// -----------------------------------------------------------------------------
 	// clock
 	// -----------------------------------------------------------------------------
@@ -579,7 +577,6 @@ namespace devices
 		state_var<distribution> m_dis;
 	};
 
-} // namespace devices
-} // namespace netlist
+} // namespace netlist::devices
 
 #endif // NLD_SYSTEM_H_

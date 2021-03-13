@@ -39,9 +39,6 @@
 #define NEOCD_REGION_JAPAN 0
 
 
-uint8_t NeoSystem = NEOCD_REGION_JAPAN;
-
-
 class ngcd_state : public aes_base_state
 {
 public:
@@ -83,7 +80,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
 
 	// neoCD
-
+	uint8_t m_system_region;
 	int32_t m_active_transfer_area;
 	int32_t m_sprite_transfer_bank;
 	int32_t m_adpcm_transfer_bank;
@@ -127,7 +124,7 @@ public:
 	std::unique_ptr<uint8_t[]> m_sprite_ram;
 	std::unique_ptr<uint8_t[]> m_fix_ram;
 
-	void neocd(machine_config &config);
+	void neocd_ntsc(machine_config &config);
 	void neocd_audio_io_map(address_map &map);
 	void neocd_audio_map(address_map &map);
 	void neocd_main_map(address_map &map);
@@ -193,7 +190,7 @@ uint16_t ngcd_state::control_r(offs_t offset)
 			return m_tempcdc->neocd_cdd_rx_r();
 
 		case 0x011C: // region
-			return ~((0x10 | (NeoSystem & 3)) << 8);
+			return ~((0x10 | (m_system_region & 3)) << 8);
 	}
 
 
@@ -887,7 +884,7 @@ void ngcd_state::neocd_main_map(address_map &map)
 {
 	aes_base_main_map(map);
 
-	map(0x000000, 0x1fffff).ram().region("maincpu", 0x00000);
+	map(0x000000, 0x1fffff).ram().share("maincpu");
 	map(0x000000, 0x00007f).r(FUNC(ngcd_state::banked_vectors_r)); // writes will fall through to area above
 
 	map(0x800000, 0x803fff).rw(FUNC(ngcd_state::memcard_r), FUNC(ngcd_state::memcard_w));
@@ -1035,8 +1032,8 @@ uint32_t ngcd_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	return 0;
 }
 
-
-void ngcd_state::neocd(machine_config &config)
+// NTSC region
+void ngcd_state::neocd_ntsc(machine_config &config)
 {
 	neogeo_base(config);
 	neogeo_stereo(config);
@@ -1089,9 +1086,6 @@ ROM_START( neocd )
 	ROM_SYSTEM_BIOS( 3, "unibios33", "Universe Bios (Hack, Ver. 3.3)" )
 	ROMX_LOAD("uni-bioscd33.rom",    0x00000, 0x80000, CRC(ff3abc59) SHA1(5142f205912869b673a71480c5828b1eaed782a8), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(3))
 
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
-	/* 2MB of 68K RAM */
-
 	ROM_REGION( 0x20000, "spritegen:zoomy", 0 )
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
 ROM_END
@@ -1105,9 +1099,6 @@ ROM_START( neocdz )
 	ROM_SYSTEM_BIOS( 2, "unibios33", "Universe Bios (Hack, Ver. 3.3)" )
 	ROMX_LOAD("uni-bioscd33.rom",    0x00000, 0x80000, CRC(ff3abc59) SHA1(5142f205912869b673a71480c5828b1eaed782a8), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
 
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
-	/* 2MB of 68K RAM */
-
 	ROM_REGION( 0x20000, "spritegen:zoomy", 0 )
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
 ROM_END
@@ -1116,17 +1107,18 @@ ROM_END
 
 void ngcd_state::init_neocdz()
 {
-	NeoSystem = NEOCD_REGION_US;
+	m_system_region = NEOCD_REGION_US;
 }
 
 void ngcd_state::init_neocdzj()
 {
-	NeoSystem = NEOCD_REGION_JAPAN;
+	m_system_region = NEOCD_REGION_JAPAN;
 }
 
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS        INIT          COMPANY FULLNAME               FLAGS */
-CONS( 1996, neocdz,  0,      0,      neocd,   neocd,  ngcd_state,  init_neocdz,  "SNK",  "Neo-Geo CDZ (US)",    0 ) // the CDZ is the newer model
-CONS( 1996, neocdzj, neocdz, 0,      neocd,   neocd,  ngcd_state,  init_neocdzj, "SNK",  "Neo-Geo CDZ (Japan)", 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT   CLASS        INIT          COMPANY FULLNAME               FLAGS */
+CONS( 1996, neocdz,  0,      0,      neocd_ntsc, neocd,  ngcd_state,  init_neocdz,  "SNK",  "Neo-Geo CDZ (US)",    0 ) // the CDZ is the newer model
+CONS( 1996, neocdzj, neocdz, 0,      neocd_ntsc, neocd,  ngcd_state,  init_neocdzj, "SNK",  "Neo-Geo CDZ (Japan)", 0 )
 
-CONS( 1994, neocd,   neocdz, 0,      neocd,   neocd,  ngcd_state,  empty_init,   "SNK",  "Neo-Geo CD",          MACHINE_NOT_WORKING ) // older  model, ignores disc protections?
+// NTSC region?
+CONS( 1994, neocd,   neocdz, 0,      neocd_ntsc, neocd,  ngcd_state,  empty_init,   "SNK",  "Neo-Geo CD (NTSC?)",  MACHINE_NOT_WORKING ) // older  model, ignores disc protections?

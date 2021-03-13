@@ -13,10 +13,8 @@
 
 #pragma once
 
-#include "osdcore.h"
-#include "strformat.h"
-
 #include <string>
+#include <string_view>
 
 #include <cstring>
 
@@ -56,16 +54,16 @@ bool core_iswildstr(const char *sp);
 
 void strdelchr(std::string& str, char chr);
 void strreplacechr(std::string& str, char ch, char newch);
-std::string &strtrimspace(std::string& str);
-std::string &strtrimrightspace(std::string& str);
-std::string &strmakeupper(std::string& str);
-std::string &strmakelower(std::string& str);
+[[nodiscard]] std::string_view strtrimspace(std::string_view str);
+[[nodiscard]] std::string_view strtrimrightspace(std::string_view str);
+[[nodiscard]] std::string strmakeupper(std::string_view str);
+[[nodiscard]] std::string strmakelower(std::string_view str);
 int strreplace(std::string &str, const std::string& search, const std::string& replace);
 
 namespace util {
 
 // based on Jaro-Winkler distance - returns value from 0.0 (totally dissimilar) to 1.0 (identical)
-double edit_distance(std::u32string const &lhs, std::u32string const &rhs);
+double edit_distance(std::u32string_view lhs, std::u32string_view rhs);
 
 } // namespace util
 

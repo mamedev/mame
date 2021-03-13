@@ -351,6 +351,19 @@ ROM_END
   |______________________________________________________________________________|
 */
 ROM_START(diolakoa)
+	PHILIPS_REF34VA
+
+	ROM_REGION(0x20000, "program", 0)
+	ROM_LOAD("mt_plus_8_38.ic3", 0x00000, 0x20000, CRC(5d58bbbc) SHA1(b47adf99c2a443792b99d3881602ffdbdccfd3b9))
+
+	ROM_REGION(0x800, "eeprom", 0)
+	ROM_LOAD("24c16.ic6", 0x000, 0x800, NO_DUMP)
+
+	ROM_REGION(0x117, "plds", 0)
+	ROM_LOAD("palce16v8h.ic8", 0x000, 0x117, NO_DUMP)
+ROM_END
+
+ROM_START(diola827)
 	// REF 0034 9515S (without Philips logos)
 	PHILIPS_REF34VA
 
@@ -370,4 +383,5 @@ GAME(199?, dibif743, dibifuca, microdar, microdar, microdar_state, empty_init, R
 GAME(199?, dibif727, dibifuca, microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v7.27)",                           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1997, cfarwest, 0,        microdar, microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Far West (Compumatic)",                          MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1997, prospdp,  0,        prospdp,  microdar, microdar_state, empty_init, ROT0, "Compumatic",          "Unknown Compumatic ProSPDP based darts machine", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1997, diolakoa, 0,        microdv5, microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa",                                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, diolakoa, 0,        microdv5, microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa (v8.38)",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1997, diola827, diolakoa, microdv5, microdar, microdar_state, empty_init, ROT0, "Compumatic / Olakoa", "Diana Olakoa (v8.27)",                           MACHINE_IS_SKELETON_MECHANICAL)

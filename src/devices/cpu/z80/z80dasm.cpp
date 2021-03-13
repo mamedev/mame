@@ -497,7 +497,7 @@ offs_t z80_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 				break;
 			case 'X':
 				offset = params.r8(pos++);
-				/* fall through */
+				[[fallthrough]];
 			case 'Y':
 				util::stream_format(stream,"(%s%c$%02x)", ixy, sign(offset), offs(offset) );
 				break;

@@ -157,7 +157,7 @@
 
 DEFINE_DEVICE_TYPE_NS(INTERPRO_LLE_EN_US_KEYBOARD, bus::interpro::keyboard, lle_en_us_device, "kbd_lle_en_us", "InterPro Keyboard (LLE, US English)")
 
-namespace bus { namespace interpro { namespace keyboard {
+namespace bus::interpro::keyboard {
 
 namespace {
 
@@ -610,4 +610,4 @@ ioport_constructor lle_en_us_device::device_input_ports() const
 	return INPUT_PORTS_NAME(lle_en_us_device);
 }
 
-} } } // namespace bus::interpro::keyboard
+} // namespace bus::interpro::keyboard

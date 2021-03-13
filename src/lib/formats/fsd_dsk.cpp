@@ -83,7 +83,7 @@ bool fsd_format::supports_save() const
 	return false;
 }
 
-int fsd_format::identify(io_generic *io, uint32_t form_factor)
+int fsd_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t h[3];
 
@@ -95,7 +95,7 @@ int fsd_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool fsd_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool fsd_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	const char* result[255];
 	result[0x00] = "OK";

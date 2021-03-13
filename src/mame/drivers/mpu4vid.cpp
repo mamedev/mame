@@ -209,6 +209,8 @@ TODO:
 #include "v4strike.lh"
 
 
+namespace {
+
 class mpu4vid_state : public mpu4_state
 {
 public:
@@ -217,7 +219,7 @@ public:
 		mpu4_state(mconfig, type, tag),
 		m_videocpu(*this, "video"),
 		m_scn2674(*this, "scn2674_vid"),
-		m_vid_vidram(*this, "vid_vidram"),
+		m_vid_vidram(*this, "vid_vidram", 0x20000, ENDIANNESS_BIG),
 		m_vid_mainram(*this, "vid_mainram"),
 		m_acia_0(*this, "acia6850_0"),
 		m_acia_1(*this, "acia6850_1"),
@@ -267,10 +269,16 @@ public:
 	void init_cybcas();
 	void init_v4frfact();
 	void init_bwbhack();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_device<m68000_base_device> m_videocpu;
 	optional_device<scn2674_device> m_scn2674;
-	optional_shared_ptr<uint16_t> m_vid_vidram;
+	memory_share_creator<uint16_t> m_vid_vidram;
 	optional_shared_ptr<uint16_t> m_vid_mainram;
 	required_device<acia6850_device> m_acia_0;
 	required_device<acia6850_device> m_acia_1;
@@ -287,9 +295,6 @@ private:
 	int m_gfx_index;
 	int8_t m_cur[2];
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 	DECLARE_WRITE_LINE_MEMBER(m6809_acia_irq);
 	DECLARE_WRITE_LINE_MEMBER(m68k_acia_irq);
@@ -321,6 +326,7 @@ private:
 	void mpu4_vram(address_map &map);
 	void mpu4oki_68k_map(address_map &map);
 
+	void mpu4_6809_map(address_map &map);
 	void mpu4_6809_german_map(address_map &map);
 
 	void vidcharacteriser_4k_lookup_w(offs_t offset, uint8_t data);
@@ -346,7 +352,7 @@ private:
  *************************************/
 
 /* The interrupt system consists of a 74148 priority encoder
-   with the following interrupt priorites.  A lower number
+   with the following interrupt priorities.  A lower number
    indicates a lower priority:
 
     7 - Game Card
@@ -500,8 +506,6 @@ void mpu4vid_state::mpu4_vid_vidram_w(offs_t offset, uint16_t data, uint16_t mem
 
 void mpu4vid_state::video_start()
 {
-	m_vid_vidram.allocate(0x20000/2);
-
 	memset(m_vid_vidram,0,0x20000);
 
 	/* find first empty slot to decode gfx */
@@ -512,7 +516,15 @@ void mpu4vid_state::video_start()
 	assert(m_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_gfx_index+0, std::make_unique<gfx_element>(m_palette, mpu4_vid_char_8x8_layout, reinterpret_cast<uint8_t *>(m_vid_vidram.target()), NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0));
+	m_gfxdecode->set_gfx(
+			m_gfx_index+0,
+			std::make_unique<gfx_element>(
+				m_palette,
+				mpu4_vid_char_8x8_layout,
+				reinterpret_cast<uint8_t *>(m_vid_vidram.target()),
+				NATIVE_ENDIAN_VALUE_LE_BE(8,0),
+				m_palette->entries() / 16,
+				0));
 }
 
 EF9369_COLOR_UPDATE( mpu4vid_state::ef9369_color_update )
@@ -1880,6 +1892,9 @@ void mpu4vid_state::machine_reset()
 	m_prot_col  = 0;
 	m_chr_counter    = 0;
 	m_chr_value     = 0;
+
+	m_m6840_irq_state = 0;
+	m_m6850_irq_state = 0;
 }
 
 void mpu4vid_state::mpu4_68k_map_base(address_map &map)
@@ -1991,9 +2006,14 @@ void mpu4vid_state::mpu4_vid_bt_a00002_w(offs_t offset, uint8_t data)
 {
 	switch (m_bt_which)
 	{
-	case 0: m_btpal_r[m_bt_palbase] = data;
-	case 1: m_btpal_g[m_bt_palbase] = data;
-	case 2: m_btpal_b[m_bt_palbase] = data;
+	case 0:
+		m_btpal_r[m_bt_palbase] = data;
+		[[fallthrough]]; // FIXME: really?
+	case 1:
+		m_btpal_g[m_bt_palbase] = data;
+		[[fallthrough]]; // FIXME: really?
+	case 2:
+		m_btpal_b[m_bt_palbase] = data;
 	}
 
 	m_bt_which++;
@@ -2016,7 +2036,7 @@ void mpu4vid_state::bwbvidoki_68k_bt471_map(address_map& map)
 }
 
 /* TODO: Fix up MPU4 map*/
-void mpu4_state::mpu4_6809_map(address_map &map)
+void mpu4vid_state::mpu4_6809_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x0800, 0x0801).rw("acia6850_0", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
@@ -4262,7 +4282,7 @@ ROM_START( v4turnovd )
 	ROM_REGION( 0x800000, "video", 0 )
 	ROM_LOAD16_BYTE( "tov2.2p1",0x000000, 0x010000, CRC(460a5dd0) SHA1(42bc54b0ca206606b980dd80ccf0cbfb3210769d) )
 	ROM_LOAD16_BYTE( "tov2.2p2",0x000000, 0x010000, NO_DUMP )
-	// + unkonwn additional ROMs
+	// + an unknown number of additional ROMs
 ROM_END
 
 
@@ -8961,6 +8981,7 @@ ROM_START( v4rencasi )
 	/* none present */
 ROM_END
 
+} // Anonymous namespace
 
 
 /* Complete sets */
@@ -8971,7 +8992,7 @@ the copyright dates recorded.
 TODO: Sort these better given the wide variation in dates/versions/core code (SWP version id, for one thing).
 */
 
-GAME(  199?, v4bios,     0,        mod2,       mpu4vid,     mpu4_state,    empty_init,     ROT0, "Barcrest","MPU4 Video Firmware",MACHINE_IS_BIOS_ROOT )
+GAME(  199?, v4bios,     0,        mod2,       mpu4vid,     mpu4_state,    init_m4default_banks,     ROT0, "Barcrest","MPU4 Video Firmware",MACHINE_IS_BIOS_ROOT )
 
 #define GAME_FLAGS MACHINE_NOT_WORKING
 #define GAME_FLAGS_OK (MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)

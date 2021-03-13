@@ -48,7 +48,7 @@ at28c16_device::at28c16_device(const machine_config &mconfig, const char *tag, d
 		m_a9_12v(0),
 		m_oe_12v(0),
 		m_last_write(-1),
-		m_default_data(*this, DEVICE_SELF, AT28C16_DATA_BYTES)
+		m_default_data(*this, DEVICE_SELF)
 {
 }
 

@@ -231,7 +231,7 @@ m6805_hmos_device::m6805_hmos_device(machine_config const &mconfig, char const *
 m68705_device::m68705_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, u32 addr_width, unsigned ram_size)
 	: m6805_hmos_device(mconfig, tag, owner, clock, type, addr_width, ram_size)
 	, device_nvram_interface(mconfig, *this)
-	, m_user_rom(*this, DEVICE_SELF, u32(1) << addr_width)
+	, m_user_rom(*this, DEVICE_SELF)
 	, m_vihtp(CLEAR_LINE)
 	, m_pcr(0xff)
 	, m_pl_data(0xff)

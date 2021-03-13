@@ -667,6 +667,7 @@ void i8275_device::dack_w(uint8_t data)
 		if (m_buffer_idx == CHARACTERS_PER_ROW)
 		{
 			// stop DMA
+			m_drq_on_timer->adjust(attotime::never);
 		}
 		else if (!(m_dma_idx % DMA_BURST_COUNT))
 		{

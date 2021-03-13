@@ -26,6 +26,7 @@ public:
 
 	// callbacks
 	auto irq() { return m_write_irq.bind(); }
+	auto sqw() { return m_write_sqw.bind(); }
 
 	// The MC146818 doesn't have century support (some variants do), but when syncing the date & time at startup we can optionally store the century.
 	void set_century_index(int century_index) { assert(!century_count_enabled()); m_century_index = century_index; }
@@ -165,8 +166,10 @@ protected:
 	emu_timer *m_periodic_timer;
 
 	devcb_write_line m_write_irq;
+	devcb_write_line m_write_sqw;
 	int m_century_index, m_epoch;
 	bool m_use_utc, m_binary, m_hour, m_binyear;
+	bool m_sqw_state;
 };
 
 

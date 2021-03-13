@@ -29,21 +29,18 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
 
 private:
-	static constexpr device_timer_id TIMER_TC = 0;
+	TIMER_CALLBACK_MEMBER(tc_off);
 
 	// internal state
 	required_device<z80_device> m_cpu;
 	required_device<upd765a_device> m_fdc;
 	required_device<i8255_device> m_ppi;
-
-	floppy_image_device *m_fd0;
-	floppy_image_device *m_fd1;
+	required_device_array<floppy_connector, 2> m_fd;
 
 	emu_timer *m_timer_tc;
 

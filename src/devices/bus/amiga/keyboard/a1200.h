@@ -14,7 +14,7 @@
 #include "keyboard.h"
 
 
-namespace bus { namespace amiga { namespace keyboard {
+namespace bus::amiga::keyboard {
 
 //**************************************************************************
 //  TYPE DECLARATIONS
@@ -55,7 +55,7 @@ private:
 	bool                        m_host_kdat, m_mpu_kdat;
 };
 
-} } } // namespace bus::amiga::keyboard
+} // namespace bus::amiga::keyboard
 
 
 //**************************************************************************

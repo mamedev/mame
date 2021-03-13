@@ -829,7 +829,7 @@ QUICKLOAD_LOAD_MEMBER(einstein_state::quickload_cb)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
-	if (quickload_size >= 0xfd00)
+	if (image.length() >= 0xfd00)
 		return image_init_result::FAIL;
 
 	/* disable rom */
@@ -837,6 +837,7 @@ QUICKLOAD_LOAD_MEMBER(einstein_state::quickload_cb)
 	m_bank1->set_entry(m_rom_enabled);
 
 	/* load image */
+	uint16_t quickload_size = image.length();
 	for (uint16_t i = 0; i < quickload_size; i++)
 	{
 		uint8_t data;
@@ -951,10 +952,10 @@ void einstein_state::einstein(machine_config &config)
 	/* floppy */
 	WD1770(config, m_fdc, XTAL_X002);
 
-	FLOPPY_CONNECTOR(config, IC_I042 ":0", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, IC_I042 ":1", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, IC_I042 ":2", einstein_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, IC_I042 ":3", einstein_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, IC_I042 ":0", einstein_floppies, "3ss", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, IC_I042 ":1", einstein_floppies, "3ss", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, IC_I042 ":2", einstein_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, IC_I042 ":3", einstein_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "disk_list").set_original("einstein").set_filter("TC01");

@@ -19,7 +19,7 @@
 #include "sound/mos6581.h"
 #include "speaker.h"
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 class sidmaster_device : public device_t, public device_ti99_peribox_card_interface
 {
@@ -40,7 +40,7 @@ private:
 	required_device<mos6581_device> m_sid;
 };
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 
 DECLARE_DEVICE_TYPE_NS(TI99_SIDMASTER, bus::ti99::peb, sidmaster_device)
 

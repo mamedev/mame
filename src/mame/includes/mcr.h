@@ -93,6 +93,8 @@ public:
 	void mcr_90010(machine_config &config);
 	void cpu_90009_map(address_map &map);
 	void cpu_90009_portmap(address_map &map);
+	void cpu_90009_dp_map(address_map &map);
+	void cpu_90009_dp_portmap(address_map &map);
 	void cpu_90010_map(address_map &map);
 	void cpu_90010_portmap(address_map &map);
 	void cpu_91490_map(address_map &map);
@@ -147,7 +149,8 @@ public:
 		mcr_state(mconfig, type, tag),
 		m_coin_in_timer(*this, "coinin"),
 		m_hopper_timer(*this, "hopper"),
-		m_lamps(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U),
+		m_meter_ram(*this, "meter", 0x200, ENDIANNESS_LITTLE)
 	{ }
 
 	uint8_t ip0_r();
@@ -175,6 +178,7 @@ private:
 	required_device<timer_device> m_coin_in_timer;
 	required_device<timer_device> m_hopper_timer;
 	output_finder<14> m_lamps;
+	memory_share_creator<uint8_t> m_meter_ram;
 };
 
 class mcr_nflfoot_state : public mcr_state

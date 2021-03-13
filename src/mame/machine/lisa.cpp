@@ -941,6 +941,9 @@ void lisa_state::machine_start()
 	m_cops_ready_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 
 	m_nvram->set_base(m_fdc_ram, 1024);
+
+	m_fifo_tail = 0;
+	m_videoROM_address = 0;
 }
 
 void lisa_state::machine_reset()

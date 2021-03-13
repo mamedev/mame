@@ -24,7 +24,7 @@
 #include "machine/74259.h"
 #include "machine/74543.h"
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 class nouspikel_ide_card_device : public device_t, public device_ti99_peribox_card_interface
 {
@@ -68,6 +68,9 @@ private:
 	// RTC type
 	int m_rtctype;
 
+	// Genmod decoding. If not used, the AME line is pulled up, and the AMD line is pulled down
+	bool m_genmod;
+
 	DECLARE_WRITE_LINE_MEMBER(clock_interrupt_callback);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt_callback);
 	DECLARE_WRITE_LINE_MEMBER(resetdr_callback);
@@ -75,7 +78,7 @@ private:
 	void decode(offs_t offset, bool& mmap, bool& sramsel, bool& xramsel, bool& rtcsel, bool& cs1fx, bool& cs3fx);
 };
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 
 DECLARE_DEVICE_TYPE_NS(TI99_IDE, bus::ti99::peb, nouspikel_ide_card_device)
 

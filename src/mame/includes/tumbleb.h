@@ -22,6 +22,10 @@ public:
 		m_pf1_data(*this, "pf1_data"),
 		m_pf2_data(*this, "pf2_data"),
 		m_control(*this, "control"),
+		m_pf1_tilemap(nullptr),
+		m_pf1_alt_tilemap(nullptr),
+		m_pf2_tilemap(nullptr),
+		m_pf2_alt_tilemap(nullptr),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki"),
@@ -29,7 +33,8 @@ public:
 		m_palette(*this, "palette"),
 		m_sprgen(*this, "spritegen"),
 		m_screen(*this, "screen"),
-		m_soundlatch(*this, "soundlatch")
+		m_soundlatch(*this, "soundlatch"),
+		m_protbase(0)
 	{ }
 
 	void tumblepb(machine_config &config);

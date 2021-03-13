@@ -687,7 +687,7 @@ static void mpz80_s100_cards(device_slot_interface &device)
 
 void mpz80_state::machine_start()
 {
-	m_map_ram.allocate(0x200);
+	m_task = 0;
 }
 
 

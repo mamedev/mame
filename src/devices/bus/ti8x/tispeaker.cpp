@@ -11,7 +11,7 @@ DEFINE_DEVICE_TYPE_NS(TI8X_SPEAKER_STEREO, bus::ti8x, stereo_speaker_device, "ti
 DEFINE_DEVICE_TYPE_NS(TI8X_SPEAKER_MONO,   bus::ti8x, mono_speaker_device,   "ti8x_mspkr",  "TI-8x Speaker (Mono)")
 
 
-namespace bus { namespace ti8x {
+namespace bus::ti8x {
 
 stereo_speaker_device::stereo_speaker_device(
 		machine_config const &mconfig,
@@ -99,4 +99,4 @@ WRITE_LINE_MEMBER(mono_speaker_device::input_ring)
 	m_speaker->level_w((m_tip_state || m_ring_state) ? 1 : 0);
 }
 
-} } // namespace bus::ti8x
+} // namespace bus::ti8x

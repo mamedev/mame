@@ -47,6 +47,9 @@ public:
 		, m_floppy2(*this, WD1795_TAG":2")
 		, m_floppy3(*this, WD1795_TAG":3")
 		, m_rom(*this, Z80_TAG)
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
 	{ }
 
 	void xor100(machine_config &config);
@@ -90,6 +93,9 @@ private:
 	required_device<floppy_connector> m_floppy2;
 	required_device<floppy_connector> m_floppy3;
 	required_memory_region m_rom;
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
+	required_memory_bank m_bank3;
 
 	// memory state
 	int m_mode;

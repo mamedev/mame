@@ -1,0 +1,391 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="alphasmart_kapps" description="AlphaSmart 3000 SmartApplets">
+
+	<software name="accreader_uk_1_3" supported="no">
+		<description>Accelerated Reader (1.3, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x15f98">
+				<rom name="acceleratedreader_1.3.os3kapp" size="0x15f98" crc="cc96dcf3" sha1="8bb9ebc6e4d3705c892bfc7d0506b3f4cc6bd117" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="accreader_uk_1_2" cloneof="accreader_uk_1_3" supported="no">
+		<description>Accelerated Reader (1.2, English (UK))</description>
+		<year>2010</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x157c4">
+				<rom name="acceleratedreader_1.2.os3kapp" size="0x157c4" crc="2c9ec0bf" sha1="179427a8e40c6462348a6cac97d81fbfe3b8c8ce" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alphaquiz_uk_3_1" supported="no">
+		<description>AlphaQuiz (3.1, English (UK))</description>
+		<year>2006</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0xc2a4">
+				<rom name="alphaquiz_3.1.os3kapp" size="0xc2a4" crc="d9c3a120" sha1="e83f259affb31847f539489c2e2c3106ea67b143" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alpwrdp_uk_3_4" supported="no">
+		<description>AlphaWord Plus (3.4, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x1a0bc">
+				<rom name="alphawordplus_3.4.os3kapp" size="0x1a0bc" crc="8def3c61" sha1="78524bbe97a40f84456da90afba08ff0eeb16cd3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beamer_uk_1_01" supported="no">
+		<description>Beamer (1.01, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x7f44">
+				<rom name="beamer_1.01.os3kapp" size="0x7f44" crc="1fd74572" sha1="00678113fecf001feb108fe3be3f0146e4eb0ce0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="calc_uk_3_02" supported="no">
+		<description>Calculator (3.02, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x5fe0">
+				<rom name="calculator_3.02.os3kapp" size="0x5fe0" crc="503841d5" sha1="f16aa368c97ac94380bca004195828d62bc44c75" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpanel_uk_1_07" supported="no">
+		<description>Control Panel (1.07, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x6b14">
+				<rom name="controlpanel_1.07.os3kapp" size="0x6b14" crc="4415737e" sha1="02e7f1c7bd90055a57ba40544c80f7d9d86d35dd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpanel_uk_1_04" cloneof="cpanel_uk_1_07" supported="no">
+		<description>Control Panel (1.04, English (UK))</description>
+		<year>2009</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x67e0">
+				<rom name="controlpanel_1.04.os3kapp" size="0x67e0" crc="0236a203" sha1="26008cb37ecd4c743da2d99dd56e016ffd77d244" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keywords_uk_3_6" supported="no">
+		<description>KeyWords (3.6, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x1efa8">
+				<rom name="keywords_3.6.os3kapp" size="0x1efa8" crc="2649ce8e" sha1="f5e7c855ac117bd281b7e745b7f17e4772751376" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keywordsw_uk_4_2" supported="no">
+		<description>KeyWords Wireless (4.2, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x2d350">
+				<rom name="keywordswireless_4.2.os3kapp" size="0x2d350" crc="6e22eacc" sha1="64fdfded26406eee58fd49ef1b69be495fd33b98" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathfacts_uk_1_3" supported="no">
+		<description>MathFacts in a Flash RP (1.3, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x16e20">
+				<rom name="mathfactsinaflash_1.3.os3kapp" size="0x16e20" crc="dbab7bb7" sha1="ac9b45bd56f42ec877b30b6a9fc03e54f57ece49" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathfacts_uk_1_1" cloneof="mathfacts_uk_1_3" supported="no">
+		<description>MathFacts in a Flash RP (1.1, English (UK))</description>
+		<year>2010</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x10208">
+				<rom name="mathfactsinaflash_1.1.os3kapp" size="0x10208" crc="91f171b4" sha1="64873e9fe2034c352d0e7df536d7c453c1405568" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathfacts_uk_1_2" supported="no">
+		<description>MathFacts in a Flash (offline) (1.2, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x2582c">
+				<rom name="mathfactsoffline_1.2.os3kapp" size="0x2582c" crc="696cc9a3" sha1="6350dc4075cc250372cea862a12d7353b6b26321" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathfacts_uk_1_0" cloneof="mathfacts_uk_1_2" supported="no">
+		<description>MathFacts in a Flash (offline) (1.0, English (UK))</description>
+		<year>2010</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x20b44">
+				<rom name="mathfactsoffline_1.0.os3kapp" size="0x20b44" crc="72fd9d3e" sha1="b32894c3ac728c2d2aaeba8f6cac1c8337668930" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neofontlg_uk_1_0" supported="no">
+		<description>Neo Font - Large (4 lines) (1.0, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x10a8">
+				<rom name="neofontlarge_1.0.os3kapp" size="0x10a8" crc="b93445df" sha1="443b9913340dafe4458ebdb81ad2482ced914e2e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neofontmd_uk_1_0" supported="no">
+		<description>Neo Font - Medium (5 lines) (1.0, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x1108">
+				<rom name="neofontmedium_1.0.os3kapp" size="0x1108" crc="eb1f4cd9" sha1="748052988f0a943a2adf77f88bc10f895ea5a778" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neofntsm_uk_1_0" supported="no">
+		<description>Neo Font - Small (6 lines) (1.0, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x1044">
+				<rom name="neofontsmall_1.0.os3kapp" size="0x1044" crc="f9e8725e" sha1="408158654bb770bd0583c901960ac7906d16574a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neofntvlg_uk_1_0" supported="no">
+		<description>Neo Font - Very Large (3 lines) (1.0, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x24b0">
+				<rom name="neofontvlarge_1.0.os3kapp" size="0x24b0" crc="1d6b247e" sha1="9837224ee0b174e8e38142489d6ce0c7f902e4bd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neofntxlg_uk_1_0" supported="no">
+		<description>Neo Font - Extra Large (2 lines) (1.0, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x3360">
+				<rom name="neofontxlarge_1.0.os3kapp" size="0x3360" crc="f9bc0976" sha1="8fa7d7c7643b287db0a73aa48bcbb6afa7fc8367" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="responder_uk_1_2" supported="no">
+		<description>Responder (1.2, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x8da4">
+				<rom name="responder_1.2.os3kapp" size="0x8da4" crc="8a0746f7" sha1="65a68c5b27f84b8878ac9a9d73a75b5d0fa97657" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sp_lg_us_uk_1_03" supported="no">
+		<description>SpellCheck Large USA (1.03, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x573c0">
+				<rom name="spellcheck_large_usa_1.03.os3kapp" size="0x573c0" crc="d174f613" sha1="503d2ee6a2e39ad726e55abe0357bd6847ccffe7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sp_lg_us_uk_1_02" cloneof="sp_lg_us_uk_1_03" supported="no">
+		<description>SpellCheck Large USA (1.02, English (UK))</description>
+		<year>2010</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x57488">
+				<rom name="spellcheck_large_usa_1.02.os3kapp" size="0x57488" crc="f9739dcf" sha1="82efe569563029ee9ff6750c46cd516d6230aee5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sp_sm_us_uk_1_03" supported="no">
+		<description>SpellCheck Small USA (1.03, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x2dac0">
+				<rom name="spellcheck_small_usa_1.03.os3kapp" size="0x2dac0" crc="c929f42a" sha1="688dcd474123919203470b245dcdab681da98455" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sp_sm_us_uk_1_02" cloneof="sp_sm_us_uk_1_03" supported="no">
+		<description>SpellCheck Small USA (1.02, English (UK))</description>
+		<year>2010</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x2db54">
+				<rom name="spellcheck_small_usa_1.02.os3kapp" size="0x2db54" crc="66e8ac4b" sha1="2e5c74d0b879d9caff688f0489493315db2fc791" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sp_spa_uk_1_0" supported="no">
+		<description>SpellCheck Spanish (1.0, Dutch)</description>
+		<year>2006</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0xadb60">
+				<rom name="spellcheck_spanish_1.0.os3kapp" size="0xadb60" crc="648d2f65" sha1="42d8a7f7ad3ab4227447a99466c7b812fbe37919" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttsupdate_uk_1_4" supported="no">
+		<description>Text2Speech Updater (1.4, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x2cc4">
+				<rom name="text2speechupdate_1.4.os3kapp" size="0x2cc4" crc="1fe2eb78" sha1="71d613105e241437dcd895ddc87f3c74ff6a2857" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttsupdate_uk_1_3" cloneof="ttsupdate_uk_1_4" supported="no">
+		<description>Text2Speech Updater (1.3, English (UK))</description>
+		<year>2010</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x2cb0">
+				<rom name="text2speechupdate_1.3.os3kapp" size="0x2cb0" crc="a3ec580a" sha1="06caea2b9305d18da583dcd9e80712599f6f556e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="th_lg_usa_uk_1_1" supported="no">
+		<description>Thesaurus Large USA (1.1, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x598cc">
+				<rom name="thesaurus_large_usa_1.1.os3kapp" size="0x598cc" crc="322817f5" sha1="99354fac798d7aaccb05e48493e4659d166c697c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="th_lg_usa_uk_1_0" cloneof="th_lg_usa_uk_1_1" supported="no">
+		<description>Thesaurus Large USA (1.0, English (UK))</description>
+		<year>2005</year>
+		<publisher>AlphaSmart, LLC</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x592d4">
+				<rom name="thesaurus_large_usa_1.0.os3kapp" size="0x592d4" crc="798ec48c" sha1="6f055c4e2be8683ab8f1652617a949558fa2bdf0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="th_sm_usa_uk_1_1" supported="no">
+		<description>Thesaurus Small USA (1.1, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x3f63c">
+				<rom name="thesaurus_small_usa_1.1.os3kapp" size="0x3f63c" crc="f789b852" sha1="9162f41d3b5537e295be88b7cfa1f1d4d244447e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="th_sm_usa_uk_1_0" cloneof="th_sm_usa_uk_1_1" supported="no">
+		<description>Thesaurus Small USA (1.0, English (UK))</description>
+		<year>2005</year>
+		<publisher>AlphaSmart, LLC</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x3f5e4">
+				<rom name="thesaurus_small_usa_1.0.os3kapp" size="0x3f5e4" crc="95121e74" sha1="ead2cba7b17b1e783362a26b23731b10217c32a9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="th_sp2eng_uk_1_1" supported="no">
+		<description>Thesaurus Spanish to English (1.1, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x598cc">
+				<rom name="thesaurusspanishtoeng.os3kap" size="105120" crc="afddefbd" sha1="34a976f0f84d71f80d807c3f045a612f4554982e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrlstr_uk_1_1" supported="no">
+		<description>Wireless File Transfer (1.1, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0xc4e4">
+				<rom name="wirelessfiletransfer_1.1.os3kapp" size="0xc4e4" crc="698a4fc3" sha1="a3b759affa876b2ba759955df21d6ca6d74c1cda" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrlsupdt_uk_2_0" supported="no">
+		<description>Wireless Updater (2.0, English (UK))</description>
+		<year>2012</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0x193e4">
+				<rom name="wirelessupdate_2.0.os3kapp" size="0x193e4" crc="e0110d57" sha1="b70f74effc5941e091264e64894a79d5f4b21528" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrlsupdt_uk_1_3" cloneof="wrlsupdt_uk_2_0" supported="no">
+		<description>Wireless Updater (1.3, English (UK))</description>
+		<year>2008</year>
+		<publisher>Renaissance Learning, Inc.</publisher>
+		<part name="kapp" interface="alphasmart_kapp">
+			<dataarea name="kapp" size="0xc2a4">
+				<rom name="wirelessupdate_1.3.os3kapp" size="0xc2a4" crc="c73046b0" sha1="4404c9605d1887188cb2646f3ee0b004d7082171" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

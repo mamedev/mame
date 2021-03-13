@@ -1770,6 +1770,7 @@ void tms5220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			case 0x03:
 				/* High Impedance */
 				m_io_ready = param;
+				break;
 			case 0x00:
 				/* illegal */
 				m_io_ready = param;

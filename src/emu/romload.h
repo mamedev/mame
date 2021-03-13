@@ -51,7 +51,6 @@ template <typename T> inline bool ROMENTRY_ISPARAMETER(T const &r)     { return 
 template <typename T> inline bool ROMENTRY_ISREGIONEND(T const &r)     { return ROMENTRY_ISREGION(r) || ROMENTRY_ISPARAMETER(r) || ROMENTRY_ISEND(r); }
 
 /* ----- per-region macros ----- */
-#define ROMREGION_GETTAG(r)         ((r)->name().c_str())
 template <typename T> inline u32  ROMREGION_GETLENGTH(T const &r)      { return ROMENTRY_UNWRAP(r).get_length(); }
 template <typename T> inline u32  ROMREGION_GETFLAGS(T const &r)       { return ROMENTRY_UNWRAP(r).get_flags(); }
 template <typename T> inline u32  ROMREGION_GETWIDTH(T const &r)       { return 8 << ((ROMREGION_GETFLAGS(r) & ROMREGION_WIDTHMASK) >> 8); }
@@ -71,7 +70,6 @@ template <typename T> inline bool ROMREGION_ISDISKDATA(T const &r)     { return 
 template <typename T> inline u32  ROM_GETOFFSET(T const &r)            { return ROMENTRY_UNWRAP(r).get_offset(); }
 template <typename T> inline u32  ROM_GETLENGTH(T const &r)            { return ROMENTRY_UNWRAP(r).get_length(); }
 template <typename T> inline u32  ROM_GETFLAGS(T const &r)             { return ROMENTRY_UNWRAP(r).get_flags(); }
-#define ROM_GETHASHDATA(r)          ((r)->hashdata().c_str())
 template <typename T> inline bool ROM_ISOPTIONAL(T const &r)           { return (ROM_GETFLAGS(r) & ROM_OPTIONALMASK) == ROM_OPTIONAL; }
 template <typename T> inline u32  ROM_GETGROUPSIZE(T const &r)         { return ((ROM_GETFLAGS(r) & ROM_GROUPMASK) >> 8) + 1; }
 template <typename T> inline u32  ROM_GETSKIPCOUNT(T const &r)         { return (ROM_GETFLAGS(r) & ROM_SKIPMASK) >> 12; }
@@ -387,9 +385,9 @@ class rom_load_manager
 	class open_chd
 	{
 	public:
-		open_chd(const char *region) : m_region(region) { }
+		open_chd(std::string_view region) : m_region(region) { }
 
-		const char *region() const { return m_region.c_str(); }
+		std::string_view region() const { return m_region; }
 		chd_file &chd() { return m_diffchd.opened() ? m_diffchd : m_origchd; }
 		chd_file &orig_chd() { return m_origchd; }
 		chd_file &diff_chd() { return m_diffchd; }
@@ -418,12 +416,12 @@ public:
 	/* ----- disk handling ----- */
 
 	/* return a pointer to the CHD file associated with the given region */
-	chd_file *get_disk_handle(const char *region);
+	chd_file *get_disk_handle(std::string_view region);
 
 	/* set a pointer to the CHD file associated with the given region */
-	int set_disk_handle(const char *region, const char *fullpath);
+	int set_disk_handle(std::string_view region, const char *fullpath);
 
-	void load_software_part_region(device_t &device, software_list_device &swlist, const char *swname, const rom_entry *start_region);
+	void load_software_part_region(device_t &device, software_list_device &swlist, std::string_view swname, const rom_entry *start_region);
 
 	/* get search path for a software item */
 	static std::vector<std::string> get_software_searchpath(software_list_device &swlist, const software_info &swinfo);
@@ -438,20 +436,20 @@ private:
 	void fill_random(u8 *base, u32 length);
 	void handle_missing_file(const rom_entry *romp, const std::vector<std::string> &tried_file_names, chd_error chderr);
 	void dump_wrong_and_correct_checksums(const util::hash_collection &hashes, const util::hash_collection &acthashes);
-	void verify_length_and_hash(emu_file *file, const char *name, u32 explength, const util::hash_collection &hashes);
+	void verify_length_and_hash(emu_file *file, std::string_view name, u32 explength, const util::hash_collection &hashes);
 	void display_loading_rom_message(const char *name, bool from_list);
 	void display_rom_load_results(bool from_list);
 	void region_post_process(memory_region *region, bool invert);
 	std::unique_ptr<emu_file> open_rom_file(std::initializer_list<std::reference_wrapper<const std::vector<std::string> > > searchpath, const rom_entry *romp, std::vector<std::string> &tried_file_names, bool from_list);
-	std::unique_ptr<emu_file> open_rom_file(const std::vector<std::string> &paths, std::vector<std::string> &tried, bool has_crc, u32 crc, const std::string &name, osd_file::error &filerr);
+	std::unique_ptr<emu_file> open_rom_file(const std::vector<std::string> &paths, std::vector<std::string> &tried, bool has_crc, u32 crc, std::string_view name, osd_file::error &filerr);
 	int rom_fread(emu_file *file, u8 *buffer, int length, const rom_entry *parent_region);
 	int read_rom_data(emu_file *file, const rom_entry *parent_region, const rom_entry *romp);
 	void fill_rom_data(const rom_entry *romp);
 	void copy_rom_data(const rom_entry *romp);
 	void process_rom_entries(std::initializer_list<std::reference_wrapper<const std::vector<std::string> > > searchpath, u8 bios, const rom_entry *parent_region, const rom_entry *romp, bool from_list);
 	chd_error open_disk_diff(emu_options &options, const rom_entry *romp, chd_file &source, chd_file &diff_chd);
-	void process_disk_entries(std::initializer_list<std::reference_wrapper<const std::vector<std::string> > > searchpath, const char *regiontag, const rom_entry *romp, std::function<const rom_entry * ()> next_parent);
-	void normalize_flags_for_device(const char *rgntag, u8 &width, endianness_t &endian);
+	void process_disk_entries(std::initializer_list<std::reference_wrapper<const std::vector<std::string> > > searchpath, std::string_view regiontag, const rom_entry *romp, std::function<const rom_entry * ()> next_parent);
+	void normalize_flags_for_device(std::string_view rgntag, u8 &width, endianness_t &endian);
 	void process_region_list();
 
 	// internal state

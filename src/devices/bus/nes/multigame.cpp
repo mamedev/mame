@@ -1770,6 +1770,7 @@ void nes_bmc_ball11_device::write_h(offs_t offset, uint8_t data)
 	{
 		case 0x4000:    // here we also update reg[0] upper bit
 			m_reg[0] = (m_reg[0] & 0x01) | ((data >> 3) & 0x02);
+			[[fallthrough]];
 		case 0x0000:
 		case 0x2000:
 		case 0x6000:

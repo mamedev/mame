@@ -43,9 +43,9 @@ public:
 	auto readca2_handler() { return m_in_ca2_handler.bind(); }
 	auto readcb1_handler() { return m_in_cb1_handler.bind(); }
 
-	// TODO: CONVERT THESE TO WRITE LINE
 	auto writepa_handler() { return m_out_a_handler.bind(); }
 	auto writepb_handler() { return m_out_b_handler.bind(); }
+	auto tspb_handler() { return m_ts_b_handler.bind(); }
 
 	auto ca2_handler() { return m_ca2_handler.bind(); }
 	auto cb2_handler() { return m_cb2_handler.bind(); }
@@ -104,6 +104,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -162,6 +163,7 @@ private:
 	devcb_read_line m_in_ca2_handler;
 	devcb_write8 m_out_a_handler;
 	devcb_write8 m_out_b_handler;
+	devcb_read8 m_ts_b_handler;
 	devcb_write_line m_ca2_handler;
 	devcb_write_line m_cb2_handler;
 	devcb_write_line m_irqa_handler;
@@ -175,8 +177,8 @@ private:
 	uint8_t m_out_ca2;
 	uint8_t m_ddr_a;
 	uint8_t m_ctl_a;
-	uint8_t m_irq_a1;
-	uint8_t m_irq_a2;
+	bool m_irq_a1;
+	bool m_irq_a2;
 	uint8_t m_irq_a_state;
 
 	uint8_t m_in_b;
@@ -187,8 +189,8 @@ private:
 	uint8_t m_last_out_cb2_z;
 	uint8_t m_ddr_b;
 	uint8_t m_ctl_b;
-	uint8_t m_irq_b1;
-	uint8_t m_irq_b2;
+	bool m_irq_b1;
+	bool m_irq_b2;
 	uint8_t m_irq_b_state;
 
 	// variables that indicate if access a line externally -

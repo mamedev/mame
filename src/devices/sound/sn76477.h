@@ -42,6 +42,8 @@
 
 #include "machine/rescap.h"
 
+#include "wavwrite.h"
+
 
 /*****************************************************************************
  *
@@ -186,24 +188,24 @@ private:
 	double m_pitch_voltage;
 
 	// internal state
-	double m_one_shot_cap_voltage;        /* voltage on the one-shot cap */
-	uint32_t m_one_shot_running_ff;         /* 1 = one-shot running, 0 = stopped */
+	double m_one_shot_cap_voltage;        // voltage on the one-shot cap
+	uint32_t m_one_shot_running_ff;       // 1 = one-shot running, 0 = stopped
 
-	double m_slf_cap_voltage;             /* voltage on the SLF cap */
-	uint32_t m_slf_out_ff;                  /* output of the SLF */
+	double m_slf_cap_voltage;             // voltage on the SLF cap
+	uint32_t m_slf_out_ff;                // output of the SLF
 
-	double m_vco_cap_voltage;             /* voltage on the VCO cap */
-	uint32_t m_vco_out_ff;                  /* output of the VCO */
-	uint32_t m_vco_alt_pos_edge_ff;         /* keeps track of the # of positive edges for VCO Alt envelope */
+	double m_vco_cap_voltage;             // voltage on the VCO cap
+	uint32_t m_vco_out_ff;                // output of the VCO
+	uint32_t m_vco_alt_pos_edge_ff;       // keeps track of the # of positive edges for VCO Alt envelope
 
-	double m_noise_filter_cap_voltage;    /* voltage on the noise filter cap */
-	uint32_t m_real_noise_bit_ff;           /* the current noise bit before filtering */
-	uint32_t m_filtered_noise_bit_ff;       /* the noise bit after filtering */
-	uint32_t m_noise_gen_count;             /* noise freq emulation */
+	double m_noise_filter_cap_voltage;    // voltage on the noise filter cap
+	uint32_t m_real_noise_bit_ff;         // the current noise bit before filtering
+	uint32_t m_filtered_noise_bit_ff;     // the noise bit after filtering
+	uint32_t m_noise_gen_count;           // noise freq emulation
 
-	double m_attack_decay_cap_voltage;    /* voltage on the attack/decay cap */
+	double m_attack_decay_cap_voltage;    // voltage on the attack/decay cap
 
-	uint32_t m_rng;                         /* current value of the random number generator */
+	uint32_t m_rng;                       // current value of the random number generator
 
 	// configured by the drivers and used to setup m_mixer_mode & m_envelope_mode at start
 	uint32_t m_mixer_a;
@@ -213,10 +215,10 @@ private:
 	uint32_t m_envelope_2;
 
 	/* others */
-	sound_stream *m_channel;              /* returned by stream_create() */
-	int m_our_sample_rate;                    /* from machine.sample_rate() */
+	sound_stream *m_channel;              // returned by stream_create()
+	int m_our_sample_rate;                // from machine.sample_rate()
 
-	wav_file *m_file;                     /* handle of the wave file to produce */
+	util::wav_file_ptr m_file;            // handle of the wave file to produce
 
 	double compute_one_shot_cap_charging_rate();
 	double compute_one_shot_cap_discharging_rate();

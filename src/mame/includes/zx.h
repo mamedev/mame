@@ -57,6 +57,10 @@ public:
 
 	void init_zx();
 
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -70,8 +74,6 @@ private:
 	void zx80_io_w(offs_t offset, uint8_t data);
 	void zx81_io_w(offs_t offset, uint8_t data);
 
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	void zx_tape_input();
 	void zx_ula_hsync();
 

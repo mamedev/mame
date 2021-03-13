@@ -566,7 +566,8 @@ void hec2hrp_state::video_start()
 	save_item(NAME(m_counter_write));
 	save_item(NAME(m_irq_current_state));
 	save_item(NAME(m_nmi_current_state));
-	save_item(NAME(m_hector_videoram_hrx));
+
+	m_hector_flag_80c = false;
 }
 
 

@@ -68,7 +68,7 @@ DEFINE_DEVICE_TYPE_NS(CCDCC_PALU1, bus::ti99::peb, ccdcc_palu1_device, CCDCC_PAL
 DEFINE_DEVICE_TYPE_NS(CCFDC_PALU12, bus::ti99::peb, ccfdc_palu12_device, CCFDC_PALU12_TAG, "CorComp FDC PAL u12")
 DEFINE_DEVICE_TYPE_NS(CCFDC_PALU6, bus::ti99::peb, ccfdc_palu6_device, CCFDC_PALU6_TAG, "CorComp FDC PAL u6")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 // ----------------------------------
 
@@ -470,10 +470,12 @@ INPUT_PORTS_START( cc_fdc )
 		PORT_DIPSETTING( 0xc0, "3 ms")
 INPUT_PORTS_END
 
-FLOPPY_FORMATS_MEMBER(corcomp_fdc_device::floppy_formats)
-	FLOPPY_TI99_SDF_FORMAT,
-	FLOPPY_TI99_TDF_FORMAT
-FLOPPY_FORMATS_END
+void corcomp_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_TI99_SDF_FORMAT);
+	fr.add(FLOPPY_TI99_TDF_FORMAT);
+}
 
 static void ccfdc_floppies(device_slot_interface &device)
 {
@@ -826,4 +828,5 @@ void ccfdc_palu6_device::device_config_complete()
 	m_board = static_cast<corcomp_fdca_device*>(owner());
 	m_decpal = static_cast<ccfdc_dec_pal_device*>(owner()->subdevice(CCFDC_PALU12_TAG));
 }
-} } } // end namespace bus::ti99::peb
+
+} // end namespace bus::ti99::peb

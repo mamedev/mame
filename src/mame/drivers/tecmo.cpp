@@ -54,6 +54,176 @@ f808      ROM bank selector
 f809      ????
 f80b      ????
 
+***************************************************************************
+
+Rygar, Tecmo 1986
+Hardware Info By Guru
+
+PCB Layout
+----------
+6002-A
+|-----------------------------------------------------------------|
+|DSW2               4MHz                            24MHz         |
+|DSW1                    M4069                                    |
+|                                                                |-|
+|                   Z80B                            MN50005XTA   | |
+|1                            5.5P                               | |
+|8                                                               | |
+|W                            4.5M                               | |
+|A                  MA7053                6116                   |-|
+|Y   DIP28                    6264                                |
+|                   Z80A                  6.7K                    |
+|                             3.5J                                |
+|                   2.4H                                          |
+|                                                                |-|
+|                   6116                                         | |
+|    1.1E                                                        | |
+|         M5205     YM3526                                       | |
+|         400kHz                                                 | |
+|    VOL                 M4066           MBM2148                 |-|
+|         M5224                          MBM2148                  |
+|M51516         M5224  YM3014            MBM2148              CN4 |
+|-----------------------------------------------------------------|
+Notes:
+      Z80B       - Clock 6.000MHz [24/4]
+      Z80A       - Clock 4.000MHz
+      M5205      - Clock 400kHz
+      YM3526     - Clock 4.000MHz
+      CN4        - RGB/Sync connector for video output to monitor
+      MN50005XTA - Mitsubishi DIP28 custom chip. On the bootleg this chip
+                   is replaced by a plug-in daughterboard containing a
+                   few logic chips
+      MA7053     - Mitsubishi SIL28 custom ceramic module
+      M5224      - Equivalent to LM324 OP AMP
+      DIP28      - unpopulated socket
+      DSW1/2     - 8-position DIP Switch
+      6116       - 2kx8 SRAM
+      6264       - 8kx8 SRAM
+      2148       - 1kx4 SRAM
+
+      Measurements -
+                    OSC1  - 23.99999MHz
+                    XTAL1 - 3.999187MHz
+                    VSync - 59.1856Hz
+                    HSync - 15.1436kHz
+6002B
+|-----------------------------------------------------------------|
+|                            6116                                 |
+|                            18.6R                                |
+|                            17.6P                               |-|
+|                            16.6N                               | |
+|4164 4164 4164 4164         15.6M                               | |
+|4164 4164 4164 4164         14.6L                               | |
+|4164 4164 4164 4164         13.6K                               | |
+|4164 4164 4164 4164                                             |-|
+|4164 4164 4164 4164         12.6J                                |
+|                                                                 |
+|                            11.6H                                |
+|                                                                 |
+|                            10.6E                               |-|
+|                                                                | |
+|                            9.6D                                | |
+|                                                                | |
+|                            8.6C                                | |
+|                  M60002-0118P                                  |-|
+|      6116                  7.6B                                 |
+|                            6116                                 |
+|-----------------------------------------------------------------|
+Notes:
+      M60002-0118P - Mitsubishi DIP42 custom chip. On the bootleg this chip
+                     is replaced by a plug-in daughterboard containing a
+                     few logic chips
+      4164         - 64kx1 DRAM
+      6116         - 2kx8 SRAM
+
+
+Silkworm, Tecmo 1988
+Hardware Info By Guru
+
+PCB Layout
+----------
+6217A
+|-----------------------------------------------------------------|
+|CN3   M5224    1.6B                       MN50005XTA        24MHz|
+| MB3731  M5205 384kHz                                            |
+|  VOL                                                           |-|
+|LED  M5224             D780C-2                                  | |
+|LED  Y3014                                   M58725             | |
+|                                                                | |
+|                                                                | |
+|J  J9 J8  AM2148  YM3812                                        |-|
+|A         AM2148  M58725 3.5J        2.3J                        |
+|M         AM2148                                                 |
+|M                                                                |
+|A                                                                |
+|                                                                |-|
+| PC847                                                          | |
+| PC847                                                          | |
+| PC847                                                          | |
+| PC847         5.6S 6264 4.5S                                   | |
+| PC847                                            J1            |-|
+| PC847 SW2                                        J2             |
+|       SW1    MA7053                     LH0080E  J11   8MHz     |
+|-----------------------------------------------------------------|
+Notes:
+      D780C-2    - Z80 CPU (sound program), clock 4.000MHz [24/6]
+      LH0080E    - Z80 CPU (main program), clock 8.000MHz
+      M5205      - Oki M5205 ADPCM sample player driven by a 384kHz resonator. Pin 1,2=H,L so sample rate divider is /48 and sample rate is 8kHz
+      YM3812     - Clock 4.000MHz [24/6]
+      Y3014      - Yamaha DAC
+      MB3731     - Fujitsu MB3731 audio power AMP
+      CN3        - 4-pin power connector joining to bottom board
+      MN50005XTA - Mitsubishi DIP28 custom chip. On the bootleg this chip
+                   is replaced by a plug-in daughterboard containing a few
+                   logic chips or integrated directly onto the PCB using logic chips.
+      MA7053     - Mitsubishi SIL28 custom ceramic module
+      M5224      - Equivalent to LM324 OP AMP
+      DSW1/2     - 8-position DIP switch
+      M58725     - 2kx8 SRAM equivalent to 6116
+      6264       - 8kx8 SRAM
+      AM2148     - 1kx4 SRAM
+      PC847      - Sharp PC847 Optocoupler. Printed on the chip is PC817 x4 and it's the same on the datasheet.
+      J1,J2      - Solder-blob jumper, open
+      J11,J8,J9  - Solder-blob jumper, shorted
+
+      Measurements -
+                    VSync - 59.2680Hz
+                    HSync - 15.1439kHz
+6217B
+|-----------------------------------------------------------------|
+| 14.1S  16.2S         JP8         6116                           |
+|   15.12S  17.3S      JP7                                        |
+|                      JP6                                       |-|
+|                      JP5                                       | |
+| 10.1P  12.2P                                                   | |
+|   11.12P  13.3P                                                | |
+|                      JP4                                       | |
+|                      JP3         6116                          |-|
+|                      JP2                                        |
+|                      JP1         6116                           |
+|                                                                 |
+| 9.1H                                                            |
+|                                                                |-|
+| 8.1F                                                           | |
+|                   MN41128 MN41128 MN41128 MN41128              | |
+| 7.1D              MN41128 MN41128 MN41128 MN41128              | |
+|                   MN41128 MN41128 MN41128 MN41128              | |
+| 6.1C              MN41128 MN41128 MN41128 MN41128              |-|
+|                   MN41128 MN41128 MN41128 MN41128               |
+| M60002-0118P                                                    |
+|-----------------------------------------------------------------|
+Notes:
+      Note some ROMs are mid-way between position 1 and 2 so 12 is used as the location.
+      M60002-0118P - Mitsubishi DIP42 custom chip. On the bootleg this chip
+                     is replaced by a plug-in daughterboard containing a
+                     few logic chips or integrated directly onto the PCB using logic chips.
+                     There is a 6MHz clock input on pin 4.
+      MN41128      - Panasonic MN41128 128kx1 NMOS DRAM (total=320kx8 video RAM)
+      6116         - 2kx8 SRAM
+      JP8,6,4,2    - Solder-blob jumper, open
+      JP7,5,3,1    - Solder-blob jumper, shorted
+      CN3          - 4-pin power connector joining to bottom board
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -746,7 +916,7 @@ void tecmo_state::silkworm(machine_config &config)
 	gemini(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(6000000);
+	m_maincpu->set_clock(8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tecmo_state::silkworm_map);
 }
 
@@ -774,90 +944,6 @@ void tecmo_state::silkwormp(machine_config &config)
   Game driver(s)
 
 ***************************************************************************/
-
-/* Rygar
-Tecmo 1986
-
-PCB Layouts
------------
-
-6002-A
-|-----------------------------------------------------------------|
-|DSW2               4MHz                            24MHz         |
-|DSW1                    M4069                                    |
-|                                                                |-|
-|                   Z80B                            MN50005XTA   | |
-|1                            5.5P                               | |
-|8                                                               | |
-|W                            4.5M                               | |
-|A                  MA7053                6116                   |-|
-|Y   DIP28                    6264                                |
-|                   Z80A                  6.7K                    |
-|                             3.5J                                |
-|                   2.4H                                          |
-|                                                                |-|
-|                   6116                                         | |
-|    1.1E                                                        | |
-|         M5205     YM3526                                       | |
-|         400kHz                                                 | |
-|    VOL                 M4066           MBM2148                 |-|
-|         M5224                          MBM2148                  |
-|M51516         M5224  YM3014            MBM2148              CN4 |
-|-----------------------------------------------------------------|
-Notes:
-      Z80B       - clock 6.000MHz [24/4]
-      Z80A       - clock 4.000MHz
-      M5205      - clock 400kHz
-      YM3526     - clock 4.000MHz
-      CN4        - RGB/Sync connector for video output to monitor
-      MN50005XTA - Mitsubishi DIP28 custom chip. On the bootleg this chip
-                   is replaced by a plug-in daughterboard containing a
-                   few logic chips
-      MA7053     - Mitsubishi SIL28 custom ceramic module
-      M5224      - Equivalent to LM324 OP AMP
-      DIP28      - unpopulated socket
-      DSW1/2     - 8-position Dip Switches
-      6116       - 2kx8 SRAM
-      6264       - 8kx8 SRAM
-      2148       - 1kx4 SRAM
-
-      Measurements -
-                    OSC1  - 23.99999MHz
-                    XTAL1 - 3.999187MHz
-                    VSync - 59.1856Hz
-                    HSync - 15.1436kHz
-
-
-6002B
-|-----------------------------------------------------------------|
-|                            6116                                 |
-|                            18.6R                                |
-|                            17.6P                               |-|
-|                            16.6N                               | |
-|4164 4164 4164 4164         15.6M                               | |
-|4164 4164 4164 4164         14.6L                               | |
-|4164 4164 4164 4164         13.6K                               | |
-|4164 4164 4164 4164                                             |-|
-|4164 4164 4164 4164         12.6J                                |
-|                                                                 |
-|                            11.6H                                |
-|                                                                 |
-|                            10.6E                               |-|
-|                                                                | |
-|                            9.6D                                | |
-|                                                                | |
-|                            8.6C                                | |
-|                  M60002-0118P                                  |-|
-|      6116                  7.6B                                 |
-|                            6116                                 |
-|-----------------------------------------------------------------|
-Notes:
-      M60002-0118P - Mitsubishi DIP42 custom chip. On the bootleg this chip
-                     is replaced by a plug-in daughterboard containing a
-                     few logic chips
-      4164         - 64kx1 DRAM
-      6116         - 2kx8 SRAM
-*/
 
 ROM_START( rygar )
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -999,35 +1085,35 @@ ROM_END
 
 ROM_START( silkworm )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "silkworm.4",   0x00000, 0x10000, CRC(a5277cce) SHA1(3886a3f3d1230d49d541f884c5b29938e13f98c8) )  /* c000-ffff is not used */
-	ROM_LOAD( "silkworm.5",   0x10000, 0x10000, CRC(a6c7bb51) SHA1(75f6625459ab65f2d47a282c1295d4db38f5fe51) )  /* banked at f000-f7ff */
+	ROM_LOAD( "4.5s",   0x00000, 0x10000, CRC(a5277cce) SHA1(3886a3f3d1230d49d541f884c5b29938e13f98c8) )  /* c000-ffff is not used */
+	ROM_LOAD( "5.6s",   0x10000, 0x10000, CRC(a6c7bb51) SHA1(75f6625459ab65f2d47a282c1295d4db38f5fe51) )  /* banked at f000-f7ff */
 
 	ROM_REGION( 0x20000, "soundcpu", 0 )
-	ROM_LOAD( "silkworm.3",   0x0000, 0x8000, CRC(b589f587) SHA1(0be5e2bf3daf3e28d63fdc8c89bb6fe7c48c6c3f) )
+	ROM_LOAD( "3.5j",   0x0000, 0x8000, CRC(b589f587) SHA1(0be5e2bf3daf3e28d63fdc8c89bb6fe7c48c6c3f) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "silkworm.2",   0x00000, 0x08000, CRC(e80a1cd9) SHA1(ef16feb1113acc7401f8951158b25f6f201196f2) )  /* characters */
+	ROM_LOAD( "2.3j",   0x00000, 0x08000, CRC(e80a1cd9) SHA1(ef16feb1113acc7401f8951158b25f6f201196f2) )  /* characters */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "silkworm.6",   0x00000, 0x10000, CRC(1138d159) SHA1(3b938606d448c4effdfe414bbf495b50cc3bc1c1) )  /* sprites */
-	ROM_LOAD( "silkworm.7",   0x10000, 0x10000, CRC(d96214f7) SHA1(a5b2be3ae6a6eb8afef2c18c865a998fbf4adf93) )  /* sprites */
-	ROM_LOAD( "silkworm.8",   0x20000, 0x10000, CRC(0494b38e) SHA1(03255f153824056e430a0b8595103f3b58b1fd97) )  /* sprites */
-	ROM_LOAD( "silkworm.9",   0x30000, 0x10000, CRC(8ce3cdf5) SHA1(635248514c4e1e5aab7a2ed4d620a5b970d4a43a) )  /* sprites */
+	ROM_LOAD( "6.1c",   0x00000, 0x10000, CRC(1138d159) SHA1(3b938606d448c4effdfe414bbf495b50cc3bc1c1) )  /* sprites */
+	ROM_LOAD( "7.1d",   0x10000, 0x10000, CRC(d96214f7) SHA1(a5b2be3ae6a6eb8afef2c18c865a998fbf4adf93) )  /* sprites */
+	ROM_LOAD( "8.1f",   0x20000, 0x10000, CRC(0494b38e) SHA1(03255f153824056e430a0b8595103f3b58b1fd97) )  /* sprites */
+	ROM_LOAD( "9.1h",   0x30000, 0x10000, CRC(8ce3cdf5) SHA1(635248514c4e1e5aab7a2ed4d620a5b970d4a43a) )  /* sprites */
 
 	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "silkworm.10",  0x00000, 0x10000, CRC(8c7138bb) SHA1(0cfd69fa77d5b546f7dad80537d8d2497ae758bc) )  /* tiles #1 */
-	ROM_LOAD( "silkworm.11",  0x10000, 0x10000, CRC(6c03c476) SHA1(79ad800a2f4ba6d44ba5a31210cbd8566bb357b6) )  /* tiles #1 */
-	ROM_LOAD( "silkworm.12",  0x20000, 0x10000, CRC(bb0f568f) SHA1(b66c6d0407ed0b068c6bf07987f1b923d4a6e4f8) )  /* tiles #1 */
-	ROM_LOAD( "silkworm.13",  0x30000, 0x10000, CRC(773ad0a4) SHA1(f7576e1ac8c779b33d7ec393555fd097a34257fa) )  /* tiles #1 */
+	ROM_LOAD( "10.1p",  0x00000, 0x10000, CRC(8c7138bb) SHA1(0cfd69fa77d5b546f7dad80537d8d2497ae758bc) )  /* tiles #1 */
+	ROM_LOAD( "11.12p", 0x10000, 0x10000, CRC(6c03c476) SHA1(79ad800a2f4ba6d44ba5a31210cbd8566bb357b6) )  /* tiles #1 */
+	ROM_LOAD( "12.2p",  0x20000, 0x10000, CRC(bb0f568f) SHA1(b66c6d0407ed0b068c6bf07987f1b923d4a6e4f8) )  /* tiles #1 */
+	ROM_LOAD( "13.3p",  0x30000, 0x10000, CRC(773ad0a4) SHA1(f7576e1ac8c779b33d7ec393555fd097a34257fa) )  /* tiles #1 */
 
 	ROM_REGION( 0x40000, "gfx4", 0 )
-	ROM_LOAD( "silkworm.14",  0x00000, 0x10000, CRC(409df64b) SHA1(cada970bf9cc8f6522e7a71e00fe873568852873) )  /* tiles #2 */
-	ROM_LOAD( "silkworm.15",  0x10000, 0x10000, CRC(6e4052c9) SHA1(e2e3d7221b75cb044449a25a076a93c3def1f11b) )  /* tiles #2 */
-	ROM_LOAD( "silkworm.16",  0x20000, 0x10000, CRC(9292ed63) SHA1(70aa46fcc187b8200c5d246870e2e2dc4b2985cb) )  /* tiles #2 */
-	ROM_LOAD( "silkworm.17",  0x30000, 0x10000, CRC(3fa4563d) SHA1(46e3cc41491d63efcdda43c84c7ac1385a1926d0) )  /* tiles #2 */
+	ROM_LOAD( "14.1s",  0x00000, 0x10000, CRC(409df64b) SHA1(cada970bf9cc8f6522e7a71e00fe873568852873) )  /* tiles #2 */
+	ROM_LOAD( "15.12s", 0x10000, 0x10000, CRC(6e4052c9) SHA1(e2e3d7221b75cb044449a25a076a93c3def1f11b) )  /* tiles #2 */
+	ROM_LOAD( "16.2s",  0x20000, 0x10000, CRC(9292ed63) SHA1(70aa46fcc187b8200c5d246870e2e2dc4b2985cb) )  /* tiles #2 */
+	ROM_LOAD( "17.3s",  0x30000, 0x10000, CRC(3fa4563d) SHA1(46e3cc41491d63efcdda43c84c7ac1385a1926d0) )  /* tiles #2 */
 
 	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples */
-	ROM_LOAD( "silkworm.1",   0x0000, 0x8000, CRC(5b553644) SHA1(5d39d2251094c17f7b732b4861401b3516fce9b1) )
+	ROM_LOAD( "1.6b",   0x0000, 0x8000, CRC(5b553644) SHA1(5d39d2251094c17f7b732b4861401b3516fce9b1) )
 ROM_END
 
 ROM_START( silkwormj )

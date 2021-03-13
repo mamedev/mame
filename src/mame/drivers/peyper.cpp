@@ -17,9 +17,6 @@
   Hang-On (Sonic)
   Ator (Video Dens)
 
-  Others not emulated (need roms):
-  Storm (Sonic)
-
   Sir Lancelot (Peyper, 1994)
   - CPU is a B409 (could be a higher-speed Z80)
   - Audio CPU is a TMP91P640F-10. Other audio chips are YMF262 and YAC512.
@@ -42,6 +39,8 @@ ToDo:
 
 #include "peyper.lh"
 
+namespace {
+
 class peyper_state : public genpin_class
 {
 public:
@@ -51,7 +50,9 @@ public:
 		, m_switch(*this, "SWITCH.%u", 0)
 		, m_leds(*this, "led_%u", 1U)
 		, m_dpl(*this, "dpl_%u", 0U)
-	{ }
+	{
+		std::fill(std::begin(m_disp_layout), std::end(m_disp_layout), 0);
+	}
 
 	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(wolfman_replay_hs_r);
 	void init_peyper();
@@ -59,6 +60,10 @@ public:
 	void init_wolfman();
 
 	void peyper(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	uint8_t sw_r();
@@ -71,9 +76,6 @@ private:
 	void p1b_w(uint8_t data) { } // more lamps
 	void p2a_w(uint8_t data) { } // more lamps
 	void p2b_w(uint8_t data) { } // more lamps
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	void peyper_io(address_map &map);
 	void peyper_map(address_map &map);
@@ -588,6 +590,8 @@ void peyper_state::machine_start()
 {
 	genpin_class::machine_start();
 
+	m_digit = 0;
+
 	m_leds.resolve();
 	m_dpl.resolve();
 
@@ -860,7 +864,14 @@ ROM_END
 /*-------------------------------------------------------------------
 / Ator (1985)
 /-------------------------------------------------------------------*/
-ROM_START(ator)
+ROM_START(ator) // Version with 2 bumpers, probably older
+	ROM_REGION(0x6000, "maincpu", 0)
+	ROM_LOAD("ator1.bin", 0x0000, 0x2000, CRC(87967577) SHA1(6586401a4b1a837bacd61d156b44eedaab271479))
+	ROM_LOAD("ator2.bin", 0x2000, 0x2000, CRC(832b06ea) SHA1(c70c613fd29d1d560951890bce072cbf45525526))
+	// No ROM 3
+ROM_END
+
+ROM_START(ator3bmp) // Version with 3 bumpers, probably newer
 	ROM_REGION(0x6000, "maincpu", 0)
 	ROM_LOAD("1.bin", 0x0000, 0x2000, NO_DUMP)
 	ROM_LOAD("ator 2 _0xba29.bin", 0x2000, 0x2000, CRC(21aad5c4) SHA1(e78da5d80682710db34cbbfeae5af54241c73371))
@@ -882,6 +893,8 @@ ROM_START(lancelot)
 	ROM_LOAD("snd_u5.bin", 0x00000, 0x20000, CRC(bf141441) SHA1(630b852bb3bba0fcdae13ae548b1e9810bc64d7d))
 ROM_END
 
+} // Anonymous namespace
+
 GAME( 1985, odin,     0,        peyper,   odin_dlx, peyper_state, init_odin,    ROT0, "Peyper",     "Odin",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1985, odin_dlx, 0,        peyper,   odin_dlx, peyper_state, init_odin,    ROT0, "Sonic",      "Odin De Luxe",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1986, solarwap, 0,        peyper,   solarwap, peyper_state, init_peyper,  ROT0, "Sonic",      "Solar Wars (Sonic)",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
@@ -893,5 +906,6 @@ GAME( 1987, wolfman,  0,        peyper,   wolfman,  peyper_state, init_wolfman, 
 GAME( 1986, nemesisp, 0,        peyper,   wolfman,  peyper_state, init_wolfman, ROT0, "Peyper",     "Nemesis",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1987, odisea,   0,        peyper,   odisea,   peyper_state, init_wolfman, ROT0, "Peyper",     "Odisea Paris-Dakar",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1988, hangonp,  0,        peyper,   sonstwar, peyper_state, init_peyper,  ROT0, "Sonic",      "Hang-On (Sonic)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // inputs to be checked
-GAME( 1985, ator,     0,        peyper,   sonstwar, peyper_state, init_peyper,  ROT0, "Video Dens", "Ator",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // initial program ROM missing; no manual found
-GAME( 1994, lancelot, 0,        peyper,   sonstwar, peyper_state, empty_init,   ROT0,  "Peyper",    "Sir Lancelot",             MACHINE_IS_SKELETON_MECHANICAL) // different hardware (see top of file)
+GAME( 1985, ator,     0,        peyper,   sonstwar, peyper_state, init_peyper,  ROT0, "Video Dens", "Ator (set 1, 2 bumpers)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // inputs to be checked
+GAME( 1985, ator3bmp, ator,     peyper,   sonstwar, peyper_state, init_peyper,  ROT0, "Video Dens", "Ator (set 2, 3 bumpers)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // initial program ROM missing; no manual found
+GAME( 1994, lancelot, 0,        peyper,   sonstwar, peyper_state, empty_init,   ROT0, "Peyper",     "Sir Lancelot",             MACHINE_IS_SKELETON_MECHANICAL) // different hardware (see top of file)

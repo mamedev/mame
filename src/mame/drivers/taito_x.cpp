@@ -323,8 +323,8 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/2610intf.h"
 #include "sound/ym2151.h"
+#include "sound/ym2610.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -826,8 +826,10 @@ void taitox_state::superman(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
 
-	SETA001_SPRITE(config, m_seta001, 0);
-	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	SETA001_SPRITE(config, m_seta001, 16'000'000, m_palette, gfx_taito_x);
+	// position kludges
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -838,10 +840,9 @@ void taitox_state::superman(machine_config &config)
 	screen.set_screen_update(FUNC(taitox_state::screen_update_seta_no_layers));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taito_x);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
+	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -873,8 +874,10 @@ void taitox_state::daisenpu(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
 
-	SETA001_SPRITE(config, m_seta001, 0);
-	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	SETA001_SPRITE(config, m_seta001, 16'000'000, m_palette, gfx_taito_x);
+	// position kludges
+	m_seta001->set_fg_yoffsets(-0x12, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -885,10 +888,9 @@ void taitox_state::daisenpu(machine_config &config)
 	screen.set_screen_update(FUNC(taitox_state::screen_update_seta_no_layers));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taito_x);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
+	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -918,8 +920,7 @@ void taitox_state::gigandes(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
 
-	SETA001_SPRITE(config, m_seta001, 0);
-	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_taito_x);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -930,10 +931,9 @@ void taitox_state::gigandes(machine_config &config)
 	screen.set_screen_update(FUNC(taitox_state::screen_update_seta_no_layers));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taito_x);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta_no_layers)
+	MCFG_VIDEO_START_OVERRIDE(taitox_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -965,8 +965,10 @@ void taitox_state::ballbros(machine_config &config)
 
 	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
 
-	SETA001_SPRITE(config, m_seta001, 0);
-	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_taito_x);
+	// position kludges
+	m_seta001->set_fg_yoffsets(-0x0a, 0x0e);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -977,10 +979,9 @@ void taitox_state::ballbros(machine_config &config)
 	screen.set_screen_update(FUNC(taitox_state::screen_update_seta_no_layers));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taito_x);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	MCFG_VIDEO_START_OVERRIDE(taitox_state, kyustrkr_no_layers)
+	MCFG_VIDEO_START_OVERRIDE(taitox_state, seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1074,7 +1075,7 @@ ROM_START( superman )
 	ROM_LOAD32_WORD_SWAP( "b61-16.j1", 0x000000, 0x80000, CRC(3622ed2f) SHA1(03f4383f6ff8b5f1e26bc6bbef2fb1855d3bb93f) ) /* Plane 2, 3 */
 	ROM_LOAD32_WORD_SWAP( "b61-17.k1", 0x100000, 0x80000, CRC(c34f27e0) SHA1(07ee02c18ce29f35e8ae87d0c1ed80b726c246a6) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b61-01.e18", 0x00000, 0x80000, CRC(3cf99786) SHA1(f6febf9bda87ca04f0a5890d0e8001c26dfa6c81) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
@@ -1097,7 +1098,7 @@ ROM_START( supermanu ) /* No US copyright notice or FBI logo - Just a coinage di
 	ROM_LOAD32_WORD_SWAP( "b61-16.j1", 0x000000, 0x80000, CRC(3622ed2f) SHA1(03f4383f6ff8b5f1e26bc6bbef2fb1855d3bb93f) ) /* Plane 2, 3 */
 	ROM_LOAD32_WORD_SWAP( "b61-17.k1", 0x100000, 0x80000, CRC(c34f27e0) SHA1(07ee02c18ce29f35e8ae87d0c1ed80b726c246a6) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b61-01.e18", 0x00000, 0x80000, CRC(3cf99786) SHA1(f6febf9bda87ca04f0a5890d0e8001c26dfa6c81) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
@@ -1120,7 +1121,7 @@ ROM_START( supermanj ) /* Shows a Japan copyright notice */
 	ROM_LOAD32_WORD_SWAP( "b61-16.j1", 0x000000, 0x80000, CRC(3622ed2f) SHA1(03f4383f6ff8b5f1e26bc6bbef2fb1855d3bb93f) ) /* Plane 2, 3 */
 	ROM_LOAD32_WORD_SWAP( "b61-17.k1", 0x100000, 0x80000, CRC(c34f27e0) SHA1(07ee02c18ce29f35e8ae87d0c1ed80b726c246a6) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b61-01.e18", 0x00000, 0x80000, CRC(3cf99786) SHA1(f6febf9bda87ca04f0a5890d0e8001c26dfa6c81) )
 
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
@@ -1198,10 +1199,10 @@ ROM_START( gigandes )
 	ROM_LOAD32_WORD_SWAP( "east_9.3j", 0x000000, 0x80000, CRC(5c5e6898) SHA1(f348ac752a571902c55f36e21aa3fb9ef97528e3) ) /* Plane 2, 3 */
 	ROM_LOAD32_WORD_SWAP( "east_6.3k", 0x100000, 0x80000, CRC(52db30e9) SHA1(0b6d73f2c6e6c1ad5fcb2a9edf50069cd0691483) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )   /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )   /* Delta-T samples */
 	ROM_LOAD( "east-11.16f", 0x00000, 0x80000, CRC(92111f96) SHA1(e781f24761b7a923388f4cda64c7b31388fd64c5) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "east-10.16e", 0x00000, 0x80000, CRC(ca0ac419) SHA1(b29f30a8ff1286c65b741353b6551918a45bcafe) )
 ROM_END
 
@@ -1221,10 +1222,10 @@ ROM_START( gigandesa )
 	ROM_LOAD32_WORD_SWAP( "east_9.3j", 0x000000, 0x80000, CRC(5c5e6898) SHA1(f348ac752a571902c55f36e21aa3fb9ef97528e3) ) /* Plane 2, 3 */
 	ROM_LOAD32_WORD_SWAP( "east_6.3k", 0x100000, 0x80000, CRC(52db30e9) SHA1(0b6d73f2c6e6c1ad5fcb2a9edf50069cd0691483) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )      /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )      /* Delta-T samples */
 	ROM_LOAD( "east-11.16f", 0x00000, 0x80000, CRC(92111f96) SHA1(e781f24761b7a923388f4cda64c7b31388fd64c5) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "east-10.16e", 0x00000, 0x80000, CRC(ca0ac419) SHA1(b29f30a8ff1286c65b741353b6551918a45bcafe) )
 ROM_END
 
@@ -1242,10 +1243,10 @@ ROM_START( kyustrkr )
 	ROM_LOAD32_BYTE( "m-8-1.u5",     0x00001, 0x20000, CRC(9d95aad6) SHA1(3391b14196fea12223ab247d909791bc68fc8d56) )
 	ROM_LOAD32_BYTE( "m-8-0.u6",     0x00000, 0x20000, CRC(0dfb6ed3) SHA1(0937614c8f97040d0216363bfb2bc21161128a3c) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )   /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )   /* Delta-T samples */
 	ROM_LOAD( "m-8-5.u2",     0x00000, 0x20000, CRC(d9d90e0a) SHA1(1011548b4fb5f1a194c93ded512e74cda2c06ceb) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "m-8-4.u1",     0x00000, 0x20000, CRC(d3f6047a) SHA1(0db6d762bbe2d68cddf30e06125b904e1021b96d) )
 ROM_END
 
@@ -1263,10 +1264,10 @@ ROM_START( ballbros )
 	ROM_LOAD32_BYTE( "1", 0x000001, 0x20000, CRC(8196d624) SHA1(c859e3b1d3b481f38cfe47576efc1dcdbe6cde28) ) /* Plane 2 */
 	ROM_LOAD32_BYTE( "0", 0x000000, 0x20000, CRC(1cc584e5) SHA1(18cf607fa06c095d088b80cea2a1e507d19c7126) ) /* Plane 3 */
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )   /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )   /* Delta-T samples */
 	ROM_LOAD( "east-11", 0x00000, 0x80000, CRC(92111f96) SHA1(e781f24761b7a923388f4cda64c7b31388fd64c5) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "east-10", 0x00000, 0x80000, CRC(ca0ac419) SHA1(b29f30a8ff1286c65b741353b6551918a45bcafe) )
 ROM_END
 

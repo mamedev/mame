@@ -267,8 +267,9 @@ private:
 	int m_adb_line;
 	void set_adb_line(int state) { m_adb_line = state; }
 	u8 pmu_adb_r() { return (m_adb_line<<1); }
-	void pmu_adb_w(u8 data) { m_macadb->adb_linechange_w(data & 1); }
-	u8 pmu_in_r() { return 0x20; }  // bit 5 is 0 if the Target Disk Mode should be enabled on the PB100
+	void pmu_adb_w(u8 data) { m_macadb->adb_linechange_w((data & 1) ^ 1); }
+
+	u8 pmu_in_r() { return 0x20; }  // bit 5 is 0 if the Target Disk Mode should be enabled
 };
 
 // 4-level grayscale
@@ -347,8 +348,7 @@ void macpb030_state::machine_reset()
 	offs_t memory_mirror = memory_end & ~(memory_size - 1);
 
 	space.unmap_write(0x00000000, memory_end);
-	space.install_read_bank(0x00000000, memory_end & ~memory_mirror, memory_mirror, "bank1");
-	membank("bank1")->set_base(m_rom_ptr);
+	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
 
 	// start 60.15 Hz timer
 	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
@@ -505,8 +505,7 @@ u32 macpb030_state::rom_switch_r(offs_t offset)
 		void *memory_data = m_ram->pointer();
 		offs_t memory_mirror = memory_end & ~memory_end;
 
-		space.install_readwrite_bank(0x00000000, memory_end & ~memory_mirror, memory_mirror, "bank1");
-		membank("bank1")->set_base(memory_data);
+		space.install_ram(0x00000000, memory_end & ~memory_mirror, memory_mirror, memory_data);
 		m_overlay = false;
 	}
 
@@ -522,6 +521,7 @@ TIMER_CALLBACK_MEMBER(macpb030_state::mac_6015_tick)
 	m_via1->write_ca1(m_ca1_data);
 
 	m_pmu->set_input_line(m50753_device::M50753_INT1_LINE, ASSERT_LINE);
+	m_macadb->adb_vblank();
 
 	if (++m_irq_count == 60)
 	{
@@ -869,7 +869,7 @@ void macpb030_state::macpb140(machine_config &config)
 	SCC85C30(config, m_scc, C7M);
 //  m_scc->intrq_callback().set(FUNC(macpb030_state::set_scc_interrupt));
 
-	VIA6522(config, m_via1, C7M/10);
+	R65NC22(config, m_via1, C7M/10);
 	m_via1->readpa_handler().set(FUNC(macpb030_state::mac_via_in_a));
 	m_via1->readpb_handler().set(FUNC(macpb030_state::mac_via_in_b));
 	m_via1->writepa_handler().set(FUNC(macpb030_state::mac_via_out_a));
@@ -877,7 +877,7 @@ void macpb030_state::macpb140(machine_config &config)
 	m_via1->irq_handler().set(FUNC(macpb030_state::via_irq_w));
 	m_via1->cb2_handler().set(FUNC(macpb030_state::via_cb2_w));
 
-	VIA6522(config, m_via2, C7M/10);
+	R65NC22(config, m_via2, C7M/10);
 	m_via2->readpa_handler().set(FUNC(macpb030_state::mac_via2_in_a));
 	m_via2->readpb_handler().set(FUNC(macpb030_state::mac_via2_in_b));
 	m_via2->writepa_handler().set(FUNC(macpb030_state::mac_via2_out_a));
@@ -961,7 +961,7 @@ void macpb030_state::macpb160(machine_config &config)
 	SCC85C30(config, m_scc, C7M);
 	//  m_scc->intrq_callback().set(FUNC(macpb030_state::set_scc_interrupt));
 
-	VIA6522(config, m_via1, C7M / 10);
+	R65NC22(config, m_via1, C7M / 10);
 	m_via1->readpa_handler().set(FUNC(macpb030_state::mac_via_in_a));
 	m_via1->readpb_handler().set(FUNC(macpb030_state::mac_via_in_b));
 	m_via1->writepa_handler().set(FUNC(macpb030_state::mac_via_out_a));
@@ -969,7 +969,7 @@ void macpb030_state::macpb160(machine_config &config)
 	m_via1->irq_handler().set(FUNC(macpb030_state::via_irq_w));
 	m_via1->cb2_handler().set(FUNC(macpb030_state::via_cb2_w));
 
-	VIA6522(config, m_via2, C7M / 10);
+	R65NC22(config, m_via2, C7M / 10);
 	m_via2->readpa_handler().set(FUNC(macpb030_state::mac_via2_in_a));
 	m_via2->readpb_handler().set(FUNC(macpb030_state::mac_via2_in_b));
 	m_via2->writepa_handler().set(FUNC(macpb030_state::mac_via2_out_a));

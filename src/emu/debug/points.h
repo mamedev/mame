@@ -47,7 +47,7 @@ public:
 	const char *action() const { return m_action.c_str(); }
 
 	// setters
-	void setEnabled(bool value) { m_enabled = value; }
+	void setEnabled(bool value) { m_enabled = value; } // FIXME: need to update breakpoint flags but it's a private method
 
 private:
 	// internals

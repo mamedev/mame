@@ -22,13 +22,13 @@
     operation by disassembling the Nimbus bios and by writing experemental
     code on the real machine.
 */
-
-#include <functional>
-
 #include "emu.h"
+#include "includes/rmnimbus.h"
+
 #include "debugger.h"
 #include "debug/debugcon.h"
-#include "includes/rmnimbus.h"
+
+#include <functional>
 
 
 #define WIDTH_MASK      0x07
@@ -222,6 +222,7 @@ void rmnimbus_state::nimbus_video_io_w(offs_t offset, uint16_t data, uint16_t me
 
 		case 0x09:
 			colours = FILL_WORD(FG_COLOUR);
+			[[fallthrough]];
 		case 0x01:
 			m_x = data;
 			break;
@@ -233,6 +234,7 @@ void rmnimbus_state::nimbus_video_io_w(offs_t offset, uint16_t data, uint16_t me
 
 		case 0x0B:
 			colours = FILL_WORD(FG_COLOUR);
+			[[fallthrough]];
 		case 0x03:
 			m_x = data;
 			m_y++;
@@ -245,12 +247,14 @@ void rmnimbus_state::nimbus_video_io_w(offs_t offset, uint16_t data, uint16_t me
 
 		case 0x0E:
 			colours = FILL_WORD(FG_COLOUR);
+			[[fallthrough]];
 		case 0x06:
 			m_y = data;
 			break;
 
 		case 0x0F:
 			colours = FILL_WORD(FG_COLOUR);
+			[[fallthrough]];
 		case 0x07:
 			m_y = data;
 			m_x++;

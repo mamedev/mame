@@ -183,7 +183,7 @@ void nemesis_state::create_palette_lookups()
 
 void nemesis_state::nemesis_palette_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(m_paletteram + offset);
+	COMBINE_DATA(&m_paletteram[offset]);
 	data = m_paletteram[offset];
 
 	int r = (data >> 0) & 0x1f;
@@ -262,7 +262,7 @@ void nemesis_state::video_start()
 	m_foreground->set_scroll_rows(256);
 
 	memset(m_charram, 0, m_charram.bytes());
-	memset(m_blank_tile, 0, ARRAY_LENGTH(m_blank_tile));
+	std::fill(std::begin(m_blank_tile), std::end(m_blank_tile), 0);
 
 	/* Set up save state */
 	machine().save().register_postload(save_prepost_delegate(FUNC(nemesis_state::nemesis_postload), this));

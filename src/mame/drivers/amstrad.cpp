@@ -241,12 +241,12 @@ static INPUT_PORTS_START( amstrad_keyboard )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')
 
 	PORT_START("kbrow.9")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2)        PORT_PLAYER(1)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(1) PORT_8WAY PORT_CONDITION("controller_type", 0x01, EQUALS, 0x01)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(1) PORT_8WAY PORT_CONDITION("controller_type", 0x01, EQUALS, 0x01)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1) PORT_8WAY PORT_CONDITION("controller_type", 0x01, EQUALS, 0x01)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_8WAY PORT_CONDITION("controller_type", 0x01, EQUALS, 0x01)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(1) PORT_CONDITION("controller_type", 0x01, EQUALS, 0x01)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2)        PORT_PLAYER(1) PORT_CONDITION("controller_type", 0x01, EQUALS, 0x01)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 /* The bit for the third button is officially undocumented: Amstrad joysticks actually
    use only two buttons. The only device that reads this bit is the AMX mouse, which uses
@@ -335,28 +335,41 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( amx_mouse )
 	PORT_START("mouse_input1")
-	PORT_BIT(0xff , 0, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) PORT_CONDITION("controller_type", 0x01, EQUALS, 0x01)
+	PORT_BIT(0xff , 0, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) PORT_CONDITION("controller_type", 0x02, EQUALS, 0x02)
 
 	PORT_START("mouse_input2")
-	PORT_BIT(0xff , 0, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) PORT_CONDITION("controller_type", 0x01, EQUALS, 0x01)
+	PORT_BIT(0xff , 0, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) PORT_CONDITION("controller_type", 0x02, EQUALS, 0x02)
 
 	PORT_START("mouse_input3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CONDITION("controller_type", 0x01, EQUALS, 0x01)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CONDITION("controller_type", 0x01, EQUALS, 0x01)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3) PORT_CONDITION("controller_type", 0x01, EQUALS, 0x01)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CONDITION("controller_type", 0x02, EQUALS, 0x02)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CONDITION("controller_type", 0x02, EQUALS, 0x02)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3) PORT_CONDITION("controller_type", 0x02, EQUALS, 0x02)
 
 	PORT_START("controller_type")
-	PORT_CONFNAME( 0x03, 0x00, "Joystick port device" )
-	PORT_CONFSETTING(0x00, "2-button Joystick" )
-	PORT_CONFSETTING(0x01, "AMX mouse interface" )
-	PORT_CONFSETTING(0x02, "Nothing" )
+	PORT_CONFNAME( 0x07, 0x01, "Joystick port device" )
+	PORT_CONFSETTING(0x00, "Nothing" )
+	PORT_CONFSETTING(0x01, "2-button joystick" )
+	PORT_CONFSETTING(0x02, "AMX mouse interface" )
+	PORT_CONFSETTING(0x04, "Cheetah 125 Special rotational joystick" )
 
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cheetah_125_special )
+	PORT_START("cheetah")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(1) PORT_8WAY PORT_NAME("Cheetah 125 Up") PORT_CONDITION("controller_type", 0x04, EQUALS, 0x04)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(1) PORT_8WAY PORT_NAME("Cheetah 125 Down") PORT_CONDITION("controller_type", 0x04, EQUALS, 0x04)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1) PORT_8WAY PORT_NAME("Cheetah 125 Left") PORT_CONDITION("controller_type", 0x04, EQUALS, 0x04)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_8WAY PORT_NAME("Cheetah 125 Right") PORT_CONDITION("controller_type", 0x04, EQUALS, 0x04)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(1) PORT_NAME("Cheetah 125 Fire") PORT_CONDITION("controller_type", 0x04, EQUALS, 0x04)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2)        PORT_PLAYER(1) PORT_NAME("Cheetah 125 Rotate Left") PORT_CONDITION("controller_type", 0x04, EQUALS, 0x04)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3)        PORT_PLAYER(1) PORT_NAME("Cheetah 125 Rotate Right") PORT_CONDITION("controller_type", 0x04, EQUALS, 0x04)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cpc464 )
 	PORT_INCLUDE(amstrad_keyboard)
 	PORT_INCLUDE(crtc_links)
 	PORT_INCLUDE(amx_mouse)
+	PORT_INCLUDE(cheetah_125_special)
 INPUT_PORTS_END
 
 
@@ -383,6 +396,7 @@ static INPUT_PORTS_START( cpc664 )
 
 	PORT_INCLUDE(crtc_links)
 	PORT_INCLUDE(amx_mouse)
+	PORT_INCLUDE(cheetah_125_special)
 INPUT_PORTS_END
 
 
@@ -415,6 +429,7 @@ static INPUT_PORTS_START( cpc6128 )
 
 	PORT_INCLUDE(crtc_links)
 	PORT_INCLUDE(amx_mouse)
+	PORT_INCLUDE(cheetah_125_special)
 INPUT_PORTS_END
 
 
@@ -483,6 +498,7 @@ static INPUT_PORTS_START( cpc6128f )
 
 	PORT_INCLUDE(crtc_links)
 	PORT_INCLUDE(amx_mouse)
+	PORT_INCLUDE(cheetah_125_special)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cpc6128s )
@@ -554,6 +570,7 @@ static INPUT_PORTS_START( kccomp )
 
 	PORT_INCLUDE(crtc_links)
 	PORT_INCLUDE(amx_mouse)
+	PORT_INCLUDE(cheetah_125_special)
 INPUT_PORTS_END
 
 
@@ -743,6 +760,7 @@ static INPUT_PORTS_START( aleste )
 
 	PORT_INCLUDE(crtc_links)
 	PORT_INCLUDE(amx_mouse)
+	PORT_INCLUDE(cheetah_125_special)
 INPUT_PORTS_END
 
 
@@ -802,9 +820,11 @@ static void aleste_floppies(device_slot_interface &device)
 	device.option_add("35dd", FLOPPY_35_DD);
 }
 
-FLOPPY_FORMATS_MEMBER( amstrad_state::aleste_floppy_formats )
-	FLOPPY_MSX_FORMAT
-FLOPPY_FORMATS_END
+void amstrad_state::aleste_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_MSX_FORMAT);
+}
 
 void amstrad_state::cpcplus_cartslot(machine_config &config)
 {
@@ -944,8 +964,6 @@ void amstrad_state::amstrad_base(machine_config &config)
 	m_crtc->out_vsync_callback().set(FUNC(amstrad_state::amstrad_vsync_changed));
 	m_crtc->out_cur_callback().set("exp", FUNC(cpc_expansion_slot_device::cursor_w));
 
-	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	AY8912(config, m_ay, 16_MHz_XTAL / 16);
@@ -987,8 +1005,8 @@ void amstrad_state::cpc664(machine_config &config)
 {
 	amstrad_base(config);
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, true, true);
-	FLOPPY_CONNECTOR(config, "upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_mfm_floppy_formats);
 	SOFTWARE_LIST(config, "flop_list").set_original("cpc_flop");
 
 	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config, "exp", 16_MHz_XTAL / 4, cpc_exp_cards, nullptr));
@@ -1006,8 +1024,8 @@ void amstrad_state::cpc6128(machine_config &config)
 {
 	amstrad_base(config);
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, true, true);
-	FLOPPY_CONNECTOR(config, "upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_mfm_floppy_formats);
 	SOFTWARE_LIST(config, "flop_list").set_original("cpc_flop");
 
 	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config, "exp", 16_MHz_XTAL / 4, cpc_exp_cards, nullptr));
@@ -1069,8 +1087,6 @@ void amstrad_state::cpcplus(machine_config &config)
 	m_crtc->out_hsync_callback().set(FUNC(amstrad_state::amstrad_plus_hsync_changed));
 	m_crtc->out_vsync_callback().set(FUNC(amstrad_state::amstrad_plus_vsync_changed));
 
-	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	AY8912(config, m_ay, 40_MHz_XTAL / 40);
@@ -1095,8 +1111,8 @@ void amstrad_state::cpcplus(machine_config &config)
 
 	cpcplus_cartslot(config);
 
-	FLOPPY_CONNECTOR(config, "upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:0", amstrad_floppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "upd765:1", amstrad_floppies, "35ssdd", floppy_image_device::default_mfm_floppy_formats);
 	SOFTWARE_LIST(config, "flop_list").set_original("cpc_flop");
 
 	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config, "exp", 40_MHz_XTAL / 10, cpcplus_exp_cards, nullptr));
@@ -1147,8 +1163,6 @@ void amstrad_state::gx4000(machine_config &config)
 	m_crtc->out_de_callback().set(FUNC(amstrad_state::amstrad_plus_de_changed));
 	m_crtc->out_hsync_callback().set(FUNC(amstrad_state::amstrad_plus_hsync_changed));
 	m_crtc->out_vsync_callback().set(FUNC(amstrad_state::amstrad_plus_vsync_changed));
-
-	MCFG_VIDEO_START_OVERRIDE(amstrad_state,amstrad)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

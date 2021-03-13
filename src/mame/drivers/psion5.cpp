@@ -88,7 +88,7 @@ void psion5mx_state::machine_start()
 
 void psion5mx_state::machine_reset()
 {
-	memset(m_memcfg, 0, sizeof(uint32_t) * ARRAY_LENGTH(m_memcfg));
+	std::fill(std::begin(m_memcfg), std::end(m_memcfg), 0);
 	m_dramcfg = 0;
 
 	m_timers[0]->adjust(attotime::never);
@@ -107,7 +107,7 @@ void psion5mx_state::machine_reset()
 	m_ssi_read_counter = 0;
 	m_kbd_scan = 0;
 
-	memset(m_ports, 0, ARRAY_LENGTH(m_ports));
+	std::fill(std::begin(m_ports), std::end(m_ports), 0);
 
 	m_periodic->adjust(attotime::from_hz(64), 0, attotime::from_hz(64));
 
@@ -652,6 +652,7 @@ void psion5mx_state::periphs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		case REG_PADR:
 			LOGMASKED(LOG_GPIO_WRITES, "%s: peripheral write, PADR = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			m_ports[PORTA] = data;
+			break;
 		case REG_PBDR:
 		{
 			LOGMASKED(LOG_GPIO_WRITES, "%s: peripheral write, PBDR = %08x & %08x\n", machine().describe_context(), data, mem_mask);

@@ -209,7 +209,7 @@ void asma2k_state::port_a_w(uint8_t data)
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 
 		if (data & 0x40)
-			space.install_readwrite_bank(0x0000, 0x7fff, "rambank");
+			space.install_readwrite_bank(0x0000, 0x7fff, m_rambank);
 		else
 			space.install_readwrite_handler(0x0000, 0x7fff, read8sm_delegate(*this, FUNC(asma2k_state::io_r)), write8sm_delegate(*this, FUNC(asma2k_state::io_w)));
 	}

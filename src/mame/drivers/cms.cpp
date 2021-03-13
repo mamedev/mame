@@ -164,7 +164,7 @@ void cms_state::cms6502(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	VIA6522(config, m_via, 1_MHz_XTAL);
+	MOS6522(config, m_via, 1_MHz_XTAL);
 	m_via->irq_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
 
 	M3002(config, "rtc", 32.768_kHz_XTAL);

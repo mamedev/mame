@@ -8,7 +8,7 @@
 DEFINE_DEVICE_TYPE_NS(TI8X_GRAPH_LINK_HLE, bus::ti8x, graph_link_hle_device, "ti8x_glinkhle", "TI-Graph Link (grey, HLE)")
 
 
-namespace bus { namespace ti8x {
+namespace bus::ti8x {
 
 graph_link_hle_device::graph_link_hle_device(
 		machine_config const &mconfig,
@@ -142,4 +142,4 @@ void graph_link_hle_device::tra_complete()
 	accept_byte();
 }
 
-} } // namespace bus::ti8x
+} // namespace bus::ti8x

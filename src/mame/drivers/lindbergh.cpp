@@ -85,7 +85,7 @@ Answer X Answer 1.1                           ?                 ?               
 Answer X Answer DX                            ?                 ?               ?
 Answer X Answer Premium                       ?                 ?               ?
 Answer X Answer 2                             ?                 ?               DVP-0067
-Atractive Deck Poker (rev C)                  ?                 ?               DVP-0033C
+Attractive Deck Poker (rev C)                 ?                 ?               DVP-0033C
 Cloud Nine (rev E)                            ?                 ?               DVP-0034E
 Club Majesty Extend                           ?                 ?               ?
 Club Majesty Formal                           ?                 ?               ?
@@ -119,6 +119,7 @@ MJ4 Evolution                                 ?                 ?               
 OutRun 2 Special Tours (EXPORT)               253-5508-0452     317-0452-COM    ?
 OutRun 2 SP SDX                               ?                 ?               DVP-0015A
 Primeval Hunt                                 253-5508-0512     317-0512-COM   ^DVP-0048A
+Psy-Phi                                       ?                 ?               ?
 R-Tuned: Ultimate Street Racing               ?                 ?               DVP-0060
 Rambo (EXPORT)                                253-5508-0540    ^317-0540-COM   ^DVP-0069
 SEGA Network Casino Club Ver. 2               ?                 ?               DVP-0053
@@ -235,7 +236,7 @@ Rear Board incorporating Security Board (plugged into main board security connec
 ---------------------------------------
 
 This board has the power input connectors on it and holes for access to the mainboard
-I/O conections (LAN/COM/USB/speakers etc). Lower left is where the security board is plugged in.
+I/O connections (LAN/COM/USB/speakers etc). Lower left is where the security board is plugged in.
 
 837-14520R
 171-8322C
@@ -375,7 +376,7 @@ public:
 
 	void lindbergh(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };

@@ -51,7 +51,6 @@
 
 #include "corefile.h"
 #include "corestr.h"
-#include "osdcore.h"
 #include "strformat.h"
 
 #include <algorithm>
@@ -597,7 +596,7 @@ void cleaner_base::output_utf8(char32_t ch)
 
 void cleaner_base::commit_character(char32_t ch)
 {
-	assert(ARRAY_LENGTH(m_buffer) > m_position);
+	assert(std::size(m_buffer) > m_position);
 	assert(1U <= m_code_length);
 	assert(6U >= m_code_length);
 
@@ -697,7 +696,7 @@ void cleaner_base::commit_character(char32_t ch)
 
 void cleaner_base::process_if_full()
 {
-	if (ARRAY_LENGTH(m_buffer) == m_position)
+	if (std::size(m_buffer) == m_position)
 	{
 		process_characters(m_buffer, m_buffer + m_position);
 		m_position = 0U;
@@ -1247,6 +1246,7 @@ void cpp_cleaner::process_line_comment(char32_t ch)
 			break;
 		}
 		m_parse_state = parse_state::DEFAULT;
+		[[fallthrough]];
 	default:
 		output_character(ch);
 	}
@@ -1350,12 +1350,14 @@ void cpp_cleaner::process_numeric(char32_t ch)
 		case UPPERCASE_B:
 			++m_uppercase_radix;
 			ch = LOWERCASE_B;
+			[[fallthrough]];
 		case LOWERCASE_B:
 			m_radix = 2U;
 			break;
 		case UPPERCASE_X:
 			++m_uppercase_radix;
 			ch = LOWERCASE_X;
+			[[fallthrough]];
 		case LOWERCASE_X:
 			m_radix = 16U;
 			break;
@@ -1616,6 +1618,7 @@ void lua_cleaner::process_default(char32_t ch)
 			m_block_line = m_input_line;
 			m_block_level = m_long_bracket_level;
 			m_parse_state = parse_state::LONG_STRING_CONSTANT;
+			[[fallthrough]];
 		default:
 			m_long_bracket_level = -1;
 		}
@@ -1643,6 +1646,7 @@ void lua_cleaner::process_short_comment(char32_t ch)
 			m_block_level = m_long_bracket_level;
 			m_parse_state = parse_state::LONG_COMMENT;
 			set_tab_limit();
+			[[fallthrough]];
 		default:
 			m_long_bracket_level = -1;
 		}

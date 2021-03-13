@@ -201,8 +201,8 @@ If you calibrate the guns correctly the game runs as expected:
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "machine/upd7004.h"
-#include "sound/2608intf.h"
-#include "sound/2610intf.h"
+#include "sound/ym2608.h"
+#include "sound/ym2610.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -757,10 +757,10 @@ ROM_START( bbusters )
 	ROM_LOAD( "bb-8.a14",      0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
 	ROM_LOAD( "bb-9.c14",      0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "bb-pcma.l5",  0x000000, 0x80000, CRC(44cd5bfe) SHA1(26a612191a0aa614c090203485aba17c99c763ee) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "bb-pcmb.l3",  0x000000, 0x80000, CRC(c8d5dd53) SHA1(0f7e94532cc14852ca12c1b792e5479667af899e) )
 ROM_END
 
@@ -802,10 +802,10 @@ ROM_START( bbustersu )
 	ROM_LOAD( "bb-8.a14",      0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
 	ROM_LOAD( "bb-9.c14",      0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "bb-pcma.l5",  0x000000, 0x80000, CRC(44cd5bfe) SHA1(26a612191a0aa614c090203485aba17c99c763ee) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "bb-pcma.l5",  0x000000, 0x80000, CRC(44cd5bfe) SHA1(26a612191a0aa614c090203485aba17c99c763ee) )
 ROM_END
 
@@ -847,10 +847,10 @@ ROM_START( bbustersua )
 	ROM_LOAD( "bb-8.a14",      0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
 	ROM_LOAD( "bb-9.c14",      0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "bb-pcma.l5",  0x000000, 0x80000, CRC(44cd5bfe) SHA1(26a612191a0aa614c090203485aba17c99c763ee) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "bb-pcma.l5",  0x000000, 0x80000, CRC(44cd5bfe) SHA1(26a612191a0aa614c090203485aba17c99c763ee) )
 ROM_END
 
@@ -892,10 +892,10 @@ ROM_START( bbustersj )
 	ROM_LOAD( "bb-8.a14",      0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
 	ROM_LOAD( "bb-9.c14",      0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "bb-pcma.l5",  0x000000, 0x80000, CRC(44cd5bfe) SHA1(26a612191a0aa614c090203485aba17c99c763ee) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "bb-pcmb.l3",  0x000000, 0x80000, CRC(c8d5dd53) SHA1(0f7e94532cc14852ca12c1b792e5479667af899e) )
 ROM_END
 
@@ -937,10 +937,10 @@ ROM_START( bbustersja )
 	ROM_LOAD( "bb-8.a14",      0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
 	ROM_LOAD( "bb-9.c14",      0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "bb-pcma.l5",  0x000000, 0x80000, CRC(44cd5bfe) SHA1(26a612191a0aa614c090203485aba17c99c763ee) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "bb-pcmb.l3",  0x000000, 0x80000, CRC(c8d5dd53) SHA1(0f7e94532cc14852ca12c1b792e5479667af899e) )
 ROM_END
 
@@ -970,7 +970,7 @@ ROM_START( mechatt )
 	ROM_REGION( 0x80000, "gfx4", 0 ) // Located on the A8002-2 board
 	ROM_LOAD( "mab289c2.bin",  0x000000, 0x80000, CRC(14f97ceb) SHA1(a22033532ea616dc3a3db8b66ad6ccc6172ed7cc) )
 
-	ROM_REGION( 0x20000, "ymsnd", 0 ) // Located on the A8002-1 main board
+	ROM_REGION( 0x20000, "ymsnd:adpcma", 0 ) // Located on the A8002-1 main board
 	ROM_LOAD( "ma_2.d10", 0x000000, 0x20000, CRC(ea4cc30d) SHA1(d8f089fc0ce76309411706a8110ad907f93dc97e) )
 
 	ROM_REGION( 0x20000, "scale_table", 0 ) // Zoom table - Located on the A8002-2 board
@@ -1021,7 +1021,7 @@ ROM_START( mechattj ) // Uses EPROMs on official SNK A8002-5 & A8002-6 sub board
 	ROM_LOAD( "s_19.a5", 0x040000, 0x20000, CRC(b07f5289) SHA1(8817bd225edf9b0fa439b220617f925365e39253) )
 	ROM_LOAD( "s_20.a6", 0x060000, 0x20000, CRC(a9bb4fa9) SHA1(ccede784671a864667b92a8101d686c26c78d76f) )
 
-	ROM_REGION( 0x20000, "ymsnd", 0 ) // Located on the A8002-1 main board
+	ROM_REGION( 0x20000, "ymsnd:adpcma", 0 ) // Located on the A8002-1 main board
 	ROM_LOAD( "ma_2.d10", 0x000000, 0x20000, CRC(ea4cc30d) SHA1(d8f089fc0ce76309411706a8110ad907f93dc97e) )
 
 	ROM_REGION( 0x20000, "scale_table", 0 ) // Zoom table - Located on the A8002-2 board
@@ -1054,7 +1054,7 @@ ROM_START( mechattu )
 	ROM_REGION( 0x80000, "gfx4", 0 ) // Located on the A8002-2 board
 	ROM_LOAD( "mab289c2.bin",  0x000000, 0x80000, CRC(14f97ceb) SHA1(a22033532ea616dc3a3db8b66ad6ccc6172ed7cc) )
 
-	ROM_REGION( 0x20000, "ymsnd", 0 ) // Located on the A8002-1 main board
+	ROM_REGION( 0x20000, "ymsnd:adpcma", 0 ) // Located on the A8002-1 main board
 	ROM_LOAD( "ma_2.d10", 0x000000, 0x20000, CRC(ea4cc30d) SHA1(d8f089fc0ce76309411706a8110ad907f93dc97e) )
 
 	ROM_REGION( 0x20000, "scale_table", 0 ) // Zoom table - Located on the A8002-2 board
@@ -1106,7 +1106,7 @@ ROM_START( mechattu1 ) // Uses EPROMs on official SNK A8002-5 & A8002-6 sub boar
 	ROM_LOAD( "s_19.a5", 0x040000, 0x20000, CRC(b07f5289) SHA1(8817bd225edf9b0fa439b220617f925365e39253) )
 	ROM_LOAD( "s_20.a6", 0x060000, 0x20000, CRC(a9bb4fa9) SHA1(ccede784671a864667b92a8101d686c26c78d76f) )
 
-	ROM_REGION( 0x20000, "ymsnd", 0 ) // Located on the A8002-1 main board
+	ROM_REGION( 0x20000, "ymsnd:adpcma", 0 ) // Located on the A8002-1 main board
 	ROM_LOAD( "ma_2.d10", 0x000000, 0x20000, CRC(ea4cc30d) SHA1(d8f089fc0ce76309411706a8110ad907f93dc97e) )
 
 	ROM_REGION( 0x20000, "scale_table", 0 ) // Zoom table - Located on the A8002-2 board

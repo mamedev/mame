@@ -1008,8 +1008,8 @@ void seibuspi_state::base_map(address_map &map)
 	map(0x00000604, 0x00000607).portr("INPUTS");
 	map(0x00000608, 0x0000060b).portr("EXCH");
 	map(0x0000060c, 0x0000060f).portr("SYSTEM");
-	map(0x00200000, 0x003fffff).rom().share("share1");
-	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0).share("share1"); // ROM location in real-mode
+	map(0x00200000, 0x003fffff).rom().region("maincpu", 0);
+	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0); // ROM location in real-mode
 }
 
 void seibuspi_state::sei252_map(address_map &map)
@@ -1119,8 +1119,8 @@ void seibuspi_state::sys386f_map(address_map &map)
 	map(0x00000494, 0x00000497).w(FUNC(seibuspi_state::video_dma_address_w));
 	map(0x00000600, 0x00000607).r("ymz", FUNC(ymz280b_device::read)).umask32(0x000000ff);
 	map(0x0000060c, 0x0000060f).r(FUNC(seibuspi_state::ejsakura_keyboard_r));
-	map(0x00200000, 0x003fffff).rom().share("share1");
-	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0).share("share1"); // ROM location in real-mode
+	map(0x00200000, 0x003fffff).rom().region("maincpu", 0);
+	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0); // ROM location in real-mode
 }
 
 
@@ -1233,7 +1233,7 @@ CUSTOM_INPUT_MEMBER(seibuspi_state::ejanhs_encode)
 	static const u8 encoding[] = { 6, 5, 4, 3, 2, 7 };
 	ioport_value state = ~m_key[N]->read();
 
-	for (int bit = 0; bit < ARRAY_LENGTH(encoding); bit++)
+	for (int bit = 0; bit < std::size(encoding); bit++)
 		if (state & (1 << bit))
 			return encoding[bit];
 	return 0;

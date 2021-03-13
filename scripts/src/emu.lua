@@ -24,6 +24,7 @@ includedirs {
 	MAME_DIR .. "src/lib",
 	MAME_DIR .. "src/lib/util",
 	MAME_DIR .. "3rdparty",
+	MAME_DIR .. "3rdparty/sol2",
 	GEN_DIR  .. "emu",
 	GEN_DIR  .. "emu/layout",
 }
@@ -116,6 +117,8 @@ files {
 	MAME_DIR .. "src/emu/emucore.h",
 	MAME_DIR .. "src/emu/emumem.cpp",
 	MAME_DIR .. "src/emu/emumem.h",
+	MAME_DIR .. "src/emu/emumem_aspace.cpp",
+	MAME_DIR .. "src/emu/emumem_mview.cpp",
 	MAME_DIR .. "src/emu/emumem_mud.cpp",
 	MAME_DIR .. "src/emu/emumem_mud.h",
 	MAME_DIR .. "src/emu/emumem_hea.h",
@@ -250,7 +253,7 @@ files {
 	MAME_DIR .. "src/emu/debug/textbuf.cpp",
 	MAME_DIR .. "src/emu/debug/textbuf.h",
 	MAME_DIR .. "src/emu/drivers/empty.cpp",
-	MAME_DIR .. "src/emu/drivers/xtal.h",
+	MAME_DIR .. "src/emu/layout/generic.h",
 	MAME_DIR .. "src/emu/video/generic.cpp",
 	MAME_DIR .. "src/emu/video/generic.h",
 	MAME_DIR .. "src/emu/video/resnet.cpp",
@@ -265,7 +268,7 @@ files {
 }
 
 pchsource(MAME_DIR .. "src/emu/main.cpp")
--- 3 files do not inlcude emu.h
+-- 3 files do not include emu.h
 nopch(MAME_DIR .. "src/emu/emualloc.cpp")
 nopch(MAME_DIR .. "src/emu/attotime.cpp")
 nopch(MAME_DIR .. "src/emu/debug/textbuf.cpp")

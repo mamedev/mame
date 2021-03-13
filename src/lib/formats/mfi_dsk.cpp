@@ -94,7 +94,7 @@ bool mfi_format::supports_save() const
 	return true;
 }
 
-int mfi_format::identify(io_generic *io, uint32_t form_factor)
+int mfi_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	header h;
 
@@ -108,16 +108,20 @@ int mfi_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool mfi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool mfi_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	header h;
 	entry entries[84*2*4];
 	io_generic_read(io, &h, 0, sizeof(header));
 	int resolution = h.cyl_count >> RESOLUTION_SHIFT;
 	h.cyl_count &= CYLINDER_MASK;
+
 	io_generic_read(io, &entries, sizeof(header), (h.cyl_count << resolution)*h.head_count*sizeof(entry));
 
-	image->set_variant(h.variant);
+	image->set_form_variant(h.form_factor, h.variant);
+
+	if(!h.cyl_count)
+		return true;
 
 	std::vector<uint8_t> compressed;
 
@@ -160,7 +164,7 @@ bool mfi_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	return true;
 }
 
-bool mfi_format::save(io_generic *io, floppy_image *image)
+bool mfi_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int tracks, heads;
 	image->get_actual_geometry(tracks, heads);

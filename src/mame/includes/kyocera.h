@@ -25,7 +25,6 @@
 #include "bus/rs232/rs232.h"
 
 #include "emupal.h"
-#include "rendlay.h"
 
 
 #define SCREEN_TAG      "screen"
@@ -62,7 +61,9 @@ public:
 		m_rs232(*this, RS232_TAG),
 		m_rom(*this, I8085_TAG),
 		m_y(*this, "Y%u", 0U),
-		m_battery(*this, "BATTERY")
+		m_battery(*this, "BATTERY"),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2")
 	{ }
 
 	void kc85(machine_config &config);
@@ -93,6 +94,8 @@ protected:
 	required_memory_region m_rom;
 	required_ioport_array<9> m_y;
 	required_ioport m_battery;
+	memory_bank_creator m_bank1;
+	memory_bank_creator m_bank2;
 
 	virtual void machine_start() override;
 	memory_region *m_opt_region;
@@ -193,10 +196,15 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_rs232(*this, RS232_TAG),
 		m_rom(*this, I8085_TAG),
-		m_y(*this, "Y%u", 0U)
+		m_y(*this, "Y%u", 0U),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2")
 	{ }
 
 	void tandy200(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	required_device<i8085a_cpu_device> m_maincpu;
@@ -211,8 +219,9 @@ private:
 	required_device<rs232_port_device> m_rs232;
 	required_memory_region m_rom;
 	required_ioport_array<9> m_y;
+	memory_bank_creator m_bank1;
+	memory_bank_creator m_bank2;
 
-	virtual void machine_start() override;
 	memory_region *m_opt_region;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

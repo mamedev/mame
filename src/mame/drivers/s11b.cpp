@@ -141,7 +141,7 @@ static INPUT_PORTS_START( s11b )
 	PORT_CONFSETTING( 0x10, "English" )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER( s11b_state, s11b )
+void s11b_state::machine_reset()
 {
 	membank("bank0")->set_entry(0);
 	membank("bank1")->set_entry(0);
@@ -232,7 +232,6 @@ void s11b_state::s11b_base(machine_config &config)
 	/* basic machine hardware */
 	M6808(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &s11_state::s11_main_map);
-	MCFG_MACHINE_RESET_OVERRIDE(s11b_state, s11b)
 	INPUT_MERGER_ANY_HIGH(config, m_mainirq).output_handler().set(FUNC(s11_state::main_irq));
 	INPUT_MERGER_ANY_HIGH(config, m_piairq).output_handler().set(FUNC(s11_state::pia_irq));
 
@@ -389,6 +388,28 @@ ROM_START(bcats_l2)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("bcgu26.la2", 0x4000, 0x4000, CRC(206c7cf8) SHA1(34eb128d46a0e1ba943f4e37aa95fa6d81aefb0e))
 	ROM_LOAD("bcgu27.la2", 0x8000, 0x8000, CRC(911981c6) SHA1(0d5b5c6d8399c6337300c789a0466242f91eaf94))
+	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("cats_u21.l1", 0x18000, 0x8000, CRC(04110d08) SHA1(4b44b26983cb5d14a93c16a19dc2bdbaa665dc69))
+	ROM_LOAD("cats_u22.l1", 0x10000, 0x8000, CRC(7e152c78) SHA1(b4ab770fdd9420a5d35e55bf8fb84c99ac544b8b))
+	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
+	ROM_LOAD("cats_u4.l1", 0x00000, 0x8000, CRC(18c62813) SHA1(a4fb69cfedd0b92c22b599913df3cdf8b3eef42c))
+	ROM_RELOAD(0x08000,0x8000)
+	ROM_RELOAD(0x10000,0x8000)
+	ROM_RELOAD(0x18000,0x8000)
+	ROM_LOAD("cats_u19.l1", 0x20000, 0x8000, CRC(f2fea68b) SHA1(9a41823e71342b7a162420378f122bba34ce0636))
+	ROM_RELOAD(0x28000,0x8000)
+	ROM_RELOAD(0x30000,0x8000)
+	ROM_RELOAD(0x38000,0x8000)
+	ROM_LOAD("cats_u20.l1", 0x40000, 0x8000, CRC(bf4dc35a) SHA1(9920ce90d93fb6ecf98792c35bb6eb8862a969f3))
+	ROM_RELOAD(0x48000,0x8000)
+	ROM_RELOAD(0x50000,0x8000)
+	ROM_RELOAD(0x58000,0x8000)
+ROM_END
+
+ROM_START(bcats_g4)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("cats_u26.l5",  0x4000, 0x4000, CRC(32246d12) SHA1(b8aa89d197a6b992501904f5072a10ab1a31db87))
+	ROM_LOAD("cats_u27.lg4", 0x8000, 0x8000, CRC(6af8cc3b) SHA1(ac9908dc3fbe1d3b1821c2976aaa5bbffbf24cda))
 	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("cats_u21.l1", 0x18000, 0x8000, CRC(04110d08) SHA1(4b44b26983cb5d14a93c16a19dc2bdbaa665dc69))
 	ROM_LOAD("cats_u22.l1", 0x10000, 0x8000, CRC(7e152c78) SHA1(b4ab770fdd9420a5d35e55bf8fb84c99ac544b8b))
@@ -1532,6 +1553,7 @@ ROM_END
 
 GAME(1989,  bcats_l5,       0,          s11b,   s11b, s11b_state, init_s11b_invert, ROT0, "Williams", "Bad Cats (L-5)",                               MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  bcats_l2,       bcats_l5,   s11b,   s11b, s11b_state, init_s11b_invert, ROT0, "Williams", "Bad Cats (LA-2)",                              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989,  bcats_g4,       bcats_l5,   s11b,   s11b, s11b_state, init_s11b_invert, ROT0, "Williams", "Bad Cats (LG-4)",                              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988,  bnzai_l3,       0,          s11b,   s11b, s11b_state, init_s11b,        ROT0, "Williams", "Banzai Run (L-3)",                             MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988,  bnzai_g3,       bnzai_l3,   s11b,   s11b, s11b_state, init_s11b,        ROT0, "Williams", "Banzai Run (L-3) Germany",                     MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988,  bnzai_l1,       bnzai_l3,   s11b,   s11b, s11b_state, init_s11b,        ROT0, "Williams", "Banzai Run (L-1)",                             MACHINE_IS_SKELETON_MECHANICAL)

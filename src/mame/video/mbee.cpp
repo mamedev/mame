@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
 /***************************************************************************
-    microbee.c
+    mbee.cpp
 
     video hardware
     Originally written by Juergen Buchmueller, Dec 1999

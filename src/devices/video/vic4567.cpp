@@ -191,7 +191,8 @@ void vic3_device::device_start()
 	m_lightpen_x_cb.resolve_safe(0);
 	m_lightpen_y_cb.resolve_safe(0);
 
-	m_screenptr[0] = auto_alloc_array(machine(), uint8_t, 216 * 656 / 8);
+	m_screendata = std::make_unique<uint8_t []>(216 * 656 / 8);
+	m_screenptr[0] = m_screendata.get();
 
 	for (int i = 1; i < 216; i++)
 		m_screenptr[i] = m_screenptr[i - 1] + 656 / 8;
@@ -316,7 +317,7 @@ void vic3_device::device_start()
 
 void vic3_device::device_reset()
 {
-	memset(m_reg, 0, ARRAY_LENGTH(m_reg));
+	std::fill(std::begin(m_reg), std::end(m_reg), 0);
 
 	m_on = 1;
 
@@ -354,8 +355,8 @@ void vic3_device::device_reset()
 	m_lastline = 0;
 	m_rasterline = 0;
 
-	memset(m_shift, 0, ARRAY_LENGTH(m_shift));
-	memset(m_multi_collision, 0, ARRAY_LENGTH(m_multi_collision));
+	std::fill(std::begin(m_shift), std::end(m_shift), 0);
+	std::fill(std::begin(m_multi_collision), std::end(m_multi_collision), 0);
 
 	for (int i = 0; i < 256; i++)
 	{

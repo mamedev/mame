@@ -13,8 +13,8 @@
 
 #pragma once
 
-#include "osdcore.h"
-#include "coretmpl.h"
+#include <cstdint>
+#include <vector>
 
 
 //**************************************************************************

@@ -43,7 +43,7 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/vs9209.h"
-#include "sound/2610intf.h"
+#include "sound/ym2610.h"
 #include "speaker.h"
 
 
@@ -605,10 +605,10 @@ ROM_START( gstriker )
 	ROM_LOAD( "human_scr-gs-104_m531602c-43_3405354.u22", 0x600000, 0x200000, CRC(0ac33e5a) SHA1(9d7717d80f2c6817bac3fad50c39e04f0aa94255) )
 	ROM_LOAD( "human-4_27c240.u6",   0xf80000, 0x080000, CRC(a990f9bb) SHA1(7ce31d4c650eb244e2ab285f253a98d6613b7dc8) ) // extra european team flags
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "human_scr-gs-106_m532001b-16_3402370.u93", 0x00000, 0x040000, CRC(93c9868c) SHA1(dcecb34e46405155e35aaf134b8547430d23f5a7) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "scrgs107.u99", 0x00000, 0x100000, CRC(ecc0a01b) SHA1(239e832b7d22925460a8f44eb82e782cd13aba49) )
 
 	ROM_REGION( 0x1000, "plds", 0 )
@@ -640,10 +640,10 @@ ROM_START( gstrikera )
 	ROM_LOAD( "human_scr-gs-104_m531602c-43_3405354.u22", 0x600000, 0x200000, CRC(0ac33e5a) SHA1(9d7717d80f2c6817bac3fad50c39e04f0aa94255) )
 	ROM_LOAD( "human-4_27c240.u6",   0xf80000, 0x080000, CRC(a990f9bb) SHA1(7ce31d4c650eb244e2ab285f253a98d6613b7dc8) ) // extra european team flags
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "human_scr-gs-106_m532001b-16_3402370.u93", 0x00000, 0x040000, CRC(93c9868c) SHA1(dcecb34e46405155e35aaf134b8547430d23f5a7) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "scrgs107.u99", 0x00000, 0x100000, CRC(ecc0a01b) SHA1(239e832b7d22925460a8f44eb82e782cd13aba49) )
 
 	/* PALs were protected on this version, used the ones from the "gstriker" set */
@@ -676,10 +676,10 @@ ROM_START( gstrikerj )
 	ROM_LOAD( "human_scr-gs-104_m531602c-43_3405354.u22", 0x600000, 0x200000, CRC(0ac33e5a) SHA1(9d7717d80f2c6817bac3fad50c39e04f0aa94255) )
 	// u6 is NOT populated on the JPN version
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "human_scr-gs-106_m532001b-16_3402370.u93", 0x00000, 0x040000, CRC(93c9868c) SHA1(dcecb34e46405155e35aaf134b8547430d23f5a7) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "scrgs107.u99", 0x00000, 0x100000, CRC(ecc0a01b) SHA1(239e832b7d22925460a8f44eb82e782cd13aba49) )
 
 	/* PALs were protected on this version, used the ones from the "gstriker" set */
@@ -722,10 +722,10 @@ ROM_START( vgoalsoc )
 	ROM_LOAD( "c13_u11.u11",  0x000000, 0x200000, CRC(76d09f27) SHA1(ffef83954426f9e56bbe2d98b32cea675c063fab) )
 	ROM_LOAD( "c13_u12.u12",  0x200000, 0x200000, CRC(a3874419) SHA1(c9fa283106ada3419e311f400fcf4251b32318c4) )
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "c13_u86.u86",  0x000000, 0x040000, CRC(4b76a162) SHA1(38dcb7536662f5f520e59f3ff746b42e9df789d2) )
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "c13_u104.104", 0x000000, 0x200000, CRC(8437b6f8) SHA1(79f183dcbf3cde5c77e086e4fdd8341809396e37) )
 
 	ROM_REGION( 0x1200, "plds", 0 ) // from twcup94a set
@@ -753,10 +753,10 @@ ROM_START( vgoalsca )
 	ROM_LOAD( "c13_u11.u11",  0x000000, 0x200000, CRC(76d09f27) SHA1(ffef83954426f9e56bbe2d98b32cea675c063fab) )
 	ROM_LOAD( "c13_u12.u12",  0x200000, 0x200000, CRC(a3874419) SHA1(c9fa283106ada3419e311f400fcf4251b32318c4) )
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "c13_u86.u86",  0x000000, 0x040000, CRC(4b76a162) SHA1(38dcb7536662f5f520e59f3ff746b42e9df789d2) )
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "c13_u104.104", 0x000000, 0x200000, CRC(8437b6f8) SHA1(79f183dcbf3cde5c77e086e4fdd8341809396e37) )
 
 	ROM_REGION( 0x1200, "plds", 0 ) // from twcup94a set
@@ -786,10 +786,10 @@ ROM_START( twcup94 )
 	ROM_LOAD( "u13", 0x400000, 0x200000, CRC(8db6b3a9) SHA1(9422cd5d6fb57a7eaa7a13bdf4ccee1f8b57f773) )
 	ROM_LOAD( "u14", 0x600000, 0x200000, CRC(89739c31) SHA1(29cd779bfe93448fb6cbfe6f8e3661dd659c0d21) )
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "u86", 0x000000, 0x040000, CRC(775f45dc) SHA1(1a740dd880d9f873e93dfc096fbcae1784b4f522) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "u104", 0x000000, 0x100000, CRC(df07d0af) SHA1(356560e164ff222bc9004fe202f829c93244a6c9) )
 
 	ROM_REGION( 0x1200, "plds", 0 ) // from twcup94a set
@@ -819,10 +819,10 @@ ROM_START( twcup94a )
 	ROM_LOAD( "u13", 0x400000, 0x200000, CRC(8db6b3a9) SHA1(9422cd5d6fb57a7eaa7a13bdf4ccee1f8b57f773) )
 	ROM_LOAD( "u14", 0x600000, 0x200000, CRC(89739c31) SHA1(29cd779bfe93448fb6cbfe6f8e3661dd659c0d21) )
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "u86", 0x000000, 0x040000, CRC(775f45dc) SHA1(1a740dd880d9f873e93dfc096fbcae1784b4f522) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "u104", 0x000000, 0x100000, CRC(df07d0af) SHA1(356560e164ff222bc9004fe202f829c93244a6c9) )
 
 	ROM_REGION( 0x1200, "plds", 0 )
@@ -852,10 +852,10 @@ ROM_START( twcup94b )
 	ROM_LOAD( "u13", 0x400000, 0x200000, CRC(8db6b3a9) SHA1(9422cd5d6fb57a7eaa7a13bdf4ccee1f8b57f773) )
 	ROM_LOAD( "u14", 0x600000, 0x200000, CRC(89739c31) SHA1(29cd779bfe93448fb6cbfe6f8e3661dd659c0d21) )
 
-	ROM_REGION( 0x40000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x40000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "u86", 0x000000, 0x040000, CRC(775f45dc) SHA1(1a740dd880d9f873e93dfc096fbcae1784b4f522) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "u104", 0x000000, 0x100000, CRC(df07d0af) SHA1(356560e164ff222bc9004fe202f829c93244a6c9) )
 
 	ROM_REGION( 0x1200, "plds", 0 ) // from twcup94a set

@@ -224,7 +224,7 @@ public:
 		, m_bank2(*this, "bank2")
 		, m_bank3(*this, "bank3")
 		, m_bank4(*this, "bank4")
-		, m_region_maincpu(*this, "maincpu")
+		, m_share_maincpu(*this, "maincpu")
 		, m_region_kernel(*this, "kernel")
 		, m_io_in0(*this, "IN0")
 		, m_io_in1(*this, "IN1")
@@ -295,7 +295,7 @@ private:
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4;
-	required_memory_region m_region_maincpu;
+	required_shared_ptr<u8> m_share_maincpu;
 	required_memory_region m_region_kernel;
 	required_ioport m_io_in0;
 	required_ioport m_io_in1;

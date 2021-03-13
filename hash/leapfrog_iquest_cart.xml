@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="leapfrog_iquest_cart" description="LeapFrog IQuest cartridges">
+
+	<software name="start40" supported="no">
+		<description>IQuest 4.0 Starter Pack</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_iquest_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="iqueststarterpack.bin" size="0x400000" crc="f20f1a67" sha1="4bc8533e0266ba6d21d14e45e30af3cdb943c865" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scig5" supported="no">
+		<description>Science Grade 5</description>
+		<year>200?</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_iquest_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="iquestsciencegrade5.bin" size="0x400000" crc="0ce7729c" sha1="b3585b1f181afe618835742d2dcd05903671c789" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

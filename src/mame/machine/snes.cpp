@@ -1071,21 +1071,18 @@ void snes_state::machine_start()
 
 	snes_init_timers();
 
-	for (int i = 0; i < 8; i++)
-	{
-		save_item(NAME(m_dma_channel[i].dmap), i);
-		save_item(NAME(m_dma_channel[i].dest_addr), i);
-		save_item(NAME(m_dma_channel[i].src_addr), i);
-		save_item(NAME(m_dma_channel[i].bank), i);
-		save_item(NAME(m_dma_channel[i].trans_size), i);
-		save_item(NAME(m_dma_channel[i].ibank), i);
-		save_item(NAME(m_dma_channel[i].hdma_addr), i);
-		save_item(NAME(m_dma_channel[i].hdma_iaddr), i);
-		save_item(NAME(m_dma_channel[i].hdma_line_counter), i);
-		save_item(NAME(m_dma_channel[i].unk), i);
-		save_item(NAME(m_dma_channel[i].do_transfer), i);
-		save_item(NAME(m_dma_channel[i].dma_disabled), i);
-	}
+	save_item(STRUCT_MEMBER(m_dma_channel, dmap));
+	save_item(STRUCT_MEMBER(m_dma_channel, dest_addr));
+	save_item(STRUCT_MEMBER(m_dma_channel, src_addr));
+	save_item(STRUCT_MEMBER(m_dma_channel, bank));
+	save_item(STRUCT_MEMBER(m_dma_channel, trans_size));
+	save_item(STRUCT_MEMBER(m_dma_channel, ibank));
+	save_item(STRUCT_MEMBER(m_dma_channel, hdma_addr));
+	save_item(STRUCT_MEMBER(m_dma_channel, hdma_iaddr));
+	save_item(STRUCT_MEMBER(m_dma_channel, hdma_line_counter));
+	save_item(STRUCT_MEMBER(m_dma_channel, unk));
+	save_item(STRUCT_MEMBER(m_dma_channel, do_transfer));
+	save_item(STRUCT_MEMBER(m_dma_channel, dma_disabled));
 
 	save_item(NAME(m_hblank_offset));
 	save_item(NAME(m_wram_address));
@@ -1107,6 +1104,7 @@ void snes_state::machine_start()
 	m_input_disabled = 0;
 	m_game_over_flag = 0;
 	m_joy_flag = 1;
+	m_wram_address = 0;
 }
 
 void snes_state::machine_reset()

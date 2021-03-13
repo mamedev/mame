@@ -185,9 +185,9 @@ void micro3d_state::micro3d_mac2_w(uint32_t data)
 		case 0x00: break;
 		case 0x04: break;
 
-		case 0x0b: cnt += 0x100;
-		case 0x0a: cnt += 0x100;
-		case 0x09: cnt += 0x100;
+		case 0x0b: cnt += 0x100; [[fallthrough]];
+		case 0x0a: cnt += 0x100; [[fallthrough]];
+		case 0x09: cnt += 0x100; [[fallthrough]];
 		case 0x08:
 		{
 			int i;
@@ -225,8 +225,8 @@ void micro3d_state::micro3d_mac2_w(uint32_t data)
 
 			break;
 		}
-		case 0x0e: cnt += 0x100;
-		case 0x0d: cnt += 0x100;
+		case 0x0e: cnt += 0x100; [[fallthrough]];
+		case 0x0d: cnt += 0x100; [[fallthrough]];
 		case 0x0c:
 		{
 			int i;
@@ -277,7 +277,7 @@ void micro3d_state::micro3d_mac2_w(uint32_t data)
 			break;
 		}
 		/* Dot product of SRAM vectors with single SRAM vector */
-		case 0x11: cnt += 0x100;
+		case 0x11: cnt += 0x100; [[fallthrough]];
 		case 0x10:
 		{
 			micro3d_vtx v2;
@@ -302,8 +302,8 @@ void micro3d_state::micro3d_mac2_w(uint32_t data)
 			break;
 		}
 		/* Dot product of SRAM vectors with SRAM vectors */
-		case 0x16: cnt += 0x100;
-		case 0x15: cnt += 0x100;
+		case 0x16: cnt += 0x100; [[fallthrough]];
+		case 0x15: cnt += 0x100; [[fallthrough]];
 		case 0x14:
 		{
 			for (int i = 0; i <= cnt; ++i)

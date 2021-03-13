@@ -155,22 +155,21 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 
 void vrender0soc_device::device_start()
 {
-	int i;
-	m_textureram = auto_alloc_array_clear(machine(), uint16_t, 0x00800000/2);
-	m_frameram = auto_alloc_array_clear(machine(), uint16_t, 0x00800000/2);
+	m_textureram = make_unique_clear<uint16_t []>(0x00800000/2);
+	m_frameram = make_unique_clear<uint16_t []>(0x00800000/2);
 
-	m_vr0vid->set_areas(m_textureram, m_frameram);
+	m_vr0vid->set_areas(m_textureram.get(), m_frameram.get());
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
 
 	if (this->clock() == 0)
 		fatalerror("%s: bus clock not setup properly",this->tag());
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 		m_Timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrender0soc_device::Timercb),this), (void*)(uintptr_t)i);
 
 	write_tx.resolve_all_safe();
 
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		m_uart[i]->set_channel_num(i);
 		m_uart[i]->set_parent(this);

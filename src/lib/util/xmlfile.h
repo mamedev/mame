@@ -7,13 +7,11 @@
     XML file parsing code.
 
 ***************************************************************************/
-
-#pragma once
-
 #ifndef MAME_LIB_UTIL_XMLFILE_H
 #define MAME_LIB_UTIL_XMLFILE_H
 
-#include "osdcore.h"
+#pragma once
+
 #include "corefile.h"
 
 #include <list>
@@ -25,7 +23,7 @@
 struct XML_ParserStruct;
 
 
-namespace util { namespace xml {
+namespace util::xml {
 
 /***************************************************************************
     CONSTANTS
@@ -134,6 +132,9 @@ public:
 
 	// return whether a node has the specified attribute
 	bool has_attribute(const char *attribute) const;
+
+	// return a pointer to the string value of an attribute, or nullptr if not present
+	std::string const *get_attribute_string_ptr(const char *attribute) const;
 
 	// return the string value of an attribute, or the specified default if not present
 	const char *get_attribute_string(const char *attribute, const char *defvalue) const;
@@ -246,6 +247,6 @@ private:
 /* normalize a string into something that can be written to an XML file */
 const char *normalize_string(const char *string);
 
-} } // namespace util::xml
+} // namespace util::xml
 
-#endif  /* MAME_LIB_UTIL_XMLFILE_H */
+#endif // MAME_LIB_UTIL_XMLFILE_H

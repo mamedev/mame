@@ -87,28 +87,6 @@ void coco3_state::ff40_write(offs_t offset, uint8_t data)
 
 
 //-------------------------------------------------
-//  firq_get_line
-//-------------------------------------------------
-
-bool coco3_state::firq_get_line(void)
-{
-	return coco_state::firq_get_line() || m_gime->firq_r();
-}
-
-
-
-//-------------------------------------------------
-//  irq_get_line
-//-------------------------------------------------
-
-bool coco3_state::irq_get_line(void)
-{
-	return coco_state::irq_get_line() || m_gime->irq_r();
-}
-
-
-
-//-------------------------------------------------
 //  update_keyboard_input
 //-------------------------------------------------
 

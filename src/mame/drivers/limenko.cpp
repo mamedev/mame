@@ -54,6 +54,7 @@ public:
 		, m_spriteram(*this, "spriteram")
 		, m_videoreg(*this, "videoreg")
 		, m_gfx_region(*this, "gfx")
+		, m_qs1000_bank(*this, "qs1000_bank")
 	{
 	}
 
@@ -86,6 +87,8 @@ private:
 	required_shared_ptr<u32> m_spriteram;
 	required_shared_ptr<u32> m_videoreg;
 	required_region_ptr<u8> m_gfx_region;
+
+	memory_bank_creator m_qs1000_bank;
 
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_md_tilemap;
@@ -200,7 +203,7 @@ void limenko_state::qs1000_p3_w(u8 data)
 	// ...x .... - ?
 	// ..x. .... - /IRQ clear
 
-	membank("qs1000:bank")->set_entry(data & 0x07);
+	m_qs1000_bank->set_entry(data & 0x07);
 
 	if (!BIT(data, 5))
 		m_soundlatch->acknowledge_w();
@@ -1071,8 +1074,8 @@ u32 limenko_state::spotty_speedup_r()
 void limenko_state::init_common()
 {
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
-	m_qs1000->cpu().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
-	membank("qs1000:bank")->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
+	m_qs1000->cpu().space(AS_IO).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
+	m_qs1000_bank->configure_entries(0, 8, memregion("qs1000:cpu")->base()+0x100, 0x10000);
 
 	m_spriteram_bit = 1;
 }

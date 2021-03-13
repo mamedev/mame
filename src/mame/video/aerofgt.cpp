@@ -77,6 +77,8 @@ VIDEO_START_MEMBER(aerofgt_state,pspikes)
 	/* no bg2 in this game */
 
 	m_sprite_gfx = 1;
+	m_spikes91_lookup = 0;
+	m_charpalettebank = 0;
 
 	aerofgt_register_state_globals();
 	save_item(NAME(m_spikes91_lookup));

@@ -51,7 +51,7 @@ private:
 	required_region_ptr<uint8_t> m_video_bios;
 	required_region_ptr<uint8_t> m_ex_bios;
 
-	uint8_t *m_shadow_ram;
+	std::unique_ptr<uint8_t []> m_shadow_ram;
 
 	uint8_t bios_r(offs_t offset);
 	void bios_w(offs_t offset, uint8_t data);
@@ -230,8 +230,8 @@ INPUT_PORTS_END
 
 void photoply_state::machine_start()
 {
-	m_shadow_ram = auto_alloc_array(machine(), uint8_t, 0x40000);
-	save_pointer(NAME(m_shadow_ram),0x40000);
+	m_shadow_ram = std::make_unique<uint8_t []>(0x40000);
+	save_pointer(NAME(m_shadow_ram), 0x40000);
 }
 
 void photoply_state::machine_reset()

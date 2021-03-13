@@ -56,10 +56,15 @@ DEFINE_DEVICE_TYPE(HP_HIL_MLC, hp_hil_mlc_device, "hp_hil_mlc", "HP-HIL Master L
 //  hp_hil_mlc_device - constructor
 //-------------------------------------------------
 hp_hil_mlc_device::hp_hil_mlc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HP_HIL_MLC, tag, owner, clock)
-	, m_loop(1)
-	, int_cb(*this)
-	, nmi_cb(*this)
+	: device_t{mconfig, HP_HIL_MLC, tag, owner, clock}
+	, m_r2{0}
+	, m_r3{0}
+	, m_w1{0}
+	, m_w2{0}
+	, m_w3{0}
+	, m_loop{1}
+	, int_cb{*this}
+	, nmi_cb{*this}
 {
 }
 
@@ -96,6 +101,10 @@ void hp_hil_mlc_device::device_reset()
 
 	m_r2 = 0;
 	m_r3 = 0; // HPMLC_R3_NMI;
+	m_w1 = 0;
+	m_w2 = 0;
+	m_w3 = 0;
+	m_loop = 1;
 }
 
 
@@ -244,6 +253,8 @@ WRITE_LINE_MEMBER(hp_hil_mlc_device::ap_w)
 device_hp_hil_interface::device_hp_hil_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "hphil")
 	, m_hp_hil_mlc(nullptr)
+	, m_device_id(0)
+	, m_device_id16(0)
 	, m_next(nullptr)
 {
 }

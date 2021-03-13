@@ -27,7 +27,7 @@
 
 DEFINE_DEVICE_TYPE_NS(TI99_MEMEX, bus::ti99::peb, geneve_memex_device, "ti99_memex", "Geneve memory expansion card")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 #define RAMREGION "ram2meg"
 
@@ -181,4 +181,4 @@ ioport_constructor geneve_memex_device::device_input_ports() const
 	return INPUT_PORTS_NAME( memex );
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

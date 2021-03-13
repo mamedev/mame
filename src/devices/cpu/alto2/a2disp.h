@@ -193,26 +193,26 @@
 #ifndef MAME_CPU_ALTO2_A2DISP_H
 #define MAME_CPU_ALTO2_A2DISP_H
 struct {
-	uint32_t state;                           //!< current state of the display_state_machine()
-	uint32_t hlc;                             //!< horizontal line counter
-	uint32_t setmode;                         //!< value written by last SETMODE<-
-	uint32_t inverse;                         //!< set to 0xffff if line is inverse, 0x0000 otherwise
-	uint32_t scanline;                        //!< current scanline
+	uint32_t state;                         //!< current state of the display_state_machine()
+	uint32_t hlc;                           //!< horizontal line counter
+	uint32_t setmode;                       //!< value written by last SETMODE<-
+	uint32_t inverse;                       //!< set to 0xffff if line is inverse, 0x0000 otherwise
+	uint32_t scanline;                      //!< current scanline
 	bool halfclock;                         //!< false for normal pixel clock, true for half pixel clock
 	bool vblank;                            //!< true during vblank, false otherwise
-	uint16_t fifo[A2_DISP_FIFO];              //!< display word fifo
-	uint32_t wa;                              //!< fifo input pointer (write address; 4-bit)
-	uint32_t ra;                              //!< fifo output pointer (read address; 4-bit)
-	uint32_t a63;                             //!< most recent value read from the PROM a63
-	uint32_t a66;                             //!< most recent value read from the PROM a66
+	uint16_t fifo[A2_DISP_FIFO];            //!< display word fifo
+	uint32_t wa;                            //!< fifo input pointer (write address; 4-bit)
+	uint32_t ra;                            //!< fifo output pointer (read address; 4-bit)
+	uint32_t a63;                           //!< most recent value read from the PROM a63
+	uint32_t a66;                           //!< most recent value read from the PROM a66
 	bool dht_blocks;                        //!< set true, if the DHT executed BLOCK
 	bool dwt_blocks;                        //!< set true, if the DWT executed BLOCK
 	bool curt_blocks;                       //!< set true, if the CURT executed BLOCK
 	bool curt_wakeup;                       //!< set true, if CURT wakeups are generated
-	uint32_t xpreg;                           //!< cursor cursor x position register (10-bit)
-	uint32_t csr;                             //!< cursor shift register (16-bit)
-	std::unique_ptr<uint16_t[]> framebuf;     //!< array of words of the raw bitmap that is displayed
-	uint8_t *patterns;                        //!< array of 65536 patterns (16 bytes) with 1 byte per pixel
+	uint32_t xpreg;                         //!< cursor cursor x position register (10-bit)
+	uint32_t csr;                           //!< cursor shift register (16-bit)
+	std::unique_ptr<uint16_t[]> framebuf;   //!< array of words of the raw bitmap that is displayed
+	std::unique_ptr<uint8_t[]> patterns;    //!< array of 65536 patterns (16 bytes) with 1 byte per pixel
 	std::unique_ptr<bitmap_ind16> bitmap;   //!< MAME bitmap with 16 bit indices
 }   m_dsp;
 

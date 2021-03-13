@@ -306,7 +306,7 @@ void exidy440_state::exidy440_bank_select(uint8_t bank)
 		if (bank == 0 && m_bank != 0)
 			m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x7fff, read8sm_delegate(*this, FUNC(exidy440_state::showdown_bank0_r)));
 		else if (bank != 0 && m_bank == 0)
-			m_maincpu->space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, "bank1");
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, membank("bank1"));
 	}
 
 	/* select the bank and update the bank pointer */

@@ -13,8 +13,8 @@
 
 #pragma once
 
-#include "osdcore.h"
 #include "bitstream.h"
+#include "osdcomm.h"
 
 
 //**************************************************************************

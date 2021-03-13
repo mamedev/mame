@@ -372,12 +372,15 @@ void galaxold_state::video_start_common()
 	m_background_red = 0;
 	m_background_green = 0;
 
+	m_stars_on = 0;
 	m_draw_stars = &galaxold_state::noop_draw_stars;
 
 	m_flipscreen_x = 0;
 	m_flipscreen_y = 0;
 
 	m_spriteram2_present = 0;
+
+	std::fill(std::begin(m_gfxbank), std::end(m_gfxbank), 0);
 
 	state_save_register();
 }
@@ -696,22 +699,6 @@ VIDEO_START_MEMBER(galaxold_state,harem)
 	m_modify_spritecode = &galaxold_state::harem_modify_spritecode;
 }
 
-VIDEO_START_MEMBER(galaxold_state,ozon1)
-{
-	VIDEO_START_CALL_MEMBER(galaxold_plain);
-
-	m_bg_tilemap->set_scrolldx(0, 384-256);
-}
-
-VIDEO_START_MEMBER(galaxold_state,bongo)
-{
-	VIDEO_START_CALL_MEMBER(galaxold_plain);
-
-	m_bg_tilemap->set_scrolldx(0, 384-256);
-
-	m_modify_spritecode = &galaxold_state::batman2_modify_spritecode;
-}
-
 TILE_GET_INFO_MEMBER(galaxold_state::dambustr_get_tile_info2)
 {
 	uint8_t x = tile_index & 0x1f;
@@ -741,6 +728,7 @@ VIDEO_START_MEMBER(galaxold_state,dambustr)
 	m_dambustr_bg_color_2 = 0;
 	m_dambustr_bg_priority = 0;
 	m_dambustr_char_bank = 0;
+	m_stars_scrollpos = 0;
 
 	m_draw_background = &galaxold_state::dambustr_draw_background;
 
@@ -1736,22 +1724,4 @@ uint32_t galaxold_state::screen_update_dambustr(screen_device &screen, bitmap_in
 	};
 
 	return 0;
-}
-
-void galaxold_state::bagmanmc_modify_charcode(uint16_t *code, uint8_t x)
-{
-	*code |= (m_gfxbank[0] << 9);
-}
-
-void galaxold_state::bagmanmc_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs)
-{
-	*code |= (m_gfxbank[0] << 7) | 0x40;
-}
-
-VIDEO_START_MEMBER(galaxold_state,bagmanmc)
-{
-	VIDEO_START_CALL_MEMBER(galaxold);
-
-	m_modify_charcode = &galaxold_state::bagmanmc_modify_charcode;
-	m_modify_spritecode = &galaxold_state::bagmanmc_modify_spritecode;
 }

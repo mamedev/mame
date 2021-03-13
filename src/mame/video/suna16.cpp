@@ -96,6 +96,8 @@ void suna16_state::video_start()
 	m_paletteram = std::make_unique<uint16_t[]>(m_palette->entries());
 
 	save_item(NAME(m_color_bank));
+
+	m_color_bank = 0;
 }
 
 uint16_t suna16_state::paletteram_r(offs_t offset)

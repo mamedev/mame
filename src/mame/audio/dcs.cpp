@@ -706,8 +706,8 @@ dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type ty
 	m_sounddata_bank(0),
 	m_ram_map(*this, "data_map_bank"),
 	m_data_bank(*this, "databank"),
-	m_rom_page(nullptr),
-	m_dram_page(nullptr),
+	m_rom_page(*this, "rompage"),
+	m_dram_page(*this, "drampage"),
 	m_auto_ack(0),
 	m_latch_control(0),
 	m_input_data(0),
@@ -1051,16 +1051,14 @@ void dcs_audio_device::sdrc_remap_memory()
 	{
 		int baseaddr = (SDRC_ROM_ST == 0) ? 0x0000 : (SDRC_ROM_ST == 1) ? 0x3000 : 0x3400;
 		int pagesize = (SDRC_ROM_SZ == 0 && SDRC_ROM_ST != 0) ? 4096 : 1024;
-		m_data->install_read_bank(baseaddr, baseaddr + pagesize - 1, "rompage");
-		m_rom_page = membank("rompage");
+		m_data->install_read_bank(baseaddr, baseaddr + pagesize - 1, m_rom_page);
 	}
 
 	/* map the DRAM page as bank 26 */
 	if (SDRC_DM_ST != 0)
 	{
 		int baseaddr = (SDRC_DM_ST == 1) ? 0x0000 : (SDRC_DM_ST == 2) ? 0x3000 : 0x3400;
-		m_data->install_readwrite_bank(baseaddr, baseaddr + 0x3ff, "drampage");
-		m_dram_page = membank("drampage");
+		m_data->install_readwrite_bank(baseaddr, baseaddr + 0x3ff, m_dram_page);
 	}
 
 	/* update the bank pointers */

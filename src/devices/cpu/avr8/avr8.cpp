@@ -593,6 +593,7 @@ static const char avr8_reg_name[4] = { 'A', 'B', 'C', 'D' };
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(ATMEGA88,   atmega88_device,   "atmega88",   "Atmel ATmega88")
+DEFINE_DEVICE_TYPE(ATMEGA168,  atmega168_device,  "atmega168",  "Atmel ATmega168")
 DEFINE_DEVICE_TYPE(ATMEGA328,  atmega328_device,  "atmega328",  "Atmel ATmega328")
 DEFINE_DEVICE_TYPE(ATMEGA644,  atmega644_device,  "atmega644",  "Atmel ATmega644")
 DEFINE_DEVICE_TYPE(ATMEGA1280, atmega1280_device, "atmega1280", "Atmel ATmega1280")
@@ -606,6 +607,11 @@ DEFINE_DEVICE_TYPE(ATTINY15,   attiny15_device,   "attiny15",   "Atmel ATtiny15"
 void atmega88_device::atmega88_internal_map(address_map &map)
 {
 	map(0x0000, 0x00ff).rw(FUNC(atmega88_device::regs_r), FUNC(atmega88_device::regs_w));
+}
+
+void atmega168_device::atmega168_internal_map(address_map &map)
+{
+	map(0x0000, 0x00ff).rw(FUNC(atmega168_device::regs_r), FUNC(atmega168_device::regs_w));
 }
 
 void atmega328_device::atmega328_internal_map(address_map &map)
@@ -639,6 +645,15 @@ void attiny15_device::attiny15_internal_map(address_map &map)
 
 atmega88_device::atmega88_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: avr8_device(mconfig, tag, owner, clock, ATMEGA88, 0x0fff, address_map_constructor(FUNC(atmega88_device::atmega88_internal_map), this), 3)
+{
+}
+
+//-------------------------------------------------
+//  atmega168_device - constructor
+//-------------------------------------------------
+
+atmega168_device::atmega168_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: avr8_device(mconfig, tag, owner, clock, ATMEGA168, 0x1fff, address_map_constructor(FUNC(atmega168_device::atmega168_internal_map), this), 3)
 {
 }
 
@@ -696,7 +711,6 @@ avr8_device::avr8_device(const machine_config &mconfig, const char *tag, device_
 	, m_shifted_pc(0)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 22)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0, internal_map)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 4)
 	, m_eeprom(*this, finder_base::DUMMY_TAG)
 	, m_lfuses(0x62)
 	, m_hfuses(0x99)
@@ -704,6 +718,8 @@ avr8_device::avr8_device(const machine_config &mconfig, const char *tag, device_
 	, m_lock_bits(0xff)
 	, m_pc(0)
 	, m_num_timers(num_timers)
+	, m_gpio_out_cb(*this)
+	, m_gpio_in_cb(*this)
 	, m_spi_active(false)
 	, m_spi_prescale(0)
 	, m_spi_prescale_count(0)
@@ -798,7 +814,9 @@ void avr8_device::device_start()
 
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
-	m_io = &space(AS_IO);
+
+	m_gpio_out_cb.resolve_all_safe();
+	m_gpio_in_cb.resolve_all_safe(0);
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_shifted_pc).noshow();
@@ -977,8 +995,7 @@ device_memory_interface::space_config_vector avr8_device::memory_space_config() 
 {
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_DATA,    &m_data_config),
-		std::make_pair(AS_IO,      &m_io_config)
+		std::make_pair(AS_DATA,    &m_data_config)
 	};
 }
 
@@ -1098,6 +1115,23 @@ void avr8_device::update_interrupt(int source)
 	}
 }
 
+//TODO: review this!
+void atmega168_device::update_interrupt(int source)
+{
+	const interrupt_condition &condition = s_int_conditions[source];
+
+	int intstate = 0;
+	if (m_r[condition.m_intreg] & condition.m_intmask)
+		intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
+
+	set_irq_line(condition.m_intindex << 1, intstate);
+
+	if (intstate)
+	{
+		m_r[condition.m_regindex] &= ~condition.m_regmask;
+	}
+}
+
 void atmega328_device::update_interrupt(int source)
 {
 	const interrupt_condition &condition = s_int_conditions[source];
@@ -1194,7 +1228,7 @@ void avr8_device::timer_tick()
 			{
 				uint8_t out_bit = (m_r[AVR8_REGIDX_SPDR] & (1 << m_spi_prescale_countdown)) >> m_spi_prescale_countdown;
 				m_spi_prescale_countdown--;
-				m_io->write_byte(AVR8_IO_PORTB, (m_r[AVR8_REGIDX_PORTB] &~ AVR8_PORTB_MOSI) | (out_bit ? AVR8_PORTB_MOSI : 0));
+				write_gpio(AVR8_IO_PORTB, (m_r[AVR8_REGIDX_PORTB] &~ AVR8_PORTB_MOSI) | (out_bit ? AVR8_PORTB_MOSI : 0));
 				m_r[AVR8_REGIDX_PORTB] = (m_r[AVR8_REGIDX_PORTB] &~ AVR8_PORTB_MOSI) | (out_bit ? AVR8_PORTB_MOSI : 0);
 				m_spi_prescale_count -= m_spi_prescale;
 			}
@@ -1267,7 +1301,7 @@ void avr8_device::timer0_tick()
 			{
 				m_timer_top[0] = 0;
 				LOGMASKED(LOG_TIMER0, "%s: timer0: Toggle OC0B on match\n", machine().describe_context());
-				m_io->write_byte(AVR8_IO_PORTG, m_io->read_byte(AVR8_IO_PORTG) ^ (1 << 5));
+				write_gpio(AVR8_IO_PORTG, m_r[AVR8_REGIDX_PORTG] ^ (1 << 5));
 			}
 			break;
 
@@ -1276,7 +1310,7 @@ void avr8_device::timer0_tick()
 			{
 				m_timer_top[0] = 0;
 				LOGMASKED(LOG_TIMER0, "[0] timer0: Clear OC0B on match\n", machine().describe_context());
-				m_io->write_byte(AVR8_IO_PORTG, m_io->read_byte(AVR8_IO_PORTG) & ~(1 << 5));
+				write_gpio(AVR8_IO_PORTG, m_r[AVR8_REGIDX_PORTG] & ~(1 << 5));
 			}
 			break;
 
@@ -1285,7 +1319,7 @@ void avr8_device::timer0_tick()
 			{
 				m_timer_top[0] = 0;
 				LOGMASKED(LOG_TIMER0, "%s: timer0: Set OC0B on match\n", machine().describe_context());
-				m_io->write_byte(AVR8_IO_PORTG, m_io->read_byte(AVR8_IO_PORTG) | (1 << 5));
+				write_gpio(AVR8_IO_PORTG, m_r[AVR8_REGIDX_PORTG] | (1 << 5));
 			}
 			break;
 		}
@@ -1396,17 +1430,42 @@ inline void avr8_device::timer1_tick()
 
 			if (m_timer1_count == m_ocr1[reg])
 			{
-				if (reg == 0)
+				if (reg == AVR8_REG_A)
 				{
 					m_timer1_count = 0;
 					increment = 0;
 				}
+
+				switch (m_timer1_compare_mode[reg] & 3)
+				{
+				case 0: /* Normal Operation; OC1A/B disconnected */
+					break;
+
+				case 1: /* Toggle OC1A on compare match */
+					if (reg == AVR8_REG_A)
+					{
+						LOGMASKED(LOG_TIMER1, "%s: timer1: Toggle OC1%c on match\n", machine().describe_context());
+						write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] ^ 2);
+					}
+					break;
+
+				case 2: /* Clear OC1A/B on compare match */
+					LOGMASKED(LOG_TIMER1, "%s: timer1: Clear OC1%c on match\n", machine().describe_context(), reg ? 'B' : 'A');
+					write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] & ~(2 << reg));
+					break;
+
+				case 3: /* Set OC1A/B on compare match */
+					LOGMASKED(LOG_TIMER1, "%s: timer1: Set OC1%c on match\n", machine().describe_context(), reg ? 'B' : 'A');
+					write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] | (2 << reg));
+					break;
+				}
+
 				m_r[AVR8_REGIDX_TIFR1] |= s_ocf1[reg];
 				update_interrupt(s_int1[reg]);
 			}
 			else if (m_timer1_count == 0)
 			{
-				if (reg == 0)
+				if (reg == AVR8_REG_A)
 				{
 					m_r[AVR8_REGIDX_TIFR1] &= ~AVR8_TIFR1_TOV1_MASK;
 					update_interrupt(AVR8_INTIDX_TOV1);
@@ -1417,7 +1476,7 @@ inline void avr8_device::timer1_tick()
 		case WGM1_FAST_PWM_OCR:
 			if (m_timer1_count == m_ocr1[reg])
 			{
-				if (reg == 0)
+				if (reg == AVR8_REG_A)
 				{
 					m_r[AVR8_REGIDX_TIFR1] |= AVR8_TIFR1_TOV1_MASK;
 					update_interrupt(AVR8_INTIDX_TOV1);
@@ -1431,21 +1490,21 @@ inline void avr8_device::timer1_tick()
 					break;
 
 				case 1: /* Toggle OC1A on compare match */
-					if (reg == 0)
+					if (reg == AVR8_REG_A)
 					{
 						LOGMASKED(LOG_TIMER1, "%s: timer1: Toggle OC1%c on match\n", machine().describe_context());
-						m_io->write_byte(AVR8_IO_PORTB, m_io->read_byte(AVR8_IO_PORTB) ^ (2 << reg));
+						write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] ^ 2);
 					}
 					break;
 
 				case 2: /* Clear OC1A/B on compare match */
 					LOGMASKED(LOG_TIMER1, "%s: timer1: Clear OC1%c on match\n", machine().describe_context(), reg ? 'B' : 'A');
-					m_io->write_byte(AVR8_IO_PORTB, m_io->read_byte(AVR8_IO_PORTB) & ~(2 << reg));
+					write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] & ~(2 << reg));
 					break;
 
 				case 3: /* Set OC1A/B on compare match */
 					LOGMASKED(LOG_TIMER1, "%s: timer1: Set OC1%c on match\n", machine().describe_context(), reg ? 'B' : 'A');
-					m_io->write_byte(AVR8_IO_PORTB, m_io->read_byte(AVR8_IO_PORTB) | (2 << reg));
+					write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] | (2 << reg));
 					break;
 				}
 
@@ -1454,7 +1513,7 @@ inline void avr8_device::timer1_tick()
 			}
 			else if (m_timer1_count == 0)
 			{
-				if (reg == 0)
+				if (reg == AVR8_REG_A)
 				{
 					m_r[AVR8_REGIDX_TIFR1] &= ~AVR8_TIFR1_TOV1_MASK;
 					update_interrupt(AVR8_INTIDX_TOV1);
@@ -1466,21 +1525,21 @@ inline void avr8_device::timer1_tick()
 					break;
 
 				case 1: /* Toggle OC1A at BOTTOM*/
-					if (reg == 0)
+					if (reg == AVR8_REG_A)
 					{
 						LOGMASKED(LOG_TIMER1, "%s: timer1: Toggle OC1A at BOTTOM\n", machine().describe_context());
-						m_io->write_byte(AVR8_IO_PORTB, m_io->read_byte(AVR8_IO_PORTB) ^ (2 << reg));
+						write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] ^ 2);
 					}
 					break;
 
 				case 2: /* Set OC1A/B at BOTTOM*/
 					LOGMASKED(LOG_TIMER1, "%s: timer1: Set OC1%c at BOTTOM\n", machine().describe_context(), reg ? 'B' : 'A');
-					m_io->write_byte(AVR8_IO_PORTB, m_io->read_byte(AVR8_IO_PORTB) | (2 << reg));
+					write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] | (2 << reg));
 					break;
 
 				case 3: /* Clear OC1A/B at BOTTOM */
 					LOGMASKED(LOG_TIMER1, "%s: timer1: Clear OC1%c at BOTTOM\n", machine().describe_context(), reg ? 'B' : 'A');
-					m_io->write_byte(AVR8_IO_PORTB, m_io->read_byte(AVR8_IO_PORTB) & ~(2 << reg));
+					write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] & ~(2 << reg));
 					break;
 				}
 			}
@@ -1495,21 +1554,21 @@ inline void avr8_device::timer1_tick()
 					break;
 
 				case 1: /* Toggle OC1A on compare match */
-					if (reg == 0)
+					if (reg == AVR8_REG_A)
 					{
 						LOGMASKED(LOG_TIMER1, "%s: timer1: Toggle OC1%c on match\n", machine().describe_context());
-						m_io->write_byte(AVR8_IO_PORTB, m_io->read_byte(AVR8_IO_PORTB) ^ (2 << reg));
+						write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] ^ 2);
 					}
 					break;
 
 				case 2: /* Clear OC1A/B on compare match */
 					LOGMASKED(LOG_TIMER1, "%s: timer1: Clear OC1%c on match\n", machine().describe_context(), reg ? 'B' : 'A');
-					m_io->write_byte(AVR8_IO_PORTB, m_io->read_byte(AVR8_IO_PORTB) & ~(2 << reg));
+					write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] & ~(2 << reg));
 					break;
 
 				case 3: /* Set OC1A/B on compare match */
 					LOGMASKED(LOG_TIMER1, "%s: timer1: Set OC1%c on match\n", machine().describe_context(), reg ? 'B' : 'A');
-					m_io->write_byte(AVR8_IO_PORTB, m_io->read_byte(AVR8_IO_PORTB) | (2 << reg));
+					write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] | (2 << reg));
 					break;
 				}
 
@@ -1518,7 +1577,7 @@ inline void avr8_device::timer1_tick()
 			}
 			else if (m_timer1_count == 0)
 			{
-				if (reg == 0)
+				if (reg == AVR8_REG_A)
 				{
 					m_r[AVR8_REGIDX_TIFR1] &= ~AVR8_TIFR1_TOV1_MASK;
 					update_interrupt(AVR8_INTIDX_TOV1);
@@ -1530,21 +1589,21 @@ inline void avr8_device::timer1_tick()
 					break;
 
 				case 1: /* Toggle OC1A at BOTTOM*/
-					if (reg == 0)
+					if (reg == AVR8_REG_A)
 					{
 						LOGMASKED(LOG_TIMER1, "%s: timer1: Toggle OC1A at BOTTOM\n", machine().describe_context());
-						m_io->write_byte(AVR8_IO_PORTB, m_io->read_byte(AVR8_IO_PORTB) ^ (2 << reg));
+						write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] ^ 2);
 					}
 					break;
 
 				case 2: /* Set OC1A/B at BOTTOM*/
 					LOGMASKED(LOG_TIMER1, "%s: timer1: Set OC1%c at BOTTOM\n", machine().describe_context(), reg ? 'B' : 'A');
-					m_io->write_byte(AVR8_IO_PORTB, m_io->read_byte(AVR8_IO_PORTB) | (2 << reg));
+					write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] | (2 << reg));
 					break;
 
 				case 3: /* Clear OC1A/B at BOTTOM */
 					LOGMASKED(LOG_TIMER1, "%s: timer1: Clear OC1%c at BOTTOM\n", machine().describe_context(), reg ? 'B' : 'A');
-					m_io->write_byte(AVR8_IO_PORTB, m_io->read_byte(AVR8_IO_PORTB) & ~(2 << reg));
+					write_gpio(AVR8_IO_PORTB, m_r[AVR8_REGIDX_PORTB] & ~(2 << reg));
 					break;
 				}
 			}
@@ -1731,14 +1790,14 @@ void avr8_device::timer2_tick()
 			break;
 
 		case WGM02_FAST_PWM:
-			if (reg == 0)
+			if (reg == AVR8_REG_A)
 			{
 				if (count >= m_r[AVR8_REGIDX_OCR2A])
 				{
 					if (count >= 0xff)
 					{
 						// Turn on
-						m_io->write_byte(AVR8_IO_PORTD, m_io->read_byte(AVR8_IO_PORTD) | (1 << 7));
+						write_gpio(AVR8_IO_PORTD, m_r[AVR8_REGIDX_PORTD] | (1 << 7));
 						m_r[AVR8_REGIDX_TCNT2] = 0;
 						m_ocr2_not_reached_yet = true;
 					}
@@ -1747,7 +1806,7 @@ void avr8_device::timer2_tick()
 						if (m_ocr2_not_reached_yet)
 						{
 							// Turn off
-							m_io->write_byte(AVR8_IO_PORTD, m_io->read_byte(AVR8_IO_PORTD) & ~(1 << 7));
+							write_gpio(AVR8_IO_PORTD, m_r[AVR8_REGIDX_PORTD] & ~(1 << 7));
 							m_ocr2_not_reached_yet = false;
 						}
 					}
@@ -1758,7 +1817,7 @@ void avr8_device::timer2_tick()
 		case WGM02_FAST_PWM_CMP:
 			if (count == ocr2[reg])
 			{
-				if (reg == 0)
+				if (reg == AVR8_REG_A)
 				{
 					m_r[AVR8_REGIDX_TIFR2] |= AVR8_TIFR2_TOV2_MASK;
 					count = 0;
@@ -1769,7 +1828,7 @@ void avr8_device::timer2_tick()
 			}
 			else if (count == 0)
 			{
-				if (reg == 0)
+				if (reg == AVR8_REG_A)
 				{
 					m_r[AVR8_REGIDX_TIFR2] &= ~AVR8_TIFR2_TOV2_MASK;
 				}
@@ -1888,13 +1947,13 @@ void avr8_device::timer4_tick()
 			{
 				// Clear OC0B
 				LOGMASKED(LOG_TIMER4, "%s: timer4: non-inverting mode, Clear OC0B\n", machine().describe_context());
-				m_io->write_byte(AVR8_IO_PORTG, m_io->read_byte(AVR8_IO_PORTG) & ~(1 << 5));
+				write_gpio(AVR8_IO_PORTG, m_r[AVR8_REGIDX_PORTG] & ~(1 << 5));
 			}
 			else if (count == 0)
 			{
 				// Set OC0B
 				LOGMASKED(LOG_TIMER4, "%s: timer4: non-inverting mode, Set OC0B\n", machine().describe_context());
-				m_io->write_byte(AVR8_IO_PORTG, m_io->read_byte(AVR8_IO_PORTG) | (1 << 5));
+				write_gpio(AVR8_IO_PORTG, m_r[AVR8_REGIDX_PORTG] | (1 << 5));
 			}
 			break;
 		case 3: /* Inverting mode */
@@ -1902,13 +1961,13 @@ void avr8_device::timer4_tick()
 			{
 				// Set OC0B
 				LOGMASKED(LOG_TIMER4, "%s: timer4: inverting mode, Clear OC0B\n", machine().describe_context());
-				m_io->write_byte(AVR8_IO_PORTG, m_io->read_byte(AVR8_IO_PORTG) | (1 << 5));
+				write_gpio(AVR8_IO_PORTG, m_r[AVR8_REGIDX_PORTG] | (1 << 5));
 			}
 			else if (count == 0)
 			{
 				// Clear OC0B
 				LOGMASKED(LOG_TIMER4, "%s: timer4: inverting mode, Set OC0B\n", machine().describe_context());
-				m_io->write_byte(AVR8_IO_PORTG, m_io->read_byte(AVR8_IO_PORTG) & ~(1 << 5));
+				write_gpio(AVR8_IO_PORTG, m_r[AVR8_REGIDX_PORTG] & ~(1 << 5));
 			}
 			break;
 		}
@@ -2087,7 +2146,7 @@ void avr8_device::timer5_tick()
 			{
 				m_timer_top[5] = 0;
 				LOGMASKED(LOG_TIMER5, "%s: timer5: Toggle OC5B on compare match\n", machine().describe_context());
-				m_io->write_byte(AVR8_IO_PORTL, m_io->read_byte(AVR8_IO_PORTL) ^ (1 << 4));
+				write_gpio(AVR8_IO_PORTL, m_r[AVR8_REGIDX_PORTL] ^ (1 << 4));
 			}
 			break;
 		case 2: /* Clear OC5B on compare match */
@@ -2096,7 +2155,7 @@ void avr8_device::timer5_tick()
 				m_timer_top[5] = 0;
 				// Clear OC5B
 				LOGMASKED(LOG_TIMER5, "%s: timer5: Clear OC5B on compare match\n", machine().describe_context());
-				m_io->write_byte(AVR8_IO_PORTL, m_io->read_byte(AVR8_IO_PORTL) & ~(1 << 4));
+				write_gpio(AVR8_IO_PORTL, m_r[AVR8_REGIDX_PORTL] & ~(1 << 4));
 			}
 			break;
 		case 3: /* Set OC5B on compare match */
@@ -2104,7 +2163,7 @@ void avr8_device::timer5_tick()
 			{
 				m_timer_top[5] = 0;
 				LOGMASKED(LOG_TIMER5, "%s: timer5: Set OC5B on compare match\n", machine().describe_context());
-				m_io->write_byte(AVR8_IO_PORTL, m_io->read_byte(AVR8_IO_PORTL) | (1 << 4));
+				write_gpio(AVR8_IO_PORTL, m_r[AVR8_REGIDX_PORTL] | (1 << 4));
 			}
 			break;
 		}
@@ -2278,6 +2337,34 @@ void avr8_device::change_spsr(uint8_t data)
 
 /*****************************************************************************/
 
+void avr8_device::write_gpio(const uint8_t port, const uint8_t data)
+{
+	static const uint16_t s_port_to_reg[11] =
+	{
+		AVR8_REGIDX_PORTA,
+		AVR8_REGIDX_PORTB,
+		AVR8_REGIDX_PORTC,
+		AVR8_REGIDX_PORTD,
+		AVR8_REGIDX_PORTE,
+		AVR8_REGIDX_PORTF,
+		AVR8_REGIDX_PORTG,
+		AVR8_REGIDX_PORTH,
+		AVR8_REGIDX_PORTJ,
+		AVR8_REGIDX_PORTK,
+		AVR8_REGIDX_PORTL
+	};
+
+	m_r[s_port_to_reg[port]] = data;
+	m_gpio_out_cb[port](data);
+}
+
+uint8_t avr8_device::read_gpio(const uint8_t port)
+{
+	return m_gpio_in_cb[port]();
+}
+
+/*****************************************************************************/
+
 void avr8_device::regs_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
@@ -2319,68 +2406,57 @@ void avr8_device::regs_w(offs_t offset, uint8_t data)
 
 	case AVR8_REGIDX_PORTA:
 		LOGMASKED(LOG_GPIO, "%s: PORTA Write: %02x\n", machine().describe_context(), data);
-		m_io->write_byte(AVR8_IO_PORTA, data);
-		m_r[AVR8_REGIDX_PORTA] = data;
+		write_gpio(AVR8_IO_PORTA, data);
 		break;
 
 	case AVR8_REGIDX_PORTB:
 		LOGMASKED(LOG_GPIO, "%s: PORTB Write: %02x\n", machine().describe_context(), data);
-		m_io->write_byte(AVR8_IO_PORTB, data);
-		m_r[AVR8_REGIDX_PORTB] = data;
+		write_gpio(AVR8_IO_PORTB, data);
 		break;
 
 	case AVR8_REGIDX_PORTC:
 		LOGMASKED(LOG_GPIO, "%s: PORTC Write: %02x\n", machine().describe_context(), data);
-		m_io->write_byte(AVR8_IO_PORTC, data);
-		m_r[AVR8_REGIDX_PORTC] = data;
+		write_gpio(AVR8_IO_PORTC, data);
 		break;
 
 	case AVR8_REGIDX_PORTD:
 		LOGMASKED(LOG_GPIO, "%s: PORTD Write: %02x\n", machine().describe_context(), data);
-		m_io->write_byte(AVR8_IO_PORTD, data);
-		m_r[AVR8_REGIDX_PORTD] = data;
+		write_gpio(AVR8_IO_PORTD, data);
 		break;
 
 	case AVR8_REGIDX_PORTE:
 		LOGMASKED(LOG_GPIO, "%s: PORTE Write: %02x\n", machine().describe_context(), data);
-		m_io->write_byte(AVR8_IO_PORTE, data);
-		m_r[AVR8_REGIDX_PORTE] = data;
+		write_gpio(AVR8_IO_PORTE, data);
 		break;
 
 	case AVR8_REGIDX_PORTF:
 		LOGMASKED(LOG_GPIO, "%s: PORTF Write: %02x\n", machine().describe_context(), data);
-		m_io->write_byte(AVR8_IO_PORTF, data);
-		m_r[AVR8_REGIDX_PORTF] = data;
+		write_gpio(AVR8_IO_PORTF, data);
 		break;
 
 	case AVR8_REGIDX_PORTG:
 		LOGMASKED(LOG_GPIO, "%s: PORTG Write: %02x\n", machine().describe_context(), data);
-		m_io->write_byte(AVR8_IO_PORTG, data);
-		m_r[AVR8_REGIDX_PORTG] = data;
+		write_gpio(AVR8_IO_PORTG, data);
 		break;
 
 	case AVR8_REGIDX_PORTH:
 		LOGMASKED(LOG_GPIO, "%s: PORTH Write: %02x\n", machine().describe_context(), data);
-		m_io->write_byte(AVR8_IO_PORTH, data);
-		m_r[AVR8_REGIDX_PORTH] = data;
+		write_gpio(AVR8_IO_PORTH, data);
 		break;
 
 	case AVR8_REGIDX_PORTJ:
 		LOGMASKED(LOG_GPIO, "%s: PORTJ Write: %02x\n", machine().describe_context(), data);
-		m_io->write_byte(AVR8_IO_PORTJ, data);
-		m_r[AVR8_REGIDX_PORTJ] = data;
+		write_gpio(AVR8_IO_PORTJ, data);
 		break;
 
 	case AVR8_REGIDX_PORTK:
 		LOGMASKED(LOG_GPIO, "%s: PORTK Write: %02x\n", machine().describe_context(), data);
-		m_io->write_byte(AVR8_IO_PORTK, data);
-		m_r[AVR8_REGIDX_PORTK] = data;
+		write_gpio(AVR8_IO_PORTK, data);
 		break;
 
 	case AVR8_REGIDX_PORTL:
 		LOGMASKED(LOG_GPIO, "%s: PORTL Write: %02x\n", machine().describe_context(), data);
-		m_io->write_byte(AVR8_IO_PORTL, data);
-		m_r[AVR8_REGIDX_PORTL] = data;
+		write_gpio(AVR8_IO_PORTL, data);
 		break;
 
 	case AVR8_REGIDX_DDRA:
@@ -2937,47 +3013,47 @@ uint8_t avr8_device::regs_r(offs_t offset)
 
 	case AVR8_REGIDX_PINA:
 		// TODO: account for DDRA
-		return m_io->read_byte(AVR8_REG_A);
+		return read_gpio(AVR8_IO_PORTA);
 
 	case AVR8_REGIDX_PINB:
 		// TODO: account for DDRB
-		return m_io->read_byte(AVR8_REG_B);
+		return read_gpio(AVR8_IO_PORTB);
 
 	case AVR8_REGIDX_PINC:
 		// TODO: account for DDRC
-		return m_io->read_byte(AVR8_REG_C);
+		return read_gpio(AVR8_IO_PORTC);
 
 	case AVR8_REGIDX_PIND:
 		// TODO: account for DDRD
-		return m_io->read_byte(AVR8_REG_D);
+		return read_gpio(AVR8_IO_PORTD);
 
 	case AVR8_REGIDX_PINE:
 		// TODO: account for DDRE
-		return m_io->read_byte(AVR8_REG_E);
+		return read_gpio(AVR8_IO_PORTE);
 
 	case AVR8_REGIDX_PINF:
 		// TODO: account for DDRF
-		return m_io->read_byte(AVR8_REG_F);
+		return read_gpio(AVR8_IO_PORTF);
 
 	case AVR8_REGIDX_PING:
 		// TODO: account for DDRG
-		return m_io->read_byte(AVR8_REG_G);
+		return read_gpio(AVR8_IO_PORTG);
 
 	case AVR8_REGIDX_PINH:
 		// TODO: account for DDRH
-		return m_io->read_byte(AVR8_REG_H);
+		return read_gpio(AVR8_IO_PORTH);
 
 	case AVR8_REGIDX_PINJ:
 		// TODO: account for DDRJ
-		return m_io->read_byte(AVR8_REG_J);
+		return read_gpio(AVR8_IO_PORTJ);
 
 	case AVR8_REGIDX_PINK:
 		// TODO: account for DDRK
-		return m_io->read_byte(AVR8_REG_K);
+		return read_gpio(AVR8_IO_PORTK);
 
 	case AVR8_REGIDX_PINL:
 		// TODO: account for DDRL
-		return m_io->read_byte(AVR8_REG_L);
+		return read_gpio(AVR8_IO_PORTL);
 
 	case AVR8_REGIDX_PORTA:
 	case AVR8_REGIDX_PORTB:

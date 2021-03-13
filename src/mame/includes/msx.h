@@ -308,7 +308,7 @@ private:
 	void msx_memory_reset();
 	void msx_memory_init();
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	INTERRUPT_GEN_MEMBER(msx_interrupt);
 

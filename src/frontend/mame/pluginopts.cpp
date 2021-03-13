@@ -107,7 +107,7 @@ bool plugin_options::load_plugin(const std::string &path)
 //  find
 //-------------------------------------------------
 
-plugin *plugin_options::find(const std::string &name)
+plugin_options::plugin *plugin_options::find(const std::string &name)
 {
 	auto iter = std::find_if(
 		m_plugins.begin(),
@@ -139,7 +139,7 @@ static core_options create_core_options(const plugin_options &plugin_opts)
 	opts.add_entries(s_option_entries);
 
 	// create an entry for each option
-	for (const plugin &p : plugin_opts.plugins())
+	for (const plugin_options::plugin &p : plugin_opts.plugins())
 	{
 		opts.add_entry(
 			{ p.m_name },
@@ -165,7 +165,7 @@ void plugin_options::parse_ini_file(util::core_file &inifile)
 
 	// and reflect these options back
 	for (plugin &p : m_plugins)
-		p.m_start = opts.bool_value(p.m_name.c_str());
+		p.m_start = opts.bool_value(p.m_name);
 }
 
 

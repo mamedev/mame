@@ -18,9 +18,8 @@ m20_8086_device::m20_8086_device(const machine_config &mconfig, const char *tag,
 void m20_8086_device::device_start()
 {
 	uint8_t* ram = m_ram->pointer();
-	m_8086->space(AS_PROGRAM).install_readwrite_bank(0x00000,  m_ram->size() - 0x4001, "mainram");
+	m_8086->space(AS_PROGRAM).install_ram(0x00000,  m_ram->size() - 0x4001, &ram[0x4000]);
 	membank("highram")->set_base(ram);
-	membank("mainram")->set_base(&ram[0x4000]);
 	membank("vram")->set_base(memshare(":videoram")->ptr());
 	membank("vram2")->set_base(memshare(":videoram")->ptr());
 }

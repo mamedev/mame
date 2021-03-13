@@ -107,7 +107,7 @@ void lc8670_disassembler::dasm_arg(uint8_t op, char *buffer, offs_t pc, int arg,
 			break;
 		case OP_R8:
 			pc++;
-			// fall through
+			[[fallthrough]];
 		case OP_R8RI:
 			buffer += sprintf(buffer, "%04x", (pc + 1 + opcodes.r8(pos) - (opcodes.r8(pos)&0x80 ? 0x100 : 0)) & 0xffff);
 			pos++;

@@ -265,6 +265,7 @@ void argus_state::video_reset()
 void valtric_state::video_start()
 {
 	/*                           info                      offset             w   h  col  row */
+	m_bg_tilemap[0] = nullptr;
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(valtric_state::get_bg_tile_info)),    TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(valtric_state::get_tx_tile_info<2>)), TILEMAP_SCAN_COLS,  8,  8, 32, 32);
 

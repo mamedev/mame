@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods
 /*
-    video/dgn_beta.c
+    video/dgn_beta.cpp
 
 The Dragon Beta uses a 68B45 for it's display generation, this is used in the
 conventional way with a character generator ROM in the two text modes, which are
@@ -101,7 +101,7 @@ the access to the video memory is unclear to me at the moment.
 MC6845_UPDATE_ROW( dgn_beta_state::crtc_update_row )
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	uint8_t const *const videoram = m_videoram;
+	uint8_t const *const videoram = m_ram->pointer();
 	uint32_t  *p = &bitmap.pix(y);
 	int i;
 	if(IsTextMode)

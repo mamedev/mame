@@ -342,7 +342,7 @@ uint8_t jackie_state::expram_r(offs_t offset)
 void jackie_state::prg_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xffff).ram().region("maincpu", 0xf000);
+	map(0xf000, 0xffff).ram();
 }
 
 void jackie_state::io_map(address_map &map)

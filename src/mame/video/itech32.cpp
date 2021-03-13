@@ -114,9 +114,9 @@
 #define XFERFLAG_DXDYSIGN       0x0020
 #define XFERFLAG_UNKNOWN8       0x0100
 #define XFERFLAG_CLIP           0x0400
-#define XFERFLAG_UNKNOWN15      0x8000
+#define XFERFLAG_WIDTHPIX       0x8000
 
-#define XFERFLAG_KNOWNFLAGS     (XFERFLAG_TRANSPARENT | XFERFLAG_XFLIP | XFERFLAG_YFLIP | XFERFLAG_DSTXSCALE | XFERFLAG_DYDXSIGN | XFERFLAG_DXDYSIGN | XFERFLAG_CLIP)
+#define XFERFLAG_KNOWNFLAGS     (XFERFLAG_TRANSPARENT | XFERFLAG_XFLIP | XFERFLAG_YFLIP | XFERFLAG_DSTXSCALE | XFERFLAG_DYDXSIGN | XFERFLAG_DXDYSIGN | XFERFLAG_CLIP | XFERFLAG_WIDTHPIX)
 
 #define VRAM_WIDTH              512
 
@@ -333,7 +333,7 @@ void itech32_state::logblit(const char *tag)
 	}
 	else
 	{
-		logerror("%s: e=%d%d f=%04x c=%02x%02x %02x%04x -> (%03x,%03x) %3dx%3d c=(%03x,%03x)-(%03x,%03x) s=%04x %04x %04x %04x %04x %04x", tag,
+		logerror("%s: e=%d%d f=%04x c=%02x%02x %02x%04x -> (%03x,%03x) %3dx%d c=(%03x,%03x)-(%03x,%03x) s=%04x %04x %04x %04x %04x %04x", tag,
 				m_enable_latch[0], m_enable_latch[1],
 				VIDEO_TRANSFER_FLAGS,
 				m_color_latch[0] >> 8, m_color_latch[1] >> 8,
@@ -507,6 +507,118 @@ void itech32_state::draw_raw(u16 *base, u16 color)
 		enable_clipping();
 }
 
+/* draw a scaled primitive such that the specified width is in pixel, not scaled, coordinates */
+void itech32_state::draw_raw_widthpix(u16 *base, u16 color)
+{
+	u8* src = &m_grom[0];// m_grom[(m_grom_bank | ((VIDEO_TRANSFER_ADDRHI & 0xff) << 16) | VIDEO_TRANSFER_ADDRLO) % m_grom.length()];
+	const u32 grom_length = m_grom.length();
+	const u32 grom_base = m_grom_bank | ((VIDEO_TRANSFER_ADDRHI & 0xff) << 16) | VIDEO_TRANSFER_ADDRLO;
+	int transparent_pen = (VIDEO_TRANSFER_FLAGS & XFERFLAG_TRANSPARENT) ? 0xff : -1;
+	int width = VIDEO_TRANSFER_WIDTH << 8;
+	int height = ADJUSTED_HEIGHT(VIDEO_TRANSFER_HEIGHT) << 8;
+	int xsrcstep = VIDEO_SRC_XSTEP;
+	int ysrcstep = VIDEO_SRC_YSTEP;
+	int sx, sy = (VIDEO_TRANSFER_Y & 0xfff) << 8;
+	int startx = (VIDEO_TRANSFER_X & 0xfff) << 8;
+	int xdststep = 0x100;
+	int ydststep = VIDEO_DST_YSTEP;
+	int x, y, px;
+
+	/* adjust for (lack of) clipping */
+	if (!(VIDEO_TRANSFER_FLAGS & XFERFLAG_CLIP))
+		disable_clipping();
+
+	/* adjust for scaling */
+	if (VIDEO_TRANSFER_FLAGS & XFERFLAG_DSTXSCALE)
+		xdststep = VIDEO_DST_XSTEP;
+
+	/* adjust for flipping */
+	if (VIDEO_TRANSFER_FLAGS & XFERFLAG_XFLIP)
+		xdststep = -xdststep;
+	if (VIDEO_TRANSFER_FLAGS & XFERFLAG_YFLIP)
+		ydststep = -ydststep;
+
+	/* loop over Y in src pixels */
+	for (y = 0; y < height; y += ysrcstep, sy += ydststep)
+	{
+		const u32 row_base = (y >> 8) * (width >> 8);
+
+		x = 0;
+		px = 0;
+
+		/* simpler case: VIDEO_YSTEP_PER_X is zero */
+		if (VIDEO_YSTEP_PER_X == 0)
+		{
+			/* clip in the Y direction */
+			if (sy >= m_scaled_clip_rect.min_y && sy < m_scaled_clip_rect.max_y)
+			{
+				u32 dstoffs;
+
+				/* direction matters here */
+				sx = startx;
+				if (xdststep > 0)
+				{
+					/* skip left pixels */
+					for ( ; px < width && sx < m_scaled_clip_rect.min_x; x += xsrcstep, px += 0x100, sx += xdststep) ;
+
+					/* compute the address */
+					dstoffs = compute_safe_address(sx >> 8, sy >> 8) - (sx >> 8);
+
+					/* render middle pixels */
+					for ( ; px < width && sx < m_scaled_clip_rect.max_x; x += xsrcstep, px += 0x100, sx += xdststep)
+					{
+						int pixel = src[(grom_base + row_base + (x >> 8)) % grom_length];
+						if (pixel != transparent_pen)
+							base[(dstoffs + (sx >> 8)) & m_vram_mask] = pixel | color;
+					}
+				}
+				else
+				{
+					/* skip right pixels */
+					for ( ; px < width && sx >= m_scaled_clip_rect.max_x; x += xsrcstep, px += 0x100, sx += xdststep) ;
+
+					/* compute the address */
+					dstoffs = compute_safe_address(sx >> 8, sy >> 8) - (sx >> 8);
+
+					/* render middle pixels */
+					for ( ; px < width && sx >= m_scaled_clip_rect.min_x; x += xsrcstep, px += 0x100, sx += xdststep)
+					{
+						int pixel = src[(grom_base + row_base + (x >> 8)) % grom_length];
+						if (pixel != transparent_pen)
+							base[(dstoffs + (sx >> 8)) & m_vram_mask] = pixel | color;
+					}
+				}
+			}
+		}
+
+		/* slow case: VIDEO_YSTEP_PER_X is non-zero */
+		else
+		{
+			int ystep = (VIDEO_TRANSFER_FLAGS & XFERFLAG_DYDXSIGN) ? -VIDEO_YSTEP_PER_X : VIDEO_YSTEP_PER_X;
+			int ty = sy;
+
+			/* render all pixels */
+			sx = startx;
+			for ( ; px < width && sx < m_scaled_clip_rect.max_x; x += xsrcstep, px += 0x100, sx += xdststep, ty += ystep)
+				if (m_scaled_clip_rect.contains(sx, ty))
+				{
+					int pixel = src[(grom_base + row_base + (x >> 8)) % grom_length];
+					if (pixel != transparent_pen)
+						base[compute_safe_address(sx >> 8, ty >> 8)] = pixel | color;
+				}
+		}
+
+		/* apply skew */
+		if (VIDEO_TRANSFER_FLAGS & XFERFLAG_DXDYSIGN)
+			startx += VIDEO_XSTEP_PER_Y;
+		else
+			startx -= VIDEO_XSTEP_PER_Y;
+	}
+
+	/* restore cliprects */
+	if (!(VIDEO_TRANSFER_FLAGS & XFERFLAG_CLIP))
+		enable_clipping();
+}
 
 void drivedge_state::draw_raw(u16 *base, u16 *zbase, u16 color)
 {
@@ -1170,8 +1282,16 @@ void itech32_state::command_blit_raw()
 	g_profiler.start(PROFILER_USER1);
 	if (BLIT_LOGGING) logblit("Blit Raw");
 
-	if (m_enable_latch[0]) draw_raw(m_videoplane[0], m_color_latch[0]);
-	if (m_enable_latch[1]) draw_raw(m_videoplane[1], m_color_latch[1]);
+	if (VIDEO_TRANSFER_FLAGS & XFERFLAG_WIDTHPIX)
+	{
+		if (m_enable_latch[0]) draw_raw_widthpix(m_videoplane[0], m_color_latch[0]);
+		if (m_enable_latch[1]) draw_raw_widthpix(m_videoplane[1], m_color_latch[1]);
+	}
+	else
+	{
+		if (m_enable_latch[0]) draw_raw(m_videoplane[0], m_color_latch[0]);
+		if (m_enable_latch[1]) draw_raw(m_videoplane[1], m_color_latch[1]);
+	}
 
 	g_profiler.stop();
 }

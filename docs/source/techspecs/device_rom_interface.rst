@@ -1,89 +1,113 @@
 The device_rom_interface
 ========================
 
+.. contents:: :local:
+
+
 1. Capabilities
 ---------------
 
-This interface is designed for devices which expect to have a rom
-connected to them on a dedicated bus.  It's mostly designed for sound
+This interface is designed for devices that expect to have a ROM
+connected to them on a dedicated bus.  It’s mostly designed for sound
 chips.  Other devices types may be interested but other considerations
-may make it impratical (graphics decode caching for instance).  The
-interface provides the capability of either connecting a ROM_REGION,
-connecting an ADDRESS_MAP or dynamically setting up a block of memory
-as rom.  In the region/block cases, banking is automatically handled.
+may make it impractical (graphics decode caching, for instance).  The
+interface provides the capability to connect a ROM region, connect an
+address map, or dynamically set up a block of memory as ROM.  In the
+region/memory block cases, banking is handled automatically.
+
 
 2. Setup
 --------
 
-| device_rom_interface<AddrWidth, DataWidth=0, AddrShift=0, Endian=ENDIANNESS_LITTLE>
+.. code-block:: C++
 
-The interface is a template that takes the address bus width of the
+    device_rom_interface<AddrWidth, DataWidth=0, AddrShift=0, Endian=ENDIANNESS_LITTLE>
+
+The interface is a template that takes the address width of the
 dedicated bus as a parameter.  In addition the data bus width (if not
-byte), address shift (if not 0) and endianness (if not little endian
+byte), address shift (if non-zero) and Endianness (if not little Endian
 or byte-sized bus) can be provided.  Data bus width is 0 for byte, 1
 for word, etc.
 
-| **MCFG_DEVICE_ADDRESS_MAP**\ (AS_0, map)
+.. code-block:: C++
 
-Use that method at machine config time to provide an address map for
-the bus to connect to.  It has priority over a rom region if one is
+    void set_map(map);
+
+Use that method at machine configuration time to provide an address map
+for the bus to connect to.  It has priority over a ROM region if one is
 also present.
 
-| **MCFG_DEVICE_ROM**\ (tag)
+.. code-block:: C++
 
-Used to select a rom region to use if a device address map is not
-given.  Defaults to DEVICE_SELF, e.g. the device tag.
+    void set_device_rom_tag(tag);
 
-| **ROM_REGION**\ (length, tag, flags)
+Used to specify a ROM region to use if a device address map is not
+given.  Defaults to ``DEVICE_SELF``, i.e. the device’s tag.
 
-If a rom region with a tag as given with **MCFG_DEVICE_ROM** if
+.. code-block:: C++
+
+    ROM_REGION(length, tag, flags)
+
+If a ROM region with the tag specified using ``set_device_rom_tag`` if
 present, or identical to the device tag otherwise, is provided in the
-rom description for the system, it will be automatically picked up as
-the connected rom.  An address map has priority over the region if
-present in the machine config.
+ROM definitions for the system, it will be automatically picked up as
+the connected ROM.  An address map has priority over the region if
+present in the machine configuration.
 
-| void **override_address_width**\ (u8 width)
+.. code-block:: C++
 
-This method allows to override the address bus width. It must be
+    void override_address_width(u8 width);
+
+This method allows the address bus width to be overridden. It must be
 called from within the device before **config_complete** time.
 
-| void **set_rom**\ (const void \*base, u32 size);
+.. code-block:: C++
 
-At any time post- **interface_pre_start**, a memory block can be
-setup as the connected rom with that method.  It overrides any
+    void set_rom(const void *base, u32 size);
+
+At any time post-\ ``interface_pre_start``, a memory block can be
+set up as the connected ROM with that method.  It overrides any
 previous setup that may have been provided.  It can be done multiple
 times.
 
-3. Rom access
+
+3. ROM access
 -------------
 
-| u8 **read_byte**\ (offs_t byteaddress)
-| u16 **read_word**\ (offs_t byteaddress)
-| u32 **read_dword**\ (offs_t byteaddress)
-| u64 **read_qword**\ (offs_t byteaddress)
+.. code-block:: C++
 
-These methods provide read access to the connected rom.  Out-of-bounds
-access results in standard unmapped read logerror messages.
+    u8 read_byte(offs_t addr);
+    u16 read_word(offs_t addr);
+    u32 read_dword(offs_t addr);
+    u64 read_qword(offs_t addr);
 
-4. Rom banking
+These methods provide read access to the connected ROM.  Out-of-bounds
+access results in standard unmapped read ``logerror`` messages.
+
+
+4. ROM banking
 --------------
 
-If the rom region or the memory block in set_rom is larger than the
-address bus, banking is automatically setup.
+If the ROM region or the memory block in ``set_rom`` is larger than the
+address bus can access, banking is automatically set up.
 
-| void **set_rom_bank**\ (int bank)
+.. code-block:: C++
+
+    void set_rom_bank(int bank);
 
 That method selects the current bank number.
+
 
 5. Caveats
 ----------
 
 Using that interface makes the device derive from
-**device_memory_interface**. If the device wants to actually use the
-memory interface for itself, remember that AS_0/AS_PROGRAM is used by
-the rom interface, and don't forget to upcall **memory_space_config**.
+``device_memory_interface``.  If the device wants to actually use the
+memory interface for itself, remember that space zero (0, or
+``AS_PROGRAM``) is used by the ROM interface, and don’t forget to call
+the base ``memory_space_config`` method.
 
-For devices which have outputs that can be used to address ROMs but
-only to forward the data to another device for processing, it may be
-helpful to disable the interface when it is not required. This can be
-done by overriding **memory_space_config** to return an empty vector.
+For devices which have outputs that can be used to address ROMs but only
+to forward the data to another device for processing, it may be helpful
+to disable the interface when it is not required.  This can be done by
+overriding ``memory_space_config`` to return an empty vector.

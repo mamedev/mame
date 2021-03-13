@@ -110,7 +110,7 @@ void jmfb_device::device_start()
 //  printf("[JMFB %p] slotspace = %x\n", this, slotspace);
 
 	m_vram.resize(VRAM_SIZE);
-	install_bank(slotspace, slotspace+VRAM_SIZE-1, "bank_48gc", &m_vram[0]);
+	install_bank(slotspace, slotspace+VRAM_SIZE-1, &m_vram[0]);
 
 	nubus().install_device(slotspace+0x200000, slotspace+0x2003ff, read32s_delegate(*this, FUNC(jmfb_device::mac_48gc_r)), write32s_delegate(*this, FUNC(jmfb_device::mac_48gc_w)));
 

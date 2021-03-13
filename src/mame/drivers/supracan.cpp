@@ -85,6 +85,9 @@ DEBUG TRICKS:
 #include "softlist.h"
 #include "tilemap.h"
 
+
+namespace {
+
 #define DRAW_DEBUG_ROZ          (0)
 
 #define DRAW_DEBUG_UNK_SPRITE   (0)
@@ -131,11 +134,12 @@ public:
 
 	void supracan(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+private:
 	void supracan_mem(address_map &map);
 	void supracan_sound_mem(address_map &map);
 
@@ -1964,16 +1968,20 @@ void supracan_state::machine_reset()
 	m_soundcpu_irq_enable = 0;
 	m_soundcpu_irq_source = 0;
 	m_sound_cpu_shift_ctrl = 0;
-	memset(m_sound_cpu_shift_regs, 0, ARRAY_LENGTH(m_sound_cpu_shift_regs));
-	memset(m_latched_controls, 0, sizeof(uint16_t) * ARRAY_LENGTH(m_latched_controls));
+	std::fill(std::begin(m_sound_cpu_shift_regs), std::end(m_sound_cpu_shift_regs), 0);
+	std::fill(std::begin(m_latched_controls), std::end(m_latched_controls), 0);
 	m_sound_status = 0;
 	m_sound_reg_addr = 0;
-	memset(m_sound_regs, 0, ARRAY_LENGTH(m_sound_regs));
+	std::fill(std::begin(m_sound_regs), std::end(m_sound_regs), 0);
 
 	m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	m_video_timer->adjust(m_screen->time_until_pos(0, 0));
 	m_irq_mask = 0;
+
+	m_roz_base_addr = 0;
+	m_roz_mode = 0;
+	std::fill(std::begin(m_tilemap_base_addr), std::end(m_tilemap_base_addr), 0);
 }
 
 /* gfxdecode is retained for reference purposes but not otherwise used by the driver */
@@ -2093,6 +2101,9 @@ void supracan_state::supracan(machine_config &config)
 
 ROM_START( supracan )
 ROM_END
+
+} // Anonymous namespace
+
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT        COMPANY                  FULLNAME        FLAGS */
 CONS( 1995, supracan, 0,      0,      supracan, supracan, supracan_state, empty_init, "Funtech Entertainment", "Super A'Can",  MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

@@ -153,15 +153,15 @@ void s11c_state::s11c(machine_config &config)
 	m_pia28->readpa_handler().set(FUNC(s11_state::pia28_w7_r));
 	m_pia28->set_port_a_input_overrides_output_mask(0xff);
 	m_pia28->writepa_handler().set(FUNC(s11a_state::dig0_w));
-	m_pia28->writepb_handler().set(FUNC(s11b_state::dig1_w));
+	m_pia28->writepb_handler().set(FUNC(s11c_state::dig1_w));
 	m_pia28->ca2_handler().set(FUNC(s11_state::pia28_ca2_w));
 	m_pia28->cb2_handler().set(FUNC(s11_state::pia28_cb2_w));
 	m_pia28->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<5>));
 	m_pia28->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<6>));
 
 	PIA6821(config, m_pia2c, 0);
-	m_pia2c->writepa_handler().set(FUNC(s11b_state::pia2c_pa_w));
-	m_pia2c->writepb_handler().set(FUNC(s11b_state::pia2c_pb_w));
+	m_pia2c->writepa_handler().set(FUNC(s11c_state::pia2c_pa_w));
+	m_pia2c->writepb_handler().set(FUNC(s11c_state::pia2c_pb_w));
 	m_pia2c->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<7>));
 	m_pia2c->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<8>));
 
@@ -174,7 +174,7 @@ void s11c_state::s11c(machine_config &config)
 	m_pia30->irqb_handler().set(m_piairq, FUNC(input_merger_device::in_w<10>));
 
 	PIA6821(config, m_pia34, 0);
-	m_pia34->writepa_handler().set(FUNC(s11b_state::pia34_pa_w));
+	m_pia34->writepa_handler().set(FUNC(s11c_state::pia34_pa_w));
 	m_pia34->writepb_handler().set(FUNC(s11b_state::pia34_pb_w));
 	m_pia34->cb2_handler().set(FUNC(s11b_state::pia34_cb2_w));
 	m_pia34->irqa_handler().set(m_piairq, FUNC(input_merger_device::in_w<11>));
@@ -486,7 +486,7 @@ ROM_START(rvrbt_p7)
 	ROM_LOAD("gamb_u26.pa7", 0x4000, 0x4000, CRC(594db647) SHA1(914d10755c2a1609d3945554fdd8006f7d294287))
 	ROM_LOAD("gamb_u27.pa7", 0x8000, 0x8000, CRC(696248c4) SHA1(892ea48121165792d10d64dcfc188e4a100e6371))
 	ROM_REGION(0x80000, "bg:cpu", ROMREGION_ERASEFF)
-	ROM_LOAD("gamb_u4.l2", 0x00000, 0x10000, CRC(c0cfa9be) SHA1(352df9a4dcbc131ae249416e9e517137a04627ba))
+	ROM_LOAD("gamb_u4.l1", 0x00000, 0x10000, CRC(fb3fab22) SHA1(ea0f3431e4185361740840a19c93e249954c4835))
 	ROM_RELOAD(0x10000, 0x10000)
 	ROM_LOAD("gamb_u19.l1", 0x20000, 0x10000, CRC(04a3a8c8) SHA1(e72ef767f13282d2335cda3288037610d9bfedf2))
 	ROM_RELOAD(0x30000, 0x10000)

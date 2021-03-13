@@ -112,7 +112,6 @@ public:
 		m_nvram(*this, "nvram"),
 		m_latch(*this, "latch"),
 		m_fdc_cpu(*this,"fdccpu"),
-		m_fdc_rom(*this,"fdc_rom"),
 		m_fdc_ram(*this,"fdc_ram"),
 		m_io_line0(*this, "LINE0"),
 		m_io_line1(*this, "LINE1"),
@@ -147,7 +146,6 @@ private:
 	required_device<ls259_device> m_latch;
 	required_device<m6504_device> m_fdc_cpu;
 
-	required_shared_ptr<uint8_t> m_fdc_rom;
 	required_shared_ptr<uint8_t> m_fdc_ram;
 
 	required_ioport m_io_line0;

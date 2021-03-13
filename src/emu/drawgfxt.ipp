@@ -1892,15 +1892,15 @@ inline void drawscanline_core(BitmapType &bitmap, s32 destx, s32 desty, s32 leng
 		srcptr += 4;
 		destptr += 4;
 		priptr += 4;
+	}
 
-		// iterate over leftover pixels
-		while (length-- > 0)
-		{
-			pixel_op(destptr[0], priptr[0], srcptr[0]);
-			srcptr++;
-			destptr++;
-			priptr++;
-		}
+	// iterate over leftover pixels
+	while (length-- > 0)
+	{
+		pixel_op(destptr[0], priptr[0], srcptr[0]);
+		srcptr++;
+		destptr++;
+		priptr++;
 	}
 }
 

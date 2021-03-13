@@ -30,7 +30,7 @@
 DEFINE_DEVICE_TYPE_NS(SUN_1200BAUD_HLE_MOUSE, bus::sunmouse, hle_1200baud_device, "sunmouse_hle1200", "Sun Mouse (1200 Baud, HLE)")
 DEFINE_DEVICE_TYPE_NS(SUN_4800BAUD_HLE_MOUSE, bus::sunmouse, hle_4800baud_device, "sunmouse_hle4800", "Sun Mouse (4800 Baud, HLE)")
 
-namespace bus { namespace sunmouse {
+namespace bus::sunmouse {
 
 namespace {
 
@@ -229,6 +229,7 @@ void hle_device_base::tra_complete()
 					m_y_delta);
 			//break; uncommenting this causes problems with early versions of Solaris
 		}
+		[[fallthrough]];
 	case 1U:
 		LOG("Sent %s (B=%X->%x X=%d Y=%d) - sending X delta\n",
 				(1U == m_phase) ? "button state" : "Y delta",
@@ -311,4 +312,4 @@ hle_4800baud_device::hle_4800baud_device(
 {
 }
 
-} } // namespace bus::sunmouse
+} // namespace bus::sunmouse

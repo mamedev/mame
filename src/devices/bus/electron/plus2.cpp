@@ -50,7 +50,7 @@ void electron_plus2_device::device_add_mconfig(machine_config &config)
 	m_cart[1]->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::nmi_w));
 
 	/* via */
-	VIA6522(config, m_via, DERIVED_CLOCK(1, 16));
+	MOS6522(config, m_via, DERIVED_CLOCK(1, 16));
 	m_via->readpb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_r));
 	m_via->writepb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_w));
 	m_via->cb1_handler().set(m_userport, FUNC(bbc_userport_slot_device::write_cb1));
@@ -126,6 +126,7 @@ uint8_t electron_plus2_device::expbus_r(offs_t offset)
 		case 13:
 			data &= m_cart[0]->read(offset & 0x3fff, 0, 0, m_romsel & 0x01, 0, 1);
 			data &= m_cart[1]->read(offset & 0x3fff, 0, 0, m_romsel & 0x01, 0, 1);
+			[[fallthrough]];
 		case 14:
 		case 15:
 			data &= m_rom[m_romsel - 13]->read_rom(offset & 0x3fff);

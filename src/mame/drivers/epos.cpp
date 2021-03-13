@@ -27,7 +27,7 @@
 
     To Do:
 
-    - Super Blob uses a busy loop during the color test to split the screen
+    - Super Glob uses a busy loop during the color test to split the screen
       between the two palettes.  This effect is not emulated, but since both
       halves of the palette are identical, this is not an issue.  See $039c.
       The other games have a different color test, not using the busy loop.

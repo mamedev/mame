@@ -145,15 +145,15 @@ uint32_t bfm_swp_state::bfm_swp_mem_r(offs_t offset, uint32_t mem_mask)
 	switch ( cs )
 	{
 		case 1:
-			if (offset<0x100000/4) return m_cpuregion[offset];
-
+			if (offset<0x100000/4)
+				return m_cpuregion[offset];
+			[[fallthrough]]; // FIXME: really?
 		case 2:
 			offset&=0x3fff;
 			return m_mainram[offset];
 
 		default:
 			logerror("%08x maincpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
-
 	}
 
 	return 0x0000;
@@ -168,13 +168,10 @@ void bfm_swp_state::bfm_swp_mem_w(offs_t offset, uint32_t data, uint32_t mem_mas
 	{
 		default:
 			logerror("%08x maincpu write access offset %08x data %08x mem_mask %08x cs %d\n", pc, offset*4, data, mem_mask, cs);
-
+			[[fallthrough]];
 		case 2:
 			offset&=0x3fff;
 			COMBINE_DATA(&m_mainram[offset]);
-			break;
-
-
 	}
 
 }

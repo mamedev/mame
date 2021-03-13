@@ -163,7 +163,7 @@ void pc_floppy_get_info(const imgtool_class *imgclass, uint32_t state, union img
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case IMGTOOLINFO_PTR_MAKE_CLASS:                    info->make_class = imgtool_floppy_make_class; break;
 		case IMGTOOLINFO_PTR_FLOPPY_CREATE:                 info->create = fat_image_create; break;
-		case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = (void *) floppyoptions_pc; break;
+		case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = nullptr; break;
 		case IMGTOOLINFO_PTR_READ_BLOCK:                    info->read_block = fat_image_readblock; break;
 		case IMGTOOLINFO_PTR_WRITE_BLOCK:                   info->write_block = fat_image_writeblock; break;
 		case IMGTOOLINFO_PTR_GET_GEOMETRY:                  info->get_geometry = fat_image_get_geometry; break;

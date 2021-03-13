@@ -31,7 +31,7 @@ class saturn_state : public driver_device
 public:
 	saturn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_rom(*this, "bios", 0x20000),
+			m_rom(*this, "bios"),
 			m_workram_l(*this, "workram_l"),
 			m_workram_h(*this, "workram_h"),
 			m_sound_ram(*this, "sound_ram"),
@@ -85,7 +85,7 @@ protected:
 	attotime  m_sinit_boost_timeslice;
 
 	struct {
-		uint16_t    **framebuffer_display_lines;
+		std::unique_ptr<uint16_t * []> framebuffer_display_lines;
 		int       framebuffer_mode;
 		int       framebuffer_double_interlace;
 		int       fbcr_accessed;
@@ -96,9 +96,9 @@ protected:
 		int       framebuffer_clear_on_next_frame;
 		rectangle system_cliprect;
 		rectangle user_cliprect;
-		std::unique_ptr<uint16_t[]>   framebuffer[2];
-		uint16_t    **framebuffer_draw_lines;
-		std::unique_ptr<uint8_t[]>     gfx_decode;
+		std::unique_ptr<uint16_t []> framebuffer[2];
+		std::unique_ptr<uint16_t * []> framebuffer_draw_lines;
+		std::unique_ptr<uint8_t []> gfx_decode;
 		uint16_t    lopr;
 		uint16_t    copr;
 		uint16_t    ewdr;

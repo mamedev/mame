@@ -15342,7 +15342,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="eyebeho2g" cloneof="eyebehol" supported="no">
+	<software name="eyebeho2g" cloneof="eyebeho2" supported="no">
 		<!-- SPS (CAPS) release 681 -->
 		<description>Eye of the Beholder II - Legende von Darkmoon (Ger)</description>
 		<!-- retail, standalone -->

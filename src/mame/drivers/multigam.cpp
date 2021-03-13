@@ -123,7 +123,10 @@ public:
 		m_ppu(*this, "ppu"),
 		m_p1(*this, "P1"),
 		m_p2(*this, "P2"),
-		m_dsw(*this, "DSW")
+		m_dsw(*this, "DSW"),
+		m_bank_gfx(*this, "bank_gfx"),
+		m_bank_ppu(*this, "bank_ppu_%u", 1U),
+		m_bank_ram(*this, "bank_ram")
 	{ }
 
 	void multigam(machine_config &config);
@@ -148,6 +151,9 @@ private:
 	required_ioport m_p1;
 	required_ioport m_p2;
 	optional_ioport m_dsw;
+	memory_bank_creator m_bank_gfx;
+	memory_bank_array_creator<8> m_bank_ppu;
+	optional_memory_bank m_bank_ram;
 
 	std::unique_ptr<uint8_t[]> m_nt_ram;
 	std::unique_ptr<uint8_t[]> m_vram;
@@ -273,8 +279,6 @@ uint8_t multigam_state::multigam_nt_r(offs_t offset)
 	return m_nt_page[page][offset & 0x3ff];
 }
 
-static const char * const banknames[] = { "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8", "bank9" };
-
 void multigam_state::set_videorom_bank( int start, int count, int bank, int bank_size_in_kb)
 {
 	int i;
@@ -283,7 +287,7 @@ void multigam_state::set_videorom_bank( int start, int count, int bank, int bank
 	/* count determines the size of the area mapped in KB */
 	for (i = 0; i < count; i++, offset += 0x400)
 	{
-		membank(banknames[i + start])->set_base(memregion("gfx1")->base() + offset);
+		m_bank_ppu[i + start]->set_base(memregion("gfx1")->base() + offset);
 	}
 }
 
@@ -295,7 +299,7 @@ void multigam_state::set_videoram_bank( int start, int count, int bank, int bank
 	/* count determines the size of the area mapped in KB */
 	for (i = 0; i < count; i++, offset += 0x400)
 	{
-		membank(banknames[i + start])->set_base(m_vram.get() + offset);
+		m_bank_ppu[i + start]->set_base(m_vram.get() + offset);
 	}
 }
 
@@ -384,7 +388,7 @@ void multigam_state::multigam_switch_prg_rom(uint8_t data)
 
 void multigam_state::multigam_switch_gfx_rom(uint8_t data)
 {
-	membank("bank1")->set_base(memregion("gfx1")->base() + (0x2000 * (data & 0x3f)));
+	m_bank_gfx->set_base(memregion("gfx1")->base() + (0x2000 * (data & 0x3f)));
 	set_mirroring(data & 0x40 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	m_game_gfx_bank = data;
 }
@@ -394,7 +398,7 @@ void multigam_state::multigam_mapper2_w(offs_t offset, uint8_t data)
 {
 	if (m_game_gfx_bank & 0x80)
 	{
-		membank("bank1")->set_base(memregion("gfx1")->base() + (0x2000 * ((data & 0x3) + (m_game_gfx_bank & 0x3c))));
+		m_bank_gfx->set_base(memregion("gfx1")->base() + (0x2000 * ((data & 0x3) + (m_game_gfx_bank & 0x3c))));
 	}
 	else
 	{
@@ -577,11 +581,11 @@ void multigam_state::multigam3_mmc3_rom_switch_w(offs_t offset, uint8_t data)
 		case 0x2001: /* enable ram at $6000 */
 			if (data & 0x80)
 			{
-				membank("bank10")->set_base(m_multigmc_mmc3_6000_ram.get());
+				m_bank_ram->set_base(m_multigmc_mmc3_6000_ram.get());
 			}
 			else
 			{
-				membank("bank10")->set_base(memregion("maincpu")->base() + 0x6000);
+				m_bank_ram->set_base(memregion("maincpu")->base() + 0x6000);
 			}
 			if (data & 0x40)
 			{
@@ -665,7 +669,7 @@ void multigam_state::multigm3_switch_prg_rom(address_space &space, uint8_t data)
 	else
 	{
 		space.install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(multigam_state::multigm3_mapper2_w)) );
-		membank("bank10")->set_base(memregion("maincpu")->base() + 0x6000);
+		m_bank_ram->set_base(memregion("maincpu")->base() + 0x6000);
 	}
 
 	if (data & 0x80)
@@ -702,7 +706,7 @@ void multigam_state::multigm3_map(address_map &map)
 	map(0x5003, 0x5003).w(FUNC(multigam_state::multigm3_switch_gfx_rom));
 	map(0x5000, 0x5ffe).rom();
 	map(0x5fff, 0x5fff).portr("IN0");
-	map(0x6000, 0x7fff).bankrw("bank10");
+	map(0x6000, 0x7fff).bankrw("bank_ram");
 	map(0x6fff, 0x6fff).nopw(); /* 0x00 in attract mode, 0xff during play */
 	map(0x8000, 0xffff).rom().w(FUNC(multigam_state::multigm3_mapper2_w));
 }
@@ -921,23 +925,16 @@ void multigam_state::supergm3_set_bank()
 		m_supergm3_chr_bank == 0x40 )
 	{
 		// VRAM
-		m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank1");
-		m_ppu->space(AS_PROGRAM).install_write_bank(0x0000, 0x1fff, "bank1");
-		membank("bank1")->set_base(m_vram.get());
+		m_ppu->space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x1fff, m_bank_gfx);
+		m_bank_gfx->set_base(m_vram.get());
 
 		if (m_supergm3_chr_bank == 0x40)
 			set_mirroring(PPU_MIRROR_VERT);
 	}
 	else
 	{
-		m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x03ff, "bank2");
-		m_ppu->space(AS_PROGRAM).install_read_bank(0x0400, 0x07ff, "bank3");
-		m_ppu->space(AS_PROGRAM).install_read_bank(0x0800, 0x0bff, "bank4");
-		m_ppu->space(AS_PROGRAM).install_read_bank(0x0c00, 0x0fff, "bank5");
-		m_ppu->space(AS_PROGRAM).install_read_bank(0x1000, 0x13ff, "bank6");
-		m_ppu->space(AS_PROGRAM).install_read_bank(0x1400, 0x17ff, "bank7");
-		m_ppu->space(AS_PROGRAM).install_read_bank(0x1800, 0x1bff, "bank8");
-		m_ppu->space(AS_PROGRAM).install_read_bank(0x1c00, 0x1fff, "bank9");
+		for(int i=0; i<8; i++)
+			m_ppu->space(AS_PROGRAM).install_read_bank(0x0000 + 0x400*i, 0x03ff + 0x400*i, m_bank_ppu[i]);
 		m_ppu->space(AS_PROGRAM).unmap_write(0x0000, 0x1fff);
 
 		set_videorom_bank(0, 8, 0, 8);
@@ -948,7 +945,7 @@ void multigam_state::supergm3_set_bank()
 	{
 		// title screen
 		memcpy(mem + 0x8000, mem + 0x18000, 0x8000);
-		membank("bank10")->set_base(mem + 0x6000);
+		m_bank_ram->set_base(mem + 0x6000);
 		m_ppu->set_scanline_callback(nullptr);
 	}
 	else if ((m_supergm3_prg_bank & 0x40) == 0)
@@ -1004,7 +1001,7 @@ void multigam_state::supergm3_map(address_map &map)
 	map(0x5001, 0x5001).w(FUNC(multigam_state::supergm3_prg_bank_w));
 	map(0x5002, 0x5002).w(FUNC(multigam_state::supergm3_chr_bank_w));
 	map(0x5fff, 0x5fff).nopw();
-	map(0x6000, 0x7fff).bankrw("bank10");
+	map(0x6000, 0x7fff).bankrw("bank_ram");
 	map(0x8000, 0xffff).rom();
 }
 
@@ -1169,8 +1166,8 @@ void multigam_state::machine_start()
 	m_nt_page[3] = m_nt_ram.get() + 0xc00;
 
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(multigam_state::multigam_nt_r)), write8sm_delegate(*this, FUNC(multigam_state::multigam_nt_w)));
-	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank1");
-	membank("bank1")->set_base(memregion("gfx1")->base());
+	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, m_bank_gfx);
+	m_bank_gfx->set_base(memregion("gfx1")->base());
 }
 
 MACHINE_START_MEMBER(multigam_state,multigm3)
@@ -1182,15 +1179,8 @@ MACHINE_START_MEMBER(multigam_state,multigm3)
 	m_nt_page[3] = m_nt_ram.get() + 0xc00;
 
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(multigam_state::multigam_nt_r)), write8sm_delegate(*this, FUNC(multigam_state::multigam_nt_w)));
-
-	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x03ff, "bank2");
-	m_ppu->space(AS_PROGRAM).install_read_bank(0x0400, 0x07ff, "bank3");
-	m_ppu->space(AS_PROGRAM).install_read_bank(0x0800, 0x0bff, "bank4");
-	m_ppu->space(AS_PROGRAM).install_read_bank(0x0c00, 0x0fff, "bank5");
-	m_ppu->space(AS_PROGRAM).install_read_bank(0x1000, 0x13ff, "bank6");
-	m_ppu->space(AS_PROGRAM).install_read_bank(0x1400, 0x17ff, "bank7");
-	m_ppu->space(AS_PROGRAM).install_read_bank(0x1800, 0x1bff, "bank8");
-	m_ppu->space(AS_PROGRAM).install_read_bank(0x1c00, 0x1fff, "bank9");
+	for(int i=0; i<8; i++)
+		m_ppu->space(AS_PROGRAM).install_read_bank(0x0000 + 0x400*i, 0x03ff + 0x400*i, m_bank_ppu[i]);
 
 	set_videorom_bank(0, 8, 0, 8);
 }

@@ -594,6 +594,7 @@ offs_t alpha_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 
 				default: UNKNOWN("intm*"); break;
 			}
+			break;
 		case 0x14: // ITFP* (integer to floating)
 			switch ((instruction >> 5) & 0x7ff)
 			{

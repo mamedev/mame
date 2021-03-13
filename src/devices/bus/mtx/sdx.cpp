@@ -29,9 +29,11 @@ static void sdx_floppies(device_slot_interface &device)
 	device.option_add("525qd", FLOPPY_525_QD);
 }
 
-FLOPPY_FORMATS_MEMBER(mtx_sdx_device::floppy_formats)
-	FLOPPY_MTX_FORMAT
-FLOPPY_FORMATS_END
+void mtx_sdx_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_MTX_FORMAT);
+}
 
 //-------------------------------------------------
 //  ROM( sdx )
@@ -281,7 +283,7 @@ uint8_t mtx_sdx_device::sdx_status_r()
 
 	uint8_t data = 0x00;
 
-	data |= m_dsw[BIT(m_control, 0)].read_safe(0x0f) & 0x0f;
+	data |= m_dsw[BIT(m_control, 0)]->read() & 0x0f;
 
 	data |= (m_floppy0->get_device() && m_floppy1->get_device()) ? 0x10 : 0x00;
 

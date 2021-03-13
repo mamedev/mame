@@ -288,7 +288,11 @@ int gl3000s_state::sed1520_screen_update(bitmap_ind16 &bitmap, const rectangle &
 
 SED1520_UPDATE_CB(gl3000s_state::screen_update_right)
 {
-	return sed1520_screen_update(bitmap, cliprect, vram, start_line, adc, 119);
+	if (lcd_on)
+		return sed1520_screen_update(bitmap, cliprect, dram, start_line, adc, 119);
+
+	bitmap.fill(0, cliprect);
+	return 0;
 }
 
 SED1520_UPDATE_CB(gl3000s_state::screen_update_left)
@@ -301,7 +305,10 @@ SED1520_UPDATE_CB(gl3000s_state::screen_update_left)
 	for (int y=0; y<2; y++)
 		for (int x=59; x<85; x++)
 		{
-			uint8_t data = vram[(y*0x50 + x) % 0x140];
+			uint8_t data = 0;
+			if (lcd_on)
+				data = dram[((y + (start_line >> 3)) * 80 + x) & 0x1ff];
+
 			int32_t dpos = (x - 74) / 2;
 			if (dpos < 0)
 			{
@@ -348,7 +355,11 @@ SED1520_UPDATE_CB(gl3000s_state::screen_update_left)
 		m_points_out[1][i] = points[0][i];
 	}
 
-	return sed1520_screen_update(bitmap, cliprect, vram, start_line, adc, 58);
+	if (lcd_on)
+		return sed1520_screen_update(bitmap, cliprect, dram, start_line, adc, 58);
+
+	bitmap.fill(0, cliprect);
+	return 0;
 }
 
 

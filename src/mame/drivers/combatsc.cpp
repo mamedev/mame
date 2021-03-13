@@ -126,7 +126,7 @@ Dip location and recommended settings verified with the US manual
 #include "cpu/m6809/hd6309.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "sound/2203intf.h"
+#include "sound/ym2203.h"
 #include "speaker.h"
 
 
@@ -240,7 +240,7 @@ void combatsc_state::combatscb_bankselect_w(address_space &space, uint8_t data)
 		}
 		else
 		{
-			space.install_read_bank(0x4000, 0x7fff, "bank1");   /* banked ROM */
+			space.install_read_bank(0x4000, 0x7fff, membank("bank1"));   /* banked ROM */
 			space.unmap_write(0x4000, 0x7fff);  /* banked ROM */
 		}
 	}

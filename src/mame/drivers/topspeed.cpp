@@ -192,7 +192,7 @@ u8 topspeed_state::input_bypass_r()
 {
 	// Read port number
 	const u8 port = m_tc0040ioc->port_r();
-	const u16 steer = 0xff80 + m_steer.read_safe(0);
+	const u16 steer = 0xff80 + m_steer->read();
 
 	switch (port)
 	{
@@ -209,14 +209,14 @@ u8 topspeed_state::input_bypass_r()
 
 CUSTOM_INPUT_MEMBER(topspeed_state::gas_pedal_r)
 {
-	static const u8 retval[8] = { 0,1,3,2,6,7,5,4 };
-	return retval[m_gas.read_safe(0) & 7];
+	static constexpr u8 retval[8] = { 0,1,3,2,6,7,5,4 };
+	return retval[m_gas->read() & 7];
 }
 
 CUSTOM_INPUT_MEMBER(topspeed_state::brake_pedal_r)
 {
-	static const u8 retval[8] = { 0,1,3,2,6,7,5,4 };
-	return retval[m_brake.read_safe(0) & 7];
+	static constexpr u8 retval[8] = { 0,1,3,2,6,7,5,4 };
+	return retval[m_brake->read() & 7];
 }
 
 // TODO: proper motorcpu hook-up

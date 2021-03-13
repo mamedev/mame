@@ -171,11 +171,9 @@ void tnx1_state::protection_w(offs_t offset, uint8_t data)
 }
 
 
-void tnx1_state::maincpu_program_map(address_map &map)
+void tnx1_state::maincpu_common_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu",0);
-	map(0x8000, 0x87ff).ram().share("ramlow");
-	map(0x8800, 0x8bff).nopw(); // Attempts to initialize this area with 00 on boot
 	map(0x8c00, 0x8e7f).ram().share("dmasource");
 	map(0x8e80, 0x8fff).ram().share("ramhigh");
 	map(0xa000, 0xa3ff).w(FUNC(tnx1_state::popeye_videoram_w)).share("videoram");
@@ -184,10 +182,17 @@ void tnx1_state::maincpu_program_map(address_map &map)
 	map(0xe000, 0xe001).rw(FUNC(tnx1_state::protection_r), FUNC(tnx1_state::protection_w));
 }
 
+void tnx1_state::maincpu_program_map(address_map &map)
+{
+	maincpu_common_map(map);
+	map(0x8000, 0x87ff).ram().share("ramlow");
+	map(0x8800, 0x8bff).nopw(); // Attempts to initialize this area with 00 on boot
+}
+
 void tpp2_state::maincpu_program_map(address_map &map)
 {
-	tpp1_state::maincpu_program_map(map);
-	map(0x8000, 0x87ff).unmaprw(); // 7f (unpopulated)
+	maincpu_common_map(map);
+	// 8000-87ff is unpopulated (7f)
 	map(0x8800, 0x8bff).ram().share("ramlow"); // 7h
 	map(0xc000, 0xdfff).w(FUNC(tpp2_state::background_w));
 }

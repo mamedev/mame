@@ -29,10 +29,7 @@ DEFINE_DEVICE_TYPE(VIC10_EXPANSION_SLOT, vic10_expansion_slot_device, "vic10_exp
 //-------------------------------------------------
 
 device_vic10_expansion_card_interface::device_vic10_expansion_card_interface(const machine_config &mconfig, device_t &device) :
-	device_interface(device, "vic10exp"),
-	m_lorom(*this, "lorom"),
-	m_exram(*this, "exram"),
-	m_uprom(*this, "uprom")
+	device_interface(device, "vic10exp")
 {
 	m_slot = dynamic_cast<vic10_expansion_slot_device *>(device.owner());
 }
@@ -133,11 +130,11 @@ image_init_result vic10_expansion_slot_device::call_load()
 					uint8_t *roml = nullptr;
 					uint8_t *romh = nullptr;
 
-					m_card->m_lorom.allocate(roml_size);
-					m_card->m_uprom.allocate(romh_size);
+					m_card->m_lorom = std::make_unique<uint8_t[]>(roml_size);
+					m_card->m_uprom = std::make_unique<uint8_t[]>(romh_size);
 
-					if (roml_size) roml = m_card->m_lorom;
-					if (romh_size) romh = m_card->m_lorom;
+					if (roml_size) roml = m_card->m_lorom.get();
+					if (romh_size) romh = m_card->m_lorom.get();
 
 					cbm_crt_read_data(image_core_file(), roml, romh);
 				}

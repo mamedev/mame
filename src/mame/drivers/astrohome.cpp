@@ -24,6 +24,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class astrocde_home_state : public astrocde_state
 {
 public:
@@ -38,9 +40,13 @@ public:
 
 	void astrocde(machine_config &config);
 
+	void init_astrocde();
+
+protected:
+	virtual void machine_start() override;
+
 private:
 	uint8_t inputs_r(offs_t offset);
-	DECLARE_MACHINE_START(astrocde);
 
 	void astrocade_io(address_map &map);
 	void astrocade_mem(address_map &map);
@@ -187,8 +193,6 @@ void astrocde_home_state::astrocde(machine_config &config)
 
 	config.set_perfect_quantum(m_maincpu);
 
-	MCFG_MACHINE_START_OVERRIDE(astrocde_home_state, astrocde)
-
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(ASTROCADE_CLOCK, 455, 0, 352, 262, 0, 240);
@@ -256,12 +260,12 @@ ROM_END
  *
  *************************************/
 
-void astrocde_state::init_astrocde()
+void astrocde_home_state::init_astrocde()
 {
 	m_video_config = AC_SOUND_PRESENT;
 }
 
-MACHINE_START_MEMBER(astrocde_home_state, astrocde)
+void astrocde_home_state::machine_start()
 {
 	if (m_cart->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x3fff, read8sm_delegate(*m_cart, FUNC(astrocade_cart_slot_device::read_rom)));
@@ -274,6 +278,9 @@ MACHINE_START_MEMBER(astrocde_home_state, astrocde)
 		m_maincpu->space(AS_IO).install_readwrite_handler(0x0080, 0x00ff, 0x0000, 0x0000, 0xff00, read8sm_delegate(*m_exp, FUNC(astrocade_exp_device::read_io)), write8sm_delegate(*m_exp, FUNC(astrocade_exp_device::write_io)));
 	}
 }
+
+} // Anonymous namespace
+
 
 /*************************************
  *

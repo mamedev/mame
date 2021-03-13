@@ -637,6 +637,7 @@ void _3do_state::madam_w(offs_t offset, uint32_t data, uint32_t mem_mask){
 	case 0x0680/4: case 0x0684/4: case 0x0688/4: case 0x068c/4:
 	case 0x0690/4: case 0x0694/4: case 0x0698/4: case 0x069c/4:
 		m_madam.mult[offset & 0x3f] = data;
+		break;
 	case 0x07f0/4:
 		m_madam.mult_control |= data;
 		break;

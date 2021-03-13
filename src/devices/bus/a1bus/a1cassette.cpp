@@ -76,7 +76,7 @@ a1bus_cassette_device::a1bus_cassette_device(const machine_config &mconfig, devi
 void a1bus_cassette_device::device_start()
 {
 	install_device(0xc000, 0xc0ff, read8sm_delegate(*this, FUNC(a1bus_cassette_device::cassette_r)), write8sm_delegate(*this, FUNC(a1bus_cassette_device::cassette_w)));
-	install_bank(0xc100, 0xc1ff, "bank_a1cas", &m_rom[0]);
+	install_bank(0xc100, 0xc1ff, &m_rom[0]);
 
 	save_item(NAME(m_cassette_output_flipflop));
 }

@@ -112,10 +112,10 @@ void side116_device::device_reset()
 	{
 		switch ((m_config->read() >> 1) & 0x03)
 		{
-		case 0: m_isa->install_rom(this, 0xc8000, 0xc9fff, "side116", "option"); break;
-		case 1: m_isa->install_rom(this, 0xd8000, 0xd9fff, "side116", "option"); break;
-		case 2: m_isa->install_rom(this, 0xcc000, 0xcdfff, "side116", "option"); break;
-		case 3: m_isa->install_rom(this, 0xdc000, 0xddfff, "side116", "option"); break;
+		case 0: m_isa->install_rom(this, 0xc8000, 0xc9fff, "option"); break;
+		case 1: m_isa->install_rom(this, 0xd8000, 0xd9fff, "option"); break;
+		case 2: m_isa->install_rom(this, 0xcc000, 0xcdfff, "option"); break;
+		case 3: m_isa->install_rom(this, 0xdc000, 0xddfff, "option"); break;
 		}
 	}
 

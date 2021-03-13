@@ -291,9 +291,7 @@ static const nes_mmc mmc_list[] =
 
 const nes_mmc *nes_mapper_lookup( int mapper )
 {
-	int i;
-
-	for (i = 0; i < ARRAY_LENGTH(mmc_list); i++)
+	for (int i = 0; i < std::size(mmc_list); i++)
 	{
 		if (mmc_list[i].iNesMapper == mapper)
 			return &mmc_list[i];
@@ -372,6 +370,7 @@ void nes_cart_slot_device::call_load_ines()
 
 		case 0x8:   // it's iNES 2.0 format
 			ines20 = true;
+			[[fallthrough]];
 		case 0x0:
 		default:
 			mapper |= header[7] & 0xf0;
@@ -840,6 +839,7 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 
 		case 0x8:   // it's iNES 2.0 format
 			ines20 = true;
+			[[fallthrough]];
 		case 0x0:
 		default:
 			mapper |= ROM[7] & 0xf0;

@@ -1000,7 +1000,7 @@ void isa8_hdc_device::device_reset()
 	dip = ioport("HDD")->read();
 
 	if (ioport("ROM")->read() == 1 && m_hdc->install_rom())
-		m_isa->install_rom(this, 0xc8000, 0xc9fff, "hdc", "hdc");
+		m_isa->install_rom(this, 0xc8000, 0xc9fff, "hdc");
 }
 
 /*************************************************************************

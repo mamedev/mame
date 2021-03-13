@@ -43,6 +43,7 @@
 #include "speaker.h"
 
 
+namespace {
 
 class tomcat_state : public driver_device
 {
@@ -229,12 +230,12 @@ void tomcat_state::tomcat_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
 	map(0x402001, 0x402001).r("adc", FUNC(adc0808_device::data_r)).w(FUNC(tomcat_state::adcon_w));
-	map(0x404000, 0x404001).r(FUNC(tomcat_state::tomcat_inputs_r)).w("avg", FUNC(avg_tomcat_device::go_word_w));
-	map(0x406000, 0x406001).w("avg", FUNC(avg_tomcat_device::reset_word_w));
+	map(0x404000, 0x404001).r(FUNC(tomcat_state::tomcat_inputs_r)).w("avg", FUNC(avg_device::go_word_w));
+	map(0x406000, 0x406001).w("avg", FUNC(avg_device::reset_word_w));
 	map(0x408000, 0x408001).r(FUNC(tomcat_state::tomcat_inputs2_r)).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x40a000, 0x40a001).rw(FUNC(tomcat_state::tomcat_320bio_r), FUNC(tomcat_state::tomcat_irqclr_w));
 	map(0x40e000, 0x40e01f).w(FUNC(tomcat_state::main_latch_w));
-	map(0x800000, 0x803fff).ram().share("avg:vectorram");
+	map(0x800000, 0x803fff).ram();
 	map(0xffa000, 0xffbfff).ram().share("shared_ram");
 	map(0xffc000, 0xffcfff).ram();
 	map(0xffd000, 0xffdfff).rw("m48t02", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);
@@ -276,7 +277,7 @@ void tomcat_state::sound_map(address_map &map)
 
 static INPUT_PORTS_START( tomcat )
 	PORT_START("IN0")   /* INPUTS */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_tomcat_device, done_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_device, done_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNUSED ) // SPARE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON5 ) // DIAGNOSTIC
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
@@ -369,8 +370,9 @@ void tomcat_state::tomcat(machine_config &config)
 	screen.set_visarea(0, 280, 0, 250);
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	avg_device &avg(AVG_TOMCAT(config, "avg", 0));
-	avg.set_vector_tag("vector");
+	avg_device &avg(AVG_STARWARS(config, "avg", 0));
+	avg.set_vector("vector");
+	avg.set_memory(m_maincpu, AS_PROGRAM, 0x800000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -393,5 +395,7 @@ ROM_START( tomcat )
 	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "136021-105.1l",   0x0000, 0x0100, CRC(82fc3eb2) SHA1(184231c7baef598294860a7d2b8a23798c5c7da6) ) /* AVG PROM */
 ROM_END
+
+} // anonymous namespace
 
 GAME( 1985, tomcat, 0,        tomcat, tomcat, tomcat_state, empty_init, ROT0, "Atari", "TomCat (prototype)", MACHINE_SUPPORTS_SAVE )

@@ -17,7 +17,7 @@ class blockout_state : public driver_device
 public:
 	blockout_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram", 16),
+		m_videoram(*this, "videoram", 0x40000, ENDIANNESS_BIG),
 		m_frontvideoram(*this, "frontvideoram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -26,7 +26,7 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<u8> m_videoram;
+	memory_share_creator<u8> m_videoram;
 	required_shared_ptr<u16> m_frontvideoram;
 
 	/* video-related */

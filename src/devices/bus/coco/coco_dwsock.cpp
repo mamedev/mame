@@ -80,7 +80,7 @@ beckerport_device::~beckerport_device()
     device_start
 -------------------------------------------------*/
 
-void beckerport_device::device_start(void)
+void beckerport_device::device_start()
 {
 	char chAddress[64];
 
@@ -104,7 +104,7 @@ void beckerport_device::device_start(void)
     device_stop
 -------------------------------------------------*/
 
-void beckerport_device::device_stop(void)
+void beckerport_device::device_stop()
 {
 	if (m_pSocket)
 	{
@@ -117,7 +117,7 @@ void beckerport_device::device_stop(void)
     device_config_complete
 -------------------------------------------------*/
 
-void beckerport_device::device_config_complete(void)
+void beckerport_device::device_config_complete()
 {
 	m_hostname = "127.0.0.1";
 	m_dwtcpport = 65504;
@@ -198,9 +198,9 @@ void beckerport_device::write(offs_t offset, u8 data)
     update_port
 -------------------------------------------------*/
 
-void beckerport_device::update_port(void)
+void beckerport_device::update_port()
 {
 	device_stop();
-	m_dwtcpport = m_dwconfigport.read_safe(65504);
+	m_dwtcpport = m_dwconfigport->read();
 	device_start();
 }

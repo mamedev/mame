@@ -4,7 +4,7 @@
 #include "cpu/m6805/m68705.h"
 #include "cpu/m6800/m6801.h"
 
-#include "sound/2203intf.h"
+#include "sound/ym2203.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -40,6 +40,8 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	IRQ_CALLBACK_MEMBER(mcram_vect_r);
 
 private:
 	/* memory pointers */

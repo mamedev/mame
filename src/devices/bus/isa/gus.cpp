@@ -502,6 +502,7 @@ uint8_t gf1_device::global_reg_data_r(offs_t offset)
 			m_dma_irq_handler(0);
 			return ret;
 		}
+		break;
 	case 0x45:  // Timer control
 		if(offset == 1)
 			return m_timer_ctrl & 0x0c;
@@ -509,15 +510,18 @@ uint8_t gf1_device::global_reg_data_r(offs_t offset)
 	case 0x49:  // Sampling control
 		if(offset == 1)
 			return m_sampling_ctrl & 0xe7;
+		break;
 	case 0x4c:  // Reset
 		if(offset == 1)
 			return m_reset;
+		break;
 	case 0x80: // Voice control
 /* bit 0 - 1 if voice is stopped
  * bit 6 - 1 if addresses are decreasing, can change when looping is enabled
  * bit 7 - 1 if Wavetable IRQ is pending */
 		if(offset == 1)
 			return m_voice[m_current_voice].voice_ctrl & 0xff;
+		break;
 	case 0x81:  // Frequency Control
 		ret = m_voice[m_current_voice].freq_ctrl;
 		if(offset == 0)
@@ -551,12 +555,15 @@ uint8_t gf1_device::global_reg_data_r(offs_t offset)
 	case 0x86:  // Volume Ramp rate
 		if(offset == 1)
 			return m_voice[m_current_voice].vol_ramp_rate;
+		break;
 	case 0x87:  // Volume Ramp start (high 4 bits = exponent, low 4 bits = mantissa)
 		if(offset == 1)
 			return m_voice[m_current_voice].vol_ramp_start;
+		break;
 	case 0x88:  // Volume Ramp end (high 4 bits = exponent, low 4 bits = mantissa)
 		if(offset == 1)
 			return m_voice[m_current_voice].vol_ramp_end;
+		break;
 	case 0x89:  // Current Volume (high 4 bits = exponent, middle 8 bits = mantissa, low 4 bits = 0 [reserved])
 		ret = m_voice[m_current_voice].current_vol;
 		if(offset == 0)
@@ -578,15 +585,18 @@ uint8_t gf1_device::global_reg_data_r(offs_t offset)
 	case 0x8c:  // Pan position (4 bits, 0=full left, 15=full right)
 		if(offset == 1)
 			return m_voice[m_current_voice].pan_position;
+		break;
 	case 0x8d:  // Volume Ramp control
 /* bit 0 - Ramp has stopped
  * bit 6 - Ramp direction
  * bit 7 - Ramp IRQ pending */
 		if(offset == 1)
 			return m_voice[m_current_voice].vol_ramp_ctrl;
+		break;
 	case 0x8e:  // Active voices (6 bits, high 2 bits are always 1)
 		if(offset == 1)
 			return (m_active_voices - 1) | 0xc0;
+		break;
 	case 0x8f:  // IRQ source register
 		if(offset == 1)
 		{

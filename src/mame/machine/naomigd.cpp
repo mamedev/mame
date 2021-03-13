@@ -566,8 +566,8 @@ void naomi_gdrom_board::sh4_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).mirror(0xa0000000).rom().region("bios", 0);
 	map(0x04000000, 0x040000ff).rw(m_315_6154, FUNC(sega_315_6154_device::registers_r), FUNC(sega_315_6154_device::registers_w));
-	map(0x0c000000, 0x0cffffff).ram().share("pci:sh4sdram");
-	map(0x10000000, 0x103fffff).ram().share("pci:6154sdram");
+	map(0x0c000000, 0x0cffffff).ram();
+	map(0x10000000, 0x103fffff).rw(FUNC(naomi_gdrom_board::shared_6154_sdram_r), FUNC(naomi_gdrom_board::shared_6154_sdram_w));
 	map(0x14000000, 0x17ffffff).rw(m_315_6154, FUNC(sega_315_6154_device::aperture_r<0>), FUNC(sega_315_6154_device::aperture_w<0>));
 	map(0x18000000, 0x1bffffff).rw(m_315_6154, FUNC(sega_315_6154_device::aperture_r<1>), FUNC(sega_315_6154_device::aperture_w<1>));
 	map.unmap_value_high();
@@ -592,8 +592,8 @@ void naomi_gdrom_board::pci_map(address_map &map)
 	map(0x0000002c, 0x0000002f).rw(t, FUNC(naomi_gdrom_board::sh4_sdramconfig_r), FUNC(naomi_gdrom_board::sh4_sdramconfig_w));
 	map(0x00000030, 0x00000033).rw(t, FUNC(naomi_gdrom_board::sh4_des_keyl_r), FUNC(naomi_gdrom_board::sh4_des_keyl_w));
 	map(0x00000034, 0x00000037).rw(t, FUNC(naomi_gdrom_board::sh4_des_keyh_r), FUNC(naomi_gdrom_board::sh4_des_keyh_w));
-	map(0x70000000, 0x70ffffff).ram().share("sh4sdram");
-	map(0x78000000, 0x783fffff).ram().share("6154sdram");
+	map(0x70000000, 0x70ffffff).rw(t, FUNC(naomi_gdrom_board::shared_sh4_sdram_r), FUNC(naomi_gdrom_board::shared_sh4_sdram_w));
+	map(0x78000000, 0x783fffff).ram();
 }
 
 void naomi_gdrom_board::dimm_command_w(uint16_t data)
@@ -734,7 +734,7 @@ void naomi_gdrom_board::sh4_control_w(uint32_t data)
 	}
 	else
 	{
-		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data);
+		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data.get());
 	}
 	if (((old & 1) == 0) && ((dimm_control & 1) == 1))
 		set_reset_out();
@@ -774,6 +774,26 @@ void naomi_gdrom_board::sh4_des_keyh_w(uint32_t data)
 uint32_t naomi_gdrom_board::sh4_des_keyh_r()
 {
 	return (uint32_t)(dimm_des_key >> 32);
+}
+
+uint64_t naomi_gdrom_board::shared_6154_sdram_r(offs_t offset)
+{
+	return space_6154->read_qword(0x78000000 + (offset << 3));
+}
+
+void naomi_gdrom_board::shared_6154_sdram_w(offs_t offset, uint64_t data, uint64_t mem_mask)
+{
+	space_6154->write_qword(0x78000000 + (offset << 3), data, mem_mask);
+}
+
+uint32_t naomi_gdrom_board::shared_sh4_sdram_r(offs_t offset)
+{
+	return space_sh4->read_dword(0x0c000000 + (offset << 2));
+}
+
+void naomi_gdrom_board::shared_sh4_sdram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	space_sh4->write_dword(0x0c000000 + (offset << 2), data, mem_mask);
 }
 
 uint64_t naomi_gdrom_board::i2cmem_dimm_r()
@@ -924,8 +944,8 @@ void naomi_gdrom_board::device_start()
 		} else {
 			// use extracted pic data
 			// printf("This PIC key hasn't been converted to a proper PIC binary yet!\n");
-			memcpy(name, picdata+33, 7);
-			memcpy(name+7, picdata+25, 7);
+			memcpy(name, &picdata[33], 7);
+			memcpy(name+7, &picdata[25], 7);
 
 			key = ((uint64_t(picdata[0x31]) << 56) |
 					(uint64_t(picdata[0x32]) << 48) |
@@ -996,22 +1016,22 @@ void naomi_gdrom_board::device_start()
 		if (file_start) {
 			uint32_t file_rounded_size = (file_size + 2047) & -2048;
 			for (dimm_data_size = 4096; dimm_data_size < file_rounded_size; dimm_data_size <<= 1);
-			dimm_data = auto_alloc_array(machine(), uint8_t, dimm_data_size);
-			dimm_des_data = auto_alloc_array(machine(), uint8_t, dimm_data_size);
+			dimm_data = std::make_unique<uint8_t[]>(dimm_data_size);
+			dimm_des_data = std::make_unique<uint8_t[]>(dimm_data_size);
 			if (dimm_data_size != file_rounded_size)
-				memset(dimm_data + file_rounded_size, 0, dimm_data_size - file_rounded_size);
+				memset(&dimm_data[file_rounded_size], 0, dimm_data_size - file_rounded_size);
 
 			// read encrypted data into dimm_des_data
 			uint32_t sectors = file_rounded_size / 2048;
 			for (uint32_t sec = 0; sec != sectors; sec++)
-				cdrom_read_data(gdromfile, file_start + sec, dimm_des_data + 2048 * sec, CD_TRACK_MODE1);
+				cdrom_read_data(gdromfile, file_start + sec, &dimm_des_data[2048 * sec], CD_TRACK_MODE1);
 
 			uint32_t des_subkeys[32];
 			des_generate_subkeys(rev64(key), des_subkeys);
 
 			// decrypt read data from dimm_des_data to dimm_data
 			for (int i = 0; i < file_rounded_size; i += 8)
-				write_from_qword(dimm_data + i, rev64(des_encrypt_decrypt(true, rev64(read_to_qword(dimm_des_data + i)), des_subkeys)));
+				write_from_qword(&dimm_data[i], rev64(des_encrypt_decrypt(true, rev64(read_to_qword(&dimm_des_data[i])), des_subkeys)));
 		}
 
 		cdrom_close(gdromfile);
@@ -1019,6 +1039,9 @@ void naomi_gdrom_board::device_start()
 		if(!dimm_data)
 			throw emu_fatalerror("GDROM: Could not find the file to decrypt.");
 	}
+
+	space_sh4 = &m_maincpu->space(AS_PROGRAM);
+	space_6154 = &m_315_6154->space(sega_315_6154_device::AS_PCI_MEMORY);
 
 	save_item(NAME(dimm_cur_address));
 	save_item(NAME(picbus));
@@ -1057,9 +1080,9 @@ void naomi_gdrom_board::device_reset()
 		dimm_offsetl = 0;
 		dimm_parameterl = 0;
 		dimm_parameterh = 0;
-		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data);
+		m_315_6154->memory()->install_ram(0x10000000, 0x10000000 + dimm_data_size - 1, dimm_des_data.get());
 		if (work_mode == 2) // invalidate dimm memory contents by setting the first 2048 bytes to 0
-			memset(dimm_des_data, 0, 2048);
+			memset(dimm_des_data.get(), 0, 2048);
 	}
 	else
 	{
@@ -1078,12 +1101,12 @@ ioport_constructor naomi_gdrom_board::device_input_ports() const
 
 void naomi_gdrom_board::board_setup_address(uint32_t address, bool is_dma)
 {
-	dimm_cur_address = address & (dimm_data_size-1);
+	dimm_cur_address = address & (dimm_data_size - 1);
 }
 
 void naomi_gdrom_board::board_get_buffer(uint8_t *&base, uint32_t &limit)
 {
-	base = dimm_data + dimm_cur_address;
+	base = &dimm_data[dimm_cur_address];
 	limit = dimm_data_size - dimm_cur_address;
 }
 
@@ -1148,7 +1171,7 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 ROM_START( dimm )
 	ROM_REGION( 0x200000, "segadimm", 0)
 	// Altera FLEX EPF10K30 firmwares (implements PCI IDE controller)
-	ROM_LOAD("315-6301.ic11", 0x000000, 0x01ff01, NO_DUMP ) // GD-only DIMM
+	ROM_LOAD("315-6301.ic11", 0x000000, 0x01ff5b, CRC(cc7735c7) SHA1(1afb442b5918c0d60f98688ed0a7117b0d068722) ) // GD-only DIMM
 	ROM_LOAD("315-6334.ic11", 0x000000, 0x01ff01, CRC(534c342d) SHA1(3e879f432c82305487922ab28c07107cf0f3c5cf) ) // Net-DIMM
 
 	// unused and/or unknown security PICs

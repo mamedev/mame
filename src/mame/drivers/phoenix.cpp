@@ -435,18 +435,11 @@ static GFXDECODE_START( gfx_pleiads )
 GFXDECODE_END
 
 
-MACHINE_RESET_MEMBER(phoenix_state,phoenix)
-{
-}
-
-
 void phoenix_state::phoenix(machine_config &config)
 {
 	/* basic machine hardware */
 	I8085A(config, m_maincpu, CPU_CLOCK);  /* 2.75 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &phoenix_state::phoenix_memory_map);
-
-	MCFG_MACHINE_RESET_OVERRIDE(phoenix_state,phoenix)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -456,8 +449,6 @@ void phoenix_state::phoenix(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_phoenix);
 	PALETTE(config, m_palette, FUNC(phoenix_state::phoenix_palette), 256);
-
-	MCFG_VIDEO_START_OVERRIDE(phoenix_state,phoenix)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -510,8 +501,6 @@ void phoenix_state::survival(machine_config &config)
 	maincpu.in_sid_func().set(FUNC(phoenix_state::survival_sid_callback));
 	maincpu.set_addrmap(AS_PROGRAM, &phoenix_state::survival_memory_map);
 
-	MCFG_MACHINE_RESET_OVERRIDE(phoenix_state,phoenix)
-
 	/* video hardware */
 
 	/* schematics fairly identical to phoenix, however the interesting
@@ -524,8 +513,6 @@ void phoenix_state::survival(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_phoenix);
 	PALETTE(config, m_palette, FUNC(phoenix_state::survival_palette), 256);
-
-	MCFG_VIDEO_START_OVERRIDE(phoenix_state,phoenix)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

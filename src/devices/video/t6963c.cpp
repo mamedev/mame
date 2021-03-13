@@ -36,7 +36,7 @@ t6963c_device::t6963c_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, T6963C, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_display_config("display", ENDIANNESS_LITTLE, 8, 16, 0)
-	, m_cgrom(*this, "cgrom", 0x400)
+	, m_cgrom(*this, "cgrom")
 	, m_display_ram(nullptr)
 	, m_data(0)
 	, m_adp(0)

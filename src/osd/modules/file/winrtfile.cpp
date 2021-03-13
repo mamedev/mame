@@ -350,7 +350,7 @@ osd_file::error osd_get_full_path(std::string &dst, std::string const &path)
 
 	// canonicalize the path
 	TCHAR buffer[MAX_PATH];
-	if (!GetFullPathName(t_path.c_str(), ARRAY_LENGTH(buffer), buffer, nullptr))
+	if (!GetFullPathName(t_path.c_str(), std::size(buffer), buffer, nullptr))
 		return win_error_to_file_error(GetLastError());
 
 	// convert the result back to UTF-8
@@ -380,9 +380,19 @@ bool osd_is_absolute_path(std::string const &path)
 //  osd_get_volume_name
 //============================================================
 
-const char *osd_get_volume_name(int idx)
+std::string osd_get_volume_name(int idx)
 {
-	return nullptr;
+	return std::string();
+}
+
+
+//============================================================
+//  osd_get_volume_names
+//============================================================
+
+std::vector<std::string> osd_get_volume_names()
+{
+	return std::vector<std::string>();
 }
 
 

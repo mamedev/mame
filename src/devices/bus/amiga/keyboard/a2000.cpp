@@ -82,7 +82,7 @@ DEFINE_DEVICE_TYPE_NS(A2000_KBD_G80_GB, bus::amiga::keyboard, a2000_kbd_g80_gb_d
 
 
 
-namespace bus { namespace amiga { namespace keyboard {
+namespace bus::amiga::keyboard {
 
 namespace {
 
@@ -669,4 +669,4 @@ ioport_constructor a2000_kbd_g80_gb_device::device_input_ports() const
 	return INPUT_PORTS_NAME(a2000_gb_keyboard);
 }
 
-} } } // namespace bus::amiga::keyboard
+} // namespace bus::amiga::keyboard

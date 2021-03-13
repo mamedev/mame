@@ -38,31 +38,41 @@ public:
 
 	gameplan_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_trvquest_question(*this, "trvquest_q"),
 			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_riot(*this, "riot"),
 			m_via_0(*this, "via6522_0"),
 			m_via_1(*this, "via6522_1"),
 			m_via_2(*this, "via6522_2"),
 			m_screen(*this, "screen"),
+			m_audiocpu(*this, "audiocpu"),
+			m_riot(*this, "riot"),
 			m_soundlatch(*this, "soundlatch") { }
 
 	void gameplan(machine_config &config);
 	void gameplan_video(machine_config &config);
 	void leprechn(machine_config &config);
 	void leprechn_video(machine_config &config);
-	void trvquest(machine_config &config);
-	void trvquest_video(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<via6522_device> m_via_0;
+	required_device<via6522_device> m_via_1;
+	required_device<via6522_device> m_via_2;
+	required_device<screen_device> m_screen;
+
+	void video_data_w(uint8_t data);
+	void gameplan_video_command_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(video_command_trigger_w);
+	DECLARE_WRITE_LINE_MEMBER(via_irq);
+	uint32_t screen_update_gameplan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
 	/* machine state */
 	uint8_t   m_current_port;
-	optional_shared_ptr<uint8_t> m_trvquest_question;
 
 	/* video state */
 	std::unique_ptr<uint8_t[]>   m_videoram;
@@ -73,13 +83,8 @@ private:
 	uint8_t    m_video_data;
 
 	/* devices */
-	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<riot6532_device> m_riot;
-	required_device<via6522_device> m_via_0;
-	required_device<via6522_device> m_via_1;
-	required_device<via6522_device> m_via_2;
-	required_device<screen_device> m_screen;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
 
@@ -90,28 +95,41 @@ private:
 	void audio_cmd_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(audio_trigger_w);
 	DECLARE_WRITE_LINE_MEMBER(r6532_irq);
-	DECLARE_MACHINE_START(gameplan);
-	DECLARE_MACHINE_RESET(gameplan);
-	DECLARE_MACHINE_START(trvquest);
-	DECLARE_MACHINE_RESET(trvquest);
-	uint32_t screen_update_gameplan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	uint32_t screen_update_leprechn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(clear_screen_done_callback);
 	TIMER_CALLBACK_MEMBER(via_irq_delayed);
-	void video_data_w(uint8_t data);
-	void gameplan_video_command_w(uint8_t data);
 	void leprechn_video_command_w(uint8_t data);
 	uint8_t leprechn_videoram_r();
-	DECLARE_WRITE_LINE_MEMBER(video_command_trigger_w);
 	void gameplan_get_pens( pen_t *pens );
 	void leprechn_get_pens( pen_t *pens );
-	DECLARE_WRITE_LINE_MEMBER(via_irq);
-	uint8_t trvquest_question_r(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(trvquest_coin_w);
-	DECLARE_WRITE_LINE_MEMBER(trvquest_misc_w);
 
-	void cpu_map(address_map &map);
 	void gameplan_audio_map(address_map &map);
 	void gameplan_main_map(address_map &map);
 	void leprechn_audio_map(address_map &map);
+};
+
+class trvquest_state : public gameplan_state
+{
+public:
+	trvquest_state(const machine_config &mconfig, device_type type, const char *tag) :
+		gameplan_state(mconfig, type, tag),
+		m_question(*this, "question"),
+		m_questions_region(*this, "questions") { }
+
+	void trvquest(machine_config &config);
+	void trvquest_video(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	required_shared_ptr<uint8_t> m_question;
+	required_region_ptr<uint8_t> m_questions_region;
+
+	uint8_t question_r(offs_t offset);
+	DECLARE_WRITE_LINE_MEMBER(coin_w);
+	DECLARE_WRITE_LINE_MEMBER(misc_w);
+
+	void cpu_map(address_map &map);
 };

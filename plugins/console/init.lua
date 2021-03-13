@@ -28,11 +28,16 @@ function console.startplugin()
 			print(num, line)
 		end
 	end
-	print("    _/      _/    _/_/    _/      _/  _/_/_/_/");
-	print("   _/_/  _/_/  _/    _/  _/_/  _/_/  _/       ");
-	print("  _/  _/  _/  _/_/_/_/  _/  _/  _/  _/_/_/    ");
-	print(" _/      _/  _/    _/  _/      _/  _/         ");
-	print("_/      _/  _/    _/  _/      _/  _/_/_/_/    \n");
+	print("       /|  /|    /|     /|  /|    _______")
+	print("      / | / |   / |    / | / |   /      /")
+	print("     /  |/  |  /  |   /  |/  |  /  ____/ ")
+	print("    /       | /   |  /       | /  /_     ")
+	print("   /        |/    | /        |/  __/     ")
+	print("  /  /|  /|    /| |/  /|  /|    /____    ")
+	print(" /  / | / |   / |    / | / |        /    ")
+	print("/ _/  |/  /  /  |___/  |/  /_______/     ")
+	print("         /  /                            ")
+	print("        / _/                             \n")
 	print(emu.app_name() .. " " .. emu.app_version(), "\nCopyright (C) Nicola Salmoria and the MAME team\n");
 	print(_VERSION, "\nCopyright (C) Lua.org, PUC-Rio\n");
 	-- linenoise isn't thread safe but that means history can handled here
@@ -211,8 +216,8 @@ return ln.linenoise('$PROMPT')
 	end
 
 	emu.register_start(function()
-		if not consolebuf and manager:machine():debugger() then
-			consolebuf = manager:machine():debugger().consolelog
+		if not consolebuf and manager.machine.debugger then
+			consolebuf = manager.machine.debugger.consolelog
 			lastindex = 0
 		end
 	end)

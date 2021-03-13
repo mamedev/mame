@@ -11,8 +11,7 @@
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsicd.h"
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 class dio16_98265a_device :
 		public device_t,
@@ -65,7 +64,7 @@ private:
 	bool m_dmar0;
 };
 
-} } // namespace bus::hp_dio
+} // namespace bus::hp_dio
 
 DECLARE_DEVICE_TYPE_NS(HPDIO_98265A, bus::hp_dio, dio16_98265a_device)
 

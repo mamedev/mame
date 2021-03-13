@@ -93,7 +93,8 @@ c64_ide64_cartridge_device::c64_ide64_cartridge_device(const machine_config &mco
 	m_rtc(*this, DS1302_TAG),
 	m_ata(*this, ATA_TAG),
 	m_jp1(*this, "JP1"),
-	m_ram(*this, "ram"), m_bank(0), m_ata_data(0), m_wp(0), m_enable(0)
+	m_ram(*this, "ram", 0x8000, ENDIANNESS_LITTLE),
+	m_bank(0), m_ata_data(0), m_wp(0), m_enable(0)
 {
 }
 
@@ -104,9 +105,6 @@ c64_ide64_cartridge_device::c64_ide64_cartridge_device(const machine_config &mco
 
 void c64_ide64_cartridge_device::device_start()
 {
-	// allocate memory
-	m_ram.allocate(0x8000);
-
 	// state saving
 	save_item(NAME(m_bank));
 	save_item(NAME(m_ata_data));

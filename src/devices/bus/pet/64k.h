@@ -41,7 +41,7 @@ private:
 	inline uint8_t read_ram(offs_t offset);
 	inline void write_ram(offs_t offset, uint8_t data);
 
-	optional_shared_ptr<uint8_t> m_ram;
+	memory_share_creator<uint8_t> m_ram;
 
 	uint8_t m_ctrl;
 };

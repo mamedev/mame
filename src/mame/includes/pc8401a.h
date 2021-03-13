@@ -49,7 +49,7 @@ public:
 		, m_io_cart(*this, "io_cart")
 		, m_ram(*this, RAM_TAG)
 		, m_rom(*this, Z80_TAG)
-		, m_crt_ram(*this, "crt_ram")
+		, m_crt_ram(*this, "crt_ram", PC8401A_CRT_VIDEORAM_SIZE, ENDIANNESS_LITTLE)
 		, m_io_y(*this, "Y.%u", 0)
 	{ }
 
@@ -62,7 +62,7 @@ public:
 	required_device<generic_slot_device> m_io_cart;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
-	optional_shared_ptr<uint8_t> m_crt_ram;
+	memory_share_creator<uint8_t> m_crt_ram;
 	required_ioport_array<10> m_io_y;
 
 	memory_region *m_cart_rom;

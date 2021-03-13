@@ -460,7 +460,7 @@ void nscsi_cdrom_device::scsi_command()
 			"Session info",
 			"Full TOC",
 			"PMA",
-			"ATIP"
+			"ATIP",
 			"Reserved 5",
 			"Reserved 6",
 			"Reserved 7",

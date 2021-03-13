@@ -46,7 +46,7 @@ ds1386_device::ds1386_device(const machine_config &mconfig, device_type type, co
 	, m_watchdog_timer(nullptr)
 	, m_inta_timer(nullptr)
 	, m_intb_timer(nullptr)
-	, m_default_data(*this, DEVICE_SELF, size)
+	, m_default_data(*this, DEVICE_SELF)
 	, m_hundredths(0)
 	, m_seconds(0)
 	, m_minutes(0)

@@ -7,7 +7,7 @@ Mephisto Academy
 
 Hardware notes:
 - PCB label HGS 10 130 01
-- VL65NC02-04PC, 4.91Mhz XTAL
+- VL65NC02-04PC, 4.91MHz XTAL
 - 2*32KB ROM(TC57256AD-12), 1st ROM half-empty
 - 8KB battery-backed RAM(TC5564APL-15)
 - HD44100H, HD44780, 2*16 chars LCD screen

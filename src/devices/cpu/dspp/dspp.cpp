@@ -613,10 +613,11 @@ inline void dspp_device::set_rbase(uint32_t base, uint32_t addr)
 		case 0:
 			m_core->m_rbase[0] = addr;
 			m_core->m_rbase[1] = addr + 4 - base;
+			[[fallthrough]];
 		// Intentional fall-through
 		case 8:
 			m_core->m_rbase[2] = addr + 8 - base;
-
+			[[fallthrough]];
 		case 12:
 			m_core->m_rbase[3] = addr + 12 - base;
 			break;

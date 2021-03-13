@@ -5,16 +5,6 @@
 
     Written by Ville Linde
     Improvements by the hoot development team
-
-    history -
-    2007-02-08 hoot development team
-        looping
-        stereo panning
-        8-bit sample support
-
-    2007-02-16 hoot development team
-        envelope
-        fixed volume table
 */
 
 #include "emu.h"
@@ -23,10 +13,12 @@
 namespace {
 
 int volume_table[256];
-double pan_table[0x64];
+double pan_table[256];
 
 void init_static_tables()
 {
+	std::fill(std::begin(pan_table), std::end(pan_table), 0.0);
+
 	// init volume/pan tables
 	double max = 255.0;
 	for (int i = 0; i < 256; i++) {
@@ -35,9 +27,6 @@ void init_static_tables()
 	}
 	for (int i = 0; i < 0x48; i++) {
 		pan_table[i] = sqrt(double(0x47 - i)) / sqrt(double(0x47));
-	}
-	for (int i = 0x48; i < 0x64; i++) {
-		pan_table[i] = 0.0;
 	}
 }
 
@@ -149,15 +138,33 @@ void rf5c400_device::device_start()
 	// init channel info
 	for (rf5c400_channel &chan : m_channels)
 	{
+		chan.startH = 0;
+		chan.startL = 0;
+		chan.freq = 0;
+		chan.endL = 0;
+		chan.endHloopH = 0;
+		chan.loopL = 0;
+		chan.pan = 0;
+		chan.effect = 0;
+		chan.volume = 0;
+		chan.attack = 0;
+		chan.decay = 0;
+		chan.release = 0;
+		chan.pos = 0;
+		chan.step = 0;
+		chan.keyon = 0;
 		chan.env_phase = PHASE_NONE;
 		chan.env_level = 0.0;
 		chan.env_step = 0.0;
 		chan.env_scale = 1.0;
 	}
 
+	m_req_channel = 0;
+
 	save_item(NAME(m_rf5c400_status));
 	save_item(NAME(m_ext_mem_address));
 	save_item(NAME(m_ext_mem_data));
+	save_item(NAME(m_req_channel));
 
 	save_item(STRUCT_MEMBER(m_channels, startH));
 	save_item(STRUCT_MEMBER(m_channels, startL));
@@ -180,7 +187,7 @@ void rf5c400_device::device_start()
 	save_item(STRUCT_MEMBER(m_channels, env_step));
 	save_item(STRUCT_MEMBER(m_channels, env_scale));
 
-	m_stream = stream_alloc(0, 2, clock() / 384);
+	m_stream = stream_alloc(0, 4, clock() / 384);
 }
 
 //-------------------------------------------------
@@ -201,34 +208,46 @@ void rf5c400_device::device_clock_changed()
 void rf5c400_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	int i, ch;
-	uint64_t end, loop;
+	uint64_t start, end, loop;
 	uint64_t pos;
-	uint8_t vol, lvol, rvol, type;
+	uint8_t vol, lvol, rvol, effect_lvol, effect_rvol, type;
 	uint8_t env_phase;
 	double env_level, env_step, env_rstep;
 
 	outputs[0].fill(0);
 	outputs[1].fill(0);
+	outputs[2].fill(0);
+	outputs[3].fill(0);
 
 	for (ch=0; ch < 32; ch++)
 	{
 		rf5c400_channel *channel = &m_channels[ch];
 		auto &buf0 = outputs[0];
 		auto &buf1 = outputs[1];
+		auto &buf2 = outputs[2];
+		auto &buf3 = outputs[3];
 
-//      start = ((channel->startH & 0xFF00) << 8) | channel->startL;
-		end = ((channel->endHloopH & 0xFF) << 16) | channel->endL;
-		loop = ((channel->endHloopH & 0xFF00) << 8) | channel->loopL;
+		start = ((uint32_t)(channel->startH & 0xFF00) << 8) | channel->startL;
+		end = ((uint32_t)(channel->endHloopH & 0xFF) << 16) | channel->endL;
+		loop = ((uint32_t)(channel->endHloopH & 0xFF00) << 8) | channel->loopL;
 		pos = channel->pos;
 		vol = channel->volume & 0xFF;
 		lvol = channel->pan & 0xFF;
 		rvol = channel->pan >> 8;
+		effect_lvol = channel->effect & 0xFF;
+		effect_rvol = channel->effect >> 8;
 		type = (channel->volume >> 8) & TYPE_MASK;
 
 		env_phase = channel->env_phase;
 		env_level = channel->env_level;
 		env_step = channel->env_step;
 		env_rstep = env_step * channel->env_scale;
+
+		if (start == end)
+		{
+			// This occurs in pop'n music when trying to play a non-existent sample on the sound test menu
+			continue;
+		}
 
 		for (i=0; i < buf0.samples(); i++)
 		{
@@ -302,12 +321,23 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			sample = (sample >> 9) * env_level;
 			buf0.add_int(i, sample * pan_table[lvol], 32768);
 			buf1.add_int(i, sample * pan_table[rvol], 32768);
+			buf2.add_int(i, sample * pan_table[effect_lvol], 32768);
+			buf3.add_int(i, sample * pan_table[effect_rvol], 32768);
 
 			pos += channel->step;
 			if ((pos>>16) > end)
 			{
 				pos -= loop<<16;
 				pos &= 0xFFFFFF0000ULL;
+
+				if (pos < (start<<16))
+				{
+					// This case only shows up in Firebeat games from what I could tell.
+					// The loop value will be higher than the actual buffer size.
+					// This is used when DMAs will be overwriting the current buffer.
+					// It expects the buffer to be looped without any additional commands.
+					pos = start<<16;
+				}
 			}
 
 		}
@@ -342,6 +372,32 @@ uint16_t rf5c400_device::rf5c400_r(offs_t offset, uint16_t mem_mask)
 			case 0x04:      // unknown read
 			{
 				return 0;
+			}
+
+			case 0x09:      // position read?
+			{
+				// The game will always call rf5c400_w 0x08 with a channel number and some other value before reading this register.
+				// The call to rf5c400_w 0x08 contains additional information, potentially what information it's expecting to be returned here.
+				// This implementation assumes all commands want the same information as command 6.
+				m_stream->update();
+
+				rf5c400_channel* channel = &m_channels[m_req_channel];
+				if (channel->env_phase == PHASE_NONE)
+				{
+					return 0;
+				}
+
+				// pop'n music's SPU program expects to read this register 6 times with the same value between every read before it will send the next DMA request.
+				//
+				// This register is polled while a streaming BGM is being played.
+				// For pop'n music specifically, the game starts off by reading 0x200000 into 0x00780000 - 0x00880000.
+				// When 2xxx is found (pos - start = 0x00080000), it will trigger the next DMA of 0x100000 overwriting 0x00780000 - 0x00800000, and continues polling the register until it reads 1xxx next.
+				// When 1xxx is found (pos - start = 0x00040000), it will trigger the next DMA of 0x100000 overwriting 0x00800000 - 0x00880000, and continues polling the register until it reads 2xxx next.
+				// ... repeat until song is finished, alternating between 2xxx and 1xxx ...
+				// This ends up so that it'll always be buffering new sample data into the sections of memory that aren't being used.
+				auto start = ((uint32_t)(channel->startH & 0xFF00) << 8) | channel->startL;
+				auto ch_offset = (channel->pos >> 16) - start;
+				return ch_offset >> 6;
 			}
 
 			case 0x13:      // memory read
@@ -391,7 +447,7 @@ void rf5c400_device::rf5c400_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				{
 					case 0x60:
 						m_channels[ch].pos =
-							((m_channels[ch].startH & 0xFF00) << 8) | m_channels[ch].startL;
+							((uint32_t)(m_channels[ch].startH & 0xFF00) << 8) | m_channels[ch].startL;
 						m_channels[ch].pos <<= 16;
 
 						m_channels[ch].env_phase = PHASE_ATTACK;
@@ -421,8 +477,16 @@ void rf5c400_device::rf5c400_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				break;
 			}
 
-			case 0x08:      // relative to env attack (channel no)
-			case 0x09:      // relative to env attack (0x0c00/ 0x1c00)
+			case 0x08:
+			{
+				// There's some other data stuffed in the upper bits beyond the channel: data >> 5
+				// The other data might be some kind of register or command. I've seen 0, 4, 5, and 6.
+				// Firebeat uses 6 when polling rf5c400_r 0x09.
+				m_req_channel = data & 0x1f;
+				break;
+			}
+
+			case 0x09:      // relative to env attack (0x0c00/ 0x1c00/ 0x1e00)
 
 			case 0x11:      // memory r/w address, bits 15 - 0
 			{
@@ -521,6 +585,31 @@ void rf5c400_device::rf5c400_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			case 0x07:      // effect depth
 			{
 				// 0xCCRR: CC = chorus send depth, RR = reverb send depth
+
+				// Note: beatmania III uses this register differently?
+				//  When effects are off, it writes 0xe0e0 to this register:
+				//    Changed ch 30 reg 6 to volume 18176 -> l: 71, r: 0
+				//    Changed ch 30 reg 7 to volume 57568 -> 0xe0e0
+				//    Changed ch 31 reg 6 to volume 71    -> l: 0, r: 71
+				//    Changed ch 31 reg 7 to volume 57568 -> 0xe0e0
+				//  When effects are on, it writes reg 6 information here:
+				//    Changed ch 30 reg 6 to volume 57568 -> 0xe0e0
+				//    Changed ch 30 reg 7 to volume 18176 -> l: 71, r: 0
+				//    Changed ch 31 reg 6 to volume 57568 -> 0xe0e0
+				//    Changed ch 31 reg 7 to volume 71    -> l: 0, r: 71
+				//
+				// I've observed values of 0xff instead of 0xe0 in some games like Gradius 4,
+				// so 0xe0 is not some kind of max value.
+				//
+				// When effects are enabled the audio is redirected to an external
+				// PCB board for effect processing before returning to the sound PCB.
+				//
+				// That makes me think that the effects are not internal and that
+				// this register is just used to adjust the volume of the channels
+				// being routed externally.
+				//
+				// Whether the effect is a chorus or reverb or something else would
+				// depend on how the PCB is using these external channels.
 				channel->effect = data;
 				break;
 			}

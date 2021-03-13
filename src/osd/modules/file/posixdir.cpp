@@ -40,6 +40,7 @@
 #define _DARWIN_C_SOURCE  // to get DT_xxx on OS X
 
 #include "osdcore.h"
+#include "osdfile.h"
 #include "modules/lib/osdlib.h"
 #include "util/strformat.h"
 

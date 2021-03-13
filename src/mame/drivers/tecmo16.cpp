@@ -624,10 +624,34 @@ ROM_START( riot )
 	ROM_LOAD( "8.ic18", 0x00000, 0x20000, CRC(4b70e266) SHA1(4ed23de9223cc7359fbaff9dd500ef6daee00fb0) )
 ROM_END
 
+ROM_START( riotw )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "riotw1.ic1", 0x00000, 0x40000, CRC(c1849b44) SHA1(a47fa87b0c73e766e3aee935fdb58341ae8856cb) )
+	ROM_LOAD16_BYTE( "riotw2.ic2", 0x00001, 0x40000, CRC(d6dc0c09) SHA1(1ccce338ee7ed0b909323a1649ffdffc6784f980) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "7.ic17", 0x00000, 0x10000, CRC(0a95b8f3) SHA1(cc6bdeeeb184eb4f3867eb9c961b0b82743fac9f) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "3.ic3", 0x00000, 0x20000, CRC(f60f5c96) SHA1(56ea21f22d3cf47071bfb3555b331a676463b63e) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "5.ic9", 0x00000, 0x80000, CRC(056fce78) SHA1(25234fa0282fdbefefb06e6aa5a467f9d08ed534) )
+	ROM_LOAD16_BYTE( "4.ic5", 0x00001, 0x80000, CRC(0894e7b4) SHA1(37a04476770942f292d836997c649a343f71e317) )
+
+	ROM_REGION( 0x100000, "gfx3", 0 )
+	ROM_LOAD16_BYTE( "9.ic22", 0x00000, 0x80000, CRC(0ead54f3) SHA1(4848eb158d9e2279332225e0b25f1c96a8a5a0c4) )
+	ROM_LOAD16_BYTE( "6.ic16", 0x00001, 0x80000, CRC(96ef61da) SHA1(c306e4d1eee19af0229a47c2f115f98c74f33d33) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "8.ic18", 0x00000, 0x20000, CRC(4b70e266) SHA1(4ed23de9223cc7359fbaff9dd500ef6daee00fb0) )
+ROM_END
+
 /******************************************************************************/
 
-GAME( 1992, fstarfrc,  0,        fstarfrc, fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo", "Final Star Force (US)",     MACHINE_SUPPORTS_SAVE ) // Has 'Recycle it, don't trash it"  and 'Winners don't use drugs' screens after first attract cycle
-GAME( 1992, fstarfrcj, fstarfrc, fstarfrc, fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo", "Final Star Force (Japan)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fstarfrcw, fstarfrc, fstarfrc, fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo", "Final Star Force (World?)", MACHINE_SUPPORTS_SAVE ) // more similar the to the Japanese version than to the US one, not the parent because not sure it's the world version
-GAME( 1992, riot,      0,        riot,     riot,     tecmo16_state, empty_init, ROT0,  "NMK",   "Riot",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, ginkun,    0,        ginkun,   ginkun,   tecmo16_state, empty_init, ROT0,  "Tecmo", "Ganbare Ginkun",            MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fstarfrc,  0,        fstarfrc, fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo",    "Final Star Force (US)",     MACHINE_SUPPORTS_SAVE ) // Has 'Recycle it, don't trash it"  and 'Winners don't use drugs' screens after first attract cycle
+GAME( 1992, fstarfrcj, fstarfrc, fstarfrc, fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo",    "Final Star Force (Japan)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fstarfrcw, fstarfrc, fstarfrc, fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo",    "Final Star Force (World?)", MACHINE_SUPPORTS_SAVE ) // more similar the to the Japanese version than to the US one, not the parent because not sure it's the world version
+GAME( 1992, riot,      0,        riot,     riot,     tecmo16_state, empty_init, ROT0,  "NMK",      "Riot",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1992, riotw,     riot,     riot,     riot,     tecmo16_state, empty_init, ROT0,  "Woong Bi", "Riot (Woong Bi license)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ginkun,    0,        ginkun,   ginkun,   tecmo16_state, empty_init, ROT0,  "Tecmo",    "Ganbare Ginkun",            MACHINE_SUPPORTS_SAVE )

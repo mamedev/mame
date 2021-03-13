@@ -8,8 +8,7 @@
 
 #include "hp_dio.h"
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 class dio16_98603a_device :
 		public device_t,
@@ -37,7 +36,6 @@ private:
 };
 
 } // namespace bus::hp_dio
-} // namespace bus
 
 DECLARE_DEVICE_TYPE_NS(HPDIO_98603A, bus::hp_dio, dio16_98603a_device)
 

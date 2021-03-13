@@ -18,6 +18,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_bgram(*this, "bgram"),
 		m_scrollx(*this, "scrollx"),
+		m_rambank(*this, "rambank"),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -33,6 +34,7 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_bgram;
 	required_shared_ptr<uint8_t> m_scrollx;
+	required_memory_bank m_rambank;
 	std::unique_ptr<uint8_t[]>        m_otherram;
 
 	/* video-related */

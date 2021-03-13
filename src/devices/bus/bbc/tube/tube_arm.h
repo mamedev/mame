@@ -42,15 +42,12 @@ protected:
 	virtual void host_w(offs_t offset, uint8_t data) override;
 
 private:
-	required_device<arm_cpu_device> m_arm;
+	required_device<arm_cpu_device> m_maincpu;
 	required_device<tube_device> m_ula;
 	required_device<ram_device> m_ram;
 	required_memory_region m_bootstrap;
 
-	bool m_rom_select;
-
-	uint8_t ram_r(offs_t offset);
-	void ram_w(offs_t offset, uint8_t data);
+	memory_passthrough_handler *m_rom_shadow_tap;
 
 	void tube_arm_mem(address_map &map);
 };

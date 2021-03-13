@@ -58,7 +58,7 @@ protected:
 
 	virtual void interface_post_start() override;
 
-	optional_shared_ptr<uint8_t> m_rom;
+	std::unique_ptr<uint8_t[]> m_rom;
 
 	ql_rom_cartridge_slot_device *const m_slot;
 

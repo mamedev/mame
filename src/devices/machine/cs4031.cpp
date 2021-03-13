@@ -565,28 +565,25 @@ void cs4031_device::config_data_w(uint8_t data)
 //  MEMORY MAPPER
 //**************************************************************************
 
-void cs4031_device::update_read_region(int index, const char *region, offs_t start, offs_t end)
+void cs4031_device::update_read_region(int index, offs_t start, offs_t end)
 {
 	if (!BIT(m_registers[SHADOW_READ], index) && BIT(m_registers[ROMCS], index))
 	{
 		LOGMEMORY("ROM read from %x to %x\n", start, end);
 
-		m_space->install_read_bank(start, end, region);
-		machine().root_device().membank(region)->set_base(m_bios + start);
+		m_space->install_rom(start, end, m_bios + start);
 	}
 	else if (!BIT(m_registers[SHADOW_READ], index) && !BIT(m_registers[ROMCS], index))
 	{
 		LOGMEMORY("ISA read from %x to %x\n", start, end);
 
-		m_space->install_read_bank(start, end, region);
-		machine().root_device().membank(region)->set_base(m_isa + start - 0xc0000);
+		m_space->install_rom(start, end, m_isa + start - 0xc0000);
 	}
 	else if (BIT(m_registers[SHADOW_READ], index))
 	{
 		LOGMEMORY("RAM read from %x to %x\n", start, end);
 
-		m_space->install_read_bank(start, end, region);
-		machine().root_device().membank(region)->set_base(m_ram + start);
+		m_space->install_rom(start, end, m_ram + start);
 	}
 	else
 	{
@@ -596,28 +593,25 @@ void cs4031_device::update_read_region(int index, const char *region, offs_t sta
 	}
 }
 
-void cs4031_device::update_write_region(int index, const char *region, offs_t start, offs_t end)
+void cs4031_device::update_write_region(int index, offs_t start, offs_t end)
 {
 	if (!BIT(m_registers[SHADOW_WRITE], index) && BIT(m_registers[ROMCS], index) && BIT(m_registers[ROMCS], 7))
 	{
 		LOGMEMORY("ROM write from %x to %x\n", start, end);
 
-		m_space->install_write_bank(start, end, region);
-		machine().root_device().membank(region)->set_base(m_bios + start);
+		m_space->install_writeonly(start, end, m_bios + start);
 	}
 	else if (!BIT(m_registers[SHADOW_WRITE], index) && !BIT(m_registers[ROMCS], index))
 	{
 		LOGMEMORY("ISA write from %x to %x\n", start, end);
 
-		m_space->install_write_bank(start, end, region);
-		machine().root_device().membank(region)->set_base(m_isa + start - 0xc0000);
+		m_space->install_writeonly(start, end, m_isa + start - 0xc0000);
 	}
 	else if (BIT(m_registers[SHADOW_WRITE], index))
 	{
 		LOGMEMORY("RAM write from %x to %x\n", start, end);
 
-		m_space->install_write_bank(start, end, region);
-		machine().root_device().membank(region)->set_base(m_ram + start);
+		m_space->install_writeonly(start, end, m_ram + start);
 	}
 	else
 	{
@@ -629,24 +623,24 @@ void cs4031_device::update_write_region(int index, const char *region, offs_t st
 
 void cs4031_device::update_read_regions()
 {
-	update_read_region(0, "read_c0000", 0xc0000, 0xc3fff);
-	update_read_region(1, "read_c4000", 0xc4000, 0xc7fff);
-	update_read_region(2, "read_c8000", 0xc8000, 0xcbfff);
-	update_read_region(3, "read_cc000", 0xcc000, 0xcffff);
-	update_read_region(4, "read_d0000", 0xd0000, 0xdffff);
-	update_read_region(5, "read_e0000", 0xe0000, 0xeffff);
-	update_read_region(6, "read_f0000", 0xf0000, 0xfffff);
+	update_read_region(0, 0xc0000, 0xc3fff);
+	update_read_region(1, 0xc4000, 0xc7fff);
+	update_read_region(2, 0xc8000, 0xcbfff);
+	update_read_region(3, 0xcc000, 0xcffff);
+	update_read_region(4, 0xd0000, 0xdffff);
+	update_read_region(5, 0xe0000, 0xeffff);
+	update_read_region(6, 0xf0000, 0xfffff);
 }
 
 void cs4031_device::update_write_regions()
 {
-	update_write_region(0, "write_c0000", 0xc0000, 0xc3fff);
-	update_write_region(1, "write_c4000", 0xc4000, 0xc7fff);
-	update_write_region(2, "write_c8000", 0xc8000, 0xcbfff);
-	update_write_region(3, "write_cc000", 0xcc000, 0xcffff);
-	update_write_region(4, "write_d0000", 0xd0000, 0xdffff);
-	update_write_region(5, "write_e0000", 0xe0000, 0xeffff);
-	update_write_region(6, "write_f0000", 0xf0000, 0xfffff);
+	update_write_region(0, 0xc0000, 0xc3fff);
+	update_write_region(1, 0xc4000, 0xc7fff);
+	update_write_region(2, 0xc8000, 0xcbfff);
+	update_write_region(3, 0xcc000, 0xcffff);
+	update_write_region(4, 0xd0000, 0xdffff);
+	update_write_region(5, 0xe0000, 0xeffff);
+	update_write_region(6, 0xf0000, 0xfffff);
 }
 
 

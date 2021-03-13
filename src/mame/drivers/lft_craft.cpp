@@ -44,10 +44,10 @@ protected:
 
 	void prg_map(address_map &map);
 	void data_map(address_map &map);
-	void io_map(address_map &map);
 
-	uint8_t port_r(offs_t offset);
-	void port_w(offs_t offset, uint8_t data);
+	void port_b_w(uint8_t data);
+	void port_c_w(uint8_t data);
+	void port_d_w(uint8_t data);
 
 	void init_palette(palette_device &palette) const;
 	void video_update();
@@ -58,17 +58,8 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	enum port : uint8_t
-	{
-		PORT_A,
-		PORT_B,
-		PORT_C,
-		PORT_D,
-
-		PORT_COUNT
-	};
-
-	uint8_t m_ports[PORT_COUNT];
+	uint8_t m_gpio_b;
+	uint8_t m_gpio_c;
 
 	uint32_t m_last_cycles;
 	uint64_t m_frame_start_cycle;
@@ -81,41 +72,34 @@ protected:
 //  GPIO
 //**************************************************************************
 
-uint8_t lft_craft_state::port_r(offs_t offset)
+void lft_craft_state::port_b_w(uint8_t data)
 {
-	return m_ports[offset];
-}
-
-void lft_craft_state::port_w(offs_t offset, uint8_t data)
-{
-	const uint8_t old = m_ports[offset];
-	m_ports[offset] = data;
+	const uint8_t old = m_gpio_b;
+	m_gpio_b = data;
 	const uint8_t changed = data ^ old;
 
-	switch (offset)
+	if (BIT(changed, 1) && BIT(data, 1))
 	{
-	case AVR8_IO_PORTB:
-		if (BIT(changed, 1) && BIT(data, 1))
-		{
-			m_frame_start_cycle = machine().time().as_ticks(MASTER_CLOCK);
-			video_update();
-		}
-		if (BIT(changed, 3))
-		{
-			video_update();
-			m_latched_color = (data & 0x08) ? (m_ports[PORT_C] & 0x3f) : 0x3f;
-		}
-		break;
-
-	case AVR8_IO_PORTC:
+		m_frame_start_cycle = machine().time().as_ticks(MASTER_CLOCK);
 		video_update();
-		m_latched_color = data;
-		break;
-
-	case AVR8_IO_PORTD:
-		m_dac->write((data & 0x02) | ((data & 0xf4) >> 2));
-		break;
 	}
+	if (BIT(changed, 3))
+	{
+		video_update();
+		m_latched_color = (data & 0x08) ? (m_gpio_c & 0x3f) : 0x3f;
+	}
+}
+
+void lft_craft_state::port_c_w(uint8_t data)
+{
+	m_gpio_c = data;
+	video_update();
+	m_latched_color = data;
+}
+
+void lft_craft_state::port_d_w(uint8_t data)
+{
+	m_dac->write((data & 0x02) | ((data & 0xf4) >> 2));
 }
 
 //**************************************************************************
@@ -130,11 +114,6 @@ void lft_craft_state::prg_map(address_map &map)
 void lft_craft_state::data_map(address_map &map)
 {
 	map(0x0100, 0x04ff).ram();
-}
-
-void lft_craft_state::io_map(address_map &map)
-{
-	map(AVR8_IO_PORTA, AVR8_IO_PORTD).rw(FUNC(lft_craft_state::port_r), FUNC(lft_craft_state::port_w));
 }
 
 //**************************************************************************
@@ -194,7 +173,8 @@ void lft_craft_state::machine_start()
 {
 	m_pixels = std::make_unique<uint8_t[]>(PIXELS_PER_FRAME);
 
-	save_item(NAME(m_ports));
+	save_item(NAME(m_gpio_b));
+	save_item(NAME(m_gpio_c));
 	save_item(NAME(m_last_cycles));
 	save_item(NAME(m_frame_start_cycle));
 
@@ -204,7 +184,8 @@ void lft_craft_state::machine_start()
 
 void lft_craft_state::machine_reset()
 {
-	memset(m_ports, 0, PORT_COUNT);
+	m_gpio_b = 0;
+	m_gpio_c = 0;
 
 	m_frame_start_cycle = 0;
 	m_last_cycles = 0;
@@ -218,8 +199,12 @@ void lft_craft_state::craft(machine_config &config)
 	ATMEGA88(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lft_craft_state::prg_map);
 	m_maincpu->set_addrmap(AS_DATA, &lft_craft_state::data_map);
-	m_maincpu->set_addrmap(AS_IO, &lft_craft_state::io_map);
 	m_maincpu->set_eeprom_tag("eeprom");
+	m_maincpu->gpio_in<AVR8_IO_PORTB>().set([this]() { return m_gpio_b; });
+	m_maincpu->gpio_in<AVR8_IO_PORTC>().set([this]() { return m_gpio_c; });
+	m_maincpu->gpio_out<AVR8_IO_PORTB>().set(FUNC(lft_craft_state::port_b_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTC>().set(FUNC(lft_craft_state::port_c_w));
+	m_maincpu->gpio_out<AVR8_IO_PORTD>().set(FUNC(lft_craft_state::port_d_w));
 
 	PALETTE(config, m_palette, FUNC(lft_craft_state::init_palette), 64);
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

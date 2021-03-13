@@ -17,7 +17,7 @@
 
 #pragma once
 
-namespace bus { namespace hp_dio {
+namespace bus::hp_dio {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -83,8 +83,8 @@ public:
 	//         due to the varying bus widths.  Using all install_memory() shields you from this problem.
 	//         Either know what you're doing (m_prgwidth is available to cards for this purpose) or
 	//         only use these for 32-bit DIO-II cards.
-	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
-	void install_rom(offs_t start, offs_t end, const char *tag, uint8_t *data);
+	void install_bank(offs_t start, offs_t end, uint8_t *data);
+	void install_rom(offs_t start, offs_t end, uint8_t *data);
 
 	void unmap_bank(offs_t start, offs_t end);
 	void unmap_rom(offs_t start, offs_t end);
@@ -280,7 +280,7 @@ protected:
 	dio32_device &dio() { assert(m_dio_dev); return downcast<dio32_device &>(*m_dio_dev); }
 };
 
-} } // namespace bus::hp_dio
+} // namespace bus::hp_dio
 
 // device type definition
 DECLARE_DEVICE_TYPE_NS(DIO16_SLOT, bus::hp_dio, dio16_slot_device)

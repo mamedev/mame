@@ -43,7 +43,7 @@ const char *dcp_format::extensions() const
 	return "dcp,dcu";
 }
 
-int dcp_format::identify(io_generic *io, uint32_t form_factor)
+int dcp_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t size = io_generic_size(io);
 	uint8_t h[0xa2];
@@ -112,7 +112,7 @@ int dcp_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool dcp_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool dcp_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t h[0xa2];
 	int heads, tracks, spt, bps;

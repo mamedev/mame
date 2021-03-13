@@ -274,7 +274,7 @@ void mephisto_risc_state::mrisc(machine_config &config)
 
 void mephisto_milano_state::milano(machine_config &config)
 {
-	polgar(config); // CPU: W65C02P-8, 4.9152Mhz
+	polgar(config); // CPU: W65C02P-8, 4.9152MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_milano_state::milano_mem);
 
 	MEPHISTO_BUTTONS_BOARD(config.replace(), m_board);

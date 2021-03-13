@@ -20,10 +20,8 @@
 
 #include "nl_base.h"
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
+
 	NETLIB_OBJECT(Am2847_shifter)
 	{
 		NETLIB_CONSTRUCTOR_MODEL(Am2847_shifter, "CD4XXX")
@@ -128,5 +126,4 @@ namespace netlist
 
 	NETLIB_DEVICE_IMPL(AM2847,     "TTL_AM2847",     "+CP,+INA,+INB,+INC,+IND,+RCA,+RCB,+RCC,+RCD,@VSS,@VDD")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

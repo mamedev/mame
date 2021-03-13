@@ -145,7 +145,8 @@ atari_motion_objects_device::atari_motion_objects_device(const machine_config &m
 	, m_bank(0)
 	, m_xscroll(0)
 	, m_yscroll(0)
-	, m_slipram(*this, "slip")
+	, m_slipram(nullptr)
+	, m_slipramshare(*this, "slip")
 	, m_activelast(nullptr)
 	, m_last_xpos(0)
 	, m_next_xpos(0)
@@ -300,6 +301,10 @@ void atari_motion_objects_device::device_start()
 	m_sliprammask = m_slipramsize - 1;
 	if (m_maxperline == 0)
 		m_maxperline = MAX_PER_BANK;
+
+	// Get the slipram from the share if not already explicitly set
+	if (!m_slipram)
+		m_slipram = m_slipramshare;
 
 	// allocate and initialize the code lookup
 	int codesize = round_to_powerof2(m_codemask.mask());

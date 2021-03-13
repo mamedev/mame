@@ -1535,6 +1535,8 @@ static INPUT_PORTS_START( shogwarr )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	// dip defaults confirmed by manual ("Bolr (sic) face indicate standard setting")
+	// including Demo Sounds
 	PORT_START("DSW1")      /* from the MCU - 102e15.b <- 200059.b */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -1543,7 +1545,7 @@ static INPUT_PORTS_START( shogwarr )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPNAME( 0x38, 0x20, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:4,5,6")
 	PORT_DIPSETTING(    0x38, "1 Easy" )
 	PORT_DIPSETTING(    0x30, "2" )
 	PORT_DIPSETTING(    0x28, "3" )
@@ -1553,8 +1555,10 @@ static INPUT_PORTS_START( shogwarr )
 	PORT_DIPSETTING(    0x08, "7" )
 	PORT_DIPSETTING(    0x00, "8 Hard" )
 	PORT_DIPNAME( 0x40, 0x40, "Can Join During Game" ) PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )  //  2 credits       winner vs computer
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )   //  1 credit        game over
+	// 1p vs 2p is allowed only at title screen with a single credit by pressing 2p start. akin to an "event mode"
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )  //  "impossible", vs.play 1 credit, game over aftewards
+	// "normal mode"
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )   //  "possible", vs.play 2 credits, winner plays against CPU afterwards
 	PORT_DIPNAME( 0x80, 0x80, "Continue Coin" ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

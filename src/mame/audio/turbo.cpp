@@ -547,7 +547,7 @@ void turbo_state::buckrog_sound_b_w(u8 data)
 	if ((diff & 0x40) && !(data & 0x40) &&  m_samples->playing(5)) m_samples->stop(5);
 
 	/* GAME ON */
-	machine().sound().system_enable(data & 0x80);
+	machine().sound().system_mute(!BIT(data, 7));
 }
 
 

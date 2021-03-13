@@ -676,13 +676,17 @@ sparc_disassembler::sparc_disassembler(const config *conf, unsigned version, vis
 	{
 	case vis_3b:
 		add_vis_op_desc(VIS3B_OP_DESC);
+		[[fallthrough]];
 	case vis_3:
 		add_fpop1_desc(VIS3_FPOP1_DESC);
 		add_vis_op_desc(VIS3_OP_DESC);
+		[[fallthrough]];
 	case vis_2p:
 		add_asi_desc(VIS2P_ASI_DESC);
+		[[fallthrough]];
 	case vis_2:
 		add_vis_op_desc(VIS2_OP_DESC);
+		[[fallthrough]];
 	case vis_1:
 		m_op_field_width = std::max(m_op_field_width, 12);
 		add_vis_op_desc(VIS1_OP_DESC);
@@ -717,6 +721,7 @@ sparc_disassembler::sparc_disassembler(const config *conf, unsigned version, vis
 			m_vis_op_desc.find(0x07c)->second.mnemonic = "ford";
 			m_vis_op_desc.find(0x07e)->second.mnemonic = "foned";
 		}
+		[[fallthrough]];
 	case vis_none:
 		break;
 	}

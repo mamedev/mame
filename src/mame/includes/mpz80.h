@@ -22,7 +22,7 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_s100(*this, S100_TAG),
 			m_rom(*this, Z80_TAG),
-			m_map_ram(*this, "map_ram"),
+			m_map_ram(*this, "map_ram", 0x200, ENDIANNESS_LITTLE),
 			m_16c(*this, "16C"),
 			m_nmi(1),
 			m_pint(1),
@@ -39,16 +39,17 @@ public:
 
 	void mpz80(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<s100_bus_device> m_s100;
 	required_memory_region m_rom;
-	optional_shared_ptr<uint8_t> m_map_ram;
+	memory_share_creator<uint8_t> m_map_ram;
 	required_ioport m_16c;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	inline offs_t get_address(offs_t offset);
 	inline offs_t get_io_address(offs_t offset);

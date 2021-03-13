@@ -52,6 +52,8 @@ struct polyVert
 	float clipCoords[4];    // Homogeneous screen space coordinates (X Y Z W)
 
 	float light[3];         // The intensity of the illumination at this point
+
+	uint16_t colorIndex;    // Flat shaded polygons, no texture, no lighting
 };
 
 struct polygon
@@ -60,7 +62,8 @@ struct polygon
 	polyVert vert[10];          // Vertices (maximum number per polygon is 10 -> 3+6)
 
 	float faceNormal[4];        // Normal of the face overall - for calculating visibility and flat-shading...
-	int visible;                // Polygon visibility in scene
+	bool visible;                // Polygon visibility in scene
+	bool flatShade;              // Flat shaded polygon, no texture, no lighting
 
 	uint8_t texIndex;             // Which texture to draw from (0x00-0x0f)
 	uint8_t texType;              // How to index into the texture
@@ -116,7 +119,8 @@ public:
 	hng64_poly_renderer(hng64_state& state);
 
 	void drawShaded(polygon *p);
-	void render_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
+	void render_texture_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
+	void render_flat_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
 
 	hng64_state& state() { return m_state; }
 	bitmap_rgb32& colorBuffer3d() { return m_colorBuffer3d; }
@@ -172,9 +176,9 @@ public:
 		m_comm(*this, "network"),
 		m_rtc(*this, "rtc"),
 		m_mainram(*this, "mainram"),
-		m_cart(*this, "cart"),
+		m_cart(*this, "gameprg"),
 		m_sysregs(*this, "sysregs"),
-		m_rombase(*this, "rombase"),
+		m_rombase(*this, "user1"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteregs(*this, "spriteregs"),
 		m_videoram(*this, "videoram"),
@@ -232,9 +236,9 @@ private:
 	required_device<msm6242_device> m_rtc;
 
 	required_shared_ptr<uint32_t> m_mainram;
-	required_shared_ptr<uint32_t> m_cart;
+	required_region_ptr<uint32_t> m_cart;
 	required_shared_ptr<uint32_t> m_sysregs;
-	required_shared_ptr<uint32_t> m_rombase;
+	required_region_ptr<uint32_t> m_rombase;
 	required_shared_ptr<uint32_t> m_spriteram;
 	required_shared_ptr<uint32_t> m_spriteregs;
 	required_shared_ptr<uint32_t> m_videoram;
@@ -301,6 +305,8 @@ private:
 
 	//uint32_t *q2;
 
+	std::vector< std::pair <int, uint32_t *> > m_spritelist;
+
 	uint8_t m_screen_dis;
 
 	struct hng64_tilemap {
@@ -326,7 +332,7 @@ private:
 	float m_lightStrength;
 	float m_lightVector[3];
 
-	uint32_t hng64_com_r(offs_t offset);
+	uint32_t hng64_com_r(offs_t offset, uint32_t mem_mask = ~0);
 	void hng64_com_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void hng64_com_share_w(offs_t offset, uint8_t data);
 	uint8_t hng64_com_share_r(offs_t offset);

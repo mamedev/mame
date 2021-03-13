@@ -59,7 +59,7 @@ private:
 	required_device<mos6551_device> m_acia;
 	required_device<mos6702_device> m_dongle;
 	required_memory_region m_rom;
-	optional_shared_ptr<uint8_t> m_ram;
+	memory_share_creator<uint8_t> m_ram;
 	required_ioport m_io_sw1;
 	required_ioport m_io_sw2;
 

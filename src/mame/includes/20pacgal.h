@@ -79,7 +79,6 @@ protected:
 	void sprite_lookup_w(offs_t offset, uint8_t data);
 
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_20pacgal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);

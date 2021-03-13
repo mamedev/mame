@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud, Jonathan Gevaryahu
 /*
  * nld_4029.cpp
@@ -130,10 +130,7 @@
 
 #include "nl_base.h"
 
-namespace netlist
-{
-namespace devices
-{
+namespace netlist::devices {
 
 	NETLIB_OBJECT(CD4029)
 	{
@@ -268,5 +265,4 @@ namespace devices
 
 	NETLIB_DEVICE_IMPL(CD4029,     "CD4029",        "+PE,+J1,+J2,+J3,+J4,+CI,+UD,+BD,+CLK,@VCC,@GND")
 
-} // namespace devices
-} // namespace netlist
+} // namespace netlist::devices

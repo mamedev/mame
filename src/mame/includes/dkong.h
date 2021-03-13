@@ -121,6 +121,7 @@ public:
 		, m_snd_rom(*this, "soundcpu")
 		, m_vidhw(DKONG_BOARD)
 		, m_sig30Hz(0)
+		, m_star_ff(0)
 		, m_blue_level(0)
 		, m_cv1(0)
 		, m_cv2(0)
@@ -129,11 +130,15 @@ public:
 		, m_vg3(0)
 		, m_cv3(0)
 		, m_cv4(0)
+		, m_vc17(0)
+		, m_pixelcnt(0)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_z80dma(*this, "z80dma")
 		, m_dma8257(*this, "dma8257")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
 	{
 	}
 
@@ -255,6 +260,8 @@ private:
 	required_device<palette_device> m_palette;
 	optional_device<z80dma_device> m_z80dma;
 	optional_device<i8257_device> m_dma8257;
+	memory_bank_creator m_bank1;
+	memory_bank_creator m_bank2;
 
 	/* radarscp_scanline */
 	int m_counter;

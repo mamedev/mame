@@ -137,15 +137,15 @@ public:
 protected:
 	device_plus4_expansion_card_interface(const machine_config &mconfig, device_t &device);
 
-	optional_shared_ptr<uint8_t> m_c1l;
-	optional_shared_ptr<uint8_t> m_c1h;
-	optional_shared_ptr<uint8_t> m_c2l;
-	optional_shared_ptr<uint8_t> m_c2h;
+	std::unique_ptr<uint8_t[]> m_c1l;
+	std::unique_ptr<uint8_t[]> m_c1h;
+	std::unique_ptr<uint8_t[]> m_c2l;
+	std::unique_ptr<uint8_t[]> m_c2h;
 
-	size_t m_c1l_mask;
-	size_t m_c1h_mask;
-	size_t m_c2l_mask;
-	size_t m_c2h_mask;
+	size_t m_c1l_size;
+	size_t m_c1h_size;
+	size_t m_c2l_size;
+	size_t m_c2h_size;
 
 	plus4_expansion_slot_device *m_slot;
 };

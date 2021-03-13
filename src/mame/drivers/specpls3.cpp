@@ -355,12 +355,12 @@ void specpls3_state::plus3_mem(address_map &map)
 	map(0xc000, 0xffff).bankrw("bank4");
 }
 
-MACHINE_RESET_MEMBER(specpls3_state,spectrum_plus3)
+void specpls3_state::machine_reset()
 {
 	uint8_t *messram = m_ram->pointer();
 	memset(messram,0,128*1024);
 
-	MACHINE_RESET_CALL_MEMBER(spectrum);
+	spectrum_state::machine_reset();
 
 	/* Initial configuration */
 	m_port_7ffd_data = 0;
@@ -412,8 +412,6 @@ void specpls3_state::spectrum_plus2(machine_config &config)
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(specpls3);
 
-	MCFG_MACHINE_RESET_OVERRIDE(specpls3_state, spectrum_plus3 )
-
 	SPECTRUM_EXPANSION_SLOT(config.replace(), m_exp, specpls3_expansion_devices, nullptr);
 	m_exp->irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
@@ -425,8 +423,8 @@ void specpls3_state::spectrum_plus3(machine_config &config)
 
 	UPD765A(config, m_upd765, 16_MHz_XTAL / 4, true, false); // clocked through SED9420
 	m_upd765->us_wr_callback().set(FUNC(specpls3_state::plus3_us_w));
-	FLOPPY_CONNECTOR(config, "upd765:0", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats); // internal drive
-	FLOPPY_CONNECTOR(config, "upd765:1", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats); // external drive
+	FLOPPY_CONNECTOR(config, "upd765:0", specpls3_floppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats); // internal drive
+	FLOPPY_CONNECTOR(config, "upd765:1", specpls3_floppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats); // external drive
 
 	SOFTWARE_LIST(config, "flop_list").set_original("specpls3_flop");
 }

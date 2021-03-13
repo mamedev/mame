@@ -58,20 +58,18 @@ class sbus_device : public device_t,
 public:
 	// construction/destruction
 	template <typename T, typename U>
-	sbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&space_tag)
+	sbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, U &&space_tag, int space_num)
 		: sbus_device(mconfig, tag, owner, clock)
 	{
-		set_cpu_tag(std::forward<T>(cpu_tag));
-		set_space_tag(std::forward<U>(space_tag));
+		set_cpu(std::forward<T>(cpu_tag));
+		set_type1space(std::forward<U>(space_tag), space_num);
 	}
 
 	sbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
-	template <typename T> void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_space_tag(T &&tag) { m_type1space.set_tag(std::forward<T>(tag)); }
-
-	// devcb3
+	template <typename T> void set_cpu(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_type1space(T &&tag, int num) { m_type1space.set_tag(std::forward<T>(tag), num); }
 	template <unsigned Line> auto irq() { return m_irq_cb[Line].bind(); }
 	auto buserr() { return m_buserr.bind(); }
 
@@ -101,7 +99,7 @@ protected:
 
 	// internal state
 	required_device<sparc_base_device> m_maincpu;
-	required_device<address_map_bank_device> m_type1space;
+	required_address_space m_type1space;
 	address_space *m_space;
 
 	devcb_write_line::array<7> m_irq_cb;

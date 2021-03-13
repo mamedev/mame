@@ -151,7 +151,7 @@ protected:
 	void floppy_load_unload(bool load, floppy_image_device *dev);
 	image_init_result floppy_load(floppy_image_device *dev);
 	void floppy_unload(floppy_image_device *dev);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	struct
 	{

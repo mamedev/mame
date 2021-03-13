@@ -310,6 +310,7 @@ void psychic5_state::draw_background(screen_device &screen, bitmap_rgb32 &bitmap
 		case  3: case  7: if (m_sy2 == 0xf0) m_bg_clip_mode++; break;
 		case  9: case 11: if (m_sx1 == 0xf0) m_bg_clip_mode++; break;
 		case 13: case 15: if (sx1_old == 0xf0) m_bg_clip_mode++;
+			[[fallthrough]];
 		case 16: if (m_sy1 != 0x00) m_bg_clip_mode = 0; break;
 		}
 

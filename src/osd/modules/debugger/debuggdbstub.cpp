@@ -251,6 +251,34 @@ static const gdb_register_map gdb_register_map_m68020pmmu =
 };
 
 //-------------------------------------------------------------------------
+static const gdb_register_map gdb_register_map_m68000 =
+{
+	"m68k",
+	"org.gnu.gdb.m68k.core",
+	{
+		{ "D0", "d0", false, TYPE_INT },
+		{ "D1", "d1", false, TYPE_INT },
+		{ "D2", "d2", false, TYPE_INT },
+		{ "D3", "d3", false, TYPE_INT },
+		{ "D4", "d4", false, TYPE_INT },
+		{ "D5", "d5", false, TYPE_INT },
+		{ "D6", "d6", false, TYPE_INT },
+		{ "D7", "d7", false, TYPE_INT },
+		{ "A0", "a0", false, TYPE_INT },
+		{ "A1", "a1", false, TYPE_INT },
+		{ "A2", "a2", false, TYPE_INT },
+		{ "A3", "a3", false, TYPE_INT },
+		{ "A4", "a4", false, TYPE_INT },
+		{ "A5", "a5", false, TYPE_INT },
+		{ "A6", "fp", true,  TYPE_INT },
+		{ "A7", "sp", true,  TYPE_INT },
+		{ "SR", "ps", false, TYPE_INT }, // NOTE GDB named it ps, but it's actually sr
+		{ "PC", "pc", true,  TYPE_CODE_POINTER },
+		//NOTE m68-elf-gdb complains about fpcontrol register not present but 68000 doesn't have floating point so...
+	}
+};
+
+//-------------------------------------------------------------------------
 static const gdb_register_map gdb_register_map_z80 =
 {
 	"z80",
@@ -281,8 +309,28 @@ static const gdb_register_map gdb_register_map_m6502 =
 		{ "X",  "x",   false, TYPE_INT },
 		{ "Y",  "y",   false, TYPE_INT },
 		{ "P",  "p",   false, TYPE_INT },
-		{ "PC", "pc",  true,  TYPE_CODE_POINTER },
 		{ "SP", "sp",  true,  TYPE_DATA_POINTER },
+		{ "PC", "pc",  true,  TYPE_CODE_POINTER },
+	}
+};
+
+
+//-------------------------------------------------------------------------
+static const gdb_register_map gdb_register_map_m6809 =
+{
+	"m6809",
+	"mame.m6809",
+	{
+		{ "A",  "a",   false, TYPE_INT },
+		{ "B",  "b",   false, TYPE_INT },
+		{ "D",  "d",   false, TYPE_INT },
+		{ "X",  "x",   false, TYPE_INT },
+		{ "Y",  "y",   false, TYPE_INT },
+		{ "U",  "u",   true,  TYPE_DATA_POINTER },
+		{ "PC", "pc",  true,  TYPE_CODE_POINTER },
+		{ "S",  "s",   true,  TYPE_DATA_POINTER },
+		{ "CC", "cc",  false, TYPE_INT }, // TODO describe bitfield
+		{ "DP", "dp",  false, TYPE_INT },
 	}
 };
 
@@ -293,8 +341,11 @@ static const std::map<std::string, const gdb_register_map &> gdb_register_maps =
 	{ "r4600",      gdb_register_map_r4600 },
 	{ "ppc601",     gdb_register_map_ppc601 },
 	{ "m68020pmmu", gdb_register_map_m68020pmmu },
+	{ "m68000",     gdb_register_map_m68000 },
 	{ "z80",        gdb_register_map_z80 },
 	{ "m6502",      gdb_register_map_m6502 },
+	{ "n2a03",      gdb_register_map_m6502 },
+	{ "m6809",      gdb_register_map_m6809 },
 };
 
 //-------------------------------------------------------------------------
@@ -656,7 +707,7 @@ void debug_gdbstub::send_reply(const char *str)
 		checksum += str[i];
 
 	std::string reply = string_format("$%s#%02x", str, checksum);
-	m_socket.puts(reply.c_str());
+	m_socket.puts(reply);
 }
 
 

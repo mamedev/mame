@@ -35,6 +35,9 @@ void sb2m600_state::video_start()
 	if (m_color_ram)
 		for (uint16_t addr = 0; addr < OSI630_COLORRAM_SIZE; addr++)
 			m_color_ram[addr] = machine().rand() & 0x0f;
+
+	m_32 = 0;
+	m_coloren = 0;
 }
 
 /* Video Update */

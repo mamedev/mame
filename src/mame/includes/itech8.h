@@ -10,6 +10,7 @@
 #include "machine/gen_latch.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
+#include "machine/nvram.h"
 #include "video/tlc34076.h"
 #include "video/tms34061.h"
 #include "screen.h"
@@ -23,6 +24,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_subcpu(*this, "sub"),
+		m_nvram(*this, "nvram"),
 		m_soundlatch(*this, "soundlatch"),
 		m_tms34061(*this, "tms34061"),
 		m_tlc34076(*this, "tlc34076"),
@@ -80,6 +82,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<cpu_device> m_subcpu;
+	required_device<nvram_device> m_nvram;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<tms34061_device> m_tms34061;
 	required_device<tlc34076_device> m_tlc34076;

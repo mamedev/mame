@@ -44,8 +44,8 @@ Driver's Eyes works,
 #include "machine/namcos21_dsp.h"
 #include "video/namco_c355spr.h"
 #include "video/namcos21_3d.h"
-#include "sound/ym2151.h"
 #include "sound/c140.h"
+#include "sound/ym2151.h"
 #include "emupal.h"
 
 
@@ -155,11 +155,11 @@ INTERRUPT_GEN_MEMBER( namco_de_pcbstack_device::irq1_line_hold )   { device.exec
 
 void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 {
-	M68000(config, m_maincpu, 12288000); /* Master */
+	M68000(config, m_maincpu, 49.152_MHz_XTAL / 4); /* Master */
 	m_maincpu->set_addrmap(AS_PROGRAM, &namco_de_pcbstack_device::driveyes_master_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(namco_de_pcbstack_device::screen_scanline), "screen", 0, 1);
 
-	M68000(config, m_slave, 12288000); /* Slave */
+	M68000(config, m_slave, 49.152_MHz_XTAL / 4); /* Slave */
 	m_slave->set_addrmap(AS_PROGRAM, &namco_de_pcbstack_device::driveyes_slave_map);
 
 	MC6809E(config, m_audiocpu, 3072000); /* Sound */
@@ -180,7 +180,7 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: basic parameters to get 60.606060 Hz, x2 is for interlace
-	m_screen->set_raw(12288000*2, 768, 0, 496, 264*2, 0, 480);
+	m_screen->set_raw(49.152_MHz_XTAL / 4 * 2, 768, 0, 496, 264*2, 0, 480);
 	m_screen->set_screen_update(FUNC(namco_de_pcbstack_device::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -210,7 +210,7 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 	m_c140->add_route(0, "lspeaker", 0.50);
 	m_c140->add_route(1, "rspeaker", 0.50);
 
-	YM2151(config, "ymsnd", 3579580).add_route(0, "lspeaker", 0.30).add_route(1, "rspeaker", 0.30);
+	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "lspeaker", 0.30).add_route(1, "rspeaker", 0.30);
 }
 
 
@@ -461,6 +461,7 @@ void namco_de_pcbstack_device::device_start()
 	for (int i = 0; i < 0x10; i++)
 		m_audiobank->configure_entry(i, memregion("audiocpu")->base() + (i % max) * 0x4000);
 
+	save_item(NAME(m_video_enable));
 }
 
 void namco_de_pcbstack_device::device_reset()
@@ -592,7 +593,7 @@ static INPUT_PORTS_START( driveyes )
 	PORT_DIPNAME( 0x10, 0x10, "DSW5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "PCM ROM")
+	PORT_DIPNAME( 0x20, 0x20, "PCM ROM")
 	PORT_DIPSETTING(    0x20, "2M" )
 	PORT_DIPSETTING(    0x00, "4M" )
 	PORT_DIPNAME( 0x40, 0x40, "DSW7")

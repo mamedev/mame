@@ -28,12 +28,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -128,8 +122,8 @@ private:
 	required_device <speaker_device> m_rspeaker;
 	required_device_array <vr0uart_device, 2> m_uart;
 	required_shared_ptr <uint32_t> m_crtcregs;
-	uint16_t *m_textureram = nullptr;
-	uint16_t *m_frameram = nullptr;
+	std::unique_ptr<uint16_t []> m_textureram;
+	std::unique_ptr<uint16_t []> m_frameram;
 
 	address_space *m_host_space = nullptr;
 	uint32_t m_ext_vclk = 0;

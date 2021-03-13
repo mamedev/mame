@@ -22,7 +22,7 @@
 DEFINE_DEVICE_TYPE_NS(ZORRO_A2058, bus::amiga::zorro, a2058_device, "zorro_a2058", "CBM A2058 Fast Memory")
 
 
-namespace bus { namespace amiga { namespace zorro {
+namespace bus::amiga::zorro {
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -139,4 +139,4 @@ WRITE_LINE_MEMBER( a2058_device::cfgin_w )
 	}
 }
 
-} } } // namespace bus::amiga::zorro
+} // namespace bus::amiga::zorro

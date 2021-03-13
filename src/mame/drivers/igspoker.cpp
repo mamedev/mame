@@ -74,8 +74,8 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/timer.h"
-#include "sound/ym2413.h"
 #include "sound/okim6295.h"
+#include "sound/ym2413.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -409,7 +409,7 @@ uint8_t igspoker_state::exp_rom_r(offs_t offset)
 void igspoker_state::igspoker_prg_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
-	map(0xf000, 0xffff).ram().region("maincpu", 0xf000);
+	map(0xf000, 0xffff).ram();
 }
 
 void igspoker_state::igspoker_io_map(address_map &map)

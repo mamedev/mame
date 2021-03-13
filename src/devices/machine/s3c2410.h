@@ -335,7 +335,7 @@ protected:
 	uint32_t s3c24xx_nand_r(offs_t offset, uint32_t mem_mask = ~0);
 	void s3c24xx_nand_init_ecc();
 	void s3c24xx_nand_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	ATTR_UNUSED WRITE_LINE_MEMBER( s3c24xx_pin_frnb_w );
+	[[maybe_unused]] WRITE_LINE_MEMBER( s3c24xx_pin_frnb_w );
 	void s3c24xx_nand_auto_boot();
 	void s3c24xx_device_reset();
 	void s3c24xx_device_start();
