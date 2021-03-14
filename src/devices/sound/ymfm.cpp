@@ -9,6 +9,19 @@
 #include "logmacro.h"
 
 //
+// TO DO:
+//
+// Try removing register base class; do we need it?
+// Make register states stateless; pass in choffs/opoffs
+// Prefix channel getters with ch_ and operator getters with op_
+// Move registers into register state
+// Move LFO/noise calculations into register state
+// More caching?
+// Engine method to compute FM clock from input clock
+// Expose some constants through the engine
+//
+
+//
 // ONE FM CORE TO RULE THEM ALL
 //
 // This emulator is written from the ground-up using the analysis and deduction
@@ -246,6 +259,7 @@
 //    prescale: |    2   ||  2/3/6 |  2/3/6 ||    4   |    4   |    4   |    8   |
 //  EG divider: |    3   ||    3   |    3   ||    1   |    1   |    1   |    1   |
 //       EG DP: |   no   ||   no   |   no   ||   no   |   no   |   yes  |   no   |
+//      EG SSG: |   no   ||   yes  |   yes  ||   no   |   no   |   no   |   no   |
 //   mod delay: |   no   ||   no   |   no   ||   yes  |   yes  |   yes? |   no   |
 //         CSM: |   yes  ||  ch 2  |  ch 2  ||   yes  |   yes  |   yes  |   no   |
 //         LFO: |   yes  ||   no   |   yes  ||   yes  |   yes  |   yes  |   yes  |
@@ -266,6 +280,7 @@
 // EG divider represents the divider applied to the envelope generator clock.
 // EG DP indicates whether the envelope generator includes a DP (depress?) phase
 //   at the beginning of each key on.
+// SSG EG indicates whether the envelope generator has SSG-style support.
 // Mod delay indicates whether the connection to the first modulator's input is
 //   delayed by 1 sample.
 // CSM indicates whether CSM mode is supported, triggered by timer A.
@@ -829,7 +844,7 @@ void ymopm_registers::cache_operator_data(u8 chnum, u8 opnum, ymfm_opdata_cache 
 	//
 	// the 5-bit keycode is just the top 5 bits (block + top 2 bits
 	// of the key code)
-	u8 keycode = cache.keycode = BIT(block_freq, 8, 5);
+	u8 keycode = BIT(block_freq, 8, 5);
 
 	// detune adjustment
 	s8 detune = cache.detune = detune_adjustment(this->detune(), keycode);
@@ -857,14 +872,15 @@ void ymopm_registers::cache_operator_data(u8 chnum, u8 opnum, ymfm_opdata_cache 
 
 
 //*********************************************************
-//  OPN SPECIFICS
+//  OPN/OPNA SPECIFICS
 //*********************************************************
 
 //-------------------------------------------------
-//  ymopn_registers - constructor
+//  ymopn_registers_base - constructor
 //-------------------------------------------------
 
-ymopn_registers::ymopn_registers(u8 *regdata) :
+template<bool IsOpnA>
+ymopn_registers_base<IsOpnA>::ymopn_registers_base(u8 *regdata) :
 	ymfm_registers_base(regdata)
 {
 }
@@ -875,7 +891,8 @@ ymopn_registers::ymopn_registers(u8 *regdata) :
 //  indices for each channel; for OPN this is fixed
 //-------------------------------------------------
 
-void ymopn_registers::operator_map(operator_mapping &dest) const
+template<>
+void ymopn_registers_base<false>::operator_map(operator_mapping &dest) const
 {
 	// Note that the channel index order is 0,2,1,3, so we bitswap the index.
 	//
@@ -893,25 +910,52 @@ void ymopn_registers::operator_map(operator_mapping &dest) const
 	dest = s_fixed_map;
 }
 
+template<>
+void ymopn_registers_base<true>::operator_map(operator_mapping &dest) const
+{
+	// Note that the channel index order is 0,2,1,3, so we bitswap the index.
+	//
+	// This is because the order in the map is:
+	//    carrier 1, carrier 2, modulator 1, modulator 2
+	//
+	// But when wiring up the connections, the more natural order is:
+	//    carrier 1, modulator 1, carrier 2, modulator 2
+	static const operator_mapping s_fixed_map =
+	{ {
+		YMFM_OP4(  0,  6,  3,  9 ),  // Channel 0 operators
+		YMFM_OP4(  1,  7,  4, 10 ),  // Channel 1 operators
+		YMFM_OP4(  2,  8,  5, 11 ),  // Channel 2 operators
+		YMFM_OP4( 12, 18, 15, 21 ),  // Channel 3 operators
+		YMFM_OP4( 13, 19, 16, 22 ),  // Channel 4 operators
+		YMFM_OP4( 14, 20, 17, 23 ),  // Channel 5 operators
+	} };
+	dest = s_fixed_map;
+}
+
 
 //-------------------------------------------------
 //  reset - reset to initial state
 //-------------------------------------------------
 
-void ymopn_registers::reset()
+template<bool IsOpnA>
+void ymopn_registers_base<IsOpnA>::reset()
 {
 	std::fill_n(&m_regdata[0], REGISTERS, 0);
+	if (IsOpnA)
+	{
+		// enable output on both channels by default
+		m_regdata[0xb4] = m_regdata[0xb5] = m_regdata[0xb6] = 0xc0;
+		m_regdata[0x1b4] = m_regdata[0x1b5] = m_regdata[0x1b6] = 0xc0;
+	}
 }
 
 
 //-------------------------------------------------
-//  write - handle writes to the register array;
-//  note that this code is also used by
-//  ymopna_registers, so it must handle upper
-//  channels cleanly
+//  write - handle writes to the register array
 //-------------------------------------------------
 
-bool ymopn_registers::write(u16 index, u8 data, u8 &channel, u8 &opmask)
+template<bool IsOpnA>
+bool ymopn_registers_base<IsOpnA>::write(u16 index, u8 data, u8 &channel, u8 &opmask)
 {
 	assert(index < REGISTERS);
 
@@ -919,7 +963,9 @@ bool ymopn_registers::write(u16 index, u8 data, u8 &channel, u8 &opmask)
 	// borrow unused registers 0xb8-bf/0x1b8-bf as temporary holding locations
 	if ((index & 0xf0) == 0xa0)
 	{
-		u16 latchindex = (index & 0x100) | 0xb8 | (BIT(index, 3) << 2) | BIT(index, 0, 2);
+		u16 latchindex = 0xb8 | (BIT(index, 3) << 2) | BIT(index, 0, 2);
+		if (IsOpnA)
+			latchindex |= index & 0x100;
 
 		// writes to the upper half just latch (only low 6 bits matter)
 		if (BIT(index, 2))
@@ -942,7 +988,8 @@ bool ymopn_registers::write(u16 index, u8 data, u8 &channel, u8 &opmask)
 		channel = BIT(data, 0, 2);
 		if (channel == 3)
 			return false;
-		channel += BIT(data, 2, 1) * 3;
+		if (IsOpnA)
+			channel += BIT(data, 2, 1) * 3;
 		opmask = BIT(data, 4, 4);
 		return true;
 	}
@@ -954,7 +1001,8 @@ bool ymopn_registers::write(u16 index, u8 data, u8 &channel, u8 &opmask)
 //  compute_phase_step - compute the phase step
 //-------------------------------------------------
 
-u32 ymopn_registers::compute_phase_step(u16 block_freq, s8 detuneval, s8 lfo_raw_pm)
+template<bool IsOpnA>
+u32 ymopn_registers_base<IsOpnA>::compute_phase_step(u16 block_freq, s8 detuneval, s8 lfo_raw_pm)
 {
 	// OPN phase calculation has only a single detune parameter
 	// and uses FNUMs instead of keycodes
@@ -993,12 +1041,11 @@ u32 ymopn_registers::compute_phase_step(u16 block_freq, s8 detuneval, s8 lfo_raw
 
 //-------------------------------------------------
 //  cache_operator_data - fill the operator cache
-//  with prefetched data; note that this code is
-//  also used by ymopna_registers, so it must
-//  handle upper channels cleanly
+//  with prefetched data
 //-------------------------------------------------
 
-void ymopn_registers::cache_operator_data(u8 chnum, u8 opnum, ymfm_opdata_cache &cache)
+template<bool IsOpnA>
+void ymopn_registers_base<IsOpnA>::cache_operator_data(u8 chnum, u8 opnum, ymfm_opdata_cache &cache)
 {
 	// get frequency from the channel
 	u16 block_freq = cache.block_freq = this->block_freq();
@@ -1008,11 +1055,11 @@ void ymopn_registers::cache_operator_data(u8 chnum, u8 opnum, ymfm_opdata_cache 
 	if (multi_freq() && chnum == 2)
 	{
 		if (opnum == 2)
-			block_freq = cache.block_freq = multi_block_freq1();
+			block_freq = cache.block_freq = multi_block_freq(1);
 		else if (opnum == 8)
-			block_freq = cache.block_freq = multi_block_freq2();
+			block_freq = cache.block_freq = multi_block_freq(2);
 		else if (opnum == 5)
-			block_freq = cache.block_freq = multi_block_freq0();
+			block_freq = cache.block_freq = multi_block_freq(0);
 	}
 
 	// compute the keycode: block_freq is:
@@ -1022,7 +1069,7 @@ void ymopn_registers::cache_operator_data(u8 chnum, u8 opnum, ymfm_opdata_cache 
 	//
 	// the 5-bit keycode uses the top 4 bits plus a magic formula
 	// for the final bit
-	u8 keycode = BIT(cache.block_freq, 10, 4) << 1;
+	u8 keycode = BIT(block_freq, 10, 4) << 1;
 
 	// lowest bit is determined by a mix of next lower FNUM bits
 	// according to this equation from the YM2608 manual:
@@ -1030,14 +1077,14 @@ void ymopn_registers::cache_operator_data(u8 chnum, u8 opnum, ymfm_opdata_cache 
 	//   (F11 & (F10 | F9 | F8)) | (!F11 & F10 & F9 & F8)
 	//
 	// for speed, we just look it up in a 16-bit constant
-	cache.keycode = keycode |= BIT(0xfe80, BIT(cache.block_freq, 7, 4));
+	keycode |= BIT(0xfe80, BIT(block_freq, 7, 4));
 
 	// detune adjustment
 	s8 detune = cache.detune = detune_adjustment(this->detune(), keycode);
 
 	// phase step, or 0 if PM is active; this depends on block_freq and
 	// detune, so compute it after we've done those
-	cache.phase_step = (lfo_enabled() && lfo_pm_sensitivity() != 0) ? 0 : compute_phase_step(block_freq, detune, 0);
+	cache.phase_step = (IsOpnA && lfo_enabled() && lfo_pm_sensitivity() != 0) ? 0 : compute_phase_step(block_freq, detune, 0);
 
 	// total level, scaled by 8
 	cache.total_level = total_level() << 3;
@@ -1047,7 +1094,7 @@ void ymopn_registers::cache_operator_data(u8 chnum, u8 opnum, ymfm_opdata_cache 
 	cache.eg_sustain |= (cache.eg_sustain + 1) & 0x10;
 
 	// determine KSR adjustment for enevlope rates
-	u8 ksrval = cache.keycode >> (ksr() ^ 3);
+	u8 ksrval = keycode >> (ksr() ^ 3);
 	cache.eg_rate[YMFM_ENV_ATTACK] = effective_rate(attack_rate() * 2, ksrval);
 	cache.eg_rate[YMFM_ENV_DECAY] = effective_rate(decay_rate() * 2, ksrval);
 	cache.eg_rate[YMFM_ENV_SUSTAIN] = effective_rate(sustain_rate() * 2, ksrval);
@@ -1056,72 +1103,16 @@ void ymopn_registers::cache_operator_data(u8 chnum, u8 opnum, ymfm_opdata_cache 
 }
 
 
-
-//*********************************************************
-//  OPNA SPECIFICS
-//*********************************************************
-
-//-------------------------------------------------
-//  ymopna_registers - constructor
-//-------------------------------------------------
-
-ymopna_registers::ymopna_registers(u8 *regdata) :
-	ymopn_registers(regdata)
-{
-}
-
-
-//-------------------------------------------------
-//  operator_map - return an array of operator
-//  indices for each channel; for OPN this is fixed
-//-------------------------------------------------
-
-void ymopna_registers::operator_map(operator_mapping &dest) const
-{
-	// Note that the channel index order is 0,2,1,3, so we bitswap the index.
-	//
-	// This is because the order in the map is:
-	//    carrier 1, carrier 2, modulator 1, modulator 2
-	//
-	// But when wiring up the connections, the more natural order is:
-	//    carrier 1, modulator 1, carrier 2, modulator 2
-	static const operator_mapping s_fixed_map =
-	{ {
-		YMFM_OP4(  0,  6,  3,  9 ),  // Channel 0 operators
-		YMFM_OP4(  1,  7,  4, 10 ),  // Channel 1 operators
-		YMFM_OP4(  2,  8,  5, 11 ),  // Channel 2 operators
-		YMFM_OP4( 12, 18, 15, 21 ),  // Channel 3 operators
-		YMFM_OP4( 13, 19, 16, 22 ),  // Channel 4 operators
-		YMFM_OP4( 14, 20, 17, 23 ),  // Channel 5 operators
-	} };
-	dest = s_fixed_map;
-}
-
-
-//-------------------------------------------------
-//  reset - reset to initial state
-//-------------------------------------------------
-
-void ymopna_registers::reset()
-{
-	std::fill_n(&m_regdata[0], REGISTERS, 0);
-
-	// enable output on both channels by default
-	m_regdata[0xb4] = m_regdata[0xb5] = m_regdata[0xb6] = 0xc0;
-	m_regdata[0x1b4] = m_regdata[0x1b5] = m_regdata[0x1b6] = 0xc0;
-}
-
-
-
 //*********************************************************
 //  OPL SPECIFICS
 //*********************************************************
 
 //-------------------------------------------------
-//  ymopl_registers - constructor
+//  ymopl_registers_base - constructor
 //-------------------------------------------------
 
-ymopl_registers::ymopl_registers(u8 *regdata) :
+template<int Revision>
+ymopl_registers_base<Revision>::ymopl_registers_base(u8 *regdata) :
 	ymfm_registers_base(regdata)
 {
 }
@@ -1132,7 +1123,8 @@ ymopl_registers::ymopl_registers(u8 *regdata) :
 //  indices for each channel; for OPL this is fixed
 //-------------------------------------------------
 
-void ymopl_registers::operator_map(operator_mapping &dest) const
+template<int Revision>
+void ymopl_registers_base<Revision>::operator_map(operator_mapping &dest) const
 {
 	static const operator_mapping s_fixed_map =
 	{ {
@@ -1149,25 +1141,50 @@ void ymopl_registers::operator_map(operator_mapping &dest) const
 	dest = s_fixed_map;
 }
 
+template<>
+void ymopl_registers_base<3>::operator_map(operator_mapping &dest) const
+{
+	u8 fourop = fourop_enable();
+
+	dest.chan[ 0] = BIT(fourop, 0) ? YMFM_OP4(  0,  3,  6,  9 ) : YMFM_OP2(  0,  3 );
+	dest.chan[ 1] = BIT(fourop, 1) ? YMFM_OP4(  1,  4,  7, 10 ) : YMFM_OP2(  1,  4 );
+	dest.chan[ 2] = BIT(fourop, 2) ? YMFM_OP4(  2,  5,  8, 11 ) : YMFM_OP2(  2,  5 );
+	dest.chan[ 3] = BIT(fourop, 0) ? YMFM_OP0() : YMFM_OP2(  6,  9 );
+	dest.chan[ 4] = BIT(fourop, 1) ? YMFM_OP0() : YMFM_OP2(  7, 10 );
+	dest.chan[ 5] = BIT(fourop, 2) ? YMFM_OP0() : YMFM_OP2(  8, 11 );
+	dest.chan[ 6] = YMFM_OP2( 12, 15 );
+	dest.chan[ 7] = YMFM_OP2( 13, 16 );
+	dest.chan[ 8] = YMFM_OP2( 14, 17 );
+
+	dest.chan[ 9] = BIT(fourop, 3) ? YMFM_OP4( 18, 21, 24, 27 ) : YMFM_OP2( 18, 21 );
+	dest.chan[10] = BIT(fourop, 4) ? YMFM_OP4( 19, 22, 25, 28 ) : YMFM_OP2( 19, 22 );
+	dest.chan[11] = BIT(fourop, 5) ? YMFM_OP4( 20, 23, 26, 29 ) : YMFM_OP2( 20, 23 );
+	dest.chan[12] = BIT(fourop, 3) ? YMFM_OP0() : YMFM_OP2( 24, 27 );
+	dest.chan[13] = BIT(fourop, 4) ? YMFM_OP0() : YMFM_OP2( 25, 28 );
+	dest.chan[14] = BIT(fourop, 5) ? YMFM_OP0() : YMFM_OP2( 26, 29 );
+	dest.chan[15] = YMFM_OP2( 30, 33 );
+	dest.chan[16] = YMFM_OP2( 31, 34 );
+	dest.chan[17] = YMFM_OP2( 32, 35 );
+}
+
 
 //-------------------------------------------------
 //  reset - reset to initial state
 //-------------------------------------------------
 
-void ymopl_registers::reset()
+template<int Revision>
+void ymopl_registers_base<Revision>::reset()
 {
 	std::fill_n(&m_regdata[0], REGISTERS, 0);
 }
 
 
 //-------------------------------------------------
-//  write - handle writes to the register array;
-//  note that this code is also used by
-//  ymopl3_registers, so it must handle upper
-//  channels cleanly
+//  write - handle writes to the register array
 //-------------------------------------------------
 
-bool ymopl_registers::write(u16 index, u8 data, u8 &channel, u8 &opmask)
+template<int Revision>
+bool ymopl_registers_base<Revision>::write(u16 index, u8 data, u8 &channel, u8 &opmask)
 {
 	assert(index < REGISTERS);
 
@@ -1194,7 +1211,8 @@ bool ymopl_registers::write(u16 index, u8 data, u8 &channel, u8 &opmask)
 		channel = index & 0x0f;
 		if (channel < 9)
 		{
-			channel += 9 * BIT(index, 8);
+			if (IsOpl3Plus)
+				channel += 9 * BIT(index, 8);
 			opmask = BIT(data, 5) ? 15 : 0;
 			return true;
 		}
@@ -1207,7 +1225,8 @@ bool ymopl_registers::write(u16 index, u8 data, u8 &channel, u8 &opmask)
 //  compute_phase_step - compute the phase step
 //-------------------------------------------------
 
-u32 ymopl_registers::compute_phase_step(u16 block_freq, s8 detuneval, s8 lfo_raw_pm)
+template<int Revision>
+u32 ymopl_registers_base<Revision>::compute_phase_step(u16 block_freq, s8 detuneval, s8 lfo_raw_pm)
 {
 	// OPL phase calculation has no detuning, but uses FNUMs like
 	// the OPN version, and computes PM a bit differently
@@ -1243,7 +1262,8 @@ u32 ymopl_registers::compute_phase_step(u16 block_freq, s8 detuneval, s8 lfo_raw
 //  handle upper channels cleanly
 //-------------------------------------------------
 
-void ymopl_registers::cache_operator_data(u8 chnum, u8 opnum, ymfm_opdata_cache &cache)
+template<int Revision>
+void ymopl_registers_base<Revision>::cache_operator_data(u8 chnum, u8 opnum, ymfm_opdata_cache &cache)
 {
 	// get frequency from the channel
 	u16 block_freq = cache.block_freq = this->block_freq();
@@ -1258,7 +1278,7 @@ void ymopl_registers::cache_operator_data(u8 chnum, u8 opnum, ymfm_opdata_cache 
 
 	// lowest bit is determined by note_select(); note that it is
 	// actually reversed from what the manual says, however
-	cache.keycode = keycode |= BIT(block_freq, 10 - note_select(), 1);
+	keycode |= BIT(block_freq, 10 - note_select(), 1);
 
 	// no detune adjustment on OPL
 	cache.detune = 0;
@@ -1439,7 +1459,7 @@ void ymopll_registers::cache_operator_data(u8 chnum, u8 opnum, ymfm_opdata_cache
 	//     ^^^^
 	//
 	// the 4-bit keycode uses the top 3 bits plus one of the next two bits
-	u8 keycode = cache.keycode = BIT(cache.block_freq, 10, 4);
+	u8 keycode = BIT(cache.block_freq, 10, 4);
 
 	// no detune adjustment on OPLL
 	cache.detune = 0;
@@ -1485,63 +1505,6 @@ void ymopll_registers::cache_operator_data(u8 chnum, u8 opnum, ymfm_opdata_cache
 	cache.eg_rate[YMFM_ENV_SUSTAIN] = eg_sustain() ? 0 : effective_rate(release_rate() * 4, ksrval);
 	cache.eg_rate[YMFM_ENV_RELEASE] = sustain() ? RS : (eg_sustain() ? effective_rate(release_rate() * 4, ksrval) : RR);
 	cache.eg_rate[YMFM_ENV_DEPRESS] = DP;
-}
-
-
-
-//*********************************************************
-//  OPL3 SPECIFICS
-//*********************************************************
-
-//-------------------------------------------------
-//  ymopl3_registers - constructor
-//-------------------------------------------------
-
-ymopl3_registers::ymopl3_registers(u8 *regdata) :
-	ymopl_registers(regdata)
-{
-}
-
-
-//-------------------------------------------------
-//  operator_map - return an array of operator
-//  indices for each channel; for OPL3 this is
-//  based on the 4-operator enable flags
-//-------------------------------------------------
-
-void ymopl3_registers::operator_map(operator_mapping &dest) const
-{
-	u8 fourop = fourop_enable();
-
-	dest.chan[ 0] = BIT(fourop, 0) ? YMFM_OP4(  0,  3,  6,  9 ) : YMFM_OP2(  0,  3 );
-	dest.chan[ 1] = BIT(fourop, 1) ? YMFM_OP4(  1,  4,  7, 10 ) : YMFM_OP2(  1,  4 );
-	dest.chan[ 2] = BIT(fourop, 2) ? YMFM_OP4(  2,  5,  8, 11 ) : YMFM_OP2(  2,  5 );
-	dest.chan[ 3] = BIT(fourop, 0) ? YMFM_OP0() : YMFM_OP2(  6,  9 );
-	dest.chan[ 4] = BIT(fourop, 1) ? YMFM_OP0() : YMFM_OP2(  7, 10 );
-	dest.chan[ 5] = BIT(fourop, 2) ? YMFM_OP0() : YMFM_OP2(  8, 11 );
-	dest.chan[ 6] = YMFM_OP2( 12, 15 );
-	dest.chan[ 7] = YMFM_OP2( 13, 16 );
-	dest.chan[ 8] = YMFM_OP2( 14, 17 );
-
-	dest.chan[ 9] = BIT(fourop, 3) ? YMFM_OP4( 18, 21, 24, 27 ) : YMFM_OP2( 18, 21 );
-	dest.chan[10] = BIT(fourop, 4) ? YMFM_OP4( 19, 22, 25, 28 ) : YMFM_OP2( 19, 22 );
-	dest.chan[11] = BIT(fourop, 5) ? YMFM_OP4( 20, 23, 26, 29 ) : YMFM_OP2( 20, 23 );
-	dest.chan[12] = BIT(fourop, 3) ? YMFM_OP0() : YMFM_OP2( 24, 27 );
-	dest.chan[13] = BIT(fourop, 4) ? YMFM_OP0() : YMFM_OP2( 25, 28 );
-	dest.chan[14] = BIT(fourop, 5) ? YMFM_OP0() : YMFM_OP2( 26, 29 );
-	dest.chan[15] = YMFM_OP2( 30, 33 );
-	dest.chan[16] = YMFM_OP2( 31, 34 );
-	dest.chan[17] = YMFM_OP2( 32, 35 );
-}
-
-
-//-------------------------------------------------
-//  reset - reset to initial state
-//-------------------------------------------------
-
-void ymopl3_registers::reset()
-{
-	std::fill_n(&m_regdata[0], REGISTERS, 0);
 }
 
 
@@ -1936,7 +1899,7 @@ void ymfm_operator<RegisterType>::clock_envelope(u16 env_counter)
 			m_env_state = YMFM_ENV_SUSTAIN;
 	}
 
-	// determine our raw 5-bit rate value
+	// fetch the appropriate 6-bit rate value from the cache
 	u8 rate = m_cache.eg_rate[m_env_state];
 
 	// compute the rate shift value; this is the shift needed to
@@ -2025,7 +1988,7 @@ u16 ymfm_operator<RegisterType>::envelope_attenuation(u8 am_offset) const
 	if (m_regs.lfo_am_enabled())
 		result += am_offset;
 
-	// add in total level
+	// add in total level and KSL from the cache
 	result += m_cache.total_level;
 
 	// clamp to max and return
@@ -2123,23 +2086,39 @@ void ymfm_channel<RegisterType>::clock(u32 env_counter, s8 lfo_raw_pm, bool is_m
 
 
 //-------------------------------------------------
-//  output - combine the operators according to the
-//  specified algorithm, returning a sum according
-//  to the rshift and clipmax parameters, which
-//  vary between different OPN implementations
+//  output - output the channel
 //-------------------------------------------------
 
 template<class RegisterType>
 void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const
 {
-	// if this channel has no operators, nothing to do
-	if (RegisterType::DYNAMIC_OPS && m_op[0] == nullptr)
+	// handle the dynamic vs 4-op vs 2-op cases separately
+	if (RegisterType::DYNAMIC_OPS)
 	{
-		m_feedback_in = 0;
-		return;
+		if (m_op[2] != nullptr)
+			output_4op(lfo_raw_am, noise_state, outputs, rshift, clipmax);
+		else if (m_op[0] != nullptr)
+			output_2op(lfo_raw_am, outputs, rshift, clipmax);
 	}
+	else if (RegisterType::OPERATORS / RegisterType::CHANNELS == 4)
+		output_4op(lfo_raw_am, noise_state, outputs, rshift, clipmax);
+	else
+		output_2op(lfo_raw_am, outputs, rshift, clipmax);
+}
 
-	// always assume at least 2 live operators
+
+//-------------------------------------------------
+//  output_2op - combine 4 operators according to
+//  the specified algorithm, returning a sum
+//  according to the rshift and clipmax parameters,
+//  which vary between different implementations
+//-------------------------------------------------
+
+template<class RegisterType>
+void ymfm_channel<RegisterType>::output_2op(u8 lfo_raw_am, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const
+{
+	// The first 2 operators should be populated
+	assert(m_op[0] != nullptr);
 	assert(m_op[1] != nullptr);
 
 	// AM amount is the same across all operators; compute it once
@@ -2159,112 +2138,143 @@ void ymfm_channel<RegisterType>::output(u8 lfo_raw_am, u8 noise_state, s32 outpu
 	if (m_regs.output0() == 0 && m_regs.output1() == 0 && m_regs.output2() == 0 && m_regs.output3() == 0)
 		return;
 
-	// handle two-operator and four-operator cases separately
+	// Algorithms for two-operator case:
+	//    0: O1 -> O2 -> out
+	//    1: (O1 + O2) -> out
 	s32 result;
-	u8 algorithm = m_regs.algorithm();
-	if ((!RegisterType::DYNAMIC_OPS && RegisterType::OPERATORS / RegisterType::CHANNELS == 2) ||
-		(RegisterType::DYNAMIC_OPS && m_op[2] == nullptr))
+	if (BIT(m_regs.algorithm(), 0) == 0)
 	{
-		// Algorithms for two-operator case:
-		//    0: O1 -> O2 -> out
-		//    1: (O1 + O2) -> out
-		if (BIT(algorithm, 0) == 0)
-		{
-			// some OPL chips use the previous sample for modulation instead of
-			// the current sample
-			opmod = (RegisterType::MODULATOR_DELAY ? m_feedback[1] : op1value) >> 1;
-			result = m_op[1]->compute_volume(m_op[1]->phase() + opmod, am_offset) >> rshift;
-		}
-		else
-		{
-			result = op1value + (m_op[1]->compute_volume(m_op[1]->phase(), am_offset) >> rshift);
-			s32 clipmin = -clipmax - 1;
-			result = std::clamp(result, clipmin, clipmax);
-		}
+		// some OPL chips use the previous sample for modulation instead of
+		// the current sample
+		opmod = (RegisterType::MODULATOR_DELAY ? m_feedback[1] : op1value) >> 1;
+		result = m_op[1]->compute_volume(m_op[1]->phase() + opmod, am_offset) >> rshift;
 	}
-	else if (RegisterType::DYNAMIC_OPS || RegisterType::OPERATORS / RegisterType::CHANNELS == 4)
+	else
 	{
-		// OPM/OPN offer 8 different connection algorithms for 4 operators,
-		// and OPL3 offers 4 more, which we designate here as 8-11.
-		//
-		// The operators are computed in order, with the inputs pulled from
-		// an array of values (opout) that is populated as we go:
-		//    0 = 0
-		//    1 = O1
-		//    2 = O2
-		//    3 = O3
-		//    4 = (O4)
-		//    5 = O1+O2
-		//    6 = O1+O3
-		//    7 = O2+O3
-		//
-		// The s_algorithm_ops table describes the inputs and outputs of each
-		// algorithm as follows:
-		//
-		//      ---------x use opout[x] as operator 2 input
-		//      ------xxx- use opout[x] as operator 3 input
-		//      ---xxx---- use opout[x] as operator 4 input
-		//      --x------- include opout[1] in final sum
-		//      -x-------- include opout[2] in final sum
-		//      x--------- include opout[3] in final sum
-		#define ALGORITHM(op2in, op3in, op4in, op1out, op2out, op3out) \
-			(op2in | (op3in << 1) | (op4in << 4) | (op1out << 7) | (op2out << 8) | (op3out << 9))
-		static u16 const s_algorithm_ops[8+4] =
-		{
-			ALGORITHM(1,2,3, 0,0,0),	//  0: O1 -> O2 -> O3 -> O4 -> out (O4)
-			ALGORITHM(0,5,3, 0,0,0),	//  1: (O1 + O2) -> O3 -> O4 -> out (O4)
-			ALGORITHM(0,2,6, 0,0,0),	//  2: (O1 + (O2 -> O3)) -> O4 -> out (O4)
-			ALGORITHM(1,0,7, 0,0,0),	//  3: ((O1 -> O2) + O3) -> O4 -> out (O4)
-			ALGORITHM(1,0,3, 0,1,0),	//  4: ((O1 -> O2) + (O3 -> O4)) -> out (O2+O4)
-			ALGORITHM(1,1,1, 0,1,1),	//  5: ((O1 -> O2) + (O1 -> O3) + (O1 -> O4)) ->
-			ALGORITHM(1,0,0, 0,1,1),	//  6: ((O1 -> O2) + O3 + O4) -> out (O2+O3+O4)
-			ALGORITHM(0,0,0, 1,1,1),	//  7: (O1 + O2 + O3 + O4) -> out (O1+O2+O3+O4)
-			ALGORITHM(1,2,3, 0,0,0),	//  8: O1 -> O2 -> O3 -> O4 -> out (O4)         [same as 0]
-			ALGORITHM(0,2,3, 1,0,0),	//  9: (O1 + (O2 -> O3 -> O4)) -> out (O1+O4)   [unique]
-			ALGORITHM(1,0,3, 0,1,0),	// 10: ((O1 -> O2) + (O3 -> O4)) -> out (O2+O4) [same as 4]
-			ALGORITHM(0,2,0, 1,0,1)		// 11: (O1 + (O2 -> O3) + O4) -> out (O1+O3+O4) [unique]
-		};
-		u16 algorithm_ops = s_algorithm_ops[algorithm];
-
-		// populate the opout table
-		s16 opout[8];
-		opout[0] = 0;
-		opout[1] = op1value;
-
-		// 4-operator case: make sure op[3] is valid
-		assert(m_op[3] != nullptr);
-
-		// compute the 14-bit volume/value of operator 2
-		opmod = opout[BIT(algorithm_ops, 0, 1)] >> 1;
-		opout[2] = m_op[1]->compute_volume(m_op[1]->phase() + opmod, am_offset);
-		opout[5] = opout[1] + opout[2];
-
-		// compute the 14-bit volume/value of operator 3
-		opmod = opout[BIT(algorithm_ops, 1, 3)] >> 1;
-		opout[3] = m_op[2]->compute_volume(m_op[2]->phase() + opmod, am_offset);
-		opout[6] = opout[1] + opout[3];
-		opout[7] = opout[2] + opout[3];
-
-		// compute the 14-bit volume/value of operator 4; this could be a noise
-		// value on the OPM; all algorithms consume OP4 output at a minimum
-		if (noise_state != 0)
-			result = m_op[3]->compute_noise_volume(noise_state, am_offset);
-		else
-		{
-			opmod = opout[BIT(algorithm_ops, 4, 3)] >> 1;
-			result = m_op[3]->compute_volume(m_op[3]->phase() + opmod, am_offset);
-		}
-		result >>= rshift;
-
-		// optionally add OP1, OP2, OP3
+		result = op1value + (m_op[1]->compute_volume(m_op[1]->phase(), am_offset) >> rshift);
 		s32 clipmin = -clipmax - 1;
-		if (BIT(algorithm_ops, 7) != 0)
-			result = std::clamp(result + (opout[1] >> rshift), clipmin, clipmax);
-		if (BIT(algorithm_ops, 8) != 0)
-			result = std::clamp(result + (opout[2] >> rshift), clipmin, clipmax);
-		if (BIT(algorithm_ops, 9) != 0)
-			result = std::clamp(result + (opout[3] >> rshift), clipmin, clipmax);
+		result = std::clamp(result, clipmin, clipmax);
 	}
+
+	// add to the output
+	add_to_output(outputs, result);
+}
+
+
+//-------------------------------------------------
+//  output_4op - combine 4 operators according to
+//  the specified algorithm, returning a sum
+//  according to the rshift and clipmax parameters,
+//  which vary between different implementations
+//-------------------------------------------------
+
+template<class RegisterType>
+void ymfm_channel<RegisterType>::output_4op(u8 lfo_raw_am, u8 noise_state, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const
+{
+	// all 4 operators should be populated
+	assert(m_op[0] != nullptr);
+	assert(m_op[1] != nullptr);
+	assert(m_op[2] != nullptr);
+	assert(m_op[3] != nullptr);
+
+	// AM amount is the same across all operators; compute it once
+	u16 am_offset = lfo_am_offset(lfo_raw_am);
+
+	// operator 1 has optional self-feedback
+	s16 opmod = 0;
+	u8 feedback = m_regs.feedback();
+	if (feedback != 0)
+		opmod = (m_feedback[0] + m_feedback[1]) >> (10 - feedback);
+
+	// compute the 14-bit volume/value of operator 1 and update the feedback
+	s16 op1value = m_feedback_in = m_op[0]->compute_volume(m_op[0]->phase() + opmod, am_offset);
+
+	// now that the feedback has been computed, skip the rest if all volumes
+	// are clear; no need to do all this work for nothing
+	if (m_regs.output0() == 0 && m_regs.output1() == 0 && m_regs.output2() == 0 && m_regs.output3() == 0)
+		return;
+
+	// OPM/OPN offer 8 different connection algorithms for 4 operators,
+	// and OPL3 offers 4 more, which we designate here as 8-11.
+	//
+	// The operators are computed in order, with the inputs pulled from
+	// an array of values (opout) that is populated as we go:
+	//    0 = 0
+	//    1 = O1
+	//    2 = O2
+	//    3 = O3
+	//    4 = (O4)
+	//    5 = O1+O2
+	//    6 = O1+O3
+	//    7 = O2+O3
+	//
+	// The s_algorithm_ops table describes the inputs and outputs of each
+	// algorithm as follows:
+	//
+	//      ---------x use opout[x] as operator 2 input
+	//      ------xxx- use opout[x] as operator 3 input
+	//      ---xxx---- use opout[x] as operator 4 input
+	//      --x------- include opout[1] in final sum
+	//      -x-------- include opout[2] in final sum
+	//      x--------- include opout[3] in final sum
+	#define ALGORITHM(op2in, op3in, op4in, op1out, op2out, op3out) \
+		(op2in | (op3in << 1) | (op4in << 4) | (op1out << 7) | (op2out << 8) | (op3out << 9))
+	static u16 const s_algorithm_ops[8+4] =
+	{
+		ALGORITHM(1,2,3, 0,0,0),	//  0: O1 -> O2 -> O3 -> O4 -> out (O4)
+		ALGORITHM(0,5,3, 0,0,0),	//  1: (O1 + O2) -> O3 -> O4 -> out (O4)
+		ALGORITHM(0,2,6, 0,0,0),	//  2: (O1 + (O2 -> O3)) -> O4 -> out (O4)
+		ALGORITHM(1,0,7, 0,0,0),	//  3: ((O1 -> O2) + O3) -> O4 -> out (O4)
+		ALGORITHM(1,0,3, 0,1,0),	//  4: ((O1 -> O2) + (O3 -> O4)) -> out (O2+O4)
+		ALGORITHM(1,1,1, 0,1,1),	//  5: ((O1 -> O2) + (O1 -> O3) + (O1 -> O4)) ->
+		ALGORITHM(1,0,0, 0,1,1),	//  6: ((O1 -> O2) + O3 + O4) -> out (O2+O3+O4)
+		ALGORITHM(0,0,0, 1,1,1),	//  7: (O1 + O2 + O3 + O4) -> out (O1+O2+O3+O4)
+		ALGORITHM(1,2,3, 0,0,0),	//  8: O1 -> O2 -> O3 -> O4 -> out (O4)         [same as 0]
+		ALGORITHM(0,2,3, 1,0,0),	//  9: (O1 + (O2 -> O3 -> O4)) -> out (O1+O4)   [unique]
+		ALGORITHM(1,0,3, 0,1,0),	// 10: ((O1 -> O2) + (O3 -> O4)) -> out (O2+O4) [same as 4]
+		ALGORITHM(0,2,0, 1,0,1)		// 11: (O1 + (O2 -> O3) + O4) -> out (O1+O3+O4) [unique]
+	};
+	u16 algorithm_ops = s_algorithm_ops[m_regs.algorithm()];
+
+	// populate the opout table
+	s16 opout[8];
+	opout[0] = 0;
+	opout[1] = op1value;
+
+	// 4-operator case: make sure op[3] is valid
+	assert(m_op[3] != nullptr);
+
+	// compute the 14-bit volume/value of operator 2
+	opmod = opout[BIT(algorithm_ops, 0, 1)] >> 1;
+	opout[2] = m_op[1]->compute_volume(m_op[1]->phase() + opmod, am_offset);
+	opout[5] = opout[1] + opout[2];
+
+	// compute the 14-bit volume/value of operator 3
+	opmod = opout[BIT(algorithm_ops, 1, 3)] >> 1;
+	opout[3] = m_op[2]->compute_volume(m_op[2]->phase() + opmod, am_offset);
+	opout[6] = opout[1] + opout[3];
+	opout[7] = opout[2] + opout[3];
+
+	// compute the 14-bit volume/value of operator 4; this could be a noise
+	// value on the OPM; all algorithms consume OP4 output at a minimum
+	s32 result;
+	if (noise_state != 0)
+		result = m_op[3]->compute_noise_volume(noise_state, am_offset);
+	else
+	{
+		opmod = opout[BIT(algorithm_ops, 4, 3)] >> 1;
+		result = m_op[3]->compute_volume(m_op[3]->phase() + opmod, am_offset);
+	}
+	result >>= rshift;
+
+	// optionally add OP1, OP2, OP3
+	s32 clipmin = -clipmax - 1;
+	if (BIT(algorithm_ops, 7) != 0)
+		result = std::clamp(result + (opout[1] >> rshift), clipmin, clipmax);
+	if (BIT(algorithm_ops, 8) != 0)
+		result = std::clamp(result + (opout[2] >> rshift), clipmin, clipmax);
+	if (BIT(algorithm_ops, 9) != 0)
+		result = std::clamp(result + (opout[3] >> rshift), clipmin, clipmax);
 
 	// add to the output
 	add_to_output(outputs, result);

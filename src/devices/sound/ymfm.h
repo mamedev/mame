@@ -18,7 +18,6 @@
 #define YMFM_NAME(x) x, "ymfm." #x
 
 
-
 //*********************************************************
 //  GLOBAL ENUMERATORS
 //*********************************************************
@@ -37,7 +36,6 @@ enum ymfm_envelope_state : u8
 //  GLOBAL HELPERS
 //*********************************************************
 
-//
 // Many of the Yamaha FM chips emit a floating-point value, which is sent to
 // a DAC for processing. The exact format of this floating-point value is
 // documented below. This description only makes sense if the "internal"
@@ -60,7 +58,6 @@ enum ymfm_envelope_state : u8
 // 0 110xxxxxxxx----  ->  1 110xxxxxxxx----  ->  101   0  0xxxxxxx
 // 0 10xxxxxxxx-----  ->  1 10xxxxxxxx-----  ->  110   0  0xxxxxxx
 // 0 0xxxxxxxx------  ->  1 0xxxxxxxx------  ->  111   0  0xxxxxxx
-//
 
 //-------------------------------------------------
 //  ymfm_encode_fp - given a 32-bit signed input
@@ -139,7 +136,6 @@ inline s16 ymfm_roundtrip_fp(s32 value)
 }
 
 
-
 //*********************************************************
 //  REGISTER CLASSES
 //*********************************************************
@@ -148,13 +144,12 @@ inline s16 ymfm_roundtrip_fp(s32 value)
 
 struct ymfm_opdata_cache
 {
-	u32 phase_step;
-	u16 block_freq;
-	u16 total_level;
-	u8 keycode;
-	s8 detune;
-	u8 eg_sustain;
-	u8 eg_rate[5];
+	u32 phase_step;		// phase step, or 0 if PM is active
+	u16 block_freq;		// block frequency value
+	u16 total_level;	// total level, shifted up by 3 bits
+	s8 detune;			// detuning value
+	u8 eg_sustain;		// sustain level
+	u8 eg_rate[5];		// envelope rate for each step
 };
 
 
@@ -380,7 +375,7 @@ public:
 	static constexpr u8 EG_CLOCK_DIVIDER = 3;
 	static constexpr bool EG_HAS_DEPRESS = false;
 	static constexpr bool MODULATOR_DELAY = false;
-	static constexpr u32 CSM_TRIGGER_MASK = 0xff;
+	static constexpr u32 CSM_TRIGGER_MASK = ALL_CHANNELS;
 	static constexpr u8 STATUS_TIMERA = 0x01;
 	static constexpr u8 STATUS_TIMERB = 0x02;
 	static constexpr u8 STATUS_BUSY = 0x80;
@@ -388,6 +383,10 @@ public:
 
 	// constructor
 	ymopm_registers(u8 *regdata);
+
+	// register offsets for each channel and operator
+	static constexpr u16 channel_offset(u8 chnum) { return chnum; }
+	static constexpr u16 operator_offset(u8 opnum) { return opnum; }
 
 	// return an array of operator indices for each channel
 	struct operator_mapping { u32 chan[CHANNELS]; };
@@ -447,13 +446,15 @@ public:
 };
 
 
-// ======================> ymopn_registers
+// ======================> ymopn_registers_base
 
 //
 // OPN register map:
 //
 //      System-wide registers:
 //           21 xxxxxxxx Test register
+//           22 ----x--- LFO enable [OPNA+ only]
+//              -----xxx LFO rate [OPNA+ only]
 //           24 xxxxxxxx Timer A value (upper 8 bits)
 //           25 ------xx Timer A value (lower 2 bits)
 //           26 xxxxxxxx Timer B value
@@ -470,25 +471,32 @@ public:
 //              ---x---- Key on/off operator 1
 //              ------xx Channel select
 //
-//     Per-channel registers (channel in address bits 0-1)
-//        A0-A3 xxxxxxxx Frequency number lower 8 bits
-//        A4-A7 --xxx--- Block (0-7)
-//              -----xxx Frequency number upper 3 bits
-//        B0-B3 --xxx--- Feedback level for operator 1 (0-7)
-//              -----xxx Operator connection algorithm (0-7)
-//
 //     Per-operator registers (channel in address bits 0-1, operator in bits 2-3)
+//     Note that all these apply to address+100 as well on OPNA+
 //        30-3F -xxx---- Detune value (0-7)
 //              ----xxxx Multiple value (0-15)
 //        40-4F -xxxxxxx Total level (0-127)
 //        50-5F xx------ Key scale rate (0-3)
 //              ---xxxxx Attack rate (0-31)
-//        60-6F ---xxxxx Decay rate (0-31)
+//        60-6F x------- LFO AM enable [OPNA]
+//              ---xxxxx Decay rate (0-31)
 //        70-7F ---xxxxx Sustain rate (0-31)
 //        80-8F xxxx---- Sustain level (0-15)
 //              ----xxxx Release rate (0-15)
 //        90-9F ----x--- SSG-EG enable
 //              -----xxx SSG-EG envelope (0-7)
+//
+//     Per-channel registers (channel in address bits 0-1)
+//     Note that all these apply to address+100 as well on OPNA+
+//        A0-A3 xxxxxxxx Frequency number lower 8 bits
+//        A4-A7 --xxx--- Block (0-7)
+//              -----xxx Frequency number upper 3 bits
+//        B0-B3 --xxx--- Feedback level for operator 1 (0-7)
+//              -----xxx Operator connection algorithm (0-7)
+//        B4-B7 x------- Pan left [OPNA]
+//              -x------ Pan right [OPNA]
+//              --xx---- LFO AM shift (0-3) [OPNA+ only]
+//              -----xxx LFO PM depth (0-7) [OPNA+ only]
 //
 //     Special multi-frequency registers (channel implicitly #2; operator in address bits 0-1)
 //        A8-AB xxxxxxxx Frequency number lower 8 bits
@@ -500,17 +508,18 @@ public:
 //        BC-BF --xxxxxx Latched frequency number upper bits (from AC-AF)
 //
 
-class ymopn_registers : public ymfm_registers_base
+template<bool IsOpnA>
+class ymopn_registers_base : public ymfm_registers_base
 {
 public:
 	// constants
 	static constexpr family_type FAMILY = FAMILY_OPN;
-	static constexpr u8 OUTPUTS = 1;
-	static constexpr u8 CHANNELS = 3;
+	static constexpr u8 OUTPUTS = IsOpnA ? 2 : 1;
+	static constexpr u8 CHANNELS = IsOpnA ? 6 : 3;
 	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
 	static constexpr u8 OPERATORS = CHANNELS * 4;
 	static constexpr u8 DYNAMIC_OPS = false;
-	static constexpr u16 REGISTERS = 0x100;
+	static constexpr u16 REGISTERS = IsOpnA ? 0x200 : 0x100;
 	static constexpr u16 REG_MODE = 0x27;
 	static constexpr u8 DEFAULT_PRESCALE = 6;
 	static constexpr u8 EG_CLOCK_DIVIDER = 3;
@@ -523,18 +532,38 @@ public:
 	static constexpr u8 STATUS_IRQ = 0;
 
 	// constructor
-	ymopn_registers(u8 *regdata);
+	ymopn_registers_base(u8 *regdata);
+
+	// offsets to channels and operators
+	static constexpr u16 channel_offset(u8 chnum)
+	{
+		assert(chnum < CHANNELS);
+		if (!IsOpnA)
+			return chnum;
+		else
+			return (chnum % 3) + 0x100 * (chnum / 3);
+	}
+	static constexpr u16 operator_offset(u8 opnum)
+	{
+		assert(opnum < OPERATORS);
+		if (!IsOpnA)
+			return opnum + opnum / 3;
+		else
+			return (opnum % 12) + ((opnum % 12) / 3) + 0x100 * (opnum / 12);
+	}
 
 	// setters for operator number
+	void set_chnum(u8 chnum)
+	{
+		assert(chnum < CHANNELS);
+		m_chnum = chnum;
+		m_choffs = channel_offset(chnum);
+	}
 	void set_opnum(u8 opnum)
 	{
-		static const u16 s_opoffs[OPERATORS] =
-		{
-			0x000,0x001,0x002, 0x004,0x005,0x006, 0x008,0x009,0x00a, 0x00c,0x00d,0x00e
-		};
 		assert(opnum < OPERATORS);
 		m_opnum = opnum;
-		m_opoffs = s_opoffs[opnum];
+		m_opoffs = operator_offset(opnum);
 	}
 
 	// return an array of operator indices for each channel
@@ -555,6 +584,8 @@ public:
 
 	// system-wide registers
 	u8 test() const               /*  8 bits */ { return sysbyte(0x21, 0, 8); }
+	u8 lfo_enabled() const        /*  3 bits */ { return IsOpnA ? sysbyte(0x22, 3, 1) : 0; }
+	u8 lfo_rate() const           /*  3 bits */ { return IsOpnA ? sysbyte(0x22, 0, 3) : 0; }
 	u16 timer_a_value() const     /* 10 bits */ { return sysword(0x24, 0, 8, 0x25, 0, 2); }
 	u8 timer_b_value() const      /*  8 bits */ { return sysbyte(0x26, 0, 8); }
 	u8 csm() const                /*  2 bits */ { return (sysbyte(0x27, 6, 2) == 2); }
@@ -565,14 +596,16 @@ public:
 	u8 enable_timer_a() const     /*  1 bit  */ { return sysbyte(0x27, 2, 1); }
 	u8 load_timer_b() const       /*  1 bit  */ { return sysbyte(0x27, 1, 1); }
 	u8 load_timer_a() const       /*  1 bit  */ { return sysbyte(0x27, 0, 1); }
-	u16 multi_block_freq0() const /* 14 bits */ { return sysword(0xac, 0, 6, 0xa8, 0, 8); }
-	u16 multi_block_freq1() const /* 14 bits */ { return sysword(0xad, 0, 6, 0xa9, 0, 8); }
-	u16 multi_block_freq2() const /* 14 bits */ { return sysword(0xae, 0, 6, 0xaa, 0, 8); }
+	u16 multi_block_freq(u8 num) const /* 14 bits */ { return sysword(0xac + num, 0, 6, 0xa8 + num, 0, 8); }
 
 	// per-channel registers
 	u16 block_freq() const        /* 14 bits */ { return chword(0xa4, 0, 6, 0xa0, 0, 8); }
 	u8 feedback() const           /*  3 bits */ { return chbyte(0xb0, 3, 3); }
 	u8 algorithm() const          /*  3 bits */ { return chbyte(0xb0, 0, 3); }
+	u8 output0() const            /*  1 bit  */ { return IsOpnA ? chbyte(0xb4, 7, 1) : 1; }
+	u8 output1() const            /*  1 bit  */ { return IsOpnA ? chbyte(0xb4, 6, 1) : 0; }
+	u8 lfo_am_sensitivity() const /*  2 bits */ { return IsOpnA ? chbyte(0xb4, 4, 2) : 0; }
+	u8 lfo_pm_sensitivity() const /*  3 bits */ { return IsOpnA ? chbyte(0xb4, 0, 3) : 0; }
 
 	// per-operator registers
 	u8 detune() const             /*  3 bits */ { return opbyte(0x30, 4, 3); }
@@ -581,138 +614,22 @@ public:
 	u8 ksr() const                /*  2 bits */ { return opbyte(0x50, 6, 2); }
 	u8 attack_rate() const        /*  5 bits */ { return opbyte(0x50, 0, 5); }
 	u8 decay_rate() const         /*  5 bits */ { return opbyte(0x60, 0, 5); }
+	u8 lfo_am_enabled() const     /*  1 bit  */ { return IsOpnA ? opbyte(0x60, 7, 1) : 0; }
 	u8 sustain_rate() const       /*  5 bits */ { return opbyte(0x70, 0, 5); }
 	u8 sustain_level() const      /*  4 bits */ { return opbyte(0x80, 4, 4); }
 	u8 release_rate() const       /*  4 bits */ { return opbyte(0x80, 0, 4); }
 	u8 ssg_eg_enabled() const     /*  1 bit  */ { return opbyte(0x90, 3, 1); }
 	u8 ssg_eg_mode() const        /*  3 bits */ { return opbyte(0x90, 0, 3); }
-
-	// no LFO on OPN
-	u8 lfo_enabled() const { return 0; }
 };
 
-
-// ======================> ymopna_registers
-
-//
-// OPNA/OPNB/OPNB2/OPN2 register map:
-//
-//      System-wide registers:
-//           21 xxxxxxxx Test register
-//           22 ----x--- LFO enable (new for OPNA)
-//              -----xxx LFO rate (new for OPNA)
-//           24 xxxxxxxx Timer A value (upper 8 bits)
-//           25 ------xx Timer A value (lower 2 bits)
-//           26 xxxxxxxx Timer B value
-//           27 xx------ CSM/Multi-frequency mode for channel #2
-//              --x----- Reset timer B
-//              ---x---- Reset timer A
-//              ----x--- Enable timer B
-//              -----x-- Enable timer A
-//              ------x- Load timer B
-//              -------x Load timer A
-//           28 x------- Key on/off operator 4
-//              -x------ Key on/off operator 3
-//              --x----- Key on/off operator 2
-//              ---x---- Key on/off operator 1
-//              -----x-- Upper channel select (new for OPNA)
-//              ------xx Channel select
-//
-//     Per-operator registers (channel in address bits 0-1,8, operator in bits 2-3)
-//     Note that all these apply to address+100 as well
-//        30-3F -xxx---- Detune value (0-7)
-//              ----xxxx Multiple value (0-15)
-//        40-4F -xxxxxxx Total level (0-127)
-//        50-5F xx------ Key scale rate (0-3)
-//              ---xxxxx Attack rate (0-31)
-//        60-6F x------- LFO AM enable (new for OPNA)
-//              ---xxxxx Decay rate (0-31)
-//        70-7F ---xxxxx Sustain rate (0-31)
-//        80-8F xxxx---- Sustain level (0-15)
-//              ----xxxx Release rate (0-15)
-//        90-9F ----x--- SSG-EG enable
-//              -----xxx SSG-EG envelope (0-7)
-//
-//     Per-channel registers (channel in address bits 0-1,8)
-//     Note that all these apply to address+100 as well
-//        A0-A3 xxxxxxxx Frequency number lower 8 bits
-//        A4-A7 --xxx--- Block (0-7)
-//              -----xxx Frequency number upper 3 bits
-//        B0-B3 --xxx--- Feedback level for operator 1 (0-7)
-//              -----xxx Operator connection algorithm (0-7)
-//        B4-B7 x------- Pan left (new for OPNA)
-//              -x------ Pan right (new for OPNA)
-//              --xx---- LFO AM shift (0-3) (new for OPNA)
-//              -----xxx LFO PM depth (0-7) (new for OPNA)
-//
-//     Special multi-frequency registers (channel implicitly #2; operator in address bits 0-1)
-//        A8-AB xxxxxxxx Frequency number lower 8 bits
-//        AC-AF --xxx--- Block (0-7)
-//              -----xxx Frequency number upper 3 bits
-//
-//     Internal (fake) registers:
-//        B8-BB --xxxxxx Latched frequency number upper bits (from A4-A7)
-//        BC-BF --xxxxxx Latched frequency number upper bits (from AC-AF)
-//
-
-class ymopna_registers : public ymopn_registers
-{
-public:
-	// constants
-	static constexpr u8 OUTPUTS = 2;
-	static constexpr u8 CHANNELS = 6;
-	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
-	static constexpr u8 OPERATORS = CHANNELS * 4;
-	static constexpr u16 REGISTERS = 0x200;
-
-	// constructor
-	ymopna_registers(u8 *regdata);
-
-	// setters for channel and operator base within the register file
-	void set_chnum(u8 chnum)
-	{
-		assert(chnum < CHANNELS);
-		m_chnum = chnum;
-		m_choffs = chnum % 3 + 0x100 * (chnum / 3);
-	}
-	void set_opnum(u8 opnum)
-	{
-		static const u16 s_opoffs[OPERATORS] =
-		{
-			0x000,0x001,0x002, 0x004,0x005,0x006, 0x008,0x009,0x00a, 0x00c,0x00d,0x00e,
-			0x100,0x101,0x102, 0x104,0x105,0x106, 0x108,0x109,0x10a, 0x10c,0x10d,0x10e
-		};
-		assert(opnum < OPERATORS);
-		m_opnum = opnum;
-		m_opoffs = s_opoffs[opnum];
-	}
-
-	// return an array of operator indices for each channel
-	struct operator_mapping { u32 chan[CHANNELS]; };
-	void operator_map(operator_mapping &dest) const;
-
-	// reset to initial state
-	void reset();
-
-	// OPNA-specific system-wide registers
-	u8 lfo_enabled() const        /*  3 bits */ { return sysbyte(0x22, 3, 1); }
-	u8 lfo_rate() const           /*  3 bits */ { return sysbyte(0x22, 0, 3); }
-
-	// OPNA-specific per-channel registers
-	u8 output0() const            /*  1 bit  */ { return chbyte(0xb4, 7, 1); }
-	u8 output1() const            /*  1 bit  */ { return chbyte(0xb4, 6, 1); }
-	u8 lfo_am_sensitivity() const /*  2 bits */ { return chbyte(0xb4, 4, 2); }
-	u8 lfo_pm_sensitivity() const /*  3 bits */ { return chbyte(0xb4, 0, 3); }
-
-	// OPNA-specific per-operator registers
-	u8 lfo_am_enabled() const     /*  1 bit  */ { return opbyte(0x60, 7, 1); }
-};
+using ymopn_registers = ymopn_registers_base<false>;
+using ymopna_registers = ymopn_registers_base<true>;
 
 
-// ======================> ymopl_registers, ymopl2_registers
+// ======================> ymopl_registers_base
 
 //
-// OPL/OPL2 register map:
+// OPL/OPL2/OPL3/OPL4 register map:
 //
 //      System-wide registers:
 //           01 xxxxxxxx Test register
@@ -724,7 +641,7 @@ public:
 //              --x----- Mask timer B
 //              ------x- Load timer B
 //              -------x Load timer A
-//           08 x------- CSM mode
+//           08 x------- CSM mode [OPL/OPL2 only]
 //              -x------ Note select
 //           BD x------- AM depth
 //              -x------ PM depth
@@ -734,16 +651,18 @@ public:
 //              -----x-- Tom key on
 //              ------x- Top cymbal key on
 //              -------x High hat key on
-//
-//     Per-channel registers (channel in address bits 0-3)
-//        A0-A8 xxxxxxxx F-number (low 8 bits)
-//        B0-B8 --x----- Key on
-//              ---xxx-- Block (octvate, 0-7)
-//              ------xx F-number (high two bits)
-//        C0-C8 ----xxx- Feedback level for operator 1 (0-7)
-//              -------x Operator connection algorithm
+//          101 --xxxxxx Test register 2 [OPL3 only]
+//          104 --x----- Channel 6 4-operator mode [OPL3 only]
+//              ---x---- Channel 5 4-operator mode [OPL3 only]
+//              ----x--- Channel 4 4-operator mode [OPL3 only]
+//              -----x-- Channel 3 4-operator mode [OPL3 only]
+//              ------x- Channel 2 4-operator mode [OPL3 only]
+//              -------x Channel 1 4-operator mode [OPL3 only]
+//          105 -------x New [OPL3 only]
+//              ------x- New2 [OPL4 only]
 //
 //     Per-operator registers (operator in bits 0-5)
+//     Note that all these apply to address+100 as well on OPL3+
 //        20-35 x------- AM enable
 //              -x------ PM enable (VIB)
 //              --x----- EG type
@@ -756,44 +675,79 @@ public:
 //        80-95 xxxx---- Sustain level (0-15)
 //              ----xxxx Release rate (0-15)
 //        E0-F5 ------xx Wave select (0-3) [OPL2 only]
+//              -----xxx Wave select (0-7) [OPL3+ only]
+//
+//     Per-channel registers (channel in address bits 0-3)
+//     Note that all these apply to address+100 as well on OPL3+
+//        A0-A8 xxxxxxxx F-number (low 8 bits)
+//        B0-B8 --x----- Key on
+//              ---xxx-- Block (octvate, 0-7)
+//              ------xx F-number (high two bits)
+//        C0-C8 ----xxx- Feedback level for operator 1 (0-7)
+//              -------x Operator connection algorithm
 //
 
-class ymopl_registers : public ymfm_registers_base
+template<int Revision>
+class ymopl_registers_base : public ymfm_registers_base
 {
+	static constexpr bool IsOpl2 = (Revision == 2);
+	static constexpr bool IsOpl2Plus = (Revision >= 2);
+	static constexpr bool IsOpl3Plus = (Revision >= 3);
+	static constexpr bool IsOpl4Plus = (Revision >= 4);
+
 public:
 	// constants
 	static constexpr family_type FAMILY = FAMILY_OPL;
-	static constexpr u8 OUTPUTS = 1;
-	static constexpr u8 CHANNELS = 9;
+	static constexpr u8 OUTPUTS = IsOpl3Plus ? 4 : 1;
+	static constexpr u8 CHANNELS = IsOpl3Plus ? 18 : 9;
 	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
 	static constexpr u8 OPERATORS = CHANNELS * 2;
 	static constexpr u8 DYNAMIC_OPS = false;
-	static constexpr u16 REGISTERS = 0x100;
+	static constexpr u16 REGISTERS = IsOpl3Plus ? 0x200 : 0x100;
 	static constexpr u16 REG_MODE = 0x04;
-	static constexpr u8 DEFAULT_PRESCALE = 4;
+	static constexpr u8 DEFAULT_PRESCALE = IsOpl3Plus ? 8 : 4;
 	static constexpr u8 EG_CLOCK_DIVIDER = 1;
 	static constexpr bool EG_HAS_DEPRESS = false;
-	static constexpr bool MODULATOR_DELAY = true;
-	static constexpr u32 CSM_TRIGGER_MASK = 0x1ff;
+	static constexpr bool MODULATOR_DELAY = !IsOpl3Plus;
+	static constexpr u32 CSM_TRIGGER_MASK = ALL_CHANNELS;
 	static constexpr u8 STATUS_TIMERA = 0x40;
 	static constexpr u8 STATUS_TIMERB = 0x20;
 	static constexpr u8 STATUS_BUSY = 0;
 	static constexpr u8 STATUS_IRQ = 0x80;
 
 	// constructor
-	ymopl_registers(u8 *regdata);
+	ymopl_registers_base(u8 *regdata);
+
+	// offsets to channels and operators
+	static constexpr u16 channel_offset(u8 chnum)
+	{
+		assert(chnum < CHANNELS);
+		if (!IsOpl3Plus)
+			return chnum;
+		else
+			return (chnum % 9) + 0x100 * (chnum / 9);
+	}
+	static constexpr u16 operator_offset(u8 opnum)
+	{
+		assert(opnum < OPERATORS);
+		if (!IsOpl3Plus)
+			return opnum + 2 * (opnum / 6);
+		else
+			return (opnum % 18) + 2 * ((opnum % 18) / 6) + 0x100 * (opnum / 18);
+	}
 
 	// setters for operator number
+	void set_chnum(u8 chnum)
+	{
+		assert(chnum < CHANNELS);
+		m_chnum = chnum;
+		m_choffs = channel_offset(chnum);
+	}
 	void set_opnum(u8 opnum)
 	{
-		static const u16 s_opoffs[OPERATORS] =
-		{
-			0x000,0x001,0x002,0x003,0x004,0x005, 0x008,0x009,0x00A,0x00B,0x00C,0x00D,
-			0x010,0x011,0x012,0x013,0x014,0x015
-		};
 		assert(opnum < OPERATORS);
 		m_opnum = opnum;
-		m_opoffs = s_opoffs[opnum];
+		m_opoffs = operator_offset(opnum);
 	}
 
 	// return an array of operator indices for each channel
@@ -828,6 +782,7 @@ public:
 
 	// system-wide registers
 	u8 test() const               /*  8 bits */ { return sysbyte(0x01, 0, 8); }
+	u8 waveform_enable() const    /*  1 bits */ { return IsOpl2 ? sysbyte(0x01, 5, 1) : (IsOpl3Plus ? 1 : 0); }
 	u16 timer_a_value() const     /*  8 bits */ { return sysbyte(0x02, 0, 8) * 4; } // 8->10 bits
 	u8 timer_b_value() const      /*  8 bits */ { return sysbyte(0x03, 0, 8); }
 	u8 status_mask() const        /*  8 bits */ { return sysbyte(0x04, 0, 8) & 0x78; }
@@ -838,17 +793,23 @@ public:
 	u8 enable_timer_a() const     /*  1 bit  */ { return sysbyte(0x04, 6, 1) ^ 1; }
 	u8 load_timer_b() const       /*  1 bit  */ { return sysbyte(0x04, 1, 1); }
 	u8 load_timer_a() const       /*  1 bit  */ { return sysbyte(0x04, 0, 1); }
-	u8 csm() const                /*  1 bit  */ { return sysbyte(0x08, 7, 1); }
+	u8 csm() const                /*  1 bit  */ { return IsOpl3Plus ? 0 : sysbyte(0x08, 7, 1); }
 	u8 note_select() const        /*  1 bit  */ { return sysbyte(0x08, 6, 1); }
 	u8 lfo_am_depth() const       /*  1 bit  */ { return sysbyte(0xbd, 7, 1) * 2; } // 1->2 bits
 	u8 lfo_pm_depth() const       /*  1 bit  */ { return sysbyte(0xbd, 6, 1); }
 	u8 rhythm_enable() const      /*  1 bit  */ { return sysbyte(0xbd, 5, 1); }
 	u8 rhythm_keyon() const       /*  5 bits */ { return sysbyte(0xbd, 4, 0); }
+	u8 newflag() const            /*  1 bit  */ { return IsOpl3Plus ? sysbyte(0x105, 0, 1) : 0; }
+	u8 fourop_enable() const      /*  6 bits */ { return IsOpl3Plus ? sysbyte(0x104, 0, 6) : 0; }
 
 	// per-channel registers
 	u16 block_freq() const        /* 13 bits */ { return chword(0xb0, 0, 5, 0xa0, 0, 8) * 2; } // 13->14 bits
 	u8 feedback() const           /*  3 bits */ { return chbyte(0xc0, 1, 3); }
-	u8 algorithm() const          /*  1 bit  */ { return chbyte(0xc0, 0, 1); }
+	u8 algorithm() const          /*  1 bit  */ { return chbyte(0xc0, 0, 1) | (IsOpl3Plus ? (8 | (chbyte(0xc3, 0, 1) << 1)) : 0); }
+	u8 output0() const            /*  1 bit  */ { return IsOpl3Plus ? chbyte(0xc0, 5, 1) : 1; }
+	u8 output1() const            /*  1 bit  */ { return IsOpl3Plus ? chbyte(0xc0, 4, 1) : 0; }
+	u8 output2() const            /*  1 bit  */ { return IsOpl3Plus ? chbyte(0xc0, 6, 1) : 0; }
+	u8 output3() const            /*  1 bit  */ { return IsOpl3Plus ? chbyte(0xc0, 7, 1) : 0; }
 
 	// per-operator registers
 	u8 lfo_am_enabled() const     /*  1 bit  */ { return opbyte(0x20, 7, 1); }
@@ -862,23 +823,12 @@ public:
 	u8 decay_rate() const         /*  4 bits */ { return opbyte(0x60, 0, 4); }
 	u8 sustain_level() const      /*  4 bits */ { return opbyte(0x80, 4, 4); }
 	u8 release_rate() const       /*  4 bits */ { return opbyte(0x80, 0, 4); }
+	u8 waveform() const           /*  2 bits */ { return IsOpl2Plus ? opbyte(0xe0, 0, IsOpl3Plus ? 3 : 2) : 0; }
 };
 
-class ymopl2_registers : public ymopl_registers
-{
-public:
-	// constructor
-	ymopl2_registers(u8 *regdata) :
-		ymopl_registers(regdata)
-	{
-	}
-
-	// system-wide registers
-	u8 waveform_enable() const    /*  1 bits */ { return sysbyte(0x01, 5, 1); }
-
-	// per-operator registers
-	u8 waveform() const           /*  2 bits */ { return opbyte(0xe0, 0, 2); }
-};
+using ymopl_registers = ymopl_registers_base<1>;
+using ymopl2_registers = ymopl_registers_base<2>;
+using ymopl3_registers = ymopl_registers_base<3>;
 
 
 // ======================> ymopll_registers
@@ -1045,132 +995,6 @@ private:
 };
 
 
-// ======================> ymopl3_registers
-
-//
-// OPL3 register map:
-//
-//      System-wide registers:
-//           01 xxxxxxxx Test register
-//           02 xxxxxxxx Timer A value (4 * OPN)
-//           03 xxxxxxxx Timer B value
-//           04 x------- RST
-//              -x------ Mask timer A
-//              --x----- Mask timer B
-//              ------x- Load timer B
-//              -------x Load timer A
-//           08 -x------ Note select
-//           BD x------- AM depth
-//              -x------ PM depth
-//              --x----- Rhythm enable
-//              ---x---- Bass drum key on
-//              ----x--- Snare drum key on
-//              -----x-- Tom key on
-//              ------x- Top cymbal key on
-//              -------x High hat key on
-//          101 --xxxxxx Test register 2
-//          104 --x----- Channel 6 4-operator mode
-//              ---x---- Channel 5 4-operator mode
-//              ----x--- Channel 4 4-operator mode
-//              -----x-- Channel 3 4-operator mode
-//              ------x- Channel 2 4-operator mode
-//              -------x Channel 1 4-operator mode
-//          105 -------x New
-//
-//     Per-channel registers (channel in address bits 0-3)
-//     Note that all these apply to address+100 as well
-//        A0-A8 xxxxxxxx F-number (low 8 bits)
-//        B0-B8 --x----- Key on
-//              ---xxx-- Block (octvate, 0-7)
-//              ------xx F-number (high two bits)
-//        C0-C8 x------- External output 1
-//              -x------ External output 0
-//              --x----- Stereo left
-//              ---x---- Stereo right
-//              ----xxx- Feedback level for operator 1 (0-7)
-//              -------x Operator connection algorithm
-//
-//     Per-operator registers (operator in bits 0-5)
-//     Note that all these apply to address+100 as well
-//        20-35 x------- AM enable
-//              -x------ PM enable (VIB)
-//              --x----- EG type
-//              ---x---- Key scale rate
-//              ----xxxx Multiple value (0-15)
-//        40-55 xx------ Key scale level (0-3)
-//              --xxxxxx Total level (0-63)
-//        60-75 xxxx---- Attack rate (0-15)
-//              ----xxxx Decay rate (0-15)
-//        80-95 xxxx---- Sustain level (0-15)
-//              ----xxxx Release rate (0-15)
-//        E0-F5 -----xxx Wave select (0-7)
-//
-
-class ymopl3_registers : public ymopl_registers
-{
-public:
-	// constants
-	static constexpr family_type FAMILY = FAMILY_OPL;
-	static constexpr u8 OUTPUTS = 4;
-	static constexpr u8 CHANNELS = 9*2;
-	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
-	static constexpr u8 OPERATORS = CHANNELS * 2;
-	static constexpr u8 DYNAMIC_OPS = true;
-	static constexpr u16 REGISTERS = 0x200;
-	static constexpr u8 DEFAULT_PRESCALE = 8;
-	static constexpr bool MODULATOR_DELAY = false;
-	static constexpr u32 CSM_TRIGGER_MASK = 0;
-
-	// constructor
-	ymopl3_registers(u8 *regdata);
-
-	// setters for operator number
-	void set_chnum(u8 chnum)
-	{
-		assert(chnum < CHANNELS);
-		m_chnum = chnum;
-		m_choffs = chnum % 9 + 0x100 * (chnum / 9);
-	}
-	void set_opnum(u8 opnum)
-	{
-		static const u16 s_opoffs[OPERATORS] =
-		{
-			0x000,0x001,0x002,0x003,0x004,0x005, 0x008,0x009,0x00a,0x00b,0x00c,0x00d,
-			0x010,0x011,0x012,0x013,0x014,0x015,
-			0x100,0x101,0x102,0x103,0x104,0x105, 0x108,0x109,0x10a,0x10b,0x10c,0x10d,
-			0x110,0x111,0x112,0x113,0x114,0x115
-		};
-		assert(opnum < OPERATORS);
-		m_opnum = opnum;
-		m_opoffs = s_opoffs[opnum];
-	}
-
-	// return an array of operator indices for each channel
-	struct operator_mapping { u32 chan[CHANNELS]; };
-	void operator_map(operator_mapping &dest) const;
-
-	// reset to initial state
-	void reset();
-
-	// OPL3-specific system-wide registers
-	u8 csm() const                /*  1 bit  */ { return 0; }
-	u8 newflag() const            /*  1 bit  */ { return sysbyte(0x105, 0, 1); }
-	u8 fourop_enable() const      /*  6 bits */ { return sysbyte(0x104, 0, 6); }
-
-	// OPL3-specific per-channel registers
-	u8 algorithm() const          /*  2 bits */ { return 8 | (chbyte(0xc3, 0, 1) << 1) | chbyte(0xc0, 0, 1); }
-	u8 output0() const            /*  1 bit  */ { return chbyte(0xc0, 5, 1); }
-	u8 output1() const            /*  1 bit  */ { return chbyte(0xc0, 4, 1); }
-	u8 output2() const            /*  1 bit  */ { return chbyte(0xc0, 6, 1); }
-	u8 output3() const            /*  1 bit  */ { return chbyte(0xc0, 7, 1); }
-
-	// per-operator registers
-	u8 waveform_enable() const    /*  1 bits */ { return 1; }
-	u8 waveform() const           /*  2 bits */ { return opbyte(0xe0, 0, newflag() ? 3 : 2); }
-};
-
-
-
 //*********************************************************
 //  CORE ENGINE CLASSES
 //*********************************************************
@@ -1288,6 +1112,10 @@ public:
 
 	// compute the channel output and add to the left/right output sums
 	void output(u8 lfo_raw_am, u8 noise_state, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
+
+	// specific 2-operator and 4-operator output handlers
+	void output_2op(u8 lfo_raw_am, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
+	void output_4op(u8 lfo_raw_am, u8 noise_state, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
 
 	// compute the special OPL rhythm channel outputs
 	void output_rhythm_ch6(u8 lfo_raw_am, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
