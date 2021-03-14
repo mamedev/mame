@@ -14,6 +14,7 @@ dvd check for bmiidx, bmiidxa, bmiidxc & bmiidxca
 The first 128k of RF5C400 bank 0 is uploaded by the 68000, the rest is unused. It may be using 16J & 18J
 emulate dvd player and video mixing
 16seg led font
+The SPU has an IRQ2 handler that doesn't do anything, find out if or to what it is connected.
 
 
 Konami Twinkle Hardware Overview
@@ -1048,7 +1049,6 @@ void twinkle_state::twinkle(machine_config &config)
 	M68000(config, m_audiocpu, 32000000/2);    /* 16.000 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &twinkle_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(twinkle_state::irq1_line_assert), attotime::from_hz(60));
-	m_audiocpu->set_periodic_int(FUNC(twinkle_state::irq2_line_assert), attotime::from_hz(60));
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_msec(1200)); /* check TD pin on LTC1232 */
 
