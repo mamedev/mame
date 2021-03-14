@@ -694,8 +694,10 @@ void device_cococart_interface::set_line_value(cococart_slot_device::line line, 
 void coco_cart_add_basic_devices(device_slot_interface &device)
 {
 	// basic devices, on both the main slot and the Multi-Pak interface
-	device.option_add_internal("banked_16k", COCO_PAK_BANKED);
-	device.option_add_internal("pak", COCO_PAK);
+//	device.option_add_internal("banked_16k", COCO_PAK_BANKED);
+	device.option_add("banked_16k", COCO_PAK_BANKED);
+//	device.option_add_internal("pak", COCO_PAK);
+	device.option_add("pak", COCO_PAK);
 	device.option_add("ccpsg", COCO_PSG);
 	device.option_add("dcmodem", COCO_DCMODEM);
 	device.option_add("games_master", COCO_PAK_GMC);
