@@ -1,7 +1,7 @@
 // license:GPLv2+
 // copyright-holders:Felipe Sanches
 #include "emu.h"
-#include "cpu/i386/i386.h"
+#include "cpu/i386/i386ex.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/ins8250.h"
 
@@ -203,14 +203,14 @@ static void bit_pattern(char* bits, int n, int data){
 uint16_t vmp3700_state::p1_data_r(offs_t offset)
 {
 	//TODO: Implement-me!
-        return m_port1;
+	return m_port1;
 }
 
 void vmp3700_state::p1_data_w(offs_t offset, uint16_t data)
 {
 	//TODO: Implement-me!
-        char bits[9];
-        bit_pattern(bits, 8, data);
+	char bits[9];
+	bit_pattern(bits, 8, data);
 	logerror("Port 1 data write:\t %02X [%s]\n", data, bits);
 	logerror("Serial port #1 routed to: %s\n", BIT(data, 6) ? "Audio Module" : "Front Panel");
 	m_port1 = data;
@@ -219,14 +219,14 @@ void vmp3700_state::p1_data_w(offs_t offset, uint16_t data)
 uint16_t vmp3700_state::p2_data_r(offs_t offset)
 {
 	//TODO: Implement-me!
-        return m_port2;
+	return m_port2;
 }
 
 void vmp3700_state::p2_data_w(offs_t offset, uint16_t data)
 {
 	//TODO: Implement-me!
-        char bits[9];
-        bit_pattern(bits, 8, data);
+	char bits[9];
+	bit_pattern(bits, 8, data);
 	logerror("Port 2 data write:\t %02X [%s]\n", data, bits);
 	m_port2 = data;
 }
@@ -242,13 +242,13 @@ U4 A21 = P3.6 pin 86
 
 uint16_t vmp3700_state::p3_data_r(offs_t offset)
 {
-        return m_port3;
+	return m_port3;
 }
 
 void vmp3700_state::p3_data_w(offs_t offset, uint16_t data)
 {
-        char bits[9];
-        bit_pattern(bits, 8, data);
+	char bits[9];
+	bit_pattern(bits, 8, data);
 	m_maskrom_bank = (data >> 2) & 0x1f;
 
 	logerror("Port 3 data write:\t %02X [%s] -- BANK SELECTION: %d\n", data, bits, m_maskrom_bank);
@@ -260,7 +260,7 @@ void vmp3700_state::p3_data_w(offs_t offset, uint16_t data)
 uint16_t vmp3700_state::p1_dir_r(offs_t offset)
 {
 	//TODO: Implement-me!
-        return m_port1_direction;
+	return m_port1_direction;
 }
 
 void vmp3700_state::p1_dir_w(offs_t offset, uint16_t data)
@@ -275,7 +275,7 @@ void vmp3700_state::p1_dir_w(offs_t offset, uint16_t data)
 uint16_t vmp3700_state::p2_dir_r(offs_t offset)
 {
 	//TODO: Implement-me!
-        return m_port2_direction;
+	return m_port2_direction;
 }
 
 void vmp3700_state::p2_dir_w(offs_t offset, uint16_t data)
@@ -290,7 +290,7 @@ void vmp3700_state::p2_dir_w(offs_t offset, uint16_t data)
 uint16_t vmp3700_state::p3_dir_r(offs_t offset)
 {
 	//TODO: Implement-me!
-        return m_port3_direction;
+	return m_port3_direction;
 }
 
 void vmp3700_state::p3_dir_w (offs_t offset, uint16_t data)
@@ -307,14 +307,14 @@ void vmp3700_state::p3_dir_w (offs_t offset, uint16_t data)
 uint16_t vmp3700_state::p1_config_r(offs_t offset)
 {
 	//TODO: Implement-me!
-        return m_port1_config;
+	return m_port1_config;
 }
 
 void vmp3700_state::p1_config_w (offs_t offset, uint16_t data)
 {
 	//TODO: Implement-me!
-        char bits[9];
-        bit_pattern(bits, 8, data);
+	char bits[9];
+	bit_pattern(bits, 8, data);
 	logerror("Port 1 config:\t %02X [%s]\n", data, bits);
 	m_port1_config = data;
 }
@@ -322,14 +322,14 @@ void vmp3700_state::p1_config_w (offs_t offset, uint16_t data)
 uint16_t vmp3700_state::p2_config_r(offs_t offset)
 {
 	//TODO: Implement-me!
-        return m_port2_config;
+	return m_port2_config;
 }
 
 void vmp3700_state::p2_config_w(offs_t offset, uint16_t data)
 {
 	//TODO: Implement-me!
-        char bits[9];
-        bit_pattern(bits, 8, data);
+	char bits[9];
+	bit_pattern(bits, 8, data);
 	logerror("Port 2 config:\t %02X [%s]\n", data, bits);
 	m_port2_config = data;
 }
@@ -337,14 +337,14 @@ void vmp3700_state::p2_config_w(offs_t offset, uint16_t data)
 uint16_t vmp3700_state::p3_config_r(offs_t offset)
 {
 	//TODO: Implement-me!
-        return m_port3_config;
+	return m_port3_config;
 }
 
 void vmp3700_state::p3_config_w(offs_t offset, uint16_t data)
 {
 	//TODO: Implement-me!
-        char bits[9];
-        bit_pattern(bits, 8, data);
+	char bits[9];
+	bit_pattern(bits, 8, data);
 	logerror("Port 3 config:\t %02X [%s]\n", data, bits);
 	m_port3_config = data;
 }

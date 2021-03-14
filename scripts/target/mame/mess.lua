@@ -1337,7 +1337,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"quantel",
 		"qume",
 		"radio",
-                "rafelectronics",
+		"rafelectronics",
 		"rca",
 		"regnecentralen",
 		"ritam",
