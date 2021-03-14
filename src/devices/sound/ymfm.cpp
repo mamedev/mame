@@ -1618,6 +1618,11 @@ void ymopl_registers_base<Revision>::cache_operator_data(u16 choffs, u16 opoffs,
 template<int Revision>
 s8 ymopl_registers_base<Revision>::clock_noise_and_lfo()
 {
+	// OPL has a 23-bit noise generator for the rhythm section, running at
+	// a constant rate, used only for percussion input
+	m_noise_lfsr <<= 1;
+	m_noise_lfsr |= BIT(m_noise_lfsr, 23) ^ BIT(m_noise_lfsr, 9) ^ BIT(m_noise_lfsr, 8) ^ BIT(m_noise_lfsr, 1);
+
 	// OPL has two fixed-frequency LFOs, one for AM, one for PM
 
 	// the AM LFO has 210*64 steps; at a nominal 50kHz output,
@@ -1897,6 +1902,11 @@ void ymopll_registers::cache_operator_data(u16 choffs, u16 opoffs, ymfm_opdata_c
 
 s8 ymopll_registers::clock_noise_and_lfo()
 {
+	// OPL has a 23-bit noise generator for the rhythm section, running at
+	// a constant rate, used only for percussion input
+	m_noise_lfsr <<= 1;
+	m_noise_lfsr |= BIT(m_noise_lfsr, 23) ^ BIT(m_noise_lfsr, 9) ^ BIT(m_noise_lfsr, 8) ^ BIT(m_noise_lfsr, 1);
+
 	// OPL has two fixed-frequency LFOs, one for AM, one for PM
 	// Note that OPLL is the same as OPL but with fixed depths
 
