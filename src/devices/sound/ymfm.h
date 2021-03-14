@@ -1152,9 +1152,6 @@ public:
 	// master clocking function
 	void clock(u32 env_counter, s8 lfo_raw_pm);
 
-	// compute the channel output and add to the left/right output sums
-	void output(s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
-
 	// specific 2-operator and 4-operator output handlers
 	void output_2op(s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
 	void output_4op(s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
@@ -1163,6 +1160,14 @@ public:
 	void output_rhythm_ch6(s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
 	void output_rhythm_ch7(u8 phase_select, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
 	void output_rhythm_ch8(u8 phase_select, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
+
+	// are we a 4-operator channel or a 2-operator one?
+	bool is4op() const
+	{
+		if (RegisterType::DYNAMIC_OPS)
+			return (m_op[2] != nullptr);
+		return (RegisterType::OPERATORS / RegisterType::CHANNELS == 4);
+	}
 
 	// return a reference to our registers
 	RegisterType &regs() { return m_regs; }

@@ -2529,18 +2529,22 @@ void ymfm_channel<RegisterType>::keyonoff(u8 states, ymfm_keyon_type type)
 template<class RegisterType>
 bool ymfm_channel<RegisterType>::prepare()
 {
-	bool active = false;
+	u8 active_mask = 0;
 
-	// prepare all operators determine if they are active
-	// if none active, then this channel is not active
-	// NOTE: this could be further optimized by only considering
-	// operators that sum to the final output.
+	// prepare all operators and determine if they are active
 	for (int opnum = 0; opnum < std::size(m_op); opnum++)
 		if (m_op[opnum] != nullptr)
 			if (m_op[opnum]->prepare())
-				active = true;
+				active_mask |= 1 << opnum;
 
-	return active;
+	// if none of the output operators are active, the
+	// channel is not active
+	static const u8 s_2op_active_mask[2] = { 2,3 };
+	static const u8 s_4op_active_mask[12] = { 8,8,8,8,10,14,14,15,8,9,10,13 };
+	u8 algorithm = m_regs.ch_algorithm(m_choffs);
+	active_mask &= is4op() ? s_4op_active_mask[algorithm] : s_2op_active_mask[BIT(algorithm, 0)];
+
+	return (active_mask != 0);
 }
 
 
@@ -2558,28 +2562,6 @@ void ymfm_channel<RegisterType>::clock(u32 env_counter, s8 lfo_raw_pm)
 	for (int opnum = 0; opnum < std::size(m_op); opnum++)
 		if (m_op[opnum] != nullptr)
 			m_op[opnum]->clock(env_counter, lfo_raw_pm);
-}
-
-
-//-------------------------------------------------
-//  output - output the channel
-//-------------------------------------------------
-
-template<class RegisterType>
-void ymfm_channel<RegisterType>::output(s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const
-{
-	// handle the dynamic vs 4-op vs 2-op cases separately
-	if (RegisterType::DYNAMIC_OPS)
-	{
-		if (m_op[2] != nullptr)
-			output_4op(outputs, rshift, clipmax);
-		else if (m_op[0] != nullptr)
-			output_2op(outputs, rshift, clipmax);
-	}
-	else if (RegisterType::OPERATORS / RegisterType::CHANNELS == 4)
-		output_4op(outputs, rshift, clipmax);
-	else
-		output_2op(outputs, rshift, clipmax);
 }
 
 
@@ -2704,7 +2686,7 @@ void ymfm_channel<RegisterType>::output_4op(s32 outputs[RegisterType::OUTPUTS], 
 		ALGORITHM(0,2,6, 0,0,0),	//  2: (O1 + (O2 -> O3)) -> O4 -> out (O4)
 		ALGORITHM(1,0,7, 0,0,0),	//  3: ((O1 -> O2) + O3) -> O4 -> out (O4)
 		ALGORITHM(1,0,3, 0,1,0),	//  4: ((O1 -> O2) + (O3 -> O4)) -> out (O2+O4)
-		ALGORITHM(1,1,1, 0,1,1),	//  5: ((O1 -> O2) + (O1 -> O3) + (O1 -> O4)) ->
+		ALGORITHM(1,1,1, 0,1,1),	//  5: ((O1 -> O2) + (O1 -> O3) + (O1 -> O4)) -> out (O2+O3+O4)
 		ALGORITHM(1,0,0, 0,1,1),	//  6: ((O1 -> O2) + O3 + O4) -> out (O2+O3+O4)
 		ALGORITHM(0,0,0, 1,1,1),	//  7: (O1 + O2 + O3 + O4) -> out (O1+O2+O3+O4)
 		ALGORITHM(1,2,3, 0,0,0),	//  8: O1 -> O2 -> O3 -> O4 -> out (O4)         [same as 0]
@@ -3029,8 +3011,10 @@ void ymfm_engine_base<RegisterType>::output(s32 outputs[RegisterType::OUTPUTS], 
 					m_channel[chnum]->output_rhythm_ch7(phase_select, outputs, rshift, clipmax);
 				else if (chnum == 8)
 					m_channel[chnum]->output_rhythm_ch8(phase_select, outputs, rshift, clipmax);
+				else if (m_channel[chnum]->is4op())
+					m_channel[chnum]->output_4op(outputs, rshift, clipmax);
 				else
-					m_channel[chnum]->output(outputs, rshift, clipmax);
+					m_channel[chnum]->output_2op(outputs, rshift, clipmax);
 			}
 	}
 	else
@@ -3038,7 +3022,12 @@ void ymfm_engine_base<RegisterType>::output(s32 outputs[RegisterType::OUTPUTS], 
 		// sum over all the desired channels
 		for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
 			if (BIT(chanmask, chnum))
-				m_channel[chnum]->output(outputs, rshift, clipmax);
+			{
+				if (m_channel[chnum]->is4op())
+					m_channel[chnum]->output_4op(outputs, rshift, clipmax);
+				else
+					m_channel[chnum]->output_2op(outputs, rshift, clipmax);
+			}
 	}
 }
 
