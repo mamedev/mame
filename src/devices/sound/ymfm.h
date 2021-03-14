@@ -24,11 +24,12 @@
 
 enum ymfm_envelope_state : u8
 {
-	YMFM_ENV_ATTACK = 0,
-	YMFM_ENV_DECAY = 1,
-	YMFM_ENV_SUSTAIN = 2,
-	YMFM_ENV_RELEASE = 3,
-	YMFM_ENV_DEPRESS = 4
+	YMFM_ENV_DEPRESS = 0,
+	YMFM_ENV_ATTACK = 1,
+	YMFM_ENV_DECAY = 2,
+	YMFM_ENV_SUSTAIN = 3,
+	YMFM_ENV_RELEASE = 4,
+	YMFM_ENV_STATES = 5
 };
 
 
@@ -149,7 +150,7 @@ struct ymfm_opdata_cache
 	u16 total_level;	// total level, shifted up by 3 bits
 	s8 detune;			// detuning value
 	u8 eg_sustain;		// sustain level
-	u8 eg_rate[5];		// envelope rate for each step
+	u8 eg_rate[YMFM_ENV_STATES]; // envelope rate for each step
 };
 
 
@@ -1046,6 +1047,9 @@ enum ymfm_keyon_type : u8
 template<class RegisterType>
 class ymfm_operator
 {
+	// "quiet" value, used to optimize when we can skip doing working
+	static constexpr u16 ENV_QUIET = 0x200;
+
 public:
 	// constructor
 	ymfm_operator(ymfm_engine_base<RegisterType> &owner, u8 opnum);
@@ -1060,7 +1064,7 @@ public:
 	void set_chnum(u8 chnum) { m_chnum = chnum; m_choffs = RegisterType::channel_offset(chnum); }
 
 	// prepare prior to clocking
-	void prepare();
+	bool prepare();
 
 	// master clocking function
 	void clock(u32 env_counter, s8 lfo_raw_pm);
@@ -1143,7 +1147,7 @@ public:
 	void keyonoff(u8 states, ymfm_keyon_type type);
 
 	// prepare prior to clocking
-	void prepare();
+	bool prepare();
 
 	// master clocking function
 	void clock(u32 env_counter, s8 lfo_raw_pm);
@@ -1282,6 +1286,7 @@ protected:
 	u8 m_clock_prescale;             // prescale factor (2/3/6)
 	u8 m_irq_mask;                   // mask of which bits signal IRQs
 	u8 m_irq_state;                  // current IRQ state
+	u32 m_active_channels;           // mask of active channels computed by prepare
 	attotime m_busy_end;             // end of the busy time
 	emu_timer *m_timer[2];           // our two timers
 	devcb_write_line m_irq_handler;  // IRQ callback

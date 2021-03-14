@@ -2100,13 +2100,17 @@ void ymfm_operator<RegisterType>::reset()
 //-------------------------------------------------
 
 template<class RegisterType>
-void ymfm_operator<RegisterType>::prepare()
+bool ymfm_operator<RegisterType>::prepare()
 {
+	// cache the data
 	m_regs.cache_operator_data(m_choffs, m_opoffs, m_cache);
 
 	// clock the key state
 	clock_keystate(u8(m_keyon_live != 0));
 	m_keyon_live &= ~(1 << YMFM_KEYON_CSM);
+
+	// we're active if depressing/attacking or above quiet
+	return (m_env_state <= YMFM_ENV_ATTACK) || (m_env_attenuation < ENV_QUIET);
 }
 
 
@@ -2143,7 +2147,7 @@ s16 ymfm_operator<RegisterType>::compute_volume(u16 phase, u16 am_offset) const
 	// the full sin wave
 
 	// early out if the envelope is effectively off
-	if (m_env_attenuation > 0x200)
+	if (m_env_attenuation > ENV_QUIET)
 		return 0;
 
 	// transform the phase for the different waveforms
@@ -2523,11 +2527,20 @@ void ymfm_channel<RegisterType>::keyonoff(u8 states, ymfm_keyon_type type)
 //-------------------------------------------------
 
 template<class RegisterType>
-void ymfm_channel<RegisterType>::prepare()
+bool ymfm_channel<RegisterType>::prepare()
 {
+	bool active = false;
+
+	// prepare all operators determine if they are active
+	// if none active, then this channel is not active
+	// NOTE: this could be further optimized by only considering
+	// operators that sum to the final output.
 	for (int opnum = 0; opnum < std::size(m_op); opnum++)
 		if (m_op[opnum] != nullptr)
-			m_op[opnum]->prepare();
+			if (m_op[opnum]->prepare())
+				active = true;
+
+	return active;
 }
 
 
@@ -2855,6 +2868,7 @@ ymfm_engine_base<RegisterType>::ymfm_engine_base(device_t &device) :
 	m_clock_prescale(RegisterType::DEFAULT_PRESCALE),
 	m_irq_mask(RegisterType::STATUS_TIMERA | RegisterType::STATUS_TIMERB),
 	m_irq_state(0),
+	m_active_channels(RegisterType::ALL_CHANNELS),
 	m_busy_end(attotime::zero),
 	m_timer{ nullptr, nullptr },
 	m_irq_handler(device)
@@ -2946,9 +2960,11 @@ void ymfm_engine_base<RegisterType>::prepare(u32 chanmask)
 		assign_operators();
 
 	// call each channel to prepare
+	m_active_channels = 0;
 	for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
 		if (BIT(chanmask, chnum))
-			m_channel[chnum]->prepare();
+			if (m_channel[chnum]->prepare())
+				m_active_channels |= 1 << chnum;
 }
 
 
@@ -2988,6 +3004,9 @@ u32 ymfm_engine_base<RegisterType>::clock(u32 chanmask)
 template<class RegisterType>
 void ymfm_engine_base<RegisterType>::output(s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax, u32 chanmask) const
 {
+	// mask out inactive channels
+	chanmask &= m_active_channels;
+
 	// handle the rhythm case, where some of the operators are dedicated
 	// to percussion (this is an OPL-specific feature)
 	if (m_regs.rhythm_enable())
