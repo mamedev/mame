@@ -1697,9 +1697,9 @@ void a2_video_device::text_updateGS(screen_device &screen, bitmap_ind16 &bitmap,
 				/* calculate address */
 				uint32_t const address = start_address + ((((row / 8) & 0x07) << 7) | (((row / 8) & 0x18) * 5 + col));
 
-				plot_text_character(bitmap, col * 14, row, 1, aux_page[address],
+				plot_text_characterGS(bitmap, col * 14, row, 1, aux_page[address],
 									m_GSfg, m_GSbg);
-				plot_text_character(bitmap, col * 14 + 7, row, 1, m_ram_ptr[address],
+				plot_text_characterGS(bitmap, col * 14 + 7, row, 1, m_ram_ptr[address],
 									m_GSfg, m_GSbg);
 			}
 		}
@@ -1710,7 +1710,7 @@ void a2_video_device::text_updateGS(screen_device &screen, bitmap_ind16 &bitmap,
 				/* calculate address */
 				uint32_t const address = start_address + ((((row / 8) & 0x07) << 7) | (((row / 8) & 0x18) * 5 + col));
 
-				plot_text_character(bitmap, col * 14, row, 2, m_ram_ptr[address], m_GSfg, m_GSbg);
+				plot_text_characterGS(bitmap, col * 14, row, 2, m_ram_ptr[address], m_GSfg, m_GSbg);
 			}
 		}
 	}
