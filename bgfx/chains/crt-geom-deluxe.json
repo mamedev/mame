@@ -67,6 +67,15 @@
           "format": "%1.2f",
           "screen": "raster" },
         { "type": "float",
+          "name": "phosphor_cutoff",
+          "text": "Phosphor decay cutoff frames",
+          "default":  300.0,
+          "max"    : 1000.0,
+          "min"    :   10.0,
+          "step"   :   10.0,
+          "format": "%1.0f",
+          "screen": "raster" },
+        { "type": "float",
           "name": "phosphor_amplitude",
           "text": "Phosphor persistence amplitude",
           "default":  0.04,
@@ -227,6 +236,7 @@
             "uniforms": [
                 { "uniform": "u_phosphor_power",    "slider": "phosphor_power" },
                 { "uniform": "u_phosphor_amplitude","slider": "phosphor_amplitude" },
+                { "uniform": "u_phosphor_cutoff",   "slider": "phosphor_cutoff" },
                 { "uniform": "u_gamma",             "slider": "CRTgamma" }
             ],
             "input": [
@@ -253,6 +263,7 @@
             "uniforms": [
                 { "uniform": "u_phosphor_power",    "slider": "phosphor_power" },
                 { "uniform": "u_phosphor_amplitude","slider": "phosphor_amplitude" },
+                { "uniform": "u_phosphor_cutoff",   "slider": "phosphor_cutoff" },
                 { "uniform": "u_gamma",             "slider": "CRTgamma" }
             ],
             "input": [
