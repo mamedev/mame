@@ -22,8 +22,8 @@
 // internal artwork
 #include "ftri1.lh"
 #include "mastmind.lh"
-#include "mwcfootb.lh"
 #include "memoquiz.lh"
+#include "mwcfootb.lh"
 #include "rdqa.lh"
 #include "scrabsen.lh"
 #include "smastmind.lh"
@@ -564,7 +564,7 @@ void mwcfootb_state::main_write_d(u16 data)
 u16 mwcfootb_state::main_read_d()
 {
 	// DIO9: subcpu DIO9
-	return m_subcpu->d_r() & 0x200;
+	return m_subcpu->d_output_r() & 0x200;
 }
 
 void mwcfootb_state::main_write_r(u8 data)

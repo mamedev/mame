@@ -38,11 +38,6 @@ void mm76_device::op_illegal()
 	logerror("unknown opcode $%02X at $%03X\n", m_op, m_prev_pc);
 }
 
-void mm76_device::op_todo()
-{
-	logerror("unimplemented opcode $%02X at $%03X\n", m_op, m_prev_pc);
-}
-
 
 // opcodes
 
