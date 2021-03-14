@@ -166,7 +166,7 @@ public:
 		FAMILY_OPL
 	};
 
-	// this value is returned from the is_keyon() function for rhythm channels
+	// this value is returned from the write() function for rhythm channels
 	static constexpr u8 YMFM_RHYTHM_CHANNEL = 0xff;
 
 	//
@@ -191,35 +191,22 @@ public:
 	//
 
 	// system-wide register defaults
-	u8 status_mask() const        /*  8 bits */ { return 0; } // OPL only
-	u8 irq_reset() const          /*  8 bits */ { return 0; } // OPL only
-	u8 noise_frequency() const    /*  5 bits */ { return 0; } // OPM only
-	u8 noise_enabled() const      /*  1 bit  */ { return 0; } // OPM only
-	u8 lfo_enabled() const        /*  1 bit  */ { return 1; } // OPN(A) only
-	u8 lfo_rate() const           /*3-8 bits */ { return 0; } // OPM,OPNA
-	u8 lfo_waveform() const       /*  2 bits */ { return 0; } // OPM only
-	u8 lfo_pm_depth() const       /*  7 bits */ { return 0; } // OPM,OPL only
-	u8 lfo_am_depth() const       /*  7 bits */ { return 0; } // OPM,OPL only
-	u8 multi_freq() const         /*  1 bit  */ { return 0; } // OPN(A) only
-	u8 rhythm_enable() const      /*  1 bit  */ { return 0; } // OPL only
-	u8 waveform_enable() const    /*  1 bits */ { return 0; } // OPL2+ only
-
-	// per-channel register defaults
-	u8 ch_lfo_am_sens(u16 choffs) const /*  2 bits */ { return 0; } // OPM,OPNA only
+	u8 status_mask() const                { return 0; } // OPL only
+	u8 irq_reset() const                  { return 0; } // OPL only
+	u8 noise_enable() const               { return 0; } // OPM only
+	u8 rhythm_enable() const              { return 0; } // OPL only
 
 	// per-operator register defaults
-	u8 op_ssg_eg_enabled(u16 opoffs) const     /*  1 bit  */ { return 0; } // OPN(A) only
-	u8 op_ssg_eg_mode(u16 opoffs) const        /*  1 bit  */ { return 0; } // OPN(A) only
-	u8 op_waveform(u16 opoffs) const           /*  3 bits */ { return 0; } // OPL2+ only
+	u8 op_ssg_eg_enable(u16 opoffs) const { return 0; } // OPN(A) only
+	u8 op_ssg_eg_mode(u16 opoffs) const   { return 0; } // OPN(A) only
 
 protected:
+	// helper to apply KSR to the raw ADSR rate, ignoring ksr if the
+	// raw value is 0, and clamping to 63
 	static constexpr u8 effective_rate(u8 rawrate, u8 ksr)
 	{
 		return (rawrate == 0) ? 0 : std::min(rawrate + ksr, 63);
 	}
-
-	// internal state
-	u8 *m_regdata;                 // pointer to the raw data
 };
 
 
@@ -332,12 +319,6 @@ public:
 	// handle writes to the register array
 	bool write(u16 index, u8 data, u8 &chan, u8 &opmask);
 
-	// compute the phase step, given a PM value
-	u32 compute_phase_step(u16 choffs, u16 opoffs, u16 block_freq, s8 detuneval, s8 lfo_raw_pm);
-
-	// caching helpers
-	void cache_operator_data(u16 choffs, u16 opoffs, ymfm_opdata_cache &cache);
-
 	// clock the noise and LFO, if present, returning LFO PM value
 	s8 clock_noise_and_lfo();
 
@@ -350,47 +331,56 @@ public:
 	// return the current noise state, gated by the noise clock
 	u8 noise_state() const { return m_noise_state; }
 
+	// caching helpers
+	void cache_operator_data(u16 choffs, u16 opoffs, ymfm_opdata_cache &cache);
+
+	// compute the phase step, given a PM value
+	u32 compute_phase_step(u16 choffs, u16 opoffs, u16 block_freq, s8 detuneval, s8 lfo_raw_pm);
+
+	// transform the phase based on the waveform, returning inversion
+	u16 transform_phase(u16 opoffs, u16 &phase) { return 0; }
+
 	// log a key-on event
 	void log_keyon(u16 choffs, u16 opoffs);
 
 	// system-wide registers
-	u8 test() const                        { return byte(0x01, 0, 8); }
-	u8 noise_frequency() const             { return byte(0x0f, 0, 5); }
-	u8 noise_enabled() const               { return byte(0x0f, 7, 1); }
-	u16 timer_a_value() const              { return word(0x10, 0, 8, 0x11, 0, 2); }
-	u8 timer_b_value() const               { return byte(0x12, 0, 8); }
-	u8 csm() const                         { return byte(0x14, 7, 1); }
-	u8 reset_timer_b() const               { return byte(0x14, 5, 1); }
-	u8 reset_timer_a() const               { return byte(0x14, 4, 1); }
-	u8 enable_timer_b() const              { return byte(0x14, 3, 1); }
-	u8 enable_timer_a() const              { return byte(0x14, 2, 1); }
-	u8 load_timer_b() const                { return byte(0x14, 1, 1); }
-	u8 load_timer_a() const                { return byte(0x14, 0, 1); }
-	u8 lfo_rate() const                    { return byte(0x18, 0, 8); }
-	u8 lfo_am_depth() const                { return byte(0x19, 0, 7); }
-	u8 lfo_pm_depth() const                { return byte(0x1a, 0, 7); }
-	u8 lfo_waveform() const                { return byte(0x1b, 0, 2); }
+	u8 test() const                       { return byte(0x01, 0, 8); }
+	u8 noise_frequency() const            { return byte(0x0f, 0, 5); }
+	u8 noise_enable() const               { return byte(0x0f, 7, 1); }
+	u16 timer_a_value() const             { return word(0x10, 0, 8, 0x11, 0, 2); }
+	u8 timer_b_value() const              { return byte(0x12, 0, 8); }
+	u8 csm() const                        { return byte(0x14, 7, 1); }
+	u8 reset_timer_b() const              { return byte(0x14, 5, 1); }
+	u8 reset_timer_a() const              { return byte(0x14, 4, 1); }
+	u8 enable_timer_b() const             { return byte(0x14, 3, 1); }
+	u8 enable_timer_a() const             { return byte(0x14, 2, 1); }
+	u8 load_timer_b() const               { return byte(0x14, 1, 1); }
+	u8 load_timer_a() const               { return byte(0x14, 0, 1); }
+	u8 lfo_rate() const                   { return byte(0x18, 0, 8); }
+	u8 lfo_am_depth() const               { return byte(0x19, 0, 7); }
+	u8 lfo_pm_depth() const               { return byte(0x1a, 0, 7); }
+	u8 lfo_waveform() const               { return byte(0x1b, 0, 2); }
 
 	// per-channel registers
-	u8 ch_output_mask(u16 choffs) const    { return byte(0x20, 6, 2, choffs); }
-	u8 ch_feedback(u16 choffs) const       { return byte(0x20, 3, 3, choffs); }
-	u8 ch_algorithm(u16 choffs) const      { return byte(0x20, 0, 3, choffs); }
-	u16 ch_block_freq(u16 choffs) const    { return word(0x28, 0, 7, 0x30, 2, 6, choffs); }
-	u8 ch_lfo_pm_sens(u16 choffs) const    { return byte(0x38, 4, 3, choffs); }
-	u8 ch_lfo_am_sens(u16 choffs) const    { return byte(0x38, 0, 2, choffs); }
+	u8 ch_output_mask(u16 choffs) const   { return byte(0x20, 6, 2, choffs); }
+	u8 ch_feedback(u16 choffs) const      { return byte(0x20, 3, 3, choffs); }
+	u8 ch_algorithm(u16 choffs) const     { return byte(0x20, 0, 3, choffs); }
+	u16 ch_block_freq(u16 choffs) const   { return word(0x28, 0, 7, 0x30, 2, 6, choffs); }
+	u8 ch_lfo_pm_sens(u16 choffs) const   { return byte(0x38, 4, 3, choffs); }
+	u8 ch_lfo_am_sens(u16 choffs) const   { return byte(0x38, 0, 2, choffs); }
 
 	// per-operator registers
-	u8 op_detune(u16 opoffs) const         { return byte(0x40, 4, 3, opoffs); }
-	u8 op_multiple(u16 opoffs) const       { return byte(0x40, 0, 4, opoffs); }
-	u8 op_total_level(u16 opoffs) const    { return byte(0x60, 0, 7, opoffs); }
-	u8 op_ksr(u16 opoffs) const            { return byte(0x80, 6, 2, opoffs); }
-	u8 op_attack_rate(u16 opoffs) const    { return byte(0x80, 0, 5, opoffs); }
-	u8 op_lfo_am_enabled(u16 opoffs) const { return byte(0xa0, 7, 1, opoffs); }
-	u8 op_decay_rate(u16 opoffs) const     { return byte(0xa0, 0, 5, opoffs); }
-	u8 op_detune2(u16 opoffs) const        { return byte(0xc0, 6, 2, opoffs); }
-	u8 op_sustain_rate(u16 opoffs) const   { return byte(0xc0, 0, 5, opoffs); }
-	u8 op_sustain_level(u16 opoffs) const  { return byte(0xe0, 4, 4, opoffs); }
-	u8 op_release_rate(u16 opoffs) const   { return byte(0xe0, 0, 4, opoffs); }
+	u8 op_detune(u16 opoffs) const        { return byte(0x40, 4, 3, opoffs); }
+	u8 op_multiple(u16 opoffs) const      { return byte(0x40, 0, 4, opoffs); }
+	u8 op_total_level(u16 opoffs) const   { return byte(0x60, 0, 7, opoffs); }
+	u8 op_ksr(u16 opoffs) const           { return byte(0x80, 6, 2, opoffs); }
+	u8 op_attack_rate(u16 opoffs) const   { return byte(0x80, 0, 5, opoffs); }
+	u8 op_lfo_am_enable(u16 opoffs) const { return byte(0xa0, 7, 1, opoffs); }
+	u8 op_decay_rate(u16 opoffs) const    { return byte(0xa0, 0, 5, opoffs); }
+	u8 op_detune2(u16 opoffs) const       { return byte(0xc0, 6, 2, opoffs); }
+	u8 op_sustain_rate(u16 opoffs) const  { return byte(0xc0, 0, 5, opoffs); }
+	u8 op_sustain_level(u16 opoffs) const { return byte(0xe0, 4, 4, opoffs); }
+	u8 op_release_rate(u16 opoffs) const  { return byte(0xe0, 0, 4, opoffs); }
 
 protected:
 	// return a bitfield extracted from a byte
@@ -441,6 +431,18 @@ protected:
 //              ---x---- Key on/off operator 1
 //              ------xx Channel select
 //
+//     Per-channel registers (channel in address bits 0-1)
+//     Note that all these apply to address+100 as well on OPNA+
+//        A0-A3 xxxxxxxx Frequency number lower 8 bits
+//        A4-A7 --xxx--- Block (0-7)
+//              -----xxx Frequency number upper 3 bits
+//        B0-B3 --xxx--- Feedback level for operator 1 (0-7)
+//              -----xxx Operator connection algorithm (0-7)
+//        B4-B7 x------- Pan left [OPNA]
+//              -x------ Pan right [OPNA]
+//              --xx---- LFO AM shift (0-3) [OPNA+ only]
+//              -----xxx LFO PM depth (0-7) [OPNA+ only]
+//
 //     Per-operator registers (channel in address bits 0-1, operator in bits 2-3)
 //     Note that all these apply to address+100 as well on OPNA+
 //        30-3F -xxx---- Detune value (0-7)
@@ -455,18 +457,6 @@ protected:
 //              ----xxxx Release rate (0-15)
 //        90-9F ----x--- SSG-EG enable
 //              -----xxx SSG-EG envelope (0-7)
-//
-//     Per-channel registers (channel in address bits 0-1)
-//     Note that all these apply to address+100 as well on OPNA+
-//        A0-A3 xxxxxxxx Frequency number lower 8 bits
-//        A4-A7 --xxx--- Block (0-7)
-//              -----xxx Frequency number upper 3 bits
-//        B0-B3 --xxx--- Feedback level for operator 1 (0-7)
-//              -----xxx Operator connection algorithm (0-7)
-//        B4-B7 x------- Pan left [OPNA]
-//              -x------ Pan right [OPNA]
-//              --xx---- LFO AM shift (0-3) [OPNA+ only]
-//              -----xxx LFO PM depth (0-7) [OPNA+ only]
 //
 //     Special multi-frequency registers (channel implicitly #2; operator in address bits 0-1)
 //        A8-AB xxxxxxxx Frequency number lower 8 bits
@@ -537,12 +527,6 @@ public:
 	// handle writes to the register array
 	bool write(u16 index, u8 data, u8 &chan, u8 &opmask);
 
-	// compute the phase step, given a PM value
-	u32 compute_phase_step(u16 choffs, u16 opoffs, u16 block_freq, s8 detuneval, s8 lfo_raw_pm);
-
-	// caching helpers
-	void cache_operator_data(u16 choffs, u16 opoffs, ymfm_opdata_cache &cache);
-
 	// clock the noise and LFO, if present, returning LFO PM value
 	s8 clock_noise_and_lfo();
 
@@ -555,46 +539,55 @@ public:
 	// return LFO/noise states
 	u8 noise_state() const { return 0; }
 
+	// caching helpers
+	void cache_operator_data(u16 choffs, u16 opoffs, ymfm_opdata_cache &cache);
+
+	// compute the phase step, given a PM value
+	u32 compute_phase_step(u16 choffs, u16 opoffs, u16 block_freq, s8 detuneval, s8 lfo_raw_pm);
+
+	// transform the phase based on the waveform, returning inversion
+	u16 transform_phase(u16 opoffs, u16 &phase) { return 0; }
+
 	// log a key-on event
 	void log_keyon(u16 choffs, u16 opoffs);
 
 	// system-wide registers
-	u8 test() const                        { return byte(0x21, 0, 8); }
-	u8 lfo_enabled() const                 { return IsOpnA ? byte(0x22, 3, 1) : 0; }
-	u8 lfo_rate() const                    { return IsOpnA ? byte(0x22, 0, 3) : 0; }
-	u16 timer_a_value() const              { return word(0x24, 0, 8, 0x25, 0, 2); }
-	u8 timer_b_value() const               { return byte(0x26, 0, 8); }
-	u8 csm() const                         { return (byte(0x27, 6, 2) == 2); }
-	u8 multi_freq() const                  { return (byte(0x27, 6, 2) != 0); }
-	u8 reset_timer_b() const               { return byte(0x27, 5, 1); }
-	u8 reset_timer_a() const               { return byte(0x27, 4, 1); }
-	u8 enable_timer_b() const              { return byte(0x27, 3, 1); }
-	u8 enable_timer_a() const              { return byte(0x27, 2, 1); }
-	u8 load_timer_b() const                { return byte(0x27, 1, 1); }
-	u8 load_timer_a() const                { return byte(0x27, 0, 1); }
-	u16 multi_block_freq(u8 num) const     { return word(0xac, 0, 6, 0xa8, 0, 8, num); }
+	u8 test() const                       { return byte(0x21, 0, 8); }
+	u8 lfo_enable() const                 { return IsOpnA ? byte(0x22, 3, 1) : 0; }
+	u8 lfo_rate() const                   { return IsOpnA ? byte(0x22, 0, 3) : 0; }
+	u16 timer_a_value() const             { return word(0x24, 0, 8, 0x25, 0, 2); }
+	u8 timer_b_value() const              { return byte(0x26, 0, 8); }
+	u8 csm() const                        { return (byte(0x27, 6, 2) == 2); }
+	u8 multi_freq() const                 { return (byte(0x27, 6, 2) != 0); }
+	u8 reset_timer_b() const              { return byte(0x27, 5, 1); }
+	u8 reset_timer_a() const              { return byte(0x27, 4, 1); }
+	u8 enable_timer_b() const             { return byte(0x27, 3, 1); }
+	u8 enable_timer_a() const             { return byte(0x27, 2, 1); }
+	u8 load_timer_b() const               { return byte(0x27, 1, 1); }
+	u8 load_timer_a() const               { return byte(0x27, 0, 1); }
+	u16 multi_block_freq(u8 num) const    { return word(0xac, 0, 6, 0xa8, 0, 8, num); }
 
 	// per-channel registers
-	u16 ch_block_freq(u16 choffs) const    { return word(0xa4, 0, 6, 0xa0, 0, 8, choffs); }
-	u8 ch_feedback(u16 choffs) const       { return byte(0xb0, 3, 3, choffs); }
-	u8 ch_algorithm(u16 choffs) const      { return byte(0xb0, 0, 3, choffs); }
-	u8 ch_output_mask(u16 choffs) const    { return IsOpnA ? bitswap<2>(byte(0xb4, 6, 2, choffs), 0, 1) : 1; }
-	u8 ch_lfo_am_sens(u16 choffs) const    { return IsOpnA ? byte(0xb4, 4, 2, choffs) : 0; }
-	u8 ch_lfo_pm_sens(u16 choffs) const    { return IsOpnA ? byte(0xb4, 0, 3, choffs) : 0; }
+	u16 ch_block_freq(u16 choffs) const   { return word(0xa4, 0, 6, 0xa0, 0, 8, choffs); }
+	u8 ch_feedback(u16 choffs) const      { return byte(0xb0, 3, 3, choffs); }
+	u8 ch_algorithm(u16 choffs) const     { return byte(0xb0, 0, 3, choffs); }
+	u8 ch_output_mask(u16 choffs) const   { return IsOpnA ? bitswap<2>(byte(0xb4, 6, 2, choffs), 0, 1) : 1; }
+	u8 ch_lfo_am_sens(u16 choffs) const   { return IsOpnA ? byte(0xb4, 4, 2, choffs) : 0; }
+	u8 ch_lfo_pm_sens(u16 choffs) const   { return IsOpnA ? byte(0xb4, 0, 3, choffs) : 0; }
 
 	// per-operator registers
-	u8 op_detune(u16 opoffs) const         { return byte(0x30, 4, 3, opoffs); }
-	u8 op_multiple(u16 opoffs) const       { return byte(0x30, 0, 4, opoffs); }
-	u8 op_total_level(u16 opoffs) const    { return byte(0x40, 0, 7, opoffs); }
-	u8 op_ksr(u16 opoffs) const            { return byte(0x50, 6, 2, opoffs); }
-	u8 op_attack_rate(u16 opoffs) const    { return byte(0x50, 0, 5, opoffs); }
-	u8 op_decay_rate(u16 opoffs) const     { return byte(0x60, 0, 5, opoffs); }
-	u8 op_lfo_am_enabled(u16 opoffs) const { return IsOpnA ? byte(0x60, 7, 1, opoffs) : 0; }
-	u8 op_sustain_rate(u16 opoffs) const   { return byte(0x70, 0, 5, opoffs); }
-	u8 op_sustain_level(u16 opoffs) const  { return byte(0x80, 4, 4, opoffs); }
-	u8 op_release_rate(u16 opoffs) const   { return byte(0x80, 0, 4, opoffs); }
-	u8 op_ssg_eg_enabled(u16 opoffs) const { return byte(0x90, 3, 1, opoffs); }
-	u8 op_ssg_eg_mode(u16 opoffs) const    { return byte(0x90, 0, 3, opoffs); }
+	u8 op_detune(u16 opoffs) const        { return byte(0x30, 4, 3, opoffs); }
+	u8 op_multiple(u16 opoffs) const      { return byte(0x30, 0, 4, opoffs); }
+	u8 op_total_level(u16 opoffs) const   { return byte(0x40, 0, 7, opoffs); }
+	u8 op_ksr(u16 opoffs) const           { return byte(0x50, 6, 2, opoffs); }
+	u8 op_attack_rate(u16 opoffs) const   { return byte(0x50, 0, 5, opoffs); }
+	u8 op_decay_rate(u16 opoffs) const    { return byte(0x60, 0, 5, opoffs); }
+	u8 op_lfo_am_enable(u16 opoffs) const { return IsOpnA ? byte(0x60, 7, 1, opoffs) : 0; }
+	u8 op_sustain_rate(u16 opoffs) const  { return byte(0x70, 0, 5, opoffs); }
+	u8 op_sustain_level(u16 opoffs) const { return byte(0x80, 4, 4, opoffs); }
+	u8 op_release_rate(u16 opoffs) const  { return byte(0x80, 0, 4, opoffs); }
+	u8 op_ssg_eg_enable(u16 opoffs) const { return byte(0x90, 3, 1, opoffs); }
+	u8 op_ssg_eg_mode(u16 opoffs) const   { return byte(0x90, 0, 3, opoffs); }
 
 protected:
 	// return a bitfield extracted from a byte
@@ -654,6 +647,15 @@ using ymopna_registers = ymopn_registers_base<true>;
 //          105 -------x New [OPL3 only]
 //              ------x- New2 [OPL4 only]
 //
+//     Per-channel registers (channel in address bits 0-3)
+//     Note that all these apply to address+100 as well on OPL3+
+//        A0-A8 xxxxxxxx F-number (low 8 bits)
+//        B0-B8 --x----- Key on
+//              ---xxx-- Block (octvate, 0-7)
+//              ------xx F-number (high two bits)
+//        C0-C8 ----xxx- Feedback level for operator 1 (0-7)
+//              -------x Operator connection algorithm
+//
 //     Per-operator registers (operator in bits 0-5)
 //     Note that all these apply to address+100 as well on OPL3+
 //        20-35 x------- AM enable
@@ -670,15 +672,6 @@ using ymopna_registers = ymopn_registers_base<true>;
 //        E0-F5 ------xx Wave select (0-3) [OPL2 only]
 //              -----xxx Wave select (0-7) [OPL3+ only]
 //
-//     Per-channel registers (channel in address bits 0-3)
-//     Note that all these apply to address+100 as well on OPL3+
-//        A0-A8 xxxxxxxx F-number (low 8 bits)
-//        B0-B8 --x----- Key on
-//              ---xxx-- Block (octvate, 0-7)
-//              ------xx F-number (high two bits)
-//        C0-C8 ----xxx- Feedback level for operator 1 (0-7)
-//              -------x Operator connection algorithm
-//
 
 template<int Revision>
 class ymopl_registers_base : public ymfm_registers_base
@@ -686,7 +679,6 @@ class ymopl_registers_base : public ymfm_registers_base
 	static constexpr bool IsOpl2 = (Revision == 2);
 	static constexpr bool IsOpl2Plus = (Revision >= 2);
 	static constexpr bool IsOpl3Plus = (Revision >= 3);
-	static constexpr bool IsOpl4Plus = (Revision >= 4);
 
 public:
 	// constants
@@ -744,12 +736,6 @@ public:
 	// handle writes to the register array
 	bool write(u16 index, u8 data, u8 &chan, u8 &opmask);
 
-	// compute the phase step, given a PM value
-	u32 compute_phase_step(u16 choffs, u16 opoffs, u16 block_freq, s8 detuneval, s8 lfo_raw_pm);
-
-	// caching helpers
-	void cache_operator_data(u16 choffs, u16 opoffs, ymfm_opdata_cache &cache);
-
 	// clock the noise and LFO, if present, returning LFO PM value
 	s8 clock_noise_and_lfo();
 
@@ -763,8 +749,72 @@ public:
 	// return LFO/noise states
 	u8 noise_state() const { return m_noise_lfsr >> 23; }
 
+	// caching helpers
+	void cache_operator_data(u16 choffs, u16 opoffs, ymfm_opdata_cache &cache);
+
+	// compute the phase step, given a PM value
+	u32 compute_phase_step(u16 choffs, u16 opoffs, u16 block_freq, s8 detuneval, s8 lfo_raw_pm);
+
+	// transform the phase based on the waveform, returning inversion
+	u16 transform_phase(u16 opoffs, u16 &phase);
+
 	// log a key-on event
 	void log_keyon(u16 choffs, u16 opoffs);
+
+	// system-wide registers
+	u8 test() const                       { return byte(0x01, 0, 8); }
+	u8 waveform_enable() const            { return IsOpl2 ? byte(0x01, 5, 1) : (IsOpl3Plus ? 1 : 0); }
+	u16 timer_a_value() const             { return byte(0x02, 0, 8) * 4; } // 8->10 bits
+	u8 timer_b_value() const              { return byte(0x03, 0, 8); }
+	u8 status_mask() const                { return byte(0x04, 0, 8) & 0x78; }
+	u8 irq_reset() const                  { return byte(0x04, 7, 1); }
+	u8 reset_timer_b() const              { return byte(0x04, 7, 1) | byte(0x04, 5, 1); }
+	u8 reset_timer_a() const              { return byte(0x04, 7, 1) | byte(0x04, 6, 1); }
+	u8 enable_timer_b() const             { return byte(0x04, 5, 1) ^ 1; }
+	u8 enable_timer_a() const             { return byte(0x04, 6, 1) ^ 1; }
+	u8 load_timer_b() const               { return byte(0x04, 1, 1); }
+	u8 load_timer_a() const               { return byte(0x04, 0, 1); }
+	u8 csm() const                        { return IsOpl3Plus ? 0 : byte(0x08, 7, 1); }
+	u8 note_select() const                { return byte(0x08, 6, 1); }
+	u8 lfo_am_depth() const               { return byte(0xbd, 7, 1) * 2; } // 1->2 bits
+	u8 lfo_pm_depth() const               { return byte(0xbd, 6, 1); }
+	u8 rhythm_enable() const              { return byte(0xbd, 5, 1); }
+	u8 rhythm_keyon() const               { return byte(0xbd, 4, 0); }
+	u8 newflag() const                    { return IsOpl3Plus ? byte(0x105, 0, 1) : 0; }
+	u8 fourop_enable() const              { return IsOpl3Plus ? byte(0x104, 0, 6) : 0; }
+
+	// per-channel registers
+	u16 ch_block_freq(u16 choffs) const   { return word(0xb0, 0, 5, 0xa0, 0, 8, choffs) * 2; } // 13->14 bits
+	u8 ch_feedback(u16 choffs) const      { return byte(0xc0, 1, 3, choffs); }
+	u8 ch_algorithm(u16 choffs) const     { return byte(0xc0, 0, 1, choffs) | (IsOpl3Plus ? (8 | (byte(0xc3, 0, 1, choffs) << 1)) : 0); }
+	u8 ch_output_mask(u16 choffs) const   { return IsOpl3Plus ? bitswap<4>(byte(0xc0 + choffs, 5, 1), 3,2,0,1) : 1; }
+
+	// per-operator registers
+	u8 op_lfo_am_enable(u16 opoffs) const { return byte(0x20, 7, 1, opoffs); }
+	u8 op_lfo_pm_enable(u16 opoffs) const { return byte(0x20, 6, 1, opoffs); }
+	u8 op_eg_sustain(u16 opoffs) const    { return byte(0x20, 5, 1, opoffs); }
+	u8 op_ksr(u16 opoffs) const           { return byte(0x20, 4, 1, opoffs) * 2 + 1; } // 1->2 bits
+	u8 op_multiple(u16 opoffs) const      { return opl_multiple_map(byte(0x20, 0, 4, opoffs)); }
+	u8 op_ksl(u16 opoffs) const           { return bitswap<2>(byte(0x40, 6, 2, opoffs), 0, 1); }
+	u8 op_total_level(u16 opoffs) const   { return byte(0x40, 0, 6, opoffs); }
+	u8 op_attack_rate(u16 opoffs) const   { return byte(0x60, 4, 4, opoffs); }
+	u8 op_decay_rate(u16 opoffs) const    { return byte(0x60, 0, 4, opoffs); }
+	u8 op_sustain_level(u16 opoffs) const { return byte(0x80, 4, 4, opoffs); }
+	u8 op_release_rate(u16 opoffs) const  { return byte(0x80, 0, 4, opoffs); }
+	u8 op_waveform(u16 opoffs) const      { return IsOpl2Plus ? byte(0xe0, 0, IsOpl3Plus ? 3 : 2, opoffs) : 0; }
+
+protected:
+	// return a bitfield extracted from a byte
+	u8 byte(u16 offset, u8 start, u8 count, u16 extra_offset = 0) const
+	{
+		return BIT(m_regdata[offset + extra_offset], start, count);
+	}
+
+	// return a bitfield extracted from a pair of bytes, MSBs listed first
+	u16 word(u16 offset1, u8 start1, u8 count1, u16 offset2, u8 start2, u8 count2, u16 extra_offset = 0) const
+	{
+		return (byte(offset1, start1, count1, extra_offset) << count2) | byte(offset2, start2, count2, extra_offset);
+	}
 
 	// helper to determine if the this channel is an active rhythm channel
 	bool is_rhythm(u16 choffs) const
@@ -778,61 +828,6 @@ public:
 		// replace the low bit with a table lookup; the equivalent
 		// OPM/OPN values are: 0,1,2,3,4,5,6,7,8,9,10,10,12,12,15,15
 		return (raw & 0xe) | BIT(0xc2aa, raw);
-	}
-
-	// system-wide registers
-	u8 test() const               /*  8 bits */ { return byte(0x01, 0, 8); }
-	u8 waveform_enable() const    /*  1 bits */ { return IsOpl2 ? byte(0x01, 5, 1) : (IsOpl3Plus ? 1 : 0); }
-	u16 timer_a_value() const     /*  8 bits */ { return byte(0x02, 0, 8) * 4; } // 8->10 bits
-	u8 timer_b_value() const      /*  8 bits */ { return byte(0x03, 0, 8); }
-	u8 status_mask() const        /*  8 bits */ { return byte(0x04, 0, 8) & 0x78; }
-	u8 irq_reset() const          /*  1 bit  */ { return byte(0x04, 7, 1); }
-	u8 reset_timer_b() const      /*  1 bit  */ { return byte(0x04, 7, 1) | byte(0x04, 5, 1); }
-	u8 reset_timer_a() const      /*  1 bit  */ { return byte(0x04, 7, 1) | byte(0x04, 6, 1); }
-	u8 enable_timer_b() const     /*  1 bit  */ { return byte(0x04, 5, 1) ^ 1; }
-	u8 enable_timer_a() const     /*  1 bit  */ { return byte(0x04, 6, 1) ^ 1; }
-	u8 load_timer_b() const       /*  1 bit  */ { return byte(0x04, 1, 1); }
-	u8 load_timer_a() const       /*  1 bit  */ { return byte(0x04, 0, 1); }
-	u8 csm() const                /*  1 bit  */ { return IsOpl3Plus ? 0 : byte(0x08, 7, 1); }
-	u8 note_select() const        /*  1 bit  */ { return byte(0x08, 6, 1); }
-	u8 lfo_am_depth() const       /*  1 bit  */ { return byte(0xbd, 7, 1) * 2; } // 1->2 bits
-	u8 lfo_pm_depth() const       /*  1 bit  */ { return byte(0xbd, 6, 1); }
-	u8 rhythm_enable() const      /*  1 bit  */ { return byte(0xbd, 5, 1); }
-	u8 rhythm_keyon() const       /*  5 bits */ { return byte(0xbd, 4, 0); }
-	u8 newflag() const            /*  1 bit  */ { return IsOpl3Plus ? byte(0x105, 0, 1) : 0; }
-	u8 fourop_enable() const      /*  6 bits */ { return IsOpl3Plus ? byte(0x104, 0, 6) : 0; }
-
-	// per-channel registers
-	u16 ch_block_freq(u16 choffs) const        /* 13 bits */ { return word(0xb0, 0, 5, 0xa0, 0, 8, choffs) * 2; } // 13->14 bits
-	u8 ch_feedback(u16 choffs) const           /*  3 bits */ { return byte(0xc0, 1, 3, choffs); }
-	u8 ch_algorithm(u16 choffs) const          /*  1 bit  */ { return byte(0xc0, 0, 1, choffs) | (IsOpl3Plus ? (8 | (byte(0xc3, 0, 1, choffs) << 1)) : 0); }
-	u8 ch_output_mask(u16 choffs) const        /*  4 bits */ { return IsOpl3Plus ? bitswap<4>(byte(0xc0 + choffs, 5, 1), 3,2,0,1) : 1; }
-
-	// per-operator registers
-	u8 op_lfo_am_enabled(u16 opoffs) const   { return byte(0x20, 7, 1, opoffs); }
-	u8 op_lfo_pm_enabled(u16 opoffs) const   { return byte(0x20, 6, 1, opoffs); }
-	u8 op_eg_sustain(u16 opoffs) const       { return byte(0x20, 5, 1, opoffs); }
-	u8 op_ksr(u16 opoffs) const              { return byte(0x20, 4, 1, opoffs) * 2 + 1; } // 1->2 bits
-	u8 op_multiple(u16 opoffs) const         { return opl_multiple_map(byte(0x20, 0, 4, opoffs)); }
-	u8 op_key_scale_level(u16 opoffs) const  { return bitswap<2>(byte(0x40, 6, 2, opoffs), 0, 1); }
-	u8 op_total_level(u16 opoffs) const      { return byte(0x40, 0, 6, opoffs); }
-	u8 op_attack_rate(u16 opoffs) const      { return byte(0x60, 4, 4, opoffs); }
-	u8 op_decay_rate(u16 opoffs) const       { return byte(0x60, 0, 4, opoffs); }
-	u8 op_sustain_level(u16 opoffs) const    { return byte(0x80, 4, 4, opoffs); }
-	u8 op_release_rate(u16 opoffs) const     { return byte(0x80, 0, 4, opoffs); }
-	u8 op_waveform(u16 opoffs) const         { return IsOpl2Plus ? byte(0xe0, 0, IsOpl3Plus ? 3 : 2, opoffs) : 0; }
-
-protected:
-	// return a bitfield extracted from a byte
-	u8 byte(u16 offset, u8 start, u8 count, u16 extra_offset = 0) const
-	{
-		return BIT(m_regdata[offset + extra_offset], start, count);
-	}
-
-	// return a bitfield extracted from a pair of bytes, MSBs listed first
-	u16 word(u16 offset1, u8 start1, u8 count1, u16 offset2, u8 start2, u8 count2, u16 extra_offset = 0) const
-	{
-		return (byte(offset1, start1, count1, extra_offset) << count2) | byte(offset2, start2, count2, extra_offset);
 	}
 
 	// internal state
@@ -939,51 +934,48 @@ public:
 	// handle writes to the register array
 	bool write(u16 index, u8 data, u8 &chan, u8 &opmask);
 
-	// compute the phase step, given a PM value
-	u32 compute_phase_step(u16 choffs, u16 opoffs, u16 block_freq, s8 detuneval, s8 lfo_raw_pm);
+	// clock the noise and LFO, if present, returning LFO PM value
+	s8 clock_noise_and_lfo();
 
 	// caching helpers
 	void cache_operator_data(u16 choffs, u16 opoffs, ymfm_opdata_cache &cache);
 
-	// clock the noise and LFO, if present, returning LFO PM value
-	s8 clock_noise_and_lfo();
+	// compute the phase step, given a PM value
+	u32 compute_phase_step(u16 choffs, u16 opoffs, u16 block_freq, s8 detuneval, s8 lfo_raw_pm);
+
+	// transform the phase based on the waveform, returning inversion
+	u16 transform_phase(u16 opoffs, u16 &phase);
 
 	// log a key-on event
 	void log_keyon(u16 choffs, u16 opoffs);
 
-	// helper to determine if the this channel is an active rhythm channel
-	bool is_rhythm(u16 choffs) const
-	{
-		return rhythm_enable() && (choffs >= 6 && choffs <= 8);
-	}
-
 	// system-wide registers
-	u8 rhythm_enable() const                 { return byte(0x0e, 5, 1); }
-	u8 rhythm_keyon() const                  { return byte(0x0e, 4, 0); }
-	u8 test() const                          { return byte(0x0f, 0, 8); }
-	u8 waveform_enable() const               { return 1; }
+	u8 rhythm_enable() const              { return byte(0x0e, 5, 1); }
+	u8 rhythm_keyon() const               { return byte(0x0e, 4, 0); }
+	u8 test() const                       { return byte(0x0f, 0, 8); }
+	u8 waveform_enable() const            { return 1; }
 
 	// per-channel registers
-	u16 ch_block_freq(u16 choffs) const      { return word(0x20, 0, 4, 0x10, 0, 8, choffs) * 4; } // 12->14 bits
-	u8 ch_sustain(u16 choffs) const          { return byte(0x20, 5, 1, choffs); }
-	u8 ch_feedback(u16 choffs) const         { return instchbyte(0x03, 0, 3, choffs); }
-	u8 ch_algorithm(u16 choffs) const        { return 0; }
-	u8 ch_instrument(u16 choffs) const       { return byte(0x30, 4, 4, choffs); }
-	u8 ch_output_mask(u16 choffs) const      { return 1 << is_rhythm(choffs); }
+	u16 ch_block_freq(u16 choffs) const   { return word(0x20, 0, 4, 0x10, 0, 8, choffs) * 4; } // 12->14 bits
+	u8 ch_sustain(u16 choffs) const       { return byte(0x20, 5, 1, choffs); }
+	u8 ch_feedback(u16 choffs) const      { return instchbyte(0x03, 0, 3, choffs); }
+	u8 ch_algorithm(u16 choffs) const     { return 0; }
+	u8 ch_instrument(u16 choffs) const    { return byte(0x30, 4, 4, choffs); }
+	u8 ch_output_mask(u16 choffs) const   { return 1 << is_rhythm(choffs); }
 
 	// per-operator registers
-	u8 op_lfo_am_enabled(u16 opoffs) const   { return instopbyte(0x00, 7, 1, opoffs); }
-	u8 op_lfo_pm_enabled(u16 opoffs) const   { return instopbyte(0x00, 6, 1, opoffs); }
-	u8 op_eg_sustain(u16 opoffs) const       { return instopbyte(0x00, 5, 1, opoffs); }
-	u8 op_ksr(u16 opoffs) const              { return instopbyte(0x00, 4, 1, opoffs) * 2 + 1; } // 1->2 bits
-	u8 op_multiple(u16 opoffs) const         { return opl_multiple_map(instopbyte(0x00, 0, 4, opoffs)); }
-	u8 op_key_scale_level(u16 opoffs) const  { return instopbyte(0x02, 6, 2, opoffs); }
-	u8 op_total_level(u16 opoffs) const      { return total_level_or_volume(opoffs); }
-	u8 op_waveform(u16 opoffs) const         { return instchbyte(0x03, 3 + BIT(opoffs, 0), 1, opoffs >> 1); }
-	u8 op_attack_rate(u16 opoffs) const      { return instopbyte(0x04, 4, 4, opoffs); }
-	u8 op_decay_rate(u16 opoffs) const       { return instopbyte(0x04, 0, 4, opoffs); }
-	u8 op_sustain_level(u16 opoffs) const    { return instopbyte(0x06, 4, 4, opoffs); }
-	u8 op_release_rate(u16 opoffs) const     { return instopbyte(0x06, 0, 4, opoffs); }
+	u8 op_lfo_am_enable(u16 opoffs) const { return instopbyte(0x00, 7, 1, opoffs); }
+	u8 op_lfo_pm_enable(u16 opoffs) const { return instopbyte(0x00, 6, 1, opoffs); }
+	u8 op_eg_sustain(u16 opoffs) const    { return instopbyte(0x00, 5, 1, opoffs); }
+	u8 op_ksr(u16 opoffs) const           { return instopbyte(0x00, 4, 1, opoffs) * 2 + 1; } // 1->2 bits
+	u8 op_multiple(u16 opoffs) const      { return opl_multiple_map(instopbyte(0x00, 0, 4, opoffs)); }
+	u8 op_ksl(u16 opoffs) const           { return instopbyte(0x02, 6, 2, opoffs); }
+	u8 op_total_level(u16 opoffs) const   { return total_level_or_volume(opoffs); }
+	u8 op_waveform(u16 opoffs) const      { return instchbyte(0x03, 3 + BIT(opoffs, 0), 1, opoffs >> 1); }
+	u8 op_attack_rate(u16 opoffs) const   { return instopbyte(0x04, 4, 4, opoffs); }
+	u8 op_decay_rate(u16 opoffs) const    { return instopbyte(0x04, 0, 4, opoffs); }
+	u8 op_sustain_level(u16 opoffs) const { return instopbyte(0x06, 4, 4, opoffs); }
+	u8 op_release_rate(u16 opoffs) const  { return instopbyte(0x06, 0, 4, opoffs); }
 
 	// set the instrument data
 	void set_instrument_data(u8 const *data)
@@ -992,6 +984,12 @@ public:
 	}
 
 private:
+	// helper to determine if the this channel is an active rhythm channel
+	bool is_rhythm(u16 choffs) const
+	{
+		return rhythm_enable() && (choffs >= 6 && choffs <= 8);
+	}
+
 	// OPLL-specific helper to return either the total level or the volume
 	u8 total_level_or_volume(u16 opoffs) const
 	{
@@ -1148,7 +1146,7 @@ public:
 	void prepare();
 
 	// master clocking function
-	void clock(u32 env_counter, s8 lfo_raw_pm, bool is_multi_freq);
+	void clock(u32 env_counter, s8 lfo_raw_pm);
 
 	// compute the channel output and add to the left/right output sums
 	void output(s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;

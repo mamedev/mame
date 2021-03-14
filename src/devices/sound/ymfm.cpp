@@ -805,90 +805,6 @@ bool ymopm_registers::write(u16 index, u8 data, u8 &channel, u8 &opmask)
 
 
 //-------------------------------------------------
-//  compute_phase_step - compute the phase step
-//-------------------------------------------------
-
-u32 ymopm_registers::compute_phase_step(u16 choffs, u16 opoffs, u16 block_freq, s8 detuneval, s8 lfo_raw_pm)
-{
-	// OPM logic is rather unique here, due to extra detune
-	// and the use of key codes (not to be confused with keycode)
-
-	// start with coarse detune delta; table uses cents value from
-	// manual, converted into 1/64ths
-	static const s16 s_detune2_delta[4] = { 0, (600*64+50)/100, (781*64+50)/100, (950*64+50)/100 };
-	s16 delta = s_detune2_delta[op_detune2(opoffs)];
-
-	// add in the PM delta
-	u8 pm_sensitivity = ch_lfo_pm_sens(choffs);
-	if (pm_sensitivity != 0)
-	{
-		// raw PM value is -127..128 which is +/- 200 cents
-		// manual gives these magnitudes in cents:
-		//    0, +/-5, +/-10, +/-20, +/-50, +/-100, +/-400, +/-700
-		// this roughly corresponds to shifting the 200-cent value:
-		//    0  >> 5,  >> 4,  >> 3,  >> 2,  >> 1,   << 1,   << 2
-		if (pm_sensitivity < 6)
-			delta += lfo_raw_pm >> (6 - pm_sensitivity);
-		else
-			delta += lfo_raw_pm << (pm_sensitivity - 5);
-	}
-
-	// apply delta and convert to a frequency number
-	u32 phase_step = opm_key_code_to_phase_step(block_freq, delta);
-
-	// apply detune based on the keycode
-	phase_step += detuneval;
-
-	// apply frequency multiplier (0 means 0.5, other values are as-is)
-	u8 multi = op_multiple(opoffs);
-	return (multi == 0) ? (phase_step >> 1) : (phase_step * multi);
-}
-
-
-//-------------------------------------------------
-//  cache_operator_data - fill the operator cache
-//  with prefetched data
-//-------------------------------------------------
-
-void ymopm_registers::cache_operator_data(u16 choffs, u16 opoffs, ymfm_opdata_cache &cache)
-{
-	// get frequency from the channel
-	u16 block_freq = cache.block_freq = this->ch_block_freq(choffs);
-
-	// compute the keycode: block_freq is:
-	//
-	//     BBBCCCCFFFFFF
-	//     ^^^^^
-	//
-	// the 5-bit keycode is just the top 5 bits (block + top 2 bits
-	// of the key code)
-	u8 keycode = BIT(block_freq, 8, 5);
-
-	// detune adjustment
-	s8 detune = cache.detune = detune_adjustment(this->op_detune(opoffs), keycode);
-
-	// phase step, or 0 if PM is active; this depends on block_freq and
-	// detune, so compute it after we've done those
-	cache.phase_step = (ch_lfo_pm_sens(choffs) != 0) ? 0 : compute_phase_step(choffs, opoffs, block_freq, detune, 0);
-
-	// total level, scaled by 8
-	cache.total_level = op_total_level(opoffs) << 3;
-
-	// 4-bit sustain level, but 15 means 31 so effectively 5 bits
-	cache.eg_sustain = op_sustain_level(opoffs);
-	cache.eg_sustain |= (cache.eg_sustain + 1) & 0x10;
-
-	// determine KSR adjustment for enevlope rates
-	u8 ksrval = keycode >> (op_ksr(opoffs) ^ 3);
-	cache.eg_rate[YMFM_ENV_ATTACK] = effective_rate(op_attack_rate(opoffs) * 2, ksrval);
-	cache.eg_rate[YMFM_ENV_DECAY] = effective_rate(op_decay_rate(opoffs) * 2, ksrval);
-	cache.eg_rate[YMFM_ENV_SUSTAIN] = effective_rate(op_sustain_rate(opoffs) * 2, ksrval);
-	cache.eg_rate[YMFM_ENV_RELEASE] = effective_rate(op_release_rate(opoffs) * 4 + 2, ksrval);
-	cache.eg_rate[YMFM_ENV_DEPRESS] = 0x3f;
-}
-
-
-//-------------------------------------------------
 //  clock_noise_and_lfo - clock the noise and LFO,
 //  handling clock division, depth, and waveform
 //  computations
@@ -996,6 +912,90 @@ u16 ymopm_registers::lfo_am_offset(u16 choffs) const
 
 
 //-------------------------------------------------
+//  cache_operator_data - fill the operator cache
+//  with prefetched data
+//-------------------------------------------------
+
+void ymopm_registers::cache_operator_data(u16 choffs, u16 opoffs, ymfm_opdata_cache &cache)
+{
+	// get frequency from the channel
+	u16 block_freq = cache.block_freq = this->ch_block_freq(choffs);
+
+	// compute the keycode: block_freq is:
+	//
+	//     BBBCCCCFFFFFF
+	//     ^^^^^
+	//
+	// the 5-bit keycode is just the top 5 bits (block + top 2 bits
+	// of the key code)
+	u8 keycode = BIT(block_freq, 8, 5);
+
+	// detune adjustment
+	s8 detune = cache.detune = detune_adjustment(this->op_detune(opoffs), keycode);
+
+	// phase step, or 0 if PM is active; this depends on block_freq and
+	// detune, so compute it after we've done those
+	cache.phase_step = (ch_lfo_pm_sens(choffs) != 0) ? 0 : compute_phase_step(choffs, opoffs, block_freq, detune, 0);
+
+	// total level, scaled by 8
+	cache.total_level = op_total_level(opoffs) << 3;
+
+	// 4-bit sustain level, but 15 means 31 so effectively 5 bits
+	cache.eg_sustain = op_sustain_level(opoffs);
+	cache.eg_sustain |= (cache.eg_sustain + 1) & 0x10;
+
+	// determine KSR adjustment for enevlope rates
+	u8 ksrval = keycode >> (op_ksr(opoffs) ^ 3);
+	cache.eg_rate[YMFM_ENV_ATTACK] = effective_rate(op_attack_rate(opoffs) * 2, ksrval);
+	cache.eg_rate[YMFM_ENV_DECAY] = effective_rate(op_decay_rate(opoffs) * 2, ksrval);
+	cache.eg_rate[YMFM_ENV_SUSTAIN] = effective_rate(op_sustain_rate(opoffs) * 2, ksrval);
+	cache.eg_rate[YMFM_ENV_RELEASE] = effective_rate(op_release_rate(opoffs) * 4 + 2, ksrval);
+	cache.eg_rate[YMFM_ENV_DEPRESS] = 0x3f;
+}
+
+
+//-------------------------------------------------
+//  compute_phase_step - compute the phase step
+//-------------------------------------------------
+
+u32 ymopm_registers::compute_phase_step(u16 choffs, u16 opoffs, u16 block_freq, s8 detuneval, s8 lfo_raw_pm)
+{
+	// OPM logic is rather unique here, due to extra detune
+	// and the use of key codes (not to be confused with keycode)
+
+	// start with coarse detune delta; table uses cents value from
+	// manual, converted into 1/64ths
+	static const s16 s_detune2_delta[4] = { 0, (600*64+50)/100, (781*64+50)/100, (950*64+50)/100 };
+	s16 delta = s_detune2_delta[op_detune2(opoffs)];
+
+	// add in the PM delta
+	u8 pm_sensitivity = ch_lfo_pm_sens(choffs);
+	if (pm_sensitivity != 0)
+	{
+		// raw PM value is -127..128 which is +/- 200 cents
+		// manual gives these magnitudes in cents:
+		//    0, +/-5, +/-10, +/-20, +/-50, +/-100, +/-400, +/-700
+		// this roughly corresponds to shifting the 200-cent value:
+		//    0  >> 5,  >> 4,  >> 3,  >> 2,  >> 1,   << 1,   << 2
+		if (pm_sensitivity < 6)
+			delta += lfo_raw_pm >> (6 - pm_sensitivity);
+		else
+			delta += lfo_raw_pm << (pm_sensitivity - 5);
+	}
+
+	// apply delta and convert to a frequency number
+	u32 phase_step = opm_key_code_to_phase_step(block_freq, delta);
+
+	// apply detune based on the keycode
+	phase_step += detuneval;
+
+	// apply frequency multiplier (0 means 0.5, other values are as-is)
+	u8 multi = op_multiple(opoffs);
+	return (multi == 0) ? (phase_step >> 1) : (phase_step * multi);
+}
+
+
+//-------------------------------------------------
 //  log_keyon - log a key-on event
 //-------------------------------------------------
 
@@ -1018,13 +1018,13 @@ void ymopm_registers::log_keyon(u16 choffs, u16 opoffs)
 		BIT(ch_output_mask(choffs), 0) ? 'L' : '-',
 		BIT(ch_output_mask(choffs), 1) ? 'R' : '-');
 
-	if (op_lfo_am_enabled(opoffs))
+	if (op_lfo_am_enable(opoffs))
 		LOG(" lfoa=%d/%02X", ch_lfo_am_sens(choffs), lfo_am_depth());
 	if (ch_lfo_pm_sens(choffs) != 0)
 		LOG(" lfop=%d/%02X", ch_lfo_pm_sens(choffs), lfo_pm_depth());
-	if (op_lfo_am_enabled(opoffs) || ch_lfo_pm_sens(choffs) != 0)
+	if (op_lfo_am_enable(opoffs) || ch_lfo_pm_sens(choffs) != 0)
 		LOG(" lfo=%02X/%d", lfo_rate(), lfo_waveform());
-	if (noise_enabled() && opoffs == 31)
+	if (noise_enable() && opoffs == 31)
 		LOG(" noise=1");
 }
 
@@ -1173,112 +1173,6 @@ bool ymopn_registers_base<IsOpnA>::write(u16 index, u8 data, u8 &channel, u8 &op
 
 
 //-------------------------------------------------
-//  compute_phase_step - compute the phase step
-//-------------------------------------------------
-
-template<bool IsOpnA>
-u32 ymopn_registers_base<IsOpnA>::compute_phase_step(u16 choffs, u16 opoffs, u16 block_freq, s8 detuneval, s8 lfo_raw_pm)
-{
-	// OPN phase calculation has only a single detune parameter
-	// and uses FNUMs instead of keycodes
-
-	// extract frequency number (low 11 bits of block_freq)
-	u16 fnum = BIT(block_freq, 0, 11) << 1;
-
-	// if there's a non-zero PM sensitivity, compute the adjustment
-	u8 pm_sensitivity = ch_lfo_pm_sens(choffs);
-	if (pm_sensitivity != 0)
-	{
-		// apply the phase adjustment based on the upper 7 bits
-		// of FNUM and the PM depth parameters
-		fnum += opn_lfo_pm_phase_adjustment(BIT(block_freq, 4, 7), pm_sensitivity, lfo_raw_pm);
-
-		// keep fnum to 12 bits
-		fnum &= 0xfff;
-	}
-
-	// apply block shift to compute phase step
-	u8 block = BIT(block_freq, 11, 3);
-	u32 phase_step = (fnum << block) >> 2;
-
-	// apply detune based on the keycode
-	phase_step += detuneval;
-
-	// clamp to 17 bits in case detune overflows
-	// QUESTION: is this specific to the YM2612/3438?
-	phase_step &= 0x1ffff;
-
-	// apply frequency multiplier (0 means 0.5, other values are as-is)
-	u8 multi = op_multiple(opoffs);
-	return (multi == 0) ? (phase_step >> 1) : (phase_step * multi);
-}
-
-
-//-------------------------------------------------
-//  cache_operator_data - fill the operator cache
-//  with prefetched data
-//-------------------------------------------------
-
-template<bool IsOpnA>
-void ymopn_registers_base<IsOpnA>::cache_operator_data(u16 choffs, u16 opoffs, ymfm_opdata_cache &cache)
-{
-	// get frequency from the channel
-	u16 block_freq = cache.block_freq = this->ch_block_freq(choffs);
-
-	// if multi-frequency mode is enabled and this is channel 2,
-	// fetch one of the special frequencies
-	if (multi_freq() && choffs == 2)
-	{
-		if (opoffs == 2)
-			block_freq = cache.block_freq = multi_block_freq(1);
-		else if (opoffs == 10)
-			block_freq = cache.block_freq = multi_block_freq(2);
-		else if (opoffs == 6)
-			block_freq = cache.block_freq = multi_block_freq(0);
-	}
-
-	// compute the keycode: block_freq is:
-	//
-	//     BBBFFFFFFFFFFF
-	//     ^^^^???
-	//
-	// the 5-bit keycode uses the top 4 bits plus a magic formula
-	// for the final bit
-	u8 keycode = BIT(block_freq, 10, 4) << 1;
-
-	// lowest bit is determined by a mix of next lower FNUM bits
-	// according to this equation from the YM2608 manual:
-	//
-	//   (F11 & (F10 | F9 | F8)) | (!F11 & F10 & F9 & F8)
-	//
-	// for speed, we just look it up in a 16-bit constant
-	keycode |= BIT(0xfe80, BIT(block_freq, 7, 4));
-
-	// detune adjustment
-	s8 detune = cache.detune = detune_adjustment(op_detune(opoffs), keycode);
-
-	// phase step, or 0 if PM is active; this depends on block_freq and
-	// detune, so compute it after we've done those
-	cache.phase_step = (IsOpnA && lfo_enabled() && ch_lfo_pm_sens(choffs) != 0) ? 0 : compute_phase_step(choffs, opoffs, block_freq, detune, 0);
-
-	// total level, scaled by 8
-	cache.total_level = op_total_level(opoffs) << 3;
-
-	// 4-bit sustain level, but 15 means 31 so effectively 5 bits
-	cache.eg_sustain = op_sustain_level(opoffs);
-	cache.eg_sustain |= (cache.eg_sustain + 1) & 0x10;
-
-	// determine KSR adjustment for enevlope rates
-	u8 ksrval = keycode >> (op_ksr(opoffs) ^ 3);
-	cache.eg_rate[YMFM_ENV_ATTACK] = effective_rate(op_attack_rate(opoffs) * 2, ksrval);
-	cache.eg_rate[YMFM_ENV_DECAY] = effective_rate(op_decay_rate(opoffs) * 2, ksrval);
-	cache.eg_rate[YMFM_ENV_SUSTAIN] = effective_rate(op_sustain_rate(opoffs) * 2, ksrval);
-	cache.eg_rate[YMFM_ENV_RELEASE] = effective_rate(op_release_rate(opoffs) * 4 + 2, ksrval);
-	cache.eg_rate[YMFM_ENV_DEPRESS] = 0x3f;
-}
-
-
-//-------------------------------------------------
 //  clock_noise_and_lfo - clock the noise and LFO,
 //  handling clock division, depth, and waveform
 //  computations
@@ -1290,7 +1184,7 @@ s8 ymopn_registers_base<IsOpnA>::clock_noise_and_lfo()
 	// OPN has no noise generation
 
 	// if LFO not enabled (not present on OPN), quick exit with 0s
-	if (!IsOpnA || !lfo_enabled())
+	if (!IsOpnA || !lfo_enable())
 	{
 		m_lfo_counter = 0;
 		m_lfo_am = 0;
@@ -1350,6 +1244,112 @@ u16 ymopn_registers_base<IsOpnA>::lfo_am_offset(u16 choffs) const
 
 
 //-------------------------------------------------
+//  cache_operator_data - fill the operator cache
+//  with prefetched data
+//-------------------------------------------------
+
+template<bool IsOpnA>
+void ymopn_registers_base<IsOpnA>::cache_operator_data(u16 choffs, u16 opoffs, ymfm_opdata_cache &cache)
+{
+	// get frequency from the channel
+	u16 block_freq = cache.block_freq = this->ch_block_freq(choffs);
+
+	// if multi-frequency mode is enabled and this is channel 2,
+	// fetch one of the special frequencies
+	if (multi_freq() && choffs == 2)
+	{
+		if (opoffs == 2)
+			block_freq = cache.block_freq = multi_block_freq(1);
+		else if (opoffs == 10)
+			block_freq = cache.block_freq = multi_block_freq(2);
+		else if (opoffs == 6)
+			block_freq = cache.block_freq = multi_block_freq(0);
+	}
+
+	// compute the keycode: block_freq is:
+	//
+	//     BBBFFFFFFFFFFF
+	//     ^^^^???
+	//
+	// the 5-bit keycode uses the top 4 bits plus a magic formula
+	// for the final bit
+	u8 keycode = BIT(block_freq, 10, 4) << 1;
+
+	// lowest bit is determined by a mix of next lower FNUM bits
+	// according to this equation from the YM2608 manual:
+	//
+	//   (F11 & (F10 | F9 | F8)) | (!F11 & F10 & F9 & F8)
+	//
+	// for speed, we just look it up in a 16-bit constant
+	keycode |= BIT(0xfe80, BIT(block_freq, 7, 4));
+
+	// detune adjustment
+	s8 detune = cache.detune = detune_adjustment(op_detune(opoffs), keycode);
+
+	// phase step, or 0 if PM is active; this depends on block_freq and
+	// detune, so compute it after we've done those
+	cache.phase_step = (IsOpnA && lfo_enable() && ch_lfo_pm_sens(choffs) != 0) ? 0 : compute_phase_step(choffs, opoffs, block_freq, detune, 0);
+
+	// total level, scaled by 8
+	cache.total_level = op_total_level(opoffs) << 3;
+
+	// 4-bit sustain level, but 15 means 31 so effectively 5 bits
+	cache.eg_sustain = op_sustain_level(opoffs);
+	cache.eg_sustain |= (cache.eg_sustain + 1) & 0x10;
+
+	// determine KSR adjustment for enevlope rates
+	u8 ksrval = keycode >> (op_ksr(opoffs) ^ 3);
+	cache.eg_rate[YMFM_ENV_ATTACK] = effective_rate(op_attack_rate(opoffs) * 2, ksrval);
+	cache.eg_rate[YMFM_ENV_DECAY] = effective_rate(op_decay_rate(opoffs) * 2, ksrval);
+	cache.eg_rate[YMFM_ENV_SUSTAIN] = effective_rate(op_sustain_rate(opoffs) * 2, ksrval);
+	cache.eg_rate[YMFM_ENV_RELEASE] = effective_rate(op_release_rate(opoffs) * 4 + 2, ksrval);
+	cache.eg_rate[YMFM_ENV_DEPRESS] = 0x3f;
+}
+
+
+//-------------------------------------------------
+//  compute_phase_step - compute the phase step
+//-------------------------------------------------
+
+template<bool IsOpnA>
+u32 ymopn_registers_base<IsOpnA>::compute_phase_step(u16 choffs, u16 opoffs, u16 block_freq, s8 detuneval, s8 lfo_raw_pm)
+{
+	// OPN phase calculation has only a single detune parameter
+	// and uses FNUMs instead of keycodes
+
+	// extract frequency number (low 11 bits of block_freq)
+	u16 fnum = BIT(block_freq, 0, 11) << 1;
+
+	// if there's a non-zero PM sensitivity, compute the adjustment
+	u8 pm_sensitivity = ch_lfo_pm_sens(choffs);
+	if (pm_sensitivity != 0)
+	{
+		// apply the phase adjustment based on the upper 7 bits
+		// of FNUM and the PM depth parameters
+		fnum += opn_lfo_pm_phase_adjustment(BIT(block_freq, 4, 7), pm_sensitivity, lfo_raw_pm);
+
+		// keep fnum to 12 bits
+		fnum &= 0xfff;
+	}
+
+	// apply block shift to compute phase step
+	u8 block = BIT(block_freq, 11, 3);
+	u32 phase_step = (fnum << block) >> 2;
+
+	// apply detune based on the keycode
+	phase_step += detuneval;
+
+	// clamp to 17 bits in case detune overflows
+	// QUESTION: is this specific to the YM2612/3438?
+	phase_step &= 0x1ffff;
+
+	// apply frequency multiplier (0 means 0.5, other values are as-is)
+	u8 multi = op_multiple(opoffs);
+	return (multi == 0) ? (phase_step >> 1) : (phase_step * multi);
+}
+
+
+//-------------------------------------------------
 //  log_keyon - log a key-on event
 //-------------------------------------------------
 
@@ -1374,14 +1374,16 @@ void ymopn_registers_base<IsOpnA>::log_keyon(u16 choffs, u16 opoffs)
 		LOG(" out=%c%c",
 			BIT(ch_output_mask(choffs), 0) ? 'L' : '-',
 			BIT(ch_output_mask(choffs), 1) ? 'R' : '-');
-	if (op_ssg_eg_enabled(opoffs))
+	if (op_ssg_eg_enable(opoffs))
 		LOG(" ssg=%X", op_ssg_eg_mode(opoffs));
-	if (lfo_enabled() && op_lfo_am_enabled(opoffs))
+	if (lfo_enable() && op_lfo_am_enable(opoffs))
 		LOG(" lfoa=%d", ch_lfo_am_sens(choffs));
-	if (lfo_enabled() && ch_lfo_pm_sens(choffs) != 0)
+	if (lfo_enable() && ch_lfo_pm_sens(choffs) != 0)
 		LOG(" lfop=%d", ch_lfo_pm_sens(choffs));
-	if (lfo_enabled() && (op_lfo_am_enabled(opoffs) || ch_lfo_pm_sens(choffs) != 0))
+	if (lfo_enable() && (op_lfo_am_enable(opoffs) || ch_lfo_pm_sens(choffs) != 0))
 		LOG(" lfo=%02X", lfo_rate());
+	if (multi_freq() && choffs == 2)
+		LOG(" multi=1");
 }
 
 
@@ -1522,94 +1524,6 @@ bool ymopl_registers_base<Revision>::write(u16 index, u8 data, u8 &channel, u8 &
 
 
 //-------------------------------------------------
-//  compute_phase_step - compute the phase step
-//-------------------------------------------------
-
-template<int Revision>
-u32 ymopl_registers_base<Revision>::compute_phase_step(u16 choffs, u16 opoffs, u16 block_freq, s8 detuneval, s8 lfo_raw_pm)
-{
-	// OPL phase calculation has no detuning, but uses FNUMs like
-	// the OPN version, and computes PM a bit differently
-
-	// extract frequency number (low 11 bits of block_freq)
-	u16 fnum = BIT(block_freq, 0, 11) << 1;
-
-	// if there's a non-zero PM sensitivity, compute the adjustment
-	if (op_lfo_pm_enabled(opoffs))
-	{
-		// apply the phase adjustment based on the upper 7 bits
-		// of FNUM and the PM depth parameters
-		fnum += (lfo_raw_pm * BIT(block_freq, 8, 3)) >> 3;
-
-		// keep fnum to 12 bits
-		fnum &= 0xfff;
-	}
-
-	// apply block shift to compute phase step
-	u8 block = BIT(block_freq, 11, 3);
-	u32 phase_step = (fnum << block) >> 2;
-
-	// apply frequency multiplier (0 means 0.5, other values are as-is)
-	u8 multi = op_multiple(opoffs);
-	return (multi == 0) ? (phase_step >> 1) : (phase_step * multi);
-}
-
-
-//-------------------------------------------------
-//  cache_operator_data - fill the operator cache
-//  with prefetched data; note that this code is
-//  also used by ymopna_registers, so it must
-//  handle upper channels cleanly
-//-------------------------------------------------
-
-template<int Revision>
-void ymopl_registers_base<Revision>::cache_operator_data(u16 choffs, u16 opoffs, ymfm_opdata_cache &cache)
-{
-	// get frequency from the channel
-	u16 block_freq = cache.block_freq = this->ch_block_freq(choffs);
-
-	// compute the keycode: block_freq is:
-	//
-	//     BBBFFFFFFFFFF0
-	//     ^^^??
-	//
-	// the 4-bit keycode uses the top 3 bits plus one of the next two bits
-	u8 keycode = BIT(block_freq, 11, 3) << 1;
-
-	// lowest bit is determined by note_select(); note that it is
-	// actually reversed from what the manual says, however
-	keycode |= BIT(block_freq, 10 - note_select(), 1);
-
-	// no detune adjustment on OPL
-	cache.detune = 0;
-
-	// phase step, or 0 if PM is active; this depends on block_freq and
-	// detune, so compute it after we've done those
-	cache.phase_step = op_lfo_pm_enabled(opoffs) ? 0 : compute_phase_step(choffs, opoffs, block_freq, 0, 0);
-
-	// total level, scaled by 8
-	cache.total_level = op_total_level(opoffs) << 3;
-
-	// pre-add key scale level
-	u8 ksl = op_key_scale_level(opoffs);
-	if (ksl != 0)
-		cache.total_level += opl_key_scale_atten(block_freq) << ksl;
-
-	// 4-bit sustain level, but 15 means 31 so effectively 5 bits
-	cache.eg_sustain = op_sustain_level(opoffs);
-	cache.eg_sustain |= (cache.eg_sustain + 1) & 0x10;
-
-	// determine KSR adjustment for enevlope rates
-	u8 ksrval = keycode >> (op_ksr(opoffs) ^ 3);
-	cache.eg_rate[YMFM_ENV_ATTACK] = effective_rate(op_attack_rate(opoffs) * 4, ksrval);
-	cache.eg_rate[YMFM_ENV_DECAY] = effective_rate(op_decay_rate(opoffs) * 4, ksrval);
-	cache.eg_rate[YMFM_ENV_SUSTAIN] = op_eg_sustain(opoffs) ? 0 : effective_rate(op_release_rate(opoffs) * 4, ksrval);
-	cache.eg_rate[YMFM_ENV_RELEASE] = effective_rate(op_release_rate(opoffs) * 4, ksrval);
-	cache.eg_rate[YMFM_ENV_DEPRESS] = 0x3f;
-}
-
-
-//-------------------------------------------------
 //  clock_noise_and_lfo - clock the noise and LFO,
 //  handling clock division, depth, and waveform
 //  computations
@@ -1651,6 +1565,149 @@ s8 ymopl_registers_base<Revision>::clock_noise_and_lfo()
 
 
 //-------------------------------------------------
+//  cache_operator_data - fill the operator cache
+//  with prefetched data; note that this code is
+//  also used by ymopna_registers, so it must
+//  handle upper channels cleanly
+//-------------------------------------------------
+
+template<int Revision>
+void ymopl_registers_base<Revision>::cache_operator_data(u16 choffs, u16 opoffs, ymfm_opdata_cache &cache)
+{
+	// get frequency from the channel
+	u16 block_freq = cache.block_freq = this->ch_block_freq(choffs);
+
+	// compute the keycode: block_freq is:
+	//
+	//     BBBFFFFFFFFFF0
+	//     ^^^??
+	//
+	// the 4-bit keycode uses the top 3 bits plus one of the next two bits
+	u8 keycode = BIT(block_freq, 11, 3) << 1;
+
+	// lowest bit is determined by note_select(); note that it is
+	// actually reversed from what the manual says, however
+	keycode |= BIT(block_freq, 10 - note_select(), 1);
+
+	// no detune adjustment on OPL
+	cache.detune = 0;
+
+	// phase step, or 0 if PM is active; this depends on block_freq and
+	// detune, so compute it after we've done those
+	cache.phase_step = op_lfo_pm_enable(opoffs) ? 0 : compute_phase_step(choffs, opoffs, block_freq, 0, 0);
+
+	// total level, scaled by 8
+	cache.total_level = op_total_level(opoffs) << 3;
+
+	// pre-add key scale level
+	u8 ksl = op_ksl(opoffs);
+	if (ksl != 0)
+		cache.total_level += opl_key_scale_atten(block_freq) << ksl;
+
+	// 4-bit sustain level, but 15 means 31 so effectively 5 bits
+	cache.eg_sustain = op_sustain_level(opoffs);
+	cache.eg_sustain |= (cache.eg_sustain + 1) & 0x10;
+
+	// determine KSR adjustment for enevlope rates
+	u8 ksrval = keycode >> (op_ksr(opoffs) ^ 3);
+	cache.eg_rate[YMFM_ENV_ATTACK] = effective_rate(op_attack_rate(opoffs) * 4, ksrval);
+	cache.eg_rate[YMFM_ENV_DECAY] = effective_rate(op_decay_rate(opoffs) * 4, ksrval);
+	cache.eg_rate[YMFM_ENV_SUSTAIN] = op_eg_sustain(opoffs) ? 0 : effective_rate(op_release_rate(opoffs) * 4, ksrval);
+	cache.eg_rate[YMFM_ENV_RELEASE] = effective_rate(op_release_rate(opoffs) * 4, ksrval);
+	cache.eg_rate[YMFM_ENV_DEPRESS] = 0x3f;
+}
+
+
+//-------------------------------------------------
+//  compute_phase_step - compute the phase step
+//-------------------------------------------------
+
+template<int Revision>
+u32 ymopl_registers_base<Revision>::compute_phase_step(u16 choffs, u16 opoffs, u16 block_freq, s8 detuneval, s8 lfo_raw_pm)
+{
+	// OPL phase calculation has no detuning, but uses FNUMs like
+	// the OPN version, and computes PM a bit differently
+
+	// extract frequency number (low 11 bits of block_freq)
+	u16 fnum = BIT(block_freq, 0, 11) << 1;
+
+	// if there's a non-zero PM sensitivity, compute the adjustment
+	if (op_lfo_pm_enable(opoffs))
+	{
+		// apply the phase adjustment based on the upper 7 bits
+		// of FNUM and the PM depth parameters
+		fnum += (lfo_raw_pm * BIT(block_freq, 8, 3)) >> 3;
+
+		// keep fnum to 12 bits
+		fnum &= 0xfff;
+	}
+
+	// apply block shift to compute phase step
+	u8 block = BIT(block_freq, 11, 3);
+	u32 phase_step = (fnum << block) >> 2;
+
+	// apply frequency multiplier (0 means 0.5, other values are as-is)
+	u8 multi = op_multiple(opoffs);
+	return (multi == 0) ? (phase_step >> 1) : (phase_step * multi);
+}
+
+
+//-------------------------------------------------
+//  transform_phase - transform the phase value
+//  based on the selected waveform, returning 0xfff
+//  if the output needs to be inverted
+//-------------------------------------------------
+
+template<int Revision>
+u16 ymopl_registers_base<Revision>::transform_phase(u16 opoffs, u16 &phase)
+{
+	// if waveforms enabled, do nothing
+	if (!waveform_enable())
+		return 0;
+
+	// per-quadrant behaviors:
+	//   bits  0-11 = mask to AND with
+	//   bits 12-13 = shift value: 0: <<1, 1:0, 2: >>1
+	//   bit     14 = set bit 0x100
+	//   bit     15 = invert the output
+	static u16 const s_waveform_mask_shift[8*4] =
+	{
+		// OPL2 waveforms:
+		0x13ff, 0x13ff, 0x13ff, 0x13ff, // 0: no shift
+		0x13ff, 0x13ff, 0x0000, 0x0000, // 1: no shift, mask to 0 in Q3/Q4
+		0x11ff, 0x11ff, 0x11ff, 0x11ff, // 2: no shift, mask off sign bit
+		0x11ff, 0x0000, 0x11ff, 0x0000, // 3: no shift, mask off sign bit in Q1/Q3, mask to 0 in Q2/Q4
+
+		// OPL3 waveforms:
+		0x03ff, 0x03ff, 0x0000, 0x0000, // 4: lshift 1, mask to 0 in Q3/Q4
+		0x01ff, 0x01ff, 0x0000, 0x0000, // 5: lshift 1, mask off sign bit in Q1/Q2, mask to 0 in Q2/Q4
+		0x5200, 0x5200, 0x5200, 0x5200, // 6: no shift, sign bit only, OR with 0x100
+		0xa3ff, 0xa3ff, 0xa3ff, 0xa3ff  // 7: rshift 1 and invert the output
+	};
+	u16 mask_shift = s_waveform_mask_shift[op_waveform(opoffs) * 4 + BIT(phase, 8, 2)];
+
+	// The OPL2 waveforms only need the AND, so handle them separately
+	if (!IsOpl3Plus)
+	{
+		phase &= mask_shift;
+		return 0;
+	}
+	else
+	{
+		// apply the shift, preserving the sign bit for the right shift case
+		phase = s16(phase << 6) >> (5 + BIT(mask_shift, 12, 2));
+
+		// next apply the mask and set the 0x100 bit if needed
+		phase &= mask_shift;
+		phase |= BIT(mask_shift, 14) << 8;
+
+		// the invert state comes from the top bit
+		return (s16(mask_shift) >> 15) & 0xfff;
+	}
+}
+
+
+//-------------------------------------------------
 //  log_keyon - log a key-on event
 //-------------------------------------------------
 
@@ -1665,7 +1722,7 @@ void ymopl_registers_base<Revision>::log_keyon(u16 choffs, u16 opoffs)
 		op_total_level(opoffs),
 		op_ksr(opoffs),
 		note_select(),
-		op_key_scale_level(opoffs),
+		op_ksl(opoffs),
 		op_attack_rate(opoffs),
 		op_decay_rate(opoffs),
 		op_release_rate(opoffs),
@@ -1678,9 +1735,9 @@ void ymopl_registers_base<Revision>::log_keyon(u16 choffs, u16 opoffs)
 			BIT(ch_output_mask(choffs), 1) ? 'R' : '-',
 			BIT(ch_output_mask(choffs), 2) ? '0' : '-',
 			BIT(ch_output_mask(choffs), 3) ? '1' : '-');
-	if (op_lfo_am_enabled(opoffs))
+	if (op_lfo_am_enable(opoffs))
 		LOG(" lfoa=%d", lfo_am_depth());
-	if (op_lfo_pm_enabled(opoffs) != 0)
+	if (op_lfo_pm_enable(opoffs) != 0)
 		LOG(" lfop=%d", lfo_pm_depth());
 	if (waveform_enable() && op_waveform(opoffs) != 0)
 		LOG(" wf=%d", op_waveform(opoffs));
@@ -1795,106 +1852,6 @@ bool ymopll_registers::write(u16 index, u8 data, u8 &channel, u8 &opmask)
 
 
 //-------------------------------------------------
-//  compute_phase_step - compute the phase step
-//-------------------------------------------------
-
-u32 ymopll_registers::compute_phase_step(u16 choffs, u16 opoffs, u16 block_freq, s8 detuneval, s8 lfo_raw_pm)
-{
-	// OPL phase calculation has no detuning, but uses FNUMs like
-	// the OPN version, and computes PM a bit differently
-
-	// extract frequency number (low 11 bits of block_freq)
-	u16 fnum = BIT(block_freq, 0, 11) << 1;
-
-	// if there's a non-zero PM sensitivity, compute the adjustment
-	if (op_lfo_pm_enabled(opoffs))
-	{
-		// apply the phase adjustment based on the upper 7 bits
-		// of FNUM and the PM depth parameters
-		fnum += (lfo_raw_pm * BIT(block_freq, 8, 3)) >> 3;
-
-		// keep fnum to 12 bits
-		fnum &= 0xfff;
-	}
-
-	// apply block shift to compute phase step
-	u8 block = BIT(block_freq, 11, 3);
-	u32 phase_step = (fnum << block) >> 2;
-
-	// apply frequency multiplier (0 means 0.5, other values are as-is)
-	u8 multi = op_multiple(opoffs);
-	return (multi == 0) ? (phase_step >> 1) : (phase_step * multi);
-}
-
-
-//-------------------------------------------------
-//  cache_operator_data - fill the operator cache
-//  with prefetched data; note that this code is
-//  also used by ymopna_registers, so it must
-//  handle upper channels cleanly
-//-------------------------------------------------
-
-void ymopll_registers::cache_operator_data(u16 choffs, u16 opoffs, ymfm_opdata_cache &cache)
-{
-	// get frequency from the channel
-	u16 block_freq = cache.block_freq = this->ch_block_freq(choffs);
-
-	// compute the keycode: block_freq is:
-	//
-	//     BBBFFFFFFFFFF0
-	//     ^^^^
-	//
-	// the 4-bit keycode uses the top 3 bits plus one of the next two bits
-	u8 keycode = BIT(cache.block_freq, 10, 4);
-
-	// no detune adjustment on OPLL
-	cache.detune = 0;
-
-	// phase step, or 0 if PM is active; this depends on block_freq and
-	// detune, so compute it after we've done those
-	cache.phase_step = op_lfo_pm_enabled(opoffs) ? 0 : compute_phase_step(choffs, opoffs, block_freq, 0, 0);
-
-	// total level, scaled by 8
-	cache.total_level = op_total_level(opoffs) << 3;
-
-	// pre-add key scale level
-	u8 ksl = op_key_scale_level(opoffs);
-	if (ksl != 0)
-		cache.total_level += opl_key_scale_atten(block_freq) << ksl;
-
-	// 4-bit sustain level, but 15 means 31 so effectively 5 bits
-	cache.eg_sustain = op_sustain_level(opoffs);
-	cache.eg_sustain |= (cache.eg_sustain + 1) & 0x10;
-
-	// The envelope diagram in the YM2413 datasheet gives values for these
-	// in ms from 0->48dB. The attack/decay tables give values in ms from
-	// 0->96dB, so to pick an equivalent decay rate, we want to find the
-	// closest match that is 2x the 0->48dB value:
-	//
-	//     DP =   10ms (0->48db) ->   20ms (0->96db); decay of 12 gives   19.20ms
-	//     RR =  310ms (0->48db) ->  620ms (0->96db); decay of  7 gives  613.76ms
-	//     RS = 1200ms (0->48db) -> 2400ms (0->96db); decay of  5 gives 2455.04ms
-	//
-	// The envelope diagram for percussive sounds (eg_sustain() == 0) also uses
-	// "RR" to mean both the constant RR above and the Release Rate specified in
-	// the instrument data. In this case, Relief Pitcher's credit sound bears out
-	// that the Release Rate is used during sustain, and that the constant RR
-	// (or RS) is used during the release phase.
-	constexpr u8 DP = 12 * 4;
-	constexpr u8 RR = 7 * 4;
-	constexpr u8 RS = 5 * 4;
-
-	// determine KSR adjustment for enevlope rates
-	u8 ksrval = keycode >> (op_ksr(opoffs) ^ 3);
-	cache.eg_rate[YMFM_ENV_ATTACK] = effective_rate(op_attack_rate(opoffs) * 4, ksrval);
-	cache.eg_rate[YMFM_ENV_DECAY] = effective_rate(op_decay_rate(opoffs) * 4, ksrval);
-	cache.eg_rate[YMFM_ENV_SUSTAIN] = op_eg_sustain(opoffs) ? 0 : effective_rate(op_release_rate(opoffs) * 4, ksrval);
-	cache.eg_rate[YMFM_ENV_RELEASE] = ch_sustain(choffs) ? RS : (op_eg_sustain(opoffs) ? effective_rate(op_release_rate(opoffs) * 4, ksrval) : RR);
-	cache.eg_rate[YMFM_ENV_DEPRESS] = DP;
-}
-
-
-//-------------------------------------------------
 //  clock_noise_and_lfo - clock the noise and LFO,
 //  handling clock division, depth, and waveform
 //  computations
@@ -1932,6 +1889,120 @@ s8 ymopll_registers::clock_noise_and_lfo()
 
 
 //-------------------------------------------------
+//  cache_operator_data - fill the operator cache
+//  with prefetched data; note that this code is
+//  also used by ymopna_registers, so it must
+//  handle upper channels cleanly
+//-------------------------------------------------
+
+void ymopll_registers::cache_operator_data(u16 choffs, u16 opoffs, ymfm_opdata_cache &cache)
+{
+	// get frequency from the channel
+	u16 block_freq = cache.block_freq = this->ch_block_freq(choffs);
+
+	// compute the keycode: block_freq is:
+	//
+	//     BBBFFFFFFFFFF0
+	//     ^^^^
+	//
+	// the 4-bit keycode uses the top 3 bits plus one of the next two bits
+	u8 keycode = BIT(cache.block_freq, 10, 4);
+
+	// no detune adjustment on OPLL
+	cache.detune = 0;
+
+	// phase step, or 0 if PM is active; this depends on block_freq and
+	// detune, so compute it after we've done those
+	cache.phase_step = op_lfo_pm_enable(opoffs) ? 0 : compute_phase_step(choffs, opoffs, block_freq, 0, 0);
+
+	// total level, scaled by 8
+	cache.total_level = op_total_level(opoffs) << 3;
+
+	// pre-add key scale level
+	u8 ksl = op_ksl(opoffs);
+	if (ksl != 0)
+		cache.total_level += opl_key_scale_atten(block_freq) << ksl;
+
+	// 4-bit sustain level, but 15 means 31 so effectively 5 bits
+	cache.eg_sustain = op_sustain_level(opoffs);
+	cache.eg_sustain |= (cache.eg_sustain + 1) & 0x10;
+
+	// The envelope diagram in the YM2413 datasheet gives values for these
+	// in ms from 0->48dB. The attack/decay tables give values in ms from
+	// 0->96dB, so to pick an equivalent decay rate, we want to find the
+	// closest match that is 2x the 0->48dB value:
+	//
+	//     DP =   10ms (0->48db) ->   20ms (0->96db); decay of 12 gives   19.20ms
+	//     RR =  310ms (0->48db) ->  620ms (0->96db); decay of  7 gives  613.76ms
+	//     RS = 1200ms (0->48db) -> 2400ms (0->96db); decay of  5 gives 2455.04ms
+	//
+	// The envelope diagram for percussive sounds (eg_sustain() == 0) also uses
+	// "RR" to mean both the constant RR above and the Release Rate specified in
+	// the instrument data. In this case, Relief Pitcher's credit sound bears out
+	// that the Release Rate is used during sustain, and that the constant RR
+	// (or RS) is used during the release phase.
+	constexpr u8 DP = 12 * 4;
+	constexpr u8 RR = 7 * 4;
+	constexpr u8 RS = 5 * 4;
+
+	// determine KSR adjustment for enevlope rates
+	u8 ksrval = keycode >> (op_ksr(opoffs) ^ 3);
+	cache.eg_rate[YMFM_ENV_ATTACK] = effective_rate(op_attack_rate(opoffs) * 4, ksrval);
+	cache.eg_rate[YMFM_ENV_DECAY] = effective_rate(op_decay_rate(opoffs) * 4, ksrval);
+	cache.eg_rate[YMFM_ENV_SUSTAIN] = op_eg_sustain(opoffs) ? 0 : effective_rate(op_release_rate(opoffs) * 4, ksrval);
+	cache.eg_rate[YMFM_ENV_RELEASE] = ch_sustain(choffs) ? RS : (op_eg_sustain(opoffs) ? effective_rate(op_release_rate(opoffs) * 4, ksrval) : RR);
+	cache.eg_rate[YMFM_ENV_DEPRESS] = DP;
+}
+
+
+//-------------------------------------------------
+//  compute_phase_step - compute the phase step
+//-------------------------------------------------
+
+u32 ymopll_registers::compute_phase_step(u16 choffs, u16 opoffs, u16 block_freq, s8 detuneval, s8 lfo_raw_pm)
+{
+	// OPL phase calculation has no detuning, but uses FNUMs like
+	// the OPN version, and computes PM a bit differently
+
+	// extract frequency number (low 11 bits of block_freq)
+	u16 fnum = BIT(block_freq, 0, 11) << 1;
+
+	// if there's a non-zero PM sensitivity, compute the adjustment
+	if (op_lfo_pm_enable(opoffs))
+	{
+		// apply the phase adjustment based on the upper 7 bits
+		// of FNUM and the PM depth parameters
+		fnum += (lfo_raw_pm * BIT(block_freq, 8, 3)) >> 3;
+
+		// keep fnum to 12 bits
+		fnum &= 0xfff;
+	}
+
+	// apply block shift to compute phase step
+	u8 block = BIT(block_freq, 11, 3);
+	u32 phase_step = (fnum << block) >> 2;
+
+	// apply frequency multiplier (0 means 0.5, other values are as-is)
+	u8 multi = op_multiple(opoffs);
+	return (multi == 0) ? (phase_step >> 1) : (phase_step * multi);
+}
+
+
+//-------------------------------------------------
+//  transform_phase - transform the phase value
+//  based on the selected waveform, returning 0xfff
+//  if the output needs to be inverted
+//-------------------------------------------------
+
+u16 ymopll_registers::transform_phase(u16 opoffs, u16 &phase)
+{
+	// if the waveform is 1, zero the second half of the waveform
+	phase &= (BIT(phase, 9) & op_waveform(opoffs)) - 1;
+	return 0;
+}
+
+
+//-------------------------------------------------
 //  log_keyon - log a key-on event
 //-------------------------------------------------
 
@@ -1944,7 +2015,7 @@ void ymopll_registers::log_keyon(u16 choffs, u16 opoffs)
 		op_multiple(opoffs),
 		op_total_level(opoffs),
 		op_ksr(opoffs),
-		op_key_scale_level(opoffs),
+		op_ksl(opoffs),
 		op_attack_rate(opoffs),
 		op_decay_rate(opoffs),
 		op_release_rate(opoffs),
@@ -1952,9 +2023,9 @@ void ymopll_registers::log_keyon(u16 choffs, u16 opoffs)
 		op_eg_sustain(opoffs),
 		ch_sustain(choffs));
 
-	if (op_lfo_am_enabled(opoffs))
+	if (op_lfo_am_enable(opoffs))
 		LOG(" lfoa=1");
-	if (op_lfo_pm_enabled(opoffs))
+	if (op_lfo_pm_enable(opoffs))
 		LOG(" lfop=1");
 	if (op_waveform(opoffs) != 0)
 		LOG(" wf=1");
@@ -2047,7 +2118,7 @@ template<class RegisterType>
 void ymfm_operator<RegisterType>::clock(u32 env_counter, s8 lfo_raw_pm)
 {
 	// clock the SSG-EG state (OPN/OPNA)
-	if (m_regs.op_ssg_eg_enabled(m_opoffs))
+	if (m_regs.op_ssg_eg_enable(m_opoffs))
 		clock_ssg_eg_state();
 
 	// clock the envelope if on an envelope cycle; env_counter is a x.2 value
@@ -2071,41 +2142,12 @@ s16 ymfm_operator<RegisterType>::compute_volume(u16 phase, u16 am_offset) const
 	// the low 10 bits of phase represents a full 2*PI period over
 	// the full sin wave
 
-	// adjust the phase for the different waveforms
-	u16 invert = 0;
-	if (m_regs.waveform_enable())
-	{
-		// per-quadrant behaviors:
-		//   bits  0-11 = mask to AND with
-		//   bits 12-13 = shift value: 0: <<1, 1:0, 2: >>1
-		//   bit     14 = set bit 0x100
-		//   bit     15 = invert the output
-		static u16 const waveform_mask_shift[8*4] =
-		{
-			// OPL2 waveforms:
-			0x13ff, 0x13ff, 0x13ff, 0x13ff, // 0: no shift
-			0x13ff, 0x13ff, 0x0000, 0x0000, // 1: no shift, mask to 0 in Q3/Q4
-			0x11ff, 0x11ff, 0x11ff, 0x11ff, // 2: no shift, mask off sign bit
-			0x11ff, 0x0000, 0x11ff, 0x0000, // 3: no shift, mask off sign bit in Q1/Q3, mask to 0 in Q2/Q4
+	// early out if the envelope is effectively off
+	if (m_env_attenuation > 0x200)
+		return 0;
 
-			// OPL3 waveforms:
-			0x03ff, 0x03ff, 0x0000, 0x0000, // 4: lshift 1, mask to 0 in Q3/Q4
-			0x01ff, 0x01ff, 0x0000, 0x0000, // 5: lshift 1, mask off sign bit in Q1/Q2, mask to 0 in Q2/Q4
-			0x5200, 0x5200, 0x5200, 0x5200, // 6: no shift, sign bit only, OR with 0x100
-			0xa3ff, 0xa3ff, 0xa3ff, 0xa3ff  // 7: rshift 1 and invert the output
-		};
-		u16 mask_shift = waveform_mask_shift[m_regs.op_waveform(m_opoffs) * 4 + BIT(phase, 8, 2)];
-
-		// apply the shift, preserving the sign bit for the right shift case
-		phase = s16(phase << 6) >> (5 + BIT(mask_shift, 12, 2));
-
-		// next apply the mask and set the 0x100 bit if needed
-		phase &= mask_shift;
-		phase |= BIT(mask_shift, 14) << 8;
-
-		// the invert state comes from the top bit
-		invert = (s16(mask_shift) >> 15) & 0xfff;
-	}
+	// transform the phase for the different waveforms
+	u16 invert = m_regs.transform_phase(m_opoffs, phase);
 
 	// get the absolute value of the sin, as attenuation, as a 4.8 fixed point value
 	u16 sin_attenuation = abs_sin_attenuation(phase) ^ invert;
@@ -2169,7 +2211,7 @@ void ymfm_operator<RegisterType>::start_attack()
 
 	// generally not inverted at start, except if SSG-EG is
 	// enabled and one of the inverted modes is specified
-	m_ssg_inverted = m_regs.op_ssg_eg_enabled(m_opoffs) & BIT(m_regs.op_ssg_eg_mode(m_opoffs), 2);
+	m_ssg_inverted = m_regs.op_ssg_eg_enable(m_opoffs) & BIT(m_regs.op_ssg_eg_mode(m_opoffs), 2);
 
 	// reset the phase when we start an attack
 	m_phase = 0;
@@ -2179,7 +2221,7 @@ void ymfm_operator<RegisterType>::start_attack()
 		m_env_attenuation = 0;
 
 	// log key on events under certain conditions
-//	if (m_regs.lfo_waveform() == 3 && m_regs.lfo_enabled() && ((m_regs.lfo_am_enabled() && m_regs.lfo_am_sensitivity() != 0) || m_regs.lfo_pm_sensitivity() != 0))
+//	if (m_regs.lfo_waveform() == 3 && m_regs.lfo_enable() && ((m_regs.lfo_am_enable() && m_regs.lfo_am_sensitivity() != 0) || m_regs.lfo_pm_sensitivity() != 0))
 //	if ((m_regs.rhythm_enable() && m_regs.chnum() >= 6) ||
 //	    (m_regs.waveform_enable() && m_regs.waveform() != 0))
 	{
@@ -2352,7 +2394,7 @@ void ymfm_operator<RegisterType>::clock_envelope(u16 env_counter)
 	else
 	{
 		// non-SSG-EG cases just apply the increment
-		if (!m_regs.op_ssg_eg_enabled(m_opoffs))
+		if (!m_regs.op_ssg_eg_enable(m_opoffs))
 			m_env_attenuation += increment;
 
 		// SSG-EG only applies if less than mid-point, and then at 4x
@@ -2404,7 +2446,7 @@ u16 ymfm_operator<RegisterType>::envelope_attenuation(u8 am_offset) const
 		result = (0x200 - result) & 0x3ff;
 
 	// add in LFO AM modulation
-	if (m_regs.op_lfo_am_enabled(m_opoffs))
+	if (m_regs.op_lfo_am_enable(m_opoffs))
 		result += am_offset;
 
 	// add in total level and KSL from the cache
@@ -2494,7 +2536,7 @@ void ymfm_channel<RegisterType>::prepare()
 //-------------------------------------------------
 
 template<class RegisterType>
-void ymfm_channel<RegisterType>::clock(u32 env_counter, s8 lfo_raw_pm, bool is_multi_freq)
+void ymfm_channel<RegisterType>::clock(u32 env_counter, s8 lfo_raw_pm)
 {
 	// clock the feedback through
 	m_feedback[0] = m_feedback[1];
@@ -2681,7 +2723,7 @@ void ymfm_channel<RegisterType>::output_4op(s32 outputs[RegisterType::OUTPUTS], 
 	// compute the 14-bit volume/value of operator 4; this could be a noise
 	// value on the OPM; all algorithms consume OP4 output at a minimum
 	s32 result;
-	if (m_regs.noise_enabled() && m_chnum == 7)
+	if (m_regs.noise_enable() && m_chnum == 7)
 		result = m_op[3]->compute_noise_volume(am_offset);
 	else
 	{
@@ -2931,7 +2973,7 @@ u32 ymfm_engine_base<RegisterType>::clock(u32 chanmask)
 	// now update the state of all the channels and operators
 	for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
 		if (BIT(chanmask, chnum))
-			m_channel[chnum]->clock(m_env_counter, lfo_raw_pm, chnum == 2 && m_regs.multi_freq());
+			m_channel[chnum]->clock(m_env_counter, lfo_raw_pm);
 
 	// return the envelope counter as it is used to clock ADPCM-A
 	return m_env_counter;
@@ -3063,7 +3105,7 @@ template<class RegisterType>
 void ymfm_engine_base<RegisterType>::update_timer(u8 tnum, u8 enable)
 {
 	// if the timer is live, but not currently enabled, set the timer
-	if (enable && !m_timer[tnum]->enabled())
+	if (enable && !m_timer[tnum]->enable())
 	{
 		// each timer clock is n operators * prescale factor (2/3/6)
 		u32 clockscale = RegisterType::OPERATORS * m_clock_prescale;
