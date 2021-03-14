@@ -748,12 +748,12 @@ ROM_START( ttwistm )
 	ROM_LOAD( "turbotwistmath.bin", 0x000000, 0x200000, CRC(a21d3723) SHA1(d0ae245621d7bc92bdf9fd683908690db6e25133))
 ROM_END
 
-ROM_START( ttwistsp )
+ROM_START( ttwistsp ) // PCB marks ROM glob as 8M
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "ttspelling.bin", 0x000000, 0x100000, CRC(09715a8e) SHA1(5d7eb7b714b95012aeb03c37dd0b71a1c025bdda))
 ROM_END
 
-ROM_START( ttwistvc )
+ROM_START( ttwistvc ) // PCB marks ROM glob as 8M
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "vocabulator.bin", 0x000000, 0x100000, CRC(71f9c4c9) SHA1(8cafb42bd56c7db99949781e42b6ad4991ee2246))
 ROM_END
@@ -762,6 +762,13 @@ ROM_START( ttwistbq )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "turbotwistbrainquest.bin", 0x000000, 0x200000, CRC(b184a517) SHA1(181975da58b3d117a389c54ac025b6a9b24342b2))
 ROM_END
+
+ROM_START( ttwistfb ) // PCB marks ROM glob as 16M
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "factblaster.bin", 0x000000, 0x200000, CRC(8efd63f5) SHA1(2cbd1299006ad9743d846e774afe7a134ba0fce3))
+ROM_END
+
+
 
 //    year, name,        parent,    compat, machine,                         input,            class,                                init,       company,    fullname,                         flags
 // it is unknown if the versions of IQuest without 4.0 on the case have different system ROM
@@ -772,6 +779,8 @@ CONS( 2004, turboex,     0,         0,      leapfrog_turboex,                lea
 // from a silver unit with orange lettering (there are different case styles, it is unknown if the software changed)
 CONS( 2002, ttwistm,     0,         0,      leapfrog_turbotwistmath,         leapfrog_iquest,  leapfrog_turbotwistmath_state,        empty_init, "LeapFrog", "Turbo Twist Math (US)",          MACHINE_IS_SKELETON )
 
+// Brain Quest / Fact Blaster are compatible with the same cartridges
+CONS( 200?, ttwistfb,    0,         0,      leapfrog_turbotwistbrainquest,   leapfrog_iquest,  leapfrog_turbotwistbrainquest_state,  empty_init, "LeapFrog", "Turbo Twist Fact Blaster (US)",  MACHINE_IS_SKELETON )
 CONS( 2002, ttwistbq,    0,         0,      leapfrog_turbotwistbrainquest,   leapfrog_iquest,  leapfrog_turbotwistbrainquest_state,  empty_init, "LeapFrog", "Turbo Twist Brain Quest (US)",   MACHINE_IS_SKELETON )
 
 // from a green unit with blue edges
@@ -780,9 +789,6 @@ CONS( 2000, ttwistsp,    0,         0,      leapfrog_turbotwistspelling,     lea
 CONS( 2001, ttwistvc,    0,         0,      leapfrog_turbotwistvocabulator,  leapfrog_iquest,  leapfrog_turbotwistvocabulator_state, empty_init, "LeapFrog", "Turbo Twist Vocabulator (US)",   MACHINE_IS_SKELETON )
 
 // Undumped units
-
-// Similar to above
-// Turbo Twist Fact Blaster (compatible with Brain Quest cartridges)
 
 // These have 2 digit 7-seg style displays, it is unknown if they are on related hardware
 // Twist & Shout Addition
