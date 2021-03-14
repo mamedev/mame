@@ -327,8 +327,8 @@ private:
 
 	enum disk_reg_bits
 	{
-		DISKREG_35HEADSEL   = 0x80, // head select for 3.5" "dumb" Sony drives
-		DISKREG_35ENABLE    = 0x40  // 1 to enable 3.5" drives, 0 to chain through to 5.25"
+		DISKREG_HDSEL   = 7, // select signal for 3.5" Sony drives
+		DISKREG_35SEL   = 6  // 1 to enable 3.5" drives, 0 to chain through to 5.25"
 	};
 
 	enum irq_sources
@@ -2835,41 +2835,9 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			m_slotromsel = data;
 			break;
 		case 0x31:  // DISKREG
-			if (BIT(m_diskreg, 6) != BIT(data, 6))
+			if ((m_cur_floppy) && (BIT(data, DISKREG_35SEL)))
 			{
-				if (m_devsel == 1)
-				{
-					if (!BIT(data, 6))
-					{
-						m_cur_floppy = m_floppy[0]->get_device();
-					}
-					else
-					{
-						m_cur_floppy = m_floppy[2]->get_device();
-					}
-				}
-				else if (m_devsel == 2)
-				{
-					if (!BIT(data, 6))
-					{
-						m_cur_floppy = m_floppy[1]->get_device();
-					}
-					else
-					{
-						m_cur_floppy = m_floppy[3]->get_device();
-					}
-				}
-				else
-				{
-					m_cur_floppy = nullptr;
-				}
-
-				m_iwm->set_floppy(m_cur_floppy);
-			}
-
-			if (m_cur_floppy)
-			{
-				m_cur_floppy->ss_w(BIT(data, 7));
+				m_cur_floppy->ss_w(BIT(data, DISKREG_HDSEL));
 			}
 			m_diskreg = data;
 			break;
@@ -4464,7 +4432,7 @@ void apple2gs_state::devsel_w(uint8_t devsel)
 	m_devsel = devsel;
 	if (m_devsel == 1)
 	{
-		if (!BIT(m_diskreg, 6))
+		if (!BIT(m_diskreg, DISKREG_35SEL))
 		{
 			m_cur_floppy = m_floppy[0]->get_device();
 		}
@@ -4475,7 +4443,7 @@ void apple2gs_state::devsel_w(uint8_t devsel)
 	}
 	else if (m_devsel == 2)
 	{
-		if (!BIT(m_diskreg, 6))
+		if (!BIT(m_diskreg, DISKREG_35SEL))
 		{
 			m_cur_floppy = m_floppy[1]->get_device();
 		}
@@ -4489,9 +4457,10 @@ void apple2gs_state::devsel_w(uint8_t devsel)
 		m_cur_floppy = nullptr;
 	}
 	m_iwm->set_floppy(m_cur_floppy);
-	if (m_cur_floppy)
+
+	if ((m_cur_floppy) && (BIT(m_diskreg, DISKREG_35SEL)))
 	{
-		m_cur_floppy->ss_w(BIT(m_diskreg, 7));
+		m_cur_floppy->ss_w(BIT(m_diskreg, DISKREG_HDSEL));
 	}
 }
 
