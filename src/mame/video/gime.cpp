@@ -560,9 +560,6 @@ void gime_device::update_memory(int bank)
 			{ 6, 7, 4, 5 }
 		};
 
-		// Pin ROM page to MMU slot
-		block = (block & 0xfc) | (bank & 0x03);
-
 		// look up the block in the ROM map
 		block = rom_map[m_gime_registers[0] & 3][(block & 0x3F) - 0x3C];
 
