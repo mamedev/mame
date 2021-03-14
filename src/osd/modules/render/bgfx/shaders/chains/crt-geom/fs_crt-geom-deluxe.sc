@@ -51,6 +51,8 @@ uniform vec4 spot_size;
 uniform vec4 spot_growth;
 uniform vec4 spot_growth_power;
 
+uniform vec4 u_interp;
+
 uniform vec4 aperture_strength;
 uniform vec4 aperture_brightboost;
 
@@ -156,6 +158,43 @@ vec4 scanlineWeights(float distance, vec4 color)
 #endif
 }
 
+vec4 cubic(vec4 x, float B, float C)
+{
+  // https://en.wikipedia.org/wiki/Mitchell%E2%80%93Netravali_filters
+  vec2 a = x.yz; // components in [0,1]
+  vec2 b = x.xw; // components in [1,2]
+  vec2 a2 = a*a;
+  vec2 b2 = b*b;
+  a = (2.0-1.5*B-1.0*C)*a*a2 + (-3.0+2.0*B+C)*a2 + (1.0-(1.0/3.0)*B);
+  b = ((-1.0/6.0)*B-C)*b*b2 + (B+5.0*C)*b2 + (-2.0*B-8.0*C)*b + ((4.0/3.0)*B+4.0*C);
+  return vec4(b.x,a.x,a.y,b.y);
+}
+
+vec4 x_coeffs(vec4 x, float pos_x)
+{
+  if (u_interp.x < 0.5) { // box
+    float wid = length(vec2(dFdx(pos_x),dFdy(pos_x)));
+    float dx = clamp((0.5 + 0.5*wid - x.y)/wid, 0.0, 1.0);
+    return vec4(0.0,dx,1.0-dx,0.0);
+  } else if (u_interp.x < 1.5) { // linear
+    return vec4(0.0, 1.0-x.y, 1.0-x.z, 0.0);
+  } else if (u_interp.x < 2.5) { // Lanczos
+    // Prevent division by zero.
+    vec4 coeffs = FIX(PI * x);
+    // Lanczos2 kernel.
+    coeffs = 2.0 * sin(coeffs) * sin(coeffs / 2.0) / (coeffs * coeffs);
+    // Normalize.
+    coeffs /= dot(coeffs, vec4_splat(1.0));
+    return coeffs;
+  } else if (u_interp.x < 3.5) { // Catmull-Rom
+    return cubic(x,0.0,0.5);
+  } else if (u_interp.x < 4.5) { // Mitchell-Netravali
+    return cubic(x,1.0/3.0,1.0/3.0);
+  } else if (u_interp.x < 5.5) { // B-spline
+    return cubic(x,1.0,0.0);
+  }
+}
+
 vec4 sample_scanline(vec2 xy, vec4 coeffs, float onex)
 {
   // Calculate the effective colour of the given
@@ -222,19 +261,10 @@ void main()
   // Snap to the center of the underlying texel.
   xy = (floor(ratio_scale) + vec2_splat(0.5)) / u_tex_size0.xy;
 
-  // Calculate Lanczos scaling coefficients describing the effect
+  // Calculate scaling coefficients describing the effect
   // of various neighbour texels in a scanline on the current
   // pixel.
-  vec4 coeffs = PI * vec4(1.0 + uv_ratio.x, uv_ratio.x, 1.0 - uv_ratio.x, 2.0 - uv_ratio.x);
-
-  // Prevent division by zero.
-  coeffs = FIX(coeffs);
-
-  // Lanczos2 kernel.
-  coeffs = 2.0 * sin(coeffs) * sin(coeffs / 2.0) / (coeffs * coeffs);
-
-  // Normalize.
-  coeffs /= dot(coeffs, vec4_splat(1.0));
+  vec4 coeffs = x_coeffs(vec4(1.0 + uv_ratio.x, uv_ratio.x, 1.0 - uv_ratio.x, 2.0 - uv_ratio.x), ratio_scale.x);
 
   vec4 col = sample_scanline(xy, coeffs, v_one.x);
   vec4 col_prev = sample_scanline(xy + vec2(0.0,-v_one.y), coeffs, v_one.x);

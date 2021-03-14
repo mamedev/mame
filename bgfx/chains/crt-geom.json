@@ -47,6 +47,16 @@
           "step"   :  0.1,
           "format": "%1.1f",
           "screen": "raster" },
+        { "type": "intenum",
+          "name": "x_interpolation",
+          "text": "Horizontal interpolation",
+          "default":  2,
+          "max"    :  5,
+          "min"    :  0,
+          "step"   :  1,
+          "format": "%s",
+          "strings": [ "box", "linear", "Lanczos", "Catmull-Rom", "Mitchell-Netravali", "B-spline" ],
+          "screen": "raster" },
         { "type": "float",
           "name": "curvature",
           "text": "Enable curvature",
@@ -160,7 +170,8 @@
                 { "uniform": "aperture_brightboost","slider": "aperture_brightboost" },
                 { "uniform": "spot_size",   "slider": "spot_size" },
                 { "uniform": "spot_growth", "slider": "spot_growth" },
-                { "uniform": "spot_growth_power", "slider": "spot_growth_power" }
+                { "uniform": "spot_growth_power", "slider": "spot_growth_power" },
+                { "uniform": "u_interp",    "slider": "x_interpolation" }
             ],
             "input": [
                 { "sampler": "mpass_texture", "target": "screen" },
