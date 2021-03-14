@@ -316,3 +316,24 @@ void i386ex_device::device_add_mconfig(machine_config &config)
 	//TODO: WDTOUT DEVWRITELINE("pic8259_slave", pic8259_device, ir7_w)
 }
 
+#if 0 
+uint8_t i386ex_device::FETCH()
+{
+	uint8_t value;
+	uint16_t value16;
+	uint32_t address = m_pc, error;
+
+	if(!translate_address(m_CPL,TRANSLATE_FETCH,&address,&error))
+		PF_THROW(error);
+
+	value16 = mem_pr16((address & m_a20_mask) >> 1);
+	value = (value16 >> (8*(address%2))) & 0xff;
+#ifdef DEBUG_MISSING_OPCODE
+	m_opcode_bytes[m_opcode_bytes_length] = value;
+	m_opcode_bytes_length = (m_opcode_bytes_length + 1) & 15;
+#endif
+	m_eip++;
+	m_pc++;
+	return value;
+}
+#endif
