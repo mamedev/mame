@@ -2109,8 +2109,8 @@ bool ymfm_operator<RegisterType>::prepare()
 	clock_keystate(u8(m_keyon_live != 0));
 	m_keyon_live &= ~(1 << YMFM_KEYON_CSM);
 
-	// we're active if depressing/attacking or above quiet
-	return (m_env_state <= YMFM_ENV_ATTACK) || (m_env_attenuation < ENV_QUIET);
+	// we're active until we're quiet after the release
+	return (m_env_state != YMFM_ENV_RELEASE || m_env_attenuation < ENV_QUIET);
 }
 
 
