@@ -593,7 +593,7 @@ void rc759_state::rc759(machine_config &config)
 	m_maincpu->tmrout0_handler().set(FUNC(rc759_state::i186_timer0_w));
 	m_maincpu->tmrout1_handler().set(FUNC(rc759_state::i186_timer1_w));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
 
 	NVRAM(config, "nvram").set_custom_handler(FUNC(rc759_state::nvram_init));
@@ -616,6 +616,7 @@ void rc759_state::rc759(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(1250000 * 16, 896, 96, 816, 377, 4, 364); // 22 kHz setting
 	screen.set_screen_update("txt", FUNC(i82730_device::screen_update));
+	screen.screen_vblank().set(m_maincpu, FUNC(i80186_cpu_device::tmrin0_w)); // TMRIN0 source not documented, but self-test needs something like this
 
 	I82730(config, m_txt, 1250000, m_maincpu);
 	m_txt->set_screen("screen");
