@@ -384,7 +384,7 @@
 //  attenuation value, in 4.8 fixed point format
 //-------------------------------------------------
 
-inline u16 abs_sin_attenuation(u16 input)
+inline u32 abs_sin_attenuation(u32 input)
 {
 	// the values here are stored as 4.8 logarithmic values for 1/4 phase
 	// this matches the internal format of the OPN chip, extracted from the die
@@ -424,7 +424,7 @@ inline u16 abs_sin_attenuation(u16 input)
 //  linear volume
 //-------------------------------------------------
 
-inline u16 attenuation_to_volume(u16 input)
+inline u32 attenuation_to_volume(u32 input)
 {
 	// the values here are 10-bit mantissas with an implied leading bit
 	// this matches the internal format of the OPN chip, extracted from the die
@@ -461,7 +461,7 @@ inline u16 attenuation_to_volume(u16 input)
 //  fractional scale factor to decrease by)
 //-------------------------------------------------
 
-inline u8 attenuation_increment(u8 rate, u8 index)
+inline u32 attenuation_increment(u32 rate, u32 index)
 {
 	static u32 const s_increment_table[64] =
 	{
@@ -495,7 +495,7 @@ inline u8 attenuation_increment(u8 rate, u8 index)
 //  we'll keep the simplicity of the table
 //-------------------------------------------------
 
-inline s8 detune_adjustment(u8 detune, u8 keycode)
+inline s32 detune_adjustment(u32 detune, u32 keycode)
 {
 	static u8 const s_detune_adjustment[32][4] =
 	{
@@ -508,7 +508,7 @@ inline s8 detune_adjustment(u8 detune, u8 keycode)
 		{ 0,  5, 11, 16 },	{ 0,  6, 12, 17 },	{ 0,  6, 13, 19 },	{ 0,  7, 14, 20 },
 		{ 0,  8, 16, 22 },	{ 0,  8, 16, 22 },	{ 0,  8, 16, 22 },	{ 0,  8, 16, 22 }
 	};
-	s8 result = s_detune_adjustment[keycode][detune & 3];
+	s32 result = s_detune_adjustment[keycode][detune & 3];
 	return BIT(detune, 2) ? -result : result;
 }
 
@@ -521,7 +521,7 @@ inline s8 detune_adjustment(u8 detune, u8 keycode)
 //  algorithm written to match Nuked behavior
 //-------------------------------------------------
 
-inline s16 opn_lfo_pm_phase_adjustment(u8 fnum_bits, u8 pm_sensitivity, s8 lfo_raw_pm)
+inline s32 opn_lfo_pm_phase_adjustment(u32 fnum_bits, u32 pm_sensitivity, s32 lfo_raw_pm)
 {
 	// this table encodes 2 shift values to apply to the top 7 bits
 	// of fnum; it is effectively a cheap multiply by a constant
@@ -539,11 +539,11 @@ inline s16 opn_lfo_pm_phase_adjustment(u8 fnum_bits, u8 pm_sensitivity, s8 lfo_r
 	};
 
 	// look up the relevant shifts
-	s8 abs_pm = (lfo_raw_pm < 0) ? -lfo_raw_pm : lfo_raw_pm;
-	u8 const shifts = s_lfo_pm_shifts[pm_sensitivity][BIT(abs_pm, 0, 3)];
+	s32 abs_pm = (lfo_raw_pm < 0) ? -lfo_raw_pm : lfo_raw_pm;
+	u32 const shifts = s_lfo_pm_shifts[pm_sensitivity][BIT(abs_pm, 0, 3)];
 
 	// compute the adjustment
-	s16 adjust = (fnum_bits >> BIT(shifts, 0, 4)) + (fnum_bits >> BIT(shifts, 4, 4));
+	s32 adjust = (fnum_bits >> BIT(shifts, 0, 4)) + (fnum_bits >> BIT(shifts, 4, 4));
 	if (pm_sensitivity > 5)
 		adjust <<= pm_sensitivity - 5;
 	adjust >>= 2;
@@ -560,7 +560,7 @@ inline s16 opn_lfo_pm_phase_adjustment(u8 fnum_bits, u8 pm_sensitivity, s8 lfo_r
 //  phase step, after applying the given delta
 //-------------------------------------------------
 
-inline u32 opm_key_code_to_phase_step(u16 block_freq, s16 delta)
+inline u32 opm_key_code_to_phase_step(u32 block_freq, s32 delta)
 {
 	// The phase step is essentially the fnum in OPN-speak. To compute this table,
 	// we used the standard formula for computing the frequency of a note, and
@@ -637,22 +637,22 @@ inline u32 opm_key_code_to_phase_step(u16 block_freq, s16 delta)
 	};
 
 	// extract the block (octave) first
-	u8 block = BIT(block_freq, 10, 3);
+	u32 block = BIT(block_freq, 10, 3);
 
 	// the keycode (bits 6-9) is "gappy", mapping 12 values over 16 in each
 	// octave; to correct for this, we multiply the 4-bit value by 3/4 (or
 	// rather subtract 1/4); note that a (invalid) value of 15 will bleed into
 	// the next octave -- this is confirmed
-	u8 adjusted_code = BIT(block_freq, 6, 4) - BIT(block_freq, 8, 2);
+	u32 adjusted_code = BIT(block_freq, 6, 4) - BIT(block_freq, 8, 2);
 
 	// now re-insert the 6-bit fraction
-	s16 eff_freq = (adjusted_code << 6) | BIT(block_freq, 0, 6);
+	s32 eff_freq = (adjusted_code << 6) | BIT(block_freq, 0, 6);
 
 	// now that the gaps are removed, add the delta
 	eff_freq += delta;
 
 	// handle over/underflow by adjusting the block:
-	if (u16(eff_freq) >= 768)
+	if (u32(eff_freq) >= 768)
 	{
 		// minimum delta is -512 (PM), so we can only underflow by 1 octave
 		if (eff_freq < 0)
@@ -686,14 +686,14 @@ inline u32 opm_key_code_to_phase_step(u16 block_freq, s16 delta)
 //  (matching total level LSB)
 //-------------------------------------------------
 
-inline u8 opl_key_scale_atten(u16 block_freq)
+inline u32 opl_key_scale_atten(u16 block_freq)
 {
 	// this table uses the top 4 bits of FNUM and are the maximal values
 	// (for when block == 7). Values for other blocks can be computed by
 	// subtracting 8 for each block below 7.
 	static u8 const fnum_to_atten[16] = { 0,24,32,37,40,43,45,47,48,50,51,52,53,54,55,56 };
-	s8 result = fnum_to_atten[BIT(block_freq, 7, 4)] - 8 * BIT(~block_freq, 11, 3);
-	return std::max<s8>(0, result);
+	s32 result = fnum_to_atten[BIT(block_freq, 7, 4)] - 8 * BIT(~block_freq, 11, 3);
+	return std::max<s32>(0, result);
 }
 
 
@@ -780,7 +780,7 @@ void ymopm_registers::operator_map(operator_mapping &dest) const
 //  write - handle writes to the register array
 //-------------------------------------------------
 
-bool ymopm_registers::write(u16 index, u8 data, u8 &channel, u8 &opmask)
+bool ymopm_registers::write(u16 index, u8 data, u32 &channel, u32 &opmask)
 {
 	assert(index < REGISTERS);
 
@@ -1132,7 +1132,7 @@ void ymopn_registers_base<true>::operator_map(operator_mapping &dest) const
 //-------------------------------------------------
 
 template<bool IsOpnA>
-bool ymopn_registers_base<IsOpnA>::write(u16 index, u8 data, u8 &channel, u8 &opmask)
+bool ymopn_registers_base<IsOpnA>::write(u16 index, u8 data, u32 &channel, u32 &opmask)
 {
 	assert(index < REGISTERS);
 
@@ -1140,7 +1140,7 @@ bool ymopn_registers_base<IsOpnA>::write(u16 index, u8 data, u8 &channel, u8 &op
 	// borrow unused registers 0xb8-bf/0x1b8-bf as temporary holding locations
 	if ((index & 0xf0) == 0xa0)
 	{
-		u16 latchindex = 0xb8 | (BIT(index, 3) << 2) | BIT(index, 0, 2);
+		u32 latchindex = 0xb8 | (BIT(index, 3) << 2) | BIT(index, 0, 2);
 		if (IsOpnA)
 			latchindex |= index & 0x100;
 
@@ -1492,7 +1492,7 @@ void ymopl_registers_base<3>::operator_map(operator_mapping &dest) const
 //-------------------------------------------------
 
 template<int Revision>
-bool ymopl_registers_base<Revision>::write(u16 index, u8 data, u8 &channel, u8 &opmask)
+bool ymopl_registers_base<Revision>::write(u16 index, u8 data, u32 &channel, u32 &opmask)
 {
 	assert(index < REGISTERS);
 
@@ -1665,7 +1665,7 @@ u32 ymopl_registers_base<Revision>::compute_phase_step(u32 choffs, u32 opoffs, u
 //-------------------------------------------------
 
 template<int Revision>
-u16 ymopl_registers_base<Revision>::transform_phase(u32 opoffs, u16 &phase)
+u16 ymopl_registers_base<Revision>::transform_phase(u32 opoffs, u32 &phase)
 {
 	// if waveforms enabled, do nothing
 	if (!waveform_enable())
@@ -1690,7 +1690,7 @@ u16 ymopl_registers_base<Revision>::transform_phase(u32 opoffs, u16 &phase)
 		0x5200, 0x5200, 0x5200, 0x5200, // 6: no shift, sign bit only, OR with 0x100
 		0xa3ff, 0xa3ff, 0xa3ff, 0xa3ff  // 7: rshift 1 and invert the output
 	};
-	u16 mask_shift = s_waveform_mask_shift[op_waveform(opoffs) * 4 + BIT(phase, 8, 2)];
+	u32 mask_shift = s_waveform_mask_shift[op_waveform(opoffs) * 4 + BIT(phase, 8, 2)];
 
 	// The OPL2 waveforms only need the AND, so handle them separately
 	if (!IsOpl3Plus)
@@ -1818,7 +1818,7 @@ void ymopll_registers::operator_map(operator_mapping &dest) const
 //  channels cleanly
 //-------------------------------------------------
 
-bool ymopll_registers::write(u16 index, u8 data, u8 &channel, u8 &opmask)
+bool ymopll_registers::write(u16 index, u8 data, u32 &channel, u32 &opmask)
 {
 	assert(index < REGISTERS);
 
@@ -2003,7 +2003,7 @@ u32 ymopll_registers::compute_phase_step(u32 choffs, u32 opoffs, u32 block_freq,
 //  if the output needs to be inverted
 //-------------------------------------------------
 
-u16 ymopll_registers::transform_phase(u32 opoffs, u16 &phase)
+u16 ymopll_registers::transform_phase(u32 opoffs, u32 &phase)
 {
 	// if the waveform is 1, zero the second half of the waveform
 	phase &= (BIT(phase, 9) & op_waveform(opoffs)) - 1;
@@ -2153,7 +2153,7 @@ void ymfm_operator<RegisterType>::clock(u32 env_counter, s8 lfo_raw_pm)
 //-------------------------------------------------
 
 template<class RegisterType>
-s16 ymfm_operator<RegisterType>::compute_volume(u16 phase, u16 am_offset) const
+s32 ymfm_operator<RegisterType>::compute_volume(u32 phase, u32 am_offset) const
 {
 	// the low 10 bits of phase represents a full 2*PI period over
 	// the full sin wave
@@ -2163,16 +2163,16 @@ s16 ymfm_operator<RegisterType>::compute_volume(u16 phase, u16 am_offset) const
 		return 0;
 
 	// transform the phase for the different waveforms
-	u16 invert = m_regs.transform_phase(m_opoffs, phase);
+	u32 invert = m_regs.transform_phase(m_opoffs, phase);
 
 	// get the absolute value of the sin, as attenuation, as a 4.8 fixed point value
-	u16 sin_attenuation = abs_sin_attenuation(phase) ^ invert;
+	u32 sin_attenuation = abs_sin_attenuation(phase) ^ invert;
 
 	// get the attenuation from the evelope generator as a 4.6 value, shifted up to 4.8
-	u16 env_attenuation = envelope_attenuation(am_offset) << 2;
+	u32 env_attenuation = envelope_attenuation(am_offset) << 2;
 
 	// combine into a 5.8 value, then convert from attenuation to 13-bit linear volume
-	s16 result = attenuation_to_volume(sin_attenuation + env_attenuation);
+	s32 result = attenuation_to_volume(sin_attenuation + env_attenuation);
 
 	// negate if in the negative part of the sin wave (sign bit gives 14 bits)
 	return BIT(phase, 9) ? -result : result;
@@ -2186,12 +2186,12 @@ s16 ymfm_operator<RegisterType>::compute_volume(u16 phase, u16 am_offset) const
 //-------------------------------------------------
 
 template<class RegisterType>
-s16 ymfm_operator<RegisterType>::compute_noise_volume(u16 am_offset) const
+s32 ymfm_operator<RegisterType>::compute_noise_volume(u32 am_offset) const
 {
 	// application manual says the logarithmic transform is not applied here, so we
 	// just use the raw envelope attenuation, inverted (since 0 attenuation should be
 	// maximum), and shift it up from a 10-bit value to an 11-bit value
-	u16 result = (envelope_attenuation(am_offset) ^ 0x3ff) << 1;
+	u32 result = (envelope_attenuation(am_offset) ^ 0x3ff) << 1;
 
 	// QUESTION: is AM applied still?
 
@@ -2377,12 +2377,12 @@ void ymfm_operator<RegisterType>::clock_envelope(u16 env_counter)
 	}
 
 	// fetch the appropriate 6-bit rate value from the cache
-	u8 rate = m_cache.eg_rate[m_env_state];
+	u32 rate = m_cache.eg_rate[m_env_state];
 
 	// compute the rate shift value; this is the shift needed to
 	// apply to the env_counter such that it becomes a 5.11 fixed
 	// point number
-	u8 rate_shift = rate >> 2;
+	u32 rate_shift = rate >> 2;
 	env_counter <<= rate_shift;
 
 	// see if the fractional part is 0; if not, it's not time to clock
@@ -2390,7 +2390,7 @@ void ymfm_operator<RegisterType>::clock_envelope(u16 env_counter)
 		return;
 
 	// determine the increment based on the non-fractional part of env_counter
-	u8 increment = attenuation_increment(rate, BIT(env_counter, 11, 3));
+	u32 increment = attenuation_increment(rate, BIT(env_counter, 11, 3));
 
 	// attack is the only one that increases
 	if (m_env_state == YMFM_ENV_ATTACK)
@@ -3059,8 +3059,8 @@ void ymfm_engine_base<RegisterType>::write(u16 regnum, u8 data)
 	}
 
 	// most writes are passive, consumed only when needed
-	u8 keyon_channel;
-	u8 keyon_opmask;
+	u32 keyon_channel;
+	u32 keyon_opmask;
 	if (m_regs.write(regnum, data, keyon_channel, keyon_opmask))
 	{
 		// handle writes to the keyon register(s)
@@ -3218,7 +3218,7 @@ template<class RegisterType>
 TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::synced_mode_w)
 {
 	// actually write the mode register now
-	u8 dummy1, dummy2;
+	u32 dummy1, dummy2;
 	m_regs.write(RegisterType::REG_MODE, param, dummy1, dummy2);
 
 	// reset IRQ status -- when written, all other bits are ignored

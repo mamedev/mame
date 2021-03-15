@@ -290,14 +290,14 @@ public:
 	void reset();
 
 	// map channel number to register offset
-	static constexpr u16 channel_offset(u8 chnum)
+	static constexpr u32 channel_offset(u8 chnum)
 	{
 		assert(chnum < CHANNELS);
 		return chnum;
 	}
 
 	// map operator number to register offset
-	static constexpr u16 operator_offset(u8 opnum)
+	static constexpr u32 operator_offset(u8 opnum)
 	{
 		assert(opnum < OPERATORS);
 		return opnum;
@@ -308,7 +308,7 @@ public:
 	void operator_map(operator_mapping &dest) const;
 
 	// handle writes to the register array
-	bool write(u16 index, u8 data, u8 &chan, u8 &opmask);
+	bool write(u16 index, u8 data, u32 &chan, u32 &opmask);
 
 	// clock the noise and LFO, if present, returning LFO PM value
 	s32 clock_noise_and_lfo();
@@ -329,7 +329,7 @@ public:
 	u32 compute_phase_step(u32 choffs, u32 opoffs, u32 block_freq, s32 detuneval, s32 lfo_raw_pm);
 
 	// transform the phase based on the waveform, returning inversion
-	u16 transform_phase(u32 opoffs, u16 &phase) { return 0; }
+	u16 transform_phase(u32 opoffs, u32 &phase) { return 0; }
 
 	// log a key-on event
 	void log_keyon(u32 choffs, u32 opoffs);
@@ -491,7 +491,7 @@ public:
 	void reset();
 
 	// map channel number to register offset
-	static constexpr u16 channel_offset(u8 chnum)
+	static constexpr u32 channel_offset(u8 chnum)
 	{
 		assert(chnum < CHANNELS);
 		if (!IsOpnA)
@@ -501,7 +501,7 @@ public:
 	}
 
 	// map operator number to register offset
-	static constexpr u16 operator_offset(u8 opnum)
+	static constexpr u32 operator_offset(u8 opnum)
 	{
 		assert(opnum < OPERATORS);
 		if (!IsOpnA)
@@ -515,7 +515,7 @@ public:
 	void operator_map(operator_mapping &dest) const;
 
 	// handle writes to the register array
-	bool write(u16 index, u8 data, u8 &chan, u8 &opmask);
+	bool write(u16 index, u8 data, u32 &chan, u32 &opmask);
 
 	// clock the noise and LFO, if present, returning LFO PM value
 	s32 clock_noise_and_lfo();
@@ -536,7 +536,7 @@ public:
 	u32 compute_phase_step(u32 choffs, u32 opoffs, u32 block_freq, s32 detuneval, s32 lfo_raw_pm);
 
 	// transform the phase based on the waveform, returning inversion
-	u16 transform_phase(u32 opoffs, u16 &phase) { return 0; }
+	u16 transform_phase(u32 opoffs, u32 &phase) { return 0; }
 
 	// log a key-on event
 	void log_keyon(u32 choffs, u32 opoffs);
@@ -699,7 +699,7 @@ public:
 	void reset();
 
 	// map channel number to register offset
-	static constexpr u16 channel_offset(u8 chnum)
+	static constexpr u32 channel_offset(u8 chnum)
 	{
 		assert(chnum < CHANNELS);
 		if (!IsOpl3Plus)
@@ -709,7 +709,7 @@ public:
 	}
 
 	// map operator number to register offset
-	static constexpr u16 operator_offset(u8 opnum)
+	static constexpr u32 operator_offset(u8 opnum)
 	{
 		assert(opnum < OPERATORS);
 		if (!IsOpl3Plus)
@@ -723,7 +723,7 @@ public:
 	void operator_map(operator_mapping &dest) const;
 
 	// handle writes to the register array
-	bool write(u16 index, u8 data, u8 &chan, u8 &opmask);
+	bool write(u16 index, u8 data, u32 &chan, u32 &opmask);
 
 	// clock the noise and LFO, if present, returning LFO PM value
 	s32 clock_noise_and_lfo();
@@ -745,7 +745,7 @@ public:
 	u32 compute_phase_step(u32 choffs, u32 opoffs, u32 block_freq, s32 detuneval, s32 lfo_raw_pm);
 
 	// transform the phase based on the waveform, returning inversion
-	u16 transform_phase(u32 opoffs, u16 &phase);
+	u16 transform_phase(u32 opoffs, u32 &phase);
 
 	// log a key-on event
 	void log_keyon(u32 choffs, u32 opoffs);
@@ -903,14 +903,14 @@ public:
 	void reset();
 
 	// map channel number to register offset
-	static constexpr u16 channel_offset(u8 chnum)
+	static constexpr u32 channel_offset(u8 chnum)
 	{
 		assert(chnum < CHANNELS);
 		return chnum;
 	}
 
 	// map operator number to register offset
-	static constexpr u16 operator_offset(u8 opnum)
+	static constexpr u32 operator_offset(u8 opnum)
 	{
 		assert(opnum < OPERATORS);
 		return opnum;
@@ -921,7 +921,7 @@ public:
 	void operator_map(operator_mapping &dest) const;
 
 	// handle writes to the register array
-	bool write(u16 index, u8 data, u8 &chan, u8 &opmask);
+	bool write(u16 index, u8 data, u32 &chan, u32 &opmask);
 
 	// clock the noise and LFO, if present, returning LFO PM value
 	s32 clock_noise_and_lfo();
@@ -933,7 +933,7 @@ public:
 	u32 compute_phase_step(u32 choffs, u32 opoffs, u32 block_freq, s32 detuneval, s32 lfo_raw_pm);
 
 	// transform the phase based on the waveform, returning inversion
-	u16 transform_phase(u32 opoffs, u16 &phase);
+	u16 transform_phase(u32 opoffs, u32 &phase);
 
 	// log a key-on event
 	void log_keyon(u32 choffs, u32 opoffs);
@@ -1058,13 +1058,13 @@ public:
 	void clock(u32 env_counter, s8 lfo_raw_pm);
 
 	// return the current phase value
-	u16 phase() const { return m_phase >> 10; }
+	u32 phase() const { return m_phase >> 10; }
 
 	// compute operator volume
-	s16 compute_volume(u16 phase, u16 am_offset) const;
+	s32 compute_volume(u32 phase, u32 am_offset) const;
 
 	// compute volume for the OPM noise channel
-	s16 compute_noise_volume(u16 am_offset) const;
+	s32 compute_noise_volume(u32 am_offset) const;
 
 	// key state control
 	void keyonoff(u8 on, ymfm_keyon_type type);
@@ -1073,9 +1073,6 @@ public:
 	RegisterType &regs() { return m_regs; }
 
 private:
-	// return the effective 6-bit ADSR rate after adjustments
-	u8 effective_rate(u8 rawrate);
-
 	// start the attack phase
 	void start_attack();
 
