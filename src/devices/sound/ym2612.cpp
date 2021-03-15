@@ -136,7 +136,7 @@ void ym2612_device::write(offs_t offset, u8 value)
 void ym2612_device::device_start()
 {
 	// create our stream
-	m_stream = stream_alloc(0, ymopn_registers::OUTPUTS, m_opn.fm_sample_rate(clock()));
+	m_stream = stream_alloc(0, ymopna_registers::OUTPUTS, m_opn.fm_sample_rate(clock()));
 
 	// call this for the variants that need to adjust the rate
 	device_clock_changed();
