@@ -22,7 +22,7 @@
 //  GLOBAL ENUMERATORS
 //*********************************************************
 
-enum ymfm_envelope_state : u8
+enum ymfm_envelope_state : u32
 {
 	YMFM_ENV_DEPRESS = 0,
 	YMFM_ENV_ATTACK = 1,
@@ -145,11 +145,12 @@ inline s16 ymfm_roundtrip_fp(s32 value)
 
 struct ymfm_opdata_cache
 {
+	u16 const *waveform;// base of sine table
 	u32 phase_step;		// phase step, or 0 if PM is active
-	u16 block_freq;		// block frequency value
-	u16 total_level;	// total level, shifted up by 3 bits
-	s8 detune;			// detuning value
-	u8 eg_sustain;		// sustain level
+	u32 total_level;	// total level, shifted up by 3 bits
+	s32 detune;			// detuning value
+	u32 eg_sustain;		// sustain level
+	u32 block_freq;		// block frequency value
 	u8 eg_rate[YMFM_ENV_STATES]; // envelope rate for each step
 };
 
@@ -162,6 +163,9 @@ public:
 	// this value is returned from the write() function for rhythm channels
 	static constexpr u32 YMFM_RHYTHM_CHANNEL = 0xff;
 
+	// this is the size of a full sin waveform
+	static constexpr u32 WAVEFORM_LENGTH = 0x400;
+
 	//
 	// the following constants need to be defined per family:
 	//          u32 OUTPUTS: The number of outputs exposed (1-4)
@@ -169,6 +173,7 @@ public:
 	//     u32 ALL_CHANNELS: A bitmask of all channels
 	//        u32 OPERATORS: The number of operators on the chip
 	//     bool DYNAMIC_OPS: True if ops/channel can be changed at runtime
+	//        u32 WAVEFORMS: The number of waveforms offered
 	//        u32 REGISTERS: The number of 8-bit registers allocated
 	//         u32 REG_MODE: The address of the "mode" register controlling timers
 	// u32 DEFAULT_PRESCALE: The starting clock prescale
@@ -269,6 +274,7 @@ public:
 	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
 	static constexpr u32 OPERATORS = CHANNELS * 4;
 	static constexpr u32 DYNAMIC_OPS = false;
+	static constexpr u32 WAVEFORMS = 1;
 	static constexpr u32 REGISTERS = 0x100;
 	static constexpr u32 REG_MODE = 0x14;
 	static constexpr u32 DEFAULT_PRESCALE = 2;
@@ -329,9 +335,6 @@ public:
 
 	// compute the phase step, given a PM value
 	u32 compute_phase_step(u32 choffs, u32 opoffs, u32 block_freq, s32 detuneval, s32 lfo_raw_pm);
-
-	// transform the phase based on the waveform, returning inversion
-	u32 transform_phase(u32 opoffs, u32 &phase) { return 0; }
 
 	// log a key-on event
 	void log_keyon(u32 choffs, u32 opoffs);
@@ -396,6 +399,7 @@ protected:
 	u8 m_noise_lfo;                  // latched LFO noise value
 	u8 m_lfo_am;                     // current LFO AM value
 	u8 m_regdata[REGISTERS];         // register data
+	u16 m_waveform[WAVEFORMS][WAVEFORM_LENGTH]; // waveforms
 };
 
 
@@ -471,6 +475,7 @@ public:
 	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
 	static constexpr u32 OPERATORS = CHANNELS * 4;
 	static constexpr u32 DYNAMIC_OPS = false;
+	static constexpr u32 WAVEFORMS = 1;
 	static constexpr u32 REGISTERS = IsOpnA ? 0x200 : 0x100;
 	static constexpr u32 REG_MODE = 0x27;
 	static constexpr u32 DEFAULT_PRESCALE = 6;
@@ -538,9 +543,6 @@ public:
 	// compute the phase step, given a PM value
 	u32 compute_phase_step(u32 choffs, u32 opoffs, u32 block_freq, s32 detuneval, s32 lfo_raw_pm);
 
-	// transform the phase based on the waveform, returning inversion
-	u32 transform_phase(u32 opoffs, u32 &phase) { return 0; }
-
 	// log a key-on event
 	void log_keyon(u32 choffs, u32 opoffs);
 
@@ -599,6 +601,7 @@ protected:
 	u32 m_lfo_counter;               // LFO counter
 	u8 m_lfo_am;                     // current LFO AM value
 	u8 m_regdata[REGISTERS];         // register data
+	u16 m_waveform[WAVEFORMS][WAVEFORM_LENGTH]; // waveforms
 };
 
 using ymopn_registers = ymopn_registers_base<false>;
@@ -680,6 +683,7 @@ public:
 	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
 	static constexpr u32 OPERATORS = CHANNELS * 2;
 	static constexpr u32 DYNAMIC_OPS = false;
+	static constexpr u32 WAVEFORMS = IsOpl3Plus ? 8 : (IsOpl2Plus ? 4 : 1);
 	static constexpr u32 REGISTERS = IsOpl3Plus ? 0x200 : 0x100;
 	static constexpr u32 REG_MODE = 0x04;
 	static constexpr u32 DEFAULT_PRESCALE = IsOpl3Plus ? 8 : 4;
@@ -747,9 +751,6 @@ public:
 
 	// compute the phase step, given a PM value
 	u32 compute_phase_step(u32 choffs, u32 opoffs, u32 block_freq, s32 detuneval, s32 lfo_raw_pm);
-
-	// transform the phase based on the waveform, returning inversion
-	u32 transform_phase(u32 opoffs, u32 &phase);
 
 	// log a key-on event
 	void log_keyon(u32 choffs, u32 opoffs);
@@ -829,6 +830,7 @@ protected:
 	u32 m_noise_lfsr;                // noise LFSR state
 	u8 m_lfo_am;                     // current LFO AM value
 	u8 m_regdata[REGISTERS];         // register data
+	u16 m_waveform[WAVEFORMS][WAVEFORM_LENGTH]; // waveforms
 };
 
 using ymopl_registers = ymopl_registers_base<1>;
@@ -886,6 +888,7 @@ class ymopll_registers : public ymopl_registers
 {
 public:
 	static constexpr u32 OUTPUTS = 2;
+	static constexpr u32 WAVEFORMS = 2;
 	static constexpr u32 REG_MODE = 0xff;
 	static constexpr bool EG_HAS_DEPRESS = true;
 	static constexpr u8 STATUS_TIMERA = 0;
@@ -935,9 +938,6 @@ public:
 
 	// compute the phase step, given a PM value
 	u32 compute_phase_step(u32 choffs, u32 opoffs, u32 block_freq, s32 detuneval, s32 lfo_raw_pm);
-
-	// transform the phase based on the waveform, returning inversion
-	u32 transform_phase(u32 opoffs, u32 &phase);
 
 	// log a key-on event
 	void log_keyon(u32 choffs, u32 opoffs);
@@ -1093,8 +1093,8 @@ private:
 	u32 envelope_attenuation(u32 am_offset) const;
 
 	// internal state
-	u16 m_choffs;                    // channel offset in registers
-	u16 m_opoffs;                    // operator offset in registers
+	u32 m_choffs;                    // channel offset in registers
+	u32 m_opoffs;                    // operator offset in registers
 	u32 m_phase;                     // current phase value (10.10 format)
 	u16 m_env_attenuation;           // computed envelope attenuation (4.6 format)
 	ymfm_envelope_state m_env_state; // current envelope state
@@ -1175,7 +1175,7 @@ private:
 	}
 
 	// internal state
-	u16 m_choffs;                         // channel offset in registers
+	u32 m_choffs;                         // channel offset in registers
 	s16 m_feedback[2];                    // feedback memory for operator 1
 	mutable s16 m_feedback_in;            // next input value for op 1 feedback (set in output)
 	ymfm_operator<RegisterType> *m_op[4]; // up to 4 operators

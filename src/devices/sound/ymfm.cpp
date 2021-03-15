@@ -428,28 +428,50 @@ inline u32 attenuation_to_volume(u32 input)
 {
 	// the values here are 10-bit mantissas with an implied leading bit
 	// this matches the internal format of the OPN chip, extracted from the die
+
+	// as a nod to performance, the implicit 0x400 bit is pre-incorporated, and
+	// the values are left-shifted by 2 so that a simple right shift is all that
+	// is needed; also the order is reversed to save a NOT on the input
+#define X(a) ((a | 0x400) << 2)
 	static u16 const s_power_table[256] =
 	{
-		0x000,0x003,0x006,0x008,0x00b,0x00e,0x011,0x014,0x016,0x019,0x01c,0x01f,0x022,0x025,0x028,0x02a,
-		0x02d,0x030,0x033,0x036,0x039,0x03c,0x03f,0x042,0x045,0x048,0x04b,0x04e,0x051,0x054,0x057,0x05a,
-		0x05d,0x060,0x063,0x066,0x069,0x06c,0x06f,0x072,0x075,0x078,0x07b,0x07e,0x082,0x085,0x088,0x08b,
-		0x08e,0x091,0x094,0x098,0x09b,0x09e,0x0a1,0x0a4,0x0a8,0x0ab,0x0ae,0x0b1,0x0b5,0x0b8,0x0bb,0x0be,
-		0x0c2,0x0c5,0x0c8,0x0cc,0x0cf,0x0d2,0x0d6,0x0d9,0x0dc,0x0e0,0x0e3,0x0e7,0x0ea,0x0ed,0x0f1,0x0f4,
-		0x0f8,0x0fb,0x0ff,0x102,0x106,0x109,0x10c,0x110,0x114,0x117,0x11b,0x11e,0x122,0x125,0x129,0x12c,
-		0x130,0x134,0x137,0x13b,0x13e,0x142,0x146,0x149,0x14d,0x151,0x154,0x158,0x15c,0x160,0x163,0x167,
-		0x16b,0x16f,0x172,0x176,0x17a,0x17e,0x181,0x185,0x189,0x18d,0x191,0x195,0x199,0x19c,0x1a0,0x1a4,
-		0x1a8,0x1ac,0x1b0,0x1b4,0x1b8,0x1bc,0x1c0,0x1c4,0x1c8,0x1cc,0x1d0,0x1d4,0x1d8,0x1dc,0x1e0,0x1e4,
-		0x1e8,0x1ec,0x1f0,0x1f5,0x1f9,0x1fd,0x201,0x205,0x209,0x20e,0x212,0x216,0x21a,0x21e,0x223,0x227,
-		0x22b,0x230,0x234,0x238,0x23c,0x241,0x245,0x249,0x24e,0x252,0x257,0x25b,0x25f,0x264,0x268,0x26d,
-		0x271,0x276,0x27a,0x27f,0x283,0x288,0x28c,0x291,0x295,0x29a,0x29e,0x2a3,0x2a8,0x2ac,0x2b1,0x2b5,
-		0x2ba,0x2bf,0x2c4,0x2c8,0x2cd,0x2d2,0x2d6,0x2db,0x2e0,0x2e5,0x2e9,0x2ee,0x2f3,0x2f8,0x2fd,0x302,
-		0x306,0x30b,0x310,0x315,0x31a,0x31f,0x324,0x329,0x32e,0x333,0x338,0x33d,0x342,0x347,0x34c,0x351,
-		0x356,0x35b,0x360,0x365,0x36a,0x370,0x375,0x37a,0x37f,0x384,0x38a,0x38f,0x394,0x399,0x39f,0x3a4,
-		0x3a9,0x3ae,0x3b4,0x3b9,0x3bf,0x3c4,0x3c9,0x3cf,0x3d4,0x3da,0x3df,0x3e4,0x3ea,0x3ef,0x3f5,0x3fa
+		X(0x3fa),X(0x3f5),X(0x3ef),X(0x3ea),X(0x3e4),X(0x3df),X(0x3da),X(0x3d4),
+		X(0x3cf),X(0x3c9),X(0x3c4),X(0x3bf),X(0x3b9),X(0x3b4),X(0x3ae),X(0x3a9),
+		X(0x3a4),X(0x39f),X(0x399),X(0x394),X(0x38f),X(0x38a),X(0x384),X(0x37f),
+		X(0x37a),X(0x375),X(0x370),X(0x36a),X(0x365),X(0x360),X(0x35b),X(0x356),
+		X(0x351),X(0x34c),X(0x347),X(0x342),X(0x33d),X(0x338),X(0x333),X(0x32e),
+		X(0x329),X(0x324),X(0x31f),X(0x31a),X(0x315),X(0x310),X(0x30b),X(0x306),
+		X(0x302),X(0x2fd),X(0x2f8),X(0x2f3),X(0x2ee),X(0x2e9),X(0x2e5),X(0x2e0),
+		X(0x2db),X(0x2d6),X(0x2d2),X(0x2cd),X(0x2c8),X(0x2c4),X(0x2bf),X(0x2ba),
+		X(0x2b5),X(0x2b1),X(0x2ac),X(0x2a8),X(0x2a3),X(0x29e),X(0x29a),X(0x295),
+		X(0x291),X(0x28c),X(0x288),X(0x283),X(0x27f),X(0x27a),X(0x276),X(0x271),
+		X(0x26d),X(0x268),X(0x264),X(0x25f),X(0x25b),X(0x257),X(0x252),X(0x24e),
+		X(0x249),X(0x245),X(0x241),X(0x23c),X(0x238),X(0x234),X(0x230),X(0x22b),
+		X(0x227),X(0x223),X(0x21e),X(0x21a),X(0x216),X(0x212),X(0x20e),X(0x209),
+		X(0x205),X(0x201),X(0x1fd),X(0x1f9),X(0x1f5),X(0x1f0),X(0x1ec),X(0x1e8),
+		X(0x1e4),X(0x1e0),X(0x1dc),X(0x1d8),X(0x1d4),X(0x1d0),X(0x1cc),X(0x1c8),
+		X(0x1c4),X(0x1c0),X(0x1bc),X(0x1b8),X(0x1b4),X(0x1b0),X(0x1ac),X(0x1a8),
+		X(0x1a4),X(0x1a0),X(0x19c),X(0x199),X(0x195),X(0x191),X(0x18d),X(0x189),
+		X(0x185),X(0x181),X(0x17e),X(0x17a),X(0x176),X(0x172),X(0x16f),X(0x16b),
+		X(0x167),X(0x163),X(0x160),X(0x15c),X(0x158),X(0x154),X(0x151),X(0x14d),
+		X(0x149),X(0x146),X(0x142),X(0x13e),X(0x13b),X(0x137),X(0x134),X(0x130),
+		X(0x12c),X(0x129),X(0x125),X(0x122),X(0x11e),X(0x11b),X(0x117),X(0x114),
+		X(0x110),X(0x10c),X(0x109),X(0x106),X(0x102),X(0x0ff),X(0x0fb),X(0x0f8),
+		X(0x0f4),X(0x0f1),X(0x0ed),X(0x0ea),X(0x0e7),X(0x0e3),X(0x0e0),X(0x0dc),
+		X(0x0d9),X(0x0d6),X(0x0d2),X(0x0cf),X(0x0cc),X(0x0c8),X(0x0c5),X(0x0c2),
+		X(0x0be),X(0x0bb),X(0x0b8),X(0x0b5),X(0x0b1),X(0x0ae),X(0x0ab),X(0x0a8),
+		X(0x0a4),X(0x0a1),X(0x09e),X(0x09b),X(0x098),X(0x094),X(0x091),X(0x08e),
+		X(0x08b),X(0x088),X(0x085),X(0x082),X(0x07e),X(0x07b),X(0x078),X(0x075),
+		X(0x072),X(0x06f),X(0x06c),X(0x069),X(0x066),X(0x063),X(0x060),X(0x05d),
+		X(0x05a),X(0x057),X(0x054),X(0x051),X(0x04e),X(0x04b),X(0x048),X(0x045),
+		X(0x042),X(0x03f),X(0x03c),X(0x039),X(0x036),X(0x033),X(0x030),X(0x02d),
+		X(0x02a),X(0x028),X(0x025),X(0x022),X(0x01f),X(0x01c),X(0x019),X(0x016),
+		X(0x014),X(0x011),X(0x00e),X(0x00b),X(0x008),X(0x006),X(0x003),X(0x000)
 	};
+#undef X
 
 	// look up the fractional part, then shift by the whole
-	return ((s_power_table[~input & 0xff] | 0x400) << 2) >> (input >> 8);
+	return s_power_table[input & 0xff] >> (input >> 8);
 }
 
 
@@ -714,6 +736,9 @@ ymopm_registers::ymopm_registers() :
 	m_noise_lfo(0),
 	m_lfo_am(0)
 {
+	// create the waveforms
+	for (int index = 0; index < 0x400; index++)
+		m_waveform[0][index] = abs_sin_attenuation(index) | (BIT(index, 9) << 15);
 }
 
 
@@ -916,6 +941,9 @@ u32 ymopm_registers::lfo_am_offset(u32 choffs) const
 
 void ymopm_registers::cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_cache &cache)
 {
+	// set up the sine table
+	cache.waveform = &m_waveform[0][0];
+
 	// get frequency from the channel
 	u32 block_freq = cache.block_freq = this->ch_block_freq(choffs);
 
@@ -1044,6 +1072,9 @@ ymopn_registers_base<IsOpnA>::ymopn_registers_base() :
 	m_lfo_counter(0),
 	m_lfo_am(0)
 {
+	// create the waveforms
+	for (int index = 0; index < 0x400; index++)
+		m_waveform[0][index] = abs_sin_attenuation(index) | (BIT(index, 9) << 15);
 }
 
 
@@ -1253,6 +1284,9 @@ u32 ymopn_registers_base<IsOpnA>::lfo_am_offset(u32 choffs) const
 template<bool IsOpnA>
 void ymopn_registers_base<IsOpnA>::cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_cache &cache)
 {
+	// set up the sine table
+	cache.waveform = &m_waveform[0][0];
+
 	// get frequency from the channel
 	u32 block_freq = cache.block_freq = this->ch_block_freq(choffs);
 
@@ -1408,6 +1442,24 @@ ymopl_registers_base<Revision>::ymopl_registers_base() :
 	m_noise_lfsr(1),
 	m_lfo_am(0)
 {
+	// create the waveforms
+	for (int index = 0; index < 0x400; index++)
+		m_waveform[0][index] = abs_sin_attenuation(index) | (BIT(index, 9) << 15);
+
+	if (WAVEFORMS >= 4)
+		for (int index = 0; index < 0x400; index++)
+		{
+			m_waveform[1][index] = BIT(index, 9) ? 0 : m_waveform[0][index];
+			m_waveform[2][index] = m_waveform[0][index] & 0x7fff;
+			m_waveform[3][index] = BIT(index, 8) ? 0 : (m_waveform[0][index] & 0x7fff);
+			if (WAVEFORMS >= 8)
+			{
+				m_waveform[4][index] = BIT(index, 9) ? 0 : m_waveform[0][index * 2];
+				m_waveform[5][index] = BIT(index, 9) ? 0 : m_waveform[0][(index * 2) & 0x1ff];
+				m_waveform[6][index] = BIT(index, 9) << 15;
+				m_waveform[7][index] = (0x859 - m_waveform[0][(index / 2)]) | (BIT(index, 9) << 15);
+			}
+		}
 }
 
 
@@ -1580,6 +1632,9 @@ s32 ymopl_registers_base<Revision>::clock_noise_and_lfo()
 template<int Revision>
 void ymopl_registers_base<Revision>::cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_cache &cache)
 {
+	// set up the sine table
+	cache.waveform = &m_waveform[op_waveform(opoffs) % WAVEFORMS][0];
+
 	// get frequency from the channel
 	u32 block_freq = cache.block_freq = this->ch_block_freq(choffs);
 
@@ -1655,61 +1710,6 @@ u32 ymopl_registers_base<Revision>::compute_phase_step(u32 choffs, u32 opoffs, u
 	// apply frequency multiplier (0 means 0.5, other values are as-is)
 	u32 multi = op_multiple(opoffs);
 	return (multi == 0) ? (phase_step >> 1) : (phase_step * multi);
-}
-
-
-//-------------------------------------------------
-//  transform_phase - transform the phase value
-//  based on the selected waveform, returning 0xfff
-//  if the output needs to be inverted
-//-------------------------------------------------
-
-template<int Revision>
-u32 ymopl_registers_base<Revision>::transform_phase(u32 opoffs, u32 &phase)
-{
-	// if waveforms enabled, do nothing
-	if (!waveform_enable())
-		return 0;
-
-	// per-quadrant behaviors:
-	//   bits  0-11 = mask to AND with
-	//   bits 12-13 = shift value: 0: <<1, 1:0, 2: >>1
-	//   bit     14 = set bit 0x100
-	//   bit     15 = invert the output
-	static u16 const s_waveform_mask_shift[8*4] =
-	{
-		// OPL2 waveforms:
-		0x13ff, 0x13ff, 0x13ff, 0x13ff, // 0: no shift
-		0x13ff, 0x13ff, 0x0000, 0x0000, // 1: no shift, mask to 0 in Q3/Q4
-		0x11ff, 0x11ff, 0x11ff, 0x11ff, // 2: no shift, mask off sign bit
-		0x11ff, 0x0000, 0x11ff, 0x0000, // 3: no shift, mask off sign bit in Q1/Q3, mask to 0 in Q2/Q4
-
-		// OPL3 waveforms:
-		0x03ff, 0x03ff, 0x0000, 0x0000, // 4: lshift 1, mask to 0 in Q3/Q4
-		0x01ff, 0x01ff, 0x0000, 0x0000, // 5: lshift 1, mask off sign bit in Q1/Q2, mask to 0 in Q2/Q4
-		0x5200, 0x5200, 0x5200, 0x5200, // 6: no shift, sign bit only, OR with 0x100
-		0xa3ff, 0xa3ff, 0xa3ff, 0xa3ff  // 7: rshift 1 and invert the output
-	};
-	u32 mask_shift = s_waveform_mask_shift[op_waveform(opoffs) * 4 + BIT(phase, 8, 2)];
-
-	// The OPL2 waveforms only need the AND, so handle them separately
-	if (!IsOpl3Plus)
-	{
-		phase &= mask_shift;
-		return 0;
-	}
-	else
-	{
-		// apply the shift, preserving the sign bit for the right shift case
-		phase = s16(phase << 6) >> (5 + BIT(mask_shift, 12, 2));
-
-		// next apply the mask and set the 0x100 bit if needed
-		phase &= mask_shift;
-		phase |= BIT(mask_shift, 14) << 8;
-
-		// the invert state comes from the top bit
-		return (s16(mask_shift) >> 15) & 0xfff;
-	}
 }
 
 
@@ -1906,6 +1906,9 @@ s32 ymopll_registers::clock_noise_and_lfo()
 
 void ymopll_registers::cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_cache &cache)
 {
+	// set up the sine table
+	cache.waveform = &m_waveform[op_waveform(opoffs) % WAVEFORMS][0];
+
 	// get frequency from the channel
 	u32 block_freq = cache.block_freq = this->ch_block_freq(choffs);
 
@@ -1954,12 +1957,20 @@ void ymopll_registers::cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_c
 	constexpr u8 RR = 7 * 4;
 	constexpr u8 RS = 5 * 4;
 
-	// determine KSR adjustment for enevlope rates
+	// determine KSR adjustment for envelope rates
 	u32 ksrval = keycode >> (op_ksr(opoffs) ^ 3);
 	cache.eg_rate[YMFM_ENV_ATTACK] = effective_rate(op_attack_rate(opoffs) * 4, ksrval);
 	cache.eg_rate[YMFM_ENV_DECAY] = effective_rate(op_decay_rate(opoffs) * 4, ksrval);
-	cache.eg_rate[YMFM_ENV_SUSTAIN] = op_eg_sustain(opoffs) ? 0 : effective_rate(op_release_rate(opoffs) * 4, ksrval);
-	cache.eg_rate[YMFM_ENV_RELEASE] = ch_sustain(choffs) ? RS : (op_eg_sustain(opoffs) ? effective_rate(op_release_rate(opoffs) * 4, ksrval) : RR);
+	if (op_eg_sustain(opoffs))
+	{
+		cache.eg_rate[YMFM_ENV_SUSTAIN] = 0;
+		cache.eg_rate[YMFM_ENV_RELEASE] = ch_sustain(choffs) ? RS : effective_rate(op_release_rate(opoffs) * 4, ksrval);
+	}
+	else
+	{
+		cache.eg_rate[YMFM_ENV_SUSTAIN] = effective_rate(op_release_rate(opoffs) * 4, ksrval);
+		cache.eg_rate[YMFM_ENV_RELEASE] = ch_sustain(choffs) ? RS : RR;
+	}
 	cache.eg_rate[YMFM_ENV_DEPRESS] = DP;
 }
 
@@ -1994,20 +2005,6 @@ u32 ymopll_registers::compute_phase_step(u32 choffs, u32 opoffs, u32 block_freq,
 	// apply frequency multiplier (0 means 0.5, other values are as-is)
 	u32 multi = op_multiple(opoffs);
 	return (multi == 0) ? (phase_step >> 1) : (phase_step * multi);
-}
-
-
-//-------------------------------------------------
-//  transform_phase - transform the phase value
-//  based on the selected waveform, returning 0xfff
-//  if the output needs to be inverted
-//-------------------------------------------------
-
-u32 ymopll_registers::transform_phase(u32 opoffs, u32 &phase)
-{
-	// if the waveform is 1, zero the second half of the waveform
-	phase &= (BIT(phase, 9) & op_waveform(opoffs)) - 1;
-	return 0;
 }
 
 
@@ -2162,20 +2159,17 @@ s32 ymfm_operator<RegisterType>::compute_volume(u32 phase, u32 am_offset) const
 	if (m_env_attenuation > ENV_QUIET)
 		return 0;
 
-	// transform the phase for the different waveforms
-	u32 invert = m_regs.transform_phase(m_opoffs, phase);
-
 	// get the absolute value of the sin, as attenuation, as a 4.8 fixed point value
-	u32 sin_attenuation = abs_sin_attenuation(phase) ^ invert;
+	u32 sin_attenuation = m_cache.waveform[phase & 0x3ff];
 
 	// get the attenuation from the evelope generator as a 4.6 value, shifted up to 4.8
 	u32 env_attenuation = envelope_attenuation(am_offset) << 2;
 
 	// combine into a 5.8 value, then convert from attenuation to 13-bit linear volume
-	s32 result = attenuation_to_volume(sin_attenuation + env_attenuation);
+	s32 result = attenuation_to_volume((sin_attenuation & 0x7fff) + env_attenuation);
 
 	// negate if in the negative part of the sin wave (sign bit gives 14 bits)
-	return BIT(phase, 9) ? -result : result;
+	return BIT(sin_attenuation, 15) ? -result : result;
 }
 
 
