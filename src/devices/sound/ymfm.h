@@ -160,7 +160,7 @@ class ymfm_registers_base
 {
 public:
 	// this value is returned from the write() function for rhythm channels
-	static constexpr u8 YMFM_RHYTHM_CHANNEL = 0xff;
+	static constexpr u32 YMFM_RHYTHM_CHANNEL = 0xff;
 
 	//
 	// the following constants need to be defined per family:
@@ -290,14 +290,14 @@ public:
 	void reset();
 
 	// map channel number to register offset
-	static constexpr u32 channel_offset(u8 chnum)
+	static constexpr u32 channel_offset(u32 chnum)
 	{
 		assert(chnum < CHANNELS);
 		return chnum;
 	}
 
 	// map operator number to register offset
-	static constexpr u32 operator_offset(u8 opnum)
+	static constexpr u32 operator_offset(u32 opnum)
 	{
 		assert(opnum < OPERATORS);
 		return opnum;
@@ -329,7 +329,7 @@ public:
 	u32 compute_phase_step(u32 choffs, u32 opoffs, u32 block_freq, s32 detuneval, s32 lfo_raw_pm);
 
 	// transform the phase based on the waveform, returning inversion
-	u16 transform_phase(u32 opoffs, u32 &phase) { return 0; }
+	u32 transform_phase(u32 opoffs, u32 &phase) { return 0; }
 
 	// log a key-on event
 	void log_keyon(u32 choffs, u32 opoffs);
@@ -491,7 +491,7 @@ public:
 	void reset();
 
 	// map channel number to register offset
-	static constexpr u32 channel_offset(u8 chnum)
+	static constexpr u32 channel_offset(u32 chnum)
 	{
 		assert(chnum < CHANNELS);
 		if (!IsOpnA)
@@ -501,7 +501,7 @@ public:
 	}
 
 	// map operator number to register offset
-	static constexpr u32 operator_offset(u8 opnum)
+	static constexpr u32 operator_offset(u32 opnum)
 	{
 		assert(opnum < OPERATORS);
 		if (!IsOpnA)
@@ -536,7 +536,7 @@ public:
 	u32 compute_phase_step(u32 choffs, u32 opoffs, u32 block_freq, s32 detuneval, s32 lfo_raw_pm);
 
 	// transform the phase based on the waveform, returning inversion
-	u16 transform_phase(u32 opoffs, u32 &phase) { return 0; }
+	u32 transform_phase(u32 opoffs, u32 &phase) { return 0; }
 
 	// log a key-on event
 	void log_keyon(u32 choffs, u32 opoffs);
@@ -555,7 +555,7 @@ public:
 	u32 enable_timer_a() const             { return byte(0x27, 2, 1); }
 	u32 load_timer_b() const               { return byte(0x27, 1, 1); }
 	u32 load_timer_a() const               { return byte(0x27, 0, 1); }
-	u32 multi_block_freq(u8 num) const     { return word(0xac, 0, 6, 0xa8, 0, 8, num); }
+	u32 multi_block_freq(u32 num) const    { return word(0xac, 0, 6, 0xa8, 0, 8, num); }
 
 	// per-channel registers
 	u32 ch_block_freq(u32 choffs) const    { return word(0xa4, 0, 6, 0xa0, 0, 8, choffs); }
@@ -699,7 +699,7 @@ public:
 	void reset();
 
 	// map channel number to register offset
-	static constexpr u32 channel_offset(u8 chnum)
+	static constexpr u32 channel_offset(u32 chnum)
 	{
 		assert(chnum < CHANNELS);
 		if (!IsOpl3Plus)
@@ -709,7 +709,7 @@ public:
 	}
 
 	// map operator number to register offset
-	static constexpr u32 operator_offset(u8 opnum)
+	static constexpr u32 operator_offset(u32 opnum)
 	{
 		assert(opnum < OPERATORS);
 		if (!IsOpl3Plus)
@@ -745,7 +745,7 @@ public:
 	u32 compute_phase_step(u32 choffs, u32 opoffs, u32 block_freq, s32 detuneval, s32 lfo_raw_pm);
 
 	// transform the phase based on the waveform, returning inversion
-	u16 transform_phase(u32 opoffs, u32 &phase);
+	u32 transform_phase(u32 opoffs, u32 &phase);
 
 	// log a key-on event
 	void log_keyon(u32 choffs, u32 opoffs);
@@ -812,7 +812,7 @@ protected:
 	}
 
 	// OPL-specific helper to handle the weird multiple mapping
-	static constexpr u8 opl_multiple_map(u32 raw)
+	static constexpr u32 opl_multiple_map(u32 raw)
 	{
 		// replace the low bit with a table lookup; the equivalent
 		// OPM/OPN values are: 0,1,2,3,4,5,6,7,8,9,10,10,12,12,15,15
@@ -903,14 +903,14 @@ public:
 	void reset();
 
 	// map channel number to register offset
-	static constexpr u32 channel_offset(u8 chnum)
+	static constexpr u32 channel_offset(u32 chnum)
 	{
 		assert(chnum < CHANNELS);
 		return chnum;
 	}
 
 	// map operator number to register offset
-	static constexpr u32 operator_offset(u8 opnum)
+	static constexpr u32 operator_offset(u32 opnum)
 	{
 		assert(opnum < OPERATORS);
 		return opnum;
@@ -933,7 +933,7 @@ public:
 	u32 compute_phase_step(u32 choffs, u32 opoffs, u32 block_freq, s32 detuneval, s32 lfo_raw_pm);
 
 	// transform the phase based on the waveform, returning inversion
-	u16 transform_phase(u32 opoffs, u32 &phase);
+	u32 transform_phase(u32 opoffs, u32 &phase);
 
 	// log a key-on event
 	void log_keyon(u32 choffs, u32 opoffs);
@@ -980,7 +980,7 @@ private:
 	}
 
 	// OPLL-specific helper to return either the total level or the volume
-	u8 total_level_or_volume(u32 opoffs) const
+	u32 total_level_or_volume(u32 opoffs) const
 	{
 		u32 choffs = opoffs >> 1;
 		int opindex = BIT(opoffs, 0);
@@ -991,7 +991,7 @@ private:
 	}
 
 	// helper to compute the ROM address of an instrument number
-	static constexpr u8 rom_address(int instrument)
+	static constexpr u32 rom_address(int instrument)
 	{
 		return (instrument == 0) ? 0 : (INSTDATA_BASE + 8 * (instrument - 1));
 	}
@@ -999,7 +999,7 @@ private:
 	// helper to update the instrument
 	void update_instrument(u32 choffs)
 	{
-		u8 baseaddr;
+		u32 baseaddr;
 		if (rhythm_enable() && choffs >= 6)
 			baseaddr = rom_address(16 + (choffs - 6));
 		else
@@ -1036,14 +1036,14 @@ template<class RegisterType>
 class ymfm_operator
 {
 	// "quiet" value, used to optimize when we can skip doing working
-	static constexpr u16 ENV_QUIET = 0x200;
+	static constexpr u32 ENV_QUIET = 0x200;
 
 public:
 	// constructor
 	ymfm_operator(ymfm_engine_base<RegisterType> &owner, u32 opoffs);
 
 	// register for save states
-	void save(device_t &device, u8 index);
+	void save(device_t &device, u32 index);
 
 	// reset the operator state
 	void reset();
@@ -1055,7 +1055,7 @@ public:
 	bool prepare();
 
 	// master clocking function
-	void clock(u32 env_counter, s8 lfo_raw_pm);
+	void clock(u32 env_counter, s32 lfo_raw_pm);
 
 	// return the current phase value
 	u32 phase() const { return m_phase >> 10; }
@@ -1067,7 +1067,7 @@ public:
 	s32 compute_noise_volume(u32 am_offset) const;
 
 	// key state control
-	void keyonoff(u8 on, ymfm_keyon_type type);
+	void keyonoff(u32 on, ymfm_keyon_type type);
 
 	// return a reference to our registers
 	RegisterType &regs() { return m_regs; }
@@ -1080,13 +1080,13 @@ private:
 	void start_release();
 
 	// clock phases
-	void clock_keystate(u8 keystate);
+	void clock_keystate(u32 keystate);
 	void clock_ssg_eg_state();
-	void clock_envelope(u16 env_counter);
-	void clock_phase(s8 lfo_raw_pm);
+	void clock_envelope(u32 env_counter);
+	void clock_phase(s32 lfo_raw_pm);
 
 	// return effective attenuation of the envelope
-	u16 envelope_attenuation(u8 am_offset) const;
+	u32 envelope_attenuation(u32 am_offset) const;
 
 	// internal state
 	u16 m_choffs;                    // channel offset in registers
@@ -1113,7 +1113,7 @@ public:
 	ymfm_channel(ymfm_engine_base<RegisterType> &owner, u32 choffs);
 
 	// register for save states
-	void save(device_t &device, u8 index);
+	void save(device_t &device, u32 index);
 
 	// reset the channel state
 	void reset();
@@ -1128,22 +1128,22 @@ public:
 	}
 
 	// signal key on/off to our operators
-	void keyonoff(u8 states, ymfm_keyon_type type);
+	void keyonoff(u32 states, ymfm_keyon_type type);
 
 	// prepare prior to clocking
 	bool prepare();
 
 	// master clocking function
-	void clock(u32 env_counter, s8 lfo_raw_pm);
+	void clock(u32 env_counter, s32 lfo_raw_pm);
 
 	// specific 2-operator and 4-operator output handlers
-	void output_2op(s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
-	void output_4op(s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
+	void output_2op(s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax) const;
+	void output_4op(s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax) const;
 
 	// compute the special OPL rhythm channel outputs
-	void output_rhythm_ch6(s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
-	void output_rhythm_ch7(u8 phase_select, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
-	void output_rhythm_ch8(u8 phase_select, s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax) const;
+	void output_rhythm_ch6(s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax) const;
+	void output_rhythm_ch7(u32 phase_select, s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax) const;
+	void output_rhythm_ch8(u32 phase_select, s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax) const;
 
 	// are we a 4-operator channel or a 2-operator one?
 	bool is4op() const
@@ -1158,7 +1158,7 @@ public:
 
 private:
 	// helper to add values to the outputs based on channel enables
-	void add_to_output(u8 outmask, s32 *outputs, s32 value) const
+	void add_to_output(u32 outmask, s32 *outputs, s32 value) const
 	{
 		if (RegisterType::OUTPUTS == 1 || BIT(outmask, 0))
 			outputs[0] += value;
@@ -1205,7 +1205,7 @@ public:
 	u32 clock(u32 chanmask);
 
 	// compute sum of channel outputs
-	void output(s32 outputs[RegisterType::OUTPUTS], u8 rshift, s32 clipmax, u32 chanmask) const;
+	void output(s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax, u32 chanmask) const;
 
 	// write to the OPN registers
 	void write(u16 regnum, u8 data);
@@ -1234,10 +1234,10 @@ public:
 	void set_busy_end(attotime end) { m_busy_end = end; }
 
 	// return the current clock prescale
-	u8 clock_prescale() const { return m_clock_prescale; }
+	u32 clock_prescale() const { return m_clock_prescale; }
 
 	// set prescale factor (2/3/6)
-	void set_clock_prescale(u8 prescale) { m_clock_prescale = prescale; }
+	void set_clock_prescale(u32 prescale) { m_clock_prescale = prescale; }
 
 	// compute sample rate
 	u32 fm_sample_rate(u32 baseclock) const { return baseclock / (m_clock_prescale * RegisterType::OPERATORS); }
@@ -1256,7 +1256,7 @@ protected:
 	void assign_operators();
 
 	// update the state of the given timer
-	void update_timer(u8 which, u8 enable);
+	void update_timer(u32 which, u32 enable);
 
 	// timer callback
 	TIMER_CALLBACK_MEMBER(timer_handler);
