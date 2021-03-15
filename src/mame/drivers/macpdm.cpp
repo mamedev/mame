@@ -15,13 +15,12 @@
 #include "machine/ncr5380.h"
 #include "machine/ram.h"
 #include "machine/swim3.h"
+#include "machine/timer.h"
 #include "softlist.h"
 #include "sound/awacs.h"
 #include "speaker.h"
 
 constexpr auto IO_CLOCK = 31.3344_MHz_XTAL;
-[[maybe_unused]] constexpr auto VGA_CLOCK = 25.1750_MHz_XTAL;
-[[maybe_unused]] constexpr auto DOT_CLOCK = 57.2832_MHz_XTAL;
 constexpr auto ENET_CLOCK = 20_MHz_XTAL;
 
 class macpdm_state : public driver_device
@@ -55,6 +54,8 @@ private:
 
 	uint8_t m_irq_control;
 
+	uint8_t m_via2_ier, m_via2_ifr, m_via2_sier, m_via2_sifr;
+
 	uint32_t m_dma_badr, m_dma_floppy_adr;
 	uint16_t m_dma_berr_en, m_dma_berr_flag;
 
@@ -68,7 +69,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(dma_irq);
 	DECLARE_WRITE_LINE_MEMBER(enet_irq);
 	DECLARE_WRITE_LINE_MEMBER(scc_irq);
-	DECLARE_WRITE_LINE_MEMBER(via2_irq);
 	DECLARE_WRITE_LINE_MEMBER(via1_irq);
 
 	DECLARE_WRITE_LINE_MEMBER(bus_err_irq);
@@ -104,6 +104,7 @@ private:
 	uint8_t via1_in_b();
 	void via1_out_a(uint8_t data);
 	void via1_out_b(uint8_t data);
+	TIMER_DEVICE_CALLBACK_MEMBER(via1_60_15_timer);
 	DECLARE_WRITE_LINE_MEMBER(via1_out_cb2);
 
 	DECLARE_WRITE_LINE_MEMBER(cuda_reset_w);
@@ -111,8 +112,13 @@ private:
 	uint8_t via1_r(offs_t offset);
 	void via1_w(offs_t offset, uint8_t data);
 
-	uint8_t via2_r(offs_t offset);
-	void via2_w(offs_t offset, uint8_t data);
+	uint8_t via2_ier_r();
+	void via2_ier_w(uint8_t data);
+	uint8_t via2_ifr_r();
+	uint8_t via2_sier_r();
+	void via2_sier_w(uint8_t data);
+	uint8_t via2_sifr_r();
+	void via2_sifr_w(uint8_t data);
 
 	uint8_t fdc_r(offs_t offset);
 	void fdc_w(offs_t offset, uint8_t data);
@@ -197,6 +203,11 @@ void macpdm_state::driver_init()
 	save_item(NAME(m_hmc_buffer));
 	save_item(NAME(m_hmc_bit));
 
+	save_item(NAME(m_via2_ier));
+	save_item(NAME(m_via2_ifr));
+	save_item(NAME(m_via2_sier));
+	save_item(NAME(m_via2_sifr));
+
 	save_item(NAME(m_irq_control));
 
 	save_item(NAME(m_dma_badr));
@@ -236,6 +247,11 @@ void macpdm_state::driver_reset()
 	m_hmc_buffer = 0;
 	m_hmc_bit = 0;
 
+	m_via2_ier = 0x00;
+	m_via2_ifr = 0x00;
+	m_via2_sier = 0x00;
+	m_via2_sifr = 0x07;
+
 	m_irq_control = 0;
 
 	m_dma_badr = 0;
@@ -271,8 +287,6 @@ void macpdm_state::irq_control_w(uint8_t data)
 		m_irq_control &= 0x7f;
 		m_maincpu->set_input_line(PPC_IRQ, CLEAR_LINE);
 	}	
-
-	logerror("irq control %02x\n", m_irq_control);
 }
 
 void macpdm_state::irq_main_set(uint8_t mask, int state)
@@ -294,8 +308,6 @@ void macpdm_state::irq_main_set(uint8_t mask, int state)
 			m_maincpu->set_input_line(PPC_IRQ, CLEAR_LINE);
 		}
 	}
-
-	logerror("irq control %02x\n", m_irq_control);
 }
 
 
@@ -333,6 +345,12 @@ void macpdm_state::via1_out_b(uint8_t data)
 	m_cuda->set_tip(BIT(data, 5));
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(macpdm_state::via1_60_15_timer)
+{
+	m_via1->write_ca1(1);
+	m_via1->write_ca1(0);
+}
+
 WRITE_LINE_MEMBER(macpdm_state::via1_out_cb2)
 {
 	m_cuda->set_via_data(state & 1);
@@ -356,16 +374,63 @@ void macpdm_state::via1_w(offs_t offset, uint8_t data)
 	m_via1->write(offset >> 9, data);
 }
 
-uint8_t macpdm_state::via2_r(offs_t offset)
+
+uint8_t macpdm_state::via2_ier_r()
 {
-	logerror("via2_r %x\n", offset);
-	return 0;
+	return m_via2_ier;
 }
 
-void macpdm_state::via2_w(offs_t offset, uint8_t data)
+void macpdm_state::via2_ier_w(uint8_t data)
 {
-	logerror("via2_w %x, %02x\n", offset, data);
+	if(data & 0x80)
+		m_via2_ier |= data & 0x29;
+	else
+		m_via2_ier &= ~data;
+
+	logerror("via2 ier %s %s %s %s\n",
+			 m_via2_ier & 0x20 ? "fdc" : "-",
+			 m_via2_ier & 0x08 ? "scsi" : "-",
+			 m_via2_ier & 0x02 ? "slot" : "-",
+			 m_via2_ier & 0x01 ? "scsidrq" : "-");
 }
+
+uint8_t macpdm_state::via2_ifr_r()
+{
+	return m_via2_ifr;
+}
+
+uint8_t macpdm_state::via2_sier_r()
+{
+	return m_via2_ier;
+}
+
+void macpdm_state::via2_sier_w(uint8_t data)
+{
+	if(data & 0x80)
+		m_via2_sier |= data & 0x38;
+	else
+		m_via2_sier &= ~data;
+
+	logerror("via2 sier %s %s %s %s\n",
+			 m_via2_ier & 0x40 ? "vbl" : "-",
+			 m_via2_ier & 0x20 ? "slot2" : "-",
+			 m_via2_ier & 0x10 ? "slot1" : "-",
+			 m_via2_ier & 0x08 ? "slot0" : "-");
+}
+
+uint8_t macpdm_state::via2_sifr_r()
+{
+	return m_via2_sifr;
+}
+
+void macpdm_state::via2_sifr_w(uint8_t data)
+{
+	if(data & m_via2_sifr & 0x40) {
+		m_via2_sifr &= ~0x40;
+	}
+}
+
+
 
 uint8_t macpdm_state::scc_r(offs_t offset)
 {
@@ -644,8 +709,14 @@ void macpdm_state::pdm_map(address_map &map)
 	// 50f14000 = sound registers (AWACS)
 	map(0x50f14000, 0x50f1401f).rw(m_awacs, FUNC(awacs_device::read), FUNC(awacs_device::write));
 	map(0x50f16000, 0x50f16000).rw(FUNC(macpdm_state::fdc_r), FUNC(macpdm_state::fdc_w)).select(0x1e00);
+
 	map(0x50f24000, 0x50f24003).w(m_video, FUNC(mac_video_sonora_device::dac_w));
-	map(0x50f26000, 0x50f2601f).rw(FUNC(macpdm_state::via2_r), FUNC(macpdm_state::via2_w));
+
+	map(0x50f26002, 0x50f26002).rw(FUNC(macpdm_state::via2_sifr_r), FUNC(macpdm_state::via2_sifr_w));
+	map(0x50f26003, 0x50f26003).r(FUNC(macpdm_state::via2_ifr_r));
+	map(0x50f26012, 0x50f26012).rw(FUNC(macpdm_state::via2_sier_r), FUNC(macpdm_state::via2_sier_w));
+	map(0x50f26013, 0x50f26013).rw(FUNC(macpdm_state::via2_ier_r), FUNC(macpdm_state::via2_ier_w));
+
 	map(0x50f28000, 0x50f28007).rw(m_video, FUNC(mac_video_sonora_device::vctrl_r), FUNC(mac_video_sonora_device::vctrl_w));
 
 	map(0x50f2a000, 0x50f2a000).rw(FUNC(macpdm_state::irq_control_r), FUNC(macpdm_state::irq_control_w));
@@ -706,7 +777,7 @@ void macpdm_state::macpdm(machine_config &config)
 	SCC8530(config, m_scc, 60000000/4);
 	m_scc->intrq_callback().set(FUNC(macpdm_state::scc_irq));
 
-	R65NC22(config, m_via1, IO_CLOCK/2);
+	R65NC22(config, m_via1, IO_CLOCK/40);
 	m_via1->readpa_handler().set(FUNC(macpdm_state::via1_in_a));
 	m_via1->readpb_handler().set(FUNC(macpdm_state::via1_in_b));
 	m_via1->writepa_handler().set(FUNC(macpdm_state::via1_out_a));
@@ -727,6 +798,8 @@ void macpdm_state::macpdm(machine_config &config)
 	m_macadb->set_mcu_mode(true);
 	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
 	config.set_perfect_quantum(m_maincpu);
+
+	TIMER(config, "beat_60_15").configure_periodic(FUNC(macpdm_state::via1_60_15_timer), attotime::from_double(1/60.15));
 }
 
 static INPUT_PORTS_START( macpdm )

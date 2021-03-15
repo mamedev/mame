@@ -113,7 +113,7 @@ uint32_t mac_video_sonora_device::screen_update(screen_device &screen, bitmap_rg
 			uint32_t *scanline = &bitmap.pix(y);
 			for(uint32_t x = 0; x != hres; x += 64) {
 				uint64_t pixels = *vram ++;
-				for(uint32_t bit = 0; bit != 64; bit ++)
+				for(int32_t bit = 63; bit >= 0; bit --)
 					*scanline ++ = pens[(((pixels >> bit) & 1) << 7) | 0x7f];
 			}
 		}
@@ -124,7 +124,7 @@ uint32_t mac_video_sonora_device::screen_update(screen_device &screen, bitmap_rg
 			uint32_t *scanline = &bitmap.pix(y);
 			for(uint32_t x = 0; x != hres; x += 8) {
 				uint64_t pixels = *vram ++;
-				for(uint32_t bit = 0; bit != 64; bit += 8)
+				for(int32_t bit = 56; bit >= 0; bit -= 8)
 					*scanline ++ = pens[((pixels >> bit) & 0xff)];
 			}
 		}
