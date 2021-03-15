@@ -1596,6 +1596,11 @@ uint32_t a2_video_device::screen_update_GS_8bit(screen_device &screen, bitmap_in
 {
 	bool old_page2 = m_page2;
 
+	if (cliprect.bottom() > 191)
+	{
+		return 0;
+	}
+
 	// don't display page2 if 80store is set (we just saved the previous value, don't worry)
 	if (m_80store)
 	{
