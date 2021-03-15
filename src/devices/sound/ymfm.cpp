@@ -2227,7 +2227,8 @@ void ymfm_operator<RegisterType>::start_attack()
 
 	// generally not inverted at start, except if SSG-EG is
 	// enabled and one of the inverted modes is specified
-	m_ssg_inverted = m_regs.op_ssg_eg_enable(m_opoffs) & BIT(m_regs.op_ssg_eg_mode(m_opoffs), 2);
+	if (RegisterType::EG_HAS_SSG)
+		m_ssg_inverted = m_regs.op_ssg_eg_enable(m_opoffs) & BIT(m_regs.op_ssg_eg_mode(m_opoffs), 2);
 
 	// reset the phase when we start an attack
 	m_phase = 0;
@@ -2262,7 +2263,7 @@ void ymfm_operator<RegisterType>::start_release()
 	m_env_state = YMFM_ENV_RELEASE;
 
 	// adjust attenuation if inverted due to SSG-EG
-	if (m_ssg_inverted)
+	if (RegisterType::EG_HAS_SSG && m_ssg_inverted)
 		m_env_attenuation = 0x200 - m_env_attenuation;
 }
 
@@ -2458,7 +2459,7 @@ u32 ymfm_operator<RegisterType>::envelope_attenuation(u32 am_offset) const
 	u32 result = m_env_attenuation;
 
 	// invert if necessary due to SSG-EG
-	if (m_ssg_inverted)
+	if (RegisterType::EG_HAS_SSG && m_ssg_inverted)
 		result = (0x200 - result) & 0x3ff;
 
 	// add in LFO AM modulation

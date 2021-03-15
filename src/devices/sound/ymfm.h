@@ -174,6 +174,7 @@ public:
 	//  u8 DEFAULT_PRESCALE: The starting clock prescale
 	//  u8 EG_CLOCK_DIVIDER: The clock divider of the envelope generator
 	//  bool EG_HAS_DEPRESS: True if the chip has a DP ("depress"?) envelope stage
+	//      bool EG_HAS_SSG: True if the chip has SSG envelope support
 	// bool MODULATOR_DELAY: True if the modulator is delayed by 1 sample (OPL pre-OPL3)
 	// u32 CSM_TRIGGER_MASK: Mask of channels to trigger in CSM mode
 	//     u8 STATUS_TIMERA: Status bit to set when timer A fires
@@ -273,6 +274,7 @@ public:
 	static constexpr u8 DEFAULT_PRESCALE = 2;
 	static constexpr u8 EG_CLOCK_DIVIDER = 3;
 	static constexpr bool EG_HAS_DEPRESS = false;
+	static constexpr bool EG_HAS_SSG = false;
 	static constexpr bool MODULATOR_DELAY = false;
 	static constexpr u32 CSM_TRIGGER_MASK = ALL_CHANNELS;
 	static constexpr u8 STATUS_TIMERA = 0x01;
@@ -474,6 +476,7 @@ public:
 	static constexpr u8 DEFAULT_PRESCALE = 6;
 	static constexpr u8 EG_CLOCK_DIVIDER = 3;
 	static constexpr bool EG_HAS_DEPRESS = false;
+	static constexpr bool EG_HAS_SSG = true;
 	static constexpr bool MODULATOR_DELAY = false;
 	static constexpr u32 CSM_TRIGGER_MASK = 1 << 2;
 	static constexpr u8 STATUS_TIMERA = 0x01;
@@ -682,6 +685,7 @@ public:
 	static constexpr u8 DEFAULT_PRESCALE = IsOpl3Plus ? 8 : 4;
 	static constexpr u8 EG_CLOCK_DIVIDER = 1;
 	static constexpr bool EG_HAS_DEPRESS = false;
+	static constexpr bool EG_HAS_SSG = false;
 	static constexpr bool MODULATOR_DELAY = !IsOpl3Plus;
 	static constexpr u32 CSM_TRIGGER_MASK = ALL_CHANNELS;
 	static constexpr u8 STATUS_TIMERA = 0x40;
