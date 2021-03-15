@@ -62,7 +62,7 @@ license:CC0
 		<description>Shoku Iku Series 1 Soreike! Anpanman-Sukikirai Nai Ko Genki na Ko!</description>
 		<year>2005</year>
 		<publisher>Sega Toys</publisher>
-		<info name="alt_title" value="食育シリーズ ① それいけ!アンパンマン すききらいないこ げんきなこ!"/>
+		<info name="alt_title" value="食育シリーズ①それいけ!アンパンマンすききらいないこげんきなこ!"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
 				<rom loadflag="load16_word_swap" name="S-100008-1000 - Shoku Iku Series 1 Soreike Anpanman-Sukikirai Nai Ko Genki na Ko.bin" size="0x00800000" crc="e7d8333d" sha1="7488dddf64cb0c93b17235db93cf6a1bd5c05c0f"/>
@@ -107,10 +107,10 @@ license:CC0
 	</software>
 
 	<software name="dtanoshib" supported="no">
-		<description>Disney Tanoshii O-Benkyou Series: Mic de Kantan ABC</description>
+		<description>Disney Tanoshii O-Benkyou Series 1: Mic de Kantan ABC</description>
 		<year>2005</year>
 		<publisher>Sega Toys</publisher>
-		<info name="alt_title" value="ディズニー たのしいおべんきょうシリーズ ① マイクでかんたんABC♪"/>
+		<info name="alt_title" value="ディズニーたのしいおべんきょうシリーズ①マイクでかんたんABC♪"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
 				<rom loadflag="load16_word_swap" name="S-100005-1000 - Disney Tanoshii o-Benkyou Series-Mic de Kantan ABC (Japan).bin" size="0x800000" crc="e95e91a0" sha1="ea3dcaca3c1fcc31dbc58674238c7c32d12539ad"/>
@@ -134,7 +134,7 @@ license:CC0
 		<description>Disney Tanoshii Oekaki: O-Mise-ya-san o Tsukutchaou!</description>
 		<year>2007</year>
 		<publisher>Sega Toys</publisher>
-		<info name="alt_title" value="ディズニーたのしいおえかき おみせやさんをつくっちゃおう!"/>
+		<info name="alt_title" value="ディズニーたのしいおえかきおみせやさんをつくっちゃおう!"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
 				<rom loadflag="load16_word_swap" name="S-100032-1001 - Disney Tanoshii Oekaki-o-Mise-ya-san o Tsukutchaou (Japan).bin" size="0x800000" crc="2c3107b0" sha1="19b216901a1c7b06bfc892b6df64f6efef569159"/>
@@ -158,7 +158,7 @@ license:CC0
 		<description>Cooking Beena: O-Ryouri Dekichatta!</description>
 		<year>2007</year>
 		<publisher>Sega Toys</publisher>
-		<info name="alt_title" value="クッキングビーナ ～おりょうりできちゃった!～"/>
+		<info name="alt_title" value="クッキングビーナ～おりょうりできちゃった!～"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
 				<rom loadflag="load16_word_swap" name="S-100029-1000 - Cooking Beena-o-Ryouri Dekichatta (Japan).bin" size="0x800000" crc="a3f58ab8" sha1="20b3dfe395f7c97a32c93b580040787b98fd6024"/>
@@ -180,7 +180,7 @@ license:CC0
 		<description>Issho ni Henshin Fresh Pretty Cure</description>
 		<year>2009</year>
 		<publisher>Bandai</publisher>
-		<info name="alt_title" value="いっしょにへんしん フレッシュプリキュア!"/>
+		<info name="alt_title" value="いっしょにへんしんフレッシュプリキュア!"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
 				<rom loadflag="load16_word_swap" name="beena.bin" size="0x800000" crc="afa3466c" sha1="b49914f97db95f611489487f558d13d7cceb3299"/>
@@ -206,7 +206,7 @@ license:CC0
 		<description>Soreike! Anpanman Hajimete Kaketa yo! Oboeta yo! Hiragana Katakana - Gojuuon Board Kinou-tsuki</description>
 		<year>2005</year>
 		<publisher>Sega Toys</publisher>
-		<info name="alt_title" value="それいけ！アンパンマン はじめてかけたよ!おぼえたよ!ひらがな・カタカナ～50音ボード機能つき～"/>
+		<info name="alt_title" value="それいけ!アンパンマンはじめてかけたよ!おぼえたよ!ひらがな·カタカナ～50音ボード機能つき～"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
 				<rom loadflag="load16_word_swap" name="S-100002-1200 - Soreike Anpanman Hajimete Kaketa yo Oboeta yo Hiragana Katakana - Gojuuon Board Kinou-tsuki.bin" size="0x00800000" crc="b6e038c9" sha1="b12bd91e8ead04f558d32ce9086102a3c99f13eb"/>
@@ -232,7 +232,7 @@ license:CC0
 		<description>Hello Kitty no Hiragana Katakana O-Namae Kaitemiyou!</description>
 		<year>2008</year>
 		<publisher>Sega Toys</publisher>
-		<info name="alt_title" value="ハローキティのひらがな・カタカナ・おなまえかいてみよう!"/>
+		<info name="alt_title" value="ハローキティのひらがな·カタカナ·おなまえかいてみよう!"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
 				<rom loadflag="load16_word_swap" name="S-100035-1000 - Hello Kitty no Hiragana Katakana o-Namae Kaitemiyou (Japan).bin" size="0x800000" crc="133ec328" sha1="0bce6e18b5b9ed3f74791a72cb8656b0f5dd18bc"/>
@@ -280,7 +280,7 @@ license:CC0
 		<description>Kouchuu Ouja Mushiking: Mori no Tami no Densetsu: Minna de Tanken! Kouchuu no Mori</description>
 		<year>2005</year>
 		<publisher>Sega Toys</publisher>
-		<info name="alt_title" value="甲虫王者ムシキング ～森の民の伝説～ みんなでたんけん!甲虫の森"/>
+		<info name="alt_title" value="甲虫王者ムシキング～森の民の伝説～みんなでたんけん!甲虫の森"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
 				<rom loadflag="load16_word_swap" name="S-100009-1000 - Kouchuu Ouja Mushiking-Mori no Tami no Densetsu-Minna de Tanken Kouchuu no Mori (Japan).bin" size="0x800000" crc="99154825" sha1="566978b9e11dfc1d7a1012b56d8e638927f2eadb"/>
@@ -330,7 +330,7 @@ license:CC0
 		<description>Oshare Majo Love and Berry-Cute ni Oshare</description>
 		<year>20??</year>
 		<publisher>Sega Toys</publisher>
-		<info name="alt_title" value="オシャレ魔女 ラブ and ベリー キュートにオシャレ"/>
+		<info name="alt_title" value="オシャレ魔女ラブ and ベリー キュートにオシャレ"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
 				<rom loadflag="load16_word_swap" name="S-100013-1101 - Oshare Majo Love and Berry-Cute ni Oshare (Japan).bin" size="0x00800000" crc="f5245eea" sha1="2006c3fd2b662f4bb77388bfeefc2c885908fc5f"/>
@@ -404,7 +404,7 @@ license:CC0
 		<description>Pocket Monsters Best Wishes! Chinou Ikusei Pokémon Daiundoukai</description>
 		<year>2010</year>
 		<publisher>Sega Toys</publisher>
-		<info name="alt_title" value="ポケットモンスター ベストウイッシュ 知能育成 ポケモン大運動会"/>
+		<info name="alt_title" value="ポケットモンスターベストウイッシュ知能育成ポケモン大運動会"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
 				<rom loadflag="load16_word_swap" name="S-100042-1000 - Pocket Monsters Best Wishes Chinou Ikusei Pokemon Daiundoukai (Japan).bin" size="0x800000" crc="a88ec549" sha1="866b56789fcb118e1ac50a8214a630a092aadd2f"/>
@@ -430,7 +430,7 @@ license:CC0
 		<description>Pocket Monsters Diamond &amp; Pearl Pokemon o Sagase! Meiro de Daibouken!</description>
 		<year>2009</year>
 		<publisher>Sega Toys</publisher>
-		<info name="alt_title" value="ポケットモンスター ダイヤモンド・パール ポケモンをさがせ!めいろでだいぼうけん!"/>
+		<info name="alt_title" value="ポケットモンスターダイヤモンド·パール ポケモンをさがせ!めいろでだいぼうけん!"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
 				<rom loadflag="load16_word_swap" name="S-100039-1100 - Pocket Monsters Diamond and Pearl Pokemon o Sagase Meiro de Daibouken.bin" size="0x00800000" crc="7bbf9599" sha1="25aba3628c627c3ed603f14cb50cfe6101816db7"/>
@@ -456,7 +456,7 @@ license:CC0
 		<description>Yes! PreCure 5 Asonde Oboeyou Hiragana!</description>
 		<year>2007</year>
 		<publisher>Bandai</publisher>
-		<info name="alt_title" value="Yes!プリキュア5 あそんでおぼえよう!ひらがな!"/>
+		<info name="alt_title" value="Yes!プリキュア5あそんでおぼえよう!ひらがな!"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
 				<rom loadflag="load16_word_swap" name="T-110008-1101 - Yes PreCure 5 Asonde Oboeyou Hiragana.bin" size="0x00800000" crc="6ae77335" sha1="29650349b117b96105882da7b12cac8fe9a04813"/>
@@ -508,7 +508,7 @@ license:CC0
 		<description>Samurai Sentai Shinkenger Battle ga Ippai! Iza Mairu!</description>
 		<year>2009</year>
 		<publisher>Bandai</publisher>
-		<info name="alt_title" value="侍戦隊シンケンジャー バトルがいっぱい!いざ参る!"/>
+		<info name="alt_title" value="侍戦隊シンケンジャーバトルがいっぱい!いざ参る!"/>
 		<part name="cart" interface="sega_beena_cart">
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
 				<rom loadflag="load16_word_swap" name="T-110012-1000 - Samurai Sentai Shinkenger Battle ga Ippai Iza Mairu.bin" size="0x00800000" crc="41ed4615" sha1="f0106c4a79f9aff9815318eadc272c7c62a50ec2"/>
