@@ -42,6 +42,7 @@ public:
 	auto write_sdo() { return m_write_sdo.bind(); }
 	auto write_ssc() { return m_write_ssc.bind(); }
 
+	// I/O access
 	u16 d_output_r() { return m_d_output; }
 	u8 r_output_r() { return m_r_output; }
 	int sdo_r() { return BIT(m_s, 3); }

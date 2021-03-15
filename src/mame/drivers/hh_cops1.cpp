@@ -201,6 +201,7 @@ void mbaskb_state::write_f(u8 data)
 u8 mbaskb_state::read_f()
 {
 	// F1: difficulty switch
+	// F2: N/C
 	return m_inputs[2]->read() | (m_f & 2);
 }
 
@@ -320,7 +321,9 @@ public:
 	void update_display();
 	void write_do(u8 data);
 	void write_s(u8 data);
+	u8 read_f();
 	u8 read_k();
+	int read_si();
 	void qkracerm(machine_config &config);
 };
 
@@ -349,15 +352,30 @@ void qkracerm_state::write_do(u8 data)
 
 void qkracerm_state::write_s(u8 data)
 {
-	// S: digit segment data
+	// Sa-Sg: digit segment data
+	// Sp: link data out
 	m_s = data;
 	update_display();
+}
+
+u8 qkracerm_state::read_f()
+{
+	// F1: N/C
+	// F2: link cable detected
+	// F3: link data in
+	return m_maincpu->f_output_r() & 1;
 }
 
 u8 qkracerm_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(5);
+}
+
+int qkracerm_state::read_si()
+{
+	// SI: link master(1)/slave(0)
+	return 0;
 }
 
 // config
@@ -402,7 +420,9 @@ void qkracerm_state::qkracerm(machine_config &config)
 	m_maincpu->set_option_lb_10(5);
 	m_maincpu->write_do().set(FUNC(qkracerm_state::write_do));
 	m_maincpu->write_s().set(FUNC(qkracerm_state::write_s));
+	m_maincpu->read_f().set(FUNC(qkracerm_state::read_f));
 	m_maincpu->read_k().set(FUNC(qkracerm_state::read_k));
+	m_maincpu->read_si().set(FUNC(qkracerm_state::read_si));
 
 	/* video hardware */
 	DS8874(config, m_ds8874).write_output().set(FUNC(qkracerm_state::ds8874_output_w));
