@@ -164,15 +164,15 @@ public:
 
 	//
 	// the following constants need to be defined per family:
-	//           u8 OUTPUTS: The number of outputs exposed (1-4)
-	//          u8 CHANNELS: The number of channels on the chip
+	//          u32 OUTPUTS: The number of outputs exposed (1-4)
+	//         u32 CHANNELS: The number of channels on the chip
 	//     u32 ALL_CHANNELS: A bitmask of all channels
-	//         u8 OPERATORS: The number of operators on the chip
+	//        u32 OPERATORS: The number of operators on the chip
 	//     bool DYNAMIC_OPS: True if ops/channel can be changed at runtime
-	//        u16 REGISTERS: The number of 8-bit registers allocated
-	//         u16 REG_MODE: The address of the "mode" register controlling timers
-	//  u8 DEFAULT_PRESCALE: The starting clock prescale
-	//  u8 EG_CLOCK_DIVIDER: The clock divider of the envelope generator
+	//        u32 REGISTERS: The number of 8-bit registers allocated
+	//         u32 REG_MODE: The address of the "mode" register controlling timers
+	// u32 DEFAULT_PRESCALE: The starting clock prescale
+	// u32 EG_CLOCK_DIVIDER: The clock divider of the envelope generator
 	//  bool EG_HAS_DEPRESS: True if the chip has a DP ("depress"?) envelope stage
 	//      bool EG_HAS_SSG: True if the chip has SSG envelope support
 	// bool MODULATOR_DELAY: True if the modulator is delayed by 1 sample (OPL pre-OPL3)
@@ -264,15 +264,15 @@ class ymopm_registers : public ymfm_registers_base
 {
 public:
 	// constants
-	static constexpr u8 OUTPUTS = 2;
-	static constexpr u8 CHANNELS = 8;
+	static constexpr u32 OUTPUTS = 2;
+	static constexpr u32 CHANNELS = 8;
 	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
-	static constexpr u8 OPERATORS = CHANNELS * 4;
-	static constexpr u8 DYNAMIC_OPS = false;
-	static constexpr u16 REGISTERS = 0x100;
-	static constexpr u16 REG_MODE = 0x14;
-	static constexpr u8 DEFAULT_PRESCALE = 2;
-	static constexpr u8 EG_CLOCK_DIVIDER = 3;
+	static constexpr u32 OPERATORS = CHANNELS * 4;
+	static constexpr u32 DYNAMIC_OPS = false;
+	static constexpr u32 REGISTERS = 0x100;
+	static constexpr u32 REG_MODE = 0x14;
+	static constexpr u32 DEFAULT_PRESCALE = 2;
+	static constexpr u32 EG_CLOCK_DIVIDER = 3;
 	static constexpr bool EG_HAS_DEPRESS = false;
 	static constexpr bool EG_HAS_SSG = false;
 	static constexpr bool MODULATOR_DELAY = false;
@@ -466,15 +466,15 @@ class ymopn_registers_base : public ymfm_registers_base
 {
 public:
 	// constants
-	static constexpr u8 OUTPUTS = IsOpnA ? 2 : 1;
-	static constexpr u8 CHANNELS = IsOpnA ? 6 : 3;
+	static constexpr u32 OUTPUTS = IsOpnA ? 2 : 1;
+	static constexpr u32 CHANNELS = IsOpnA ? 6 : 3;
 	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
-	static constexpr u8 OPERATORS = CHANNELS * 4;
-	static constexpr u8 DYNAMIC_OPS = false;
-	static constexpr u16 REGISTERS = IsOpnA ? 0x200 : 0x100;
-	static constexpr u16 REG_MODE = 0x27;
-	static constexpr u8 DEFAULT_PRESCALE = 6;
-	static constexpr u8 EG_CLOCK_DIVIDER = 3;
+	static constexpr u32 OPERATORS = CHANNELS * 4;
+	static constexpr u32 DYNAMIC_OPS = false;
+	static constexpr u32 REGISTERS = IsOpnA ? 0x200 : 0x100;
+	static constexpr u32 REG_MODE = 0x27;
+	static constexpr u32 DEFAULT_PRESCALE = 6;
+	static constexpr u32 EG_CLOCK_DIVIDER = 3;
 	static constexpr bool EG_HAS_DEPRESS = false;
 	static constexpr bool EG_HAS_SSG = true;
 	static constexpr bool MODULATOR_DELAY = false;
@@ -675,15 +675,15 @@ class ymopl_registers_base : public ymfm_registers_base
 
 public:
 	// constants
-	static constexpr u8 OUTPUTS = IsOpl3Plus ? 4 : 1;
-	static constexpr u8 CHANNELS = IsOpl3Plus ? 18 : 9;
+	static constexpr u32 OUTPUTS = IsOpl3Plus ? 4 : 1;
+	static constexpr u32 CHANNELS = IsOpl3Plus ? 18 : 9;
 	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
-	static constexpr u8 OPERATORS = CHANNELS * 2;
-	static constexpr u8 DYNAMIC_OPS = false;
-	static constexpr u16 REGISTERS = IsOpl3Plus ? 0x200 : 0x100;
-	static constexpr u16 REG_MODE = 0x04;
-	static constexpr u8 DEFAULT_PRESCALE = IsOpl3Plus ? 8 : 4;
-	static constexpr u8 EG_CLOCK_DIVIDER = 1;
+	static constexpr u32 OPERATORS = CHANNELS * 2;
+	static constexpr u32 DYNAMIC_OPS = false;
+	static constexpr u32 REGISTERS = IsOpl3Plus ? 0x200 : 0x100;
+	static constexpr u32 REG_MODE = 0x04;
+	static constexpr u32 DEFAULT_PRESCALE = IsOpl3Plus ? 8 : 4;
+	static constexpr u32 EG_CLOCK_DIVIDER = 1;
 	static constexpr bool EG_HAS_DEPRESS = false;
 	static constexpr bool EG_HAS_SSG = false;
 	static constexpr bool MODULATOR_DELAY = !IsOpl3Plus;
@@ -885,8 +885,8 @@ using ymopl3_registers = ymopl_registers_base<3>;
 class ymopll_registers : public ymopl_registers
 {
 public:
-	static constexpr u8 OUTPUTS = 2;
-	static constexpr u16 REG_MODE = 0xff;
+	static constexpr u32 OUTPUTS = 2;
+	static constexpr u32 REG_MODE = 0xff;
 	static constexpr bool EG_HAS_DEPRESS = true;
 	static constexpr u8 STATUS_TIMERA = 0;
 	static constexpr u8 STATUS_TIMERB = 0;
@@ -894,11 +894,11 @@ public:
 	static constexpr u8 STATUS_IRQ = 0;
 
 	// OPLL-specific constants
-	static constexpr u16 EXTERNAL_REGISTERS = 0x40;
-	static constexpr u16 CHANNEL_INSTBASE = 0x40;
-	static constexpr u16 OPERATOR_INSTBASE = 0x4e;
-	static constexpr u16 INSTDATA_BASE = 0x70;
-	static constexpr u16 INSTDATA_SIZE = 0x90;
+	static constexpr u32 EXTERNAL_REGISTERS = 0x40;
+	static constexpr u32 CHANNEL_INSTBASE = 0x40;
+	static constexpr u32 OPERATOR_INSTBASE = 0x4e;
+	static constexpr u32 INSTDATA_BASE = 0x70;
+	static constexpr u32 INSTDATA_SIZE = 0x90;
 
 	// constructor
 	ymopll_registers();
@@ -1190,6 +1190,12 @@ template<class RegisterType>
 class ymfm_engine_base
 {
 public:
+	// expose some constants from the registers
+	static constexpr u32 OUTPUTS = RegisterType::OUTPUTS;
+	static constexpr u32 CHANNELS = RegisterType::CHANNELS;
+	static constexpr u32 ALL_CHANNELS = RegisterType::ALL_CHANNELS;
+	static constexpr u32 OPERATORS = RegisterType::OPERATORS;
+
 	// constructor
 	ymfm_engine_base(device_t &device);
 
