@@ -17,7 +17,8 @@ addons:
 jobs:
   include:
     - os: linux
-      arch: arm64
+      arch: arm64-graviton2
+      virt: vm
       compiler: gcc
       env: SUBTARGET=ci   MAME=mameci
     - os: linux
