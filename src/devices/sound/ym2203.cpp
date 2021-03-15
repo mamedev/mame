@@ -106,7 +106,7 @@ void ym2203_device::device_start()
 	ay8910_device::device_start();
 
 	// create our stream
-	m_stream = stream_alloc(0, ymopn_registers::OUTPUTS, clock() / (ymopn_registers::DEFAULT_PRESCALE * ymopn_registers::OPERATORS));
+	m_stream = stream_alloc(0, ymopn_registers::OUTPUTS, m_opn.fm_sample_rate(clock()));
 
 	// save our data
 	save_item(YMFM_NAME(m_address));
@@ -184,8 +184,8 @@ void ym2203_device::update_prescale(u8 newval)
 {
 	// inform the OPN engine and refresh our clock rate
 	m_opn.set_clock_prescale(newval);
-	m_stream->set_sample_rate(clock() / (newval * ymopn_registers::OPERATORS));
-	logerror("Prescale = %d; sample_rate = %d\n", newval, clock() / (newval * ymopn_registers::OPERATORS));
+	m_stream->set_sample_rate(m_opn.fm_sample_rate(clock()));
+	logerror("Prescale = %d; sample_rate = %d\n", newval, m_opn.fm_sample_rate(clock()));
 
 	// also scale the SSG streams
 	// mapping is (OPN->SSG): 6->4, 3->2, 2->1

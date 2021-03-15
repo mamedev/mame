@@ -8,7 +8,7 @@
 // the YM2612/YM3438 just timeslice the output among all channels
 // instead of summing them; turn this on to simulate (may create
 // audible issues)
-#define MULTIPLEX_YM2612_YM3438_OUTPUT (0)
+#define MULTIPLEX_OUTPUT (0)
 
 
 DEFINE_DEVICE_TYPE(YM2612, ym2612_device, "ym2612", "YM2612 OPN2")
@@ -136,7 +136,7 @@ void ym2612_device::write(offs_t offset, u8 value)
 void ym2612_device::device_start()
 {
 	// create our stream
-	m_stream = stream_alloc(0, ymopna_registers::OUTPUTS, clock() / (ymopna_registers::DEFAULT_PRESCALE * ymopna_registers::OPERATORS));
+	m_stream = stream_alloc(0, ymopn_registers::OUTPUTS, m_opn.fm_sample_rate(clock()));
 
 	// call this for the variants that need to adjust the rate
 	device_clock_changed();
@@ -173,8 +173,8 @@ void ym2612_device::device_reset()
 
 void ym2612_device::device_clock_changed()
 {
-	u32 const sample_divider = MULTIPLEX_YM2612_YM3438_OUTPUT ? ymopna_registers::CHANNELS : 1;
-	m_stream->set_sample_rate(clock() / (ymopna_registers::DEFAULT_PRESCALE * ymopna_registers::OPERATORS / sample_divider));
+	u32 const sample_divider = MULTIPLEX_OUTPUT ? ymopna_registers::CHANNELS : 1;
+	m_stream->set_sample_rate(m_opn.fm_sample_rate(clock()) * sample_divider);
 
 	// recompute the busy duration
 	m_busy_duration = m_opn.compute_busy_duration();
@@ -198,7 +198,7 @@ void ym2612_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 void ym2612_device::sound_stream_update_common(write_stream_view &outl, write_stream_view &outr, bool discontinuity)
 {
-	u32 const sample_divider = (discontinuity ? 260 : 256) * (MULTIPLEX_YM2612_YM3438_OUTPUT ? 1 : ymopna_registers::CHANNELS);
+	u32 const sample_divider = (discontinuity ? 260 : 256) * (MULTIPLEX_OUTPUT ? 1 : ymopna_registers::CHANNELS);
 
 	m_opn.prepare(ymopna_registers::ALL_CHANNELS);
 
@@ -234,7 +234,7 @@ void ym2612_device::sound_stream_update_common(write_stream_view &outl, write_st
 		}
 
 		// if multiplexing, just scale to 16 bits and output
-		if (MULTIPLEX_YM2612_YM3438_OUTPUT)
+		if (MULTIPLEX_OUTPUT)
 		{
 			outl.put_int(sampindex, outputs[0], sample_divider);
 			outr.put_int(sampindex, outputs[1], sample_divider);
@@ -311,7 +311,7 @@ ymf276_device::ymf276_device(const machine_config &mconfig, const char *tag, dev
 
 void ymf276_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(clock() / (ymopna_registers::DEFAULT_PRESCALE * ymopna_registers::OPERATORS));
+	m_stream->set_sample_rate(m_opn.fm_sample_rate(clock()));
 }
 
 

@@ -190,7 +190,7 @@ void ym2610_device::device_start()
 	ay8910_device::device_start();
 
 	// create our stream
-	m_stream = stream_alloc(0, ymopna_registers::OUTPUTS, clock() / (ymopna_registers::DEFAULT_PRESCALE * ymopna_registers::OPERATORS));
+	m_stream = stream_alloc(0, ymopna_registers::OUTPUTS, m_opn.fm_sample_rate(clock()));
 
 	// save our data
 	save_item(YMFM_NAME(m_address));
@@ -247,7 +247,7 @@ void ym2610_device::device_reset()
 
 void ym2610_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(clock() / (ymopna_registers::DEFAULT_PRESCALE * ymopna_registers::OPERATORS));
+	m_stream->set_sample_rate(m_opn.fm_sample_rate(clock()));
 	ay_set_clock(clock() / 4);
 
 	// recompute the busy duration

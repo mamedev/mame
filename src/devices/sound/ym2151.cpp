@@ -116,7 +116,7 @@ WRITE_LINE_MEMBER(ym2151_device::reset_w)
 void ym2151_device::device_start()
 {
 	// create our stream
-	m_stream = stream_alloc(0, ymopm_registers::OUTPUTS, clock() / (ymopm_registers::DEFAULT_PRESCALE * ymopm_registers::OPERATORS));
+	m_stream = stream_alloc(0, ymopm_registers::OUTPUTS, m_opm.fm_sample_rate(clock()));
 
 	// resolve the write callback
 	m_port_w.resolve_safe();
@@ -150,7 +150,7 @@ void ym2151_device::device_reset()
 
 void ym2151_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(clock() / (ymopm_registers::DEFAULT_PRESCALE * ymopm_registers::OPERATORS));
+	m_stream->set_sample_rate(m_opm.fm_sample_rate(clock()));
 	m_busy_duration = m_opm.compute_busy_duration();
 }
 

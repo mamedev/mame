@@ -13,9 +13,7 @@
 //
 // Try removing register base class; do we need it?
 // More caching?
-// Engine method to compute FM clock from input clock
 // Expose some constants through the engine
-// Get rid of chnum?
 //
 
 //
@@ -1001,7 +999,11 @@ u32 ymopm_registers::compute_phase_step(u16 choffs, u16 opoffs, u16 block_freq, 
 
 void ymopm_registers::log_keyon(u16 choffs, u16 opoffs)
 {
-	LOG("freq=%04X dt2=%d dt=%d fb=%d alg=%X mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X out=%c%c",
+	u8 chnum = choffs;
+	u8 opnum = opoffs;
+
+	LOG("%d.%02d freq=%04X dt2=%d dt=%d fb=%d alg=%X mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X out=%c%c",
+		chnum, opnum,
 		ch_block_freq(choffs),
 		op_detune2(opoffs),
 		op_detune(opoffs),
@@ -1356,7 +1358,11 @@ u32 ymopn_registers_base<IsOpnA>::compute_phase_step(u16 choffs, u16 opoffs, u16
 template<bool IsOpnA>
 void ymopn_registers_base<IsOpnA>::log_keyon(u16 choffs, u16 opoffs)
 {
-	LOG("freq=%04X dt=%d fb=%d alg=%X mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X",
+	u8 chnum = (choffs & 3) + 3 * BIT(choffs, 8);
+	u8 opnum = (opoffs & 15) - ((opoffs & 15) / 4) + 12 * BIT(opoffs, 8);
+
+	LOG("%d.%02d freq=%04X dt=%d fb=%d alg=%X mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X",
+		chnum, opnum,
 		ch_block_freq(choffs),
 		op_detune(opoffs),
 		ch_feedback(choffs),
@@ -1714,7 +1720,11 @@ u16 ymopl_registers_base<Revision>::transform_phase(u16 opoffs, u16 &phase)
 template<int Revision>
 void ymopl_registers_base<Revision>::log_keyon(u16 choffs, u16 opoffs)
 {
-	LOG("freq=%04X fb=%d alg=%X mul=%X tl=%02X ksr=%d ns=%d ksl=%d adr=%X/%X/%X sl=%X sus=%d",
+	u8 chnum = (choffs & 15) + 9 * BIT(choffs, 8);
+	u8 opnum = (opoffs & 31) - 2 * ((opoffs & 31) / 8) + 18 * BIT(opoffs, 8);
+
+	LOG("%2d.%02d freq=%04X fb=%d alg=%X mul=%X tl=%02X ksr=%d ns=%d ksl=%d adr=%X/%X/%X sl=%X sus=%d",
+		chnum, opnum,
 		ch_block_freq(choffs),
 		ch_feedback(choffs),
 		ch_algorithm(choffs),
@@ -1747,7 +1757,6 @@ void ymopl_registers_base<Revision>::log_keyon(u16 choffs, u16 opoffs)
 	{
 		operator_mapping map;
 		operator_map(map);
-		u8 chnum = (choffs & 15) + 9 * BIT(choffs, 8);
 		if (BIT(map.chan[chnum], 16, 8) != 0xff)
 			LOG(" 4op");
 	}
@@ -2008,7 +2017,11 @@ u16 ymopll_registers::transform_phase(u16 opoffs, u16 &phase)
 
 void ymopll_registers::log_keyon(u16 choffs, u16 opoffs)
 {
-	LOG("freq=%04X inst=%X fb=%d mul=%X tl=%02X ksr=%d ksl=%d adr=%X/%X/%X sl=%X sus=%d/%d",
+	u8 chnum = choffs;
+	u8 opnum = opoffs;
+
+	LOG("%d.%02d freq=%04X inst=%X fb=%d mul=%X tl=%02X ksr=%d ksl=%d adr=%X/%X/%X sl=%X sus=%d/%d",
+		chnum, opnum,
 		ch_block_freq(choffs),
 		ch_instrument(choffs),
 		ch_feedback(choffs),
@@ -2043,10 +2056,9 @@ void ymopll_registers::log_keyon(u16 choffs, u16 opoffs)
 //-------------------------------------------------
 
 template<class RegisterType>
-ymfm_operator<RegisterType>::ymfm_operator(ymfm_engine_base<RegisterType> &owner, u8 opnum) :
-	m_chnum(0),
+ymfm_operator<RegisterType>::ymfm_operator(ymfm_engine_base<RegisterType> &owner, u16 opoffs) :
 	m_choffs(0),
-	m_opoffs(RegisterType::operator_offset(opnum)),
+	m_opoffs(opoffs),
 	m_phase(0),
 	m_env_attenuation(0x3ff),
 	m_env_state(YMFM_ENV_RELEASE),
@@ -2229,7 +2241,7 @@ void ymfm_operator<RegisterType>::start_attack()
 //	if ((m_regs.rhythm_enable() && m_regs.chnum() >= 6) ||
 //	    (m_regs.waveform_enable() && m_regs.waveform() != 0))
 	{
-		LOG("%s: %03X: ", m_owner.device().tag(), m_opoffs);
+		LOG("%s: ", m_owner.device().tag(), m_opoffs);
 		m_regs.log_keyon(m_choffs, m_opoffs);
 		LOG("\n");
 	}
@@ -2471,9 +2483,8 @@ u16 ymfm_operator<RegisterType>::envelope_attenuation(u8 am_offset) const
 //-------------------------------------------------
 
 template<class RegisterType>
-ymfm_channel<RegisterType>::ymfm_channel(ymfm_engine_base<RegisterType> &owner, u8 chnum) :
-	m_chnum(chnum),
-	m_choffs(RegisterType::channel_offset(chnum)),
+ymfm_channel<RegisterType>::ymfm_channel(ymfm_engine_base<RegisterType> &owner, u16 choffs) :
+	m_choffs(choffs),
 	m_feedback{ 0, 0 },
 	m_feedback_in(0),
 	m_op{ nullptr, nullptr, nullptr, nullptr },
@@ -2718,7 +2729,7 @@ void ymfm_channel<RegisterType>::output_4op(s32 outputs[RegisterType::OUTPUTS], 
 	// compute the 14-bit volume/value of operator 4; this could be a noise
 	// value on the OPM; all algorithms consume OP4 output at a minimum
 	s32 result;
-	if (m_regs.noise_enable() && m_chnum == 7)
+	if (m_regs.noise_enable() && m_choffs == 7)
 		result = m_op[3]->compute_noise_volume(am_offset);
 	else
 	{
@@ -2857,11 +2868,11 @@ ymfm_engine_base<RegisterType>::ymfm_engine_base(device_t &device) :
 {
 	// create the channels
 	for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
-		m_channel[chnum] = std::make_unique<ymfm_channel<RegisterType>>(*this, chnum);
+		m_channel[chnum] = std::make_unique<ymfm_channel<RegisterType>>(*this, RegisterType::channel_offset(chnum));
 
 	// create the operators
 	for (int opnum = 0; opnum < RegisterType::OPERATORS; opnum++)
-		m_operator[opnum] = std::make_unique<ymfm_operator<RegisterType>>(*this, opnum);
+		m_operator[opnum] = std::make_unique<ymfm_operator<RegisterType>>(*this, RegisterType::operator_offset(opnum));
 
 	// do the initial operator assignment
 	assign_operators();

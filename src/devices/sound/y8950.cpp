@@ -149,7 +149,7 @@ void y8950_device::write(offs_t offset, u8 value)
 void y8950_device::device_start()
 {
 	// create our stream
-	m_stream = stream_alloc(0, ymopl_registers::OUTPUTS, clock() / (ymopl_registers::DEFAULT_PRESCALE * ymopl_registers::OPERATORS));
+	m_stream = stream_alloc(0, ymopl_registers::OUTPUTS, m_opl.fm_sample_rate(clock()));
 
 	// resolve callbacks
 	m_keyboard_read_handler.resolve_safe(0);
@@ -193,7 +193,7 @@ void y8950_device::device_reset()
 
 void y8950_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(clock() / (ymopl_registers::DEFAULT_PRESCALE * ymopl_registers::OPERATORS));
+	m_stream->set_sample_rate(m_opl.fm_sample_rate(clock()));
 }
 
 

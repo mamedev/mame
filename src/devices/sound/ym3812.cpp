@@ -79,7 +79,7 @@ void ym3812_device::write(offs_t offset, u8 value)
 void ym3812_device::device_start()
 {
 	// create our stream
-	m_stream = stream_alloc(0, ymopl_registers::OUTPUTS, clock() / (ymopl_registers::DEFAULT_PRESCALE * ymopl_registers::OPERATORS));
+	m_stream = stream_alloc(0, ymopl_registers::OUTPUTS, m_opl.fm_sample_rate(clock()));
 
 	// call this for the variants that need to adjust the rate
 	device_clock_changed();
@@ -109,7 +109,7 @@ void ym3812_device::device_reset()
 
 void ym3812_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(clock() / (ymopl_registers::DEFAULT_PRESCALE * ymopl_registers::OPERATORS));
+	m_stream->set_sample_rate(m_opl.fm_sample_rate(clock()));
 }
 
 

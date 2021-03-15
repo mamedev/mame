@@ -1052,7 +1052,7 @@ class ymfm_operator
 
 public:
 	// constructor
-	ymfm_operator(ymfm_engine_base<RegisterType> &owner, u8 opnum);
+	ymfm_operator(ymfm_engine_base<RegisterType> &owner, u16 opoffs);
 
 	// register for save states
 	void save(device_t &device, u8 index);
@@ -1061,7 +1061,7 @@ public:
 	void reset();
 
 	// set the current channel
-	void set_chnum(u8 chnum) { m_chnum = chnum; m_choffs = RegisterType::channel_offset(chnum); }
+	void set_choffs(u16 choffs) { m_choffs = choffs; }
 
 	// prepare prior to clocking
 	bool prepare();
@@ -1104,7 +1104,6 @@ private:
 	u16 envelope_attenuation(u8 am_offset) const;
 
 	// internal state
-	u8 m_chnum;                      // channel number
 	u16 m_choffs;                    // channel offset in registers
 	u16 m_opoffs;                    // operator offset in registers
 	u32 m_phase;                     // current phase value (10.10 format)
@@ -1126,7 +1125,7 @@ class ymfm_channel
 {
 public:
 	// constructor
-	ymfm_channel(ymfm_engine_base<RegisterType> &owner, u8 chnum);
+	ymfm_channel(ymfm_engine_base<RegisterType> &owner, u16 choffs);
 
 	// register for save states
 	void save(device_t &device, u8 index);
@@ -1140,7 +1139,7 @@ public:
 		assert(index < std::size(m_op));
 		m_op[index] = op;
 		if (op != nullptr)
-			op->set_chnum(m_chnum);
+			op->set_choffs(m_choffs);
 	}
 
 	// signal key on/off to our operators
@@ -1187,7 +1186,6 @@ private:
 	}
 
 	// internal state
-	u8 m_chnum;                           // channel number
 	u16 m_choffs;                         // channel offset in registers
 	s16 m_feedback[2];                    // feedback memory for operator 1
 	mutable s16 m_feedback_in;            // next input value for op 1 feedback (set in output)
@@ -1255,6 +1253,9 @@ public:
 
 	// set prescale factor (2/3/6)
 	void set_clock_prescale(u8 prescale) { m_clock_prescale = prescale; }
+
+	// compute sample rate
+	u32 fm_sample_rate(u32 baseclock) const { return baseclock / (m_clock_prescale * RegisterType::OPERATORS); }
 
 	// reset the LFO state
 	void reset_lfo() { m_regs.reset_lfo(); }

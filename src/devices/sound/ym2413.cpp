@@ -62,7 +62,7 @@ void ym2413_device::write(offs_t offset, u8 value)
 void ym2413_device::device_start()
 {
 	// create our stream
-	m_stream = stream_alloc(0, ymopll_registers::OUTPUTS, clock() / (ymopll_registers::DEFAULT_PRESCALE * ymopl_registers::OPERATORS));
+	m_stream = stream_alloc(0, ymopll_registers::OUTPUTS, m_opll.fm_sample_rate(clock()));
 
 	// call this for the variants that need to adjust the rate
 	device_clock_changed();
@@ -95,7 +95,7 @@ void ym2413_device::device_reset()
 
 void ym2413_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(clock() / (ymopll_registers::DEFAULT_PRESCALE * ymopll_registers::OPERATORS));
+	m_stream->set_sample_rate(m_opll.fm_sample_rate(clock()));
 }
 
 
