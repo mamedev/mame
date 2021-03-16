@@ -957,8 +957,13 @@ void ymopm_registers::cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_ca
 	// detune adjustment
 	cache.detune = detune_adjustment(op_detune(opoffs), keycode);
 
-	// phase step, or 0 if PM is active; this depends on block_freq and
-	// detune, so compute it after we've done those
+	// multiple value, as an x.1 value (0 means 0.5)
+	cache.multiple = op_multiple(opoffs) * 2;
+	if (cache.multiple == 0)
+		cache.multiple = 1;
+
+	// phase step, or 1 if PM is active; this depends on block_freq, detune,
+	// and multiple, so compute it after we've done those
 	cache.phase_step = (ch_lfo_pm_sens(choffs) != 0) ? 1 : compute_phase_step(choffs, opoffs, cache, 0);
 
 	// total level, scaled by 8
@@ -967,11 +972,6 @@ void ymopm_registers::cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_ca
 	// 4-bit sustain level, but 15 means 31 so effectively 5 bits
 	cache.eg_sustain = op_sustain_level(opoffs);
 	cache.eg_sustain |= (cache.eg_sustain + 1) & 0x10;
-
-	// multiple value, as an x.1 value (0 means 0.5)
-	cache.multiple = op_multiple(opoffs) * 2;
-	if (cache.multiple == 0)
-		cache.multiple = 1;
 
 	// determine KSR adjustment for enevlope rates
 	u32 ksrval = keycode >> (op_ksr(opoffs) ^ 3);
@@ -1324,8 +1324,13 @@ void ymopn_registers_base<IsOpnA>::cache_operator_data(u32 choffs, u32 opoffs, y
 	// detune adjustment
 	cache.detune = detune_adjustment(op_detune(opoffs), keycode);
 
-	// phase step, or 0 if PM is active; this depends on block_freq and
-	// detune, so compute it after we've done those
+	// multiple value, as an x.1 value (0 means 0.5)
+	cache.multiple = op_multiple(opoffs) * 2;
+	if (cache.multiple == 0)
+		cache.multiple = 1;
+
+	// phase step, or 0 if PM is active; this depends on block_freq, detune,
+	// and multiple, so compute it after we've done those
 	cache.phase_step = (IsOpnA && lfo_enable() && ch_lfo_pm_sens(choffs) != 0) ? 1 : compute_phase_step(choffs, opoffs, cache, 0);
 
 	// total level, scaled by 8
@@ -1334,11 +1339,6 @@ void ymopn_registers_base<IsOpnA>::cache_operator_data(u32 choffs, u32 opoffs, y
 	// 4-bit sustain level, but 15 means 31 so effectively 5 bits
 	cache.eg_sustain = op_sustain_level(opoffs);
 	cache.eg_sustain |= (cache.eg_sustain + 1) & 0x10;
-
-	// multiple value, as an x.1 value (0 means 0.5)
-	cache.multiple = op_multiple(opoffs) * 2;
-	if (cache.multiple == 0)
-		cache.multiple = 1;
 
 	// determine KSR adjustment for enevlope rates
 	u32 ksrval = keycode >> (op_ksr(opoffs) ^ 3);
@@ -1663,8 +1663,15 @@ void ymopl_registers_base<Revision>::cache_operator_data(u32 choffs, u32 opoffs,
 	// no detune adjustment on OPL
 	cache.detune = 0;
 
-	// phase step, or 0 if PM is active; this depends on block_freq and
-	// detune, so compute it after we've done those
+	// multiple value, as an x.1 value (0 means 0.5)
+	// replace the low bit with a table lookup to give 0,1,2,3,4,5,6,7,8,9,10,10,12,12,15,15
+	u32 multiple = op_multiple(opoffs);
+	cache.multiple = ((multiple & 0xe) | BIT(0xc2aa, multiple)) * 2;
+	if (cache.multiple == 0)
+		cache.multiple = 1;
+
+	// phase step, or 0 if PM is active; this depends on block_freq, detune,
+	// and multiple, so compute it after we've done those
 	cache.phase_step = op_lfo_pm_enable(opoffs) ? 1 : compute_phase_step(choffs, opoffs, cache, 0);
 
 	// total level, scaled by 8
@@ -1678,13 +1685,6 @@ void ymopl_registers_base<Revision>::cache_operator_data(u32 choffs, u32 opoffs,
 	// 4-bit sustain level, but 15 means 31 so effectively 5 bits
 	cache.eg_sustain = op_sustain_level(opoffs);
 	cache.eg_sustain |= (cache.eg_sustain + 1) & 0x10;
-
-	// multiple value, as an x.1 value (0 means 0.5)
-	// replace the low bit with a table lookup to give 0,1,2,3,4,5,6,7,8,9,10,10,12,12,15,15
-	u32 multiple = op_multiple(opoffs);
-	cache.multiple = ((multiple & 0xe) | BIT(0xc2aa, multiple)) * 2;
-	if (cache.multiple == 0)
-		cache.multiple = 1;
 
 	// determine KSR adjustment for enevlope rates
 	u32 ksrval = keycode >> (op_ksr(opoffs) ^ 3);
@@ -1949,8 +1949,15 @@ void ymopll_registers::cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_c
 	// no detune adjustment on OPLL
 	cache.detune = 0;
 
-	// phase step, or 0 if PM is active; this depends on block_freq and
-	// detune, so compute it after we've done those
+	// multiple value, as an x.1 value (0 means 0.5)
+	// replace the low bit with a table lookup to give 0,1,2,3,4,5,6,7,8,9,10,10,12,12,15,15
+	u32 multiple = op_multiple(opoffs);
+	cache.multiple = ((multiple & 0xe) | BIT(0xc2aa, multiple)) * 2;
+	if (cache.multiple == 0)
+		cache.multiple = 1;
+
+	// phase step, or 0 if PM is active; this depends on block_freq, detune,
+	// and multiple, so compute it after we've done those
 	cache.phase_step = op_lfo_pm_enable(opoffs) ? 1 : compute_phase_step(choffs, opoffs, cache, 0);
 
 	// total level, scaled by 8
@@ -1964,13 +1971,6 @@ void ymopll_registers::cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_c
 	// 4-bit sustain level, but 15 means 31 so effectively 5 bits
 	cache.eg_sustain = op_sustain_level(opoffs);
 	cache.eg_sustain |= (cache.eg_sustain + 1) & 0x10;
-
-	// multiple value, as an x.1 value (0 means 0.5)
-	// replace the low bit with a table lookup to give 0,1,2,3,4,5,6,7,8,9,10,10,12,12,15,15
-	u32 multiple = op_multiple(opoffs);
-	cache.multiple = ((multiple & 0xe) | BIT(0xc2aa, multiple)) * 2;
-	if (cache.multiple == 0)
-		cache.multiple = 1;
 
 	// The envelope diagram in the YM2413 datasheet gives values for these
 	// in ms from 0->48dB. The attack/decay tables give values in ms from
