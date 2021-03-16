@@ -32,6 +32,7 @@ public:
 		m_spriteram(*this, "spriteram")
 	{ }
 
+	void base(machine_config &config);
 	void ginkun(machine_config &config);
 	void fstarfrc(machine_config &config);
 	void riot(machine_config &config);

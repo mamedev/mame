@@ -17,6 +17,10 @@ TODO:
   fstarfrc relies on the interrupt being held for a while,
   otherwise the titlescreen background goes wrong.
   If I had to guess: 24/4(6MHz) pixel clock, 384 hclocks, 264 scanlines
+  riot does not like multiple interrupts per frame and will start to
+  fail towards the end of level 1 (bad palette) then randomly lock up
+  on level 2.  Is there an acknowledge mechanism that riot triggers
+  but fstarfrc does not?
 - there could be some priorities problems in riot
   (more noticeable in level 2)
 
@@ -331,7 +335,7 @@ GFXDECODE_END
 #define MASTER_CLOCK XTAL(24'000'000)
 #define OKI_CLOCK XTAL(8'000'000)
 
-void tecmo16_state::fstarfrc(machine_config &config)
+void tecmo16_state::base(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, MASTER_CLOCK/2);          /* 12MHz */
@@ -351,7 +355,6 @@ void tecmo16_state::fstarfrc(machine_config &config)
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(tecmo16_state::screen_update));
-	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ5);
 	m_screen->screen_vblank().append(FUNC(tecmo16_state::screen_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tecmo16);
@@ -383,11 +386,22 @@ void tecmo16_state::fstarfrc(machine_config &config)
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
 }
 
+void tecmo16_state::fstarfrc(machine_config &config)
+{
+	base(config);
+	// see notes at top, fstarfrc requires this to be held for the duration of blanking
+	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ5);
+	m_screen->screen_vblank().append(FUNC(tecmo16_state::screen_vblank));
+}
+
 void tecmo16_state::ginkun(machine_config &config)
 {
-	fstarfrc(config);
+	base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &tecmo16_state::ginkun_map);
+
+	// riot however does not want multiple interrupts per frame
+	m_maincpu->set_vblank_int("screen", FUNC(tecmo16_state::irq5_line_hold));
 
 	MCFG_VIDEO_START_OVERRIDE(tecmo16_state,ginkun)
 }
