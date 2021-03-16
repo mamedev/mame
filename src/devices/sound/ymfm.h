@@ -146,12 +146,14 @@ inline s16 ymfm_roundtrip_fp(s32 value)
 struct ymfm_opdata_cache
 {
 	u16 const *waveform;// base of sine table
-	u32 phase_step;		// phase step, or 0 if PM is active
-	u32 total_level;	// total level, shifted up by 3 bits
+	u32 phase_step;		// phase step, or 1 if PM is active
+	u32 total_level;	// total level + KSL (times 8)
 	s32 detune;			// detuning value
-	u32 eg_sustain;		// sustain level
-	u32 block_freq;		// block frequency value
-	u8 eg_rate[YMFM_ENV_STATES]; // envelope rate for each step
+	u32 eg_sustain;		// sustain level (4-bit value)
+	u32 block_freq;		// block frequency value (raw)
+	u32 multiple;		// multiple value (x.1 value)
+	u8 output_mask;		// output mask (bitmask)
+	u8 eg_rate[YMFM_ENV_STATES]; // envelope rate, including KSR
 };
 
 
@@ -334,7 +336,7 @@ public:
 	void cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_cache &cache);
 
 	// compute the phase step, given a PM value
-	u32 compute_phase_step(u32 choffs, u32 opoffs, u32 block_freq, s32 detuneval, s32 lfo_raw_pm);
+	u32 compute_phase_step(u32 choffs, u32 opoffs, ymfm_opdata_cache const &cache, s32 lfo_raw_pm);
 
 	// log a key-on event
 	void log_keyon(u32 choffs, u32 opoffs);
@@ -358,7 +360,11 @@ public:
 	u32 lfo_waveform() const               { return byte(0x1b, 0, 2); }
 
 	// per-channel registers
-	u32 ch_output_mask(u32 choffs) const   { return byte(0x20, 6, 2, choffs); }
+	u32 ch_output_any(u32 choffs) const    { return byte(0x20, 6, 2, choffs); }
+	u32 ch_output_0(u32 choffs) const      { return byte(0x20, 6, 1, choffs); }
+	u32 ch_output_1(u32 choffs) const      { return byte(0x20, 7, 1, choffs); }
+	u32 ch_output_2(u32 choffs) const      { return 0; }
+	u32 ch_output_3(u32 choffs) const      { return 0; }
 	u32 ch_feedback(u32 choffs) const      { return byte(0x20, 3, 3, choffs); }
 	u32 ch_algorithm(u32 choffs) const     { return byte(0x20, 0, 3, choffs); }
 	u32 ch_block_freq(u32 choffs) const    { return word(0x28, 0, 7, 0x30, 2, 6, choffs); }
@@ -541,7 +547,7 @@ public:
 	void cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_cache &cache);
 
 	// compute the phase step, given a PM value
-	u32 compute_phase_step(u32 choffs, u32 opoffs, u32 block_freq, s32 detuneval, s32 lfo_raw_pm);
+	u32 compute_phase_step(u32 choffs, u32 opoffs, ymfm_opdata_cache const &cache, s32 lfo_raw_pm);
 
 	// log a key-on event
 	void log_keyon(u32 choffs, u32 opoffs);
@@ -566,7 +572,11 @@ public:
 	u32 ch_block_freq(u32 choffs) const    { return word(0xa4, 0, 6, 0xa0, 0, 8, choffs); }
 	u32 ch_feedback(u32 choffs) const      { return byte(0xb0, 3, 3, choffs); }
 	u32 ch_algorithm(u32 choffs) const     { return byte(0xb0, 0, 3, choffs); }
-	u32 ch_output_mask(u32 choffs) const   { return IsOpnA ? bitswap<2>(byte(0xb4, 6, 2, choffs), 0, 1) : 1; }
+	u32 ch_output_any(u32 choffs) const    { return IsOpnA ? byte(0xb4, 6, 2, choffs) : 1; }
+	u32 ch_output_0(u32 choffs) const      { return IsOpnA ? byte(0xb4, 7, 1, choffs) : 1; }
+	u32 ch_output_1(u32 choffs) const      { return IsOpnA ? byte(0xb4, 6, 1, choffs) : 0; }
+	u32 ch_output_2(u32 choffs) const      { return 0; }
+	u32 ch_output_3(u32 choffs) const      { return 0; }
 	u32 ch_lfo_am_sens(u32 choffs) const   { return IsOpnA ? byte(0xb4, 4, 2, choffs) : 0; }
 	u32 ch_lfo_pm_sens(u32 choffs) const   { return IsOpnA ? byte(0xb4, 0, 3, choffs) : 0; }
 
@@ -649,7 +659,11 @@ using ymopna_registers = ymopn_registers_base<true>;
 //        B0-B8 --x----- Key on
 //              ---xxx-- Block (octvate, 0-7)
 //              ------xx F-number (high two bits)
-//        C0-C8 ----xxx- Feedback level for operator 1 (0-7)
+//        C0-C8 x------- CHD output (to DO0 pin) [OPL3+ only]
+//              -x------ CHC output (to DO0 pin) [OPL3+ only]
+//              --x----- CHB output (mixed right, to DO2 pin) [OPL3+ only]
+//              ---x---- CHA output (mixed left, to DO2 pin) [OPL3+ only]
+//              ----xxx- Feedback level for operator 1 (0-7)
 //              -------x Operator connection algorithm
 //
 //     Per-operator registers (operator in bits 0-5)
@@ -750,7 +764,7 @@ public:
 	void cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_cache &cache);
 
 	// compute the phase step, given a PM value
-	u32 compute_phase_step(u32 choffs, u32 opoffs, u32 block_freq, s32 detuneval, s32 lfo_raw_pm);
+	u32 compute_phase_step(u32 choffs, u32 opoffs, ymfm_opdata_cache const &cache, s32 lfo_raw_pm);
 
 	// log a key-on event
 	void log_keyon(u32 choffs, u32 opoffs);
@@ -781,14 +795,18 @@ public:
 	u32 ch_block_freq(u32 choffs) const    { return word(0xb0, 0, 5, 0xa0, 0, 8, choffs); }
 	u32 ch_feedback(u32 choffs) const      { return byte(0xc0, 1, 3, choffs); }
 	u32 ch_algorithm(u32 choffs) const     { return byte(0xc0, 0, 1, choffs) | (IsOpl3Plus ? (8 | (byte(0xc3, 0, 1, choffs) << 1)) : 0); }
-	u32 ch_output_mask(u32 choffs) const   { return IsOpl3Plus ? bitswap<4>(byte(0xc0 + choffs, 5, 1), 3,2,0,1) : 1; }
+	u32 ch_output_any(u32 choffs) const    { return IsOpl3Plus ? byte(0xc0 + choffs, 4, 4) : 1; }
+	u32 ch_output_0(u32 choffs) const      { return IsOpl3Plus ? byte(0xc0 + choffs, 4, 1) : 1; }
+	u32 ch_output_1(u32 choffs) const      { return IsOpl3Plus ? byte(0xc0 + choffs, 5, 1) : 0; }
+	u32 ch_output_2(u32 choffs) const      { return IsOpl3Plus ? byte(0xc0 + choffs, 6, 1) : 0; }
+	u32 ch_output_3(u32 choffs) const      { return IsOpl3Plus ? byte(0xc0 + choffs, 7, 1) : 0; }
 
 	// per-operator registers
 	u32 op_lfo_am_enable(u32 opoffs) const { return byte(0x20, 7, 1, opoffs); }
 	u32 op_lfo_pm_enable(u32 opoffs) const { return byte(0x20, 6, 1, opoffs); }
 	u32 op_eg_sustain(u32 opoffs) const    { return byte(0x20, 5, 1, opoffs); }
 	u32 op_ksr(u32 opoffs) const           { return byte(0x20, 4, 1, opoffs) * 2 + 1; } // 1->2 bits
-	u32 op_multiple(u32 opoffs) const      { return opl_multiple_map(byte(0x20, 0, 4, opoffs)); }
+	u32 op_multiple(u32 opoffs) const      { return byte(0x20, 0, 4, opoffs); }
 	u32 op_ksl(u32 opoffs) const           { return bitswap<2>(byte(0x40, 6, 2, opoffs), 0, 1); }
 	u32 op_total_level(u32 opoffs) const   { return byte(0x40, 0, 6, opoffs); }
 	u32 op_attack_rate(u32 opoffs) const   { return byte(0x60, 4, 4, opoffs); }
@@ -814,14 +832,6 @@ protected:
 	bool is_rhythm(u32 choffs) const
 	{
 		return rhythm_enable() && (choffs >= 6 && choffs <= 8);
-	}
-
-	// OPL-specific helper to handle the weird multiple mapping
-	static constexpr u32 opl_multiple_map(u32 raw)
-	{
-		// replace the low bit with a table lookup; the equivalent
-		// OPM/OPN values are: 0,1,2,3,4,5,6,7,8,9,10,10,12,12,15,15
-		return (raw & 0xe) | BIT(0xc2aa, raw);
 	}
 
 	// internal state
@@ -937,7 +947,7 @@ public:
 	void cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_cache &cache);
 
 	// compute the phase step, given a PM value
-	u32 compute_phase_step(u32 choffs, u32 opoffs, u32 block_freq, s32 detuneval, s32 lfo_raw_pm);
+	u32 compute_phase_step(u32 choffs, u32 opoffs, ymfm_opdata_cache const &cache, s32 lfo_raw_pm);
 
 	// log a key-on event
 	void log_keyon(u32 choffs, u32 opoffs);
@@ -954,14 +964,18 @@ public:
 	u32 ch_feedback(u32 choffs) const      { return instchbyte(0x03, 0, 3, choffs); }
 	u32 ch_algorithm(u32 choffs) const     { return 0; }
 	u32 ch_instrument(u32 choffs) const    { return byte(0x30, 4, 4, choffs); }
-	u32 ch_output_mask(u32 choffs) const   { return 1 << is_rhythm(choffs); }
+	u32 ch_output_any(u32 choffs) const    { return 1; }
+	u32 ch_output_0(u32 choffs) const      { return !is_rhythm(choffs); }
+	u32 ch_output_1(u32 choffs) const      { return is_rhythm(choffs); }
+	u32 ch_output_2(u32 choffs) const      { return 0; }
+	u32 ch_output_3(u32 choffs) const      { return 0; }
 
 	// per-operator registers
 	u32 op_lfo_am_enable(u32 opoffs) const { return instopbyte(0x00, 7, 1, opoffs); }
 	u32 op_lfo_pm_enable(u32 opoffs) const { return instopbyte(0x00, 6, 1, opoffs); }
 	u32 op_eg_sustain(u32 opoffs) const    { return instopbyte(0x00, 5, 1, opoffs); }
 	u32 op_ksr(u32 opoffs) const           { return instopbyte(0x00, 4, 1, opoffs) * 2 + 1; } // 1->2 bits
-	u32 op_multiple(u32 opoffs) const      { return opl_multiple_map(instopbyte(0x00, 0, 4, opoffs)); }
+	u32 op_multiple(u32 opoffs) const      { return instopbyte(0x00, 0, 4, opoffs); }
 	u32 op_ksl(u32 opoffs) const           { return instopbyte(0x02, 6, 2, opoffs); }
 	u32 op_total_level(u32 opoffs) const   { return total_level_or_volume(opoffs); }
 	u32 op_waveform(u32 opoffs) const      { return instchbyte(0x03, 3 + BIT(opoffs, 0), 1, opoffs >> 1); }
@@ -1165,15 +1179,15 @@ public:
 
 private:
 	// helper to add values to the outputs based on channel enables
-	void add_to_output(u32 outmask, s32 *outputs, s32 value) const
+	void add_to_output(u32 choffs, s32 *outputs, s32 value) const
 	{
-		if (RegisterType::OUTPUTS == 1 || BIT(outmask, 0))
+		if (RegisterType::OUTPUTS == 1 || m_regs.ch_output_0(choffs))
 			outputs[0] += value;
-		if (RegisterType::OUTPUTS >= 2 && BIT(outmask, 1))
+		if (RegisterType::OUTPUTS >= 2 && m_regs.ch_output_1(choffs))
 			outputs[1] += value;
-		if (RegisterType::OUTPUTS >= 3 && BIT(outmask, 2))
+		if (RegisterType::OUTPUTS >= 3 && m_regs.ch_output_2(choffs))
 			outputs[2] += value;
-		if (RegisterType::OUTPUTS >= 4 && BIT(outmask, 3))
+		if (RegisterType::OUTPUTS >= 4 && m_regs.ch_output_3(choffs))
 			outputs[3] += value;
 	}
 
