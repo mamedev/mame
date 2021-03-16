@@ -34,7 +34,6 @@ public:
 
 	void base(machine_config &config);
 	void ginkun(machine_config &config);
-	void fstarfrc(machine_config &config);
 	void riot(machine_config &config);
 
 private:
@@ -82,6 +81,9 @@ private:
 	void scroll_char_x_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void scroll_char_y_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
+	void irq_150021_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	void irq_150031_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
@@ -94,7 +96,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	void save_state();
-
+	void common_map(address_map& map);
 	void fstarfrc_map(address_map &map);
 	void ginkun_map(address_map &map);
 	void sound_map(address_map &map);
