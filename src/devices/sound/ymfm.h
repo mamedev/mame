@@ -770,7 +770,7 @@ public:
 	u32 load_timer_a() const               { return byte(0x04, 0, 1); }
 	u32 csm() const                        { return IsOpl3Plus ? 0 : byte(0x08, 7, 1); }
 	u32 note_select() const                { return byte(0x08, 6, 1); }
-	u32 lfo_am_depth() const               { return byte(0xbd, 7, 1) * 2; } // 1->2 bits
+	u32 lfo_am_depth() const               { return byte(0xbd, 7, 1); }
 	u32 lfo_pm_depth() const               { return byte(0xbd, 6, 1); }
 	u32 rhythm_enable() const              { return byte(0xbd, 5, 1); }
 	u32 rhythm_keyon() const               { return byte(0xbd, 4, 0); }
@@ -778,7 +778,7 @@ public:
 	u32 fourop_enable() const              { return IsOpl3Plus ? byte(0x104, 0, 6) : 0; }
 
 	// per-channel registers
-	u32 ch_block_freq(u32 choffs) const    { return word(0xb0, 0, 5, 0xa0, 0, 8, choffs) * 2; } // 13->14 bits
+	u32 ch_block_freq(u32 choffs) const    { return word(0xb0, 0, 5, 0xa0, 0, 8, choffs); }
 	u32 ch_feedback(u32 choffs) const      { return byte(0xc0, 1, 3, choffs); }
 	u32 ch_algorithm(u32 choffs) const     { return byte(0xc0, 0, 1, choffs) | (IsOpl3Plus ? (8 | (byte(0xc3, 0, 1, choffs) << 1)) : 0); }
 	u32 ch_output_mask(u32 choffs) const   { return IsOpl3Plus ? bitswap<4>(byte(0xc0 + choffs, 5, 1), 3,2,0,1) : 1; }
@@ -949,7 +949,7 @@ public:
 	u32 waveform_enable() const            { return 1; }
 
 	// per-channel registers
-	u32 ch_block_freq(u32 choffs) const    { return word(0x20, 0, 4, 0x10, 0, 8, choffs) * 4; } // 12->14 bits
+	u32 ch_block_freq(u32 choffs) const    { return word(0x20, 0, 4, 0x10, 0, 8, choffs); }
 	u32 ch_sustain(u32 choffs) const       { return byte(0x20, 5, 1, choffs); }
 	u32 ch_feedback(u32 choffs) const      { return instchbyte(0x03, 0, 3, choffs); }
 	u32 ch_algorithm(u32 choffs) const     { return 0; }
@@ -1017,6 +1017,9 @@ private:
 	// helpers to read from instrument channel/operator data
 	u32 instchbyte(u32 offset, u32 start, u32 count, u32 choffs) const { return BIT(m_regdata[offset + m_regdata[CHANNEL_INSTBASE + choffs]], start, count); }
 	u32 instopbyte(u32 offset, u32 start, u32 count, u32 opoffs) const { return BIT(m_regdata[offset + m_regdata[OPERATOR_INSTBASE + opoffs]], start, count); }
+
+	// internal state
+	u16 m_waveform[WAVEFORMS][WAVEFORM_LENGTH]; // waveforms
 };
 
 
@@ -1214,9 +1217,6 @@ public:
 	// reset the overall state
 	void reset();
 
-	// prepare prior to clocking
-	void prepare(u32 chanmask);
-
 	// master clocking function
 	u32 clock(u32 chanmask);
 
@@ -1256,7 +1256,7 @@ public:
 	void set_clock_prescale(u32 prescale) { m_clock_prescale = prescale; }
 
 	// compute sample rate
-	u32 sample_rate(u32 baseclock) const { return baseclock / (m_clock_prescale * RegisterType::OPERATORS); }
+	u32 sample_rate(u32 baseclock) const { return baseclock / (m_clock_prescale * OPERATORS); }
 
 	// reset the LFO state
 	void reset_lfo() { m_regs.reset_lfo(); }
@@ -1293,13 +1293,15 @@ protected:
 	u8 m_clock_prescale;             // prescale factor (2/3/6)
 	u8 m_irq_mask;                   // mask of which bits signal IRQs
 	u8 m_irq_state;                  // current IRQ state
-	u32 m_active_channels;           // mask of active channels computed by prepare
+	u32 m_active_channels;           // mask of active channels (computed by prepare)
+	u32 m_modified_channels;         // mask of channels that have been modified
+	u32 m_prepare_count;             // counter to do periodic prepare sweeps
 	attotime m_busy_end;             // end of the busy time
 	emu_timer *m_timer[2];           // our two timers
 	devcb_write_line m_irq_handler;  // IRQ callback
 	RegisterType m_regs;             // register accessor
- 	std::unique_ptr<ymfm_channel<RegisterType>> m_channel[RegisterType::CHANNELS]; // channel pointers
- 	std::unique_ptr<ymfm_operator<RegisterType>> m_operator[RegisterType::OPERATORS]; // operator pointers
+ 	std::unique_ptr<ymfm_channel<RegisterType>> m_channel[CHANNELS]; // channel pointers
+ 	std::unique_ptr<ymfm_operator<RegisterType>> m_operator[OPERATORS]; // operator pointers
 };
 
 

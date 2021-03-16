@@ -268,9 +268,6 @@ void ym2610_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		return;
 	}
 
-	// prepare for output
-	m_fm.prepare(m_fm_mask);
-
 	// iterate over all target samples
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{

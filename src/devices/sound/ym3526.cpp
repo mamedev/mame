@@ -121,9 +121,6 @@ void ym3526_device::device_clock_changed()
 
 void ym3526_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	// prepare for output
-	m_fm.prepare(fm_engine::ALL_CHANNELS);
-
 	// iterate over all target samples
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{

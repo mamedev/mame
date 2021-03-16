@@ -301,8 +301,6 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		}
 	}
 
-	m_fm.prepare(fm_engine::ALL_CHANNELS);
-
 	mixp = &m_mix_buffer[0];
 	stream_buffer::sample_t wtl = stream_buffer::sample_t(m_mix_level[m_pcm_l]) / (65536.0f * 32768.0f);
 	stream_buffer::sample_t wtr = stream_buffer::sample_t(m_mix_level[m_pcm_r]) / (65536.0f * 32768.0f);

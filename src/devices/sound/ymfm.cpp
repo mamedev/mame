@@ -11,9 +11,7 @@
 //
 // TO DO:
 //
-// Try removing register base class; do we need it?
 // More caching?
-// Expose some constants through the engine
 //
 
 //
@@ -708,13 +706,13 @@ inline u32 opm_key_code_to_phase_step(u32 block_freq, s32 delta)
 //  (matching total level LSB)
 //-------------------------------------------------
 
-inline u32 opl_key_scale_atten(u32 block_freq)
+inline u32 opl_key_scale_atten(u32 block, u32 fnum_4msb)
 {
 	// this table uses the top 4 bits of FNUM and are the maximal values
 	// (for when block == 7). Values for other blocks can be computed by
 	// subtracting 8 for each block below 7.
 	static u8 const fnum_to_atten[16] = { 0,24,32,37,40,43,45,47,48,50,51,52,53,54,55,56 };
-	s32 result = fnum_to_atten[BIT(block_freq, 7, 4)] - 8 * BIT(~block_freq, 11, 3);
+	s32 result = fnum_to_atten[fnum_4msb] - 8 * (block ^ 7);
 	return std::max<s32>(0, result);
 }
 
@@ -737,7 +735,7 @@ ymopm_registers::ymopm_registers() :
 	m_lfo_am(0)
 {
 	// create the waveforms
-	for (int index = 0; index < 0x400; index++)
+	for (int index = 0; index < WAVEFORM_LENGTH; index++)
 		m_waveform[0][index] = abs_sin_attenuation(index) | (BIT(index, 9) << 15);
 }
 
@@ -941,11 +939,11 @@ u32 ymopm_registers::lfo_am_offset(u32 choffs) const
 
 void ymopm_registers::cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_cache &cache)
 {
-	// set up the sine table
+	// set up the waveform
 	cache.waveform = &m_waveform[0][0];
 
 	// get frequency from the channel
-	u32 block_freq = cache.block_freq = this->ch_block_freq(choffs);
+	u32 block_freq = cache.block_freq = ch_block_freq(choffs);
 
 	// compute the keycode: block_freq is:
 	//
@@ -957,7 +955,7 @@ void ymopm_registers::cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_ca
 	u32 keycode = BIT(block_freq, 8, 5);
 
 	// detune adjustment
-	s32 detune = cache.detune = detune_adjustment(this->op_detune(opoffs), keycode);
+	s32 detune = cache.detune = detune_adjustment(op_detune(opoffs), keycode);
 
 	// phase step, or 0 if PM is active; this depends on block_freq and
 	// detune, so compute it after we've done those
@@ -1073,7 +1071,7 @@ ymopn_registers_base<IsOpnA>::ymopn_registers_base() :
 	m_lfo_am(0)
 {
 	// create the waveforms
-	for (int index = 0; index < 0x400; index++)
+	for (int index = 0; index < WAVEFORM_LENGTH; index++)
 		m_waveform[0][index] = abs_sin_attenuation(index) | (BIT(index, 9) << 15);
 }
 
@@ -1284,11 +1282,11 @@ u32 ymopn_registers_base<IsOpnA>::lfo_am_offset(u32 choffs) const
 template<bool IsOpnA>
 void ymopn_registers_base<IsOpnA>::cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_cache &cache)
 {
-	// set up the sine table
+	// set up the waveform
 	cache.waveform = &m_waveform[0][0];
 
 	// get frequency from the channel
-	u32 block_freq = cache.block_freq = this->ch_block_freq(choffs);
+	u32 block_freq = cache.block_freq = ch_block_freq(choffs);
 
 	// if multi-frequency mode is enabled and this is channel 2,
 	// fetch one of the special frequencies
@@ -1443,23 +1441,26 @@ ymopl_registers_base<Revision>::ymopl_registers_base() :
 	m_lfo_am(0)
 {
 	// create the waveforms
-	for (int index = 0; index < 0x400; index++)
+	for (int index = 0; index < WAVEFORM_LENGTH; index++)
 		m_waveform[0][index] = abs_sin_attenuation(index) | (BIT(index, 9) << 15);
 
 	if (WAVEFORMS >= 4)
-		for (int index = 0; index < 0x400; index++)
+	{
+		u16 zeroval = m_waveform[0][0];
+		for (int index = 0; index < WAVEFORM_LENGTH; index++)
 		{
-			m_waveform[1][index] = BIT(index, 9) ? 0 : m_waveform[0][index];
+			m_waveform[1][index] = BIT(index, 9) ? zeroval : m_waveform[0][index];
 			m_waveform[2][index] = m_waveform[0][index] & 0x7fff;
-			m_waveform[3][index] = BIT(index, 8) ? 0 : (m_waveform[0][index] & 0x7fff);
+			m_waveform[3][index] = BIT(index, 8) ? zeroval : (m_waveform[0][index] & 0x7fff);
 			if (WAVEFORMS >= 8)
 			{
-				m_waveform[4][index] = BIT(index, 9) ? 0 : m_waveform[0][index * 2];
-				m_waveform[5][index] = BIT(index, 9) ? 0 : m_waveform[0][(index * 2) & 0x1ff];
+				m_waveform[4][index] = BIT(index, 9) ? zeroval : m_waveform[0][index * 2];
+				m_waveform[5][index] = BIT(index, 9) ? zeroval : m_waveform[0][(index * 2) & 0x1ff];
 				m_waveform[6][index] = BIT(index, 9) << 15;
-				m_waveform[7][index] = (m_waveform[0][0] - m_waveform[0][(index / 2)]) | (BIT(index, 9) << 15);
+				m_waveform[7][index] = (zeroval - m_waveform[0][(index / 2)]) | (BIT(index, 9) << 15);
 			}
 		}
+	}
 }
 
 
@@ -1603,12 +1604,11 @@ s32 ymopl_registers_base<Revision>::clock_noise_and_lfo()
 	if (am_counter >= 210*64 - 1)
 		m_lfo_am_counter = 0;
 
-	// low 8 bits are fractional; depth 0 is divided by 4, while depth 1 is normal
-	// on OPL, lfo_am_depth is 0 or 2; on OPLL, it is 1
-	int shift = 10 - lfo_am_depth();
+	// low 8 bits are fractional; depth 0 is divided by 2, while depth 1 is times 2
+	int shift = 9 - 2 * lfo_am_depth();
 
-	// AM value is the upper bits of the value, inverted across
-	// the midpoint to produce a triangle
+	// AM value is the upper bits of the value, inverted across the midpoint
+	// to produce a triangle
 	m_lfo_am = ((am_counter < 105*64) ? am_counter : (210*64+63 - am_counter)) >> shift;
 
 	// the PM LFO has 8192 steps, or a nominal period of 6.1Hz
@@ -1632,23 +1632,25 @@ s32 ymopl_registers_base<Revision>::clock_noise_and_lfo()
 template<int Revision>
 void ymopl_registers_base<Revision>::cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_cache &cache)
 {
-	// set up the sine table
+	// set up the waveform
 	cache.waveform = &m_waveform[op_waveform(opoffs) % WAVEFORMS][0];
 
 	// get frequency from the channel
-	u32 block_freq = cache.block_freq = this->ch_block_freq(choffs);
+	u32 block_freq = cache.block_freq = ch_block_freq(choffs);
 
 	// compute the keycode: block_freq is:
 	//
-	//     BBBFFFFFFFFFF0
+	//     111  |
+	//     21098|76543210
+	//     BBBFF|FFFFFFFF
 	//     ^^^??
 	//
 	// the 4-bit keycode uses the top 3 bits plus one of the next two bits
-	u32 keycode = BIT(block_freq, 11, 3) << 1;
+	u32 keycode = BIT(block_freq, 10, 3) << 1;
 
 	// lowest bit is determined by note_select(); note that it is
 	// actually reversed from what the manual says, however
-	keycode |= BIT(block_freq, 10 - note_select(), 1);
+	keycode |= BIT(block_freq, 9 - note_select(), 1);
 
 	// no detune adjustment on OPL
 	cache.detune = 0;
@@ -1663,7 +1665,7 @@ void ymopl_registers_base<Revision>::cache_operator_data(u32 choffs, u32 opoffs,
 	// pre-add key scale level
 	u32 ksl = op_ksl(opoffs);
 	if (ksl != 0)
-		cache.total_level += opl_key_scale_atten(block_freq) << ksl;
+		cache.total_level += opl_key_scale_atten(BIT(block_freq, 10, 3), BIT(block_freq, 6, 4)) << ksl;
 
 	// 4-bit sustain level, but 15 means 31 so effectively 5 bits
 	cache.eg_sustain = op_sustain_level(opoffs);
@@ -1689,22 +1691,22 @@ u32 ymopl_registers_base<Revision>::compute_phase_step(u32 choffs, u32 opoffs, u
 	// OPL phase calculation has no detuning, but uses FNUMs like
 	// the OPN version, and computes PM a bit differently
 
-	// extract frequency number (low 11 bits of block_freq)
-	u32 fnum = BIT(block_freq, 0, 11) << 1;
+	// extract frequency number as a 12-bit fraction
+	u32 fnum = BIT(block_freq, 0, 10) << 2;
 
 	// if there's a non-zero PM sensitivity, compute the adjustment
 	if (op_lfo_pm_enable(opoffs))
 	{
-		// apply the phase adjustment based on the upper 7 bits
+		// apply the phase adjustment based on the upper 3 bits
 		// of FNUM and the PM depth parameters
-		fnum += (lfo_raw_pm * BIT(block_freq, 8, 3)) >> 3;
+		fnum += (lfo_raw_pm * BIT(block_freq, 7, 3)) >> 1;
 
 		// keep fnum to 12 bits
 		fnum &= 0xfff;
 	}
 
 	// apply block shift to compute phase step
-	u32 block = BIT(block_freq, 11, 3);
+	u32 block = BIT(block_freq, 10, 3);
 	u32 phase_step = (fnum << block) >> 2;
 
 	// apply frequency multiplier (0 means 0.5, other values are as-is)
@@ -1773,6 +1775,13 @@ void ymopl_registers_base<Revision>::log_keyon(u32 choffs, u32 opoffs)
 
 ymopll_registers::ymopll_registers()
 {
+	// create the waveforms
+	for (int index = 0; index < WAVEFORM_LENGTH; index++)
+		m_waveform[0][index] = abs_sin_attenuation(index) | (BIT(index, 9) << 15);
+
+	u16 zeroval = m_waveform[0][0];
+	for (int index = 0; index < WAVEFORM_LENGTH; index++)
+		m_waveform[1][index] = BIT(index, 9) ? zeroval : m_waveform[0][index];
 }
 
 
@@ -1882,9 +1891,10 @@ s32 ymopll_registers::clock_noise_and_lfo()
 	if (am_counter >= 210*64 - 1)
 		m_lfo_am_counter = 0;
 
-	// AM value is the upper bits of the value, inverted across
-	// the midpoint to produce a triangle
-	m_lfo_am = ((am_counter < 105*64) ? am_counter : (210*64+63 - am_counter)) >> 9;
+	// AM value is the upper bits of the value, inverted across the midpoint
+	// to produce a triangle; nominally the value is x.8, but needs to be
+	// scaled up by a fixed depth of 2 to match observations
+	m_lfo_am = ((am_counter < 105*64) ? am_counter : (210*64+63 - am_counter)) >> 7;
 
 	// the PM LFO has 8192 steps, or a nominal period of 6.1Hz
 	u32 pm_counter = m_lfo_pm_counter++;
@@ -1906,19 +1916,21 @@ s32 ymopll_registers::clock_noise_and_lfo()
 
 void ymopll_registers::cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_cache &cache)
 {
-	// set up the sine table
+	// set up the waveform
 	cache.waveform = &m_waveform[op_waveform(opoffs) % WAVEFORMS][0];
 
 	// get frequency from the channel
-	u32 block_freq = cache.block_freq = this->ch_block_freq(choffs);
+	u32 block_freq = cache.block_freq = ch_block_freq(choffs);
 
 	// compute the keycode: block_freq is:
 	//
-	//     BBBFFFFFFFFFF0
+	//     11  |
+	//     1098|76543210
+	//     BBBF|FFFFFFFF
 	//     ^^^^
 	//
 	// the 4-bit keycode uses the top 3 bits plus one of the next two bits
-	u32 keycode = BIT(cache.block_freq, 10, 4);
+	u32 keycode = BIT(block_freq, 8, 4);
 
 	// no detune adjustment on OPLL
 	cache.detune = 0;
@@ -1933,7 +1945,7 @@ void ymopll_registers::cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_c
 	// pre-add key scale level
 	u32 ksl = op_ksl(opoffs);
 	if (ksl != 0)
-		cache.total_level += opl_key_scale_atten(block_freq) << ksl;
+		cache.total_level += opl_key_scale_atten(BIT(block_freq, 9, 3), BIT(block_freq, 5, 4)) << ksl;
 
 	// 4-bit sustain level, but 15 means 31 so effectively 5 bits
 	cache.eg_sustain = op_sustain_level(opoffs);
@@ -1984,22 +1996,22 @@ u32 ymopll_registers::compute_phase_step(u32 choffs, u32 opoffs, u32 block_freq,
 	// OPL phase calculation has no detuning, but uses FNUMs like
 	// the OPN version, and computes PM a bit differently
 
-	// extract frequency number (low 11 bits of block_freq)
-	u32 fnum = BIT(block_freq, 0, 11) << 1;
+	// extract frequency number as a 12-bit fraction
+	u32 fnum = BIT(block_freq, 0, 9) << 3;
 
 	// if there's a non-zero PM sensitivity, compute the adjustment
 	if (op_lfo_pm_enable(opoffs))
 	{
-		// apply the phase adjustment based on the upper 7 bits
+		// apply the phase adjustment based on the upper 3 bits
 		// of FNUM and the PM depth parameters
-		fnum += (lfo_raw_pm * BIT(block_freq, 8, 3)) >> 3;
+		fnum += (lfo_raw_pm * BIT(block_freq, 6, 3)) >> 1;
 
 		// keep fnum to 12 bits
 		fnum &= 0xfff;
 	}
 
 	// apply block shift to compute phase step
-	u32 block = BIT(block_freq, 11, 3);
+	u32 block = BIT(block_freq, 9, 3);
 	u32 phase_step = (fnum << block) >> 2;
 
 	// apply frequency multiplier (0 means 0.5, other values are as-is)
@@ -2854,19 +2866,21 @@ ymfm_engine_base<RegisterType>::ymfm_engine_base(device_t &device) :
 	m_env_counter(0),
 	m_status(0),
 	m_clock_prescale(RegisterType::DEFAULT_PRESCALE),
-	m_irq_mask(RegisterType::STATUS_TIMERA | RegisterType::STATUS_TIMERB),
+	m_irq_mask(STATUS_TIMERA | STATUS_TIMERB),
 	m_irq_state(0),
-	m_active_channels(RegisterType::ALL_CHANNELS),
+	m_active_channels(ALL_CHANNELS),
+	m_modified_channels(0),
+	m_prepare_count(0),
 	m_busy_end(attotime::zero),
 	m_timer{ nullptr, nullptr },
 	m_irq_handler(device)
 {
 	// create the channels
-	for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
+	for (int chnum = 0; chnum < CHANNELS; chnum++)
 		m_channel[chnum] = std::make_unique<ymfm_channel<RegisterType>>(*this, RegisterType::channel_offset(chnum));
 
 	// create the operators
-	for (int opnum = 0; opnum < RegisterType::OPERATORS; opnum++)
+	for (int opnum = 0; opnum < OPERATORS; opnum++)
 		m_operator[opnum] = std::make_unique<ymfm_operator<RegisterType>>(*this, RegisterType::operator_offset(opnum));
 
 	// do the initial operator assignment
@@ -2900,11 +2914,11 @@ void ymfm_engine_base<RegisterType>::save(device_t &device)
 	m_regs.save(device);
 
 	// save channel data
-	for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
+	for (int chnum = 0; chnum < CHANNELS; chnum++)
 		m_channel[chnum]->save(device, chnum);
 
 	// save operator data
-	for (int opnum = 0; opnum < RegisterType::OPERATORS; opnum++)
+	for (int opnum = 0; opnum < OPERATORS; opnum++)
 		m_operator[opnum]->save(device, opnum);
 }
 
@@ -2937,26 +2951,6 @@ void ymfm_engine_base<RegisterType>::reset()
 
 
 //-------------------------------------------------
-//  prepare - prepare for clocking
-//-------------------------------------------------
-
-template<class RegisterType>
-void ymfm_engine_base<RegisterType>::prepare(u32 chanmask)
-{
-	// reassign operators to channels if dynamic
-	if (RegisterType::DYNAMIC_OPS)
-		assign_operators();
-
-	// call each channel to prepare
-	m_active_channels = 0;
-	for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
-		if (BIT(chanmask, chnum))
-			if (m_channel[chnum]->prepare())
-				m_active_channels |= 1 << chnum;
-}
-
-
-//-------------------------------------------------
 //  clock - iterate over all channels, clocking
 //  them forward one step
 //-------------------------------------------------
@@ -2964,6 +2958,25 @@ void ymfm_engine_base<RegisterType>::prepare(u32 chanmask)
 template<class RegisterType>
 u32 ymfm_engine_base<RegisterType>::clock(u32 chanmask)
 {
+	// if something was modified, prepare
+	// also prepare every 4k samples to catch ending notes
+	if (m_modified_channels != 0 || m_prepare_count++ >= 4096)
+	{
+		// reassign operators to channels if dynamic
+		if (RegisterType::DYNAMIC_OPS)
+			assign_operators();
+
+		// call each channel to prepare
+		m_active_channels = 0;
+		for (int chnum = 0; chnum < CHANNELS; chnum++)
+			if (BIT(chanmask, chnum))
+				if (m_channel[chnum]->prepare())
+					m_active_channels |= 1 << chnum;
+
+		// reset the modified channels and prepare count
+		m_modified_channels = m_prepare_count = 0;
+	}
+
 	// if the envelope clock divider is 1, just increment by 4;
 	// otherwise, increment by 1 and manually wrap when we reach the divide count
 	if (RegisterType::EG_CLOCK_DIVIDER == 1)
@@ -2975,7 +2988,7 @@ u32 ymfm_engine_base<RegisterType>::clock(u32 chanmask)
 	s32 lfo_raw_pm = m_regs.clock_noise_and_lfo();
 
 	// now update the state of all the channels and operators
-	for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
+	for (int chnum = 0; chnum < CHANNELS; chnum++)
 		if (BIT(chanmask, chnum))
 			m_channel[chnum]->clock(m_env_counter, lfo_raw_pm);
 
@@ -3008,7 +3021,7 @@ void ymfm_engine_base<RegisterType>::output(s32 outputs[RegisterType::OUTPUTS], 
 		u32 phase_select = (BIT(op13phase, 2) ^ BIT(op13phase, 7)) | BIT(op13phase, 3) | (BIT(op17phase, 5) ^ BIT(op17phase, 3));
 
 		// sum over all the desired channels
-		for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
+		for (int chnum = 0; chnum < CHANNELS; chnum++)
 			if (BIT(chanmask, chnum))
 			{
 				if (chnum == 6)
@@ -3026,7 +3039,7 @@ void ymfm_engine_base<RegisterType>::output(s32 outputs[RegisterType::OUTPUTS], 
 	else
 	{
 		// sum over all the desired channels
-		for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
+		for (int chnum = 0; chnum < CHANNELS; chnum++)
 			if (BIT(chanmask, chnum))
 			{
 				if (m_channel[chnum]->is4op())
@@ -3053,18 +3066,21 @@ void ymfm_engine_base<RegisterType>::write(u16 regnum, u8 data)
 		return;
 	}
 
+	// for now just mark all channels as modified
+	m_modified_channels = ALL_CHANNELS;
+
 	// most writes are passive, consumed only when needed
 	u32 keyon_channel;
 	u32 keyon_opmask;
 	if (m_regs.write(regnum, data, keyon_channel, keyon_opmask))
 	{
 		// handle writes to the keyon register(s)
-		if (keyon_channel < RegisterType::CHANNELS)
+		if (keyon_channel < CHANNELS)
 		{
 			// normal channel on/off
 			m_channel[keyon_channel]->keyonoff(keyon_opmask, YMFM_KEYON_NORMAL);
 		}
-		else if (RegisterType::CHANNELS >= 9 && keyon_channel == RegisterType::YMFM_RHYTHM_CHANNEL)
+		else if (CHANNELS >= 9 && keyon_channel == RegisterType::YMFM_RHYTHM_CHANNEL)
 		{
 			// special case for the OPL rhythm channels
 			m_channel[6]->keyonoff(BIT(keyon_opmask, 4) ? 3 : 0, YMFM_KEYON_RHYTHM);
@@ -3083,9 +3099,9 @@ void ymfm_engine_base<RegisterType>::write(u16 regnum, u8 data)
 template<class RegisterType>
 u8 ymfm_engine_base<RegisterType>::status() const
 {
-	u8 result = m_status & ~RegisterType::STATUS_BUSY;
+	u8 result = m_status & ~STATUS_BUSY;
 	if (m_device.machine().time() < m_busy_end)
-		result |= RegisterType::STATUS_BUSY;
+		result |= STATUS_BUSY;
 	return result;
 }
 
@@ -3101,7 +3117,7 @@ void ymfm_engine_base<RegisterType>::assign_operators()
 	typename RegisterType::operator_mapping map;
 	m_regs.operator_map(map);
 
-	for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
+	for (int chnum = 0; chnum < CHANNELS; chnum++)
 		for (int index = 0; index < 4; index++)
 		{
 			u32 opnum = BIT(map.chan[chnum], 8 * index, 8);
@@ -3122,7 +3138,7 @@ void ymfm_engine_base<RegisterType>::update_timer(u32 tnum, u32 enable)
 	if (enable && !m_timer[tnum]->enable())
 	{
 		// each timer clock is n operators * prescale factor (2/3/6)
-		u32 clockscale = RegisterType::OPERATORS * m_clock_prescale;
+		u32 clockscale = OPERATORS * m_clock_prescale;
 
 		// period comes from the registers, and is different for each
 		u32 period = (tnum == 0) ? (1024 - m_regs.timer_a_value()) : 16 * (256 - m_regs.timer_b_value());
@@ -3147,13 +3163,13 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::timer_handler)
 {
 	// update status
 	if (param == 0 && m_regs.enable_timer_a())
-		set_reset_status(RegisterType::STATUS_TIMERA, 0);
+		set_reset_status(STATUS_TIMERA, 0);
 	else if (param == 1 && m_regs.enable_timer_b())
-	 	set_reset_status(RegisterType::STATUS_TIMERB, 0);
+	 	set_reset_status(STATUS_TIMERB, 0);
 
 	// if timer A fired in CSM mode, trigger CSM on all relevant channels
 	if (param == 0 && m_regs.csm())
-		for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
+		for (int chnum = 0; chnum < CHANNELS; chnum++)
 			if (BIT(RegisterType::CSM_TRIGGER_MASK, chnum))
 				m_channel[chnum]->keyonoff(1, YMFM_KEYON_CSM);
 
@@ -3194,9 +3210,9 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::check_interrupts)
 
 	// set the IRQ status bit
 	if (m_irq_state)
-		m_status |= RegisterType::STATUS_IRQ;
+		m_status |= STATUS_IRQ;
 	else
-		m_status &= ~RegisterType::STATUS_IRQ;
+		m_status &= ~STATUS_IRQ;
 
 	// if changed, signal the new state
 	if (old_state != m_irq_state && !m_irq_handler.isnull())
@@ -3225,9 +3241,9 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::synced_mode_w)
 	{
 		// reset timer status
 		if (m_regs.reset_timer_b())
-			set_reset_status(0, RegisterType::STATUS_TIMERB);
+			set_reset_status(0, STATUS_TIMERB);
 		if (m_regs.reset_timer_a())
-			set_reset_status(0, RegisterType::STATUS_TIMERA);
+			set_reset_status(0, STATUS_TIMERA);
 
 		// load timers
 		update_timer(1, m_regs.load_timer_b());

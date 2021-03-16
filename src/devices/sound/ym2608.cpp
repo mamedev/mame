@@ -304,9 +304,6 @@ void ym2608_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 	// top bit of the IRQ enable flags controls 3-channel vs 6-channel mode
 	u8 fmmask = BIT(m_irq_enable, 7) ? 0x3f : 0x07;
 
-	// prepare for output
-	m_fm.prepare(fmmask);
-
 	// iterate over all target samples
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{

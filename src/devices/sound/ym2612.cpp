@@ -200,8 +200,6 @@ void ym2612_device::sound_stream_update_common(write_stream_view &outl, write_st
 {
 	u32 const sample_divider = (discontinuity ? 260 : 256) * (MULTIPLEX_OUTPUT ? 1 : fm_engine::CHANNELS);
 
-	m_fm.prepare(fm_engine::ALL_CHANNELS);
-
 	// iterate over all target samples
 	s32 sums[2] = { 0 };
 	for (int sampindex = 0; sampindex < outl.samples(); )
@@ -323,9 +321,6 @@ void ymf276_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 {
 	// mask off channel 6 if DAC is enabled
 	u8 const fm_mask = m_dac_enable ? 0x1f : 0x3f;
-
-	// prepare for output
-	m_fm.prepare(fm_engine::ALL_CHANNELS);
 
 	// iterate over all target samples
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
