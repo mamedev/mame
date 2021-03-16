@@ -23,7 +23,7 @@ y8950_device::y8950_device(const machine_config &mconfig, const char *tag, devic
 	m_address(0),
 	m_io_ddr(0),
 	m_stream(nullptr),
-	m_opl(*this),
+	m_fm(*this),
 	m_adpcm_b(*this, read8sm_delegate(*this, FUNC(y8950_device::adpcm_b_read)), write8sm_delegate(*this, FUNC(y8950_device::adpcm_b_write))),
 	m_keyboard_read_handler(*this),
 	m_keyboard_write_handler(*this),
@@ -96,7 +96,7 @@ void y8950_device::write(offs_t offset, u8 value)
 			switch (m_address)
 			{
 				case 0x04:	// IRQ control
-					m_opl.write(m_address, value);
+					m_fm.write(m_address, value);
 					combine_status();
 					break;
 
@@ -104,9 +104,9 @@ void y8950_device::write(offs_t offset, u8 value)
 					m_keyboard_write_handler(0, value);
 					break;
 
-				case 0x08:	// split OPL/ADPCM-B
+				case 0x08:	// split FM/ADPCM-B
 					m_adpcm_b.write(m_address - 0x07, (value & 0x0f) | 0x80);
-					m_opl.write(m_address, value & 0xc0);
+					m_fm.write(m_address, value & 0xc0);
 					break;
 
 				case 0x07:	// ADPCM-B registers
@@ -134,8 +134,8 @@ void y8950_device::write(offs_t offset, u8 value)
 					m_io_write_handler(0, value & m_io_ddr);
 					break;
 
-				default:	// everything else to OPL
-					m_opl.write(m_address, value);
+				default:	// everything else to FM
+					m_fm.write(m_address, value);
 					break;
 			}
 	}
@@ -149,7 +149,7 @@ void y8950_device::write(offs_t offset, u8 value)
 void y8950_device::device_start()
 {
 	// create our stream
-	m_stream = stream_alloc(0, ymopl_registers::OUTPUTS, m_opl.fm_sample_rate(clock()));
+	m_stream = stream_alloc(0, fm_engine::OUTPUTS, m_fm.sample_rate(clock()));
 
 	// resolve callbacks
 	m_keyboard_read_handler.resolve_safe(0);
@@ -165,7 +165,7 @@ void y8950_device::device_start()
 	save_item(YMFM_NAME(m_io_ddr));
 
 	// save the engines
-	m_opl.save(*this);
+	m_fm.save(*this);
 	m_adpcm_b.save(*this);
 
 	// configure ADPCM-B limit, since these registers are not
@@ -182,7 +182,7 @@ void y8950_device::device_start()
 void y8950_device::device_reset()
 {
 	// reset the engines
-	m_opl.reset();
+	m_fm.reset();
 	m_adpcm_b.reset();
 }
 
@@ -193,7 +193,7 @@ void y8950_device::device_reset()
 
 void y8950_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(m_opl.fm_sample_rate(clock()));
+	m_stream->set_sample_rate(m_fm.sample_rate(clock()));
 }
 
 
@@ -215,28 +215,28 @@ void y8950_device::rom_bank_updated()
 void y8950_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// prepare for output
-	m_opl.prepare(ymopl_registers::ALL_CHANNELS);
+	m_fm.prepare(fm_engine::ALL_CHANNELS);
 
 	// iterate over all target samples
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
 		// clock the system
-		m_opl.clock(ymopl_registers::ALL_CHANNELS);
+		m_fm.clock(fm_engine::ALL_CHANNELS);
 
 		// clock the ADPCM-B engine every cycle
 		m_adpcm_b.clock(0x01);
 
-		// update the OPL content; clipping is unknown
-		s32 sums[std::max<int>(ymopl_registers::OUTPUTS, 2)] = { 0 };
-		m_opl.output(sums, 1, 32767, ymopl_registers::ALL_CHANNELS);
+		// update the FM content; clipping is unknown
+		s32 sums[std::max<int>(fm_engine::OUTPUTS, 2)] = { 0 };
+		m_fm.output(sums, 1, 32767, fm_engine::ALL_CHANNELS);
 
 		// mix in the ADPCM; ADPCM-B is stereo, but only one channel
 		// not sure how it's wired up internally
 		m_adpcm_b.output(sums, 3, 0x01);
 
 		// convert to 10.3 floating point value for the DAC and back
-		// OPL is mono
-		for (int index = 0; index < ymopl_registers::OUTPUTS; index++)
+		// Y8950 is mono
+		for (int index = 0; index < fm_engine::OUTPUTS; index++)
 			outputs[index].put_int(sampindex, ymfm_roundtrip_fp(sums[index]), 32768);
 	}
 
@@ -253,7 +253,7 @@ void y8950_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 
 u8 y8950_device::combine_status()
 {
-	u8 status = m_opl.status() & ~(STATUS_ADPCM_B_EOS | STATUS_ADPCM_B_BRDY | STATUS_ADPCM_B_PLAYING);
+	u8 status = m_fm.status() & ~(STATUS_ADPCM_B_EOS | STATUS_ADPCM_B_BRDY | STATUS_ADPCM_B_PLAYING);
 	u8 adpcm_status = m_adpcm_b.status(0);
 	if ((adpcm_status & ymadpcm_b_channel::STATUS_EOS) != 0)
 		status |= STATUS_ADPCM_B_EOS;
@@ -261,7 +261,7 @@ u8 y8950_device::combine_status()
 		status |= STATUS_ADPCM_B_BRDY;
 	if ((adpcm_status & ymadpcm_b_channel::STATUS_PLAYING) != 0)
 		status |= STATUS_ADPCM_B_PLAYING;
-	return m_opl.set_reset_status(status, ~status);
+	return m_fm.set_reset_status(status, ~status);
 }
 
 

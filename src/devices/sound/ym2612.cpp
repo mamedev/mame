@@ -27,9 +27,9 @@ DEFINE_DEVICE_TYPE(YMF276, ymf276_device, "ymf276", "YMF276 OPN2L")
 ym2612_device::ym2612_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
-	m_opn(*this),
+	m_fm(*this),
 	m_stream(nullptr),
-	m_busy_duration(m_opn.compute_busy_duration()),
+	m_busy_duration(m_fm.compute_busy_duration()),
 	m_address(0),
 	m_dac_data(0),
 	m_dac_enable(0),
@@ -48,7 +48,7 @@ u8 ym2612_device::read(offs_t offset)
 	switch (offset & 3)
 	{
 		case 0:	// status port, YM2203 compatible
-			result = m_opn.status();
+			result = m_fm.status();
 			break;
 
 		case 1: // data port (unused)
@@ -100,12 +100,12 @@ void ym2612_device::write(offs_t offset, u8 value)
 			}
 			else
 			{
-				// write to OPN
-				m_opn.write(m_address, value);
+				// write to FM
+				m_fm.write(m_address, value);
 			}
 
 			// mark busy for a bit
-			m_opn.set_busy_end(machine().time() + m_busy_duration);
+			m_fm.set_busy_end(machine().time() + m_busy_duration);
 			break;
 
 		case 2: // upper address port
@@ -118,12 +118,12 @@ void ym2612_device::write(offs_t offset, u8 value)
 			if (!BIT(m_address, 8))
 				break;
 
-			// write to OPN
+			// write to FM
 			m_stream->update();
-			m_opn.write(m_address, value);
+			m_fm.write(m_address, value);
 
 			// mark busy for a bit
-			m_opn.set_busy_end(machine().time() + m_busy_duration);
+			m_fm.set_busy_end(machine().time() + m_busy_duration);
 			break;
 	}
 }
@@ -136,7 +136,7 @@ void ym2612_device::write(offs_t offset, u8 value)
 void ym2612_device::device_start()
 {
 	// create our stream
-	m_stream = stream_alloc(0, ymopna_registers::OUTPUTS, m_opn.fm_sample_rate(clock()));
+	m_stream = stream_alloc(0, fm_engine::OUTPUTS, m_fm.sample_rate(clock()));
 
 	// call this for the variants that need to adjust the rate
 	device_clock_changed();
@@ -148,7 +148,7 @@ void ym2612_device::device_start()
 	save_item(YMFM_NAME(m_channel));
 
 	// save the engines
-	m_opn.save(*this);
+	m_fm.save(*this);
 }
 
 
@@ -159,7 +159,7 @@ void ym2612_device::device_start()
 void ym2612_device::device_reset()
 {
 	// reset the engines
-	m_opn.reset();
+	m_fm.reset();
 
 	// reset our internal state
 	m_dac_enable = 0;
@@ -173,11 +173,11 @@ void ym2612_device::device_reset()
 
 void ym2612_device::device_clock_changed()
 {
-	u32 const sample_divider = MULTIPLEX_OUTPUT ? ymopna_registers::CHANNELS : 1;
-	m_stream->set_sample_rate(m_opn.fm_sample_rate(clock()) * sample_divider);
+	u32 const sample_divider = MULTIPLEX_OUTPUT ? fm_engine::CHANNELS : 1;
+	m_stream->set_sample_rate(m_fm.sample_rate(clock()) * sample_divider);
 
 	// recompute the busy duration
-	m_busy_duration = m_opn.compute_busy_duration();
+	m_busy_duration = m_fm.compute_busy_duration();
 }
 
 
@@ -198,22 +198,22 @@ void ym2612_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 void ym2612_device::sound_stream_update_common(write_stream_view &outl, write_stream_view &outr, bool discontinuity)
 {
-	u32 const sample_divider = (discontinuity ? 260 : 256) * (MULTIPLEX_OUTPUT ? 1 : ymopna_registers::CHANNELS);
+	u32 const sample_divider = (discontinuity ? 260 : 256) * (MULTIPLEX_OUTPUT ? 1 : fm_engine::CHANNELS);
 
-	m_opn.prepare(ymopna_registers::ALL_CHANNELS);
+	m_fm.prepare(fm_engine::ALL_CHANNELS);
 
 	// iterate over all target samples
 	s32 sums[2] = { 0 };
 	for (int sampindex = 0; sampindex < outl.samples(); )
 	{
-		// clock the OPN when we hit channel 0
+		// clock the FM when we hit channel 0
 		if (m_channel == 0)
-			m_opn.clock(ymopna_registers::ALL_CHANNELS);
+			m_fm.clock(fm_engine::ALL_CHANNELS);
 
-		// update the current OPN channel; OPN2 is 9-bit with intermediate clipping
+		// update the current FM channel; YM2612 is 9-bit with intermediate clipping
 		s32 outputs[2] = { 0 };
 		if (m_channel != 5 || !m_dac_enable)
-			m_opn.output(outputs, 5, 256, 1 << m_channel);
+			m_fm.output(outputs, 5, 256, 1 << m_channel);
 		else
 			outputs[0] = outputs[1] = s16(m_dac_data << 7) >> 7;
 
@@ -311,7 +311,7 @@ ymf276_device::ymf276_device(const machine_config &mconfig, const char *tag, dev
 
 void ymf276_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(m_opn.fm_sample_rate(clock()));
+	m_stream->set_sample_rate(m_fm.sample_rate(clock()));
 }
 
 
@@ -322,32 +322,32 @@ void ymf276_device::device_clock_changed()
 void ymf276_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// mask off channel 6 if DAC is enabled
-	u8 const opn_mask = m_dac_enable ? 0x1f : 0x3f;
+	u8 const fm_mask = m_dac_enable ? 0x1f : 0x3f;
 
 	// prepare for output
-	m_opn.prepare(ymopna_registers::ALL_CHANNELS);
+	m_fm.prepare(fm_engine::ALL_CHANNELS);
 
 	// iterate over all target samples
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
-		// clock the OPN
-		m_opn.clock(ymopna_registers::ALL_CHANNELS);
+		// clock the FM
+		m_fm.clock(fm_engine::ALL_CHANNELS);
 
-		// update the OPN content; OPN2L is 14-bit with intermediate clipping
-		s32 sums[ymopna_registers::OUTPUTS] = { 0 };
-		m_opn.output(sums, 0, 8191, opn_mask);
+		// update the FM content; YMF276 is 14-bit with intermediate clipping
+		s32 sums[fm_engine::OUTPUTS] = { 0 };
+		m_fm.output(sums, 0, 8191, fm_mask);
 
 		// shifted down 1 bit after mixer
-		for (int index = 0; index < ymopna_registers::OUTPUTS; index++)
+		for (int index = 0; index < fm_engine::OUTPUTS; index++)
 			sums[index] >>= 1;
 
 		// add in DAC if enabled
 		if (m_dac_enable)
-			for (int index = 0; index < ymopna_registers::OUTPUTS; index++)
+			for (int index = 0; index < fm_engine::OUTPUTS; index++)
 				sums[index] += s16(m_dac_data << 7) >> 3;
 
 		// YMF3438 is stereo
-		for (int index = 0; index < ymopna_registers::OUTPUTS; index++)
+		for (int index = 0; index < fm_engine::OUTPUTS; index++)
 			outputs[index].put_int_clamp(sampindex, sums[0], 32768);
 	}
 }

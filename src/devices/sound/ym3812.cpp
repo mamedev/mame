@@ -21,7 +21,7 @@ ym3812_device::ym3812_device(const machine_config &mconfig, const char *tag, dev
 	device_sound_interface(mconfig, *this),
 	m_address(0),
 	m_stream(nullptr),
-	m_opl(*this)
+	m_fm(*this)
 {
 }
 
@@ -36,7 +36,7 @@ u8 ym3812_device::read(offs_t offset)
 	switch (offset & 1)
 	{
 		case 0: // status port
-			result = m_opl.status() | 0x06;
+			result = m_fm.status() | 0x06;
 			break;
 
 		case 1:	// data port (unused)
@@ -65,8 +65,8 @@ void ym3812_device::write(offs_t offset, u8 value)
 			// force an update
 			m_stream->update();
 
-			// write to OPL
-			m_opl.write(m_address, value);
+			// write to FM
+			m_fm.write(m_address, value);
 			break;
 	}
 }
@@ -79,7 +79,7 @@ void ym3812_device::write(offs_t offset, u8 value)
 void ym3812_device::device_start()
 {
 	// create our stream
-	m_stream = stream_alloc(0, ymopl_registers::OUTPUTS, m_opl.fm_sample_rate(clock()));
+	m_stream = stream_alloc(0, fm_engine::OUTPUTS, m_fm.sample_rate(clock()));
 
 	// call this for the variants that need to adjust the rate
 	device_clock_changed();
@@ -88,7 +88,7 @@ void ym3812_device::device_start()
 	save_item(YMFM_NAME(m_address));
 
 	// save the engines
-	m_opl.save(*this);
+	m_fm.save(*this);
 }
 
 
@@ -99,7 +99,7 @@ void ym3812_device::device_start()
 void ym3812_device::device_reset()
 {
 	// reset the engines
-	m_opl.reset();
+	m_fm.reset();
 }
 
 
@@ -109,7 +109,7 @@ void ym3812_device::device_reset()
 
 void ym3812_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(m_opl.fm_sample_rate(clock()));
+	m_stream->set_sample_rate(m_fm.sample_rate(clock()));
 }
 
 
@@ -120,21 +120,21 @@ void ym3812_device::device_clock_changed()
 void ym3812_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// prepare for output
-	m_opl.prepare(ymopl_registers::ALL_CHANNELS);
+	m_fm.prepare(fm_engine::ALL_CHANNELS);
 
 	// iterate over all target samples
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
 		// clock the system
-		m_opl.clock(ymopl_registers::ALL_CHANNELS);
+		m_fm.clock(fm_engine::ALL_CHANNELS);
 
-		// update the OPL content; clipping is unknown
-		s32 sums[ymopl_registers::OUTPUTS] = { 0 };
-		m_opl.output(sums, 1, 32767, ymopl_registers::ALL_CHANNELS);
+		// update the FM content; clipping is unknown
+		s32 sums[fm_engine::OUTPUTS] = { 0 };
+		m_fm.output(sums, 1, 32767, fm_engine::ALL_CHANNELS);
 
 		// convert to 10.3 floating point value for the DAC and back
-		// OPL is mono
-		for (int index = 0; index < ymopl_registers::OUTPUTS; index++)
+		// YM3812 is mono
+		for (int index = 0; index < fm_engine::OUTPUTS; index++)
 			outputs[index].put_int(sampindex, ymfm_roundtrip_fp(sums[index]), 32768);
 	}
 }

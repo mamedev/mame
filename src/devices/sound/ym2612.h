@@ -16,11 +16,14 @@ DECLARE_DEVICE_TYPE(YM2612, ym2612_device);
 class ym2612_device : public device_t, public device_sound_interface
 {
 public:
+	// YM2612 is OPNA
+	using fm_engine = ymopna_engine;
+
 	// constructor
 	ym2612_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type = YM2612);
 
 	// configuration helpers
-	auto irq_handler() { return m_opn.irq_handler(); }
+	auto irq_handler() { return m_fm.irq_handler(); }
 
 	// read/write access
 	u8 read(offs_t offset);
@@ -39,7 +42,7 @@ protected:
 	void sound_stream_update_common(write_stream_view &outl, write_stream_view &outr, bool discontinuity);
 
 	// internal state
-	ymopna_engine m_opn;             // core OPN engine
+	fm_engine m_fm;                  // core FM engine
 	sound_stream *m_stream;          // sound stream
 	attotime m_busy_duration;        // precomputed busy signal duration
 	u16 m_address;                   // address register

@@ -25,7 +25,7 @@ ym2413_device::ym2413_device(const machine_config &mconfig, const char *tag, dev
 	m_address(0),
 	m_stream(nullptr),
 	m_internal(*this, "internal"),
-	m_opll(*this)
+	m_fm(*this)
 {
 }
 
@@ -48,8 +48,8 @@ void ym2413_device::write(offs_t offset, u8 value)
 			// force an update
 			m_stream->update();
 
-			// write to OPL
-			m_opll.write(m_address, value);
+			// write to FM
+			m_fm.write(m_address, value);
 			break;
 	}
 }
@@ -62,7 +62,7 @@ void ym2413_device::write(offs_t offset, u8 value)
 void ym2413_device::device_start()
 {
 	// create our stream
-	m_stream = stream_alloc(0, ymopll_registers::OUTPUTS, m_opll.fm_sample_rate(clock()));
+	m_stream = stream_alloc(0, fm_engine::OUTPUTS, m_fm.sample_rate(clock()));
 
 	// call this for the variants that need to adjust the rate
 	device_clock_changed();
@@ -71,10 +71,10 @@ void ym2413_device::device_start()
 	save_item(YMFM_NAME(m_address));
 
 	// save the engines
-	m_opll.save(*this);
+	m_fm.save(*this);
 
 	// set up the instrument data
-	m_opll.set_instrument_data(m_internal->base());
+	m_fm.set_instrument_data(m_internal->base());
 }
 
 
@@ -85,7 +85,7 @@ void ym2413_device::device_start()
 void ym2413_device::device_reset()
 {
 	// reset the engines
-	m_opll.reset();
+	m_fm.reset();
 }
 
 
@@ -95,7 +95,7 @@ void ym2413_device::device_reset()
 
 void ym2413_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(m_opll.fm_sample_rate(clock()));
+	m_stream->set_sample_rate(m_fm.sample_rate(clock()));
 }
 
 
@@ -125,22 +125,22 @@ const tiny_rom_entry *ym2413_device::device_rom_region() const
 void ym2413_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// prepare for output
-	m_opll.prepare(ymopll_registers::ALL_CHANNELS);
+	m_fm.prepare(fm_engine::ALL_CHANNELS);
 
 	// iterate over all target samples
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
 		// clock the system
-		m_opll.clock(ymopll_registers::ALL_CHANNELS);
+		m_fm.clock(fm_engine::ALL_CHANNELS);
 
-		// update the OPL; OPLL is 9-bit, unsure of clipping but guessing
+		// update the FM; YM3812 is 9-bit, unsure of clipping but guessing
 		// it is similar to YM2612
-		s32 sums[ymopll_registers::OUTPUTS] = { 0 };
-		m_opll.output(sums, 5, 256, ymopll_registers::ALL_CHANNELS);
+		s32 sums[fm_engine::OUTPUTS] = { 0 };
+		m_fm.output(sums, 5, 256, fm_engine::ALL_CHANNELS);
 
-		// the OPLL is time multiplexed; just simulate this by summing all the
+		// the YM3812 is time multiplexed; just simulate this by summing all the
 		// channels and dividing down
-		for (int outnum = 0; outnum < ymopll_registers::OUTPUTS; outnum++)
+		for (int outnum = 0; outnum < fm_engine::OUTPUTS; outnum++)
 			outputs[outnum].put_int(sampindex, sums[outnum], 256*6*2);
 	}
 }

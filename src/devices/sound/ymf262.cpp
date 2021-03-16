@@ -21,7 +21,7 @@ ymf262_device::ymf262_device(const machine_config &mconfig, const char *tag, dev
 	device_sound_interface(mconfig, *this),
 	m_address(0),
 	m_stream(nullptr),
-	m_opl(*this)
+	m_fm(*this)
 {
 }
 
@@ -36,7 +36,7 @@ u8 ymf262_device::read(offs_t offset)
 	switch (offset & 1)
 	{
 		case 0: // status port
-			result = m_opl.status();
+			result = m_fm.status();
 			break;
 
 		case 1:	// data port (unused)
@@ -69,8 +69,8 @@ void ymf262_device::write(offs_t offset, u8 value)
 			// force an update
 			m_stream->update();
 
-			// write to OPL
-			m_opl.write(m_address, value);
+			// write to FM
+			m_fm.write(m_address, value);
 			break;
 
 		case 2: // upper address port
@@ -85,7 +85,7 @@ void ymf262_device::write(offs_t offset, u8 value)
 
 			// write to OPN
 			m_stream->update();
-			m_opl.write(m_address, value);
+			m_fm.write(m_address, value);
 			break;
 	}
 }
@@ -98,7 +98,7 @@ void ymf262_device::write(offs_t offset, u8 value)
 void ymf262_device::device_start()
 {
 	// create our stream
-	m_stream = stream_alloc(0, ymopl3_registers::OUTPUTS, m_opl.fm_sample_rate(clock()));
+	m_stream = stream_alloc(0, fm_engine::OUTPUTS, m_fm.sample_rate(clock()));
 
 	// call this for the variants that need to adjust the rate
 	device_clock_changed();
@@ -107,7 +107,7 @@ void ymf262_device::device_start()
 	save_item(YMFM_NAME(m_address));
 
 	// save the engines
-	m_opl.save(*this);
+	m_fm.save(*this);
 }
 
 
@@ -118,7 +118,7 @@ void ymf262_device::device_start()
 void ymf262_device::device_reset()
 {
 	// reset the engines
-	m_opl.reset();
+	m_fm.reset();
 }
 
 
@@ -128,7 +128,7 @@ void ymf262_device::device_reset()
 
 void ymf262_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(m_opl.fm_sample_rate(clock()));
+	m_stream->set_sample_rate(m_fm.sample_rate(clock()));
 }
 
 
@@ -139,20 +139,20 @@ void ymf262_device::device_clock_changed()
 void ymf262_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// prepare for output
-	m_opl.prepare(ymopl3_registers::ALL_CHANNELS);
+	m_fm.prepare(fm_engine::ALL_CHANNELS);
 
 	// iterate over all target samples
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
 		// clock the system
-		m_opl.clock(ymopl3_registers::ALL_CHANNELS);
+		m_fm.clock(fm_engine::ALL_CHANNELS);
 
-		// update the OPL content; clipping is unknown
-		s32 sums[ymopl3_registers::OUTPUTS] = { 0 };
-		m_opl.output(sums, 0, 32767, ymopl3_registers::ALL_CHANNELS);
+		// update the FM content; clipping is unknown
+		s32 sums[fm_engine::OUTPUTS] = { 0 };
+		m_fm.output(sums, 0, 32767, fm_engine::ALL_CHANNELS);
 
-		// OPL3 outputs straight 16-bit data in 4 channels
-		for (int index = 0; index < ymopl3_registers::OUTPUTS; index++)
+		// YMF262 outputs straight 16-bit data in 4 channels
+		for (int index = 0; index < fm_engine::OUTPUTS; index++)
 			outputs[index].put_int(sampindex, sums[index], 32768);
 	}
 }

@@ -16,17 +16,20 @@ DECLARE_DEVICE_TYPE(Y8950, y8950_device);
 
 class y8950_device : public device_t, public device_sound_interface, public device_rom_interface<21>
 {
+public:
+	// YM2151 is OPL
+	using fm_engine = ymopl_engine;
+
 	static constexpr u8 STATUS_ADPCM_B_PLAYING = 0x01;
 	static constexpr u8 STATUS_ADPCM_B_BRDY = 0x08;
 	static constexpr u8 STATUS_ADPCM_B_EOS = 0x10;
-	static constexpr u8 ALL_IRQS = STATUS_ADPCM_B_BRDY | STATUS_ADPCM_B_EOS | ymopl_registers::STATUS_TIMERA | ymopl_registers::STATUS_TIMERB;
+	static constexpr u8 ALL_IRQS = STATUS_ADPCM_B_BRDY | STATUS_ADPCM_B_EOS | fm_engine::STATUS_TIMERA | fm_engine::STATUS_TIMERB;
 
-public:
 	// constructor
 	y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type = Y8950);
 
 	// configuration helpers
-	auto irq_handler() { return m_opl.irq_handler(); }
+	auto irq_handler() { return m_fm.irq_handler(); }
 	auto keyboard_read() { return m_keyboard_read_handler.bind(); }
 	auto keyboard_write() { return m_keyboard_write_handler.bind(); }
 	auto io_read() { return m_io_read_handler.bind(); }
@@ -65,7 +68,7 @@ private:
 	u8 m_address;                    // address register
 	u8 m_io_ddr;                     // data direction register for I/O
 	sound_stream *m_stream;          // sound stream
-	ymopl_engine m_opl;              // core OPL engine
+	fm_engine m_fm;                  // core FM engine
 	ymadpcm_b_engine m_adpcm_b;      // ADPCM-B engine
 	devcb_read8 m_keyboard_read_handler; // keyboard port read
 	devcb_write8 m_keyboard_write_handler; // keyboard port write

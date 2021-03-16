@@ -1196,6 +1196,12 @@ public:
 	static constexpr u32 ALL_CHANNELS = RegisterType::ALL_CHANNELS;
 	static constexpr u32 OPERATORS = RegisterType::OPERATORS;
 
+	// also expose status flags for consumers that inject additional bits
+	static constexpr u8 STATUS_TIMERA = RegisterType::STATUS_TIMERA;
+	static constexpr u8 STATUS_TIMERB = RegisterType::STATUS_TIMERB;
+	static constexpr u8 STATUS_BUSY = RegisterType::STATUS_BUSY;
+	static constexpr u8 STATUS_IRQ = RegisterType::STATUS_IRQ;
+
 	// constructor
 	ymfm_engine_base(device_t &device);
 
@@ -1250,7 +1256,7 @@ public:
 	void set_clock_prescale(u32 prescale) { m_clock_prescale = prescale; }
 
 	// compute sample rate
-	u32 fm_sample_rate(u32 baseclock) const { return baseclock / (m_clock_prescale * RegisterType::OPERATORS); }
+	u32 sample_rate(u32 baseclock) const { return baseclock / (m_clock_prescale * RegisterType::OPERATORS); }
 
 	// reset the LFO state
 	void reset_lfo() { m_regs.reset_lfo(); }

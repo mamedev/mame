@@ -301,7 +301,7 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		}
 	}
 
-	m_opl.prepare(ymopl3_registers::ALL_CHANNELS);
+	m_fm.prepare(fm_engine::ALL_CHANNELS);
 
 	mixp = &m_mix_buffer[0];
 	stream_buffer::sample_t wtl = stream_buffer::sample_t(m_mix_level[m_pcm_l]) / (65536.0f * 32768.0f);
@@ -311,11 +311,11 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	for (i = 0; i < outputs[0].samples(); i++)
 	{
 		// clock the system
-		m_opl.clock(ymopl3_registers::ALL_CHANNELS);
+		m_fm.clock(fm_engine::ALL_CHANNELS);
 
-		// update the OPL content; clipping is unknown
-		s32 sums[ymopl3_registers::OUTPUTS] = { 0 };
-		m_opl.output(sums, 0, 32767, ymopl3_registers::ALL_CHANNELS);
+		// update the FM content; clipping is unknown
+		s32 sums[fm_engine::OUTPUTS] = { 0 };
+		m_fm.output(sums, 0, 32767, fm_engine::ALL_CHANNELS);
 
 		// DO2 output: mixed FM channels 0+1 and wavetable channels 0+1
 		outputs[0].put(i, stream_buffer::sample_t(*mixp++) * wtl + stream_buffer::sample_t(sums[0]) * fml);
@@ -716,7 +716,7 @@ void ymf278b_device::write(offs_t offset, u8 data)
 			if (m_lastport) B_w(m_port_AB, data);
 			else A_w(m_port_AB, data);
 			m_last_fm_data = data;
-			m_opl.write(m_port_AB | (m_lastport << 8), data);
+			m_fm.write(m_port_AB | (m_lastport << 8), data);
 			break;
 
 		case 4:
@@ -857,7 +857,7 @@ void ymf278b_device::device_reset()
 	if (!m_irq_handler.isnull())
 		m_irq_handler(0);
 
-	m_opl.reset();
+	m_fm.reset();
 }
 
 void ymf278b_device::device_clock_changed()
@@ -1023,7 +1023,7 @@ void ymf278b_device::device_start()
 	register_save_state();
 
 	// YMF262 related
-	m_opl.save(*this);
+	m_fm.save(*this);
 }
 
 
@@ -1035,6 +1035,6 @@ ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, d
 	, device_rom_interface(mconfig, *this)
 	, m_irq_handler(*this)
 	, m_last_fm_data(0)
-	, m_opl(*this)
+	, m_fm(*this)
 {
 }

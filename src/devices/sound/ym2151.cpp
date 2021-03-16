@@ -21,10 +21,10 @@ DEFINE_DEVICE_TYPE(YM2414, ym2414_device, "ym2414", "YM2414 OPZ")
 ym2151_device::ym2151_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
-	m_opm(*this),
+	m_fm(*this),
 	m_stream(nullptr),
 	m_port_w(*this),
-	m_busy_duration(m_opm.compute_busy_duration()),
+	m_busy_duration(m_fm.compute_busy_duration()),
 	m_address(0),
 	m_reset_state(1)
 {
@@ -45,7 +45,7 @@ u8 ym2151_device::read(offs_t offset)
 			break;
 
 		case 1:	// status port, YM2203 compatible
-			result = m_opm.status();
+			result = m_fm.status();
 			break;
 	}
 	return result;
@@ -74,14 +74,14 @@ void ym2151_device::write(offs_t offset, u8 value)
 			// force an update
 			m_stream->update();
 
-			// write to OPM
-			m_opm.write(m_address, value);
+			// write to FM
+			m_fm.write(m_address, value);
 
 			// special cases
 			if (m_address == 0x01 && BIT(value, 1))
 			{
 				// writes to the test register can reset the LFO
-				m_opm.reset_lfo();
+				m_fm.reset_lfo();
 			}
 			else if (m_address == 0x1b)
 			{
@@ -90,7 +90,7 @@ void ym2151_device::write(offs_t offset, u8 value)
 			}
 
 			// mark busy for a bit
-			m_opm.set_busy_end(machine().time() + m_busy_duration);
+			m_fm.set_busy_end(machine().time() + m_busy_duration);
 			break;
 	}
 }
@@ -116,7 +116,7 @@ WRITE_LINE_MEMBER(ym2151_device::reset_w)
 void ym2151_device::device_start()
 {
 	// create our stream
-	m_stream = stream_alloc(0, ymopm_registers::OUTPUTS, m_opm.fm_sample_rate(clock()));
+	m_stream = stream_alloc(0, fm_engine::OUTPUTS, m_fm.sample_rate(clock()));
 
 	// resolve the write callback
 	m_port_w.resolve_safe();
@@ -129,7 +129,7 @@ void ym2151_device::device_start()
 	save_item(YMFM_NAME(m_reset_state));
 
 	// save the engines
-	m_opm.save(*this);
+	m_fm.save(*this);
 }
 
 
@@ -140,7 +140,7 @@ void ym2151_device::device_start()
 void ym2151_device::device_reset()
 {
 	// reset the engines
-	m_opm.reset();
+	m_fm.reset();
 }
 
 
@@ -150,8 +150,8 @@ void ym2151_device::device_reset()
 
 void ym2151_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(m_opm.fm_sample_rate(clock()));
-	m_busy_duration = m_opm.compute_busy_duration();
+	m_stream->set_sample_rate(m_fm.sample_rate(clock()));
+	m_busy_duration = m_fm.compute_busy_duration();
 }
 
 
@@ -162,21 +162,21 @@ void ym2151_device::device_clock_changed()
 void ym2151_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// prepare for output
-	m_opm.prepare(ymopm_registers::ALL_CHANNELS);
+	m_fm.prepare(fm_engine::ALL_CHANNELS);
 
 	// iterate over all target samples
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
 		// clock the system
-		m_opm.clock(ymopm_registers::ALL_CHANNELS);
+		m_fm.clock(fm_engine::ALL_CHANNELS);
 
-		// update the OPM content; OPM is full 14-bit with no intermediate clipping
-		s32 sums[ymopm_registers::OUTPUTS] = { 0 };
-		m_opm.output(sums, 0, 32767, ymopm_registers::ALL_CHANNELS);
+		// update the FM content; YM2151 is full 14-bit with no intermediate clipping
+		s32 sums[fm_engine::OUTPUTS] = { 0 };
+		m_fm.output(sums, 0, 32767, fm_engine::ALL_CHANNELS);
 
 		// convert to 10.3 floating point value for the DAC and back
-		// OPM is stereo
-		for (int index = 0; index < ymopm_registers::OUTPUTS; index++)
+		// YM2151 is stereo
+		for (int index = 0; index < fm_engine::OUTPUTS; index++)
 			outputs[index].put_int(sampindex, ymfm_roundtrip_fp(sums[index]), 32768);
 	}
 }
@@ -218,15 +218,15 @@ void ym2164_device::write(offs_t offset, u8 value)
 			// force an update
 			m_stream->update();
 
-			// write to OPM
-			m_opm.write(m_address, value);
+			// write to FM
+			m_fm.write(m_address, value);
 
 			// writes to register 0x1B send the upper 2 bits to the output lines
 			if (m_address == 0x1b)
 				m_port_w(0, value >> 6, 0xff);
 
 			// mark busy for a bit
-			m_opm.set_busy_end(machine().time() + m_busy_duration);
+			m_fm.set_busy_end(machine().time() + m_busy_duration);
 			break;
 	}
 }

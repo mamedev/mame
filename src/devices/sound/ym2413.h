@@ -16,6 +16,9 @@ DECLARE_DEVICE_TYPE(YM2413, ym2413_device);
 class ym2413_device : public device_t, public device_sound_interface
 {
 public:
+	// YM2151 is OPLL
+	using fm_engine = ymopll_engine;
+
 	// constructor
 	ym2413_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type = YM2413, u8 const *instruments = nullptr);
 
@@ -39,7 +42,7 @@ protected:
 	u8 m_address;                    // address register
 	sound_stream *m_stream;          // sound stream
 	required_memory_region m_internal; // internal memory region
-	ymopll_engine m_opll;            // core OPLL engine
+	fm_engine m_fm;                  // core FM engine
 };
 
 

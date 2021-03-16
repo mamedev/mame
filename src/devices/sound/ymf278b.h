@@ -11,6 +11,9 @@
 class ymf278b_device : public device_t, public device_sound_interface, public device_rom_interface<22>
 {
 public:
+	// YMF278B is OPL3/4
+	using fm_engine = ymopl3_engine;
+
 	ymf278b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
@@ -127,7 +130,7 @@ private:
 	uint8_t m_last_fm_data;
 
 	// ymf262
-	ymopl3_engine m_opl;
+	fm_engine m_fm;
 };
 
 DECLARE_DEVICE_TYPE(YMF278B, ymf278b_device)
