@@ -136,22 +136,10 @@ namespace {
 #define A2GS_7M     (A2GS_MASTER_CLOCK/4)
 #define A2GS_1M     (A2GS_MASTER_CLOCK/28)
 
-#define A2GS_CPU_TAG "maincpu"
-#define A2GS_ADBMCU_TAG    "adbmicro"
-#define A2GS_KBDC_TAG "ay3600"
-#define A2GS_BUS_TAG "a2bus"
-#define A2GS_SPEAKER_TAG "speaker"
-#define A2GS_CASSETTE_TAG "tape"
 #define A2GS_UPPERBANK_TAG "inhbank"
 #define A2GS_AUXUPPER_TAG "inhaux"
 #define A2GS_00UPPER_TAG "inh00"
 #define A2GS_01UPPER_TAG "inh01"
-#define A2GS_IWM_TAG    "fdc"   // must be "fdc" or sonydriv pukes
-#define A2GS_DOC_TAG    "doc"
-#define A2GS_VIDEO_TAG "a2video"
-#define SCC_TAG    "scc"
-#define RS232A_TAG "printer"
-#define RS232B_TAG "modem"
 
 #define A2GS_C300_TAG "c3bank"
 #define A2GS_LCBANK_TAG "lcbank"
@@ -169,29 +157,26 @@ namespace {
 
 #define A2GS_KBD_SPEC_TAG "keyb_special"
 
-#define CNXX_UNCLAIMED  -1
-#define CNXX_INTROM     -2
-
 class apple2gs_state : public driver_device
 {
 public:
 	apple2gs_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, A2GS_CPU_TAG),
+		  m_maincpu(*this, "maincpu"),
 		  m_screen(*this, "screen"),
 		  m_scantimer(*this, "scantimer"),
 		  m_acceltimer(*this, "acceltimer"),
-		  m_adbmicro(*this, A2GS_ADBMCU_TAG),
-		  m_ram(*this, RAM_TAG),
+		  m_adbmicro(*this, "adbmicro"),
+		  m_ram(*this, "ram"),
 		  m_rom(*this, "maincpu"),
 		  m_docram(*this, "docram"),
 		  m_nvram(*this, "nvram"),
-		  m_video(*this, A2GS_VIDEO_TAG),
-		  m_a2bus(*this, A2GS_BUS_TAG),
+		  m_video(*this, "a2video"),
+		  m_a2bus(*this, "a2bus"),
 		  m_a2common(*this, "a2common"),
 		  //      m_a2host(*this, "a2host"),
 		  m_gameio(*this, "gameio"),
-		  m_speaker(*this, A2GS_SPEAKER_TAG),
+		  m_speaker(*this, "speaker"),
 		  m_upperbank(*this, A2GS_UPPERBANK_TAG),
 		  m_upperaux(*this, A2GS_AUXUPPER_TAG),
 		  m_upper00(*this, A2GS_00UPPER_TAG),
@@ -209,8 +194,8 @@ public:
 		  m_lc01(*this, A2GS_LC01_TAG),
 		  m_bank0_atc(*this, A2GS_B0CXXX_TAG),
 		  m_bank1_atc(*this, A2GS_B1CXXX_TAG),
-		  m_scc(*this, SCC_TAG),
-		  m_doc(*this, A2GS_DOC_TAG),
+		  m_scc(*this, "scc"),
+		  m_doc(*this, "doc"),
 		  m_iwm(*this, "fdc"),
 		  m_floppy(*this, "fdc:%d", 0U),
 		  m_kbd(*this, "Y%d", 0),
@@ -265,6 +250,9 @@ private:
 	required_memory_region m_kbdrom;
 	required_ioport m_adb_mousex, m_adb_mousey;
 
+	static constexpr int CNXX_UNCLAIMED = -1;
+	static constexpr int CNXX_INTROM = -2;
+
 	enum glu_reg_names
 	{
 		// these are the MCU-visible registers
@@ -282,54 +270,40 @@ private:
 		GLU_SYSSTAT     // 816 R/(limited) W
 	};
 
-	enum glu_kg_status
-	{
-		KGS_ANY_KEY_DOWN = 0x01,
-		KGS_KEYSTROBE    = 0x10,
-		KGS_DATA_FULL    = 0x20,
-		KGS_COMMAND_FULL = 0x40,
-		KGS_MOUSEX_FULL  = 0x80
-	};
 
-	enum glu_sys_status
-	{
-		GLU_STATUS_CMDFULL  = 0x01,
-		GLU_STATUS_MOUSEXY  = 0x02,
-		GLU_STATUS_KEYDATIRQEN = 0x04,
-		GLU_STATUS_KEYDATIRQ = 0x08,
-		GLU_STATUS_DATAIRQEN = 0x10,
-		GLU_STATUS_DATAIRQ  = 0x20,
-		GLU_STATUS_MOUSEIRQEN = 0x40,
-		GLU_STATUS_MOUSEIRQ = 0x080
-	};
+	static constexpr u8 KGS_ANY_KEY_DOWN = 0x01;
+	static constexpr u8 KGS_KEYSTROBE    = 0x10;
+	static constexpr u8 KGS_DATA_FULL    = 0x20;
+	static constexpr u8 KGS_COMMAND_FULL = 0x40;
+	static constexpr u8 KGS_MOUSEX_FULL  = 0x80;
 
-	enum shadow_reg_bits
-	{
-		SHAD_IOLC       = 0x40, // I/O and language card inhibit for banks 00/01
-		SHAD_TXTPG2     = 0x20, // inhibits text-page 2 shadowing in both banks (ROM 03 h/w only)
-		SHAD_AUXHIRES   = 0x10, // inhibits bank 01 hi-res region shadowing
-		SHAD_SUPERHIRES = 0x08, // inhibits bank 01 super-hi-res region shadowing
-		SHAD_HIRESPG2   = 0x04, // inhibits hi-res page 2 shadowing in both banks
-		SHAD_HIRESPG1   = 0x02, // inhibits hi-res page 1 shadowing in both banks
-		SHAD_TXTPG1     = 0x01  // inhibits text-page 1 shadowing in both banks
-	};
+	[[maybe_unused]] static constexpr u8 GLU_STATUS_CMDFULL  = 0x01;
+	[[maybe_unused]] static constexpr u8 GLU_STATUS_MOUSEXY  = 0x02;
+	static constexpr u8 GLU_STATUS_KEYDATIRQEN = 0x04;
+	static constexpr u8 GLU_STATUS_KEYDATIRQ = 0x08;
+	[[maybe_unused]] static constexpr u8 GLU_STATUS_DATAIRQEN = 0x10;
+	static constexpr u8 GLU_STATUS_DATAIRQ  = 0x20;
+	static constexpr u8 GLU_STATUS_MOUSEIRQEN = 0x40;
+	static constexpr u8 GLU_STATUS_MOUSEIRQ = 0x080;
 
-	enum speed_reg_bits
-	{
-		SPEED_HIGH      = 0x80, // full 2.8 MHz speed when set, Apple II 1 MHz when clear
-		SPEED_POWERON   = 0x40, // ROM 03 only; indicates machine turned on by power switch (as opposed to ?)
-		SPEED_ALLBANKS  = 0x10, // enables bank 0/1 shadowing in all banks (not supported)
-		SPEED_DISKIISL7 = 0x08, // enable Disk II motor on detect for slot 7
-		SPEED_DISKIISL6 = 0x04, // enable Disk II motor on detect for slot 6
-		SPEED_DISKIISL5 = 0x02, // enable Disk II motor on detect for slot 5
-		SPEED_DISKIISL4 = 0x01  // enable Disk II motor on detect for slot 4
-	};
+	static constexpr u8 SHAD_IOLC       = 0x40; // I/O and language card inhibit for banks 00/01
+	static constexpr u8 SHAD_TXTPG2     = 0x20; // inhibits text-page 2 shadowing in both banks (ROM 03 h/w only)
+	static constexpr u8 SHAD_AUXHIRES   = 0x10; // inhibits bank 01 hi-res region shadowing
+	static constexpr u8 SHAD_SUPERHIRES = 0x08; // inhibits bank 01 super-hi-res region shadowing
+	static constexpr u8 SHAD_HIRESPG2   = 0x04; // inhibits hi-res page 2 shadowing in both banks
+	static constexpr u8 SHAD_HIRESPG1   = 0x02; // inhibits hi-res page 1 shadowing in both banks
+	static constexpr u8 SHAD_TXTPG1     = 0x01; // inhibits text-page 1 shadowing in both banks
 
-	enum disk_reg_bits
-	{
-		DISKREG_HDSEL   = 7, // select signal for 3.5" Sony drives
-		DISKREG_35SEL   = 6  // 1 to enable 3.5" drives, 0 to chain through to 5.25"
-	};
+	static constexpr u8 SPEED_HIGH      = 0x80; // full 2.8 MHz speed when set, Apple II 1 MHz when clear
+	[[maybe_unused]] static constexpr u8 SPEED_POWERON = 0x40; // ROM 03 only; indicates machine turned on by power switch (as opposed to ?)
+	static constexpr u8 SPEED_ALLBANKS  = 0x10; // enables bank 0/1 shadowing in all banks (not supported)
+	[[maybe_unused]] static constexpr u8 SPEED_DISKIISL7 = 0x08; // enable Disk II motor on detect for slot 7
+	[[maybe_unused]] static constexpr u8 SPEED_DISKIISL6 = 0x04; // enable Disk II motor on detect for slot 6
+	[[maybe_unused]] static constexpr u8 SPEED_DISKIISL5 = 0x02; // enable Disk II motor on detect for slot 5
+	[[maybe_unused]] static constexpr u8 SPEED_DISKIISL4 = 0x01; // enable Disk II motor on detect for slot 4
+
+	static constexpr u8 DISKREG_HDSEL = 7; // select signal for 3.5" Sony drives
+	static constexpr u8 DISKREG_35SEL = 6; // 1 to enable 3.5" drives, 0 to chain through to 5.25"
 
 	enum irq_sources
 	{
@@ -343,28 +317,22 @@ private:
 		IRQS_SCC        = 7
 	};
 
-	enum intflag_bits
-	{
-		INTFLAG_IRQASSERTED = 0x01,
-		INTFLAG_M2MOUSEMOVE = 0x02,
-		INTFLAG_M2MOUSESW   = 0x04,
-		INTFLAG_VBL         = 0x08,
-		INTFLAG_QUARTER     = 0x10,
-		INTFLAG_AN3         = 0x20,
-		INTFLAG_MOUSEDOWNLAST = 0x40,
-		INTFLAG_MOUSEDOWN   = 0x80
-	};
+	static constexpr u8 INTFLAG_IRQASSERTED = 0x01;
+	[[maybe_unused]] static constexpr u8 INTFLAG_M2MOUSEMOVE = 0x02;
+	[[maybe_unused]] static constexpr u8 INTFLAG_M2MOUSESW   = 0x04;
+	static constexpr u8 INTFLAG_VBL         = 0x08;
+	static constexpr u8 INTFLAG_QUARTER     = 0x10;
+	static constexpr u8 INTFLAG_AN3         = 0x20;
+	[[maybe_unused]] static constexpr u8 INTFLAG_MOUSEDOWNLAST = 0x40;
+	[[maybe_unused]] static constexpr u8 INTFLAG_MOUSEDOWN   = 0x80;
 
-	enum vgcint_bits
-	{
-		VGCINT_EXTERNALEN   = 0x01,
-		VGCINT_SCANLINEEN   = 0x02,
-		VGCINT_SECONDENABLE = 0x04,
-		VGCINT_EXTERNAL     = 0x10,
-		VGCINT_SCANLINE     = 0x20,
-		VGCINT_SECOND       = 0x40,
-		VGCINT_ANYVGCINT    = 0x80
-	};
+	[[maybe_unused]]  static constexpr u8 VGCINT_EXTERNALEN = 0x01;
+	static constexpr u8 VGCINT_SCANLINEEN   = 0x02;
+	static constexpr u8 VGCINT_SECONDENABLE = 0x04;
+	[[maybe_unused]] static constexpr u8 VGCINT_EXTERNAL     = 0x10;
+	static constexpr u8 VGCINT_SCANLINE     = 0x20;
+	static constexpr u8 VGCINT_SECOND       = 0x40;
+	static constexpr u8 VGCINT_ANYVGCINT    = 0x80;
 
 	enum apple2gs_clock_mode
 	{
@@ -522,6 +490,7 @@ private:
 	double m_joystick_x1_time, m_joystick_y1_time, m_joystick_x2_time, m_joystick_y2_time;
 
 	int m_inh_slot, m_cnxx_slot;
+	int m_motoroff_time;
 
 	bool m_page2;
 	bool m_an0, m_an1, m_an2, m_an3;
@@ -1542,6 +1511,7 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_accel_percent));
 	save_item(NAME(m_accel_temp_slowdown));
 	save_item(NAME(m_accel_speed));
+	save_item(NAME(m_motoroff_time));
 }
 
 void apple2gs_state::machine_reset()
@@ -1627,6 +1597,8 @@ void apple2gs_state::machine_reset()
 	m_intflag = 0;
 	m_vgcint = 0;
 	m_inten = 0;
+
+	m_motoroff_time = 0;
 
 	m_slow_counter = 0;
 
@@ -1843,6 +1815,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 			{
 				m_intflag |= INTFLAG_QUARTER;
 				raise_irq(IRQS_QTRSEC);
+			}
+		}
+
+		// 3.5 motor off timeout
+		if (m_motoroff_time > 0)
+		{
+			m_motoroff_time--;
+			if (m_motoroff_time == 0)
+			{
+				m_floppy[2]->get_device()->tfsel_w(0);
+				m_floppy[3]->get_device()->tfsel_w(0);
 			}
 		}
 
@@ -2330,15 +2313,18 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 	slow_cycle();
 	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
+#if RUN_ADB_MICRO
+	u8 uKeyboard = keyglu_816_read(GLU_C000);
+	u8 uKeyboardC010 = keyglu_816_read(GLU_C010);
+#else
+	u8 uKeyboard = m_transchar | m_strobe;
+	u8 uKeyboardC010 = m_transchar;
+#endif
 
 	switch (offset)
 	{
 		case 0x00:  // keyboard latch
-		#if RUN_ADB_MICRO
-			return keyglu_816_read(GLU_C000);
-		#else
-			return m_transchar | m_strobe;
-		#endif
+			return uKeyboard;
 
 		case 0x02:  // RAMRDOFF
 			m_ramrd = false;
@@ -2361,58 +2347,53 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			break;
 
 		case 0x10:  // read any key down, reset keyboard strobe
-		#if RUN_ADB_MICRO
-			return keyglu_816_read(GLU_C010);
-		#else
-			ret = m_transchar | (m_anykeydown ? 0x80 : 0x00);
 			m_strobe = 0;
-			return ret;
-		#endif
+			return uKeyboardC010 | (m_anykeydown ? 0x80 : 0x00);
 
 		case 0x11:  // read LCRAM2 (LC Dxxx bank)
-			return m_lcram2 ? 0x80 : 0x00;
+			return uKeyboardC010 | (m_lcram2 ? 0x80 : 0x00);
 
 		case 0x12:  // read LCRAM (is LC readable?)
-			return m_lcram ? 0x80 : 0x00;
+			return uKeyboardC010 | (m_lcram ? 0x80 : 0x00);
 
 		case 0x13:  // read RAMRD
-			return m_ramrd ? 0x80 : 0x00;
+			return uKeyboardC010 | (m_ramrd ? 0x80 : 0x00);
 
 		case 0x14:  // read RAMWRT
-			return m_ramwrt ? 0x80 : 0x00;
+			return uKeyboardC010 | (m_ramwrt ? 0x80 : 0x00);
 
 		case 0x15:  // read INTCXROM
-			return m_intcxrom ? 0x80 : 0x00;
+			return uKeyboardC010 | (m_intcxrom ? 0x80 : 0x00);
 
 		case 0x16:  // read ALTZP
-			return m_altzp ? 0x80 : 0x00;
+			return uKeyboardC010 | (m_altzp ? 0x80 : 0x00);
 
 		case 0x17:  // read SLOTC3ROM
-			return m_slotc3rom ? 0x80 : 0x00;
+			return uKeyboardC010 | (m_slotc3rom ? 0x80 : 0x00);
 
 		case 0x18:  // read 80STORE
-			return m_80store ? 0x80 : 0x00;
+			return uKeyboardC010 | (m_80store ? 0x80 : 0x00);
 
 		case 0x19:  // read VBLBAR
-			return m_screen->vblank() ? 0x00 : 0x80;
+			return uKeyboardC010 | (m_screen->vblank() ? 0x00 : 0x80);
 
 		case 0x1a:  // read TEXT
-			return m_video->m_graphics ? 0x00 : 0x80;
+			return uKeyboardC010 | (m_video->m_graphics ? 0x00 : 0x80);
 
 		case 0x1b:  // read MIXED
-			return m_video->m_mix ? 0x80 : 0x00;
+			return uKeyboardC010 | (m_video->m_mix ? 0x80 : 0x00);
 
 		case 0x1c:  // read PAGE2
-			return m_page2 ? 0x80 : 0x00;
+			return uKeyboardC010 | (m_page2 ? 0x80 : 0x00);
 
 		case 0x1d:  // read HIRES
-			return m_video->m_hires ? 0x80 : 0x00;
+			return uKeyboardC010 | (m_video->m_hires ? 0x80 : 0x00);
 
 		case 0x1e:  // read ALTCHARSET
-			return m_video->m_altcharset ? 0x80 : 0x00;
+			return uKeyboardC010 | (m_video->m_altcharset ? 0x80 : 0x00);
 
 		case 0x1f:  // read 80COL
-			return m_video->m_80col ? 0x80 : 0x00;
+			return uKeyboardC010 | (m_video->m_80col ? 0x80 : 0x00);
 
 		case 0x22:  // TEXTCOL
 			return m_textcol;
@@ -2672,6 +2653,12 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			break;
 	}
 
+	// assume all $C00X returns the keyboard, like on the IIe
+	if ((offset & 0xf0) == 0x00)
+	{
+		return uKeyboard;
+	}
+
 	return read_floatingbus();
 }
 
@@ -2834,7 +2821,12 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 		case 0x2d:  // SLOTROMSEL
 			m_slotromsel = data;
 			break;
-		case 0x31:  // DISKREG
+		case 0x31:  //
+			if (!BIT(data, DISKREG_35SEL))
+			{
+				m_motoroff_time = 30;
+			}
+
 			if ((m_cur_floppy) && (BIT(data, DISKREG_35SEL)))
 			{
 				m_cur_floppy->ss_w(BIT(data, DISKREG_HDSEL));
@@ -4439,6 +4431,7 @@ void apple2gs_state::devsel_w(uint8_t devsel)
 		else
 		{
 			m_cur_floppy = m_floppy[2]->get_device();
+			m_motoroff_time = 0;
 		}
 	}
 	else if (m_devsel == 2)
@@ -4450,6 +4443,7 @@ void apple2gs_state::devsel_w(uint8_t devsel)
 		else
 		{
 			m_cur_floppy = m_floppy[3]->get_device();
+			m_motoroff_time = 0;
 		}
 	}
 	else
@@ -4932,15 +4926,15 @@ void apple2gs_state::apple2gs(machine_config &config)
 	/* serial */
 	SCC85C30(config, m_scc, A2GS_14M/2);
 	m_scc->out_int_callback().set(FUNC(apple2gs_state::scc_irq_w));
-	m_scc->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
-	m_scc->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
+	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
+	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
 
-	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
+	rs232_port_device &rs232a(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
 	rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
 	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
 
-	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
+	rs232_port_device &rs232b(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
 	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
@@ -5001,7 +4995,7 @@ void apple2gs_state::apple2gsr1(machine_config &config)
 ***************************************************************************/
 ROM_START(apple2gs)
 	// M50740/50741 ADB MCU inside the IIgs system unit
-	ROM_REGION(0x1000, A2GS_ADBMCU_TAG, 0)
+	ROM_REGION(0x1000, "adbmicro", 0)
 	ROM_LOAD( "341s0632-2.bin", 0x000000, 0x001000, CRC(e1c11fb0) SHA1(141d18c36a617ab9dce668445440d34354be0672) )
 
 	// i8048 microcontroller inside the IIgs ADB Standard Keyboard
@@ -5029,7 +5023,7 @@ ROM_START(apple2gs)
 ROM_END
 
 ROM_START(apple2gsr3p)
-	ROM_REGION(0x1000, A2GS_ADBMCU_TAG, 0)
+	ROM_REGION(0x1000, "adbmicro", 0)
 	ROM_LOAD( "341s0632-2.bin", 0x000000, 0x001000, CRC(e1c11fb0) SHA1(141d18c36a617ab9dce668445440d34354be0672) )
 
 	ROM_REGION(0x400, "kmcu", 0)
@@ -5049,7 +5043,7 @@ ROM_START(apple2gsr3p)
 ROM_END
 
 ROM_START(apple2gsr1)
-	ROM_REGION(0xc00, A2GS_ADBMCU_TAG, 0)
+	ROM_REGION(0xc00, "adbmicro", 0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
 	ROM_REGION(0x400, "kmcu", 0)
@@ -5068,7 +5062,7 @@ ROM_START(apple2gsr1)
 ROM_END
 
 ROM_START(apple2gsr0)
-	ROM_REGION(0xc00, A2GS_ADBMCU_TAG, 0)
+	ROM_REGION(0xc00, "adbmicro", 0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
 	ROM_REGION(0x400, "kmcu", 0)
@@ -5087,7 +5081,7 @@ ROM_START(apple2gsr0)
 ROM_END
 
 ROM_START(apple2gsr0p)  // 6/19/1986 Cortland prototype
-	ROM_REGION(0xc00, A2GS_ADBMCU_TAG, 0)
+	ROM_REGION(0xc00, "adbmicro", 0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
 	ROM_REGION(0x400, "kmcu", 0)
@@ -5106,7 +5100,7 @@ ROM_START(apple2gsr0p)  // 6/19/1986 Cortland prototype
 ROM_END
 
 ROM_START(apple2gsr0p2)  // 3/10/1986 Cortland prototype, boots as "Apple //'ing - Alpha 2.0"
-	ROM_REGION(0xc00, A2GS_ADBMCU_TAG, 0)
+	ROM_REGION(0xc00, "adbmicro", 0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
 	ROM_REGION(0x400, "kmcu", 0)
