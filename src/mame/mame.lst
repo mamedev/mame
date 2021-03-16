@@ -16160,6 +16160,7 @@ cfrogger                        // Coleco
 gjungler                        // Gakken
 
 @source:hh_pic16.cpp
+drdunk                          // Kmart
 flash                           // Ideal
 hccbaskb                        // Tiger Electronics
 leboom                          // Lakeside
@@ -16168,7 +16169,6 @@ melodym                         // GAF
 matchme                         // Kingsford
 pabball                         // Caprice
 rockpin                         // Tiger Electronics
-tbaskb                          // Tandy Corporation
 touchme                         // Atari
 ttfball                         // Toytronic
 ttfballa                        // Toytronic
@@ -16176,6 +16176,7 @@ us2pfball                       // US Games
 uspbball                        // US Games
 
 @source:hh_pps41.cpp
+dunksunk                        // Kmart
 ftri1                           // Fonas
 mastmind                        // Invicta
 memoquiz                        // MEM

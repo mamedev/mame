@@ -3,12 +3,12 @@
 // thanks-to:Sean Riddle
 /***************************************************************************
 
-  National Semiconductor COPS(MM57 MCU series) handhelds
+National Semiconductor COPS(MM57 MCU series) handhelds
 
-  MCU die label for MM5799 games says MM4799, but they are in fact MM5799.
+MCU die label for MM5799 games says MM4799, but they are in fact MM5799.
 
-  TODO:
-  - qkracerm link cable
+TODO:
+- qkracerm link cable
 
 ***************************************************************************/
 
@@ -18,6 +18,7 @@
 #include "machine/ds8874.h"
 #include "video/pwm.h"
 #include "sound/spkrdev.h"
+
 #include "speaker.h"
 
 // internal artwork

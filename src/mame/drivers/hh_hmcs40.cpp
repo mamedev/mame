@@ -3,10 +3,10 @@
 // thanks-to:Kevin Horton
 /***************************************************************************
 
-  Hitachi HMCS40 MCU tabletops/handhelds or other simple devices,
-  most of them are VFD electronic games/toys.
+Hitachi HMCS40 MCU tabletops/handhelds or other simple devices,
+most of them are VFD electronic games/toys.
 
-  known chips:
+known chips:
 
   serial  device   etc.
 ----------------------------------------------------------------
@@ -90,32 +90,39 @@
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
+ROM source notes when dumped from another publisher, but confident it's the same game:
+- gckong: CGL Super Kong
+- ghalien: CGL Earth Invaders
+- kingman: Tandy Kingman
+- zackman: Tandy Zackman
 
-  TODO:
-  - cgalaxn discrete sound (alien attacking sound effect)
-  - gckong glitchy jump on 1st level (rarely happens), caused by MCU stack overflow.
-    It can be tested by jumping up repeatedly at the start position under the ladder,
-    if the glitch happens there, you can jump onto the 2nd floor.
-  - epacman2 booting the game in demo mode, pacman should take the shortest route to
-    the upper-left power pill: mcu cycle/interrupt timing related
-  - kevtris's HMCS40 ROM dumps are incomplete, missing MCU factory test code from
-    the 2nd half of the ROM, none of the games access it though and it's impossible
-    to execute unless the chip is in testmode.
-  - Though very uncommon when compared to games with LED/lamp display, some
-    games may manipulate VFD plate brightness by strobing it longer/shorter,
-    eg. cgalaxn when a ship explodes.
-  - bzaxxon 3D effect is difficult to simulate
-  - improve/redo SVGs of: bzaxxon, bpengo, bbtime
+TODO:
+- cgalaxn discrete sound (alien attacking sound effect)
+- gckong glitchy jump on 1st level (rarely happens), caused by MCU stack overflow.
+  It can be tested by jumping up repeatedly at the start position under the ladder,
+  if the glitch happens there, you can jump onto the 2nd floor.
+- epacman2 booting the game in demo mode, pacman should take the shortest route to
+  the upper-left power pill: mcu cycle/interrupt timing related
+- kevtris's HMCS40 ROM dumps are incomplete, missing MCU factory test code from
+  the 2nd half of the ROM, none of the games access it though and it's impossible
+  to execute unless the chip is in testmode.
+- Though very uncommon when compared to games with LED/lamp display, some
+  games may manipulate VFD plate brightness by strobing it longer/shorter,
+  eg. cgalaxn when a ship explodes.
+- bzaxxon 3D effect is difficult to simulate
+- improve/redo SVGs of: bzaxxon, bpengo, bbtime
 
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/hmcs40/hmcs40.h"
 #include "cpu/cop400/cop400.h"
 #include "video/pwm.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -662,8 +669,8 @@ ROM_END
   * cyan/red/green VFD display Futaba DM-21ZK 2B, with bezel overlay
 
   known releases:
-  - Japan: FL Packri Monster
-  - USA(World?): Packri Monster
+  - Japan: FL Packri Monster, published by Bandai
+  - USA(World?): Packri Monster, published by Bandai
   - USA/Canada: Hungry Monster, published by Tandy
   - other: Gobble Man/Ogre Monster, published by Tandy
 
@@ -908,6 +915,10 @@ ROM_END
   Bandai Zackman "The Pit, FL Exploration of Space" (manufactured in Japan)
   * Hitachi QFP HD38820A49 MCU
   * cyan/red/yellow VFD display Futaba DM-53Z 3E, with color overlay
+
+  known releases:
+  - World: Zackman, published by Bandai
+  - USA: Zackman, published by Tandy
 
 ***************************************************************************/
 
@@ -2464,8 +2475,8 @@ ROM_END
   * cyan/red/green VFD display Futaba DM-20
 
   known releases:
-  - USA: Galaxian 2
-  - UK: Astro Invader (Hales/Entex)
+  - USA: Galaxian 2, published by Entex
+  - UK: Astro Invader, published by Hales/Entex
 
 ***************************************************************************/
 
@@ -3138,7 +3149,7 @@ ROM_END
   * cyan/red VFD display Futaba DM-11Z 1H
 
   known releases:
-  - Japan: Heiankyo Alien
+  - Japan: Heiankyo Alien, published by Gakken
   - USA: Earth Invaders, published by CGL
 
 ***************************************************************************/
@@ -3265,7 +3276,7 @@ ROM_END
   * cyan/red/blue VFD display Futaba DM-54Z 2H, with bezel overlay
 
   known releases:
-  - Japan: Crazy Kong
+  - Japan: Crazy Kong, published by Gakken
   - USA: Super Kong, published by CGL
 
 ***************************************************************************/
@@ -4059,6 +4070,10 @@ ROM_END
   * Hitachi HD38800B23 MCU
   * cyan/red/blue VFD display Futaba DM-65ZK 3A
 
+  known releases:
+  - World: Kingman, published by Tomy
+  - USA: Kingman, published by Tandy
+
 ***************************************************************************/
 
 class kingman_state : public hh_hmcs40_state
@@ -4185,7 +4200,7 @@ ROM_END
   * cyan/red VFD display Futaba DM-26Z 1G, with bezel
 
   known releases:
-  - USA: Invaders/Sonic Invader
+  - USA: Invaders/Sonic Invader, published by VTech
   - UK: Cosmic Invader, published by Grandstand
   - UK: Galactic Invaders, published by Prinztronic
 

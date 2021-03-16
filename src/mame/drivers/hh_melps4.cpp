@@ -3,12 +3,13 @@
 // thanks-to:Kevin Horton
 /***************************************************************************
 
-  Mitsubishi MELPS 4 MCU tabletops/handhelds or other simple devices,
-  most of them are VFD electronic games/toys.
+Mitsubishi MELPS 4 MCU tabletops/handhelds or other simple devices,
+most of them are VFD electronic games/toys.
 
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/melps4/m58846.h"
 #include "video/pwm.h"
 #include "sound/spkrdev.h"
