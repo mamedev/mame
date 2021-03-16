@@ -170,12 +170,9 @@ void ymadpcm_a_channel::output(s32 &leftout, s32 &rightout) const
 	// volume combined instrument and total levels
 	int vol = (m_regs.instrument_level() ^ 0x1f) + (m_regs.total_level() ^ 0x3f);
 
-	// if combined is maximum, output 0
+	// if combined is maximum, don't add to outputs
 	if (vol >= 63)
-	{
-		leftout = rightout = 0;
 		return;
-	}
 
 	// convert into a shift and a multiplier
 	// QUESTION: verify this from other sources
