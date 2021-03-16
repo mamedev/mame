@@ -1457,7 +1457,7 @@ ymopl_registers_base<Revision>::ymopl_registers_base() :
 				m_waveform[4][index] = BIT(index, 9) ? 0 : m_waveform[0][index * 2];
 				m_waveform[5][index] = BIT(index, 9) ? 0 : m_waveform[0][(index * 2) & 0x1ff];
 				m_waveform[6][index] = BIT(index, 9) << 15;
-				m_waveform[7][index] = (0x859 - m_waveform[0][(index / 2)]) | (BIT(index, 9) << 15);
+				m_waveform[7][index] = (m_waveform[0][0] - m_waveform[0][(index / 2)]) | (BIT(index, 9) << 15);
 			}
 		}
 }
@@ -2160,7 +2160,7 @@ s32 ymfm_operator<RegisterType>::compute_volume(u32 phase, u32 am_offset) const
 		return 0;
 
 	// get the absolute value of the sin, as attenuation, as a 4.8 fixed point value
-	u32 sin_attenuation = m_cache.waveform[phase & 0x3ff];
+	u32 sin_attenuation = m_cache.waveform[phase & (RegisterType::WAVEFORM_LENGTH - 1)];
 
 	// get the attenuation from the evelope generator as a 4.6 value, shifted up to 4.8
 	u32 env_attenuation = envelope_attenuation(am_offset) << 2;
