@@ -1557,9 +1557,6 @@ bool ymopl_registers_base<Revision>::write(u16 index, u8 data, u32 &channel, u32
 	else
 		m_regdata[index] = data;
 
-	// everything else is normal
-	m_regdata[index] = data;
-
 	// handle writes to the rhythm keyons
 	if (index == 0xbd)
 	{
@@ -3231,10 +3228,12 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::synced_mode_w)
 	else
 	{
 		// reset timer status
+		u8 reset_mask = 0;
 		if (m_regs.reset_timer_b())
-			set_reset_status(0, STATUS_TIMERB);
+			reset_mask |= RegisterType::STATUS_TIMERB;
 		if (m_regs.reset_timer_a())
-			set_reset_status(0, STATUS_TIMERA);
+			reset_mask |= RegisterType::STATUS_TIMERA;
+		set_reset_status(0, reset_mask);
 
 		// load timers
 		update_timer(1, m_regs.load_timer_b());
