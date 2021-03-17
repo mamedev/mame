@@ -275,7 +275,7 @@ public:
 	static constexpr u32 CHANNELS = 8;
 	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
 	static constexpr u32 OPERATORS = CHANNELS * 4;
-	static constexpr u32 DYNAMIC_OPS = false;
+	static constexpr bool DYNAMIC_OPS = false;
 	static constexpr u32 WAVEFORMS = 1;
 	static constexpr u32 REGISTERS = 0x100;
 	static constexpr u32 REG_MODE = 0x14;
@@ -480,7 +480,7 @@ public:
 	static constexpr u32 CHANNELS = IsOpnA ? 6 : 3;
 	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
 	static constexpr u32 OPERATORS = CHANNELS * 4;
-	static constexpr u32 DYNAMIC_OPS = false;
+	static constexpr bool DYNAMIC_OPS = false;
 	static constexpr u32 WAVEFORMS = 1;
 	static constexpr u32 REGISTERS = IsOpnA ? 0x200 : 0x100;
 	static constexpr u32 REG_MODE = 0x27;
@@ -696,7 +696,7 @@ public:
 	static constexpr u32 CHANNELS = IsOpl3Plus ? 18 : 9;
 	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
 	static constexpr u32 OPERATORS = CHANNELS * 2;
-	static constexpr u32 DYNAMIC_OPS = false;
+	static constexpr bool DYNAMIC_OPS = IsOpl3Plus;
 	static constexpr u32 WAVEFORMS = IsOpl3Plus ? 8 : (IsOpl2Plus ? 4 : 1);
 	static constexpr u32 REGISTERS = IsOpl3Plus ? 0x200 : 0x100;
 	static constexpr u32 REG_MODE = 0x04;
@@ -902,7 +902,7 @@ public:
 	static constexpr u32 CHANNELS = 9;
 	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
 	static constexpr u32 OPERATORS = CHANNELS * 2;
-	static constexpr u32 DYNAMIC_OPS = false;
+	static constexpr bool DYNAMIC_OPS = false;
 	static constexpr u32 WAVEFORMS = 2;
 	static constexpr u32 REGISTERS = 0x40;
 	static constexpr u32 REG_MODE = 0x3f;
