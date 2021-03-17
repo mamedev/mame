@@ -30,6 +30,7 @@
 #include "bus/coco/coco_ssc.h"
 #include "bus/coco/coco_ram.h"
 #include "bus/coco/coco_orch90.h"
+#include "bus/coco/coco_midi.h"
 #include "bus/coco/coco_gmc.h"
 #include "bus/coco/coco_psg.h"
 
@@ -207,6 +208,7 @@ void dragon_cart(device_slot_interface &device)
 	device.option_add("sdtandy_fdc", SDTANDY_FDC);
 	device.option_add("jcbsnd", DRAGON_JCBSND);
 	device.option_add("jcbspch", DRAGON_JCBSPCH);
+	device.option_add("midi", DRAGON_MIDI);
 	device.option_add("sprites", DRAGON_SPRITES);
 	device.option_add("ssc", COCO_SSC);
 	device.option_add("ram", COCO_PAK_RAM);
@@ -548,3 +550,4 @@ COMP( 1985, d64plus,    dragon32, 0,      d64plus,    dragon,     d64plus_state,
 COMP( 1983, tanodr64,   dragon32, 0,      tanodr64,   dragon,     dragon64_state,     empty_init, "Dragon Data Ltd / Tano Ltd",   "Tano Dragon 64 (NTSC)",          0 )
 COMP( 19??, tanodr64h,  dragon32, 0,      tanodr64h,  dragon,     dragon64_state,     empty_init, "Dragon Data Ltd / Tano Ltd",   "Tano Dragon 64 (NTSC; HD6309E)", MACHINE_UNOFFICIAL )
 COMP( 1984, dgnalpha,   dragon32, 0,      dgnalpha,   dragon,     dragon_alpha_state, empty_init, "Dragon Data Ltd",              "Dragon Professional (Alpha)",    0 )
+	
