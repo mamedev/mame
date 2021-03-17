@@ -9,12 +9,6 @@
 #include "logmacro.h"
 
 //
-// TO DO:
-//
-// More caching?
-//
-
-//
 // ONE FM CORE TO RULE THEM ALL
 //
 // This emulator is written from the ground-up using the analysis and deduction
