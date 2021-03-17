@@ -301,7 +301,6 @@ void i386ex_device::device_add_mconfig(machine_config &config)
 
 	PIC8259(config, m_pic_slave, 0);
 	m_pic_slave->out_int_callback().set(m_pic_master, FUNC(pic8259_device::ir2_w));
-	// FIXME: GND, NOOP);
 
 	//TODO: (mux:Vss/INT0) DEVWRITELINE("pic8259_master", pic8259_device, ir1_w)
 	//TODO: (mux:Vss/INT1) DEVWRITELINE("pic8259_master", pic8259_device, ir5_w)
@@ -315,25 +314,3 @@ void i386ex_device::device_add_mconfig(machine_config &config)
 	//TODO: (mux:Vss/INT7) DEVWRITELINE("pic8259_slave", pic8259_device, ir6_w)
 	//TODO: WDTOUT DEVWRITELINE("pic8259_slave", pic8259_device, ir7_w)
 }
-
-#if 0 
-uint8_t i386ex_device::FETCH()
-{
-	uint8_t value;
-	uint16_t value16;
-	uint32_t address = m_pc, error;
-
-	if(!translate_address(m_CPL,TRANSLATE_FETCH,&address,&error))
-		PF_THROW(error);
-
-	value16 = mem_pr16((address & m_a20_mask) >> 1);
-	value = (value16 >> (8*(address%2))) & 0xff;
-#ifdef DEBUG_MISSING_OPCODE
-	m_opcode_bytes[m_opcode_bytes_length] = value;
-	m_opcode_bytes_length = (m_opcode_bytes_length + 1) & 15;
-#endif
-	m_eip++;
-	m_pc++;
-	return value;
-}
-#endif

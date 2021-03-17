@@ -27,6 +27,9 @@ protected:
 	void io_map(address_map&);
 
 	// device-level overrides
+	virtual u8 mem_pr8(offs_t address) override { return macache16.read_byte(address); };
+	virtual u16 mem_pr16(offs_t address) override { return macache16.read_word(address); };
+	virtual u32 mem_pr32(offs_t address) override { return macache16.read_dword(address); };
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_reset() override;
 	address_space_config m_386ex_io_config;
