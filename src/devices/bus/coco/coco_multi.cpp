@@ -60,6 +60,7 @@
 #include "coco_dcmodem.h"
 #include "coco_fdc.h"
 #include "coco_gmc.h"
+#include "coco_midi.h"
 #include "coco_orch90.h"
 #include "coco_pak.h"
 #include "coco_rs232.h"
@@ -159,18 +160,7 @@ namespace
     IMPLEMENTATION
 ***************************************************************************/
 
-static void coco_cart_slot1_3(device_slot_interface &device)
-{
-	device.option_add("rs232", COCO_RS232);
-	device.option_add("dcmodem", COCO_DCMODEM);
-	device.option_add("orch90", COCO_ORCH90);
-	device.option_add("ssc", COCO_SSC);
-	device.option_add("ram", COCO_PAK_RAM);
-	device.option_add("games_master", COCO_PAK_GMC);
-	device.option_add("banked_16k", COCO_PAK_BANKED);
-	device.option_add("pak", COCO_PAK);
-}
-static void coco_cart_slot4(device_slot_interface &device)
+static void coco_cart_slot1_4(device_slot_interface &device)
 {
 	device.option_add("cc2hdb1", COCO2_HDB1);
 	device.option_add("cc3hdb1", COCO3_HDB1);
@@ -181,26 +171,26 @@ static void coco_cart_slot4(device_slot_interface &device)
 	device.option_add("ssc", COCO_SSC);
 	device.option_add("ram", COCO_PAK_RAM);
 	device.option_add("games_master", COCO_PAK_GMC);
+	device.option_add("midi", COCO_MIDI);
 	device.option_add("banked_16k", COCO_PAK_BANKED);
 	device.option_add("pak", COCO_PAK);
 }
 
-
 void coco_multipak_device::device_add_mconfig(machine_config &config)
 {
-	COCOCART_SLOT(config, m_slots[0], DERIVED_CLOCK(1, 1), coco_cart_slot1_3, nullptr);
+	COCOCART_SLOT(config, m_slots[0], DERIVED_CLOCK(1, 1), coco_cart_slot1_4, nullptr);
 	m_slots[0]->cart_callback().set(FUNC(coco_multipak_device::multi_slot1_cart_w));
 	m_slots[0]->nmi_callback().set(FUNC(coco_multipak_device::multi_slot1_nmi_w));
 	m_slots[0]->halt_callback().set(FUNC(coco_multipak_device::multi_slot1_halt_w));
-	COCOCART_SLOT(config, m_slots[1], DERIVED_CLOCK(1, 1), coco_cart_slot1_3, nullptr);
+	COCOCART_SLOT(config, m_slots[1], DERIVED_CLOCK(1, 1), coco_cart_slot1_4, nullptr);
 	m_slots[1]->cart_callback().set(FUNC(coco_multipak_device::multi_slot2_cart_w));
 	m_slots[1]->nmi_callback().set(FUNC(coco_multipak_device::multi_slot2_nmi_w));
 	m_slots[1]->halt_callback().set(FUNC(coco_multipak_device::multi_slot2_halt_w));
-	COCOCART_SLOT(config, m_slots[2], DERIVED_CLOCK(1, 1), coco_cart_slot1_3, nullptr);
+	COCOCART_SLOT(config, m_slots[2], DERIVED_CLOCK(1, 1), coco_cart_slot1_4, nullptr);
 	m_slots[2]->cart_callback().set(FUNC(coco_multipak_device::multi_slot3_cart_w));
 	m_slots[2]->nmi_callback().set(FUNC(coco_multipak_device::multi_slot3_nmi_w));
 	m_slots[2]->halt_callback().set(FUNC(coco_multipak_device::multi_slot3_halt_w));
-	COCOCART_SLOT(config, m_slots[3], DERIVED_CLOCK(1, 1), coco_cart_slot4, "fdcv11");
+	COCOCART_SLOT(config, m_slots[3], DERIVED_CLOCK(1, 1), coco_cart_slot1_4, "fdcv11");
 	m_slots[3]->cart_callback().set(FUNC(coco_multipak_device::multi_slot4_cart_w));
 	m_slots[3]->nmi_callback().set(FUNC(coco_multipak_device::multi_slot4_nmi_w));
 	m_slots[3]->halt_callback().set(FUNC(coco_multipak_device::multi_slot4_halt_w));
