@@ -286,8 +286,6 @@ void ym2610_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		// update the FM content; YM2610 is 13-bit with no intermediate clipping
 		s32 sums[fm_engine::OUTPUTS] = { 0 };
 		m_fm.output(sums, 1, 32767, m_fm_mask);
-		for (int index = 0; index < fm_engine::OUTPUTS; index++)
-			sums[index] <<= 1;
 
 		// mix in the ADPCM
 		m_adpcm_a.output(sums, 0x3f);
