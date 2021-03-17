@@ -30,6 +30,7 @@
 #include "bus/coco/coco_dwsock.h"
 #include "bus/coco/coco_fdc.h"
 #include "bus/coco/coco_gmc.h"
+#include "bus/coco/coco_midi.h"
 #include "bus/coco/coco_multi.h"
 #include "bus/coco/coco_orch90.h"
 #include "bus/coco/coco_pak.h"
@@ -418,6 +419,7 @@ void coco_cart(device_slot_interface &device)
 	device.option_add("ssc", COCO_SSC);
 	device.option_add("ram", COCO_PAK_RAM);
 	device.option_add("games_master", COCO_PAK_GMC);
+	device.option_add("midi", COCO_MIDI);
 	device.option_add("banked_16k", COCO_PAK_BANKED);
 	device.option_add("pak", COCO_PAK);
 	device.option_add("multi", COCO_MULTIPAK);
