@@ -789,6 +789,7 @@ public:
 	u32 rhythm_enable() const              { return byte(0xbd, 5, 1); }
 	u32 rhythm_keyon() const               { return byte(0xbd, 4, 0); }
 	u32 newflag() const                    { return IsOpl3Plus ? byte(0x105, 0, 1) : 0; }
+	u32 new2flag() const                   { return IsOpl3Plus ? byte(0x105, 1, 1) : 0; }
 	u32 fourop_enable() const              { return IsOpl3Plus ? byte(0x104, 0, 6) : 0; }
 
 	// per-channel registers
@@ -805,7 +806,7 @@ public:
 	u32 op_lfo_am_enable(u32 opoffs) const { return byte(0x20, 7, 1, opoffs); }
 	u32 op_lfo_pm_enable(u32 opoffs) const { return byte(0x20, 6, 1, opoffs); }
 	u32 op_eg_sustain(u32 opoffs) const    { return byte(0x20, 5, 1, opoffs); }
-	u32 op_ksr(u32 opoffs) const           { return byte(0x20, 4, 1, opoffs) * 2 + 1; } // 1->2 bits
+	u32 op_ksr(u32 opoffs) const           { return byte(0x20, 4, 1, opoffs); }
 	u32 op_multiple(u32 opoffs) const      { return byte(0x20, 0, 4, opoffs); }
 	u32 op_ksl(u32 opoffs) const           { return bitswap<2>(byte(0x40, 6, 2, opoffs), 0, 1); }
 	u32 op_total_level(u32 opoffs) const   { return byte(0x40, 0, 6, opoffs); }
@@ -894,27 +895,36 @@ using ymopl3_registers = ymopl_registers_base<3>;
 //        70-FF xxxxxxxx Data for instruments (1-16 plus 3 drums)
 //
 
-class ymopll_registers : public ymopl_registers
+class ymopll_registers : public ymfm_registers_base
 {
 public:
 	static constexpr u32 OUTPUTS = 2;
+	static constexpr u32 CHANNELS = 9;
+	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
+	static constexpr u32 OPERATORS = CHANNELS * 2;
+	static constexpr u32 DYNAMIC_OPS = false;
 	static constexpr u32 WAVEFORMS = 2;
-	static constexpr u32 REG_MODE = 0xff;
+	static constexpr u32 REGISTERS = 0x40;
+	static constexpr u32 REG_MODE = 0x3f;
+	static constexpr u32 DEFAULT_PRESCALE = 4;
+	static constexpr u32 EG_CLOCK_DIVIDER = 1;
 	static constexpr bool EG_HAS_DEPRESS = true;
+	static constexpr bool EG_HAS_SSG = false;
+	static constexpr bool MODULATOR_DELAY = true;
+	static constexpr u32 CSM_TRIGGER_MASK = 0;
 	static constexpr u8 STATUS_TIMERA = 0;
 	static constexpr u8 STATUS_TIMERB = 0;
 	static constexpr u8 STATUS_BUSY = 0;
 	static constexpr u8 STATUS_IRQ = 0;
 
 	// OPLL-specific constants
-	static constexpr u32 EXTERNAL_REGISTERS = 0x40;
-	static constexpr u32 CHANNEL_INSTBASE = 0x40;
-	static constexpr u32 OPERATOR_INSTBASE = 0x4e;
-	static constexpr u32 INSTDATA_BASE = 0x70;
 	static constexpr u32 INSTDATA_SIZE = 0x90;
 
 	// constructor
 	ymopll_registers();
+
+	// register for save states
+	void save(device_t &device);
 
 	// reset to initial state
 	void reset();
@@ -943,6 +953,16 @@ public:
 	// clock the noise and LFO, if present, returning LFO PM value
 	s32 clock_noise_and_lfo();
 
+	// reset the LFO
+	void reset_lfo() { m_lfo_am_counter = m_lfo_pm_counter = 0; }
+
+	// return the AM offset from LFO for the given channel
+	// on OPL this is just a fixed value
+	u32 lfo_am_offset(u32 choffs) const { return m_lfo_am; }
+
+	// return LFO/noise states
+	u32 noise_state() const { return m_noise_lfsr >> 23; }
+
 	// caching helpers
 	void cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_cache &cache);
 
@@ -952,15 +972,33 @@ public:
 	// log a key-on event
 	void log_keyon(u32 choffs, u32 opoffs);
 
+	// set the instrument data
+	void set_instrument_data(u8 const *data)
+	{
+		memcpy(&m_instdata[0], data, INSTDATA_SIZE);
+	}
+
 	// system-wide registers
 	u32 rhythm_enable() const              { return byte(0x0e, 5, 1); }
 	u32 rhythm_keyon() const               { return byte(0x0e, 4, 0); }
 	u32 test() const                       { return byte(0x0f, 0, 8); }
 	u32 waveform_enable() const            { return 1; }
+	u32 timer_a_value() const              { return 0; }
+	u32 timer_b_value() const              { return 0; }
+	u32 status_mask() const                { return 0; }
+	u32 irq_reset() const                  { return 0; }
+	u32 reset_timer_b() const              { return 0; }
+	u32 reset_timer_a() const              { return 0; }
+	u32 enable_timer_b() const             { return 0; }
+	u32 enable_timer_a() const             { return 0; }
+	u32 load_timer_b() const               { return 0; }
+	u32 load_timer_a() const               { return 0; }
+	u32 csm() const                        { return 0; }
 
 	// per-channel registers
 	u32 ch_block_freq(u32 choffs) const    { return word(0x20, 0, 4, 0x10, 0, 8, choffs); }
 	u32 ch_sustain(u32 choffs) const       { return byte(0x20, 5, 1, choffs); }
+	u32 ch_total_level(u32 choffs) const   { return instchbyte(0x02, 0, 6, choffs); }
 	u32 ch_feedback(u32 choffs) const      { return instchbyte(0x03, 0, 3, choffs); }
 	u32 ch_algorithm(u32 choffs) const     { return 0; }
 	u32 ch_instrument(u32 choffs) const    { return byte(0x30, 4, 4, choffs); }
@@ -974,65 +1012,48 @@ public:
 	u32 op_lfo_am_enable(u32 opoffs) const { return instopbyte(0x00, 7, 1, opoffs); }
 	u32 op_lfo_pm_enable(u32 opoffs) const { return instopbyte(0x00, 6, 1, opoffs); }
 	u32 op_eg_sustain(u32 opoffs) const    { return instopbyte(0x00, 5, 1, opoffs); }
-	u32 op_ksr(u32 opoffs) const           { return instopbyte(0x00, 4, 1, opoffs) * 2 + 1; } // 1->2 bits
+	u32 op_ksr(u32 opoffs) const           { return instopbyte(0x00, 4, 1, opoffs); }
 	u32 op_multiple(u32 opoffs) const      { return instopbyte(0x00, 0, 4, opoffs); }
 	u32 op_ksl(u32 opoffs) const           { return instopbyte(0x02, 6, 2, opoffs); }
-	u32 op_total_level(u32 opoffs) const   { return total_level_or_volume(opoffs); }
 	u32 op_waveform(u32 opoffs) const      { return instchbyte(0x03, 3 + BIT(opoffs, 0), 1, opoffs >> 1); }
 	u32 op_attack_rate(u32 opoffs) const   { return instopbyte(0x04, 4, 4, opoffs); }
 	u32 op_decay_rate(u32 opoffs) const    { return instopbyte(0x04, 0, 4, opoffs); }
 	u32 op_sustain_level(u32 opoffs) const { return instopbyte(0x06, 4, 4, opoffs); }
 	u32 op_release_rate(u32 opoffs) const  { return instopbyte(0x06, 0, 4, opoffs); }
-
-	// set the instrument data
-	void set_instrument_data(u8 const *data)
-	{
-		memcpy(&m_regdata[INSTDATA_BASE], data, INSTDATA_SIZE);
-	}
+	u32 op_volume(u32 opoffs) const        { return byte(0x30, 4 * BIT(~opoffs, 0), 4, opoffs >> 1); }
 
 private:
-	// helper to determine if the this channel is an active rhythm channel
-	bool is_rhythm(u32 choffs) const
+	// return a bitfield extracted from a byte
+	u32 byte(u32 offset, u32 start, u32 count, u32 extra_offset = 0) const
 	{
-		return rhythm_enable() && (choffs >= 6 && choffs <= 8);
+		return BIT(m_regdata[offset + extra_offset], start, count);
 	}
 
-	// OPLL-specific helper to return either the total level or the volume
-	u32 total_level_or_volume(u32 opoffs) const
+	// return a bitfield extracted from a pair of bytes, MSBs listed first
+	u32 word(u32 offset1, u32 start1, u32 count1, u32 offset2, u32 start2, u32 count2, u32 extra_offset = 0) const
 	{
-		u32 choffs = opoffs >> 1;
-		int opindex = BIT(opoffs, 0);
-		if (opindex == 1 || is_rhythm(choffs))
-			return byte(0x30, 4 * (opindex ^ 1), 4, choffs) * 4;
-		else
-			return instchbyte(0x02, 0, 6, choffs);
-	}
-
-	// helper to compute the ROM address of an instrument number
-	static constexpr u32 rom_address(int instrument)
-	{
-		return (instrument == 0) ? 0 : (INSTDATA_BASE + 8 * (instrument - 1));
-	}
-
-	// helper to update the instrument
-	void update_instrument(u32 choffs)
-	{
-		u32 baseaddr;
-		if (rhythm_enable() && choffs >= 6)
-			baseaddr = rom_address(16 + (choffs - 6));
-		else
-			baseaddr = rom_address(ch_instrument(choffs));
-
-		m_regdata[CHANNEL_INSTBASE + choffs] = baseaddr;
-		m_regdata[OPERATOR_INSTBASE + choffs * 2 + 0] = baseaddr + 0;
-		m_regdata[OPERATOR_INSTBASE + choffs * 2 + 1] = baseaddr + 1;
+		return (byte(offset1, start1, count1, extra_offset) << count2) | byte(offset2, start2, count2, extra_offset);
 	}
 
 	// helpers to read from instrument channel/operator data
-	u32 instchbyte(u32 offset, u32 start, u32 count, u32 choffs) const { return BIT(m_regdata[offset + m_regdata[CHANNEL_INSTBASE + choffs]], start, count); }
-	u32 instopbyte(u32 offset, u32 start, u32 count, u32 opoffs) const { return BIT(m_regdata[offset + m_regdata[OPERATOR_INSTBASE + opoffs]], start, count); }
+	u32 instchbyte(u32 offset, u32 start, u32 count, u32 choffs) const { return BIT(m_chinst[choffs][offset], start, count); }
+	u32 instopbyte(u32 offset, u32 start, u32 count, u32 opoffs) const { return BIT(m_opinst[opoffs][offset], start, count); }
+
+	// helper to determine if the this channel is an active rhythm channel
+	bool is_rhythm(u32 choffs) const
+	{
+		return rhythm_enable() && choffs >= 6;
+	}
 
 	// internal state
+	u16 m_lfo_am_counter;            // LFO AM counter
+	u16 m_lfo_pm_counter;            // LFO PM counter
+	u32 m_noise_lfsr;                // noise LFSR state
+	u8 m_lfo_am;                     // current LFO AM value
+	u8 const *m_chinst[CHANNELS];    // pointer to instrument data for each channel
+	u8 const *m_opinst[OPERATORS];   // pointer to instrument data for each operator
+	u8 m_regdata[REGISTERS];         // register data
+	u8 m_instdata[INSTDATA_SIZE];    // instrument data
 	u16 m_waveform[WAVEFORMS][WAVEFORM_LENGTH]; // waveforms
 };
 
