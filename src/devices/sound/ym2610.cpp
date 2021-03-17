@@ -285,8 +285,6 @@ void ym2610_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		// update the OPN content; OPNB is 13-bit with no intermediate clipping
 		s32 lsum = 0, rsum = 0;
 		m_opn.output(lsum, rsum, 1, 32767, m_opn_mask);
-		lsum <<= 1;
-		rsum <<= 1;
 
 		// mix in the ADPCM
 		m_adpcm_a.output(lsum, rsum, 0x3f);
