@@ -423,7 +423,7 @@ function cheat.startplugin()
 	local function set_index(cheat, index)
 		local param = cheat.parameter
 		local oldindex = param.index
-		if (param.index < 0) or (param.index >= param.last) or (param.index == index) then
+		if (index < 0) or (index > param.last) or (param.index == index) then
 			return param.index, false
 		end
 		param.index = index
