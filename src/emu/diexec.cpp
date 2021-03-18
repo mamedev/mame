@@ -69,8 +69,6 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 	, m_cycles_per_second(0)
 	, m_attoseconds_per_cycle(0)
 {
-	memset(&m_localtime, 0, sizeof(m_localtime));
-
 	// configure the fast accessor
 	assert(!device.interfaces().m_execute);
 	device.interfaces().m_execute = this;
@@ -214,9 +212,9 @@ attotime device_execute_interface::local_time() const noexcept
 	{
 		assert(m_cycles_running >= *m_icountptr);
 		int cycles = m_cycles_running - *m_icountptr;
-		return m_localtime + cycles_to_attotime(cycles);
+		return m_localtime.absolute() + cycles_to_attotime(cycles);
 	}
-	return m_localtime;
+	return m_localtime.absolute();
 }
 
 
@@ -372,6 +370,7 @@ void device_execute_interface::interface_validity_check(validity_checker &valid)
 void device_execute_interface::interface_pre_start()
 {
 	m_scheduler = &device().machine().scheduler();
+	m_localtime.set_base_seconds(m_scheduler->m_basetime.seconds());
 
 	// bind delegates
 	m_vblank_interrupt.resolve();
@@ -408,7 +407,7 @@ void device_execute_interface::interface_post_start()
 	device().save_item(NAME(m_nexteatcycles));
 	device().save_item(NAME(m_trigger));
 	device().save_item(NAME(m_totalcycles));
-	device().save_item(NAME(m_localtime));
+//	device().save_item(NAME(m_localtime));
 
 	// it's more efficient and causes less clutter to save these this way
 	device().save_item(STRUCT_MEMBER(m_input, m_stored_vector));

@@ -318,7 +318,7 @@ private:
 
 	// clock and timing information
 	u64                     m_totalcycles;              // total device cycles executed
-	attotime                m_localtime;                // local time, relative to the timer system's global time
+	basetime_relative       m_localtime;                // local time, relative to the timer system's global time
 	s32                     m_divisor;                  // 32-bit attoseconds_per_cycle divisor
 	u8                      m_divshift;                 // right shift amount to fit the divisor into 32 bits
 	u32                     m_cycles_per_second;        // cycles per second, adjusted for multipliers

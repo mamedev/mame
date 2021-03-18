@@ -29,6 +29,98 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+class basetime_relative
+{
+public:
+	static constexpr attoseconds_t MAX_RELATIVE = 2 * ATTOSECONDS_PER_SECOND;
+	static constexpr attoseconds_t MIN_RELATIVE = -MAX_RELATIVE;
+
+	basetime_relative() :
+		m_relative(0),
+		m_absolute(attotime::zero),
+		m_base_seconds(0)
+	{
+	}
+
+	void set(attotime const &src)
+	{
+		m_absolute = src;
+		update_relative();
+	}
+
+	void set(attoseconds_t src)
+	{
+		m_relative = src;
+		update_absolute();
+	}
+
+	void add(attoseconds_t src)
+	{
+		m_relative += src;
+		update_absolute();
+	}
+
+	void set_base_seconds(seconds_t base)
+	{
+		if (base != m_base_seconds)
+		{
+			m_base_seconds = base;
+			update_relative();
+		}
+	}
+
+	attoseconds_t relative() const { return m_relative; }
+	attotime const &absolute() const { return m_absolute; }
+
+	const char *as_string(int precision = 9) const { return m_absolute.as_string(precision); }
+
+private:
+	void update_relative()
+	{
+		seconds_t delta = m_absolute.seconds() - m_base_seconds;
+		m_relative = m_absolute.attoseconds();
+		if (delta == 0)
+			return;
+		if (delta > 0)
+		{
+			if (delta == 1)
+				m_relative += ATTOSECONDS_PER_SECOND;
+			else
+				m_relative = MAX_RELATIVE;
+		}
+		else
+		{
+			if (delta == -1)
+				m_relative -= ATTOSECONDS_PER_SECOND;
+			else
+				m_relative = MIN_RELATIVE;
+		}
+	}
+
+	void update_absolute()
+	{
+		seconds_t secs = m_base_seconds;
+		attoseconds_t attos = m_relative;
+		if (attos >= ATTOSECONDS_PER_SECOND)
+		{
+			attos -= ATTOSECONDS_PER_SECOND;
+			secs++;
+		}
+		else if (attos < 0)
+		{
+			attos += ATTOSECONDS_PER_SECOND;
+			secs--;
+		}
+		m_absolute.set_seconds(secs);
+		m_absolute.set_attoseconds(attos);
+	}
+
+	attoseconds_t m_relative;
+	attotime m_absolute;
+	seconds_t m_base_seconds;
+};
+
+
 // timer callbacks look like this
 typedef named_delegate<void (void *, s32)> timer_expired_delegate;
 
@@ -71,7 +163,7 @@ public:
 	attotime elapsed() const noexcept;
 	attotime remaining() const noexcept;
 	attotime start() const { return m_start; }
-	attotime expire() const { return m_expire; }
+	attotime expire() const { return m_expire.absolute(); }
 	attotime period() const { return m_period; }
 
 private:
@@ -92,7 +184,7 @@ private:
 	bool                m_temporary;    // is the timer temporary?
 	attotime            m_period;       // the repeat frequency of the timer
 	attotime            m_start;        // time when the timer was started
-	attotime            m_expire;       // time when the timer will expire
+	basetime_relative   m_expire;       // time when the timer will expire
 	device_t *          m_device;       // for device timers, a pointer to the device
 	device_timer_id     m_id;           // for device timers, the ID of the timer
 };
@@ -103,6 +195,7 @@ private:
 class device_scheduler
 {
 	friend class device_execute_interface;
+	friend class basetime_relative;
 	friend class emu_timer;
 
 public:
@@ -155,6 +248,10 @@ private:
 	emu_timer &timer_list_insert(emu_timer &timer);
 	emu_timer &timer_list_remove(emu_timer &timer);
 	void execute_timers();
+	void update_basetime();
+
+	// basetime_relative helpers
+	attotime const &basetime() const { return m_basetime; }
 
 	// internal state
 	running_machine &           m_machine;                  // reference to our machine
@@ -189,6 +286,7 @@ private:
 	fixed_allocator<quantum_slot> m_quantum_allocator;      // allocator for quanta
 	attoseconds_t               m_quantum_minimum;          // duration of minimum quantum
 };
+
 
 
 #endif  // MAME_EMU_SCHEDULE_H
