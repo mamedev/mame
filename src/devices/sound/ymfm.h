@@ -143,22 +143,30 @@ inline s16 ymfm_roundtrip_fp(s32 value)
 
 // ======================> ymfm_opdata_cache
 
+// this class holds data that is computed once at the start of clocking
+// and remains static during subsequent sound generation
 struct ymfm_opdata_cache
 {
-	u16 const *waveform;// base of sine table
-	u32 phase_step;		// phase step, or 1 if PM is active
-	u32 total_level;	// total level + KSL (times 8)
-	s32 detune;			// detuning value
-	u32 eg_sustain;		// sustain level (4-bit value)
-	u32 block_freq;		// block frequency value (raw)
-	u32 multiple;		// multiple value (x.1 value)
-	u8 output_mask;		// output mask (bitmask)
+	// set phase_step to this value to recalculate it each sample; needed
+	// in the case of PM LFO changes
+	static constexpr u32 PHASE_STEP_DYNAMIC = 1;
+
+	u16 const *waveform;         // base of sine table
+	u32 phase_step;              // phase step, or PHASE_STEP_DYNAMIC if PM is active
+	u32 total_level;             // total level * 8 + KSL
+	u32 block_freq;              // raw block frequency value (used to compute phase_step)
+	s32 detune;                  // detuning value (used to compute phase_step)
+	u32 multiple;                // multiple value (x.1, used to compute phase_step)
+	u32 eg_sustain;              // sustain level, shifted up to envelope values
 	u8 eg_rate[YMFM_ENV_STATES]; // envelope rate, including KSR
 };
 
 
 // ======================> ymfm_registers_base
 
+// base class for family-specific register classes; this provides a few
+// constants, common defaults, and helpers, but mostly each derived
+// class is responsible for defining all commonly-called methods
 class ymfm_registers_base
 {
 public:
@@ -1062,9 +1070,11 @@ private:
 //  CORE ENGINE CLASSES
 //*********************************************************
 
+// forward declarations
 template<class RegisterType> class ymfm_engine_base;
 
-enum ymfm_keyon_type : u8
+// three different keyon sources; actual keyon is an OR over all of these
+enum ymfm_keyon_type : u32
 {
 	YMFM_KEYON_NORMAL = 0,
 	YMFM_KEYON_RHYTHM = 1,
@@ -1074,6 +1084,8 @@ enum ymfm_keyon_type : u8
 
 // ======================> ymfm_operator
 
+// ymfm_operator represents an FM operator (or "slot" in FM parlance), which
+// produces an output sine wave modulated by an envelope
 template<class RegisterType>
 class ymfm_operator
 {
@@ -1140,13 +1152,15 @@ private:
 	u8 m_key_state;                  // current key state: on or off (bit 0)
 	u8 m_keyon_live;                 // live key on state (bit 0 = direct, bit 1 = rhythm, bit 2 = CSM)
 	ymfm_opdata_cache m_cache;       // cached values for performance
-	RegisterType &m_regs;            // operator-specific registers
+	RegisterType &m_regs;            // direct reference to registers
 	ymfm_engine_base<RegisterType> &m_owner; // reference to the owning engine
 };
 
 
 // ======================> ymfm_channel
 
+// ymfm_channel represents an FM channel which combines the output of 2 or 4
+// operators into a final result
 template<class RegisterType>
 class ymfm_channel
 {
@@ -1217,13 +1231,16 @@ private:
 	s16 m_feedback[2];                    // feedback memory for operator 1
 	mutable s16 m_feedback_in;            // next input value for op 1 feedback (set in output)
 	ymfm_operator<RegisterType> *m_op[4]; // up to 4 operators
-	RegisterType &m_regs;                 // channel-specific registers
+	RegisterType &m_regs;                 // direct reference to registers
 	ymfm_engine_base<RegisterType> &m_owner; // reference to the owning engine
 };
 
 
 // ======================> ymfm_engine_base
 
+// ymfm_engine_base represents a set of operators and channels which together
+// form a Yamaha FM core; chips that implement other engines (ADPCM, wavetable,
+// etc) take this output and combine it with the others externally
 template<class RegisterType>
 class ymfm_engine_base
 {
@@ -1335,8 +1352,8 @@ protected:
 	emu_timer *m_timer[2];           // our two timers
 	devcb_write_line m_irq_handler;  // IRQ callback
 	RegisterType m_regs;             // register accessor
- 	std::unique_ptr<ymfm_channel<RegisterType>> m_channel[CHANNELS]; // channel pointers
- 	std::unique_ptr<ymfm_operator<RegisterType>> m_operator[OPERATORS]; // operator pointers
+	std::unique_ptr<ymfm_channel<RegisterType>> m_channel[CHANNELS]; // channel pointers
+	std::unique_ptr<ymfm_operator<RegisterType>> m_operator[OPERATORS]; // operator pointers
 };
 
 
@@ -1359,6 +1376,8 @@ using ymopl3_engine = ymfm_engine_base<ymopl3_registers>;
 
 // ======================> ymopll_engine
 
+// ymopll_engine is a special case because instrument data needs to be
+// provided from an external source
 class ymopll_engine : public ymfm_engine_base<ymopll_registers>
 {
 public:

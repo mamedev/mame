@@ -358,10 +358,9 @@
 
 // macro to encode four operator numbers into a 32-bit value in the
 // operator maps for each register class
-#define YMFM_OP4(o1,o2,o3,o4) u32(o1 | (o2 << 8) | (o3 << 16) | (o4 <<24))
+#define YMFM_OP4(o1,o2,o3,o4) u32(o1 | (o2 << 8) | (o3 << 16) | (o4 << 24))
 #define YMFM_OP2(o1,o2) YMFM_OP4(o1,o2,0xff,0xff)
 #define YMFM_OP0() YMFM_OP4(0xff,0xff,0xff,0xff)
-
 
 
 //*********************************************************
@@ -513,14 +512,14 @@ inline s32 detune_adjustment(u32 detune, u32 keycode)
 {
 	static u8 const s_detune_adjustment[32][4] =
 	{
-		{ 0,  0,  1,  2 },	{ 0,  0,  1,  2 },	{ 0,  0,  1,  2 },	{ 0,  0,  1,  2 },
-		{ 0,  1,  2,  2 },	{ 0,  1,  2,  3 },	{ 0,  1,  2,  3 },	{ 0,  1,  2,  3 },
-		{ 0,  1,  2,  4 },	{ 0,  1,  3,  4 },	{ 0,  1,  3,  4 },	{ 0,  1,  3,  5 },
-		{ 0,  2,  4,  5 },	{ 0,  2,  4,  6 },	{ 0,  2,  4,  6 },	{ 0,  2,  5,  7 },
-		{ 0,  2,  5,  8 },	{ 0,  3,  6,  8 },	{ 0,  3,  6,  9 },	{ 0,  3,  7, 10 },
-		{ 0,  4,  8, 11 },	{ 0,  4,  8, 12 },	{ 0,  4,  9, 13 },	{ 0,  5, 10, 14 },
-		{ 0,  5, 11, 16 },	{ 0,  6, 12, 17 },	{ 0,  6, 13, 19 },	{ 0,  7, 14, 20 },
-		{ 0,  8, 16, 22 },	{ 0,  8, 16, 22 },	{ 0,  8, 16, 22 },	{ 0,  8, 16, 22 }
+		{ 0,  0,  1,  2 },  { 0,  0,  1,  2 },  { 0,  0,  1,  2 },  { 0,  0,  1,  2 },
+		{ 0,  1,  2,  2 },  { 0,  1,  2,  3 },  { 0,  1,  2,  3 },  { 0,  1,  2,  3 },
+		{ 0,  1,  2,  4 },  { 0,  1,  3,  4 },  { 0,  1,  3,  4 },  { 0,  1,  3,  5 },
+		{ 0,  2,  4,  5 },  { 0,  2,  4,  6 },  { 0,  2,  4,  6 },  { 0,  2,  5,  7 },
+		{ 0,  2,  5,  8 },  { 0,  3,  6,  8 },  { 0,  3,  6,  9 },  { 0,  3,  7, 10 },
+		{ 0,  4,  8, 11 },  { 0,  4,  8, 12 },  { 0,  4,  9, 13 },  { 0,  5, 10, 14 },
+		{ 0,  5, 11, 16 },  { 0,  6, 12, 17 },  { 0,  6, 13, 19 },  { 0,  7, 14, 20 },
+		{ 0,  8, 16, 22 },  { 0,  8, 16, 22 },  { 0,  8, 16, 22 },  { 0,  8, 16, 22 }
 	};
 	s32 result = s_detune_adjustment[keycode][detune & 3];
 	return BIT(detune, 2) ? -result : result;
@@ -956,9 +955,12 @@ void ymopm_registers::cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_ca
 	if (cache.multiple == 0)
 		cache.multiple = 1;
 
-	// phase step, or 1 if PM is active; this depends on block_freq, detune,
-	// and multiple, so compute it after we've done those
-	cache.phase_step = (ch_lfo_pm_sens(choffs) != 0) ? 1 : compute_phase_step(choffs, opoffs, cache, 0);
+	// phase step, or PHASE_STEP_DYNAMIC if PM is active; this depends on
+	// block_freq, detune, and multiple, so compute it after we've done those
+	if (lfo_pm_depth() == 0 || ch_lfo_pm_sens(choffs) == 0)
+		cache.phase_step = compute_phase_step(choffs, opoffs, cache, 0);
+	else
+		cache.phase_step = ymfm_opdata_cache::PHASE_STEP_DYNAMIC;
 
 	// total level, scaled by 8
 	cache.total_level = op_total_level(opoffs) << 3;
@@ -966,6 +968,7 @@ void ymopm_registers::cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_ca
 	// 4-bit sustain level, but 15 means 31 so effectively 5 bits
 	cache.eg_sustain = op_sustain_level(opoffs);
 	cache.eg_sustain |= (cache.eg_sustain + 1) & 0x10;
+	cache.eg_sustain <<= 5;
 
 	// determine KSR adjustment for enevlope rates
 	u32 ksrval = keycode >> (op_ksr(opoffs) ^ 3);
@@ -1325,9 +1328,12 @@ void ymopn_registers_base<IsOpnA>::cache_operator_data(u32 choffs, u32 opoffs, y
 	if (cache.multiple == 0)
 		cache.multiple = 1;
 
-	// phase step, or 0 if PM is active; this depends on block_freq, detune,
-	// and multiple, so compute it after we've done those
-	cache.phase_step = (IsOpnA && lfo_enable() && ch_lfo_pm_sens(choffs) != 0) ? 1 : compute_phase_step(choffs, opoffs, cache, 0);
+	// phase step, or PHASE_STEP_DYNAMIC if PM is active; this depends on
+	// block_freq, detune, and multiple, so compute it after we've done those
+	if (!IsOpnA || lfo_enable() == 0 || ch_lfo_pm_sens(choffs) == 0)
+		cache.phase_step = compute_phase_step(choffs, opoffs, cache, 0);
+	else
+		cache.phase_step = ymfm_opdata_cache::PHASE_STEP_DYNAMIC;
 
 	// total level, scaled by 8
 	cache.total_level = op_total_level(opoffs) << 3;
@@ -1335,6 +1341,7 @@ void ymopn_registers_base<IsOpnA>::cache_operator_data(u32 choffs, u32 opoffs, y
 	// 4-bit sustain level, but 15 means 31 so effectively 5 bits
 	cache.eg_sustain = op_sustain_level(opoffs);
 	cache.eg_sustain |= (cache.eg_sustain + 1) & 0x10;
+	cache.eg_sustain <<= 5;
 
 	// determine KSR adjustment for enevlope rates
 	u32 ksrval = keycode >> (op_ksr(opoffs) ^ 3);
@@ -1681,9 +1688,12 @@ void ymopl_registers_base<Revision>::cache_operator_data(u32 choffs, u32 opoffs,
 	if (cache.multiple == 0)
 		cache.multiple = 1;
 
-	// phase step, or 0 if PM is active; this depends on block_freq, detune,
+	// phase step, or PHASE_STEP_DYNAMIC if PM is active; this depends on block_freq, detune,
 	// and multiple, so compute it after we've done those
-	cache.phase_step = op_lfo_pm_enable(opoffs) ? 1 : compute_phase_step(choffs, opoffs, cache, 0);
+	if (op_lfo_pm_enable(opoffs) == 0)
+		cache.phase_step = compute_phase_step(choffs, opoffs, cache, 0);
+	else
+		cache.phase_step = ymfm_opdata_cache::PHASE_STEP_DYNAMIC;
 
 	// total level, scaled by 8
 	cache.total_level = op_total_level(opoffs) << 3;
@@ -1696,6 +1706,7 @@ void ymopl_registers_base<Revision>::cache_operator_data(u32 choffs, u32 opoffs,
 	// 4-bit sustain level, but 15 means 31 so effectively 5 bits
 	cache.eg_sustain = op_sustain_level(opoffs);
 	cache.eg_sustain |= (cache.eg_sustain + 1) & 0x10;
+	cache.eg_sustain <<= 5;
 
 	// determine KSR adjustment for enevlope rates
 	u32 ksrval = keycode >> (2 * (op_ksr(opoffs) ^ 1));
@@ -1960,9 +1971,12 @@ void ymopll_registers::cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_c
 	if (cache.multiple == 0)
 		cache.multiple = 1;
 
-	// phase step, or 0 if PM is active; this depends on block_freq, detune,
-	// and multiple, so compute it after we've done those
-	cache.phase_step = op_lfo_pm_enable(opoffs) ? 1 : compute_phase_step(choffs, opoffs, cache, 0);
+	// phase step, or PHASE_STEP_DYNAMIC if PM is active; this depends on
+	// block_freq, detune, and multiple, so compute it after we've done those
+	if (op_lfo_pm_enable(opoffs) == 0)
+		cache.phase_step = compute_phase_step(choffs, opoffs, cache, 0);
+	else
+		cache.phase_step = ymfm_opdata_cache::PHASE_STEP_DYNAMIC;
 
 	// total level, scaled by 8; for non-rhythm operator 0, this is the total
 	// level from the instrument data; for other operators it is 4*volume
@@ -1980,6 +1994,7 @@ void ymopll_registers::cache_operator_data(u32 choffs, u32 opoffs, ymfm_opdata_c
 	// 4-bit sustain level, but 15 means 31 so effectively 5 bits
 	cache.eg_sustain = op_sustain_level(opoffs);
 	cache.eg_sustain |= (cache.eg_sustain + 1) & 0x10;
+	cache.eg_sustain <<= 5;
 
 	// The envelope diagram in the YM2413 datasheet gives values for these
 	// in ms from 0->48dB. The attack/decay tables give values in ms from
@@ -2298,9 +2313,9 @@ void ymfm_operator<RegisterType>::clock_keystate(u32 keystate)
 		if (keystate != 0)
 		{
 			// log key on events under certain conditions
-		//	if (m_regs.lfo_waveform() == 3 && m_regs.lfo_enable() && ((m_regs.lfo_am_enable() && m_regs.lfo_am_sensitivity() != 0) || m_regs.lfo_pm_sensitivity() != 0))
-		//	if ((m_regs.rhythm_enable() && m_regs.chnum() >= 6) ||
-		//	    (m_regs.waveform_enable() && m_regs.waveform() != 0))
+		//  if (m_regs.lfo_waveform() == 3 && m_regs.lfo_enable() && ((m_regs.lfo_am_enable() && m_regs.lfo_am_sensitivity() != 0) || m_regs.lfo_pm_sensitivity() != 0))
+		//  if ((m_regs.rhythm_enable() && m_regs.chnum() >= 6) ||
+		//      (m_regs.waveform_enable() && m_regs.waveform() != 0))
 			{
 				LOG("%s: ", m_owner.device().tag(), m_opoffs);
 				m_regs.log_keyon(m_choffs, m_opoffs);
@@ -2386,17 +2401,11 @@ void ymfm_operator<RegisterType>::clock_ssg_eg_state()
 template<class RegisterType>
 void ymfm_operator<RegisterType>::clock_envelope(u32 env_counter)
 {
-	// if in attack state, see if we hit minimum attenuation
+	// handle attack->decay and decay->sustain transitions
 	if (m_env_state == YMFM_ENV_ATTACK && m_env_attenuation == 0)
 		m_env_state = YMFM_ENV_DECAY;
-
-	// if in decay state, see if we hit the sustain level
-	else if (m_env_state == YMFM_ENV_DECAY)
-	{
-		// bring current attenuation down to 5 bits and compare
-		if ((m_env_attenuation >> 5) >= m_cache.eg_sustain)
-			m_env_state = YMFM_ENV_SUSTAIN;
-	}
+	else if (m_env_state == YMFM_ENV_DECAY && m_env_attenuation >= m_cache.eg_sustain)
+		m_env_state = YMFM_ENV_SUSTAIN;
 
 	// fetch the appropriate 6-bit rate value from the cache
 	u32 rate = m_cache.eg_rate[m_env_state];
@@ -2461,7 +2470,7 @@ void ymfm_operator<RegisterType>::clock_phase(s32 lfo_raw_pm)
 {
 	// read from the cache, or recalculate if PM active
 	u32 phase_step = m_cache.phase_step;
-	if (phase_step == 1)
+	if (phase_step == ymfm_opdata_cache::PHASE_STEP_DYNAMIC)
 		phase_step = m_regs.compute_phase_step(m_choffs, m_opoffs, m_cache, lfo_raw_pm);
 
 	// finally apply the step to the current phase value
@@ -2705,18 +2714,18 @@ void ymfm_channel<RegisterType>::output_4op(s32 outputs[RegisterType::OUTPUTS], 
 		(op2in | (op3in << 1) | (op4in << 4) | (op1out << 7) | (op2out << 8) | (op3out << 9))
 	static u16 const s_algorithm_ops[8+4] =
 	{
-		ALGORITHM(1,2,3, 0,0,0),	//  0: O1 -> O2 -> O3 -> O4 -> out (O4)
-		ALGORITHM(0,5,3, 0,0,0),	//  1: (O1 + O2) -> O3 -> O4 -> out (O4)
-		ALGORITHM(0,2,6, 0,0,0),	//  2: (O1 + (O2 -> O3)) -> O4 -> out (O4)
-		ALGORITHM(1,0,7, 0,0,0),	//  3: ((O1 -> O2) + O3) -> O4 -> out (O4)
-		ALGORITHM(1,0,3, 0,1,0),	//  4: ((O1 -> O2) + (O3 -> O4)) -> out (O2+O4)
-		ALGORITHM(1,1,1, 0,1,1),	//  5: ((O1 -> O2) + (O1 -> O3) + (O1 -> O4)) -> out (O2+O3+O4)
-		ALGORITHM(1,0,0, 0,1,1),	//  6: ((O1 -> O2) + O3 + O4) -> out (O2+O3+O4)
-		ALGORITHM(0,0,0, 1,1,1),	//  7: (O1 + O2 + O3 + O4) -> out (O1+O2+O3+O4)
-		ALGORITHM(1,2,3, 0,0,0),	//  8: O1 -> O2 -> O3 -> O4 -> out (O4)         [same as 0]
-		ALGORITHM(0,2,3, 1,0,0),	//  9: (O1 + (O2 -> O3 -> O4)) -> out (O1+O4)   [unique]
-		ALGORITHM(1,0,3, 0,1,0),	// 10: ((O1 -> O2) + (O3 -> O4)) -> out (O2+O4) [same as 4]
-		ALGORITHM(0,2,0, 1,0,1)		// 11: (O1 + (O2 -> O3) + O4) -> out (O1+O3+O4) [unique]
+		ALGORITHM(1,2,3, 0,0,0),    //  0: O1 -> O2 -> O3 -> O4 -> out (O4)
+		ALGORITHM(0,5,3, 0,0,0),    //  1: (O1 + O2) -> O3 -> O4 -> out (O4)
+		ALGORITHM(0,2,6, 0,0,0),    //  2: (O1 + (O2 -> O3)) -> O4 -> out (O4)
+		ALGORITHM(1,0,7, 0,0,0),    //  3: ((O1 -> O2) + O3) -> O4 -> out (O4)
+		ALGORITHM(1,0,3, 0,1,0),    //  4: ((O1 -> O2) + (O3 -> O4)) -> out (O2+O4)
+		ALGORITHM(1,1,1, 0,1,1),    //  5: ((O1 -> O2) + (O1 -> O3) + (O1 -> O4)) -> out (O2+O3+O4)
+		ALGORITHM(1,0,0, 0,1,1),    //  6: ((O1 -> O2) + O3 + O4) -> out (O2+O3+O4)
+		ALGORITHM(0,0,0, 1,1,1),    //  7: (O1 + O2 + O3 + O4) -> out (O1+O2+O3+O4)
+		ALGORITHM(1,2,3, 0,0,0),    //  8: O1 -> O2 -> O3 -> O4 -> out (O4)         [same as 0]
+		ALGORITHM(0,2,3, 1,0,0),    //  9: (O1 + (O2 -> O3 -> O4)) -> out (O1+O4)   [unique]
+		ALGORITHM(1,0,3, 0,1,0),    // 10: ((O1 -> O2) + (O3 -> O4)) -> out (O2+O4) [same as 4]
+		ALGORITHM(0,2,0, 1,0,1)     // 11: (O1 + (O2 -> O3) + O4) -> out (O1+O3+O4) [unique]
 	};
 	u32 algorithm_ops = s_algorithm_ops[m_regs.ch_algorithm(m_choffs)];
 
@@ -3168,7 +3177,7 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::timer_handler)
 	if (param == 0 && m_regs.enable_timer_a())
 		set_reset_status(STATUS_TIMERA, 0);
 	else if (param == 1 && m_regs.enable_timer_b())
-	 	set_reset_status(STATUS_TIMERB, 0);
+		set_reset_status(STATUS_TIMERB, 0);
 
 	// if timer A fired in CSM mode, trigger CSM on all relevant channels
 	if (param == 0 && m_regs.csm())
