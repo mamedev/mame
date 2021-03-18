@@ -47,6 +47,24 @@
           "step"   :  0.1,
           "format": "%1.1f",
           "screen": "raster" },
+        { "type": "float",
+          "name": "lowpass_cutoff",
+          "text": "Lowpass cutoff pixels/scanline",
+          "default": 200.0,
+          "max"    :1000.0,
+          "min"    : 100.0,
+          "step"   :  10.0,
+          "format": "%1.0f",
+          "screen": "raster" },
+        { "type": "float",
+          "name": "lowpass_width",
+          "text": "Lowpass width",
+          "default":  80.0,
+          "max"    : 300.0,
+          "min"    :   0.0,
+          "step"   :  10.0,
+          "format": "%1.0f",
+          "screen": "raster" },
         { "type": "intenum",
           "name": "x_interpolation",
           "text": "Horizontal interpolation",
@@ -230,6 +248,30 @@
     ],
     "passes": [
         {
+            "effect": "crt-geom/lowpass",
+            "name": "lowpass",
+            "uniforms": [
+                { "uniform": "u_lowpass_cutoff", "slider": "lowpass_cutoff" },
+                { "uniform": "u_lowpass_width",  "slider": "lowpass_width" }
+            ],
+            "input": [
+                { "sampler": "s_screen",   "target": "screen" }
+            ],
+            "output": "internal2"
+        },
+        {
+            "effect": "crt-geom/mipmap8",
+            "name": "mipmap",
+            "uniforms": [
+                { "uniform": "u_smooth",   "slider": "rasterbloom_smooth" }
+            ],
+            "input": [
+                { "sampler": "s_screen",   "target": "internal2" },
+                { "sampler": "s_mipmap",   "target": "mipmap" }
+            ],
+            "output": "mipmap"
+        },
+        {
             "effect": "crt-geom/phosphor_apply",
             "applytint": true,
             "name": "phosphor apply",
@@ -240,22 +282,10 @@
                 { "uniform": "u_gamma",             "slider": "CRTgamma" }
             ],
             "input": [
-                { "sampler": "s_screen",   "target": "screen" },
+                { "sampler": "s_screen",   "target": "internal2" },
                 { "sampler": "s_phosphor", "target": "phosphor" }
             ],
             "output": "internal1"
-        },
-        {
-            "effect": "crt-geom/mipmap8",
-            "name": "mipmap",
-            "uniforms": [
-                { "uniform": "u_smooth",   "slider": "rasterbloom_smooth" }
-            ],
-            "input": [
-                { "sampler": "s_screen",   "target": "internal1" },
-                { "sampler": "s_mipmap",   "target": "mipmap" }
-            ],
-            "output": "mipmap"
         },
         {
             "effect": "crt-geom/phosphor_update",
@@ -267,7 +297,7 @@
                 { "uniform": "u_gamma",             "slider": "CRTgamma" }
             ],
             "input": [
-                { "sampler": "s_screen",   "target": "screen" },
+                { "sampler": "s_screen",   "target": "internal2" },
                 { "sampler": "s_phosphor", "target": "phosphor" }
             ],
             "output": "phosphor"
