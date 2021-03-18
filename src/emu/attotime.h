@@ -94,12 +94,12 @@ class attotime
 
 public:
 	// construction/destruction
-	constexpr attotime() noexcept : m_seconds(0), m_attoseconds(0) { }
+	constexpr attotime() noexcept : m_attoseconds(0), m_seconds(0) { }
 
 	/** Constructs with @p secs seconds and @p attos attoseconds. */
-	constexpr attotime(seconds_t secs, attoseconds_t attos) noexcept : m_seconds(secs), m_attoseconds(attos) { }
+	constexpr attotime(seconds_t secs, attoseconds_t attos) noexcept : m_attoseconds(attos), m_seconds(secs) { }
 
-	constexpr attotime(const attotime& that) noexcept : m_seconds(that.m_seconds), m_attoseconds(that.m_attoseconds) { }
+	constexpr attotime(const attotime& that) noexcept : m_attoseconds(that.m_attoseconds), m_seconds(that.m_seconds) { }
 
 	// assignment
 	attotime &operator=(const attotime& that) noexcept
@@ -189,8 +189,8 @@ public:
 
 private:
 	// members
-	seconds_t       m_seconds;
 	attoseconds_t   m_attoseconds;
+	seconds_t       m_seconds;
 };
 /** @} */
 
