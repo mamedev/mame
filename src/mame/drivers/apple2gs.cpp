@@ -1824,8 +1824,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 			m_motoroff_time--;
 			if (m_motoroff_time == 0)
 			{
-				m_floppy[2]->get_device()->tfsel_w(0);
-				m_floppy[3]->get_device()->tfsel_w(0);
+				if (m_floppy[2]->get_device()) m_floppy[2]->get_device()->tfsel_w(0);
+				if (m_floppy[3]->get_device()) m_floppy[3]->get_device()->tfsel_w(0);
 			}
 		}
 
