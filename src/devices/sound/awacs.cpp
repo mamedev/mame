@@ -88,7 +88,7 @@ void awacs_device::device_timer(emu_timer &timer, device_timer_id tid, int param
 
 void awacs_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	int offset = (m_buffer_num == 0) ? m_dma_offset_0 : m_dma_offset_1;
+	//	int offset = (m_buffer_num == 0) ? m_dma_offset_0 : m_dma_offset_1;
 
 	auto &outL = outputs[0];
 	auto &outR = outputs[1];
@@ -97,8 +97,13 @@ void awacs_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 	{
 		for (int i = 0; i < outL.samples(); i++)
 		{
+#if 0
 			outL.put_int(i, s16(m_dma_space->read_word(offset + m_play_ptr)), 32768);
 			outR.put_int(i, s16(m_dma_space->read_word(offset + m_play_ptr + 2)), 32768);
+#else
+			outL.put_int(i, 0, 32768);
+			outR.put_int(i, 0, 32768);
+#endif
 			m_play_ptr += 4;
 		}
 

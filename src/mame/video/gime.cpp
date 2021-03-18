@@ -301,6 +301,8 @@ void gime_device::device_reset(void)
 
 	m_displayed_rgb = false;
 
+	m_ff22_value = 0;
+
 	update_memory();
 	reset_timer();
 }
@@ -552,27 +554,15 @@ void gime_device::update_memory(int bank)
 	if (((block & 0x3F) >= 0x3C) && !(m_sam_state & SAM_STATE_TY) && !force_ram)
 	{
 		// we're in ROM
-		static const uint8_t rom_map[4][4] =
-		{
-			{ 0, 1, 4, 5 },
-			{ 0, 1, 4, 5 },
-			{ 0, 1, 2, 3 },
-			{ 6, 7, 4, 5 }
-		};
-
-		// Pin ROM page to MMU slot
-		block = (block & 0xfc) | (bank & 0x03);
-
-		// look up the block in the ROM map
-		block = rom_map[m_gime_registers[0] & 3][(block & 0x3F) - 0x3C];
+		const uint8_t rom_mode = m_gime_registers[0] & 3;
 
 		// are we in onboard ROM or cart ROM?
-		if (block > 3)
+		if (rom_mode == 3 || (rom_mode < 2 && (block & 0x3F) >= 0x3E))
 		{
 			if (m_cart_rom)
 			{
-				// perform the look up
-				memory = &m_cart_rom[((block & 3) * 0x2000) % m_cart_size];
+				// perform the look up (ROM page is pinned to MMU slot)
+				memory = &m_cart_rom[(((bank & 3) ^ 2) * 0x2000) % m_cart_size];
 			}
 			else
 			{
@@ -581,7 +571,7 @@ void gime_device::update_memory(int bank)
 		}
 		else
 		{
-			memory = &m_rom[(block & 3) * 0x2000];
+			memory = &m_rom[(bank & 3) * 0x2000];
 		}
 		is_read_only = true;
 	}

@@ -10,6 +10,7 @@
 //#include "bus/midi/midi.h"
 #include "cpu/i86/i186.h"
 #include "cpu/upd7810/upd7811.h"
+#include "machine/clock.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/upd765.h"
@@ -116,6 +117,8 @@ void mpc60_state::mpc60(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpc60_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &mpc60_state::io_map);
 
+	CLOCK(config, "tmrck", 20_MHz_XTAL / 10).signal_handler().set(m_maincpu, FUNC(i80186_cpu_device::tmrin1_w)); // CPUCK output divided by 74HC390
+
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // CXK5816PN-15L + CL2020 battery
 
 	UPD78C11(config, m_panelcpu, 12_MHz_XTAL);
@@ -127,6 +130,10 @@ void mpc60_state::mpc60(machine_config &config)
 	I8255(config, "ppi"); // MB89255A-P-C
 
 	UPD72065(config, m_fdc, 16_MHz_XTAL / 4); // μPD72066C (clocked by SED9420CAC)
+	m_fdc->set_ready_line_connected(false); // RDY tied to VDD (TODO: drive ready signal connected to PPI's PB2 instead)
+	m_fdc->set_select_lines_connected(false);
+	m_fdc->intrq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
+	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w)); // FIXME: delayed and combined with DRQAD
 
 	hd61830_device &lcdc(HD61830(config, "lcdc", 0)); // LC7981
 	lcdc.set_addrmap(0, &mpc60_state::lcd_map);
@@ -140,6 +147,8 @@ void mpc60_state::mpc60(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
+
+	//L4003(config, "voicelsi", 35.84_MHz_XTAL);
 }
 
 ROM_START(mpc60)
@@ -150,7 +159,7 @@ ROM_START(mpc60)
 	ROM_LOAD16_BYTE("mpc6cpu4.ic5", 0x20001, 0x10000, CRC(d922a66d) SHA1(0f4bc0522b9826d617f4af72382d75853515d7f5))
 
 	ROM_REGION16_LE(0x10000, "waves", 0)
-	ROM_LOAD16_BYTE("ic17", 0x00000, 0x08000, NO_DUMP)
+	ROM_LOAD16_BYTE("ic17", 0x00000, 0x08000, NO_DUMP) // lowest nibble is unused
 	ROM_LOAD16_BYTE("ic18", 0x00001, 0x08000, NO_DUMP)
 
 	ROM_REGION(0x1000, "panelcpu", 0)

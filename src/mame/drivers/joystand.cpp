@@ -86,10 +86,15 @@ Notes:
 - To unlock some hidden items in test mode, go in the option menu and move:
   left, right, left, left
 
+TODO:
+- Support cartridge slot select function
+- Requires camera, printer, lightpen emulation
+
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/bankdev.h"
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
 #include "machine/msm6242.h"
@@ -111,18 +116,8 @@ public:
 		m_bg15_palette(*this, "bg15_palette"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_eeprom(*this, "eeprom"),
-		m_cart_u1(*this, "cart.u1"),
-		m_cart_u2(*this, "cart.u2"),
-		m_cart_u3(*this, "cart.u3"),
-		m_cart_u4(*this, "cart.u4"),
-		m_cart_u5(*this, "cart.u5"),
-		m_cart_u6(*this, "cart.u6"),
-		m_cart_u7(*this, "cart.u7"),
-		m_cart_u8(*this, "cart.u8"),
-		m_cart_u9(*this, "cart.u9"),
-		m_cart_u10(*this, "cart.u10"),
-		m_cart_u11(*this, "cart.u11"),
-		m_cart_u12(*this, "cart.u12"),
+		m_cart_flash(*this, "cart.u%u", 1U),
+		m_cartflash_bankdev(*this, "cartflash_bankdev"),
 		m_oki(*this, "oki"),
 		m_bg1_ram(*this, "bg1_ram"),
 		m_bg2_ram(*this, "bg2_ram"),
@@ -147,19 +142,8 @@ private:
 	required_device<palette_device> m_bg15_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<intelfsh8_device> m_cart_u1;
-	required_device<intelfsh8_device> m_cart_u2;
-	required_device<intelfsh8_device> m_cart_u3;
-	required_device<intelfsh8_device> m_cart_u4;
-	required_device<intelfsh8_device> m_cart_u5;
-	required_device<intelfsh8_device> m_cart_u6;
-	required_device<intelfsh8_device> m_cart_u7;
-	required_device<intelfsh8_device> m_cart_u8;
-	required_device<intelfsh8_device> m_cart_u9;
-	required_device<intelfsh8_device> m_cart_u10;
-	required_device<intelfsh8_device> m_cart_u11;
-	required_device<intelfsh8_device> m_cart_u12;
-	intelfsh8_device *m_cart_flash[12];
+	required_device_array<intelfsh8_device, 12> m_cart_flash;
+	required_device<address_map_bank_device> m_cartflash_bankdev;
 	required_device<okim6295_device> m_oki;
 
 	// memory pointers
@@ -182,9 +166,9 @@ private:
 	// r5g5b5 layers
 	bitmap_rgb32 m_bg15_bitmap[2];
 	void bg15_0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void bg15_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void bg15_1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	static const rgb_t BG15_TRANSPARENT;
-	void draw_bg15_tile(address_space &space, int x, int y, uint16_t code);
+	void draw_bg15_tile(int x, int y, uint16_t code);
 	void draw_bg15_tilemap();
 	bool bg15_tiles_dirty;
 
@@ -193,7 +177,6 @@ private:
 	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// cart
-	uint16_t cart_r(offs_t offset);
 	void cart_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	// misc
@@ -209,6 +192,7 @@ private:
 	// machine
 	INTERRUPT_GEN_MEMBER(joystand_interrupt);
 	void joystand_map(address_map &map);
+	void cart_map(address_map &map);
 };
 
 const rgb_t joystand_state::BG15_TRANSPARENT = 0x99999999;
@@ -257,11 +241,13 @@ void joystand_state::bg15_0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 }
 
 // tile-based
-void joystand_state::draw_bg15_tile(address_space &space, int x, int y, uint16_t code)
+void joystand_state::draw_bg15_tile(int x, int y, uint16_t code)
 {
+	address_space &space = m_cartflash_bankdev->space(0);
+
 	x *= 16;
 	y *= 16;
-	int srcaddr = 0x800000 + (code % (0x800 * 6)) * 16 * 16 * 2;
+	int srcaddr = (code % (0x800 * 6)) * 16 * 16 * 2;
 
 	for (int ty = 0; ty < 16; ++ty)
 	{
@@ -280,24 +266,23 @@ void joystand_state::draw_bg15_tilemap()
 
 	bg15_tiles_dirty = false;
 
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint16_t *src = m_bg15_1_ram + 2/2;
 	for (int y = 0; y < 0x10; ++y)
 	{
 		for (int x = 0; x < 0x20; ++x)
 		{
-			draw_bg15_tile(space, x, y, *src);
+			draw_bg15_tile(x, y, *src);
 			src += 8/2;
 		}
 		src += 0x100/2;
 	}
 }
 
-void joystand_state::bg15_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
+void joystand_state::bg15_1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t code = COMBINE_DATA(&m_bg15_1_ram[offset]);
 	if ((offset & 0x83) == 0x01)
-		draw_bg15_tile(space, (offset/4) & 0x1f, offset/0x100, code);
+		draw_bg15_tile((offset/4) & 0x1f, offset/0x100, code);
 }
 
 /***************************************************************************
@@ -429,23 +414,9 @@ uint16_t joystand_state::e00020_r()
 	return ioport("MASTER")->read();
 }
 
-uint16_t joystand_state::cart_r(offs_t offset)
-{
-	int which = offset / 0x80000;
-	int addr  = offset & 0x7ffff;
-	return (m_cart_flash[which * 2 + 0]->read(addr) << 8) | m_cart_flash[which * 2 + 1]->read(addr);
-}
-
 void joystand_state::cart_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int which = offset / 0x80000;
-	int addr  = offset & 0x7ffff;
-
-	if (ACCESSING_BITS_0_7)
-		m_cart_flash[which * 2 + 1]->write(addr, data & 0xff);
-	if (ACCESSING_BITS_8_15)
-		m_cart_flash[which * 2 + 0]->write(addr, data >> 8);
-
+	m_cartflash_bankdev->write16(offset, data, mem_mask);
 	bg15_tiles_dirty = true;
 }
 
@@ -472,12 +443,33 @@ void joystand_state::joystand_map(address_map &map)
 	map(0x60c000, 0x60c003).ram().share("scroll"); // write
 	map(0x60c00c, 0x60c00d).ram().share("enable"); // write
 
-	map(0x800000, 0xdfffff).rw(FUNC(joystand_state::cart_r), FUNC(joystand_state::cart_w)); // r/w (cart flash)
+	map(0x800000, 0xdfffff).r(m_cartflash_bankdev, FUNC(address_map_bank_device::read16)).w(FUNC(joystand_state::cart_w)); // r/w (cart flash)
 //  map(0xe00080, 0xe00081) // write (bit 0 = cart? bit 1 = ? bit 3 = ?)
 	map(0xe00000, 0xe00001).r(FUNC(joystand_state::e00000_r)); // copy slot
 	map(0xe00020, 0xe00021).r(FUNC(joystand_state::e00020_r)); // master slot
 
 	map(0xe80040, 0xe8005f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
+}
+
+void joystand_state::cart_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rw(m_cart_flash[10], FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x000000, 0x0fffff).rw(m_cart_flash[4],  FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+
+	map(0x100000, 0x1fffff).rw(m_cart_flash[11], FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x100000, 0x1fffff).rw(m_cart_flash[5],  FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+
+	map(0x200000, 0x2fffff).rw(m_cart_flash[8],  FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x200000, 0x2fffff).rw(m_cart_flash[2],  FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+
+	map(0x300000, 0x3fffff).rw(m_cart_flash[9],  FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x300000, 0x3fffff).rw(m_cart_flash[3],  FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+
+	map(0x400000, 0x4fffff).rw(m_cart_flash[6],  FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x400000, 0x4fffff).rw(m_cart_flash[0],  FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
+
+	map(0x500000, 0x5fffff).rw(m_cart_flash[7],  FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0xff00);
+	map(0x500000, 0x5fffff).rw(m_cart_flash[1],  FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
 }
 
 
@@ -566,12 +558,6 @@ GFXDECODE_END
 
 void joystand_state::machine_start()
 {
-	m_cart_flash[0]  = m_cart_u11;      m_cart_flash[1]  = m_cart_u5;
-	m_cart_flash[2]  = m_cart_u12;      m_cart_flash[3]  = m_cart_u6;
-	m_cart_flash[4]  = m_cart_u9;       m_cart_flash[5]  = m_cart_u3;
-	m_cart_flash[6]  = m_cart_u10;      m_cart_flash[7]  = m_cart_u4;
-	m_cart_flash[8]  = m_cart_u7;       m_cart_flash[9]  = m_cart_u1;
-	m_cart_flash[10] = m_cart_u8;       m_cart_flash[11] = m_cart_u2;
 }
 
 void joystand_state::machine_reset()
@@ -593,6 +579,7 @@ void joystand_state::joystand(machine_config &config)
 	m_maincpu->in_parallel_callback().set(FUNC(joystand_state::eeprom_r));
 	m_maincpu->out_parallel_callback().set(FUNC(joystand_state::eeprom_w));
 
+	ADDRESS_MAP_BANK(config, m_cartflash_bankdev).set_map(&joystand_state::cart_map).set_options(ENDIANNESS_BIG, 16, 24, 0x800000); // TODO: address bit per carts?
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -613,18 +600,8 @@ void joystand_state::joystand(machine_config &config)
 	OKIM6295(config, m_oki, XTAL(16'000'000) / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // pin 7 not verified
 
 	// cart
-	TMS_29F040(config, "cart.u1");
-	TMS_29F040(config, "cart.u2");
-	TMS_29F040(config, "cart.u3");
-	TMS_29F040(config, "cart.u4");
-	TMS_29F040(config, "cart.u5");
-	TMS_29F040(config, "cart.u6");
-	TMS_29F040(config, "cart.u7");
-	TMS_29F040(config, "cart.u8");
-	TMS_29F040(config, "cart.u9");
-	TMS_29F040(config, "cart.u10");
-	TMS_29F040(config, "cart.u11");
-	TMS_29F040(config, "cart.u12");
+	for (int i = 0; i < 12; i++)
+		TMS_29F040(config, m_cart_flash[i]);
 
 	// devices
 	EEPROM_93C46_16BIT(config, "eeprom");
@@ -685,4 +662,4 @@ ROM_START( joystand )
 	ROM_LOAD( "jsp-xct.ic5",   0x000, 0x117, NO_DUMP )
 ROM_END
 
-GAME( 1997, joystand, 0, joystand, joystand, joystand_state, empty_init, ROT0, "Yuvo", "Joy Stand Private", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, joystand, 0, joystand, joystand, joystand_state, empty_init, ROT0, "Yuvo", "Joy Stand Private", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE )

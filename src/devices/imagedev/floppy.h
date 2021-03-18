@@ -55,7 +55,7 @@ public:
 		const char *m_name;
 		u32 m_key;
 		const char *m_description;
-		
+
 		fs_info(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, u32 key, const char *description) :
 			m_manager(manager),
 			m_type(type),
@@ -64,7 +64,7 @@ public:
 			m_key(key),
 			m_description(description)
 		{}
-		
+
 		fs_info(const filesystem_manager_t *manager, const char *name, u32 key, const char *description) :
 			m_manager(manager),
 			m_type(nullptr),
@@ -117,6 +117,7 @@ public:
 	bool ready_r();
 	void set_ready(bool state);
 	double get_pos();
+	virtual void tfsel_w(int state) { };    // 35SEL line for Apple Sony drives
 
 	virtual bool wpt_r(); // Mac sony drives using this for various reporting
 	int dskchg_r() { return dskchg; }
@@ -156,7 +157,7 @@ protected:
 	struct fs_enum : public filesystem_manager_t::floppy_enumerator {
 		floppy_image_device *m_fid;
 		fs_enum(floppy_image_device *fid) : filesystem_manager_t::floppy_enumerator(), m_fid(fid) {};
-		
+
 		virtual void add(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, u32 key, const char *description) override;
 		virtual void add_raw(const filesystem_manager_t *manager, const char *name, u32 key, const char *description) override;
 	};
@@ -315,6 +316,7 @@ public:
 
 	virtual bool wpt_r() override;
 	virtual void mon_w(int) override;
+	virtual void tfsel_w(int state) override;
 	virtual void seek_phase_w(int phases) override;
 	virtual const char *image_interface() const noexcept override { return "floppy_3_5"; }
 	virtual bool writing_disabled() const override;

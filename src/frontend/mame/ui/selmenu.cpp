@@ -1851,6 +1851,8 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				stop = true;
 				break;
 			case ui_event::type::NONE:
+			case ui_event::type::WINDOW_FOCUS:
+			case ui_event::type::WINDOW_DEFOCUS:
 			case ui_event::type::MOUSE_MOVE:
 			case ui_event::type::MOUSE_LEAVE:
 			case ui_event::type::MOUSE_UP:

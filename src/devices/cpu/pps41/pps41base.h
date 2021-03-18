@@ -16,9 +16,7 @@
 enum
 {
 	PPS41_INPUT_LINE_INT0 = 0,
-	PPS41_INPUT_LINE_INT1,
-	PPS41_INPUT_LINE_SDI, // serial data input
-	PPS41_INPUT_LINE_SSC // serial shift clock
+	PPS41_INPUT_LINE_INT1
 };
 
 
@@ -40,8 +38,15 @@ public:
 	auto write_r() { return m_write_r.bind(); }
 
 	// serial data/clock
+	auto read_sdi() { return m_read_sdi.bind(); }
 	auto write_sdo() { return m_write_sdo.bind(); }
 	auto write_ssc() { return m_write_ssc.bind(); }
+
+	// I/O access
+	u16 d_output_r() { return m_d_output; }
+	u8 r_output_r() { return m_r_output; }
+	int sdo_r() { return BIT(m_s, 3); }
+	void ssc_w(int state);
 
 protected:
 	// construction/destruction
@@ -52,9 +57,11 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); }
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
 	virtual u32 execute_max_cycles() const noexcept override { return 2; }
-	virtual u32 execute_input_lines() const noexcept override { return 4; }
+	virtual u32 execute_input_lines() const noexcept override { return 2; }
 	virtual void execute_set_input(int line, int state) override;
 	virtual void execute_run() override;
 	virtual void execute_one() = 0;
@@ -84,6 +91,7 @@ protected:
 	devcb_write16 m_write_d;
 	devcb_read8 m_read_r;
 	devcb_write8 m_write_r;
+	devcb_read_line m_read_sdi;
 	devcb_write_line m_write_sdo;
 	devcb_write_line m_write_ssc;
 
@@ -113,10 +121,8 @@ protected:
 	int m_skip_count;
 
 	u8 m_s;
-	int m_sdi;
 	int m_sclock_in;
 	int m_sclock_count;
-	bool m_ss_pending;
 
 	int m_d_pins;
 	u16 m_d_mask;
@@ -127,6 +133,8 @@ protected:
 
 	// misc handlers
 	virtual bool op_is_tr(u8 op) = 0;
+	void serial_shift(int state);
+	void serial_clock();
 	void cycle();
 	void increment_pc();
 };

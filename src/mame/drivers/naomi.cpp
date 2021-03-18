@@ -151,8 +151,21 @@ EPF8452AQC160-3 - Altera FLEX EPF8452AQC160-3 FPGA (QFP160)
 837-14351 (sticker)
 (C) SEGA 2001
 Later board revision, components layout more similar to Naomi 2, was added JP9-JP13 jumpers to configure CN8 serial port type, see below Naomi 2 description.
+However, CN8 serial lines uses TTL UART 3V3 voltage levels, not +-12V RS-232C like Naomi 2.
 
-Also known to exist later revison which have replaced Altera FLEX with Actel A54SX08A (315-6415) FPGA and have not populated IC69 93C46 (SN# EEPROM). Other details not known, there might be more differences.
+171-8183E
+837-14601 (sticker)
+(C) SEGA 2001
+Latest known revision, most notable difference - uses Actel FPGA instead of Altera FLEX.
+
+Main components are later revisions (same as was seen in Sega-made Atomiswave PCB):
+      HD6417091T - Hitachi SH4 CPU, CPU version register = 0x040206c8, where 06 means it should be 7750S type, but it's not and missing 7750S's expanded features like INTC "Interrupt priority D" register.
+       315-6318A - HOLLY chipset
+       315-6258A - video DAC/encoder, (QFP56)
+       315-6232A - Yamaha AICA SPU (QFP100)
+       315-6146A - custom Z80-based MCU (QFP176), was verified same firmware as 315-6146.
+        315-6415 - Actel A54SX08A FPGA
+
 
 Sega NAOMI 2 Mainboard PCB Layout
 ---------------------------------
@@ -828,6 +841,7 @@ Notes:
                                               Cart  Sticker   FL0-FL3   FLASHROMs   X76F100  CY37128  315-5881      Known Game
  Game                                         Type  on cart   FLASHROM  # of SOP48  IC @ 1F  IC @ 2J  IC @ 1M       code (1)    Notes
 ----------------------------------------------------------------------------------------------------------------------------------------
+Mazan: Flash of the Blade (Japan, MAZ1 Ver.A) F1X   25869812  1 (64Mb)   8 (128Mb)  present  NAODEC3  317-0266-COM  MAZ1        uses 2x Namco FCB JVS I/O (not dumped)
 Mazan: Flash of the Blade (World, MAZ2 Ver.A) F1X   25869812  1 (64Mb)   8 (128Mb)  present  NAODEC3  317-0266-COM  MAZ2        uses 2x Namco FCB JVS I/O (not dumped)
 Mazan: Flash of the Blade (US, MAZ3 Ver.A)    F1X   25869812  1 (64Mb)   8 (128Mb)  present  NAODEC3  317-0266-COM  MAZ3
 Ninja Assault (Japan, NJA1 Ver.A)             F3    25469801  3 (64Mb)   9 (128Mb)  present  NAODEC3  317-5068-COM  NJA1        uses Namco JYU JVS I/O
@@ -7647,6 +7661,25 @@ ROM_START( mazanu )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "280fea94" )
 ROM_END
 
+ROM_START( mazanj )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x10000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "maz1vera.2d",  0x0800000, 0x0800000, CRC(d157f771) SHA1(058ced0e2eee7db22aada987e158c93dbb6edf26) )
+	ROM_LOAD( "maz1ma1.4m",  0x1000000, 0x1000000, CRC(68e12189) SHA1(5a434bd0305189620a62c785c5ac2812dae033d6) )
+	ROM_LOAD( "maz1ma2.4l",  0x2000000, 0x1000000, CRC(c7a05b44) SHA1(dfbeb3be5adfdf3d4f1d330f3654a5532eb28cc2) )
+	ROM_LOAD( "maz1ma3.4k",  0x3000000, 0x1000000, CRC(48e1a8a5) SHA1(8b0d83c02ab576d90c95aad297c7447326154c0e) )
+	ROM_LOAD( "maz1ma4.4j",  0x4000000, 0x1000000, CRC(0187cdab) SHA1(aaa9fd208103426eb0eee58ae0a64a191abcd126) )
+	ROM_LOAD( "maz1ma5.4h",  0x5000000, 0x1000000, CRC(c6885ee7) SHA1(14e7e017438adcbe0136d7d863af95fe65bd15d8) )
+	ROM_LOAD( "maz1ma6.4f",  0x6000000, 0x1000000, CRC(a6593c36) SHA1(627bf19d960037ea92b673b786a9da7208acd447) )
+	ROM_LOAD( "maz1ma7.4e",  0x7000000, 0x1000000, CRC(6103ad9c) SHA1(e4abbb5867cae6a9bf9067ab3a091ef7b18fa0cd) )
+	ROM_LOAD( "maz1ma8.4d",  0x8000000, 0x1000000, CRC(d46c9f40) SHA1(45eec7fa3d4261f12438e841254fa75d572331b3) )
+
+	// 25869812    2002     317-0266-COM   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "280fea94" )
+ROM_END
+
 ROM_START( vtenis2c )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -11787,6 +11820,7 @@ ROM_END
 /* 25509801 */ GAME( 2000, wldkickspw, wldkicks, naomim2,naomi, naomi_state, init_naomi, ROT0, "Namco",          "World Kicks PCB (World, WKC2 Ver.A)", GAME_FLAGS )    // "PCB" means upright version, uses analog button on control panel to kick the ball
 /* 25709801 */ GAME( 2001, gunsur2j,   gunsur2,  naomim2,naomi, naomi_state, init_naomi, ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (Japan, BHF1 Ver.E)", GAME_FLAGS )
 /* 25709801 */ GAME( 2001, gunsur2,    naomi,    naomim2,naomi, naomi_state, init_naomi, ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (World, BHF2 Ver.E)", GAME_FLAGS )
+/* 25869812 */ GAME( 2002, mazanj,     mazan,    naomim2,naomi, naomi_state, init_naomi, ROT0, "Namco",          "Mazan: Flash of the Blade (Japan, MAZ1 Ver.A)", GAME_FLAGS )
 /* 25869812 */ GAME( 2002, mazan,      naomi,    naomim2,naomi, naomi_state, init_naomi, ROT0, "Namco",          "Mazan: Flash of the Blade (World, MAZ2 Ver.A)", GAME_FLAGS )
 /* 25869812 */ GAME( 2002, mazanu,     mazan,    naomim2,naomi, naomi_state, init_naomi, ROT0, "Namco",          "Mazan: Flash of the Blade (US, MAZ3 Ver.A)", GAME_FLAGS )
 

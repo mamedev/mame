@@ -259,6 +259,7 @@ const double XTAL::known_xtals[] = {
 	 16'400'000, /* 16.4_MHz_XTAL          MS 6102 */
 	 16'572'000, /* 16.572_MHz_XTAL        Micro-Term ACT-5A */
 	 16'588'800, /* 16.5888_MHz_XTAL       SM 7238 */
+	 16'666'600, /* 16.6666_MHz_XTAL       Firebeat GCU */
 	 16'669'800, /* 16.6698_MHz_XTAL       Qume QVT-102 */
 	 16'670'000, /* 16.67_MHz_XTAL         - */
 	 16'777'216, /* 16.777216_MHz_XTAL     Nintendo Game Boy Advance */
@@ -398,6 +399,7 @@ const double XTAL::known_xtals[] = {
 	 34'291'712, /* 34.291712_MHz_XTAL     Fairlight CMI master card */
 	 34'846'000, /* 34.846_MHz_XTAL        Visual 550 */
 	 35'834'400, /* 35.8344_MHz_XTAL       Tab Products E-22 132-column display clock */
+	 35'840'000, /* 35.84_MHz_XTAL         Akai MPC 60 voice PCB */
 	 35'904'000, /* 35.904_MHz_XTAL        Used on HP98543 graphics board */
 	 36'000'000, /* 36_MHz_XTAL            Sega Model 1 video board */
 	 36'864'000, /* 36.864_MHz_XTAL        Unidesa Cirsa Rock 'n' Roll */

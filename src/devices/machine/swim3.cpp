@@ -48,12 +48,11 @@ void swim3_device::set_floppy(floppy_image_device *floppy)
 	if(m_floppy == floppy)
 		return;
 
-	if(m_floppy)
-		m_floppy->mon_w(true);
+	logerror("floppy %s\n", floppy ? floppy->tag() : "-");
+
 	m_floppy = floppy;
-	if(m_mode & 0x80)
-		m_floppy->mon_w(false);
 	update_phases();
+	m_hdsel_cb((m_mode >> 5) & 1);
 }
 
 floppy_image_device *swim3_device::get_floppy() const
@@ -63,36 +62,42 @@ floppy_image_device *swim3_device::get_floppy() const
 
 void swim3_device::show_mode() const
 {
-	logerror("mode%s %s hdsel=%c %c%s %c%c%s\n",
-			 m_mode & 0x80 ? " motoron" : "",
-			 m_mode & 0x40 ? "ism" : "iwm",
+	logerror("mode%s%s hdsel=%c %c%s %c%c%s\n",
+			 m_mode & 0x80 ? " step" : "",
+			 m_mode & 0x40 ? " format" : "",
 			 m_mode & 0x20 ? '1' : '0',
 			 m_mode & 0x10 ? 'w' : 'r',
-			 m_mode & 0x08 ? " action" : "",
-			 m_mode & 0x04 ? 'a' : '-',
-			 m_mode & 0x02 ? 'b' : '-',
-			 m_mode & 0x01 ? " clear" : "");
+			 m_mode & 0x08 ? " go" : "",
+			 m_mode & 0x04 ? 'b' : '-',
+			 m_mode & 0x02 ? 'a' : '-',
+			 m_mode & 0x01 ? " irq" : "");
 
 }
 
 u8 swim3_device::read(offs_t offset)
 {
 	static const char *const names[] = {
-		"?0", "?1", "?2", "?3", "?4", "?5", "?6", "?7",
-		"data", "mark", "crc", "param", "phases", "setup", "status", "handshake"
+		"data", "timer", "error", "param", "phases", "setup", "?6", "handshake",
+		"interrupt", "step", "track", "sector", "gap", "sect1", "xfer", "imask"
 	};
 	switch(offset) {
-	case 0x3: case 0xb: {
-		u8 r = m_param[m_param_idx];
-		m_param_idx = (m_param_idx + 1) & 15;
-		return r;
-	}
-	case 0x4: case 0xc:
-		return m_phases;
-	case 0x5: case 0xd:
+	case 0x4: // phases
+		return m_phases & 0xf;
+
+	case 0x5: // setup
 		return m_setup;
-	case 0xe:
+
+	case 0x6: // mode
 		return m_mode;
+
+	case 0x7: { // handshake
+		u8 h = 0;
+		if(!m_floppy || m_floppy->wpt_r())
+			h |= 0x08;
+		logerror("hand %02x\n", h);
+		return h;
+	};
+
 	default:
 		logerror("read %s\n", names[offset & 15]);
 		break;
@@ -102,65 +107,41 @@ u8 swim3_device::read(offs_t offset)
 
 void swim3_device::write(offs_t offset, u8 data)
 {
-	machine().debug_break();
+	u8 prev_mode = m_mode;
+
 	static const char *const names[] = {
-		"data", "mark", "crc", "param", "phases", "setup", "mode0", "mode1",
-		"?8", "?9", "?a", "?b", "?c", "?d", "?e", "?f"
+		"data", "timer", "error", "param", "phases", "setup", "mode0", "mode1",
+		"?8", "step", "track", "sector", "gap", "sect1", "xfer", "imask"
 	};
 	switch(offset) {
-	case 0x3: case 0xb: {
-#if 0
-		static const char *const pname[16] = {
-			"minct", "mult", "ssl", "sss", "sll", "sls", "rpt", "csls",
-			"lsl", "lss", "lll", "lls", "late", "time0", "early", "time1"
-		};
-#endif
-		static const char *const pname[4] = {
-			"late", "time0", "early", "time1"
-		};
-		logerror("param[%s] = %02x\n", pname[m_param_idx], data);
-		m_param[m_param_idx] = data;
-		m_param_idx = (m_param_idx + 1) & 3;
-		break;
-	}
-	case 0x4: {
-		m_phases = data;
+	case 4: { // phases
+		m_phases = data | 0xf0;
+		logerror("phases %x\n", data);
 		update_phases();
 		break;
 	}
 
-	case 0x5: case 0xd:
+	case 5: // setup
 		m_setup = data;
-#if 0
-		logerror("setup timer=%s tsm=%s %s ecm=%s %s %s 3.5=%s %s\n",
-				 m_setup & 0x80 ? "on" : "off",
-				 m_setup & 0x40 ? "off" : "on",
+		m_sel35_cb((m_setup >> 1) & 1);
+		logerror("setup write=%s %s nogcrconv=%s %s %s%s %s\n",
+				 m_setup & 0x40 ? "gcr" : "mfm",
 				 m_setup & 0x20 ? "ibm" : "apple",
 				 m_setup & 0x10 ? "on" : "off",
 				 m_setup & 0x08 ? "fclk/2" : "fclk",
 				 m_setup & 0x04 ? "gcr" : "mfm",
-				 m_setup & 0x02 ? "off" : "on",
-				 m_setup & 0x01 ? "hdsel" : "q3");
-#endif
-		logerror("setup timer=%s tsm=%s %s ecm=%s %s %s 3.5=%s %s\n",
-				 m_setup & 0x80 ? "on" : "off",
-				 m_setup & 0x40 ? "off" : "on",
-				 m_setup & 0x20 ? "ibm" : "apple",
-				 m_setup & 0x10 ? "on" : "off",
-				 m_setup & 0x08 ? "fclk/2" : "fclk",
-				 m_setup & 0x04 ? "gcr" : "mfm",
-				 m_setup & 0x02 ? "off" : "on",
-				 m_setup & 0x01 ? "hdsel" : "q3");
+				 m_setup & 0x02 ? " copy" : "",
+				 m_setup & 0x01 ? "wrinvert" : "wrdirect");
 		break;
 
-	case 0x6:
+	case 6: // mode clear
 		m_mode &= ~data;
 		m_mode |= 0x40;
 		m_param_idx = 0;
 		show_mode();
 		break;
 
-	case 0x7:
+	case 7: // mode set
 		m_mode |= data;
 		show_mode();
 		break;
@@ -169,6 +150,12 @@ void swim3_device::write(offs_t offset, u8 data)
 		logerror("write %s, %02x\n", names[offset], data);
 		break;
 	}
+
+	if((m_mode ^ prev_mode) & 0x06)
+		m_devsel_cb((m_mode >> 1) & 3);
+	if((m_mode ^ prev_mode) & 0x20)
+		m_hdsel_cb((m_mode >> 5) & 1);
+
 }
 
 void swim3_device::sync()

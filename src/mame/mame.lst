@@ -16160,6 +16160,7 @@ cfrogger                        // Coleco
 gjungler                        // Gakken
 
 @source:hh_pic16.cpp
+drdunk                          // Kmart
 flash                           // Ideal
 hccbaskb                        // Tiger Electronics
 leboom                          // Lakeside
@@ -16168,7 +16169,6 @@ melodym                         // GAF
 matchme                         // Kingsford
 pabball                         // Caprice
 rockpin                         // Tiger Electronics
-tbaskb                          // Tandy Corporation
 touchme                         // Atari
 ttfball                         // Toytronic
 ttfballa                        // Toytronic
@@ -16176,9 +16176,14 @@ us2pfball                       // US Games
 uspbball                        // US Games
 
 @source:hh_pps41.cpp
+dunksunk                        // Kmart
+ftri1                           // Fonas
 mastmind                        // Invicta
 memoquiz                        // MEM
+mwcfootb                        // Mattel
+rdqa                            // Selchow & Righter
 scrabsen                        // Selchow & Righter
+smastmind                       // Invicta
 
 @source:hh_sm510.cpp
 auslalom                        // Elektronika
@@ -19569,8 +19574,11 @@ lcmate2                         //
 
 @source:leapfrog_iquest.cpp
 iquest
+ttwistfb
 ttwistbq
 ttwistm
+ttwistsp
+ttwistvc
 turboex
 
 @source:leapfrog_leappad.cpp
@@ -20126,6 +20134,8 @@ maclc2                          // 1991 Apple Macintosh LC II
 maclc3                          // 1993 Apple Macintosh LC III
 maclc520                        // 1993 Apple Macintosh LC 520
 macse30                         // 1989 Apple Macintosh SE/30
+
+@source:macpdm.cpp
 pmac6100                        // 1993 Apple Power Macintosh 6100
 
 @source:macquadra700.cpp
@@ -31725,6 +31735,7 @@ manicpnc                        // 2007.07 Manic Panic Ghosts! (USA)
 marstv                          // 1999.12 Mars TV
 maxspeed                        // 2002.12 Maximum Speed
 mazan                           // 2002.07 Mazan: Flash of the Blade (World, MAZ2 Ver.A)
+mazanj                          // 2002.07 Mazan: Flash of the Blade (Japan, MAZ1 Ver.A)
 mazanu                          // 2002.07 Mazan: Flash of the Blade (US, MAZ3 Ver.A)
 mbaa                            // 2008.12 Melty Blood Actress Again Version A (Rev A)
 mbaao                           // 2008.09 Melty Blood Actress Again
@@ -32979,6 +32990,7 @@ nss_lwep                        // 1992 Nintendo
 nss_ncaa                        // 1992 Sculptured Software Inc.
 nss_rob3                        // 1992 Ocean
 nss_skin                        // 1992 Irem
+nss_smas                        // 1993 Nintendo
 nss_smw                         // 1991 Nintendo
 nss_ssoc                        // 1992 Human Inc.
 nss_sten                        // 199? Nintendo
@@ -36294,6 +36306,7 @@ risc2500a
 schess
 
 @source:saitek_simultano.cpp
+cc2150
 simultano
 simultanoa
 
@@ -38530,41 +38543,42 @@ lx_jg7425
 lx_aven
 
 @source:spg2xx.cpp
-rad_skat                        //
-rad_skatp                       //
-rad_crik                        //
-rad_fb2                         //
-mattelcs                        //
-hotwhl2p
-comil                           //
+ablkickb
 abltenni                        //
-totspies
-fordrace
-tvsprt10                        //
+comil                           //
 decathln
 decathlna
-ablkickb
-lxspidaj
+doraglob                        // (c) 2007 VTech
+doraphon                        // (c) 2006 VTech
+dreamlss
+fordrace
+gssytts
 guitarfv
 guitarss
 guitarssa
-tmntbftc
-gssytts
-senwfit
+hotwhl2p
+itvphone
 jjstrip
-doraglob                        // (c) 2007 VTech
-doraphon                        // (c) 2006 VTech
-vtechtvssp                      // (c) 2006 VTech
-vtechtvsgr                      // (c) 2006 VTech
-tmntmutm
-pballpup
-swclone
-dreamlss
-senspeed
-ordentv
-wfcentro
-tiktokmm
 jouet
+lxspidaj
+mattelcs                        //
+ordentv
+pballpup
+rad_crik                        //
+rad_fb2                         //
+rad_skat                        //
+rad_skatp                       //
+senspeed
+senwfit
+swclone
+tiktokmm
+tmntbftc
+tmntmutm
+totspies
+tvsprt10                        //
+vtechtvsgr                      // (c) 2006 VTech
+vtechtvssp                      // (c) 2006 VTech
+wfcentro
 
 @source:spg2xx_digimake.cpp
 rad_digi
@@ -41251,17 +41265,20 @@ bmiidx                          //
 bmiidx2                         //
 bmiidx3                         //
 bmiidx3a                        //
+bmiidx3b                        //
 bmiidx4                         //
 bmiidx5                         //
 bmiidx6                         //
 bmiidx6a                        //
 bmiidx7                         //
+bmiidx7a                        //
 bmiidx8                         //
 bmiidxa                         //
 bmiidxc                         //
 bmiidxc2                        //
 bmiidxca                        //
 bmiidxs                         //
+bmiidxsa                        //
 gq863                           //
 
 @source:twins.cpp
