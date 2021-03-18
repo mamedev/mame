@@ -1044,12 +1044,14 @@ void ymopm_registers::log_keyon(u32 choffs, u32 opoffs)
 		ch_output_0(choffs) ? 'L' : '-',
 		ch_output_1(choffs) ? 'R' : '-');
 
-	if (op_lfo_am_enable(opoffs))
+	bool am = (lfo_am_depth() != 0 && ch_lfo_am_sens(choffs) != 0 && op_lfo_am_enable(opoffs) != 0);
+	if (am)
 		LOG(" am=%d/%02X", ch_lfo_am_sens(choffs), lfo_am_depth());
-	if (ch_lfo_pm_sens(choffs) != 0)
+	bool pm = (lfo_pm_depth() != 0 && ch_lfo_pm_sens(choffs) != 0);
+	if (pm)
 		LOG(" pm=%d/%02X", ch_lfo_pm_sens(choffs), lfo_pm_depth());
-	if (op_lfo_am_enable(opoffs) || ch_lfo_pm_sens(choffs) != 0)
-		LOG(" lfo=%02X/%d", lfo_rate(), lfo_waveform());
+	if (am || pm)
+		LOG(" lfo=%02X/%c", lfo_rate(), "WQTN"[lfo_waveform()]);
 	if (noise_enable() && opoffs == 31)
 		LOG(" noise=1");
 }
@@ -1395,9 +1397,20 @@ void ymopn_registers_base<IsOpnA>::log_keyon(u32 choffs, u32 opoffs)
 	u32 chnum = (choffs & 3) + 3 * BIT(choffs, 8);
 	u32 opnum = (opoffs & 15) - ((opoffs & 15) / 4) + 12 * BIT(opoffs, 8);
 
+	u32 block_freq = ch_block_freq(choffs);
+	if (multi_freq() && choffs == 2)
+	{
+		if (opoffs == 2)
+			block_freq = multi_block_freq(1);
+		else if (opoffs == 10)
+			block_freq = multi_block_freq(2);
+		else if (opoffs == 6)
+			block_freq = multi_block_freq(0);
+	}
+
 	LOG("%d.%02d freq=%04X dt=%d fb=%d alg=%X mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X",
 		chnum, opnum,
-		ch_block_freq(choffs),
+		block_freq,
 		op_detune(opoffs),
 		ch_feedback(choffs),
 		ch_algorithm(choffs),
@@ -1416,11 +1429,13 @@ void ymopn_registers_base<IsOpnA>::log_keyon(u32 choffs, u32 opoffs)
 			ch_output_1(choffs) ? 'R' : '-');
 	if (op_ssg_eg_enable(opoffs))
 		LOG(" ssg=%X", op_ssg_eg_mode(opoffs));
-	if (lfo_enable() && op_lfo_am_enable(opoffs))
+	bool am = (lfo_enable() && op_lfo_am_enable(opoffs) && ch_lfo_am_sens(choffs) != 0);
+	if (am)
 		LOG(" am=%d", ch_lfo_am_sens(choffs));
-	if (lfo_enable() && ch_lfo_pm_sens(choffs) != 0)
+	bool pm = (lfo_enable() && ch_lfo_pm_sens(choffs) != 0);
+	if (pm)
 		LOG(" pm=%d", ch_lfo_pm_sens(choffs));
-	if (lfo_enable() && (op_lfo_am_enable(opoffs) || ch_lfo_pm_sens(choffs) != 0))
+	if (am || pm)
 		LOG(" lfo=%02X", lfo_rate());
 	if (multi_freq() && choffs == 2)
 		LOG(" multi=1");
@@ -1758,7 +1773,7 @@ void ymopl_registers_base<Revision>::log_keyon(u32 choffs, u32 opoffs)
 			ch_output_1(choffs) ? 'R' : '-',
 			ch_output_2(choffs) ? '0' : '-',
 			ch_output_3(choffs) ? '1' : '-');
-	if (op_lfo_am_enable(opoffs))
+	if (op_lfo_am_enable(opoffs) != 0)
 		LOG(" am=%d", lfo_am_depth());
 	if (op_lfo_pm_enable(opoffs) != 0)
 		LOG(" pm=%d", lfo_pm_depth());
