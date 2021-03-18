@@ -395,8 +395,8 @@ std::string &video_manager::timecode_text(std::string &str)
 	str = string_format(" %s%s%02d:%02d %s",
 			m_timecode_text,
 			m_timecode_text.empty() ? "" : " ",
-			(elapsed_time.m_seconds / 60) % 60,
-			elapsed_time.m_seconds % 60,
+			(elapsed_time.seconds() / 60) % 60,
+			elapsed_time.seconds() % 60,
 			machine().paused() ? "[paused] " : "");
 	return str;
 }
@@ -408,8 +408,8 @@ std::string &video_manager::timecode_total_text(std::string &str)
 		elapsed_time += machine().time() - m_timecode_start;
 	}
 	str = string_format("TOTAL %02d:%02d ",
-			(elapsed_time.m_seconds / 60) % 60,
-			elapsed_time.m_seconds % 60);
+			(elapsed_time.seconds() / 60) % 60,
+			elapsed_time.seconds() % 60);
 	return str;
 }
 

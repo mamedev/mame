@@ -716,7 +716,7 @@ void pit_counter_device::update()
 			attotime elapsed_time = now - m_last_updated;
 
 			// in the case of sub-Hz frequencies, just loop; there's not going to be many
-			if (m_clock_period.m_seconds != 0)
+			if (m_clock_period.seconds() != 0)
 			{
 				while (elapsed_time >= m_clock_period)
 				{
@@ -728,28 +728,28 @@ void pit_counter_device::update()
 			// otherwise, compute it a straightforward way
 			else
 			{
-				elapsed_cycles = elapsed_time.m_attoseconds / m_clock_period.m_attoseconds;
+				elapsed_cycles = elapsed_time.attoseconds() / m_clock_period.attoseconds();
 
 				// not expecting to see many cases of this, but just in case, let's do it right
-				if (elapsed_time.m_seconds != 0)
+				if (elapsed_time.seconds() != 0)
 				{
-					// first account for the elapsed_cycles counted above (guaranteed to be <= elapsed_time.m_attoseconds)
-					elapsed_time.m_attoseconds -= elapsed_cycles * m_clock_period.m_attoseconds;
+					// first account for the elapsed_cycles counted above (guaranteed to be <= elapsed_time.attoseconds())
+					elapsed_time.set_attoseconds(elapsed_time.attoseconds() - elapsed_cycles * m_clock_period.attoseconds());
 
 					// now compute the integral cycles per second based on the clock period
-					int64_t cycles_per_second = ATTOSECONDS_PER_SECOND / m_clock_period.m_attoseconds;
+					int64_t cycles_per_second = ATTOSECONDS_PER_SECOND / m_clock_period.attoseconds();
 
 					// add that many times the number of elapsed seconds
-					elapsed_cycles += cycles_per_second * elapsed_time.m_seconds;
+					elapsed_cycles += cycles_per_second * elapsed_time.seconds();
 
 					// now compute how many attoseconds we missed for each full second (will be 0 for integral values)
-					int64_t remainder_per_second = ATTOSECONDS_PER_SECOND - cycles_per_second * m_clock_period.m_attoseconds;
+					int64_t remainder_per_second = ATTOSECONDS_PER_SECOND - cycles_per_second * m_clock_period.attoseconds();
 
 					// add those to the elapsed attoseconds
-					elapsed_time.m_attoseconds += elapsed_time.m_seconds * remainder_per_second;
+					elapsed_time.set_attoseconds(elapsed_time.attoseconds() + elapsed_time.seconds() * remainder_per_second);
 
 					// finally, see if that adds up to any additional cycles
-					elapsed_cycles += elapsed_time.m_attoseconds / m_clock_period.m_attoseconds;
+					elapsed_cycles += elapsed_time.attoseconds() / m_clock_period.attoseconds();
 				}
 			}
 

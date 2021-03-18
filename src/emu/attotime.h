@@ -89,6 +89,9 @@ template <typename T> inline constexpr attoseconds_t ATTOSECONDS_IN_NSEC(T &&x) 
 // the attotime structure itself
 class attotime
 {
+	// save_manager needs direct access for save/restore purposes
+	friend class save_manager;
+
 public:
 	// construction/destruction
 	constexpr attotime() noexcept : m_seconds(0), m_attoseconds(0) { }
@@ -130,6 +133,9 @@ public:
 	/** @return the seconds portion. */
 	constexpr seconds_t seconds() const noexcept { return m_seconds; }
 
+	void set_seconds(seconds_t seconds) { m_seconds = seconds;}
+	void set_attoseconds(attoseconds_t attoseconds) { m_attoseconds = attoseconds;}
+
 	static attotime from_double(double _time);
 	static attotime from_ticks(u64 ticks, u32 frequency);
 	static attotime from_ticks(u64 ticks, const XTAL &xtal) { return from_ticks(ticks, xtal.value()); }
@@ -164,13 +170,27 @@ public:
 	attotime &operator*=(u32 factor);
 	attotime &operator/=(u32 factor);
 
-	// members
-	seconds_t       m_seconds;
-	attoseconds_t   m_attoseconds;
-
 	// constants
 	static const attotime never;
 	static const attotime zero;
+
+	// friend functions
+	friend attotime operator+(const attotime &left, const attotime &right) noexcept;
+	friend attotime operator-(const attotime &left, const attotime &right) noexcept;
+	friend attotime operator*(const attotime &left, u32 factor);
+	friend attotime operator*(u32 factor, const attotime &right);
+	friend attotime operator/(const attotime &left, u32 factor);
+	friend constexpr bool operator==(const attotime &left, const attotime &right) noexcept;
+	friend constexpr bool operator!=(const attotime &left, const attotime &right) noexcept;
+	friend constexpr bool operator<(const attotime &left, const attotime &right) noexcept;
+	friend constexpr bool operator<=(const attotime &left, const attotime &right) noexcept;
+	friend constexpr bool operator>(const attotime &left, const attotime &right) noexcept;
+	friend constexpr bool operator>=(const attotime &left, const attotime &right) noexcept;
+
+private:
+	// members
+	seconds_t       m_seconds;
+	attoseconds_t   m_attoseconds;
 };
 /** @} */
 

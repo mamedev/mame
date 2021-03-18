@@ -250,7 +250,7 @@ u32 stream_buffer::time_to_buffer_index(attotime time, bool round_up, bool allow
 		sound_assert(allow_expansion);
 
 		m_end_sample = sample;
-		m_end_second = time.m_seconds;
+		m_end_second = time.seconds();
 
 		// due to round_up, we could tweak over the line into the next second
 		if (sample >= size())
