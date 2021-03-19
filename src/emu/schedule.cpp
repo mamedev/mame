@@ -430,10 +430,9 @@ inline void device_scheduler::apply_suspend_changes()
 //  timeslice
 //-------------------------------------------------
 
+template<bool Debugging>
 void device_scheduler::timeslice()
 {
-	bool call_debugger = ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
-
 	// build the execution list if we don't have one yet
 	if (UNEXPECTED(m_execute_list == nullptr))
 		rebuild_execute_list();
@@ -489,14 +488,11 @@ void device_scheduler::timeslice()
 					exec->m_cycles_stolen = 0;
 					m_executing_device = exec;
 					*exec->m_icountptr = exec->m_cycles_running;
-					if (!call_debugger)
-						exec->run();
-					else
-					{
+					if (Debugging)
 						exec->debugger_start_cpu_hook(attotime(m_basetime.seconds(), target) + attotime::zero);
-						exec->run();
+					exec->run();
+					if (Debugging)
 						exec->debugger_stop_cpu_hook();
-					}
 
 					// adjust for any cycles we took back
 					assert(ran >= *exec->m_icountptr);
@@ -544,6 +540,9 @@ void device_scheduler::timeslice()
 	// execute timers
 	execute_timers();
 }
+
+template void device_scheduler::timeslice<true>();
+template void device_scheduler::timeslice<false>();
 
 
 void device_scheduler::update_basetime()

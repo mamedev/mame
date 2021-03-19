@@ -211,7 +211,7 @@ public:
 	bool can_save() const;
 
 	// execution
-	void timeslice();
+	template<bool Debugging> void timeslice();
 	void abort_timeslice();
 	void trigger(int trigid, const attotime &after = attotime::zero);
 	void boost_interleave(const attotime &timeslice_time, const attotime &boost_duration);

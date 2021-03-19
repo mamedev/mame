@@ -380,10 +380,14 @@ int running_machine::run(bool quiet)
 		{
 			g_profiler.start(PROFILER_EXTRA);
 
-			// execute CPUs if not paused
+			// execute CPUs if not paused; otherwise, just pump video updates through
 			if (!m_paused)
-				m_scheduler.timeslice();
-			// otherwise, just pump video updates through
+			{
+				if ((debug_flags & DEBUG_FLAG_ENABLED) == 0)
+					m_scheduler.timeslice<false>();
+				else
+					m_scheduler.timeslice<true>();
+			}
 			else
 				m_video->frame_update();
 
@@ -1416,7 +1420,7 @@ void running_machine::emscripten_main_loop()
 
 		while (!machine->m_paused && !machine->scheduled_event_pending() && scheduler->time() < stoptime)
 		{
-			scheduler->timeslice();
+			scheduler->timeslice<false>();
 			// handle save/load
 			if (machine->m_saveload_schedule != saveload_schedule::NONE)
 			{
