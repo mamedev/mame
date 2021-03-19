@@ -89,8 +89,7 @@ inline emu_timer &emu_timer::init(running_machine &machine, timer_expired_delega
 	m_temporary = temporary;
 	m_period = attotime::never;
 	m_start = machine.time();
-	m_expire.set_base_seconds(machine.scheduler().m_basetime.seconds());
-	m_expire.set(attotime::never);
+	m_expire = attotime::never;
 	m_id = 0;
 
 	// if we're not temporary, register ourselves with the save state system
@@ -121,8 +120,7 @@ inline emu_timer &emu_timer::init(device_t &device, device_timer_id id, void *pt
 	m_temporary = temporary;
 	m_period = attotime::never;
 	m_start = machine().time();
-	m_expire.set_base_seconds(device.machine().scheduler().m_basetime.seconds());
-	m_expire.set(attotime::never);
+	m_expire = attotime::never;
 	m_device = &device;
 	m_id = id;
 
@@ -193,7 +191,7 @@ void emu_timer::adjust(attotime start_delay, s32 param, const attotime &period)
 
 	// set the start and expire times
 	m_start = scheduler.time();
-	m_expire.set(m_start + start_delay);
+	m_expire = m_start + start_delay;
 	m_period = period;
 
 	// remove and re-insert the timer in its new order
@@ -225,9 +223,9 @@ attotime emu_timer::elapsed() const noexcept
 attotime emu_timer::remaining() const noexcept
 {
 	attotime curtime = machine().time();
-	if (curtime >= m_expire.absolute())
+	if (curtime >= m_expire)
 		return attotime::zero;
-	return m_expire.absolute() - curtime;
+	return m_expire - curtime;
 }
 
 
@@ -269,7 +267,7 @@ void emu_timer::register_save()
 	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_enabled));
 	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_period));
 	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_start));
-//	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_expire));
+	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_expire));
 }
 
 
@@ -281,8 +279,8 @@ void emu_timer::register_save()
 inline void emu_timer::schedule_next_period()
 {
 	// advance by one period
-	m_start = m_expire.absolute();
-	m_expire.set(m_expire.absolute() + m_period);
+	m_start = m_expire;
+	m_expire += m_period;
 
 	// remove and re-insert us
 	device_scheduler &scheduler = machine().scheduler();
@@ -443,15 +441,15 @@ void device_scheduler::timeslice()
 
 	// loop until we hit the next timer
 	attoseconds_t basetime = m_basetime.attoseconds();
-	while (basetime < m_timer_list->m_expire.relative())
+	while (basetime < m_first_timer_expire.relative())
 	{
 		// by default, assume our target is the end of the next quantum
 		attoseconds_t target = basetime + m_quantum_list.first()->m_actual;
-		assert(target < 2 * ATTOSECONDS_PER_SECOND);
+		assert(target < basetime_relative::MAX_RELATIVE);
 
 		// however, if the next timer is going to fire before then, override
-		if (m_timer_list->m_expire.relative() < target)
-			target = m_timer_list->m_expire.relative();
+		if (m_first_timer_expire.relative() < target)
+			target = m_first_timer_expire.relative();
 
 		LOG("------------------\n");
 		LOG("cpu_timeslice: target = %lld\n", target);
@@ -463,84 +461,142 @@ void device_scheduler::timeslice()
 		// loop over all executing devices
 		for (device_execute_interface *exec = m_execute_list; exec != nullptr; exec = exec->m_nextexec)
 		{
-			// only process if this device is executing or truly halted (not yielding)
-			// and if our target is later than the CPU's current time (coarse check)
-			if (EXPECTED(exec->m_suspend == 0 || exec->m_eatcycles))
-			{
-				// compute how many attoseconds to execute this CPU
-				attoseconds_t delta = target - exec->m_localtime.relative();
+			// compute how many attoseconds to execute this device
+			attoseconds_t delta = target - exec->m_localtime.relative() - 1;
+			assert(delta < basetime_relative::MAX_RELATIVE);
 
-				// if we're already ahead, do nothing
-				if (delta <= 0)
-					continue;
+			// if we're already ahead, do nothing; in theory we should do this 0 as
+			// well, but it's a rare case and the compiler tends to be able to
+			// optimize a strict < 0 check better than <= 0
+			if (delta < 0)
+				continue;
+
+			// if not suspended, execute normally
+			if (EXPECTED(exec->m_suspend == 0))
+			{
+				// precache the CPU timing information
+				u64 attoseconds_per_cycle = exec->m_attoseconds_per_cycle;
 
 				// compute how many cycles we want to execute, rounding up
-				u32 ran = exec->m_cycles_running = u64(delta - 1) / u64(exec->m_attoseconds_per_cycle) + 1;
+				u32 ran = u64(delta) / attoseconds_per_cycle + 1;
 				LOG("  cpu '%s': %d (%d cycles)\n", exec->device().tag(), delta, exec->m_cycles_running);
 
-				// if we're not suspended, actually execute
-				if (exec->m_suspend == 0)
-				{
-					g_profiler.start(exec->m_profiler);
+				g_profiler.start(exec->m_profiler);
 
-					// note that this global variable cycles_stolen can be modified
-					// via the call to cpu_execute
-					exec->m_cycles_stolen = 0;
-					m_executing_device = exec;
-					*exec->m_icountptr = exec->m_cycles_running;
-					if (Debugging)
-						exec->debugger_start_cpu_hook(attotime(m_basetime.seconds(), target) + attotime::zero);
-					exec->run();
-					if (Debugging)
-						exec->debugger_stop_cpu_hook();
+				// store the number of cycles we've requested in the executing
+				// device
+				// TODO: do we need to do this?
+				exec->m_cycles_running = ran;
 
-					// adjust for any cycles we took back
-					assert(ran >= *exec->m_icountptr);
-					ran -= *exec->m_icountptr;
-					assert(ran >= exec->m_cycles_stolen);
-					ran -= exec->m_cycles_stolen;
-					g_profiler.stop();
-				}
+				// set the device's icount value to the number of cycles we want
+				// the fact that we have a direct point to this is an artifact of
+				// the original MAME design
+				auto *icountptr = exec->m_icountptr;
+				*icountptr = ran;
 
-				// account for these cycles
+				// clear m_cycles_stolen, which gets updated if the timeslice
+				// is aborted (due to synchronization or setting a new timer to
+				// expire before the original timeslice end)
+				exec->m_cycles_stolen = 0;
+
+				// store a pointer to the executing device so that we know the
+				// relevant active context
+				m_executing_device = exec;
+
+				// tell the debugger we're going to start executing; the funny math
+				// below uses the relative target as attoseconds, but it may be
+				// larger than the the max attoseconds allowed, so we add zero to
+				// it, which forces a normalization
+				if (Debugging)
+					exec->debugger_start_cpu_hook(attotime(m_basetime.seconds(), target) + attotime::zero);
+
+				// now run the device for the number of cycles
+				exec->run();
+
+				// tell the debugger we're done executing
+				if (Debugging)
+					exec->debugger_stop_cpu_hook();
+
+				// now let's see how many cycles we actually ran; if the device's
+				// icount is negative, then we ran more than requested (this is both
+				// allowed and expected), so the subtract here typically will
+				// increase ran
+				assert(ran >= *icountptr);
+				ran -= *icountptr;
+
+				// if cycles were stolen (i.e., icount was artificially decremented)
+				// then ran isn't actually correct, so remove the number of cycles
+				// that we did that for
+				assert(ran >= exec->m_cycles_stolen);
+				ran -= exec->m_cycles_stolen;
+
+				// time should never go backwards, nor should we ever attempt to
+				// execute more than a full second (minimum quantum prevents that)
+				assert(ran >= 0 && ran < exec->m_cycles_per_second);
+
+				g_profiler.stop();
+
+				// update the device's count of total cycles executed with the
+				// true number of cycles
 				exec->m_totalcycles += ran;
 
-				// update the local time for this CPU
-				assert(ran < exec->m_cycles_per_second);
-				attoseconds_t deltatime = exec->m_attoseconds_per_cycle * ran;
-				assert(deltatime >= 0);
+				// update the local time for the device so that it represents an
+				// integral number of cycles
+				attoseconds_t deltatime = attoseconds_per_cycle * ran;
 				exec->m_localtime.add(deltatime);
+
 				LOG("         %d ran, %d total, time = %s\n", ran, s32(exec->m_totalcycles), exec->m_localtime.as_string(PRECISION));
 
-				// if the new local CPU time is less than our target, move the target up, but not before the base
+				// if the new local device time is less than our target, move the
+				// target up, but not before the base
 				if (exec->m_localtime.relative() < target)
 				{
 					target = std::max(exec->m_localtime.relative(), basetime);
 					LOG("         (new target)\n");
 				}
 			}
+
+			// if suspended, eat cycles efficiently
+			else if (exec->m_eatcycles)
+			{
+				// this is just the minimal logic from above to consume the cycles;
+				// we don't check to see if the new local time is less than the
+				// target because the calculation below guarantees it won't happen
+				u32 ran = u64(delta) / u64(exec->m_attoseconds_per_cycle) + 1;
+				exec->m_totalcycles += ran;
+				exec->m_localtime.add(exec->m_attoseconds_per_cycle * ran);
+			}
 		}
+
+		// set the executing device to null, which indicates that there is
+		// no active context; this is used by machine.time() to return the
+		// context-appropriate value
 		m_executing_device = nullptr;
 
-		// update the base time
+		// our final target becomes our new base time
 		basetime = target;
 	}
 
-	// update basetime
+	// if basetime remained within the current second, we just have to
+	// update the attoseconds part; however, it if did overflow, we need to
+	// update all the basetime_relative structures in the system
 	if (basetime < ATTOSECONDS_PER_SECOND)
 		m_basetime.set_attoseconds(basetime);
 	else
 	{
 		basetime -= ATTOSECONDS_PER_SECOND;
+		assert(basetime < ATTOSECONDS_PER_SECOND);
 		m_basetime.set_attoseconds(basetime);
 		m_basetime.set_seconds(m_basetime.seconds() + 1);
 		update_basetime();
 	}
 
-	// execute timers
+	// now that we've reached the expiration time of the first timer in the
+	// queue, execute pending ones
 	execute_timers();
 }
 
+// explicitly instatiate both versions of the scheduler
 template void device_scheduler::timeslice<true>();
 template void device_scheduler::timeslice<false>();
 
@@ -552,8 +608,7 @@ void device_scheduler::update_basetime()
 		exec.m_localtime.set_base_seconds(m_basetime.seconds());
 
 	// update timers
-	for (emu_timer *curtimer = m_timer_list; curtimer != nullptr; curtimer = curtimer->next())
-		curtimer->m_expire.set_base_seconds(m_basetime.seconds());
+	m_first_timer_expire.set_base_seconds(m_basetime.seconds());
 }
 
 
@@ -828,14 +883,14 @@ void device_scheduler::rebuild_execute_list()
 inline emu_timer &device_scheduler::timer_list_insert(emu_timer &timer)
 {
 	// disabled timers sort to the end
-	const attotime expire = timer.m_enabled ? timer.m_expire.absolute() : attotime::never;
+	const attotime expire = timer.m_enabled ? timer.m_expire : attotime::never;
 
 	// loop over the timer list
 	emu_timer *prevtimer = nullptr;
 	for (emu_timer *curtimer = m_timer_list; curtimer != nullptr; prevtimer = curtimer, curtimer = curtimer->next())
 	{
 		// if the current list entry expires after us, we should be inserted before it
-		if (curtimer->m_expire.absolute() > expire)
+		if (curtimer->m_expire > expire)
 		{
 			// link the new guy in before the current list entry
 			timer.m_prev = prevtimer;
@@ -844,7 +899,10 @@ inline emu_timer &device_scheduler::timer_list_insert(emu_timer &timer)
 			if (prevtimer != nullptr)
 				prevtimer->m_next = &timer;
 			else
+			{
 				m_timer_list = &timer;
+				m_first_timer_expire.set(timer.m_expire);
+			}
 
 			curtimer->m_prev = &timer;
 			return timer;
@@ -855,7 +913,10 @@ inline emu_timer &device_scheduler::timer_list_insert(emu_timer &timer)
 	if (prevtimer != nullptr)
 		prevtimer->m_next = &timer;
 	else
+	{
 		m_timer_list = &timer;
+		m_first_timer_expire.set(timer.m_expire);
+	}
 
 	timer.m_prev = prevtimer;
 	timer.m_next = nullptr;
@@ -874,7 +935,10 @@ inline emu_timer &device_scheduler::timer_list_remove(emu_timer &timer)
 	if (timer.m_prev != nullptr)
 		timer.m_prev->m_next = timer.m_next;
 	else
+	{
 		m_timer_list = timer.m_next;
+		m_first_timer_expire.set((timer.m_next != nullptr) ? timer.m_next->m_expire : attotime::never);
+	}
 
 	if (timer.m_next != nullptr)
 		timer.m_next->m_prev = timer.m_prev;
@@ -892,7 +956,7 @@ inline void device_scheduler::execute_timers()
 	LOG("execute_timers: new=%s head->expire=%s\n", m_basetime.as_string(PRECISION), m_timer_list->m_expire.as_string(PRECISION));
 
 	// now process any timers that are overdue
-	while (m_timer_list->m_expire.absolute() <= m_basetime)
+	while (m_timer_list->m_expire <= m_basetime)
 	{
 		// if this is a one-shot timer, disable it now
 		emu_timer &timer = *m_timer_list;
@@ -903,7 +967,7 @@ inline void device_scheduler::execute_timers()
 		// set the global state of which callback we're in
 		m_callback_timer_modified = false;
 		m_callback_timer = &timer;
-		m_callback_timer_expire_time = timer.m_expire.absolute();
+		m_callback_timer_expire_time = timer.m_expire;
 
 		// call the callback
 		if (was_enabled)

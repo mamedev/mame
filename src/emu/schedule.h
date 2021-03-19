@@ -163,7 +163,7 @@ public:
 	attotime elapsed() const noexcept;
 	attotime remaining() const noexcept;
 	attotime start() const { return m_start; }
-	attotime expire() const { return m_expire.absolute(); }
+	attotime expire() const { return m_expire; }
 	attotime period() const { return m_period; }
 
 private:
@@ -184,7 +184,7 @@ private:
 	bool                m_temporary;    // is the timer temporary?
 	attotime            m_period;       // the repeat frequency of the timer
 	attotime            m_start;        // time when the timer was started
-	basetime_relative   m_expire;       // time when the timer will expire
+	attotime            m_expire;       // time when the timer will expire
 	device_t *          m_device;       // for device timers, a pointer to the device
 	device_timer_id     m_id;           // for device timers, the ID of the timer
 };
@@ -260,6 +260,7 @@ private:
 	attotime                    m_basetime;                 // global basetime; everything moves forward from here
 
 	// list of active timers
+	basetime_relative           m_first_timer_expire;       // time of the first timer expiration
 	emu_timer *                 m_timer_list;               // head of the active list
 	fixed_allocator<emu_timer>  m_timer_allocator;          // allocator for timers
 
