@@ -590,6 +590,13 @@ ymadpcm_b_engine::ymadpcm_b_engine(device_t &device, read8sm_delegate reader, wr
 {
 	// create the channel (only one supported for now, but leaving possibilities open)
 	m_channel[0] = std::make_unique<ymadpcm_b_channel>(m_regs, reader, writer, addrshift);
+
+	// clear registers by default
+	std::fill_n(&m_regdata[0], m_regdata.size(), 0);
+
+	// set the limit to 0xffff by default
+	m_regs.write(0x0c, 0xff);
+	m_regs.write(0x0d, 0xff);
 }
 
 
