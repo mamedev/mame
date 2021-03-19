@@ -170,7 +170,7 @@ vec4 x_coeffs(vec4 x, float pos_x)
     return cubic(x,0.0,0.5);
   } else if (u_interp.x < 4.5) { // Mitchell-Netravali
     return cubic(x,1.0/3.0,1.0/3.0);
-  } else if (u_interp.x < 5.5) { // B-spline
+  } else /*if (u_interp.x < 5.5)*/ { // B-spline
     return cubic(x,1.0,0.0);
   }
 }
