@@ -164,7 +164,7 @@ void mm78_device::op_tab()
 void mm78_device::op_ix()
 {
 	// IX: input to X from channel X(aka B)
-	m_x = (m_read_r() & m_r_output) >> 4;
+	m_x = (m_read_r() & m_r_output) >> 4 & 0xf;
 }
 
 void mm78_device::op_ox()

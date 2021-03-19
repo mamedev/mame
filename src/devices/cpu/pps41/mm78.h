@@ -60,7 +60,10 @@ protected:
 	// device_execute_interface overrides
 	virtual void execute_one() override;
 
+	void data_96x4(address_map &map);
 	void data_128x4(address_map &map);
+	void program_1_3k(address_map &map);
+	void program_1_5k(address_map &map);
 	void program_2k(address_map &map);
 
 	// opcode helpers
@@ -107,18 +110,12 @@ public:
 
 protected:
 	mm77_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
-
-	void data_96x4(address_map &map);
-	void program_1_3k(address_map &map);
 };
 
 class mm77l_device : public mm77_device
 {
 public:
 	mm77l_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	void program_1_5k(address_map &map);
 };
 
 

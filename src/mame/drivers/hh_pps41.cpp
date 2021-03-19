@@ -15,6 +15,7 @@ ROM source notes when dumped from another publisher, but confident it's the same
 #include "cpu/pps41/mm75.h"
 #include "cpu/pps41/mm76.h"
 #include "cpu/pps41/mm78.h"
+#include "cpu/pps41/mm78la.h"
 #include "video/pwm.h"
 #include "sound/beep.h"
 #include "sound/spkrdev.h"
@@ -58,7 +59,7 @@ public:
 
 	// MCU output pin state
 	u16 m_d = 0;
-	u8 m_r = ~0;
+	u16 m_r = 0;
 
 	u8 read_inputs(int columns);
 	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
@@ -148,7 +149,7 @@ public:
 
 	void update_display();
 	void write_d(u16 data);
-	void write_r(u8 data);
+	void write_r(u16 data);
 	void ftri1(machine_config &config);
 };
 
@@ -169,7 +170,7 @@ void ftri1_state::write_d(u16 data)
 	m_speaker->level_w(BIT(data, 9));
 }
 
-void ftri1_state::write_r(u8 data)
+void ftri1_state::write_r(u16 data)
 {
 	// RIO1-RIO8: digit/led data
 	m_r = data;
@@ -253,7 +254,7 @@ public:
 
 	void update_display();
 	void write_d(u16 data);
-	void write_r(u8 data);
+	void write_r(u16 data);
 	u8 read_p();
 
 	void mastmind(machine_config &config);
@@ -279,7 +280,7 @@ void mastmind_state::write_d(u16 data)
 		m_beeper->set_state(BIT(data, 8));
 }
 
-void mastmind_state::write_r(u8 data)
+void mastmind_state::write_r(u16 data)
 {
 	// RIO1-RIO7: digit segment data
 	m_r = data;
@@ -401,7 +402,7 @@ public:
 
 	void update_display();
 	void write_d(u16 data);
-	void write_r(u8 data);
+	void write_r(u16 data);
 	void dunksunk(machine_config &config);
 };
 
@@ -430,7 +431,7 @@ void dunksunk_state::write_d(u16 data)
 	update_display();
 }
 
-void dunksunk_state::write_r(u8 data)
+void dunksunk_state::write_r(u16 data)
 {
 	// RIO1-RIO7: led data
 	m_r = data;
@@ -526,7 +527,7 @@ public:
 
 	void update_display();
 	void write_d(u16 data);
-	void write_r(u8 data);
+	void write_r(u16 data);
 	u8 read_p();
 	void memoquiz(machine_config &config);
 };
@@ -556,7 +557,7 @@ void memoquiz_state::write_d(u16 data)
 	// DIO8: N/C, looks like they planned to add sound, but didn't
 }
 
-void memoquiz_state::write_r(u8 data)
+void memoquiz_state::write_r(u16 data)
 {
 	// RIO1-RIO7: digit segment data
 	m_r = data;
@@ -660,11 +661,11 @@ public:
 
 	void main_write_d(u16 data);
 	u16 main_read_d();
-	void main_write_r(u8 data);
+	void main_write_r(u16 data);
 	u8 main_read_p();
 
 	void sub_write_d(u16 data);
-	void sub_write_r(u8 data);
+	void sub_write_r(u16 data);
 
 	void mwcfootb(machine_config &config);
 };
@@ -695,7 +696,7 @@ u16 mwcfootb_state::main_read_d()
 	return m_subcpu->d_output_r() & 0x200;
 }
 
-void mwcfootb_state::main_write_r(u8 data)
+void mwcfootb_state::main_write_r(u16 data)
 {
 	// RIO1-RIO7: vfd plate 0-6
 	m_plate = (m_plate & 0xfff00) | (~data & 0x7f);
@@ -723,7 +724,7 @@ void mwcfootb_state::sub_write_d(u16 data)
 	m_maincpu->set_input_line(0, (data & 0x200) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void mwcfootb_state::sub_write_r(u8 data)
+void mwcfootb_state::sub_write_r(u16 data)
 {
 	// RIO1-RIO8: vfd plate 7-14
 	m_plate = (m_plate & 0xf00ff) | (~data << 8 & 0xff00);
@@ -855,7 +856,7 @@ public:
 
 	void update_display();
 	void write_d(u16 data);
-	void write_r(u8 data);
+	void write_r(u16 data);
 	u8 read_p();
 	void scrabsen(machine_config &config);
 };
@@ -884,7 +885,7 @@ void scrabsen_state::write_d(u16 data)
 	m_speaker->level_w(BIT(data, 8));
 }
 
-void scrabsen_state::write_r(u8 data)
+void scrabsen_state::write_r(u16 data)
 {
 	// RIO1-RIO8: led data
 	m_r = data;
@@ -1006,7 +1007,7 @@ public:
 
 	void update_display();
 	void write_d(u16 data);
-	void write_r(u8 data);
+	void write_r(u16 data);
 	u8 read_p();
 	void rdqa(machine_config &config);
 };
@@ -1035,7 +1036,7 @@ void rdqa_state::write_d(u16 data)
 	m_speaker->level_w(data >> 8 & 3);
 }
 
-void rdqa_state::write_r(u8 data)
+void rdqa_state::write_r(u16 data)
 {
 	// RIO1-RIO7: digit segment data
 	m_r = data;
