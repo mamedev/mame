@@ -45,14 +45,7 @@ const int TRIGGER_SUSPENDTIME   = -4000;
 device_execute_interface::device_execute_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "execute")
 	, m_scheduler(nullptr)
-	, m_disabled(false)
-	, m_vblank_interrupt(device)
-	, m_vblank_interrupt_screen(nullptr)
-	, m_timed_interrupt(device)
-	, m_timed_interrupt_period(attotime::zero)
 	, m_nextexec(nullptr)
-	, m_driver_irq(device)
-	, m_timedint_timer(nullptr)
 	, m_profiler(PROFILER_IDLE)
 	, m_icountptr(nullptr)
 	, m_cycles_running(0)
@@ -64,10 +57,15 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 	, m_trigger(0)
 	, m_inttrigger(0)
 	, m_totalcycles(0)
-	, m_divisor(0)
-	, m_divshift(0)
 	, m_cycles_per_second(0)
 	, m_attoseconds_per_cycle(0)
+	, m_disabled(false)
+	, m_vblank_interrupt(device)
+	, m_vblank_interrupt_screen(nullptr)
+	, m_timed_interrupt(device)
+	, m_timed_interrupt_period(attotime::zero)
+	, m_timedint_timer(nullptr)
+	, m_driver_irq(device)
 {
 	// configure the fast accessor
 	assert(!device.interfaces().m_execute);
@@ -490,16 +488,6 @@ void device_execute_interface::interface_clock_changed()
 	// recompute cps and spc
 	m_cycles_per_second = clocks_to_cycles(device().clock());
 	m_attoseconds_per_cycle = HZ_TO_ATTOSECONDS(m_cycles_per_second);
-
-	// update the device's divisor
-	s64 attos = m_attoseconds_per_cycle;
-	m_divshift = 0;
-	while (attos >= (1UL << 31))
-	{
-		m_divshift++;
-		attos >>= 1;
-	}
-	m_divisor = attos;
 
 	// re-compute the perfect interleave factor
 	m_scheduler->compute_perfect_interleave();

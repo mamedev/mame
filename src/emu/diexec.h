@@ -287,20 +287,8 @@ private:
 	// scheduler
 	device_scheduler *      m_scheduler;                // pointer to the machine scheduler
 
-	// configuration
-	bool                    m_disabled;                 // disabled from executing?
-	device_interrupt_delegate m_vblank_interrupt;       // for interrupts tied to VBLANK
-	const char *            m_vblank_interrupt_screen;  // the screen that causes the VBLANK interrupt
-	device_interrupt_delegate m_timed_interrupt;        // for interrupts not tied to VBLANK
-	attotime                m_timed_interrupt_period;   // period for periodic interrupts
-
 	// execution lists
 	device_execute_interface *m_nextexec;               // pointer to the next device to execute, in order
-
-	// input states and IRQ callbacks
-	device_irq_acknowledge_delegate m_driver_irq;       // driver-specific IRQ callback
-	device_input            m_input[MAX_INPUT_LINES];   // data about inputs
-	emu_timer *             m_timedint_timer;           // reference to this device's periodic interrupt timer
 
 	// cycle counting and executing
 	profile_type            m_profiler;                 // profiler tag
@@ -319,10 +307,20 @@ private:
 	// clock and timing information
 	u64                     m_totalcycles;              // total device cycles executed
 	basetime_relative       m_localtime;                // local time, relative to the timer system's global time
-	s32                     m_divisor;                  // 32-bit attoseconds_per_cycle divisor
-	u8                      m_divshift;                 // right shift amount to fit the divisor into 32 bits
 	u32                     m_cycles_per_second;        // cycles per second, adjusted for multipliers
 	attoseconds_t           m_attoseconds_per_cycle;    // attoseconds per adjusted clock cycle
+
+	// configuration
+	bool                    m_disabled;                 // disabled from executing?
+	device_interrupt_delegate m_vblank_interrupt;       // for interrupts tied to VBLANK
+	const char *            m_vblank_interrupt_screen;  // the screen that causes the VBLANK interrupt
+	device_interrupt_delegate m_timed_interrupt;        // for interrupts not tied to VBLANK
+	attotime                m_timed_interrupt_period;   // period for periodic interrupts
+
+	// input states and IRQ callbacks
+	emu_timer *             m_timedint_timer;           // reference to this device's periodic interrupt timer
+	device_irq_acknowledge_delegate m_driver_irq;       // driver-specific IRQ callback
+	device_input            m_input[MAX_INPUT_LINES];   // data about inputs
 
 	// callbacks
 	TIMER_CALLBACK_MEMBER(timed_trigger_callback) { trigger(param); }
