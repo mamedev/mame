@@ -203,7 +203,7 @@ void device_execute_interface::trigger(int trigid)
 //  for a device
 //-------------------------------------------------
 
-attotime device_execute_interface::local_time() const noexcept
+attotime device_execute_interface::local_time() noexcept
 {
 	// if we're active, add in the time from the current slice
 	if (executing())

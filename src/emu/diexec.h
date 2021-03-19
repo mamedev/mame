@@ -183,7 +183,7 @@ public:
 	void signal_interrupt_trigger() { trigger(m_inttrigger); }
 
 	// time and cycle accounting
-	attotime local_time() const noexcept;
+	attotime local_time() noexcept;
 	u64 total_cycles() const noexcept;
 
 	// required operation overrides

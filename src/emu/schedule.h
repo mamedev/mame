@@ -38,6 +38,7 @@ public:
 	basetime_relative() :
 		m_relative(0),
 		m_absolute(attotime::zero),
+		m_absolute_dirty(false),
 		m_base_seconds(0)
 	{
 	}
@@ -45,34 +46,41 @@ public:
 	void set(attotime const &src)
 	{
 		m_absolute = src;
+		m_absolute_dirty = false;
 		update_relative();
-	}
-
-	void set(attoseconds_t src)
-	{
-		m_relative = src;
-		update_absolute();
 	}
 
 	void add(attoseconds_t src)
 	{
 		m_relative += src;
-		update_absolute();
+		m_absolute_dirty = true;
 	}
 
 	void set_base_seconds(seconds_t base)
 	{
 		if (base != m_base_seconds)
 		{
+			if (m_absolute_dirty)
+				update_absolute();
 			m_base_seconds = base;
 			update_relative();
 		}
 	}
 
 	attoseconds_t relative() const { return m_relative; }
-	attotime const &absolute() const { return m_absolute; }
+	attotime const &absolute()
+	{
+		if (m_absolute_dirty)
+			update_absolute();
+		return m_absolute;
+	}
 
-	const char *as_string(int precision = 9) const { return m_absolute.as_string(precision); }
+	const char *as_string(int precision = 9)
+	{
+		if (m_absolute_dirty)
+			update_absolute();
+		return m_absolute.as_string(precision);
+	}
 
 private:
 	void update_relative()
@@ -113,10 +121,12 @@ private:
 		}
 		m_absolute.set_seconds(secs);
 		m_absolute.set_attoseconds(attos);
+		m_absolute_dirty = false;
 	}
 
 	attoseconds_t m_relative;
 	attotime m_absolute;
+	bool m_absolute_dirty;
 	seconds_t m_base_seconds;
 };
 
