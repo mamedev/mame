@@ -167,11 +167,6 @@ void y8950_device::device_start()
 	// save the engines
 	m_fm.save(*this);
 	m_adpcm_b.save(*this);
-
-	// configure ADPCM-B limit, since these registers are not
-	// directly accessible in the map
-	m_adpcm_b.write(0x0c, 0xff);
-	m_adpcm_b.write(0x0d, 0xff);
 }
 
 
@@ -251,7 +246,7 @@ void y8950_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 u8 y8950_device::combine_status()
 {
 	u8 status = m_fm.status() & ~(STATUS_ADPCM_B_EOS | STATUS_ADPCM_B_BRDY | STATUS_ADPCM_B_PLAYING);
-	u8 adpcm_status = m_adpcm_b.status(0);
+	u8 adpcm_status = m_adpcm_b.status();
 	if ((adpcm_status & ymadpcm_b_channel::STATUS_EOS) != 0)
 		status |= STATUS_ADPCM_B_EOS;
 	if ((adpcm_status & ymadpcm_b_channel::STATUS_BRDY) != 0)

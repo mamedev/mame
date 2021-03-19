@@ -205,14 +205,6 @@ void ym2608_device::device_start()
 	m_fm.save(*this);
 	m_adpcm_a.save(*this);
 	m_adpcm_b.save(*this);
-
-	// configure ADPCM percussion sounds
-	m_adpcm_a.set_start_end(0, 0x0000, 0x01bf); // bass drum
-	m_adpcm_a.set_start_end(1, 0x01c0, 0x043f); // snare drum
-	m_adpcm_a.set_start_end(2, 0x0440, 0x1b7f); // top cymbal
-	m_adpcm_a.set_start_end(3, 0x1b80, 0x1cff); // high hat
-	m_adpcm_a.set_start_end(4, 0x1d00, 0x1f7f); // tom tom
-	m_adpcm_a.set_start_end(5, 0x1f80, 0x1fff); // rim shot
 }
 
 
@@ -229,6 +221,14 @@ void ym2608_device::device_reset()
 	m_fm.reset();
 	m_adpcm_a.reset();
 	m_adpcm_b.reset();
+
+	// configure ADPCM percussion sounds
+	m_adpcm_a.set_start_end(0, 0x0000, 0x01bf); // bass drum
+	m_adpcm_a.set_start_end(1, 0x01c0, 0x043f); // snare drum
+	m_adpcm_a.set_start_end(2, 0x0440, 0x1b7f); // top cymbal
+	m_adpcm_a.set_start_end(3, 0x1b80, 0x1cff); // high hat
+	m_adpcm_a.set_start_end(4, 0x1d00, 0x1f7f); // tom tom
+	m_adpcm_a.set_start_end(5, 0x1f80, 0x1fff); // rim shot
 
 	// initialize our special interrupt states
 	m_irq_enable = 0x1f;
@@ -365,7 +365,7 @@ void ym2608_device::update_prescale(u8 newval)
 u8 ym2608_device::combine_status()
 {
 	u8 status = m_fm.status() & ~(STATUS_ADPCM_B_EOS | STATUS_ADPCM_B_BRDY | STATUS_ADPCM_B_PLAYING);
-	u8 adpcm_status = m_adpcm_b.status(0);
+	u8 adpcm_status = m_adpcm_b.status();
 	if ((adpcm_status & ymadpcm_b_channel::STATUS_EOS) != 0)
 		status |= STATUS_ADPCM_B_EOS;
 	if ((adpcm_status & ymadpcm_b_channel::STATUS_BRDY) != 0)
