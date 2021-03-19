@@ -430,7 +430,7 @@ ROM_START( twcup90 )
 	ROM_LOAD( "ic60_14v.bin", 0x40000, 0x20000, CRC(499dfb1b) SHA1(ac67985d36fea18c82a4ea00019d9e6e4bcb5d0d) )  /* sprites  */
 	ROM_LOAD( "ic65_15v.bin", 0x60000, 0x20000, CRC(d8ea5c81) SHA1(ccb3f7d565b1c1b8e874a2df91cda40dde2962ed) )  /* sprites  */
 
-	ROM_REGION( 0x20000, "ymsnd:adpcma", 0 )   /* 64k for ADPCM samples */
+	ROM_REGION( 0x20000, "ymsnd", 0 )   /* 64k for ADPCM samples */
 	ROM_LOAD( "ic82_06.bin",  0x00000, 0x20000, CRC(2fd692ed) SHA1(0273dc39181504320bec0187d074b2f86c821508) )
 ROM_END
 
@@ -463,7 +463,7 @@ ROM_START( twcup90a )
 	ROM_LOAD( "ic60_14v.bin", 0x40000, 0x20000, CRC(499dfb1b) SHA1(ac67985d36fea18c82a4ea00019d9e6e4bcb5d0d) )  /* sprites  */
 	ROM_LOAD( "ic65_15v.bin", 0x60000, 0x20000, CRC(d8ea5c81) SHA1(ccb3f7d565b1c1b8e874a2df91cda40dde2962ed) )  /* sprites  */
 
-	ROM_REGION( 0x20000, "ymsnd:adpcma", 0 )   /* 64k for ADPCM samples */
+	ROM_REGION( 0x20000, "ymsnd", 0 )   /* 64k for ADPCM samples */
 	ROM_LOAD( "ic82_06.bin",  0x00000, 0x20000, CRC(2fd692ed) SHA1(0273dc39181504320bec0187d074b2f86c821508) )
 ROM_END
 
@@ -496,7 +496,7 @@ ROM_START( twcup90b )
 	ROM_LOAD( "ic60_14v.bin", 0x40000, 0x20000, CRC(499dfb1b) SHA1(ac67985d36fea18c82a4ea00019d9e6e4bcb5d0d) )  /* sprites  */
 	ROM_LOAD( "ic65_15v.bin", 0x60000, 0x20000, CRC(d8ea5c81) SHA1(ccb3f7d565b1c1b8e874a2df91cda40dde2962ed) )  /* sprites  */
 
-	ROM_REGION( 0x20000, "ymsnd:adpcma", 0 )   /* 64k for ADPCM samples */
+	ROM_REGION( 0x20000, "ymsnd", 0 )   /* 64k for ADPCM samples */
 	ROM_LOAD( "ic82_06.bin",  0x00000, 0x20000, CRC(2fd692ed) SHA1(0273dc39181504320bec0187d074b2f86c821508) )
 ROM_END
 
@@ -529,7 +529,7 @@ ROM_START( twcup90c ) // 2 PCB set: 6303 A and 6303 B. ic87_01 is very similar t
 	ROM_LOAD( "ic60_14v.bin", 0x40000, 0x20000, CRC(499dfb1b) SHA1(ac67985d36fea18c82a4ea00019d9e6e4bcb5d0d) )  /* sprites  */
 	ROM_LOAD( "ic65_15v.bin", 0x60000, 0x20000, CRC(d8ea5c81) SHA1(ccb3f7d565b1c1b8e874a2df91cda40dde2962ed) )  /* sprites  */
 
-	ROM_REGION( 0x20000, "ymsnd:adpcma", 0 )   /* 64k for ADPCM samples */
+	ROM_REGION( 0x20000, "ymsnd", 0 )   /* 64k for ADPCM samples */
 	ROM_LOAD( "ic82_06.bin",  0x00000, 0x20000, CRC(2fd692ed) SHA1(0273dc39181504320bec0187d074b2f86c821508) )
 ROM_END
 
@@ -562,7 +562,7 @@ ROM_START( twcup90t )
 	ROM_LOAD( "ic60_14v.bin", 0x40000, 0x20000, CRC(499dfb1b) SHA1(ac67985d36fea18c82a4ea00019d9e6e4bcb5d0d) )  /* sprites  */
 	ROM_LOAD( "ic65_15v.bin", 0x60000, 0x20000, CRC(d8ea5c81) SHA1(ccb3f7d565b1c1b8e874a2df91cda40dde2962ed) )  /* sprites  */
 
-	ROM_REGION( 0x20000, "ymsnd:adpcma", 0 )   /* 64k for ADPCM samples */
+	ROM_REGION( 0x20000, "ymsnd", 0 )   /* 64k for ADPCM samples */
 	ROM_LOAD( "ic82_06.bin",  0x00000, 0x20000, CRC(2fd692ed) SHA1(0273dc39181504320bec0187d074b2f86c821508) )
 ROM_END
 
@@ -592,7 +592,7 @@ ROM_START( pac90 )
 	ROM_LOAD( "sprite1.ic50", 0x00000, 0x10000, CRC(190852ea) SHA1(fad7eb3aa53d03917173dd5a040655cfd329db32) )  /* sprites  */
 	ROM_LOAD( "sprite2.ic60", 0x40000, 0x10000, CRC(33effbea) SHA1(dbf6b735f3c8bacb695caf5d15ac8b7961bffc74) )  /* sprites  */
 
-	ROM_REGION( 0x20000, "ymsnd:adpcma", ROMREGION_ERASE00 )   /* 64k for ADPCM samples */
+	ROM_REGION( 0x20000, "ymsnd", ROMREGION_ERASE00 )   /* 64k for ADPCM samples */
 	ROM_LOAD( "voice.ic82",  0x00000, 0x10000, CRC(abc61f3d) SHA1(c6f123d16a26c4d77c635617dd97bb4b906c463a) )
 ROM_END
 
