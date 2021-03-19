@@ -201,11 +201,6 @@ void ym2610_device::device_start()
 	m_adpcm_a.save(*this);
 	m_adpcm_b.save(*this);
 
-	// configure ADPCM-B limit, since these registers are not
-	// directly accessible in the map
-	m_adpcm_b.write(0x0c, 0xff);
-	m_adpcm_b.write(0x0d, 0xff);
-
 	// automatically map memory regions if not configured externally
 	if (!has_configured_map(0) && !has_configured_map(1))
 	{
