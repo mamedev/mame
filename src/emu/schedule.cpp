@@ -461,70 +461,66 @@ void device_scheduler::timeslice()
 		if (m_suspend_changes_pending)
 			apply_suspend_changes();
 
-		// loop over all CPUs
+		// loop over all executing devices
 		for (device_execute_interface *exec = m_execute_list; exec != nullptr; exec = exec->m_nextexec)
 		{
-			// only process if this CPU is executing or truly halted (not yielding)
+			// only process if this device is executing or truly halted (not yielding)
 			// and if our target is later than the CPU's current time (coarse check)
 			if (EXPECTED(exec->m_suspend == 0 || exec->m_eatcycles))
 			{
 				// compute how many attoseconds to execute this CPU
 				attoseconds_t delta = target - exec->m_localtime.relative();
 
-				if (exec->m_attoseconds_per_cycle == 0)
+				// if we're already ahead, do nothing
+				if (delta <= 0)
+					continue;
+
+				// compute how many cycles we want to execute, rounding up
+				u32 ran = exec->m_cycles_running = u64(delta - 1) / u64(exec->m_attoseconds_per_cycle) + 1;
+				LOG("  cpu '%s': %d (%d cycles)\n", exec->device().tag(), delta, exec->m_cycles_running);
+
+				// if we're not suspended, actually execute
+				if (exec->m_suspend == 0)
 				{
-					exec->m_localtime.set(target);
+					g_profiler.start(exec->m_profiler);
+
+					// note that this global variable cycles_stolen can be modified
+					// via the call to cpu_execute
+					exec->m_cycles_stolen = 0;
+					m_executing_device = exec;
+					*exec->m_icountptr = exec->m_cycles_running;
+					if (!call_debugger)
+						exec->run();
+					else
+					{
+						exec->debugger_start_cpu_hook(attotime(m_basetime.seconds(), target) + attotime::zero);
+						exec->run();
+						exec->debugger_stop_cpu_hook();
+					}
+
+					// adjust for any cycles we took back
+					assert(ran >= *exec->m_icountptr);
+					ran -= *exec->m_icountptr;
+					assert(ran >= exec->m_cycles_stolen);
+					ran -= exec->m_cycles_stolen;
+					g_profiler.stop();
 				}
-				// if we have enough for at least 1 cycle, do the math
-				else if (delta >= exec->m_attoseconds_per_cycle)
+
+				// account for these cycles
+				exec->m_totalcycles += ran;
+
+				// update the local time for this CPU
+				assert(ran < exec->m_cycles_per_second);
+				attoseconds_t deltatime = exec->m_attoseconds_per_cycle * ran;
+				assert(deltatime >= 0);
+				exec->m_localtime.add(deltatime);
+				LOG("         %d ran, %d total, time = %s\n", ran, s32(exec->m_totalcycles), exec->m_localtime.as_string(PRECISION));
+
+				// if the new local CPU time is less than our target, move the target up, but not before the base
+				if (exec->m_localtime.relative() < target)
 				{
-					// compute how many cycles we want to execute
-					int ran = exec->m_cycles_running = divu_64x32(u64(delta) >> exec->m_divshift, exec->m_divisor);
-					LOG("  cpu '%s': %d (%d cycles)\n", exec->device().tag(), delta, exec->m_cycles_running);
-
-					// if we're not suspended, actually execute
-					if (exec->m_suspend == 0)
-					{
-						g_profiler.start(exec->m_profiler);
-
-						// note that this global variable cycles_stolen can be modified
-						// via the call to cpu_execute
-						exec->m_cycles_stolen = 0;
-						m_executing_device = exec;
-						*exec->m_icountptr = exec->m_cycles_running;
-						if (!call_debugger)
-							exec->run();
-						else
-						{
-							exec->debugger_start_cpu_hook(attotime(m_basetime.seconds(), target) + attotime::zero);
-							exec->run();
-							exec->debugger_stop_cpu_hook();
-						}
-
-						// adjust for any cycles we took back
-						assert(ran >= *exec->m_icountptr);
-						ran -= *exec->m_icountptr;
-						assert(ran >= exec->m_cycles_stolen);
-						ran -= exec->m_cycles_stolen;
-						g_profiler.stop();
-					}
-
-					// account for these cycles
-					exec->m_totalcycles += ran;
-
-					// update the local time for this CPU
-					assert(ran < exec->m_cycles_per_second);
-					attoseconds_t deltatime = exec->m_attoseconds_per_cycle * ran;
-					assert(deltatime >= 0);
-					exec->m_localtime.add(deltatime);
-					LOG("         %d ran, %d total, time = %s\n", ran, s32(exec->m_totalcycles), exec->m_localtime.as_string(PRECISION));
-
-					// if the new local CPU time is less than our target, move the target up, but not before the base
-					if (exec->m_localtime.relative() < target)
-					{
-						target = std::max(exec->m_localtime.relative(), basetime);
-						LOG("         (new target)\n");
-					}
+					target = std::max(exec->m_localtime.relative(), basetime);
+					LOG("         (new target)\n");
 				}
 			}
 		}
