@@ -183,9 +183,6 @@ void y8950_device::device_start()
 	m_io_read_handler.resolve_safe(0);
 	m_io_write_handler.resolve_safe();
 
-	// call this for the variants that need to adjust the rate
-	device_clock_changed();
-
 	// save our data
 	save_item(YMFM_NAME(m_address));
 	save_item(YMFM_NAME(m_io_ddr));

@@ -27,23 +27,50 @@ ym3812_device::ym3812_device(const machine_config &mconfig, const char *tag, dev
 
 
 //-------------------------------------------------
+//  status_r - return the status port (A0=0)
+//-------------------------------------------------
+
+u8 ym3812_device::status_r()
+{
+	return m_fm.status() | 0x06;
+}
+
+
+//-------------------------------------------------
 //  read - handle a read from the device
 //-------------------------------------------------
 
 u8 ym3812_device::read(offs_t offset)
 {
-	u8 result = 0xff;
-	switch (offset & 1)
-	{
-		case 0: // status port
-			result = m_fm.status() | 0x06;
-			break;
+	// datasheet says status only reads when A0=0
+	if ((offset & 1) == 0)
+		return status_r();
+	logerror("Unexpected read from YM3812 offset %d\n", offset & 1);
+	return 0xff;
+}
 
-		case 1:	// data port (unused)
-			logerror("Unexpected read from YM3812 offset %d\n", offset & 3);
-			break;
-	}
-	return result;
+
+//-------------------------------------------------
+//  address_w - write to the address port (A0=0)
+//-------------------------------------------------
+
+void ym3812_device::address_w(u8 value)
+{
+	m_address = value;
+}
+
+
+//-------------------------------------------------
+//  data_w - write to the data port (A0=1)
+//-------------------------------------------------
+
+void ym3812_device::data_w(u8 value)
+{
+	// force an update
+	m_stream->update();
+
+	// write to FM
+	m_fm.write(m_address, value);
 }
 
 
@@ -54,21 +81,11 @@ u8 ym3812_device::read(offs_t offset)
 
 void ym3812_device::write(offs_t offset, u8 value)
 {
-	switch (offset & 1)
-	{
-		case 0:	// address port
-			m_address = value;
-			break;
-
-		case 1: // data port
-
-			// force an update
-			m_stream->update();
-
-			// write to FM
-			m_fm.write(m_address, value);
-			break;
-	}
+	// A0 selects between address/data
+	if ((offset & 1) == 0)
+		address_w(value);
+	else
+		data_w(value);
 }
 
 
@@ -80,9 +97,6 @@ void ym3812_device::device_start()
 {
 	// create our stream
 	m_stream = stream_alloc(0, fm_engine::OUTPUTS, m_fm.sample_rate(clock()));
-
-	// call this for the variants that need to adjust the rate
-	device_clock_changed();
 
 	// save our data
 	save_item(YMFM_NAME(m_address));

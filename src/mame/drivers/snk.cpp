@@ -1760,10 +1760,10 @@ void snk_state::YM3526_YM3526_sound_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
 	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xe800, 0xe800).rw("ym1", FUNC(ym3526_device::status_port_r), FUNC(ym3526_device::control_port_w));
-	map(0xec00, 0xec00).w("ym1", FUNC(ym3526_device::write_port_w));
-	map(0xf000, 0xf000).rw("ym2", FUNC(ym3526_device::status_port_r), FUNC(ym3526_device::control_port_w));
-	map(0xf400, 0xf400).w("ym2", FUNC(ym3526_device::write_port_w));
+	map(0xe800, 0xe800).rw("ym1", FUNC(ym3526_device::status_r), FUNC(ym3526_device::address_w));
+	map(0xec00, 0xec00).w("ym1", FUNC(ym3526_device::data_w));
+	map(0xf000, 0xf000).rw("ym2", FUNC(ym3526_device::status_r), FUNC(ym3526_device::address_w));
+	map(0xf400, 0xf400).w("ym2", FUNC(ym3526_device::data_w));
 	map(0xf800, 0xf800).rw(FUNC(snk_state::snk_sound_status_r), FUNC(snk_state::snk_sound_status_w));
 }
 
@@ -1772,8 +1772,8 @@ void snk_state::YM3812_sound_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
 	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xe800, 0xe800).rw("ym1", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
-	map(0xec00, 0xec00).w("ym1", FUNC(ym3812_device::write_port_w));
+	map(0xe800, 0xe800).rw("ym1", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
+	map(0xec00, 0xec00).w("ym1", FUNC(ym3812_device::data_w));
 	map(0xf800, 0xf800).rw(FUNC(snk_state::snk_sound_status_r), FUNC(snk_state::snk_sound_status_w));
 }
 
@@ -1782,8 +1782,8 @@ void snk_state::YM3526_Y8950_sound_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
 	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xe800, 0xe800).rw("ym1", FUNC(ym3526_device::status_port_r), FUNC(ym3526_device::control_port_w));
-	map(0xec00, 0xec00).w("ym1", FUNC(ym3526_device::write_port_w));
+	map(0xe800, 0xe800).rw("ym1", FUNC(ym3526_device::status_r), FUNC(ym3526_device::address_w));
+	map(0xec00, 0xec00).w("ym1", FUNC(ym3526_device::data_w));
 	map(0xf000, 0xf000).rw("ym2", FUNC(y8950_device::status_r), FUNC(y8950_device::address_w));
 	map(0xf400, 0xf400).w("ym2", FUNC(y8950_device::data_w));
 	map(0xf800, 0xf800).rw(FUNC(snk_state::snk_sound_status_r), FUNC(snk_state::snk_sound_status_w));
@@ -1794,8 +1794,8 @@ void snk_state::YM3812_Y8950_sound_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
 	map(0xe000, 0xe000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xe800, 0xe800).rw("ym1", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
-	map(0xec00, 0xec00).w("ym1", FUNC(ym3812_device::write_port_w));
+	map(0xe800, 0xe800).rw("ym1", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
+	map(0xec00, 0xec00).w("ym1", FUNC(ym3812_device::data_w));
 	map(0xf000, 0xf000).rw("ym2", FUNC(y8950_device::status_r), FUNC(y8950_device::address_w));
 	map(0xf400, 0xf400).w("ym2", FUNC(y8950_device::data_w));
 	map(0xf800, 0xf800).rw(FUNC(snk_state::snk_sound_status_r), FUNC(snk_state::snk_sound_status_w));
