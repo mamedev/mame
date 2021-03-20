@@ -22,11 +22,12 @@ public:
 	// constructor
 	ym2413_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type = YM2413, u8 const *instruments = nullptr);
 
-	// write access
-	virtual void write(offs_t offset, u8 data);
+	// no read access present
 
-	void register_port_w(u8 data) { write(0, data); }
-	void data_port_w(u8 data) { write(1, data); }
+	// write access
+	void address_w(u8 data);	// A0=0
+	void data_w(u8 data);		// A0=1
+	void write(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides
@@ -39,10 +40,10 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// internal state
-	u8 m_address;                    // address register
-	sound_stream *m_stream;          // sound stream
-	required_memory_region m_internal; // internal memory region
-	fm_engine m_fm;                  // core FM engine
+	u8 m_address;                       // address register
+	sound_stream *m_stream;             // sound stream
+	required_region_ptr<u8> m_internal; // internal memory region
+	fm_engine m_fm;                     // core FM engine
 };
 
 

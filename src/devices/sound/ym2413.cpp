@@ -31,27 +31,41 @@ ym2413_device::ym2413_device(const machine_config &mconfig, const char *tag, dev
 
 
 //-------------------------------------------------
+//  address_w - write to the address port (A0=0)
+//-------------------------------------------------
+
+void ym2413_device::address_w(u8 value)
+{
+	m_address = value;
+}
+
+
+//-------------------------------------------------
+//  data_w - write to the data port (A0=1)
+//-------------------------------------------------
+
+void ym2413_device::data_w(u8 value)
+{
+	// force an update
+	m_stream->update();
+
+	// write to FM
+	m_fm.write(m_address, value);
+}
+
+
+//-------------------------------------------------
 //  write - handle a write to the register
 //  interface
 //-------------------------------------------------
 
 void ym2413_device::write(offs_t offset, u8 value)
 {
-	switch (offset & 1)
-	{
-		case 0:	// address port
-			m_address = value;
-			break;
-
-		case 1: // data port
-
-			// force an update
-			m_stream->update();
-
-			// write to FM
-			m_fm.write(m_address, value);
-			break;
-	}
+	// A0 selects between address/data
+	if ((offset & 1) == 0)
+		address_w(value);
+	else
+		data_w(value);
 }
 
 
@@ -64,9 +78,6 @@ void ym2413_device::device_start()
 	// create our stream
 	m_stream = stream_alloc(0, fm_engine::OUTPUTS, m_fm.sample_rate(clock()));
 
-	// call this for the variants that need to adjust the rate
-	device_clock_changed();
-
 	// save our data
 	save_item(YMFM_NAME(m_address));
 
@@ -74,7 +85,7 @@ void ym2413_device::device_start()
 	m_fm.save(*this);
 
 	// set up the instrument data
-	m_fm.set_instrument_data(m_internal->base());
+	m_fm.set_instrument_data(m_internal);
 }
 
 

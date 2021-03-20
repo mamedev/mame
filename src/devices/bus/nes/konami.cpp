@@ -679,11 +679,11 @@ void nes_konami_vrc7_device::write_h(offs_t offset, uint8_t data)
 
 		case 0x1010:
 		case 0x1018:
-			m_vrc7snd->register_port_w(data);
+			m_vrc7snd->address_w(data);
 			break;
 		case 0x1030:
 		case 0x1038:
-			m_vrc7snd->data_port_w(data);
+			m_vrc7snd->data_w(data);
 			break;
 
 		case 0x2000:
