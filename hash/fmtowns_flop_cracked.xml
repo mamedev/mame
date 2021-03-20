@@ -6,7 +6,7 @@ license:CC0
 <softwarelist name="fmtowns_flop" description="Fujitsu FM Towns cracked floppy disk images">
 
 	<!-- Cracked by cyo.the.vile -->
-	<software name="cameltryc">
+	<software name="cameltry">
 		<description>Cameltry (cracked)</description>
 		<year>1994</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -20,7 +20,7 @@ license:CC0
 	</software>
 
 	<!-- Cracked by cyo.the.vile -->
-	<software name="columnsc">
+	<software name="columns">
 		<description>Columns (cracked)</description>
 		<year>1990</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
@@ -33,7 +33,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dinosaurc">
+	<software name="dinosaur">
 		<description>Dinosaur (cracked)</description>
 		<year>1991</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
