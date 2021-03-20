@@ -33,13 +33,13 @@ ymf262_device::ymf262_device(const machine_config &mconfig, const char *tag, dev
 u8 ymf262_device::read(offs_t offset)
 {
 	u8 result = 0x00;
-	switch (offset & 1)
+	switch (offset & 3)
 	{
-		case 0: // status port
+		case 0: 	// status port (A0=0, A1=0)
 			result = m_fm.status();
 			break;
 
-		case 1:	// data port (unused)
+		default:	// datasheet says anything else is not guaranteed
 			logerror("Unexpected read from YMF262 offset %d\n", offset & 3);
 			break;
 	}
@@ -54,37 +54,23 @@ u8 ymf262_device::read(offs_t offset)
 
 void ymf262_device::write(offs_t offset, u8 value)
 {
-	switch (offset & 3)
+	switch (offset & 1)
 	{
-		case 0:	// address port
-			m_address = value;
+		case 0:	// address ports - A1 references upper bank
+			m_address = value | (BIT(offset, 1) << 8);
+
+			// tests reveal that in compatibility mode, upper bit is masked
+			// except for register 0x105
+			if (m_fm.regs().newflag() == 0 && m_address != 0x105)
+				m_address &= 0xff;
 			break;
 
-		case 1: // data port
-
-			// ignore if paired with upper address
-			if (BIT(m_address, 8))
-				break;
+		case 1: // data ports (A1 is ignored)
 
 			// force an update
 			m_stream->update();
 
 			// write to FM
-			m_fm.write(m_address, value);
-			break;
-
-		case 2: // upper address port
-			m_address = 0x100 | value;
-			break;
-
-		case 3: // upper data port
-
-			// ignore if paired with lower address
-			if (!BIT(m_address, 8))
-				break;
-
-			// write to OPN
-			m_stream->update();
 			m_fm.write(m_address, value);
 			break;
 	}
@@ -99,9 +85,6 @@ void ymf262_device::device_start()
 {
 	// create our stream
 	m_stream = stream_alloc(0, fm_engine::OUTPUTS, m_fm.sample_rate(clock()));
-
-	// call this for the variants that need to adjust the rate
-	device_clock_changed();
 
 	// save our data
 	save_item(YMFM_NAME(m_address));

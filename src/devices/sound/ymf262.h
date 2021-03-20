@@ -27,7 +27,7 @@ public:
 
 	// read/write access
 	u8 read(offs_t offset);
-	virtual void write(offs_t offset, u8 data);
+	void write(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides
