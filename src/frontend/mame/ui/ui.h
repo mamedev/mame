@@ -235,6 +235,7 @@ private:
 	ui_colors               m_ui_colors;
 	float                   m_target_font_height;
 	bool                    m_has_warnings;
+	bool                    m_unthrottle_mute;
 
 	std::unique_ptr<ui::machine_info> m_machine_info;
 	device_feature_set      m_unemulated_features;

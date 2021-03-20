@@ -225,6 +225,10 @@ void mame_ui_manager::init()
 	memcpy(dst,mouse_bitmap,32*32*sizeof(uint32_t));
 	m_mouse_arrow_texture = machine().render().texture_alloc();
 	m_mouse_arrow_texture->set_bitmap(m_mouse_bitmap, m_mouse_bitmap.cliprect(), TEXFORMAT_ARGB32);
+
+	// throttle-related options
+	machine().video().set_throttled(machine().options().throttle());
+	m_unthrottle_mute = options().unthrottle_mute();
 }
 
 
@@ -1363,6 +1367,9 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	// toggle throttle?
 	if (machine().ui_input().pressed(IPT_UI_THROTTLE))
 		machine().video().set_throttled(!machine().video().throttled());
+
+	// update unthrottle mute state
+	machine().sound().unthrottle_mute(!machine().video().throttled() && m_unthrottle_mute);
 
 	// check for fast forward
 	if (machine().ioport().type_pressed(IPT_UI_FAST_FORWARD))
