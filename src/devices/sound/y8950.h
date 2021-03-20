@@ -35,14 +35,15 @@ public:
 	auto io_read() { return m_io_read_handler.bind(); }
 	auto io_write() { return m_io_write_handler.bind(); }
 
-	// read/write access
+	// read access
+	u8 status_r();	// A0=0
+	u8 data_r();	// A0=1
 	u8 read(offs_t offset);
-	virtual void write(offs_t offset, u8 data);
 
-	u8 status_port_r() { return read(0); }
-	u8 read_port_r() { return read(1); }
-	void control_port_w(u8 data) { write(0, data); }
-	void write_port_w(u8 data) { write(1, data); }
+	// write access
+	void address_w(u8 data);	// A0=0
+	void data_w(u8 data);		// A0=1
+	void write(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides

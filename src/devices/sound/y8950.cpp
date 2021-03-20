@@ -34,43 +34,122 @@ y8950_device::y8950_device(const machine_config &mconfig, const char *tag, devic
 
 
 //-------------------------------------------------
+//  status_r - return the status port (A0=0)
+//-------------------------------------------------
+
+u8 y8950_device::status_r()
+{
+	m_stream->update();
+	return combine_status();
+}
+
+
+//-------------------------------------------------
+//  data_r - return specific register data (A0=1)
+//-------------------------------------------------
+
+u8 y8950_device::data_r()
+{
+	u8 result = 0xff;
+	switch (m_address)
+	{
+		case 0x05:	// keyboard in
+			result = m_keyboard_read_handler(0);
+			break;
+
+		case 0x09:	// ADPCM data
+		case 0x1a:
+			result = m_adpcm_b.read(m_address - 0x07);
+			break;
+
+		case 0x19:	// I/O data
+			result = m_io_read_handler(0);
+			break;
+
+		default:
+			logerror("Unexpected read from Y8950 data port %02X\n", m_address);
+			break;
+	}
+	return result;
+}
+
+
+//-------------------------------------------------
 //  read - handle a read from the device
 //-------------------------------------------------
 
 u8 y8950_device::read(offs_t offset)
 {
-	u8 result = 0xff;
-	switch (offset & 1)
+	// A0 selects between status/data
+	return ((offset & 1) == 0) ? status_r() : data_r();
+}
+
+
+//-------------------------------------------------
+//  address_w - write to the address port (A0=0)
+//-------------------------------------------------
+
+void y8950_device::address_w(u8 value)
+{
+	m_address = value;
+}
+
+
+//-------------------------------------------------
+//  data_w - write to the data port (A0=1)
+//-------------------------------------------------
+
+void y8950_device::data_w(u8 value)
+{
+	// force an update
+	m_stream->update();
+
+	// handle special addresses
+	switch (m_address)
 	{
-		case 0: // status port
-			m_stream->update();
-			result = combine_status();
+		case 0x04:	// IRQ control
+			m_fm.write(m_address, value);
+			combine_status();
 			break;
 
-		case 1:	// data port
+		case 0x06:	// keyboard out
+			m_keyboard_write_handler(0, value);
+			break;
 
-			switch (m_address)
-			{
-				case 0x05:	// keyboard in
-					result = m_keyboard_read_handler(0);
-					break;
+		case 0x08:	// split FM/ADPCM-B
+			m_adpcm_b.write(m_address - 0x07, (value & 0x0f) | 0x80);
+			m_fm.write(m_address, value & 0xc0);
+			break;
 
-				case 0x09:	// ADPCM data
-				case 0x1a:
-					result = m_adpcm_b.read(offset - 0x07);;
-					break;
+		case 0x07:	// ADPCM-B registers
+		case 0x09:
+		case 0x0a:
+		case 0x0b:
+		case 0x0c:
+		case 0x0d:
+		case 0x0e:
+		case 0x0f:
+		case 0x10:
+		case 0x11:
+		case 0x12:
+		case 0x15:
+		case 0x16:
+		case 0x17:
+			m_adpcm_b.write(m_address - 0x07, value);
+			break;
 
-				case 0x19:	// I/O data
-					result = m_io_read_handler(0);
-					break;
+		case 0x18:	// I/O direction
+			m_io_ddr = value & 0x0f;
+			break;
 
-				default:
-					logerror("Unexpected read from Y8950 offset %d\n", offset & 3);
-					break;
-			}
+		case 0x19:	// I/O data
+			m_io_write_handler(0, value & m_io_ddr);
+			break;
+
+		default:	// everything else to FM
+			m_fm.write(m_address, value);
 			break;
 	}
-	return result;
 }
 
 
@@ -81,64 +160,11 @@ u8 y8950_device::read(offs_t offset)
 
 void y8950_device::write(offs_t offset, u8 value)
 {
-	switch (offset & 1)
-	{
-		case 0:	// address port
-			m_address = value;
-			break;
-
-		case 1: // data port
-
-			// force an update
-			m_stream->update();
-
-			// handle special addresses
-			switch (m_address)
-			{
-				case 0x04:	// IRQ control
-					m_fm.write(m_address, value);
-					combine_status();
-					break;
-
-				case 0x06:	// keyboard out
-					m_keyboard_write_handler(0, value);
-					break;
-
-				case 0x08:	// split FM/ADPCM-B
-					m_adpcm_b.write(m_address - 0x07, (value & 0x0f) | 0x80);
-					m_fm.write(m_address, value & 0xc0);
-					break;
-
-				case 0x07:	// ADPCM-B registers
-				case 0x09:
-				case 0x0a:
-				case 0x0b:
-				case 0x0c:
-				case 0x0d:
-				case 0x0e:
-				case 0x0f:
-				case 0x10:
-				case 0x11:
-				case 0x12:
-				case 0x15:
-				case 0x16:
-				case 0x17:
-					m_adpcm_b.write(m_address - 0x07, value);
-					break;
-
-				case 0x18:	// I/O direction
-					m_io_ddr = value & 0x0f;
-					break;
-
-				case 0x19:	// I/O data
-					m_io_write_handler(0, value & m_io_ddr);
-					break;
-
-				default:	// everything else to FM
-					m_fm.write(m_address, value);
-					break;
-			}
-	}
+	// A0 selects between address/data
+	if ((offset & 1) == 0)
+		address_w(value);
+	else
+		data_w(value);
 }
 
 
@@ -219,7 +245,7 @@ void y8950_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 		m_adpcm_b.clock(0x01);
 
 		// update the FM content; clipping is unknown
-		s32 sums[std::max<int>(fm_engine::OUTPUTS, 2)] = { 0 };
+		s32 sums[std::max<int>(fm_engine::OUTPUTS, ymadpcm_b_engine::OUTPUTS)] = { 0 };
 		m_fm.output(sums, 1, 32767, fm_engine::ALL_CHANNELS);
 
 		// mix in the ADPCM; ADPCM-B is stereo, but only one channel
@@ -245,7 +271,10 @@ void y8950_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 
 u8 y8950_device::combine_status()
 {
+	// start with current FM status, masking out bits we might set
 	u8 status = m_fm.status() & ~(STATUS_ADPCM_B_EOS | STATUS_ADPCM_B_BRDY | STATUS_ADPCM_B_PLAYING);
+
+	// insert the live ADPCM status bits
 	u8 adpcm_status = m_adpcm_b.status();
 	if ((adpcm_status & ymadpcm_b_channel::STATUS_EOS) != 0)
 		status |= STATUS_ADPCM_B_EOS;
@@ -253,6 +282,8 @@ u8 y8950_device::combine_status()
 		status |= STATUS_ADPCM_B_BRDY;
 	if ((adpcm_status & ymadpcm_b_channel::STATUS_PLAYING) != 0)
 		status |= STATUS_ADPCM_B_PLAYING;
+
+	// run it through the FM engine to handle interrupts for us
 	return m_fm.set_reset_status(status, ~status);
 }
 
