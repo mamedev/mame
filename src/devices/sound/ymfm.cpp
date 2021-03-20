@@ -353,17 +353,6 @@
 
 
 //*********************************************************
-//  MACROS
-//*********************************************************
-
-// macro to encode four operator numbers into a 32-bit value in the
-// operator maps for each register class
-#define YMFM_OP4(o1,o2,o3,o4) u32(o1 | (o2 << 8) | (o3 << 16) | (o4 << 24))
-#define YMFM_OP2(o1,o2) YMFM_OP4(o1,o2,0xff,0xff)
-#define YMFM_OP0() YMFM_OP4(0xff,0xff,0xff,0xff)
-
-
-//*********************************************************
 //  GLOBAL TABLE LOOKUPS
 //*********************************************************
 
@@ -730,6 +719,28 @@ ymopm_registers::ymopm_registers() :
 	// create the waveforms
 	for (int index = 0; index < WAVEFORM_LENGTH; index++)
 		m_waveform[0][index] = abs_sin_attenuation(index) | (BIT(index, 9) << 15);
+
+	// create the LFO waveforms; AM in the low 8 bits, PM in the upper 8
+	// waveforms are adjusted to match the pictures in the application manual
+	for (int index = 0; index < LFO_WAVEFORM_LENGTH; index++)
+	{
+		// waveform 0 is a sawtooth
+		u8 am = index ^ 0xff;
+		s8 pm = s8(index);
+		m_lfo_waveform[0][index] = am | (pm << 8);
+
+		// waveform 1 is a square wave
+		am = BIT(index, 7) ? 0 : 0xff;
+		pm = s8(am ^ 0x80);
+		m_lfo_waveform[1][index] = am | (pm << 8);
+
+		// waveform 2 is a triangle wave
+		am = BIT(index, 7) ? (index << 1) : ((index ^ 0xff) << 1);
+		pm = s8(BIT(index, 6) ? am : ~am);
+		m_lfo_waveform[2][index] = am | (pm << 8);
+
+		// waveform 3 is noise; it is filled in dynamically
+	}
 }
 
 
@@ -779,14 +790,14 @@ void ymopm_registers::operator_map(operator_mapping &dest) const
 	//    carrier 1, modulator 1, carrier 2, modulator 2
 	static const operator_mapping s_fixed_map =
 	{ {
-		YMFM_OP4(  0, 16,  8, 24 ),  // Channel 0 operators
-		YMFM_OP4(  1, 17,  9, 25 ),  // Channel 1 operators
-		YMFM_OP4(  2, 18, 10, 26 ),  // Channel 2 operators
-		YMFM_OP4(  3, 19, 11, 27 ),  // Channel 3 operators
-		YMFM_OP4(  4, 20, 12, 28 ),  // Channel 4 operators
-		YMFM_OP4(  5, 21, 13, 29 ),  // Channel 5 operators
-		YMFM_OP4(  6, 22, 14, 30 ),  // Channel 6 operators
-		YMFM_OP4(  7, 23, 15, 31 ),  // Channel 7 operators
+		operator_list(  0, 16,  8, 24 ),  // Channel 0 operators
+		operator_list(  1, 17,  9, 25 ),  // Channel 1 operators
+		operator_list(  2, 18, 10, 26 ),  // Channel 2 operators
+		operator_list(  3, 19, 11, 27 ),  // Channel 3 operators
+		operator_list(  4, 20, 12, 28 ),  // Channel 4 operators
+		operator_list(  5, 21, 13, 29 ),  // Channel 5 operators
+		operator_list(  6, 22, 14, 30 ),  // Channel 6 operators
+		operator_list(  7, 23, 15, 31 ),  // Channel 7 operators
 	} };
 	dest = s_fixed_map;
 }
@@ -850,53 +861,25 @@ s32 ymopm_registers::clock_noise_and_lfo()
 	// leading 1; this matches exactly the frequencies in the application
 	// manual, though it might not be implemented exactly this way on chip
 	u32 rate = lfo_rate();
-	u32 prev_counter = m_lfo_counter;
 	m_lfo_counter += (0x10 | BIT(rate, 0, 4)) << BIT(rate, 4, 4);
 	u32 lfo = BIT(m_lfo_counter, 22, 8);
 
-	// compute the AM and PM values based on the waveform
-	// AM is 8-bit unsigned; PM is 8-bit signed; waveforms are adjusted
-	// to match the pictures in the application manual
-	u32 am;
-	s32 pm;
-	switch (lfo_waveform())
-	{
-		// sawtooth
-		default:
-		case 0:
-			am = lfo ^ 0xff;
-			pm = s8(lfo);
-			break;
+	// fill in the noise entry 1 ahead of our current position; this
+	// ensures the current value remains stable for a full LFO clock
+	// and effectively latches the running value when the LFO advances
+	u32 lfo_noise = BIT(m_noise_lfsr, 17, 8);
+	m_lfo_waveform[3][(lfo + 1) & 0xff] = lfo_noise | (lfo_noise << 8);
 
-		// square wave
-		case 1:
-			am = BIT(lfo, 7) ? 0 : 0xff;
-			pm = s8(am ^ 0x80);
-			break;
-
-		// triangle wave
-		case 2:
-			am = BIT(lfo, 7) ? (lfo << 1) : ((lfo ^ 0xff) << 1);
-			pm = s8(BIT(lfo, 6) ? am : ~am);
-			break;
-
-		// noise:
-		case 3:
-			// QUESTION: this behavior is surmised but not yet verified:
-			// LFO noise value is accumulated over 8 bits of LFSR and
-			// clocked as the LFO value transitions
-			if (BIT(m_lfo_counter ^ prev_counter, 22, 8) != 0)
-				m_noise_lfo = BIT(m_noise_lfsr, 17, 8);
-			am = m_noise_lfo;
-			pm = s8(am ^ 0x80);
-			break;
-	}
+	// fetch the AM/PM values based on the waveform; AM is unsigned and
+	// encoded in the low 8 bits, while PM signed and encoded in the upper
+	// 8 bits
+	s32 ampm = m_lfo_waveform[lfo_waveform()][lfo];
 
 	// apply depth to the AM value and store for later
-	m_lfo_am = (am * lfo_am_depth()) >> 7;
+	m_lfo_am = ((ampm & 0xff) * lfo_am_depth()) >> 7;
 
 	// apply depth to the PM value and return it
-	return (pm * s32(lfo_pm_depth())) >> 7;
+	return ((ampm >> 8) * s32(lfo_pm_depth())) >> 7;
 }
 
 
@@ -1129,9 +1112,9 @@ void ymopn_registers_base<false>::operator_map(operator_mapping &dest) const
 	//    carrier 1, modulator 1, carrier 2, modulator 2
 	static const operator_mapping s_fixed_map =
 	{ {
-		YMFM_OP4(  0,  6,  3,  9 ),  // Channel 0 operators
-		YMFM_OP4(  1,  7,  4, 10 ),  // Channel 1 operators
-		YMFM_OP4(  2,  8,  5, 11 ),  // Channel 2 operators
+		operator_list(  0,  6,  3,  9 ),  // Channel 0 operators
+		operator_list(  1,  7,  4, 10 ),  // Channel 1 operators
+		operator_list(  2,  8,  5, 11 ),  // Channel 2 operators
 	} };
 	dest = s_fixed_map;
 }
@@ -1148,12 +1131,12 @@ void ymopn_registers_base<true>::operator_map(operator_mapping &dest) const
 	//    carrier 1, modulator 1, carrier 2, modulator 2
 	static const operator_mapping s_fixed_map =
 	{ {
-		YMFM_OP4(  0,  6,  3,  9 ),  // Channel 0 operators
-		YMFM_OP4(  1,  7,  4, 10 ),  // Channel 1 operators
-		YMFM_OP4(  2,  8,  5, 11 ),  // Channel 2 operators
-		YMFM_OP4( 12, 18, 15, 21 ),  // Channel 3 operators
-		YMFM_OP4( 13, 19, 16, 22 ),  // Channel 4 operators
-		YMFM_OP4( 14, 20, 17, 23 ),  // Channel 5 operators
+		operator_list(  0,  6,  3,  9 ),  // Channel 0 operators
+		operator_list(  1,  7,  4, 10 ),  // Channel 1 operators
+		operator_list(  2,  8,  5, 11 ),  // Channel 2 operators
+		operator_list( 12, 18, 15, 21 ),  // Channel 3 operators
+		operator_list( 13, 19, 16, 22 ),  // Channel 4 operators
+		operator_list( 14, 20, 17, 23 ),  // Channel 5 operators
 	} };
 	dest = s_fixed_map;
 }
@@ -1524,15 +1507,15 @@ void ymopl_registers_base<Revision>::operator_map(operator_mapping &dest) const
 {
 	static const operator_mapping s_fixed_map =
 	{ {
-		YMFM_OP2(  0,  3 ),  // Channel 0 operators
-		YMFM_OP2(  1,  4 ),  // Channel 1 operators
-		YMFM_OP2(  2,  5 ),  // Channel 2 operators
-		YMFM_OP2(  6,  9 ),  // Channel 3 operators
-		YMFM_OP2(  7, 10 ),  // Channel 4 operators
-		YMFM_OP2(  8, 11 ),  // Channel 5 operators
-		YMFM_OP2( 12, 15 ),  // Channel 6 operators
-		YMFM_OP2( 13, 16 ),  // Channel 7 operators
-		YMFM_OP2( 14, 17 ),  // Channel 8 operators
+		operator_list(  0,  3 ),  // Channel 0 operators
+		operator_list(  1,  4 ),  // Channel 1 operators
+		operator_list(  2,  5 ),  // Channel 2 operators
+		operator_list(  6,  9 ),  // Channel 3 operators
+		operator_list(  7, 10 ),  // Channel 4 operators
+		operator_list(  8, 11 ),  // Channel 5 operators
+		operator_list( 12, 15 ),  // Channel 6 operators
+		operator_list( 13, 16 ),  // Channel 7 operators
+		operator_list( 14, 17 ),  // Channel 8 operators
 	} };
 	dest = s_fixed_map;
 }
@@ -1542,25 +1525,25 @@ void ymopl_registers_base<3>::operator_map(operator_mapping &dest) const
 {
 	u32 fourop = fourop_enable();
 
-	dest.chan[ 0] = BIT(fourop, 0) ? YMFM_OP4(  0,  3,  6,  9 ) : YMFM_OP2(  0,  3 );
-	dest.chan[ 1] = BIT(fourop, 1) ? YMFM_OP4(  1,  4,  7, 10 ) : YMFM_OP2(  1,  4 );
-	dest.chan[ 2] = BIT(fourop, 2) ? YMFM_OP4(  2,  5,  8, 11 ) : YMFM_OP2(  2,  5 );
-	dest.chan[ 3] = BIT(fourop, 0) ? YMFM_OP0() : YMFM_OP2(  6,  9 );
-	dest.chan[ 4] = BIT(fourop, 1) ? YMFM_OP0() : YMFM_OP2(  7, 10 );
-	dest.chan[ 5] = BIT(fourop, 2) ? YMFM_OP0() : YMFM_OP2(  8, 11 );
-	dest.chan[ 6] = YMFM_OP2( 12, 15 );
-	dest.chan[ 7] = YMFM_OP2( 13, 16 );
-	dest.chan[ 8] = YMFM_OP2( 14, 17 );
+	dest.chan[ 0] = BIT(fourop, 0) ? operator_list(  0,  3,  6,  9 ) : operator_list(  0,  3 );
+	dest.chan[ 1] = BIT(fourop, 1) ? operator_list(  1,  4,  7, 10 ) : operator_list(  1,  4 );
+	dest.chan[ 2] = BIT(fourop, 2) ? operator_list(  2,  5,  8, 11 ) : operator_list(  2,  5 );
+	dest.chan[ 3] = BIT(fourop, 0) ? operator_list() : operator_list(  6,  9 );
+	dest.chan[ 4] = BIT(fourop, 1) ? operator_list() : operator_list(  7, 10 );
+	dest.chan[ 5] = BIT(fourop, 2) ? operator_list() : operator_list(  8, 11 );
+	dest.chan[ 6] = operator_list( 12, 15 );
+	dest.chan[ 7] = operator_list( 13, 16 );
+	dest.chan[ 8] = operator_list( 14, 17 );
 
-	dest.chan[ 9] = BIT(fourop, 3) ? YMFM_OP4( 18, 21, 24, 27 ) : YMFM_OP2( 18, 21 );
-	dest.chan[10] = BIT(fourop, 4) ? YMFM_OP4( 19, 22, 25, 28 ) : YMFM_OP2( 19, 22 );
-	dest.chan[11] = BIT(fourop, 5) ? YMFM_OP4( 20, 23, 26, 29 ) : YMFM_OP2( 20, 23 );
-	dest.chan[12] = BIT(fourop, 3) ? YMFM_OP0() : YMFM_OP2( 24, 27 );
-	dest.chan[13] = BIT(fourop, 4) ? YMFM_OP0() : YMFM_OP2( 25, 28 );
-	dest.chan[14] = BIT(fourop, 5) ? YMFM_OP0() : YMFM_OP2( 26, 29 );
-	dest.chan[15] = YMFM_OP2( 30, 33 );
-	dest.chan[16] = YMFM_OP2( 31, 34 );
-	dest.chan[17] = YMFM_OP2( 32, 35 );
+	dest.chan[ 9] = BIT(fourop, 3) ? operator_list( 18, 21, 24, 27 ) : operator_list( 18, 21 );
+	dest.chan[10] = BIT(fourop, 4) ? operator_list( 19, 22, 25, 28 ) : operator_list( 19, 22 );
+	dest.chan[11] = BIT(fourop, 5) ? operator_list( 20, 23, 26, 29 ) : operator_list( 20, 23 );
+	dest.chan[12] = BIT(fourop, 3) ? operator_list() : operator_list( 24, 27 );
+	dest.chan[13] = BIT(fourop, 4) ? operator_list() : operator_list( 25, 28 );
+	dest.chan[14] = BIT(fourop, 5) ? operator_list() : operator_list( 26, 29 );
+	dest.chan[15] = operator_list( 30, 33 );
+	dest.chan[16] = operator_list( 31, 34 );
+	dest.chan[17] = operator_list( 32, 35 );
 }
 
 
@@ -1865,15 +1848,15 @@ void ymopll_registers::operator_map(operator_mapping &dest) const
 {
 	static const operator_mapping s_fixed_map =
 	{ {
-		YMFM_OP2(  0,  1 ),  // Channel 0 operators
-		YMFM_OP2(  2,  3 ),  // Channel 1 operators
-		YMFM_OP2(  4,  5 ),  // Channel 2 operators
-		YMFM_OP2(  6,  7 ),  // Channel 3 operators
-		YMFM_OP2(  8,  9 ),  // Channel 4 operators
-		YMFM_OP2( 10, 11 ),  // Channel 5 operators
-		YMFM_OP2( 12, 13 ),  // Channel 6 operators
-		YMFM_OP2( 14, 15 ),  // Channel 7 operators
-		YMFM_OP2( 16, 17 ),  // Channel 8 operators
+		operator_list(  0,  1 ),  // Channel 0 operators
+		operator_list(  2,  3 ),  // Channel 1 operators
+		operator_list(  4,  5 ),  // Channel 2 operators
+		operator_list(  6,  7 ),  // Channel 3 operators
+		operator_list(  8,  9 ),  // Channel 4 operators
+		operator_list( 10, 11 ),  // Channel 5 operators
+		operator_list( 12, 13 ),  // Channel 6 operators
+		operator_list( 14, 15 ),  // Channel 7 operators
+		operator_list( 16, 17 ),  // Channel 8 operators
 	} };
 	dest = s_fixed_map;
 }

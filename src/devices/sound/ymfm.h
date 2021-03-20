@@ -209,6 +209,13 @@ public:
 	u32 op_ssg_eg_mode(u32 opoffs) const   { return 0; } // OPN(A) only
 
 protected:
+	// helper to encode four operator numbers into a 32-bit value in the
+	// operator maps for each register class
+	static constexpr u32 operator_list(u8 o1 = 0xff, u8 o2 = 0xff, u8 o3 = 0xff, u8 o4 = 0xff)
+	{
+		return o1 | (o2 << 8) | (o3 << 16) | (o4 << 24);
+	}
+
 	// helper to apply KSR to the raw ADSR rate, ignoring ksr if the
 	// raw value is 0, and clamping to 63
 	static constexpr u32 effective_rate(u32 rawrate, u32 ksr)
@@ -277,6 +284,9 @@ protected:
 
 class ymopm_registers : public ymfm_registers_base
 {
+	// LFO waveforms are 256 entries long
+	static constexpr u32 LFO_WAVEFORM_LENGTH = 256;
+
 public:
 	// constants
 	static constexpr u32 OUTPUTS = 2;
@@ -413,6 +423,7 @@ protected:
 	u8 m_noise_lfo;                  // latched LFO noise value
 	u8 m_lfo_am;                     // current LFO AM value
 	u8 m_regdata[REGISTERS];         // register data
+	s16 m_lfo_waveform[4][LFO_WAVEFORM_LENGTH]; // LFO waveforms; AM in low 8, PM in upper 8
 	u16 m_waveform[WAVEFORMS][WAVEFORM_LENGTH]; // waveforms
 };
 
