@@ -399,6 +399,7 @@ const double XTAL::known_xtals[] = {
 	 34'291'712, /* 34.291712_MHz_XTAL     Fairlight CMI master card */
 	 34'846'000, /* 34.846_MHz_XTAL        Visual 550 */
 	 35'834'400, /* 35.8344_MHz_XTAL       Tab Products E-22 132-column display clock */
+	 35'840'000, /* 35.84_MHz_XTAL         Akai MPC 60 voice PCB */
 	 35'904'000, /* 35.904_MHz_XTAL        Used on HP98543 graphics board */
 	 36'000'000, /* 36_MHz_XTAL            Sega Model 1 video board */
 	 36'864'000, /* 36.864_MHz_XTAL        Unidesa Cirsa Rock 'n' Roll */

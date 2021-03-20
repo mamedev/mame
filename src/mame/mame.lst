@@ -14011,6 +14011,8 @@ cuoreunoa                       // (c) 1996 C.M.C.
 cuoreunob                       // (c) 1996 C.M.C.
 cuoreunoc                       // (c) 1996 C.M.C.
 cuoreunod                       // (c) 1996 C.M.C.
+cuoreunoe                       // (c) 1996 C.M.C.
+cuoreunof                       // 1996? bootleg
 elephfam                        // (c) 1997 C.M.C.
 elephfmb                        // (c) 1996 C.M.C.
 funquiz                         // (c) 198? Fun World
@@ -14052,6 +14054,7 @@ lluck4x1                        // (c) 1991 TAB-Austria
 lunapark                        // 1998 unknown.
 lunaparkb                       // 1998 unknown.
 lunaparkc                       // 1998 unknown.
+mag10                           // (c) 1997 Magic, bootleg
 magicrd2                        // (c) 1996 Impera
 magicrd2a                       // (c) 1996 Impera
 magicrd2b                       // (c) 1996 Impera
@@ -16160,6 +16163,7 @@ cfrogger                        // Coleco
 gjungler                        // Gakken
 
 @source:hh_pic16.cpp
+drdunk                          // Kmart
 flash                           // Ideal
 hccbaskb                        // Tiger Electronics
 leboom                          // Lakeside
@@ -16168,7 +16172,6 @@ melodym                         // GAF
 matchme                         // Kingsford
 pabball                         // Caprice
 rockpin                         // Tiger Electronics
-tbaskb                          // Tandy Corporation
 touchme                         // Atari
 ttfball                         // Toytronic
 ttfballa                        // Toytronic
@@ -16176,6 +16179,7 @@ us2pfball                       // US Games
 uspbball                        // US Games
 
 @source:hh_pps41.cpp
+dunksunk                        // Kmart
 ftri1                           // Fonas
 mastmind                        // Invicta
 memoquiz                        // MEM
@@ -19573,8 +19577,11 @@ lcmate2                         //
 
 @source:leapfrog_iquest.cpp
 iquest
+ttwistfb
 ttwistbq
 ttwistm
+ttwistsp
+ttwistvc
 turboex
 
 @source:leapfrog_leappad.cpp
@@ -32795,6 +32802,7 @@ manybloc                        // (c) 1991 Bee-Oh
 mustang                         // UPL-90058 (c) 1990 UPL
 mustangb                        // bootleg
 mustangb2                       // TAB Austria bootleg
+mustangb3                       // Lettering bootleg
 mustangs                        // UPL-90058 (c) 1990 UPL + Seoul Trading
 nouryoku                        // (c) 1995 Tecmo
 nouryokup                       // (c) 1995 Tecmo
@@ -32828,6 +32836,7 @@ tdragon2a                       // UPL-93091 (c) 1993 NMK
 tdragon3h
 tdragonb                        // bootleg
 tharrier                        // UPL-89053 (c) 1989 UPL
+tharrierb                       // Lettering bootleg
 tharrieru                       // UPL-89053 (c) 1989 UPL + American Sammy license
 tomagic                         //
 twinactn                        // (c) 1995 - bootleg of US AFF Mustang
@@ -32986,6 +32995,7 @@ nss_lwep                        // 1992 Nintendo
 nss_ncaa                        // 1992 Sculptured Software Inc.
 nss_rob3                        // 1992 Ocean
 nss_skin                        // 1992 Irem
+nss_smas                        // 1993 Nintendo
 nss_smw                         // 1991 Nintendo
 nss_ssoc                        // 1992 Human Inc.
 nss_sten                        // 199? Nintendo
@@ -36301,6 +36311,7 @@ risc2500a
 schess
 
 @source:saitek_simultano.cpp
+cc2150
 simultano
 simultanoa
 

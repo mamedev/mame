@@ -544,6 +544,7 @@ m79152pc.cpp
 mac.cpp
 mac128.cpp
 macpci.cpp
+macpdm.cpp
 macprtb.cpp
 macpwrbk030.cpp
 macquadra700.cpp

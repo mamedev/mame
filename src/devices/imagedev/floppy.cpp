@@ -346,7 +346,7 @@ void floppy_image_device::register_formats()
 		auto ff = fmt();
 		ff->enumerate(fse, form_factor, variants);
 		m_fs_managers.push_back(std::unique_ptr<filesystem_manager_t>(ff));
-	}		
+	}
 }
 
 void floppy_image_device::set_formats(std::function<void (format_registration &fr)> formats)
@@ -2779,6 +2779,15 @@ void mac_floppy_device::track_changed()
 void mac_floppy_device::mon_w(int)
 {
 	// Motor control is through commands
+}
+
+void mac_floppy_device::tfsel_w(int state)
+{
+	// if 35SEL line is clear and the motor is on, turn off the motor
+	if ((state == CLEAR_LINE) && (!floppy_image_device::mon_r()))
+	{
+		floppy_image_device::mon_w(1);
+	}
 }
 
 oa_d34v_device::oa_d34v_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : mac_floppy_device(mconfig, OAD34V, tag, owner, clock)

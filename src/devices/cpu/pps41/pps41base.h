@@ -29,11 +29,11 @@ public:
 	// 8-bit P(parallel) input
 	auto read_p() { return m_read_p.bind(); }
 
-	// 10-bit D(discrete) I/O
+	// 10/12-bit D(discrete) I/O
 	auto read_d() { return m_read_d.bind(); }
 	auto write_d() { return m_write_d.bind(); }
 
-	// 8-bit R I/O
+	// 8/10/14-bit R I/O
 	auto read_r() { return m_read_r.bind(); }
 	auto write_r() { return m_write_r.bind(); }
 
@@ -42,8 +42,9 @@ public:
 	auto write_sdo() { return m_write_sdo.bind(); }
 	auto write_ssc() { return m_write_ssc.bind(); }
 
-	u16 d_r() { return m_d_output; }
-	u8 r_r() { return m_r_output; }
+	// I/O access
+	u16 d_output_r() { return m_d_output; }
+	u16 r_output_r() { return m_r_output; }
 	int sdo_r() { return BIT(m_s, 3); }
 	void ssc_w(int state);
 
@@ -88,8 +89,8 @@ protected:
 	devcb_read8 m_read_p;
 	devcb_read16 m_read_d;
 	devcb_write16 m_write_d;
-	devcb_read8 m_read_r;
-	devcb_write8 m_write_r;
+	devcb_read16 m_read_r;
+	devcb_write16 m_write_r;
 	devcb_read_line m_read_sdi;
 	devcb_write_line m_write_sdo;
 	devcb_write_line m_write_ssc;
@@ -126,12 +127,17 @@ protected:
 	int m_d_pins;
 	u16 m_d_mask;
 	u16 m_d_output;
-	u8 m_r_output;
+	int m_r_pins;
+	u16 m_r_mask;
+	u16 m_r_output;
 	int m_int_line[2];
 	int m_int_ff[2];
 
 	// misc handlers
+	void set_d_pins(u8 p) { m_d_pins = p; m_d_mask = (1 << p) - 1; }
+	void set_r_pins(u8 p) { m_r_pins = p; m_r_mask = (1 << p) - 1; }
 	virtual bool op_is_tr(u8 op) = 0;
+
 	void serial_shift(int state);
 	void serial_clock();
 	void cycle();

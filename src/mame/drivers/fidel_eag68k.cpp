@@ -559,7 +559,7 @@ void excel68k_state::fex68k(machine_config &config)
 
 	const attotime irq_period = attotime::from_hz(600); // 556 timer (22nF, 91K + 20K POT @ 14.8K, 0.1K), ideal is 600Hz (measured 580Hz, 604Hz, 632Hz)
 	TIMER(config, m_irq_on).configure_periodic(FUNC(excel68k_state::irq_on<M68K_IRQ_2>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(1528)); // active for 1.525us
+	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(1525)); // active for 1.525us
 	TIMER(config, "irq_off").configure_periodic(FUNC(excel68k_state::irq_off<M68K_IRQ_2>), irq_period);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);

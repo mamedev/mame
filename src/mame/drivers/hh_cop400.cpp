@@ -3,25 +3,27 @@
 // thanks-to:Sean Riddle
 /***************************************************************************
 
-  National Semiconductor COPS(COP400 MCU series) handhelds or other simple
-  devices, mostly LED electronic games/toys.
+National Semiconductor COPS(COP400 MCU series) handhelds or other simple
+devices, mostly LED electronic games/toys.
 
-  TODO:
-  - why does h2hbaskbc(and clones) need a workaround on writing L pins?
-  - plus1: which sensor position is which colour?
-  - vidchal: Add screen and gun cursor with brightness detection callback,
-    and softwarelist for the video tapes. We'd also need a VHS player device.
-    The emulated lightgun itself appears to be working fine(eg. add a 30hz
-    timer to IN.3 to score +100)
+TODO:
+- why does h2hbaskbc(and clones) need a workaround on writing L pins?
+- plus1: which sensor position is which colour?
+- vidchal: Add screen and gun cursor with brightness detection callback,
+  and softwarelist for the video tapes. We'd also need a VHS player device.
+  The emulated lightgun itself appears to be working fine(eg. add a 30hz
+  timer to IN.3 to score +100)
 
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/cop400/cop400.h"
 #include "video/pwm.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "sound/dac.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -657,7 +659,7 @@ ROM_END
   This toy includes 4 games: Tic Tac Toe, Chicken Sez, and Total Recall I/II.
 
   known releases:
-  - USA: I Took a Lickin' From a Chicken
+  - USA: I Took a Lickin' From a Chicken, published by LJN
   - Japan: Professor Chicken's Genius Classroom 「にわとり博士の天才教室」, published by Bandai
     (not sure if it's the same ROM, or just licensed the outer shell)
 
@@ -941,8 +943,8 @@ ROM_END
   * 14 LEDs, 1-bit sound
 
   known releases:
-  - USA: Funtronics: Red Light Green Light
-  - USA(rerelease): Funtronics: Hot Wheels Drag Race
+  - USA: Funtronics: Red Light Green Light, published by Mattel
+  - USA(rerelease): Funtronics: Hot Wheels Drag Race, published by Mattel
 
 ***************************************************************************/
 

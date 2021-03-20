@@ -153,6 +153,8 @@ REF. 970429
 
 #include "speaker.h"
 
+#include "speedup.lh"
+
 
 #define LOG             0
 
@@ -539,7 +541,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gaelco3d_state::adsp_autobuffer_irq)
 	if (m_adsp_incs)
 	{
 		for (uint8_t i = 0; i < SOUND_CHANNELS; i++)
-			m_dmadac[i]->transfer(i, m_adsp_incs, SOUND_CHANNELS * m_adsp_incs, m_adsp_size / (SOUND_CHANNELS * m_adsp_incs), (int16_t *)&m_adsp_fastram_base[reg - 0x3800]);
+			m_dmadac[i]->transfer(i, m_adsp_incs, SOUND_CHANNELS * m_adsp_incs, m_adsp_size / (SOUND_CHANNELS * m_adsp_incs), (int16_t *)&m_adsp_fastram_base[(reg - 0x3800) / 2]);
 	}
 
 	// Increment it
@@ -675,10 +677,12 @@ void gaelco3d_state::main_map(address_map &map)
 	map(0x51003c, 0x51003d).portr("IN3");
 	map(0x510041, 0x510041).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x510042, 0x510043).r(FUNC(gaelco3d_state::sound_status_r));
+	map(0x510044, 0x510045).nopw(); // unknown (cabinet control?)
 	map(0x510100, 0x510101).rw(FUNC(gaelco3d_state::eeprom_data_r), FUNC(gaelco3d_state::irq_ack_w));
 	map(0x510103, 0x510103).r(m_serial, FUNC(gaelco_serial_device::data_r));
 	map(0x510103, 0x510103).select(0x000038).lw8(NAME([this] (offs_t offset, u8 data) { m_mainlatch->write_d0(offset >> 3, data); }));
 	map(0x510105, 0x510105).w(m_serial, FUNC(gaelco_serial_device::data_w));
+	map(0x510106, 0x510107).mirror(0x000070).nopr(); // clr.b instructions do dummy reads
 	map(0x510107, 0x510107).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
 	map(0xfe0000, 0xfeffff).ram().share("m68k_ram_base16");
 }
@@ -1258,9 +1262,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1996, speedup,    0,        gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (Version 2.20)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, speedup12,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (Version 1.20)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, speedup10,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (Version 1.00)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1996, speedup,    0,        gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (Version 2.20)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
+GAMEL( 1996, speedup12,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (Version 1.20)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
+GAMEL( 1996, speedup10,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (Version 1.00)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
 
 GAME( 1997, surfplnt,   0,        gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (Version 4.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 GAME( 1997, surfplnt40, surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (Version 4.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)

@@ -30,7 +30,7 @@ license:CC0
 
 	<element name="black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
 	<element name="blackd"><disk><color red="0.0" green="0.0" blue="0.0" /></disk></element>
-	<element name="green"><rect><color red="0.0" green="0.38" blue="0.149" /></rect></element>
+	<element name="green"><rect><color red="0.0" green="0.3804" blue="0.1491" /></rect></element>
 	<element name="white"><rect><color red="0.8" green="0.8" blue="0.8" /></rect></element>
 
 	<element name="led" defstate="0">
@@ -53,59 +53,59 @@ license:CC0
 	</element>
 
 	<element name="text_p">
-		<rect><color red="0.0" green="0.38" blue="0.15" /></rect>
+		<rect><color red="0.0" green="0.3804" blue="0.1491" /></rect>
 		<text string="P"><color red="0.8" green="0.8" blue="0.8" /></text>
 	</element>
 	<element name="text_1st">
-		<rect><color red="0.0" green="0.38" blue="0.15" /></rect>
+		<rect><color red="0.0" green="0.3804" blue="0.1491" /></rect>
 		<text string="1st"><color red="0.8" green="0.8" blue="0.8" /></text>
 	</element>
 	<element name="text_2nd">
-		<rect><color red="0.0" green="0.38" blue="0.15" /></rect>
+		<rect><color red="0.0" green="0.3804" blue="0.1491" /></rect>
 		<text string="2nd"><color red="0.8" green="0.8" blue="0.8" /></text>
 	</element>
 	<element name="text_3rd">
-		<rect><color red="0.0" green="0.38" blue="0.15" /></rect>
+		<rect><color red="0.0" green="0.3804" blue="0.1491" /></rect>
 		<text string="3rd"><color red="0.8" green="0.8" blue="0.8" /></text>
 	</element>
 	<element name="text_foul">
-		<rect><color red="0.0" green="0.38" blue="0.15" /></rect>
+		<rect><color red="0.0" green="0.3804" blue="0.1491" /></rect>
 		<text string="FOUL"><color red="0.8" green="0.8" blue="0.8" /></text>
 	</element>
 	<element name="text_curve">
-		<rect><color red="0.0" green="0.38" blue="0.15" /></rect>
+		<rect><color red="0.0" green="0.3804" blue="0.1491" /></rect>
 		<text string="CURVE"><color red="0.8" green="0.8" blue="0.8" /></text>
 	</element>
 	<element name="text_ball">
-		<rect><color red="0.0" green="0.38" blue="0.15" /></rect>
+		<rect><color red="0.0" green="0.3804" blue="0.1491" /></rect>
 		<text string="BALL"><color red="0.8" green="0.8" blue="0.8" /></text>
 	</element>
 	<element name="text_strike">
-		<rect><color red="0.0" green="0.38" blue="0.15" /></rect>
+		<rect><color red="0.0" green="0.3804" blue="0.1491" /></rect>
 		<text string="STRIKE"><color red="0.8" green="0.8" blue="0.8" /></text>
 	</element>
 	<element name="text_flyout">
-		<rect><color red="0.0" green="0.38" blue="0.15" /></rect>
+		<rect><color red="0.0" green="0.3804" blue="0.1491" /></rect>
 		<text string="FLY OUT"><color red="0.8" green="0.8" blue="0.8" /></text>
 	</element>
 	<element name="text_homerun">
-		<rect><color red="0.0" green="0.38" blue="0.15" /></rect>
+		<rect><color red="0.0" green="0.3804" blue="0.1491" /></rect>
 		<text string="HOME RUN"><color red="0.8" green="0.8" blue="0.8" /></text>
 	</element>
 	<element name="text_grout">
-		<rect><color red="0.0" green="0.38" blue="0.15" /></rect>
+		<rect><color red="0.0" green="0.3804" blue="0.1491" /></rect>
 		<text string="GR. OUT"><color red="0.8" green="0.8" blue="0.8" /></text>
 	</element>
 	<element name="text_single">
-		<rect><color red="0.0" green="0.38" blue="0.15" /></rect>
+		<rect><color red="0.0" green="0.3804" blue="0.1491" /></rect>
 		<text string="SINGLE"><color red="0.8" green="0.8" blue="0.8" /></text>
 	</element>
 	<element name="text_double">
-		<rect><color red="0.0" green="0.38" blue="0.15" /></rect>
+		<rect><color red="0.0" green="0.3804" blue="0.1491" /></rect>
 		<text string="DOUBLE"><color red="0.8" green="0.8" blue="0.8" /></text>
 	</element>
 	<element name="text_triple">
-		<rect><color red="0.0" green="0.38" blue="0.15" /></rect>
+		<rect><color red="0.0" green="0.3804" blue="0.1491" /></rect>
 		<text string="TRIPLE"><color red="0.8" green="0.8" blue="0.8" /></text>
 	</element>
 

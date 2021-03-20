@@ -3,7 +3,10 @@
 // thanks-to:Sean Riddle, Kevin Horton
 /***************************************************************************
 
-  Rockwell PPS-4/1 MCU series handhelds
+Rockwell PPS-4/1 MCU series handhelds
+
+ROM source notes when dumped from another publisher, but confident it's the same game:
+- memoquiz: Mattel Mind Boggler
 
 ***************************************************************************/
 
@@ -12,6 +15,7 @@
 #include "cpu/pps41/mm75.h"
 #include "cpu/pps41/mm76.h"
 #include "cpu/pps41/mm78.h"
+#include "cpu/pps41/mm78la.h"
 #include "video/pwm.h"
 #include "sound/beep.h"
 #include "sound/spkrdev.h"
@@ -20,10 +24,11 @@
 #include "speaker.h"
 
 // internal artwork
+#include "dunksunk.lh"
 #include "ftri1.lh"
 #include "mastmind.lh"
-#include "mwcfootb.lh"
 #include "memoquiz.lh"
+#include "mwcfootb.lh"
 #include "rdqa.lh"
 #include "scrabsen.lh"
 #include "smastmind.lh"
@@ -54,7 +59,7 @@ public:
 
 	// MCU output pin state
 	u16 m_d = 0;
-	u8 m_r = ~0;
+	u16 m_r = 0;
 
 	u8 read_inputs(int columns);
 	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
@@ -144,7 +149,7 @@ public:
 
 	void update_display();
 	void write_d(u16 data);
-	void write_r(u8 data);
+	void write_r(u16 data);
 	void ftri1(machine_config &config);
 };
 
@@ -165,7 +170,7 @@ void ftri1_state::write_d(u16 data)
 	m_speaker->level_w(BIT(data, 9));
 }
 
-void ftri1_state::write_r(u8 data)
+void ftri1_state::write_r(u16 data)
 {
 	// RIO1-RIO8: digit/led data
 	m_r = data;
@@ -249,7 +254,7 @@ public:
 
 	void update_display();
 	void write_d(u16 data);
-	void write_r(u8 data);
+	void write_r(u16 data);
 	u8 read_p();
 
 	void mastmind(machine_config &config);
@@ -275,7 +280,7 @@ void mastmind_state::write_d(u16 data)
 		m_beeper->set_state(BIT(data, 8));
 }
 
-void mastmind_state::write_r(u8 data)
+void mastmind_state::write_r(u16 data)
 {
 	// RIO1-RIO7: digit segment data
 	m_r = data;
@@ -370,6 +375,130 @@ ROM_END
 
 /***************************************************************************
 
+  Kmart Dunk 'n Sunk (manufactured in Hong Kong)
+  * MM76EL MCU (label GE-E 1V2280, die label B8617)
+  * 4 7seg leds, 31 other leds, 1-bit sound
+
+  It's by the same Hong Kong company that did Kmart Dr. Dunk/Tandy Electronic
+  Basketball (PIC16 MCU), Grandstand Pocket Match of the Day (MOS MPS765x MCU)
+  among others.
+
+  known releases:
+  - USA(1): Dunk 'n Sunk, published by Kmart
+  - USA(2): Electronic Basketball / Submarine Warfare, published by U.S. Games
+
+***************************************************************************/
+
+class dunksunk_state : public hh_pps41_state
+{
+public:
+	dunksunk_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_pps41_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch) { update_int(); }
+	DECLARE_INPUT_CHANGED_MEMBER(game_switch) { update_int(); }
+	virtual void update_int() override;
+
+	void update_display();
+	void write_d(u16 data);
+	void write_r(u16 data);
+	void dunksunk(machine_config &config);
+};
+
+// handlers
+
+void dunksunk_state::update_int()
+{
+	// 2 of the switches are tied to MCU interrupt pins
+	m_maincpu->set_input_line(0, (m_inputs[1]->read() & 1) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(1, (m_inputs[2]->read() & 1) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void dunksunk_state::update_display()
+{
+	m_display->matrix(m_d >> 1, ~m_r);
+}
+
+void dunksunk_state::write_d(u16 data)
+{
+	// DIO0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// DIO1-DIO5: led select
+	// DIO6-DIO9: digit select
+	m_d = data;
+	update_display();
+}
+
+void dunksunk_state::write_r(u16 data)
+{
+	// RIO1-RIO7: led data
+	m_r = data;
+	update_display();
+}
+
+// config
+
+static INPUT_PORTS_START( dunksunk )
+	PORT_START("IN.0") // P
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CONDITION("IN.1", 0x03, EQUALS, 0x01)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+
+	PORT_START("IN.1")
+	PORT_CONFNAME( 0x03, 0x00, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, dunksunk_state, difficulty_switch, 0)
+	PORT_CONFSETTING(    0x00, "1" ) // INT0
+	PORT_CONFSETTING(    0x01, "2" ) // PI4
+	PORT_CONFSETTING(    0x03, "3" )
+
+	PORT_START("IN.2") // INT1
+	PORT_CONFNAME( 0x01, 0x01, "Game Select" ) PORT_CHANGED_MEMBER(DEVICE_SELF, dunksunk_state, game_switch, 0)
+	PORT_CONFSETTING(    0x01, "Basketball" )
+	PORT_CONFSETTING(    0x00, "Submarine Chase" )
+INPUT_PORTS_END
+
+void dunksunk_state::dunksunk(machine_config &config)
+{
+	/* basic machine hardware */
+	MM76EL(config, m_maincpu, 390000); // approximation - VC osc. R=56K
+	m_maincpu->write_d().set(FUNC(dunksunk_state::write_d));
+	m_maincpu->write_r().set(FUNC(dunksunk_state::write_r));
+	m_maincpu->read_p().set_ioport("IN.0");
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 7);
+	m_display->set_segmask(0x1e0, 0x7f);
+	m_display->set_bri_levels(0.015, 0.2); // player led is brighter
+	config.set_default_layout(layout_dunksunk);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( dunksunk )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "ge-e_1v2280", 0x0000, 0x0400, CRC(90f17191) SHA1(80c3708af99c9db7afe17254fa4df2080aa9f145) )
+
+	ROM_REGION( 314, "maincpu:opla", 0 )
+	ROM_LOAD( "mm76_dunksunk_output.pla", 0, 314, CRC(410fa6d7) SHA1(d46aaf1ec2c942083cba7dbd59d4261dc238d4c8) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   M.E.M. Belgium Memoquiz
   * PCB label: MEMOQUIZ MO3
   * MM75 MCU (label M7505 A7505-12, die label A7505)
@@ -380,7 +509,7 @@ ROM_END
   confirming with the "=" button. CD reveals the answer, PE is for player entry.
 
   known releases:
-  - Europe: Memoquiz
+  - Europe: Memoquiz, published by M.E.M. Belgium
   - UK: Memoquiz, published by Polymark
   - USA: Mind Boggler (model 2626), published by Mattel
 
@@ -398,7 +527,7 @@ public:
 
 	void update_display();
 	void write_d(u16 data);
-	void write_r(u8 data);
+	void write_r(u16 data);
 	u8 read_p();
 	void memoquiz(machine_config &config);
 };
@@ -428,7 +557,7 @@ void memoquiz_state::write_d(u16 data)
 	// DIO8: N/C, looks like they planned to add sound, but didn't
 }
 
-void memoquiz_state::write_r(u8 data)
+void memoquiz_state::write_r(u16 data)
 {
 	// RIO1-RIO7: digit segment data
 	m_r = data;
@@ -532,11 +661,11 @@ public:
 
 	void main_write_d(u16 data);
 	u16 main_read_d();
-	void main_write_r(u8 data);
+	void main_write_r(u16 data);
 	u8 main_read_p();
 
 	void sub_write_d(u16 data);
-	void sub_write_r(u8 data);
+	void sub_write_r(u16 data);
 
 	void mwcfootb(machine_config &config);
 };
@@ -564,10 +693,10 @@ void mwcfootb_state::main_write_d(u16 data)
 u16 mwcfootb_state::main_read_d()
 {
 	// DIO9: subcpu DIO9
-	return m_subcpu->d_r() & 0x200;
+	return m_subcpu->d_output_r() & 0x200;
 }
 
-void mwcfootb_state::main_write_r(u8 data)
+void mwcfootb_state::main_write_r(u16 data)
 {
 	// RIO1-RIO7: vfd plate 0-6
 	m_plate = (m_plate & 0xfff00) | (~data & 0x7f);
@@ -595,7 +724,7 @@ void mwcfootb_state::sub_write_d(u16 data)
 	m_maincpu->set_input_line(0, (data & 0x200) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void mwcfootb_state::sub_write_r(u8 data)
+void mwcfootb_state::sub_write_r(u16 data)
 {
 	// RIO1-RIO8: vfd plate 7-14
 	m_plate = (m_plate & 0xf00ff) | (~data << 8 & 0xff00);
@@ -727,7 +856,7 @@ public:
 
 	void update_display();
 	void write_d(u16 data);
-	void write_r(u8 data);
+	void write_r(u16 data);
 	u8 read_p();
 	void scrabsen(machine_config &config);
 };
@@ -756,7 +885,7 @@ void scrabsen_state::write_d(u16 data)
 	m_speaker->level_w(BIT(data, 8));
 }
 
-void scrabsen_state::write_r(u8 data)
+void scrabsen_state::write_r(u16 data)
 {
 	// RIO1-RIO8: led data
 	m_r = data;
@@ -878,7 +1007,7 @@ public:
 
 	void update_display();
 	void write_d(u16 data);
-	void write_r(u8 data);
+	void write_r(u16 data);
 	u8 read_p();
 	void rdqa(machine_config &config);
 };
@@ -907,7 +1036,7 @@ void rdqa_state::write_d(u16 data)
 	m_speaker->level_w(data >> 8 & 3);
 }
 
-void rdqa_state::write_r(u8 data)
+void rdqa_state::write_r(u16 data)
 {
 	// RIO1-RIO7: digit segment data
 	m_r = data;
@@ -1004,9 +1133,11 @@ CONS( 1979, ftri1,     0,       0, ftri1,     ftri1,    ftri1_state,    empty_in
 CONS( 1979, mastmind,  0,       0, mastmind,  mastmind, mastmind_state, empty_init, "Invicta", "Electronic Master Mind (Invicta)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 CONS( 1979, smastmind, 0,       0, smastmind, mastmind, mastmind_state, empty_init, "Invicta", "Super-Sonic Electronic Master Mind", MACHINE_SUPPORTS_SAVE )
 
+CONS( 1980, dunksunk,  0,       0, dunksunk,  dunksunk, dunksunk_state, empty_init, "Kmart", "Dunk 'n Sunk", MACHINE_SUPPORTS_SAVE )
+
 CONS( 1978, memoquiz,  0,       0, memoquiz,  memoquiz, memoquiz_state, empty_init, "M.E.M. Belgium", "Memoquiz", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1980, mwcfootb,  0,       0, mwcfootb,  mwcfootb, mwcfootb_state, empty_init, "Mattel", "World Championship Football", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, mwcfootb,  0,       0, mwcfootb,  mwcfootb, mwcfootb_state, empty_init, "Mattel", "World Championship Football", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1978, scrabsen,  0,       0, scrabsen,  scrabsen, scrabsen_state, empty_init, "Selchow & Righter", "Scrabble Sensor - Electronic Word Game", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, scrabsen,  0,       0, scrabsen,  scrabsen, scrabsen_state, empty_init, "Selchow & Righter", "Scrabble Sensor - Electronic Word Game", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, rdqa,      0,       0, rdqa,      rdqa,     rdqa_state,     empty_init, "Selchow & Righter", "Reader's Digest Q&A - Computer Question & Answer Game", MACHINE_SUPPORTS_SAVE )
