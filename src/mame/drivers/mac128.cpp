@@ -698,7 +698,7 @@ void mac128_state::via_sync()
 	uint64_t vpa_cycle = cur_cycle+2;
 	uint64_t via_start_cycle = (vpa_cycle + 9) / 10;
 	uint64_t end_cycle = via_start_cycle * 10 + 4;
-	m_maincpu->adjust_icount(cur_cycle - end_cycle - 4); // 4 cycles already counted by the core
+	m_maincpu->adjust_icount(cur_cycle - end_cycle + 4); // 4 cycles already counted by the core
 }
 
 uint16_t mac128_state::mac_via_r(offs_t offset)
@@ -1184,7 +1184,7 @@ void mac128_state::macse(machine_config &config)
 	config.device_remove("pds");
 	config.device_remove("scsibus");
 
-	IWM(config.replace(), m_iwm, C7M);
+	IWM(config.replace(), m_iwm, C7M*2);
 	m_iwm->phases_cb().set(FUNC(mac128_state::phases_w));
 	m_iwm->devsel_cb().set(FUNC(mac128_state::devsel_se_w));
 
