@@ -203,6 +203,16 @@ newoption {
 }
 
 newoption {
+	trigger = "AR",
+	description = "AR replacement",
+}
+
+newoption {
+	trigger = "STRIP",
+	description = "STRIP replacement",
+}
+
+newoption {
 	trigger = "TOOLCHAIN",
 	description = "Toolchain prefix"
 }
@@ -395,6 +405,11 @@ newoption {
 newoption {
 	trigger = "PLATFORM",
 	description = "Target machine platform (x86,arm,...)",
+}
+
+newoption {
+	trigger = "NO_USE_BGFX_KHRONOS",
+	description = "Skip including bgfx 3rdparty khronos headers (rely on system ones)",
 }
 
 newoption {

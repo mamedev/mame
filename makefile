@@ -33,6 +33,7 @@
 # SDL2_MULTIAPI = 1
 # NO_USE_MIDI = 1
 # NO_USE_PORTAUDIO = 1
+# NO_USE_BGFX_KHRONOS =
 # USE_TAPTUN = 1
 # USE_PCAP = 1
 # USE_QTDEBUG = 1
@@ -86,10 +87,13 @@
 # BUILDDIR = build
 # TARGETOS = windows
 # CROSS_BUILD = 1
+# CROSS_ARCH =
 # TOOLCHAIN =
 # OVERRIDE_CC = cc
 # OVERRIDE_CXX = c++
 # OVERRIDE_LD = ld
+# OVERRIDE_AR = ar
+# OVERRIDE_STRIP = strip
 
 # DEPRECATED = 0
 # LTO = 1
@@ -335,6 +339,10 @@ endif
 
 else
 CROSS_BUILD := 1
+ifdef CROSS_ARCH
+PLATFORM := $(CROSS_ARCH)
+UNAME := $(CROSS_ARCH)
+endif
 endif # TARGET_OS
 
 ifdef PTR64
@@ -591,6 +599,18 @@ ifndef CROSS_BUILD
 LD := $(OVERRIDE_LD)
 endif
 endif
+ifdef OVERRIDE_AR
+PARAMS += --AR='$(OVERRIDE_AR)'
+ifndef CROSS_BUILD
+AR := $(OVERRIDE_AR)
+endif
+endif
+ifdef OVERRIDE_STRIP
+PARAMS += --STRIP='$(OVERRIDE_STRIP)'
+ifndef CROSS_BUILD
+STRIP := $(OVERRIDE_STRIP)
+endif
+endif
 
 #-------------------------------------------------
 # sanity check the configuration
@@ -756,6 +776,10 @@ endif
 
 ifdef NO_USE_MIDI
 PARAMS += --NO_USE_MIDI='$(NO_USE_MIDI)'
+endif
+
+ifdef NO_USE_BGFX_KHRONOS
+PARAMS += --NO_USE_BGFX_KHRONOS='$(NO_USE_BGFX_KHRONOS)'
 endif
 
 ifdef NO_USE_PORTAUDIO
