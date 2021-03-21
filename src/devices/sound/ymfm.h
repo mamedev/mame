@@ -601,6 +601,7 @@ class ymfm_operator
 		ENV_SUSTAIN = 2,
 		ENV_RELEASE = 3
 	};
+	static constexpr u16 ENV_QUIET = 0x200;
 
 public:
 	// constructor
@@ -624,6 +625,9 @@ public:
 	// key state control
 	void keyonoff(u8 on) { m_keyon = on; }
 	void keyon_csm() { m_csm_triggered = 1; }
+
+	// are we active?
+	bool active() const { return (m_env_state != ENV_RELEASE || m_env_attenuation < ENV_QUIET); }
 
 private:
 	// convert the generic block_freq into a 5-bit keycode
@@ -691,6 +695,9 @@ public:
 
 	// compute the channel output and add to the left/right output sums
 	void output(u8 lfo_raw_am, u8 noise_state, s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax) const;
+
+	// is this channel active?
+	bool active() const { return m_op1.active() || m_op2.active() || m_op3.active() || m_op4.active(); }
 
 private:
 	// convert a 6/8-bit raw AM value into an amplitude offset based on sensitivity
@@ -806,6 +813,9 @@ private:
 	u8 m_clock_prescale;             // prescale factor (2/3/6)
 	u8 m_irq_mask;                   // mask of which bits signal IRQs
 	u8 m_irq_state;                  // current IRQ state
+	u32 m_active_channels;           // mask of active channels (computed by prepare)
+	u32 m_modified_channels;         // mask of channels that have been modified
+	u32 m_prepare_count;             // counter to do periodic prepare sweeps
 	attotime m_busy_end;             // end of the busy time
 	emu_timer *m_timer[2];           // our two timers
 	devcb_write_line m_irq_handler;  // IRQ callback
