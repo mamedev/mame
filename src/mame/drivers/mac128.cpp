@@ -698,7 +698,7 @@ void mac128_state::via_sync()
 	uint64_t vpa_cycle = cur_cycle+2;
 	uint64_t via_start_cycle = (vpa_cycle + 9) / 10;
 	uint64_t end_cycle = via_start_cycle * 10 + 4;
-	m_maincpu->adjust_icount(cur_cycle - end_cycle);
+	m_maincpu->adjust_icount(cur_cycle - end_cycle - 4); // 4 cycles already counted by the core
 }
 
 uint16_t mac128_state::mac_via_r(offs_t offset)

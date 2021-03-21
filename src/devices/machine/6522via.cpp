@@ -776,13 +776,19 @@ u8 via6522_device::read(offs_t offset)
 			LOGSHIFT(" - ACR: %02x ", m_acr);
 			if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
 			{
-				m_shift_timer->adjust(clocks_to_attotime(8) / 2); // 8 edges to start shifter from a read
-				LOGSHIFT(" - read SR starts O2 timer ");
+				if (m_shift_timer->expire().is_never())
+				{
+					m_shift_timer->adjust(clocks_to_attotime(7) / 2); // 8 edges to start shifter from a read -- use 7 for a mac128 issue to be fixed later
+					LOGSHIFT(" - read SR starts O2 timer ");
+				}
 			}
 			else if (SI_T2_CONTROL(m_acr) || SO_T2_CONTROL(m_acr))
 			{
-				m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2) / 2);
-				LOGSHIFT(" - read SR starts T2 timer ");
+				if (m_shift_timer->expire().is_never())
+				{
+					m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2) / 2);
+					LOGSHIFT(" - read SR starts T2 timer ");
+				}
 			}
 			else if (!SO_T2_RATE(m_acr))
 			{
@@ -972,13 +978,19 @@ void via6522_device::write(offs_t offset, u8 data)
 		LOGSHIFT(" - ACR is: %02x ", m_acr);
 		if (SO_O2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime(8) / 2); // 8 edges to start shifter from a write
-			LOGSHIFT(" - write SR starts O2 timer");
+			if (m_shift_timer->expire().is_never())
+			{
+				m_shift_timer->adjust(clocks_to_attotime(8) / 2); // 8 edges to start shifter from a write
+				LOGSHIFT(" - write SR starts O2 timer");
+			}
 		}
 		else if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2) / 2);
-			LOGSHIFT(" - write starts T2 timer");
+			if (m_shift_timer->expire().is_never())
+			{
+				m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2) / 2);
+				LOGSHIFT(" - write starts T2 timer");
+			}
 		}
 		else
 		{
