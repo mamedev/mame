@@ -1537,6 +1537,18 @@ if (SOUNDS["SWP30"]~=null) then
 end
 
 ---------------------------------------------------
+--
+--@src/devices/sound/mu100b.h,SOUNDS["MU100B"] = true
+---------------------------------------------------
+
+if (SOUNDS["MU100B"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/mu100b.cpp",
+		MAME_DIR .. "src/devices/sound/mu100b.h",
+	}
+end
+
+---------------------------------------------------
 -- Roland sample players
 --@src/devices/sound/rolandpcm.h,SOUNDS["ROLANDPCM"] = true
 ---------------------------------------------------
