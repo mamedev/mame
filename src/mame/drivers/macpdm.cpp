@@ -21,6 +21,7 @@
 
 constexpr auto IO_CLOCK = 31.3344_MHz_XTAL;
 constexpr auto ENET_CLOCK = 20_MHz_XTAL;
+constexpr auto SOUND_CLOCK = 45.1584_MHz_XTAL;
 
 class macpdm_state : public driver_device
 {
@@ -199,6 +200,9 @@ private:
 	uint8_t dma_enet_tx_ctrl_r();
 	void dma_enet_tx_ctrl_w(uint8_t data);
 
+	uint32_t sound_dma_output(offs_t offset);
+	void sound_dma_input(offs_t offset, uint32_t value);
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
@@ -227,8 +231,6 @@ void macpdm_state::driver_init()
 	m_model_id = 0xa55a3011;
 	// 7100 = a55a3012
 	// 8100 = a55a3013
-
-	m_awacs->set_dma_base(m_maincpu->space(AS_PROGRAM), 0x10000, 0x12000);
 
 	save_item(NAME(m_hmc_reg));
 	save_item(NAME(m_hmc_buffer));
@@ -654,9 +656,14 @@ WRITE_LINE_MEMBER(macpdm_state::slot1_irq)
 	via2_irq_slot_set(0x10, state);
 }
 
-WRITE_LINE_MEMBER(macpdm_state::slot0_irq)
+WRITE_LINE_MEMBER(macpdm_state::sndo_dma_irq)
 {
-	via2_irq_slot_set(0x08, state);
+	// TODO
+}
+
+WRITE_LINE_MEMBER(macpdm_state::sndi_dma_irq)
+{
+	// TODO
 }
 
 uint32_t macpdm_state::dma_badr_r()
@@ -918,6 +925,17 @@ void macpdm_state::dma_enet_tx_ctrl_w(uint8_t data)
 	logerror("dma_enet_tx_ctrl_w %02x\n", m_dma_enet_tx_ctrl);
 }
 
+uint32_t macpdm_state::sound_dma_output(offs_t offset)
+{
+	offs_t adr = m_dma_badr + (offset & 0x10000 ? 0x12000 : 0x10000) + 4*(offset & 0x7ff);
+	return m_maincpu->space().read_dword(adr);
+}
+
+void macpdm_state::sound_dma_input(offs_t offset, uint32_t value)
+{
+	offs_t adr = m_dma_badr + (offset & 0x10000 ? 0x0e000 : 0x0c000) + 4*(offset & 0x7ff);
+	m_maincpu->space().write_dword(adr, value);
+}
 
 
 void macpdm_state::pdm_map(address_map &map)
@@ -930,8 +948,6 @@ void macpdm_state::pdm_map(address_map &map)
 	// 50f0a000 = MACE ethernet controller
 	map(0x50f10000, 0x50f10000).rw(FUNC(macpdm_state::scsi_r), FUNC(macpdm_state::scsi_w)).select(0xf0);
 	map(0x50f10100, 0x50f10101).r(m_ncr53c94, FUNC(ncr53c94_device::dma16_r));
-
-	// 50f14000 = sound registers (AWACS)
 	map(0x50f14000, 0x50f1401f).rw(m_awacs, FUNC(awacs_device::read), FUNC(awacs_device::write));
 	map(0x50f16000, 0x50f16000).rw(FUNC(macpdm_state::fdc_r), FUNC(macpdm_state::fdc_w)).select(0x1e00);
 
@@ -986,7 +1002,13 @@ void macpdm_state::macpdm(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	AWACS(config, m_awacs, 44100);
+
+	AWACS(config, m_awacs, SOUND_CLOCK/2);
+	m_awacs->irq_out_cb().set(FUNC(macpdm_state::sndo_dma_irq));
+	m_awacs->irq_in_cb().set(FUNC(macpdm_state::sndi_dma_irq));
+	m_awacs->dma_output().set(FUNC(macpdm_state::sound_dma_output));
+	m_awacs->dma_input().set(FUNC(macpdm_state::sound_dma_input));
+
 	m_awacs->add_route(0, "lspeaker", 1.0);
 	m_awacs->add_route(1, "rspeaker", 1.0);
 
