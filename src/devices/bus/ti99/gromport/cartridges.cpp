@@ -1593,8 +1593,6 @@ std::unique_ptr<ti99_cartridge_device::rpk_socket> ti99_cartridge_device::rpk_lo
 
 std::unique_ptr<ti99_cartridge_device::rpk> ti99_cartridge_device::rpk_open(emu_options &options, const char *filename, const char *system_name)
 {
-	int i;
-
 	std::unique_ptr<rpk> newrpk = std::make_unique<rpk>(options, system_name);
 
 	try
@@ -1623,7 +1621,6 @@ std::unique_ptr<ti99_cartridge_device::rpk> ti99_cartridge_device::rpk_open(emu_
 
 			default:
 				throw false;
-				break;
 			}
 		}
 	}

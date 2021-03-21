@@ -403,7 +403,7 @@ util::rpk_exception::rpk_exception(archive_file::error ziperr)
 //  what
 //-------------------------------------------------
 
-const char *util::rpk_exception::what() const
+const char *util::rpk_exception::what() const noexcept
 {
 	return m_what.c_str();
 }

@@ -144,7 +144,7 @@ public:
 	rpk_exception(rpk_reader::error error);
 	rpk_exception(rpk_reader::error error, std::string_view details);
 	rpk_exception(archive_file::error ziperr);
-	virtual const char *what() const override;
+	virtual const char *what() const noexcept override;
 
 private:
 	std::string m_what;
