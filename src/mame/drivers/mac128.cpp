@@ -193,6 +193,7 @@ private:
 	void ram_w_se(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t ram_600000_r(offs_t offset);
 	void ram_600000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~ 0);
+	void via_sync();
 	uint16_t mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, uint16_t data);
 	uint16_t mac_autovector_r(offs_t offset);
@@ -253,7 +254,6 @@ private:
 	int m_scsi_drq;
 
 	// wait states for accessing the VIA
-	int m_via_cycles;
 	bool m_snd_enable;
 	bool m_main_buffer;
 	int m_snd_vol;
@@ -304,7 +304,6 @@ void mac128_state::machine_start()
 
 void mac128_state::machine_reset()
 {
-	m_via_cycles = -10;
 	m_last_taken_interrupt = -1;
 	m_overlay = 1;
 	m_screen_buffer = 1;
@@ -680,6 +679,28 @@ WRITE_LINE_MEMBER(mac128_state::mac_via_irq)
 	set_via_interrupt(state);
 }
 
+void mac128_state::via_sync()
+{
+	// The VIA runs from the E clock of the 68k and uses VPA.
+
+	// That means:
+	// - The 68000 starts the access cycle, with AS and the address bus.  It's validated at cycle+1.
+
+	// - The glue chip sets VPA.  The 68000 sees it and acts on it at cycle+2.
+
+	// - Between cycle+2 and cycle+11, the E clock goes up.  The VIA
+	// is synced on that clock, so that's at a multiple of 10 in
+	// absolute time
+
+	// - 4 cycles later E goes down and that's the end of the access
+
+	uint64_t cur_cycle = m_maincpu->total_cycles();
+	uint64_t vpa_cycle = cur_cycle+2;
+	uint64_t via_start_cycle = (vpa_cycle + 9) / 10;
+	uint64_t end_cycle = via_start_cycle * 10 + 4;
+	m_maincpu->adjust_icount(cur_cycle - end_cycle);
+}
+
 uint16_t mac128_state::mac_via_r(offs_t offset)
 {
 	uint16_t data;
@@ -687,9 +708,9 @@ uint16_t mac128_state::mac_via_r(offs_t offset)
 	offset >>= 8;
 	offset &= 0x0f;
 
-	data = m_via->read(offset);
+	via_sync();
 
-	m_maincpu->adjust_icount(m_via_cycles);
+	data = m_via->read(offset);
 
 	return (data & 0xff) | (data << 8);
 }
@@ -699,9 +720,9 @@ void mac128_state::mac_via_w(offs_t offset, uint16_t data)
 	offset >>= 8;
 	offset &= 0x0f;
 
-	m_via->write(offset, (data >> 8) & 0xff);
+	via_sync();
 
-	m_maincpu->adjust_icount(m_via_cycles);
+	m_via->write(offset, (data >> 8) & 0xff);
 }
 
 void mac128_state::mac_autovector_w(offs_t offset, uint16_t data)
