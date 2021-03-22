@@ -24,8 +24,10 @@ ROM source notes when dumped from another publisher, but confident it's the same
 #include "speaker.h"
 
 // internal artwork
+#include "brainbaf.lh"
 #include "dunksunk.lh"
 #include "ftri1.lh"
+#include "horocomp.lh"
 #include "mastmind.lh"
 #include "memoquiz.lh"
 #include "mwcfootb.lh"
@@ -51,7 +53,7 @@ public:
 	required_device<pps41_base_device> m_maincpu;
 	optional_device<pwm_display_device> m_display;
 	optional_device<speaker_sound_device> m_speaker;
-	optional_ioport_array<6> m_inputs; // max 6
+	optional_ioport_array<11> m_inputs; // max 11
 
 	u16 m_inp_mux = 0;
 	u32 m_grid = 0;
@@ -104,8 +106,7 @@ u8 hh_pps41_state::read_inputs(int columns)
 		if (m_inp_mux >> i & 1)
 			ret |= m_inputs[i]->read();
 
-	// active low by default
-	return ~ret;
+	return ret;
 }
 
 INPUT_CHANGED_MEMBER(hh_pps41_state::reset_button)
@@ -290,7 +291,7 @@ void mastmind_state::write_r(u16 data)
 u8 mastmind_state::read_p()
 {
 	// PI1-PI4: multiplexed inputs
-	return read_inputs(4);
+	return ~read_inputs(4);
 }
 
 // config
@@ -441,7 +442,7 @@ void dunksunk_state::write_r(u16 data)
 // config
 
 static INPUT_PORTS_START( dunksunk )
-	PORT_START("IN.0") // P
+	PORT_START("IN.0") // PI
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -567,7 +568,7 @@ void memoquiz_state::write_r(u16 data)
 u8 memoquiz_state::read_p()
 {
 	// PI1-PI4: multiplexed inputs
-	return read_inputs(4);
+	return ~read_inputs(4);
 }
 
 // config
@@ -629,6 +630,342 @@ ROM_START( memoquiz )
 
 	ROM_REGION( 314, "maincpu:opla", 0 )
 	ROM_LOAD( "mm76_memoquiz_output.pla", 0, 314, CRC(a5799b50) SHA1(9b4923b37c9ba8221ecece5a3370c605a880a453) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Mattel Brain Baffler (model 1080)
+  * PCB label: OLYMPOS KOREA, CM04-D102-001 REV D
+  * MM78LA MCU (label MM95 B9000-12, die label B9000)
+  * 8-digit 14seg LED display, 2-bit sound
+
+  It includes 8 word games, most of them are meant for 2 players.
+
+***************************************************************************/
+
+class brainbaf_state : public hh_pps41_state
+{
+public:
+	brainbaf_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_pps41_state(mconfig, type, tag)
+	{ }
+
+	void update_display();
+	void write_d(u16 data);
+	void write_r(u16 data);
+	u8 read_p();
+	void write_spk(u8 data);
+	void brainbaf(machine_config &config);
+};
+
+// handlers
+
+void brainbaf_state::update_display()
+{
+	m_display->matrix(m_inp_mux, bitswap<14>(m_r, 6,5,13,12,11,4,3,10,9,8,7,2,1,0));
+}
+
+void brainbaf_state::write_d(u16 data)
+{
+	// DIO0-DIO9: input mux
+	// DIO0-DIO7: digit select
+	m_inp_mux = data;
+	update_display();
+}
+
+void brainbaf_state::write_r(u16 data)
+{
+	// RO01-RO14: digit segment data
+	m_r = data;
+	update_display();
+}
+
+u8 brainbaf_state::read_p()
+{
+	// PI5-PI8: multiplexed inputs
+	return read_inputs(10) << 4;
+}
+
+void brainbaf_state::write_spk(u8 data)
+{
+	// SPK: speaker out
+	m_speaker->level_w(data);
+}
+
+// config
+
+static INPUT_PORTS_START( brainbaf )
+	PORT_START("IN.0") // DIO0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('J') PORT_NAME("J-0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F12) PORT_NAME("Player / Bonus R")
+
+	PORT_START("IN.1") // DIO1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('A') PORT_NAME("A-1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_NAME("Player / Bonus L")
+
+	PORT_START("IN.2") // DIO2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('B') PORT_NAME("B-2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F3) PORT_NAME("Game")
+
+	PORT_START("IN.3") // DIO3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CHAR('C') PORT_NAME("C-3")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F4) PORT_NAME("Go")
+
+	PORT_START("IN.4") // DIO4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR('D') PORT_NAME("D-4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F5) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(13) PORT_NAME("Entry")
+
+	PORT_START("IN.5") // DIO5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHAR('E') PORT_NAME("E-5")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F6) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_NAME("Clear")
+
+	PORT_START("IN.6") // DIO6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('F') PORT_NAME("F-6")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F7) PORT_NAME("Refresh")
+
+	PORT_START("IN.7") // DIO7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHAR('G') PORT_NAME("G-7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F8) PORT_NAME("Buy")
+
+	PORT_START("IN.8") // DIO8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR('H') PORT_NAME("H-8")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F9) PORT_NAME("Give-Up")
+
+	PORT_START("IN.9") // DIO9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR('I') PORT_NAME("I-9")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_CODE(KEYCODE_F11) PORT_NAME("Stop") // both STOP keys
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F10) PORT_NAME("Score")
+INPUT_PORTS_END
+
+void brainbaf_state::brainbaf(machine_config &config)
+{
+	/* basic machine hardware */
+	MM78LA(config, m_maincpu, 440000); // approximation - VC osc. R=10K
+	m_maincpu->write_d().set(FUNC(brainbaf_state::write_d));
+	m_maincpu->write_r().set(FUNC(brainbaf_state::write_r));
+	m_maincpu->read_p().set(FUNC(brainbaf_state::read_p));
+	m_maincpu->write_spk().set(FUNC(brainbaf_state::write_spk));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(8, 14);
+	m_display->set_segmask(0xff, 0x3fff);
+	config.set_default_layout(layout_brainbaf);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
+	m_speaker->set_levels(4, speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( brainbaf )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mm95_b9000-12", 0x0000, 0x0800, CRC(f7a4829c) SHA1(12f789d8264a969777764d31ea67067cc330a73c) )
+
+	ROM_REGION( 605, "maincpu:opla", 0 )
+	ROM_LOAD( "mm78la_brainbaf_output.pla", 0, 605, CRC(4fae532f) SHA1(3a08c0fa3ce476c014280b3cfeb6aa37824ae503) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Mattel Horoscope Computer (model 1081)
+  * PCB label: DET. CM05-D102-001 REV D
+  * MM78LA MCU (label MM95 B9001-13, die label B9001)
+  * 8-digit 14seg LED display, 2-bit sound
+
+  This is not a toy, but a fortune forecast. Date format is mm-dd-yy, it is
+  valid only from June 1 1979 until December 31 1987
+
+***************************************************************************/
+
+class horocomp_state : public hh_pps41_state
+{
+public:
+	horocomp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_pps41_state(mconfig, type, tag)
+	{ }
+
+	void update_display();
+	void write_d(u16 data);
+	void write_r(u16 data);
+	u8 read_p();
+	void write_spk(u8 data);
+	void horocomp(machine_config &config);
+};
+
+// handlers
+
+void horocomp_state::update_display()
+{
+	// 7seg display is upside-down
+	u16 flip = m_r << 7 | m_r >> 7;
+	m_display->matrix(m_inp_mux, bitswap<14>(flip, 6,5,13,12,11,4,3,10,9,8,7,2,1,0));
+}
+
+void horocomp_state::write_d(u16 data)
+{
+	// DIO0-DIO9: input mux
+	// DIO0-DIO7: digit select
+	m_inp_mux = data;
+	update_display();
+}
+
+void horocomp_state::write_r(u16 data)
+{
+	// RO01-RO14: digit segment data
+	m_r = data;
+	update_display();
+}
+
+u8 horocomp_state::read_p()
+{
+	// PI4: mode switch
+	// PI5-PI8: multiplexed inputs
+	return read_inputs(10) << 4 | (m_inputs[10]->read() & 8);
+}
+
+void horocomp_state::write_spk(u8 data)
+{
+	// SPK: speaker out
+	m_speaker->level_w(data);
+}
+
+// config
+
+/* physical button layout and labels is like this:
+
+              CAP.
+       AQU.   [ ]   SAG.
+         [ ]   9   [ ]
+  PIS.             8     SCO.
+     [ ]              7[ ]
+
+ARI.[ ]0               6[ ]LIB.
+
+     [ ]1             5[ ]          [   ]   [   ]   [   ]   [   ]
+  TAU.     2       4     VIR.       LOVE    CAREER  TRAVEL  MONEY
+         [ ]   3   [ ]
+       GEM.   [ ]   LEO             [   ]   [   ]   [   ]   [   ]
+              CAN.                  FRIENDS SPIRIT  FAMILY  CREATIVE
+*/
+
+static INPUT_PORTS_START( horocomp )
+	PORT_START("IN.0") // DIO0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("Love")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Friends")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0 / Aries")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // DIO1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Career")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Spirit")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1 / Taurus")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // DIO2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Travel")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Family")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2 / Gemini")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // DIO3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("Money")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Creative")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3 / Cancer")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // DIO4
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4 / Leo")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("Aquarius / Reset")
+
+	PORT_START("IN.5") // DIO5
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5 / Virgo")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("Pisces")
+
+	PORT_START("IN.6") // DIO6
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6 / Libra")
+
+	PORT_START("IN.7") // DIO7
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7 / Scorpio")
+
+	PORT_START("IN.8") // DIO8
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8 / Sagittarius")
+
+	PORT_START("IN.9") // DIO9
+	PORT_BIT( 0x0b, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9 / Capricorn")
+
+	PORT_START("IN.10") // PI4
+	PORT_CONFNAME( 0x08, 0x00, "Mode" )
+	PORT_CONFSETTING(    0x08, "C" ) // compatibility
+	PORT_CONFSETTING(    0x00, "P" ) // personal
+INPUT_PORTS_END
+
+void horocomp_state::horocomp(machine_config &config)
+{
+	/* basic machine hardware */
+	MM78LA(config, m_maincpu, 440000); // approximation - VC osc. R=10K
+	m_maincpu->write_d().set(FUNC(horocomp_state::write_d));
+	m_maincpu->write_r().set(FUNC(horocomp_state::write_r));
+	m_maincpu->read_p().set(FUNC(horocomp_state::read_p));
+	m_maincpu->write_spk().set(FUNC(horocomp_state::write_spk));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(8, 14);
+	m_display->set_segmask(0xff, 0x3fff);
+	config.set_default_layout(layout_horocomp);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
+	m_speaker->set_levels(4, speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( horocomp )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mm95_b9001-13", 0x0000, 0x0800, CRC(d284a837) SHA1(02092db2a29b4bb7e9f86286601b67b2e9556476) )
+
+	ROM_REGION( 605, "maincpu:opla", 0 )
+	ROM_LOAD( "mm78la_horocomp_output.pla", 0, 605, CRC(4fae532f) SHA1(3a08c0fa3ce476c014280b3cfeb6aa37824ae503) )
 ROM_END
 
 
@@ -709,7 +1046,7 @@ void mwcfootb_state::main_write_r(u16 data)
 u8 mwcfootb_state::main_read_p()
 {
 	// PI1-PI8: multiplexed inputs
-	return read_inputs(3);
+	return ~read_inputs(3);
 }
 
 // subcpu side
@@ -895,7 +1232,7 @@ void scrabsen_state::write_r(u16 data)
 u8 scrabsen_state::read_p()
 {
 	// PI1-PI7: multiplexed inputs
-	return read_inputs(5);
+	return ~read_inputs(5);
 }
 
 // config
@@ -988,7 +1325,7 @@ ROM_END
 
   Selchow & Righter Reader's Digest Q&A
   * MM76EL MCU (label MM76EL B8654-11, die label B8654)
-  * 9-digit 7seg display(4 unused), 2-bit sound
+  * 9-digit 7seg LED display(4 unused), 2-bit sound
 
   The game requires question books. The player inputs a 3-digit code and
   answers 20 multiple-choice questions from the page.
@@ -1046,7 +1383,7 @@ void rdqa_state::write_r(u16 data)
 u8 rdqa_state::read_p()
 {
 	// PI1-PI5: multiplexed inputs
-	return read_inputs(4);
+	return ~read_inputs(4);
 }
 
 // config
@@ -1133,11 +1470,13 @@ CONS( 1979, ftri1,     0,       0, ftri1,     ftri1,    ftri1_state,    empty_in
 CONS( 1979, mastmind,  0,       0, mastmind,  mastmind, mastmind_state, empty_init, "Invicta", "Electronic Master Mind (Invicta)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 CONS( 1979, smastmind, 0,       0, smastmind, mastmind, mastmind_state, empty_init, "Invicta", "Super-Sonic Electronic Master Mind", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, dunksunk,  0,       0, dunksunk,  dunksunk, dunksunk_state, empty_init, "Kmart", "Dunk 'n Sunk", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, dunksunk,  0,       0, dunksunk,  dunksunk, dunksunk_state, empty_init, "Kmart", "Dunk 'n Sunk", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1978, memoquiz,  0,       0, memoquiz,  memoquiz, memoquiz_state, empty_init, "M.E.M. Belgium", "Memoquiz", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1981, mwcfootb,  0,       0, mwcfootb,  mwcfootb, mwcfootb_state, empty_init, "Mattel", "World Championship Football", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, brainbaf,  0,       0, brainbaf,  brainbaf, brainbaf_state, empty_init, "Mattel", "Brain Baffler", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, horocomp,  0,       0, horocomp,  horocomp, horocomp_state, empty_init, "Mattel", "Horoscope Computer", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, mwcfootb,  0,       0, mwcfootb,  mwcfootb, mwcfootb_state, empty_init, "Mattel", "World Championship Football", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, scrabsen,  0,       0, scrabsen,  scrabsen, scrabsen_state, empty_init, "Selchow & Righter", "Scrabble Sensor - Electronic Word Game", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, scrabsen,  0,       0, scrabsen,  scrabsen, scrabsen_state, empty_init, "Selchow & Righter", "Scrabble Sensor - Electronic Word Game", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, rdqa,      0,       0, rdqa,      rdqa,     rdqa_state,     empty_init, "Selchow & Righter", "Reader's Digest Q&A - Computer Question & Answer Game", MACHINE_SUPPORTS_SAVE )
