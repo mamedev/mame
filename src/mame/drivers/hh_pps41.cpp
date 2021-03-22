@@ -30,6 +30,7 @@ ROM source notes when dumped from another publisher, but confident it's the same
 #include "horocomp.lh"
 #include "mastmind.lh"
 #include "memoquiz.lh"
+#include "mfootb2.lh"
 #include "mwcfootb.lh"
 #include "rdqa.lh"
 #include "scrabsen.lh"
@@ -638,6 +639,118 @@ ROM_END
 
 /***************************************************************************
 
+  Mattel Football 2 (model 1050)
+  * PCB label: MATTEL, 1050-4369D
+  * MM77LA MCU (label B8000-12, die label B8000)
+  * 7 7seg leds, 30 other leds, 2-bit sound
+
+  Through its production run, it was released as "Football 2" and "Football II".
+
+***************************************************************************/
+
+class mfootb2_state : public hh_pps41_state
+{
+public:
+	mfootb2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_pps41_state(mconfig, type, tag)
+	{ }
+
+	void update_display();
+	void write_d(u16 data);
+	void write_r(u16 data);
+	void write_spk(u8 data);
+	void mfootb2(machine_config &config);
+};
+
+// handlers
+
+void mfootb2_state::update_display()
+{
+	m_display->matrix(m_d, (m_r & 0x7f) | (m_d >> 4 & 0x80) | (m_r << 1 & 0x700));
+}
+
+void mfootb2_state::write_d(u16 data)
+{
+	// DIO0-DIO2, DIO6-DIO9: digit select
+	// DIO3-DIO5: led select
+	// DIO10: 4th digit DP
+	m_d = data;
+	update_display();
+}
+
+void mfootb2_state::write_r(u16 data)
+{
+	// RO01-RO10: led data
+	m_r = data;
+	update_display();
+}
+
+void mfootb2_state::write_spk(u8 data)
+{
+	// SPK: speaker out
+	m_speaker->level_w(data);
+}
+
+// config
+
+static INPUT_PORTS_START( mfootb2 )
+	PORT_START("IN.0") // PI
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("Score")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Status")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Kick")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pass")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+
+	PORT_START("IN.1") // DIO11
+	PORT_CONFNAME( 0x400, 0x000, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(     0x000, "1" )
+	PORT_CONFSETTING(     0x400, "2" )
+INPUT_PORTS_END
+
+void mfootb2_state::mfootb2(machine_config &config)
+{
+	/* basic machine hardware */
+	MM77LA(config, m_maincpu, 380000); // approximation - VC osc. R=56K
+	m_maincpu->write_d().set(FUNC(mfootb2_state::write_d));
+	m_maincpu->read_d().set_ioport("IN.1");
+	m_maincpu->write_r().set(FUNC(mfootb2_state::write_r));
+	m_maincpu->read_p().set_ioport("IN.0");
+	m_maincpu->write_spk().set(FUNC(mfootb2_state::write_spk));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 11);
+	m_display->set_segmask(0x3c7, 0x7f);
+	m_display->set_segmask(0x002, 0xff);
+	m_display->set_bri_levels(0.015, 0.2); // ball led is brighter
+	config.set_default_layout(layout_mfootb2);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
+	m_speaker->set_levels(4, speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( mfootb2 )
+	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "b8000-12", 0x0000, 0x0600, CRC(5b65fc38) SHA1(4fafc9deb5609b16f09b18b7346ea96ffe8bf9e0) )
+
+	ROM_REGION( 317, "maincpu:opla", 0 )
+	ROM_LOAD( "mm77la_mfootb2_output.pla", 0, 317, CRC(11c0bbfa) SHA1(939a0a6adeace8ca0f9e17290306a2e7ced21db3) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Mattel Brain Baffler (model 1080)
   * PCB label: OLYMPOS KOREA, CM04-D102-001 REV D
   * MM78LA MCU (label MM95 B9000-12, die label B9000)
@@ -827,7 +940,7 @@ public:
 
 void horocomp_state::update_display()
 {
-	// 7seg display is upside-down
+	// 14seg display is upside-down
 	u16 flip = m_r << 7 | m_r >> 7;
 	m_display->matrix(m_inp_mux, bitswap<14>(flip, 6,5,13,12,11,4,3,10,9,8,7,2,1,0));
 }
@@ -1474,6 +1587,7 @@ CONS( 1979, dunksunk,  0,       0, dunksunk,  dunksunk, dunksunk_state, empty_in
 
 CONS( 1978, memoquiz,  0,       0, memoquiz,  memoquiz, memoquiz_state, empty_init, "M.E.M. Belgium", "Memoquiz", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
+CONS( 1978, mfootb2,   0,       0, mfootb2,   mfootb2,  mfootb2_state,  empty_init, "Mattel", "Football 2 (Mattel)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, brainbaf,  0,       0, brainbaf,  brainbaf, brainbaf_state, empty_init, "Mattel", "Brain Baffler", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, horocomp,  0,       0, horocomp,  horocomp, horocomp_state, empty_init, "Mattel", "Horoscope Computer", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, mwcfootb,  0,       0, mwcfootb,  mwcfootb, mwcfootb_state, empty_init, "Mattel", "World Championship Football", MACHINE_SUPPORTS_SAVE )
