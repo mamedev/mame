@@ -26,16 +26,16 @@
 	Picmatic games had different versions depending on TV system (PAL or NTSC) and
 	TV frecuency (NTSC 60Hz, PAL 50Hz, PAL 100Hz):
 
-        Game                   System    ROM dumped  LD dumped
-        ---------------------  --------  ----------  ---------
-        Marbella Vice          PAL 50Hz  YES         NO
-        Marbella Vice          PAL 100Hz YES         NO
-        Marbella Vice          NTSC 60Hz NO          NO
-        Tierras Salvajes       PAL 50Hz  NO          NO
-        Tierras Salvajes       PAL 100Hz NO          NO
-        Zorton Brothers v1.00  PAL 50Hz  YES         NO
-        Zorton Brothers v1.01  PAL 50Hz  YES         NO
-        Zorton Brothers v1.01  PAL 100Hz YES         NO
+        Game                   System     ROM dumped  LD dumped
+        ---------------------  ---------  ----------  ---------
+        Marbella Vice          PAL 50Hz   YES         NO
+        Marbella Vice          PAL 100Hz  YES         NO
+        Marbella Vice          NTSC 60Hz  NO          NO
+        Tierras Salvajes       PAL 50Hz   NO          NO
+        Tierras Salvajes       PAL 100Hz  YES         NO
+        Zorton Brothers v1.00  PAL 50Hz   YES         NO
+        Zorton Brothers v1.01  PAL 50Hz   YES         NO
+        Zorton Brothers v1.01  PAL 100Hz  NO          NO
 
 **************************************************************************************/
 
