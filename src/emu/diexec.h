@@ -306,7 +306,7 @@ private:
 
 	// clock and timing information
 	u64                     m_totalcycles;              // total device cycles executed
-	basetime_relative       m_localtime;                // local time, relative to the timer system's global time
+	device_scheduler::basetime_relative m_localtime;    // local time, relative to the scheduler's base
 	u32                     m_cycles_per_second;        // cycles per second, adjusted for multipliers
 	attoseconds_t           m_attoseconds_per_cycle;    // attoseconds per adjusted clock cycle
 

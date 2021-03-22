@@ -29,108 +29,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class basetime_relative
-{
-public:
-	static constexpr attoseconds_t MAX_RELATIVE = 2 * ATTOSECONDS_PER_SECOND;
-	static constexpr attoseconds_t MIN_RELATIVE = -MAX_RELATIVE;
-
-	basetime_relative() :
-		m_relative(0),
-		m_absolute(attotime::zero),
-		m_absolute_dirty(false),
-		m_base_seconds(0)
-	{
-	}
-
-	void set(attotime const &src)
-	{
-		m_absolute = src;
-		m_absolute_dirty = false;
-		update_relative();
-	}
-
-	void add(attoseconds_t src)
-	{
-		m_relative += src;
-		m_absolute_dirty = true;
-	}
-
-	void set_base_seconds(seconds_t base)
-	{
-		if (base != m_base_seconds)
-		{
-			if (m_absolute_dirty)
-				update_absolute();
-			m_base_seconds = base;
-			update_relative();
-		}
-	}
-
-	attoseconds_t relative() const { return m_relative; }
-	attotime const &absolute()
-	{
-		if (m_absolute_dirty)
-			update_absolute();
-		return m_absolute;
-	}
-
-	const char *as_string(int precision = 9)
-	{
-		if (m_absolute_dirty)
-			update_absolute();
-		return m_absolute.as_string(precision);
-	}
-
-private:
-	void update_relative()
-	{
-		seconds_t delta = m_absolute.seconds() - m_base_seconds;
-		m_relative = m_absolute.attoseconds();
-		if (delta == 0)
-			return;
-		if (delta > 0)
-		{
-			if (delta == 1)
-				m_relative += ATTOSECONDS_PER_SECOND;
-			else
-				m_relative = MAX_RELATIVE;
-		}
-		else
-		{
-			if (delta == -1)
-				m_relative -= ATTOSECONDS_PER_SECOND;
-			else
-				m_relative = MIN_RELATIVE;
-		}
-	}
-
-	void update_absolute()
-	{
-		seconds_t secs = m_base_seconds;
-		attoseconds_t attos = m_relative;
-		if (attos >= ATTOSECONDS_PER_SECOND)
-		{
-			attos -= ATTOSECONDS_PER_SECOND;
-			secs++;
-		}
-		else if (attos < 0)
-		{
-			attos += ATTOSECONDS_PER_SECOND;
-			secs--;
-		}
-		m_absolute.set_seconds(secs);
-		m_absolute.set_attoseconds(attos);
-		m_absolute_dirty = false;
-	}
-
-	attoseconds_t m_relative;
-	attotime m_absolute;
-	bool m_absolute_dirty;
-	seconds_t m_base_seconds;
-};
-
-
 // timer callbacks look like this
 typedef named_delegate<void (void *, s32)> timer_expired_delegate;
 
@@ -139,24 +37,25 @@ typedef named_delegate<void (void *, s32)> timer_expired_delegate;
 class emu_timer
 {
 	friend class device_scheduler;
-	friend class simple_list<emu_timer>;
-	friend class fixed_allocator<emu_timer>;
-	friend class resource_pool_object<emu_timer>;
+	friend class timer_list;
 
 	// construction/destruction
 	emu_timer();
 	~emu_timer();
 
 	// allocation and re-use
-	emu_timer &init(running_machine &machine, timer_expired_delegate callback, void *ptr, bool temporary);
-	emu_timer &init(device_t &device, device_timer_id id, void *ptr, bool temporary);
-	emu_timer &release();
+	emu_timer &init_persistent(running_machine &machine, timer_expired_delegate callback, void *ptr);
+	emu_timer &init_persistent(device_t &device, device_timer_id id, void *ptr);
+	emu_timer &init_temporary(running_machine &machine, timer_expired_delegate callback, void *ptr, int param, attotime const &duration);
+	emu_timer &init_temporary(device_t &device, device_timer_id id, void *ptr, int param, attotime const &duration);
 
 public:
 	// getters
+	emu_timer *prev() const { return m_prev; }
 	emu_timer *next() const { return m_next; }
 	running_machine &machine() const noexcept { assert(m_machine != nullptr); return *m_machine; }
 	bool enabled() const { return m_enabled; }
+	bool active() const { return m_enabled && !m_expire.is_never(); }
 	int param() const { return m_param; }
 	void *ptr() const { return m_ptr; }
 
@@ -179,7 +78,6 @@ public:
 private:
 	// internal helpers
 	void register_save();
-	void schedule_next_period();
 	void dump() const;
 	static void device_timer_expired(emu_timer &timer, void *ptr, s32 param);
 
@@ -187,14 +85,14 @@ private:
 	running_machine *   m_machine;      // reference to the owning machine
 	emu_timer *         m_next;         // next timer in order in the list
 	emu_timer *         m_prev;         // previous timer in order in the list
-	timer_expired_delegate m_callback;  // callback function
-	s32                 m_param;        // integer parameter
-	void *              m_ptr;          // pointer parameter
-	bool                m_enabled;      // is the timer enabled?
-	bool                m_temporary;    // is the timer temporary?
+	attotime            m_expire;       // time when the timer will expire
 	attotime            m_period;       // the repeat frequency of the timer
 	attotime            m_start;        // time when the timer was started
-	attotime            m_expire;       // time when the timer will expire
+	void *              m_ptr;          // pointer parameter
+	s32                 m_param;        // integer parameter
+	bool                m_enabled;      // is the timer enabled?
+	bool                m_temporary;    // is the timer temporary?
+	timer_expired_delegate m_callback;  // callback function
 	device_t *          m_device;       // for device timers, a pointer to the device
 	device_timer_id     m_id;           // for device timers, the ID of the timer
 };
@@ -208,6 +106,64 @@ class device_scheduler
 	friend class basetime_relative;
 	friend class emu_timer;
 
+	class basetime_relative
+	{
+	public:
+		// minima/maxima
+		static constexpr attoseconds_t MAX_RELATIVE = 2 * ATTOSECONDS_PER_SECOND;
+		static constexpr attoseconds_t MIN_RELATIVE = -MAX_RELATIVE;
+
+		// construction/destruction
+		basetime_relative();
+
+		// set an absolute time
+		void set(attotime const &src);
+
+		// add a number of attoseconds to the relative time
+		void add(attoseconds_t src);
+
+		// set the base for the relative time
+		void set_base_seconds(seconds_t base);
+
+		// return the relative time
+		attoseconds_t relative() const { return m_relative; }
+
+		// return the absolute time, updating if dirty
+		attotime const &absolute() { if (m_absolute_dirty) update_absolute(); return m_absolute; }
+
+	private:
+		// internal helpers
+		void update_relative();
+		void update_absolute();
+
+		// internal state
+		attoseconds_t m_relative;
+		attotime m_absolute;
+		bool m_absolute_dirty;
+		seconds_t m_base_seconds;
+	};
+
+	class timer_list
+	{
+	public:
+		timer_list();
+		~timer_list();
+
+		emu_timer *head() const { return m_head; }
+		emu_timer *tail() const { return m_tail; }
+
+		bool insert_sorted(emu_timer &timer);
+		emu_timer &insert_head(emu_timer &timer);
+		emu_timer &insert_tail(emu_timer &timer);
+
+		emu_timer *remove_head();
+		emu_timer &remove(emu_timer &timer);
+
+	private:
+		emu_timer *m_head;
+		emu_timer *m_tail;
+	};
+
 public:
 	// construction/destruction
 	device_scheduler(running_machine &machine);
@@ -216,7 +172,7 @@ public:
 	// getters
 	running_machine &machine() const noexcept { return m_machine; }
 	attotime time() const noexcept;
-	emu_timer *first_timer() const { return m_timer_list; }
+	emu_timer *first_timer();
 	device_execute_interface *currently_executing() const noexcept { return m_executing_device; }
 	bool can_save() const;
 
@@ -255,8 +211,10 @@ private:
 	void add_scheduling_quantum(const attotime &quantum, const attotime &duration);
 
 	// timer helpers
-	emu_timer &timer_list_insert(emu_timer &timer);
-	emu_timer &timer_list_remove(emu_timer &timer);
+	emu_timer &timer_alloc_object();
+	void timer_reclaim_object(emu_timer &timer);
+	void timer_list_move(emu_timer &timer, attotime const &new_expire, bool new_enable);
+	void update_first_timer_expire();
 	void execute_timers();
 	void update_basetime();
 
@@ -271,8 +229,9 @@ private:
 
 	// list of active timers
 	basetime_relative           m_first_timer_expire;       // time of the first timer expiration
-	emu_timer *                 m_timer_list;               // head of the active list
-	fixed_allocator<emu_timer>  m_timer_allocator;          // allocator for timers
+	timer_list                  m_active_timers;            // sorted list of active timers
+	timer_list                  m_inactive_timers;          // unsorted list of inactive timers
+	emu_timer *                 m_free_timers;              // simple list of free timers
 
 	// other internal states
 	emu_timer *                 m_callback_timer;           // pointer to the current callback timer
