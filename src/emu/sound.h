@@ -740,7 +740,6 @@ class sound_manager
 	static constexpr u8 MUTE_REASON_UI = 0x02;
 	static constexpr u8 MUTE_REASON_DEBUGGER = 0x04;
 	static constexpr u8 MUTE_REASON_SYSTEM = 0x08;
-	static constexpr u8 MUTE_REASON_UNTHROTTLE = 0x10;
 
 	// stream updates
 	static const attotime STREAMS_UPDATE_ATTOTIME;
@@ -777,11 +776,9 @@ public:
 	bool ui_mute() const { return bool(m_muted & MUTE_REASON_UI); }
 	bool debugger_mute() const { return bool(m_muted & MUTE_REASON_DEBUGGER); }
 	bool system_mute() const { return bool(m_muted & MUTE_REASON_SYSTEM); }
-	bool unthrottle_mute() const { return bool(m_muted & MUTE_REASON_UNTHROTTLE); }
 	void ui_mute(bool turn_off) { mute(turn_off, MUTE_REASON_UI); }
 	void debugger_mute(bool turn_off) { mute(turn_off, MUTE_REASON_DEBUGGER); }
 	void system_mute(bool turn_off) { mute(turn_off, MUTE_REASON_SYSTEM); }
-	void unthrottle_mute(bool turn_off) { mute(turn_off, MUTE_REASON_UNTHROTTLE); }
 
 	// return information about the given mixer input, by index
 	bool indexed_mixer_input(int index, mixer_input &info) const;
