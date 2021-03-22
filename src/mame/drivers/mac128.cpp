@@ -194,6 +194,7 @@ private:
 	uint16_t ram_600000_r(offs_t offset);
 	void ram_600000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~ 0);
 	void via_sync();
+	void via_sync_end();
 	uint16_t mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, uint16_t data);
 	uint16_t mac_autovector_r(offs_t offset);
@@ -692,13 +693,21 @@ void mac128_state::via_sync()
 	// is synced on that clock, so that's at a multiple of 10 in
 	// absolute time
 
-	// - 4 cycles later E goes down and that's the end of the access
+	// - 4 cycles later E goes down and that's the end of the access, 
+
+	// We sync on the start of cycle (so that the via timings go ok)
+	// then on the end on via_sync_end()
 
 	uint64_t cur_cycle = m_maincpu->total_cycles();
 	uint64_t vpa_cycle = cur_cycle+2;
 	uint64_t via_start_cycle = (vpa_cycle + 9) / 10;
-	uint64_t end_cycle = via_start_cycle * 10 + 4;
-	m_maincpu->adjust_icount(cur_cycle - end_cycle + 4); // 4 cycles already counted by the core
+	uint64_t m68k_start_cycle = via_start_cycle * 10;
+	m_maincpu->adjust_icount(cur_cycle - m68k_start_cycle); // 4 cycles already counted by the core
+}
+
+void mac128_state::via_sync_end()
+{
+	m_maincpu->adjust_icount(-4);
 }
 
 uint16_t mac128_state::mac_via_r(offs_t offset)
@@ -712,6 +721,7 @@ uint16_t mac128_state::mac_via_r(offs_t offset)
 
 	data = m_via->read(offset);
 
+	via_sync_end();
 	return (data & 0xff) | (data << 8);
 }
 
@@ -723,6 +733,8 @@ void mac128_state::mac_via_w(offs_t offset, uint16_t data)
 	via_sync();
 
 	m_via->write(offset, (data >> 8) & 0xff);
+
+	via_sync_end();
 }
 
 void mac128_state::mac_autovector_w(offs_t offset, uint16_t data)
