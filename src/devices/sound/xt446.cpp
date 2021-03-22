@@ -3,25 +3,25 @@
 
 /*************************************************************************************
 
-    Yamaha MU-100B : 32-voice polyphonic/multitimbral General MIDI/GS/XG tone modules
+    Yamaha XT446 : 32-voice polyphonic/multitimbral General MIDI/GS/XG tone modules
 
-    Embedded version
+    Embedded version of the MU100B
 
 **************************************************************************************/
 
 #include "emu.h"
 
-#include "mu100b.h"
+#include "xt446.h"
 
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 
-DEFINE_DEVICE_TYPE(MU100B, mu100b_device, "mu100b_emb", "Yamaha MU100B synth (embedded version)")
+DEFINE_DEVICE_TYPE(XT446, xt446_device, "xt446", "Yamaha XT446 synth (embedded MU100B)")
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
-ROM_START( mu100b )
+ROM_START( xt446 )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	// MU-100B v1.08 (Nov. 28, 1997)
 	ROM_LOAD16_WORD_SWAP( "xu50710-m27c160.bin", 0x000000, 0x200000, CRC(4b10bd27) SHA1(12d7c6e1bce7974b34916e1bfa5057ab55867476) )
@@ -35,8 +35,8 @@ ROM_START( mu100b )
 	ROM_LOAD32_WORD( "xt463a0.ic38", 0x1000002, 0x400000, CRC(cce5f8d3) SHA1(bdca8c5158f452f2b5535c7d658c9b22c6d66048) )
 ROM_END
 
-mu100b_device::mu100b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MU100B, tag, owner, clock)
+xt446_device::xt446_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, XT446, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this, 2)
 	, m_maincpu(*this, "maincpu")
 	, m_swp30(*this, "swp30")
@@ -44,27 +44,27 @@ mu100b_device::mu100b_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-const tiny_rom_entry *mu100b_device::device_rom_region() const
+const tiny_rom_entry *xt446_device::device_rom_region() const
 {
-	return ROM_NAME(mu100b);
+	return ROM_NAME(xt446);
 }
 
-void mu100b_device::device_start()
-{
-}
-
-void mu100b_device::device_reset()
+void xt446_device::device_start()
 {
 }
 
-void mu100b_device::mu100_map(address_map &map)
+void xt446_device::device_reset()
+{
+}
+
+void xt446_device::xt446_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom().region("maincpu", 0);
 	map(0x200000, 0x21ffff).ram(); // 128K work RAM
 	map(0x400000, 0x401fff).m(m_swp30, FUNC(swp30_device::map));
 }
 
-void mu100b_device::mu100_iomap(address_map &map)
+void xt446_device::xt446_iomap(address_map &map)
 {
 	map(h8_device::ADC_0, h8_device::ADC_0).lr16(NAME([]() -> u16 { return 0; }));
 	map(h8_device::ADC_1, h8_device::ADC_1).lr16(NAME([]() -> u16 { return 0; }));
@@ -76,21 +76,21 @@ void mu100b_device::mu100_iomap(address_map &map)
 	map(h8_device::ADC_7, h8_device::ADC_7).lr16(NAME([]() -> u16 { return 0x200; }));
 }
 
-void mu100b_device::swp30_map(address_map &map)
+void xt446_device::swp30_map(address_map &map)
 {
 	map(0x000000*4, 0x200000*4-1).rom().region("swp30",         0).mirror(4*0x200000);
 	map(0x400000*4, 0x500000*4-1).rom().region("swp30",  0x800000).mirror(4*0x300000);
 	map(0x800000*4, 0xa00000*4-1).rom().region("swp30", 0x1000000).mirror(4*0x200000);
 }
 
-void mu100b_device::device_add_mconfig(machine_config &config)
+void xt446_device::device_add_mconfig(machine_config &config)
 {
 	H8S2655(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mu100b_device::mu100_map);
-	m_maincpu->set_addrmap(AS_IO, &mu100b_device::mu100_iomap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &xt446_device::xt446_map);
+	m_maincpu->set_addrmap(AS_IO, &xt446_device::xt446_iomap);
 
 	SWP30(config, m_swp30);
-	m_swp30->set_addrmap(0, &mu100b_device::swp30_map);
+	m_swp30->set_addrmap(0, &xt446_device::swp30_map);
 	m_swp30->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
 	m_swp30->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
 }

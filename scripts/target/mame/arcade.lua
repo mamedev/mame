@@ -294,7 +294,7 @@ SOUNDS["TT5665"] = true
 --SOUNDS["RP2C33_SOUND"] = true
 --SOUNDS["UDA1344"] = true
 SOUNDS["SWP30"] = true
-SOUNDS["MU100B"] = true
+SOUNDS["XT446"] = true
 
 --------------------------------------------------
 -- specify available video cores
