@@ -60,6 +60,9 @@ protected:
 	virtual void nvram_read( emu_file &file ) override;
 	virtual void nvram_write( emu_file &file ) override;
 
+	// configuration helpers
+	void set_devsel_address_low(bool devsel_address_low) { m_devsel_address_low = devsel_address_low; }
+
 	// internal helpers
 	int address_mask();
 	int select_device();
@@ -90,6 +93,7 @@ protected:
 	std::vector<uint8_t> m_page;
 	int m_page_offset;
 	int m_page_written_size;
+	bool m_devsel_address_low;
 };
 
 #define DECLARE_I2C_DEVICE(name) \
@@ -99,6 +103,7 @@ protected:
 		i2c_##name##_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0); \
 	};
 
+DECLARE_I2C_DEVICE(x24c01);
 DECLARE_I2C_DEVICE(24c01);
 DECLARE_I2C_DEVICE(pcf8570);
 DECLARE_I2C_DEVICE(pcd8572);
@@ -113,17 +118,18 @@ DECLARE_I2C_DEVICE(24c64);
 DECLARE_I2C_DEVICE(24c512);
 
 // device type definition
-DECLARE_DEVICE_TYPE(I2C_24C01,  i2c_24c01_device)
+DECLARE_DEVICE_TYPE(I2C_X24C01,  i2c_x24c01_device)
+DECLARE_DEVICE_TYPE(I2C_24C01,   i2c_24c01_device)
 DECLARE_DEVICE_TYPE(I2C_PCF8570, i2c_pcf8570_device)
 DECLARE_DEVICE_TYPE(I2C_PCD8572, i2c_pcd8572_device)
 DECLARE_DEVICE_TYPE(I2C_PCF8582, i2c_pcf8582_device)
-DECLARE_DEVICE_TYPE(I2C_24C02,  i2c_24c02_device)
+DECLARE_DEVICE_TYPE(I2C_24C02,   i2c_24c02_device)
 DECLARE_DEVICE_TYPE(I2C_M24C02,  i2c_m24c02_device)
-DECLARE_DEVICE_TYPE(I2C_24C04,  i2c_24c04_device)
-DECLARE_DEVICE_TYPE(I2C_X2404P, i2c_x2404p_device)
-DECLARE_DEVICE_TYPE(I2C_24C08,  i2c_24c08_device)
-DECLARE_DEVICE_TYPE(I2C_24C16,  i2c_24c16_device)
-DECLARE_DEVICE_TYPE(I2C_24C64,  i2c_24c64_device)
-DECLARE_DEVICE_TYPE(I2C_24C512, i2c_24c512_device)
+DECLARE_DEVICE_TYPE(I2C_24C04,   i2c_24c04_device)
+DECLARE_DEVICE_TYPE(I2C_X2404P,  i2c_x2404p_device)
+DECLARE_DEVICE_TYPE(I2C_24C08,   i2c_24c08_device)
+DECLARE_DEVICE_TYPE(I2C_24C16,   i2c_24c16_device)
+DECLARE_DEVICE_TYPE(I2C_24C64,   i2c_24c64_device)
+DECLARE_DEVICE_TYPE(I2C_24C512,  i2c_24c512_device)
 
 #endif // MAME_MACHINE_I2CMEM_H
