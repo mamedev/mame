@@ -17159,7 +17159,7 @@ but dumps still have to be confirmed.
 			</dataarea>
 		</part>
 	</software>	
-
+	
 	<software name="prostrfs">
 		<description>Pro Striker Final Stage (Jpn)</description>
 		<year>1995</year>
@@ -31517,14 +31517,28 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<!-- // based on SMGP code -->
+	<!-- TC2000 is based on SMGP code -->
+	<!-- is this set hacked to have the protection removed? it's more than just a trivial patch however -->
 	<software name="tc2000">
-		<description>TC 2000 (Arg)</description>
+		<description>TC 2000 (Argentina, unprotected)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="tc2000.bin" size="1048576" crc="cef91bdb" sha1="80a2f21304cea6876bc07a48dcd1f5e53a5b3adb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tc2000a" cloneof="tc2000">
+		<description>TC 2000 (Argentina, protected)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_tc2000"/>
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<!-- 2nd half is probably not ROM but default state values from the protection, as it maps there -->
+				<rom name="tc2000_protected.bin" size="2097152" crc="6f91b33c" sha1="d117b85ba12f5148808be65d2d25690935dfc9f4"/>
 			</dataarea>
 		</part>
 	</software>

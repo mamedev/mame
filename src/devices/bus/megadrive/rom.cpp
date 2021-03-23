@@ -57,6 +57,7 @@ DEFINE_DEVICE_TYPE(MD_ROM_POKESTAD, md_rom_pokestad_device, "md_rom_pokestad", "
 DEFINE_DEVICE_TYPE(MD_ROM_REALTEC,  md_rom_realtec_device,  "md_rom_realtec",  "MD Realtec")
 DEFINE_DEVICE_TYPE(MD_ROM_REDCL,    md_rom_redcl_device,    "md_rom_redcl",    "MD Redcliff")
 DEFINE_DEVICE_TYPE(MD_ROM_SQUIR,    md_rom_squir_device,    "md_rom_squir",    "MD Squirrel King")
+DEFINE_DEVICE_TYPE(MD_ROM_TC2000,   md_rom_tc2000_device,   "md_rom_tc2000",   "MD TC2000")
 DEFINE_DEVICE_TYPE(MD_ROM_TEKKENSP, md_rom_tekkensp_device, "md_rom_tekkensp", "MD Tekken Special")
 DEFINE_DEVICE_TYPE(MD_ROM_TOPF,     md_rom_topf_device,     "md_rom_topf",     "MD Top Fighter")
 DEFINE_DEVICE_TYPE(MD_ROM_RADICA,   md_rom_radica_device,   "md_rom_radica",   "MD Radica TV games")
@@ -225,6 +226,11 @@ md_rom_redcl_device::md_rom_redcl_device(const machine_config &mconfig, const ch
 
 md_rom_squir_device::md_rom_squir_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: md_std_rom_device(mconfig, MD_ROM_SQUIR, tag, owner, clock), m_latch(0)
+{
+}
+
+md_rom_tc2000_device::md_rom_tc2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: md_std_rom_device(mconfig, MD_ROM_TC2000, tag, owner, clock)
 {
 }
 
@@ -1236,6 +1242,49 @@ void md_rom_smw64_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 		}
 	}
 }
+
+/*-------------------------------------------------
+ TC2000
+ -------------------------------------------------*/
+
+uint16_t md_rom_tc2000_device::read(offs_t offset)
+{
+	if (offset < 0x100000 / 2)
+	{
+		return md_std_rom_device::read(offset);
+	}
+	else
+	{
+		// this works for game boot and starting a game, are there any further checks?
+		uint16_t retvalue = 0x0000;
+
+		if (((offset * 2) & 0xf) == 0x4)
+		{
+			retvalue = 0x5000;
+		}
+		else if (((offset * 2) & 0xf) == 0x8)
+		{
+			retvalue = 0xa000;
+		}
+		
+		logerror("protection read at offset %08x returning %04x\n", offset*2, retvalue);
+
+		return retvalue;
+	}
+}
+
+void md_rom_tc2000_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (offset < 0x100000/2)
+	{
+		md_std_rom_device::write(offset, data, mem_mask);
+	}
+	else
+	{
+		logerror("unhandled write at offset %08x %04x %04x\n", offset*2, data, mem_mask);
+	}
+}
+
 
 /*-------------------------------------------------
  TEKKEN SPECIAL
