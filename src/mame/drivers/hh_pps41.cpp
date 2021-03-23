@@ -1088,8 +1088,8 @@ ROM_END
 /***************************************************************************
 
   Mattel World Championship Football (model 3202)
-  * MM78L MCU (label MM78 A78C6-12, die label A78C6)
-  * MM78L MCU (label MM78 A78C7-12, die label A78C7)
+  * MM78 MCU (MM78L pinout) (label MM78 A78C6-12, die label A78C6)
+  * MM78 MCU (MM78L pinout) (label MM78 A78C7-12, die label A78C7)
   * 8-digit 7seg VFD, cyan/red/green VFD Itron CP5023, 1-bit sound
 
   It was patented under US4422639. Like the Baseball counterpart (mwcbaseb in
@@ -1235,7 +1235,7 @@ INPUT_PORTS_END
 void mwcfootb_state::mwcfootb(machine_config &config)
 {
 	/* basic machine hardware */
-	MM78L(config, m_maincpu, 360000); // approximation - VC osc. R=56K
+	MM78(config, m_maincpu, 360000); // approximation - VC osc. R=56K
 	m_maincpu->write_d().set(FUNC(mwcfootb_state::main_write_d));
 	m_maincpu->read_d().set(FUNC(mwcfootb_state::main_read_d));
 	m_maincpu->write_r().set(FUNC(mwcfootb_state::main_write_r));
@@ -1243,7 +1243,7 @@ void mwcfootb_state::mwcfootb(machine_config &config)
 	m_maincpu->read_sdi().set(m_subcpu, FUNC(pps41_base_device::sdo_r));
 	m_maincpu->write_ssc().set(m_subcpu, FUNC(pps41_base_device::ssc_w));
 
-	MM78L(config, m_subcpu, 360000); // osc. from maincpu
+	MM78(config, m_subcpu, 360000); // osc. from maincpu
 	m_subcpu->write_d().set(FUNC(mwcfootb_state::sub_write_d));
 	m_subcpu->write_r().set(FUNC(mwcfootb_state::sub_write_r));
 	m_subcpu->read_sdi().set(m_maincpu, FUNC(pps41_base_device::sdo_r));

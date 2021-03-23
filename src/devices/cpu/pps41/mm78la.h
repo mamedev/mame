@@ -87,6 +87,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	// opcode handlers
 	virtual void op_ix() override;
 };
 
