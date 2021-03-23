@@ -50,7 +50,7 @@
         { "type": "float",
           "name": "lowpass_cutoff",
           "text": "Lowpass cutoff pixels/scanline",
-          "default": 200.0,
+          "default":1000.0,
           "max"    :1000.0,
           "min"    : 100.0,
           "step"   :  10.0,
