@@ -1418,8 +1418,16 @@ TIMER_CALLBACK_MEMBER( upi41_cpu_device::master_callback )
 
 void upi41_cpu_device::upi41_master_w(offs_t offset, uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(upi41_cpu_device::master_callback), this), (offset << 8) | data);
+	m_master_callback.synchronize((offset << 8) | data);
 }
+
+void upi41_cpu_device::device_start()
+{
+	mcs48_cpu_device::device_start();
+
+	m_master_callback.enregister(*this, FUNC(upi41_cpu_device::master_callback));
+}
+
 
 
 /***************************************************************************

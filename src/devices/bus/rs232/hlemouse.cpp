@@ -236,7 +236,8 @@ void hle_msmouse_device_base::device_start()
 	m_btn_val = m_btn_sent = 0x00U;
 	m_enable = 0U;
 
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(hle_msmouse_device_base::start_mouse), this));
+	m_start_mouse.enregister(*this, FUNC(hle_msmouse_device_base::start_mouse));
+	m_start_mouse.synchronize();
 }
 
 WRITE_LINE_MEMBER(hle_msmouse_device_base::input_dtr)
@@ -463,7 +464,8 @@ void hle_msystems_device_base::device_start()
 
 	m_phase = 0U;
 
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(hle_msystems_device_base::start_mouse), this));
+	m_start_mouse.enregister(*this, FUNC(hle_msystems_device_base::start_mouse));
+	m_start_mouse.synchronize();
 }
 
 void hle_msystems_device_base::tra_callback()

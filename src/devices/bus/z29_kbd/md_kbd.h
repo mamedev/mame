@@ -37,6 +37,7 @@ private:
 
 	// misc. helpers
 	TIMER_CALLBACK_MEMBER(receive_data_synced);
+	emu_timer_cb m_receive_data_synced;
 	void ls175_w(u8 data);
 
 	// address maps

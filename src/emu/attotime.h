@@ -195,6 +195,61 @@ private:
 /** @} */
 
 
+class precise_clock
+{
+public:
+	precise_clock(u32 rate = 1, u32 divider = 1) :
+		m_rate(rate),
+		m_divider(1),
+		m_period((rate == 0) ? ATTOSECONDS_PER_SECOND : ((ATTOSECONDS_PER_SECOND + rate - 1) / rate)),
+		m_base(attotime::zero),
+		m_tick_base(0)
+	{
+	}
+
+	void reset_tick_base() { m_tick_base = 0; }
+
+	void set_rate(attotime const &base, u32 rate, u32 divider = 0)
+	{
+		// remember the ticks at the old rate at the base time before setting it
+		m_tick_base = tick(base);
+		m_base = base;
+
+		// configure the new rate
+		m_rate = rate;
+		if (divider != 0)
+			m_divider = divider;
+		m_period = (rate == 0) ? ATTOSECONDS_PER_SECOND : ((ATTOSECONDS_PER_SECOND + rate - 1) / rate);
+	}
+
+	u64 tick(attotime const &time)
+	{
+		attotime delta = time - m_base;
+		u64 count = delta.seconds() * m_rate + delta.attoseconds() / m_period;
+		return m_tick_base + ((m_divider == 1) ? count : (count / m_divider));
+	}
+
+	attotime tick_time(u64 ticknum)
+	{
+		// can't get time of ticks prior to the last rate switch
+		if (ticknum < m_tick_base)
+			return attotime::zero;
+		ticknum = (ticknum - m_tick_base) * m_divider;
+
+		u64 seconds = ticknum / m_rate;
+		attotime delta(seconds, (ticknum - seconds * m_rate) * m_period);
+		return delta + m_base;
+	}
+
+private:
+	u32 m_rate;					// integral rate in Hz
+	u32 m_divider;				// clock divider (or 1 if no divider)
+	attoseconds_t m_period;		// period, measured in attoseconds
+	attotime m_base;			// time of last rate change
+	u64 m_tick_base;			// ticks at last rate change
+};
+
+
 //**************************************************************************
 //  INLINE FUNCTIONS
 //**************************************************************************

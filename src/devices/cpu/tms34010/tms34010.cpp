@@ -741,8 +741,10 @@ void tms340x0_device::device_start()
 		}
 	}
 
+	m_internal_interrupt_callback.enregister(*this, FUNC(tms340x0_device::internal_interrupt_callback));
+
 	/* allocate a scanline timer and set it to go off at the start */
-	m_scantimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tms340x0_device::scanline_callback), this));
+	m_scantimer = timer_alloc(*this, FUNC(tms340x0_device::scanline_callback));
 	m_scantimer->adjust(attotime::zero);
 
 	save_item(NAME(m_pc));
@@ -1286,7 +1288,7 @@ void tms34010_device::io_register_w(offs_t offset, u16 data, u16 mem_mask)
 
 				/* NMI issued? */
 				if (data & 0x0100)
-					machine().scheduler().synchronize(timer_expired_delegate(FUNC(tms340x0_device::internal_interrupt_callback), this), 0);
+					m_internal_interrupt_callback.synchronize(0);
 			}
 			break;
 
@@ -1324,7 +1326,7 @@ void tms34010_device::io_register_w(offs_t offset, u16 data, u16 mem_mask)
 
 				/* input interrupt? (should really be state-based, but the functions don't exist!) */
 				if (!(oldreg & 0x0008) && (newreg & 0x0008))
-					machine().scheduler().synchronize(timer_expired_delegate(FUNC(tms340x0_device::internal_interrupt_callback), this), TMS34010_HI);
+					m_internal_interrupt_callback.synchronize(TMS34010_HI);
 				else if ((oldreg & 0x0008) && !(newreg & 0x0008))
 					IOREG(REG_INTPEND) &= ~TMS34010_HI;
 			}
@@ -1441,7 +1443,7 @@ void tms34020_device::io_register_w(offs_t offset, u16 data, u16 mem_mask)
 
 			/* NMI issued? */
 			if (data & 0x0100)
-				machine().scheduler().synchronize(timer_expired_delegate(FUNC(tms340x0_device::internal_interrupt_callback), this), 0);
+				m_internal_interrupt_callback.synchronize(0);
 			break;
 
 		case REG020_HSTCTLL:
@@ -1476,7 +1478,7 @@ void tms34020_device::io_register_w(offs_t offset, u16 data, u16 mem_mask)
 
 			/* input interrupt? (should really be state-based, but the functions don't exist!) */
 			if (!(oldreg & 0x0008) && (newreg & 0x0008))
-				machine().scheduler().synchronize(timer_expired_delegate(FUNC(tms340x0_device::internal_interrupt_callback), this), TMS34010_HI);
+				m_internal_interrupt_callback.synchronize(TMS34010_HI);
 			else if ((oldreg & 0x0008) && !(newreg & 0x0008))
 				IOREG(REG020_INTPEND) &= ~TMS34010_HI;
 			break;

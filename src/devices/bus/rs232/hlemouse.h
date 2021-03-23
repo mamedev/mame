@@ -44,6 +44,7 @@ protected:
 
 private:
 	TIMER_CALLBACK_MEMBER(start_mouse);
+	emu_timer_cb m_start_mouse;
 	void check_enable();
 	void check_inputs();
 
@@ -138,6 +139,7 @@ protected:
 
 private:
 	TIMER_CALLBACK_MEMBER(start_mouse);
+	emu_timer_cb m_start_mouse;
 
 	virtual bool read_inputs() = 0;
 	virtual uint8_t report_buttons() = 0;

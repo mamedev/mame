@@ -49,6 +49,7 @@ void md_keyboard_device::device_resolve_objects()
 
 void md_keyboard_device::device_start()
 {
+	m_receive_data_synced.enregister(*this, FUNC(md_keyboard_device::receive_data_synced));
 	save_item(NAME(m_14515b_select));
 	save_item(NAME(m_ls175_clock));
 	save_item(NAME(m_recv_data));
@@ -61,7 +62,7 @@ void md_keyboard_device::device_reset()
 
 void md_keyboard_device::receive_data(bool state)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(md_keyboard_device::receive_data_synced), this), state);
+	m_receive_data_synced.synchronize(state);
 }
 
 TIMER_CALLBACK_MEMBER(md_keyboard_device::receive_data_synced)

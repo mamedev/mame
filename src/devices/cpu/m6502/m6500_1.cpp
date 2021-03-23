@@ -105,28 +105,28 @@ m6500_1_device::m6500_1_device(machine_config const &mconfig, char const *tag, d
 
 void m6500_1_device::pa_w(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m6500_1_device::set_port_in<0>), this), unsigned(data));
+	m_set_port_in[0].synchronize(data);
 }
 
 void m6500_1_device::pb_w(u8 data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m6500_1_device::set_port_in<1>), this), unsigned(data));
+	m_set_port_in[1].synchronize(data);
 }
 
 void m6500_1_device::pc_w(u8 data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m6500_1_device::set_port_in<2>), this), unsigned(data));
+	m_set_port_in[2].synchronize(data);
 }
 
 void m6500_1_device::pd_w(u8 data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m6500_1_device::set_port_in<3>), this), unsigned(data));
+	m_set_port_in[3].synchronize(data);
 }
 
 
 WRITE_LINE_MEMBER(m6500_1_device::cntr_w)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m6500_1_device::set_cntr_in), this), state);
+	m_set_cntr_in.synchronize(state);
 }
 
 
@@ -144,6 +144,12 @@ void m6500_1_device::device_start()
 	m6502_mcu_device::device_start();
 
 	m_counter_base = 0U;
+
+	m_set_port_in[0].enregister(*this, FUNC(m6500_1_device::set_port_in<0>));
+	m_set_port_in[1].enregister(*this, FUNC(m6500_1_device::set_port_in<1>));
+	m_set_port_in[2].enregister(*this, FUNC(m6500_1_device::set_port_in<2>));
+	m_set_port_in[3].enregister(*this, FUNC(m6500_1_device::set_port_in<3>));
+	m_set_cntr_in.enregister(*this, FUNC(m6500_1_device::set_cntr_in));
 
 	state_add(M6500_1_CR, "CR", m_cr).callimport().callexport();
 	state_add(M6500_1_UL, "UL", m_ul).callimport().callexport();

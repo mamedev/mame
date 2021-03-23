@@ -42,13 +42,15 @@ void he191_3425_device::device_start()
 {
 	m_leds[0] = 1; // L1: Power
 
+	m_receive_data_synced.enregister(*this, FUNC(he191_3425_device::receive_data_synced));
+
 	save_item(NAME(m_select));
 	save_item(NAME(m_recv_data));
 }
 
 void he191_3425_device::receive_data(bool state)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(he191_3425_device::receive_data_synced), this), state);
+	m_receive_data_synced.synchronize(state);
 }
 
 TIMER_CALLBACK_MEMBER(he191_3425_device::receive_data_synced)

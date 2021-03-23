@@ -73,6 +73,8 @@ void nes_sxrom_device::device_start()
 	save_item(NAME(m_count));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_reg_write_enable));
+
+	m_resync_callback.enregister(*this, FUNC(nes_sxrom_device::resync_callback));
 }
 
 void nes_sxrom_device::pcb_reset()
@@ -235,7 +237,7 @@ void nes_sxrom_device::write_h(offs_t offset, uint8_t data)
 	else
 	{
 		m_reg_write_enable = 0;
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(nes_sxrom_device::resync_callback),this));
+		m_resync_callback.synchronize();
 	}
 
 	if (data & 0x80)

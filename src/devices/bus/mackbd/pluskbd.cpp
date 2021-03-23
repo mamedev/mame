@@ -144,6 +144,8 @@ protected:
 		m_host_data_out = 1U;
 		m_host_data_in = 0x01U;
 
+		m_update_host_data.enregister(*this, FUNC(keyboard_base::update_host_data));
+
 		save_item(NAME(m_row_drive));
 		save_item(NAME(m_host_clock_out));
 		save_item(NAME(m_host_data_out));
@@ -152,7 +154,7 @@ protected:
 
 	virtual DECLARE_WRITE_LINE_MEMBER(data_w) override
 	{
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(keyboard_base::update_host_data), this), state);
+		m_update_host_data.synchronize(state);
 	}
 
 private:
@@ -207,6 +209,7 @@ private:
 			m_host_data_in = param ? 0x01U : 0x00U;
 		}
 	}
+	emu_timer_cb m_update_host_data;
 
 	required_device<mcs48_cpu_device> m_mpu;
 	required_ioport_array<10> m_rows;

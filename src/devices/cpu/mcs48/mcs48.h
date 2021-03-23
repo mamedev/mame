@@ -631,7 +631,11 @@ protected:
 	// construction/destruction
 	upi41_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size);
 
+	// overrides
+	virtual void device_start() override;
+
 	TIMER_CALLBACK_MEMBER( master_callback );
+	emu_timer_cb m_master_callback;
 };
 
 class i8041a_device : public upi41_cpu_device

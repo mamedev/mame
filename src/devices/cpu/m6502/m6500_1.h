@@ -98,6 +98,7 @@ protected:
 	void write_port(offs_t offset, u8 data);
 	void clear_edge(offs_t offset, u8 data);
 	template <unsigned Port> TIMER_CALLBACK_MEMBER(set_port_in);
+	emu_timer_cb m_set_port_in[4];
 
 	u8 read_upper_count();
 	u8 read_lower_count();
@@ -108,6 +109,7 @@ protected:
 	bool pulse_generator_mode() const;
 	bool event_counter_mode() const;
 	TIMER_CALLBACK_MEMBER(set_cntr_in);
+	emu_timer_cb m_set_cntr_in;
 	void toggle_cntr();
 
 	void memory_map(address_map &map);

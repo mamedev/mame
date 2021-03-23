@@ -237,6 +237,8 @@ const tiny_rom_entry *hp98046_io_card_device::device_rom_region() const
 void hp98046_io_card_device::device_start()
 {
 	m_ram = std::make_unique<uint8_t[]>(1024);
+	m_sync_rx_im_w.enregister(*this, FUNC(hp98046_io_card_device::sync_rx_im_w));
+	m_sync_tx_im_w.enregister(*this, FUNC(hp98046_io_card_device::sync_tx_im_w));
 	save_pointer(NAME(m_ram) , 1024);
 }
 
@@ -495,14 +497,14 @@ WRITE_LINE_MEMBER(hp98046_io_card_device::rs232_cts_w)
 WRITE_LINE_MEMBER(hp98046_io_card_device::rs232_rxc_w)
 {
 	if (!m_loopback) {
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(hp98046_io_card_device::sync_rx_im_w) , this) , state);
+		m_sync_rx_im_w.synchronize(state);
 	}
 }
 
 WRITE_LINE_MEMBER(hp98046_io_card_device::rs232_txc_w)
 {
 	if (!m_loopback) {
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(hp98046_io_card_device::sync_tx_im_w) , this) , state);
+		m_sync_tx_im_w.synchronize(state);
 	}
 }
 
@@ -636,7 +638,7 @@ WRITE_LINE_MEMBER(hp98046_io_card_device::rxc_w)
 		m_last_rxc = bool(state);
 		m_sio->rxca_w(m_last_rxc);
 		if (m_loopback) {
-			machine().scheduler().synchronize(timer_expired_delegate(FUNC(hp98046_io_card_device::sync_tx_im_w) , this) , state);
+			m_sync_tx_im_w.synchronize(state);
 		}
 	}
 }
@@ -649,7 +651,7 @@ WRITE_LINE_MEMBER(hp98046_io_card_device::txc_w)
 		m_sio->txcb_w(m_last_txc);
 		m_sio->rxcb_w(m_last_txc);
 		if (m_loopback) {
-			machine().scheduler().synchronize(timer_expired_delegate(FUNC(hp98046_io_card_device::sync_rx_im_w) , this) , state);
+			m_sync_rx_im_w.synchronize(state);
 		}
 	}
 }
