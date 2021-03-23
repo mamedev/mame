@@ -73,7 +73,7 @@ void emu_timer_cb::enregister(device_t &device, timer_expired_delegate callback)
 	m_scheduler->register_timer_expired(*this);
 }
 
-void emu_timer_cb::enregister_interface(device_interface &intf, timer_expired_delegate callback)
+void emu_timer_cb::interface_enregister(device_interface &intf, timer_expired_delegate callback)
 {
 	if (m_next != nullptr)
 		throw emu_fatalerror("Attempted to re-enregister a emu_timer_cb");

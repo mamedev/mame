@@ -46,7 +46,7 @@ public:
 	// registration
 	void enregister(device_scheduler &scheduler, timer_expired_delegate callback);
 	void enregister(device_t &device, timer_expired_delegate callback);
-	void enregister_interface(device_interface &device, timer_expired_delegate callback);
+	void interface_enregister(device_interface &device, timer_expired_delegate callback);
 
 	// direct registration for device's and device interfaces
 	template<typename DeviceType, typename FuncType>
@@ -55,7 +55,7 @@ public:
 		return enregister(device, timer_expired_delegate(callback, string, &device));
 	}
 	template<typename IntfType, typename FuncType>
-	void enregister_interface(IntfType &intf, FuncType callback, char const *string)
+	void interface_enregister(IntfType &intf, FuncType callback, char const *string)
 	{
 		return enregister(intf, timer_expired_delegate(callback, string, &intf));
 	}

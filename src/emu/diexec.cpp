@@ -385,9 +385,9 @@ void device_execute_interface::interface_pre_start()
 	if (m_timed_interrupt_period != attotime::zero)
 		m_timedint_timer = interface_timer_alloc(*this, FUNC(device_execute_interface::trigger_periodic_interrupt));
 
-	m_irq_pulse_clear.enregister_interface(*this, FUNC(device_execute_interface::irq_pulse_clear));
-	m_timed_trigger_callback.enregister_interface(*this, FUNC(device_execute_interface::timed_trigger_callback));
-	m_empty_event_queue.enregister_interface(*this, FUNC(device_execute_interface::empty_event_queue));
+	m_irq_pulse_clear.interface_enregister(*this, FUNC(device_execute_interface::irq_pulse_clear));
+	m_timed_trigger_callback.interface_enregister(*this, FUNC(device_execute_interface::timed_trigger_callback));
+	m_empty_event_queue.interface_enregister(*this, FUNC(device_execute_interface::empty_event_queue));
 }
 
 
