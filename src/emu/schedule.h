@@ -61,10 +61,10 @@ public:
 	}
 
 	// call the delegate after a set amount of time, with the given parameter
-	void call_after(const attotime &duration, int param = 0) const;
+	void call_after(const attotime &duration, s32 param = 0, u64 param2 = 0, u64 param3 = 0) const;
 
 	// synchronize; essentially, call immediately
-	void synchronize(int param = 0) const { call_after(attotime::zero, param); }
+	void synchronize(s32 param = 0, u64 param2 = 0, u64 param3 = 0) const { call_after(attotime::zero, param, param2, param3); }
 
 private:
 	// internal state
@@ -89,8 +89,8 @@ class emu_timer
 	// allocation and re-use
 	emu_timer &init_persistent(running_machine &machine, timer_expired_delegate callback, void *ptr);
 	emu_timer &init_persistent(device_t &device, device_timer_id id, void *ptr);
-	emu_timer &init_temporary(running_machine &machine, timer_expired_delegate callback, int param, attotime const &duration);
-	emu_timer &init_temporary(device_t &device, device_timer_id id, int param, attotime const &duration);
+	emu_timer &init_temporary(running_machine &machine, timer_expired_delegate callback, attotime const &duration, s32 param, u64 param2, u64 param3);
+	emu_timer &init_temporary(device_t &device, device_timer_id id, attotime const &duration, s32 param, u64 param2, u64 param3);
 
 public:
 	// getters
@@ -104,7 +104,7 @@ public:
 
 	// setters
 	bool enable(bool enable = true);
-	void set_param(int param) { m_param = param; }
+	void set_param(s32 param) { m_param = param; }
 	void set_ptr(void *ptr) { m_ptr = ptr; }
 
 	// control
@@ -133,6 +133,8 @@ private:
 	attotime            m_start;        // time when the timer was started
 	void *              m_ptr;          // pointer parameter
 	s32                 m_param;        // integer parameter
+	u64                 m_param2;       // larger integer parameter
+	u64                 m_param3;       // larger integer parameter
 	bool                m_enabled;      // is the timer enabled?
 	bool                m_temporary;    // is the timer temporary?
 	timer_expired_delegate m_callback;  // callback function
@@ -232,12 +234,12 @@ public:
 	// timers, specified by callback/name
 	emu_timer *timer_alloc(timer_expired_delegate callback, void *ptr = nullptr);
 	void synchronize() { synchronize(m_empty_timer_cb); }
-	void synchronize(timer_expired_delegate callback, int param = 0) { timer_set(attotime::zero, callback, param); }
-	void synchronize(emu_timer_cb const &callback, int param = 0) { timer_set(attotime::zero, callback, param); }
+	void synchronize(timer_expired_delegate callback, s32 param = 0, u64 param2 = 0, u64 param3 = 0) { timer_set(attotime::zero, callback, param, param2, param3); }
+	void synchronize(emu_timer_cb const &callback, s32 param = 0, u64 param2 = 0, u64 param3 = 0) { timer_set(attotime::zero, callback, param, param2, param3); }
 
 	// timers, specified by device/id; generally devices should use the device_t methods instead
 	emu_timer *timer_alloc(device_t &device, device_timer_id id = 0, void *ptr = nullptr);
-	void timer_set(const attotime &duration, device_t &device, device_timer_id id = 0, int param = 0);
+	void timer_set(const attotime &duration, device_t &device, device_timer_id id = 0, s32 param = 0, u64 param2 = 0, u64 param3 = 0);
 
 	// debugging
 	void dump_timers() const;
@@ -258,8 +260,8 @@ private:
 	void add_scheduling_quantum(const attotime &quantum, const attotime &duration);
 
 	// deprecated timer interfaces
-	void timer_set(const attotime &duration, timer_expired_delegate callback, int param = 0);
-	void timer_set(const attotime &duration, emu_timer_cb const &callback, int param = 0);
+	void timer_set(const attotime &duration, timer_expired_delegate callback, s32 param = 0, u64 param2 = 0, u64 param3 = 0);
+	void timer_set(const attotime &duration, emu_timer_cb const &callback, s32 param = 0, u64 param2 = 0, u64 param3 = 0);
 
 	// timer helpers
 	emu_timer &timer_alloc_object();
@@ -286,6 +288,7 @@ private:
 	emu_timer *                 m_free_timers;              // simple list of free timers
 	emu_timer_cb *              m_registered_timers;        // list of registered timers
 	emu_timer_cb                m_empty_timer_cb;           // empty callback
+	emu_timer_cb                m_timed_trigger;            // timed trigger callback
 
 	// other internal states
 	emu_timer *                 m_callback_timer;           // pointer to the current callback timer

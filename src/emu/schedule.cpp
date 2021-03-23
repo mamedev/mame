@@ -12,6 +12,10 @@
 #include "debugger.h"
 
 
+// current regex search:
+// [.>]synchronize.*timer_expired_delegate
+
+
 //**************************************************************************
 //  DEBUGGING
 //**************************************************************************
@@ -85,9 +89,9 @@ void emu_timer_cb::interface_enregister(device_interface &intf, timer_expired_de
 	m_scheduler->register_timer_expired(*this);
 }
 
-void emu_timer_cb::call_after(const attotime &duration, int param) const
+void emu_timer_cb::call_after(const attotime &duration, s32 param, u64 param2, u64 param3) const
 {
-	m_scheduler->timer_set(duration, *this, param);
+	m_scheduler->timer_set(duration, *this, param, param2, param3);
 }
 
 
@@ -133,6 +137,8 @@ inline emu_timer &emu_timer::init_persistent(running_machine &machine, timer_exp
 	m_period = attotime::never;
 	m_ptr = ptr;
 	m_param = 0;
+	m_param2 = 0;
+	m_param3 = 0;
 	m_enabled = false;
 	m_temporary = false;
 	m_callback = callback.isnull() ? s_dummy_delegate : callback;
@@ -155,6 +161,8 @@ inline emu_timer &emu_timer::init_persistent(device_t &device, device_timer_id i
 	m_period = attotime::never;
 	m_ptr = ptr;
 	m_param = 0;
+	m_param2 = 0;
+	m_param3 = 0;
 	m_enabled = false;
 	m_temporary = false;
 	m_callback = timer_expired_delegate(FUNC(emu_timer::device_timer_expired), this);
@@ -173,7 +181,7 @@ inline emu_timer &emu_timer::init_persistent(device_t &device, device_timer_id i
 //  and expiration time from the outset
 //-------------------------------------------------
 
-inline emu_timer &emu_timer::init_temporary(running_machine &machine, timer_expired_delegate callback, int param, attotime const &duration)
+inline emu_timer &emu_timer::init_temporary(running_machine &machine, timer_expired_delegate callback, attotime const &duration, s32 param, u64 param2, u64 param3)
 {
 	// ensure the entire timer state is clean
 	m_machine = &machine;
@@ -184,6 +192,8 @@ inline emu_timer &emu_timer::init_temporary(running_machine &machine, timer_expi
 	m_period = attotime::never;
 	m_ptr = nullptr;
 	m_param = param;
+	m_param2 = param2;
+	m_param3 = param3;
 	m_enabled = true;
 	m_temporary = true;
 	m_callback = callback.isnull() ? s_dummy_delegate : callback;
@@ -193,7 +203,7 @@ inline emu_timer &emu_timer::init_temporary(running_machine &machine, timer_expi
 	return *this;
 }
 
-inline emu_timer &emu_timer::init_temporary(device_t &device, device_timer_id id, int param, attotime const &duration)
+inline emu_timer &emu_timer::init_temporary(device_t &device, device_timer_id id, attotime const &duration, s32 param, u64 param2, u64 param3)
 {
 	// ensure the entire timer state is clean
 	m_machine = &device.machine();
@@ -204,6 +214,8 @@ inline emu_timer &emu_timer::init_temporary(device_t &device, device_timer_id id
 	m_period = attotime::never;
 	m_ptr = nullptr;
 	m_param = param;
+	m_param2 = param2;
+	m_param3 = param3;
 	m_enabled = true;
 	m_temporary = true;
 	m_callback = timer_expired_delegate(FUNC(emu_timer::device_timer_expired), this);
@@ -324,6 +336,8 @@ void emu_timer::register_save()
 
 	// save the bits
 	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_param));
+	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_param2));
+	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_param3));
 	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_enabled));
 	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_period));
 	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_start));
@@ -338,7 +352,7 @@ void emu_timer::register_save()
 
 void emu_timer::dump() const
 {
-	machine().logerror("%p: en=%d temp=%d exp=%15s start=%15s per=%15s param=%d ptr=%p", this, m_enabled, m_temporary, m_expire.as_string(PRECISION), m_start.as_string(PRECISION), m_period.as_string(PRECISION), m_param, m_ptr);
+	machine().logerror("%p: en=%d temp=%d exp=%15s start=%15s per=%15s param=%d/%lld/%lld ptr=%p", this, m_enabled, m_temporary, m_expire.as_string(PRECISION), m_start.as_string(PRECISION), m_period.as_string(PRECISION), m_param, m_param2, m_param3, m_ptr);
 	if (m_device == nullptr)
 		if (m_callback.name() == nullptr)
 			machine().logerror(" cb=NULL\n");
@@ -671,6 +685,7 @@ device_scheduler::device_scheduler(running_machine &machine) :
 	machine.save().register_postload(save_prepost_delegate(FUNC(device_scheduler::postload), this));
 
 	m_empty_timer_cb.enregister(*this, FUNC(device_scheduler::empty_timer_cb));
+	m_timed_trigger.enregister(*this, FUNC(device_scheduler::timed_trigger));
 }
 
 
@@ -953,7 +968,7 @@ void device_scheduler::update_basetime()
 //  timers provide nothing
 //-------------------------------------------------
 
-void device_scheduler::empty_timer_cb(void *ptr, int param)
+void device_scheduler::empty_timer_cb(void *ptr, s32 param)
 {
 }
 
@@ -982,7 +997,7 @@ void device_scheduler::trigger(int trigid, const attotime &after)
 
 	// if we have a non-zero time, schedule a timer
 	if (after != attotime::zero)
-		timer_set(after, timer_expired_delegate(FUNC(device_scheduler::timed_trigger), this), trigid);
+		m_timed_trigger.call_after(after, trigid);
 
 	// send the trigger to everyone who cares
 	else
@@ -1066,11 +1081,11 @@ emu_timer *device_scheduler::timer_alloc(timer_expired_delegate callback, void *
 //  amount of time
 //-------------------------------------------------
 
-void device_scheduler::timer_set(const attotime &duration, timer_expired_delegate callback, int param)
+void device_scheduler::timer_set(const attotime &duration, timer_expired_delegate callback, s32 param, u64 param2, u64 param3)
 {
 	// temporary timers are implicitly active, so add them directly
 	// to the active list after creation
-	emu_timer &timer = timer_alloc_object().init_temporary(machine(), callback, param, duration);
+	emu_timer &timer = timer_alloc_object().init_temporary(machine(), callback, duration, param, param2, param3);
 	if (m_active_timers.insert_sorted(timer))
 	{
 		update_first_timer_expire();
@@ -1085,11 +1100,11 @@ void device_scheduler::timer_set(const attotime &duration, timer_expired_delegat
 //  amount of time
 //-------------------------------------------------
 
-void device_scheduler::timer_set(const attotime &duration, emu_timer_cb const &callback, int param)
+void device_scheduler::timer_set(const attotime &duration, emu_timer_cb const &callback, s32 param, u64 param2, u64 param3)
 {
 	// temporary timers are implicitly active, so add them directly
 	// to the active list after creation
-	emu_timer &timer = timer_alloc_object().init_temporary(machine(), callback.m_callback, param, duration);
+	emu_timer &timer = timer_alloc_object().init_temporary(machine(), callback.m_callback, duration, param, param2, param3);
 	if (m_active_timers.insert_sorted(timer))
 	{
 		update_first_timer_expire();
@@ -1117,11 +1132,11 @@ emu_timer *device_scheduler::timer_alloc(device_t &device, device_timer_id id, v
 //  time
 //-------------------------------------------------
 
-void device_scheduler::timer_set(const attotime &duration, device_t &device, device_timer_id id, int param)
+void device_scheduler::timer_set(const attotime &duration, device_t &device, device_timer_id id, s32 param, u64 param2, u64 param3)
 {
 	// temporary timers are implicitly active, so add them directly
 	// to the active list after creation
-	emu_timer &timer = timer_alloc_object().init_temporary(device, id, param, duration);
+	emu_timer &timer = timer_alloc_object().init_temporary(device, id, duration, param, param2, param3);
 	if (m_active_timers.insert_sorted(timer))
 	{
 		update_first_timer_expire();

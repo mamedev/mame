@@ -49,6 +49,7 @@ private:
 	void vertigo_motor_w(uint16_t data);
 	INTERRUPT_GEN_MEMBER(vertigo_interrupt);
 	TIMER_CALLBACK_MEMBER(sound_command_w);
+	emu_timer_cb m_sound_command_w;
 	DECLARE_WRITE_LINE_MEMBER(v_irq4_w);
 	DECLARE_WRITE_LINE_MEMBER(v_irq3_w);
 	void update_irq(uint8_t data);

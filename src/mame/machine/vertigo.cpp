@@ -121,7 +121,7 @@ TIMER_CALLBACK_MEMBER(vertigo_state::sound_command_w)
 void vertigo_state::vertigo_audio_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(vertigo_state::sound_command_w),this), data & 0xff);
+		m_sound_command_w.synchronize(data & 0xff);
 }
 
 
@@ -142,6 +142,8 @@ void vertigo_state::machine_start()
 {
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_irq4_time));
+
+	m_sound_command_w.enregister(*this, FUNC(vertigo_state::sound_command_w));
 
 	vertigo_vproc_init();
 }
