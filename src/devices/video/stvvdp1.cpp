@@ -2056,7 +2056,7 @@ void saturn_state::stv_vdp1_process_list( void )
 	/* TODO: what's the exact formula? Guess it should be a mix between number of pixels written and actual command data fetched. */
 	// if spritecount = 10000 don't send a vdp1 draw end
 //  if(spritecount < 10000)
-	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(spritecount*16), timer_expired_delegate(FUNC(saturn_state::vdp1_draw_end),this));
+	m_vdp1_draw_end.call_after(m_maincpu->cycles_to_attotime(spritecount*16));
 
 	if (VDP1_LOG) logerror ("End of list processing!\n");
 }
@@ -2215,5 +2215,8 @@ int saturn_state::stv_vdp1_start ( void )
 	save_item(NAME(m_vdp1.local_x));
 	save_item(NAME(m_vdp1.local_y));
 	machine().save().register_postload(save_prepost_delegate(FUNC(saturn_state::stv_vdp1_state_save_postload), this));
+
+	m_vdp1_draw_end.enregister(*this, FUNC(saturn_state::vdp1_draw_end));
+
 	return 0;
 }

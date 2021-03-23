@@ -309,6 +309,8 @@ void vic3_device::device_start()
 		save_item(NAME(m_sprites[i].bitmap[6]), i);
 		save_item(NAME(m_sprites[i].bitmap[7]), i);
 	}
+
+	m_timer_timeout.enregister(*this, FUNC(vic3_device::timer_timeout));
 }
 
 //-------------------------------------------------
@@ -1983,7 +1985,7 @@ void vic3_device::raster_interrupt_gen()
 		if (LIGHTPEN_BUTTON)
 		{
 			/* lightpen timer start */
-			machine().scheduler().timer_set(attotime(0, 0), timer_expired_delegate(FUNC(vic3_device::timer_timeout),this), 1);
+			m_timer_timeout.synchronize(1);
 		}
 
 	}

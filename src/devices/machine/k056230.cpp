@@ -46,6 +46,7 @@ k056230_device::k056230_device(const machine_config &mconfig, const char *tag, d
 void k056230_device::device_start()
 {
 	save_item(NAME(m_ram));
+	m_network_irq_clear.enregister(*this, FUNC(k056230_device::network_irq_clear));
 }
 
 
@@ -89,7 +90,7 @@ void k056230_device::write(offs_t offset, uint8_t data)
 					if (m_cpu)
 						m_cpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 
-					machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(k056230_device::network_irq_clear), this));
+					m_network_irq_clear.call_after(attotime::from_usec(10));
 				}
 			}
 //          else

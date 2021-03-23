@@ -48,6 +48,8 @@ void ttl74123_device::device_start()
 {
 	m_output_changed_cb.resolve_safe();
 
+	m_output_callback.enregister(*this, FUNC(ttl74123_device::output_callback));
+
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ttl74123_device::clear_callback),this));
 
 	/* register for state saving */
@@ -133,7 +135,7 @@ void ttl74123_device::set_output()
 {
 	int output = timer_running();
 
-	machine().scheduler().timer_set( attotime::zero, timer_expired_delegate(FUNC(ttl74123_device::output_callback ),this), output);
+	m_output_callback.synchronize(output);
 
 	LOG("74123:  Output: %d\n", output);
 }

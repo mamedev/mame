@@ -115,6 +115,7 @@ private:
 	int m_b;                /* initial/constant value of the B pin */
 	int m_clear;            /* initial/constant value of the Clear pin */
 	devcb_write_line  m_output_changed_cb;
+	timer_expired_registered_delegate m_output_callback;
 };
 
 

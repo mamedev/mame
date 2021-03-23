@@ -48,16 +48,16 @@ TIMER_CALLBACK_MEMBER(zeus2_device::display_irq_off)
 	//  vblank_period = screen().frame_period();
 	//vblank_timer->adjust(vblank_period);
 	vblank_timer->adjust(screen().time_until_vblank_start());
-	//machine().scheduler().timer_set(attotime::from_hz(30000000), timer_expired_delegate(FUNC(zeus2_device::display_irq), this));
+	//vblank_timer->adjust(attotime::from_hz(30000000));
 }
 
 TIMER_CALLBACK_MEMBER(zeus2_device::display_irq)
 {
 	m_vblank(ASSERT_LINE);
 	/* set a timer for the next off state */
-	//machine().scheduler().timer_set(screen().time_until_pos(0), timer_expired_delegate(FUNC(zeus2_device::display_irq_off), this), 0, this);
-	machine().scheduler().timer_set(screen().time_until_vblank_end(), timer_expired_delegate(FUNC(zeus2_device::display_irq_off), this));
-	//machine().scheduler().timer_set(attotime::from_hz(30000000), timer_expired_delegate(FUNC(zeus2_device::display_irq_off), this));
+	//m_display_irq_off.call_after(screen().time_until_pos(0), 0);
+	m_display_irq_off.call_after(screen().time_until_vblank_end());
+	//m_display_irq_off.call_after(attotime::from_hz(30000000));
 }
 
 TIMER_CALLBACK_MEMBER(zeus2_device::int_timer_callback)
@@ -90,6 +90,8 @@ void zeus2_device::device_start()
 	int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zeus2_device::int_timer_callback), this));
 
 	vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zeus2_device::display_irq), this));
+
+	m_display_irq_off.enregister(*this, FUNC(zeus2_device::display_irq_off));
 
 	//printf("%s\n", machine().system().name);
 	// Set system type

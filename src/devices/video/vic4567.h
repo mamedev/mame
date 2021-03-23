@@ -173,6 +173,7 @@ private:
 	void draw_bitplanes();
 
 	TIMER_CALLBACK_MEMBER(timer_timeout);
+	timer_expired_registered_delegate m_timer_timeout;
 
 	vic3_type  m_type;
 

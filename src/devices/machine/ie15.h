@@ -154,6 +154,8 @@ private:
 	devcb_write_line m_rs232_conn_dtr_handler;
 	devcb_write_line m_rs232_conn_rts_handler;
 
+	timer_expired_registered_delegate m_ie15_beepoff;
+
 	// Until the UART is implemented
 	required_ioport m_rs232_txbaud;
 	required_ioport m_rs232_rxbaud;

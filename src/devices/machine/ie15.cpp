@@ -166,7 +166,7 @@ void ie15_device::beep_w(uint8_t data)
 	{
 		LOG("beep (%s)\n", m_long_beep ? "short" : "long");
 	}
-	machine().scheduler().timer_set(attotime::from_msec(length), timer_expired_delegate(FUNC(ie15_device::ie15_beepoff),this));
+	m_ie15_beepoff.call_after(attotime::from_msec(length));
 	m_beeper->set_state(1);
 }
 
@@ -496,6 +496,8 @@ void ie15_device::device_start()
 
 	m_hblank_timer = timer_alloc(TIMER_HBLANK);
 	m_hblank_timer->adjust(attotime::never);
+
+	m_ie15_beepoff.enregister(*this, FUNC(ie15_device::ie15_beepoff));
 
 	m_video.ptr1 = m_video.ptr2 = m_latch = 0;
 

@@ -1297,7 +1297,6 @@ void corvus_hdc_device::corvus_process_command_packet(bool invalid_command_flag)
 	//
 	// Set up timers for command completion and timeout from host
 	//
-	//machine.scheduler().timer_set(attotime::from_usec(m_delay), FUNC(corvus_hdc_callback), CALLBACK_CTH_MODE);
 	m_cmd_timer->adjust(attotime::from_usec(m_delay), CALLBACK_CTH_MODE);
 	m_timeout_timer->enable(0);            // We've received enough data, disable the timeout timer
 

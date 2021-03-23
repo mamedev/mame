@@ -497,7 +497,7 @@ TIMER_CALLBACK_MEMBER(rtc65271_device::rtc_begin_update_cb)
 		m_regs[reg_A] |= reg_A_UIP;
 
 		/* schedule end of update cycle */
-		machine().scheduler().timer_set(UPDATE_CYCLE_TIME, timer_expired_delegate(FUNC(rtc65271_device::rtc_end_update_cb), this));
+		m_rtc_end_update_cb.call_after(UPDATE_CYCLE_TIME);
 	}
 }
 
@@ -672,6 +672,8 @@ void rtc65271_device::device_start()
 	m_update_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 	m_SQW_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rtc65271_device::rtc_SQW_cb), this));
 	m_interrupt_cb.resolve();
+
+	m_rtc_end_update_cb.enregister(*this, FUNC(rtc65271_device::rtc_end_update_cb));
 
 	save_item(NAME(m_regs));
 	save_item(NAME(m_cur_reg));
