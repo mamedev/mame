@@ -31506,13 +31506,27 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<!-- is this set hacked to have the protection removed? -->
 	<software name="truco96">
-		<description>Truco '96 (Arg)</description>
+		<description>Truco '96 (Argentina, unprotected)</description>
 		<year>1996</year>
 		<publisher>Miky</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="truco96.bin" size="1048576" crc="cddbecfc" sha1="7a087d08cf7a565c7ad22ca9824971d8cc351ca3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="truco96a" cloneof="truco96" supported="no">
+		<description>Truco '96 (Argentina, protected)</description>
+		<year>1996</year>
+		<publisher>Miky</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_tc2000"/>
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<!-- 2nd half is probably not ROM as the protection maps there, could be cut in half? -->
+				<rom name="MIKY V1 TRUCO (X).bin" size="2097152" crc="79de5e57" sha1="51013c30ae736bd4e0e49e6ef8ea20c1cfbc79d7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31537,7 +31551,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_tc2000"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<!-- 2nd half is probably not ROM but default state values from the protection, as it maps there -->
+				<!-- 2nd half is probably not ROM as the protection maps there, could be cut in half? -->
 				<rom name="tc2000_protected.bin" size="2097152" crc="6f91b33c" sha1="d117b85ba12f5148808be65d2d25690935dfc9f4"/>
 			</dataarea>
 		</part>

@@ -1244,8 +1244,18 @@ void md_rom_smw64_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 }
 
 /*-------------------------------------------------
- TC2000
+ TC2000 / TRUCO 96
  -------------------------------------------------*/
+
+void md_rom_tc2000_device::device_start()
+{
+	save_item(NAME(m_retvalue));
+}
+
+void md_rom_tc2000_device::device_reset()
+{
+	m_retvalue = 0;
+}
 
 uint16_t md_rom_tc2000_device::read(offs_t offset)
 {
@@ -1256,20 +1266,9 @@ uint16_t md_rom_tc2000_device::read(offs_t offset)
 	else
 	{
 		// this works for game boot and starting a game, are there any further checks?
-		uint16_t retvalue = 0x0000;
+		logerror("protection read at offset %08x returning %04x\n", offset*2, m_retvalue);
 
-		if (((offset * 2) & 0xf) == 0x4)
-		{
-			retvalue = 0x5000;
-		}
-		else if (((offset * 2) & 0xf) == 0x8)
-		{
-			retvalue = 0xa000;
-		}
-		
-		logerror("protection read at offset %08x returning %04x\n", offset*2, retvalue);
-
-		return retvalue;
+		return m_retvalue;
 	}
 }
 
@@ -1281,7 +1280,20 @@ void md_rom_tc2000_device::write(offs_t offset, uint16_t data, uint16_t mem_mask
 	}
 	else
 	{
-		logerror("unhandled write at offset %08x %04x %04x\n", offset*2, data, mem_mask);
+		if (((offset * 2) & 0xf) == 0x0) // truco96a uses this case
+		{
+			m_retvalue = 0x0000;
+		}
+		else if (((offset * 2) & 0xf) == 0x8)
+		{
+			m_retvalue = 0x5000;
+		}
+		else if (((offset * 2) & 0xf) == 0xc)
+		{
+			m_retvalue = 0xa000;
+		}
+
+		logerror("protection write at offset %08x %04x %04x\n", offset*2, data, mem_mask);
 	}
 }
 

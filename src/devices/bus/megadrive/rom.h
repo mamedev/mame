@@ -494,6 +494,14 @@ public:
 	// reading and writing
 	virtual uint16_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	uint16_t m_retvalue;
 };
 
 
