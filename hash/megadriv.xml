@@ -2748,7 +2748,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 <!-- Only Euro is confirmed -->
 	<software name="fatfury">
-		<description>Fatal Fury (Euro, Kor)</description>
+		<description>Fatal Fury - King of Fighters (Euro, Kor)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -2763,7 +2763,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 
 	<software name="fatfuryu" cloneof="fatfury">
-		<description>Fatal Fury (USA)</description>
+		<description>Fatal Fury - King of Fighters (USA)</description>
 		<year>1993</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -17289,7 +17289,7 @@ but dumps still have to be confirmed.
 
 	<software name="jellyboy">
 		<description>Jelly Boy (Euro, Prototype)</description>
-		<year>199?</year>
+		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -27218,7 +27218,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="tecmow92">
+	<software name="tecmow92" cloneof="tecmowc">
 		<description>Tecmo World Cup '92 (Jpn)</description>
 		<year>1992</year>
 		<publisher>Sims</publisher>
@@ -27234,8 +27234,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="tecmowc">
 		<description>Tecmo World Cup (USA)</description>
-		<year>1990</year>
-		<publisher>Tecmo</publisher>
+		<year>1992</year>
+		<publisher>Sims</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">
 				<rom name="tecmo world cup (usa).bin" size="262144" crc="caf8eb2c" sha1="53e47c40ac550c334147482610b3465fe9f6a535"/>
