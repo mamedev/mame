@@ -38,6 +38,8 @@ void harddriv_state::device_start()
 {
 	m_lamps.resolve();
 
+	m_xsdp_sport1_irq_off_callback.enregister(*this, FUNC(harddriv_state::xsdp_sport1_irq_off_callback));
+
 	/* predetermine memory regions */
 	m_adsp_pgm_memory_word = (uint16_t *)(reinterpret_cast<uint8_t *>(m_adsp_pgm_memory.target()) + 1);
 
@@ -46,7 +48,7 @@ void harddriv_state::device_start()
 }
 
 
-void  harddriv_state::device_reset()
+void harddriv_state::device_reset()
 {
 	/* halt several of the DSPs to start */
 	m_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -1334,7 +1336,7 @@ void harddriv_state::hdds3sdsp_serial_tx_callback(uint32_t data)
 	m_ds3sdsp_sdata = data;
 
 	m_ds3xdsp->set_input_line(ADSP2105_SPORT1_RX, ASSERT_LINE);
-	machine().scheduler().timer_set(attotime::from_nsec(200), timer_expired_delegate(FUNC(harddriv_state::xsdp_sport1_irq_off_callback), this));
+	m_xsdp_sport1_irq_off_callback.call_after(attotime::from_nsec(200));
 }
 
 

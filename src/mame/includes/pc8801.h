@@ -247,6 +247,7 @@ private:
 	DECLARE_MACHINE_RESET(pc8801_cdrom);
 	INTERRUPT_GEN_MEMBER(pc8801_vrtc_irq);
 	TIMER_CALLBACK_MEMBER(pc8801fd_upd765_tc_to_zero);
+	emu_timer_cb m_pc8801fd_upd765_tc_to_zero;
 	TIMER_DEVICE_CALLBACK_MEMBER(pc8801_rtc_irq);
 	uint8_t cpu_8255_c_r();
 	void cpu_8255_c_w(uint8_t data);

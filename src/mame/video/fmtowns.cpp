@@ -1488,7 +1488,7 @@ INTERRUPT_GEN_MEMBER(towns_state::towns_vsync_irq)
 	m_pic_slave->ir3_w(1);  // IRQ11 = VSync
 	if(IRQ_LOG) logerror("PIC: IRQ11 (VSync) set high\n");
 	m_video.towns_vblank_flag = 1;
-	machine().scheduler().timer_set(m_screen->time_until_vblank_end(), timer_expired_delegate(FUNC(towns_state::towns_vblank_end),this));
+	m_towns_vblank_end.call_after(m_screen->time_until_vblank_end());
 	if(m_video.towns_tvram_enable)
 		draw_text_layer();
 	if(m_video.towns_sprite_reg[1] & 0x80)
@@ -1500,6 +1500,7 @@ void towns_state::video_start()
 	m_video.towns_vram_wplane = 0x00;
 	m_video.towns_sprite_page = 0;
 	m_video.sprite_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_sprite_done),this));
+	m_towns_vblank_end.enregister(*this, FUNC(towns_state::towns_vblank_end));
 }
 
 uint32_t towns_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

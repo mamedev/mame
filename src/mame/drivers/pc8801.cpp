@@ -1632,7 +1632,7 @@ uint8_t pc8801_state::upd765_tc_r()
 	m_fdc->tc_w(true);
 	//TODO: I'm not convinced that this works correctly with current hook-up ... 1000 usec is needed by Aploon, a bigger value breaks Alpha.
 	//OTOH, 50 seems more than enough for the new upd...
-	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(pc8801_state::pc8801fd_upd765_tc_to_zero),this));
+	m_pc8801fd_upd765_tc_to_zero.call_after(attotime::from_usec(50));
 	return 0xff; // value is meaningless
 }
 
@@ -2153,6 +2153,8 @@ void pc8801_state::machine_start()
 	m_n88rom = memregion("n88rom")->base();
 	m_kanji_rom = memregion("kanji")->base();
 	m_cg_rom = memregion("cgrom")->base();
+
+	m_pc8801fd_upd765_tc_to_zero.enregister(*this, FUNC(pc8801_state::pc8801fd_upd765_tc_to_zero));
 
 	save_pointer(NAME(m_work_ram), 0x10000);
 	save_pointer(NAME(m_hi_work_ram), 0x1000);

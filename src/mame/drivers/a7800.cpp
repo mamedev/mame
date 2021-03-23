@@ -139,6 +139,7 @@ protected:
 	void a7800_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(maria_startdma);
+	emu_timer_cb m_maria_startdma;
 	uint8_t riot_joystick_r();
 	uint8_t riot_console_button_r();
 	void riot_button_pullup_w(uint8_t data);
@@ -276,7 +277,7 @@ void a7800_state::tia_w(offs_t offset, uint8_t data)
 TIMER_DEVICE_CALLBACK_MEMBER(a7800_state::interrupt)
 {
 	// DMA Begins 7 cycles after hblank
-	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(7), timer_expired_delegate(FUNC(a7800_state::maria_startdma), this));
+	m_maria_startdma.call_after(m_maincpu->cycles_to_attotime(7));
 	m_maria->interrupt(m_lines);
 }
 

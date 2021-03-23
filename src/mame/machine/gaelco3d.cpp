@@ -216,6 +216,8 @@ void gaelco_serial_device::device_start()
 	m_sync_timer->adjust(attotime::zero,0,attotime::from_hz(SYNC_FREQ));
 #endif
 
+	m_set_status_cb.enregister(*this, FUNC(gaelco_serial_device::set_status_cb));
+
 	m_os_shmem = osd_sharedmem_alloc(PATH_NAME, 0, sizeof(shmem_t));
 	if (m_os_shmem == nullptr)
 	{
@@ -274,7 +276,7 @@ TIMER_CALLBACK_MEMBER( gaelco_serial_device::set_status_cb )
 
 void gaelco_serial_device::set_status(uint8_t mask, uint8_t set, int wait)
 {
-	machine().scheduler().timer_set(attotime::from_hz(wait), timer_expired_delegate(FUNC(gaelco_serial_device::set_status_cb), this), (mask << 8)|set);
+	m_set_status_cb.call_after(attotime::from_hz(wait), (mask << 8) | set);
 }
 
 void gaelco_serial_device::process_in()

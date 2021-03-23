@@ -1537,21 +1537,21 @@ TIMER_CALLBACK_MEMBER( thomson_state::ans3 )
 {
 	LOG(( "%f ans3\n", machine().time().as_double() ));
 	m_mc6854->set_cts( 1 );
-	machine().scheduler().timer_set( attotime::from_usec( 100 ), timer_expired_delegate(FUNC(thomson_state::ans4),this));
+	m_ans4.call_after(attotime::from_usec( 100 ));
 }
 
 TIMER_CALLBACK_MEMBER( thomson_state::ans2 )
 {
 	LOG(( "%f ans2\n", machine().time().as_double() ));
 	m_mc6854->set_cts( 0 );
-	machine().scheduler().timer_set( attotime::from_usec( 100 ), timer_expired_delegate(FUNC(thomson_state::ans3),this));
+	m_ans3.call_after(attotime::from_usec( 100 ));
 }
 
 TIMER_CALLBACK_MEMBER( thomson_state::ans )
 {
 	LOG(( "%f ans\n", machine().time().as_double() ));
 	m_mc6854->set_cts( 1 );
-	machine().scheduler().timer_set( attotime::from_usec( 100 ), timer_expired_delegate(FUNC(thomson_state::ans2),this));
+	m_ans2.call_after(attotime::from_usec( 100 ));
 }
 /* consigne DKBOOT
 
@@ -1592,7 +1592,7 @@ void thomson_state::to7_network_got_frame(uint8_t *data, int length)
 	if ( data[1] == 0xff )
 	{
 		LOG(( "to7_network_got_frame: %i phones %i\n", data[2], data[0] ));
-		machine().scheduler().timer_set( attotime::from_usec( 100 ), timer_expired_delegate(FUNC(thomson_state::ans), this));
+		m_ans.call_after(attotime::from_usec( 100 ));
 		m_mc6854->set_cts( 0 );
 	}
 	else if ( ! data[1] )
@@ -1616,6 +1616,11 @@ void thomson_state::to7_network_init()
 {
 	LOG(( "to7_network_init: NR 07-005 network extension\n" ));
 	logerror( "to7_network_init: network not handled!\n" );
+
+	m_ans.enregister(*this, FUNC(thomson_state::ans));
+	m_ans2.enregister(*this, FUNC(thomson_state::ans2));
+	m_ans3.enregister(*this, FUNC(thomson_state::ans3));
+	m_ans4.enregister(*this, FUNC(thomson_state::ans4));
 }
 
 

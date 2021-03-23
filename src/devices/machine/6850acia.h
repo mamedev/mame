@@ -54,6 +54,7 @@ private:
 	void output_irq(int irq);
 
 	TIMER_CALLBACK_MEMBER(delayed_output_irq);
+	emu_timer_cb m_delayed_output_irq;
 
 	enum
 	{

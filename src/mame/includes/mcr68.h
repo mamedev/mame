@@ -54,7 +54,7 @@ public:
 	void init_archrivlb();
 
 protected:
-	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	virtual void video_start() override;
 
 private:
@@ -74,7 +74,8 @@ private:
 	attotime m_timing_factor;
 	uint8_t m_sprite_clip;
 	int8_t m_sprite_xoffset;
-	timer_expired_delegate m_v493_callback;
+	emu_timer_cb m_493_callback;
+	emu_timer_cb m_493_off_callback;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	void xenophobe_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

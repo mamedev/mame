@@ -330,6 +330,13 @@ public:
 	TIMER_CALLBACK_MEMBER(transfer_punch_through_list_irq);
 	TIMER_CALLBACK_MEMBER(pvr_dma_irq);
 
+	emu_timer_cb m_pvr_dma_irq;
+	emu_timer_cb m_transfer_opaque_list_irq;
+	emu_timer_cb m_transfer_opaque_modifier_volume_list_irq;
+	emu_timer_cb m_transfer_translucent_list_irq;
+	emu_timer_cb m_transfer_translucent_modifier_volume_list_irq;
+	emu_timer_cb m_transfer_punch_through_list_irq;
+
 	void pvr_dma_execute(address_space &space);
 	void pvr_scanline_timer(int vpos);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

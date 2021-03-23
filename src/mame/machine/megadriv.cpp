@@ -626,7 +626,7 @@ void md_base_state::megadriv_68k_req_z80_bus(offs_t offset, uint16_t data, uint1
 
 	/* If the z80 is running, sync the z80 execution state */
 	if (!m_genz80.z80_is_reset)
-		machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(md_base_state::megadriv_z80_run_state),this));
+		m_megadriv_z80_run_state.synchronize();
 }
 
 void md_base_state::megadriv_68k_req_z80_reset(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -670,7 +670,7 @@ void md_base_state::megadriv_68k_req_z80_reset(offs_t offset, uint16_t data, uin
 			m_genz80.z80_is_reset = 1;
 		}
 	}
-	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(md_base_state::megadriv_z80_run_state),this));
+	m_megadriv_z80_run_state.synchronize();
 }
 
 
@@ -797,6 +797,8 @@ void md_base_state::machine_start()
 	m_io_pad_3b[2] = ioport("IN0");
 	m_io_pad_3b[3] = ioport("UNK");
 
+	m_megadriv_z80_run_state.enregister(*this, FUNC(md_base_state::megadriv_z80_run_state));
+
 	save_item(NAME(m_io_stage));
 	save_item(NAME(m_megadrive_io_data_regs));
 	save_item(NAME(m_megadrive_io_ctrl_regs));
@@ -814,7 +816,7 @@ void md_base_state::machine_reset()
 		m_genz80.z80_has_bus = 1;
 		m_genz80.z80_bank_addr = 0;
 		m_vdp->set_scanline_counter(-1);
-		machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(md_base_state::megadriv_z80_run_state),this));
+		m_megadriv_z80_run_state.synchronize();
 	}
 
 	megadrive_reset_io();

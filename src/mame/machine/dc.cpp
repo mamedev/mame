@@ -231,7 +231,7 @@ void dc_state::g2_dma_execute(address_space &space, int channel)
 	m_g2_dma[channel].flag = (m_g2_dma[channel].indirect & 1) ? 1 : 0;
 	/* Note: if you trigger an instant DMA IRQ trigger, sfz3upper doesn't play any bgm. */
 	/* TODO: timing of this */
-	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(m_g2_dma[channel].size / 4), timer_expired_delegate(FUNC(dc_state::g2_dma_irq), this), channel);
+	m_g2_dma_irq.call_after(m_maincpu->cycles_to_attotime(m_g2_dma[channel].size / 4), channel);
 }
 
 // register decode helpers
@@ -441,7 +441,7 @@ void dc_state::dc_sysctrl_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 					dc_sysctrl_regs[SB_C2DSTAT]=address+ddtdata.length;
 
 				/* TODO: timing is a guess */
-				machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(ddtdata.length/4), timer_expired_delegate(FUNC(dc_state::ch2_dma_irq),this));
+				m_ch2_dma_irq.call_after(m_maincpu->cycles_to_attotime(ddtdata.length/4));
 			}
 			break;
 
@@ -656,6 +656,9 @@ void dc_state::machine_start()
 
 	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY | SH2DRC_STRICT_PCREL);
 	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0cffffff, false, dc_ram);
+
+	m_g2_dma_irq.enregister(*this, FUNC(dc_state::g2_dma_irq));
+	m_ch2_dma_irq.enregister(*this, FUNC(dc_state::ch2_dma_irq));
 
 	// save states
 	save_pointer(NAME(dc_sysctrl_regs), 0x200/4);

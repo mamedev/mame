@@ -110,7 +110,7 @@ public:
 	uint32_t zeus2_r(offs_t offset);
 	void zeus2_w(offs_t offset, uint32_t data);
 	TIMER_CALLBACK_MEMBER(display_irq_off);
-	timer_expired_registered_delegate m_display_irq_off;
+	emu_timer_cb m_display_irq_off;
 	TIMER_CALLBACK_MEMBER(display_irq);
 
 	auto vblank_callback() { return m_vblank.bind(); }

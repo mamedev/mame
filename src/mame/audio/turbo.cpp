@@ -12,9 +12,6 @@
 #include "speaker.h"
 
 
-#define DISCRETE_TEST (0)
-
-
 
 /*************************************
  *
@@ -38,34 +35,6 @@ void turbo_state::turbo_update_samples()
 }
 
 
-#if (DISCRETE_TEST)
-
-TIMER_CALLBACK_MEMBER(turbo_state::update_sound_a)
-{
-	discrete_device *discrete = machine.device<discrete_device>("discrete");
-	int data = param;
-
-	/* missing short crash sample, but I've never seen it triggered */
-	discrete->write(0, !(data & 0x01));
-	discrete->write(1, (data >> 1) & 1);
-	discrete->write(2, (data >> 2) & 1);
-	discrete->write(3, (data >> 3) & 1);
-	discrete->write(4, (data >> 4) & 1);
-	discrete->write(5, !(data & 0x20));
-	discrete->write(6, !(data & 0x40));
-
-if (!((data >> 1) & 1)) osd_printf_debug("/TRIG1\n");
-if (!((data >> 2) & 1)) osd_printf_debug("/TRIG2\n");
-if (!((data >> 3) & 1)) osd_printf_debug("/TRIG3\n");
-if (!((data >> 4) & 1)) osd_printf_debug("/TRIG4\n");
-
-//  osel = (osel & 6) | ((data >> 5) & 1);
-//  turbo_update_samples(samples);
-}
-#endif
-
-
-
 /*************************************
  *
  *  Turbo PPI write handlers
@@ -74,14 +43,8 @@ if (!((data >> 4) & 1)) osd_printf_debug("/TRIG4\n");
 
 void turbo_state::turbo_sound_a_w(u8 data)
 {
-#if (!DISCRETE_TEST)
-#endif
-#if (!DISCRETE_TEST)
 	uint8_t diff = data ^ m_sound_state[0];
-#endif
 	m_sound_state[0] = data;
-
-#if (!DISCRETE_TEST)
 
 	/* /CRASH.S: channel 0 */
 	if ((diff & 0x01) && !(data & 0x01)) m_samples->start(0, 5);
@@ -109,17 +72,6 @@ void turbo_state::turbo_sound_a_w(u8 data)
 
 	/* update any samples */
 	turbo_update_samples();
-
-#else
-
-	if (((data ^ m_last_sound_a) & 0x1e) && (m_last_sound_a & 0x1e) != 0x1e)
-		machine().scheduler().timer_set(attotime::from_hz(20000), FUNC(update_sound_a), data);
-	else
-		update_sound_a(data);
-
-	m_last_sound_a = data;
-
-#endif
 }
 
 

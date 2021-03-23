@@ -1011,7 +1011,7 @@ void vk100_state::init_vk100()
 	//m_i8251_rx_timer = timer_alloc(TID_I8251_RX);
 	//m_i8251_tx_timer = timer_alloc(TID_I8251_TX);
 	//m_i8251_sync_timer = timer_alloc(TID_SYNC);
-	//machine().scheduler().timer_set(attotime::from_hz(10000), FUNC(i8251_rx_clk));
+	//m_i8251_rx_clk.call_after(attotime::from_hz(10000), FUNC(i8251_rx_clk));
 }
 
 void vk100_state::video_start()

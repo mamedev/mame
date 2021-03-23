@@ -227,6 +227,7 @@ private:
 	INTERRUPT_GEN_MEMBER(lisa_interrupt);
 	TIMER_CALLBACK_MEMBER(handle_mouse);
 	TIMER_CALLBACK_MEMBER(read_COPS_command);
+	emu_timer_cb m_read_COPS_command;
 	TIMER_CALLBACK_MEMBER(set_COPS_ready);
 	void COPS_via_out_a(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(COPS_via_out_ca2);

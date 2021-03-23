@@ -101,6 +101,12 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
 
+protected:
+	virtual void machine_start() override
+	{
+		m_clear_load.enregister(*this, FUNC(tm990189_state::clear_load));
+	}
+
 private:
 	uint8_t video_vdp_r(offs_t offset);
 	void video_vdp_w(offs_t offset, uint8_t data);
@@ -154,6 +160,7 @@ private:
 	void digitsel(int offset, bool state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_callback);
+	emu_timer_cb m_clear_load;
 	TIMER_CALLBACK_MEMBER(clear_load);
 	void hold_load();
 
@@ -241,7 +248,7 @@ void tm990189_state::hold_load()
 {
 	m_load_state = true;
 	m_tms9980a->set_input_line(INT_9980A_LOAD, ASSERT_LINE);
-	machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(tm990189_state::clear_load),this));
+	m_clear_load.call_after(attotime::from_msec(100));
 }
 
 /*

@@ -160,7 +160,7 @@ void device_execute_interface::spin_until_time(const attotime &duration)
 	suspend_until_trigger(TRIGGER_SUSPENDTIME + timetrig, true);
 
 	// then set a timer for it
-	m_scheduler->timer_set(duration, timer_expired_delegate(FUNC(device_execute_interface::timed_trigger_callback),this), TRIGGER_SUSPENDTIME + timetrig);
+	m_timed_trigger_callback.call_after(duration, TRIGGER_SUSPENDTIME + timetrig);
 	timetrig = (timetrig + 1) % 256;
 }
 
@@ -383,7 +383,11 @@ void device_execute_interface::interface_pre_start()
 
 	// allocate timers if we need them
 	if (m_timed_interrupt_period != attotime::zero)
-		m_timedint_timer = m_scheduler->timer_alloc(timer_expired_delegate(FUNC(device_execute_interface::trigger_periodic_interrupt), this));
+		m_timedint_timer = interface_timer_alloc(*this, FUNC(device_execute_interface::trigger_periodic_interrupt));
+
+	m_irq_pulse_clear.enregister_interface(*this, FUNC(device_execute_interface::irq_pulse_clear));
+	m_timed_trigger_callback.enregister_interface(*this, FUNC(device_execute_interface::timed_trigger_callback));
+	m_empty_event_queue.enregister_interface(*this, FUNC(device_execute_interface::empty_event_queue));
 }
 
 
@@ -602,7 +606,7 @@ void device_execute_interface::pulse_input_line(int irqline, const attotime &dur
 		set_input_line(irqline, ASSERT_LINE);
 
 		attotime target_time = local_time() + duration;
-		m_scheduler->timer_set(target_time - m_scheduler->time(), timer_expired_delegate(FUNC(device_execute_interface::irq_pulse_clear), this), irqline);
+		m_irq_pulse_clear.call_after(target_time - m_scheduler->time(), irqline);
 	}
 }
 
@@ -669,7 +673,7 @@ if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linen
 	if (event_index >= std::size(m_queue))
 	{
 		m_qindex--;
-		empty_event_queue(nullptr,0);
+		empty_event_queue();
 		event_index = m_qindex++;
 		m_execute->device().logerror("Exceeded pending input line event queue on device '%s'!\n", m_execute->device().tag());
 	}
@@ -683,7 +687,7 @@ if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linen
 
 		// if this is the first one, set the timer
 		if (event_index == 0)
-			m_execute->scheduler().synchronize(timer_expired_delegate(FUNC(device_execute_interface::device_input::empty_event_queue),this));
+			m_execute->synchronize_event_queue(m_linenum);
 	}
 }
 
@@ -692,7 +696,7 @@ if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linen
 //  empty_event_queue - empty our event queue
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER(device_execute_interface::device_input::empty_event_queue)
+void device_execute_interface::device_input::empty_event_queue()
 {
 if (TEMPLOG) printf("empty_queue(%s,%d,%d)\n", m_execute->device().tag(), m_linenum, m_qindex);
 	// loop over all events

@@ -112,6 +112,8 @@ void acia6850_device::device_start()
 	m_rts_handler.resolve_safe();
 	m_irq_handler.resolve_safe();
 
+	m_delayed_output_irq.enregister(*this, FUNC(acia6850_device::delayed_output_irq));
+
 	save_item(NAME(m_status));
 	save_item(NAME(m_tdr));
 	save_item(NAME(m_rdr));
@@ -608,7 +610,7 @@ void acia6850_device::output_irq(int irq)
 	{
 		m_irq = irq;
 
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(acia6850_device::delayed_output_irq), this), irq);
+		m_delayed_output_irq.synchronize(irq);
 	}
 }
 

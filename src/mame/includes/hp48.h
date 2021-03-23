@@ -105,7 +105,9 @@ private:
 	uint8_t bank_r(offs_t offset);
 	void hp49_bank_w(offs_t offset, uint8_t data);
 	TIMER_CALLBACK_MEMBER(rs232_byte_recv_cb);
+	emu_timer_cb m_rs232_byte_recv_cb;
 	TIMER_CALLBACK_MEMBER(rs232_byte_sent_cb);
+	emu_timer_cb m_rs232_byte_sent_cb;
 	TIMER_CALLBACK_MEMBER(kbd_cb);
 	TIMER_CALLBACK_MEMBER(timer1_cb);
 	TIMER_CALLBACK_MEMBER(timer2_cb);

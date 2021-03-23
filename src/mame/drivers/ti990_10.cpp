@@ -93,6 +93,10 @@ public:
 	void ti990_10(machine_config &config);
 
 protected:
+	virtual void machine_start() override
+	{
+		m_clear_load.enregister(*this, FUNC(ti990_10_state::clear_load));
+	}
 	virtual void machine_reset() override;
 
 private:
@@ -105,6 +109,7 @@ private:
 	void ti990_panel_write(uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(clear_load);
+	emu_timer_cb m_clear_load;
 
 	void ti990_hold_load();
 	void ti990_set_int_line(int line, int state);
@@ -160,7 +165,7 @@ TIMER_CALLBACK_MEMBER(ti990_10_state::clear_load)
 void ti990_10_state::ti990_hold_load()
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(ti990_10_state::clear_load),this));
+	m_clear_load.call_after(attotime::from_msec(100));
 }
 
 /*

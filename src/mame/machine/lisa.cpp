@@ -558,7 +558,7 @@ TIMER_CALLBACK_MEMBER(lisa_state::set_COPS_ready)
 	m_via0->write_pb6(m_COPS_Ready);
 
 	/* impulsion width : +/- 20us */
-	machine().scheduler().timer_set(attotime::from_usec(20), timer_expired_delegate(FUNC(lisa_state::read_COPS_command),this));
+	m_read_COPS_command.call_after(attotime::from_usec(20));
 }
 
 void lisa_state::reset_COPS()
@@ -939,6 +939,8 @@ void lisa_state::machine_start()
 	/* read command every ms (don't know the real value) */
 	m_cops_ready_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lisa_state::set_COPS_ready), this));
 	m_cops_ready_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+
+	m_read_COPS_command.enregister(*this, FUNC(lisa_state::read_COPS_command));
 
 	m_nvram->set_base(m_fdc_ram, 1024);
 

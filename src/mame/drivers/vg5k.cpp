@@ -108,6 +108,7 @@ private:
 	uint8_t cassette_r();
 	void cassette_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER(z80_irq_clear);
+	emu_timer_cb m_z80_irq_clear;
 	TIMER_DEVICE_CALLBACK_MEMBER(z80_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(vg5k_scanline);
 	void vg5k_io(address_map &map);
@@ -334,7 +335,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(vg5k_state::z80_irq)
 {
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 
-	machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(vg5k_state::z80_irq_clear),this));
+	m_z80_irq_clear.call_after(attotime::from_usec(100));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(vg5k_state::vg5k_scanline)
@@ -353,6 +354,8 @@ INPUT_CHANGED_MEMBER(vg5k_state::delta_button)
 
 void vg5k_state::machine_start()
 {
+	m_z80_irq_clear.enregister(*this, FUNC(vg5k_state::z80_irq_clear));
+
 	save_item(NAME(m_ef9345_offset));
 	save_item(NAME(m_printer_latch));
 	save_item(NAME(m_printer_signal));

@@ -162,6 +162,8 @@ private:
 	void on_machine_frame();
 
 	void resume(void *ptr, int nparam);
+	emu_timer_cb m_resume;
+
 	void register_function(sol::function func, const char *id);
 	int enumerate_functions(const char *id, std::function<bool(const sol::protected_function &func)> &&callback);
 	bool execute_function(const char *id);

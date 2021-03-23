@@ -354,9 +354,13 @@ private:
 	uint8_t to7_5p14sd_r(offs_t offset);
 	void to7_5p14sd_w(offs_t offset, uint8_t data);
 	TIMER_CALLBACK_MEMBER( ans4 );
+	emu_timer_cb m_ans4;
 	TIMER_CALLBACK_MEMBER( ans3 );
+	emu_timer_cb m_ans3;
 	TIMER_CALLBACK_MEMBER( ans2 );
+	emu_timer_cb m_ans2;
 	TIMER_CALLBACK_MEMBER( ans );
+	emu_timer_cb m_ans;
 	uint8_t to7_network_r(offs_t offset);
 	void to7_network_w(offs_t offset, uint8_t data);
 	uint8_t to7_floppy_r(offs_t offset);

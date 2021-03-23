@@ -191,6 +191,7 @@ protected:
 	void hdds3_xdsp_control_w(offs_t offset, uint16_t data);
 
 	TIMER_CALLBACK_MEMBER( xsdp_sport1_irq_off_callback );
+	emu_timer_cb m_xsdp_sport1_irq_off_callback;
 
 	uint16_t hdgsp_control_lo_r(offs_t offset);
 	void hdgsp_control_lo_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

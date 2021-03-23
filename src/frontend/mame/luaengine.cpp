@@ -637,6 +637,8 @@ bool lua_engine::on_missing_mandatory_image(const std::string &instance_name)
 
 void lua_engine::attach_notifiers()
 {
+	m_resume.enregister(machine().scheduler(), timer_expired_delegate(FUNC(lua_engine::resume), this));
+
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&lua_engine::on_machine_prestart, this), true);
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&lua_engine::on_machine_start, this));
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&lua_engine::on_machine_stop, this));
@@ -794,7 +796,7 @@ void lua_engine::initialize()
 				if (ret == 1)
 					return luaL_error(L, "cannot wait from outside coroutine");
 				int ref = luaL_ref(L, LUA_REGISTRYINDEX);
-				engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), ref);
+				engine->m_resume.call_after(attotime::from_double(lua_tonumber(L, 1)), ref);
 				return lua_yield(L, 0);
 			});
 	emu["lang_translate"] = &lang_translate;

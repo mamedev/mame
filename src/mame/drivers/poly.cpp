@@ -196,6 +196,7 @@ INPUT_PORTS_END
 void poly_state::machine_start()
 {
 	m_dat_bank = 0;
+	m_set_protect.enregister(*this, FUNC(poly_state::set_protect));
 }
 
 

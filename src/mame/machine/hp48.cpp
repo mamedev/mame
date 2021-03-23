@@ -108,7 +108,7 @@ void hp48_state::rs232_start_recv_byte(uint8_t data)
 	}
 
 	/* schedule end of reception */
-	machine().scheduler().timer_set(RS232_DELAY, timer_expired_delegate(FUNC(hp48_state::rs232_byte_recv_cb),this), data);
+	m_rs232_byte_recv_cb.call_after(RS232_DELAY, data);
 }
 
 
@@ -137,7 +137,7 @@ void hp48_state::rs232_send_byte()
 	m_io[0x12] |= 3;
 
 	/* schedule transmission */
-	machine().scheduler().timer_set(RS232_DELAY, timer_expired_delegate(FUNC(hp48_state::rs232_byte_sent_cb),this), data);
+	m_rs232_byte_sent_cb.call_after(RS232_DELAY, data);
 }
 
 
@@ -984,6 +984,9 @@ void hp48_state::base_machine_start(hp48_models model)
 	/* 1ms keyboard polling */
 	m_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp48_state::kbd_cb), this));
 	m_kbd_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+
+	m_rs232_byte_recv_cb.enregister(*this, FUNC(hp48_state::rs232_byte_recv_cb));
+	m_rs232_byte_sent_cb.enregister(*this, FUNC(hp48_state::rs232_byte_sent_cb));
 
 	m_lshift0.resolve();
 	m_rshift0.resolve();

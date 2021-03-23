@@ -42,19 +42,29 @@ static timer_expired_delegate const s_dummy_delegate(FUNC(dummy_delegate));
 
 
 //**************************************************************************
-//  TIMER EXPIRED REGISTERED DELEGATE
+//  EMU TIMER CB
 //**************************************************************************
 
-timer_expired_registered_delegate::timer_expired_registered_delegate() :
+emu_timer_cb::emu_timer_cb() :
 	m_scheduler(nullptr),
 	m_next(nullptr)
 {
 }
 
-void timer_expired_registered_delegate::enregister(device_t &device, timer_expired_delegate callback)
+void emu_timer_cb::enregister(device_scheduler &scheduler, timer_expired_delegate callback)
 {
 	if (m_next != nullptr)
-		throw emu_fatalerror("Attempted to re-enregister a timer_expired_registered_delegate");
+		throw emu_fatalerror("Attempted to re-enregister a emu_timer_cb");
+	m_callback = callback;
+	m_scheduler = &scheduler;
+	m_unique_id = m_callback.name();
+	m_scheduler->register_timer_expired(*this);
+}
+
+void emu_timer_cb::enregister(device_t &device, timer_expired_delegate callback)
+{
+	if (m_next != nullptr)
+		throw emu_fatalerror("Attempted to re-enregister a emu_timer_cb");
 	m_callback = callback;
 	m_scheduler = &device.machine().scheduler();
 	m_unique_id = device.tag();
@@ -63,7 +73,19 @@ void timer_expired_registered_delegate::enregister(device_t &device, timer_expir
 	m_scheduler->register_timer_expired(*this);
 }
 
-void timer_expired_registered_delegate::call_after(const attotime &duration, int param) const
+void emu_timer_cb::enregister_interface(device_interface &intf, timer_expired_delegate callback)
+{
+	if (m_next != nullptr)
+		throw emu_fatalerror("Attempted to re-enregister a emu_timer_cb");
+	m_callback = callback;
+	m_scheduler = &intf.device().machine().scheduler();
+	m_unique_id = intf.device().tag();
+	m_unique_id += "/";
+	m_unique_id += m_callback.name();
+	m_scheduler->register_timer_expired(*this);
+}
+
+void emu_timer_cb::call_after(const attotime &duration, int param) const
 {
 	m_scheduler->timer_set(duration, *this, param);
 }
@@ -647,6 +669,8 @@ device_scheduler::device_scheduler(running_machine &machine) :
 	machine.save().save_item(NAME(m_basetime));
 	machine.save().register_presave(save_prepost_delegate(FUNC(device_scheduler::presave), this));
 	machine.save().register_postload(save_prepost_delegate(FUNC(device_scheduler::postload), this));
+
+	m_empty_timer_cb.enregister(*this, FUNC(device_scheduler::empty_timer_cb));
 }
 
 
@@ -925,6 +949,16 @@ void device_scheduler::update_basetime()
 
 
 //-------------------------------------------------
+//  empty_timer_cb - empty callback stub when
+//  timers provide nothing
+//-------------------------------------------------
+
+void device_scheduler::empty_timer_cb(void *ptr, int param)
+{
+}
+
+
+//-------------------------------------------------
 //  abort_timeslice - abort execution for the
 //  current timeslice
 //-------------------------------------------------
@@ -1006,7 +1040,7 @@ void device_scheduler::timer_reclaim_object(emu_timer &timer)
 //  expired callback
 //-------------------------------------------------
 
-void device_scheduler::register_timer_expired(timer_expired_registered_delegate &callback)
+void device_scheduler::register_timer_expired(emu_timer_cb &callback)
 {
 	callback.m_next = m_registered_timers;
 	m_registered_timers = &callback;
@@ -1051,7 +1085,7 @@ void device_scheduler::timer_set(const attotime &duration, timer_expired_delegat
 //  amount of time
 //-------------------------------------------------
 
-void device_scheduler::timer_set(const attotime &duration, timer_expired_registered_delegate const &callback, int param)
+void device_scheduler::timer_set(const attotime &duration, emu_timer_cb const &callback, int param)
 {
 	// temporary timers are implicitly active, so add them directly
 	// to the active list after creation

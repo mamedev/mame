@@ -176,7 +176,7 @@ protected:
 
 	/* callbacks */
 	devcb_write_line m_out_idx_func;
-	timer_expired_registered_delegate m_set_wpt;
+	emu_timer_cb m_set_wpt;
 
 	/* state of input lines */
 	int m_drtn; /* direction */

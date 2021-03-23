@@ -1879,11 +1879,11 @@ void powervr2_device::process_ta_fifo()
 		//printf("%d %d\n",tafifo_listtype,screen().vpos());
 		switch (tafifo_listtype)
 		{
-		case DISPLAY_LIST_OPAQUE: machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_opaque_list_irq), this)); break;
-		case DISPLAY_LIST_OPAQUE_MOD: machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_opaque_modifier_volume_list_irq), this)); break;
-		case DISPLAY_LIST_TRANS: machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_translucent_list_irq), this)); break;
-		case DISPLAY_LIST_TRANS_MOD: machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_translucent_modifier_volume_list_irq), this)); break;
-		case DISPLAY_LIST_PUNCH_THROUGH: machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_punch_through_list_irq), this)); break;
+		case DISPLAY_LIST_OPAQUE: m_transfer_opaque_list_irq.call_after(attotime::from_usec(100)); break;
+		case DISPLAY_LIST_OPAQUE_MOD: m_transfer_opaque_modifier_volume_list_irq.call_after(attotime::from_usec(100)); break;
+		case DISPLAY_LIST_TRANS: m_transfer_translucent_list_irq.call_after(attotime::from_usec(100)); break;
+		case DISPLAY_LIST_TRANS_MOD: m_transfer_translucent_modifier_volume_list_irq.call_after(attotime::from_usec(100)); break;
+		case DISPLAY_LIST_PUNCH_THROUGH: m_transfer_punch_through_list_irq.call_after(attotime::from_usec(100)); break;
 		}
 		tafifo_listtype= DISPLAY_LIST_NONE; // no list being received
 		listtype_used |= (2+8);
@@ -3961,7 +3961,7 @@ void powervr2_device::pvr_dma_execute(address_space &space)
 	}
 	/* Note: do not update the params, since this DMA type doesn't support it. */
 	/* TODO: timing of this */
-	machine().scheduler().timer_set(state->m_maincpu->cycles_to_attotime(m_pvr_dma.size/4), timer_expired_delegate(FUNC(powervr2_device::pvr_dma_irq), this));
+	m_pvr_dma_irq.call_after(state->m_maincpu->cycles_to_attotime(m_pvr_dma.size/4));
 }
 
 powervr2_device::powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -3990,6 +3990,13 @@ void powervr2_device::device_start()
 	endofrender_timer_isp = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_isp),this));
 	endofrender_timer_tsp = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_tsp),this));
 	endofrender_timer_video = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_video),this));
+
+	m_pvr_dma_irq.enregister(*this, FUNC(powervr2_device::pvr_dma_irq));
+	m_transfer_opaque_list_irq.enregister(*this, FUNC(powervr2_device::transfer_opaque_list_irq));
+	m_transfer_opaque_modifier_volume_list_irq.enregister(*this, FUNC(powervr2_device::transfer_opaque_modifier_volume_list_irq));
+	m_transfer_translucent_list_irq.enregister(*this, FUNC(powervr2_device::transfer_translucent_list_irq));
+	m_transfer_translucent_modifier_volume_list_irq.enregister(*this, FUNC(powervr2_device::transfer_translucent_modifier_volume_list_irq));
+	m_transfer_punch_through_list_irq.enregister(*this, FUNC(powervr2_device::transfer_punch_through_list_irq));
 
 	fake_accumulationbuffer_bitmap = std::make_unique<bitmap_rgb32>(2048,2048);
 

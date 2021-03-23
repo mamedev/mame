@@ -143,6 +143,8 @@ private:
 	uint8_t m_video_pa, m_video_pb;
 	uint8_t m_term_data;
 
+	emu_timer_cb m_set_protect;
+
 	inline offs_t physical(offs_t offset);
 
 	int m_dat_bank;

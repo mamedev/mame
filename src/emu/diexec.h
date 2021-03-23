@@ -95,6 +95,7 @@ class device_execute_interface : public device_interface
 {
 	friend class device_scheduler;
 	friend class testcpu_state;
+	friend class device_input;
 
 public:
 	// construction/destruction
@@ -258,6 +259,7 @@ private:
 		void set_state_synced(int state, int vector = USE_STORED_VECTOR);
 		void set_vector(int vector) { m_stored_vector = vector; }
 		int default_irq_callback();
+		void empty_event_queue();
 
 		device_execute_interface *m_execute;// pointer to the execute interface
 		int             m_linenum;          // which input line we are
@@ -267,10 +269,9 @@ private:
 		u8              m_curstate;         // most recently processed state
 		s32             m_queue[32];        // queue of pending events
 		int             m_qindex;           // index within the queue
-
-	private:
-		TIMER_CALLBACK_MEMBER(empty_event_queue);
 	};
+
+	void synchronize_event_queue(int line) { m_empty_event_queue.synchronize(line); }
 
 	// internal debugger hooks
 	void debugger_start_cpu_hook(const attotime &endtime)
@@ -324,11 +325,17 @@ private:
 
 	// callbacks
 	TIMER_CALLBACK_MEMBER(timed_trigger_callback) { trigger(param); }
+	emu_timer_cb m_timed_trigger_callback;
 
 	void on_vblank(screen_device &screen, bool vblank_state);
 
 	TIMER_CALLBACK_MEMBER(trigger_periodic_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_pulse_clear) { set_input_line(int(param), CLEAR_LINE); }
+	emu_timer_cb m_irq_pulse_clear;
+
+	TIMER_CALLBACK_MEMBER(empty_event_queue) { m_input[param].empty_event_queue(); }
+	emu_timer_cb m_empty_event_queue;
+
 	void suspend_resume_changed();
 
 	attoseconds_t minimum_quantum() const;

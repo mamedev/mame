@@ -87,10 +87,8 @@ void zeus2_device::device_start()
 	/* we need to cleanup on exit */
 	//machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&zeus2_device::exit_handler2, this));
 
-	int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zeus2_device::int_timer_callback), this));
-
-	vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zeus2_device::display_irq), this));
-
+	int_timer = timer_alloc(*this, FUNC(zeus2_device::int_timer_callback));
+	vblank_timer = timer_alloc(*this, FUNC(zeus2_device::display_irq));
 	m_display_irq_off.enregister(*this, FUNC(zeus2_device::display_irq_off));
 
 	//printf("%s\n", machine().system().name);

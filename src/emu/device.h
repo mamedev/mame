@@ -608,6 +608,11 @@ public:
 
 	// timer interfaces
 	emu_timer *timer_alloc(device_timer_id id = 0, void *ptr = nullptr);
+	template<typename DeviceType, typename FuncType>
+	emu_timer *timer_alloc(DeviceType &device, FuncType callback, char const *name)
+	{
+		return machine().scheduler().timer_alloc(timer_expired_delegate(callback, name, &device));
+	}
 	void timer_set(const attotime &duration, device_timer_id id = 0, int param = 0);
 	void synchronize(device_timer_id id = 0, int param = 0) { timer_set(attotime::zero, id, param); }
 	void timer_expired(emu_timer &timer, device_timer_id id, int param, void *ptr) { device_timer(timer, id, param, ptr); }
@@ -869,6 +874,13 @@ public:
 	device_t &device() { return m_device; }
 	const device_t &device() const { return m_device; }
 	operator device_t &() { return m_device; }
+
+	// timer helpers
+	template<typename InterfaceType, typename FuncType>
+	emu_timer *interface_timer_alloc(InterfaceType &intf, FuncType callback, char const *name)
+	{
+		return m_device.machine().scheduler().timer_alloc(timer_expired_delegate(callback, name, &intf));
+	}
 
 	// iteration helpers
 	device_interface *interface_next() const { return m_interface_next; }

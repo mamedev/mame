@@ -455,8 +455,11 @@ private:
 	void lions_palette(palette_device &palette) const;
 	uint32_t screen_update_aristmk4(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(note_input_reset);
+	emu_timer_cb m_note_input_reset;
 	TIMER_CALLBACK_MEMBER(coin_input_reset);
+	emu_timer_cb m_coin_input_reset;
 	TIMER_CALLBACK_MEMBER(hopper_reset);
+	emu_timer_cb m_hopper_reset;
 	void power_fail();
 	inline void uBackgroundColour();
 
@@ -634,7 +637,7 @@ uint8_t aristmk4_state::bv_p0()
 	case 0x02:
 		bv_p0_ret=0x89;
 		m_insnote++;
-		machine().scheduler().timer_set(attotime::from_msec(150), timer_expired_delegate(FUNC(aristmk4_state::note_input_reset),this));
+		m_note_input_reset.call_after(attotime::from_msec(150));
 		break;
 	default:
 		break; //timer will reset the input
@@ -834,7 +837,7 @@ uint8_t aristmk4_state::via_b_r()
 	case 0x02:
 		ret=ret^0x20;
 		m_inscrd++;
-		machine().scheduler().timer_set(attotime::from_msec(150), timer_expired_delegate(FUNC(aristmk4_state::coin_input_reset),this));
+		m_coin_input_reset.call_after(attotime::from_msec(150));
 		break;
 	default:
 		break; //timer will reset the input
@@ -846,7 +849,7 @@ uint8_t aristmk4_state::via_b_r()
 	{
 	case 0x00:
 		ret=ret^0x40;
-		machine().scheduler().timer_set(attotime::from_msec(175), timer_expired_delegate(FUNC(aristmk4_state::hopper_reset),this));
+		m_hopper_reset.call_after(attotime::from_msec(175));
 		m_hopper_motor = 0x02;
 		m_hopper_motor_out = 2;
 		break;
@@ -1729,6 +1732,9 @@ void aristmk4_state::machine_start()
 	m_hopper_motor_out.resolve();
 	m_lamps.resolve();
 	m_power_timer = timer_alloc(TIMER_POWER_FAIL);
+	m_note_input_reset.enregister(*this, FUNC(aristmk4_state::note_input_reset));
+	m_hopper_reset.enregister(*this, FUNC(aristmk4_state::hopper_reset));
+	m_coin_input_reset.enregister(*this, FUNC(aristmk4_state::coin_input_reset));
 }
 
 void aristmk4_state::machine_reset()
