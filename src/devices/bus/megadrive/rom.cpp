@@ -63,6 +63,7 @@ DEFINE_DEVICE_TYPE(MD_ROM_RADICA,   md_rom_radica_device,   "md_rom_radica",   "
 DEFINE_DEVICE_TYPE(MD_ROM_BEGGARP,  md_rom_beggarp_device,  "md_rom_beggarp",  "MD Beggar Prince")
 DEFINE_DEVICE_TYPE(MD_ROM_WUKONG,   md_rom_wukong_device,   "md_rom_wukong",   "MD Legend of Wukong")
 DEFINE_DEVICE_TYPE(MD_ROM_STARODYS, md_rom_starodys_device, "md_rom_starodys", "MD Star Odyssey")
+DEFINE_DEVICE_TYPE(MD_ROM_SRAM_ARG96, md_rom_sram_arg96_device, "md_rom_sram_arg96", "MD Futbol Argentino 96")
 
 
 md_std_rom_device::md_std_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -76,9 +77,21 @@ md_std_rom_device::md_std_rom_device(const machine_config &mconfig, const char *
 }
 
 md_rom_sram_device::md_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: md_std_rom_device(mconfig, MD_ROM_SRAM, tag, owner, clock)
+	: md_rom_sram_device(mconfig, MD_ROM_SRAM, tag, owner, clock)
 {
 }
+
+md_rom_sram_device::md_rom_sram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: md_std_rom_device(mconfig, type, tag, owner, clock)
+{
+}
+
+
+md_rom_sram_arg96_device::md_rom_sram_arg96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: md_rom_sram_device(mconfig, MD_ROM_SRAM_ARG96, tag, owner, clock)
+{
+}
+
 
 md_rom_fram_device::md_rom_fram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: md_std_rom_device(mconfig, MD_ROM_FRAM, tag, owner, clock)
@@ -1551,5 +1564,45 @@ void md_rom_starodys_device::write_a13(offs_t offset, uint16_t data)
 
 		if (m_nvram_active)
 			m_nvram_handlers_installed = 1;
+	}
+}
+
+
+/*-------------------------------------------------
+ Futbol Argentino 96 (Argentina)
+ -------------------------------------------------*/
+
+uint16_t md_rom_sram_arg96_device::read(offs_t offset)
+{
+	if (offset < 0x400000 / 2)
+	{
+		return md_rom_sram_device::read(offset);
+	}
+	else
+	{
+		// these return values are probably connected somehow with the writes
+		// but the game only ever looks for these results before doing DMA operations
+		if ((offset * 2) == 0x4c6200)
+			return 0xa;
+		else if ((offset * 2) == 0x4c6600)
+			return 0x9;
+		else if ((offset * 2) == 0x4c6a00)
+			return 0x7;
+		else
+			logerror("unhandled read at offset %08x\n", offset);
+
+		return 0x0000;
+	}
+}
+
+void md_rom_sram_arg96_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (offset < 0x400000/2)
+	{
+		md_rom_sram_device::write(offset, data, mem_mask);
+	}
+	else
+	{
+		logerror("unhandled write at offset %08x %04x %04x\n", offset, data, mem_mask);
 	}
 }

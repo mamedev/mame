@@ -17146,6 +17146,20 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+	<software name="fbarg96" cloneof="jlps2">
+		<description>Futbol Argentino 96 (Argentina) (hack of J. League Pro Striker 2)</description>
+		<year>1996</year>
+		<publisher>bootleg</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram_arg96"/>
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="Futbol Argentino 96 (Argentina) (Unl) (Pirate).md" size="2097152" crc="65071ccc" sha1="097811a4c590c8856314aae1410f7b1d9f4a21e9"/>
+			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>	
+
 	<software name="prostrfs">
 		<description>Pro Striker Final Stage (Jpn)</description>
 		<year>1995</year>

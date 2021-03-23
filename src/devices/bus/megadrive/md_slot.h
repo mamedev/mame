@@ -78,6 +78,7 @@ enum
 	SMOUSE,                      /* Smart Mouse */
 	SOULBLAD,                    /* Soul Blade */
 	SQUIRRELK,                   /* Squirrel King */
+	SRAM_ARG96,					 /* Futbol Argentino 96 (Argentina) (hack of J. League Pro Striker 2) */
 	TEKKENSP,                    /* Tekken Special */
 	TOPFIGHTER,                  /* Top Fighter 2000 MK VIII */
 
