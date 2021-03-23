@@ -56,7 +56,7 @@ void vectrex_base_state::device_timer(emu_timer &timer, device_timer_id id, int 
 		vectrex_imager_change_color(ptr, param);
 		break;
 	case TIMER_UPDATE_LEVEL:
-		update_level(ptr, param);
+		m_imager_pinlevel = param;
 		break;
 	case TIMER_VECTREX_IMAGER_EYE:
 		vectrex_imager_eye(ptr, param);
@@ -71,7 +71,16 @@ void vectrex_base_state::device_timer(emu_timer &timer, device_timer_id id, int 
 		vectrex_zero_integrators(ptr, param);
 		break;
 	case TIMER_UPDATE_SIGNAL:
-		update_signal(ptr, param);
+		update_signal(nullptr, param);
+		break;
+	case TIMER_UPDATE_RAMP:
+		update_signal(&m_ramp, param);
+		break;
+	case TIMER_UPDATE_BLANK:
+		update_signal(&m_blank, param);
+		break;
+	case TIMER_UPDATE_ANALOG:
+		update_signal(&m_analog[param >> 8], param & 0xff);
 		break;
 	default:
 		fatalerror("Unknown id in vectrex_base_state::device_timer");
@@ -230,13 +239,6 @@ TIMER_CALLBACK_MEMBER(vectrex_base_state::vectrex_imager_change_color)
 }
 
 
-TIMER_CALLBACK_MEMBER(vectrex_base_state::update_level)
-{
-	if (ptr)
-		* (uint8_t *) ptr = param;
-}
-
-
 TIMER_CALLBACK_MEMBER(vectrex_base_state::vectrex_imager_eye)
 {
 	int coffset;
@@ -258,7 +260,7 @@ TIMER_CALLBACK_MEMBER(vectrex_base_state::vectrex_imager_eye)
 			m_via6522_0->write_ca1(1);
 			m_via6522_0->write_ca1(0);
 			m_imager_pinlevel |= 0x80;
-			timer_set(attotime::from_double(rtime / 360.0), TIMER_UPDATE_LEVEL, 0, &m_imager_pinlevel);
+			timer_set(attotime::from_double(rtime / 360.0), TIMER_UPDATE_LEVEL);
 		}
 	}
 }

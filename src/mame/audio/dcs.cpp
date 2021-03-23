@@ -794,6 +794,15 @@ void dcs_audio_device::device_start()
 	m_internal_timer = subdevice<timer_device>("dcs_int_timer");
 	m_reg_timer = subdevice<timer_device>("dcs_reg_timer");
 
+	m_dcs_reset.enregister(*this, FUNC(dcs_audio_device::dcs_reset));
+	m_dcs_delayed_data_w_callback.enregister(*this, FUNC(dcs_audio_device::dcs_delayed_data_w_callback));
+	m_latch_delayed_w.enregister(*this, FUNC(dcs_audio_device::latch_delayed_w));
+	m_delayed_ack_w_callback.enregister(*this, FUNC(dcs_audio_device::delayed_ack_w_callback));
+	m_output_control_delayed_w.enregister(*this, FUNC(dcs_audio_device::output_control_delayed_w));
+	m_s1_ack_callback2.enregister(*this, FUNC(dcs_audio_device::s1_ack_callback2));
+	m_s1_ack_callback1.enregister(*this, FUNC(dcs_audio_device::s1_ack_callback1));
+	m_s2_ack_callback.enregister(*this, FUNC(dcs_audio_device::s2_ack_callback));
+
 	/* non-RAM based automatically acks */
 	m_auto_ack = true;
 	/* register for save states */
@@ -889,6 +898,15 @@ void dcs2_audio_device::device_start()
 
 	/* we don't do auto-ack by default */
 	m_auto_ack = false;
+
+	m_dcs_reset.enregister(*this, FUNC(dcs_audio_device::dcs_reset));
+	m_dcs_delayed_data_w_callback.enregister(*this, FUNC(dcs_audio_device::dcs_delayed_data_w_callback));
+	m_latch_delayed_w.enregister(*this, FUNC(dcs_audio_device::latch_delayed_w));
+	m_delayed_ack_w_callback.enregister(*this, FUNC(dcs_audio_device::delayed_ack_w_callback));
+	m_output_control_delayed_w.enregister(*this, FUNC(dcs_audio_device::output_control_delayed_w));
+	m_s1_ack_callback2.enregister(*this, FUNC(dcs_audio_device::s1_ack_callback2));
+	m_s1_ack_callback1.enregister(*this, FUNC(dcs_audio_device::s1_ack_callback1));
+	m_s2_ack_callback.enregister(*this, FUNC(dcs_audio_device::s2_ack_callback));
 
 	/* install the speedup handler */
 	install_speedup();
@@ -1486,7 +1504,7 @@ void dcs_audio_device::reset_w(int state)
 		//      logerror("%s: DCS reset = %d\n", machine().describe_context(), state);
 
 		/* just run through the init code again */
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::dcs_reset),this));
+		m_dcs_reset.synchronize();
 		m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
@@ -1561,7 +1579,7 @@ void dcs_audio_device::data_w(uint16_t data)
 
 	/* if we are DCS1, set a timer to latch the data */
 	if (m_sport0_timer == nullptr)
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::dcs_delayed_data_w_callback),this), data);
+		m_dcs_delayed_data_w_callback.synchronize(data);
 	else
 		dcs_delayed_data_w(data);
 }
@@ -1617,7 +1635,7 @@ void dcs_audio_device::output_latch_w(uint16_t data)
 	if (LOG_DCS_IO)
 		logerror("%s output_latch_w(%04X) (empty=%d)\n", machine().describe_context(), data, IS_OUTPUT_EMPTY());
 
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::latch_delayed_w),this), data>>8);
+	m_latch_delayed_w.synchronize(data>>8);
 }
 
 void dcs_audio_device::output_latch32_w(uint32_t data)
@@ -1626,7 +1644,7 @@ void dcs_audio_device::output_latch32_w(uint32_t data)
 	if (LOG_DCS_IO)
 		logerror("%s output_latch32_w(%04X) (empty=%d)\n", machine().describe_context(), data>>8, IS_OUTPUT_EMPTY());
 
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::latch_delayed_w),this), data>>8);
+	m_latch_delayed_w.synchronize(data>>8);
 }
 
 
@@ -1646,7 +1664,7 @@ void dcs_audio_device::ack_w()
 {
 	if (LOG_DCS_IO)
 		logerror("%s:ack_w\n", machine().describe_context());
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::delayed_ack_w_callback),this));
+	m_delayed_ack_w_callback.synchronize();
 }
 
 
@@ -1686,7 +1704,7 @@ void dcs_audio_device::output_control_w(uint16_t data)
 {
 	if (LOG_DCS_IO)
 		logerror("%s output_control_w = %04X\n", machine().describe_context(), data);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::output_control_delayed_w),this), data);
+	m_output_control_delayed_w.synchronize(data);
 }
 
 
@@ -2210,7 +2228,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::s1_ack_callback2 )
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s1_ack_callback2),this), param);
+		m_s1_ack_callback2.call_after(attotime::from_usec(1), param);
 		return;
 	}
 	output_latch_w(0x000a);
@@ -2222,13 +2240,13 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::s1_ack_callback1 )
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s1_ack_callback1),this), param);
+		m_s1_ack_callback1.call_after(attotime::from_usec(1), param);
 		return;
 	}
 	output_latch_w(param);
 
 	/* chain to the next word we need to write back */
-	machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s1_ack_callback2),this));
+	m_s1_ack_callback2.call_after(attotime::from_usec(1));
 }
 
 
@@ -2346,7 +2364,7 @@ int dcs_audio_device::preprocess_stage_1(uint16_t data)
 
 				/* if we're done, start a timer to send the response words */
 				if (transfer.state == 0)
-					machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s1_ack_callback1),this), transfer.sum);
+					m_s1_ack_callback1.call_after(attotime::from_usec(1), transfer.sum);
 				return 1;
 			}
 			break;
@@ -2360,7 +2378,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::s2_ack_callback )
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s2_ack_callback),this), param);
+		m_s2_ack_callback.call_after(attotime::from_usec(1), param);
 		return;
 	}
 	output_latch_w(param);
@@ -2459,7 +2477,7 @@ int dcs_audio_device::preprocess_stage_2(uint16_t data)
 				/* if we're done, start a timer to send the response words */
 				if (transfer.state == 0)
 				{
-					machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(dcs_audio_device::s2_ack_callback),this), transfer.sum);
+					m_s2_ack_callback.call_after(attotime::from_usec(1), transfer.sum);
 					transfer.watchdog->reset();
 				}
 				return 1;

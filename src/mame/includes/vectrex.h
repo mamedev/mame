@@ -33,7 +33,10 @@ public:
 		TIMER_LIGHTPEN_TRIGGER,
 		TIMER_VECTREX_REFRESH,
 		TIMER_VECTREX_ZERO_INTEGRATORS,
-		TIMER_UPDATE_SIGNAL
+		TIMER_UPDATE_SIGNAL,
+		TIMER_UPDATE_RAMP,
+		TIMER_UPDATE_ANALOG,
+		TIMER_UPDATE_BLANK
 	};
 
 	void vectrex_cart(device_slot_interface &device);
@@ -64,7 +67,6 @@ protected:
 	virtual void video_start() override;
 	uint32_t screen_update_vectrex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(vectrex_imager_change_color);
-	TIMER_CALLBACK_MEMBER(update_level);
 	TIMER_CALLBACK_MEMBER(vectrex_imager_eye);
 	TIMER_CALLBACK_MEMBER(lightpen_trigger);
 	TIMER_CALLBACK_MEMBER(vectrex_refresh);

@@ -230,6 +230,15 @@ protected:
 	uint32_t      m_timer_period;
 	uint32_t      m_timers_fired;
 
+	timer_expired_registered_delegate m_dcs_reset;
+	timer_expired_registered_delegate m_dcs_delayed_data_w_callback;
+	timer_expired_registered_delegate m_latch_delayed_w;
+	timer_expired_registered_delegate m_delayed_ack_w_callback;
+	timer_expired_registered_delegate m_output_control_delayed_w;
+	timer_expired_registered_delegate m_s1_ack_callback2;
+	timer_expired_registered_delegate m_s1_ack_callback1;
+	timer_expired_registered_delegate m_s2_ack_callback;
+
 	std::unique_ptr<uint16_t[]> m_sram;
 	uint16_t m_polling_value;
 	uint32_t m_polling32_value;

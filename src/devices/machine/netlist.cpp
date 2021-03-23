@@ -288,9 +288,7 @@ void netlist_mame_analog_input_device::write(const double val)
 {
 	m_value_for_device_timer = val * m_mult + m_offset;
 	if (m_value_for_device_timer != (*m_param)())
-	{
-		synchronize(0, 0, &m_value_for_device_timer);
-}
+		synchronize(0);
 }
 
 void netlist_mame_analog_input_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -299,7 +297,7 @@ void netlist_mame_analog_input_device::device_timer(emu_timer &timer, device_tim
 #if NETLIST_CREATE_CSV
 	nl_owner().log_add(m_param_name, *((double *) ptr), true);
 #endif
-	m_param->set(*((double *) ptr));
+	m_param->set(m_value_for_device_timer);
 }
 
 void netlist_mame_int_input_device::write(const uint32_t val)

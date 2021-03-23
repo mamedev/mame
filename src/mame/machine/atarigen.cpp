@@ -41,7 +41,7 @@ void atarigen_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	{
 		// unhalt the CPU that was passed as a pointer
 		case TID_UNHALT_CPU:
-			reinterpret_cast<device_t *>(ptr)->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			break;
 	}
 }
@@ -59,6 +59,8 @@ void atarigen_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void atarigen_state::halt_until_hblank_0(device_t &device, screen_device &screen)
 {
+	assert(&device == m_maincpu);
+
 	// halt the CPU until the next HBLANK
 	int hpos = screen.hpos();
 	int width = screen.width();
@@ -70,7 +72,7 @@ void atarigen_state::halt_until_hblank_0(device_t &device, screen_device &screen
 
 	// halt and set a timer to wake up
 	device.execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	timer_set(screen.scan_period() * (hblank - hpos) / width, TID_UNHALT_CPU, 0, (void *)&device);
+	timer_set(screen.scan_period() * (hblank - hpos) / width, TID_UNHALT_CPU);
 }
 
 

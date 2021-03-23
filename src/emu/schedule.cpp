@@ -42,6 +42,35 @@ static timer_expired_delegate const s_dummy_delegate(FUNC(dummy_delegate));
 
 
 //**************************************************************************
+//  TIMER EXPIRED REGISTERED DELEGATE
+//**************************************************************************
+
+timer_expired_registered_delegate::timer_expired_registered_delegate() :
+	m_scheduler(nullptr),
+	m_next(nullptr)
+{
+}
+
+void timer_expired_registered_delegate::enregister(device_t &device, timer_expired_delegate callback)
+{
+	if (m_next != nullptr)
+		throw emu_fatalerror("Attempted to re-enregister a timer_expired_registered_delegate");
+	m_callback = callback;
+	m_scheduler = &device.machine().scheduler();
+	m_unique_id = device.tag();
+	m_unique_id += "/";
+	m_unique_id += m_callback.name();
+	m_scheduler->register_timer_expired(*this);
+}
+
+void timer_expired_registered_delegate::call_after(const attotime &duration, int param) const
+{
+	m_scheduler->timer_set(duration, *this, param);
+}
+
+
+
+//**************************************************************************
 //  EMU TIMER
 //**************************************************************************
 
@@ -122,7 +151,7 @@ inline emu_timer &emu_timer::init_persistent(device_t &device, device_timer_id i
 //  and expiration time from the outset
 //-------------------------------------------------
 
-inline emu_timer &emu_timer::init_temporary(running_machine &machine, timer_expired_delegate callback, void *ptr, int param, attotime const &duration)
+inline emu_timer &emu_timer::init_temporary(running_machine &machine, timer_expired_delegate callback, int param, attotime const &duration)
 {
 	// ensure the entire timer state is clean
 	m_machine = &machine;
@@ -131,7 +160,7 @@ inline emu_timer &emu_timer::init_temporary(running_machine &machine, timer_expi
 	m_start = machine.time();
 	m_expire = m_start + duration;
 	m_period = attotime::never;
-	m_ptr = ptr;
+	m_ptr = nullptr;
 	m_param = param;
 	m_enabled = true;
 	m_temporary = true;
@@ -142,7 +171,7 @@ inline emu_timer &emu_timer::init_temporary(running_machine &machine, timer_expi
 	return *this;
 }
 
-inline emu_timer &emu_timer::init_temporary(device_t &device, device_timer_id id, void *ptr, int param, attotime const &duration)
+inline emu_timer &emu_timer::init_temporary(device_t &device, device_timer_id id, int param, attotime const &duration)
 {
 	// ensure the entire timer state is clean
 	m_machine = &device.machine();
@@ -151,7 +180,7 @@ inline emu_timer &emu_timer::init_temporary(device_t &device, device_timer_id id
 	m_start = m_machine->time();
 	m_expire = m_start + duration;
 	m_period = attotime::never;
-	m_ptr = ptr;
+	m_ptr = nullptr;
 	m_param = param;
 	m_enabled = true;
 	m_temporary = true;
@@ -607,6 +636,7 @@ device_scheduler::device_scheduler(running_machine &machine) :
 	m_execute_list(nullptr),
 	m_basetime(attotime::zero),
 	m_free_timers(nullptr),
+	m_registered_timers(nullptr),
 	m_callback_timer(nullptr),
 	m_callback_timer_modified(false),
 	m_callback_timer_expire_time(attotime::zero),
@@ -875,6 +905,12 @@ template void device_scheduler::timeslice<true>();
 template void device_scheduler::timeslice<false>();
 
 
+//-------------------------------------------------
+//  update_basetime - update all the
+//  basetime_relative times now that the basetime
+//  has ticked over another second
+//-------------------------------------------------
+
 void device_scheduler::update_basetime()
 {
 	seconds_t base_seconds = m_basetime.seconds();
@@ -966,6 +1002,18 @@ void device_scheduler::timer_reclaim_object(emu_timer &timer)
 
 
 //-------------------------------------------------
+//  register_timer_expired - register a timer
+//  expired callback
+//-------------------------------------------------
+
+void device_scheduler::register_timer_expired(timer_expired_registered_delegate &callback)
+{
+	callback.m_next = m_registered_timers;
+	m_registered_timers = &callback;
+}
+
+
+//-------------------------------------------------
 //  timer_alloc - allocate a global non-device
 //  timer and return a pointer
 //-------------------------------------------------
@@ -984,11 +1032,30 @@ emu_timer *device_scheduler::timer_alloc(timer_expired_delegate callback, void *
 //  amount of time
 //-------------------------------------------------
 
-void device_scheduler::timer_set(const attotime &duration, timer_expired_delegate callback, int param, void *ptr)
+void device_scheduler::timer_set(const attotime &duration, timer_expired_delegate callback, int param)
 {
 	// temporary timers are implicitly active, so add them directly
 	// to the active list after creation
-	emu_timer &timer = timer_alloc_object().init_temporary(machine(), callback, ptr, param, duration);
+	emu_timer &timer = timer_alloc_object().init_temporary(machine(), callback, param, duration);
+	if (m_active_timers.insert_sorted(timer))
+	{
+		update_first_timer_expire();
+		abort_timeslice();
+	}
+}
+
+
+//-------------------------------------------------
+//  timer_set - allocate an anonymous non-device
+//  timer and set it to go off after the given
+//  amount of time
+//-------------------------------------------------
+
+void device_scheduler::timer_set(const attotime &duration, timer_expired_registered_delegate const &callback, int param)
+{
+	// temporary timers are implicitly active, so add them directly
+	// to the active list after creation
+	emu_timer &timer = timer_alloc_object().init_temporary(machine(), callback.m_callback, param, duration);
 	if (m_active_timers.insert_sorted(timer))
 	{
 		update_first_timer_expire();
@@ -1016,11 +1083,11 @@ emu_timer *device_scheduler::timer_alloc(device_t &device, device_timer_id id, v
 //  time
 //-------------------------------------------------
 
-void device_scheduler::timer_set(const attotime &duration, device_t &device, device_timer_id id, int param, void *ptr)
+void device_scheduler::timer_set(const attotime &duration, device_t &device, device_timer_id id, int param)
 {
 	// temporary timers are implicitly active, so add them directly
 	// to the active list after creation
-	emu_timer &timer = timer_alloc_object().init_temporary(device, id, ptr, param, duration);
+	emu_timer &timer = timer_alloc_object().init_temporary(device, id, param, duration);
 	if (m_active_timers.insert_sorted(timer))
 	{
 		update_first_timer_expire();

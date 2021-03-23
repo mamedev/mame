@@ -473,9 +473,9 @@ emu_timer *device_t::timer_alloc(device_timer_id id, void *ptr)
 //  call our device callback
 //-------------------------------------------------
 
-void device_t::timer_set(const attotime &duration, device_timer_id id, int param, void *ptr)
+void device_t::timer_set(const attotime &duration, device_timer_id id, int param)
 {
-	machine().scheduler().timer_set(duration, *this, id, param, ptr);
+	machine().scheduler().timer_set(duration, *this, id, param);
 }
 
 

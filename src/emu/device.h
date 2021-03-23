@@ -608,8 +608,8 @@ public:
 
 	// timer interfaces
 	emu_timer *timer_alloc(device_timer_id id = 0, void *ptr = nullptr);
-	void timer_set(const attotime &duration, device_timer_id id = 0, int param = 0, void *ptr = nullptr);
-	void synchronize(device_timer_id id = 0, int param = 0, void *ptr = nullptr) { timer_set(attotime::zero, id, param, ptr); }
+	void timer_set(const attotime &duration, device_timer_id id = 0, int param = 0);
+	void synchronize(device_timer_id id = 0, int param = 0) { timer_set(attotime::zero, id, param); }
 	void timer_expired(emu_timer &timer, device_timer_id id, int param, void *ptr) { device_timer(timer, id, param, ptr); }
 
 	// state saving interfaces
