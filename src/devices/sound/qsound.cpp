@@ -159,9 +159,7 @@ void qsound_device::qsound_w(offs_t offset, u8 data)
 		break;
 	case 2:
 		m_dsp_ready = 0U;
-		machine().scheduler().synchronize(
-				timer_expired_delegate(FUNC(qsound_device::set_cmd), this),
-				(unsigned(data) << 16) | m_new_data);
+		m_set_cmd.synchronize((unsigned(data) << 16) | m_new_data);
 		break;
 	default:
 		logerror("QSound: host write to unknown register %01X = %02X (%s)\n", offset, data, machine().describe_context());
@@ -210,6 +208,7 @@ void qsound_device::device_start()
 	m_stream = stream_alloc(0, 2, clock() / 2 / 1248);
 
 	m_set_dsp_ready.enregister(*this, FUNC(qsound_device::set_dsp_ready));
+	m_set_cmd.enregister(*this, FUNC(qsound_device::set_cmd));
 
 	// save DSP communication state
 	save_item(NAME(m_rom_bank));

@@ -45,6 +45,7 @@
 #include "fileio.h"
 #include "delegate.h"
 #include "devdelegate.h"
+#include "timer.h"
 
 // memory and address spaces
 #include "emumem.h"

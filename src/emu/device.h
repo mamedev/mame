@@ -376,9 +376,6 @@ constexpr auto driver_device_creator = &emu::detail::driver_tag_func<DriverClass
 class device_missing_dependencies : public emu_exception { };
 
 
-// timer IDs for devices
-typedef u32 device_timer_id;
-
 // ======================> device_t
 
 // device_t represents a device
@@ -615,7 +612,7 @@ public:
 	}
 	void timer_set(const attotime &duration, device_timer_id id = 0, int param = 0);
 	void synchronize(device_timer_id id = 0, int param = 0) { timer_set(attotime::zero, id, param); }
-	void timer_expired(emu_timer &timer, device_timer_id id, int param, void *ptr) { device_timer(timer, id, param, ptr); }
+	void device_timer_cb(void *ptr, int param);
 
 	// state saving interfaces
 	template<typename ItemType>
@@ -846,6 +843,7 @@ private:
 	mutable std::vector<rom_entry>  m_rom_entries;
 	std::list<devcb_base *> m_callbacks;
 	std::vector<memory_view *> m_viewlist;          // list of views
+	emu_timer_cb            m_device_timer_cb;      // a device timer callback
 
 	// string formatting buffer for logerror
 	mutable util::ovectorstream m_string_buffer;
