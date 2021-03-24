@@ -501,11 +501,11 @@ uint8_t macpdm_state::via2_sifr_r()
 
 void macpdm_state::via2_sifr_w(uint8_t data)
 {
-	if(data & m_via2_sifr & 0x40) {
-		m_via2_sifr &= ~0x40;
+	if(data & (~m_via2_sifr) & 0x40) {
+		m_via2_sifr |= 0x40;
+		via2_irq_main_set(0x02, ((~m_via2_sifr) & m_via2_sier) != 0);
 	}
 }
-
 
 
 uint8_t macpdm_state::scc_r(offs_t offset)
