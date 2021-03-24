@@ -338,36 +338,5 @@ void awacs_device::write(offs_t offset, uint8_t data)
 	default:
 		logerror("reg_w %02x, %02x\n", offset, data);
 		break;
-
-#if 0
-		case 0x8:
-		case 0x9:
-			m_regs[offset] = data;
-			m_buffer_size = (m_regs[8]<<6) | (m_regs[9]>>2);
-//            printf("buffer size = %x samples, %x bytes\n", m_buffer_size, m_buffer_size*4);
-			m_buffer_size *= 4; // samples * 16 bits * stereo
-			break;
-
-		case 0x10:
-			{
-				static const int rates[4] = { 22100, 29400, 44100, 22100 };
-				m_stream->set_sample_rate(rates[(data>>1)&3]);
-//                printf("rate %d, enable: %d\n", rates[(data>>1)&3], data & 1);
-				m_playback_enable = (data & 1) ? true : false;
-
-				if (m_playback_enable && !(m_regs[0x10]&1))
-				{
-					m_play_ptr = 0;
-					m_buffer_num = 0;
-				}
-			}
-			break;
-
-		case 0x18:
-			m_regs[offset] &= 0xf0;
-			m_regs[offset] |= (data & 0x0f);
-			m_regs[offset] &= ~(data & 0xf0);
-			return;
-#endif
 	}
 }
