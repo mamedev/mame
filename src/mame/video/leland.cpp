@@ -95,6 +95,8 @@ TILE_GET_INFO_MEMBER(ataxx_state::ataxx_get_tile_info)
 
 void leland_state::video_start()
 {
+	m_leland_delayed_mvram_w.enregister(*this, FUNC(leland_state::leland_delayed_mvram_w));
+
 	/* tilemap */
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(leland_state::leland_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(leland_state::leland_scan)), 8, 8, 256, 256);
 
@@ -120,6 +122,8 @@ void leland_state::video_start()
 
 void ataxx_state::video_start()
 {
+	m_leland_delayed_mvram_w.enregister(*this, FUNC(ataxx_state::leland_delayed_mvram_w));
+
 	// TODO: further untangle driver so the base class doesn't have stuff that isn't common and this can call the base implementation
 	/* tilemap */
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ataxx_state::ataxx_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(ataxx_state::ataxx_scan)), 8, 8, 256, 128);
@@ -361,7 +365,7 @@ TIMER_CALLBACK_MEMBER(leland_state::leland_delayed_mvram_w)
 
 void leland_state::leland_mvram_port_w(offs_t offset, u8 data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(leland_state::leland_delayed_mvram_w),this), 0x00000 | (offset << 8) | data);
+	m_leland_delayed_mvram_w.synchronize(0x00000 | (offset << 8) | data);
 }
 
 
@@ -404,7 +408,7 @@ u8 leland_state::leland_svram_port_r(offs_t offset)
 void ataxx_state::ataxx_mvram_port_w(offs_t offset, u8 data)
 {
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(ataxx_state::leland_delayed_mvram_w),this), 0x00000 | (offset << 8) | data);
+	m_leland_delayed_mvram_w.synchronize(0x00000 | (offset << 8) | data);
 }
 
 

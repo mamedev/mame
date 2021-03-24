@@ -70,6 +70,7 @@ private:
 	void quad_pokeyn_w(offs_t offset, uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(delayed_gamma_w);
+	emu_timer_cb m_delayed_gamma_w;
 	TIMER_DEVICE_CALLBACK_MEMBER(mhavoc_cpu_irq_clock);
 	void alpha_map(address_map &map);
 	void alphaone_map(address_map &map);

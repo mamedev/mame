@@ -347,7 +347,7 @@ void sega_315_5250_compare_timer_device::write(offs_t offset, u16 data, u16 mem_
 		case 0xe:   COMBINE_DATA(&m_regs[10]); break;
 		case 0xb:
 		case 0xf:
-			machine().scheduler().synchronize(timer_expired_delegate(FUNC(sega_315_5250_compare_timer_device::write_to_sound), this), data & 0xff);
+			m_write_to_sound.synchronize(data & 0xff);
 			break;
 	}
 }
@@ -362,6 +362,8 @@ void sega_315_5250_compare_timer_device::device_start()
 	// bind our handlers
 	m_68kint_callback.resolve();
 	m_zint_callback.resolve();
+
+	m_write_to_sound.enregister(*this, FUNC(sega_315_5250_compare_timer_device::write_to_sound));
 
 	// save states
 	save_item(NAME(m_regs));

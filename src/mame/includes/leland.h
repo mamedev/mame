@@ -141,6 +141,7 @@ protected:
 	void asylum_slave_map_program(address_map &map);
 
 	TIMER_CALLBACK_MEMBER(leland_delayed_mvram_w);
+	emu_timer_cb m_leland_delayed_mvram_w;
 
 private:
 	optional_device_array<dac_byte_interface, 2> m_dac;

@@ -102,7 +102,9 @@ protected:
 	void init_video();
 	INTERRUPT_GEN_MEMBER(hd68k_irq_gen);
 	TIMER_CALLBACK_MEMBER(deferred_adsp_bank_switch);
+	emu_timer_cb m_deferred_adsp_bank_switch;
 	TIMER_CALLBACK_MEMBER(rddsp32_sync_cb);
+	emu_timer_cb m_rddsp32_sync_cb;
 
 	/*----------- defined in machine/harddriv.cpp -----------*/
 

@@ -94,6 +94,7 @@ private:
 	void execute(bool update_history = false);
 	void interrupt_ack();
 	TIMER_CALLBACK_MEMBER(write_to_sound);
+	emu_timer_cb m_write_to_sound;
 
 	// configuration
 	devcb_write_line         m_68kint_callback;

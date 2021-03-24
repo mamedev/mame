@@ -71,6 +71,7 @@ public:
 	void init_kram3();
 
 protected:
+	virtual void machine_start() override;
 	virtual void sound_start() override;
 	virtual void video_start() override;
 
@@ -122,6 +123,7 @@ protected:
 	void qix_palettebank_w(uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(pia_w_callback);
+	emu_timer_cb m_pia_w_callback;
 	TIMER_CALLBACK_MEMBER(deferred_sndpia1_porta_w);
 	emu_timer_cb m_deferred_sndpia1_porta_w;
 	DECLARE_WRITE_LINE_MEMBER(qix_vsync_changed);

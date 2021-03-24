@@ -49,6 +49,8 @@ void williams_state::machine_start()
 	/* configure the memory bank */
 	m_mainbank->configure_entry(1, memregion("maincpu")->base() + 0x10000);
 	m_mainbank->configure_entry(0, m_videoram);
+
+	m_deferred_snd_cmd_w.enregister(*this, FUNC(williams_state::deferred_snd_cmd_w));
 }
 
 
@@ -162,12 +164,12 @@ TIMER_CALLBACK_MEMBER(williams_state::deferred_snd_cmd_w)
 void williams_state::snd_cmd_w(u8 data)
 {
 	/* the high two bits are set externally, and should be 1 */
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::deferred_snd_cmd_w),this), data | 0xc0);
+	m_deferred_snd_cmd_w.synchronize(data | 0xc0);
 }
 
 void playball_state::snd_cmd_w(u8 data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(playball_state::deferred_snd_cmd_w),this), data);
+	m_deferred_snd_cmd_w.synchronize(data);
 }
 
 TIMER_CALLBACK_MEMBER(williams2_state::deferred_snd_cmd_w)
@@ -177,7 +179,7 @@ TIMER_CALLBACK_MEMBER(williams2_state::deferred_snd_cmd_w)
 
 void williams2_state::snd_cmd_w(u8 data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams2_state::deferred_snd_cmd_w),this), data);
+	m_deferred_snd_cmd_w.synchronize(data);
 }
 
 
@@ -424,7 +426,7 @@ TIMER_CALLBACK_MEMBER(blaster_state::deferred_snd_cmd_w)
 
 void blaster_state::snd_cmd_w(u8 data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(blaster_state::deferred_snd_cmd_w),this), data);
+	m_deferred_snd_cmd_w.synchronize(data);
 }
 
 
@@ -522,5 +524,5 @@ void joust2_state::snd_cmd_w(u8 data)
 {
 	m_current_sound_data = (m_current_sound_data & ~0xff) | (data & 0xff);
 	m_bg->data_w(data);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(joust2_state::deferred_snd_cmd_w),this), m_current_sound_data);
+	m_deferred_snd_cmd_w.synchronize(m_current_sound_data);
 }

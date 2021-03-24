@@ -29,6 +29,8 @@ void advision_state::machine_start()
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
+	m_sound_cmd_sync.enregister(*this, FUNC(advision_state::sound_cmd_sync));
+
 	/* configure EA banking */
 	m_bank1->configure_entry(0, memregion(I8048_TAG)->base());
 	if (m_cart_rom)
@@ -142,7 +144,7 @@ void advision_state::sound_d_w(uint8_t data)
 
 void advision_state::av_control_w(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(advision_state::sound_cmd_sync), this), data >> 4);
+	m_sound_cmd_sync.synchronize(data >> 4);
 
 	if ((m_video_enable == 0x00) && (data & 0x10))
 	{

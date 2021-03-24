@@ -1244,7 +1244,7 @@ void deco_146_base_device::write_protport(u16 address, u16 data, u16 mem_mask)
 	else if ((address & 0xff) == m_soundlatch_port)
 	{
 		logerror("LOAD SOUND LATCH: %04x\n", data);
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(deco_146_base_device::write_soundlatch), this), data & 0xff);
+		m_write_soundlatch.synchronize(data & 0xff);
 	}
 
 	// always store
@@ -1339,6 +1339,8 @@ void deco_146_base_device::device_start()
 	m_port_b_r.resolve_safe(0xffff);
 	m_port_c_r.resolve_safe(0xffff);
 	m_soundlatch_irq_cb.resolve_safe();
+
+	m_write_soundlatch.enregister(*this, FUNC(deco_146_base_device::write_soundlatch));
 
 	save_item(NAME(m_xor));
 	save_item(NAME(m_nand));

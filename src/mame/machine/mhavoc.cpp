@@ -67,6 +67,8 @@ void mhavoc_state::machine_start()
 {
 	m_lamps.resolve();
 
+	m_delayed_gamma_w.enregister(*this, FUNC(mhavoc_state::delayed_gamma_w));
+
 	save_item(NAME(m_alpha_data));
 	save_item(NAME(m_alpha_rcvd));
 	save_item(NAME(m_alpha_xmtd));
@@ -139,7 +141,7 @@ TIMER_CALLBACK_MEMBER(mhavoc_state::delayed_gamma_w)
 void mhavoc_state::mhavoc_gamma_w(uint8_t data)
 {
 	//logerror("  writing to gamma processor: %02x (%d %d)\n", data, m_gamma_rcvd, m_alpha_xmtd);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(mhavoc_state::delayed_gamma_w),this), data);
+	m_delayed_gamma_w.synchronize(data);
 }
 
 

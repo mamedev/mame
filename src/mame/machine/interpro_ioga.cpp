@@ -179,6 +179,8 @@ void interpro_ioga_device::device_start()
 	m_fdc_tc_func.resolve();
 	m_eth_ca_func.resolve();
 
+	m_set_irq_vector.enregister(*this, FUNC(interpro_ioga_device::set_irq_vector));
+
 	m_hwicr = std::make_unique<u16[]>(get_int_count());
 
 	for (dma_channel_t &dma_channel : m_dma_channel)
@@ -460,7 +462,7 @@ void interpro_ioga_device::irq(int state, u8 irq_vector)
 		LOGIRQ(m_active_interrupt_number, "irq: setting irq vector 0x%02x\n", irq_vector);
 
 		m_irq_vector = irq_vector;
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(interpro_ioga_device::set_irq_vector), this));
+		m_set_irq_vector.synchronize();
 	}
 
 	if (m_irq_state != state)

@@ -206,7 +206,7 @@ TIMER_CALLBACK_MEMBER(tnzs_base_state::kludge_callback)
 
 void tnzs_base_state::tnzs_sync_kludge_w(uint8_t data)
 {
-    machine().scheduler().synchronize(timer_expired_delegate(FUNC(tnzs_base_state::kludge_callback),this), data);
+	m_kludge_callback.synchronize(data);
 }
 */
 

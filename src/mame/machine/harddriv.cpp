@@ -39,6 +39,8 @@ void harddriv_state::device_start()
 	m_lamps.resolve();
 
 	m_xsdp_sport1_irq_off_callback.enregister(*this, FUNC(harddriv_state::xsdp_sport1_irq_off_callback));
+	m_deferred_adsp_bank_switch.enregister(*this, FUNC(harddriv_state::deferred_adsp_bank_switch));
+	m_rddsp32_sync_cb.enregister(*this, FUNC(harddriv_state::rddsp32_sync_cb));
 
 	/* predetermine memory regions */
 	m_adsp_pgm_memory_word = (uint16_t *)(reinterpret_cast<uint8_t *>(m_adsp_pgm_memory.target()) + 1);
@@ -699,7 +701,7 @@ void harddriv_state::hd68k_adsp_control_w(offs_t offset, uint16_t data)
 
 		case 3:
 			logerror("ADSP bank = %d (deferred)\n", val);
-			machine().scheduler().synchronize(timer_expired_delegate(FUNC(harddriv_state::deferred_adsp_bank_switch),this), val);
+			m_deferred_adsp_bank_switch.synchronize(val);
 			break;
 
 		case 5:
@@ -1636,7 +1638,7 @@ void harddriv_state::rddsp32_sync0_w(offs_t offset, uint32_t data, uint32_t mem_
 		COMBINE_DATA(&newdata);
 		m_dataptr[m_next_msp_sync % MAX_MSP_SYNC] = dptr;
 		m_dataval[m_next_msp_sync % MAX_MSP_SYNC] = newdata;
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(harddriv_state::rddsp32_sync_cb),this), m_next_msp_sync++ % MAX_MSP_SYNC);
+		m_rddsp32_sync_cb.synchronize(m_next_msp_sync++ % MAX_MSP_SYNC);
 	}
 	else
 		COMBINE_DATA(&m_rddsp32_sync[0][offset]);
@@ -1652,7 +1654,7 @@ void harddriv_state::rddsp32_sync1_w(offs_t offset, uint32_t data, uint32_t mem_
 		COMBINE_DATA(&newdata);
 		m_dataptr[m_next_msp_sync % MAX_MSP_SYNC] = dptr;
 		m_dataval[m_next_msp_sync % MAX_MSP_SYNC] = newdata;
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(harddriv_state::rddsp32_sync_cb),this), m_next_msp_sync++ % MAX_MSP_SYNC);
+		m_rddsp32_sync_cb.synchronize(m_next_msp_sync++ % MAX_MSP_SYNC);
 	}
 	else
 		COMBINE_DATA(&m_rddsp32_sync[1][offset]);

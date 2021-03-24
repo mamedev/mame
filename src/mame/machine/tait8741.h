@@ -37,6 +37,7 @@ public:
 	void write_3(offs_t offset, uint8_t data) { if(offset&1) command_w(3,data); else data_w(3,data); }
 
 	TIMER_CALLBACK_MEMBER( serial_tx );
+	emu_timer_cb m_serial_tx;
 	void update(int num);
 	int status_r(int num);
 	int data_r(int num);

@@ -198,7 +198,7 @@ void taito8741_4pack_device::update(int num)
 				st->txd[0] = port_read(st->number,0);
 				if( sst )
 				{
-					machine().scheduler().synchronize(timer_expired_delegate(FUNC(taito8741_4pack_device::serial_tx),this), num);
+					m_serial_tx.synchronize(num);
 					st->serial_out = 0;
 					st->status |= 0x04;
 					st->phase = CMD_08;
@@ -252,6 +252,8 @@ void taito8741_4pack_device::device_start()
 	m_port_handler_1_r.resolve_safe(0);
 	m_port_handler_2_r.resolve_safe(0);
 	m_port_handler_3_r.resolve_safe(0);
+
+	m_serial_tx.enregister(*this, FUNC(taito8741_4pack_device::serial_tx));
 
 	for (int i = 0; i < 4; i++)
 	{

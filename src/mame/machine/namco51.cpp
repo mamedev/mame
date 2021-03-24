@@ -75,7 +75,7 @@ WRITE_LINE_MEMBER( namco_51xx_device::vblank )
 
 WRITE_LINE_MEMBER(namco_51xx_device::rw)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_51xx_device::rw_sync),this), state);
+	m_rw_sync.synchronize(state);
 }
 
 TIMER_CALLBACK_MEMBER( namco_51xx_device::rw_sync )
@@ -95,7 +95,7 @@ uint8_t namco_51xx_device::read()
 
 void namco_51xx_device::write(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_51xx_device::write_sync),this), data);
+	m_write_sync.synchronize(data);
 }
 
 TIMER_CALLBACK_MEMBER( namco_51xx_device::write_sync )
@@ -176,6 +176,9 @@ void namco_51xx_device::device_start()
 	/* resolve our write callbacks */
 	m_out.resolve_safe();
 	m_lockout.resolve_safe();
+
+	m_rw_sync.enregister(*this, FUNC(namco_51xx_device::rw_sync));
+	m_write_sync.enregister(*this, FUNC(namco_51xx_device::write_sync));
 
 	save_item(NAME(m_portO));
 	save_item(NAME(m_rw));

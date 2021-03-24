@@ -19,6 +19,11 @@
  *
  *************************************/
 
+void qix_state::machine_start()
+{
+	m_pia_w_callback.enregister(*this, FUNC(qix_state::pia_w_callback));
+}
+
 void qixmcu_state::machine_start()
 {
 	qix_state::machine_start();
@@ -242,7 +247,7 @@ void qix_state::qix_pia_w(offs_t offset, uint8_t data)
 {
 	/* make all the CPUs synchronize, and only AFTER that write the command to the PIA */
 	/* otherwise the 68705 will miss commands */
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(qix_state::pia_w_callback), this), data | (offset << 8));
+	m_pia_w_callback.synchronize(data | (offset << 8));
 }
 
 

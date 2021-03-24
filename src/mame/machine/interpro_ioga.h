@@ -284,6 +284,7 @@ protected:
 
 private:
 	TIMER_CALLBACK_MEMBER(set_irq_vector) { m_out_irq_vector_func(m_irq_vector); }
+	emu_timer_cb m_set_irq_vector;
 
 	void drq(int state, int channel);
 	void serial_drq(int state, int channel);

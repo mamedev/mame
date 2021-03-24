@@ -65,7 +65,7 @@ void taito_sj_security_mcu_device::data_w(offs_t offset, u8 data)
 	{
 		// ZLWRITE
 		device_scheduler &sched(machine().scheduler());
-		sched.synchronize(timer_expired_delegate(FUNC(taito_sj_security_mcu_device::do_host_write), this), data);
+		m_do_host_write.synchronize(data);
 		sched.boost_interleave(attotime::zero, attotime::from_usec(10));
 	}
 }
@@ -94,6 +94,10 @@ void taito_sj_security_mcu_device::device_start()
 	m_68write_cb.resolve_safe();
 	m_68intrq_cb.resolve_safe();
 	m_busrq_cb.resolve_safe();
+
+	m_do_mcu_read.enregister(*this, FUNC(taito_sj_security_mcu_device::do_mcu_read));
+	m_do_mcu_write.enregister(*this, FUNC(taito_sj_security_mcu_device::do_mcu_write));
+	m_do_host_write.enregister(*this, FUNC(taito_sj_security_mcu_device::do_host_write));
 
 	save_item(NAME(m_addr));
 	save_item(NAME(m_mcu_data));
@@ -166,14 +170,14 @@ void taito_sj_security_mcu_device::mcu_pb_w(u8 data)
 	u8 const bus_val(get_bus_val());
 	if (BIT(diff & data, 1))
 	{
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(taito_sj_security_mcu_device::do_mcu_read), this));
+		m_do_mcu_read.synchronize();
 		if (int_mode::LATCH == m_int_mode)
 			m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 	}
 
 	// 68LWR
 	if (BIT(diff & data, 2))
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(taito_sj_security_mcu_device::do_mcu_write), this), bus_val);
+		m_do_mcu_write.synchronize(bus_val);
 
 	// BUSRQ
 	if (BIT(diff, 3))

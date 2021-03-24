@@ -118,7 +118,7 @@ void sega_315_5195_mapper_device::write(offs_t offset, u8 data)
 
 		case 0x03:
 			// write through to the sound chip
-			machine().scheduler().synchronize(timer_expired_delegate(FUNC(sega_315_5195_mapper_device::write_to_sound), this), data);
+			m_write_to_sound.synchronize(data);
 			break;
 
 		case 0x04:
@@ -403,7 +403,7 @@ u8 sega_315_5195_mapper_device::pread()
 
 void sega_315_5195_mapper_device::pwrite(u8 data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(sega_315_5195_mapper_device::write_from_sound), this), data);
+	m_write_from_sound.synchronize(data);
 }
 
 
@@ -417,6 +417,9 @@ void sega_315_5195_mapper_device::device_start()
 	m_mapper.resolve();
 	m_pbf_callback.resolve();
 	m_mcu_int_callback.resolve();
+
+	m_write_to_sound.enregister(*this, FUNC(sega_315_5195_mapper_device::write_to_sound));
+	m_write_from_sound.enregister(*this, FUNC(sega_315_5195_mapper_device::write_from_sound));
 
 	// if we are mapping an FD1089, tell all the banks
 	fd1089_base_device *fd1089 = dynamic_cast<fd1089_base_device *>(m_cpu.target());

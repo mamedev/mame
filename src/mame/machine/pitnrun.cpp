@@ -24,6 +24,11 @@ void pitnrun_state::machine_start()
 	save_item(NAME(m_porta_in));
 	save_item(NAME(m_porta_out));
 	save_item(NAME(m_address));
+
+	m_mcu_real_data_r.enregister(*this, FUNC(pitnrun_state::mcu_real_data_r));
+	m_mcu_real_data_w.enregister(*this, FUNC(pitnrun_state::mcu_real_data_w));
+	m_mcu_data_real_r.enregister(*this, FUNC(pitnrun_state::mcu_data_real_r));
+	m_mcu_status_real_w.enregister(*this, FUNC(pitnrun_state::mcu_status_real_w));
 }
 
 void pitnrun_state::machine_reset()
@@ -40,7 +45,7 @@ TIMER_CALLBACK_MEMBER(pitnrun_state::mcu_real_data_r)
 
 uint8_t pitnrun_state::mcu_data_r()
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pitnrun_state::mcu_real_data_r),this));
+	m_mcu_real_data_r.synchronize();
 	return m_toz80;
 }
 
@@ -53,7 +58,7 @@ TIMER_CALLBACK_MEMBER(pitnrun_state::mcu_real_data_w)
 
 void pitnrun_state::mcu_data_w(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pitnrun_state::mcu_real_data_w),this), data);
+	m_mcu_real_data_w.synchronize(data);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(5));
 }
 
@@ -119,14 +124,14 @@ void pitnrun_state::m68705_portb_w(uint8_t data)
 	if (~data & 0x02)
 	{
 		/* 68705 is going to read data from the Z80 */
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(pitnrun_state::mcu_data_real_r),this));
+		m_mcu_data_real_r.synchronize();
 		m_mcu->set_input_line(0,CLEAR_LINE);
 		m_porta_in = m_fromz80;
 	}
 	if (~data & 0x04)
 	{
 		/* 68705 is writing data for the Z80 */
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(pitnrun_state::mcu_status_real_w),this), m_porta_out);
+		m_mcu_status_real_w.synchronize(m_porta_out);
 	}
 	if (~data & 0x10)
 	{
