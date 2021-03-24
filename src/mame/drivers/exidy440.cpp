@@ -365,7 +365,7 @@ TIMER_CALLBACK_MEMBER(exidy440_state::delayed_sound_command_w)
 
 void exidy440_state::sound_command_w(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(exidy440_state::delayed_sound_command_w), this), data);
+	m_delayed_sound_command_w.synchronize(data);
 }
 
 
@@ -447,6 +447,8 @@ void exidy440_state::machine_start()
 {
 	/* the EEROM lives in the uppermost 8k of the top bank */
 	uint8_t *rom = memregion("maincpu")->base();
+
+	m_delayed_sound_command_w.enregister(*this, FUNC(exidy440_state::delayed_sound_command_w));
 
 	subdevice<nvram_device>("nvram")->set_base(&rom[0x10000 + 15 * 0x4000 + 0x2000], 0x2000);
 }

@@ -32,6 +32,9 @@ void tankbust_state::machine_start()
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
 	membank("bank2")->configure_entries(0, 2, memregion("maincpu")->base() + 0x18000, 0x2000);
 
+	m_soundlatch_callback.enregister(*this, FUNC(tankbust_state::soundlatch_callback));
+	m_soundirqline_callback.enregister(*this, FUNC(tankbust_state::soundirqline_callback));
+
 	save_item(NAME(m_latch));
 	save_item(NAME(m_timer1));
 	save_item(NAME(m_e0xx_data));
@@ -48,7 +51,7 @@ TIMER_CALLBACK_MEMBER(tankbust_state::soundlatch_callback)
 
 void tankbust_state::soundlatch_w(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(tankbust_state::soundlatch_callback),this), data);
+	m_soundlatch_callback.synchronize(data);
 }
 
 uint8_t tankbust_state::soundlatch_r()
@@ -95,7 +98,7 @@ void tankbust_state::e0xx_w(offs_t offset, uint8_t data)
 		break;
 
 	case 1: /* 0xe001 (value 0 then 1) written right after the soundlatch_byte_w */
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(tankbust_state::soundirqline_callback),this), data);
+		m_soundirqline_callback.synchronize(data);
 		break;
 
 	case 2: /* 0xe002 coin counter */

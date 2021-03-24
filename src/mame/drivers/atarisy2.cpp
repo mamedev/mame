@@ -222,6 +222,8 @@ void atarisy2_state::machine_start()
 	m_p2portwr_state = false;
 	m_p2portrd_state = false;
 
+	m_delayed_int_enable_w.enregister(*this, FUNC(atarisy2_state::delayed_int_enable_w));
+
 	save_item(NAME(m_interrupt_enable));
 	save_item(NAME(m_scanline_int_state));
 	save_item(NAME(m_video_int_state));
@@ -287,7 +289,7 @@ TIMER_CALLBACK_MEMBER(atarisy2_state::delayed_int_enable_w)
 
 void atarisy2_state::int_enable_w(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(atarisy2_state::delayed_int_enable_w),this), data);
+	m_delayed_int_enable_w.synchronize(data);
 }
 
 

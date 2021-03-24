@@ -209,12 +209,20 @@ other supported games as well.
 
 void m72_state::machine_start()
 {
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m72_state::scanline_interrupt),this));
+	m_synch_callback.enregister(*this, FUNC(m72_state::synch_callback));
+	m_delayed_ram16_w.enregister(*this, FUNC(m72_state::delayed_ram16_w));
+	m_delayed_ram8_w.enregister(*this, FUNC(m72_state::delayed_ram8_w));
+
+	m_scanline_timer = timer_alloc(*this, FUNC(m72_state::scanline_interrupt));
 }
 
 MACHINE_START_MEMBER(m72_state,kengo)
 {
-	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m72_state::kengo_scanline_interrupt),this));
+	m_synch_callback.enregister(*this, FUNC(m72_state::synch_callback));
+	m_delayed_ram16_w.enregister(*this, FUNC(m72_state::delayed_ram16_w));
+	m_delayed_ram8_w.enregister(*this, FUNC(m72_state::delayed_ram8_w));
+
+	m_scanline_timer = timer_alloc(*this, FUNC(m72_state::kengo_scanline_interrupt));
 }
 
 TIMER_CALLBACK_MEMBER(m72_state::synch_callback)
@@ -229,7 +237,7 @@ void m72_state::machine_reset()
 	//m_mcu_snd_cmd_latch = 0;
 
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::synch_callback),this));
+	m_synch_callback.synchronize();
 
 	// Hold sound CPU in reset if main CPU has to upload the program into RAM
 	if (m_soundram.found())
@@ -332,12 +340,12 @@ TIMER_CALLBACK_MEMBER(m72_state::delayed_ram8_w)
 
 void m72_state::main_mcu_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::delayed_ram16_w), this), offset << 16 | data | (mem_mask & 0x0180) << 20);
+	m_delayed_ram16_w.synchronize(offset << 16 | data | (mem_mask & 0x0180) << 20);
 }
 
 void m72_state::mcu_data_w(offs_t offset, u8 data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::delayed_ram8_w), this), offset << 8 | u32(data));
+	m_delayed_ram8_w.synchronize(offset << 8 | u32(data));
 }
 
 u8 m72_state::mcu_data_r(offs_t offset)

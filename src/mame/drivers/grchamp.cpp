@@ -98,6 +98,9 @@ void grchamp_state::machine_start()
 	m_digits.resolve();
 	m_soundlatch_data = 0x00;
 	m_soundlatch_flag = false;
+	m_soundlatch_w_cb.enregister(*this, FUNC(grchamp_state::soundlatch_w_cb));
+	m_soundlatch_clear7_w_cb.enregister(*this, FUNC(grchamp_state::soundlatch_clear7_w_cb));
+	m_main_to_sub_comm_sync_w.enregister(*this, FUNC(grchamp_state::main_to_sub_comm_sync_w));
 	save_item(NAME(m_cpu0_out));
 	save_item(NAME(m_cpu1_out));
 	save_item(NAME(m_comm_latch));
@@ -219,7 +222,7 @@ void grchamp_state::cpu0_outputs_w(offs_t offset, uint8_t data)
 
 		case 0x0e:  /* OUT14 */
 			/* O-21 connector */
-			machine().scheduler().synchronize(timer_expired_delegate(FUNC(grchamp_state::soundlatch_w_cb), this), data); // soundlatch write, needs to synchronize
+			m_soundlatch_w_cb.synchronize(data); // soundlatch write, needs to synchronize
 			break;
 	}
 }
@@ -423,7 +426,7 @@ TIMER_CALLBACK_MEMBER(grchamp_state::main_to_sub_comm_sync_w)
 
 void grchamp_state::main_to_sub_comm_w(offs_t offset, uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(grchamp_state::main_to_sub_comm_sync_w),this), data | (offset << 8));
+	m_main_to_sub_comm_sync_w.synchronize(data | (offset << 8));
 }
 
 
@@ -469,7 +472,7 @@ uint8_t grchamp_state::soundlatch_r()
 // WR5000
 void grchamp_state::soundlatch_clear7_w(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(grchamp_state::soundlatch_clear7_w_cb), this), data);
+	m_soundlatch_clear7_w_cb.synchronize(data);
 }
 
 // RD5001

@@ -181,7 +181,7 @@ void taitosj_state::taitosj_sndnmi_msk_w(uint8_t data)
 
 void taitosj_state::soundlatch_w(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(taitosj_state::soundlatch_w_cb), this), data);
+	m_soundlatch_w_cb.synchronize(data);
 }
 
 
@@ -193,7 +193,7 @@ void taitosj_state::input_port_4_f0_w(uint8_t data)
 // EPORT2
 void taitosj_state::sound_semaphore2_w(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(taitosj_state::sound_semaphore2_w_cb), this), data);
+	m_sound_semaphore2_w_cb.synchronize(data);
 }
 
 CUSTOM_INPUT_MEMBER(taitosj_state::input_port_4_f0_r)
@@ -360,13 +360,13 @@ uint8_t taitosj_state::soundlatch_flags_r()
 // WR5000
 void taitosj_state::soundlatch_clear7_w(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(taitosj_state::soundlatch_clear7_w_cb), this), data);
+	m_soundlatch_clear7_w_cb.synchronize(data);
 }
 
 // WR5001
 void taitosj_state::sound_semaphore2_clear_w(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(taitosj_state::sound_semaphore2_clear_w_cb), this), data);
+	m_sound_semaphore2_clear_w_cb.synchronize(data);
 }
 
 
@@ -2835,6 +2835,11 @@ void taitosj_state::init_common()
 	save_item(NAME(m_sound_semaphore2));
 	save_item(NAME(m_input_port_4_f0));
 	save_item(NAME(m_kikstart_gears));
+
+	m_soundlatch_w_cb.enregister(*this, FUNC(taitosj_state::soundlatch_w_cb));
+	m_soundlatch_clear7_w_cb.enregister(*this, FUNC(taitosj_state::soundlatch_clear7_w_cb));
+	m_sound_semaphore2_w_cb.enregister(*this, FUNC(taitosj_state::sound_semaphore2_w_cb));
+	m_sound_semaphore2_clear_w_cb.enregister(*this, FUNC(taitosj_state::sound_semaphore2_clear_w_cb));
 
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&taitosj_state::reset_common, this));
 }

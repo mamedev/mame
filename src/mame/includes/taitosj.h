@@ -111,9 +111,13 @@ private:
 	void soundlatch_w(uint8_t data);
 	void sound_semaphore2_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER(soundlatch_w_cb);
+	emu_timer_cb m_soundlatch_w_cb;
 	TIMER_CALLBACK_MEMBER(soundlatch_clear7_w_cb);
+	emu_timer_cb m_soundlatch_clear7_w_cb;
 	TIMER_CALLBACK_MEMBER(sound_semaphore2_w_cb);
+	emu_timer_cb m_sound_semaphore2_w_cb;
 	TIMER_CALLBACK_MEMBER(sound_semaphore2_clear_w_cb);
+	emu_timer_cb m_sound_semaphore2_clear_w_cb;
 	uint8_t soundlatch_r();
 	void soundlatch_clear7_w(uint8_t data);
 	uint8_t soundlatch_flags_r();

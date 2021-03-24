@@ -237,7 +237,7 @@ READ_LINE_MEMBER(metro_state::rxd_r)
 
 void metro_state::sound_data_w(u8 data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(metro_state::sound_data_sync), this), data);
+	m_sound_data_sync.synchronize(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // seen rxd_r
 }
 
@@ -5344,6 +5344,8 @@ ROM_END
 
 void metro_state::init_metro()
 {
+	m_sound_data_sync.enregister(*this, FUNC(metro_state::sound_data_sync));
+
 	if (m_audiobank.found())
 	{
 		m_audiobank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);

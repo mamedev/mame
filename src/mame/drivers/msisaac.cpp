@@ -35,7 +35,7 @@ TIMER_CALLBACK_MEMBER(msisaac_state::nmi_callback)
 void msisaac_state::sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(msisaac_state::nmi_callback),this), data);
+	m_nmi_callback.synchronize(data);
 }
 
 void msisaac_state::nmi_disable_w(uint8_t data)
@@ -409,6 +409,8 @@ GFXDECODE_END
 
 void msisaac_state::machine_start()
 {
+	m_nmi_callback.enregister(*this, FUNC(msisaac_state::nmi_callback));
+
 	/* video */
 	save_item(NAME(m_bg2_textbank));
 	/* sound */

@@ -100,6 +100,7 @@ private:
 	void nmi_disable_w(uint8_t data);
 	void nmi_enable_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
+	emu_timer_cb m_nmi_callback;
 
 	uint8_t mcu_status_r();
 
@@ -357,7 +358,7 @@ TIMER_CALLBACK_MEMBER(wyvernf0_state::nmi_callback)
 void wyvernf0_state::sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(wyvernf0_state::nmi_callback),this), data);
+	m_nmi_callback.synchronize(data);
 }
 
 void wyvernf0_state::nmi_disable_w(uint8_t data)
@@ -612,6 +613,8 @@ void wyvernf0_state::machine_start()
 	m_objram = std::make_unique<uint8_t[]>(0x1000 * 2);
 	save_pointer(NAME(m_objram), 0x1000 * 2);
 	membank("rambank")->configure_entries(0, 2, m_objram.get(), 0x1000);
+
+	m_nmi_callback.enregister(*this, FUNC(wyvernf0_state::nmi_callback));
 
 	save_item(NAME(m_sound_nmi_enable));
 	save_item(NAME(m_pending_nmi));

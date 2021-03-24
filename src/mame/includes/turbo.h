@@ -89,7 +89,7 @@ private:
 	output_finder<> m_lamp;
 
 	std::unique_ptr<uint8_t[]>     m_buckrog_bitmap_ram;
-	virtual void machine_start() override { m_digits.resolve(); m_lamp.resolve(); }
+	virtual void machine_start() override;
 
 	/* machine states */
 	uint8_t       m_i8279_scanlines;
@@ -192,6 +192,7 @@ private:
 	uint32_t screen_update_subroc3d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_buckrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(delayed_i8255_w);
+	emu_timer_cb m_delayed_i8255_w;
 	void turbo_sound_a_w(u8 data);
 	void turbo_sound_b_w(u8 data);
 	void turbo_sound_c_w(u8 data);

@@ -89,7 +89,7 @@ TIMER_CALLBACK_MEMBER(ladyfrog_state::nmi_callback)
 void ladyfrog_state::sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(ladyfrog_state::nmi_callback),this), data);
+	m_nmi_callback.synchronize(data);
 }
 
 void ladyfrog_state::nmi_disable_w(uint8_t data)
@@ -269,6 +269,8 @@ GFXDECODE_END
 
 void ladyfrog_state::machine_start()
 {
+	m_nmi_callback.enregister(*this, FUNC(ladyfrog_state::nmi_callback));
+
 	save_item(NAME(m_tilebank));
 	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_sound_nmi_enable));

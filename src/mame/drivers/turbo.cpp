@@ -189,6 +189,15 @@
  *
  *************************************/
 
+void turbo_state::machine_start()
+{
+	m_digits.resolve();
+	m_lamp.resolve();
+
+	m_delayed_i8255_w.enregister(*this, FUNC(turbo_state::delayed_i8255_w));
+}
+
+
 MACHINE_RESET_MEMBER(turbo_state,buckrog)
 {
 	m_buckrog_command = 0x00;
@@ -477,7 +486,7 @@ void turbo_state::buckrog_i8255_0_w(offs_t offset, uint8_t data)
 {
 	/* the port C handshaking signals control the sub CPU IRQ, */
 	/* so we have to sync whenever we access this PPI */
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(turbo_state::delayed_i8255_w),this), ((offset & 3) << 8) | (data & 0xff));
+	m_delayed_i8255_w.synchronize(((offset & 3) << 8) | (data & 0xff));
 }
 
 uint8_t turbo_state::spriteram_r(offs_t offset)

@@ -725,7 +725,7 @@ void norautp_state::counterlamps_w(uint8_t data)
 
 WRITE_LINE_MEMBER(norautp_state::ppi2_obf_w)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(norautp_state::ppi2_ack), this), state);
+	m_ppi2_ack.synchronize(state);
 }
 
 TIMER_CALLBACK_MEMBER(norautp_state::ppi2_ack)
@@ -1313,6 +1313,12 @@ GFXDECODE_END
 /*************************
 *    Machine Drivers     *
 *************************/
+
+void norautp_state::machine_start()
+{
+	m_lamps.resolve();
+	m_ppi2_ack.enregister(*this, FUNC(norautp_state::ppi2_ack));
+}
 
 void norautp_state::noraut_base(machine_config &config)
 {

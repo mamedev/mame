@@ -52,12 +52,13 @@ public:
 	void init_deb();
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void machine_start() override;
 	virtual void video_start() override;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(ppi2_obf_w);
 	TIMER_CALLBACK_MEMBER(ppi2_ack);
+	emu_timer_cb m_ppi2_ack;
 	uint8_t test2_r();
 	void mainlamps_w(uint8_t data);
 	void soundlamps_w(uint8_t data);

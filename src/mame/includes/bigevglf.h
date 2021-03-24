@@ -68,6 +68,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_bigevglf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(deferred_ls74_w);
+	emu_timer_cb m_deferred_ls74_w;
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5232_device> m_msm;

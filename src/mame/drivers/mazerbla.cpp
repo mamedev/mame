@@ -162,7 +162,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	TIMER_CALLBACK_MEMBER(deferred_ls670_0_w);
+	emu_timer_cb m_deferred_ls670_0_w;
 	TIMER_CALLBACK_MEMBER(deferred_ls670_1_w);
+	emu_timer_cb m_deferred_ls670_1_w;
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void greatgun_cpu3_io_map(address_map &map);
 	void greatgun_io_map(address_map &map);
@@ -305,7 +307,7 @@ TIMER_CALLBACK_MEMBER(mazerbla_state::deferred_ls670_0_w)
 void mazerbla_state::ls670_0_w(offs_t offset, uint8_t data)
 {
 	/* do this on a timer to let the CPUs synchronize */
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(mazerbla_state::deferred_ls670_0_w),this), (offset << 8) | data);
+	m_deferred_ls670_0_w.synchronize((offset << 8) | data);
 }
 
 uint8_t mazerbla_state::ls670_1_r(offs_t offset)
@@ -327,7 +329,7 @@ TIMER_CALLBACK_MEMBER(mazerbla_state::deferred_ls670_1_w)
 void mazerbla_state::ls670_1_w(offs_t offset, uint8_t data)
 {
 	/* do this on a timer to let the CPUs synchronize */
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(mazerbla_state::deferred_ls670_1_w),this), (offset << 8) | data);
+	m_deferred_ls670_1_w.synchronize((offset << 8) | data);
 }
 
 
@@ -934,6 +936,9 @@ void mazerbla_state::machine_start()
 	m_lamps.resolve();
 
 	membank("bank1")->configure_entries(0, 256, memregion("sub2")->base() + 0x10000, 0x2000);
+
+	m_deferred_ls670_0_w.enregister(*this, FUNC(mazerbla_state::deferred_ls670_0_w));
+	m_deferred_ls670_1_w.enregister(*this, FUNC(mazerbla_state::deferred_ls670_1_w));
 
 	save_item(NAME(m_port02_status));
 	save_item(NAME(m_gfx_rom_bank));

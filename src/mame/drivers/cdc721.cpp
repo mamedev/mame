@@ -54,6 +54,7 @@ private:
 
 	template<int Line> DECLARE_WRITE_LINE_MEMBER(int_w);
 	TIMER_CALLBACK_MEMBER(update_interrupts);
+	emu_timer_cb m_update_interrupts;
 	IRQ_CALLBACK_MEMBER(restart_cb);
 
 	template<int Bit> DECLARE_WRITE_LINE_MEMBER(foreign_char_bank_w);
@@ -84,7 +85,7 @@ private:
 void cdc721_state::interrupt_mask_w(u8 data)
 {
 	m_interrupt_mask = data ^ 0xff;
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(cdc721_state::update_interrupts), this));
+	m_update_interrupts.synchronize();
 }
 
 template <int Line>
@@ -98,7 +99,7 @@ WRITE_LINE_MEMBER(cdc721_state::int_w)
 	else
 		m_pending_interrupts &= ~(0x01 << Line);
 
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(cdc721_state::update_interrupts), this));
+	m_update_interrupts.synchronize();
 }
 
 TIMER_CALLBACK_MEMBER(cdc721_state::update_interrupts)
@@ -224,6 +225,8 @@ void cdc721_state::machine_start()
 	m_active_interrupts = 0;
 	m_interrupt_mask = 0;
 	m_foreign_char_bank = 0;
+
+	m_update_interrupts.enregister(*this, FUNC(cdc721_state::update_interrupts));
 
 	save_item(NAME(m_pending_interrupts));
 	save_item(NAME(m_active_interrupts));

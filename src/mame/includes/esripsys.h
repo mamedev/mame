@@ -130,6 +130,7 @@ private:
 	uint32_t screen_update_esripsys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(esripsys_vblank_irq);
 	TIMER_CALLBACK_MEMBER(delayed_bank_swap);
+	emu_timer_cb m_delayed_bank_swap;
 	TIMER_CALLBACK_MEMBER(hblank_start_callback);
 	TIMER_CALLBACK_MEMBER(hblank_end_callback);
 	required_device<dac_word_interface> m_dac;

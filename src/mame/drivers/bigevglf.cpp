@@ -95,22 +95,22 @@ TIMER_CALLBACK_MEMBER(bigevglf_state::deferred_ls74_w)
 /* do this on a timer to let the CPUs synchronize */
 void bigevglf_state::beg13_a_clr_w(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bigevglf_state::deferred_ls74_w),this), (0 << 8) | 0);
+	m_deferred_ls74_w.synchronize((0 << 8) | 0);
 }
 
 void bigevglf_state::beg13_b_clr_w(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bigevglf_state::deferred_ls74_w),this), (1 << 8) | 0);
+	m_deferred_ls74_w.synchronize((1 << 8) | 0);
 }
 
 void bigevglf_state::beg13_a_set_w(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bigevglf_state::deferred_ls74_w),this), (0 << 8) | 1);
+	m_deferred_ls74_w.synchronize((0 << 8) | 1);
 }
 
 void bigevglf_state::beg13_b_set_w(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bigevglf_state::deferred_ls74_w),this), (1 << 8) | 1);
+	m_deferred_ls74_w.synchronize((1 << 8) | 1);
 }
 
 uint8_t bigevglf_state::beg_status_r()
@@ -350,6 +350,8 @@ GFXDECODE_END
 
 void bigevglf_state::machine_start()
 {
+	m_deferred_ls74_w.enregister(*this, FUNC(bigevglf_state::deferred_ls74_w));
+
 	save_item(NAME(m_vidram_bank));
 	save_item(NAME(m_plane_selected));
 	save_item(NAME(m_plane_visible));

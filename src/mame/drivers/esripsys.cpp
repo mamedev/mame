@@ -163,7 +163,7 @@ TIMER_CALLBACK_MEMBER(esripsys_state::delayed_bank_swap)
 
 void esripsys_state::frame_w(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(esripsys_state::delayed_bank_swap),this));
+	m_delayed_bank_swap.synchronize();
 	m_frame_vbl = 1;
 }
 
@@ -632,6 +632,8 @@ void esripsys_state::init_esripsys()
 	membank("bank2")->set_base(&rom[0x0000]);
 	membank("bank3")->set_base(&rom[0x4000]);
 	membank("bank4")->set_base(&rom[0x8000]);
+
+	m_delayed_bank_swap.enregister(*this, FUNC(esripsys_state::delayed_bank_swap));
 
 	/* Register stuff for state saving */
 	save_pointer(NAME(m_fdt_a), FDT_RAM_SIZE);

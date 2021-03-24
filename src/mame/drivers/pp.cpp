@@ -59,6 +59,7 @@ private:
 
 	template<int Line> DECLARE_WRITE_LINE_MEMBER(int_w);
 	TIMER_CALLBACK_MEMBER(int_update);
+	emu_timer_cb m_int_update;
 	IRQ_CALLBACK_MEMBER(intak_cb);
 
 	void kbd_scan_w(u8 data);
@@ -110,6 +111,8 @@ void pp_state::machine_start()
 
 	m_fdc->dden_w(0);
 
+	m_int_update.enregister(*this, FUNC(pp_state::int_update));
+
 	// 64K of dynamic RAM (8x 4864)
 	m_ram = make_unique_clear<u8[]>(0x10000);
 	save_pointer(NAME(m_ram), 0x10000);
@@ -143,7 +146,7 @@ WRITE_LINE_MEMBER(pp_state::int_w)
 	else
 		m_int_pending &= ~(1 << Line);
 
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pp_state::int_update), this));
+	m_int_update.synchronize();
 }
 
 TIMER_CALLBACK_MEMBER(pp_state::int_update)

@@ -89,6 +89,7 @@ private:
 	DECLARE_VIDEO_START(ladyfrog_common);
 	uint32_t screen_update_ladyfrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
+	emu_timer_cb m_nmi_callback;
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void ladyfrog_map(address_map &map);
 	void ladyfrog_sound_map(address_map &map);

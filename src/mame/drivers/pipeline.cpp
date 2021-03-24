@@ -118,6 +118,7 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_CALLBACK_MEMBER(protection_deferred_w);
+	emu_timer_cb m_protection_deferred_w;
 
 	void cpu0_mem(address_map &map);
 	void cpu1_mem(address_map &map);
@@ -143,6 +144,7 @@ private:
 void pipeline_state::machine_start()
 {
 	save_item(NAME(m_from_mcu));
+	m_protection_deferred_w.enregister(*this, FUNC(pipeline_state::protection_deferred_w));
 }
 
 TILE_GET_INFO_MEMBER(pipeline_state::get_tile_info)
@@ -218,7 +220,7 @@ TIMER_CALLBACK_MEMBER(pipeline_state::protection_deferred_w)
 
 void pipeline_state::protection_w(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pipeline_state::protection_deferred_w),this), data);
+	m_protection_deferred_w.synchronize(data);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 

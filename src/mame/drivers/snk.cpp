@@ -587,6 +587,9 @@ TODO:
 void snk_state::machine_start()
 {
 	m_countryc_trackball = 0;
+
+	m_sgladiat_sndirq_update_callback.enregister(*this, FUNC(snk_state::sgladiat_sndirq_update_callback));
+	m_sndirq_update_callback.enregister(*this, FUNC(snk_state::sndirq_update_callback));
 }
 
 /*********************************************************************/
@@ -667,18 +670,18 @@ TIMER_CALLBACK_MEMBER(snk_state::sgladiat_sndirq_update_callback)
 void snk_state::sgladiat_soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sgladiat_sndirq_update_callback),this), CMDIRQ_BUSY_ASSERT);
+	m_sgladiat_sndirq_update_callback.synchronize(CMDIRQ_BUSY_ASSERT);
 }
 
 uint8_t snk_state::sgladiat_soundlatch_r()
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sgladiat_sndirq_update_callback),this), BUSY_CLEAR);
+	m_sgladiat_sndirq_update_callback.synchronize(BUSY_CLEAR);
 	return m_soundlatch->read();
 }
 
 uint8_t snk_state::sgladiat_sound_nmi_ack_r()
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sgladiat_sndirq_update_callback),this), CMDIRQ_CLEAR);
+	m_sgladiat_sndirq_update_callback.synchronize(CMDIRQ_CLEAR);
 	return 0xff;
 }
 
@@ -752,20 +755,20 @@ TIMER_CALLBACK_MEMBER(snk_state::sndirq_update_callback)
 WRITE_LINE_MEMBER(snk_state::ymirq_callback_1 )
 {
 	if (state)
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), YM1IRQ_ASSERT);
+		m_sndirq_update_callback.synchronize(YM1IRQ_ASSERT);
 }
 
 WRITE_LINE_MEMBER(snk_state::ymirq_callback_2)
 {
 	if (state)
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), YM2IRQ_ASSERT);
+		m_sndirq_update_callback.synchronize(YM2IRQ_ASSERT);
 }
 
 
 void snk_state::snk_soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), CMDIRQ_BUSY_ASSERT);
+	m_sndirq_update_callback.synchronize(CMDIRQ_BUSY_ASSERT);
 }
 
 READ_LINE_MEMBER(snk_state::sound_busy_r)
@@ -782,28 +785,28 @@ uint8_t snk_state::snk_sound_status_r()
 void snk_state::snk_sound_status_w(uint8_t data)
 {
 	if (~data & 0x10)   // ack YM1 irq
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), YM1IRQ_CLEAR);
+		m_sndirq_update_callback.synchronize(YM1IRQ_CLEAR);
 
 	if (~data & 0x20)   // ack YM2 irq
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), YM2IRQ_CLEAR);
+		m_sndirq_update_callback.synchronize(YM2IRQ_CLEAR);
 
 	if (~data & 0x40)   // clear busy flag
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), BUSY_CLEAR);
+		m_sndirq_update_callback.synchronize(BUSY_CLEAR);
 
 	if (~data & 0x80)   // ack command from main cpu
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), CMDIRQ_CLEAR);
+		m_sndirq_update_callback.synchronize(CMDIRQ_CLEAR);
 }
 
 
 uint8_t snk_state::tnk3_cmdirq_ack_r()
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), CMDIRQ_CLEAR);
+	m_sndirq_update_callback.synchronize(CMDIRQ_CLEAR);
 	return 0xff;
 }
 
 uint8_t snk_state::tnk3_ymirq_ack_r()
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), YM1IRQ_CLEAR);
+	m_sndirq_update_callback.synchronize(YM1IRQ_CLEAR);
 	return 0xff;
 }
 
@@ -811,7 +814,7 @@ uint8_t snk_state::tnk3_busy_clear_r()
 {
 	// it's uncertain whether the latch should be cleared here or when it's read
 	m_soundlatch->clear_w();
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), BUSY_CLEAR);
+	m_sndirq_update_callback.synchronize(BUSY_CLEAR);
 	return 0xff;
 }
 

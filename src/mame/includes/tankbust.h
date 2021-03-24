@@ -73,7 +73,9 @@ private:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	TIMER_CALLBACK_MEMBER(soundlatch_callback);
+	emu_timer_cb m_soundlatch_callback;
 	TIMER_CALLBACK_MEMBER(soundirqline_callback);
+	emu_timer_cb m_soundirqline_callback;
 
 	void main_map(address_map &map);
 	void map_cpu2(address_map &map);
