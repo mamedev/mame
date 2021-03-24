@@ -92,6 +92,7 @@ private:
 	void update_status();
 
 	TIMER_CALLBACK_MEMBER(rdy_write_callback);
+	emu_timer_cb m_rdy_write_callback;
 
 	// internal state
 	devcb_write_line   m_out_busreq_cb;

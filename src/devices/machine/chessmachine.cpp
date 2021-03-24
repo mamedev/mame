@@ -60,6 +60,8 @@ void chessmachine_device::device_start()
 {
 	// resolve callbacks
 	m_data_out.resolve_safe();
+	m_sync0_callback.enregister(*this, FUNC(chessmachine_device::sync0_callback));
+	m_sync1_callback.enregister(*this, FUNC(chessmachine_device::sync1_callback));
 
 	// zerofill
 	m_bootstrap_enabled = false;
@@ -83,7 +85,7 @@ void chessmachine_device::sync0_callback(void *ptr, s32 param)
 
 void chessmachine_device::data0_w(int state)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(chessmachine_device::sync0_callback), this), state ? 1 : 0);
+	m_sync0_callback.synchronize(state ? 1 : 0);
 }
 
 void chessmachine_device::sync1_callback(void *ptr, s32 param)
@@ -96,7 +98,7 @@ void chessmachine_device::sync1_callback(void *ptr, s32 param)
 
 void chessmachine_device::data1_w(int state)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(chessmachine_device::sync1_callback), this), state ? 0x80 : 0);
+	m_sync1_callback.synchronize(state ? 0x80 : 0);
 }
 
 void chessmachine_device::reset_w(int state)

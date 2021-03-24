@@ -167,7 +167,7 @@ uint8_t at_kbc_device_base::status_r()
 void at_kbc_device_base::data_w(uint8_t data)
 {
 	LOG("data_w 0x%02x (%s)\n", data, machine().describe_context());
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(at_kbc_device_base::write_data), this), unsigned(data));
+	m_write_data.synchronize(unsigned(data));
 }
 
 void at_kbc_device_base::command_w(uint8_t data)
@@ -269,17 +269,17 @@ void at_kbc_device_base::command_w(uint8_t data)
 	else
 		LOG("command_w 0x%02x (%s)\n", data, machine().describe_context());
 
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(at_kbc_device_base::write_command), this), unsigned(data));
+	m_write_command.synchronize(unsigned(data));
 }
 
 WRITE_LINE_MEMBER(at_kbc_device_base::kbd_clk_w)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(at_kbc_device_base::set_kbd_clk_in), this), state);
+	m_set_kbd_clk_in.synchronize(state);
 }
 
 WRITE_LINE_MEMBER(at_kbc_device_base::kbd_data_w)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(at_kbc_device_base::set_kbd_data_in), this), state);
+	m_set_kbd_data_in.synchronize(state);
 }
 
 at_kbc_device_base::at_kbc_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
@@ -310,6 +310,11 @@ void at_kbc_device_base::device_start()
 	save_item(NAME(m_kbd_clk_out));
 	save_item(NAME(m_kbd_data_in));
 	save_item(NAME(m_kbd_data_out));
+
+	m_write_data.enregister(*this, FUNC(at_kbc_device_base::write_data));
+	m_write_command.enregister(*this, FUNC(at_kbc_device_base::write_command));
+	m_set_kbd_clk_in.enregister(*this, FUNC(at_kbc_device_base::set_kbd_clk_in));
+	m_set_kbd_data_in.enregister(*this, FUNC(at_kbc_device_base::set_kbd_data_in));
 
 	m_hot_res = m_gate_a20 = m_kbd_irq = 0U;
 	m_kbd_clk_in = m_kbd_clk_out = 1U;
@@ -444,12 +449,12 @@ uint8_t ps2_keyboard_controller_device::status_r()
 
 WRITE_LINE_MEMBER(ps2_keyboard_controller_device::aux_clk_w)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(ps2_keyboard_controller_device::set_aux_clk_in), this), state);
+	m_set_aux_clk_in.synchronize(state);
 }
 
 WRITE_LINE_MEMBER(ps2_keyboard_controller_device::aux_data_w)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(ps2_keyboard_controller_device::set_aux_data_in), this), state);
+	m_set_aux_data_in.synchronize(state);
 }
 
 ps2_keyboard_controller_device::ps2_keyboard_controller_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
@@ -490,6 +495,9 @@ void ps2_keyboard_controller_device::device_resolve_objects()
 void ps2_keyboard_controller_device::device_start()
 {
 	at_kbc_device_base::device_start();
+
+	m_set_aux_clk_in.enregister(*this, FUNC(ps2_keyboard_controller_device::set_aux_clk_in));
+	m_set_aux_data_in.enregister(*this, FUNC(ps2_keyboard_controller_device::set_aux_data_in));
 
 	save_item(NAME(m_aux_irq));
 	save_item(NAME(m_aux_clk_in));

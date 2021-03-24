@@ -75,6 +75,9 @@ void aic565_device::device_start()
 	save_item(NAME(m_local_status));
 	save_item(NAME(m_aux_status));
 	save_item(NAME(m_interrupt_flags));
+
+	m_host_sync_w.enregister(*this, FUNC(aic565_device::host_sync_w));
+	m_local_sync_w.enregister(*this, FUNC(aic565_device::local_sync_w));
 }
 
 
@@ -130,7 +133,7 @@ u8 aic565_device::host_r(offs_t offset)
 
 void aic565_device::host_w(offs_t offset, u8 data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(aic565_device::host_sync_w), this), (offset & 3) << 8 | data);
+	m_host_sync_w.synchronize((offset & 3) << 8 | data);
 }
 
 
@@ -214,7 +217,7 @@ u8 aic565_device::local_r(offs_t offset)
 
 void aic565_device::local_w(offs_t offset, u8 data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(aic565_device::local_sync_w), this), (offset & 3) << 8 | data);
+	m_local_sync_w.synchronize((offset & 3) << 8 | data);
 }
 
 

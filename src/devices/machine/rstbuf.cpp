@@ -117,6 +117,9 @@ void rst_buffer_device::device_resolve_objects()
 
 void rst_buffer_device::device_start()
 {
+	m_sync_set_input.enregister(*this, FUNC(rst_pos_buffer_device::sync_set_input));
+	m_sync_clear_input.enregister(*this, FUNC(rst_pos_buffer_device::sync_clear_input));
+
 	// save input state
 	save_item(NAME(m_input_buffer));
 }
@@ -163,9 +166,9 @@ TIMER_CALLBACK_MEMBER(rst_buffer_device::sync_clear_input)
 void rst_buffer_device::sync_input(bool state, u8 mask)
 {
 	if (state)
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(rst_pos_buffer_device::sync_set_input), this), mask);
+		m_sync_set_input.synchronize(mask);
 	else
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(rst_pos_buffer_device::sync_clear_input), this), mask);
+		m_sync_clear_input.synchronize(mask);
 }
 
 

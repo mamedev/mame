@@ -83,6 +83,8 @@ void am9513_device::device_start()
 	m_out_cb.resolve_all_safe();
 	m_fout_cb.resolve();
 
+	m_clear_outputs.enregister(*this, FUNC(am9513_device::clear_outputs));
+
 	// Power-on reset
 	m_dpr = 0x1f;
 	m_mmr = 0;
@@ -144,7 +146,7 @@ void am9513_device::device_start()
 	save_item(NAME(m_fout_counter));
 
 	// Synchronize clearing of OUT n
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(am9513_device::clear_outputs), this));
+	m_clear_outputs.synchronize();
 }
 
 

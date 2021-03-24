@@ -182,6 +182,7 @@ void z80dma_device::device_start()
 
 	// allocate timer
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80dma_device::timerproc), this));
+	m_rdy_write_callback.enregister(*this, FUNC(z80dma_device::rdy_write_callback));
 
 	// register for state saving
 	save_item(NAME(m_regs));
@@ -866,7 +867,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::rdy_write_callback)
 WRITE_LINE_MEMBER(z80dma_device::rdy_w)
 {
 	LOG("Z80DMA RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(z80dma_device::rdy_write_callback),this), state);
+	m_rdy_write_callback.synchronize(state);
 }
 
 

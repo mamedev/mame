@@ -48,6 +48,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(dsp_ock_w);
 	u16 dsp_pio_r();
 	void set_dsp_ready(void *ptr, s32 param);
+	emu_timer_cb m_set_dsp_ready;
 	void set_cmd(void *ptr, s32 param);
 
 	// MAME resources

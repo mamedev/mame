@@ -789,9 +789,11 @@ private:
 
 	// check interrupts
 	TIMER_CALLBACK_MEMBER(check_interrupts);
+	emu_timer_cb m_check_interrupts;
 
 	// handle a mode register write
 	TIMER_CALLBACK_MEMBER(synced_mode_w);
+	emu_timer_cb m_synced_mode_w;
 
 	// internal state
 	device_t &m_device;              // reference to the owning device

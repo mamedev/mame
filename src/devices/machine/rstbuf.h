@@ -39,7 +39,9 @@ protected:
 	// synchronization helpers
 	void sync_input(bool state, u8 mask);
 	TIMER_CALLBACK_MEMBER(sync_set_input);
+	emu_timer_cb m_sync_set_input;
 	TIMER_CALLBACK_MEMBER(sync_clear_input);
+	emu_timer_cb m_sync_clear_input;
 
 	// interrupt output callback
 	devcb_write_line m_int_cb;

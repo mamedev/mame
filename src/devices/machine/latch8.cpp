@@ -60,7 +60,7 @@ void latch8_device::write(offs_t offset, uint8_t data)
 	assert(offset == 0);
 
 	if (m_nosync != 0xff)
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(latch8_device::timerproc),this), (0xFF << 8) | data);
+		m_timerproc.synchronize((0xFF << 8) | data);
 	else
 		update(data, 0xFF);
 }
@@ -87,7 +87,7 @@ void latch8_device::bitx_w(int bit, offs_t offset, uint8_t data)
 	if (m_nosync & mask)
 		update(masked_data, mask);
 	else
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(latch8_device::timerproc),this), (mask << 8) | masked_data);
+		m_timerproc.synchronize((mask << 8) | masked_data);
 }
 
 void latch8_device::bit0_w(offs_t offset, uint8_t data) { bitx_w(0, offset, data); }
@@ -133,6 +133,8 @@ void latch8_device::device_validity_check(validity_checker &valid) const
 
 void latch8_device::device_start()
 {
+	m_timerproc.enregister(*this, FUNC(latch8_device::timerproc));
+
 	/* setup nodemap */
 	for (auto &cb : m_write_cb)
 	{

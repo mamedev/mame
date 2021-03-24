@@ -52,6 +52,7 @@ protected:
 
 private:
 	void init_callback(void *ptr, s32 param);
+	emu_timer_cb m_init_callback;
 
 	bool                    m_separate_acknowledge;
 	bool                    m_latch_written;
@@ -79,6 +80,7 @@ protected:
 	virtual void device_start() override;
 
 	void sync_callback(void *ptr, s32 param);
+	emu_timer_cb m_sync_callback;
 
 private:
 	u8 m_latched_value;
@@ -105,6 +107,7 @@ protected:
 	virtual void device_start() override;
 
 	void sync_callback(void *ptr, s32 param);
+	emu_timer_cb m_sync_callback;
 
 private:
 	u16 m_latched_value;

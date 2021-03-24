@@ -1291,6 +1291,10 @@ void ymfm_engine_base<RegisterType>::save(device_t &device)
 	// resolve the IRQ handler while we're here
 	m_irq_handler.resolve();
 
+	// register timer callbacks
+	m_synced_mode_w.enregister(device.machine().scheduler(), device.tag(), timer_expired_delegate(FUNC(ymfm_engine_base<RegisterType>::synced_mode_w), this));
+	m_check_interrupts.enregister(device.machine().scheduler(), device.tag(), timer_expired_delegate(FUNC(ymfm_engine_base<RegisterType>::check_interrupts), this));
+
 	// save our data
 	device.save_item(YMFM_NAME(m_env_counter));
 	device.save_item(YMFM_NAME(m_lfo_counter));
@@ -1399,7 +1403,7 @@ void ymfm_engine_base<RegisterType>::write(u16 regnum, u8 data)
 	// schedule these writes to ensure ordering with timers
 	if (regnum == RegisterType::REG_MODE)
 	{
-		m_device.machine().scheduler().synchronize(timer_expired_delegate(FUNC(ymfm_engine_base<RegisterType>::synced_mode_w), this), data);
+		m_synced_mode_w.synchronize(data);
 		return;
 	}
 
@@ -1637,7 +1641,7 @@ void ymfm_engine_base<RegisterType>::schedule_check_interrupts()
 	// otherwise, do it directly
 	auto &scheduler = m_device.machine().scheduler();
 	if (scheduler.currently_executing())
-		scheduler.synchronize(timer_expired_delegate(FUNC(ymfm_engine_base<RegisterType>::check_interrupts), this), 0);
+		m_check_interrupts.synchronize(0);
 	else
 		check_interrupts(nullptr, 0);
 }

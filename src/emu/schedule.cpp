@@ -55,17 +55,22 @@ emu_timer_cb::emu_timer_cb() :
 {
 }
 
-void emu_timer_cb::enregister(device_scheduler &scheduler, timer_expired_delegate callback)
+void emu_timer_cb::enregister(device_scheduler &scheduler, char const *unique, timer_expired_delegate callback)
 {
 	if (m_next != nullptr)
 		throw emu_fatalerror("Attempted to re-enregister a emu_timer_cb");
 	m_callback = callback;
 	m_scheduler = &scheduler;
 	m_unique_id = m_callback.name();
+	if (unique != nullptr)
+	{
+		m_unique_id += "/";
+		m_unique_id += unique;
+	}
 	m_scheduler->register_timer_expired(*this);
 }
 
-void emu_timer_cb::enregister(device_t &device, timer_expired_delegate callback)
+void emu_timer_cb::enregister(device_t &device, char const *unique, timer_expired_delegate callback)
 {
 	if (m_next != nullptr)
 		throw emu_fatalerror("Attempted to re-enregister a emu_timer_cb");
@@ -74,10 +79,15 @@ void emu_timer_cb::enregister(device_t &device, timer_expired_delegate callback)
 	m_unique_id = device.tag();
 	m_unique_id += "/";
 	m_unique_id += m_callback.name();
+	if (unique != nullptr)
+	{
+		m_unique_id += "/";
+		m_unique_id += unique;
+	}
 	m_scheduler->register_timer_expired(*this);
 }
 
-void emu_timer_cb::interface_enregister(device_interface &intf, timer_expired_delegate callback)
+void emu_timer_cb::interface_enregister(device_interface &intf, char const *unique, timer_expired_delegate callback)
 {
 	if (m_next != nullptr)
 		throw emu_fatalerror("Attempted to re-enregister a emu_timer_cb");
@@ -86,6 +96,11 @@ void emu_timer_cb::interface_enregister(device_interface &intf, timer_expired_de
 	m_unique_id = intf.device().tag();
 	m_unique_id += "/";
 	m_unique_id += m_callback.name();
+	if (unique != nullptr)
+	{
+		m_unique_id += "/";
+		m_unique_id += unique;
+	}
 	m_scheduler->register_timer_expired(*this);
 }
 

@@ -44,20 +44,20 @@ public:
 	emu_timer_cb();
 
 	// registration
-	void enregister(device_scheduler &scheduler, timer_expired_delegate callback);
-	void enregister(device_t &device, timer_expired_delegate callback);
-	void interface_enregister(device_interface &device, timer_expired_delegate callback);
+	void enregister(device_scheduler &scheduler, char const *unique, timer_expired_delegate callback);
+	void enregister(device_t &device, char const *unique, timer_expired_delegate callback);
+	void interface_enregister(device_interface &device, char const *unique, timer_expired_delegate callback);
 
 	// direct registration for device's and device interfaces
 	template<typename DeviceType, typename FuncType>
-	void enregister(DeviceType &device, FuncType callback, char const *string)
+	void enregister(DeviceType &device, FuncType callback, char const *string, char const *unique = nullptr)
 	{
-		return enregister(device, timer_expired_delegate(callback, string, &device));
+		enregister(device, unique, timer_expired_delegate(callback, string, &device));
 	}
 	template<typename IntfType, typename FuncType>
-	void interface_enregister(IntfType &intf, FuncType callback, char const *string)
+	void interface_enregister(IntfType &intf, FuncType callback, char const *string, char const *unique = nullptr)
 	{
-		return enregister(intf, timer_expired_delegate(callback, string, &intf));
+		interface_enregister(intf, unique, timer_expired_delegate(callback, string, &intf));
 	}
 
 	// call the delegate after a set amount of time, with the given parameter

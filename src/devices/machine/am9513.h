@@ -98,6 +98,7 @@ protected:
 private:
 	// internal helpers
 	TIMER_CALLBACK_MEMBER(clear_outputs);
+	emu_timer_cb m_clear_outputs;
 	void master_reset();
 	void init_freq_timer(int f);
 	void select_freq_timer(int f, int c, bool selected, bool cycle);

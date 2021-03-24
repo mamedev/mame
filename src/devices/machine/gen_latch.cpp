@@ -49,7 +49,8 @@ void generic_latch_base_device::device_start()
 	save_item(NAME(m_latch_written));
 
 	// synchronization is needed since other devices may not be initialized yet
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(generic_latch_base_device::init_callback), this));
+	m_init_callback.enregister(*this, FUNC(generic_latch_base_device::init_callback));
+	m_init_callback.synchronize();
 }
 
 //-------------------------------------------------
@@ -125,7 +126,7 @@ u8 generic_latch_8_device::read()
 
 void generic_latch_8_device::write(u8 data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(generic_latch_8_device::sync_callback), this), data);
+	m_sync_callback.synchronize(data);
 }
 
 void generic_latch_8_device::preset_w(u8 data)
@@ -174,6 +175,7 @@ void generic_latch_8_device::device_start()
 {
 	// register for state saving
 	generic_latch_base_device::device_start();
+	m_sync_callback.enregister(*this, FUNC(generic_latch_8_device::sync_callback));
 	save_item(NAME(m_latched_value));
 }
 
@@ -196,7 +198,7 @@ u16 generic_latch_16_device::read()
 
 void generic_latch_16_device::write(u16 data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(generic_latch_16_device::sync_callback), this), data);
+	m_sync_callback.synchronize(data);
 }
 
 void generic_latch_16_device::preset_w(u16 data)
@@ -245,5 +247,6 @@ void generic_latch_16_device::device_start()
 {
 	// register for state saving
 	generic_latch_base_device::device_start();
+	m_sync_callback.enregister(*this, FUNC(generic_latch_16_device::sync_callback));
 	save_item(NAME(m_latched_value));
 }

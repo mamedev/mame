@@ -209,6 +209,8 @@ void qsound_device::device_start()
 	// hope we get good synchronisation between the DSP and the sound system
 	m_stream = stream_alloc(0, 2, clock() / 2 / 1248);
 
+	m_set_dsp_ready.enregister(*this, FUNC(qsound_device::set_dsp_ready));
+
 	// save DSP communication state
 	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_rom_offset));
@@ -349,7 +351,7 @@ u16 qsound_device::dsp_pio_r()
 	{
 		m_cmd_pending = 0U;
 		m_dsp->set_input_line(DSP16_INT_LINE, CLEAR_LINE);
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(qsound_device::set_dsp_ready), this));
+		m_set_dsp_ready.synchronize();
 		return m_cmd_addr;
 	}
 	else

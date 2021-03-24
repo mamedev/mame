@@ -47,7 +47,9 @@ private:
 
 	u8 m_latch[2];
 	void sync0_callback(void *ptr, s32 param);
+	emu_timer_cb m_sync0_callback;
 	void sync1_callback(void *ptr, s32 param);
+	emu_timer_cb m_sync1_callback;
 
 	bool m_bootstrap_enabled;
 	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootstrap) { m_bootstrap_enabled = false; }
