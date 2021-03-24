@@ -13,7 +13,7 @@ void mm78la_device::op_ioa()
 {
 	// IOA: output A+carry to lower half of RO pins
 	u16 mask = (1 << (m_r_pins / 2)) - 1;
-	m_r_output = (m_r_output & ~mask) | (m_c << 4 | m_a);
+	m_r_output = (m_r_output & ~mask) | (m_c_in << 4 | m_a);
 	m_write_r(m_r_output);
 }
 
@@ -21,7 +21,7 @@ void mm78la_device::op_ox()
 {
 	// OX: output A+carry to upper half of RO pins
 	u16 mask = (1 << (m_r_pins / 2)) - 1;
-	m_r_output = (m_r_output & mask) | (m_c << 4 | m_a) << (m_r_pins / 2);
+	m_r_output = (m_r_output & mask) | (m_c_in << 4 | m_a) << (m_r_pins / 2);
 	m_write_r(m_r_output);
 }
 
@@ -30,7 +30,7 @@ void mm78la_device::op_ix()
 	// IX: output A+carry to RO pins through PLA (MM78LA)
 	u32 out = ~m_opla->read(m_a) & 0x0fff'ffff;
 	out = bitswap<28>(out, 26,22,18,14,10,6,2,1,5,9,13,17,21,25, 27,23,19,15,11,7,3,0,4,8,12,16,20,24);
-	m_r_output = out >> (m_c ? 0 : 14) & 0x3fff;
+	m_r_output = out >> (m_c_in ? 0 : 14) & 0x3fff;
 	m_write_r(m_r_output);
 }
 
