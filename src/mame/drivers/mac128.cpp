@@ -87,7 +87,6 @@ part number 338-6523 (later Macs use a PLCC version which Apple numbered
 #include "bus/scsi/scsihd.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
-#include "machine/applefdc.h"
 #include "machine/iwm.h"
 #include "machine/swim1.h"
 #include "machine/ncr5380n.h"
