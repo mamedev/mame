@@ -291,7 +291,7 @@ void macpdm_state::driver_reset()
 	m_via2_ier = 0x00;
 	m_via2_ifr = 0x00;
 	m_via2_sier = 0x00;
-	m_via2_sifr = 0x07;
+	m_via2_sifr = 0x7f;
 
 	m_irq_control = 0;
 
@@ -374,11 +374,11 @@ void macpdm_state::via2_irq_main_set(uint8_t mask, int state)
 
 void macpdm_state::via2_irq_slot_set(uint8_t mask, int state)
 {
-	if(((m_via2_sifr & mask) != 0) == state)
+	if(((m_via2_sifr & mask) == 0) == state)
 		return;
 
 	m_via2_sifr ^= mask;
-	via2_irq_main_set(0x02, (m_via2_sifr & m_via2_sier) != 0);
+	via2_irq_main_set(0x02, ((~m_via2_sifr) & m_via2_sier) != 0);
 }
 
 
@@ -460,7 +460,7 @@ void macpdm_state::via2_ier_w(uint8_t data)
 
 	logerror("via2 ier %s %s %s %s\n",
 			 m_via2_ier & 0x20 ? "fdc" : "-",
-			 m_via2_ier & 0x20 ? "sound" : "-",
+			 m_via2_ier & 0x10 ? "sound" : "-",
 			 m_via2_ier & 0x08 ? "scsi" : "-",
 			 m_via2_ier & 0x02 ? "slot" : "-",
 			 m_via2_ier & 0x01 ? "scsidrq" : "-");
@@ -491,7 +491,7 @@ void macpdm_state::via2_sier_w(uint8_t data)
 			 m_via2_sier & 0x10 ? "slot1" : "-",
 			 m_via2_sier & 0x08 ? "slot0" : "-");
 
-	via2_irq_main_set(0x02, (m_via2_sifr & m_via2_sier) != 0);
+	via2_irq_main_set(0x02, ((~m_via2_sifr) & m_via2_sier) != 0);
 }
 
 uint8_t macpdm_state::via2_sifr_r()
@@ -999,6 +999,7 @@ void macpdm_state::macpdm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpdm_state::pdm_map);
 
 	MAC_VIDEO_SONORA(config, m_video);
+	m_video->screen_vblank().set(FUNC(macpdm_state::vblank_irq));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1075,4 +1076,4 @@ ROM_START( pmac6100 )
 ROM_END
 
 
-COMP( 1994, pmac6100,  0, 0, macpdm, macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 6100/60",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1994, pmac6100,  0, 0, macpdm, macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 6100/60",  MACHINE_NOT_WORKING )
