@@ -317,6 +317,8 @@ void leland_80186_sound_device::device_start()
 	save_item(NAME(m_ext_stop));
 	save_item(NAME(m_ext_active));
 
+	m_delayed_response_r.enregister(*this, FUNC(leland_80186_sound_device::delayed_response_r));
+
 	// zerofill
 	m_peripheral = 0;
 	m_last_control = 0;
@@ -523,7 +525,7 @@ u8 leland_80186_sound_device::response_r()
 	if (LOG_COMM) logerror("%04X:Read sound response latch = %02X\n", pc, m_sound_response);
 
 	/* synchronize the response */
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(leland_80186_sound_device::delayed_response_r), this), pc + 2);
+	m_delayed_response_r.synchronize(pc + 2);
 	return m_sound_response;
 }
 

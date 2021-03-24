@@ -24,6 +24,11 @@
 #define QIX_VOL_DATA_R      NODE_04
 
 
+void qix_state::sound_start()
+{
+	m_deferred_sndpia1_porta_w.enregister(*this, FUNC(qix_state::deferred_sndpia1_porta_w));
+}
+
 
 /***************************************************************************
 Audio handlers
@@ -111,7 +116,7 @@ TIMER_CALLBACK_MEMBER(qix_state::deferred_sndpia1_porta_w)
 void qix_state::sync_sndpia1_porta_w(uint8_t data)
 {
 	/* we need to synchronize this so the sound CPU doesn't drop anything important */
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(qix_state::deferred_sndpia1_porta_w), this), data);
+	m_deferred_sndpia1_porta_w.synchronize(data);
 }
 
 

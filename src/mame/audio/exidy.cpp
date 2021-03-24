@@ -932,7 +932,7 @@ void victory_sound_device::command_w(uint8_t data)
 {
 	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound command = %02X\n", machine().describe_context(), data);
 
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(victory_sound_device::delayed_command_w), this), data);
+	m_delayed_command_w.synchronize(data);
 }
 
 
@@ -979,6 +979,8 @@ void victory_sound_device::device_start()
 	save_item(NAME(m_victory_sound_response_ack_clk));
 	save_item(NAME(m_pia_ca1));
 	save_item(NAME(m_pia_cb1));
+
+	m_delayed_command_w.enregister(*this, FUNC(victory_sound_device::delayed_command_w));
 
 	exidy_sh8253_sound_device::device_start();
 }

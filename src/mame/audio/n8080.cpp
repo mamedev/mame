@@ -15,6 +15,12 @@ constexpr double ATTACK_RATE = 10e-6 * 500;
 constexpr double DECAY_RATE = 10e-6 * 16000;
 
 
+void n8080_state::sound_start()
+{
+	m_delayed_sound_1_callback.enregister(*this, FUNC(n8080_state::delayed_sound_1_callback));
+	m_delayed_sound_2_callback.enregister(*this, FUNC(n8080_state::delayed_sound_2_callback));
+}
+
 void spacefev_state::update_SN76477_status()
 {
 	double dblR0 = RES_M(1.0);
@@ -251,12 +257,12 @@ TIMER_CALLBACK_MEMBER( n8080_state::delayed_sound_2_callback )
 
 void n8080_state::n8080_sound_1_w(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(n8080_state::delayed_sound_1_callback), this), data); /* force CPUs to sync */
+	m_delayed_sound_1_callback.synchronize(data); /* force CPUs to sync */
 }
 
 void n8080_state::n8080_sound_2_w(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(n8080_state::delayed_sound_2_callback), this), data); /* force CPUs to sync */
+	m_delayed_sound_2_callback.synchronize(data); /* force CPUs to sync */
 }
 
 
@@ -374,6 +380,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(helifire_state::dac_volume_timer)
 
 void spacefev_state::sound_start()
 {
+	n8080_state::sound_start();
+
 	m_sound_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spacefev_state::stop_mono_flop_callback), this));
 	m_sound_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spacefev_state::stop_mono_flop_callback), this));
 	m_sound_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spacefev_state::stop_mono_flop_callback), this));
@@ -400,6 +408,8 @@ void spacefev_state::sound_reset()
 
 void sheriff_state::sound_start()
 {
+	n8080_state::sound_start();
+
 	m_sound_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sheriff_state::stop_mono_flop_callback), this));
 	m_sound_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sheriff_state::stop_mono_flop_callback), this));
 
@@ -424,6 +434,8 @@ void sheriff_state::sound_reset()
 
 void helifire_state::sound_start()
 {
+	n8080_state::sound_start();
+
 	save_item(NAME(m_prev_snd_data));
 	save_item(NAME(m_prev_sound_pins));
 	save_item(NAME(m_curr_sound_pins));

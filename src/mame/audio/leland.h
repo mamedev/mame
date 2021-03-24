@@ -72,6 +72,7 @@ protected:
 
 private:
 	void delayed_response_r(void *ptr, int param);
+	emu_timer_cb m_delayed_response_r;
 	void set_clock_line(int which, int state) { m_clock_active = state ? (m_clock_active | (1<<which)) : (m_clock_active & ~(1<<which)); }
 
 	// internal state

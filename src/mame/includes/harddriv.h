@@ -571,6 +571,7 @@ private:
 
 	void update_68k_interrupts();
 	TIMER_CALLBACK_MEMBER( delayed_68k_w );
+	emu_timer_cb m_delayed_68k_w;
 
 	DECLARE_READ_LINE_MEMBER(hdsnddsp_get_bio);
 };

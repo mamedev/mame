@@ -88,6 +88,8 @@ void usb_sound_device::device_start()
 	save_item(NAME(m_work_ram_bank));
 	save_item(NAME(m_t1_clock));
 
+	m_delayed_usb_data_w.enregister(*this, FUNC(usb_sound_device::delayed_usb_data_w));
+
 #if (ENABLE_SEGAUSB_NETLIST)
 
 	for (int index = 0; index < 3; index++)
@@ -231,7 +233,7 @@ TIMER_CALLBACK_MEMBER( usb_sound_device::delayed_usb_data_w )
 void usb_sound_device::data_w(u8 data)
 {
 	LOG("%s:usb_data_w = %02X\n", machine().describe_context(), data);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(usb_sound_device::delayed_usb_data_w), this), data);
+	m_delayed_usb_data_w.synchronize(data);
 
 	// boost the interleave so that sequences can be sent
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));

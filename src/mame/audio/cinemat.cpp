@@ -326,7 +326,7 @@ WRITE_LINE_MEMBER(demon_state::demon_sound4_w)
 {
 	/* watch for a 0->1 edge on bit 4 ("shift in") to clock in the new data */
 	if (state)
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(demon_state::synced_sound_w), this), ~m_outlatch->output_state() & 0x0f);
+		m_synced_sound_w.synchronize(~m_outlatch->output_state() & 0x0f);
 }
 
 
@@ -370,6 +370,8 @@ void demon_state::sound_output_w(u8 data)
 void demon_state::sound_start()
 {
 	cinemat_state::sound_start();
+
+	m_synced_sound_w.enregister(*this, FUNC(demon_state::synced_sound_w));
 
 	/* register for save states */
 	save_item(NAME(m_sound_fifo));
@@ -461,7 +463,7 @@ void demon_state::demon_sound(machine_config &config)
 void qb3_state::qb3_sound_fifo_w(u8 data)
 {
 	u16 rega = m_maincpu->state_int(ccpu_cpu_device::CCPU_A);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(qb3_state::synced_sound_w), this), rega & 0x0f);
+	m_synced_sound_w.synchronize(rega & 0x0f);
 }
 
 

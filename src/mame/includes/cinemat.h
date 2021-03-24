@@ -181,6 +181,7 @@ public:
 
 protected:
 	TIMER_CALLBACK_MEMBER(synced_sound_w);
+	emu_timer_cb m_synced_sound_w;
 	DECLARE_WRITE_LINE_MEMBER(demon_sound4_w);
 	u8 sound_porta_r();
 	u8 sound_portb_r();

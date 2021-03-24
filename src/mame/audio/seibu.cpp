@@ -99,6 +99,8 @@ void seibu_sound_device::device_start()
 	m_ym_read_cb.resolve_safe(0);
 	m_ym_write_cb.resolve_safe();
 
+	m_update_irq_synced.enregister(*this, FUNC(seibu_sound_device::update_irq_synced));
+
 	if (m_sound_rom.found() && m_rom_bank.found())
 	{
 		if (m_sound_rom.length() > 0x10000)
@@ -135,7 +137,7 @@ void seibu_sound_device::device_reset()
 
 void seibu_sound_device::update_irq_lines(int param)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(seibu_sound_device::update_irq_synced), this), param);
+	m_update_irq_synced.synchronize(param);
 }
 
 TIMER_CALLBACK_MEMBER(seibu_sound_device::update_irq_synced)

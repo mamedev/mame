@@ -80,6 +80,7 @@ protected:
 private:
 	void update_irq_lines(int param);
 	TIMER_CALLBACK_MEMBER(update_irq_synced);
+	emu_timer_cb m_update_irq_synced;
 
 	// device callbacks
 	devcb_write_line m_int_cb;

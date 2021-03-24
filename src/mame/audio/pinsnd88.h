@@ -45,6 +45,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	TIMER_CALLBACK_MEMBER(deferred_sync_w);
+	emu_timer_cb m_deferred_sync_w;
 
 	// members
 	required_device<mc6809e_device> m_cpu;

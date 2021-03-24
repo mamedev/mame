@@ -325,12 +325,12 @@ TIMER_CALLBACK_MEMBER(s11c_bg_device::deferred_pb_w)
 
 WRITE_LINE_MEMBER( s11c_bg_device::pia40_cb2_w)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(s11c_bg_device::deferred_cb2_w),this), state);
+	m_deferred_cb2_w.synchronize(state);
 }
 
 void s11c_bg_device::pia40_pb_w(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(s11c_bg_device::deferred_pb_w),this), data);
+	m_deferred_pb_w.synchronize(data);
 }
 
 
@@ -504,6 +504,8 @@ void s11c_bg_device::device_start()
 	/* resolve lines */
 	m_cb2_cb.resolve();
 	m_pb_cb.resolve();
+	m_deferred_cb2_w.enregister(*this, FUNC(s11c_bg_device::deferred_cb2_w));
+	m_deferred_pb_w.enregister(*this, FUNC(s11c_bg_device::deferred_pb_w));
 	save_item(NAME(m_old_resetq_state));
 }
 

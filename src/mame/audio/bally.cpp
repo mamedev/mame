@@ -91,7 +91,7 @@ DISCRETE_SOUND_END
 
 void bally_as2888_device::sound_select(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_as2888_device::sound_select_sync), this), data);
+	m_sound_select_sync.synchronize(data);
 }
 
 
@@ -106,7 +106,7 @@ TIMER_CALLBACK_MEMBER(bally_as2888_device::sound_select_sync)
 
 WRITE_LINE_MEMBER(bally_as2888_device::sound_int)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_as2888_device::sound_int_sync), this), state);
+	m_sound_int_sync.synchronize(state);
 }
 
 TIMER_CALLBACK_MEMBER(bally_as2888_device::sound_int_sync)
@@ -141,6 +141,9 @@ void bally_as2888_device::device_start()
 	save_item(NAME(m_snd_sel));
 	save_item(NAME(m_snd_tone_gen));
 	save_item(NAME(m_snd_div));
+
+	m_sound_select_sync.enregister(*this, FUNC(bally_as2888_device::sound_select_sync));
+	m_sound_int_sync.enregister(*this, FUNC(bally_as2888_device::sound_int_sync));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(bally_as2888_device::timer_s)
@@ -198,7 +201,7 @@ INPUT_CHANGED_MEMBER(bally_as3022_device::sw1)
 
 void bally_as3022_device::sound_select(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_as3022_device::sound_select_sync), this), data);
+	m_sound_select_sync.synchronize(data);
 }
 
 
@@ -213,7 +216,7 @@ TIMER_CALLBACK_MEMBER(bally_as3022_device::sound_select_sync)
 
 WRITE_LINE_MEMBER(bally_as3022_device::sound_int)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_as3022_device::sound_int_sync), this), state);
+	m_sound_int_sync.synchronize(state);
 }
 
 TIMER_CALLBACK_MEMBER(bally_as3022_device::sound_int_sync)
@@ -284,6 +287,9 @@ void bally_as3022_device::device_start()
 	m_ay->set_volume(0, 0);
 	m_ay->set_volume(1, 0);
 	m_ay->set_volume(2, 0);
+
+	m_sound_select_sync.enregister(*this, FUNC(bally_as3022_device::sound_select_sync));
+	m_sound_int_sync.enregister(*this, FUNC(bally_as3022_device::sound_int_sync));
 
 	save_item(NAME(m_bc1));
 	save_item(NAME(m_bdir));
@@ -461,7 +467,7 @@ INPUT_CHANGED_MEMBER(bally_cheap_squeak_device::sw1)
 
 void bally_cheap_squeak_device::sound_select(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_cheap_squeak_device::sound_select_sync), this), data);
+	m_sound_select_sync.synchronize(data);
 }
 
 TIMER_CALLBACK_MEMBER(bally_cheap_squeak_device::sound_select_sync)
@@ -474,7 +480,7 @@ TIMER_CALLBACK_MEMBER(bally_cheap_squeak_device::sound_select_sync)
 //-------------------------------------------------
 WRITE_LINE_MEMBER(bally_cheap_squeak_device::sound_int)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_cheap_squeak_device::sound_int_sync), this), state);
+	m_sound_int_sync.synchronize(state);
 }
 
 TIMER_CALLBACK_MEMBER(bally_cheap_squeak_device::sound_int_sync)
@@ -517,6 +523,10 @@ void bally_cheap_squeak_device::device_add_mconfig(machine_config &config)
 void bally_cheap_squeak_device::device_start()
 {
 	m_sound_ack_w_handler.resolve();
+
+	m_sound_select_sync.enregister(*this, FUNC(bally_cheap_squeak_device::sound_select_sync));
+	m_sound_int_sync.enregister(*this, FUNC(bally_cheap_squeak_device::sound_int_sync));
+
 	save_item(NAME(m_sound_select));
 	save_item(NAME(m_sound_int));
 }
@@ -591,7 +601,7 @@ INPUT_CHANGED_MEMBER(bally_squawk_n_talk_device::sw1)
 
 void bally_squawk_n_talk_device::sound_select(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_squawk_n_talk_device::sound_select_sync), this), data);
+	m_sound_select_sync.synchronize(data);
 }
 
 TIMER_CALLBACK_MEMBER(bally_squawk_n_talk_device::sound_select_sync)
@@ -605,7 +615,7 @@ TIMER_CALLBACK_MEMBER(bally_squawk_n_talk_device::sound_select_sync)
 
 WRITE_LINE_MEMBER(bally_squawk_n_talk_device::sound_int)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bally_squawk_n_talk_device::sound_int_sync), this), state);
+	m_sound_int_sync.synchronize(state);
 }
 
 TIMER_CALLBACK_MEMBER(bally_squawk_n_talk_device::sound_int_sync)
@@ -674,6 +684,9 @@ void bally_squawk_n_talk_device::device_add_mconfig(machine_config &config)
 void bally_squawk_n_talk_device::device_start()
 {
 	save_item(NAME(m_sound_select));
+
+	m_sound_select_sync.enregister(*this, FUNC(bally_squawk_n_talk_device::sound_select_sync));
+	m_sound_int_sync.enregister(*this, FUNC(bally_squawk_n_talk_device::sound_int_sync));
 }
 
 //-------------------------------------------------

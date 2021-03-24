@@ -30,6 +30,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void sound_start() override;
 
 	virtual void sound_pins_changed();
 	virtual void update_SN76477_status();
@@ -83,7 +84,9 @@ protected:
 	void stop_mono_flop( int n );
 	TIMER_CALLBACK_MEMBER( stop_mono_flop_callback );
 	TIMER_CALLBACK_MEMBER( delayed_sound_1_callback );
+	emu_timer_cb m_delayed_sound_1_callback;
 	TIMER_CALLBACK_MEMBER( delayed_sound_2_callback );
+	emu_timer_cb m_delayed_sound_2_callback;
 
 	void main_cpu_map(address_map &map);
 	void main_io_map(address_map &map);

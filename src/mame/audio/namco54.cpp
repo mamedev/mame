@@ -92,7 +92,7 @@ void namco_54xx_device::R1_w(uint8_t data)
 
 void namco_54xx_device::write(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_54xx_device::latch_callback),this), data);
+	m_latch_callback.synchronize(data);
 
 	// TODO: should use chip_select line for this
 	m_cpu->pulse_input_line(0, m_irq_duration);
@@ -132,6 +132,8 @@ namco_54xx_device::namco_54xx_device(const machine_config &mconfig, const char *
 
 void namco_54xx_device::device_start()
 {
+	m_latch_callback.enregister(*this, FUNC(namco_54xx_device::latch_callback));
+
 	save_item(NAME(m_latched_cmd));
 }
 

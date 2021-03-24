@@ -108,7 +108,7 @@ void namco_52xx_device::O_w(uint8_t data)
 
 void namco_52xx_device::write(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_52xx_device::latch_callback),this), data);
+	m_latch_callback.synchronize(data);
 
 	// TODO: should use chip_select line for this
 	m_cpu->pulse_input_line(0, m_irq_duration);
@@ -162,6 +162,8 @@ void namco_52xx_device::device_start()
 	/* resolve our read/write callbacks */
 	m_romread.resolve_safe(0);
 	m_si.resolve_safe(0);
+
+	m_latch_callback.enregister(*this, FUNC(namco_52xx_device::latch_callback));
 
 	/* start the external clock */
 	if (m_extclock != 0)

@@ -93,7 +93,9 @@ private:
 
 	// internal communications
 	TIMER_CALLBACK_MEMBER(sound_select_sync);
+	emu_timer_cb m_sound_select_sync;
 	TIMER_CALLBACK_MEMBER(sound_int_sync);
+	emu_timer_cb m_sound_int_sync;
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_as2888);
 };
@@ -161,7 +163,9 @@ private:
 
 	// internal communications
 	TIMER_CALLBACK_MEMBER(sound_select_sync);
+	emu_timer_cb m_sound_select_sync;
 	TIMER_CALLBACK_MEMBER(sound_int_sync);
+	emu_timer_cb m_sound_int_sync;
 	uint8_t pia_porta_r();
 	void pia_porta_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
@@ -250,7 +254,9 @@ private:
 
 	// internal communications
 	TIMER_CALLBACK_MEMBER(sound_select_sync);
+	emu_timer_cb m_sound_select_sync;
 	TIMER_CALLBACK_MEMBER(sound_int_sync);
+	emu_timer_cb m_sound_int_sync;
 	void out_p1_cb(uint8_t data);
 	uint8_t in_p2_cb();
 	void out_p2_cb(uint8_t data);
@@ -323,7 +329,9 @@ protected:
 private:
 	// internal communications
 	TIMER_CALLBACK_MEMBER(sound_select_sync);
+	emu_timer_cb m_sound_select_sync;
 	TIMER_CALLBACK_MEMBER(sound_int_sync);
+	emu_timer_cb m_sound_int_sync;
 	void pia1_portb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia2_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_irq_w);

@@ -52,6 +52,7 @@ private:
 	u8 m_p2;
 
 	TIMER_CALLBACK_MEMBER( delayed_speech_w );
+	emu_timer_cb m_delayed_speech_w;
 };
 
 DECLARE_DEVICE_TYPE(SEGA_SPEECH_BOARD, sega_speech_device)

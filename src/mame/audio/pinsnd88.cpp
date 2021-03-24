@@ -188,7 +188,7 @@ TIMER_CALLBACK_MEMBER(pinsnd88_device::deferred_sync_w)
 
 void pinsnd88_device::sync_w(uint8_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pinsnd88_device::deferred_sync_w),this), 0);
+	m_deferred_sync_w.synchronize(0);
 }
 
 WRITE_LINE_MEMBER(pinsnd88_device::strobe_w)
@@ -242,6 +242,7 @@ void pinsnd88_device::device_start()
 	/* timer */
 	m_sync_timer = timer_alloc(TIMER_SYNC);
 	m_sync_timer->adjust(attotime::never);
+	m_deferred_sync_w.enregister(*this, FUNC(pinsnd88_device::deferred_sync_w));
 	save_item(NAME(m_old_resetq_state));
 	save_item(NAME(m_data_in));
 }

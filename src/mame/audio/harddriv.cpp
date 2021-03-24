@@ -54,6 +54,7 @@ harddriv_sound_board_device::harddriv_sound_board_device(const machine_config &m
 
 void harddriv_sound_board_device::device_start()
 {
+	m_delayed_68k_w.enregister(*this, FUNC(harddriv_sound_board_device::delayed_68k_w));
 }
 
 //-------------------------------------------------
@@ -110,7 +111,7 @@ TIMER_CALLBACK_MEMBER( harddriv_sound_board_device::delayed_68k_w )
 
 void harddriv_sound_board_device::hd68k_snd_data_w(uint16_t data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(harddriv_sound_board_device::delayed_68k_w), this), data);
+	m_delayed_68k_w.synchronize(data);
 	logerror("%s:main write to sound=%04X\n", machine().describe_context(), data);
 }
 
