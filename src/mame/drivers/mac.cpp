@@ -1,56 +1,15 @@
 // license:BSD-3-Clause
-// copyright-holders:Nathan Woods, Raphael Nabet, R. Belmont
+// copyright-holders: Nathan Woods, Raphael Nabet, R. Belmont, O. Galibert
 /****************************************************************************
 
-    drivers/mac.c
-    Macintosh family emulation
-
-    Nate Woods, Raphael Nabet, R. Belmont
-
-        0x000000 - 0x3fffff     RAM/ROM (switches based on overlay)
-        0x400000 - 0x4fffff     ROM
-        0x580000 - 0x5fffff     5380 NCR/Symbios SCSI peripherals chip (Mac Plus only)
-        0x600000 - 0x6fffff     RAM
-        0x800000 - 0x9fffff     Zilog 8530 SCC (Serial Control Chip) Read
-        0xa00000 - 0xbfffff     Zilog 8530 SCC (Serial Control Chip) Write
-        0xc00000 - 0xdfffff     IWM (Integrated Woz Machine; floppy)
-        0xe80000 - 0xefffff     Rockwell 6522 VIA
-        0xf00000 - 0xffffef     ??? (the ROM appears to be accessing here)
-        0xfffff0 - 0xffffff     Auto Vector
-
-    Interrupts:
-        M68K:
-            Level 1 from VIA
-            Level 2 from SCC
-            Level 4 : Interrupt switch (not implemented)
-
-        VIA:
-            CA1 from VBLANK
-            CA2 from 1 Hz clock (RTC)
-            CB1 from Keyboard Clock
-            CB2 from Keyboard Data
-            SR  from Keyboard Data Ready
-
-        SCC:
-            PB_EXT  from mouse Y circuitry
-            PA_EXT  from mouse X circuitry
-
-    NOTES:
-        - pmac6100: with recent PPC fixes now gets into the 68000 emulator and executes part of the 680x0 startup code.
-          'g 6802c73c' to get to the interesting part (wait past the boot chime).  PPC register r24 is the 68000 PC.
-          when the PC hits GetCPUID, the move.l (a2), d0 at PC = 0x10000 will cause an MMU fault (jump to 0xFFF00300).  why?
-          a2 = 0x5ffffffc (the CPU ID register).  MMU is unable to resolve this; defect in the MMU emulation probable.
+    drivers/mac.cpp
+    Macintosh II family emulation
 
     TODO:
-        - SE and Classic to own driver
-        - Portable and PowerBook 100 to own driver
-        - Remaining PowerBooks to own driver
-        - Quadra 700 to own driver
-        - V8 and friends to own driver
+        - V8 and friends (LC, LC2, Classic 2, Color Classic) to own driver
         - LC3 / LC520 / IIvx / IIvi to own driver
 
 ****************************************************************************/
-
 
 #include "emu.h"
 #include "includes/mac.h"
@@ -58,9 +17,6 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/m6805/m6805.h"
-#include "machine/applefdc.h"
-#include "machine/swim.h"
-#include "machine/sonydriv.h"
 #include "formats/ap_dsk35.h"
 #include "machine/iwm.h"
 #include "machine/swim1.h"
@@ -646,17 +602,7 @@ void mac_state::maciifx_map(address_map &map)
 /***************************************************************************
     DEVICE CONFIG
 ***************************************************************************/
-#if !NEW_SWIM
-static const applefdc_interface mac_iwm_interface =
-{
-	sony_set_lines,
-	mac_fdc_set_enable_lines,
 
-	sony_read_data,
-	sony_write_data,
-	sony_read_status
-};
-#endif
 static void mac_nubus_cards(device_slot_interface &device)
 {
 	device.option_add("m2video", NUBUS_M2VIDEO);    /* Apple Macintosh II Video Card */
@@ -694,20 +640,12 @@ static void mac_lcpds_cards(device_slot_interface &device)
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
-#if !NEW_SWIM
-static const floppy_interface mac_floppy_interface =
-{
-	FLOPPY_STANDARD_3_5_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(apple35_mac),
-	"floppy_3_5"
-};
-#endif
+
 void mac_state::add_base_devices(machine_config &config, bool rtc, int woz_version)
 {
 	if (rtc)
 		RTC3430042(config, m_rtc, XTAL(32'768));
 
-#if NEW_SWIM
 	switch (woz_version) {
 	case 0:
 		IWM(config, m_fdc, C15M);
@@ -737,13 +675,6 @@ void mac_state::add_base_devices(machine_config &config, bool rtc, int woz_versi
 		applefdintf_device::add_35_hd(config, m_floppy[0]);
 		applefdintf_device::add_35_nc(config, m_floppy[1]);
 	}
-#else
-	if (woz_version)
-		LEGACY_SWIM(config, m_fdc, &mac_iwm_interface);
-	else
-		LEGACY_IWM(config, m_fdc, &mac_iwm_interface);
-	sonydriv_floppy_image_device::legacy_2_drives_add(config, &mac_floppy_interface);
-#endif
 
 	SCC8530(config, m_scc, C7M);
 	m_scc->intrq_callback().set(FUNC(mac_state::set_scc_interrupt));
@@ -904,15 +835,13 @@ void mac_state::maciihd(machine_config &config)
 {
 	macii(config, true);
 
-#if NEW_SWIM
 	SWIM1(config.replace(), m_fdc, C15M);
 	m_fdc->phases_cb().set(FUNC(mac_state::phases_w));
 	m_fdc->sel35_cb().set(FUNC(mac_state::sel35_w));
 	m_fdc->devsel_cb().set(FUNC(mac_state::devsel_w));
 
 	applefdintf_device::add_35_hd(config, m_floppy[0]);
-	applefdintf_device::add_35_nc(config, m_floppy[1]);
-#endif
+	applefdintf_device::add_35_hd(config, m_floppy[1]);
 }
 
 void mac_state::maciifx(machine_config &config)
@@ -1069,15 +998,13 @@ void mac_state::maciix(machine_config &config, bool nubus_bank1, bool nubus_bank
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macii_map);
 	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
 
-#if NEW_SWIM
 	SWIM1(config.replace(), m_fdc, C15M);
 	m_fdc->phases_cb().set(FUNC(mac_state::phases_w));
 	m_fdc->sel35_cb().set(FUNC(mac_state::sel35_w));
 	m_fdc->devsel_cb().set(FUNC(mac_state::devsel_w));
 
 	applefdintf_device::add_35_hd(config, m_floppy[0]);
-	applefdintf_device::add_35_nc(config, m_floppy[1]);
-#endif
+	applefdintf_device::add_35_hd(config, m_floppy[1]);
 
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("8M,32M,64M,96M,128M");
