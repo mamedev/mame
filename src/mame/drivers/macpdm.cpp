@@ -951,7 +951,7 @@ void macpdm_state::pdm_map(address_map &map)
 	map(0x50f14000, 0x50f1401f).rw(m_awacs, FUNC(awacs_device::read), FUNC(awacs_device::write));
 	map(0x50f16000, 0x50f16000).rw(FUNC(macpdm_state::fdc_r), FUNC(macpdm_state::fdc_w)).select(0x1e00);
 
-	map(0x50f24000, 0x50f24003).w(m_video, FUNC(mac_video_sonora_device::dac_w));
+	map(0x50f24000, 0x50f24003).rw(m_video, FUNC(mac_video_sonora_device::dac_r), FUNC(mac_video_sonora_device::dac_w));
 
 	map(0x50f26002, 0x50f26002).rw(FUNC(macpdm_state::via2_sifr_r), FUNC(macpdm_state::via2_sifr_w)).mirror(0x1fe0);
 	map(0x50f26003, 0x50f26003).r(FUNC(macpdm_state::via2_ifr_r)).mirror(0x1fe0);
@@ -1028,6 +1028,8 @@ void macpdm_state::macpdm(machine_config &config)
 																							 ctrl.irq_handler_cb().set(*this, FUNC(macpdm_state::scsi_irq));
 																						 });
 
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
+	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 
 	SWIM3(config, m_fdc, IO_CLOCK/2);

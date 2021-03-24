@@ -21,18 +21,20 @@ void swim3_device::device_start()
 	applefdintf_device::device_start();
 	save_item(NAME(m_mode));
 	save_item(NAME(m_setup));
-	save_item(NAME(m_param_idx));
 	save_item(NAME(m_param));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_imask));
 }
 
 void swim3_device::device_reset()
 {
 	applefdintf_device::device_reset();
-	m_mode = 0x40;
+	m_mode = 0x00;
 	m_setup = 0x00;
-	m_param_idx = 0;
-	memset(m_param, 0, sizeof(m_param));
+	m_param = 0x77;
 	m_floppy = nullptr;
+	m_irq = 0;
+	m_imask = 0;
 
 	m_devsel_cb(0);
 	m_sel35_cb(true);
@@ -80,7 +82,11 @@ u8 swim3_device::read(offs_t offset)
 		"data", "timer", "error", "param", "phases", "setup", "?6", "handshake",
 		"interrupt", "step", "track", "sector", "gap", "sect1", "xfer", "imask"
 	};
+
 	switch(offset) {
+	case 0x3: // param
+		return m_param;
+
 	case 0x4: // phases
 		return m_phases & 0xf;
 
@@ -93,10 +99,19 @@ u8 swim3_device::read(offs_t offset)
 	case 0x7: { // handshake
 		u8 h = 0;
 		if(!m_floppy || m_floppy->wpt_r())
-			h |= 0x08;
+			h |= 0x0c;
 		logerror("hand %02x\n", h);
 		return h;
 	};
+
+	case 0x8: {
+		u8 res = m_irq;
+		m_irq = 0;
+		return res;
+	}
+
+	case 0xf:
+		return m_imask;
 
 	default:
 		logerror("read %s\n", names[offset & 15]);
@@ -114,14 +129,18 @@ void swim3_device::write(offs_t offset, u8 data)
 		"?8", "step", "track", "sector", "gap", "sect1", "xfer", "imask"
 	};
 	switch(offset) {
-	case 4: { // phases
+	case 0x3: // param
+		m_param = data;
+		logerror("precompensation late=%x early=%x\n", m_param >> 4, m_param & 0xf);
+		break;
+
+	case 0x4: { // phases
 		m_phases = data | 0xf0;
-		logerror("phases %x\n", data);
 		update_phases();
 		break;
 	}
 
-	case 5: // setup
+	case 0x5: // setup
 		m_setup = data;
 		m_sel35_cb((m_setup >> 1) & 1);
 		logerror("setup write=%s %s nogcrconv=%s %s %s%s %s\n",
@@ -134,16 +153,28 @@ void swim3_device::write(offs_t offset, u8 data)
 				 m_setup & 0x01 ? "wrinvert" : "wrdirect");
 		break;
 
-	case 6: // mode clear
+	case 0x6: // mode clear
 		m_mode &= ~data;
-		m_mode |= 0x40;
-		m_param_idx = 0;
 		show_mode();
 		break;
 
-	case 7: // mode set
+	case 0x7: // mode set
 		m_mode |= data;
 		show_mode();
+		break;
+
+	case 0x9: // step
+		m_step = data;
+		break;
+
+	case 0xf:
+		m_imask = data;
+		logerror("imask%s%s%s%s%s\n",
+				 m_imask & 0x10 ? " sense" : " -",
+				 m_imask & 0x08 ? " sector" : " -",
+				 m_imask & 0x04 ? " id" : " -",
+				 m_imask & 0x02 ? " step" : " -",
+				 m_imask & 0x01 ? " timer" : " -");
 		break;
 
 	default:

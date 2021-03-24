@@ -22,6 +22,7 @@ public:
 
 	uint8_t vctrl_r(offs_t offset);
 	void vctrl_w(offs_t offset, uint8_t data);
+	uint8_t dac_r(offs_t offset);
 	void dac_w(offs_t offset, uint8_t data);
 
 	DECLARE_READ_LINE_MEMBER(vblank) const { return m_screen->vblank(); }

@@ -39,8 +39,8 @@ protected:
 
 private:
 	floppy_image_device *m_floppy;
-	u8 m_param[4];
-	u8 m_mode, m_setup, m_param_idx;
+	u8 m_param;
+	u8 m_mode, m_setup, m_irq, m_imask, m_step;
 
 	void show_mode() const;
 };

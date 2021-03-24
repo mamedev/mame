@@ -222,6 +222,18 @@ void mac_video_sonora_device::vctrl_w(offs_t offset, uint8_t data)
 	}
 }
 
+uint8_t mac_video_sonora_device::dac_r(offs_t offset)
+{
+	switch(offset) {
+	case 2:
+		return m_pal_control;
+
+	default:
+		logerror("dac_r %x\n", offset);
+		return 0;
+	}
+}
+
 void mac_video_sonora_device::dac_w(offs_t offset, uint8_t data)
 {
 	switch(offset) {
@@ -244,6 +256,7 @@ void mac_video_sonora_device::dac_w(offs_t offset, uint8_t data)
 		break;
 
 	case 2:
+		logerror("control = %02x\n", data);
 		m_pal_control = data;
 		break;
 
