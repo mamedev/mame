@@ -12,7 +12,7 @@
     Unitron 1024: Brazilian Mac Plus clone.
 
     Driver by R. Belmont and O. Galibert, with thanks to the original Mac
-    driver authors Nathan Woods and Raphael  Nabet.
+    driver authors Nathan Woods and Raphael Nabet.
     Thanks also to SCSI guru Patrick Mackinlay and keyboard/mouse wrangler
     Vas Crabb.
 
@@ -693,7 +693,7 @@ void mac128_state::via_sync()
 	// is synced on that clock, so that's at a multiple of 10 in
 	// absolute time
 
-	// - 4 cycles later E goes down and that's the end of the access, 
+	// - 4 cycles later E goes down and that's the end of the access,
 
 	// We sync on the start of cycle (so that the via timings go ok)
 	// then on the end on via_sync_end()
@@ -1414,13 +1414,13 @@ ROM_START( macclasc )
 ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS         INIT              COMPANY              FULLNAME */
-//COMP( 1983, mactw,    0,       0,      mac128k,  macplus, mac128_state, mac_driver_init, "Apple Computer",    "Macintosh (4.3T Prototype)",  MACHINE_NOT_WORKING )
-COMP( 1984, mac128k,  0,       0,      mac128k,  macplus, mac128_state, mac_driver_init,  "Apple Computer",    "Macintosh 128k",  MACHINE_NOT_WORKING )
-COMP( 1984, mac512k,  mac128k, 0,      mac512k,  macplus, mac128_state, mac_driver_init,  "Apple Computer",    "Macintosh 512k",  MACHINE_NOT_WORKING )
-COMP( 1986, mac512ke, macplus, 0,      mac512ke, macplus, mac128_state, mac_driver_init,  "Apple Computer",    "Macintosh 512ke", MACHINE_NOT_WORKING )
-COMP( 1985, unitron,  macplus, 0,      mac512ke, macplus, mac128_state, mac_driver_init,  "bootleg (Unitron)", "Mac 512",  MACHINE_NOT_WORKING )
-COMP( 1986, macplus,  0,       0,      macplus,  macplus, mac128_state, mac_driver_init,  "Apple Computer",    "Macintosh Plus",  MACHINE_NOT_WORKING )
-COMP( 1985, utrn1024, macplus, 0,      macplus,  macplus, mac128_state, mac_driver_init,  "bootleg (Unitron)", "Unitron 1024",  MACHINE_NOT_WORKING )
-COMP( 1987, macse,    0,       0,      macse,    macadb, mac128_state,  mac_driver_init,  "Apple Computer",   "Macintosh SE",  MACHINE_NOT_WORKING )
-COMP( 1987, macsefd,  0,       0,      macsefd,  macadb, mac128_state,  mac_driver_init,  "Apple Computer",   "Macintosh SE (FDHD)",  MACHINE_NOT_WORKING )
-COMP( 1990, macclasc, 0,       0,      macclasc, macadb, mac128_state,  mac_driver_init,  "Apple Computer",   "Macintosh Classic",  MACHINE_NOT_WORKING )
+//COMP( 1983, mactw,    0,       0,      mac128k,  macplus, mac128_state, mac_driver_init, "Apple Computer",    "Macintosh (4.3T Prototype)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1984, mac128k,  0,       0,      mac128k,  macplus, mac128_state, mac_driver_init,  "Apple Computer",    "Macintosh 128k",  MACHINE_SUPPORTS_SAVE )
+COMP( 1984, mac512k,  mac128k, 0,      mac512k,  macplus, mac128_state, mac_driver_init,  "Apple Computer",    "Macintosh 512k",  MACHINE_SUPPORTS_SAVE )
+COMP( 1986, mac512ke, macplus, 0,      mac512ke, macplus, mac128_state, mac_driver_init,  "Apple Computer",    "Macintosh 512ke", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, unitron,  macplus, 0,      mac512ke, macplus, mac128_state, mac_driver_init,  "bootleg (Unitron)", "Mac 512",  MACHINE_SUPPORTS_SAVE )
+COMP( 1986, macplus,  0,       0,      macplus,  macplus, mac128_state, mac_driver_init,  "Apple Computer",    "Macintosh Plus",  MACHINE_SUPPORTS_SAVE )
+COMP( 1985, utrn1024, macplus, 0,      macplus,  macplus, mac128_state, mac_driver_init,  "bootleg (Unitron)", "Unitron 1024",  MACHINE_SUPPORTS_SAVE )
+COMP( 1987, macse,    0,       0,      macse,    macadb, mac128_state,  mac_driver_init,  "Apple Computer",   "Macintosh SE",  MACHINE_SUPPORTS_SAVE )
+COMP( 1987, macsefd,  0,       0,      macsefd,  macadb, mac128_state,  mac_driver_init,  "Apple Computer",   "Macintosh SE (FDHD)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1990, macclasc, 0,       0,      macclasc, macadb, mac128_state,  mac_driver_init,  "Apple Computer",   "Macintosh Classic",  MACHINE_SUPPORTS_SAVE )
