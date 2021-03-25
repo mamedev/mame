@@ -90,6 +90,7 @@ void rf5c68_device::device_start()
 	save_item(STRUCT_MEMBER(m_chan, addr));
 	save_item(STRUCT_MEMBER(m_chan, step));
 	save_item(STRUCT_MEMBER(m_chan, loopst));
+	save_item(STRUCT_MEMBER(m_chan, partial));
 
 	save_item(NAME(m_cbank));
 	save_item(NAME(m_wbank));
@@ -118,6 +119,22 @@ device_memory_interface::space_config_vector rf5c68_device::memory_space_config(
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
+
+u8 rf5c68_device::read_sample(pcm_channel &chan)
+{
+	/* fetch the sample and handle looping */
+	u8 sample = m_cache.read_byte(((chan.addr) >> 11) & 0xffff);
+	if (sample == 0xff)
+	{
+		chan.addr = chan.loopst << 11;
+		sample = m_cache.read_byte(((chan.addr) >> 11) & 0xffff);
+	}
+	else
+	{
+		chan.addr += 1 << 11;
+	}
+	return sample;
+}
 
 void rf5c68_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
@@ -154,25 +171,21 @@ void rf5c68_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 			{
 				int sample;
 
-				/* trigger sample callback */
+				/* trigger sample callback (should be in read_sample or could be missed, but don't want multiple triggers..) */
 				if(!m_sample_end_cb.isnull())
 				{
 					if(((chan.addr >> 11) & 0xfff) == 0xfff)
 						m_sample_end_cb((chan.addr >> 11)/0x2000);
 				}
 
-				/* fetch the sample and handle looping */
-				sample = m_cache.read_byte((chan.addr >> 11) & 0xffff);
-				if (sample == 0xff)
+				sample = 0x00;
+				while (chan.partial <= chan.step)
 				{
-					chan.addr = chan.loopst << 11;
-					sample = m_cache.read_byte((chan.addr >> 11) & 0xffff);
-
-					/* if we loop to a loop point, we're effectively dead */
-					if (sample == 0xff)
-						break;
+					sample = read_sample(chan);
+					chan.partial += 1 << 11;
 				}
-				chan.addr += chan.step;
+
+				chan.partial -= chan.step;
 
 				/* add to the buffer */
 				if (sample & 0x80)
@@ -275,7 +288,10 @@ void rf5c68_device::rf5c68_w(offs_t offset, u8 data)
 			{
 				m_chan[i].enable = (~data >> i) & 1;
 				if (!m_chan[i].enable)
+				{
 					m_chan[i].addr = m_chan[i].start << (8 + 11);
+					m_chan[i].partial = 0;
+				}
 			}
 			break;
 	}

@@ -66,6 +66,7 @@ private:
 		u32      addr   = 0;
 		u16      step   = 0;
 		u16      loopst = 0;
+		u16      partial = 0;
 	};
 
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
@@ -77,6 +78,7 @@ private:
 	int                                               m_output_bits;
 	std::vector<s32> m_mixleft;
 	std::vector<s32> m_mixright;
+	u8 read_sample(pcm_channel &chan);
 
 	sample_end_cb_delegate m_sample_end_cb;
 };
