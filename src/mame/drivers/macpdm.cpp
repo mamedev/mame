@@ -43,7 +43,7 @@ private:
 	required_device<scc8530_legacy_device> m_scc;
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<ncr53c94_device> m_ncr53c94;
-	required_device<applefdintf_device> m_fdc;
+	required_device<swim3_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<mac_video_sonora_device> m_video;
 
@@ -60,6 +60,8 @@ private:
 	uint64_t m_dma_scsi_buffer;
 
 	uint32_t m_dma_badr, m_dma_floppy_adr;
+	uint16_t m_dma_floppy_byte_count, m_dma_floppy_offset;
+
 	uint16_t m_dma_berr_en, m_dma_berr_flag;
 
 	uint32_t m_dma_scsi_a_base_adr, m_dma_scsi_b_base_adr;
@@ -71,7 +73,7 @@ private:
 	uint8_t m_dma_scc_txa_ctrl, m_dma_scc_rxa_ctrl, m_dma_scc_txb_ctrl, m_dma_scc_rxb_ctrl;
 	uint8_t m_dma_enet_rx_ctrl, m_dma_enet_tx_ctrl;
 
-	bool m_dma_scsi_a_in_step;
+	bool m_dma_scsi_a_in_step, m_dma_floppy_in_step, m_floppy_drq;
 
 	void pdm_map(address_map &map);
 
@@ -111,6 +113,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(slot0_irq);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsi_drq);
@@ -181,10 +184,13 @@ private:
 	uint32_t dma_scsi_a_cur_adr_r();
 	uint32_t dma_scsi_b_cur_adr_r();
 
+	void dma_floppy_step();
 	uint8_t dma_floppy_ctrl_r();
 	void dma_floppy_ctrl_w(uint8_t data);
 	uint32_t dma_floppy_adr_r();
 	void dma_floppy_adr_w(offs_t, uint32_t data, uint32_t mem_mask);
+	uint16_t dma_floppy_byte_count_r();
+	void dma_floppy_byte_count_w(offs_t, uint16_t data, uint16_t mem_mask);
 
 	uint8_t dma_scc_txa_ctrl_r();
 	void dma_scc_txa_ctrl_w(uint8_t data);
@@ -256,6 +262,7 @@ void macpdm_state::driver_init()
 	save_item(NAME(m_dma_scsi_a_cur_offset));
 	save_item(NAME(m_dma_scsi_b_cur_offset));
 	save_item(NAME(m_dma_floppy_ctrl));
+	save_item(NAME(m_dma_floppy_in_step));
 	save_item(NAME(m_dma_scc_txa_ctrl));
 	save_item(NAME(m_dma_scc_rxa_ctrl));
 	save_item(NAME(m_dma_scc_txb_ctrl));
@@ -264,6 +271,9 @@ void macpdm_state::driver_init()
 	save_item(NAME(m_dma_enet_tx_ctrl));
 
 	save_item(NAME(m_dma_floppy_adr));
+	save_item(NAME(m_dma_floppy_offset));
+	save_item(NAME(m_dma_floppy_byte_count));
+	save_item(NAME(m_floppy_drq));
 
 	m_maincpu->space().install_read_tap(0x4000c2e0, 0x4000c2e7, 0, "cuda", [this](offs_t offset, u64 &data, u64 mem_mask) {
 											if(mem_mask == 0xffff000000000000) {
@@ -316,6 +326,9 @@ void macpdm_state::driver_reset()
 	m_dma_enet_tx_ctrl = 0;
 
 	m_dma_floppy_adr = 0x15000;
+	m_dma_floppy_offset = 0;
+	m_dma_floppy_byte_count = 0;
+	m_floppy_drq = false;
 
 	m_video->set_vram_base((const u64 *)m_ram->pointer());
 	m_video->set_vram_offset(0);
@@ -367,7 +380,7 @@ void macpdm_state::via2_irq_main_set(uint8_t mask, int state)
 		return;
 
 	m_via2_ifr ^= mask;
-	logerror("via2 main %02x / %02x -> %02x\n", m_via2_ifr, m_via2_ier, m_via2_ifr & m_via2_ier);
+	//	logerror("via2 main %02x / %02x -> %02x\n", m_via2_ifr, m_via2_ier, m_via2_ifr & m_via2_ier);
 
 	irq_main_set(0x02, (m_via2_ifr & m_via2_ier) != 0);
 }
@@ -631,11 +644,6 @@ WRITE_LINE_MEMBER(macpdm_state::via1_irq)
 	irq_main_set(0x01, state);
 }
 
-WRITE_LINE_MEMBER(macpdm_state::fdc_irq)
-{
-	via2_irq_main_set(0x20, state);
-}
-
 WRITE_LINE_MEMBER(macpdm_state::sound_irq)
 {
 	via2_irq_main_set(0x20, state);
@@ -840,8 +848,27 @@ uint8_t macpdm_state::dma_floppy_ctrl_r()
 
 void macpdm_state::dma_floppy_ctrl_w(uint8_t data)
 {
-	m_dma_floppy_ctrl = data;
-	logerror("dma_floppy_ctrl_w %02x\n", m_dma_floppy_ctrl);
+	m_dma_floppy_ctrl = (m_dma_floppy_ctrl & 0x80) | (data & 0x4a);
+	if(data & 0x01) {
+		m_dma_floppy_ctrl &= 0x7f;
+		m_dma_floppy_offset = 0;
+	}
+
+	if(data & 0x80)
+		m_dma_floppy_ctrl &= 0x7f;
+
+	logerror("dma floppy ctrl %02x\n", m_dma_floppy_ctrl);
+}
+
+uint16_t macpdm_state::dma_floppy_byte_count_r()
+{
+	return m_dma_floppy_byte_count;
+}
+
+void macpdm_state::dma_floppy_byte_count_w(offs_t, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_dma_floppy_byte_count);
+	logerror("dma floppy count %04x\n", m_dma_floppy_byte_count);
 }
 
 uint32_t macpdm_state::dma_floppy_adr_r()
@@ -853,8 +880,49 @@ void macpdm_state::dma_floppy_adr_w(offs_t, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_dma_floppy_adr);
 	m_dma_floppy_adr = (m_dma_badr | 0x10000) + (m_dma_floppy_adr & 0xffff);
+	m_dma_floppy_offset = 0;
 	logerror("dma floppy adr %08x\n", m_dma_floppy_adr);
 }
+
+WRITE_LINE_MEMBER(macpdm_state::fdc_irq)
+{
+	via2_irq_main_set(0x20, state);
+}
+
+void macpdm_state::dma_floppy_step()
+{
+	m_dma_floppy_in_step = true;
+
+	if(m_dma_floppy_ctrl & 0x40) {
+		fatalerror("floppy dma write\n");
+
+	} else {
+		while(m_floppy_drq) {
+			u8 r = m_fdc->dma_r();
+			m_maincpu->space().write_byte(m_dma_floppy_adr + m_dma_floppy_offset, r);
+			m_dma_floppy_offset ++;
+			m_dma_floppy_byte_count --;
+			//			logerror("dma_w %03x, %02x\n", m_dma_floppy_offset, r);
+			if(m_dma_floppy_byte_count == 0) {
+				m_dma_floppy_ctrl &= ~0x02;
+				m_dma_floppy_ctrl |= 0x80;
+				logerror("dma floppy done\n");
+				// todo irq dma
+				break;
+			}
+		}
+	}
+
+	m_dma_floppy_in_step = false;
+}
+
+WRITE_LINE_MEMBER(macpdm_state::fdc_drq)
+{
+	m_floppy_drq = state;
+	if((m_dma_floppy_ctrl & 0x02) && m_floppy_drq && !m_dma_floppy_in_step)
+		dma_floppy_step();
+}
+
 
 
 // SCC management
@@ -977,6 +1045,7 @@ void macpdm_state::pdm_map(address_map &map)
 	map(0x50f32028, 0x50f32028).rw(FUNC(macpdm_state::dma_enet_rx_ctrl_r), FUNC(macpdm_state::dma_enet_rx_ctrl_w));
 
 	map(0x50f32060, 0x50f32063).rw(FUNC(macpdm_state::dma_floppy_adr_r), FUNC(macpdm_state::dma_floppy_adr_w));
+	map(0x50f32064, 0x50f32065).rw(FUNC(macpdm_state::dma_floppy_byte_count_r), FUNC(macpdm_state::dma_floppy_byte_count_w));
 	map(0x50f32068, 0x50f32068).rw(FUNC(macpdm_state::dma_floppy_ctrl_r), FUNC(macpdm_state::dma_floppy_ctrl_w));
 
 	map(0x50f32088, 0x50f32088).rw(FUNC(macpdm_state::dma_scc_txa_ctrl_r), FUNC(macpdm_state::dma_scc_txa_ctrl_w));
@@ -1032,7 +1101,9 @@ void macpdm_state::macpdm(machine_config &config)
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 
-	SWIM3(config, m_fdc, IO_CLOCK/2);
+	SWIM3(config, m_fdc, IO_CLOCK);
+	m_fdc->irq_cb().set(FUNC(macpdm_state::fdc_irq));
+	m_fdc->drq_cb().set(FUNC(macpdm_state::fdc_drq));
 	m_fdc->hdsel_cb().set(FUNC(macpdm_state::hdsel_w));
 	m_fdc->devsel_cb().set(FUNC(macpdm_state::devsel_w));
 	m_fdc->phases_cb().set(FUNC(macpdm_state::phases_w));

@@ -2283,18 +2283,6 @@
 			<color red="1.00" green="1.00" blue="1.00"/>
 		</disk>
 	</element>
-	<element name="label_162">
-		<text string="Thanks To Bugs!">
-			<color red="0.0" green="0.0" blue="0.0"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
-		</text>
-	</element>
-	<element name="label_163">
-		<text string="www.mfme.co.uk">
-			<color red="0.0" green="0.0" blue="0.0"/>
-			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
-		</text>
-	</element>
 	<element name="debug_backdrop_colour">
 		<rect>
 			<color red="0.0" green="0.0" blue="0.0"/>
@@ -4350,22 +4338,22 @@
 		<element name="lamp1" ref="reel_lamp_layer_5" state="0">
 			<bounds x="169.6667" y="519.2778" width="46.6667" height="19.4444"/>
 		</element>
-		<element name="lamp-2" ref="reel_lamp_layer_0" state="0">
+		<element name="lamp0" ref="reel_lamp_layer_0" state="0">
 			<bounds x="153.0000" y="545.6667" width="80.0000" height="33.3333"/>
 		</element>
-		<element name="lamp-2" ref="reel_lamp_layer_1" state="0">
+		<element name="lamp0" ref="reel_lamp_layer_1" state="0">
 			<bounds x="156.3333" y="547.0556" width="73.3333" height="30.5556"/>
 		</element>
-		<element name="lamp-2" ref="reel_lamp_layer_2" state="0">
+		<element name="lamp0" ref="reel_lamp_layer_2" state="0">
 			<bounds x="159.6667" y="548.4445" width="66.6667" height="27.7778"/>
 		</element>
-		<element name="lamp-2" ref="reel_lamp_layer_3" state="0">
+		<element name="lamp0" ref="reel_lamp_layer_3" state="0">
 			<bounds x="163.0000" y="549.8334" width="60.0000" height="25.0000"/>
 		</element>
-		<element name="lamp-2" ref="reel_lamp_layer_4" state="0">
+		<element name="lamp0" ref="reel_lamp_layer_4" state="0">
 			<bounds x="166.3333" y="551.2222" width="53.3333" height="22.2222"/>
 		</element>
-		<element name="lamp-2" ref="reel_lamp_layer_5" state="0">
+		<element name="lamp0" ref="reel_lamp_layer_5" state="0">
 			<bounds x="169.6667" y="552.6111" width="46.6667" height="19.4444"/>
 		</element>
 		<element name="sreel1" ref="reel0" state="0">
@@ -4494,22 +4482,22 @@
 		<element ref="reel_background">
 			<bounds x="459" y="395" width="50" height="50"/>
 		</element>
-		<element name="lamp-2" ref="reel_lamp_layer_0" state="0">
+		<element name="lamp20" ref="reel_lamp_layer_0" state="0">
 			<bounds x="459.0000" y="395.0000" width="50.0000" height="50.0000"/>
 		</element>
-		<element name="lamp-2" ref="reel_lamp_layer_1" state="0">
+		<element name="lamp20" ref="reel_lamp_layer_1" state="0">
 			<bounds x="461.0833" y="397.0833" width="45.8333" height="45.8333"/>
 		</element>
-		<element name="lamp-2" ref="reel_lamp_layer_2" state="0">
+		<element name="lamp20" ref="reel_lamp_layer_2" state="0">
 			<bounds x="463.1667" y="399.1667" width="41.6667" height="41.6667"/>
 		</element>
-		<element name="lamp-2" ref="reel_lamp_layer_3" state="0">
+		<element name="lamp20" ref="reel_lamp_layer_3" state="0">
 			<bounds x="465.2500" y="401.2500" width="37.5000" height="37.5000"/>
 		</element>
-		<element name="lamp-2" ref="reel_lamp_layer_4" state="0">
+		<element name="lamp20" ref="reel_lamp_layer_4" state="0">
 			<bounds x="467.3333" y="403.3333" width="33.3333" height="33.3333"/>
 		</element>
-		<element name="lamp-2" ref="reel_lamp_layer_5" state="0">
+		<element name="lamp20" ref="reel_lamp_layer_5" state="0">
 			<bounds x="469.4167" y="405.4167" width="29.1667" height="29.1667"/>
 		</element>
 		<element name="sreel4" ref="reel3" state="0">
@@ -5202,12 +5190,7 @@
 		<element name="vfd15" ref="vfd0" state="0">
 			<bounds x="398" y="435" width="17" height="30"/>
 		</element>
-		<element name="label162" ref="label_162">
-			<bounds x="420" y="2" width="45" height="48"/>
-		</element>
-		<element name="label163" ref="label_163">
-			<bounds x="229" y="464" width="99" height="14"/>
-		</element>
+
 	</view>
 
 	<view name="MFME2MAME Debug">
