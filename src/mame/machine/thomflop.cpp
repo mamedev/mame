@@ -1489,7 +1489,7 @@ void thmfc1_device::device_start()
 {
 	m_data = make_unique_clear<uint8_t[]>(THOM_MAXBUF);
 
-	m_floppy_cmd = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thmfc1_device::floppy_cmd_complete_cb), this));
+	m_floppy_cmd = timer_alloc(*this, FUNC(thmfc1_device::floppy_cmd_complete_cb));
 
 	save_item(NAME(m_op));
 	save_item(NAME(m_sector));

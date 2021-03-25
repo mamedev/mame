@@ -132,8 +132,8 @@ void akiko_device::device_start()
 	m_cdrom_cmd_resp = 0;
 
 	m_cdrom_toc = nullptr;
-	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(akiko_device::dma_proc), this));
-	m_frame_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(akiko_device::frame_proc), this));
+	m_dma_timer = timer_alloc(*this, FUNC(akiko_device::dma_proc));
+	m_frame_timer = timer_alloc(*this, FUNC(akiko_device::frame_proc));
 }
 
 //-------------------------------------------------

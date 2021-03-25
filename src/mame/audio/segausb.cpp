@@ -628,7 +628,7 @@ void usb_sound_device::workram_w(offs_t offset, u8 data)
 		case 0x02:  // 8253 U41
 		case 0x03:  // 8253 U41
 			if ((offset & 3) != 3)
-				printf("%s: 2.%d count=%d\n", machine().scheduler().time().as_string(), offset & 3, data);
+				printf("%s: 2.%d count=%d\n", machine().time().as_string(), offset & 3, data);
 			m_pit[0]->write(offset & 3, data);
 			break;
 
@@ -647,7 +647,7 @@ void usb_sound_device::workram_w(offs_t offset, u8 data)
 		case 0x0a:  // 8253 U42
 		case 0x0b:  // 8253 U42
 			if ((offset & 3) != 3)
-				printf("%s: 2.%d count=%d\n", machine().scheduler().time().as_string(), offset & 3, data);
+				printf("%s: 2.%d count=%d\n", machine().time().as_string(), offset & 3, data);
 			m_pit[1]->write(offset & 3, data);
 			break;
 
@@ -666,7 +666,7 @@ void usb_sound_device::workram_w(offs_t offset, u8 data)
 		case 0x12:  // 8253 U43
 		case 0x13:  // 8253 U43
 			if ((offset & 3) != 3)
-				printf("%s: 2.%d count=%d\n", machine().scheduler().time().as_string(), offset & 3, data);
+				printf("%s: 2.%d count=%d\n", machine().time().as_string(), offset & 3, data);
 			m_pit[2]->write(offset & 3, data);
 			break;
 

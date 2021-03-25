@@ -1374,10 +1374,10 @@ void viper_state::mpc8240_interrupt(int irq)
 void viper_state::mpc8240_epic_init()
 {
 	memset(&m_epic, 0, sizeof(m_epic));
-	m_epic.global_timer[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),this));
-	m_epic.global_timer[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),this));
-	m_epic.global_timer[2].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),this));
-	m_epic.global_timer[3].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),this));
+	m_epic.global_timer[0].timer = timer_alloc(*this, FUNC(viper_state::epic_global_timer_callback));
+	m_epic.global_timer[1].timer = timer_alloc(*this, FUNC(viper_state::epic_global_timer_callback));
+	m_epic.global_timer[2].timer = timer_alloc(*this, FUNC(viper_state::epic_global_timer_callback));
+	m_epic.global_timer[3].timer = timer_alloc(*this, FUNC(viper_state::epic_global_timer_callback));
 }
 
 void viper_state::mpc8240_epic_reset(void)
@@ -2371,7 +2371,7 @@ WRITE_LINE_MEMBER(viper_state::voodoo_pciint)
 
 void viper_state::machine_start()
 {
-	m_ds2430_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::ds2430_timer_callback),this));
+	m_ds2430_timer = timer_alloc(*this, FUNC(viper_state::ds2430_timer_callback));
 	mpc8240_epic_init();
 
 	/* set conservative DRC options */

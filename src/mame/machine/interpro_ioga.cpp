@@ -196,24 +196,24 @@ void interpro_ioga_device::device_start()
 	}
 
 	// allocate timers
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(interpro_ioga_device::interrupt_check), this));
-	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(interpro_ioga_device::dma), this));
-	m_serial_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(interpro_ioga_device::serial_dma), this));
+	m_interrupt_timer = timer_alloc(*this, FUNC(interpro_ioga_device::interrupt_check));
+	m_dma_timer = timer_alloc(*this, FUNC(interpro_ioga_device::dma));
+	m_serial_dma_timer = timer_alloc(*this, FUNC(interpro_ioga_device::serial_dma));
 
-	m_timer0 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(interpro_ioga_device::timer0), this));
-	m_timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(interpro_ioga_device::timer1), this));
+	m_timer0 = timer_alloc(*this, FUNC(interpro_ioga_device::timer0));
+	m_timer1 = timer_alloc(*this, FUNC(interpro_ioga_device::timer1));
 
-	m_timer_60hz = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(interpro_ioga_device::timer_60hz), this));
+	m_timer_60hz = timer_alloc(*this, FUNC(interpro_ioga_device::timer_60hz));
 
-	m_eth_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(interpro_ioga_device::eth_reset), this));
+	m_eth_reset_timer = timer_alloc(*this, FUNC(interpro_ioga_device::eth_reset));
 }
 
 void sapphire_ioga_device::device_start()
 {
 	interpro_ioga_device::device_start();
 
-	m_timer2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sapphire_ioga_device::timer2), this));
-	m_timer3 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sapphire_ioga_device::timer3), this));
+	m_timer2 = timer_alloc(*this, FUNC(sapphire_ioga_device::timer2));
+	m_timer3 = timer_alloc(*this, FUNC(sapphire_ioga_device::timer3));
 }
 
 void interpro_ioga_device::device_reset()

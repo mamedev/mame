@@ -1723,10 +1723,10 @@ void fm7_state::init_fm7()
 {
 //  m_shared_ram = std::make_unique<uint8_t[]>(0x80);
 	m_video_ram = make_unique_clear<uint8_t[]>(0x18000);  // 2 pages on some systems
-	m_beeper_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm7_state::beeper_off), this));
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm7_state::timer_irq), this));
-	m_subtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm7_state::subtimer_irq), this));
-	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm7_state::keyboard_poll), this));
+	m_beeper_off_timer = timer_alloc(*this, FUNC(fm7_state::beeper_off));
+	m_timer = timer_alloc(*this, FUNC(fm7_state::timer_irq));
+	m_subtimer = timer_alloc(*this, FUNC(fm7_state::subtimer_irq));
+	m_keyboard_timer = timer_alloc(*this, FUNC(fm7_state::keyboard_poll));
 
 	m_init_rom_en = false;
 }
@@ -1746,9 +1746,9 @@ MACHINE_START_MEMBER(fm7_state,fm7)
 
 MACHINE_START_MEMBER(fm77_state,fm77av)
 {
-	m_encoder_ack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm77_state::av_encoder_ack), this));
-	m_alu_task_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm77_state::av_alu_task_end), this));
-	m_vsync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm77_state::av_vsync), this));
+	m_encoder_ack_timer = timer_alloc(*this, FUNC(fm77_state::av_encoder_ack));
+	m_alu_task_end_timer = timer_alloc(*this, FUNC(fm77_state::av_alu_task_end));
+	m_vsync_timer = timer_alloc(*this, FUNC(fm77_state::av_vsync));
 
 	memset(m_shared_ram,0xff,0x80);
 
@@ -1765,9 +1765,9 @@ MACHINE_START_MEMBER(fm77_state,fm77av)
 
 MACHINE_START_MEMBER(fm11_state,fm11)
 {
-	m_encoder_ack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm11_state::av_encoder_ack), this));
-	m_alu_task_end_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm11_state::av_alu_task_end), this));
-	m_vsync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm11_state::av_vsync), this));
+	m_encoder_ack_timer = timer_alloc(*this, FUNC(fm11_state::av_encoder_ack));
+	m_alu_task_end_timer = timer_alloc(*this, FUNC(fm11_state::av_alu_task_end));
+	m_vsync_timer = timer_alloc(*this, FUNC(fm11_state::av_vsync));
 
 	memset(m_shared_ram,0xff,0x80);
 	m_type = SYS_FM11;

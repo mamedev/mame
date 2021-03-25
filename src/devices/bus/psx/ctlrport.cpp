@@ -112,7 +112,7 @@ void device_psx_controller_interface::interface_pre_start()
 {
 	m_owner = dynamic_cast<psx_controller_port_device *>(device().owner());
 	if (!m_ack_timer)
-		m_ack_timer = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_psx_controller_interface::ack_timer), this));
+		m_ack_timer = device().timer_alloc(*this, FUNC(device_psx_controller_interface::ack_timer));
 }
 
 void device_psx_controller_interface::interface_pre_reset()

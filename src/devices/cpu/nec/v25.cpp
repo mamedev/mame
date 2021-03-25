@@ -557,7 +557,7 @@ void v25_common_device::device_start()
 	m_E16 = 0;
 
 	for (i = 0; i < 4; i++)
-		m_timers[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(v25_common_device::v25_timer_callback),this));
+		m_timers[i] = timer_alloc(*this, FUNC(v25_common_device::v25_timer_callback));
 
 	std::fill_n(&m_intp_state[0], 3, 0);
 	std::fill_n(&m_ems[0], 3, 0);

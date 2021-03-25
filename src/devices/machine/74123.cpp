@@ -50,7 +50,7 @@ void ttl74123_device::device_start()
 
 	m_output_callback.enregister(*this, FUNC(ttl74123_device::output_callback));
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ttl74123_device::clear_callback),this));
+	m_timer = timer_alloc(*this, FUNC(ttl74123_device::clear_callback));
 
 	/* register for state saving */
 	save_item(NAME(m_a));

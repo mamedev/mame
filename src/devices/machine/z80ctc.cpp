@@ -307,7 +307,7 @@ z80ctc_channel_device::z80ctc_channel_device(const machine_config &mconfig, cons
 void z80ctc_channel_device::device_start()
 {
 	// initialize state
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80ctc_channel_device::timer_callback), this));
+	m_timer = timer_alloc(*this, FUNC(z80ctc_channel_device::timer_callback));
 
 	// register for save states
 	save_item(NAME(m_mode));

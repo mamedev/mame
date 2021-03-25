@@ -61,8 +61,8 @@ void ics2115_device::device_start()
 
 	space(0).cache(m_cache);
 
-	m_timer[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_0),this), this);
-	m_timer[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ics2115_device::timer_cb_1),this), this);
+	m_timer[0].timer = timer_alloc(*this, FUNC(ics2115_device::timer_cb_0));
+	m_timer[1].timer = timer_alloc(*this, FUNC(ics2115_device::timer_cb_1));
 	m_stream = stream_alloc(0, 2, clock() / (32 * 32));
 
 	m_irq_cb.resolve_safe();

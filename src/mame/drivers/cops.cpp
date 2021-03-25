@@ -876,7 +876,7 @@ INPUT_PORTS_END
 
 void cops_state::machine_start()
 {
-	m_ld_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cops_state::ld_timer_callback),this));
+	m_ld_timer = timer_alloc(*this, FUNC(cops_state::ld_timer_callback));
 
 	m_ld_timer->adjust(attotime::from_hz(167*5), 0, attotime::from_hz(167*5));
 

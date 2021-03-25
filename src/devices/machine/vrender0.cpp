@@ -165,7 +165,7 @@ void vrender0soc_device::device_start()
 		fatalerror("%s: bus clock not setup properly",this->tag());
 
 	for (int i = 0; i < 4; i++)
-		m_Timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrender0soc_device::Timercb),this), (void*)(uintptr_t)i);
+		m_Timer[i] = timer_alloc(*this, FUNC(vrender0soc_device::Timercb), (void*)(uintptr_t)i);
 
 	write_tx.resolve_all_safe();
 

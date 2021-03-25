@@ -734,7 +734,7 @@ void jpmsys5v_state::machine_start()
 
 	m_rombank->configure_entries(0, 32, memregion("maincpu")->base() + 0x20000, 0x20000);
 	m_rombank->set_entry(0);
-	m_touch_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jpmsys5v_state::touch_cb),this));
+	m_touch_timer = timer_alloc(*this, FUNC(jpmsys5v_state::touch_cb));
 }
 
 void jpmsys5v_state::machine_reset()

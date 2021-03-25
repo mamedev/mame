@@ -34,9 +34,9 @@ template <uint8_t ROW_COUNT>
 void device_matrix_keyboard_interface<ROW_COUNT>::interface_pre_start()
 {
 	if (!m_scan_timer)
-		m_scan_timer = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_matrix_keyboard_interface<ROW_COUNT>::scan_row), this));
+		m_scan_timer = device().timer_alloc(*this, FUNC(device_matrix_keyboard_interface<ROW_COUNT>::scan_row));
 	if (!m_typematic_timer)
-		m_typematic_timer = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_matrix_keyboard_interface<ROW_COUNT>::typematic), this));
+		m_typematic_timer = device().timer_alloc(*this, FUNC(device_matrix_keyboard_interface<ROW_COUNT>::typematic));
 	reset_key_state();
 	typematic_stop();
 }

@@ -134,12 +134,12 @@ void m68307_cpu_device::m68307_timer::init(m68307_cpu_device *device)
 	single_timer* tptr;
 
 	tptr = &singletimer[0];
-	tptr->mametimer = device->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68307_timer::timer0_callback),this), parent);
+	tptr->mametimer = device->timer_alloc(*this, FUNC(m68307_timer::timer0_callback), parent);
 
 	tptr = &singletimer[1];
-	tptr->mametimer = device->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68307_timer::timer1_callback),this), parent);
+	tptr->mametimer = device->timer_alloc(*this, FUNC(m68307_timer::timer1_callback), parent);
 
-	wd_mametimer = device->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68307_timer::wd_timer_callback),this), parent);
+	wd_mametimer = device->timer_alloc(*this, FUNC(m68307_timer::wd_timer_callback));
 }
 
 uint16_t m68307_cpu_device::m68307_timer::read_tcn(uint16_t mem_mask, int which)

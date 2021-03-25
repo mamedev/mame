@@ -758,7 +758,7 @@ void notetaker_state::machine_start()
 	// allocate RAM
 	m_mainram = make_unique_clear<uint16_t[]>(0x100000/2);
 	// allocate the DAC timer, and set it to fire NEVER. We'll set it up properly in IPReset.
-	m_FIFO_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(notetaker_state::timer_fifoclk),this));
+	m_FIFO_timer = timer_alloc(*this, FUNC(notetaker_state::timer_fifoclk));
 	m_FIFO_timer->adjust(attotime::never);
 	// FDC: /DDEN is tied permanently LOW so MFM mode is ALWAYS ON
 	m_fdc->dden_w(0);

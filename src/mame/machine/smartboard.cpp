@@ -78,7 +78,7 @@ tasc_sb30_device::tasc_sb30_device(const machine_config &mconfig, const char *ta
 void tasc_sb30_device::device_start()
 {
 	m_out_leds.resolve();
-	m_leds_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tasc_sb30_device::leds_off_cb), this));
+	m_leds_off_timer = timer_alloc(*this, FUNC(tasc_sb30_device::leds_off_cb));
 
 	save_item(NAME(m_data));
 	save_item(NAME(m_position));

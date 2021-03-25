@@ -38,7 +38,7 @@ TIMER_CALLBACK_MEMBER(runaway_state::interrupt_callback)
 
 void runaway_state::machine_start()
 {
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(runaway_state::interrupt_callback),this));
+	m_interrupt_timer = timer_alloc(*this, FUNC(runaway_state::interrupt_callback));
 }
 
 void runaway_state::machine_reset()

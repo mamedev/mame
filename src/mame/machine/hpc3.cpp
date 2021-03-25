@@ -166,7 +166,7 @@ void hpc3_device::device_start()
 	save_pointer(NAME(m_enet_fifo[ENET_RECV]), 32);
 	save_pointer(NAME(m_enet_fifo[ENET_XMIT]), 40);
 
-	m_enet_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hpc3_device::enet_transmit), this));
+	m_enet_tx_timer = timer_alloc(*this, FUNC(hpc3_device::enet_transmit));
 }
 
 void hpc3_device::device_reset()

@@ -120,7 +120,7 @@ void i8279_device::device_start()
 	m_in_shift_cb.resolve();
 	m_in_ctrl_cb.resolve();
 	m_scanclock = clock();
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(i8279_device::timerproc_callback), this));
+	m_timer = timer_alloc(*this, FUNC(i8279_device::timerproc_callback));
 
 	// save state
 	save_item(NAME(m_d_ram));

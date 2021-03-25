@@ -668,9 +668,9 @@ rtc65271_device::rtc65271_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 void rtc65271_device::device_start()
 {
-	m_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rtc65271_device::rtc_begin_update_cb), this));
+	m_update_timer = timer_alloc(*this, FUNC(rtc65271_device::rtc_begin_update_cb));
 	m_update_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
-	m_SQW_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rtc65271_device::rtc_SQW_cb), this));
+	m_SQW_timer = timer_alloc(*this, FUNC(rtc65271_device::rtc_SQW_cb));
 	m_interrupt_cb.resolve();
 
 	m_rtc_end_update_cb.enregister(*this, FUNC(rtc65271_device::rtc_end_update_cb));

@@ -376,7 +376,7 @@ INPUT_PORTS_END
 
 void h01x_state::machine_start()
 {
-	m_cassette_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(h01x_state::cassette_data_callback), this));
+	m_cassette_data_timer = timer_alloc(*this, FUNC(h01x_state::cassette_data_callback));
 	m_cassette_data_timer->adjust(attotime::zero, 0, attotime::from_hz(11025));
 }
 

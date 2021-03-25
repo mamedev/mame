@@ -576,7 +576,7 @@ void adsp21062_device::device_start()
 	m_core->cache_dirty = 1;
 
 
-	m_core->delayed_iop_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(adsp21062_device::sharc_iop_delayed_write_callback), this));
+	m_core->delayed_iop_timer = timer_alloc(*this, FUNC(adsp21062_device::sharc_iop_delayed_write_callback));
 
 	for (auto & elem : m_core->dma_op)
 	{
@@ -590,7 +590,7 @@ void adsp21062_device::device_start()
 		elem.pmode = 0;
 		elem.chained_direction = 0;
 		elem.active = false;
-		elem.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(adsp21062_device::sharc_dma_callback), this));
+		elem.timer = timer_alloc(*this, FUNC(adsp21062_device::sharc_dma_callback));
 	}
 
 	for (int i=0; i < 16; i++)

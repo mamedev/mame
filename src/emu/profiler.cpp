@@ -120,7 +120,7 @@ const char *real_profiler_state::text(running_machine &machine)
 	start(PROFILER_PROFILER);
 
 	// get the current time
-	attotime current_time = machine.scheduler().time();
+	attotime current_time = machine.time();
 
 	// we only want to update the text periodically
 	if ((m_text_time == attotime::never) || ((current_time - m_text_time).as_double() >= TEXT_UPDATE_TIME))

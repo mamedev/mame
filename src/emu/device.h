@@ -607,9 +607,9 @@ public:
 	// timer interfaces
 	emu_timer *timer_alloc(device_timer_id id = 0, void *ptr = nullptr);
 	template<typename DeviceType, typename FuncType>
-	emu_timer *timer_alloc(DeviceType &device, FuncType callback, char const *name)
+	emu_timer *timer_alloc(DeviceType &device, FuncType callback, char const *name, void *ptr = nullptr)
 	{
-		return m_scheduler->timer_alloc(timer_expired_delegate(callback, name, &device));
+		return m_scheduler->timer_alloc(timer_expired_delegate(callback, name, &device), ptr);
 	}
 	void timer_set(const attotime &duration, device_timer_id id = 0, int param = 0);
 	void synchronize(device_timer_id id = 0, int param = 0) { timer_set(attotime::zero, id, param); }

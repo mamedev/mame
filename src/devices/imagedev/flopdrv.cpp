@@ -123,7 +123,7 @@ void legacy_floppy_image_device::floppy_drive_init()
 	/* initialise flags */
 	m_flags = 0;
 	m_index_pulse_callback = nullptr;
-	m_index_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(legacy_floppy_image_device::floppy_drive_index_callback),this));
+	m_index_timer = timer_alloc(*this, FUNC(legacy_floppy_image_device::floppy_drive_index_callback));
 	m_idx = 0;
 
 	floppy_drive_set_geometry(m_config->floppy_type);

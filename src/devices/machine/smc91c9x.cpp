@@ -83,7 +83,7 @@ void smc91c9x_device::device_start()
 	m_buffer = std::make_unique<u8[]>(ETHER_BUFFER_SIZE * m_num_ebuf);
 
 	// TX timer
-	m_tx_poll = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(smc91c9x_device::tx_poll), this));
+	m_tx_poll = timer_alloc(*this, FUNC(smc91c9x_device::tx_poll));
 
 	m_irq_handler.resolve_safe();
 
@@ -576,7 +576,7 @@ TIMER_CALLBACK_MEMBER(smc91c9x_device::tx_poll)
 		m_tx_active = 1;
 		m_tx_poll->enable(false);
 
-		LOGMASKED(LOG_TX, "Start sending packet %d length = %d time: %s\n", packet_num, length, machine().scheduler().time().as_string());
+		LOGMASKED(LOG_TX, "Start sending packet %d length = %d time: %s\n", packet_num, length, machine().time().as_string());
 		dump_bytes(&tx_buffer[4], length);
 
 		// Write loopback data and save result
@@ -608,7 +608,7 @@ void smc91c9x_device::send_complete_cb(int result)
 	const int packet_num = pop_queued_tx();
 	uint8_t *const tx_buffer = &m_buffer[packet_num * ETHER_BUFFER_SIZE];
 
-	LOGMASKED(LOG_TX, "End sending packet %d result = %d time: %s\n", packet_num, result, machine().scheduler().time().as_string());
+	LOGMASKED(LOG_TX, "End sending packet %d result = %d time: %s\n", packet_num, result, machine().time().as_string());
 
 	/* update the EPH register */
 	m_reg[B0_EPH_STATUS] |= TX_SUC;
@@ -764,7 +764,7 @@ void smc91c9x_device::process_command(uint16_t data)
 				if (!m_tx_active && !m_tx_poll->enabled())
 				{
 					m_tx_poll->adjust(attotime::from_usec(10));
-					LOG("Start polling time: %s\n", machine().scheduler().time().as_string());
+					LOG("Start polling time: %s\n", machine().time().as_string());
 				}
 			}
 			break;

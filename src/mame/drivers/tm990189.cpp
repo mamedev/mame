@@ -206,7 +206,7 @@ MACHINE_START_MEMBER(tm990189_state,tm990_189)
 {
 	m_digits.resolve();
 	m_leds.resolve();
-	m_displayena_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
+	m_displayena_timer = timer_alloc();
 
 	m_digitsel = 0;
 	m_LED_state = 0;
@@ -216,12 +216,12 @@ MACHINE_START_MEMBER(tm990189_state,tm990_189_v)
 {
 	m_digits.resolve();
 	m_leds.resolve();
-	m_displayena_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
+	m_displayena_timer = timer_alloc();
 
-	m_joy1x_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
-	m_joy1y_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
-	m_joy2x_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
-	m_joy2y_timer = machine().scheduler().timer_alloc(timer_expired_delegate());
+	m_joy1x_timer = timer_alloc();
+	m_joy1y_timer = timer_alloc();
+	m_joy2x_timer = timer_alloc();
+	m_joy2y_timer = timer_alloc();
 
 	m_digitsel = 0;
 	m_LED_state = 0;

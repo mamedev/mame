@@ -917,7 +917,7 @@ public:
 
 	TIMER_CALLBACK_MEMBER( vblank_off_callback );
 	TIMER_CALLBACK_MEMBER( stall_cpu_callback );
-	TIMER_CALLBACK_MEMBER( vblank_callback );
+	TIMER_CALLBACK_MEMBER( vblank_on_callback );
 
 	void voodoo_postload();
 
@@ -1252,7 +1252,7 @@ protected:
 
 	void check_stalled_cpu(attotime current_time);
 	static void flush_fifos( voodoo_device* vd, attotime current_time);
-	static void init_fbi(voodoo_device *vd, fbi_state *f, void *memory, int fbmem);
+	void init_fbi(voodoo_device *vd, fbi_state *f, void *memory, int fbmem);
 	static int32_t register_w(voodoo_device *vd, offs_t offset, uint32_t data);
 	static int32_t swapbuffer(voodoo_device *vd, uint32_t data);
 	static int32_t lfb_w(voodoo_device *vd, offs_t offset, uint32_t data, uint32_t mem_mask);

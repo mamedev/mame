@@ -105,7 +105,7 @@ void atetris_state::machine_start()
 	m_slapstic_bank->configure_entries(2, 2, m_slapstic_region, 0x4000);
 
 	/* Allocate interrupt timer */
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(atetris_state::interrupt_gen),this));
+	m_interrupt_timer = timer_alloc(*this, FUNC(atetris_state::interrupt_gen));
 }
 
 

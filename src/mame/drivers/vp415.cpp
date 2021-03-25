@@ -122,7 +122,7 @@ WRITE_LINE_MEMBER(vp415_state::refv_w)
 {
 	m_refv = state;
 	m_drivecpu->set_input_line(MCS51_INT0_LINE, m_refv ? CLEAR_LINE : ASSERT_LINE);
-	//printf("Current time in ms: %f\n", machine().scheduler().time().as_double() * 1000.0D);
+	//printf("Current time in ms: %f\n", machine().time().as_double() * 1000.0D);
 }
 
 // CPU Datagrabber Module (W)

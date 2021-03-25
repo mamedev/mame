@@ -1101,7 +1101,7 @@ void hornet_state::machine_start()
 	save_pointer(NAME(m_jvs_sdata), 1024);
 	save_item(NAME(m_jvs_sdata_ptr));
 
-	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hornet_state::sound_irq), this));
+	m_sound_irq_timer = timer_alloc(*this, FUNC(hornet_state::sound_irq));
 }
 
 void hornet_state::machine_reset()

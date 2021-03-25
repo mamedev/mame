@@ -869,7 +869,7 @@ TIMER_CALLBACK_MEMBER(thomson_state::to7_game_update_cb)
 void thomson_state::to7_game_init()
 {
 	LOG (( "to7_game_init called\n" ));
-	m_to7_game_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thomson_state::to7_game_update_cb),this));
+	m_to7_game_timer = timer_alloc(*this, FUNC(thomson_state::to7_game_update_cb));
 	m_to7_game_timer->adjust(TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD);
 	save_item(NAME(m_to7_game_sound));
 	save_item(NAME(m_to7_game_mute));
@@ -1592,7 +1592,7 @@ MACHINE_START_MEMBER( thomson_state, mo5 )
 	to7_floppy_init();
 	to7_modem_init();
 	to7_midi_init();
-	m_mo5_periodic_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thomson_state::mo5_periodic_cb),this));
+	m_mo5_periodic_timer = timer_alloc(*this, FUNC(thomson_state::mo5_periodic_cb));
 
 	/* memory */
 	m_thom_cart_bank = 0;
@@ -2415,7 +2415,7 @@ void thomson_state::to9_kbd_reset()
 void thomson_state::to9_kbd_init()
 {
 	LOG(( "to9_kbd_init called\n" ));
-	m_to9_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thomson_state::to9_kbd_timer_cb),this));
+	m_to9_kbd_timer = timer_alloc(*this, FUNC(thomson_state::to9_kbd_timer_cb));
 	save_item(NAME(m_to9_kbd_parity));
 	save_item(NAME(m_to9_kbd_intr));
 	save_item(NAME(m_to9_kbd_in));
@@ -2866,8 +2866,8 @@ void thomson_state::to8_kbd_reset()
 
 void thomson_state::to8_kbd_init()
 {
-	m_to8_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thomson_state::to8_kbd_timer_cb),this));
-	m_to8_kbd_signal = machine().scheduler().timer_alloc(timer_expired_delegate());
+	m_to8_kbd_timer = timer_alloc(*this, FUNC(thomson_state::to8_kbd_timer_cb));
+	m_to8_kbd_signal = timer_alloc();
 	save_item(NAME(m_to8_kbd_ack));
 	save_item(NAME(m_to8_kbd_data));
 	save_item(NAME(m_to8_kbd_step));
@@ -4076,7 +4076,7 @@ TIMER_CALLBACK_MEMBER(thomson_state::mo6_game_update_cb)
 void thomson_state::mo6_game_init()
 {
 	LOG (( "mo6_game_init called\n" ));
-	m_to7_game_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thomson_state::mo6_game_update_cb),this));
+	m_to7_game_timer = timer_alloc(*this, FUNC(thomson_state::mo6_game_update_cb));
 	m_to7_game_timer->adjust(TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD);
 	save_item(NAME(m_to7_game_sound));
 	save_item(NAME(m_to7_game_mute));
@@ -4380,7 +4380,7 @@ MACHINE_START_MEMBER( thomson_state, mo6 )
 	to9_palette_init();
 	to7_modem_init();
 	to7_midi_init();
-	m_mo5_periodic_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thomson_state::mo5_periodic_cb),this));
+	m_mo5_periodic_timer = timer_alloc(*this, FUNC(thomson_state::mo5_periodic_cb));
 
 	/* memory */
 	m_thom_cart_bank = 0;
@@ -4526,7 +4526,7 @@ void thomson_state::mo5nr_sys_porta_out(uint8_t data)
 void thomson_state::mo5nr_game_init()
 {
 	LOG (( "mo5nr_game_init called\n" ));
-	m_to7_game_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thomson_state::mo6_game_update_cb),this));
+	m_to7_game_timer = timer_alloc(*this, FUNC(thomson_state::mo6_game_update_cb));
 	m_to7_game_timer->adjust( TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD );
 	save_item(NAME(m_to7_game_sound));
 	save_item(NAME(m_to7_game_mute));
@@ -4604,7 +4604,7 @@ MACHINE_START_MEMBER( thomson_state, mo5nr )
 	to9_palette_init();
 	to7_modem_init();
 	to7_midi_init();
-	m_mo5_periodic_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thomson_state::mo5_periodic_cb),this));
+	m_mo5_periodic_timer = timer_alloc(*this, FUNC(thomson_state::mo5_periodic_cb));
 
 	/* memory */
 	m_thom_cart_bank = 0;

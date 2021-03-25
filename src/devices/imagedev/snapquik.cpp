@@ -60,7 +60,7 @@ void snapshot_image_device::device_start()
 	m_load.resolve();
 
 	/* allocate a timer */
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snapshot_image_device::process_snapshot_or_quickload),this));
+	m_timer = timer_alloc(*this, FUNC(snapshot_image_device::process_snapshot_or_quickload));
 }
 
 /*-------------------------------------------------

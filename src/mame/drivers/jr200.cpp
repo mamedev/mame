@@ -520,7 +520,7 @@ GFXDECODE_END
 
 void jr200_state::machine_start()
 {
-	m_timer_d = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jr200_state::timer_d_callback),this));
+	m_timer_d = timer_alloc(*this, FUNC(jr200_state::timer_d_callback));
 }
 
 void jr200_state::machine_reset()

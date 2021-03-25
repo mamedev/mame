@@ -280,7 +280,7 @@ ioport_constructor a2bus_pic_device::device_input_ports() const
 
 void a2bus_pic_device::device_start()
 {
-	m_strobe_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2bus_pic_device::release_strobe), this));
+	m_strobe_timer = timer_alloc(*this, FUNC(a2bus_pic_device::release_strobe));
 
 	m_firmware_base = 0x0100U;
 	m_data_latch = 0xffU;

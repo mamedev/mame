@@ -221,7 +221,7 @@ uint8_t spc1000_state::iplk_r()
 
 void spc1000_state::cass_w(uint8_t data)
 {
-	attotime time = machine().scheduler().time();
+	attotime time = machine().time();
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
 	if (BIT(data, 1) || (((time - m_time).as_attoseconds()/ATTOSECONDS_PER_MILLISECOND) < 1000))
 	{
@@ -408,7 +408,7 @@ void spc1000_state::machine_start()
 	membank("bank2")->set_base(ram);
 	membank("bank4")->set_base(ram + 0x8000);
 
-	m_time = machine().scheduler().time();
+	m_time = machine().time();
 
 	save_item(NAME(m_IPLK));
 	save_item(NAME(m_GMODE));

@@ -68,9 +68,9 @@ device_serial_interface::~device_serial_interface()
 void device_serial_interface::interface_pre_start()
 {
 	if (!m_rcv_clock)
-		m_rcv_clock = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_serial_interface::rcv_clock), this));
+		m_rcv_clock = interface_timer_alloc(*this, FUNC(device_serial_interface::rcv_clock));
 	if (!m_tra_clock)
-		m_tra_clock = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_serial_interface::tra_clock), this));
+		m_tra_clock = interface_timer_alloc(*this, FUNC(device_serial_interface::tra_clock));
 	m_rcv_clock_state = false;
 	m_tra_clock_state = false;
 }

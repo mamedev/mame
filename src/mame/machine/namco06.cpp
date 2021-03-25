@@ -251,7 +251,7 @@ void namco_06xx_device::device_start()
 	m_write.resolve_all_safe();
 
 	/* allocate a timer */
-	m_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namco_06xx_device::nmi_generate),this));
+	m_nmi_timer = timer_alloc(*this, FUNC(namco_06xx_device::nmi_generate));
 
 	save_item(NAME(m_control));
 	save_item(NAME(m_next_timer_state));

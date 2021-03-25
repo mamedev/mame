@@ -66,8 +66,8 @@ void cdp1852_device::device_start()
 	m_write_data.resolve_safe();
 
 	// allocate timers
-	m_update_do_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdp1852_device::update_do), this));
-	m_update_sr_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdp1852_device::update_sr), this));
+	m_update_do_timer = timer_alloc(*this, FUNC(cdp1852_device::update_do));
+	m_update_sr_timer = timer_alloc(*this, FUNC(cdp1852_device::update_sr));
 
 	// register for state saving
 	save_item(NAME(m_new_data));

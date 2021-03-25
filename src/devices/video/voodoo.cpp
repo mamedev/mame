@@ -1029,8 +1029,8 @@ void voodoo_device::init_fbi(voodoo_device* vd,fbi_state *f, void *memory, int f
 	}
 
 	/* allocate a VBLANK timer */
-	f->vsync_stop_timer = vd->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device::vblank_off_callback), vd), vd);
-	f->vsync_start_timer = vd->machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device::vblank_callback),vd), vd);
+	f->vsync_stop_timer = timer_alloc(*this, FUNC(voodoo_device::vblank_off_callback));
+	f->vsync_start_timer = timer_alloc(*this, FUNC(voodoo_device::vblank_on_callback));
 	f->vblank = false;
 
 	/* initialize the memory FIFO */
@@ -1509,7 +1509,7 @@ TIMER_CALLBACK_MEMBER( voodoo_device::vblank_off_callback )
 }
 
 
-TIMER_CALLBACK_MEMBER( voodoo_device::vblank_callback )
+TIMER_CALLBACK_MEMBER( voodoo_device::vblank_on_callback )
 {
 	if (LOG_VBLANK_SWAP) logerror("--- vblank start\n");
 
@@ -5749,7 +5749,7 @@ void voodoo_device::device_start()
 	pci.fifo.size = 64*2;
 	pci.fifo.in = pci.fifo.out = 0;
 	pci.stall_state = NOT_STALLED;
-	pci.continue_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(voodoo_device::stall_cpu_callback), this), nullptr);
+	pci.continue_timer = timer_alloc(*this, FUNC(voodoo_device::stall_cpu_callback));
 
 	/* allocate memory */
 	void *fbmem, *tmumem[2];

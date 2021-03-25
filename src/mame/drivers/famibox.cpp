@@ -519,8 +519,8 @@ void famibox_state::machine_start()
 
 	famicombox_bankswitch(0);
 
-	m_attract_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(famibox_state::famicombox_attract_timer_callback),this));
-	m_gameplay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(famibox_state::famicombox_gameplay_timer_callback),this));
+	m_attract_timer = timer_alloc(*this, FUNC(famibox_state::famicombox_attract_timer_callback));
+	m_gameplay_timer = timer_alloc(*this, FUNC(famibox_state::famicombox_gameplay_timer_callback));
 	m_exception_cause = 0xff;
 	m_exception_mask = 0;
 	m_attract_timer_period = 0;

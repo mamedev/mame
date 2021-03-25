@@ -78,7 +78,7 @@ const atari_motion_objects_config atarisy2_state::s_mob_config =
 void atarisy2_state::video_start()
 {
 	// reset the statics
-	m_yscroll_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(atarisy2_state::reset_yscroll_callback),this));
+	m_yscroll_reset_timer = timer_alloc(*this, FUNC(atarisy2_state::reset_yscroll_callback));
 
 	// save states
 	save_item(NAME(m_playfield_tile_bank));

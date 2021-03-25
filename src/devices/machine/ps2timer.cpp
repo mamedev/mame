@@ -42,10 +42,10 @@ ps2_timer_device::ps2_timer_device(const machine_config &mconfig, const char *ta
 void ps2_timer_device::device_start()
 {
 	if (!m_compare_timer)
-		m_compare_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ps2_timer_device::compare), this));
+		m_compare_timer = timer_alloc(*this, FUNC(ps2_timer_device::compare));
 
 	if (!m_overflow_timer)
-		m_overflow_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ps2_timer_device::overflow), this));
+		m_overflow_timer = timer_alloc(*this, FUNC(ps2_timer_device::overflow));
 }
 
 void ps2_timer_device::device_reset()
@@ -122,7 +122,7 @@ void ps2_timer_device::update_count()
 			break;
 	}
 
-	attotime curr_time = machine().scheduler().time();
+	attotime curr_time = machine().time();
 	attotime time_delta = curr_time - m_last_update_time;
 	m_last_update_time = curr_time;
 	m_elapsed_time += time_delta;

@@ -1499,7 +1499,7 @@ void towns_state::video_start()
 {
 	m_video.towns_vram_wplane = 0x00;
 	m_video.towns_sprite_page = 0;
-	m_video.sprite_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_sprite_done),this));
+	m_video.sprite_timer = timer_alloc(*this, FUNC(towns_state::towns_sprite_done));
 	m_towns_vblank_end.enregister(*this, FUNC(towns_state::towns_vblank_end));
 }
 

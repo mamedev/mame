@@ -255,7 +255,7 @@ void risc2500_state::machine_start()
 
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
 
-	m_boot_rom_disable_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(risc2500_state::disable_boot_rom), this));
+	m_boot_rom_disable_timer = timer_alloc(*this, FUNC(risc2500_state::disable_boot_rom));
 
 	save_item(NAME(m_p1000));
 

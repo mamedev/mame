@@ -380,7 +380,7 @@ void netlist_mame_device::log_add(char const* param, double value, bool isfloat)
 		return;
 
 	// make a new entry
-	buffer_entry entry = { machine().scheduler().time(), isfloat, value, param };
+	buffer_entry entry = { machine().time(), isfloat, value, param };
 
 	// flush out half of the old entries if we hit the buffer limit
 	if (m_buffer.size() >= MAX_BUFFER_ENTRIES)

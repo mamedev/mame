@@ -230,7 +230,7 @@ void timekeeper_device::device_start()
 	emu_timer *timer = timer_alloc();
 	timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 
-	m_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(timekeeper_device::watchdog_callback), this));
+	m_watchdog_timer = timer_alloc(*this, FUNC(timekeeper_device::watchdog_callback));
 	m_watchdog_timer->adjust(attotime::never);
 	m_reset_cb.resolve_safe();
 	m_irq_cb.resolve_safe();

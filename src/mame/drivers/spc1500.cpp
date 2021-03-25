@@ -836,7 +836,7 @@ void spc1500_state::machine_start()
 void spc1500_state::machine_reset()
 {
 	m_motor = false;
-	m_time = machine().scheduler().time();
+	m_time = machine().time();
 	m_double_mode = false;
 	memset(&m_paltbl[0], 1, 8);
 	m_char_count = 0;

@@ -47,8 +47,8 @@ void victory_state::video_start()
 	m_scrollx = m_scrolly = 0;
 	m_video_control = 0;
 	memset(&m_micro, 0, sizeof(m_micro));
-	m_micro.timer = machine().scheduler().timer_alloc(timer_expired_delegate());
-	m_bgcoll_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(victory_state::bgcoll_irq_callback), this));
+	m_micro.timer = timer_alloc();
+	m_bgcoll_irq_timer = timer_alloc(*this, FUNC(victory_state::bgcoll_irq_callback));
 
 	/* register for state saving */
 	save_item(NAME(m_paletteram));

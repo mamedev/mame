@@ -13,7 +13,7 @@
 
 // TO DO: DPC should be made a separate device!
 
-//  m_dpc.oscillator = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2600_state::modeDPC_timer_callback),this));
+//  m_dpc.oscillator = timer_alloc(*this, FUNC(a2600_state::modeDPC_timer_callback));
 
 class dpc_device : public device_t
 {

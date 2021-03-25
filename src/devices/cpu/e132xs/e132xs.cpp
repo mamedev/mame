@@ -1142,7 +1142,7 @@ void hyperstone_device::init(int scale_mask)
 	}
 	m_io = &space(AS_IO);
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hyperstone_device::timer_callback), this));
+	m_timer = timer_alloc(*this, FUNC(hyperstone_device::timer_callback));
 	m_core->clock_scale_mask = scale_mask;
 
 	for (uint8_t i = 0; i < 16; i++)

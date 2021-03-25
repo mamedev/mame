@@ -502,13 +502,13 @@ void bq4847_device::connect_osc(bool conn)
 
 void bq4847_device::device_start()
 {
-	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bq4847_device::rtc_clock_cb), this));
+	m_clock_timer = timer_alloc(*this, FUNC(bq4847_device::rtc_clock_cb));
 
 	// Periodic timer
-	m_periodic_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bq4847_device::rtc_periodic_cb), this));
+	m_periodic_timer = timer_alloc(*this, FUNC(bq4847_device::rtc_periodic_cb));
 
 	// Watchdog timer
-	m_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bq4847_device::rtc_watchdog_cb), this));
+	m_watchdog_timer = timer_alloc(*this, FUNC(bq4847_device::rtc_watchdog_cb));
 
 	// Interrupt line
 	m_interrupt_cb.resolve_safe();

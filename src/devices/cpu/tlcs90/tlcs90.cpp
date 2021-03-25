@@ -2951,9 +2951,9 @@ void tlcs90_device::device_start()
 	// Timers
 
 	for (int i = 0; i < 4; i++)
-		m_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs90_device::t90_timer_callback),this));
+		m_timer[i] = timer_alloc(*this, FUNC(tlcs90_device::t90_timer_callback));
 
-	m_timer[4] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tlcs90_device::t90_timer4_callback),this));
+	m_timer[4] = timer_alloc(*this, FUNC(tlcs90_device::t90_timer4_callback));
 
 	state_add( T90_PC, "PC", m_pc.w.l).formatstr("%04X");
 	state_add( T90_SP, "SP", m_sp.w.l).formatstr("%04X");

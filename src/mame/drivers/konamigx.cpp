@@ -3890,8 +3890,8 @@ void konamigx_state::init_konamigx()
 	m_esc_cb = nullptr;
 	m_resume_trigger = 0;
 
-	m_dmadelay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(konamigx_state::dmaend_callback),this));
-	m_boothack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(konamigx_state::boothack_callback),this));
+	m_dmadelay_timer = timer_alloc(*this, FUNC(konamigx_state::dmaend_callback));
+	m_boothack_timer = timer_alloc(*this, FUNC(konamigx_state::boothack_callback));
 
 	int i = 0, match = 0, readback = 0;
 	while ((gameDefs[i].cfgport != 0xff) && (!match))

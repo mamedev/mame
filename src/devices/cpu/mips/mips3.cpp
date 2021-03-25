@@ -432,7 +432,7 @@ void mips3_device::device_start()
 	m_program->accessors(m_memory);
 
 	/* allocate a timer for the compare interrupt */
-	m_compare_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mips3_device::compare_int_callback), this));
+	m_compare_int_timer = timer_alloc(*this, FUNC(mips3_device::compare_int_callback));
 
 	uint32_t flags = 0;
 	/* initialize the UML generator */

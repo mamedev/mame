@@ -1286,18 +1286,18 @@ void cdicdic_device::device_start()
 	save_item(NAME(m_audio_sample_freq));
 	save_item(NAME(m_audio_sample_size));
 
-	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdicdic_device::trigger_readback_int), this));
+	m_interrupt_timer = timer_alloc(*this, FUNC(cdicdic_device::trigger_readback_int));
 	m_interrupt_timer->adjust(attotime::never);
 
-	m_audio_sample_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdicdic_device::audio_sample_trigger), this));
+	m_audio_sample_timer = timer_alloc(*this, FUNC(cdicdic_device::audio_sample_trigger));
 	m_audio_sample_timer->adjust(attotime::never);
 
-	m_audio_playback_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdicdic_device::initial_sample_trigger), this));
+	m_audio_playback_timer = timer_alloc(*this, FUNC(cdicdic_device::initial_sample_trigger));
 	m_audio_playback_timer->adjust(attotime::never);
 
-	m_periodic_sample_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdicdic_device::periodic_sample_trigger), this));
+	m_periodic_sample_timer[0] = timer_alloc(*this, FUNC(cdicdic_device::periodic_sample_trigger));
 	m_periodic_sample_timer[0]->adjust(attotime::never);
-	m_periodic_sample_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdicdic_device::periodic_sample_trigger), this));
+	m_periodic_sample_timer[1] = timer_alloc(*this, FUNC(cdicdic_device::periodic_sample_trigger));
 	m_periodic_sample_timer[1]->adjust(attotime::never);
 
 	m_ram = std::make_unique<uint16_t[]>(0x3c00/2);

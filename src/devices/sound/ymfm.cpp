@@ -1286,7 +1286,7 @@ void ymfm_engine_base<RegisterType>::save(device_t &device)
 {
 	// allocate our timers
 	for (int tnum = 0; tnum < 2; tnum++)
-		m_timer[tnum] = device.machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ymfm_engine_base::timer_handler), this));
+		m_timer[tnum] = device.timer_alloc(*this, FUNC(ymfm_engine_base::timer_handler));
 
 	// resolve the IRQ handler while we're here
 	m_irq_handler.resolve();

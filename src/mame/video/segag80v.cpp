@@ -309,7 +309,7 @@ void segag80v_state::sega_generate_vector_list()
 	}
 
 	// set the drawing end time for this frame
-	m_draw_end_time = machine().scheduler().time() + attotime(0, IRQ_ATTOS - time_remaining);
+	m_draw_end_time = machine().time() + attotime(0, IRQ_ATTOS - time_remaining);
 }
 
 

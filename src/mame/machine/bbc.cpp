@@ -1378,8 +1378,8 @@ void bbc_state::init_bbc()
 	m_nr_high_tones = 0;
 	m_serproc_data = 0;
 	m_cass_out_enabled = 0;
-	m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bbc_state::tape_timer_cb), this));
-	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bbc_state::reset_timer_cb), this));
+	m_tape_timer = timer_alloc(*this, FUNC(bbc_state::tape_timer_cb));
+	m_reset_timer = timer_alloc(*this, FUNC(bbc_state::reset_timer_cb));
 
 	/* vertical sync pulse from video circuit */
 	m_via6522_0->write_ca1(1);

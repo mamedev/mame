@@ -205,7 +205,7 @@ void gt64xxx_device::device_start()
 	status = 0x0;
 
 	// DMA timer
-	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt64xxx_device::perform_dma), this));
+	m_dma_timer = timer_alloc(*this, FUNC(gt64xxx_device::perform_dma));
 	// Leave the timer disabled.
 	m_dma_timer->adjust(attotime::never, 0, DMA_TIMER_PERIOD);
 
@@ -228,10 +228,10 @@ void gt64xxx_device::device_start()
 	}
 
 	/* allocate timers for the galileo */
-	m_timer[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt64xxx_device::timer_callback), this));
-	m_timer[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt64xxx_device::timer_callback), this));
-	m_timer[2].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt64xxx_device::timer_callback), this));
-	m_timer[3].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt64xxx_device::timer_callback), this));
+	m_timer[0].timer = timer_alloc(*this, FUNC(gt64xxx_device::timer_callback));
+	m_timer[1].timer = timer_alloc(*this, FUNC(gt64xxx_device::timer_callback));
+	m_timer[2].timer = timer_alloc(*this, FUNC(gt64xxx_device::timer_callback));
+	m_timer[3].timer = timer_alloc(*this, FUNC(gt64xxx_device::timer_callback));
 
 	// Save states
 	save_item(NAME(m_pci_stall_state));

@@ -121,7 +121,7 @@ void device_ti8x_link_port_bit_interface::interface_pre_start()
 	device_ti8x_link_port_interface::interface_pre_start();
 
 	if (!m_error_timer)
-		m_error_timer = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_ti8x_link_port_bit_interface::bit_timeout), this));
+		m_error_timer = device().timer_alloc(*this, FUNC(device_ti8x_link_port_bit_interface::bit_timeout));
 
 	m_bit_phase = IDLE;
 	m_tx_bit_buffer = EMPTY;

@@ -3982,14 +3982,14 @@ void powervr2_device::device_start()
 
 	computedilated();
 
-//  vbout_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::vbout),this));
-//  vbin_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::vbin),this));
-	hbin_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::hbin),this));
-	yuv_timer_end = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::yuv_convert_end),this));
+//  vbout_timer = timer_alloc(*this, FUNC(powervr2_device::vbout));
+//  vbin_timer = timer_alloc(*this, FUNC(powervr2_device::vbin));
+	hbin_timer = timer_alloc(*this, FUNC(powervr2_device::hbin));
+	yuv_timer_end = timer_alloc(*this, FUNC(powervr2_device::yuv_convert_end));
 
-	endofrender_timer_isp = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_isp),this));
-	endofrender_timer_tsp = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_tsp),this));
-	endofrender_timer_video = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(powervr2_device::endofrender_video),this));
+	endofrender_timer_isp = timer_alloc(*this, FUNC(powervr2_device::endofrender_isp));
+	endofrender_timer_tsp = timer_alloc(*this, FUNC(powervr2_device::endofrender_tsp));
+	endofrender_timer_video = timer_alloc(*this, FUNC(powervr2_device::endofrender_video));
 
 	m_pvr_dma_irq.enregister(*this, FUNC(powervr2_device::pvr_dma_irq));
 	m_transfer_opaque_list_irq.enregister(*this, FUNC(powervr2_device::transfer_opaque_list_irq));

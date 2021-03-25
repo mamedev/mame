@@ -1444,7 +1444,7 @@ void mcd212_device::device_start()
 
 	screen().register_screen_bitmap(m_bitmap);
 
-	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mcd212_device::perform_scan), this));
+	m_scan_timer = timer_alloc(*this, FUNC(mcd212_device::perform_scan));
 	m_scan_timer->adjust(screen().time_until_pos(0, 0));
 
 	save_item(NAME(m_region_flag_0));

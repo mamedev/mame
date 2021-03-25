@@ -159,8 +159,8 @@ void redalert_state::panther_audio_map(address_map &map)
 
 void redalert_state::sound_start()
 {
-	m_audio_irq_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(redalert_state::audio_irq_on), this));
-	m_audio_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(redalert_state::audio_irq_off), this));
+	m_audio_irq_on_timer = timer_alloc(*this, FUNC(redalert_state::audio_irq_on));
+	m_audio_irq_off_timer = timer_alloc(*this, FUNC(redalert_state::audio_irq_off));
 
 	m_audio_irq_on_timer->adjust(REDALERT_AUDIO_CPU_IRQ_FREQ, 0, REDALERT_AUDIO_CPU_IRQ_FREQ);
 

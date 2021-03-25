@@ -343,8 +343,8 @@ void z80ne_state::machine_start()
 	m_lx383_digits.resolve();
 
 	m_lx385_ctrl = 0x1f;
-	m_cassette_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80ne_state::z80ne_cassette_tc), this));
-	m_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(z80ne_state::z80ne_kbd_scan), this));
+	m_cassette_timer = timer_alloc(*this, FUNC(z80ne_state::z80ne_cassette_tc));
+	m_kbd_timer = timer_alloc(*this, FUNC(z80ne_state::z80ne_kbd_scan));
 	m_kbd_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
 }
 

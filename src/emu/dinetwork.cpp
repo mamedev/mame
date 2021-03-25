@@ -19,8 +19,8 @@ device_network_interface::~device_network_interface()
 
 void device_network_interface::interface_pre_start()
 {
-	m_send_timer = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_network_interface::send_complete), this));
-	m_recv_timer = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_network_interface::recv_complete), this));
+	m_send_timer = interface_timer_alloc(*this, FUNC(device_network_interface::send_complete));
+	m_recv_timer = interface_timer_alloc(*this, FUNC(device_network_interface::recv_complete));
 }
 
 void device_network_interface::interface_post_start()

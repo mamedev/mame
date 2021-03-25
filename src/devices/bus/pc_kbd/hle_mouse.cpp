@@ -104,8 +104,8 @@ void hle_ps2_mouse_device::device_start()
 
 	set_pc_kbdc_device();
 
-	m_serial = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hle_ps2_mouse_device::serial), this));
-	m_sample = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hle_ps2_mouse_device::sample), this));
+	m_serial = timer_alloc(*this, FUNC(hle_ps2_mouse_device::serial));
+	m_sample = timer_alloc(*this, FUNC(hle_ps2_mouse_device::sample));
 }
 
 void hle_ps2_mouse_device::device_reset()

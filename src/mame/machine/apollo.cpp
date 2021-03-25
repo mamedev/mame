@@ -1276,8 +1276,7 @@ void apollo_stdio_device::device_start()
 
 	m_tx_w.resolve_safe();
 
-	m_poll_timer = machine().scheduler().timer_alloc(timer_expired_delegate(
-			FUNC(apollo_stdio_device::poll_timer), this));
+	m_poll_timer = timer_alloc(*this, FUNC(apollo_stdio_device::poll_timer));
 }
 
 //-------------------------------------------------
