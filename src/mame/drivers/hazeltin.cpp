@@ -394,7 +394,7 @@ WRITE_LINE_MEMBER(hazl1500_state::ay3600_data_ready_w)
 
 NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::vblank_cb)
 {
-	synchronize();
+	scheduler().synchronize();
 	if (int(data) > 1)
 	{
 		m_kbd_status_latch &= ~KBD_STATUS_TV_UB;
@@ -407,7 +407,7 @@ NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::vblank_cb)
 
 NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::tvinterq_cb)
 {
-	synchronize();
+	scheduler().synchronize();
 	if (int(data) > 1)
 	{
 		m_kbd_status_latch &= ~KBD_STATUS_TV_INT;
@@ -422,7 +422,7 @@ NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::tvinterq_cb)
 
 NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::video_out_cb)
 {
-	synchronize();
+	scheduler().synchronize();
 	attotime second_fraction(0, time.attoseconds());
 	attotime frame_fraction(0, (second_fraction * 60).attoseconds());
 	attotime pixel_time = frame_fraction * (SCREEN_HTOTAL * SCREEN_VTOTAL);
@@ -461,7 +461,7 @@ NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::video_out_cb)
 
 void hazl1500_state::refresh_address_w(uint8_t data)
 {
-	synchronize();
+	scheduler().synchronize();
 	//printf("refresh: %02x, %d, %d\n", data, m_screen->hpos(), m_screen->vpos());
 	m_iowq_timer->adjust(attotime::from_hz(XTAL(18'000'000)/9));
 	m_cpu_iowq->write(0);

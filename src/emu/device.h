@@ -612,7 +612,7 @@ public:
 		return m_scheduler->timer_alloc(timer_expired_delegate(callback, name, &device), ptr);
 	}
 	void timer_set(const attotime &duration, device_timer_id id = 0, int param = 0);
-	void synchronize(device_timer_id id = 0, int param = 0) { timer_set(attotime::zero, id, param); }
+	void synchronize(device_timer_id id, int param = 0) { timer_set(attotime::zero, id, param); }
 	emu_timer_cb const &device_timer_cb() const { return m_device_timer_cb; }
 
 	// state saving interfaces
