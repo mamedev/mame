@@ -1199,7 +1199,7 @@ void z80scc_channel::device_timer(emu_timer const &timer, device_timer_id id, in
 			{
 				//  int rate = owner()->clock() / brconst;
 				//  attotime attorate = attotime::from_hz(rate);
-				//  timer.adjust(attorate, id, attorate);
+				//  baudtimer->adjust(attorate, id, attorate);
 				txc_w(m_brg_counter & 1);
 				rxc_w(m_brg_counter & 1);
 				m_brg_counter++; // Will just keep track of state in timer mode, not hardware counter value.
@@ -1207,7 +1207,7 @@ void z80scc_channel::device_timer(emu_timer const &timer, device_timer_id id, in
 			else
 			{
 				LOG(" - turning off Baudrate timer\n");
-				timer.adjust(attotime::never, 0, attotime::never);
+				baudtimer->adjust(attotime::never, 0, attotime::never);
 			}
 		}
 		break;

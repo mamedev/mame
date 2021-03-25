@@ -41,6 +41,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
+		, m_int_timer(*this, "int_timer")
 		, m_videoram(*this,"videoram")
 		, m_spriteram(*this,"spriteram")
 		, m_spriteram2(*this,"spriteram2")
@@ -60,6 +61,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<timer_device> m_int_timer;
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;

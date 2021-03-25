@@ -99,6 +99,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_sound_timer(*this, "sound_timer"),
 		m_ports(*this, "IN%u", 0U)
 	{ }
 
@@ -171,6 +172,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<timer_device> m_sound_timer;
 	uint8_t m_pal[768];
 
 	optional_ioport_array<9> m_ports;   // but parallel_pointer takes values 0 -> 23
@@ -655,7 +657,7 @@ void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_m
 TIMER_DEVICE_CALLBACK_MEMBER(mediagx_state::sound_timer_callback)
 {
 	m_ad1847_sample_counter = 0;
-	timer.adjust(attotime::from_msec(10));
+	m_sound_timer->adjust(attotime::from_msec(10));
 
 	m_dmadac[0]->transfer(1, 0, 1, m_dacl_ptr, m_dacl.get());
 	m_dmadac[1]->transfer(1, 0, 1, m_dacr_ptr, m_dacr.get());
@@ -858,8 +860,7 @@ void mediagx_state::machine_reset()
 	memcpy(m_bios_ram, rom, 0x40000);
 	m_maincpu->reset();
 
-	timer_device *sound_timer = subdevice<timer_device>("sound_timer");
-	sound_timer->adjust(attotime::from_msec(10));
+	m_sound_timer->adjust(attotime::from_msec(10));
 
 	m_dmadac[0]->enable(1);
 	m_dmadac[1]->enable(1);

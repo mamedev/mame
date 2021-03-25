@@ -1765,7 +1765,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::internal_timer_callback )
 
 	/* set the next timer, but only if it's for a reasonable number */
 	if (!m_timer_ignore && (m_timer_period > 10 || m_timer_scale > 1))
-		timer.adjust(m_cpu->cycles_to_attotime(target_cycles));
+		m_internal_timer->adjust(m_cpu->cycles_to_attotime(target_cycles));
 
 	/* the IRQ line is edge triggered */
 	m_cpu->set_input_line(ADSP2105_TIMER, ASSERT_LINE);

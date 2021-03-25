@@ -191,7 +191,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_cage_device::dma_timer_callback )
 	{
 		if (m_dma_timer_enabled)
 		{
-			timer.adjust(attotime::never);
+			m_dma_timer->adjust(attotime::never);
 			m_dma_timer_enabled = 0;
 		}
 		return;

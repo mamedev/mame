@@ -135,7 +135,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(foodf_state::scanline_update_timer)
 		scanline = 0;
 
 	/* set a timer for it */
-	timer.adjust(m_screen->time_until_pos(scanline), scanline);
+	m_scan_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 

@@ -20,7 +20,8 @@
 //**************************************************************************
 
 // macros for a timer callback functions
-#define TIMER_DEVICE_CALLBACK_MEMBER(name)  void name(timer_device &timer, void *ptr, s32 param)
+#define TIMER_DEVICE_CALLBACK_MEMBER(name)  void name(void *ptr, s32 param)
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -32,7 +33,7 @@ class timer_device : public device_t
 {
 public:
 	// a timer callbacks look like this
-	typedef device_delegate<void (timer_device &, void *, s32)> expired_delegate;
+	typedef device_delegate<void (void *, s32)> expired_delegate;
 
 	// construction/destruction
 	timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
