@@ -40650,4 +40650,74 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mcmthr10">
+		<description>MECC-A712 Music Theory: Music Fundamentals (Version 1.0) (cleanly cracked)</description>
+		<year>1979</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-25"/>
+		<!--"Music Theory: Music Fundamentals" is a 1979 educational program developed by Linda Borry and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a712 apple music theory- music fundamentals v1.0 (4am crack).dsk" size="143360" crc="e0dbc805" sha1="d793b38c12b27e5ec5d360be54fd5c38b8c23f5c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcev5p15">
+		<description>MECC-A719 Elementary Volume 5: Language Arts: Prefixes (Version 1.5) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-25"/>
+		<!--"Elementary Volume 5: Language Arts: Prefixes" is a 1980 educational program developed and distributed by MECC. This is version 1.5.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a719 elementary volume 5- language arts- prefixes v1.5 (4am crack).dsk" size="143360" crc="9f0e8279" sha1="4358a6da33df2c7623c4c3a63461a77ce618aec7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcev5p17">
+		<description>MECC-A719 Elementary Volume 5: Language Arts: Prefixes (Version 1.7) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-25"/>
+		<!--"Elementary Volume 5: Language Arts: Prefixes" is a 1980 educational program developed and distributed by MECC. This is version 1.7.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a719 elementary volume 5- language arts- prefixes v1.7 (4am crack).dsk" size="143360" crc="6a72201c" sha1="c28569f55b122bf54bec1d08146ce4ea0da8be74"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcbv3a18">
+		<description>MECC-A721 Business Volume 3: Accounting (Version 1.8) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-25"/>
+		<!--"Business Volume 3: Accounting" is a 1981 educational program developed by R. Philip Bouchard and distributed by MECC. This is version 1.8.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a721 business volume 3 - accounting v1.8 (4am crack).dsk" size="143360" crc="171e6e38" sha1="981b78b289bdc87717e72a6e04d49edff9f777b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsv1p20">
+		<description>MECC-A726 Spelling Volume 1: Primary (Version 2.0) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-25"/>
+		<!--"Spelling Volume 1: Primary" is a 1980 educational program developed and distributed by MECC. This is version 2.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a726 spelling volume 1- primary v2.0 (4am crack).dsk" size="143360" crc="0b75f4e8" sha1="75b0ac33e13209b7db7c248184642ea4f629a340"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
