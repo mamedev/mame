@@ -207,6 +207,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(scsi_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(set_scc_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 	WRITE_LINE_MEMBER(adb_irq_w) { m_adb_irq_pending = state; }
 
@@ -240,7 +241,7 @@ private:
 
 	uint32_t m_overlay;
 
-	int m_irq_count, m_ca1_data, m_ca2_data;
+	int m_irq_count, m_ca2_data;
 	uint8_t m_mouse_bit[2], m_mouse_last[2];
 	int16_t m_mouse_last_m[2], m_mouse_count[2];
 	int m_screen_buffer;
@@ -276,7 +277,6 @@ void mac128_state::machine_start()
 
 	save_item(NAME(m_overlay));
 	save_item(NAME(m_irq_count));
-	save_item(NAME(m_ca1_data));
 	save_item(NAME(m_ca2_data));
 	save_item(NAME(m_mouse_bit));
 	save_item(NAME(m_mouse_last));
@@ -312,7 +312,6 @@ void mac128_state::machine_reset()
 	m_main_buffer = true;
 	m_snd_vol = 3;
 	m_irq_count = 0;
-	m_ca1_data = 0;
 	m_ca2_data = 0;
 	m_adb_irq_pending = 0;
 	m_drive_select = 0;
@@ -406,9 +405,6 @@ void mac128_state::set_via_interrupt(int value)
 
 void mac128_state::vblank_irq()
 {
-	m_ca1_data ^= 1;
-	m_via->write_ca1(m_ca1_data);
-
 	if (m_macadb)
 	{
 		m_macadb->adb_vblank();
@@ -439,6 +435,11 @@ void mac128_state::update_volume()
 		// sound -> r16 (68k)  -> 4016 (pa2 != 0)
 		m_dac->set_output_gain(ALL_OUTPUTS, 8.0 / (m_snd_vol + 1));
 	}
+}
+
+WRITE_LINE_MEMBER(mac128_state::vblank_w)
+{
+	m_via->write_ca1(state);
 }
 
 TIMER_CALLBACK_MEMBER(mac128_state::mac_scanline)
@@ -1089,6 +1090,7 @@ void mac128_state::mac512ke(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(15.6672_MHz_XTAL, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS);
 	m_screen->set_screen_update(FUNC(mac128_state::screen_update_mac));
+	m_screen->screen_vblank().set(FUNC(mac128_state::vblank_w));
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
