@@ -725,7 +725,7 @@ TIMER_CALLBACK_MEMBER(exorterm155_device::kbd_scan_row)
 	m_kbd_next_row = (m_kbd_next_row + 1) % 5;
 }
 
-TIMER_CALLBACK_MEMBER(exorterm155_device::kbd_repeat)
+TIMER_CALLBACK_MEMBER(exorterm155_device::kbd_repeat_cb)
 {
 	assert((m_kbd_repeat_row != 0xff) || (m_kbd_repeat_column != 0xff));
 	kbd_send_translated((m_kbd_repeat_row << 5) | m_kbd_repeat_column);
@@ -762,7 +762,7 @@ void exorterm155_device::device_start()
 
 	// Keyboard
 	m_kbd_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(exorterm155_device::kbd_scan_row), this));
-	m_kbd_repeat_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(exorterm155_device::kbd_repeat), this));
+	m_kbd_repeat_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(exorterm155_device::kbd_repeat_cb), this));
 	kbd_reset_state();
 	kbd_repeat_stop();
 

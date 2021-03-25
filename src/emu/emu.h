@@ -45,7 +45,7 @@
 #include "fileio.h"
 #include "delegate.h"
 #include "devdelegate.h"
-#include "timer.h"
+#include "schedule.h"
 
 // memory and address spaces
 #include "emumem.h"
@@ -73,7 +73,6 @@
 #include "disound.h"
 #include "divideo.h"
 #include "dinvram.h"
-#include "schedule.h"
 #include "dinetwork.h"
 
 // machine and driver configuration

@@ -612,7 +612,7 @@ public:
 	}
 	void timer_set(const attotime &duration, device_timer_id id = 0, int param = 0);
 	void synchronize(device_timer_id id = 0, int param = 0) { timer_set(attotime::zero, id, param); }
-	void device_timer_cb(void *ptr, int param);
+	emu_timer_cb const &device_timer_cb() const { return m_device_timer_cb; }
 
 	// state saving interfaces
 	template<typename ItemType>

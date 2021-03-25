@@ -568,7 +568,7 @@ void device_t::view_register(memory_view *view)
 void device_t::start()
 {
 	// register our timer callback
-	m_device_timer_cb.enregister(*this, FUNC(device_t::device_timer_cb));
+	m_device_timer_cb.enregister(*this, FUNC(device_t::device_timer));
 
 	// prepare the logerror buffer
 	if (m_machine->allow_logging())
@@ -1025,13 +1025,6 @@ finder_base *device_t::register_auto_finder(finder_base &autodev)
 void device_t::register_callback(devcb_base &callback)
 {
 	m_callbacks.emplace_back(&callback);
-}
-
-
-void device_t::device_timer_cb(void *ptr, int param)
-{
-	emu_timer &timer = *machine().scheduler().callback_timer();
-	device_timer(timer, timer.id(), param, ptr);
 }
 
 

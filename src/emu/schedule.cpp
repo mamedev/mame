@@ -22,24 +22,6 @@
 #define PRECISION
 
 
-//**************************************************************************
-//  GLOBAL HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  dummy_delegate - a global empty delegate that
-//  can substitute for a null function pointer, if
-//  one is provided; this saves us a check in the
-//  innermost timer expiration loop
-//-------------------------------------------------
-
-static void dummy_delegate(void *, s32)
-{
-}
-
-static timer_expired_delegate const s_dummy_delegate(FUNC(dummy_delegate));
-
-
 
 //**************************************************************************
 //  EMU TIMER CB
@@ -51,7 +33,7 @@ emu_timer_cb::emu_timer_cb() :
 {
 }
 
-void emu_timer_cb::enregister(device_scheduler &scheduler, char const *unique, timer_expired_delegate callback)
+void emu_timer_cb::enregister(device_scheduler &scheduler, char const *unique, timer_expired_delegate const &callback)
 {
 	// build the full name, appending the unique identifier if present
 	std::string fullid = callback.name();
@@ -80,7 +62,7 @@ void emu_timer_cb::enregister(device_scheduler &scheduler, char const *unique, t
 	}
 }
 
-void emu_timer_cb::enregister(device_t &device, char const *unique, timer_expired_delegate callback)
+void emu_timer_cb::enregister(device_t &device, char const *unique, timer_expired_delegate const &callback)
 {
 	if (unique == nullptr)
 		enregister(device.machine().scheduler(), device.tag(), callback);
@@ -93,7 +75,7 @@ void emu_timer_cb::enregister(device_t &device, char const *unique, timer_expire
 	}
 }
 
-void emu_timer_cb::interface_enregister(device_interface &intf, char const *unique, timer_expired_delegate callback)
+void emu_timer_cb::interface_enregister(device_interface &intf, char const *unique, timer_expired_delegate const &callback)
 {
 	enregister(intf.device(), unique, callback);
 }
@@ -135,7 +117,7 @@ emu_timer::~emu_timer()
 //  be saved and start off in a disabled state
 //-------------------------------------------------
 
-inline emu_timer &emu_timer::init_persistent(running_machine &machine, timer_expired_delegate callback, void *ptr)
+inline emu_timer &emu_timer::init_persistent(running_machine &machine, timer_expired_delegate const &callback, void *ptr)
 {
 	// ensure the entire timer state is clean
 	m_machine = &machine;
@@ -150,7 +132,7 @@ inline emu_timer &emu_timer::init_persistent(running_machine &machine, timer_exp
 	m_param3 = 0;
 	m_enabled = false;
 	m_temporary = false;
-	m_timer_cb.enregister(machine.scheduler(), nullptr, callback.isnull() ? s_dummy_delegate : callback);
+	m_timer_cb.enregister(machine.scheduler(), nullptr, callback);
 	m_callback = &m_timer_cb.m_callback;
 	m_device = nullptr;
 	m_id = 0;
@@ -175,8 +157,7 @@ inline emu_timer &emu_timer::init_persistent(device_t &device, device_timer_id i
 	m_param3 = 0;
 	m_enabled = false;
 	m_temporary = false;
-	m_timer_cb.enregister(device, FUNC(device_t::device_timer_cb));
-	m_callback = &m_timer_cb.m_callback;
+	m_callback = &device.device_timer_cb().m_callback;
 	m_device = &device;
 	m_id = id;
 
@@ -229,8 +210,7 @@ inline emu_timer &emu_timer::init_temporary(device_t &device, device_timer_id id
 	m_param3 = param3;
 	m_enabled = true;
 	m_temporary = true;
-	m_timer_cb.enregister(device, FUNC(device_t::device_timer_cb));
-	m_callback = &m_timer_cb.m_callback;
+	m_callback = &device.device_timer_cb().m_callback;
 	m_device = &device;
 	m_id = id;
 
@@ -969,7 +949,7 @@ void device_scheduler::update_basetime()
 //  timers provide nothing
 //-------------------------------------------------
 
-void device_scheduler::empty_timer_cb(void *ptr, s32 param)
+void device_scheduler::empty_timer_cb(emu_timer const &timer)
 {
 }
 
@@ -1068,7 +1048,7 @@ void device_scheduler::register_timer_expired(emu_timer_cb &callback)
 //  timer and return a pointer
 //-------------------------------------------------
 
-emu_timer *device_scheduler::timer_alloc(timer_expired_delegate callback, void *ptr)
+emu_timer *device_scheduler::timer_alloc(timer_expired_delegate const &callback, void *ptr)
 {
 	// persistent timers are implicitly inactive, so they go on the
 	// inactive list once created
@@ -1144,9 +1124,9 @@ void device_scheduler::eat_all_cycles()
 //  given amount of time
 //-------------------------------------------------
 
-void device_scheduler::timed_trigger(void *ptr, s32 param)
+void device_scheduler::timed_trigger(emu_timer const &timer)
 {
-	trigger(param);
+	trigger(timer.param());
 }
 
 
@@ -1406,7 +1386,7 @@ inline void device_scheduler::execute_timers()
 				else
 					LOG("execute_timers: timer callback %s\n", timer.m_callback->name());
 
-				(*timer.m_callback)(timer.m_ptr, timer.m_param);
+				(*timer.m_callback)(timer);
 			}
 			g_profiler.stop();
 
@@ -1431,7 +1411,7 @@ inline void device_scheduler::execute_timers()
 					LOG("execute_timers: timer device %s timer %d\n", timer.m_device->tag(), timer.m_id);
 				else
 					LOG("execute_timers: timer callback %s\n", timer.m_callback->name());
-				(*timer.m_callback)(timer.m_ptr, timer.m_param);
+				(*timer.m_callback)(timer);
 			}
 			g_profiler.stop();
 

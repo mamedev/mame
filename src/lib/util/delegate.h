@@ -228,6 +228,7 @@ public:
 
 	// comparison helpers
 	bool operator==(const delegate_mfp &rhs) const { return (m_rawdata == rhs.m_rawdata); }
+	bool operator!=(const delegate_mfp &rhs) const { return (m_rawdata != rhs.m_rawdata); }
 	bool isnull() const { return (m_rawdata == s_null_mfp); }
 
 	// getters
@@ -271,6 +272,7 @@ private:
 		int data[((sizeof(void *) + 3 * sizeof(int)) + (sizeof(int) - 1)) / sizeof(int)];
 #endif
 		bool operator==(const raw_mfp_data &rhs) const { return (memcmp(data, rhs.data, sizeof(data)) == 0); }
+		bool operator!=(const raw_mfp_data &rhs) const { return (memcmp(data, rhs.data, sizeof(data)) != 0); }
 	};
 
 	// internal state
@@ -310,6 +312,7 @@ public:
 
 	// comparison helpers
 	bool operator==(const delegate_mfp &rhs) const { return (m_function == rhs.m_function && m_this_delta == rhs.m_this_delta); }
+	bool operator!=(const delegate_mfp &rhs) const { return (m_function != rhs.m_function || m_this_delta != rhs.m_this_delta); }
 	bool isnull() const { return (m_function == 0 && m_this_delta == 0); }
 
 	// getters
@@ -365,6 +368,7 @@ public:
 
 	// comparison helpers
 	bool operator==(const delegate_mfp &rhs) const { return (m_function == rhs.m_function); }
+	bool operator!=(const delegate_mfp &rhs) const { return (m_function != rhs.m_function); }
 	bool isnull() const { return (m_function == 0); }
 
 	// getters
@@ -499,6 +503,10 @@ public:
 	bool operator==(const delegate_base &rhs) const
 	{
 		return (m_raw_function == rhs.m_raw_function && object() == rhs.object() && m_raw_mfp == rhs.m_raw_mfp);
+	}
+	bool operator!=(const delegate_base &rhs) const
+	{
+		return (m_raw_function != rhs.m_raw_function || object() != rhs.object() || m_raw_mfp != rhs.m_raw_mfp);
 	}
 
 

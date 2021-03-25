@@ -134,7 +134,7 @@ private:
 	void kbd_send_translated(u8 code);
 
 	TIMER_CALLBACK_MEMBER(kbd_scan_row);
-	TIMER_CALLBACK_MEMBER(kbd_repeat);
+	TIMER_CALLBACK_MEMBER(kbd_repeat_cb);
 
 	emu_timer       *m_kbd_scan_timer;
 	emu_timer       *m_kbd_repeat_timer;
