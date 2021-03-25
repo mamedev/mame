@@ -45,6 +45,8 @@ Plugs near the 68EC000
 #include "machine/microtch.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
+#include "video/bt47x.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -59,28 +61,77 @@ public:
 	vlc34010_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_tms(*this, "tms")
+		m_tms(*this, "tms"),
+		m_duart(*this, "duart%u", 0U),
+		m_boot_view(*this, "boot")
 	{ }
 
 	void base(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
+	void switch_w(u8 data);
+	template <int N> u8 duart_r(offs_t offset);
+	template <int N> void duart_w(offs_t offset, u8 data);
+
+	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34010_device> m_tms;
+	required_device_array<mc68681_device, 3> m_duart;
+	memory_view m_boot_view;
 
 	void main_map(address_map &map);
 	void tms_map(address_map &map);
 };
 
 
+void vlc34010_state::machine_reset()
+{
+	m_boot_view.select(0);
+}
+
+TMS340X0_SCANLINE_RGB32_CB_MEMBER(vlc34010_state::scanline_update)
+{
+}
+
+void vlc34010_state::switch_w(u8 data)
+{
+	m_boot_view.select(1);
+}
+
+template <int N> u8 vlc34010_state::duart_r(offs_t offset)
+{
+	return m_duart[N]->read(offset >> 4);
+}
+
+template <int N> void vlc34010_state::duart_w(offs_t offset, u8 data)
+{
+	m_duart[N]->write(offset >> 4, data);
+}
+
+
 void vlc34010_state::main_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).rom().region("maincpu", 0);
+	map(0x000000, 0x7fffff).view(m_boot_view);
+	m_boot_view[0](0x000000, 0x1fffff).rom().region("maincpu", 0);
+	m_boot_view[1](0x000000, 0x03ffff).ram().mirror(0x7c0000);
+	map(0xa10001, 0xa10001).r("watchdog", FUNC(watchdog_timer_device::reset_r));
+	map(0xa70001, 0xa70001).w(FUNC(vlc34010_state::switch_w));
+	map(0xb10001, 0xb10001).select(0xf0).rw(FUNC(vlc34010_state::duart_r<0>), FUNC(vlc34010_state::duart_w<0>));
+	map(0xb20001, 0xb20001).select(0xf0).rw(FUNC(vlc34010_state::duart_r<1>), FUNC(vlc34010_state::duart_w<1>));
+	map(0xb30001, 0xb30001).select(0xf0).rw(FUNC(vlc34010_state::duart_r<2>), FUNC(vlc34010_state::duart_w<2>));
+	map(0xf00000, 0xffffff).rom().region("maincpu", 0);
 }
 
 void vlc34010_state::tms_map(address_map &map)
 {
-	map(0xfff00000, 0xffffffff).rom().region("tms", 0);
+	map(0x00000000, 0x003fffff).ram();
+	map(0x02000000, 0x027fffff).ram();
+	map(0x05000000, 0x0500007f).m("ramdac", FUNC(bt471_device::map)).umask16(0xff00);
+	map(0xff800000, 0xffffffff).rom().region("tms", 0);
 }
 
 static INPUT_PORTS_START( beezerk )
@@ -95,6 +146,10 @@ void vlc34010_state::base(machine_config &config)
 
 	TMS34010(config, m_tms, 50_MHz_XTAL);
 	m_tms->set_addrmap(AS_PROGRAM, &vlc34010_state::tms_map);
+	m_tms->set_scanline_rgb32_callback(FUNC(vlc34010_state::scanline_update));
+	m_tms->set_pixel_clock(50_MHz_XTAL); // ???
+
+	WATCHDOG_TIMER(config, "watchdog");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: all wrong
 	screen.set_refresh_hz(60);
@@ -102,6 +157,8 @@ void vlc34010_state::base(machine_config &config)
 	screen.set_size((42+1)*8, (32+1)*8);
 	screen.set_visarea(0*8, 31*8-1, 0*8, 31*8-1);
 	screen.set_screen_update(m_tms, FUNC(tms34010_device::tms340x0_rgb32));
+
+	BT471(config, "ramdac", 0); // type not correct
 
 	MC68681(config, "duart0", 3.6864_MHz_XTAL);
 
