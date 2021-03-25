@@ -112,7 +112,7 @@ private:
 	uint8_t m_switch_col;
 	bool m_data_ok;
 	emu_timer* m_irq_timer;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_IRQ = 0;
 	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
@@ -381,7 +381,7 @@ WRITE_LINE_MEMBER( s6_state::pia_irq )
 	}
 }
 
-void s6_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void s6_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
 	{

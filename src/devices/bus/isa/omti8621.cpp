@@ -417,7 +417,7 @@ void omti8621_device::set_interrupt(enum line_state line_state)
 	m_isa->irq14_w(line_state);
 }
 
-void omti8621_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void omti8621_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	set_interrupt(ASSERT_LINE);
 }

@@ -243,10 +243,10 @@ private:
 	void ep_io(address_map &map);
 	void ep_mem(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-void notetaker_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void notetaker_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

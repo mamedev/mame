@@ -449,7 +449,7 @@ void laserbat_state::machine_start()
 	save_item(NAME(m_keys));
 }
 
-void laserbat_state_base::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void laserbat_state_base::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

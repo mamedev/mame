@@ -489,7 +489,7 @@ void sc499_device::check_tape()
  timer_func - handle timer interrupts
  -------------------------------------------------*/
 
-void sc499_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void sc499_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	LOG2(("timer_func param=%d status=%x", param, m_status));
 

@@ -277,7 +277,7 @@ private:
 	void vk100_io(address_map &map);
 	void vk100_mem(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 // vram access functions:
@@ -349,7 +349,7 @@ void vk100_state::vram_write(uint8_t data)
 	m_vram[(EA<<1)] = (block&0xFF00)>>8; // ''
 }
 
-void vk100_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void vk100_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

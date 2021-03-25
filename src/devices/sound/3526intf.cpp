@@ -31,7 +31,7 @@ void ym3526_device::irq_handler(int irq)
 }
 
 /* Timer overflow callback from timer.c */
-void ym3526_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ym3526_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
 	{

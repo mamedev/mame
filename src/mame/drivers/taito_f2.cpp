@@ -529,7 +529,7 @@ driftout  8000 0000/8  0000 0000    The first control changes from 8000 to 0000 
 
 ******************************************************************/
 
-void taitof2_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void taitof2_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

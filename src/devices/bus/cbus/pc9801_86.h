@@ -47,7 +47,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
 	void pc9801_86_config(machine_config &config);
 
 	required_device<pc9801_slot_device> m_bus;

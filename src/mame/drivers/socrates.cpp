@@ -214,7 +214,7 @@ protected:
 	void socrates_io(address_map &map);
 	void socrates_mem(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 
@@ -386,7 +386,7 @@ void socrates_state::machine_reset()
 	m_speech_load_settings_count = 0;
 }
 
-void socrates_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void socrates_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

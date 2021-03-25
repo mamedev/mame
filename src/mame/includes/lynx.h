@@ -134,7 +134,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_shared_ptr<uint8_t> m_mem_0000;
 	required_shared_ptr<uint8_t> m_mem_fc00;

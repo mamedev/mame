@@ -28,7 +28,7 @@ protected:
 
 	void device_start() override;
 	void device_reset() override;
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	uint8_t m_bus, m_t0, m_t1, m_p1, m_p2;

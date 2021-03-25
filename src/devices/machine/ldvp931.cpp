@@ -185,7 +185,7 @@ void philips_22vp931_device::device_reset()
 //  device
 //-------------------------------------------------
 
-void philips_22vp931_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void philips_22vp931_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

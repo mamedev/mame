@@ -39,7 +39,7 @@ void clock_device::device_clock_changed()
 		m_timer->adjust(attotime::never);
 }
 
-void clock_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void clock_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	m_signal = !m_signal;
 	m_signal_handler(m_signal);

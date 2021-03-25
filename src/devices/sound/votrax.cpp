@@ -333,7 +333,7 @@ void votrax_sc01_device::device_clock_changed()
 //  device_timer - handle device timer
 //-------------------------------------------------
 
-void votrax_sc01_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void votrax_sc01_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	m_stream->update();
 

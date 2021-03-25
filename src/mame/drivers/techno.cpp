@@ -58,7 +58,7 @@ private:
 	void techno_sub_map(address_map &map);
 	void cpu_space_map(address_map &map);
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -259,7 +259,7 @@ void techno_state::cpu_space_map(address_map &map)
 	map(0xfffff2, 0xfffff3).lr16(NAME([this] () -> u16 { return m_vector; }));
 }
 
-void techno_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void techno_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == IRQ_ADVANCE_TIMER)
 	{

@@ -64,7 +64,7 @@ void fgoal_state::fgoal_palette(palette_device &palette) const
 }
 
 
-void fgoal_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void fgoal_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

@@ -234,7 +234,7 @@ void am9513_device::device_clock_changed()
 //  fires
 //-------------------------------------------------
 
-void am9513_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void am9513_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	assert(id >= TIMER_F1 && id <= TIMER_F5);
 

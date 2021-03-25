@@ -58,9 +58,9 @@ void naomi_g1_device::device_reset()
 	set_ext_irq(CLEAR_LINE);
 }
 
-void naomi_g1_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void naomi_g1_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
-	timer.adjust(attotime::never);
+	this->timer->adjust(attotime::never);
 	if(!gdst)
 		return;
 	gdst = 0;

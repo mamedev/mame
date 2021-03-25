@@ -42,7 +42,7 @@ private:
 	emu_timer   *m_poll_timer;
 	emu_timer   *m_send_timer;
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
 
 	static constexpr unsigned KEYQUEUESIZE = 256;
 	static constexpr unsigned MAXKEYMSGLENGTH = 10;

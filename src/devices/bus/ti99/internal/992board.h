@@ -63,7 +63,7 @@ private:
 
 	void device_start() override;
 	void device_reset() override;
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
 	std::string tts(attotime t);
 	devcb_read8   m_mem_read_cb; // Callback to read memory
 	devcb_write_line m_hold_cb;

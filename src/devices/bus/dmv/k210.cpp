@@ -68,7 +68,7 @@ void dmv_k210_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void dmv_k210_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void dmv_k210_device::device_timer(emu_timer const &timer, device_timer_id tid, int param, void *ptr)
 {
 	m_centronics->write_strobe(CLEAR_LINE);
 }

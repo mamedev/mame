@@ -424,7 +424,7 @@ void intv_state::intvkbd2_mem(address_map &map)
 	map(0xe000, 0xffff).r(FUNC(intv_state::intvkb_iocart_r));
 }
 
-void intv_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void intv_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

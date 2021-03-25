@@ -583,7 +583,7 @@ void lynx_state::lynx_blit_lines()
 	}
 }
 
-void lynx_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void lynx_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

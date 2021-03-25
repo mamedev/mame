@@ -221,7 +221,7 @@ TIMER_CALLBACK_MEMBER(amstrad_state::amstrad_pc2_low)
 }
 
 
-void amstrad_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void amstrad_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

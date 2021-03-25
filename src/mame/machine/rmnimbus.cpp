@@ -1522,7 +1522,7 @@ void rmnimbus_state::mouse_js_reset()
 	m_nimbus_mouse.m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(1000));
 }
 
-void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void rmnimbus_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	uint8_t   x = 0;
 	uint8_t   y = 0;

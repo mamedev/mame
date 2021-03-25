@@ -191,7 +191,7 @@ protected:
 		m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override
+	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override
 	{
 		switch (id)
 		{

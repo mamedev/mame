@@ -66,7 +66,7 @@ private:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
@@ -105,7 +105,7 @@ void pwrview_state::device_reset()
 	m_biosbank->set_bank(0);
 }
 
-void pwrview_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pwrview_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
 	{

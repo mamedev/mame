@@ -363,7 +363,7 @@ uint8_t nes_ks7022_device::read_h(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_ks7032_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_ks7032_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -481,7 +481,7 @@ uint8_t nes_ks202_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_ks7017_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void nes_ks7017_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == TIMER_IRQ)
 	{

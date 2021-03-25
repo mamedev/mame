@@ -218,7 +218,7 @@ void hpc3_device::map(address_map &map)
 	map(0x00060000, 0x0007ffff).rw(FUNC(hpc3_device::bbram_r), FUNC(hpc3_device::bbram_w));
 }
 
-void hpc3_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hpc3_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

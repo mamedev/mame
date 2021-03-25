@@ -194,13 +194,13 @@ uint16_t swapb16(uint16_t data)
 }
 
 
-void m3comm_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void m3comm_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	if(id != TIMER_IRQ5)
 		return;
 
 	m_commcpu->set_input_line(M68K_IRQ_5, ASSERT_LINE);
-	timer.adjust(attotime::from_usec(10000));   // there is it from actually ??????
+	this->timer->adjust(attotime::from_usec(10000));   // there is it from actually ??????
 }
 
 ///////////// Internal MMIO

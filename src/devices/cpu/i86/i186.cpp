@@ -1199,7 +1199,7 @@ void i80186_cpu_device::external_int(uint16_t intno, int state)
  *
  *************************************/
 
-void i80186_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void i80186_cpu_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
 	{
@@ -1404,7 +1404,7 @@ void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_
 		/* RIU is cleared whenever ALT = 0 */
 		if (!(new_control & 0x0002))
 			new_control &= ~0x1000;
-		
+
 		/* set the new control register */
 		t->control = new_control;
 	}

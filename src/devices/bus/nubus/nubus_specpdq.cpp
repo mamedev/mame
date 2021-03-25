@@ -139,7 +139,7 @@ void nubus_specpdq_device::device_reset()
 }
 
 
-void nubus_specpdq_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void nubus_specpdq_device::device_timer(emu_timer const &timer, device_timer_id tid, int param, void *ptr)
 {
 	if (!m_vbl_disable)
 	{

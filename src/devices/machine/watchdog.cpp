@@ -90,7 +90,7 @@ void watchdog_timer_device::device_reset()
 //  device_timer - handle timer expiration events
 //-------------------------------------------------
 
-void watchdog_timer_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void watchdog_timer_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	watchdog_fired();
 }

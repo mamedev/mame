@@ -60,7 +60,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// timer IDs
@@ -75,8 +75,8 @@ private:
 	void internal_control_write(offs_t offset, uint16_t newword);
 	void update_pf_xscrolls();
 	void update_parameter(uint16_t newword);
-	void update_tilerow(emu_timer &timer, int scanline);
-	void eof_update(emu_timer &timer);
+	void update_tilerow(int scanline);
+	void eof_update();
 
 	// configuration state
 	devcb_write_line   m_scanline_int_cb;

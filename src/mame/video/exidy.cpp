@@ -255,7 +255,7 @@ void exidy_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 ***************************************************************************/
 
-void exidy_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void exidy_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

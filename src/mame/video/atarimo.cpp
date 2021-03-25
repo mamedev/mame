@@ -355,7 +355,7 @@ void atari_motion_objects_device::device_reset()
 //  calbacks
 //-------------------------------------------------
 
-void atari_motion_objects_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void atari_motion_objects_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
@@ -365,7 +365,7 @@ void atari_motion_objects_device::device_timer(emu_timer &timer, device_timer_id
 			param += 64;
 			if (param >= screen().visible_area().bottom())
 				param = 0;
-			timer.adjust(screen().time_until_pos(param), param);
+			m_force_update_timer->adjust(screen().time_until_pos(param), param);
 			break;
 	}
 }

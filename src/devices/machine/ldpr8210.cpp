@@ -316,7 +316,7 @@ void pioneer_pr8210_device::device_reset()
 //  device
 //-------------------------------------------------
 
-void pioneer_pr8210_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pioneer_pr8210_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
@@ -986,7 +986,7 @@ void simutrek_special_device::device_reset()
 //  device
 //-------------------------------------------------
 
-void simutrek_special_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void simutrek_special_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

@@ -47,7 +47,7 @@ protected:
 	void device_config_complete() override;
 
 private:
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
 	void device_start() override;
 	void device_reset() override;
 

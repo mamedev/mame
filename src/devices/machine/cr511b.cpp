@@ -87,7 +87,7 @@ void cr511b_device::device_reset()
 //  device_timer - device-specific timer events
 //-------------------------------------------------
 
-void cr511b_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void cr511b_device::device_timer(emu_timer const &timer, device_timer_id tid, int param, void *ptr)
 {
 }
 

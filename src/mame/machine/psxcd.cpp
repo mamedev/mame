@@ -1181,7 +1181,7 @@ void psxcd_device::stop_read()
 	m_spu->flush_cdda(sector);
 }
 
-void psxcd_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void psxcd_device::device_timer(emu_timer const &timer, device_timer_id tid, int param, void *ptr)
 {
 	if (!m_timerinuse[tid])
 	{

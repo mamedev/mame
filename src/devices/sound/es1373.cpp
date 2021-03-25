@@ -224,7 +224,7 @@ void es1373_device::map_extra(uint64_t memory_window_start, uint64_t memory_wind
 //-------------------------------------------------
 //  device_timer - called when our device timer expires
 //-------------------------------------------------
-void es1373_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void es1373_device::device_timer(emu_timer const &timer, device_timer_id tid, int param, void *ptr)
 {
 	m_stream->update();
 }

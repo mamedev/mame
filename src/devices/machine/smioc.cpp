@@ -246,7 +246,7 @@ void smioc_device::SoftReset()
 }
 
 
-void smioc_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void smioc_device::device_timer(emu_timer const &timer, device_timer_id tid, int param, void *ptr)
 {
 	switch (tid)
 	{

@@ -49,7 +49,7 @@ void videopin_state::update_plunger()
 }
 
 
-void videopin_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void videopin_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

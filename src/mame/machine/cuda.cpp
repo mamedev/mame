@@ -457,7 +457,7 @@ void cuda_device::device_reset()
 	last_adb = 0;
 }
 
-void cuda_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void cuda_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == 0)
 	{

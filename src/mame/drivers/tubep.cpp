@@ -237,7 +237,7 @@ void tubep_state::tubep_sound_portmap(address_map &map)
 }
 
 
-void tubep_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void tubep_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

@@ -454,7 +454,7 @@ void econet_e01_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void econet_e01_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void econet_e01_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (m_clk_en)
 	{

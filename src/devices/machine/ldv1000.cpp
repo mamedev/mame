@@ -191,7 +191,7 @@ void pioneer_ldv1000_device::device_reset()
 //  device
 //-------------------------------------------------
 
-void pioneer_ldv1000_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pioneer_ldv1000_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
@@ -203,7 +203,7 @@ void pioneer_ldv1000_device::device_timer(emu_timer &timer, device_timer_id id, 
 
 			// update down counter and reschedule
 			if (--m_counter != 0)
-				timer.adjust(MULTIJUMP_TRACK_TIME);
+				m_multitimer->adjust(MULTIJUMP_TRACK_TIME);
 			break;
 		}
 

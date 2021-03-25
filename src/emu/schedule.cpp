@@ -119,6 +119,9 @@ emu_timer::~emu_timer()
 
 inline emu_timer &emu_timer::init_persistent(running_machine &machine, timer_expired_delegate const &callback, void *ptr)
 {
+	// auto-enregister this callback
+	m_timer_cb.enregister(machine.scheduler(), nullptr, callback);
+
 	// ensure the entire timer state is clean
 	m_machine = &machine;
 	m_next = nullptr;
@@ -126,14 +129,13 @@ inline emu_timer &emu_timer::init_persistent(running_machine &machine, timer_exp
 	m_start = machine.time();
 	m_expire = attotime::never;
 	m_period = attotime::never;
+	m_callback = &m_timer_cb.m_callback;
 	m_ptr = ptr;
 	m_param = 0;
 	m_param2 = 0;
 	m_param3 = 0;
 	m_enabled = false;
 	m_temporary = false;
-	m_timer_cb.enregister(machine.scheduler(), nullptr, callback);
-	m_callback = &m_timer_cb.m_callback;
 	m_device = nullptr;
 	m_id = 0;
 
@@ -151,13 +153,13 @@ inline emu_timer &emu_timer::init_persistent(device_t &device, device_timer_id i
 	m_start = m_machine->time();
 	m_expire = attotime::never;
 	m_period = attotime::never;
+	m_callback = &device.device_timer_cb().m_callback;
 	m_ptr = ptr;
 	m_param = 0;
 	m_param2 = 0;
 	m_param3 = 0;
 	m_enabled = false;
 	m_temporary = false;
-	m_callback = &device.device_timer_cb().m_callback;
 	m_device = &device;
 	m_id = id;
 
@@ -173,7 +175,7 @@ inline emu_timer &emu_timer::init_persistent(device_t &device, device_timer_id i
 //  and expiration time from the outset
 //-------------------------------------------------
 
-inline emu_timer &emu_timer::init_temporary(running_machine &machine, emu_timer_cb const &callback, attotime const &duration, s32 param, u64 param2, u64 param3)
+inline emu_timer &emu_timer::init_temporary(running_machine &machine, emu_timer_cb const &callback, attotime const &duration, u64 param, u64 param2, u64 param3)
 {
 	// ensure the entire timer state is clean
 	m_machine = &machine;
@@ -182,20 +184,20 @@ inline emu_timer &emu_timer::init_temporary(running_machine &machine, emu_timer_
 	m_start = machine.time();
 	m_expire = m_start + duration;
 	m_period = attotime::never;
+	m_callback = &callback.m_callback;
 	m_ptr = nullptr;
 	m_param = param;
 	m_param2 = param2;
 	m_param3 = param3;
 	m_enabled = true;
 	m_temporary = true;
-	m_callback = &callback.m_callback;
 	m_device = nullptr;
 	m_id = 0;
 
 	return *this;
 }
 
-inline emu_timer &emu_timer::init_temporary(device_t &device, device_timer_id id, attotime const &duration, s32 param, u64 param2, u64 param3)
+inline emu_timer &emu_timer::init_temporary(device_t &device, device_timer_id id, attotime const &duration, u64 param, u64 param2, u64 param3)
 {
 	// ensure the entire timer state is clean
 	m_machine = &device.machine();
@@ -204,13 +206,13 @@ inline emu_timer &emu_timer::init_temporary(device_t &device, device_timer_id id
 	m_start = m_machine->time();
 	m_expire = m_start + duration;
 	m_period = attotime::never;
+	m_callback = &device.device_timer_cb().m_callback;
 	m_ptr = nullptr;
 	m_param = param;
 	m_param2 = param2;
 	m_param3 = param3;
 	m_enabled = true;
 	m_temporary = true;
-	m_callback = &device.device_timer_cb().m_callback;
 	m_device = &device;
 	m_id = id;
 
@@ -327,13 +329,13 @@ void emu_timer::register_save()
 	}
 
 	// save the bits
+	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_start));
+	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_expire));
+	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_period));
 	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_param));
 	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_param2));
 	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_param3));
 	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_enabled));
-	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_period));
-	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_start));
-	machine().save().save_item(m_device, "timer", name.c_str(), index, NAME(m_expire));
 }
 
 

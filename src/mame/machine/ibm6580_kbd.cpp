@@ -201,7 +201,7 @@ void dw_keyboard_device::device_reset()
 {
 }
 
-void dw_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void dw_keyboard_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }

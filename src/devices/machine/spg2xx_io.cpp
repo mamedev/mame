@@ -1495,7 +1495,7 @@ void spg2xx_io_device::io_extended_w(offs_t offset, uint16_t data)
 	}
 }
 
-void spg2xx_io_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void spg2xx_io_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

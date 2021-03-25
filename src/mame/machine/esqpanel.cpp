@@ -483,7 +483,7 @@ void esqpanel_device::device_stop()
 	m_external_panel_server = nullptr;
 }
 
-void esqpanel_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void esqpanel_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (ESQPANEL_EXTERNAL_TIMER_ID == id)
 	{

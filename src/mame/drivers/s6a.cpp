@@ -79,7 +79,7 @@ public:
 
 protected:
 	virtual void machine_start() override { m_digits.resolve(); }
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	uint8_t sound_r();
@@ -367,7 +367,7 @@ WRITE_LINE_MEMBER( s6a_state::pia_irq )
 	}
 }
 
-void s6a_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void s6a_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
 	{

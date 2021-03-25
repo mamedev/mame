@@ -525,6 +525,7 @@ public:
 	// getters
 	bool has_running_machine() const { return m_machine != nullptr; }
 	running_machine &machine() const { /*assert(m_machine != nullptr);*/ return *m_machine; }
+	device_scheduler &scheduler() const { return *m_scheduler; }
 	const char *tag() const { return m_tag.c_str(); }
 	const char *basetag() const { return m_basetag.c_str(); }
 	device_type type() const { return m_type; }
@@ -608,7 +609,7 @@ public:
 	template<typename DeviceType, typename FuncType>
 	emu_timer *timer_alloc(DeviceType &device, FuncType callback, char const *name)
 	{
-		return machine().scheduler().timer_alloc(timer_expired_delegate(callback, name, &device));
+		return m_scheduler->timer_alloc(timer_expired_delegate(callback, name, &device));
 	}
 	void timer_set(const attotime &duration, device_timer_id id = 0, int param = 0);
 	void synchronize(device_timer_id id = 0, int param = 0) { timer_set(attotime::zero, id, param); }
@@ -799,7 +800,7 @@ protected:
 
 	virtual void device_clock_changed();
 	virtual void device_debug_setup();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr);
 
 	//------------------- end derived class overrides
 
@@ -835,6 +836,7 @@ private:
 	// private state; accessor use required
 	running_machine *       m_machine;
 	save_manager *          m_save;
+	device_scheduler *      m_scheduler;
 	std::string             m_tag;                  // full tag for this instance
 	std::string             m_basetag;              // base part of the tag
 	bool                    m_config_complete;      // have we completed our configuration?
@@ -877,7 +879,7 @@ public:
 	template<typename InterfaceType, typename FuncType>
 	emu_timer *interface_timer_alloc(InterfaceType &intf, FuncType callback, char const *name)
 	{
-		return m_device.machine().scheduler().timer_alloc(timer_expired_delegate(callback, name, &intf));
+		return m_device.scheduler().timer_alloc(timer_expired_delegate(callback, name, &intf));
 	}
 
 	// iteration helpers

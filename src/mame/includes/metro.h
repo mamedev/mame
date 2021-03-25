@@ -181,7 +181,7 @@ private:
 	void ymf278_map(address_map &map);
 
 	virtual void machine_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

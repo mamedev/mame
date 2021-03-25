@@ -381,7 +381,7 @@ void midyunit_state::dma_draw(uint16_t command)
  *
  *************************************/
 
-void midyunit_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void midyunit_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

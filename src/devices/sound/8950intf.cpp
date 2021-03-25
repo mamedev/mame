@@ -28,7 +28,7 @@ void y8950_device::irq_handler(int irq)
 	m_irq_handler(irq);
 }
 
-void y8950_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void y8950_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
 	{

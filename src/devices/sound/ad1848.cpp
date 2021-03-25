@@ -156,7 +156,7 @@ void ad1848_device::dack_w(uint8_t data)
 		m_drq_cb(CLEAR_LINE);
 }
 
-void ad1848_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ad1848_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	if(!m_play)
 		return;

@@ -210,7 +210,7 @@ void atari_vad_device::device_reset()
 //  calbacks
 //-------------------------------------------------
 
-void atari_vad_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void atari_vad_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
@@ -219,11 +219,11 @@ void atari_vad_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 			break;
 
 		case TID_TILEROW_UPDATE:
-			update_tilerow(timer, param);
+			update_tilerow(param);
 			break;
 
 		case TID_EOF:
-			eof_update(timer);
+			eof_update();
 			break;
 	}
 }
@@ -420,7 +420,7 @@ void atari_vad_device::update_parameter(uint16_t newword)
 //  rowscrolling.
 //-------------------------------------------------
 
-void atari_vad_device::update_tilerow(emu_timer &timer, int scanline)
+void atari_vad_device::update_tilerow(int scanline)
 {
 	// skip if out of bounds, or not enabled
 	if (scanline <= screen().visible_area().bottom() && (m_control[0x0a] & 0x2000) != 0 && m_alpha_tilemap != nullptr)
@@ -445,7 +445,7 @@ void atari_vad_device::update_tilerow(emu_timer &timer, int scanline)
 	scanline += ((m_control[0x0a] & 0x2000) != 0) ? 1 : 8;
 	if (scanline >= screen().height())
 		scanline = 0;
-	timer.adjust(screen().time_until_pos(scanline), scanline);
+	m_tilerow_update_timer->adjust(screen().time_until_pos(scanline), scanline);
 }
 
 
@@ -455,7 +455,7 @@ void atari_vad_device::update_tilerow(emu_timer &timer, int scanline)
 //  every refresh.
 //-------------------------------------------------
 
-void atari_vad_device::eof_update(emu_timer &timer)
+void atari_vad_device::eof_update()
 {
 	// echo all the commands to the video controller
 	for (int i = 0; i < 0x1c; i++)
@@ -471,7 +471,7 @@ void atari_vad_device::eof_update(emu_timer &timer)
     m_playfield_tilemap->set_scrolly(0, m_pf0_yscroll);
     if (m_playfield2_tilemap != nullptr)
         m_playfield2_tilemap->set_scrolly(0, m_pf1_yscroll);*/
-	timer.adjust(screen().time_until_pos(0));
+	m_eof_timer->adjust(screen().time_until_pos(0));
 
 	// use this for debugging the video controller values
 #if 0

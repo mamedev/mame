@@ -1306,7 +1306,7 @@ void apollo_stdio_device::device_reset()
 	m_poll_timer->adjust(attotime::zero, 0, attotime::from_msec(1)); // every 1ms
 }
 
-void apollo_stdio_device::device_timer(emu_timer &timer, device_timer_id id,
+void apollo_stdio_device::device_timer(emu_timer const &timer, device_timer_id id,
 		int param, void *ptr)
 {
 //  FIXME?

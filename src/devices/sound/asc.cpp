@@ -107,7 +107,7 @@ void asc_device::device_reset()
 //  device_timer - called when our device timer expires
 //-------------------------------------------------
 
-void asc_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void asc_device::device_timer(emu_timer const &timer, device_timer_id tid, int param, void *ptr)
 {
 	m_stream->update();
 }

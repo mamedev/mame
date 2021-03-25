@@ -35,7 +35,7 @@ using device_timer_id = u32;
 // timer callbacks look like this
 using timer_expired_delegate_native = named_delegate<void (emu_timer const &timer)>;
 using timer_expired_delegate_form1 = named_delegate<void ()>;
-using timer_expired_delegate_form2 = named_delegate<void (emu_timer &, device_timer_id, int, void *)>;
+using timer_expired_delegate_form2 = named_delegate<void (emu_timer const &, device_timer_id, int, void *)>;
 template<typename IntType> using timer_expired_delegate_form3 = named_delegate<void (IntType)>;
 template<typename IntType> using timer_expired_delegate_form4 = named_delegate<void (void *, IntType)>;
 template<typename IntType, typename IntType2> using timer_expired_delegate_form5 = named_delegate<void (IntType, IntType2)>;
@@ -92,7 +92,7 @@ public:
 			return rhs.has_sub_delegate() ? false : timer_expired_delegate_native::operator!=(rhs);
 	}
 
-	// form 1 constructor
+	// form 1 constructor: void timer_callback()
 	template<typename FuncDeviceType, typename DeviceType>
 	timer_expired_delegate(void (FuncDeviceType::*cb)(), char const *name, DeviceType *bindto) :
 		timer_expired_delegate_native(FUNC(timer_expired_delegate::form1_callback), this)
@@ -101,16 +101,16 @@ public:
 		reinterpret_cast<timer_expired_delegate_form1 &>(m_sub_delegate) = timer_expired_delegate_form1(cb, name, bindto);
 	}
 
-	// form 2 constructor
+	// form 2 constructor: void timer_callback(emu_timer const &timer, device_timer_id id, int param, void *ptr) -- device_timer style
 	template<typename FuncDeviceType, typename DeviceType>
-	timer_expired_delegate(void (FuncDeviceType::*cb)(emu_timer &, device_timer_id, int, void *), char const *name, DeviceType *bindto) :
+	timer_expired_delegate(void (FuncDeviceType::*cb)(emu_timer const &, device_timer_id, int, void *), char const *name, DeviceType *bindto) :
 		timer_expired_delegate_native(FUNC(timer_expired_delegate::form2_callback), this)
 	{
 		static_assert(sizeof(timer_expired_delegate_form2) == sizeof(generic_delegate));
 		reinterpret_cast<timer_expired_delegate_form2 &>(m_sub_delegate) = timer_expired_delegate_form2(cb, name, bindto);
 	}
 
-	// form 3 constructor
+	// form 3 constructor: void timer_callback(int param)
 	template<typename FuncDeviceType, typename DeviceType, typename IntType, std::enable_if_t<std::is_integral<IntType>::value, bool> = true>
 	timer_expired_delegate(void (FuncDeviceType::*cb)(IntType), char const *name, DeviceType *bindto) :
 		timer_expired_delegate_native(FUNC(timer_expired_delegate::form3_callback<IntType>), this)
@@ -119,7 +119,7 @@ public:
 		reinterpret_cast<timer_expired_delegate_form3<IntType> &>(m_sub_delegate) = timer_expired_delegate_form3<IntType>(cb, name, bindto);
 	}
 
-	// form 4 constructor
+	// form 4 constructor: void timer_callback(void *ptr, int param) -- legacy style
 	template<typename FuncDeviceType, typename DeviceType, typename IntType, std::enable_if_t<std::is_integral<IntType>::value, bool> = true>
 	timer_expired_delegate(void (FuncDeviceType::*cb)(void *ptr, IntType), char const *name, DeviceType *bindto) :
 		timer_expired_delegate_native(FUNC(timer_expired_delegate::form4_callback<IntType>), this)
@@ -128,7 +128,7 @@ public:
 		reinterpret_cast<timer_expired_delegate_form4<IntType> &>(m_sub_delegate) = timer_expired_delegate_form4<IntType>(cb, name, bindto);
 	}
 
-	// form 5 constructor
+	// form 5 constructor: void timer_callback(int param, int param2)
 	template<typename FuncDeviceType, typename DeviceType, typename IntType, typename IntType2, std::enable_if_t<std::is_integral<IntType>::value && std::is_integral<IntType2>::value, bool> = true>
 	timer_expired_delegate(void (FuncDeviceType::*cb)(u32, IntType), char const *name, DeviceType *bindto) :
 		timer_expired_delegate_native(FUNC((timer_expired_delegate::form5_callback<IntType, IntType2>)), this)
@@ -137,7 +137,7 @@ public:
 		reinterpret_cast<timer_expired_delegate_form5<IntType, IntType2> &>(m_sub_delegate) = timer_expired_delegate_form5<IntType, IntType2>(cb, name, bindto);
 	}
 
-	// form 6 constructor
+	// form 6 constructor: void timer_callback(int param, int param2, int param3)
 	template<typename FuncDeviceType, typename DeviceType, typename IntType, typename IntType2, typename IntType3, std::enable_if_t<std::is_integral<IntType>::value && std::is_integral<IntType2>::value && std::is_integral<IntType3>::value, bool> = true>
 	timer_expired_delegate(void (FuncDeviceType::*cb)(u32, IntType, IntType), char const *name, DeviceType *bindto) :
 		timer_expired_delegate_native(FUNC((timer_expired_delegate::form6_callback<IntType, IntType2, IntType3>)), this)
@@ -164,7 +164,7 @@ private:
 	template<typename IntType, typename IntType2> void form5_callback(emu_timer const &timer);
 	template<typename IntType, typename IntType2, typename IntType3> void form6_callback(emu_timer const &timer);
 
-	// buffer to hold an arbitrary secondary delegate
+	// secondary delegate, which may be of a number of forms
 	generic_delegate m_sub_delegate;
 };
 
@@ -201,7 +201,7 @@ public:
 	void call_after(attotime const &duration, s32 param = 0, u64 param2 = 0, u64 param3 = 0) const;
 
 	// synchronize; essentially, call immediately
-	void synchronize(s32 param = 0, u64 param2 = 0, u64 param3 = 0) const
+	void synchronize(u64 param = 0, u64 param2 = 0, u64 param3 = 0) const
 	{
 		call_after(attotime::zero, param, param2, param3);
 	}
@@ -229,8 +229,8 @@ class emu_timer
 	// allocation and re-use
 	emu_timer &init_persistent(running_machine &machine, timer_expired_delegate const &callback, void *ptr);
 	emu_timer &init_persistent(device_t &device, device_timer_id id, void *ptr);
-	emu_timer &init_temporary(running_machine &machine, emu_timer_cb const &callback, attotime const &duration, s32 param, u64 param2, u64 param3);
-	emu_timer &init_temporary(device_t &device, device_timer_id id, attotime const &duration, s32 param, u64 param2, u64 param3);
+	emu_timer &init_temporary(running_machine &machine, emu_timer_cb const &callback, attotime const &duration, u64 param, u64 param2, u64 param3);
+	emu_timer &init_temporary(device_t &device, device_timer_id id, attotime const &duration, u64 param, u64 param2, u64 param3);
 
 public:
 	// getters
@@ -239,7 +239,7 @@ public:
 	running_machine &machine() const noexcept { assert(m_machine != nullptr); return *m_machine; }
 	bool enabled() const { return m_enabled; }
 	bool active() const { return m_enabled && !m_expire.is_never(); }
-	s32 param() const { return m_param; }
+	u64 param() const { return m_param; }
 	u64 param2() const { return m_param2; }
 	u64 param3() const { return m_param3; }
 	void *ptr() const { return m_ptr; }
@@ -247,7 +247,7 @@ public:
 
 	// setters
 	bool enable(bool enable = true);
-	void set_param(s32 param) { m_param = param; }
+	void set_param(u64 param) { m_param = param; }
 	void set_param2(u64 param2) { m_param2 = param2; }
 	void set_param3(u64 param3) { m_param3 = param3; }
 	void set_ptr(void *ptr) { m_ptr = ptr; }
@@ -272,19 +272,19 @@ private:
 	running_machine *   m_machine;      // reference to the owning machine
 	emu_timer *         m_next;         // next timer in order in the list
 	emu_timer *         m_prev;         // previous timer in order in the list
+	attotime            m_start;        // time when the timer was started
 	attotime            m_expire;       // time when the timer will expire
 	attotime            m_period;       // the repeat frequency of the timer
-	attotime            m_start;        // time when the timer was started
+	timer_expired_delegate const *m_callback; // pointer to an external callback
 	void *              m_ptr;          // pointer parameter
-	s32                 m_param;        // integer parameter
+	u64                 m_param;        // integer parameter
 	u64                 m_param2;       // larger integer parameter
 	u64                 m_param3;       // larger integer parameter
 	bool                m_enabled;      // is the timer enabled?
 	bool                m_temporary;    // is this a temporary timer?
-	emu_timer_cb        m_timer_cb;     // embedded callback
-	timer_expired_delegate const *m_callback; // pointer to an external callback
 	device_t *          m_device;       // for device timers, a pointer to the device
 	device_timer_id     m_id;           // for device timers, the ID of the timer
+	emu_timer_cb        m_timer_cb;     // embedded callback
 };
 
 
@@ -467,7 +467,7 @@ inline void timer_expired_delegate::form1_callback(emu_timer const &timer)
 
 inline void timer_expired_delegate::form2_callback(emu_timer const &timer)
 {
-	reinterpret_cast<timer_expired_delegate_form2 &>(m_sub_delegate)(const_cast<emu_timer &>(timer), timer.id(), timer.param(), timer.ptr());
+	reinterpret_cast<timer_expired_delegate_form2 &>(m_sub_delegate)(timer, timer.id(), timer.param(), timer.ptr());
 }
 
 template<typename IntType>

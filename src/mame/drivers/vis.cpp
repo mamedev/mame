@@ -23,7 +23,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void dack16_w(int line, uint16_t data) override;
 	virtual void device_add_mconfig(machine_config &config) override;
 private:
@@ -79,7 +79,7 @@ void vis_audio_device::dack16_w(int line, uint16_t data)
 		m_isa->drq7_w(CLEAR_LINE);
 }
 
-void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void vis_audio_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	if(m_samples < 2)
 		return;

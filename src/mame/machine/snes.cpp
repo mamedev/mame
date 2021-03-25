@@ -43,7 +43,7 @@ uint32_t snes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
     Timers
 
 *************************************/
-void snes_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void snes_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

@@ -2485,7 +2485,7 @@ std::string upd765_family_device::ttsn() const
 	return machine().time().to_string();
 }
 
-void upd765_family_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void upd765_family_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	if(id == TIMER_DRIVE_READY_POLLING) {
 		run_drive_ready_polling();

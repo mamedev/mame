@@ -36,7 +36,7 @@ midvunit_renderer::midvunit_renderer(midvunit_state &state)
  *
  *************************************/
 
-void midvunit_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void midvunit_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

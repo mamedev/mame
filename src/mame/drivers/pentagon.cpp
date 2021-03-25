@@ -34,7 +34,7 @@ public:
 protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	enum
@@ -130,7 +130,7 @@ void pentagon_state::pentagon_scr2_w(offs_t offset, uint8_t data)
 	*((uint8_t*)m_bank4->base() + offset) = data;
 }
 
-void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void pentagon_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

@@ -1309,7 +1309,7 @@ void ymf271_device::ymf271_write_pcm(uint8_t address, uint8_t data)
 	}
 }
 
-void ymf271_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ymf271_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
 	{

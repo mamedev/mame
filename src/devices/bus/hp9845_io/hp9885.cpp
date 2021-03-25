@@ -359,7 +359,7 @@ void hp9885_device::device_reset()
 	set_state(FSM_IDLE);
 }
 
-void hp9885_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hp9885_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	LOG_TIMER("Tmr %.06f ID %d FSM %d HD %d\n" , machine().time().as_double() , id , m_fsm_state , m_head_state);
 
@@ -521,7 +521,7 @@ void hp9885_device::device_timer(emu_timer &timer, device_timer_id id, int param
 				set_state(FSM_IDLE);
 				return;
 			}
-			timer.adjust(m_pll.ctime - machine().time());
+			m_bit_byte_timer->adjust(m_pll.ctime - machine().time());
 		}
 		break;
 	}

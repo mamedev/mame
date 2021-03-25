@@ -235,7 +235,7 @@ DIP locations verified for:
                 INTERRUPTS
 ***********************************************************/
 
-void asuka_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void asuka_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

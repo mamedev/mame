@@ -147,7 +147,7 @@
 static constexpr uint32_t adpcm_clock[2] = { 8000000, 4000000 };
 static constexpr uint32_t adpcm_div[4] = { 1024, 768, 512, /* Reserved */512 };
 
-void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void x68k_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

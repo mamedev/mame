@@ -48,7 +48,7 @@ READ_LINE_MEMBER(ultratnk_state::joystick_r)
 }
 
 
-void ultratnk_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void ultratnk_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

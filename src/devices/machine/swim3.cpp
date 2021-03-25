@@ -39,7 +39,7 @@ void swim3_device::device_reset()
 	m_hdsel_cb(false);
 }
 
-void swim3_device::device_timer(emu_timer &, device_timer_id, int, void *)
+void swim3_device::device_timer(emu_timer const &, device_timer_id, int, void *)
 {
 }
 

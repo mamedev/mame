@@ -155,7 +155,7 @@ static INPUT_PORTS_START( s11 )
 	PORT_CONFSETTING( 0x10, "English" )
 INPUT_PORTS_END
 
-void s11_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void s11_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
 	{

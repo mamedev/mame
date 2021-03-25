@@ -428,7 +428,7 @@ uint16_t amiga_fdc_device::dskbytr_r()
 	return res;
 }
 
-void amiga_fdc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void amiga_fdc_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	live_sync();
 	live_run();

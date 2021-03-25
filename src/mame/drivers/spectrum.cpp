@@ -745,7 +745,7 @@ static GFXDECODE_START( gfx_spectrum )
 	GFXDECODE_ENTRY( "maincpu", 0x3d00, spectrum_charlayout, 0, 8 )
 GFXDECODE_END
 
-void spectrum_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void spectrum_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

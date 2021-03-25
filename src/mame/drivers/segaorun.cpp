@@ -548,7 +548,7 @@ void segaorun_state::machine_reset()
 //  device_timer - handle device timers
 //-------------------------------------------------
 
-void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void segaorun_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
@@ -604,7 +604,7 @@ void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int para
 			update_main_irqs();
 
 			// come back at the next targeted scanline
-			timer.adjust(m_screen->time_until_pos(next_scanline), next_scanline);
+			m_scanline_timer->adjust(m_screen->time_until_pos(next_scanline), next_scanline);
 			break;
 		}
 

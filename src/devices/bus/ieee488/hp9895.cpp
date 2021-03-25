@@ -236,7 +236,7 @@ void hp9895_device::device_reset()
 	m_half_bit_timer->reset();
 }
 
-void hp9895_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void hp9895_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id) {
 	case TIMEOUT_TMR_ID:
@@ -315,7 +315,7 @@ void hp9895_device::device_timer(emu_timer &timer, device_timer_id id, int param
 				LOG_0(("RD D=%02x/C=%02x\n" , m_data_sr , m_clock_sr));
 			}
 			LOG_0(("next SDOK @ %.06f\n" , m_pll.ctime.as_double()));
-			timer.adjust(m_pll.ctime - sdok_time);
+			m_byte_timer->adjust(m_pll.ctime - sdok_time);
 		}
 		break;
 
@@ -341,7 +341,7 @@ void hp9895_device::device_timer(emu_timer &timer, device_timer_id id, int param
 					if (BIT(m_cntl_reg , REG_CNTL_WRITON_BIT)) {
 						// When loopback is active, leave AM detection to byte timer as
 						// byte boundary is already synchronized
-						timer.reset();
+						m_half_bit_timer->reset();
 						return;
 					} else {
 						// Align with bit cell
@@ -377,12 +377,12 @@ void hp9895_device::device_timer(emu_timer &timer, device_timer_id id, int param
 					attotime adjust{m_pll.ctime - machine().time()};
 					LOG_0(("Got AM @ %.6f, ctime=%.6f, adj=%.6f, D=%02x/C=%02x\n" , machine().time().as_double() , m_pll.ctime.as_double() , adjust.as_double() , m_data_sr , m_clock_sr));
 					// Disable half-bit timer & enable byte timer
-					timer.reset();
+					m_half_bit_timer->reset();
 					m_byte_timer->adjust(adjust);
 					return;
 				}
 			}
-			timer.adjust(m_pll.ctime - machine().time());
+			m_half_bit_timer->adjust(m_pll.ctime - machine().time());
 		}
 		break;
 
