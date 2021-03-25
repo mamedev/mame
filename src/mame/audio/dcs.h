@@ -49,7 +49,7 @@ public:
 
 	// non public
 	void dcs_boot();
-	TIMER_CALLBACK_MEMBER( dcs_reset );
+	void dcs_reset();
 	void dcs_register_state();
 	uint16_t dcs_dataram_r(offs_t offset);
 	void dcs_dataram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -70,16 +70,14 @@ public:
 	uint16_t latch_status_r(address_space &space);
 	uint16_t fifo_input_r();
 	void dcs_delayed_data_w(uint16_t data);
-	TIMER_CALLBACK_MEMBER( dcs_delayed_data_w_callback );
 	void input_latch_ack_w(uint16_t data);
 	uint16_t input_latch_r();
 	uint32_t input_latch32_r();
-	TIMER_CALLBACK_MEMBER( latch_delayed_w );
+	void latch_delayed_w();
 	void output_latch_w(uint16_t data);
 	void output_latch32_w(uint32_t data);
 	void delayed_ack_w();
-	TIMER_CALLBACK_MEMBER( delayed_ack_w_callback );
-	TIMER_CALLBACK_MEMBER( output_control_delayed_w );
+	void output_control_delayed_w(uint16_t param);
 	void output_control_w(uint16_t data);
 	uint16_t output_control_r();
 	void update_timer_count();
@@ -97,10 +95,10 @@ public:
 	uint32_t dcs_polling32_r(address_space &space);
 	void dcs_polling32_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	TIMER_DEVICE_CALLBACK_MEMBER( transfer_watchdog_callback );
-	TIMER_CALLBACK_MEMBER( s1_ack_callback2 );
-	TIMER_CALLBACK_MEMBER( s1_ack_callback1 );
+	void s1_ack_callback2();
+	void s1_ack_callback1(uint16_t param);
 	int preprocess_stage_1(uint16_t data);
-	TIMER_CALLBACK_MEMBER( s2_ack_callback );
+	void s2_ack_callback(uint16_t param);
 	int preprocess_stage_2(uint16_t data);
 	int preprocess_write(uint16_t data);
 
@@ -231,9 +229,9 @@ protected:
 	uint32_t      m_timers_fired;
 
 	emu_timer_cb m_dcs_reset;
-	emu_timer_cb m_dcs_delayed_data_w_callback;
+	emu_timer_cb m_dcs_delayed_data_w;
 	emu_timer_cb m_latch_delayed_w;
-	emu_timer_cb m_delayed_ack_w_callback;
+	emu_timer_cb m_delayed_ack_w;
 	emu_timer_cb m_output_control_delayed_w;
 	emu_timer_cb m_s1_ack_callback2;
 	emu_timer_cb m_s1_ack_callback1;

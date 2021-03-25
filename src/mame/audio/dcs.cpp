@@ -538,7 +538,7 @@ void dcs_audio_device::dcs_boot()
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::dcs_reset )
+void dcs_audio_device::dcs_reset()
 {
 	if (LOG_DCS_IO)
 		logerror("dcs_reset\n");
@@ -746,7 +746,7 @@ dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type ty
 
 void dcs_audio_device::device_reset()
 {
-	dcs_reset(nullptr, 0);
+	dcs_reset();
 }
 
 void dcs_audio_device::device_start()
@@ -795,9 +795,9 @@ void dcs_audio_device::device_start()
 	m_reg_timer = subdevice<timer_device>("dcs_reg_timer");
 
 	m_dcs_reset.enregister(*this, FUNC(dcs_audio_device::dcs_reset));
-	m_dcs_delayed_data_w_callback.enregister(*this, FUNC(dcs_audio_device::dcs_delayed_data_w_callback));
+	m_dcs_delayed_data_w.enregister(*this, FUNC(dcs_audio_device::dcs_delayed_data_w));
 	m_latch_delayed_w.enregister(*this, FUNC(dcs_audio_device::latch_delayed_w));
-	m_delayed_ack_w_callback.enregister(*this, FUNC(dcs_audio_device::delayed_ack_w_callback));
+	m_delayed_ack_w.enregister(*this, FUNC(dcs_audio_device::delayed_ack_w));
 	m_output_control_delayed_w.enregister(*this, FUNC(dcs_audio_device::output_control_delayed_w));
 	m_s1_ack_callback2.enregister(*this, FUNC(dcs_audio_device::s1_ack_callback2));
 	m_s1_ack_callback1.enregister(*this, FUNC(dcs_audio_device::s1_ack_callback1));
@@ -808,7 +808,7 @@ void dcs_audio_device::device_start()
 	/* register for save states */
 	dcs_register_state();
 	/* reset the system */
-	dcs_reset(nullptr, 0);
+	dcs_reset();
 }
 
 
@@ -900,9 +900,9 @@ void dcs2_audio_device::device_start()
 	m_auto_ack = false;
 
 	m_dcs_reset.enregister(*this, FUNC(dcs_audio_device::dcs_reset));
-	m_dcs_delayed_data_w_callback.enregister(*this, FUNC(dcs_audio_device::dcs_delayed_data_w_callback));
+	m_dcs_delayed_data_w.enregister(*this, FUNC(dcs_audio_device::dcs_delayed_data_w));
 	m_latch_delayed_w.enregister(*this, FUNC(dcs_audio_device::latch_delayed_w));
-	m_delayed_ack_w_callback.enregister(*this, FUNC(dcs_audio_device::delayed_ack_w_callback));
+	m_delayed_ack_w.enregister(*this, FUNC(dcs_audio_device::delayed_ack_w));
 	m_output_control_delayed_w.enregister(*this, FUNC(dcs_audio_device::output_control_delayed_w));
 	m_s1_ack_callback2.enregister(*this, FUNC(dcs_audio_device::s1_ack_callback2));
 	m_s1_ack_callback1.enregister(*this, FUNC(dcs_audio_device::s1_ack_callback1));
@@ -920,7 +920,7 @@ void dcs2_audio_device::device_start()
 	dcs_register_state();
 
 	/* reset the system */
-	dcs_reset(nullptr, 0);
+	dcs_reset();
 }
 
 
@@ -1564,12 +1564,6 @@ void dcs_audio_device::dcs_delayed_data_w(uint16_t data)
 }
 
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::dcs_delayed_data_w_callback )
-{
-	dcs_delayed_data_w(param);
-}
-
-
 void dcs_audio_device::data_w(uint16_t data)
 {
 	/* preprocess the write */
@@ -1579,7 +1573,7 @@ void dcs_audio_device::data_w(uint16_t data)
 
 	/* if we are DCS1, set a timer to latch the data */
 	if (m_sport0_timer == nullptr)
-		m_dcs_delayed_data_w_callback.synchronize(data);
+		m_dcs_delayed_data_w.synchronize(data);
 	else
 		dcs_delayed_data_w(data);
 }
@@ -1620,7 +1614,7 @@ uint32_t dcs_audio_device::input_latch32_r()
     OUTPUT LATCH (data from DCS to host)
 ****************************************************************************/
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::latch_delayed_w )
+void dcs_audio_device::latch_delayed_w()
 {
 	if (!m_last_output_full && !m_output_full_cb.isnull())
 		m_output_full_cb(m_last_output_full = 1);
@@ -1635,7 +1629,7 @@ void dcs_audio_device::output_latch_w(uint16_t data)
 	if (LOG_DCS_IO)
 		logerror("%s output_latch_w(%04X) (empty=%d)\n", machine().describe_context(), data, IS_OUTPUT_EMPTY());
 
-	m_latch_delayed_w.synchronize(data>>8);
+	m_latch_delayed_w.synchronize();
 }
 
 void dcs_audio_device::output_latch32_w(uint32_t data)
@@ -1644,7 +1638,7 @@ void dcs_audio_device::output_latch32_w(uint32_t data)
 	if (LOG_DCS_IO)
 		logerror("%s output_latch32_w(%04X) (empty=%d)\n", machine().describe_context(), data>>8, IS_OUTPUT_EMPTY());
 
-	m_latch_delayed_w.synchronize(data>>8);
+	m_latch_delayed_w.synchronize();
 }
 
 
@@ -1654,17 +1648,11 @@ void dcs_audio_device::delayed_ack_w()
 }
 
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::delayed_ack_w_callback )
-{
-	delayed_ack_w();
-}
-
-
 void dcs_audio_device::ack_w()
 {
 	if (LOG_DCS_IO)
 		logerror("%s:ack_w\n", machine().describe_context());
-	m_delayed_ack_w_callback.synchronize();
+	m_delayed_ack_w.synchronize();
 }
 
 
@@ -1691,7 +1679,7 @@ uint16_t dcs_audio_device::data_r()
     OUTPUT CONTROL BITS (has 3 additional lines to the host)
 ****************************************************************************/
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::output_control_delayed_w )
+void dcs_audio_device::output_control_delayed_w(uint16_t param)
 {
 	//if (LOG_DCS_IO)
 	//  logerror("output_control = %04X\n", param);
@@ -2223,19 +2211,19 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::transfer_watchdog_callback )
 }
 
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::s1_ack_callback2 )
+void dcs_audio_device::s1_ack_callback2()
 {
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{
-		m_s1_ack_callback2.call_after(attotime::from_usec(1), param);
+		m_s1_ack_callback2.call_after(attotime::from_usec(1));
 		return;
 	}
 	output_latch_w(0x000a);
 }
 
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::s1_ack_callback1 )
+void dcs_audio_device::s1_ack_callback1(uint16_t param)
 {
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
@@ -2373,7 +2361,7 @@ int dcs_audio_device::preprocess_stage_1(uint16_t data)
 }
 
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::s2_ack_callback )
+void dcs_audio_device::s2_ack_callback(uint16_t param)
 {
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
