@@ -178,10 +178,19 @@ void rf5c68_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 						m_sample_end_cb((chan.addr >> 11)/0x2000);
 				}
 
+				bool firstread = true;
 				sample = 0x00;
 				while (chan.partial < chan.step)
 				{
-					sample = read_sample(chan);
+					if (firstread)
+					{
+						sample = read_sample(chan);
+					}
+					else
+					{
+						read_sample(chan);
+					}
+
 					chan.partial += 1 << 11;
 				}
 
