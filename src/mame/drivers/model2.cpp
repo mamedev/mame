@@ -4097,7 +4097,6 @@ ROM_START( vcop2 ) /* Virtua Cop 2, Model 2A, Sega Game ID# 833-12266, ROM board
 	ROM_LOAD32_WORD( "mpr-18510.20", 0x000002, 0x200000, CRC(e83de997) SHA1(8a8597aa31609663869e584cc5fad6e4b84f7dbe) )
 
 	ROM_REGION( 0x400000, "textures", 0 ) // Textures
-	/* TODO: Wrong labels? */
 	ROM_LOAD32_WORD( "mpr-18511.24", 0x000002, 0x200000, CRC(cae77a4f) SHA1(f21474486f0dc4092cbad4566deea8a952862ab7) )
 	ROM_LOAD32_WORD( "mpr-18512.25", 0x000000, 0x200000, CRC(d9bc7e71) SHA1(774eba886083b0dad9a47519c5801e44346312cf) )
 
@@ -6864,7 +6863,7 @@ ROM_START( daytonagtx )
 	ROMX_LOAD("epr-16488.ic12",  0x000000, 0x010000, CRC(4f0b8114) SHA1(1fcebd0632da8f224a04fe6b39147a05eb358e83), ROM_BIOS(1) )
 ROM_END
 
-ROM_START( vcop ) /* Virtua Cop Revision B, Model 2 */
+ROM_START( vcop ) /* Virtua Cop Revision B, Model 2, Sega Game ID# 833-11127 VIRTUA COP, ROM board ID# 834-11128 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-17166b.12", 0x000000, 0x020000, CRC(a5647c59) SHA1(0a9e0be447d3591e82efd40ef4acbfe7ae211579) )
 	ROM_LOAD32_WORD( "epr-17167b.13", 0x000002, 0x020000, CRC(f5dde26a) SHA1(95db029bc4206a44ea216afbcd1c19689f79115a) )
@@ -6904,7 +6903,7 @@ ROM_START( vcop ) /* Virtua Cop Revision B, Model 2 */
 	MODEL2_CPU_BOARD
 ROM_END
 
-ROM_START( vcopa ) /* Virtua Cop Revision A, Model 2 */
+ROM_START( vcopa ) /* Virtua Cop Revision A, Model 2, Sega Game ID# 833-11127 VIRTUA COP, ROM board ID# 834-11128 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "epr-17166a.12", 0x000000, 0x020000, CRC(702566e6) SHA1(478eec1e1d51a2ff63e8fd591528f0ca70df9310) )
 	ROM_LOAD32_WORD( "epr-17167a.13", 0x000002, 0x020000, CRC(9b8e05a8) SHA1(5e95f3f901d7f87f8c9cbeb3a65cd1b74e9cc09b) )
