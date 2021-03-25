@@ -1369,7 +1369,7 @@ void jpmimpct_state::impact_nonvideo_altreels(machine_config &config)
 	m_reel[5]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<5>));
 }
 
-void jpmimpct_state::impact_nonvideo_big50(machine_config &config)
+void jpmimpct_state::impact_nonvideo_disc(machine_config &config)
 {
 	impact_nonvideo_base(config);
 
@@ -1379,7 +1379,7 @@ void jpmimpct_state::impact_nonvideo_big50(machine_config &config)
 	m_reel[1]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<1>));
 	REEL(config, m_reel[2], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
 	m_reel[2]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_cb<2>));
-	// this is a wheel, not a standard reel, there are 2 open windows into it, and all other cards on it can be seen through grilles
+	// this is a wheel, not a standard reel, there are can be a number of open windows into it showing all symbols(e.g. 2 in big50, with other cards on it can be seen through grilles)
 	// to render this properly in the layout would require a new type of element
 	REEL(config, m_reel[3], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
 	m_reel[3]->optic_handler().set(FUNC(jpmimpct_state::reel_optic_inv_cb<3>));
