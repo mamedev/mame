@@ -41781,6 +41781,10 @@ vk100                           // 1980 Digital Equipment Corporation
 @source:vlc.cpp
 nevada                          //
 
+@source:vlc34010.cpp
+beezerk                         //
+vlcunk                          //
+
 @source:volfied.cpp
 volfied                         // C04 (c) 1989 Taito Corporation Japan (World)
 volfiedj                        // C04 (c) 1989 Taito Corporation (Japan)
