@@ -3405,7 +3405,7 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			return true;
 
 		case 0x200: /* MCRXR */
-			UML_ROLAND(block, I0, SPR32(SPR_XER), 28, 0x0f);                    // roland  i0,[xer],28,0x0f
+			UML_ROLAND(block, I0, SPR32(SPR_XER), 4, 0x0f);                    // roland  i0,[xer],4,0x0f
 			UML_SHL(block, I1, XERSO32, 3);                                     // shl     i1,[xerso],3
 			UML_OR(block, CR32(G_CRFD(op)), I0, I1);                                // or      [crd],i0,i1
 			UML_AND(block, SPR32(SPR_XER), SPR32(SPR_XER), ~0xf0000000);                // and     [xer],[xer],~0xf0000000
