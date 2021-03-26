@@ -74,7 +74,7 @@ public:
 
 	void impact_nonvideo(machine_config &config);
 	void impact_nonvideo_altreels(machine_config &config);
-	void impact_nonvideo_big50(machine_config &config);
+	void impact_nonvideo_disc(machine_config &config);
 	
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed);

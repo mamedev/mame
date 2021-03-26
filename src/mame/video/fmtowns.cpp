@@ -541,7 +541,7 @@ void towns_state::towns_update_palette()
 	}
 	// chasehq wants the + 8, the real hardware appears to be less consistent, revisit if other software doesn't like it
 	if(!m_screen->vblank())
-		m_screen->update_partial(m_screen->vpos() + 8);
+		m_screen->update_partial(m_screen->vpos() + 4);
 }
 
 /* Video/CRTC

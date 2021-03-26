@@ -666,11 +666,11 @@ QUICKLOAD_LOAD_MEMBER(trs80m3_state::quickload_cb)
 				u16 address = (addr[1] << 8) | addr[0];
 				if (LOG) logerror("/CMD object code block: address %04x length %u\n", address, block_length);
 				// Todo: the below only applies for non-ram
-				//if (address < 0x4000)
-				//{
-					//image.seterror(IMAGE_ERROR_UNSPECIFIED, "Attempting to write outside of RAM");
-					//return image_init_result::FAIL;
-				//}
+				if (address < 0x3c00)
+				{
+					image.message("Attempting to write outside of RAM");
+					return image_init_result::FAIL;
+				}
 				ptr = program.get_write_ptr(address);
 				image.fread( ptr, block_length);
 			}
@@ -698,7 +698,7 @@ QUICKLOAD_LOAD_MEMBER(trs80m3_state::quickload_cb)
 		default:
 			image.fread( &data, length);
 			logerror("/CMD unsupported block type %u!\n", type);
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported or invalid block type");
+			image.message("Unsupported or invalid block type");
 			return image_init_result::FAIL;
 		}
 	}
