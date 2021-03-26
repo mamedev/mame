@@ -73,6 +73,8 @@ void awacs_device::device_start()
 	save_item(NAME(m_in_irq));
 	save_item(NAME(m_output_buffer));
 	save_item(NAME(m_input_buffer));
+	save_item(NAME(m_phase));
+	save_item(NAME(m_buffer_size));
 }
 
 
@@ -95,6 +97,8 @@ void awacs_device::device_reset()
 	m_in_irq = 0;
 	m_output_buffer = false;
 	m_input_buffer = false;
+	m_phase = 0;
+	m_buffer_size = 0;
 
 	m_irq_out_cb(false);
 	m_irq_in_cb(false);
