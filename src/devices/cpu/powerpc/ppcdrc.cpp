@@ -1739,7 +1739,10 @@ void ppc_device::generate_sequence_instruction(drcuml_block &block, compiler_sta
 		if (PRINTF_MMU)
 		{
 			const char *text = "Compiler page fault @ %08X\n";
-			UML_MOV(block, mem(&m_core->format), (uintptr_t)text);                    // mov     [format],text
+			if (sizeof(uintptr_t) == 8)
+				UML_DMOV(block, mem(&m_core->format), (uintptr_t)text);                   // mov     [format],text
+			else
+				UML_MOV(block, mem(&m_core->format), (uintptr_t)text);                    // mov     [format],text
 			UML_MOV(block, mem(&m_core->arg0), desc->pc);                        // mov     [arg0],desc->pc
 			UML_CALLC(block, cfunc_printf_debug, this);                                      // callc   printf_debug
 		}
@@ -1757,7 +1760,10 @@ void ppc_device::generate_sequence_instruction(drcuml_block &block, compiler_sta
 			if (PRINTF_MMU)
 			{
 				const char *text = "Checking TLB at @ %08X\n";
-				UML_MOV(block, mem(&m_core->format), (uintptr_t)text);                // mov     [format],text
+				if (sizeof(uintptr_t) == 8)
+					UML_DMOV(block, mem(&m_core->format), (uintptr_t)text);                   // mov     [format],text
+				else
+					UML_MOV(block, mem(&m_core->format), (uintptr_t)text);                    // mov     [format],text
 				UML_MOV(block, mem(&m_core->arg0), desc->pc);                    // mov     [arg0],desc->pc
 				UML_CALLC(block, cfunc_printf_debug, this);                                  // callc   printf_debug
 			}
@@ -1772,7 +1778,10 @@ void ppc_device::generate_sequence_instruction(drcuml_block &block, compiler_sta
 			if (PRINTF_MMU)
 			{
 				const char *text = "No valid TLB @ %08X\n";
-				UML_MOV(block, mem(&m_core->format), (uintptr_t)text);                // mov     [format],text
+				if (sizeof(uintptr_t) == 8)
+					UML_DMOV(block, mem(&m_core->format), (uintptr_t)text);                   // mov     [format],text
+				else
+					UML_MOV(block, mem(&m_core->format), (uintptr_t)text);                    // mov     [format],text
 				UML_MOV(block, mem(&m_core->arg0), desc->pc);                    // mov     [arg0],desc->pc
 				UML_CALLC(block, cfunc_printf_debug, this);                                  // callc   printf_debug
 			}
