@@ -114,7 +114,7 @@ private:
 	void setup_response( int len, uint8_t *r1 );
 
 	TIMER_CALLBACK_MEMBER( cd_delayed_cmd );
-	emu_timer_cb m_cd_delayed_cmd;
+	transient_timer_factory m_cd_delayed_cmd;
 	void update_cdrom();
 
 	// interface

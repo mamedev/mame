@@ -70,7 +70,7 @@ input_merger_device::~input_merger_device()
 void input_merger_device::device_start()
 {
 	m_output_handler.resolve_safe();
-	m_update_state.enregister(*this, FUNC(input_merger_device::update_state));
+	m_update_state.init(*this, FUNC(input_merger_device::update_state));
 	save_item(NAME(m_state));
 	m_state = m_initval;
 }

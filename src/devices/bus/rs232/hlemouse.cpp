@@ -236,7 +236,7 @@ void hle_msmouse_device_base::device_start()
 	m_btn_val = m_btn_sent = 0x00U;
 	m_enable = 0U;
 
-	m_start_mouse.enregister(*this, FUNC(hle_msmouse_device_base::start_mouse));
+	m_start_mouse.init(*this, FUNC(hle_msmouse_device_base::start_mouse));
 	m_start_mouse.synchronize();
 }
 
@@ -464,7 +464,7 @@ void hle_msystems_device_base::device_start()
 
 	m_phase = 0U;
 
-	m_start_mouse.enregister(*this, FUNC(hle_msystems_device_base::start_mouse));
+	m_start_mouse.init(*this, FUNC(hle_msystems_device_base::start_mouse));
 	m_start_mouse.synchronize();
 }
 

@@ -54,7 +54,7 @@ void geebee_sound_device::device_start()
 	save_item(NAME(m_vcount));
 }
 
-void geebee_sound_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void geebee_sound_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

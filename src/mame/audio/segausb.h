@@ -159,7 +159,7 @@ private:
 #endif
 
 	TIMER_CALLBACK_MEMBER( delayed_usb_data_w );
-	emu_timer_cb m_delayed_usb_data_w;
+	transient_timer_factory m_delayed_usb_data_w;
 	void timer_w(int which, u8 offset, u8 data);
 	void env_w(int which, u8 offset, u8 data);
 

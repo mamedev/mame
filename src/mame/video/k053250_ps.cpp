@@ -498,7 +498,7 @@ uint16_t k053250ps_device::reg_r(offs_t offset)
 }
 
 
-void k053250ps_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void k053250ps_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(m_timer_lvcdma_state)
 	{

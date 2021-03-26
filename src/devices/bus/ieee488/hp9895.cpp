@@ -236,7 +236,7 @@ void hp9895_device::device_reset()
 	m_half_bit_timer->reset();
 }
 
-void hp9895_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void hp9895_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id) {
 	case TIMEOUT_TMR_ID:

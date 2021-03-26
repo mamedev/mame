@@ -105,7 +105,7 @@ protected:
 
 	virtual uint32_t palette_entries() const override { return 256; }
 
-	void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 	address_space *m_iospace;
 
 private:

@@ -350,7 +350,7 @@ GFXDECODE_END
 
 void bigevglf_state::machine_start()
 {
-	m_deferred_ls74_w.enregister(*this, FUNC(bigevglf_state::deferred_ls74_w));
+	m_deferred_ls74_w.init(*this, FUNC(bigevglf_state::deferred_ls74_w));
 
 	save_item(NAME(m_vidram_bank));
 	save_item(NAME(m_plane_selected));

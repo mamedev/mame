@@ -741,7 +741,7 @@ void tms340x0_device::device_start()
 		}
 	}
 
-	m_internal_interrupt_callback.enregister(*this, FUNC(tms340x0_device::internal_interrupt_callback));
+	m_internal_interrupt_callback.init(*this, FUNC(tms340x0_device::internal_interrupt_callback));
 
 	/* allocate a scanline timer and set it to go off at the start */
 	m_scantimer = timer_alloc(*this, FUNC(tms340x0_device::scanline_callback));

@@ -359,7 +359,7 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 	}
 }
 
-void swim1_device::device_timer(emu_timer const &, device_timer_id, int, void *)
+void swim1_device::device_timer(timer_instance const &, device_timer_id, int, void *)
 {
 	if(m_iwm_active == MODE_DELAY) {
 		flush_write();

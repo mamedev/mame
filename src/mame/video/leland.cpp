@@ -95,7 +95,7 @@ TILE_GET_INFO_MEMBER(ataxx_state::ataxx_get_tile_info)
 
 void leland_state::video_start()
 {
-	m_leland_delayed_mvram_w.enregister(*this, FUNC(leland_state::leland_delayed_mvram_w));
+	m_leland_delayed_mvram_w.init(*this, FUNC(leland_state::leland_delayed_mvram_w));
 
 	/* tilemap */
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(leland_state::leland_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(leland_state::leland_scan)), 8, 8, 256, 256);
@@ -122,7 +122,7 @@ void leland_state::video_start()
 
 void ataxx_state::video_start()
 {
-	m_leland_delayed_mvram_w.enregister(*this, FUNC(ataxx_state::leland_delayed_mvram_w));
+	m_leland_delayed_mvram_w.init(*this, FUNC(ataxx_state::leland_delayed_mvram_w));
 
 	// TODO: further untangle driver so the base class doesn't have stuff that isn't common and this can call the base implementation
 	/* tilemap */

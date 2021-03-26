@@ -96,7 +96,7 @@ protected:
 	void blitter_w(address_space &space, offs_t offset, u8 data);
 
 	TIMER_CALLBACK_MEMBER(deferred_snd_cmd_w);
-	emu_timer_cb m_deferred_snd_cmd_w;
+	transient_timer_factory m_deferred_snd_cmd_w;
 
 	void snd_cmd_w(u8 data);
 

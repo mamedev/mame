@@ -192,7 +192,7 @@ private:
 	uint32_t screen_update_subroc3d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_buckrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(delayed_i8255_w);
-	emu_timer_cb m_delayed_i8255_w;
+	transient_timer_factory m_delayed_i8255_w;
 	void turbo_sound_a_w(u8 data);
 	void turbo_sound_b_w(u8 data);
 	void turbo_sound_c_w(u8 data);

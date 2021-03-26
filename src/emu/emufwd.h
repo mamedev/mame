@@ -211,7 +211,7 @@ class rom_load_manager;
 
 // declared in schedule.h
 class device_scheduler;
-class emu_timer;
+class timer_instance;
 
 // declared in screen.h
 class screen_device;

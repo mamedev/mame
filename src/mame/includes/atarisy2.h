@@ -149,7 +149,7 @@ private:
 	uint32_t screen_update_atarisy2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_int);
 	TIMER_CALLBACK_MEMBER(delayed_int_enable_w);
-	emu_timer_cb m_delayed_int_enable_w;
+	transient_timer_factory m_delayed_int_enable_w;
 	TIMER_CALLBACK_MEMBER(reset_yscroll_callback);
 	void yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void xscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

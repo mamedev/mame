@@ -658,7 +658,7 @@ legacy_floppy_image_device::~legacy_floppy_image_device()
 
 void legacy_floppy_image_device::device_start()
 {
-	m_set_wpt.enregister(*this, FUNC(legacy_floppy_image_device::set_wpt));
+	m_set_wpt.init(*this, FUNC(legacy_floppy_image_device::set_wpt));
 
 	floppy_drive_init();
 

@@ -1617,10 +1617,10 @@ void thomson_state::to7_network_init()
 	LOG(( "to7_network_init: NR 07-005 network extension\n" ));
 	logerror( "to7_network_init: network not handled!\n" );
 
-	m_ans.enregister(*this, FUNC(thomson_state::ans));
-	m_ans2.enregister(*this, FUNC(thomson_state::ans2));
-	m_ans3.enregister(*this, FUNC(thomson_state::ans3));
-	m_ans4.enregister(*this, FUNC(thomson_state::ans4));
+	m_ans.init(*this, FUNC(thomson_state::ans));
+	m_ans2.init(*this, FUNC(thomson_state::ans2));
+	m_ans3.init(*this, FUNC(thomson_state::ans3));
+	m_ans4.init(*this, FUNC(thomson_state::ans4));
 }
 
 

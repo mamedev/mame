@@ -325,16 +325,16 @@ private:
 
 	// callbacks
 	TIMER_CALLBACK_MEMBER(timed_trigger_callback) { trigger(param); }
-	emu_timer_cb m_timed_trigger_callback;
+	transient_timer_factory m_timed_trigger_callback;
 
 	void on_vblank(screen_device &screen, bool vblank_state);
 
 	TIMER_CALLBACK_MEMBER(trigger_periodic_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_pulse_clear) { set_input_line(int(param), CLEAR_LINE); }
-	emu_timer_cb m_irq_pulse_clear;
+	transient_timer_factory m_irq_pulse_clear;
 
 	TIMER_CALLBACK_MEMBER(empty_event_queue) { m_input[param].empty_event_queue(); }
-	emu_timer_cb m_empty_event_queue;
+	transient_timer_factory m_empty_event_queue;
 
 	void suspend_resume_changed();
 

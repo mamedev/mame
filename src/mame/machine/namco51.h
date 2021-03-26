@@ -48,9 +48,9 @@ private:
 	void P_w(uint8_t data);
 
 	TIMER_CALLBACK_MEMBER( rw_sync );
-	emu_timer_cb m_rw_sync;
+	transient_timer_factory m_rw_sync;
 	TIMER_CALLBACK_MEMBER( write_sync );
-	emu_timer_cb m_write_sync;
+	transient_timer_factory m_write_sync;
 };
 
 DECLARE_DEVICE_TYPE(NAMCO_51XX, namco_51xx_device)

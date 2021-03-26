@@ -39,7 +39,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_c64_expansion_card_interface overrides
 	virtual uint8_t c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;

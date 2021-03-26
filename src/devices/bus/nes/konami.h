@@ -70,7 +70,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	static constexpr device_timer_id TIMER_IRQ = 0;
@@ -103,7 +103,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 	void set_prg();
 	uint8_t m_mmc_vrom_bank[8];
 	uint8_t m_latch, m_mmc_prg_bank;

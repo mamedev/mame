@@ -81,7 +81,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	int m_lastvalue;
@@ -507,7 +507,7 @@ static INPUT_PORTS_START( tetriskr )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void pcxt_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void pcxt_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	m_cvsd->digit_w(BIT(m_samples->as_u8(m_vaddr), m_bit));
 	m_cvsd->clock_w(1);

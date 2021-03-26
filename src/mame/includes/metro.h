@@ -105,7 +105,7 @@ private:
 	void mouja_irq_timer_ctrl_w(uint16_t data);
 	void sound_data_w(u8 data);
 	TIMER_CALLBACK_MEMBER(sound_data_sync);
-	emu_timer_cb m_sound_data_sync;
+	transient_timer_factory m_sound_data_sync;
 	u8 soundstatus_r();
 	void soundstatus_w(u8 data);
 	template<int Mask> void upd7810_rombank_w(u8 data);
@@ -181,7 +181,7 @@ private:
 	void ymf278_map(address_map &map);
 
 	virtual void machine_start() override;
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

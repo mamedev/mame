@@ -635,7 +635,7 @@ protected:
 	virtual void device_start() override;
 
 	TIMER_CALLBACK_MEMBER( master_callback );
-	emu_timer_cb m_master_callback;
+	transient_timer_factory m_master_callback;
 };
 
 class i8041a_device : public upi41_cpu_device

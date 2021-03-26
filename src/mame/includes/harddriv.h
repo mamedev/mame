@@ -102,9 +102,9 @@ protected:
 	void init_video();
 	INTERRUPT_GEN_MEMBER(hd68k_irq_gen);
 	TIMER_CALLBACK_MEMBER(deferred_adsp_bank_switch);
-	emu_timer_cb m_deferred_adsp_bank_switch;
+	transient_timer_factory m_deferred_adsp_bank_switch;
 	TIMER_CALLBACK_MEMBER(rddsp32_sync_cb);
-	emu_timer_cb m_rddsp32_sync_cb;
+	transient_timer_factory m_rddsp32_sync_cb;
 
 	/*----------- defined in machine/harddriv.cpp -----------*/
 
@@ -193,7 +193,7 @@ protected:
 	void hdds3_xdsp_control_w(offs_t offset, uint16_t data);
 
 	TIMER_CALLBACK_MEMBER( xsdp_sport1_irq_off_callback );
-	emu_timer_cb m_xsdp_sport1_irq_off_callback;
+	transient_timer_factory m_xsdp_sport1_irq_off_callback;
 
 	uint16_t hdgsp_control_lo_r(offs_t offset);
 	void hdgsp_control_lo_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -573,7 +573,7 @@ private:
 
 	void update_68k_interrupts();
 	TIMER_CALLBACK_MEMBER( delayed_68k_w );
-	emu_timer_cb m_delayed_68k_w;
+	transient_timer_factory m_delayed_68k_w;
 
 	DECLARE_READ_LINE_MEMBER(hdsnddsp_get_bio);
 };

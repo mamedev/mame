@@ -96,7 +96,7 @@ protected:
 	virtual void video_start() override;
 	uint32_t screen_update_laserbat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 	// video functions
 	TIMER_CALLBACK_MEMBER(video_line);

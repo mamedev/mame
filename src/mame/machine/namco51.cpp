@@ -177,8 +177,8 @@ void namco_51xx_device::device_start()
 	m_out.resolve_safe();
 	m_lockout.resolve_safe();
 
-	m_rw_sync.enregister(*this, FUNC(namco_51xx_device::rw_sync));
-	m_write_sync.enregister(*this, FUNC(namco_51xx_device::write_sync));
+	m_rw_sync.init(*this, FUNC(namco_51xx_device::rw_sync));
+	m_write_sync.init(*this, FUNC(namco_51xx_device::write_sync));
 
 	save_item(NAME(m_portO));
 	save_item(NAME(m_rw));

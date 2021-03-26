@@ -29,7 +29,7 @@ protected:
 	virtual void device_start() override;
 
 	TIMER_CALLBACK_MEMBER(resync_callback);
-	emu_timer_cb m_resync_callback;
+	transient_timer_factory m_resync_callback;
 
 	virtual void update_regs(int reg);      // this is needed to simplify NES-EVENT pcb implementation, which handle differently some regs!
 	virtual void set_prg();

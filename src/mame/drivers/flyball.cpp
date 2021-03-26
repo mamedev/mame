@@ -84,7 +84,7 @@ private:
 	TIMER_CALLBACK_MEMBER(quarter_callback);
 
 	void flyball_map(address_map &map);
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -181,7 +181,7 @@ uint32_t flyball_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-void flyball_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void flyball_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

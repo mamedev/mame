@@ -238,7 +238,7 @@ void mcms_device::device_reset()
 	m_enabled = false;
 }
 
-void mcms_device::device_timer(emu_timer const &timer, device_timer_id tid, int param, void *ptr)
+void mcms_device::device_timer(timer_instance const &timer, device_timer_id tid, int param, void *ptr)
 {
 	if (tid == 0)
 	{

@@ -1404,7 +1404,7 @@ void diablo_hd_device::device_reset()
  * @param id timer id
  * @param arg argument supplied to timer_insert (unused)
  */
-void diablo_hd_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void diablo_hd_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	LOG_DRIVE(9,"[DHD%u]   TIMER id=%d param=%d ptr=%p @%.0fns\n", m_unit, id, param, ptr, timer.elapsed().as_double() * ATTOSECONDS_PER_NANOSECOND);
 	if (!m_disk)

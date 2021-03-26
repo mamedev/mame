@@ -88,7 +88,7 @@ void usb_sound_device::device_start()
 	save_item(NAME(m_work_ram_bank));
 	save_item(NAME(m_t1_clock));
 
-	m_delayed_usb_data_w.enregister(*this, FUNC(usb_sound_device::delayed_usb_data_w));
+	m_delayed_usb_data_w.init(*this, FUNC(usb_sound_device::delayed_usb_data_w));
 
 #if (ENABLE_SEGAUSB_NETLIST)
 

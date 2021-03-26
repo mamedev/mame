@@ -2216,7 +2216,7 @@ int saturn_state::stv_vdp1_start ( void )
 	save_item(NAME(m_vdp1.local_y));
 	machine().save().register_postload(save_prepost_delegate(FUNC(saturn_state::stv_vdp1_state_save_postload), this));
 
-	m_vdp1_draw_end.enregister(*this, FUNC(saturn_state::vdp1_draw_end));
+	m_vdp1_draw_end.init(*this, FUNC(saturn_state::vdp1_draw_end));
 
 	return 0;
 }

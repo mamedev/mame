@@ -145,11 +145,11 @@ void m6500_1_device::device_start()
 
 	m_counter_base = 0U;
 
-	m_set_port_in[0].enregister(*this, FUNC(m6500_1_device::set_port_in<0>));
-	m_set_port_in[1].enregister(*this, FUNC(m6500_1_device::set_port_in<1>));
-	m_set_port_in[2].enregister(*this, FUNC(m6500_1_device::set_port_in<2>));
-	m_set_port_in[3].enregister(*this, FUNC(m6500_1_device::set_port_in<3>));
-	m_set_cntr_in.enregister(*this, FUNC(m6500_1_device::set_cntr_in));
+	m_set_port_in[0].init(*this, FUNC(m6500_1_device::set_port_in<0>));
+	m_set_port_in[1].init(*this, FUNC(m6500_1_device::set_port_in<1>));
+	m_set_port_in[2].init(*this, FUNC(m6500_1_device::set_port_in<2>));
+	m_set_port_in[3].init(*this, FUNC(m6500_1_device::set_port_in<3>));
+	m_set_cntr_in.init(*this, FUNC(m6500_1_device::set_cntr_in));
 
 	state_add(M6500_1_CR, "CR", m_cr).callimport().callexport();
 	state_add(M6500_1_UL, "UL", m_ul).callimport().callexport();

@@ -209,18 +209,18 @@ other supported games as well.
 
 void m72_state::machine_start()
 {
-	m_synch_callback.enregister(*this, FUNC(m72_state::synch_callback));
-	m_delayed_ram16_w.enregister(*this, FUNC(m72_state::delayed_ram16_w));
-	m_delayed_ram8_w.enregister(*this, FUNC(m72_state::delayed_ram8_w));
+	m_synch_callback.init(*this, FUNC(m72_state::synch_callback));
+	m_delayed_ram16_w.init(*this, FUNC(m72_state::delayed_ram16_w));
+	m_delayed_ram8_w.init(*this, FUNC(m72_state::delayed_ram8_w));
 
 	m_scanline_timer = timer_alloc(*this, FUNC(m72_state::scanline_interrupt));
 }
 
 MACHINE_START_MEMBER(m72_state,kengo)
 {
-	m_synch_callback.enregister(*this, FUNC(m72_state::synch_callback));
-	m_delayed_ram16_w.enregister(*this, FUNC(m72_state::delayed_ram16_w));
-	m_delayed_ram8_w.enregister(*this, FUNC(m72_state::delayed_ram8_w));
+	m_synch_callback.init(*this, FUNC(m72_state::synch_callback));
+	m_delayed_ram16_w.init(*this, FUNC(m72_state::delayed_ram16_w));
+	m_delayed_ram8_w.init(*this, FUNC(m72_state::delayed_ram8_w));
 
 	m_scanline_timer = timer_alloc(*this, FUNC(m72_state::kengo_scanline_interrupt));
 }

@@ -241,7 +241,7 @@ void pit68230_device::tick_clock()
 //-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
-void pit68230_device::device_timer (emu_timer const &timer, device_timer_id id, int32_t param, void *ptr)
+void pit68230_device::device_timer(timer_instance const &timer, device_timer_id id, int32_t param, void *ptr)
 {
 	switch(id)
 	{

@@ -75,7 +75,7 @@ private:
 	int m_unit;
 	int m_interrupt;
 	rx01_state m_state;
-	emu_timer_cb m_service_command;
+	transient_timer_factory m_service_command;
 };
 
 // device type definition

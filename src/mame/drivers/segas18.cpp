@@ -153,7 +153,7 @@ void segas18_state::init_generic(segas18_rom_board rom_board)
  *
  *************************************/
 
-void segas18_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void segas18_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

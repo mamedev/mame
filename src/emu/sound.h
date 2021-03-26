@@ -686,7 +686,7 @@ private:
 	bool m_output_adaptive;                        // adaptive stream that runs at the sample rate of its output
 	bool m_synchronous;                            // synchronous stream that runs at the rate of its input
 	bool m_resampling_disabled;                    // is resampling of input streams disabled?
-	emu_timer *m_sync_timer;                       // update timer for synchronous streams
+	persistent_timer m_sync_timer;                 // update timer for synchronous streams
 
 	// input information
 	std::vector<sound_stream_input> m_input;       // list of streams we directly depend upon
@@ -815,7 +815,7 @@ private:
 
 	// internal state
 	running_machine &m_machine;           // reference to the running machine
-	emu_timer *m_update_timer;            // timer that runs the update function
+	persistent_timer m_update_timer;      // timer that runs the update function
 	std::vector<std::reference_wrapper<speaker_device> > m_speakers;
 
 	u32 m_update_number;                  // current update index; used for sample rate updates

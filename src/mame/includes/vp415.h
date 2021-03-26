@@ -79,7 +79,7 @@ public:
 private:
 	void machine_reset() override;
 	void machine_start() override;
-	void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

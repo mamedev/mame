@@ -76,7 +76,7 @@ void awacs_device::device_reset()
 //  device_timer - called when our device timer expires
 //-------------------------------------------------
 
-void awacs_device::device_timer(emu_timer const &timer, device_timer_id tid, int param, void *ptr)
+void awacs_device::device_timer(timer_instance const &timer, device_timer_id tid, int param, void *ptr)
 {
 	m_stream->update();
 }

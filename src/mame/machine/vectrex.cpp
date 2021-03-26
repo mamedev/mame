@@ -48,7 +48,7 @@ static const double unknown_game_angles[3] = {0,0.16666666, 0.33333333};
 
 
 
-void vectrex_base_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void vectrex_base_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

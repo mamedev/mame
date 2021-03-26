@@ -439,7 +439,7 @@ uint8_t towns_state::towns_intervaltimer2_r(offs_t offset)
 	return 0xff;
 }
 
-void towns_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void towns_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
 	{

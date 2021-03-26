@@ -985,8 +985,8 @@ void hp48_state::base_machine_start(hp48_models model)
 	m_kbd_timer = timer_alloc(*this, FUNC(hp48_state::kbd_cb));
 	m_kbd_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 
-	m_rs232_byte_recv_cb.enregister(*this, FUNC(hp48_state::rs232_byte_recv_cb));
-	m_rs232_byte_sent_cb.enregister(*this, FUNC(hp48_state::rs232_byte_sent_cb));
+	m_rs232_byte_recv_cb.init(*this, FUNC(hp48_state::rs232_byte_recv_cb));
+	m_rs232_byte_sent_cb.init(*this, FUNC(hp48_state::rs232_byte_sent_cb));
 
 	m_lshift0.resolve();
 	m_rshift0.resolve();

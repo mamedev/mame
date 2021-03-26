@@ -116,7 +116,7 @@ void m3745x_device::device_reset()
 	m_last_all_ints = 0;
 }
 
-void m3745x_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void m3745x_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

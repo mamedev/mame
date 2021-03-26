@@ -67,7 +67,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }

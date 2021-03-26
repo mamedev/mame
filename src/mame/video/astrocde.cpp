@@ -379,7 +379,7 @@ uint32_t astrocde_state::screen_update_profpac(screen_device &screen, bitmap_ind
  *
  *************************************/
 
-void astrocde_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void astrocde_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

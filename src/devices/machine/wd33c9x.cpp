@@ -446,7 +446,7 @@ void wd33c9x_base_device::device_reset()
 //  device_timer - device-specific timer handler
 //-------------------------------------------------
 
-void wd33c9x_base_device::device_timer(emu_timer const &timer, device_timer_id tid, int param, void *ptr)
+void wd33c9x_base_device::device_timer(timer_instance const &timer, device_timer_id tid, int param, void *ptr)
 {
 	step(true);
 }

@@ -32,8 +32,8 @@ void tankbust_state::machine_start()
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
 	membank("bank2")->configure_entries(0, 2, memregion("maincpu")->base() + 0x18000, 0x2000);
 
-	m_soundlatch_callback.enregister(*this, FUNC(tankbust_state::soundlatch_callback));
-	m_soundirqline_callback.enregister(*this, FUNC(tankbust_state::soundirqline_callback));
+	m_soundlatch_callback.init(*this, FUNC(tankbust_state::soundlatch_callback));
+	m_soundirqline_callback.init(*this, FUNC(tankbust_state::soundirqline_callback));
 
 	save_item(NAME(m_latch));
 	save_item(NAME(m_timer1));

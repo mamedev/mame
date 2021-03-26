@@ -163,7 +163,7 @@ void nbmj8991_state::update_pixel(int x, int y)
 	m_tmpbitmap.pix(y, x) = color;
 }
 
-void nbmj8991_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void nbmj8991_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

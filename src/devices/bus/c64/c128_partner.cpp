@@ -130,7 +130,7 @@ void c128_partner_cartridge_device::device_reset()
 //  device_timer -
 //-------------------------------------------------
 
-void c128_partner_cartridge_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void c128_partner_cartridge_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (m_ls74_cd)
 	{

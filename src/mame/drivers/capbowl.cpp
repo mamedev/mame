@@ -122,7 +122,7 @@ INTERRUPT_GEN_MEMBER(capbowl_state::interrupt)
  *
  *************************************/
 
-void capbowl_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void capbowl_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

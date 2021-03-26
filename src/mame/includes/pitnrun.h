@@ -85,13 +85,13 @@ private:
 
 	INTERRUPT_GEN_MEMBER(nmi_source);
 	TIMER_CALLBACK_MEMBER(mcu_real_data_r);
-	emu_timer_cb m_mcu_real_data_r;
+	transient_timer_factory m_mcu_real_data_r;
 	TIMER_CALLBACK_MEMBER(mcu_real_data_w);
-	emu_timer_cb m_mcu_real_data_w;
+	transient_timer_factory m_mcu_real_data_w;
 	TIMER_CALLBACK_MEMBER(mcu_data_real_r);
-	emu_timer_cb m_mcu_data_real_r;
+	transient_timer_factory m_mcu_data_real_r;
 	TIMER_CALLBACK_MEMBER(mcu_status_real_w);
-	emu_timer_cb m_mcu_status_real_w;
+	transient_timer_factory m_mcu_status_real_w;
 
 	void pitnrun_palette(palette_device &palette) const;
 

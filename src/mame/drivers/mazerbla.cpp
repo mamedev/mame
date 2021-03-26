@@ -162,9 +162,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	TIMER_CALLBACK_MEMBER(deferred_ls670_0_w);
-	emu_timer_cb m_deferred_ls670_0_w;
+	transient_timer_factory m_deferred_ls670_0_w;
 	TIMER_CALLBACK_MEMBER(deferred_ls670_1_w);
-	emu_timer_cb m_deferred_ls670_1_w;
+	transient_timer_factory m_deferred_ls670_1_w;
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void greatgun_cpu3_io_map(address_map &map);
 	void greatgun_io_map(address_map &map);
@@ -937,8 +937,8 @@ void mazerbla_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 256, memregion("sub2")->base() + 0x10000, 0x2000);
 
-	m_deferred_ls670_0_w.enregister(*this, FUNC(mazerbla_state::deferred_ls670_0_w));
-	m_deferred_ls670_1_w.enregister(*this, FUNC(mazerbla_state::deferred_ls670_1_w));
+	m_deferred_ls670_0_w.init(*this, FUNC(mazerbla_state::deferred_ls670_0_w));
+	m_deferred_ls670_1_w.init(*this, FUNC(mazerbla_state::deferred_ls670_1_w));
 
 	save_item(NAME(m_port02_status));
 	save_item(NAME(m_gfx_rom_bank));

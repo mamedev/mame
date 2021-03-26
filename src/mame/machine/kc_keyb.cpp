@@ -491,7 +491,7 @@ ioport_constructor kc_keyboard_device::device_input_ports() const
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void kc_keyboard_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void kc_keyboard_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
 	{

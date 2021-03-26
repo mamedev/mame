@@ -657,8 +657,8 @@ void dc_state::machine_start()
 	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY | SH2DRC_STRICT_PCREL);
 	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0cffffff, false, dc_ram);
 
-	m_g2_dma_irq.enregister(*this, FUNC(dc_state::g2_dma_irq));
-	m_ch2_dma_irq.enregister(*this, FUNC(dc_state::ch2_dma_irq));
+	m_g2_dma_irq.init(*this, FUNC(dc_state::g2_dma_irq));
+	m_ch2_dma_irq.init(*this, FUNC(dc_state::ch2_dma_irq));
 
 	// save states
 	save_pointer(NAME(dc_sysctrl_regs), 0x200/4);

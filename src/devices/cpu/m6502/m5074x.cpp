@@ -121,7 +121,7 @@ void m5074x_device::device_reset()
 	m_tmr1 = m_tmr2 = m_tmrx = 0;
 }
 
-void m5074x_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void m5074x_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
@@ -606,7 +606,7 @@ void m50753_device::execute_set_input(int inputnum, int state)
 	recalc_irqs();
 }
 
-void m50753_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void m50753_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

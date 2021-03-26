@@ -105,7 +105,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	uint32_t screen_update_msisaac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
-	emu_timer_cb m_nmi_callback;
+	transient_timer_factory m_nmi_callback;
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void msisaac_map(address_map &map);
 	void msisaac_sound_map(address_map &map);

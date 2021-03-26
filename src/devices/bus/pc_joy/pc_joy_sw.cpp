@@ -35,7 +35,7 @@ void pc_mssw_pad_device::device_reset()
 	m_timer->adjust(attotime::never, 0);
 }
 
-void pc_mssw_pad_device::device_timer(emu_timer const &timer, device_timer_id tid, int param, void *ptr)
+void pc_mssw_pad_device::device_timer(timer_instance const &timer, device_timer_id tid, int param, void *ptr)
 {
 	uint16_t pad_state = 0;
 	// only multibit mode for now

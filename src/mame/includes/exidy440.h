@@ -64,7 +64,7 @@ protected:
 	uint32_t screen_update_exidy440(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_interrupt_w);
 	TIMER_CALLBACK_MEMBER(delayed_sound_command_w);
-	emu_timer_cb m_delayed_sound_command_w;
+	transient_timer_factory m_delayed_sound_command_w;
 	TIMER_CALLBACK_MEMBER(beam_firq_callback);
 	TIMER_CALLBACK_MEMBER(collide_firq_callback);
 	void exidy440_update_firq();

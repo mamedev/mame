@@ -691,7 +691,7 @@ void gottlieb_state::qbert_knocker(machine_config &config)
 *
 *************************************/
 
-void gottlieb_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void gottlieb_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

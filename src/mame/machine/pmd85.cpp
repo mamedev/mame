@@ -620,7 +620,7 @@ void pmd85_state::mato_io_w(offs_t offset, uint8_t data)
 	}
 }
 
-void pmd85_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void pmd85_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

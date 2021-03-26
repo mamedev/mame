@@ -43,7 +43,7 @@ private:
 	bool m_is_thunderh;
 
 	required_device<cpu_device> m_cpu;
-	emu_timer_cb m_network_irq_clear;
+	transient_timer_factory m_network_irq_clear;
 	uint32_t m_ram[0x2000];
 };
 

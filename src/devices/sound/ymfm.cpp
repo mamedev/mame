@@ -1292,8 +1292,8 @@ void ymfm_engine_base<RegisterType>::save(device_t &device)
 	m_irq_handler.resolve();
 
 	// register timer callbacks
-	m_synced_mode_w.enregister(device.machine().scheduler(), device.tag(), timer_expired_delegate(FUNC(ymfm_engine_base<RegisterType>::synced_mode_w), this));
-	m_check_interrupts.enregister(device.machine().scheduler(), device.tag(), timer_expired_delegate(FUNC(ymfm_engine_base<RegisterType>::check_interrupts), this));
+	m_synced_mode_w.init(device.machine().scheduler(), device.tag(), timer_expired_delegate(FUNC(ymfm_engine_base<RegisterType>::synced_mode_w), this));
+	m_check_interrupts.init(device.machine().scheduler(), device.tag(), timer_expired_delegate(FUNC(ymfm_engine_base<RegisterType>::check_interrupts), this));
 
 	// save our data
 	device.save_item(YMFM_NAME(m_env_counter));

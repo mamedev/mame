@@ -86,7 +86,7 @@ VIDEO_START_MEMBER(blstroid_state,blstroid)
  *
  *************************************/
 
-void blstroid_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void blstroid_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

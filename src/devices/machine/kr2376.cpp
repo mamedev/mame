@@ -263,7 +263,7 @@ void kr2376_device::detect_keypress()
 	}
 }
 
-void kr2376_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void kr2376_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 		{

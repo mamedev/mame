@@ -43,7 +43,7 @@ READ_LINE_MEMBER(sprint4_state::collision_flipflop_r)
 }
 
 
-void sprint4_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void sprint4_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

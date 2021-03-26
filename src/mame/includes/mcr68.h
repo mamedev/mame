@@ -74,8 +74,8 @@ private:
 	attotime m_timing_factor;
 	uint8_t m_sprite_clip;
 	int8_t m_sprite_xoffset;
-	emu_timer_cb m_493_callback;
-	emu_timer_cb m_493_off_callback;
+	transient_timer_factory m_493_callback;
+	transient_timer_factory m_493_off_callback;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	void xenophobe_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

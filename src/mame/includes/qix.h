@@ -123,9 +123,9 @@ protected:
 	void qix_palettebank_w(uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(pia_w_callback);
-	emu_timer_cb m_pia_w_callback;
+	transient_timer_factory m_pia_w_callback;
 	TIMER_CALLBACK_MEMBER(deferred_sndpia1_porta_w);
-	emu_timer_cb m_deferred_sndpia1_porta_w;
+	transient_timer_factory m_deferred_sndpia1_porta_w;
 	DECLARE_WRITE_LINE_MEMBER(qix_vsync_changed);
 	void qix_pia_w(offs_t offset, uint8_t data);
 	void qix_coinctl_w(uint8_t data);

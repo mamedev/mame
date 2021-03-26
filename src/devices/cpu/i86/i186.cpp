@@ -1199,7 +1199,12 @@ void i80186_cpu_device::external_int(uint16_t intno, int state)
  *
  *************************************/
 
-void i80186_cpu_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void i80186_cpu_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
+{
+	device_timer(id, param, ptr);
+}
+
+void i80186_cpu_device::device_timer(device_timer_id id, int param, void *ptr)
 {
 	switch(id)
 	{
@@ -1303,10 +1308,10 @@ void i80186_cpu_device::inc_timer(int which)
 	if (t->control & 2)
 	{
 		if (t->count == ((t->control & 0x1000) ? t->maxB : t->maxA))
-			device_timer(*t->int_timer, which, which, nullptr);
+			device_timer(which, which, nullptr);
 	}
 	else if (t->count == t->maxA)
-		device_timer(*t->int_timer, which, which, nullptr);
+		device_timer(which, which, nullptr);
 }
 
 void i80186_cpu_device::internal_timer_update(int which, int new_count, int new_maxA, int new_maxB, int new_control)

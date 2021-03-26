@@ -559,7 +559,6 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output
 	m_output_adaptive(sample_rate == SAMPLE_RATE_OUTPUT_ADAPTIVE),
 	m_synchronous((flags & STREAM_SYNCHRONOUS) != 0),
 	m_resampling_disabled((flags & STREAM_DISABLE_INPUT_RESAMPLING) != 0),
-	m_sync_timer(nullptr),
 	m_input(inputs),
 	m_input_view(inputs),
 	m_empty_buffer(100),
@@ -602,7 +601,7 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output
 
 	// create an update timer for synchronous streams
 	if (synchronous())
-		m_sync_timer = m_device.timer_alloc(*this, FUNC(sound_stream::sync_update));
+		m_sync_timer.init(m_device.scheduler(), nullptr, timer_expired_delegate(FUNC(sound_stream::sync_update), this));
 
 	// force an update to the sample rates
 	sample_rate_changed();
@@ -876,7 +875,7 @@ void sound_stream::reprime_sync_timer()
 {
 	attotime curtime = m_device.machine().time();
 	attotime target = m_output[0].end_time() + attotime(0, 1);
-	m_sync_timer->adjust(target - curtime);
+	m_sync_timer.adjust(target - curtime);
 }
 
 
@@ -1058,7 +1057,6 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 
 sound_manager::sound_manager(running_machine &machine) :
 	m_machine(machine),
-	m_update_timer(nullptr),
 	m_update_number(0),
 	m_last_update(attotime::zero),
 	m_finalmix_leftover(0),
@@ -1103,8 +1101,8 @@ sound_manager::sound_manager(running_machine &machine) :
 	set_attenuation(machine.options().volume());
 
 	// start the periodic update flushing timer
-	m_update_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(sound_manager::update), this));
-	m_update_timer->adjust(STREAMS_UPDATE_ATTOTIME, 0, STREAMS_UPDATE_ATTOTIME);
+	m_update_timer.init(machine.scheduler(), nullptr, timer_expired_delegate(FUNC(sound_manager::update), this));
+	m_update_timer.adjust(STREAMS_UPDATE_ATTOTIME, 0, STREAMS_UPDATE_ATTOTIME);
 }
 
 

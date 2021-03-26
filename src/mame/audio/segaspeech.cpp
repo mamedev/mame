@@ -54,7 +54,7 @@ sega_speech_device::sega_speech_device(const machine_config &mconfig, const char
 
 void sega_speech_device::device_start()
 {
-	m_delayed_speech_w.enregister(*this, FUNC(sega_speech_device::delayed_speech_w));
+	m_delayed_speech_w.init(*this, FUNC(sega_speech_device::delayed_speech_w));
 
 	save_item(NAME(m_latch));
 	save_item(NAME(m_t0));

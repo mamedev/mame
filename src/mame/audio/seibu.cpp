@@ -99,7 +99,7 @@ void seibu_sound_device::device_start()
 	m_ym_read_cb.resolve_safe(0);
 	m_ym_write_cb.resolve_safe();
 
-	m_update_irq_synced.enregister(*this, FUNC(seibu_sound_device::update_irq_synced));
+	m_update_irq_synced.init(*this, FUNC(seibu_sound_device::update_irq_synced));
 
 	if (m_sound_rom.found() && m_rom_bank.found())
 	{

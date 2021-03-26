@@ -33,9 +33,9 @@ private:
 	uint8_t                   m_portO;
 
 	TIMER_CALLBACK_MEMBER( rw_sync );
-	emu_timer_cb m_rw_sync;
+	transient_timer_factory m_rw_sync;
 	TIMER_CALLBACK_MEMBER( write_sync );
-	emu_timer_cb m_write_sync;
+	transient_timer_factory m_write_sync;
 
 	uint8_t K_r();
 	uint8_t R0_r();

@@ -74,7 +74,7 @@ public:
 	void init_bshark();
 
 protected:
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void device_post_load() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

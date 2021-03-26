@@ -1317,7 +1317,7 @@ GFXDECODE_END
 void norautp_state::machine_start()
 {
 	m_lamps.resolve();
-	m_ppi2_ack.enregister(*this, FUNC(norautp_state::ppi2_ack));
+	m_ppi2_ack.init(*this, FUNC(norautp_state::ppi2_ack));
 }
 
 void norautp_state::noraut_base(machine_config &config)

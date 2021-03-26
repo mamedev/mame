@@ -212,7 +212,7 @@ private:
 	DECLARE_MACHINE_RESET(multigm3);
 	DECLARE_MACHINE_START(supergm3);
 	TIMER_CALLBACK_MEMBER(mmc1_resync_callback);
-	emu_timer_cb m_mmc1_resync_callback;
+	transient_timer_factory m_mmc1_resync_callback;
 	void set_videorom_bank( int start, int count, int bank, int bank_size_in_kb);
 	void set_videoram_bank( int start, int count, int bank, int bank_size_in_kb);
 	void multigam_init_mmc3(uint8_t *prg_base, int prg_size, int chr_bank_base);
@@ -1160,7 +1160,7 @@ MACHINE_RESET_MEMBER(multigam_state,multigm3)
 
 void multigam_state::machine_start()
 {
-	m_mmc1_resync_callback.enregister(*this, FUNC(multigam_state::mmc1_resync_callback));
+	m_mmc1_resync_callback.init(*this, FUNC(multigam_state::mmc1_resync_callback));
 
 	m_nt_ram = std::make_unique<uint8_t[]>(0x1000);
 	m_nt_page[0] = m_nt_ram.get();

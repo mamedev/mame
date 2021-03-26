@@ -371,7 +371,7 @@ void demon_state::sound_start()
 {
 	cinemat_state::sound_start();
 
-	m_synced_sound_w.enregister(*this, FUNC(demon_state::synced_sound_w));
+	m_synced_sound_w.init(*this, FUNC(demon_state::synced_sound_w));
 
 	/* register for save states */
 	save_item(NAME(m_sound_fifo));

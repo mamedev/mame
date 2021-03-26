@@ -95,9 +95,9 @@ void taito_sj_security_mcu_device::device_start()
 	m_68intrq_cb.resolve_safe();
 	m_busrq_cb.resolve_safe();
 
-	m_do_mcu_read.enregister(*this, FUNC(taito_sj_security_mcu_device::do_mcu_read));
-	m_do_mcu_write.enregister(*this, FUNC(taito_sj_security_mcu_device::do_mcu_write));
-	m_do_host_write.enregister(*this, FUNC(taito_sj_security_mcu_device::do_host_write));
+	m_do_mcu_read.init(*this, FUNC(taito_sj_security_mcu_device::do_mcu_read));
+	m_do_mcu_write.init(*this, FUNC(taito_sj_security_mcu_device::do_mcu_write));
+	m_do_host_write.init(*this, FUNC(taito_sj_security_mcu_device::do_host_write));
 
 	save_item(NAME(m_addr));
 	save_item(NAME(m_mcu_data));

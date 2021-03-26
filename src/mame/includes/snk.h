@@ -235,9 +235,9 @@ private:
 	uint32_t screen_update_tdfever(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_fitegolf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sgladiat_sndirq_update_callback);
-	emu_timer_cb m_sgladiat_sndirq_update_callback;
+	transient_timer_factory m_sgladiat_sndirq_update_callback;
 	TIMER_CALLBACK_MEMBER(sndirq_update_callback);
-	emu_timer_cb m_sndirq_update_callback;
+	transient_timer_factory m_sndirq_update_callback;
 	DECLARE_WRITE_LINE_MEMBER(ymirq_callback_2);
 	void marvins_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int scrollx, const int scrolly, const int from, const int to);
 	void tnk3_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int xscroll, const int yscroll);

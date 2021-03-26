@@ -100,7 +100,7 @@ void vp550_device::device_start()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void vp550_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void vp550_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (LOG) logerror("VP550 '%s' Interrupt\n", tag());
 

@@ -98,9 +98,9 @@ void grchamp_state::machine_start()
 	m_digits.resolve();
 	m_soundlatch_data = 0x00;
 	m_soundlatch_flag = false;
-	m_soundlatch_w_cb.enregister(*this, FUNC(grchamp_state::soundlatch_w_cb));
-	m_soundlatch_clear7_w_cb.enregister(*this, FUNC(grchamp_state::soundlatch_clear7_w_cb));
-	m_main_to_sub_comm_sync_w.enregister(*this, FUNC(grchamp_state::main_to_sub_comm_sync_w));
+	m_soundlatch_w_cb.init(*this, FUNC(grchamp_state::soundlatch_w_cb));
+	m_soundlatch_clear7_w_cb.init(*this, FUNC(grchamp_state::soundlatch_clear7_w_cb));
+	m_main_to_sub_comm_sync_w.init(*this, FUNC(grchamp_state::main_to_sub_comm_sync_w));
 	save_item(NAME(m_cpu0_out));
 	save_item(NAME(m_cpu1_out));
 	save_item(NAME(m_comm_latch));

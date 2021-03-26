@@ -92,7 +92,7 @@ void ds2401_device::device_reset()
 	memset(m_data, 0, SIZE_DATA);
 }
 
-void ds2401_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void ds2401_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
 	{

@@ -221,7 +221,7 @@ void sun4_mmu_base_device::device_reset()
 	memset(&m_cachedata[0], 0, sizeof(uint32_t) * 16384);
 }
 
-void sun4_mmu_base_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void sun4_mmu_base_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == TIMER_RESET)
 	{

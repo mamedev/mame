@@ -45,7 +45,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	TIMER_CALLBACK_MEMBER(deferred_sync_w);
-	emu_timer_cb m_deferred_sync_w;
+	transient_timer_factory m_deferred_sync_w;
 
 	// members
 	required_device<mc6809e_device> m_cpu;
@@ -56,7 +56,7 @@ protected:
 	static const device_timer_id TIMER_SYNC = 0;
 private:
 	// overrides
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 	// members
 	devcb_write_line m_syncq_cb;

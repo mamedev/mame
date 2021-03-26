@@ -130,17 +130,17 @@ private:
 	virtual void machine_init_common() override;
 
 	TIMER_CALLBACK_MEMBER(z80_semaphore_assert_cb);
-	emu_timer_cb m_z80_semaphore_assert_cb;
+	transient_timer_factory m_z80_semaphore_assert_cb;
 	TIMER_CALLBACK_MEMBER(mcu_port2_w_cb);
-	emu_timer_cb m_mcu_port2_w_cb;
+	transient_timer_factory m_mcu_port2_w_cb;
 	TIMER_CALLBACK_MEMBER(mcu_port3_w_cb);
-	emu_timer_cb m_mcu_port3_w_cb;
+	transient_timer_factory m_mcu_port3_w_cb;
 	TIMER_CALLBACK_MEMBER(z80_ay1_sync_address_w_cb);
-	emu_timer_cb m_z80_ay1_sync_address_w_cb;
+	transient_timer_factory m_z80_ay1_sync_address_w_cb;
 	TIMER_CALLBACK_MEMBER(z80_ay2_iob_w_cb);
-	emu_timer_cb m_z80_ay2_iob_w_cb;
+	transient_timer_factory m_z80_ay2_iob_w_cb;
 	TIMER_CALLBACK_MEMBER(bootleg_mcu_port1_w_cb);
-	emu_timer_cb m_bootleg_mcu_port1_w_cb;
+	transient_timer_factory m_bootleg_mcu_port1_w_cb;
 };
 
 

@@ -383,7 +383,7 @@ private:
 		TIMER_POWER_FAIL
 	};
 
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc146818_device> m_rtc;
@@ -455,11 +455,11 @@ private:
 	void lions_palette(palette_device &palette) const;
 	uint32_t screen_update_aristmk4(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(note_input_reset);
-	emu_timer_cb m_note_input_reset;
+	transient_timer_factory m_note_input_reset;
 	TIMER_CALLBACK_MEMBER(coin_input_reset);
-	emu_timer_cb m_coin_input_reset;
+	transient_timer_factory m_coin_input_reset;
 	TIMER_CALLBACK_MEMBER(hopper_reset);
-	emu_timer_cb m_hopper_reset;
+	transient_timer_factory m_hopper_reset;
 	void power_fail();
 	inline void uBackgroundColour();
 
@@ -1732,9 +1732,9 @@ void aristmk4_state::machine_start()
 	m_hopper_motor_out.resolve();
 	m_lamps.resolve();
 	m_power_timer = timer_alloc(TIMER_POWER_FAIL);
-	m_note_input_reset.enregister(*this, FUNC(aristmk4_state::note_input_reset));
-	m_hopper_reset.enregister(*this, FUNC(aristmk4_state::hopper_reset));
-	m_coin_input_reset.enregister(*this, FUNC(aristmk4_state::coin_input_reset));
+	m_note_input_reset.init(*this, FUNC(aristmk4_state::note_input_reset));
+	m_hopper_reset.init(*this, FUNC(aristmk4_state::hopper_reset));
+	m_coin_input_reset.init(*this, FUNC(aristmk4_state::coin_input_reset));
 }
 
 void aristmk4_state::machine_reset()
@@ -1753,7 +1753,7 @@ void aristmk4_state::machine_reset()
 	m_power_timer->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
 }
 
-void aristmk4_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void aristmk4_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

@@ -237,8 +237,8 @@ const tiny_rom_entry *hp98046_io_card_device::device_rom_region() const
 void hp98046_io_card_device::device_start()
 {
 	m_ram = std::make_unique<uint8_t[]>(1024);
-	m_sync_rx_im_w.enregister(*this, FUNC(hp98046_io_card_device::sync_rx_im_w));
-	m_sync_tx_im_w.enregister(*this, FUNC(hp98046_io_card_device::sync_tx_im_w));
+	m_sync_rx_im_w.init(*this, FUNC(hp98046_io_card_device::sync_rx_im_w));
+	m_sync_tx_im_w.init(*this, FUNC(hp98046_io_card_device::sync_tx_im_w));
 	save_pointer(NAME(m_ram) , 1024);
 }
 

@@ -675,7 +675,7 @@ void grmatch_state::machine_reset()
 	m_palette_timer->adjust(m_screen->time_until_pos(m_screen->vpos()+1));
 }
 
-void itech8_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void itech8_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

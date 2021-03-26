@@ -139,7 +139,7 @@ protected:
 
 
 	TIMER_CALLBACK_MEMBER(vdp1_draw_end);
-	emu_timer_cb m_vdp1_draw_end;
+	transient_timer_factory m_vdp1_draw_end;
 	void saturn_soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t saturn_soundram_r(offs_t offset);
 	void minit_w(uint32_t data);

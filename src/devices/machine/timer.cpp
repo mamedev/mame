@@ -158,7 +158,7 @@ void timer_device::device_reset()
 //  device_timer - handle timer expiration events
 //-------------------------------------------------
 
-void timer_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void timer_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (m_type)
 	{

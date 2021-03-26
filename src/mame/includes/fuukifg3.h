@@ -109,7 +109,7 @@ private:
 	void fuuki32_sound_io_map(address_map &map);
 	void fuuki32_sound_map(address_map &map);
 
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 #endif // MAME_INCLUDES_FUUKIFG3_H

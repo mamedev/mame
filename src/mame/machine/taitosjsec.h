@@ -55,11 +55,11 @@ private:
 	{ return (BIT(~m_pb_val, 1) ? m_host_data : 0xffU) & m_pa_val & ((m_busak && BIT(~m_pb_val, 5)) ? m_read_data : 0xffU); }
 
 	TIMER_CALLBACK_MEMBER(do_mcu_read);
-	emu_timer_cb m_do_mcu_read;
+	transient_timer_factory m_do_mcu_read;
 	TIMER_CALLBACK_MEMBER(do_mcu_write);
-	emu_timer_cb m_do_mcu_write;
+	transient_timer_factory m_do_mcu_write;
 	TIMER_CALLBACK_MEMBER(do_host_write);
-	emu_timer_cb m_do_host_write;
+	transient_timer_factory m_do_host_write;
 
 	required_device<m68705p_device> m_mcu;
 

@@ -341,7 +341,7 @@ enum
 	TIMER_LD_CLEAR
 };
 
-void ymf278b_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void ymf278b_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
 	{

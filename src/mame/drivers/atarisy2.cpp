@@ -222,7 +222,7 @@ void atarisy2_state::machine_start()
 	m_p2portwr_state = false;
 	m_p2portrd_state = false;
 
-	m_delayed_int_enable_w.enregister(*this, FUNC(atarisy2_state::delayed_int_enable_w));
+	m_delayed_int_enable_w.init(*this, FUNC(atarisy2_state::delayed_int_enable_w));
 
 	save_item(NAME(m_interrupt_enable));
 	save_item(NAME(m_scanline_int_state));

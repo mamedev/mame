@@ -95,7 +95,7 @@ public:
 protected:
 	virtual void machine_start() override
 	{
-		m_clear_load.enregister(*this, FUNC(ti990_10_state::clear_load));
+		m_clear_load.init(*this, FUNC(ti990_10_state::clear_load));
 	}
 	virtual void machine_reset() override;
 
@@ -109,7 +109,7 @@ private:
 	void ti990_panel_write(uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(clear_load);
-	emu_timer_cb m_clear_load;
+	transient_timer_factory m_clear_load;
 
 	void ti990_hold_load();
 	void ti990_set_int_line(int line, int state);

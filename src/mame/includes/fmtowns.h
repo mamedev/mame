@@ -280,7 +280,7 @@ private:
 	optional_shared_ptr<uint16_t> m_nvram16;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 	uint8_t towns_system_r(offs_t offset);
 	void towns_system_w(offs_t offset, uint8_t data);
@@ -414,7 +414,7 @@ private:
 	TIMER_CALLBACK_MEMBER(towns_cdrom_read_byte);
 	TIMER_CALLBACK_MEMBER(towns_sprite_done);
 	TIMER_CALLBACK_MEMBER(towns_vblank_end);
-	emu_timer_cb m_towns_vblank_end;
+	transient_timer_factory m_towns_vblank_end;
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out1_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit2_out1_changed);

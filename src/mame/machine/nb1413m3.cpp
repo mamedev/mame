@@ -103,7 +103,7 @@ void nb1413m3_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-void nb1413m3_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void nb1413m3_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

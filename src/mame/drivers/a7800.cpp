@@ -139,7 +139,7 @@ protected:
 	void a7800_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(maria_startdma);
-	emu_timer_cb m_maria_startdma;
+	transient_timer_factory m_maria_startdma;
 	uint8_t riot_joystick_r();
 	uint8_t riot_console_button_r();
 	void riot_button_pullup_w(uint8_t data);

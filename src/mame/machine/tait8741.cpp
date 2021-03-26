@@ -253,7 +253,7 @@ void taito8741_4pack_device::device_start()
 	m_port_handler_2_r.resolve_safe(0);
 	m_port_handler_3_r.resolve_safe(0);
 
-	m_serial_tx.enregister(*this, FUNC(taito8741_4pack_device::serial_tx));
+	m_serial_tx.init(*this, FUNC(taito8741_4pack_device::serial_tx));
 
 	for (int i = 0; i < 4; i++)
 	{

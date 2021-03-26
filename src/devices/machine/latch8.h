@@ -90,7 +90,7 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 
 	TIMER_CALLBACK_MEMBER( timerproc );
-	emu_timer_cb m_timerproc;
+	transient_timer_factory m_timerproc;
 	void update(uint8_t new_val, uint8_t mask);
 	inline void bitx_w(int bit, offs_t offset, uint8_t data);
 

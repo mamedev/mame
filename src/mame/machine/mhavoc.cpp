@@ -67,7 +67,7 @@ void mhavoc_state::machine_start()
 {
 	m_lamps.resolve();
 
-	m_delayed_gamma_w.enregister(*this, FUNC(mhavoc_state::delayed_gamma_w));
+	m_delayed_gamma_w.init(*this, FUNC(mhavoc_state::delayed_gamma_w));
 
 	save_item(NAME(m_alpha_data));
 	save_item(NAME(m_alpha_rcvd));

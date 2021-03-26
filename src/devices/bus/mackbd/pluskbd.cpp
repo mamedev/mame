@@ -144,7 +144,7 @@ protected:
 		m_host_data_out = 1U;
 		m_host_data_in = 0x01U;
 
-		m_update_host_data.enregister(*this, FUNC(keyboard_base::update_host_data));
+		m_update_host_data.init(*this, FUNC(keyboard_base::update_host_data));
 
 		save_item(NAME(m_row_drive));
 		save_item(NAME(m_host_clock_out));
@@ -209,7 +209,7 @@ private:
 			m_host_data_in = param ? 0x01U : 0x00U;
 		}
 	}
-	emu_timer_cb m_update_host_data;
+	transient_timer_factory m_update_host_data;
 
 	required_device<mcs48_cpu_device> m_mpu;
 	required_ioport_array<10> m_rows;

@@ -313,7 +313,7 @@ void gime_device::device_reset(void)
 //  device_timer - handle timer callbacks
 //-------------------------------------------------
 
-void gime_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void gime_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
 	{

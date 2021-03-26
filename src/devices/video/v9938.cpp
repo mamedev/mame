@@ -172,7 +172,7 @@ void v99x8_device::device_config_complete()
 }
 
 
-void v99x8_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void v99x8_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	int scanline = (m_scanline - (m_scanline_start + m_offset_y));
 

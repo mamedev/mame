@@ -86,7 +86,7 @@ public:
 	uint32_t screen_update_cubeqst(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	TIMER_CALLBACK_MEMBER(delayed_bank_swap);
-	emu_timer_cb m_delayed_bank_swap;
+	transient_timer_factory m_delayed_bank_swap;
 	void swap_linecpu_banks();
 	void cubeqst(machine_config &config);
 	void line_sound_map(address_map &map);
@@ -465,7 +465,7 @@ void cubeqst_state::machine_start()
 	/* TODO: Use resistor values */
 	int i;
 
-	m_delayed_bank_swap.enregister(*this, FUNC(cubeqst_state::delayed_bank_swap));
+	m_delayed_bank_swap.init(*this, FUNC(cubeqst_state::delayed_bank_swap));
 
 	m_colormap = std::make_unique<rgb_t[]>(65536);
 	for (i = 0; i < 65536; ++i)

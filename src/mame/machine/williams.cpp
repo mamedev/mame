@@ -50,7 +50,7 @@ void williams_state::machine_start()
 	m_mainbank->configure_entry(1, memregion("maincpu")->base() + 0x10000);
 	m_mainbank->configure_entry(0, m_videoram);
 
-	m_deferred_snd_cmd_w.enregister(*this, FUNC(williams_state::deferred_snd_cmd_w));
+	m_deferred_snd_cmd_w.init(*this, FUNC(williams_state::deferred_snd_cmd_w));
 }
 
 

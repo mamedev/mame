@@ -409,7 +409,7 @@ GFXDECODE_END
 
 void msisaac_state::machine_start()
 {
-	m_nmi_callback.enregister(*this, FUNC(msisaac_state::nmi_callback));
+	m_nmi_callback.init(*this, FUNC(msisaac_state::nmi_callback));
 
 	/* video */
 	save_item(NAME(m_bg2_textbank));

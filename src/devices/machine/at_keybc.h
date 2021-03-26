@@ -63,13 +63,13 @@ protected:
 private:
 	// internal sync helpers
 	TIMER_CALLBACK_MEMBER(write_data);
-	emu_timer_cb m_write_data;
+	transient_timer_factory m_write_data;
 	TIMER_CALLBACK_MEMBER(write_command);
-	emu_timer_cb m_write_command;
+	transient_timer_factory m_write_command;
 	TIMER_CALLBACK_MEMBER(set_kbd_clk_in);
-	emu_timer_cb m_set_kbd_clk_in;
+	transient_timer_factory m_set_kbd_clk_in;
 	TIMER_CALLBACK_MEMBER(set_kbd_data_in);
-	emu_timer_cb m_set_kbd_data_in;
+	transient_timer_factory m_set_kbd_data_in;
 
 	devcb_write_line m_hot_res_cb, m_gate_a20_cb, m_kbd_irq_cb;
 	devcb_write_line m_kbd_clk_cb, m_kbd_data_cb;
@@ -145,9 +145,9 @@ private:
 
 	// internal sync helpers
 	TIMER_CALLBACK_MEMBER(set_aux_clk_in);
-	emu_timer_cb m_set_aux_clk_in;
+	transient_timer_factory m_set_aux_clk_in;
 	TIMER_CALLBACK_MEMBER(set_aux_data_in);
-	emu_timer_cb m_set_aux_data_in;
+	transient_timer_factory m_set_aux_data_in;
 
 	// MCU I/O handlers
 	uint8_t p1_r();

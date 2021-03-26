@@ -12,7 +12,7 @@
 #define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
-void vic_pl192_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void vic_pl192_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	if(u32 intrs = (raw_intr | soft_intr) & intr_en)
 	{

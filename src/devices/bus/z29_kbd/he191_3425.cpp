@@ -42,7 +42,7 @@ void he191_3425_device::device_start()
 {
 	m_leds[0] = 1; // L1: Power
 
-	m_receive_data_synced.enregister(*this, FUNC(he191_3425_device::receive_data_synced));
+	m_receive_data_synced.init(*this, FUNC(he191_3425_device::receive_data_synced));
 
 	save_item(NAME(m_select));
 	save_item(NAME(m_recv_data));

@@ -311,10 +311,10 @@ void at_kbc_device_base::device_start()
 	save_item(NAME(m_kbd_data_in));
 	save_item(NAME(m_kbd_data_out));
 
-	m_write_data.enregister(*this, FUNC(at_kbc_device_base::write_data));
-	m_write_command.enregister(*this, FUNC(at_kbc_device_base::write_command));
-	m_set_kbd_clk_in.enregister(*this, FUNC(at_kbc_device_base::set_kbd_clk_in));
-	m_set_kbd_data_in.enregister(*this, FUNC(at_kbc_device_base::set_kbd_data_in));
+	m_write_data.init(*this, FUNC(at_kbc_device_base::write_data));
+	m_write_command.init(*this, FUNC(at_kbc_device_base::write_command));
+	m_set_kbd_clk_in.init(*this, FUNC(at_kbc_device_base::set_kbd_clk_in));
+	m_set_kbd_data_in.init(*this, FUNC(at_kbc_device_base::set_kbd_data_in));
 
 	m_hot_res = m_gate_a20 = m_kbd_irq = 0U;
 	m_kbd_clk_in = m_kbd_clk_out = 1U;
@@ -496,8 +496,8 @@ void ps2_keyboard_controller_device::device_start()
 {
 	at_kbc_device_base::device_start();
 
-	m_set_aux_clk_in.enregister(*this, FUNC(ps2_keyboard_controller_device::set_aux_clk_in));
-	m_set_aux_data_in.enregister(*this, FUNC(ps2_keyboard_controller_device::set_aux_data_in));
+	m_set_aux_clk_in.init(*this, FUNC(ps2_keyboard_controller_device::set_aux_clk_in));
+	m_set_aux_data_in.init(*this, FUNC(ps2_keyboard_controller_device::set_aux_data_in));
 
 	save_item(NAME(m_aux_irq));
 	save_item(NAME(m_aux_clk_in));

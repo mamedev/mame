@@ -54,7 +54,7 @@ harddriv_sound_board_device::harddriv_sound_board_device(const machine_config &m
 
 void harddriv_sound_board_device::device_start()
 {
-	m_delayed_68k_w.enregister(*this, FUNC(harddriv_sound_board_device::delayed_68k_w));
+	m_delayed_68k_w.init(*this, FUNC(harddriv_sound_board_device::delayed_68k_w));
 }
 
 //-------------------------------------------------

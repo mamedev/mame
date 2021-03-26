@@ -203,7 +203,7 @@ void i82586_base_device::device_reset()
 	m_scp_address = SCP_ADDRESS;
 }
 
-void i82586_base_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void i82586_base_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

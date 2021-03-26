@@ -179,7 +179,7 @@ void interpro_ioga_device::device_start()
 	m_fdc_tc_func.resolve();
 	m_eth_ca_func.resolve();
 
-	m_set_irq_vector.enregister(*this, FUNC(interpro_ioga_device::set_irq_vector));
+	m_set_irq_vector.init(*this, FUNC(interpro_ioga_device::set_irq_vector));
 
 	m_hwicr = std::make_unique<u16[]>(get_int_count());
 

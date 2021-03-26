@@ -45,9 +45,9 @@ protected:
 private:
 	// synchronization helpers
 	TIMER_CALLBACK_MEMBER(host_sync_w);
-	emu_timer_cb m_host_sync_w;
+	transient_timer_factory m_host_sync_w;
 	TIMER_CALLBACK_MEMBER(local_sync_w);
-	emu_timer_cb m_local_sync_w;
+	transient_timer_factory m_local_sync_w;
 
 	// callback objects
 	devcb_write_line m_hrst_callback;

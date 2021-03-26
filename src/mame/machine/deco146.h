@@ -118,7 +118,7 @@ protected:
 
 private:
 	TIMER_CALLBACK_MEMBER(write_soundlatch);
-	emu_timer_cb m_write_soundlatch;
+	transient_timer_factory m_write_soundlatch;
 
 	u8 region_selects[6];
 

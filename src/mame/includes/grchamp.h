@@ -63,9 +63,9 @@ private:
 	void center_w(offs_t offset, uint8_t data);
 	void right_w(offs_t offset, uint8_t data);
 	TIMER_CALLBACK_MEMBER(soundlatch_w_cb);
-	emu_timer_cb m_soundlatch_w_cb;
+	transient_timer_factory m_soundlatch_w_cb;
 	TIMER_CALLBACK_MEMBER(soundlatch_clear7_w_cb);
-	emu_timer_cb m_soundlatch_clear7_w_cb;
+	transient_timer_factory m_soundlatch_clear7_w_cb;
 	uint8_t soundlatch_r();
 	void soundlatch_clear7_w(uint8_t data);
 	uint8_t soundlatch_flags_r();
@@ -84,7 +84,7 @@ private:
 	INTERRUPT_GEN_MEMBER(cpu0_interrupt);
 	INTERRUPT_GEN_MEMBER(cpu1_interrupt);
 	TIMER_CALLBACK_MEMBER(main_to_sub_comm_sync_w);
-	emu_timer_cb m_main_to_sub_comm_sync_w;
+	transient_timer_factory m_main_to_sub_comm_sync_w;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_objects(int y, uint8_t *objdata);

@@ -22,8 +22,8 @@
 
 void mcr68_state::machine_start()
 {   /* for the most part all MCR/68k games are the same */
-	m_493_callback.enregister(*this, FUNC(mcr68_state::mcr68_493_callback));
-	m_493_off_callback.enregister(*this, FUNC(mcr68_state::mcr68_493_off_callback));
+	m_493_callback.init(*this, FUNC(mcr68_state::mcr68_493_callback));
+	m_493_off_callback.init(*this, FUNC(mcr68_state::mcr68_493_off_callback));
 }
 
 

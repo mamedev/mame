@@ -158,7 +158,7 @@ private:
 	void secolove_map(address_map &map);
 	void seiha_io_map(address_map &map);
 
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 #endif // MAME_INCLUDES_NBMJ8688_H

@@ -369,7 +369,7 @@ scc2698b_device::scc2698b_device(const machine_config &mconfig, const char *tag,
 
 
 
-void scc2698b_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void scc2698b_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 
 }

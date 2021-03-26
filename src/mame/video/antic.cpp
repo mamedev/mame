@@ -1936,7 +1936,7 @@ void antic_device::linerefresh()
 #define ANTIC_TIME_FROM_CYCLES(cycles)  \
 (attotime)(screen().scan_period() * (cycles) / CYCLES_PER_LINE)
 
-void antic_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void antic_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

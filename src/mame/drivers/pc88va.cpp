@@ -368,7 +368,7 @@ uint32_t pc88va_state::screen_update_pc88va(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-void pc88va_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void pc88va_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

@@ -1559,7 +1559,7 @@ void sb_device::dack_w(int line, uint8_t data)
 	}
 }
 
-void sb_device::device_timer(emu_timer const &timer, device_timer_id tid, int param, void *ptr)
+void sb_device::device_timer(timer_instance const &timer, device_timer_id tid, int param, void *ptr)
 {
 	if (tid)
 		return;

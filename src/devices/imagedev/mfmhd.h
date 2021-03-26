@@ -106,7 +106,7 @@ protected:
 	void                device_start() override;
 	void                device_stop() override;
 	void                device_reset() override;
-	void                device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	void                device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 	std::string         tts(const attotime &t);
 

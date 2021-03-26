@@ -133,7 +133,7 @@ void latch8_device::device_validity_check(validity_checker &valid) const
 
 void latch8_device::device_start()
 {
-	m_timerproc.enregister(*this, FUNC(latch8_device::timerproc));
+	m_timerproc.init(*this, FUNC(latch8_device::timerproc));
 
 	/* setup nodemap */
 	for (auto &cb : m_write_cb)

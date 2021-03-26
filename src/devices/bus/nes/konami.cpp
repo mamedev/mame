@@ -355,7 +355,7 @@ void nes_konami_vrc2_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_konami_vrc3_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void nes_konami_vrc3_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -443,7 +443,7 @@ void nes_konami_vrc4_device::irq_tick()
 		m_irq_count++;
 }
 
-void nes_konami_vrc4_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void nes_konami_vrc4_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == TIMER_IRQ)
 	{

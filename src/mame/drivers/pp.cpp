@@ -59,7 +59,7 @@ private:
 
 	template<int Line> DECLARE_WRITE_LINE_MEMBER(int_w);
 	TIMER_CALLBACK_MEMBER(int_update);
-	emu_timer_cb m_int_update;
+	transient_timer_factory m_int_update;
 	IRQ_CALLBACK_MEMBER(intak_cb);
 
 	void kbd_scan_w(u8 data);
@@ -111,7 +111,7 @@ void pp_state::machine_start()
 
 	m_fdc->dden_w(0);
 
-	m_int_update.enregister(*this, FUNC(pp_state::int_update));
+	m_int_update.init(*this, FUNC(pp_state::int_update));
 
 	// 64K of dynamic RAM (8x 4864)
 	m_ram = make_unique_clear<u8[]>(0x10000);

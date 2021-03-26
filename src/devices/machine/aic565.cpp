@@ -76,8 +76,8 @@ void aic565_device::device_start()
 	save_item(NAME(m_aux_status));
 	save_item(NAME(m_interrupt_flags));
 
-	m_host_sync_w.enregister(*this, FUNC(aic565_device::host_sync_w));
-	m_local_sync_w.enregister(*this, FUNC(aic565_device::local_sync_w));
+	m_host_sync_w.init(*this, FUNC(aic565_device::host_sync_w));
+	m_local_sync_w.init(*this, FUNC(aic565_device::local_sync_w));
 }
 
 

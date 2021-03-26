@@ -310,7 +310,7 @@ void vic3_device::device_start()
 		save_item(NAME(m_sprites[i].bitmap[7]), i);
 	}
 
-	m_timer_timeout.enregister(*this, FUNC(vic3_device::timer_timeout));
+	m_timer_timeout.init(*this, FUNC(vic3_device::timer_timeout));
 }
 
 //-------------------------------------------------

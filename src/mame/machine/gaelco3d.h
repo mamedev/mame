@@ -95,7 +95,7 @@ private:
 	std::mutex m_mutex;
 
 	TIMER_CALLBACK_MEMBER( set_status_cb );
-	emu_timer_cb m_set_status_cb;
+	transient_timer_factory m_set_status_cb;
 	TIMER_CALLBACK_MEMBER( link_cb );
 	void set_status(uint8_t mask, uint8_t set, int wait);
 	void process_in();

@@ -264,7 +264,7 @@ void nes_sunsoft_2_device::write_h(offs_t offset, uint8_t data)
  -------------------------------------------------*/
 
 
-void nes_sunsoft_3_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void nes_sunsoft_3_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -457,7 +457,7 @@ uint8_t nes_sunsoft_4_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_sunsoft_fme7_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void nes_sunsoft_fme7_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == TIMER_IRQ)
 	{

@@ -41,7 +41,7 @@ public:
 	void control_w(uint16_t data);
 
 	TIMER_CALLBACK_MEMBER( cage_deferred_w );
-	emu_timer_cb m_cage_deferred_w;
+	transient_timer_factory m_cage_deferred_w;
 
 	void cage_map(address_map &map);
 protected:

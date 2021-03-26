@@ -213,13 +213,13 @@ private:
 
 	INTERRUPT_GEN_MEMBER(fake_nmi);
 	TIMER_CALLBACK_MEMBER(synch_callback);
-	emu_timer_cb m_synch_callback;
+	transient_timer_factory m_synch_callback;
 	TIMER_CALLBACK_MEMBER(scanline_interrupt);
 	TIMER_CALLBACK_MEMBER(kengo_scanline_interrupt);
 	TIMER_CALLBACK_MEMBER(delayed_ram16_w);
-	emu_timer_cb m_delayed_ram16_w;
+	transient_timer_factory m_delayed_ram16_w;
 	TIMER_CALLBACK_MEMBER(delayed_ram8_w);
-	emu_timer_cb m_delayed_ram8_w;
+	transient_timer_factory m_delayed_ram8_w;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_m81(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

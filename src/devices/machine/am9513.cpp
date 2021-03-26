@@ -83,7 +83,7 @@ void am9513_device::device_start()
 	m_out_cb.resolve_all_safe();
 	m_fout_cb.resolve();
 
-	m_clear_outputs.enregister(*this, FUNC(am9513_device::clear_outputs));
+	m_clear_outputs.init(*this, FUNC(am9513_device::clear_outputs));
 
 	// Power-on reset
 	m_dpr = 0x1f;
@@ -234,7 +234,7 @@ void am9513_device::device_clock_changed()
 //  fires
 //-------------------------------------------------
 
-void am9513_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void am9513_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	assert(id >= TIMER_F1 && id <= TIMER_F5);
 

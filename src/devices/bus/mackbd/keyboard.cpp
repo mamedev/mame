@@ -287,7 +287,7 @@ protected:
 		m_host_data_in = 0x01U;
 		m_watchdog_in = 1U;
 
-		m_update_host_data.enregister(*this, FUNC(peripheral_base::update_host_data));
+		m_update_host_data.init(*this, FUNC(peripheral_base::update_host_data));
 
 		save_item(NAME(m_row_drive));
 		save_item(NAME(m_host_clock_out));
@@ -353,7 +353,7 @@ private:
 			m_host_data_in = param ? 0x01U : 0x00U;
 		}
 	}
-	emu_timer_cb m_update_host_data;
+	transient_timer_factory m_update_host_data;
 
 	TIMER_CALLBACK_MEMBER(watchdog_timeout)
 	{
@@ -446,8 +446,8 @@ protected:
 	{
 		peripheral_base<3>::device_start();
 
-		m_update_keyboard_clock.enregister(*this, FUNC(keypad_base::update_keyboard_clock));
-		m_update_keyboard_data.enregister(*this, FUNC(keypad_base::update_keyboard_data));
+		m_update_keyboard_clock.init(*this, FUNC(keypad_base::update_keyboard_clock));
+		m_update_keyboard_data.init(*this, FUNC(keypad_base::update_keyboard_data));
 
 		m_keyboard_data_out = 0x01U;
 		m_keyboard_clock_in = 0x01U;
@@ -484,13 +484,13 @@ private:
 	{
 		m_keyboard_clock_in = param ? 0x01U : 0x00U;
 	}
-	emu_timer_cb m_update_keyboard_clock;
+	transient_timer_factory m_update_keyboard_clock;
 
 	TIMER_CALLBACK_MEMBER(update_keyboard_data)
 	{
 		m_keyboard_data_in = param ? 0x01U : 0x00U;
 	}
-	emu_timer_cb m_update_keyboard_data;
+	transient_timer_factory m_update_keyboard_data;
 
 	u8  m_keyboard_data_out = 0x01U;        // data line drive to keyboard (idle high)
 	u8  m_keyboard_clock_in = 0x01U;        // clock line driver from keyboard (idle high)

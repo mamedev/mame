@@ -706,7 +706,7 @@ void nes_sc127_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_mbaby_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void nes_mbaby_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -794,7 +794,7 @@ uint8_t nes_asn_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_smb3p_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void nes_smb3p_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -957,7 +957,7 @@ uint8_t nes_whirl2706_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_smb2j_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void nes_smb2j_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -1039,7 +1039,7 @@ uint8_t nes_smb2j_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_smb2ja_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void nes_smb2ja_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -1096,7 +1096,7 @@ uint8_t nes_smb2ja_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-void nes_smb2jb_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void nes_smb2jb_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -1338,7 +1338,7 @@ void nes_lh10_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-void nes_lh53_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void nes_lh53_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == TIMER_IRQ)
 	{
@@ -1582,7 +1582,7 @@ void nes_mmalee_device::write_m(offs_t offset, uint8_t data)
  -------------------------------------------------*/
 
 // timer always running and checking IRQ every 114 CPU cycles?
-void nes_shuiguan_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void nes_shuiguan_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == TIMER_IRQ)
 	{

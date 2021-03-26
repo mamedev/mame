@@ -58,7 +58,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( vsync_r );
 
 	TIMER_CALLBACK_MEMBER( sound_cmd_sync );
-	emu_timer_cb m_sound_cmd_sync;
+	transient_timer_factory m_sound_cmd_sync;
 	uint8_t sound_cmd_r();
 	void sound_g_w(uint8_t data);
 	void sound_d_w(uint8_t data);

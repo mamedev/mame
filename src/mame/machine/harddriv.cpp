@@ -38,9 +38,9 @@ void harddriv_state::device_start()
 {
 	m_lamps.resolve();
 
-	m_xsdp_sport1_irq_off_callback.enregister(*this, FUNC(harddriv_state::xsdp_sport1_irq_off_callback));
-	m_deferred_adsp_bank_switch.enregister(*this, FUNC(harddriv_state::deferred_adsp_bank_switch));
-	m_rddsp32_sync_cb.enregister(*this, FUNC(harddriv_state::rddsp32_sync_cb));
+	m_xsdp_sport1_irq_off_callback.init(*this, FUNC(harddriv_state::xsdp_sport1_irq_off_callback));
+	m_deferred_adsp_bank_switch.init(*this, FUNC(harddriv_state::deferred_adsp_bank_switch));
+	m_rddsp32_sync_cb.init(*this, FUNC(harddriv_state::rddsp32_sync_cb));
 
 	/* predetermine memory regions */
 	m_adsp_pgm_memory_word = (uint16_t *)(reinterpret_cast<uint8_t *>(m_adsp_pgm_memory.target()) + 1);

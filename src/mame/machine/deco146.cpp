@@ -1340,7 +1340,7 @@ void deco_146_base_device::device_start()
 	m_port_c_r.resolve_safe(0xffff);
 	m_soundlatch_irq_cb.resolve_safe();
 
-	m_write_soundlatch.enregister(*this, FUNC(deco_146_base_device::write_soundlatch));
+	m_write_soundlatch.init(*this, FUNC(deco_146_base_device::write_soundlatch));
 
 	save_item(NAME(m_xor));
 	save_item(NAME(m_nand));

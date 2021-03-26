@@ -100,7 +100,7 @@ private:
 	void nmi_disable_w(uint8_t data);
 	void nmi_enable_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
-	emu_timer_cb m_nmi_callback;
+	transient_timer_factory m_nmi_callback;
 
 	uint8_t mcu_status_r();
 
@@ -614,7 +614,7 @@ void wyvernf0_state::machine_start()
 	save_pointer(NAME(m_objram), 0x1000 * 2);
 	membank("rambank")->configure_entries(0, 2, m_objram.get(), 0x1000);
 
-	m_nmi_callback.enregister(*this, FUNC(wyvernf0_state::nmi_callback));
+	m_nmi_callback.init(*this, FUNC(wyvernf0_state::nmi_callback));
 
 	save_item(NAME(m_sound_nmi_enable));
 	save_item(NAME(m_pending_nmi));

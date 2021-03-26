@@ -53,7 +53,7 @@ protected:
 	u32 const m_initval, m_xorval;
 	int const m_active;
 	u32 m_state;
-	emu_timer_cb m_update_state;
+	transient_timer_factory m_update_state;
 };
 
 

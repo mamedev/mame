@@ -605,15 +605,24 @@ public:
 	u64 attotime_to_clocks(const attotime &duration) const noexcept;
 
 	// timer interfaces
-	emu_timer *timer_alloc(device_timer_id id = 0, void *ptr = nullptr);
 	template<typename DeviceType, typename FuncType>
 	emu_timer *timer_alloc(DeviceType &device, FuncType callback, char const *name, void *ptr = nullptr)
 	{
 		return m_scheduler->timer_alloc(timer_expired_delegate(callback, name, &device), ptr);
 	}
-	void timer_set(const attotime &duration, device_timer_id id = 0, int param = 0);
-	void synchronize(device_timer_id id, int param = 0) { timer_set(attotime::zero, id, param); }
-	emu_timer_cb const &device_timer_cb() const { return m_device_timer_cb; }
+	emu_timer *timer_alloc(device_timer_id id = 0, void *ptr = nullptr)
+	{
+		return m_scheduler->timer_alloc(*this, id, ptr);
+	}
+	void timer_set(const attotime &duration, device_timer_id id = 0, int param = 0)
+	{
+		m_device_timer.call_after(id, duration, param);
+	}
+	void synchronize(device_timer_id id, int param = 0)
+	{
+		timer_set(attotime::zero, id, param);
+	}
+	transient_timer_factory &device_timer_factory() { return m_device_timer; }
 
 	// state saving interfaces
 	template<typename ItemType>
@@ -800,7 +809,7 @@ protected:
 
 	virtual void device_clock_changed();
 	virtual void device_debug_setup();
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr);
 
 	//------------------- end derived class overrides
 
@@ -845,7 +854,7 @@ private:
 	mutable std::vector<rom_entry>  m_rom_entries;
 	std::list<devcb_base *> m_callbacks;
 	std::vector<memory_view *> m_viewlist;          // list of views
-	emu_timer_cb            m_device_timer_cb;      // a device timer callback
+	transient_timer_factory m_device_timer;
 
 	// string formatting buffer for logerror
 	mutable util::ovectorstream m_string_buffer;

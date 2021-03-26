@@ -99,7 +99,7 @@ struct genesis_z80_vars
 	uint8_t megadriv_z80_vdp_read(offs_t offset);
 	uint8_t megadriv_z80_unmapped_read();
 	TIMER_CALLBACK_MEMBER(megadriv_z80_run_state);
-	emu_timer_cb m_megadriv_z80_run_state;
+	transient_timer_factory m_megadriv_z80_run_state;
 
 	/* Megadrive / Genesis has 3 I/O ports */
 	emu_timer *m_io_timeout[3];

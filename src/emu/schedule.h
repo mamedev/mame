@@ -33,9 +33,9 @@
 using device_timer_id = u32;
 
 // timer callbacks look like this
-using timer_expired_delegate_native = named_delegate<void (emu_timer const &timer)>;
+using timer_expired_delegate_native = named_delegate<void (timer_instance const &)>;
 using timer_expired_delegate_form1 = named_delegate<void ()>;
-using timer_expired_delegate_form2 = named_delegate<void (emu_timer const &, device_timer_id, int, void *)>;
+using timer_expired_delegate_form2 = named_delegate<void (timer_instance const &, device_timer_id, int, void *)>;
 template<typename IntType> using timer_expired_delegate_form3 = named_delegate<void (IntType)>;
 template<typename IntType> using timer_expired_delegate_form4 = named_delegate<void (void *, IntType)>;
 template<typename IntType, typename IntType2> using timer_expired_delegate_form5 = named_delegate<void (IntType, IntType2)>;
@@ -101,9 +101,9 @@ public:
 		reinterpret_cast<timer_expired_delegate_form1 &>(m_sub_delegate) = timer_expired_delegate_form1(cb, name, bindto);
 	}
 
-	// form 2 constructor: void timer_callback(emu_timer const &timer, device_timer_id id, int param, void *ptr) -- device_timer style
+	// form 2 constructor: void timer_callback(timer_instance const &timer, device_timer_id id, int param, void *ptr) -- device_timer style
 	template<typename FuncDeviceType, typename DeviceType>
-	timer_expired_delegate(void (FuncDeviceType::*cb)(emu_timer const &, device_timer_id, int, void *), char const *name, DeviceType *bindto) :
+	timer_expired_delegate(void (FuncDeviceType::*cb)(timer_instance const &, device_timer_id, int, void *), char const *name, DeviceType *bindto) :
 		timer_expired_delegate_native(FUNC(timer_expired_delegate::form2_callback), this)
 	{
 		static_assert(sizeof(timer_expired_delegate_form2) == sizeof(generic_delegate));
@@ -157,104 +157,117 @@ private:
 	}
 
 	// callbacks for various forms
-	void form1_callback(emu_timer const &timer);
-	void form2_callback(emu_timer const &timer);
-	template<typename IntType> void form3_callback(emu_timer const &timer);
-	template<typename IntType> void form4_callback(emu_timer const &timer);
-	template<typename IntType, typename IntType2> void form5_callback(emu_timer const &timer);
-	template<typename IntType, typename IntType2, typename IntType3> void form6_callback(emu_timer const &timer);
+	void form1_callback(timer_instance const &timer);
+	void form2_callback(timer_instance const &timer);
+	template<typename IntType> void form3_callback(timer_instance const &timer);
+	template<typename IntType> void form4_callback(timer_instance const &timer);
+	template<typename IntType, typename IntType2> void form5_callback(timer_instance const &timer);
+	template<typename IntType, typename IntType2, typename IntType3> void form6_callback(timer_instance const &timer);
 
 	// secondary delegate, which may be of a number of forms
 	generic_delegate m_sub_delegate;
 };
 
 
-// ======================> emu_timer_cb
+// ======================> timer_callback
 
-class emu_timer_cb
+class timer_callback
 {
 	friend class device_scheduler;
-	friend class emu_timer;
+	friend class timer_instance;
+	friend class transient_timer_factory;
 
 public:
 	// construction/destruction
-	emu_timer_cb();
+	timer_callback();
+	~timer_callback();
+
+	// copy constructor
+	timer_callback(timer_callback const &src);
+
+	// copy assignment
+	timer_callback &operator=(timer_callback const &src);
 
 	// registration
-	void enregister(device_scheduler &scheduler, char const *unique, timer_expired_delegate const &callback);
-	void enregister(device_t &device, char const *unique, timer_expired_delegate const &callback);
-	void interface_enregister(device_interface &device, char const *unique, timer_expired_delegate const &callback);
+	timer_callback &enregister(device_scheduler &scheduler, char const *unique, timer_expired_delegate const &callback);
+	timer_callback &enregister(device_t &device, char const *unique, timer_expired_delegate const &callback);
+	timer_callback &interface_enregister(device_interface &device, char const *unique, timer_expired_delegate const &callback);
 
 	// direct registration for device's and device interfaces
 	template<typename DeviceType, typename FuncType>
-	void enregister(DeviceType &device, FuncType callback, char const *string, char const *unique = nullptr)
+	timer_callback &enregister(DeviceType &device, FuncType callback, char const *string, char const *unique = nullptr)
 	{
-		enregister(device, unique, timer_expired_delegate(callback, string, &device));
+		return enregister(device, unique, timer_expired_delegate(callback, string, &device));
 	}
 	template<typename IntfType, typename FuncType>
-	void interface_enregister(IntfType &intf, FuncType callback, char const *string, char const *unique = nullptr)
+	timer_callback &interface_enregister(IntfType &intf, FuncType callback, char const *string, char const *unique = nullptr)
 	{
-		interface_enregister(intf, unique, timer_expired_delegate(callback, string, &intf));
+		return interface_enregister(intf, unique, timer_expired_delegate(callback, string, &intf));
 	}
 
-	// call the delegate after a set amount of time, with the given parameter
-	void call_after(attotime const &duration, s32 param = 0, u64 param2 = 0, u64 param3 = 0) const;
+	// getters
+	device_scheduler &scheduler() const { assert(m_scheduler != nullptr); return *m_scheduler; }
+	char const *name() const { return m_callback.name(); }
+	void *ptr() const { return m_ptr; }
+	device_t *device() const { return m_device; }
 
-	// synchronize; essentially, call immediately
-	void synchronize(u64 param = 0, u64 param2 = 0, u64 param3 = 0) const
-	{
-		call_after(attotime::zero, param, param2, param3);
-	}
+	// setters
+	timer_callback &set_ptr(void *ptr) { m_ptr = ptr; return *this; }
+	timer_callback &set_device(device_t &device) { m_device = &device; return *this; }
 
 private:
 	// internal state
 	timer_expired_delegate m_callback;    // the full delegate
+	void *m_ptr;                          // user-supplied pointer
+	device_t *m_device;                   // pointer to device, if there is one
 	device_scheduler *m_scheduler;        // pointer to the scheduler
-	emu_timer_cb *m_next;                 // link to the next registered item
+	timer_callback *m_next;                 // link to the next registered item
+	u32 m_unique_hash;                    // hash of the unique ID
 	std::string m_unique_id;              // a unique ID string
 };
 
 
-// ======================> emu_timer
+// ======================> timer_instance
 
-class emu_timer
+class timer_instance
 {
 	friend class device_scheduler;
+	friend class persistent_timer;
+	friend class transient_timer_factory;
 	friend class timer_list;
 
-	// construction/destruction
-	emu_timer();
-	~emu_timer();
-
 	// allocation and re-use
-	emu_timer &init_persistent(running_machine &machine, timer_expired_delegate const &callback, void *ptr);
-	emu_timer &init_persistent(device_t &device, device_timer_id id, void *ptr);
-	emu_timer &init_temporary(running_machine &machine, emu_timer_cb const &callback, attotime const &duration, u64 param, u64 param2, u64 param3);
-	emu_timer &init_temporary(device_t &device, device_timer_id id, attotime const &duration, u64 param, u64 param2, u64 param3);
+	timer_instance &init_transient(timer_callback &callback, attotime const &duration);
+	timer_instance &init_persistent(timer_callback &callback);
 
 public:
+	// construction/destruction
+	timer_instance();
+	~timer_instance();
+
 	// getters
-	emu_timer *prev() const { return m_prev; }
-	emu_timer *next() const { return m_next; }
-	running_machine &machine() const noexcept { assert(m_machine != nullptr); return *m_machine; }
+	running_machine &machine() const noexcept;
+	device_scheduler &scheduler() const noexcept;
+	timer_instance *prev() const { return m_prev; }
+	timer_instance *next() const { return m_next; }
 	bool enabled() const { return m_enabled; }
 	bool active() const { return m_enabled && !m_expire.is_never(); }
 	u64 param() const { return m_param; }
 	u64 param2() const { return m_param2; }
 	u64 param3() const { return m_param3; }
-	void *ptr() const { return m_ptr; }
-	u32 id() const { return m_id; }
+	device_timer_id id() const { return m_id; }
+	void *ptr() const { return m_callback->ptr(); }
 
 	// setters
 	bool enable(bool enable = true);
-	void set_param(u64 param) { m_param = param; }
-	void set_param2(u64 param2) { m_param2 = param2; }
-	void set_param3(u64 param3) { m_param3 = param3; }
-	void set_ptr(void *ptr) { m_ptr = ptr; }
+	timer_instance &set_param(u64 param) { m_param = param; return *this; }
+	timer_instance &set_param2(u64 param2) { m_param2 = param2; return *this; }
+	timer_instance &set_param3(u64 param3) { m_param3 = param3; return *this; }
+	timer_instance &set_id(device_timer_id id) { m_id = id; return *this; }
 
 	// control
-	void reset(attotime const &duration = attotime::never) { adjust(duration, m_param, m_period); }
-	void adjust(attotime start_delay, s32 param = 0, attotime const &periodicity = attotime::never);
+	timer_instance &reset(attotime const &duration = attotime::never) { return adjust(duration, m_param, m_period); }
+	timer_instance &adjust(attotime start_delay, s32 param = 0, attotime const &periodicity = attotime::never);
 
 	// timing queries
 	attotime elapsed() const noexcept;
@@ -269,23 +282,121 @@ private:
 	void dump() const;
 
 	// internal state
-	running_machine *   m_machine;      // reference to the owning machine
-	emu_timer *         m_next;         // next timer in order in the list
-	emu_timer *         m_prev;         // previous timer in order in the list
+	timer_instance *    m_next;         // next timer in order in the list
+	timer_instance *    m_prev;         // previous timer in order in the list
 	attotime            m_start;        // time when the timer was started
 	attotime            m_expire;       // time when the timer will expire
 	attotime            m_period;       // the repeat frequency of the timer
-	timer_expired_delegate const *m_callback; // pointer to an external callback
-	void *              m_ptr;          // pointer parameter
+	timer_callback *      m_callback;     // pointer to an external callback
 	u64                 m_param;        // integer parameter
 	u64                 m_param2;       // larger integer parameter
 	u64                 m_param3;       // larger integer parameter
-	bool                m_enabled;      // is the timer enabled?
-	bool                m_temporary;    // is this a temporary timer?
-	device_t *          m_device;       // for device timers, a pointer to the device
 	device_timer_id     m_id;           // for device timers, the ID of the timer
-	emu_timer_cb        m_timer_cb;     // embedded callback
+	bool                m_enabled;      // is the timer enabled?
+	bool                m_transient;    // is this a transient timer?
 };
+
+
+// ======================> transient_timer_factory
+
+class transient_timer_factory
+{
+	friend class timer_instance;
+
+public:
+	// constructor
+	transient_timer_factory();
+
+	// initialization
+	template<typename... T>
+	void init(T &&... args)
+	{
+		m_callback.enregister(std::forward<T>(args)...);
+	}
+
+	// initialization
+	template<typename... T>
+	void interface_init(T &&... args)
+	{
+		m_callback.interface_enregister(std::forward<T>(args)...);
+	}
+
+	// create a new timer_instance that will fire after the given duration
+	void call_after(attotime const &duration, u64 param = 0, u64 param2 = 0, u64 param3 = 0);
+
+	// same as above, but accepting a timer ID up front as well
+	void call_after(device_timer_id id, attotime const &duration, u64 param = 0, u64 param2 = 0, u64 param3 = 0);
+
+	// create a new timer_instance that will fire as soon as possible
+	void synchronize(u64 param = 0, u64 param2 = 0, u64 param3 = 0)
+	{
+		call_after(attotime::zero, param, param2, param3);
+	}
+
+	// getters
+	timer_callback const &callback() const { return m_callback; }
+
+private:
+	// internal state
+	timer_callback m_callback;
+};
+
+
+// ======================> persistent_timer
+
+class persistent_timer
+{
+public:
+	// constructor
+	persistent_timer();
+	~persistent_timer();
+
+	// initialization
+	template<typename... T>
+	persistent_timer &init(T &&... args)
+	{
+		m_callback.enregister(std::forward<T>(args)...);
+		m_instance.init_persistent(m_callback);
+		return *this;
+	}
+	persistent_timer &init(device_t &device, device_timer_id id);
+
+	// getters
+	timer_instance const &instance() const { return m_instance; }
+	timer_callback const &callback() const { return m_callback; }
+	bool enabled() const { return m_instance.enabled(); }
+	bool active() const { return m_instance.active(); }
+	u64 param() const { return m_instance.param(); }
+	u64 param2() const { return m_instance.param2(); }
+	u64 param3() const { return m_instance.param3(); }
+	void *ptr() const { return m_callback.ptr(); }
+	device_timer_id id() const { return m_instance.id(); }
+
+	// setters
+	bool enable(bool newenable = true) { return m_instance.enable(newenable); }
+	persistent_timer &set_param(u64 param) { m_instance.set_param(param); return *this; }
+	persistent_timer &set_param2(u64 param2) { m_instance.set_param2(param2); return *this; }
+	persistent_timer &set_param3(u64 param3) { m_instance.set_param3(param3); return *this; }
+	persistent_timer &set_ptr(void *ptr) { m_callback.set_ptr(ptr); return *this; }
+
+	// control
+	persistent_timer &reset(attotime const &duration = attotime::never) { return adjust(duration, m_instance.param(), m_instance.period()); }
+	persistent_timer &adjust(attotime start_delay, s32 param = 0, attotime const &periodicity = attotime::never) { m_instance.adjust(start_delay, param, periodicity); return *this; }
+
+	// timing queries
+	attotime elapsed() const noexcept { return m_instance.elapsed(); }
+	attotime remaining() const noexcept { return m_instance.remaining(); }
+	attotime start() const { return m_instance.start(); }
+	attotime expire() const { return m_instance.expire(); }
+	attotime period() const { return m_instance.period(); }
+
+private:
+	// internal state
+	timer_instance m_instance;
+	timer_callback m_callback;
+};
+
+using emu_timer = persistent_timer;
 
 
 // ======================> device_scheduler
@@ -293,9 +404,10 @@ private:
 class device_scheduler
 {
 	friend class device_execute_interface;
+	friend class transient_timer_factory;
 	friend class basetime_relative;
-	friend class emu_timer_cb;
-	friend class emu_timer;
+	friend class timer_callback;
+	friend class timer_instance;
 
 	class basetime_relative
 	{
@@ -340,19 +452,19 @@ class device_scheduler
 		timer_list();
 		~timer_list();
 
-		emu_timer *head() const { return m_head; }
-		emu_timer *tail() const { return m_tail; }
+		timer_instance *head() const { return m_head; }
+		timer_instance *tail() const { return m_tail; }
 
-		bool insert_sorted(emu_timer &timer);
-		emu_timer &insert_head(emu_timer &timer);
-		emu_timer &insert_tail(emu_timer &timer);
+		bool insert_sorted(timer_instance &timer);
+		timer_instance &insert_head(timer_instance &timer);
+		timer_instance &insert_tail(timer_instance &timer);
 
-		emu_timer *remove_head();
-		emu_timer &remove(emu_timer &timer);
+		timer_instance *remove_head();
+		timer_instance &remove(timer_instance &timer);
 
 	private:
-		emu_timer *m_head;
-		emu_timer *m_tail;
+		timer_instance *m_head;
+		timer_instance *m_tail;
 	};
 
 public:
@@ -373,19 +485,20 @@ public:
 	void boost_interleave(attotime const &timeslice_time, attotime const &boost_duration);
 	void suspend_resume_changed() { m_suspend_changes_pending = true; }
 
-	// register timer callback
-	void register_timer_expired(emu_timer_cb &callback);
+	// timer callback registration
+	void register_callback(timer_callback &callback);
+	void deregister_callback(timer_callback &callback);
 
 	// timers, specified by callback/name
-	emu_timer *timer_alloc(timer_expired_delegate const &callback, void *ptr = nullptr);
-	void synchronize() { m_empty_timer_cb.synchronize(); }
+	persistent_timer *timer_alloc(timer_expired_delegate const &callback, void *ptr = nullptr);
+	void synchronize() { m_empty_timer.synchronize(); }
 
 	// timers, specified by device/id; generally devices should use the device_t methods instead
-	emu_timer *timer_alloc(device_t &device, device_timer_id id = 0, void *ptr = nullptr);
+	persistent_timer *timer_alloc(device_t &device, device_timer_id id = 0, void *ptr = nullptr);
 	void timer_set(attotime const &duration, device_t &device, device_timer_id id = 0, s32 param = 0, u64 param2 = 0, u64 param3 = 0);
 
 	// pointer to the current callback timer, if live
-	emu_timer *callback_timer() const { return m_callback_timer; }
+	timer_instance *callback_timer() const { return m_callback_timer; }
 
 	// debugging
 	void dump_timers() const;
@@ -395,9 +508,13 @@ public:
 
 private:
 	// callbacks
-	void timed_trigger(emu_timer const &timer);
 	void presave();
 	void postload();
+
+	// execution helpers
+	void execute_timers();
+	void update_first_timer_expire();
+	void update_basetime();
 
 	// scheduling helpers
 	void compute_perfect_interleave();
@@ -405,17 +522,18 @@ private:
 	void apply_suspend_changes();
 	void add_scheduling_quantum(attotime const &quantum, attotime const &duration);
 
-	// deprecated timer interfaces
-	void timer_set(attotime const &duration, emu_timer_cb const &callback, s32 param = 0, u64 param2 = 0, u64 param3 = 0);
+	// helpers for other friends
+	timer_instance &insert_active(timer_instance &instance);
+	timer_instance &insert_inactive(timer_instance &instance);
 
 	// timer helpers
-	emu_timer &timer_alloc_object();
-	void timer_reclaim_object(emu_timer &timer);
-	void timer_list_move(emu_timer &timer, attotime const &new_expire, bool new_enable);
-	void update_first_timer_expire();
-	void execute_timers();
-	void update_basetime();
-	void empty_timer_cb(emu_timer const &timer);
+	timer_instance &instance_alloc();
+	void instance_reclaim(timer_instance &timer);
+	void instance_move(timer_instance &timer, attotime const &new_expire, bool new_enable);
+
+	// internal timers
+	void empty_timer(timer_instance const &timer);
+	void timed_trigger(timer_instance const &timer);
 
 	// basetime_relative helpers
 	attotime const &basetime() const { return m_basetime; }
@@ -430,13 +548,15 @@ private:
 	basetime_relative           m_first_timer_expire;       // time of the first timer expiration
 	timer_list                  m_active_timers;            // sorted list of active timers
 	timer_list                  m_inactive_timers;          // unsorted list of inactive timers
-	emu_timer *                 m_free_timers;              // simple list of free timers
-	emu_timer_cb *              m_registered_timers;        // list of registered timers
-	emu_timer_cb                m_empty_timer_cb;           // empty callback
-	emu_timer_cb                m_timed_trigger;            // timed trigger callback
+	timer_instance *            m_free_timers;              // simple list of free timers
+	timer_callback *              m_registered_callbacks;     // list of registered callbacks
+	transient_timer_factory     m_empty_timer;              // empty timer factory
+	transient_timer_factory     m_timed_trigger;            // timed trigger factory
+	std::vector<std::unique_ptr<persistent_timer>> m_allocated_persistents;
+	std::vector<std::unique_ptr<timer_instance>> m_allocated_instances;
 
 	// other internal states
-	emu_timer *                 m_callback_timer;           // pointer to the current callback timer
+	timer_instance *            m_callback_timer;           // pointer to the current callback timer
 	bool                        m_callback_timer_modified;  // true if the current callback timer was modified
 	attotime                    m_callback_timer_expire_time; // the original expiration time
 	bool                        m_suspend_changes_pending;  // suspend/resume changes are pending
@@ -460,36 +580,49 @@ private:
 };
 
 
-inline void timer_expired_delegate::form1_callback(emu_timer const &timer)
+
+inline running_machine &timer_instance::machine() const noexcept
+{
+	return m_callback->m_scheduler->machine();
+}
+
+inline device_scheduler &timer_instance::scheduler() const noexcept
+{
+	return *m_callback->m_scheduler;
+}
+
+
+
+inline void timer_expired_delegate::form1_callback(timer_instance const &timer)
 {
 	reinterpret_cast<timer_expired_delegate_form1 &>(m_sub_delegate)();
 }
 
-inline void timer_expired_delegate::form2_callback(emu_timer const &timer)
+inline void timer_expired_delegate::form2_callback(timer_instance const &timer)
 {
 	reinterpret_cast<timer_expired_delegate_form2 &>(m_sub_delegate)(timer, timer.id(), timer.param(), timer.ptr());
 }
 
 template<typename IntType>
-inline void timer_expired_delegate::form3_callback(emu_timer const &timer)
+inline void timer_expired_delegate::form3_callback(timer_instance const &timer)
 {
 	reinterpret_cast<timer_expired_delegate_form3<IntType> &>(m_sub_delegate)(IntType(timer.param()));
 }
 
 template<typename IntType>
-inline void timer_expired_delegate::form4_callback(emu_timer const &timer)
+inline void timer_expired_delegate::form4_callback(timer_instance const &timer)
 {
 	reinterpret_cast<timer_expired_delegate_form4<IntType> &>(m_sub_delegate)(timer.ptr(), IntType(timer.param()));
 }
 
 template<typename IntType, typename IntType2>
-inline void timer_expired_delegate::form5_callback(emu_timer const &timer)
+inline void timer_expired_delegate::form5_callback(timer_instance const &timer)
 {
 	reinterpret_cast<timer_expired_delegate_form5<IntType, IntType2> &>(m_sub_delegate)(IntType(timer.param()), IntType2(timer.param2()));
 }
 
 template<typename IntType, typename IntType2, typename IntType3>
-inline void timer_expired_delegate::form6_callback(emu_timer const &timer)
+inline void timer_expired_delegate::form6_callback(timer_instance const &timer)
 {
 	reinterpret_cast<timer_expired_delegate_form6<IntType, IntType2, IntType3> &>(m_sub_delegate)(IntType(timer.param()), IntType2(timer.param2()), IntType3(timer.param3()));
 }

@@ -176,7 +176,7 @@ protected:
 
 	/* callbacks */
 	devcb_write_line m_out_idx_func;
-	emu_timer_cb m_set_wpt;
+	transient_timer_factory m_set_wpt;
 
 	/* state of input lines */
 	int m_drtn; /* direction */

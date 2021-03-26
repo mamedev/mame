@@ -3911,7 +3911,7 @@ void m2_te_device::load_texture()
     TIMERS
 ***************************************************************************/
 
-void m2_te_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void m2_te_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

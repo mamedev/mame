@@ -141,7 +141,7 @@ void compucolor_floppy_device::device_start()
 //  device_timer - handle timer events
 //-------------------------------------------------
 
-void compucolor_floppy_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void compucolor_floppy_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (!m_sel && !m_rw)
 	{

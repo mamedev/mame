@@ -225,8 +225,8 @@ namco_50xx_device::namco_50xx_device(const machine_config &mconfig, const char *
 
 void namco_50xx_device::device_start()
 {
-	m_rw_sync.enregister(*this, FUNC(namco_50xx_device::rw_sync));
-	m_write_sync.enregister(*this, FUNC(namco_50xx_device::write_sync));
+	m_rw_sync.init(*this, FUNC(namco_50xx_device::rw_sync));
+	m_write_sync.init(*this, FUNC(namco_50xx_device::write_sync));
 
 	save_item(NAME(m_rw));
 	save_item(NAME(m_cmd));

@@ -52,7 +52,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 	hard_disk_file *pc_hdc_file(int id);
 	void pc_hdc_result(int set_error_info);
 	int no_dma(void);

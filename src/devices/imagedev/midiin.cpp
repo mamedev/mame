@@ -62,7 +62,7 @@ void midiin_device::device_reset()
     device_timer
 -------------------------------------------------*/
 
-void midiin_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void midiin_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (!id) {
 		uint8_t buf[8192*4];

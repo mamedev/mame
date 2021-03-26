@@ -194,7 +194,7 @@ void turbo_state::machine_start()
 	m_digits.resolve();
 	m_lamp.resolve();
 
-	m_delayed_i8255_w.enregister(*this, FUNC(turbo_state::delayed_i8255_w));
+	m_delayed_i8255_w.init(*this, FUNC(turbo_state::delayed_i8255_w));
 }
 
 

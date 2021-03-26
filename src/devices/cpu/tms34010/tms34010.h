@@ -177,7 +177,7 @@ public:
 	u16 host_r(offs_t offset);
 
 	TIMER_CALLBACK_MEMBER(internal_interrupt_callback);
-	emu_timer_cb m_internal_interrupt_callback;
+	transient_timer_factory m_internal_interrupt_callback;
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 
 protected:

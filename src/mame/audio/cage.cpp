@@ -150,7 +150,7 @@ void atari_cage_device::device_start()
 	cage_cpu_clock_period = attotime::from_hz(m_cpu->clock());
 	m_cpu_h1_clock_period = cage_cpu_clock_period * 2;
 
-	m_cage_deferred_w.enregister(*this, FUNC(atari_cage_device::cage_deferred_w));
+	m_cage_deferred_w.init(*this, FUNC(atari_cage_device::cage_deferred_w));
 
 	if (m_speedup) {
 		m_cpu->space(AS_PROGRAM).install_write_handler(m_speedup, m_speedup, write32s_delegate(*this, FUNC(atari_cage_device::speedup_w)));

@@ -39,7 +39,7 @@ public:
 protected:
 	virtual void machine_reset() override;
 
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update);

@@ -481,7 +481,7 @@ void vme_fccpu20_device::device_reset()
 //-------------------------------------------------
 //  device_timer - handler timer events
 //-------------------------------------------------
-void vme_fccpu20_device::device_timer (emu_timer const &timer, device_timer_id id, int32_t param, void *ptr)
+void vme_fccpu20_device::device_timer(timer_instance const &timer, device_timer_id id, int32_t param, void *ptr)
 {
 	switch(id)
 	{

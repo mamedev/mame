@@ -159,7 +159,7 @@ void pinsnd88_device::pinsnd88_map(address_map &map)
 	map(0xc000, 0xffff).rom().region("cpu",0x3c000); // fixed bank
 }
 
-void pinsnd88_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void pinsnd88_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
 	{
@@ -242,7 +242,7 @@ void pinsnd88_device::device_start()
 	/* timer */
 	m_sync_timer = timer_alloc(TIMER_SYNC);
 	m_sync_timer->adjust(attotime::never);
-	m_deferred_sync_w.enregister(*this, FUNC(pinsnd88_device::deferred_sync_w));
+	m_deferred_sync_w.init(*this, FUNC(pinsnd88_device::deferred_sync_w));
 	save_item(NAME(m_old_resetq_state));
 	save_item(NAME(m_data_in));
 }

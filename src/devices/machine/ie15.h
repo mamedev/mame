@@ -56,7 +56,7 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
@@ -154,7 +154,7 @@ private:
 	devcb_write_line m_rs232_conn_dtr_handler;
 	devcb_write_line m_rs232_conn_rts_handler;
 
-	emu_timer_cb m_ie15_beepoff;
+	transient_timer_factory m_ie15_beepoff;
 
 	// Until the UART is implemented
 	required_ioport m_rs232_txbaud;

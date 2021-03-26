@@ -102,7 +102,7 @@ private:
 	void rapidfir_map(address_map &map);
 	void tickee_map(address_map &map);
 
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 };
 
 
@@ -133,7 +133,7 @@ inline void tickee_state::get_crosshair_xy(int player, int &x, int &y)
  *
  *************************************/
 
-void tickee_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void tickee_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

@@ -228,14 +228,14 @@ protected:
 	uint32_t      m_timer_period;
 	uint32_t      m_timers_fired;
 
-	emu_timer_cb m_dcs_reset;
-	emu_timer_cb m_dcs_delayed_data_w;
-	emu_timer_cb m_latch_delayed_w;
-	emu_timer_cb m_delayed_ack_w;
-	emu_timer_cb m_output_control_delayed_w;
-	emu_timer_cb m_s1_ack_callback2;
-	emu_timer_cb m_s1_ack_callback1;
-	emu_timer_cb m_s2_ack_callback;
+	transient_timer_factory m_dcs_reset;
+	transient_timer_factory m_dcs_delayed_data_w;
+	transient_timer_factory m_latch_delayed_w;
+	transient_timer_factory m_delayed_ack_w;
+	transient_timer_factory m_output_control_delayed_w;
+	transient_timer_factory m_s1_ack_callback2;
+	transient_timer_factory m_s1_ack_callback1;
+	transient_timer_factory m_s2_ack_callback;
 
 	std::unique_ptr<uint16_t[]> m_sram;
 	uint16_t m_polling_value;

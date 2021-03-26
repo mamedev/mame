@@ -29,7 +29,7 @@ void advision_state::machine_start()
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
-	m_sound_cmd_sync.enregister(*this, FUNC(advision_state::sound_cmd_sync));
+	m_sound_cmd_sync.init(*this, FUNC(advision_state::sound_cmd_sync));
 
 	/* configure EA banking */
 	m_bank1->configure_entry(0, memregion(I8048_TAG)->base());

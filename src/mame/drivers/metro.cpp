@@ -129,7 +129,7 @@ void metro_state::cpu_space_map(address_map &map)
 }
 
 
-void metro_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void metro_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
@@ -5344,7 +5344,7 @@ ROM_END
 
 void metro_state::init_metro()
 {
-	m_sound_data_sync.enregister(*this, FUNC(metro_state::sound_data_sync));
+	m_sound_data_sync.init(*this, FUNC(metro_state::sound_data_sync));
 
 	if (m_audiobank.found())
 	{

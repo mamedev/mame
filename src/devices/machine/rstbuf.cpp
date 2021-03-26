@@ -117,8 +117,8 @@ void rst_buffer_device::device_resolve_objects()
 
 void rst_buffer_device::device_start()
 {
-	m_sync_set_input.enregister(*this, FUNC(rst_pos_buffer_device::sync_set_input));
-	m_sync_clear_input.enregister(*this, FUNC(rst_pos_buffer_device::sync_clear_input));
+	m_sync_set_input.init(*this, FUNC(rst_pos_buffer_device::sync_set_input));
+	m_sync_clear_input.init(*this, FUNC(rst_pos_buffer_device::sync_clear_input));
 
 	// save input state
 	save_item(NAME(m_input_buffer));

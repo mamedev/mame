@@ -178,7 +178,7 @@ void appleiii_fdc_device::device_reset()
 	enable1 = 1;
 }
 
-void wozfdc_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void wozfdc_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	if(active)
 		lss_sync();

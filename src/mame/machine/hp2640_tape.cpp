@@ -311,7 +311,7 @@ void hp2640_tape_device::device_reset()
 	m_cell_timer->reset();
 }
 
-void hp2640_tape_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void hp2640_tape_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	LOG("TMR %d @%s\n" , id , machine().time().to_string());
 

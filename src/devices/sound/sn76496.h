@@ -49,7 +49,7 @@ protected:
 private:
 	inline bool     in_noise_mode();
 	void            register_for_save_states();
-	void            device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	void            device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 	bool            m_ready_state;
 	devcb_write_line m_ready_handler;

@@ -93,12 +93,12 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_clock_changed() override;
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// internal helpers
 	TIMER_CALLBACK_MEMBER(clear_outputs);
-	emu_timer_cb m_clear_outputs;
+	transient_timer_factory m_clear_outputs;
 	void master_reset();
 	void init_freq_timer(int f);
 	void select_freq_timer(int f, int c, bool selected, bool cycle);

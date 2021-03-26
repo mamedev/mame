@@ -37,7 +37,7 @@ driver by Chris Moore
  *
  *************************************/
 
-void gameplan_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void gameplan_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

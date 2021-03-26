@@ -64,7 +64,7 @@ private:
 	/* callback called when interrupt pin state changes (may be nullptr) */
 	devcb_write_line    m_interrupt_cb;
 
-	emu_timer_cb m_rtc_end_update_cb;
+	transient_timer_factory m_rtc_end_update_cb;
 };
 
 // device type definition

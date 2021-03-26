@@ -58,9 +58,9 @@ class dc_state : public driver_device
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(g2_dma_irq);
-	emu_timer_cb m_g2_dma_irq;
+	transient_timer_factory m_g2_dma_irq;
 	TIMER_CALLBACK_MEMBER(ch2_dma_irq);
-	emu_timer_cb m_ch2_dma_irq;
+	transient_timer_factory m_ch2_dma_irq;
 	uint32_t dc_aica_reg_r(offs_t offset, uint32_t mem_mask = ~0);
 	void dc_aica_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t dc_arm_aica_r(offs_t offset);

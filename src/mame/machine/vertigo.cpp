@@ -143,7 +143,7 @@ void vertigo_state::machine_start()
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_irq4_time));
 
-	m_sound_command_w.enregister(*this, FUNC(vertigo_state::sound_command_w));
+	m_sound_command_w.init(*this, FUNC(vertigo_state::sound_command_w));
 
 	vertigo_vproc_init();
 }

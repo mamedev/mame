@@ -17,8 +17,8 @@ constexpr double DECAY_RATE = 10e-6 * 16000;
 
 void n8080_state::sound_start()
 {
-	m_delayed_sound_1_callback.enregister(*this, FUNC(n8080_state::delayed_sound_1_callback));
-	m_delayed_sound_2_callback.enregister(*this, FUNC(n8080_state::delayed_sound_2_callback));
+	m_delayed_sound_1_callback.init(*this, FUNC(n8080_state::delayed_sound_1_callback));
+	m_delayed_sound_2_callback.init(*this, FUNC(n8080_state::delayed_sound_2_callback));
 }
 
 void spacefev_state::update_SN76477_status()

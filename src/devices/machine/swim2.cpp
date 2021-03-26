@@ -69,7 +69,7 @@ void swim2_device::device_reset()
 	m_last_sync = machine().time().as_ticks(clock());
 }
 
-void swim2_device::device_timer(emu_timer const &, device_timer_id, int, void *)
+void swim2_device::device_timer(timer_instance const &, device_timer_id, int, void *)
 {
 }
 

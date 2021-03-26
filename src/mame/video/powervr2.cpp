@@ -3991,12 +3991,12 @@ void powervr2_device::device_start()
 	endofrender_timer_tsp = timer_alloc(*this, FUNC(powervr2_device::endofrender_tsp));
 	endofrender_timer_video = timer_alloc(*this, FUNC(powervr2_device::endofrender_video));
 
-	m_pvr_dma_irq.enregister(*this, FUNC(powervr2_device::pvr_dma_irq));
-	m_transfer_opaque_list_irq.enregister(*this, FUNC(powervr2_device::transfer_opaque_list_irq));
-	m_transfer_opaque_modifier_volume_list_irq.enregister(*this, FUNC(powervr2_device::transfer_opaque_modifier_volume_list_irq));
-	m_transfer_translucent_list_irq.enregister(*this, FUNC(powervr2_device::transfer_translucent_list_irq));
-	m_transfer_translucent_modifier_volume_list_irq.enregister(*this, FUNC(powervr2_device::transfer_translucent_modifier_volume_list_irq));
-	m_transfer_punch_through_list_irq.enregister(*this, FUNC(powervr2_device::transfer_punch_through_list_irq));
+	m_pvr_dma_irq.init(*this, FUNC(powervr2_device::pvr_dma_irq));
+	m_transfer_opaque_list_irq.init(*this, FUNC(powervr2_device::transfer_opaque_list_irq));
+	m_transfer_opaque_modifier_volume_list_irq.init(*this, FUNC(powervr2_device::transfer_opaque_modifier_volume_list_irq));
+	m_transfer_translucent_list_irq.init(*this, FUNC(powervr2_device::transfer_translucent_list_irq));
+	m_transfer_translucent_modifier_volume_list_irq.init(*this, FUNC(powervr2_device::transfer_translucent_modifier_volume_list_irq));
+	m_transfer_punch_through_list_irq.init(*this, FUNC(powervr2_device::transfer_punch_through_list_irq));
 
 	fake_accumulationbuffer_bitmap = std::make_unique<bitmap_rgb32>(2048,2048);
 

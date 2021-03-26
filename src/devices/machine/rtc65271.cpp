@@ -673,7 +673,7 @@ void rtc65271_device::device_start()
 	m_SQW_timer = timer_alloc(*this, FUNC(rtc65271_device::rtc_SQW_cb));
 	m_interrupt_cb.resolve();
 
-	m_rtc_end_update_cb.enregister(*this, FUNC(rtc65271_device::rtc_end_update_cb));
+	m_rtc_end_update_cb.init(*this, FUNC(rtc65271_device::rtc_end_update_cb));
 
 	save_item(NAME(m_regs));
 	save_item(NAME(m_cur_reg));

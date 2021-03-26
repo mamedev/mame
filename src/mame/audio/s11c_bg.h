@@ -59,9 +59,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	TIMER_CALLBACK_MEMBER(deferred_cb2_w);
-	emu_timer_cb m_deferred_cb2_w;
+	transient_timer_factory m_deferred_cb2_w;
 	TIMER_CALLBACK_MEMBER(deferred_pb_w);
-	emu_timer_cb m_deferred_pb_w;
+	transient_timer_factory m_deferred_pb_w;
 
 	required_device<mc6809e_device> m_cpu;
 	required_device<mc1408_device> m_dac;

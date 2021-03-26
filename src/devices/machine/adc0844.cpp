@@ -103,7 +103,7 @@ uint8_t adc0844_device::clamp(int value)
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void adc0844_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void adc0844_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (m_channel)
 	{
@@ -132,7 +132,7 @@ void adc0844_device::device_timer(emu_timer const &timer, device_timer_id id, in
 	m_intr_cb(ASSERT_LINE);
 }
 
-void adc0848_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void adc0848_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (m_channel)
 	{

@@ -138,7 +138,7 @@ protected:
 	// emu_timer *m_live_timer;
 
 	// Timer callback
-	void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 	// Handlers for incoming signals
 	void ready_handler();

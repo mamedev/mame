@@ -106,7 +106,7 @@ void akiko_device::device_start()
 	m_sda_r.resolve_safe(1);
 	m_sda_w.resolve_safe();
 
-	m_cd_delayed_cmd.enregister(*this, FUNC(akiko_device::cd_delayed_cmd));
+	m_cd_delayed_cmd.init(*this, FUNC(akiko_device::cd_delayed_cmd));
 
 	m_c2p_input_index = 0;
 	m_c2p_output_index = 0;

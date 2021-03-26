@@ -317,7 +317,7 @@ void leland_80186_sound_device::device_start()
 	save_item(NAME(m_ext_stop));
 	save_item(NAME(m_ext_active));
 
-	m_delayed_response_r.enregister(*this, FUNC(leland_80186_sound_device::delayed_response_r));
+	m_delayed_response_r.init(*this, FUNC(leland_80186_sound_device::delayed_response_r));
 
 	// zerofill
 	m_peripheral = 0;

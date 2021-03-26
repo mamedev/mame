@@ -89,7 +89,7 @@ void zeus2_device::device_start()
 
 	int_timer = timer_alloc(*this, FUNC(zeus2_device::int_timer_callback));
 	vblank_timer = timer_alloc(*this, FUNC(zeus2_device::display_irq));
-	m_display_irq_off.enregister(*this, FUNC(zeus2_device::display_irq_off));
+	m_display_irq_off.init(*this, FUNC(zeus2_device::display_irq_off));
 
 	//printf("%s\n", machine().system().name);
 	// Set system type

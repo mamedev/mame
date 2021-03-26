@@ -47,7 +47,7 @@ uint8_t am53cf96_device::read(offs_t offset)
 	return rv;
 }
 
-void am53cf96_device::device_timer(emu_timer const &timer, device_timer_id tid, int param, void *ptr)
+void am53cf96_device::device_timer(timer_instance const &timer, device_timer_id tid, int param, void *ptr)
 {
 	scsi_regs[REG_IRQSTATE] = 8;    // indicate success
 	scsi_regs[REG_STATUS] |= 0x80;  // indicate IRQ

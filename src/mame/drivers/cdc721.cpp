@@ -54,7 +54,7 @@ private:
 
 	template<int Line> DECLARE_WRITE_LINE_MEMBER(int_w);
 	TIMER_CALLBACK_MEMBER(update_interrupts);
-	emu_timer_cb m_update_interrupts;
+	transient_timer_factory m_update_interrupts;
 	IRQ_CALLBACK_MEMBER(restart_cb);
 
 	template<int Bit> DECLARE_WRITE_LINE_MEMBER(foreign_char_bank_w);
@@ -226,7 +226,7 @@ void cdc721_state::machine_start()
 	m_interrupt_mask = 0;
 	m_foreign_char_bank = 0;
 
-	m_update_interrupts.enregister(*this, FUNC(cdc721_state::update_interrupts));
+	m_update_interrupts.init(*this, FUNC(cdc721_state::update_interrupts));
 
 	save_item(NAME(m_pending_interrupts));
 	save_item(NAME(m_active_interrupts));

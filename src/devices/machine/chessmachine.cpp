@@ -60,8 +60,8 @@ void chessmachine_device::device_start()
 {
 	// resolve callbacks
 	m_data_out.resolve_safe();
-	m_sync0_callback.enregister(*this, FUNC(chessmachine_device::sync0_callback));
-	m_sync1_callback.enregister(*this, FUNC(chessmachine_device::sync1_callback));
+	m_sync0_callback.init(*this, FUNC(chessmachine_device::sync0_callback));
+	m_sync1_callback.init(*this, FUNC(chessmachine_device::sync1_callback));
 
 	// zerofill
 	m_bootstrap_enabled = false;

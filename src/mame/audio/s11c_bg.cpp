@@ -504,8 +504,8 @@ void s11c_bg_device::device_start()
 	/* resolve lines */
 	m_cb2_cb.resolve();
 	m_pb_cb.resolve();
-	m_deferred_cb2_w.enregister(*this, FUNC(s11c_bg_device::deferred_cb2_w));
-	m_deferred_pb_w.enregister(*this, FUNC(s11c_bg_device::deferred_pb_w));
+	m_deferred_cb2_w.init(*this, FUNC(s11c_bg_device::deferred_cb2_w));
+	m_deferred_pb_w.init(*this, FUNC(s11c_bg_device::deferred_pb_w));
 	save_item(NAME(m_old_resetq_state));
 }
 

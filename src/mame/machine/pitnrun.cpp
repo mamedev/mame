@@ -25,10 +25,10 @@ void pitnrun_state::machine_start()
 	save_item(NAME(m_porta_out));
 	save_item(NAME(m_address));
 
-	m_mcu_real_data_r.enregister(*this, FUNC(pitnrun_state::mcu_real_data_r));
-	m_mcu_real_data_w.enregister(*this, FUNC(pitnrun_state::mcu_real_data_w));
-	m_mcu_data_real_r.enregister(*this, FUNC(pitnrun_state::mcu_data_real_r));
-	m_mcu_status_real_w.enregister(*this, FUNC(pitnrun_state::mcu_status_real_w));
+	m_mcu_real_data_r.init(*this, FUNC(pitnrun_state::mcu_real_data_r));
+	m_mcu_real_data_w.init(*this, FUNC(pitnrun_state::mcu_real_data_w));
+	m_mcu_data_real_r.init(*this, FUNC(pitnrun_state::mcu_data_real_r));
+	m_mcu_status_real_w.init(*this, FUNC(pitnrun_state::mcu_status_real_w));
 }
 
 void pitnrun_state::machine_reset()

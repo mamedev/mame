@@ -158,7 +158,7 @@ void applefdc_base_device::device_reset(void)
 //  device_timer - device-specific timer callbacks
 //-------------------------------------------------
 
-void applefdc_base_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void applefdc_base_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
 	{

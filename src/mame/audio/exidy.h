@@ -223,7 +223,7 @@ private:
 	uint8_t m_victory_sound_response_ack_clk; /* 7474 @ F4 */
 
 	TIMER_CALLBACK_MEMBER( delayed_command_w );
-	emu_timer_cb m_delayed_command_w;
+	transient_timer_factory m_delayed_command_w;
 
 	int m_pia_ca1;
 	int m_pia_cb1;

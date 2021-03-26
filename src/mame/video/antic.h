@@ -48,7 +48,7 @@ public:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 	template <typename T> void set_gtia_tag(T &&tag) { m_gtia.set_tag(std::forward<T>(tag)); }
 

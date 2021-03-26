@@ -134,7 +134,7 @@ private:
 	TIMER_CALLBACK_MEMBER(clear_ack);
 	TIMER_CALLBACK_MEMBER(adpcm_dma_timer_callback);
 
-	emu_timer_cb m_clear_ack;
+	transient_timer_factory m_clear_ack;
 
 	required_device<cpu_device> m_maincpu;
 

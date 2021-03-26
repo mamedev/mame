@@ -283,7 +283,7 @@ void segahang_state::machine_reset()
 //  device_timer - handle device timers
 //-------------------------------------------------
 
-void segahang_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void segahang_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

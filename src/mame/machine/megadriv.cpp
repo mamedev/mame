@@ -797,7 +797,7 @@ void md_base_state::machine_start()
 	m_io_pad_3b[2] = ioport("IN0");
 	m_io_pad_3b[3] = ioport("UNK");
 
-	m_megadriv_z80_run_state.enregister(*this, FUNC(md_base_state::megadriv_z80_run_state));
+	m_megadriv_z80_run_state.init(*this, FUNC(md_base_state::megadriv_z80_run_state));
 
 	save_item(NAME(m_io_stage));
 	save_item(NAME(m_megadrive_io_data_regs));

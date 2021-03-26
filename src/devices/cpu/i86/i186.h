@@ -65,7 +65,7 @@ protected:
 	virtual void execute_run() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
 	virtual uint8_t fetch() override;
 	uint32_t update_pc() { return m_pc = (m_sregs[CS] << 4) + m_ip; }
@@ -83,6 +83,7 @@ protected:
 	static const uint8_t m_i80186_timing[200];
 
 private:
+	void device_timer(device_timer_id id, int param, void *ptr);
 	void update_interrupt_state();
 	void handle_eoi(int data);
 	void external_int(uint16_t intno, int state);

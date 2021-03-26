@@ -2836,10 +2836,10 @@ void taitosj_state::init_common()
 	save_item(NAME(m_input_port_4_f0));
 	save_item(NAME(m_kikstart_gears));
 
-	m_soundlatch_w_cb.enregister(*this, FUNC(taitosj_state::soundlatch_w_cb));
-	m_soundlatch_clear7_w_cb.enregister(*this, FUNC(taitosj_state::soundlatch_clear7_w_cb));
-	m_sound_semaphore2_w_cb.enregister(*this, FUNC(taitosj_state::sound_semaphore2_w_cb));
-	m_sound_semaphore2_clear_w_cb.enregister(*this, FUNC(taitosj_state::sound_semaphore2_clear_w_cb));
+	m_soundlatch_w_cb.init(*this, FUNC(taitosj_state::soundlatch_w_cb));
+	m_soundlatch_clear7_w_cb.init(*this, FUNC(taitosj_state::soundlatch_clear7_w_cb));
+	m_sound_semaphore2_w_cb.init(*this, FUNC(taitosj_state::sound_semaphore2_w_cb));
+	m_sound_semaphore2_clear_w_cb.init(*this, FUNC(taitosj_state::sound_semaphore2_clear_w_cb));
 
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&taitosj_state::reset_common, this));
 }

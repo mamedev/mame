@@ -160,7 +160,7 @@ void pce_cd_device::device_start()
 	m_adpcm_fadein_timer = timer_alloc(*this, FUNC(pce_cd_device::adpcm_fadein_callback));
 	m_adpcm_fadein_timer->adjust(attotime::never);
 
-	m_clear_ack.enregister(*this, FUNC(pce_cd_device::clear_ack));
+	m_clear_ack.init(*this, FUNC(pce_cd_device::clear_ack));
 
 	// m_cd_file pointer is setup at a later stage because it is still empty when this function is called
 

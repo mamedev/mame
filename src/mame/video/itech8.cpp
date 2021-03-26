@@ -541,7 +541,7 @@ void grmatch_state::xscroll_w(uint8_t data)
 }
 
 
-void grmatch_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void grmatch_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

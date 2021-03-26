@@ -227,7 +227,7 @@ uint32_t amiga_state::rom_mirror32_r(offs_t offset, uint32_t mem_mask)
 	return m_maincpu->space(AS_PROGRAM).read_dword(offset + 0xf80000, mem_mask);
 }
 
-void amiga_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void amiga_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

@@ -163,7 +163,7 @@ void namco_52xx_device::device_start()
 	m_romread.resolve_safe(0);
 	m_si.resolve_safe(0);
 
-	m_latch_callback.enregister(*this, FUNC(namco_52xx_device::latch_callback));
+	m_latch_callback.init(*this, FUNC(namco_52xx_device::latch_callback));
 
 	/* start the external clock */
 	if (m_extclock != 0)

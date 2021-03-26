@@ -46,7 +46,7 @@ k056230_device::k056230_device(const machine_config &mconfig, const char *tag, d
 void k056230_device::device_start()
 {
 	save_item(NAME(m_ram));
-	m_network_irq_clear.enregister(*this, FUNC(k056230_device::network_irq_clear));
+	m_network_irq_clear.init(*this, FUNC(k056230_device::network_irq_clear));
 }
 
 

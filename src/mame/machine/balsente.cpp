@@ -72,8 +72,8 @@ void balsente_state::machine_start()
 		m_acia->write_dcd(0);
 	}
 
-	m_irq_off.enregister(*this, FUNC(balsente_state::irq_off));
-	m_adc_finished.enregister(*this, FUNC(balsente_state::adc_finished));
+	m_irq_off.init(*this, FUNC(balsente_state::irq_off));
+	m_adc_finished.init(*this, FUNC(balsente_state::adc_finished));
 
 	save_item(NAME(m_nstocker_bits));
 	save_item(NAME(m_spiker_expand_color));

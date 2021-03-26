@@ -197,7 +197,7 @@ private:
 	int m_scsi_cd;
 	int m_scsi_req;
 
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 	enum
 	{

@@ -588,8 +588,8 @@ void snk_state::machine_start()
 {
 	m_countryc_trackball = 0;
 
-	m_sgladiat_sndirq_update_callback.enregister(*this, FUNC(snk_state::sgladiat_sndirq_update_callback));
-	m_sndirq_update_callback.enregister(*this, FUNC(snk_state::sndirq_update_callback));
+	m_sgladiat_sndirq_update_callback.init(*this, FUNC(snk_state::sgladiat_sndirq_update_callback));
+	m_sndirq_update_callback.init(*this, FUNC(snk_state::sndirq_update_callback));
 }
 
 /*********************************************************************/

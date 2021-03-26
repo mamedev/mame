@@ -73,9 +73,9 @@ protected:
 
 private:
 	TIMER_CALLBACK_MEMBER(write_to_sound);
-	emu_timer_cb m_write_to_sound;
+	transient_timer_factory m_write_to_sound;
 	TIMER_CALLBACK_MEMBER(write_from_sound);
-	emu_timer_cb m_write_from_sound;
+	transient_timer_factory m_write_from_sound;
 
 	// internal region struct
 	struct region_info

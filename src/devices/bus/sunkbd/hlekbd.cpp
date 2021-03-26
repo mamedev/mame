@@ -865,7 +865,7 @@ void hle_device_base::device_reset()
     handle timed events
 --------------------------------------------------*/
 
-void hle_device_base::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void hle_device_base::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

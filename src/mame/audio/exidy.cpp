@@ -980,7 +980,7 @@ void victory_sound_device::device_start()
 	save_item(NAME(m_pia_ca1));
 	save_item(NAME(m_pia_cb1));
 
-	m_delayed_command_w.enregister(*this, FUNC(victory_sound_device::delayed_command_w));
+	m_delayed_command_w.init(*this, FUNC(victory_sound_device::delayed_command_w));
 
 	exidy_sh8253_sound_device::device_start();
 }

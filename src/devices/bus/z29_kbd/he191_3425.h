@@ -39,7 +39,7 @@ private:
 
 	// misc. helpers
 	TIMER_CALLBACK_MEMBER(receive_data_synced);
-	emu_timer_cb m_receive_data_synced;
+	transient_timer_factory m_receive_data_synced;
 
 	// object finders
 	required_device<cpu_device> m_mcu;

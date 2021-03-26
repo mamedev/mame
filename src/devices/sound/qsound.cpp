@@ -207,8 +207,8 @@ void qsound_device::device_start()
 	// hope we get good synchronisation between the DSP and the sound system
 	m_stream = stream_alloc(0, 2, clock() / 2 / 1248);
 
-	m_set_dsp_ready.enregister(*this, FUNC(qsound_device::set_dsp_ready));
-	m_set_cmd.enregister(*this, FUNC(qsound_device::set_cmd));
+	m_set_dsp_ready.init(*this, FUNC(qsound_device::set_dsp_ready));
+	m_set_cmd.init(*this, FUNC(qsound_device::set_cmd));
 
 	// save DSP communication state
 	save_item(NAME(m_rom_bank));

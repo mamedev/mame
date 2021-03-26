@@ -111,7 +111,7 @@ protected:
 	virtual void sound_start() override;
 	virtual void video_start() override;
 	virtual void device_postload();
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 	void video_config(machine_config &config, const XTAL clock);
 

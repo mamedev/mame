@@ -132,7 +132,7 @@ namco_54xx_device::namco_54xx_device(const machine_config &mconfig, const char *
 
 void namco_54xx_device::device_start()
 {
-	m_latch_callback.enregister(*this, FUNC(namco_54xx_device::latch_callback));
+	m_latch_callback.init(*this, FUNC(namco_54xx_device::latch_callback));
 
 	save_item(NAME(m_latched_cmd));
 }

@@ -269,7 +269,7 @@ GFXDECODE_END
 
 void ladyfrog_state::machine_start()
 {
-	m_nmi_callback.enregister(*this, FUNC(ladyfrog_state::nmi_callback));
+	m_nmi_callback.init(*this, FUNC(ladyfrog_state::nmi_callback));
 
 	save_item(NAME(m_tilebank));
 	save_item(NAME(m_palette_bank));

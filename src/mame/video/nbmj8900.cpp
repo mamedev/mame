@@ -196,7 +196,7 @@ void nbmj8900_state::update_pixel1(int x, int y)
 	m_tmpbitmap1.pix(y, x) = m_palette->pen(color);
 }
 
-void nbmj8900_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void nbmj8900_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

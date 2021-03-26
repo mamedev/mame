@@ -61,7 +61,7 @@ void meters_device::device_reset()
 //  device_timer - device-specific timer events
 //-------------------------------------------------
 
-void meters_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void meters_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id >= m_number_mtr)
 			throw emu_fatalerror("Unknown id in meters_device::device_timer");

@@ -102,7 +102,7 @@ public:
 protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 	// until machine/spec_snqk.cpp gets somehow disentangled
 	virtual void plus3_update_memory() { }

@@ -99,9 +99,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(rxc_w);
 	DECLARE_WRITE_LINE_MEMBER(txc_w);
 	TIMER_CALLBACK_MEMBER(sync_rx_im_w);
-	emu_timer_cb m_sync_rx_im_w;
+	transient_timer_factory m_sync_rx_im_w;
 	TIMER_CALLBACK_MEMBER(sync_tx_im_w);
-	emu_timer_cb m_sync_tx_im_w;
+	transient_timer_factory m_sync_tx_im_w;
 };
 
 // device type definitions

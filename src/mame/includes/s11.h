@@ -111,7 +111,7 @@ public:
 
 protected:
 	virtual void machine_start() override { m_digits.resolve(); }
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_reset() override;
 
 	// devices

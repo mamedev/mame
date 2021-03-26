@@ -948,7 +948,7 @@ void mc6845_device::handle_line_timer()
 }
 
 
-void mc6845_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void mc6845_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
@@ -1018,7 +1018,7 @@ void mc6845_device::device_timer(emu_timer const &timer, device_timer_id id, int
 }
 
 
-void mos8563_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void mos8563_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

@@ -74,7 +74,7 @@ void nes_sxrom_device::device_start()
 	save_item(NAME(m_reg));
 	save_item(NAME(m_reg_write_enable));
 
-	m_resync_callback.enregister(*this, FUNC(nes_sxrom_device::resync_callback));
+	m_resync_callback.init(*this, FUNC(nes_sxrom_device::resync_callback));
 }
 
 void nes_sxrom_device::pcb_reset()

@@ -28,7 +28,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::serial_tc)
 }
 
 
-void sorcerer_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void sorcerer_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{

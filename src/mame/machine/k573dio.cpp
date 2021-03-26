@@ -172,7 +172,7 @@ void k573dio_device::device_add_mconfig(machine_config &config)
 	DS2401(config, digital_id);
 }
 
-void k573dio_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void k573dio_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 }
 

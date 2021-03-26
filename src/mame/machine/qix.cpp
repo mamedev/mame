@@ -21,7 +21,7 @@
 
 void qix_state::machine_start()
 {
-	m_pia_w_callback.enregister(*this, FUNC(qix_state::pia_w_callback));
+	m_pia_w_callback.init(*this, FUNC(qix_state::pia_w_callback));
 }
 
 void qixmcu_state::machine_start()

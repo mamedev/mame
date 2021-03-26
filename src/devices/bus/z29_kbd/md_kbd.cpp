@@ -49,7 +49,7 @@ void md_keyboard_device::device_resolve_objects()
 
 void md_keyboard_device::device_start()
 {
-	m_receive_data_synced.enregister(*this, FUNC(md_keyboard_device::receive_data_synced));
+	m_receive_data_synced.init(*this, FUNC(md_keyboard_device::receive_data_synced));
 	save_item(NAME(m_14515b_select));
 	save_item(NAME(m_ls175_clock));
 	save_item(NAME(m_recv_data));

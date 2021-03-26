@@ -134,9 +134,9 @@ private:
 	uint32_t screen_update_balsente(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(update_analog_inputs);
 	TIMER_CALLBACK_MEMBER(irq_off);
-	emu_timer_cb m_irq_off;
+	transient_timer_factory m_irq_off;
 	TIMER_CALLBACK_MEMBER(adc_finished);
-	emu_timer_cb m_adc_finished;
+	transient_timer_factory m_adc_finished;
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_timer);
 	void draw_one_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *sprite);
 	void poly17_init();

@@ -940,7 +940,7 @@ void lisa_state::machine_start()
 	m_cops_ready_timer = timer_alloc(*this, FUNC(lisa_state::set_COPS_ready));
 	m_cops_ready_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 
-	m_read_COPS_command.enregister(*this, FUNC(lisa_state::read_COPS_command));
+	m_read_COPS_command.init(*this, FUNC(lisa_state::read_COPS_command));
 
 	m_nvram->set_base(m_fdc_ram, 1024);
 

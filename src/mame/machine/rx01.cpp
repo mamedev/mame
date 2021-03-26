@@ -81,7 +81,7 @@ void rx01_device::device_add_mconfig(machine_config &config)
 
 void rx01_device::device_start()
 {
-	m_service_command.enregister(*this, FUNC(rx01_device::service_command));
+	m_service_command.init(*this, FUNC(rx01_device::service_command));
 }
 
 

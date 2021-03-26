@@ -693,7 +693,7 @@ void mpu4_state::ic24_setup()
 }
 
 
-void mpu4_state::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void mpu4_state::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
 	{

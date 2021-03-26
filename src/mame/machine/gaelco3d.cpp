@@ -216,7 +216,7 @@ void gaelco_serial_device::device_start()
 	m_sync_timer->adjust(attotime::zero,0,attotime::from_hz(SYNC_FREQ));
 #endif
 
-	m_set_status_cb.enregister(*this, FUNC(gaelco_serial_device::set_status_cb));
+	m_set_status_cb.init(*this, FUNC(gaelco_serial_device::set_status_cb));
 
 	m_os_shmem = osd_sharedmem_alloc(PATH_NAME, 0, sizeof(shmem_t));
 	if (m_os_shmem == nullptr)

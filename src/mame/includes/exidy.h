@@ -152,5 +152,5 @@ private:
 	void venture_map(address_map &map);
 
 protected:
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 };

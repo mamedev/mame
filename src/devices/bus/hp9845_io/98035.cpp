@@ -207,7 +207,7 @@ void hp98035_io_card_device::device_reset()
 	half_init();
 }
 
-void hp98035_io_card_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void hp98035_io_card_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == MSEC_TMR_ID) {
 		// On real hw there's a full 4-bit decimal counter, but only the LSB is used to

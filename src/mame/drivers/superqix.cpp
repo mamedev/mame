@@ -929,12 +929,12 @@ void superqix_state::machine_init_common()
 {
 	superqix_state_base::machine_init_common();
 
-	m_z80_semaphore_assert_cb.enregister(*this, FUNC(superqix_state::z80_semaphore_assert_cb));
-	m_mcu_port2_w_cb.enregister(*this, FUNC(superqix_state::mcu_port2_w_cb));
-	m_mcu_port3_w_cb.enregister(*this, FUNC(superqix_state::mcu_port3_w_cb));
-	m_z80_ay1_sync_address_w_cb.enregister(*this, FUNC(superqix_state::z80_ay1_sync_address_w_cb));
-	m_z80_ay2_iob_w_cb.enregister(*this, FUNC(superqix_state::z80_ay2_iob_w_cb));
-	m_bootleg_mcu_port1_w_cb.enregister(*this, FUNC(superqix_state::bootleg_mcu_port1_w_cb));
+	m_z80_semaphore_assert_cb.init(*this, FUNC(superqix_state::z80_semaphore_assert_cb));
+	m_mcu_port2_w_cb.init(*this, FUNC(superqix_state::mcu_port2_w_cb));
+	m_mcu_port3_w_cb.init(*this, FUNC(superqix_state::mcu_port3_w_cb));
+	m_z80_ay1_sync_address_w_cb.init(*this, FUNC(superqix_state::z80_ay1_sync_address_w_cb));
+	m_z80_ay2_iob_w_cb.init(*this, FUNC(superqix_state::z80_ay2_iob_w_cb));
+	m_bootleg_mcu_port1_w_cb.init(*this, FUNC(superqix_state::bootleg_mcu_port1_w_cb));
 
 	// 8031 and/or 8751 MCU related
 	save_item(NAME(m_bl_port1));

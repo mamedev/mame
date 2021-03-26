@@ -83,7 +83,7 @@ protected:
 
 	void vectrex_base(machine_config &config);
 
-	virtual void device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr) override;
 
 	void configure_imager(bool reset_refresh, const double *imager_angles);
 	void vectrex_configuration();

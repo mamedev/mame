@@ -56,7 +56,7 @@ void mb3773_device::device_reset()
 	reset_timer();
 }
 
-void mb3773_device::device_timer(emu_timer const &timer, device_timer_id id, int param, void *ptr)
+void mb3773_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
 	logerror("Reset caused by watchdog\n");
 

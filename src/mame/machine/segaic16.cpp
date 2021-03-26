@@ -363,7 +363,7 @@ void sega_315_5250_compare_timer_device::device_start()
 	m_68kint_callback.resolve();
 	m_zint_callback.resolve();
 
-	m_write_to_sound.enregister(*this, FUNC(sega_315_5250_compare_timer_device::write_to_sound));
+	m_write_to_sound.init(*this, FUNC(sega_315_5250_compare_timer_device::write_to_sound));
 
 	// save states
 	save_item(NAME(m_regs));

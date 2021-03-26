@@ -794,14 +794,14 @@ void dcs_audio_device::device_start()
 	m_internal_timer = subdevice<timer_device>("dcs_int_timer");
 	m_reg_timer = subdevice<timer_device>("dcs_reg_timer");
 
-	m_dcs_reset.enregister(*this, FUNC(dcs_audio_device::dcs_reset));
-	m_dcs_delayed_data_w.enregister(*this, FUNC(dcs_audio_device::dcs_delayed_data_w));
-	m_latch_delayed_w.enregister(*this, FUNC(dcs_audio_device::latch_delayed_w));
-	m_delayed_ack_w.enregister(*this, FUNC(dcs_audio_device::delayed_ack_w));
-	m_output_control_delayed_w.enregister(*this, FUNC(dcs_audio_device::output_control_delayed_w));
-	m_s1_ack_callback2.enregister(*this, FUNC(dcs_audio_device::s1_ack_callback2));
-	m_s1_ack_callback1.enregister(*this, FUNC(dcs_audio_device::s1_ack_callback1));
-	m_s2_ack_callback.enregister(*this, FUNC(dcs_audio_device::s2_ack_callback));
+	m_dcs_reset.init(*this, FUNC(dcs_audio_device::dcs_reset));
+	m_dcs_delayed_data_w.init(*this, FUNC(dcs_audio_device::dcs_delayed_data_w));
+	m_latch_delayed_w.init(*this, FUNC(dcs_audio_device::latch_delayed_w));
+	m_delayed_ack_w.init(*this, FUNC(dcs_audio_device::delayed_ack_w));
+	m_output_control_delayed_w.init(*this, FUNC(dcs_audio_device::output_control_delayed_w));
+	m_s1_ack_callback2.init(*this, FUNC(dcs_audio_device::s1_ack_callback2));
+	m_s1_ack_callback1.init(*this, FUNC(dcs_audio_device::s1_ack_callback1));
+	m_s2_ack_callback.init(*this, FUNC(dcs_audio_device::s2_ack_callback));
 
 	/* non-RAM based automatically acks */
 	m_auto_ack = true;
@@ -899,14 +899,14 @@ void dcs2_audio_device::device_start()
 	/* we don't do auto-ack by default */
 	m_auto_ack = false;
 
-	m_dcs_reset.enregister(*this, FUNC(dcs_audio_device::dcs_reset));
-	m_dcs_delayed_data_w.enregister(*this, FUNC(dcs_audio_device::dcs_delayed_data_w));
-	m_latch_delayed_w.enregister(*this, FUNC(dcs_audio_device::latch_delayed_w));
-	m_delayed_ack_w.enregister(*this, FUNC(dcs_audio_device::delayed_ack_w));
-	m_output_control_delayed_w.enregister(*this, FUNC(dcs_audio_device::output_control_delayed_w));
-	m_s1_ack_callback2.enregister(*this, FUNC(dcs_audio_device::s1_ack_callback2));
-	m_s1_ack_callback1.enregister(*this, FUNC(dcs_audio_device::s1_ack_callback1));
-	m_s2_ack_callback.enregister(*this, FUNC(dcs_audio_device::s2_ack_callback));
+	m_dcs_reset.init(*this, FUNC(dcs_audio_device::dcs_reset));
+	m_dcs_delayed_data_w.init(*this, FUNC(dcs_audio_device::dcs_delayed_data_w));
+	m_latch_delayed_w.init(*this, FUNC(dcs_audio_device::latch_delayed_w));
+	m_delayed_ack_w.init(*this, FUNC(dcs_audio_device::delayed_ack_w));
+	m_output_control_delayed_w.init(*this, FUNC(dcs_audio_device::output_control_delayed_w));
+	m_s1_ack_callback2.init(*this, FUNC(dcs_audio_device::s1_ack_callback2));
+	m_s1_ack_callback1.init(*this, FUNC(dcs_audio_device::s1_ack_callback1));
+	m_s2_ack_callback.init(*this, FUNC(dcs_audio_device::s2_ack_callback));
 
 	/* install the speedup handler */
 	install_speedup();

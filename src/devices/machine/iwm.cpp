@@ -82,7 +82,7 @@ void iwm_device::device_reset()
 	m_devsel_cb(0);
 }
 
-void iwm_device::device_timer(emu_timer const &, device_timer_id, int, void *)
+void iwm_device::device_timer(timer_instance const &, device_timer_id, int, void *)
 {
 	if(m_active == MODE_DELAY) {
 		flush_write();

@@ -182,7 +182,7 @@ void z80dma_device::device_start()
 
 	// allocate timer
 	m_timer = timer_alloc(*this, FUNC(z80dma_device::timerproc));
-	m_rdy_write_callback.enregister(*this, FUNC(z80dma_device::rdy_write_callback));
+	m_rdy_write_callback.init(*this, FUNC(z80dma_device::rdy_write_callback));
 
 	// register for state saving
 	save_item(NAME(m_regs));

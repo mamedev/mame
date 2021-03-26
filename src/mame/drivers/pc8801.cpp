@@ -2154,7 +2154,7 @@ void pc8801_state::machine_start()
 	m_kanji_rom = memregion("kanji")->base();
 	m_cg_rom = memregion("cgrom")->base();
 
-	m_pc8801fd_upd765_tc_to_zero.enregister(*this, FUNC(pc8801_state::pc8801fd_upd765_tc_to_zero));
+	m_pc8801fd_upd765_tc_to_zero.init(*this, FUNC(pc8801_state::pc8801fd_upd765_tc_to_zero));
 
 	save_pointer(NAME(m_work_ram), 0x10000);
 	save_pointer(NAME(m_hi_work_ram), 0x1000);

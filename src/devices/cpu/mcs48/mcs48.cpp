@@ -1425,7 +1425,7 @@ void upi41_cpu_device::device_start()
 {
 	mcs48_cpu_device::device_start();
 
-	m_master_callback.enregister(*this, FUNC(upi41_cpu_device::master_callback));
+	m_master_callback.init(*this, FUNC(upi41_cpu_device::master_callback));
 }
 
 

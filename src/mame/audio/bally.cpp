@@ -142,8 +142,8 @@ void bally_as2888_device::device_start()
 	save_item(NAME(m_snd_tone_gen));
 	save_item(NAME(m_snd_div));
 
-	m_sound_select_sync.enregister(*this, FUNC(bally_as2888_device::sound_select_sync));
-	m_sound_int_sync.enregister(*this, FUNC(bally_as2888_device::sound_int_sync));
+	m_sound_select_sync.init(*this, FUNC(bally_as2888_device::sound_select_sync));
+	m_sound_int_sync.init(*this, FUNC(bally_as2888_device::sound_int_sync));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(bally_as2888_device::timer_s)
@@ -288,8 +288,8 @@ void bally_as3022_device::device_start()
 	m_ay->set_volume(1, 0);
 	m_ay->set_volume(2, 0);
 
-	m_sound_select_sync.enregister(*this, FUNC(bally_as3022_device::sound_select_sync));
-	m_sound_int_sync.enregister(*this, FUNC(bally_as3022_device::sound_int_sync));
+	m_sound_select_sync.init(*this, FUNC(bally_as3022_device::sound_select_sync));
+	m_sound_int_sync.init(*this, FUNC(bally_as3022_device::sound_int_sync));
 
 	save_item(NAME(m_bc1));
 	save_item(NAME(m_bdir));
@@ -524,8 +524,8 @@ void bally_cheap_squeak_device::device_start()
 {
 	m_sound_ack_w_handler.resolve();
 
-	m_sound_select_sync.enregister(*this, FUNC(bally_cheap_squeak_device::sound_select_sync));
-	m_sound_int_sync.enregister(*this, FUNC(bally_cheap_squeak_device::sound_int_sync));
+	m_sound_select_sync.init(*this, FUNC(bally_cheap_squeak_device::sound_select_sync));
+	m_sound_int_sync.init(*this, FUNC(bally_cheap_squeak_device::sound_int_sync));
 
 	save_item(NAME(m_sound_select));
 	save_item(NAME(m_sound_int));
@@ -685,8 +685,8 @@ void bally_squawk_n_talk_device::device_start()
 {
 	save_item(NAME(m_sound_select));
 
-	m_sound_select_sync.enregister(*this, FUNC(bally_squawk_n_talk_device::sound_select_sync));
-	m_sound_int_sync.enregister(*this, FUNC(bally_squawk_n_talk_device::sound_int_sync));
+	m_sound_select_sync.init(*this, FUNC(bally_squawk_n_talk_device::sound_select_sync));
+	m_sound_int_sync.init(*this, FUNC(bally_squawk_n_talk_device::sound_int_sync));
 }
 
 //-------------------------------------------------

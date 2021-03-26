@@ -26,7 +26,7 @@
 
 void qix_state::sound_start()
 {
-	m_deferred_sndpia1_porta_w.enregister(*this, FUNC(qix_state::deferred_sndpia1_porta_w));
+	m_deferred_sndpia1_porta_w.init(*this, FUNC(qix_state::deferred_sndpia1_porta_w));
 }
 
 
