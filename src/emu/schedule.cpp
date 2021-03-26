@@ -187,7 +187,7 @@ timer_instance::~timer_instance()
 //  be saved and start off in a disabled state
 //-------------------------------------------------
 
-inline timer_instance &timer_instance::init_persistent(timer_callback &callback)
+timer_instance &timer_instance::init_persistent(timer_callback &callback)
 {
 	// ensure the entire timer state is clean
 	m_start = callback.m_scheduler->time();
