@@ -719,7 +719,15 @@ void macpdm_state::dma_scsi_a_step()
 	m_dma_scsi_a_in_step = true;
 
 	if(m_dma_scsi_a_ctrl & 0x40) {
-		fatalerror("scsi dma write\n");
+		while(m_via2_ifr & 0x01) {
+			if(m_dma_scsi_buffer_byte_count == 0) {
+				m_dma_scsi_buffer_byte_count = 8;
+				m_dma_scsi_buffer = m_maincpu->space().read_qword(m_dma_scsi_a_base_adr + m_dma_scsi_a_cur_offset);
+				m_dma_scsi_a_cur_offset += 8;
+			}
+			m_dma_scsi_buffer_byte_count --;
+			m_ncr53c94->dma_w(m_dma_scsi_buffer >> (8*m_dma_scsi_buffer_byte_count));
+		}
 
 	} else {
 		while(m_via2_ifr & 0x01) {
