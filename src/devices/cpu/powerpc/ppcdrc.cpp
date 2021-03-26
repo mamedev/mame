@@ -3077,7 +3077,7 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			UML_ADD(block, mem(&m_core->updateaddr), R32Z(G_RA(op)), R32(G_RB(op))); // add     [updateaddr],ra,rb
 			UML_AND(block, mem(&m_core->swcount), SPR32(SPR_XER), 0x7f);     // and     [swcount],[xer],0x7f
 			UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), mem(&m_core->swcount));// sub  icount,icount,[swcount]
-			UML_CALLHc(block, COND_NZ, *m_lsw[m_core->mode][G_RD(op)]); // call    lsw[rd],nz
+			UML_CALLH(block, *m_lsw[m_core->mode][G_RD(op)]); // call    lsw[rd],nz
 			generate_update_cycles(block, compiler, desc->pc + 4, true);           // <update cycles>
 			return true;
 
@@ -3229,7 +3229,7 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			UML_ADD(block, mem(&m_core->updateaddr), R32Z(G_RA(op)), R32(G_RB(op))); // add     [updateaddr],ra,rb
 			UML_AND(block, mem(&m_core->swcount), SPR32(SPR_XER), 0x7f);     // and     [swcount],[xer],0x7f
 			UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), mem(&m_core->swcount));// sub  icount,icount,[swcount]
-			UML_CALLHc(block, COND_NZ, *m_stsw[m_core->mode][G_RD(op)]);    // call   stsw[rd]
+			UML_CALLH(block, *m_stsw[m_core->mode][G_RD(op)]);    // call   stsw[rd]
 			generate_update_cycles(block, compiler, desc->pc + 4, true);           // <update cycles>
 			return true;
 
