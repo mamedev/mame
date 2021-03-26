@@ -14891,6 +14891,7 @@ mduckspa                        // Mega Duck / Super Quique (Spain)
 
 @source:gba.cpp
 gba                             // Nintendo Game Boy Advance Handheld
+robotech                        // Coleco
 
 @source:gberet.cpp
 gberet                          // GX577 (c) 1985
