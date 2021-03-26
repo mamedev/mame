@@ -429,7 +429,7 @@ private:
 	class svg_renderer;
 
 	// timer IDs
-	enum
+	enum : device_timer_id
 	{
 		TID_VBLANK_START,
 		TID_VBLANK_END,
@@ -511,10 +511,10 @@ private:
 	attoseconds_t       m_vblank_period;            // attoseconds per VBLANK period
 	attotime            m_vblank_start_time;        // time of last VBLANK start
 	attotime            m_vblank_end_time;          // time of last VBLANK end
-	emu_timer *         m_vblank_begin_timer;       // timer to signal VBLANK start
-	emu_timer *         m_vblank_end_timer;         // timer to signal VBLANK end
-	emu_timer *         m_scanline0_timer;          // scanline 0 timer
-	emu_timer *         m_scanline_timer;           // scanline timer
+	persistent_timer    m_vblank_begin_timer;       // timer to signal VBLANK start
+	persistent_timer    m_vblank_end_timer;         // timer to signal VBLANK end
+	persistent_timer    m_scanline0_timer;          // scanline 0 timer
+	persistent_timer    m_scanline_timer;           // scanline timer
 	u64                 m_frame_number;             // the current frame number
 	u32                 m_partial_updates_this_frame;// partial update counter this frame
 

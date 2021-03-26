@@ -267,14 +267,14 @@ public:
 
 	// control
 	timer_instance &reset(attotime const &duration = attotime::never) { return adjust(duration, m_param, m_period); }
-	timer_instance &adjust(attotime start_delay, s32 param = 0, attotime const &periodicity = attotime::never);
+	timer_instance &adjust(attotime const &start_delay, s32 param = 0, attotime const &periodicity = attotime::never);
 
 	// timing queries
 	attotime elapsed() const noexcept;
 	attotime remaining() const noexcept;
-	attotime start() const { return m_start; }
-	attotime expire() const { return m_expire; }
-	attotime period() const { return m_period; }
+	attotime const &start() const { return m_start; }
+	attotime const &expire() const { return m_expire; }
+	attotime const &period() const { return m_period; }
 
 private:
 	// internal helpers
@@ -287,7 +287,7 @@ private:
 	attotime            m_start;        // time when the timer was started
 	attotime            m_expire;       // time when the timer will expire
 	attotime            m_period;       // the repeat frequency of the timer
-	timer_callback *      m_callback;     // pointer to an external callback
+	timer_callback *    m_callback;     // pointer to an external callback
 	u64                 m_param;        // integer parameter
 	u64                 m_param2;       // larger integer parameter
 	u64                 m_param3;       // larger integer parameter
@@ -351,11 +351,11 @@ public:
 	persistent_timer();
 	~persistent_timer();
 
-	// initialization
-	template<typename... T>
-	persistent_timer &init(T &&... args)
+	// initialization; note that we check the 2nd parameter for integer/enum so that the second init form works
+	template<typename T1, typename T2, typename... Tn, std::enable_if_t<!std::is_integral<T2>::value && !std::is_enum<T2>::value, bool> = true>
+	persistent_timer &init(T1 &&arg1, T2 &&arg2, Tn &&... args)
 	{
-		m_callback.enregister(std::forward<T>(args)...);
+		m_callback.enregister(std::forward<T1>(arg1), std::forward<T2>(arg2), std::forward<Tn>(args)...);
 		m_instance.init_persistent(m_callback);
 		return *this;
 	}
@@ -381,14 +381,14 @@ public:
 
 	// control
 	persistent_timer &reset(attotime const &duration = attotime::never) { return adjust(duration, m_instance.param(), m_instance.period()); }
-	persistent_timer &adjust(attotime start_delay, s32 param = 0, attotime const &periodicity = attotime::never) { m_instance.adjust(start_delay, param, periodicity); return *this; }
+	persistent_timer &adjust(attotime const &start_delay, s32 param = 0, attotime const &periodicity = attotime::never) { m_instance.adjust(start_delay, param, periodicity); return *this; }
 
 	// timing queries
 	attotime elapsed() const noexcept { return m_instance.elapsed(); }
 	attotime remaining() const noexcept { return m_instance.remaining(); }
-	attotime start() const { return m_instance.start(); }
-	attotime expire() const { return m_instance.expire(); }
-	attotime period() const { return m_instance.period(); }
+	attotime const &start() const { return m_instance.start(); }
+	attotime const &expire() const { return m_instance.expire(); }
+	attotime const &period() const { return m_instance.period(); }
 
 private:
 	// internal state
@@ -408,6 +408,7 @@ class device_scheduler
 	friend class basetime_relative;
 	friend class timer_callback;
 	friend class timer_instance;
+	friend class device_t; // for access to timer_alloc/timer_set device forms
 
 	class basetime_relative
 	{
@@ -489,13 +490,9 @@ public:
 	void register_callback(timer_callback &callback);
 	void deregister_callback(timer_callback &callback);
 
-	// timers, specified by callback/name
+	// timers, specified by callback/name; using persistent_timer is preferred
 	persistent_timer *timer_alloc(timer_expired_delegate const &callback, void *ptr = nullptr);
 	void synchronize() { m_empty_timer.synchronize(); }
-
-	// timers, specified by device/id; generally devices should use the device_t methods instead
-	persistent_timer *timer_alloc(device_t &device, device_timer_id id = 0, void *ptr = nullptr);
-	void timer_set(attotime const &duration, device_t &device, device_timer_id id = 0, s32 param = 0, u64 param2 = 0, u64 param3 = 0);
 
 	// pointer to the current callback timer, if live
 	timer_instance *callback_timer() const { return m_callback_timer; }
@@ -507,6 +504,10 @@ public:
 	void eat_all_cycles();
 
 private:
+	// timers, specified by device/id; generally devices should use the device_t methods instead
+	persistent_timer *timer_alloc(device_t &device, device_timer_id id = 0, void *ptr = nullptr);
+	void timer_set(attotime const &duration, device_t &device, device_timer_id id = 0, s32 param = 0, u64 param2 = 0, u64 param3 = 0);
+
 	// callbacks
 	void presave();
 	void postload();

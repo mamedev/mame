@@ -563,10 +563,6 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	, m_vblank_period(0)
 	, m_vblank_start_time(attotime::zero)
 	, m_vblank_end_time(attotime::zero)
-	, m_vblank_begin_timer(nullptr)
-	, m_vblank_end_timer(nullptr)
-	, m_scanline0_timer(nullptr)
-	, m_scanline_timer(nullptr)
 	, m_frame_number(0)
 	, m_partial_updates_this_frame(0)
 {
@@ -834,15 +830,15 @@ void screen_device::device_start()
 	m_container->set_user_settings(settings);
 
 	// allocate the VBLANK timers
-	m_vblank_begin_timer = timer_alloc(TID_VBLANK_START);
-	m_vblank_end_timer = timer_alloc(TID_VBLANK_END);
+	m_vblank_begin_timer.init(*this, TID_VBLANK_START);
+	m_vblank_end_timer.init(*this, TID_VBLANK_END);
 
 	// allocate a timer to reset partial updates
-	m_scanline0_timer = timer_alloc(TID_SCANLINE0);
+	m_scanline0_timer.init(*this, TID_SCANLINE0);
 
 	// allocate a timer to generate per-scanline updates
 	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0 || m_scanline_cb)
-		m_scanline_timer = timer_alloc(TID_SCANLINE);
+		m_scanline_timer.init(*this, TID_SCANLINE);
 
 	// configure the screen with the default parameters
 	configure(m_width, m_height, m_visarea, m_refresh);
@@ -853,7 +849,7 @@ void screen_device::device_start()
 
 	// start the timer to generate per-scanline updates
 	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0 || m_scanline_cb)
-		m_scanline_timer->adjust(time_until_pos(0));
+		m_scanline_timer.adjust(time_until_pos(0));
 
 	// create burn-in bitmap
 	if (machine().options().burnin())
@@ -975,7 +971,7 @@ void screen_device::device_timer(timer_instance const &timer, device_timer_id id
 			param++;
 			if (param > m_visarea.bottom())
 				param = m_visarea.top();
-			m_scanline_timer->adjust(time_until_pos(param), param);
+			m_scanline_timer.adjust(time_until_pos(param), param);
 			break;
 	}
 }
@@ -1028,14 +1024,14 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 	if (delta >= m_frame_period)
 		vblank_begin();
 	else
-		m_vblank_begin_timer->adjust(time_until_vblank_start());
+		m_vblank_begin_timer.adjust(time_until_vblank_start());
 
 	// if we are on scanline 0 already, call the scanline 0 timer
 	// by hand now; otherwise, adjust it for the future
 	if (vpos() == 0)
 		reset_partial_updates();
 	else
-		m_scanline0_timer->adjust(time_until_pos(0));
+		m_scanline0_timer.adjust(time_until_pos(0));
 
 	// adjust speed if necessary
 	machine().video().update_refresh_speed();
@@ -1059,14 +1055,14 @@ void screen_device::reset_origin(int beamy, int beamx)
 	if (beamy == 0 && beamx == 0)
 		reset_partial_updates();
 	else
-		m_scanline0_timer->adjust(time_until_pos(0));
+		m_scanline0_timer.adjust(time_until_pos(0));
 
 	// if we are resetting relative to (visarea.bottom() + 1, 0) == VBLANK start,
 	// call the VBLANK start timer now; otherwise, adjust it for the future
 	if (beamy == ((m_visarea.bottom() + 1) % m_height) && beamx == 0)
 		vblank_begin();
 	else
-		m_vblank_begin_timer->adjust(time_until_vblank_start());
+		m_vblank_begin_timer.adjust(time_until_vblank_start());
 }
 
 
@@ -1409,7 +1405,7 @@ void screen_device::reset_partial_updates()
 	m_last_partial_scan = 0;
 	m_partial_scan_hpos = -1;
 	m_partial_updates_this_frame = 0;
-	m_scanline0_timer->adjust(time_until_pos(0));
+	m_scanline0_timer.adjust(time_until_pos(0));
 }
 
 
@@ -1662,13 +1658,13 @@ void screen_device::vblank_begin()
 	m_screen_vblank(1);
 
 	// reset the VBLANK start timer for the next frame
-	m_vblank_begin_timer->adjust(time_until_vblank_start());
+	m_vblank_begin_timer.adjust(time_until_vblank_start());
 
 	// if no VBLANK period, call the VBLANK end callback immediately, otherwise reset the timer
 	if (m_vblank_period == 0)
 		vblank_end();
 	else
-		m_vblank_end_timer->adjust(time_until_vblank_end());
+		m_vblank_end_timer.adjust(time_until_vblank_end());
 }
 
 

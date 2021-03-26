@@ -256,19 +256,18 @@ bool timer_instance::enable(bool enable)
 //  firings
 //-------------------------------------------------
 
-timer_instance &timer_instance::adjust(attotime start_delay, s32 param, const attotime &period)
+timer_instance &timer_instance::adjust(attotime const &start_delay, s32 param, attotime const &period)
 {
-	// clamp negative times to 0
-	if (start_delay.seconds() < 0)
-		start_delay = attotime::zero;
-
 	// set the start and expire times
 	m_start = scheduler().time();
 	m_period = period.is_zero() ? attotime::never : period;
 	m_param = param;
 
 	// move it into place
-	scheduler().instance_move(*this, m_start + start_delay, true);
+	if (start_delay.seconds() >= 0)
+		scheduler().instance_move(*this, m_start + start_delay, true);
+	else
+		scheduler().instance_move(*this, m_start, true);
 	return *this;
 }
 
@@ -401,7 +400,7 @@ transient_timer_factory::transient_timer_factory()
 //  call the callback after a given amount of time
 //-------------------------------------------------
 
-void transient_timer_factory::call_after(const attotime &duration, u64 param, u64 param2, u64 param3)
+void transient_timer_factory::call_after(attotime const &duration, u64 param, u64 param2, u64 param3)
 {
 	m_callback.scheduler().instance_alloc().init_transient(m_callback, duration)
 		.set_param(param).set_param2(param2).set_param3(param3);
@@ -413,7 +412,7 @@ void transient_timer_factory::call_after(const attotime &duration, u64 param, u6
 //  call the callback after a given amount of time
 //-------------------------------------------------
 
-void transient_timer_factory::call_after(device_timer_id id, const attotime &duration, u64 param, u64 param2, u64 param3)
+void transient_timer_factory::call_after(device_timer_id id, attotime const &duration, u64 param, u64 param2, u64 param3)
 {
 	m_callback.scheduler().instance_alloc().init_transient(m_callback, duration)
 		.set_id(id).set_param(param).set_param2(param2).set_param3(param3);
@@ -973,7 +972,7 @@ void device_scheduler::abort_timeslice()
 //  trigger - generate a global trigger
 //-------------------------------------------------
 
-void device_scheduler::trigger(int trigid, const attotime &after)
+void device_scheduler::trigger(int trigid, attotime const &after)
 {
 	// ensure we have a list of executing devices
 	if (m_execute_list == nullptr)
@@ -995,7 +994,7 @@ void device_scheduler::trigger(int trigid, const attotime &after)
 //  interleave factor
 //-------------------------------------------------
 
-void device_scheduler::boost_interleave(const attotime &timeslice_time, const attotime &boost_duration)
+void device_scheduler::boost_interleave(attotime const &timeslice_time, attotime const &boost_duration)
 {
 	// ignore timeslices > 1 second
 	if (timeslice_time.seconds() > 0)
@@ -1385,7 +1384,7 @@ inline void device_scheduler::apply_suspend_changes()
 //  that is in use
 //-------------------------------------------------
 
-void device_scheduler::add_scheduling_quantum(const attotime &quantum, const attotime &duration)
+void device_scheduler::add_scheduling_quantum(attotime const &quantum, attotime const &duration)
 {
 	assert(quantum.seconds() == 0);
 
