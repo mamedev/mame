@@ -22641,6 +22641,7 @@ megazonej                       // GX319 (c) 1983 + Interlogic / Kosuka
 
 @source:meijinsn.cpp
 meijinsn                        // (c) 1986 SNK
+meijinsna                       // (c) 1986 SNK
 
 @source:mekd1.cpp
 mekd1                           // 1975 Motorola Evaluation Kit
