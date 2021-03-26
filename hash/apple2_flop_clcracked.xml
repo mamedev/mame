@@ -15731,7 +15731,7 @@ license:CC0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="mecc-a785 writing a character sketch v1.0 (4am crack).dsk" size="143360" crc="7085b661" sha1="8b65a6841d5615ecf39806478d7a355f09484ab5" />
+				<rom name="mecc-a785 writing a character sketch v1.0 (4am crack).dsk" size="143360" crc="608ea78b" sha1="8b65a6841d5615ecf39806478d7a355f09484ab5" />
 			</dataarea>
 		</part>
 	</software>
