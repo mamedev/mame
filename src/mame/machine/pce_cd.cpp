@@ -700,11 +700,6 @@ void pce_cd_device::nec_get_dir_info()
 			{
 				track = std::max(bcd_2_dec(m_command_buffer[2]), 1U);
 				frame = toc->tracks[track-1].logframeofs;
-				// PCE wants the start sector for data tracks to *not* include the pregap
-				if (toc->tracks[track-1].trktype != CD_TRACK_AUDIO)
-				{
-					frame += toc->tracks[track-1].pregap;
-				}
 				m_data_buffer[3] = (toc->tracks[track-1].trktype == CD_TRACK_AUDIO) ? 0x00 : 0x04;
 			}
 			logerror("track = %d, frame = %d\n", track, frame);
