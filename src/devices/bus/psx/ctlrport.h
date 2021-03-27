@@ -57,7 +57,7 @@ private:
 	bool m_ack;
 	bool m_rx;
 
-	emu_timer *m_ack_timer;
+	persistent_timer m_ack_timer;
 	psx_controller_port_device *m_owner;
 };
 

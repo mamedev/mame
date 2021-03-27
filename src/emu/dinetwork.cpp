@@ -19,8 +19,8 @@ device_network_interface::~device_network_interface()
 
 void device_network_interface::interface_pre_start()
 {
-	m_send_timer = interface_timer_alloc(*this, FUNC(device_network_interface::send_complete));
-	m_recv_timer = interface_timer_alloc(*this, FUNC(device_network_interface::recv_complete));
+	m_send_timer.init(*this, FUNC(device_network_interface::send_complete));
+	m_recv_timer.init(*this, FUNC(device_network_interface::recv_complete));
 }
 
 void device_network_interface::interface_post_start()
@@ -44,7 +44,7 @@ int device_network_interface::send(u8 *buf, int len)
 		if (result)
 		{
 			// schedule receive complete callback
-			m_recv_timer->adjust(attotime::from_ticks(len, m_bandwidth * 1'000'000 / 8), result);
+			m_recv_timer.adjust(attotime::from_ticks(len, m_bandwidth * 1'000'000 / 8), result);
 		}
 	}
 	else if (m_dev)
@@ -54,19 +54,19 @@ int device_network_interface::send(u8 *buf, int len)
 	}
 
 	// schedule transmit complete callback
-	m_send_timer->adjust(attotime::from_ticks(len, m_bandwidth * 1'000'000 / 8), result);
+	m_send_timer.adjust(attotime::from_ticks(len, m_bandwidth * 1'000'000 / 8), result);
 
 	return result;
 }
 
-TIMER_CALLBACK_MEMBER(device_network_interface::send_complete)
+void device_network_interface::send_complete(timer_instance const &timer)
 {
-	send_complete_cb(param);
+	send_complete_cb(timer.param());
 }
 
 void device_network_interface::recv_cb(u8 *buf, int len)
 {
-	if (m_recv_timer->enabled())
+	if (m_recv_timer.enabled())
 		throw emu_fatalerror("%s(%s): attempted to receive while receive already in progress", device().shortname(), device().tag());
 
 	int result = 0;
@@ -82,13 +82,13 @@ void device_network_interface::recv_cb(u8 *buf, int len)
 			m_dev->stop();
 
 		// schedule receive complete callback
-		m_recv_timer->adjust(attotime::from_ticks(len, m_bandwidth * 1'000'000 / 8), result);
+		m_recv_timer.adjust(attotime::from_ticks(len, m_bandwidth * 1'000'000 / 8), result);
 	}
 }
 
-TIMER_CALLBACK_MEMBER(device_network_interface::recv_complete)
+void device_network_interface::recv_complete(timer_instance const &timer)
 {
-	recv_complete_cb(param);
+	recv_complete_cb(timer.param());
 
 	// start receiving data from the network again
 	if (m_dev && !m_loopback_control)
@@ -130,7 +130,7 @@ void device_network_interface::set_loopback(bool loopback)
 	{
 		if (loopback)
 			m_dev->stop();
-		else if (!m_recv_timer->enabled())
+		else if (!m_recv_timer.enabled())
 			m_dev->start();
 	}
 }

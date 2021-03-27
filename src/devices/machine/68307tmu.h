@@ -15,13 +15,13 @@ public:
 	{
 		uint16_t regs[0x8];
 		bool enabled;
-		emu_timer *mametimer;
+		persistent_timer mametimer;
 	};
 
 
 	single_timer singletimer[2];
 
-	emu_timer *wd_mametimer;
+	persistent_timer wd_mametimer;
 	m68307_cpu_device *parent;
 
 	void write_tmr(uint16_t data, uint16_t mem_mask, int which);

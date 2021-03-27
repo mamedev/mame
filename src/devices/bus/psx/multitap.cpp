@@ -222,9 +222,9 @@ void psx_multitap_device::do_pad()
 		// ports won't ack if they are done
 		m_cack[0] = m_cack[1] = m_cack[2] = m_cack[3] = true;
 		if(m_count < 11)
-			m_ack_timer->adjust(attotime::from_usec(12), 0); // give a bit of time for the ports to ack
+			m_ack_timer.adjust(attotime::from_usec(12), 0); // give a bit of time for the ports to ack
 		else if(m_count < 35)
-			m_ack_timer->adjust(attotime::from_usec(10), 0);
+			m_ack_timer.adjust(attotime::from_usec(10), 0);
 	}
 
 	m_bit = (m_bit + 1) % 8;

@@ -830,8 +830,8 @@ void screen_device::device_start()
 	m_container->set_user_settings(settings);
 
 	// allocate the VBLANK timers
-	m_vblank_begin_timer.init(*this, TID_VBLANK_START);
-	m_vblank_end_timer.init(*this, TID_VBLANK_END);
+	m_vblank_begin_timer.init(*this, FUNC(screen_device::vblank_begin));
+	m_vblank_end_timer.init(*this, FUNC(screen_device::vblank_end));
 
 	// allocate a timer to reset partial updates
 	m_scanline0_timer.init(*this, TID_SCANLINE0);
@@ -934,16 +934,6 @@ void screen_device::device_timer(timer_instance const &timer, device_timer_id id
 {
 	switch (id)
 	{
-		// signal VBLANK start
-		case TID_VBLANK_START:
-			vblank_begin();
-			break;
-
-		// signal VBLANK end
-		case TID_VBLANK_END:
-			vblank_end();
-			break;
-
 		// first scanline
 		case TID_SCANLINE0:
 			reset_partial_updates();

@@ -19,8 +19,6 @@ template <uint8_t ROW_COUNT>
 template <typename... T>
 device_matrix_keyboard_interface<ROW_COUNT>::device_matrix_keyboard_interface(machine_config const &mconfig, device_t &device, T &&... tags)
 	: device_interface(device, "matrix_keyboard")
-	, m_scan_timer(nullptr)
-	, m_typematic_timer(nullptr)
 	, m_key_rows{ { device, std::forward<T>(tags) }... }
 	, m_next_row(0U)
 	, m_processing(0U)
@@ -33,10 +31,8 @@ device_matrix_keyboard_interface<ROW_COUNT>::device_matrix_keyboard_interface(ma
 template <uint8_t ROW_COUNT>
 void device_matrix_keyboard_interface<ROW_COUNT>::interface_pre_start()
 {
-	if (!m_scan_timer)
-		m_scan_timer = device().timer_alloc(*this, FUNC(device_matrix_keyboard_interface<ROW_COUNT>::scan_row));
-	if (!m_typematic_timer)
-		m_typematic_timer = device().timer_alloc(*this, FUNC(device_matrix_keyboard_interface<ROW_COUNT>::typematic));
+	m_scan_timer.init(*this, FUNC(device_matrix_keyboard_interface<ROW_COUNT>::scan_row));
+	m_typematic_timer.init(*this, FUNC(device_matrix_keyboard_interface<ROW_COUNT>::typematic));
 	reset_key_state();
 	typematic_stop();
 }
@@ -57,14 +53,14 @@ template <uint8_t ROW_COUNT>
 void device_matrix_keyboard_interface<ROW_COUNT>::start_processing(const attotime &period)
 {
 	m_processing = 1U;
-	m_scan_timer->adjust(period, 0, period);
+	m_scan_timer.adjust(period, 0, period);
 }
 
 
 template <uint8_t ROW_COUNT>
 void device_matrix_keyboard_interface<ROW_COUNT>::stop_processing()
 {
-	m_scan_timer->reset();
+	m_scan_timer.reset();
 	m_processing = 0U;
 }
 
@@ -82,7 +78,7 @@ void device_matrix_keyboard_interface<ROW_COUNT>::typematic_start(uint8_t row, u
 {
 	m_typematic_row = row;
 	m_typematic_column = column;
-	m_typematic_timer->adjust(delay, 0, interval);
+	m_typematic_timer.adjust(delay, 0, interval);
 }
 
 
@@ -90,7 +86,7 @@ template <uint8_t ROW_COUNT>
 void device_matrix_keyboard_interface<ROW_COUNT>::typematic_restart(attotime const &delay, attotime const &interval)
 {
 	if ((m_typematic_row != uint8_t(~0U)) || (m_typematic_column != uint8_t(~0U)))
-		m_typematic_timer->adjust(delay, 0, interval);
+		m_typematic_timer.adjust(delay, 0, interval);
 }
 
 
@@ -99,12 +95,12 @@ void device_matrix_keyboard_interface<ROW_COUNT>::typematic_stop()
 {
 	m_typematic_row = uint8_t(~0U);
 	m_typematic_column = uint8_t(~0U);
-	m_typematic_timer->reset();
+	m_typematic_timer.reset();
 }
 
 
 template <uint8_t ROW_COUNT>
-TIMER_CALLBACK_MEMBER(device_matrix_keyboard_interface<ROW_COUNT>::scan_row)
+void device_matrix_keyboard_interface<ROW_COUNT>::scan_row(timer_instance const &timer)
 {
 	assert(m_next_row < std::size(m_key_rows));
 	assert(m_next_row < std::size(m_key_states));
@@ -135,7 +131,7 @@ TIMER_CALLBACK_MEMBER(device_matrix_keyboard_interface<ROW_COUNT>::scan_row)
 
 
 template <uint8_t ROW_COUNT>
-TIMER_CALLBACK_MEMBER(device_matrix_keyboard_interface<ROW_COUNT>::typematic)
+void device_matrix_keyboard_interface<ROW_COUNT>::typematic(timer_instance const &timer)
 {
 	assert((m_typematic_row != uint8_t(~0U)) || (m_typematic_column != uint8_t(~0U)));
 	key_repeat(m_typematic_row, m_typematic_column);

@@ -129,8 +129,8 @@ protected:
 	const char *stop_bits_tostring(stop_bits_t stop_bits);
 
 private:
-	TIMER_CALLBACK_MEMBER(rcv_clock) { rx_clock_w(!m_rcv_clock_state); }
-	TIMER_CALLBACK_MEMBER(tra_clock) { tx_clock_w(!m_tra_clock_state); }
+	void rcv_clock(timer_instance const &timer) { rx_clock_w(!m_rcv_clock_state); }
+	void tra_clock(timer_instance const &timer) { tx_clock_w(!m_tra_clock_state); }
 
 	u8 m_serial_parity_table[256];
 
@@ -169,8 +169,8 @@ private:
 	/* length of data to send */
 	u8 m_tra_bit_count;
 
-	emu_timer *m_rcv_clock;
-	emu_timer *m_tra_clock;
+	persistent_timer m_rcv_clock;
+	persistent_timer m_tra_clock;
 	attotime m_rcv_rate;
 	attotime m_tra_rate;
 	u8 m_rcv_line;

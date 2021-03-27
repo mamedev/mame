@@ -162,7 +162,7 @@ private:
 
 	void check_tx_bit_buffer();
 
-	emu_timer * m_error_timer;
+	persistent_timer m_error_timer;
 	u8          m_bit_phase;
 	u8          m_tx_bit_buffer;
 	bool        m_tip_in, m_ring_in;

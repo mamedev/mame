@@ -38,8 +38,8 @@ class osd_netdev *open_netdev(int id, class device_network_interface *ifdev, int
 osd_netdev::osd_netdev(class device_network_interface *ifdev, int rate)
 {
 	m_dev = ifdev;
-	m_timer = ifdev->device().timer_alloc(*this, FUNC(osd_netdev::recv));
-	m_timer->adjust(attotime::from_hz(rate), 0, attotime::from_hz(rate));
+	m_timer.init(ifdev->device().scheduler(), *this, FUNC(osd_netdev::recv));
+	m_timer.adjust(attotime::from_hz(rate), 0, attotime::from_hz(rate));
 }
 
 osd_netdev::~osd_netdev()
@@ -48,12 +48,12 @@ osd_netdev::~osd_netdev()
 
 void osd_netdev::start()
 {
-	m_timer->enable(true);
+	m_timer.enable(true);
 }
 
 void osd_netdev::stop()
 {
-	m_timer->enable(false);
+	m_timer.enable(false);
 }
 
 int osd_netdev::send(uint8_t *buf, int len)
@@ -66,7 +66,7 @@ void osd_netdev::recv(void *ptr, int param)
 	uint8_t *buf;
 	int len;
 	//const char atalkmac[] = { 0x09, 0x00, 0x07, 0xff, 0xff, 0xff };
-	while(m_timer->enabled() && (len = recv_dev(&buf)))
+	while(m_timer.enabled() && (len = recv_dev(&buf)))
 	{
 #if 0
 		if(buf[0] & 1)

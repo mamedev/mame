@@ -344,7 +344,7 @@ private:
 	bool                    m_paused;               // paused?
 	bool                    m_hard_reset_pending;   // is a hard reset pending?
 	bool                    m_exit_pending;         // is an exit pending?
-	emu_timer *             m_soft_reset_timer;     // timer used to schedule a soft reset
+	persistent_timer        m_soft_reset_timer;     // timer used to schedule a soft reset
 
 	// misc state
 	u32                     m_rand_seed;            // current random number seed

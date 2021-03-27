@@ -601,7 +601,7 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output
 
 	// create an update timer for synchronous streams
 	if (synchronous())
-		m_sync_timer.init(m_device.scheduler(), nullptr, timer_expired_delegate(FUNC(sound_stream::sync_update), this));
+		m_sync_timer.init(m_device.scheduler(), *this, FUNC(sound_stream::sync_update));
 
 	// force an update to the sample rates
 	sample_rate_changed();
@@ -1101,7 +1101,7 @@ sound_manager::sound_manager(running_machine &machine) :
 	set_attenuation(machine.options().volume());
 
 	// start the periodic update flushing timer
-	m_update_timer.init(machine.scheduler(), nullptr, timer_expired_delegate(FUNC(sound_manager::update), this));
+	m_update_timer.init(machine.scheduler(), *this, FUNC(sound_manager::update));
 	m_update_timer.adjust(STREAMS_UPDATE_ATTOTIME, 0, STREAMS_UPDATE_ATTOTIME);
 }
 

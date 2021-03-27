@@ -89,7 +89,7 @@ private:
 
 		apollo_kbd_device *m_device; // pointer back to our device
 		beep_device *m_beeper; // the keyboard beeper device
-		emu_timer * m_timer; // timer to clock data in
+		persistent_timer m_timer; // timer to clock data in
 	};
 
 	// the keyboard mouse
@@ -133,7 +133,7 @@ private:
 	uint32_t m_rx_message;
 	uint16_t m_loopback_mode;
 
-	emu_timer* m_timer;
+	persistent_timer m_timer;
 	uint16_t m_mode;
 	uint16_t m_delay;         // key press delay after initial press
 	uint16_t m_repeat;        // key press repeat rate

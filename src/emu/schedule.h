@@ -67,7 +67,7 @@ public:
 	// copy assignment
 	timer_expired_delegate &operator=(timer_expired_delegate const &src)
 	{
-		*(timer_expired_delegate_native *)this = src;
+		*static_cast<timer_expired_delegate_native *>(this) = src;
 		m_sub_delegate = src.m_sub_delegate;
 
 		// if the delegate is bound to the source object, rebind it to the copy
@@ -188,21 +188,32 @@ public:
 	// copy assignment
 	timer_callback &operator=(timer_callback const &src);
 
-	// registration
-	timer_callback &enregister(device_scheduler &scheduler, char const *unique, timer_expired_delegate const &callback);
-	timer_callback &enregister(device_t &device, char const *unique, timer_expired_delegate const &callback);
-	timer_callback &interface_enregister(device_interface &device, char const *unique, timer_expired_delegate const &callback);
+	// registration of a delegate directly
+	timer_callback &enregister_base(device_scheduler &scheduler, timer_expired_delegate const &callback, char const *unique);
 
-	// direct registration for device's and device interfaces
-	template<typename DeviceType, typename FuncType>
+	// registration of a delegate directly, adding device tag to unique id
+	timer_callback &enregister_device(device_t &device, timer_expired_delegate const &callback, char const *unique);
+
+	// registration of an arbitrary member function bound to an arbitrary object; requires the
+	// device_scheduler as the first parameter since we don't know how to get one
+	template<typename ObjectType, typename FuncType>
+	timer_callback &enregister(device_scheduler &scheduler, ObjectType &object, FuncType callback, char const *string, char const *unique = nullptr)
+	{
+		return enregister_base(scheduler, timer_expired_delegate(callback, string, &object), unique);
+	}
+
+	// registration of a device member function bound to that device
+	template<typename DeviceType, typename FuncType, std::enable_if_t<std::is_base_of<device_t, DeviceType>::value, bool> = true>
 	timer_callback &enregister(DeviceType &device, FuncType callback, char const *string, char const *unique = nullptr)
 	{
-		return enregister(device, unique, timer_expired_delegate(callback, string, &device));
+		return enregister_device(device, timer_expired_delegate(callback, string, &device), unique);
 	}
-	template<typename IntfType, typename FuncType>
-	timer_callback &interface_enregister(IntfType &intf, FuncType callback, char const *string, char const *unique = nullptr)
+
+	// registration of a device interface member function bound to the interface
+	template<typename IntfType, typename FuncType, std::enable_if_t<std::is_base_of<device_interface, IntfType>::value && !std::is_base_of<device_t, IntfType>::value, bool> = true>
+	timer_callback &enregister(IntfType &intf, FuncType callback, char const *string, char const *unique = nullptr)
 	{
-		return interface_enregister(intf, unique, timer_expired_delegate(callback, string, &intf));
+		return enregister_device(intf.device(), timer_expired_delegate(callback, string, &intf), unique);
 	}
 
 	// getters
@@ -314,13 +325,6 @@ public:
 		m_callback.enregister(std::forward<T>(args)...);
 	}
 
-	// initialization
-	template<typename... T>
-	void interface_init(T &&... args)
-	{
-		m_callback.interface_enregister(std::forward<T>(args)...);
-	}
-
 	// create a new timer_instance that will fire after the given duration
 	void call_after(attotime const &duration, u64 param = 0, u64 param2 = 0, u64 param3 = 0);
 
@@ -351,14 +355,26 @@ public:
 	persistent_timer();
 	~persistent_timer();
 
-	// initialization; note that we check the 2nd parameter for integer/enum so that the second init form works
-	template<typename T1, typename T2, typename... Tn, std::enable_if_t<!std::is_integral<T2>::value && !std::is_enum<T2>::value, bool> = true>
+	// generic initialization; matches any of the enregister forms; note that we test the
+	// second parameter for int/enum/timer_expired_delegate to allow for the specialized
+	// cases below
+	template<typename T1, typename T2, typename... Tn, std::enable_if_t<!std::is_integral<T2>::value && !std::is_enum<T2>::value && !std::is_base_of<timer_expired_delegate, T2>::value, bool> = true>
 	persistent_timer &init(T1 &&arg1, T2 &&arg2, Tn &&... args)
 	{
 		m_callback.enregister(std::forward<T1>(arg1), std::forward<T2>(arg2), std::forward<Tn>(args)...);
 		m_instance.init_persistent(m_callback);
 		return *this;
 	}
+
+	// initialize with the scheduler and a pre-formed timer_expired_delegate
+	persistent_timer &init(device_scheduler &scheduler, timer_expired_delegate const &callback, char const *unique = nullptr)
+	{
+		m_callback.enregister_base(scheduler, callback, unique);
+		m_instance.init_persistent(m_callback);
+		return *this;
+	}
+
+	// initialize with a device and ID; implicitly calls the device's device_timer method
 	persistent_timer &init(device_t &device, device_timer_id id);
 
 	// getters

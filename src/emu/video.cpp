@@ -72,7 +72,6 @@ static void video_notifier_callback(const char *outname, s32 value, void *param)
 
 video_manager::video_manager(running_machine &machine)
 	: m_machine(machine)
-	, m_screenless_frame_timer(nullptr)
 	, m_output_changed(false)
 	, m_throttle_last_ticks(0)
 	, m_throttle_realtime(attotime::zero)
@@ -172,8 +171,8 @@ video_manager::video_manager(running_machine &machine)
 	// if no screens, create a periodic timer to drive updates
 	if (no_screens)
 	{
-		m_screenless_frame_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(video_manager::screenless_update_callback), this));
-		m_screenless_frame_timer->adjust(screen_device::DEFAULT_FRAME_PERIOD, 0, screen_device::DEFAULT_FRAME_PERIOD);
+		m_screenless_frame_timer.init(machine.scheduler(), *this, FUNC(video_manager::screenless_update_callback));
+		m_screenless_frame_timer.adjust(screen_device::DEFAULT_FRAME_PERIOD, 0, screen_device::DEFAULT_FRAME_PERIOD);
 		machine.output().set_global_notifier(video_notifier_callback, this);
 	}
 }

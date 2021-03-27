@@ -431,8 +431,6 @@ private:
 	// timer IDs
 	enum : device_timer_id
 	{
-		TID_VBLANK_START,
-		TID_VBLANK_END,
 		TID_SCANLINE0,
 		TID_SCANLINE
 	};

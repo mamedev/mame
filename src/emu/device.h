@@ -605,7 +605,7 @@ public:
 	u64 attotime_to_clocks(const attotime &duration) const noexcept;
 
 	// timer interfaces
-	template<typename DeviceType, typename FuncType>
+	template<typename DeviceType, typename FuncType, std::enable_if_t<std::is_base_of<device_t, DeviceType>::value, bool> = true>
 	emu_timer *timer_alloc(DeviceType &device, FuncType callback, char const *name, void *ptr = nullptr)
 	{
 		return m_scheduler->timer_alloc(timer_expired_delegate(callback, name, &device), ptr);
@@ -883,13 +883,6 @@ public:
 	device_t &device() { return m_device; }
 	const device_t &device() const { return m_device; }
 	operator device_t &() { return m_device; }
-
-	// timer helpers
-	template<typename InterfaceType, typename FuncType>
-	emu_timer *interface_timer_alloc(InterfaceType &intf, FuncType callback, char const *name)
-	{
-		return m_device.scheduler().timer_alloc(timer_expired_delegate(callback, name, &intf));
-	}
 
 	// iteration helpers
 	device_interface *interface_next() const { return m_interface_next; }

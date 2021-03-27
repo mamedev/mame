@@ -90,10 +90,10 @@ timer_callback &timer_callback::operator=(timer_callback const &src)
 
 
 //-------------------------------------------------
-//  enregister - register this callback
+//  enregister_base - register a callback
 //-------------------------------------------------
 
-timer_callback &timer_callback::enregister(device_scheduler &scheduler, char const *unique, timer_expired_delegate const &callback)
+timer_callback &timer_callback::enregister_base(device_scheduler &scheduler, timer_expired_delegate const &callback, char const *unique)
 {
 	// build the full name, appending the unique identifier if present
 	std::string fullid = callback.name();
@@ -126,11 +126,11 @@ timer_callback &timer_callback::enregister(device_scheduler &scheduler, char con
 
 
 //-------------------------------------------------
-//  enregister - register this callback, associated
-//  with a device
+//  enregister_device - register this callback,
+//  associated with a device
 //-------------------------------------------------
 
-timer_callback &timer_callback::enregister(device_t &device, char const *unique, timer_expired_delegate const &callback)
+timer_callback &timer_callback::enregister_device(device_t &device, timer_expired_delegate const &callback, char const *unique)
 {
 	char const *new_unique = device.tag();
 	std::string tempstr;
@@ -141,18 +141,7 @@ timer_callback &timer_callback::enregister(device_t &device, char const *unique,
 		tempstr += unique;
 		new_unique = tempstr.c_str();
 	}
-	return enregister(device.machine().scheduler(), new_unique, callback).set_device(device);
-}
-
-
-//-------------------------------------------------
-//  interface_enregister - register this callback,
-//  associated with a device_interface
-//-------------------------------------------------
-
-timer_callback &timer_callback::interface_enregister(device_interface &intf, char const *unique, timer_expired_delegate const &callback)
-{
-	return enregister(intf.device(), unique, callback);
+	return enregister_base(device.machine().scheduler(), callback, new_unique).set_device(device);
 }
 
 
@@ -726,8 +715,8 @@ device_scheduler::device_scheduler(running_machine &machine) :
 	machine.save().register_presave(save_prepost_delegate(FUNC(device_scheduler::presave), this));
 	machine.save().register_postload(save_prepost_delegate(FUNC(device_scheduler::postload), this));
 
-	m_empty_timer.init(*this, FUNC(device_scheduler::empty_timer));
-	m_timed_trigger.init(*this, FUNC(device_scheduler::timed_trigger));
+	m_empty_timer.init(*this, *this, FUNC(device_scheduler::empty_timer));
+	m_timed_trigger.init(*this, *this, FUNC(device_scheduler::timed_trigger));
 }
 
 
@@ -1043,7 +1032,7 @@ persistent_timer *device_scheduler::timer_alloc(timer_expired_delegate const &ca
 	persistent_timer &timer = *m_allocated_persistents.back().get();
 
 	// initialize the timer instance
-	return &timer.init(*this, nullptr, callback).set_ptr(ptr);
+	return &timer.init(*this, callback).set_ptr(ptr);
 }
 
 

@@ -57,22 +57,22 @@ void cedar_magnet_board_interface::irq_hold()
 
 void cedar_magnet_board_interface::halt_assert()
 {
-	m_halt_assert_timer->adjust(attotime::from_usec(2));
+	m_halt_assert_timer.adjust(attotime::from_usec(2));
 }
 
 void cedar_magnet_board_interface::halt_clear()
 {
-	m_halt_clear_timer->adjust(attotime::from_usec(2));
+	m_halt_clear_timer.adjust(attotime::from_usec(2));
 }
 
 void cedar_magnet_board_interface::reset_assert()
 {
-	m_reset_assert_timer->adjust(attotime::from_usec(1));
+	m_reset_assert_timer.adjust(attotime::from_usec(1));
 }
 
 void cedar_magnet_board_interface::reset_clear()
 {
-	m_reset_clear_timer->adjust(attotime::from_usec(1));
+	m_reset_clear_timer.adjust(attotime::from_usec(1));
 }
 
 void cedar_magnet_board_interface::interface_pre_reset()
@@ -82,8 +82,8 @@ void cedar_magnet_board_interface::interface_pre_reset()
 
 void cedar_magnet_board_interface::interface_pre_start()
 {
-	m_halt_assert_timer = device().timer_alloc(*this, FUNC(cedar_magnet_board_interface::halt_assert_callback));
-	m_halt_clear_timer = device().timer_alloc(*this, FUNC(cedar_magnet_board_interface::halt_clear_callback));
-	m_reset_assert_timer = device().timer_alloc(*this, FUNC(cedar_magnet_board_interface::reset_assert_callback));
-	m_reset_clear_timer = device().timer_alloc(*this, FUNC(cedar_magnet_board_interface::reset_clear_callback));
+	m_halt_assert_timer.init(device().scheduler(), *this, FUNC(cedar_magnet_board_interface::halt_assert_callback));
+	m_halt_clear_timer.init(device().scheduler(), *this, FUNC(cedar_magnet_board_interface::halt_clear_callback));
+	m_reset_assert_timer.init(device().scheduler(), *this, FUNC(cedar_magnet_board_interface::reset_assert_callback));
+	m_reset_clear_timer.init(device().scheduler(), *this, FUNC(cedar_magnet_board_interface::reset_clear_callback));
 }

@@ -54,17 +54,17 @@ protected:
 	bool are_all_keys_up();
 
 private:
-	TIMER_CALLBACK_MEMBER(scan_row);
-	TIMER_CALLBACK_MEMBER(typematic);
+	void scan_row(timer_instance const &timer);
+	void typematic(timer_instance const &timer);
 
-	emu_timer       *m_scan_timer;
-	emu_timer       *m_typematic_timer;
-	required_ioport m_key_rows[ROW_COUNT];
-	ioport_value    m_key_states[ROW_COUNT];
-	u8              m_next_row;
-	u8              m_processing;
-	u8              m_typematic_row;
-	u8              m_typematic_column;
+	persistent_timer m_scan_timer;
+	persistent_timer m_typematic_timer;
+	required_ioport  m_key_rows[ROW_COUNT];
+	ioport_value     m_key_states[ROW_COUNT];
+	u8               m_next_row;
+	u8               m_processing;
+	u8               m_typematic_row;
+	u8               m_typematic_column;
 };
 
 

@@ -120,7 +120,6 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 		m_paused(false),
 		m_hard_reset_pending(false),
 		m_exit_pending(false),
-		m_soft_reset_timer(nullptr),
 		m_rand_seed(0x9d14abd7),
 		m_ui_active(_config.options().ui_active()),
 		m_basename(_config.gamedrv().name),
@@ -198,7 +197,7 @@ void running_machine::start()
 	m_bookkeeping = std::make_unique<bookkeeping_manager>(*this);
 
 	// allocate a soft_reset timer
-	m_soft_reset_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::soft_reset), this));
+	m_soft_reset_timer.init(m_scheduler, *this, FUNC(running_machine::soft_reset));
 
 	// initialize UI input
 	m_ui_input = std::make_unique<ui_input_manager>(*this);
@@ -492,7 +491,7 @@ void running_machine::schedule_hard_reset()
 
 void running_machine::schedule_soft_reset()
 {
-	m_soft_reset_timer->adjust(attotime::zero);
+	m_soft_reset_timer.adjust(attotime::zero);
 
 	// we can't be paused since the timer needs to fire
 	resume();

@@ -1266,7 +1266,6 @@ ymfm_engine_base<RegisterType>::ymfm_engine_base(device_t &device) :
 	m_irq_mask(STATUS_TIMERA | STATUS_TIMERB),
 	m_irq_state(0),
 	m_busy_end(attotime::zero),
-	m_timer{ nullptr, nullptr },
 	m_irq_handler(device),
 	m_regdata(RegisterType::REGISTERS),
 	m_regs(m_regdata)
@@ -1286,14 +1285,14 @@ void ymfm_engine_base<RegisterType>::save(device_t &device)
 {
 	// allocate our timers
 	for (int tnum = 0; tnum < 2; tnum++)
-		m_timer[tnum] = device.timer_alloc(*this, FUNC(ymfm_engine_base::timer_handler));
+		m_timer[tnum].init(device.scheduler(), *this, FUNC(ymfm_engine_base::timer_handler));
 
 	// resolve the IRQ handler while we're here
 	m_irq_handler.resolve();
 
 	// register timer callbacks
-	m_synced_mode_w.init(device.machine().scheduler(), device.tag(), timer_expired_delegate(FUNC(ymfm_engine_base<RegisterType>::synced_mode_w), this));
-	m_check_interrupts.init(device.machine().scheduler(), device.tag(), timer_expired_delegate(FUNC(ymfm_engine_base<RegisterType>::check_interrupts), this));
+	m_synced_mode_w.init(device.scheduler(), *this, FUNC(ymfm_engine_base<RegisterType>::synced_mode_w));
+	m_check_interrupts.init(device.scheduler(), *this, FUNC(ymfm_engine_base<RegisterType>::check_interrupts));
 
 	// save our data
 	device.save_item(YMFM_NAME(m_env_counter));
@@ -1586,7 +1585,7 @@ template<class RegisterType>
 void ymfm_engine_base<RegisterType>::update_timer(u8 tnum, u8 enable)
 {
 	// if the timer is live, but not currently enabled, set the timer
-	if (enable && !m_timer[tnum]->enabled())
+	if (enable && !m_timer[tnum].enabled())
 	{
 		// each timer clock is n channels * 4 operators * prescale factor (2/3/6)
 		u32 clockscale = RegisterType::CHANNELS * 4 * m_clock_prescale;
@@ -1595,12 +1594,12 @@ void ymfm_engine_base<RegisterType>::update_timer(u8 tnum, u8 enable)
 		u32 period = (tnum == 0) ? (1024 - m_regs.timer_a_value()) : 16 * (256 - m_regs.timer_b_value());
 
 		// reset it
-		m_timer[tnum]->adjust(attotime::from_hz(m_device.clock()) * (period * clockscale), tnum);
+		m_timer[tnum].adjust(attotime::from_hz(m_device.clock()) * (period * clockscale), tnum);
 	}
 
 	// if the timer is not live, ensure it is not enabled
 	else if (!enable)
-		m_timer[tnum]->enable(false);
+		m_timer[tnum].enable(false);
 }
 
 

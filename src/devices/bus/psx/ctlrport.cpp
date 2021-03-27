@@ -100,7 +100,7 @@ void psxcontrollerports_device::ack()
 device_psx_controller_interface::device_psx_controller_interface(const machine_config &mconfig, device_t &device) :
 	device_interface(device, "psxctrl"),
 	m_odata(0), m_idata(0), m_bit(0), m_count(0), m_memcard(false), m_clock(false), m_sel(false),
-	m_ack(true), m_rx(false), m_ack_timer(nullptr), m_owner(nullptr)
+	m_ack(true), m_rx(false), m_owner(nullptr)
 {
 }
 
@@ -111,8 +111,7 @@ device_psx_controller_interface::~device_psx_controller_interface()
 void device_psx_controller_interface::interface_pre_start()
 {
 	m_owner = dynamic_cast<psx_controller_port_device *>(device().owner());
-	if (!m_ack_timer)
-		m_ack_timer = device().timer_alloc(*this, FUNC(device_psx_controller_interface::ack_timer));
+	m_ack_timer.init(*this, FUNC(device_psx_controller_interface::ack_timer));
 }
 
 void device_psx_controller_interface::interface_pre_reset()
@@ -131,7 +130,6 @@ void device_psx_controller_interface::interface_pre_reset()
 
 void device_psx_controller_interface::interface_post_stop()
 {
-	m_ack_timer = nullptr;
 }
 
 void device_psx_controller_interface::ack_timer(void *ptr, int param)
@@ -140,7 +138,7 @@ void device_psx_controller_interface::ack_timer(void *ptr, int param)
 	m_owner->ack();
 
 	if (!param)
-		m_ack_timer->adjust(attotime::from_usec(2), 1);
+		m_ack_timer.adjust(attotime::from_usec(2), 1);
 }
 
 void device_psx_controller_interface::do_pad()
@@ -165,7 +163,7 @@ void device_psx_controller_interface::do_pad()
 		}
 
 		if(get_pad(m_count++, &m_odata, m_idata))
-			m_ack_timer->adjust(attotime::from_usec(10), 0);
+			m_ack_timer.adjust(attotime::from_usec(10), 0);
 		else
 			m_count = 0;
 	}

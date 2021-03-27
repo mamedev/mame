@@ -107,7 +107,6 @@ device_ti8x_link_port_bit_interface::device_ti8x_link_port_bit_interface(
 		machine_config const &mconfig,
 		device_t &device)
 	: device_ti8x_link_port_interface(mconfig, device)
-	, m_error_timer(nullptr)
 	, m_bit_phase(IDLE)
 	, m_tx_bit_buffer(EMPTY)
 	, m_tip_in(true)
@@ -120,8 +119,7 @@ void device_ti8x_link_port_bit_interface::interface_pre_start()
 {
 	device_ti8x_link_port_interface::interface_pre_start();
 
-	if (!m_error_timer)
-		m_error_timer = device().timer_alloc(*this, FUNC(device_ti8x_link_port_bit_interface::bit_timeout));
+	m_error_timer.init(device().scheduler(), *this, FUNC(device_ti8x_link_port_bit_interface::bit_timeout));
 
 	m_bit_phase = IDLE;
 	m_tx_bit_buffer = EMPTY;
@@ -144,7 +142,7 @@ void device_ti8x_link_port_bit_interface::interface_pre_reset()
 {
 	device_ti8x_link_port_interface::interface_pre_reset();
 
-	m_error_timer->reset();
+	m_error_timer.reset();
 	m_bit_phase = (m_tip_in && m_ring_in) ? IDLE : WAIT_IDLE;
 	m_tx_bit_buffer = EMPTY;
 
@@ -164,7 +162,7 @@ void device_ti8x_link_port_bit_interface::send_bit(bool data)
 	if (IDLE == m_bit_phase)
 		check_tx_bit_buffer();
 	else if (WAIT_IDLE == m_bit_phase)
-		m_error_timer->reset(attotime(1, 0)); // TODO: configurable timeout
+		m_error_timer.reset(attotime(1, 0)); // TODO: configurable timeout
 }
 
 
@@ -197,7 +195,7 @@ void device_ti8x_link_port_bit_interface::accept_bit()
 		else
 		{
 			LOGBITPROTO("accepted 0 bit, ring low (collision) - waiting for bus idle\n");
-			m_error_timer->reset((EMPTY == m_tx_bit_buffer) ? attotime::never : attotime(1, 0)); // TODO: configurable timeout
+			m_error_timer.reset((EMPTY == m_tx_bit_buffer) ? attotime::never : attotime(1, 0)); // TODO: configurable timeout
 			m_bit_phase = WAIT_IDLE;
 			bit_collision();
 		}
@@ -216,7 +214,7 @@ void device_ti8x_link_port_bit_interface::accept_bit()
 		else
 		{
 			LOGBITPROTO("accepted 1 bit, tip low (collision) - waiting for bus idle\n");
-			m_error_timer->reset((EMPTY == m_tx_bit_buffer) ? attotime::never : attotime(1, 0)); // TODO: configurable timeout
+			m_error_timer.reset((EMPTY == m_tx_bit_buffer) ? attotime::never : attotime(1, 0)); // TODO: configurable timeout
 			m_bit_phase = WAIT_IDLE;
 			bit_collision();
 		}
@@ -239,7 +237,7 @@ WRITE_LINE_MEMBER(device_ti8x_link_port_bit_interface::input_tip)
 		if (!m_tip_in)
 		{
 			LOGBITPROTO("falling edge on tip, acknowledging 0 bit\n");
-			m_error_timer->reset(attotime(1, 0)); // TODO: configurable timeout
+			m_error_timer.reset(attotime(1, 0)); // TODO: configurable timeout
 			m_bit_phase = ACK_0;
 			output_ring(0);
 		}
@@ -256,7 +254,7 @@ WRITE_LINE_MEMBER(device_ti8x_link_port_bit_interface::input_tip)
 		if (!m_tip_in)
 		{
 			LOGBITPROTO("falling edge on tip, 1 bit acknowledged, confirming\n");
-			m_error_timer->reset(attotime(1, 0)); // TODO: configurable timeout
+			m_error_timer.reset(attotime(1, 0)); // TODO: configurable timeout
 			m_bit_phase = WAIT_REL_1;
 			output_ring(1);
 		}
@@ -268,7 +266,7 @@ WRITE_LINE_MEMBER(device_ti8x_link_port_bit_interface::input_tip)
 		if (!m_tip_in)
 		{
 			LOGBITPROTO("falling edge on tip, lost sync, waiting for bus idle\n");
-			m_error_timer->reset((EMPTY == m_tx_bit_buffer) ? attotime::never : attotime(1, 0)); // TODO: configurable timeout
+			m_error_timer.reset((EMPTY == m_tx_bit_buffer) ? attotime::never : attotime(1, 0)); // TODO: configurable timeout
 			m_bit_phase = WAIT_IDLE;
 			output_ring(1);
 			bit_collision();
@@ -292,7 +290,7 @@ WRITE_LINE_MEMBER(device_ti8x_link_port_bit_interface::input_tip)
 		if (m_tip_in)
 		{
 			LOGBITPROTO("rising edge on tip, 0 bit acknowledge confirmed, holding\n");
-			m_error_timer->reset();
+			m_error_timer.reset();
 			m_bit_phase = HOLD_0;
 			bit_received(false);
 		}
@@ -324,7 +322,7 @@ WRITE_LINE_MEMBER(device_ti8x_link_port_bit_interface::input_ring)
 		if (!m_ring_in)
 		{
 			LOGBITPROTO("falling edge on ring, acknowledging 1 bit\n");
-			m_error_timer->reset(attotime(1, 0)); // TODO: configurable timeout
+			m_error_timer.reset(attotime(1, 0)); // TODO: configurable timeout
 			m_bit_phase = ACK_1;
 			output_tip(0);
 		}
@@ -335,7 +333,7 @@ WRITE_LINE_MEMBER(device_ti8x_link_port_bit_interface::input_ring)
 		if (!m_ring_in)
 		{
 			LOGBITPROTO("falling edge on ring, 0 bit acknowledged, confirming\n");
-			m_error_timer->reset(attotime(1, 0)); // TODO: configurable timeout
+			m_error_timer.reset(attotime(1, 0)); // TODO: configurable timeout
 			m_bit_phase = WAIT_REL_0;
 			output_tip(1);
 		}
@@ -365,7 +363,7 @@ WRITE_LINE_MEMBER(device_ti8x_link_port_bit_interface::input_ring)
 		if (!m_ring_in)
 		{
 			LOGBITPROTO("falling edge on ring, lost sync, waiting for bus idle\n");
-			m_error_timer->reset((EMPTY == m_tx_bit_buffer) ? attotime::never : attotime(1, 0)); // TODO: configurable timeout
+			m_error_timer.reset((EMPTY == m_tx_bit_buffer) ? attotime::never : attotime(1, 0)); // TODO: configurable timeout
 			m_bit_phase = WAIT_IDLE;
 			output_tip(1);
 			bit_collision();
@@ -377,7 +375,7 @@ WRITE_LINE_MEMBER(device_ti8x_link_port_bit_interface::input_ring)
 		if (m_ring_in)
 		{
 			LOGBITPROTO("rising edge on ring, 1 bit acknowledge confirmed, holding\n");
-			m_error_timer->reset();
+			m_error_timer.reset();
 			m_bit_phase = HOLD_1;
 			bit_received(true);
 		}
@@ -423,7 +421,7 @@ TIMER_CALLBACK_MEMBER(device_ti8x_link_port_bit_interface::bit_timeout)
 		else
 		{
 			LOGBITPROTO("waiting for bus idle\n");
-			m_error_timer->reset((EMPTY == m_tx_bit_buffer) ? attotime::never : attotime(1, 0)); // TODO: configurable timeout
+			m_error_timer.reset((EMPTY == m_tx_bit_buffer) ? attotime::never : attotime(1, 0)); // TODO: configurable timeout
 			m_bit_phase = WAIT_IDLE;
 		}
 		bit_receive_timeout();
@@ -438,7 +436,7 @@ TIMER_CALLBACK_MEMBER(device_ti8x_link_port_bit_interface::bit_timeout)
 	case WAIT_REL_0:
 	case WAIT_REL_1:
 		LOGBITPROTO("timeout sending bit\n");
-		m_error_timer->reset();
+		m_error_timer.reset();
 		m_bit_phase = (m_tip_in && m_ring_in) ? IDLE : WAIT_IDLE;
 		m_tx_bit_buffer = EMPTY;
 		output_tip(1);
@@ -459,14 +457,14 @@ void device_ti8x_link_port_bit_interface::check_tx_bit_buffer()
 	// nothing to do
 	case EMPTY:
 		LOGBITPROTO("no pending bit, entering idle state\n");
-		m_error_timer->reset();
+		m_error_timer.reset();
 		m_bit_phase = IDLE;
 		break;
 
 	// pull tip low and wait for acknowledgement
 	case PENDING_0:
 		LOGBITPROTO("sending 0 bit, pulling tip low\n");
-		m_error_timer->reset(attotime(1, 0)); // TODO: configurable timeout
+		m_error_timer.reset(attotime(1, 0)); // TODO: configurable timeout
 		m_bit_phase = WAIT_ACK_0;
 		m_tx_bit_buffer = EMPTY;
 		output_tip(0);
@@ -475,7 +473,7 @@ void device_ti8x_link_port_bit_interface::check_tx_bit_buffer()
 	// pull ring low and wait for acknowledgement
 	case PENDING_1:
 		LOGBITPROTO("sending 1 bit, pulling ring low\n");
-		m_error_timer->reset(attotime(1, 0)); // TODO: configurable timeout
+		m_error_timer.reset(attotime(1, 0)); // TODO: configurable timeout
 		m_bit_phase = WAIT_ACK_1;
 		m_tx_bit_buffer = EMPTY;
 		output_ring(0);

@@ -637,7 +637,7 @@ bool lua_engine::on_missing_mandatory_image(const std::string &instance_name)
 
 void lua_engine::attach_notifiers()
 {
-	m_resume.init(machine().scheduler(), nullptr, timer_expired_delegate(FUNC(lua_engine::resume), this));
+	m_resume.init(machine().scheduler(), *this, FUNC(lua_engine::resume));
 
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&lua_engine::on_machine_prestart, this), true);
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&lua_engine::on_machine_start, this));

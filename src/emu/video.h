@@ -126,7 +126,7 @@ private:
 	running_machine &   m_machine;                  // reference to our machine
 
 	// screenless systems
-	emu_timer *         m_screenless_frame_timer;   // timer to signal VBLANK start
+	persistent_timer    m_screenless_frame_timer;   // timer to signal VBLANK start
 	bool                m_output_changed;           // did an output element change?
 
 	// throttling calculations

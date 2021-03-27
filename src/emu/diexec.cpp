@@ -64,7 +64,6 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 	, m_vblank_interrupt_screen(nullptr)
 	, m_timed_interrupt(device)
 	, m_timed_interrupt_period(attotime::zero)
-	, m_timedint_timer(nullptr)
 	, m_driver_irq(device)
 {
 	// configure the fast accessor
@@ -383,11 +382,11 @@ void device_execute_interface::interface_pre_start()
 
 	// allocate timers if we need them
 	if (m_timed_interrupt_period != attotime::zero)
-		m_timedint_timer = interface_timer_alloc(*this, FUNC(device_execute_interface::trigger_periodic_interrupt));
+		m_timedint_timer.init(*this, FUNC(device_execute_interface::trigger_periodic_interrupt));
 
-	m_irq_pulse_clear.interface_init(*this, FUNC(device_execute_interface::irq_pulse_clear));
-	m_timed_trigger_callback.interface_init(*this, FUNC(device_execute_interface::timed_trigger_callback));
-	m_empty_event_queue.interface_init(*this, FUNC(device_execute_interface::empty_event_queue));
+	m_irq_pulse_clear.init(*this, FUNC(device_execute_interface::irq_pulse_clear));
+	m_timed_trigger_callback.init(*this, FUNC(device_execute_interface::timed_trigger_callback));
+	m_empty_event_queue.init(*this, FUNC(device_execute_interface::empty_event_queue));
 }
 
 
@@ -465,8 +464,7 @@ void device_execute_interface::interface_post_reset()
 	if (m_timed_interrupt_period != attotime::zero)
 	{
 		attotime timedint_period = m_timed_interrupt_period;
-		assert(m_timedint_timer != nullptr);
-		m_timedint_timer->adjust(timedint_period, 0, timedint_period);
+		m_timedint_timer.adjust(timedint_period, 0, timedint_period);
 	}
 }
 

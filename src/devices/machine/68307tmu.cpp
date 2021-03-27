@@ -106,7 +106,7 @@ TIMER_CALLBACK_MEMBER(m68307_cpu_device::m68307_timer::timer0_callback )
 	if (BIT(tptr->regs[m68307TIMER_TMR], 4))
 		m68k->timer0_interrupt(1);
 
-	tptr->mametimer->adjust(m68k->cycles_to_attotime(20000));
+	tptr->mametimer.adjust(m68k->cycles_to_attotime(20000));
 }
 
 TIMER_CALLBACK_MEMBER(m68307_cpu_device::m68307_timer::timer1_callback )
@@ -118,7 +118,7 @@ TIMER_CALLBACK_MEMBER(m68307_cpu_device::m68307_timer::timer1_callback )
 	if (BIT(tptr->regs[m68307TIMER_TMR], 4))
 		m68k->timer1_interrupt(1);
 
-	tptr->mametimer->adjust(m68k->cycles_to_attotime(20000));
+	tptr->mametimer.adjust(m68k->cycles_to_attotime(20000));
 
 }
 
@@ -134,12 +134,12 @@ void m68307_cpu_device::m68307_timer::init(m68307_cpu_device *device)
 	single_timer* tptr;
 
 	tptr = &singletimer[0];
-	tptr->mametimer = device->timer_alloc(*this, FUNC(m68307_timer::timer0_callback), parent);
+	tptr->mametimer.init(device->device_t::scheduler(), *this, FUNC(m68307_timer::timer0_callback)).set_ptr(parent);
 
 	tptr = &singletimer[1];
-	tptr->mametimer = device->timer_alloc(*this, FUNC(m68307_timer::timer1_callback), parent);
+	tptr->mametimer.init(device->device_t::scheduler(), *this, FUNC(m68307_timer::timer1_callback)).set_ptr(parent);
 
-	wd_mametimer = device->timer_alloc(*this, FUNC(m68307_timer::wd_timer_callback));
+	wd_mametimer.init(device->device_t::scheduler(), *this, FUNC(m68307_timer::wd_timer_callback));
 }
 
 uint16_t m68307_cpu_device::m68307_timer::read_tcn(uint16_t mem_mask, int which)
@@ -209,7 +209,7 @@ void m68307_cpu_device::m68307_timer::write_tmr(uint16_t data, uint16_t mem_mask
 	if (rst==0x0) m68k->logerror("(timer is reset)\n");
 	if (rst==0x1) m68k->logerror("(timer is running)\n");
 
-	tptr->mametimer->adjust(m68k->cycles_to_attotime(100000));
+	tptr->mametimer.adjust(m68k->cycles_to_attotime(100000));
 
 	m68k->logerror("\n");
 }
@@ -239,10 +239,10 @@ void m68307_cpu_device::m68307_timer::reset()
 		tptr->regs[m68307TIMER_WCR] = 0xffff;
 		tptr->regs[m68307TIMER_XXX] = 0;
 		tptr->enabled = false;
-		tptr->mametimer->adjust(attotime::never);
+		tptr->mametimer.adjust(attotime::never);
 	}
 
-	wd_mametimer->adjust(attotime::never);
+	wd_mametimer.adjust(attotime::never);
 }
 
 

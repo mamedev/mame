@@ -36,8 +36,6 @@ device_serial_interface::device_serial_interface(const machine_config &mconfig, 
 	m_tra_flags(TRANSMIT_REGISTER_EMPTY),
 	m_tra_bit_count_transmitted(0),
 	m_tra_bit_count(0),
-	m_rcv_clock(nullptr),
-	m_tra_clock(nullptr),
 	m_rcv_rate(attotime::never),
 	m_tra_rate(attotime::never),
 	m_rcv_line(0),
@@ -67,10 +65,8 @@ device_serial_interface::~device_serial_interface()
 
 void device_serial_interface::interface_pre_start()
 {
-	if (!m_rcv_clock)
-		m_rcv_clock = interface_timer_alloc(*this, FUNC(device_serial_interface::rcv_clock));
-	if (!m_tra_clock)
-		m_tra_clock = interface_timer_alloc(*this, FUNC(device_serial_interface::tra_clock));
+	m_rcv_clock.init(*this, FUNC(device_serial_interface::rcv_clock));
+	m_tra_clock.init(*this, FUNC(device_serial_interface::tra_clock));
 	m_rcv_clock_state = false;
 	m_tra_clock_state = false;
 }
@@ -103,14 +99,14 @@ void device_serial_interface::set_rcv_rate(const attotime &rate)
 {
 	m_rcv_rate = rate/2;
 	receive_register_reset();
-	m_rcv_clock->adjust(attotime::never);
+	m_rcv_clock.adjust(attotime::never);
 }
 
 void device_serial_interface::set_tra_rate(const attotime &rate)
 {
 	m_tra_rate = rate/2;
 	transmit_register_reset();
-	m_tra_clock->adjust(attotime::never);
+	m_tra_clock.adjust(attotime::never);
 }
 
 void device_serial_interface::tra_edge()
@@ -124,7 +120,7 @@ void device_serial_interface::tra_edge()
 
 	if (is_transmit_register_empty() && !m_tra_rate.is_never())
 	{
-		m_tra_clock->adjust(attotime::never);
+		m_tra_clock.adjust(attotime::never);
 	}
 }
 
@@ -133,7 +129,7 @@ void device_serial_interface::rcv_edge()
 	rcv_callback();
 	if(is_receive_register_full())
 	{
-		m_rcv_clock->adjust(attotime::never);
+		m_rcv_clock.adjust(attotime::never);
 		rcv_complete();
 	}
 }
@@ -225,9 +221,9 @@ WRITE_LINE_MEMBER(device_serial_interface::rx_w)
 	if(m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED)
 	{
 		LOGMASKED(LOG_RX, "Receiver is synchronized\n");
-		if(m_rcv_clock && !(m_rcv_rate.is_never()))
+		if(!(m_rcv_rate.is_never()))
 			// make start delay just a bit longer to make sure we are called after the sender
-			m_rcv_clock->adjust(((m_rcv_rate*3)/2), 0, m_rcv_rate);
+			m_rcv_clock.adjust(((m_rcv_rate*3)/2), 0, m_rcv_rate);
 		else if(m_start_bit_hack_for_external_clocks)
 			m_rcv_bit_count_received--;
 	}
@@ -369,8 +365,8 @@ void device_serial_interface::transmit_register_setup(u8 data_byte)
 	int i;
 	u8 transmit_data;
 
-	if(m_tra_clock && !m_tra_rate.is_never())
-		m_tra_clock->adjust(m_tra_rate, 0, m_tra_rate);
+	if(!m_tra_rate.is_never())
+		m_tra_clock.adjust(m_tra_rate, 0, m_tra_rate);
 
 	m_tra_bit_count_transmitted = 0;
 	m_tra_bit_count = 0;

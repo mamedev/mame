@@ -34,8 +34,8 @@ public:
 	virtual void recv_complete_cb(int result) {}
 
 protected:
-	TIMER_CALLBACK_MEMBER(send_complete);
-	TIMER_CALLBACK_MEMBER(recv_complete);
+	void send_complete(timer_instance const &timer);
+	void recv_complete(timer_instance const &timer);
 
 	bool m_promisc;
 	char m_mac[6];
@@ -44,8 +44,8 @@ protected:
 	int m_intf;
 	bool m_loopback_control;
 
-	emu_timer *m_send_timer;
-	emu_timer *m_recv_timer;
+	persistent_timer m_send_timer;
+	persistent_timer m_recv_timer;
 };
 
 

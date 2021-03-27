@@ -331,7 +331,6 @@ natural_keyboard::natural_keyboard(running_machine &machine)
 	, m_fieldnum(0)
 	, m_status_keydown(false)
 	, m_last_cr(false)
-	, m_timer(nullptr)
 	, m_current_rate(attotime::zero)
 	, m_queue_chars()
 	, m_accept_char()
@@ -342,7 +341,7 @@ natural_keyboard::natural_keyboard(running_machine &machine)
 	if (!m_keyboards.empty())
 	{
 		m_buffer.resize(KEY_BUFFER_SIZE);
-		m_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(natural_keyboard::timer), this));
+		m_timer.init(machine.scheduler(), *this, FUNC(natural_keyboard::timer));
 	}
 
 	// retrieve option setting
@@ -358,7 +357,6 @@ natural_keyboard::natural_keyboard(running_machine &machine)
 void natural_keyboard::configure(ioport_queue_chars_delegate queue_chars, ioport_accept_char_delegate accept_char, ioport_charqueue_empty_delegate charqueue_empty)
 {
 	// set the callbacks
-	assert(m_timer != nullptr);
 	m_queue_chars = std::move(queue_chars);
 	m_accept_char = std::move(accept_char);
 	m_charqueue_empty = std::move(charqueue_empty);
@@ -846,7 +844,7 @@ void natural_keyboard::internal_post(char32_t ch)
 	// need to start up the timer?
 	if (empty())
 	{
-		m_timer->adjust(choose_delay(ch));
+		m_timer.adjust(choose_delay(ch));
 		m_fieldnum = 0;
 		m_status_keydown = false;
 	}
@@ -864,7 +862,7 @@ void natural_keyboard::internal_post(char32_t ch)
 //  when posting a string of characters
 //-------------------------------------------------
 
-void natural_keyboard::timer(void *ptr, int param)
+void natural_keyboard::timer(timer_instance const &timer)
 {
 	if (!m_queue_chars.isnull())
 	{
@@ -920,7 +918,7 @@ void natural_keyboard::timer(void *ptr, int param)
 
 	// need to make sure timerproc is called again if buffer not empty
 	if (!empty())
-		m_timer->adjust(choose_delay(m_buffer[m_bufbegin]));
+		m_timer.adjust(choose_delay(m_buffer[m_bufbegin]));
 }
 
 

@@ -240,7 +240,7 @@ void apollo_kbd_device::device_start()
 	m_beeper.start(this);
 	m_mouse.start(this);
 
-	m_timer = timer_alloc(*this, FUNC(apollo_kbd_device::kbd_scan_timer));
+	m_timer.init(*this, FUNC(apollo_kbd_device::kbd_scan_timer));
 }
 
 //-------------------------------------------------
@@ -265,7 +265,7 @@ void apollo_kbd_device::device_reset()
 	memset(m_keyon, 0, sizeof(m_keyon));
 
 	// start timer
-	m_timer->adjust( attotime::zero, 0, attotime::from_msec(5)); // every 5ms
+	m_timer.adjust( attotime::zero, 0, attotime::from_msec(5)); // every 5ms
 
 	// keyboard comms is at 8E1, 1200 baud
 	set_data_frame(1, 8, PARITY_EVEN, STOP_BITS_1);
@@ -305,8 +305,7 @@ void apollo_kbd_device::logerror(Format &&fmt, Params &&... args) const
 
 apollo_kbd_device::beeper::beeper() :
 	m_device(nullptr),
-	m_beeper(nullptr),
-	m_timer(nullptr)
+	m_beeper(nullptr)
 {
 }
 
@@ -315,7 +314,7 @@ void apollo_kbd_device::beeper::start(apollo_kbd_device *device)
 	m_device = device;
 	LOG2(("start apollo_kbd::beeper"));
 	m_beeper = m_device->m_beep.target();
-	m_timer = m_device->timer_alloc(*this, FUNC(apollo_kbd_device::beeper::beeper_callback));
+	m_timer.init(m_device->scheduler(), *this, FUNC(apollo_kbd_device::beeper::beeper_callback));
 }
 
 void apollo_kbd_device::beeper::reset()
@@ -334,7 +333,7 @@ void apollo_kbd_device::beeper::on()
 	if (keyboard_has_beeper())
 	{
 		m_beeper->set_state(1);
-		m_timer->adjust( attotime::from_msec(10), 0, attotime::zero);
+		m_timer.adjust( attotime::from_msec(10), 0);
 	}
 }
 

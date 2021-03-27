@@ -319,7 +319,7 @@ private:
 	attotime                m_timed_interrupt_period;   // period for periodic interrupts
 
 	// input states and IRQ callbacks
-	emu_timer *             m_timedint_timer;           // reference to this device's periodic interrupt timer
+	persistent_timer        m_timedint_timer;           // reference to this device's periodic interrupt timer
 	device_irq_acknowledge_delegate m_driver_irq;       // driver-specific IRQ callback
 	device_input            m_input[MAX_INPUT_LINES];   // data about inputs
 

@@ -109,7 +109,7 @@ private:
 	bool can_post_alternate(char32_t ch);
 	attotime choose_delay(char32_t ch);
 	void internal_post(char32_t ch);
-	void timer(void *ptr, int param);
+	void timer(timer_instance const &timer);
 	std::string unicode_to_string(char32_t ch) const;
 	const keycode_map_entry *find_code(char32_t ch) const;
 
@@ -125,7 +125,7 @@ private:
 	unsigned                        m_fieldnum;         // current step in multi-key sequence
 	bool                            m_status_keydown;   // current keydown status
 	bool                            m_last_cr;          // was the last char a CR?
-	emu_timer *                     m_timer;            // timer for posting characters
+	persistent_timer                m_timer;            // timer for posting characters
 	attotime                        m_current_rate;     // current rate for posting
 	ioport_queue_chars_delegate     m_queue_chars;      // queue characters callback
 	ioport_accept_char_delegate     m_accept_char;      // accept character callback
