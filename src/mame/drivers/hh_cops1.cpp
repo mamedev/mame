@@ -258,6 +258,8 @@ void mbaskb_state::msoccer(machine_config &config)
 {
 	mbaskb(config);
 	config.set_default_layout(layout_msoccer);
+
+	m_display->set_bri_levels(0.005, 0.05, 0.2); // goalie is darker
 }
 
 void mbaskb_state::mhockey(machine_config &config)
