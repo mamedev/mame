@@ -2927,7 +2927,9 @@ void towns_state::towns_base(machine_config &config)
 	m_fdc->drq_wr_callback().set(FUNC(towns_state::mb8877a_drq_w));
 	FLOPPY_CONNECTOR(config, m_flop[0], towns_floppies, "35hd", towns_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, m_flop[1], towns_floppies, "35hd", towns_state::floppy_formats);
-	SOFTWARE_LIST(config, "fd_list").set_original("fmtowns_flop");
+	SOFTWARE_LIST(config, "fd_list_orig").set_original("fmtowns_flop_orig");
+	SOFTWARE_LIST(config, "fd_list_cracked").set_original("fmtowns_flop_cracked");
+	SOFTWARE_LIST(config, "fd_list_misc").set_original("fmtowns_flop_misc");
 
 	CDROM(config, m_cdrom, 0).set_interface("fmt_cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("fmtowns_cd");
