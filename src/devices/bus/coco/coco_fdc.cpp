@@ -278,6 +278,8 @@ void coco_fdc_device_base::device_start()
 
 	save_item(NAME(m_cache_controler));
 	save_item(NAME(m_cache_pointer));
+
+	coco_family_fdc_device_base::device_start();
 }
 
 
