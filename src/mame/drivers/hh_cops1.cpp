@@ -133,6 +133,10 @@ namespace {
   Judging from videos online, there are two versions of Basketball. One where
   the display shows "12" at power-on(as on MAME), and one that shows "15".
 
+  There's also an other version of Hockey, presumably for the foreign market.
+  It plays more like Basketball/Soccer: no penalty boxes and you can't go
+  behind the goal.
+
 ***************************************************************************/
 
 class mbaskb_state : public hh_cops1_state
@@ -254,6 +258,8 @@ void mbaskb_state::msoccer(machine_config &config)
 {
 	mbaskb(config);
 	config.set_default_layout(layout_msoccer);
+
+	m_display->set_bri_levels(0.005, 0.05, 0.2); // goalie is darker
 }
 
 void mbaskb_state::mhockey(machine_config &config)
@@ -640,4 +646,7 @@ CONS( 1978, msoccer,   0,       0, msoccer,   mbaskb,    mbaskb_state,    empty_
 CONS( 1978, mhockey,   0,       0, mhockey,   mbaskb,    mbaskb_state,    empty_init, "Mattel", "Hockey (Mattel)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1977, qkracerm,  qkracer, 0, qkracerm,  qkracerm,  qkracerm_state,  empty_init, "National Semiconductor", "QuizKid Racer (MM5799 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN )
-CONS( 1978, qkspeller, 0,       0, qkspeller, qkspeller, qkspeller_state, empty_init, "National Semiconductor", "QuizKid Speller", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+CONS( 1978, qkspeller, 0,       0, qkspeller, qkspeller, qkspeller_state, empty_init, "National Semiconductor", "QuizKid Speller", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW ) // ***
+
+// ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
+// with other, unemulatable, things eg. game board/pieces, book, playing cards, pen & paper, etc.

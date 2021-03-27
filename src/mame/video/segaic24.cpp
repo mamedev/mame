@@ -630,50 +630,42 @@ void segas24_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 	}
 
 	for(countspr--; countspr >= 0; countspr--) {
-		uint16_t *source, *pix;
 		int x, y, sx, sy;
 		uint16_t colors[16];
 		int flipx, flipy;
-		int zoomx, zoomy;
-		uint8_t pm[16];
 		//      int dump;
-		int xmod, ymod;
-		int min_x, min_y, max_x, max_y;
-		int clip_reverse_y;
 
-		uint32_t addoffset;
-		uint32_t newoffset;
-		uint32_t offset;
-
-		source = sprd[countspr];
+		const uint16_t *const source = sprd[countspr];
 		cclip = clip[countspr];
 
+		int min_x, min_y, max_x, max_y, clip_first, clip_last;
 		if(cclip) {
 			// Crackdown uses this on pre-title screen intro
 			// for masking both avatars and the Sega logo itself.
-			clip_reverse_y = (cclip[1] & 0x2000) >> 13;
-			min_y = (cclip[2] & 511);
-			min_x = (cclip[3] & 511) - 8;
-			max_y = (cclip[4] & 511);
-			max_x = (cclip[5] & 511) - 8;
+			const bool clip_reverse_y = (cclip[1] & 0x2000) >> 13;
+			min_x = std::max<int>(cliprect.min_x, (cclip[3] & 511) - 8);
+			max_x = std::min<int>(cliprect.max_x, (cclip[5] & 511) - 8);
+			if(clip_reverse_y) {
+				min_y = std::max<int>(cliprect.min_y, 0);
+				max_y = std::min<int>(cliprect.max_y, 383);
+				clip_first = (cclip[2] & 511) - 1;
+				clip_last = (cclip[4] & 511) + 1;
+			} else {
+				min_y = std::max<int>(cliprect.min_y, cclip[2] & 511);
+				max_y = std::min<int>(cliprect.max_y, cclip[4] & 511);
+				clip_first = max_y;
+				clip_last = min_y;
+			}
 		} else {
-			clip_reverse_y = 0;
-			min_x = 0;
-			max_x = 495;
-			min_y = 0;
-			max_y = 383;
+			min_x = std::max<int>(cliprect.min_x, 0);
+			max_x = std::min<int>(cliprect.max_x, 495);
+			min_y = std::max<int>(cliprect.min_y, 0);
+			max_y = std::min<int>(cliprect.max_y, 383);
+			clip_first = max_y;
+			clip_last = min_y;
 		}
 
-
-		if(min_x < cliprect.min_x)
-			min_x = cliprect.min_x;
-		if(min_y < cliprect.min_y)
-			min_y = cliprect.min_y;
-		if(max_x > cliprect.max_x)
-			max_x = cliprect.max_x;
-		if(max_y > cliprect.max_y)
-			max_y = cliprect.max_y;
-
+		int zoomx, zoomy;
 		if(!(source[0] & 0x2000))
 			zoomx = zoomy = source[1] & 0xff;
 		else {
@@ -702,7 +694,8 @@ void segas24_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 		flipy = source[4] & 0x8000;
 		sy = 1 << ((source[4] & 0x7000) >> 12);
 
-		pix = &sprite_ram[(source[3] & 0x3fff)* 0x8];
+		uint16_t *const pix = &sprite_ram[(source[3] & 0x3fff) * 0x8];
+		uint8_t pm[16];
 		for(int px=0; px<8; px++) {
 			int c;
 			c              = pix[px] >> 8;
@@ -718,25 +711,25 @@ void segas24_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 			colors[px*2+1] = c;
 		}
 
-		offset = (source[2] & 0x7fff) * 0x10;
+		const uint32_t offset = (source[2] & 0x7fff) * 0x10;
 
-		xmod = 0x20;
-		ymod = 0x20;
+		int xmod = 0x20;
+		int ymod = 0x20;
 		for(int py=0; py<sy; py++) {
 			int xmod1 = xmod;
 			int xpos1 = x;
 			int ypos1 = y, ymod1 = ymod;
 			for(int px=0; px<sx; px++) {
 				int xmod2 = xmod1, xpos2 = xpos1;
-				addoffset = 0x10*(flipx ? sx-px-1 : px) + 0x10*sx*(flipy ? sy-py-1 : py) + (flipy ? 7*2 : 0);
-				newoffset = offset + addoffset;
+				const uint32_t addoffset = 0x10*(flipx ? sx-px-1 : px) + 0x10*sx*(flipy ? sy-py-1 : py) + (flipy ? 7*2 : 0);
+				uint32_t newoffset = offset + addoffset;
 
 				ymod1 = ymod;
 				ypos1 = y;
 				for(int zy=0; zy<8; zy++) {
 					ymod1 += zoomy;
 					while(ymod1 >= 0x40) {
-						if((ypos1 >= min_y && ypos1 <= max_y) ^ clip_reverse_y) {
+						if(ypos1 >= min_y && ypos1 <= max_y && (ypos1 <= clip_first || ypos1 >= clip_last)) {
 							xmod2 = xmod1;
 							xpos2 = xpos1;
 

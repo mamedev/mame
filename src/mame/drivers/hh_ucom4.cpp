@@ -1482,8 +1482,8 @@ static INPUT_PORTS_START( efball )
 	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x02, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("P1 Down-Field")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME("P1 Score-Time")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("P1 Down-Field")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("P1 Score-Time")
 
 	PORT_START("IN.1") // port B
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
@@ -3024,4 +3024,4 @@ CONS( 1982, tcaveman, 0,        0, tcaveman, tcaveman, tcaveman_state, empty_ini
 CONS( 1984, alnchase, 0,        0, alnchase, alnchase, alnchase_state, empty_init, "Tomy", "Alien Chase", MACHINE_SUPPORTS_SAVE )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
-// with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.
+// with other, unemulatable, things eg. game board/pieces, book, playing cards, pen & paper, etc.

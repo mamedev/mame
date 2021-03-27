@@ -1488,9 +1488,9 @@ static INPUT_PORTS_START( cqback )
 	PORT_BIT( 0x02, 0x02, IPT_CUSTOM ) PORT_CONDITION("IN.1", 0x01, EQUALS, 0x00) // run/kick
 
 	PORT_START("IN.2") // K4
-	PORT_CONFNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
-	PORT_CONFSETTING(    0x02, "1" )
-	PORT_CONFSETTING(    0x01, "2" )
+	PORT_CONFNAME( 0x03, 0x01, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
 
 	PORT_START("IN.3") // K8
 	PORT_CONFNAME( 0x01, 0x00, "Factory Test" )
@@ -12821,4 +12821,4 @@ CONS( 1980, ssports4,   0,         0, ssports4,  ssports4,  ssports4_state,  emp
 CONS( 1983, xl25,       0,         0, xl25,      xl25,      xl25_state,      empty_init, "Vulcan Electronics", "XL 25", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
-// with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.
+// with other, unemulatable, things eg. game board/pieces, book, playing cards, pen & paper, etc.

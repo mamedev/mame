@@ -1537,6 +1537,18 @@ if (SOUNDS["SWP30"]~=null) then
 end
 
 ---------------------------------------------------
+--
+--@src/devices/sound/xt446.h,SOUNDS["XT446"] = true
+---------------------------------------------------
+
+if (SOUNDS["XT446"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/xt446.cpp",
+		MAME_DIR .. "src/devices/sound/xt446.h",
+	}
+end
+
+---------------------------------------------------
 -- Roland sample players
 --@src/devices/sound/rolandpcm.h,SOUNDS["ROLANDPCM"] = true
 ---------------------------------------------------

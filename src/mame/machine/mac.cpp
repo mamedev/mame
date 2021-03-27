@@ -864,12 +864,8 @@ void mac_state::mac_via_out_a(uint8_t data)
 
 	set_scc_waitrequest((data & 0x80) >> 7);
 	m_screen_buffer = (data & 0x40) >> 6;
-#if NEW_SWIM
 	if (m_cur_floppy)
 		m_cur_floppy->ss_w((data & 0x20) >> 5);
-#else
-	sony_set_sel_line(m_fdc.target(), (data & 0x20) >> 5);
-#endif
 }
 
 void mac_state::mac_via_out_b(uint8_t data)
@@ -1117,11 +1113,6 @@ void mac_state::machine_reset()
 	m_6015_timer->adjust(attotime::never);
 
 	m_rbv_vbltime = 0;
-
-	if (m_model >= MODEL_MAC_POWERMAC_6100 && m_model <= MODEL_MAC_POWERMAC_8100)
-	{
-		m_awacs->set_dma_base(m_maincpu->space(AS_PROGRAM), 0x10000, 0x12000);
-	}
 
 	// start 60.15 Hz timer for most systems
 	if (((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIVI)) || (m_model >= MODEL_MAC_LC))
@@ -2442,25 +2433,6 @@ void mac_state::mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 }
 #endif
 
-#if !NEW_SWIM
-void mac_state::phases_w(u8)
-{
-}
-
-void mac_state::sel35_w(int)
-{
-}
-
-void mac_state::devsel_w(u8)
-{
-}
-
-void mac_state::hdsel_w(int)
-{
-}
-
-#else
-
 void mac_state::phases_w(uint8_t phases)
 {
 	if(m_cur_floppy)
@@ -2488,5 +2460,3 @@ void mac_state::devsel_w(uint8_t devsel)
 void mac_state::hdsel_w(int hdsel)
 {
 }
-
-#endif

@@ -1953,6 +1953,29 @@ ROM_START( trogpa4 )
 ROM_END
 
 
+ROM_START( mazebl ) // Trog bootleg. 2-PCB set, upper one has a RC 0112 sticker
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )
+	ROM_LOAD( "1", 0x10000, 0x10000, CRC(cf3a206e) SHA1(a30bab30ef546cad3ad65a93a67c68b1fff51e79) )
+	ROM_CONTINUE(  0x30000, 0x10000 )
+	ROM_CONTINUE(  0x50000, 0x10000 )
+	ROM_CONTINUE(  0x70000, 0x10000 )
+	ROM_COPY( "cvsd:cpu", 0x10000, 0x20000, 0x10000 )
+	ROM_COPY( "cvsd:cpu", 0x30000, 0x40000, 0x10000 )
+	ROM_COPY( "cvsd:cpu", 0x50000, 0x60000, 0x10000 )
+	ROM_COPY( "cvsd:cpu", 0x70000, 0x80000, 0x10000 )
+
+	ROM_REGION16_LE( 0x100000, "user1", 0 ) // 34010 code
+	ROM_LOAD16_BYTE( "2", 0xc0000, 0x20000, CRC(e6095189) SHA1(a2caaf64e371050b37c63d9608ba5d289cf3cd91) )
+	ROM_LOAD16_BYTE( "3", 0xc0001, 0x20000, CRC(fdd7cc65) SHA1(bfc4339953c122bca968f9cfa3a82df3584a3727) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 )
+	ROM_LOAD( "4", 0x000000, 0x80000, CRC(dd7cd402) SHA1(78419fddd98bc37d5382f22d2ce2615948f80d5f) )
+	ROM_LOAD( "6", 0x080000, 0x40000, CRC(9c001d17) SHA1(c0770fa3968355e06e7c99bff56edbf834c43196) )
+	ROM_LOAD( "5", 0x200000, 0x80000, CRC(e036e21a) SHA1(584d06e82f1df571851a22fcb57248d03e49c233) )
+	ROM_LOAD( "7", 0x280000, 0x40000, CRC(c5ce99fa) SHA1(29e8d7935816355d2e9d9deca3f5950ddd30a632) )
+ROM_END
+
+
 ROM_START( smashtv )
 	ROM_REGION( 0x90000, "cvsd:cpu", 0 )    /* sound CPU */
 	ROM_LOAD ( "sl2_smash_tv_sound_rom_u4.u4",   0x10000, 0x10000, CRC(29d3f6c8) SHA1(8a90cdff54f59ddb7dba521504d880515a59df08) )
@@ -3322,6 +3345,7 @@ GAME( 1990, trog4,      trog,     yunit_cvsd_4bit_slow,    trog,     midyunit_st
 GAME( 1990, trog3,      trog,     yunit_cvsd_4bit_slow,    trog,     midyunit_state, init_trog,     ROT0, "Midway",   "Trog (rev LA3 02/14/91)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, trogpa6,    trog,     yunit_cvsd_4bit_slow,    trog,     midyunit_state, init_trog,     ROT0, "Midway",   "Trog (prototype, rev PA6-PAC 09/09/90)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, trogpa4,    trog,     yunit_cvsd_4bit_slow,    trogpa4,  midyunit_state, init_trog,     ROT0, "Midway",   "Trog (prototype, rev 4.00 07/27/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mazebl,     trog,     yunit_cvsd_4bit_slow,    trog,     midyunit_state, init_trog,     ROT0, "bootleg",  "Maze (Trog bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, smashtv,    0,        yunit_cvsd_6bit_slow,    smashtv,  midyunit_state, init_smashtv,  ROT0, "Williams", "Smash T.V. (rev 8.00)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, smashtv6,   smashtv,  yunit_cvsd_6bit_slow,    smashtv,  midyunit_state, init_smashtv,  ROT0, "Williams", "Smash T.V. (rev 6.00)", MACHINE_SUPPORTS_SAVE )

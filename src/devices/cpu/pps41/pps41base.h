@@ -42,6 +42,9 @@ public:
 	auto write_sdo() { return m_write_sdo.bind(); }
 	auto write_ssc() { return m_write_ssc.bind(); }
 
+	// speaker output
+	auto write_spk() { return m_write_spk.bind(); }
+
 	// I/O access
 	u16 d_output_r() { return m_d_output; }
 	u16 r_output_r() { return m_r_output; }
@@ -94,6 +97,7 @@ protected:
 	devcb_read_line m_read_sdi;
 	devcb_write_line m_write_sdo;
 	devcb_write_line m_write_ssc;
+	devcb_write8 m_write_spk;
 
 	// internal state, regs
 	u16 m_pc;
@@ -140,7 +144,7 @@ protected:
 
 	void serial_shift(int state);
 	void serial_clock();
-	void cycle();
+	virtual void cycle();
 	void increment_pc();
 };
 

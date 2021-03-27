@@ -153,6 +153,7 @@
 #include "machine/rtc65271.h"
 #include "machine/timer.h"
 #include "sound/cdda.h"
+#include "sound/xt446.h"
 #include "sound/rf5c400.h"
 #include "sound/ymz280b.h"
 #include "video/k057714.h"
@@ -1878,6 +1879,12 @@ void firebeat_kbm_state::firebeat_kbm(machine_config &config)
 	auto &midi_chan0(NS16550(config, "duart_midi:chan0", XTAL(24'000'000)));
 	MIDI_KBD(config, m_kbd[1], 31250).tx_callback().set(midi_chan0, FUNC(ins8250_uart_device::rx_w));
 	midi_chan0.out_int_callback().set(FUNC(firebeat_kbm_state::midi_keyboard_right_irq_callback));
+
+	// Synth card
+	auto &xt446(XT446(config, "xt446"));
+	midi_chan1.out_tx_callback().set(xt446, FUNC(xt446_device::midi_w));
+	xt446.add_route(0, "lspeaker", 1.0);
+	xt446.add_route(1, "rspeaker", 1.0);
 }
 
 void firebeat_kbm_state::firebeat_kbm_map(address_map &map)

@@ -149,6 +149,7 @@ CPUS["FR"] = true
 CPUS["UPD78K"] = true
 CPUS["KS0164"] = true
 --CPUS["COPS1"] = true
+CPUS["MEG"] = true
 
 --------------------------------------------------
 -- specify available sound cores
@@ -293,6 +294,8 @@ SOUNDS["KS0164"] = true
 SOUNDS["TT5665"] = true
 --SOUNDS["RP2C33_SOUND"] = true
 --SOUNDS["UDA1344"] = true
+SOUNDS["SWP30"] = true
+SOUNDS["XT446"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -5155,6 +5158,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/video21.cpp",
 	MAME_DIR .. "src/mame/drivers/videosaa.cpp",
 	MAME_DIR .. "src/mame/drivers/vlc.cpp",
+	MAME_DIR .. "src/mame/drivers/vlc34010.cpp",
 	MAME_DIR .. "src/mame/drivers/voyager.cpp",
 	MAME_DIR .. "src/mame/drivers/vp101.cpp",
 	MAME_DIR .. "src/mame/drivers/vpoker.cpp",

@@ -21,19 +21,15 @@
 #include "machine/macadb.h"
 #include "bus/nubus/nubus.h"
 #include "bus/macpds/macpds.h"
-#include "machine/applefdc.h"
 #include "machine/applefdintf.h"
 #include "machine/ncr539x.h"
 #include "machine/ncr5380.h"
 #include "machine/macrtc.h"
 #include "sound/asc.h"
-#include "sound/awacs.h"
 #include "sound/dac.h"
 #include "cpu/m68000/m68000.h"
 #include "emupal.h"
 #include "screen.h"
-
-#define NEW_SWIM 0
 
 #define MAC_SCREEN_NAME "screen"
 #define MAC_539X_1_TAG "539x_1"
@@ -65,7 +61,6 @@ public:
 		m_via1(*this, "via6522_0"),
 		m_via2(*this, "via6522_1"),
 		m_asc(*this, "asc"),
-		m_awacs(*this, "awacs"),
 		m_egret(*this, EGRET_TAG),
 		m_cuda(*this, CUDA_TAG),
 		m_macadb(*this, "macadb"),
@@ -224,7 +219,6 @@ private:
 	required_device<via6522_device> m_via1;
 	optional_device<via6522_device> m_via2;
 	optional_device<asc_device> m_asc;
-	optional_device<awacs_device> m_awacs;
 	optional_device<egret_device> m_egret;
 	optional_device<cuda_device> m_cuda;
 	optional_device<macadb_device> m_macadb;
@@ -233,13 +227,8 @@ private:
 	optional_device<ncr539x_device> m_539x_1;
 	optional_device<ncr539x_device> m_539x_2;
 	optional_device<ncr5380_device> m_ncr5380;
-#if NEW_SWIM
 	required_device<applefdintf_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
-#else
-	required_device<applefdc_base_device> m_fdc;
-	optional_device_array<floppy_connector, 2> m_floppy;
-#endif
 	optional_device<rtc3430042_device> m_rtc;
 
 	//required_ioport m_mouse0, m_mouse1, m_mouse2;

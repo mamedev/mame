@@ -14179,6 +14179,7 @@ speedup12                       // (c) 1996 - Ref ???
 speedup10                       // (c) 1996 - Ref ???
 surfplnt                        // (c) 1997 - Ref 971223
 surfplnt40                      // (c) 1997 - Ref 970514
+surfplnt30                      // (c) 1997 - Red 970489
 
 @source:gaelcof3.cpp
 autopapa                        //
@@ -16179,10 +16180,13 @@ us2pfball                       // US Games
 uspbball                        // US Games
 
 @source:hh_pps41.cpp
+brainbaf                        // Mattel
 dunksunk                        // Kmart
 ftri1                           // Fonas
+horocomp                        // Mattel
 mastmind                        // Invicta
 memoquiz                        // MEM
+mfootb2                         // Mattel
 mwcfootb                        // Mattel
 rdqa                            // Selchow & Righter
 scrabsen                        // Selchow & Righter
@@ -16846,7 +16850,8 @@ wlcc                            // (c) 1996
 xymg                            // (c) 1996
 
 @source:igs017.cpp
-genius6                         // (c) 1998?
+genius6                         // (c) 1998
+genius6a                        // (c) 1997
 happyskl                        // (c) 2001?
 iqblocka                        // (c) 1996
 iqblockf                        // (c) 1996
@@ -18958,7 +18963,8 @@ gtmrusa                         // (c) 1994 Kaneko (US)
 mgcrystl                        // (c) 1991 Kaneko (World)
 mgcrystlj                       // (c) 1991 Kaneko + distributed by Atlus (Japan)
 mgcrystlo                       // (c) 1991 Kaneko (World)
-oedfight                        // (c) 1994 Kaneko
+oedfight                        // (c) 1994 Kaneko (Bloodshed version)
+oedfighta                       // (c) 1994 Kaneko (Bloodless version)
 packbang                        // (c) 1994 Kaneko (prototype)
 shogwarr                        // (c) 1992 Kaneko
 shogwarrk                       // (c) 1992 Kaneko
@@ -22636,6 +22642,7 @@ megazonej                       // GX319 (c) 1983 + Interlogic / Kosuka
 
 @source:meijinsn.cpp
 meijinsn                        // (c) 1986 SNK
+meijinsna                       // (c) 1986 SNK
 
 @source:mekd1.cpp
 mekd1                           // 1975 Motorola Evaluation Kit
@@ -23163,6 +23170,7 @@ hiimpact2                       // (c) 1990 Williams
 hiimpact3                       // (c) 1990 Williams
 hiimpact4                       // (c) 1990 Williams
 hiimpactp                       // (c) 1990 Williams
+mazebl                          // bootleg
 mkla1                           // (c) 1992 Midway
 mkla2                           // (c) 1992 Midway
 mkla3                           // (c) 1992 Midway
@@ -32835,6 +32843,7 @@ tdragon2                        // UPL-93091 (c) 1993 NMK
 tdragon2a                       // UPL-93091 (c) 1993 NMK
 tdragon3h
 tdragonb                        // bootleg
+tdragonb2                       // bootleg
 tharrier                        // UPL-89053 (c) 1989 UPL
 tharrierb                       // Lettering bootleg
 tharrieru                       // UPL-89053 (c) 1989 UPL + American Sammy license
@@ -35514,6 +35523,7 @@ r9751                           // ROLM 9751 phone system
 
 @source:rabbit.cpp
 rabbit                          // (c) 1997 Electronic Arts
+rabbita                         // (c) 1996 Electronic Arts
 rabbitj                         // (c) 1997 Electronic Arts
 rabbitjt                        // (c) 1996 Electronic Arts
 
@@ -41774,6 +41784,10 @@ vk100                           // 1980 Digital Equipment Corporation
 
 @source:vlc.cpp
 nevada                          //
+
+@source:vlc34010.cpp
+beezerk                         //
+vlcunk                          //
 
 @source:volfied.cpp
 volfied                         // C04 (c) 1989 Taito Corporation Japan (World)

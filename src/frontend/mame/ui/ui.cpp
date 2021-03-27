@@ -178,6 +178,7 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 	, m_mouse_show(false)
 	, m_target_font_height(0)
 	, m_has_warnings(false)
+	, m_unthrottle_mute(false)
 	, m_machine_info()
 	, m_unemulated_features()
 	, m_imperfect_features()
@@ -353,6 +354,13 @@ void mame_ui_manager::initialize(running_machine &machine)
 				if (field.type() == IPT_DIPSWITCH && strcmp(field.name(), service_mode_dipname) == 0)
 					field.set_defseq(machine.ioport().type_seq(IPT_SERVICE));
 	}
+
+	// handle throttle-related options and initial muting state now that the sound manager has been brought up
+	const bool starting_throttle = machine.options().throttle();
+	machine.video().set_throttled(starting_throttle);
+	m_unthrottle_mute = options().unthrottle_mute();
+	if (!starting_throttle && m_unthrottle_mute)
+		machine.sound().ui_mute(true);
 }
 
 
@@ -1362,7 +1370,12 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 
 	// toggle throttle?
 	if (machine().ui_input().pressed(IPT_UI_THROTTLE))
-		machine().video().set_throttled(!machine().video().throttled());
+	{
+		const bool new_throttle_state = !machine().video().throttled();
+		machine().video().set_throttled(new_throttle_state);
+		if (m_unthrottle_mute)
+			machine().sound().ui_mute(!new_throttle_state);
+	}
 
 	// check for fast forward
 	if (machine().ioport().type_pressed(IPT_UI_FAST_FORWARD))

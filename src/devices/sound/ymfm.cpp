@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "ymfm.h"
 
-#define VERBOSE 1
+//#define VERBOSE 1
 #define LOG_OUTPUT_FUNC osd_printf_verbose
 #include "logmacro.h"
 
@@ -528,6 +528,10 @@ void ymfm_operator<RegisterType>::clock(u32 env_counter, s8 lfo_raw_pm, u16 bloc
 template<class RegisterType>
 s16 ymfm_operator<RegisterType>::compute_volume(u16 modulation, u16 am_offset) const
 {
+	// early out if the envelope is effectively off
+	if (m_env_attenuation > ENV_QUIET)
+		return 0;
+
 	// start with the upper 10 bits of the phase value plus modulation
 	// the low 10 bits of this result represents a full 2*PI period over
 	// the full sin wave
@@ -1265,6 +1269,9 @@ ymfm_engine_base<RegisterType>::ymfm_engine_base(device_t &device) :
 	m_clock_prescale(RegisterType::DEFAULT_PRESCALE),
 	m_irq_mask(STATUS_TIMERA | STATUS_TIMERB),
 	m_irq_state(0),
+	m_active_channels(0xffffffff),
+	m_modified_channels(0xffffffff),
+	m_prepare_count(0),
 	m_busy_end(attotime::zero),
 	m_timer{ nullptr, nullptr },
 	m_irq_handler(device),
@@ -1346,6 +1353,21 @@ void ymfm_engine_base<RegisterType>::reset()
 template<class RegisterType>
 u32 ymfm_engine_base<RegisterType>::clock(u8 chanmask)
 {
+	// if something was modified, prepare
+	// also prepare every 4k samples to catch ending notes
+	if (m_modified_channels != 0 || m_prepare_count++ >= 4096)
+	{
+		// call each channel to prepare
+		m_active_channels = 0;
+		for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
+			if (BIT(chanmask, chnum))
+				if (m_channel[chnum]->active())
+					m_active_channels |= 1 << chnum;
+
+		// reset the modified channels and prepare count
+		m_modified_channels = m_prepare_count = 0;
+	}
+
 	// increment the envelope count; low two bits are the subcount, which
 	// only counts to 3, so if it reaches 3, count one more time
 	m_env_counter++;
@@ -1376,6 +1398,9 @@ u32 ymfm_engine_base<RegisterType>::clock(u8 chanmask)
 template<class RegisterType>
 void ymfm_engine_base<RegisterType>::output(s32 &lsum, s32 &rsum, u8 rshift, s16 clipmax, u8 chanmask) const
 {
+	// mask out inactive channels
+	chanmask &= m_active_channels;
+
 	// sum over all the desired channels
 	for (int chnum = 0; chnum < RegisterType::CHANNELS; chnum++)
 		if (BIT(chanmask, chnum))
@@ -1405,6 +1430,9 @@ void ymfm_engine_base<RegisterType>::write(u16 regnum, u8 data)
 
 	// most writes are passive, consumed only when needed
 	m_regs.write(regnum, data);
+
+	// for now just mark all channels as modified
+	m_modified_channels = 0xffffffff;
 
 	// handle writes to the keyon registers
 	if (regnum == RegisterType::REG_KEYON)
