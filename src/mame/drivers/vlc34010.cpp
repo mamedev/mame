@@ -62,6 +62,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_tms(*this, "tms"),
+		m_rtc(*this, "rtc"),
 		m_duart(*this, "duart%u", 0U),
 		m_boot_view(*this, "boot")
 	{ }
@@ -73,6 +74,8 @@ protected:
 
 private:
 	void switch_w(u8 data);
+	u8 rtc_r(offs_t offset);
+	void rtc_w(offs_t offset, u8 data);
 	template <int N> u8 duart_r(offs_t offset);
 	template <int N> void duart_w(offs_t offset, u8 data);
 
@@ -80,6 +83,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34010_device> m_tms;
+	required_device<msm6242_device> m_rtc;
 	required_device_array<mc68681_device, 3> m_duart;
 	memory_view m_boot_view;
 
@@ -102,6 +106,16 @@ void vlc34010_state::switch_w(u8 data)
 	m_boot_view.select(1);
 }
 
+u8 vlc34010_state::rtc_r(offs_t offset)
+{
+	return m_rtc->read(offset >> 4);
+}
+
+void vlc34010_state::rtc_w(offs_t offset, u8 data)
+{
+	m_rtc->write(offset >> 4, data);
+}
+
 template <int N> u8 vlc34010_state::duart_r(offs_t offset)
 {
 	return m_duart[N]->read(offset >> 4);
@@ -117,7 +131,9 @@ void vlc34010_state::main_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).view(m_boot_view);
 	m_boot_view[0](0x000000, 0x1fffff).rom().region("maincpu", 0);
-	m_boot_view[1](0x000000, 0x03ffff).ram().mirror(0x7c0000);
+	m_boot_view[1](0x000000, 0x03ffff).mirror(0x7c0000).ram(); // mirroring is probably not exactly correct
+	m_boot_view[1](0x510000, 0x510000).select(0xf0).rw(FUNC(vlc34010_state::rtc_r), FUNC(vlc34010_state::rtc_w));
+	m_boot_view[1](0x520000, 0x520007).rw(m_tms, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
 	map(0xa10001, 0xa10001).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 	map(0xa70001, 0xa70001).w(FUNC(vlc34010_state::switch_w));
 	map(0xb10001, 0xb10001).select(0xf0).rw(FUNC(vlc34010_state::duart_r<0>), FUNC(vlc34010_state::duart_w<0>));
