@@ -8454,6 +8454,26 @@ Notes:
       * - Unknown PLCC68 IC
       + - Not populated
 
+NOTE:
+The hotbubl set is also known to use double sized EPROMs with the identical halves:
+  Program data on a 27C020 EPROM:
+    ROM @ C1 with a CRC32 of 0x7bb240e9
+    ROM @ C2 with a CRC32 of 0x7917b95d
+  Sprite data on a 27C040 EPROM:
+    ROM @ BR1 with a CRC32 of 0x6fc18de4
+    ROM @ BR3 with a CRC32 of 0xbb677240
+
+All EPROMs had identical AFEGA 8, AFEGA 9 or AFEGA 10 labels, so each was named as found
+and are distinguished by PCB / IC locations.
+
+The hotbubla set also has program data with identical halves. While not confirmed, there
+may be a PCB out there using the smaller 27C010's for the program data. IE:
+    ROM @ C1 with a CRC32 of 0x41c3edbc and 0x20000 bytes in length
+    ROM @ C2 with a CRC32 of 0xf59aea4a and 0x20000 bytes in length
+
+It was not uncommon for manufacturers to use whatever size EPROMs were readily
+available and either double the data or padded the empty space with a fill byte.
+
 ***************************************************************************/
 
 ROM_START( hotbubl ) // Korean release - Nude images of women for backgrounds
@@ -8486,8 +8506,8 @@ ROM_END
 
 ROM_START( hotbubla ) // Korean release - Nude images replaced with pictures of satellite dishes
 	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
-	ROM_LOAD16_BYTE( "6_c1.uc1",  0x00001, 0x40000, CRC(7c65bf47) SHA1(fe578d3336c5f437bfd1bc81bfe3763b12f3e63f) )
-	ROM_LOAD16_BYTE( "7_c2.uc9",  0x00000, 0x40000, CRC(74eb11c3) SHA1(88aeb02c4088706a56b4c930ffe6fdfbc99031c6) )
+	ROM_LOAD16_BYTE( "6_c1.uc1",  0x00001, 0x40000, CRC(7c65bf47) SHA1(fe578d3336c5f437bfd1bc81bfe3763b12f3e63f) ) // 1st and 2nd half identical
+	ROM_LOAD16_BYTE( "7_c2.uc9",  0x00000, 0x40000, CRC(74eb11c3) SHA1(88aeb02c4088706a56b4c930ffe6fdfbc99031c6) ) // 1st and 2nd half identical
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "1_s1.uc14", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) ) // same as the other games on this driver
