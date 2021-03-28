@@ -68,6 +68,7 @@ device_sega8_cart_interface::device_sega8_cart_interface(const machine_config &m
 	, m_lphaser_xoffs(-1)
 	, m_sms_mode(0)
 {
+	m_slot = dynamic_cast<sega8_cart_slot_device *>(device.owner());
 }
 
 
@@ -174,7 +175,8 @@ gamegear_cart_slot_device::gamegear_cart_slot_device(const machine_config &mconf
 
 
 sms_card_slot_device::sms_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sega8_card_slot_device(mconfig, SMS_CARD_SLOT, tag, owner, clock)
+	: sega8_card_slot_device(mconfig, SMS_CARD_SLOT, tag, owner, clock),
+	m_screen(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -890,6 +892,7 @@ void sega8_cart_slot_device::internal_header_logging(uint8_t *ROM, uint32_t len,
 #include "rom.h"
 #include "ccatch.h"
 #include "mgear.h"
+#include "3dadp.h"
 
 void sg1000_cart(device_slot_interface &device)
 {
@@ -939,6 +942,12 @@ void sms_cart(device_slot_interface &device)
 	device.option_add_internal("hicom",  SEGA8_ROM_HICOM);
 	device.option_add_internal("korean",  SEGA8_ROM_KOREAN);
 	device.option_add_internal("korean_nb",  SEGA8_ROM_KOREAN_NB);
+}
+
+void sms_card(device_slot_interface &device)
+{
+	device.option_add_internal("rom",  SEGA8_ROM_STD);
+	device.option_add_internal("3dadp",  SEGA8_ROM_3D_ADAPTOR);
 }
 
 void gg_cart(device_slot_interface &device)

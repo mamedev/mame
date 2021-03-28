@@ -13,14 +13,16 @@ license:CC0
 		</screen>
 	</view>
 
-	<view name="SegaScope Left LCD Standard (4:3)">
-		<screen index="1">
-			<bounds left="0" top="0" right="4" bottom="3" />
-		</screen>
-	</view>
+	<view name="Main Screen (2x3D) Standard (4:3)">
+		<!-- workaround for MAME selecting a 5-screen view by default -->
+		<!-- screens for one 3d glasses device -->
+		<screen index="1"><bounds left="0" top="0" right="4" bottom="3" /><color alpha="0" /></screen>
+		<screen index="2"><bounds left="0" top="0" right="4" bottom="3" /><color alpha="0" /></screen>
+		<!-- screens for an extra 3d glasses (e.g.: when using adapter + SMSJ built-in port) -->
+		<screen index="3"><bounds left="0" top="0" right="4" bottom="3" /><color alpha="0" /></screen>
+		<screen index="4"><bounds left="0" top="0" right="4" bottom="3" /><color alpha="0" /></screen>
 
-	<view name="SegaScope Right LCD Standard (4:3)">
-		<screen index="2">
+		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 	</view>
@@ -31,39 +33,9 @@ license:CC0
 		</screen>
 	</view>
 
-	<view name="SegaScope Left LCD Aspect (~scr1nativexaspect~:~scr1nativeyaspect~)">
-		<screen index="1">
-			<bounds left="0" top="0" right="~scr1width~" bottom="~scr1height~" />
-		</screen>
-	</view>
-
-	<view name="SegaScope Right LCD Pixel Aspect (~scr1nativexaspect~:~scr1nativeyaspect~)">
-		<screen index="2">
-			<bounds left="0" top="0" right="~scr1width~" bottom="~scr1height~" />
-		</screen>
-	</view>
-
 	<view name="Main Screen">
 		<screen index="0">
 			<bounds x="0" y="0" width="4" height="3" />
-		</screen>
-	</view>
-
-	<view name="SegaScope 3-D Glasses">
-		<screen index="1">
-			<bounds x="0" y="0" width="4" height="3" />
-		</screen>
-		<screen index="2">
-			<bounds x="4.03" y="0" width="4" height="3" />
-		</screen>
-	</view>
-
-	<view name="SegaScope 3-D Glasses (Gapless)">
-		<screen index="1">
-			<bounds x="0" y="0" width="4" height="3" />
-		</screen>
-		<screen index="2">
-			<bounds x="4" y="0" width="4" height="3" />
 		</screen>
 	</view>
 </mamelayout>

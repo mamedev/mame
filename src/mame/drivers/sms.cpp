@@ -386,32 +386,15 @@ static INPUT_PORTS_START( sms )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_1) PORT_WRITE_LINE_DEVICE_MEMBER("sms_vdp", sega315_5124_device, n_nmi_in_write)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( sg1000m3 )
-	PORT_INCLUDE( sms )
-
-	PORT_START("SEGASCOPE")
-	PORT_CONFNAME( 0x01, 0x00, "SegaScope (3-D Glasses)" )
-	PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING( 0x01, DEF_STR( On ) )
-
-	PORT_START("SSCOPE_BINOCULAR")
-	PORT_CONFNAME( 0x03, 0x00, "SegaScope - Binocular Hack" ) PORT_CONDITION("SEGASCOPE", 0x01, EQUALS, 0x01)
-	PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING( 0x01, "Left Lens" )
-	PORT_CONFSETTING( 0x02, "Right Lens" )
-	PORT_CONFSETTING( 0x03, "Both Lens" )
-	PORT_BIT( 0x03, 0x00, IPT_UNUSED ) PORT_CONDITION("SEGASCOPE", 0x01, EQUALS, 0x00)
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( sms1 )
-	PORT_INCLUDE( sg1000m3 )
+	PORT_INCLUDE( sms )
 
 	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Reset Button")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( smsj )
-	PORT_INCLUDE( sg1000m3 )
+	PORT_INCLUDE( sms )
 
 	PORT_START("RAPID")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Rapid Button")
@@ -607,16 +590,6 @@ void sms1_state::sms1_ntsc(machine_config &config)
 	screen_sms_ntsc_raw_params(*m_main_scr, XTAL(10'738'635)/2);
 	m_main_scr->set_screen_update(FUNC(sms1_state::screen_update_sms));
 
-	SCREEN(config, m_left_lcd, SCREEN_TYPE_LCD);    // This is needed for SegaScope Left LCD
-	screen_sms_ntsc_raw_params(*m_left_lcd, XTAL(10'738'635)/2);
-	m_left_lcd->set_screen_update(FUNC(sms1_state::screen_update_left));
-
-	SCREEN(config, m_right_lcd, SCREEN_TYPE_LCD);   // This is needed for SegaScope Right LCD
-	screen_sms_ntsc_raw_params(*m_right_lcd, XTAL(10'738'635)/2);
-	m_right_lcd->set_screen_update(FUNC(sms1_state::screen_update_right));
-
-	m_main_scr->screen_vblank().set(FUNC(sms1_state::sscope_vblank));
-
 	config.set_default_layout(layout_sms1);
 
 	SEGA315_5124(config, m_vdp, XTAL(10'738'635));
@@ -627,7 +600,7 @@ void sms1_state::sms1_ntsc(machine_config &config)
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// card and expansion slots, not present in Master System II
-	SMS_CARD_SLOT(config, "mycard", sms_cart, nullptr);
+	SMS_CARD_SLOT(config, "mycard", sms_card, nullptr).set_screen_tag(m_main_scr);
 	SMS_EXPANSION_SLOT(config, "smsexp", sms_expansion_devices, nullptr);
 
 	m_has_bios_full = true;
@@ -651,7 +624,7 @@ void smssdisp_state::sms_sdisp(machine_config &config)
 	for (int i = 1; i < 16; i++)
 		SMS_CART_SLOT(config, m_slots[i], sms_cart, nullptr);
 	for (int i = 0; i < 16; i++)
-		SMS_CARD_SLOT(config, m_cards[i], sms_cart, nullptr);
+		SMS_CARD_SLOT(config, m_cards[i], sms_card, nullptr).set_screen_tag(m_main_scr);
 
 	m_has_bios_full = false;
 	m_has_pwr_led = false;
@@ -698,16 +671,6 @@ void sms1_state::sms1_pal(machine_config &config)
 	screen_sms_pal_raw_params(*m_main_scr, MASTER_CLOCK_PAL/10);
 	m_main_scr->set_screen_update(FUNC(sms1_state::screen_update_sms));
 
-	SCREEN(config, m_left_lcd, SCREEN_TYPE_LCD);    // This is needed for SegaScope Left LCD
-	screen_sms_pal_raw_params(*m_left_lcd, MASTER_CLOCK_PAL/10);
-	m_left_lcd->set_screen_update(FUNC(sms1_state::screen_update_left));
-
-	SCREEN(config, m_right_lcd, SCREEN_TYPE_LCD);   // This is needed for SegaScope Right LCD
-	screen_sms_pal_raw_params(*m_right_lcd, MASTER_CLOCK_PAL/10);
-	m_right_lcd->set_screen_update(FUNC(sms1_state::screen_update_right));
-
-	m_main_scr->screen_vblank().set(FUNC(sms1_state::sscope_vblank));
-
 	config.set_default_layout(layout_sms1);
 
 	SEGA315_5124(config, m_vdp, MASTER_CLOCK_PAL/5);
@@ -718,7 +681,7 @@ void sms1_state::sms1_pal(machine_config &config)
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// card and expansion slots, not present in Master System II
-	SMS_CARD_SLOT(config, "mycard", sms_cart, nullptr);
+	SMS_CARD_SLOT(config, "mycard", sms_card, nullptr).set_screen_tag(m_main_scr);
 	SMS_EXPANSION_SLOT(config, "smsexp", sms_expansion_devices, nullptr);
 
 	m_has_bios_full = true;
@@ -767,16 +730,6 @@ void sms1_state::sms1_paln(machine_config &config)
 	screen_sms_pal_raw_params(*m_main_scr, MASTER_CLOCK_PALN/2);
 	m_main_scr->set_screen_update(FUNC(sms1_state::screen_update_sms));
 
-	SCREEN(config, m_left_lcd, SCREEN_TYPE_LCD);    // This is needed for SegaScope Left LCD
-	screen_sms_pal_raw_params(*m_left_lcd, MASTER_CLOCK_PALN/2);
-	m_left_lcd->set_screen_update(FUNC(sms1_state::screen_update_left));
-
-	SCREEN(config, m_right_lcd, SCREEN_TYPE_LCD);   // This is needed for SegaScope Right LCD
-	screen_sms_pal_raw_params(*m_right_lcd, MASTER_CLOCK_PALN/2);
-	m_right_lcd->set_screen_update(FUNC(sms1_state::screen_update_right));
-
-	m_main_scr->screen_vblank().set(FUNC(sms1_state::sscope_vblank));
-
 	config.set_default_layout(layout_sms1);
 
 	SEGA315_5124(config, m_vdp, MASTER_CLOCK_PALN);
@@ -787,7 +740,7 @@ void sms1_state::sms1_paln(machine_config &config)
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// card and expansion slots, not present in Tec Toy Master System III
-	SMS_CARD_SLOT(config, "mycard", sms_cart, nullptr);
+	SMS_CARD_SLOT(config, "mycard", sms_card, nullptr).set_screen_tag(m_main_scr);
 	SMS_EXPANSION_SLOT(config, "smsexp", sms_expansion_devices, nullptr);
 
 	m_has_bios_full = true;
@@ -838,16 +791,6 @@ void sms1_state::sms1_br(machine_config &config)
 	screen_sms_ntsc_raw_params(*m_main_scr, MASTER_CLOCK_PALM/2);
 	m_main_scr->set_screen_update(FUNC(sms1_state::screen_update_sms));
 
-	SCREEN(config, m_left_lcd, SCREEN_TYPE_LCD);    // This is needed for SegaScope Left LCD
-	screen_sms_ntsc_raw_params(*m_left_lcd, MASTER_CLOCK_PALM/2);
-	m_left_lcd->set_screen_update(FUNC(sms1_state::screen_update_left));
-
-	SCREEN(config, m_right_lcd, SCREEN_TYPE_LCD);   // This is needed for SegaScope Right LCD
-	screen_sms_ntsc_raw_params(*m_right_lcd, MASTER_CLOCK_PALM/2);
-	m_right_lcd->set_screen_update(FUNC(sms1_state::screen_update_right));
-
-	m_main_scr->screen_vblank().set(FUNC(sms1_state::sscope_vblank));
-
 	config.set_default_layout(layout_sms1);
 
 	SEGA315_5124(config, m_vdp, MASTER_CLOCK_PALM);
@@ -858,7 +801,7 @@ void sms1_state::sms1_br(machine_config &config)
 	m_vdp->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// card and expansion slots, not present in Tec Toy Master System III
-	SMS_CARD_SLOT(config, "mycard", sms_cart, nullptr);
+	SMS_CARD_SLOT(config, "mycard", sms_card, nullptr).set_screen_tag(m_main_scr);
 	SMS_EXPANSION_SLOT(config, "smsexp", sms_expansion_devices, nullptr);
 
 	m_has_bios_full = true;
@@ -892,8 +835,11 @@ void sms1_state::sms1_kr(machine_config &config)
 	config.device_remove("mycard");
 	config.device_remove("smsexp");
 	SG1000MK3_CART_SLOT(config, "slot", sg1000mk3_cart, nullptr);
-	SMS_CARD_SLOT(config, "mycard", sms_cart, nullptr);
+	SMS_CARD_SLOT(config, "mycard", sms_card, nullptr).set_screen_tag(m_main_scr);
 	SMS_EXPANSION_SLOT(config, "smsexp", sms_expansion_devices, nullptr);
+
+	SMS_3D_PORT(config, m_port_3d, sms_3d_port_devices, nullptr);
+	m_port_3d->set_screen_tag(m_main_scr);
 
 	SOFTWARE_LIST(config, "cart_list2").set_original("sg1000");
 
@@ -931,7 +877,7 @@ void sms1_state::sg1000m3(machine_config &config)
 	config.device_remove("mycard");
 	config.device_remove("smsexp");
 	SG1000MK3_CART_SLOT(config, "slot", sg1000mk3_cart, nullptr);
-	SMS_CARD_SLOT(config, "mycard", sms_cart, nullptr);
+	SMS_CARD_SLOT(config, "mycard", sms_card, nullptr).set_screen_tag(m_main_scr);
 	SG1000_EXPANSION_SLOT(config, "sgexp", sg1000_expansion_devices, nullptr, false);
 
 	SOFTWARE_LIST(config, "cart_list2").set_original("sg1000");
@@ -1240,7 +1186,7 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT           COMPANY    FULLNAME                              FLAGS */
-CONS( 1985, sg1000m3, sms,      0,      sg1000m3,  sg1000m3, sms1_state,     empty_init,    "Sega",    "Mark III",                           MACHINE_SUPPORTS_SAVE )
+CONS( 1985, sg1000m3, sms,      0,      sg1000m3,  sms,      sms1_state,     empty_init,    "Sega",    "Mark III",                           MACHINE_SUPPORTS_SAVE )
 CONS( 1986, sms1,     sms,      0,      sms1_ntsc, sms1,     sms1_state,     empty_init,    "Sega",    "Master System I",                    MACHINE_SUPPORTS_SAVE )
 CONS( 1986, sms1pal,  sms,      0,      sms1_pal,  sms1,     sms1_state,     empty_init,    "Sega",    "Master System I (PAL)" ,             MACHINE_SUPPORTS_SAVE )
 CONS( 1986, smssdisp, sms,      0,      sms_sdisp, smssdisp, smssdisp_state, empty_init,    "Sega",    "Master System Store Display Unit",   MACHINE_SUPPORTS_SAVE )

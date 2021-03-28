@@ -26,6 +26,7 @@
 #include "bus/sg1000_exp/sg1000exp.h"
 #include "bus/sms_ctrl/smsctrl.h"
 #include "bus/sms_exp/smsexp.h"
+#include "bus/sms_3d/s3dport.h"
 #include "sound/ym2413.h"
 #include "video/315_5124.h"
 
@@ -197,7 +198,7 @@ protected:
 	// slot devices
 	sega8_cart_slot_device *m_cartslot;
 	optional_device<sega8_cart_slot_device> m_slot;
-	optional_device<sega8_card_slot_device> m_cardslot;
+	optional_device<sms_card_slot_device> m_cardslot;
 	optional_device<sms_expansion_slot_device> m_smsexpslot;
 	optional_device<sg1000_expansion_slot_device> m_sgexpslot;
 };
@@ -207,10 +208,7 @@ class sms1_state : public sms_state
 public:
 	sms1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		sms_state(mconfig, type, tag),
-		m_left_lcd(*this, "left_lcd"),
-		m_right_lcd(*this, "right_lcd"),
-		m_port_scope(*this, "SEGASCOPE"),
-		m_port_scope_binocular(*this, "SSCOPE_BINOCULAR")
+		m_port_3d(*this, "3dport")
 	{ }
 
 	void sms1_paln(machine_config &config);
@@ -221,31 +219,13 @@ public:
 	void smsj(machine_config &config);
 	void sg1000m3(machine_config &config);
 
-protected:
-	virtual void video_start() override;
-	virtual void video_reset() override;
-
 private:
 	uint8_t sscope_r(offs_t offset);
 	void sscope_w(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(sscope_vblank);
-	uint32_t screen_update_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	void sms1_mem(address_map &map);
 
-	// for 3D glass binocular hack
-	required_device<screen_device> m_left_lcd;
-	required_device<screen_device> m_right_lcd;
-	required_ioport m_port_scope;
-	required_ioport m_port_scope_binocular;
-	bitmap_rgb32 m_prevleft_bitmap;
-	bitmap_rgb32 m_prevright_bitmap;
-
-	// Data needed for SegaScope (3D glasses)
-	uint8_t m_sscope_state;
-	uint8_t m_frame_sscope_state;
+	optional_device<sms_3d_port_device> m_port_3d;
 };
 
 class smssdisp_state : public sms1_state

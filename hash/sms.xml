@@ -8270,4 +8270,16 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="3dadp">
+		<description>3-D Adaptor</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_card">
+			<feature name="slot" value="3dadp" />
+			<dataarea name="rom" size="1">
+				<!-- this card is just an adapter -->
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

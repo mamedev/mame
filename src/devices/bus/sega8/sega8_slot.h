@@ -6,6 +6,7 @@
 #pragma once
 
 #include "softlist_dev.h"
+#include "screen.h"
 
 
 /***************************************************************************
@@ -63,6 +64,8 @@ public:
 	virtual uint8_t read_io(offs_t offset) { return 0xff; }
 	virtual void write_io(offs_t offset, uint8_t data) { }
 
+	virtual DECLARE_WRITE_LINE_MEMBER(write_sscope) { }
+
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
 
@@ -101,6 +104,8 @@ protected:
 
 	int m_lphaser_xoffs;
 	int m_sms_mode;
+
+	sega8_cart_slot_device *m_slot;
 };
 
 
@@ -330,7 +335,12 @@ public:
 	sms_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual const char *image_interface() const noexcept override { return "sms_card"; }
-	virtual const char *file_extensions() const noexcept override { return "bin"; }
+	virtual const char *file_extensions() const noexcept override { return "bin,sg"; }
+
+	// required for the 3D glasses
+	DECLARE_WRITE_LINE_MEMBER(write_sscope) { if (m_cart) m_cart->write_sscope(state); }
+	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
+	required_device<screen_device> m_screen;
 };
 
 // ======================> sg1000_card_slot_device
@@ -373,6 +383,7 @@ DECLARE_DEVICE_TYPE(SG1000_CARD_SLOT,    sg1000_card_slot_device)
 void sg1000_cart(device_slot_interface &device);
 void sg1000mk3_cart(device_slot_interface &device);
 void sms_cart(device_slot_interface &device);
+void sms_card(device_slot_interface &device);
 void gg_cart(device_slot_interface &device);
 
 #endif // MAME_BUS_SEGA8_SLOT_H

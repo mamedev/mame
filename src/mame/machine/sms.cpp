@@ -568,27 +568,13 @@ void sms1_state::sscope_w(offs_t offset, uint8_t data)
 {
 	write_ram(0x3ff8 + offset, data);
 
-	int sscope = m_port_scope->read();
+	if (m_cardslot && m_cardslot->exists())
+		m_cardslot->write_sscope(BIT(data, 0));
 
 	// On SMSJ, address $fffb also controls the built-in 3-D port, that works
 	// in parallel with the 3-D adapter that is inserted into the card slot.
-
-	if ( sscope )
-	{
-		// Scope is attached
-		m_sscope_state = data;
-
-		// There are occurrences when Sega Scope's state changes after VBLANK, or at
-		// active screen. Most cases are solid-color frames of scene transitions, but
-		// one exception is the first frame of Zaxxon 3-D's title screen. In that
-		// case, this method is enough for setting the intended state for the frame.
-		// According to Charles MacDonald: "It takes around 10 scanlines for the
-		// display to transition from fully visible to fully obscured by the shutter".
-		if (m_main_scr->vpos() < (m_main_scr->height() >> 1))
-		{
-			m_frame_sscope_state = m_sscope_state;
-		}
-	}
+	if (m_port_3d && offset == 3)
+		m_port_3d->write_sscope(BIT(data, 0));
 }
 
 
@@ -1235,112 +1221,6 @@ WRITE_LINE_MEMBER(smssdisp_state::sms_store_int_callback)
 	}
 }
 
-
-void sms1_state::video_start()
-{
-	m_main_scr->register_screen_bitmap(m_prevleft_bitmap);
-	m_main_scr->register_screen_bitmap(m_prevright_bitmap);
-	save_item(NAME(m_prevleft_bitmap));
-	save_item(NAME(m_prevright_bitmap));
-	save_item(NAME(m_sscope_state));
-	save_item(NAME(m_frame_sscope_state));
-
-	// Allow sscope screens to have crosshair, useful for the game missil3d
-	machine().crosshair().get_crosshair(0).set_screen(CROSSHAIR_SCREEN_ALL);
-}
-
-
-void sms1_state::video_reset()
-{
-	if (m_port_scope->read())
-	{
-		uint8_t sscope_binocular_hack = m_port_scope_binocular->read();
-
-		if (sscope_binocular_hack & 0x01)
-			m_prevleft_bitmap.fill(rgb_t::black());
-		if (sscope_binocular_hack & 0x02)
-			m_prevright_bitmap.fill(rgb_t::black());
-	}
-
-	m_sscope_state = 0;
-	m_frame_sscope_state = 0;
-}
-
-
-WRITE_LINE_MEMBER(sms1_state::sscope_vblank)
-{
-	// on falling edge
-	if (!state)
-	{
-		// Most of the 3-D games usually set Sega Scope's state for next frame
-		// soon after the active area of current frame was drawn, but before
-		// it is displayed by the screen update function. That function needs to
-		// check the state used at the time of frame drawing, to display it on
-		// the correct side. So here, when the frame is about to be drawn, the
-		// Sega Scope's state is stored, to be checked by that function.
-		m_frame_sscope_state = m_sscope_state;
-	}
-}
-
-uint32_t sms1_state::screen_update_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	uint8_t sscope = m_port_scope->read();
-
-	// without SegaScope, both LCDs for glasses go black
-	// with SegaScope, state 0 = left screen OFF, right screen ON
-	if (sscope && BIT(m_frame_sscope_state, 0))
-	{
-		m_vdp->screen_update(screen, bitmap, cliprect);
-
-		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
-		// save a copy of current bitmap for the binocular hack
-		if (BIT(m_port_scope_binocular->read(), 0))
-			copybitmap(m_prevleft_bitmap, bitmap, 0, 0, 0, 0, cliprect);
-	}
-	else
-	{
-		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
-		// use the copied bitmap for the binocular hack
-		if (sscope && BIT(m_port_scope_binocular->read(), 0))
-		{
-			copybitmap(bitmap, m_prevleft_bitmap, 0, 0, 0, 0, cliprect);
-			return 0;
-		}
-		bitmap.fill(rgb_t::black(), cliprect);
-	}
-
-	return 0;
-}
-
-uint32_t sms1_state::screen_update_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	uint8_t sscope = m_port_scope->read();
-
-	// without SegaScope, both LCDs for glasses go black
-	// with SegaScope, state 1 = left screen ON, right screen OFF
-	if (sscope && !BIT(m_frame_sscope_state, 0))
-	{
-		m_vdp->screen_update(screen, bitmap, cliprect);
-
-		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
-		// save a copy of current bitmap for the binocular hack
-		if (BIT(m_port_scope_binocular->read(), 1))
-			copybitmap(m_prevright_bitmap, bitmap, 0, 0, 0, 0, cliprect);
-	}
-	else
-	{
-		// HACK: fake 3D->2D handling (if enabled, it repeats each frame twice on the selected lens)
-		// use the copied bitmap for the binocular hack
-		if (sscope && BIT(m_port_scope_binocular->read(), 1))
-		{
-			copybitmap(bitmap, m_prevright_bitmap, 0, 0, 0, 0, cliprect);
-			return 0;
-		}
-		bitmap.fill(rgb_t::black(), cliprect);
-	}
-
-	return 0;
-}
 
 uint32_t sms_state::screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {

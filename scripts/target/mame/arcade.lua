@@ -819,6 +819,7 @@ BUSES["SG1000_EXP"] = true
 BUSES["SGIKBD"] = true
 BUSES["SMS_CTRL"] = true
 BUSES["SMS_EXP"] = true
+BUSES["SMS_3D"] = true
 --BUSES["SNES"] = true
 --BUSES["SPC1000"] = true
 BUSES["SUNKBD"] = true

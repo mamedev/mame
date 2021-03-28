@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+	<view name="SegaScope Left LCD Standard (4:3)">
+		<screen tag="left_lcd">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+	</view>
+
+	<view name="SegaScope Right LCD Standard (4:3)">
+		<screen tag="right_lcd">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+	</view>
+
+	<view name="SegaScope Left LCD Aspect (~scr1nativexaspect~:~scr1nativeyaspect~)">
+		<screen tag="left_lcd">
+			<bounds left="0" top="0" right="~scr1width~" bottom="~scr1height~" />
+		</screen>
+	</view>
+
+	<view name="SegaScope Right LCD Pixel Aspect (~scr1nativexaspect~:~scr1nativeyaspect~)">
+		<screen tag="right_lcd">
+			<bounds left="0" top="0" right="~scr1width~" bottom="~scr1height~" />
+		</screen>
+	</view>
+
+	<view name="SegaScope 3-D Glasses">
+		<screen tag="left_lcd">
+			<bounds x="0" y="0" width="4" height="3" />
+		</screen>
+		<screen tag="right_lcd">
+			<bounds x="4.03" y="0" width="4" height="3" />
+		</screen>
+	</view>
+
+	<view name="SegaScope 3-D Glasses (Gapless)">
+		<screen tag="left_lcd">
+			<bounds x="0" y="0" width="4" height="3" />
+		</screen>
+		<screen tag="right_lcd">
+			<bounds x="4" y="0" width="4" height="3" />
+		</screen>
+	</view>
+</mamelayout>

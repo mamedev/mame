@@ -3112,6 +3112,8 @@ if (BUSES["SEGA8"]~=null) then
 		MAME_DIR .. "src/devices/bus/sega8/ccatch.h",
 		MAME_DIR .. "src/devices/bus/sega8/mgear.cpp",
 		MAME_DIR .. "src/devices/bus/sega8/mgear.h",
+		MAME_DIR .. "src/devices/bus/sega8/3dadp.cpp",
+		MAME_DIR .. "src/devices/bus/sega8/3dadp.h",
 	}
 end
 
@@ -3174,6 +3176,28 @@ if (BUSES["SMS_EXP"]~=null) then
 		MAME_DIR .. "src/devices/bus/sms_exp/smsexp.h",
 		MAME_DIR .. "src/devices/bus/sms_exp/gender.cpp",
 		MAME_DIR .. "src/devices/bus/sms_exp/gender.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/sms_3d/s3dport.h,BUSES["SMS_3D"] = true
+---------------------------------------------------
+
+if (BUSES["SMS_3D"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/sms_3d/s3dport.cpp",
+		MAME_DIR .. "src/devices/bus/sms_3d/s3dport.h",
+		MAME_DIR .. "src/devices/bus/sms_3d/s3dglass.cpp",
+		MAME_DIR .. "src/devices/bus/sms_3d/s3dglass.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/bus/sms_3d/s3dglass.cpp", GEN_DIR .. "emu/layout/s3dglass.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "s3dglass"),
 	}
 end
 
