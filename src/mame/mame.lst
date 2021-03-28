@@ -22479,6 +22479,8 @@ megajet                         // 1993 Sega Mega Jet (Japan)
 
 @source:megadriv_acbl.cpp
 aladmdb                         // MegaDrive-based hack
+barekch                         // MegaDrive-based hack
+barek2ch                        // MegaDrive-based hack
 barek2mb                        // MegaDrive-based hack
 barek3mb                        // MegaDrive-based hack
 bk3ssrmb                        // MegaDrive-based hack
