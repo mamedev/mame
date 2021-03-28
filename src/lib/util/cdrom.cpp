@@ -266,6 +266,7 @@ cdrom_file *cdrom_open(const char *inputfile)
 		file->cdtoc.tracks[i].physframeofs = physofs;
 		file->cdtoc.tracks[i].chdframeofs = 0;
 		file->cdtoc.tracks[i].logframeofs += logofs;
+		file->cdtoc.tracks[i].logframes = file->cdtoc.tracks[i].frames - file->cdtoc.tracks[i].pregap;
 
 		// postgap adds to the track length
 		logofs += file->cdtoc.tracks[i].postgap;
@@ -273,7 +274,7 @@ cdrom_file *cdrom_open(const char *inputfile)
 		physofs += file->cdtoc.tracks[i].frames;
 		logofs  += file->cdtoc.tracks[i].frames;
 
-/*      printf("Track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d\n", i+1,
+/*      printf("Track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d logframes %d\n", i+1,
             file->cdtoc.tracks[i].trktype,
             file->cdtoc.tracks[i].subtype,
             file->cdtoc.tracks[i].datasize,
@@ -286,13 +287,15 @@ cdrom_file *cdrom_open(const char *inputfile)
             file->cdtoc.tracks[i].postgap,
             file->cdtoc.tracks[i].logframeofs,
             file->cdtoc.tracks[i].physframeofs,
-            file->cdtoc.tracks[i].chdframeofs);*/
+            file->cdtoc.tracks[i].chdframeofs,
+            file->cdtoc.tracks[i].logframes);*/
 	}
 
 	/* fill out dummy entries for the last track to help our search */
 	file->cdtoc.tracks[i].physframeofs = physofs;
 	file->cdtoc.tracks[i].logframeofs = logofs;
 	file->cdtoc.tracks[i].chdframeofs = 0;
+	file->cdtoc.tracks[i].logframes = 0;
 
 	return file;
 }
@@ -375,6 +378,7 @@ cdrom_file *cdrom_open(chd_file *chd)
 		file->cdtoc.tracks[i].physframeofs = physofs;
 		file->cdtoc.tracks[i].chdframeofs = chdofs;
 		file->cdtoc.tracks[i].logframeofs += logofs;
+		file->cdtoc.tracks[i].logframes = file->cdtoc.tracks[i].frames - file->cdtoc.tracks[i].pregap;
 
 		// postgap counts against the next track
 		logofs += file->cdtoc.tracks[i].postgap;
@@ -383,8 +387,8 @@ cdrom_file *cdrom_open(chd_file *chd)
 		chdofs  += file->cdtoc.tracks[i].frames;
 		chdofs  += file->cdtoc.tracks[i].extraframes;
 		logofs  += file->cdtoc.tracks[i].frames;
-/*
-      printf("Track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d\n", i+1,
+
+      printf("Track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d logframes %d\n", i+1,
             file->cdtoc.tracks[i].trktype,
             file->cdtoc.tracks[i].subtype,
             file->cdtoc.tracks[i].datasize,
@@ -397,13 +401,15 @@ cdrom_file *cdrom_open(chd_file *chd)
             file->cdtoc.tracks[i].postgap,
             file->cdtoc.tracks[i].logframeofs,
             file->cdtoc.tracks[i].physframeofs,
-            file->cdtoc.tracks[i].chdframeofs);*/
+            file->cdtoc.tracks[i].chdframeofs,
+            file->cdtoc.tracks[i].logframes);
 	}
 
 	/* fill out dummy entries for the last track to help our search */
 	file->cdtoc.tracks[i].physframeofs = physofs;
 	file->cdtoc.tracks[i].logframeofs = logofs;
 	file->cdtoc.tracks[i].chdframeofs = chdofs;
+	file->cdtoc.tracks[i].logframes = 0;
 
 	return file;
 }

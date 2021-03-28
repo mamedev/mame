@@ -503,7 +503,7 @@ void pce_cd_device::nec_set_audio_start_position()
 		else
 		{
 			//m_cdda_status = PCE_CD_CDDA_PLAYING;
-			m_end_frame = m_toc->tracks[ cdrom_get_track(m_cd_file, m_current_frame) + 1 ].logframeofs; //get the end of THIS track
+			m_end_frame = m_toc->tracks[ cdrom_get_track(m_cd_file, m_current_frame) ].logframeofs + m_toc->tracks[ cdrom_get_track(m_cd_file, m_current_frame) ].logframes; //get the end of THIS track
 			m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
 			m_end_mark = 0;
 			m_cdda_play_mode = 3;
