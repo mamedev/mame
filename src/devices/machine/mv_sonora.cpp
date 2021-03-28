@@ -3,7 +3,7 @@
 /*********************************************************************
 
     Mac video support, "Sonora" edition
-	Supports 5 different modelines at up to 16bpp
+    Supports 5 different modelines at up to 16bpp
 
 *********************************************************************/
 
@@ -163,7 +163,7 @@ uint8_t mac_video_sonora_device::vctrl_r(offs_t offset)
 			res = mon;
 			if(!(m_monitor_id & 8))
 				res &= m_monitor_id & 7;
-		}			
+		}
 
 		return m_monitor_id | (res << 4);
 	}

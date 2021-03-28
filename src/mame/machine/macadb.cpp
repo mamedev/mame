@@ -1026,7 +1026,7 @@ void macadb_device::device_reset()
 
 WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
 {
-/*	static char const *const states[] =
+/*  static char const *const states[] =
     {
         "idle",
         "attention",
@@ -1053,14 +1053,14 @@ WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
 	int dtime = (int)(machine().time().as_ticks(adb_timebase) - m_last_adb_time);
 	m_last_adb_time = machine().time().as_ticks(adb_timebase);
 
-/*	if (m_adb_linestate <= 12)
-	{
-	    printf("linechange: %d -> %d, time %d (state %d = %s)\n", state^1, state, dtime, m_adb_linestate, states[m_adb_linestate]);
-	}
-	else
-	{
-	    printf("linechange: %d -> %d, time %d (state %d)\n", state^1, state, dtime, m_adb_linestate);
-	}*/
+/*  if (m_adb_linestate <= 12)
+    {
+        printf("linechange: %d -> %d, time %d (state %d = %s)\n", state^1, state, dtime, m_adb_linestate, states[m_adb_linestate]);
+    }
+    else
+    {
+        printf("linechange: %d -> %d, time %d (state %d)\n", state^1, state, dtime, m_adb_linestate);
+    }*/
 
 	if ((m_adb_direction) && (m_adb_linestate == LST_TSTOP))
 	{

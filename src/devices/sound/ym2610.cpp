@@ -56,7 +56,7 @@ u8 ym2610_device::read(offs_t offset)
 	u8 result = 0;
 	switch (offset & 3)
 	{
-		case 0:	// status port, YM2203 compatible
+		case 0: // status port, YM2203 compatible
 			result = m_opn.status() & (ymopna_engine::STATUS_TIMERA | ymopna_engine::STATUS_TIMERB | ymopna_engine::STATUS_BUSY);
 			break;
 
@@ -67,11 +67,11 @@ u8 ym2610_device::read(offs_t offset)
 				result = 1;  // ID code
 			break;
 
-		case 2:	// status port, extended
+		case 2: // status port, extended
 			result = m_eos_status & m_flag_mask;
 			break;
 
-		case 3:	// ADPCM-B data
+		case 3: // ADPCM-B data
 			break;
 	}
 	return result;
@@ -87,7 +87,7 @@ void ym2610_device::write(offs_t offset, u8 value)
 {
 	switch (offset & 3)
 	{
-		case 0:	// address port
+		case 0: // address port
 			m_address = value;
 
 			// write register to SSG emulator

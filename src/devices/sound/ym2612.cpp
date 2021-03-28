@@ -47,13 +47,13 @@ u8 ym2612_device::read(offs_t offset)
 	u8 result = 0;
 	switch (offset & 3)
 	{
-		case 0:	// status port, YM2203 compatible
+		case 0: // status port, YM2203 compatible
 			result = m_opn.status();
 			break;
 
 		case 1: // data port (unused)
-		case 2:	// status port, extended
-		case 3:	// data port (unused)
+		case 2: // status port, extended
+		case 3: // data port (unused)
 			logerror("Unexpected read from YM2612 offset %d\n", offset & 3);
 			break;
 	}
@@ -70,7 +70,7 @@ void ym2612_device::write(offs_t offset, u8 value)
 {
 	switch (offset & 3)
 	{
-		case 0:	// address port
+		case 0: // address port
 			m_address = value;
 			break;
 

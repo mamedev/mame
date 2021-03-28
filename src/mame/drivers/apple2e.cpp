@@ -737,7 +737,7 @@ void apple2e_state::recalc_active_device()
 		{
 			m_cur_floppy = m_floppy[1]->get_device();
 		}
-		else	// should be external 3.5 #2, for a 3rd drive
+		else    // should be external 3.5 #2, for a 3rd drive
 		{
 			m_cur_floppy = nullptr;
 		}

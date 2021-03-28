@@ -43,9 +43,9 @@
 #define MAC_H_TOTAL (704)  // (512+192)
 #define MAC_V_TOTAL (370) // (342+28)
 
-	/* Mac driver data */
+// Mac driver data
 
-	class mac_state:public driver_device
+class mac_state:public driver_device
 {
 public:
 	mac_state(const machine_config &mconfig, device_type type, const char *tag) :

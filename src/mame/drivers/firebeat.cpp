@@ -76,8 +76,8 @@
         GQ972 Main Board
         2x CD-ROM drive in Slot 1
 
-	Pop'n Music
-	------------
+    Pop'n Music
+    ------------
         GQ986 Backplane
         GQ971 SPU
         GQ972 Main Board
@@ -826,31 +826,31 @@ uint32_t firebeat_state::cabinet_r(offs_t offset, uint32_t mem_mask)
 /* Security dongle is a Dallas DS1411 RS232 Adapter with a DS1991 Multikey iButton */
 
 /*
-	Each DS1991 dongle has 3 secure enclaves. The first enclave is always the game
-	serial number. This is a 9 digit alphanumeric ID. The first three characters are
-	always the game's code, and the rest of the characters are all digits. The fourth
-	character seems to be a region specifier and causes many games to check against
-	values in the m_cabinet_info register to verify that the hardware matches. This was
-	used to region lock JP and overseas data as well as specify that certain firebeats
-	only accept e-Amusement dongles (Konami's rental service before it was an online network).
+    Each DS1991 dongle has 3 secure enclaves. The first enclave is always the game
+    serial number. This is a 9 digit alphanumeric ID. The first three characters are
+    always the game's code, and the rest of the characters are all digits. The fourth
+    character seems to be a region specifier and causes many games to check against
+    values in the m_cabinet_info register to verify that the hardware matches. This was
+    used to region lock JP and overseas data as well as specify that certain firebeats
+    only accept e-Amusement dongles (Konami's rental service before it was an online network).
 
-	Odd numbers in the 4th position correspond to JP data, with 1 and 3 being observed
-	values in the wild. Some games also accept a 7 and a few games also accept a 5.
-	Even numbers in the 4th position correspond to overseas data, with 4 being the only
-	observed value. A 0 or 9 in the 4th position is game-specific (much like the handling of
-	m_cabinet_info) but generally correspond to rental data.
+    Odd numbers in the 4th position correspond to JP data, with 1 and 3 being observed
+    values in the wild. Some games also accept a 7 and a few games also accept a 5.
+    Even numbers in the 4th position correspond to overseas data, with 4 being the only
+    observed value. A 0 or 9 in the 4th position is game-specific (much like the handling of
+    m_cabinet_info) but generally correspond to rental data.
 
-	The second enclave is license data for some Pop'n Music games and specifies the length
-	of time a dongle is valid for. The RTCRAM is used for this check which is why there is
-	no operator menu to change the RTC. Instead, the time is set using the license check
-	screen that appears on some series such as Pop'n Music and Firebeat. It is encoded in
-	the password that is given to the operator to pass the check. For games which do not use
-	extended license information, this enclave is left blank.
+    The second enclave is license data for some Pop'n Music games and specifies the length
+    of time a dongle is valid for. The RTCRAM is used for this check which is why there is
+    no operator menu to change the RTC. Instead, the time is set using the license check
+    screen that appears on some series such as Pop'n Music and Firebeat. It is encoded in
+    the password that is given to the operator to pass the check. For games which do not use
+    extended license information, this enclave is left blank.
 
-	The third enclave is a mode switch. Every game looks for some unique set of data here
-	and will turn on manufacture/service mode if the right value is set. Some games also
-	look for overseas and rental strings here and a few also have no hardware check dongles
-	and debug dongles. In the case of normal retail dongles, this enclave is left blank.
+    The third enclave is a mode switch. Every game looks for some unique set of data here
+    and will turn on manufacture/service mode if the right value is set. Some games also
+    look for overseas and rental strings here and a few also have no hardware check dongles
+    and debug dongles. In the case of normal retail dongles, this enclave is left blank.
 */
 
 enum

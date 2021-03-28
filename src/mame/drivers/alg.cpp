@@ -23,8 +23,8 @@
         Tierras Salvajes
         Zorton Brothers (Los Justicieros) [2 versions]
 
-	Picmatic games had different versions depending on TV system (PAL or NTSC) and
-	TV frequency (NTSC 60Hz, PAL 50Hz, PAL 100Hz):
+    Picmatic games had different versions depending on TV system (PAL or NTSC) and
+    TV frequency (NTSC 60Hz, PAL 50Hz, PAL 100Hz):
 
         Game                   System     ROM dumped  LD dumped
         ---------------------  ---------  ----------  ---------

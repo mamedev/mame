@@ -89,7 +89,7 @@ u8 ym2151_device::read(offs_t offset)
 			logerror("Unexpected read from YM2151 offset %d\n", offset & 3);
 			break;
 
-		case 1:	// status port, YM2203 compatible
+		case 1: // status port, YM2203 compatible
 			result = m_opm.status();
 			break;
 	}
@@ -110,7 +110,7 @@ void ym2151_device::write(offs_t offset, u8 value)
 
 	switch (offset & 1)
 	{
-		case 0:	// address port
+		case 0: // address port
 			m_address = value;
 			break;
 
@@ -251,7 +251,7 @@ void ym2164_device::write(offs_t offset, u8 value)
 
 	switch (offset & 1)
 	{
-		case 0:	// address port
+		case 0: // address port
 			m_address = value;
 			break;
 

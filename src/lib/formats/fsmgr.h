@@ -30,7 +30,7 @@ public:
 
 	// Floppy image initialization for add_raw
 	virtual void floppy_instantiate_raw(u32 key, floppy_image *image) const;
-	
+
 protected:
 	filesystem_manager_t() = default;
 
