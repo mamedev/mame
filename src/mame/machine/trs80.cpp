@@ -12,8 +12,7 @@
 
 TIMER_CALLBACK_MEMBER(trs80_state::cassette_data_callback)
 {
-/* This does all baud rates. 250 baud (trs80), and 500 baud (all others) set bit 7 of "cassette_data".
-    1500 baud (trs80m3, trs80m4) is interrupt-driven and uses bit 0 of "cassette_data" */
+// This does all baud rates. 250 baud (trs80), and 500 baud (all others) set bit 7 of "cassette_data".
 
 	double new_val = (m_cassette->input());
 

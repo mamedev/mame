@@ -155,7 +155,6 @@ lnw80:     works
 
 2021-03-26 MT 07903 - most floppies no longer boot.
            Most machines have problems loading real tapes.
-           Cannot load CAS tapes, but they can be loaded with trs80m3.
 
 *******************************************************************************************************/
 

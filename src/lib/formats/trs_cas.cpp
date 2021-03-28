@@ -15,42 +15,33 @@ Support for TRS80 .cas cassette images
 #define SMPHI   32767
 
 
-static int cas_size; // FIXME: global variable prevents mutliple instances
+static int cas_size; // FIXME: global variable prevents multiple instances
 
 
 /*******************************************************************
    Generate one high-low cycle of sample data
 ********************************************************************/
-static inline int trs80l2_cas_cycle(int16_t *buffer, int sample_pos, int silence, int high, int low)
+static inline int trs80l2_cas_cycle(int16_t *buffer, int sample_pos, bool bit)
 {
-	int i = 0;
+	uint8_t i;
 
 	if ( buffer )
 	{
-		while( i < silence )
-		{
-			buffer[ sample_pos + i ] = SILENCE;
-			i++;
-		}
-		while( i < silence + high)
-		{
-			buffer[ sample_pos + i ] = SMPHI;
-			i++;
-		}
-
-		while( i < silence + high + low )
-		{
-			buffer[ sample_pos + i ] = SMPLO;
-			i++;
-		}
+		for (i = 0; i < 32; i++)
+			buffer[ sample_pos++ ] = SILENCE;
+		for (i = 0; i < 6; i++)
+			buffer[ sample_pos++ ] = bit ? SMPHI : SILENCE;
+		for (i = 0; i < 6; i++)
+			buffer[ sample_pos++ ] = bit ? SMPLO : SILENCE;
 	}
-	return silence + high + low;
+	return 44;
 }
 
 
 static int trs80l2_handle_cas(int16_t *buffer, const uint8_t *casdata)
 {
-	int data_pos, sample_count;
+	int data_pos = 0, sample_count = 0;
+	bool a5sw = false;
 
 	data_pos = 0;
 	sample_count = 0;
@@ -58,24 +49,31 @@ static int trs80l2_handle_cas(int16_t *buffer, const uint8_t *casdata)
 	while( data_pos < cas_size )
 	{
 		uint8_t   data = casdata[data_pos];
-		int     i;
 
-		for ( i = 0; i < 8; i++ )
+		for (uint8_t i = 0; i < 8; i++ )
 		{
 			/* Signal code */
-			sample_count += trs80l2_cas_cycle( buffer, sample_count, 33, 6, 6 );
+			sample_count += trs80l2_cas_cycle( buffer, sample_count, true );
 
 			/* Bit code */
-			if ( data & 0x80 )
-				sample_count += trs80l2_cas_cycle( buffer, sample_count, 33, 6, 6 );
-			else
-				sample_count += trs80l2_cas_cycle( buffer, sample_count, 33 + 6 + 6, 0, 0 );
+			sample_count += trs80l2_cas_cycle( buffer, sample_count, data >> 7 );
 
 			data <<= 1;
 		}
 
+		if (!a5sw && (casdata[data_pos] == 0xA5))
+		{
+			a5sw = true;
+			// Need 1ms silence here while rom is busy
+			sample_count += trs80l2_cas_cycle( buffer, sample_count, false );
+		}
+
 		data_pos++;
 	}
+
+	// Specification requires a short silence to indicate EOF
+	sample_count += trs80l2_cas_cycle( buffer, sample_count, false );
+	sample_count += trs80l2_cas_cycle( buffer, sample_count, false );
 	return sample_count;
 }
 
