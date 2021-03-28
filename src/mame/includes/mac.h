@@ -339,12 +339,6 @@ private:
 	uint8_t scciop_r(offs_t offset);
 	void scciop_w(offs_t offset, uint8_t data);
 
-	uint8_t hmc_r();
-	void hmc_w(offs_t offset, uint8_t data);
-	uint8_t amic_dma_r();
-	void amic_dma_w(offs_t offset, uint8_t data);
-	uint8_t pmac_diag_r(offs_t offset);
-
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_9_w);
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_a_w);
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_b_w);
