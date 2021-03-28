@@ -478,7 +478,7 @@ chd_error read_partial_sector(cdrom_file *file, void *dest, uint32_t lbasector, 
 	// if a CHD, just read
 	if (file->chd != nullptr)
 	{
-		if (!phys) {
+		if (!phys && file->cdtoc.tracks[tracknum].pgdatasize != 0) {
 			// chdman (phys=true) relies on chdframeofs to point to index 0 instead of index 1 for extractcd.
 			// Actually playing CDs requires it to point to index 1 instead of index 0, so adjust the offset when phys=false.
 			chdsector += file->cdtoc.tracks[tracknum].pregap;
@@ -499,7 +499,7 @@ chd_error read_partial_sector(cdrom_file *file, void *dest, uint32_t lbasector, 
 		uint64_t sourcefileoffset = file->track_info.track[tracknum].offset;
 
 		if (file->cdtoc.tracks[tracknum].pgdatasize != 0)
-			sourcefileoffset += file->cdtoc.tracks[tracknum].pregap * bytespersector;
+			chdsector += file->cdtoc.tracks[tracknum].pregap;
 
 		sourcefileoffset += chdsector * bytespersector + startoffs;
 
