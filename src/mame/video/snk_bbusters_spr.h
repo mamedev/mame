@@ -27,9 +27,8 @@ private:
 	const uint8_t *m_scale_table_ptr;
 	uint8_t m_scale_line_count;
 
-	int adjust4x4(int dx, int dy, int code);
-	int adjust8x8(int dx, int dy, int code);
-	int adjust16x16(int dx, int dy, int code);
+	template<int Size>
+	int adjust_spritecode(int dx, int dy, int code);
 
 	const uint8_t *get_source_ptr(gfx_element *tilegfx, uint32_t sprite, int dx, int dy, int block);
 	void draw_block(bitmap_ind16 &dest, const rectangle &cliprect, int x,int y,int size,int flipx,int flipy,uint32_t sprite,int color,int block);

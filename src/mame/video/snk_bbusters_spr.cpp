@@ -55,27 +55,11 @@ void snk_bbusters_spr_device::device_start()
 	save_item(NAME(m_scale_line_count));
 }
 
-int snk_bbusters_spr_device::adjust4x4(int dx, int dy, int code)
+template<int Size>
+int snk_bbusters_spr_device::adjust_spritecode(int dx, int dy, int code)
 {
-	if ((dx & 0x10) && (dy & 0x10)) code += 3;
-	else if (dy & 0x10) code += 2;
-	else if (dx & 0x10) code += 1;
-	return code;
-}
-
-int snk_bbusters_spr_device::adjust8x8(int dx, int dy, int code)
-{
-	if ((dx & 0x20) && (dy & 0x20)) code += 12;
-	else if (dy & 0x20) code += 8;
-	else if (dx & 0x20) code += 4;
-	return code;
-}
-
-int snk_bbusters_spr_device::adjust16x16(int dx, int dy, int code)
-{
-	if ((dx & 0x40) && (dy & 0x40)) code += 48;
-	else if (dy & 0x40) code += 32;
-	else if (dx & 0x40) code += 16;
+	if (dy & (0x10 << Size)) code += 2 << (Size * 2);
+	if (dx & (0x10 << Size)) code += 1 << (Size * 2);
 	return code;
 }
 
@@ -93,7 +77,7 @@ inline const uint8_t* snk_bbusters_spr_device::get_source_ptr(gfx_element* tileg
 	            0 1
 	            2 3
 	        */
-		code = adjust4x4(dx, dy, code);
+		code = adjust_spritecode<0>(dx, dy, code); // 4x4
 		break;
 
 	case 2: /* 64 by 64 block
@@ -103,14 +87,14 @@ inline const uint8_t* snk_bbusters_spr_device::get_source_ptr(gfx_element* tileg
 	            8  9    12 13
 	            10 11   14 15
 	        */
-		code = adjust4x4(dx, dy, code);
-		code = adjust8x8(dx, dy, code);
+		code = adjust_spritecode<0>(dx, dy, code); // 4x4
+		code = adjust_spritecode<1>(dx, dy, code); // 8x8
 		break;
 
 	case 3: /* 128 by 128 block */
-		code = adjust4x4(dx, dy, code);
-		code = adjust8x8(dx, dy, code);
-		code = adjust16x16(dx, dy, code);
+		code = adjust_spritecode<0>(dx, dy, code); // 4x4
+		code = adjust_spritecode<1>(dx, dy, code); // 8x8
+		code = adjust_spritecode<2>(dx, dy, code); // 16x16
 		break;
 	}
 
@@ -119,6 +103,8 @@ inline const uint8_t* snk_bbusters_spr_device::get_source_ptr(gfx_element* tileg
 
 void snk_bbusters_spr_device::draw_block(bitmap_ind16 &dest, const rectangle &cliprect, int x, int y, int size, int flipx, int flipy, uint32_t sprite, int color, int block)
 {
+	// TODO: respect cliprect
+
 	gfx_element* tilegfx = gfx(0);
 	pen_t pen_base = tilegfx->colorbase() + tilegfx->granularity() * (color % tilegfx->colors());
 	uint32_t xinc = (m_scale_line_count * 0x10000) / size;
