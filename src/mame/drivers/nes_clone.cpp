@@ -1311,7 +1311,22 @@ CONS( 200?, vtvppong,  0,  0,  nes_clone_vtvppong,    nes_clone, nes_clone_vtvpp
 
 CONS( 200?, pjoypj001, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "Trump Grand", "PowerJoy (PJ001, NES based plug & play)", MACHINE_NOT_WORKING )
 
-// Daidaixing aka TimeTop
+// 
+
+/*
+	Dancing Export by Daidaixing (aka TimeTop)
+
+	(notes from Sean Riddle regarding missing sound)
+	There are two globs on the main PCB, the bigger one next to a label that says NT6561.
+	Also two 32-pin COBs, one marked 27C020 and the other 27C010 (both dumped)
+
+	Finally, a daughterboard with 1 glob.
+	The daughterboard has 10 traces going to it; power, ground, and 7 from the smaller glob.
+	The 10th trace looks like the audio output.
+
+	I assume the daughterboard has a microcontroller for sound
+	I'm not sure what the smaller glob is, but it looks like it sends commands to the daughterboard.
+*/
 CONS( 200?, dancexpt, 0, 0, nes_clone_dancexpt, dancexpt, nes_clone_dancexpt_state, init_nes_clone, "Daidaixing", "Dancing Expert", MACHINE_NOT_WORKING )
 
 CONS( 200?, vtvsocr,     0,  0,  nes_clone_vtvsocr, nes_clone, nes_clone_vtvsocr_state, init_nes_clone, "<unknown>", "Virtual TV Soccer", MACHINE_NOT_WORKING )
