@@ -168,7 +168,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-protected:
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<screen_device> m_screen;
@@ -529,8 +529,8 @@ void mechatt_state::mechatt(machine_config &config)
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
 	ymsnd.add_route(0, "lspeaker", 0.15);
 	ymsnd.add_route(0, "rspeaker", 0.15);
-	ymsnd.add_route(1, "lspeaker", 0.50);
-	ymsnd.add_route(2, "rspeaker", 0.50);
+	ymsnd.add_route(1, "lspeaker", 0.80);
+	ymsnd.add_route(2, "rspeaker", 0.80);
 }
 
 /******************************************************************************/

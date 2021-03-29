@@ -123,8 +123,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_sprites(*this, "sprites1"),
-		m_sprites2(*this, "sprites2"),
+		m_sprites(*this, "sprites%u", 1U),
 		m_spriteram(*this, "spriteram%u", 1U),
 		m_soundlatch(*this, "soundlatch%u", 1U),
 		m_tx_videoram(*this, "tx_videoram"),
@@ -145,8 +144,7 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<snk_bbusters_spr_device> m_sprites;
-	required_device<snk_bbusters_spr_device> m_sprites2;
+	required_device_array<snk_bbusters_spr_device, 2> m_sprites;
 	required_device_array<buffered_spriteram16_device, 2> m_spriteram;
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 
@@ -288,8 +286,8 @@ uint32_t bbusters_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	m_bitmap_sprites[0].fill(0xffff);
 	m_bitmap_sprites[1].fill(0xffff);
-	m_sprites2->draw_sprites(m_bitmap_sprites[1], cliprect);
-	m_sprites->draw_sprites(m_bitmap_sprites[0], cliprect);
+	m_sprites[1]->draw_sprites(m_bitmap_sprites[1], cliprect);
+	m_sprites[0]->draw_sprites(m_bitmap_sprites[0], cliprect);
 
 	m_pf_tilemap[0]->set_scrollx(0, m_pf_scroll_data[0][0]);
 	m_pf_tilemap[0]->set_scrolly(0, m_pf_scroll_data[0][1]);
@@ -527,15 +525,15 @@ void bbusters_state::bbusters(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_bbusters);
 	PALETTE(config, "palette").set_format(palette_device::RGBx_444, 2048);
 
-	SNK_BBUSTERS_SPR(config, m_sprites, 0);
-	m_sprites->set_scaletable_tag("sprites1:scale_table");
-	m_sprites->set_palette("palette");
-	m_sprites->set_spriteram_tag("spriteram1");
+	SNK_BBUSTERS_SPR(config, m_sprites[0], 0);
+	m_sprites[0]->set_scaletable_tag("sprites1:scale_table");
+	m_sprites[0]->set_palette("palette");
+	m_sprites[0]->set_spriteram_tag("spriteram1");
 
-	SNK_BBUSTERS_SPR(config, m_sprites2, 0);
-	m_sprites2->set_scaletable_tag("sprites2:scale_table");
-	m_sprites2->set_palette("palette");
-	m_sprites2->set_spriteram_tag("spriteram2");
+	SNK_BBUSTERS_SPR(config, m_sprites[1], 0);
+	m_sprites[1]->set_scaletable_tag("sprites2:scale_table");
+	m_sprites[1]->set_palette("palette");
+	m_sprites[1]->set_spriteram_tag("spriteram2");
 
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 	BUFFERED_SPRITERAM16(config, m_spriteram[1]);
