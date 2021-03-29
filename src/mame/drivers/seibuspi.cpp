@@ -1183,7 +1183,7 @@ void seibuspi_state::spi_soundmap(address_map &map)
 {
 	sxx2e_soundmap(map);
 	map(0x4008, 0x4008).w("soundfifo2", FUNC(fifo7200_device::data_byte_w));
-	map(0x400a, 0x400a).portr("JUMPERS"); // TO DO: get these to actually work
+	map(0x400a, 0x400a).portr("JUMPERS"); // TODO: get these to actually work (only on SXX2C)
 }
 
 void seibuspi_state::spi_ymf271_map(address_map &map)
