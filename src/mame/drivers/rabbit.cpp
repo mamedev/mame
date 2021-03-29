@@ -884,7 +884,7 @@ GFXDECODE_END
    irq 5 = ?
    irq 1 = ?
 
-  */
+*/
 
 INTERRUPT_GEN_MEMBER(rabbit_state::vblank_interrupt)
 {
