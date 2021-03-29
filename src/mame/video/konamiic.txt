@@ -14,16 +14,16 @@ TODO:
   Games requiring shadows to NOT affect sprites behind them:
   - Asterix (Asterix's shadow would be over his feet otherwise)
   - X-Men is dubious, see enemies halfway through level 1 coming from above with
-	boulders over their heads.
+    boulders over their heads.
 
 - scrollcontrol = 30 in Golfing Greats (leader board)
 
 
 
-					  Emulated
-						 |
-				  board #|year    CPU      tiles        sprites  priority palette    other
-					-----|---- ------- ------------- ------------- ------ ------ ----------------
+                      Emulated
+                         |
+                  board #|year    CPU      tiles        sprites  priority palette    other
+                    -----|---- ------- ------------- ------------- ------ ------ ----------------
 Hyper Crash         GX401 1985                   GX400
 Twinbee             GX412*1985   68000           GX400
 Yie Ar Kung Fu      GX407*1985    6809
@@ -59,7 +59,7 @@ Rack 'Em Up /       GX765*1987    6309 007342        007420               007327
   The Hustler
 Haunted Castle      GX768*1988  052001           007121(x2)               007327
 Ajax / Typhoon      GX770*1987   6309+ 052109 051962 051960 051937  PROM  007327 051316 (roz)
-								052001
+                                052001
 Labyrinth Runner /  GX771*1987    6309           007121                   007593 051733 (protection) 051550
   Trick Trap
 Super Contra        GX775*1988  052001 052109 051962 051960 051937  PROM  007327
@@ -249,22 +249,22 @@ control registers
 000:          scroll y
 001:          scroll x (low 8 bits)
 002: -------x scroll x (high bit)
-	 ----xxx- row/colscroll control
-			  000 = solid scroll (finalizr, ddribble bg)
-			  100 = solid scroll (jackal)
-			  001 = ? (ddribble fg)
-			  011 = colscroll (jackal high scores)
-			  101 = rowscroll (ironhors, jackal map)
+     ----xxx- row/colscroll control
+              000 = solid scroll (finalizr, ddribble bg)
+              100 = solid scroll (jackal)
+              001 = ? (ddribble fg)
+              011 = colscroll (jackal high scores)
+              101 = rowscroll (ironhors, jackal map)
 003: ------xx high bits of the tile code
-	 -----x-- unknown (finalizr)
-	 ----x--- selects sprite buffer (and makes a copy to a private buffer?)
-	 --x----- unknown (ironhors)
-	 -x------ unknown (ironhors)
-	 x------- unknown (ironhors, jackal)
+     -----x-- unknown (finalizr)
+     ----x--- selects sprite buffer (and makes a copy to a private buffer?)
+     --x----- unknown (ironhors)
+     -x------ unknown (ironhors)
+     x------- unknown (ironhors, jackal)
 004: -------x nmi enable
-	 ------x- irq enable
-	 -----x-- firq enable
-	 ----x--- flip screen
+     ------x- irq enable
+     -----x-- firq enable
+     ----x--- flip screen
 
 
 
