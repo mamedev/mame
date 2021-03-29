@@ -67,19 +67,21 @@ class nes_clone_dancexpt_state : public nes_clone_state
 public:
 	nes_clone_dancexpt_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_clone_state(mconfig, type, tag),
-		m_bank_gfx(*this, "bank_gfx"),
 		m_nametables(*this, "nametable%u", 0),
+		m_prgrom(*this, "prgrom"),
+		m_gfxrom(*this, "gfxrom"),
 		m_mainrom(*this, "maincpu")
 	{ }
 	void nes_clone_dancexpt(machine_config &config);
 
 private:
 	void nes_clone_dancexpt_map(address_map &map);
-	memory_bank_creator m_bank_gfx;
 	memory_bank_array_creator<4> m_nametables;
+	required_memory_bank m_prgrom;
+	memory_bank_creator m_gfxrom;
 	required_region_ptr<uint8_t> m_mainrom;
 
-	std::vector<u8> m_nt_ram;
+	std::unique_ptr<u8[]> m_nt_ram;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -220,9 +222,9 @@ private:
 	uint8_t m_extraregs[4];
 
 	void update_banks();
-	void multigam3_mmc3_scanline_cb(int scanline, int vblank, int blanked);
-	int16_t m_multigam3_mmc3_scanline_counter;
-	uint8_t m_multigam3_mmc3_scanline_latch;
+	void mmc3_scanline_cb(int scanline, int vblank, int blanked);
+	int16_t m_mmc3_scanline_counter;
+	uint8_t m_mmc3_scanline_latch;
 	uint8_t m_mmc3_irq_enable;
 
 	std::vector<u8> m_vram;
@@ -454,15 +456,18 @@ void nes_clone_state::nes_clone_pal(machine_config &config)
 void nes_clone_dancexpt_state::machine_start()
 {
 	nes_clone_state::machine_start();
-	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, m_bank_gfx);
-	m_bank_gfx->set_base(memregion("gfx1")->base());
 
-	m_nt_ram.resize(0x800);
+	m_nt_ram = std::make_unique<u8[]>(0x800);
+
+	m_prgrom->configure_entries(0, 0x08, &m_mainrom[0], 0x4000);
+	m_gfxrom->configure_entries(0, 0x20, memregion("gfx1")->base(), 0x2000);
+
+	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, m_gfxrom);
 
 	for (int i = 0; i < 4; i++)
 		m_nametables[i]->configure_entries(0, 2, &m_nt_ram[0], 0x400);
 
-	save_item(NAME(m_nt_ram));
+	save_pointer(NAME(m_nt_ram), 0x800);
 
 	m_nametables[0]->set_entry(0);
 	m_nametables[1]->set_entry(1);
@@ -494,18 +499,12 @@ void nes_clone_dancexpt_state::machine_reset()
 	m_5000_val = 0x6;
 }
 
-uint8_t nes_clone_dancexpt_state::bankrom_r(offs_t offset)
-{
-//	printf("%s: bankrom_r %04x\n", machine().describe_context().c_str(), offset);
-	return m_mainrom[((m_5000_val & 0x7) * 0x4000) + offset];
-}
-
 void nes_clone_dancexpt_state::update_video_bank()
 {
 	int bank = (m_previous_port0 & 0x7) * 4;
 	bank += m_5100_val & 0x3;
 
-	m_bank_gfx->set_base(memregion("gfx1")->base() + bank * 0x2000);
+	m_gfxrom->set_entry(bank);
 }
 
 void nes_clone_dancexpt_state::mapper_5000_w(offs_t offset, uint8_t data)
@@ -516,6 +515,8 @@ void nes_clone_dancexpt_state::mapper_5000_w(offs_t offset, uint8_t data)
 		logerror("%s: mapper_5000_w %02x\n", machine().describe_context(), data);
 
 	m_5000_val = data;
+
+	m_prgrom->set_entry(m_5000_val & 0x7);
 }
 
 void nes_clone_dancexpt_state::mapper_5100_w(offs_t offset, uint8_t data)
@@ -561,7 +562,7 @@ void nes_clone_dancexpt_state::nes_clone_dancexpt_map(address_map &map)
 	map(0x5100, 0x5100).w(FUNC(nes_clone_dancexpt_state::mapper_5100_w));
 	map(0x5200, 0x5200).w(FUNC(nes_clone_dancexpt_state::mapper_5200_w));
 	
-	map(0x8000, 0xbfff).r(FUNC(nes_clone_dancexpt_state::bankrom_r));
+	map(0x8000, 0xbfff).bankr("prgrom");
 	map(0xc000, 0xffff).rom().region("maincpu", 0x1c000);
 }
 
@@ -808,13 +809,13 @@ void nes_clone_afbm7800_state::mapper_a001_w(uint8_t data)
 void nes_clone_afbm7800_state::mapper_c000_w(uint8_t data)
 {
 	// irq latch
-	m_multigam3_mmc3_scanline_counter = data ^ 0xff;
+	m_mmc3_scanline_counter = data ^ 0xff;
 }
 
 void nes_clone_afbm7800_state::mapper_c001_w(uint8_t data)
 {
 	// irq reload
-	m_multigam3_mmc3_scanline_latch = data;
+	m_mmc3_scanline_latch = data;
 }
 
 void nes_clone_afbm7800_state::mapper_e000_w(uint8_t data)
@@ -832,15 +833,15 @@ void nes_clone_afbm7800_state::mapper_e001_w(uint8_t data)
 
 
 
-void nes_clone_afbm7800_state::multigam3_mmc3_scanline_cb( int scanline, int vblank, int blanked )
+void nes_clone_afbm7800_state::mmc3_scanline_cb( int scanline, int vblank, int blanked )
 {
 	if (m_mmc3_irq_enable)
 	{
 		if (!vblank && !blanked)
 		{
-			if (--m_multigam3_mmc3_scanline_counter == -1)
+			if (--m_mmc3_scanline_counter == -1)
 			{
-				m_multigam3_mmc3_scanline_counter = m_multigam3_mmc3_scanline_latch;
+				m_mmc3_scanline_counter = m_mmc3_scanline_latch;
 				m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 			}
 		}
@@ -985,8 +986,8 @@ void nes_clone_afbm7800_state::machine_reset()
 	update_banks();
 	update_nt_mirroring();
 
-	m_multigam3_mmc3_scanline_counter = 0;
-	m_multigam3_mmc3_scanline_latch = 0;
+	m_mmc3_scanline_counter = 0;
+	m_mmc3_scanline_latch = 0;
 	m_mmc3_irq_enable = 0;
 }
 
@@ -1027,7 +1028,7 @@ void nes_clone_afbm7800_state::machine_start()
 		m_nametables[i]->configure_entries(0, 0x800 / 0x400, &m_nt_ram[0], 0x400);
 
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x1fff, read8sm_delegate(*this, FUNC(nes_clone_afbm7800_state::vram_r)), write8sm_delegate(*this, FUNC(nes_clone_afbm7800_state::vram_w)));
-	m_ppu->set_scanline_callback(*this, FUNC(nes_clone_afbm7800_state::multigam3_mmc3_scanline_cb));
+	m_ppu->set_scanline_callback(*this, FUNC(nes_clone_afbm7800_state::mmc3_scanline_cb));
 
 	m_ppu->space(AS_PROGRAM).install_readwrite_bank(0x2000,0x23ff,m_nametables[0]);
 	m_ppu->space(AS_PROGRAM).install_readwrite_bank(0x2400,0x27ff,m_nametables[1]);
@@ -1037,8 +1038,8 @@ void nes_clone_afbm7800_state::machine_start()
 	save_item(NAME(m_vram));
 	save_item(NAME(m_nt_ram));
 
-	save_item(NAME(m_multigam3_mmc3_scanline_counter));
-	save_item(NAME(m_multigam3_mmc3_scanline_latch));
+	save_item(NAME(m_mmc3_scanline_counter));
+	save_item(NAME(m_mmc3_scanline_latch));
 	save_item(NAME(m_mmc3_irq_enable));
 
 	save_item(NAME(m_ntmirror));
