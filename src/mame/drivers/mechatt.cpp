@@ -456,6 +456,22 @@ static INPUT_PORTS_START( mechattu )
 	PORT_DIPUNUSED_DIPLOC( 0x00c0, 0x00c0, "SW1:7,8" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mechattu1 )
+	PORT_INCLUDE( mechattu )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("GUNX2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("GUNY2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
 
 /******************************************************************************/
 
@@ -712,4 +728,4 @@ ROM_END
 GAME( 1989, mechatt,    0,        mechatt,  mechatt,  mechatt_state,  empty_init, ROT0, "SNK", "Mechanized Attack (World)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mechattj,   mechatt,  mechatt,  mechattj, mechatt_state,  empty_init, ROT0, "SNK", "Mechanized Attack (Japan)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mechattu,   mechatt,  mechatt,  mechattu, mechatt_state,  empty_init, ROT0, "SNK", "Mechanized Attack (US)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mechattu1,  mechatt,  mechatt,  mechattu, mechatt_state,  empty_init, ROT0, "SNK", "Mechanized Attack (US, Version 1, Single Player)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mechattu1,  mechatt,  mechatt,  mechattu1,mechatt_state,  empty_init, ROT0, "SNK", "Mechanized Attack (US, Version 1, Single Player)", MACHINE_SUPPORTS_SAVE )
