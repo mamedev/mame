@@ -86,8 +86,6 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	uint8_t bankrom_r(offs_t offset);
-
 	void mapper_5000_w(offs_t offset, uint8_t data);
 	void mapper_5100_w(offs_t offset, uint8_t data);
 	void mapper_5200_w(offs_t offset, uint8_t data);
