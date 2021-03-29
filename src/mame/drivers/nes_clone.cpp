@@ -69,7 +69,6 @@ public:
 		nes_clone_state(mconfig, type, tag),
 		m_bank_gfx(*this, "bank_gfx"),
 		m_nametables(*this, "nametable%u", 0),
-		m_ntbank(*this, "ntbank"),
 		m_mainrom(*this, "maincpu")
 	{ }
 	void nes_clone_dancexpt(machine_config &config);
@@ -77,20 +76,15 @@ public:
 private:
 	void nes_clone_dancexpt_map(address_map &map);
 	memory_bank_creator m_bank_gfx;
-	required_memory_bank_array<4> m_nametables;
-	required_device<address_map_bank_device> m_ntbank;
+	memory_bank_array_creator<4> m_nametables;
 	required_region_ptr<uint8_t> m_mainrom;
 
 	std::vector<u8> m_nt_ram;
-	void ntram_map(address_map &map);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	uint8_t bankrom_r(offs_t offset);
-
-	uint8_t nametable_r(offs_t offset);
-	void nametable_w(offs_t offset, uint8_t data);
 
 	void mapper_5000_w(offs_t offset, uint8_t data);
 	void mapper_5100_w(offs_t offset, uint8_t data);
@@ -188,7 +182,6 @@ public:
 		m_cbank(*this, "cbank%u", 0),
 		m_nametables(*this, "nametable%u", 0),
 		m_charbank(*this, "charbank"),
-		m_ntbank(*this, "ntbank"),
 		m_rom_solderpad_bank(*this, "rom_sldpad_bank")
 	{ }
 	void nes_clone_afbm7800(machine_config& config);
@@ -240,19 +233,15 @@ private:
 	void update_nt_mirroring();
 	std::vector<u8> m_nt_ram;
 
-	void nametable_w(offs_t offset, uint8_t data);
-	uint8_t nametable_r(offs_t offset);
-
 	void vram_map(address_map &map);
 	void ntram_map(address_map &map);
 	void romarea_map(address_map &map);
 
 	required_memory_bank_array<4> m_prgbank;
 	required_memory_bank_array<6> m_cbank;
-	required_memory_bank_array<4> m_nametables;
+	memory_bank_array_creator<4> m_nametables;
 
 	required_device<address_map_bank_device> m_charbank;
-	required_device<address_map_bank_device> m_ntbank;
 	required_device<address_map_bank_device> m_rom_solderpad_bank;
 };
 
@@ -480,7 +469,10 @@ void nes_clone_dancexpt_state::machine_start()
 	m_nametables[2]->set_entry(0);
 	m_nametables[3]->set_entry(1);
 
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(nes_clone_dancexpt_state::nametable_r)), write8sm_delegate(*this, FUNC(nes_clone_dancexpt_state::nametable_w)));
+	m_ppu->space(AS_PROGRAM).install_readwrite_bank(0x2000,0x23ff,m_nametables[0]);
+	m_ppu->space(AS_PROGRAM).install_readwrite_bank(0x2400,0x27ff,m_nametables[1]);
+	m_ppu->space(AS_PROGRAM).install_readwrite_bank(0x2800,0x2bff,m_nametables[2]);
+	m_ppu->space(AS_PROGRAM).install_readwrite_bank(0x2c00,0x2fff,m_nametables[3]);
 }
 
 
@@ -506,16 +498,6 @@ uint8_t nes_clone_dancexpt_state::bankrom_r(offs_t offset)
 {
 //	printf("%s: bankrom_r %04x\n", machine().describe_context().c_str(), offset);
 	return m_mainrom[((m_5000_val & 0x7) * 0x4000) + offset];
-}
-
-uint8_t nes_clone_dancexpt_state::nametable_r(offs_t offset)
-{
-	return m_ntbank->read8(offset);
-}
-
-void nes_clone_dancexpt_state::nametable_w(offs_t offset, uint8_t data)
-{
-	m_ntbank->write8(offset, data);
 }
 
 void nes_clone_dancexpt_state::update_video_bank()
@@ -569,8 +551,6 @@ void nes_clone_dancexpt_state::nes_clone_dancexpt(machine_config &config)
 {
 	nes_clone(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_dancexpt_state::nes_clone_dancexpt_map);
-
-	ADDRESS_MAP_BANK(config, "ntbank").set_map(&nes_clone_dancexpt_state::ntram_map).set_options(ENDIANNESS_NATIVE, 8, 12, 0x1000);
 }
 
 void nes_clone_dancexpt_state::nes_clone_dancexpt_map(address_map &map)
@@ -583,14 +563,6 @@ void nes_clone_dancexpt_state::nes_clone_dancexpt_map(address_map &map)
 	
 	map(0x8000, 0xbfff).r(FUNC(nes_clone_dancexpt_state::bankrom_r));
 	map(0xc000, 0xffff).rom().region("maincpu", 0x1c000);
-}
-
-void nes_clone_dancexpt_state::ntram_map(address_map &map)
-{
-	map(0x0000, 0x03ff).bankrw("nametable0");
-	map(0x0400, 0x07ff).bankrw("nametable1");
-	map(0x0800, 0x0bff).bankrw("nametable2");
-	map(0x0c00, 0x0fff).bankrw("nametable3");
 }
 
 
@@ -1028,15 +1000,6 @@ void nes_clone_afbm7800_state::vram_w(offs_t offset, uint8_t data)
 	m_charbank->write8(offset, data);
 }
 
-uint8_t nes_clone_afbm7800_state::nametable_r(offs_t offset)
-{
-	return m_ntbank->read8(offset);
-}
-
-void nes_clone_afbm7800_state::nametable_w(offs_t offset, uint8_t data)
-{
-	m_ntbank->write8(offset, data);
-}
 
 void nes_clone_afbm7800_state::machine_start()
 {
@@ -1066,7 +1029,10 @@ void nes_clone_afbm7800_state::machine_start()
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x1fff, read8sm_delegate(*this, FUNC(nes_clone_afbm7800_state::vram_r)), write8sm_delegate(*this, FUNC(nes_clone_afbm7800_state::vram_w)));
 	m_ppu->set_scanline_callback(*this, FUNC(nes_clone_afbm7800_state::multigam3_mmc3_scanline_cb));
 
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(nes_clone_afbm7800_state::nametable_r)), write8sm_delegate(*this, FUNC(nes_clone_afbm7800_state::nametable_w)));
+	m_ppu->space(AS_PROGRAM).install_readwrite_bank(0x2000,0x23ff,m_nametables[0]);
+	m_ppu->space(AS_PROGRAM).install_readwrite_bank(0x2400,0x27ff,m_nametables[1]);
+	m_ppu->space(AS_PROGRAM).install_readwrite_bank(0x2800,0x2bff,m_nametables[2]);
+	m_ppu->space(AS_PROGRAM).install_readwrite_bank(0x2c00,0x2fff,m_nametables[3]);
 
 	save_item(NAME(m_vram));
 	save_item(NAME(m_nt_ram));
