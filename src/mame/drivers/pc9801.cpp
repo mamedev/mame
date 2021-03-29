@@ -48,8 +48,8 @@
     TODO: (PC-9821AP)
     - No way to exit the initial loop. Code looks broken/bad dump?
 
-	TODO: (PC-9821Xa16)
-	- "MICON ERROR" at POST
+	TODO: (PC-9821Xa16/PC-9821Ra20)
+	- "MICON ERROR" at POST (?);
 
     floppy issues TODO (* denotes actually fixed, to be moved into specific sheet)
     - 46okunen (DOS not booting / disk swap);
@@ -320,7 +320,7 @@
     PC-9821Es (1994) - aka 98FINE, desktop computer with integrated LCD, successor of the PC-98T
     PC-9821X series (1994->1995) - aka 98MATE X, desktop computers, Pentium based
     PC-9821V series (1995) - aka 98MATE Valuestar, desktop computers, Pentium based
-    PC-9821S series (1995->2996) - aka 98Pro, tower computers, PentiumPro based
+    PC-9821S series (1995->1996) - aka 98Pro, tower computers, PentiumPro based
     PC-9821R series (1996->2000) - aka 98MATE R, desktop & tower & server computers, various CPU
     PC-9821C200 (1997) - aka CEREB, desktop computer, Pentium MMX based
     PC-9821 Ne/Ns/Np/Nm (1993->1995) - aka 98NOTE, laptops, 486 based
@@ -2575,6 +2575,14 @@ void pc9801_state::pc9821xa16(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 }
 
+void pc9801_state::pc9821ra20(machine_config &config)
+{
+	pc9821(config);
+	PENTIUM_PRO(config.replace(), m_maincpu, XTAL(200'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+}
 
 /* took from "raw" memory dump, uncomment ROM_FILL if you want to play with it */
 #define LOAD_IDE_ROM \
@@ -2973,6 +2981,31 @@ ROM_START( pc9821xa16 )
 ROM_END
 
 /*
+pc-9821Ra20 (98MATE-R)
+
+Pentium Pro @ 200
+32MB
+3.5"2DD/2HDx1, 8xCD-ROM
+CBus: 3 slots
+*/
+
+ROM_START( pc9821ra20 )
+	ROM_REGION16_LE( 0x40000, "biosrom", ROMREGION_ERASEFF )
+	ROM_LOAD( "g8wtp_a13_wtp8b01_ab28f200b5-t.bin", 0x00000, 0x040000, CRC(cd3acc5c) SHA1(746490d7f3d8d0e8df865315adaaae65f3fd0425) ) // SOP44
+
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// TODO: all of the 256k space seems valid
+	ROM_COPY( "biosrom", 0x28000, 0x00000, 0x18000 )
+	ROM_COPY( "biosrom", 0x00000, 0x18000, 0x18000 )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
+	
+	LOAD_KANJI_ROMS
+	LOAD_IDE_ROM
+ROM_END
+
+/*
 98MATE VALUESTAR - Pentium based
 */
 
@@ -3160,5 +3193,6 @@ COMP( 1994, pc9821ce2,  pc9821,   0, pc9821,    pc9821,   pc9801_state, init_pc9
 COMP( 1994, pc9821ne,   pc9821,   0, pc9821,    pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98NOTE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1994, pc486mu,    pc9821,   0, pc486mu,   pc9821,   pc9801_state, init_pc9801_kanji,   "Epson", "PC-486MU",                      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP( 1996, pc9821xa16, pc9821,   0, pc9821xa16,pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Xa16",                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1996, pc9821ra20, pc9821,   0, pc9821ra20,pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra20 (98MATE R)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1998, pc9821v13,  pc9821,   0, pc9821,    pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE VALUESTAR 13)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1998, pc9821v20,  pc9821,   0, pc9821v20, pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE VALUESTAR 20)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
