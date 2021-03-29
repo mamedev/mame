@@ -122,6 +122,7 @@ public:
 	void pc9821(machine_config &config);
 	void pc9821as(machine_config &config);
 	void pc9821ap2(machine_config &config);
+	void pc486mu(machine_config &config);
 	DECLARE_CUSTOM_INPUT_MEMBER(system_type_r);
 	void init_pc9801_kanji();
 	void init_pc9801vm_kanji();
