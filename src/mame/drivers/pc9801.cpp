@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese,Carl
-/***************************************************************************************************
+/**************************************************************************************************
 
     PC-9801 (c) 1981 NEC
 
@@ -24,6 +24,11 @@
     - extra features;
     - keyboard shift doesn't seem to disable properly;
     - clean-up duplicate code;
+
+	TODO (PC-386M):
+	- "ERR:BR" at boot (BIOS loader error). 
+	  Executes some code in text VRAM area ($a00xx), trying to setup a writeable RAM bank 
+	  (shadow RAM even?) to IPL window, I/O $c06 seems to be the control port for it;
 
     TODO (PC-9821):
     - fix CPU for some clones;
@@ -116,11 +121,11 @@
     - annivers: GRPH (ALT) key cycles through different color schemes (normal, b&w, legacy);
     - Animahjong V3 makes advantage of the possibility of installing 2 sound boards, where SFX and BGMs are played on separate chips.
     - Apple Club 1/2 needs data disks to load properly;
-    - Beast Lord: needs a titan.fnt, in MS-DOS
+    - Beast Lord: needs a titan.fnt via MS-DOS
     - fhtag2: product key is 001J0283TA 100001
     - To deprotect BASIC modules set 0xcd7 in ram to 0
 
-========================================================================================
+===================================================================================================
 
     This series features a huge number of models released between 1982 and 1997. They
     were not IBM PC-compatible, but they had similar hardware (and software: in the
@@ -387,7 +392,7 @@ Keyboard TX commands:
 0x9d keyboard LED settings
 0x9f keyboard ID
 
-****************************************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "includes/pc9801.h"
@@ -2659,7 +2664,7 @@ ROM_START( pc9801rs )
 	ROM_LOAD( "itf_rs.rom",  0x10000, 0x08000, CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
 	ROM_LOAD( "bios_rs.rom", 0x18000, 0x18000, BAD_DUMP CRC(315d2703) SHA1(4f208d1dbb68373080d23bff5636bb6b71eb7565) )
 
-	/* following is an emulator memory dump, should be checked and nuked */
+	/* following is an emulator memory dump, should be checked and eventually nuked if nothing worth is there */
 	ROM_REGION( 0x100000, "memory", 0 )
 	ROM_LOAD( "00000.rom", 0x00000, 0x8000, CRC(6e299128) SHA1(d0e7d016c005cdce53ea5ecac01c6f883b752b80) )
 	ROM_LOAD( "c0000.rom", 0xc0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )  // 0xff everywhere
@@ -2677,9 +2682,30 @@ ROM_START( pc9801rs )
 ROM_END
 
 /*
+PC-386M
+
+i386SX-16 @ 16
+1MB
+3.5"2DD/2HDx2
+CBus: 3slots
+*/
+
+ROM_START( pc386m )
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "cwma-a02.bin", 0x10000, 0x08000,  CRC(d2c357a4) SHA1(819c9a1fc92124a8d6a85339c74651add7efaf92) )
+	ROM_CONTINUE(             0x18000, 0x18000 )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font_rs.rom", 0x00000, 0x46800, BAD_DUMP CRC(da370e7a) SHA1(584d0c7fde8c7eac1f76dc5e242102261a878c5e) )
+
+	LOAD_KANJI_ROMS
+	LOAD_IDE_ROM
+ROM_END
+
+/*
 BX2/U2 - 486SX - (should be 33, but "dumper" note says it's 25 MHz)
 
-Yet another franken-dump done with a lame program, shrug
+Yet another franken-romset done with direct memory dump, shrug
 
 */
 
@@ -3082,11 +3108,12 @@ COMP( 1985, pc9801vm,   pc9801ux, 0, pc9801vm,  pc9801rs, pc9801_state, init_pc9
 COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1985, pc9801vm11, pc9801ux, 0, pc9801vm,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801VM11",                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // 386+ class
-COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801RS",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) //TODO: not sure about the exact model
+COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801RS",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) //TODO: identify proper model
 COMP( 1988, pc9801rx,   pc9801rs, 0, pc9801rs,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801RX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1990, pc386m,     pc9801rs, 0, pc9801rs,  pc9801rs, pc9801_state, init_pc9801_kanji,   "Epson", "PC-386M",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1993, pc9801bx2,  pc9801rs, 0, pc9801bx2, pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801BX2/U2",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // PC9821
-COMP( 1994, pc9821,     0,        0, pc9821,    pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) //TODO: not sure about the exact model
+COMP( 1994, pc9821,     0,        0, pc9821,    pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) //TODO: identify proper model
 COMP( 1993, pc9821as,   pc9821,   0, pc9821as,  pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE A)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1993, pc9821ap2,  pc9821,   0, pc9821ap2, pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821AP2/U8W (98MATE A)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1994, pc9821xs,   pc9821,   0, pc9821,    pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE Xs)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
