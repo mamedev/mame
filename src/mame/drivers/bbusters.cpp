@@ -100,19 +100,21 @@
 
 #include "emu.h"
 
+// src/mame
 #include "video/snk_bbusters_spr.h"
-#include "machine/gen_latch.h"
-#include "video/bufsprite.h"
-#include "screen.h"
-#include "tilemap.h"
-#include "cpu/z80/z80.h"
+// src/devices
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/upd7004.h"
 #include "sound/ym2610.h"
+#include "video/bufsprite.h"
+// src/emu
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 class bbusters_state : public driver_device
 {
