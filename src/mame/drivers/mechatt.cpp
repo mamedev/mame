@@ -4,9 +4,9 @@
 
     Mechanized Attack       A8002   (c) 1989 SNK Corporation
 
-    Mechanized Attack (A8002) is an earlier design, it only has one sprite
-    chip, no eeprom, and only 2 machine guns, but the tilemaps are twice
-    the size.
+    Compared to Beast Busters (A9003), Mechanized Attack (A8002) is an
+	earlier design, it only has one sprite chip, no eeprom, and only 2
+	machine guns, but the tilemaps are twice the size.
 
     ----------------------------------------------------------------------------------------
 
