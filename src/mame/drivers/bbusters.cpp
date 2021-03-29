@@ -190,7 +190,7 @@ void bbusters_state::machine_start()
 
 void bbusters_state::sound_cpu_w(uint8_t data)
 {
-	m_soundlatch[0]->write(data&0xff);
+	m_soundlatch[0]->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
