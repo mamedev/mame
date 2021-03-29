@@ -344,7 +344,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START ( mp_soni2 )
 	PORT_INCLUDE( megaplay )
-		
+
 	PORT_MODIFY("DSW1") // DSW C  (per game settings)
 	PORT_DIPNAME( 0x03, 0x01, "Initial Players (Normal mode)" ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING( 0x03, "1" )
