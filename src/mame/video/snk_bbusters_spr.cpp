@@ -117,44 +117,44 @@ inline const uint8_t* snk_bbusters_spr_device::get_source_ptr(gfx_element* tileg
 	return tilegfx->get_data((sprite + code) % tilegfx->elements()) + ((dy % 16) * tilegfx->rowbytes());
 }
 
-void snk_bbusters_spr_device::draw_block(bitmap_ind16 &dest, const rectangle &cliprect, int x,int y,int size,int flipx,int flipy,uint32_t sprite,int color,int block)
+void snk_bbusters_spr_device::draw_block(bitmap_ind16 &dest, const rectangle &cliprect, int x, int y, int size, int flipx, int flipy, uint32_t sprite, int color, int block)
 {
-	gfx_element *tilegfx = gfx(0);
+	gfx_element* tilegfx = gfx(0);
 	pen_t pen_base = tilegfx->colorbase() + tilegfx->granularity() * (color % tilegfx->colors());
-	uint32_t xinc=(m_scale_line_count * 0x10000 ) / size;
-	int dy=y;
+	uint32_t xinc = (m_scale_line_count * 0x10000) / size;
+	int dy = y;
 	int ex = m_scale_line_count;
 
 	while (m_scale_line_count)
 	{
-		if (dy>=16 && dy<240)
+		if (dy >= 16 && dy < 240)
 		{
-			uint16_t *const destline = &dest.pix(dy);
-			uint8_t srcline=*m_scale_table_ptr;
-			const uint8_t *srcptr=nullptr;
+			uint16_t* const destline = &dest.pix(dy);
+			uint8_t srcline = *m_scale_table_ptr;
+			const uint8_t* srcptr = nullptr;
 
 			if (!flipy)
-				srcline=size-srcline-1;
+				srcline = size - srcline - 1;
 
 			int x_index;
 			if (flipx)
-				x_index=(ex-1)*0x10000;
+				x_index = (ex - 1) * 0x10000;
 			else
-				x_index=0;
+				x_index = 0;
 
-			for (int sx=0; sx<size; sx++)
+			for (int sx = 0; sx < size; sx++)
 			{
-				if ((sx%16)==0)
-					srcptr=get_source_ptr(tilegfx,sprite,sx,srcline,block);
+				if ((sx % 16) == 0)
+					srcptr = get_source_ptr(tilegfx, sprite, sx, srcline, block);
 
-				uint8_t pixel=*srcptr++;
-				if (pixel!=15)
-					destline[(x+(x_index>>16)) & 0x1ff]= pen_base + pixel;
+				uint8_t pixel = *srcptr++;
+				if (pixel != 15)
+					destline[(x + (x_index >> 16)) & 0x1ff] = pen_base + pixel;
 
 				if (flipx)
-					x_index-=xinc;
+					x_index -= xinc;
 				else
-					x_index+=xinc;
+					x_index += xinc;
 			}
 		}
 
