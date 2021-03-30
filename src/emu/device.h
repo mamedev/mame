@@ -384,6 +384,7 @@ class device_t : public delegate_late_bind
 	DISABLE_COPYING(device_t);
 
 	friend class simple_list<device_t>;
+	friend class device_persistent_timer;
 	friend class running_machine;
 	friend class finder_base;
 	friend class devcb_base;
@@ -614,15 +615,14 @@ public:
 	{
 		return m_scheduler->timer_alloc(*this, id, ptr);
 	}
-	void timer_set(const attotime &duration, device_timer_id id = 0, int param = 0)
+	void timer_set(const attotime &duration, device_timer_id id = 0, u64 param = 0, u64 param2 = 0)
 	{
-		m_device_timer.call_after(id, duration, param);
+		m_device_timer.call_after(duration, param, param2, id);
 	}
-	void synchronize(device_timer_id id, int param = 0)
+	void synchronize(device_timer_id id, u64 param = 0, u64 param2 = 0)
 	{
-		timer_set(attotime::zero, id, param);
+		m_device_timer.call_after(attotime::zero, param, param2, id);
 	}
-	transient_timer_factory &device_timer_factory() { return m_device_timer; }
 
 	// state saving interfaces
 	template<typename ItemType>
@@ -1340,6 +1340,37 @@ private:
 	// internal state
 	device_t &      m_root;
 	int             m_maxdepth;
+};
+
+
+// ======================> device_persistent_timer
+
+class device_persistent_timer : public persistent_timer
+{
+public:
+	// construction/destruction
+	device_persistent_timer() :
+		persistent_timer() { }
+
+	// initialize with a device and ID; implicitly calls the device's device_timer method
+	persistent_timer &init(device_t &device, device_timer_id id, void *ptr = nullptr)
+	{
+		// turn the ID into a string as an additional uniquifier
+		char tempstr[64];
+		sprintf(tempstr, "%d", id);
+
+		// call through to the base class to register this
+		persistent_timer::init(device, FUNC(device_t::device_timer), tempstr).set_param(2, id);
+		m_callback.set_ptr(ptr);
+		return *this;
+	}
+
+protected:
+	// hide the base class inits
+	using persistent_timer::init;
+
+	// device timers use param2 for the id, so hide the three-parameter form
+	persistent_timer &set_params(u64 param0, u64 param1, u64 param2) { return *this; }
 };
 
 

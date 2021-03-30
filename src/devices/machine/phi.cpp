@@ -419,7 +419,7 @@ void phi_device::device_reset()
 
 void phi_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
-	LOG_NOISY("tmr %d enabled %d\n" , id , timer.enabled());
+	LOG_NOISY("tmr %d\n" , id);
 	update_fsm();
 }
 

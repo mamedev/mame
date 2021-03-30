@@ -45,7 +45,6 @@
 #include "fileio.h"
 #include "delegate.h"
 #include "devdelegate.h"
-#include "schedule.h"
 
 // memory and address spaces
 #include "emumem.h"
@@ -53,6 +52,7 @@
 // machine-wide utilities
 #include "romentry.h"
 #include "save.h"
+#include "schedule.h"
 
 // I/O
 #include "input.h"

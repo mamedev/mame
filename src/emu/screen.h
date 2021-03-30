@@ -511,8 +511,8 @@ private:
 	attotime            m_vblank_end_time;          // time of last VBLANK end
 	persistent_timer    m_vblank_begin_timer;       // timer to signal VBLANK start
 	persistent_timer    m_vblank_end_timer;         // timer to signal VBLANK end
-	persistent_timer    m_scanline0_timer;          // scanline 0 timer
-	persistent_timer    m_scanline_timer;           // scanline timer
+	device_persistent_timer m_scanline0_timer;      // scanline 0 timer
+	device_persistent_timer m_scanline_timer;       // scanline timer
 	u64                 m_frame_number;             // the current frame number
 	u32                 m_partial_updates_this_frame;// partial update counter this frame
 

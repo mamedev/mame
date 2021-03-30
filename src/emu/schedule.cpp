@@ -32,12 +32,14 @@
 //  timer_callback - constructor
 //-------------------------------------------------
 
-timer_callback::timer_callback() :
+timer_callback::timer_callback(persistent_timer *persistent) :
 	m_ptr(nullptr),
-	m_device(nullptr),
 	m_scheduler(nullptr),
-	m_next(nullptr),
-	m_unique_hash(0)
+	m_next_registered(nullptr),
+	m_persistent(persistent),
+	m_device(nullptr),
+	m_unique_hash(0),
+	m_save_index(0)
 {
 }
 
@@ -58,12 +60,14 @@ timer_callback::~timer_callback()
 //-------------------------------------------------
 
 timer_callback::timer_callback(timer_callback const &src) :
-	m_callback(src.m_callback),
+	m_delegate(src.m_delegate),
 	m_ptr(src.m_ptr),
-	m_device(src.m_device),
 	m_scheduler(src.m_scheduler),
-	m_next(src.m_next),
+	m_next_registered(src.m_next_registered),
+	m_persistent(nullptr),
+	m_device(src.m_device),
 	m_unique_hash(src.m_unique_hash),
+	m_save_index(src.m_save_index),
 	m_unique_id(src.m_unique_id)
 {
 }
@@ -77,11 +81,13 @@ timer_callback &timer_callback::operator=(timer_callback const &src)
 {
 	if (&src != this)
 	{
-		m_callback = src.m_callback;
+		m_delegate = src.m_delegate;
 		m_ptr = src.m_ptr;
 		m_device = src.m_device;
 		m_scheduler = src.m_scheduler;
-		m_next = src.m_next;
+		m_next_registered = src.m_next_registered;
+		// deliberately do not touch m_persistent since it is
+		// an allocation-only property
 		m_unique_hash = src.m_unique_hash;
 		m_unique_id = src.m_unique_id;
 	}
@@ -90,33 +96,71 @@ timer_callback &timer_callback::operator=(timer_callback const &src)
 
 
 //-------------------------------------------------
+//  set_ptr - set the callback's pointer value;
+//  only valid at initialization
+//-------------------------------------------------
+
+timer_callback &timer_callback::set_ptr(void *ptr)
+{
+	// only allowed to set pointers prior to execution; use the save state
+	// registration_allowed() as a proxy for this
+	if (!m_scheduler->machine().save().registration_allowed())
+		throw emu_fatalerror("Timer pointers must remain constant after creation.");
+	m_ptr = ptr;
+	return *this;
+}
+
+
+//-------------------------------------------------
+//  set_device - set the callback's associated
+//  device; only valid at initialization
+//-------------------------------------------------
+
+timer_callback &timer_callback::set_device(device_t &device)
+{
+	// only allowed to set pointers prior to execution; use the save state
+	// registration_allowed() as a proxy for this
+	if (!m_scheduler->machine().save().registration_allowed())
+		throw emu_fatalerror("Timer devices must remain constant after creation.");
+	m_device = &device;
+	return *this;
+}
+
+
+//-------------------------------------------------
 //  enregister_base - register a callback
 //-------------------------------------------------
 
-timer_callback &timer_callback::enregister_base(device_scheduler &scheduler, timer_expired_delegate const &callback, char const *unique)
+timer_callback &timer_callback::enregister_base(device_scheduler &scheduler, timer_expired_delegate const &callback, char const *unique, const char *unique2)
 {
-	// build the full name, appending the unique identifier if present
+	// build the full name, appending the unique identifier(s) if present
 	std::string fullid = callback.name();
 	if (unique != nullptr)
 	{
 		fullid += "/";
 		fullid += unique;
 	}
+	if (unique2 != nullptr)
+	{
+		fullid += "/";
+		fullid += unique2;
+	}
 
 	// if not already registered, just pass through
-	if (m_next == nullptr)
+	if (m_next_registered == nullptr)
 	{
-		m_callback = callback;
+		m_delegate = callback;
 		m_scheduler = &scheduler;
 		m_unique_id = fullid;
 		m_unique_hash = util::crc32_creator::simple(fullid.c_str(), fullid.length());
-		m_scheduler->register_callback(*this);
+		m_save_index = m_scheduler->register_callback(*this);
+printf("Registered: %d %08X %s\n", m_save_index, m_unique_hash, m_unique_id.c_str());
 	}
 
 	// otherwise, make sure we match
 	else
 	{
-		if (!(m_callback == callback))
+		if (!(m_delegate == callback))
 			throw emu_fatalerror("timer_callback::enregister called multiple times on the same object with different callbacks.");
 		if (m_unique_id != fullid)
 			throw emu_fatalerror("timer_callback::enregister called multiple times on the same object with different ids (%s vs. %s).", m_unique_id.c_str(), fullid.c_str());
@@ -132,16 +176,7 @@ timer_callback &timer_callback::enregister_base(device_scheduler &scheduler, tim
 
 timer_callback &timer_callback::enregister_device(device_t &device, timer_expired_delegate const &callback, char const *unique)
 {
-	char const *new_unique = device.tag();
-	std::string tempstr;
-	if (unique != nullptr)
-	{
-		tempstr = device.tag();
-		tempstr += "/";
-		tempstr += unique;
-		new_unique = tempstr.c_str();
-	}
-	return enregister_base(device.machine().scheduler(), callback, new_unique).set_device(device);
+	return enregister_base(device.machine().scheduler(), callback, device.tag(), unique).set_device(device);
 }
 
 
@@ -178,23 +213,18 @@ timer_instance::~timer_instance()
 
 timer_instance &timer_instance::init_persistent(timer_callback &callback)
 {
-	// ensure the entire timer state is clean
-	m_start = callback.m_scheduler->time();
-	m_expire = attotime::never;
-	m_period = attotime::never;
+	assert(callback.persistent() != nullptr);
 	m_callback = &callback;
-	m_param = 0;
-	m_param2 = 0;
-	m_param3 = 0;
-	m_id = 0;
-	m_enabled = false;
-	m_transient = false;
 
-	// register ourselves with the save state system
-	register_save();
+	// ensure the entire timer state is clean
+	m_param[0] = m_param[1] = m_param[2] = 0;
+	m_active = false;
 
-	// add to the inactive queue
-	return callback.m_scheduler->insert_inactive(*this);
+	// set the start/expire times to defaults
+	m_start = attotime::zero;
+	m_expire = attotime::never;
+
+	return *this;
 }
 
 
@@ -206,58 +236,16 @@ timer_instance &timer_instance::init_persistent(timer_callback &callback)
 
 inline timer_instance &timer_instance::init_transient(timer_callback &callback, attotime const &duration)
 {
-	// transient timers are only saved on demand
+	assert(callback.persistent() == nullptr);
+	m_callback = &callback;
 
 	// ensure the entire timer state is clean
-	m_start = callback.m_scheduler->time();
-	m_expire = m_start + duration;
-	m_period = attotime::never;
-	m_callback = &callback;
-	m_param = 0;
-	m_param2 = 0;
-	m_param3 = 0;
-	m_id = 0;
-	m_enabled = true;
-	m_transient = true;
+	m_param[0] = m_param[1] = m_param[2] = 0;
+	m_active = false;
 
-	// add to the active queue
-	return callback.m_scheduler->insert_active(*this);
-}
-
-
-//-------------------------------------------------
-//  enable - enable/disable a timer
-//-------------------------------------------------
-
-bool timer_instance::enable(bool enable)
-{
-	// reschedule only if the state has changed
-	const bool old = m_enabled;
-	if (old != enable)
-		scheduler().instance_move(*this, m_expire, enable);
-	return old;
-}
-
-
-//-------------------------------------------------
-//  adjust - adjust the time when this timer will
-//  fire and specify a period for subsequent
-//  firings
-//-------------------------------------------------
-
-timer_instance &timer_instance::adjust(attotime const &start_delay, s32 param, attotime const &period)
-{
-	// set the start and expire times
-	m_start = scheduler().time();
-	m_period = period.is_zero() ? attotime::never : period;
-	m_param = param;
-
-	// move it into place
-	if (start_delay.seconds() >= 0)
-		scheduler().instance_move(*this, m_start + start_delay, true);
-	else
-		scheduler().instance_move(*this, m_start, true);
-	return *this;
+	// add immediately to the active queue
+	attotime start = callback.scheduler().time();
+	return insert(start, start + duration);
 }
 
 
@@ -287,32 +275,64 @@ attotime timer_instance::remaining() const noexcept
 
 
 //-------------------------------------------------
-//  register_save - register ourself with the save
-//  state system
+//  save - save our state to the given save data
+//  structure
 //-------------------------------------------------
 
-void timer_instance::register_save()
+timer_instance &timer_instance::save(timer_instance_save &dst)
 {
-	u32 this_hash = m_callback->m_unique_hash;
-	char const *this_name = m_callback->m_unique_id.c_str();
+	dst.start = m_start;
+	dst.expire = m_expire;
+	dst.param[0] = m_param[0];
+	dst.param[1] = m_param[1];
+	dst.param[2] = m_param[2];
+	dst.hash = m_callback->unique_hash();
+	dst.save_index = m_callback->save_index();
+	return *this;
+}
 
-	int index = 0;
-	for (timer_instance *curtimer = scheduler().m_active_timers.head(); curtimer != nullptr; curtimer = curtimer->next())
-		if (!curtimer->m_transient && curtimer->m_callback->m_unique_hash == this_hash)
-			index++;
-	for (timer_instance *curtimer = scheduler().m_inactive_timers.head(); curtimer != nullptr; curtimer = curtimer->next())
-		if (!curtimer->m_transient && curtimer->m_callback->m_unique_hash == this_hash)
-			index++;
 
-	// save the bits
-	device_t *this_device = (m_callback != nullptr) ? m_callback->device() : nullptr;
-	machine().save().save_item(this_device, "timer", this_name, index, NAME(m_start));
-	machine().save().save_item(this_device, "timer", this_name, index, NAME(m_expire));
-	machine().save().save_item(this_device, "timer", this_name, index, NAME(m_period));
-	machine().save().save_item(this_device, "timer", this_name, index, NAME(m_param));
-	machine().save().save_item(this_device, "timer", this_name, index, NAME(m_param2));
-	machine().save().save_item(this_device, "timer", this_name, index, NAME(m_param3));
-	machine().save().save_item(this_device, "timer", this_name, index, NAME(m_enabled));
+//-------------------------------------------------
+//  restore - restore our state from the given
+//  save data structure
+//-------------------------------------------------
+
+timer_instance &timer_instance::restore(timer_instance_save const &src, timer_callback &callback, bool enabled)
+{
+	m_callback = &callback;
+	m_param[0] = src.param[0];
+	m_param[1] = src.param[1];
+	m_param[2] = src.param[2];
+	m_active = false;
+	m_start = src.start;
+	m_expire = src.expire;
+	return enabled ? insert(src.start, src.expire) : *this;
+}
+
+
+//-------------------------------------------------
+//  insert - insert us into the scheduler's
+//  active timer queue
+//-------------------------------------------------
+
+timer_instance &timer_instance::insert(attotime const &start, attotime const &expire)
+{
+	m_start = start;
+	m_expire = expire;
+	m_active = true;
+	return m_callback->scheduler().insert_instance(*this);
+}
+
+
+//-------------------------------------------------
+//  remove - remove us from the scheduler's
+//  active timer queue
+//-------------------------------------------------
+
+timer_instance &timer_instance::remove()
+{
+	m_active = false;
+	return m_callback->scheduler().remove_instance(*this);
 }
 
 
@@ -323,15 +343,24 @@ void timer_instance::register_save()
 
 void timer_instance::dump() const
 {
-	machine().logerror("%p: en=%d temp=%d exp=%15s start=%15s per=%15s param=%d/%lld/%lld ptr=%p",
-		this, m_enabled, m_transient, m_expire.as_string(PRECISION), m_start.as_string(PRECISION), m_period.as_string(PRECISION), m_param, m_param2, m_param3, ptr());
-	if (m_callback == nullptr || m_callback->device() == nullptr)
-		if (m_callback->name() == nullptr)
-			machine().logerror(" cb=NULL\n");
-		else
-			machine().logerror(" cb=%s\n", m_callback->name());
+	persistent_timer *persistent = m_callback->persistent();
+
+	running_machine &machine = scheduler().machine();
+	machine.logerror("%p: %s exp=%15s start=%15s ptr=%p param=%lld/%lld/%lld",
+		this,
+		(m_callback->persistent() != nullptr) ? "P" : "T",
+		m_expire.as_string(PRECISION),
+		m_start.as_string(PRECISION),
+		m_callback->ptr(),
+		m_param[0], m_param[1], m_param[2]);
+
+	if (persistent != nullptr)
+		machine.logerror(" per=%15s", persistent->period().as_string(PRECISION));
+
+	if (m_callback->device() != nullptr)
+		machine.logerror(" dev=%s id=%d\n", m_callback->device()->tag(), int(param(2)));
 	else
-		machine().logerror(" dev=%s id=%d\n", m_callback->device()->tag(), id());
+		machine.logerror(" cb=%s\n", m_callback->name());
 }
 
 
@@ -344,7 +373,10 @@ void timer_instance::dump() const
 //  persistent_timer - constructor
 //-------------------------------------------------
 
-persistent_timer::persistent_timer()
+persistent_timer::persistent_timer() :
+	m_modified(0),
+	m_callback(this),
+	m_periodic_callback(this)
 {
 }
 
@@ -359,14 +391,140 @@ persistent_timer::~persistent_timer()
 
 
 //-------------------------------------------------
-//  init - initialize a device persistent timer
+//  enable - enable a timer, returning the
+//  previous state
 //-------------------------------------------------
 
-persistent_timer &persistent_timer::init(device_t &device, device_timer_id id)
+bool persistent_timer::enable(bool enable)
 {
-	m_callback = device.device_timer_factory().callback();
-	m_instance.init_persistent(m_callback).set_id(id);
+	// fetch the previous state and set the new one
+	bool old = enabled();
+	m_enabled = enable;
+
+	// if nothing changed, leave it alone
+	if (old == enable)
+		return old;
+
+	// remove if previously active
+	if (m_instance.active())
+		m_instance.remove();
+
+	// only re-insert if enabled
+	if (enable)
+		m_instance.insert(m_instance.start(), m_instance.expire());
+
+	// mark as modified
+	m_modified = true;
+	return old;
+}
+
+
+//-------------------------------------------------
+//  adjust - change the timer's start time,
+//  parameter, or period
+//-------------------------------------------------
+
+persistent_timer &persistent_timer::adjust(attotime const &start_delay, s32 param, attotime const &period)
+{
+	// set the parameters first
+	m_instance.set_param(param);
+
+	// adjust implicitly enables the timer
+	m_enabled = true;
+
+	// set the period and adjust the callback appropriately
+	m_period = period.is_zero() ? attotime::never : period;
+	if (periodic())
+		m_instance.m_callback = &m_periodic_callback;
+	else
+		m_instance.m_callback = &m_callback;
+
+	// compute start/expire times
+	attotime start = m_callback.scheduler().time();
+	attotime expire = start;
+	if (start_delay.seconds() >= 0)
+		expire += start_delay;
+
+	// then insert into the active list, removing first if previously active
+	if (m_instance.active())
+		m_instance.remove();
+	m_instance.insert(start, expire);
+
+	// mark as modified
+	m_modified = true;
 	return *this;
+}
+
+
+//-------------------------------------------------
+//  init_common - handle common initialization
+//  tasks
+//-------------------------------------------------
+
+persistent_timer &persistent_timer::init_common(device_timer_id id)
+{
+	// initialize the timer instance
+	m_instance.init_persistent(m_callback);
+
+	// create the periodic callback
+	// FIX ME: Use the new C++ formatting stuff that I can't examples of find right now
+	char temp[10];
+	sprintf(temp, "%d", id);
+	m_periodic_callback.enregister(m_callback.scheduler(), *this, FUNC(persistent_timer::periodic_callback), temp);
+
+	return *this;
+}
+
+
+//-------------------------------------------------
+//  save - save persistent timer data to the given
+//  save data structure
+//-------------------------------------------------
+
+persistent_timer &persistent_timer::save(timer_instance_save &dst)
+{
+	m_instance.save(dst);
+
+	// overwrite the hash/save_index from the instance becuase it could be pointing
+	// to our periodic callback and we want the real underlying callback
+	dst.hash = m_callback.unique_hash();
+	dst.save_index = m_callback.save_index();
+	dst.period = m_period;
+	dst.enabled = enabled();
+	return *this;
+}
+
+
+//-------------------------------------------------
+//  restore - restore persistent timer data from
+//  the given save data structure
+//-------------------------------------------------
+
+persistent_timer &persistent_timer::restore(timer_instance_save const &src, timer_callback &callback)
+{
+	m_period = src.period;
+	m_enabled = src.enabled;
+	m_instance.restore(src, periodic() ? m_periodic_callback : m_callback, m_enabled);
+	return *this;
+}
+
+
+//-------------------------------------------------
+//  periodic_callback - callback to handle
+//  periodic timers
+//-------------------------------------------------
+
+void persistent_timer::periodic_callback(timer_instance const &timer)
+{
+	// clear the modified state
+	m_modified = false;
+
+	// call the real callback
+	m_callback(timer);
+
+	// if the timer wasn't modified during the callback, advance by one period
+	if (!m_modified)
+		m_instance.insert(m_instance.m_expire, m_instance.m_expire + m_period);
 }
 
 
@@ -381,30 +539,6 @@ persistent_timer &persistent_timer::init(device_t &device, device_timer_id id)
 
 transient_timer_factory::transient_timer_factory()
 {
-}
-
-
-//-------------------------------------------------
-//  call_after - create a new timer that will
-//  call the callback after a given amount of time
-//-------------------------------------------------
-
-void transient_timer_factory::call_after(attotime const &duration, u64 param, u64 param2, u64 param3)
-{
-	m_callback.scheduler().instance_alloc().init_transient(m_callback, duration)
-		.set_param(param).set_param2(param2).set_param3(param3);
-}
-
-
-//-------------------------------------------------
-//  call_after - create a new timer that will
-//  call the callback after a given amount of time
-//-------------------------------------------------
-
-void transient_timer_factory::call_after(device_timer_id id, attotime const &duration, u64 param, u64 param2, u64 param3)
-{
-	m_callback.scheduler().instance_alloc().init_transient(m_callback, duration)
-		.set_id(id).set_param(param).set_param2(param2).set_param3(param3);
 }
 
 
@@ -705,15 +839,26 @@ device_scheduler::device_scheduler(running_machine &machine) :
 	m_free_timers(nullptr),
 	m_registered_callbacks(nullptr),
 	m_callback_timer(nullptr),
-	m_callback_timer_modified(false),
 	m_callback_timer_expire_time(attotime::zero),
 	m_suspend_changes_pending(true),
 	m_quantum_minimum(ATTOSECONDS_IN_NSEC(1) / 1000)
 {
 	// register global states
-	machine.save().save_item(NAME(m_basetime));
-	machine.save().register_presave(save_prepost_delegate(FUNC(device_scheduler::presave), this));
-	machine.save().register_postload(save_prepost_delegate(FUNC(device_scheduler::postload), this));
+	auto &save = machine.save();
+	save.save_item(NAME(m_basetime));
+
+	// we could use STRUCT_MEMBER here if it worked on attotimes, but it doesn't
+	// currently, so do it the manual way
+	for (int index = 0; index < MAX_SAVE_INSTANCES; index++)
+	{
+		save.save_item(NAME(m_timer_save[index].start), index);
+		save.save_item(NAME(m_timer_save[index].expire), index);
+		save.save_item(NAME(m_timer_save[index].param), index);
+		save.save_item(NAME(m_timer_save[index].hash), index);
+		save.save_item(NAME(m_timer_save[index].save_index), index);
+		save.save_item(NAME(m_timer_save[index].enabled), index);
+		save.save_item(NAME(m_timer_save[index].period), index);
+	}
 
 	m_empty_timer.init(*this, *this, FUNC(device_scheduler::empty_timer));
 	m_timed_trigger.init(*this, *this, FUNC(device_scheduler::timed_trigger));
@@ -755,7 +900,7 @@ bool device_scheduler::can_save() const
 	// if any live transient timers exist, fail (transient timers are
 	// always active, so only need to scan the active list)
 	for (timer_instance *timer = m_active_timers.head(); timer != nullptr; timer = timer->next())
-		if (timer->m_transient && !timer->expire().is_never())
+		if (timer->m_callback->persistent() == nullptr)
 		{
 			machine().logerror("Failed save state attempt due to anonymous timers:\n");
 			dump_timers();
@@ -997,10 +1142,18 @@ void device_scheduler::boost_interleave(attotime const &timeslice_time, attotime
 //  expired callback
 //-------------------------------------------------
 
-void device_scheduler::register_callback(timer_callback &callback)
+u32 device_scheduler::register_callback(timer_callback &callback)
 {
-	callback.m_next = m_registered_callbacks;
+	// look for duplicates and compute a unique id
+	u32 index = 0;
+	for (timer_callback *scan = m_registered_callbacks; scan != nullptr; scan = scan->m_next_registered)
+		if (scan->unique_hash() == callback.unique_hash())
+			index++;
+
+	// now hook us in
+	callback.m_next_registered = m_registered_callbacks;
 	m_registered_callbacks = &callback;
+	return index;
 }
 
 
@@ -1011,10 +1164,10 @@ void device_scheduler::register_callback(timer_callback &callback)
 
 void device_scheduler::deregister_callback(timer_callback &callback)
 {
-	for (timer_callback **nextptr = &m_registered_callbacks; *nextptr != nullptr; nextptr = &(*nextptr)->m_next)
+	for (timer_callback **nextptr = &m_registered_callbacks; *nextptr != nullptr; nextptr = &(*nextptr)->m_next_registered)
 		if (*nextptr == &callback)
 		{
-			*nextptr = callback.m_next;
+			*nextptr = callback.m_next_registered;
 			return;
 		}
 }
@@ -1044,11 +1197,11 @@ persistent_timer *device_scheduler::timer_alloc(timer_expired_delegate const &ca
 persistent_timer *device_scheduler::timer_alloc(device_t &device, device_timer_id id, void *ptr)
 {
 	// allocate a new persistent timer and save it in a vector
-	m_allocated_persistents.push_back(std::make_unique<persistent_timer>());
-	persistent_timer &timer = *m_allocated_persistents.back().get();
+	m_allocated_persistents.push_back(std::make_unique<device_persistent_timer>());
+	device_persistent_timer &timer = static_cast<device_persistent_timer &>(*m_allocated_persistents.back().get());
 
 	// initialize the timer instance
-	return &timer.init(device, id).set_ptr(ptr);
+	return &timer.init(device, id, ptr);
 }
 
 
@@ -1070,11 +1223,41 @@ void device_scheduler::eat_all_cycles()
 
 void device_scheduler::presave()
 {
-	// report the timer state after a log
-	LOG("Prior to saving state:\n");
+	int index = 0;
+
 #if VERBOSE
 	dump_timers();
 #endif
+
+	// copy in all the timer instance data to the save area
+	for (timer_instance *timer = m_active_timers.head(); timer != nullptr && index < MAX_SAVE_INSTANCES; timer = timer->next())
+	{
+		auto *persistent = timer->m_callback->persistent();
+		if (persistent != nullptr)
+			persistent->save(m_timer_save[index++]);
+		else
+			timer->save(m_timer_save[index++]);
+	}
+
+	// then copy in inactive persistent timers
+	for (timer_callback *cb = m_registered_callbacks; cb != nullptr && index < MAX_SAVE_INSTANCES; cb = cb->m_next_registered)
+		if (cb->persistent() != nullptr && !cb->persistent()->instance().active())
+			cb->persistent()->save(m_timer_save[index++]);
+
+	// zero out the remainder
+	for ( ; index < MAX_SAVE_INSTANCES; index++)
+	{
+		auto &dest = m_timer_save[index];
+		dest.start = attotime::zero;
+		dest.expire = attotime::never;
+		dest.period = attotime::never;
+		dest.param[0] = dest.param[1] = dest.param[2] = 0;
+		dest.hash = 0;
+		dest.enabled = false;
+	}
+
+	// report the timer state after a log
+	LOG("Prior to saving state:\n");
 }
 
 
@@ -1084,39 +1267,39 @@ void device_scheduler::presave()
 
 void device_scheduler::postload()
 {
-	// upon reloading, all the timers' parameters and expiration times
-	// will be different; because we rely on this information to tell us
-	// which category (active/inactive) they belong to, we have to be
-	// careful in how we maniuplate the timers
-
-	// our approach here is to remove all the timers in each list directly,
-	// discarding any transient timers, and appending persistent ones to
-	// a local list; once all timers have been rescued this way, we
-	// reassemble the final list
-
-	timer_list private_list;
-	timer_instance *timer;
-
 	// first discard or capture active timers
+	timer_instance *timer;
 	while ((timer = m_active_timers.remove_head()) != nullptr)
-		if (timer->m_transient)
-			instance_reclaim(*timer);
-		else
-			private_list.insert_tail(*timer);
+		instance_reclaim(*timer);
 
-	// then discard or capture inactive timers
-	while ((timer = m_inactive_timers.remove_head()) != nullptr)
-		if (timer->m_transient)
-			instance_reclaim(*timer);
-		else
-			private_list.insert_tail(*timer);
+	// now go through the restored save area and recreate all the timers
+	for (int index = 0; index < MAX_SAVE_INSTANCES; index++)
+	{
+		// scan until we find a never-expiring timer
+		auto &dest = m_timer_save[index];
+		if (dest.expire.is_never())
+			break;
 
-	// now re-insert them; this effectively re-sorts them by time
-	while ((timer = private_list.remove_head()) != nullptr)
-		if (timer->active())
-			m_active_timers.insert_sorted(*timer);
+		// first find a matching callback
+		timer_callback *cb;
+		for (cb = m_registered_callbacks; cb != nullptr; cb = cb->m_next_registered)
+			if (cb->unique_hash() == dest.hash && cb->save_index() == dest.save_index)
+				break;
+
+		// if we can't find the timer, that's a concern (probably fatal)
+		if (cb == nullptr)
+		{
+			osd_printf_warning("Unable to find matching callback for %08X\n", dest.hash);
+			continue;
+		}
+
+		// if the callback is persistent, just configure the persistent timer
+		auto *persistent = cb->persistent();
+		if (persistent != nullptr)
+			persistent->restore(dest, *cb);
 		else
-			m_inactive_timers.insert_tail(*timer);
+			instance_alloc().restore(dest, *cb);
+	}
 
 	// force a refresh of things that are lazily updated
 	update_first_timer_expire();
@@ -1144,64 +1327,26 @@ inline void device_scheduler::execute_timers()
 	{
 		// if this is a one-shot timer, disable it now
 		timer_instance &timer = *m_active_timers.remove_head();
+		timer.m_active = false;
 
-		// handle transient timers specially
-		if (timer.m_transient)
+		// set the global state of which callback we're in
+		m_callback_timer = &timer;
+		m_callback_timer_expire_time = timer.m_expire;
+
+		// call the callback
+		g_profiler.start(PROFILER_TIMER_CALLBACK);
 		{
-			// set the global state of which callback we're in
-			m_callback_timer = &timer;
-			m_callback_timer_expire_time = timer.m_expire;
-
-			// call the callback
-			g_profiler.start(PROFILER_TIMER_CALLBACK);
-			{
-				if (timer.m_callback->device() != nullptr)
-					LOG("execute_timers: timer device %s timer %d\n", timer.m_callback->device()->tag(), timer.id());
-				else
-					LOG("execute_timers: timer callback %s\n", timer.m_callback->name());
-
-				timer.m_callback->m_callback(timer);
-			}
-			g_profiler.stop();
-
-			// reclaim the timer now that we're done with it
-			instance_reclaim(timer);
-		}
-		else
-		{
-			// if not repeating, mark the timer disabled now
-			if (timer.m_period.is_never())
-				timer.m_enabled = false;
-
-			// set the global state of which callback we're in
-			m_callback_timer_modified = false;
-			m_callback_timer = &timer;
-			m_callback_timer_expire_time = timer.m_expire;
-
-			// call the callback
-			g_profiler.start(PROFILER_TIMER_CALLBACK);
-			{
-				if (timer.m_callback->device() != nullptr)
-					LOG("execute_timers: timer device %s timer %d\n", timer.m_callback->device()->tag(), timer.id());
-				else
-					LOG("execute_timers: timer callback %s\n", timer.m_callback->name());
-				timer.m_callback->m_callback(timer);
-			}
-			g_profiler.stop();
-
-			// if the timer wasn't modified during the callback, advance by one period
-			if (!m_callback_timer_modified)
-			{
-				timer.m_start = timer.m_expire;
-				timer.m_expire += timer.m_period;
-			}
-
-			// insert into the appropriate list
-			if (timer.active())
-				m_active_timers.insert_sorted(timer);
+			if (timer.m_callback->device() != nullptr)
+				LOG("execute_timers: timer device %s timer %d\n", timer.m_callback->device()->tag(), int(timer.param(2)));
 			else
-				m_inactive_timers.insert_tail(timer);
+				LOG("execute_timers: timer callback %s\n", timer.m_callback->name());
+
+			(*timer.m_callback)(timer);
 		}
+		g_profiler.stop();
+
+		// reclaim the timer now that we're done with it
+		instance_reclaim(timer);
 	}
 
 	// update the expiration time of the first timer
@@ -1413,36 +1558,6 @@ void device_scheduler::add_scheduling_quantum(attotime const &quantum, attotime 
 
 
 //-------------------------------------------------
-//  insert_active - insert a timer instance at
-//  the the appropriate spot in the active
-//  timer queue
-//-------------------------------------------------
-
-inline timer_instance &device_scheduler::insert_active(timer_instance &instance)
-{
-	// if insert_sorted returns true, it means we were inserted at the
-	// head, and need to recompute our next fire time
-	if (m_active_timers.insert_sorted(instance))
-	{
-		update_first_timer_expire();
-		abort_timeslice();
-	}
-	return instance;
-}
-
-
-//-------------------------------------------------
-//  insert_inactive - insert a timer instance at
-//  the end of the inactive queue
-//-------------------------------------------------
-
-inline timer_instance &device_scheduler::insert_inactive(timer_instance &instance)
-{
-	return m_inactive_timers.insert_tail(instance);
-}
-
-
-//-------------------------------------------------
 //  instance_alloc - allocate memory for a new
 //  timer instance, either by reclaiming a
 //  freed one, or allocating memory for a new one
@@ -1471,6 +1586,11 @@ inline timer_instance &device_scheduler::instance_alloc()
 
 inline void device_scheduler::instance_reclaim(timer_instance &timer)
 {
+	// don't reclaim persistent instances because they are part of the
+	// persistent_timer object
+	if (timer.m_callback->persistent() != nullptr)
+		return;
+
 	// reclaimed instances go back on the free list
 	timer.m_next = m_free_timers;
 	m_free_timers = &timer;
@@ -1478,46 +1598,36 @@ inline void device_scheduler::instance_reclaim(timer_instance &timer)
 
 
 //-------------------------------------------------
-//  instance_move - move an existing timer into
-//  the appropriate list at the appropriate
-//  location
+//  insert_instance - insert a timer instance at
+//  the the appropriate spot in the active
+//  timer queue
 //-------------------------------------------------
 
-inline void device_scheduler::instance_move(timer_instance &timer, attotime const &new_expire, bool new_enable)
+inline timer_instance &device_scheduler::insert_instance(timer_instance &instance)
 {
-	// track the before/after active state to see if it changed
-	bool was_active = timer.active();
-	timer.m_expire = new_expire;
-	timer.m_enabled = new_enable;
-
-	// if this is the active timer, don't move anything, just mark it modified
-	if (m_callback_timer == &timer)
+	// if insert_sorted returns true, it means we were inserted at the
+	// head, and need to recompute our next fire time
+	if (m_active_timers.insert_sorted(instance))
 	{
-		m_callback_timer_modified = true;
-		return;
+		update_first_timer_expire();
+		abort_timeslice();
 	}
+	return instance;
+}
 
-	// most common case is becoming/remaining active
-	if (timer.active())
-	{
-		// ok, we're active now; remove us from the previous list, then do
-		// a normal insert to the active list
-		(was_active ? m_active_timers : m_inactive_timers).remove(timer);
-		insert_active(timer);
-	}
-	else if (was_active)
-	{
-		bool was_first = (timer.m_prev == nullptr);
 
-		// remove and then insert into the inactive list
-		insert_inactive(m_active_timers.remove(timer));
+//-------------------------------------------------
+//  remove_instance - remove a timer from the
+//  active timer queue
+//-------------------------------------------------
 
-		// if we were previously the head, update the first timer expiration;
-		// no need to abort the current timeslice because the new expiration
-		// time will be later than before
-		if (was_first)
-			update_first_timer_expire();
-	}
+inline timer_instance &device_scheduler::remove_instance(timer_instance &instance)
+{
+	bool was_first = (instance.prev() == nullptr);
+	m_active_timers.remove(instance);
+	if (was_first)
+		update_first_timer_expire();
+	return instance;
 }
 
 
@@ -1551,8 +1661,6 @@ void device_scheduler::dump_timers() const
 	machine().logerror("=============================================\n");
 	machine().logerror("Timer Dump: Time = %15s\n", time().as_string(PRECISION));
 	for (timer_instance *timer = m_active_timers.head(); timer != nullptr; timer = timer->next())
-		timer->dump();
-	for (timer_instance *timer = m_inactive_timers.head(); timer != nullptr; timer = timer->next())
 		timer->dump();
 	machine().logerror("=============================================\n");
 }
