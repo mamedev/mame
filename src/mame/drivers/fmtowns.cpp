@@ -1837,7 +1837,6 @@ uint8_t towns_state::towns_cdrom_r(offs_t offset)
 									{
 										int track = (m_towns_cd.extra_status/2)-4;
 										addr = cdrom_get_track_start(m_cdrom->get_cdrom_file(),track);
-										addr += cdrom_get_toc(m_cdrom->get_cdrom_file())->tracks[track].pregap;
 										addr = lba_to_msf(addr + 150);
 										towns_cd_set_status(0x17,
 											(addr & 0xff0000) >> 16,(addr & 0x00ff00) >> 8,addr & 0x0000ff);
