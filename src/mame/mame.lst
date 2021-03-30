@@ -32478,6 +32478,7 @@ nespal                          // Nintendo Entertainment System PAL
 
 @source:nes_clone.cpp
 afbm7800
+dancexpt
 dnce2000
 hs36blk
 hs36red
