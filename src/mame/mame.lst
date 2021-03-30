@@ -3330,10 +3330,6 @@ bbustersu                       // A9003 'BB' (c) 1989
 bbustersua                      // A9003 'BB' (c) 1989
 bbustersj                       //
 bbustersja                      //
-mechatt                         // A8002 'MA' (c) 1989
-mechattj                        // A8002 'MA' (c) 1989
-mechattu                        // A8002 'MA' (c) 1989
-mechattu1                       // A8002 'MA' (c) 1989
 
 @source:bcs3.cpp
 bcs3                            //
@@ -22442,6 +22438,12 @@ bombaway                        // (c) 1976 Meadows
 cgunship                        // (c) 1976 Meadows
 ckidzo                          // (c) 1976 Meadows
 mead4in1                        // (c) 197? Meadows
+
+@source:mechatt.cpp
+mechatt                         // A8002 'MA' (c) 1989
+mechattj                        // A8002 'MA' (c) 1989
+mechattu                        // A8002 'MA' (c) 1989
+mechattu1                       // A8002 'MA' (c) 1989
 
 @source:mediagx.cpp
 a51site4                        // ??           (c) 1998

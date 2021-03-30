@@ -3860,8 +3860,9 @@ files {
 createMAMEProjects(_target, _subtarget, "snk")
 files {
 	MAME_DIR .. "src/mame/drivers/bbusters.cpp",
-	MAME_DIR .. "src/mame/includes/bbusters.h",
-	MAME_DIR .. "src/mame/video/bbusters.cpp",
+	MAME_DIR .. "src/mame/drivers/mechatt.cpp",
+	MAME_DIR .. "src/mame/video/snk_bbusters_spr.cpp",
+	MAME_DIR .. "src/mame/video/snk_bbusters_spr.h",
 	MAME_DIR .. "src/mame/drivers/dmndrby.cpp",
 	MAME_DIR .. "src/mame/drivers/hng64.cpp",
 	MAME_DIR .. "src/mame/includes/hng64.h",
