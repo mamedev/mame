@@ -1366,8 +1366,6 @@ public:
 	}
 
 protected:
-	// hide the base class inits
-	using persistent_timer::init;
 
 	// device timers use param2 for the id, so hide the three-parameter form
 	persistent_timer &set_params(u64 param0, u64 param1, u64 param2) { return *this; }
