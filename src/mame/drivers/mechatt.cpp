@@ -5,8 +5,8 @@
     Mechanized Attack       A8002   (c) 1989 SNK Corporation
 
     Compared to Beast Busters (A9003), Mechanized Attack (A8002) is an
-	earlier design, it only has one sprite chip, no eeprom, and only 2
-	machine guns, but the tilemaps are twice the size.
+    earlier design, it only has one sprite chip, no eeprom, and only 2
+    machine guns, but the tilemaps are twice the size.
 
     ----------------------------------------------------------------------------------------
 
@@ -145,6 +145,8 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+namespace {
+
 class mechatt_state : public driver_device
 {
 public:
@@ -188,7 +190,7 @@ private:
 	tilemap_t *m_pf_tilemap[2];
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	template<int Layer, int Gfx> TILE_GET_INFO_MEMBER(get_pf_tile_info);
+	template <int Layer, int Gfx> TILE_GET_INFO_MEMBER(get_pf_tile_info);
 
 	void sound_cpu_w(uint8_t data);
 	void video_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -239,14 +241,14 @@ void mechatt_state::coin_counter_w(uint8_t data)
 TILE_GET_INFO_MEMBER(mechatt_state::get_tile_info)
 {
 	uint16_t tile = m_tx_videoram[tile_index];
-	tileinfo.set(0,tile&0xfff,tile>>12,0);
+	tileinfo.set(0, tile&0xfff, tile>>12, 0);
 }
 
-template<int Layer, int Gfx>
+template <int Layer, int Gfx>
 TILE_GET_INFO_MEMBER(mechatt_state::get_pf_tile_info)
 {
 	uint16_t tile = m_pf_data[Layer][tile_index];
-	tileinfo.set(Gfx,tile&0xfff,tile>>12,0);
+	tileinfo.set(Gfx, tile&0xfff, tile>>12, 0);
 }
 
 void mechatt_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -262,8 +264,8 @@ void mechatt_state::video_start()
 	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mechatt_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fix_tilemap->set_transparent_pen(15);
 
-	m_pf_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&mechatt_state::get_pf_tile_info<0,1>))), TILEMAP_SCAN_COLS, 16, 16, 256, 32);
-	m_pf_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&mechatt_state::get_pf_tile_info<1,2>))), TILEMAP_SCAN_COLS, 16, 16, 256, 32);
+	m_pf_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&mechatt_state::get_pf_tile_info<0, 1>))), TILEMAP_SCAN_COLS, 16, 16, 256, 32);
+	m_pf_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, NAME((&mechatt_state::get_pf_tile_info<1, 2>))), TILEMAP_SCAN_COLS, 16, 16, 256, 32);
 
 	m_pf_tilemap[0]->set_transparent_pen(15);
 
@@ -276,8 +278,8 @@ void mechatt_state::mix_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, c
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t* srcbuf = &srcbitmap.pix(y);
-		uint16_t* dstbuf = &bitmap.pix(y);
+		uint16_t *srcbuf = &srcbitmap.pix(y);
+		uint16_t *dstbuf = &bitmap.pix(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			uint16_t srcdat = srcbuf[x];
@@ -318,17 +320,15 @@ void mechatt_state::two_gun_output_w(uint16_t data)
 
 uint16_t mechatt_state::mechatt_gun_r(offs_t offset)
 {
-	int x, y;
+	int x = m_gun_io[offset ? 2 : 0]->read();
+	int y = m_gun_io[offset ? 3 : 1]->read();
 
-	x = m_gun_io[offset ? 2 : 0]->read();
-	y = m_gun_io[offset ? 3 : 1]->read();
-
-	/* Todo - does the hardware really clamp like this? */
+	// TODO - does the hardware really clamp like this?
 	x += 0x18;
 	if (x > 0xff) x = 0xff;
 	if (y > 0xef) y = 0xef;
 
-	return x | (y<<8);
+	return x | (y << 8);
 }
 
 void mechatt_state::mechatt_map(address_map &map)
@@ -364,7 +364,7 @@ void mechatt_state::sounda_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ymsnd", FUNC(ym2608_device::read), FUNC(ym2608_device::write));
-	map(0xc0, 0xc1).nopw(); /* -> Main CPU */
+	map(0xc0, 0xc1).nopw(); // -> Main CPU
 }
 
 /******************************************************************************/
@@ -721,6 +721,8 @@ ROM_START( mechattu1 ) // Uses EPROMs on official SNK A8002-5 & A8002-6 sub boar
 	ROM_LOAD( "ma_8.f10", 0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) )
 	ROM_LOAD( "ma_9.f12", 0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) ) // identical to ma_8.f10
 ROM_END
+
+} // anonymous namespace
 
 
 /******************************************************************************/

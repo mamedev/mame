@@ -55,15 +55,15 @@ void snk_bbusters_spr_device::device_start()
 	save_item(NAME(m_scale_line_count));
 }
 
-template<int Size>
-int snk_bbusters_spr_device::adjust_spritecode(int dx, int dy, int code)
+template <int Size>
+inline int snk_bbusters_spr_device::adjust_spritecode(int dx, int dy, int code)
 {
 	if (dy & (0x10 << Size)) code += 2 << (Size * 2);
 	if (dx & (0x10 << Size)) code += 1 << (Size * 2);
 	return code;
 }
 
-inline const uint8_t* snk_bbusters_spr_device::get_source_ptr(gfx_element* tilegfx, uint32_t sprite, int dx, int dy, int block)
+inline const uint8_t *snk_bbusters_spr_device::get_source_ptr(gfx_element *tilegfx, uint32_t sprite, int dx, int dy, int block)
 {
 	int code = 0;
 
@@ -105,7 +105,7 @@ void snk_bbusters_spr_device::draw_block(bitmap_ind16 &dest, const rectangle &cl
 {
 	// TODO: respect cliprect
 
-	gfx_element* tilegfx = gfx(0);
+	gfx_element *tilegfx = gfx(0);
 	pen_t pen_base = tilegfx->colorbase() + tilegfx->granularity() * (color % tilegfx->colors());
 	uint32_t xinc = (m_scale_line_count * 0x10000) / size;
 	int dy = y;
@@ -115,9 +115,9 @@ void snk_bbusters_spr_device::draw_block(bitmap_ind16 &dest, const rectangle &cl
 	{
 		if (dy >= 16 && dy < 240)
 		{
-			uint16_t* const destline = &dest.pix(dy);
+			uint16_t *const destline = &dest.pix(dy);
 			uint8_t srcline = *m_scale_table_ptr;
-			const uint8_t* srcptr = nullptr;
+			const uint8_t *srcptr = nullptr;
 
 			if (!flipy)
 				srcline = size - srcline - 1;
@@ -150,9 +150,9 @@ void snk_bbusters_spr_device::draw_block(bitmap_ind16 &dest, const rectangle &cl
 	}
 }
 
-void snk_bbusters_spr_device::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
+void snk_bbusters_spr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const uint16_t* sprram = m_spriteram->buffer();
+	const uint16_t *sprram = m_spriteram->buffer();
 
 	for (int offs = 0; offs < 0x800; offs += 4)
 	{
@@ -184,11 +184,11 @@ void snk_bbusters_spr_device::draw_sprites(bitmap_ind16& bitmap, const rectangle
 		    Block type 3: 0x00 = no scale, 0x3f == half size - 128 pixel sprite
 
 		*/
-		colour = colour >> 12;
+		colour >>= 12;
 		int block = (sprram[offs + 0] >> 8) & 0x3;
 		int fy = sprram[offs + 0] & 0x400;
 		int fx = sprram[offs + 0] & 0x800;
-		sprite = sprite & 0x3fff;
+		sprite &= 0x3fff;
 
 		int scale;
 		switch ((sprram[offs + 0] >> 8) & 0x3)

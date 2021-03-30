@@ -3,6 +3,7 @@
 #ifndef MAME_VIDEO_SNK_BBUSTERS_SPR_H
 #define MAME_VIDEO_SNK_BBUSTERS_SPR_H
 
+#pragma once
 
 #include "video/bufsprite.h"
 
@@ -21,17 +22,16 @@ protected:
 	virtual void device_start() override;
 
 private:
-
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
+
+	const uint8_t *get_source_ptr(gfx_element *tilegfx, uint32_t sprite, int dx, int dy, int block);
+	void draw_block(bitmap_ind16 &dest, const rectangle &cliprect, int x, int y, int size, int flipx, int flipy, uint32_t sprite, int color, int block);
+
+	template <int Size>
+	static int adjust_spritecode(int dx, int dy, int code);
 
 	const uint8_t *m_scale_table_ptr;
 	uint8_t m_scale_line_count;
-
-	template<int Size>
-	int adjust_spritecode(int dx, int dy, int code);
-
-	const uint8_t *get_source_ptr(gfx_element *tilegfx, uint32_t sprite, int dx, int dy, int block);
-	void draw_block(bitmap_ind16 &dest, const rectangle &cliprect, int x,int y,int size,int flipx,int flipy,uint32_t sprite,int color,int block);
 
 	required_region_ptr<uint8_t> m_scale_table;
 	required_device<buffered_spriteram16_device> m_spriteram;

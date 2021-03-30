@@ -16,12 +16,12 @@
 
 ***************************************************************************/
 
-#include <cassert>
-
 #include "cdrom.h"
 
-#include <cstdlib>
 #include "chdcd.h"
+
+#include <cassert>
+#include <cstdlib>
 
 
 /***************************************************************************
@@ -484,7 +484,8 @@ chd_error read_partial_sector(cdrom_file *file, void *dest, uint32_t lbasector, 
 	// if a CHD, just read
 	if (file->chd != nullptr)
 	{
-		if (!phys && file->cdtoc.tracks[tracknum].pgdatasize != 0) {
+		if (!phys && file->cdtoc.tracks[tracknum].pgdatasize != 0)
+		{
 			// chdman (phys=true) relies on chdframeofs to point to index 0 instead of index 1 for extractcd.
 			// Actually playing CDs requires it to point to index 1 instead of index 0, so adjust the offset when phys=false.
 			chdsector += file->cdtoc.tracks[tracknum].pregap;
@@ -492,7 +493,7 @@ chd_error read_partial_sector(cdrom_file *file, void *dest, uint32_t lbasector, 
 
 		result = file->chd->read_bytes(uint64_t(chdsector) * uint64_t(CD_FRAME_SIZE) + startoffs, dest, length);
 
-		/* swap CDDA in the case of LE GDROMs */
+		// swap CDDA in the case of LE GDROMs
 		if ((file->cdtoc.flags & CD_FLAG_GDROMLE) && (file->cdtoc.tracks[tracknum].trktype == CD_TRACK_AUDIO))
 			needswap = true;
 	}

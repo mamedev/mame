@@ -116,6 +116,8 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+namespace {
+
 class bbusters_state : public driver_device
 {
 public:
@@ -161,7 +163,7 @@ private:
 	tilemap_t *m_pf_tilemap[2];
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	template<int Layer, int Gfx> TILE_GET_INFO_MEMBER(get_pf_tile_info);
+	template <int Layer, int Gfx> TILE_GET_INFO_MEMBER(get_pf_tile_info);
 
 	void sound_cpu_w(uint8_t data);
 	void video_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -196,10 +198,10 @@ void bbusters_state::sound_cpu_w(uint8_t data)
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-/* Eprom is byte wide, top half of word _must_ be 0xff */
+// EPROM is byte wide, top half of word _must_ be 0xff
 uint16_t bbusters_state::eprom_r(offs_t offset)
 {
-	return (m_eprom_data[offset]&0xff) | 0xff00;
+	return (m_eprom_data[offset] & 0xff) | 0xff00;
 }
 
 void bbusters_state::three_gun_output_w(uint16_t data)
@@ -208,7 +210,7 @@ void bbusters_state::three_gun_output_w(uint16_t data)
 		m_gun_recoil[i] = BIT(data, i);
 }
 
-template<int Layer>
+template <int Layer>
 void bbusters_state::pf_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf_data[Layer][offset]);
@@ -226,15 +228,15 @@ TILE_GET_INFO_MEMBER(bbusters_state::get_tile_info)
 {
 	uint16_t tile = m_tx_videoram[tile_index];
 
-	tileinfo.set(0,tile&0xfff,tile>>12,0);
+	tileinfo.set(0, tile&0xfff, tile>>12, 0);
 }
 
-template<int Layer, int Gfx>
+template <int Layer, int Gfx>
 TILE_GET_INFO_MEMBER(bbusters_state::get_pf_tile_info)
 {
 	uint16_t tile = m_pf_data[Layer][tile_index];
 
-	tileinfo.set(Gfx,tile&0xfff,tile>>12,0);
+	tileinfo.set(Gfx, tile&0xfff, tile>>12, 0);
 }
 
 void bbusters_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -273,8 +275,8 @@ void bbusters_state::mix_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, 
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t* srcbuf = &srcbitmap.pix(y);
-		uint16_t* dstbuf = &bitmap.pix(y);
+		uint16_t *srcbuf = &srcbitmap.pix(y);
+		uint16_t *dstbuf = &bitmap.pix(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			uint16_t srcdat = srcbuf[x];
@@ -299,10 +301,10 @@ uint32_t bbusters_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_pf_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 
 	// Palettes 0xc-0xf confirmed to be behind tilemap on Beast Busters for 2nd sprite chip (elevator stage)
-	mix_sprites(bitmap, m_bitmap_sprites[1], cliprect, [](uint16_t srcdat, uint16_t x, uint16_t* dstbuf) { if ((srcdat & 0xc0) == 0xc0) dstbuf[x] = srcdat + 512; } );
+	mix_sprites(bitmap, m_bitmap_sprites[1], cliprect, [](uint16_t srcdat, uint16_t x, uint16_t *dstbuf) { if ((srcdat & 0xc0) == 0xc0) dstbuf[x] = srcdat + 512; } );
 	m_pf_tilemap[0]->draw(screen, bitmap, cliprect, 0, 2);
-	mix_sprites(bitmap, m_bitmap_sprites[1], cliprect, [](uint16_t srcdat, uint16_t x, uint16_t* dstbuf) { if ((srcdat & 0xc0) != 0xc0) dstbuf[x] = srcdat + 512; } );
-	mix_sprites(bitmap, m_bitmap_sprites[0], cliprect, [](uint16_t srcdat, uint16_t x, uint16_t* dstbuf) { dstbuf[x] = srcdat + 256; } );
+	mix_sprites(bitmap, m_bitmap_sprites[1], cliprect, [](uint16_t srcdat, uint16_t x, uint16_t *dstbuf) { if ((srcdat & 0xc0) != 0xc0) dstbuf[x] = srcdat + 512; } );
+	mix_sprites(bitmap, m_bitmap_sprites[0], cliprect, [](uint16_t srcdat, uint16_t x, uint16_t *dstbuf) { dstbuf[x] = srcdat + 256; } );
 
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -499,7 +501,7 @@ void bbusters_state::bbusters(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bbusters_state::bbusters_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bbusters_state::irq6_line_hold));
 
-	Z80(config, m_audiocpu, 4000000); /* Accurate */
+	Z80(config, m_audiocpu, 4000000); // Accurate
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bbusters_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &bbusters_state::sound_portmap);
 
@@ -786,6 +788,8 @@ ROM_START( bbustersja )
 	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "bb-pcmb.l3",  0x000000, 0x80000, CRC(c8d5dd53) SHA1(0f7e94532cc14852ca12c1b792e5479667af899e) )
 ROM_END
+
+} // anonymous namespace
 
 /******************************************************************************/
 
