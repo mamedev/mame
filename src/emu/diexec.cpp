@@ -480,6 +480,8 @@ void device_execute_interface::interface_clock_changed()
 	if (device().clock() == 0)
 	{
 		suspend(SUSPEND_REASON_CLOCK, true);
+		m_attoseconds_per_cycle = ATTOSECONDS_PER_SECOND;
+		m_cycles_per_second = 0;
 		return;
 	}
 
