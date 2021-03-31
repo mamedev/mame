@@ -9,6 +9,9 @@
 ---
 
 	Still to do:
+	- Move debug/suspend decisions into diexec fully
+	- Verify performance of calling through delegate ptr vs copying the delegate
+	- Rebuilding suspend/execute lists seems like it's doing a lot of work, consolidate?
 	- Test out save states
 	- Clean up timer devices
 	- Clean up more timers in devices/drivers
@@ -756,6 +759,10 @@ device_scheduler::device_scheduler(running_machine &machine) :
 		save.save_item(NAME(m_timer_save[index].period), index);
 	}
 
+	// register for presave and postload
+	save.register_presave(save_prepost_delegate(FUNC(device_scheduler::presave), this));
+	save.register_postload(save_prepost_delegate(FUNC(device_scheduler::postload), this));
+
 	// create a factory for empty timers
 	m_empty_timer.init(*this, *this, FUNC(device_scheduler::empty_timer));
 
@@ -815,179 +822,104 @@ bool device_scheduler::can_save() const
 //  timeslice
 //-------------------------------------------------
 
-template<bool Debugging>
-void device_scheduler::timeslice()
+void device_scheduler::timeslice(attoseconds_t minslice)
 {
-	LOG("------------------\n");
-
-	// build the execution list if we don't have one yet
-	if (UNEXPECTED(m_execute_list == nullptr))
-		rebuild_execute_list();
-
-	// if the current quantum has expired, find a new one
-	while (m_basetime >= m_quantum_list.first()->m_expire)
-		m_quantum_allocator.reclaim(m_quantum_list.detach_head());
-
-	// loop until we hit the next timer
+	// run up to the given number of attoseconds
 	attoseconds_t basetime = m_basetime.attoseconds();
-	while (basetime < m_first_timer_expire.relative())
+	attoseconds_t endslice = basetime + minslice;
+	while (basetime < endslice)
 	{
-		// by default, assume our target is the end of the next quantum
-		attoseconds_t target = basetime + m_quantum_list.first()->m_actual;
-		assert(target < basetime_relative::MAX_RELATIVE);
+		LOG("------------------\n");
 
-		// however, if the next timer is going to fire before then, override
-		if (m_first_timer_expire.relative() < target)
-			target = m_first_timer_expire.relative();
+		// if the current quantum has expired, find a new one
+		while (m_basetime >= m_quantum_list.first()->m_expire)
+			m_quantum_allocator.reclaim(m_quantum_list.detach_head());
 
-		LOG("timeslice: target = %18lldas\n", target);
-
-		// do we have pending suspension changes?
-		if (m_suspend_changes_pending)
-			apply_suspend_changes();
-
-		// loop over all executing devices
-		for (device_execute_interface *exec = m_execute_list; exec != nullptr; exec = exec->m_nextexec)
+		// loop until we hit the next timer
+		while (basetime < m_first_timer_expire.relative())
 		{
-			// compute how many attoseconds to execute this device
-			attoseconds_t delta = target - exec->m_localtime.relative() - 1;
-			assert(delta < basetime_relative::MAX_RELATIVE);
+			// by default, assume our target is the end of the next quantum
+			attoseconds_t target = basetime + m_quantum_list.first()->m_actual;
+			assert(target < basetime_relative::MAX_RELATIVE);
 
-			// if we're already ahead, do nothing; in theory we should do this 0 as
-			// well, but it's a rare case and the compiler tends to be able to
-			// optimize a strict < 0 check better than <= 0
-			if (delta < 0)
-				continue;
+			// however, if the next timer is going to fire before then, override
+			if (m_first_timer_expire.relative() < target)
+				target = m_first_timer_expire.relative();
 
-			// if not suspended, execute normally
-			if (EXPECTED(exec->m_suspend == 0))
+			LOG("timeslice: target = %18lldas\n", target);
+
+			// do we have pending suspension changes?
+			if (m_suspend_changes_pending)
+				apply_suspend_changes();
+
+			// loop over all executing devices
+			for (device_execute_interface *exec = m_execute_list; exec != nullptr; exec = exec->m_nextexec)
 			{
-				// precache the CPU timing information
-				u64 attoseconds_per_cycle = exec->m_attoseconds_per_cycle;
+				// compute how many attoseconds to execute this device
+				attoseconds_t delta = target - exec->m_localtime.relative() - 1;
+				assert(delta < basetime_relative::MAX_RELATIVE);
 
-				// compute how many cycles we want to execute, rounding up
-				u32 ran = u64(delta) / attoseconds_per_cycle + 1;
-				LOG("  %12.12s: t=%018lldas %018lldas = %dc; ", exec->device().tag(), exec->m_localtime.relative(), delta, ran);
-
-				g_profiler.start(exec->m_profiler);
-
-				// store the number of cycles we've requested in the executing
-				// device
-				// TODO: do we need to do this?
-				exec->m_cycles_running = ran;
-
-				// set the device's icount value to the number of cycles we want
-				// the fact that we have a direct point to this is an artifact of
-				// the original MAME design
-				auto *icountptr = exec->m_icountptr;
-				*icountptr = ran;
-
-				// clear m_cycles_stolen, which gets updated if the timeslice
-				// is aborted (due to synchronization or setting a new timer to
-				// expire before the original timeslice end)
-				exec->m_cycles_stolen = 0;
+				// if we're already ahead, do nothing; in theory we should do this 0 as
+				// well, but it's a rare case and the compiler tends to be able to
+				// optimize a strict < 0 check better than <= 0
+				if (delta < 0)
+					continue;
 
 				// store a pointer to the executing device so that we know the
 				// relevant active context
 				m_executing_device = exec;
 
-				// tell the debugger we're going to start executing; the funny math
-				// below uses the relative target as attoseconds, but it may be
-				// larger than the the max attoseconds allowed, so we add zero to
-				// it, which forces a normalization
-				if (Debugging)
-					exec->debugger_start_cpu_hook(attotime(m_basetime.seconds(), target) + attotime::zero);
+#if VERBOSE
+				u64 start_cycles = exec->m_total_cycles;
+				LOG("  %12.12s: t=%018lldas %018lldas = %dc; ", exec->device().tag(), exec->m_localtime.relative(), delta, u64(delta) / exec->m_attoseconds_per_cycle + 1);
+#endif
 
-				// now run the device for the number of cycles
-				exec->run();
+				// execute for the given number of attoseconds
+				attoseconds_t localtime = exec->run_for(delta);
 
-				// tell the debugger we're done executing
-				if (Debugging)
-					exec->debugger_stop_cpu_hook();
-
-				// now let's see how many cycles we actually ran; if the device's
-				// icount is negative, then we ran more than requested (this is both
-				// allowed and expected), so the subtract here typically will
-				// increase ran
-				assert(ran >= *icountptr);
-				ran -= *icountptr;
-
-				// if cycles were stolen (i.e., icount was artificially decremented)
-				// then ran isn't actually correct, so remove the number of cycles
-				// that we did that for
-				assert(ran >= exec->m_cycles_stolen);
-				ran -= exec->m_cycles_stolen;
-
-				// time should never go backwards, nor should we ever attempt to
-				// execute more than a full second (minimum quantum prevents that)
-				assert(ran >= 0 && ran < exec->m_cycles_per_second);
-
-				g_profiler.stop();
-
-				// update the device's count of total cycles executed with the
-				// true number of cycles
-				exec->m_totalcycles += ran;
-
-				// update the local time for the device so that it represents an
-				// integral number of cycles
-				attoseconds_t deltatime = attoseconds_per_cycle * ran;
-				exec->m_localtime.add(deltatime);
-
-				LOG(" ran %dc, %dc total", ran, s32(exec->m_totalcycles));
+#if VERBOSE
+				LOG(" ran %dc, %dc total", s32(exec->m_totalcycles - start_cycles), s32(exec->m_totalcycles));
+#endif
 
 				// if the new local device time is less than our target, move the
 				// target up, but not before the base
-				if (exec->m_localtime.relative() < target)
+				if (UNEXPECTED(localtime < target))
 				{
-					target = std::max(exec->m_localtime.relative(), basetime);
+					target = std::max(localtime, basetime);
 					LOG(" (new target)");
 				}
 				LOG("\n");
 			}
 
-			// if suspended, eat cycles efficiently
-			else if (exec->m_eatcycles)
-			{
-				// this is just the minimal logic from above to consume the cycles;
-				// we don't check to see if the new local time is less than the
-				// target because the calculation below guarantees it won't happen
-				u32 ran = u64(delta) / u64(exec->m_attoseconds_per_cycle) + 1;
-				exec->m_totalcycles += ran;
-				exec->m_localtime.add(exec->m_attoseconds_per_cycle * ran);
-			}
+			// set the executing device to null, which indicates that there is
+			// no active context; this is used by machine.time() to return the
+			// context-appropriate value
+			m_executing_device = nullptr;
+
+			// our final target becomes our new base time
+			basetime = target;
 		}
 
-		// set the executing device to null, which indicates that there is
-		// no active context; this is used by machine.time() to return the
-		// context-appropriate value
-		m_executing_device = nullptr;
+		// if basetime remained within the current second, we just have to
+		// update the attoseconds part; however, it if did overflow, we need to
+		// update all the basetime_relative structures in the system
+		if (basetime < ATTOSECONDS_PER_SECOND)
+			m_basetime.set_attoseconds(basetime);
+		else
+		{
+			basetime -= ATTOSECONDS_PER_SECOND;
+			endslice -= ATTOSECONDS_PER_SECOND;
+			assert(basetime < ATTOSECONDS_PER_SECOND);
+			m_basetime.set_attoseconds(basetime);
+			m_basetime.set_seconds(m_basetime.seconds() + 1);
+			update_basetime();
+		}
 
-		// our final target becomes our new base time
-		basetime = target;
+		// now that we've reached the expiration time of the first timer in the
+		// queue, execute pending ones
+		execute_timers();
 	}
-
-	// if basetime remained within the current second, we just have to
-	// update the attoseconds part; however, it if did overflow, we need to
-	// update all the basetime_relative structures in the system
-	if (basetime < ATTOSECONDS_PER_SECOND)
-		m_basetime.set_attoseconds(basetime);
-	else
-	{
-		basetime -= ATTOSECONDS_PER_SECOND;
-		assert(basetime < ATTOSECONDS_PER_SECOND);
-		m_basetime.set_attoseconds(basetime);
-		m_basetime.set_seconds(m_basetime.seconds() + 1);
-		update_basetime();
-	}
-
-	// now that we've reached the expiration time of the first timer in the
-	// queue, execute pending ones
-	execute_timers();
 }
-
-// explicitly instatiate both versions of the scheduler
-template void device_scheduler::timeslice<true>();
-template void device_scheduler::timeslice<false>();
 
 
 //-------------------------------------------------
@@ -1008,10 +940,6 @@ void device_scheduler::abort_timeslice()
 
 void device_scheduler::trigger(int trigid, attotime const &after)
 {
-	// ensure we have a list of executing devices
-	if (m_execute_list == nullptr)
-		rebuild_execute_list();
-
 	// if we have a non-zero time, schedule a timer
 	if (after != attotime::zero)
 		m_timed_trigger.call_after(after, trigid);
@@ -1289,7 +1217,7 @@ void device_scheduler::update_basetime()
 void device_scheduler::compute_perfect_interleave()
 {
 	// ensure we have a list of executing devices
-	if (m_execute_list == nullptr)
+	if (UNEXPECTED(m_execute_list == nullptr))
 		rebuild_execute_list();
 
 	// start with the first one
@@ -1384,14 +1312,14 @@ void device_scheduler::rebuild_execute_list()
 
 inline void device_scheduler::apply_suspend_changes()
 {
+	// ensure we have a list of executing devices to work with
+	if (UNEXPECTED(m_execute_list == nullptr))
+		rebuild_execute_list();
+
+	// update the suspend state on all executing devices
 	u32 suspendchanged = 0;
 	for (device_execute_interface *exec = m_execute_list; exec != nullptr; exec = exec->m_nextexec)
-	{
-		suspendchanged |= exec->m_suspend ^ exec->m_nextsuspend;
-		exec->m_suspend = exec->m_nextsuspend;
-		exec->m_nextsuspend &= ~SUSPEND_REASON_TIMESLICE;
-		exec->m_eatcycles = exec->m_nexteatcycles;
-	}
+		suspendchanged |= exec->update_suspend();
 
 	// recompute the execute list if any CPUs changed their suspension state
 	if (suspendchanged != 0)

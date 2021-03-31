@@ -82,10 +82,10 @@ enum
 
 
 // interrupt callback for VBLANK and timed interrupts
-typedef device_delegate<void (device_t &)> device_interrupt_delegate;
+using device_interrupt_delegate = device_delegate<void (device_t &)>;
 
 // IRQ callback to be called by executing devices when an IRQ is actually taken
-typedef device_delegate<int (device_t &, int)> device_irq_acknowledge_delegate;
+using device_irq_acknowledge_delegate = device_delegate<int (device_t &, int)>;
 
 
 
@@ -96,6 +96,8 @@ class device_execute_interface : public device_interface
 	friend class device_scheduler;
 	friend class testcpu_state;
 	friend class device_input;
+
+	using execute_delegate = delegate<void ()>;
 
 public:
 	// construction/destruction
@@ -186,6 +188,7 @@ public:
 	// time and cycle accounting
 	attotime local_time() noexcept;
 	u64 total_cycles() const noexcept;
+	attotime minimum_quantum_time() const { return attotime(0, minimum_quantum()); }
 
 	// required operation overrides
 	void run() { execute_run(); }
@@ -219,6 +222,10 @@ protected:
 	virtual void interface_post_reset() override;
 	virtual void interface_clock_changed() override;
 
+	// device_scheduler helpers
+	attoseconds_t run_for(attoseconds_t attoseconds);
+	u32 update_suspend();
+
 	// for use by devcpu for now...
 	int current_input_state(unsigned i) const { return m_input[i].m_curstate; }
 	void set_icountptr(int &icount) { assert(!m_icountptr); m_icountptr = &icount; }
@@ -245,6 +252,18 @@ protected:
 	}
 
 private:
+	void suspend_resume_changed();
+	attoseconds_t minimum_quantum() const;
+
+	void run_debug();
+	void run_suspend();
+
+	void on_vblank(screen_device &screen, bool vblank_state);
+
+	TIMER_CALLBACK_MEMBER(trigger_periodic_interrupt);
+	TIMER_CALLBACK_MEMBER(irq_pulse_clear) { set_input_line(int(param), CLEAR_LINE); }
+	TIMER_CALLBACK_MEMBER(empty_event_queue) { m_input[param].empty_event_queue(); }
+
 	// internal information about the state of inputs
 	class device_input
 	{
@@ -288,14 +307,20 @@ private:
 	// scheduler
 	device_scheduler *      m_scheduler;                // pointer to the machine scheduler
 
-	// execution lists
+	// core execution state: keep all these members close to the top
+	// so they live within the first 128 bytes of the object; this helps
+	// the super-hot execution loop stay lean & mean on x64 systems
 	device_execute_interface *m_nextexec;               // pointer to the next device to execute, in order
-
-	// cycle counting and executing
-	profile_type            m_profiler;                 // profiler tag
+	execute_delegate *      m_run_delegate;             // currently active run delegate
 	int *                   m_icountptr;                // pointer to the icount
 	int                     m_cycles_running;           // number of cycles we are executing
 	int                     m_cycles_stolen;            // number of cycles we artificially stole
+	u32                     m_cycles_per_second;        // cycles per second, adjusted for multipliers
+	attoseconds_t           m_attoseconds_per_cycle;    // attoseconds per adjusted clock cycle
+	u64                     m_totalcycles;              // total device cycles executed
+	device_scheduler::basetime_relative m_localtime;    // local time, relative to the scheduler's base
+	profile_type            m_profiler;                 // profiler tag
+	// end core execution state
 
 	// suspend states
 	u32                     m_suspend;                  // suspend reason mask (0 = not suspended)
@@ -305,12 +330,6 @@ private:
 	s32                     m_trigger;                  // pending trigger to release a trigger suspension
 	s32                     m_inttrigger;               // interrupt trigger index
 
-	// clock and timing information
-	u64                     m_totalcycles;              // total device cycles executed
-	device_scheduler::basetime_relative m_localtime;    // local time, relative to the scheduler's base
-	u32                     m_cycles_per_second;        // cycles per second, adjusted for multipliers
-	attoseconds_t           m_attoseconds_per_cycle;    // attoseconds per adjusted clock cycle
-
 	// configuration
 	bool                    m_disabled;                 // disabled from executing?
 	device_interrupt_delegate m_vblank_interrupt;       // for interrupts tied to VBLANK
@@ -318,33 +337,116 @@ private:
 	device_interrupt_delegate m_timed_interrupt;        // for interrupts not tied to VBLANK
 	attotime                m_timed_interrupt_period;   // period for periodic interrupts
 
+	// execution delegates
+	execute_delegate        m_run_fast_delegate;        // normal run delegate
+	execute_delegate        m_run_debug_delegate;       // debugging run delegate
+	execute_delegate        m_suspend_delegate;         // suspend delegate
+
+	// timers
+	transient_timer_factory m_timed_trigger_callback;
+	transient_timer_factory m_irq_pulse_clear;
+	transient_timer_factory m_empty_event_queue;
+
 	// input states and IRQ callbacks
 	persistent_timer        m_timedint_timer;           // reference to this device's periodic interrupt timer
 	device_irq_acknowledge_delegate m_driver_irq;       // driver-specific IRQ callback
 	device_input            m_input[MAX_INPUT_LINES];   // data about inputs
-
-	// callbacks
-	TIMER_CALLBACK_MEMBER(timed_trigger_callback) { trigger(param); }
-	transient_timer_factory m_timed_trigger_callback;
-
-	void on_vblank(screen_device &screen, bool vblank_state);
-
-	TIMER_CALLBACK_MEMBER(trigger_periodic_interrupt);
-	TIMER_CALLBACK_MEMBER(irq_pulse_clear) { set_input_line(int(param), CLEAR_LINE); }
-	transient_timer_factory m_irq_pulse_clear;
-
-	TIMER_CALLBACK_MEMBER(empty_event_queue) { m_input[param].empty_event_queue(); }
-	transient_timer_factory m_empty_event_queue;
-
-	void suspend_resume_changed();
-
-	attoseconds_t minimum_quantum() const;
-
-public:
-	attotime minimum_quantum_time() const { return attotime(0, minimum_quantum()); }
 };
 
 // iterator
-typedef device_interface_enumerator<device_execute_interface> execute_interface_enumerator;
+using execute_interface_enumerator = device_interface_enumerator<device_execute_interface>;
+
+
+//-------------------------------------------------
+//  run_for - execute for the given number of
+//  attoseconds; note that this function is super
+//  hot, so be extremely careful making any
+//  changes here
+//-------------------------------------------------
+
+inline attoseconds_t device_execute_interface::run_for(attoseconds_t attoseconds)
+{
+	g_profiler.start(m_profiler);
+
+	// compute how many cycles we want to execute, rounding up
+	// note that we pre-cache attoseconds per cycle
+	u64 attoseconds_per_cycle = m_attoseconds_per_cycle;
+	u32 ran = u64(attoseconds) / attoseconds_per_cycle + 1;
+
+	// store the number of cycles we've requested in the executing
+	// device
+	// TODO: do we need to do this?
+	m_cycles_running = ran;
+
+	// set the device's icount value to the number of cycles we want
+	// the fact that we have a direct point to this is an artifact of
+	// the original MAME design
+	auto *icountptr = m_icountptr;
+	*icountptr = ran;
+
+	// clear m_cycles_stolen, which gets updated if the timeslice
+	// is aborted (due to synchronization or setting a new timer to
+	// expire before the original timeslice end)
+	m_cycles_stolen = 0;
+
+	// now run the device for the number of cycles
+	(*m_run_delegate)();
+
+	// now let's see how many cycles we actually ran; if the device's
+	// icount is negative, then we ran more than requested (this is both
+	// allowed and expected), so the subtract here typically will
+	// increase ran
+	assert(ran >= *icountptr);
+	ran -= *icountptr;
+
+	// if cycles were stolen (i.e., icount was artificially decremented)
+	// then ran isn't actually correct, so remove the number of cycles
+	// that we did that for
+	assert(ran >= m_cycles_stolen);
+	ran -= m_cycles_stolen;
+
+	// time should never go backwards, nor should we ever attempt to
+	// execute more than a full second (minimum quantum prevents that)
+	assert(ran >= 0 && ran < m_cycles_per_second);
+
+	// update the device's count of total cycles executed with the
+	// true number of cycles
+	m_totalcycles += ran;
+
+	// update the local time for the device so that it represents an
+	// integral number of cycles
+	m_localtime.add(attoseconds_per_cycle * ran);
+
+	g_profiler.stop();
+
+	// return the current localtime as a basetime-relative value
+	return m_localtime.relative();
+}
+
+
+//-------------------------------------------------
+//  update_suspend - clock the pending suspension
+//  states forward, updating execution delegates
+//  along the way
+//-------------------------------------------------
+
+inline u32 device_execute_interface::update_suspend()
+{
+	// update the suspend and eatcycles states
+	u32 delta = m_suspend ^ m_nextsuspend;
+	m_suspend = m_nextsuspend;
+	m_nextsuspend &= ~SUSPEND_REASON_TIMESLICE;
+	m_eatcycles = m_nexteatcycles;
+
+	// update the execution delegate
+	if (m_suspend != 0)
+		m_run_delegate = &m_suspend_delegate;
+	else if (!m_scheduler->machine().debug_enabled())
+		m_run_delegate = &m_run_fast_delegate;
+	else
+		m_run_delegate = &m_run_debug_delegate;
+
+	return delta;
+}
 
 #endif // MAME_EMU_DIEXEC_H

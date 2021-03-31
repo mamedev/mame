@@ -46,19 +46,20 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 	: device_interface(device, "execute")
 	, m_scheduler(nullptr)
 	, m_nextexec(nullptr)
-	, m_profiler(PROFILER_IDLE)
+	, m_run_delegate(nullptr)
 	, m_icountptr(nullptr)
 	, m_cycles_running(0)
 	, m_cycles_stolen(0)
+	, m_cycles_per_second(0)
+	, m_attoseconds_per_cycle(0)
+	, m_totalcycles(0)
+	, m_profiler(PROFILER_IDLE)
 	, m_suspend(0)
 	, m_nextsuspend(0)
 	, m_eatcycles(0)
 	, m_nexteatcycles(0)
 	, m_trigger(0)
 	, m_inttrigger(0)
-	, m_totalcycles(0)
-	, m_cycles_per_second(0)
-	, m_attoseconds_per_cycle(0)
 	, m_disabled(false)
 	, m_vblank_interrupt(device)
 	, m_vblank_interrupt_screen(nullptr)
@@ -369,6 +370,12 @@ void device_execute_interface::interface_pre_start()
 	m_scheduler = &device().machine().scheduler();
 	m_localtime.set_base_seconds(m_scheduler->m_basetime.seconds());
 
+	// create execution delegates
+	m_run_fast_delegate = execute_delegate(&device_execute_interface::execute_run, this);
+	m_run_debug_delegate = execute_delegate(&device_execute_interface::run_debug, this);
+	m_suspend_delegate = execute_delegate(&device_execute_interface::run_suspend, this);
+	m_run_delegate = &m_run_fast_delegate;
+
 	// bind delegates
 	m_vblank_interrupt.resolve();
 	m_timed_interrupt.resolve();
@@ -385,7 +392,7 @@ void device_execute_interface::interface_pre_start()
 		m_timedint_timer.init(*this, FUNC(device_execute_interface::trigger_periodic_interrupt));
 
 	m_irq_pulse_clear.init(*this, FUNC(device_execute_interface::irq_pulse_clear));
-	m_timed_trigger_callback.init(*this, FUNC(device_execute_interface::timed_trigger_callback));
+	m_timed_trigger_callback.init(*this, FUNC(device_execute_interface::trigger));
 	m_empty_event_queue.init(*this, FUNC(device_execute_interface::empty_event_queue));
 }
 
@@ -787,4 +794,28 @@ int device_execute_interface::device_input::default_irq_callback()
 		m_curstate = CLEAR_LINE;
 	}
 	return vector;
+}
+
+
+//-------------------------------------------------
+//  run_debug - landing pad for debugging
+//-------------------------------------------------
+
+void device_execute_interface::run_debug()
+{
+	debugger_start_cpu_hook(m_scheduler->basetime());
+	execute_run();
+	debugger_stop_cpu_hook();
+}
+
+
+//-------------------------------------------------
+//  run_suspend - landing pad for suspended CPUs
+//-------------------------------------------------
+
+void device_execute_interface::run_suspend()
+{
+	// do nothing except eat cycles if that's what we're supposed to do
+	if (m_eatcycles)
+		*m_icountptr = 0;
 }

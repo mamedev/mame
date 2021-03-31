@@ -375,18 +375,14 @@ int running_machine::run(bool quiet)
 #endif
 
 		// run the CPUs until a reset or exit
+		constexpr attoseconds_t minslice = HZ_TO_ATTOSECONDS(100);
 		while ((!m_hard_reset_pending && !m_exit_pending) || m_saveload_schedule != saveload_schedule::NONE)
 		{
 			g_profiler.start(PROFILER_EXTRA);
 
 			// execute CPUs if not paused; otherwise, just pump video updates through
 			if (!m_paused)
-			{
-				if ((debug_flags & DEBUG_FLAG_ENABLED) == 0)
-					m_scheduler.timeslice<false>();
-				else
-					m_scheduler.timeslice<true>();
-			}
+				m_scheduler.timeslice(minslice);
 			else
 				m_video->frame_update();
 
@@ -1414,18 +1410,16 @@ void running_machine::emscripten_main_loop()
 
 		// Emscripten will call this function at 60Hz, so step the simulation
 		// forward for the amount of time that has passed since the last frame
-		const attotime frametime(0,HZ_TO_ATTOSECONDS(60));
-		const attotime stoptime(scheduler->time() + frametime);
+		constexpr attoseconds_t frametime = HZ_TO_ATTOSECONDS(60);
+		const attoseconds_t start = scheduler->time().attoseconds();
+		const attoseconds_t end = ((start / frametime) + 1) * frametime;
 
-		while (!machine->m_paused && !machine->scheduled_event_pending() && scheduler->time() < stoptime)
+		scheduler->timeslice(end - start);
+		// handle save/load
+		if (machine->m_saveload_schedule != saveload_schedule::NONE)
 		{
-			scheduler->timeslice<false>();
-			// handle save/load
-			if (machine->m_saveload_schedule != saveload_schedule::NONE)
-			{
-				machine->handle_saveload();
-				break;
-			}
+			machine->handle_saveload();
+			break;
 		}
 	}
 	// otherwise, just pump video updates through

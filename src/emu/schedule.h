@@ -475,7 +475,9 @@ class device_scheduler
 	friend class timer_instance;
 	friend class device_t; // for access to timer_alloc/timer_set device forms
 
-	static constexpr int MAX_SAVE_INSTANCES = 256;
+	// due to save state limitations this has to be fixed; vgmplay allocates 256
+	// timers and needs room for active instances, so hoping 512 is enough
+	static constexpr int MAX_SAVE_INSTANCES = 512;
 
 	// inner private class for maintaining base-time relative values for
 	// faster comparisons vs a full attotime
@@ -528,7 +530,7 @@ public:
 	bool can_save() const;
 
 	// execution
-	template<bool Debugging> void timeslice();
+	void timeslice(attoseconds_t minslice);
 	void abort_timeslice();
 	void trigger(int trigid, attotime const &after = attotime::zero);
 	void boost_interleave(attotime const &timeslice_time, attotime const &boost_duration);

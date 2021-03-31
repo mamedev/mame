@@ -792,6 +792,8 @@ void cosmac_device::execute_run()
 
 				// execute initialization cycle
 				m_state = cosmac_state::STATE_1_INIT;
+
+				// fix me: this is very dodgy, why are we recursively calling ourselves here?
 				run();
 
 				// next state is IDLE
