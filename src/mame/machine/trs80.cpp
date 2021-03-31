@@ -251,13 +251,17 @@ WRITE_LINE_MEMBER(trs80_state::intrq_w)
  *                                   *
  *************************************/
 
-uint8_t trs80_state::wd179x_r()
+u8 trs80_state::fdc_r(offs_t offset)
 {
-	uint8_t data = 0xff;
-	if (BIT(m_io_config->read(), 7))
-		data = m_fdc->status_r();
+	if ((offset == 0) && (!BIT(m_io_config->read(), 7)))
+		return 0xff;
+	else
+		return m_fdc->read(offset) ^ 0xff;
+}
 
-	return data;
+void trs80_state::fdc_w(offs_t offset, u8 data)
+{
+	m_fdc->write(offset, data ^ 0xff);
 }
 
 uint8_t trs80_state::printer_r()

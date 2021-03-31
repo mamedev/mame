@@ -88,7 +88,8 @@ private:
 	void cassunit_w(uint8_t data);
 	void motor_w(uint8_t data);
 	uint8_t keyboard_r(offs_t offset);
-	uint8_t wd179x_r();
+	u8 fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, u8 data);
 
 	INTERRUPT_GEN_MEMBER(rtc_interrupt);
 	INTERRUPT_GEN_MEMBER(fdc_interrupt);
@@ -137,7 +138,7 @@ private:
 	optional_device<ay31015_device> m_uart;
 	optional_device<clock_device> m_uart_clock;
 	optional_device<i8255_device> m_ppi;
-	optional_device<fd1793_device> m_fdc;
+	optional_device<fd1771_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 	optional_device<floppy_connector> m_floppy2;

@@ -119,7 +119,7 @@ Not emulated:
  LNW80 1.77 / 4.0 MHz switch (this is a physical switch)
  Radionic has 16 colours with a byte at 350B controlling the operation. See manual.
 
-Virtual floppy disk formats are JV1, JV3, and DMK. Only the JV1 is emulated.
+Virtual floppy disk formats are JV1, JV3, and DMK. JV3 is not emulated.
 
 ********************************************************************************************************
 
@@ -194,11 +194,7 @@ void trs80_state::m1_mem(address_map &map)
 	map(0x37e0, 0x37e3).rw(FUNC(trs80_state::irq_status_r), FUNC(trs80_state::motor_w));
 	map(0x37e4, 0x37e7).w(FUNC(trs80_state::cassunit_w));
 	map(0x37e8, 0x37eb).rw(FUNC(trs80_state::printer_r), FUNC(trs80_state::printer_w));
-	map(0x37ec, 0x37ec).r(FUNC(trs80_state::wd179x_r));
-	map(0x37ec, 0x37ec).w(m_fdc, FUNC(fd1793_device::cmd_w));
-	map(0x37ed, 0x37ed).rw(m_fdc, FUNC(fd1793_device::track_r), FUNC(fd1793_device::track_w));
-	map(0x37ee, 0x37ee).rw(m_fdc, FUNC(fd1793_device::sector_r), FUNC(fd1793_device::sector_w));
-	map(0x37ef, 0x37ef).rw(m_fdc, FUNC(fd1793_device::data_r), FUNC(fd1793_device::data_w));
+	map(0x37ec, 0x37ef).rw(FUNC(trs80_state::fdc_r), FUNC(trs80_state::fdc_w));
 	map(0x3800, 0x3bff).r(FUNC(trs80_state::keyboard_r));
 	map(0x3c00, 0x3fff).ram().share(m_p_videoram);
 	map(0x4000, 0xffff).ram();
@@ -246,11 +242,7 @@ void trs80_state::lnw_banked_mem(address_map &map)
 	map(0x0000, 0x2fff).rom().region("maincpu", 0);
 	map(0x37e0, 0x37e3).rw(FUNC(trs80_state::irq_status_r), FUNC(trs80_state::motor_w));
 	map(0x37e8, 0x37eb).rw(FUNC(trs80_state::printer_r), FUNC(trs80_state::printer_w));
-	map(0x37ec, 0x37ec).r(FUNC(trs80_state::wd179x_r));
-	map(0x37ec, 0x37ec).w(m_fdc, FUNC(fd1793_device::cmd_w));
-	map(0x37ed, 0x37ed).rw(m_fdc, FUNC(fd1793_device::track_r), FUNC(fd1793_device::track_w));
-	map(0x37ee, 0x37ee).rw(m_fdc, FUNC(fd1793_device::sector_r), FUNC(fd1793_device::sector_w));
-	map(0x37ef, 0x37ef).rw(m_fdc, FUNC(fd1793_device::data_r), FUNC(fd1793_device::data_w));
+	map(0x37ec, 0x37ef).rw(FUNC(trs80_state::fdc_r), FUNC(trs80_state::fdc_w));
 	map(0x3800, 0x3bff).r(FUNC(trs80_state::keyboard_r));
 	map(0x3c00, 0x3fff).ram().share(m_p_videoram);
 	map(0x4000, 0x7fff).ram().share(m_p_gfxram);
@@ -497,14 +489,13 @@ GFXDECODE_END
 
 void trs80_state::floppy_formats(format_registration &fr)
 {
-	fr.add_mfm_containers();
 	fr.add(FLOPPY_TRS80_FORMAT);
 	fr.add(FLOPPY_DMK_FORMAT);
 }
 
 static void trs80_floppies(device_slot_interface &device)
 {
-	device.option_add("sssd", FLOPPY_525_QD);
+	device.option_add("sssd", FLOPPY_525_QD); // QD allows the 80-track boot disks to work.
 }
 
 
@@ -547,7 +538,7 @@ void trs80_state::model1(machine_config &config)      // model I, level II
 
 	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(trs80_state::quickload_cb));
 
-	FD1793(config, m_fdc, 4_MHz_XTAL / 4); // todo: should be fd1771
+	FD1771(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(FUNC(trs80_state::intrq_w));
 
 	FLOPPY_CONNECTOR(config, "fdc:0", trs80_floppies, "sssd", trs80_state::floppy_formats).enable_sound(true);
