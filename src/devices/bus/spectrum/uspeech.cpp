@@ -114,7 +114,7 @@ uint8_t spectrum_uspeech_device::iorq_r(offs_t offset)
 		m_romcs = !m_romcs;
 	}
 
-	return 0xff;
+	return offset & 1 ? m_slot->fb_r() : 0xff;
 }
 
 uint8_t spectrum_uspeech_device::mreq_r(offs_t offset)

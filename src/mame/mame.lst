@@ -38464,7 +38464,6 @@ spdodgeb                        // TA-0022 (c) 1987
 
 @source:spec128.cpp
 hc128                           // 1991 HC-128
-hc2000                          // 1992 HC-2000
 spec128                         // 1986 ZX Spectrum 128
 specpls2                        // 1986 ZX Spectrum +2
 
@@ -38511,6 +38510,7 @@ didakm92                        // 1992 Didaktik M 92
 didakm93                        // 1993 Didaktik M 93
 didakt90                        // 1990 Didaktik Skalica 90
 didaktk                         // 1992 Didaktik Kompakt
+hc2000                          // 1992 HC-2000
 hc85                            // 1985 HC-85
 hc88                            // 1988 HC-88
 hc90                            // 1990 HC-90
