@@ -52,8 +52,8 @@ Winning Run
           - priority, mixing incorrection
 
     reference videos
-	- https://youtu.be/ZNNveBLWevg
-	- https://youtu.be/KazxHW9wQ60
+    - https://youtu.be/ZNNveBLWevg
+    - https://youtu.be/KazxHW9wQ60
 
 *****************************
 

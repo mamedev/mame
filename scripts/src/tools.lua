@@ -681,6 +681,8 @@ files {
 	MAME_DIR .. "src/tools/imgtool/formats/vt_dsk.h",
 	MAME_DIR .. "src/tools/imgtool/formats/coco_dsk.cpp",
 	MAME_DIR .. "src/tools/imgtool/formats/coco_dsk.h",
+	MAME_DIR .. "src/tools/imgtool/formats/pc_dsk_legacy.cpp",
+	MAME_DIR .. "src/tools/imgtool/formats/pc_dsk_legacy.h",
 	MAME_DIR .. "src/tools/imgtool/modules/amiga.cpp",
 	MAME_DIR .. "src/tools/imgtool/modules/macbin.cpp",
 	MAME_DIR .. "src/tools/imgtool/modules/rsdos.cpp",

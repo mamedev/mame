@@ -63,30 +63,6 @@ VIDEO_START_MEMBER(mac_state,mac)
 {
 }
 
-#define MAC_MAIN_SCREEN_BUF_OFFSET  0x5900
-#define MAC_ALT_SCREEN_BUF_OFFSET   0xD900
-
-uint32_t mac_state::screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	uint32_t const video_base = m_ram->size() - (m_screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
-	uint16_t const *video_ram = (const uint16_t *) (m_ram->pointer() + video_base);
-
-	for (int y = 0; y < MAC_V_VIS; y++)
-	{
-		uint16_t *const line = &bitmap.pix(y);
-
-		for (int x = 0; x < MAC_H_VIS; x += 16)
-		{
-			uint16_t const word = *(video_ram++);
-			for (int b = 0; b < 16; b++)
-			{
-				line[x + b] = (word >> (15 - b)) & 0x0001;
-			}
-		}
-	}
-	return 0;
-}
-
 uint32_t mac_state::screen_update_macse30(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint32_t const video_base = (m_screen_buffer ? 0x8000 : 0) + (MAC_H_VIS/8);
@@ -361,35 +337,6 @@ uint32_t mac_state::screen_update_macrbv(screen_device &screen, bitmap_rgb32 &bi
 					*scanline++ = m_rbv_palette[pixels];
 				}
 			}
-		}
-	}
-
-	return 0;
-}
-
-uint32_t mac_state::screen_update_pwrmac(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	uint8_t const *const vram8 = (uint8_t *)m_vram64.target();
-	int hres, vres;
-
-	hres = 640;
-	vres = 480;
-
-	for (int y = 0; y < vres; y++)
-	{
-		uint32_t *scanline = &bitmap.pix(y);
-		for (int x = 0; x < hres; x += 8)
-		{
-			uint8_t const pixels = vram8[(y * (hres / 8)) + ((x / 8) ^ 3)];
-
-			*scanline++ = m_rbv_palette[0x7f | (pixels & 0x80)];
-			*scanline++ = m_rbv_palette[0x7f | ((pixels << 1) & 0x80)];
-			*scanline++ = m_rbv_palette[0x7f | ((pixels << 2) & 0x80)];
-			*scanline++ = m_rbv_palette[0x7f | ((pixels << 3) & 0x80)];
-			*scanline++ = m_rbv_palette[0x7f | ((pixels << 4) & 0x80)];
-			*scanline++ = m_rbv_palette[0x7f | ((pixels << 5) & 0x80)];
-			*scanline++ = m_rbv_palette[0x7f | ((pixels << 6) & 0x80)];
-			*scanline++ = m_rbv_palette[0x7f | ((pixels << 7) & 0x80)];
 		}
 	}
 

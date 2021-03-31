@@ -70,7 +70,7 @@ u8 ym2608_device::read(offs_t offset)
 			result = combine_status();
 			break;
 
-		case 3:	// ADPCM-B data
+		case 3: // ADPCM-B data
 			if (m_address < 0x10)
 				result = m_adpcm_b.read(m_address);
 			break;
@@ -88,7 +88,7 @@ void ym2608_device::write(offs_t offset, u8 value)
 {
 	switch (offset & 3)
 	{
-		case 0:	// address port
+		case 0: // address port
 			m_address = value;
 			if (m_address < 0x10)
 			{

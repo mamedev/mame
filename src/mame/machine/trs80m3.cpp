@@ -656,43 +656,50 @@ QUICKLOAD_LOAD_MEMBER(trs80m3_state::quickload_cb)
 		image.fread( &type, 1);
 		image.fread( &length, 1);
 
-		length -= 2;
-		int block_length = length ? length : 256;
-
 		switch (type)
 		{
-		case CMD_TYPE_OBJECT_CODE:
+			case CMD_TYPE_OBJECT_CODE:  // 01 - block of data
 			{
-			image.fread( &addr, 2);
-			uint16_t address = (addr[1] << 8) | addr[0];
-			if (LOG) logerror("/CMD object code block: address %04x length %u\n", address, block_length);
-			ptr = program.get_write_ptr(address);
-			image.fread( ptr, block_length);
+				length -= 2;
+				u16 block_length = length ? length : 256;
+				image.fread( &addr, 2);
+				u16 address = (addr[1] << 8) | addr[0];
+				if (LOG) logerror("/CMD object code block: address %04x length %u\n", address, block_length);
+				// Todo: the below only applies for non-ram
+				if (address < 0x3c00)
+				{
+					image.message("Attempting to write outside of RAM");
+					return image_init_result::FAIL;
+				}
+				ptr = program.get_write_ptr(address);
+				image.fread( ptr, block_length);
 			}
 			break;
 
-		case CMD_TYPE_TRANSFER_ADDRESS:
+			case CMD_TYPE_TRANSFER_ADDRESS: // 02 - go address
 			{
-			image.fread( &addr, 2);
-			uint16_t address = (addr[1] << 8) | addr[0];
-			if (LOG) logerror("/CMD transfer address %04x\n", address);
-			m_maincpu->set_state_int(Z80_PC, address);
+				image.fread( &addr, 2);
+				u16 address = (addr[1] << 8) | addr[0];
+				if (LOG) logerror("/CMD transfer address %04x\n", address);
+				m_maincpu->set_state_int(Z80_PC, address);
 			}
-			break;
+			return image_init_result::PASS;
 
-		case CMD_TYPE_LOAD_MODULE_HEADER:
-			image.fread( &data, block_length);
+		case CMD_TYPE_LOAD_MODULE_HEADER: // 05 - name
+			image.fread( &data, length);
 			if (LOG) logerror("/CMD load module header '%s'\n", data);
 			break;
 
-		case CMD_TYPE_COPYRIGHT_BLOCK:
-			image.fread( &data, block_length);
+		case CMD_TYPE_COPYRIGHT_BLOCK: // 1F - copyright info
+			image.fread( &data, length);
 			if (LOG) logerror("/CMD copyright block '%s'\n", data);
 			break;
 
 		default:
-			image.fread( &data, block_length);
+			image.fread( &data, length);
 			logerror("/CMD unsupported block type %u!\n", type);
+			image.message("Unsupported or invalid block type");
+			return image_init_result::FAIL;
 		}
 	}
 

@@ -1824,8 +1824,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 			m_motoroff_time--;
 			if (m_motoroff_time == 0)
 			{
-				m_floppy[2]->get_device()->tfsel_w(0);
-				m_floppy[3]->get_device()->tfsel_w(0);
+				if (m_floppy[2]->get_device()) m_floppy[2]->get_device()->tfsel_w(0);
+				if (m_floppy[3]->get_device()) m_floppy[3]->get_device()->tfsel_w(0);
 			}
 		}
 
@@ -4925,6 +4925,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 
 	/* serial */
 	SCC85C30(config, m_scc, A2GS_14M/2);
+	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_int_callback().set(FUNC(apple2gs_state::scc_irq_w));
 	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
 	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));

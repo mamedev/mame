@@ -65,7 +65,7 @@ void ym2151_device::write(offs_t offset, u8 value)
 
 	switch (offset & 1)
 	{
-		case 0:	// address port
+		case 0: // address port
 			m_address = value;
 			break;
 
@@ -206,7 +206,7 @@ void ym2164_device::write(offs_t offset, u8 value)
 
 	switch (offset & 1)
 	{
-		case 0:	// address port
+		case 0: // address port
 			m_address = value;
 			break;
 

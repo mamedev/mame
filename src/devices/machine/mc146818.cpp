@@ -22,6 +22,7 @@
 
 // device type definition
 DEFINE_DEVICE_TYPE(MC146818, mc146818_device, "mc146818", "MC146818 RTC")
+DEFINE_DEVICE_TYPE(DS1287,   ds1287_device,   "ds1287",   "DS1287 RTC")
 
 //-------------------------------------------------
 //  mc146818_device - constructor
@@ -30,6 +31,21 @@ DEFINE_DEVICE_TYPE(MC146818, mc146818_device, "mc146818", "MC146818 RTC")
 mc146818_device::mc146818_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc146818_device(mconfig, MC146818, tag, owner, clock)
 {
+	switch (clock)
+	{
+	case 4'194'304:
+	case 1'048'576:
+		m_tuc = 248;
+		break;
+	case 32'768:
+		m_tuc = 1984;
+		break;
+	}
+}
+
+ds1287_device::ds1287_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mc146818_device(mconfig, DS1287, tag, owner, clock)
+{
 }
 
 mc146818_device::mc146818_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -37,7 +53,7 @@ mc146818_device::mc146818_device(const machine_config &mconfig, device_type type
 		device_nvram_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
 		m_index(0),
-		m_last_refresh(attotime::zero), m_clock_timer(nullptr), m_periodic_timer(nullptr),
+		m_clock_timer(nullptr), m_update_timer(nullptr), m_periodic_timer(nullptr),
 		m_write_irq(*this),
 		m_write_sqw(*this),
 		m_century_index(-1),
@@ -46,7 +62,8 @@ mc146818_device::mc146818_device(const machine_config &mconfig, device_type type
 		m_binary(false),
 		m_hour(false),
 		m_binyear(false),
-		m_sqw_state(false)
+		m_sqw_state(false),
+		m_tuc(0)
 {
 }
 
@@ -57,8 +74,8 @@ mc146818_device::mc146818_device(const machine_config &mconfig, device_type type
 void mc146818_device::device_start()
 {
 	m_data = make_unique_clear<uint8_t[]>(data_size());
-	m_last_refresh = machine().time();
 	m_clock_timer = timer_alloc(TIMER_CLOCK);
+	m_update_timer = timer_alloc(TIMER_UPDATE);
 	m_periodic_timer = timer_alloc(TIMER_PERIODIC);
 
 	m_write_irq.resolve_safe();
@@ -110,6 +127,15 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 	case TIMER_CLOCK:
 		if (!(m_data[REG_B] & REG_B_SET))
+		{
+			m_data[REG_A] |= REG_A_UIP;
+
+			m_update_timer->adjust(attotime::from_usec(244));
+		}
+		break;
+
+	case TIMER_UPDATE:
+		if (!param)
 		{
 			/// TODO: find out how the real chip deals with updates when binary/bcd values are already outside the normal range
 			int seconds = get_seconds() + 1;
@@ -195,12 +221,19 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				m_data[REG_C] |= REG_C_AF;
 			}
 
-			// set the update-ended interrupt Flag UF
-			m_data[REG_C] |=  REG_C_UF;
-			update_irq();
-
-			m_last_refresh = machine().time();
+			// defer the update end sequence if update cycle time is non-zero
+			if (m_tuc)
+			{
+				m_update_timer->adjust(attotime::from_usec(m_tuc), 1);
+				break;
+			}
 		}
+
+		// clear update in progress and set update ended
+		m_data[REG_A] &= ~REG_A_UIP;
+		m_data[REG_C] |= REG_C_UF;
+
+		update_irq();
 		break;
 	}
 }
@@ -627,11 +660,6 @@ uint8_t mc146818_device::internal_read(offs_t offset)
 	{
 	case REG_A:
 		data = m_data[REG_A];
-		// Update In Progress (UIP) time for 32768 Hz is 244+1984usec
-		/// TODO: support other dividers
-		/// TODO: don't set this if update is stopped
-		if ((machine().time() - m_last_refresh) < attotime::from_usec(244+1984))
-			data |= REG_A_UIP;
 		break;
 
 	case REG_C:

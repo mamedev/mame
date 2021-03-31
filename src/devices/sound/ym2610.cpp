@@ -72,7 +72,7 @@ u8 ym2610_device::read(offs_t offset)
 			result = m_eos_status & m_flag_mask;
 			break;
 
-		case 3:	// ADPCM-B data
+		case 3: // ADPCM-B data
 			break;
 	}
 	return result;
@@ -88,7 +88,7 @@ void ym2610_device::write(offs_t offset, u8 value)
 {
 	switch (offset & 3)
 	{
-		case 0:	// address port
+		case 0: // address port
 			m_address = value;
 
 			// write register to SSG emulator

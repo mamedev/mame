@@ -744,15 +744,15 @@ void menu_machine_configure::handle()
 				break;
 			case CONTROLLER:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<submenu>(ui(), container(), submenu::control_options, &m_drv, &m_opts);
+					menu::stack_push<submenu>(ui(), container(), submenu::control_options(), &m_drv, &m_opts);
 				break;
 			case VIDEO:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<submenu>(ui(), container(), submenu::video_options, &m_drv, &m_opts);
+					menu::stack_push<submenu>(ui(), container(), submenu::video_options(), &m_drv, &m_opts);
 				break;
 			case ADVANCED:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<submenu>(ui(), container(), submenu::advanced_options, &m_drv, &m_opts);
+					menu::stack_push<submenu>(ui(), container(), submenu::advanced_options(), &m_drv, &m_opts);
 				break;
 			default:
 				break;
@@ -784,9 +784,9 @@ void menu_machine_configure::populate(float &customtop, float &custombottom)
 		item_append(_("This machine has no BIOS."), FLAG_DISABLE, nullptr);
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_(submenu::advanced_options[0].description), 0, (void *)(uintptr_t)ADVANCED);
-	item_append(_(submenu::video_options[0].description), 0, (void *)(uintptr_t)VIDEO);
-	item_append(_(submenu::control_options[0].description), 0, (void *)(uintptr_t)CONTROLLER);
+	item_append(_(submenu::advanced_options()[0].description), 0, (void *)(uintptr_t)ADVANCED);
+	item_append(_(submenu::video_options()[0].description), 0, (void *)(uintptr_t)VIDEO);
+	item_append(_(submenu::control_options()[0].description), 0, (void *)(uintptr_t)CONTROLLER);
 	item_append(menu_item_type::SEPARATOR);
 
 	if (!m_want_favorite)

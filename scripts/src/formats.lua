@@ -25,7 +25,7 @@ project "formats"
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
-	    GEN_DIR,
+		GEN_DIR,
 		ext_includedir("zlib"),
 	}
 

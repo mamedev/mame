@@ -100,12 +100,11 @@ Normal: Store $08 to $C05A (Zip compatible)
 Lock: Store $A5 to $C05A (Zip compatible).
 Unlock: Store $5A 4 times in a row to $C05A (Zip compatible).
 Read state: Cached by the firmware in MIG RAM (see below).
-Write state: Store speaker/slot byte at $C05C (NOT Zip compatible).  Firmware always enables the paddle
+Write state: Store speaker/slot byte at $C05C (Zip compatible).  Firmware always enables the paddle
 delay at $C05F, regardless of what you pass in.
 
-For the $C05C slot/speaker delay, the Zip has bit 0 = speaker, 7-1 = slots 7-1, and 1=normal, 0=fast.
-The IIc+ instead is as documented in the IIc Technical Reference Manual, Second Edition: bit 7=speaker,
-bits 6-0 = slots 7-1, and 1=fast, 0=normal.
+Previous versions of this driver stated that the IIc+ speaker/slot control byte was not Zip compatible; that
+was a misunderstanding.
 
 Accelerator control firmware saves/restores zero page locations 0-7 in MIG RAM page 2 locations $CE10-$CE17.
 MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accelerator bitfield.
@@ -715,46 +714,39 @@ void apple2e_state::sel35_w(int sel35)
 
 void apple2e_state::recalc_active_device()
 {
-//  printf("recalc_active_device: devsel %d 35sel %d intdrive %d\n", m_devsel, m_35sel, m_intdrive);
 	if (m_devsel == 1)
 	{
 		if (!m_35sel)
 		{
-//          printf("5.25 1\n");
 			m_cur_floppy = m_floppy[0]->get_device();
 		}
 		else
 		{
-//          printf("3.5 1\n");
-			m_cur_floppy = m_floppy[2]->get_device();
+			m_cur_floppy = m_floppy[3]->get_device();
 		}
 	}
 	else if (m_devsel == 2)
 	{
-		if (!m_35sel)
+		// as per http://apple2.guidero.us/doku.php/mg_notes/apple_iic/mig_chip intdrive + devsel = 2 enables
+		// the internal drive, no 35sel is necessary.  If intdrive is clear, 35sel and devsel work as normal.
+		if (m_intdrive)
 		{
-//          printf("5.25 2\n");
+			m_cur_floppy = m_floppy[2]->get_device();
+		}
+		else if (!m_35sel)
+		{
 			m_cur_floppy = m_floppy[1]->get_device();
 		}
-		else
+		else    // should be external 3.5 #2, for a 3rd drive
 		{
-			// hookup is a little weird here
-			if (m_intdrive)
-			{
-//              printf("3.5 1\n");
-				m_cur_floppy = m_floppy[2]->get_device();
-			}
-			else
-			{
-//              printf("3.5 2\n");
-				m_cur_floppy = m_floppy[3]->get_device();
-			}
+			m_cur_floppy = nullptr;
 		}
 	}
 	else
 	{
 		m_cur_floppy = nullptr;
 	}
+
 	m_iicpiwm->set_floppy(m_cur_floppy);
 
 	if (m_cur_floppy)
@@ -2370,9 +2362,7 @@ u8 apple2e_state::c000_iic_r(offs_t offset)
 			do_io(offset, true);
 			if ((m_accel_unlocked) && (offset == 0x5c))
 			{
-				u8 temp = (m_accel_slotspk ^ 0xff) >> 2;
-				temp |= (m_accel_slotspk & 1) ? 0 : 1;
-				return temp;
+				return m_accel_slotspk;
 			}
 			break;
 	}
@@ -2504,8 +2494,7 @@ void apple2e_state::c000_iic_w(offs_t offset, u8 data)
 		case 0x5c:
 			if (m_accel_unlocked)
 			{
-				u8 temp = data ^ 0xff;
-				m_accel_slotspk = (temp << 1) | ((temp & 0x80) ? 1 : 0);
+				m_accel_slotspk = data;
 			}
 			break;
 

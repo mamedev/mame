@@ -23,6 +23,20 @@
         Tierras Salvajes
         Zorton Brothers (Los Justicieros) [2 versions]
 
+    Picmatic games had different versions depending on TV system (PAL or NTSC) and
+    TV frequency (NTSC 60Hz, PAL 50Hz, PAL 100Hz):
+
+        Game                   System     ROM dumped  LD dumped
+        ---------------------  ---------  ----------  ---------
+        Marbella Vice          PAL 50Hz   YES         NO
+        Marbella Vice          PAL 100Hz  YES         NO
+        Marbella Vice          NTSC 60Hz  NO          NO
+        Tierras Salvajes       PAL 50Hz   NO          NO
+        Tierras Salvajes       PAL 100Hz  YES         NO
+        Zorton Brothers v1.00  PAL 50Hz   YES         NO
+        Zorton Brothers v1.01  PAL 50Hz   YES         NO
+        Zorton Brothers v1.01  PAL 100Hz  NO          NO
+
 **************************************************************************************/
 
 #include "emu.h"
@@ -939,7 +953,7 @@ GAME( 1995, fastdraw_130, fastdraw, alg_r2,   alg_2p, alg_state, init_palr6,    
 // NOVA games on ALG hardware with own address scramble
 GAME( 1995, aplatoon,     alg_bios, alg_r2,   alg,    alg_state, init_aplatoon, ROT0,  "Nova?", "Platoon V.3.1 US", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-// Web Picmatic games PAL TV standard or 100Hz, own ROM board
+// Web Picmatic games NTSC or PAL (50 or 100Hz) TV standard, own ROM board
 GAME( 1993, zortonbr_100, zortonbr, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Zorton Brothers v1.00 (Los Justicieros)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, zortonbr,     alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Zorton Brothers v1.01 (Los Justicieros)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, marvice,      alg_bios, picmatic, alg,    alg_state, init_pal,      ROT0,  "Web Picmatic", "Marbella Vice",                           MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )

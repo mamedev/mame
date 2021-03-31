@@ -9,6 +9,10 @@
     TODO:
     - ADB and PS/2
     - charset ROM is wrong
+    - asma2k keyboard doesn't work
+    - asma2k accesses memory below 0x8000; is there more ROM there?
+    - asma2k reads from nonexistent internal register at 0x0001
+      (probably a bug, since the same code exists in both BIOSes)
 
 ****************************************************************************/
 
@@ -77,17 +81,19 @@ class asma2k_state : public alphasmart_state
 public:
 	asma2k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: alphasmart_state(mconfig, type, tag)
+		, m_io_view(*this, "io")
 	{
 	}
 
 	void asma2k(machine_config &config);
 
 private:
-	uint8_t io_r(offs_t offset);
-	void io_w(offs_t offset, uint8_t data);
+	void lcd_ctrl_w(uint8_t data);
 	virtual void port_a_w(uint8_t data) override;
 
 	void asma2k_mem(address_map &map);
+
+	memory_view m_io_view;
 
 	uint8_t m_lcd_ctrl;
 };
@@ -178,41 +184,16 @@ void alphasmart_state::alphasmart_mem(address_map &map)
 	map(0xc000, 0xc000).w(FUNC(alphasmart_state::kb_matrixl_w));
 }
 
-uint8_t asma2k_state::io_r(offs_t offset)
+void asma2k_state::lcd_ctrl_w(uint8_t data)
 {
-	if (offset == 0x2000)
-		return kb_r();
-
-	//else printf("unknown r: %x\n", offset);
-
-	return 0;
-}
-
-void asma2k_state::io_w(offs_t offset, uint8_t data)
-{
-	if (offset == 0x2000)
-		kb_matrixh_w(data);
-	else if (offset == 0x4000)
-	{
-		uint8_t changed = (m_lcd_ctrl ^ data) & data;
-		update_lcdc(changed & 0x01, changed & 0x02);
-		m_lcd_ctrl = data;
-	}
-
-	//else printf("unknown w: %x %x\n", offset, data);
+	uint8_t changed = (m_lcd_ctrl ^ data) & data;
+	update_lcdc(changed & 0x01, changed & 0x02);
+	m_lcd_ctrl = data;
 }
 
 void asma2k_state::port_a_w(uint8_t data)
 {
-	if ((m_port_a ^ data) & 0x40)
-	{
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-
-		if (data & 0x40)
-			space.install_readwrite_bank(0x0000, 0x7fff, m_rambank);
-		else
-			space.install_readwrite_handler(0x0000, 0x7fff, read8sm_delegate(*this, FUNC(asma2k_state::io_r)), write8sm_delegate(*this, FUNC(asma2k_state::io_w)));
-	}
+	m_io_view.select(BIT(data, 6));
 
 	m_rambank->set_entry(((data>>4) & 0x03));
 	m_port_a = data;
@@ -222,7 +203,12 @@ void asma2k_state::port_a_w(uint8_t data)
 void asma2k_state::asma2k_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).bankrw("rambank");
+	map(0x0000, 0x7fff).view(m_io_view);
+	m_io_view[0](0x2000, 0x2000).rw(FUNC(asma2k_state::kb_r), FUNC(asma2k_state::kb_matrixh_w));
+	m_io_view[0](0x4000, 0x4000).w(FUNC(asma2k_state::lcd_ctrl_w));
+	m_io_view[0](0x7fd4, 0x7fd7).lr8(NAME([]() { return 0; })); // ?
+	m_io_view[0](0x7fe8, 0x7feb).lr8(NAME([]() { return 0; })); // ?
+	m_io_view[1](0x0000, 0x7fff).bankrw("rambank");
 	map(0x8000, 0xffff).rom().region("maincpu", 0);
 	map(0x9000, 0x9000).w(FUNC(asma2k_state::kb_matrixl_w));
 }

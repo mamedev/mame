@@ -21,6 +21,61 @@
           "format": "%1.2f",
           "screen": "raster" },
         { "type": "float",
+          "name": "spot_size",
+          "text": "Spot size minimum",
+          "default":  0.3,
+          "max"    :  0.5,
+          "min"    :  0.1,
+          "step"   :  0.01,
+          "format": "%1.2f",
+          "screen": "raster" },
+        { "type": "float",
+          "name": "spot_growth",
+          "text": "Spot size dilation",
+          "default":  0.1,
+          "max"    :  0.4,
+          "min"    :  0.0,
+          "step"   :  0.01,
+          "format": "%1.2f",
+          "screen": "raster" },
+        { "type": "float",
+          "name": "spot_growth_power",
+          "text": "Spot dilation onset power",
+          "default":  3.0,
+          "max"    :  4.0,
+          "min"    :  0.2,
+          "step"   :  0.1,
+          "format": "%1.1f",
+          "screen": "raster" },
+        { "type": "float",
+          "name": "lowpass_cutoff",
+          "text": "Lowpass cutoff pixels/scanline",
+          "default":1000.0,
+          "max"    :1000.0,
+          "min"    : 100.0,
+          "step"   :  10.0,
+          "format": "%1.0f",
+          "screen": "raster" },
+        { "type": "float",
+          "name": "lowpass_width",
+          "text": "Lowpass width",
+          "default":  80.0,
+          "max"    : 300.0,
+          "min"    :   0.0,
+          "step"   :  10.0,
+          "format": "%1.0f",
+          "screen": "raster" },
+        { "type": "intenum",
+          "name": "x_interpolation",
+          "text": "Horizontal interpolation",
+          "default":  2,
+          "max"    :  5,
+          "min"    :  0,
+          "step"   :  1,
+          "format": "%s",
+          "strings": [ "box", "linear", "Lanczos", "Catmull-Rom", "Mitchell-Netravali", "B-spline" ],
+          "screen": "raster" },
+        { "type": "float",
           "name": "phosphor_power",
           "text": "Phosphor decay power",
           "default":  1.2,
@@ -28,6 +83,15 @@
           "min"    :  0.5,
           "step"   :  0.05,
           "format": "%1.2f",
+          "screen": "raster" },
+        { "type": "float",
+          "name": "phosphor_cutoff",
+          "text": "Phosphor decay cutoff frames",
+          "default":  300.0,
+          "max"    : 1000.0,
+          "min"    :   10.0,
+          "step"   :   10.0,
+          "format": "%1.0f",
           "screen": "raster" },
         { "type": "float",
           "name": "phosphor_amplitude",
@@ -184,19 +248,16 @@
     ],
     "passes": [
         {
-            "effect": "crt-geom/phosphor_apply",
-            "applytint": true,
-            "name": "phosphor apply",
+            "effect": "crt-geom/lowpass",
+            "name": "lowpass",
             "uniforms": [
-                { "uniform": "u_phosphor_power",    "slider": "phosphor_power" },
-                { "uniform": "u_phosphor_amplitude","slider": "phosphor_amplitude" },
-                { "uniform": "u_gamma",             "slider": "CRTgamma" }
+                { "uniform": "u_lowpass_cutoff", "slider": "lowpass_cutoff" },
+                { "uniform": "u_lowpass_width",  "slider": "lowpass_width" }
             ],
             "input": [
-                { "sampler": "s_screen",   "target": "screen" },
-                { "sampler": "s_phosphor", "target": "phosphor" }
+                { "sampler": "s_screen",   "target": "screen" }
             ],
-            "output": "internal1"
+            "output": "internal2"
         },
         {
             "effect": "crt-geom/mipmap8",
@@ -205,10 +266,26 @@
                 { "uniform": "u_smooth",   "slider": "rasterbloom_smooth" }
             ],
             "input": [
-                { "sampler": "s_screen",   "target": "internal1" },
+                { "sampler": "s_screen",   "target": "internal2" },
                 { "sampler": "s_mipmap",   "target": "mipmap" }
             ],
             "output": "mipmap"
+        },
+        {
+            "effect": "crt-geom/phosphor_apply",
+            "applytint": true,
+            "name": "phosphor apply",
+            "uniforms": [
+                { "uniform": "u_phosphor_power",    "slider": "phosphor_power" },
+                { "uniform": "u_phosphor_amplitude","slider": "phosphor_amplitude" },
+                { "uniform": "u_phosphor_cutoff",   "slider": "phosphor_cutoff" },
+                { "uniform": "u_gamma",             "slider": "CRTgamma" }
+            ],
+            "input": [
+                { "sampler": "s_screen",   "target": "internal2" },
+                { "sampler": "s_phosphor", "target": "phosphor" }
+            ],
+            "output": "internal1"
         },
         {
             "effect": "crt-geom/phosphor_update",
@@ -216,10 +293,11 @@
             "uniforms": [
                 { "uniform": "u_phosphor_power",    "slider": "phosphor_power" },
                 { "uniform": "u_phosphor_amplitude","slider": "phosphor_amplitude" },
+                { "uniform": "u_phosphor_cutoff",   "slider": "phosphor_cutoff" },
                 { "uniform": "u_gamma",             "slider": "CRTgamma" }
             ],
             "input": [
-                { "sampler": "s_screen",   "target": "screen" },
+                { "sampler": "s_screen",   "target": "internal2" },
                 { "sampler": "s_phosphor", "target": "phosphor" }
             ],
             "output": "phosphor"
@@ -266,6 +344,10 @@
                 { "uniform": "monitorgamma","slider": "monitorgamma" },
                 { "uniform": "aperture_strength","slider": "aperture_strength" },
                 { "uniform": "aperture_brightboost","slider": "aperture_brightboost" },
+                { "uniform": "spot_size",   "slider": "spot_size" },
+                { "uniform": "spot_growth", "slider": "spot_growth" },
+                { "uniform": "spot_growth_power", "slider": "spot_growth_power" },
+                { "uniform": "u_interp",    "slider": "x_interpolation" },
                 { "uniform": "halation",    "slider": "halation" },
                 { "uniform": "blurwidth",   "slider": "blurwidth" },
                 { "uniform": "rasterbloom", "slider": "rasterbloom" }

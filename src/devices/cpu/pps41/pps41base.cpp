@@ -8,17 +8,19 @@ This is the single-chip evolution of Rockwell's older PPS-4 CPU. It is similar,
 but a lot of things were simplified, the ALU instructions are less diverse.
 
 Part numbers:
-- A75xx = MM75   - 28 pin dip
-- A76xx = MM76   - 42 pin spider
-- A77xx = MM77   - 42 pin spider
-- A78xx = MM78   - 42 pin spider
-- A79xx = MM76C  - 52 pin spider - counter
-- A86xx = MM76E  - 42 pin spider - extended ROM
-- B76xx = MM76L  - 40 pin dip
-- B77xx = MM77L  - 40 pin dip
-- B78xx = MM78L  - 40 pin dip
-- B86xx = MM76EL - 40 pin dip
-- B90xx = MM78LA - 42 pin spider
+- A75xx = MM75    - 28 pin dip
+- A76xx = MM76    - 42 pin spider
+- A77xx = MM77    - 42 pin spider
+- A78xx = MM78    - 42 pin spider
+- A79xx = MM76C   - 52 pin spider - high-speed counter
+- A??xx = MM76D   - 52 pin spider - 12-bit ADC
+- A86xx = MM76E   - 42 pin spider - extended ROM
+- B76xx = MM76L   - 40 pin dip
+- B77xx = MM77L   - 40 pin dip
+- B80xx = MM77LA? - 40 pin dip
+- B78xx = MM78L   - 40 pin dip
+- B86xx = MM76EL  - 40 pin dip
+- B90xx = MM78LA  - 42 pin spider
 
 "spider" = 2 rows of pins on each side, just like standard PPS-4 CPUs.
 "L" main difference is low-power
@@ -42,7 +44,9 @@ TODO:
   but again does not explain why
 - allowed opcode after TAB should be limited
 - add MCU mask options, there's one for inverting interrupts
-- add MM78LA
+- does MM78LA support interrupts? the sparse documentation available says it does
+- MM78LA mnemonics for changed opcodes is unknown
+- no known documentation exists for MM77LA, mcu name is guessed
 
 */
 
@@ -66,7 +70,8 @@ pps41_base_device::pps41_base_device(const machine_config &mconfig, device_type 
 	m_write_r(*this),
 	m_read_sdi(*this),
 	m_write_sdo(*this),
-	m_write_ssc(*this)
+	m_write_ssc(*this),
+	m_write_spk(*this)
 { }
 
 
@@ -90,6 +95,7 @@ void pps41_base_device::device_start()
 	m_read_sdi.resolve_safe(1);
 	m_write_sdo.resolve_safe();
 	m_write_ssc.resolve_safe();
+	m_write_spk.resolve_safe();
 
 	// init RAM with 0xf
 	for (int i = 0; i <= m_datamask; i++)
@@ -103,6 +109,7 @@ void pps41_base_device::device_start()
 	m_prev2_op = 0;
 	m_prev3_op = 0;
 	memset(m_stack, 0, sizeof(m_stack));
+	m_stack_levels = 1;
 
 	m_a = 0;
 	m_b = 0;
@@ -123,9 +130,9 @@ void pps41_base_device::device_start()
 	m_sclock_in = 0;
 	m_sclock_count = 0;
 
-	m_d_pins = 10;
-	m_d_mask = (1 << m_d_pins) - 1;
+	set_d_pins(10);
 	m_d_output = 0;
+	set_r_pins(8);
 	m_r_output = 0;
 	m_int_line[0] = m_int_line[1] = 1; // GND = 1
 	m_int_ff[0] = m_int_ff[1] = 0;
@@ -198,7 +205,7 @@ void pps41_base_device::device_reset()
 	m_skip_count = 0;
 
 	// clear outputs
-	m_write_r(m_r_output = 0xff);
+	m_write_r(m_r_output = m_r_mask);
 	m_write_d(m_d_output = 0);
 
 	m_s = 0;

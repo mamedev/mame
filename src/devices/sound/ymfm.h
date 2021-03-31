@@ -1223,6 +1223,9 @@ public:
 	// return a reference to our registers
 	RegisterType &regs() { return m_regs; }
 
+	// is this channel active?
+	bool active() const { return m_op1.active() || m_op2.active() || m_op3.active() || m_op4.active(); }
+
 private:
 	// helper to add values to the outputs based on channel enables
 	void add_to_output(u32 choffs, s32 *outputs, s32 value) const

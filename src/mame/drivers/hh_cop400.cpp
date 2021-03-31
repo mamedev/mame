@@ -1542,6 +1542,7 @@ public:
 	{ }
 
 	void write_d(u8 data);
+	void write_g(u8 data);
 	u8 read_l();
 	u8 read_in();
 	DECLARE_WRITE_LINE_MEMBER(write_so);
@@ -1554,6 +1555,13 @@ void bship82_state::write_d(u8 data)
 {
 	// D: input mux
 	m_inp_mux = data;
+}
+
+void bship82_state::write_g(u8 data)
+{
+	// G0-G2: speaker out via 3.9K, 2.2K, 1.0K resistor
+	// G3: enable speaker
+	m_speaker->level_w((data & 8) ? (data & 7) : 0);
 }
 
 u8 bship82_state::read_l()
@@ -1637,31 +1645,13 @@ static INPUT_PORTS_START( bship82 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_TOGGLE PORT_CODE(KEYCODE_F1) PORT_NAME("Load/Go") // switch
 INPUT_PORTS_END
 
-/*
-
-http://www.seanriddle.com/bship82.txt
-
-21 G0     3.9K resistor to speaker transistor base
-22 G1     2.2K resistor to speaker transistor base
-23 G2     1.0K resistor to speaker transistor base
-24 G3     speaker transistor base tied high 4.7K
-
-speaker connection
-2N3904 transistor:
-emitter to 10ohm resistor to ground
-collector to 68ohm resistor to speaker (other speaker terminal to VCC)
-base pulled high with 4.7K resistor, connects directly to G3, 1K resistor to G2,
-2.2K resistor to G1, 3.9K resistor to G0
-
-*/
-
 void bship82_state::bship82(machine_config &config)
 {
 	/* basic machine hardware */
 	COP420(config, m_maincpu, 750000); // approximation - RC osc. R=14K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(bship82_state::write_d));
-	m_maincpu->write_g().set("dac", FUNC(dac_byte_interface::data_w));
+	m_maincpu->write_g().set(FUNC(bship82_state::write_g));
 	m_maincpu->read_l().set(FUNC(bship82_state::read_l));
 	m_maincpu->read_in().set(FUNC(bship82_state::read_in));
 	m_maincpu->write_so().set(FUNC(bship82_state::write_so));
@@ -1673,7 +1663,10 @@ void bship82_state::bship82(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE(config, "dac").add_route(ALL_OUTPUTS, "mono", 0.125); // see above
+	SPEAKER_SOUND(config, m_speaker);
+	static const double speaker_levels[8] = { 0.0, 1.0/7.0, 2.0/7.0, 3.0/7.0, 4.0/7.0, 5.0/7.0, 6.0/7.0, 1.0 };
+	m_speaker->set_levels(8, speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 // roms
@@ -1956,4 +1949,4 @@ CONS( 1979, qkracer,    0,         0, qkracer,    qkracer,    qkracer_state,   e
 CONS( 1987, vidchal,    0,         0, vidchal,    vidchal,    vidchal_state,   empty_init, "Select Merchandise", "Video Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
-// with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.
+// with other, unemulatable, things eg. game board/pieces, book, playing cards, pen & paper, etc.

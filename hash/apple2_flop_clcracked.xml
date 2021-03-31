@@ -3276,20 +3276,26 @@ license:CC0
 		<year>1983</year>
 		<publisher>Davka Corporation</publisher>
 		<info name="release" value="2017-08-29"/>
+		<!-- On Feb 25th 2021, 4AM recracked "All About Purim" from the original
+		disks to fix some data corruption in disk 2 that was introduced during
+		the original (pre-Applesauce) disk imaging process. -->
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1, Side 1"/>
 			<dataarea name="flop" size="143360">
-				<rom name="all about purim (4am crack) disk 1.dsk" size="143360" crc="2d9fbe91" sha1="9572fb9474a21a347e4f8ebe2ebad75a46d247f4" />
+				<rom name="all about purim (4am crack) disk 1 side 1.dsk" size="143360" crc="0d1e25a0" sha1="5a6370115e51d63193dd47b98e40e8a12720fac5" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1, Side 2"/>
 			<dataarea name="flop" size="143360">
-				<rom name="all about purim (4am crack) disk 2.dsk" size="143360" crc="e5fc68c9" sha1="e6f29aca09461d841d1ead8b9157887948cec8e5" />
+				<rom name="all about purim (4am crack) disk 1 side 2.dsk" size="143360" crc="c32d6d3e" sha1="9d52c53ba85e995bf661c5dba684dc11a9ece7aa" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2, Side 1"/>
 			<dataarea name="flop" size="143360">
-				<rom name="all about purim (4am crack) disk 3.dsk" size="143360" crc="8ef26463" sha1="823b87aae72902d8c1d358123b4cc2d4ffeffe1b" />
+				<rom name="all about purim (4am crack) disk 2 side 1.dsk" size="143360" crc="c6eb7822" sha1="c439413d73f8bb3c5d4aea60da60464d35544b67" />
 			</dataarea>
 		</part>
 	</software>
@@ -15079,7 +15085,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mcgrph11">
+	<software name="mcgrpp11">
 		<description>MECC-A136 MECC Graphing Primer (Version 1.1) (cleanly cracked)</description>
 		<year>1985</year>
 		<publisher>MECC</publisher>
@@ -15183,10 +15189,12 @@ license:CC0
 		<year>1986</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2017-04-10"/>
+		<!-- This was re-cracked on Feb 28th, 2021 to patch additional RWTS
+		swappers that affected the self-booting data disks it creates. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="mecc-a172 mecc dataquest composer v1.1 (4am crack).dsk" size="143360" crc="2ab4729b" sha1="7f618da046c0bc9c3ae49bd407c1181913211203" />
+				<rom name="mecc-a172 mecc dataquest composer v1.1 (4am crack).dsk" size="143360" crc="ee94e2fd" sha1="4e2a864d46648752230079f36f56ca7034da0823" />
 			</dataarea>
 		</part>
 	</software>
@@ -15718,10 +15726,12 @@ license:CC0
 		<year>1983</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2016-08-02"/>
+		<!-- This was updated on Feb 23rd, 2021 to fix the hidden CTRL-A
+		administrative menu crashing due to an incomplete crack. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="mecc-a785 writing a character sketch v1.0 (4am crack).dsk" size="143360" crc="7085b661" sha1="2f0afa37c569d6f6e2ece14e73794c618c2c77b7" />
+				<rom name="mecc-a785 writing a character sketch v1.0 (4am crack).dsk" size="143360" crc="608ea78b" sha1="8b65a6841d5615ecf39806478d7a355f09484ab5" />
 			</dataarea>
 		</part>
 	</software>
@@ -16227,25 +16237,24 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mcorgtrl" supported="no">
+	<software name="mcorgtrl">
 		<description>MECC-A157 Oregon Trail (Version 1.1) (cleanly cracked)</description>
 		<year>1985</year>
 		<publisher>MECC</publisher>
 		<info name="release" value="2019-05-29"/>
-		<!-- As of 8/16/2020 changed to not working; this disk image looks like
-		it may be bad. I've gotten in touch with 4am to investigate as the disk
-		image doesn't seem to work on multiple Apple emulators. - FH -->
+		<!-- This was redumped on Feb 21st, 2021 to fix data corruption
+		that would cause the game to crash immediately on leaving town. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
-				<rom name="mecc-a157 the oregon trail v1.1 (4am crack) side a.dsk" size="143360" crc="c4cfd4aa" sha1="ec0a9ad7cec071f3fccef8a7a4207e2930025f88" />
+				<rom name="mecc-a157 the oregon trail v1.1 (4am crack) side a.dsk" size="143360" crc="f67db23d" sha1="3762550258fbc0656783fac49bd7a24c4a32b599" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
-				<rom name="mecc-a157 the oregon trail v1.1 (4am crack) side b.dsk" size="143360" crc="edd6f8a7" sha1="e58fbb135b17b36df7437f6ee2988b0de8cc5ea3" />
+				<rom name="mecc-a157 the oregon trail v1.1 (4am crack) side b.dsk" size="143360" crc="75f2eb62" sha1="69643b521e6fa7f2e41a90f0e49881e311a42c55" />
 			</dataarea>
 		</part>
 	</software>
@@ -22458,7 +22467,9 @@ license:CC0
 		<year>1988</year>
 		<publisher>Davidson and Associates</publisher>
 		<info name="release" value="2015-02-11"/>
+		<info name="programmer" value="Jan Davidson, Julie Baumgartner, J.M. Albanese, and Kevin R. Burley" />
 		<!--"Word Attack Plus! Spanish" is a 1988 educational game developed by Jan Davidson, Julie Baumgartner, J.M. Albanese, and Kevin R. Burley, and distributed by Davidson and Associates. It is preserved here for the first time.-->
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="143360">
@@ -37928,6 +37939,2783 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="uncle clyde's consonant slides - beginning consonants (4am crack).dsk" size="143360" crc="239d4daa" sha1="7b530d4f20e8275e767c6a23e37de3cb85f2fe4c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lfstfrog">
+		<description>Life Story Frog (cleanly cracked)</description>
+		<year>1993</year>
+		<publisher>Troll Associates</publisher>
+		<info name="release" value="2021-02-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="life story frog (4am crack).dsk" size="143360" crc="e107f2f8" sha1="f15828fe236a02b0ce18346e2c7c041010f1fb4f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsmokng">
+		<description>MECC-A103 Smoking: It's Up To You (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a103 smoking- it's up to you v1.0 (4am crack).dsk" size="143360" crc="4057a91b" sha1="cd6c091e4e776aca98178d1f2cdff712e60b1550"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcpayrol">
+		<description>MECC-A104 Payroll System: A Business Simulation (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a104 payroll system- a business simulation v1.2 (4am crack).dsk" size="143360" crc="d212f43f" sha1="93087105dfe4b4e9c62b2ccf88de205bc663c454"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwhsa10">
+		<description>MECC-A106 Word Herd: Sound-Alikes (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a106 word herd- sound-alikes v1.0 (4am crack).dsk" size="143360" crc="5ef8fd83" sha1="fe4d68431bafb5e2c94086de575e0775d0c630cb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcdcks11">
+		<description>MECC-A107 Ducks (Version 1.1) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a107 ducks v1.1 (4am crack).dsk" size="143360" crc="e6a1db28" sha1="f03efeb3d7bf262c7fc6b59910c507293be973d5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccmat10">
+		<description>MECC-A109 Circus Math (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a109 circus math v1.0 (4am crack).dsk" size="143360" crc="188da76b" sha1="a1631ac7a3cb7059f44b80522f9929076aa62f69"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsort11">
+		<description>MECC-A110 Exploring Sorting Routines (Version 1.1) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a110 exploring sorting routines v1.1 (4am crack).dsk" size="143360" crc="4f531c1c" sha1="9c4f8ddb2e345d822f0b7bc588cf8240f6817279"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcpets10">
+		<description>MECC-A111 Pets, Ltd. (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-22"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a111 pets, ltd. v1.0 (4am crack).dsk" size="143360" crc="6e15b0c4" sha1="78881bc772f48ac282ec732e8d1a20d1bd20d412"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mckeyb10">
+		<description>MECC-A130 MECC Keyboarding Primer (Version 1.0) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"MECC Keyboarding Primer" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Student program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a130 mecc keyboarding primer v1.0 (4am crack) side a - student program.dsk" size="143360" crc="7bbe8cfa" sha1="4649e91f9fa2f27a19a2feda256781458f4b62a9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Teacher utilities disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a130 mecc keyboarding primer v1.0 (4am crack) side b - teacher utilities.dsk" size="143360" crc="3a65c5f6" sha1="e4abeb8d9164380b6192e00a303abdd9cde0ff49"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mckbgd11">
+		<description>MECC-A131 MECC Keyboarding Master: Games and Drills (Version 1.1) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"MECC Keyboarding Master: Games and Drills" is a 1985 educational program developed and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a131 mecc keyboarding master v1.1 (4am crack).dsk" size="143360" crc="ac24dc09" sha1="0f3fe347c30c24de41cf77e59695a857edf51382"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwrtr11">
+		<description>MECC-A132 MECC Writer (Version 1.1) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"MECC Writer" is a 1985 educational program developed and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a132 mecc writer v1.1 (4am crack).dsk" size="143360" crc="28017f79" sha1="0180842ef43818de7164eb5f661f7aa5859b3c83"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwrtr12">
+		<description>MECC-A132 MECC Writer (Version 1.2) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"MECC Writer" is a 1985 educational program developed and distributed by MECC. This is version 1.2.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a132 mecc writer v1.2 (4am crack).dsk" size="143360" crc="41eeb966" sha1="6b6cd31dbc640781691f6b1e1e886f9c6e54394c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwrst12">
+		<description>MECC-A133 MECC Writer (Version 1.2) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"MECC Write Start" is a 1985 educational program developed and distributed by MECC. This is version 1.2.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a133 mecc write start v1.2 (4am crack).dsk" size="143360" crc="4c9f233d" sha1="a4773b48762922b92c92c9e90007b865d4296e93"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcspl10">
+		<description>MECC-A134 MECC Speller (Version 1.0) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"MECC Speller" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a134 mecc speller v1.0 (4am crack) side a - program.dsk" size="143360" crc="c8f08b29" sha1="5f6a776ed6ec12cc025b886c7f036807d841aea4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Dictionary"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a134 mecc speller v1.0 (4am crack) side b - dictionary.dsk" size="143360" crc="fbdc252e" sha1="df2f44ba88fcf848e7a4ff98398d7707f97b39ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcedtr10">
+		<description>MECC-A135 MECC Editor (Version 1.0) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"MECC Editor" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a135 mecc editor v1.0 (4am crack).dsk" size="143360" crc="74c0c894" sha1="2a01af093ffff94e1c413ad86538704b61864ba2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcgrpr10">
+		<description>MECC-A136 MECC Graphing Primer (Version 1.0) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"MECC Graphing Primer" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a136 mecc graphing primer v1.0 (4am crack).dsk" size="143360" crc="cbd0f138" sha1="4ff15fee49110d574f44122007bf3ef100ef01f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwdwz10">
+		<description>MECC-A112 Word Wizards (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Word Wizards" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a112 word wizards v.1.0 (4am crack).dsk" size="143360" crc="02e3f328" sha1="4d1904f2711439e76b838fbc4657743742936258"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwdwz12">
+		<description>MECC-A112 Word Wizards (Version 1.2) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Word Wizards" is a 1984 educational program developed and distributed by MECC. This is version 1.2.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a112 word wizards v1.2 (4am crack).dsk" size="143360" crc="f3ad8aa1" sha1="0e6ac325614ed5f8b42eeac49c68b9ee985cd5c6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwopn10">
+		<description>MECC-A114 Writing an Opinion Paper (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Writing an Opinion Paper" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a114 writing an opinion paper v1.0 (4am crack).dsk" size="143360" crc="25b83423" sha1="5a2e3c54034e3ac807c8ee35d4ea05cb5420643e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwdwz13">
+		<description>MECC-A112 Word Wizards (Version 1.3) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Word Wizards" is a 1984 educational program developed and distributed by MECC. This is version 1.3.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a112 word wizards v1.3 (4am crack).dsk" size="143360" crc="43f0413f" sha1="5357ba86600e5c8058534fcfb3ce26c8dc9975ed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcrow11">
+		<description>MECC-A115 Right of Way (Version 1.1) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Right of Way" is a 1984 educational program developed and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a115 right of way v1.1 (4am crack).dsk" size="143360" crc="e64255e7" sha1="e0a1ebfb396d9f9a5f99177509d9a6fcf46bc0a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcpzps11">
+		<description>MECC-A116 Puzzles and Posters (Version 1.1) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Puzzles and Posters" is a 1984 educational program developed and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a116 puzzles and posters v1.1 (4am crack).dsk" size="143360" crc="d9721f88" sha1="d4fea3b907a53896befb53787c02e728470e62f6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcpzps13">
+		<description>MECC-A116 Puzzles and Posters (Version 1.3) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Puzzles and Posters" is a 1984 educational program developed and distributed by MECC. This is version 1.3.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a116 puzzles and posters v1.3 (4am crack).dsk" size="143360" crc="d479a5c6" sha1="a5e6034ce85ecb300dc953a8fb176eaf83733b58"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcpzps16">
+		<description>MECC-A116 Puzzles and Posters (Version 1.6) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Puzzles and Posters" is a 1984 educational program developed and distributed by MECC. This is version 1.6.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a116 puzzles and posters v1.6 (4am crack).dsk" size="143360" crc="e6cf894b" sha1="603850fd85b0a828d373f3a46e4a0629fc5da5cf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmspl10">
+		<description>MECC-A119 Master Spell (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Master Spell" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a119 master spell v1.0 (4am crack).dsk" size="143360" crc="c243091d" sha1="e5dde217fcd983ac1a828d929bd0887a05ed5ae1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcgrph11">
+		<description>MECC-A137 MECC Graph (Version 1.1) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"MECC Graph" is a 1985 educational program developed and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a137 mecc graph v1.1 (4am crack).dsk" size="143360" crc="f173770c" sha1="faa4cda7a04e4054c11dd4f17a1f12028cc904a9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmspl13">
+		<description>MECC-A119 Master Spell (Version 1.3) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Master Spell" is a 1984 educational program developed and distributed by MECC. This is version 1.3.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a119 master spell v1.3 (4am crack).dsk" size="143360" crc="896a59e6" sha1="a861bd31f676ad312e7a8af7b1af6c96dcb80f1d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwhla10">
+		<description>MECC-A120 Word Herd: Look-Alikes (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Word Herd: Look-Alikes" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a120 word herd- look-alikes v1.0 (4am crack).dsk" size="143360" crc="043afc42" sha1="d7164db876e6917b680fb235692241194162616c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcjmc10">
+		<description>MECC-A121 Jeux Mathematiques Classiques (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Jeux Mathematiques Classiques" (Classic Math Games) is a 1984 French educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a121 jeux mathematiques classiques v1.0 (4am crack).dsk" size="143360" crc="b5dc1790" sha1="9d9cd5c59ab4118ae95d222dc59f5967d73a3eea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcprnm10">
+		<description>MECC-A123 Prime Numbers (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Prime Numbers" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a123 prime numbers v1.0 (4am crack).dsk" size="143360" crc="f0ceda44" sha1="b6a650ab7b8e2719df6b26dcde8f4d4af3827a09"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcestm10">
+		<description>MECC-A124 Estimation (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Estimation" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a124 estimation v1.0 (4am crack).dsk" size="143360" crc="c5bfc791" sha1="dbcb239e725ce2daf739a69cda5582a0a26c5b3f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcadlg10">
+		<description>MECC-A125 Addition Logician (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-24"/>
+		<!--"Addition Logician" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a125 addition logician v1.0 (4am crack).dsk" size="143360" crc="b75534aa" sha1="788263abea98ffaf2ec39c6a8ca17489fc9878c2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcstdg15">
+		<description>MECC-A126 Study Guide (Version 1.5) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"Study Guide" is a 1984 educational program developed and distributed by MECC. This is version 1.5.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a126 study guide v1.5 (4am crack) disk 1 - program.dsk" size="143360" crc="ce0f7fd0" sha1="f225f519109453cbfba80e4bd605b6ff5d3acc15"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Data master"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a126 study guide v1.5 (4am crack) disk 2 - data master.dsk" size="143360" crc="4bc0b40e" sha1="b0158d83f12cd5266e18e1ff367449a063c43141"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsalt10">
+		<description>MECC-A127 Salt and You (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"Salt and You" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a127 salt and you v1.0 (4am crack).dsk" size="143360" crc="1194d56a" sha1="5323eed0ba08cf9cd002d83713c8e8c85764190d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcdscl10">
+		<description>MECC-A128 Discovery Lab (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"Discovery Lab" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a128 discovery lab v1.0 (4am crack).dsk" size="143360" crc="f9478038" sha1="a72c97834e8e978de439702551c7767c5065234c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcdthd10">
+		<description>MECC-A129 Data Handler (Version 1.0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-02-25"/>
+		<!--"Data Handler" is a 1983 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a129 data handler v1.0 (4am crack).dsk" size="143360" crc="1b9af318" sha1="1dc867f65473b316722abd9d5fdefd61b0f07cbd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsgnt10">
+		<description>MECC-A343 Science Giants (Version 1.0) (cleanly cracked)</description>
+		<year>1994</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-15"/>
+		<info name="programmer" value="Ray Kush, John A. Persoon, and David L. Wood"/>
+		<!--"Science Giants" is a 1994 educational program developed by Ray Kush, John A. Persoon, and David L. Wood, and distributed by MECC. This is version 1.0. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a343 science giants v1.0 (4am crack).dsk" size="143360" crc="5b7cffc2" sha1="ea3e14ffcf27b451957032a98873e2bb0f52c66f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccfas10">
+		<description>MECC-A204 Conquering Fractions (Addition, Subtraction) (Version 1.0) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-04"/>
+		<info name="programmer" value="Sheila Dols, Vince Erickson, Susan M. Gabrys, Shari Glenn, Scott Jensen, Jane Peterson, Craig Solomonson, and James L. Thompson"/>
+		<!--"Conquering Fractions (Addition, Subtraction)" is a 1988 educational program developed by Sheila Dols, Vince Erickson, Susan M. Gabrys, Shari Glenn, Scott Jensen, Jane Peterson, Craig Solomonson, and James L. Thompson, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a204 conquering fractions (addition, subtraction) v1.0 (4am crack).dsk" size="143360" crc="01b0b920" sha1="e22ad28bc88a59ee72889a69ff9c0974c41776ce"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccfas11">
+		<description>MECC-A204 Conquering Fractions (Addition, Subtraction) (Version 1.1) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-04"/>
+		<info name="programmer" value="Sheila Dols, Vince Erickson, Susan M. Gabrys, Shari Glenn, Scott Jensen, Jane Peterson, Craig Solomonson, and James L. Thompson"/>
+		<!--"Conquering Fractions (Addition, Subtraction)" is a 1988 educational program developed by Sheila Dols, Vince Erickson, Susan M. Gabrys, Shari Glenn, Scott Jensen, Jane Peterson, Craig Solomonson, and James L. Thompson, and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a204 conquering fractions (addition, subtraction) v1.1 (4am crack).dsk" size="143360" crc="cd989a45" sha1="58fd8655ec116895d9bdc51f8274a3c4bf3b252b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccfmd10">
+		<description>MECC-A205 Conquering Fractions (Multiplication, Division) (Version 1.0) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-04"/>
+		<info name="programmer" value="Sheila Dols, Vince Erickson, Susan M. Gabrys, Shari Glenn, Scott Jensen, Craig Solomonson, and James L. Thompson"/>
+		<!--"Conquering Fractions (Multiplication, Division)" is a 1988 educational program developed by Sheila Dols, Vince Erickson, Susan M. Gabrys, Shari Glenn, Scott Jensen, Craig Solomonson, and James L. Thompson, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a205 conquering fractions (multiplication, division) v1.0 (4am crack).dsk" size="143360" crc="51f938d5" sha1="ed7ea5be0549ffcab654a2d980dfac6a968528ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccfmd11">
+		<description>MECC-A205 Conquering Fractions (Multiplication, Division) (Version 1.1) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-04"/>
+		<info name="programmer" value="Sheila Dols, Vince Erickson, Susan M. Gabrys, Shari Glenn, Scott Jensen, Craig Solomonson, and James L. Thompson"/>
+		<!--"Conquering Fractions (Multiplication, Division)" is a 1988 educational program developed by Sheila Dols, Vince Erickson, Susan M. Gabrys, Shari Glenn, Scott Jensen, Craig Solomonson, and James L. Thompson, and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a205 conquering fractions (multiplication, division) v1.1 (4am crack).dsk" size="143360" crc="2fd27dc3" sha1="790fe4defca56f99962b144f938749572486c93b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcdecc10">
+		<description>MECC-A206 Decimal Concepts (Version 1.0) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-04"/>
+		<info name="programmer" value="Sheila Dols, Susan M. Gabrys, Shari Glenn, Scott Jensen, John Persoon, Jane Peterson, Craig Solomonson, and James L. Thompson"/>
+		<!--"Decimal Concepts" is a 1988 educational program developed by Sheila Dols, Susan M. Gabrys, Shari Glenn, Scott Jensen, John Persoon, Jane Peterson, Craig Solomonson, and James L. Thompson, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a206 decimal concepts v1.0 (4am crack).dsk" size="143360" crc="115a31be" sha1="98cf730c4f7ab5d1126ded4bd5d4924462490719"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccdas10">
+		<description>MECC-A207 Conquering Decimals (Addition, Subtraction) (Version 1.0) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-04"/>
+		<info name="programmer" value="Sheila Dols, Susan M. Gabrys, Shari Glenn, Scott Jensen, Craig Solomonson, and James L. Thompson"/>
+		<!--"Conquering Decimals (Addition, Subtraction)" is a 1988 educational program developed by Sheila Dols, Susan M. Gabrys, Shari Glenn, Scott Jensen, Craig Solomonson, and James L. Thompson, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a207 conquering decimals (addition, subtraction) v1.0 (4am crack).dsk" size="143360" crc="c81fa04b" sha1="119883d5dd30a89aa71f817df06c86d3e1b2b819"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccdmd10">
+		<description>MECC-A208 Conquering Decimals (Multiplication, Division) (Version 1.0) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-04"/>
+		<info name="programmer" value="Sheila Dols, Susan M. Gabrys, Shari Glenn, Scott Jensen, Craig Solomonson, and James L. Thompson"/>
+		<!--"Conquering Decimals (Multiplication, Division)" is a 1988 educational program developed by Sheila Dols, Susan M. Gabrys, Shari Glenn, Scott Jensen, Craig Solomonson, and James L. Thompson, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a208 conquering decimals (multiplication, division) v1.0 (4am crack).dsk" size="143360" crc="4bddcb36" sha1="0ca877895cf5be4d2e0f54061e6f633af81e25f2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccdmd11">
+		<description>MECC-A208 Conquering Decimals (Multiplication, Division) (Version 1.1) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-04"/>
+		<info name="programmer" value="Sheila Dols, Susan M. Gabrys, Shari Glenn, Scott Jensen, Craig Solomonson, and James L. Thompson"/>
+		<!--"Conquering Decimals (Multiplication, Division)" is a 1988 educational program developed by Sheila Dols, Susan M. Gabrys, Shari Glenn, Scott Jensen, Craig Solomonson, and James L. Thompson, and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a208 conquering decimals (multiplication, division) v1.1 (4am crack).dsk" size="143360" crc="65dbd733" sha1="0275cb5e2c7d30497307c14f1820eebf92b216ae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccrap10">
+		<description>MECC-A209 Conquering Ratios and Proportions (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-04"/>
+		<info name="programmer" value="Sheila Dols, Shari Glenn, Scott Jensen, Charolyn Kapplinger, Sherry Leudloff, Diane Lin, Jane Peterson, and Craig Solomonson"/>
+		<!--"Conquering Ratios and Proportions" is a 1989 educational program developed by Sheila Dols, Shari Glenn, Scott Jensen, Charolyn Kapplinger, Sherry Leudloff, Diane Lin, Jane Peterson, and Craig Solomonson, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a209 conquering ratios and proportions v1.0 (4am crack).dsk" size="143360" crc="1cafe757" sha1="3c55eb8c8947113bc2fc60d58ec854f7010050d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccmpc10">
+		<description>MECC-A210 Conquering Percents (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-04"/>
+		<info name="programmer" value="Sheila Dols, Susan Gabrys, Shari Glenn, Scott Jensen, Charolyn Kapplinger, Pat Korn, Jane Peterson, Craig Solomonson, and James L. Thompson"/>
+		<!--"Conquering Percents" is a 1989 educational program developed by Sheila Dols, Susan Gabrys, Shari Glenn, Scott Jensen, Charolyn Kapplinger, Pat Korn, Jane Peterson, Craig Solomonson, and James L. Thompson, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a210 conquering percents v1.0 (4am crack).dsk" size="143360" crc="c9df4baf" sha1="32d6d2d1cade5f29cccdce3af1c735949a5c5eec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcgww10">
+		<description>MECC-A351 Get Well, Woolly! (Version 1.0) (cleanly cracked)</description>
+		<year>1994</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-15"/>
+		<info name="programmer" value="Sheila Kelly, Pat Korn, Claudio Valenzeula, and Ju-Chang Wang"/>
+		<!--"Get Well, Woolly!" is a 1994 educational program developed by Sheila Kelly, Pat Korn, Claudio Valenzeula, and Ju-Chang Wang, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a351 get well, woolly v1.0 (4am crack).dsk" size="143360" crc="f0caed04" sha1="7ddb645d13c7046d548700a188fb35687347e2b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccmpc11">
+		<description>MECC-A210 Conquering Percents (Version 1.1) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-04"/>
+		<info name="programmer" value="Sheila Dols, Susan Gabrys, Shari Glenn, Scott Jensen, Charolyn Kapplinger, Pat Korn, Jane Peterson, Craig Solomonson, and James L. Thompson"/>
+		<!--"Conquering Percents" is a 1989 educational program developed by Sheila Dols, Susan Gabrys, Shari Glenn, Scott Jensen, Charolyn Kapplinger, Pat Korn, Jane Peterson, Craig Solomonson, and James L. Thompson, and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a210 conquering percents v1.1 (4am crack).dsk" size="143360" crc="f56e85a3" sha1="82d04e3155661533722086dc874a558c3aa44577"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmyob10">
+		<description>MECC-A211 Mystery Objects (Version 1.0) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-06"/>
+		<info name="programmer" value="Greg Holey, Liz Husebye, Charolyn Kapplinger, John Krenz, Nan Leekley, Sherry Luedloff, Kevin Neff, and Diane Portner"/>
+		<!--"Mystery Objects" is a 1988 educational program developed by Greg Holey, Liz Husebye, Charolyn Kapplinger, John Krenz, Nan Leekley, Sherry Luedloff, Kevin Neff, and Diane Portner, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a211 mystery objects v1.0 (4am crack).dsk" size="143360" crc="0900c191" sha1="731317e36d2dfdd498eb2bbc90da9bf6baac5cfc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmyma10">
+		<description>MECC-A212 Mystery Matter (Version 1.0) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-06"/>
+		<info name="programmer" value="Greg Holey, Nan Leekley, Sherry Luedloff, John Persoon, Jane Peterson, Diane Portner, and Jim Thompson"/>
+		<!--"Mystery Matter" is a 1988 educational program developed by Greg Holey, Nan Leekley, Sherry Luedloff, John Persoon, Jane Peterson, Diane Portner, and Jim Thompson, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a212 mystery matter v1.0 (4am crack).dsk" size="143360" crc="e9572a92" sha1="3ece54f857fa1d48d962a73159e0816774d2f968"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmcv10">
+		<description>MECC-A213 Miner's Cave (Version 1.0) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-06"/>
+		<info name="programmer" value="Dean Brown, Bob Eggers, Matt Osber, Susan Christie Thomas, Peter Dublin, Gary Fujiwara, Mildred Feloney, and Herbert Fox"/>
+		<!--"Miner's Cave" is a 1988 educational program developed by Dean Brown, Bob Eggers, Matt Osber, Susan Christie Thomas, Peter Dublin, Gary Fujiwara, Mildred Feloney, and Herbert Fox, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a213 miner's cave v1.0 (4am crack).dsk" size="143360" crc="e070b0e6" sha1="94765d4d7353fc2f7484ec3c4ee7cbbcc45fe529"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwcrl10">
+		<description>MECC-A214 Wood Car Rally (Version 1.0) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-06"/>
+		<info name="programmer" value="Gene Breault, Greg Holey, Kevin Neff, John Persoon, and Diane Portner"/>
+		<!--"Wood Car Rally" is a 1988 educational program developed by Gene Breault, Greg Holey, Kevin Neff, John Persoon, and Diane Portner, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a214 wood car rally v1.0 (4am crack).dsk" size="143360" crc="1114aaac" sha1="c596513cbb09cf0624251220c5d8b294f1231913"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwcrl11">
+		<description>MECC-A214 Wood Car Rally (Version 1.1) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-06"/>
+		<info name="programmer" value="Gene Breault, Greg Holey, Kevin Neff, John Persoon, and Diane Portner"/>
+		<!--"Wood Car Rally" is a 1988 educational program developed by Gene Breault, Greg Holey, Kevin Neff, John Persoon, and Diane Portner, and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a214 wood car rally v1.1 (4am crack).dsk" size="143360" crc="2ee9b683" sha1="e0a01525ec3eb20d6c3cb1403b916f6cbd637a35"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mclngr10">
+		<description>MECC-A215 Lunar Greenhouse (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-06"/>
+		<info name="programmer" value="Beth Bell, Kevin Neff, John Persoon, and Diane Portner"/>
+		<!--"Lunar Greenhouse" is a 1989 educational program developed by Beth Bell, Kevin Neff, John Persoon, and Diane Portner, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a215 lunar greenhouse v1.0 (4am crack).dsk" size="143360" crc="52740424" sha1="e64a3a9c10493dfb69591fbf36c0cc07a13f3192"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcbbrd10">
+		<description>MECC-A216 Backyard Birds (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-06"/>
+		<info name="programmer" value="Hassan Kaganda, John Persoon, Larry Phenow, Diane Portner, and James L. Thompson"/>
+		<!--"Backyard Birds" is a 1989 educational program developed by Hassan Kaganda, John Persoon, Larry Phenow, Diane Portner, and James L. Thompson, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a216 backyard birds v1.0 (4am crack).dsk" size="143360" crc="c2aff632" sha1="620682c6be6567bd18e89bbfd0a28329c73cc592"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcweed10">
+		<description>MECC-A217 Weeds to Trees (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-06"/>
+		<info name="programmer" value="R. Philip Bouchard, Gene Breault, Greg Holey, Kevin Neff, and Brian Nesse"/>
+		<!--"Weeds to Trees" is a 1989 educational program developed by R. Philip Bouchard, Gene Breault, Greg Holey, Kevin Neff, and Brian Nesse, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a217 weeds to trees v1.0 (4am crack).dsk" size="143360" crc="2a637486" sha1="c3c91d20a4eaabc78974ab78378df5fd1a1b84ed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcinvb10">
+		<description>MECC-A218 Invisible Bugs (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-06"/>
+		<info name="programmer" value="Gene Breault, Scott Jensen, Charolyn Kapplinger, John Persoon, and Jane Peterson"/>
+		<!--"Invisible Bugs" is a 1989 educational program developed by Gene Breault, Scott Jensen, Charolyn Kapplinger, John Persoon, and Jane Peterson, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a218 invisible bugs v1.0 (4am crack).dsk" size="143360" crc="ff5f12ff" sha1="10a41babe1b099e9f14a6f6b1e53ad404e31c08f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mctptb11">
+		<description>MECC-A251 Chemistry: The Periodic Table (Version 1.1) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-15"/>
+		<info name="programmer" value="Gene Breault, Charolyn Kapplinger, Kevin W. Neff, John Persoon, and James L. Thompson"/>
+		<!--"Chemistry: The Periodic Table" is a 1988 educational program developed by Gene Breault, Charolyn Kapplinger, Kevin W. Neff, John Persoon, and James L. Thompson, and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a251 chemistry- the periodic table v1.1 (4am crack).dsk" size="143360" crc="4e519211" sha1="c0165ffb4ee3895f490e951d91c54e09be0dcaac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc5sf">
+		<description>MECC-A219 Five-Star Forecast (Version 1.0) (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-06"/>
+		<info name="programmer" value="Kevin Neff, Diane Portner, Elizabeth Wendland, and John P. Wlazlo"/>
+		<!--"Five-Star Forecast" is a 1990 educational program developed by Kevin Neff, Diane Portner, Elizabeth Wendland, and John P. Wlazlo, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a219 five-star forecast v1.0 (4am crack).dsk" size="143360" crc="98167ff6" sha1="24fa99949a0c4d5e953c8aa8323eb9faad5ba914"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcfosh10">
+		<description>MECC-A220 Fossil Hunter (Version 1.0) (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-06"/>
+		<info name="programmer" value="R. Philip Bouchard, Gene Breault, and Diane Portner"/>
+		<!--"Fossil Hunter" is a 1990 educational program developed by R. Philip Bouchard, Gene Breault, and Diane Portner, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a220 fossil hunter v1.0 (4am crack).dsk" size="143360" crc="0ebebf1e" sha1="d0b462e0a9ee741315c128448e3df5a5c400a077"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmmin10">
+		<description>MECC-A221 Murphy's Minerals (Version 1.0) (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-06"/>
+		<info name="programmer" value="Beth Bell, Gene Breault, John Persoon, Larry Phenow, and Diane Portner"/>
+		<!--"Murphy's Minerals" is a 1990 educational program developed by Beth Bell, Gene Breault, John Persoon, Larry Phenow, and Diane Portner, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a221 murphy's minerals v1.0 (4am crack).dsk" size="143360" crc="66dd7299" sha1="c223aa0f93c28e6c969b736ef1796ba949c753bd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsuns10">
+		<description>MECC-A222 Sun and Seasons (Version 1.0) (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-06"/>
+		<info name="programmer" value="Beth Bell, Gene Breault, Kevin Neff, Liz Wendland"/>
+		<!--"Sun and Seasons" is a 1990 educational program developed by Beth Bell, Gene Breault, Kevin Neff, Liz Wendland, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a222 sun and seasons v1.0 (4am crack).dsk" size="143360" crc="45c002ef" sha1="21c065a7cd048bf26a7355128e14c316d0b67289"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcinsv10">
+		<description>MECC-A224 Instant Survey (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-12"/>
+		<info name="programmer" value="Mark Dostal, Cathy Grittner, Greg Holey, Pat Korn, Sherry Luedloff, Jean Sharp, Roger Shimada, Craig Solomonson, Jim Thompson, Debra Vonk, and Brian Walker"/>
+		<!--"Instant Survey" is a 1989 educational program developed by Mark Dostal, Cathy Grittner, Greg Holey, Pat Korn, Sherry Luedloff, Jean Sharp, Roger Shimada, Craig Solomonson, Jim Thompson, Debra Vonk, and Brian Walker, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a224 instant survey v1.0 (4am crack) side a - program.dsk" size="143360" crc="ee40cabd" sha1="6fc93354199368f14931e2f9aa5ac6d8b4be9b49"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Sampler disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a224 instant survey v1.0 (4am crack) side b - sampler.dsk" size="143360" crc="28c36de8" sha1="e7f0102f95db0c911c0e717a17f973e39756e092"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mctmnl10">
+		<description>MECC-A225 Time Navigator Leaps Back (Version 1.0) (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-12"/>
+		<info name="programmer" value="Beth Bell, Vincent Erickson, John J. Krenz, Nan Leekley, Brian Nesse, Mark Paquette, Diane Portner, and Wayne Studer"/>
+		<!--"Time Navigator Leaps Back" is a 1990 educational program developed by Beth Bell, Vincent Erickson, John J. Krenz, Nan Leekley, Brian Nesse, Mark Paquette, Diane Portner, and Wayne Studer, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a225 time navigator leaps back v1.0 (4am crack) side a.dsk" size="143360" crc="242dc594" sha1="59ad4f92ff06798faa86ffcbe2cece6eee86aa12"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a225 time navigator leaps back v1.0 (4am crack) side b.dsk" size="143360" crc="1f30e5de" sha1="9665ba1b767079283fd312db1f4d2f13637ddb52"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcpatt10">
+		<description>MECC-A227 Patterns (Version 1.0) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-12"/>
+		<info name="programmer" value="Miryam Acevedo-Bouchard, Rich Childers, Susan Gabrys, Charolyn Kapplinger, Sherry Luedloff, Jane Peterson, and Larry Phenow"/>
+		<!--"Patterns" is a 1988 educational program developed by Miryam Acevedo-Bouchard, Rich Childers, Susan Gabrys, Charolyn Kapplinger, Sherry Luedloff, Jane Peterson, and Larry Phenow, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a227 patterns v1.0 (4am crack).dsk" size="143360" crc="f0b922ab" sha1="7cfcc850aca0a29384ef1eacee24e8e5eaf7165a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcoutl10">
+		<description>MECC-A228 MECC Outliner (Version 1.0) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-12"/>
+		<info name="programmer" value="Miryam Acevedo-Bouchard, John J. Krenz, Mark Paquette, Larry Phenow, Roger Shimada, Steve Taffee, and Paul Wieser"/>
+		<!--"MECC Outliner" is a 1988 educational program developed by Miryam Acevedo-Bouchard, John J. Krenz, Mark Paquette, Larry Phenow, Roger Shimada, Steve Taffee, and Paul Wieser, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a228 mecc outliner v1.0 (4am crack).dsk" size="143360" crc="0ec517a3" sha1="aea3878c39dc0f9350aa18aebc818b4d33a0ca57"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcpatt12">
+		<description>MECC-A227 Patterns (Version 1.2) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-12"/>
+		<info name="programmer" value="Miryam Acevedo-Bouchard, Rich Childers, Susan Gabrys, Charolyn Kapplinger, Sherry Luedloff, Jane Peterson, and Larry Phenow"/>
+		<!--"Patterns" is a 1988 educational program developed by Miryam Acevedo-Bouchard, Rich Childers, Susan Gabrys, Charolyn Kapplinger, Sherry Luedloff, Jane Peterson, and Larry Phenow, and distributed by MECC. This is version 1.2.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a227 patterns v1.2 (4am crack).dsk" size="143360" crc="75df4a84" sha1="67219bd6257e132342915c34dc72221b882d659d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcgasl10">
+		<description>MECC-A229 Exploring Gas Laws (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-12"/>
+		<info name="programmer" value="Gene Breault, Hassan Kaganda, John J. Krenz, Patricia Korn, Kevin Neff, and Diane Portner"/>
+		<!--"Exploring Gas Laws" is a 1989 educational program developed by Gene Breault, Hassan Kaganda, John J. Krenz, Patricia Korn, Kevin Neff, and Diane Portner, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a229 exploring gas laws v1.0 (4am crack).dsk" size="143360" crc="e5486fab" sha1="a8b421cfe14c1aabe1f3530ba43e24d3019aa7c4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcenh10">
+		<description>MECC-A401 Energy House (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-18"/>
+		<!--"Energy House" is a 1984 educational program developed by TIES and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a401 energy house v1.0 (4am crack).dsk" size="143360" crc="106fc6a2" sha1="e2de2216f405ff9d39a36834b897ed9d70581046"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsplw10">
+		<description>MECC-A230 Spelling Workout (Version 1.0) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-12"/>
+		<info name="programmer" value="Miryam Acevedo-Bouchard, Vince Erickson, Charlyn Kapplinger, Sherry Luedloff, Brian Nesse, Diane Portner, Roger Shimada, Caren Stelson, and Paul Wieser"/>
+		<!--"Spelling Workout" is a 1988 educational program developed by Miryam Acevedo-Bouchard, Vince Erickson, Charlyn Kapplinger, Sherry Luedloff, Brian Nesse, Diane Portner, Roger Shimada, Caren Stelson, and Paul Wieser, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a230 spelling workout v1.0 (4am crack).dsk" size="143360" crc="a5294dd1" sha1="c4f73965a3170306e05cd78e39e349ba96ebf75a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsplw11">
+		<description>MECC-A230 Spelling Workout (Version 1.1) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-12"/>
+		<info name="programmer" value="Miryam Acevedo-Bouchard, Vince Erickson, Charlyn Kapplinger, Sherry Luedloff, Brian Nesse, Diane Portner, Roger Shimada, Caren Stelson, and Paul Wieser"/>
+		<!--"Spelling Workout" is a 1988 educational program developed by Miryam Acevedo-Bouchard, Vince Erickson, Charlyn Kapplinger, Sherry Luedloff, Brian Nesse, Diane Portner, Roger Shimada, Caren Stelson, and Paul Wieser, and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a230 spelling workout v1.1 (4am crack).dsk" size="143360" crc="ac924999" sha1="176cb9c863bbdb074a5a971ed35b29b93f9ec652"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsple10">
+		<description>MECC-A230B Spelling List Editor (Version 1.0) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-12"/>
+		<info name="programmer" value="Susan Gabrys, Larry Phenow, Michael Stein, Caren Stelson, and Paul Wenker"/>
+		<!--"Spelling List Editor" is a 1988 educational program developed by Susan Gabrys, Larry Phenow, Michael Stein, Caren Stelson, and Paul Wenker, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a230b spelling list editor v1.0 (4am crack).dsk" size="143360" crc="8bb00961" sha1="67976bbe84eee43715297e1ce202b4a292376802"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcspl11">
+		<description>MECC-A230B Spelling List Editor (Version 1.1) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-12"/>
+		<info name="programmer" value="Susan Gabrys, Larry Phenow, Michael Stein, Caren Stelson, and Paul Wenker"/>
+		<!--"Spelling List Editor" is a 1988 educational program developed by Susan Gabrys, Larry Phenow, Michael Stein, Caren Stelson, and Paul Wenker, and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a230b spelling list editor v1.1 (4am crack).dsk" size="143360" crc="a6b3e91d" sha1="1b3afcfb967957358c4752c8a7bd5a22750d0000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcspl12">
+		<description>MECC-A230B Spelling List Editor (Version 1.2) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-12"/>
+		<info name="programmer" value="Susan Gabrys, Larry Phenow, Michael Stein, Caren Stelson, and Paul Wenker"/>
+		<!--"Spelling List Editor" is a 1988 educational program developed by Susan Gabrys, Larry Phenow, Michael Stein, Caren Stelson, and Paul Wenker, and distributed by MECC. This is version 1.2.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a230b spelling list editor v1.2 (4am crack).dsk" size="143360" crc="1ea13b8d" sha1="c8cbc13bfc9ed8d1411d237b3f1740a42dd05d38"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcspl14">
+		<description>MECC-A230B Spelling List Editor (Version 1.4) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-12"/>
+		<info name="programmer" value="Susan Gabrys, Larry Phenow, Michael Stein, Caren Stelson, and Paul Wenker"/>
+		<!--"Spelling List Editor" is a 1988 educational program developed by Susan Gabrys, Larry Phenow, Michael Stein, Caren Stelson, and Paul Wenker, and distributed by MECC. This is version 1.4.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a230b spelling list editor v1.4 (4am crack).dsk" size="143360" crc="4acbc3d2" sha1="72be7248e61e5d6e0d0a1bc32ba393c7001647e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcspl13">
+		<description>MECC-A230B Spelling List Editor (Version 1.3) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-12"/>
+		<info name="programmer" value="Susan Gabrys, Larry Phenow, Michael Stein, Caren Stelson, and Paul Wenker"/>
+		<!--"Spelling List Editor" is a 1988 educational program developed by Susan Gabrys, Larry Phenow, Michael Stein, Caren Stelson, and Paul Wenker, and distributed by MECC. This is version 1.3.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a230b spelling list editor v1.3 (4am crack).dsk" size="143360" crc="04cf01b0" sha1="5153ae52883ad87d2f6b93c11f7ba1fcff1339a2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsplv10">
+		<description>MECC-A231 Spellevator (Version 1.0) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-12"/>
+		<info name="programmer" value="Susan Gabrys, Charolyn Kapplinger, Larry Phenow, Michael Stein, Caren Stelson, Loren Sucher, and Paul Wenker"/>
+		<!--"Spellevator" is a 1988 educational program developed by Susan Gabrys, Charolyn Kapplinger, Larry Phenow, Michael Stein, Caren Stelson, Loren Sucher, and Paul Wenker, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a231 spellevator v1.0 (4am crack).dsk" size="143360" crc="b42fea28" sha1="e957898dca42fb5bde7239813c2ef6c9211c4666"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsplv12">
+		<description>MECC-A231 Spellevator (Version 1.2) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-12"/>
+		<info name="programmer" value="Susan Gabrys, Charolyn Kapplinger, Larry Phenow, Michael Stein, Caren Stelson, Loren Sucher, and Paul Wenker"/>
+		<!--"Spellevator" is a 1988 educational program developed by Susan Gabrys, Charolyn Kapplinger, Larry Phenow, Michael Stein, Caren Stelson, Loren Sucher, and Paul Wenker, and distributed by MECC. This is version 1.2.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a231 spellevator v1.2 (4am crack).dsk" size="143360" crc="5f313951" sha1="f77d9ed6b668547cbb0d34b127f4ed780942326a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsplv13">
+		<description>MECC-A231 Spellevator (Version 1.3) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-12"/>
+		<info name="programmer" value="Susan Gabrys, Charolyn Kapplinger, Larry Phenow, Michael Stein, Caren Stelson, Loren Sucher, and Paul Wenker"/>
+		<!--"Spellevator" is a 1988 educational program developed by Susan Gabrys, Charolyn Kapplinger, Larry Phenow, Michael Stein, Caren Stelson, Loren Sucher, and Paul Wenker, and distributed by MECC. This is version 1.3.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a231 spellevator v1.3 (4am crack).dsk" size="143360" crc="01aba934" sha1="8ff0e51180b3ed93fbff517c638c442b2bf6ed76"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcelgn11">
+		<description>MECC-A402 Elementary Genetics (Version 1.1) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-18"/>
+		<info name="programmer" value="Marcia Horn, Earl Keyser, Joyce Lindgren, and Jerome A. Farm"/>
+		<!--"Elementary Genetics" is a 1986 educational program developed by Marcia Horn, Earl Keyser, Joyce Lindgren, and Jerome A. Farm, and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a402 elementary genetics v1.1 (4am crack).dsk" size="143360" crc="9d161d79" sha1="f577c07acfa513ae488c18379fcb18f4a9b55365"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsplp10">
+		<description>MECC-A232 Spelling Press (Version 1.0) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-12"/>
+		<info name="programmer" value="Susan Gabrys, Charolyn Kapplinger, Larry Phenow, Roger Shimada, Caren Stelson, and Brian Walker"/>
+		<!--"Spelling Press" is a 1988 educational program developed by Susan Gabrys, Charolyn Kapplinger, Larry Phenow, Roger Shimada, Caren Stelson, and Brian Walker, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a232 spelling press v1.0 (4am crack).dsk" size="143360" crc="95bdc5f3" sha1="8655d3f4e9889b0c0c7261b9cb22d5f847a0a772"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccins10">
+		<description>MECC-A240 Computer Inspector (Version 1.0) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-12"/>
+		<info name="programmer" value="Diane Portner, Craig Solomonson, Michael Stein, and James Thompson"/>
+		<!--"Computer Inspector" is a 1988 educational program developed by Diane Portner, Craig Solomonson, Michael Stein, and James Thompson, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a240 computer inspector v1.0 (4am crack).dsk" size="143360" crc="88c9ca53" sha1="6c80cc0a5b451e480abea6066e3536df77d9aa86"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mclblm10">
+		<description>MECC-A241 LabelMaker (Version 1.0) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-12"/>
+		<!--"LabelMaker" is a 1988 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a241 labelmaker 1.0 (4am crack).dsk" size="143360" crc="38b81413" sha1="fed27a649393a872e31ec824dfebf5f8be9132f5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mctoo12">
+		<description>MECC-A242 Teach Option Organizer (Version 1.2) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-12"/>
+		<info name="programmer" value="Kevin Neff, Larry Phenow, Diane Portner, Jim Thompson, Brian Walker, and Nelson Whyatt"/>
+		<!--"Teacher Option Organizer" is a 1988 educational program developed by Kevin Neff, Larry Phenow, Diane Portner, Jim Thompson, Brian Walker, and Nelson Whyatt, and distributed by MECC. This is version 1.2.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a242 teacher option organizer v1.2 (4am crack).dsk" size="143360" crc="ff67fab9" sha1="26138a626fd6e35e64f16e48a263e46c94c44f80"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcdqmena">
+		<description>MECC-A244 MECC Dataquest: The Middle East and North Africa (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-12"/>
+		<!--"MECC Dataquest: The Middle East and North Africa" is a 1989 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a244 mecc dataquest- the middle east and north africa v1.0 (4am crack).dsk" size="143360" crc="5f17c471" sha1="58fa47eb5239c1836a076992509592bd9bcb11b8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcins10">
+		<description>MECC-A245 Instant Survey (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-13"/>
+		<info name="programmer" value="Mark Dostal, Cathy Grittner, Greg Holey, Pat Korn, Sherry Luedloff, Jean Sharp, Roger Shimada, Craig Solomonson, Jim Thompson, Debra Vonk, and Brian Walker"/>
+		<!--"Instant Survey" is a 1989 educational program developed by Mark Dostal, Cathy Grittner, Greg Holey, Pat Korn, Sherry Luedloff, Jean Sharp, Roger Shimada, Craig Solomonson, Jim Thompson, Debra Vonk, and Brian Walker, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a245 instant survey v1.0 (4am crack).dsk" size="143360" crc="ee40cabd" sha1="6fc93354199368f14931e2f9aa5ac6d8b4be9b49"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmswk10">
+		<description>MECC-A246 Measure Works (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-13"/>
+		<info name="programmer" value="Elizabeth Bell, Vince Erickson, Susan Gabrys, Nan Leekley, Sherry Luedloff, and Diane Portner"/>
+		<!--"Measure Works" is a 1989 educational program developed by Elizabeth Bell, Vince Erickson, Susan Gabrys, Nan Leekley, Sherry Luedloff, and Diane Portner, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a246 measure works v1.0 (4am crack).dsk" size="143360" crc="ceca4bb0" sha1="8a1d109b4ede5cf92395a4a930fac6106ec5deee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mctmnv10">
+		<description>MECC-A247 Time Navigator (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-13"/>
+		<info name="programmer" value="Beth Bell, Vincent Erickson, Charolyn Kapplinger, John J. Krenz, Nan Leekley, Brian Nesse, Mark Paquette, Diane Portner, and Wayne Studer"/>
+		<!--"Time Navigator" is a 1989 educational program developed by Beth Bell, Vincent Erickson, Charolyn Kapplinger, John J. Krenz, Nan Leekley, Brian Nesse, Mark Paquette, Diane Portner, and Wayne Studer, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a247 time navigator v1.0 (4am crack) side a.dsk" size="143360" crc="02ac6cbb" sha1="0a7eb7a62cf639c2eab9e839b1a8623c2cc5a6c1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a247 time navigator v1.0 (4am crack) side b.dsk" size="143360" crc="23ac1066" sha1="4ea6eaa0b8a46abab2084fc3aee9a3586cf5e08d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccmky11">
+		<description>MECC-A248 CommuniKeys (Version 1.1) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-13"/>
+		<info name="programmer" value="Beth Bell, Vincent Erickson, Charolyn Kapplinger, Sherry Luedloff, Michael Palmquist, John Persoon, and Paul Weiser"/>
+		<!--"CommuniKeys" is a 1989 educational program developed by Beth Bell, Vincent Erickson, Charolyn Kapplinger, Sherry Luedloff, Michael Palmquist, John Persoon, and Paul Weiser, and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a248 communikeys v1.1 (4am crack).dsk" size="143360" crc="ace29987" sha1="e535e4916339e5c80761542b9e69163add9c6a1b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdqnam10">
+		<description>MECC-A250 MECC Dataquest: North American Mammals (Version 1.0) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-13"/>
+		<!--"MECC Dataquest: North American Mammals" is a 1988 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a250 mecc dataquest- north american mammals v1.0 (4am crack).dsk" size="143360" crc="eb7e12f6" sha1="79d7609a113617d002a7d425fa52f7debca24d5f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mclgg10">
+		<description>MECC-A403 Logic Gates (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-18"/>
+		<!--"Logic Gates" is a 1984 educational program developed by TIES and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a403 logic gates v1.0 (4am crack).dsk" size="143360" crc="f38dc84c" sha1="2595174e3f51db812c153ee5db5ab1d9aefbc94c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdqnam11">
+		<description>MECC-A250 MECC Dataquest: North American Mammals (Version 1.1) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-13"/>
+		<!--"MECC Dataquest: North American Mammals" is a 1988 educational program developed and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a250 mecc dataquest- north american mammals v1.1 (4am crack).dsk" size="143360" crc="d04dc175" sha1="870539d1bedc4b04d57269ff92c692447f92fc82"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdqaao10">
+		<description>MECC-A254 MECC Dataquest: Asia and Oceania (Version 1.0) (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-13"/>
+		<!--"MECC Dataquest: Asia and Oceania" is a 1990 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-254 mecc dataquest- asia and oceania v1.0 (4am crack).dsk" size="143360" crc="91e770b9" sha1="fd23956a1c67a2def4b3c0ceb44b8f3dd4a1bf41"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcpicc10">
+		<description>MECC-A255 Picture Chompers (Version 1.0) (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-13"/>
+		<info name="programmer" value="Sheila Dols, Scott Jensen, Charolyn Kapplinger, Sherry Luedloff, Jane Peterson, Liz Wendland, John Wlazlo, and Stephen Zehm"/>
+		<!--"Picture Chompers" is a 1990 educational program developed by Sheila Dols, Scott Jensen, Charolyn Kapplinger, Sherry Luedloff, Jane Peterson, Liz Wendland, John Wlazlo, and Stephen Zehm, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a255 picture chompers v1.0 (4am crack).dsk" size="143360" crc="2155af5c" sha1="90bf18c1e924f2c6e0c833d6b999771797c1e26b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcblgb10">
+		<description>MECC-A256 Bluegrass Bluff (Version 1.0) (cleanly cracked)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-13"/>
+		<info name="programmer" value="Rich Bergeron, Gene Breault, Charolyn Kapplinger, Kevin Neff, and Dick Sisco"/>
+		<!--"Bluegrass Bluff" is a 1991 educational program developed by Rich Bergeron, Gene Breault, Charolyn Kapplinger, Kevin Neff, and Dick Sisco, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a256 bluegrass bluff v1.0 (4am crack).dsk" size="143360" crc="2be155ea" sha1="f7b731c72d7eb45df95dfdcb1b86d2f4917d04ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcpswn10">
+		<description>MECC-A257 Problem Solving with Nim (Version 1.0) (cleanly cracked)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-13"/>
+		<info name="programmer" value="Charolyn Kapplinger, Dick Sisco, Craig Solomonson, and Elizabeth Wendland"/>
+		<!--"Problem Solving with Nim" is a 1991 educational program developed by Charolyn Kapplinger, Dick Sisco, Craig Solomonson, and Elizabeth Wendland, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a257 problem solving with nim v1.0 (4am crack).dsk" size="143360" crc="f6827911" sha1="49713c1b031d32e83c9434ae6a9daacd3535ebfb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcqes110">
+		<description>MECC-A258 Estimation: Quick Solve I (Version 1.0) (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-13"/>
+		<info name="programmer" value="Beth Bell, Vincent Erickson, Shari Glenn, Charolyn Kapplinger, Sherry Luedloff, Jane Peterson, and Elizabeth Wendland"/>
+		<!--"Estimation: Quick Solve I" is a 1990 educational program developed by Beth Bell, Vincent Erickson, Shari Glenn, Charolyn Kapplinger, Sherry Luedloff, Jane Peterson, and Elizabeth Wendland, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a258 estimation- quick solve i v1.0 (4am crack).dsk" size="143360" crc="29bc44a0" sha1="d782dedc1747830085865b7c15db87da632b31d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mceqs210">
+		<description>MECC-A259 Estimation: Quick Solve II (Version 1.0) (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-13"/>
+		<info name="programmer" value="Beth Bell, Vincent Erickson, Shari Glenn, Charolyn Kapplinger, Sherry Luedloff, and Elizabeth Wendland"/>
+		<!--"Estimation: Quick Solve II" is a 1990 educational program developed by Beth Bell, Vincent Erickson, Shari Glenn, Charolyn Kapplinger, Sherry Luedloff, and Elizabeth Wendland, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a259 estimation- quick solve ii v1.0 (4am crack).dsk" size="143360" crc="546fba86" sha1="1172a6de615a87776859e18cee53fddb1f4aca37"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccmwg10">
+		<description>MECC-A260 Conquering Math Worksheet Generator (Version 1.0) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-14"/>
+		<info name="programmer" value="Sue Gabrys, Shari Glenn, Scott Jensen, and Kevin Neff"/>
+		<!--"Conquering Math Worksheet Generator" is a 1989 educational program developed by Sue Gabrys, Shari Glenn, Scott Jensen, and Kevin Neff, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a260 conquering math worksheet generator v1.0 (4am crack).dsk" size="143360" crc="8b30dec5" sha1="6a1f14e80d868165d99c808181b58bef2f24cf49"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcprlb10">
+		<description>MECC-A262 Probability Lab (Version 1.0) (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-14"/>
+		<info name="programmer" value="Brian Nesse, Jane Peterson, and Craig Solomonson"/>
+		<!--"Probability Lab" is a 1990 educational program developed by Brian Nesse, Jane Peterson, and Craig Solomonson, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a262 probability lab v1.0 (4am crack).dsk" size="143360" crc="b1e5ce58" sha1="55d16a85d170588fbcbd5ec46c41021bfd495ad8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcesas10">
+		<description>MECC-A263 Exploring Sequences and Series (Version 1.0) (cleanly cracked)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-14"/>
+		<info name="programmer" value="Beth Daniels, Vince Erickson, Jane Peterson, Craig Solomonson, Elizabeth Wendland, and John P. Wlazlo"/>
+		<!--"Exploring Sequences and Series" is a 1991 educational program developed by Beth Daniels, Vince Erickson, Jane Peterson, Craig Solomonson, Elizabeth Wendland, and John P. Wlazlo, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a263 exploring sequences and series v1.0 (4am crack).dsk" size="143360" crc="b2db124a" sha1="6f3b4890649830ad3620145f5c36fd68a19c611c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcspst10">
+		<description>MECC-A405 Sports Stats (Version 1.0) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-18"/>
+		<info name="programmer" value="Jim Sydow, Ron Geiser, Reed Christiansen, Dave Laden, Curt Traaseth, and Jean Brown"/>
+		<!--"Sports Stats" is a 1985 educational program developed by Jim Sydow, Ron Geiser, Reed Christiansen, Dave Laden, Curt Traaseth, and Jean Brown, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a405 sports stats v1.0 (4am crack).dsk" size="143360" crc="f6c8c982" sha1="897feba8aff55998851bfde89d18fd743bb0b196"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcgts10">
+		<description>MECC-A271 Grammar Toy Shop (Version 1.0) (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-14"/>
+		<info name="programmer" value="Sheila Dols, Vincent Erickson, Charolyn Kapplinger, Patricia Korn, Sherry Luedloff, and Stephen Zehm"/>
+		<!--"Grammar Toy Shop" is a 1990 educational program developed by Sheila Dols, Vincent Erickson, Charolyn Kapplinger, Patricia Korn, Sherry Luedloff, and Stephen Zehm, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a271 grammar toy shop v1.0 (4am crack).dsk" size="143360" crc="c8084946" sha1="0b09e1388aa0220e7297b0373b8628abe2a3fb1a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcgrmn10">
+		<description>MECC-A272 Grammar Monsters (Version 1.0) (cleanly cracked)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-14"/>
+		<info name="programmer" value="Sheila Dols, Charolyn Kapplinger, John R. Ojanen, Elizabeth T. Wendland, and Stephen Zehm"/>
+		<!--"Grammar Monsters" is a 1991 educational program developed by Sheila Dols, Charolyn Kapplinger, John R. Ojanen, Elizabeth T. Wendland, and Stephen Zehm, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a272 grammar monsters v1.0 (4am crack).dsk" size="143360" crc="bbc37ea6" sha1="efc9354e8331931d48a27477c9d32b3e0de8154b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcgrgz10">
+		<description>MECC-A273 Grammar Gazette (Version 1.0) (cleanly cracked)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-14"/>
+		<info name="programmer" value="Beth Bell, Sheila Dols, Dee Dee Roedel, and Elizabeth T. Wendland"/>
+		<!--"Grammar Gazette" is a 1991 educational program developed by Beth Bell, Sheila Dols, Dee Dee Roedel, and Elizabeth T. Wendland, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a273 grammar gazette v1.0 (4am crack).dsk" size="143360" crc="73f2d134" sha1="afa56b1a030692e5e71f4b79c5dc782f0be75436"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mclcel10">
+		<description>MECC-A278 The Living Cell (Version 1.0) (cleanly cracked)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-14"/>
+		<info name="programmer" value="Gene Breault, Ed Gratz, Mark Hanson, and Kevin Neff"/>
+		<!--"The Living Cell" is a 1991 educational program developed by Gene Breault, Ed Gratz, Mark Hanson, and Kevin Neff, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a278 the living cell v1.0 (4am crack).dsk" size="143360" crc="e761efd8" sha1="259374d9337a5b5c67d92e30829f4e955b6356a7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mclcsh">
+		<description>MECC-A279 Lewis and Clark Stayed Home (Version 1.0) (cleanly cracked)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-14"/>
+		<info name="programmer" value="R. Philip Bouchard, Charolyn Kapplinger, Craig Solomonson, John A. Persoon, and Rich Bergeron"/>
+		<!--"Lewis and Clark Stayed Home" is a 1991 educational program developed by R. Philip Bouchard, Charolyn Kapplinger, Craig Solomonson, John A. Persoon, and Rich Bergeron, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a279 lewis and clark stayed home v1.0 (4am crack) side a.dsk" size="143360" crc="65d01a05" sha1="f76b2745535f9c0b6d6f36e7b88282177dec8bd6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a279 lewis and clark stayed home v1.0 (4am crack) side b.dsk" size="143360" crc="a1a27f3b" sha1="f82f925b5328ce1849dc55c1b6163b3cc3ae3a04"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcchbe10">
+		<description>MECC-A280 Chemistry: Balancing Equations (Version 1.0) (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-14"/>
+		<info name="programmer" value="Beth Bell, Gene Breault, Scott Jensen, and Elizabeth Wendland"/>
+		<!--"Chemistry: Balancing Equations" is a 1990 educational program developed by Beth Bell, Gene Breault, Scott Jensen, and Elizabeth Wendland, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a280 chemistry- balancing equations v1.0 (4am crack).dsk" size="143360" crc="9194215b" sha1="33ba5d83469b8520fc9a1876bf78c37a23580af5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcppp10">
+		<description>MECC-A281 Paper Plane Pilot (Version 1.0) (cleanly cracked)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-14"/>
+		<info name="programmer" value="Beth Bell, Gene Breault, Mark Hanson, Diane Portner, Shari Zehm, and Steve Zehm"/>
+		<!--"Paper Plane Pilot" is a 1991 educational program developed by Beth Bell, Gene Breault, Mark Hanson, Diane Portner, Shari Zehm, and Steve Zehm, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a281 paper plane pilot v1.0 (4am crack).dsk" size="143360" crc="3c1e21e3" sha1="2c700ab474e3f6443ebb31a871da50faf6b4e796"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccld10">
+		<description>MECC-A282 Cleanwater Detectives (Version 1.0) (cleanly cracked)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-14"/>
+		<info name="programmer" value="Vincent J. Erickson, John Ojanen, and Diane Portner"/>
+		<!--"Cleanwater Detectives" is a 1991 educational program developed by Vincent J. Erickson, John Ojanen, and Diane Portner, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a282 cleanwater detectives v1.0 (4am crack).dsk" size="143360" crc="dcec5ce5" sha1="50a27abc33aa7a82199fb986f57a84410ba34738"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwob10">
+		<description>MECC-A283 Woolly Bounce (Version 1.0) (cleanly cracked)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-14"/>
+		<info name="programmer" value="Gene Breault, Scott Jensen, Charolyn Kapplinger, and Kim D. Smith"/>
+		<!--"Woolly Bounce" is a 1991 educational program developed by Gene Breault, Scott Jensen, Charolyn Kapplinger, and Kim D. Smith, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a283 woolly bounce v1.0 (4am crack).dsk" size="143360" crc="a8677a88" sha1="452251f799e55d64dc96a3423c1ea7f4955b235e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccbu10">
+		<description>MECC-A284 Cavity Busters (Version 1.0) (cleanly cracked)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-14"/>
+		<info name="programmer" value="R. Philip Bouchard, Gene Breault, Kevin Neff, Eileen Nannen, Larry Phenow, and Diane Portner"/>
+		<!--"Cavity Busters" is a 1991 educational program developed by R. Philip Bouchard, Gene Breault, Kevin Neff, Eileen Nannen, Larry Phenow, and Diane Portner, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a284 cavity busters v1.0 (4am crack).dsk" size="143360" crc="50bdfefc" sha1="581beb655316f30967d63eac2d7ea2f8de8b26da"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccab10">
+		<description>MECC-A406 Create-A-Base (Version 1.0) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-18"/>
+		<!--"Create-A-Base" is a 1985 educational program developed by TIES and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a406 create-a-base v1.0 (4am crack).dsk" size="143360" crc="82b7ac23" sha1="46fe0f00219fe50eacd5a256930c8016bc81e5bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcssf10">
+		<description>MECC-A290 Space Station Freedom (Version 1.0) (cleanly cracked)</description>
+		<year>1990</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-14"/>
+		<info name="programmer" value="Mark Hanson, Charolyn Kapplinger, Mike Palmquist, Jane Peterson, and John P. Wlazlo"/>
+		<!--"Space Station Freedom" is a 1990 educational program developed by Mark Hanson, Charolyn Kapplinger, Mike Palmquist, Jane Peterson, and John P. Wlazlo, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a290 space station freedom v1.0 (4am crack) side a.dsk" size="143360" crc="256e9c8a" sha1="e5111bcc2e277f183d1a50028f5835493537b690"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a290 space station freedom v1.0 (4am crack) side b.dsk" size="143360" crc="9684bba0" sha1="4567ef175018226b78a34447bcbe6647cfe914cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcvnt10">
+		<description>MECC-A291 Vacation Nation Travel (Version 1.0) (cleanly cracked)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-14"/>
+		<info name="programmer" value="John Ojanen, Mike Palmquist, Dee Dee Roedel, and John P. Wlazlo"/>
+		<!--"Vacation Nation Travel" is a 1991 educational program developed by John Ojanen, Mike Palmquist, Dee Dee Roedel, and John P. Wlazlo, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a291 vacation nation travel v1.0 (4am crack) side a.dsk" size="143360" crc="0f8d83db" sha1="dd5099105fd71f79c3ae5f198ae13f30d2bca308"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a291 vacation nation travel v1.0 (4am crack) side b.dsk" size="143360" crc="7b1e19ba" sha1="7c1a9d9cbb79c7a5f29205af7d5ea5fef76b76aa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcltz10">
+		<description>MECC-A292 Littletown Zoo (Version 1.0) (cleanly cracked)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-14"/>
+		<info name="programmer" value="Eileen M. Nannen, John Ojanen, Mike Palmquist, Dee Dee Roedel, and John P. Wlazlo"/>
+		<!--"Littletown Zoo" is a 1991 educational program developed by Eileen M. Nannen, John Ojanen, Mike Palmquist, Dee Dee Roedel, and John P. Wlazlo, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a292 littletown zoo v1.0 (4am crack) side a.dsk" size="143360" crc="693b6194" sha1="169739e6ba1c3e2dda17605e0005f55aefee6351"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a292 littletown zoo v1.0 (4am crack) side b.dsk" size="143360" crc="b005e0b9" sha1="a8a7c05d100851ecc7a96a558b1172278d07164b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcess10">
+		<description>MECC-A295 Estimation Strategies (Version 1.0) (cleanly cracked)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-14"/>
+		<info name="programmer" value="Beth Bell, Charolyn Kapplinger, Jane Peterson, and Shari Zehm"/>
+		<!--"Estimation Strategies" is a 1991 educational program developed by Beth Bell, Charolyn Kapplinger, Jane Peterson, and Shari Zehm, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a295 estimation strategies v1.0 (4am crack).dsk" size="143360" crc="723d14bd" sha1="bcd33de40735741a868c1492a62a036c30debd4c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcesa10">
+		<description>MECC-A296 Estimation Activities (Version 1.0) (cleanly cracked)</description>
+		<year>1991</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-14"/>
+		<info name="programmer" value="Beth Bell, Beth Daniels, Mark Hanson, Scott Jensen, Dee Dee Roedel, and Shari Zehm"/>
+		<!--"Estimation Activities" is a 1991 educational program developed by Beth Bell, Beth Daniels, Mark Hanson, Scott Jensen, Dee Dee Roedel, and Shari Zehm, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a296 estimation activities v1.0 (4am crack).dsk" size="143360" crc="c94c1301" sha1="c5cbe823728cb82d7315a970a96642d53e8ad81a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcfsch10">
+		<description>MECC-A302 Fish School (Version 1.0) (cleanly cracked)</description>
+		<year>1992</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-15"/>
+		<info name="programmer" value="Sue Gabrys, Sheila Kelly, Mike Palmquist, John Persoon, and John Wlazlo"/>
+		<!--"Fish School" is a 1992 educational program developed by Sue Gabrys, Sheila Kelly, Mike Palmquist, John Persoon, and John Wlazlo, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a302 fish school v1.0 (4am crack).dsk" size="143360" crc="63bc727a" sha1="e17cd655bf2abed7b31512e3d342e24a55711676"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccvm10">
+		<description>MECC-A303 Moving Museum (Version 1.0) (cleanly cracked)</description>
+		<year>1992</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-15"/>
+		<info name="programmer" value="Sue Gabrys, Sheila Kelly, Mike Palmquist, John Persoon, and John Wlazlo"/>
+		<!--"Moving Museum" is a 1992 educational program developed by Sue Gabrys, Sheila Kelly, Mike Palmquist, John Persoon, and John Wlazlo, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a303 moving museum v1.0 (4am crack).dsk" size="143360" crc="77a80339" sha1="aa83d4ee8d5bed1c71bba786b9c3a33199b921a1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mceeli10">
+		<description>MECC-A304 Eerieville Library (Version 1.0) (cleanly cracked)</description>
+		<year>1993</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-15"/>
+		<info name="programmer" value="Sheila Dols, Kevin Neff, Mike Palmquist, Mike Tschimperle, and John Wlazlo"/>
+		<!--"Eerieville Library" is a 1993 educational program developed by Sheila Dols, Kevin Neff, Mike Palmquist, Mike Tschimperle, and John Wlazlo, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a304 eerieville library v1.0 (4am crack).dsk" size="143360" crc="45403098" sha1="662deb01dbe8ca55c74fed44ab3b59746def1b15"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcgrgb10">
+		<description>MECC-A306 Grammar Gobble (Version 1.0) (cleanly cracked)</description>
+		<year>1992</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-15"/>
+		<info name="programmer" value="Beth Bell, Sheila Dols, Scott Jensen, and David Wood"/>
+		<!--"Grammar Gobble" is a 1992 educational program developed by Beth Bell, Sheila Dols, Scott Jensen, and David Wood, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a306 grammar gobble v1.0 (4am crack).dsk" size="143360" crc="8f798b94" sha1="1cc77a8b8d6475eb1d96869a734128c30f99c271"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcgrmd10">
+		<description>MECC-A307 Grammar Madness (Version 1.0) (cleanly cracked)</description>
+		<year>1992</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-15"/>
+		<info name="programmer" value="Beth Daniels, Sheila Dols, Sheila Kelly, and Elizabeth T. Wendland"/>
+		<!--"Grammar Madness" is a 1992 educational program developed by Beth Daniels, Sheila Dols, Sheila Kelly, and Elizabeth T. Wendland, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a307 grammar madness v1.0 (4am crack).dsk" size="143360" crc="1f03936f" sha1="cc2faf8287c097ac0e26b4e5f38b9b4a30939c06"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcbkw10">
+		<description>MECC-A407 Book Worm (Version 1.0) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-18"/>
+		<!--"Book Worm" is a 1985 educational program developed by TIES and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a407 book worm v1.0 (4am crack).dsk" size="143360" crc="090bdbb0" sha1="0e982610d85bc82bed88153e6480ca9cb0bb86d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwlgd10">
+		<description>MECC-A309 Woolly's Garden (Version 1.0) (cleanly cracked)</description>
+		<year>1992</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-15"/>
+		<info name="programmer" value="Beth Bell, Eileen Nannen, Jean Sharp, and Dave Wood"/>
+		<!--"Woolly's Garden" is a 1992 educational program developed by Beth Bell, Eileen Nannen, Jean Sharp, and Dave Wood, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a309 woolly's garden v1.0 (4am crack).dsk" size="143360" crc="fdd3ecb4" sha1="213e4ef02f820a795620286bc63da0b77293a24b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwnpz10">
+		<description>MECC-A310 Wonderland Puzzles (Version 1.0) (cleanly cracked)</description>
+		<year>1992</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-15"/>
+		<info name="programmer" value="Mark Hanson, Charolyn Kapplinger, Patricia Korn, and Dick Sisco"/>
+		<!--"Wonderland Puzzles" is a 1992 educational program developed by Mark Hanson, Charolyn Kapplinger, Patricia Korn, and Dick Sisco, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a310 wonderland puzzles v1.0 (4am crack).dsk" size="143360" crc="588b05ee" sha1="42b629ac843a82a79afe7faa5d8aa33bee076468"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcpcas10">
+		<description>MECC-A311 Picture A Story (Version 1.0) (cleanly cracked)</description>
+		<year>1992</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-15"/>
+		<info name="programmer" value="Beth Bell, Sheila Kelly, and Jean Sharp"/>
+		<!--"Picture A Story" is a 1992 educational program developed by Beth Bell, Sheila Kelly, and Jean Sharp, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a311 picture a story v1.0 (4am crack).dsk" size="143360" crc="fdcc0dd4" sha1="e048f609a089159b33bdc1b6540edccd80b4489f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mctac10">
+		<description>MECC-A317 Take A Chance! (Version 1.0) (cleanly cracked)</description>
+		<year>1992</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-15"/>
+		<info name="programmer" value="Beth Bell, Dee Dee Daus, Ruth Kivisto, Kevin Neff, John Persoon, and Shari Zehm"/>
+		<!--"Take A Chance!" is a 1992 educational program developed by Beth Bell, Dee Dee Daus, Ruth Kivisto, Kevin Neff, John Persoon, and Shari Zehm, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a317 take a chance v1.0 (4am crack).dsk" size="143360" crc="4d51c5d8" sha1="741adf2c268cf2ab87bf77b15585e6b3476223d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcnunb10">
+		<description>MECC-A330 Nutrition Nabber (Version 1.0) (cleanly cracked)</description>
+		<year>1993</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-15"/>
+		<info name="programmer" value="Dee Dee Daus, Kevin Neff, Korey Schulz, Paul Wieser, and John Wlazlo"/>
+		<!--"Nutrition Nabber" is a 1993 educational program developed by Dee Dee Daus, Kevin Neff, Korey Schulz, Paul Wieser, and John Wlazlo, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a330 nutrition nabber v1.0 (4am crack).dsk" size="143360" crc="fd26d45a" sha1="6044b45f46c4be4f43c2a2399f2b9ae4b8728030"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcptg10">
+		<description>MECC-A333 Pizza to Go (Version 1.0) (cleanly cracked)</description>
+		<year>1993</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-15"/>
+		<info name="programmer" value="Beth Daniels, Rod Haenke, Sheila Kelly, Kevin Neff, and Ju-Chang Wang"/>
+		<!--"Pizza to Go" is a 1993 educational program developed by Beth Daniels, Rod Haenke, Sheila Kelly, Kevin Neff, and Ju-Chang Wang, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a333 pizza to go v1.0 (4am crack).dsk" size="143360" crc="da7bba25" sha1="24956ed3f00d8fd335ca802136b6257b896dd2ae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcstr10">
+		<description>MECC-A159 Sound Tracks (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-01"/>
+		<!--"Sound Tracks" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a159 sound tracks v1.0 (4am crack).dsk" size="143360" crc="f391030d" sha1="aefe5b72ed9b2604aa065a65b0422ceb4fa22b4c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mctmp10">
+		<description>MECC-A160 The Market Place (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-01"/>
+		<!--"The Market Place" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a160 the market place v1.0 (4am crack).dsk" size="143360" crc="646c3331" sha1="826658fc5039fd80b4d34998805928a7815d75d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcjenj10">
+		<description>MECC-A161 Jenny's Journeys (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Jenny's Journeys" is a 1984 educational program developed and distributed by MECC. Thisf is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a161 jenny's journeys v1.0 (4am crack).dsk" size="143360" crc="b20d19b5" sha1="651132dd6617f80886698c76754a9107dabffc65"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcptac10">
+		<description>MECC-A162 Path Tactics (Version 1.0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Path Tactics" is a 1984 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a162 path tactics v1.0 (4am crack).dsk" size="143360" crc="04d7a9e5" sha1="6885f2fd5f4d25fd467afbc095335b0a79643709"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcdq50s">
+		<description>MECC-A163 MECC Dataquest: The Fifty States (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"MECC Dataquest: The Fifty States" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a163 mecc dataquest- the fifty states v1.0 (4am crack).dsk" size="143360" crc="2627bb27" sha1="b7330dfb679e684b51ce4239081212dd2c47f216"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcffaz10">
+		<description>MECC-A164 Fun from A to Z (Version 1.0) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Fun from A to Z" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a164 fun from a to z v1.0 (4am crack).dsk" size="143360" crc="2ea54e81" sha1="f109ed00e6296703ba41a7d04cd2633dbe8b72f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcelec10">
+		<description>MECC-A334 Electrifying Adventures (Version 1.0) (cleanly cracked)</description>
+		<year>1993</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-15"/>
+		<info name="programmer" value="Beth Bell, Ruth Kivisto, Patricia Korn, and David Wood"/>
+		<!--"Electrifying Adventures" is a 1993 educational program developed by Beth Bell, Ruth Kivisto, Patricia Korn, and David Wood, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a334 electrifying adventures v1.0 (4am crack).dsk" size="143360" crc="151f6186" sha1="c5f6e090f6d9137291c7e94e3161a5b24b3ecadf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccncr10">
+		<description>MECC-A165 Counting Critters (Version 1.0) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Counting Critters" is a 1985 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a165 counting critters v1.0 (4am crack).dsk" size="143360" crc="e9f68839" sha1="cc7b3b89807c6e1d5afe803b92d37ba8cb620f4b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcarcr10">
+		<description>MECC-A166 Arithmetic Critters (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Arithmetic Critters" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a166 arithmetic critters v1.0 (4am crack).dsk" size="143360" crc="d0385057" sha1="57132c71d767a4ac40fc504b9e6eaabc7880cb48"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcqfl10">
+		<description>MECC-A167 Quickflash (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Quickflash" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a167 quickflash v1.0 (4am crack).dsk" size="143360" crc="d8e44581" sha1="3d7d00f57b770a8bef98dcb2ca59af3f7b383071"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcclw10">
+		<description>MECC-A168 Clock Works (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Clock Works" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a168 clock works v1.0 (4am crack).dsk" size="143360" crc="b57ae582" sha1="e258e8d1ff008f58bc50f792a554098f0c5f2e2a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsmth10">
+		<description>MECC-A169 Speedway Math (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Speedway Math" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a169 speedway math v1.0 (4am crack).dsk" size="143360" crc="cff8d1bc" sha1="4ef56187addf57e9cf0b52b3dc564772859501e8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcnmm10">
+		<description>MECC-A170 Number Munchers (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Number Munchers" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a170 number munchers v1.0 (4am crack).dsk" size="143360" crc="10d98d5f" sha1="f2013bcb35421a65c92922c6a92827f66f9b41a5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcnmm13">
+		<description>MECC-A170 Number Munchers (Version 1.3) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Number Munchers" is a 1986 educational program developed and distributed by MECC. This is version 1.3.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a170 number munchers v1.3 (4am crack).dsk" size="143360" crc="11a34694" sha1="11b6be5fb5a6df08982007e76c53ee8bec35e20e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcstm10">
+		<description>MECC-A171 Show Time (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Show Time" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a171 show time v1.0 (4am crack) side a.dsk" size="143360" crc="1c583497" sha1="174b119b8bc59b68e8f6fd7660f3e5f25d2dfef2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a171 show time v1.0 (4am crack) side b.dsk" size="143360" crc="13965064" sha1="212c55f763a36b2b0c1d8bf370a19940c4c0a2e5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcstm11">
+		<description>MECC-A171 Show Time (Version 1.1) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Show Time" is a 1986 educational program developed and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a171 show time v1.1 (4am crack) side a.dsk" size="143360" crc="944e21ef" sha1="830af0e0504d0f5cd124e3b2a830b34a8032939c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a171 show time v1.1 (4am crack) side b.dsk" size="143360" crc="0865208a" sha1="c018c0b3a21fc54ee20e4995e8fdac225ede87ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcdqc10">
+		<description>MECC-A172 MECC Dataquest Composer (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"MECC Dataquest Composer" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a172 mecc dataquest composer v1.0 (4am crack).dsk" size="143360" crc="c11e1562" sha1="bf87e04bc6e07c2c5989b7c011b0fb5a72742191"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcama10">
+		<description>MECC-A336 Amazing Arithmetricks (Version 1.0) (cleanly cracked)</description>
+		<year>1993</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-15"/>
+		<info name="programmer" value="Diane Portner, Korey Schulz, Ju-Chang Wang, John P. Wlazlo, and Shari Zehm"/>
+		<!--"Amazing Arithmetricks" is a 1993 educational program developed by Diane Portner, Korey Schulz, Ju-Chang Wang, John P. Wlazlo, and Shari Zehm, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a336 amazing arithmetricks v1.0 (4am crack).dsk" size="143360" crc="86a050a0" sha1="f409ec335fb0a6a42d3086ab3b49794dd0bc0a7c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mpptic10">
+		<description>MECC-A175 Phonics Prime Time: Initial Consonants (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Phonics Prime Time: Initial Consonants" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a175 phonics prime time- initial consonants v1.0 (4am crack).dsk" size="143360" crc="f7d81538" sha1="9ec7142ce5cc89ec8b21cb87ac5346cba81c7efb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mpptfc10">
+		<description>MECC-A176 Phonics Prime Time: Final Consonants (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Phonics Prime Time: Final Consonants" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a176 phonics prime time- final consonants v1.0 (4am crack).dsk" size="143360" crc="caa2ac11" sha1="03ef069a1f56e3f77c52b7a91c01207192a0cf2a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mpptv110">
+		<description>MECC-A177 Phonics Prime Time: Vowels I (Version 1.0) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Phonics Prime Time: Vowels I" is a 1987 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a177 phonics prime time- vowels i v1.0 (4am crack).dsk" size="143360" crc="c6eba371" sha1="ce860d36fc2fcca9e3e6e8a2aef5f14f958a15b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mpptv210">
+		<description>MECC-A178 Phonics Prime Time: Vowels II (Version 1.0) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Phonics Prime Time: Vowels II" is a 1987 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a178 phonics prime time- vowels ii v1.0 (4am crack).dsk" size="143360" crc="c629df4f" sha1="91f743d3e188de5a9b3575cf11f06fcceb9aeb58"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mpptbd10">
+		<description>MECC-A179 Phonics Prime Time: Blends and Digraphs (Version 1.0) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Phonics Prime Time: Blends and Digraphs" is a 1987 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a179 phonics prime time- blends and digraphs v1.0 (4am crack).dsk" size="143360" crc="66cb41e3" sha1="2581a00550bdb9bd856ddfe25de183538c0a80ee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mwawca10">
+		<description>MECC-A180 Words at Work: Contraction Action (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Words at Work: Contraction Action" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a180 words at work- contraction action v1.0 (4am crack).dsk" size="143360" crc="ba34b024" sha1="e89aefdf4a8f9e05f107026cc168364de1c68a60"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mwawpp10">
+		<description>MECC-A181 Words at Work: Prefix Power (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Words at Work: Prefix Power" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a181 words at work- prefix power v1.0 (4am crack).dsk" size="143360" crc="83dfe3ba" sha1="5be548e4055e7db9ac5d927b2783f0e093d7500a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mwawss10">
+		<description>MECC-A182 Words at Work: Suffix Sense (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Words at Work: Suffix Sense" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a182 words at work- suffix sense v1.0 (4am crack).dsk" size="143360" crc="92e3f1b4" sha1="f2aa869c3485b0ff83ebb96ebb92b12ad9d9d5d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mwawci10">
+		<description>MECC-A183 Words at Work: Compound It (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Words at Work: Compound It" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a183 words at work- compound it v1.0 (4am crack).dsk" size="143360" crc="d04c4112" sha1="8c2053ed56f1d8d5a0da966755126f86688cdf4c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mtarm110">
+		<description>MECC-A185 Those Amazing Reading Machines (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Those Amazing Reading Machines I" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a185 those amazing reading machines i v1.0 (4am crack).dsk" size="143360" crc="dcf4433b" sha1="cf1c219b1aa2bd83807c10e4a921369e4e1dc921"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mctfs10">
+		<description>MECC-A337 Treasures for Sale (Version 1.0) (cleanly cracked)</description>
+		<year>1993</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-15"/>
+		<info name="programmer" value="Lon Koenig, John A. Persoon, Jean Sharp, John Wlazlo, and David L. Wood"/>
+		<!--"Treasures for Sale" is a 1993 educational program developed by Lon Koenig, John A. Persoon, Jean Sharp, John Wlazlo, and David L. Wood, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a337 treasures for sale v1.0 (4am crack).dsk" size="143360" crc="93303a05" sha1="b977e56e509cdb719324356eead3c3856c472e8b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mtarm210">
+		<description>MECC-A186 Those Amazing Reading Machines II (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Those Amazing Reading Machines II" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a186 those amazing reading machines ii v1.0 (4am crack).dsk" size="143360" crc="db6a9744" sha1="6a554f00f4f25a4c35aafee73c8a5bb02b200733"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mtarm310">
+		<description>MECC-A187 Those Amazing Reading Machines III (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Those Amazing Reading Machines III" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a187 those amazing reading machines iii v1.0 (4am crack).dsk" size="143360" crc="aaf9cc01" sha1="a6715a6d1958c3f10d3e079168b8eaea1b8da716"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mtarm410">
+		<description>MECC-A188 Those Amazing Reading Machines IV (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-02"/>
+		<!--"Those Amazing Reading Machines IV" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a188 those amazing reading machines iv v1.0 (4am crack).dsk" size="143360" crc="aead822c" sha1="7d0ee74ec2471fb56cd284c07a6d254528e6b015"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcodl10">
+		<description>MECC-A191 Odell Lake (Version 1.0) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-03"/>
+		<!--"Odell Lake" is a 1986 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a191 odell lake v1.0 (4am crack).dsk" size="143360" crc="60b1b4e8" sha1="137dc71b9e7547a1d763303948efde8540d3fe83"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcodl12">
+		<description>MECC-A191 Odell Lake (Version 1.2) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-03"/>
+		<!--"Odell Lake" is a 1986 educational program developed and distributed by MECC. This is version 1.2.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a191 odell lake v1.2 (4am crack).dsk" size="143360" crc="f3a5b62a" sha1="b2ce3a070cc2c7d2f95ee0cca16f5a13c41d8cbc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcdcm10">
+		<description>MECC-A192 Coordinate Math (Version 1.0) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-03"/>
+		<!--"Coordinate Math" is a 1987 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a192 coordinate math v1.0 (4am crack).dsk" size="143360" crc="ab3c16b4" sha1="7850ae1577349eebed6e4df60983aa9ed405eb98"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcdcm11">
+		<description>MECC-A192 Coordinate Math (Version 1.1) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-03"/>
+		<!--"Coordinate Math" is a 1987 educational program developed and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a192 coordinate math v1.1 (4am crack).dsk" size="143360" crc="59a4788e" sha1="96d11c63f4cf339a745d9db2a34a431154d65656"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mceqm10">
+		<description>MECC-A193 Equation Math (Version 1.0) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-03"/>
+		<!--"Equation Math" is a 1987 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a193 equation math v1.0 (4am crack).dsk" size="143360" crc="c1a96955" sha1="7cda6fe3b4d33bb02337f7201fefd69286098438"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mceqm11">
+		<description>MECC-A193 Equation Math (Version 1.1) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-03"/>
+		<!--"Equation Math" is a 1987 educational program developed and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a193 equation math v1.1 (4am crack).dsk" size="143360" crc="69ed6482" sha1="aba2803bba4451d1e53e61d836777f6c9550ac70"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmnwk10">
+		<description>MECC-A195 Money Works (Version 1.0) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-03"/>
+		<!--"Money Works" is a 1987 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a195 money works v1.0 (4am crack).dsk" size="143360" crc="0f93a058" sha1="f211e681c9cfcd81d262fd99d437f7d7f32afc9e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccryp10">
+		<description>MECC-A340 CryptoQuest (Version 1.0) (cleanly cracked)</description>
+		<year>1993</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-15"/>
+		<info name="programmer" value="Mark Durkin, Rod Haenke, Ruth Kivisto, and Mike Tschimperle"/>
+		<!--"CryptoQuest" is a 1993 educational program developed by Mark Durkin, Rod Haenke, Ruth Kivisto, and Mike Tschimperle, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a340 cryptoquest v1.0 (4am crack).dsk" size="143360" crc="e1e0ee4c" sha1="8a1208de5738887117d7fdbad10cd901a3ed2593"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmnwk11">
+		<description>MECC-A195 Money Works (Version 1.1) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-03"/>
+		<!--"Money Works" is a 1987 educational program developed and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a195 money works v1.1 (4am crack).dsk" size="143360" crc="ffaba004" sha1="ea8875494a3cf1401ea16228491a4dedeead3058"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcfrmn10">
+		<description>MECC-A196 Fraction Munchers (Version 1.0) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-03"/>
+		<!--"Fraction Munchers" is a 1987 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a196 fraction munchers v1.0 (4am crack).dsk" size="143360" crc="9b6f2ac6" sha1="22b5a361b1c3b3622790c283359178ce42e0dab6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mctppd11">
+		<description>MECC-A198 To Preserve, Protect and Defend (Version 1.1) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-03"/>
+		<!--"To Preserve, Protect and Defend" is a 1987 educational program developed and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a198 to preserve, protect and defend v1.1 (4am crack).dsk" size="143360" crc="7ffba023" sha1="29e318b73420c11020a84d46f021e7e18a45189b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mczoyp10">
+		<description>MECC-A199 Zoyon Patrol (Version 1.0) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-03"/>
+		<!--"Zoyon Patrol" is a 1987 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a199 zoyon patrol v1.0 (4am crack) side a.dsk" size="143360" crc="c8ba3979" sha1="cf91a1c7ac485f435818ee4aef66fd7f9278f868"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a199 zoyon patrol v1.0 (4am crack) side b.dsk" size="143360" crc="5a5c18b8" sha1="62428a2d91a99052002afcfa92d28cf7977ba58d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccwn10">
+		<description>MECC-A201 Conquering Whole Numbers (Version 1.0) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-04"/>
+		<!--"Conquering Whole Numbers" is a 1987 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a201 conquering whole numbers v1.0 (4am crack).dsk" size="143360" crc="6c5389e1" sha1="6b2a1d95ebaab8b4415777c3e9413c63b6895251"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccwn11">
+		<description>MECC-A201 Conquering Whole Numbers (Version 1.1) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-04"/>
+		<!--"Conquering Whole Numbers" is a 1987 educational program developed and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a201 conquering whole numbers v1.1 (4am crack).dsk" size="143360" crc="80855ab5" sha1="d161a71e5d93120d49fc7ca11b56c03478fda6e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcfrcc10">
+		<description>MECC-A202 Fraction Concepts, Inc. (Version 1.0) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-04"/>
+		<!--"Fraction Concepts, Inc." is a 1987 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a202 fraction concepts, inc. v1.0 (4am crack).dsk" size="143360" crc="e3748d43" sha1="c75c33d534c8f473a4d386b80c7a72e9039bba9d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcfrcc12">
+		<description>MECC-A202 Fraction Concepts, Inc. (Version 1.2) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-04"/>
+		<!--"Fraction Concepts, Inc." is a 1987 educational program developed and distributed by MECC. This is version 1.2.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a202 fraction concepts inc. v1.2 (4am crack).dsk" size="143360" crc="76c2a51c" sha1="df7315d2f599144ff29961b7de304e459b29c536"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcfpu10">
+		<description>MECC-A203 Fraction Practice Unlimited (Version 1.0) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-04"/>
+		<!--"Fraction Practice Unlimited" is a 1987 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a203 fraction practice unlimited v1.0 (4am crack).dsk" size="143360" crc="7be3f9b2" sha1="e0eac67a6fde37dc74a9ecf53f8f8565966c9ba4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcfpu11">
+		<description>MECC-A203 Fraction Practice Unlimited (Version 1.1) (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-04"/>
+		<!--"Fraction Practice Unlimited" is a 1987 educational program developed and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a203 fraction practice unlimited v1.1 (4am crack).dsk" size="143360" crc="42f712da" sha1="3c16468095aa4448e0447a816ee194cf54eb04a0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmthr10">
+		<description>MECC-A712 Music Theory: Music Fundamentals (Version 1.0) (cleanly cracked)</description>
+		<year>1979</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-25"/>
+		<!--"Music Theory: Music Fundamentals" is a 1979 educational program developed by Linda Borry and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a712 apple music theory- music fundamentals v1.0 (4am crack).dsk" size="143360" crc="e0dbc805" sha1="d793b38c12b27e5ec5d360be54fd5c38b8c23f5c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcev5p15">
+		<description>MECC-A719 Elementary Volume 5: Language Arts: Prefixes (Version 1.5) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-25"/>
+		<!--"Elementary Volume 5: Language Arts: Prefixes" is a 1980 educational program developed and distributed by MECC. This is version 1.5.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a719 elementary volume 5- language arts- prefixes v1.5 (4am crack).dsk" size="143360" crc="9f0e8279" sha1="4358a6da33df2c7623c4c3a63461a77ce618aec7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcev5p17">
+		<description>MECC-A719 Elementary Volume 5: Language Arts: Prefixes (Version 1.7) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-25"/>
+		<!--"Elementary Volume 5: Language Arts: Prefixes" is a 1980 educational program developed and distributed by MECC. This is version 1.7.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a719 elementary volume 5- language arts- prefixes v1.7 (4am crack).dsk" size="143360" crc="6a72201c" sha1="c28569f55b122bf54bec1d08146ce4ea0da8be74"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcbv3a18">
+		<description>MECC-A721 Business Volume 3: Accounting (Version 1.8) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-25"/>
+		<!--"Business Volume 3: Accounting" is a 1981 educational program developed by R. Philip Bouchard and distributed by MECC. This is version 1.8.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a721 business volume 3 - accounting v1.8 (4am crack).dsk" size="143360" crc="171e6e38" sha1="981b78b289bdc87717e72a6e04d49edff9f777b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsv1p20">
+		<description>MECC-A726 Spelling Volume 1: Primary (Version 2.0) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-25"/>
+		<!--"Spelling Volume 1: Primary" is a 1980 educational program developed and distributed by MECC. This is version 2.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a726 spelling volume 1- primary v2.0 (4am crack).dsk" size="143360" crc="0b75f4e8" sha1="75b0ac33e13209b7db7c248184642ea4f629a340"/>
 			</dataarea>
 		</part>
 	</software>
