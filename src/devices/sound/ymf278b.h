@@ -107,6 +107,8 @@ private:
 	int32_t m_fm_l, m_fm_r;
 	int32_t m_pcm_l, m_pcm_r;
 
+	uint32_t m_fm_pos;
+
 	uint8_t m_port_C, m_port_AB, m_lastport;
 	bool m_next_status_id;
 

@@ -57,6 +57,18 @@
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
+// Using the nominal datasheet frequency of 33.868MHz, the output of
+// the chip will be clock/768 = 44.1kHz. However, the FM engine is
+// clocked internally at clock/(19*36), or 49.515kHz, so the FM output
+// needs to be downsampled. The calculations below produce the fractional
+// number of extra FM samples we need to consume for each output sample,
+// as a 0.24 fixed point fraction.
+static constexpr double NOMINAL_CLOCK = 33868800;
+static constexpr double NOMINAL_FM_RATE = NOMINAL_CLOCK / double(ymopl4_registers::DEFAULT_PRESCALE * ymopl4_registers::OPERATORS);
+static constexpr double NOMINAL_OUTPUT_RATE = NOMINAL_CLOCK / 768.0;
+static constexpr uint32_t FM_STEP = uint32_t((NOMINAL_FM_RATE / NOMINAL_OUTPUT_RATE - 1.0) * double(1 << 24));
+
+
 /**************************************************************************/
 
 int ymf278b_device::compute_rate(YMF278BSlot *slot, int val)
@@ -308,12 +320,23 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	stream_buffer::sample_t fmr = stream_buffer::sample_t(m_mix_level[m_fm_r]) / (65536.0f * 32768.0f);
 	for (i = 0; i < outputs[0].samples(); i++)
 	{
+		// the FM_STEP value is the fractional number of extra samples consumed per
+		// output sample; when this overflows, we need to clock the FM engine an
+		// extra time; since the PCM side of the chip doesn't do interpolation, I'm
+		// assuming this resampling stage doesn't either
+		m_fm_pos += FM_STEP;
+		if (BIT(m_fm_pos, 24))
+		{
+			m_fm.clock(fm_engine::ALL_CHANNELS);
+			m_fm_pos &= 0xffffff;
+		}
+
 		// clock the system
 		m_fm.clock(fm_engine::ALL_CHANNELS);
 
 		// update the FM content; clipping is unknown
 		s32 sums[fm_engine::OUTPUTS] = { 0 };
-		m_fm.output(sums, 0, 32767, fm_engine::ALL_CHANNELS);
+		m_fm.output(sums, 1, 32767, fm_engine::ALL_CHANNELS);
 
 		// DO2 output: mixed FM channels 0+1 and wavetable channels 0+1
 		outputs[0].put(i, stream_buffer::sample_t(*mixp++) * wtl + stream_buffer::sample_t(sums[0]) * fml);
@@ -757,6 +780,7 @@ void ymf278b_device::device_clock_changed()
 	int old_rate = m_rate;
 	m_clock = clock();
 	m_rate = m_clock/768;
+	m_fm_pos = 0;
 
 	if (m_rate > old_rate)
 	{
@@ -807,6 +831,7 @@ void ymf278b_device::register_save_state()
 	save_item(NAME(m_memadr));
 	save_item(NAME(m_fm_l));
 	save_item(NAME(m_fm_r));
+	save_item(NAME(m_fm_pos));
 	save_item(NAME(m_pcm_l));
 	save_item(NAME(m_pcm_r));
 	save_item(NAME(m_port_AB));
@@ -864,6 +889,7 @@ void ymf278b_device::device_start()
 
 	m_clock = clock();
 	m_rate = m_clock / 768;
+	m_fm_pos = 0;
 
 	m_timer_busy = timer_alloc(TIMER_BUSY_CLEAR);
 	m_timer_ld = timer_alloc(TIMER_LD_CLEAR);
