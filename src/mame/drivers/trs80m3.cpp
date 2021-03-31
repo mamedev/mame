@@ -59,12 +59,10 @@ To Do / Status:
 
 trs80m3:   works
            MT 07903 - most floppies no longer boot
-           CAS handler doesn't support 1500 baud
 
 trs80m4:   works
            will boot model 3 floppies, but not model 4 ones
            MT 07903 - most floppies no longer boot
-           CAS handler doesn't support 1500 baud
 
 trs80m4p:  floppy not working, so machine is useless
 

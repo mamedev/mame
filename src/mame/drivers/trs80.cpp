@@ -152,6 +152,7 @@ lnw80:     works
            find out if it really did support 32-cpl mode or not
            hi-res and colour are coded but do not work
            investigate expansion-box
+           none of my collection of lnw80-specific floppies will work; some crash MAME
 
 2021-03-26 MT 07903 - most floppies no longer boot.
            Most machines have problems loading real tapes.
