@@ -1505,45 +1505,48 @@ void ymopl_registers_base<Revision>::reset()
 template<int Revision>
 void ymopl_registers_base<Revision>::operator_map(operator_mapping &dest) const
 {
-	static const operator_mapping s_fixed_map =
-	{ {
-		operator_list(  0,  3 ),  // Channel 0 operators
-		operator_list(  1,  4 ),  // Channel 1 operators
-		operator_list(  2,  5 ),  // Channel 2 operators
-		operator_list(  6,  9 ),  // Channel 3 operators
-		operator_list(  7, 10 ),  // Channel 4 operators
-		operator_list(  8, 11 ),  // Channel 5 operators
-		operator_list( 12, 15 ),  // Channel 6 operators
-		operator_list( 13, 16 ),  // Channel 7 operators
-		operator_list( 14, 17 ),  // Channel 8 operators
-	} };
-	dest = s_fixed_map;
-}
+	if (Revision <= 2)
+	{
+		// OPL/OPL2 has a fixed map, all 2 operators
+		static const operator_mapping s_fixed_map =
+		{ {
+			operator_list(  0,  3 ),  // Channel 0 operators
+			operator_list(  1,  4 ),  // Channel 1 operators
+			operator_list(  2,  5 ),  // Channel 2 operators
+			operator_list(  6,  9 ),  // Channel 3 operators
+			operator_list(  7, 10 ),  // Channel 4 operators
+			operator_list(  8, 11 ),  // Channel 5 operators
+			operator_list( 12, 15 ),  // Channel 6 operators
+			operator_list( 13, 16 ),  // Channel 7 operators
+			operator_list( 14, 17 ),  // Channel 8 operators
+		} };
+		dest = s_fixed_map;
+	}
+	else
+	{
+		// OPL3/OPL4 can be configured for 2 or 4 operators
+		u32 fourop = fourop_enable();
 
-template<>
-void ymopl_registers_base<3>::operator_map(operator_mapping &dest) const
-{
-	u32 fourop = fourop_enable();
+		dest.chan[ 0] = BIT(fourop, 0) ? operator_list(  0,  3,  6,  9 ) : operator_list(  0,  3 );
+		dest.chan[ 1] = BIT(fourop, 1) ? operator_list(  1,  4,  7, 10 ) : operator_list(  1,  4 );
+		dest.chan[ 2] = BIT(fourop, 2) ? operator_list(  2,  5,  8, 11 ) : operator_list(  2,  5 );
+		dest.chan[ 3] = BIT(fourop, 0) ? operator_list() : operator_list(  6,  9 );
+		dest.chan[ 4] = BIT(fourop, 1) ? operator_list() : operator_list(  7, 10 );
+		dest.chan[ 5] = BIT(fourop, 2) ? operator_list() : operator_list(  8, 11 );
+		dest.chan[ 6] = operator_list( 12, 15 );
+		dest.chan[ 7] = operator_list( 13, 16 );
+		dest.chan[ 8] = operator_list( 14, 17 );
 
-	dest.chan[ 0] = BIT(fourop, 0) ? operator_list(  0,  3,  6,  9 ) : operator_list(  0,  3 );
-	dest.chan[ 1] = BIT(fourop, 1) ? operator_list(  1,  4,  7, 10 ) : operator_list(  1,  4 );
-	dest.chan[ 2] = BIT(fourop, 2) ? operator_list(  2,  5,  8, 11 ) : operator_list(  2,  5 );
-	dest.chan[ 3] = BIT(fourop, 0) ? operator_list() : operator_list(  6,  9 );
-	dest.chan[ 4] = BIT(fourop, 1) ? operator_list() : operator_list(  7, 10 );
-	dest.chan[ 5] = BIT(fourop, 2) ? operator_list() : operator_list(  8, 11 );
-	dest.chan[ 6] = operator_list( 12, 15 );
-	dest.chan[ 7] = operator_list( 13, 16 );
-	dest.chan[ 8] = operator_list( 14, 17 );
-
-	dest.chan[ 9] = BIT(fourop, 3) ? operator_list( 18, 21, 24, 27 ) : operator_list( 18, 21 );
-	dest.chan[10] = BIT(fourop, 4) ? operator_list( 19, 22, 25, 28 ) : operator_list( 19, 22 );
-	dest.chan[11] = BIT(fourop, 5) ? operator_list( 20, 23, 26, 29 ) : operator_list( 20, 23 );
-	dest.chan[12] = BIT(fourop, 3) ? operator_list() : operator_list( 24, 27 );
-	dest.chan[13] = BIT(fourop, 4) ? operator_list() : operator_list( 25, 28 );
-	dest.chan[14] = BIT(fourop, 5) ? operator_list() : operator_list( 26, 29 );
-	dest.chan[15] = operator_list( 30, 33 );
-	dest.chan[16] = operator_list( 31, 34 );
-	dest.chan[17] = operator_list( 32, 35 );
+		dest.chan[ 9] = BIT(fourop, 3) ? operator_list( 18, 21, 24, 27 ) : operator_list( 18, 21 );
+		dest.chan[10] = BIT(fourop, 4) ? operator_list( 19, 22, 25, 28 ) : operator_list( 19, 22 );
+		dest.chan[11] = BIT(fourop, 5) ? operator_list( 20, 23, 26, 29 ) : operator_list( 20, 23 );
+		dest.chan[12] = BIT(fourop, 3) ? operator_list() : operator_list( 24, 27 );
+		dest.chan[13] = BIT(fourop, 4) ? operator_list() : operator_list( 25, 28 );
+		dest.chan[14] = BIT(fourop, 5) ? operator_list() : operator_list( 26, 29 );
+		dest.chan[15] = operator_list( 30, 33 );
+		dest.chan[16] = operator_list( 31, 34 );
+		dest.chan[17] = operator_list( 32, 35 );
+	}
 }
 
 
