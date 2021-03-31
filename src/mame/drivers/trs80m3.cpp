@@ -335,7 +335,7 @@ void trs80m3_state::floppy_formats(format_registration &fr)
 
 static void trs80_floppies(device_slot_interface &device)
 {
-	device.option_add("sssd", FLOPPY_525_QD);
+	device.option_add("sssd", FLOPPY_525_DD);
 }
 
 
