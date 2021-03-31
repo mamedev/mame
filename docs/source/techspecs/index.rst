@@ -20,3 +20,5 @@ MAME’s source or working on scripts that run within the MAME framework.
         luaengine
         luareference
         m6502
+        pc98_epson_error_codes
+        pc98_expansion_boards
