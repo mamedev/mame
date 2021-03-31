@@ -3261,3 +3261,4 @@ template class ymfm_engine_base<ymopl_registers>;
 template class ymfm_engine_base<ymopl2_registers>;
 template class ymfm_engine_base<ymopll_registers>;
 template class ymfm_engine_base<ymopl3_registers>;
+template class ymfm_engine_base<ymopl4_registers>;

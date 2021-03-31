@@ -708,6 +708,7 @@ class ymopl_registers_base : public ymfm_registers_base
 	static constexpr bool IsOpl2 = (Revision == 2);
 	static constexpr bool IsOpl2Plus = (Revision >= 2);
 	static constexpr bool IsOpl3Plus = (Revision >= 3);
+	static constexpr bool IsOpl4Plus = (Revision >= 4);
 
 public:
 	// constants
@@ -719,7 +720,7 @@ public:
 	static constexpr u32 WAVEFORMS = IsOpl3Plus ? 8 : (IsOpl2Plus ? 4 : 1);
 	static constexpr u32 REGISTERS = IsOpl3Plus ? 0x200 : 0x100;
 	static constexpr u32 REG_MODE = 0x04;
-	static constexpr u32 DEFAULT_PRESCALE = IsOpl3Plus ? 8 : 4;
+	static constexpr u32 DEFAULT_PRESCALE = IsOpl4Plus ? 19 : (IsOpl3Plus ? 8 : 4);
 	static constexpr u32 EG_CLOCK_DIVIDER = 1;
 	static constexpr bool EG_HAS_DEPRESS = false;
 	static constexpr bool EG_HAS_SSG = false;
@@ -762,6 +763,9 @@ public:
 	// return an array of operator indices for each channel
 	struct operator_mapping { u32 chan[CHANNELS]; };
 	void operator_map(operator_mapping &dest) const;
+
+	// OPL4 apparently can read back FM registers?
+	u8 read(u16 index) { return m_regdata[index]; }
 
 	// handle writes to the register array
 	bool write(u16 index, u8 data, u32 &chan, u32 &opmask);
@@ -808,7 +812,7 @@ public:
 	u32 rhythm_enable() const              { return byte(0xbd, 5, 1); }
 	u32 rhythm_keyon() const               { return byte(0xbd, 4, 0); }
 	u32 newflag() const                    { return IsOpl3Plus ? byte(0x105, 0, 1) : 0; }
-	u32 new2flag() const                   { return IsOpl3Plus ? byte(0x105, 1, 1) : 0; }
+	u32 new2flag() const                   { return IsOpl4Plus ? byte(0x105, 1, 1) : 0; }
 	u32 fourop_enable() const              { return IsOpl3Plus ? byte(0x104, 0, 6) : 0; }
 
 	// per-channel registers
@@ -866,6 +870,7 @@ protected:
 using ymopl_registers = ymopl_registers_base<1>;
 using ymopl2_registers = ymopl_registers_base<2>;
 using ymopl3_registers = ymopl_registers_base<3>;
+using ymopl4_registers = ymopl_registers_base<4>;
 
 
 // ======================> ymopll_registers
@@ -1223,9 +1228,6 @@ public:
 	// return a reference to our registers
 	RegisterType &regs() { return m_regs; }
 
-	// is this channel active?
-	bool active() const { return m_op1.active() || m_op2.active() || m_op3.active() || m_op4.active(); }
-
 private:
 	// helper to add values to the outputs based on channel enables
 	void add_to_output(u32 choffs, s32 *outputs, s32 value) const
@@ -1386,6 +1388,7 @@ using ymopna_engine = ymfm_engine_base<ymopna_registers>;
 using ymopl_engine = ymfm_engine_base<ymopl_registers>;
 using ymopl2_engine = ymfm_engine_base<ymopl2_registers>;
 using ymopl3_engine = ymfm_engine_base<ymopl3_registers>;
+using ymopl4_engine = ymfm_engine_base<ymopl4_registers>;
 
 
 // ======================> ymopll_engine

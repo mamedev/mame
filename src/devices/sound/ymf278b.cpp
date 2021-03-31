@@ -329,18 +329,8 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	}
 }
 
-void ymf278b_device::irq_check()
-{
-	int prev_line = m_irq_line;
-	m_irq_line = m_current_irq ? 1 : 0;
-	if (m_irq_line != prev_line && !m_irq_handler.isnull())
-		m_irq_handler(m_irq_line);
-}
-
 enum
 {
-	TIMER_A = 0,
-	TIMER_B,
 	TIMER_BUSY_CLEAR,
 	TIMER_LD_CLEAR
 };
@@ -349,119 +339,18 @@ void ymf278b_device::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	switch(id)
 	{
-	case TIMER_A:
-		if(!(m_enable & 0x40))
-		{
-			m_current_irq |= 0x40;
-			irq_check();
-		}
-		break;
-
-	case TIMER_B:
-		if(!(m_enable & 0x20))
-		{
-			m_current_irq |= 0x20;
-			irq_check();
-		}
-		break;
-
 	case TIMER_BUSY_CLEAR:
-		m_status_busy = 0;
+		m_fm.set_reset_status(0, STATUS_BUSY);
 		break;
 
 	case TIMER_LD_CLEAR:
-		m_status_ld = 0;
+		m_fm.set_reset_status(0, STATUS_LD);
 		break;
 	}
 }
 
 
 /**************************************************************************/
-
-void ymf278b_device::A_w(uint8_t reg, uint8_t data)
-{
-	// FM register array 0 (compatible with YMF262)
-	switch(reg)
-	{
-		// LSI TEST
-		case 0x00:
-		case 0x01:
-			break;
-
-		// timer a count
-		case 0x02:
-			if (data != m_timer_a_count)
-			{
-				m_timer_a_count = data;
-
-				// change period, ~80.8us * t
-				if (m_enable & 1)
-					m_timer_a->adjust(m_timer_a->remaining(), 0, m_timer_base * (256-data) * 4);
-			}
-			break;
-
-		// timer b count
-		case 0x03:
-			if (data != m_timer_b_count)
-			{
-				m_timer_b_count = data;
-
-				// change period, ~323.1us * t
-				if (m_enable & 2)
-					m_timer_b->adjust(m_timer_b->remaining(), 0, m_timer_base * (256-data) * 16);
-			}
-			break;
-
-		// timer control
-		case 0x04:
-			if(data & 0x80)
-				m_current_irq = 0;
-			else
-			{
-				// reset timers
-				if((m_enable ^ data) & 1)
-				{
-					attotime period = (data & 1) ? m_timer_base * (256-m_timer_a_count) * 4 : attotime::never;
-					m_timer_a->adjust(period, 0, period);
-				}
-				if((m_enable ^ data) & 2)
-				{
-					attotime period = (data & 2) ? m_timer_base * (256-m_timer_b_count) * 16 : attotime::never;
-					m_timer_b->adjust(period, 0, period);
-				}
-
-				m_enable = data;
-				m_current_irq &= ~data;
-			}
-			irq_check();
-			break;
-
-		default:
-			logerror("YMF278B:  Port A write %02x, %02x\n", reg, data);
-			break;
-	}
-}
-
-void ymf278b_device::B_w(uint8_t reg, uint8_t data)
-{
-	// FM register array 1 (compatible with YMF262)
-	switch(reg)
-	{
-		// LSI TEST
-		case 0x00:
-		case 0x01:
-			break;
-
-		// expansion register (NEW2/NEW)
-		case 0x05:
-			m_exp = data;
-			break;
-
-		default:
-			logerror("YMF278B:  Port B write %02x, %02x\n", reg, data);
-			break;
-	}
-}
 
 void ymf278b_device::retrigger_note(YMF278BSlot *slot)
 {
@@ -519,7 +408,7 @@ void ymf278b_device::C_w(uint8_t reg, uint8_t data)
 					C_w(8 + snum + (i-2) * 24, p[i]);
 
 				// status register LD bit is on for approx 300us
-				m_status_ld = 1;
+				m_fm.set_reset_status(STATUS_LD, 0);
 				period = clocks_to_attotime(10);
 				m_timer_ld->adjust(period);
 
@@ -693,28 +582,32 @@ void ymf278b_device::C_w(uint8_t reg, uint8_t data)
 void ymf278b_device::timer_busy_start(int is_pcm)
 {
 	// status register BUSY bit is on for 56(FM) or 88(PCM) cycles
-	m_status_busy = 1;
+	m_fm.set_reset_status(STATUS_BUSY, 0);
 	m_timer_busy->adjust(attotime::from_hz(m_clock / (is_pcm ? 88 : 56)));
 }
 
 void ymf278b_device::write(offs_t offset, u8 data)
 {
-	switch (offset)
+	uint32_t old;
+	switch (offset & 7)
 	{
 		case 0:
 		case 2:
 			timer_busy_start(0);
 			m_port_AB = data;
-			m_lastport = offset>>1 & 1;
+			m_lastport = BIT(offset, 1);
 			break;
 
 		case 1:
 		case 3:
 			timer_busy_start(0);
-			if (m_lastport) B_w(m_port_AB, data);
-			else A_w(m_port_AB, data);
-			m_last_fm_data = data;
+			old = m_fm.regs().new2flag();
 			m_fm.write(m_port_AB | (m_lastport << 8), data);
+
+			// if the new2 flag is turned on, the next status read will set bit 1
+			// but only for the first status read after new2 is set
+			if (old == 0 && m_fm.regs().new2flag() != 0)
+				m_next_status_id = true;
 			break;
 
 		case 4:
@@ -724,7 +617,7 @@ void ymf278b_device::write(offs_t offset, u8 data)
 
 		case 5:
 			// PCM regs are only accessible if NEW2 is set
-			if (~m_exp & 2)
+			if (!m_fm.regs().new2flag())
 				break;
 
 			m_stream->update();
@@ -744,32 +637,42 @@ u8 ymf278b_device::read(offs_t offset)
 {
 	uint8_t ret = 0;
 
-	switch (offset)
+	switch (offset & 7)
 	{
 		// status register
 		case 0:
-		{
-			// bits 0 and 1 are only valid if NEW2 is set
-			uint8_t newbits = 0;
-			if (m_exp & 2)
-				newbits = (m_status_ld << 1) | m_status_busy;
+			ret = m_fm.status();
 
-			ret = newbits | m_current_irq | (m_irq_line ? 0x80 : 0x00);
+			// if new2 flag is not set, we're in OPL2 or OPL3 mode
+			if (!m_fm.regs().new2flag())
+			{
+				// these bits are not reported in OPL2/3 mode
+				ret &= ~(STATUS_BUSY | STATUS_LD);
+
+				// if in OPL2 mode, bits 1 and 2 are returned on
+				if (!m_fm.regs().newflag())
+					ret |= 0x06;
+			}
+			else if (m_next_status_id)
+			{
+				// if new2 flag was just changed to on, then the next read will be 0x02
+				ret |= 0x02;
+				m_next_status_id = false;
+			}
 			break;
-		}
 
 		// FM regs can be read too (on contrary to what the datasheet says)
 		case 1:
 		case 3:
 			// but they're not implemented here yet
 			// This may be incorrect, but it makes the mbwave moonsound detection in msx drivers pass.
-			ret = m_last_fm_data;
+			ret = m_fm.regs().read(m_port_AB | (m_lastport << 8));
 			break;
 
 		// PCM regs
 		case 5:
 			// only accessible if NEW2 is set
-			if (~m_exp & 2)
+			if (!m_fm.regs().new2flag())
 				break;
 
 			switch (m_port_C)
@@ -809,9 +712,6 @@ void ymf278b_device::device_reset()
 	int i;
 
 	// clear registers
-	for (i = 0; i <= 4; i++)
-		A_w(i, 0);
-	B_w(5, 0);
 	for (i = 0; i < 8; i++)
 		C_w(i, 0);
 	for (i = 0xff; i >= 8; i--)
@@ -820,6 +720,7 @@ void ymf278b_device::device_reset()
 
 	m_port_AB = m_port_C = 0;
 	m_lastport = 0;
+	m_next_status_id = false;
 	m_memadr = 0;
 
 	// init/silence channels
@@ -845,15 +746,8 @@ void ymf278b_device::device_reset()
 		compute_envelope(slot);
 	}
 
-	m_timer_a->reset();
-	m_timer_b->reset();
-	m_timer_busy->reset();  m_status_busy = 0;
-	m_timer_ld->reset();    m_status_ld = 0;
-
-	m_irq_line = 0;
-	m_current_irq = 0;
-	if (!m_irq_handler.isnull())
-		m_irq_handler(0);
+	m_timer_busy->reset();
+	m_timer_ld->reset();
 
 	m_fm.reset();
 }
@@ -869,8 +763,6 @@ void ymf278b_device::device_clock_changed()
 		m_mix_buffer.resize(m_rate*4,0);
 	}
 	m_stream->set_sample_rate(m_rate);
-
-	m_timer_base = m_clock ? attotime::from_hz(m_clock) * (19 * 36) : attotime::zero;
 }
 
 void ymf278b_device::rom_bank_updated()
@@ -913,22 +805,14 @@ void ymf278b_device::register_save_state()
 	save_item(NAME(m_wavetblhdr));
 	save_item(NAME(m_memmode));
 	save_item(NAME(m_memadr));
-	save_item(NAME(m_status_busy));
-	save_item(NAME(m_status_ld));
-	save_item(NAME(m_exp));
 	save_item(NAME(m_fm_l));
 	save_item(NAME(m_fm_r));
 	save_item(NAME(m_pcm_l));
 	save_item(NAME(m_pcm_r));
-	save_item(NAME(m_timer_a_count));
-	save_item(NAME(m_timer_b_count));
-	save_item(NAME(m_enable));
-	save_item(NAME(m_current_irq));
-	save_item(NAME(m_irq_line));
 	save_item(NAME(m_port_AB));
 	save_item(NAME(m_port_C));
 	save_item(NAME(m_lastport));
-	save_item(NAME(m_last_fm_data));
+	save_item(NAME(m_next_status_id));
 
 	for (i = 0; i < 24; ++i)
 	{
@@ -980,11 +864,7 @@ void ymf278b_device::device_start()
 
 	m_clock = clock();
 	m_rate = m_clock / 768;
-	m_irq_handler.resolve();
 
-	m_timer_base = m_clock ? attotime::from_hz(m_clock) * (19*36) : attotime::zero;
-	m_timer_a = timer_alloc(TIMER_A);
-	m_timer_b = timer_alloc(TIMER_B);
 	m_timer_busy = timer_alloc(TIMER_BUSY_CLEAR);
 	m_timer_ld = timer_alloc(TIMER_LD_CLEAR);
 
@@ -1031,8 +911,6 @@ ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, YMF278B, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)
-	, m_irq_handler(*this)
-	, m_last_fm_data(0)
 	, m_fm(*this)
 {
 }
