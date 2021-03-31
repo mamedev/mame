@@ -9,41 +9,11 @@
 ---
 
 	Still to do:
-	- Move debug/suspend decisions into diexec fully
 	- Verify performance of calling through delegate ptr vs copying the delegate
 	- Rebuilding suspend/execute lists seems like it's doing a lot of work, consolidate?
 	- Test out save states
 	- Clean up timer devices
 	- Clean up more timers in devices/drivers
-	- Attotime tweaks:
-
-	   - Make ATTOTIME_MAX_SECONDS = (1 << 29)
-	   - Remove check at start of add
-	   - Is never could be (seconds >> 29) == 1
-	   - Is zero should check attoseconds first
-
-inline attotime operator+(const attotime &left, const attotime &right) noexcept
-{
-	attotime result;
-
-	// add the seconds and attoseconds
-	attoseconds_t attos = left.m_attoseconds + right.m_attoseconds;
-	seconds_t secs = left.m_seconds + right.m_seconds;
-
-	// normalize
-	attoseconds_t over = attos - ATTOSECONDS_PER_SECOND;
-	if (over >= 0)
-	{
-		attos = over;
-		secs += 1;
-	}
-
-	// overflow
-	if (secs >= ATTOTIME_MAX_SECONDS)
-		return attotime::never;
-
-	return attotime(secs, attos);
-}
 
 ***************************************************************************/
 
@@ -193,7 +163,6 @@ timer_callback &timer_callback::init_base(device_scheduler &scheduler, timer_exp
 		m_unique_id = fullid;
 		m_unique_hash = util::crc32_creator::simple(fullid.c_str(), fullid.length());
 		m_save_index = m_scheduler->register_callback(*this);
-printf("Registered: %d %08X %s\n", m_save_index, m_unique_hash, m_unique_id.c_str());
 	}
 
 	// otherwise, make sure we match
@@ -506,7 +475,8 @@ persistent_timer &persistent_timer::adjust(attotime const &start_delay, s32 para
 	// then insert into the active list, removing first if previously active
 	if (m_instance.active())
 		m_instance.remove();
-	m_instance.insert(start, expire);
+	if (!expire.is_never())
+		m_instance.insert(start, expire);
 
 	// mark as modified
 	m_modified = true;
@@ -777,6 +747,42 @@ device_scheduler::device_scheduler(running_machine &machine) :
 
 device_scheduler::~device_scheduler()
 {
+#if (COLLECT_SCHEDULER_STATS)
+	double seconds = m_basetime.as_double();
+	printf("%12.2f timeslice\n", m_timeslice / seconds);
+	printf("%12.2f    inner1 (%.2f avg)\n", m_timeslice_inner1 / seconds, (1.0 * m_timeslice_inner1) / m_timeslice);
+	printf("%12.2f    inner2 (%.2f avg)\n", m_timeslice_inner2 / seconds, (1.0 * m_timeslice_inner2) / m_timeslice_inner1);
+	printf("%12.2f    inner3 (%.2f avg)\n", m_timeslice_inner3 / seconds, (1.0 * m_timeslice_inner3) / m_timeslice_inner2);
+	printf("%12.2f execute_timers: (%.2f avg)\n", m_execute_timers / seconds, 1.0 * m_execute_timers_average / m_execute_timers);
+	printf("%12.2f    update_basetime\n", m_update_basetime / seconds);
+	printf("%12.2f    apply_suspend_changes\n", m_apply_suspend_changes / seconds);
+	printf("%12.2f compute_perfect_interleave\n", m_compute_perfect_interleave / seconds);
+	printf("%12.2f rebuild_execute_list\n", m_rebuild_execute_list / seconds);
+	printf("%12.2f add_scheduling_quantum\n", m_add_scheduling_quantum / seconds);
+	printf("%12.2f instance_alloc (%lld full)\n", m_instance_alloc / seconds, m_instance_alloc_full);
+	u64 total_insert = m_instance_insert_head + m_instance_insert_tail + m_instance_insert_middle;
+	printf("%12.2f instance_insert:\n", total_insert / seconds);
+	printf("%12.2f    head (%.2f%%)\n", m_instance_insert_head / seconds, (100.0 * m_instance_insert_head) / total_insert);
+	printf("%12.2f    tail (%.2f%%)\n", m_instance_insert_tail / seconds, (100.0 * m_instance_insert_tail) / total_insert);
+	printf("%12.2f    middle (%.2f%%, avg search = %.2f)\n", m_instance_insert_middle / seconds, (100.0 * m_instance_insert_middle) / total_insert, 1.0 * m_instance_insert_average / m_instance_insert_middle);
+	printf("%12.2f instance_remove\n", m_instance_remove / seconds);
+	printf("%12.2f empty_timer\n", m_empty_timer_calls / seconds);
+	printf("%12.2f timed_trigger\n", m_timed_trigger_calls / seconds);
+	printf("\ntimers:\n");
+
+	using cbptr = timer_callback *;
+	std::vector<cbptr> timers;
+	for (timer_callback *cb = m_registered_callbacks; cb != nullptr; cb = cb->m_next_registered)
+		if (cb->m_calls != 0)
+			timers.push_back(cb);
+	std::sort(timers.begin(), timers.end(),
+		[](cbptr const &a, cbptr const &b)
+		{
+			return (a->m_calls > b->m_calls);
+		});
+	for (auto &cb : timers)
+		printf("%12.2f %s\n", cb->m_calls / seconds, cb->m_unique_id.c_str());
+#endif
 }
 
 
@@ -824,11 +830,15 @@ bool device_scheduler::can_save() const
 
 void device_scheduler::timeslice(attoseconds_t minslice)
 {
-	// run up to the given number of attoseconds
+	INCREMENT_SCHEDULER_STAT(m_timeslice);
+
+	// run at least the given number of attoseconds
 	attoseconds_t basetime = m_basetime.attoseconds();
 	attoseconds_t endslice = basetime + minslice;
 	while (basetime < endslice)
 	{
+		INCREMENT_SCHEDULER_STAT(m_timeslice_inner1);
+
 		LOG("------------------\n");
 
 		// if the current quantum has expired, find a new one
@@ -838,6 +848,8 @@ void device_scheduler::timeslice(attoseconds_t minslice)
 		// loop until we hit the next timer
 		while (basetime < m_first_timer_expire.relative())
 		{
+			INCREMENT_SCHEDULER_STAT(m_timeslice_inner2);
+
 			// by default, assume our target is the end of the next quantum
 			attoseconds_t target = basetime + m_quantum_list.first()->m_actual;
 			assert(target < basetime_relative::MAX_RELATIVE);
@@ -855,6 +867,8 @@ void device_scheduler::timeslice(attoseconds_t minslice)
 			// loop over all executing devices
 			for (device_execute_interface *exec = m_execute_list; exec != nullptr; exec = exec->m_nextexec)
 			{
+				INCREMENT_SCHEDULER_STAT(m_timeslice_inner3);
+
 				// compute how many attoseconds to execute this device
 				attoseconds_t delta = target - exec->m_localtime.relative() - 1;
 				assert(delta < basetime_relative::MAX_RELATIVE);
@@ -1153,13 +1167,18 @@ inline void device_scheduler::execute_timers()
 {
 	LOG("execute_timers: new=%s head->expire=%s\n", m_basetime.as_string(PRECISION), m_first_timer_expire.absolute().as_string(PRECISION));
 
+	INCREMENT_SCHEDULER_STAT(m_execute_timers);
+
 	// now process any timers that are overdue; due to our never-expiring dummy
 	// instance, we don't need to check for nullptr on the head
 	while (m_active_timers_head->m_expire <= m_basetime)
 	{
-		// if this is a one-shot timer, disable it now
+		INCREMENT_SCHEDULER_STAT(m_execute_timers_average);
+
+		// pull the timer off the head of the queue
 		timer_instance &timer = *m_active_timers_head;
 		m_active_timers_head = timer.m_next;
+		m_active_timers_head->m_prev = nullptr;
 		timer.m_active = false;
 
 		// set the global state of which callback we're in
@@ -1198,6 +1217,8 @@ inline void device_scheduler::execute_timers()
 
 void device_scheduler::update_basetime()
 {
+	INCREMENT_SCHEDULER_STAT(m_update_basetime);
+
 	seconds_t base_seconds = m_basetime.seconds();
 
 	// update execute devices
@@ -1216,6 +1237,8 @@ void device_scheduler::update_basetime()
 
 void device_scheduler::compute_perfect_interleave()
 {
+	INCREMENT_SCHEDULER_STAT(m_compute_perfect_interleave);
+
 	// ensure we have a list of executing devices
 	if (UNEXPECTED(m_execute_list == nullptr))
 		rebuild_execute_list();
@@ -1260,6 +1283,8 @@ void device_scheduler::compute_perfect_interleave()
 
 void device_scheduler::rebuild_execute_list()
 {
+	INCREMENT_SCHEDULER_STAT(m_rebuild_execute_list);
+
 	// if we haven't yet set a scheduling quantum, do it now
 	if (m_quantum_list.empty())
 	{
@@ -1312,6 +1337,8 @@ void device_scheduler::rebuild_execute_list()
 
 inline void device_scheduler::apply_suspend_changes()
 {
+	INCREMENT_SCHEDULER_STAT(m_apply_suspend_changes);
+
 	// ensure we have a list of executing devices to work with
 	if (UNEXPECTED(m_execute_list == nullptr))
 		rebuild_execute_list();
@@ -1337,6 +1364,8 @@ inline void device_scheduler::apply_suspend_changes()
 
 void device_scheduler::add_scheduling_quantum(attotime const &quantum, attotime const &duration)
 {
+	INCREMENT_SCHEDULER_STAT(m_add_scheduling_quantum);
+
 	assert(quantum.seconds() == 0);
 
 	attotime curtime = time();
@@ -1382,6 +1411,8 @@ void device_scheduler::add_scheduling_quantum(attotime const &quantum, attotime 
 
 timer_instance &device_scheduler::instance_alloc()
 {
+	INCREMENT_SCHEDULER_STAT(m_instance_alloc);
+
 	// attempt to rescue one off the free list
 	timer_instance *instance = m_free_timers;
 	if (instance != nullptr)
@@ -1389,6 +1420,8 @@ timer_instance &device_scheduler::instance_alloc()
 		m_free_timers = instance->m_next;
 		return *instance;
 	}
+
+	INCREMENT_SCHEDULER_STAT(m_instance_alloc_full);
 
 	// if none, allocate a new one
 	m_allocated_instances.push_back(std::make_unique<timer_instance>());
@@ -1426,6 +1459,8 @@ inline timer_instance &device_scheduler::instance_insert(timer_instance &timer)
 	// expiring timer in the list, so no need to check for nullptr
 	if (timer.m_expire < m_active_timers_head->m_expire)
 	{
+		INCREMENT_SCHEDULER_STAT(m_instance_insert_head);
+
 		// no previous, next is the head
 		timer.m_prev = nullptr;
 		timer.m_next = m_active_timers_head;
@@ -1443,6 +1478,8 @@ inline timer_instance &device_scheduler::instance_insert(timer_instance &timer)
 	// that there's at least one timer before the permanent tail
 	if (timer.m_expire >= m_active_timers_tail.m_prev->m_expire)
 	{
+		INCREMENT_SCHEDULER_STAT(m_instance_insert_tail);
+
 		// hook us up in front of the tail
 		timer.m_prev = m_active_timers_tail.m_prev;
 		timer.m_next = &m_active_timers_tail;
@@ -1452,8 +1489,12 @@ inline timer_instance &device_scheduler::instance_insert(timer_instance &timer)
 		return timer;
 	}
 
+	INCREMENT_SCHEDULER_STAT(m_instance_insert_middle);
+
 	// scan to find out where we go
 	for (timer_instance *scan = m_active_timers_head->m_next; scan != nullptr; scan = scan->m_next)
+	{
+		INCREMENT_SCHEDULER_STAT(m_instance_insert_average);
 		if (timer.m_expire < scan->m_expire)
 		{
 			timer.m_prev = scan->m_prev;
@@ -1463,6 +1504,7 @@ inline timer_instance &device_scheduler::instance_insert(timer_instance &timer)
 			// no need to recompute if changing a later timer
 			return timer;
 		}
+	}
 
 	// should never get here
 	return timer;
@@ -1476,6 +1518,8 @@ inline timer_instance &device_scheduler::instance_insert(timer_instance &timer)
 
 inline timer_instance &device_scheduler::instance_remove(timer_instance &timer)
 {
+	INCREMENT_SCHEDULER_STAT(m_instance_remove);
+
 	// link the previous to us; if no previous, we're the head
 	if (timer.m_prev != nullptr)
 		timer.m_prev->m_next = timer.m_next;
@@ -1500,6 +1544,7 @@ inline timer_instance &device_scheduler::instance_remove(timer_instance &timer)
 
 void device_scheduler::empty_timer(timer_instance const &timer)
 {
+	INCREMENT_SCHEDULER_STAT(m_empty_timer_calls);
 }
 
 
@@ -1510,6 +1555,7 @@ void device_scheduler::empty_timer(timer_instance const &timer)
 
 void device_scheduler::timed_trigger(timer_instance const &timer)
 {
+	INCREMENT_SCHEDULER_STAT(m_timed_trigger_calls);
 	trigger(timer.param());
 }
 

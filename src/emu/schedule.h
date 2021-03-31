@@ -22,6 +22,13 @@
 //  MACROS
 //**************************************************************************
 
+#define COLLECT_SCHEDULER_STATS (1)
+#if (COLLECT_SCHEDULER_STATS)
+#define INCREMENT_SCHEDULER_STAT(x) do { x += 1; } while (0)
+#else
+#define INCREMENT_SCHEDULER_STAT(x)
+#endif
+
 #define TIMER_CALLBACK_MEMBER(name)     void name(void *ptr, s32 param)
 
 
@@ -213,7 +220,7 @@ public:
 	timer_callback &operator=(timer_callback const &src);
 
 	// calling operator
-	void operator()(timer_instance const &timer) { m_delegate(timer); }
+	void operator()(timer_instance const &timer) { INCREMENT_SCHEDULER_STAT(m_calls); m_delegate(timer); }
 
 	// registration of a delegate directly
 	timer_callback &init(device_scheduler &scheduler, timer_expired_delegate const &delegate, char const *unique = nullptr, char const *unique2 = nullptr)
@@ -273,6 +280,9 @@ private:
 	device_t *m_device;                 // pointer to device, for debugging/logging
 	u32 m_unique_hash;                  // hash of the unique ID
 	u32 m_save_index;                   // index for saving
+#if (COLLECT_SCHEDULER_STATS)
+	u64 m_calls = 0;                    // number of calls made
+#endif
 	std::string m_unique_id;            // a unique ID string
 };
 
@@ -607,7 +617,30 @@ private:
 	timer_instance *            m_callback_timer;           // pointer to the current callback timer
 	attotime                    m_callback_timer_expire_time; // the original expiration time
 	bool                        m_suspend_changes_pending;  // suspend/resume changes are pending
-	timer_instance_save         m_timer_save[MAX_SAVE_INSTANCES]; // state saving area
+
+	// statistics
+#if (COLLECT_SCHEDULER_STATS)
+	u64                         m_timeslice = 0;
+	u64                         m_timeslice_inner1 = 0;
+	u64                         m_timeslice_inner2 = 0;
+	u64                         m_timeslice_inner3 = 0;
+	u64                         m_execute_timers = 0;
+	u64                         m_execute_timers_average = 0;
+	u64                         m_update_basetime = 0;
+	u64                         m_compute_perfect_interleave = 0;
+	u64                         m_rebuild_execute_list = 0;
+	u64                         m_apply_suspend_changes = 0;
+	u64                         m_add_scheduling_quantum = 0;
+	u64                         m_instance_alloc = 0;
+	u64                         m_instance_alloc_full = 0;
+	u64                         m_instance_insert_head = 0;
+	u64                         m_instance_insert_tail = 0;
+	u64                         m_instance_insert_middle = 0;
+	u64                         m_instance_insert_average = 0;
+	u64                         m_instance_remove = 0;
+	u64                         m_empty_timer_calls = 0;
+	u64                         m_timed_trigger_calls = 0;
+#endif
 
 	// scheduling quanta
 	class quantum_slot
@@ -625,6 +658,9 @@ private:
 	simple_list<quantum_slot>   m_quantum_list;             // list of active quanta
 	fixed_allocator<quantum_slot> m_quantum_allocator;      // allocator for quanta
 	attoseconds_t               m_quantum_minimum;          // duration of minimum quantum
+
+	// put this at the end since it's big
+	timer_instance_save         m_timer_save[MAX_SAVE_INSTANCES]; // state saving area
 };
 
 
