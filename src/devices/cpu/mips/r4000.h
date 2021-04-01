@@ -17,7 +17,7 @@ public:
 	enum config_mask : u32
 	{
 		CONFIG_K0 = 0x00000007, // kseg0 cache coherency
-		CONFIG_CU = 0x00000080, // store conditional cache coherent
+		CONFIG_CU = 0x00000008, // store conditional cache coherent
 		CONFIG_DB = 0x00000010, // primary d-cache line 32 bytes
 		CONFIG_IB = 0x00000020, // primary i-cache line 32 bytes
 		CONFIG_DC = 0x000001c0, // primary d-cache size
@@ -388,8 +388,8 @@ protected:
 	address_space_config m_program_config_be;
 
 	// memory access helpers
-	memory_access<64, 3, 0, ENDIANNESS_LITTLE>::cache m_le;
-	memory_access<64, 3, 0, ENDIANNESS_BIG>::cache m_be;
+	memory_access<36, 3, 0, ENDIANNESS_LITTLE>::cache m_le;
+	memory_access<36, 3, 0, ENDIANNESS_BIG>::cache m_be;
 
 	std::function<u8(offs_t offset)> read_byte;
 	std::function<u16(offs_t offset)> read_word;
