@@ -19800,6 +19800,9 @@ llc2                            //
 @source:lms46.cpp
 lms46                           //
 
+@source:lnw80.cpp
+lnw80                           // LNW Research LNW-80
+
 @source:lockon.cpp
 lockon                          // (c) 1986 Tatsumi
 lockonc                         // (c) 1986 Tatsumi
@@ -41064,7 +41067,6 @@ shtscore
 ht108064                        // Hradstechnika Szvetkezet HT-1080Z/64
 ht1080z                         // Hradstechnika Szvetkezet HT-1080Z
 ht1080z2                        // Hradstechnika Szvetkezet HT-1080Z Series II
-lnw80                           // LNW Research LNW-80
 radionic                        // Radionic
 sys80                           // EACA System 80
 sys80p                          // EACA System 80

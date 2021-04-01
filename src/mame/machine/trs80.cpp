@@ -135,11 +135,6 @@ uint8_t trs80_state::sys80_f9_r()
 	return data;
 }
 
-uint8_t trs80_state::lnw80_fe_r()
-{
-	return m_lnw_mode;
-}
-
 uint8_t trs80_state::port_ff_r()
 {
 /* ModeSel and cassette data
@@ -165,20 +160,6 @@ void trs80_state::sys80_fe_w(uint8_t data)
 	m_tape_unit = BIT(data, 4) ? 2 : 1;
 }
 
-/* lnw80 can switch out all the devices, roms and video ram to be replaced by graphics ram. */
-void trs80_state::lnw80_fe_w(uint8_t data)
-{
-/* lnw80 video options
-    d3 bankswitch lower 16k between roms and hires ram (1=hires)
-    d2 enable colour    \
-    d1 hres             /   these 2 are the bits from the MODE command of LNWBASIC
-    d0 inverse video (entire screen) */
-
-	m_lnw_mode = data;
-
-	m_lnw_bank->set_bank(BIT(data, 3));
-}
-
 void trs80_state::port_ff_w(uint8_t data)
 {
 /* Standard output port of Model I
@@ -187,7 +168,6 @@ void trs80_state::port_ff_w(uint8_t data)
     d1, d0 Cassette output */
 
 	static const double levels[4] = { 0.0, 1.0, -1.0, 0.0 };
-	static bool init = 0;
 
 	m_cassette->change_state(BIT(data, 2) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 	m_cassette->output(levels[data & 3]);
@@ -195,13 +175,9 @@ void trs80_state::port_ff_w(uint8_t data)
 
 	m_mode = (m_mode & 0xfe) | BIT(data, 3);
 
-	if (!init)
-	{
-		init = 1;
-		static double speaker_levels[4] = { 0.0, -1.0, 0.0, 1.0 };
-		m_speaker->set_levels(4, speaker_levels);
+	static const double speaker_levels[4] = { 0.0, -1.0, 0.0, 1.0 };
+	m_speaker->set_levels(4, speaker_levels);
 
-	}
 	/* Speaker for System-80 MK II - only sounds if relay is off */
 	if (!(BIT(data, 2)))
 		m_speaker->level_w(data & 3);
@@ -349,7 +325,6 @@ void trs80_state::machine_start()
 	save_item(NAME(m_mask));
 	save_item(NAME(m_tape_unit));
 	save_item(NAME(m_reg_load));
-	save_item(NAME(m_lnw_mode));
 	save_item(NAME(m_cassette_data));
 	save_item(NAME(m_old_cassette_val));
 	save_item(NAME(m_size_store));
@@ -373,14 +348,6 @@ void trs80_state::machine_reset()
 		u16 s_clock = s_bauds[m_io_baud->read()] << 4;
 		m_uart_clock->set_unscaled_clock(s_clock);
 	}
-}
-
-MACHINE_RESET_MEMBER(trs80_state,lnw80)
-{
-	machine_reset();
-	m_reg_load = 1;
-	m_lnw_mode = 0;
-	lnw80_fe_w(0);
 }
 
 
