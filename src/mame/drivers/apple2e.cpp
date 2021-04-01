@@ -737,7 +737,7 @@ void apple2e_state::recalc_active_device()
 		{
 			m_cur_floppy = m_floppy[1]->get_device();
 		}
-		else	// should be external 3.5 #2, for a 3rd drive
+		else    // should be external 3.5 #2, for a 3rd drive
 		{
 			m_cur_floppy = nullptr;
 		}
@@ -1291,6 +1291,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 		if ((m_kbspecial->read() & 0x88) == 0x88)
 		{
 			m_maincpu->reset();
+
+			// reset intcxrom to default
+			if (m_isiic)
+			{
+				m_intcxrom = true;
+			}
+			else
+			{
+				m_intcxrom = false;
+			}
+			update_slotrom_banks();
 		}
 	}
 }

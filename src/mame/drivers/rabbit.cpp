@@ -884,7 +884,7 @@ GFXDECODE_END
    irq 5 = ?
    irq 1 = ?
 
-  */
+*/
 
 INTERRUPT_GEN_MEMBER(rabbit_state::vblank_interrupt)
 {
@@ -1110,7 +1110,7 @@ ROM_START( rabbitjt )
 	ROM_LOAD( "epm7032.u1",   0x0000, 0x0798, CRC(bb1c930e) SHA1(7513ed6a0d797276dab1e3446fe346a9c340e69d) ) // unprotected
 ROM_END
 
-GAME( 1997, rabbit,        0, rabbit,  rabbit, rabbit_state, init_rabbit, ROT0, "Aorn / Electronic Arts", "Rabbit (Asia 3/6)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // For use in Japan notice, English text, (C) 1997
-GAME( 1996, rabbita,  rabbit, rabbit,  rabbit, rabbit_state, init_rabbit, ROT0, "Aorn / Electronic Arts", "Rabbit (Asia 1-28?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // For use in Japan notice, English text, (C) 1996
+GAME( 1997, rabbit,   0,      rabbit,  rabbit, rabbit_state, init_rabbit, ROT0, "Aorn / Electronic Arts", "Rabbit (Asia 3/6)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // For use in Japan notice, English text, (C) 1997
+GAME( 1996, rabbita,  rabbit, rabbit,  rabbit, rabbit_state, init_rabbit, ROT0, "Aorn / Electronic Arts", "Rabbit (Asia 1/28?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // For use in Japan notice, English text, (C) 1996
 GAME( 1997, rabbitj,  rabbit, rabbit,  rabbit, rabbit_state, init_rabbit, ROT0, "Aorn / Electronic Arts", "Rabbit (Japan 3/6?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // For use in Japan notice, Japanese text, (C) 1997
 GAME( 1996, rabbitjt, rabbit, rabbit,  rabbit, rabbit_state, init_rabbit, ROT0, "Aorn / Electronic Arts", "Rabbit (Japan 1/28, location test)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // For use in Japan notice, Japanese text, (C) 1996

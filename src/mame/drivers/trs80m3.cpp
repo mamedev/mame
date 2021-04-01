@@ -59,12 +59,10 @@ To Do / Status:
 
 trs80m3:   works
            MT 07903 - most floppies no longer boot
-           CAS handler doesn't support 1500 baud
 
 trs80m4:   works
            will boot model 3 floppies, but not model 4 ones
            MT 07903 - most floppies no longer boot
-           CAS handler doesn't support 1500 baud
 
 trs80m4p:  floppy not working, so machine is useless
 
@@ -76,6 +74,7 @@ trs80m4p:  floppy not working, so machine is useless
 #include "screen.h"
 #include "speaker.h"
 
+#include "formats/imd_dsk.h"
 #include "formats/trs80_dsk.h"
 #include "formats/dmk_dsk.h"
 
@@ -328,14 +327,14 @@ GFXDECODE_END
 
 void trs80m3_state::floppy_formats(format_registration &fr)
 {
-	fr.add_mfm_containers();
+	fr.add(FLOPPY_IMD_FORMAT);
 	fr.add(FLOPPY_TRS80_FORMAT);
 	fr.add(FLOPPY_DMK_FORMAT);
 }
 
 static void trs80_floppies(device_slot_interface &device)
 {
-	device.option_add("sssd", FLOPPY_525_QD);
+	device.option_add("sssd", FLOPPY_525_DD);
 }
 
 

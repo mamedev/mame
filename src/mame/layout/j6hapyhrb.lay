@@ -6161,6 +6161,6 @@
 		</element>
 		<element name="debug_reel_symbol_count" ref="debug_reel_symbol_count_3">
 			<bounds x="1600" y="272" width="50" height="30"/>
-		</element>	
-		</view>
+		</element>
+	</view>
 </mamelayout>

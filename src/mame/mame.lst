@@ -3330,10 +3330,6 @@ bbustersu                       // A9003 'BB' (c) 1989
 bbustersua                      // A9003 'BB' (c) 1989
 bbustersj                       //
 bbustersja                      //
-mechatt                         // A8002 'MA' (c) 1989
-mechattj                        // A8002 'MA' (c) 1989
-mechattu                        // A8002 'MA' (c) 1989
-mechattu1                       // A8002 'MA' (c) 1989
 
 @source:bcs3.cpp
 bcs3                            //
@@ -10301,6 +10297,7 @@ outr2sto                        // 2004.09 Outrun 2 Special Tours
 outr2st                         // 2004.12 Outrun 2 Special Tours (Rev A)
 outr2stj                        // 2004.12 Outrun 2 Special Tours (Japan) (Rev A)
 scg05nt                         // 2004.10 Sega Golf Club Network Pro Tour 2005 (Rev C) (GDX-0010C)
+scg05ntb                        // 2004.10 Sega Golf Club Network Pro Tour 2005 (Rev B) (GDX-0010B)
 scg06nt                         // 2005.12 Sega Golf Club 2006: Next Tours (Rev A)
 vcop3a                          // 2003.02.26 Virtua Cop 3 (Rev A)
 vcop3                           // 2003.05.21 Virtua Cop 3 (Rev B)
@@ -19804,6 +19801,9 @@ llc2                            //
 @source:lms46.cpp
 lms46                           //
 
+@source:lnw80.cpp
+lnw80                           // LNW Research LNW-80
+
 @source:lockon.cpp
 lockon                          // (c) 1986 Tatsumi
 lockonc                         // (c) 1986 Tatsumi
@@ -22444,6 +22444,12 @@ cgunship                        // (c) 1976 Meadows
 ckidzo                          // (c) 1976 Meadows
 mead4in1                        // (c) 197? Meadows
 
+@source:mechatt.cpp
+mechatt                         // A8002 'MA' (c) 1989
+mechattj                        // A8002 'MA' (c) 1989
+mechattu                        // A8002 'MA' (c) 1989
+mechattu1                       // A8002 'MA' (c) 1989
+
 @source:mediagx.cpp
 a51site4                        // ??           (c) 1998
 a51site4a                       // Sept.11,1998     (c) 1998
@@ -22480,6 +22486,8 @@ megajet                         // 1993 Sega Mega Jet (Japan)
 
 @source:megadriv_acbl.cpp
 aladmdb                         // MegaDrive-based hack
+barekch                         // MegaDrive-based hack
+barek2ch                        // MegaDrive-based hack
 barek2mb                        // MegaDrive-based hack
 barek3mb                        // MegaDrive-based hack
 bk3ssrmb                        // MegaDrive-based hack
@@ -31402,7 +31410,6 @@ gunbarl                         // 1999.?? Gunbarl (Japan, GNB4/VER.A)
 kaiunqz                         // 1999.12 Kaiun Quiz (Japan, KW1/VER.A)
 kartduel                        // 2000.07 Kart Duel (Japan, KTD1/VER.A)
 lbgrande                        // 1997.?? Libero Grande (World, LG2/VER.A)
-lbgrandeja                      // 1997.12 Libero Grande (Japan, LG1/VER.A)
 mdhorse                         // 1998.11 Derby Quiz My Dream Horse (Japan, MDH1/VER.A2)
 mrdrillr                        // 1999.11 Mr Driller (US, DRI3/VER.A2)
 mrdrillrj                       // 1999.11 Mr Driller (Japan, DRI1/VER.A2, Japan)
@@ -31426,6 +31433,7 @@ technodr                        // 1998.07 Techno Drive (Japan, TD2/VER.B)
 tekken3                         // 1997.03 Tekken 3 (World, TET2/VER.E1)
 tekken3a                        // 1997.?? Tekken 3 (World, TET2/VER.A)
 tekken3b                        // 1997.?? Tekken 3 (World, TET2/VER.B)
+tekken3d                        // 1997.?? Tekken 3 (World, TET2/VER.D)
 tekken3ja                       // 1997.?? Tekken 3 (Japan, TET1/VER.A)
 tekken3je1                      // 1997.03 Tekken 3 (Japan, TET1/VER.E1)
 tekken3ua                       // 1997.?? Tekken 3 (US, TET3/VER.A)
@@ -32475,6 +32483,7 @@ nespal                          // Nintendo Entertainment System PAL
 
 @source:nes_clone.cpp
 afbm7800
+dancexpt
 dnce2000
 hs36blk
 hs36red
@@ -41059,7 +41068,6 @@ shtscore
 ht108064                        // Hradstechnika Szvetkezet HT-1080Z/64
 ht1080z                         // Hradstechnika Szvetkezet HT-1080Z
 ht1080z2                        // Hradstechnika Szvetkezet HT-1080Z Series II
-lnw80                           // LNW Research LNW-80
 radionic                        // Radionic
 sys80                           // EACA System 80
 sys80p                          // EACA System 80

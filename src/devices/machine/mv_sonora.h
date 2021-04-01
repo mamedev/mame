@@ -3,7 +3,7 @@
 /*********************************************************************
 
     Mac video support, "Sonora" edition
-	Supports 5 different modelines at up to 16bpp
+    Supports 5 different modelines at up to 16bpp
 
 *********************************************************************/
 #ifndef MAME_MACHINE_MAC_VIDEO_SONORA_H

@@ -92,7 +92,7 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	for(auto it : m_spritelist)
 	{
 		source = it.second;
-		
+
 		int tileno,chainx,chainy,xflip;
 		int pal,xinc,yinc,yflip;
 		uint16_t xpos, ypos;

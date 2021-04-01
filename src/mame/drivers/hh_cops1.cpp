@@ -220,7 +220,7 @@ static INPUT_PORTS_START( mbaskb )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
 
 	PORT_START("IN.1") // INB
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // both buttons
 
 	PORT_START("IN.2") // F1
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Difficulty ) )
@@ -258,6 +258,8 @@ void mbaskb_state::msoccer(machine_config &config)
 {
 	mbaskb(config);
 	config.set_default_layout(layout_msoccer);
+
+	m_display->set_bri_levels(0.005, 0.05, 0.2); // goalie is darker
 }
 
 void mbaskb_state::mhockey(machine_config &config)

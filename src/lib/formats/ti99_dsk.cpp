@@ -1298,7 +1298,7 @@ void ti99_tdf_format::determine_sizes(io_generic *io, int& cell_size, int& secto
 		sector_count = 18;
 		tracks = 40;
 		break;
-	case 1003520:            
+	case 1003520:
 		sector_count = 36;
 		tracks = 40;
 		break;
@@ -1325,7 +1325,7 @@ void ti99_tdf_format::determine_sizes(io_generic *io, int& cell_size, int& secto
 		sector_count = 0;
 		return;
 	}
-	
+
 	heads = 2;  // TDF only supports two-sided recordings
 	cell_size = (sector_count <= 9)? 4000 : ((sector_count <= 18)? 2000 : 1000);
 }

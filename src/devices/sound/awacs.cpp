@@ -130,7 +130,7 @@ void awacs_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 		s16 right = data;
 		outputs[0].put_int(0, left, 32768);
 		outputs[1].put_int(0, right, 32768);
-		
+
 	} else {
 		m_output_buffer = false;
 
@@ -177,7 +177,7 @@ void awacs_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 				else
 					m_in_irq |= 0x80;
 			}
-		}		
+		}
 		update_irq();
 	}
 }
@@ -299,7 +299,7 @@ void awacs_device::write(offs_t offset, uint8_t data)
 	case 0x10:
 		m_ctrl0 = data;
 		m_stream->set_sample_rate(clock()/64/divider[(m_ctrl0 >> 1) & 3]);
-		
+
 		logerror("ctr0_w %02x - play=%s rate=%d\n", m_ctrl0, m_ctrl0 & 1 ? "on" : "off", clock()/64/divider[(m_ctrl0 >> 1) & 3]);
 		break;
 

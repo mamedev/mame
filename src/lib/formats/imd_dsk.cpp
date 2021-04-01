@@ -503,6 +503,11 @@ bool imd_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 			m_trackmult = 2;
 		}
 	}
+	else
+	{
+		if (maxtrack > 42)
+			return false;
+	}
 
 	pos = savepos;
 	while(pos < size) {

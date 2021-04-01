@@ -44,7 +44,7 @@ Lotus123 comes with 2 cartridges and 3 floppy disks. None of the disks are boota
 included. Since the computer only has one floppy, you need to use MAME's File Manager to switch disks as needed.
 Please note that most actions take quite a while to happen.
 
-Start the emulation with >mame64 ibmpcjr lotus123
+Start the emulation with >mame ibmpcjr lotus123
 Wait for the floppy to boot, and answer the questions about date and time. The carts add 3 new internal commands:
 * TUTOR - to use the tutorial, select the Tutorial disk, then type in TUTOR. After a while it will start up.
 * 123 - this is the direct way to use the Lotus 1-2-3 spreadsheet program. To quit, press /QY .

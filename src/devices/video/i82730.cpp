@@ -506,7 +506,7 @@ bool i82730_device::dscmd_sl_scroll_end(uint8_t param)
 {
 	LOGMASKED(LOG_DATASTREAM, "Executing datastream command SL SCROLL END %d - not implemented\n", param);
 
-	return false;	
+	return false;
 }
 
 bool i82730_device::dscmd_tab_to(uint8_t param)
@@ -556,7 +556,7 @@ bool i82730_device::dscmd_repeat(uint8_t param)
 	while (param--)
 	{
 		if (--m_dma_count && m_row_count < 200)
-			m_row[m_row_count++] = data;	
+			m_row[m_row_count++] = data;
 		else
 			return true;
 	}
