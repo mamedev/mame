@@ -25,8 +25,10 @@
 #define COLLECT_SCHEDULER_STATS (1)
 #if (COLLECT_SCHEDULER_STATS)
 #define INCREMENT_SCHEDULER_STAT(x) do { x += 1; } while (0)
+#define SET_SCHEDULER_STAT(x, y) do { x = y; } while (0)
 #else
 #define INCREMENT_SCHEDULER_STAT(x)
+#define SET_SCHEDULER_STAT(x)
 #endif
 
 #define TIMER_CALLBACK_MEMBER(name)     void name(void *ptr, s32 param)
@@ -90,6 +92,7 @@ public:
 		// if the delegate is bound to the source object, rebind it to the copy
 		if (src.has_sub_delegate())
 			bind(reinterpret_cast<delegate_generic_class *>(this));
+		SET_SCHEDULER_STAT(m_form, src.m_form);
 	}
 
 	// copy assignment
@@ -98,6 +101,7 @@ public:
 		// copy the native and sub delegates
 		*static_cast<timer_expired_delegate_native *>(this) = src;
 		m_sub_delegate = src.m_sub_delegate;
+		SET_SCHEDULER_STAT(m_form, src.m_form);
 
 		// if the delegate is bound to the source object, rebind it to the copy
 		if (src.has_sub_delegate())
@@ -128,6 +132,7 @@ public:
 	{
 		static_assert(sizeof(timer_expired_delegate_form1) == sizeof(generic_delegate));
 		reinterpret_cast<timer_expired_delegate_form1 &>(m_sub_delegate) = timer_expired_delegate_form1(cb, name, bindto);
+		SET_SCHEDULER_STAT(m_form, 1);
 	}
 
 	// form 2 constructor: void timer_callback(timer_instance const &timer, device_timer_id id, int param, void *ptr)
@@ -137,6 +142,7 @@ public:
 	{
 		static_assert(sizeof(timer_expired_delegate_form2) == sizeof(generic_delegate));
 		reinterpret_cast<timer_expired_delegate_form2 &>(m_sub_delegate) = timer_expired_delegate_form2(cb, name, bindto);
+		SET_SCHEDULER_STAT(m_form, 2);
 	}
 
 	// form 3 constructor: void timer_callback(int param)
@@ -146,6 +152,7 @@ public:
 	{
 		static_assert(sizeof(timer_expired_delegate_form3<IntType>) == sizeof(generic_delegate));
 		reinterpret_cast<timer_expired_delegate_form3<IntType> &>(m_sub_delegate) = timer_expired_delegate_form3<IntType>(cb, name, bindto);
+		SET_SCHEDULER_STAT(m_form, 3);
 	}
 
 	// form 4 constructor: void timer_callback(void *ptr, int param)
@@ -155,6 +162,7 @@ public:
 	{
 		static_assert(sizeof(timer_expired_delegate_form4<IntType>) == sizeof(generic_delegate));
 		reinterpret_cast<timer_expired_delegate_form4<IntType> &>(m_sub_delegate) = timer_expired_delegate_form4<IntType>(cb, name, bindto);
+		SET_SCHEDULER_STAT(m_form, 4);
 	}
 
 	// form 5 constructor: void timer_callback(int param, int param2)
@@ -164,6 +172,7 @@ public:
 	{
 		static_assert(sizeof(timer_expired_delegate_form5<IntType, IntType2>) == sizeof(generic_delegate));
 		reinterpret_cast<timer_expired_delegate_form5<IntType, IntType2> &>(m_sub_delegate) = timer_expired_delegate_form5<IntType, IntType2>(cb, name, bindto);
+		SET_SCHEDULER_STAT(m_form, 5);
 	}
 
 	// form 6 constructor: void timer_callback(int param, int param2, int param3)
@@ -173,10 +182,15 @@ public:
 	{
 		static_assert(sizeof(timer_expired_delegate_form6<IntType, IntType2, IntType3>) == sizeof(generic_delegate));
 		reinterpret_cast<timer_expired_delegate_form6<IntType, IntType2, IntType3> &>(m_sub_delegate) = timer_expired_delegate_form6<IntType, IntType2, IntType3>(cb, name, bindto);
+		SET_SCHEDULER_STAT(m_form, 6);
 	}
 
 	// return the name
 	char const *name() const { return has_sub_delegate() ? m_sub_delegate.name() : timer_expired_delegate_native::name(); }
+
+#if (COLLECT_SCHEDULER_STATS)
+	int m_form = 0;
+#endif
 
 private:
 	// helper: true if this uses a subdelegate

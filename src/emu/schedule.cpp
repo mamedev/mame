@@ -750,9 +750,9 @@ device_scheduler::~device_scheduler()
 #if (COLLECT_SCHEDULER_STATS)
 	double seconds = m_basetime.as_double();
 	printf("%12.2f timeslice\n", m_timeslice / seconds);
-	printf("%12.2f    inner1 (%.2f avg)\n", m_timeslice_inner1 / seconds, (1.0 * m_timeslice_inner1) / m_timeslice);
-	printf("%12.2f    inner2 (%.2f avg)\n", m_timeslice_inner2 / seconds, (1.0 * m_timeslice_inner2) / m_timeslice_inner1);
-	printf("%12.2f    inner3 (%.2f avg)\n", m_timeslice_inner3 / seconds, (1.0 * m_timeslice_inner3) / m_timeslice_inner2);
+	printf("%12.2f    avg reps until minslice\n", (1.0 * m_timeslice_inner1) / m_timeslice);
+	printf("%12.2f    avg reps through execution loop until timer\n", (1.0 * m_timeslice_inner2) / m_timeslice_inner1);
+	printf("%12.2f    avg run_for called per execution loop\n", (1.0 * m_timeslice_inner3) / m_timeslice_inner2);
 	printf("%12.2f execute_timers: (%.2f avg)\n", m_execute_timers / seconds, 1.0 * m_execute_timers_average / m_execute_timers);
 	printf("%12.2f    update_basetime\n", m_update_basetime / seconds);
 	printf("%12.2f    apply_suspend_changes\n", m_apply_suspend_changes / seconds);
@@ -780,8 +780,10 @@ device_scheduler::~device_scheduler()
 		{
 			return (a->m_calls > b->m_calls);
 		});
+
+	static char const *forms[] = { "native", " void ", "device", " int  ", "legacy", "intint", " int3 " };
 	for (auto &cb : timers)
-		printf("%12.2f %s\n", cb->m_calls / seconds, cb->m_unique_id.c_str());
+		printf("%12.2f %s %s\n", cb->m_calls / seconds, forms[cb->m_delegate.m_form], cb->m_unique_id.c_str());
 #endif
 }
 
@@ -867,8 +869,6 @@ void device_scheduler::timeslice(attoseconds_t minslice)
 			// loop over all executing devices
 			for (device_execute_interface *exec = m_execute_list; exec != nullptr; exec = exec->m_nextexec)
 			{
-				INCREMENT_SCHEDULER_STAT(m_timeslice_inner3);
-
 				// compute how many attoseconds to execute this device
 				attoseconds_t delta = target - exec->m_localtime.relative() - 1;
 				assert(delta < basetime_relative::MAX_RELATIVE);
@@ -878,6 +878,8 @@ void device_scheduler::timeslice(attoseconds_t minslice)
 				// optimize a strict < 0 check better than <= 0
 				if (delta < 0)
 					continue;
+
+				INCREMENT_SCHEDULER_STAT(m_timeslice_inner3);
 
 				// store a pointer to the executing device so that we know the
 				// relevant active context
