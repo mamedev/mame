@@ -479,7 +479,8 @@ void sound_xaudio2::create_buffers(const WAVEFORMATEX &format)
 {
 	// Compute the buffer size
 	// buffer size is equal to the bytes we need to hold in memory per X tenths of a second where X is audio_latency
-	float audio_latency_in_seconds = m_audio_latency / 10.0f;
+	int audio_latency = std::max(m_audio_latency, 1);
+	float audio_latency_in_seconds = audio_latency / 10.0f;
 	uint32_t format_bytes_per_second = format.nSamplesPerSec * format.nBlockAlign;
 	uint32_t total_buffer_size = format_bytes_per_second * audio_latency_in_seconds * RESAMPLE_TOLERANCE;
 
