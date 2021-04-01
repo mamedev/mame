@@ -1293,10 +1293,12 @@ bool device_image_interface::load_software_part(std::string_view identifier)
 
 		case SOFTWARE_IS_INCOMPATIBLE:
 			swlist->popmessage("WARNING! the set %s might not work on this system due to incompatible filter(s) '%s'\n", m_software_part_ptr->info().shortname(), swlist->filter());
+			osd_printf_warning("WARNING: the set %s might not work on this system due to incompatible filter(s) '%s'\n", m_software_part_ptr->info().shortname(), swlist->filter());
 			break;
 
 		case SOFTWARE_NOT_COMPATIBLE:
 			swlist->popmessage("WARNING! the set %s might not work on this system due to missing filter(s) '%s'\n", m_software_part_ptr->info().shortname(), swlist->filter());
+			osd_printf_warning("WARNING! the set %s might not work on this system due to missing filter(s) '%s'\n", m_software_part_ptr->info().shortname(), swlist->filter());
 			break;
 	}
 
