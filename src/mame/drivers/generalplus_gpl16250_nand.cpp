@@ -562,6 +562,13 @@ ROM_START( jak_camp )
 	ROM_LOAD( "camprockguitar1_sandisk11352-256b_45da.bin", 0x0000, 0x10800000, CRC(f52a4289) SHA1(d027ae274cd4ac97924d2344df1a96456e8e7c55) )
 ROM_END
 
+ROM_START( jak_hmpt )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only
+
+	ROM_REGION( 0x10800000, "nandrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "hmsecretstar_sandisk11270_9876.bin", 0x0000, 0x10800000, CRC(fbe09633) SHA1(169a1546072f53c2da19ce97396cacd25412c5f2) )
+ROM_END
 
 ROM_START( jak_hsmg2 )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
@@ -916,7 +923,11 @@ CONS(2008, jak_hsmg2,  0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gp
 CONS(2008, jak_hmhsm,  0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Hannah Montana G2 Deluxe / High School Musical G2 Deluxe - Two in One (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // Sep 12 2008 18:48:14 (Menu/HM) / Sep 12 2008 18:50:45 (HSM)
 CONS(2008, jak_umdf,   0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / Handheld Games",       "Ultimotion - Disney Fairies Sleeping Beauty & TinkerBell (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // Ultimotion Swing Zone is SPG29xx instead
-CONS(2008, jak_camp,   0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Camp Rock Guitar Video Game (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2008, jak_camp,   0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Camp Rock - Guitar Video Game (JAKKS Pacific TV Game)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// 2 blocks fail the hidden ROM test in jak_hmpt set below, however this seems to be an error in the test mode, not the dump
+// a different set, https://www.youtube.com/watch?v=XiEMtLzcTFw showing a date of May 14 2008 10:05:22 shows exactly the same failures
+CONS(2008, jak_hmpt,   0, 0, generalplus_gpac800,       jak_hsm,  generalplus_gpac800_game_state,       nand_init210_32mb,  "JAKKS Pacific Inc / HotGen Ltd",           "Hannah Montana Pop Tour - Guitar Video Game (JAKKS Pacific TV Game) (May 16 2008)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // May 16 2008 10:36:59
 
 // There were 1 player and 2 player versions for several of the JAKKS guns.  The 2nd gun appears to be simply a controller (no AV connectors) but as they were separate products with the 2 player versions being released up to a year after the original, the code could differ.
 // If they differ, it is currently uncertain which versions these ROMs are from
