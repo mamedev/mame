@@ -103,7 +103,6 @@ function cheat.startplugin()
 		end
 
 		cheatname = filename
-		print(cheatname)
 		local function add(addcheats)
 			if not next(newcheats) then
 				newcheats = addcheats
