@@ -986,7 +986,7 @@ void namconb1_state::namconb1(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(namconb1_state::screen_vblank));
 	m_screen->set_palette(m_c116);
 
-	NAMCO_C355SPR(config, m_c355spr, 0);
+	NAMCO_C355SPR(config, m_c355spr);
 	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_palette(m_c116);
 	m_c355spr->set_scroll_offsets(0x26, 0x19);
@@ -995,12 +995,12 @@ void namconb1_state::namconb1(machine_config &config)
 	m_c355spr->set_buffer(2); // triple buffered
 	m_c355spr->set_color_base(0);
 
-	NAMCO_C123TMAP(config, m_c123tmap, 0);
+	NAMCO_C123TMAP(config, m_c123tmap);
 	m_c123tmap->set_palette(m_c116);
 	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namconb1_state::NB1TilemapCB, this));
 	m_c123tmap->set_color_base(0x1000);
 
-	NAMCO_C116(config, m_c116, 0);
+	NAMCO_C116(config, m_c116);
 	m_c116->enable_shadows();
 
 	SPEAKER(config, "lspeaker").front_left();
@@ -1021,7 +1021,7 @@ void namconb1_state::namconb2(machine_config &config)
 
 	m_screen->set_screen_update(FUNC(namconb1_state::screen_update_namconb2));
 
-	NAMCO_C169ROZ(config, m_c169roz, 0);
+	NAMCO_C169ROZ(config, m_c169roz);
 	m_c169roz->set_palette(m_c116);
 	m_c169roz->set_is_namcofl(false);
 	m_c169roz->set_ram_words(0x20000 / 2);

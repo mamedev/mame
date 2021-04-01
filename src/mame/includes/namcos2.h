@@ -16,7 +16,7 @@
 #include "machine/namco_c148.h"
 #include "machine/timer.h"
 #include "sound/c140.h"
-#include "video/c45.h"
+#include "video/namco_c45road.h"
 #include "video/namco_c116.h"
 #include "machine/namco65.h"
 #include "machine/namco68.h"

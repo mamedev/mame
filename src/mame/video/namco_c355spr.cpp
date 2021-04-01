@@ -133,9 +133,6 @@ void namco_c355spr_device::zdrawgfxzoom(
 
 void namco_c355spr_device::copybitmap(bitmap_ind16 &dest_bmp, const rectangle &clip, u8 pri)
 {
-	device_palette_interface &palette = gfx(0)->palette();
-	const int shadow_offset = (palette.shadows_enabled()) ? palette.entries() : 0;
-	const pen_t black = palette.black_pen();
 	if (m_palxor)
 	{
 		for (int y = clip.min_y; y <= clip.max_y; y++)
@@ -186,10 +183,9 @@ void namco_c355spr_device::copybitmap(bitmap_ind16 &dest_bmp, const rectangle &c
 					{
 						if ((c & 0xff) != 0xff)
 						{
-							if (c == 0xffe && shadow_offset)
+							if (c == 0xffe)
 							{
-								if (dest[x] != black)
-									dest[x] |= shadow_offset;
+								dest[x] |= 0x800;
 							}
 							else
 							{
@@ -206,8 +202,6 @@ void namco_c355spr_device::copybitmap(bitmap_ind16 &dest_bmp, const rectangle &c
 void namco_c355spr_device::copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &clip, u8 pri)
 {
 	device_palette_interface &palette = gfx(0)->palette();
-	const int shadow_offset = (palette.shadows_enabled()) ? palette.entries() : 0;
-	const pen_t black = palette.black_pen();
 	const pen_t *pal = &palette.pen(gfx(0)->colorbase());
 	if (m_palxor)
 	{
@@ -264,10 +258,9 @@ void namco_c355spr_device::copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &c
 					{
 						if ((c & 0xff) != 0xff)
 						{
-							if (c == 0xffe && shadow_offset)
+							if (c == 0xffe)
 							{
-								if (srcrender[x] != black)
-									srcrender[x] |= shadow_offset;
+								srcrender[x] |= 0x800;
 							}
 							else
 							{

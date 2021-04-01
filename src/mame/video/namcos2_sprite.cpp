@@ -50,7 +50,6 @@ void namcos2_sprite_device::zdrawgfxzoom(
 		if (gfx)
 		{
 			device_palette_interface &palette = gfx->palette();
-			const int shadow_offset = (palette.shadows_enabled()) ? palette.entries() : 0;
 			const pen_t *pal = &palette.pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 			const u8 *source_base = gfx->get_data(code % gfx->elements());
 			const int sprite_screen_height = (scaley * gfx->height() + 0x8000) >> 16;
@@ -160,9 +159,9 @@ void namcos2_sprite_device::zdrawgfxzoom(
 									{
 										if (pri[x] <= zpos)
 										{
-											if (color == 0xf && c==0xfe && shadow_offset)
+											if (color == 0xf && c == 0xfe)
 											{
-												dest[x] |= shadow_offset;
+												dest[x] |= 0x800;
 											}
 											else
 											{

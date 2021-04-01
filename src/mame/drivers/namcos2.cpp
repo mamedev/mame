@@ -1641,7 +1641,7 @@ via software as INT1
 
 void namcos2_state::configure_c116_standard(machine_config &config)
 {
-	NAMCO_C116(config, m_c116, 0);
+	NAMCO_C116(config, m_c116);
 	m_c116->enable_shadows();
 }
 
@@ -1761,7 +1761,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos2_state::screen_scanline)
 
 void namcos2_state::configure_c123tmap_standard(machine_config &config)
 {
-	NAMCO_C123TMAP(config, m_c123tmap, 0);
+	NAMCO_C123TMAP(config, m_c123tmap);
 	m_c123tmap->set_palette(m_c116);
 	m_c123tmap->set_tile_callback(namco_c123tmap_device::c123_tilemap_delegate(&namcos2_state::TilemapCB, this));
 	m_c123tmap->set_color_base(16*256);
@@ -1769,7 +1769,7 @@ void namcos2_state::configure_c123tmap_standard(machine_config &config)
 
 void namcos2_state::configure_c169roz_standard(machine_config &config)
 {
-	NAMCO_C169ROZ(config, m_c169roz, 0);
+	NAMCO_C169ROZ(config, m_c169roz);
 	m_c169roz->set_palette(m_c116);
 	m_c169roz->set_is_namcofl(false);
 	m_c169roz->set_ram_words(0x10000/2);
@@ -1778,7 +1778,7 @@ void namcos2_state::configure_c169roz_standard(machine_config &config)
 
 void namcos2_state::configure_c355spr_standard(machine_config &config)
 {
-	NAMCO_C355SPR(config, m_c355spr, 0);
+	NAMCO_C355SPR(config, m_c355spr);
 	m_c355spr->set_screen(m_screen);
 	m_c355spr->set_palette(m_c116);
 	m_c355spr->set_scroll_offsets(0x26, 0x19);
@@ -1789,7 +1789,7 @@ void namcos2_state::configure_c355spr_standard(machine_config &config)
 
 void namcos2_state::configure_c45road_standard(machine_config &config)
 {
-	NAMCO_C45_ROAD(config, m_c45_road, 0);
+	NAMCO_C45_ROAD(config, m_c45_road);
 	m_c45_road->set_palette(m_c116);
 }
 

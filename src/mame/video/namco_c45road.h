@@ -19,7 +19,7 @@ class namco_c45_road_device : public device_t, public device_gfx_interface, publ
 {
 public:
 	// construction/destruction
-	namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void map(address_map &map);
 
