@@ -10,7 +10,8 @@
     - ADB and PS/2
     - charset ROM is wrong
     - asma2k keyboard doesn't work
-    - asma2k accesses memory below 0x8000; is there more ROM there?
+    - asma2k accesses memory below 0x8000; spellcheck ROM is probably
+      banked there
     - asma2k reads from nonexistent internal register at 0x0001
       (probably a bug, since the same code exists in both BIOSes)
 
@@ -206,6 +207,7 @@ void asma2k_state::asma2k_mem(address_map &map)
 	map(0x0000, 0x7fff).view(m_io_view);
 	m_io_view[0](0x2000, 0x2000).rw(FUNC(asma2k_state::kb_r), FUNC(asma2k_state::kb_matrixh_w));
 	m_io_view[0](0x4000, 0x4000).w(FUNC(asma2k_state::lcd_ctrl_w));
+	//m_io_view[0](0x6000, 0x7fff).bankr("eprombank");
 	m_io_view[0](0x7fd4, 0x7fd7).lr8(NAME([]() { return 0; })); // ?
 	m_io_view[0](0x7fe8, 0x7feb).lr8(NAME([]() { return 0; })); // ?
 	m_io_view[1](0x0000, 0x7fff).bankrw("rambank");
@@ -402,7 +404,7 @@ void alphasmart_state::machine_reset()
 void alphasmart_state::alphasmart(machine_config &config)
 {
 	/* basic machine hardware */
-	MC68HC11D0(config, m_maincpu, XTAL(8'000'000));  // XTAL is 8 Mhz
+	MC68HC11D0(config, m_maincpu, 8_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &alphasmart_state::alphasmart_mem);
 	m_maincpu->in_pa_callback().set(FUNC(alphasmart_state::port_a_r));
 	m_maincpu->out_pa_callback().set(FUNC(alphasmart_state::port_a_w));
@@ -436,12 +438,20 @@ void asma2k_state::asma2k(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &asma2k_state::asma2k_mem);
 }
 
-/* ROM definition */
+// MCU: MC68HC11D0P
+// NVRAM: KM681000ALP-7L (or TC551001BPL-85L) + CR2032 battery
+// XTAL: 8.000MHz
+// LCD: 2x KS0066F05 + 8x HD44100H
 ROM_START( asmapro )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "alphasmartpro212.rom",  0x0000, 0x8000, CRC(896ddf1c) SHA1(c3c6a421c9ced92db97431d04b4a3f09a39de716) )   // Checksum 8D24 on label
 ROM_END
 
+// MCU: MC68HC11D0FN
+// NVRAM: NEC D431000ACW-70LL + battery
+// XTAL: SB8.000
+// LCD: 2x KS0066F05 + 4x KS0063B
+// 16-pin header for optional IrDA sub board
 ROM_START( asma2k )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	/*
@@ -454,8 +464,8 @@ ROM_START( asma2k )
 	ROM_SYSTEM_BIOS( 1, "v308", "v3.08" )
 	ROMX_LOAD( "alphasmart__2000__v3.0.8.zpsd211r.plcc44.bin",  0x0000, 0x81e5, CRC(0b3b1a0c) SHA1(97878819188a1ec40052fbce9d5a5059728d5aec), ROM_BIOS(1) )
 
-	ROM_REGION( 0x8000, "spellcheck", 0 )
-	ROM_LOAD( "spellcheck.bin",  0x0000, 0x8000, NO_DUMP )
+	ROM_REGION( 0x20000, "spellcheck", 0 )
+	ROM_LOAD( "dictrom__v01.m27c1001.plcc32.bin", 0x00000, 0x20000, NO_DUMP )
 ROM_END
 
 
