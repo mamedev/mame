@@ -95,18 +95,15 @@ function cheat.startplugin()
 		local filename = emu.romname()
 		local newcheats = {}
 		local file = emu.file(manager.machine.options.entries.cheatpath:value():gsub("([^;]+)", "%1;%1/cheat") , 1)
-		if emu.softname() ~= "" then
-			if emu.softname():find(":") then
-				filename = emu.softname():gsub(":", "/")
-			else
-				for name, image in pairs(manager.machine.images) do
-					if image.exists and image.software_list_name ~= "" then
-						filename = image.software_list_name .. "/" .. emu.softname()
-					end
-				end
+
+		for name, image in pairs(manager.machine.images) do
+			if image.exists and image.software_list_name ~= "" then
+				filename = image.software_list_name .. "/" .. image.filename
 			end
 		end
+
 		cheatname = filename
+		print(cheatname)
 		local function add(addcheats)
 			if not next(newcheats) then
 				newcheats = addcheats
