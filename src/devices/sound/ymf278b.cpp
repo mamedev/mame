@@ -459,7 +459,7 @@ void ymf278b_device::B_w(uint8_t reg, uint8_t data)
 	}
 }
 
-void ymf278b_device::retrigger_note(YMF278BSlot *slot)
+void ymf278b_device::retrigger_sample(YMF278BSlot *slot)
 {
 	// activate channel
 	if (slot->octave != 8)
@@ -521,7 +521,7 @@ void ymf278b_device::C_w(uint8_t reg, uint8_t data)
 
 				// retrigger if key is on
 				if (slot->KEY_ON)
-					retrigger_note(slot);
+					retrigger_sample(slot);
 				else if (slot->active)
 				{
 					// deactivate channel
@@ -589,7 +589,7 @@ void ymf278b_device::C_w(uint8_t reg, uint8_t data)
 						break;
 					}
 
-					retrigger_note(slot);
+					retrigger_sample(slot);
 				}
 				else if (slot->active)
 				{
