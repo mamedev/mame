@@ -1874,7 +1874,13 @@ void ymopll_registers::operator_map(operator_mapping &dest) const
 
 bool ymopll_registers::write(u16 index, u8 data, u32 &channel, u32 &opmask)
 {
-	assert(index < REGISTERS);
+	// unclear the address is masked down to 6 bits or if writes above
+	// the register top are ignored; assuming the latter for now
+	if (index >= REGISTERS)
+	{
+		LOG("ymopll write above register area; ignoring: %02X=%02X\n", index, data);
+		return false;
+	}
 
 	// write the new data
 	m_regdata[index] = data;
