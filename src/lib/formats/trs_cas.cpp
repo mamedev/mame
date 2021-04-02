@@ -43,6 +43,14 @@ static int trs80l2_handle_cas(int16_t *buffer, const uint8_t *casdata)
 	int data_pos = 0, sample_count = 0;
 	bool sw = false;
 
+	// Make sure this is a trs80 tape
+	// Should have some zero bytes then one 0xA5
+	while ((cas_size > data_pos) && (casdata[data_pos] == 0x00))
+		data_pos++;
+	if (casdata[data_pos] != 0xA5)
+		return 0;
+
+	data_pos = 0;
 	while( data_pos < cas_size )
 	{
 		uint8_t data = casdata[data_pos];

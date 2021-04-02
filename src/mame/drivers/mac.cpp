@@ -15,7 +15,6 @@
 #include "includes/mac.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/powerpc/ppc.h"
 #include "cpu/m6805/m6805.h"
 #include "formats/ap_dsk35.h"
 #include "machine/iwm.h"

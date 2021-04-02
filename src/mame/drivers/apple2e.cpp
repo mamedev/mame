@@ -1291,6 +1291,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 		if ((m_kbspecial->read() & 0x88) == 0x88)
 		{
 			m_maincpu->reset();
+
+			// reset intcxrom to default
+			if (m_isiic)
+			{
+				m_intcxrom = true;
+			}
+			else
+			{
+				m_intcxrom = false;
+			}
+			update_slotrom_banks();
 		}
 	}
 }

@@ -147,7 +147,7 @@ void magreel_state::magreel(machine_config &config)
 //  screen.set_screen_update(FUNC(magreel_state::screen_update));
 //  screen.set_size(32*8, 32*8);
 //  screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
-//  screen.set_raw(58_MHz_XTAL / 2, 442, 0, 320, 264, 0, 240);          /* generic NTSC video timing at 320x240 */
+//  screen.set_raw(58_MHz_XTAL / 2, 442, 0, 320, 264, 0, 240);          // generic NTSC video timing at 320x240
 //  screen.set_palette("palette");
 
 //  GFXDECODE(config, "gfxdecode", "palette", gfx_magreel);
@@ -167,7 +167,7 @@ void magreel_state::magreel(machine_config &config)
 
 ROM_START( magreel )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "m27c800ic18",  0x000000, 0x100000, CRC(2af3d8e7) SHA1(729cd2c1011d8018cf8d77c2d118d1815e30f475) ) // TODO: figure out the line swapping
+	ROM_LOAD( "m27c800.ic18",  0x000000, 0x100000, CRC(2af3d8e7) SHA1(729cd2c1011d8018cf8d77c2d118d1815e30f475) ) // TODO: figure out the line swapping
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF )
 	ROM_LOAD( "pic16c621", 0x0000, 0x4000, NO_DUMP ) // read protected
@@ -179,7 +179,7 @@ ROM_START( magreel )
 	ROM_LOAD( "m27c160.ic6",  0x600000, 0x200000, CRC(0f3274d0) SHA1(1abb45ebc74a09f1832cf80775a35966e8d5cd84) )
 
 	ROM_REGION( 0x200000, "flash", 0 )
-	ROM_LOAD( "mx29f161.ic24",0x000000, 0x200000, CRC(61accab0) SHA1(0fee6bf6071849d1b00fbfc248ab654a8abc3b99) ) // FIXED BITS (xxxxxxxxxxxxxxx0)
+	ROM_LOAD( "mx29f161.ic24",0x000000, 0x200000, CRC(b479c2db) SHA1(cac4c38ef26d307bfd3ffff77859ea90cf554418) )
 
 	ROM_REGION( 0x4000, "eeproms", 0 )
 	ROM_LOAD( "m28c64.ic19",  0x000000, 0x002000, CRC(d0238e5c) SHA1(513bb97487d33c3b844877104bb2af3220851583) )
@@ -189,7 +189,21 @@ ROM_END
 
 void magreel_state::init_magreel()
 {
-	// TODO: decryption
+	uint8_t *rom = memregion("maincpu")->base();
+
+	std::vector<uint8_t> buffer(0x100000);
+
+	memcpy(&buffer[0], rom, 0x100000);
+
+	// descramble address. TODO: gives M68000-looking code structure, but probably isn't correct
+	for (int i = 0; i < 0x100000; i++)
+		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 16, 17, 18, 1, 3, 2, 4, 7, 5, 6, 8, 9, 10, 11, 14, 12, 13, 15, 0)];
+
+	uint16_t *rom16 = (uint16_t *)memregion("maincpu")->base();
+
+	// descramble data. TODO: everything
+	for (int i = 0; i < 0x100000 / 2; i++)
+		rom16[i] = bitswap<16>(rom16[i] ^ 0x0000, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
 } // Anonymous namespace

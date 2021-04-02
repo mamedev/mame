@@ -88,7 +88,7 @@ private:
 	void compute_freq_step(YMF278BSlot *slot);
 	void compute_envelope(YMF278BSlot *slot);
 	void irq_check();
-	void retrigger_note(YMF278BSlot *slot);
+	void retrigger_sample(YMF278BSlot *slot);
 	void C_w(uint8_t reg, uint8_t data);
 	void timer_busy_start(int is_pcm);
 	void precompute_rate_tables();

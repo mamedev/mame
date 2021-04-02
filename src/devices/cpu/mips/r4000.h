@@ -17,7 +17,7 @@ public:
 	enum config_mask : u32
 	{
 		CONFIG_K0 = 0x00000007, // kseg0 cache coherency
-		CONFIG_CU = 0x00000080, // store conditional cache coherent
+		CONFIG_CU = 0x00000008, // store conditional cache coherent
 		CONFIG_DB = 0x00000010, // primary d-cache line 32 bytes
 		CONFIG_IB = 0x00000020, // primary i-cache line 32 bytes
 		CONFIG_DC = 0x000001c0, // primary d-cache size
@@ -57,7 +57,7 @@ protected:
 		CACHE_256K = 6,
 		CACHE_512K = 7,
 	};
-	r4000_base_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 prid, u32 fcr, cache_size icache_size, cache_size dcache_size);
+	r4000_base_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, u32 prid, u32 fcr, cache_size icache_size, cache_size dcache_size, unsigned m32, unsigned m64, unsigned d32, unsigned d64);
 
 	enum cp0_reg : int
 	{
@@ -320,8 +320,10 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// device_execute_interface overrides
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks * 2); }
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles + 1) / 2; }
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
-	virtual u32 execute_max_cycles() const noexcept override { return 40; }
+	virtual u32 execute_max_cycles() const noexcept override { return *std::max_element(std::begin(m_hilo_cycles), std::end(m_hilo_cycles)); }
 	virtual u32 execute_input_lines() const noexcept override { return 6; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
@@ -366,10 +368,11 @@ protected:
 	void cp2_execute(u32 const op);
 
 	// address and memory handling
-	enum translate_result { ERROR, MISS, UNCACHED, CACHED };
+	enum translate_result : unsigned { ERROR, MISS, UNCACHED, CACHED };
 	translate_result translate(int intention, u64 &address);
 	void address_error(int intention, u64 const address);
 
+	template <typename T> void accessors(T &m);
 	template <typename T, bool Aligned = true, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(T)>>::value, bool> load(u64 program_address, U &&apply);
 	template <typename T, typename U> std::enable_if_t<std::is_convertible<U, std::function<void(u64, T)>>::value, bool> load_linked(u64 program_address, U &&apply);
 	template <typename T, bool Aligned = true, typename U> std::enable_if_t<std::is_convertible<U, T>::value, bool> store(u64 program_address, U data, T mem_mask = ~T(0));
@@ -384,24 +387,43 @@ protected:
 	address_space_config m_program_config_le;
 	address_space_config m_program_config_be;
 
+	// memory access helpers
+	memory_access<36, 3, 0, ENDIANNESS_LITTLE>::cache m_le;
+	memory_access<36, 3, 0, ENDIANNESS_BIG>::cache m_be;
+
+	std::function<u8(offs_t offset)> read_byte;
+	std::function<u16(offs_t offset)> read_word;
+	std::function<u32(offs_t offset)> read_dword;
+	std::function<u64(offs_t offset)> read_qword;
+	std::function<void(offs_t offset, u8 data)> write_byte;
+	std::function<void(offs_t offset, u16 data, u16 mem_mask)> write_word;
+	std::function<void(offs_t offset, u32 data, u32 mem_mask)> write_dword;
+	std::function<void(offs_t offset, u64 data, u64 mem_mask)> write_qword;
+
+	enum branch_state : u64
+	{
+		STATE   = 0x00000000'00000003,
+		TARGET  = 0xffffffff'fffffffc,
+
+		NONE    = 0,
+		BRANCH  = 1, // retire delayed branch
+		DELAY   = 2, // delay slot instruction
+		NULLIFY = 3, // next instruction nullified
+	};
+
 	// runtime state
 	int m_icount;
+
+	// integer multiple/divide state
+	unsigned const m_hilo_cycles[4];
+	unsigned m_hilo_delay;
 
 	// cpu state
 	u64 m_pc;
 	u64 m_r[32];
 	u64 m_hi;
 	u64 m_lo;
-	enum branch_state : unsigned
-	{
-		NONE      = 0,
-		DELAY     = 1, // delay slot instruction active
-		BRANCH    = 2, // branch instruction active
-		EXCEPTION = 3, // exception triggered
-		NULLIFY   = 4, // next instruction nullified
-	}
-	m_branch_state;
-	u64 m_branch_target;
+	u64 m_branch_state;
 
 	// cp0 state
 	u64 m_cp0[32];
@@ -447,7 +469,7 @@ class r4000_device : public r4000_base_device
 public:
 	// NOTE: R4000 chips prior to 3.0 have an xtlb bug
 	r4000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: r4000_base_device(mconfig, R4000, tag, owner, clock, 0x0430, 0x0500, CACHE_8K, CACHE_8K)
+		: r4000_base_device(mconfig, R4000, tag, owner, clock, 0x0430, 0x0500, CACHE_8K, CACHE_8K, 10, 20, 69, 133)
 	{
 		// no secondary cache
 		m_cp0[CP0_Config] |= CONFIG_SC;
@@ -458,7 +480,7 @@ class r4400_device : public r4000_base_device
 {
 public:
 	r4400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: r4000_base_device(mconfig, R4400, tag, owner, clock, 0x0440, 0x0500, CACHE_16K, CACHE_16K)
+		: r4000_base_device(mconfig, R4400, tag, owner, clock, 0x0440, 0x0500, CACHE_16K, CACHE_16K, 10, 20, 69, 133)
 	{
 		// no secondary cache
 		m_cp0[CP0_Config] |= CONFIG_SC;
@@ -469,7 +491,7 @@ class r4600_device : public r4000_base_device
 {
 public:
 	r4600_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: r4000_base_device(mconfig, R4600, tag, owner, clock, 0x2020, 0x2020, CACHE_16K, CACHE_16K)
+		: r4000_base_device(mconfig, R4600, tag, owner, clock, 0x2020, 0x2020, CACHE_16K, CACHE_16K, 10, 12, 42, 74)
 	{
 		// no secondary cache
 		m_cp0[CP0_Config] |= CONFIG_SC;
@@ -480,7 +502,7 @@ class r5000_device : public r4000_base_device
 {
 public:
 	r5000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: r4000_base_device(mconfig, R5000, tag, owner, clock, 0x2320, 0x2320, CACHE_32K, CACHE_32K)
+		: r4000_base_device(mconfig, R5000, tag, owner, clock, 0x2320, 0x2320, CACHE_32K, CACHE_32K, 5, 9, 36, 68)
 	{
 		// no secondary cache
 		m_cp0[CP0_Config] |= CONFIG_SC;
