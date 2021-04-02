@@ -957,7 +957,7 @@ void _8080bw_state::schaser_sh_port_1_w(uint8_t data)
 			else if (!m_schaser_effect_555_is_low)
 			{
 				/* set 555 high time */
-				attotime new_time = attotime(0, ATTOSECONDS_PER_SECOND * .8873 * schaser_effect_rc[effect]);
+				attotime new_time = attotime::from_double(0.8873 * schaser_effect_rc[effect]);
 				m_schaser_effect_555_timer->adjust(new_time, effect);
 			}
 		}
@@ -1028,7 +1028,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(_8080bw_state::schaser_effect_555_cb)
 	else
 	{
 		if (effect)
-			new_time = attotime(0, ATTOSECONDS_PER_SECOND * .8873 * schaser_effect_rc[effect]);
+			new_time = attotime::from_double(0.8873 * schaser_effect_rc[effect]);
 		else
 			new_time = attotime::never;
 	}

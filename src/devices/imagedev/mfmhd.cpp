@@ -306,7 +306,7 @@ enum
 std::string mfm_harddisk_device::tts(const attotime &t)
 {
 	char buf[256];
-	int nsec = t.attoseconds() / ATTOSECONDS_PER_NANOSECOND;
+	int nsec = t.as_nsec_int();
 	sprintf(buf, "%4d.%03d,%03d,%03d", int(t.seconds()), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
 	return buf;
 }

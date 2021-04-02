@@ -588,7 +588,7 @@ void ti85_state::ti81(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(0);
+	screen.set_vblank_time(subseconds::zero());
 	screen.set_size(96, 64);
 	screen.set_visarea(0, 96-1, 0, 64-1);
 	screen.set_screen_update(FUNC(ti85_state::screen_update_ti85));

@@ -209,7 +209,7 @@ void ccastles_state::machine_start()
 
 	/* reconfigure the visible area to match */
 	visarea.set(0, 255, m_vblank_end, m_vblank_start - 1);
-	m_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
+	m_screen->configure(320, 256, visarea, subseconds::from_hz(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* configure the ROM banking */
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0xa000, 0x6000);

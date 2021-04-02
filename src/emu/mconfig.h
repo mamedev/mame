@@ -153,7 +153,7 @@ public:
 	/// Set the maximum scheduling quantum required for the current
 	/// device.  The smallest maximum quantum requested by a device in
 	/// the system will be used.
-	/// \param [in] quantum Maximum scheduling quantum in attoseconds.
+	/// \param [in] quantum Maximum scheduling quantum as attotime.
 	void set_maximum_quantum(attotime const &quantum);
 
 	template <typename T>

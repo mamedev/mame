@@ -1008,7 +1008,7 @@ void scn2674_device::recompute_parameters()
 	LOGMASKED(LOG_IR, "width %u height %u max_x %u max_y %u refresh %f\n", horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, refresh.as_hz());
 
 	rectangle visarea(0, max_visible_x, 0, max_visible_y);
-	screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh.as_attoseconds());
+	screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh.as_subseconds());
 
 	m_linecounter = screen().vpos();
 	m_scanline_timer->adjust(screen().time_until_pos((m_linecounter + 1) % vert_pix_total, 0), 0, screen().scan_period());

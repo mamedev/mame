@@ -953,7 +953,7 @@ void apc_state::apc(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_vblank_time(subseconds::from_usec(2500));
 	m_screen->set_screen_update(FUNC(apc_state::screen_update));
 	m_screen->set_size(640, 494);
 	m_screen->set_visarea(0*8, 640-1, 0*8, 494-1);

@@ -458,7 +458,7 @@ void oneshot_state::oneshot(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(56);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(32*16, 32*16);
 	screen.set_visarea(0*16, 20*16-1, 0*16, 15*16-1);
 	screen.set_screen_update(FUNC(oneshot_state::screen_update_oneshot));

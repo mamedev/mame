@@ -193,7 +193,7 @@ void tk635_state::tk635(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(70);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_vblank_time(subseconds::from_usec(2500)); // not accurate
 	screen.set_screen_update(FUNC(tk635_state::screen_update));
 	screen.set_size(1188, 416);
 	screen.set_visarea(0, 1188-1, 0, 416-1);

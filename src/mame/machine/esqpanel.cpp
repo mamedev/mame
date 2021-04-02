@@ -462,8 +462,8 @@ void esqpanel_device::device_reset()
 	m_bCalibSecondByte = false;
 	m_bButtonLightSecondByte = false;
 
-	attotime sample_time(0, ATTOSECONDS_PER_MILLISECOND);
-	attotime initial_delay(0, ATTOSECONDS_PER_MILLISECOND);
+	attotime sample_time = attotime::from_msec(1);
+	attotime initial_delay = attotime::from_msec(1);
 
 	if (m_external_timer) {
 		m_external_timer->adjust(initial_delay, 0, sample_time);

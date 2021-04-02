@@ -272,7 +272,7 @@ void lw700i_state::lw700i(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	m_screen->set_screen_update(FUNC(lw700i_state::screen_update));
 	m_screen->set_size(640, 400);
 	m_screen->set_visarea(0, 480, 0, 128);

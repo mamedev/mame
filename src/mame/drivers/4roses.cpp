@@ -467,7 +467,7 @@ void _4roses_state::_4roses(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size((124+1)*4, (30+1)*8);               /* guess. taken from funworld games */
 	screen.set_visarea(0*4, 96*4-1, 0*8, 29*8-1);  /* guess. taken from funworld games */
 	screen.set_screen_update(FUNC(_4roses_state::screen_update_funworld));

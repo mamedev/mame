@@ -649,7 +649,7 @@ void vpoker_state::vpoker(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_vblank_time(subseconds::from_usec(2500)); // not accurate
 	screen.set_size(512, 256);
 	screen.set_visarea(0*8, 480-1, 0*8, 240-1);
 //  screen.set_visarea(0*8, 512-1, 0*8, 256-1);

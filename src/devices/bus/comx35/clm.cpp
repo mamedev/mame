@@ -143,7 +143,7 @@ void comx_clm_device::device_add_mconfig(machine_config &config)
 	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
 	screen.set_size(80*8, 24*8);
 	screen.set_visarea(0, 80*8-1, 0, 24*8-1);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_refresh_hz(50);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_comx_clm);

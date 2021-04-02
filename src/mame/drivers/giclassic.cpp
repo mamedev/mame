@@ -305,7 +305,7 @@ void giclassic_state::giclassic(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(59.62);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(600, 384);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(giclassic_state::screen_update_giclassic));
@@ -330,7 +330,7 @@ void giclassicsvr_state::giclassvr(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(59.62);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(giclassicsvr_state::screen_update_giclassicsvr));
 	screen.set_palette(m_palette);

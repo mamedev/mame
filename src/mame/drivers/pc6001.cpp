@@ -602,7 +602,7 @@ inline void pc6001mk2_state::refresh_crtc_params()
 
 	visarea.set(0, (320) - 1, 0, (y_height) - 1);
 
-	m_screen->configure(m_screen->width(), m_screen->height(), visarea, m_screen->frame_period().attoseconds());
+	m_screen->configure(m_screen->width(), m_screen->height(), visarea, m_screen->frame_period().as_subseconds());
 }
 
 void pc6001mk2_state::mk2_vram_bank_w(uint8_t data)

@@ -132,7 +132,7 @@ void attckufo_state::attckufo(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(MOS6560_VRETRACERATE);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_size((MOS6560_XSIZE + 7) & ~7, MOS6560_YSIZE);
 	screen.set_visarea(0, 23*8 - 1, 0, 22*8 - 1);
 	screen.set_screen_update("mos6560", FUNC(mos6560_device::screen_update));

@@ -1937,7 +1937,7 @@ void tmnt_state::cuebrick(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(tmnt_state::screen_update_mia));
@@ -1989,7 +1989,7 @@ void tmnt_state::mia(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(tmnt_state::screen_update_mia));
@@ -2050,7 +2050,7 @@ void tmnt_state::tmnt(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1 );
 	// verified against real hardware
@@ -2115,7 +2115,7 @@ void tmnt_state::punkshot(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(tmnt_state::screen_update_punkshot));
@@ -2164,7 +2164,7 @@ void tmnt_state::lgtnfght(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(tmnt_state::screen_update_lgtnfght));
@@ -2219,7 +2219,7 @@ void tmnt_state::blswhstl(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(tmnt_state::screen_update_lgtnfght));
@@ -2295,7 +2295,7 @@ void glfgreat_state::glfgreat(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(glfgreat_state::screen_update_glfgreat));
@@ -2361,7 +2361,7 @@ void prmrsocr_state::prmrsocr(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(prmrsocr_state::screen_update_glfgreat));
@@ -2425,7 +2425,7 @@ void tmnt_state::tmnt2(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(tmnt_state::screen_update_tmnt2));
@@ -2480,7 +2480,7 @@ void tmnt_state::ssriders(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(tmnt_state::screen_update_tmnt2));
@@ -2529,7 +2529,7 @@ void tmnt_state::sunsetbl(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(tmnt_state::screen_update_tmnt2));
@@ -2579,7 +2579,7 @@ void tmnt_state::thndrx2(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(tmnt_state::screen_update_thndrx2));

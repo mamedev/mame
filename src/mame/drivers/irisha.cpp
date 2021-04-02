@@ -384,7 +384,7 @@ void irisha_state::irisha(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(320, 200);
 	screen.set_visarea(0, 320-1, 0, 200-1);
 	screen.set_screen_update(FUNC(irisha_state::screen_update));

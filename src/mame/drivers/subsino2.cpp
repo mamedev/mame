@@ -2953,7 +2953,7 @@ void subsino2_state::mtrain(machine_config &config)
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 256-32-1);
 	m_screen->set_refresh_hz(58.7270);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
+	m_screen->set_vblank_time(subseconds::from_usec(2500) /* not accurate */);   // game reads vblank state
 	m_screen->set_screen_update(FUNC(subsino2_state::screen_update_subsino2));
 	m_screen->set_palette(m_palette);
 
@@ -2987,7 +2987,7 @@ void subsino2_state::saklove(machine_config &config)
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
 	m_screen->set_refresh_hz(58.7270);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
+	m_screen->set_vblank_time(subseconds::from_usec(2500) /* not accurate */);   // game reads vblank state
 	m_screen->set_screen_update(FUNC(subsino2_state::screen_update_subsino2));
 	m_screen->set_palette(m_palette);
 
@@ -3022,7 +3022,7 @@ void subsino2_state::xplan(machine_config &config)
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
 	m_screen->set_refresh_hz(58.7270);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
+	m_screen->set_vblank_time(subseconds::from_usec(2500) /* not accurate */);   // game reads vblank state
 	m_screen->set_screen_update(FUNC(subsino2_state::screen_update_subsino2));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set("maincpu", FUNC(i80188_cpu_device::int0_w));

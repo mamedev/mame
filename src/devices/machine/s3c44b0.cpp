@@ -453,7 +453,7 @@ void s3c44b0_device::device_start()
 
 void s3c44b0_device::device_post_load()
 {
-	m_lcd.frame_period = HZ_TO_ATTOSECONDS(m_lcd.framerate);
+	m_lcd.frame_period = subseconds::from_hz(m_lcd.framerate);
 	m_lcd.scantime = m_lcd.frame_period / m_lcd.vpos_end;
 	m_lcd.pixeltime = m_lcd.frame_period / (m_lcd.vpos_end * m_lcd.hpos_end);
 }
@@ -631,23 +631,23 @@ void s3c44b0_device::lcd_render_stn_08()
 
 attotime s3c44b0_device::time_until_pos(int vpos, int hpos)
 {
-	attoseconds_t time1, time2;
+	subseconds time1, time2;
 	attotime retval;
 	verboselog( *this, 3, "s3c44b0_time_until_pos - vpos %d hpos %d\n", vpos, hpos);
-	time1 = (attoseconds_t)vpos * m_lcd.scantime + (attoseconds_t)hpos * m_lcd.pixeltime;
-	time2 = (machine().time() - m_lcd.frame_time).as_attoseconds();
-	verboselog( *this, 3, "machine %f frametime %f time1 %f time2 %f\n", machine().time().as_double(), m_lcd.frame_time.as_double(), attotime(0, time1).as_double(), attotime(0, time2).as_double());
+	time1 = vpos * m_lcd.scantime + hpos * m_lcd.pixeltime;
+	time2 = (machine().time() - m_lcd.frame_time).as_subseconds();
+	verboselog( *this, 3, "machine %f frametime %f time1 %f time2 %f\n", machine().time().as_double(), m_lcd.frame_time.as_double(), time1.as_double(), time2.as_double());
 	while (time1 <= time2) time1 += m_lcd.frame_period;
-	retval = attotime( 0, time1 - time2);
+	retval = attotime(time1 - time2);
 	verboselog( *this, 3, "result %f\n", retval.as_double());
 	return retval;
 }
 
 int s3c44b0_device::lcd_get_vpos()
 {
-	attoseconds_t delta;
+	subseconds delta;
 	int vpos;
-	delta = (machine().time() - m_lcd.frame_time).as_attoseconds();
+	delta = (machine().time() - m_lcd.frame_time).as_subseconds();
 	delta = delta + (m_lcd.pixeltime / 2);
 	vpos = delta / m_lcd.scantime;
 	return (m_lcd.vpos_min + vpos) % m_lcd.vpos_end;
@@ -655,9 +655,9 @@ int s3c44b0_device::lcd_get_vpos()
 
 int s3c44b0_device::lcd_get_hpos()
 {
-	attoseconds_t delta;
+	subseconds delta;
 	int vpos;
-	delta = (machine().time() - m_lcd.frame_time).as_attoseconds();
+	delta = (machine().time() - m_lcd.frame_time).as_subseconds();
 	delta = delta + (m_lcd.pixeltime / 2);
 	vpos = delta / m_lcd.scantime;
 	delta = delta - (vpos * m_lcd.scantime);
@@ -773,7 +773,7 @@ void s3c44b0_device::lcd_configure()
 	height = lineval + 1;
 	m_lcd.framerate = framerate;
 	verboselog( *this, 3, "video_screen_configure %d %d %f\n", width, height, m_lcd.framerate);
-	screen().configure(screen().width(), screen().height(), screen().visible_area(), HZ_TO_ATTOSECONDS(m_lcd.framerate));
+	screen().configure(screen().width(), screen().height(), screen().visible_area(), subseconds::from_hz(m_lcd.framerate));
 	m_lcd.hpos_min = 25;
 	m_lcd.hpos_max = 25 + width - 1;
 	m_lcd.hpos_end = 25 + width - 1 + 25;
@@ -786,12 +786,12 @@ void s3c44b0_device::lcd_configure()
 		m_lcd.bitmap = nullptr;
 	}
 	m_lcd.bitmap = std::make_unique<uint8_t[]>((m_lcd.hpos_max - m_lcd.hpos_min + 1) * (m_lcd.vpos_max - m_lcd.vpos_min + 1) * 3);
-	m_lcd.frame_period = HZ_TO_ATTOSECONDS(m_lcd.framerate);
+	m_lcd.frame_period = subseconds::from_hz(m_lcd.framerate);
 	m_lcd.scantime = m_lcd.frame_period / m_lcd.vpos_end;
 	m_lcd.pixeltime = m_lcd.frame_period / (m_lcd.vpos_end * m_lcd.hpos_end);
-//  printf("frame_period %f\n", attotime( 0, m_lcd.frame_period).as_double());
-//  printf("scantime %f\n", attotime( 0, m_lcd.scantime).as_double());
-//  printf("pixeltime %f\n", attotime( 0, m_lcd.pixeltime).as_double());
+//  printf("frame_period %f\n", m_lcd.frame_period.as_double());
+//  printf("scantime %f\n", m_lcd.scantime.as_double());
+//  printf("pixeltime %f\n", m_lcd.pixeltime.as_double());
 }
 
 

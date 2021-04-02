@@ -241,8 +241,8 @@ public:
 	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, attotime>::value> save_item(device_t *device, const char *module, const char *tag, int index, ItemType &value, const char *valname)
 	{
 		std::string tempstr;
-		tempstr.assign(valname).append(".attoseconds");
-		save_item(device, module, tag, index, value, &attotime::m_attoseconds, tempstr.c_str());
+		tempstr.assign(valname).append(".subseconds");
+		save_item(device, module, tag, index, value, &attotime::m_subseconds, tempstr.c_str());
 		tempstr.assign(valname).append(".seconds");
 		save_item(device, module, tag, index, value, &attotime::m_seconds, tempstr.c_str());
 	}
@@ -251,8 +251,8 @@ public:
 	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, attotime>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, ItemType *value, const char *valname, u32 count)
 	{
 		std::string tempstr;
-		tempstr.assign(valname).append(".attoseconds");
-		save_item(device, module, tag, index, value, &attotime::m_attoseconds, tempstr.c_str(), count);
+		tempstr.assign(valname).append(".subseconds");
+		save_item(device, module, tag, index, value, &attotime::m_subseconds, tempstr.c_str(), count);
 		tempstr.assign(valname).append(".seconds");
 		save_item(device, module, tag, index, value, &attotime::m_seconds, tempstr.c_str(), count);
 	}
@@ -261,10 +261,29 @@ public:
 	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, attotime>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, const std::unique_ptr<ItemType []> &value, const char *valname, u32 count)
 	{
 		std::string tempstr;
-		tempstr.assign(valname).append(".attoseconds");
-		save_item(device, module, tag, index, value, &attotime::m_attoseconds, tempstr.c_str(), count);
+		tempstr.assign(valname).append(".subseconds");
+		save_item(device, module, tag, index, value, &attotime::m_subseconds, tempstr.c_str(), count);
 		tempstr.assign(valname).append(".seconds");
 		save_item(device, module, tag, index, value, &attotime::m_seconds, tempstr.c_str(), count);
+	}
+
+	// specializations for subseconds
+	template <typename ItemType>
+	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, subseconds>::value> save_item(device_t *device, const char *module, const char *tag, int index, ItemType &value, const char *valname)
+	{
+		save_item(device, module, tag, index, value, &subseconds::m_subseconds, valname);
+	}
+
+	template <typename ItemType>
+	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, subseconds>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, ItemType *value, const char *valname, u32 count)
+	{
+		save_item(device, module, tag, index, value, &subseconds::m_subseconds, valname, count);
+	}
+
+	template <typename ItemType>
+	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, subseconds>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, const std::unique_ptr<ItemType []> &value, const char *valname, u32 count)
+	{
+		save_item(device, module, tag, index, value, &subseconds::m_subseconds, valname, count);
 	}
 
 	// global memory registration

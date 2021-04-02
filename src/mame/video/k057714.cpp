@@ -158,7 +158,7 @@ inline void k057714_device::crtc_set_screen_params()
 	auto vtotal = m_display_v_visarea + m_display_v_frontporch + m_display_v_backporch + m_display_v_syncpulse;
 
 	rectangle visarea(0, m_display_h_visarea - 1, 0, m_display_v_visarea - 1);
-	screen().configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(m_pixclock) * htotal * vtotal);
+	screen().configure(htotal, vtotal, visarea, subseconds::from_hz(m_pixclock) * htotal * vtotal);
 }
 
 uint32_t k057714_device::read(offs_t offset)

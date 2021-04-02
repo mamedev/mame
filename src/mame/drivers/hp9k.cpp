@@ -403,7 +403,7 @@ void hp9k_state::hp9k(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(HP9816_ROWX*HP9816_CHDIMX, HP9816_ROWY*HP9816_CHDIMY);
 	screen.set_visarea(0, (HP9816_ROWX*HP9816_CHDIMX)-1, 0, (HP9816_ROWY*HP9816_CHDIMY)-1);
 	screen.set_screen_update(FUNC(hp9k_state::screen_update));

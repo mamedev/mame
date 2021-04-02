@@ -747,7 +747,7 @@ void tmmjprd_state::tmpdoki(machine_config &config)
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);
-	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_vblank_time(subseconds::from_usec(0));
 	lscreen.set_size(64*16, 64*16);
 	lscreen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
 	//lscreen.set_visarea(0*8, 64*16-1, 0*8, 64*16-1);
@@ -771,7 +771,7 @@ void tmmjprd_state::tmmjprd(machine_config &config)
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_refresh_hz(60);
-	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_vblank_time(subseconds::from_usec(0));
 	rscreen.set_size(64*16, 64*16);
 	rscreen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
 	//rscreen.set_visarea(0*8, 64*16-1, 0*8, 64*16-1);

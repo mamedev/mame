@@ -240,7 +240,7 @@ void prof180x_state::prof180x(machine_config &config)
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(prof180x_state::screen_update));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);
 

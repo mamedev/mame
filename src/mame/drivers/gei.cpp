@@ -1032,7 +1032,7 @@ void gei_state::getrivia(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_screen_update(FUNC(gei_state::screen_update));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(48, 511-48, 16, 255-16);

@@ -490,7 +490,7 @@ void xexex_state::xexex(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 //  m_screen->set_refresh_hz(XTAL(32'000'000)/4/512/288);
 	m_screen->set_raw(XTAL(32'000'000)/4, 384+33+40+55, 0, 383, 256+12+6+14, 0, 255); // 8Mhz horizontal dotclock
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(40, 40+384-1, 0, 0+256-1);
 	m_screen->set_screen_update(FUNC(xexex_state::screen_update_xexex));

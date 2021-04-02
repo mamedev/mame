@@ -82,7 +82,7 @@ void compis_hrg_device::device_add_mconfig(machine_config &config)
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_vblank_time(subseconds::from_usec(2500)); // not accurate
 	screen.set_size(640, 400);
 	screen.set_visarea(0, 640-1, 0, 400-1);
 	screen.set_screen_update(UPD7220_TAG, FUNC(upd7220_device::screen_update));
@@ -101,7 +101,7 @@ void compis_uhrg_device::device_add_mconfig(machine_config &config)
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_vblank_time(subseconds::from_usec(2500)); // not accurate
 	screen.set_size(1280, 800);
 	screen.set_visarea(0, 1280-1, 0, 800-1);
 	screen.set_screen_update(UPD7220_TAG, FUNC(upd7220_device::screen_update));

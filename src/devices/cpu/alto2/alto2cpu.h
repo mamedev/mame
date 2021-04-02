@@ -553,6 +553,8 @@ private:
 	inline uint32_t loadl() const { return X_BIT(m_mir, 32, DLOADL); }
 	inline uint32_t next() const { return X_RDBITS(m_mir, 32, NEXT0, NEXT9); }
 
+	inline subseconds ucycle_subs() const { return subseconds::from_hz(clock()); }
+
 	/**
 	 * \brief current micro instruction's register selection
 	 * The emulator F2s ACSOURCE and ACDEST modify this.
@@ -583,10 +585,10 @@ private:
 	uint8_t m_bank_reg[ALTO2_TASKS];                  //!< normal and extended RAM banks per task
 	bool m_ether_enable;                            //!< set to true, if the ethernet should be simulated
 	bool m_ewfct;                                   //!< set by Ether task when it want's a wakeup at switch to task_mrt
-	attoseconds_t m_display_time;                   //!< display time accu (display state machine)
-	attoseconds_t m_unload_time;                    //!< unload word time accu (display FIFO)
+	subseconds m_display_time;                      //!< display time accu (display state machine)
+	subseconds m_unload_time;                       //!< unload word time accu (display FIFO)
 	int m_unload_word;                              //!< unload word number
-	attoseconds_t m_bitclk_time;                    //!< bitclk call time accu (disk shift register)
+	subseconds m_bitclk_time;                       //!< bitclk call time accu (disk shift register)
 	int m_bitclk_index;                             //!< bitclk index (bit number in sector)
 
 	static const char *task_name(int task);         //!< human readable task names

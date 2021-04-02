@@ -219,7 +219,7 @@ void vt100_video_device::recompute_parameters()
 	// dot clock is divided by 1.5 in 80 column mode
 	screen().set_unscaled_clock(m_columns == 132 ? clock() : clock() * 2 / 3);
 	rectangle visarea(0, horiz_pix_visible - 1, 0, vert_pix_visible - 1);
-	screen().configure(horiz_pix_total, vert_pix_total, visarea, frame_period.as_attoseconds());
+	screen().configure(horiz_pix_total, vert_pix_total, visarea, frame_period.as_subseconds());
 
 	LOG("(RECOMPUTE) HPIX: %d (%d) - VPIX: %d (%d)\n", horiz_pix_visible, horiz_pix_total, vert_pix_visible, vert_pix_total);
 	LOG("(RECOMPUTE) FREQUENCY: %f\n", frame_period.as_hz());

@@ -1120,13 +1120,13 @@ void output_display(std::ostream &out, device_t &device, machine_flags::type con
 			}
 
 			// output refresh rate
-			out << util::string_format(" refresh=\"%f\"", ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds()));
+			out << util::string_format(" refresh=\"%f\"", screendev.refresh_subseconds().as_hz());
 
 			// output raw video parameters only for games that are not vector
 			// and had raw parameters specified
 			if (screendev.screen_type() != SCREEN_TYPE_VECTOR && !screendev.oldstyle_vblank_supplied())
 			{
-				int pixclock = screendev.width() * screendev.height() * ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds());
+				int pixclock = screendev.width() * screendev.height() * screendev.refresh_subseconds().as_hz();
 
 				out << util::string_format(" pixclock=\"%d\"", pixclock);
 				out << util::string_format(" htotal=\"%d\"", screendev.width());

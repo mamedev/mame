@@ -236,7 +236,7 @@ void aquarium_state::aquarium(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(64*8, 64*8);
 	m_screen->set_visarea(2*8, 42*8-1, 2*8, 34*8-1);
 	m_screen->set_screen_update(FUNC(aquarium_state::screen_update));

@@ -237,7 +237,7 @@ void pioneer_pr8210_device::control_w(uint8_t data)
 		// log the deltas for debugging
 		if (LOG_SERIAL)
 		{
-			int usecdiff = (int)(delta.attoseconds() / ATTOSECONDS_IN_USEC(1));
+			int usecdiff = delta.as_usec_int();
 			logerror("bitdelta = %5d (%d) - accum = %04X\n", usecdiff, longpulse, m_accumulator);
 		}
 

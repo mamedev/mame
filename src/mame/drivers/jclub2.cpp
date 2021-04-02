@@ -1163,7 +1163,7 @@ void jclub2o_state::jclub2o(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(0x190, 0x100+16);
 	screen.set_visarea(0, 0x190-1, 0x10, 0x100-1);
 	screen.set_screen_update(FUNC(jclub2_state::screen_update));
@@ -1197,7 +1197,7 @@ void jclub2_state::jclub2(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(0x190, 0x100+16);
 	screen.set_visarea(0, 0x190-1, 8, 0x100-8-1);
 	screen.set_screen_update(FUNC(jclub2_state::screen_update));
@@ -1241,7 +1241,7 @@ void darkhors_state::darkhors(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(0x190, 0x100+16);
 	screen.set_visarea(0, 0x190-1, 8, 0x100-8-1);
 	screen.set_screen_update(FUNC(darkhors_state::screen_update));

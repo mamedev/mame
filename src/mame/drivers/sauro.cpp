@@ -464,7 +464,7 @@ void sauro_state::tecfri(machine_config &config)
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(55.72);   // Verified on PCB
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(5000));  // frames per second, vblank duration (otherwise sprites lag)
+	screen.set_vblank_time(subseconds::from_usec(5000));  // frames per second, vblank duration (otherwise sprites lag)
 	screen.set_size(32 * 8, 32 * 8);
 	screen.set_visarea(1 * 8, 31 * 8 - 1, 2 * 8, 30 * 8 - 1);
 	screen.set_palette(m_palette);

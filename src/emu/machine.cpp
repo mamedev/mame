@@ -375,7 +375,7 @@ int running_machine::run(bool quiet)
 #endif
 
 		// run the CPUs until a reset or exit
-		constexpr attoseconds_t minslice = HZ_TO_ATTOSECONDS(100);
+		constexpr subseconds minslice = subseconds::from_hz(100);
 		while ((!m_hard_reset_pending && !m_exit_pending) || m_saveload_schedule != saveload_schedule::NONE)
 		{
 			g_profiler.start(PROFILER_EXTRA);
@@ -1410,9 +1410,9 @@ void running_machine::emscripten_main_loop()
 
 		// Emscripten will call this function at 60Hz, so step the simulation
 		// forward for the amount of time that has passed since the last frame
-		constexpr attoseconds_t frametime = HZ_TO_ATTOSECONDS(60);
-		const attoseconds_t start = scheduler->time().attoseconds();
-		const attoseconds_t end = ((start / frametime) + 1) * frametime;
+		constexpr subseconds frametime = subseconds::from_hz(60);
+		const subseconds start = scheduler->time().raw_subseconds();
+		const subseconds end = ((start / frametime) + 1) * frametime;
 
 		scheduler->timeslice(end - start);
 		// handle save/load

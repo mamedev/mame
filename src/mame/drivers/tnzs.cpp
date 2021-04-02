@@ -1550,7 +1550,7 @@ void tnzs_base_state::tnzs_base(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(tnzs_base_state::screen_update_tnzs));
@@ -1577,7 +1577,7 @@ void tnzs_mcu_state::tnzs(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_refresh_hz(59.15);   /* it should be the same as the newer pcb vsync */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 
 	/* sound hardware */
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000)/4));
@@ -1595,7 +1595,7 @@ void extrmatn_state::extrmatn(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 
 	m_palette->set_init(FUNC(extrmatn_state::prompalette));
 }

@@ -508,7 +508,7 @@ void okean240_state::okean240t(machine_config &config)
 	/* video hardware */
 	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
 	screen1.set_refresh_hz(50);
-	screen1.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen1.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen1.set_size(256, 256);
 	screen1.set_visarea(0, 255, 0, 255);
 	screen1.set_screen_update(FUNC(okean240_state::screen_update_okean240));

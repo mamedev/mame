@@ -193,7 +193,7 @@ void tk80bs_state::tk80bs(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(256, 128);
 	screen.set_visarea(0, 256-1, 0, 128-1);
 	screen.set_screen_update(FUNC(tk80bs_state::screen_update_tk80bs));

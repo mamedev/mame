@@ -472,7 +472,7 @@ void intv_state::intv(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(59.92);
-	//screen.set_vblank_time(ATTOSECONDS_IN_USEC(2400)); /* not accurate */
+	//screen.set_vblank_time(subseconds::from_usec(2400)); /* not accurate */
 	screen.set_screen_update(FUNC(intv_state::screen_update_intv));
 	screen.set_size(stic_device::SCREEN_WIDTH*INTV_X_SCALE, stic_device::SCREEN_HEIGHT*INTV_Y_SCALE);
 	screen.set_visarea(0, stic_device::SCREEN_WIDTH*INTV_X_SCALE-1, 0, stic_device::SCREEN_HEIGHT*INTV_Y_SCALE-1);

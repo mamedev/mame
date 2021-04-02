@@ -303,7 +303,7 @@ void good_state::good(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(32*16, 32*16);
 	screen.set_visarea(1*16, 23*16-1, 0*16, 14*16-1);
 	screen.set_screen_update(FUNC(good_state::screen_update_good));

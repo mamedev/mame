@@ -286,7 +286,7 @@ void targeth_state::targeth(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	m_screen->set_size(64*16, 16*16);
 	m_screen->set_visarea(3*8, 23*16-8-1, 16, 16*16-8-1);
 	m_screen->set_screen_update(FUNC(targeth_state::screen_update));

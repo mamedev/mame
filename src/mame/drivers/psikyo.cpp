@@ -1044,7 +1044,7 @@ void psikyo_state::sngkace(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: accurate measurements
 	m_screen->set_refresh_hz(59.3);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_vblank_time(subseconds::from_usec(2500));
 	m_screen->set_size(320, 256);
 	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
@@ -1090,7 +1090,7 @@ void psikyo_state::gunbird(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: accurate measurements
 	m_screen->set_refresh_hz(59.3);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_vblank_time(subseconds::from_usec(2500));
 	m_screen->set_size(320, 256);
 	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));
@@ -1131,7 +1131,7 @@ void psikyo_state::s1945bl(machine_config &config) /* Bootleg hardware based on 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: accurate measurements
 	m_screen->set_refresh_hz(59.3);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_vblank_time(subseconds::from_usec(2500));
 	m_screen->set_size(320, 256);
 	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update_bootleg));
@@ -1174,7 +1174,7 @@ void psikyo_state::s1945(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: accurate measurements
 	m_screen->set_refresh_hz(59.9229);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_vblank_time(subseconds::from_usec(2500));
 	m_screen->set_size(320, 256);
 	m_screen->set_visarea(0, 320-1, 0, 256-32-1);
 	m_screen->set_screen_update(FUNC(psikyo_state::screen_update));

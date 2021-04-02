@@ -143,7 +143,7 @@ void vtech_innotv_innotabmax_state::vtech_innotv_innotabmax(machine_config &conf
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
+	m_screen->set_vblank_time(subseconds::from_usec(10));
 	m_screen->set_size(1280, 720);
 	m_screen->set_visarea(0, 1280-1, 0, 720-1);
 	m_screen->set_screen_update(FUNC(vtech_innotv_innotabmax_state::screen_update));

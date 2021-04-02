@@ -248,7 +248,7 @@ void vdt911_device::device_reset()
 	// European models have 50 Hz
 	int lines = (m_model == model::US) || (m_model == model::Japanese) ? 262 : 314;
 	attotime refresh = attotime::from_hz(11.004_MHz_XTAL / 700 / lines);
-	m_screen->configure(700, lines, m_screen->visible_area(), refresh.as_attoseconds());
+	m_screen->configure(700, lines, m_screen->visible_area(), refresh.as_subseconds());
 	m_line_timer->adjust(attotime::from_msec(0), 0, refresh);
 }
 

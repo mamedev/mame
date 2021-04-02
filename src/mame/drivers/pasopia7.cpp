@@ -854,7 +854,7 @@ void pasopia7_state::p7_raster(machine_config &config)
 	p7_base(config);
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 640-1, 0, 32-1);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
@@ -875,7 +875,7 @@ void pasopia7_state::p7_lcd(machine_config &config)
 	p7_base(config);
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 640-1, 0, 200-1);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));

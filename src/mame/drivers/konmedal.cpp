@@ -823,7 +823,7 @@ void konmedal_state::tsukande(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(59.62);  /* verified on pcb */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(80, 400-1, 16, 240-1);
 	screen.set_screen_update(FUNC(konmedal_state::screen_update_konmedal));
@@ -866,7 +866,7 @@ void konmedal_state::ddboy(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(59.62);  /* verified on pcb */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(80, 400-1, 16, 240-1);
 	screen.set_screen_update(FUNC(konmedal_state::screen_update_konmedal));
@@ -1005,7 +1005,7 @@ void konmedal_state::shuriboy(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // everything not verified, just a placeholder
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(30));
+	screen.set_vblank_time(subseconds::from_usec(30));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(112, 400-1, 16, 240-1);
 	screen.set_screen_update(FUNC(konmedal_state::screen_update_shuriboy));

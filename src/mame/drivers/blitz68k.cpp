@@ -1801,7 +1801,7 @@ void blitz68k_state::ilpag(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(512, 256);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
@@ -1871,7 +1871,7 @@ void blitz68k_state::cjffruit(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0, 256-8-1);
 	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
@@ -1911,7 +1911,7 @@ void blitz68k_state::bankrob(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0+4, 256-1-4);
 	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
@@ -1942,7 +1942,7 @@ void blitz68k_state::bankroba(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0+7, 256-1);
 	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
@@ -1972,7 +1972,7 @@ void blitz68k_state::deucesw2(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(512, 256);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
@@ -2004,7 +2004,7 @@ void blitz68k_state::dualgame(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0+4, 256-1-4);
 	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
@@ -2034,7 +2034,7 @@ void blitz68k_state::hermit(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0+4, 256-1-4);
 	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k));
@@ -2068,7 +2068,7 @@ void blitz68k_state::maxidbl(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(512, 256);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(blitz68k_state::screen_update_blitz68k_noblit));

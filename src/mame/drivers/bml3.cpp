@@ -887,7 +887,7 @@ void bml3_state::bml3_common(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2400)); /* Service manual specifies "Raster return period" as 2.4 ms (p.64), although the total vertical non-displaying time seems to be 4 ms. */
+	screen.set_vblank_time(subseconds::from_usec(2400)); /* Service manual specifies "Raster return period" as 2.4 ms (p.64), although the total vertical non-displaying time seems to be 4 ms. */
 	screen.set_size(640, 400);
 	screen.set_visarea(0, 320-1, 0, 200-1);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));

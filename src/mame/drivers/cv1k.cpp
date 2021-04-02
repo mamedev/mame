@@ -477,8 +477,8 @@ void cv1k_state::cv1k(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh(HZ_TO_ATTOSECONDS(60.024)); // measured from ibara PCB rates - 60.024Hz, 262 total lines
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_refresh(subseconds::from_hz(60.024)); // measured from ibara PCB rates - 60.024Hz, 262 total lines
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(512, 512);
 	screen.set_visarea(0, 320-1, 0, 240-1);
 	screen.set_screen_update(FUNC(cv1k_state::screen_update));

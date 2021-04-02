@@ -382,7 +382,7 @@ void d6800_state::d6800(machine_config &config)
 	screen.set_size(64, 32);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(d6800_state::screen_update_d6800));
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(300)); // verified
+	screen.set_vblank_time(subseconds::from_usec(300)); // verified
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);

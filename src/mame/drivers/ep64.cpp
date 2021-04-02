@@ -582,7 +582,7 @@ void ep64_state::ep64(machine_config &config)
 	// video hardware
 	screen_device& screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_size(ENTERPRISE_SCREEN_WIDTH, ENTERPRISE_SCREEN_HEIGHT);
 	screen.set_visarea(0, ENTERPRISE_SCREEN_WIDTH-1, 0, ENTERPRISE_SCREEN_HEIGHT-1);
 	screen.set_screen_update(NICK_TAG, FUNC(nick_device::screen_update));

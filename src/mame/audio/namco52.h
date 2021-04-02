@@ -13,7 +13,7 @@ public:
 
 	template <typename T> void set_discrete(T &&tag) { m_discrete.set_tag(std::forward<T>(tag)); }
 	void set_basenote(int node) { m_basenode = node; }
-	void set_extclock(attoseconds_t clk) { m_extclock = clk; }
+	void set_extclock(subseconds clk) { m_extclock = clk; }
 	auto romread_callback() { return m_romread.bind(); }
 	auto si_callback() { return m_si.bind(); }
 	namco_52xx_device &set_irq_duration(attotime t) { m_irq_duration = t; return *this; }
@@ -39,7 +39,7 @@ private:
 
 	attotime m_irq_duration;
 	int m_basenode;
-	attoseconds_t m_extclock;
+	subseconds m_extclock;
 	emu_timer *m_extclock_pulse_timer;
 	devcb_read8 m_romread;
 	devcb_read8 m_si;

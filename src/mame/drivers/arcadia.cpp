@@ -484,7 +484,7 @@ void arcadia_state::arcadia(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(128+2*XPOS, 262);
 	m_screen->set_visarea(0, 2*XPOS+128-1, 0, 262-1);
 	m_screen->set_screen_update(FUNC(arcadia_state::screen_update_arcadia));

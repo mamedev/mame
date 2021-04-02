@@ -1244,14 +1244,10 @@ u16 sega315_5313_device::get_hposition()
 
 		time_elapsed_since_megadriv_scanline_timer = m_megadriv_scanline_timer->time_elapsed();
 
-		if (time_elapsed_since_megadriv_scanline_timer.attoseconds() < (ATTOSECONDS_PER_SECOND/get_framerate() /double(m_total_scanlines)))
-		{
-			value4 = (u16)(MAX_HPOSITION * ((double)(time_elapsed_since_megadriv_scanline_timer.attoseconds()) / (double)(ATTOSECONDS_PER_SECOND/get_framerate() /double(m_total_scanlines))));
-		}
-		else /* in some cases (probably due to rounding errors) we get some stupid results (the odd huge value where the time elapsed is much higher than the scanline time??!).. hopefully by clamping the result to the maximum we limit errors */
-		{
-			value4 = MAX_HPOSITION;
-		}
+		u64 ticks = time_elapsed_since_megadriv_scanline_timer.as_ticks(subseconds::from_hz(get_framerate() * double(m_total_scanlines) * MAX_HPOSITION));
+
+		/* in some cases (probably due to rounding errors) we get some stupid results (the odd huge value where the time elapsed is much higher than the scanline time??!).. hopefully by clamping the result to the maximum we limit errors */
+		value4 = (u16)std::min<u64>(ticks, MAX_HPOSITION);
 	}
 	else
 	{
@@ -2359,7 +2355,7 @@ void sega315_5313_device::vdp_handle_eof()
 
 	visarea.set(0, scr_width - 1, 0, m_visible_scanlines - 1);
 
-	screen().configure(480 * scr_mul, m_total_scanlines, visarea, screen().frame_period().attoseconds());
+	screen().configure(480 * scr_mul, m_total_scanlines, visarea, screen().frame_period().as_subseconds());
 }
 
 

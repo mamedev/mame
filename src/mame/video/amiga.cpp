@@ -1078,7 +1078,7 @@ void amiga_state::update_screenmode()
 	int vblank = pal ? VBLANK_PAL : VBLANK_NTSC;
 
 	// frame period
-	attoseconds_t period = HZ_TO_ATTOSECONDS(m_screen->clock()) * SCREEN_WIDTH * height;
+	subseconds period = subseconds::from_hz(m_screen->clock()) * SCREEN_WIDTH * height;
 
 	// adjust visible area
 	rectangle visarea = m_screen->visible_area();

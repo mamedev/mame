@@ -293,7 +293,7 @@ void circus_state::circus(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);  /* needed for proper hardware collisions */
 	screen.set_refresh_hz(57);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3500)); /* (complete guess) */
+	screen.set_vblank_time(subseconds::from_usec(3500)); /* (complete guess) */
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 31*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(circus_state::screen_update_circus));
@@ -325,7 +325,7 @@ void circus_state::robotbwl(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(57);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3500)); /* (complete guess) */
+	screen.set_vblank_time(subseconds::from_usec(3500)); /* (complete guess) */
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 31*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(circus_state::screen_update_robotbwl));
@@ -365,7 +365,7 @@ void circus_state::crash(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(57);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3500)); /* (complete guess) */
+	screen.set_vblank_time(subseconds::from_usec(3500)); /* (complete guess) */
 	screen.set_size(40*8, 40*8); // TODO // to do what?
 	screen.set_visarea(0*8, 31*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(circus_state::screen_update_crash));
@@ -397,7 +397,7 @@ void circus_state::ripcord(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);          /* needed for proper hardware collisions */
 	screen.set_refresh_hz(57);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3500)); /* (complete guess) */
+	screen.set_vblank_time(subseconds::from_usec(3500)); /* (complete guess) */
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 31*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(circus_state::screen_update_ripcord));

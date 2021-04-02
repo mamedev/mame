@@ -294,7 +294,8 @@ private:
 	uint8_t             m_fieldnum;             // field number (0 or 1)
 	int32_t             m_curtrack;             // current track at this end of this vsync
 	uint32_t            m_maxtrack;             // maximum track number
-	attoseconds_t       m_attospertrack;        // attoseconds per track, or 0 if not moving
+	subseconds          m_subspertrack;         // subseconds per track, or 0 if not moving
+	bool                m_subspertrack_neg;     // sign: true = negative
 	attotime            m_sliderupdate;         // time of last slider update
 
 	// video data
@@ -304,7 +305,7 @@ private:
 
 	// audio data
 	sound_stream *      m_stream;
-	std::vector<int16_t>       m_audiobuffer[2];       // buffer for audio samples
+	std::vector<int16_t>  m_audiobuffer[2];       // buffer for audio samples
 	uint32_t              m_audiobufsize;         // size of buffer
 	uint32_t              m_audiobufin;           // input index
 	uint32_t              m_audiobufout;          // output index

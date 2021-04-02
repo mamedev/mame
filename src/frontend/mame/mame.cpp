@@ -308,7 +308,7 @@ TIMER_CALLBACK_MEMBER(mame_machine_manager::autoboot_callback)
 void mame_machine_manager::reset()
 {
 	// setup autoboot if needed
-	m_autoboot_timer->adjust(attotime(options().autoboot_delay(),0),0);
+	m_autoboot_timer->adjust(attotime(options().autoboot_delay()), 0);
 }
 
 ui_manager* mame_machine_manager::create_ui(running_machine& machine)

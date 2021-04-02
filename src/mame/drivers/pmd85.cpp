@@ -656,7 +656,7 @@ void pmd85_state::pmd85(machine_config &config, bool with_uart)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(0);
+	screen.set_vblank_time(subseconds::zero());
 	screen.set_size(288, 256);
 	screen.set_visarea(0, 288-1, 0, 256-1);
 	screen.set_screen_update(FUNC(pmd85_state::screen_update));

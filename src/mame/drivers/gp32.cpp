@@ -328,7 +328,7 @@ void gp32_state::s3c240x_lcd_configure()
 	LOGMASKED(LOG_VRAM, "LCD - framerate %f\n", framerate);
 	visarea.set(0, hozval, 0, lineval);
 	LOGMASKED(LOG_VRAM, "LCD - visarea min_x %d min_y %d max_x %d max_y %d\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
-	m_screen->configure(hozval + 1, lineval + 1, visarea, HZ_TO_ATTOSECONDS( framerate));
+	m_screen->configure(hozval + 1, lineval + 1, visarea, subseconds::from_hz( framerate));
 }
 
 void gp32_state::s3c240x_lcd_start()
@@ -1691,7 +1691,7 @@ void gp32_state::gp32(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	// TODO: bad setup that theoretically should fail a validation check plus console doesn't have vertical screen anyway
 	// TODO: retrieve actual defaults from BIOS
 	m_screen->set_size(240, 320);

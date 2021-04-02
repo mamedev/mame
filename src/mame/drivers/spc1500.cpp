@@ -366,14 +366,14 @@ void spc1500_state::portb_w(uint8_t data)
 
 void spc1500_state::psgb_w(uint8_t data)
 {
-	int elapsed_time = m_timer->elapsed().as_attoseconds()/ATTOSECONDS_PER_MICROSECOND;
+	attotime const &elapsed_time = m_timer->elapsed();
 	if (m_ipl != ((data>>1)&1))
 	{
 		m_ipl = ((data>>1)&1);
 		membank("bank1")->set_entry(m_ipl ? 0 : 1);
 	}
 	//m_cass->change_state(BIT(data, 6) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
-	if (m_motor && !BIT(data, 7) && (elapsed_time > 100))
+	if (m_motor && !BIT(data, 7) && (elapsed_time > attotime::from_usec(100)))
 	{
 		m_cass->change_state((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 		m_timer->reset();
@@ -877,7 +877,7 @@ void spc1500_state::spc1500(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(640, 400);
 	screen.set_visarea(0,640-1,0,400-1);
 	screen.set_screen_update("mc6845", FUNC(mc6845_device::screen_update));

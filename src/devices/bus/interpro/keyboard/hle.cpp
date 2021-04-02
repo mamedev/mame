@@ -280,7 +280,7 @@ WRITE_LINE_MEMBER(hle_device_base::input_txd)
 void hle_device_base::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "bell").front_center();
-	BEEP(config, m_beeper, ATTOSECONDS_TO_HZ(480 * ATTOSECONDS_PER_MICROSECOND)).add_route(ALL_OUTPUTS, "bell", 1.0);
+	BEEP(config, m_beeper, 1.0 / 480e-6).add_route(ALL_OUTPUTS, "bell", 1.0);
 }
 
 void hle_device_base::device_start()

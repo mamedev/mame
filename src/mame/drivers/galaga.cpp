@@ -1600,7 +1600,7 @@ void bosco_state::bosco(machine_config &config)
 	namco_52xx_device &n52xx(NAMCO_52XX(config, "52xx", MASTER_CLOCK/6/2));      /* 1.536 MHz */
 	n52xx.set_discrete("discrete");
 	n52xx.set_basenote(NODE_04);
-	n52xx.set_extclock(ATTOSECONDS_IN_NSEC(PERIOD_OF_555_ASTABLE_NSEC(RES_K(33), RES_K(10), CAP_U(0.0047))));
+	n52xx.set_extclock(subseconds::from_nsec(PERIOD_OF_555_ASTABLE_NSEC(RES_K(33), RES_K(10), CAP_U(0.0047))));
 	n52xx.romread_callback().set(FUNC(galaga_state::namco_52xx_rom_r));
 	n52xx.si_callback().set(FUNC(galaga_state::namco_52xx_si_r));
 

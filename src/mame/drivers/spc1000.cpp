@@ -223,7 +223,7 @@ void spc1000_state::cass_w(uint8_t data)
 {
 	attotime time = machine().time();
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
-	if (BIT(data, 1) || (((time - m_time).as_attoseconds()/ATTOSECONDS_PER_MILLISECOND) < 1000))
+	if (BIT(data, 1) || (time - m_time) < attotime::from_msec(1000))
 	{
 		m_cass->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		m_time = time;

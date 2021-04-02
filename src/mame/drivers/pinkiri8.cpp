@@ -1123,7 +1123,7 @@ void pinkiri8_state::pinkiri8(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 64*8);
 	screen.set_visarea(0*8, 62*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(pinkiri8_state::screen_update_pinkiri8));

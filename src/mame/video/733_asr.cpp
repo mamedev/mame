@@ -787,7 +787,7 @@ void asr733_device::device_add_mconfig(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	m_screen->set_screen_update(FUNC(asr733_device::screen_update));
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 640-1, 0, 480-1);

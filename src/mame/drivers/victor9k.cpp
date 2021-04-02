@@ -674,7 +674,7 @@ void victor9k_state::victor9k(machine_config &config)
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_vblank_time(subseconds::from_usec(2500)); // not accurate
 	screen.set_screen_update(HD46505S_TAG, FUNC(hd6845s_device::screen_update));
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);

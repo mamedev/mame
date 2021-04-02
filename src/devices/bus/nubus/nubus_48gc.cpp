@@ -50,7 +50,7 @@ void jmfb_device::device_add_mconfig(machine_config &config)
 //  screen.set_size(1152, 870);
 //  screen.set_visarea(0, 1152-1, 0, 870-1);
 //  screen.set_refresh_hz(75);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(1260));
+//  screen.set_vblank_time(subseconds::from_usec(1260));
 }
 
 //-------------------------------------------------

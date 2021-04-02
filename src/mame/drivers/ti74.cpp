@@ -532,7 +532,7 @@ void ti74_state::ti74(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60); // arbitrary
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_size(6*31+1, 9*1+1+1);
 	screen.set_visarea_full();
 	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
@@ -566,7 +566,7 @@ void ti74_state::ti95(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60); // arbitrary
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_size(200, 20);
 	screen.set_visarea_full();
 	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));

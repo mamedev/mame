@@ -153,7 +153,7 @@ void ssrj_state::ssrj(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(0*8, 34*8-1, 1*8, 31*8-1); // unknown res
 	screen.set_screen_update(FUNC(ssrj_state::screen_update));

@@ -661,10 +661,10 @@ void mc6845_device::recompute_parameters(bool postload)
 				 horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, refresh.as_hz());
 
 			if (has_screen())
-				screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh.as_attoseconds());
+				screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh.as_subseconds());
 
 			if(!m_reconfigure_cb.isnull())
-				m_reconfigure_cb(horiz_pix_total, vert_pix_total, visarea, refresh.as_attoseconds());
+				m_reconfigure_cb(horiz_pix_total, vert_pix_total, visarea, refresh.as_subseconds());
 
 			m_has_valid_parameters = true;
 		}

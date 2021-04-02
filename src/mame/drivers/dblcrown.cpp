@@ -606,7 +606,7 @@ void dblcrown_state::dblcrown(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_screen_update(FUNC(dblcrown_state::screen_update));
 	screen.set_size(64*8, 64*8);
 	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);

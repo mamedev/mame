@@ -329,7 +329,7 @@ void pc1500_state::pc1500(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));  // not accurate
+	screen.set_vblank_time(subseconds::from_usec(2500));  // not accurate
 	screen.set_screen_update(FUNC(pc1500_state::screen_update));
 	screen.set_size(156, 8);
 	screen.set_visarea(0, 156-1, 0, 7-1);

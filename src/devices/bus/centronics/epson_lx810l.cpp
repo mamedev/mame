@@ -143,7 +143,7 @@ void epson_lx810l_device::device_add_mconfig(machine_config &config)
 	/* video hardware (simulates paper) */
 	screen_device &screen(SCREEN(config, m_screen, SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(PAPER_WIDTH, PAPER_HEIGHT);
 	screen.set_visarea(0, PAPER_WIDTH-1, 0, PAPER_HEIGHT-1);
 	screen.set_screen_update(FUNC(epson_lx810l_device::screen_update_lx810l));

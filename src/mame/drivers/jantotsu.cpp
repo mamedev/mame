@@ -508,7 +508,7 @@ void jantotsu_state::jantotsu(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); //not accurate
+	screen.set_vblank_time(subseconds::from_usec(2500)); //not accurate
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 256-1, 16, 240-1);
 	screen.set_screen_update(FUNC(jantotsu_state::screen_update_jantotsu));

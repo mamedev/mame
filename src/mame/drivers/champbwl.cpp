@@ -553,7 +553,7 @@ void champbwl_state::champbwl(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(57.5);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(champbwl_state::screen_update));
@@ -598,7 +598,7 @@ void doraemon_state::doraemon(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(320, 256);
 	screen.set_visarea(0, 320-1, 16, 256-16-1);
 	screen.set_screen_update(FUNC(doraemon_state::screen_update));

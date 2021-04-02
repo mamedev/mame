@@ -1320,7 +1320,7 @@ public:
 	const uint8_t       vd_type;                // type of system
 	uint8_t             chipmask;               // mask for which chips are available
 	uint32_t            freq;                   // operating frequency
-	attoseconds_t       attoseconds_per_cycle;  // attoseconds per cycle
+	subseconds          subseconds_per_cycle;   // subseconds per cycle
 	uint32_t            extra_cycles;           // extra cycles not yet accounted for
 	int                 trigger;                // trigger used for stalling
 

@@ -622,7 +622,7 @@ void taitoh_state::syvalion(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*16, 64*16);
 	screen.set_visarea(0*16, 32*16-1, 3*16, 28*16-1);
 	screen.set_screen_update(FUNC(taitoh_state::screen_update_syvalion));
@@ -672,7 +672,7 @@ void taitoh_state::recordbr(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*16, 64*16);
 	screen.set_visarea(1*16, 21*16-1, 2*16, 17*16-1);
 	screen.set_screen_update(FUNC(taitoh_state::screen_update_recordbr));
@@ -732,7 +732,7 @@ void taitoh_state::dleague(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*16, 64*16);
 	screen.set_visarea(1*16, 21*16-1, 2*16, 17*16-1);
 	screen.set_screen_update(FUNC(taitoh_state::screen_update_dleague));

@@ -4208,7 +4208,7 @@ void dynax_state::cdracula(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(58.56);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(16, 512-16-1, 16, 256-1);
 	m_screen->set_screen_update(FUNC(dynax_state::screen_update_cdracula));
@@ -4265,7 +4265,7 @@ void dynax_state::hanamai(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1-4, 16+8, 255-8);
 	m_screen->set_screen_update(FUNC(dynax_state::screen_update_hanamai));
@@ -4337,7 +4337,7 @@ void dynax_state::hnoridur(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(512, 256+22);
 	m_screen->set_visarea(0, 512-1-4, 16, 256-1);
 	m_screen->set_screen_update(FUNC(dynax_state::screen_update_hnoridur));
@@ -4406,7 +4406,7 @@ void dynax_state::hjingi(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1-4, 16, 256-1);
 	m_screen->set_screen_update(FUNC(dynax_state::screen_update_hnoridur));
@@ -4468,7 +4468,7 @@ void dynax_state::sprtmtch(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 16, 256-1);
 	m_screen->set_screen_update(FUNC(dynax_state::screen_update_sprtmtch));
@@ -4533,7 +4533,7 @@ void dynax_state::mjfriday(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0, 256-1, 16, 256-1);
 	m_screen->set_screen_update(FUNC(dynax_state::screen_update_mjdialq2));
@@ -4690,7 +4690,7 @@ void dynax_state::jantouki(machine_config &config)
 
 	screen_device &top(SCREEN(config, "top", SCREEN_TYPE_RASTER));
 	top.set_refresh_hz(60);
-	top.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	top.set_vblank_time(subseconds::from_usec(0));
 	top.set_size(512, 256);
 	top.set_visarea(0, 512-1, 16, 256-1);
 	top.set_screen_update(FUNC(dynax_state::screen_update_jantouki_top));
@@ -4705,7 +4705,7 @@ void dynax_state::jantouki(machine_config &config)
 
 	screen_device &bottom(SCREEN(config, "bottom", SCREEN_TYPE_RASTER));
 	bottom.set_refresh_hz(60);
-	bottom.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	bottom.set_vblank_time(subseconds::from_usec(0));
 	bottom.set_size(512, 256);
 	bottom.set_visarea(0, 512-1, 16, 256-1);
 	bottom.set_screen_update(FUNC(dynax_state::screen_update_jantouki_bottom));
@@ -4866,7 +4866,7 @@ void dynax_state::tenkai(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(512, 256+22);
 	m_screen->set_visarea(4, 512-1, 4, 255-8-4);  // hide first 4 horizontal pixels (see scroll of gal 4 in test mode)
 	m_screen->set_screen_update(FUNC(dynax_state::screen_update_hnoridur));
@@ -4941,7 +4941,7 @@ void dynax_state::gekisha(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(2, 256-1, 16, 256-1);
 	m_screen->set_screen_update(FUNC(dynax_state::screen_update_mjdialq2));

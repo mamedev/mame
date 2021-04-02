@@ -1489,7 +1489,7 @@ void x07_state::x07(machine_config &config)
 	/* video hardware */
 	screen_device &lcd(SCREEN(config, "lcd", SCREEN_TYPE_LCD));
 	lcd.set_refresh_hz(60);
-	lcd.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	lcd.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	lcd.set_screen_update(FUNC(x07_state::screen_update));
 	lcd.set_size(120, 32);
 	lcd.set_visarea(0, 120-1, 0, 32-1);

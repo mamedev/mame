@@ -198,7 +198,7 @@ void gizmondo_state::gizmondo(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(320, 240);
 	screen.set_visarea_full();
 	screen.set_screen_update("gf4500", FUNC(gf4500_device::screen_update));

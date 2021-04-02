@@ -708,7 +708,7 @@ void spdheat_state::spdheat(machine_config &config)
 
 	screen_device &screen0(SCREEN(config, "screen0", SCREEN_TYPE_RASTER));
 	screen0.set_refresh_hz(60);
-	screen0.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen0.set_vblank_time(subseconds::from_usec(0));
 	screen0.set_size(256, 256);
 	screen0.set_visarea(0, 256-1, 16, 256-16-1);
 	screen0.set_screen_update(FUNC(spdheat_state::screen_update<0>));
@@ -716,7 +716,7 @@ void spdheat_state::spdheat(machine_config &config)
 
 	screen_device &screen1(SCREEN(config, "screen1", SCREEN_TYPE_RASTER));
 	screen1.set_refresh_hz(60);
-	screen1.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen1.set_vblank_time(subseconds::from_usec(0));
 	screen1.set_size(256, 256);
 	screen1.set_visarea(0, 256-1, 16, 256-16-1);
 	screen1.set_screen_update(FUNC(spdheat_state::screen_update<1>));
@@ -724,7 +724,7 @@ void spdheat_state::spdheat(machine_config &config)
 
 	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
 	screen2.set_refresh_hz(60);
-	screen2.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen2.set_vblank_time(subseconds::from_usec(0));
 	screen2.set_size(256, 256);
 	screen2.set_visarea(0, 256-1, 16, 256-16-1);
 	screen2.set_screen_update(FUNC(spdheat_state::screen_update<2>));
@@ -732,7 +732,7 @@ void spdheat_state::spdheat(machine_config &config)
 
 	screen_device &screen3(SCREEN(config, "screen3", SCREEN_TYPE_RASTER));
 	screen3.set_refresh_hz(60);
-	screen3.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen3.set_vblank_time(subseconds::from_usec(0));
 	screen3.set_size(256, 256);
 	screen3.set_visarea(0, 256-1, 16, 256-16-1);
 	screen3.set_screen_update(FUNC(spdheat_state::screen_update<3>));

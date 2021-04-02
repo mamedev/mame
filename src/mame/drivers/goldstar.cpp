@@ -8659,7 +8659,7 @@ void goldstar_state::goldstar(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
@@ -8692,7 +8692,7 @@ void goldstar_state::goldstbl(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
@@ -8737,7 +8737,7 @@ void sanghopm_state::star100(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(sanghopm_state::screen_update_sangho));
@@ -8775,7 +8775,7 @@ void goldstar_state::super9(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
@@ -8878,7 +8878,7 @@ void cb3_state::ncb3(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
@@ -8964,7 +8964,7 @@ void goldstar_state::wcherry(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
@@ -9008,7 +9008,7 @@ void cmaster_state::cm(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
@@ -9080,7 +9080,7 @@ void goldstar_state::cmast91(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_cmast91));
@@ -9134,7 +9134,7 @@ void wingco_state::lucky8(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
@@ -9236,7 +9236,7 @@ void wingco_state::bingowng(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(wingco_state::screen_update_bingowng));
@@ -9357,7 +9357,7 @@ void wingco_state::magodds(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(wingco_state::screen_update_magical));
@@ -9405,7 +9405,7 @@ void goldstar_state::kkotnoli(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
@@ -9441,7 +9441,7 @@ void goldstar_state::ladylinr(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
@@ -9497,7 +9497,7 @@ void wingco_state::wcat3(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
@@ -9544,7 +9544,7 @@ void cmaster_state::amcoe1(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
@@ -9598,7 +9598,7 @@ void cmaster_state::amcoe2(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
@@ -9649,7 +9649,7 @@ void unkch_state::unkch(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(unkch_state::screen_update_unkch));
@@ -9684,7 +9684,7 @@ void goldstar_state::pkrmast(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));
@@ -9732,7 +9732,7 @@ void unkch_state::megaline(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar));

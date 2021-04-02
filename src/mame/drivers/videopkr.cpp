@@ -1261,7 +1261,7 @@ void videopkr_state::videopkr(machine_config &config)
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(5*8, 31*8-1, 3*8, 29*8-1);
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(2080);
+	screen.set_vblank_time(subseconds::from_usec(2080));
 	screen.set_screen_update(FUNC(videopkr_state::screen_update_videopkr));
 	screen.set_palette("palette");
 

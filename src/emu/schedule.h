@@ -508,38 +508,50 @@ class device_scheduler
 	class basetime_relative
 	{
 	public:
-		// minima/maxima
-		static constexpr attoseconds_t MAX_RELATIVE = 2 * ATTOSECONDS_PER_SECOND;
-		static constexpr attoseconds_t MIN_RELATIVE = -MAX_RELATIVE;
+		static constexpr s64 MIN_RELATIVE = -(subseconds::PER_SECOND/2);
+		static constexpr s64 MAX_RELATIVE =  (subseconds::PER_SECOND/2) - 1;
 
 		// construction/destruction
 		basetime_relative();
 
 		// set an absolute time
-		void set(attotime const &src);
+		void set(attotime const &src) { m_absolute = src; m_absolute_dirty = false; update_relative(); }
 
-		// add a number of attoseconds to the relative time
-		void add(attoseconds_t src);
+		// set a relative time
+		void set_relative(s64 rel) { m_relative = rel; m_absolute_dirty = true; }
 
-		// set the base for the relative time
-		void set_base_seconds(seconds_t base);
+		// add a number of subseconds to the relative time
+		void add(subseconds src) { m_relative += src.raw(); m_absolute_dirty = true; }
 
 		// return the relative time
-		attoseconds_t relative() const { return m_relative; }
+		s64 relative() const { return m_relative; }
 
 		// return the absolute time, updating if dirty
 		attotime const &absolute() { if (m_absolute_dirty) update_absolute(); return m_absolute; }
+
+		// return the absolute time, with no updating
+		attotime const &absolute_no_update() const { return m_absolute; }
+
+		// return the base time
+		attotime const &base() { return m_base; }
+
+		// update the base to ensure times within the given window will fit; return true if updated
+		bool update_window(subseconds window);
+
+		// set the base for the relative time
+		void set_base(attotime const &base) { m_base = base; update_relative(); }
 
 	private:
 		// internal helpers
 		void update_relative();
 		void update_absolute();
 
-		// internal state
-		attoseconds_t m_relative;
+	public:
+		// internal state, public for saving
+		s64 m_relative;
 		attotime m_absolute;
+		attotime m_base;
 		bool m_absolute_dirty;
-		seconds_t m_base_seconds;
 	};
 
 public:
@@ -554,7 +566,7 @@ public:
 	bool can_save() const;
 
 	// execution
-	void timeslice(attoseconds_t minslice);
+	void timeslice(subseconds minslice);
 	void abort_timeslice();
 	void trigger(int trigid, attotime const &after = attotime::zero);
 	void boost_interleave(attotime const &timeslice_time, attotime const &boost_duration);
@@ -587,7 +599,7 @@ private:
 	void postload();
 
 	// execution helpers
-	void execute_timers();
+	void execute_timers(attotime const &basetime);
 	void update_first_timer_expire() { m_first_timer_expire.set(m_active_timers_head->m_expire); }
 	void update_basetime();
 
@@ -608,13 +620,13 @@ private:
 	void timed_trigger(timer_instance const &timer);
 
 	// basetime_relative helpers
-	attotime const &basetime() const { return m_basetime; }
+	attotime const &basetime() { return m_basetime.absolute(); }
 
 	// internal state
 	running_machine &           m_machine;                  // reference to our machine
 	device_execute_interface *  m_executing_device;         // pointer to currently executing device
 	device_execute_interface *  m_execute_list;             // list of devices to be executed
-	attotime                    m_basetime;                 // global basetime; everything moves forward from here
+	basetime_relative           m_basetime;                 // global basetime; everything moves forward from here
 	basetime_relative           m_first_timer_expire;       // time of the first timer expiration
 
 	// timer allocation and management
@@ -665,13 +677,13 @@ private:
 		quantum_slot *next() const { return m_next; }
 
 		quantum_slot *          m_next;
-		attoseconds_t           m_actual;                   // actual duration of the quantum
-		attoseconds_t           m_requested;                // duration of the requested quantum
+		subseconds              m_actual;                   // actual duration of the quantum
+		subseconds              m_requested;                // duration of the requested quantum
 		attotime                m_expire;                   // absolute expiration time of this quantum
 	};
 	simple_list<quantum_slot>   m_quantum_list;             // list of active quanta
 	fixed_allocator<quantum_slot> m_quantum_allocator;      // allocator for quanta
-	attoseconds_t               m_quantum_minimum;          // duration of minimum quantum
+	subseconds                  m_quantum_minimum;          // duration of minimum quantum
 
 	// put this at the end since it's big
 	timer_instance_save         m_timer_save[MAX_SAVE_INSTANCES]; // state saving area

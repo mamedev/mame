@@ -1688,7 +1688,7 @@ int32_t mame_ui_manager::slider_overclock(device_t &device, std::string *str, in
 
 int32_t mame_ui_manager::slider_refresh(screen_device &screen, std::string *str, int32_t newval)
 {
-	double defrefresh = ATTOSECONDS_TO_HZ(screen.refresh_attoseconds());
+	double defrefresh = screen.refresh_subseconds().as_hz();
 	double refresh;
 
 	if (newval != SLIDER_NOCHANGE)
@@ -1696,7 +1696,7 @@ int32_t mame_ui_manager::slider_refresh(screen_device &screen, std::string *str,
 		int width = screen.width();
 		int height = screen.height();
 		const rectangle &visarea = screen.visible_area();
-		screen.configure(width, height, visarea, HZ_TO_ATTOSECONDS(defrefresh + (double)newval * 0.001));
+		screen.configure(width, height, visarea, subseconds::from_hz(defrefresh + (double)newval * 0.001));
 	}
 
 	if (str)

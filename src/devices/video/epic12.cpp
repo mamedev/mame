@@ -851,7 +851,7 @@ void epic12_device::draw_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	}
 	if ((m_prev_screen_height != curr_height) || (m_prev_screen_width != curr_width))
 	{
-		screen().configure(curr_width, curr_height, curr_visarea, screen().refresh_attoseconds());
+		screen().configure(curr_width, curr_height, curr_visarea, screen().refresh_subseconds());
 		m_prev_screen_height = curr_height;
 		m_prev_screen_width = curr_width;
 	}

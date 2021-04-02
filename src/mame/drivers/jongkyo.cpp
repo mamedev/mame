@@ -506,7 +506,7 @@ void jongkyo_state::jongkyo(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 256-1, 8, 256-8-1);
 	screen.set_screen_update(FUNC(jongkyo_state::screen_update));

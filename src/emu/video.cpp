@@ -524,7 +524,7 @@ void video_manager::exit()
 		osd_ticks_t tps = osd_ticks_per_second();
 		double final_real_time = (double)m_overall_real_seconds + (double)m_overall_real_ticks / (double)tps;
 		double final_emu_time = m_overall_emutime.as_double();
-		osd_printf_info("Average speed: %.2f%% (%d seconds)\n", 100 * final_emu_time / final_real_time, (m_overall_emutime + attotime(0, ATTOSECONDS_PER_SECOND / 2)).seconds());
+		osd_printf_info("Average speed: %.2f%% (%d seconds)\n", 100 * final_emu_time / final_real_time, (m_overall_emutime + attotime::from_hz(2)).seconds());
 	}
 }
 
@@ -723,7 +723,7 @@ void video_manager::update_throttle(attotime emutime)
 
 		// compute conversion factors up front
 		osd_ticks_t ticks_per_second = osd_ticks_per_second();
-		attoseconds_t attoseconds_per_tick = ATTOSECONDS_PER_SECOND / ticks_per_second * m_throttle_rate;
+		subseconds subseconds_per_tick = subseconds::from_hz(ticks_per_second) * m_throttle_rate;
 
 		// if we're paused, emutime will not advance; instead, we subtract a fixed
 		// amount of time (1/60th of a second) from the emulated time that was passed in,
@@ -732,7 +732,7 @@ void video_manager::update_throttle(attotime emutime)
 		// ago, and was in sync in both real and emulated time
 		if (machine().paused())
 		{
-			m_throttle_emutime = emutime - attotime(0, ATTOSECONDS_PER_SECOND / PAUSED_REFRESH_RATE);
+			m_throttle_emutime = emutime - attotime::from_hz(PAUSED_REFRESH_RATE);
 			m_throttle_realtime = m_throttle_emutime;
 		}
 
@@ -740,11 +740,11 @@ void video_manager::update_throttle(attotime emutime)
 		// reported value from our current value; this should be a small value somewhere
 		// between 0 and 1/10th of a second ... anything outside of this range is obviously
 		// wrong and requires a resync
-		attoseconds_t emu_delta_attoseconds = (emutime - m_throttle_emutime).as_attoseconds();
-		if (emu_delta_attoseconds < 0 || emu_delta_attoseconds > ATTOSECONDS_PER_SECOND / 10)
+		subseconds emu_delta_subseconds = (emutime - m_throttle_emutime).as_subseconds();
+		if (emu_delta_subseconds > subseconds::from_hz(10))
 		{
 			if (LOG_THROTTLE)
-				machine().logerror("Resync due to weird emutime delta: %s\n", attotime(0, emu_delta_attoseconds).as_string(18));
+				machine().logerror("Resync due to weird emutime delta: %s\n", attotime(emu_delta_subseconds).as_string(18));
 			break;
 		}
 
@@ -763,43 +763,44 @@ void video_manager::update_throttle(attotime emutime)
 			break;
 		}
 
-		// convert this value into attoseconds for easier comparison
-		attoseconds_t real_delta_attoseconds = diff_ticks * attoseconds_per_tick;
+		// convert this value into subseconds for easier comparison
+		subseconds real_delta_subseconds = diff_ticks * subseconds_per_tick;
 
 		// now update our real and emulated timers with the current values
 		m_throttle_emutime = emutime;
-		m_throttle_realtime += attotime(0, real_delta_attoseconds);
+		m_throttle_realtime += real_delta_subseconds;
 
 		// keep a history of whether or not emulated time beat real time over the last few
 		// updates; this can be used for future heuristics
-		m_throttle_history = (m_throttle_history << 1) | (emu_delta_attoseconds > real_delta_attoseconds);
+		m_throttle_history = (m_throttle_history << 1) | (emu_delta_subseconds > real_delta_subseconds);
 
 		// determine how far ahead real time is versus emulated time; note that we use the
 		// accumulated times for this instead of the deltas for the current update because
 		// we want to track time over a longer duration than a single update
-		attoseconds_t real_is_ahead_attoseconds = (m_throttle_emutime - m_throttle_realtime).as_attoseconds();
+		subseconds real_is_ahead_subseconds = (m_throttle_emutime - m_throttle_realtime).as_subseconds();
+		subseconds real_is_behind_subseconds = (m_throttle_realtime - m_throttle_emutime).as_subseconds();
 
 		// if we're more than 1/10th of a second out, or if we are behind at all and emulation
 		// is taking longer than the real frame, we just need to resync
-		if (real_is_ahead_attoseconds < -ATTOSECONDS_PER_SECOND / 10 ||
-			(real_is_ahead_attoseconds < 0 && population_count_32(m_throttle_history & 0xff) < 6))
+		if (real_is_behind_subseconds > subseconds::from_hz(10) ||
+			(!real_is_behind_subseconds.is_zero() && population_count_32(m_throttle_history & 0xff) < 6))
 		{
 			if (LOG_THROTTLE)
-				machine().logerror("Resync due to being behind: %s (history=%08X)\n", attotime(0, -real_is_ahead_attoseconds).as_string(18), m_throttle_history);
+				machine().logerror("Resync due to being behind: %s (history=%08X)\n", attotime(real_is_behind_subseconds).as_string(18), m_throttle_history);
 			break;
 		}
 
 		// if we're behind, it's time to just get out
-		if (real_is_ahead_attoseconds < 0)
+		if (!real_is_behind_subseconds.is_zero())
 			return;
 
 		// compute the target real time, in ticks, where we want to be
-		osd_ticks_t target_ticks = m_throttle_last_ticks + real_is_ahead_attoseconds / attoseconds_per_tick;
+		osd_ticks_t target_ticks = m_throttle_last_ticks + real_is_ahead_subseconds / subseconds_per_tick;
 
 		// throttle until we read the target, and update real time to match the final time
 		diff_ticks = throttle_until_ticks(target_ticks) - m_throttle_last_ticks;
 		m_throttle_last_ticks += diff_ticks;
-		m_throttle_realtime += attotime(0, diff_ticks * attoseconds_per_tick);
+		m_throttle_realtime += attotime(diff_ticks * subseconds_per_tick);
 		return;
 	}
 
@@ -927,25 +928,25 @@ void video_manager::update_refresh_speed()
 		{
 			// find the screen with the shortest frame period (max refresh rate)
 			// note that we first check the token since this can get called before all screens are created
-			attoseconds_t min_frame_period = ATTOSECONDS_PER_SECOND;
+			subseconds min_frame_period = subseconds::max();
 			for (screen_device &screen : screen_device_enumerator(machine().root_device()))
 			{
-				attoseconds_t period = screen.frame_period().attoseconds();
-				if (period != 0)
+				subseconds period = screen.frame_period().as_subseconds();
+				if (!period.is_zero())
 					min_frame_period = std::min(min_frame_period, period);
 			}
 
 			// compute a target speed as an integral percentage
 			// note that we lop 0.25Hz off of the minrefresh when doing the computation to allow for
 			// the fact that most refresh rates are not accurate to 10 digits...
-			u32 target_speed = floor((minrefresh - 0.25) * 1000.0 / ATTOSECONDS_TO_HZ(min_frame_period));
+			u32 target_speed = floor((minrefresh - 0.25) * 1000.0 / min_frame_period.as_hz());
 			u32 original_speed = original_speed_setting();
 			target_speed = std::min(target_speed, original_speed);
 
 			// if we changed, log that verbosely
 			if (target_speed != m_speed)
 			{
-				osd_printf_verbose("Adjusting target speed to %.1f%% (hw=%.2fHz, game=%.2fHz, adjusted=%.2fHz)\n", target_speed / 10.0, minrefresh, ATTOSECONDS_TO_HZ(min_frame_period), ATTOSECONDS_TO_HZ(min_frame_period * 1000.0 / target_speed));
+				osd_printf_verbose("Adjusting target speed to %.1f%% (hw=%.2fHz, game=%.2fHz, adjusted=%.2fHz)\n", target_speed / 10.0, minrefresh, min_frame_period.as_hz(), (min_frame_period * 1000 / target_speed).as_hz());
 				m_speed = target_speed;
 			}
 		}
@@ -970,9 +971,9 @@ void video_manager::recompute_speed(const attotime &emutime)
 
 	// if it has been more than the update interval, update the time
 	attotime delta_emutime = emutime - m_speed_last_emutime;
-	if (delta_emutime > attotime(0, ATTOSECONDS_PER_SPEED_UPDATE))
+	if (delta_emutime > SPEED_UPDATE_PERIOD)
 	{
-		// convert from ticks to attoseconds
+		// convert from ticks to subseconds
 		osd_ticks_t realtime = osd_ticks();
 		osd_ticks_t delta_realtime = realtime - m_speed_last_realtime;
 		osd_ticks_t tps = osd_ticks_per_second();

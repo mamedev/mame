@@ -406,7 +406,7 @@ void proteus3_state::proteus3(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(200));
+	screen.set_vblank_time(subseconds::from_usec(200));
 	screen.set_size(64*8, 16*12);
 	screen.set_visarea(0, 64*8-1, 0, 16*12-1);
 	screen.set_screen_update(FUNC(proteus3_state::screen_update_proteus3));

@@ -1177,7 +1177,7 @@ void legionna_state::legionna(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_size(36*8, 36*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(legionna_state::screen_update_legionna));
@@ -1230,7 +1230,7 @@ void legionna_state::heatbrl(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_size(36*8, 36*8);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(legionna_state::screen_update_heatbrl));
@@ -1284,7 +1284,7 @@ void legionna_state::godzilla(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 //  screen.set_refresh_hz(61);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+//  screen.set_vblank_time(subseconds::from_usec(2500));
 //  screen.set_size(42*8, 36*8);
 //  screen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
 	screen.set_raw(14318180/2,455,0,320,258,0,224); // ~61 Hz, 15.734 kHz
@@ -1341,7 +1341,7 @@ void legionna_state::denjinmk(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_size(42*8, 36*8);
 	screen.set_refresh_hz(56); // <= 56 FPS, Value from doc
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_visarea(0*8, 40*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(legionna_state::screen_update_godzilla));
 	screen.set_palette(m_palette);
@@ -1394,7 +1394,7 @@ void legionna_state::grainbow(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_size(64*8, 36*8);
 	screen.set_visarea(2*8, 42*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(legionna_state::screen_update_grainbow));
@@ -1448,7 +1448,7 @@ void legionna_state::cupsoc(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_size(42*8, 36*8);
 	// TODO: real PCB is a bit more complex,
 	// it's really 320x256 in-game but with 8px border color on top/bottom.

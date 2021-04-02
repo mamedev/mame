@@ -291,7 +291,7 @@ void suprslam_state::suprslam(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2300)); /* hand-tuned */
+	screen.set_vblank_time(subseconds::from_usec(2300)); /* hand-tuned */
 	screen.set_size(64*8, 64*8);
 	screen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
 	screen.set_screen_update(FUNC(suprslam_state::screen_update_suprslam));

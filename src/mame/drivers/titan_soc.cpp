@@ -83,7 +83,7 @@ void titan_soc_state::titan_soc(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	screen.set_size(320, 256);
 	screen.set_visarea(0, 320-1, 0, 256-1);
 	screen.set_screen_update(FUNC(titan_soc_state::screen_update_titan_soc));

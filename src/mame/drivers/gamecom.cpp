@@ -268,7 +268,7 @@ void gamecom_state::gamecom(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(59.732155);
-	m_screen->set_vblank_time(500);
+	m_screen->set_vblank_time(subseconds::from_usec(500));
 	m_screen->set_screen_update(FUNC(gamecom_state::screen_update));
 	m_screen->set_size(200, 160);
 	m_screen->set_visarea_full();

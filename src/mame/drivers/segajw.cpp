@@ -405,7 +405,7 @@ void segajw_state::segajw(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_screen_update("hd63484", FUNC(hd63484_device::update_screen));
 	screen.set_size(720, 480);
 	screen.set_visarea(0, 720-1, 0, 448-1);

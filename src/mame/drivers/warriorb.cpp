@@ -424,7 +424,7 @@ void warriorb_state::darius2d(machine_config &config)
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);
-	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_vblank_time(subseconds::from_usec(0));
 	lscreen.set_size(40*8, 32*8);
 	lscreen.set_visarea(0*8, 40*8-1, 3*8, 32*8-1);
 	lscreen.set_screen_update(FUNC(warriorb_state::screen_update_left));
@@ -438,7 +438,7 @@ void warriorb_state::darius2d(machine_config &config)
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_refresh_hz(60);
-	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_vblank_time(subseconds::from_usec(0));
 	rscreen.set_size(40*8, 32*8);
 	rscreen.set_visarea(0*8, 40*8-1, 3*8, 32*8-1);
 	rscreen.set_screen_update(FUNC(warriorb_state::screen_update_right));
@@ -500,7 +500,7 @@ void warriorb_state::warriorb(machine_config &config)
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);
-	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_vblank_time(subseconds::from_usec(0));
 	lscreen.set_size(40*8, 32*8);
 	lscreen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
 	lscreen.set_screen_update(FUNC(warriorb_state::screen_update_left));
@@ -514,7 +514,7 @@ void warriorb_state::warriorb(machine_config &config)
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_refresh_hz(60);
-	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_vblank_time(subseconds::from_usec(0));
 	rscreen.set_size(40*8, 32*8);
 	rscreen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
 	rscreen.set_screen_update(FUNC(warriorb_state::screen_update_right));

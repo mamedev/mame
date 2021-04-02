@@ -207,7 +207,7 @@ void vta2000_state::vta2000(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(80*8, 25*12);
 	screen.set_visarea(0, 80*8-1, 0, 25*12-1);
 	screen.set_screen_update(FUNC(vta2000_state::screen_update_vta2000));

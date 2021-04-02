@@ -4164,7 +4164,7 @@ void nmk16_state::set_hacky_screen_lowres(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	//m_screen->set_raw(XTAL(12'000'000)/2, 384, 0, 256, 278, 16, 240); // confirmed
 	m_screen->set_refresh_hz(56.18);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3450));
+	m_screen->set_vblank_time(subseconds::from_usec(3450));
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	m_screen->set_palette(m_palette);
@@ -4179,7 +4179,7 @@ void nmk16_state::set_hacky_screen_hires(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	//m_screen->set_raw(XTAL(16'000'000)/2, 512, 0, 384, 278, 16, 240); // confirmed
 	m_screen->set_refresh_hz(56.18);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3450));
+	m_screen->set_vblank_time(subseconds::from_usec(3450));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
 	m_screen->set_palette(m_palette);
@@ -5021,7 +5021,7 @@ void nmk16_state::manybloc(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(56);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	m_screen->set_vblank_time(subseconds::from_usec(2500)); // not accurate
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));

@@ -5472,7 +5472,7 @@ void vt_vt1682_state::vt_vt1682_ntscbase(machine_config& config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(300, 262); // 262 for NTSC, might be 261 if Vblank line is changed
 	m_screen->set_visarea(0, 256-1, 0, 240-1);
@@ -5498,7 +5498,7 @@ void vt_vt1682_state::vt_vt1682_palbase(machine_config& config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_refresh_hz(50.0070);
 	m_screen->set_size(300, 312); // 312? for PAL
 	m_screen->set_visarea(0, 256-1, 0, 240-1);

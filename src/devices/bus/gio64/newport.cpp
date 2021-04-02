@@ -4440,7 +4440,7 @@ void newport_base_device::device_add_mconfig(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	//m_screen->set_size(2048, 2048);
 	//m_screen->set_visarea(0, 2047, 0, 2047);
 	m_screen->set_size(1280+64, 1024+64);

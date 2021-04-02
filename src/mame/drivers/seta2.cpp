@@ -2294,7 +2294,7 @@ void seta2_state::seta2(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_vblank_time(subseconds::from_usec(2500));
 	m_screen->set_size(0x200, 0x100);
 	m_screen->set_visarea(0x00, 0x180-1, 0x00, 0xf0-1);
 	m_screen->set_screen_update(FUNC(seta2_state::screen_update));
@@ -2446,7 +2446,7 @@ void staraudi_state::staraudi(machine_config &config)
 	UPD4992(config, m_rtc, 32'768);
 
 	// video hardware
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));  // not accurate
+	m_screen->set_vblank_time(subseconds::from_usec(2500));  // not accurate
 	m_screen->set_visarea(0x00, 0x140-1, 0x000, 0x0f0-1);
 
 	m_gfxdecode->set_info(gfx_seta2);
@@ -2519,7 +2519,7 @@ void funcube_state::funcube(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));  // not accurate
+	m_screen->set_vblank_time(subseconds::from_usec(2500));  // not accurate
 	m_screen->set_size(0x200, 0x200);
 	m_screen->set_visarea(0x0+1, 0x140-1+1, 0x00, 0xf0-1);
 	m_screen->set_screen_update(FUNC(funcube_state::screen_update));
@@ -2569,7 +2569,7 @@ void seta2_state::namcostr(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(0x200, 0x200);
 	m_screen->set_visarea(0x40, 0x1c0-1, 0x00, 0xf0-1);
 	m_screen->set_screen_update(FUNC(seta2_state::screen_update));

@@ -538,7 +538,7 @@ void imolagp_state::imolagp(machine_config &config)
 	// It would be better to move this into the layout so that the video output can be used with a restored cabinet.
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(256,256);
 	screen.set_visarea(0+48,255,0+16,255);
 	screen.set_screen_update(FUNC(imolagp_state::screen_update_imolagp));

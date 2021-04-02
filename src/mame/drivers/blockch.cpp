@@ -272,7 +272,7 @@ void blockch_state::blockch(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 384-1, 0, 256-1);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_vblank_time(subseconds::from_usec(2500));
 	m_screen->set_screen_update(FUNC(blockch_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(blockch_state::vblank_irq));
 

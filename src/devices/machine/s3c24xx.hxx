@@ -858,7 +858,7 @@ int S3C24_CLASS_NAME::s3c24xx_lcd_configure_tft()
 	m_lcd.hpos_max = m_lcd.hpos_min + (hozval + 1) - 1;
 	m_lcd.vpos_min = (vspw + 1) + (vbpd + 1);
 	m_lcd.vpos_max = m_lcd.vpos_min + (lineval + 1) - 1;
-	m_screen->configure(width, height, visarea, HZ_TO_ATTOSECONDS(m_lcd.framerate));
+	m_screen->configure(width, height, visarea, subseconds::from_hz(m_lcd.framerate));
 	return true;
 }
 
@@ -907,7 +907,7 @@ int S3C24_CLASS_NAME::s3c24xx_lcd_configure_stn()
 	m_lcd.hpos_max = width - 1;
 	m_lcd.vpos_min = 0;
 	m_lcd.vpos_max = height - 1;
-	m_screen->configure( width, height, visarea, HZ_TO_ATTOSECONDS( m_lcd.framerate));
+	m_screen->configure( width, height, visarea, subseconds::from_hz( m_lcd.framerate));
 	return true;
 }
 

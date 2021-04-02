@@ -1066,7 +1066,7 @@ void igrosoft_gamble_state::igrosoft_gamble(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(64*16, 32*16);
 	m_screen->set_visarea(17*16, 1024-16*7-1, 1*16, 32*16-1*16-1);
 	m_screen->set_screen_update(FUNC(igrosoft_gamble_state::screen_update_igrosoft_gamble));

@@ -205,7 +205,7 @@ void darkseal_state::darkseal(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(58);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	screen.set_vblank_time(subseconds::from_usec(529));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(darkseal_state::screen_update));

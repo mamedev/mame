@@ -439,7 +439,7 @@ void lm24014h_device::device_add_mconfig(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_size(240, 64);
 	screen.set_visarea(0, 240-1, 0, 64-1);
 	screen.set_screen_update("lcdc", FUNC(t6963c_device::screen_update));

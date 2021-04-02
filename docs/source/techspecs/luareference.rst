@@ -868,8 +868,8 @@ screen.height (read-only)
 screen.refresh (read-only)
     The screen’s configured refresh rate in Hertz (this may not reflect the
     current value).
-screen.refresh_attoseconds (read-only)
-    The screen’s configured refresh interval in attoseconds (this may not
+screen.refresh_subseconds (read-only)
+    The screen’s configured refresh interval in subseconds (this may not
     reflect the current value).
 screen.xoffset (read-only)
     The screen’s default X position offset.  This is a floating-point number

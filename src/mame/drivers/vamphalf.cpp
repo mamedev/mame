@@ -883,13 +883,13 @@ void vamphalf_state::handle_flipped_visible_area(screen_device &screen)
 	{
 		rectangle visarea;
 		visarea.set(31, 350, 16, 251);
-		screen.configure(screen.width(), screen.height(), visarea, screen.refresh_attoseconds());
+		screen.configure(screen.width(), screen.height(), visarea, screen.refresh_subseconds());
 	}
 	else
 	{
 		rectangle visarea;
 		visarea.set(31, 350, 20, 255);
-		screen.configure(screen.width(), screen.height(), visarea, screen.refresh_attoseconds());
+		screen.configure(screen.width(), screen.height(), visarea, screen.refresh_subseconds());
 	}
 }
 
@@ -1103,7 +1103,7 @@ void vamphalf_state::common(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	// 28MHz
 	screen.set_refresh_hz(59);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(512, 256);
 	screen.set_visarea(31, 350, 16, 251);
 	screen.set_screen_update(FUNC(vamphalf_state::screen_update_common));
@@ -1292,7 +1292,7 @@ void vamphalf_state::aoh(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	// 32MHz
 	screen.set_refresh_hz(59.185);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(512, 512);
 	screen.set_visarea(64, 511-64, 16, 255-16);
 	screen.set_screen_update(FUNC(vamphalf_state::screen_update_aoh));

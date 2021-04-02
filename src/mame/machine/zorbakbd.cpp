@@ -324,7 +324,7 @@ void zorba_keyboard_device::device_add_mconfig(machine_config &config)
 
 	// TODO: beeper frequency is unknown, using value from Sun keyboard for now
 	SPEAKER(config, "bell").front_center();
-	BEEP(config, m_beeper, ATTOSECONDS_TO_HZ(480 * ATTOSECONDS_PER_MICROSECOND));
+	BEEP(config, m_beeper, 1.0 / 480e-6);
 	m_beeper->add_route(ALL_OUTPUTS, "bell", 0.4);
 }
 

@@ -839,7 +839,7 @@ void suna16_state::bssoccer(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0, 256-1, 0+16, 256-16-1);
 	m_screen->set_screen_update(FUNC(suna16_state::screen_update));
@@ -895,7 +895,7 @@ void suna16_state::uballoon(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0, 256-1, 0+16, 256-16-1);
 	m_screen->set_screen_update(FUNC(suna16_state::screen_update));
@@ -948,7 +948,7 @@ void suna16_state::sunaq(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0, 256-1, 0+16, 256-16-1);
 	m_screen->set_screen_update(FUNC(suna16_state::screen_update));
@@ -1005,7 +1005,7 @@ void suna16_state::bestbest(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(59.1734);    // measured on pcb (15.6218kHz HSync)
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0, 256-1, 0+16, 256-16-1);
 	m_screen->set_screen_update(FUNC(suna16_state::screen_update_bestbest));

@@ -375,7 +375,7 @@ void tecmo16_state::base(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(59.17);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1000)); // not accurate
+	m_screen->set_vblank_time(subseconds::from_usec(1000)); // not accurate
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(tecmo16_state::screen_update));

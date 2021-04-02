@@ -3877,7 +3877,7 @@ void igs017_state::iqblocka(machine_config &config)
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 240-1);
 	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
@@ -3973,7 +3973,7 @@ void igs017_state::mgcs(machine_config &config)
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 240-1);
 	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
@@ -4014,7 +4014,7 @@ void igs017_state::lhzb2(machine_config &config)
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 240-1);
 	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
@@ -4063,7 +4063,7 @@ void igs017_state::lhzb2a(machine_config &config)
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);    // VSync 60Hz, HSync 15.3kHz
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
 	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
@@ -4104,7 +4104,7 @@ void igs017_state::slqz2(machine_config &config)
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 240-1);
 	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
@@ -4138,7 +4138,7 @@ void igs017_state::sdmg2(machine_config &config)
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);    // VSync 60Hz, HSync 15.3kHz
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
 	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
@@ -4181,7 +4181,7 @@ void igs017_state::mgdha(machine_config &config)
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 256-16-1);
 	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
@@ -4216,7 +4216,7 @@ void igs017_state::tjsb(machine_config &config)
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 240-1);
 	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));
@@ -4254,7 +4254,7 @@ void igs017_state::spkrform(machine_config &config)
 	// video
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 0, 240-1);
 	m_screen->set_screen_update("igs017_igs031", FUNC(igs017_igs031_device::screen_update));

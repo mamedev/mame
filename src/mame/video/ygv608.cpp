@@ -2446,7 +2446,7 @@ void ygv608_device::screen_configure()
 
 	// TODO: Dig Dug Original wants this to be 60.60 Hz (like original Namco HW), lets compensate somehow
 	//      (clock is really 6144000 x 8 = 49152000, so it must have same parameters in practice)
-	attoseconds_t period = HZ_TO_ATTOSECONDS(screen().clock()) * (m_crtc.vtotal + m_crtc.display_vsync) * ((m_crtc.htotal + 12 - m_crtc.display_hsync) / 2);
+	subseconds period = subseconds::from_hz(screen().clock()) * (m_crtc.vtotal + m_crtc.display_vsync) * ((m_crtc.htotal + 12 - m_crtc.display_hsync) / 2);
 
 	screen().configure(m_crtc.htotal / 2, m_crtc.vtotal, visarea, period );
 

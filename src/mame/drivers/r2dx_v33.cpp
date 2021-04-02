@@ -733,7 +733,7 @@ void r2dx_v33_state::rdx_v33(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_refresh_hz(55.47);    /* verified on pcb */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(500)); /* not accurate */
 	screen.set_size(44*8, 34*8);
 	screen.set_visarea(0*8, 40*8-1, 0, 30*8-1);
 	screen.set_screen_update(FUNC(r2dx_v33_state::screen_update));
@@ -771,7 +771,7 @@ void r2dx_v33_state::nzerotea(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_refresh_hz(55.47);    /* verified on pcb */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(500)); /* not accurate */
 	screen.set_size(44*8, 34*8);
 	screen.set_visarea(0*8, 40*8-1, 0, 32*8-1);
 	screen.set_screen_update(FUNC(r2dx_v33_state::screen_update));

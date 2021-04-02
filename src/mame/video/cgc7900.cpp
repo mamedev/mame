@@ -231,7 +231,7 @@ void cgc7900_state::cgc7900_video(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(cgc7900_state::screen_update));
 	screen.set_size(1024, 768);
 	screen.set_visarea(0, 1024-1, 0, 768-1);

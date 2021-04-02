@@ -582,7 +582,7 @@ void fp_state::fp(machine_config &config)
 
 	screen_device &screen_lcd(SCREEN(config, SCREEN_LCD_TAG, SCREEN_TYPE_RASTER));
 	screen_lcd.set_refresh_hz(50);
-	screen_lcd.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen_lcd.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen_lcd.set_screen_update(FUNC(fp_state::screen_update));
 	screen_lcd.set_size(640, 200);
 	screen_lcd.set_visarea_full();
@@ -590,7 +590,7 @@ void fp_state::fp(machine_config &config)
 
 	screen_device &screen_crt(SCREEN(config, SCREEN_CRT_TAG, SCREEN_TYPE_RASTER));
 	screen_crt.set_refresh_hz(50);
-	screen_crt.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen_crt.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen_crt.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
 	screen_crt.set_size(640, 256);
 	screen_crt.set_visarea_full();

@@ -449,7 +449,7 @@ void _20pacgal_state::_20pacgal_video(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(SCREEN_WIDTH, SCREEN_HEIGHT);
 	screen.set_visarea(0, SCREEN_WIDTH - 1, 0, SCREEN_HEIGHT - 1);
 	screen.set_screen_update(FUNC(_20pacgal_state::screen_update_20pacgal));

@@ -1049,7 +1049,7 @@ void aleck64_state::aleck64(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(640, 525);
 	screen.set_visarea(0, 639, 0, 239);
 	screen.set_screen_update(FUNC(aleck64_state::screen_update_n64));

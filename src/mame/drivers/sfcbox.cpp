@@ -493,7 +493,7 @@ void sfcbox_state::sfcbox(machine_config &config)
 	// SFCBOX
 	screen_device &osd(SCREEN(config, "osd", SCREEN_TYPE_RASTER));
 	osd.set_refresh_hz(60);
-	osd.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	osd.set_vblank_time(subseconds::from_usec(2500));
 //  osd.set_size(24*12+22, 12*18+22);
 //  osd.set_visarea(0*8, 24*12-1, 0*8, 12*18-1);
 	osd.set_size(24*16+22, 12*16+22);

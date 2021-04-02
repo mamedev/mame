@@ -1182,7 +1182,7 @@ void ampoker2_state::ampoker2(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	/*  if VBLANK is used, the watchdog timer stop to work.
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	*/
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(20*8, 56*8-1, 2*8, 32*8-1);

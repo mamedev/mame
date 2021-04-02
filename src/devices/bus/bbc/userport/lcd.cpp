@@ -29,7 +29,7 @@ void bbc_lcd_device::device_add_mconfig(machine_config &config)
 {
 	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_LCD);
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_size(120, 36);
 	screen.set_visarea_full();
 	screen.set_screen_update(m_lcdc, FUNC(hd44780_device::screen_update));

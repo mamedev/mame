@@ -1461,7 +1461,7 @@ private:
 
 	// frame time tracking
 	attotime                m_last_frame_time;      // time of the last frame callback
-	attoseconds_t           m_last_delta_nsec;      // nanoseconds that passed since the previous callback
+	u32                     m_last_delta_nsec;      // nanoseconds that passed since the previous callback
 
 	// playback/record information
 	emu_file                m_record_file;          // recording file (nullptr if not recording)

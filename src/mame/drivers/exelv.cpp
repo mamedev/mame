@@ -519,7 +519,7 @@ void exelv_state::exl100(machine_config &config)
 	screen.set_visarea(0, tms3556_device::TOTAL_WIDTH-1, 0, tms3556_device::TOTAL_HEIGHT-1);
 #endif
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::RGB_3BIT);
@@ -575,7 +575,7 @@ void exelv_state::exeltel(machine_config &config)
 	screen.set_visarea(0, tms3556_device::TOTAL_WIDTH-1, 0, tms3556_device::TOTAL_HEIGHT-1);
 #endif
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::RGB_3BIT);

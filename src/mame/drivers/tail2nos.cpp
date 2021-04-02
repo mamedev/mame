@@ -252,7 +252,7 @@ void tail2nos_state::tail2nos(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(tail2nos_state::screen_update_tail2nos));

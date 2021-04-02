@@ -115,7 +115,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(teleray10_state::timer_expired)
 	{
 		int height = BIT(m_swmisc->read(), 2) ? 310 : 372;
 		if (height != m_screen->height())
-			m_screen->configure(1000, height, m_screen->visible_area(), attotime::from_ticks(1000 * height, 18.6_MHz_XTAL).as_attoseconds());
+			m_screen->configure(1000, height, m_screen->visible_area(), attotime::from_ticks(1000 * height, 18.6_MHz_XTAL).as_subseconds());
 	}
 
 	if (m_outreg->q7_r())

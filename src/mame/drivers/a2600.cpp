@@ -233,7 +233,7 @@ void a2600_base_state::a2600_tia_vsync_callback(uint16_t data)
 			if ( supported_screen_heights[i] != m_current_screen_height )
 			{
 				m_current_screen_height = supported_screen_heights[i];
-//              m_screen->configure(228, m_current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_NTSC ) * 228 * m_current_screen_height );
+//              m_screen->configure(228, m_current_screen_height, &visarea[i], subseconds::from_hz( MASTER_CLOCK_NTSC ) * 228 * m_current_screen_height );
 			}
 		}
 	}
@@ -248,7 +248,7 @@ void a2600_base_state::a2600_tia_vsync_callback_pal(uint16_t data)
 			if ( supported_screen_heights[i] != m_current_screen_height )
 			{
 				m_current_screen_height = supported_screen_heights[i];
-//              m_screen->configure(228, m_current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_PAL ) * 228 * m_current_screen_height );
+//              m_screen->configure(228, m_current_screen_height, &visarea[i], subseconds::from_hz( MASTER_CLOCK_PAL ) * 228 * m_current_screen_height );
 			}
 		}
 	}

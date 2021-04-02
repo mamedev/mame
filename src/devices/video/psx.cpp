@@ -418,7 +418,7 @@ int psxgpu_device::DebugTextureDisplay( bitmap_rgb32 &bitmap )
 void psxgpu_device::updatevisiblearea()
 {
 	rectangle visarea;
-	double refresh;
+	double refresh = 60;
 
 	if( ( n_gpustatus & ( 1 << 0x14 ) ) != 0 )
 	{
@@ -492,7 +492,7 @@ void psxgpu_device::updatevisiblearea()
 #endif
 
 	visarea.set(0, n_screenwidth - 1, 0, n_screenheight - 1);
-	screen().configure(n_screenwidth, n_screenheight, visarea, HZ_TO_ATTOSECONDS(refresh));
+	screen().configure(n_screenwidth, n_screenheight, visarea, subseconds::from_hz(refresh));
 }
 
 void psxgpu_device::psx_gpu_init( int n_gputype )
@@ -3538,10 +3538,10 @@ void psxgpu_device::device_config_complete()
 	if (!has_screen())
 		return;
 
-	if (!screen().refresh_attoseconds())
+	if (screen().refresh_subseconds().is_zero())
 	{
 		screen().set_refresh_hz(60);
-		screen().set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+		screen().set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 		screen().set_size(1024, 1024);
 		screen().set_visarea(0, 639, 0, 479);
 	}

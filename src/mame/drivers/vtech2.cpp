@@ -476,7 +476,7 @@ void vtech2_state::laser350(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(0);
+	screen.set_vblank_time(subseconds::zero());
 	screen.set_size(88*8, 24*8+32);
 	screen.set_visarea(0*8, 88*8-1, 0*8, 24*8+32-1);
 	screen.set_screen_update(FUNC(vtech2_state::screen_update));

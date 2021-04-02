@@ -79,7 +79,7 @@ void light_video_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(x_res, y_res);
 	screen.set_visarea(0, x_res-1, 0, y_res-1);
 	screen.set_screen_update(FUNC(light_video_device::screen_update));

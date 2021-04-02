@@ -1904,7 +1904,7 @@ void dec8_state::lastmisn(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(58);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529)); /* 58Hz, 529us Vblank duration */
+//  m_screen->set_vblank_time(subseconds::from_usec(529)); /* 58Hz, 529us Vblank duration */
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	set_screen_raw_params_data_east(config);
@@ -1964,7 +1964,7 @@ void dec8_state::shackled(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(58);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529)); /* 58Hz, 529us Vblank duration */
+//  m_screen->set_vblank_time(subseconds::from_usec(529)); /* 58Hz, 529us Vblank duration */
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	set_screen_raw_params_data_east(config);
@@ -2017,7 +2017,7 @@ void dec8_state::gondo(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(58);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529us Vblank duration */);
+//  m_screen->set_vblank_time(subseconds::from_usec(529) /* 58Hz, 529us Vblank duration */);
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	set_screen_raw_params_data_east(config);
@@ -2073,7 +2073,7 @@ void dec8_state::garyoret(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(58);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529us Vblank duration */);
+//  m_screen->set_vblank_time(subseconds::from_usec(529) /* 58Hz, 529us Vblank duration */);
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	set_screen_raw_params_data_east(config);
@@ -2133,7 +2133,7 @@ void dec8_state::ghostb(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(58);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529us Vblank duration */);
+//  m_screen->set_vblank_time(subseconds::from_usec(529) /* 58Hz, 529us Vblank duration */);
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	set_screen_raw_params_data_east(config);
@@ -2203,7 +2203,7 @@ void csilver_state::csilver(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(58);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529)); /* 58Hz, 529us Vblank duration */
+//  m_screen->set_vblank_time(subseconds::from_usec(529)); /* 58Hz, 529us Vblank duration */
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	set_screen_raw_params_data_east(config);
@@ -2265,7 +2265,7 @@ void dec8_state::oscar(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(58);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* 58Hz, 529us Vblank duration */
+//  m_screen->set_vblank_time(subseconds::from_usec(2500)); /* 58Hz, 529us Vblank duration */
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	set_screen_raw_params_data_east(config);
@@ -2316,7 +2316,7 @@ void dec8_state::srdarwin(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(58);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529)); /* 58Hz, 529us Vblank duration */
+//  m_screen->set_vblank_time(subseconds::from_usec(529)); /* 58Hz, 529us Vblank duration */
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	set_screen_raw_params_data_east(config);
@@ -2370,7 +2370,7 @@ void dec8_state::cobracom(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(58);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529)); /* 58Hz, 529us Vblank duration */
+//  m_screen->set_vblank_time(subseconds::from_usec(529)); /* 58Hz, 529us Vblank duration */
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	set_screen_raw_params_data_east(config);

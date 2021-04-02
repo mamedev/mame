@@ -321,7 +321,7 @@ void coco3_state::coco3(machine_config &config)
 	composite_screen.set_screen_update(FUNC(coco3_state::screen_update));
 	composite_screen.set_size(640, 243);
 	composite_screen.set_visarea(0, 640-1, 1, 241-1);
-	composite_screen.set_vblank_time(0);
+	composite_screen.set_vblank_time(subseconds::zero());
 
 	// RGB monitor
 	screen_device &rgb_screen(SCREEN(config, RGB_SCREEN_TAG, SCREEN_TYPE_RASTER));
@@ -329,7 +329,7 @@ void coco3_state::coco3(machine_config &config)
 	rgb_screen.set_screen_update(FUNC(coco3_state::screen_update));
 	rgb_screen.set_size(640, 243);
 	rgb_screen.set_visarea(0, 640-1, 1, 241-1);
-	rgb_screen.set_vblank_time(0);
+	rgb_screen.set_vblank_time(subseconds::zero());
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("128K,2M,8M");

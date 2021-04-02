@@ -166,7 +166,7 @@ uint32_t c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 
 			if (attr & 0x10)
 			{
-				if ((machine().time().attoseconds() / (ATTOSECONDS_PER_SECOND / 2)) & 1)
+				if (machine().time().raw_subseconds() >= subseconds::from_hz(2))
 					attr &= 0x0f;
 				else if ((attr & 0xf0) != 0x10)
 					attr &= ~0x10;
@@ -709,7 +709,7 @@ void c65_state::c65(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(60);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+//  m_screen->set_vblank_time(subseconds::from_usec(2500));
 	m_screen->set_screen_update(FUNC(c65_state::screen_update));
 //  m_screen->set_size(32*8, 32*8);
 //  m_screen->set_visarea(0*8, 32*8-1, 0*8, 32*8-1);

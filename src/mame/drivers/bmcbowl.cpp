@@ -468,7 +468,7 @@ void bmcbowl_state::bmcbowl(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(35*8, 30*8);
 	screen.set_visarea(0*8, 35*8-1, 0*8, 29*8-1);
 	screen.set_screen_update(FUNC(bmcbowl_state::screen_update));

@@ -1047,7 +1047,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 			int htotal = SMART_IOREG(HTOTAL);
 			if (htotal > 0 && vtotal > 0)
 			{
-				attoseconds_t refresh = HZ_TO_ATTOSECONDS(m_pixclock) * (htotal + 1) * (vtotal + 1);
+				subseconds refresh = subseconds::from_hz(m_pixclock) * (htotal + 1) * (vtotal + 1);
 				int width = (htotal + 1) * m_pixperclock;
 				int height = vtotal + 1;
 				rectangle visarea;
@@ -1076,7 +1076,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 				}
 
 				LOG("Configuring screen: HTOTAL=%3d BLANK=%3d-%3d VTOTAL=%3d BLANK=%3d-%3d refresh=%f\n",
-						htotal, SMART_IOREG(HEBLNK), SMART_IOREG(HSBLNK), vtotal, veblnk, vsblnk, ATTOSECONDS_TO_HZ(refresh));
+						htotal, SMART_IOREG(HEBLNK), SMART_IOREG(HSBLNK), vtotal, veblnk, vsblnk, refresh.as_hz());
 
 				/* interlaced timing not supported */
 				if ((SMART_IOREG(DPYCTL) & 0x4000) == 0)
@@ -1121,9 +1121,9 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 	if (vcount > vtotal)
 		vcount = 0;
 
-	/* note that we add !master (0 or 1) as a attoseconds value; this makes no practical difference */
+	/* note that we add !master (0 or 1) as a subseconds value; this makes no practical difference */
 	/* but helps ensure that masters are updated first before slaves */
-	m_scantimer->adjust(screen().time_until_pos(vcount) + attotime(0, !master), vcount);
+	m_scantimer->adjust(screen().time_until_pos(vcount) + (master ? subseconds::zero() : subseconds::min()), vcount);
 }
 
 

@@ -2131,7 +2131,7 @@ void tumbleb_state::tumblepb(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(58);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	m_screen->set_vblank_time(subseconds::from_usec(529));
 	m_screen->set_size(40*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_tumblepb));
@@ -2172,7 +2172,7 @@ void tumbleb_state::tumbleb2(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(58);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	m_screen->set_vblank_time(subseconds::from_usec(529));
 	m_screen->set_size(40*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_tumblepb));
@@ -2230,7 +2230,7 @@ void tumbleb_state::jumpkids(machine_config &config) // OSCs: 12MHz, 8MHz & 14.3
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	m_screen->set_vblank_time(subseconds::from_usec(529));
 	m_screen->set_size(40*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_jumpkids));
@@ -2267,7 +2267,7 @@ void tumbleb_state::fncywld(machine_config &config) // OSCs: 12MHz, 4MHz & 28.63
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	m_screen->set_vblank_time(subseconds::from_usec(529));
 	m_screen->set_size(40*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_fncywld));
@@ -2305,7 +2305,7 @@ void tumbleb_state::magipur(machine_config &config) // OSCs: 12MHz, 4MHz, 28.636
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60); // refresh rate not verified
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	m_screen->set_vblank_time(subseconds::from_usec(529));
 	m_screen->set_size(40*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_fncywld));
@@ -2362,7 +2362,7 @@ void tumbleb_state::htchctch(machine_config &config) // OSCs: 15MHz, 4.096MHz
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2400)); // ?? cookbib needs it above ~2400 or the Joystick on the How to Play screen is the wrong colour?!
+	m_screen->set_vblank_time(subseconds::from_usec(2400)); // ?? cookbib needs it above ~2400 or the Joystick on the How to Play screen is the wrong colour?!
 	m_screen->set_size(40*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_semicom));
@@ -2475,7 +2475,7 @@ void tumbleb_state::suprtrio(machine_config &config) // OSCs: 14MHz, 12MHz & 8MH
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	m_screen->set_vblank_time(subseconds::from_usec(529));
 	m_screen->set_size(40*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 1*8-1, 31*8-2);
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_suprtrio));
@@ -2513,7 +2513,7 @@ void tumbleb_state::pangpang(machine_config &config) // OSCs: 14MHz, 12MHz & 8MH
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(58);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1529));
+	m_screen->set_vblank_time(subseconds::from_usec(1529));
 	m_screen->set_size(40*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_pangpang));

@@ -298,7 +298,7 @@ void malzak_state::malzak(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: convert to PAL set_raw
 	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_vblank_time(subseconds::from_usec(2500));
 	m_screen->set_size(480, 512);  /* vert size is a guess */
 	m_screen->set_visarea(0, 479, 0, 479);
 	m_screen->set_screen_update(FUNC(malzak_state::screen_update));

@@ -1430,7 +1430,7 @@ void itech32_state::video_w(offs_t offset, u16 data, u16 mem_mask)
 
 				logerror("Configure Screen: HTOTAL: %x  HBSTART: %x  HBEND: %x  VTOTAL: %x  VBSTART: %x  VBEND: %x\n",
 					VIDEO_HTOTAL, VIDEO_HBLANK_START, VIDEO_HBLANK_END, VIDEO_VTOTAL, VIDEO_VBLANK_START, VIDEO_VBLANK_END);
-				m_screen->configure(VIDEO_HTOTAL, VIDEO_VTOTAL, visarea, HZ_TO_ATTOSECONDS(VIDEO_CLOCK) * VIDEO_HTOTAL * VIDEO_VTOTAL);
+				m_screen->configure(VIDEO_HTOTAL, VIDEO_VTOTAL, visarea, subseconds::from_hz(VIDEO_CLOCK) * VIDEO_HTOTAL * VIDEO_VTOTAL);
 			}
 			break;
 	}

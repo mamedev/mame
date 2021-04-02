@@ -164,7 +164,7 @@ void k053252_device::res_change()
 		rectangle visarea;
 		//(HC+1) - HFP - HBP - 8*(HSW+1)
 		//VC - VFP - VBP - (VSW+1)
-		attoseconds_t refresh = HZ_TO_ATTOSECONDS(clock()) * (m_hc) * m_vc;
+		subseconds refresh = subseconds::from_hz(clock()) * (m_hc) * m_vc;
 
 		visarea.min_x = m_offsx;
 		visarea.min_y = m_offsy;
@@ -177,12 +177,12 @@ void k053252_device::res_change()
 			m_slave_screen->configure(m_hc, m_vc, visarea, refresh);
 
 #if 0
-		attoseconds_t hsync = HZ_TO_ATTOSECONDS(clock()) * (m_hc);
+		subseconds hsync = subseconds::from_hz(clock()) * (m_hc);
 		printf("H %d HFP %d HSW %d HBP %d\n",m_hc,m_hfp,m_hsw*8,m_hbp);
 		printf("V %d VFP %d VSW %d VBP %d\n",m_vc,m_vfp,m_vsw,m_vbp);
 		// L stands for Legacy ...
 		printf("L %d %d\n",m_offsx,m_offsy);
-		printf("Screen params: Clock: %u V-Sync %.2f H-Sync %.f\n",clock(),ATTOSECONDS_TO_HZ(refresh),ATTOSECONDS_TO_HZ(hsync));
+		printf("Screen params: Clock: %u V-Sync %.2f H-Sync %.f\n",clock(),refresh.as_hz(),hsync.as_hz());
 		printf("visible screen area: %d x %d\n\n",(visarea.max_x - visarea.min_x) + 1,(visarea.max_y - visarea.min_y) + 1);
 #endif
 	}

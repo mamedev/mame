@@ -536,7 +536,7 @@ void h19_state::h19(machine_config &config)
 	// TODO: make configurable, Heath offered 3 different CRTs - White, Green, Amber.
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
 	screen.set_refresh_hz(60);   // TODO- this is adjustable by dipswitch.
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	screen.set_size(640, 250);
 	screen.set_visarea(0, 640 - 1, 0, 250 - 1);

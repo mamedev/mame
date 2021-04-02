@@ -827,7 +827,7 @@ protected:
 	u32                     m_unscaled_clock;       // current unscaled device clock
 	u32                     m_clock;                // current device clock, after scaling
 	double                  m_clock_scale;          // clock scale factor
-	attoseconds_t           m_attoseconds_per_clock;// period in attoseconds
+	subseconds              m_subseconds_per_clock; // period in subseconds
 
 	std::unique_ptr<device_debug> m_debug;
 	const machine_config &  m_machine_config;       // reference to the machine's configuration

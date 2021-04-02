@@ -800,7 +800,7 @@ void hp1ll3_device::apply_conf()
 	h_active *= 8;
 
 	attotime frame_rate{clocks_to_attotime(h_total * v_total)};
-	screen().configure(h_total, v_total, rectangle{0, int32_t(h_active - 1), 0, int32_t(v_active - 1)}, frame_rate.attoseconds() / 4);
+	screen().configure(h_total, v_total, rectangle{0, int32_t(h_active - 1), 0, int32_t(v_active - 1)}, frame_rate.as_subseconds() / 4);
 
 	m_horiz_pix_total = h_active;
 	m_vert_pix_total = v_active;

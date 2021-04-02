@@ -883,7 +883,7 @@ void nss_state::nss(machine_config &config)
 	// NSS
 	screen_device &osd(SCREEN(config, "osd", SCREEN_TYPE_RASTER));
 	osd.set_refresh_hz(60);
-	osd.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	osd.set_vblank_time(subseconds::from_usec(2500));
 	osd.set_size(288+22, 216+22);
 	osd.set_visarea(0, 288-1, 0, 216-1);
 	osd.set_screen_update(FUNC(nss_state::screen_update));

@@ -89,7 +89,7 @@
 #define A2_DISP_BITCLOCK 20160000ll
 
 //! Display bit time in pico seconds (~= 49.6031ns).
-#define A2_DISP_BITTIME(n) DOUBLE_TO_ATTOSECONDS(static_cast<double>(n)/A2_DISP_BITCLOCK)
+#define A2_DISP_BITTIME(n) ((n) * subseconds::from_hz(u64(A2_DISP_BITCLOCK)))
 
 //! Time for a scanline in pico seconds (768 * 49.6031ns ~= 38095.1808ns).
 #define A2_DISP_SCANLINE_TIME A2_DISP_BITTIME(A2_DISP_TOTAL_WIDTH)
@@ -100,7 +100,7 @@
 //!< Time for a word in pico seconds (16 pixels * 49.6031ns ~= 793.6496ns).
 #define A2_DISP_WORD_TIME A2_DISP_BITTIME(16)
 
-#define A2_DISP_VBLANK_TIME (static_cast<double>(-A2_DISP_HEIGHT)*HZ_TO_ATTOSECONDS(26250))
+#define A2_DISP_VBLANK_TIME ((-A2_DISP_HEIGHT)*subseconds::from_hz(26250))
 
 #else   // ALTO2_DEFINE_CONSTANTS
 /**

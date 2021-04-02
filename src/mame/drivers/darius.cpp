@@ -716,7 +716,7 @@ void darius_state::darius(machine_config &config)
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);
-	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_vblank_time(subseconds::from_usec(0));
 	lscreen.set_size(36*8, 32*8);
 	lscreen.set_visarea(0*8, 36*8-1, 1*8, 29*8-1);
 	lscreen.set_screen_update(FUNC(darius_state::screen_update_left));
@@ -724,7 +724,7 @@ void darius_state::darius(machine_config &config)
 
 	screen_device &mscreen(SCREEN(config, "mscreen", SCREEN_TYPE_RASTER));
 	mscreen.set_refresh_hz(60);
-	mscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	mscreen.set_vblank_time(subseconds::from_usec(0));
 	mscreen.set_size(36*8, 32*8);
 	mscreen.set_visarea(0*8, 36*8-1, 1*8, 29*8-1);
 	mscreen.set_screen_update(FUNC(darius_state::screen_update_middle));
@@ -732,7 +732,7 @@ void darius_state::darius(machine_config &config)
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_refresh_hz(60);
-	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_vblank_time(subseconds::from_usec(0));
 	rscreen.set_size(36*8, 32*8);
 	rscreen.set_visarea(0*8, 36*8-1, 1*8, 29*8-1);
 	rscreen.set_screen_update(FUNC(darius_state::screen_update_right));

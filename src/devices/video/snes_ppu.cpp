@@ -1420,7 +1420,7 @@ void snes_ppu_device::set_latch_hv(int16_t x, int16_t y)
 void snes_ppu_device::dynamic_res_change()
 {
 	rectangle visarea = screen().visible_area();
-	attoseconds_t refresh;
+	subseconds refresh;
 
 	visarea.min_x = visarea.min_y = 0;
 	visarea.max_y = m_beam.last_visible_line * m_interlace - 1;
@@ -1435,12 +1435,12 @@ void snes_ppu_device::dynamic_res_change()
 	/* FIXME: does the timing changes when the gfx mode is equal to 5 or 6? */
 	if ((m_stat78 & 0x10) == SNES_NTSC)
 	{
-		refresh = HZ_TO_ATTOSECONDS(DOTCLK_NTSC) * SNES_HTOTAL * SNES_VTOTAL_NTSC;
+		refresh = subseconds::from_hz(DOTCLK_NTSC) * SNES_HTOTAL * SNES_VTOTAL_NTSC;
 		screen().configure(SNES_HTOTAL * m_htmult, SNES_VTOTAL_NTSC * m_interlace, visarea, refresh);
 	}
 	else
 	{
-		refresh = HZ_TO_ATTOSECONDS(DOTCLK_PAL) * SNES_HTOTAL * SNES_VTOTAL_PAL;
+		refresh = subseconds::from_hz(DOTCLK_PAL) * SNES_HTOTAL * SNES_VTOTAL_PAL;
 		screen().configure(SNES_HTOTAL * m_htmult, SNES_VTOTAL_PAL * m_interlace, visarea, refresh);
 	}
 }

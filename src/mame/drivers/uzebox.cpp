@@ -293,7 +293,7 @@ void uzebox_state::uzebox(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(59.99);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1395));
+	m_screen->set_vblank_time(subseconds::from_usec(1395));
 	m_screen->set_size(870, 525);
 	m_screen->set_visarea(150, 870-1, 40, 488-1);
 	m_screen->set_screen_update(FUNC(uzebox_state::screen_update));

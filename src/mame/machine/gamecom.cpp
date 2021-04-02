@@ -241,7 +241,7 @@ void gamecom_state::recompute_lcd_params()
 	int vblank_period,hblank_period;
 	int H_timing,V_timing;
 	int pixel_clock;
-	attoseconds_t refresh;
+	subseconds refresh;
 
 	if(m_lch_reg != 7)
 		popmessage("LCH = %02x!",m_lch_reg);
@@ -261,7 +261,7 @@ void gamecom_state::recompute_lcd_params()
 	vblank_period = (V_timing + 160);
 	hblank_period = (H_timing + 200);
 
-	refresh  = HZ_TO_ATTOSECONDS(pixel_clock) * (hblank_period) * vblank_period;
+	refresh  = subseconds::from_hz(pixel_clock) * (hblank_period) * vblank_period;
 	m_screen->configure(hblank_period, vblank_period, visarea, refresh);
 }
 

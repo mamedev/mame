@@ -1456,7 +1456,7 @@ void sigmab98_state::sigmab98(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);                    // ?
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
+	m_screen->set_vblank_time(subseconds::from_usec(2500) /* not accurate */);   // game reads vblank state
 	m_screen->set_size(0x140, 0x100);
 	m_screen->set_visarea(0,0x140-1, 0,0xf0-1);
 	m_screen->set_screen_update(FUNC(sigmab98_state::screen_update));
@@ -1526,7 +1526,7 @@ void lufykzku_state::lufykzku(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);                    // ?
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
+	m_screen->set_vblank_time(subseconds::from_usec(2500) /* not accurate */);   // game reads vblank state
 	m_screen->set_size(0x140, 0x100);
 	m_screen->set_visarea(0,0x140-1, 0,0xf0-1);
 	m_screen->set_screen_update(FUNC(lufykzku_state::screen_update));
@@ -1598,7 +1598,7 @@ void sammymdl_state::sammymdl(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);                    // ?
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
+	m_screen->set_vblank_time(subseconds::from_usec(2500) /* not accurate */);   // game reads vblank state
 	m_screen->set_size(0x140, 0x100);
 	m_screen->set_visarea(0, 0x140-1, 0, 0xf0-1);
 	m_screen->set_screen_update(FUNC(sammymdl_state::screen_update));

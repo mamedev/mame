@@ -81,7 +81,6 @@ laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type ty
 		m_fieldnum(0),
 		m_curtrack(0),
 		m_maxtrack(0),
-		m_attospertrack(0),
 		m_sliderupdate(attotime::zero),
 		m_videoindex(0),
 		m_stream(nullptr),
@@ -261,7 +260,7 @@ void laserdisc_device::device_reset()
 	m_videosquelch = 1;
 	m_fieldnum = 0;
 	m_curtrack = 1;
-	m_attospertrack = 0;
+	m_subspertrack = subseconds::zero();
 	m_sliderupdate = machine().time();
 }
 
@@ -387,15 +386,21 @@ void laserdisc_device::set_slider_speed(int32_t tracks_per_vsync)
 	// if 0, set the time to 0
 	attotime vsyncperiod = screen().frame_period();
 	if (tracks_per_vsync == 0)
-		m_attospertrack = 0;
+		m_subspertrack = subseconds::zero();
 
 	// positive values store positive times
 	else if (tracks_per_vsync > 0)
-		m_attospertrack = (vsyncperiod / tracks_per_vsync).as_attoseconds();
+	{
+		m_subspertrack = (vsyncperiod / tracks_per_vsync).as_subseconds();
+		m_subspertrack_neg = false;
+	}
 
 	// negative values store negative times
 	else
-		m_attospertrack = -(vsyncperiod / -tracks_per_vsync).as_attoseconds();
+	{
+		m_subspertrack = (vsyncperiod / -tracks_per_vsync).as_subseconds();
+		m_subspertrack_neg = true;
+	}
 
 	if (LOG_SLIDER)
 		printf("Slider speed = %d\n", tracks_per_vsync);
@@ -811,28 +816,28 @@ void laserdisc_device::update_slider_pos()
 	attotime curtime = machine().time();
 
 	// if not moving, update to now
-	if (m_attospertrack == 0)
+	if (m_subspertrack.is_zero())
 		m_sliderupdate = curtime;
 
 	// otherwise, compute the number of tracks covered
 	else
 	{
-		attoseconds_t delta = (curtime - m_sliderupdate).as_attoseconds();
+		subseconds delta = (curtime - m_sliderupdate).as_subseconds();
 
 		// determine how many tracks we covered and advance
-		if (m_attospertrack >= 0)
+		if (!m_subspertrack_neg)
 		{
-			int32_t tracks_covered = delta / m_attospertrack;
+			int32_t tracks_covered = delta / m_subspertrack;
 			add_and_clamp_track(tracks_covered);
 			if (tracks_covered != 0)
-				m_sliderupdate += attotime(0, tracks_covered * m_attospertrack);
+				m_sliderupdate += tracks_covered * m_subspertrack;
 		}
 		else
 		{
-			int32_t tracks_covered = delta / -m_attospertrack;
+			int32_t tracks_covered = delta / m_subspertrack;
 			add_and_clamp_track(-tracks_covered);
 			if (tracks_covered != 0)
-				m_sliderupdate += attotime(0, tracks_covered * -m_attospertrack);
+				m_sliderupdate += tracks_covered * m_subspertrack;
 		}
 	}
 }

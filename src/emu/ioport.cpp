@@ -1987,7 +1987,7 @@ void ioport_manager::frame_update()
 	record_frame(curtime);
 
 	// track the duration of the previous frame
-	m_last_delta_nsec = (curtime - m_last_frame_time).as_attoseconds() / ATTOSECONDS_PER_NANOSECOND;
+	m_last_delta_nsec = (curtime - m_last_frame_time).as_subseconds().as_nsec_int();
 	m_last_frame_time = curtime;
 
 	// update the digital joysticks
@@ -2033,8 +2033,8 @@ s32 ioport_manager::frame_interpolate(s32 oldval, s32 newval)
 		return newval;
 
 	// otherwise, interpolate
-	attoseconds_t nsec_since_last = (machine().time() - m_last_frame_time).as_attoseconds() / ATTOSECONDS_PER_NANOSECOND;
-	return oldval + (s64(newval - oldval) * nsec_since_last / m_last_delta_nsec);
+	u32 nsec_since_last = (machine().time() - m_last_frame_time).as_subseconds().as_nsec_int();
+	return oldval + (s64(newval - oldval) * s64(nsec_since_last) / s64(m_last_delta_nsec));
 }
 
 
@@ -2634,11 +2634,11 @@ void ioport_manager::playback_frame(const attotime &curtime)
 	if (m_playback_file.is_open())
 	{
 		// first the absolute time
-		seconds_t seconds_temp;
-		attoseconds_t attoseconds_temp;
+		s32 seconds_temp;
+		s64 subseconds_temp;
 		playback_read(seconds_temp);
-		playback_read(attoseconds_temp);
-		attotime readtime(seconds_temp, attoseconds_temp);
+		playback_read(subseconds_temp);
+		attotime readtime(seconds_temp, subseconds::from_raw(subseconds_temp));
 		if (readtime != curtime)
 			playback_end("Out of sync");
 
@@ -2847,7 +2847,7 @@ void ioport_manager::record_frame(const attotime &curtime)
 	{
 		// first the absolute time
 		record_write(curtime.seconds());
-		record_write(curtime.attoseconds());
+		record_write(curtime.raw_subseconds().raw());
 
 		// then the current speed
 		record_write(u32(machine().video().speed_percent() * double(1 << 20)));
@@ -2861,7 +2861,7 @@ void ioport_manager::record_frame(const attotime &curtime)
 				(int)curtime.seconds() / (60 * 60),
 				(curtime.seconds() / 60) % 60,
 				curtime.seconds() % 60,
-				(int)(curtime.attoseconds()/ATTOSECONDS_PER_MILLISECOND));
+				curtime.raw_subseconds().as_msec_int());
 
 		// Elapsed from previous timecode
 		attotime const elapsed_time = curtime - m_timecode_last_time;
@@ -2870,15 +2870,15 @@ void ioport_manager::record_frame(const attotime &curtime)
 				elapsed_time.seconds() / (60 * 60),
 				(elapsed_time.seconds() / 60) % 60,
 				elapsed_time.seconds() % 60,
-				int(elapsed_time.attoseconds()/ATTOSECONDS_PER_MILLISECOND));
+				elapsed_time.raw_subseconds().as_msec_int());
 
 		// Number of ms from beginning of playback
-		int const mseconds_start = curtime.seconds()*1000 + curtime.attoseconds()/ATTOSECONDS_PER_MILLISECOND;
-		std::string const mseconds_start_str = string_format("%015d", mseconds_start);
+		s64 const mseconds_start = curtime.as_msec_int();
+		std::string const mseconds_start_str = string_format("%015lld", mseconds_start);
 
 		// Number of ms from previous timecode
-		int mseconds_elapsed = elapsed_time.seconds()*1000 + elapsed_time.attoseconds()/ATTOSECONDS_PER_MILLISECOND;
-		std::string const mseconds_elapsed_str = string_format("%015d", mseconds_elapsed);
+		s64 mseconds_elapsed = elapsed_time.as_msec_int();
+		std::string const mseconds_elapsed_str = string_format("%015lld", mseconds_elapsed);
 
 		// Number of frames from beginning of playback
 		int const frame_start = mseconds_start * 60 / 1000;

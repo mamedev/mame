@@ -614,7 +614,7 @@ void gb_state::gameboy(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(DMG_FRAMES_PER_SECOND);
-	screen.set_vblank_time(0);
+	screen.set_vblank_time(subseconds::zero());
 	screen.set_screen_update("ppu", FUNC(dmg_ppu_device::screen_update));
 	screen.set_palette(m_palette);
 //  screen.set_size(20*8, 18*8);
@@ -655,7 +655,7 @@ void gb_state::supergb(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_physical_aspect(4, 3); // runs on a TV, not an LCD
 	screen.set_refresh_hz(SGB_FRAMES_PER_SECOND);
-	screen.set_vblank_time(0);
+	screen.set_vblank_time(subseconds::zero());
 	screen.set_screen_update("ppu", FUNC(dmg_ppu_device::screen_update));
 	screen.set_palette(m_palette);
 	screen.set_size(32*8, 28*8);
@@ -725,7 +725,7 @@ void gb_state::gbcolor(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(DMG_FRAMES_PER_SECOND);
-	screen.set_vblank_time(0);
+	screen.set_vblank_time(subseconds::zero());
 	screen.set_screen_update("ppu", FUNC(dmg_ppu_device::screen_update));
 	screen.set_palette(m_palette);
 //  screen.set_size(20*8, 18*8);
@@ -765,7 +765,7 @@ void megaduck_state::megaduck(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(DMG_FRAMES_PER_SECOND);
-	screen.set_vblank_time(0);
+	screen.set_vblank_time(subseconds::zero());
 	screen.set_screen_update("ppu", FUNC(dmg_ppu_device::screen_update));
 	screen.set_palette(m_palette);
 	screen.set_size(20*8, 18*8);

@@ -217,7 +217,7 @@ void channelf_state::channelf(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(128, 64);
 	screen.set_visarea(4, 112 - 7, 4, 64 - 3);
 	screen.set_screen_update(FUNC(channelf_state::screen_update_channelf));
@@ -242,7 +242,7 @@ void channelf_state::sabavdpl(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(4623)); /* approximate */
+	screen.set_vblank_time(subseconds::from_usec(4623)); /* approximate */
 	screen.set_size(128, 64);
 	screen.set_visarea(4, 112 - 7, 4, 64 - 3);
 	screen.set_screen_update(FUNC(channelf_state::screen_update_channelf));
@@ -268,7 +268,7 @@ void channelf_state::channlf2(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(128, 64);
 	screen.set_visarea(4, 112 - 7, 4, 64 - 3);
 	screen.set_screen_update(FUNC(channelf_state::screen_update_channelf));
@@ -294,7 +294,7 @@ void channelf_state::sabavpl2(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(4623)); /* approximate */
+	screen.set_vblank_time(subseconds::from_usec(4623)); /* approximate */
 	screen.set_size(128, 64);
 	screen.set_visarea(4, 112 - 7, 4, 64 - 3);
 	screen.set_screen_update(FUNC(channelf_state::screen_update_channelf));

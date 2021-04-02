@@ -542,7 +542,7 @@ void st0016_state::st0016(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(48*8, 48*8);
 	m_screen->set_visarea(0*8, 48*8-1, 0*8, 48*8-1);
 	m_screen->set_screen_update(FUNC(st0016_state::screen_update));

@@ -590,13 +590,13 @@ void mc6847_base_device::device_config_complete()
 	if (!has_screen())
 		return;
 
-	if (!screen().refresh_attoseconds())
+	if (screen().refresh_subseconds().is_zero())
 	{
 		// FIXME: use correct raw parameters rather than this nonsense
 		screen().set_refresh_hz(m_tpfs > 310.0 ? 50 : 60);
 		screen().set_size(320, 243);
 		screen().set_visarea(0, 320-1, 1, 241-1);
-		screen().set_vblank_time(0);
+		screen().set_vblank_time(subseconds::zero());
 	}
 
 	if (!screen().has_screen_update())

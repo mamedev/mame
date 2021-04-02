@@ -1004,7 +1004,7 @@ void kingdrby_state::kingdrby(machine_config &config)
 	PALETTE(config, m_palette, FUNC(kingdrby_state::kingdrby_palette), 0x200);
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 256-1, 0, 224-1);    /* controlled by CRTC */
 	screen.set_screen_update(FUNC(kingdrby_state::screen_update_kingdrby));

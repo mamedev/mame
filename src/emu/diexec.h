@@ -223,7 +223,7 @@ protected:
 	virtual void interface_clock_changed() override;
 
 	// device_scheduler helpers
-	attoseconds_t run_for(attoseconds_t attoseconds);
+	s64 run_for(subseconds subs);
 	u32 update_suspend();
 
 	// for use by devcpu for now...
@@ -253,7 +253,7 @@ protected:
 
 private:
 	void suspend_resume_changed();
-	attoseconds_t minimum_quantum() const;
+	subseconds minimum_quantum() const;
 
 	void run_debug();
 	void run_suspend();
@@ -316,7 +316,7 @@ private:
 	int                     m_cycles_running;           // number of cycles we are executing
 	int                     m_cycles_stolen;            // number of cycles we artificially stole
 	u32                     m_cycles_per_second;        // cycles per second, adjusted for multipliers
-	attoseconds_t           m_attoseconds_per_cycle;    // attoseconds per adjusted clock cycle
+	subseconds              m_subseconds_per_cycle;     // subseconds per adjusted clock cycle
 	u64                     m_totalcycles;              // total device cycles executed
 	device_scheduler::basetime_relative m_localtime;    // local time, relative to the scheduler's base
 	profile_type            m_profiler;                 // profiler tag
@@ -359,19 +359,19 @@ using execute_interface_enumerator = device_interface_enumerator<device_execute_
 
 //-------------------------------------------------
 //  run_for - execute for the given number of
-//  attoseconds; note that this function is super
+//  subseconds; note that this function is super
 //  hot, so be extremely careful making any
 //  changes here
 //-------------------------------------------------
 
-inline attoseconds_t device_execute_interface::run_for(attoseconds_t attoseconds)
+inline s64 device_execute_interface::run_for(subseconds subs)
 {
 	g_profiler.start(m_profiler);
 
 	// compute how many cycles we want to execute, rounding up
-	// note that we pre-cache attoseconds per cycle
-	u64 attoseconds_per_cycle = m_attoseconds_per_cycle;
-	u32 ran = u64(attoseconds) / attoseconds_per_cycle + 1;
+	// note that we pre-cache subseconds per cycle
+	subseconds subseconds_per_cycle = m_subseconds_per_cycle;
+	u32 ran = subs / subseconds_per_cycle + 1;
 
 	// store the number of cycles we've requested in the executing
 	// device
@@ -415,7 +415,7 @@ inline attoseconds_t device_execute_interface::run_for(attoseconds_t attoseconds
 
 	// update the local time for the device so that it represents an
 	// integral number of cycles
-	m_localtime.add(attoseconds_per_cycle * ran);
+	m_localtime.add(subseconds_per_cycle * ran);
 
 	g_profiler.stop();
 

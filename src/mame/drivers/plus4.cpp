@@ -854,7 +854,7 @@ void plus4_state::plus4(machine_config &config)
 	// video and sound hardware
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(mos7360_device::PAL_VRETRACERATE);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_size(336, 216);
 	screen.set_visarea(0, 336 - 1, 0, 216 - 1);
 	screen.set_screen_update(MOS7360_TAG, FUNC(mos7360_device::screen_update));

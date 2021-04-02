@@ -1956,7 +1956,7 @@ void halleys_state::halleys(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(59.50); /* verified on PCB */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(SCREEN_WIDTH, SCREEN_HEIGHT);
 	screen.set_visarea(VIS_MINX, VIS_MAXX, VIS_MINY, VIS_MAXY);
 	screen.set_screen_update(FUNC(halleys_state::screen_update_halleys));

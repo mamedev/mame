@@ -542,7 +542,7 @@ void skimaxx_state::skimaxx(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 //  screen.set_raw(40000000/4, 156*4, 0, 100*4, 328, 0, 300); // TODO - Wrong but TMS overrides it anyway
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_size(0x400, 0x100);
 	screen.set_visarea(0, 0x280-1, 0, 0xf0-1);
 	screen.set_screen_update("tms", FUNC(tms34010_device::tms340x0_ind16));

@@ -420,7 +420,7 @@ void toratora_state::toratora(machine_config &config)
 	screen.set_size(256, 256);
 	screen.set_visarea(0,256-1,8,248-1);
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_screen_update(FUNC(toratora_state::screen_update_toratora));
 
 	/* audio hardware */

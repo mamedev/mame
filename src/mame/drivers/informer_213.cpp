@@ -426,7 +426,7 @@ void informer_213_state::informer_213(machine_config &config)
 	m_screen->set_size(480, 234);
 	m_screen->set_visarea_full();
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	m_screen->set_vblank_time(subseconds::from_usec(2500)); // not accurate
 //  m_screen->set_raw(18.432_MHz_XTAL, 0, 0, 0, 0, 0, 0);
 	m_screen->set_screen_update(FUNC(informer_213_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(informer_213_state::vblank_w));

@@ -531,7 +531,7 @@ void fromanc2_state::fromanc2(machine_config &config)
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);
-	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_vblank_time(subseconds::from_usec(0));
 	lscreen.set_size(512, 512);
 	lscreen.set_visarea(0, 352-1, 0, 240-1);
 	lscreen.set_screen_update(FUNC(fromanc2_state::screen_update_left));
@@ -539,7 +539,7 @@ void fromanc2_state::fromanc2(machine_config &config)
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_refresh_hz(60);
-	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_vblank_time(subseconds::from_usec(0));
 	rscreen.set_size(512, 512);
 	rscreen.set_visarea(0, 352-1, 0, 240-1);
 	rscreen.set_screen_update(FUNC(fromanc2_state::screen_update_right));
@@ -589,7 +589,7 @@ void fromanc2_state::fromancr(machine_config &config)
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);
-	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_vblank_time(subseconds::from_usec(0));
 	lscreen.set_size(512, 512);
 	lscreen.set_visarea(0, 352-1, 0, 240-1);
 	lscreen.set_screen_update(FUNC(fromanc2_state::screen_update_left));
@@ -597,7 +597,7 @@ void fromanc2_state::fromancr(machine_config &config)
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_refresh_hz(60);
-	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_vblank_time(subseconds::from_usec(0));
 	rscreen.set_size(512, 512);
 	rscreen.set_visarea(0, 352-1, 0, 240-1);
 	rscreen.set_screen_update(FUNC(fromanc2_state::screen_update_right));
@@ -648,7 +648,7 @@ void fromanc2_state::fromanc4(machine_config &config)
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);
-	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_vblank_time(subseconds::from_usec(0));
 	lscreen.set_size(512, 512);
 	lscreen.set_visarea(0, 352-1, 0, 240-1);
 	lscreen.set_screen_update(FUNC(fromanc2_state::screen_update_left));
@@ -656,7 +656,7 @@ void fromanc2_state::fromanc4(machine_config &config)
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_refresh_hz(60);
-	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_vblank_time(subseconds::from_usec(0));
 	rscreen.set_size(512, 512);
 	rscreen.set_visarea(0, 352-1, 0, 240-1);
 	rscreen.set_screen_update(FUNC(fromanc2_state::screen_update_right));

@@ -140,7 +140,7 @@ void acorn_vidc10_device::device_config_complete()
 	if (!has_screen())
 		return;
 
-	if (!screen().refresh_attoseconds())
+	if (screen().refresh_subseconds().is_zero())
 		screen().set_raw(clock() * 2 / 3, 1024,0,735, 624/2,0,292); // RiscOS 3 default screen settings
 
 	if (!screen().has_screen_update())
@@ -280,7 +280,7 @@ inline void acorn_vidc10_device::screen_dynamic_res_change()
 		m_vidc_vblank_time);
 #endif
 
-	attoseconds_t const refresh = HZ_TO_ATTOSECONDS(pixel_clock) * m_crtc_regs[CRTC_HCR] * m_crtc_regs[CRTC_VCR];
+	subseconds const refresh = subseconds::from_hz(pixel_clock) * m_crtc_regs[CRTC_HCR] * m_crtc_regs[CRTC_VCR];
 
 	screen().configure(m_crtc_regs[CRTC_HCR], m_crtc_regs[CRTC_VCR] * (m_crtc_interlace+1), visarea, refresh);
 }
@@ -589,7 +589,7 @@ void arm_vidc20_device::device_config_complete()
 	if (!has_screen())
 		return;
 
-	if (!screen().refresh_attoseconds())
+	if (screen().refresh_subseconds().is_zero())
 		screen().set_raw(clock() * 2 / 3, 1024,0,735, 624/2,0,292); // RiscOS 3 default screen settings
 
 	if (!screen().has_screen_update())

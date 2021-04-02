@@ -2510,7 +2510,7 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 	screen.set_color(rgb_t::green());
 	screen.set_screen_update(MC68B45_TAG, FUNC(mc6845_device::screen_update));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_size(768, 312);
 	screen.set_visarea(0, 768-1, 0, 312-1);
 

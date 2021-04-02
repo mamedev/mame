@@ -468,7 +468,7 @@ void microvision_state::microvision(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(0);
+	screen.set_vblank_time(subseconds::zero());
 	screen.set_screen_update(FUNC(microvision_state::screen_update));
 	screen.set_size(16, 16);
 	screen.set_visarea_full();

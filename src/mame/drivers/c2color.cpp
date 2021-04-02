@@ -129,7 +129,7 @@ void c2_color_state::c2_color(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(c2_color_state::screen_update));

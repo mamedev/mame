@@ -201,7 +201,7 @@ void alphatan_state::alphatan(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	//m_screen->set_raw(6_MHz_XTAL, 768, 0, 480, 625, 0, 480);
 	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_vblank_time(subseconds::from_usec(2500));
 	m_screen->set_size(768, 480);
 	m_screen->set_visarea(0, 480-1, 0, 480-1);
 	m_screen->set_screen_update(FUNC(alphatan_state::screen_update));

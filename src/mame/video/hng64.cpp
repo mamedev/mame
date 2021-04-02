@@ -1119,7 +1119,7 @@ void hng64_state::tcram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		m_screen_dis = 0;
 
 		visarea.set(min_x, min_x + max_x - 1, min_y, min_y + max_y - 1);
-		m_screen->configure(HTOTAL, VTOTAL, visarea, m_screen->frame_period().attoseconds() );
+		m_screen->configure(HTOTAL, VTOTAL, visarea, m_screen->frame_period().as_subseconds() );
 	}
 }
 

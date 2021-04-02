@@ -169,7 +169,7 @@ VIDEO_RESET_MEMBER(mac_state,macrbv)
 	}
 
 //    logerror("RBV reset: monitor is %dx%d @ %f Hz\n", visarea.width(), visarea.height(), framerate);
-	m_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(framerate));
+	m_screen->configure(htotal, vtotal, visarea, subseconds::from_hz(framerate));
 	render_target *target = machine().render().first_target();
 	target->set_view(view);
 }
@@ -220,7 +220,7 @@ VIDEO_RESET_MEMBER(mac_state,macsonora)
 	}
 
 //    logerror("Sonora reset: monitor is %dx%d @ %f Hz\n", visarea.width(), visarea.height(), framerate);
-	m_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(framerate));
+	m_screen->configure(htotal, vtotal, visarea, subseconds::from_hz(framerate));
 	render_target *target = machine().render().first_target();
 	target->set_view(view);
 }

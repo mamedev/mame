@@ -378,7 +378,7 @@ void aristmk6_state::aristmk6(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));  /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500));  /* not accurate */
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);
 	screen.set_screen_update(FUNC(aristmk6_state::screen_update_aristmk6));

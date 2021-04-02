@@ -460,7 +460,7 @@ void midvunit_state::midvunit_video_control_w(offs_t offset, uint32_t data, uint
 		visarea.max_x = (m_video_regs[6] + m_video_regs[2] - m_video_regs[5]) % m_video_regs[6];
 		visarea.min_y = 0;
 		visarea.max_y = (m_video_regs[11] + m_video_regs[7] - m_video_regs[10]) % m_video_regs[11];
-		m_screen->configure(m_video_regs[6], m_video_regs[11], visarea, HZ_TO_ATTOSECONDS(MIDVUNIT_VIDEO_CLOCK / 2) * m_video_regs[6] * m_video_regs[11]);
+		m_screen->configure(m_video_regs[6], m_video_regs[11], visarea, subseconds::from_hz(MIDVUNIT_VIDEO_CLOCK / 2) * m_video_regs[6] * m_video_regs[11]);
 	}
 }
 

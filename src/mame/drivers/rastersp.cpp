@@ -903,7 +903,7 @@ void rastersp_state::rastersp(machine_config &config)
 	screen.set_visarea(0, 320-1, 0, 240-1);
 	screen.set_screen_update(FUNC(rastersp_state::screen_update));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(rastersp_state::vblank_irq));
 

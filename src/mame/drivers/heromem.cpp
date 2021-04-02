@@ -127,7 +127,7 @@ void heromem_state::heromem(machine_config &config)
 	// video hardware
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER)); // all wrong
 	lscreen.set_refresh_hz(60);
-	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	lscreen.set_vblank_time(subseconds::from_usec(2500));
 	lscreen.set_size(64*8, 32*8);
 	lscreen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
 	lscreen.set_screen_update("tc0091lvc_l", FUNC(tc0091lvc_device::screen_update));
@@ -135,7 +135,7 @@ void heromem_state::heromem(machine_config &config)
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER)); // all wrong
 	rscreen.set_refresh_hz(60);
-	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	rscreen.set_vblank_time(subseconds::from_usec(2500));
 	rscreen.set_size(64*8, 32*8);
 	rscreen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
 	rscreen.set_screen_update("tc0091lvc_r", FUNC(tc0091lvc_device::screen_update));

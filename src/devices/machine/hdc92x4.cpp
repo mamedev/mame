@@ -3912,7 +3912,7 @@ bool hdc92x4_device::read_one_bit(const attotime &limit)
 	// value < 100: big trouble for controller, will fail
 	if (UNRELIABLE_MEDIA)
 	{
-		if ((machine().time().attoseconds() % 1009)==0) bit = 0;
+		if ((machine().time().raw_subseconds().raw() % 1009)==0) bit = 0;
 	}
 
 	// Push into shift register

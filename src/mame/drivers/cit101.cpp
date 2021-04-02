@@ -244,7 +244,7 @@ u32 cit101_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 void cit101_state::screen_reconfigure(const XTAL &xtal, int visible_width, int total_width, int visible_height, int total_height)
 {
 	const rectangle visarea(0, visible_width - 1, 0, visible_height - 1);
-	const attoseconds_t frame_period = attotime::from_ticks(total_width * total_height, xtal).as_attoseconds();
+	const subseconds frame_period = attotime::from_ticks(total_width * total_height, xtal).as_subseconds();
 
 	m_screen->set_unscaled_clock(xtal);
 	m_screen->configure(total_width, total_height, visarea, frame_period);

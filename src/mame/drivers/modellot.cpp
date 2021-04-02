@@ -218,7 +218,7 @@ void modellot_state::modellot(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*8, 16*16);
 	screen.set_visarea(0, 64*8-1, 0, 16*16-1);
 	screen.set_screen_update(FUNC(modellot_state::screen_update_modellot));

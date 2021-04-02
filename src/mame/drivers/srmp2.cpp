@@ -1158,7 +1158,7 @@ void srmp2_state::srmp2(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(464, 256-16);
 	screen.set_visarea(16, 464-1, 8, 256-1-24);
 	screen.set_screen_update(FUNC(srmp2_state::screen_update_srmp2));
@@ -1201,7 +1201,7 @@ void srmp2_state::srmp3(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(400, 256-16);
 	screen.set_visarea(16, 400-1, 8, 256-1-24);
 	screen.set_screen_update(FUNC(srmp2_state::screen_update_srmp3));
@@ -1255,7 +1255,7 @@ void srmp2_state::mjyuugi(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(400, 256-16);
 	screen.set_visarea(16, 400-1, 0, 256-1-16);
 	screen.set_screen_update(FUNC(srmp2_state::screen_update_srmp3));

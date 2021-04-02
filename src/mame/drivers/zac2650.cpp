@@ -240,7 +240,7 @@ void zac2650_state::tinvader(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(55);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1041));
+	m_screen->set_vblank_time(subseconds::from_usec(1041));
 	m_screen->set_size(30*24, 32*24);
 	m_screen->set_visarea(0, 719, 0, 767);
 	m_screen->set_screen_update(FUNC(zac2650_state::screen_update_tinvader));

@@ -103,7 +103,7 @@ void huc6260_device::device_timer(timer_instance const &timer, device_timer_id i
 //                  visible_area.max_x = 64 + 1024 + 64 - 1;
 //                  visible_area.max_y = 18 + 242 - 1;
 //
-//                  video_screen_configure( m_screen, WPF, m_height, &visible_area, HZ_TO_ATTOSECONDS( device->clock / ( WPF * m_height ) ) );
+//                  video_screen_configure( m_screen, WPF, m_height, &visible_area, subseconds::from_hz( device->clock / ( WPF * m_height ) ) );
 //              }
 //          }
 			break;

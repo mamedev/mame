@@ -244,7 +244,7 @@ void volfied_state::volfied(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(320, 256);
 	m_screen->set_visarea(0, 319, 8, 247);
 	m_screen->set_screen_update(FUNC(volfied_state::screen_update));

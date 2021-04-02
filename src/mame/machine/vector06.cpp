@@ -47,7 +47,7 @@ void vector06_state::ppi1_portb_w(uint8_t data)
 		m_video_mode = BIT(data, 4);
 		u16 width = m_video_mode ? 512 : 256;
 		rectangle visarea(0, width+64-1, 0, 256+64-1);
-		m_screen->configure(width+64, 256+64, visarea, m_screen->frame_period().attoseconds());
+		m_screen->configure(width+64, 256+64, visarea, m_screen->frame_period().as_subseconds());
 	}
 }
 

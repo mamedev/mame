@@ -1552,8 +1552,8 @@ void lua_engine::initialize()
 	screen_dev_type["screen_type"] = sol::property(&screen_device::screen_type);
 	screen_dev_type["width"] = sol::property([] (screen_device &sdev) { return sdev.visible_area().width(); });
 	screen_dev_type["height"] = sol::property([] (screen_device &sdev) { return sdev.visible_area().height(); });
-	screen_dev_type["refresh"] = sol::property([] (screen_device &sdev) { return ATTOSECONDS_TO_HZ(sdev.refresh_attoseconds()); });
-	screen_dev_type["refresh_attoseconds"] = sol::property([] (screen_device &sdev) { return sdev.refresh_attoseconds(); });
+	screen_dev_type["refresh"] = sol::property([] (screen_device &sdev) { return sdev.refresh_subseconds().as_hz(); });
+	screen_dev_type["refresh_subseconds"] = sol::property([] (screen_device &sdev) { return sdev.refresh_subseconds(); });
 	screen_dev_type["xofffset"] = sol::property(&screen_device::xoffset);
 	screen_dev_type["yofffset"] = sol::property(&screen_device::yoffset);
 	screen_dev_type["xscale"] = sol::property(&screen_device::xscale);

@@ -407,7 +407,7 @@ void rungun_state::rng(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_refresh_hz(59.185606);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(88, 88+416-1, 24, 24+224-1);
 	m_screen->set_screen_update(FUNC(rungun_state::screen_update_rng));
@@ -467,7 +467,7 @@ void rungun_state::rng_dual(machine_config &config)
 	screen_device &demultiplex2(SCREEN(config, "demultiplex2", SCREEN_TYPE_RASTER));
 	demultiplex2.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	demultiplex2.set_refresh_hz(59.185606);
-	demultiplex2.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	demultiplex2.set_vblank_time(subseconds::from_usec(0));
 	demultiplex2.set_size(64*8, 32*8);
 	demultiplex2.set_visarea(88, 88+416-1, 24, 24+224-1);
 	demultiplex2.set_screen_update(FUNC(rungun_state::screen_update_rng_dual_right));

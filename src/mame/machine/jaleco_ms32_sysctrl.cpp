@@ -243,7 +243,7 @@ inline void jaleco_ms32_sysctrl_device::crtc_refresh_screen_params()
 	rectangle visarea;
 	const u16 htotal = m_crtc.horz_blank + m_crtc.horz_display;
 	const u16 vtotal = crtc_vtotal();
-	const attoseconds_t refresh = HZ_TO_ATTOSECONDS(get_dotclock_frequency()) * htotal * vtotal;
+	const subseconds refresh = subseconds::from_hz(get_dotclock_frequency()) * htotal * vtotal;
 	visarea.set(0, m_crtc.horz_display - 1, 0, m_crtc.vert_display - 1);
 	logerror("%s: CRTC setup total: %d x %d display: %d x %d\n", this->tag(), htotal, vtotal, m_crtc.horz_display, m_crtc.vert_display);
 	m_screen->configure(htotal, vtotal, visarea, refresh);

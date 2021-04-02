@@ -438,7 +438,7 @@ void vendetta_state::vendetta(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(59.17); /* measured on PCB */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(vendetta_state::screen_update));

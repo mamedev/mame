@@ -163,7 +163,7 @@ void ttl74123_device::start_pulse()
 	if(timer_running())
 	{
 		/* retriggering, but not if we are called to quickly */
-		attotime delay_time = attotime(0, ATTOSECONDS_PER_SECOND * m_cap * 220);
+		attotime delay_time = attotime::from_double(m_cap * 220);
 
 		if(m_timer->elapsed() >= delay_time)
 		{

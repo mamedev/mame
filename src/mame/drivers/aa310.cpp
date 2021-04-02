@@ -271,7 +271,7 @@ void aa310_state::peripheral5_w(offs_t offset, uint32_t data)
 		const int post_debug = 0;
 		if (post_debug && BIT(data, 17))
 		{
-			static attotime last_time(0, 0);
+			static attotime last_time(attotime::zero);
 			static int bitpos = 0;
 
 			if (BIT(data, 16) && bitpos <= 32)

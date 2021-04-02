@@ -431,7 +431,7 @@ void mainevt_state::mainevt(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 //  screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_vblank_time(subseconds::from_usec(0));
 //  screen.set_size(64*8, 32*8);
 //  screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
 	screen.set_raw(XTAL(24'000'000)/3, 528, 14*8, (64-14)*8, 256, 16, 240); // same hardware as Devastators so assume 59.17
@@ -479,7 +479,7 @@ void mainevt_state::devstors(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 //  screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_vblank_time(subseconds::from_usec(0));
 //  screen.set_size(64*8, 32*8);
 //  screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
 	screen.set_raw(XTAL(24'000'000)/3, 528, 13*8, (64-13)*8, 256, 16, 240); // measured 59.17

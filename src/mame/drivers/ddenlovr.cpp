@@ -4433,7 +4433,7 @@ void htengoku_state::htengoku(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 336-1, 0+8, 256-1-8);
 	m_screen->set_screen_update(FUNC(htengoku_state::screen_update_htengoku));
@@ -9792,7 +9792,7 @@ void ddenlovr_state::ddenlovr(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(336, 256);
 	m_screen->set_visarea(0, 336-1, 5, 256-16+5-1);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
@@ -9915,7 +9915,7 @@ void ddenlovr_state::quizchq(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(336, 256+22);
 	m_screen->set_visarea(0, 336-1, 5, 256-16+5-1);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
@@ -10005,7 +10005,7 @@ void mmpanic_state::mmpanic(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(336, 256+22);
 	m_screen->set_visarea(0, 336-1, 5, 256-16+5-1);
 	m_screen->set_screen_update(FUNC(mmpanic_state::screen_update_ddenlovr));
@@ -10068,7 +10068,7 @@ void hanakanz_state::hanakanz(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(336, 256+22);
 	m_screen->set_visarea(0, 336-1, 5, 256-11-1);
 	m_screen->set_screen_update(FUNC(hanakanz_state::screen_update_ddenlovr));
@@ -10119,7 +10119,7 @@ void hanakanz_state::kotbinyo(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.1656);   // HSync 15.1015kHz
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(336, 256+22);
 	m_screen->set_visarea(0, 336-1-1, 1+4, 256-15-1+4);
 	m_screen->set_screen_update(FUNC(hanakanz_state::screen_update_ddenlovr));
@@ -10236,7 +10236,7 @@ void ddenlovr_state::mjschuka(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(336, 256+22);
 	m_screen->set_visarea(0, 336-1, 5, 256-11-1);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
@@ -10528,7 +10528,7 @@ void hanakanz_state::jongtei(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(336, 256);
 	m_screen->set_visarea(0, 336-1, 5, 256-11-1);
 	m_screen->set_screen_update(FUNC(hanakanz_state::screen_update_ddenlovr));
@@ -10580,7 +10580,7 @@ void ddenlovr_state::sryudens(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.8532);   // VSync 60.8532Hz, HSync 15.2790kHz
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(336, 256+22);
 	m_screen->set_visarea(0, 336-1, 0+5, 256-12-1);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
@@ -10626,7 +10626,7 @@ void ddenlovr_state::janshinp(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.8532);   // VSync 60.8532Hz, HSync 15.2790kHz ?
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(336, 256+22);
 	m_screen->set_visarea(0, 336-1, 0+5, 256-12-1);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
@@ -10694,7 +10694,7 @@ void ddenlovr_state::seljan2(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.8532);   // VSync 60.8532Hz, HSync 15.2790kHz ?
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(336, 256+22);
 	m_screen->set_visarea(0, 336-1, 0+5, 256-12-1);
 	m_screen->set_screen_update(FUNC(ddenlovr_state::screen_update_ddenlovr));
@@ -10748,7 +10748,7 @@ void hanakanz_state::daimyojn(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(59.7922);   // HSync 15.4248kHz
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(336, 256+22);
 	m_screen->set_visarea(0, 336-1-1, 1, 256-15-1);
 	m_screen->set_screen_update(FUNC(hanakanz_state::screen_update_ddenlovr));

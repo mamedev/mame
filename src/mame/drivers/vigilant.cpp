@@ -497,7 +497,7 @@ void vigilant_state::vigilant(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(55);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea((16*8)-1, (64-16)*8-4, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(vigilant_state::screen_update_vigilant));
@@ -547,7 +547,7 @@ void vigilant_state::buccanrs(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(55);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(16*8, (64-16)*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(vigilant_state::screen_update_vigilant));
@@ -613,7 +613,7 @@ void vigilant_state::kikcubic(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(55);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(8*8, (64-8)*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(vigilant_state::screen_update_kikcubic));

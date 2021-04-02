@@ -461,7 +461,7 @@ void tecmosys_state::tecmosys(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_refresh_hz(57.4458);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(3000));
+	m_screen->set_vblank_time(subseconds::from_usec(3000));
 	m_screen->set_size(64*8, 64*8);
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(tecmosys_state::screen_update));

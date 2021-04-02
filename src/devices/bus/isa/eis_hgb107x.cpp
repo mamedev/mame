@@ -294,7 +294,7 @@ void isa8_epc_mda_device::io_write(offs_t offset, uint8_t data)
 			m_update_row_type = ((data & 0x20) == 0 ? MDA_LOWRES_TEXT_INTEN : MDA_LOWRES_TEXT_BLINK);
 			{
 				rectangle rect(0, get_xres() - 1, 0, get_yres() -1);
-				m_screen->configure(get_xres(), get_yres(), rect, HZ_TO_ATTOSECONDS(50));
+				m_screen->configure(get_xres(), get_yres(), rect, subseconds::from_hz(50));
 			}
 			LOGMODE("Video Mode:%02x\n\n", m_vmode);
 			break;
@@ -309,7 +309,7 @@ void isa8_epc_mda_device::io_write(offs_t offset, uint8_t data)
 			m_vmode |= ((m_mode_control2 & 0x80) ? VM_VER400 : 0);
 			{
 				rectangle rect(0, get_xres() - 1, 0, get_yres() -1);
-				m_screen->configure(get_xres(), get_yres(), rect, HZ_TO_ATTOSECONDS(50));
+				m_screen->configure(get_xres(), get_yres(), rect, subseconds::from_hz(50));
 			}
 			LOGMODE("Video Mode:%02x\n\n", m_vmode);
 			break;

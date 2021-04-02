@@ -51,7 +51,6 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 	, m_cycles_running(0)
 	, m_cycles_stolen(0)
 	, m_cycles_per_second(0)
-	, m_attoseconds_per_cycle(0)
 	, m_totalcycles(0)
 	, m_profiler(PROFILER_IDLE)
 	, m_suspend(0)
@@ -368,7 +367,7 @@ void device_execute_interface::interface_validity_check(validity_checker &valid)
 void device_execute_interface::interface_pre_start()
 {
 	m_scheduler = &device().machine().scheduler();
-	m_localtime.set_base_seconds(m_scheduler->m_basetime.seconds());
+	m_localtime.set_base(m_scheduler->m_basetime.absolute());
 
 	// create execution delegates
 	m_run_fast_delegate = execute_delegate(&device_execute_interface::execute_run, this);
@@ -415,7 +414,9 @@ void device_execute_interface::interface_post_start()
 	device().save_item(NAME(m_nexteatcycles));
 	device().save_item(NAME(m_trigger));
 	device().save_item(NAME(m_totalcycles));
-//	device().save_item(NAME(m_localtime));
+	device().save_item(NAME(m_localtime.m_relative));
+	device().save_item(NAME(m_localtime.m_absolute));
+	device().save_item(NAME(m_localtime.m_base));
 
 	// it's more efficient and causes less clutter to save these this way
 	device().save_item(STRUCT_MEMBER(m_input, m_stored_vector));
@@ -487,7 +488,7 @@ void device_execute_interface::interface_clock_changed()
 	if (device().clock() == 0)
 	{
 		suspend(SUSPEND_REASON_CLOCK, true);
-		m_attoseconds_per_cycle = ATTOSECONDS_PER_SECOND;
+		m_subseconds_per_cycle = subseconds::max();
 		m_cycles_per_second = 0;
 		return;
 	}
@@ -498,7 +499,7 @@ void device_execute_interface::interface_clock_changed()
 
 	// recompute cps and spc
 	m_cycles_per_second = clocks_to_cycles(device().clock());
-	m_attoseconds_per_cycle = HZ_TO_ATTOSECONDS(m_cycles_per_second);
+	m_subseconds_per_cycle = subseconds::from_hz(m_cycles_per_second);
 
 	// re-compute the perfect interleave factor
 	m_scheduler->compute_perfect_interleave();
@@ -540,16 +541,16 @@ int device_execute_interface::standard_irq_callback(int irqline)
 //  required for this device
 //-------------------------------------------------
 
-attoseconds_t device_execute_interface::minimum_quantum() const
+subseconds device_execute_interface::minimum_quantum() const
 {
 	// if we don't have a clock, return a huge factor
 	if (device().clock() == 0)
-		return ATTOSECONDS_PER_SECOND - 1;
+		return subseconds::max();
 
 	// if we don't have the quantum time, compute it
-	attoseconds_t basetick = m_attoseconds_per_cycle;
-	if (basetick == 0)
-		basetick = HZ_TO_ATTOSECONDS(clocks_to_cycles(device().clock()));
+	subseconds basetick = m_subseconds_per_cycle;
+	if (basetick.is_zero())
+		basetick = subseconds::from_hz(clocks_to_cycles(device().clock()));
 
 	// apply the minimum cycle count
 	return basetick * min_cycles();

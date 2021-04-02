@@ -387,7 +387,7 @@ void sed1330_device::data_w(uint8_t data)
 			if (clock() != 0)
 			{
 				attotime fr = clocks_to_attotime(m_tcr * m_lf * 9);
-				screen().configure(m_tcr * m_fx, m_lf, screen().visible_area(), fr.as_attoseconds());
+				screen().configure(m_tcr * m_fx, m_lf, screen().visible_area(), fr.as_subseconds());
 				LOG("SED1330 Frame Rate: %.1f Hz\n", fr.as_hz());
 			}
 			break;

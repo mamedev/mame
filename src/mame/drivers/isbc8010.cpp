@@ -204,7 +204,7 @@ void isbc8010_state::isbc8010(machine_config &config)
 	   are visible, and each character time is 7 dot times; a dot time
 	   is 2 cycles of the fundamental 14.31818 MHz oscillator.  The
 	   total blanking time is about 4450 microseconds. */
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC((int) (70 * 65 * 7 * 2 / 14.31818)));
+//  screen.set_vblank_time(subseconds::from_usec((int) (70 * 65 * 7 * 2 / 14.31818)));
 	/* It would be nice if we could implement some sort of display
 	   overscan here. */
 //  screen.set_size(40 * 7, 24 * 8);

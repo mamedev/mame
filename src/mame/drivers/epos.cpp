@@ -519,7 +519,7 @@ void epos_state::epos(machine_config &config) /* EPOS TRISTAR 8000 PCB */
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	screen.set_size(272, 241);
 	screen.set_visarea(0, 271, 0, 235);
 	screen.set_screen_update(FUNC(epos_state::screen_update));
@@ -556,7 +556,7 @@ void epos_state::dealer(machine_config &config) /* EPOS TRISTAR 9000 PCB */
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	screen.set_size(272, 241);
 	screen.set_visarea(0, 271, 0, 235);
 	screen.set_screen_update(FUNC(epos_state::screen_update));

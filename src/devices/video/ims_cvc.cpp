@@ -365,7 +365,7 @@ void g332_device::control_a_w(u32 data)
 			u32 const dotclock = (m_boot & PLL_SELECT) ? clock() * (m_boot & PLL_MULTIPLIER) : clock();
 			attotime const refresh = attotime::from_hz(dotclock / (width * height));
 
-			m_screen->configure(width, height, visarea, refresh.as_attoseconds());
+			m_screen->configure(width, height, visarea, refresh.as_subseconds());
 			m_screen->reset_origin();
 		}
 	}

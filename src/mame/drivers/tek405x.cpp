@@ -965,7 +965,7 @@ void tek4051_state::tek4051(machine_config &config)
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_VECTOR));
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_vblank_time(subseconds::from_usec(2500)); // not accurate
 	screen.set_size(1024, 780);
 	screen.set_visarea(0, 1024-1, 0, 780-1);
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
@@ -1066,7 +1066,7 @@ void tek4052_state::tek4052(machine_config &config)
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_VECTOR));
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_vblank_time(subseconds::from_usec(2500)); // not accurate
 	screen.set_size(1024, 780);
 	screen.set_visarea(0, 1024-1, 0, 780-1);
 	screen.set_screen_update("vector", FUNC(vector_device::screen_update));

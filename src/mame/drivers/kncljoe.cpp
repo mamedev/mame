@@ -268,7 +268,7 @@ void kncljoe_state::kncljoe(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1500));
+	m_screen->set_vblank_time(subseconds::from_usec(1500));
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(1*8, 31*8-1, 0*8, 32*8-1);
 	m_screen->set_screen_update(FUNC(kncljoe_state::screen_update_kncljoe));

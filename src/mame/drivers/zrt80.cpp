@@ -280,7 +280,7 @@ void zrt80_state::zrt80(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(640, 200);
 	screen.set_visarea(0, 640-1, 0, 200-1);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));

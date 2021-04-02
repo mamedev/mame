@@ -580,51 +580,9 @@ transient_timer_factory::transient_timer_factory()
 device_scheduler::basetime_relative::basetime_relative() :
 	m_relative(0),
 	m_absolute(attotime::zero),
-	m_absolute_dirty(false),
-	m_base_seconds(0)
+	m_base(attotime::zero),
+	m_absolute_dirty(false)
 {
-}
-
-
-//-------------------------------------------------
-//  set - set an absolute time, updating the
-//  base-relative time as well
-//-------------------------------------------------
-
-void device_scheduler::basetime_relative::set(attotime const &src)
-{
-	m_absolute = src;
-	m_absolute_dirty = false;
-	update_relative();
-}
-
-
-//-------------------------------------------------
-//  add - add attoseconds to the base-relative
-//  time, marking the absolute time dirty for
-//  later conversion if needed
-//-------------------------------------------------
-
-void device_scheduler::basetime_relative::add(attoseconds_t src)
-{
-	m_relative += src;
-	m_absolute_dirty = true;
-}
-
-
-//-------------------------------------------------
-//  set_base_seconds - set the base seconds value
-//-------------------------------------------------
-
-void device_scheduler::basetime_relative::set_base_seconds(seconds_t base)
-{
-	// update the absolute time if dirty first
-	if (m_absolute_dirty)
-		update_absolute();
-
-	// then set and recompute the relative from the absolute time
-	m_base_seconds = base;
-	update_relative();
 }
 
 
@@ -635,26 +593,29 @@ void device_scheduler::basetime_relative::set_base_seconds(seconds_t base)
 
 void device_scheduler::basetime_relative::update_relative()
 {
-	seconds_t delta = m_absolute.seconds() - m_base_seconds;
+	s32 delta = m_absolute.seconds() - m_base.seconds();
 
 	// if the seconds match, then the relative time is fine as-is
-	m_relative = m_absolute.attoseconds();
+	m_relative = m_absolute.raw_subseconds().raw() - m_base.raw_subseconds().raw();
 	if (delta == 0)
+	{
+		m_relative = std::clamp<s64>(m_relative, MIN_RELATIVE, MAX_RELATIVE);
 		return;
+	}
 
 	// if the absolute time is ahead/behind, we need to add/subtract
-	// ATTOSECONDS_PER_SECOND; but only do it once
+	// subseconds::PER_SECOND; but only do it once
 	if (delta > 0)
 	{
 		if (delta == 1)
-			m_relative += ATTOSECONDS_PER_SECOND;
+			m_relative = std::min<s64>(m_relative + subseconds::PER_SECOND, MAX_RELATIVE);
 		else
 			m_relative = MAX_RELATIVE;
 	}
 	else
 	{
 		if (delta == -1)
-			m_relative -= ATTOSECONDS_PER_SECOND;
+			m_relative = std::max<s64>(m_relative - subseconds::PER_SECOND, MIN_RELATIVE);
 		else
 			m_relative = MIN_RELATIVE;
 	}
@@ -668,25 +629,30 @@ void device_scheduler::basetime_relative::update_relative()
 
 void device_scheduler::basetime_relative::update_absolute()
 {
-	seconds_t secs = m_base_seconds;
-	attoseconds_t attos = m_relative;
-
-	// if relative is outside of range, adjust the seconds
-	if (attos >= ATTOSECONDS_PER_SECOND)
-	{
-		attos -= ATTOSECONDS_PER_SECOND;
-		secs++;
-	}
-	else if (attos < 0)
-	{
-		attos += ATTOSECONDS_PER_SECOND;
-		secs--;
-	}
-
-	// set the new value and clear any dirtiness
-	m_absolute.set_seconds(secs);
-	m_absolute.set_attoseconds(attos);
+	if (m_relative >= 0)
+		m_absolute = m_base + subseconds::from_raw(m_relative);
+	else
+		m_absolute = m_base - subseconds::from_raw(-m_relative);
 	m_absolute_dirty = false;
+}
+
+
+//-------------------------------------------------
+//  update_window - update the base to ensure times
+//  within the given window will fit; return true
+//  if updated from the relative time
+//-------------------------------------------------
+
+bool device_scheduler::basetime_relative::update_window(subseconds window)
+{
+	// get the difference to the window
+	if (MAX_RELATIVE - m_relative < window.raw())
+	{
+		m_base = absolute();
+		m_relative = 0;
+		return true;
+	}
+	return false;
 }
 
 
@@ -703,18 +669,19 @@ device_scheduler::device_scheduler(running_machine &machine) :
 	m_machine(machine),
 	m_executing_device(nullptr),
 	m_execute_list(nullptr),
-	m_basetime(attotime::zero),
 	m_active_timers_head(&m_active_timers_tail),
 	m_free_timers(nullptr),
 	m_registered_callbacks(nullptr),
 	m_callback_timer(nullptr),
 	m_callback_timer_expire_time(attotime::zero),
 	m_suspend_changes_pending(true),
-	m_quantum_minimum(ATTOSECONDS_IN_NSEC(1) / 1000)
+	m_quantum_minimum(subseconds::from_nsec(1) / 1000)
 {
 	// register global states
 	auto &save = machine.save();
-	save.save_item(NAME(m_basetime));
+	save.save_item(NAME(m_basetime.m_relative));
+	save.save_item(NAME(m_basetime.m_absolute));
+	save.save_item(NAME(m_basetime.m_base));
 
 	// we could use STRUCT_MEMBER here if it worked on attotimes, but it doesn't
 	// currently, so do it the manual way
@@ -748,7 +715,7 @@ device_scheduler::device_scheduler(running_machine &machine) :
 device_scheduler::~device_scheduler()
 {
 #if (COLLECT_SCHEDULER_STATS)
-	double seconds = m_basetime.as_double();
+	double seconds = m_basetime.absolute().as_double();
 	printf("%12.2f timeslice\n", m_timeslice / seconds);
 	printf("%12.2f    avg reps until minslice\n", (1.0 * m_timeslice_inner1) / m_timeslice);
 	printf("%12.2f    avg reps through execution loop until timer\n", (1.0 * m_timeslice_inner2) / m_timeslice_inner1);
@@ -800,7 +767,7 @@ attotime device_scheduler::time() const noexcept
 
 	// if we're executing as a particular CPU, use its local time as a base
 	// otherwise, return the global base time
-	return (m_executing_device != nullptr) ? m_executing_device->local_time() : m_basetime;
+	return (m_executing_device != nullptr) ? m_executing_device->local_time() : m_basetime.absolute_no_update();
 }
 
 
@@ -830,13 +797,17 @@ bool device_scheduler::can_save() const
 //  timeslice
 //-------------------------------------------------
 
-void device_scheduler::timeslice(attoseconds_t minslice)
+void device_scheduler::timeslice(subseconds minslice)
 {
 	INCREMENT_SCHEDULER_STAT(m_timeslice);
 
-	// run at least the given number of attoseconds
-	attoseconds_t basetime = m_basetime.attoseconds();
-	attoseconds_t endslice = basetime + minslice;
+	// ensure we have 1/4 second of runway in our relative times
+	if (m_basetime.update_window(subseconds::from_msec(250)))
+		update_basetime();
+
+	// run at least the given number of subseconds
+	s64 basetime = m_basetime.relative();
+	s64 endslice = basetime + minslice.raw();
 	while (basetime < endslice)
 	{
 		INCREMENT_SCHEDULER_STAT(m_timeslice_inner1);
@@ -844,7 +815,7 @@ void device_scheduler::timeslice(attoseconds_t minslice)
 		LOG("------------------\n");
 
 		// if the current quantum has expired, find a new one
-		while (m_basetime >= m_quantum_list.first()->m_expire)
+		while (m_basetime.absolute() >= m_quantum_list.first()->m_expire)
 			m_quantum_allocator.reclaim(m_quantum_list.detach_head());
 
 		// loop until we hit the next timer
@@ -853,7 +824,7 @@ void device_scheduler::timeslice(attoseconds_t minslice)
 			INCREMENT_SCHEDULER_STAT(m_timeslice_inner2);
 
 			// by default, assume our target is the end of the next quantum
-			attoseconds_t target = basetime + m_quantum_list.first()->m_actual;
+			s64 target = basetime + m_quantum_list.first()->m_actual.raw();
 			assert(target < basetime_relative::MAX_RELATIVE);
 
 			// however, if the next timer is going to fire before then, override
@@ -869,11 +840,11 @@ void device_scheduler::timeslice(attoseconds_t minslice)
 			// loop over all executing devices
 			for (device_execute_interface *exec = m_execute_list; exec != nullptr; exec = exec->m_nextexec)
 			{
-				// compute how many attoseconds to execute this device
-				attoseconds_t delta = target - exec->m_localtime.relative() - 1;
+				// compute how many subseconds to execute this device
+				s64 delta = target - exec->m_localtime.relative() - 1;
 				assert(delta < basetime_relative::MAX_RELATIVE);
 
-				// if we're already ahead, do nothing; in theory we should do this 0 as
+				// if we're already ahead, do notOhing; in theory we should do this 0 as
 				// well, but it's a rare case and the compiler tends to be able to
 				// optimize a strict < 0 check better than <= 0
 				if (delta < 0)
@@ -887,11 +858,11 @@ void device_scheduler::timeslice(attoseconds_t minslice)
 
 #if VERBOSE
 				u64 start_cycles = exec->m_total_cycles;
-				LOG("  %12.12s: t=%018lldas %018lldas = %dc; ", exec->device().tag(), exec->m_localtime.relative(), delta, u64(delta) / exec->m_attoseconds_per_cycle + 1);
+				LOG("  %12.12s: t=%018lldas %018lldas = %dc; ", exec->device().tag(), exec->m_localtime.relative(), delta, u64(delta) / exec->m_subseconds_per_cycle + 1);
 #endif
 
-				// execute for the given number of attoseconds
-				attoseconds_t localtime = exec->run_for(delta);
+				// execute for the given number of subseconds
+				s64 localtime = exec->run_for(subseconds::from_raw(delta));
 
 #if VERBOSE
 				LOG(" ran %dc, %dc total", s32(exec->m_totalcycles - start_cycles), s32(exec->m_totalcycles));
@@ -916,24 +887,12 @@ void device_scheduler::timeslice(attoseconds_t minslice)
 			basetime = target;
 		}
 
-		// if basetime remained within the current second, we just have to
-		// update the attoseconds part; however, it if did overflow, we need to
-		// update all the basetime_relative structures in the system
-		if (basetime < ATTOSECONDS_PER_SECOND)
-			m_basetime.set_attoseconds(basetime);
-		else
-		{
-			basetime -= ATTOSECONDS_PER_SECOND;
-			endslice -= ATTOSECONDS_PER_SECOND;
-			assert(basetime < ATTOSECONDS_PER_SECOND);
-			m_basetime.set_attoseconds(basetime);
-			m_basetime.set_seconds(m_basetime.seconds() + 1);
-			update_basetime();
-		}
+		// set the new basetime globally so that timers see it
+		m_basetime.set_relative(basetime);
 
 		// now that we've reached the expiration time of the first timer in the
 		// queue, execute pending ones
-		execute_timers();
+		execute_timers(m_basetime.absolute());
 	}
 }
 
@@ -1165,15 +1124,15 @@ void device_scheduler::postload()
 //  execute_timers - execute timers that are due
 //-------------------------------------------------
 
-inline void device_scheduler::execute_timers()
+inline void device_scheduler::execute_timers(attotime const &basetime)
 {
-	LOG("execute_timers: new=%s head->expire=%s\n", m_basetime.as_string(PRECISION), m_first_timer_expire.absolute().as_string(PRECISION));
+	LOG("execute_timers: new=%s head->expire=%s\n", basetime.as_string(PRECISION), m_first_timer_expire.absolute().as_string(PRECISION));
 
 	INCREMENT_SCHEDULER_STAT(m_execute_timers);
 
 	// now process any timers that are overdue; due to our never-expiring dummy
 	// instance, we don't need to check for nullptr on the head
-	while (m_active_timers_head->m_expire <= m_basetime)
+	while (m_active_timers_head->m_expire <= basetime)
 	{
 		INCREMENT_SCHEDULER_STAT(m_execute_timers_average);
 
@@ -1221,14 +1180,14 @@ void device_scheduler::update_basetime()
 {
 	INCREMENT_SCHEDULER_STAT(m_update_basetime);
 
-	seconds_t base_seconds = m_basetime.seconds();
+	const attotime &basetime = m_basetime.absolute();
 
 	// update execute devices
 	for (device_execute_interface &exec : execute_interface_enumerator(machine().root_device()))
-		exec.m_localtime.set_base_seconds(base_seconds);
+		exec.m_localtime.set_base(basetime);
 
 	// move timers from future list into current list
-	m_first_timer_expire.set_base_seconds(base_seconds);
+	m_first_timer_expire.set_base(basetime);
 }
 
 
@@ -1250,12 +1209,12 @@ void device_scheduler::compute_perfect_interleave()
 	if (first != nullptr)
 	{
 		// start with a huge time factor and find the 2nd smallest cycle time
-		attoseconds_t smallest = first->minimum_quantum();
-		attoseconds_t perfect = ATTOSECONDS_PER_SECOND - 1;
+		subseconds smallest = first->minimum_quantum();
+		subseconds perfect = subseconds::max();
 		for (device_execute_interface *exec = first->m_nextexec; exec != nullptr; exec = exec->m_nextexec)
 		{
 			// find the 2nd smallest cycle interval
-			attoseconds_t curquantum = exec->minimum_quantum();
+			subseconds curquantum = exec->minimum_quantum();
 			if (curquantum < smallest)
 			{
 				perfect = smallest;
@@ -1296,7 +1255,7 @@ void device_scheduler::rebuild_execute_list()
 		// if the configuration specifies a device to make perfect, pick that as the minimum
 		device_execute_interface *const exec(machine().config().perfect_quantum_device());
 		if (exec)
-			min_quantum = (std::min)(attotime(0, exec->minimum_quantum()), min_quantum);
+			min_quantum = (std::min)(attotime(exec->minimum_quantum()), min_quantum);
 
 		// inform the timer system of our decision
 		add_scheduling_quantum(min_quantum, attotime::never);
@@ -1372,7 +1331,7 @@ void device_scheduler::add_scheduling_quantum(attotime const &quantum, attotime 
 
 	attotime curtime = time();
 	attotime expire = curtime + duration;
-	const attoseconds_t quantum_attos = quantum.attoseconds();
+	const subseconds quantum_subs = quantum.raw_subseconds();
 
 	// figure out where to insert ourselves, expiring any quanta that are out-of-date
 	quantum_slot *insert_after = nullptr;
@@ -1385,20 +1344,20 @@ void device_scheduler::add_scheduling_quantum(attotime const &quantum, attotime 
 			m_quantum_allocator.reclaim(m_quantum_list.detach(*quant));
 
 		// if this quantum is shorter than us, we need to be inserted afterwards
-		else if (quant->m_requested <= quantum_attos)
+		else if (quant->m_requested <= quantum_subs)
 			insert_after = quant;
 	}
 
 	// if we found an exact match, just take the maximum expiry time
-	if (insert_after != nullptr && insert_after->m_requested == quantum_attos)
+	if (insert_after != nullptr && insert_after->m_requested == quantum_subs)
 		insert_after->m_expire = std::max(insert_after->m_expire, expire);
 
 	// otherwise, allocate a new quantum and insert it after the one we picked
 	else
 	{
 		quantum_slot &quant = *m_quantum_allocator.alloc();
-		quant.m_requested = quantum_attos;
-		quant.m_actual = std::max(quantum_attos, m_quantum_minimum);
+		quant.m_requested = quantum_subs;
+		quant.m_actual = std::max(quantum_subs, m_quantum_minimum);
 		quant.m_expire = expire;
 		m_quantum_list.insert_after(quant, insert_after);
 	}

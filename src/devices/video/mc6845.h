@@ -36,7 +36,7 @@
 
 
 /* callback definitions */
-#define MC6845_RECONFIGURE(name)  void name(int width, int height, const rectangle &visarea, attoseconds_t frame_period)
+#define MC6845_RECONFIGURE(name)  void name(int width, int height, const rectangle &visarea, subseconds frame_period)
 
 #define MC6845_BEGIN_UPDATE(name)  void name(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
@@ -52,7 +52,7 @@ class mc6845_device :   public device_t,
 						public device_video_interface
 {
 public:
-	typedef device_delegate<void (int width, int height, const rectangle &visarea, attoseconds_t frame_period)> reconfigure_delegate;
+	typedef device_delegate<void (int width, int height, const rectangle &visarea, subseconds frame_period)> reconfigure_delegate;
 	typedef device_delegate<void (bitmap_rgb32 &bitmap, const rectangle &cliprect)> begin_update_delegate;
 	typedef device_delegate<void (bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t ma, uint8_t ra,
 									uint16_t y, uint8_t x_count, int8_t cursor_x, int de, int hbp, int vbp)> update_row_delegate;

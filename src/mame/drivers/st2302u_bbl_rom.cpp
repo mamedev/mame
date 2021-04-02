@@ -311,7 +311,7 @@ void st22xx_bbl338_state::st22xx_dphh8213(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(160, 128);
 	m_screen->set_visarea(0, 160 - 1, 0, 128 - 1);
 	m_screen->set_screen_update(FUNC(st22xx_bbl338_state::screen_update));
@@ -330,7 +330,7 @@ void st22xx_bbl338_state::st22xx_bbl338(machine_config &config)
 	// incorrect for bbl338
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(160, 128);
 	m_screen->set_visarea(0, 160 - 1, 0, 128 - 1);
 	m_screen->set_screen_update(FUNC(st22xx_bbl338_state::screen_update));

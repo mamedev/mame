@@ -522,7 +522,7 @@ void beezer_state::beezer(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	m_screen->set_size(384, 256);
 	m_screen->set_visarea(16, 304-1, 0, 240-1); // 288 x 240, correct?
 	m_screen->set_screen_update(FUNC(beezer_state::screen_update));

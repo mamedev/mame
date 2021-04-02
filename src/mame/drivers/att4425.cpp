@@ -242,7 +242,7 @@ void att4425_state::att4425(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
 	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	m_screen->set_screen_update(FUNC(att4425_state::screen_update));
 	m_screen->set_palette("palette");
 	m_screen->set_size(720, 351);

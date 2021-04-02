@@ -227,7 +227,7 @@ void fixedfreq_device::device_config_complete()
 {
 	if (!has_screen())
 		return;
-	if (!screen().refresh_attoseconds())
+	if (screen().refresh_subseconds().is_zero())
 		screen().set_raw(m_monitor.m_monitor_clock, m_monitor.htotal(), 0,
 			m_monitor.htotal(), m_monitor.vtotal(), 0,
 			m_monitor.vtotal());
@@ -414,7 +414,7 @@ void fixedfreq_device::vsync_end_cb(double refresh_time)
 
 	rectangle visarea(m_monitor.minh(), m_monitor.maxh(), m_monitor.minv(), m_monitor.maxv());
 
-	screen().configure(m_monitor.htotal_scaled(), m_monitor.vtotal(), visarea, DOUBLE_TO_ATTOSECONDS(refresh_limited));
+	screen().configure(m_monitor.htotal_scaled(), m_monitor.vtotal(), visarea, subseconds::from_double(refresh_limited));
 	screen().reset_origin(m_state.m_last_y-(m_monitor.vsync_width() + m_monitor.vbackporch_width()), 0);
 }
 

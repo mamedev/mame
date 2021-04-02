@@ -252,14 +252,14 @@ void fromance_state::crtc_refresh()
 		return;
 
 	rectangle visarea;
-	attoseconds_t refresh;
+	subseconds refresh;
 
 	visarea.min_x = 0;
 	visarea.min_y = 0;
 	visarea.max_x = ((m_gga->reg(0)+1)*4) - 1;
 	visarea.max_y = 240 - 1;
 
-	refresh = HZ_TO_ATTOSECONDS(60);
+	refresh = subseconds::from_hz(60);
 
 	m_screen->configure(512, 256, visarea, refresh);
 }

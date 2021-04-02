@@ -624,13 +624,13 @@ void upd3301_device::recompute_parameters()
 	int horiz_pix_total = (m_h + m_z) * m_width;
 	int vert_pix_total = (m_l + m_v) * m_r;
 
-	attoseconds_t refresh = HZ_TO_ATTOSECONDS(clock()) * horiz_pix_total * vert_pix_total;
+	subseconds refresh = subseconds::from_hz(clock()) * horiz_pix_total * vert_pix_total;
 
 	rectangle visarea;
 
 	visarea.set(0, (m_h * m_width) - 1, 0, (m_l * m_r) - 1);
 
-	LOG("UPD3301 Screen: %u x %u @ %f Hz\n", horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+	LOG("UPD3301 Screen: %u x %u @ %f Hz\n", horiz_pix_total, vert_pix_total, refresh.as_hz());
 	LOG("UPD3301 Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
 
 	screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);

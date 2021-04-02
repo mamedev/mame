@@ -199,8 +199,8 @@ public:
 	const rectangle &visible_area() const { return m_visarea; }
 	const rectangle &cliprect() const { return m_bitmap[0].cliprect(); }
 	bool oldstyle_vblank_supplied() const { return m_oldstyle_vblank_supplied; }
-	attoseconds_t refresh_attoseconds() const { return m_refresh; }
-	attoseconds_t vblank_attoseconds() const { return m_vblank; }
+	subseconds refresh_subseconds() const { return m_refresh; }
+	subseconds vblank_subseconds() const { return m_vblank; }
 	bitmap_format format() const { return !m_screen_update_ind16.isnull() ? BITMAP_FORMAT_IND16 : BITMAP_FORMAT_RGB32; }
 	float xoffset() const { return m_xoffset; }
 	float yoffset() const { return m_yoffset; }
@@ -234,7 +234,7 @@ public:
 	{
 		assert(pixclock != 0);
 		m_clock = pixclock;
-		m_refresh = HZ_TO_ATTOSECONDS(pixclock) * htotal * vtotal;
+		m_refresh = subseconds::from_hz(pixclock) * htotal * vtotal;
 		m_vblank = m_refresh / vtotal * (vtotal - (vbstart - vbend));
 		m_width = htotal;
 		m_height = vtotal;
@@ -246,7 +246,7 @@ public:
 		xtal.validate(std::string("Configuring screen ") + tag());
 		return set_raw(xtal.value(), htotal, hbend, hbstart, vtotal, vbend, vbstart);
 	}
-	void set_refresh(attoseconds_t rate) { m_refresh = rate; }
+	void set_refresh(subseconds rate) { m_refresh = rate; }
 
 	/// \brief Set refresh rate in Hertz
 	///
@@ -258,7 +258,7 @@ public:
 	/// \return Reference to device for method chaining.
 	template <typename T> screen_device &set_refresh_hz(T &&hz)
 	{
-		set_refresh(HZ_TO_ATTOSECONDS(std::forward<T>(hz)));
+		set_refresh(subseconds::from_hz(std::forward<T>(hz)));
 		return *this;
 	}
 
@@ -270,7 +270,7 @@ public:
 	/// terms of pixel clock.
 	/// \param [in] time Length of vertical blanking interval.
 	/// \return Reference to device for method chaining.
-	screen_device &set_vblank_time(attoseconds_t time)
+	screen_device &set_vblank_time(subseconds time)
 	{
 		m_vblank = time;
 		m_oldstyle_vblank_supplied = true;
@@ -381,7 +381,7 @@ public:
 	screen_bitmap &curbitmap() { return m_bitmap[m_curtexture]; }
 
 	// dynamic configuration
-	void configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period);
+	void configure(int width, int height, const rectangle &visarea, subseconds frame_period);
 	void reset_origin(int beamy = 0, int beamx = 0);
 	void set_visible_area(int min_x, int max_x, int min_y, int max_y);
 	void set_brightness(u8 brightness) { m_brightness = brightness; }
@@ -397,9 +397,10 @@ public:
 	attotime time_until_vblank_start() const { return time_until_pos(m_visarea.bottom() + 1); }
 	attotime time_until_vblank_end() const;
 	attotime time_until_update() const { return (m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK) ? time_until_vblank_end() : time_until_vblank_start(); }
-	attotime scan_period() const { return attotime(0, m_scantime); }
-	attotime pixel_period() const { return attotime(0, m_pixeltime); }
-	attotime frame_period() const { return attotime(0, m_frame_period); }
+	attotime scan_period() const { return attotime(m_scantime); }
+	attotime pixel_period() const { return attotime(m_pixeltime); }
+	attotime frame_period() const { return attotime(m_frame_period); }
+	subseconds frame_period_subseconds() const { return m_frame_period; }
 	u64 frame_number() const { return m_frame_number; }
 
 	// pixel-level access
@@ -463,8 +464,8 @@ private:
 	int                 m_orientation;              // orientation flags combined with system flags
 	std::pair<unsigned, unsigned> m_phys_aspect;    // physical aspect ratio
 	bool                m_oldstyle_vblank_supplied; // set_vblank_time call used
-	attoseconds_t       m_refresh;                  // default refresh period
-	attoseconds_t       m_vblank;                   // duration of a VBLANK
+	subseconds          m_refresh;                  // default refresh period
+	subseconds          m_vblank;                   // duration of a VBLANK
 	float               m_xoffset, m_yoffset;       // default X/Y offsets
 	float               m_xscale, m_yscale;         // default X/Y scale factor
 	screen_update_ind16_delegate m_screen_update_ind16; // screen update callback (16-bit palette)
@@ -503,10 +504,10 @@ private:
 	u8                  m_brightness;               // global brightness
 
 	// screen timing
-	attoseconds_t       m_frame_period;             // attoseconds per frame
-	attoseconds_t       m_scantime;                 // attoseconds per scanline
-	attoseconds_t       m_pixeltime;                // attoseconds per pixel
-	attoseconds_t       m_vblank_period;            // attoseconds per VBLANK period
+	subseconds          m_frame_period;             // subseconds per frame
+	subseconds          m_scantime;                 // subseconds per scanline
+	subseconds          m_pixeltime;                // subseconds per pixel
+	subseconds          m_vblank_period;            // subseconds per VBLANK period
 	attotime            m_vblank_start_time;        // time of last VBLANK start
 	attotime            m_vblank_end_time;          // time of last VBLANK end
 	persistent_timer    m_vblank_begin_timer;       // timer to signal VBLANK start

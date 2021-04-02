@@ -60,7 +60,7 @@ void nes_state::nes(machine_config &config)
 	// the number of cycles in each scanline for the PPU scanline timer. Since the PPU has 20 vblank scanlines + 2
 	// non-rendering scanlines, we compensate. This ends up being 2500 cycles for the non-rendering portion, 2273
 	// cycles for the actual vblank period.
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK.dvalue()/1000000)) *
+	m_screen->set_vblank_time(subseconds::from_usec((113.66/(NTSC_APU_CLOCK.dvalue()/1000000)) *
 							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
 	m_screen->set_size(32*8, 262);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
@@ -103,7 +103,7 @@ void nes_state::nespal(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_refresh_hz(50.0070);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) *
+	m_screen->set_vblank_time(subseconds::from_usec((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) *
 							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
 	m_screen->set_size(32*8, 312);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
@@ -140,7 +140,7 @@ void nes_state::nespalc(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_refresh_hz(50.0070);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66/(PALC_APU_CLOCK.dvalue()/1000000)) *
+	m_screen->set_vblank_time(subseconds::from_usec((113.66/(PALC_APU_CLOCK.dvalue()/1000000)) *
 							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE_PALC+1+2)));
 }
 

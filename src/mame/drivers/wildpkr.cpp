@@ -480,7 +480,7 @@ void wildpkr_state::wildpkr(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_size(384, 280);
 	screen.set_visarea(0, 384-1, 0, 280-1);
 	screen.set_screen_update("acrtc", FUNC(hd63484_device::update_screen));
@@ -519,7 +519,7 @@ void wildpkr_state::tabpkr(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_size(384, 280);
 	screen.set_visarea(0, 384-1, 0, 280-1);
 	screen.set_screen_update("acrtc", FUNC(hd63484_device::update_screen));

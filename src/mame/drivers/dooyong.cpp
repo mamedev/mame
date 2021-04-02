@@ -1511,7 +1511,7 @@ void dooyong_z80_ym2203_state::lastday(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1 );
 	screen.set_screen_update(FUNC(dooyong_z80_ym2203_state::screen_update_lastday));
@@ -1562,7 +1562,7 @@ void dooyong_z80_ym2203_state::gulfstrm(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1 );
 	screen.set_screen_update(FUNC(dooyong_z80_ym2203_state::screen_update_gulfstrm));
@@ -1599,7 +1599,7 @@ void dooyong_z80_ym2203_state::pollux(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1 );
 	screen.set_screen_update(FUNC(dooyong_z80_ym2203_state::screen_update_pollux));
@@ -1636,7 +1636,7 @@ void dooyong_z80_state::bluehawk(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1 );
 	screen.set_screen_update(FUNC(dooyong_z80_state::screen_update_bluehawk));
@@ -1682,7 +1682,7 @@ void dooyong_z80_state::flytiger(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1 );
 	screen.set_screen_update(FUNC(dooyong_z80_state::screen_update_flytiger));
@@ -1718,7 +1718,7 @@ void dooyong_z80_state::primella(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(8*8, (64-8)*8-1, 0*8, 32*8-1 );
 	screen.set_screen_update(FUNC(dooyong_z80_state::screen_update_primella));
@@ -1769,7 +1769,7 @@ void rshark_state::dooyong_68k(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));  // not accurate
+	screen.set_vblank_time(subseconds::from_usec(2500));  // not accurate
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(rshark_state::screen_update_rshark));
@@ -1827,7 +1827,7 @@ void popbingo_state::popbingo(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));  // not accurate
+	m_screen->set_vblank_time(subseconds::from_usec(2500));  // not accurate
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1);
 	m_screen->set_screen_update(FUNC(popbingo_state::screen_update_popbingo));

@@ -753,7 +753,7 @@ void homelab2_state::homelab2(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_size(40*8, 25*8);
 	screen.set_visarea(0, 40*8-1, 0, 25*8-1);
 	screen.set_screen_update(FUNC(homelab2_state::screen_update));
@@ -782,7 +782,7 @@ void homelab3_state::homelab3(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0, 64*8-1, 0, 32*8-1);
 	screen.set_screen_update(FUNC(homelab3_state::screen_update));

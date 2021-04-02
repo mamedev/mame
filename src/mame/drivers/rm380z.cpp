@@ -148,15 +148,15 @@ Module timer tag static_vblank_timer name m_param
 Attempt to register save state entry after state registration is closed!
 Module timer tag static_vblank_timer name m_enabled
 Attempt to register save state entry after state registration is closed!
-Module timer tag static_vblank_timer name m_period.attoseconds
+Module timer tag static_vblank_timer name m_period.subseconds
 Attempt to register save state entry after state registration is closed!
 Module timer tag static_vblank_timer name m_period.seconds
 Attempt to register save state entry after state registration is closed!
-Module timer tag static_vblank_timer name m_start.attoseconds
+Module timer tag static_vblank_timer name m_start.subseconds
 Attempt to register save state entry after state registration is closed!
 Module timer tag static_vblank_timer name m_start.seconds
 Attempt to register save state entry after state registration is closed!
-Module timer tag static_vblank_timer name m_expire.attoseconds
+Module timer tag static_vblank_timer name m_expire.subseconds
 Attempt to register save state entry after state registration is closed!
 Module timer tag static_vblank_timer name m_expire.seconds
 ':maincpu' (E48B): unmapped program memory write to E000 = C1 & FF
@@ -245,7 +245,7 @@ void rm380z_state::rm380z(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	// according to videos and pictures of the real hardware, chars are spaced of at least 1 pixel
 	// and there is at least 1 pixel between each row of characters
 	screen.set_size((RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1)), (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1)));
@@ -288,7 +288,7 @@ void rm380z_state::rm480z(machine_config &config)
 	/* video hardware */
 //  screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 //  screen.set_refresh_hz(50);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_vblank_time(subseconds::from_usec(0));
 //  screen.set_size((RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1)), (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1)));
 //  screen.set_visarea(0, (RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1))-1, 0, (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1))-1);
 //  screen.set_screen_update(FUNC(rm380z_state::screen_update_rm480z));

@@ -422,7 +422,7 @@ enum
 
 
 
-#define PARALLEL_DRUM_WORD_TIME attotime::from_nsec(8500)
+#define PARALLEL_DRUM_WORD_SUBSECONDS subseconds::from_nsec(8500)
 #define PARALLEL_DRUM_ROTATION_TIME attotime::from_nsec(8500*4096)
 
 
@@ -1296,7 +1296,7 @@ void pdp1_cylinder_image_device::set_il(int il)
 {
 	m_il = il;
 
-	attotime il_phase = ((PARALLEL_DRUM_WORD_TIME * il) - m_rotation_timer->elapsed());
+	attotime il_phase = (attotime(PARALLEL_DRUM_WORD_SUBSECONDS * il) - m_rotation_timer->elapsed());
 	if (il_phase < attotime::zero)
 		il_phase = il_phase + PARALLEL_DRUM_ROTATION_TIME;
 	m_il_timer->adjust(il_phase, 0, PARALLEL_DRUM_ROTATION_TIME);
@@ -1412,7 +1412,7 @@ void pdp1_cylinder_image_device::iot_dcc(int op2, int nac, int mb, int &io, int 
 		m_wcl = (m_wcl+1) & 0177777/*0007777???*/;
 		dc = (dc+1) & 07777;
 		if (m_wc)
-			delay = delay + PARALLEL_DRUM_WORD_TIME;
+			delay = delay + PARALLEL_DRUM_WORD_SUBSECONDS;
 	} while (m_wc);
 	m_maincpu->adjust_icount(-m_maincpu->attotime_to_cycles(delay));
 	/* if no error, skip */
@@ -1421,8 +1421,7 @@ void pdp1_cylinder_image_device::iot_dcc(int op2, int nac, int mb, int &io, int 
 
 void pdp1_cylinder_image_device::iot_dra(int op2, int nac, int mb, int &io, int ac)
 {
-	io = (m_rotation_timer->elapsed() *
-		  (ATTOSECONDS_PER_SECOND / (PARALLEL_DRUM_WORD_TIME.as_attoseconds()))).seconds() & 0007777;
+	io = m_rotation_timer->elapsed().as_ticks(PARALLEL_DRUM_WORD_SUBSECONDS) & 0007777;
 
 	/* set parity error and timing error... */
 }
@@ -1800,7 +1799,7 @@ void pdp1_state::pdp1(machine_config &config)
 	/* video hardware (includes the control panel and typewriter output) */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(refresh_rate);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(virtual_width, virtual_height);
 	screen.set_visarea(0, virtual_width-1, 0, virtual_height-1);
 	screen.set_screen_update(FUNC(pdp1_state::screen_update_pdp1));

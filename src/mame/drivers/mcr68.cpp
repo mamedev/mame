@@ -925,7 +925,7 @@ void mcr68_state::mcr68(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(30);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	m_screen->set_size(32*16, 30*16);
 	m_screen->set_visarea(0, 32*16-1, 0, 30*16-1);
 	m_screen->set_screen_update(FUNC(mcr68_state::screen_update_mcr68));

@@ -357,7 +357,7 @@ void tms9927_device::recompute_parameters(bool postload)
 
 	osd_printf_debug("TMS9927: Total = %dx%d, Visible = %dx%d, HSync = %d-%d, VSync = %d-%d, Skew=%d, Upscroll=%d, Period=%f Hz\n", m_total_hpix, m_total_vpix, m_visible_hpix, m_visible_vpix, m_hsyn_start, m_hsyn_end, m_vsyn_start, m_vsyn_end, SKEW_BITS, m_start_datarow, refresh.as_hz());
 
-	screen().configure(m_total_hpix, m_total_vpix, visarea, refresh.as_attoseconds());
+	screen().configure(m_total_hpix, m_total_vpix, visarea, refresh.as_subseconds());
 
 	m_hsyn = false;
 	if (!m_write_hsyn.isnull())

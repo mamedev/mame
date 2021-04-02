@@ -407,7 +407,7 @@ inline void upd7220_device::recompute_parameters()
 	if (horiz_pix_total == 0 || vert_pix_total == 0) //bail out if screen params aren't valid
 		return;
 
-	attoseconds_t refresh = HZ_TO_ATTOSECONDS(clock() * 8) * horiz_pix_total * vert_pix_total;
+	subseconds refresh = subseconds::from_hz(clock() * 8) * horiz_pix_total * vert_pix_total;
 
 	rectangle visarea(
 			0, //(m_hs + m_hbp) * 8;
@@ -415,7 +415,7 @@ inline void upd7220_device::recompute_parameters()
 			m_vbp, //m_vs + m_vbp;
 			m_al * vert_mult + m_vbp - 1);//vert_pix_total - m_vfp - 1;
 
-	LOG("uPD7220 Screen: %u x %u @ %f Hz\n", horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+	LOG("uPD7220 Screen: %u x %u @ %f Hz\n", horiz_pix_total, vert_pix_total, refresh.as_hz());
 	LOG("Visible Area: (%u, %u) - (%u, %u)\n", visarea.left(), visarea.top(), visarea.right(), visarea.bottom());
 	LOG("%d %d %d %d %d\n",m_hs,m_hbp,m_aw,m_hfp,m_pitch);
 	LOG("%d %d %d %d\n",m_vs,m_vbp,m_al,m_vfp);

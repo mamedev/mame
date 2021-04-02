@@ -176,7 +176,7 @@ private:
 
 	static const bool   s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS];
 
-	static const attoseconds_t ATTOSECONDS_PER_SPEED_UPDATE = ATTOSECONDS_PER_SECOND / 4;
+	static constexpr attotime SPEED_UPDATE_PERIOD = attotime::from_hz(4);
 	static const int PAUSED_REFRESH_RATE = 30;
 
 	bool                m_timecode_enabled;     // inp.timecode record enabled

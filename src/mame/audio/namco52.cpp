@@ -145,7 +145,6 @@ namco_52xx_device::namco_52xx_device(const machine_config &mconfig, const char *
 	m_discrete(*this, finder_base::DUMMY_TAG),
 	m_irq_duration(attotime::from_usec(100)),
 	m_basenode(0),
-	m_extclock(0),
 	m_romread(*this),
 	m_si(*this),
 	m_latched_cmd(0),
@@ -166,10 +165,10 @@ void namco_52xx_device::device_start()
 	m_latch_callback.init(*this, FUNC(namco_52xx_device::latch_callback));
 
 	/* start the external clock */
-	if (m_extclock != 0)
+	if (!m_extclock.is_zero())
 	{
 		m_extclock_pulse_timer = timer_alloc(*this, FUNC(namco_52xx_device::external_clock_pulse));
-		m_extclock_pulse_timer->adjust(attotime(0, m_extclock), 0, attotime(0, m_extclock));
+		m_extclock_pulse_timer->adjust(attotime(m_extclock), 0, attotime(m_extclock));
 	}
 
 	save_item(NAME(m_latched_cmd));

@@ -2204,7 +2204,7 @@ void segas1x_bootleg_state::system16_base(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(40*8, 36*8);
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
 	m_screen->set_screen_update(FUNC(segas1x_bootleg_state::screen_update_system16));
@@ -2303,7 +2303,7 @@ void segas1x_bootleg_state::goldnaxeb_base(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(40*8, 28*8);
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
 	m_screen->set_screen_update(FUNC(segas1x_bootleg_state::screen_update_system16));
@@ -2469,7 +2469,7 @@ void segas1x_bootleg_state::system18(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(40*8, 28*8);
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
 	m_screen->set_screen_update(FUNC(segas1x_bootleg_state::screen_update_system18old));
@@ -2524,7 +2524,7 @@ void segas1x_bootleg_state::astormb2(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(58.271); /* V-Sync is 58.271Hz & H-Sync is ~ 14.48KHz measured */
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(40*8, 28*8);
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
 	m_screen->set_screen_update(FUNC(segas1x_bootleg_state::screen_update_system18old));
@@ -2618,7 +2618,7 @@ void segas1x_bootleg_state::ddcrewbl(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(40*8, 28*8);
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
 	m_screen->set_screen_update(FUNC(segas1x_bootleg_state::screen_update_system18old));

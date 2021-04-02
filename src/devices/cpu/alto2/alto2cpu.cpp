@@ -164,10 +164,7 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_wrtram_flag(false),
 	m_ether_enable(false),
 	m_ewfct(false),
-	m_display_time(0),
-	m_unload_time(0),
 	m_unload_word(0),
-	m_bitclk_time(0),
 	m_bitclk_index(0),
 	m_ctl2k_u3(nullptr),
 	m_ctl2k_u38(nullptr),
@@ -2254,10 +2251,10 @@ void alto2_cpu_device::execute_run()
 {
 	m_next = m_task_mpc[m_task];        // get current task's next mpc and address modifier
 	m_next2 = m_task_next2[m_task];
-	attoseconds_t ucycle = DOUBLE_TO_ATTOSECONDS(1.0/m_clock);
+	subseconds ucycle = ucycle_subs();
 
 	do {
-		if (m_display_time >= 0) {
+		if (m_display_time >= ucycle) {
 			/**
 			 * Subtract the microcycle time from the display time accu.
 			 * If it underflows, call the display state machine which
@@ -2265,11 +2262,11 @@ void alto2_cpu_device::execute_run()
 			 * This is very close to every seventh CPU cycle
 			 */
 			m_display_time -= ucycle;
-			if (m_display_time < 0)
+			if (m_display_time < ucycle)
 				display_state_machine();
 		}
 
-		if (m_unload_time >= 0) {
+		if (m_unload_time >= m_unload_time) {
 			/**
 			 * Subtract the microcycle time from the unload time accu.
 			 * If it underflows, call the unload word function which adds
@@ -2277,11 +2274,11 @@ void alto2_cpu_device::execute_run()
 			 * the FIFO unloading by leaving m_unload_time at -1.
 			 */
 			m_unload_time -= ucycle;
-			if (m_unload_time < 0)
+			if (m_unload_time < m_unload_time)
 				unload_word();
 		}
 
-		if (m_bitclk_time >= 0) {
+		if (m_bitclk_time >= m_bitclk_time) {
 			/**
 			 * Subtract the microcycle time from the bitclk time accu.
 			 * If it underflows, call the disk bitclk function which adds
@@ -2910,9 +2907,9 @@ void alto2_cpu_device::hard_reset()
 	init_part();
 	init_kwd();
 
-	m_display_time = 0;                 // reset the display state timing
-	m_unload_time = 0;              // reset the word unload timing accu
-	m_bitclk_time = 0;              // reset the bitclk timing accu
+	m_display_time = ucycle_subs(); // reset the display state timing
+	m_unload_time = ucycle_subs();  // reset the word unload timing accu
+	m_bitclk_time = ucycle_subs();  // reset the bitclk timing accu
 	m_task = task_emu;              // start with task 0 (emulator)
 	m_task_wakeup |= 1 << task_emu; // set wakeup flag
 }
@@ -2956,9 +2953,9 @@ void alto2_cpu_device::soft_reset()
 	m_task = task_emu;              // set current task to emulator
 	m_task_wakeup = 1 << task_emu;  // set only the emulator task wakeup flag
 
-	m_display_time = 0;                 // reset the display state machine timing accu
-	m_unload_time = 0;              // reset the word unload timing accu
-	m_bitclk_time = 0;              // reset the bitclk timing accu
+	m_display_time = ucycle_subs(); // reset the display state machine timing accu
+	m_unload_time = ucycle_subs();  // reset the word unload timing accu
+	m_bitclk_time = ucycle_subs();  // reset the bitclk timing accu
 }
 
 std::unique_ptr<util::disasm_interface> alto2_cpu_device::create_disassembler()

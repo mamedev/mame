@@ -616,7 +616,7 @@ void piratesh_state::piratesh(machine_config &config)
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 //  screen.set_refresh_hz(60);
 	screen.set_raw(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223); // TODO
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(600));
+	screen.set_vblank_time(subseconds::from_usec(600));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(24, 24+288-1, 16, 16+224-1);
 	screen.set_screen_update(FUNC(piratesh_state::screen_update_piratesh));

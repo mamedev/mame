@@ -256,7 +256,7 @@ void sspeedr_state::sspeedr(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(59.39);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(16 * 1000000 / 15680));
+	screen.set_vblank_time(subseconds::from_usec(16 * 1000000 / 15680));
 	screen.set_size(376, 256);
 	screen.set_visarea(0, 375, 0, 247);
 	screen.set_screen_update(FUNC(sspeedr_state::screen_update));

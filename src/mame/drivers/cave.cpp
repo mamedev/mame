@@ -2052,7 +2052,7 @@ void cave_state::add_base_config(machine_config &config, int layer)
 
 	SCREEN(config, m_screen[0], SCREEN_TYPE_RASTER);
 	m_screen[0]->set_refresh_hz(15625/271.5);
-	m_screen[0]->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen[0]->set_vblank_time(subseconds::from_usec(0));
 	m_screen[0]->set_size(320, 240);
 	m_screen[0]->set_visarea(0, 320-1, 0, 240-1);
 	m_screen[0]->set_screen_update(FUNC(cave_state::screen_update));
@@ -2489,7 +2489,7 @@ void cave_state::ppsatan(machine_config &config)
 
 	SCREEN(config, m_screen[1], SCREEN_TYPE_RASTER);
 	m_screen[1]->set_refresh_hz(15625/271.5);
-	m_screen[1]->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen[1]->set_vblank_time(subseconds::from_usec(0));
 	m_screen[1]->set_size(320, 240);
 	m_screen[1]->set_visarea(0, 320-1, 0, 224-1);
 	m_screen[1]->set_screen_update(FUNC(cave_state::screen_update_ppsatan_left));
@@ -2497,7 +2497,7 @@ void cave_state::ppsatan(machine_config &config)
 
 	SCREEN(config, m_screen[2], SCREEN_TYPE_RASTER);
 	m_screen[2]->set_refresh_hz(15625/271.5);
-	m_screen[2]->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen[2]->set_vblank_time(subseconds::from_usec(0));
 	m_screen[2]->set_size(320, 240);
 	m_screen[2]->set_visarea(0, 320-1, 0, 224-1);
 	m_screen[2]->set_screen_update(FUNC(cave_state::screen_update_ppsatan_right));

@@ -129,7 +129,7 @@ void tamag1_state::tama(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(32.768_kHz_XTAL/1024);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(40, 16);
 	screen.set_visarea(0, 32-1, 0, 16-1);
 	screen.set_screen_update("maincpu", FUNC(e0c6s46_device::screen_update));

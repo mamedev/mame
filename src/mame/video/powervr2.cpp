@@ -1599,7 +1599,7 @@ void powervr2_device::update_screen_format()
 	//int32_t vo_vert_start_pos_f1 = vo_starty & 0x3ff;
 	int pclk = spg_clks[(spg_control >> 6) & 3] * (((spg_control & 0x10) >> 4)+1);
 
-	attoseconds_t refresh = HZ_TO_ATTOSECONDS(pclk) * spg_hsize * spg_vsize;
+	subseconds refresh = subseconds::from_hz(pclk) * spg_hsize * spg_vsize;
 
 	rectangle visarea = screen().visible_area();
 

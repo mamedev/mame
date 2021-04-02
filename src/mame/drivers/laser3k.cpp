@@ -961,7 +961,7 @@ void laser3k_state::laser3k(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	m_screen->set_size(300*2, 192);
 	m_screen->set_visarea(0, (280*2)-1,0,192-1);
 	m_screen->set_screen_update(FUNC(laser3k_state::screen_update));

@@ -95,7 +95,7 @@ void cdp1861_device::device_config_complete()
 	if (!has_screen())
 		return;
 
-	if (!screen().refresh_attoseconds())
+	if (screen().refresh_subseconds().is_zero())
 		screen().set_raw(clock(), SCREEN_WIDTH, HBLANK_END, HBLANK_START, TOTAL_SCANLINES, SCANLINE_VBLANK_END, SCANLINE_VBLANK_START);
 
 	if (!screen().has_screen_update())

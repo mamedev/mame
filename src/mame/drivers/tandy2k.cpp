@@ -1004,7 +1004,7 @@ void tandy2k_state::tandy2k(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_vblank_time(subseconds::from_usec(2500)); // not accurate
 	screen.set_size(640, 400);
 	screen.set_visarea(0, 640-1, 0, 400-1);
 	//screen.set_screen_update(CRT9021B_TAG, FUNC(crt9021_device::screen_update));

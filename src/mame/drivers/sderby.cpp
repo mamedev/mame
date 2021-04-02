@@ -609,7 +609,7 @@ void sderby_state::sderby(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 64*8);
 	screen.set_visarea(4*8, 44*8-1, 3*8, 33*8-1);
 	screen.set_screen_update(FUNC(sderby_state::screen_update_sderby));
@@ -632,7 +632,7 @@ void sderby_state::sderbya(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 64*8);
 	screen.set_visarea(4*8, 44*8-1, 3*8, 33*8-1);
 	screen.set_screen_update(FUNC(sderby_state::screen_update_sderby));
@@ -655,7 +655,7 @@ void sderby_state::luckboom(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 64*8);
 	screen.set_visarea(4*8, 44*8-1, 3*8, 33*8-1);
 	screen.set_screen_update(FUNC(sderby_state::screen_update_sderby));
@@ -678,7 +678,7 @@ void sderby_state::spacewin(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 64*8);
 	screen.set_visarea(4*8, 44*8-1, 3*8, 33*8-1);
 	screen.set_screen_update(FUNC(sderby_state::screen_update_pmroulet));
@@ -701,7 +701,7 @@ void sderby_state::shinygld(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(57.47); // measured on PCB
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 64*8);
 	screen.set_visarea(4*8, 44*8-1, 3*8, 33*8-1);
 	screen.set_screen_update(FUNC(sderby_state::screen_update_sderby));
@@ -724,7 +724,7 @@ void sderby_state::pmroulet(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*8, 64*8);
 	screen.set_visarea(4*8, 44*8-1, 3*8, 33*8-1);
 	screen.set_screen_update(FUNC(sderby_state::screen_update_pmroulet));

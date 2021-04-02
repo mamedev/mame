@@ -411,7 +411,7 @@ void shanghai_state::shanghai(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(57);
-	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	//m_screen->set_vblank_time(subseconds::from_usec(2500));
 	m_screen->set_size(384, 280);
 	m_screen->set_visarea(0, 384-1, 0, 280-1);
 	m_screen->set_screen_update("hd63484", FUNC(hd63484_device::update_screen));
@@ -445,7 +445,7 @@ void shanghai_state::shangha2(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(57);
-	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	//m_screen->set_vblank_time(subseconds::from_usec(2500));
 	m_screen->set_size(384, 280);
 	m_screen->set_visarea(0, 384-1, 0, 280-1);
 	m_screen->set_screen_update("hd63484", FUNC(hd63484_device::update_screen));
@@ -484,7 +484,7 @@ void shanghai_state::kothello(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(57);
-	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	//m_screen->set_vblank_time(subseconds::from_usec(2500));
 	m_screen->set_size(384, 280);
 	m_screen->set_visarea(0, 384-1, 0, 280-1);
 	m_screen->set_screen_update("hd63484", FUNC(hd63484_device::update_screen));

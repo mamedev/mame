@@ -186,7 +186,7 @@ void gaelco2_state::maniacsq(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(59.1);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*16, 32*16);
 	screen.set_visarea(0, 320-1, 16, 256-1);
 	screen.set_screen_update(FUNC(gaelco2_state::screen_update));
@@ -470,7 +470,7 @@ void gaelco2_state::saltcrdi(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(59.1);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*16, 32*16);
 	screen.set_visarea(0, 384-1, 16, 256-1);
 	screen.set_screen_update(FUNC(gaelco2_state::screen_update));
@@ -1002,7 +1002,7 @@ void gaelco2_state::play2000(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(59.1);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*16, 32*16);
 	screen.set_visarea(0, 384-1, 16, 256-1);
 	screen.set_screen_update(FUNC(gaelco2_state::screen_update));
@@ -1041,7 +1041,7 @@ void gaelco2_state::srollnd(machine_config& config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(59.1);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*16, 32*16);
 	screen.set_visarea(0, 384-1, 16, 256-1);
 	screen.set_screen_update(FUNC(gaelco2_state::screen_update));
@@ -1146,7 +1146,7 @@ void bang_state::bang(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(59.1);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*16, 32*16);
 	screen.set_visarea(0, 320-1, 16, 256-1);
 	screen.set_screen_update(FUNC(gaelco2_state::screen_update));
@@ -1391,7 +1391,7 @@ void gaelco2_state::alighunt(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(59.1);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*16, 32*16);
 	screen.set_visarea(0, 320-1, 16, 256-1);
 	screen.set_screen_update(FUNC(gaelco2_state::screen_update));
@@ -1755,7 +1755,7 @@ void gaelco2_state::touchgo(machine_config &config)
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(59.1);
-	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	lscreen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	lscreen.set_size(64*16, 32*16);
 	lscreen.set_visarea(0, 480-1, 16, 256-1);
 	lscreen.set_screen_update(FUNC(gaelco2_state::screen_update_left));
@@ -1763,7 +1763,7 @@ void gaelco2_state::touchgo(machine_config &config)
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_refresh_hz(59.1);
-	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	rscreen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	rscreen.set_size(64*16, 32*16);
 	rscreen.set_visarea(0, 480-1, 16, 256-1);
 	rscreen.set_screen_update(FUNC(gaelco2_state::screen_update_right));
@@ -2061,7 +2061,7 @@ void gaelco2_state::snowboar(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(59.1);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*16, 32*16);
 	screen.set_visarea(0, 384-1, 16, 256-1);
 	screen.set_screen_update(FUNC(gaelco2_state::screen_update));
@@ -2105,7 +2105,7 @@ void gaelco2_state::maniacsqs(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(59.1);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*16, 32*16);
 	screen.set_visarea(0, 320-1, 16, 256-1);
 	screen.set_screen_update(FUNC(gaelco2_state::screen_update));
@@ -2399,7 +2399,7 @@ void wrally2_state::wrally2(machine_config &config)
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(59.1);
-	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	lscreen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	lscreen.set_size(384, 32*16);
 	lscreen.set_visarea(0, 384-1, 16, 256-1);
 	lscreen.set_screen_update(FUNC(gaelco2_state::screen_update_left));
@@ -2407,7 +2407,7 @@ void wrally2_state::wrally2(machine_config &config)
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_refresh_hz(59.1);
-	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	rscreen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	rscreen.set_size(384, 32*16);
 	rscreen.set_visarea(0, 384-1, 16, 256-1);
 	rscreen.set_screen_update(FUNC(gaelco2_state::screen_update_right));

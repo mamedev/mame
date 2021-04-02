@@ -738,7 +738,7 @@ void fitfight_state::fitfight(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(2*8, 39*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(fitfight_state::screen_update_fitfight));
@@ -762,7 +762,7 @@ void fitfight_state::bbprot(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(40*8, 32*8);
 	screen.set_visarea(2*8, 39*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(fitfight_state::screen_update_fitfight));

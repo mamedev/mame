@@ -954,7 +954,7 @@ void magictg_state::magictg(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(1024, 1024);
 	screen.set_visarea(0, 511, 16, 447);
 	screen.set_screen_update(FUNC(magictg_state::screen_update_magictg));

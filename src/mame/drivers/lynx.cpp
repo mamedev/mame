@@ -87,7 +87,7 @@ void lynx_state::lynx(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(30);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	m_screen->set_screen_update(FUNC(lynx_state::screen_update));
 	m_screen->set_size(160, 102);
 	m_screen->set_visarea(0, 160-1, 0, 102-1);

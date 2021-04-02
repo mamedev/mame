@@ -32,8 +32,8 @@ constexpr double TIME_OF_74LS123(double r, double c) { return 0.45 * r * c; }
 
 // macros for the RC time constant on a 555 timer IC
 // R is in ohms, C is in farads
-constexpr attoseconds_t PERIOD_OF_555_MONOSTABLE_NSEC(double r, double c)          { return attoseconds_t(1100000000 * r * c); }
-constexpr attoseconds_t PERIOD_OF_555_ASTABLE_NSEC(double r1, double r2, double c) { return attoseconds_t( 693000000 * (r1 + 2.0 * r2) * c); }
+constexpr u64 PERIOD_OF_555_MONOSTABLE_NSEC(double r, double c)          { return u64(1100000000.0 * r * c); }
+constexpr u64 PERIOD_OF_555_ASTABLE_NSEC(double r1, double r2, double c) { return u64( 693000000.0 * (r1 + 2.0 * r2) * c); }
 constexpr attotime PERIOD_OF_555_MONOSTABLE(double r, double c)                    { return attotime::from_nsec(PERIOD_OF_555_MONOSTABLE_NSEC(r, c)); }
 constexpr attotime PERIOD_OF_555_ASTABLE(double r1, double r2, double c)           { return attotime::from_nsec(PERIOD_OF_555_ASTABLE_NSEC(r1, r2, c)); }
 

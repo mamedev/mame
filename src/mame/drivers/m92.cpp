@@ -928,7 +928,7 @@ void m92_state::m92(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(80, 511-112, 8, 247); /* 320 x 240 */
 	m_screen->set_screen_update(FUNC(m92_state::screen_update_m92));

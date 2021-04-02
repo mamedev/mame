@@ -159,7 +159,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( tvbg_2button )
 	PORT_INCLUDE( tvbg_1button )
-	
+
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Boggle uses 2 buttons for gameplay, other units do read this to enter secret test mode, but none of the games need it?
 INPUT_PORTS_END
@@ -253,7 +253,7 @@ void elan_ep3a19a_state::elan_ep3a19a(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_vblank_time(subseconds::from_usec(2500));
 	m_screen->set_screen_update(FUNC(elan_ep3a19a_state::screen_update));
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 28*8-1);

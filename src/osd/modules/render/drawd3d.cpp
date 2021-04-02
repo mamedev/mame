@@ -1283,7 +1283,7 @@ void renderer_d3d9::pick_best_mode()
 	const screen_device *primary_screen = screen_device_enumerator(win->machine().root_device()).first();
 	if (primary_screen != nullptr)
 	{
-		target_refresh = ATTOSECONDS_TO_HZ(primary_screen->refresh_attoseconds());
+		target_refresh = primary_screen->refresh_subseconds().as_hz();
 	}
 
 	// determine the minimum width/height for the selected target

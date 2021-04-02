@@ -2797,7 +2797,7 @@ void metro_state::i4100_config(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(320, 240);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update("vdp", FUNC(imagetek_i4100_device::screen_update));
@@ -2811,7 +2811,7 @@ void metro_state::i4220_config(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(320, 240);
 	m_screen->set_visarea(0, 320-1, 0, 224-1);
 	m_screen->set_screen_update("vdp2", FUNC(imagetek_i4100_device::screen_update));
@@ -2825,7 +2825,7 @@ void metro_state::i4300_config(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(320, 240);
 	m_screen->set_visarea(0, 320-1, 0, 224-1);
 	m_screen->set_screen_update("vdp3", FUNC(imagetek_i4100_device::screen_update));
@@ -3425,7 +3425,7 @@ void metro_state::blzntrnd(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(58.2328); // VSync 58.2328Hz, HSync 15.32kHz
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(320, 240);
 	m_screen->set_visarea(0, 304-1, 0, 224-1);
 	m_screen->set_screen_update(FUNC(metro_state::screen_update_psac_vdp2_mix));

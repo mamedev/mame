@@ -141,7 +141,7 @@ void bartop52_state::a5200(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1));
+	m_screen->set_vblank_time(subseconds::from_usec(1));
 	m_screen->set_visarea(antic_device::MIN_X, antic_device::MAX_X, antic_device::MIN_Y, antic_device::MAX_Y);
 	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
 	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);

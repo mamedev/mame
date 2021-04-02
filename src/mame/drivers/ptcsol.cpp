@@ -616,7 +616,7 @@ void sol20_state::machine_reset()
 	m_rs232->write_rts(1);
 
 	int lines = BIT(m_iop_config->read(), 2) ? 260 : 312;
-	m_screen->configure(918, lines, m_screen->visible_area(), attotime::from_ticks(918 * lines, 14.318181_MHz_XTAL).as_attoseconds());
+	m_screen->configure(918, lines, m_screen->visible_area(), attotime::from_ticks(918 * lines, 14.318181_MHz_XTAL).as_subseconds());
 
 	// set CPU speed (TODO: also present on bus pin 49)
 	double freq = (14.318181_MHz_XTAL / (4 + ((m_iop_config->read() >> 3) & 3))).dvalue();

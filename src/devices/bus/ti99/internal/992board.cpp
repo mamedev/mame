@@ -169,7 +169,7 @@ std::string video992_device::tts(attotime t)
 		t = attotime::zero-t;
 		sign = "-";
 	}
-	int nsec = t.attoseconds() / ATTOSECONDS_PER_NANOSECOND;
+	int nsec = t.as_nsec_int();
 	sprintf(buf, "%s%04d.%03d,%03d,%03d", sign, int(t.seconds()), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
 	return buf;
 }

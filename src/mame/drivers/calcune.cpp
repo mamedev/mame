@@ -263,7 +263,7 @@ void calcune_state::calcune(machine_config &config)
 	screen_device &screen(SCREEN(config, "megadriv", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(double(OSC1_CLOCK) / 10.0 / 262.0 / 342.0); // same as SMS?
 //  screen.set_refresh_hz(double(OSC1_CLOCK) / 8.0 / 262.0 / 427.0); // or 427 Htotal?
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
+	screen.set_vblank_time(subseconds::from_usec(0)); // Vblank handled manually.
 	screen.set_size(64*8, 620);
 	screen.set_visarea(0, 40*8-1, 0, 28*8-1);
 	screen.set_screen_update(FUNC(calcune_state::screen_update_calcune));

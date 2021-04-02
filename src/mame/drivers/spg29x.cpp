@@ -209,9 +209,9 @@ void spg29x_game_state::tve_control_w(offs_t offset, uint32_t data, uint32_t mem
 
 	int interlaced = m_tve_control & 1;
 	if (m_tve_control & 2)
-		m_screen->configure(864, 625, visarea, HZ_TO_ATTOSECONDS(27_MHz_XTAL) * 864 * 625 * (interlaced ? 2 : 1));      // PAL
+		m_screen->configure(864, 625, visarea, subseconds::from_hz(27_MHz_XTAL) * 864 * 625 * (interlaced ? 2 : 1));      // PAL
 	else
-		m_screen->configure(858, 525, visarea, HZ_TO_ATTOSECONDS(27_MHz_XTAL) * 858 * 525 * (interlaced ? 2 : 1));      // NTSC
+		m_screen->configure(858, 525, visarea, subseconds::from_hz(27_MHz_XTAL) * 858 * 525 * (interlaced ? 2 : 1));      // NTSC
 }
 
 void spg29x_game_state::gpio_out_w(offs_t offset, uint32_t data, uint32_t mem_mask)

@@ -540,7 +540,7 @@ private:
 	u8 m_clkdata, m_clock_control, m_clock_read, m_clock_reg1;
 	apple2gs_clock_mode m_clock_mode;
 	u32 m_clock_curtime;
-	seconds_t m_clock_curtime_interval;
+	s32 m_clock_curtime_interval;
 	u8 m_clock_bram[256];
 	int m_clock_frame;
 

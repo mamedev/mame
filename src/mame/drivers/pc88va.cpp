@@ -552,7 +552,7 @@ void pc88va_state::execute_sync_cmd()
 	    --xx xxxx [E] - v sync
 	*/
 	rectangle visarea;
-	attoseconds_t refresh;
+	subseconds refresh;
 	uint16_t x_vis_area,y_vis_area;
 
 	//printf("V blank start: %d\n",(sync_cmd[0x8]));
@@ -567,11 +567,11 @@ void pc88va_state::execute_sync_cmd()
 	visarea.set(0, x_vis_area - 1, 0, y_vis_area - 1);
 
 	//if(y_vis_area == 400)
-	//  refresh = HZ_TO_ATTOSECONDS(24800) * x_vis_area * y_vis_area; //24.8 KHz
+	//  refresh = subseconds::from_hz(24800) * x_vis_area * y_vis_area; //24.8 KHz
 	//else
-	//  refresh = HZ_TO_ATTOSECONDS(15730) * x_vis_area * y_vis_area; //15.73 KHz
+	//  refresh = subseconds::from_hz(15730) * x_vis_area * y_vis_area; //15.73 KHz
 
-	refresh = HZ_TO_ATTOSECONDS(60);
+	refresh = subseconds::from_hz(60);
 
 	m_screen->configure(640, 480, visarea, refresh);
 }

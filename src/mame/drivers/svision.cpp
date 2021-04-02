@@ -541,7 +541,7 @@ void svision_state::svisionp(machine_config &config)
 	svision(config);
 
 	m_maincpu->set_clock(4430000);
-	m_screen->set_refresh(HZ_TO_ATTOSECONDS(50));
+	m_screen->set_refresh(subseconds::from_hz(50));
 	m_palette->set_init(FUNC(svision_state::svisionp_palette));
 }
 
@@ -549,7 +549,7 @@ void svision_state::svisionn(machine_config &config)
 {
 	svision(config);
 	m_maincpu->set_clock(3560000/*?*/);
-	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
+	m_screen->set_refresh(subseconds::from_hz(60));
 	m_palette->set_init(FUNC(svision_state::svisionn_palette));
 }
 

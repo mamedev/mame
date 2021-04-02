@@ -91,7 +91,7 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 	, m_unscaled_clock(clock)
 	, m_clock(clock)
 	, m_clock_scale(1.0)
-	, m_attoseconds_per_clock((clock == 0) ? 0 : HZ_TO_ATTOSECONDS(clock))
+	, m_subseconds_per_clock((clock == 0) ? subseconds::max() : subseconds::from_hz(clock))
 
 	, m_machine_config(mconfig)
 	, m_input_defaults(nullptr)
@@ -371,7 +371,7 @@ void device_t::set_unscaled_clock(u32 clock)
 
 	m_unscaled_clock = clock;
 	m_clock = m_unscaled_clock * m_clock_scale;
-	m_attoseconds_per_clock = (m_clock == 0) ? 0 : HZ_TO_ATTOSECONDS(m_clock);
+	m_subseconds_per_clock = (m_clock == 0) ? subseconds::max() : subseconds::from_hz(m_clock);
 
 	// recalculate all derived clocks
 	for (device_t &child : subdevices())
@@ -396,7 +396,7 @@ void device_t::set_clock_scale(double clockscale)
 
 	m_clock_scale = clockscale;
 	m_clock = m_unscaled_clock * m_clock_scale;
-	m_attoseconds_per_clock = (m_clock == 0) ? 0 : HZ_TO_ATTOSECONDS(m_clock);
+	m_subseconds_per_clock = (m_clock == 0) ? subseconds::max() : subseconds::from_hz(m_clock);
 
 	// recalculate all derived clocks
 	for (device_t &child : subdevices())
@@ -433,12 +433,12 @@ attotime device_t::clocks_to_attotime(u64 numclocks) const noexcept
 	if (m_clock == 0)
 		return attotime::never;
 	else if (numclocks < m_clock)
-		return attotime(0, numclocks * m_attoseconds_per_clock);
+		return attotime(numclocks * m_subseconds_per_clock);
 	else
 	{
 		u32 remainder;
 		u32 quotient = divu_64x32_rem(numclocks, m_clock, remainder);
-		return attotime(quotient, u64(remainder) * u64(m_attoseconds_per_clock));
+		return attotime(quotient, u64(remainder) * m_subseconds_per_clock);
 	}
 }
 
@@ -453,7 +453,7 @@ u64 device_t::attotime_to_clocks(const attotime &duration) const noexcept
 	if (m_clock == 0)
 		return 0;
 	else
-		return mulu_32x32(duration.seconds(), m_clock) + u64(duration.attoseconds()) / u64(m_attoseconds_per_clock);
+		return mulu_32x32(duration.seconds(), m_clock) + duration.raw_subseconds() / m_subseconds_per_clock;
 }
 
 

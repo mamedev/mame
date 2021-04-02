@@ -195,12 +195,12 @@ void crtc_ega_device::recompute_parameters(bool postload)
 			(hsync_on_pos <= horiz_pix_total) && (vsync_on_pos <= vert_pix_total) &&
 			(hsync_on_pos != hsync_off_pos))
 		{
-			attoseconds_t refresh = HZ_TO_ATTOSECONDS(m_clock) * (m_horiz_char_total + 2) * vert_pix_total;
+			subseconds refresh = subseconds::from_hz(m_clock) * (m_horiz_char_total + 2) * vert_pix_total;
 
 			rectangle visarea(0, max_visible_x, 0, max_visible_y);
 
 			LOG("CRTC_EGA config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
-								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / refresh.as_double());
 
 			if (has_screen())
 				screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);

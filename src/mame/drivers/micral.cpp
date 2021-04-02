@@ -411,7 +411,7 @@ void micral_state::micral(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(250));
+	screen.set_vblank_time(subseconds::from_usec(250));
 	screen.set_screen_update(FUNC(micral_state::screen_update));
 	screen.set_size(640, 240);
 	screen.set_visarea(0, 639, 0, 239);

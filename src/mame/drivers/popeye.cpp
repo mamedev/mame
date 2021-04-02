@@ -541,7 +541,7 @@ void tnx1_state::config(machine_config &config)
 	// FIXME: 59.94 screen refresch is the NTSC standard
 	auto &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(59.94)
-		.set_vblank_time(ATTOSECONDS_IN_USEC(0))
+		.set_vblank_time(subseconds::from_usec(0))
 		.set_size(32*16, 32*16)
 		.set_visarea(0*16, 32*16-1, 2*16, 30*16-1)
 		.set_palette(m_palette)

@@ -301,7 +301,7 @@ void clshroad_state::firebatl(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(0x120, 0x100);
 	screen.set_visarea(0, 0x120-1, 0x0+16, 0x100-16-1);
 	screen.set_screen_update(FUNC(clshroad_state::screen_update));
@@ -339,7 +339,7 @@ void clshroad_state::clshroad(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(0x120, 0x100);
 	screen.set_visarea(0, 0x120-1, 0x0+16, 0x100-16-1);
 	screen.set_screen_update(FUNC(clshroad_state::screen_update));

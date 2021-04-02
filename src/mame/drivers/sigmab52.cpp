@@ -593,7 +593,7 @@ void sigmab52_state::jwildb52(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(1024, 1024);
 	screen.set_visarea(0, 544-1, 0, 436-1);
 	screen.set_screen_update("hd63484", FUNC(hd63484_device::update_screen));

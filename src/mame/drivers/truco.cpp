@@ -410,7 +410,7 @@ void truco_state::truco(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));  // not accurate
+	screen.set_vblank_time(subseconds::from_usec(2500));  // not accurate
 	screen.set_size(256, 192);
 	screen.set_visarea(0, 256-1, 0, 192-1);
 	screen.set_screen_update(FUNC(truco_state::screen_update));

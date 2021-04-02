@@ -192,7 +192,7 @@ void subs_state::subs(machine_config &config)
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(57);
-	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	lscreen.set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	lscreen.set_size(32*8, 32*8);
 	lscreen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
 	lscreen.set_screen_update(FUNC(subs_state::screen_update_left));
@@ -200,7 +200,7 @@ void subs_state::subs(machine_config &config)
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
 	rscreen.set_refresh_hz(57);
-	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	rscreen.set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	rscreen.set_size(32*8, 32*8);
 	rscreen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
 	rscreen.set_screen_update(FUNC(subs_state::screen_update_right));

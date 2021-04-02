@@ -404,7 +404,7 @@ private:
 		double framerate;
 		uint32_t hpos_min, hpos_max, hpos_end, vpos_min, vpos_max, vpos_end;
 		attotime frame_time;
-		attoseconds_t frame_period, pixeltime, scantime;
+		subseconds frame_period, pixeltime, scantime;
 	};
 
 	struct s3c44b0_uart_t

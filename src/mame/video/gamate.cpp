@@ -314,7 +314,7 @@ void gamate_video_device::device_add_mconfig(machine_config &config)
 	screen.set_screen_update(FUNC(gamate_video_device::screen_update));
 	screen.set_palette("palette");
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE); // close approximate until we use timers to emulate exact video update
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 
 	PALETTE(config, "palette", FUNC(gamate_video_device::gamate_palette), 4);
 }

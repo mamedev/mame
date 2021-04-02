@@ -1225,7 +1225,7 @@ void highvdeo_state::tv_vcf(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(400, 300);
 	screen.set_visarea(0, 320-1, 0, 200-1);
 	screen.set_screen_update(FUNC(highvdeo_state::screen_update_tourvisn));
@@ -1306,7 +1306,7 @@ void highvdeo_state::brasil(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(400, 300);
 	screen.set_visarea(0, 400-1, 0, 300-1);
 	screen.set_screen_update(FUNC(highvdeo_state::screen_update_brasil));
@@ -1337,7 +1337,7 @@ void highvdeo_state::grancapi(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(400, 300);
 	screen.set_visarea(0, 400-1, 0, 300-1);
 	screen.set_screen_update(FUNC(highvdeo_state::screen_update_brasil));
@@ -1361,7 +1361,7 @@ void highvdeo_state::magicbom(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(400, 300);
 	screen.set_visarea(0, 400-1, 0, 300-1);
 	screen.set_screen_update(FUNC(highvdeo_state::screen_update_brasil));

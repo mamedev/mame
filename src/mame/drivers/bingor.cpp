@@ -704,7 +704,7 @@ void bingor_state::bingor(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(400, 300);
 	screen.set_visarea(0, 400-1, 0, 300-1);
 	screen.set_screen_update(FUNC(bingor_state::screen_update_bingor));
@@ -775,7 +775,7 @@ void bingor_state::vip2000(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(400, 300);
 	screen.set_visarea(0, 400-1, 0, 300-1);
 	screen.set_screen_update(FUNC(bingor_state::screen_update_bingor));

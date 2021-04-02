@@ -193,7 +193,7 @@ void mac_video_sonora_device::vctrl_w(offs_t offset, uint8_t data)
 		if(m_modeline_id != -1 && m_modeline_id != prev_modeline) {
 			const modeline &m = modelines[m_modeline_id];
 			rectangle visarea(0, m.htot - m.hfp - m.hs - m.hbp - 1, 0, m.vtot - m.vfp - m.vs - m.vbp - 1);
-			m_screen->configure(m.htot, m.vtot, visarea, attotime::from_ticks(m.htot*m.vtot, m.dotclock).as_attoseconds());
+			m_screen->configure(m.htot, m.vtot, visarea, attotime::from_ticks(m.htot*m.vtot, m.dotclock).as_subseconds());
 		}
 		break;
 	}

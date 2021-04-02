@@ -953,7 +953,7 @@ void iqunlimz_state::video_regs_w(offs_t offset, uint8_t data)
 	{
 		rectangle visarea = m_screen->visible_area();
 		visarea.set(0, (data & 0x02 ? 496 : 256) - 1, 0, 224 - 1);
-		m_screen->configure(data & 0x02 ? 496 : 256 , 224, visarea, m_screen->frame_period().attoseconds());
+		m_screen->configure(data & 0x02 ? 496 : 256 , 224, visarea, m_screen->frame_period().as_subseconds());
 	}
 
 	m_video_regs[offset] = data;
@@ -1491,7 +1491,7 @@ void socrates_state::socrates(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	m_screen->set_size(264, 228); // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
 	m_screen->set_visarea(0, 263, 0, 219); // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
 	m_screen->set_screen_update(FUNC(socrates_state::screen_update_socrates));
@@ -1518,7 +1518,7 @@ void socrates_state::socrates_pal(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(50));
 
 	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	m_screen->set_vblank_time(subseconds::from_usec(2500)); // not accurate
 	m_screen->set_size(264, 238); // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
 	m_screen->set_visarea(0, 263, 0, 229); // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
 	m_screen->set_screen_update(FUNC(socrates_state::screen_update_socrates));
@@ -1550,7 +1550,7 @@ void iqunlimz_state::iqunlimz(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	m_screen->set_screen_update(FUNC(iqunlimz_state::screen_update));
 	m_screen->set_size(256, 224);
 	m_screen->set_visarea(0, 256-1, 0, 224-1);

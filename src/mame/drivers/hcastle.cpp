@@ -204,7 +204,7 @@ void hcastle_state::hcastle(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(59);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));  /* frames per second verified by comparison with real board */
+	screen.set_vblank_time(subseconds::from_usec(0));  /* frames per second verified by comparison with real board */
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(hcastle_state::screen_update_hcastle));

@@ -83,7 +83,7 @@ void vt_unknown_state::vt_unknown(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt_unknown_state::vt_unknown_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(300, 262);
 	m_screen->set_visarea(0, 256-1, 0, 240-1);

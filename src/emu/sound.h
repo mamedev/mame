@@ -132,9 +132,9 @@ private:
 	// set a new sample rate
 	void set_sample_rate(u32 rate, bool resample);
 
-	// return the current sample period in attoseconds
-	attoseconds_t sample_period_attoseconds() const { return m_sample_attos; }
-	attotime sample_period() const { return attotime(0, m_sample_attos); }
+	// return the current sample period in subseconds
+	subseconds sample_period_subseconds() const { return m_sample_subs; }
+	attotime sample_period() const { return attotime(m_sample_subs); }
 
 	// return the attotime of the current end of buffer
 	attotime end_time() const { return index_time(m_end_sample); }
@@ -143,7 +143,7 @@ private:
 	void set_end_time(attotime time)
 	{
 		m_end_second = time.seconds();
-		m_end_sample = u32(time.attoseconds() / m_sample_attos);
+		m_end_sample = u32(time.raw_subseconds() / m_sample_subs);
 	}
 
 	// return the effective buffer size; currently it is a full second of audio
@@ -203,7 +203,7 @@ private:
 	u32 m_end_second;                     // current full second of the buffer end
 	u32 m_end_sample;                     // current sample number within the final second
 	u32 m_sample_rate;                    // sample rate of the data in the buffer
-	attoseconds_t m_sample_attos;         // pre-computed attoseconds per sample
+	subseconds m_sample_subs;             // pre-computed subseconds per sample
 	std::vector<sample_t> m_buffer;       // vector of actual buffer data
 
 #if (SOUND_DEBUG)
@@ -290,8 +290,8 @@ public:
 	// return the sample rate of the data
 	u32 sample_rate() const { return m_buffer->sample_rate(); }
 
-	// return the sample period (in attoseconds) of the data
-	attoseconds_t sample_period_attoseconds() const { return m_buffer->sample_period_attoseconds(); }
+	// return the sample period (in subseconds) of the data
+	subseconds sample_period_subseconds() const { return m_buffer->sample_period_subseconds(); }
 	attotime sample_period() const { return m_buffer->sample_period(); }
 
 	// return the number of samples represented by the buffer
@@ -628,8 +628,8 @@ public:
 	// sample rate and timing getters
 	u32 sample_rate() const { return (m_pending_sample_rate != SAMPLE_RATE_INVALID) ? m_pending_sample_rate : m_sample_rate; }
 	attotime sample_time() const { return m_output[0].end_time(); }
-	attotime sample_period() const { return attotime(0, sample_period_attoseconds()); }
-	attoseconds_t sample_period_attoseconds() const { return (m_sample_rate != SAMPLE_RATE_INVALID) ? HZ_TO_ATTOSECONDS(m_sample_rate) : ATTOSECONDS_PER_SECOND; }
+	attotime sample_period() const { return attotime(sample_period_subseconds()); }
+	subseconds sample_period_subseconds() const { return (m_sample_rate != SAMPLE_RATE_INVALID) ? subseconds::from_hz(m_sample_rate) : subseconds::max(); }
 
 	// set the sample rate of the stream; will kick in at the next global update
 	void set_sample_rate(u32 sample_rate);

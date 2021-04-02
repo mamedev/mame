@@ -1702,7 +1702,7 @@ void kaneko16_berlwall_state::berlwall(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0, 256-1, 16, 240-1);
 	m_screen->set_screen_update(FUNC(kaneko16_berlwall_state::screen_update));
@@ -1764,7 +1764,7 @@ void kaneko16_state::bakubrkr(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(59);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0, 256-1, 16, 240-1);
 	m_screen->set_screen_update(FUNC(kaneko16_state::screen_update));
@@ -1835,7 +1835,7 @@ void kaneko16_state::blazeon(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	m_screen->set_size(320, 240);
 	m_screen->set_visarea(0, 320-1, 0, 240-1 -8);
 	m_screen->set_screen_update(FUNC(kaneko16_state::screen_update));
@@ -1889,7 +1889,7 @@ void kaneko16_state::wingforc(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(59.1854);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	m_screen->set_size(320, 240);
 	m_screen->set_visarea(0, 320-1, 0, 240-1 -16);
 	m_screen->set_screen_update(FUNC(kaneko16_state::screen_update));
@@ -1968,7 +1968,7 @@ void kaneko16_gtmr_state::gtmr(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	m_screen->set_size(320, 240);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(kaneko16_gtmr_state::screen_update));
@@ -2080,7 +2080,7 @@ void kaneko16_state::mgcrystl(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0, 256-1, 0+16, 256-16-1);
 	m_screen->set_screen_update(FUNC(kaneko16_state::screen_update));
@@ -2198,7 +2198,7 @@ void kaneko16_shogwarr_state::shogwarr(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(59.1854);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(320, 240);
 	m_screen->set_visarea(40, 296-1, 16, 240-1);
 	m_screen->set_screen_update(FUNC(kaneko16_shogwarr_state::screen_update));

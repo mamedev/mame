@@ -191,7 +191,7 @@ void palm_state::palm(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1260));
+	screen.set_vblank_time(subseconds::from_usec(1260));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_size(160, 220);
 	screen.set_visarea(0, 159, 0, 219);

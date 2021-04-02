@@ -652,7 +652,7 @@ void fastinvaders_state::fastinvaders(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_size(64*16, 32*16);
 	screen.set_visarea(0*16, 40*16-1, 0*14, 19*14-1);
 	screen.set_screen_update(FUNC(fastinvaders_state::screen_update));

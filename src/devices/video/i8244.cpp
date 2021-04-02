@@ -58,7 +58,7 @@ void i8244_device::device_config_complete()
 	if (!has_screen())
 		return;
 
-	if (!screen().refresh_attoseconds())
+	if (screen().refresh_subseconds().is_zero())
 		screen().set_raw(clock()*2, m_htotal, m_cropx, m_cropx + m_width, m_vtotal, m_cropy, m_cropy + m_height);
 }
 

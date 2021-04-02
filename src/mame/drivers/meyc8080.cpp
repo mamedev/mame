@@ -596,7 +596,7 @@ void meyc8080_state::meyc8080(machine_config &config)
 	screen.set_size(256, 256);
 	screen.set_visarea(0*8, 32*8-1, 4*8, 32*8-1);
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	screen.set_screen_update(FUNC(meyc8080_state::screen_update_meyc8080));
 
 	/* audio hardware */

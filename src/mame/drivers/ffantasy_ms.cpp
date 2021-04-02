@@ -90,7 +90,7 @@ void ffantasy_ms_state::ffantasym(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // all wrong
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0, 256-1, 0, 256-32-1);
 	m_screen->set_screen_update(FUNC(ffantasy_ms_state::screen_update));

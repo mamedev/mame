@@ -239,7 +239,7 @@ void m57_state::m57(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(57);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1790)   /* accurate frequency, measured on a Moon Patrol board, is 56.75Hz. */);
+	screen.set_vblank_time(subseconds::from_usec(1790)   /* accurate frequency, measured on a Moon Patrol board, is 56.75Hz. */);
 				/* the Lode Runner manual (similar but different hardware) */
 				/* talks about 55Hz and 1790ms vblank duration. */
 	screen.set_size(32*8, 32*8);

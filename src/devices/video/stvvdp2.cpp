@@ -6331,12 +6331,12 @@ void saturn_state::stv_vdp2_dynamic_res_change( void )
 
 	{
 		int vblank_period,hblank_period;
-		attoseconds_t refresh;
+		subseconds refresh;
 		rectangle visarea(0, horz_res-1, 0, vert_res-1);
 
 		vblank_period = get_vblank_duration();
 		hblank_period = get_hblank_duration();
-		refresh  = HZ_TO_ATTOSECONDS(get_pixel_clock()) * (hblank_period) * vblank_period;
+		refresh  = subseconds::from_hz(get_pixel_clock()) * (hblank_period) * vblank_period;
 		//printf("%d %d %d %d\n",horz_res,vert_res,horz_res+hblank_period,vblank_period);
 
 		m_screen->configure(hblank_period, vblank_period, visarea, refresh );

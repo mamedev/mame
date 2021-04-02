@@ -606,7 +606,7 @@ void z88_state::z88(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(Z88_SCREEN_WIDTH, Z88_SCREEN_HEIGHT);
 	m_screen->set_visarea(0, (Z88_SCREEN_WIDTH - 1), 0, (Z88_SCREEN_HEIGHT - 1));
 	m_screen->set_palette(m_palette);

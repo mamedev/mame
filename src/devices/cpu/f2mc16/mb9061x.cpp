@@ -329,7 +329,7 @@ void mb9061x_device::tbtc_w(u8 data)
 	//printf("%02x to TBTC\n", data);
 //  if ((!(data & TBTC_TBR)) || ((data & (TBTC_TBC1|TBTC_TBC0)) != (m_tbtc & (TBTC_TBC1|TBTC_TBC0))))
 	{
-		m_tbtc_timer->adjust(attotime(0, ATTOSECONDS_IN_MSEC(periods[data & (TBTC_TBC1|TBTC_TBC0)])));
+		m_tbtc_timer->adjust(attotime::from_msec(periods[data & (TBTC_TBC1|TBTC_TBC0)]));
 
 		if (!(data & TBTC_TBR))
 		{

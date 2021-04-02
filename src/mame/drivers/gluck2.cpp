@@ -496,7 +496,7 @@ void gluck2_state::gluck2(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 
 /* CRTC Register:  00   01   02   03   04   05   06
    CRTC Value   : 0x27 0x20 0x23 0x03 0x26 0x00 0x20

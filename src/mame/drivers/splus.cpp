@@ -694,7 +694,7 @@ void splus_state::splus(machine_config &config) // basic machine hardware
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_screen_update(FUNC(splus_state::screen_update));
 	screen.set_size((52+1)*8, (31+1)*8);
 	screen.set_visarea(0*8, 40*8-1, 0*8, 25*8-1);

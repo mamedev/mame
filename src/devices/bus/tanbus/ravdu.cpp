@@ -32,7 +32,7 @@ void tanbus_ravdu_device::device_add_mconfig(machine_config &config)
 {
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_vblank_time(subseconds::from_usec(2500));
 	m_screen->set_size(1536, 624);
 	m_screen->set_visarea(0, 972 - 1, 0, 500 - 1);
 	//m_screen->set_screen_update("mc6845", FUNC(mc6845_device::screen_update)); // TODO: implement interlace in mc6845

@@ -158,7 +158,7 @@ void v99x8_device::device_config_complete()
 	if (!has_screen())
 		return;
 
-	if (!screen().refresh_attoseconds())
+	if (screen().refresh_subseconds().is_zero())
 		screen().set_raw(clock(),
 			HTOTAL,
 			0,
@@ -257,7 +257,7 @@ void v99x8_device::configure_pal_ntsc()
 		m_height = VTOTAL_PAL;
 		rectangle visible;
 		visible.set(0, HVISIBLE - 1, VERTICAL_ADJUST * 2, VVISIBLE_PAL * 2 - 1 - VERTICAL_ADJUST * 2);
-		screen().configure(HTOTAL, VTOTAL_PAL * 2, visible, HZ_TO_ATTOSECONDS(50.158974));
+		screen().configure(HTOTAL, VTOTAL_PAL * 2, visible, subseconds::from_hz(50.158974));
 	}
 	else
 	{
@@ -265,7 +265,7 @@ void v99x8_device::configure_pal_ntsc()
 		m_height = VTOTAL_NTSC;
 		rectangle visible;
 		visible.set(0, HVISIBLE - 1, VERTICAL_ADJUST * 2, VVISIBLE_NTSC * 2 - 1 - VERTICAL_ADJUST * 2);
-		screen().configure(HTOTAL, VTOTAL_NTSC * 2, visible, HZ_TO_ATTOSECONDS(59.922743));
+		screen().configure(HTOTAL, VTOTAL_NTSC * 2, visible, subseconds::from_hz(59.922743));
 	}
 	m_vblank_start = m_height - VERTICAL_SYNC - TOP_ERASE; /* Sync + top erase */
 }

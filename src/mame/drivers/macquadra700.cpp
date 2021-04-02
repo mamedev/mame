@@ -950,7 +950,7 @@ void macquadra_state::macqd700(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(75.08);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1260));
+	m_screen->set_vblank_time(subseconds::from_usec(1260));
 	m_screen->set_size(1152, 870);
 	m_screen->set_visarea(0, 1152-1, 0, 870-1);
 	m_screen->set_screen_update(FUNC(macquadra_state::screen_update_dafb));

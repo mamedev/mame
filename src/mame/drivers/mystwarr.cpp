@@ -945,7 +945,7 @@ void mystwarr_state::mystwarr(machine_config &config)
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 //  m_screen->set_refresh_hz(60);
 	m_screen->set_raw(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(600));
+	m_screen->set_vblank_time(subseconds::from_usec(600));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(24, 24+288-1, 16, 16+224-1);
 	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_mystwarr));
@@ -1006,7 +1006,7 @@ void mystwarr_state::viostorm(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, viostorm)
 
 	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_metamrph));
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(900));
+	m_screen->set_vblank_time(subseconds::from_usec(900));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(40, 40+384-1, 16, 16+224-1);
 
@@ -1033,7 +1033,7 @@ void mystwarr_state::metamrph(machine_config &config)
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, metamrph)
 	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_metamrph));
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(900));
+	m_screen->set_vblank_time(subseconds::from_usec(900));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(24, 24+288-1, 15, 15+224-1);
 
@@ -1062,7 +1062,7 @@ void mystwarr_state::dadandrn(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, dadandrn)
 
 	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_dadandrn));
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(600));
+	m_screen->set_vblank_time(subseconds::from_usec(600));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(24, 24+288-1, 17, 17+224-1);
 
@@ -1094,7 +1094,7 @@ void mystwarr_state::gaiapols(machine_config &config)
 
 	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_dadandrn));
 	m_screen->set_raw(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(600));
+	m_screen->set_vblank_time(subseconds::from_usec(600));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(40, 40+376-1, 16, 16+224-1);
 
@@ -1123,7 +1123,7 @@ void mystwarr_state::martchmp(machine_config &config)
 
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_martchmp));
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(32, 32+384-1, 16, 16+224-1);
 

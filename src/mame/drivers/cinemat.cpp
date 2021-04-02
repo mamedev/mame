@@ -259,10 +259,10 @@ u8 qb3_state::qb3_frame_r()
 {
 	attotime next_update = m_screen->time_until_update();
 	attotime frame_period = m_screen->frame_period();
-	int percent = next_update.attoseconds() / (frame_period.attoseconds() / 100);
+	double fraction = next_update.raw_subseconds().as_double() / frame_period.raw_subseconds().as_double();
 
 	/* note this is just an approximation... */
-	return (percent >= 10);
+	return (fraction >= 0.1);
 }
 
 

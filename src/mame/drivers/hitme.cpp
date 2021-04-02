@@ -192,7 +192,7 @@ void hitme_state::output_port_0_w(uint8_t data)
 	*/
 	uint8_t raw_game_speed = ioport("R3")->read();
 	double resistance = raw_game_speed * 25000 / 100;
-	attotime duration = attotime(0, ATTOSECONDS_PER_SECOND * 0.45 * 6.8e-6 * resistance * (data + 1));
+	attotime duration = attotime::from_double(0.45 * 6.8e-6 * resistance * (data + 1));
 	m_timeout_time = machine().time() + duration;
 
 	m_discrete->write(HITME_DOWNCOUNT_VAL, data);
@@ -325,7 +325,7 @@ void hitme_state::hitme(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(40*8, 19*10);
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 19*10-1);
 	m_screen->set_screen_update(FUNC(hitme_state::screen_update_hitme));

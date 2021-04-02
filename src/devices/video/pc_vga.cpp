@@ -1331,7 +1331,7 @@ uint8_t vga_device::crtc_reg_read(uint8_t index)
 void vga_device::recompute_params_clock(int divisor, int xtal)
 {
 	int vblank_period,hblank_period;
-	attoseconds_t refresh;
+	subseconds refresh;
 	uint8_t hclock_m = (!GRAPHIC_MODE) ? VGA_CH_WIDTH : 8;
 	int pixel_clock;
 
@@ -1347,7 +1347,7 @@ void vga_device::recompute_params_clock(int divisor, int xtal)
 	/* TODO: 10b and 11b settings aren't known */
 	pixel_clock = xtal / (((vga.sequencer.data[1]&8) >> 3) + 1);
 
-	refresh  = HZ_TO_ATTOSECONDS(pixel_clock) * (hblank_period) * vblank_period;
+	refresh  = subseconds::from_hz(pixel_clock) * (hblank_period) * vblank_period;
 	screen().configure((hblank_period), (vblank_period), visarea, refresh );
 	//popmessage("%d %d\n",vga.crtc.horz_total * 8,vga.crtc.vert_total);
 	m_vblank_timer->adjust( screen().time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );

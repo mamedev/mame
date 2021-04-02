@@ -159,7 +159,7 @@ void pangofun_state::pangofun(machine_config &config)
 	/* video hardware */
 	pcvideo_vga(config);
 	subdevice<screen_device>("screen")->set_refresh_hz(60);
-	subdevice<screen_device>("screen")->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	subdevice<screen_device>("screen")->set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 
 	pcat_common(config);
 }

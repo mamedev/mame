@@ -55,7 +55,7 @@ stream_buffer::stream_buffer(u32 sample_rate) :
 	m_end_second(0),
 	m_end_sample(0),
 	m_sample_rate(sample_rate),
-	m_sample_attos((sample_rate == 0) ? ATTOSECONDS_PER_SECOND : ((ATTOSECONDS_PER_SECOND + sample_rate - 1) / sample_rate)),
+	m_sample_subs((sample_rate == 0) ? subseconds::max() : subseconds::from_hz(sample_rate) + subseconds::min()),
 	m_buffer(sample_rate)
 {
 }
@@ -95,8 +95,8 @@ void stream_buffer::set_sample_rate(u32 rate, bool resample)
 	attotime prevend = end_time();
 
 	// compute the time and period of the new buffer
-	attotime newperiod = attotime(0, (ATTOSECONDS_PER_SECOND + rate - 1) / rate);
-	attotime newend = attotime(prevend.seconds(), (prevend.attoseconds() / newperiod.attoseconds()) * newperiod.attoseconds());
+	attotime newperiod = subseconds::from_hz(rate) + subseconds::min();
+	attotime newend = attotime(prevend.seconds(), (prevend.raw_subseconds() / newperiod.raw_subseconds()) * newperiod.raw_subseconds());
 
 	// buffer a short runway of previous samples; in order to support smooth
 	// sample rate changes (needed by, e.g., Q*Bert's Votrax), we buffer a few
@@ -138,7 +138,7 @@ void stream_buffer::set_sample_rate(u32 rate, bool resample)
 
 	// set the new rate
 	m_sample_rate = rate;
-	m_sample_attos = newperiod.attoseconds();
+	m_sample_subs = newperiod.raw_subseconds();
 
 	// compute the new end sample index based on the buffer time
 	m_end_sample = time_to_buffer_index(prevend, false, true);
@@ -229,7 +229,7 @@ void stream_buffer::flush_wav()
 attotime stream_buffer::index_time(s32 index) const
 {
 	index = clamp_index(index);
-	return attotime(m_end_second - ((index > m_end_sample) ? 1 : 0), index * m_sample_attos);
+	return attotime(m_end_second - ((index > m_end_sample) ? 1 : 0), index * m_sample_subs);
 }
 
 
@@ -241,7 +241,7 @@ attotime stream_buffer::index_time(s32 index) const
 u32 stream_buffer::time_to_buffer_index(attotime time, bool round_up, bool allow_expansion)
 {
 	// compute the sample index within the second
-	int sample = (time.attoseconds() + (round_up ? (m_sample_attos - 1) : 0)) / m_sample_attos;
+	int sample = (time.raw_subseconds() + subseconds::from_raw(round_up ? (m_sample_subs.raw() - 1) : 0)) / m_sample_subs;
 	sound_assert(sample >= 0 && sample <= size());
 
 	// if the time is past the current end, make it the end
@@ -874,7 +874,7 @@ void sound_stream::postload()
 void sound_stream::reprime_sync_timer()
 {
 	attotime curtime = m_device.machine().time();
-	attotime target = m_output[0].end_time() + attotime(0, 1);
+	attotime target = m_output[0].end_time() + subseconds::min();
 	m_sync_timer.adjust(target - curtime);
 }
 
@@ -987,7 +987,7 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 	// compute the fractional input start position
 	attotime delta = output_start - (rebased.start_time() + latency);
 	sound_assert(delta.seconds() == 0);
-	stream_buffer::sample_t srcpos = stream_buffer::sample_t(double(delta.attoseconds()) / double(rebased.sample_period_attoseconds()));
+	stream_buffer::sample_t srcpos = stream_buffer::sample_t(delta.raw_subseconds().as_double() / rebased.sample_period_subseconds().as_double());
 	sound_assert(srcpos <= 1.0f);
 
 	// input is undersampled: point sample except where our sample period covers a boundary
@@ -1464,11 +1464,11 @@ void sound_manager::update()
 	sound_assert(update_period.seconds() == 0);
 
 	// use that to compute the number of samples we need from the speakers
-	attoseconds_t sample_rate_attos = HZ_TO_ATTOSECONDS(machine().sample_rate());
-	m_samples_this_update = update_period.attoseconds() / sample_rate_attos;
+	subseconds sample_rate_sub = subseconds::from_hz(machine().sample_rate());
+	m_samples_this_update = update_period.raw_subseconds() / sample_rate_sub;
 
 	// recompute the end time to an even sample boundary
-	attotime endtime = m_last_update + attotime(0, m_samples_this_update * sample_rate_attos);
+	attotime endtime = m_last_update + m_samples_this_update * sample_rate_sub;
 
 	// clear out the mix bufers
 	std::fill_n(&m_leftmix[0], m_samples_this_update, 0);

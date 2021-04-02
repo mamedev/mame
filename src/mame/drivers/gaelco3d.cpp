@@ -959,7 +959,7 @@ void gaelco3d_state::gaelco3d(machine_config &config)
 	// Video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // Not accurate
+	m_screen->set_vblank_time(subseconds::from_usec(2500)); // Not accurate
 	m_screen->set_size(576, 432);
 	m_screen->set_visarea(0, 575, 0, 431);
 	m_screen->set_screen_update(FUNC(gaelco3d_state::screen_update));

@@ -1626,7 +1626,7 @@ void alto2_cpu_device::disk_bitclk(void* ptr, int32_t arg)
 		m_bitclk_index = arg;
 	} else {
 		// stop the bitclock timer
-		m_bitclk_time = -1;
+		m_bitclk_time = ucycle_subs() - subseconds::min();
 	}
 }
 
@@ -1639,11 +1639,11 @@ void alto2_cpu_device::next_sector(int unit)
 {
 	diablo_hd_device* dhd = m_drive[unit];
 	LOG((this,LOG_DISK,0,"%s dhd=%p\n", __FUNCTION__, dhd));
-	// get bit time in attoseconds
-	m_dsk.bitclk_time[unit] = dhd->bit_time().as_attoseconds();
-	if (m_bitclk_time >= 0) {
+	// get bit time in subseconds
+	m_dsk.bitclk_time[unit] = dhd->bit_time().as_subseconds();
+	if (m_bitclk_time >= ucycle_subs()) {
 		LOG((this,LOG_DISK,0,"   unit #%d stop bitclk\n", unit));
-		m_bitclk_time = -1;
+		m_bitclk_time = ucycle_subs() - subseconds::min();
 		m_bitclk_index = -1;
 	}
 
@@ -1661,7 +1661,7 @@ void alto2_cpu_device::next_sector(int unit)
 	if (debug_read_mem(0521))
 	{
 		// Make the CPU execution loop call disk_bitclk
-		m_bitclk_time = 0;
+		m_bitclk_time = ucycle_subs();
 		m_bitclk_index = 0;
 	}
 }
@@ -1761,8 +1761,8 @@ void alto2_cpu_device::init_disk()
 	m_dsk.ready_timer = timer_alloc(*this, FUNC(alto2_cpu_device::disk_ready_mf31a));
 	m_dsk.ready_timer->reset();
 
-	m_dsk.bitclk_time[0] = static_cast<int>(attotime::from_nsec(300).as_attoseconds() / 1000000);
-	m_dsk.bitclk_time[1] = static_cast<int>(attotime::from_nsec(300).as_attoseconds() / 1000000);
+	m_dsk.bitclk_time[0] = subseconds::from_nsec(300) / 1000000;
+	m_dsk.bitclk_time[1] = subseconds::from_nsec(300) / 1000000;
 }
 
 /**
@@ -1797,8 +1797,8 @@ void alto2_cpu_device::reset_disk()
 	m_dsk.strobe = 0;
 	m_dsk.strobon_timer->reset();
 	m_dsk.bitclk = 0;
-	m_dsk.bitclk_time[0] = attotime::from_nsec(300).as_attoseconds();
-	m_dsk.bitclk_time[1] = attotime::from_nsec(300).as_attoseconds();
+	m_dsk.bitclk_time[0] = subseconds::from_nsec(300);
+	m_dsk.bitclk_time[1] = subseconds::from_nsec(300);
 	m_dsk.datin = 0;
 	m_dsk.bitcount = 0;
 	m_dsk.seclate = 0;

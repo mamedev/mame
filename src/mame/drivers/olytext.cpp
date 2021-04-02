@@ -159,7 +159,7 @@ void olytext_state::olytext(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(80*8, 28*11);
 	screen.set_visarea(0, (80*8)-1, 0, (28*11)-1);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(olytext_state::screen_update));
 	//screen.set_palette("palette");
 	PALETTE(config, "palette", palette_device::MONOCHROME);

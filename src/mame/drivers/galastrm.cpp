@@ -203,7 +203,7 @@ void galastrm_state::galastrm(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(64*8, 50*8);
 	m_screen->set_visarea(0+96, 40*8-1+96, 3*8+60, 32*8-1+60);
 	m_screen->set_screen_update(FUNC(galastrm_state::screen_update));

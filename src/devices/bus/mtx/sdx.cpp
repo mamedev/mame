@@ -152,7 +152,7 @@ void mtx_sdxcpm_device::device_add_mconfig(machine_config &config)
 
 	/* 80 column video card - required to be installed in MTX internally */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	m_screen->set_refresh_hz(50);
 	m_screen->set_size(960, 313);
 	m_screen->set_visarea(00, 640 - 1, 0, 240 - 1);

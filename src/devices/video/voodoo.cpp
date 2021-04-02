@@ -1473,7 +1473,7 @@ void voodoo_device::swap_buffers(voodoo_device *vd)
 void voodoo_device::adjust_vblank_timer()
 {
 	attotime vblank_period = m_screen->time_until_pos(fbi.vsyncstart);
-	if (LOG_VBLANK_SWAP) logerror("adjust_vblank_timer: period: %s\n", vblank_period.as_string());
+	if (LOG_VBLANK_SWAP) logerror("adjust_vblank_timer: period: %s\n", vblank_period.as_string(18));
 	/* if zero, adjust to next frame, otherwise we may get stuck in an infinite loop */
 	if (vblank_period == attotime::zero)
 		vblank_period = m_screen->frame_period();
@@ -2598,13 +2598,12 @@ void voodoo_device::cmdfifo_w(voodoo_device *vd, cmdfifo_info *f, offs_t offset,
 		if (cycles > 0)
 		{
 			vd->pci.op_pending = true;
-			vd->pci.op_end_time = vd->machine().time() + attotime(0, (attoseconds_t)cycles * vd->attoseconds_per_cycle);
+			vd->pci.op_end_time = vd->machine().time() + cycles * vd->subseconds_per_cycle;
 
 			if (LOG_FIFO_VERBOSE)
 			{
-				vd->logerror("VOODOO.FIFO:direct write start at %d.%018d end at %d.%018d\n",
-						vd->machine().time().seconds(), vd->machine().time().attoseconds(),
-						vd->pci.op_end_time.seconds(), vd->pci.op_end_time.attoseconds());
+				vd->logerror("VOODOO.FIFO:direct write start at %s end at %s\n",
+						vd->machine().time().as_string(18), vd->pci.op_end_time.as_string(18));
 			}
 		}
 	}
@@ -3126,9 +3125,9 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 				if (vd->reg[hSync].u != 0 && vd->reg[vSync].u != 0 && vd->reg[videoDimensions].u != 0)
 				{
 					int hvis, vvis, htotal, vtotal, hbp, vbp;
-					attoseconds_t refresh = vd->m_screen->frame_period().attoseconds();
-					attoseconds_t stdperiod, medperiod, vgaperiod;
-					attoseconds_t stddiff, meddiff, vgadiff;
+					subseconds refresh = vd->m_screen->frame_period_subseconds();
+					subseconds stdperiod, medperiod, vgaperiod;
+					subseconds stddiff, meddiff, vgadiff;
 					rectangle visarea;
 
 					if (vd->vd_type == TYPE_VOODOO_2)
@@ -3158,17 +3157,14 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 					visarea.max_y = (std::min)(visarea.max_y, vtotal - 1);
 
 					/* compute the new period for standard res, medium res, and VGA res */
-					stdperiod = HZ_TO_ATTOSECONDS(15750) * vtotal;
-					medperiod = HZ_TO_ATTOSECONDS(25000) * vtotal;
-					vgaperiod = HZ_TO_ATTOSECONDS(31500) * vtotal;
+					stdperiod = subseconds::from_hz(15750) * vtotal;
+					medperiod = subseconds::from_hz(25000) * vtotal;
+					vgaperiod = subseconds::from_hz(31500) * vtotal;
 
 					/* compute a diff against the current refresh period */
-					stddiff = stdperiod - refresh;
-					if (stddiff < 0) stddiff = -stddiff;
-					meddiff = medperiod - refresh;
-					if (meddiff < 0) meddiff = -meddiff;
-					vgadiff = vgaperiod - refresh;
-					if (vgadiff < 0) vgadiff = -vgadiff;
+					stddiff = (stdperiod >= refresh) ? (stdperiod - refresh) : (refresh - stdperiod);
+					meddiff = (medperiod >= refresh) ? (medperiod - refresh) : (refresh - medperiod);
+					vgadiff = (vgaperiod >= refresh) ? (vgaperiod - refresh) : (refresh - vgaperiod);
 
 					osd_printf_debug("hSync=%08X  vSync=%08X  backPorch=%08X  videoDimensions=%08X\n",
 						vd->reg[hSync].u, vd->reg[vSync].u, vd->reg[backPorch].u, vd->reg[videoDimensions].u);
@@ -3178,17 +3174,17 @@ int32_t voodoo_device::register_w(voodoo_device *vd, offs_t offset, uint32_t dat
 					if (stddiff < meddiff && stddiff < vgadiff)
 					{
 						vd->m_screen->configure(htotal, vtotal, visarea, stdperiod);
-						osd_printf_debug("Standard resolution, %f Hz\n", ATTOSECONDS_TO_HZ(stdperiod));
+						osd_printf_debug("Standard resolution, %f Hz\n", stdperiod.as_hz());
 					}
 					else if (meddiff < vgadiff)
 					{
 						vd->m_screen->configure(htotal, vtotal, visarea, medperiod);
-						osd_printf_debug("Medium resolution, %f Hz\n", ATTOSECONDS_TO_HZ(medperiod));
+						osd_printf_debug("Medium resolution, %f Hz\n", medperiod.as_hz());
 					}
 					else
 					{
 						vd->m_screen->configure(htotal, vtotal, visarea, vgaperiod);
-						osd_printf_debug("VGA resolution, %f Hz\n", ATTOSECONDS_TO_HZ(vgaperiod));
+						osd_printf_debug("VGA resolution, %f Hz\n", vgaperiod.as_hz());
 					}
 
 					/* configure the new framebuffer info */
@@ -4122,9 +4118,8 @@ void voodoo_device::flush_fifos(voodoo_device *vd, attotime current_time)
 
 	if (LOG_FIFO_VERBOSE)
 	{
-		vd->logerror("VOODOO.FIFO:flush_fifos start -- pending=%d.%018d cur=%d.%018d\n",
-				vd->pci.op_end_time.seconds(), vd->pci.op_end_time.attoseconds(),
-				current_time.seconds(), current_time.attoseconds());
+		vd->logerror("VOODOO.FIFO:flush_fifos start -- pending=%s cur=%s\n",
+				vd->pci.op_end_time.as_string(18), current_time.as_string(18));
 	}
 
 	/* loop while we still have cycles to burn */
@@ -4219,20 +4214,19 @@ void voodoo_device::flush_fifos(voodoo_device *vd, attotime current_time)
 		cycles += extra_cycles;
 
 		/* account for those cycles */
-		vd->pci.op_end_time += attotime(0, (attoseconds_t)cycles * vd->attoseconds_per_cycle);
+		vd->pci.op_end_time += cycles * vd->subseconds_per_cycle;
 
 		if (LOG_FIFO_VERBOSE)
 		{
-			vd->logerror("VOODOO.FIFO:update -- pending=%d.%018d cur=%d.%018d\n",
-					vd->pci.op_end_time.seconds(), vd->pci.op_end_time.attoseconds(),
-					current_time.seconds(), current_time.attoseconds());
+			vd->logerror("VOODOO.FIFO:update -- pending=%s cur=%s\n",
+					vd->pci.op_end_time.as_string(18), current_time.as_string(18));
 		}
 	}
 
 	if (LOG_FIFO_VERBOSE)
 	{
-		vd->logerror("VOODOO.FIFO:flush_fifos end -- pending command complete at %d.%018d\n",
-				vd->pci.op_end_time.seconds(), vd->pci.op_end_time.attoseconds());
+		vd->logerror("VOODOO.FIFO:flush_fifos end -- pending command complete at %s\n",
+				vd->pci.op_end_time.as_string());
 	}
 
 	in_flush = false;
@@ -4342,13 +4336,13 @@ void voodoo_device::voodoo_w(offs_t offset, u32 data, u32 mem_mask)
 		if (cycles)
 		{
 			pci.op_pending = true;
-			pci.op_end_time = machine().time() + attotime(0, (attoseconds_t)cycles * attoseconds_per_cycle);
+			pci.op_end_time = machine().time() + cycles * subseconds_per_cycle;
 
 			if (LOG_FIFO_VERBOSE)
 			{
-				logerror("VOODOO.FIFO:direct write start at %d.%018d end at %d.%018d\n",
-						machine().time().seconds(), machine().time().attoseconds(),
-						pci.op_end_time.seconds(), pci.op_end_time.attoseconds());
+				logerror("VOODOO.FIFO:direct write start at %s end at %s\n",
+						machine().time().as_string(18),
+						pci.op_end_time.as_string(18));
 			}
 		}
 		g_profiler.stop();
@@ -5568,7 +5562,7 @@ void voodoo_banshee_device::banshee_io_w(offs_t offset, u32 data, u32 mem_mask)
 					htotal, vtotal, vstart, vstop, width, height, 1.0 / frame_period);
 			if (htotal > 0 && vtotal > 0) {
 				rectangle visarea(0, width - 1, 0, height - 1);
-				m_screen->configure(htotal, vtotal, visarea, DOUBLE_TO_ATTOSECONDS(frame_period));
+				m_screen->configure(htotal, vtotal, visarea, subseconds::from_double(frame_period));
 
 				// Set the vsync start and stop
 				fbi.vsyncstart = vstart;
@@ -5736,7 +5730,7 @@ void voodoo_device::device_start()
 		tmu_config |= 0xc0;  // two TMUs
 
 	chipmask = 0x01;
-	attoseconds_per_cycle = ATTOSECONDS_PER_SECOND / freq;
+	subseconds_per_cycle = subseconds::from_hz(freq);
 	trigger = 51324 + index;
 
 	/* build the rasterizer table */
@@ -6471,7 +6465,7 @@ voodoo_device::voodoo_device(const machine_config &mconfig, device_type type, co
 	, vd_type(vdt)
 	, chipmask(0)
 	, freq(0)
-	, attoseconds_per_cycle(0)
+	, subseconds_per_cycle()
 	, extra_cycles(0)
 	, trigger(0)
 	, regaccess(nullptr)

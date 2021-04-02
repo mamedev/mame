@@ -1738,7 +1738,7 @@ void pet_state::pet(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_vblank_time(subseconds::from_usec(2500));
 	m_screen->set_size(320, 200);
 	m_screen->set_visarea(0, 320-1, 0, 200-1);
 	m_screen->set_screen_update(FUNC(pet_state::screen_update));
@@ -1795,7 +1795,7 @@ void pet_state::cbm3000(machine_config &config)
 	pet2001n(config, false);
 	// video hardware
 	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_vblank_time(subseconds::from_usec(2500));
 	m_screen->set_size(320, 200);
 	m_screen->set_visarea(0, 320-1, 0, 200-1);
 	m_screen->set_screen_update(FUNC(pet_state::screen_update));
@@ -1849,7 +1849,7 @@ void pet2001b_state::cbm3032b(machine_config &config)
 	pet2001b(config);
 	// video hardware
 	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_vblank_time(subseconds::from_usec(2500));
 	m_screen->set_size(320, 200);
 	m_screen->set_visarea(0, 320-1, 0, 200-1);
 	m_screen->set_screen_update(FUNC(pet_state::screen_update));
@@ -1885,7 +1885,7 @@ void pet2001b_state::pet4032f(machine_config &config)
 
 	// video hardware
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_vblank_time(subseconds::from_usec(2500));
 	m_screen->set_size(320, 250);
 	m_screen->set_visarea(0, 320 - 1, 0, 250 - 1);
 	m_screen->set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
@@ -1912,7 +1912,7 @@ void pet_state::cbm4000(machine_config &config)
 	pet2001n(config, false);
 	// video hardware
 	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_vblank_time(subseconds::from_usec(2500));
 	m_screen->set_size(320, 200);
 	m_screen->set_visarea(0, 320-1, 0, 200-1);
 	m_screen->set_screen_update(FUNC(pet_state::screen_update));
@@ -1941,7 +1941,7 @@ void pet_state::cbm4032f(machine_config &config)
 
 	// video hardware
 	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_vblank_time(subseconds::from_usec(2500));
 	m_screen->set_size(320, 250);
 	m_screen->set_visarea(0, 320 - 1, 0, 250 - 1);
 	m_screen->set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
@@ -1979,7 +1979,7 @@ void pet2001b_state::cbm4000b(machine_config &config)
 	pet2001b(config, false);
 	// video hardware
 	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_vblank_time(subseconds::from_usec(2500));
 	m_screen->set_size(320, 200);
 	m_screen->set_visarea(0, 320-1, 0, 200-1);
 	m_screen->set_screen_update(FUNC(pet_state::screen_update));
@@ -2007,7 +2007,7 @@ void pet80_state::pet80(machine_config &config)
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_size(640, 250);
 	screen.set_visarea(0, 640 - 1, 0, 250 - 1);
 	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));

@@ -783,7 +783,7 @@ void prestige_state::prestige_base(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(prestige_state::screen_update_1bpp));
 	screen.set_size(240, 100);
 	screen.set_visarea(0, 240-1, 0, 100-1);

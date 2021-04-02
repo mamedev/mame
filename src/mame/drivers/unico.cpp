@@ -572,7 +572,7 @@ void unico_state::burglarx(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(384, 224);
 	screen.set_visarea(0, 384-1, 0, 224-1);
 	screen.set_screen_update(FUNC(unico_state::screen_update));
@@ -616,7 +616,7 @@ void zeropnt_state::zeropnt(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(384, 224);
 	m_screen->set_visarea(0, 384-1, 0, 224-1);
 	m_screen->set_screen_update(FUNC(zeropnt_state::screen_update));
@@ -663,7 +663,7 @@ void zeropnt2_state::zeropnt2(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(384, 224);
 	m_screen->set_visarea(0, 384-1, 0, 224-1);
 	m_screen->set_screen_update(FUNC(zeropnt2_state::screen_update));

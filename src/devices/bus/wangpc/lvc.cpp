@@ -122,7 +122,7 @@ void wangpc_lvc_device::device_add_mconfig(machine_config &config)
 	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
 	screen.set_size(80*8, 25*9);
 	screen.set_visarea(0, 80*8-1, 0, 25*9-1);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_refresh_hz(60);
 
 	MC6845_1(config, m_crtc, XTAL(14'318'181)/16);

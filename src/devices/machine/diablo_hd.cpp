@@ -1352,11 +1352,11 @@ void diablo_hd_device::device_reset()
 	}
 	LOG_DRIVE(0,"[DHD%u]   m_handle            : %p\n", m_unit, reinterpret_cast<void const *>(m_handle));
 	LOG_DRIVE(0,"[DHD%u]   m_disk              : %p\n", m_unit, reinterpret_cast<void const *>(m_disk));
-	LOG_DRIVE(0,"[DHD%u]   rotation time       : %.0fns\n", m_unit, m_rotation_time.as_double() * ATTOSECONDS_PER_NANOSECOND);
-	LOG_DRIVE(0,"[DHD%u]   sector time         : %.0fns\n", m_unit, m_sector_time.as_double() * ATTOSECONDS_PER_NANOSECOND);
-	LOG_DRIVE(0,"[DHD%u]   sector mark 0 time  : %.0fns\n", m_unit, m_sector_mark_0_time.as_double() * ATTOSECONDS_PER_NANOSECOND);
-	LOG_DRIVE(0,"[DHD%u]   sector mark 1 time  : %.0fns\n", m_unit, m_sector_mark_1_time.as_double() * ATTOSECONDS_PER_NANOSECOND);
-	LOG_DRIVE(0,"[DHD%u]   bit time            : %.0fns\n", m_unit, m_bit_time.as_double() * ATTOSECONDS_PER_NANOSECOND);
+	LOG_DRIVE(0,"[DHD%u]   rotation time       : %.0fns\n", m_unit, m_rotation_time.as_nsec());
+	LOG_DRIVE(0,"[DHD%u]   sector time         : %.0fns\n", m_unit, m_sector_time.as_nsec());
+	LOG_DRIVE(0,"[DHD%u]   sector mark 0 time  : %.0fns\n", m_unit, m_sector_mark_0_time.as_nsec());
+	LOG_DRIVE(0,"[DHD%u]   sector mark 1 time  : %.0fns\n", m_unit, m_sector_mark_1_time.as_nsec());
+	LOG_DRIVE(0,"[DHD%u]   bit time            : %.0fns\n", m_unit, m_bit_time.as_nsec());
 
 	m_s_r_w_0 = 1;                  // deassert seek/read/write ready
 	m_ready_0 = 1;                  // deassert drive ready
@@ -1406,7 +1406,7 @@ void diablo_hd_device::device_reset()
  */
 void diablo_hd_device::device_timer(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 {
-	LOG_DRIVE(9,"[DHD%u]   TIMER id=%d param=%d ptr=%p @%.0fns\n", m_unit, id, param, ptr, timer.elapsed().as_double() * ATTOSECONDS_PER_NANOSECOND);
+	LOG_DRIVE(9,"[DHD%u]   TIMER id=%d param=%d ptr=%p @%.0fns\n", m_unit, id, param, ptr, timer.elapsed().as_nsec());
 	if (!m_disk)
 		return;
 

@@ -559,7 +559,7 @@ void vp10x_state::vp101(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(vp10x_state::screen_update));
 	screen.set_size(320, 240);
 	screen.set_visarea(0, 319, 0, 239);
@@ -579,7 +579,7 @@ void vp10x_state::vp50(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(vp10x_state::vp50_screen_update));
 	screen.set_size(400, 240);
 	screen.set_visarea(0, 399, 0, 239);

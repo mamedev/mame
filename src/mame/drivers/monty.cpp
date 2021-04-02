@@ -243,7 +243,7 @@ void monty_state::monty(machine_config &config)
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(0);
+	screen.set_vblank_time(subseconds::zero());
 	screen.set_size(40+8+1, 32+1);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(monty_state::screen_update));

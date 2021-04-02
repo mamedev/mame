@@ -909,7 +909,7 @@ void rex6000_state::rex6000(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(rex6000_state::screen_update));
 	screen.set_size(240, 120);
 	screen.set_visarea(0, 240-1, 0, 120-1);
@@ -987,7 +987,7 @@ void oz750_state::oz750(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(oz750_state::screen_update_oz));
 	screen.set_size(240, 80);
 	screen.set_visarea(0, 240-1, 0, 80-1);

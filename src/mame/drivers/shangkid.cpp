@@ -390,7 +390,7 @@ void chinhero_state::chinhero(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_vblank_time(subseconds::from_usec(2500)); // not accurate
 	screen.set_size(40 * 8, 28 * 8);
 	screen.set_visarea(16, 319 - 16, 0, 223);
 	screen.set_screen_update(FUNC(chinhero_state::screen_update));
@@ -475,7 +475,7 @@ void dynamski_state::dynamski(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_vblank_time(subseconds::from_usec(2500)); // not accurate
 	screen.set_size(256+32, 256);
 	screen.set_visarea(0, 255+32, 16, 255-16);
 	screen.set_screen_update(FUNC(dynamski_state::screen_update));

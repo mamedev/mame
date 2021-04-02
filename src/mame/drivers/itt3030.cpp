@@ -718,7 +718,7 @@ void itt3030_state::itt3030(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(250));
+	m_screen->set_vblank_time(subseconds::from_usec(250));
 	m_screen->set_screen_update(FUNC(itt3030_state::screen_update));
 	m_screen->set_size(80*8, 24*12);
 	m_screen->set_visarea(0, 80*8-1, 0, 24*12-1);

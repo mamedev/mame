@@ -684,7 +684,7 @@ void jaguar_state::tom_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 					if (hperiod != 0 && vperiod != 0 && hbend < hbstart && vbend < vbstart && hbstart < hperiod)
 					{
 						rectangle visarea(hbend / 2, hbstart / 2 - 1, vbend / 2, vbstart / 2 - 1);
-						m_screen->configure(hperiod / 2, vperiod / 2, visarea, HZ_TO_ATTOSECONDS(double(m_pixel_clock) * 2 / hperiod / vperiod));
+						m_screen->configure(hperiod / 2, vperiod / 2, visarea, subseconds::from_hz(double(m_pixel_clock) * 2 / hperiod / vperiod));
 					}
 				}
 				break;

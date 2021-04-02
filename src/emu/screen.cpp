@@ -531,8 +531,6 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	, m_orientation(ROT0)
 	, m_phys_aspect(0U, 0U)
 	, m_oldstyle_vblank_supplied(false)
-	, m_refresh(0)
-	, m_vblank(0)
 	, m_xoffset(0.0f)
 	, m_yoffset(0.0f)
 	, m_xscale(1.0f)
@@ -557,12 +555,9 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	, m_partial_scan_hpos(-1)
 	, m_color(rgb_t(0xff, 0xff, 0xff, 0xff))
 	, m_brightness(0xff)
-	, m_frame_period(DEFAULT_FRAME_PERIOD.as_attoseconds())
-	, m_scantime(1)
-	, m_pixeltime(1)
-	, m_vblank_period(0)
-	, m_vblank_start_time(attotime::zero)
-	, m_vblank_end_time(attotime::zero)
+	, m_frame_period(DEFAULT_FRAME_PERIOD.as_subseconds())
+	, m_scantime(subseconds::min())
+	, m_pixeltime(subseconds::min())
 	, m_frame_number(0)
 	, m_partial_updates_this_frame(0)
 {
@@ -680,7 +675,7 @@ void screen_device::device_validity_check(validity_checker &valid) const
 	}
 
 	// check for zero frame rate
-	if (m_refresh == 0)
+	if (m_refresh.is_zero())
 		osd_printf_error("Invalid (zero) refresh rate\n");
 
 	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
@@ -845,7 +840,7 @@ void screen_device::device_start()
 
 	// reset VBLANK timing
 	m_vblank_start_time = attotime::zero;
-	m_vblank_end_time = attotime(0, m_vblank_period);
+	m_vblank_end_time = attotime(m_vblank_period);
 
 	// start the timer to generate per-scanline updates
 	if ((m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0 || m_scanline_cb)
@@ -971,7 +966,7 @@ void screen_device::device_timer(timer_instance const &timer, device_timer_id id
 //  configure - configure screen parameters
 //-------------------------------------------------
 
-void screen_device::configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period)
+void screen_device::configure(int width, int height, const rectangle &visarea, subseconds frame_period)
 {
 	// validate arguments
 	assert(width > 0);
@@ -982,7 +977,6 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 //  assert(visarea.bottom() < height);
 	assert(m_type == SCREEN_TYPE_VECTOR || m_type == SCREEN_TYPE_SVG || visarea.left() < width);
 	assert(m_type == SCREEN_TYPE_VECTOR || m_type == SCREEN_TYPE_SVG || visarea.top() < height);
-	assert(frame_period > 0);
 
 	// fill in the new parameters
 	m_max_width = std::max(m_max_width, width);
@@ -1010,7 +1004,7 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 
 	// if the frame period was reduced so that we are now past the end of the frame,
 	// call the VBLANK start timer now; otherwise, adjust it for the future
-	attoseconds_t delta = (machine().time() - m_vblank_start_time).as_attoseconds();
+	subseconds delta = (machine().time() - m_vblank_start_time).as_subseconds();
 	if (delta >= m_frame_period)
 		vblank_begin();
 	else
@@ -1037,8 +1031,8 @@ void screen_device::reset_origin(int beamy, int beamx)
 {
 	// compute the effective VBLANK start/end times
 	attotime curtime = machine().time();
-	m_vblank_end_time = curtime - attotime(0, beamy * m_scantime + beamx * m_pixeltime);
-	m_vblank_start_time = m_vblank_end_time - attotime(0, m_vblank_period);
+	m_vblank_end_time = curtime - (beamy * m_scantime + beamx * m_pixeltime);
+	m_vblank_start_time = m_vblank_end_time - m_vblank_period;
 
 	// if we are resetting relative to (0,0) == VBLANK end, call the
 	// scanline 0 timer by hand now; otherwise, adjust it for the future
@@ -1505,14 +1499,13 @@ void screen_device::pixels(u32 *buffer)
 
 int screen_device::vpos() const
 {
-	attoseconds_t delta = (machine().time() - m_vblank_start_time).as_attoseconds();
-	int vpos;
+	subseconds delta = (machine().time() - m_vblank_start_time).as_subseconds();
 
 	// round to the nearest pixel
 	delta += m_pixeltime / 2;
 
 	// compute the v position relative to the start of VBLANK
-	vpos = delta / m_scantime;
+	int vpos = delta / m_scantime;
 
 	// adjust for the fact that VBLANK starts at the bottom of the visible area
 	return (m_visarea.bottom() + 1 + vpos) % m_height;
@@ -1526,7 +1519,7 @@ int screen_device::vpos() const
 
 int screen_device::hpos() const
 {
-	attoseconds_t delta = (machine().time() - m_vblank_start_time).as_attoseconds();
+	subseconds delta = (machine().time() - m_vblank_start_time).as_subseconds();
 
 	// round to the nearest pixel
 	delta += m_pixeltime / 2;
@@ -1559,17 +1552,17 @@ attotime screen_device::time_until_pos(int vpos, int hpos) const
 	vpos %= m_height;
 
 	// compute the delta for the given X,Y position
-	attoseconds_t targetdelta = (attoseconds_t)vpos * m_scantime + (attoseconds_t)hpos * m_pixeltime;
+	subseconds targetdelta = vpos * m_scantime + hpos * m_pixeltime;
 
 	// if we're past that time (within 1/2 of a pixel), head to the next frame
-	attoseconds_t curdelta = (machine().time() - m_vblank_start_time).as_attoseconds();
+	subseconds curdelta = (machine().time() - m_vblank_start_time).as_subseconds();
 	if (targetdelta <= curdelta + m_pixeltime / 2)
 		targetdelta += m_frame_period;
 	while (targetdelta <= curdelta)
 		targetdelta += m_frame_period;
 
 	// return the difference
-	return attotime(0, targetdelta - curdelta);
+	return attotime(targetdelta - curdelta);
 }
 
 
@@ -1585,7 +1578,7 @@ attotime screen_device::time_until_vblank_end() const
 	// if we are in the VBLANK region, compute the time until the end of the current VBLANK period
 	attotime target_time = m_vblank_end_time;
 	if (!vblank())
-		target_time += attotime(0, m_frame_period);
+		target_time += m_frame_period;
 	return target_time - machine().time();
 }
 
@@ -1636,7 +1629,7 @@ void screen_device::vblank_begin()
 {
 	// reset the starting VBLANK time
 	m_vblank_start_time = machine().time();
-	m_vblank_end_time = m_vblank_start_time + attotime(0, m_vblank_period);
+	m_vblank_end_time = m_vblank_start_time + m_vblank_period;
 
 	// if this is the primary screen and we need to update now
 	if (m_is_primary_screen && !(m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
@@ -1651,7 +1644,7 @@ void screen_device::vblank_begin()
 	m_vblank_begin_timer.adjust(time_until_vblank_start());
 
 	// if no VBLANK period, call the VBLANK end callback immediately, otherwise reset the timer
-	if (m_vblank_period == 0)
+	if (m_vblank_period.is_zero())
 		vblank_end();
 	else
 		m_vblank_end_timer.adjust(time_until_vblank_end());

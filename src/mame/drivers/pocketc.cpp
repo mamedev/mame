@@ -729,7 +729,7 @@ void pocketc_state::pocketc_base(machine_config &config)
 	// TODO: Convert to an SVG
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(20);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	m_screen->set_size(594, 273);
 	m_screen->set_visarea(0, 594-1, 0, 273-1);
 	m_screen->set_palette(m_palette);

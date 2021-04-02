@@ -1489,7 +1489,7 @@ void aerofgt_state::pspikes(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(61.31);  /* verified on pcb */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8+4, 44*8+4-1, 0*8, 30*8-1);
 	screen.set_screen_update(FUNC(aerofgt_state::screen_update_pspikes));
@@ -1542,7 +1542,7 @@ void aerofgt_state::spikes91(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 320-1, 0*8+4, 224+4-1);
 	screen.set_screen_update(FUNC(aerofgt_state::screen_update_spikes91));
@@ -1576,7 +1576,7 @@ void aerofgt_state::pspikesb(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8+4, 44*8+4-1, 0*8, 30*8-1);
 	screen.set_screen_update(FUNC(aerofgt_state::screen_update_pspikesb));
@@ -1620,7 +1620,7 @@ void aerofgt_state::kickball(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8+4, 44*8+4-1, 0*8, 30*8-1);
 	screen.set_screen_update(FUNC(aerofgt_state::screen_update_pspikes));
@@ -1666,7 +1666,7 @@ void aerofgt_state::pspikesc(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8+4, 44*8+4-1, 0*8, 30*8-1);
 	screen.set_screen_update(FUNC(aerofgt_state::screen_update_pspikes));
@@ -1708,7 +1708,7 @@ void aerofgt_state::karatblz(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(1*8, 45*8-1, 0*8, 30*8-1);
 	screen.set_screen_update(FUNC(aerofgt_state::screen_update_karatblz));
@@ -1764,7 +1764,7 @@ void aerofgt_state::karatblzbl(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(1*8, 45*8-1, 0*8, 30*8-1);
 	screen.set_screen_update(FUNC(aerofgt_state::screen_update_karatblz));
@@ -1819,7 +1819,7 @@ void aerofgt_state::spinlbrk(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(1*8, 45*8-1, 0*8, 30*8-1);
 	screen.set_screen_update(FUNC(aerofgt_state::screen_update_spinlbrk));
@@ -1876,7 +1876,7 @@ void aerofgt_state::turbofrc(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(61.31);   /* verified on pcb */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 44*8-1, 0*8, 30*8-1);
 	screen.set_screen_update(FUNC(aerofgt_state::screen_update_turbofrc));
@@ -1932,7 +1932,7 @@ void aerofgt_state::aerofgtb(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(500)); /* wrong but improves sprite-background synchronization */
+	screen.set_vblank_time(subseconds::from_usec(500)); /* wrong but improves sprite-background synchronization */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8+12, 40*8-1+12, 0*8, 28*8-1);
 	screen.set_screen_update(FUNC(aerofgt_state::screen_update_turbofrc));
@@ -2000,7 +2000,7 @@ void aerofgt_state::aerofgt(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(61.31);  /* verified on pcb */
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(400)); /* wrong but improves sprite-background synchronization */
+	screen.set_vblank_time(subseconds::from_usec(400)); /* wrong but improves sprite-background synchronization */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
 	screen.set_screen_update(FUNC(aerofgt_state::screen_update_aerofgt));
@@ -2048,7 +2048,7 @@ void aerofgt_state::aerfboot(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(500)); /* wrong but improves sprite-background synchronization */
+	screen.set_vblank_time(subseconds::from_usec(500)); /* wrong but improves sprite-background synchronization */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8+12, 40*8-1+12, 0*8, 28*8-1);
 	screen.set_screen_update(FUNC(aerofgt_state::screen_update_aerfboot));
@@ -2085,7 +2085,7 @@ void aerofgt_state::aerfboo2(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(500)); /* wrong but improves sprite-background synchronization */
+	screen.set_vblank_time(subseconds::from_usec(500)); /* wrong but improves sprite-background synchronization */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8+12, 40*8-1+12, 0*8, 28*8-1);
 	screen.set_screen_update(FUNC(aerofgt_state::screen_update_aerfboo2));
@@ -2120,7 +2120,7 @@ void aerofgt_state::wbbc97(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(64*8, 64*8);
 	screen.set_visarea(0*8+14, 44*8-1+4, 0*8, 30*8-1);
 	screen.set_screen_update(FUNC(aerofgt_state::screen_update_wbbc97));

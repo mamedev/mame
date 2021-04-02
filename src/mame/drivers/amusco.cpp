@@ -577,7 +577,7 @@ void amusco_state::amusco(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(88*8, 27*10);                           // screen size: 88*8 27*10
 	m_screen->set_visarea(0*8, 74*8-1, 0*10, 24*10-1);    // visible scr: 74*8 24*10
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));

@@ -159,7 +159,7 @@ void vt5x_cpu_device::device_config_complete()
 	if (!screen().has_screen_update())
 		screen().set_screen_update(*this, FUNC(vt5x_cpu_device::screen_update));
 
-	if (!screen().refresh_attoseconds())
+	if (screen().refresh_subseconds().is_zero())
 		screen().set_raw(clock(), 900, 128, 848, 256, 4, 244); // 60 Hz default parameters
 }
 
@@ -723,7 +723,7 @@ void vt5x_cpu_device::clock_video_counters()
 					900,
 					(010000 - m_vert_count) / 10,
 					rectangle(128, 847, first_line, 24 * (is_60hz ? 10 : 11) + first_line - 1),
-					clocks_to_attotime((010000 - m_vert_count) * 90).as_attoseconds()
+					clocks_to_attotime((010000 - m_vert_count) * 90).as_subseconds()
 				);
 				screen().reset_origin();
 				m_current_line = 0;

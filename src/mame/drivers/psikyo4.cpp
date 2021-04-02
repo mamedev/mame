@@ -618,7 +618,7 @@ void psikyo4_state::ps4big(machine_config &config)
 
 	SCREEN(config, m_lscreen, SCREEN_TYPE_RASTER);
 	m_lscreen->set_refresh_hz(60);
-	m_lscreen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_lscreen->set_vblank_time(subseconds::from_usec(0));
 	m_lscreen->set_size(40*8, 32*8);
 	m_lscreen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
 	m_lscreen->set_screen_update(FUNC(psikyo4_state::screen_update<0>));
@@ -626,7 +626,7 @@ void psikyo4_state::ps4big(machine_config &config)
 
 	SCREEN(config, m_rscreen, SCREEN_TYPE_RASTER);
 	m_rscreen->set_refresh_hz(60);
-	m_rscreen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_rscreen->set_vblank_time(subseconds::from_usec(0));
 	m_rscreen->set_size(40*8, 32*8);
 	m_rscreen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
 	m_rscreen->set_screen_update(FUNC(psikyo4_state::screen_update<1>));

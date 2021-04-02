@@ -4018,7 +4018,7 @@ void pacman_state::s2650games(machine_config &config)
 	screen_device &screen(*subdevice<screen_device>("screen"));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(pacman_state::screen_update_s2650games));
 	screen.screen_vblank().set(FUNC(pacman_state::s2650_interrupt));
 

@@ -110,13 +110,13 @@ void speaker_sound_device::device_start()
 
 	m_composed_sample_index = 0;
 	m_last_update_time = machine().time();
-	m_channel_sample_period = HZ_TO_ATTOSECONDS(machine().sample_rate());
-	m_channel_sample_period_secfrac = ATTOSECONDS_TO_DOUBLE(m_channel_sample_period);
+	m_channel_sample_period = subseconds::from_hz(machine().sample_rate());
+	m_channel_sample_period_secfrac = m_channel_sample_period.as_double();
 	m_interm_sample_period = m_channel_sample_period / RATE_MULTIPLIER;
-	m_interm_sample_period_secfrac = ATTOSECONDS_TO_DOUBLE(m_interm_sample_period);
+	m_interm_sample_period_secfrac = m_interm_sample_period.as_double();
 	m_channel_last_sample_time = m_channel->sample_time();
-	m_channel_next_sample_time = m_channel_last_sample_time + attotime(0, m_channel_sample_period);
-	m_next_interm_sample_time = m_channel_last_sample_time + attotime(0, m_interm_sample_period);
+	m_channel_next_sample_time = m_channel_last_sample_time + m_channel_sample_period;
+	m_next_interm_sample_time = m_channel_last_sample_time + m_interm_sample_period;
 	m_interm_sample_index = 0;
 	m_prevx = m_prevy = 0.0;
 
@@ -180,21 +180,21 @@ void speaker_sound_device::device_reset()
 
 	m_composed_sample_index = 0;
 	m_last_update_time = machine().time();
-	m_channel_sample_period = HZ_TO_ATTOSECONDS(machine().sample_rate());
-	m_channel_sample_period_secfrac = ATTOSECONDS_TO_DOUBLE(m_channel_sample_period);
+	m_channel_sample_period = subseconds::from_hz(machine().sample_rate());
+	m_channel_sample_period_secfrac = m_channel_sample_period.as_double();
 	m_interm_sample_period = m_channel_sample_period / RATE_MULTIPLIER;
-	m_interm_sample_period_secfrac = ATTOSECONDS_TO_DOUBLE(m_interm_sample_period);
+	m_interm_sample_period_secfrac = m_interm_sample_period.as_double();
 	m_channel_last_sample_time = m_channel->sample_time();
-	m_channel_next_sample_time = m_channel_last_sample_time + attotime(0, m_channel_sample_period);
-	m_next_interm_sample_time = m_channel_last_sample_time + attotime(0, m_interm_sample_period);
+	m_channel_next_sample_time = m_channel_last_sample_time + m_channel_sample_period;
+	m_next_interm_sample_time = m_channel_last_sample_time + m_interm_sample_period;
 	m_interm_sample_index = 0;
 	m_prevx = m_prevy = 0.0;
 }
 
 void speaker_sound_device::device_post_load()
 {
-	m_channel_next_sample_time = m_channel_last_sample_time + attotime(0, m_channel_sample_period);
-	m_next_interm_sample_time = m_channel_last_sample_time + attotime(0, m_interm_sample_period);
+	m_channel_next_sample_time = m_channel_last_sample_time + m_channel_sample_period;
+	m_next_interm_sample_time = m_channel_last_sample_time + m_interm_sample_period;
 }
 
 //-------------------------------------------------
@@ -212,7 +212,7 @@ void speaker_sound_device::sound_stream_update(sound_stream &stream, std::vector
 	if (buffer.samples() > 0)
 	{
 		/* Prepare to update time state */
-		sampled_time = attotime(0, m_channel_sample_period);
+		sampled_time = m_channel_sample_period;
 		if (buffer.samples() > 1)
 			sampled_time *= buffer.samples();
 
@@ -239,8 +239,8 @@ void speaker_sound_device::sound_stream_update(sound_stream &stream, std::vector
 
 		/* Update the time state */
 		m_channel_last_sample_time += sampled_time;
-		m_channel_next_sample_time = m_channel_last_sample_time + attotime(0, m_channel_sample_period);
-		m_next_interm_sample_time = m_channel_last_sample_time + attotime(0, m_interm_sample_period);
+		m_channel_next_sample_time = m_channel_last_sample_time + m_channel_sample_period;
+		m_next_interm_sample_time = m_channel_last_sample_time + m_interm_sample_period;
 		m_last_update_time = m_channel_last_sample_time;
 	}
 }
@@ -285,8 +285,8 @@ void speaker_sound_device::level_w(int new_level)
 	 * however this ensures synchronization between the speaker and stream timing:
 	 */
 	m_channel_last_sample_time = m_channel->sample_time();
-	m_channel_next_sample_time = m_channel_last_sample_time + attotime(0, m_channel_sample_period);
-	m_next_interm_sample_time = m_channel_last_sample_time + attotime(0, m_interm_sample_period);
+	m_channel_next_sample_time = m_channel_last_sample_time + m_channel_sample_period;
+	m_next_interm_sample_time = m_channel_last_sample_time + m_interm_sample_period;
 	m_last_update_time = m_channel_last_sample_time;
 
 	/* Assertion: time - last_update_time < channel_sample_period, i.e. time < channel_next_sample_time */
@@ -363,7 +363,7 @@ void speaker_sound_device::finalize_interm_sample(double volume)
 	m_composed_volume[m_composed_sample_index] += volume * fraction;
 	/* Update time state */
 	m_last_update_time = m_next_interm_sample_time;
-	m_next_interm_sample_time += attotime(0, m_interm_sample_period);
+	m_next_interm_sample_time += m_interm_sample_period;
 
 	/* For compatibility with filtering, do not incr. index and initialise next sample yet. */
 }

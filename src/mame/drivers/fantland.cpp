@@ -820,7 +820,7 @@ void fantland_state::fantland(machine_config &config)
 	// Video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(352,256);
 	m_screen->set_visarea_full();
 	m_screen->set_screen_update(FUNC(fantland_state::screen_update));
@@ -860,7 +860,7 @@ void fantland_state::galaxygn(machine_config &config)
 	// Video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(352,256);
 	m_screen->set_visarea_full();
 	m_screen->set_screen_update(FUNC(fantland_state::screen_update));
@@ -936,7 +936,7 @@ void borntofi_state::borntofi(machine_config &config)
 	// Video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(54);    // 54 Hz
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(352,256);
 	m_screen->set_visarea(0, 352-1, 0, 256-1);
 	m_screen->set_screen_update(FUNC(borntofi_state::screen_update));
@@ -986,7 +986,7 @@ void fantland_state::wheelrun(machine_config &config)
 	// Video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(256,224);
 	m_screen->set_visarea(0, 256-1, 0, 224-1);
 	m_screen->set_screen_update(FUNC(fantland_state::screen_update));

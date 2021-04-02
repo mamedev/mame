@@ -103,7 +103,7 @@ void miuchiz_state::miuchiz(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(68, 98);
 	m_screen->set_visarea(0, 68 - 1, 0, 98 - 1);
 	m_screen->set_screen_update(FUNC(miuchiz_state::screen_update));

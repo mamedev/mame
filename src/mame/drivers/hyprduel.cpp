@@ -412,7 +412,7 @@ void hyprduel_state::i4220_config(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_refresh_hz(60); // Unknown/Unverified
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(320, 224);
 	screen.set_visarea(0, 320-1, FIRST_VISIBLE_LINE, LAST_VISIBLE_LINE);
 	screen.set_screen_update("vdp", FUNC(imagetek_i4100_device::screen_update));

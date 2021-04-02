@@ -1098,7 +1098,7 @@ void mac_state::macse30(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_refresh_hz(60.15);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1260));
+	m_screen->set_vblank_time(subseconds::from_usec(1260));
 	m_screen->set_size(MAC_H_TOTAL, MAC_V_TOTAL);
 	m_screen->set_visarea(0, MAC_H_VIS-1, 0, MAC_V_VIS-1);
 	m_screen->set_screen_update(FUNC(mac_state::screen_update_macse30));

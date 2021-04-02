@@ -66,11 +66,11 @@ private:
 	 */
 	double        m_composed_volume[FILTER_LENGTH];   /* integrator(s) */
 	int           m_composed_sample_index;            /* array index for composed_volume */
-	attoseconds_t m_channel_sample_period;            /* in as */
+	subseconds    m_channel_sample_period;            /* in as */
 	double        m_channel_sample_period_secfrac;    /* in fraction of second */
 	attotime      m_channel_last_sample_time;
 	attotime      m_channel_next_sample_time;
-	attoseconds_t m_interm_sample_period;
+	subseconds    m_interm_sample_period;
 	double        m_interm_sample_period_secfrac;
 	attotime      m_next_interm_sample_time;
 	int           m_interm_sample_index;              /* counts interm. samples between stream samples */

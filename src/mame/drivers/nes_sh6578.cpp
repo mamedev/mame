@@ -629,7 +629,7 @@ void nes_sh6578_state::nes_sh6578(machine_config& config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.0988);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK.dvalue()/1000000)) *
+	m_screen->set_vblank_time(subseconds::from_usec((113.66/(NTSC_APU_CLOCK.dvalue()/1000000)) *
 							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
 	m_screen->set_size(32*8, 262);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
@@ -659,7 +659,7 @@ void nes_sh6578_state::nes_sh6578_pal(machine_config& config)
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	m_screen->set_refresh_hz(50.0070);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66 / (PALC_APU_CLOCK.dvalue() / 1000000)) *
+	m_screen->set_vblank_time(subseconds::from_usec((113.66 / (PALC_APU_CLOCK.dvalue() / 1000000)) *
 		(ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL - ppu2c0x_device::VBLANK_FIRST_SCANLINE_PALC + 1 + 2)));
 	m_screen->set_size(32 * 8, 312);
 	m_screen->set_visarea(0 * 8, 32 * 8 - 1, 0 * 8, 30 * 8 - 1);

@@ -37,7 +37,7 @@ struct {
 	uint8_t strobe;                   //!< strobe (still) active
 	emu_timer* strobon_timer;       //!< set strobe on timer
 	uint8_t bitclk;                   //!< current bitclk state (either crystal clock, or rdclk from the drive)
-	attoseconds_t bitclk_time[2];   //!< per drive time in attoseconds per bit
+	subseconds bitclk_time[2];        //!< per drive time in subseconds per bit
 	uint8_t datin;                    //!< current datin from the drive
 	uint8_t bitcount;                 //!< bit counter
 	uint8_t carry;                    //!< carry output of the bitcounter

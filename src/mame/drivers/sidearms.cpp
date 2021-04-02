@@ -622,7 +622,7 @@ void sidearms_state::sidearms(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(sidearms_state::screen_update));
@@ -668,7 +668,7 @@ void sidearms_state::turtship(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1);
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram8_device::vblank_copy_rising));
@@ -717,7 +717,7 @@ void sidearms_state::whizz(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(8*8, (64-8)*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(sidearms_state::screen_update));

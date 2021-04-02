@@ -377,7 +377,7 @@ void blmbycar_state::blmbycar(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(0x180, 0x100);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(blmbycar_state::screen_update));
@@ -424,7 +424,7 @@ void blmbycar_state::watrball(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(*subdevice<screen_device>("screen"));
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	screen.set_visarea(0, 0x180-1, 16, 0x100-1);
 }
 

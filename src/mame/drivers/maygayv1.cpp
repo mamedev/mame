@@ -903,7 +903,7 @@ void maygayv1_state::maygayv1(machine_config &config)
 	/* TODO: Use real video timings */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_size(640, 300);
 	screen.set_visarea(0, 640 - 1, 0, 300 - 1);
 	screen.set_screen_update(FUNC(maygayv1_state::screen_update_maygayv1));

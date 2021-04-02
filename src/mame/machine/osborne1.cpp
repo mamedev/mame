@@ -529,8 +529,8 @@ void osborne1_state::update_acia_rxc_txc()
 {
 	m_acia->write_rxc(m_acia_rxc_txc_state);
 	m_acia->write_txc(m_acia_rxc_txc_state);
-	attoseconds_t const dividend = (ATTOSECONDS_PER_SECOND / 100) * (m_acia_rxc_txc_state ? m_acia_rxc_txc_p_high : m_acia_rxc_txc_p_low);
-	attoseconds_t const divisor = (15974400 / 100) / m_acia_rxc_txc_div;
+	subseconds const dividend = subseconds::from_hz(100) * (m_acia_rxc_txc_state ? m_acia_rxc_txc_p_high : m_acia_rxc_txc_p_low);
+	u32 const divisor = (15974400 / 100) / m_acia_rxc_txc_div;
 	m_acia_rxc_txc_timer->adjust(attotime(0, dividend / divisor));
 }
 

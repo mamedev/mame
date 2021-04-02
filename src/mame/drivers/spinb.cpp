@@ -666,7 +666,7 @@ void spinb_state::spinb(machine_config &config)
 	// Video
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_screen_update(FUNC(spinb_state::screen_update));
 	screen.set_size(128, 32);
 	screen.set_visarea(0, 127, 0, 31);

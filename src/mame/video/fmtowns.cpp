@@ -127,7 +127,7 @@ void towns_state::towns_crtc_refresh_mode()
 	if(scr.max_x <= scr.min_x || scr.max_y <= scr.min_y)
 		return;
 
-	m_screen->configure(scr.max_x+1,scr.max_y+1,scr,HZ_TO_ATTOSECONDS(60));
+	m_screen->configure(scr.max_x+1,scr.max_y+1,scr,subseconds::from_hz(60));
 }
 
 uint8_t towns_state::towns_gfx_high_r(offs_t offset)

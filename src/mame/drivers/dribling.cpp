@@ -299,7 +299,7 @@ void dribling_state::dribling(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_vblank_time(subseconds::from_usec(2500)); // not accurate
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 255, 40, 255);
 	screen.set_screen_update(FUNC(dribling_state::screen_update));

@@ -100,7 +100,7 @@ void pc8500_state::pc8500_video(machine_config &config)
 	screen.set_screen_update(FUNC(pc8500_state::screen_update));
 	screen.set_size(80*8, 24*8);
 	screen.set_visarea(0, 80*8-1, 0, 24*8-1);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_vblank_time(subseconds::from_usec(2500));
 	screen.set_refresh_hz(50);
 	screen.set_palette("palette");
 

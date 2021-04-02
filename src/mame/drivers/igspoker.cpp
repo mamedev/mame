@@ -1946,7 +1946,7 @@ void igspoker_state::igspoker(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(57);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(64*8, 32*8); // TODO: wrong screen size!
 	m_screen->set_visarea(0*8, 64*8-1, 0, 32*8-1);
 	m_screen->set_screen_update(FUNC(igspoker_state::screen_update_igs_video));

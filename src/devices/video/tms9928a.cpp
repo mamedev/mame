@@ -80,7 +80,7 @@ void tms9928a_device::device_config_complete()
 	if (!screen().has_screen_update())
 		screen().set_screen_update(*this, FUNC(tms9928a_device::screen_update));
 
-	if (!screen().refresh_attoseconds())
+	if (screen().refresh_subseconds().is_zero())
 	{
 		if (m_50hz)
 			screen().set_raw(clock() / 2, m_total_horz, HORZ_DISPLAY_START - 12, HORZ_DISPLAY_START + 256 + 12,

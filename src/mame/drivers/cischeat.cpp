@@ -1983,7 +1983,7 @@ void cischeat_state::bigrun(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0, 256-1,  0+16, 256-16-1);
 	m_screen->set_screen_update(FUNC(cischeat_state::screen_update_bigrun));
@@ -2148,7 +2148,7 @@ void cischeat_state::scudhamm(machine_config &config)
 	// measured values for Arm Champs II: VSync: 59.1784Hz, HSync: 15082.0 kHz
 	m_screen->set_raw(XTAL(12'000'000)/2,396,0,256,256,16,240);
 //  m_screen->set_refresh_hz(30); //TODO: wrong!
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */);
+//  m_screen->set_vblank_time(subseconds::from_usec(2500 * 3) /* not accurate */);
 //  m_screen->set_size(256, 256);
 //  m_screen->set_visarea(0, 256-1, 0 +16, 256-1 -16);
 	m_screen->set_screen_update(FUNC(cischeat_state::screen_update_scudhamm));
@@ -2245,7 +2245,7 @@ void captflag_state::captflag(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_refresh_hz(30); //TODO: wrong!
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */);
+//  m_screen->set_vblank_time(subseconds::from_usec(2500 * 3) /* not accurate */);
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0, 256-1, 0 +16, 256-1 -16);
 	m_screen->set_screen_update(FUNC(captflag_state::screen_update_scudhamm));

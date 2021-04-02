@@ -337,7 +337,7 @@ void clayshoo_state::clayshoo(machine_config &config)
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 255, 64, 255);
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	screen.set_screen_update(FUNC(clayshoo_state::screen_update_clayshoo));
 
 	I8255A(config, "ppi8255_0");

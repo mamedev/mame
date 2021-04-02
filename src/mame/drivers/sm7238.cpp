@@ -210,17 +210,17 @@ WRITE_LINE_MEMBER(sm7238_state::write_printer_clock)
 void sm7238_state::recompute_parameters()
 {
 	rectangle visarea;
-	attoseconds_t refresh;
+	subseconds refresh;
 
 	visarea.set(0, m_video.stride * 8 - 1, 0, KSM_DISP_VERT - 1);
 
 	if (m_video.stride == 80)
 	{
-		refresh = HZ_TO_ATTOSECONDS(12.5_MHz_XTAL) * m_video.stride * 10 * KSM_TOTAL_VERT;
+		refresh = subseconds::from_hz(12.5_MHz_XTAL) * m_video.stride * 10 * KSM_TOTAL_VERT;
 	}
 	else
 	{
-		refresh = HZ_TO_ATTOSECONDS(20.625_MHz_XTAL) * m_video.stride * 10 * KSM_TOTAL_VERT;
+		refresh = subseconds::from_hz(20.625_MHz_XTAL) * m_video.stride * 10 * KSM_TOTAL_VERT;
 	}
 
 	m_screen->configure(m_video.stride * 10, KSM_TOTAL_VERT, visarea, refresh);

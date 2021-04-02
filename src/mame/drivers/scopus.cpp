@@ -208,7 +208,7 @@ void sagitta180_state::sagitta180(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(80*5, 25*8);
 	screen.set_visarea(0, 80*5-1, 0, 25*8-1);
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_sagitta180);

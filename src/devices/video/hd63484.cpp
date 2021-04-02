@@ -533,7 +533,7 @@ inline void hd63484_device::recompute_parameters()
 
 	rectangle visarea = screen().visible_area();
 	visarea.set(hbend, hbend + (m_hdw * ppmc) - 1, m_vds, vbstart - 1);
-	attoseconds_t frame_period = screen().frame_period().attoseconds(); // TODO: use clock() to calculate the frame_period
+	subseconds frame_period = screen().frame_period().as_subseconds(); // TODO: use clock() to calculate the frame_period
 	screen().configure(m_hc * ppmc, m_vc, visarea, frame_period);
 }
 

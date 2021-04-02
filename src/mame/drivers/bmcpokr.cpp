@@ -802,8 +802,8 @@ void bmcpokr_state::bmcpokr(machine_config &config)
 	TIMER(config, "scantimer", 0).configure_scanline(FUNC(bmcpokr_state::interrupt), "screen", 0, 1);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh(HZ_TO_ATTOSECONDS(58.935));    // HSync - 15.440kHz, VSync - 58.935Hz
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_refresh(subseconds::from_hz(58.935));    // HSync - 15.440kHz, VSync - 58.935Hz
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(bmcpokr_state::screen_update));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 60*8-1, 0*8, 30*8-1);

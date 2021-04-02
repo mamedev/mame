@@ -527,7 +527,7 @@ void bw12_state::common(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::amber()));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_vblank_time(subseconds::from_usec(2500)); // not accurate
 	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
 	screen.set_size(640, 200);
 	screen.set_visarea(0, 640-1, 0, 200-1);

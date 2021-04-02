@@ -994,7 +994,7 @@ void pc8801_state::pc8801_dynamic_res_change(void)
 {
 	rectangle visarea;
 	int xsize,ysize,xvis,yvis;
-	attoseconds_t refresh;;
+	subseconds refresh;;
 
 	/* bail out if screen params aren't valid */
 	if(!m_crtc.param[0][0] || !m_crtc.param[0][1] || !m_crtc.param[0][2] || !m_crtc.param[0][3])
@@ -1009,9 +1009,9 @@ void pc8801_state::pc8801_dynamic_res_change(void)
 
 	visarea.set(0, xvis - 1, 0, yvis - 1);
 	if(pc8801_pixel_clock())
-		refresh = HZ_TO_ATTOSECONDS(PIXEL_CLOCK_24KHz) * (xsize) * ysize;
+		refresh = subseconds::from_hz(PIXEL_CLOCK_24KHz) * (xsize) * ysize;
 	else
-		refresh = HZ_TO_ATTOSECONDS(PIXEL_CLOCK_15KHz) * (xsize) * ysize;
+		refresh = subseconds::from_hz(PIXEL_CLOCK_15KHz) * (xsize) * ysize;
 
 	m_screen->configure(xsize, ysize, visarea, refresh);
 }

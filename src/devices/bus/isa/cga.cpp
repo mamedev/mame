@@ -1381,7 +1381,7 @@ void isa8_wyse700_device::change_resolution(uint8_t mode)
 		case 0x00: width = 640; height = 400; break; // unhandled
 	}
 	rectangle visarea(0, width-1, 0, height-1);
-	m_screen->configure(width, height, visarea, HZ_TO_ATTOSECONDS(60));
+	m_screen->configure(width, height, visarea, subseconds::from_hz(60));
 
 }
 

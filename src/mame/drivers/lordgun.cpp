@@ -658,7 +658,7 @@ void lordgun_state::lordgun(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(0x200, 0x100);
 	m_screen->set_visarea(0,0x1c0-1, 0,0xe0-1);
 	m_screen->set_screen_update(FUNC(lordgun_state::screen_update));
@@ -712,7 +712,7 @@ void lordgun_state::aliencha(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_vblank_time(subseconds::from_usec(0));
 	m_screen->set_size(0x200, 0x100);
 	m_screen->set_visarea(0,0x1c0-1, 0,0xe0-1);
 	m_screen->set_screen_update(FUNC(lordgun_state::screen_update));

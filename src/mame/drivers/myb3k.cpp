@@ -454,7 +454,7 @@ void myb3k_state::myb3k_video_mode_w(uint8_t data)
 			{
 			LOGVMOD(" - 640x200 on 80x25  \n");
 			rectangle rect(0, 640 - 1, 0, 200 - 1);
-			m_screen->configure(640, 200, rect, HZ_TO_ATTOSECONDS(50));
+			m_screen->configure(640, 200, rect, subseconds::from_hz(50));
 			break;
 		}
 
@@ -462,7 +462,7 @@ void myb3k_state::myb3k_video_mode_w(uint8_t data)
 		{
 			LOGVMOD(" - 320x200, 40 char, 8 color or 8 tones of green...\n");
 			rectangle rect(0, 320 - 1, 0, 200 - 1);
-			m_screen->configure(320, 200, rect, HZ_TO_ATTOSECONDS(50));
+			m_screen->configure(320, 200, rect, subseconds::from_hz(50));
 		}
 		break;
 
@@ -470,7 +470,7 @@ void myb3k_state::myb3k_video_mode_w(uint8_t data)
 		{
 			LOGVMOD(" - 640x200, 80 char, white on black...\n");
 			rectangle rect(0, 640 - 1, 0, 200 - 1);
-			m_screen->configure(640, 200, rect, HZ_TO_ATTOSECONDS(50));
+			m_screen->configure(640, 200, rect, subseconds::from_hz(50));
 		}
 		break;
 
@@ -486,7 +486,7 @@ void myb3k_state::myb3k_video_mode_w(uint8_t data)
 		{
 			LOGVMOD("320x400, 40 char, white on black\n");
 			rectangle rect(0, 320 - 1, 0, 400 - 1);
-			m_screen->configure(320, 400, rect, HZ_TO_ATTOSECONDS(50));
+			m_screen->configure(320, 400, rect, subseconds::from_hz(50));
 		}
 		break;
 
@@ -494,7 +494,7 @@ void myb3k_state::myb3k_video_mode_w(uint8_t data)
 		{
 			LOGVMOD("640x400, 80 char, white on black\n");
 			rectangle rect(0, 640 - 1, 0, 400 - 1);
-			m_screen->configure(640, 400, rect, HZ_TO_ATTOSECONDS(50));
+			m_screen->configure(640, 400, rect, subseconds::from_hz(50));
 		}
 		break;
 

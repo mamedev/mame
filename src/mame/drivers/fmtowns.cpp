@@ -334,10 +334,10 @@ uint8_t towns_state::towns_system_r(offs_t offset)
 			if(LOG_SYS) logerror("SYS: port 0x25 read\n");
 			return 0x00;
 /*      case 0x06:
-            count = (m_towns_freerun_counter->time_elapsed() * ATTOSECONDS_TO_HZ(ATTOSECONDS_IN_USEC(1))).as_double();
+            count = m_towns_freerun_counter->time_elapsed().as_ticks(subseconds::from_usec(1));
             return count & 0xff;
         case 0x07:
-            count = (m_towns_freerun_counter->time_elapsed() * ATTOSECONDS_TO_HZ(ATTOSECONDS_IN_USEC(1))).as_double();
+            count = (m_towns_freerun_counter->time_elapsed().as_ticks(subseconds::from_usec(1));
             return (count >> 8) & 0xff;
 */      case 0x06:
 			//if(LOG_SYS) logerror("SYS: (0x26) timer read\n");
@@ -2859,7 +2859,7 @@ void towns_state::towns_base(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	m_screen->set_size(768,512);
 	m_screen->set_visarea(0, 768-1, 0, 512-1);
 	m_screen->set_screen_update(FUNC(towns_state::screen_update));

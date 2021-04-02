@@ -915,7 +915,7 @@ void ql_state::ql(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50.08);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_vblank_time(subseconds::from_usec(2500)); // not accurate
 	screen.set_screen_update(ZX8301_TAG, FUNC(zx8301_device::screen_update));
 	screen.set_size(960, 312);
 	screen.set_visarea(0, 512-1, 0, 256-1);

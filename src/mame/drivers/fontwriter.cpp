@@ -116,7 +116,7 @@ void fontwriter_state::fontwriter(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	screen.set_screen_update(FUNC(fontwriter_state::screen_update));
 	screen.set_size(640, 400);
 	screen.set_visarea_full();
@@ -133,7 +133,7 @@ void fontwriter_state::fw600(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_vblank_time(subseconds::from_usec(2500) /* not accurate */);
 	screen.set_screen_update(FUNC(fontwriter_state::screen_update));
 	screen.set_size(640, 400);
 	screen.set_visarea_full();

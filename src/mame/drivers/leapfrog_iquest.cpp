@@ -622,7 +622,7 @@ void leapfrog_iquest_state::leapfrog_iquest(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
+	m_screen->set_vblank_time(subseconds::from_usec(10));
 	m_screen->set_size(90, 64);
 	m_screen->set_visarea(0, 90-1, 0, 64-1);
 	m_screen->set_screen_update(FUNC(leapfrog_iquest_state::screen_update));
@@ -641,7 +641,7 @@ void leapfrog_turboextreme_state::leapfrog_turboex(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
+	m_screen->set_vblank_time(subseconds::from_usec(10));
 	m_screen->set_size(64, 32); // unknown resolution, lower than iquest
 	m_screen->set_visarea(0, 64-1, 0, 32-1);
 	m_screen->set_screen_update(FUNC(leapfrog_turboextreme_state::screen_update));
@@ -660,7 +660,7 @@ void leapfrog_turbotwistmath_state::leapfrog_turbotwistmath(machine_config &conf
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
+	m_screen->set_vblank_time(subseconds::from_usec(10));
 	m_screen->set_size(64, 8); // unknown resolution, single row display
 	m_screen->set_visarea(0, 64-1, 0, 8-1);
 	m_screen->set_screen_update(FUNC(leapfrog_turbotwistmath_state::screen_update));
@@ -679,7 +679,7 @@ void leapfrog_turbotwistspelling_state::leapfrog_turbotwistspelling(machine_conf
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
+	m_screen->set_vblank_time(subseconds::from_usec(10));
 	m_screen->set_size(64, 8); // unknown resolution, single row display
 	m_screen->set_visarea(0, 64-1, 0, 8-1);
 	m_screen->set_screen_update(FUNC(leapfrog_turbotwistspelling_state::screen_update));
@@ -698,7 +698,7 @@ void leapfrog_turbotwistvocabulator_state::leapfrog_turbotwistvocabulator(machin
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
+	m_screen->set_vblank_time(subseconds::from_usec(10));
 	m_screen->set_size(64, 8); // unknown resolution, single row display
 	m_screen->set_visarea(0, 64-1, 0, 8-1);
 	m_screen->set_screen_update(FUNC(leapfrog_turbotwistvocabulator_state::screen_update));
@@ -718,7 +718,7 @@ void leapfrog_turbotwistbrainquest_state::leapfrog_turbotwistbrainquest(machine_
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(10));
+	m_screen->set_vblank_time(subseconds::from_usec(10));
 	m_screen->set_size(64, 8); // unknown resolution, single row display
 	m_screen->set_visarea(0, 64-1, 0, 8-1);
 	m_screen->set_screen_update(FUNC(leapfrog_turbotwistbrainquest_state::screen_update));

@@ -16,9 +16,9 @@
 #define IRQ_CLOCK           (U34_CLOCK/0x1f788) // 40Hz interrupt
 
 
-static constexpr attoseconds_t VCL_ATTOS = HZ_TO_ATTOSECONDS(VCL_CLOCK);
-static constexpr attoseconds_t U51_ATTOS = HZ_TO_ATTOSECONDS(U51_CLOCK);
-static constexpr attoseconds_t IRQ_ATTOS = HZ_TO_ATTOSECONDS(IRQ_CLOCK);
+static constexpr subseconds VCL_ATTOS = subseconds::from_hz(VCL_CLOCK);
+static constexpr subseconds U51_ATTOS = subseconds::from_hz(U51_CLOCK);
+static constexpr subseconds IRQ_ATTOS = subseconds::from_hz(IRQ_CLOCK);
 
 
 
@@ -114,7 +114,7 @@ inline bool segag80v_state::adjust_xy(int rawx, int rawy, int &outx, int &outy)
 
 void segag80v_state::sega_generate_vector_list()
 {
-	attoseconds_t time_remaining = IRQ_ATTOS;
+	subseconds time_remaining = IRQ_ATTOS;
 	u8 *sintable = memregion("proms")->base();
 	u8 *vectorram = m_vectorram;
 	u16 symaddr = 0;
@@ -122,7 +122,7 @@ void segag80v_state::sega_generate_vector_list()
 	m_vector->clear_list();
 
 	// Loop until we run out of time.
-	while (time_remaining > 0)
+	while (s64(time_remaining.raw()) > 0)
 	{
 		// The "draw" flag is clocked at the end of phase 0.
 		u8 draw = vectorram[symaddr++ & 0xfff];
@@ -180,7 +180,7 @@ void segag80v_state::sega_generate_vector_list()
 				m_vector->add_point(adjx, adjy, 0, 0);
 
 			// Loop until we run out of time.
-			while (time_remaining > 0)
+			while (s64(time_remaining.raw()) > 0)
 			{
 				// The 'attribute' byte is latched at the end of phase 10 into
 				// the tri-state flip flop at U2. The low bit controls whether
@@ -239,7 +239,7 @@ void segag80v_state::sega_generate_vector_list()
 				clipped = adjust_xy(curx, cury, adjx, adjy);
 				u16 xaccum = 0;
 				u16 yaccum = 0;
-				while (length-- != 0 && time_remaining > 0)
+				while (length-- != 0 && s64(time_remaining.raw() > 0))
 				{
 					// The adders at U44/U45 are used as X accumulators. The value
 					// from U48 is repeatedly added to itself here. The carry out
@@ -309,7 +309,7 @@ void segag80v_state::sega_generate_vector_list()
 	}
 
 	// set the drawing end time for this frame
-	m_draw_end_time = machine().time() + attotime(0, IRQ_ATTOS - time_remaining);
+	m_draw_end_time = machine().time() + (IRQ_ATTOS - time_remaining);
 }
 
 

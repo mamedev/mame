@@ -1558,7 +1558,7 @@ void tx0_state::tx0_64kw(machine_config &config)
 	/* video hardware (includes the control panel and typewriter output) */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(refresh_rate);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_vblank_time(subseconds::from_usec(2500)); /* not accurate */
 	screen.set_size(virtual_width, virtual_height);
 	screen.set_visarea(0, virtual_width-1, 0, virtual_height-1);
 	screen.set_screen_update(FUNC(tx0_state::screen_update_tx0));

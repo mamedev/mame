@@ -860,7 +860,7 @@ TIMER_CALLBACK_MEMBER(macadb_device::mac_adb_tick)
 				adb_talk();
 				if((m_adb_last_talk == 2) && m_adb_datasize) {
 					m_adb_timer_ticks = 8;
-					m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+					m_adb_timer->adjust(attotime::from_usec(100));
 				}
 			}
 
@@ -872,7 +872,7 @@ TIMER_CALLBACK_MEMBER(macadb_device::mac_adb_tick)
 		}
 		else
 		{
-			m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
+			m_adb_timer->adjust(attotime::from_usec(200));
 		}
 	}
 }
@@ -893,7 +893,7 @@ void macadb_device::mac_adb_newaction(int state)
 				m_adb_direction = 1;    // Mac is shifting us a command
 				m_adb_waiting_cmd = 1;  // we're going to get a command
 				write_adb_irq(CLEAR_LINE);
-				m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+				m_adb_timer->adjust(attotime::from_usec(100));
 				break;
 
 			case ADB_STATE_XFER_EVEN:
@@ -925,7 +925,7 @@ void macadb_device::mac_adb_newaction(int state)
 					write_adb_irq(ASSERT_LINE);
 				}
 
-				m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+				m_adb_timer->adjust(attotime::from_usec(100));
 				break;
 
 			case ADB_STATE_IDLE:
@@ -950,14 +950,14 @@ void macadb_device::adb_vblank()
 				this->adb_talk();
 
 				m_adb_timer_ticks = 8;
-				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+				this->m_adb_timer->adjust(attotime::from_usec(100));
 			}
 			else
 			{
 				write_adb_irq(ASSERT_LINE);
 				m_adb_command = m_adb_send = 0;
 				m_adb_timer_ticks = 1;  // one tick should be sufficient to make it see the IRQ
-				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+				this->m_adb_timer->adjust(attotime::from_usec(100));
 				m_adb_srq_switch = 1;
 			}
 		}
@@ -970,14 +970,14 @@ void macadb_device::adb_vblank()
 				this->adb_talk();
 
 				m_adb_timer_ticks = 8;
-				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+				this->m_adb_timer->adjust(attotime::from_usec(100));
 			}
 			else
 			{
 				write_adb_irq(ASSERT_LINE);
 				m_adb_command = m_adb_send = 0;
 				m_adb_timer_ticks = 1;  // one tick should be sufficient to make it see  the IRQ
-				this->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+				this->m_adb_timer->adjust(attotime::from_usec(100));
 				m_adb_srq_switch = 1;
 			}
 		}

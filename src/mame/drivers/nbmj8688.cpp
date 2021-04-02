@@ -2558,7 +2558,7 @@ void nbmj8688_state::NBMJDRV_4096(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 16, 240-1);
 	screen.set_screen_update(FUNC(nbmj8688_state::screen_update));
@@ -2718,7 +2718,7 @@ void nbmj8688_state::mbmj_p16bit_LCD(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 16, 240-1);
 	screen.set_screen_update(FUNC(nbmj8688_state::screen_update));
@@ -2730,7 +2730,7 @@ void nbmj8688_state::mbmj_p16bit_LCD(machine_config &config)
 	lcd0.set_physical_aspect(15, 3);
 	lcd0.set_orientation(ROT180);
 	lcd0.set_refresh_hz(60);
-	lcd0.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lcd0.set_vblank_time(subseconds::from_usec(0));
 	lcd0.set_size(480, 64);
 	lcd0.set_visarea(0, 480-1, 0, 64-1);
 	lcd0.set_screen_update("lcdc0", FUNC(hd61830_device::screen_update));
@@ -2742,7 +2742,7 @@ void nbmj8688_state::mbmj_p16bit_LCD(machine_config &config)
 	lcd1.set_physical_aspect(15, 3);
 	lcd1.set_orientation(ROT180);
 	lcd1.set_refresh_hz(60);
-	lcd1.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lcd1.set_vblank_time(subseconds::from_usec(0));
 	lcd1.set_size(480, 64);
 	lcd1.set_visarea(0, 480-1, 0, 64-1);
 	lcd1.set_screen_update("lcdc1", FUNC(hd61830_device::screen_update));

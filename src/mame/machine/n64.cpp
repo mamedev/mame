@@ -1002,7 +1002,7 @@ void n64_periphs::vi_recalculate_resolution()
 
 	rectangle visarea = screen().visible_area();
 	// DACRATE is the quarter pixel clock and period will be for a field, not a frame
-	attoseconds_t period = (vi_hsync & 0xfff) * (vi_vsync & 0xfff) * HZ_TO_ATTOSECONDS(DACRATE_NTSC) / 2;
+	subseconds period = (vi_hsync & 0xfff) * (vi_vsync & 0xfff) * subseconds::from_hz(DACRATE_NTSC) / 2;
 
 	if (width == 0 || height == 0 || (vi_control & 3) == 0)
 	{
@@ -1248,8 +1248,6 @@ n64_periphs::AUDIO_DMA *n64_periphs::ai_fifo_get_top()
 		return nullptr;
 	}
 }
-
-#define N64_ATTOTIME_NORMALIZE(a)   do { while ((a).attoseconds >= ATTOSECONDS_PER_SECOND) { (a).seconds++; (a).attoseconds -= ATTOSECONDS_PER_SECOND; } } while (0)
 
 void n64_periphs::ai_dma()
 {
