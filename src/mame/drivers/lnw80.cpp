@@ -511,7 +511,6 @@ void lnw80_state::port_ff_w(uint8_t data)
 
 	static const double speaker_levels[4] = { 0.0, -1.0, 0.0, 1.0 };
 	m_speaker->set_levels(4, speaker_levels);
-
 	m_speaker->level_w(data & 3);
 }
 
