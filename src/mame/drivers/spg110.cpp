@@ -53,16 +53,16 @@ protected:
 	virtual void mem_map(address_map &map);
 };
 
-class spg110_karaokd_game_state : public spg110_game_state
+class spg110_sstarkar_game_state : public spg110_game_state
 {
 public:
-	spg110_karaokd_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+	spg110_sstarkar_game_state(const machine_config &mconfig, device_type type, const char *tag) :
 		spg110_game_state(mconfig, type, tag),
 		m_cart(*this, "cartslot"),
 		m_cartrom(*this, "cartrom")
 	{ }
 public:
-	void karaokd(machine_config &config);
+	void sstarkar(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -84,7 +84,7 @@ void spg110_game_state::mem_map(address_map &map)
 	map(0x004000, 0x3fffff).rom().region("maincpu", 0x8000);
 }
 
-void spg110_karaokd_game_state::mem_map_cart(address_map &map)
+void spg110_sstarkar_game_state::mem_map_cart(address_map &map)
 {
 	map(0x004000, 0x0fffff).bankr("cartrom");
 }
@@ -548,7 +548,7 @@ void spg110_game_state::spg110_spdmo(machine_config& config)
 }
 
 
-void spg110_karaokd_game_state::machine_start()
+void spg110_sstarkar_game_state::machine_start()
 {
 	// if there's a cart, override the standard mapping
 	if (m_cart && m_cart->exists())
@@ -558,7 +558,7 @@ void spg110_karaokd_game_state::machine_start()
 	}
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(spg110_karaokd_game_state::cart_load)
+DEVICE_IMAGE_LOAD_MEMBER(spg110_sstarkar_game_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -569,18 +569,18 @@ DEVICE_IMAGE_LOAD_MEMBER(spg110_karaokd_game_state::cart_load)
 }
 
 
-void spg110_karaokd_game_state::karaokd(machine_config &config)
+void spg110_sstarkar_game_state::sstarkar(machine_config &config)
 {
 	spg110_game_state::spg110_base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &spg110_karaokd_game_state::mem_map_cart);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg110_sstarkar_game_state::mem_map_cart);
 
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "karaokd_cart");
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "singingstarkaraoke_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(FUNC(spg110_karaokd_game_state::cart_load));
+	m_cart->set_device_load(FUNC(spg110_sstarkar_game_state::cart_load));
 	m_cart->set_must_be_loaded(true);
 
-	SOFTWARE_LIST(config, "cart_list").set_original("karaokd_cart");
+	SOFTWARE_LIST(config, "cart_list").set_original("singingstarkaraoke_cart");
 }
 
 
@@ -621,7 +621,7 @@ ROM_START( conyfght )
 	// MCU (I/O?) read protected TODO: add NO_DUMP
 ROM_END
 
-ROM_START( karaokd )
+ROM_START( sstarkar )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	// no internal BIOS
 ROM_END
@@ -643,4 +643,5 @@ CONS( 2003, conyping,  0,        0, spg110_base, conyteni,  spg110_game_state, e
 // Also sold by SDW Games as both TV Virtual Fighter and TV Kickboxing (unit still has TV Virtual Fighter stickers even when box is TV Kickboxing - possibly just box changed due to Sega?)
 CONS( 200?, conyfght,  0,        0, spg110_base, conyteni,  spg110_game_state, empty_init, "Conny / Big Ben",      "TV Virtual Fighter / Free Fight Kung Fu (Conny / Big Ben)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 200?, karaokd,  0,        0, karaokd, conyteni,  spg110_karaokd_game_state, empty_init, "Imaginarium / ItsMagical",      "Karao Kids (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // "ItsMagical" brand from Imaginarium
+// The unit contains no BIOS ROM, was sold by Taikee as Singing Star Karaoke, but also by Imaginarium / ItsMagical in Spain as Karao Kids.  Cartridges are compatible.
+CONS( 200?, sstarkar,  0,        0, sstarkar, conyteni,  spg110_sstarkar_game_state, empty_init, "Taikee",      "Singing Star Karaoke (World) / Karao Kids (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // "ItsMagical" brand from Imaginarium
