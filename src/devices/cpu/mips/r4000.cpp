@@ -281,7 +281,7 @@ std::unique_ptr<util::disasm_interface> r4000_base_device::create_disassembler()
 
 void r4000_base_device::execute_run()
 {
-	while (m_icount-- > 0)
+	while (m_icount > 0)
 	{
 		debugger_instruction_hook(m_pc);
 
@@ -298,35 +298,33 @@ void r4000_base_device::execute_run()
 				m_r[0] = 0;
 			});
 
-		if (m_hilo_delay)
-			m_hilo_delay--;
-
 		// update pc and branch state
-		switch (m_branch_state)
+		switch (m_branch_state & STATE)
 		{
 		case NONE:
 			m_pc += 4;
 			break;
 
-		case DELAY:
-			m_branch_state = NONE;
-			m_pc = m_branch_target;
-			break;
-
 		case BRANCH:
-			m_branch_state = DELAY;
-			m_pc += 4;
+			m_pc = m_branch_state & TARGET;
+			m_branch_state = NONE;
 			break;
 
-		case EXCEPTION:
-			m_branch_state = NONE;
+		case DELAY:
+			m_pc += 4;
+			m_branch_state = (m_branch_state & TARGET) | BRANCH;
 			break;
 
 		case NULLIFY:
-			m_branch_state = NONE;
 			m_pc += 8;
+			m_branch_state = NONE;
 			break;
 		}
+
+		if (m_hilo_delay)
+			m_hilo_delay--;
+
+		m_icount--;
 	}
 }
 
@@ -366,12 +364,12 @@ void r4000_base_device::cpu_execute(u32 const op)
 			m_r[RDREG] = s64(s32(m_r[RTREG]) >> (m_r[RSREG] & 31));
 			break;
 		case 0x08: // JR
-			m_branch_state = BRANCH;
-			m_branch_target = ADDR(m_r[RSREG], 0);
+			// FIXME: address error if low bits are set
+			m_branch_state = ADDR(m_r[RSREG], 0) | DELAY;
 			break;
 		case 0x09: // JALR
-			m_branch_state = BRANCH;
-			m_branch_target = ADDR(m_r[RSREG], 0);
+			// FIXME: address error if low bits are set
+			m_branch_state = ADDR(m_r[RSREG], 0) | DELAY;
 			m_r[RDREG] = ADDR(m_pc, 8);
 			break;
 		//case 0x0a: // *
@@ -656,33 +654,21 @@ void r4000_base_device::cpu_execute(u32 const op)
 		{
 		case 0x00: // BLTZ
 			if (s64(m_r[RSREG]) < 0)
-			{
-				m_branch_state = BRANCH;
-				m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
-			}
+				m_branch_state = ADDR(m_pc + 4, s32(s16(op)) << 2) | DELAY;
 			break;
 		case 0x01: // BGEZ
 			if (s64(m_r[RSREG]) >= 0)
-			{
-				m_branch_state = BRANCH;
-				m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
-			}
+				m_branch_state = ADDR(m_pc + 4, s32(s16(op)) << 2) | DELAY;
 			break;
 		case 0x02: // BLTZL
 			if (s64(m_r[RSREG]) < 0)
-			{
-				m_branch_state = BRANCH;
-				m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
-			}
+				m_branch_state = ADDR(m_pc + 4, s32(s16(op)) << 2) | DELAY;
 			else
 				m_branch_state = NULLIFY;
 			break;
 		case 0x03: // BGEZL
 			if (s64(m_r[RSREG]) >= 0)
-			{
-				m_branch_state = BRANCH;
-				m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
-			}
+				m_branch_state = ADDR(m_pc + 4, s32(s16(op)) << 2) | DELAY;
 			else
 				m_branch_state = NULLIFY;
 			break;
@@ -718,36 +704,24 @@ void r4000_base_device::cpu_execute(u32 const op)
 		//case 0x0f: // *
 		case 0x10: // BLTZAL
 			if (s64(m_r[RSREG]) < 0)
-			{
-				m_branch_state = BRANCH;
-				m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
-			}
+				m_branch_state = ADDR(m_pc + 4, s32(s16(op)) << 2) | DELAY;
 			m_r[31] = ADDR(m_pc, 8);
 			break;
 		case 0x11: // BGEZAL
 			if (s64(m_r[RSREG]) >= 0)
-			{
-				m_branch_state = BRANCH;
-				m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
-			}
+				m_branch_state = ADDR(m_pc + 4, s32(s16(op)) << 2) | DELAY;
 			m_r[31] = ADDR(m_pc, 8);
 			break;
 		case 0x12: // BLTZALL
 			if (s64(m_r[RSREG]) < 0)
-			{
-				m_branch_state = BRANCH;
-				m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
-			}
+				m_branch_state = ADDR(m_pc + 4, s32(s16(op)) << 2) | DELAY;
 			else
 				m_branch_state = NULLIFY;
 			m_r[31] = ADDR(m_pc, 8);
 			break;
 		case 0x13: // BGEZALL
 			if (s64(m_r[RSREG]) >= 0)
-			{
-				m_branch_state = BRANCH;
-				m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
-			}
+				m_branch_state = ADDR(m_pc + 4, s32(s16(op)) << 2) | DELAY;
 			else
 				m_branch_state = NULLIFY;
 			m_r[31] = ADDR(m_pc, 8);
@@ -774,41 +748,27 @@ void r4000_base_device::cpu_execute(u32 const op)
 		}
 		break;
 	case 0x02: // J
-		m_branch_state = BRANCH;
-		m_branch_target = (ADDR(m_pc, 4) & ~0x0fffffffULL) | ((op & 0x03ffffffU) << 2);
+		m_branch_state = (ADDR(m_pc, 4) & ~0x0fffffffULL) | ((op & 0x03ffffffU) << 2) | DELAY;
 		break;
 	case 0x03: // JAL
-		m_branch_state = BRANCH;
-		m_branch_target = (ADDR(m_pc, 4) & ~0x0fffffffULL) | ((op & 0x03ffffffU) << 2);
+		m_branch_state = (ADDR(m_pc, 4) & ~0x0fffffffULL) | ((op & 0x03ffffffU) << 2) | DELAY;
 		m_r[31] = ADDR(m_pc, 8);
 		break;
 	case 0x04: // BEQ
 		if (m_r[RSREG] == m_r[RTREG])
-		{
-			m_branch_state = BRANCH;
-			m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
-		}
+			m_branch_state = ADDR(m_pc + 4, s32(s16(op)) << 2) | DELAY;
 		break;
 	case 0x05: // BNE
 		if (m_r[RSREG] != m_r[RTREG])
-		{
-			m_branch_state = BRANCH;
-			m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
-		}
+			m_branch_state = ADDR(m_pc + 4, s32(s16(op)) << 2) | DELAY;
 		break;
 	case 0x06: // BLEZ
 		if (s64(m_r[RSREG]) <= 0)
-		{
-			m_branch_state = BRANCH;
-			m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
-		}
+			m_branch_state = ADDR(m_pc + 4, s32(s16(op)) << 2) | DELAY;
 		break;
 	case 0x07: // BGTZ
 		if (s64(m_r[RSREG]) > 0)
-		{
-			m_branch_state = BRANCH;
-			m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
-		}
+			m_branch_state = ADDR(m_pc + 4, s32(s16(op)) << 2) | DELAY;
 		break;
 	case 0x08: // ADDI
 		{
@@ -856,37 +816,25 @@ void r4000_base_device::cpu_execute(u32 const op)
 		break;
 	case 0x14: // BEQL
 		if (m_r[RSREG] == m_r[RTREG])
-		{
-			m_branch_state = BRANCH;
-			m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
-		}
+			m_branch_state = ADDR(m_pc + 4, s32(s16(op)) << 2) | DELAY;
 		else
 			m_branch_state = NULLIFY;
 		break;
 	case 0x15: // BNEL
 		if (m_r[RSREG] != m_r[RTREG])
-		{
-			m_branch_state = BRANCH;
-			m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
-		}
+			m_branch_state = ADDR(m_pc + 4, s32(s16(op)) << 2) | DELAY;
 		else
 			m_branch_state = NULLIFY;
 		break;
 	case 0x16: // BLEZL
 		if (s64(m_r[RSREG]) <= 0)
-		{
-			m_branch_state = BRANCH;
-			m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
-		}
+			m_branch_state = ADDR(m_pc + 4, s32(s16(op)) << 2) | DELAY;
 		else
 			m_branch_state = NULLIFY;
 		break;
 	case 0x17: // BGTZL
 		if (s64(m_r[RSREG]) > 0)
-		{
-			m_branch_state = BRANCH;
-			m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
-		}
+			m_branch_state = ADDR(m_pc + 4, s32(s16(op)) << 2) | DELAY;
 		else
 			m_branch_state = NULLIFY;
 		break;
@@ -1205,8 +1153,8 @@ void r4000_base_device::cpu_exception(u32 exception, u16 const vector)
 
 		CAUSE = (CAUSE & CAUSE_IP) | exception;
 
-		// if in a branch delay slot, restart at the branch instruction
-		if (m_branch_state == DELAY)
+		// if executing a delay slot instruction, restart from the branch
+		if ((m_branch_state & STATE) == BRANCH)
 		{
 			m_cp0[CP0_EPC] -= 4;
 			CAUSE |= CAUSE_BD;
@@ -1217,10 +1165,20 @@ void r4000_base_device::cpu_exception(u32 exception, u16 const vector)
 	else
 		CAUSE = (CAUSE & (CAUSE_BD | CAUSE_IP)) | exception;
 
-	m_branch_state = EXCEPTION;
-	m_pc = ((SR & SR_BEV) ? s64(s32(0xbfc00200)) : s64(s32(0x80000000))) + vector;
+	m_branch_state = (((SR & SR_BEV) ? s64(s32(0xbfc00200)) : s64(s32(0x80000000))) + vector) | BRANCH;
 
-	if (exception != EXCEPTION_INT)
+	if (exception == EXCEPTION_INT)
+	{
+		if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+		{
+			// notify the debugger of the first pending hardware interrupt
+			u32 const iphw = CAUSE & SR & CAUSE_IPHW;
+
+			if (iphw)
+				debug()->interrupt_hook(22 - count_leading_zeros((iphw - 1) & ~iphw));
+		}
+	}
+	else
 		debugger_exception_hook(exception);
 }
 
@@ -1395,14 +1353,12 @@ void r4000_base_device::cp0_execute(u32 const op)
 		case 0x18: // ERET
 			if (SR & SR_ERL)
 			{
-				m_branch_state = EXCEPTION;
-				m_pc = m_cp0[CP0_ErrorEPC];
+				m_branch_state = m_cp0[CP0_ErrorEPC] | BRANCH;
 				SR &= ~SR_ERL;
 			}
 			else
 			{
-				m_branch_state = EXCEPTION;
-				m_pc = m_cp0[CP0_EPC];
+				m_branch_state = m_cp0[CP0_EPC] | BRANCH;
 				SR &= ~SR_EXL;
 			}
 
@@ -2255,33 +2211,21 @@ void r4000_base_device::cp1_execute(u32 const op)
 			{
 			case 0x00: // BC1F
 				if (!(m_fcr31 & FCR31_C))
-				{
-					m_branch_state = BRANCH;
-					m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
-				}
+					m_branch_state = ADDR(m_pc + 4, s32(s16(op)) << 2) | DELAY;
 				break;
 			case 0x01: // BC1T
 				if (m_fcr31 & FCR31_C)
-				{
-					m_branch_state = BRANCH;
-					m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
-				}
+					m_branch_state = ADDR(m_pc + 4, s32(s16(op)) << 2) | DELAY;
 				break;
 			case 0x02: // BC1FL
 				if (!(m_fcr31 & FCR31_C))
-				{
-					m_branch_state = BRANCH;
-					m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
-				}
+					m_branch_state = ADDR(m_pc + 4, s32(s16(op)) << 2) | DELAY;
 				else
 					m_branch_state = NULLIFY;
 				break;
 			case 0x03: // BC1TL
 				if (m_fcr31 & FCR31_C)
-				{
-					m_branch_state = BRANCH;
-					m_branch_target = ADDR(m_pc + 4, s32(s16(op)) << 2);
-				}
+					m_branch_state = ADDR(m_pc + 4, s32(s16(op)) << 2) | DELAY;
 				else
 					m_branch_state = NULLIFY;
 				break;
@@ -3133,8 +3077,7 @@ void r4000_base_device::cp1_execute(u32 const op)
 		break;
 
 	case 0x3d: // SDC1
-		if ((SR & SR_FR) || !(RTREG & 1))
-			store<u64>(ADDR(m_r[RSREG], s16(op)), m_f[RTREG]);
+		store<u64>(ADDR(m_r[RSREG], s16(op)), m_f[RTREG]);
 		break;
 	}
 }

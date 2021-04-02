@@ -368,7 +368,7 @@ protected:
 	void cp2_execute(u32 const op);
 
 	// address and memory handling
-	enum translate_result { ERROR, MISS, UNCACHED, CACHED };
+	enum translate_result : unsigned { ERROR, MISS, UNCACHED, CACHED };
 	translate_result translate(int intention, u64 &address);
 	void address_error(int intention, u64 const address);
 
@@ -400,6 +400,17 @@ protected:
 	std::function<void(offs_t offset, u32 data, u32 mem_mask)> write_dword;
 	std::function<void(offs_t offset, u64 data, u64 mem_mask)> write_qword;
 
+	enum branch_state : u64
+	{
+		STATE   = 0x00000000'00000003,
+		TARGET  = 0xffffffff'fffffffc,
+
+		NONE    = 0,
+		BRANCH  = 1, // retire delayed branch
+		DELAY   = 2, // delay slot instruction
+		NULLIFY = 3, // next instruction nullified
+	};
+
 	// runtime state
 	int m_icount;
 
@@ -412,16 +423,7 @@ protected:
 	u64 m_r[32];
 	u64 m_hi;
 	u64 m_lo;
-	enum branch_state : unsigned
-	{
-		NONE      = 0,
-		DELAY     = 1, // delay slot instruction active
-		BRANCH    = 2, // branch instruction active
-		EXCEPTION = 3, // exception triggered
-		NULLIFY   = 4, // next instruction nullified
-	}
-	m_branch_state;
-	u64 m_branch_target;
+	u64 m_branch_state;
 
 	// cp0 state
 	u64 m_cp0[32];
