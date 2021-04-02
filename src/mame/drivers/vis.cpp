@@ -6,8 +6,8 @@
 #include "cpu/i86/i286.h"
 #include "machine/8042kbdc.h"
 #include "machine/at.h"
-#include "sound/262intf.h"
 #include "sound/dac.h"
+#include "sound/ymf262.h"
 #include "video/pc_vga.h"
 #include "speaker.h"
 

@@ -81,8 +81,8 @@ a joystick.  This is not an emulation bug.
 #include "cpu/mcs51/mcs51.h" // for semicom mcu
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "sound/3812intf.h"
 #include "sound/ym2151.h"
+#include "sound/ym3812.h"
 
 #include "speaker.h"
 

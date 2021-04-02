@@ -18,7 +18,7 @@
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/3812intf.h"
+#include "sound/ym3812.h"
 #include "speaker.h"
 
 // mephisto_state was also defined in mess/drivers/mephisto.c

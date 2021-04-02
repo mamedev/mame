@@ -18,11 +18,14 @@ DECLARE_DEVICE_TYPE(YM2608, ym2608_device);
 class ym2608_device : public ay8910_device, public device_rom_interface<21>
 {
 public:
+	// YM2608 is OPNA
+	using fm_engine = ymopna_engine;
+
 	// constructor
 	ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	auto irq_handler() { return m_opn.irq_handler(); }
+	auto irq_handler() { return m_fm.irq_handler(); }
 
 	// read/write access
 	u8 read(offs_t offset);
@@ -33,9 +36,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// ROM device overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void rom_bank_updated() override;
 
 	// sound overrides
@@ -45,7 +48,7 @@ private:
 	// set a new prescale value and update clocks
 	void update_prescale(u8 newval);
 
-	// combine ADPCM and OPN statuses
+	// combine ADPCM and FM statuses
 	u8 combine_status();
 
 	// ADPCM read/write callbacks
@@ -55,7 +58,7 @@ private:
 
 	// internal state
 	required_memory_region m_internal; // internal memory region
-	ymopna_engine m_opn;             // core OPNA engine
+	fm_engine m_fm;                  // core FM engine
 	ymadpcm_a_engine m_adpcm_a;      // ADPCM-A engine
 	ymadpcm_b_engine m_adpcm_b;      // ADPCM-B engine
 	sound_stream *m_stream;          // sound stream

@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "ymadpcm.h"
 
-//#define VERBOSE 1
+#define VERBOSE 1
 #define LOG_OUTPUT_FUNC osd_printf_verbose
 #include "logmacro.h"
 
@@ -21,6 +21,30 @@
 
 
 //*********************************************************
+// ADPCM "A" REGISTERS
+//*********************************************************
+
+//-------------------------------------------------
+//  ymadpcm_a_registers - constructor
+//-------------------------------------------------
+
+void ymadpcm_a_registers::save(device_t &device)
+{
+	device.save_item(ADPCM_A_NAME(m_regdata));
+}
+
+
+//-------------------------------------------------
+//  reset - reset the register state
+//-------------------------------------------------
+
+void ymadpcm_a_registers::reset()
+{
+	std::fill_n(&m_regdata[0], REGISTERS, 0);
+}
+
+
+//*********************************************************
 // ADPCM "A" CHANNEL
 //*********************************************************
 
@@ -28,16 +52,17 @@
 //  ymadpcm_a_channel - constructor
 //-------------------------------------------------
 
-ymadpcm_a_channel::ymadpcm_a_channel(ymadpcm_a_registers regs, read8sm_delegate reader, u8 addrshift) :
+ymadpcm_a_channel::ymadpcm_a_channel(ymadpcm_a_engine &owner, u32 choffs, read8sm_delegate reader, u32 addrshift) :
+	m_choffs(choffs),
 	m_address_shift(addrshift),
-	m_reader(std::move(reader)),
 	m_playing(0),
 	m_curnibble(0),
 	m_curbyte(0),
 	m_curaddress(0),
 	m_accumulator(0),
 	m_step_index(0),
-	m_regs(regs)
+	m_reader(std::move(reader)),
+	m_regs(owner.regs())
 {
 }
 
@@ -46,7 +71,7 @@ ymadpcm_a_channel::ymadpcm_a_channel(ymadpcm_a_registers regs, read8sm_delegate 
 //  save - register for save states
 //-------------------------------------------------
 
-void ymadpcm_a_channel::save(device_t &device, u8 index)
+void ymadpcm_a_channel::save(device_t &device, u32 index)
 {
 	device.save_item(ADPCM_A_NAME(m_playing), index);
 	device.save_item(ADPCM_A_NAME(m_curnibble), index);
@@ -82,12 +107,18 @@ void ymadpcm_a_channel::keyonoff(bool on)
 	m_playing = on;
 	if (m_playing)
 	{
-		m_curaddress = m_regs.start() << m_address_shift;
+		m_curaddress = m_regs.ch_start(m_choffs) << m_address_shift;
 		m_curnibble = 0;
 		m_curbyte = 0;
 		m_accumulator = 0;
 		m_step_index = 0;
-		LOG("KeyOn ADPCM-A%d: pan=%d%d start=%04X end=%04X level=%02X\n", m_regs.chbase(), m_regs.pan_left(), m_regs.pan_right(), m_regs.start(), m_regs.end(), m_regs.instrument_level());
+		LOG("KeyOn ADPCM-A%d: pan=%d%d start=%04X end=%04X level=%02X\n",
+			m_choffs,
+			m_regs.ch_pan_left(m_choffs),
+			m_regs.ch_pan_right(m_choffs),
+			m_regs.ch_start(m_choffs),
+			m_regs.ch_end(m_choffs),
+			m_regs.ch_instrument_level(m_choffs));
 	}
 }
 
@@ -106,7 +137,7 @@ bool ymadpcm_a_channel::clock()
 	}
 
 	// stop when we hit the end address
-	if ((m_curaddress >> m_address_shift) >= m_regs.end())
+	if ((m_curaddress >> m_address_shift) >= m_regs.ch_end(m_choffs))
 	{
 		m_playing = m_accumulator = 0;
 		return true;
@@ -148,13 +179,7 @@ bool ymadpcm_a_channel::clock()
 
 	// adjust ADPCM step
 	static s8 const s_step_inc[8] = { -1, -1, -1, -1, 2, 5, 7, 9 };
-	m_step_index += s_step_inc[BIT(data, 0, 3)];
-
-	// clamp to the full range
-	if (m_step_index > 48)
-		m_step_index = 48;
-	else if (m_step_index < 0)
-		m_step_index = 0;
+	m_step_index = std::clamp(m_step_index + s_step_inc[BIT(data, 0, 3)], 0, 48);
 
 	return false;
 }
@@ -165,10 +190,10 @@ bool ymadpcm_a_channel::clock()
 //  panning applied
 //-------------------------------------------------
 
-void ymadpcm_a_channel::output(s32 &leftout, s32 &rightout) const
+void ymadpcm_a_channel::output(s32 outputs[2]) const
 {
 	// volume combined instrument and total levels
-	int vol = (m_regs.instrument_level() ^ 0x1f) + (m_regs.total_level() ^ 0x3f);
+	int vol = (m_regs.ch_instrument_level(m_choffs) ^ 0x1f) + (m_regs.total_level() ^ 0x3f);
 
 	// if combined is maximum, don't add to outputs
 	if (vol >= 63)
@@ -184,10 +209,10 @@ void ymadpcm_a_channel::output(s32 &leftout, s32 &rightout) const
 	s16 value = ((s16(m_accumulator << 4) * mul) >> shift) & ~3;
 
 	// apply to left/right as appropriate
-	if (m_regs.pan_left())
-		leftout += value;
-	if (m_regs.pan_right())
-		rightout += value;
+	if (m_regs.ch_pan_left(m_choffs))
+		outputs[0] += value;
+	if (m_regs.ch_pan_right(m_choffs))
+		outputs[1] += value;
 }
 
 
@@ -200,13 +225,11 @@ void ymadpcm_a_channel::output(s32 &leftout, s32 &rightout) const
 //  ymadpcm_a_engine - constructor
 //-------------------------------------------------
 
-ymadpcm_a_engine::ymadpcm_a_engine(device_t &device, read8sm_delegate reader, u8 addrshift) :
-	m_regdata(0x30),
-	m_regs(m_regdata)
+ymadpcm_a_engine::ymadpcm_a_engine(device_t &device, read8sm_delegate reader, u32 addrshift)
 {
 	// create the channels
-	for (int chnum = 0; chnum < 6; chnum++)
-		m_channel[chnum] = std::make_unique<ymadpcm_a_channel>(m_regs.channel_registers(chnum), reader, addrshift);
+	for (int chnum = 0; chnum < CHANNELS; chnum++)
+		m_channel[chnum] = std::make_unique<ymadpcm_a_channel>(*this, chnum, reader, addrshift);
 }
 
 
@@ -216,8 +239,8 @@ ymadpcm_a_engine::ymadpcm_a_engine(device_t &device, read8sm_delegate reader, u8
 
 void ymadpcm_a_engine::save(device_t &device)
 {
-	// save our state
-	device.save_item(ADPCM_A_NAME(m_regdata));
+	// save register state
+	m_regs.save(device);
 
 	// save channel state
 	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
@@ -231,6 +254,9 @@ void ymadpcm_a_engine::save(device_t &device)
 
 void ymadpcm_a_engine::reset()
 {
+	// reset register state
+	m_regs.reset();
+
 	// reset each channel
 	for (auto &chan : m_channel)
 		chan->reset();
@@ -241,10 +267,10 @@ void ymadpcm_a_engine::reset()
 //  clock - master clocking function
 //-------------------------------------------------
 
-u8 ymadpcm_a_engine::clock(u8 chanmask)
+u32 ymadpcm_a_engine::clock(u32 chanmask)
 {
 	// clock each channel, setting a bit in result if it finished
-	u8 result = 0;
+	u32 result = 0;
 	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
 		if (BIT(chanmask, chnum))
 			if (m_channel[chnum]->clock())
@@ -259,12 +285,12 @@ u8 ymadpcm_a_engine::clock(u8 chanmask)
 //  update - master update function
 //-------------------------------------------------
 
-void ymadpcm_a_engine::output(s32 &lsum, s32 &rsum, u8 chanmask)
+void ymadpcm_a_engine::output(s32 outputs[2], u32 chanmask)
 {
 	// compute the output of each channel
 	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
 		if (BIT(chanmask, chnum))
-			m_channel[chnum]->output(lsum, rsum);
+			m_channel[chnum]->output(outputs);
 }
 
 
@@ -272,7 +298,7 @@ void ymadpcm_a_engine::output(s32 &lsum, s32 &rsum, u8 chanmask)
 //  write - handle writes to the ADPCM-A registers
 //-------------------------------------------------
 
-void ymadpcm_a_engine::write(u8 regnum, u8 data)
+void ymadpcm_a_engine::write(u32 regnum, u8 data)
 {
 	// store the raw value to the register array;
 	// most writes are passive, consumed only when needed
@@ -288,6 +314,33 @@ void ymadpcm_a_engine::write(u8 regnum, u8 data)
 
 
 //*********************************************************
+// ADPCM "B" REGISTERS
+//*********************************************************
+
+//-------------------------------------------------
+//  ymadpcm_b_registers - constructor
+//-------------------------------------------------
+
+void ymadpcm_b_registers::save(device_t &device)
+{
+	device.save_item(ADPCM_B_NAME(m_regdata));
+}
+
+
+//-------------------------------------------------
+//  reset - reset the register state
+//-------------------------------------------------
+
+void ymadpcm_b_registers::reset()
+{
+	std::fill_n(&m_regdata[0], REGISTERS, 0);
+
+	// default limit to wide open
+	m_regdata[0x0c] = m_regdata[0x0d] = 0xff;
+}
+
+
+//*********************************************************
 // ADPCM "B" CHANNEL
 //*********************************************************
 
@@ -295,9 +348,7 @@ void ymadpcm_a_engine::write(u8 regnum, u8 data)
 //  ymadpcm_b_channel - constructor
 //-------------------------------------------------
 
-ymadpcm_b_channel::ymadpcm_b_channel(ymadpcm_b_registers regs, read8sm_delegate reader, write8sm_delegate writer, u8 addrshift) :
-	m_reader(reader),
-	m_writer(writer),
+ymadpcm_b_channel::ymadpcm_b_channel(ymadpcm_b_engine &owner, read8sm_delegate reader, write8sm_delegate writer, u32 addrshift) :
 	m_address_shift(addrshift),
 	m_status(STATUS_BRDY),
 	m_curnibble(0),
@@ -308,7 +359,9 @@ ymadpcm_b_channel::ymadpcm_b_channel(ymadpcm_b_registers regs, read8sm_delegate 
 	m_accumulator(0),
 	m_prev_accum(0),
 	m_adpcm_step(STEP_MIN),
-	m_regs(regs)
+	m_reader(reader),
+	m_writer(writer),
+	m_regs(owner.regs())
 {
 }
 
@@ -317,7 +370,7 @@ ymadpcm_b_channel::ymadpcm_b_channel(ymadpcm_b_registers regs, read8sm_delegate 
 //  save - register for save states
 //-------------------------------------------------
 
-void ymadpcm_b_channel::save(device_t &device, u8 index)
+void ymadpcm_b_channel::save(device_t &device, u32 index)
 {
 	device.save_item(ADPCM_B_NAME(m_status), index);
 	device.save_item(ADPCM_B_NAME(m_curnibble), index);
@@ -388,6 +441,7 @@ void ymadpcm_b_channel::clock()
 				m_accumulator = 0;
 				m_prev_accum = 0;
 				m_status = (m_status & ~STATUS_PLAYING) | STATUS_EOS;
+				LOG("ADPCM EOS\n");
 				return;
 			}
 		}
@@ -433,19 +487,19 @@ void ymadpcm_b_channel::clock()
 //  panning applied
 //-------------------------------------------------
 
-void ymadpcm_b_channel::output(s32 &lsum, s32 &rsum, u8 rshift) const
+void ymadpcm_b_channel::output(s32 outputs[2], u32 rshift) const
 {
 	// do a linear interpolation between samples
-	s32 result = (m_prev_accum * ((m_position ^ 0xffff) + 1) + m_accumulator * m_position) >> 16;
+	s32 result = (m_prev_accum * s32((m_position ^ 0xffff) + 1) + m_accumulator * s32(m_position)) >> 16;
 
 	// apply volume (level) in a linear fashion and reduce
-	result = (result * m_regs.level()) >> (8 + rshift);
+	result = (result * s32(m_regs.level())) >> (8 + rshift);
 
 	// apply to left/right
 	if (m_regs.pan_left())
-		lsum += result;
+		outputs[0] += result;
 	if (m_regs.pan_right())
-		rsum += result;
+		outputs[1] += result;
 }
 
 
@@ -453,7 +507,7 @@ void ymadpcm_b_channel::output(s32 &lsum, s32 &rsum, u8 rshift) const
 //  read - handle special register reads
 //-------------------------------------------------
 
-u8 ymadpcm_b_channel::read(u8 regnum)
+u8 ymadpcm_b_channel::read(u32 regnum)
 {
 	u8 result = 0;
 
@@ -469,7 +523,10 @@ u8 ymadpcm_b_channel::read(u8 regnum)
 
 		// did we hit the end? if so, signal EOS
 		if (at_end())
+		{
 			m_status = STATUS_EOS | STATUS_BRDY;
+			LOG("ADPCM EOS\n");
+		}
 
 		// otherwise, write the data and signal ready
 		else
@@ -486,7 +543,7 @@ u8 ymadpcm_b_channel::read(u8 regnum)
 //  write - handle special register writes
 //-------------------------------------------------
 
-void ymadpcm_b_channel::write(u8 regnum, u8 value)
+void ymadpcm_b_channel::write(u32 regnum, u8 value)
 {
 	// register 0 can do a reset; also use writes here to reset the
 	// dummy read counter
@@ -495,9 +552,26 @@ void ymadpcm_b_channel::write(u8 regnum, u8 value)
 		if (m_regs.execute())
 		{
 			load_start();
-			LOG("KeyOn ADPCM-B: repeat=%d speaker=%d pan=%d%d dac=%d 8bit=%d rom=%d start=%04X end=%04X prescale=%04X deltan=%04X level=%02X limit=%04X\n", m_regs.repeat(), m_regs.speaker(), m_regs.pan_left(), m_regs.pan_right(), m_regs.dac(), m_regs.dram_8bit(), m_regs.rom_ram(), m_regs.start(), m_regs.end(), m_regs.prescale(), m_regs.delta_n(), m_regs.level(), m_regs.limit());
+			LOG("KeyOn ADPCM-B: rep=%d spk=%d pan=%d%d dac=%d 8b=%d rom=%d ext=%d rec=%d start=%04X end=%04X pre=%04X dn=%04X lvl=%02X lim=%04X\n",
+				m_regs.repeat(),
+				m_regs.speaker(),
+				m_regs.pan_left(),
+				m_regs.pan_right(),
+				m_regs.dac(),
+				m_regs.dram_8bit(),
+				m_regs.rom_ram(),
+				m_regs.external(),
+				m_regs.record(),
+				m_regs.start(),
+				m_regs.end(),
+				m_regs.prescale(),
+				m_regs.delta_n(),
+				m_regs.level(),
+				m_regs.limit());
 		}
-		if (m_regs.reset())
+		else
+			m_status &= ~STATUS_EOS;
+		if (m_regs.resetflag())
 			reset();
 		if (m_regs.external())
 			m_dummy_read = 2;
@@ -522,7 +596,10 @@ void ymadpcm_b_channel::write(u8 regnum, u8 value)
 
 			// did we hit the end? if so, signal EOS
 			if (at_end())
+			{
+				LOG("ADPCM EOS\n");
 				m_status = STATUS_EOS | STATUS_BRDY;
+			}
 
 			// otherwise, write the data and signal ready
 			else
@@ -540,7 +617,7 @@ void ymadpcm_b_channel::write(u8 regnum, u8 value)
 //  shift amount based on register settings
 //-------------------------------------------------
 
-u8 ymadpcm_b_channel::address_shift() const
+u32 ymadpcm_b_channel::address_shift() const
 {
 	// if a constant address shift, just provide that
 	if (m_address_shift != 0)
@@ -584,19 +661,10 @@ void ymadpcm_b_channel::load_start()
 //  ymadpcm_b_engine - constructor
 //-------------------------------------------------
 
-ymadpcm_b_engine::ymadpcm_b_engine(device_t &device, read8sm_delegate reader, write8sm_delegate writer, u8 addrshift) :
-	m_regdata(0x10),
-	m_regs(m_regdata)
+ymadpcm_b_engine::ymadpcm_b_engine(device_t &device, read8sm_delegate reader, write8sm_delegate writer, u32 addrshift)
 {
 	// create the channel (only one supported for now, but leaving possibilities open)
-	m_channel[0] = std::make_unique<ymadpcm_b_channel>(m_regs, reader, writer, addrshift);
-
-	// clear registers by default
-	std::fill_n(&m_regdata[0], m_regdata.size(), 0);
-
-	// set the limit to 0xffff by default
-	m_regs.write(0x0c, 0xff);
-	m_regs.write(0x0d, 0xff);
+	m_channel[0] = std::make_unique<ymadpcm_b_channel>(*this, reader, writer, addrshift);
 }
 
 
@@ -607,7 +675,7 @@ ymadpcm_b_engine::ymadpcm_b_engine(device_t &device, read8sm_delegate reader, wr
 void ymadpcm_b_engine::save(device_t &device)
 {
 	// save our state
-	device.save_item(ADPCM_B_NAME(m_regdata));
+	m_regs.save(device);
 
 	// save channel state
 	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
@@ -621,6 +689,9 @@ void ymadpcm_b_engine::save(device_t &device)
 
 void ymadpcm_b_engine::reset()
 {
+	// reset registers
+	m_regs.reset();
+
 	// reset each channel
 	for (auto &chan : m_channel)
 		chan->reset();
@@ -631,7 +702,7 @@ void ymadpcm_b_engine::reset()
 //  clock - master clocking function
 //-------------------------------------------------
 
-void ymadpcm_b_engine::clock(u8 chanmask)
+void ymadpcm_b_engine::clock(u32 chanmask)
 {
 	// clock each channel, setting a bit in result if it finished
 	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
@@ -644,12 +715,12 @@ void ymadpcm_b_engine::clock(u8 chanmask)
 //  output - master output function
 //-------------------------------------------------
 
-void ymadpcm_b_engine::output(s32 &lsum, s32 &rsum, u8 rshift, u8 chanmask)
+void ymadpcm_b_engine::output(s32 outputs[2], u32 rshift, u32 chanmask)
 {
 	// compute the output of each channel
 	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
 		if (BIT(chanmask, chnum))
-			m_channel[chnum]->output(lsum, rsum, rshift);
+			m_channel[chnum]->output(outputs, rshift);
 }
 
 
@@ -657,7 +728,7 @@ void ymadpcm_b_engine::output(s32 &lsum, s32 &rsum, u8 rshift, u8 chanmask)
 //  write - handle writes to the ADPCM-B registers
 //-------------------------------------------------
 
-void ymadpcm_b_engine::write(u8 regnum, u8 data)
+void ymadpcm_b_engine::write(u32 regnum, u8 data)
 {
 	// store the raw value to the register array;
 	// most writes are passive, consumed only when needed

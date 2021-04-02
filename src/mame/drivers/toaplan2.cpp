@@ -397,8 +397,8 @@ To reset the NVRAM in Othello Derby, hold P1 Button 1 down while booting.
 #include "cpu/z80/z80.h"
 #include "cpu/z180/hd647180x.h"
 #include "machine/nvram.h"
-#include "sound/3812intf.h"
 #include "sound/ym2151.h"
+#include "sound/ym3812.h"
 #include "sound/ymz280b.h"
 #include "speaker.h"
 
@@ -1487,8 +1487,8 @@ void toaplan2_state::hd647180_io_map(address_map &map)
 	map(0x70, 0x75).nopw(); // DDRs are written with the wrong upper addresses!
 	map(0x84, 0x84).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 
-	map(0x82, 0x82).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
-	map(0x83, 0x83).rw("ymsnd", FUNC(ym3812_device::read_port_r), FUNC(ym3812_device::write_port_w));
+	map(0x82, 0x82).rw("ymsnd", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
+	map(0x83, 0x83).w("ymsnd", FUNC(ym3812_device::data_w));
 }
 
 

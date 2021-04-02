@@ -68,9 +68,8 @@ Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
-//#include "sound/ym2151.h"
+#include "sound/ym3812.h"
 #include "machine/r2crypt.h"
 
 #include "speaker.h"

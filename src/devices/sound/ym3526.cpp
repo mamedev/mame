@@ -2,21 +2,21 @@
 // copyright-holders:Aaron Giles
 
 #include "emu.h"
-#include "ymf262.h"
+#include "ym3526.h"
 
 
-DEFINE_DEVICE_TYPE(YMF262, ymf262_device, "ymf262", "YMF262 OPL3")
+DEFINE_DEVICE_TYPE(YM3526, ym3526_device, "ym3526", "YM3526 OPL")
 
 
 //*********************************************************
-//  YMF262 DEVICE
+//  YM3526 DEVICE
 //*********************************************************
 
 //-------------------------------------------------
-//  ymf262_device - constructor
+//  ym3526_device - constructor
 //-------------------------------------------------
 
-ymf262_device::ymf262_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
+ym3526_device::ym3526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_address(0),
@@ -27,23 +27,52 @@ ymf262_device::ymf262_device(const machine_config &mconfig, const char *tag, dev
 
 
 //-------------------------------------------------
+//  status_r - return the status port (A0=0)
+//-------------------------------------------------
+
+u8 ym3526_device::status_r()
+{
+	return m_fm.status() | 0x06;
+}
+
+
+//-------------------------------------------------
 //  read - handle a read from the device
 //-------------------------------------------------
 
-u8 ymf262_device::read(offs_t offset)
+u8 ym3526_device::read(offs_t offset)
 {
-	u8 result = 0x00;
-	switch (offset & 3)
-	{
-		case 0: 	// status port (A0=0, A1=0)
-			result = m_fm.status();
-			break;
+	// datasheet says status only reads when A0=0
+	if ((offset & 1) == 0)
+		return status_r();
 
-		default:	// datasheet says anything else is not guaranteed
-			logerror("Unexpected read from YMF262 offset %d\n", offset & 3);
-			break;
-	}
-	return result;
+	// when A0=1 datasheet says "the data on the bus are not guaranteed"
+	logerror("Unexpected read from YM3526 offset %d\n", offset & 1);
+	return 0xff;
+}
+
+
+//-------------------------------------------------
+//  address_w - write to the address port (A0=0)
+//-------------------------------------------------
+
+void ym3526_device::address_w(u8 value)
+{
+	m_address = value;
+}
+
+
+//-------------------------------------------------
+//  data_w - write to the data port (A0=1)
+//-------------------------------------------------
+
+void ym3526_device::data_w(u8 value)
+{
+	// force an update
+	m_stream->update();
+
+	// write to FM
+	m_fm.write(m_address, value);
 }
 
 
@@ -52,28 +81,13 @@ u8 ymf262_device::read(offs_t offset)
 //  interface
 //-------------------------------------------------
 
-void ymf262_device::write(offs_t offset, u8 value)
+void ym3526_device::write(offs_t offset, u8 value)
 {
-	switch (offset & 1)
-	{
-		case 0:	// address ports - A1 references upper bank
-			m_address = value | (BIT(offset, 1) << 8);
-
-			// tests reveal that in compatibility mode, upper bit is masked
-			// except for register 0x105
-			if (m_fm.regs().newflag() == 0 && m_address != 0x105)
-				m_address &= 0xff;
-			break;
-
-		case 1: // data ports (A1 is ignored)
-
-			// force an update
-			m_stream->update();
-
-			// write to FM
-			m_fm.write(m_address, value);
-			break;
-	}
+	// A0 selects between address/data
+	if ((offset & 1) == 0)
+		address_w(value);
+	else
+		data_w(value);
 }
 
 
@@ -81,7 +95,7 @@ void ymf262_device::write(offs_t offset, u8 value)
 //  device_start - start of emulation
 //-------------------------------------------------
 
-void ymf262_device::device_start()
+void ym3526_device::device_start()
 {
 	// create our stream
 	m_stream = stream_alloc(0, fm_engine::OUTPUTS, m_fm.sample_rate(clock()));
@@ -98,7 +112,7 @@ void ymf262_device::device_start()
 //  device_reset - start of emulation
 //-------------------------------------------------
 
-void ymf262_device::device_reset()
+void ym3526_device::device_reset()
 {
 	// reset the engines
 	m_fm.reset();
@@ -109,7 +123,7 @@ void ymf262_device::device_reset()
 //  device_clock_changed - update if clock changes
 //-------------------------------------------------
 
-void ymf262_device::device_clock_changed()
+void ym3526_device::device_clock_changed()
 {
 	m_stream->set_sample_rate(m_fm.sample_rate(clock()));
 }
@@ -119,7 +133,7 @@ void ymf262_device::device_clock_changed()
 //  sound_stream_update - update the sound stream
 //-------------------------------------------------
 
-void ymf262_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void ym3526_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
 	// iterate over all target samples
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
@@ -129,10 +143,11 @@ void ymf262_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 		// update the FM content; clipping is unknown
 		s32 sums[fm_engine::OUTPUTS] = { 0 };
-		m_fm.output(sums, 0, 32767, fm_engine::ALL_CHANNELS);
+		m_fm.output(sums, 1, 32767, fm_engine::ALL_CHANNELS);
 
-		// YMF262 outputs straight 16-bit data in 4 channels
+		// convert to 10.3 floating point value for the DAC and back
+		// YM3526 is mono
 		for (int index = 0; index < fm_engine::OUTPUTS; index++)
-			outputs[index].put_int(sampindex, sums[index], 32768);
+			outputs[index].put_int(sampindex, ymfm_roundtrip_fp(sums[index]), 32768);
 	}
 }

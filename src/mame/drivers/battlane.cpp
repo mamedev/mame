@@ -16,7 +16,7 @@
 #include "includes/battlane.h"
 
 #include "cpu/m6809/m6809.h"
-#include "sound/3526intf.h"
+#include "sound/ym3526.h"
 #include "screen.h"
 #include "speaker.h"
 
