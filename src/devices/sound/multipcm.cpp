@@ -44,7 +44,7 @@ ALLOW_SAVE_TYPE(multipcm_device::state_t); // allow save_item on a non-fundament
         ENVELOPE SECTION
 *******************************/
 
-//Times are based on a 44100Hz timebase. It's adjusted to the actual sampling rate on startup
+// Times are based on a 44100Hz timebase. It's adjusted to the actual sampling rate on startup
 
 const double multipcm_device::BASE_TIMES[64] = {
 	0,          0,          0,          0,
@@ -458,7 +458,8 @@ void multipcm_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-/* MAME/M1 access functions */
+
+/* MAME access functions */
 
 DEFINE_DEVICE_TYPE(MULTIPCM, multipcm_device, "ymw258f", "Yamaha YMW-258-F")
 
@@ -547,7 +548,7 @@ void multipcm_device::device_start()
 		}
 	}
 
-	//Pitch steps
+	// Pitch steps
 	m_freq_step_table = make_unique_clear<uint32_t[]>(0x400);
 	for (int32_t i = 0; i < 0x400; ++i)
 	{
@@ -641,8 +642,7 @@ void multipcm_device::device_clock_changed()
 }
 
 //-----------------------------------------------------
-//  convert_to_stream_sample - clamp a 32-bit value to
-//  16 bits and convert to a stream_buffer::sample_t
+//  dump_sample - dump current sample to WAV file
 //-----------------------------------------------------
 
 #if MULTIPCM_LOG_SAMPLES
