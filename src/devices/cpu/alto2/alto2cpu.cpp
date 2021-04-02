@@ -2266,7 +2266,7 @@ void alto2_cpu_device::execute_run()
 				display_state_machine();
 		}
 
-		if (m_unload_time >= m_unload_time) {
+		if (m_unload_time >= ucycle) {
 			/**
 			 * Subtract the microcycle time from the unload time accu.
 			 * If it underflows, call the unload word function which adds
@@ -2274,11 +2274,11 @@ void alto2_cpu_device::execute_run()
 			 * the FIFO unloading by leaving m_unload_time at -1.
 			 */
 			m_unload_time -= ucycle;
-			if (m_unload_time < m_unload_time)
+			if (m_unload_time < ucycle)
 				unload_word();
 		}
 
-		if (m_bitclk_time >= m_bitclk_time) {
+		if (m_bitclk_time >= ucycle) {
 			/**
 			 * Subtract the microcycle time from the bitclk time accu.
 			 * If it underflows, call the disk bitclk function which adds
