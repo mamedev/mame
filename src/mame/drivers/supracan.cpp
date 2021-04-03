@@ -1785,7 +1785,7 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			rectangle visarea = m_screen->visible_area();
 
 			visarea.set(0, ((m_video_flags & 0x100) ? 320 : 256) - 1, 8, 232 - 1);
-			m_screen->configure(348, 256, visarea, m_screen->frame_period().as_subseconds());
+			m_screen->configure(348, 256, visarea, m_screen->frame_period_subseconds());
 		}
 		break;
 	case 0x0a/2:

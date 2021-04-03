@@ -570,94 +570,6 @@ transient_timer_factory::transient_timer_factory()
 
 
 //**************************************************************************
-//  BASETIME-RELATIVE
-//**************************************************************************
-
-//-------------------------------------------------
-//  basetime_relative - constructor
-//-------------------------------------------------
-
-device_scheduler::basetime_relative::basetime_relative() :
-	m_relative(0),
-	m_absolute(attotime::zero),
-	m_base(attotime::zero),
-	m_absolute_dirty(false)
-{
-}
-
-
-//-------------------------------------------------
-//  update_relative - update the relative time
-//  from the absolute time
-//-------------------------------------------------
-
-void device_scheduler::basetime_relative::update_relative()
-{
-	s32 delta = m_absolute.seconds() - m_base.seconds();
-
-	// if the seconds match, then the relative time is fine as-is
-	m_relative = m_absolute.raw_subseconds().raw() - m_base.raw_subseconds().raw();
-	if (delta == 0)
-	{
-		m_relative = std::clamp<s64>(m_relative, MIN_RELATIVE, MAX_RELATIVE);
-		return;
-	}
-
-	// if the absolute time is ahead/behind, we need to add/subtract
-	// subseconds::PER_SECOND; but only do it once
-	if (delta > 0)
-	{
-		if (delta == 1)
-			m_relative = std::min<s64>(m_relative + subseconds::PER_SECOND, MAX_RELATIVE);
-		else
-			m_relative = MAX_RELATIVE;
-	}
-	else
-	{
-		if (delta == -1)
-			m_relative = std::max<s64>(m_relative - subseconds::PER_SECOND, MIN_RELATIVE);
-		else
-			m_relative = MIN_RELATIVE;
-	}
-}
-
-
-//-------------------------------------------------
-//  update_absolute - update the absolute time
-//  from the relative time
-//-------------------------------------------------
-
-void device_scheduler::basetime_relative::update_absolute()
-{
-	if (m_relative >= 0)
-		m_absolute = m_base + subseconds::from_raw(m_relative);
-	else
-		m_absolute = m_base - subseconds::from_raw(-m_relative);
-	m_absolute_dirty = false;
-}
-
-
-//-------------------------------------------------
-//  update_window - update the base to ensure times
-//  within the given window will fit; return true
-//  if updated from the relative time
-//-------------------------------------------------
-
-bool device_scheduler::basetime_relative::update_window(subseconds window)
-{
-	// get the difference to the window
-	if (MAX_RELATIVE - m_relative < window.raw())
-	{
-		m_base = absolute();
-		m_relative = 0;
-		return true;
-	}
-	return false;
-}
-
-
-
-//**************************************************************************
 //  DEVICE SCHEDULER
 //**************************************************************************
 
@@ -801,13 +713,13 @@ void device_scheduler::timeslice(subseconds minslice)
 {
 	INCREMENT_SCHEDULER_STAT(m_timeslice);
 
-	// ensure we have 1/4 second of runway in our relative times
-	if (m_basetime.update_window(subseconds::from_msec(250)))
+	// subseconds counts up to 2 seconds; once we pass 1 second, reset
+	if (m_basetime.relative() >= subseconds::from_msec(1000))
 		update_basetime();
 
 	// run at least the given number of subseconds
-	s64 basetime = m_basetime.relative();
-	s64 endslice = basetime + minslice.raw();
+	subseconds basetime = m_basetime.relative();
+	subseconds endslice = basetime + minslice;
 	while (basetime < endslice)
 	{
 		INCREMENT_SCHEDULER_STAT(m_timeslice_inner1);
@@ -824,14 +736,13 @@ void device_scheduler::timeslice(subseconds minslice)
 			INCREMENT_SCHEDULER_STAT(m_timeslice_inner2);
 
 			// by default, assume our target is the end of the next quantum
-			s64 target = basetime + m_quantum_list.first()->m_actual.raw();
-			assert(target < basetime_relative::MAX_RELATIVE);
+			subseconds target = basetime + m_quantum_list.first()->m_actual;
 
 			// however, if the next timer is going to fire before then, override
 			if (m_first_timer_expire.relative() < target)
 				target = m_first_timer_expire.relative();
 
-			LOG("timeslice: target = %18lldas\n", target);
+			LOG("timeslice: target = %sas\n", attotime(target).as_string(18));
 
 			// do we have pending suspension changes?
 			if (m_suspend_changes_pending)
@@ -841,13 +752,12 @@ void device_scheduler::timeslice(subseconds minslice)
 			for (device_execute_interface *exec = m_execute_list; exec != nullptr; exec = exec->m_nextexec)
 			{
 				// compute how many subseconds to execute this device
-				s64 delta = target - exec->m_localtime.relative() - 1;
-				assert(delta < basetime_relative::MAX_RELATIVE);
+				subseconds delta = target - exec->m_localtime.relative() - subseconds::unit();
 
-				// if we're already ahead, do notOhing; in theory we should do this 0 as
+				// if we're already ahead, do nothing; in theory we should do this 0 as
 				// well, but it's a rare case and the compiler tends to be able to
 				// optimize a strict < 0 check better than <= 0
-				if (delta < 0)
+				if (delta < subseconds::zero())
 					continue;
 
 				INCREMENT_SCHEDULER_STAT(m_timeslice_inner3);
@@ -858,11 +768,11 @@ void device_scheduler::timeslice(subseconds minslice)
 
 #if VERBOSE
 				u64 start_cycles = exec->m_total_cycles;
-				LOG("  %12.12s: t=%018lldas %018lldas = %dc; ", exec->device().tag(), exec->m_localtime.relative(), delta, u64(delta) / exec->m_subseconds_per_cycle + 1);
+				LOG("  %12.12s: t=%018lldas %018lldas = %dc; ", exec->device().tag(), exec->m_localtime.relative().raw(), delta, delta / exec->m_subseconds_per_cycle + 1);
 #endif
 
 				// execute for the given number of subseconds
-				s64 localtime = exec->run_for(subseconds::from_raw(delta));
+				subseconds localtime = exec->run_for(delta);
 
 #if VERBOSE
 				LOG(" ran %dc, %dc total", s32(exec->m_totalcycles - start_cycles), s32(exec->m_totalcycles));
@@ -1180,7 +1090,9 @@ void device_scheduler::update_basetime()
 {
 	INCREMENT_SCHEDULER_STAT(m_update_basetime);
 
-	const attotime &basetime = m_basetime.absolute();
+	// rebase the basetime itself
+	attotime basetime(m_basetime.absolute().seconds());
+	m_basetime.set_base(basetime);
 
 	// update execute devices
 	for (device_execute_interface &exec : execute_interface_enumerator(machine().root_device()))

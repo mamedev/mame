@@ -1102,7 +1102,7 @@ u32 cps3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	int width = ((m_ppu_crtc_zoom[1] & 0xffff0000) >> 16) - (m_ppu_crtc_zoom[0] & 0xffff);
 	if (width > 0 && m_screenwidth != width)
 	{
-		subseconds period = screen.frame_period().as_subseconds();
+		subseconds period = screen.frame_period_subseconds();
 		rectangle visarea = screen.visible_area();
 
 		int height = ((m_ppu_crtc_zoom[5] & 0xffff0000) >> 16) - (m_ppu_crtc_zoom[4] & 0xffff);

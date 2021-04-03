@@ -47,6 +47,9 @@
 //  TYPE DEFINITIONS
 //***************************************************************************/
 
+// ======================> subseconds
+
+// subseconds is a class that represents a fully-accurate value from -1 to +2 seconds
 class subseconds
 {
 	// save_manager needs direct access for save/restore purposes
@@ -54,80 +57,89 @@ class subseconds
 
 public:
 	// core definitions
-	static constexpr u64 PER_SECOND_SQRT = 1'000'000'000;
-	static constexpr u64 PER_SECOND = PER_SECOND_SQRT * PER_SECOND_SQRT;
-	static constexpr u64 PER_MILLISECOND = PER_SECOND / 1'000;
-	static constexpr u64 PER_MICROSECOND = PER_SECOND / 1'000'000;
-	static constexpr u64 PER_NANOSECOND = PER_SECOND / 1'000'000'000;
+	static constexpr s64 PER_SECOND_SQRT = 1'000'000'000;
+	static constexpr s64 PER_SECOND = PER_SECOND_SQRT * PER_SECOND_SQRT;
+	static constexpr s64 PER_MILLISECOND = PER_SECOND / 1'000;
+	static constexpr s64 PER_MICROSECOND = PER_SECOND / 1'000'000;
+	static constexpr s64 PER_NANOSECOND = PER_SECOND / 1'000'000'000;
 
-	static constexpr u64 MAX_RAW = PER_SECOND;
-//	static constexpr subseconds MAX = subseconds(MAX_RAW);
+	// maximum raw value
+	static constexpr s64 MAX_RAW = 2 * PER_SECOND;
+	static constexpr s64 MIN_RAW = -2 * PER_SECOND;
 
+	// constructor
 	constexpr subseconds() :
 		m_subseconds(0)
 	{
 	}
 
+	// copy constructor
 	subseconds(subseconds const &src) :
 		m_subseconds(src.m_subseconds)
 	{
 	}
 
+	// copy assignment
 	subseconds &operator=(subseconds const &src)
 	{
 		m_subseconds = src.m_subseconds;
 		return *this;
 	}
 
-	// math
+	// add to another subseconds value
 	subseconds &operator+=(subseconds const &right) noexcept
 	{
 		m_subseconds += right.m_subseconds;
 		return *this;
 	}
 
+	// subtract another subseconds value from us
 	subseconds &operator-=(subseconds const &right) noexcept
 	{
 		m_subseconds -= right.m_subseconds;
 		return *this;
 	}
 
-	subseconds &operator*=(u32 factor) noexcept
+	// multiply by an integral factor
+	subseconds &operator*=(s32 factor) noexcept
 	{
 		m_subseconds *= factor;
 		return *this;
 	}
 
-	subseconds &operator/=(u32 factor)
+	// divide by an integral factor
+	subseconds &operator/=(s32 factor)
 	{
 		m_subseconds /= factor;
 		return *this;
 	}
 
+	// simple getters
 	constexpr bool is_zero() const { return (m_subseconds == 0); }
-	constexpr u64 raw() const { return m_subseconds; }
+	constexpr s64 raw() const { return m_subseconds; }
 
-	// constants
-	static constexpr subseconds max() { return subseconds::from_raw(PER_SECOND); }
-	static constexpr subseconds min() { return subseconds::from_raw(1); }
+	// constant values
+	static constexpr subseconds max() { return subseconds::from_raw(MAX_RAW); }
+	static constexpr subseconds min() { return subseconds::from_raw(MIN_RAW); }
+	static constexpr subseconds unit() { return subseconds::from_raw(1); }
 	static constexpr subseconds zero() { return subseconds::from_raw(0); }
 
 	// static creators
-	static constexpr subseconds from_raw(u64 raw) { return subseconds(raw); }
-	static constexpr subseconds from_double(double secs) { return u64(secs * double(PER_SECOND)); }
-	static constexpr subseconds from_msec(u64 msec) { return subseconds(msec * PER_MILLISECOND); }
-	static constexpr subseconds from_usec(u64 usec) { return subseconds(usec * PER_MICROSECOND); }
-	static constexpr subseconds from_nsec(u64 nsec) { return subseconds(nsec * PER_NANOSECOND); }
+	static constexpr subseconds from_raw(s64 raw) { return subseconds(raw); }
+	static constexpr subseconds from_double(double secs) { return subseconds(s64(secs * double(PER_SECOND))); }
+	static constexpr subseconds from_msec(s64 msec) { return subseconds(msec * PER_MILLISECOND); }
+	static constexpr subseconds from_usec(s64 usec) { return subseconds(usec * PER_MICROSECOND); }
+	static constexpr subseconds from_nsec(s64 nsec) { return subseconds(nsec * PER_NANOSECOND); }
 	static constexpr subseconds from_hz(double hz)
 	{
-		u64 const hz_int = u64(hz);
+		s64 const hz_int = s64(hz);
 		if (hz == double(hz_int))
-			return subseconds(MAX_RAW / s64(hz));
-		return subseconds(u64(2e64 / hz));
+			return subseconds(PER_SECOND / hz_int);
+		return subseconds(s64(double(PER_SECOND) / hz));
 	}
-	static constexpr subseconds from_hz(u32 hz) { return subseconds((hz > 1) ? (MAX_RAW / hz) : MAX_RAW); }
-	static constexpr subseconds from_hz(u64 hz) { return subseconds((hz > 1) ? (MAX_RAW / hz) : MAX_RAW); }
-	static constexpr subseconds from_hz(int hz) { return subseconds((hz > 1) ? (MAX_RAW / hz) : MAX_RAW); }
+	static constexpr subseconds from_hz(u32 hz) { return subseconds((hz > 1) ? (PER_SECOND / hz) : MAX_RAW); }
+	static constexpr subseconds from_hz(u64 hz) { return subseconds((hz > 1) ? (PER_SECOND / hz) : MAX_RAW); }
+	static constexpr subseconds from_hz(int hz) { return subseconds((hz > 1) ? (PER_SECOND / hz) : MAX_RAW); }
 	static subseconds from_hz(XTAL const &xtal) { return from_hz(xtal.dvalue()); }
 
 	// conversion helpers
@@ -136,9 +148,9 @@ public:
 	constexpr double as_msec() const { return m_subseconds * (1.0 / double(PER_MILLISECOND)); }
 	constexpr double as_usec() const { return m_subseconds * (1.0 / double(PER_MICROSECOND)); }
 	constexpr double as_nsec() const { return m_subseconds * (1.0 / double(PER_NANOSECOND)); }
-	constexpr u32 as_msec_int() const { return m_subseconds / PER_MILLISECOND; }
-	constexpr u32 as_usec_int() const { return m_subseconds / PER_MICROSECOND; }
-	constexpr u32 as_nsec_int() const { return m_subseconds / PER_NANOSECOND; }
+	constexpr s32 as_msec_int() const { return m_subseconds / PER_MILLISECOND; }
+	constexpr s32 as_usec_int() const { return m_subseconds / PER_MICROSECOND; }
+	constexpr s32 as_nsec_int() const { return m_subseconds / PER_NANOSECOND; }
 
 	// friend functions
 	friend subseconds operator+(subseconds const &left, subseconds const &right) noexcept;
@@ -155,38 +167,84 @@ public:
 	friend constexpr bool operator>=(subseconds const &left, subseconds const &right) noexcept;
 
 private:
-	constexpr subseconds(u64 raw) : m_subseconds(raw) { }
+	// internal constructor from raw
+	constexpr subseconds(u64 raw) :
+		m_subseconds(raw)
+	{
+	}
 
-	u64 m_subseconds;
+	// internal state
+	s64 m_subseconds;
 };
 
+// addition of two subseconds
 inline subseconds operator+(subseconds const &left, subseconds const &right) noexcept
-{ return subseconds(left.m_subseconds + right.m_subseconds); }
+{
+	return subseconds(left.m_subseconds + right.m_subseconds);
+}
+
+// subtactions of two subseconds
 inline subseconds operator-(subseconds const &left, subseconds const &right) noexcept
-{ return subseconds(left.m_subseconds - right.m_subseconds); }
+{
+	return subseconds(left.m_subseconds - right.m_subseconds);
+}
+
+// multiplication of a subseconds value by an integral factor
 inline subseconds operator*(subseconds const &left, u32 factor) noexcept
-{ return subseconds(left.m_subseconds * factor); }
+{
+	return subseconds(left.m_subseconds * s64(factor));
+}
 inline subseconds operator*(u32 factor, subseconds const &right) noexcept
-{ return subseconds(factor * right.m_subseconds); }
+{
+	return subseconds(s64(factor) * right.m_subseconds);
+}
+
+// division of a subseconds value by another subseconds value, producing a raw integer
 inline u64 operator/(subseconds const &left, subseconds const &right)
-{ return left.m_subseconds / right.m_subseconds; }
+{
+	return left.m_subseconds / right.m_subseconds;
+}
+
+// division of a subseconds value by an integral factor
 inline subseconds operator/(subseconds const &left, u32 factor)
-{ return subseconds(left.m_subseconds / factor); }
+{
+	return subseconds(left.m_subseconds / s64(factor));
+}
+
+// equality comparisons
 inline constexpr bool operator==(subseconds const &left, subseconds const &right) noexcept
-{ return left.m_subseconds == right.m_subseconds; }
+{
+	return left.m_subseconds == right.m_subseconds;
+}
 inline constexpr bool operator!=(subseconds const &left, subseconds const &right) noexcept
-{ return left.m_subseconds != right.m_subseconds; }
+{
+	return left.m_subseconds != right.m_subseconds;
+}
+
+// less than comparisons
 inline constexpr bool operator<(subseconds const &left, subseconds const &right) noexcept
-{ return left.m_subseconds < right.m_subseconds; }
+{
+	return left.m_subseconds < right.m_subseconds;
+}
 inline constexpr bool operator<=(subseconds const &left, subseconds const &right) noexcept
-{ return left.m_subseconds <= right.m_subseconds; }
+{
+	return left.m_subseconds <= right.m_subseconds;
+}
+
+// greater than comparisons
 inline constexpr bool operator>(subseconds const &left, subseconds const &right) noexcept
-{ return left.m_subseconds > right.m_subseconds; }
+{
+	return left.m_subseconds > right.m_subseconds;
+}
 inline constexpr bool operator>=(subseconds const &left, subseconds const &right) noexcept
-{ return left.m_subseconds >= right.m_subseconds; }
+{
+	return left.m_subseconds >= right.m_subseconds;
+}
 
 
-// the attotime structure itself
+// ======================> attotime
+
+// attotime is a class holds a 96-bit time value, consisting of seconds plus subseconds
 class attotime
 {
 	// save_manager needs direct access for save/restore purposes
@@ -199,14 +257,14 @@ public:
 	constexpr attotime() noexcept : m_subseconds(0), m_seconds(0) { }
 
 	/** Constructs with @p secs seconds and @p subs subseconds. */
-	constexpr attotime(s32 secs, subseconds subs) noexcept : m_subseconds(subs.raw()), m_seconds(secs) { }
+	constexpr attotime(s32 secs, subseconds subs) noexcept : m_subseconds(subs.raw() % subseconds::PER_SECOND), m_seconds(secs) { }
 	constexpr attotime(s32 secs) noexcept : m_subseconds(0), m_seconds(secs) { }
-	constexpr attotime(subseconds subs) noexcept : m_subseconds(subs.raw()), m_seconds(0) { }
+	constexpr attotime(subseconds subs) noexcept : m_subseconds(subs.raw() % subseconds::PER_SECOND), m_seconds(subs.raw() / subseconds::PER_SECOND) { }
 
-	constexpr attotime(const attotime& that) noexcept : m_subseconds(that.m_subseconds), m_seconds(that.m_seconds) { }
+	constexpr attotime(attotime const& that) noexcept : m_subseconds(that.m_subseconds), m_seconds(that.m_seconds) { }
 
 	// assignment
-	attotime &operator=(const attotime& that) noexcept
+	attotime &operator=(attotime const& that) noexcept
 	{
 		this->m_seconds = that.m_seconds;
 		this->m_subseconds = that.m_subseconds;
@@ -214,7 +272,7 @@ public:
 	}
 
 	// queries
-	constexpr bool is_zero() const noexcept { return (m_seconds == 0 && m_subseconds == 0); }
+	constexpr bool is_zero() const noexcept { return (m_subseconds == 0 && m_seconds == 0); }
 	/** Test if value is above @ref MAX_SECONDS (considered an overflow) */
 	constexpr bool is_never() const noexcept { return (m_seconds >= MAX_SECONDS); }
 
@@ -224,7 +282,7 @@ public:
 	double as_hz() const noexcept { assert(!is_zero()); return m_seconds == 0 ? (double(subseconds::PER_SECOND) / double(m_subseconds)) : is_never() ? 0.0 : 1.0 / as_double(); }
 	double as_khz() const noexcept { assert(!is_zero()); return m_seconds == 0 ? double(subseconds::PER_MILLISECOND) / double(m_subseconds) : is_never() ? 0.0 : 1e-3 / as_double(); }
 	double as_mhz() const noexcept { assert(!is_zero()); return m_seconds == 0 ? double(subseconds::PER_MICROSECOND) / double(m_subseconds) : is_never() ? 0.0 : 1e-6 / as_double(); }
-	u64 as_ticks(u32 frequency) const;
+	u64 as_ticks(u32 frequency) const { return as_ticks(subseconds::from_hz(frequency)); }
 	u64 as_ticks(const XTAL &xtal) const { return as_ticks(xtal.value()); }
 	u64 as_ticks(subseconds period) const;
 	/** Convert to string using at @p precision */
@@ -245,7 +303,7 @@ public:
 	constexpr s32 seconds() const noexcept { return m_seconds; }
 
 	void set_seconds(s32 seconds) { m_seconds = seconds;}
-	void set_subseconds(subseconds subseconds) { m_subseconds = subseconds.raw(); }
+	void set_subseconds(subseconds subseconds) { m_subseconds = subseconds.raw() % subseconds::PER_SECOND; }
 
 	static attotime from_double(double _time);
 	static attotime from_ticks(u64 ticks, u32 frequency);
@@ -253,52 +311,57 @@ public:
 	/** Create an attotime from a integer count of seconds @seconds */
 	static constexpr attotime from_seconds(s32 seconds) { return attotime(seconds); }
 	/** Create an attotime from a integer count of milliseconds @msec */
-	static constexpr attotime from_msec(s64 msec) { return attotime(msec / 1000, subseconds::from_raw((msec % 1000) * (subseconds::PER_SECOND / 1000))); }
+	static constexpr attotime from_msec(s64 msec) { return attotime(msec / 1000, (msec % 1000) * (subseconds::PER_SECOND / 1000)); }
 	/** Create an attotime from a integer count of microseconds @usec */
-	static constexpr attotime from_usec(s64 usec) { return attotime(usec / 1000000, subseconds::from_raw((usec % 1000000) * (subseconds::PER_SECOND / 1000000))); }
+	static constexpr attotime from_usec(s64 usec) { return attotime(usec / 1000000, (usec % 1000000) * (subseconds::PER_SECOND / 1000000)); }
 	/** Create an attotime from a integer count of nanoseconds @nsec */
-	static constexpr attotime from_nsec(s64 nsec) { return attotime(nsec / 1000000000, subseconds::from_raw((nsec % 1000000000) * (subseconds::PER_SECOND / 1000000000))); }
+	static constexpr attotime from_nsec(s64 nsec) { return attotime(nsec / 1000000000, (nsec % 1000000000) * (subseconds::PER_SECOND / 1000000000)); }
 	/** Create an attotime from at the given frequency @frequency */
-	static constexpr attotime from_hz(u32 frequency) { return (frequency > 1) ? attotime(0, subseconds::from_raw(s64(subseconds::PER_SECOND / frequency))) : (frequency == 1) ? attotime::from_seconds(1) : attotime::never; }
+	static constexpr attotime from_hz(u32 frequency) { return (frequency > 1) ? attotime(0, s64(subseconds::PER_SECOND / frequency)) : (frequency == 1) ? attotime::from_seconds(1) : attotime::never; }
 	static constexpr attotime from_hz(int frequency) { return (frequency > 0) ? from_hz(u32(frequency)) : attotime::never; }
-	static attotime from_hz(const XTAL &xtal) { return (xtal.dvalue() > 1.0) ? attotime(0, subseconds::from_raw(s64(subseconds::PER_SECOND / xtal))) : from_hz(xtal.dvalue()); }
+	static attotime from_hz(const XTAL &xtal) { return (xtal.dvalue() > 1.0) ? attotime(0, s64(subseconds::PER_SECOND / xtal)) : from_hz(xtal.dvalue()); }
 	static attotime from_hz(double frequency)
 	{
 		if (frequency > 1.0)
-			return attotime(0, subseconds::from_raw(s64(subseconds::PER_SECOND / frequency)));
+			return attotime(0, s64(subseconds::PER_SECOND / frequency));
 		else if (frequency > 0.0)
 		{
 			double i, f = modf(1.0 / frequency, &i);
-			return attotime(i, subseconds::from_raw(f * subseconds::PER_SECOND));
+			return attotime(i, f * subseconds::PER_SECOND);
 		}
 		else
 			return attotime::never;
 	}
 
 	// math
-	attotime &operator+=(const attotime &right) noexcept;
-	attotime &operator-=(const attotime &right) noexcept;
+	attotime &operator+=(attotime const &right) noexcept;
+	attotime &operator-=(attotime const &right) noexcept;
 	attotime &operator*=(u32 factor);
 	attotime &operator/=(u32 factor);
 
 	// constants
-	static const attotime never;
-	static const attotime zero;
+	static attotime const never;
+	static attotime const zero;
 
 	// friend functions
-	friend attotime operator+(const attotime &left, const attotime &right) noexcept;
-	friend attotime operator-(const attotime &left, const attotime &right) noexcept;
-	friend attotime operator*(const attotime &left, u32 factor);
-	friend attotime operator*(u32 factor, const attotime &right);
-	friend attotime operator/(const attotime &left, u32 factor);
-	friend constexpr bool operator==(const attotime &left, const attotime &right) noexcept;
-	friend constexpr bool operator!=(const attotime &left, const attotime &right) noexcept;
-	friend constexpr bool operator<(const attotime &left, const attotime &right) noexcept;
-	friend constexpr bool operator<=(const attotime &left, const attotime &right) noexcept;
-	friend constexpr bool operator>(const attotime &left, const attotime &right) noexcept;
-	friend constexpr bool operator>=(const attotime &left, const attotime &right) noexcept;
+	friend attotime operator+(attotime const &left, attotime const &right) noexcept;
+	friend attotime operator-(attotime const &left, attotime const &right) noexcept;
+	friend attotime operator*(attotime const &left, u32 factor);
+	friend attotime operator*(u32 factor, attotime const &right);
+	friend attotime operator/(attotime const &left, u32 factor);
+	friend constexpr bool operator==(attotime const &left, attotime const &right) noexcept;
+	friend constexpr bool operator!=(attotime const &left, attotime const &right) noexcept;
+	friend constexpr bool operator<(attotime const &left, attotime const &right) noexcept;
+	friend constexpr bool operator<=(attotime const &left, attotime const &right) noexcept;
+	friend constexpr bool operator>(attotime const &left, attotime const &right) noexcept;
+	friend constexpr bool operator>=(attotime const &left, attotime const &right) noexcept;
 
 private:
+	constexpr attotime(s32 secs, s64 subs) :
+		m_subseconds(subs), m_seconds(secs)
+	{
+	}
+
 	// members
 	s64   m_subseconds;
 	s32   m_seconds;
@@ -349,7 +412,7 @@ public:
 		ticknum = (ticknum - m_tick_base) * m_divider;
 
 		u64 seconds = ticknum / m_rate;
-		attotime delta(seconds, subseconds::from_raw((ticknum - seconds * m_rate) * m_period));
+		attotime delta(seconds, (ticknum - seconds * m_rate) * m_period);
 		return delta + m_base;
 	}
 
@@ -518,18 +581,10 @@ inline constexpr bool operator>=(const attotime &left, const attotime &right) no
 /** Convert to an subseconds value, clamping to 0-1 second */
 inline constexpr subseconds attotime::as_subseconds() const noexcept
 {
-	return subseconds::from_raw(
-			(m_seconds == 0) ? m_subseconds :                  // positive values between 0 and 1 second
-			(m_seconds < 0) ? 0 :                               // negative values between -1 and 0 seconds
-			subseconds::MAX_RAW);                                // out-of-range negative values
-}
-
-
-/** as_ticks - convert to ticks at @p frequency */
-inline u64 attotime::as_ticks(u32 frequency) const
-{
-	u32 fracticks = (attotime(subseconds::from_raw(m_subseconds)) * frequency).m_seconds;
-	return mulu_32x32(m_seconds, frequency) + fracticks;
+	if (m_seconds >= -2 && m_seconds <= 1)
+		return subseconds::from_raw(m_subseconds + subseconds::PER_SECOND * m_seconds);
+	else
+		return (m_seconds > 0) ? subseconds::max() : subseconds::min();
 }
 
 

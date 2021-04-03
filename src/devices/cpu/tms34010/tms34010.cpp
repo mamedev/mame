@@ -1123,7 +1123,7 @@ TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
 
 	/* note that we add !master (0 or 1) as a subseconds value; this makes no practical difference */
 	/* but helps ensure that masters are updated first before slaves */
-	m_scantimer->adjust(screen().time_until_pos(vcount) + (master ? subseconds::zero() : subseconds::min()), vcount);
+	m_scantimer->adjust(screen().time_until_pos(vcount) + (master ? subseconds::zero() : subseconds::unit()), vcount);
 }
 
 

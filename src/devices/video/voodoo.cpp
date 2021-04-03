@@ -4226,7 +4226,7 @@ void voodoo_device::flush_fifos(voodoo_device *vd, attotime current_time)
 	if (LOG_FIFO_VERBOSE)
 	{
 		vd->logerror("VOODOO.FIFO:flush_fifos end -- pending command complete at %s\n",
-				vd->pci.op_end_time.as_string());
+				vd->pci.op_end_time.as_string(18));
 	}
 
 	in_flush = false;

@@ -223,7 +223,7 @@ protected:
 	virtual void interface_clock_changed() override;
 
 	// device_scheduler helpers
-	s64 run_for(subseconds subs);
+	subseconds run_for(subseconds subs);
 	u32 update_suspend();
 
 	// for use by devcpu for now...
@@ -364,7 +364,7 @@ using execute_interface_enumerator = device_interface_enumerator<device_execute_
 //  changes here
 //-------------------------------------------------
 
-inline s64 device_execute_interface::run_for(subseconds subs)
+inline subseconds device_execute_interface::run_for(subseconds subs)
 {
 	g_profiler.start(m_profiler);
 

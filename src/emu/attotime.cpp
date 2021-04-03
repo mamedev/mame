@@ -106,6 +106,11 @@ attotime &attotime::operator/=(u32 factor)
 }
 
 
+//-------------------------------------------------
+//  as_ticks - compute the number of ticks of the
+//  given period
+//-------------------------------------------------
+
 u64 attotime::as_ticks(subseconds period) const
 {
 	if (is_never() || period.raw() == 0)
@@ -123,11 +128,12 @@ u64 attotime::as_ticks(subseconds period) const
 	u64 leftover_subs_per_second = subseconds::PER_SECOND - whole_ticks_per_second * period_raw;
 
 	// start with the number of whole ticks per second
-	u64 result = m_seconds * s64(leftover_subs_per_second);
+	u64 result = m_seconds * s64(whole_ticks_per_second);
 
 	// compute the remainder: this should be a 64x64->128/64 divide
 	s64 remainder = m_seconds * s64(leftover_subs_per_second);
 
+	// add in the number of whole ticks this represents
 	s64 extra = remainder / s64(period_raw);
 	result += extra;
 	remainder -= extra * period_raw;
@@ -137,7 +143,6 @@ u64 attotime::as_ticks(subseconds period) const
 	result += remainder / period_raw;
 	return result;
 }
-
 
 
 //-------------------------------------------------

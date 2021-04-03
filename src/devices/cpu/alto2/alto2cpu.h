@@ -553,8 +553,6 @@ private:
 	inline uint32_t loadl() const { return X_BIT(m_mir, 32, DLOADL); }
 	inline uint32_t next() const { return X_RDBITS(m_mir, 32, NEXT0, NEXT9); }
 
-	inline subseconds ucycle_subs() const { return subseconds::from_hz(clock()); }
-
 	/**
 	 * \brief current micro instruction's register selection
 	 * The emulator F2s ACSOURCE and ACDEST modify this.

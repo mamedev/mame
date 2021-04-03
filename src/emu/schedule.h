@@ -508,23 +508,20 @@ class device_scheduler
 	class basetime_relative
 	{
 	public:
-		static constexpr s64 MIN_RELATIVE = -(subseconds::PER_SECOND/2);
-		static constexpr s64 MAX_RELATIVE =  (subseconds::PER_SECOND/2) - 1;
-
 		// construction/destruction
-		basetime_relative();
+		basetime_relative() : m_absolute_dirty(false) { }
 
 		// set an absolute time
 		void set(attotime const &src) { m_absolute = src; m_absolute_dirty = false; update_relative(); }
 
 		// set a relative time
-		void set_relative(s64 rel) { m_relative = rel; m_absolute_dirty = true; }
+		void set_relative(subseconds rel) { m_relative = rel; m_absolute_dirty = true; }
 
 		// add a number of subseconds to the relative time
-		void add(subseconds src) { m_relative += src.raw(); m_absolute_dirty = true; }
+		void add(subseconds src) { m_relative += src; m_absolute_dirty = true; }
 
 		// return the relative time
-		s64 relative() const { return m_relative; }
+		subseconds relative() const { return m_relative; }
 
 		// return the absolute time, updating if dirty
 		attotime const &absolute() { if (m_absolute_dirty) update_absolute(); return m_absolute; }
@@ -533,22 +530,19 @@ class device_scheduler
 		attotime const &absolute_no_update() const { return m_absolute; }
 
 		// return the base time
-		attotime const &base() { return m_base; }
-
-		// update the base to ensure times within the given window will fit; return true if updated
-		bool update_window(subseconds window);
+		attotime const &base() const { return m_base; }
 
 		// set the base for the relative time
 		void set_base(attotime const &base) { m_base = base; update_relative(); }
 
 	private:
 		// internal helpers
-		void update_relative();
-		void update_absolute();
+		void update_relative() { m_relative = (m_absolute - m_base).as_subseconds(); }
+		void update_absolute() { m_absolute = m_base + m_relative; }
 
 	public:
 		// internal state, public for saving
-		s64 m_relative;
+		subseconds m_relative;
 		attotime m_absolute;
 		attotime m_base;
 		bool m_absolute_dirty;
@@ -620,7 +614,7 @@ private:
 	void timed_trigger(timer_instance const &timer);
 
 	// basetime_relative helpers
-	attotime const &basetime() { return m_basetime.absolute(); }
+	attotime const &basetime() const { return m_basetime.absolute_no_update(); }
 
 	// internal state
 	running_machine &           m_machine;                  // reference to our machine

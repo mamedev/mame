@@ -1626,7 +1626,7 @@ void alto2_cpu_device::disk_bitclk(void* ptr, int32_t arg)
 		m_bitclk_index = arg;
 	} else {
 		// stop the bitclock timer
-		m_bitclk_time = ucycle_subs() - subseconds::min();
+		m_bitclk_time = subseconds::zero() - subseconds::unit();
 	}
 }
 
@@ -1641,9 +1641,9 @@ void alto2_cpu_device::next_sector(int unit)
 	LOG((this,LOG_DISK,0,"%s dhd=%p\n", __FUNCTION__, dhd));
 	// get bit time in subseconds
 	m_dsk.bitclk_time[unit] = dhd->bit_time().as_subseconds();
-	if (m_bitclk_time >= ucycle_subs()) {
+	if (m_bitclk_time >= subseconds::zero()) {
 		LOG((this,LOG_DISK,0,"   unit #%d stop bitclk\n", unit));
-		m_bitclk_time = ucycle_subs() - subseconds::min();
+		m_bitclk_time = subseconds::zero() - subseconds::unit();
 		m_bitclk_index = -1;
 	}
 
@@ -1661,7 +1661,7 @@ void alto2_cpu_device::next_sector(int unit)
 	if (debug_read_mem(0521))
 	{
 		// Make the CPU execution loop call disk_bitclk
-		m_bitclk_time = ucycle_subs();
+		m_bitclk_time = subseconds::zero();
 		m_bitclk_index = 0;
 	}
 }

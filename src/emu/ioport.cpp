@@ -1987,7 +1987,7 @@ void ioport_manager::frame_update()
 	record_frame(curtime);
 
 	// track the duration of the previous frame
-	m_last_delta_nsec = (curtime - m_last_frame_time).as_subseconds().as_nsec_int();
+	m_last_delta_nsec = (curtime - m_last_frame_time).as_nsec_int();
 	m_last_frame_time = curtime;
 
 	// update the digital joysticks
@@ -2033,7 +2033,7 @@ s32 ioport_manager::frame_interpolate(s32 oldval, s32 newval)
 		return newval;
 
 	// otherwise, interpolate
-	u32 nsec_since_last = (machine().time() - m_last_frame_time).as_subseconds().as_nsec_int();
+	u32 nsec_since_last = (machine().time() - m_last_frame_time).as_nsec_int();
 	return oldval + (s64(newval - oldval) * s64(nsec_since_last) / s64(m_last_delta_nsec));
 }
 

@@ -851,12 +851,12 @@ void fm77_state::av_sub_modestatus_w(uint8_t data)
 	if(data & 0x40)
 	{
 		rectangle rect(0, 320-1, 0, 200-1);
-		m_screen->configure(512, 262, rect, m_screen->frame_period().as_subseconds());
+		m_screen->configure(512, 262, rect, m_screen->frame_period_subseconds());
 	}
 	else
 	{
 		rectangle rect(0, 640-1, 0, 200-1);
-		m_screen->configure(1024, 262, rect, m_screen->frame_period().as_subseconds());
+		m_screen->configure(1024, 262, rect, m_screen->frame_period_subseconds());
 	}
 }
 

@@ -55,7 +55,7 @@ stream_buffer::stream_buffer(u32 sample_rate) :
 	m_end_second(0),
 	m_end_sample(0),
 	m_sample_rate(sample_rate),
-	m_sample_subs((sample_rate == 0) ? subseconds::max() : subseconds::from_hz(sample_rate) + subseconds::min()),
+	m_sample_subs((sample_rate == 0) ? subseconds::max() : subseconds::from_hz(sample_rate) + subseconds::unit()),
 	m_buffer(sample_rate)
 {
 }
@@ -95,7 +95,7 @@ void stream_buffer::set_sample_rate(u32 rate, bool resample)
 	attotime prevend = end_time();
 
 	// compute the time and period of the new buffer
-	attotime newperiod = subseconds::from_hz(rate) + subseconds::min();
+	attotime newperiod = subseconds::from_hz(rate) + subseconds::unit();
 	attotime newend = attotime(prevend.seconds(), (prevend.raw_subseconds() / newperiod.raw_subseconds()) * newperiod.raw_subseconds());
 
 	// buffer a short runway of previous samples; in order to support smooth
@@ -874,7 +874,7 @@ void sound_stream::postload()
 void sound_stream::reprime_sync_timer()
 {
 	attotime curtime = m_device.machine().time();
-	attotime target = m_output[0].end_time() + subseconds::min();
+	attotime target = m_output[0].end_time() + subseconds::unit();
 	m_sync_timer.adjust(target - curtime);
 }
 

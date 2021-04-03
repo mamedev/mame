@@ -64,7 +64,7 @@ void orion_state::orion128_romdisk_w(offs_t offset, uint8_t data)
 void orion_state::orion_set_video_mode(int width)
 {
 	rectangle visarea(0, width-1, 0, 255);
-	m_screen->configure(width, 256, visarea, m_screen->frame_period().as_subseconds());
+	m_screen->configure(width, 256, visarea, m_screen->frame_period_subseconds());
 }
 
 void orion_state::orion128_video_mode_w(uint8_t data)

@@ -741,7 +741,7 @@ void video_manager::update_throttle(attotime emutime)
 		// between 0 and 1/10th of a second ... anything outside of this range is obviously
 		// wrong and requires a resync
 		subseconds emu_delta_subseconds = (emutime - m_throttle_emutime).as_subseconds();
-		if (emu_delta_subseconds > subseconds::from_hz(10))
+		if (emu_delta_subseconds < subseconds::zero() || emu_delta_subseconds > subseconds::from_msec(100))
 		{
 			if (LOG_THROTTLE)
 				machine().logerror("Resync due to weird emutime delta: %s\n", attotime(emu_delta_subseconds).as_string(18));
@@ -778,20 +778,19 @@ void video_manager::update_throttle(attotime emutime)
 		// accumulated times for this instead of the deltas for the current update because
 		// we want to track time over a longer duration than a single update
 		subseconds real_is_ahead_subseconds = (m_throttle_emutime - m_throttle_realtime).as_subseconds();
-		subseconds real_is_behind_subseconds = (m_throttle_realtime - m_throttle_emutime).as_subseconds();
 
 		// if we're more than 1/10th of a second out, or if we are behind at all and emulation
 		// is taking longer than the real frame, we just need to resync
-		if (real_is_behind_subseconds > subseconds::from_hz(10) ||
-			(!real_is_behind_subseconds.is_zero() && population_count_32(m_throttle_history & 0xff) < 6))
+		if (real_is_ahead_subseconds < subseconds::from_msec(-100) ||
+			(real_is_ahead_subseconds < subseconds::zero() && population_count_32(m_throttle_history & 0xff) < 6))
 		{
 			if (LOG_THROTTLE)
-				machine().logerror("Resync due to being behind: %s (history=%08X)\n", attotime(real_is_behind_subseconds).as_string(18), m_throttle_history);
+				machine().logerror("Resync due to being behind: %s (history=%08X)\n", attotime(subseconds::zero() - real_is_ahead_subseconds).as_string(18), m_throttle_history);
 			break;
 		}
 
 		// if we're behind, it's time to just get out
-		if (!real_is_behind_subseconds.is_zero())
+		if (real_is_ahead_subseconds < subseconds::zero())
 			return;
 
 		// compute the target real time, in ticks, where we want to be
@@ -931,7 +930,7 @@ void video_manager::update_refresh_speed()
 			subseconds min_frame_period = subseconds::max();
 			for (screen_device &screen : screen_device_enumerator(machine().root_device()))
 			{
-				subseconds period = screen.frame_period().as_subseconds();
+				subseconds period = screen.frame_period_subseconds();
 				if (!period.is_zero())
 					min_frame_period = std::min(min_frame_period, period);
 			}

@@ -270,7 +270,7 @@ void alto2_cpu_device::unload_word()
 	int y = m_dsp.scanline;
 
 	if (x >= A2_DISP_VISIBLE_WORDS) {
-		m_unload_time = ucycle_subs() - subseconds::min();
+		m_unload_time = subseconds::zero() - subseconds::unit();
 		return;
 	}
 	uint16_t* framebuf = m_dsp.framebuf.get() + y * A2_DISP_SCANLINE_WORDS;
@@ -310,7 +310,7 @@ void alto2_cpu_device::unload_word()
 	if (x < A2_DISP_VISIBLE_WORDS)
 		m_unload_word = x;
 	else
-		m_unload_time = ucycle_subs() - subseconds::min();
+		m_unload_time = subseconds::zero() - subseconds::unit();
 }
 
 
@@ -448,7 +448,7 @@ void alto2_cpu_device::display_state_machine()
 			m_dsp.inverse = GET_SETMODE_INVERSE(m_dsp.setmode) ? 0xffff : 0x0000;
 			m_dsp.halfclock = GET_SETMODE_SPEEDY(m_dsp.setmode) ? true : false;
 			// stop the CPU execution loop from calling unload_word()
-			m_unload_time = ucycle_subs() - subseconds::min();
+			m_unload_time = subseconds::zero() - subseconds::unit();
 		}
 		else
 		{

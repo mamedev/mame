@@ -556,8 +556,8 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	, m_color(rgb_t(0xff, 0xff, 0xff, 0xff))
 	, m_brightness(0xff)
 	, m_frame_period(DEFAULT_FRAME_PERIOD.as_subseconds())
-	, m_scantime(subseconds::min())
-	, m_pixeltime(subseconds::min())
+	, m_scantime(subseconds::unit())
+	, m_pixeltime(subseconds::unit())
 	, m_frame_number(0)
 	, m_partial_updates_this_frame(0)
 {
