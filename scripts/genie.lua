@@ -490,14 +490,12 @@ language "C++"
 
 flags {
 	"StaticRuntime",
+	"Cpp17",
 }
 
 configuration { "vs20*" }
 	buildoptions {
 		"/bigobj",
-	}
-	buildoptions_cpp {
-		"/std:c++17",
 	}
 	flags {
 		"ExtraWarnings",
@@ -1439,6 +1437,7 @@ if _OPTIONS["vs"]=="clangcl" then
 			"-Wno-unused-local-typedef",
 			"-Wno-unused-private-field",
 			"-Wno-unused-variable",
+			"-Wno-microsoft-cast",
 		}
 end
 
