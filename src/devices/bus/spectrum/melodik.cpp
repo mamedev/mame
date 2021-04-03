@@ -72,7 +72,7 @@ uint8_t spectrum_melodik_device::iorq_r(offs_t offset)
 	switch (offset & 0xc002)
 	{
 	case 0xc000:
-		data &= m_psg->data_r();
+		data = m_psg->data_r();
 		break;
 	}
 	return data;

@@ -175,7 +175,7 @@ uint8_t spectrum_kempdisc_device::iorq_r(offs_t offset)
 	switch (offset & 0xff)
 	{
 	case 0xe5: case 0xe7: case 0xed: case 0xef:
-		data &= m_fdc->read(BIT(offset, 1) | (BIT(offset, 3) << 1));
+		data = m_fdc->read(BIT(offset, 1) | (BIT(offset, 3) << 1));
 		break;
 	}
 

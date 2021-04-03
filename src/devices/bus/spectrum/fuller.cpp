@@ -96,10 +96,10 @@ uint8_t spectrum_fuller_device::iorq_r(offs_t offset)
 	switch (offset & 0xff)
 	{
 	case 0x5f:
-		data &= m_psg->data_r();
+		data = m_psg->data_r();
 		break;
 	case 0x7f:
-		data &= m_joy->read() | (0xff ^ 0x8f);
+		data = m_joy->read() | (0xff ^ 0x8f);
 		break;
 	}
 	return data;

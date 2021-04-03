@@ -377,7 +377,7 @@ uint8_t spectrum_swiftdisc_device::iorq_r(offs_t offset)
 	uint8_t data = m_exp->iorq_r(offset);
 
 	if (!BIT(offset, 5))
-		data &= m_joy->read();
+		data = m_joy->read() & 0x1f;
 
 	return data;
 }
@@ -485,10 +485,10 @@ uint8_t spectrum_swiftdisc2_device::iorq_r(offs_t offset)
 	uint8_t data = m_exp->iorq_r(offset);
 
 	if (m_romcs && (offset & 0xf890) == 0x3000)
-		data &= control_r();
+		data = control_r();
 
 	if (!BIT(offset, 5) && !BIT(m_control, 3))
-		data &= m_joy->read();
+		data = m_joy->read() & 0x1f;
 
 	if (m_conf->read())
 	{
@@ -497,14 +497,14 @@ uint8_t spectrum_swiftdisc2_device::iorq_r(offs_t offset)
 			if (!BIT(offset, 3)) // port F7
 			{
 				// D7 - RS232 /RX
-				data &= ~(m_rs232->rxd_r() << 7);
+				data &= ~0x80;
+				data |= !m_rs232->rxd_r() << 7;
 			}
 			if (!BIT(offset, 4)) // port EF
 			{
-				data &= ~4;
-				data |= 0x0b;
 				// D3 - RS232 /DSR
-				data &= ~(m_rs232->dsr_r() << 3);
+				data &= ~0x8;
+				data |= !m_rs232->dsr_r() << 3;
 			}
 		}
 	}
@@ -513,7 +513,8 @@ uint8_t spectrum_swiftdisc2_device::iorq_r(offs_t offset)
 		if (!BIT(offset, 3)) // port F7
 		{
 			// D7 - Centronics /BUSY
-			data &= ~(m_busy << 7);
+			data &= ~0x80;
+			data |= !m_busy << 7;
 		}
 	}
 

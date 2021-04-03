@@ -188,7 +188,7 @@ uint8_t spectrum_opus_device::iorq_r(offs_t offset)
 	// PIA bit 7 is enable joystick and selected on A5 only
 	if (!BIT(m_pia->a_output(), 7) && (~offset & 0x20))
 	{
-		data &= m_joy->read() & 0x1f;
+		data = m_joy->read() & 0x1f;
 	}
 	return data;
 }
