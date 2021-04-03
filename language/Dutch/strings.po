@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-03-17 13:37+1100\n"
-"PO-Revision-Date: 2021-04-03 19:33+0200\n"
+"PO-Revision-Date: 2021-04-03 20:28+0200\n"
 "Last-Translator: Jos van Mourik\n"
 "Language-Team: MAME Language Team\n"
 "Language: nl\n"
@@ -1002,11 +1002,11 @@ msgstr "Jaar"
 
 #: src/frontend/mame/ui/utils.cpp:75
 msgid "Save Supported"
-msgstr "Ondersteund opslaan"
+msgstr "Ondersteunt opslaan"
 
 #: src/frontend/mame/ui/utils.cpp:76
 msgid "Save Unsupported"
-msgstr "Ondersteund opslaan niet"
+msgstr "Ondersteunt opslaan niet"
 
 #: src/frontend/mame/ui/utils.cpp:77
 msgid "CHD Required"
@@ -2926,11 +2926,11 @@ msgstr "Pauzeermodus"
 #: plugins/cheatfind/init.lua:511
 msgid "Manually pause & unpause the game when needed with the pause hotkey"
 msgstr ""
-"Handmatig het spel wanneer nodig pauzeren & hervatten met de pauze sneltoets"
+"Handmatig het spel wanneer nodig pauzeren en hervatten met de pauze sneltoets"
 
 #: plugins/cheatfind/init.lua:536
 msgid "All slots cleared and current state saved to Slot 1"
-msgstr "Alle slots geleegd en huidige state opgeslagen naar slot 1"
+msgstr "Alle slots geleegd en huidige state opgeslagen in slot 1"
 
 #: plugins/cheatfind/init.lua:551
 msgid "Start new search"
