@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-03-17 13:37+1100\n"
-"PO-Revision-Date: 2018-04-30 14:35+0200\n"
+"PO-Revision-Date: 2021-04-03 19:23+0200\n"
 "Last-Translator: Jos van Mourik\n"
 "Language-Team: MAME Language Team\n"
 "Language: nl\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.0.6\n"
+"X-Generator: Poedit 2.4.2\n"
 
 #: src/frontend/mame/ui/videoopt.cpp:56
 #, c-format
@@ -56,7 +56,7 @@ msgstr "Bezels"
 
 #: src/frontend/mame/ui/videoopt.cpp:220
 msgid "CPanels"
-msgstr "BPanelen"
+msgstr "CPanelen"
 
 #: src/frontend/mame/ui/videoopt.cpp:224 src/frontend/mame/ui/dirmenu.cpp:51
 #: src/frontend/mame/ui/selmenu.cpp:86
@@ -165,7 +165,7 @@ msgstr "Selecteer"
 
 #: src/frontend/mame/ui/dirmenu.cpp:58
 msgid "GameOver"
-msgstr "Game over"
+msgstr "Gameover"
 
 #: src/frontend/mame/ui/dirmenu.cpp:59 src/frontend/mame/ui/selmenu.cpp:83
 msgid "HowTo"
@@ -420,11 +420,11 @@ msgstr "Schuifinstellingen"
 
 #: src/frontend/mame/ui/mainmenu.cpp:110 src/frontend/mame/ui/submenu.cpp:101
 msgid "Video Options"
-msgstr "Videoopties"
+msgstr "Video opties"
 
 #: src/frontend/mame/ui/mainmenu.cpp:113
 msgid "Crosshair Options"
-msgstr "Vizieropties"
+msgstr "Vizier opties"
 
 #: src/frontend/mame/ui/mainmenu.cpp:116 plugins/cheat/init.lua:753
 msgid "Cheat"
@@ -432,7 +432,7 @@ msgstr "Cheat"
 
 #: src/frontend/mame/ui/mainmenu.cpp:119
 msgid "Plugin Options"
-msgstr "Pluginopties"
+msgstr "Plugin opties"
 
 #: src/frontend/mame/ui/mainmenu.cpp:122
 msgid "External DAT View"
@@ -468,7 +468,7 @@ msgstr "[mislukt]"
 
 #: src/frontend/mame/ui/optsmenu.cpp:72 src/frontend/mame/ui/sndmenu.cpp:149
 msgid "Sound Options"
-msgstr "Geluidsopties"
+msgstr "Geluid opties"
 
 #: src/frontend/mame/ui/optsmenu.cpp:75
 msgid "General Inputs"
@@ -1002,11 +1002,11 @@ msgstr "Jaar"
 
 #: src/frontend/mame/ui/utils.cpp:75
 msgid "Save Supported"
-msgstr "Opslaan ondersteund"
+msgstr "Ondersteund opslaan"
 
 #: src/frontend/mame/ui/utils.cpp:76
 msgid "Save Unsupported"
-msgstr "Opslaan niet ondersteund"
+msgstr "Ondersteund opslaan niet"
 
 #: src/frontend/mame/ui/utils.cpp:77
 msgid "CHD Required"
@@ -1075,7 +1075,7 @@ msgstr "Verwijder laatste filter"
 
 #: src/frontend/mame/ui/utils.cpp:524
 msgid "Add filter"
-msgstr "Voeg filter toe"
+msgstr "Filter toevoegen"
 
 #: src/frontend/mame/ui/utils.cpp:966
 msgid "Select category:"
@@ -1255,7 +1255,7 @@ msgstr "Normale tekst"
 
 #: src/frontend/mame/ui/custui.cpp:452
 msgid "Selected color"
-msgstr "Geselecteerde kleur"
+msgstr "Geselecteerd kleur"
 
 #: src/frontend/mame/ui/custui.cpp:453
 msgid "Normal text background"
@@ -1267,7 +1267,7 @@ msgstr "Geselecteerde achtergrondkleur"
 
 #: src/frontend/mame/ui/custui.cpp:455
 msgid "Subitem color"
-msgstr "Kleur subitem"
+msgstr "Subitemkleur"
 
 #: src/frontend/mame/ui/custui.cpp:456 src/frontend/mame/ui/custui.cpp:511
 msgid "Clone"
@@ -1287,7 +1287,7 @@ msgstr "Dipswitch"
 
 #: src/frontend/mame/ui/custui.cpp:460
 msgid "Unavailable color"
-msgstr "Onbeschikbare kleur"
+msgstr "Onbeschikbaar kleur"
 
 #: src/frontend/mame/ui/custui.cpp:461
 msgid "Slider color"
@@ -1464,7 +1464,7 @@ msgstr "Zichtbare vertraging"
 #: src/frontend/mame/ui/miscmenu.cpp:602
 #, c-format
 msgid "%s.xml saved under ui folder."
-msgstr "%s.xml is opgeslagen in de map 'ui'."
+msgstr "%s.xml is opgeslagen in de ui map."
 
 #: src/frontend/mame/ui/miscmenu.cpp:628
 msgid "Name:             Description:\n"
@@ -1597,11 +1597,11 @@ msgstr "Geluid\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1079
 msgid "Capture\tUnimplemented\n"
-msgstr ""
+msgstr "Opname\tOngeïmplementeerd\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1081
 msgid "Capture\tImperfect\n"
-msgstr ""
+msgstr "Opname\tOnvolledig\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1084
 msgid "Camera\tUnimplemented\n"
@@ -1645,11 +1645,11 @@ msgstr "Muis\tOnvolledig\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1109
 msgid "Media\tUnimplemented\n"
-msgstr ""
+msgstr "Media\tOngeïmplementeerd\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1111
 msgid "Media\tImperfect\n"
-msgstr ""
+msgstr "Media\tOnvolledig\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1114
 msgid "Disk\tUnimplemented\n"
@@ -1669,43 +1669,43 @@ msgstr "Printer\tOnvolledig\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1124
 msgid "Mag. Tape\tUnimplemented\n"
-msgstr ""
+msgstr "Mag. Band\tOngeïmplementeerd\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1126
 msgid "Mag. Tape\tImperfect\n"
-msgstr ""
+msgstr "Mag. Band\tOnvolledig\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1129
 msgid "Punch Tape\tUnimplemented\n"
-msgstr ""
+msgstr "Ponsband\tOngeïmplementeerd\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1131
 msgid "Punch Tape\tImperfect\n"
-msgstr ""
+msgstr "Ponsband\tOnvolledig\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1134
 msgid "Mag. Drum\tUnimplemented\n"
-msgstr ""
+msgstr "Mag. trommel\tOngeïmplementeerd\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1136
 msgid "Mag. Drum\tImperfect\n"
-msgstr ""
+msgstr "Mag. trommel\tOnvolledig\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1139
 msgid "(EP)ROM\tUnimplemented\n"
-msgstr ""
+msgstr "(EP)ROM\tOngeïmplementeerd\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1141
 msgid "(EP)ROM\tImperfect\n"
-msgstr ""
+msgstr "(EP)ROM\tOnvolledig\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1144
 msgid "Communications\tUnimplemented\n"
-msgstr ""
+msgstr "Communicatie\tOngeïmplementeerd\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1146
 msgid "Communications\tImperfect\n"
-msgstr ""
+msgstr "Communicatie\tOnvolledig\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1149
 msgid "LAN\tUnimplemented\n"
@@ -1914,7 +1914,7 @@ msgstr "Geavanceerde opties"
 
 #: src/frontend/mame/ui/submenu.cpp:39
 msgid "Performance Options"
-msgstr "Prestatieopties"
+msgstr "Prestatie opties"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Auto frame skip"
@@ -2070,7 +2070,7 @@ msgstr "Natuurlijk toetsenbord"
 
 #: src/frontend/mame/ui/submenu.cpp:84
 msgid "Simultaneous contradictory"
-msgstr "Gelijktijdige tegenstrijding"
+msgstr "Gelijktijdig tegenstrijdig"
 
 #: src/frontend/mame/ui/submenu.cpp:85
 msgid "Coin impulse"
@@ -2138,11 +2138,11 @@ msgstr "Bilineaire filtering"
 
 #: src/frontend/mame/ui/submenu.cpp:110
 msgid "Bitmap Prescaling"
-msgstr "Bitmap preschaling"
+msgstr "Bitmap voorschaling"
 
 #: src/frontend/mame/ui/submenu.cpp:111
 msgid "Window Mode"
-msgstr "Schermmodus"
+msgstr "Ventstermodus"
 
 #: src/frontend/mame/ui/submenu.cpp:112
 msgid "Enforce Aspect Ratio"
@@ -2321,7 +2321,7 @@ msgstr "  Toetsenbordinvoer    [%1$d invoeren]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:259
 msgid "* Media Options:\n"
-msgstr "* Media Opties:\n"
+msgstr "* Media opties:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:261
 #, c-format
@@ -2330,7 +2330,7 @@ msgstr "  %1$s    [label: %2$s]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:267
 msgid "* Slot Options:\n"
-msgstr "* Plek Opties:\n"
+msgstr "* Plek opties:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:274
 msgid "[None]\n"
@@ -2398,7 +2398,7 @@ msgstr "geluid"
 
 #: src/frontend/mame/ui/info.cpp:36
 msgid "capture hardware"
-msgstr ""
+msgstr "opnamehardware"
 
 #: src/frontend/mame/ui/info.cpp:37
 msgid "camera"
@@ -2422,7 +2422,7 @@ msgstr "muis"
 
 #: src/frontend/mame/ui/info.cpp:42
 msgid "media"
-msgstr ""
+msgstr "media"
 
 #: src/frontend/mame/ui/info.cpp:43
 msgid "disk"
@@ -2434,23 +2434,23 @@ msgstr "printer"
 
 #: src/frontend/mame/ui/info.cpp:45
 msgid "magnetic tape"
-msgstr ""
+msgstr "magneetband"
 
 #: src/frontend/mame/ui/info.cpp:46
 msgid "punch tape"
-msgstr ""
+msgstr "ponsband"
 
 #: src/frontend/mame/ui/info.cpp:47
 msgid "magnetic drum"
-msgstr ""
+msgstr "trommelgeheugen"
 
 #: src/frontend/mame/ui/info.cpp:48
 msgid "solid state storage"
-msgstr ""
+msgstr "solid state opslag"
 
 #: src/frontend/mame/ui/info.cpp:49
 msgid "communications"
-msgstr ""
+msgstr "communicatie"
 
 #: src/frontend/mame/ui/info.cpp:50
 msgid "LAN"
@@ -2465,7 +2465,7 @@ msgid ""
 "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
 "run correctly.\n"
 msgstr ""
-"Één of meer ROMs/CHDs voor deze machine zijn niet correct. De machine kan "
+"Eén of meer ROMs/CHDs voor deze machine zijn niet correct. De machine kan "
 "mogelijk niet goed functioneren.\n"
 
 #: src/frontend/mame/ui/info.cpp:198
@@ -2479,7 +2479,7 @@ msgstr ""
 #: src/frontend/mame/ui/info.cpp:203
 msgid ""
 "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
-msgstr "Één of meer ROMs/CHDs voor deze machine zijn niet correct gedumpt.\n"
+msgstr "Eén of meer ROMs/CHDs voor deze machine zijn niet correct gedumpt.\n"
 
 #: src/frontend/mame/ui/info.cpp:208
 msgid "Completely unemulated features: "
@@ -2921,15 +2921,16 @@ msgstr ""
 
 #: plugins/cheatfind/init.lua:504
 msgid "Pause Mode"
-msgstr ""
+msgstr "Pauzeermodus"
 
 #: plugins/cheatfind/init.lua:511
 msgid "Manually pause & unpause the game when needed with the pause hotkey"
 msgstr ""
+"Handmatig het spel wanneer nodig pauzeren & hervatten met de pauze sneltoets"
 
 #: plugins/cheatfind/init.lua:536
 msgid "All slots cleared and current state saved to Slot 1"
-msgstr ""
+msgstr "Alle slots geleegd en huidige state opgeslagen naar slot 1"
 
 #: plugins/cheatfind/init.lua:551
 msgid "Start new search"
@@ -2938,11 +2939,11 @@ msgstr "Start nieuwe zoekopdracht"
 #: plugins/cheatfind/init.lua:564
 #, lua-format
 msgid "Memory State saved to Slot %d"
-msgstr ""
+msgstr "Geheugen state opgeslagen in slot %d"
 
 #: plugins/cheatfind/init.lua:583
 msgid "Save Current Memory State to Slot "
-msgstr ""
+msgstr "Sla huidige geheugen state op in slot "
 
 #: plugins/cheatfind/init.lua:614
 #, lua-format
@@ -2951,15 +2952,15 @@ msgstr "%d totale overeenkomsten gevonden"
 
 #: plugins/cheatfind/init.lua:655
 msgid "Perform Compare  :  "
-msgstr ""
+msgstr "Vergelijking uitvoeren  :  "
 
 #: plugins/cheatfind/init.lua:672
 msgid "Left less than right"
-msgstr ""
+msgstr "Links kleiner dan rechts"
 
 #: plugins/cheatfind/init.lua:674
 msgid "Left greater than right"
-msgstr ""
+msgstr "Links groter dan rechts"
 
 #: plugins/cheatfind/init.lua:676
 msgid "Left equal to right"
@@ -2967,7 +2968,7 @@ msgstr "Links gelijk aan rechts"
 
 #: plugins/cheatfind/init.lua:678
 msgid "Left not equal to right"
-msgstr ""
+msgstr "Links niet gelijk aan rechts"
 
 #: plugins/cheatfind/init.lua:680
 msgid "Left equal to right with bitmask"
@@ -2999,7 +3000,7 @@ msgstr "Waarde"
 
 #: plugins/cheatfind/init.lua:714
 msgid "Difference"
-msgstr ""
+msgstr "Verschil"
 
 #: plugins/cheatfind/init.lua:719
 msgid "Any"
@@ -3007,99 +3008,103 @@ msgstr "Willekeurige"
 
 #: plugins/cheatfind/init.lua:725
 msgid "Data Format"
-msgstr "Data Format"
+msgstr "Dataformaat"
 
 #: plugins/cheatfind/init.lua:731
 msgid "Test/Write Poke Value"
-msgstr ""
+msgstr "Test/schrijf pokewaarde"
 
 #: plugins/cheatfind/init.lua:738
 msgid ""
 "Use this if you want to poke the Slot 1 value (eg. You started with "
 "something but lost it)"
 msgstr ""
+"Gebruik dit voor het poken van de slot 1 waarde (eg. Je begon met iets maar "
+"verloor het)"
 
 #: plugins/cheatfind/init.lua:740
 msgid ""
 "Use this if you want to poke the Last Slot value (eg. You started without an "
 "item but finally got it)"
 msgstr ""
+"Gebruik dit voor het poken van de laatste slot waarde (eg. Je begon zonder "
+"een item maar kreeg het)"
 
 #: plugins/cheatfind/init.lua:742
 msgid "Use this if you want to poke 0x00"
-msgstr ""
+msgstr "Gebruik dit voor het poken van 0x00"
 
 #: plugins/cheatfind/init.lua:744
 msgid "Use this if you want to poke 0x01"
-msgstr ""
+msgstr "Gebruik dit voor het poken van 0x01"
 
 #: plugins/cheatfind/init.lua:746
 msgid "Use this if you want to poke 0x02"
-msgstr ""
+msgstr "Gebruik dit voor het poken van 0x02"
 
 #: plugins/cheatfind/init.lua:748
 msgid "Use this if you want to poke 0x03"
-msgstr ""
+msgstr "Gebruik dit voor het poken van 0x03"
 
 #: plugins/cheatfind/init.lua:750
 msgid "Use this if you want to poke 0x04"
-msgstr ""
+msgstr "Gebruik dit voor het poken van 0x04"
 
 #: plugins/cheatfind/init.lua:752
 msgid "Use this if you want to poke 0x05"
-msgstr ""
+msgstr "Gebruik dit voor het poken van 0x05"
 
 #: plugins/cheatfind/init.lua:754
 msgid "Use this if you want to poke 0x06"
-msgstr ""
+msgstr "Gebruik dit voor het poken van 0x06"
 
 #: plugins/cheatfind/init.lua:756
 msgid "Use this if you want to poke 0x07"
-msgstr ""
+msgstr "Gebruik dit voor het poken van 0x07"
 
 #: plugins/cheatfind/init.lua:758
 msgid "Use this if you want to poke 0x08"
-msgstr ""
+msgstr "Gebruik dit voor het poken van 0x08"
 
 #: plugins/cheatfind/init.lua:760
 msgid "Use this if you want to poke 0x09"
-msgstr ""
+msgstr "Gebruik dit voor het poken van 0x09"
 
 #: plugins/cheatfind/init.lua:762
 msgid "Use this if you want to poke 0x63 (Decimal 99)"
-msgstr ""
+msgstr "Gebruik dit voor het poken van 0x63 (decimaal 99)"
 
 #: plugins/cheatfind/init.lua:764
 msgid "Use this if you want to poke 0x99 (BCD 99)"
-msgstr ""
+msgstr "Gebruik dit voor het poken van 0x99 (BCD 99)"
 
 #: plugins/cheatfind/init.lua:766
 msgid "Use this if you want to poke 0xFF (Decimal 255)"
-msgstr ""
+msgstr "Use this if you want to poke 0x99 (BCD 99)"
 
 #: plugins/cheatfind/init.lua:768
 msgid "Use this if you want to poke 0x3E7 (Decimal 999)"
-msgstr ""
+msgstr "Gebruik dit voor het poken van 0x3E7 (decimaal 999)"
 
 #: plugins/cheatfind/init.lua:770
 msgid "Use this if you want to poke 0x999 (BCD 999)"
-msgstr ""
+msgstr "Gebruik dit voor het poken van 0x999 (BCD 999)"
 
 #: plugins/cheatfind/init.lua:772
 msgid "Use this if you want to poke 0x270F (Decimal 9999)"
-msgstr ""
+msgstr "Gebruik dit voor het poken van 0x270F (decimaal 9999)"
 
 #: plugins/cheatfind/init.lua:774
 msgid "Use this if you want to poke 0x9999 (BCD 9999)"
-msgstr ""
+msgstr "Gebruik dit voor het poken van 0x9999 (BCD 9999)"
 
 #: plugins/cheatfind/init.lua:776
 msgid "Use this if you want to poke 0xFFFF (Decimal 65535)"
-msgstr ""
+msgstr "Gebruik dit voor het poken van 0xFFFF (decimaal 65535)"
 
 #: plugins/cheatfind/init.lua:816
 msgid "Undo last search -- #"
-msgstr "Laatste zoekopdracht ongedaan maken -- #"
+msgstr "Ongedaan maken van zoekopdracht -- #"
 
 #: plugins/cheatfind/init.lua:820
 msgid "Match block"
@@ -3112,7 +3117,7 @@ msgstr "Alle"
 #: plugins/cheatfind/init.lua:934
 #, lua-format
 msgid "Test Cheat %08X:%02X"
-msgstr ""
+msgstr "Test cheat %08X:%02X"
 
 #: plugins/cheatfind/init.lua:974
 msgid "Cheat engine not available"
@@ -3136,7 +3141,7 @@ msgstr "Pagina"
 
 #: plugins/cheatfind/init.lua:1063
 msgid "Clear Watches"
-msgstr "Herstel Watches"
+msgstr "Herstel watches"
 
 #: plugins/cheatfind/init.lua:1078
 msgid "Cheat Finder"
