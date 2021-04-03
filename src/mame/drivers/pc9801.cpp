@@ -7,40 +7,41 @@
     driver by Angelo Salese
 
     TODO:
-    - move sound bios ROMs into pc9801_26 / pc9801_86 devices
     - proper 8251 uart hook-up on keyboard
     - SASI/SCSI support;
-    - Write a PC80S31K device (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
-    - Finish DIP-Switches support
-    - text scrolling
-    - GRCG+
-    - rewrite using slot devices
-    - some later SWs put "Invalid command byte 05" (Absolutely Mahjong on Epson logo)
-    - investigate on POR bit
-    - test 2dd more
-    - clean-ups/split into devices.
+    - Finish DIP-Switches support;
+    - text scrolling;
+    - upd7220: some later SWs throws "Invalid command byte 05" (Absolutely Mahjong on Epson logo),
+	  actual undocumented command for reset something?
+    - GRCG+ (actual differences with GRCG?);
+    - Remove kludge for POR bit in a20_ctrl_w fn;
+	- CMT support (-13/-36 cbus only, identify which models mounted it off the bat);
+    - Write a PC80S31K device for 2d type floppies
+	  (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
+    - 2dd floppy interface isn't greatly tested;
+    - clean-ups & split into devices and driver flavours;
 
     TODO (PC-9801RS):
-    - extra features;
+    - several unemulated extra f/f features;
     - keyboard shift doesn't seem to disable properly;
     - clean-up duplicate code;
-
-	TODO (PC-386M):
-	- "ERR:BR" at boot (BIOS loader error). 
-	  Executes some code in text VRAM area ($a00xx), trying to setup a writeable RAM bank 
-	  (shadow RAM even?) to IPL window, I/O $c06 seems to be the control port for it;
 
     TODO (PC-9821):
     - fix CPU for some clones;
     - "cache error"
-    - undumped IDE ROM, kludged to work
-    - Compatibility is untested;
+    - undumped IDE ROM, kludged to work;
+    - CD-Rom SW compatibility is hit or miss;
 
     TODO (PC-9821AS)
     - IPL ROM banking contradicts greatly from the other machines;
 
+	TODO (PC-386M):
+    - "ERR:BR" at boot (BIOS loader error).
+	  Executes some code in text VRAM area ($a00xx), trying to setup a writeable RAM bank
+	  (shadow RAM even?) to IPL window, I/O $c06 seems to be the control port for it;
+
     TODO: (PC-486MU)
-	- Fix ROM loading (there's only one valid boot vector?);
+    - Fix ROM loading (there's only one valid boot vector?);
     - Tries to read port C of i8255_sys (-> 0x35) at boot without setting up the control
       port. This causes a jump to invalid program area;
     - Eventually dies on ARTIC check;
