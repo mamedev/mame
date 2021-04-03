@@ -57,14 +57,15 @@ Model 4P - is the same as Model 4 except:
 To Do / Status:
 --------------
 
-trs80m3:   works
-           MT 07903 - most floppies no longer boot
+There's many DSK disks that are rejected by MAME - needs to be investigated.
 
-trs80m4:   works
-           will boot model 3 floppies, but not model 4 ones
-           MT 07903 - most floppies no longer boot
+trs80m3:   Works
 
-trs80m4p:  floppy not working, so machine is useless
+trs80m4:   Works
+           Need to check banking
+
+trs80m4p:  Floppy not working, so machine is useless.
+           In debugger g 402a, then pc=0;g and it will boot.
 
 ***************************************************************************/
 
@@ -414,6 +415,8 @@ void trs80m3_state::model4(machine_config &config)
 	m_m4_bank->set_data_width(8);
 	m_m4_bank->set_addr_width(18);
 	m_m4_bank->set_stride(0x10000);
+
+	config.device_remove("quickload");  // removed because it crashes..
 }
 
 void trs80m3_state::model4p(machine_config &config)
@@ -434,6 +437,7 @@ void trs80m3_state::model4p(machine_config &config)
 	m_m4p_bank->set_stride(0x10000);
 
 	config.device_remove("quickload");
+	config.device_remove("cassette");
 }
 
 void trs80m3_state::cp500(machine_config &config)

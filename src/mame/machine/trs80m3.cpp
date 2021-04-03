@@ -292,6 +292,7 @@ void trs80m3_state::port_e4_w(uint8_t data)
     d7 1=enable disk INTRQ to generate NMI
     d6 1=enable disk Motor Timeout to generate NMI */
 
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	m_nmi_mask = data;
 }
 
@@ -355,7 +356,8 @@ void trs80m3_state::port_ec_w(uint8_t data)
 
 	m_mode = (m_mode & 0xde) | (BIT(data, 2) ? 1 : 0) | (BIT(data, 3) ? 0x20 : 0);
 
-	m_cassette->change_state(( data & 2 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
+	if (!BIT(m_model4, 2))     // Model 4P has no cassette hardware
+		m_cassette->change_state(( data & 2 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 
 	m_port_ec = data & 0x7e;
 }
@@ -409,9 +411,13 @@ void trs80m3_state::port_ff_w(uint8_t data)
 /* Cassette port
     d1, d0 Cassette output */
 
-	static const double levels[4] = { 0.0, 1.0, -1.0, 0.0 };
-	m_cassette->output(levels[data & 3]);
-	m_cassette_data &= ~0x80;
+	if (!BIT(m_model4, 2))     // Model 4P has no cassette hardware
+	{
+		static const double levels[4] = { 0.0, 1.0, -1.0, 0.0 };
+		m_cassette->output(levels[data & 3]);
+		m_cassette_data &= ~0x80;
+	}
+	m_speaker->level_w(!(BIT(data, 0)));
 }
 
 
@@ -558,8 +564,12 @@ void trs80m3_state::machine_start()
 	m_start_address = 0;
 	m_old_cassette_val = 0;
 
-	m_cassette_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(trs80m3_state::cassette_data_callback),this));
-	m_cassette_data_timer->adjust( attotime::zero, 0, attotime::from_hz(11025) );
+	if (!BIT(m_model4, 2))     // Model 4P has no cassette hardware
+	{
+		m_cassette_data_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(trs80m3_state::cassette_data_callback),this));
+		m_cassette_data_timer->adjust( attotime::zero, 0, attotime::from_hz(11025) );
+	}
+
 	if (!(m_model4 & 6))   // Model 3 leave now
 		return;
 
