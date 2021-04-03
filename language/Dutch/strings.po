@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-03-17 13:37+1100\n"
-"PO-Revision-Date: 2021-04-03 19:23+0200\n"
+"PO-Revision-Date: 2021-04-03 19:33+0200\n"
 "Last-Translator: Jos van Mourik\n"
 "Language-Team: MAME Language Team\n"
 "Language: nl\n"
@@ -2142,7 +2142,7 @@ msgstr "Bitmap voorschaling"
 
 #: src/frontend/mame/ui/submenu.cpp:111
 msgid "Window Mode"
-msgstr "Ventstermodus"
+msgstr "Venstermodus"
 
 #: src/frontend/mame/ui/submenu.cpp:112
 msgid "Enforce Aspect Ratio"
@@ -3104,7 +3104,7 @@ msgstr "Gebruik dit voor het poken van 0xFFFF (decimaal 65535)"
 
 #: plugins/cheatfind/init.lua:816
 msgid "Undo last search -- #"
-msgstr "Ongedaan maken van zoekopdracht -- #"
+msgstr "Ongedaan maken van laatste zoekopdracht -- #"
 
 #: plugins/cheatfind/init.lua:820
 msgid "Match block"
