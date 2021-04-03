@@ -278,7 +278,7 @@ void a2bus_grapplerplus_device_base::set_slct_in(void *ptr, s32 param)
 {
 	if (u32(param) != m_slct_in)
 	{
-		LOG("SELECT=%d\n", state);
+		LOG("SELECT=%d\n", param);
 		m_slct_in = u8(u32(param));
 	}
 }
