@@ -819,11 +819,11 @@ public:
 	u32 ch_block_freq(u32 choffs) const    { return word(0xb0, 0, 5, 0xa0, 0, 8, choffs); }
 	u32 ch_feedback(u32 choffs) const      { return byte(0xc0, 1, 3, choffs); }
 	u32 ch_algorithm(u32 choffs) const     { return byte(0xc0, 0, 1, choffs) | (IsOpl3Plus ? (8 | (byte(0xc3, 0, 1, choffs) << 1)) : 0); }
-	u32 ch_output_any(u32 choffs) const    { return IsOpl3Plus ? byte(0xc0 + choffs, 4, 4) : 1; }
-	u32 ch_output_0(u32 choffs) const      { return IsOpl3Plus ? byte(0xc0 + choffs, 4, 1) : 1; }
-	u32 ch_output_1(u32 choffs) const      { return IsOpl3Plus ? byte(0xc0 + choffs, 5, 1) : 0; }
-	u32 ch_output_2(u32 choffs) const      { return IsOpl3Plus ? byte(0xc0 + choffs, 6, 1) : 0; }
-	u32 ch_output_3(u32 choffs) const      { return IsOpl3Plus ? byte(0xc0 + choffs, 7, 1) : 0; }
+	u32 ch_output_any(u32 choffs) const    { return newflag() ? byte(0xc0 + choffs, 4, 4) : 1; }
+	u32 ch_output_0(u32 choffs) const      { return newflag() ? byte(0xc0 + choffs, 4, 1) : 1; }
+	u32 ch_output_1(u32 choffs) const      { return newflag() ? byte(0xc0 + choffs, 5, 1) : (IsOpl3Plus ? 1 : 0); }
+	u32 ch_output_2(u32 choffs) const      { return newflag() ? byte(0xc0 + choffs, 6, 1) : 0; }
+	u32 ch_output_3(u32 choffs) const      { return newflag() ? byte(0xc0 + choffs, 7, 1) : 0; }
 
 	// per-operator registers
 	u32 op_lfo_am_enable(u32 opoffs) const { return byte(0x20, 7, 1, opoffs); }
@@ -837,7 +837,7 @@ public:
 	u32 op_decay_rate(u32 opoffs) const    { return byte(0x60, 0, 4, opoffs); }
 	u32 op_sustain_level(u32 opoffs) const { return byte(0x80, 4, 4, opoffs); }
 	u32 op_release_rate(u32 opoffs) const  { return byte(0x80, 0, 4, opoffs); }
-	u32 op_waveform(u32 opoffs) const      { return IsOpl2Plus ? byte(0xe0, 0, IsOpl3Plus ? 3 : 2, opoffs) : 0; }
+	u32 op_waveform(u32 opoffs) const      { return IsOpl2Plus ? byte(0xe0, 0, newflag() ? 3 : 2, opoffs) : 0; }
 
 protected:
 	// return a bitfield extracted from a byte
