@@ -167,7 +167,9 @@ protected:
 	// device_t implementation
 	virtual tiny_rom_entry const *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// a2bus_grapplerplus_device_base implementation
@@ -191,6 +193,7 @@ private:
 	std::unique_ptr<u8 []>              m_ram;
 
 	u16 m_ram_row;          // U1-U8
+	u8  m_ram_mask;         // mask out chips that are not installed
 	u8  m_mcu_p2;           // U10
 	u8  m_data_latch;       // U14 (synchronised)
 	u8  m_ibusy;            // U12

@@ -1,10 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-/*
- * TODO for Buffered Grappler+:
- * - /RST does not reset the MCU, it’s connected to P27
- * - On the schematic, P22 is pulled up, but the program checks it - perhaps a test mode?
- */
 #include "emu.h"
 #include "grapplerplus.h"
 
@@ -35,7 +30,7 @@ ROM_START(bufgrapplerplus)
 	ROM_LOAD( "3.2.u18", 0x0000, 0x1000, CRC(cd07c7ef) SHA1(6c2f1375b5df6bb65dfca1444c064661242fef1a) )
 
 	ROM_REGION(0x0400, "mcu", 0)
-	ROM_LOAD( "8048.u10", 0x0000, 0x0400, CRC(f60c14a9) SHA1(e7d87dd2f7af42f0eed776b839dea0a351ab67bc) )
+	ROM_LOAD( "8048.u10", 0x0000, 0x0400, CRC(36c5e2b2) SHA1(65eea4c7352a93f780df6b30ec6c20ee1e87aa30) BAD_DUMP )
 ROM_END
 
 
@@ -53,6 +48,17 @@ INPUT_PORTS_START(grapplerplus)
 	PORT_DIPNAME(0x08, 0x08, "Most Significant Bit")            PORT_DIPLOCATION("S1:1")        PORT_CHANGED_MEMBER(DEVICE_SELF, a2bus_grapplerplus_device_base, sw_msb, 0)
 	PORT_DIPSETTING(   0x08, "Software Control")
 	PORT_DIPSETTING(   0x00, "Not Transmitted")
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START(bufgrapplerplus)
+	PORT_INCLUDE(grapplerplus)
+
+	PORT_START("CNF")
+	PORT_CONFNAME(0xff, 0x00, "RAM Size")
+	PORT_CONFSETTING(   0xfc, "16K (2 chips)")
+	PORT_CONFSETTING(   0xf0, "32K (4 chips)")
+	PORT_CONFSETTING(   0x00, "64K (8 chips)")
 INPUT_PORTS_END
 
 } // anonymous namespace
@@ -480,6 +486,7 @@ a2bus_buf_grapplerplus_device::a2bus_buf_grapplerplus_device(machine_config cons
 	m_mcu(*this, "mcu"),
 	m_ram(),
 	m_ram_row(0xff00),
+	m_ram_mask(0x00U),
 	m_mcu_p2(0xffU),
 	m_data_latch(0xffU),
 	m_ibusy(1U),
@@ -532,6 +539,12 @@ void a2bus_buf_grapplerplus_device::device_add_mconfig(machine_config &config)
 }
 
 
+ioport_constructor a2bus_buf_grapplerplus_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(bufgrapplerplus);
+}
+
+
 void a2bus_buf_grapplerplus_device::device_start()
 {
 	a2bus_grapplerplus_device_base::device_start();
@@ -540,11 +553,31 @@ void a2bus_buf_grapplerplus_device::device_start()
 
 	save_pointer(NAME(m_ram), 0x10000);
 	save_item(NAME(m_ram_row));
+	save_item(NAME(m_ram_mask));
 	save_item(NAME(m_mcu_p2));
 	save_item(NAME(m_data_latch));
 	save_item(NAME(m_ibusy));
 	save_item(NAME(m_buf_ack_latch));
 	save_item(NAME(m_buf_ack_in));
+}
+
+
+void a2bus_buf_grapplerplus_device::device_reset()
+{
+	// The MCU is not reset when /RST is asserted.  Instead, /RST is
+	// connected to P27.  Pressing the reset key(s) momentarily will not
+	// clear the print buffer - the host Apple II can be reset without
+	// interrupting a long print job.  Holding the reset key(s) for two
+	// seconds clears the buffer.  Holding the reset key(s) on initial
+	// boot enters the RAM test (results are printed).  MAME doesn't
+	// currently cater for devices that don't reset their children on
+	// reset, and Apple II slots don't currently expose the /RST signal
+	// directly.
+
+	a2bus_grapplerplus_device_base::device_reset();
+
+	// should only do this on initial reset, but we get away with it here because the MCU is automatically reset even if it shouldn't be
+	m_ram_mask = ioport("CNF")->read();
 }
 
 
@@ -592,9 +625,6 @@ void a2bus_buf_grapplerplus_device::mcu_io(address_map &map)
 
 void a2bus_buf_grapplerplus_device::mcu_p2_w(u8 data)
 {
-	//P22 = pulled up
-	//P27 = /RST
-
 	// check for changed bits
 	u8 const diff(data ^ m_mcu_p2);
 	m_mcu_p2 = data;
@@ -660,7 +690,7 @@ u8 a2bus_buf_grapplerplus_device::mcu_bus_r()
 		{
 			u16 const addr(m_ram_row | u16(m_mcu->p1_r()));
 			LOG("Read RAM @%04X=%02X\n", addr, m_ram[addr]);
-			result &= m_ram[addr];
+			result &= m_ram[addr] | m_ram_mask;
 		}
 		else
 		{
@@ -692,7 +722,7 @@ void a2bus_buf_grapplerplus_device::mcu_bus_w(u8 data)
 		{
 			u16 const addr(m_ram_row | u16(m_mcu->p1_r()));
 			LOG("Wrote RAM @%04X=%02X\n", addr, data);
-			m_ram[addr] = data;
+			m_ram[addr] = data | m_ram_mask;
 		}
 		else
 		{
