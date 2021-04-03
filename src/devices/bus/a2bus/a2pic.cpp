@@ -323,46 +323,25 @@ void a2bus_pic_device::device_reset()
 
 WRITE_LINE_MEMBER(a2bus_pic_device::ack_w)
 {
-	if (bool(state) != bool(m_ack_in))
-	{
-		m_ack_in = state ? 1U : 0U;
-		LOG("/ACK=%u\n", m_ack_in);
-		if (started() && (m_ack_in != BIT(m_input_sw1->read(), 4)))
-		{
-			LOG("Active /ACK edge\n");
-			set_ack_latch();
-		}
-	}
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::set_ack_in), this), state ? 1 : 0);
 }
 
 
 WRITE_LINE_MEMBER(a2bus_pic_device::perror_w)
 {
-	if (bool(state) != bool(m_perror_in))
-	{
-		m_perror_in = state ? 1U : 0U;
-		LOG("PAPER EMPTY=%u\n", m_perror_in);
-	}
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::set_perror_in), this), state ? 1 : 0);
 }
 
 
 WRITE_LINE_MEMBER(a2bus_pic_device::select_w)
 {
-	if (bool(state) != bool(m_select_in))
-	{
-		m_select_in = state ? 1U : 0U;
-		LOG("SELECT=%u\n", m_select_in);
-	}
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::set_select_in), this), state ? 1 : 0);
 }
 
 
 WRITE_LINE_MEMBER(a2bus_pic_device::fault_w)
 {
-	if (bool(state) != bool(m_fault_in))
-	{
-		m_fault_in = state ? 1U : 0U;
-		LOG("/FAULT=%u\n", m_fault_in);
-	}
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::set_fault_in), this), state ? 1 : 0);
 }
 
 
@@ -376,6 +355,56 @@ TIMER_CALLBACK_MEMBER(a2bus_pic_device::release_strobe)
 	int const state(BIT(~m_input_sw1->read(), 3));
 	LOG("Output /STROBE=%d\n", state);
 	m_printer_conn->write_strobe(state);
+}
+
+
+
+//----------------------------------------------
+//  synchronised inputs
+//----------------------------------------------
+
+void a2bus_pic_device::set_ack_in(void *ptr, s32 param)
+{
+	if (u32(param) != m_ack_in)
+	{
+		m_ack_in = u8(u32(param));
+		LOG("/ACK=%u\n", m_ack_in);
+		if (started() && (m_ack_in != BIT(m_input_sw1->read(), 4)))
+		{
+			LOG("Active /ACK edge\n");
+			set_ack_latch();
+		}
+	}
+}
+
+
+void a2bus_pic_device::set_perror_in(void *ptr, s32 param)
+{
+	if (u32(param) != m_perror_in)
+	{
+		m_perror_in = u8(u32(param));
+		LOG("PAPER EMPTY=%u\n", m_perror_in);
+	}
+}
+
+
+void a2bus_pic_device::set_select_in(void *ptr, s32 param)
+{
+	if (u32(param) != m_select_in)
+	{
+		m_select_in = u8(u32(param));
+		LOG("SELECT=%u\n", m_select_in);
+	}
+}
+
+
+void a2bus_pic_device::set_fault_in(void *ptr, s32 param)
+{
+	if (u32(param) != m_fault_in)
+	{
+		m_fault_in = u8(u32(param));
+		LOG("/FAULT=%u\n", m_fault_in);
+	}
 }
 
 
