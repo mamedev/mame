@@ -17,7 +17,7 @@
 #define LOG_DMA             (0)
 
 
-#define DMA_CLOCK           40000000
+#define DMA_CLOCK           XTAL(40'000'000)
 
 
 /* for when we implement DMA timing */
