@@ -16,12 +16,10 @@
         * crusnwld doesn't display the neutral gear texture propely and displays a strange green artifact
         * Rendering needs to be looked at a little more closely to fix some holes
         * crusnwld has its right side of sky wrapped in the beginning of the 'England' stage
-        * Linking between other MAME instances (see below)
-        * A more proper way to hook later serial protection PICs for the later games
-        * Timing issues; games (may) run slightly slower compared to pcb recordings
-            Some specific parts in crusnusa run at double speed
+        * Linking between other MAME instances
+        * Timing issues:
+            Some parts in crusnusa run at double speed (course/car select, name entry, credits)
             crusnwld loads the 'Mexico' stage in attract faster and the 'Insert Coins' text doesn't display properly for that sequence
-            Culprit may either be the speedhacks or TMS core
 
 Known to exist but not dumped:
     Off Road Challenge v1.00 (Mon 07-28-97)
@@ -487,18 +485,9 @@ uint16_t midvunit_state::comm_bus_out()
 		mask |= 0xff;
 	return m_comm_data & mask;
 }
- /*
- To link multiple machines together will require comm_bus_out()
- to be called on each machine and bitwise ORed here.
- This must be done in real time with proper synchronization
- between the main CPUs.
- 
- TODO:
-     * An equivalent of RS485 is required to route comm_bus_out to all MAME instances.
-     * Because the network coding is highly timing dependent on the main CPU, the TMS
-       core needs a lot of fleshing out.
-
- */
+// To link multiple machines together will require comm_bus_out()
+// to be called on each machine and bitwise ORed here.
+// This must be done in real time with proper synchronization.
 uint16_t midvunit_state::comm_bus_in()
 {
 	return comm_bus_out();
@@ -2067,26 +2056,26 @@ void midvunit_state::init_wargods()
  *
  *************************************/
 
-GAMEL( 1994, crusnusa,   0,        midvunit, crusnusa, midvunit_state, init_crusnusa, ROT0, "Midway", "Cruis'n USA (v4.5)", MACHINE_SUPPORTS_SAVE, MACHINE_IMPERFECT_TIMING, MACHINE_NODEVICE_LAN layout_crusnusa )
-GAMEL( 1994, crusnusa44, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu40, ROT0, "Midway", "Cruis'n USA (v4.4)", MACHINE_SUPPORTS_SAVE, MACHINE_IMPERFECT_TIMING, MACHINE_NODEVICE_LAN layout_crusnusa )
-GAMEL( 1994, crusnusa41, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu40, ROT0, "Midway", "Cruis'n USA (v4.1)", MACHINE_SUPPORTS_SAVE, MACHINE_IMPERFECT_TIMING, MACHINE_NODEVICE_LAN layout_crusnusa )
-GAMEL( 1994, crusnusa40, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu40, ROT0, "Midway", "Cruis'n USA (v4.0)", MACHINE_SUPPORTS_SAVE, MACHINE_IMPERFECT_TIMING, MACHINE_NODEVICE_LAN layout_crusnusa )
-GAMEL( 1994, crusnusa21, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu21, ROT0, "Midway", "Cruis'n USA (v2.1)", MACHINE_SUPPORTS_SAVE, MACHINE_IMPERFECT_TIMING layout_crusnusa )
+GAMEL( 1994, crusnusa,   0,        midvunit, crusnusa, midvunit_state, init_crusnusa, ROT0, "Midway", "Cruis'n USA (v4.5)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1994, crusnusa44, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu40, ROT0, "Midway", "Cruis'n USA (v4.4)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1994, crusnusa41, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu40, ROT0, "Midway", "Cruis'n USA (v4.1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1994, crusnusa40, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu40, ROT0, "Midway", "Cruis'n USA (v4.0)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1994, crusnusa21, crusnusa, midvunit, crusnusa, midvunit_state, init_crusnu21, ROT0, "Midway", "Cruis'n USA (v2.1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING, layout_crusnusa )
 
-GAMEL( 1996, crusnwld,   0,        crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (v2.5)", MACHINE_SUPPORTS_SAVE, MACHINE_IMPERFECT_TIMING, MACHINE_NODEVICE_LAN layout_crusnusa )
-GAMEL( 1996, crusnwld24, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (v2.4)", MACHINE_SUPPORTS_SAVE, MACHINE_IMPERFECT_TIMING, MACHINE_NODEVICE_LAN layout_crusnusa )
-GAMEL( 1996, crusnwld23, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (v2.3)", MACHINE_SUPPORTS_SAVE, MACHINE_IMPERFECT_TIMING, MACHINE_NODEVICE_LAN layout_crusnusa )
-GAMEL( 1996, crusnwld20, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (v2.0)", MACHINE_SUPPORTS_SAVE, MACHINE_IMPERFECT_TIMING, MACHINE_NODEVICE_LAN layout_crusnusa )
-GAMEL( 1996, crusnwld19, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (v1.9)", MACHINE_SUPPORTS_SAVE, MACHINE_IMPERFECT_TIMING, MACHINE_NODEVICE_LAN layout_crusnusa )
-GAMEL( 1996, crusnwld17, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (v1.7)", MACHINE_SUPPORTS_SAVE, MACHINE_IMPERFECT_TIMING, MACHINE_NODEVICE_LAN layout_crusnusa )
-GAMEL( 1996, crusnwld13, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (v1.3)", MACHINE_SUPPORTS_SAVE, MACHINE_IMPERFECT_TIMING, MACHINE_NODEVICE_LAN layout_crusnusa )
+GAMEL( 1996, crusnwld,   0,        crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (v2.5)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1996, crusnwld24, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (v2.4)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1996, crusnwld23, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (v2.3)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1996, crusnwld20, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (v2.0)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1996, crusnwld19, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (v1.9)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1996, crusnwld17, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (v1.7)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1996, crusnwld13, crusnwld, crusnwld, crusnwld, midvunit_state, init_crusnwld, ROT0, "Midway", "Cruis'n World (v1.3)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
 
-GAMEL( 1997, offroadc,  0,        offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.63)", MACHINE_SUPPORTS_SAVE, MACHINE_IMPERFECT_TIMING, MACHINE_NODEVICE_LAN layout_crusnusa )
-GAMEL( 1997, offroadc5, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.50)", MACHINE_SUPPORTS_SAVE, MACHINE_IMPERFECT_TIMING, MACHINE_NODEVICE_LAN layout_crusnusa )
-GAMEL( 1997, offroadc4, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.40)", MACHINE_SUPPORTS_SAVE, MACHINE_IMPERFECT_TIMING, MACHINE_NODEVICE_LAN layout_crusnusa )
-GAMEL( 1997, offroadc3, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.30)", MACHINE_SUPPORTS_SAVE, MACHINE_IMPERFECT_TIMING, MACHINE_NODEVICE_LAN layout_crusnusa )
-GAMEL( 1997, offroadc1, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.10)", MACHINE_SUPPORTS_SAVE, MACHINE_IMPERFECT_TIMING, MACHINE_NODEVICE_LAN layout_crusnusa )
+GAMEL( 1997, offroadc,  0,        offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.63)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1997, offroadc5, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.50)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1997, offroadc4, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.40)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1997, offroadc3, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.30)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
+GAMEL( 1997, offroadc1, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.10)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_crusnusa )
 
-GAME( 1995, wargods,   0,        midvplus, wargods, midvunit_state,  init_wargods,  ROT0, "Midway", "War Gods (HD 10/09/1996 - Dual Resolution)", MACHINE_SUPPORTS_SAVE, MACHINE_IMPERFECT_TIMING )
-GAME( 1995, wargodsa,  wargods,  midvplus, wargodsa, midvunit_state, init_wargods,  ROT0, "Midway", "War Gods (HD 08/15/1996)", MACHINE_SUPPORTS_SAVE, MACHINE_IMPERFECT_TIMING )
-GAME( 1995, wargodsb,  wargods,  midvplus, wargodsa, midvunit_state, init_wargods,  ROT0, "Midway", "War Gods (HD 12/11/1995)", MACHINE_SUPPORTS_SAVE, MACHINE_IMPERFECT_TIMING )
+GAME( 1995, wargods,   0,        midvplus, wargods, midvunit_state,  init_wargods,  ROT0, "Midway", "War Gods (HD 10/09/1996 - Dual Resolution)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wargodsa,  wargods,  midvplus, wargodsa, midvunit_state, init_wargods,  ROT0, "Midway", "War Gods (HD 08/15/1996)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wargodsb,  wargods,  midvplus, wargodsa, midvunit_state, init_wargods,  ROT0, "Midway", "War Gods (HD 12/11/1995)", MACHINE_SUPPORTS_SAVE )
