@@ -1,17 +1,16 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria
+// copyright-holders:Nathan Woods, Anders Hallström
 /***************************************************************************
-
-    speaker.c
 
     Sound driver to emulate a simple speaker,
     driven by one or more output bits
 
-    Original author: (unsigned)
-    Filtering: Anders Hallstr?m
+    Original author: MESS Team
+    Filtering: Anders Hallström
+
 ****************************************************************************/
 
-/* Discussion of oversampling and anti-alias filtering: (Anders Hallstr?m)
+/* Discussion of oversampling and anti-alias filtering: (Anders Hallström)
  *
  * This driver is for machines that directly control
  * one or more simple digital-to-analog converters (DAC)
@@ -92,6 +91,7 @@ speaker_sound_device::speaker_sound_device(const machine_config &mconfig, const 
 	, m_levels(default_levels)
 {
 }
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup

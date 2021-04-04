@@ -1,5 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods
+/**********************************************************************
+
+    Cassette wave samples sound driver
+
+**********************************************************************/
+
 #ifndef MAME_SOUND_WAVE_H
 #define MAME_SOUND_WAVE_H
 
