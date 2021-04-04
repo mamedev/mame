@@ -574,6 +574,18 @@ std::string running_machine::get_statename(const char *option) const
 		}
 	}
 
+	// handle %t in the template (for timestamp)
+	std::string statename_time("%t");
+	int pos_time = statename_str.find(statename_time);
+
+	if (pos_time != -1)
+	{
+		char t_str[15];
+		const std::time_t cur_time = std::time(nullptr);
+		strftime(t_str, sizeof(t_str), "%Y%m%d_%H%M%S", std::localtime(&cur_time));
+		strreplace(statename_str, "%t", t_str);
+	}
+
 	// substitute path and gamename up front
 	strreplace(statename_str, "/", PATH_SEPARATOR);
 	strreplace(statename_str, "%g", basename());
