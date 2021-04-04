@@ -23,14 +23,22 @@ ROM_END
 
 
 ROM_START(bufgrapplerplus)
-	// TODO: get proper ROM labels and confirm contents
+	// TODO: confirm contents
 	// despite having the same version string, this differs from the Grapper+ 3.2.u9 ROM
 
+	// 9433B-0141
+	// 90ROM00002
+	// GI8603CEY
+	// TAIWAN
 	ROM_REGION(0x1000, "rom", 0)
-	ROM_LOAD( "3.2.u18", 0x0000, 0x1000, CRC(cd07c7ef) SHA1(6c2f1375b5df6bb65dfca1444c064661242fef1a) )
+	ROM_LOAD( "90rom00002.u18", 0x0000, 0x1000, CRC(cd07c7ef) SHA1(6c2f1375b5df6bb65dfca1444c064661242fef1a) )
 
+	// S 8450
+	// SCN8048A
+	// C6N40 B
+	// 95ROM08048
 	ROM_REGION(0x0400, "mcu", 0)
-	ROM_LOAD( "8048.u10", 0x0000, 0x0400, CRC(36c5e2b2) SHA1(65eea4c7352a93f780df6b30ec6c20ee1e87aa30) BAD_DUMP )
+	ROM_LOAD( "95rom08048.u10", 0x0000, 0x0400, CRC(c9c23486) SHA1(c3a9c0fc9bd0ae728ad2aaa50d98b41929ec4a17) BAD_DUMP )
 ROM_END
 
 
@@ -529,6 +537,8 @@ void a2bus_buf_grapplerplus_device::device_add_mconfig(machine_config &config)
 
 	m_printer_conn->ack_handler().set(FUNC(a2bus_buf_grapplerplus_device::buf_ack_w));
 
+	// 1982 schematics show MCU driven by 7M clock but some boards have a crystal next to the MCU
+	// P22 is tied high, pulling it low is used for some factory test mode
 	I8048(config, m_mcu, DERIVED_CLOCK(1, 1));
 	m_mcu->set_addrmap(AS_IO, &a2bus_buf_grapplerplus_device::mcu_io);
 	m_mcu->p2_out_cb().set(FUNC(a2bus_buf_grapplerplus_device::mcu_p2_w));
