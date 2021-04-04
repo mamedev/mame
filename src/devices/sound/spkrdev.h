@@ -44,7 +44,7 @@ private:
 	// internal state
 
 	// Updates the composed volume array according to time
-	void update_interm_samples(const attotime &time, int volume);
+	void update_interm_samples(const attotime &time, double volume);
 
 	// Updates the composed volume array and returns final filtered volume of next stream sample
 	double update_interm_samples_get_filtered_volume(double volume);
