@@ -801,8 +801,8 @@ public:
 	u32 irq_reset() const                  { return byte(0x04, 7, 1); }
 	u32 reset_timer_b() const              { return byte(0x04, 7, 1) | byte(0x04, 5, 1); }
 	u32 reset_timer_a() const              { return byte(0x04, 7, 1) | byte(0x04, 6, 1); }
-	u32 enable_timer_b() const             { return byte(0x04, 5, 1) ^ 1; }
-	u32 enable_timer_a() const             { return byte(0x04, 6, 1) ^ 1; }
+	u32 enable_timer_b() const             { return 1; }
+	u32 enable_timer_a() const             { return 1; }
 	u32 load_timer_b() const               { return byte(0x04, 1, 1); }
 	u32 load_timer_a() const               { return byte(0x04, 0, 1); }
 	u32 csm() const                        { return IsOpl3Plus ? 0 : byte(0x08, 7, 1); }
@@ -1300,7 +1300,7 @@ public:
 	// set/reset bits in the status register, updating the IRQ status
 	u8 set_reset_status(u8 set, u8 reset)
 	{
-		m_status = (m_status | set) & ~reset & ~m_regs.status_mask();
+		m_status = (m_status | set) & ~reset;
 		schedule_check_interrupts();
 		return m_status;
 	}
