@@ -193,7 +193,7 @@ uint8_t a2bus_phasor_device::read_cnxx(uint8_t offset)
 		via_sel = (offset & 0x80) ? 2 : 1;
 	}
 
-	if ((offset < 0x20) || (offset >= 0x80 && offset <= 0xa0))
+	if ((offset < 0x20) || (offset >= 0x80 && offset < 0xa0))
 	{
 		if (BIT(via_sel, 0))
 		{
@@ -229,7 +229,7 @@ void a2bus_ayboard_device::write_cnxx(uint8_t offset, uint8_t data)
 
 void a2bus_phasor_device::write_cnxx(uint8_t offset, uint8_t data)
 {
-	if ((offset < 0x20) || (offset >= 0x80 && offset <= 0xa0))
+	if ((offset < 0x20) || (offset >= 0x80 && offset < 0xa0))
 	{
 		int via_sel;
 
