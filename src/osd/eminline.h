@@ -45,6 +45,128 @@
 
 
 /***************************************************************************
+    INLINE BIT MANIPULATION FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    count_leading_zeros - return the number of
+    leading zero bits in a 32-bit value
+-------------------------------------------------*/
+
+#ifndef count_leading_zeros
+inline uint8_t count_leading_zeros(uint32_t val)
+{
+	if (!val) return 32U;
+	uint8_t count;
+	for (count = 0; int32_t(val) >= 0; count++) val <<= 1;
+	return count;
+}
+#endif
+
+
+/*-------------------------------------------------
+    count_leading_ones - return the number of
+    leading one bits in a 32-bit value
+-------------------------------------------------*/
+
+#ifndef count_leading_ones
+inline uint8_t count_leading_ones(uint32_t val)
+{
+	uint8_t count;
+	for (count = 0; int32_t(val) < 0; count++) val <<= 1;
+	return count;
+}
+#endif
+
+
+/*-------------------------------------------------
+    count_leading_zeros_64 - return the number of
+    leading zero bits in a 64-bit value
+-------------------------------------------------*/
+
+#ifndef count_leading_zeros_64
+inline uint8_t count_leading_zeros_64(uint64_t val)
+{
+	uint32_t upper = uint32_t(val >> 32);
+	return (upper != 0) ? count_leading_zeros(upper) : 32 + count_leading_zeros(uint32_t(val));
+}
+#endif
+
+
+/*-------------------------------------------------
+    count_leading_ones_64 - return the number of
+    leading one bits in a 64-bit value
+-------------------------------------------------*/
+
+#ifndef count_leading_ones_64
+inline uint8_t count_leading_ones_64(uint64_t val)
+{
+	uint32_t upper = uint32_t(val >> 32);
+	return (upper != 0xffffffff) ? count_leading_ones(upper) : 32 + count_leading_ones(uint32_t(val));
+}
+#endif
+
+
+/*-------------------------------------------------
+    population_count_32 - return the number of
+    one bits in a 32-bit value
+-------------------------------------------------*/
+
+#ifndef population_count_32
+inline unsigned population_count_32(uint32_t val)
+{
+#if defined(__NetBSD__)
+	return popcount32(val);
+#else
+	// optimal Hamming weight assuming fast 32*32->32
+	constexpr uint32_t m1(0x55555555);
+	constexpr uint32_t m2(0x33333333);
+	constexpr uint32_t m4(0x0f0f0f0f);
+	constexpr uint32_t h01(0x01010101);
+	val -= (val >> 1) & m1;
+	val = (val & m2) + ((val >> 2) & m2);
+	val = (val + (val >> 4)) & m4;
+	return unsigned((val * h01) >> 24);
+#endif
+}
+#endif
+
+
+/*-------------------------------------------------
+    population_count_64 - return the number of
+    one bits in a 64-bit value
+-------------------------------------------------*/
+
+#ifndef population_count_64
+inline unsigned population_count_64(uint64_t val)
+{
+#if defined(__NetBSD__)
+	return popcount64(val);
+#else
+	// guess that architectures with 64-bit pointers have 64-bit multiplier
+	if (sizeof(void *) >= sizeof(uint64_t))
+	{
+		// optimal Hamming weight assuming fast 64*64->64
+		constexpr uint64_t m1(0x5555555555555555);
+		constexpr uint64_t m2(0x3333333333333333);
+		constexpr uint64_t m4(0x0f0f0f0f0f0f0f0f);
+		constexpr uint64_t h01(0x0101010101010101);
+		val -= (val >> 1) & m1;
+		val = (val & m2) + ((val >> 2) & m2);
+		val = (val + (val >> 4)) & m4;
+		return unsigned((val * h01) >> 56);
+	}
+	else
+	{
+		// fall back to two 32-bit operations to avoid slow multiply
+		return population_count_32(uint32_t(val)) + population_count_32(uint32_t(val >> 32));
+	}
+#endif
+}
+#endif
+
+
+/***************************************************************************
     INLINE MATH FUNCTIONS
 ***************************************************************************/
 
@@ -317,6 +439,179 @@ inline uint64_t mulu_64x64(uint64_t a, uint64_t b, uint64_t &hi)
 
 
 /*-------------------------------------------------
+    div_128x64 - perform a signed 128 bit x 64
+    bit divide and return the 64 bit result
+-------------------------------------------------*/
+
+#ifndef div_128x64
+inline int64_t div_128x64(int64_t a_hi, uint64_t a_lo, int64_t b)
+{
+	// use 64/64 divide if we can
+	if (a_hi == (int64_t(a_lo) >> 63))
+		return int64_t(a_lo) / b;
+
+	// compute the absolute value of the dividend
+	int sign = 0;
+	if (a_hi < 0)
+	{
+		a_hi = -a_hi - (a_lo != 0);
+		a_lo = -a_lo;
+		sign = 1;
+	}
+
+	// and the absolute value of the divisor
+	if (b < 0)
+	{
+		b = -b;
+		sign ^= 1;
+	}
+
+	// handle overflow and divide by 0 cases
+	if (uint64_t(a_hi << 1) >= uint64_t(b))
+		return 0x7fffffffffffffffll + sign;
+
+	int dividend_bits = count_leading_zeros_64(a_hi);
+	int divisor_bits = count_leading_zeros_64(b);
+	int count = 65 + divisor_bits - dividend_bits;
+
+	// shift the dividend so the top bit is in bit 62; unlike the unsigned case,
+	// we can presume that the divided always has at least 1 bit of wiggle room
+	if (--dividend_bits > 0)
+	{
+		a_hi = (a_hi << dividend_bits) | (a_lo >> (64 - dividend_bits));
+		a_lo <<= dividend_bits;
+	}
+
+	// shift the divisor so that its top bit is in bit 62 as well; this may lose a
+	// bit off the bottom, which we account for below
+	uint64_t bshifted = uint64_t(b << divisor_bits) >> 1;
+
+	// unlike the unsigned case, we can presume that the divisor never needs to
+	// be shifted down, and so we never have the special case
+	uint64_t result = 0;
+	for ( ; count != 0 && a_lo != 0; count--)
+	{
+		result <<= 1;
+		if (uint64_t(a_hi) >= bshifted)
+		{
+			a_hi -= bshifted;
+			result |= 1;
+		}
+		a_hi = (a_hi << 1) | (a_lo >> 63);
+		a_lo <<= 1;
+	}
+
+	// once the low part of the dividend is all 0, we shift to this more
+	// streamlined loop
+	for ( ; count != 0; count--)
+	{
+		result <<= 1;
+		if (uint64_t(a_hi) >= bshifted)
+		{
+			a_hi -= bshifted;
+			result |= 1;
+		}
+		a_hi <<= 1;
+	}
+	return sign ? -result : result;
+}
+#endif
+
+
+/*-------------------------------------------------
+    divu_128x64 - perform an unsigned 128 bit x 64
+    bit divide and return the 64 bit result
+-------------------------------------------------*/
+
+#ifndef divu_128x64
+inline uint64_t divu_128x64(uint64_t a_hi, uint64_t a_lo, uint64_t b)
+{
+	// use 64/64 divide if we can
+	if (a_hi == 0)
+		return a_lo / b;
+
+	// handle overflow and divide by 0 cases
+	if (a_hi >= b)
+		return 0xffffffffffffffffull;
+
+	// compute leading 0 bits, and the delta between dividend and divisor
+	int dividend_bits = count_leading_zeros_64(a_hi);
+	int divisor_bits = count_leading_zeros_64(b);
+	int count = 65 + divisor_bits - dividend_bits;
+
+	// if the dividend is fully 64 bit, the first iteration implicitly won't work,
+	// so decrement the count rather than shifting right one bit in order to not
+	// lose any bits of resolution
+	if (dividend_bits-- == 0)
+		count--;
+
+	// in all other cases, we want to shift the dividend so the top bit is in bit 62
+	else if (dividend_bits > 0)
+	{
+		a_hi = (a_hi << dividend_bits) | (a_lo >> (64 - dividend_bits));
+		a_lo <<= dividend_bits;
+	}
+
+	// shift the divisor so that its top bit is in bit 62 as well; this may lose a
+	// bit off the bottom, which we account for below
+	uint64_t bshifted = (b << divisor_bits) >> 1;
+
+	// if the divisor is fully 64 bits, and the LSB is non-zero, then the effective
+	// value we're checking against is (divisor >> 1) in the MSW, and a single bit at
+	// the top of the LSW; make this a special case
+	uint64_t result = 0;
+	if (divisor_bits == 0 && (b & 1) != 0)
+	{
+		// the logic below treats bshifted as if there was a lower word with a
+		// single bit in the most-significant place
+		for ( ; count != 0 && a_lo != 0; count--)
+		{
+			result <<= 1;
+			if (a_hi > bshifted || (a_hi == bshifted && int64_t(a_lo) < 0))
+			{
+				a_lo ^= 0x8000000000000000ull;
+				a_hi -= bshifted + (a_lo >> 63);
+				result |= 1;
+			}
+			a_hi = (a_hi << 1) | (a_lo >> 63);
+			a_lo <<= 1;
+		}
+	}
+	else
+	{
+		// this is the normal logic, for when we can treat bshifted as having
+		// all zeros below it
+		for ( ; count != 0 && a_lo != 0; count--)
+		{
+			result <<= 1;
+			if (a_hi >= bshifted)
+			{
+				a_hi -= bshifted;
+				result |= 1;
+			}
+			a_hi = (a_hi << 1) | (a_lo >> 63);
+			a_lo <<= 1;
+		}
+	}
+
+	// once the low part of the dividend is all 0, we shift to this more
+	// streamlined loop
+	for ( ; count != 0; count--)
+	{
+		result <<= 1;
+		if (a_hi >= bshifted)
+		{
+			a_hi -= bshifted;
+			result |= 1;
+		}
+		a_hi <<= 1;
+	}
+	return result;
+}
+#endif
+
+
+/*-------------------------------------------------
     addu_32x32_co - perform an unsigned 32 bit + 32
     bit addition and return the result with carry
     out
@@ -345,100 +640,6 @@ inline bool addu_64x64_co(uint64_t a, uint64_t b, uint64_t &sum)
 }
 #endif
 
-
-
-/***************************************************************************
-    INLINE BIT MANIPULATION FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    count_leading_zeros - return the number of
-    leading zero bits in a 32-bit value
--------------------------------------------------*/
-
-#ifndef count_leading_zeros
-inline uint8_t count_leading_zeros(uint32_t val)
-{
-	if (!val) return 32U;
-	uint8_t count;
-	for (count = 0; int32_t(val) >= 0; count++) val <<= 1;
-	return count;
-}
-#endif
-
-
-/*-------------------------------------------------
-    count_leading_ones - return the number of
-    leading one bits in a 32-bit value
--------------------------------------------------*/
-
-#ifndef count_leading_ones
-inline uint8_t count_leading_ones(uint32_t val)
-{
-	uint8_t count;
-	for (count = 0; int32_t(val) < 0; count++) val <<= 1;
-	return count;
-}
-#endif
-
-
-/*-------------------------------------------------
-    population_count_32 - return the number of
-    one bits in a 32-bit value
--------------------------------------------------*/
-
-#ifndef population_count_32
-inline unsigned population_count_32(uint32_t val)
-{
-#if defined(__NetBSD__)
-	return popcount32(val);
-#else
-	// optimal Hamming weight assuming fast 32*32->32
-	constexpr uint32_t m1(0x55555555);
-	constexpr uint32_t m2(0x33333333);
-	constexpr uint32_t m4(0x0f0f0f0f);
-	constexpr uint32_t h01(0x01010101);
-	val -= (val >> 1) & m1;
-	val = (val & m2) + ((val >> 2) & m2);
-	val = (val + (val >> 4)) & m4;
-	return unsigned((val * h01) >> 24);
-#endif
-}
-#endif
-
-
-/*-------------------------------------------------
-    population_count_64 - return the number of
-    one bits in a 64-bit value
--------------------------------------------------*/
-
-#ifndef population_count_64
-inline unsigned population_count_64(uint64_t val)
-{
-#if defined(__NetBSD__)
-	return popcount64(val);
-#else
-	// guess that architectures with 64-bit pointers have 64-bit multiplier
-	if (sizeof(void *) >= sizeof(uint64_t))
-	{
-		// optimal Hamming weight assuming fast 64*64->64
-		constexpr uint64_t m1(0x5555555555555555);
-		constexpr uint64_t m2(0x3333333333333333);
-		constexpr uint64_t m4(0x0f0f0f0f0f0f0f0f);
-		constexpr uint64_t h01(0x0101010101010101);
-		val -= (val >> 1) & m1;
-		val = (val & m2) + ((val >> 2) & m2);
-		val = (val + (val >> 4)) & m4;
-		return unsigned((val * h01) >> 56);
-	}
-	else
-	{
-		// fall back to two 32-bit operations to avoid slow multiply
-		return population_count_32(uint32_t(val)) + population_count_32(uint32_t(val >> 32));
-	}
-#endif
-}
-#endif
 
 
 /***************************************************************************

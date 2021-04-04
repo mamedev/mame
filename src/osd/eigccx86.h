@@ -23,6 +23,102 @@
 
 
 /***************************************************************************
+    INLINE BIT MANIPULATION FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    count_leading_zeros - return the number of
+    leading zero bits in a 32-bit value
+-------------------------------------------------*/
+
+#define count_leading_zeros _count_leading_zeros
+inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
+_count_leading_zeros(uint32_t value)
+{
+	uint32_t result;
+	__asm__ (
+		" bsrl    %[value], %[result] ;"
+		" cmovzl  %[bias], %[result]  ;"
+		: [result] "=&r" (result)       // result can be in any register
+		: [value]  "rm"  (value)        // 'value' can be register or memory
+		, [bias]   "rm"  (~uint32_t(0)) // 'bias' can be register or memory
+		: "cc"                          // clobbers condition codes
+	);
+	return 31U - result;
+}
+
+
+/*-------------------------------------------------
+    count_leading_ones - return the number of
+    leading one bits in a 32-bit value
+-------------------------------------------------*/
+
+#define count_leading_ones _count_leading_ones
+inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
+_count_leading_ones(uint32_t value)
+{
+	uint32_t result;
+	__asm__ (
+		" bsrl    %[value], %[result] ;"
+		" cmovzl  %[bias], %[result]  ;"
+		: [result] "=&r" (result)       // result can be in any register
+		: [value]  "rm"  (~value)       // 'value' can be register or memory
+		, [bias]   "rm"  (~uint32_t(0)) // 'bias' can be register or memory
+		: "cc"                          // clobbers condition codes
+	);
+	return 31U - result;
+}
+
+
+/*-------------------------------------------------
+    count_leading_zeros_64 - return the number of
+    leading zero bits in a 64-bit value
+-------------------------------------------------*/
+
+#ifdef __x86_64__
+#define count_leading_zeros_64 _count_leading_zeros_64
+inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
+_count_leading_zeros_64(uint64_t value)
+{
+	uint64_t result;
+	__asm__ (
+		" bsrq    %[value], %[result] ;"
+		" cmovzq  %[bias], %[result]  ;"
+		: [result] "=&r" (result)       // result can be in any register
+		: [value]  "rm"  (value)        // 'value' can be register or memory
+		, [bias]   "rm"  (~uint64_t(0)) // 'bias' can be register or memory
+		: "cc"                          // clobbers condition codes
+	);
+	return 63U - result;
+}
+#endif
+
+
+/*-------------------------------------------------
+    count_leading_ones - return the number of
+    leading one bits in a 32-bit value
+-------------------------------------------------*/
+
+#ifdef __x86_64__
+#define count_leading_ones_64 _count_leading_ones_64
+inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
+_count_leading_ones_64(uint64_t value)
+{
+	uint64_t result;
+	__asm__ (
+		" bsrq    %[value], %[result] ;"
+		" cmovzq  %[bias], %[result]  ;"
+		: [result] "=&r" (result)       // result can be in any register
+		: [value]  "rm"  (~value)       // 'value' can be register or memory
+		, [bias]   "rm"  (~uint64_t(0)) // 'bias' can be register or memory
+		: "cc"                          // clobbers condition codes
+	);
+	return 63U - result;
+}
+#endif
+
+
+/***************************************************************************
     INLINE MATH FUNCTIONS
 ***************************************************************************/
 
@@ -427,52 +523,57 @@ _mulu_64x64(uint64_t a, uint64_t b, uint64_t &hi)
 #endif
 
 
-
-/***************************************************************************
-    INLINE BIT MANIPULATION FUNCTIONS
-***************************************************************************/
-
 /*-------------------------------------------------
-    count_leading_zeros - return the number of
-    leading zero bits in a 32-bit value
+    div_128x64 - perform a signed 128 bit x 64 bit
+    divide and return the 64 bit quotient
 -------------------------------------------------*/
 
-#define count_leading_zeros _count_leading_zeros
-inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
-_count_leading_zeros(uint32_t value)
+#ifdef __x86_64__
+#define div_128x64 _div_128x64
+inline int64_t ATTR_CONST ATTR_FORCE_INLINE
+_div_128x64(int64_t a_hi, uint64_t a_lo, int64_t b)
 {
-	uint32_t result;
+	int64_t result;
+
+	// Throws arithmetic exception if result doesn't fit in 64 bits
 	__asm__ (
-		" bsrl    %[value], %[result] ;"
-		" cmovzl  %[bias], %[result]  ;"
-		: [result] "=&r" (result)       // result can be in any register
-		: [value]  "rm"  (value)        // 'value' can be register or memory
-		, [bias]   "rm"  (~uint32_t(0)) // 'bias' can be register or memory
-		: "cc"                          // clobbers condition codes
+		" idivq  %[b] ;"
+		: [result] "=a" (result)    // result ends up in eax
+		: [a_lo]   "a"  (a_lo)      // 'a_lo' in eax
+		, [a_hi]   "d"  (a_hi)      // 'a_hi' in edx
+		, [b]      "rm" (b)         // 'b' in register or memory
+		: "cc"                      // clobbers condition codes
 	);
-	return 31U - result;
+
+	return result;
 }
+#endif
 
 
 /*-------------------------------------------------
-    count_leading_ones - return the number of
-    leading one bits in a 32-bit value
+    divu_128x64 - perform an unsigned 128 bit x 64 bit
+    divide and return the 64 bit quotient
 -------------------------------------------------*/
 
-#define count_leading_ones _count_leading_ones
-inline uint8_t ATTR_CONST ATTR_FORCE_INLINE
-_count_leading_ones(uint32_t value)
+#ifdef __x86_64__
+#define divu_128x64 _divu_128x64
+inline uint64_t ATTR_CONST ATTR_FORCE_INLINE
+_divu_128x64(uint64_t a_hi, uint64_t a_lo, uint64_t b)
 {
-	uint32_t result;
+	uint64_t result;
+
+	// Throws arithmetic exception if result doesn't fit in 64 bits
 	__asm__ (
-		" bsrl    %[value], %[result] ;"
-		" cmovzl  %[bias], %[result]  ;"
-		: [result] "=&r" (result)       // result can be in any register
-		: [value]  "rm"  (~value)       // 'value' can be register or memory
-		, [bias]   "rm"  (~uint32_t(0)) // 'bias' can be register or memory
-		: "cc"                          // clobbers condition codes
+		" divq  %[b] ;"
+		: [result] "=a" (result)    // result ends up in eax
+		: [a_lo]   "a"  (a_lo)      // 'a_lo' in eax
+		, [a_hi]   "d"  (a_hi)      // 'a_hi' in edx
+		, [b]      "rm" (b)         // 'b' in register or memory
+		: "cc"                      // clobbers condition codes
 	);
-	return 31U - result;
+
+	return result;
 }
+#endif
 
 #endif // MAME_OSD_EIGCCX86_H
