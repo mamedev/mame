@@ -453,7 +453,7 @@ u64 device_t::attotime_to_clocks(const attotime &duration) const noexcept
 	if (m_clock == 0)
 		return 0;
 	else
-		return mulu_32x32(duration.seconds(), m_clock) + duration.raw_subseconds() / m_subseconds_per_clock;
+		return mulu_32x32(duration.seconds(), m_clock) + duration.frac() / m_subseconds_per_clock;
 }
 
 

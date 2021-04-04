@@ -1243,7 +1243,7 @@ void device_scheduler::add_scheduling_quantum(attotime const &quantum, attotime 
 
 	attotime curtime = time();
 	attotime expire = curtime + duration;
-	const subseconds quantum_subs = quantum.raw_subseconds();
+	const subseconds quantum_subs = quantum.frac();
 
 	// figure out where to insert ourselves, expiring any quanta that are out-of-date
 	quantum_slot *insert_after = nullptr;

@@ -143,7 +143,7 @@ private:
 	void set_end_time(attotime time)
 	{
 		m_end_second = time.seconds();
-		m_end_sample = u32(time.raw_subseconds() / m_sample_subs);
+		m_end_sample = u32(time.frac() / m_sample_subs);
 	}
 
 	// return the effective buffer size; currently it is a full second of audio

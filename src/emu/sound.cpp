@@ -96,7 +96,7 @@ void stream_buffer::set_sample_rate(u32 rate, bool resample)
 
 	// compute the time and period of the new buffer
 	attotime newperiod = subseconds::from_hz(rate) + subseconds::unit();
-	attotime newend = attotime(prevend.seconds(), (prevend.raw_subseconds() / newperiod.raw_subseconds()) * newperiod.raw_subseconds());
+	attotime newend = attotime(prevend.seconds(), (prevend.frac() / newperiod.frac()) * newperiod.frac());
 
 	// buffer a short runway of previous samples; in order to support smooth
 	// sample rate changes (needed by, e.g., Q*Bert's Votrax), we buffer a few
@@ -138,7 +138,7 @@ void stream_buffer::set_sample_rate(u32 rate, bool resample)
 
 	// set the new rate
 	m_sample_rate = rate;
-	m_sample_subs = newperiod.raw_subseconds();
+	m_sample_subs = newperiod.frac();
 
 	// compute the new end sample index based on the buffer time
 	m_end_sample = time_to_buffer_index(prevend, false, true);
@@ -241,7 +241,7 @@ attotime stream_buffer::index_time(s32 index) const
 u32 stream_buffer::time_to_buffer_index(attotime time, bool round_up, bool allow_expansion)
 {
 	// compute the sample index within the second
-	int sample = (time.raw_subseconds() + subseconds::from_raw(round_up ? (m_sample_subs.raw() - 1) : 0)) / m_sample_subs;
+	int sample = (time.frac() + subseconds::from_raw(round_up ? (m_sample_subs.raw() - 1) : 0)) / m_sample_subs;
 	sound_assert(sample >= 0 && sample <= size());
 
 	// if the time is past the current end, make it the end
@@ -987,7 +987,7 @@ void default_resampler_stream::resampler_sound_update(sound_stream &stream, std:
 	// compute the fractional input start position
 	attotime delta = output_start - (rebased.start_time() + latency);
 	sound_assert(delta.seconds() == 0);
-	stream_buffer::sample_t srcpos = stream_buffer::sample_t(delta.raw_subseconds().as_double() / rebased.sample_period_subseconds().as_double());
+	stream_buffer::sample_t srcpos = stream_buffer::sample_t(delta.frac().as_double() / rebased.sample_period_subseconds().as_double());
 	sound_assert(srcpos <= 1.0f);
 
 	// input is undersampled: point sample except where our sample period covers a boundary
@@ -1465,7 +1465,7 @@ void sound_manager::update()
 
 	// use that to compute the number of samples we need from the speakers
 	subseconds sample_rate_sub = subseconds::from_hz(machine().sample_rate());
-	m_samples_this_update = update_period.raw_subseconds() / sample_rate_sub;
+	m_samples_this_update = update_period.frac() / sample_rate_sub;
 
 	// recompute the end time to an even sample boundary
 	attotime endtime = m_last_update + m_samples_this_update * sample_rate_sub;

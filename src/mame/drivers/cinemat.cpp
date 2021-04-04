@@ -259,7 +259,7 @@ u8 qb3_state::qb3_frame_r()
 {
 	attotime next_update = m_screen->time_until_update();
 	attotime frame_period = m_screen->frame_period();
-	double fraction = next_update.raw_subseconds().as_double() / frame_period.raw_subseconds().as_double();
+	double fraction = next_update.frac().as_double() / frame_period.frac().as_double();
 
 	/* note this is just an approximation... */
 	return (fraction >= 0.1);

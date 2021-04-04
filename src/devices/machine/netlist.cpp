@@ -73,7 +73,7 @@ extern const plib::dynlib_static_sym nl_static_solver_syms[];
 static netlist::netlist_time_ext nltime_from_attotime(attotime t)
 {
 	netlist::netlist_time_ext nlmtime = netlist::netlist_time_ext::from_sec(t.seconds());
-	nlmtime += netlist::netlist_time_ext::from_raw(t.raw_subseconds() / subseconds::from_hz(u64(netlist::netlist_time_ext::resolution())));
+	nlmtime += netlist::netlist_time_ext::from_raw(t.frac() / subseconds::from_hz(u64(netlist::netlist_time_ext::resolution())));
 	return nlmtime;
 }
 

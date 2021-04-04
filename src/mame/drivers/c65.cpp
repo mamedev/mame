@@ -166,7 +166,7 @@ uint32_t c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 
 			if (attr & 0x10)
 			{
-				if (machine().time().raw_subseconds() >= subseconds::from_hz(2))
+				if (machine().time().frac() >= subseconds::from_hz(2))
 					attr &= 0x0f;
 				else if ((attr & 0xf0) != 0x10)
 					attr &= ~0x10;

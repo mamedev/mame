@@ -727,7 +727,7 @@ void pit_counter_device::update()
 
 			// otherwise, compute it a straightforward way
 			else
-				elapsed_cycles = elapsed_time.as_ticks(m_clock_period.raw_subseconds());
+				elapsed_cycles = elapsed_time.as_ticks(m_clock_period.frac());
 
 			LOG2("update(): %d elapsed_cycles\n", elapsed_cycles);
 

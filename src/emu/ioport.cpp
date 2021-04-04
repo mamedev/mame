@@ -2847,7 +2847,7 @@ void ioport_manager::record_frame(const attotime &curtime)
 	{
 		// first the absolute time
 		record_write(curtime.seconds());
-		record_write(curtime.raw_subseconds().raw());
+		record_write(curtime.frac().raw());
 
 		// then the current speed
 		record_write(u32(machine().video().speed_percent() * double(1 << 20)));
@@ -2861,7 +2861,7 @@ void ioport_manager::record_frame(const attotime &curtime)
 				(int)curtime.seconds() / (60 * 60),
 				(curtime.seconds() / 60) % 60,
 				curtime.seconds() % 60,
-				curtime.raw_subseconds().as_msec_int());
+				curtime.frac().as_msec_int());
 
 		// Elapsed from previous timecode
 		attotime const elapsed_time = curtime - m_timecode_last_time;
@@ -2870,7 +2870,7 @@ void ioport_manager::record_frame(const attotime &curtime)
 				elapsed_time.seconds() / (60 * 60),
 				(elapsed_time.seconds() / 60) % 60,
 				elapsed_time.seconds() % 60,
-				elapsed_time.raw_subseconds().as_msec_int());
+				elapsed_time.frac().as_msec_int());
 
 		// Number of ms from beginning of playback
 		s64 const mseconds_start = curtime.as_msec_int();

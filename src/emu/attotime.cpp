@@ -206,6 +206,6 @@ std::string attotime::to_string() const
 		t = attotime::zero-t;
 		sign = "-";
 	}
-	int nsec = t.raw_subseconds().as_nsec_int();
+	int nsec = t.frac().as_nsec_int();
 	return util::string_format("%s%04d.%03d,%03d,%03d", sign, int(t.seconds()), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
 }

@@ -423,8 +423,8 @@ NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::tvinterq_cb)
 NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::video_out_cb)
 {
 	scheduler().synchronize();
-	attotime second_fraction(time.raw_subseconds());
-	attotime frame_fraction((second_fraction * 60).raw_subseconds());
+	attotime second_fraction(time.frac());
+	attotime frame_fraction((second_fraction * 60).frac());
 	attotime pixel_time = frame_fraction * (SCREEN_HTOTAL * SCREEN_VTOTAL);
 	int32_t pixel_index = (frame_fraction * (SCREEN_HTOTAL * SCREEN_VTOTAL)).seconds();
 	double pixel_fraction = pixel_time.as_double();

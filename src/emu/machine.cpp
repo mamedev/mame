@@ -1411,7 +1411,7 @@ void running_machine::emscripten_main_loop()
 		// Emscripten will call this function at 60Hz, so step the simulation
 		// forward for the amount of time that has passed since the last frame
 		constexpr subseconds frametime = subseconds::from_hz(60);
-		const subseconds start = scheduler->time().raw_subseconds();
+		const subseconds start = scheduler->time().frac();
 		const subseconds end = ((start / frametime) + 1) * frametime;
 
 		scheduler->timeslice(end - start);
