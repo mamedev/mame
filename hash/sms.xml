@@ -7963,8 +7963,8 @@ license:CC0
 	         kblink device, that simulates the function of the cable link.
 	         Example for a localhost (127.0.0.1) connection:
 
-	         mame64 -window sg1000m3 -card f16falcjc -sgexp sk1100 -sgexp:sk1100:printer kblink -bitb socket.127.0.0.1:2345
-	         mame64 -window sg1000m3 -card f16falcjc -sgexp sk1100 -sgexp:sk1100:printer kblink -bitb socket.127.0.0.1:2345
+	         mame -window sg1000m3 -card f16falcjc -sgexp sk1100 -sgexp:sk1100:printer kblink -bitb socket.127.0.0.1:2345
+	         mame -window sg1000m3 -card f16falcjc -sgexp sk1100 -sgexp:sk1100:printer kblink -bitb socket.127.0.0.1:2345
 
 	         After run both instances, press the CR key on the keyboard when
 	         the title screen is displayed. Next, when asked which player

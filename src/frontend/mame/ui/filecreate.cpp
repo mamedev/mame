@@ -303,7 +303,7 @@ menu_select_floppy_init::menu_select_floppy_init(mame_ui_manager &mui, render_co
 	: menu(mui, container),
 	  m_fs(fs),
 	  m_result(result)
-	  
+
 {
 }
 

@@ -551,7 +551,7 @@ void swim3_device::live_run(attotime limit)
 			if(!(m_cur_live.bit_counter & 1))
 				m_cur_live.crc = 0xffff;
 
-			//			logerror("pre counter %02d sr %04x data %02x crc %04x\n", m_cur_live.bit_counter, m_cur_live.shift_reg, m_cur_live.data_reg, m_cur_live.crc);
+			//          logerror("pre counter %02d sr %04x data %02x crc %04x\n", m_cur_live.bit_counter, m_cur_live.shift_reg, m_cur_live.data_reg, m_cur_live.crc);
 			break;
 
 		case L_MFM_SCAN_ID:
@@ -574,7 +574,7 @@ void swim3_device::live_run(attotime limit)
 				return;
 			}
 
-			//			logerror("post counter %02d sr %04x data %02x crc %04x\n", m_cur_live.bit_counter, m_cur_live.shift_reg, m_cur_live.data_reg, m_cur_live.crc);
+			//          logerror("post counter %02d sr %04x data %02x crc %04x\n", m_cur_live.bit_counter, m_cur_live.shift_reg, m_cur_live.data_reg, m_cur_live.crc);
 			break;
 
 		case L_MFM_READ_ID:
@@ -646,7 +646,7 @@ void swim3_device::live_run(attotime limit)
 			if(!(m_cur_live.bit_counter & 1))
 				m_cur_live.crc = 0xffff;
 
-			//			logerror("pre counter %02d sr %04x data %02x crc %04x\n", m_cur_live.bit_counter, m_cur_live.shift_reg, m_cur_live.data_reg, m_cur_live.crc);
+			//          logerror("pre counter %02d sr %04x data %02x crc %04x\n", m_cur_live.bit_counter, m_cur_live.shift_reg, m_cur_live.data_reg, m_cur_live.crc);
 			break;
 
 		case L_MFM_SCAN_DATA:
@@ -670,7 +670,7 @@ void swim3_device::live_run(attotime limit)
 				return;
 			}
 
-			//			logerror("post counter %02d sr %04x data %02x crc %04x\n", m_cur_live.bit_counter, m_cur_live.shift_reg, m_cur_live.data_reg, m_cur_live.crc);
+			//          logerror("post counter %02d sr %04x data %02x crc %04x\n", m_cur_live.bit_counter, m_cur_live.shift_reg, m_cur_live.data_reg, m_cur_live.crc);
 			break;
 
 		case L_MFM_READ_DATA:
@@ -707,9 +707,9 @@ void swim3_device::live_run(attotime limit)
 						update_irq();
 						return;
 					}
-						
+
 					m_cur_live.state = L_MFM_SEARCH_DATA;
-					
+
 				} else {
 					checkpoint();
 					m_error |= 0x80;

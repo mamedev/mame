@@ -37,7 +37,7 @@ uint8_t elan_ep3a19asys_device::rombank_r(offs_t offset)
 
 void elan_ep3a19asys_device::map(address_map& map)
 {
-//	elan_eu3a05commonsys_device::map(map); // 00 - 0e
+//  elan_eu3a05commonsys_device::map(map); // 00 - 0e
 
 	map(0x0c, 0x0c).rw(FUNC(elan_ep3a19asys_device::rombank_r), FUNC(elan_ep3a19asys_device::rombank_w));
 
@@ -101,7 +101,7 @@ void elan_ep3a19asys_device::elan_eu3a05_dmatrg_w(uint8_t data)
 			destspace.write_byte(dest, dat);
 			dest++;
 		}
-		
+
 		m_dmaparams[0] = src & 0xff;
 		m_dmaparams[1] = (src >> 8) & 0xff;
 		m_dmaparams[2] = (src >> 16) & 0xff;

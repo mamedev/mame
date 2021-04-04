@@ -33,11 +33,11 @@ ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, dev
 	ay8910_device(mconfig, YM2608, tag, owner, clock, PSG_TYPE_YM, 1, 2),
 	device_rom_interface(mconfig, *this),
 	m_internal(*this, "internal"),
-	m_opn(*this),
+	m_fm(*this),
 	m_adpcm_a(*this, read8sm_delegate(*this, FUNC(ym2608_device::adpcm_a_read)), 0),
 	m_adpcm_b(*this, read8sm_delegate(*this, FUNC(ym2608_device::adpcm_b_read)), write8sm_delegate(*this, FUNC(ym2608_device::adpcm_b_write))),
 	m_stream(nullptr),
-	m_busy_duration(m_opn.compute_busy_duration()),
+	m_busy_duration(m_fm.compute_busy_duration()),
 	m_address(0),
 	m_irq_enable(0x1f),
 	m_flag_control(0x1c)
@@ -55,7 +55,7 @@ u8 ym2608_device::read(offs_t offset)
 	switch (offset & 3)
 	{
 		case 0:	// status port, YM2203 compatible
-			result = m_opn.status() & (ymopna_engine::STATUS_TIMERA | ymopna_engine::STATUS_TIMERB | ymopna_engine::STATUS_BUSY);
+			result = m_fm.status() & (fm_engine::STATUS_TIMERA | fm_engine::STATUS_TIMERB | fm_engine::STATUS_BUSY);
 			break;
 
 		case 1: // data port (only SSG)
@@ -66,10 +66,11 @@ u8 ym2608_device::read(offs_t offset)
 			break;
 
 		case 2:	// status port, extended
+			m_stream->update();
 			result = combine_status();
 			break;
 
-		case 3:	// ADPCM-B data
+		case 3: // ADPCM-B data
 			if (m_address < 0x10)
 				result = m_adpcm_b.read(m_address);
 			break;
@@ -87,7 +88,7 @@ void ym2608_device::write(offs_t offset, u8 value)
 {
 	switch (offset & 3)
 	{
-		case 0:	// address port
+		case 0: // address port
 			m_address = value;
 			if (m_address < 0x10)
 			{
@@ -99,7 +100,7 @@ void ym2608_device::write(offs_t offset, u8 value)
 				// prescaler select : 2d,2e,2f
 				if (m_address == 0x2d)
 					update_prescale(6);
-				else if (m_address == 0x2e && m_opn.clock_prescale() == 6)
+				else if (m_address == 0x2e && m_fm.clock_prescale() == 6)
 					update_prescale(3);
 				else if (m_address == 0x2f)
 					update_prescale(2);
@@ -128,17 +129,17 @@ void ym2608_device::write(offs_t offset, u8 value)
 				// special IRQ mask register
 				m_stream->update();
 				m_irq_enable = value;
-				m_opn.set_irq_mask(m_irq_enable & ~m_flag_control & 0x1f);
+				m_fm.set_irq_mask(m_irq_enable & ~m_flag_control & 0x1f);
 			}
 			else
 			{
-				// write to OPN
+				// write to FM
 				m_stream->update();
-				m_opn.write(m_address, value);
+				m_fm.write(m_address, value);
 			}
 
 			// mark busy for a bit
-			m_opn.set_busy_end(machine().time() + m_busy_duration);
+			m_fm.set_busy_end(machine().time() + m_busy_duration);
 			break;
 
 		case 2: // upper address port
@@ -162,22 +163,22 @@ void ym2608_device::write(offs_t offset, u8 value)
 				// IRQ flag control
 				m_stream->update();
 				if (BIT(value, 7))
-					m_opn.set_reset_status(0, 0xff);
+					m_fm.set_reset_status(0, 0xff);
 				else
 				{
 					m_flag_control = value;
-					m_opn.set_irq_mask(m_irq_enable & ~m_flag_control & 0x1f);
+					m_fm.set_irq_mask(m_irq_enable & ~m_flag_control & 0x1f);
 				}
 			}
 			else
 			{
-				// write to OPN
+				// write to FM
 				m_stream->update();
-				m_opn.write(m_address, value);
+				m_fm.write(m_address, value);
 			}
 
 			// mark busy for a bit
-			m_opn.set_busy_end(machine().time() + m_busy_duration);
+			m_fm.set_busy_end(machine().time() + m_busy_duration);
 			break;
 	}
 }
@@ -193,7 +194,7 @@ void ym2608_device::device_start()
 	ay8910_device::device_start();
 
 	// create our stream
-	m_stream = stream_alloc(0, 2, clock() / (4 * 6 * 6));
+	m_stream = stream_alloc(0, fm_engine::OUTPUTS, m_fm.sample_rate(clock()));
 
 	// save our data
 	save_item(YMFM_NAME(m_address));
@@ -201,17 +202,9 @@ void ym2608_device::device_start()
 	save_item(YMFM_NAME(m_flag_control));
 
 	// save the engines
-	m_opn.save(*this);
+	m_fm.save(*this);
 	m_adpcm_a.save(*this);
 	m_adpcm_b.save(*this);
-
-	// configure ADPCM percussion sounds
-	m_adpcm_a.set_start_end(0, 0x0000, 0x01bf); // bass drum
-	m_adpcm_a.set_start_end(1, 0x01c0, 0x043f); // snare drum
-	m_adpcm_a.set_start_end(2, 0x0440, 0x1b7f); // top cymbal
-	m_adpcm_a.set_start_end(3, 0x1b80, 0x1cff); // high hat
-	m_adpcm_a.set_start_end(4, 0x1d00, 0x1f7f); // tom tom
-	m_adpcm_a.set_start_end(5, 0x1f80, 0x1fff); // rim shot
 }
 
 
@@ -225,9 +218,17 @@ void ym2608_device::device_reset()
 	ay8910_device::device_reset();
 
 	// reset the engines
-	m_opn.reset();
+	m_fm.reset();
 	m_adpcm_a.reset();
 	m_adpcm_b.reset();
+
+	// configure ADPCM percussion sounds
+	m_adpcm_a.set_start_end(0, 0x0000, 0x01bf); // bass drum
+	m_adpcm_a.set_start_end(1, 0x01c0, 0x043f); // snare drum
+	m_adpcm_a.set_start_end(2, 0x0440, 0x1b7f); // top cymbal
+	m_adpcm_a.set_start_end(3, 0x1b80, 0x1cff); // high hat
+	m_adpcm_a.set_start_end(4, 0x1d00, 0x1f7f); // tom tom
+	m_adpcm_a.set_start_end(5, 0x1f80, 0x1fff); // rim shot
 
 	// initialize our special interrupt states
 	m_irq_enable = 0x1f;
@@ -243,7 +244,7 @@ void ym2608_device::device_reset()
 void ym2608_device::device_clock_changed()
 {
 	// refresh via prescale
-	update_prescale(m_opn.clock_prescale());
+	update_prescale(m_fm.clock_prescale());
 }
 
 
@@ -301,13 +302,13 @@ void ym2608_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 	}
 
 	// top bit of the IRQ enable flags controls 3-channel vs 6-channel mode
-	u8 opnmask = BIT(m_irq_enable, 7) ? 0x3f : 0x07;
+	u8 fmmask = BIT(m_irq_enable, 7) ? 0x3f : 0x07;
 
 	// iterate over all target samples
 	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
 	{
-		// clock the OPN
-		u32 env_counter = m_opn.clock(opnmask);
+		// clock the FM
+		u32 env_counter = m_fm.clock(fmmask);
 
 		// clock the ADPCM-A engine on every envelope cycle
 		// (channels 4 and 5 clock every 2 envelope clocks)
@@ -317,17 +318,17 @@ void ym2608_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		// clock the ADPCM-B engine every cycle
 		m_adpcm_b.clock(0x01);
 
-		// update the OPN content; OPNA is 13-bit with no intermediate clipping
-		s32 lsum = 0, rsum = 0;
-		m_opn.output(lsum, rsum, 1, 32767, opnmask);
+		// update the FM content; YM2608 is 13-bit with no intermediate clipping
+		s32 sums[fm_engine::OUTPUTS] = { 0 };
+		m_fm.output(sums, 1, 32767, fmmask);
 
 		// mix in the ADPCM
-		m_adpcm_a.output(lsum, rsum, 0x3f);
-		m_adpcm_b.output(lsum, rsum, 2, 0x01);
+		m_adpcm_a.output(sums, 0x3f);
+		m_adpcm_b.output(sums, 2, 0x01);
 
 		// YM2608 is stereo
-		outputs[0].put_int_clamp(sampindex, lsum, 32768);
-		outputs[1].put_int_clamp(sampindex, rsum, 32768);
+		for (int index = 0; index < fm_engine::OUTPUTS; index++)
+			outputs[index].put_int_clamp(sampindex, sums[index], 32768);
 	}
 }
 
@@ -339,32 +340,32 @@ void ym2608_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 void ym2608_device::update_prescale(u8 newval)
 {
-	// inform the OPN engine and refresh our clock rate
-	m_opn.set_clock_prescale(newval);
-	m_stream->set_sample_rate(clock() / (4 * 6 * newval));
-	logerror("Prescale = %d; sample_rate = %d\n", newval, clock() / (4 * 6 * newval));
+	// inform the FM engine and refresh our clock rate
+	m_fm.set_clock_prescale(newval);
+	m_stream->set_sample_rate(m_fm.sample_rate(clock()));
+	logerror("Prescale = %d; sample_rate = %d\n", newval, m_fm.sample_rate(clock()));
 
 	// also scale the SSG streams
-	// mapping is (OPN->SSG): 6->4, 3->2, 2->1
+	// mapping is (FM->SSG): 6->4, 3->2, 2->1
 	u8 ssg_scale = 2 * newval / 3;
 	// QUESTION: where does the *2 come from??
 	ay_set_clock(clock() / ssg_scale);
 
 	// recompute the busy duration
-	m_busy_duration = m_opn.compute_busy_duration();
+	m_busy_duration = m_fm.compute_busy_duration();
 }
 
 
 //-------------------------------------------------
 //  combine_status - combine status flags from
-//  OPN and ADPCM-B, masking out any indicated by
+//  FM and ADPCM-B, masking out any indicated by
 //  the flag control register
 //-------------------------------------------------
 
 u8 ym2608_device::combine_status()
 {
-	u8 status = m_opn.status();
-	u8 adpcm_status = m_adpcm_b.status(0);
+	u8 status = m_fm.status() & ~(STATUS_ADPCM_B_EOS | STATUS_ADPCM_B_BRDY | STATUS_ADPCM_B_PLAYING);
+	u8 adpcm_status = m_adpcm_b.status();
 	if ((adpcm_status & ymadpcm_b_channel::STATUS_EOS) != 0)
 		status |= STATUS_ADPCM_B_EOS;
 	if ((adpcm_status & ymadpcm_b_channel::STATUS_BRDY) != 0)
@@ -372,7 +373,7 @@ u8 ym2608_device::combine_status()
 	if ((adpcm_status & ymadpcm_b_channel::STATUS_PLAYING) != 0)
 		status |= STATUS_ADPCM_B_PLAYING;
 	status &= ~(m_flag_control & 0x1f);
-	m_opn.set_reset_status(status, ~status);
+	m_fm.set_reset_status(status, ~status);
 	return status;
 }
 

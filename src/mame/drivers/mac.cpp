@@ -15,7 +15,6 @@
 #include "includes/mac.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/powerpc/ppc.h"
 #include "cpu/m6805/m6805.h"
 #include "formats/ap_dsk35.h"
 #include "machine/iwm.h"
@@ -441,50 +440,6 @@ uint8_t mac_state::swimiop_r(offs_t offset)
 void mac_state::swimiop_w(offs_t offset, uint8_t data)
 {
 //  printf("swimiop_w %x @ %x (PC=%x)\n", data, offset, m_maincpu->pc());
-}
-
-uint8_t mac_state::pmac_diag_r(offs_t offset)
-{
-	switch (offset)
-	{
-		case 0: // return 0 here to get the 'car crash' sound after the boot bong, 1 otherwise
-			return 1;
-	}
-
-	return 0;
-}
-
-uint8_t mac_state::amic_dma_r()
-{
-	return 0;
-}
-
-void mac_state::amic_dma_w(offs_t offset, uint8_t data)
-{
-//  printf("amic_dma_w: %02x at %x (PC=%x)\n", data, offset+0x1000, m_maincpu->pc());
-}
-
-// HMC has one register: a 35-bit shift register which is accessed one bit at a time (see pmac6100 code at 4030383c which makes this obvious)
-uint8_t mac_state::hmc_r()
-{
-	uint8_t rv = (uint8_t)(m_hmc_shiftout&1);
-	m_hmc_shiftout>>= 1;
-	return rv;
-}
-
-void mac_state::hmc_w(offs_t offset, uint8_t data)
-{
-	// writes to xxx8 reset the bit shift position
-	if ((offset&0x8) == 8)
-	{
-		m_hmc_shiftout = m_hmc_reg;
-	}
-	else
-	{
-		uint64_t temp = (data & 1) ? 0x400000000U : 0x0U;
-		m_hmc_reg >>= 1;
-		m_hmc_reg |= temp;
-	}
 }
 
 /***************************************************************************

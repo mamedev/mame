@@ -204,10 +204,10 @@ Reference of music tempo:
 #include "cpu/z80/z80.h"
 #include "machine/nmk004.h"
 #include "machine/nmk112.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 #include "sound/ym2203.h"
+#include "sound/ym3812.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -8454,40 +8454,60 @@ Notes:
       * - Unknown PLCC68 IC
       + - Not populated
 
+NOTE:
+The hotbubl set is also known to use double sized EPROMs with the identical halves:
+  Program data on a 27C020 EPROM:
+    ROM @ C1 with a CRC32 of 0x7bb240e9
+    ROM @ C2 with a CRC32 of 0x7917b95d
+  Sprite data on a 27C040 EPROM:
+    ROM @ BR1 with a CRC32 of 0x6fc18de4
+    ROM @ BR3 with a CRC32 of 0xbb677240
+
+All EPROMs had identical AFEGA 8, AFEGA 9 or AFEGA 10 labels, so each was named as found
+and are distinguished by PCB / IC locations.
+
+The hotbubla set also has program data with identical halves. While not confirmed, there
+may be a PCB out there using the smaller 27C010's for the program data. IE:
+    ROM @ C1 with a CRC32 of 0x41c3edbc and 0x20000 bytes in length
+    ROM @ C2 with a CRC32 of 0xf59aea4a and 0x20000 bytes in length
+
+It was not uncommon for manufacturers to use whatever size EPROMs were readily
+available and either double the data or padded the empty space with a fill byte.
+
 ***************************************************************************/
 
 ROM_START( hotbubl ) // Korean release - Nude images of women for backgrounds
 	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
-	ROM_LOAD16_BYTE( "c1.uc1",  0x00001, 0x40000, CRC(7bb240e9) SHA1(99048fa275182c3da3bfb0dedd790f4b5858bd92) )
-	ROM_LOAD16_BYTE( "c2.uc9",  0x00000, 0x40000, CRC(7917b95d) SHA1(0344bae9c373c5943e7693720e5e531bc2e0d7ee) )
+	ROM_LOAD16_BYTE( "afega8.c1.uc1",  0x00001, 0x20000, CRC(d1e72a31) SHA1(abe9113c1dd31fc1a6fc0f479b42e629650ecb1c) )
+	ROM_LOAD16_BYTE( "afega9.c2.uc9",  0x00000, 0x20000, CRC(4537c6d9) SHA1(0b6ea74311389dc592615f0073629d07500cc2c4) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
-	ROM_LOAD( "s1.uc14", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) ) // same as the other games on this driver
+	ROM_LOAD( "afega8.s1.uc14", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) ) // same as the other games on this driver
 
-	ROM_REGION( 0x100000, "sprites", 0 )   // Sprites, 16x16x4
-	ROM_LOAD16_BYTE( "br1.uc3",  0x000000, 0x080000, CRC(6fc18de4) SHA1(57b4823fc41637780f64eadd1ddf61db531a2599) )
-	ROM_LOAD16_BYTE( "br3.uc10", 0x000001, 0x080000, CRC(bb677240) SHA1(d7a26bcd33d491cee441edda6d092a1d08308b0e) )
+	ROM_REGION( 0x80000, "sprites", 0 )   // Sprites, 16x16x4
+	ROM_LOAD16_BYTE( "afega10.br1.uc3",  0x000000, 0x040000, CRC(7e132eff) SHA1(f3ec5750c73017f0a2eb87f6f39ab49e59d39711) )
+	ROM_LOAD16_BYTE( "afega8.br3.uc10",  0x000001, 0x040000, CRC(22707728) SHA1(8a27aa2d1b6f902276c02bd7098526243661cff8) )
 
 	ROM_REGION( 0x300000, "bgtile", 0 )   // Layer 0, 16x16x8
-	ROM_LOAD( "cr6.uc16",  0x100000, 0x080000, CRC(99d6523c) SHA1(0b628585d749e175d5a4dc600af1ba9cb936bfeb) )
-	ROM_LOAD( "cr7.uc19",  0x080000, 0x080000, CRC(a89d9ce4) SHA1(5965b2b4b67bc91bc0e7474e593c7e1953b75adc) )
-	ROM_LOAD( "cr5.uc15",  0x000000, 0x080000, CRC(65bd5159) SHA1(627ccc0ab131e643c3c52ee9bb41c7a85153c35e) )
+	ROM_LOAD( "afega9.cr6.uc16",   0x100000, 0x080000, CRC(99d6523c) SHA1(0b628585d749e175d5a4dc600af1ba9cb936bfeb) )
+	ROM_LOAD( "afega10.cr7.uc19",  0x080000, 0x080000, CRC(a89d9ce4) SHA1(5965b2b4b67bc91bc0e7474e593c7e1953b75adc) )
+	ROM_LOAD( "afega10.cr5.uc15",  0x000000, 0x080000, CRC(65bd5159) SHA1(627ccc0ab131e643c3c52ee9bb41c7a85153c35e) )
 
-	ROM_LOAD( "cr2.uc7",  0x280000, 0x080000, CRC(27ad6fc8) SHA1(00b1a5c5e1a245590b300b9baf71585d41813e3e) )
-	ROM_LOAD( "cr3.uc12", 0x200000, 0x080000, CRC(c841a4f6) SHA1(9b0ee5623c87a0cfc63d3741a65d399bd6593f18) )
-	ROM_LOAD( "cr1.uc6",  0x180000, 0x080000, CRC(fc9101d2) SHA1(1d5b8484264b6d73fe032946096a469226cce901) )
+	ROM_LOAD( "afega9.cr2.uc7",  0x280000, 0x080000, CRC(27ad6fc8) SHA1(00b1a5c5e1a245590b300b9baf71585d41813e3e) )
+	ROM_LOAD( "afega9.cr3.uc12", 0x200000, 0x080000, CRC(c841a4f6) SHA1(9b0ee5623c87a0cfc63d3741a65d399bd6593f18) )
+	ROM_LOAD( "afega8.cr1.uc6",  0x180000, 0x080000, CRC(fc9101d2) SHA1(1d5b8484264b6d73fe032946096a469226cce901) )
 
 	ROM_REGION( 0x10000, "fgtile", 0 )    // Layer 1, 8x8x4
-	ROM_LOAD( "t1.uc2",  0x00000, 0x10000, CRC(ce683a93) SHA1(aeee2671051f1badf2255375cd7c5fa847d1746c) )
+	ROM_LOAD( "afega9.t1.uc2",  0x00000, 0x10000, CRC(ce683a93) SHA1(aeee2671051f1badf2255375cd7c5fa847d1746c) )
 
 	ROM_REGION( 0x40000, "oki1", 0 )    // Samples
-	ROM_LOAD( "s2.uc18", 0x00000, 0x40000, CRC(401c980f) SHA1(e47710c47cfeecce3ccf87f845b219a9c9f21ee3) )
+	ROM_LOAD( "afega8.s2.uc18", 0x00000, 0x40000, CRC(401c980f) SHA1(e47710c47cfeecce3ccf87f845b219a9c9f21ee3) )
 ROM_END
 
 ROM_START( hotbubla ) // Korean release - Nude images replaced with pictures of satellite dishes
 	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
-	ROM_LOAD16_BYTE( "6_c1.uc1",  0x00001, 0x40000, CRC(7c65bf47) SHA1(fe578d3336c5f437bfd1bc81bfe3763b12f3e63f) )
-	ROM_LOAD16_BYTE( "7_c2.uc9",  0x00000, 0x40000, CRC(74eb11c3) SHA1(88aeb02c4088706a56b4c930ffe6fdfbc99031c6) )
+	ROM_LOAD16_BYTE( "6_c1.uc1",  0x00001, 0x40000, CRC(7c65bf47) SHA1(fe578d3336c5f437bfd1bc81bfe3763b12f3e63f) ) // 1st and 2nd half identical
+	ROM_LOAD16_BYTE( "7_c2.uc9",  0x00000, 0x40000, CRC(74eb11c3) SHA1(88aeb02c4088706a56b4c930ffe6fdfbc99031c6) ) // 1st and 2nd half identical
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "1_s1.uc14", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) ) // same as the other games on this driver

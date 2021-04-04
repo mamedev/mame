@@ -6,15 +6,15 @@
       based on ST-0016 emulation
 
       used by
-	  - ST-0026 NiLe (srmp6, 8 voices)
-	  - ST-0032 (jclub2, 16 voices)
-	  - Capcom CPS3 sound hardware has similarity?
+      - ST-0026 NiLe (srmp6, 8 voices)
+      - ST-0032 (jclub2, 16 voices)
+      - Capcom CPS3 sound hardware has similarity?
 
       Register Format (32 byte per voices)
 
       00-1f: Voice 0
       Offset Bit               Description
-             fedcba98 76543210 
+             fedcba98 76543210
       04     xxxxxxxx xxxxxxxx Start position LSB
       06     xxxxxxxx xxxxxxxx Start position MSB
       0a     -------- ----xxx- Used but unknown
@@ -32,7 +32,7 @@
 
       20-3f: Voice 1
       ...
-	  e0-ff: Voice 7
+      e0-ff: Voice 7
 
       100: Keyon/off, Bit 0-7 means Voice 0-7
       110: Used but unknown
@@ -416,7 +416,7 @@ void setapcm_device<MaxVoices, Divider>::key_w(offs_t offset, u16 data, u16 mem_
 //-------------------------------------------------
 //  key_r - get keyon/off status from each voices
 //-------------------------------------------------
-	 
+
 template<unsigned MaxVoices, unsigned Divider>
 u16 setapcm_device<MaxVoices, Divider>::key_r()
 {

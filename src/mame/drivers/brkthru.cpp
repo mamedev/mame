@@ -145,8 +145,8 @@ buttons down after the game has started then pressing F3 to reset the game.
 #include "includes/brkthru.h"
 
 #include "cpu/m6809/m6809.h"
-#include "sound/3526intf.h"
 #include "sound/ym2203.h"
+#include "sound/ym3526.h"
 #include "screen.h"
 #include "speaker.h"
 

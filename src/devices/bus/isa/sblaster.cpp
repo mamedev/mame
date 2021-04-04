@@ -14,8 +14,8 @@
 #include "sblaster.h"
 
 #include "machine/pic8259.h"
-#include "sound/262intf.h"
 #include "sound/spkrdev.h"
+#include "sound/ymf262.h"
 
 #include "speaker.h"
 
@@ -81,7 +81,7 @@ uint8_t sb8_device::ym3812_16_r(offs_t offset)
 	uint8_t retVal = 0xff;
 	switch(offset)
 	{
-		case 0 : retVal = m_ym3812->status_port_r(); break;
+		case 0 : retVal = m_ym3812->status_r(); break;
 	}
 	return retVal;
 }
@@ -90,8 +90,8 @@ void sb8_device::ym3812_16_w(offs_t offset, uint8_t data)
 {
 	switch(offset)
 	{
-		case 0 : m_ym3812->control_port_w(data); break;
-		case 1 : m_ym3812->write_port_w(data); break;
+		case 0 : m_ym3812->address_w(data); break;
+		case 1 : m_ym3812->data_w(data); break;
 	}
 }
 

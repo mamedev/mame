@@ -348,7 +348,7 @@ void macpdm_state::irq_control_w(uint8_t data)
 	if((data & 0xc0) == 0xc0 && (m_irq_control & 0x80)) {
 		m_irq_control &= 0x7f;
 		m_maincpu->set_input_line(PPC_IRQ, CLEAR_LINE);
-	}	
+	}
 }
 
 void macpdm_state::irq_main_set(uint8_t mask, int state)
@@ -371,7 +371,7 @@ void macpdm_state::irq_main_set(uint8_t mask, int state)
 		}
 	}
 
-	//	logerror("irq control %02x\n", m_irq_control);
+	//  logerror("irq control %02x\n", m_irq_control);
 }
 
 void macpdm_state::via2_irq_main_set(uint8_t mask, int state)
@@ -380,7 +380,7 @@ void macpdm_state::via2_irq_main_set(uint8_t mask, int state)
 		return;
 
 	m_via2_ifr ^= mask;
-	//	logerror("via2 main %02x / %02x -> %02x\n", m_via2_ifr, m_via2_ier, m_via2_ifr & m_via2_ier);
+	//  logerror("via2 main %02x / %02x -> %02x\n", m_via2_ifr, m_via2_ier, m_via2_ifr & m_via2_ier);
 
 	irq_main_set(0x02, (m_via2_ifr & m_via2_ier) != 0);
 }
@@ -910,7 +910,7 @@ void macpdm_state::dma_floppy_step()
 			m_maincpu->space().write_byte(m_dma_floppy_adr + m_dma_floppy_offset, r);
 			m_dma_floppy_offset ++;
 			m_dma_floppy_byte_count --;
-			//			logerror("dma_w %03x, %02x\n", m_dma_floppy_offset, r);
+			//          logerror("dma_w %03x, %02x\n", m_dma_floppy_offset, r);
 			if(m_dma_floppy_byte_count == 0) {
 				m_dma_floppy_ctrl &= ~0x02;
 				m_dma_floppy_ctrl |= 0x80;

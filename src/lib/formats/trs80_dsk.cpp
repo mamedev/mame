@@ -50,7 +50,7 @@ const trs80_format::format trs80_format::formats[] =
 		4000, 10, 40, 1, 256, {}, 0, {}, 14, 11, 12
 	},
 	{
-		floppy_image::FF_525, floppy_image::SSDD, floppy_image::FM,
+		floppy_image::FF_525, floppy_image::SSQD, floppy_image::FM,
 		4000, 10, 80, 1, 256, {}, 0, {}, 14, 11, 12
 	},
 	{}

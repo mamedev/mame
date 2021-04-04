@@ -420,6 +420,7 @@ void sdl_osd_interface::init(running_machine &machine)
 	int bench = options().bench();
 	if (bench > 0)
 	{
+		options().set_value(OPTION_SLEEP, false, OPTION_PRIORITY_MAXIMUM);
 		options().set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
 		options().set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM);
 		options().set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM);

@@ -488,6 +488,9 @@ function toolchain(_buildDir, _subDir)
 	if (_OPTIONS["LD"] ~= nil) then
 		premake.gcc.ld  = _OPTIONS["LD"]
 	end
+	if (_OPTIONS["AR"] ~= nil) then
+		premake.gcc.ar  = _OPTIONS["AR"]
+	end
 
 	configuration {} -- reset configuration
 

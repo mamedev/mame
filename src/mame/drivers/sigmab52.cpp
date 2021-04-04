@@ -111,7 +111,7 @@
 #include "machine/6850acia.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
-#include "sound/3812intf.h"
+#include "sound/ym3812.h"
 #include "video/hd63484.h"
 #include "emupal.h"
 #include "screen.h"

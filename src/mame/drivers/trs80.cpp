@@ -5,31 +5,31 @@
 /***************************************************************************
 TRS80 memory map
 
-0000-2fff ROM                 R   D0-D7
-3000-37ff ROM on Model III        R   D0-D7
-      unused on Model I
-37de      UART status             R/W D0-D7
-37df      UART data           R/W D0-D7
-37e0      interrupt latch address (lnw80 = for the realtime clock)
-37e1      select disk drive 0         W
-37e2      cassette drive latch address    W
-37e3      select disk drive 1         W
-37e4      select which cassette unit      W   D0-D1 (D0 selects unit 1, D1 selects unit 2)
-37e5      select disk drive 2         W
-37e7      select disk drive 3         W
-37e0-37e3 floppy motor            W   D0-D3
-      or floppy head select   W   D3
-37e8      send a byte to printer          W   D0-D7
-37e8      read printer status             R   D7
-37ec-37ef FDC WD179x              R/W D0-D7
-37ec      command             W   D0-D7
-37ec      status              R   D0-D7
-37ed      track               R/W D0-D7
-37ee      sector              R/W D0-D7
-37ef      data                R/W D0-D7
-3800-38ff keyboard matrix         R   D0-D7
+0000-2fff ROM                            R   D0-D7
+3000-37ff ROM on Model III               R   D0-D7
+          unused on Model I
+37de      UART status                    R/W D0-D7
+37df      UART data                      R/W D0-D7
+37e0      interrupt latch address
+37e1      select disk drive 0            W
+37e2      cassette drive latch address   W
+37e3      select disk drive 1            W
+37e4      select which cassette unit     W   D0-D1 (D0 selects unit 1, D1 selects unit 2)
+37e5      select disk drive 2            W
+37e7      select disk drive 3            W
+37e0-37e3 floppy motor                   W   D0-D3
+          or floppy head select          W   D3
+37e8      send a byte to printer         W   D0-D7
+37e8      read printer status            R   D7
+37ec-37ef FDC FD1771                     R/W D0-D7
+37ec      command                        W   D0-D7
+37ec      status                         R   D0-D7
+37ed      track                          R/W D0-D7
+37ee      sector                         R/W D0-D7
+37ef      data                           R/W D0-D7
+3800-38ff keyboard matrix                R   D0-D7
 3900-3bff unused - kbd mirrored
-3c00-3fff video RAM               R/W D0-D5,D7 (or D0-D7)
+3c00-3fff video RAM                      R/W D0-D5,D7 (or D0-D7)
 4000-ffff RAM
 
 Interrupts:
@@ -39,11 +39,10 @@ NMI
 Printer: Level II usually 37e8; System80 uses port FD.
 
 System80 has non-addressable dip switches to set the UART control register.
-System80 and LNW80 have non-addressable links to set the baud rate. Receive and Transmit clocks are tied together.
+System80 has non-addressable links to set the baud rate. Receive and Transmit clocks are tied together.
 
 Cassette baud rates:    Model I level I - 250 baud
         Model I level II and all clones - 500 baud
-        LNW-80 - 500 baud @1.77MHz and 1000 baud @4MHz.
 
 I/O ports
 FF:
@@ -54,9 +53,6 @@ FF:
 - bit 7 is for reading from a cassette
 
 FE:
-- bit 0 is for selecting inverse video of the whole screen on a lnw80
-- bit 2 enables colour on a lnw80
-- bit 3 is for selecting roms (low) or 16k hires area (high) on a lnw80
 - bit 4 selects internal cassette player (low) or external unit (high) on a system-80
 
 FD:
@@ -116,10 +112,9 @@ Not dumped (to our knowledge):
 Not emulated:
  TRS80 Japanese kana/ascii switch and alternate keyboard
  TRS80 Model III/4 Hard drive, Graphics board, Alternate Character set
- LNW80 1.77 / 4.0 MHz switch (this is a physical switch)
  Radionic has 16 colours with a byte at 350B controlling the operation. See manual.
 
-Virtual floppy disk formats are JV1, JV3, and DMK. Only the JV1 is emulated.
+Virtual floppy disk formats are JV1, JV3, and DMK. JV3 is not emulated.
 
 ********************************************************************************************************
 
@@ -147,15 +142,8 @@ radionic:  works
            expansion-box?
            uart
 
-lnw80:     works
-           add 1.77 / 4 MHz switch
-           find out if it really did support 32-cpl mode or not
-           hi-res and colour are coded but do not work
-           investigate expansion-box
-
 2021-03-26 MT 07903 - most floppies no longer boot.
            Most machines have problems loading real tapes.
-           Cannot load CAS tapes, but they can be loaded with trs80m3.
 
 *******************************************************************************************************/
 
@@ -168,6 +156,7 @@ lnw80:     works
 #include "speaker.h"
 
 #include "formats/trs80_dsk.h"
+#include "formats/trs_cas.h"
 #include "formats/dmk_dsk.h"
 
 
@@ -194,11 +183,7 @@ void trs80_state::m1_mem(address_map &map)
 	map(0x37e0, 0x37e3).rw(FUNC(trs80_state::irq_status_r), FUNC(trs80_state::motor_w));
 	map(0x37e4, 0x37e7).w(FUNC(trs80_state::cassunit_w));
 	map(0x37e8, 0x37eb).rw(FUNC(trs80_state::printer_r), FUNC(trs80_state::printer_w));
-	map(0x37ec, 0x37ec).r(FUNC(trs80_state::wd179x_r));
-	map(0x37ec, 0x37ec).w(m_fdc, FUNC(fd1793_device::cmd_w));
-	map(0x37ed, 0x37ed).rw(m_fdc, FUNC(fd1793_device::track_r), FUNC(fd1793_device::track_w));
-	map(0x37ee, 0x37ee).rw(m_fdc, FUNC(fd1793_device::sector_r), FUNC(fd1793_device::sector_w));
-	map(0x37ef, 0x37ef).rw(m_fdc, FUNC(fd1793_device::data_r), FUNC(fd1793_device::data_w));
+	map(0x37ec, 0x37ef).rw(FUNC(trs80_state::fdc_r), FUNC(trs80_state::fdc_w));
 	map(0x3800, 0x3bff).r(FUNC(trs80_state::keyboard_r));
 	map(0x3c00, 0x3fff).ram().share(m_p_videoram);
 	map(0x4000, 0xffff).ram();
@@ -233,39 +218,6 @@ void trs80_state::ht1080z_io(address_map &map)
 	sys80_io(map);
 	map(0x1e, 0x1e).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0x1f, 0x1f).w("ay1", FUNC(ay8910_device::address_w));
-}
-
-void trs80_state::lnw80_mem(address_map &map)
-{
-	map(0x0000, 0x3fff).m(m_lnw_bank, FUNC(address_map_bank_device::amap8));
-	map(0x4000, 0xffff).ram();
-}
-
-void trs80_state::lnw_banked_mem(address_map &map)
-{
-	map(0x0000, 0x2fff).rom().region("maincpu", 0);
-	map(0x37e0, 0x37e3).rw(FUNC(trs80_state::irq_status_r), FUNC(trs80_state::motor_w));
-	map(0x37e8, 0x37eb).rw(FUNC(trs80_state::printer_r), FUNC(trs80_state::printer_w));
-	map(0x37ec, 0x37ec).r(FUNC(trs80_state::wd179x_r));
-	map(0x37ec, 0x37ec).w(m_fdc, FUNC(fd1793_device::cmd_w));
-	map(0x37ed, 0x37ed).rw(m_fdc, FUNC(fd1793_device::track_r), FUNC(fd1793_device::track_w));
-	map(0x37ee, 0x37ee).rw(m_fdc, FUNC(fd1793_device::sector_r), FUNC(fd1793_device::sector_w));
-	map(0x37ef, 0x37ef).rw(m_fdc, FUNC(fd1793_device::data_r), FUNC(fd1793_device::data_w));
-	map(0x3800, 0x3bff).r(FUNC(trs80_state::keyboard_r));
-	map(0x3c00, 0x3fff).ram().share(m_p_videoram);
-	map(0x4000, 0x7fff).ram().share(m_p_gfxram);
-}
-
-void trs80_state::lnw80_io(address_map &map)
-{
-	map.global_mask(0xff);
-	map.unmap_value_high();
-	map(0xe8, 0xe8).rw(FUNC(trs80_state::port_e8_r), FUNC(trs80_state::port_e8_w));
-	map(0xe9, 0xe9).portr("E9");
-	map(0xea, 0xea).rw(FUNC(trs80_state::port_ea_r), FUNC(trs80_state::port_ea_w));
-	map(0xeb, 0xeb).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
-	map(0xfe, 0xfe).rw(FUNC(trs80_state::lnw80_fe_r), FUNC(trs80_state::lnw80_fe_w));
-	map(0xff, 0xff).rw(FUNC(trs80_state::port_ff_r), FUNC(trs80_state::port_ff_w));
 }
 
 void trs80_state::radionic_mem(address_map &map)
@@ -381,8 +333,7 @@ static INPUT_PORTS_START( trs80 )
 
 	PORT_START("LINE7")
 	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("Left Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("Control") PORT_CODE(KEYCODE_LCONTROL) // LNW80 only
-	PORT_BIT(0xee, 0x00, IPT_UNUSED)
+	PORT_BIT(0xfe, 0x00, IPT_UNUSED)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(trs80l2)
@@ -452,19 +403,6 @@ static const gfx_layout ht1080z_charlayout =
 	8*16           /* every char takes 16 bytes */
 };
 
-static const gfx_layout lnw80_charlayout =
-{
-	8, 8,           /* 8 x 8 characters */
-	128,            /* 128 characters */
-	1,          /* 1 bits per pixel */
-	{ 0 },          /* no bitplanes */
-	/* x offsets */
-	{ 7, 5, 6, 1, 0, 2, 4, 3 },
-	/* y offsets */
-	{  0*8, 512*8, 256*8, 768*8, 1*8, 513*8, 257*8, 769*8 },
-	8*2        /* every char takes 8 bytes */
-};
-
 static const gfx_layout radionic_charlayout =
 {
 	8, 16,          /* 8 x 16 characters */
@@ -486,10 +424,6 @@ static GFXDECODE_START(gfx_ht1080z)
 	GFXDECODE_ENTRY( "chargen", 0, ht1080z_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START(gfx_lnw80)
-	GFXDECODE_ENTRY( "chargen", 0, lnw80_charlayout, 0, 4 )
-GFXDECODE_END
-
 static GFXDECODE_START(gfx_radionic)
 	GFXDECODE_ENTRY( "chargen", 0, radionic_charlayout, 0, 1 )
 GFXDECODE_END
@@ -497,14 +431,13 @@ GFXDECODE_END
 
 void trs80_state::floppy_formats(format_registration &fr)
 {
-	fr.add_mfm_containers();
 	fr.add(FLOPPY_TRS80_FORMAT);
 	fr.add(FLOPPY_DMK_FORMAT);
 }
 
 static void trs80_floppies(device_slot_interface &device)
 {
-	device.option_add("sssd", FLOPPY_525_QD);
+	device.option_add("sssd", FLOPPY_525_QD); // QD allows the 80-track boot disks to work.
 }
 
 
@@ -547,7 +480,7 @@ void trs80_state::model1(machine_config &config)      // model I, level II
 
 	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(trs80_state::quickload_cb));
 
-	FD1793(config, m_fdc, 4_MHz_XTAL / 4); // todo: should be fd1771
+	FD1771(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(FUNC(trs80_state::intrq_w));
 
 	FLOPPY_CONNECTOR(config, "fdc:0", trs80_floppies, "sssd", trs80_state::floppy_formats).enable_sound(true);
@@ -607,35 +540,6 @@ void trs80_state::ht1080z(machine_config &config)
 	AY8910(config, "ay1", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.25); // guess of clock
 	//ay1.port_a_read_callback(FUNC(trs80_state::...);  // ports are some kind of expansion slot
 	//ay1.port_b_read_callback(FUNC(trs80_state::...);
-}
-
-void trs80_state::lnw80(machine_config &config)
-{
-	model1(config);
-	//m_maincpu->set_clock(16_MHz_XTAL / 4); // or 16MHz / 9; 4MHz or 1.77MHz operation selected by HI/LO switch
-	m_maincpu->set_clock(16_MHz_XTAL / 9); // need this so cassette can work
-	m_maincpu->set_addrmap(AS_PROGRAM, &trs80_state::lnw80_mem);
-	m_maincpu->set_addrmap(AS_IO, &trs80_state::lnw80_io);
-
-	ADDRESS_MAP_BANK(config, m_lnw_bank, 0);
-	m_lnw_bank->set_addrmap(0, &trs80_state::lnw_banked_mem);
-	m_lnw_bank->set_data_width(8);
-	m_lnw_bank->set_addr_width(16);
-	m_lnw_bank->set_stride(0x4000);
-
-	MCFG_MACHINE_RESET_OVERRIDE(trs80_state, lnw80)
-
-	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_lnw80);
-
-	subdevice<palette_device>("palette")->set_entries(8).set_init(FUNC(trs80_state::lnw80_palette));
-	subdevice<screen_device>("screen")->set_raw(3.579545_MHz_XTAL * 3, 682, 0, 480, 264, 0, 192); // 10.738MHz generated by tank circuit (top left of page 2 of schematics)
-	// LNW80 Theory of Operations gives H and V periods as 15.750kHz and 59.66Hz, probably due to rounding the calculated ~15.7468kHz to 4 figures
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(trs80_state::screen_update_lnw80));
-
-	config.device_remove("brg");
-	CLOCK(config, m_uart_clock, 19200 * 16);
-	m_uart_clock->signal_handler().set(m_uart, FUNC(ay31015_device::write_rcp));
-	m_uart_clock->signal_handler().append(m_uart, FUNC(ay31015_device::write_tcp));
 }
 
 void trs80_state::radionic(machine_config &config)
@@ -720,20 +624,6 @@ ROM_END
 #define rom_sys80p rom_sys80
 
 
-ROM_START(lnw80)
-	ROM_REGION(0x3800, "maincpu",0)
-	ROM_LOAD("lnw_a.bin",    0x0000, 0x0800, CRC(e09f7e91) SHA1(cd28e72efcfebde6cf1c7dbec4a4880a69e683da))
-	ROM_LOAD("lnw_a1.bin",   0x0800, 0x0800, CRC(ac297d99) SHA1(ccf31d3f9d02c3b68a0ee3be4984424df0e83ab0))
-	ROM_LOAD("lnw_b.bin",    0x1000, 0x0800, CRC(c4303568) SHA1(13e3d81c6f0de0e93956fa58c465b5368ea51682))
-	ROM_LOAD("lnw_b1.bin",   0x1800, 0x0800, CRC(3a5ea239) SHA1(8c489670977892d7f2bfb098f5df0b4dfa8fbba6))
-	ROM_LOAD("lnw_c.bin",    0x2000, 0x0800, CRC(2ba025d7) SHA1(232efbe23c3f5c2c6655466ebc0a51cf3697be9b))
-	ROM_LOAD("lnw_c1.bin",   0x2800, 0x0800, CRC(ed547445) SHA1(20102de89a3ee4a65366bc2d62be94da984a156b))
-
-	ROM_REGION(0x0800, "chargen",0)
-	ROM_LOAD("lnw_chr.bin",  0x0000, 0x0800, CRC(c89b27df) SHA1(be2a009a07e4378d070002a558705e9a0de59389))
-ROM_END
-
-
 ROM_START(ht1080z)
 	ROM_REGION(0x3800, "maincpu",0)
 	ROM_LOAD("ht1080z.rom",  0x0000, 0x3000, CRC(2bfef8f7) SHA1(7a350925fd05c20a3c95118c1ae56040c621be8f))
@@ -781,7 +671,6 @@ COMP( 1978, trs80l2,     0,        0,      model1,   trs80l2, trs80_state, init_
 COMP( 1983, radionic,    trs80l2,  0,      radionic, trs80l2, trs80_state, init_trs80,    "Komtek",                      "Radionic",                        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, sys80,       trs80l2,  0,      sys80,    sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (60 Hz)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, sys80p,      trs80l2,  0,      sys80p,   sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (50 Hz)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, lnw80,       trs80l2,  0,      lnw80,    sys80,   trs80_state, init_trs80,    "LNW Research",                "LNW-80",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1983, ht1080z,     trs80l2,  0,      ht1080z,  sys80,   trs80_state, init_trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series I",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1984, ht1080z2,    trs80l2,  0,      ht1080z,  sys80,   trs80_state, init_trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series II",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1985, ht108064,    trs80l2,  0,      ht1080z,  sys80,   trs80_state, init_trs80,    "Hiradastechnika Szovetkezet", "HT-1080Z/64",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

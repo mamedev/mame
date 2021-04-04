@@ -1157,14 +1157,16 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 		buf.push_back(floppy_image::MG_N);
 	}
 
+	uint32_t cur_mg;
 	if((buf[index] & floppy_image::TIME_MASK) == start_pos) {
 		if(index)
-			index--;
+			cur_mg = buf[index-1];
 		else
-			index = buf.size() - 1;
-	}
+			cur_mg = buf[buf.size() - 1];
+	} else
+			cur_mg = buf[index];
 
-	uint32_t cur_mg = buf[index] & floppy_image::MG_MASK;
+	cur_mg &= floppy_image::MG_MASK;
 	if(cur_mg == floppy_image::MG_N || cur_mg == floppy_image::MG_D)
 		cur_mg = floppy_image::MG_A;
 
@@ -1293,7 +1295,6 @@ void floppy_image_device::write_zone(uint32_t *buf, int &cells, int &index, uint
 				spos = epos;
 			}
 		}
-
 	}
 }
 

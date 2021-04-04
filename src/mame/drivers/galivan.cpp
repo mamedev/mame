@@ -30,8 +30,8 @@ TODO
 #include "includes/galivan.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/3526intf.h"
 #include "sound/dac.h"
+#include "sound/ym3526.h"
 #include "speaker.h"
 
 
