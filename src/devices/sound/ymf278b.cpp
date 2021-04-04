@@ -664,23 +664,26 @@ u8 ymf278b_device::read(offs_t offset)
 	{
 		// status register
 		case 0:
-			ret = m_fm.status();
 
-			// if new2 flag is not set, we're in OPL2 or OPL3 mode
-			if (!m_fm.regs().new2flag())
+			// first status read after initialization returns a chip ID, which
+			// varies based on the "new" flags, indicating the mode
+			if (m_next_status_id)
 			{
-				// these bits are not reported in OPL2/3 mode
-				ret &= ~(STATUS_BUSY | STATUS_LD);
-
-				// if in OPL2 mode, bits 1 and 2 are returned on
-				if (!m_fm.regs().newflag())
-					ret |= 0x06;
-			}
-			else if (m_next_status_id)
-			{
-				// if new2 flag was just changed to on, then the next read will be 0x02
-				ret |= 0x02;
+				if (m_fm.regs().new2flag())
+					ret = 0x02;
+				else if (m_fm.regs().newflag())
+					ret = 0x00;
+				else
+					ret = 0x06;
 				m_next_status_id = false;
+			}
+			else
+			{
+				ret = m_fm.status();
+
+				// if new2 flag is not set, we're in OPL2 or OPL3 mode
+				if (!m_fm.regs().new2flag())
+					ret &= ~(STATUS_BUSY | STATUS_LD);
 			}
 			break;
 
@@ -743,7 +746,7 @@ void ymf278b_device::device_reset()
 
 	m_port_AB = m_port_C = 0;
 	m_lastport = 0;
-	m_next_status_id = false;
+	m_next_status_id = true;
 	m_memadr = 0;
 
 	// init/silence channels
