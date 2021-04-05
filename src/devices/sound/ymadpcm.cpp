@@ -41,6 +41,11 @@ void ymadpcm_a_registers::save(device_t &device)
 void ymadpcm_a_registers::reset()
 {
 	std::fill_n(&m_regdata[0], REGISTERS, 0);
+
+	// initialize the pans to on by default, and max instrument volume;
+	// some neogeo homebrews (for example ffeast) rely on this
+	m_regdata[0x08] = m_regdata[0x09] = m_regdata[0x0a] =
+	m_regdata[0x0b] = m_regdata[0x0c] = m_regdata[0x0d] = 0xdf;
 }
 
 
