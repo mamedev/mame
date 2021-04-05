@@ -577,7 +577,7 @@ public:
 	u32 lfo_rate() const                   { return IsOpnA ? byte(0x22, 0, 3) : 0; }
 	u32 timer_a_value() const              { return word(0x24, 0, 8, 0x25, 0, 2); }
 	u32 timer_b_value() const              { return byte(0x26, 0, 8); }
-	u32 csm() const                        { return (byte(0x27, 6, 2) == 2); }
+	u32 csm() const                        { return byte(0x27, 7, 1); }
 	u32 multi_freq() const                 { return (byte(0x27, 6, 2) != 0); }
 	u32 reset_timer_b() const              { return byte(0x27, 5, 1); }
 	u32 reset_timer_a() const              { return byte(0x27, 4, 1); }
@@ -629,6 +629,7 @@ protected:
 	// internal state
 	u32 m_lfo_counter;               // LFO counter
 	u8 m_lfo_am;                     // current LFO AM value
+	u8 m_multi_freq;                 // channel 2 is currently multi-frequency
 	u8 m_regdata[REGISTERS];         // register data
 	u16 m_waveform[WAVEFORMS][WAVEFORM_LENGTH]; // waveforms
 };
