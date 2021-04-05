@@ -3232,6 +3232,9 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::check_interrupts)
 template<class RegisterType>
 TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::synced_mode_w)
 {
+	// mark all channels as modified
+	m_modified_channels = ALL_CHANNELS;
+
 	// actually write the mode register now
 	u32 dummy1, dummy2;
 	m_regs.write(RegisterType::REG_MODE, param, dummy1, dummy2);
