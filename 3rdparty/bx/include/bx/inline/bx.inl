@@ -33,6 +33,16 @@ namespace bx
 		return __is_trivially_copyable(Ty);
 	}
 
+	template<class Ty>
+	inline Ty* addressOf(Ty& _a)
+	{
+		return reinterpret_cast<Ty*>(
+				&const_cast<char&>(
+					reinterpret_cast<const volatile char&>(_a)
+				)
+			);
+	}
+
 	template<typename Ty>
 	inline void swap(Ty& _a, Ty& _b)
 	{
