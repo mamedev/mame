@@ -38,6 +38,10 @@ namespace bx
 	template<class Ty>
 	constexpr bool isTriviallyCopyable();
 
+	/// Find the address of an object of a class that has an overloaded unary ampersand (&) operator.
+	template <class Ty>
+	Ty* addressOf(Ty& _a);
+
 	/// Swap two values.
 	template<typename Ty>
 	void swap(Ty& _a, Ty& _b);
