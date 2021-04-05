@@ -5076,6 +5076,31 @@ ROM_END
 
 ROM_START( hndlchmp )
 	SYS573_BIOS_A
+	ROM_DEFAULT_BIOS("gchgchmp")
+
+	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
+	ROM_LOAD( "710saa.31m",   0x000000, 0x200000, CRC(0eec3edf) SHA1(9624bbf207e81cdbc2754cce81aeb57d4042ddce) )
+	ROM_REGION( 0x200000, "29f016a.27m", 0 ) /* onboard flash */
+	ROM_LOAD( "710saa.27m",   0x000000, 0x200000, CRC(7571daa8) SHA1(5f07b894a954d1eb13c4da1533a634d8185f4e54) )
+	ROM_REGION( 0x200000, "29f016a.31l", 0 ) /* onboard flash */
+	ROM_LOAD( "710saa.31l",   0x000000, 0x200000, CRC(1dc20303) SHA1(46cc531977865e718ed2049651baef2eccbc233e) )
+	ROM_REGION( 0x200000, "29f016a.27l", 0 ) /* onboard flash */
+	ROM_LOAD( "710saa.27l",   0x000000, 0x200000, CRC(5109ca33) SHA1(11c0ec8773240a002083205dceff21dac2fb7a1a) )
+	ROM_REGION( 0x200000, "29f016a.31j", 0 ) /* onboard flash */
+	ROM_LOAD( "710saa.31j",   0x000000, 0x200000, CRC(bdc05d16) SHA1(ee397950f7e7e910fdc05737f99604e43d288719) )
+	ROM_REGION( 0x200000, "29f016a.27j", 0 ) /* onboard flash */
+	ROM_LOAD( "710saa.27j",   0x000000, 0x200000, CRC(ad925ed3) SHA1(e3222308961851cccee2de9da804f74854907451) )
+	ROM_REGION( 0x200000, "29f016a.31h", 0 ) /* onboard flash */
+	ROM_LOAD( "710saa.31h",   0x000000, 0x200000, CRC(dfcef2cd) SHA1(5b5025ae5d64767a17523d7e1559cf03c0609b85) )
+	ROM_REGION( 0x200000, "29f016a.27h", 0 ) /* onboard flash */
+	ROM_LOAD( "710saa.27h",   0x000000, 0x200000, CRC(eda05636) SHA1(d63ccb52946b1f70874d81ba53e09ca08b0d7f71) )
+
+	ROM_REGION( 0x002000, "m48t58", 0 )
+	ROM_LOAD( "710saa.22h",   0x000000, 0x002000, CRC(6a8b13b6) SHA1(10218242ea14cd355c139d47598a195d71db6352) )
+ROM_END
+
+ROM_START( hndlchmpj )
+	SYS573_BIOS_A
 
 	ROM_REGION( 0x200000, "29f016a.31m", 0 ) /* onboard flash */
 	ROM_LOAD( "710jab.31m",   0x000000, 0x200000, CRC(f5f71b1d) SHA1(7d518e5333f44e6ec921a1e882df970953814b6e) )
@@ -5505,8 +5530,9 @@ ROM_END
 
 GAME( 1997, sys573,    0,        konami573,  konami573, ksys573_state, empty_init,    ROT0,  "Konami", "System 573 BIOS", MACHINE_IS_BIOS_ROOT )
 
-GAME( 1997, strgchmp,  sys573,   konami573,  hndlchmp,  ksys573_state, empty_init,    ROT0,  "Konami", "Steering Champ (GQ710 VER. UAA)", MACHINE_IMPERFECT_SOUND )
-GAME( 1997, hndlchmp,  strgchmp, konami573,  hndlchmp,  ksys573_state, empty_init,    ROT0,  "Konami", "Handle Champ (GQ710 VER. JAB)", MACHINE_IMPERFECT_SOUND )
+GAME( 1997, strgchmp,  sys573,   konami573,  hndlchmp,  ksys573_state, empty_init,    ROT0,  "Konami", "Steering Champ (GQ710 97/12/18 VER. UAA)", MACHINE_IMPERFECT_SOUND )
+GAME( 1997, hndlchmp,  strgchmp, konami573,  hndlchmp,  ksys573_state, empty_init,    ROT0,  "Konami", "Handle Champ (GQ710 97/12/18 VER. SAA)", MACHINE_IMPERFECT_SOUND )
+GAME( 1997, hndlchmpj, strgchmp, konami573,  hndlchmp,  ksys573_state, empty_init,    ROT0,  "Konami", "Handle Champ (GQ710 1997/12/08 VER. JAB)", MACHINE_IMPERFECT_SOUND )
 GAME( 1998, darkhleg,  sys573,   konami573x, konami573, ksys573_state, empty_init,    ROT0,  "Konami", "Dark Horse Legend (GX706 VER. JAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1998, fbaitbc,   sys573,   fbaitbc,    fbaitbc,   ksys573_state, empty_init,    ROT0,  "Konami", "Fisherman's Bait - A Bass Challenge (GE765 VER. UAB)", MACHINE_IMPERFECT_SOUND )
 GAME( 1998, bassangl,  fbaitbc,  fbaitbc,    fbaitbc,   ksys573_state, empty_init,    ROT0,  "Konami", "Bass Angler (GE765 VER. JAA)", MACHINE_IMPERFECT_SOUND )
