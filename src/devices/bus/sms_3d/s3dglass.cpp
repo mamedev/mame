@@ -192,7 +192,7 @@ uint32_t sms_3d_glasses_device::screen_update_left(screen_device &screen, bitmap
 {
 	if (m_port->m_sscope_state)
 	{
-		// state 0 = left screen OFF, right screen ON
+		// state 1 = left screen ON, right screen OFF
 
 		blit_bitmap(bitmap, cliprect);
 
@@ -220,7 +220,7 @@ uint32_t sms_3d_glasses_device::screen_update_right(screen_device &screen, bitma
 {
 	if (!m_port->m_sscope_state)
 	{
-		// state 1 = left screen ON, right screen OFF
+		// state 0 = left screen OFF, right screen ON
 
 		blit_bitmap(bitmap, cliprect);
 
