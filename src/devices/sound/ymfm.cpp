@@ -1054,8 +1054,7 @@ void ymopm_registers::log_keyon(u32 choffs, u32 opoffs)
 template<bool IsOpnA>
 ymopn_registers_base<IsOpnA>::ymopn_registers_base() :
 	m_lfo_counter(0),
-	m_lfo_am(0),
-	m_multi_freq(0)
+	m_lfo_am(0)
 {
 	// create the waveforms
 	for (int index = 0; index < WAVEFORM_LENGTH; index++)
@@ -1074,7 +1073,6 @@ void ymopn_registers_base<IsOpnA>::save(device_t &device)
 	{
 		device.save_item(YMFM_NAME(m_lfo_counter));
 		device.save_item(YMFM_NAME(m_lfo_am));
-		device.save_item(YMFM_NAME(m_multi_freq));
 	}
 	device.save_item(YMFM_NAME(m_regdata));
 }
@@ -1179,22 +1177,11 @@ bool ymopn_registers_base<IsOpnA>::write(u16 index, u8 data, u32 &channel, u32 &
 	// handle writes to the key on index
 	if (index == 0x28)
 	{
-		// channel in low 2 bits; channel 3 is not valid
 		channel = BIT(data, 0, 2);
 		if (channel == 3)
 			return false;
-
-		// upper channels for OPNA
 		if (IsOpnA)
 			channel += BIT(data, 2, 1) * 3;
-
-		// when channel 2 key on hits, latch the multifrequency state
-		// megadriv sor2 flips the multi_freq bit on and off during playback
-		// of its sounds, specifically the punch sound
-		if (channel == 2)
-			m_multi_freq = multi_freq();
-
-		// operator mask is the top 4 bits
 		opmask = BIT(data, 4, 4);
 		return true;
 	}
@@ -1289,7 +1276,7 @@ void ymopn_registers_base<IsOpnA>::cache_operator_data(u32 choffs, u32 opoffs, y
 
 	// if multi-frequency mode is enabled and this is channel 2,
 	// fetch one of the special frequencies
-	if (m_multi_freq && choffs == 2)
+	if (multi_freq() && choffs == 2)
 	{
 		if (opoffs == 2)
 			block_freq = cache.block_freq = multi_block_freq(1);
@@ -1401,7 +1388,7 @@ void ymopn_registers_base<IsOpnA>::log_keyon(u32 choffs, u32 opoffs)
 	u32 opnum = (opoffs & 15) - ((opoffs & 15) / 4) + 12 * BIT(opoffs, 8);
 
 	u32 block_freq = ch_block_freq(choffs);
-	if (m_multi_freq && choffs == 2)
+	if (multi_freq() && choffs == 2)
 	{
 		if (opoffs == 2)
 			block_freq = multi_block_freq(1);
@@ -1440,7 +1427,7 @@ void ymopn_registers_base<IsOpnA>::log_keyon(u32 choffs, u32 opoffs)
 		LOG(" pm=%d", ch_lfo_pm_sens(choffs));
 	if (am || pm)
 		LOG(" lfo=%02X", lfo_rate());
-	if (m_multi_freq && choffs == 2)
+	if (multi_freq() && choffs == 2)
 		LOG(" multi=1");
 }
 
