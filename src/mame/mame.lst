@@ -14890,6 +14890,7 @@ mduckspa                        // Mega Duck / Super Quique (Spain)
 
 @source:gba.cpp
 gba                             // Nintendo Game Boy Advance Handheld
+robotech                        // Coleco
 
 @source:gberet.cpp
 gberet                          // GX577 (c) 1985
@@ -14984,6 +14985,7 @@ jak_gtg
 jak_sspop
 jak_hmhsm
 jak_hmg2
+jak_hmpt
 jak_hsmg2
 jak_umdf
 jak_duck
@@ -32594,6 +32596,7 @@ msimm2
 msinamco
 msisinv
 msifrog
+rbbrite
 rcapnp
 senario25
 ventur25
@@ -38562,7 +38565,7 @@ jak_spdmoa
 conyteni                        //
 conyping                        //
 conyfght
-karaokd2
+sstarkar
 
 @source:spg29x.cpp
 hyprscan                        //
