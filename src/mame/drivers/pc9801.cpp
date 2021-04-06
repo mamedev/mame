@@ -10,7 +10,7 @@
     - proper 8251 uart hook-up on keyboard
     - SASI/SCSI support;
     - Finish DIP-Switches support;
-    - text scrolling;
+    - text scrolling, upd52611 (cfr. clipping in edge & arcus2, madoum* too?);
     - upd7220: some later SWs throws "Invalid command byte 05" (Absolutely Mahjong on Epson logo),
 	  actual undocumented command for reset something?
     - GRCG+ (actual differences with GRCG?);
@@ -19,7 +19,9 @@
     - Write a PC80S31K device for 2d type floppies
 	  (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
     - 2dd floppy interface isn't greatly tested;
-    - clean-ups & split into devices and driver flavours;
+    - Anything post-PC9801E/F/M should overwrite "speaker_device" to actually use a 
+	  dac_bit_interface instead;
+	- clean-ups & split into devices and driver flavours;
 
     TODO (PC-9801RS):
     - several unemulated extra f/f features;
@@ -53,43 +55,15 @@
 	- "MICON ERROR" at POST (?);
 
     floppy issues TODO (* denotes actually fixed, to be moved into specific sheet)
-    - 46okunen (DOS not booting / disk swap);
-    * ckrynn
-    - aishogi: (asserts upon loading, 3'5 image?)
-    - akitsuka: (works in PC-9801RS only)
-    * alice
-    * genghis
-    * arcshu
-    * arcus2
-    * artjigs1 / artjigs2 / artjigs3
-    * Atlantia (disk swap?)
-    - azusa108 (disk i/o error)
-    * bacta2
-    - btech (disk swap?)
-    - baycity
-    - beast (keeps reading command sense)
-    * beast2
     * bellsave (disk swap? select B on config menu)
     * biblems2 (at new game loading)
     * birdywld
 
-    * Bokosuka Wars
-    * jangou2: floppy fails to load after the title screen;
-    - runners (size assert)
-    - Sorcerian (2dd image)
-    - Twilight Zone 3 (2dd image)
-
     List of per-game TODO:
-    - 4dboxing: inputs are unresponsive;
-    - 4dboxing: crashes after user disk creation (regression);
     - agumixsl: non-interlace mode doesn't resize graphics, has rectangle selection bugs (note: needs GDC = 5 MHz to boot);
-    - agenesis: fails loading, attempting to read IDE RAM switch port;
     - alice: doesn't set bitmap interlace properly, can't do disk swaps via the File Manager;
     - applecl1: can't pass hands apparently;
     - arctic, fsmoon: Doesn't detect sound board (tied to 0x00ec ports);
-    - arcus2: has intro glitches;
-    - artjigs*: some text doesn't appear? Namely under the puzzles and when you clear one;
-    - atragon: HDD install disk swap doesn't work?
     - asokokof: black screen with BGM, executes invalid opcode (previous note "waits at 0x225f6");
     - arquelph: beeps out at initial sound check,  no voice samples, extra sound board tested;
     - akitsuka: could not setup "initial data" (regression);
@@ -98,28 +72,16 @@
     - bishohzx: Soft House logo uses pseudo-ROZ effect (?), no title screen graphics?
     - bishotsu: beeps out before game (missing sound board?), doesn't draw some text?
 
-    - deflektr: no sound, moans about a DIP-SW setting during loading, has timing issues (keyboard being too fast on PC-9801RS);
     - edge: has gfx glitch when intro scrolls to top-left;
     - edge: user disk creation screen is offset?
-    - idolsaga: Moans with a "(program) ended. remove the floppy disk and turn off the power."
-    - karateka: no sound;
     - lovelyho: Doesn't show kanjis in PC-9801F version (tries to read them thru the 0xa9 port);
-    - madoum1, madoum2, madoum3: doesn't display bitmap gfxs during gameplay;
     - quarth: sound cuts off at title screen, doesn't work on 9801rs (bogus "corrupt .exe" detected);
-    - prinmak2, tim: cursor stays stuck when using mouse (works with keyboard);
     - puyopuyo: beeps out when it's supposed to play samples, Not supposed to use ADPCM, is it a PIT issue?
     - runners: wrong double height on the title screen;
     - rusty: black stripes when scrolling;
     - rusty: voice pitches are too slow (tested with -26 and -86);
     - win211: EGC drawing issue (byte wide writes?)
     - win31: doesn't boot at
-
-    per-game TODO (Dounjishi SW):
-    - Absolutely Mahjong: Transitions are too fast.
-
-    per-game TODO (PC-9821):
-    - Battle Skin Panic: gfx bugs at the Gainax logo, it crashes after it;
-    - Policenauts: CD-ROM drive not found;
 
     Notes:
     - annivers: GRPH (ALT) key cycles through different color schemes (normal, b&w, legacy);

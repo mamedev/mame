@@ -2255,7 +2255,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="46okunen">
+	<!-- boot OK with the given instructions -->
+	<software name="46okunen" supported="yes">
 		<description>46 Okunen Monogatari - The Shinkaron</description>
 		<year>1990</year>
 		<publisher>エニックス (Enix)</publisher>
@@ -2320,12 +2321,14 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="4dboxing">
-		<description>4D Boxing</description>
+	<!-- boot OK -->
+	<software name="4dboxing" supported="yes">
+		<description>4D Boxing (v1.1)</description>
 		<year>1993</year>
 		<publisher>エレクトロニック・アーツ・ビクター (Electronic Arts Victor)</publisher>
 		<info name="alt_title" value="４Ｄボクシング" />
 		<info name="release" value="19930114" />
+		<info name="usage" value="Create an user disk by booting with Disk A, once done reboot with Disk B in drive 0" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
@@ -3792,6 +3795,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<!-- Fails to boot with "初期データが設定できません" (cannot set initial data) error -->
+	<!-- (regressed, was working with 9801RS at some point) -->
 	<software name="akitsuka" supported="no">
 		<description>Aki to Tsukasa no Fushigi no Kabe</description>
 		<year>1988</year>
@@ -3992,6 +3996,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<year>1990</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="alt_title" value="アリスの館" />
+		<info name="usage" value="Boots on 286 or V30 class machines only" />
 		<info name="release" value="19900215" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
@@ -4798,12 +4803,14 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<!-- Seems to work only on 286-based machines (e.g. PC-9801UX). Seems to happen on real hardware too (PC-9821Nw150). -->
-	<software name="agenesis">
+	<!-- Reportedly don't recognize keyboard presses -->
+	<software name="agenesis" supported="partial">
 		<description>Another Genesis</description>
 		<year>1990</year>
 		<publisher>ソフトプラン (Soft Plan)</publisher>
 		<info name="alt_title" value="アナザージェネシス" />
 		<info name="release" value="19900621" />
+		<info name="usage" value="Boots on 286 or V30 class machines only (Uses N88-Basic v3.0)" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1086448">
@@ -4844,7 +4851,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="genghis">
+	<!-- boot OK -->
+	<software name="genghis" supported="yes">
 		<description>Aoki Ookami to Shiroki Mejika - Genghis Khan</description>
 		<year>1987</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -5144,7 +5152,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="arcshu">
+	<!-- boot OK -->
+	<software name="arcshu" supported="yes">
 		<description>Arcshu - Kagerou no Jidai o Koete</description>
 		<year>1990</year>
 		<publisher>ウルフチーム (WolfTeam)</publisher>
@@ -5183,7 +5192,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Some graphical glitches in the intro -->
+	<!-- Some graphical glitches in the intro (supposedly text layer not clipping properly) -->
+	<!-- Doesn't like hot swaps (user needs to "empty slot" first when prompted to change disks), btanb -->
 	<software name="arcus2" supported="partial">
 		<description>Arcus II - Silent Symphony</description>
 		<year>1990</year>
@@ -5478,7 +5488,9 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="artjigs1">
+	<!-- boot OK, randomly locks up (stuck note) -->
+	<!-- On selection menu selected jigsaw doesn't show proper naming, kanji issue? -->
+	<software name="artjigs1" supported="no">
 		<description>Art Jigsaw - Vol. 1 Super Weapons</description>
 		<year>1992</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
@@ -5491,7 +5503,9 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="artjigs2">
+	<!-- boot OK, randomly locks up (stuck note) -->
+	<!-- On selection menu selected jigsaw doesn't show proper naming, kanji issue? -->
+	<software name="artjigs2" supported="no">
 		<description>Art Jigsaw - Vol. 2 Pretty Girls</description>
 		<year>1992</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
@@ -5511,7 +5525,10 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="artjigs3">
+	<!-- boot OK, randomly locks up (stuck note) -->
+	<!-- On selection menu selected jigsaw doesn't show proper naming, kanji issue? -->
+	<!-- Last selectable puzzle shows up garbled on selection and in-game -->
+	<software name="artjigs3" supported="no">
 		<description>Art Jigsaw - Vol. 3 Fantastic</description>
 		<year>1992</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
@@ -5704,7 +5721,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="atlantia">
+	<!-- boot OK -->
+	<software name="atlantia" supported="yes">
 		<description>Atlantia</description>
 		<year>1994</year>
 		<publisher>ジャパンホームビデオ (Japan Home Video)</publisher>
@@ -5913,7 +5931,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Fails to boot with "Disk I/O Error" -->
+	<!-- Fails to boot with "Disk I/O Error" on cyan "Please Wait!" screen -->
 	<software name="azusa108" supported="no">
 		<description>Azusa 108 Jimusho</description>
 		<year>1988</year>
@@ -5965,7 +5983,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="bacta2">
+	<!-- Hangs with stuck note on title screen display after intro -->
+	<software name="bacta2" supported="no">
 		<description>Bacta 2</description>
 		<year>1994</year>
 		<publisher>姫屋ソフト (Himeya Soft)</publisher>
@@ -6365,7 +6384,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="skinpan">
+	<!-- Hangs during the intro (first dialogue) -->
+	<software name="skinpan" supported="no">
 		<description>Battle Skin Panic 9821</description>
 		<year>1993</year>
 		<publisher>ガイナックス (Gainax)</publisher>
@@ -6434,7 +6454,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="btech">
+	<!-- boot OK -->
+	<software name="btech" supported="yes">
 		<description>BattleTech - Ubawareta Seihai</description>
 		<year>1993</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
@@ -6460,7 +6481,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="baycity">
+	<!-- boot OK -->
+	<software name="baycity" supported="yes">
 		<description>Bay City Elegy</description>
 		<year>1994</year>
 		<publisher>カクテル・ソフト ＦＭＣ (Cocktail Soft FMC)</publisher>
@@ -6577,7 +6599,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
+	<!-- Black screen on boot (FDC keeps reading command sense) -->
 	<software name="beast" supported="no">
 		<description>Beast - Injuu no Yakata</description>
 		<year>1990</year>
@@ -6604,7 +6626,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="beast2">
+	<!-- boot OK -->
+	<software name="beast2" supported="yes">
 		<description>Beast 2 - Incubuster</description>
 		<year>1991</year>
 		<publisher>バーディーソフト (Birdy Soft)</publisher>
@@ -7056,11 +7079,14 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="idolsaga">
+	<!-- Reportedly crashes on V30 class machine -->
+	<!-- on 386 class throws a "(program) ended. remove the floppy disk and turn off the power.", most likely btanb -->
+	<software name="idolsaga" supported="partial">
 		<description>Bishoujo Audition - Idol o Sagase!</description>
 		<year>1993</year>
 		<publisher>サンタ・フェ (Santa Fe)</publisher>
 		<info name="alt_title" value="美少女オーディション アイドルを探せ！" />
+		<info name="usage" value="Boots on 286 or V30 class machines only" />
 		<info name="release" value="19930205" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
@@ -7687,7 +7713,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="bokosuka">
+	<!-- boot OK, sometimes keyboard doesn't recognize key ups -->
+	<software name="bokosuka" supported="partial">
 		<description>Bokosuka Wars</description>
 		<year>1985</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -9479,6 +9506,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<!-- Can't change disks, so it's not possible to save or load characters -->
+	<!-- randomly locks up -->
 	<software name="ckrynn" supported="no">
 		<description>Champions of Krynn</description>
 		<year>1992</year>
@@ -13324,13 +13352,14 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- No sound -->
-	<software name="deflektr" supported="partial">
+	<!-- boot OK -->
+	<software name="deflektr" supported="yes">
 		<description>Deflektor</description>
 		<year>1991</year>
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
 		<info name="alt_title" value="ディフレクター" />
 		<info name="release" value="19910712" />
+		<info name="usage" value="MEMSW-4 bit 3 must be off for sound to work (as also prompted during MEGDOS booting)" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1298608">
 				<rom name="deflektor.d88" size="1298608" crc="99a4b5f5" sha1="9cc8257a68093bc5ea992498d0c5d29953c1fa31" offset="0" />
@@ -17359,7 +17388,10 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="ecomagic">
+	<!-- Randomly crashes (happens more often with 286/V30 class machines) -->
+	<!-- (Runs on MEGDOS 0.27, should supposedly run on latter two) -->
+	<!-- On prolonged gameplays score may roll over instead of giving game over (i.e. going 65k), btanb? -->
+	<software name="ecomagic" supported="partial">
 		<description>Ecology Magic</description>
 		<year>1992</year>
 		<publisher>ジーエーエム (GAM)</publisher>
@@ -24228,8 +24260,9 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="tim" supported="no">
-		<description>The Incredible Machine</description>
+	<!-- pointer stays in place when using mouse (works with keyboard) -->
+	<software name="tim" supported="partial">
+		<description>The Incredible Machine (v1.00)</description>
 		<year>1994</year>
 		<publisher>サイベル (Cybelle)</publisher>
 		<info name="alt_title" value="インクレディブル・マシーン" />
@@ -24740,7 +24773,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="jangou2">
+	<!-- boot OK -->
+	<software name="jangou2" supported="yes">
 		<description>Jangou 2 - Kouchinou Ban</description>
 		<year>1989</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
@@ -25561,12 +25595,14 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
+	<!-- boot OK -->
 	<software name="karateka" supported="yes">
 		<description>Karateka</description>
 		<year>1988</year>
 		<publisher>ブロダーバンドジャパン (Brøderbund Japan)</publisher>
 		<info name="alt_title" value="カラテカ" />
 		<info name="release" value="198811xx" />
+		<info name="usage" value="Sound works on V30 class machines only" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1281968">
 				<rom name="karateka.d88" size="1281968" crc="d762d4d1" sha1="fb9331c301dd641c3398090330ba906b173c2020" offset="0" />
@@ -28232,7 +28268,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="madoum1">
+	<!-- no bitmap GFXs during gameplay -->
+	<software name="madoum1" supported="no">
 		<description>Madou Monogatari 1</description>
 		<year>1991</year>
 		<publisher>コンパイル (Compile)</publisher>
@@ -28252,7 +28289,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="madoum2">
+	<!-- no bitmap GFXs during gameplay -->
+	<software name="madoum2" supported="no">
 		<description>Madou Monogatari 2</description>
 		<year>1991</year>
 		<publisher>コンパイル (Compile)</publisher>
@@ -35653,7 +35691,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="prinmak2">
+	<!-- pointer stays in place when using mouse (works with keyboard) -->
+	<software name="prinmak2" supported="partial">
 		<description>Princess Maker 2</description>
 		<year>1993</year>
 		<publisher>ガイナックス (Gainax)</publisher>
@@ -40434,7 +40473,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="sorcer">
+	<!-- 2dd images, attempt to map them on 9801F (in drive 2 + BIOS enabled in Machine Config) causes access violation -->
+	<software name="sorcer" supported="no">
 		<description>Sorcerian</description>
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
@@ -42854,13 +42894,14 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="atragon">
+	<!-- boot OK -->
+	<software name="atragon" supported="yes">
 		<description>Tekkou Kikan Atragon</description>
 		<year>1995</year>
 		<publisher>ムービック (Movic)</publisher>
 		<info name="alt_title" value="鉄甲旗艦アトラゴン" />
 		<info name="release" value="19950224" />
-		<info name="usage" value="Run INSTALL.EXE from DOS" />
+		<info name="usage" value="Requires HDD install, run INSTALL.EXE from DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
@@ -44720,7 +44761,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="twiligh3">
+	<!-- 2dd images, attempt to map them on 9801F (in drive 2 + BIOS enabled in Machine Config) causes access violation -->
+	<software name="twiligh3" supported="no">
 		<description>Twilight Zone III - Nagakute Amai Yoru</description>
 		<year>1989</year>
 		<publisher>グレイト (Great)</publisher>
@@ -68934,7 +68976,8 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 	</software>
 
 <!-- 3'5 floppy, compared to the 5'25" one used in Disc Station 10 -->
-	<software name="runners">
+	<!-- "I/O error", a dir in DOS goes "(A)bort/(R)etry/(F)ail" -->
+	<software name="runners" supported="no">
 		<description>Runner's High</description>
 		<year>1996</year>
 		<publisher>コンパイル (Compile)</publisher>
@@ -68945,7 +68988,8 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		</part>
 	</software>
 
-	<software name="transbor">
+	<!-- boot OK, beeps on intro/start of stages -->
+	<software name="transbor" supported="partial">
 		<description>TransbOrder</description>
 		<year>1993</year>
 		<publisher>コンパイル (Compile)</publisher>

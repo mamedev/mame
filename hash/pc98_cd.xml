@@ -3470,7 +3470,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pnauts">
+	<!-- Can randomly lock up on prolonged sessions (1+ hours) -->
+	<software name="pnauts" supported="partial">
 		<!--
 		Origin: redump.org
 		<rom name="Policenauts (Japan).cue" size="591" crc="33715417" md5="ae17a348af34b2f7bddd0695d976f61c" sha1="2e41266a1a1e82eaa6a2b85858aec7af8ad93e33"/>
