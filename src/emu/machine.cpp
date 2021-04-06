@@ -355,6 +355,8 @@ int running_machine::run(bool quiet)
 		if (!quiet)
 			sound().start_recording();
 
+		m_hard_reset_pending = false;
+
 		// initialize ui lists
 		// display the startup screens
 		manager().ui_initialize(*this);
@@ -367,8 +369,6 @@ int running_machine::run(bool quiet)
 			handle_saveload();
 
 		export_http_api();
-
-		m_hard_reset_pending = false;
 
 #if defined(__EMSCRIPTEN__)
 		// break out to our async javascript loop and halt
