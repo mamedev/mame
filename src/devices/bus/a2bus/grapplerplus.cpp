@@ -38,7 +38,7 @@ ROM_START(bufgrapplerplus)
 	// C6N40 B
 	// 95ROM08048
 	ROM_REGION(0x0400, "mcu", 0)
-	ROM_LOAD( "95rom08048.u10", 0x0000, 0x0400, CRC(c9c23486) SHA1(c3a9c0fc9bd0ae728ad2aaa50d98b41929ec4a17) BAD_DUMP )
+	ROM_LOAD( "95rom08048.u10", 0x0000, 0x0400, CRC(55990f67) SHA1(f0907cf02d8c5dbf1bfacb0d626f2231142f0ff7) )
 ROM_END
 
 
@@ -75,6 +75,7 @@ INPUT_PORTS_END
 
 DEFINE_DEVICE_TYPE(A2BUS_GRAPPLERPLUS, a2bus_grapplerplus_device, "a2grapplerplus", "Orange Micro Grappler+ Printer Interface")
 DEFINE_DEVICE_TYPE(A2BUS_BUFGRAPPLERPLUS, a2bus_buf_grapplerplus_device, "a2bufgrapplerplus", "Orange Micro Buffered Grappler+ Printer Interface")
+DEFINE_DEVICE_TYPE(A2BUS_BUFGRAPPLERPLUSA, a2bus_buf_grapplerplus_reva_device, "a2bufgrapplerplusa", "Orange Micro Buffered Grappler+ (rev A) Printer Interface")
 
 
 
@@ -490,7 +491,13 @@ TIMER_CALLBACK_MEMBER(a2bus_grapplerplus_device::update_strobe)
 //==============================================================
 
 a2bus_buf_grapplerplus_device::a2bus_buf_grapplerplus_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
-	a2bus_grapplerplus_device_base(mconfig, A2BUS_BUFGRAPPLERPLUS, tag, owner, clock),
+	a2bus_buf_grapplerplus_device(mconfig, A2BUS_BUFGRAPPLERPLUS, tag, owner, clock)
+{
+}
+
+
+a2bus_buf_grapplerplus_device::a2bus_buf_grapplerplus_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
+	a2bus_grapplerplus_device_base(mconfig, type, tag, owner, clock),
 	m_mcu(*this, "mcu"),
 	m_ram(),
 	m_ram_row(0xff00),
@@ -533,19 +540,8 @@ tiny_rom_entry const *a2bus_buf_grapplerplus_device::device_rom_region() const
 
 void a2bus_buf_grapplerplus_device::device_add_mconfig(machine_config &config)
 {
-	a2bus_grapplerplus_device_base::device_add_mconfig(config);
-
-	m_printer_conn->ack_handler().set(FUNC(a2bus_buf_grapplerplus_device::buf_ack_w));
-
-	// 1982 schematics show MCU driven by 7M clock but some boards have a crystal next to the MCU
-	// P22 is tied high, pulling it low is used for some factory test mode
-	I8048(config, m_mcu, DERIVED_CLOCK(1, 1));
-	m_mcu->set_addrmap(AS_IO, &a2bus_buf_grapplerplus_device::mcu_io);
-	m_mcu->p2_out_cb().set(FUNC(a2bus_buf_grapplerplus_device::mcu_p2_w));
-	m_mcu->t0_in_cb().set([this] () { return busy_in(); });
-	m_mcu->t1_in_cb().set([this] () { return m_buf_ack_latch; });
-	m_mcu->bus_in_cb().set(FUNC(a2bus_buf_grapplerplus_device::mcu_bus_r));
-	m_mcu->bus_out_cb().set(FUNC(a2bus_buf_grapplerplus_device::mcu_bus_w));
+	// 1982 schematics show MCU driven by 7M clock
+	device_add_mconfig(config, DERIVED_CLOCK(1, 1));
 }
 
 
@@ -588,6 +584,29 @@ void a2bus_buf_grapplerplus_device::device_reset()
 
 	// should only do this on initial reset, but we get away with it here because the MCU is automatically reset even if it shouldn't be
 	m_ram_mask = ioport("CNF")->read();
+}
+
+
+
+//--------------------------------------------------
+//  helpers
+//--------------------------------------------------
+
+template <typename T>
+void a2bus_buf_grapplerplus_device::device_add_mconfig(machine_config &config, T &&mcu_clock)
+{
+	a2bus_grapplerplus_device_base::device_add_mconfig(config);
+
+	m_printer_conn->ack_handler().set(FUNC(a2bus_buf_grapplerplus_device::buf_ack_w));
+
+	// P22 is tied high, pulling it low is used for some factory test mode
+	I8048(config, m_mcu, std::forward<T>(mcu_clock));
+	m_mcu->set_addrmap(AS_IO, &a2bus_buf_grapplerplus_device::mcu_io);
+	m_mcu->p2_out_cb().set(FUNC(a2bus_buf_grapplerplus_device::mcu_p2_w));
+	m_mcu->t0_in_cb().set([this] () { return busy_in(); });
+	m_mcu->t1_in_cb().set([this] () { return m_buf_ack_latch; });
+	m_mcu->bus_in_cb().set(FUNC(a2bus_buf_grapplerplus_device::mcu_bus_r));
+	m_mcu->bus_out_cb().set(FUNC(a2bus_buf_grapplerplus_device::mcu_bus_w));
 }
 
 
@@ -789,4 +808,30 @@ void a2bus_buf_grapplerplus_device::clear_ibusy(void *ptr, s32 param)
 	{
 		LOG("IBUSY already clear\n");
 	}
+}
+
+
+
+//==============================================================
+//  Buffered Grappler+ rev A implementation
+//==============================================================
+
+a2bus_buf_grapplerplus_reva_device::a2bus_buf_grapplerplus_reva_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	a2bus_buf_grapplerplus_device(mconfig, A2BUS_BUFGRAPPLERPLUSA, tag, owner, clock)
+{
+}
+
+
+
+//--------------------------------------------------
+//  device_t implementation
+//--------------------------------------------------
+
+void a2bus_buf_grapplerplus_reva_device::device_add_mconfig(machine_config &config)
+{
+	// boards with 6 MHz clock crystal for MCU have been seen with both UVEPROM and mask ROM parts
+	// ORANGE MICRO INC., 1983
+	// ASSY NO, 72 BGP 00001 REV A
+	// PART NO. 95PCB00003
+	a2bus_buf_grapplerplus_device::device_add_mconfig(config, 6_MHz_XTAL);
 }

@@ -164,12 +164,17 @@ public:
 	virtual u8 read_c0nx(u8 offset) override;
 
 protected:
+	a2bus_buf_grapplerplus_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+
 	// device_t implementation
 	virtual tiny_rom_entry const *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// helpers
+	template <typename T> void device_add_mconfig(machine_config &config, T &&mcu_clock);
 
 private:
 	// a2bus_grapplerplus_device_base implementation
@@ -202,7 +207,19 @@ private:
 };
 
 
+class a2bus_buf_grapplerplus_reva_device : public a2bus_buf_grapplerplus_device
+{
+public:
+	a2bus_buf_grapplerplus_reva_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+protected:
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override;
+};
+
+
 DECLARE_DEVICE_TYPE(A2BUS_GRAPPLERPLUS, a2bus_grapplerplus_device)
 DECLARE_DEVICE_TYPE(A2BUS_BUFGRAPPLERPLUS, a2bus_buf_grapplerplus_device)
+DECLARE_DEVICE_TYPE(A2BUS_BUFGRAPPLERPLUSA, a2bus_buf_grapplerplus_reva_device)
 
 #endif // MAME_BUS_A2BUS_GRAPPLERPLUS_H
