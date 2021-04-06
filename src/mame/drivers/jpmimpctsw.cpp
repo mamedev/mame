@@ -60,7 +60,7 @@
 #include "j6impuls.lh"
 #include "j6impuls15.lh"
 #include "j6indyi.lh"
-#include "j6kungfud.lh"
+#include "j6kungfu.lh"
 #include "j6kfc.lh"
 #include "j6megbck.lh"
 #include "j6montlkb.lh"
@@ -11808,11 +11808,11 @@ GAMEL( 199?, j6indyk,      j6indy,     impact_nonvideo, j6indy, jpmimpct_state, 
 
 GAME(  199?, j6jungfv,     0,          impact_nonvideo, j6jungfv, jpmimpct_state, empty_init, ROT0, "Ace", "Jungle Fever (Ace) (IMPACT)", GAME_FLAGS )
 
-GAMEL( 199?, j6kungfu,     0,          impact_nonvideo_altreels, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 1)", GAME_FLAGS, layout_j6kungfud )
-GAMEL( 199?, j6kungfua,    j6kungfu,   impact_nonvideo_altreels, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 2)", GAME_FLAGS, layout_j6kungfud )
-GAMEL( 199?, j6kungfub,    j6kungfu,   impact_nonvideo_altreels, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 3)", GAME_FLAGS, layout_j6kungfud )
-GAMEL( 199?, j6kungfuc,    j6kungfu,   impact_nonvideo_altreels, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 4)", GAME_FLAGS, layout_j6kungfud )
-GAMEL( 199?, j6kungfud,    j6kungfu,   impact_nonvideo_altreels, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 5, Whitbread)", GAME_FLAGS, layout_j6kungfud )
+GAMEL( 199?, j6kungfu,     0,          impact_nonvideo_altreels, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 1)", GAME_FLAGS_WORKING, layout_j6kungfu )
+GAMEL( 199?, j6kungfua,    j6kungfu,   impact_nonvideo_altreels, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 2)", GAME_FLAGS_WORKING, layout_j6kungfu )
+GAMEL( 199?, j6kungfub,    j6kungfu,   impact_nonvideo_altreels, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 3)", GAME_FLAGS_WORKING, layout_j6kungfu )
+GAMEL( 199?, j6kungfuc,    j6kungfu,   impact_nonvideo_altreels, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 4)", GAME_FLAGS_WORKING, layout_j6kungfu )
+GAMEL( 199?, j6kungfud,    j6kungfu,   impact_nonvideo_altreels, j6kungfu, jpmimpct_state, empty_init, ROT0, "Ace", "Kung Fu (Ace) (IMPACT) (set 5, Whitbread)", GAME_FLAGS_WORKING, layout_j6kungfu )
 
 GAME(  199?, j6luckla,     0,          impact_nonvideo, j6luckla, jpmimpct_state, empty_init, ROT0, "Crystal", "Lucky Las Vegas (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
 GAME(  199?, j6lucklaa,    j6luckla,   impact_nonvideo, j6luckla, jpmimpct_state, empty_init, ROT0, "Crystal", "Lucky Las Vegas (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
