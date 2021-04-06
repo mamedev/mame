@@ -236,6 +236,8 @@ void kaypro_state::machine_start()
 	save_item(NAME(m_fdc_rq));
 	save_item(NAME(m_system_port));
 	save_item(NAME(m_mc6845_video_address));
+
+	m_framecnt = 0;
 }
 
 void kaypro_state::machine_reset()

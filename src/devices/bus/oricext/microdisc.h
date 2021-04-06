@@ -51,7 +51,7 @@ private:
 
 	void map(address_map &map);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 };
 
 #endif // MAME_BUS_ORICEXT_MICRODISC_H

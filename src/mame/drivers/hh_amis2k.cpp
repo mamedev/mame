@@ -3,12 +3,12 @@
 // thanks-to:Sean Riddle
 /***************************************************************************
 
-  AMI S2000 series handhelds or other simple devices.
+AMI S2000 series handhelds or other simple devices.
 
-  TODO:
-  - were any other handhelds with this MCU released?
-  - wildfire sound can be improved, volume decay should be more steep at the start,
-    and the pitch sounds wrong too (latter is an MCU emulation problem)
+TODO:
+- were any other handhelds with this MCU released?
+- wildfire sound can be improved, volume decay should be more steep at the start,
+  and the pitch sounds wrong too (latter is an MCU emulation problem)
 
 ***************************************************************************/
 

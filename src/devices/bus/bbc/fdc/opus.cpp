@@ -31,13 +31,15 @@ DEFINE_DEVICE_TYPE(BBC_OPUS1770, bbc_opus1770_device, "bbc_opus1770", "Opus D-DO
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( bbc_opusfdc_device::floppy_formats )
-	FLOPPY_ACORN_SSD_FORMAT,
-	FLOPPY_ACORN_DSD_FORMAT,
-	FLOPPY_FSD_FORMAT,
-	FLOPPY_OPUS_DDOS_FORMAT,
-	FLOPPY_OPUS_DDCPM_FORMAT
-FLOPPY_FORMATS_END
+void bbc_opusfdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ACORN_SSD_FORMAT);
+	fr.add(FLOPPY_ACORN_DSD_FORMAT);
+	fr.add(FLOPPY_FSD_FORMAT);
+	fr.add(FLOPPY_OPUS_DDOS_FORMAT);
+	fr.add(FLOPPY_OPUS_DDCPM_FORMAT);
+}
 
 static void bbc_floppies_525(device_slot_interface &device)
 {

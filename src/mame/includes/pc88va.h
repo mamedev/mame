@@ -21,7 +21,7 @@
 //#include "machine/upd71071.h"
 #include "machine/upd765.h"
 #include "machine/bankdev.h"
-#include "sound/2203intf.h"
+#include "sound/ym2203.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -182,7 +182,7 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 	void pc88va_fdc_update_ready(floppy_image_device *, int);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y);

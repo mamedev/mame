@@ -284,9 +284,11 @@ static void c8280_floppies(device_slot_interface &device)
 	device.option_add("8dsdd", FLOPPY_8_DSDD);
 }
 
-FLOPPY_FORMATS_MEMBER( c8280_device::floppy_formats )
-	FLOPPY_C8280_FORMAT
-FLOPPY_FORMATS_END
+void c8280_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_C8280_FORMAT);
+}
 
 
 //-------------------------------------------------

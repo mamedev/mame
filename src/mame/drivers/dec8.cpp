@@ -48,10 +48,10 @@ To do:
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/deco222.h"
-#include "sound/2203intf.h"
 #include "sound/3526intf.h"
 #include "sound/3812intf.h"
 #include "sound/msm5205.h"
+#include "sound/ym2203.h"
 
 #include "speaker.h"
 

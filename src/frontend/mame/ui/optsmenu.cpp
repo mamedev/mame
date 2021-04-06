@@ -68,12 +68,12 @@ void menu_simple_game_options::handle()
 
 void menu_simple_game_options::populate(float &customtop, float &custombottom)
 {
-	item_append(_(submenu::video_options[0].description), 0, (void *)(uintptr_t)DISPLAY_MENU);
+	item_append(_(submenu::video_options()[0].description), 0, (void *)(uintptr_t)DISPLAY_MENU);
 	item_append(_("Sound Options"), 0, (void *)(uintptr_t)SOUND_MENU);
-	item_append(_(submenu::misc_options[0].description), 0, (void *)(uintptr_t)MISC_MENU);
-	item_append(_(submenu::control_options[0].description), 0, (void *)(uintptr_t)CONTROLLER_MENU);
+	item_append(_(submenu::misc_options()[0].description), 0, (void *)(uintptr_t)MISC_MENU);
+	item_append(_(submenu::control_options()[0].description), 0, (void *)(uintptr_t)CONTROLLER_MENU);
 	item_append(_("General Inputs"), 0, (void *)(uintptr_t)CGI_MENU);
-	item_append(_(submenu::advanced_options[0].description), 0, (void *)(uintptr_t)ADVANCED_MENU);
+	item_append(_(submenu::advanced_options()[0].description), 0, (void *)(uintptr_t)ADVANCED_MENU);
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Save Configuration"), 0, (void *)(uintptr_t)SAVE_CONFIG);
 
@@ -92,7 +92,7 @@ void menu_simple_game_options::handle_item_event(event const &menu_event)
 	case MISC_MENU:
 		if (menu_event.iptkey == IPT_UI_SELECT)
 		{
-			menu::stack_push<submenu>(ui(), container(), submenu::misc_options);
+			menu::stack_push<submenu>(ui(), container(), submenu::misc_options());
 			ui_globals::reset = true;
 		}
 		break;
@@ -106,13 +106,13 @@ void menu_simple_game_options::handle_item_event(event const &menu_event)
 	case DISPLAY_MENU:
 		if (menu_event.iptkey == IPT_UI_SELECT)
 		{
-			menu::stack_push<submenu>(ui(), container(), submenu::video_options);
+			menu::stack_push<submenu>(ui(), container(), submenu::video_options());
 			ui_globals::reset = true;
 		}
 		break;
 	case CONTROLLER_MENU:
 		if (menu_event.iptkey == IPT_UI_SELECT)
-			menu::stack_push<submenu>(ui(), container(), submenu::control_options);
+			menu::stack_push<submenu>(ui(), container(), submenu::control_options());
 		break;
 	case CGI_MENU:
 		if (menu_event.iptkey == IPT_UI_SELECT)
@@ -121,7 +121,7 @@ void menu_simple_game_options::handle_item_event(event const &menu_event)
 	case ADVANCED_MENU:
 		if (menu_event.iptkey == IPT_UI_SELECT)
 		{
-			menu::stack_push<submenu>(ui(), container(), submenu::advanced_options);
+			menu::stack_push<submenu>(ui(), container(), submenu::advanced_options());
 			ui_globals::reset = true;
 		}
 		break;

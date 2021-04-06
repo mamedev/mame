@@ -153,6 +153,10 @@ lnw80:     works
            hi-res and colour are coded but do not work
            investigate expansion-box
 
+2021-03-26 MT 07903 - most floppies no longer boot.
+           Most machines have problems loading real tapes.
+           Cannot load CAS tapes, but they can be loaded with trs80m3.
+
 *******************************************************************************************************/
 
 #include "emu.h"
@@ -491,10 +495,12 @@ static GFXDECODE_START(gfx_radionic)
 GFXDECODE_END
 
 
-FLOPPY_FORMATS_MEMBER( trs80_state::floppy_formats )
-	FLOPPY_TRS80_FORMAT,
-	FLOPPY_DMK_FORMAT
-FLOPPY_FORMATS_END
+void trs80_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_TRS80_FORMAT);
+	fr.add(FLOPPY_DMK_FORMAT);
+}
 
 static void trs80_floppies(device_slot_interface &device)
 {
@@ -771,11 +777,11 @@ void trs80_state::init_trs80l2()
 
 //    YEAR  NAME         PARENT    COMPAT  MACHINE   INPUT    CLASS        INIT           COMPANY                        FULLNAME                           FLAGS
 COMP( 1977, trs80,       0,        0,      trs80,    trs80,   trs80_state, init_trs80,    "Tandy Radio Shack",           "TRS-80 Model I (Level I Basic)",  MACHINE_SUPPORTS_SAVE )
-COMP( 1978, trs80l2,     0,        0,      model1,   trs80l2, trs80_state, init_trs80l2,  "Tandy Radio Shack",           "TRS-80 Model I (Level II Basic)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, radionic,    trs80l2,  0,      radionic, trs80l2, trs80_state, init_trs80,    "Komtek",                      "Radionic",                        MACHINE_SUPPORTS_SAVE )
-COMP( 1980, sys80,       trs80l2,  0,      sys80,    sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (60 Hz)",               MACHINE_SUPPORTS_SAVE )
-COMP( 1980, sys80p,      trs80l2,  0,      sys80p,   sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (50 Hz)",               MACHINE_SUPPORTS_SAVE )
-COMP( 1981, lnw80,       trs80l2,  0,      lnw80,    sys80,   trs80_state, init_trs80,    "LNW Research",                "LNW-80",                          MACHINE_SUPPORTS_SAVE )
-COMP( 1983, ht1080z,     trs80l2,  0,      ht1080z,  sys80,   trs80_state, init_trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series I",               MACHINE_SUPPORTS_SAVE )
-COMP( 1984, ht1080z2,    trs80l2,  0,      ht1080z,  sys80,   trs80_state, init_trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series II",              MACHINE_SUPPORTS_SAVE )
-COMP( 1985, ht108064,    trs80l2,  0,      ht1080z,  sys80,   trs80_state, init_trs80,    "Hiradastechnika Szovetkezet", "HT-1080Z/64",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1978, trs80l2,     0,        0,      model1,   trs80l2, trs80_state, init_trs80l2,  "Tandy Radio Shack",           "TRS-80 Model I (Level II Basic)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, radionic,    trs80l2,  0,      radionic, trs80l2, trs80_state, init_trs80,    "Komtek",                      "Radionic",                        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, sys80,       trs80l2,  0,      sys80,    sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (60 Hz)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, sys80p,      trs80l2,  0,      sys80p,   sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (50 Hz)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, lnw80,       trs80l2,  0,      lnw80,    sys80,   trs80_state, init_trs80,    "LNW Research",                "LNW-80",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, ht1080z,     trs80l2,  0,      ht1080z,  sys80,   trs80_state, init_trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series I",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, ht1080z2,    trs80l2,  0,      ht1080z,  sys80,   trs80_state, init_trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series II",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ht108064,    trs80l2,  0,      ht1080z,  sys80,   trs80_state, init_trs80,    "Hiradastechnika Szovetkezet", "HT-1080Z/64",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

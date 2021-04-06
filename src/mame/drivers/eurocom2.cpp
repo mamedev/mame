@@ -88,7 +88,7 @@ protected:
 
 	uint8_t fdc_aux_r(offs_t offset);
 	void fdc_aux_w(offs_t offset, uint8_t data);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	void vico_w(offs_t offset, uint8_t data);
 
@@ -424,9 +424,11 @@ void eurocom2_state::machine_start()
 }
 
 
-FLOPPY_FORMATS_MEMBER( eurocom2_state::floppy_formats )
-	FLOPPY_PPG_FORMAT
-FLOPPY_FORMATS_END
+void eurocom2_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_PPG_FORMAT);
+}
 
 static void eurocom_floppies(device_slot_interface &device)
 {

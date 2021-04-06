@@ -50,7 +50,8 @@ const itt3030_format::format itt3030_format::formats[] = {
 		256, {},
 		1, {},
 		32, 22, 31
-	}
+	},
+	{}
 };
 
 

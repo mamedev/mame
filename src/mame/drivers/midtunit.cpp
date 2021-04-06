@@ -694,7 +694,7 @@ ROM_START( mkr4 )
 
 	ROM_REGION( 0xc00000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "l1_mortal_kombat_t-unit_ug14_game_rom.ug14", 0x000000, 0x80000, CRC(9e00834e) SHA1(2b97b63f52ba1dba6af6ae56c223519a52b2ab9d) )
-	ROM_LOAD32_BYTE( "l1_mortal_kombat_t-unit_jg14_game_rom.uj14", 0x000001, 0x80000, CRC(f4b0aaa7) SHA1(4cc6ee34c89e3cde325ad24b29511f70ae6a5a72) )
+	ROM_LOAD32_BYTE( "l1_mortal_kombat_t-unit_uj14_game_rom.uj14", 0x000001, 0x80000, CRC(f4b0aaa7) SHA1(4cc6ee34c89e3cde325ad24b29511f70ae6a5a72) )
 	ROM_LOAD32_BYTE( "l1_mortal_kombat_t-unit_ug19_game_rom.ug19", 0x000002, 0x80000, CRC(2d8c7ba1) SHA1(f891d6eb618dbf3e77f02e0f93da216e20571905) )
 	ROM_LOAD32_BYTE( "l1_mortal_kombat_t-unit_uj19_game_rom.uj19", 0x000003, 0x80000, CRC(33b9b7a4) SHA1(e8ceca4c049e1f55d480a03ff793b595bd04d344) )
 
@@ -727,7 +727,7 @@ ROM_START( mktturbo )
 
 	ROM_REGION( 0xc00000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "l1_mortal_kombat_t-unit_ug14_game_rom.ug14", 0x000000, 0x80000, CRC(9e00834e) SHA1(2b97b63f52ba1dba6af6ae56c223519a52b2ab9d) )
-	ROM_LOAD32_BYTE( "l1_mortal_kombat_t-unit_jg14_game_rom.uj14", 0x000001, 0x80000, CRC(f4b0aaa7) SHA1(4cc6ee34c89e3cde325ad24b29511f70ae6a5a72) )
+	ROM_LOAD32_BYTE( "l1_mortal_kombat_t-unit_uj14_game_rom.uj14", 0x000001, 0x80000, CRC(f4b0aaa7) SHA1(4cc6ee34c89e3cde325ad24b29511f70ae6a5a72) )
 	ROM_LOAD32_BYTE( "l1_mortal_kombat_t-unit_ug19_game_rom.ug19", 0x000002, 0x80000, CRC(2d8c7ba1) SHA1(f891d6eb618dbf3e77f02e0f93da216e20571905) )
 	ROM_LOAD32_BYTE( "l1_mortal_kombat_t-unit_uj19_game_rom.uj19", 0x000003, 0x80000, CRC(33b9b7a4) SHA1(e8ceca4c049e1f55d480a03ff793b595bd04d344) )
 

@@ -136,8 +136,8 @@ Additional notes:
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/2203intf.h"
 #include "sound/3526intf.h"
+#include "sound/ym2203.h"
 #include "screen.h"
 #include "speaker.h"
 

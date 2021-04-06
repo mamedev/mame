@@ -847,10 +847,10 @@ void super80v_state::super80v(machine_config &config)
 
 	WD2793(config, m_fdc, 2_MHz_XTAL);
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", super80_floppies, "s80flop", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", super80_floppies, "s80flop", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:2", super80_floppies, "s80flop", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:3", super80_floppies, "s80flop", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", super80_floppies, "s80flop", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", super80_floppies, "s80flop", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:2", super80_floppies, "s80flop", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", super80_floppies, "s80flop", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	// software list
 	SOFTWARE_LIST(config, "cass_list").set_original("super80_cass").set_filter("V");

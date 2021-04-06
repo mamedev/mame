@@ -408,6 +408,7 @@ void galaxian_state::video_start()
 	m_background_blue = 0;
 	m_background_red = 0;
 	m_background_green = 0;
+	std::fill(std::begin(m_gfxbank), std::end(m_gfxbank), 0);
 
 	/* initialize stars */
 	stars_init();

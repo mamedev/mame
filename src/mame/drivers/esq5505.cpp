@@ -273,7 +273,7 @@ private:
 
 	void update_irq_to_maincpu();
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	void eps_map(address_map &map);
 	void sq1_map(address_map &map);
@@ -289,9 +289,11 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(dma_irq);
 };
 
-FLOPPY_FORMATS_MEMBER( esq5505_state::floppy_formats )
-	FLOPPY_ESQIMG_FORMAT
-FLOPPY_FORMATS_END
+void esq5505_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ESQIMG_FORMAT);
+}
 
 void esq5505_state::cpu_space_map(address_map &map)
 {

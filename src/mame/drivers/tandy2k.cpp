@@ -871,9 +871,11 @@ WRITE_LINE_MEMBER( tandy2k_state::fdc_hdl_w )
 	m_floppy1->mon_w(!state);
 }
 
-FLOPPY_FORMATS_MEMBER( tandy2k_state::floppy_formats )
-	FLOPPY_TANDY_2000_FORMAT
-FLOPPY_FORMATS_END
+void tandy2k_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_TANDY_2000_FORMAT);
+}
 
 static void tandy2k_floppies(device_slot_interface &device)
 {

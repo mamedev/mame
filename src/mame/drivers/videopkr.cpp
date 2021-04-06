@@ -264,7 +264,7 @@
 
   * Add Tech. Notes for Baby board, a reworked and improved version on Video Poker hardware.
   * Fix some missing pulses on mechanical counters.
-  * Fix the bug on bookeeping mode (videodad & videocba).
+  * Fix the bug on bookkeeping mode (videodad & videocba).
   * Figure out the undocumented jumper.
   * Hopper simulation.
   * Switch to resnet system.
@@ -296,6 +296,8 @@
 #include "videopkr.lh"
 
 
+namespace {
+
 #define CPU_CLOCK       (XTAL(6'000'000))         /* main cpu clock */
 #define CPU_CLOCK_ALT   (XTAL(8'000'000))         /* alternative main cpu clock for newer games */
 #define SOUND_CLOCK     (XTAL(8'000'000))         /* sound cpu clock */
@@ -307,6 +309,9 @@ class videopkr_state : public driver_device
 public:
 	videopkr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_data_ram(*this, "data_ram", 0x100, ENDIANNESS_LITTLE)
+		, m_video_ram(*this, "video_ram", 0x400, ENDIANNESS_LITTLE)
+		, m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_LITTLE)
 		, m_maincpu(*this, "maincpu")
 		, m_soundcpu(*this, "soundcpu")
 		, m_gfxdecode(*this, "gfxdecode")
@@ -321,6 +326,10 @@ public:
 	void babypkr(machine_config &config);
 	void fortune1(machine_config &config);
 	void bpoker(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 private:
 	uint8_t videopkr_io_r(offs_t offset);
@@ -357,12 +366,9 @@ private:
 	void i8751_io_port(address_map &map);
 	void i8751_map(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-
-	uint8_t m_data_ram[0x100];
-	uint8_t m_video_ram[0x0400];
-	uint8_t m_color_ram[0x0400];
+	memory_share_creator<uint8_t> m_data_ram;
+	memory_share_creator<uint8_t> m_video_ram;
+	memory_share_creator<uint8_t> m_color_ram;
 	uint16_t m_p1;
 	uint16_t m_p2;
 	uint8_t m_t0_latch;
@@ -1212,6 +1218,11 @@ void videopkr_state::machine_start()
 	m_p1 = 0xff;
 	m_ant_cio = 0;
 	m_count0 = 0;
+	m_count1 = 0;
+	m_count2 = 0;
+	m_count3 = 0;
+	m_count4 = 0;
+	m_ant_jckp = 0;
 
 	subdevice<nvram_device>("nvram")->set_base(m_data_ram, sizeof(m_data_ram));
 }
@@ -1566,6 +1577,9 @@ ROM_START( fortune1 )
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "3140-cap8.b8", 0x0000, 0x0100, CRC(09abf5f1) SHA1(f2d6b4f2f08b47b93728dafb50576d5ca859255f) )
 ROM_END
+
+} // Anonymous namespace
+
 
 /*************************
 *      Game Drivers      *

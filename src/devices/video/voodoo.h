@@ -1134,7 +1134,7 @@ protected:
 		uint32_t            xoffs = 0;              // horizontal offset (back porch)
 		uint32_t            yoffs = 0;              // vertical offset (back porch)
 		uint32_t            vsyncstart = 0;         // vertical sync start scanline
-		uint32_t            vsyncstop = 0;          // veritcal sync stop
+		uint32_t            vsyncstop = 0;          // vertical sync stop
 		uint32_t            rowpixels = 0;          // pixels per row
 		uint32_t            tile_width = 0;         // width of video tiles
 		uint32_t            tile_height = 0;        // height of video tiles

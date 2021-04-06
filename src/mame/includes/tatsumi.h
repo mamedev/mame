@@ -66,8 +66,6 @@ protected:
 	uint16_t tatsumi_sprite_control_r(offs_t offset);
 	void tatsumi_sprite_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	uint8_t tatsumi_hack_ym2151_r();
-
 	void tatsumi_reset();
 	template<class BitmapClass> void draw_sprites(BitmapClass &bitmap, const rectangle &cliprect, int write_priority_only, int rambank);
 	template<class BitmapClass> inline void roundupt_drawgfxzoomrotate( BitmapClass &dest_bmp, const rectangle &clip,

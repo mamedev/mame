@@ -1714,19 +1714,19 @@ ROM_END
 
 ROM_START( narc1 )
 	ROM_REGION( 0x90000, "narcsnd:cpu0", 0 )    /* sound CPU */
-	ROM_LOAD( "rev2_narc_sound_rom_u4.u4", 0x50000, 0x10000, CRC(450a591a) SHA1(bbda8061262738e5866f2707f69483a0a51d2910) ) // should these be REV1 ROMs with different data? - NOT verified correct for this set
+	ROM_LOAD( "rev1_narc_sound_rom_u4.u4", 0x50000, 0x10000, CRC(345b5b0b) SHA1(98918785b2c096ceec14a42199f1ad24149ef936) )
 	ROM_RELOAD(                            0x60000, 0x10000 )
-	ROM_LOAD( "rev2_narc_sound_rom_u5.u5", 0x70000, 0x10000, CRC(e551e5e3) SHA1(c8b4f53dbd4c534abb77d4dc07c4d12653b79894) )
+	ROM_LOAD( "rev1_narc_sound_rom_u5.u5", 0x70000, 0x10000, CRC(bfa112b7) SHA1(2156b52b6ad838e3c9ba33d27da4f753f8a26bef) )
 	ROM_RELOAD(                            0x80000, 0x10000 )
 
 	ROM_REGION( 0x90000, "narcsnd:cpu1", 0 )    /* slave sound CPU */
-	ROM_LOAD( "rev2_narc_sound_rom_u35.u35", 0x10000, 0x10000, CRC(81295892) SHA1(159664e5ee03c88d6e940e70e87e2150dc5b8b25) )
+	ROM_LOAD( "rev1_narc_sound_rom_u35.u35", 0x10000, 0x10000, CRC(c932e69f) SHA1(dca1113c63f997b5a779d6e3ca6c555cb266b8ab) )
 	ROM_RELOAD(                              0x20000, 0x10000 )
-	ROM_LOAD( "rev2_narc_sound_rom_u36.u36", 0x30000, 0x10000, CRC(16cdbb13) SHA1(2dfd961a5d909c1804f4fda34de33ee2664c4bc6) )
+	ROM_LOAD( "rev1_narc_sound_rom_u36.u36", 0x30000, 0x10000, CRC(974ad9f4) SHA1(5646099214d4e29ed529b66a5dedbaeca0ad375e) )
 	ROM_RELOAD(                              0x40000, 0x10000 )
-	ROM_LOAD( "rev2_narc_sound_rom_u37.u37", 0x50000, 0x10000, CRC(29dbeffd) SHA1(4cbdc619db34f9c552de1ed3d034f8c079987e03) )
+	ROM_LOAD( "rev1_narc_sound_rom_u37.u37", 0x50000, 0x10000, CRC(b6469f79) SHA1(58b59ac8466813def7f1f0c6d0f7cdd167500889) )
 	ROM_RELOAD(                              0x60000, 0x10000 )
-	ROM_LOAD( "rev2_narc_sound_rom_u38.u38", 0x70000, 0x10000, CRC(09b03b80) SHA1(a45782d29a426fac38299b56af0815e844e35ae4) )
+	ROM_LOAD( "rev1_narc_sound_rom_u38.u38", 0x70000, 0x10000, CRC(c535d11c) SHA1(b7e670669713bbf860c2025b9830bfc4d941651c) )
 	ROM_RELOAD(                              0x80000, 0x10000 )
 
 	ROM_REGION16_LE( 0x100000, "user1", 0 ) /* 34010 code */
@@ -1950,6 +1950,29 @@ ROM_START( trogpa4 )
 
 	ROM_LOAD( "trog_ii_u-90_la-1.u90",   0x280000, 0x20000, CRC(16e06753) SHA1(62ec2b18e6b965ea0792d655d7878b4225da3aca) )
 	ROM_LOAD( "trog_ii_u-91_la-1.u91",   0x2a0000, 0x20000, CRC(880a02c7) SHA1(ab1b2d24be4571a183b230d267c6c8167d4a42a4) )
+ROM_END
+
+
+ROM_START( mazebl ) // Trog bootleg. 2-PCB set, upper one has a RC 0112 sticker
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )
+	ROM_LOAD( "1", 0x10000, 0x10000, CRC(cf3a206e) SHA1(a30bab30ef546cad3ad65a93a67c68b1fff51e79) )
+	ROM_CONTINUE(  0x30000, 0x10000 )
+	ROM_CONTINUE(  0x50000, 0x10000 )
+	ROM_CONTINUE(  0x70000, 0x10000 )
+	ROM_COPY( "cvsd:cpu", 0x10000, 0x20000, 0x10000 )
+	ROM_COPY( "cvsd:cpu", 0x30000, 0x40000, 0x10000 )
+	ROM_COPY( "cvsd:cpu", 0x50000, 0x60000, 0x10000 )
+	ROM_COPY( "cvsd:cpu", 0x70000, 0x80000, 0x10000 )
+
+	ROM_REGION16_LE( 0x100000, "user1", 0 ) // 34010 code
+	ROM_LOAD16_BYTE( "2", 0xc0000, 0x20000, CRC(e6095189) SHA1(a2caaf64e371050b37c63d9608ba5d289cf3cd91) )
+	ROM_LOAD16_BYTE( "3", 0xc0001, 0x20000, CRC(fdd7cc65) SHA1(bfc4339953c122bca968f9cfa3a82df3584a3727) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 )
+	ROM_LOAD( "4", 0x000000, 0x80000, CRC(dd7cd402) SHA1(78419fddd98bc37d5382f22d2ce2615948f80d5f) )
+	ROM_LOAD( "6", 0x080000, 0x40000, CRC(9c001d17) SHA1(c0770fa3968355e06e7c99bff56edbf834c43196) )
+	ROM_LOAD( "5", 0x200000, 0x80000, CRC(e036e21a) SHA1(584d06e82f1df571851a22fcb57248d03e49c233) )
+	ROM_LOAD( "7", 0x280000, 0x40000, CRC(c5ce99fa) SHA1(29e8d7935816355d2e9d9deca3f5950ddd30a632) )
 ROM_END
 
 
@@ -3322,6 +3345,7 @@ GAME( 1990, trog4,      trog,     yunit_cvsd_4bit_slow,    trog,     midyunit_st
 GAME( 1990, trog3,      trog,     yunit_cvsd_4bit_slow,    trog,     midyunit_state, init_trog,     ROT0, "Midway",   "Trog (rev LA3 02/14/91)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, trogpa6,    trog,     yunit_cvsd_4bit_slow,    trog,     midyunit_state, init_trog,     ROT0, "Midway",   "Trog (prototype, rev PA6-PAC 09/09/90)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, trogpa4,    trog,     yunit_cvsd_4bit_slow,    trogpa4,  midyunit_state, init_trog,     ROT0, "Midway",   "Trog (prototype, rev 4.00 07/27/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mazebl,     trog,     yunit_cvsd_4bit_slow,    trog,     midyunit_state, init_trog,     ROT0, "bootleg",  "Maze (Trog bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, smashtv,    0,        yunit_cvsd_6bit_slow,    smashtv,  midyunit_state, init_smashtv,  ROT0, "Williams", "Smash T.V. (rev 8.00)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, smashtv6,   smashtv,  yunit_cvsd_6bit_slow,    smashtv,  midyunit_state, init_smashtv,  ROT0, "Williams", "Smash T.V. (rev 6.00)", MACHINE_SUPPORTS_SAVE )

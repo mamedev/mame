@@ -155,7 +155,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	void aa310_mem(address_map &map);
 	void aa310_arm_mem(address_map &map);
@@ -433,13 +433,15 @@ static INPUT_PORTS_START( aa310 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-FLOPPY_FORMATS_MEMBER( aa310_state::floppy_formats )
-	FLOPPY_ACORN_ADFS_NEW_FORMAT,
-	FLOPPY_ACORN_ADFS_OLD_FORMAT,
-	FLOPPY_APD_FORMAT,
-	FLOPPY_JFD_FORMAT,
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
+void aa310_state::floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+
+	fr.add(FLOPPY_ACORN_ADFS_NEW_FORMAT);
+	fr.add(FLOPPY_ACORN_ADFS_OLD_FORMAT);
+	fr.add(FLOPPY_APD_FORMAT);
+	fr.add(FLOPPY_JFD_FORMAT);
+}
 
 static void aa310_floppies(device_slot_interface &device)
 {

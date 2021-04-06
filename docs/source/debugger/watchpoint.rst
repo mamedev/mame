@@ -26,7 +26,7 @@ wpset
 | The optional <condition> parameter lets you specify an expression that will be evaluated each time the watchpoint is hit. If the result of the expression is true (non-zero), the watchpoint will actually halt execution; otherwise, execution will continue with no notification.
 | The optional <action> parameter provides a command that is executed whenever the watchpoint is hit and the <condition> is true. Note that you may need to embed the action within braces { } in order to prevent commas and semicolons from being interpreted as applying to the wpset command itself.
 | Each watchpoint that is set is assigned an index which can be used in other watchpoint commands to reference this watchpoint.
-| In order to help <condition> expressions, two variables are available. For all watchpoints, the variable 'wpaddr' is set to the address that actually triggered the watchpoint. For write watchpoints, the variable 'wpdata' is set to the data that is being written.
+| In order to help <condition> expressions, two variables are available. The variable 'wpaddr' is set to the address that actually triggered the watchpoint, the variable 'wpdata' is set to the data that is being read or written, and the variable 'wpsize' is set to the size of the data in bytes.
 |
 | Examples:
 |

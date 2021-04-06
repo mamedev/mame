@@ -46,7 +46,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER( clock_out );
 	DECLARE_WRITE_LINE_MEMBER( board_ready );
 	DECLARE_WRITE_LINE_MEMBER( board_reset );
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	void device_start() override;
 	void device_reset() override;

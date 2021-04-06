@@ -27,7 +27,6 @@ class spectrum_d40base_device: public device_t, public device_spectrum_expansion
 {
 public:
 	DECLARE_INPUT_CHANGED_MEMBER(snapshot_button);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 protected:
 	spectrum_d40base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

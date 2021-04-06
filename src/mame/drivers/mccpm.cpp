@@ -248,8 +248,8 @@ void mccpm_state::mccpm(machine_config &config)
 	FD1797(config, m_fdc, 8_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set([this] (bool state) { mccpm_state::fdc_irq(state); });
 	m_fdc->drq_wr_callback().set([this] (u8 state) { m_fdc_status = (m_fdc_status & 0xfe) | (state ? 1 : 0); });
-	FLOPPY_CONNECTOR(config, "fdc:0", flop_types, "flop", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", flop_types, "flop", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", flop_types, "flop", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", flop_types, "flop", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 /* ROM definition */

@@ -37,7 +37,7 @@
 		</reel>
 	</element>
 	<element name="reel4" defstate="0">
-		<reel reelreversed="0" beltreel="1" stateoffset="2730" numsymbolsvisible="5" symbollist="11  ,5(B),3(B),1   ,9   ,3   ,6   ,5   ,10  ,9(B),12  ,4   ,7(B),2   ,8   ,7   ">
+		<reel reelreversed="0" beltreel="1" stateoffset="2730" numsymbolsvisible="5" symbollist="11,5(B),3(B),1,9,3,6,5,10,9(B),12,4,7(B),2,8,7">
 			<color red="0.0" green="0.0" blue="0.0"/>
 		</reel>
 	</element>
@@ -4934,8 +4934,7 @@
 			<bounds x="1685.0000" y="234.0000" width="70.0000" height="28.0000"/>
 		</element>
 		<element name="sreel5" ref="reel4" state="0">
-			<orientation rotate="90"/>
-			<bounds x="1660" y="32" width="120" height="240"/>
+			<bounds x="1660" y="32" width="240" height="120"/>
 		</element>
 		<element name="reel1" ref="debug_stepper_value">
 			<bounds x="1100" y="272" width="50" height="30"/>

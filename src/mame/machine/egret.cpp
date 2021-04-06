@@ -39,7 +39,6 @@
 
 #include "emu.h"
 #include "egret.h"
-#include "includes/mac.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/asc.h"
 

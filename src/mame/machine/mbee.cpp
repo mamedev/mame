@@ -2,7 +2,7 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-    microbee.cpp
+    mbee.cpp
 
     machine driver
     Originally written by Juergen Buchmueller, Jan 2000
@@ -438,6 +438,8 @@ void mbee_state::machine_start()
 	save_item(NAME(m_sy6545_ind));
 	save_item(NAME(m_fdc_rq));
 	save_item(NAME(m_bank_array));
+
+	m_b2 = 0;
 
 	// banking of the BASIC roms
 	if (m_basic)

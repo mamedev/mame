@@ -348,7 +348,7 @@ void roland_s50_state::s50(machine_config &config)
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, i8x9x_device::HSI3_LINE);
 
 	// Floppy unit: FDD4261A0K or FDD4251G0K
-	FLOPPY_CONNECTOR(config, m_floppy, s50_floppies, "35dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy, s50_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	//UPD7538A(config, "fipcpu", 600_kHz_XTAL);
 
@@ -427,7 +427,7 @@ void roland_w30_state::w30(machine_config &config)
 	WD1772(config, m_fdc, 8_MHz_XTAL); // WD1772-02
 
 	// Floppy unit: FX-354 (307F1JC)
-	FLOPPY_CONNECTOR(config, m_floppy, s50_floppies, "35dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy, s50_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	//MB89352(config, m_scsic, 8_MHz_XTAL); // by option
 
@@ -464,7 +464,7 @@ void roland_w30_state::s330(machine_config &config)
 	WD1772(config, m_fdc, 8_MHz_XTAL); // WD1772-02
 
 	// Floppy unit: ND-362S-A
-	FLOPPY_CONNECTOR(config, m_floppy, s50_floppies, "35dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy, s50_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	// LCD unit: DM1620-5BL7 (MW-5F)
 

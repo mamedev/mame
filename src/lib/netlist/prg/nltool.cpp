@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 
 // ***************************************************************************
@@ -899,7 +899,7 @@ void tool_app_t::create_header()
 	nt.parser().register_source<netlist::source_proc_t>("dummy", &netlist_dummy);
 	nt.parser().include("dummy");
 
-	pout("// license:GPL-2.0+\n");
+	pout("// license:BSD-3-Clause\n");
 	pout("// copyright-holders:Couriersud\n");
 	pout("#ifndef NLD_DEVINC_H\n");
 	pout("#define NLD_DEVINC_H\n");
@@ -953,7 +953,7 @@ void tool_app_t::create_docheader()
 		devs.push_back(e->name());
 	std::sort(devs.begin(), devs.end(), [&](pstring &a, pstring &b) { return a < b; });
 
-	pout("// license:GPL-2.0+\n");
+	pout("// license:BSD-3-Clause\n");
 	pout("// copyright-holders:Couriersud\n");
 	pout("\n");
 	pout("// ----------------------------------------------------------------------------\n");
@@ -1274,7 +1274,7 @@ int tool_app_t::execute()
 		pout(
 			"nltool (netlist) {1}\n"
 			"Copyright (C) 2021 Couriersud\n"
-			"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
+			"License BSD-3-Clause\n"
 			"This is free software: you are free to change and redistribute it.\n"
 			"There is NO WARRANTY, to the extent permitted by law.\n\n"
 			"Written by Couriersud.\n", netlist::netlist_state_t::version());

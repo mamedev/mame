@@ -15,8 +15,8 @@
 #include "machine/gen_latch.h"
 #include "video/decospr.h"
 #include "video/deco16ic.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "sound/ym2151.h"
 #include "screen.h"
 #include "speaker.h"
 

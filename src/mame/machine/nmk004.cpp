@@ -9,8 +9,8 @@
 #include "emu.h"
 #include "nmk004.h"
 
-#include "sound/2203intf.h"
 #include "sound/okim6295.h"
+#include "sound/ym2203.h"
 
 
 void nmk004_device::write(uint8_t data)

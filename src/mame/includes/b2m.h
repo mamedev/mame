@@ -58,7 +58,7 @@ private:
 	void romdisk_portb_w(uint8_t data);
 	void romdisk_portc_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
-	DECLARE_FLOPPY_FORMATS( b2m_floppy_formats );
+	static void b2m_floppy_formats(format_registration &fr);
 
 	void b2m_io(address_map &map);
 	void b2m_mem(address_map &map);

@@ -549,6 +549,7 @@ WRITE_LINE_MEMBER(pcw16_state::pcw16_keyboard_callback)
 
 static const int rtc_days_in_each_month[]=
 {
+	0, //dummy value
 	31,/* jan */
 	28, /* feb */
 	31, /* march */
@@ -926,10 +927,6 @@ WRITE_LINE_MEMBER(pcw16_state::pcw16_com_interrupt_2)
 	pcw16_refresh_ints();
 }
 
-FLOPPY_FORMATS_MEMBER( pcw16_state::floppy_formats )
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
-
 static void pcw16_floppies(device_slot_interface &device)
 {
 	device.option_add("35hd", FLOPPY_35_HD);
@@ -1062,8 +1059,8 @@ void pcw16_state::pcw16(machine_config &config)
 
 	PC_FDC_SUPERIO(config, m_fdc, 48_MHz_XTAL / 2);
 	m_fdc->intrq_wr_callback().set(FUNC(pcw16_state::fdc_interrupt));
-	FLOPPY_CONNECTOR(config, "fdc:0", pcw16_floppies, "35hd", pcw16_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", pcw16_floppies, "35hd", pcw16_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", pcw16_floppies, "35hd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", pcw16_floppies, "35hd", floppy_image_device::default_pc_floppy_formats);
 
 	SOFTWARE_LIST(config, "disk_list").set_original("pcw16");
 

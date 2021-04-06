@@ -34,7 +34,6 @@ private:
 	uint16_t mmu_io_r(offs_t offset);
 	void mmu_ram_w(offs_t offset, uint16_t data);
 	void mmu_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	void altos486_io(address_map &map);
 	void altos486_mem(address_map &map);
@@ -97,10 +96,6 @@ void altos486_state::mmu_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-FLOPPY_FORMATS_MEMBER( altos486_state::floppy_formats )
-	FLOPPY_TD0_FORMAT
-FLOPPY_FORMATS_END
-
 static void altos486_floppies(device_slot_interface &device)
 {
 	device.option_add("525qd", FLOPPY_525_QD);
@@ -151,7 +146,7 @@ void altos486_state::altos486(machine_config &config)
 	I8255(config, "ppi8255");
 
 	UPD765A(config, "fdc", 32_MHz_XTAL / 4, false, false);
-	FLOPPY_CONNECTOR(config, "fdc:0", altos486_floppies, "525qd", altos486_state::floppy_formats).set_fixed(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", altos486_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).set_fixed(true);
 
 	z80sio_device& sio0(Z80SIO(config, "sio0", 32_MHz_XTAL / 8)); // Z8440APS
 	sio0.out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));

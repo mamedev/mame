@@ -169,9 +169,10 @@ WRITE_LINE_MEMBER( econet_e01_device::clk_en_w )
 	m_clk_en = state;
 }
 
-FLOPPY_FORMATS_MEMBER( econet_e01_device::floppy_formats_afs )
-	FLOPPY_AFS_FORMAT
-FLOPPY_FORMATS_END0
+void econet_e01_device::floppy_formats_afs(format_registration &fr)
+{
+	fr.add(FLOPPY_AFS_FORMAT);
+}
 
 WRITE_LINE_MEMBER( econet_e01_device::fdc_irq_w )
 {

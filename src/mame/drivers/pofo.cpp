@@ -49,6 +49,7 @@
 #include "speaker.h"
 
 
+namespace {
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -92,10 +93,11 @@ public:
 
 	void portfolio(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+private:
 	void portfolio_io(address_map &map);
 	void portfolio_lcdc(address_map &map);
 	void portfolio_mem(address_map &map);
@@ -990,6 +992,8 @@ void portfolio_state::machine_start()
 	save_item(NAME(m_counter));
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_rom_b));
+
+	m_ip = 0;
 }
 
 
@@ -1086,6 +1090,7 @@ ROM_START( pofo )
 	ROM_LOAD( "c101783-001a-01.u3", 0x0000, 0x8000, CRC(61fdaff1) SHA1(5eb99e7a19af7b8d77ea8a2f1f554e6e3d382fa2) )
 ROM_END
 
+} // Anonymous namespace
 
 
 //**************************************************************************

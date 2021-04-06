@@ -492,6 +492,10 @@ memory_view::memory_view_entry &memory_view::operator[](int slot)
 		m_entries.resize(id+1);
 		m_entries[id].reset(e);
 		m_entry_mapping[slot] = id;
+		if (m_handler_read) {
+			m_handler_read->select_u(id);
+			m_handler_write->select_u(id);
+		}
 		return *e;
 
 	} else
@@ -637,6 +641,14 @@ memory_view::memory_view(device_t &device, std::string name) : m_device(device),
 	device.view_register(this);
 }
 
+memory_view::~memory_view()
+{
+	if (m_handler_read) {
+		m_handler_read->unref();
+		m_handler_write->unref();
+	}
+}
+
 void memory_view::register_state()
 {
 	m_device.machine().save().save_item(&m_device, "view", m_name.c_str(), 0, NAME(m_cur_slot));
@@ -768,14 +780,11 @@ std::pair<handler_entry *, handler_entry *> memory_view::make_handlers(address_s
 		m_space = &space;
 
 		offs_t span = addrstart ^ addrend;
-		u32 awidth = 0;
-		if (span) {
-			for(awidth = 1; awidth != 32; awidth++)
-				if ((1 << awidth) >= span)
-					break;
-		}
+		u32 awidth = 32 - count_leading_zeros(span);
 
 		h_make(awidth, m_config->data_width(), m_config->addr_shift(), m_config->endianness(), space, *this, m_handler_read, m_handler_write);
+		m_handler_read->ref();
+		m_handler_write->ref();
 	}
 
 	return std::make_pair(m_handler_read, m_handler_write);
@@ -974,7 +983,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 	if (rtag != "")
 	{
 		// find the port
-		ioport_port *port = m_view.m_device.owner()->ioport(rtag);
+		ioport_port *port = m_view.m_device.ioport(rtag);
 		if (port == nullptr)
 			throw emu_fatalerror("Attempted to map non-existent port '%s' for read in space %s of device '%s'\n", rtag, m_view.m_name, m_view.m_device.tag());
 
@@ -986,7 +995,7 @@ template<int Level, int Width, int AddrShift, endianness_t Endian> void memory_v
 	if (wtag != "")
 	{
 		// find the port
-		ioport_port *port = m_view.m_device.owner()->ioport(wtag);
+		ioport_port *port = m_view.m_device.ioport(wtag);
 		if (port == nullptr)
 			fatalerror("Attempted to map non-existent port '%s' for write in space %s of device '%s'\n", wtag, m_view.m_name, m_view.m_device.tag());
 

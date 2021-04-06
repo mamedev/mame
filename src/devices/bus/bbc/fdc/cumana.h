@@ -26,7 +26,7 @@ class bbc_cumanafdc_device :
 	public device_bbc_fdc_interface
 {
 public:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);

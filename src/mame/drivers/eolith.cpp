@@ -75,7 +75,8 @@
 
   - racooon (Raccoon World)
 
-      Game animation seems too fast?
+      Game animation & timers seem too fast? demoted to NOT WORKING as a
+      result
 
 -----------------------------------------------------------------------------
  Game Issues (unknown):
@@ -1758,7 +1759,7 @@ GAME( 1998, ironfort,  0,        ironfort, ironfort,  eolith_state, init_eolith,
 GAME( 1998, ironfortc, ironfort, ironfort, ironfortc, eolith_state, init_eolith,   ROT0, "Eolith (Excellent Competence Ltd. license)", "Gongtit Jiucoi Iron Fortress (Hong Kong)", MACHINE_SUPPORTS_SAVE ) // Licensed/Distributed to Hong Kong company Excellent Competence Ltd.
 GAME( 1998, hidnctch,  0,        eolith45, hidnctch,  eolith_state, init_eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  MACHINE_SUPPORTS_SAVE ) // or Teurrin Geurim Chajgi '98
 GAME( 1998, hidnctcha, hidnctch, eolith45, hidnctch,  eolith_state, init_eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)",  MACHINE_SUPPORTS_SAVE ) // or Teurrin Geurim Chajgi '98
-GAME( 1998, raccoon,   0,        eolith45, raccoon,   eolith_state, init_eolith,   ROT0, "Eolith", "Raccoon World", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, raccoon,   0,        eolith45, raccoon,   eolith_state, init_eolith,   ROT0, "Eolith", "Raccoon World", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1998, puzzlekg,  0,        eolith45, puzzlekg,  eolith_state, init_eolith,   ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1999, candy,     0,        eolith50, candy,     eolith_state, init_eolith,   ROT0, "Eolith", "Candy Candy",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1999, hidctch2,  0,        eolith50, hidctch2,  eolith_state, init_hidctch2, ROT0, "Eolith", "Hidden Catch 2 (pcb ver 3.03) (Kor/Eng) (AT89c52 protected)", MACHINE_SUPPORTS_SAVE )

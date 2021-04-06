@@ -20,7 +20,8 @@ TODO:
 - LCD status bit handling is guessed. stratos expects it to be high after lcd command 0xf,
   but tking2 won't work if it's done that way, and corona is different too
 - irq timing is derived from the main XTAL, but result should be similar with 5MHz and 5.67MHz,
-  there are a couple of "FREQ. SEL" nodes on the PCB, maybe related (not the ones in input ports)
+  there are a couple of "FREQ. SEL" nodes on the PCB, maybe related (not the ones in input ports).
+  irq source should be from HELIOS pin 2
 - tking(old revisions) and stratos slow responsive buttons, related to irq timing, but if that's changed,
   the led blinking and in-game clock is too fast
 - does nvram.u7 work? it's cleared during boot, but not used after

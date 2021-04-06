@@ -58,9 +58,13 @@ To Do / Status:
 --------------
 
 trs80m3:   works
+           MT 07903 - most floppies no longer boot
+           CAS handler doesn't support 1500 baud
 
 trs80m4:   works
            will boot model 3 floppies, but not model 4 ones
+           MT 07903 - most floppies no longer boot
+           CAS handler doesn't support 1500 baud
 
 trs80m4p:  floppy not working, so machine is useless
 
@@ -322,10 +326,12 @@ static GFXDECODE_START(gfx_trs80m3)
 GFXDECODE_END
 
 
-FLOPPY_FORMATS_MEMBER( trs80m3_state::floppy_formats )
-	FLOPPY_TRS80_FORMAT,
-	FLOPPY_DMK_FORMAT
-FLOPPY_FORMATS_END
+void trs80m3_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_TRS80_FORMAT);
+	fr.add(FLOPPY_DMK_FORMAT);
+}
 
 static void trs80_floppies(device_slot_interface &device)
 {
@@ -530,7 +536,7 @@ void trs80m3_state::init_trs80m4p()
 
 
 //    YEAR  NAME         PARENT    COMPAT    MACHINE   INPUT     CLASS          INIT             COMPANY               FULLNAME                FLAGS
-COMP( 1980, trs80m3,     0,        trs80l2,  model3,   trs80m3,  trs80m3_state, init_trs80m3,  "Tandy Radio Shack", "TRS-80 Model III",        MACHINE_SUPPORTS_SAVE )
+COMP( 1980, trs80m3,     0,        trs80l2,  model3,   trs80m3,  trs80m3_state, init_trs80m3,  "Tandy Radio Shack", "TRS-80 Model III",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, trs80m4,     trs80m3,  0,        model4,   trs80m3,  trs80m3_state, init_trs80m4,  "Tandy Radio Shack", "TRS-80 Model 4",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1983, trs80m4p,    trs80m3,  0,        model4p,  trs80m4p, trs80m3_state, init_trs80m4p, "Tandy Radio Shack", "TRS-80 Model 4P",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
-COMP( 1982, cp500,       trs80m3,  0,        cp500,    trs80m3,  trs80m3_state, init_trs80m3,  "Prológica",         "CP-500 (PVIII REV.3)",    MACHINE_SUPPORTS_SAVE )
+COMP( 1982, cp500,       trs80m3,  0,        cp500,    trs80m3,  trs80m3_state, init_trs80m3,  "Prológica",         "CP-500 (PVIII REV.3)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

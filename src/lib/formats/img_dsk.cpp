@@ -115,7 +115,7 @@ bool img_format::save(io_generic *io, const std::vector<uint32_t> &variants, flo
 
 const char *img_format::name() const
 {
-	return "img";
+	return "mds2";
 }
 
 const char *img_format::description() const

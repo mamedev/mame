@@ -39,7 +39,7 @@ uses s24 style tilemaps (ram based?)
 #include "machine/gen_latch.h"
 #include "machine/i8251.h"
 #include "machine/mb8421.h"
-#include "sound/2612intf.h"
+#include "sound/ym2612.h"
 #include "video/segaic24.h"
 #include "emupal.h"
 #include "screen.h"

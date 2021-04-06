@@ -28,6 +28,7 @@ public:
 		m_reel2_scroll(*this, "reel2_scroll"),
 		m_reel3_scroll(*this, "reel3_scroll"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
+		m_bgcolor(0),
 		m_maincpu(*this, "maincpu"),
 		m_ppi(*this, "ppi8255_%u", 0U),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -269,6 +270,7 @@ public:
 
 protected:
 	TILE_GET_INFO_MEMBER(get_magical_fg_tile_info);
+	virtual void machine_start() override { goldstar_state::machine_start(); m_tile_bank = 0; }
 
 private:
 	optional_device<ds2401_device> m_fl7w4_id;
@@ -276,7 +278,7 @@ private:
 	uint8_t m_nmi_enable;
 	uint8_t m_vidreg;
 
-	int m_tile_bank;
+	uint8_t m_tile_bank;
 
 	void nd8lines_map(address_map &map);
 };

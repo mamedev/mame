@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ville Linde, Angelo Salese, hap
+// copyright-holders:Ville Linde, Angelo Salese
 
 #define SET_Z8(r)           (m_ccr |= ((uint8_t)r == 0) ? CC_Z : 0)
 #define SET_Z16(r)          (m_ccr |= ((uint16_t)r == 0) ? CC_Z : 0)

@@ -151,8 +151,21 @@ EPF8452AQC160-3 - Altera FLEX EPF8452AQC160-3 FPGA (QFP160)
 837-14351 (sticker)
 (C) SEGA 2001
 Later board revision, components layout more similar to Naomi 2, was added JP9-JP13 jumpers to configure CN8 serial port type, see below Naomi 2 description.
+However, CN8 serial lines uses TTL UART 3V3 voltage levels, not +-12V RS-232C like Naomi 2.
 
-Also known to exist later revison which have replaced Altera FLEX with Actel A54SX08A (315-6415) FPGA and have not populated IC69 93C46 (SN# EEPROM). Other details not known, there might be more differences.
+171-8183E
+837-14601 (sticker)
+(C) SEGA 2001
+Latest known revision, most notable difference - uses Actel FPGA instead of Altera FLEX.
+
+Main components are later revisions (same as was seen in Sega-made Atomiswave PCB):
+      HD6417091T - Hitachi SH4 CPU, CPU version register = 0x040206c8, where 06 means it should be 7750S type, but it's not and missing 7750S's expanded features like INTC "Interrupt priority D" register.
+       315-6318A - HOLLY chipset
+       315-6258A - video DAC/encoder, (QFP56)
+       315-6232A - Yamaha AICA SPU (QFP100)
+       315-6146A - custom Z80-based MCU (QFP176), was verified same firmware as 315-6146.
+        315-6415 - Actel A54SX08A FPGA
+
 
 Sega NAOMI 2 Mainboard PCB Layout
 ---------------------------------
@@ -828,6 +841,7 @@ Notes:
                                               Cart  Sticker   FL0-FL3   FLASHROMs   X76F100  CY37128  315-5881      Known Game
  Game                                         Type  on cart   FLASHROM  # of SOP48  IC @ 1F  IC @ 2J  IC @ 1M       code (1)    Notes
 ----------------------------------------------------------------------------------------------------------------------------------------
+Mazan: Flash of the Blade (Japan, MAZ1 Ver.A) F1X   25869812  1 (64Mb)   8 (128Mb)  present  NAODEC3  317-0266-COM  MAZ1        uses 2x Namco FCB JVS I/O (not dumped)
 Mazan: Flash of the Blade (World, MAZ2 Ver.A) F1X   25869812  1 (64Mb)   8 (128Mb)  present  NAODEC3  317-0266-COM  MAZ2        uses 2x Namco FCB JVS I/O (not dumped)
 Mazan: Flash of the Blade (US, MAZ3 Ver.A)    F1X   25869812  1 (64Mb)   8 (128Mb)  present  NAODEC3  317-0266-COM  MAZ3
 Ninja Assault (Japan, NJA1 Ver.A)             F3    25469801  3 (64Mb)   9 (128Mb)  present  NAODEC3  317-5068-COM  NJA1        uses Namco JYU JVS I/O
@@ -3294,7 +3308,9 @@ Info from roms starting at 0x1ff060
 EPR-21329  - HOUSE OF THE DEAD 2 IPL ROM 1998 11/14 (Japan)
 EPR-21330  - HOUSE OF THE DEAD 2 IPL ROM 1998 11/14 (USA)
 EPR-21331  - HOUSE OF THE DEAD 2 IPL ROM 1998 11/14 (Export)
+EPR-21332  - HOUSE OF THE DEAD 2 IPL ROM 1998 11/14 (Korea)
 
+EPR-21332 differ from EPR-21331 only by region byte - 4, came with 833-13635-03 "GAME BD HOD KOR" board
 EPR-21329 & EPR-21330 & EPR-21331 differ by 7 bytes:
 
 0x40000 is the region byte (only one region byte)
@@ -3456,8 +3472,10 @@ OFF  OFF  ON   Australia
 	ROM_LOAD16_WORD_SWAP_BIOS( 1,  "epr-21330.ic27", 0x000000, 0x200000, CRC(9e3bfa1b) SHA1(b539d38c767b0551b8e7956c1ff795de8bbe2fbc) ) \
 	ROM_SYSTEM_BIOS( 2, "bios2", "HOTD2 (Japan)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 2,  "epr-21329.ic27", 0x000000, 0x200000, CRC(d99e5b9b) SHA1(453ffb41b6197cac6d12e7814bb1d7281ccf1659) ) \
-	ROM_SYSTEM_BIOS( 3, "bios3", "HOTD2 (Proto)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 3,  "hotd2biosproto.ic27", 0x000000, 0x200000, CRC(ea74e967) SHA1(e4d037480eb6555d335a8ab9cd6c56122335586d) )
+	ROM_SYSTEM_BIOS( 3, "bios3", "HOTD2 (Korea)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 3,  "epr-21332.ic27", 0x000000, 0x200000, CRC(bd6ce0ec) SHA1(3d1ce5cb6978afe57967d8b53bc969259dd64749) ) \
+	ROM_SYSTEM_BIOS( 4, "bios4", "HOTD2 (Proto)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 4,  "hotd2biosproto.ic27", 0x000000, 0x200000, CRC(ea74e967) SHA1(e4d037480eb6555d335a8ab9cd6c56122335586d) )
 
 #define F355DLX_BIOS \
 	ROM_REGION( 0x200000, "maincpu", 0) \
@@ -5088,6 +5106,20 @@ ROM_START( mushi2k5 )
 	ROM_LOAD( "mpr-24282.ic7",  0x6800000, 0x1000000, CRC(9aa4ad5a) SHA1(2d81f99a579477c5db725f71c51f18afc15abce7) )
 
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1") // 315-5881 not populated
+ROM_END
+
+ROM_START( mushi2k61 )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "fpr-24340.ic8", 0x0000000, 0x4000000, CRC(d348a3a7) SHA1(29561c6d565000249e8b9b00ccf43b82a4887011) )
+	ROM_LOAD( "fpr-24341.ic9", 0x4000000, 0x4000000, CRC(bde9547c) SHA1(f67b12d33163e65b2e53fcbc41a841679431805e) )
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0444-jpn.ic3", 0, 0x800, CRC(6ded35a2) SHA1(0bb12bf6b090b865abd04d26d65f28c661464514) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )
 ROM_END
 
 ROM_START( mushi2k62 )
@@ -7616,6 +7648,25 @@ ROM_START( mazanu )
 
 	ROM_REGION( 0x10000000, "rom_board", ROMREGION_ERASEFF)
 	ROM_LOAD( "maz3vera.2d",  0x0800000, 0x0800000, CRC(a4344ec9) SHA1(b1a07da2b5a0c517d72f993a55aa3e57dec4a57a) )
+	ROM_LOAD( "maz1ma1.4m",  0x1000000, 0x1000000, CRC(68e12189) SHA1(5a434bd0305189620a62c785c5ac2812dae033d6) )
+	ROM_LOAD( "maz1ma2.4l",  0x2000000, 0x1000000, CRC(c7a05b44) SHA1(dfbeb3be5adfdf3d4f1d330f3654a5532eb28cc2) )
+	ROM_LOAD( "maz1ma3.4k",  0x3000000, 0x1000000, CRC(48e1a8a5) SHA1(8b0d83c02ab576d90c95aad297c7447326154c0e) )
+	ROM_LOAD( "maz1ma4.4j",  0x4000000, 0x1000000, CRC(0187cdab) SHA1(aaa9fd208103426eb0eee58ae0a64a191abcd126) )
+	ROM_LOAD( "maz1ma5.4h",  0x5000000, 0x1000000, CRC(c6885ee7) SHA1(14e7e017438adcbe0136d7d863af95fe65bd15d8) )
+	ROM_LOAD( "maz1ma6.4f",  0x6000000, 0x1000000, CRC(a6593c36) SHA1(627bf19d960037ea92b673b786a9da7208acd447) )
+	ROM_LOAD( "maz1ma7.4e",  0x7000000, 0x1000000, CRC(6103ad9c) SHA1(e4abbb5867cae6a9bf9067ab3a091ef7b18fa0cd) )
+	ROM_LOAD( "maz1ma8.4d",  0x8000000, 0x1000000, CRC(d46c9f40) SHA1(45eec7fa3d4261f12438e841254fa75d572331b3) )
+
+	// 25869812    2002     317-0266-COM   Naomi
+	ROM_PARAMETER( ":rom_board:segam2crypt:key", "280fea94" )
+ROM_END
+
+ROM_START( mazanj )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x10000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "maz1vera.2d",  0x0800000, 0x0800000, CRC(d157f771) SHA1(058ced0e2eee7db22aada987e158c93dbb6edf26) )
 	ROM_LOAD( "maz1ma1.4m",  0x1000000, 0x1000000, CRC(68e12189) SHA1(5a434bd0305189620a62c785c5ac2812dae033d6) )
 	ROM_LOAD( "maz1ma2.4l",  0x2000000, 0x1000000, CRC(c7a05b44) SHA1(dfbeb3be5adfdf3d4f1d330f3654a5532eb28cc2) )
 	ROM_LOAD( "maz1ma3.4k",  0x3000000, 0x1000000, CRC(48e1a8a5) SHA1(8b0d83c02ab576d90c95aad297c7447326154c0e) )
@@ -11635,6 +11686,9 @@ ROM_END
 /* 0064    */ GAME( 2001, wrungp,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "CRI / Sega", "Wave Runner GP", GAME_FLAGS )
 /* 0068    */ GAME( 2001, crakndj2,  naomi,    naomim2, crackndj,naomi_state, init_naomi,   ROT0, "Sega", "Crackin' DJ Part 2 (Japan)", GAME_FLAGS )
 /* 0073    */ GAME( 2001, inunoos,   naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Wow Entertainment / Sega", "Inu no Osanpo / Dog Walking (Japan, Export, Rev A)", GAME_FLAGS )
+// 0075 Star Horse 2001 (main screens)
+// 0076 Star Horse 2001 (sound)
+// 0077 Star Horse 2001 (live)
 /* 0078    */ GAME( 2002, shors2k1,  naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT270,"Sega", "Star Horse 2001 (satellite, Rev B)", GAME_FLAGS )
 /* 0083    */ GAME( 2001, derbyoc2,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Derby Owners Club II Ver.2.1 (Japan, Rev B)", GAME_FLAGS )
 /* 0084    */ GAME( 2001, vtenis2c,  naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua Tennis 2 / Power Smash 2 (Rev A)", GAME_FLAGS )
@@ -11666,7 +11720,7 @@ ROM_END
 /* 0164    */ GAME( 2005, mushi2eo,  mushik2e, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 1.001) (World)", GAME_FLAGS ) // not for Japan or Korea, version can be changed in secret menu, ~equivalent of Japanese 2K5 versions.
 /* 0164    */ GAME( 2005, mushik2e,  naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 2.001) (World)", GAME_FLAGS ) // not for Japan or Korea, version can be changed in secret menu, ~equivalent of Japanese 2K5 versions.
 /* 0166    */ GAME( 2006, zunou,     naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Touch De Zunou (Japan, Rev A)", GAME_FLAGS )
-// 0167 Mushiking 2K6 1ST (Japan)
+/* 0167    */ GAME( 2006, mushi2k61, naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2006 First (Japan)", GAME_FLAGS )
 /* 0170-01 */ GAME( 2007, manicpnc,  naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Manic Panic Ghosts! (USA, Export)", GAME_FLAGS )
 /* 0170    */ GAME( 2007, pokasuka,  manicpnc, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Pokasuka Ghost! (Japan)", GAME_FLAGS )
 /* 0171    */ GAME( 2006, mushi2k62, naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2006 Second (Japan)", GAME_FLAGS )
@@ -11687,7 +11741,6 @@ ROM_END
 // 01xx Mushiking 2K5 2ND (Japan)
 // note: Mushiking 2006 and 2007 versions was released for both NAOMI and SystemSP hardwares.
 // 0xxx Nittere Shiki! Mirai Yosou Studio
-// 0xxx Star Horse 2001 (main screens, server)
 // 0xxx Star Horse 2002 (whole set)
 
 /* Cartridge prototypes of games released on GD-ROM */
@@ -11767,6 +11820,7 @@ ROM_END
 /* 25509801 */ GAME( 2000, wldkickspw, wldkicks, naomim2,naomi, naomi_state, init_naomi, ROT0, "Namco",          "World Kicks PCB (World, WKC2 Ver.A)", GAME_FLAGS )    // "PCB" means upright version, uses analog button on control panel to kick the ball
 /* 25709801 */ GAME( 2001, gunsur2j,   gunsur2,  naomim2,naomi, naomi_state, init_naomi, ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (Japan, BHF1 Ver.E)", GAME_FLAGS )
 /* 25709801 */ GAME( 2001, gunsur2,    naomi,    naomim2,naomi, naomi_state, init_naomi, ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (World, BHF2 Ver.E)", GAME_FLAGS )
+/* 25869812 */ GAME( 2002, mazanj,     mazan,    naomim2,naomi, naomi_state, init_naomi, ROT0, "Namco",          "Mazan: Flash of the Blade (Japan, MAZ1 Ver.A)", GAME_FLAGS )
 /* 25869812 */ GAME( 2002, mazan,      naomi,    naomim2,naomi, naomi_state, init_naomi, ROT0, "Namco",          "Mazan: Flash of the Blade (World, MAZ2 Ver.A)", GAME_FLAGS )
 /* 25869812 */ GAME( 2002, mazanu,     mazan,    naomim2,naomi, naomi_state, init_naomi, ROT0, "Namco",          "Mazan: Flash of the Blade (US, MAZ3 Ver.A)", GAME_FLAGS )
 

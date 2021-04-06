@@ -117,6 +117,8 @@ public:
 		, m_palette(*this, "palette")
 		, m_plus_ram(*this, "plus_ram", 0x10000, ENDIANNESS_BIG)
 		, m_video_ram(*this, "video_ram", 0x800, ENDIANNESS_BIG)
+		, m_pram_bank(*this, "pram_bank")
+		, m_vram_bank(*this, "vram_bank")
 		, m_char_rom(*this, "chargen")
 	{
 	}
@@ -135,6 +137,8 @@ private:
 	required_device<palette_device> m_palette;
 	memory_share_creator<uint8_t> m_plus_ram;
 	memory_share_creator<uint8_t> m_video_ram;
+	memory_bank_creator m_pram_bank;
+	memory_bank_creator m_vram_bank;
 	required_memory_region m_char_rom;
 };
 

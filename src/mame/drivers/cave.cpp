@@ -92,8 +92,8 @@ Versions known to exist but not dumped:
 #include "machine/nmk112.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "sound/2203intf.h"
 #include "sound/ym2151.h"
+#include "sound/ym2203.h"
 #include "sound/ymz280b.h"
 #include "speaker.h"
 #include <algorithm>

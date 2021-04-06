@@ -343,7 +343,7 @@ http://www.brouhaha.com/~eric/hpcalc/chips/
 Software to look for
 --------------------
 
-00095-60978 "Service ROM - Used in trobleshooting the integral PC" via ambry
+00095-60978 "Service ROM - Used in troubleshooting the integral PC" via ambry
 00095-60925 "Service ROM" via service manual
 00095-60969 "Service Diagnostic Disc" via service manual
 00095-60950 "I/O Component-Level Diagnostic Disc" via serial interface service manual
@@ -380,6 +380,8 @@ Software to look for
 #include "screen.h"
 
 
+namespace {
+
 class hp_ipc_state : public driver_device
 {
 public:
@@ -406,10 +408,12 @@ public:
 	void hp_ipc(machine_config &config);
 	void hp9808a(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+private:
 	uint16_t mem_r(offs_t offset, uint16_t mem_mask);
 	void mem_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t mmu_r(offs_t offset);
@@ -422,14 +426,14 @@ private:
 
 	uint8_t floppy_id_r();
 	void floppy_id_w(uint8_t data);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	DECLARE_WRITE_LINE_MEMBER(irq_1);
 	DECLARE_WRITE_LINE_MEMBER(irq_2);
 	DECLARE_WRITE_LINE_MEMBER(irq_3);
-	DECLARE_WRITE_LINE_MEMBER(irq_4);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(irq_4);
 	DECLARE_WRITE_LINE_MEMBER(irq_5);
-	DECLARE_WRITE_LINE_MEMBER(irq_6);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(irq_6);
 	DECLARE_WRITE_LINE_MEMBER(irq_7);
 
 	emu_timer *m_bus_error_timer;
@@ -467,7 +471,6 @@ private:
 		return (m_mmu[(m_maincpu->get_fc() >> 1) & 3] + offset) & 0x3FFFFF;
 	}
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void set_bus_error(uint32_t address, bool write, uint16_t mem_mask);
 	bool m_bus_error;
 };
@@ -731,6 +734,7 @@ WRITE_LINE_MEMBER(hp_ipc_state::irq_7)
 void hp_ipc_state::machine_start()
 {
 	m_bus_error_timer = timer_alloc(0);
+	m_bus_error = false;
 
 	m_bankdev->set_bank(1);
 
@@ -759,9 +763,11 @@ void hp_ipc_state::machine_reset()
 }
 
 
-FLOPPY_FORMATS_MEMBER( hp_ipc_state::floppy_formats )
-	FLOPPY_HP_IPC_FORMAT
-FLOPPY_FORMATS_END
+void hp_ipc_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_HP_IPC_FORMAT);
+}
 
 static void hp_ipc_floppies(device_slot_interface &device)
 {
@@ -929,6 +935,9 @@ ROM_START(hp_ipc)
 ROM_END
 
 #define rom_hp9808a rom_hp_ipc
+
+} // Anonymous namespace
+
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY            FULLNAME                            FLAGS
 COMP( 1985, hp_ipc,  0,      0,      hp_ipc,  hp_ipc, hp_ipc_state, empty_init, "Hewlett-Packard", "Integral Personal Computer 9807A", 0)

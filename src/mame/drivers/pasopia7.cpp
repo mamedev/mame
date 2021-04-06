@@ -839,8 +839,8 @@ void pasopia7_state::p7_base(machine_config &config)
 	m_ppi2->out_pc_callback().set(FUNC(pasopia7_state::nmi_reg_w));
 
 	UPD765A(config, m_fdc, 8'000'000, true, true);
-	FLOPPY_CONNECTOR(config, "fdc:0", pasopia7_floppies, "525hd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", pasopia7_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", pasopia7_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", pasopia7_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats);
 
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);

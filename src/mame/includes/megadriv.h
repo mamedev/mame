@@ -8,8 +8,8 @@
 #include "coreutil.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/2612intf.h"
 #include "sound/sn76496.h"
+#include "sound/ym2612.h"
 #include "video/315_5313.h"
 
 /* Megadrive Console Specific */
@@ -31,14 +31,6 @@ INPUT_PORTS_EXTERN( megadriv );
 INPUT_PORTS_EXTERN( megadri6 );
 INPUT_PORTS_EXTERN( ssf2mdb );
 INPUT_PORTS_EXTERN( mk3mdb );
-
-struct genesis_z80_vars
-{
-	int z80_is_reset;
-	int z80_has_bus;
-	uint32_t z80_bank_addr;
-	std::unique_ptr<uint8_t[]> z80_prgram;
-};
 
 
 class md_base_state : public driver_device
@@ -69,6 +61,14 @@ public:
 	optional_ioport m_io_reset;
 	ioport_port *m_io_pad_3b[4];
 	ioport_port *m_io_pad_6b[4];
+
+struct genesis_z80_vars
+{
+	int z80_is_reset = 0;
+	int z80_has_bus = 0;
+	uint32_t z80_bank_addr = 0;
+	std::unique_ptr<uint8_t[]> z80_prgram;
+};
 
 	genesis_z80_vars m_genz80;
 	int m_version_hi_nibble;

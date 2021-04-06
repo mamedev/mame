@@ -13935,6 +13935,43 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="museumm">
+		<description>Museum Madness</description>
+		<year>1994</year>
+		<publisher>MECC</publisher>
+		<info name="developer" value="Novotrade Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Museum Madness [MECC] [1994] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="8a1b34bb" sha1="ae3ac268bae551c8d8a61d51e8018e63211989f4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Museum Madness [MECC] [1994] [3.5HD] [Disk 2 of 6].img" size="1474560" crc="b51b6c3c" sha1="01cf3cbf2060ce85b6f372085525b9f57d745994"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Museum Madness [MECC] [1994] [3.5HD] [Disk 3 of 6].img" size="1474560" crc="91d43840" sha1="bc1eb6e9ff5668b2af3c08360024e1da0318e119"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Museum Madness [MECC] [1994] [3.5HD] [Disk 4 of 6].img" size="1474560" crc="200db528" sha1="4558d5aabb3b210cd404aef0e9313a9e61eb6169"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Museum Madness [MECC] [1994] [3.5HD] [Disk 5 of 6].img" size="1474560" crc="ed6001e7" sha1="a4d62279756f1d64c77054f67b967f027f6f7af8"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Museum Madness [MECC] [1994] [3.5HD] [Disk 6 of 6].img" size="1474560" crc="807ec8c2" sha1="22fbc04618da52584049e3848671b5165b3c324f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mystict">
 		<description>Mystic Towers</description>
 		<year>1994</year>
@@ -15841,6 +15878,23 @@ license:CC0
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size = "4312032">
 				<rom name="thunderhawk ah-73m disk 2.mfm" size="4312032" crc="af736d24" sha1="9cd7a03fd44b908a654d13bdb7e41f15fa16d648" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="topgundz">
+		<description>Top Gun: Danger Zone</description>
+		<year>1991</year>
+		<publisher>Konami</publisher>
+		<info name="developer" value="Distinctive Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Top Gun - Danger Zone [Konami] [1991] [3.5HD] [Disk 1 of 2] [F-18 Hornet Disk].img" size="1474560" crc="2655f097" sha1="59d4e6b206b0f4c0807a2487e0cc56bcf44a7c6c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Top Gun - Danger Zone [Konami] [1991] [3.5HD] [Disk 2 of 2] [F-14 Tomcat Disk].img" size="1474560" crc="ab5bdade" sha1="841ca7a5813b4d85e5757d63399f7fff26e9a2d8"/>
 			</dataarea>
 		</part>
 	</software>

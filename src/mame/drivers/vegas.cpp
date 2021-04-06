@@ -17,7 +17,7 @@
         * CART Fury Championship Racing [250MHz RM7000, 32MB RAM, Durango + Denver + Voodoo 3, 16MB]
 
     Known bugs:
-        * not working yet
+        * Tournament Editions not working yet
 
 ***************************************************************************
 
@@ -177,10 +177,10 @@
  4x MT48LC1M16AT RAM
  1x 93clc46b       label A-22911   config eeprom
  1x texas instruments 8CA00YF (don't know what it is)
- 1x motorolla MPC948 clock distribution chip
+ 1x motorola MPC948 clock distribution chip
  100MHz crystal
  1x CMDPCI646U2 IDE controller
- 1x 7segment LED display (cycles IOASIC if you try to load a game that doesnt match the PIC, spins during normal play)
+ 1x 7segment LED display (cycles IOASIC if you try to load a game that doesn't match the PIC, spins during normal play)
  1x 232ACBN serial port controller
  other misc 74xxx parts
  Boot ROM 1.7
@@ -291,6 +291,9 @@
 
 #include "sf2049.lh"
 
+
+namespace {
+
 /*************************************
  *
  *  Debugging constants
@@ -376,6 +379,10 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(keypad_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gearshift_r);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	static constexpr unsigned SYSTEM_CLOCK = 100000000;
 
@@ -423,9 +430,6 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_cb);
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	void update_sio_irqs();
 
@@ -510,6 +514,8 @@ void vegas_state::machine_start()
 		if (LOG_SIO)
 			logerror("Did not find dcs2 sound board\n");
 	}
+
+	m_cmos_unlocked = 0;
 }
 
 
@@ -2627,6 +2633,7 @@ void vegas_state::init_cartfury()
 {
 }
 
+} // Anonymous namespace
 
 
 /*************************************

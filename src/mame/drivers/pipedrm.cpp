@@ -167,8 +167,8 @@ Added Multiple Coin Feature:
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/2608intf.h"
-#include "sound/2610intf.h"
+#include "sound/ym2608.h"
+#include "sound/ym2610.h"
 #include "speaker.h"
 
 
@@ -767,10 +767,10 @@ ROM_START( pipedrm )
 	ROM_LOAD16_BYTE( "a30.u12", 0x00000, 0x40000, CRC(50bc5e98) SHA1(b351af780d04e67a560935a9eeaedf597ac5bb1f) )
 	ROM_LOAD16_BYTE( "a29.u2",  0x00001, 0x40000, CRC(a240a448) SHA1(d64169258e91eb09e8685bcdd96b16bf56e82ef1) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "g71.u118", 0x00000, 0x80000, CRC(488e2fd1) SHA1(8ef8ceb2bd36a245138802f51babf62f17c30942) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "g72.u83", 0x00000, 0x80000, CRC(dc3d14be) SHA1(4220f3fd13487dd861ac84b1b0d3e92125b3cc19) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
@@ -801,10 +801,10 @@ ROM_START( pipedrmu )
 	ROM_LOAD16_BYTE( "a30.u12", 0x00000, 0x40000, CRC(50bc5e98) SHA1(b351af780d04e67a560935a9eeaedf597ac5bb1f) )
 	ROM_LOAD16_BYTE( "a29.u2",  0x00001, 0x40000, CRC(a240a448) SHA1(d64169258e91eb09e8685bcdd96b16bf56e82ef1) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "g71.u118", 0x00000, 0x80000, CRC(488e2fd1) SHA1(8ef8ceb2bd36a245138802f51babf62f17c30942) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "g72.u83", 0x00000, 0x80000, CRC(dc3d14be) SHA1(4220f3fd13487dd861ac84b1b0d3e92125b3cc19) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
@@ -836,10 +836,10 @@ ROM_START( pipedrmj )
 	ROM_LOAD16_BYTE( "a30.u12", 0x00000, 0x40000, CRC(50bc5e98) SHA1(b351af780d04e67a560935a9eeaedf597ac5bb1f) )
 	ROM_LOAD16_BYTE( "a29.u2",  0x00001, 0x40000, CRC(a240a448) SHA1(d64169258e91eb09e8685bcdd96b16bf56e82ef1) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "g71.u118", 0x00000, 0x80000, CRC(488e2fd1) SHA1(8ef8ceb2bd36a245138802f51babf62f17c30942) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "g72.u83", 0x00000, 0x80000, CRC(dc3d14be) SHA1(4220f3fd13487dd861ac84b1b0d3e92125b3cc19) )
 
 	ROM_REGION( 0x0800, "plds", 0 )
@@ -871,10 +871,10 @@ ROM_START( pipedrmt )
 	ROM_LOAD16_BYTE( "a30.u12", 0x00000, 0x40000, CRC(50bc5e98) SHA1(b351af780d04e67a560935a9eeaedf597ac5bb1f) )
 	ROM_LOAD16_BYTE( "a29.u2",  0x00001, 0x40000, CRC(a240a448) SHA1(d64169258e91eb09e8685bcdd96b16bf56e82ef1) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "g71.u118", 0x00000, 0x80000, CRC(488e2fd1) SHA1(8ef8ceb2bd36a245138802f51babf62f17c30942) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )
 	ROM_LOAD( "g72.u83", 0x00000, 0x80000, CRC(dc3d14be) SHA1(4220f3fd13487dd861ac84b1b0d3e92125b3cc19) )
 
 	ROM_REGION( 0x0800, "plds", 0 )

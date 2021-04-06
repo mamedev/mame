@@ -1272,10 +1272,12 @@ void msx2_state::msxr_floplist(machine_config &config)
 	SOFTWARE_LIST(config, "msx1_flp_l").set_compatible("msx1_flop");    // maybe not?
 }
 
-FLOPPY_FORMATS_MEMBER( msx_state::floppy_formats )
-	FLOPPY_MSX_FORMAT,
-	FLOPPY_DMK_FORMAT
-FLOPPY_FORMATS_END
+void msx_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_MSX_FORMAT);
+	fr.add(FLOPPY_DMK_FORMAT);
+}
 
 static void msx_floppies(device_slot_interface &device)
 {

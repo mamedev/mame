@@ -53,7 +53,8 @@ private:
 		SR_WINDOW_EDGE_1,
 		SW_WINDOW_LOAD,
 		SW_WINDOW_MIDDLE,
-		SW_WINDOW_END
+		SW_WINDOW_END,
+		SW_UNDERRUN,
 	};
 
 	floppy_image_device *m_floppy;
@@ -83,7 +84,7 @@ private:
 	u64 read_register_update_delay() const;
 	u64 write_sync_half_window_size() const;
 	inline bool is_sync() const;
-	void flush_write();
+	void flush_write(u64 when = 0);
 };
 
 DECLARE_DEVICE_TYPE(IWM, iwm_device)

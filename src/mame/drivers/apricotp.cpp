@@ -103,7 +103,7 @@ public:
 	void fp(machine_config &config);
 
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -554,10 +554,12 @@ void fp_state::machine_reset()
 //  MACHINE DRIVERS
 //**************************************************************************
 
-FLOPPY_FORMATS_MEMBER( fp_state::floppy_formats )
-	FLOPPY_APRIDISK_FORMAT
-FLOPPY_FORMATS_END
+void fp_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
 
+	fr.add(FLOPPY_APRIDISK_FORMAT);
+}
 
 //-------------------------------------------------
 //  machine_config( fp )

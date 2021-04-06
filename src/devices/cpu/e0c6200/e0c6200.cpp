@@ -839,7 +839,7 @@ void e0c6200_cpu_device::execute_one()
 
 		// illegal opcode
 		default:
-			logerror("%s unknown opcode $%03X at $%04X\n", tag(), m_op, m_prev_pc);
+			logerror("unknown opcode $%03X at $%04X\n", m_op, m_prev_pc);
 			break;
 
 			} // 0xff0

@@ -39,8 +39,8 @@ protected:
 	};
 
 	static const char *const s_name[];
-	static const uint8_t s_bits[];
-	static const uint32_t s_flags[];
+	static const u8 s_bits[];
+	static const u32 s_flags[];
 
 	u8 m_l2r[0x40];
 	u8 m_r2l[0x40];

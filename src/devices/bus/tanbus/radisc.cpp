@@ -45,10 +45,10 @@ void tanbus_radisc_device::device_add_mconfig(machine_config &config)
 	m_fdc->hld_wr_callback().set(FUNC(tanbus_radisc_device::fdc_hld_w));
 	m_fdc->set_force_ready(true);
 
-	FLOPPY_CONNECTOR(config, m_floppies[0], tandos_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppies[1], tandos_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppies[2], tandos_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppies[3], tandos_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[0], tandos_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[1], tandos_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[2], tandos_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[3], tandos_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(m_irq_line, FUNC(input_merger_device::in_w<IRQ_RTC>));

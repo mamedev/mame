@@ -251,8 +251,8 @@ void pulsar_state::pulsar(machine_config &config)
 	brg.ft_handler().append("dart", FUNC(z80dart_device::rxcb_w));
 
 	FD1797(config, m_fdc, 4_MHz_XTAL / 2);
-	FLOPPY_CONNECTOR(config, "fdc:0", pulsar_floppies, "flop", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", pulsar_floppies, "flop", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", pulsar_floppies, "flop", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pulsar_floppies, "flop", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 /* ROM definition */

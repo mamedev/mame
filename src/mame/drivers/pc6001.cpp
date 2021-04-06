@@ -1407,6 +1407,8 @@ void pc6001sr_state::machine_reset()
 	m_sr_text_mode = false;
 	m_sr_text_rows = 20;
 
+	m_kludge = 0;
+
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 	// should this be mirrored into the EXROM regions? hard to tell without an actual cart dump...
