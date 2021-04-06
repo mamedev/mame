@@ -108,6 +108,7 @@ b2m.cpp
 babbage.cpp
 banctec.cpp
 bandai_design_master.cpp
+basf7100.cpp
 basic52.cpp
 basssta.cpp
 bbc.cpp

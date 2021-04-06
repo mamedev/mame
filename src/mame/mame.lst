@@ -3251,6 +3251,9 @@ redbarnp                        //
 @source:bartop52.cpp
 barbball                        // (proto)          (c) 1983
 
+@source:basf7100.cpp
+basf7120                        //
+
 @source:basic52.cpp
 basic31                         //
 basic52                         //
