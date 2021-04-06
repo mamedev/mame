@@ -2,13 +2,15 @@
 // copyright-holders:Vas Crabb
 /***********************************************************************
 
-    Orange Micro Grappler+ Printer Interface
+    Orange Micro Grappler/Grappler+ Printer Interface
 
-    With references to schematic from Grappler™+ Printer Interface
-    Series Operators Manual (© Orange Micro, Inc. 1982).  This uses
-    the IC locations on the "long" version of the card.  The newer
-    "short" version of the card has slightly different circuitry
-    and completely different IC locations.
+    With references to schematics from The Grappler™ Interface
+    Operators Manual (Copyright 1982 Orance Micro, Inc.) and
+    Grappler™+ Printer Interface Series Operators Manual (© Orange
+    Micro, Inc. 1982).  This uses the IC locations on the "long"
+    version of the Grappler+ card - the newer "short" version of the
+    card has slightly different circuitry and completely different IC
+    locations.
 
     26-pin two-row header to printer:
 
@@ -56,7 +58,84 @@
 #include "cpu/mcs48/mcs48.h"
 
 
-class a2bus_grapplerplus_device_base : public device_t, public device_a2bus_card_interface
+class a2bus_grappler_device_base : public device_t, public device_a2bus_card_interface
+{
+public:
+	// device_a2bus_card_interface implementation
+	virtual u8 read_c800(u16 offset) override;
+
+protected:
+	a2bus_grappler_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+
+	// signal state
+	u8 busy_in() const { return m_busy_in; }
+	u8 pe_in() const { return m_pe_in; }
+	u8 slct_in() const { return m_slct_in; }
+
+	required_device<centronics_device>      m_printer_conn;
+	required_device<output_latch_device>    m_printer_out;
+	required_region_ptr<u8>                 m_rom;
+
+protected:
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+
+	// helpers
+	void set_rom_bank(u16 rom_bank);
+
+private:
+	// printer status inputs
+	DECLARE_WRITE_LINE_MEMBER(busy_w);
+	DECLARE_WRITE_LINE_MEMBER(pe_w);
+	DECLARE_WRITE_LINE_MEMBER(slct_w);
+
+	// synchronised printer status inputs
+	void set_busy_in(void *ptr, s32 param);
+	void set_pe_in(void *ptr, s32 param);
+	void set_slct_in(void *ptr, s32 param);
+
+	u16 m_rom_bank;     // U2D (pin 13)
+	u8  m_busy_in;      // printer connector pin 21 (synchronised)
+	u8  m_pe_in;        // printer connector pin 23 (synchronised)
+	u8  m_slct_in;      // printer connector pin 25 (synchronised)
+};
+
+
+class a2bus_grappler_device : public a2bus_grappler_device_base
+{
+public:
+	a2bus_grappler_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+	// device_a2bus_card_interface implementation
+	virtual u8 read_c0nx(u8 offset) override;
+	virtual void write_c0nx(u8 offset, u8 data) override;
+	virtual u8 read_cnxx(u8 offset) override;
+	virtual void write_cnxx(u8 offset, u8 data) override;
+
+protected:
+	// device_t implementation
+	virtual tiny_rom_entry const *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	// printer status inputs
+	DECLARE_WRITE_LINE_MEMBER(ack_w);
+
+	// synchronised signals
+	void set_data(void *ptr, s32 param);
+	void set_strobe(void *ptr, s32 param);
+	void set_ack_in(void *ptr, s32 param);
+
+	u8  m_strobe;       // U3 (pin 4)
+	u8  m_ack_latch;    // U3 (pin 13)
+	u8  m_ack_in;       // printer connector pin 19 (synchronised)
+};
+
+
+class a2bus_grapplerplus_device_base : public a2bus_grappler_device_base
 {
 public:
 	// DIP switch handlers
@@ -66,13 +145,11 @@ public:
 	virtual void write_c0nx(u8 offset, u8 data) override;
 	virtual u8 read_cnxx(u8 offset) override;
 	virtual void write_cnxx(u8 offset, u8 data) override;
-	virtual u8 read_c800(u16 offset) override;
 
 protected:
 	a2bus_grapplerplus_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
-	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -82,39 +159,20 @@ protected:
 
 	// signal state
 	u8 ack_latch() const { return m_ack_latch; }
-	u8 busy_in() const { return m_busy_in; }
-	u8 pe_in() const { return m_pe_in; }
-	u8 slct_in() const { return m_slct_in; }
 
-	required_device<centronics_device>      m_printer_conn;
-	required_device<output_latch_device>    m_printer_out;
-	required_ioport                         m_s1;
+	required_ioport m_s1;
 
 private:
-	// printer status inputs
-	DECLARE_WRITE_LINE_MEMBER(busy_w);
-	DECLARE_WRITE_LINE_MEMBER(pe_w);
-	DECLARE_WRITE_LINE_MEMBER(slct_w);
-
 	// synchronised printer status inputs
 	void set_ack_in(void *ptr, s32 param);
-	void set_busy_in(void *ptr, s32 param);
-	void set_pe_in(void *ptr, s32 param);
-	void set_slct_in(void *ptr, s32 param);
 
 	// for derived devices to implement
 	virtual void data_latched(u8 data) = 0;
 	virtual void ack_latch_set() { }
 	virtual void ack_latch_cleared() { }
 
-	required_region_ptr<u8> m_rom;
-
-	u16 m_rom_bank;     // U2D (pin 13)
 	u8  m_ack_latch;    // U2C (pin 9)
 	u8  m_ack_in;       // printer connector pin 19 (synchronised)
-	u8  m_busy_in;      // printer connector pin 21 (synchronised)
-	u8  m_pe_in;        // printer connector pin 23 (synchronised)
-	u8  m_slct_in;      // printer connector pin 25 (synchronised)
 };
 
 
@@ -218,6 +276,7 @@ protected:
 };
 
 
+DECLARE_DEVICE_TYPE(A2BUS_GRAPPLER, a2bus_grappler_device)
 DECLARE_DEVICE_TYPE(A2BUS_GRAPPLERPLUS, a2bus_grapplerplus_device)
 DECLARE_DEVICE_TYPE(A2BUS_BUFGRAPPLERPLUS, a2bus_buf_grapplerplus_device)
 DECLARE_DEVICE_TYPE(A2BUS_BUFGRAPPLERPLUSA, a2bus_buf_grapplerplus_reva_device)
