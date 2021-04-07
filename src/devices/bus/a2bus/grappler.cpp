@@ -235,10 +235,13 @@ u8 a2bus_grappler_device::read_c0nx(u8 offset)
 {
 	LOG("Read C0n%01X\n", offset);
 
-	if (BIT(offset, 1)) // A1 - assert strobe
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device::set_strobe), this), 0);
-	else if (BIT(offset, 2)) // A2 - release strobe
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device::set_strobe), this), 1);
+	if (!machine().side_effects_disabled())
+	{
+		if (BIT(offset, 1)) // A1 - assert strobe
+			machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device::set_strobe), this), 0);
+		else if (BIT(offset, 2)) // A2 - release strobe
+			machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device::set_strobe), this), 1);
+	}
 
 	if (BIT(offset, 0)) // A0 - printer status
 	{
