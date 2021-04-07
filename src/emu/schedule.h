@@ -19,8 +19,22 @@
 
 
 //**************************************************************************
-//  MACROS
+//  DEBUGGING
 //**************************************************************************
+
+// turn this on to enable aggressive assertions and other checks
+#ifdef MAME_DEBUG
+#define SCHEDULER_DEBUG (1)
+#else
+#define SCHEDULER_DEBUG (1)
+#endif
+
+// if SCHEDULER_DEBUG is on, make assertions fire regardless of MAME_DEBUG
+#if (SCHEDULER_DEBUG)
+#define scheduler_assert(x) do { if (!(x)) { osd_printf_error("scheduler_assert: " #x "\n"); osd_break_into_debugger("scheduler_assert: " #x "\n"); } } while (0)
+#else
+#define scheduler_assert assert
+#endif
 
 #define COLLECT_SCHEDULER_STATS (1)
 #if (COLLECT_SCHEDULER_STATS)
@@ -30,6 +44,11 @@
 #define INCREMENT_SCHEDULER_STAT(x)
 #define SET_SCHEDULER_STAT(x)
 #endif
+
+
+//**************************************************************************
+//  MACROS
+//**************************************************************************
 
 #define TIMER_CALLBACK_MEMBER(name)     void name(void *ptr, s32 param)
 
@@ -766,7 +785,7 @@ inline void timer_expired_delegate::form6_callback(timer_instance const &timer)
 
 inline void transient_timer_factory::call_after(attotime const &duration, u64 param, u64 param2, u64 param3)
 {
-	assert(!duration.is_never());
+	scheduler_assert(!duration.is_never());
 	m_callback.scheduler().instance_alloc().init_transient(m_callback, duration)
 		.set_params(param, param2, param3);
 }

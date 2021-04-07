@@ -243,7 +243,7 @@ timer_instance::~timer_instance()
 
 timer_instance &timer_instance::init_persistent(timer_callback &callback)
 {
-	assert(callback.persistent() != nullptr);
+	scheduler_assert(callback.persistent() != nullptr);
 	m_callback = &callback;
 
 	// everything else has been initialized by the constructor;
@@ -262,7 +262,7 @@ timer_instance &timer_instance::init_persistent(timer_callback &callback)
 
 timer_instance &timer_instance::init_transient(timer_callback &callback, attotime const &duration)
 {
-	assert(callback.persistent() == nullptr);
+	scheduler_assert(callback.persistent() == nullptr);
 	m_callback = &callback;
 
 	// ensure the entire timer state is clean, since we re-use these
@@ -1239,7 +1239,7 @@ void device_scheduler::add_scheduling_quantum(attotime const &quantum, attotime 
 {
 	INCREMENT_SCHEDULER_STAT(m_add_scheduling_quantum);
 
-	assert(quantum.seconds() == 0);
+	scheduler_assert(quantum.seconds() == 0);
 
 	attotime curtime = time();
 	attotime expire = curtime + duration;

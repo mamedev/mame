@@ -371,7 +371,7 @@ inline subseconds device_execute_interface::run_for(subseconds subs)
 	// compute how many cycles we want to execute, rounding up
 	// note that we pre-cache subseconds per cycle
 	subseconds subseconds_per_cycle = m_subseconds_per_cycle;
-	u32 ran = subs / subseconds_per_cycle + 1;
+	s32 ran = subs / subseconds_per_cycle + 1;
 
 	// store the number of cycles we've requested in the executing
 	// device
@@ -396,18 +396,18 @@ inline subseconds device_execute_interface::run_for(subseconds subs)
 	// icount is negative, then we ran more than requested (this is both
 	// allowed and expected), so the subtract here typically will
 	// increase ran
-	assert(ran >= *icountptr);
+	scheduler_assert(ran >= *icountptr);
 	ran -= *icountptr;
 
 	// if cycles were stolen (i.e., icount was artificially decremented)
 	// then ran isn't actually correct, so remove the number of cycles
 	// that we did that for
-	assert(ran >= m_cycles_stolen);
+	scheduler_assert(ran >= m_cycles_stolen);
 	ran -= m_cycles_stolen;
 
 	// time should never go backwards, nor should we ever attempt to
 	// execute more than a full second (minimum quantum prevents that)
-	assert(ran >= 0 && ran < m_cycles_per_second);
+	scheduler_assert(ran >= 0 && ran < m_cycles_per_second);
 
 	// update the device's count of total cycles executed with the
 	// true number of cycles
