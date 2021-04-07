@@ -112,7 +112,7 @@ private:
 	uint8_t m_adc_shift;
 	uint16_t m_last_port0;
 	uint8_t m_shifter_state;
-	double m_timer_rate;
+	uint32_t m_timer_rate;
 	uint16_t m_bit_index;
 	int m_lastval;
 	uint32_t *m_generic_speedup;

@@ -335,8 +335,8 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 		{
 			// set timer pulse
 			attotime one_second = attotime::from_hz(clock() / 32768.0);
-			const double mul[4] = { 1.0, 10.0, 30.0, 60.0 };
-			m_timer_tp->adjust(attotime::zero, 0, one_second * mul[m_c - MODE_TP_1S_INT] / 2.0);
+			const int mul[4] = { 1, 10, 30, 60 };
+			m_timer_tp->adjust(attotime::zero, 0, one_second * mul[m_c - MODE_TP_1S_INT] / 2);
 
 			break;
 		}

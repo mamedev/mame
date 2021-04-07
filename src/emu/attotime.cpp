@@ -66,6 +66,10 @@ std::enable_if_t<std::is_integral<T>::value, attotime> &attotime::operator*=(T f
 	return *this;
 }
 
+template attotime &attotime::operator*=<s8>(s8);
+template attotime &attotime::operator*=<u8>(u8);
+template attotime &attotime::operator*=<s16>(s16);
+template attotime &attotime::operator*=<u16>(u16);
 template attotime &attotime::operator*=<s32>(s32);
 template attotime &attotime::operator*=<u32>(u32);
 template attotime &attotime::operator*=<s64>(s64);
@@ -120,6 +124,10 @@ std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, attotime> &attotim
 	return *this;
 }
 
+template attotime &attotime::operator/=<s8>(s8);
+template attotime &attotime::operator/=<u8>(u8);
+template attotime &attotime::operator/=<s16>(s16);
+template attotime &attotime::operator/=<u16>(u16);
 template attotime &attotime::operator/=<s32>(s32);
 template attotime &attotime::operator/=<u32>(u32);
 

@@ -2367,7 +2367,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(sega315_5313_device::megadriv_scanline_timer_callba
 		machine().scheduler().synchronize();
 		vdp_handle_scanline_callback(param);
 
-		m_megadriv_scanline_timer->adjust(attotime::from_hz(get_framerate()) / double(m_total_scanlines));
+		m_megadriv_scanline_timer->adjust(attotime::from_hz(get_framerate()) / m_total_scanlines);
 	}
 	else
 	{

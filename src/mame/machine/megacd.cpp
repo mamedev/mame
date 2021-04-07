@@ -1852,7 +1852,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::dma_timer_callback )
 	// timed reset of flags
 	scd_mode_dmna_ret_flags |= 0x0021;
 
-	m_dma_timer->adjust(attotime::from_hz(get_framerate()) / double(m_total_scanlines));
+	m_dma_timer->adjust(attotime::from_hz(get_framerate()) / m_total_scanlines);
 
 }
 

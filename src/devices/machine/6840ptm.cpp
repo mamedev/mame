@@ -342,7 +342,7 @@ uint16_t ptm6840_device::compute_counter( int counter ) const
 	LOGMASKED(LOG_COUNTERS, "Timer #%d %s clock freq %f \n", counter + 1, (m_control_reg[counter] & INTERNAL_CLK_EN) ? "internal" : "external", clk);
 
 	// See how many are left
-	int remaining = (m_timer[counter]->remaining() * clk).as_double();
+	int remaining = m_timer[counter]->remaining().as_ticks(clk);
 
 	// Adjust the count for dual byte mode
 	if (m_control_reg[counter] & COUNT_MODE_8BIT)
