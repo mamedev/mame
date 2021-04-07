@@ -60,6 +60,12 @@ class subseconds
 	// save_manager needs direct access for save/restore purposes
 	friend class save_manager;
 
+	// a divide that rounds up
+	static constexpr s64 divide_up(s64 dividend, s64 divisor)
+	{
+		return (dividend - 1) / divisor + 1;
+	}
+
 public:
 	// core definitions
 	static constexpr s64 PER_SECOND_SQRT = 1'000'000'000;
@@ -69,7 +75,7 @@ public:
 	static constexpr s64 PER_NANOSECOND = PER_SECOND / 1'000'000'000;
 
 	// maximum raw value
-	static constexpr s64 MAX_RAW = 2 * PER_SECOND;
+	static constexpr s64 MAX_RAW = PER_SECOND + (PER_SECOND - 1);
 	static constexpr s64 MIN_RAW = -2 * PER_SECOND;
 
 	// constructor
@@ -106,16 +112,18 @@ public:
 	}
 
 	// multiply by an integral factor
-	subseconds &operator*=(s32 factor) noexcept
+	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
+	subseconds &operator*=(T factor) noexcept
 	{
-		m_subseconds *= factor;
+		m_subseconds *= s64(factor);
 		return *this;
 	}
 
 	// divide by an integral factor
-	subseconds &operator/=(s32 factor)
+	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
+	subseconds &operator/=(T factor)
 	{
-		m_subseconds /= factor;
+		m_subseconds /= s64(factor);
 		return *this;
 	}
 
@@ -132,19 +140,19 @@ public:
 	// static creators
 	static constexpr subseconds from_raw(s64 raw) { return subseconds(raw); }
 	static constexpr subseconds from_double(double secs) { return subseconds(s64(secs * double(PER_SECOND))); }
-	static constexpr subseconds from_msec(s64 msec) { return subseconds(msec * PER_MILLISECOND); }
-	static constexpr subseconds from_usec(s64 usec) { return subseconds(usec * PER_MICROSECOND); }
-	static constexpr subseconds from_nsec(s64 nsec) { return subseconds(nsec * PER_NANOSECOND); }
+	static constexpr subseconds from_msec(s32 msec) { return subseconds(msec * PER_MILLISECOND); }
+	static constexpr subseconds from_usec(s32 usec) { return subseconds(usec * PER_MICROSECOND); }
+	static constexpr subseconds from_nsec(s32 nsec) { return subseconds(nsec * PER_NANOSECOND); }
 	static constexpr subseconds from_hz(double hz)
 	{
 		s64 const hz_int = s64(hz);
 		if (hz == double(hz_int))
-			return subseconds(PER_SECOND / hz_int + 1);
+			return subseconds(divide_up(PER_SECOND, hz_int));
 		return subseconds(s64(double(PER_SECOND) / hz) + 1);
 	}
-	static constexpr subseconds from_hz(u32 hz) { return subseconds((hz > 1) ? (PER_SECOND / hz + 1) : MAX_RAW); }
-	static constexpr subseconds from_hz(u64 hz) { return subseconds((hz > 1) ? (PER_SECOND / hz + 1) : MAX_RAW); }
-	static constexpr subseconds from_hz(int hz) { return subseconds((hz > 1) ? (PER_SECOND / hz + 1) : MAX_RAW); }
+	static constexpr subseconds from_hz(u32 hz) { return subseconds((hz > 0) ? divide_up(PER_SECOND, hz) : MAX_RAW); }
+	static constexpr subseconds from_hz(u64 hz) { return subseconds((hz > 0) ? divide_up(PER_SECOND, hz) : MAX_RAW); }
+	static constexpr subseconds from_hz(int hz) { return subseconds((hz > 0) ? divide_up(PER_SECOND, hz) : MAX_RAW); }
 	static subseconds from_hz(XTAL const &xtal) { return from_hz(xtal.dvalue()); }
 
 	// conversion helpers
@@ -160,10 +168,11 @@ public:
 	// friend functions
 	friend subseconds operator+(subseconds const &left, subseconds const &right) noexcept;
 	friend subseconds operator-(subseconds const &left, subseconds const &right) noexcept;
-	friend subseconds operator*(subseconds const &left, u32 factor) noexcept;
-	friend subseconds operator*(u32 factor, subseconds const &right) noexcept;
-	friend u64 operator/(subseconds const &left, subseconds const &right);
-	friend subseconds operator/(subseconds const &left, u32 factor);
+	friend subseconds operator-(subseconds const &left) noexcept;
+	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> friend subseconds operator*(subseconds const &left, T factor) noexcept;
+	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> friend subseconds operator*(T factor, subseconds const &right) noexcept;
+	friend s64 operator/(subseconds const &left, subseconds const &right);
+	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> friend subseconds operator/(subseconds const &left, T factor);
 	friend constexpr bool operator==(subseconds const &left, subseconds const &right) noexcept;
 	friend constexpr bool operator!=(subseconds const &left, subseconds const &right) noexcept;
 	friend constexpr bool operator<(subseconds const &left, subseconds const &right) noexcept;
@@ -188,6 +197,12 @@ inline subseconds operator+(subseconds const &left, subseconds const &right) noe
 	return subseconds(left.m_subseconds + right.m_subseconds);
 }
 
+// negation of subseconds
+inline subseconds operator-(subseconds const &left) noexcept
+{
+	return subseconds(-left.m_subseconds);
+}
+
 // subtactions of two subseconds
 inline subseconds operator-(subseconds const &left, subseconds const &right) noexcept
 {
@@ -195,23 +210,26 @@ inline subseconds operator-(subseconds const &left, subseconds const &right) noe
 }
 
 // multiplication of a subseconds value by an integral factor
-inline subseconds operator*(subseconds const &left, u32 factor) noexcept
+template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
+inline subseconds operator*(subseconds const &left, T factor) noexcept
 {
 	return subseconds(left.m_subseconds * s64(factor));
 }
-inline subseconds operator*(u32 factor, subseconds const &right) noexcept
+template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
+inline subseconds operator*(T factor, subseconds const &right) noexcept
 {
 	return subseconds(s64(factor) * right.m_subseconds);
 }
 
 // division of a subseconds value by another subseconds value, producing a raw integer
-inline u64 operator/(subseconds const &left, subseconds const &right)
+inline s64 operator/(subseconds const &left, subseconds const &right)
 {
 	return left.m_subseconds / right.m_subseconds;
 }
 
 // division of a subseconds value by an integral factor
-inline subseconds operator/(subseconds const &left, u32 factor)
+template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
+inline subseconds operator/(subseconds const &left, T factor)
 {
 	return subseconds(left.m_subseconds / s64(factor));
 }
@@ -319,13 +337,13 @@ public:
 	/** Create an attotime from a integer count of nanoseconds @nsec */
 	static constexpr attotime from_nsec(s64 nsec) { return attotime(nsec / 1000000000, (nsec % 1000000000) * (subseconds::PER_SECOND / 1000000000)); }
 	/** Create an attotime from at the given frequency @frequency */
-	static constexpr attotime from_hz(u32 frequency) { return (frequency > 1) ? attotime(0, s64(subseconds::PER_SECOND / frequency) + 1) : (frequency == 1) ? attotime::from_seconds(1) : attotime::never; }
+	static constexpr attotime from_hz(u32 frequency) { return (frequency > 1) ? attotime(0, s64((subseconds::PER_SECOND - 1) / frequency) + 1) : (frequency == 1) ? attotime::from_seconds(1) : attotime::never; }
 	static constexpr attotime from_hz(int frequency) { return (frequency > 0) ? from_hz(u32(frequency)) : attotime::never; }
-	static attotime from_hz(const XTAL &xtal) { return (xtal.dvalue() > 1.0) ? attotime(0, s64(subseconds::PER_SECOND / xtal) + 1) : from_hz(xtal.dvalue()); }
+	static attotime from_hz(const XTAL &xtal) { return (xtal.dvalue() > 1.0) ? attotime(0, s64((subseconds::PER_SECOND - 1) / xtal) + 1) : from_hz(xtal.dvalue()); }
 	static attotime from_hz(double frequency)
 	{
 		if (frequency > 1.0)
-			return attotime(0, s64(subseconds::PER_SECOND / frequency) + 1);
+			return attotime(0, s64((subseconds::PER_SECOND - 1) / frequency) + 1);
 		else if (frequency > 0.0)
 		{
 			double i, f = modf(1.0 / frequency, &i);
@@ -338,8 +356,10 @@ public:
 	// math
 	attotime &operator+=(attotime const &right) noexcept;
 	attotime &operator-=(attotime const &right) noexcept;
-	attotime &operator*=(u32 factor);
-	attotime &operator/=(u32 factor);
+	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
+	attotime &operator*=(T factor);
+	template<typename T, std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, bool> = true>
+	attotime &operator/=(T factor);
 
 	// constants
 	static attotime const never;
@@ -348,9 +368,10 @@ public:
 	// friend functions
 	friend attotime operator+(attotime const &left, attotime const &right) noexcept;
 	friend attotime operator-(attotime const &left, attotime const &right) noexcept;
-	friend attotime operator*(attotime const &left, u32 factor);
-	friend attotime operator*(u32 factor, attotime const &right);
-	friend attotime operator/(attotime const &left, u32 factor);
+	friend attotime operator-(attotime const &left) noexcept;
+	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> friend attotime operator*(attotime const &left, T factor);
+	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> friend attotime operator*(T factor, attotime const &right);
+	template<typename T, std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, bool> = true> friend attotime operator/(attotime const &left, T factor);
 	friend constexpr bool operator==(attotime const &left, attotime const &right) noexcept;
 	friend constexpr bool operator!=(attotime const &left, attotime const &right) noexcept;
 	friend constexpr bool operator<(attotime const &left, attotime const &right) noexcept;
@@ -523,16 +544,29 @@ inline attotime &attotime::operator-=(const attotime &right) noexcept
 	return *this;
 }
 
+inline attotime operator-(const attotime &left) noexcept
+{
+	attotime result;
+
+	// if time1 is never, return never
+	if (left.m_seconds >= attotime::MAX_SECONDS)
+		return attotime::never;
+
+	return attotime(-left.m_seconds - (left.m_subseconds != 0), subseconds::PER_SECOND - left.m_subseconds);
+}
+
 
 /** handle multiplication by an integral factor; defined in terms of the assignment operators */
-inline attotime operator*(const attotime &left, u32 factor)
+template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
+inline attotime operator*(const attotime &left, T factor)
 {
 	attotime result = left;
 	result *= factor;
 	return result;
 }
 
-inline attotime operator*(u32 factor, const attotime &right)
+template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
+inline attotime operator*(T factor, const attotime &right)
 {
 	attotime result = right;
 	result *= factor;
@@ -540,7 +574,8 @@ inline attotime operator*(u32 factor, const attotime &right)
 }
 
 /** handle division by an integral factor; defined in terms of the assignment operators */
-inline attotime operator/(const attotime &left, u32 factor)
+template<typename T, std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, bool>>
+inline attotime operator/(const attotime &left, T factor)
 {
 	attotime result = left;
 	result /= factor;
@@ -595,7 +630,7 @@ inline attotime attotime::from_ticks(u64 ticks, u32 frequency)
 {
 	if (frequency > 0)
 	{
-		s64 attos_per_tick = s64(subseconds::PER_SECOND / frequency);
+		s64 attos_per_tick = s64((subseconds::PER_SECOND - 1) / frequency) + 1;
 
 		if (ticks < frequency)
 			return attotime(subseconds::from_raw(ticks * attos_per_tick));
@@ -654,7 +689,7 @@ public:
 	static constexpr s64 PER_SECOND = 0x4000000000000000ll;
 	static constexpr s64 PER_MILLISECOND = PER_SECOND / 1000;
 	static constexpr s64 PER_MICROSECOND = PER_SECOND / 1000000;
-	static constexpr s64 PER_NANOSECOND = PER_SECOND / 1000000;
+	static constexpr s64 PER_NANOSECOND = PER_SECOND / 1000000000;
 
 	// minimum/maximum raw values
 	static constexpr s64 MAX_RAW = PER_SECOND + (PER_SECOND - 1);
@@ -694,16 +729,18 @@ public:
 	}
 
 	// multiply by an integral factor
-	subseconds &operator*=(s32 factor) noexcept
+	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
+	subseconds &operator*=(T factor) noexcept
 	{
-		m_subseconds *= factor;
+		m_subseconds *= s64(factor);
 		return *this;
 	}
 
 	// divide by an integral factor
-	subseconds &operator/=(s32 factor)
+	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
+	subseconds &operator/=(T factor)
 	{
-		m_subseconds /= factor;
+		m_subseconds /= s64(factor);
 		return *this;
 	}
 
@@ -749,10 +786,10 @@ public:
 	friend subseconds operator+(subseconds const &left, subseconds const &right) noexcept;
 	friend subseconds operator-(subseconds const &left) noexcept;
 	friend subseconds operator-(subseconds const &left, subseconds const &right) noexcept;
-	friend subseconds operator*(subseconds const &left, s32 factor) noexcept;
-	friend subseconds operator*(s32 factor, subseconds const &right) noexcept;
+	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> friend subseconds operator*(subseconds const &left, T factor) noexcept;
+	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> friend subseconds operator*(T factor, subseconds const &right) noexcept;
 	friend s64 operator/(subseconds const &left, subseconds const &right);
-	friend subseconds operator/(subseconds const &left, s32 factor);
+	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> friend subseconds operator/(subseconds const &left, T factor);
 	friend constexpr bool operator==(subseconds const &left, subseconds const &right) noexcept;
 	friend constexpr bool operator!=(subseconds const &left, subseconds const &right) noexcept;
 	friend constexpr bool operator<(subseconds const &left, subseconds const &right) noexcept;
@@ -790,11 +827,14 @@ inline subseconds operator-(subseconds const &left, subseconds const &right) noe
 }
 
 // multiplication of a subseconds value by an integral factor
-inline subseconds operator*(subseconds const &left, s32 factor) noexcept
+template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
+inline subseconds operator*(subseconds const &left, T factor) noexcept
 {
 	return subseconds(left.m_subseconds * s64(factor));
 }
-inline subseconds operator*(s32 factor, subseconds const &right) noexcept
+
+template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
+inline subseconds operator*(T factor, subseconds const &right) noexcept
 {
 	return subseconds(s64(factor) * right.m_subseconds);
 }
@@ -806,7 +846,8 @@ inline s64 operator/(subseconds const &left, subseconds const &right)
 }
 
 // division of a subseconds value by an integral factor
-inline subseconds operator/(subseconds const &left, s32 factor)
+template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
+inline subseconds operator/(subseconds const &left, T factor)
 {
 	return subseconds(left.m_subseconds / s64(factor));
 }
@@ -984,23 +1025,23 @@ public:
 
 	// creation from ticks at a given frequency
 	static attotime from_ticks(u64 ticks, subseconds period);
-	static attotime from_ticks(u64 ticks, u32 frequency) { return attotime(ticks / frequency, (ticks * frequency) * subseconds::from_hz(frequency)); }
+	static attotime from_ticks(u64 ticks, u32 frequency) { return attotime(ticks / frequency, u32(ticks % frequency) * subseconds::from_hz(frequency)); }
 	static attotime from_ticks(u64 ticks, const XTAL &xtal) { return from_ticks(ticks, xtal.value()); }
 
 	// math
 	constexpr attotime &operator+=(attotime const &right) noexcept;
 	constexpr attotime &operator-=(attotime const &right) noexcept;
-	constexpr attotime &operator*=(s32 factor);
-	constexpr attotime &operator/=(s32 factor);
+	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> constexpr attotime &operator*=(T factor);
+	template<typename T, std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, bool> = true> constexpr attotime &operator/=(T factor);
 	s64 operator/=(subseconds factor);
 
 	// friend math
 	friend constexpr attotime operator+(attotime const &left, attotime const &right) noexcept;
 	friend constexpr attotime operator-(attotime const &left) noexcept;
 	friend constexpr attotime operator-(attotime const &left, attotime const &right) noexcept;
-	friend constexpr attotime operator*(attotime const &left, s32 factor);
-	friend constexpr attotime operator*(s32 factor, attotime const &right);
-	friend constexpr attotime operator/(attotime const &left, s32 factor);
+	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> friend constexpr attotime operator*(attotime const &left, T factor);
+	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> friend constexpr attotime operator*(T factor, attotime const &right);
+	template<typename T, std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, bool> = true> friend constexpr attotime operator/(attotime const &left, T factor);
 	friend s64 operator/(attotime const &left, subseconds factor);
 
 	// friend comparisons
@@ -1097,34 +1138,37 @@ inline constexpr attotime &attotime::operator-=(const attotime &right) noexcept
 }
 
 // multiply an attotime by a 32-bit factor
-inline constexpr attotime operator*(const attotime &left, s32 factor)
+template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
+inline constexpr attotime operator*(const attotime &left, T factor)
 {
 	// check for never
 	if (UNEXPECTED(left.is_never()))
 		return attotime::never;
 
 	// multiply the fine part
-	s64 fine = s64(left.m_fine) * factor;
+	s64 fine = s64(left.m_fine) * s64(factor);
 
 	// compute the coarse portion
 	s64 coarse = left.m_coarse * s64(factor) + (fine >> 32);
 	return attotime(coarse, u32(fine));
 }
 
-inline constexpr attotime operator*(u32 factor, const attotime &right)
+template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
+inline constexpr attotime operator*(T factor, const attotime &right)
 {
 	// multiplication is commutative
 	return operator*(right, factor);
 }
 
-inline constexpr attotime &attotime::operator*=(s32 factor)
+template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
+inline constexpr attotime &attotime::operator*=(T factor)
 {
 	// check for never
 	if (UNEXPECTED(is_never()))
 		return *this;
 
 	// multiply the fine part
-	s64 fine = s64(m_fine) * factor;
+	s64 fine = s64(m_fine) * s64(factor);
 
 	// compute the coarse portion
 	m_coarse = m_coarse * s64(factor) + (fine >> 32);
@@ -1134,7 +1178,8 @@ inline constexpr attotime &attotime::operator*=(s32 factor)
 
 // divide by a 32-bit factor
 // TODO: Upgrade to use CPU-native 128/64 divide
-inline constexpr attotime operator/(const attotime &left, s32 factor)
+template<typename T, std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, bool>>
+inline constexpr attotime operator/(const attotime &left, T factor)
 {
 	// check for never
 	if (UNEXPECTED(left.is_never()))
@@ -1143,18 +1188,19 @@ inline constexpr attotime operator/(const attotime &left, s32 factor)
 	// special case the signed divide
 	if (UNEXPECTED(left.m_coarse < 0))
 		return -(-left / factor);
-	if (UNEXPECTED(factor < 0))
+	if (std::is_signed<T>::value && UNEXPECTED(factor < 0))
 		return -(left / -factor);
 
 	// compute the coarse part
-	u64 coarse = u64(left.m_coarse) / factor;
+	u64 coarse = u64(left.m_coarse) / u32(factor);
 
 	// compute the fine part by combining the remainder with the fine part
 	u64 fine = (((left.m_coarse - coarse * factor) << 32) | left.m_fine) / factor;
 	return attotime(coarse, u32(fine) & ~3);
 }
 
-inline constexpr attotime &attotime::operator/=(s32 factor)
+template<typename T, std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, bool>>
+inline constexpr attotime &attotime::operator/=(T factor)
 {
 	// check for never
 	if (UNEXPECTED(is_never()))
@@ -1163,11 +1209,11 @@ inline constexpr attotime &attotime::operator/=(s32 factor)
 	// special case the signed divide
 	if (UNEXPECTED(m_coarse < 0))
 		return *this = -(-*this / factor);
-	if (UNEXPECTED(factor < 0))
+	if (std::is_signed<T>::value && UNEXPECTED(factor < 0))
 		return *this = -(*this / -factor);
 
 	// compute the coarse part
-	u64 coarse = u64(m_coarse) / factor;
+	u64 coarse = u64(m_coarse) / u32(factor);
 
 	// compute the fine part by combining the remainder with the fine part
 	u64 fine = (((m_coarse - coarse * factor) << 32) | m_fine) / factor;

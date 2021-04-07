@@ -723,7 +723,7 @@ void video_manager::update_throttle(attotime emutime)
 
 		// compute conversion factors up front
 		osd_ticks_t ticks_per_second = osd_ticks_per_second();
-		subseconds subseconds_per_tick = subseconds::from_hz(ticks_per_second) * m_throttle_rate;
+		subseconds subseconds_per_tick = subseconds::from_raw(subseconds::from_hz(ticks_per_second).raw() * m_throttle_rate);
 
 		// if we're paused, emutime will not advance; instead, we subtract a fixed
 		// amount of time (1/60th of a second) from the emulated time that was passed in,
@@ -785,7 +785,7 @@ void video_manager::update_throttle(attotime emutime)
 			(real_is_ahead_subseconds < subseconds::zero() && population_count_32(m_throttle_history & 0xff) < 6))
 		{
 			if (LOG_THROTTLE)
-				machine().logerror("Resync due to being behind: %s (history=%08X)\n", attotime(subseconds::zero() - real_is_ahead_subseconds).as_string(18), m_throttle_history);
+				machine().logerror("Resync due to being behind: %s (history=%08X)\n", attotime(-real_is_ahead_subseconds).as_string(18), m_throttle_history);
 			break;
 		}
 
@@ -799,7 +799,7 @@ void video_manager::update_throttle(attotime emutime)
 		// throttle until we read the target, and update real time to match the final time
 		diff_ticks = throttle_until_ticks(target_ticks) - m_throttle_last_ticks;
 		m_throttle_last_ticks += diff_ticks;
-		m_throttle_realtime += attotime(diff_ticks * subseconds_per_tick);
+		m_throttle_realtime += diff_ticks * subseconds_per_tick;
 		return;
 	}
 

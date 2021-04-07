@@ -424,7 +424,7 @@ void k054539_device::write(offs_t offset, u8 data)
 
 		case 0x227:
 		{
-			attotime period = attotime::from_hz((float)(38 + data) * (clock()/384.0f/14400.0f)) / 2.0f;
+			attotime period = attotime::from_hz((float)(38 + data) * (clock()/384.0f/14400.0f)) / 2;
 
 			m_timer->adjust(period, 0, period);
 

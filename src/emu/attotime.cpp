@@ -30,7 +30,8 @@ const attotime oldtime::attotime::never(MAX_SECONDS);
 //  constant
 //-------------------------------------------------
 
-attotime &attotime::operator*=(u32 factor)
+template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
+attotime &attotime::operator*=(T factor)
 {
 	// if one of the items is attotime::never, return attotime::never
 	if (m_seconds >= MAX_SECONDS)
@@ -65,12 +66,18 @@ attotime &attotime::operator*=(u32 factor)
 	return *this;
 }
 
+template attotime &attotime::operator*=<s32>(s32);
+template attotime &attotime::operator*=<u32>(u32);
+template attotime &attotime::operator*=<s64>(s64);
+template attotime &attotime::operator*=<u64>(u64);
+
 
 //-------------------------------------------------
 //  operator/= - divide an attotime by a constant
 //-------------------------------------------------
 
-attotime &attotime::operator/=(u32 factor)
+template<typename T, std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, bool>>
+attotime &attotime::operator/=(T factor)
 {
 	// if one of the items is attotime::never, return attotime::never
 	if (m_seconds >= MAX_SECONDS)
@@ -79,6 +86,12 @@ attotime &attotime::operator/=(u32 factor)
 	// ignore divide by zero
 	if (factor == 0)
 		return *this;
+
+	// special case the signed divide
+	if (UNEXPECTED(m_seconds < 0))
+		return *this = -(-*this / factor);
+	if (std::is_signed<T>::value && UNEXPECTED(factor < 0))
+		return *this = -(*this / -factor);
 
 	// split subseconds into upper and lower halves which fit into 32 bits
 	u32 attolo;
@@ -106,6 +119,9 @@ attotime &attotime::operator/=(u32 factor)
 		}
 	return *this;
 }
+
+template attotime &attotime::operator/=<s32>(s32);
+template attotime &attotime::operator/=<u32>(u32);
 
 
 //-------------------------------------------------
