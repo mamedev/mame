@@ -533,12 +533,12 @@ class device_scheduler
 		attotime const &base() const { return m_base; }
 
 		// set the base for the relative time
-		void set_base(attotime const &base) { m_base = base; update_relative(); }
+		void set_base(attotime const &base) { if (m_absolute_dirty) update_absolute(); m_base = base; update_relative(); }
 
 	private:
 		// internal helpers
 		void update_relative() { m_relative = (m_absolute - m_base).as_subseconds(); }
-		void update_absolute() { m_absolute = m_base + m_relative; }
+		void update_absolute() { m_absolute = m_base + m_relative; m_absolute_dirty = false; }
 
 	public:
 		// internal state, public for saving
