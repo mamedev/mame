@@ -140,9 +140,9 @@ public:
 	// static creators
 	static constexpr subseconds from_raw(s64 raw) { return subseconds(raw); }
 	static constexpr subseconds from_double(double secs) { return subseconds(s64(secs * double(PER_SECOND))); }
-	static constexpr subseconds from_msec(s32 msec) { return subseconds(msec * PER_MILLISECOND); }
-	static constexpr subseconds from_usec(s32 usec) { return subseconds(usec * PER_MICROSECOND); }
-	static constexpr subseconds from_nsec(s32 nsec) { return subseconds(nsec * PER_NANOSECOND); }
+	static constexpr subseconds from_msec(s32 msec) { return subseconds(s64(msec) * PER_MILLISECOND); }
+	static constexpr subseconds from_usec(s32 usec) { return subseconds(s64(usec) * PER_MICROSECOND); }
+	static constexpr subseconds from_nsec(s32 nsec) { return subseconds(s64(nsec) * PER_NANOSECOND); }
 	static constexpr subseconds from_hz(double hz)
 	{
 		s64 const hz_int = s64(hz);
@@ -331,24 +331,21 @@ public:
 	/** Create an attotime from a integer count of seconds @seconds */
 	static constexpr attotime from_seconds(s32 seconds) { return attotime(seconds); }
 	/** Create an attotime from a integer count of milliseconds @msec */
-	static constexpr attotime from_msec(s64 msec) { return attotime(msec / 1000, (msec % 1000) * (subseconds::PER_SECOND / 1000)); }
+	static constexpr attotime from_msec(s64 msec) { return attotime(msec / 1000, (msec % 1000) * subseconds::PER_MILLISECOND); }
 	/** Create an attotime from a integer count of microseconds @usec */
-	static constexpr attotime from_usec(s64 usec) { return attotime(usec / 1000000, (usec % 1000000) * (subseconds::PER_SECOND / 1000000)); }
+	static constexpr attotime from_usec(s64 usec) { return attotime(usec / 1000000, (usec % 1000000) * subseconds::PER_MICROSECOND); }
 	/** Create an attotime from a integer count of nanoseconds @nsec */
-	static constexpr attotime from_nsec(s64 nsec) { return attotime(nsec / 1000000000, (nsec % 1000000000) * (subseconds::PER_SECOND / 1000000000)); }
+	static constexpr attotime from_nsec(s64 nsec) { return attotime(nsec / 1000000000, (nsec % 1000000000) * subseconds::PER_NANOSECOND); }
 	/** Create an attotime from at the given frequency @frequency */
-	static constexpr attotime from_hz(u32 frequency) { return (frequency > 1) ? attotime(0, s64((subseconds::PER_SECOND - 1) / frequency) + 1) : (frequency == 1) ? attotime::from_seconds(1) : attotime::never; }
+	static constexpr attotime from_hz(u32 frequency) { return (frequency > 1) ? attotime(subseconds::from_hz(frequency)) : (frequency == 1) ? attotime::from_seconds(1) : attotime::never; }
 	static constexpr attotime from_hz(int frequency) { return (frequency > 0) ? from_hz(u32(frequency)) : attotime::never; }
-	static attotime from_hz(const XTAL &xtal) { return (xtal.dvalue() > 1.0) ? attotime(0, s64((subseconds::PER_SECOND - 1) / xtal) + 1) : from_hz(xtal.dvalue()); }
+	static attotime from_hz(const XTAL &xtal) { return (xtal.dvalue() > 1.0) ? attotime(subseconds::from_hz(xtal)) : from_hz(xtal.dvalue()); }
 	static attotime from_hz(double frequency)
 	{
 		if (frequency > 1.0)
-			return attotime(0, s64((subseconds::PER_SECOND - 1) / frequency) + 1);
+			return attotime(subseconds::from_hz(frequency));
 		else if (frequency > 0.0)
-		{
-			double i, f = modf(1.0 / frequency, &i);
-			return attotime(i, s64(f * subseconds::PER_SECOND) + 1);
-		}
+			return from_double(1.0 / frequency);
 		else
 			return attotime::never;
 	}
@@ -356,10 +353,8 @@ public:
 	// math
 	attotime &operator+=(attotime const &right) noexcept;
 	attotime &operator-=(attotime const &right) noexcept;
-	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
-	attotime &operator*=(T factor);
-	template<typename T, std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, bool> = true>
-	attotime &operator/=(T factor);
+	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> attotime &operator*=(T factor);
+	template<typename T, std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, bool> = true> attotime &operator/=(T factor);
 
 	// constants
 	static attotime const never;
@@ -619,7 +614,7 @@ inline constexpr bool operator>=(const attotime &left, const attotime &right) no
 inline constexpr subseconds attotime::as_subseconds() const noexcept
 {
 	if (m_seconds >= -2 && m_seconds <= 1)
-		return subseconds::from_raw(m_subseconds + subseconds::PER_SECOND * m_seconds);
+		return subseconds::from_raw(m_subseconds + subseconds::PER_SECOND * s64(m_seconds));
 	else
 		return (m_seconds > 0) ? subseconds::max() : subseconds::min();
 }
@@ -630,14 +625,14 @@ inline attotime attotime::from_ticks(u64 ticks, u32 frequency)
 {
 	if (frequency > 0)
 	{
-		s64 attos_per_tick = s64((subseconds::PER_SECOND - 1) / frequency) + 1;
+		subseconds subs_per_tick = subseconds::from_hz(frequency);
 
 		if (ticks < frequency)
-			return attotime(subseconds::from_raw(ticks * attos_per_tick));
+			return attotime(ticks * subs_per_tick);
 
 		u32 remainder;
 		s32 secs = divu_64x32_rem(ticks, frequency, remainder);
-		return attotime(secs, subseconds::from_raw(u64(remainder) * attos_per_tick));
+		return attotime(secs, remainder * subs_per_tick);
 	}
 	else
 		return attotime::never;
