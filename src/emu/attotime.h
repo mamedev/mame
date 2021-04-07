@@ -112,16 +112,16 @@ public:
 	}
 
 	// multiply by an integral factor
-	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
-	subseconds &operator*=(T factor) noexcept
+	template<typename T>
+	std::enable_if_t<std::is_integral<T>::value, subseconds> &operator*=(T factor) noexcept
 	{
 		m_subseconds *= s64(factor);
 		return *this;
 	}
 
 	// divide by an integral factor
-	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
-	subseconds &operator/=(T factor)
+	template<typename T>
+	std::enable_if_t<std::is_integral<T>::value, subseconds> &operator/=(T factor)
 	{
 		m_subseconds /= s64(factor);
 		return *this;
@@ -169,10 +169,10 @@ public:
 	friend subseconds operator+(subseconds const &left, subseconds const &right) noexcept;
 	friend subseconds operator-(subseconds const &left, subseconds const &right) noexcept;
 	friend subseconds operator-(subseconds const &left) noexcept;
-	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> friend subseconds operator*(subseconds const &left, T factor) noexcept;
-	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> friend subseconds operator*(T factor, subseconds const &right) noexcept;
+	template<typename T> friend std::enable_if_t<std::is_integral<T>::value, subseconds> operator*(subseconds const &left, T factor) noexcept;
+	template<typename T> friend std::enable_if_t<std::is_integral<T>::value, subseconds> operator*(T factor, subseconds const &right) noexcept;
 	friend s64 operator/(subseconds const &left, subseconds const &right);
-	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> friend subseconds operator/(subseconds const &left, T factor);
+	template<typename T> friend std::enable_if_t<std::is_integral<T>::value, subseconds> operator/(subseconds const &left, T factor);
 	friend constexpr bool operator==(subseconds const &left, subseconds const &right) noexcept;
 	friend constexpr bool operator!=(subseconds const &left, subseconds const &right) noexcept;
 	friend constexpr bool operator<(subseconds const &left, subseconds const &right) noexcept;
@@ -210,13 +210,13 @@ inline subseconds operator-(subseconds const &left, subseconds const &right) noe
 }
 
 // multiplication of a subseconds value by an integral factor
-template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
-inline subseconds operator*(subseconds const &left, T factor) noexcept
+template<typename T>
+inline std::enable_if_t<std::is_integral<T>::value, subseconds> operator*(subseconds const &left, T factor) noexcept
 {
 	return subseconds(left.m_subseconds * s64(factor));
 }
-template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
-inline subseconds operator*(T factor, subseconds const &right) noexcept
+template<typename T>
+inline std::enable_if_t<std::is_integral<T>::value, subseconds> operator*(T factor, subseconds const &right) noexcept
 {
 	return subseconds(s64(factor) * right.m_subseconds);
 }
@@ -228,8 +228,8 @@ inline s64 operator/(subseconds const &left, subseconds const &right)
 }
 
 // division of a subseconds value by an integral factor
-template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
-inline subseconds operator/(subseconds const &left, T factor)
+template<typename T>
+inline std::enable_if_t<std::is_integral<T>::value, subseconds> operator/(subseconds const &left, T factor)
 {
 	return subseconds(left.m_subseconds / s64(factor));
 }
@@ -353,8 +353,8 @@ public:
 	// math
 	attotime &operator+=(attotime const &right) noexcept;
 	attotime &operator-=(attotime const &right) noexcept;
-	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> attotime &operator*=(T factor);
-	template<typename T, std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, bool> = true> attotime &operator/=(T factor);
+	template<typename T> std::enable_if_t<std::is_integral<T>::value, attotime> &operator*=(T factor);
+	template<typename T> std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, attotime> &operator/=(T factor);
 
 	// constants
 	static attotime const never;
@@ -364,9 +364,9 @@ public:
 	friend attotime operator+(attotime const &left, attotime const &right) noexcept;
 	friend attotime operator-(attotime const &left, attotime const &right) noexcept;
 	friend attotime operator-(attotime const &left) noexcept;
-	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> friend attotime operator*(attotime const &left, T factor);
-	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> friend attotime operator*(T factor, attotime const &right);
-	template<typename T, std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, bool> = true> friend attotime operator/(attotime const &left, T factor);
+	template<typename T> friend std::enable_if_t<std::is_integral<T>::value, attotime> operator*(attotime const &left, T factor);
+	template<typename T> friend std::enable_if_t<std::is_integral<T>::value, attotime> operator*(T factor, attotime const &right);
+	template<typename T> friend std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, attotime> operator/(attotime const &left, T factor);
 	friend constexpr bool operator==(attotime const &left, attotime const &right) noexcept;
 	friend constexpr bool operator!=(attotime const &left, attotime const &right) noexcept;
 	friend constexpr bool operator<(attotime const &left, attotime const &right) noexcept;
@@ -552,16 +552,16 @@ inline attotime operator-(const attotime &left) noexcept
 
 
 /** handle multiplication by an integral factor; defined in terms of the assignment operators */
-template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
-inline attotime operator*(const attotime &left, T factor)
+template<typename T>
+inline std::enable_if_t<std::is_integral<T>::value, attotime> operator*(const attotime &left, T factor)
 {
 	attotime result = left;
 	result *= factor;
 	return result;
 }
 
-template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
-inline attotime operator*(T factor, const attotime &right)
+template<typename T>
+inline std::enable_if_t<std::is_integral<T>::value, attotime> operator*(T factor, const attotime &right)
 {
 	attotime result = right;
 	result *= factor;
@@ -569,8 +569,8 @@ inline attotime operator*(T factor, const attotime &right)
 }
 
 /** handle division by an integral factor; defined in terms of the assignment operators */
-template<typename T, std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, bool>>
-inline attotime operator/(const attotime &left, T factor)
+template<typename T>
+inline std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, attotime> operator/(const attotime &left, T factor)
 {
 	attotime result = left;
 	result /= factor;
@@ -724,16 +724,16 @@ public:
 	}
 
 	// multiply by an integral factor
-	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
-	subseconds &operator*=(T factor) noexcept
+	template<typename T>
+	std::enable_if_t<std::is_integral<T>::value, subseconds> &operator*=(T factor) noexcept
 	{
 		m_subseconds *= s64(factor);
 		return *this;
 	}
 
 	// divide by an integral factor
-	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
-	subseconds &operator/=(T factor)
+	template<typename T>
+	std::enable_if_t<std::is_integral<T>::value, subseconds> &operator/=(T factor)
 	{
 		m_subseconds /= s64(factor);
 		return *this;
@@ -781,10 +781,10 @@ public:
 	friend subseconds operator+(subseconds const &left, subseconds const &right) noexcept;
 	friend subseconds operator-(subseconds const &left) noexcept;
 	friend subseconds operator-(subseconds const &left, subseconds const &right) noexcept;
-	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> friend subseconds operator*(subseconds const &left, T factor) noexcept;
-	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> friend subseconds operator*(T factor, subseconds const &right) noexcept;
+	template<typename T> friend std::enable_if_t<std::is_integral<T>::value, subseconds> operator*(subseconds const &left, T factor) noexcept;
+	template<typename T> friend std::enable_if_t<std::is_integral<T>::value, subseconds> operator*(T factor, subseconds const &right) noexcept;
 	friend s64 operator/(subseconds const &left, subseconds const &right);
-	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> friend subseconds operator/(subseconds const &left, T factor);
+	template<typename T> friend std::enable_if_t<std::is_integral<T>::value, subseconds> operator/(subseconds const &left, T factor);
 	friend constexpr bool operator==(subseconds const &left, subseconds const &right) noexcept;
 	friend constexpr bool operator!=(subseconds const &left, subseconds const &right) noexcept;
 	friend constexpr bool operator<(subseconds const &left, subseconds const &right) noexcept;
@@ -822,14 +822,14 @@ inline subseconds operator-(subseconds const &left, subseconds const &right) noe
 }
 
 // multiplication of a subseconds value by an integral factor
-template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
-inline subseconds operator*(subseconds const &left, T factor) noexcept
+template<typename T>
+inline std::enable_if_t<std::is_integral<T>::value, subseconds> operator*(subseconds const &left, T factor) noexcept
 {
 	return subseconds(left.m_subseconds * s64(factor));
 }
 
-template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
-inline subseconds operator*(T factor, subseconds const &right) noexcept
+template<typename T>
+inline std::enable_if_t<std::is_integral<T>::value, subseconds> operator*(T factor, subseconds const &right) noexcept
 {
 	return subseconds(s64(factor) * right.m_subseconds);
 }
@@ -841,8 +841,8 @@ inline s64 operator/(subseconds const &left, subseconds const &right)
 }
 
 // division of a subseconds value by an integral factor
-template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
-inline subseconds operator/(subseconds const &left, T factor)
+template<typename T>
+inline std::enable_if_t<std::is_integral<T>::value, subseconds> operator/(subseconds const &left, T factor)
 {
 	return subseconds(left.m_subseconds / s64(factor));
 }
@@ -1026,17 +1026,17 @@ public:
 	// math
 	constexpr attotime &operator+=(attotime const &right) noexcept;
 	constexpr attotime &operator-=(attotime const &right) noexcept;
-	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> constexpr attotime &operator*=(T factor);
-	template<typename T, std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, bool> = true> constexpr attotime &operator/=(T factor);
+	template<typename T> constexpr std::enable_if_t<std::is_integral<T>::value, attotime> &operator*=(T factor);
+	template<typename T> constexpr std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, attotime> &operator/=(T factor);
 	s64 operator/=(subseconds factor);
 
 	// friend math
 	friend constexpr attotime operator+(attotime const &left, attotime const &right) noexcept;
 	friend constexpr attotime operator-(attotime const &left) noexcept;
 	friend constexpr attotime operator-(attotime const &left, attotime const &right) noexcept;
-	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> friend constexpr attotime operator*(attotime const &left, T factor);
-	template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true> friend constexpr attotime operator*(T factor, attotime const &right);
-	template<typename T, std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, bool> = true> friend constexpr attotime operator/(attotime const &left, T factor);
+	template<typename T> friend constexpr std::enable_if_t<std::is_integral<T>::value, attotime> operator*(attotime const &left, T factor);
+	template<typename T> friend constexpr std::enable_if_t<std::is_integral<T>::value, attotime> operator*(T factor, attotime const &right);
+	template<typename T> friend constexpr std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, attotime> operator/(attotime const &left, T factor);
 	friend s64 operator/(attotime const &left, subseconds factor);
 
 	// friend comparisons
@@ -1148,15 +1148,15 @@ inline constexpr attotime operator*(const attotime &left, T factor)
 	return attotime(coarse, u32(fine));
 }
 
-template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
-inline constexpr attotime operator*(T factor, const attotime &right)
+template<typename T>
+inline constexpr std::enable_if_t<std::is_integral<T>::value, attotime> operator*(T factor, const attotime &right)
 {
 	// multiplication is commutative
 	return operator*(right, factor);
 }
 
-template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
-inline constexpr attotime &attotime::operator*=(T factor)
+template<typename T>
+inline constexpr std::enable_if_t<std::is_integral<T>::value, attotime> &attotime::operator*=(T factor)
 {
 	// check for never
 	if (UNEXPECTED(is_never()))
@@ -1173,8 +1173,8 @@ inline constexpr attotime &attotime::operator*=(T factor)
 
 // divide by a 32-bit factor
 // TODO: Upgrade to use CPU-native 128/64 divide
-template<typename T, std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, bool>>
-inline constexpr attotime operator/(const attotime &left, T factor)
+template<typename T>
+inline constexpr std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, attotime> operator/(const attotime &left, T factor)
 {
 	// check for never
 	if (UNEXPECTED(left.is_never()))
@@ -1194,8 +1194,8 @@ inline constexpr attotime operator/(const attotime &left, T factor)
 	return attotime(coarse, u32(fine) & ~3);
 }
 
-template<typename T, std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, bool>>
-inline constexpr attotime &attotime::operator/=(T factor)
+template<typename T>
+inline constexpr std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, attotime> &attotime::operator/=(T factor)
 {
 	// check for never
 	if (UNEXPECTED(is_never()))

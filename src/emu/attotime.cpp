@@ -30,8 +30,8 @@ const attotime oldtime::attotime::never(MAX_SECONDS);
 //  constant
 //-------------------------------------------------
 
-template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
-attotime &attotime::operator*=(T factor)
+template<typename T>
+std::enable_if_t<std::is_integral<T>::value, attotime> &attotime::operator*=(T factor)
 {
 	// if one of the items is attotime::never, return attotime::never
 	if (m_seconds >= MAX_SECONDS)
@@ -76,8 +76,8 @@ template attotime &attotime::operator*=<u64>(u64);
 //  operator/= - divide an attotime by a constant
 //-------------------------------------------------
 
-template<typename T, std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, bool>>
-attotime &attotime::operator/=(T factor)
+template<typename T>
+std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, attotime> &attotime::operator/=(T factor)
 {
 	// if one of the items is attotime::never, return attotime::never
 	if (m_seconds >= MAX_SECONDS)
