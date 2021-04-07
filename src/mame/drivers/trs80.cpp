@@ -463,6 +463,8 @@ void trs80_state::trs80(machine_config &config)       // the original model I, l
 
 	/* devices */
 	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(trs80l1_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
@@ -476,7 +478,6 @@ void trs80_state::model1(machine_config &config)      // model I, level II
 
 	/* devices */
 	m_cassette->set_formats(trs80l2_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_PLAY);
 
 	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(trs80_state::quickload_cb));
 
