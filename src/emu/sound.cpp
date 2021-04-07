@@ -241,7 +241,7 @@ attotime stream_buffer::index_time(s32 index) const
 u32 stream_buffer::time_to_buffer_index(attotime time, bool round_up, bool allow_expansion)
 {
 	// compute the sample index within the second
-	int sample = (time.frac() + subseconds::from_raw(round_up ? (m_sample_subs.raw() - 1) : 0)) / m_sample_subs;
+	int sample = (time.frac() + (round_up ? (m_sample_subs - subseconds::unit()) : subseconds::zero())) / m_sample_subs;
 	sound_assert(sample >= 0 && sample <= size());
 
 	// if the time is past the current end, make it the end

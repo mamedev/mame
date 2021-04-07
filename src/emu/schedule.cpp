@@ -26,7 +26,7 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define VERBOSE 0
+#define VERBOSE 1
 
 #define LOG(...)  do { if (VERBOSE) machine().logerror(__VA_ARGS__); } while (0)
 #define PRECISION 18
@@ -767,15 +767,15 @@ void device_scheduler::timeslice(subseconds minslice)
 				m_executing_device = exec;
 
 #if VERBOSE
-				u64 start_cycles = exec->m_total_cycles;
-				LOG("  %12.12s: t=%018lldas %018lldas = %dc; ", exec->device().tag(), exec->m_localtime.relative().raw(), delta, delta / exec->m_subseconds_per_cycle + 1);
+				u64 start_cycles = exec->total_cycles();
+				LOG("  %12.12s: t=%018lldas %018lldas = %dc; ", exec->device().tag(), exec->m_localtime.relative().raw(), delta.raw(), delta / exec->m_subseconds_per_cycle + 1);
 #endif
 
 				// execute for the given number of subseconds
 				subseconds localtime = exec->run_for(delta);
 
 #if VERBOSE
-				LOG(" ran %dc, %dc total", s32(exec->m_totalcycles - start_cycles), s32(exec->m_totalcycles));
+				LOG(" ran %dc, %dc total", s32(exec->total_cycles() - start_cycles), s32(exec->total_cycles()));
 #endif
 
 				// if the new local device time is less than our target, move the
