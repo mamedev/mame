@@ -1,54 +1,69 @@
 // license:BSD-3-Clause
-// copyright-holders:Sandro Ronco
+// copyright-holders:Sandro Ronco, hap
 /******************************************************************************
 
-Mephisto Polgar
+Mephisto Risc 1MB/II (stylized "risc")
+
+The chess engine in Mephisto Risc is also compatible with Tasc's The ChessMachine,
+see ROM defs for details.
 
 Hardware notes:
-- RP65C02G @ 4.91MHz
-- 64KB ROM
+- G65SC02P-4 @ 2.5MHz
+- 128KB ROM
+- Tasc ChessMachine EC PCB
 - Mephisto modular display module
 - Mephisto Exclusive/Muenchen chessboard
-
-The 10MHz version has a W65C02P-8 @ 9.83MHz.
 
 ******************************************************************************/
 
 #include "emu.h"
 
-#include "cpu/m6502/m65c02.h"
-#include "cpu/m6502/r65c02.h"
+#include "cpu/m6502/m65sc02.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
 #include "machine/mmboard.h"
+#include "machine/chessmachine.h"
 #include "video/mmdisplay2.h"
 
 // internal artwork
-#include "mephisto_polgar.lh"
+#include "mephisto_risc.lh"
 
 
 namespace {
 
-class mephisto_polgar_state : public driver_device
+class mephisto_risc_state : public driver_device
 {
 public:
-	mephisto_polgar_state(const machine_config &mconfig, device_type type, const char *tag)
+	mephisto_risc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_chessm(*this, "chessm")
+		, m_rombank(*this, "rombank")
 		, m_keys(*this, "KEY")
 	{ }
 
-	void polgar10(machine_config &config);
-	void polgar(machine_config &config);
+	void mrisc(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<chessmachine_device> m_chessm;
+	required_memory_bank m_rombank;
 	required_ioport m_keys;
 
-	void polgar_mem(address_map &map);
+	void mrisc_mem(address_map &map);
 
 	u8 keys_r(offs_t offset);
+	u8 chessm_r();
+	void chessm_w(u8 data);
 };
+
+void mephisto_risc_state::machine_start()
+{
+	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x8000);
+}
 
 
 
@@ -56,9 +71,25 @@ private:
     I/O
 ******************************************************************************/
 
-u8 mephisto_polgar_state::keys_r(offs_t offset)
+u8 mephisto_risc_state::keys_r(offs_t offset)
 {
 	return (BIT(m_keys->read(), offset) << 7) | 0x7f;
+}
+
+u8 mephisto_risc_state::chessm_r()
+{
+	// d0: chessmachine data
+	return m_chessm->data_r();
+}
+
+void mephisto_risc_state::chessm_w(u8 data)
+{
+	// d0,d7: chessmachine data
+	m_chessm->data0_w(BIT(data, 0));
+	m_chessm->data1_w(BIT(data, 7));
+
+	// d1: chessmachine reset
+	m_chessm->reset_w(BIT(data, 1));
 }
 
 
@@ -67,17 +98,21 @@ u8 mephisto_polgar_state::keys_r(offs_t offset)
     Address Maps
 ******************************************************************************/
 
-void mephisto_polgar_state::polgar_mem(address_map &map)
+void mephisto_risc_state::mrisc_mem(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x1fff).ram().share("nvram");
 	map(0x2000, 0x2000).w("display", FUNC(mephisto_display_module2_device::latch_w));
 	map(0x2004, 0x2004).w("display", FUNC(mephisto_display_module2_device::io_w));
+	map(0x2c00, 0x2c07).r(FUNC(mephisto_risc_state::keys_r));
 	map(0x2400, 0x2400).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x2800, 0x2800).w("board", FUNC(mephisto_board_device::mux_w));
-	map(0x2c00, 0x2c07).r(FUNC(mephisto_polgar_state::keys_r));
 	map(0x3000, 0x3000).r("board", FUNC(mephisto_board_device::input_r));
-	map(0x3400, 0x3407).w("outlatch", FUNC(hc259_device::write_d7));
-	map(0x4000, 0xffff).rom();
+	map(0x3400, 0x3407).w("outlatch", FUNC(hc259_device::write_d7)).nopr();
+	map(0x3800, 0x3800).w(FUNC(mephisto_risc_state::chessm_w));
+	map(0x3c00, 0x3c00).r(FUNC(mephisto_risc_state::chessm_r));
+	map(0x4000, 0x7fff).rom();
+	map(0x8000, 0xffff).bankr("rombank");
 }
 
 
@@ -86,7 +121,7 @@ void mephisto_polgar_state::polgar_mem(address_map &map)
     Input Ports
 ******************************************************************************/
 
-static INPUT_PORTS_START( polgar )
+static INPUT_PORTS_START( mrisc )
 	PORT_START("KEY")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("TRN / Pawn")      PORT_CODE(KEYCODE_T)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("INFO / Knight")   PORT_CODE(KEYCODE_I)
@@ -104,11 +139,14 @@ INPUT_PORTS_END
     Machine Configs
 ******************************************************************************/
 
-void mephisto_polgar_state::polgar(machine_config &config)
+void mephisto_risc_state::mrisc(machine_config &config)
 {
-	R65C02(config, m_maincpu, 4.9152_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_polgar_state::polgar_mem);
-	m_maincpu->set_periodic_int(FUNC(mephisto_polgar_state::nmi_line_pulse), attotime::from_hz(4.9152_MHz_XTAL / (1 << 13)));
+	M65SC02(config, m_maincpu, 10_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_risc_state::mrisc_mem);
+	m_maincpu->set_periodic_int(FUNC(mephisto_risc_state::irq0_line_hold), attotime::from_hz(10_MHz_XTAL / (1 << 14)));
+
+	CHESSMACHINE(config, m_chessm, 14'000'000); // Mephisto manual says 14MHz (no XTAL)
+	config.set_perfect_quantum(m_maincpu);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -119,19 +157,11 @@ void mephisto_polgar_state::polgar(machine_config &config)
 	outlatch.q_out_cb<3>().set_output("led103");
 	outlatch.q_out_cb<4>().set_output("led104");
 	outlatch.q_out_cb<5>().set_output("led105");
+	outlatch.parallel_out_cb().set_membank("rombank").rshift(6).mask(0x03).exor(0x01);
 
 	MEPHISTO_SENSORS_BOARD(config, "board");
 	MEPHISTO_DISPLAY_MODULE2(config, "display");
-	config.set_default_layout(layout_mephisto_polgar);
-}
-
-void mephisto_polgar_state::polgar10(machine_config &config)
-{
-	polgar(config);
-
-	M65C02(config.replace(), m_maincpu, 9.8304_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_polgar_state::polgar_mem);
-	m_maincpu->set_periodic_int(FUNC(mephisto_polgar_state::nmi_line_pulse), attotime::from_hz(9.8304_MHz_XTAL / (1 << 13)));
+	config.set_default_layout(layout_mephisto_risc);
 }
 
 
@@ -140,24 +170,18 @@ void mephisto_polgar_state::polgar10(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( polgar )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("polgar_1.5_01.02.1990", 0x0000, 0x10000, CRC(88d55c0f) SHA1(e86d088ec3ac68deaf90f6b3b97e3e31b1515913) )
+ROM_START( mrisc )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	// contains ChessMachine engine at 0x0-0x03fff + 0x10000-0x1c74f, concatenate those sections and make a .bin file,
+	// then it will work on ChessMachine software. It identifies as R E B E L ver. HG-021 03-04-92
+	ROM_LOAD("meph-risci-v1-2.bin", 0x00000, 0x20000, CRC(19c6ab83) SHA1(0baab84e5aa6999c24250938d207145144945fd5) )
 ROM_END
 
-ROM_START( polgara )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("polgar_1.10_04.08.1989", 0x0000, 0x10000, CRC(a4519c55) SHA1(35463a4cbcf20ebbd5ac5bc7664a862b1557c65f) ) // TC57512AD-15
-ROM_END
-
-ROM_START( polgar10 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("polg.10mhz_v_10.0", 0x00000, 0x10000, CRC(7c1960d4) SHA1(4d15b51f9e6f7943815945cd56078ca512a964d4) )
-ROM_END
-
-ROM_START( polgar101 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("polg_101.bin", 0x00000, 0x10000, CRC(8fb6afa4) SHA1(d1cf868302a665ff351686b26a149ced0045fc81) )
+ROM_START( mrisc2 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	// contains ChessMachine engine at 0x0-0x03fff + 0x10000-0x1cb7f, concatenate those sections and make a .bin file,
+	// then it will work on ChessMachine software. It identifies as R E B E L ver. 2.31 22-07-93, world champion Madrid 1992
+	ROM_LOAD("risc_2.31", 0x00000, 0x20000, CRC(9ecf9cd3) SHA1(7bfc628183037a172242c9589f15aca218d8fb12) )
 ROM_END
 
 } // anonymous namespace
@@ -168,8 +192,6 @@ ROM_END
     Game Drivers
 ***************************************************************************/
 
-/*    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT   CLASS                   INIT        COMPANY             FULLNAME                   FLAGS */
-CONS( 1990, polgar,    0,       0,      polgar,   polgar, mephisto_polgar_state,  empty_init, "Hegener + Glaser", "Mephisto Polgar (v1.50)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, polgara,   polgar,  0,      polgar,   polgar, mephisto_polgar_state,  empty_init, "Hegener + Glaser", "Mephisto Polgar (v1.10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, polgar10,  polgar,  0,      polgar10, polgar, mephisto_polgar_state,  empty_init, "Hegener + Glaser", "Mephisto Polgar 10 MHz (v10.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, polgar101, polgar,  0,      polgar10, polgar, mephisto_polgar_state,  empty_init, "Hegener + Glaser", "Mephisto Polgar 10 MHz (v10.1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT  CLASS                   INIT        COMPANY                    FULLNAME             FLAGS */
+CONS( 1992, mrisc,     0,       0,      mrisc,    mrisc, mephisto_risc_state,    empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc 1MB", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1994, mrisc2,    mrisc,   0,      mrisc,    mrisc, mephisto_risc_state,    empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc II",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

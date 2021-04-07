@@ -22720,6 +22720,11 @@ roma16                          // Roma
 roma16a                         // Roma
 roma32                          // Roma
 
+@source:mephisto_milano.cpp
+milano                          // 1991 Mephisto Milano
+milanoa                         // 1991 Mephisto Milano
+nshort                          // 1993 Mephisto Nigel Short
+
 @source:mephisto_mm1.cpp
 mm1
 mm1b
@@ -22798,11 +22803,10 @@ polgar                          // 1990 Mephisto Polgar
 polgara                         // 1989 Mephisto Polgar
 polgar10                        // 1990 Mephisto Polgar 10MHz
 polgar101                       // 1990 Mephisto Polgar 10MHz
+
+@source:mephisto_risc.cpp
 mrisc                           // 1992 Mephisto RISC 1MB
 mrisc2                          // 1994 Mephisto RISC II
-milano                          // 1991 Mephisto Milano
-milanoa                         // 1991 Mephisto Milano
-nshort                          // 1993 Mephisto Nigel Short
 
 @source:mephistp.cpp
 mephistp                        //
