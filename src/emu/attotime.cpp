@@ -12,12 +12,14 @@
 #include "eminline.h"
 #include "attotime.h"
 
+namespace oldtime
+{
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const attotime attotime::zero(0);
-const attotime attotime::never(MAX_SECONDS);
+const attotime oldtime::attotime::zero(0);
+const attotime oldtime::attotime::never(MAX_SECONDS);
 
 //**************************************************************************
 //  CORE MATH FUNCTIONS
@@ -208,4 +210,5 @@ std::string attotime::to_string() const
 	}
 	int nsec = t.frac().as_nsec_int();
 	return util::string_format("%s%04d.%03d,%03d,%03d", sign, int(t.seconds()), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
+}
 }

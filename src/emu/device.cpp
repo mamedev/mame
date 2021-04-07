@@ -91,7 +91,7 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 	, m_unscaled_clock(clock)
 	, m_clock(clock)
 	, m_clock_scale(1.0)
-	, m_subseconds_per_clock((clock == 0) ? subseconds::max() : subseconds::from_hz(clock))
+	, m_subseconds_per_clock((clock == 0) ? subseconds::zero() : subseconds::from_hz(clock))
 
 	, m_machine_config(mconfig)
 	, m_input_defaults(nullptr)
@@ -371,7 +371,7 @@ void device_t::set_unscaled_clock(u32 clock)
 
 	m_unscaled_clock = clock;
 	m_clock = m_unscaled_clock * m_clock_scale;
-	m_subseconds_per_clock = (m_clock == 0) ? subseconds::max() : subseconds::from_hz(m_clock);
+	m_subseconds_per_clock = (m_clock == 0) ? subseconds::zero() : subseconds::from_hz(m_clock);
 
 	// recalculate all derived clocks
 	for (device_t &child : subdevices())
@@ -396,7 +396,7 @@ void device_t::set_clock_scale(double clockscale)
 
 	m_clock_scale = clockscale;
 	m_clock = m_unscaled_clock * m_clock_scale;
-	m_subseconds_per_clock = (m_clock == 0) ? subseconds::max() : subseconds::from_hz(m_clock);
+	m_subseconds_per_clock = (m_clock == 0) ? subseconds::zero() : subseconds::from_hz(m_clock);
 
 	// recalculate all derived clocks
 	for (device_t &child : subdevices())
@@ -438,7 +438,7 @@ attotime device_t::clocks_to_attotime(u64 numclocks) const noexcept
 	{
 		u32 remainder;
 		u32 quotient = divu_64x32_rem(numclocks, m_clock, remainder);
-		return attotime(quotient, u64(remainder) * m_subseconds_per_clock);
+		return attotime(quotient, remainder * m_subseconds_per_clock);
 	}
 }
 
