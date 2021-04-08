@@ -155,6 +155,18 @@ endif
 ifeq ($(platform),osx)
   PLATFLAGS += DONT_USE_NETWORK=1
 endif
+
+ifeq ($(platform),ios-arm64)
+  PLATFLAGS += DONT_USE_NETWORK=1
+	LIBRETRO_CPU = arm64
+	ARCH = arm64
+	LIBRETRO_OS = ios-arm64
+	IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
+	CC = cc -arch arm64 -isysroot $(IOSSDK) -miphoneos-version-min=11.0
+	CXX = c++ -arch arm64 -isysroot $(IOSSDK) -miphoneos-version-min=11.0
+	PLATFLAGS += OVERRIDE_CC="$(CC)" OVERRIDE_CXX="$(CXX)"
+endif
+
 ifneq ($(LIBRETRO_CPU),)
 	PLATFLAGS += ARCH="" LIBRETRO_CPU="$(LIBRETRO_CPU)"
 endif

@@ -268,7 +268,7 @@ bool invalidate_instruction_cache(void const *start, std::size_t size)
 #if defined(_WIN32)
 	return FlushInstructionCache(GetCurrentProcess(), start, size) != 0;
 #else
-#if !defined(SDLMAME_EMSCRIPTEN)
+#if !defined(SDLMAME_EMSCRIPTEN) && !defined(TARGET_OS_IPHONE)
 	char const *const begin(reinterpret_cast<char const *>(start));
 	char const *const end(begin + size);
 	__builtin___clear_cache(const_cast<char *>(begin), const_cast<char *>(end));

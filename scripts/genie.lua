@@ -627,6 +627,12 @@ if _OPTIONS["osd"]=="retro" then
 			"__LIBRETRO__",
 			"NDEBUG",
 		}
+
+	if _OPTIONS["LIBRETRO_IOS"] == "1" or _OPTIONS["LIBRETRO_TVOS"] then
+		defines {
+			"TARGET_OS_IPHONE"
+		}
+	end
 end
 -- RETRO HACK
 
