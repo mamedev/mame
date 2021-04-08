@@ -108,6 +108,17 @@ libretro-build-osx-x64:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-osx-x64"
 
+# iOS
+libretro-build-ios-arm64:
+  tags:
+    - macosx-packaging
+  extends:
+    - .libretro-ios-arm64-make-default
+    - .core-defs
+  cache:
+    <<: *global_cache
+    key: "$CI_COMMIT_REF_SLUG-ios-arm64"
+
 # Android ARMv7a
 android-armeabi-v7a:
   extends:
