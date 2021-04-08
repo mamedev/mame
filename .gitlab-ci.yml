@@ -55,6 +55,10 @@ include:
   # - project: 'libretro-infrastructure/ci-templates'
   #   file: '/vita-static.yml'
   
+  # tvOS (AppleTV)
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/tvos-arm64.yml'
+  
   #################################### MISC ##################################
 
 # Stages for building
