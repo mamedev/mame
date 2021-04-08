@@ -32976,8 +32976,9 @@ ssensor4
 supercon
 
 @source:novag_diablo.cpp
-diablo68                        //
-scorpio68                       //
+diablo68
+diablo68a
+scorpio68
 
 @source:novag_micro.cpp
 nmicro
