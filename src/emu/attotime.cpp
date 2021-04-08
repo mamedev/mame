@@ -37,7 +37,7 @@ char const *attotime::generate_string(char *buffer, int precision, bool dividers
 
 		// handle the fraction
 		static s64 const s_divisors[] =
-		{ 
+		{
 			subseconds::PER_SECOND / 10ll,
 			subseconds::PER_SECOND / 100ll,
 			subseconds::PER_SECOND / 1000ll,
@@ -55,8 +55,7 @@ char const *attotime::generate_string(char *buffer, int precision, bool dividers
 			subseconds::PER_SECOND / 1000000000000000ll,
 			subseconds::PER_SECOND / 10000000000000000ll,
 			subseconds::PER_SECOND / 100000000000000000ll,
-			subseconds::PER_SECOND / 1000000000000000000ll,
-			subseconds::PER_SECOND / 10000000000000000000ll
+			subseconds::PER_SECOND / 1000000000000000000ll
 		};
 		s64 rem = frac().raw();
 		precision = std::min<int>(precision, std::size(s_divisors));
