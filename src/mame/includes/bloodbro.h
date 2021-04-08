@@ -6,7 +6,7 @@
 #pragma once
 
 #include "audio/seibu.h"
-#include "sound/3812intf.h"
+#include "sound/ym3812.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"

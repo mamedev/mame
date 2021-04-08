@@ -18,14 +18,13 @@
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/3812intf.h"
+#include "sound/ym3812.h"
 #include "speaker.h"
 
-// mephisto_state was also defined in mess/drivers/mephisto.c
-class mephisto_pinball_state : public driver_device
+class mephisto_state : public driver_device
 {
 public:
-	mephisto_pinball_state(const machine_config &mconfig, device_type type, const char *tag)
+	mephisto_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_aysnd(*this, "aysnd")
@@ -62,29 +61,29 @@ private:
 };
 
 
-void mephisto_pinball_state::shift_load_w(u8 data)
+void mephisto_state::shift_load_w(u8 data)
 {
 }
 
-u8 mephisto_pinball_state::ay8910_read()
+u8 mephisto_state::ay8910_read()
 {
 	return m_ay8910_data;
 }
 
-void mephisto_pinball_state::ay8910_write(u8 data)
+void mephisto_state::ay8910_write(u8 data)
 {
 	m_ay8910_data = data;
 	ay8910_update();
 }
 
-void mephisto_pinball_state::t0_t1_w(u8 data)
+void mephisto_state::t0_t1_w(u8 data)
 {
 	m_ay8910_bdir = BIT(data, 4); // T0
 	m_ay8910_bc1 = BIT(data, 5); // T1
 	ay8910_update();
 }
 
-void mephisto_pinball_state::ay8910_update()
+void mephisto_state::ay8910_update()
 {
 	if (m_ay8910_bdir)
 		m_aysnd->data_address_w(m_ay8910_bc1, m_ay8910_data);
@@ -92,21 +91,21 @@ void mephisto_pinball_state::ay8910_update()
 		m_ay8910_data = m_aysnd->data_r();
 }
 
-void mephisto_pinball_state::ay8910_columns_w(u8 data)
+void mephisto_state::ay8910_columns_w(u8 data)
 {
 }
 
-u8 mephisto_pinball_state::ay8910_inputs_r()
+u8 mephisto_state::ay8910_inputs_r()
 {
 	return 0xff;
 }
 
-void mephisto_pinball_state::sound_rombank_w(u8 data)
+void mephisto_state::sound_rombank_w(u8 data)
 {
 	m_soundbank->set_entry(data & 0xf);
 }
 
-void mephisto_pinball_state::mephisto_map(address_map &map)
+void mephisto_state::mephisto_map(address_map &map)
 {
 	map(0x00000, 0x07fff).rom().region("maincpu", 0).mirror(0x8000);
 	map(0x10000, 0x107ff).ram().share("nvram");
@@ -115,12 +114,12 @@ void mephisto_pinball_state::mephisto_map(address_map &map)
 	map(0x13800, 0x13807).rw("ic20", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0x14000, 0x140ff).rw("ic9", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 	map(0x14800, 0x14807).rw("ic9", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-	map(0x16000, 0x16000).w(FUNC(mephisto_pinball_state::shift_load_w));
+	map(0x16000, 0x16000).w(FUNC(mephisto_state::shift_load_w));
 	map(0x17000, 0x17001).nopw(); //???
 	map(0xf0000, 0xf7fff).rom().region("maincpu", 0).mirror(0x8000);
 }
 
-void mephisto_pinball_state::sport2k_map(address_map &map)
+void mephisto_state::sport2k_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).rom().region("maincpu", 0);
 	map(0x20000, 0x21fff).ram().share("nvram");
@@ -129,25 +128,25 @@ void mephisto_pinball_state::sport2k_map(address_map &map)
 	map(0x2b800, 0x2b807).rw("ic20", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0x2c000, 0x2c0ff).rw("ic9", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 	map(0x2c800, 0x2c807).rw("ic9", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-	map(0x2e000, 0x2e000).w(FUNC(mephisto_pinball_state::shift_load_w));
+	map(0x2e000, 0x2e000).w(FUNC(mephisto_state::shift_load_w));
 	map(0x2f000, 0x2f001).nopw(); //???
 	map(0xf0000, 0xfffff).rom().region("maincpu", 0);
 }
 
-void mephisto_pinball_state::mephisto_8051_map(address_map &map)
+void mephisto_state::mephisto_8051_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xffff).bankr("soundbank");
 }
 
-void mephisto_pinball_state::mephisto_8051_io(address_map &map)
+void mephisto_state::mephisto_8051_io(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x0800).w(FUNC(mephisto_pinball_state::sound_rombank_w));
+	map(0x0800, 0x0800).w(FUNC(mephisto_state::sound_rombank_w));
 	map(0x1000, 0x1000).w("dac", FUNC(dac08_device::data_w));
 }
 
-void mephisto_pinball_state::sport2k_8051_io(address_map &map)
+void mephisto_state::sport2k_8051_io(address_map &map)
 {
 	mephisto_8051_io(map);
 	map(0x1800, 0x1801).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
@@ -157,7 +156,7 @@ void mephisto_pinball_state::sport2k_8051_io(address_map &map)
 static INPUT_PORTS_START( mephisto )
 INPUT_PORTS_END
 
-void mephisto_pinball_state::machine_start()
+void mephisto_state::machine_start()
 {
 	m_soundbank->configure_entries(0, 16, memregion("sound1")->base(), 0x8000);
 	m_soundbank->set_entry(0);
@@ -170,15 +169,15 @@ void mephisto_pinball_state::machine_start()
 	save_item(NAME(m_ay8910_bc1));
 }
 
-void mephisto_pinball_state::machine_reset()
+void mephisto_state::machine_reset()
 {
 }
 
-void mephisto_pinball_state::mephisto(machine_config &config)
+void mephisto_state::mephisto(machine_config &config)
 {
 	/* basic machine hardware */
 	I8088(config, m_maincpu, XTAL(18'000'000)/3);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_pinball_state::mephisto_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_state::mephisto_map);
 	//m_maincpu->set_irq_acknowledge_callback("muart", FUNC(i8256_device::inta_cb));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -193,32 +192,32 @@ void mephisto_pinball_state::mephisto(machine_config &config)
 
 	I8155(config, "ic9", XTAL(18'000'000)/6);
 	//i8155_device &i8155_2(I8155(config, "ic9", XTAL(18'000'000)/6));
-	//i8155_2.out_to_callback().set(FUNC(mephisto_pinball_state::clk_shift_w));
+	//i8155_2.out_to_callback().set(FUNC(mephisto_state::clk_shift_w));
 
 	i8051_device &soundcpu(I8051(config, "soundcpu", XTAL(12'000'000)));
-	soundcpu.set_addrmap(AS_PROGRAM, &mephisto_pinball_state::mephisto_8051_map); // EA tied high for external program ROM
-	soundcpu.set_addrmap(AS_IO, &mephisto_pinball_state::mephisto_8051_io);
-	soundcpu.port_in_cb<1>().set(FUNC(mephisto_pinball_state::ay8910_read));
-	soundcpu.port_out_cb<1>().set(FUNC(mephisto_pinball_state::ay8910_write));
-	soundcpu.port_out_cb<3>().set(FUNC(mephisto_pinball_state::t0_t1_w));
+	soundcpu.set_addrmap(AS_PROGRAM, &mephisto_state::mephisto_8051_map); // EA tied high for external program ROM
+	soundcpu.set_addrmap(AS_IO, &mephisto_state::mephisto_8051_io);
+	soundcpu.port_in_cb<1>().set(FUNC(mephisto_state::ay8910_read));
+	soundcpu.port_out_cb<1>().set(FUNC(mephisto_state::ay8910_write));
+	soundcpu.port_out_cb<3>().set(FUNC(mephisto_state::t0_t1_w));
 	soundcpu.serial_rx_cb().set_constant(0); // from MUART
 
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, m_aysnd, XTAL(12'000'000)/8);
-	m_aysnd->port_a_write_callback().set(FUNC(mephisto_pinball_state::ay8910_columns_w));
-	m_aysnd->port_b_read_callback().set(FUNC(mephisto_pinball_state::ay8910_inputs_r));
+	m_aysnd->port_a_write_callback().set(FUNC(mephisto_state::ay8910_columns_w));
+	m_aysnd->port_b_read_callback().set(FUNC(mephisto_state::ay8910_inputs_r));
 	m_aysnd->add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	DAC08(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
-void mephisto_pinball_state::sport2k(machine_config &config)
+void mephisto_state::sport2k(machine_config &config)
 {
 	mephisto(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_pinball_state::sport2k_map);
-	subdevice<i8051_device>("soundcpu")->set_addrmap(AS_IO, &mephisto_pinball_state::sport2k_8051_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_state::sport2k_map);
+	subdevice<i8051_device>("soundcpu")->set_addrmap(AS_IO, &mephisto_state::sport2k_8051_io);
 
 	YM3812(config, "ymsnd", XTAL(14'318'181)/4).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
@@ -296,7 +295,7 @@ ROM_START(sport2k)
 	ROM_LOAD("s511_512.bin", 0x40000, 0x10000, CRC(ca9afa80) SHA1(6f219bdc1ad06e340b2930610897b70369a43684))
 ROM_END
 
-GAME(1987,  mephistp,   0,         mephisto,  mephisto, mephisto_pinball_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (rev. 1.2)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
-GAME(1987,  mephistp1,  mephistp,  mephisto,  mephisto, mephisto_pinball_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (rev. 1.1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
-GAME(1987,  mephistpn,  mephistp,  mephisto,  mephisto, mephisto_pinball_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (newer?)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
-GAME(1988,  sport2k,    0,         sport2k,   mephisto, mephisto_pinball_state, empty_init, ROT0,  "Cirsa",       "Sport 2000",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_NO_SOUND)
+GAME(1987,  mephistp,   0,         mephisto,  mephisto, mephisto_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (rev. 1.2)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
+GAME(1987,  mephistp1,  mephistp,  mephisto,  mephisto, mephisto_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (rev. 1.1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
+GAME(1987,  mephistpn,  mephistp,  mephisto,  mephisto, mephisto_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (newer?)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
+GAME(1988,  sport2k,    0,         sport2k,   mephisto, mephisto_state, empty_init, ROT0,  "Cirsa",       "Sport 2000",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_NO_SOUND)

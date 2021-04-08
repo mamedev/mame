@@ -11,7 +11,7 @@ TODO:
 ***************************************************************************/
 
 // the new RIOT does not work with the SuperCharger
-// for example "mame64 a2600 scharger -cass offifrog" fails to load after playing the tape
+// for example "mame a2600 scharger -cass offifrog" fails to load after playing the tape
 
 #include "emu.h"
 

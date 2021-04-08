@@ -29,9 +29,9 @@ Year + Game         PCB             Notes
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
+#include "sound/ym3812.h"
 #include "speaker.h"
 
 
@@ -63,8 +63,8 @@ void unico_state::burglarx_map(address_map &map)
 	map(0x800030, 0x800031).nopw();                                                // ? 0
 	map(0x80010c, 0x800121).rw(FUNC(unico_state::scroll_r), FUNC(unico_state::scroll_w));               // Scroll
 	map(0x800189, 0x800189).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
-	map(0x80018a, 0x80018a).w("ymsnd", FUNC(ym3812_device::write_port_w));
-	map(0x80018c, 0x80018c).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
+	map(0x80018a, 0x80018a).w("ymsnd", FUNC(ym3812_device::data_w));
+	map(0x80018c, 0x80018c).rw("ymsnd", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
 	map(0x80018e, 0x80018e).w(FUNC(unico_state::burglarx_okibank_w));                    //
 	map(0x8001e0, 0x8001e1).nopw();                                                // IRQ Ack
 	map(0x904000, 0x90ffff).rw(FUNC(unico_state::vram_r), FUNC(unico_state::vram_w));         // Layers 1, 2, 0
@@ -146,8 +146,8 @@ void zeropnt_state::zeropnt_map(address_map &map)
 	map(0x800178, 0x800179).r(FUNC(zeropnt_state::guny_1_msb_r));   //
 	map(0x80017c, 0x80017d).r(FUNC(zeropnt_state::gunx_1_msb_r));   //
 	map(0x800189, 0x800189).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // Sound
-	map(0x80018a, 0x80018a).w("ymsnd", FUNC(ym3812_device::write_port_w));
-	map(0x80018c, 0x80018c).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
+	map(0x80018a, 0x80018a).w("ymsnd", FUNC(ym3812_device::data_w));
+	map(0x80018c, 0x80018c).rw("ymsnd", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
 	map(0x80018e, 0x80018e).w(FUNC(zeropnt_state::zeropnt_okibank_leds_w));   //
 	map(0x8001e0, 0x8001e1).nopw();   // ? IRQ Ack
 	map(0x904000, 0x90ffff).rw(FUNC(zeropnt_state::vram_r), FUNC(zeropnt_state::vram_w));     // Layers 1, 2, 0

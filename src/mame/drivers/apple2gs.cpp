@@ -113,7 +113,7 @@
 #include "bus/a2bus/ccs7710.h"
 #include "bus/a2bus/cmsscsi.h"
 #include "bus/a2bus/ezcgi.h"
-#include "bus/a2bus/grapplerplus.h"
+#include "bus/a2bus/grappler.h"
 //#include "bus/a2bus/hostram.h"
 #include "bus/a2bus/laser128.h"
 #include "bus/a2bus/mouse.h"
@@ -4763,7 +4763,10 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("aevm80", A2BUS_AEVIEWMASTER80);    /* Applied Engineering ViewMaster 80 */
 	device.option_add("parprn", A2BUS_PARPRN);    /* Apple II Parallel Printer Interface Card */
 	device.option_add("parallel", A2BUS_PIC);   /* Apple Parallel Interface Card */
-	device.option_add("grapplerplus", A2BUS_GRAPPLERPLUS); /* Orange Micro Grappler+ Printer Interface card */
+	device.option_add("grappler", A2BUS_GRAPPLER); /* Orange Micro Grappler Printer Interface card */
+	device.option_add("grapplus", A2BUS_GRAPPLERPLUS); /* Orange Micro Grappler+ Printer Interface card */
+	device.option_add("bufgrapplus", A2BUS_BUFGRAPPLERPLUS); /* Orange Micro Buffered Grappler+ Printer Interface card */
+	device.option_add("bufgrapplusa", A2BUS_BUFGRAPPLERPLUSA); /* Orange Micro Buffered Grappler+ (rev A) Printer Interface card */
 	device.option_add("corvus", A2BUS_CORVUS);  /* Corvus flat-cable HDD interface (see notes in a2corvus.c) */
 	device.option_add("mcms1", A2BUS_MCMS1);  /* Mountain Computer Music System, card 1 of 2 */
 	device.option_add("mcms2", A2BUS_MCMS2);  /* Mountain Computer Music System, card 2 of 2.  must be in card 1's slot + 1! */
@@ -4925,6 +4928,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 
 	/* serial */
 	SCC85C30(config, m_scc, A2GS_14M/2);
+	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_int_callback().set(FUNC(apple2gs_state::scc_irq_w));
 	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
 	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));

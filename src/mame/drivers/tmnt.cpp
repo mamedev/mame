@@ -73,6 +73,7 @@ Updates:
 #include "sound/okim6295.h"
 #include "sound/samples.h"
 #include "sound/ym2151.h"
+#include "sound/ymfm.h"
 #include "speaker.h"
 
 
@@ -230,25 +231,11 @@ SAMPLES_START_CB_MEMBER(tmnt_state::tmnt_decode_sample)
 	int i;
 	uint8_t *source = memregion("title")->base();
 
-	/*  Sound sample for TMNT.D05 is stored in the following mode (ym3012 format):
-	 *
-	 *  Bit 15-13:  Exponent (2 ^ x)
-	 *  Bit 12-3 :  Sound data (10 bit)
-	 *
-	 *  (Sound info courtesy of Dave <dave@finalburn.com>)
-	 */
-
+	// sample data is encoded in Yamaha FP format
 	for (i = 0; i < 0x40000; i++)
 	{
 		int val = source[2 * i] + source[2 * i + 1] * 256;
-		int expo = val >> 13;
-
-		val = (val >> 3) & (0x3ff); /* 10 bit, Max Amplitude 0x400 */
-		val -= 0x200;                   /* Centralize value */
-
-		val = (val << expo) >> 3;
-
-		m_sampledata[i] = val;
+		m_sampledata[i] = ymfm_decode_fp(val >> 3);
 	}
 }
 
@@ -2093,7 +2080,7 @@ void tmnt_state::tmnt(machine_config &config)
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(1); /* 1 channel for the title music */
 	m_samples->set_samples_start_callback(FUNC(tmnt_state::tmnt_decode_sample));
-	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void tmnt_state::punkshot(machine_config &config)

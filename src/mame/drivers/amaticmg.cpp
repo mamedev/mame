@@ -414,7 +414,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/ds1994.h"
-#include "sound/3812intf.h"
+#include "sound/ym3812.h"
 #include "video/mc6845.h"
 //#include "sound/dac.h"
 #include "emupal.h"

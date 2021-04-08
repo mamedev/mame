@@ -108,6 +108,7 @@ b2m.cpp
 babbage.cpp
 banctec.cpp
 bandai_design_master.cpp
+basf7100.cpp
 basic52.cpp
 basssta.cpp
 bbc.cpp
@@ -577,6 +578,7 @@ mephisto_academy.cpp
 mephisto_berlin.cpp
 mephisto_brikett.cpp
 mephisto_glasgow.cpp
+mephisto_milano.cpp
 mephisto_mm1.cpp
 mephisto_mm2.cpp
 mephisto_modena.cpp
@@ -586,6 +588,7 @@ mephisto_mondial.cpp
 mephisto_mondial68k.cpp
 mephisto_montec.cpp
 mephisto_polgar.cpp
+mephisto_risc.cpp
 meritum.cpp
 mes.cpp
 mfabfz.cpp

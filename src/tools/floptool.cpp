@@ -117,7 +117,7 @@ static io_generic *ram_open(std::vector<u8> &data)
 	f->pos = 0;
 	return new io_generic({ &iop_ram, f });
 }
-	
+
 std::map<std::string, std::vector<floppy_image_format_t *>> formats_by_category;
 std::map<std::string, floppy_image_format_t *> formats_by_key;
 
@@ -175,7 +175,7 @@ struct enumerator : public mame_formats_enumerator {
 	virtual void add(filesystem_manager_type fs) {
 		auto ff = fs();
 		ff->enumerate(fse, floppy_image::FF_UNKNOWN, variants);
-	}		
+	}
 };
 
 void fs_enum::reg(const fs_info &fsi) const
@@ -464,7 +464,7 @@ static int create(int argc, char *argv[])
 	}
 
 	fclose((FILE *)dest_io.file);
-	
+
 	return 0;
 }
 

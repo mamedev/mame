@@ -1,66 +1,21 @@
 // license:BSD-3-Clause
-// copyright-holders:Nathan Woods, Raphael Nabet, R. Belmont
+// copyright-holders: Nathan Woods, Raphael Nabet, R. Belmont, O. Galibert
 /****************************************************************************
 
-    drivers/mac.c
-    Macintosh family emulation
-
-    Nate Woods, Raphael Nabet, R. Belmont
-
-        0x000000 - 0x3fffff     RAM/ROM (switches based on overlay)
-        0x400000 - 0x4fffff     ROM
-        0x580000 - 0x5fffff     5380 NCR/Symbios SCSI peripherals chip (Mac Plus only)
-        0x600000 - 0x6fffff     RAM
-        0x800000 - 0x9fffff     Zilog 8530 SCC (Serial Control Chip) Read
-        0xa00000 - 0xbfffff     Zilog 8530 SCC (Serial Control Chip) Write
-        0xc00000 - 0xdfffff     IWM (Integrated Woz Machine; floppy)
-        0xe80000 - 0xefffff     Rockwell 6522 VIA
-        0xf00000 - 0xffffef     ??? (the ROM appears to be accessing here)
-        0xfffff0 - 0xffffff     Auto Vector
-
-    Interrupts:
-        M68K:
-            Level 1 from VIA
-            Level 2 from SCC
-            Level 4 : Interrupt switch (not implemented)
-
-        VIA:
-            CA1 from VBLANK
-            CA2 from 1 Hz clock (RTC)
-            CB1 from Keyboard Clock
-            CB2 from Keyboard Data
-            SR  from Keyboard Data Ready
-
-        SCC:
-            PB_EXT  from mouse Y circuitry
-            PA_EXT  from mouse X circuitry
-
-    NOTES:
-        - pmac6100: with recent PPC fixes now gets into the 68000 emulator and executes part of the 680x0 startup code.
-          'g 6802c73c' to get to the interesting part (wait past the boot chime).  PPC register r24 is the 68000 PC.
-          when the PC hits GetCPUID, the move.l (a2), d0 at PC = 0x10000 will cause an MMU fault (jump to 0xFFF00300).  why?
-          a2 = 0x5ffffffc (the CPU ID register).  MMU is unable to resolve this; defect in the MMU emulation probable.
+    drivers/mac.cpp
+    Macintosh II family emulation
 
     TODO:
-        - SE and Classic to own driver
-        - Portable and PowerBook 100 to own driver
-        - Remaining PowerBooks to own driver
-        - Quadra 700 to own driver
-        - V8 and friends to own driver
+        - V8 and friends (LC, LC2, Classic 2, Color Classic) to own driver
         - LC3 / LC520 / IIvx / IIvi to own driver
 
 ****************************************************************************/
-
 
 #include "emu.h"
 #include "includes/mac.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/powerpc/ppc.h"
 #include "cpu/m6805/m6805.h"
-#include "machine/applefdc.h"
-#include "machine/swim.h"
-#include "machine/sonydriv.h"
 #include "formats/ap_dsk35.h"
 #include "machine/iwm.h"
 #include "machine/swim1.h"
@@ -487,50 +442,6 @@ void mac_state::swimiop_w(offs_t offset, uint8_t data)
 //  printf("swimiop_w %x @ %x (PC=%x)\n", data, offset, m_maincpu->pc());
 }
 
-uint8_t mac_state::pmac_diag_r(offs_t offset)
-{
-	switch (offset)
-	{
-		case 0: // return 0 here to get the 'car crash' sound after the boot bong, 1 otherwise
-			return 1;
-	}
-
-	return 0;
-}
-
-uint8_t mac_state::amic_dma_r()
-{
-	return 0;
-}
-
-void mac_state::amic_dma_w(offs_t offset, uint8_t data)
-{
-//  printf("amic_dma_w: %02x at %x (PC=%x)\n", data, offset+0x1000, m_maincpu->pc());
-}
-
-// HMC has one register: a 35-bit shift register which is accessed one bit at a time (see pmac6100 code at 4030383c which makes this obvious)
-uint8_t mac_state::hmc_r()
-{
-	uint8_t rv = (uint8_t)(m_hmc_shiftout&1);
-	m_hmc_shiftout>>= 1;
-	return rv;
-}
-
-void mac_state::hmc_w(offs_t offset, uint8_t data)
-{
-	// writes to xxx8 reset the bit shift position
-	if ((offset&0x8) == 8)
-	{
-		m_hmc_shiftout = m_hmc_reg;
-	}
-	else
-	{
-		uint64_t temp = (data & 1) ? 0x400000000U : 0x0U;
-		m_hmc_reg >>= 1;
-		m_hmc_reg |= temp;
-	}
-}
-
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
@@ -646,17 +557,7 @@ void mac_state::maciifx_map(address_map &map)
 /***************************************************************************
     DEVICE CONFIG
 ***************************************************************************/
-#if !NEW_SWIM
-static const applefdc_interface mac_iwm_interface =
-{
-	sony_set_lines,
-	mac_fdc_set_enable_lines,
 
-	sony_read_data,
-	sony_write_data,
-	sony_read_status
-};
-#endif
 static void mac_nubus_cards(device_slot_interface &device)
 {
 	device.option_add("m2video", NUBUS_M2VIDEO);    /* Apple Macintosh II Video Card */
@@ -694,20 +595,12 @@ static void mac_lcpds_cards(device_slot_interface &device)
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
-#if !NEW_SWIM
-static const floppy_interface mac_floppy_interface =
-{
-	FLOPPY_STANDARD_3_5_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(apple35_mac),
-	"floppy_3_5"
-};
-#endif
+
 void mac_state::add_base_devices(machine_config &config, bool rtc, int woz_version)
 {
 	if (rtc)
 		RTC3430042(config, m_rtc, XTAL(32'768));
 
-#if NEW_SWIM
 	switch (woz_version) {
 	case 0:
 		IWM(config, m_fdc, C15M);
@@ -737,13 +630,6 @@ void mac_state::add_base_devices(machine_config &config, bool rtc, int woz_versi
 		applefdintf_device::add_35_hd(config, m_floppy[0]);
 		applefdintf_device::add_35_nc(config, m_floppy[1]);
 	}
-#else
-	if (woz_version)
-		LEGACY_SWIM(config, m_fdc, &mac_iwm_interface);
-	else
-		LEGACY_IWM(config, m_fdc, &mac_iwm_interface);
-	sonydriv_floppy_image_device::legacy_2_drives_add(config, &mac_floppy_interface);
-#endif
 
 	SCC8530(config, m_scc, C7M);
 	m_scc->intrq_callback().set(FUNC(mac_state::set_scc_interrupt));
@@ -904,15 +790,13 @@ void mac_state::maciihd(machine_config &config)
 {
 	macii(config, true);
 
-#if NEW_SWIM
 	SWIM1(config.replace(), m_fdc, C15M);
 	m_fdc->phases_cb().set(FUNC(mac_state::phases_w));
 	m_fdc->sel35_cb().set(FUNC(mac_state::sel35_w));
 	m_fdc->devsel_cb().set(FUNC(mac_state::devsel_w));
 
 	applefdintf_device::add_35_hd(config, m_floppy[0]);
-	applefdintf_device::add_35_nc(config, m_floppy[1]);
-#endif
+	applefdintf_device::add_35_hd(config, m_floppy[1]);
 }
 
 void mac_state::maciifx(machine_config &config)
@@ -1069,15 +953,13 @@ void mac_state::maciix(machine_config &config, bool nubus_bank1, bool nubus_bank
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macii_map);
 	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
 
-#if NEW_SWIM
 	SWIM1(config.replace(), m_fdc, C15M);
 	m_fdc->phases_cb().set(FUNC(mac_state::phases_w));
 	m_fdc->sel35_cb().set(FUNC(mac_state::sel35_w));
 	m_fdc->devsel_cb().set(FUNC(mac_state::devsel_w));
 
 	applefdintf_device::add_35_hd(config, m_floppy[0]);
-	applefdintf_device::add_35_nc(config, m_floppy[1]);
-#endif
+	applefdintf_device::add_35_hd(config, m_floppy[1]);
 
 	m_ram->set_default_size("2M");
 	m_ram->set_extra_options("8M,32M,64M,96M,128M");
@@ -1330,20 +1212,20 @@ ROM_START( maclc520 )
 ROM_END
 
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT    CLASS      INIT                COMPANY           FULLNAME */
-COMP( 1987, macii,     0,        0,      macii,    macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II",  MACHINE_NOT_WORKING )
-COMP( 1987, maciihmu,  macii,    0,      maciihmu, macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II (w/o 68851 MMU)", MACHINE_NOT_WORKING )
-COMP( 1988, mac2fdhd,  0,        0,      maciihd,  macadb,  mac_state, init_maciifdhd,     "Apple Computer", "Macintosh II (FDHD)",  MACHINE_NOT_WORKING )
-COMP( 1988, maciix,    mac2fdhd, 0,      maciix,   macadb,  mac_state, init_maciix,        "Apple Computer", "Macintosh IIx",  MACHINE_NOT_WORKING )
-COMP( 1989, macse30,   mac2fdhd, 0,      macse30,  macadb,  mac_state, init_macse30,       "Apple Computer", "Macintosh SE/30",  MACHINE_NOT_WORKING )
-COMP( 1989, maciicx,   mac2fdhd, 0,      maciicx,  macadb,  mac_state, init_maciicx,       "Apple Computer", "Macintosh IIcx",  MACHINE_NOT_WORKING )
-COMP( 1989, maciici,   0,        0,      maciici,  maciici, mac_state, init_maciici,       "Apple Computer", "Macintosh IIci", MACHINE_NOT_WORKING )
+COMP( 1987, macii,     0,        0,      macii,    macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II",  MACHINE_SUPPORTS_SAVE )
+COMP( 1987, maciihmu,  macii,    0,      maciihmu, macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II (w/o 68851 MMU)", MACHINE_SUPPORTS_SAVE )
+COMP( 1988, mac2fdhd,  0,        0,      maciihd,  macadb,  mac_state, init_maciifdhd,     "Apple Computer", "Macintosh II (FDHD)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1988, maciix,    mac2fdhd, 0,      maciix,   macadb,  mac_state, init_maciix,        "Apple Computer", "Macintosh IIx",  MACHINE_SUPPORTS_SAVE )
+COMP( 1989, macse30,   mac2fdhd, 0,      macse30,  macadb,  mac_state, init_macse30,       "Apple Computer", "Macintosh SE/30",  MACHINE_SUPPORTS_SAVE )
+COMP( 1989, maciicx,   mac2fdhd, 0,      maciicx,  macadb,  mac_state, init_maciicx,       "Apple Computer", "Macintosh IIcx",  MACHINE_SUPPORTS_SAVE )
+COMP( 1989, maciici,   0,        0,      maciici,  maciici, mac_state, init_maciici,       "Apple Computer", "Macintosh IIci", MACHINE_SUPPORTS_SAVE )
 COMP( 1990, maciifx,   0,        0,      maciifx,  macadb,  mac_state, init_maciifx,       "Apple Computer", "Macintosh IIfx",  MACHINE_NOT_WORKING )
 COMP( 1990, maclc,     0,        0,      maclc,    maciici, mac_state, init_maclc,         "Apple Computer", "Macintosh LC", MACHINE_IMPERFECT_SOUND )
-COMP( 1990, maciisi,   0,        0,      maciisi,  maciici, mac_state, init_maciisi,       "Apple Computer", "Macintosh IIsi", MACHINE_NOT_WORKING )
-COMP( 1991, macclas2,  0,        0,      macclas2, macadb,  mac_state, init_macclassic2,   "Apple Computer", "Macintosh Classic II", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )
+COMP( 1990, maciisi,   0,        0,      maciisi,  maciici, mac_state, init_maciisi,       "Apple Computer", "Macintosh IIsi", MACHINE_SUPPORTS_SAVE )
+COMP( 1991, macclas2,  0,        0,      macclas2, macadb,  mac_state, init_macclassic2,   "Apple Computer", "Macintosh Classic II", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND )
 COMP( 1991, maclc2,    0,        0,      maclc2,   maciici, mac_state, init_maclc2,        "Apple Computer", "Macintosh LC II",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )
 COMP( 1993, maccclas,  0,        0,      maccclas, macadb,  mac_state, init_maclrcclassic, "Apple Computer", "Macintosh Color Classic", MACHINE_NOT_WORKING )
-COMP( 1993, maclc3,    0,        0,      maclc3,   maciici, mac_state, init_maclc3,        "Apple Computer", "Macintosh LC III",  MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )
-COMP( 1993, maciivx,   0,        0,      maciivx,  maciici, mac_state, init_maciivx,       "Apple Computer", "Macintosh IIvx", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )
-COMP( 1993, maciivi,   maciivx,  0,      maciivi,  maciici, mac_state, init_maciivi,       "Apple Computer", "Macintosh IIvi", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )
+COMP( 1993, maclc3,    0,        0,      maclc3,   maciici, mac_state, init_maclc3,        "Apple Computer", "Macintosh LC III",  MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND )
+COMP( 1993, maciivx,   0,        0,      maciivx,  maciici, mac_state, init_maciivx,       "Apple Computer", "Macintosh IIvx", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND )
+COMP( 1993, maciivi,   maciivx,  0,      maciivi,  maciici, mac_state, init_maciivi,       "Apple Computer", "Macintosh IIvi", MACHINE_SUPPORTS_SAVE|MACHINE_IMPERFECT_SOUND )
 COMP( 1993, maclc520,  0,        0,      maclc520, maciici, mac_state, init_maclc520,      "Apple Computer", "Macintosh LC 520",  MACHINE_NOT_WORKING )

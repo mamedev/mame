@@ -20,7 +20,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "sound/3812intf.h"
+#include "sound/ym3812.h"
 #include "screen.h"
 #include "speaker.h"
 

@@ -115,13 +115,13 @@ void filter_biquad_device::modify(filter_biquad_device::biquad_params p)
  *
  *                   .----------------------------.
  *                   |                            |
- *                  ---  c2                       |
+ *                  ---  c1                       |
  *                  ---                           |
  *                   |                            |
  *            r1     |   r2                |\     |
  *   In >----ZZZZ----+--ZZZZ---+--------+  | \    |
  *                             |        '--|+ \   |
- *                            ---  c1      |   >--+------> out
+ *                            ---  c2      |   >--+------> out
  *                            ---       .--|- /   |
  *                             |        |  | /    |
  *                            gnd       |  |/     |
@@ -137,19 +137,34 @@ void filter_biquad_device::modify(filter_biquad_device::biquad_params p)
  */
 filter_biquad_device& filter_biquad_device::opamp_sk_lowpass_setup(double r1, double r2, double r3, double r4, double c1, double c2)
 {
+	filter_biquad_device::biquad_params p = opamp_sk_lowpass_calc(r1, r2, r3, r4, c1, c2);
+	return setup(p);
+}
+
+void filter_biquad_device::opamp_sk_lowpass_modify(double r1, double r2, double r3, double r4, double c1, double c2)
+{
+	filter_biquad_device::biquad_params p = opamp_sk_lowpass_calc(r1, r2, r3, r4, c1, c2);
+	modify(p);
+}
+
+filter_biquad_device::biquad_params filter_biquad_device::opamp_sk_lowpass_calc(double r1, double r2, double r3, double r4, double c1, double c2)
+{
+	filter_biquad_device::biquad_params r;
 	if ((r1 == 0) || (r2 == 0) || (r3 == 0) || (r4 == 0) || (c1 == 0) || (c2 == 0))
 	{
-		fatalerror("filter_biquad_device::opamp_sk_lowpass_setup() - no parameters can be 0; parameters were: r1: %f, r2: %f, r3: %f, r4: %f, c1: %f, c2: %f", r1, r2, r3, r4, c1, c2); /* Filter can not be setup.  Undefined results. */
+		fatalerror("filter_biquad_device::opamp_sk_lowpass_calc() - no parameters can be 0; parameters were: r1: %f, r2: %f, r3: %f, r4: %f, c1: %f, c2: %f", r1, r2, r3, r4, c1, c2); /* Filter can not be setup.  Undefined results. */
 	}
-
-	// note: if R3 doesn't exist (no link to ground), pass a value of RES_M(999.99) or the like, i.e. an 'infinite resistor'
-	double const gain = (r3 + r4) / r3;
-	double const fc = 1.0 / (2 * M_PI * sqrt(r1 * r2 * c1 * c2));
-	double const q = sqrt(r1 * r2 * c1 * c2) / ((r1 * c1) + (r2 * c1) + ((r2 * c2) * (1.0 - gain)));
+	// NOTE: if R3 doesn't exist (no link to ground), pass a value of RES_M(999.99) or the like, i.e. an 'infinite resistor'
+	// NOTE: if R4 is a direct short, set its resistance to RES_R(0.001)
+	// NOTE: if R3 doesn't exist AND R4 is a direct short, follow both rules above.
+	r.type = biquad_type::LOWPASS;
+	r.gain = 1.0 + (r4 / r3); // == (r3 + r4) / r3
+	r.fc = 1.0 / (2 * M_PI * sqrt(r1 * r2 * c1 * c2));
+	r.q = sqrt(r1 * r2 * c1 * c2) / ((r1 * c2) + (r2 * c2) + ((r2 * c1) * (1.0 - r.gain)));
 #ifdef FLT_BIQUAD_DEBUG_SETUP
-		logerror("filter_biquad_device::opamp_sk_lowpass_setup() yields: fc = %f, Q = %f, gain = %f\n", fc, q, gain);
+		logerror("filter_biquad_device::opamp_sk_lowpass_calc(%f, %f, %f, %f, %f, %f) yields: fc = %f, Q = %f, gain = %f\n", r1, r2, r3, r4, c1*1000000, c2*1000000, r.fc, r.q, r.gain);
 #endif
-		return setup(biquad_type::LOWPASS, fc, q, gain);
+	return r;
 }
 
 // Multiple-Feedback filters
@@ -211,7 +226,7 @@ filter_biquad_device::biquad_params filter_biquad_device::opamp_mfb_lowpass_calc
 		r.type = biquad_type::LOWPASS;
 	}
 #ifdef FLT_BIQUAD_DEBUG_SETUP
-		logerror("filter_biquad_device::opamp_mfb_lowpass_setup(%f, %f, %f, %f, %f) yields:\n\ttype = %d, fc = %f, Q = %f, gain = %f\n", r1, r2, r3, c1*1000000, c2*1000000, static_cast<int>(r.type), r.fc, r.q, r.gain);
+		logerror("filter_biquad_device::opamp_mfb_lowpass_calc(%f, %f, %f, %f, %f) yields:\n\ttype = %d, fc = %f, Q = %f, gain = %f\n", r1, r2, r3, c1*1000000, c2*1000000, static_cast<int>(r.type), r.fc, r.q, r.gain);
 #endif
 	return r;
 }
@@ -489,7 +504,7 @@ void filter_biquad_device::recalc()
 	logerror("a2: %f\n", m_a2);
 #endif
 	// peak and shelf filters do not use gain for the entire signal, only for the peak/shelf portions
-	// side note: the first order lowpass and highpass filter analogues technically don't have gain either,
+	// side note: the first order lowpass and highpass filter analogs technically don't have gain either,
 	// but this can be 'faked' by adjusting the bx factors, so we support that anyway, even if it isn't realistic.
 	if ( (m_type != biquad_type::PEAK)
 		&& (m_type != biquad_type::LOWSHELF)

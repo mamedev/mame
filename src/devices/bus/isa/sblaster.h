@@ -8,9 +8,9 @@
 #include "isa.h"
 #include "bus/midi/midi.h"
 #include "bus/pc_joy/pc_joy.h"
-#include "sound/3812intf.h"
 #include "sound/dac.h"
 #include "sound/saa1099.h"
+#include "sound/ym3812.h"
 #include "diserial.h"
 
 //**************************************************************************

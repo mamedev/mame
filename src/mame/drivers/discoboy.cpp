@@ -47,7 +47,7 @@ Notes:
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
-#include "sound/3812intf.h"
+#include "sound/ym3812.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

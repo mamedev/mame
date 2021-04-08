@@ -78,8 +78,8 @@
 
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "sound/ym3812.h"
 #include "video/seibu_crtc.h"
 #include "screen.h"
 #include "speaker.h"

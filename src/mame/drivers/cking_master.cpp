@@ -20,12 +20,14 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/sensorboard.h"
 #include "machine/bankdev.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork

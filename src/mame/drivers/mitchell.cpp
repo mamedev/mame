@@ -123,9 +123,9 @@ mw-9.rom = ST M27C1001 / GFX
 #include "cpu/z80/z80.h"
 #include "machine/kabuki.h"  // needed for decoding functions only
 #include "sound/okim6295.h"
-#include "sound/3812intf.h"
 #include "sound/msm5205.h"
 #include "sound/ym2413.h"
+#include "sound/ym3812.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -350,8 +350,8 @@ void mitchell_state::mitchell_io_map(address_map &map)
 	map(0x00, 0x02).r(FUNC(mitchell_state::input_r));           /* The Mahjong games and Block Block need special input treatment */
 	map(0x01, 0x01).w(FUNC(mitchell_state::input_w));
 	map(0x02, 0x02).w(FUNC(mitchell_state::pang_bankswitch_w));    /* Code bank register */
-	map(0x03, 0x03).w("ymsnd", FUNC(ym2413_device::data_port_w));
-	map(0x04, 0x04).w("ymsnd", FUNC(ym2413_device::register_port_w));
+	map(0x03, 0x03).w("ymsnd", FUNC(ym2413_device::data_w));
+	map(0x04, 0x04).w("ymsnd", FUNC(ym2413_device::address_w));
 	map(0x05, 0x05).r(FUNC(mitchell_state::pang_port5_r)).w(m_oki, FUNC(okim6295_device::write));
 	map(0x06, 0x06).noprw();                     /* watchdog? IRQ ack? video buffering? */
 	map(0x07, 0x07).w(FUNC(mitchell_state::pang_video_bank_w));    /* Video RAM bank register */
@@ -455,7 +455,7 @@ void mitchell_state::pkladiesbl_io_map(address_map &map) // TODO: check everythi
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("IN0").w(FUNC(mitchell_state::pang_gfxctrl_w));   /* Palette bank, layer enable, coin counters, more */
-	map(0x01, 0x01).portr("IN1").w("ymsnd", FUNC(ym2413_device::register_port_w)); // TODO: hold buttons are here, multiplexed but not in the same way as the original
+	map(0x01, 0x01).portr("IN1").w("ymsnd", FUNC(ym2413_device::address_w)); // TODO: hold buttons are here, multiplexed but not in the same way as the original
 	map(0x02, 0x02).portr("IN2").w(FUNC(mitchell_state::pang_bankswitch_w));    /* Code bank register */
 	map(0x03, 0x03).portr("DSW0");
 	map(0x04, 0x04).portr("DSW1");
@@ -463,7 +463,7 @@ void mitchell_state::pkladiesbl_io_map(address_map &map) // TODO: check everythi
 	map(0x06, 0x06).noprw();                     /* watchdog? IRQ ack? video buffering? */
 	map(0x07, 0x07).w(FUNC(mitchell_state::pang_video_bank_w));    /* Video RAM bank register */
 	map(0x08, 0x08).w(FUNC(mitchell_state::eeprom_cs_w));
-	map(0x09, 0x09).w("ymsnd", FUNC(ym2413_device::data_port_w));
+	map(0x09, 0x09).w("ymsnd", FUNC(ym2413_device::data_w));
 	map(0x10, 0x10).w(FUNC(mitchell_state::eeprom_clock_w));
 	map(0x18, 0x18).w(FUNC(mitchell_state::eeprom_serial_w));
 }

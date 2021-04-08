@@ -7,8 +7,6 @@
 #include "mm78.h"
 
 
-// opcodes
-
 // changed opcodes
 
 void mm78_device::op_lba()
@@ -63,7 +61,7 @@ void mm78_device::op_sos()
 	}
 
 	u8 bl = m_ram_addr & 0xf;
-	if (bl < 10)
+	if (bl < m_d_pins)
 	{
 		m_d_output = (m_d_output | (1 << bl)) & m_d_mask;
 		m_write_d(m_d_output);
@@ -86,7 +84,7 @@ void mm78_device::op_ros()
 	}
 
 	u8 bl = m_ram_addr & 0xf;
-	if (bl < 10)
+	if (bl < m_d_pins)
 	{
 		m_d_output = m_d_output & ~(1 << bl);
 		m_write_d(m_d_output);
@@ -109,7 +107,7 @@ void mm78_device::op_skisl()
 	}
 
 	u8 bl = m_ram_addr & 0xf;
-	if (bl < 10)
+	if (bl < m_d_pins)
 		m_skip = !BIT((m_d_output | m_read_d()) & m_d_mask, bl);
 	else if (bl < 12)
 		m_skip = !m_int_ff[~bl & 1];
@@ -164,7 +162,7 @@ void mm78_device::op_tab()
 void mm78_device::op_ix()
 {
 	// IX: input to X from channel X(aka B)
-	m_x = (m_read_r() & m_r_output) >> 4;
+	m_x = (m_read_r() & m_r_output) >> 4 & 0xf;
 }
 
 void mm78_device::op_ox()

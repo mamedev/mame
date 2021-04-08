@@ -17,11 +17,14 @@ DECLARE_DEVICE_TYPE(YM2203, ym2203_device);
 class ym2203_device : public ay8910_device
 {
 public:
+	// YM2151 is OPN
+	using fm_engine = ymopn_engine;
+
 	// constructor
 	ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	auto irq_handler() { return m_opn.irq_handler(); }
+	auto irq_handler() { return m_fm.irq_handler(); }
 
 	// read/write access
 	u8 read(offs_t offset);
@@ -47,7 +50,7 @@ private:
 	void update_prescale(u8 newval);
 
 	// internal state
-	ymopn_engine m_opn;              // core OPN engine
+	fm_engine m_fm;                  // core FM engine
 	sound_stream *m_stream;          // sound stream
 	attotime m_busy_duration;        // precomputed busy signal duration
 	u8 m_address;                    // address register

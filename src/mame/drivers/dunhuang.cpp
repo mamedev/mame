@@ -511,8 +511,8 @@ void dunhuang_state::dunhuang_io_map(address_map &map)
 
 	map(0x001b, 0x001b).w(FUNC(dunhuang_state::block_dest_w));
 
-	map(0x0081, 0x0081).w("ymsnd", FUNC(ym2413_device::register_port_w));
-	map(0x0089, 0x0089).w("ymsnd", FUNC(ym2413_device::data_port_w));
+	map(0x0081, 0x0081).w("ymsnd", FUNC(ym2413_device::address_w));
+	map(0x0089, 0x0089).w("ymsnd", FUNC(ym2413_device::data_w));
 
 	map(0x0082, 0x0082).w("oki", FUNC(okim6295_device::write));
 

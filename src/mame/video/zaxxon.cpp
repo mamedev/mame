@@ -471,7 +471,7 @@ uint32_t zaxxon_state::screen_update_ixion(screen_device &screen, bitmap_ind16 &
 	//
 	// On Razzmatazz instead the fg tilemap is used to mask off sprites near the edges so must appear
 	// above them.
-	// 	   
+	//
 	// The Zaxxon and Congo Bongo schematics don't appear to show anything related to priority control
 	// so this is most likely a hardwired change somewhere on the PCB.  There are additional bits set
 	// in the 2nd PROM, which are currently masked out as they're not used for palette.

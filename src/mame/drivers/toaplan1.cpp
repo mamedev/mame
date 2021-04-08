@@ -973,8 +973,8 @@ void toaplan1_state::vimana_hd647180_io_map(address_map &map)
 	map(0x82, 0x82).portr("DSWA");
 	map(0x83, 0x83).portr("SYSTEM");
 	map(0x84, 0x84).w(FUNC(toaplan1_state::coin_w));  // Coin counter/lockout // needs verify
-	map(0x87, 0x87).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
-	map(0x8f, 0x8f).rw("ymsnd", FUNC(ym3812_device::read_port_r), FUNC(ym3812_device::write_port_w));
+	map(0x87, 0x87).rw("ymsnd", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
+	map(0x8f, 0x8f).w("ymsnd", FUNC(ym3812_device::data_w));
 }
 
 u8 toaplan1_state::vimana_dswb_invert_r()
@@ -1018,8 +1018,7 @@ void toaplan1_samesame_state::hd647180_io_map(address_map &map)
 	map(0xa0, 0xa0).r(FUNC(toaplan1_samesame_state::soundlatch_r));
 	map(0xb0, 0xb0).w(FUNC(toaplan1_samesame_state::sound_done_w));
 
-	map(0x80, 0x80).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
-	map(0x81, 0x81).rw("ymsnd", FUNC(ym3812_device::read_port_r), FUNC(ym3812_device::write_port_w));
+	map(0x80, 0x81).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 }
 
 /*****************************************************************************

@@ -35,9 +35,9 @@ Notes:
 
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
-#include "sound/3812intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "sound/ym3812.h"
 #include "speaker.h"
 
 

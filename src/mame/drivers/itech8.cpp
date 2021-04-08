@@ -505,10 +505,10 @@
 #include "cpu/z80/z80.h"
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "sound/ym2203.h"
 #include "sound/ym2608.h"
+#include "sound/ym3812.h"
 
 #include "speaker.h"
 
@@ -2203,20 +2203,20 @@ ROM_START( slikshot )
 	ROM_LOAD( "poolpgm-20.u5",  0x00000, 0x10000, CRC(370a00eb) SHA1(b2878f161f4931d9fc3979a84b29660941e2608f) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(a96ce0f7) SHA1(c1fec3aeef97c846fd1a20b91af54f6bf9723a71) )
+	ROM_LOAD( "pool_snd-u27.u27", 0x08000, 0x8000, CRC(a96ce0f7) SHA1(c1fec3aeef97c846fd1a20b91af54f6bf9723a71) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "u53.bin", 0x00000, 0x0800, CRC(04b85918) SHA1(409aef2e71937c7654334999df9313909d757966) )
-	ROM_CONTINUE(        0x00000, 0x0800 )
-	ROM_CONTINUE(        0x00000, 0x0800 )
-	ROM_CONTINUE(        0x00000, 0x0800 )
+	ROM_LOAD( "z80_pgm_u53.u53", 0x00000, 0x0800, CRC(04b85918) SHA1(409aef2e71937c7654334999df9313909d757966) ) /* labeled Z80 PGM (U53) */
+	ROM_CONTINUE(                0x00000, 0x0800 )
+	ROM_CONTINUE(                0x00000, 0x0800 )
+	ROM_CONTINUE(                0x00000, 0x0800 )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "grom0.bin", 0x00000, 0x20000, CRC(e60c2804) SHA1(e62d11b6c4439a70a2f32df72c8c64e2f110351e) )
-	ROM_LOAD( "grom1.bin", 0x20000, 0x20000, CRC(d764d542) SHA1(43fc0c9b627484a670d87da91e212741b137e995) )
+	ROM_LOAD( "pool-grom0.grom0", 0x00000, 0x20000, CRC(e60c2804) SHA1(e62d11b6c4439a70a2f32df72c8c64e2f110351e) )
+	ROM_LOAD( "pool-grom1.grom1", 0x20000, 0x20000, CRC(d764d542) SHA1(43fc0c9b627484a670d87da91e212741b137e995) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "srom0.bin", 0x00000, 0x10000, CRC(4b075f5e) SHA1(d1ac2c06352a5b96486a7e8cf8baae0c0e5b1883) )
+	ROM_LOAD( "pool_vr-srom0.srom0", 0x00000, 0x10000, CRC(4b075f5e) SHA1(d1ac2c06352a5b96486a7e8cf8baae0c0e5b1883) )
 ROM_END
 
 
@@ -2225,20 +2225,20 @@ ROM_START( slikshot17 )
 	ROM_LOAD( "poolpgm-17.u5", 0x00000, 0x10000, CRC(09d70554) SHA1(a009cd3b22261c60f1028694baef51f61713154f) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(a96ce0f7) SHA1(c1fec3aeef97c846fd1a20b91af54f6bf9723a71) )
+	ROM_LOAD( "pool_snd-u27.u27", 0x08000, 0x8000, CRC(a96ce0f7) SHA1(c1fec3aeef97c846fd1a20b91af54f6bf9723a71) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "u53.bin", 0x00000, 0x0800, CRC(04b85918) SHA1(409aef2e71937c7654334999df9313909d757966) )
-	ROM_CONTINUE(        0x00000, 0x0800 )
-	ROM_CONTINUE(        0x00000, 0x0800 )
-	ROM_CONTINUE(        0x00000, 0x0800 )
+	ROM_LOAD( "z80_pgm_u53.u53", 0x00000, 0x0800, CRC(04b85918) SHA1(409aef2e71937c7654334999df9313909d757966) ) /* labeled Z80 PGM (U53) */
+	ROM_CONTINUE(                0x00000, 0x0800 )
+	ROM_CONTINUE(                0x00000, 0x0800 )
+	ROM_CONTINUE(                0x00000, 0x0800 )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "grom0.bin", 0x00000, 0x20000, CRC(e60c2804) SHA1(e62d11b6c4439a70a2f32df72c8c64e2f110351e) )
-	ROM_LOAD( "grom1.bin", 0x20000, 0x20000, CRC(d764d542) SHA1(43fc0c9b627484a670d87da91e212741b137e995) )
+	ROM_LOAD( "pool-grom0.grom0", 0x00000, 0x20000, CRC(e60c2804) SHA1(e62d11b6c4439a70a2f32df72c8c64e2f110351e) )
+	ROM_LOAD( "pool-grom1.grom1", 0x20000, 0x20000, CRC(d764d542) SHA1(43fc0c9b627484a670d87da91e212741b137e995) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "srom0.bin", 0x00000, 0x10000, CRC(4b075f5e) SHA1(d1ac2c06352a5b96486a7e8cf8baae0c0e5b1883) )
+	ROM_LOAD( "pool_vr-srom0.srom0", 0x00000, 0x10000, CRC(4b075f5e) SHA1(d1ac2c06352a5b96486a7e8cf8baae0c0e5b1883) )
 ROM_END
 
 
@@ -2247,26 +2247,26 @@ ROM_START( slikshot16 )
 	ROM_LOAD( "poolpgm-16.u5", 0x00000, 0x10000, CRC(c0f17012) SHA1(5d466e058daf91b4f52e634498df9d2a03627aaa) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(a96ce0f7) SHA1(c1fec3aeef97c846fd1a20b91af54f6bf9723a71) )
+	ROM_LOAD( "pool_snd-u27.u27", 0x08000, 0x8000, CRC(a96ce0f7) SHA1(c1fec3aeef97c846fd1a20b91af54f6bf9723a71) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "u53.bin", 0x00000, 0x0800, CRC(04b85918) SHA1(409aef2e71937c7654334999df9313909d757966) )
-	ROM_CONTINUE(        0x00000, 0x0800 )
-	ROM_CONTINUE(        0x00000, 0x0800 )
-	ROM_CONTINUE(        0x00000, 0x0800 )
+	ROM_LOAD( "z80_pgm_u53.u53", 0x00000, 0x0800, CRC(04b85918) SHA1(409aef2e71937c7654334999df9313909d757966) ) /* labeled Z80 PGM (U53) */
+	ROM_CONTINUE(                0x00000, 0x0800 )
+	ROM_CONTINUE(                0x00000, 0x0800 )
+	ROM_CONTINUE(                0x00000, 0x0800 )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "pool-grom.0", 0x00000, 0x10000, CRC(e6d0edc6) SHA1(5287a31bbdde1e4291d8e9e6b99d3aa12bfb6e18) )
-	ROM_LOAD( "pool-grom.1", 0x10000, 0x10000, CRC(5a071aa2) SHA1(9c5506e37625d213429b1231d457d7ce8a7a81ff) )
-	ROM_LOAD( "pool-grom.2", 0x20000, 0x10000, CRC(c0bdf4e0) SHA1(3b7c635375c5e5fddcbc1bd1b186c960081ec37e) )
-	ROM_LOAD( "pool-grom.3", 0x30000, 0x10000, CRC(cb0bd9a3) SHA1(107ff127f9adad84a5f92077851423249fce8e30) )
+	ROM_LOAD( "grom0-pool.grom0", 0x00000, 0x10000, CRC(e6d0edc6) SHA1(5287a31bbdde1e4291d8e9e6b99d3aa12bfb6e18) )
+	ROM_LOAD( "grom1-pool.grom1", 0x10000, 0x10000, CRC(5a071aa2) SHA1(9c5506e37625d213429b1231d457d7ce8a7a81ff) )
+	ROM_LOAD( "grom2-pool.grom2", 0x20000, 0x10000, CRC(c0bdf4e0) SHA1(3b7c635375c5e5fddcbc1bd1b186c960081ec37e) )
+	ROM_LOAD( "grom3-pool.grom3", 0x30000, 0x10000, CRC(cb0bd9a3) SHA1(107ff127f9adad84a5f92077851423249fce8e30) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "srom0.bin", 0x00000, 0x10000, CRC(4b075f5e) SHA1(d1ac2c06352a5b96486a7e8cf8baae0c0e5b1883) )
+	ROM_LOAD( "pool_vr-srom0.srom0", 0x00000, 0x10000, CRC(4b075f5e) SHA1(d1ac2c06352a5b96486a7e8cf8baae0c0e5b1883) )
 ROM_END
 
 
-ROM_START( dynobop )
+ROM_START( dynobop ) /* known to be labeled as DYNO PGM 1.0 U5, but same data - a "true" v1.0 most likely labeled as DYNO BIM U5 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dyno_pgm_1.1_u5.u5", 0x00000, 0x10000, CRC(98452c40) SHA1(9b9316fc258792e0d825f16e0fadf8e0c35a864e) )
 
@@ -2274,10 +2274,10 @@ ROM_START( dynobop )
 	ROM_LOAD( "dyno_snd-u27.u27", 0x08000, 0x8000, CRC(a37d862b) SHA1(922eeae184df2c5c28040da27699dd55744f8dca) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "dynobop.u53", 0x00000, 0x0800, CRC(04b85918) SHA1(409aef2e71937c7654334999df9313909d757966) )
-	ROM_CONTINUE(            0x00000, 0x0800 )
-	ROM_CONTINUE(            0x00000, 0x0800 )
-	ROM_CONTINUE(            0x00000, 0x0800 )
+	ROM_LOAD( "z80_pgm_u53.u53", 0x00000, 0x0800, CRC(04b85918) SHA1(409aef2e71937c7654334999df9313909d757966) ) /* labeled Z80 PGM (U53) */
+	ROM_CONTINUE(                0x00000, 0x0800 )
+	ROM_CONTINUE(                0x00000, 0x0800 )
+	ROM_CONTINUE(                0x00000, 0x0800 )
 
 	ROM_REGION( 0xc0000, "grom", 0 )
 	ROM_LOAD( "grom00-dyno.grom0", 0x00000, 0x20000, CRC(3525a7a3) SHA1(fe0b08203c135d55507506936dc34e1503e4906b) )

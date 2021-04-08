@@ -220,7 +220,7 @@ Notes:
       4560      - Japan Radio Co. JRC4560 Op Amp IC (DIP8)
       YAC513-W  - Yamaha YAC513-M DAC (SOIC16)
       HA13118   - Audio Power AMP IC (ZIP15)
-      JP121     - Jumper used when swapping game board cartridges
+      JP121     - Jumper to set sound output to mono or stereo
       JP051     - Slide Switch to flip screen
       CN121     - Output connector for left/right speakers
       EXCN1/2   - Connectors for player 3 & 4 controls
@@ -1183,7 +1183,7 @@ void seibuspi_state::spi_soundmap(address_map &map)
 {
 	sxx2e_soundmap(map);
 	map(0x4008, 0x4008).w("soundfifo2", FUNC(fifo7200_device::data_byte_w));
-	map(0x400a, 0x400a).portr("JUMPERS"); // TO DO: get these to actually work
+	map(0x400a, 0x400a).portr("JUMPERS"); // TODO: get these to actually work (only on SXX2C)
 }
 
 void seibuspi_state::spi_ymf271_map(address_map &map)

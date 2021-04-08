@@ -595,7 +595,7 @@ void address_space_installer::check_optimize_all(const char *function, int width
 		// 1. Adjusting
 		nstart &= ~default_lowbits_mask;
 		nend |= default_lowbits_mask;
-		
+
 		// 2. Clearing
 		u64 smask, emask;
 		if(m_config.endianness() == ENDIANNESS_BIG) {

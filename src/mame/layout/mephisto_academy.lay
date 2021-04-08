@@ -468,9 +468,9 @@ license:CC0
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="0" right="100" top="0" bottom="98" />
+		<bounds left="0" right="101" top="-1" bottom="98" />
 
-		<element ref="background"><bounds x="13" y="0" width="87" height="98" /></element>
+		<element ref="background"><bounds x="13" y="-1" width="88" height="99" /></element>
 
 		<!-- chessboard coords -->
 		<element ref="white"><bounds x="16.5" y="2.5" width="81" height="81" /></element>

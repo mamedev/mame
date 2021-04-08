@@ -46,10 +46,10 @@ Year + Game             Main CPU  Sound CPU  Sound                         Video
 #include "cpu/i86/i86.h"
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
-#include "sound/3526intf.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/ym2151.h"
+#include "sound/ym3526.h"
 #include "speaker.h"
 
 

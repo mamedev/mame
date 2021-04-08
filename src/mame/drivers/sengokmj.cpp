@@ -58,8 +58,8 @@ RSSENGO2.72   chr.
 
 #include "cpu/nec/nec.h"
 #include "machine/nvram.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "sound/ym3812.h"
 #include "video/seibu_crtc.h"
 #include "emupal.h"
 #include "screen.h"

@@ -18,11 +18,14 @@ DECLARE_DEVICE_TYPE(YM2610, ym2610_device);
 class ym2610_device : public ay8910_device, public device_memory_interface
 {
 public:
+	// YM2610 is OPNA
+	using fm_engine = ymopna_engine;
+
 	// constructor
-	ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type = YM2610, u8 opn_mask = 0x36);
+	ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type = YM2610, u8 fm_mask = 0x36);
 
 	// configuration helpers
-	auto irq_handler() { return m_opn.irq_handler(); }
+	auto irq_handler() { return m_fm.irq_handler(); }
 
 	// read/write access
 	u8 read(offs_t offset);
@@ -50,13 +53,13 @@ private:
 	address_space_config const m_adpcm_b_config; // address space 1 config (ADPCM-B)
 	optional_memory_region m_adpcm_a_region; // ADPCM-A memory region
 	optional_memory_region m_adpcm_b_region; // ADPCM-B memory region
-	ymopna_engine m_opn;             // core OPNA engine
+	fm_engine m_fm;                  // core FM engine
 	ymadpcm_a_engine m_adpcm_a;      // ADPCM-A engine
 	ymadpcm_b_engine m_adpcm_b;      // ADPCM-B engine
 	sound_stream *m_stream;          // sound stream
 	attotime m_busy_duration;        // precomputed busy signal duration
 	u16 m_address;                   // address register
-	u8 const m_opn_mask;             // OPN channel mask
+	u8 const m_fm_mask;              // FM channel mask
 	u8 m_eos_status;                 // end-of-sample signals
 	u8 m_flag_mask;                  // flag mask control
 };

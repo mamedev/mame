@@ -16,7 +16,7 @@
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/3812intf.h"
+#include "sound/ym3812.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -75,8 +75,8 @@ void prehisle_state::prehisle_sound_map(address_map &map)
 void prehisle_state::prehisle_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
-	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::write_port_w));
+	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
+	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::data_w));
 	map(0x40, 0x40).w(FUNC(prehisle_state::upd_port_w));
 	map(0x80, 0x80).lw8(NAME([this] (u8 data) { m_upd7759->reset_w(BIT(data, 7)); }));
 }

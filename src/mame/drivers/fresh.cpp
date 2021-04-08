@@ -200,8 +200,8 @@ void fresh_state::fresh_map(address_map &map)
 	map(0xc40000, 0xc417ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xc50000, 0xc517ff).ram().w(m_palette, FUNC(palette_device::write16_ext)).share("palette_ext");
 
-	map(0xd00001, 0xd00001).w("ymsnd", FUNC(ym2413_device::register_port_w));
-	map(0xd10001, 0xd10001).w("ymsnd", FUNC(ym2413_device::data_port_w));
+	map(0xd00001, 0xd00001).w("ymsnd", FUNC(ym2413_device::address_w));
+	map(0xd10001, 0xd10001).w("ymsnd", FUNC(ym2413_device::data_w));
 
 	map(0xd30000, 0xd30001).w(FUNC(fresh_state::d30000_write));
 	map(0xd40000, 0xd40001).portr("IN0"); //.nopw(); // checks for 0x10

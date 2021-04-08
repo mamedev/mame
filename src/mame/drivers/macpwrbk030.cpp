@@ -100,10 +100,9 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m5074x.h"
 #include "machine/6522via.h"
-#include "machine/applefdc.h"
 #include "machine/ram.h"
-#include "machine/sonydriv.h"
-#include "machine/swim.h"
+#include "machine/applefdintf.h"
+#include "machine/swim1.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
 #include "machine/macadb.h"
@@ -134,7 +133,8 @@ public:
 		m_macadb(*this, "macadb"),
 		m_ncr5380(*this, "ncr5380"),
 		m_ram(*this, RAM_TAG),
-		m_iwm(*this, "fdc"),
+		m_swim(*this, "fdc"),
+		m_floppy(*this, "fdc:%d", 0U),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_asc(*this, "asc"),
@@ -166,7 +166,8 @@ private:
 	required_device<macadb_device> m_macadb;
 	required_device<ncr5380_device> m_ncr5380;
 	required_device<ram_device> m_ram;
-	required_device<applefdc_base_device> m_iwm;
+	required_device<applefdintf_device> m_swim;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<asc_device> m_asc;
@@ -201,12 +202,13 @@ private:
 	void mac_via2_out_a(u8 data);
 	void mac_via2_out_b(u8 data);
 	void field_interrupts();
+	void mac_via_sync();
 	DECLARE_WRITE_LINE_MEMBER(via_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(via2_irq_w);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 	WRITE_LINE_MEMBER(via_cb2_w) { m_macadb->adb_data_w(state); }
-	int m_via_cycles, m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_asc_interrupt, m_last_taken_interrupt;
-	int m_irq_count, m_ca1_data, m_ca2_data;
+	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_asc_interrupt, m_last_taken_interrupt;
+	int m_irq_count, m_ca1_data, m_ca2_data, m_via2_ca1_hack;
 
 	u32 rom_switch_r(offs_t offset);
 	bool m_overlay;
@@ -217,22 +219,34 @@ private:
 	void scsi_drq_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	u16 mac_scc_r(offs_t offset)
 	{
+		mac_via_sync();
 		u16 result = m_scc->dc_ab_r(offset);
 		return (result << 8) | result;
 	}
 	void mac_scc_2_w(offs_t offset, u16 data) { m_scc->dc_ab_w(offset, data >> 8); }
 
-	u16 mac_iwm_r(offs_t offset, u16 mem_mask)
+	floppy_image_device *m_cur_floppy;
+	int m_hdsel;
+
+	void phases_w(uint8_t phases);
+	void devsel_w(uint8_t devsel);
+
+	u16 swim_r(offs_t offset, u16 mem_mask)
 	{
-		u16 result = m_iwm->read(offset >> 8);
-		return (result << 8) | result;
+		if (!machine().side_effects_disabled())
+		{
+			m_maincpu->adjust_icount(-5);
+		}
+
+		u16 result = m_swim->read((offset >> 8) & 0xf);
+		return result << 8;
 	}
-	void mac_iwm_w(offs_t offset, u16 data, u16 mem_mask)
+	void swim_w(offs_t offset, u16 data, u16 mem_mask)
 	{
 		if (ACCESSING_BITS_0_7)
-			m_iwm->write((offset >> 8), data & 0xff);
+			m_swim->write((offset >> 8) & 0xf, data & 0xff);
 		else
-			m_iwm->write((offset >> 8), data>>8);
+			m_swim->write((offset >> 8) & 0xf, data >> 8);
 	}
 
 	u32 buserror_r();
@@ -318,6 +332,49 @@ void macpb030_state::field_interrupts()
 	}
 }
 
+void macpb030_state::mac_via_sync()
+{
+	// The via runs at 783.36KHz while the main cpu runs at 15MHz or
+	// more, so we need to sync the access with the via clock.  Plus
+	// the whole access takes half a (via) cycle and ends when synced
+	// with the main cpu again.
+
+	// Get the main cpu time
+	u64 cycle = m_maincpu->total_cycles();
+
+	// Get the number of the cycle the via is in at that time
+	u64 via_cycle = cycle * m_via1->clock() / m_maincpu->clock();
+
+	// The access is going to start at via_cycle+1 and end at
+	// via_cycle+1.5, compute what that means in maincpu cycles (the
+	// +1 rounds up, since the clocks are too different to ever be
+	// synced).
+	u64 main_cycle = (via_cycle * 2 + 3) * m_maincpu->clock() / (2 * m_via1->clock()) + 1;
+
+	// Finally adjust the main cpu icount as needed.
+	m_maincpu->adjust_icount(-int(main_cycle - cycle));
+}
+
+void macpb030_state::phases_w(uint8_t phases)
+{
+	if (m_cur_floppy)
+		m_cur_floppy->seek_phase_w(phases);
+}
+
+void macpb030_state::devsel_w(uint8_t devsel)
+{
+	if (devsel == 1)
+		m_cur_floppy = m_floppy[0]->get_device();
+	else if (devsel == 2)
+		m_cur_floppy = m_floppy[1]->get_device();
+	else
+		m_cur_floppy = nullptr;
+
+	m_swim->set_floppy(m_cur_floppy);
+	if (m_cur_floppy)
+		m_cur_floppy->ss_w(m_hdsel);
+}
+
 void macpb030_state::machine_start()
 {
 	m_ram_ptr = (u32*)m_ram->pointer();
@@ -325,7 +382,6 @@ void macpb030_state::machine_start()
 	m_ram_mask = m_ram_size - 1;
 	m_rom_ptr = (u32*)memregion("bootrom")->base();
 	m_rom_size = memregion("bootrom")->bytes();
-	m_via_cycles = -50;
 	m_via_interrupt = m_via2_interrupt = m_scc_interrupt = m_asc_interrupt = 0;
 	m_last_taken_interrupt = -1;
 	m_irq_count = m_ca1_data = m_ca2_data = 0;
@@ -340,6 +396,10 @@ void macpb030_state::machine_reset()
 	m_via_interrupt = m_via2_interrupt = m_scc_interrupt = m_asc_interrupt = 0;
 	m_last_taken_interrupt = -1;
 	m_irq_count = m_ca1_data = m_ca2_data = 0;
+	m_via2_ca1_hack = 0;
+
+	m_cur_floppy = nullptr;
+	m_hdsel = 0;
 
 	// put ROM mirror at 0
 	address_space& space = m_maincpu->space(AS_PROGRAM);
@@ -443,7 +503,8 @@ u16 macpb030_state::mac_via_r(offs_t offset)
 
 	data = m_via1->read(offset);
 
-	m_maincpu->adjust_icount(m_via_cycles);
+	if (!machine().side_effects_disabled())
+		mac_via_sync();
 
 	return (data & 0xff) | (data << 8);
 }
@@ -458,7 +519,7 @@ void macpb030_state::mac_via_w(offs_t offset, u16 data, u16 mem_mask)
 	if (ACCESSING_BITS_8_15)
 		m_via1->write(offset, (data >> 8) & 0xff);
 
-	m_maincpu->adjust_icount(m_via_cycles);
+	mac_via_sync();
 }
 
 uint16_t macpb030_state::mac_via2_r(offs_t offset)
@@ -468,6 +529,9 @@ uint16_t macpb030_state::mac_via2_r(offs_t offset)
 	offset >>= 8;
 	offset &= 0x0f;
 
+	if (!machine().side_effects_disabled())
+		mac_via_sync();
+
 	data = m_via2->read(offset);
 	return (data & 0xff) | (data << 8);
 }
@@ -476,6 +540,10 @@ void macpb030_state::mac_via2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset >>= 8;
 	offset &= 0x0f;
+
+	mac_via_sync();
+
+	//printf("%02x to VIA2 @ %x\n", data & 0xff, offset);
 
 	if (ACCESSING_BITS_0_7)
 		m_via2->write(offset, data & 0xff);
@@ -537,7 +605,7 @@ u16 macpb030_state::scsi_r(offs_t offset, u16 mem_mask)
 {
 	int reg = (offset >> 3) & 0xf;
 
-	//  logerror("macplus_scsi_r: offset %x mask %x\n", offset, mem_mask);
+	//printf("scsi_r: offset %x mask %x\n", offset, mem_mask);
 
 	if ((reg == 6) && (offset == 0x130))
 	{
@@ -551,14 +619,14 @@ void macpb030_state::scsi_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	int reg = (offset >> 3) & 0xf;
 
-	//  logerror("macplus_scsi_w: data %x offset %x mask %x\n", data, offset, mem_mask);
+	//printf("scsi_w: data %x offset %x mask %x\n", data, offset, mem_mask);
 
 	if ((reg == 0) && (offset == 0x100))
 	{
 		reg = R5380_OUTDATA_DTACK;
 	}
 
-	m_ncr5380->ncr5380_write_reg(reg, data);
+	m_ncr5380->ncr5380_write_reg(reg, data>>8);
 }
 
 uint32_t macpb030_state::scsi_drq_r(offs_t offset, uint32_t mem_mask)
@@ -691,8 +759,9 @@ void macpb030_state::macpb140_map(address_map &map)
 	map(0x50010000, 0x50011fff).rw(FUNC(macpb030_state::scsi_r), FUNC(macpb030_state::scsi_w)).mirror(0x01f00000);
 	map(0x50012060, 0x50012063).r(FUNC(macpb030_state::scsi_drq_r)).mirror(0x01f00000);
 	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x01f00000);
-	map(0x50016000, 0x50017fff).rw(FUNC(macpb030_state::mac_iwm_r), FUNC(macpb030_state::mac_iwm_w)).mirror(0x01f00000);
+	map(0x50016000, 0x50017fff).rw(FUNC(macpb030_state::swim_r), FUNC(macpb030_state::swim_w)).mirror(0x01f00000);
 	map(0x50024000, 0x50027fff).r(FUNC(macpb030_state::buserror_r)).mirror(0x01f00000); // bus error here to make sure we aren't mistaken for another decoder
+
 
 	map(0xfee08000, 0xfeffffff).ram().share("vram");
 }
@@ -708,7 +777,7 @@ void macpb030_state::macpb160_map(address_map &map)
 	map(0x50f10000, 0x50f11fff).rw(FUNC(macpb030_state::scsi_r), FUNC(macpb030_state::scsi_w));
 	map(0x50f12060, 0x50f12063).r(FUNC(macpb030_state::scsi_drq_r));
 	map(0x50f14000, 0x50f15fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
-	map(0x50f16000, 0x50f17fff).rw(FUNC(macpb030_state::mac_iwm_r), FUNC(macpb030_state::mac_iwm_w));
+	map(0x50f16000, 0x50f17fff).rw(FUNC(macpb030_state::swim_r), FUNC(macpb030_state::swim_w));
 	map(0x50f20000, 0x50f21fff).rw(FUNC(macpb030_state::mac_gsc_r), FUNC(macpb030_state::mac_gsc_w));
 	map(0x50f24000, 0x50f27fff).r(FUNC(macpb030_state::buserror_r)); // bus error here to make sure we aren't mistaken for another decoder
 
@@ -726,7 +795,7 @@ void macpb030_state::macpb165c_map(address_map &map)
 	map(0x50f10000, 0x50f11fff).rw(FUNC(macpb030_state::scsi_r), FUNC(macpb030_state::scsi_w));
 	map(0x50f12060, 0x50f12063).r(FUNC(macpb030_state::scsi_drq_r));
 	map(0x50f14000, 0x50f15fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
-	map(0x50f16000, 0x50f17fff).rw(FUNC(macpb030_state::mac_iwm_r), FUNC(macpb030_state::mac_iwm_w));
+	map(0x50f16000, 0x50f17fff).rw(FUNC(macpb030_state::swim_r), FUNC(macpb030_state::swim_w));
 	map(0x50f20000, 0x50f21fff).r(FUNC(macpb030_state::buserror_r)); // bus error here to detect we're not the grayscale 160/165/180
 	map(0x50f24000, 0x50f27fff).r(FUNC(macpb030_state::buserror_r)); // bus error here to make sure we aren't mistaken for another decoder
 
@@ -749,7 +818,7 @@ void macpb030_state::macpd210_map(address_map &map)
 	map(0x50f10000, 0x50f11fff).rw(FUNC(macpb030_state::scsi_r), FUNC(macpb030_state::scsi_w));
 	map(0x50f12060, 0x50f12063).r(FUNC(macpb030_state::scsi_drq_r));
 	map(0x50f14000, 0x50f15fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
-	map(0x50f16000, 0x50f17fff).rw(FUNC(macpb030_state::mac_iwm_r), FUNC(macpb030_state::mac_iwm_w));
+	map(0x50f16000, 0x50f17fff).rw(FUNC(macpb030_state::swim_r), FUNC(macpb030_state::swim_w));
 	map(0x50f20000, 0x50f21fff).rw(FUNC(macpb030_state::mac_gsc_r), FUNC(macpb030_state::mac_gsc_w));
 	map(0x50f24000, 0x50f27fff).r(FUNC(macpb030_state::buserror_r)); // bus error here to make sure we aren't mistaken for another decoder
 
@@ -770,7 +839,15 @@ u8 macpb030_state::mac_via_in_b()
 
 void macpb030_state::mac_via_out_a(u8 data)
 {
-	sony_set_sel_line(m_iwm.target(), (data & 0x20) >> 5);
+	int hdsel = BIT(data, 5);
+	if (hdsel != m_hdsel)
+	{
+		if (m_cur_floppy)
+		{
+			m_cur_floppy->ss_w(hdsel);
+		}
+	}
+	m_hdsel = hdsel;
 }
 
 void macpb030_state::mac_via_out_b(u8 data)
@@ -784,7 +861,7 @@ u8 macpb030_state::mac_via2_in_a()
 
 u8 macpb030_state::mac_via2_in_b()
 {
-	return 0xcd | ((m_pmu_ack & 1) << 1);
+	return ((m_pmu_ack & 1) << 1);
 }
 
 void macpb030_state::mac_via2_out_a(u8 data)
@@ -796,27 +873,6 @@ void macpb030_state::mac_via2_out_b(u8 data)
 {
 	m_pmu_req = BIT(data, 2);
 }
-
-/***************************************************************************
-    DEVICE CONFIG
-***************************************************************************/
-
-static const applefdc_interface mac_iwm_interface =
-{
-	sony_set_lines,
-	sony_set_enable_lines,
-
-	sony_read_data,
-	sony_write_data,
-	sony_read_status
-};
-
-static const floppy_interface mac_floppy_interface =
-{
-	FLOPPY_STANDARD_3_5_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(apple35_mac),
-	"floppy_3_5"
-};
 
 static INPUT_PORTS_START( macadb )
 INPUT_PORTS_END
@@ -856,8 +912,12 @@ void macpb030_state::macpb140(machine_config &config)
 	m_macadb->set_mcu_mode(true);
 	m_macadb->adb_data_callback().set(FUNC(macpb030_state::set_adb_line));
 
-	LEGACY_IWM(config, m_iwm, &mac_iwm_interface);
-	sonydriv_floppy_image_device::legacy_2_drives_add(config, &mac_floppy_interface);
+	SWIM1(config, m_swim, C15M);
+	m_swim->phases_cb().set(FUNC(macpb030_state::phases_w));
+	m_swim->devsel_cb().set(FUNC(macpb030_state::devsel_w));
+
+	applefdintf_device::add_35_hd(config, m_floppy[0]);
+	applefdintf_device::add_35_nc(config, m_floppy[1]);
 
 	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
 	scsibus.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
@@ -948,8 +1008,12 @@ void macpb030_state::macpb160(machine_config &config)
 	m_macadb->set_mcu_mode(true);
 	m_macadb->adb_data_callback().set(FUNC(macpb030_state::set_adb_line));
 
-	LEGACY_IWM(config, m_iwm, &mac_iwm_interface);
-	sonydriv_floppy_image_device::legacy_2_drives_add(config, &mac_floppy_interface);
+	SWIM1(config, m_swim, C15M);
+	m_swim->phases_cb().set(FUNC(macpb030_state::phases_w));
+	m_swim->devsel_cb().set(FUNC(macpb030_state::devsel_w));
+
+	applefdintf_device::add_35_hd(config, m_floppy[0]);
+	applefdintf_device::add_35_nc(config, m_floppy[1]);
 
 	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
 	scsibus.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));

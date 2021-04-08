@@ -884,7 +884,7 @@ GFXDECODE_END
    irq 5 = ?
    irq 1 = ?
 
-  */
+*/
 
 INTERRUPT_GEN_MEMBER(rabbit_state::vblank_interrupt)
 {
@@ -934,7 +934,7 @@ void rabbit_state::init_rabbit()
 
 
 
-ROM_START( rabbit )
+ROM_START( rabbit ) // This is the Asian version sold in Korea but the devs forgot to update the region disclaimer.
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68020 Code */
 	ROM_LOAD32_BYTE( "jpr0.0", 0x000000, 0x080000, CRC(52bb18c0) SHA1(625bc8a4daa6d08cacd92d9110cf67a95a91325a) )
 	ROM_LOAD32_BYTE( "jpr1.1", 0x000001, 0x080000, CRC(38299d0d) SHA1(72ccd51781b47636bb16ac18037cb3121d17199f) )
@@ -978,10 +978,54 @@ ROM_START( rabbit )
 	ROM_LOAD( "epm7032.u1",   0x0000, 0x0798, CRC(bb1c930e) SHA1(7513ed6a0d797276dab1e3446fe346a9c340e69d) ) // unprotected
 ROM_END
 
+ROM_START( rabbita ) // Sourced from a Taiwanese parts sellers, is this another Asian version?
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68020 Code */
+	ROM_LOAD32_BYTE( "pv00_mst.u82", 0x000000, 0x080000, CRC(e23e738e) SHA1(d514f3085401db7221661c3936d1fbbc5ec94b06) ) // English text, handwritten labels, but copyright 1996
+	ROM_LOAD32_BYTE( "pv01_mst.u84", 0x000001, 0x080000, CRC(8c7ff335) SHA1(ca636dc6545d453645476df8fe6e18bc71037ab8) ) // is this a 1/28 build like the rabbitjt set?
+	ROM_LOAD32_BYTE( "pv02_mst.u83", 0x000002, 0x080000, CRC(c4bee278) SHA1(c20bfc3d90ae089ff029b328a344b7c3804ed228) )
+	ROM_LOAD32_BYTE( "pv03_mst.u85", 0x000003, 0x080000, CRC(062f524e) SHA1(566bc3aa177ceb11e9558e212ea3ae11070f2db2) )
+
+
+// the rom test tests as if things were mapped like this (video chip / blitter space?)
+#if 0
+	ROM_REGION( 0x9000000, "test", ROMREGION_ERASE )
+	ROM_LOAD32_WORD( "jfv0.00", 0x0000002, 0x400000, CRC(b2a4d3d3) SHA1(0ab71d82a37ff94442b91712a28d3470619ba575) ) // sprite gfx
+	ROM_LOAD32_WORD( "jfv1.01", 0x0000000, 0x400000, CRC(83f3926e) SHA1(b1c479e675d35fc08c9a7648ff40348a24654e7e) ) // sprite gfx
+	ROM_LOAD32_WORD( "jsn0.11", 0x0800002, 0x400000, CRC(e1f726e8) SHA1(598d75f3ff9e43ec8ce6131ed37f4345bf2f2d8e) ) // sound
+	ROM_LOAD32_WORD( "jfv2.02", 0x2000002, 0x400000, CRC(b264bfb5) SHA1(8fafedb6af74150465b1773e80aef0edc3da4678) ) // sprite gfx
+	ROM_LOAD32_WORD( "jfv3.03", 0x2000000, 0x400000, CRC(3e1a9be2) SHA1(2082a4ae8cda84cec5ea0fc08753db387bb70d41) ) // sprite gfx
+	ROM_LOAD16_BYTE( "jbg0.40", 0x4000001, 0x200000, CRC(89662944) SHA1(ca916ba38480fa588af19fc9682603f5195ad6c7) ) // bg gfx (fails check, but dumped from two different boards)
+	ROM_LOAD16_BYTE( "jbg1.50", 0x6000000, 0x200000, CRC(1fc7f6e0) SHA1(b36062d2a9683683ffffd3003d5244a185f53280) ) // bg gfx
+	ROM_LOAD16_BYTE( "jbg2.60", 0x8000001, 0x200000, CRC(aee265fc) SHA1(ec420ab30b9b5141162223fc1fbf663ad9f211e6) ) // bg gfx
+#endif
+
+	ROM_REGION( 0x1000000, "gfx1", 0 ) /* Sprite Roms (and Blitter Data) */
+	ROM_LOAD32_WORD( "jfv0.00", 0x0000002, 0x400000, CRC(b2a4d3d3) SHA1(0ab71d82a37ff94442b91712a28d3470619ba575) )
+	ROM_LOAD32_WORD( "jfv1.01", 0x0000000, 0x400000, CRC(83f3926e) SHA1(b1c479e675d35fc08c9a7648ff40348a24654e7e) )
+	ROM_LOAD32_WORD( "jfv2.02", 0x0800002, 0x400000, CRC(b264bfb5) SHA1(8fafedb6af74150465b1773e80aef0edc3da4678) )
+	ROM_LOAD32_WORD( "jfv3.03", 0x0800000, 0x400000, CRC(3e1a9be2) SHA1(2082a4ae8cda84cec5ea0fc08753db387bb70d41) )
+
+
+	ROM_REGION( 0x600000, "gfx2", 0 ) /* BG Roms */
+	ROM_LOAD( "jbg0.40", 0x000000, 0x200000, CRC(89662944) SHA1(ca916ba38480fa588af19fc9682603f5195ad6c7) )
+	ROM_LOAD( "jbg1.50", 0x200000, 0x200000, CRC(1fc7f6e0) SHA1(b36062d2a9683683ffffd3003d5244a185f53280) )
+	ROM_LOAD( "jbg2.60", 0x400000, 0x200000, CRC(aee265fc) SHA1(ec420ab30b9b5141162223fc1fbf663ad9f211e6) )
+
+	ROM_REGION( 0x400000, "i5000snd", ROMREGION_ERASE ) /* sound rom */
+	ROM_LOAD( "jsn0.11", 0x000000, 0x000018, CRC(e1f726e8) SHA1(598d75f3ff9e43ec8ce6131ed37f4345bf2f2d8e) ) // header "VCDT i5000"
+	ROM_CONTINUE(        0x000000, 0x3fffe8 ) // sample data starts here
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "rabbit.nv", 0x0000, 0x0080, CRC(73d471ed) SHA1(45e045f5ea9036342b88013e021d402741d98537) )
+
+	ROM_REGION( 0x0800, "plds", 0 )
+	ROM_LOAD( "epm7032.u1",   0x0000, 0x0798, CRC(bb1c930e) SHA1(7513ed6a0d797276dab1e3446fe346a9c340e69d) ) // unprotected
+ROM_END
+
 ROM_START( rabbitj )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68020 Code, handwritten labels */
 	ROM_LOAD32_BYTE( "pvo0.u82", 0x000000, 0x080000, CRC(56ee441b) SHA1(07a02cf59a50f47f5cbdc8c624730d98c4fff48f) ) // Japanese text, no labels, unknown build date but copyright 1997 like
-	ROM_LOAD32_BYTE( "pvo1.u84", 0x000001, 0x080000, CRC(7d8addc5) SHA1(45203a8651b9701735df8e6f3827c3440b4aa2f9) ) //  the above Asia set, so it's newer then the location test below
+	ROM_LOAD32_BYTE( "pvo1.u84", 0x000001, 0x080000, CRC(7d8addc5) SHA1(45203a8651b9701735df8e6f3827c3440b4aa2f9) ) // the above Asia (parent) set, so it's newer then the location test below
 	ROM_LOAD32_BYTE( "pvo2.u83", 0x000002, 0x080000, CRC(4a333d89) SHA1(7c7859b1bcfe4c8ba408f00ce369756db804548a) )
 	ROM_LOAD32_BYTE( "pvo3.u85", 0x000003, 0x080000, CRC(791bf835) SHA1(3357af5619391323620e0c0b89a4b108f7772db7) )
 
@@ -1066,6 +1110,7 @@ ROM_START( rabbitjt )
 	ROM_LOAD( "epm7032.u1",   0x0000, 0x0798, CRC(bb1c930e) SHA1(7513ed6a0d797276dab1e3446fe346a9c340e69d) ) // unprotected
 ROM_END
 
-GAME( 1997, rabbit,        0, rabbit,  rabbit, rabbit_state, init_rabbit, ROT0, "Aorn / Electronic Arts", "Rabbit (Asia 3/6)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // This is the Asian version sold in Korea but the devs forgot to update the disclaimer. It has English text.
-GAME( 1997, rabbitj,  rabbit, rabbit,  rabbit, rabbit_state, init_rabbit, ROT0, "Aorn / Electronic Arts", "Rabbit (Japan 3/6?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Japanese text.
-GAME( 1996, rabbitjt, rabbit, rabbit,  rabbit, rabbit_state, init_rabbit, ROT0, "Aorn / Electronic Arts", "Rabbit (Japan, location test)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Japanese text.
+GAME( 1997, rabbit,   0,      rabbit,  rabbit, rabbit_state, init_rabbit, ROT0, "Aorn / Electronic Arts", "Rabbit (Asia 3/6)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // For use in Japan notice, English text, (C) 1997
+GAME( 1996, rabbita,  rabbit, rabbit,  rabbit, rabbit_state, init_rabbit, ROT0, "Aorn / Electronic Arts", "Rabbit (Asia 1/28?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // For use in Japan notice, English text, (C) 1996
+GAME( 1997, rabbitj,  rabbit, rabbit,  rabbit, rabbit_state, init_rabbit, ROT0, "Aorn / Electronic Arts", "Rabbit (Japan 3/6?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // For use in Japan notice, Japanese text, (C) 1997
+GAME( 1996, rabbitjt, rabbit, rabbit,  rabbit, rabbit_state, init_rabbit, ROT0, "Aorn / Electronic Arts", "Rabbit (Japan 1/28, location test)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // For use in Japan notice, Japanese text, (C) 1996

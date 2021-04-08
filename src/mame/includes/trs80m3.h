@@ -145,7 +145,7 @@ private:
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<cassette_image_device> m_cassette;
+	optional_device<cassette_image_device> m_cassette;
 	optional_ioport m_io_config;
 	required_ioport_array<8> m_io_keyboard;
 	optional_device<ram_device>                 m_mainram;

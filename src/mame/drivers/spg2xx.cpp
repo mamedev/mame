@@ -494,7 +494,7 @@ static INPUT_PORTS_START( itvphone ) // hold 8 and ENTER for Diagnostics mode
 	PORT_CONFNAME( 0x7000, 0x0000, "Non-TV Mode Game" )
 	PORT_CONFSETTING(      0x1000, "Learning Game" )
 	PORT_CONFSETTING(      0x2000, "Finding Game" )
-	PORT_CONFSETTING(      0x4000, "Memory Game" ) 
+	PORT_CONFSETTING(      0x4000, "Memory Game" )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2")
@@ -1203,7 +1203,7 @@ static INPUT_PORTS_START( doraglobe )
 
 	PORT_START("P1_ROW4")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_PLAYER(1) PORT_NAME("Continent Button: Australia")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) // skips over some cutscenes and makes a 'button press' sound, but doesn't seem to be a real input on the device 
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) // skips over some cutscenes and makes a 'button press' sound, but doesn't seem to be a real input on the device
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_PLAYER(1) PORT_NAME("Reset")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_PLAYER(1) PORT_NAME("Mode Button: Explore and Find")
 
@@ -1870,14 +1870,14 @@ void spg2xx_game_hotwheels_state::hotwheels(machine_config &config)
 
 uint16_t spg2xx_game_doraphone_state::porta_r(offs_t offset, uint16_t mem_mask)
 {
-    uint16_t matrix = 0x000f;
-    for (int b = 1; 6 >= b; ++b)
-    {
-        if (!BIT(m_portb_data, b))
-            matrix &= m_io_p1_rows[b - 1]->read();
-    }
+	uint16_t matrix = 0x000f;
+	for (int b = 1; 6 >= b; ++b)
+	{
+		if (!BIT(m_portb_data, b))
+			matrix &= m_io_p1_rows[b - 1]->read();
+	}
 
-    return matrix | (m_io_p1->read() & 0xfff0);
+	return matrix | (m_io_p1->read() & 0xfff0);
 }
 
 void spg2xx_game_doraphone_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)

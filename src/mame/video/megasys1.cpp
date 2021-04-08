@@ -195,6 +195,7 @@ actual code sent to the hardware.
 
 #include "emu.h"
 #include "includes/megasys1.h"
+#include "sound/ym2151.h"
 
 
 
@@ -261,12 +262,15 @@ void megasys1_state::screen_flag_w(offs_t offset, u16 data, u16 mem_mask)
 	COMBINE_DATA(&m_screen_flag);
 
 	if (m_audiocpu.found())
-	{
-		if (m_screen_flag & 0x10)
-			m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-		else
-			m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-	}
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(m_screen_flag, 4) ? ASSERT_LINE : CLEAR_LINE);
+
+	ym2151_device *opm = dynamic_cast<ym2151_device *>(m_ymsnd.target());
+	if (opm != nullptr)
+		opm->reset_w(!BIT(m_screen_flag, 4));
+	if (BIT(m_screen_flag, 4) && m_oki[0].found())
+		m_oki[0]->reset();
+	if (BIT(m_screen_flag, 4) && m_oki[1].found())
+		m_oki[1]->reset();
 }
 
 void megasys1_state::soundlatch_w(u16 data)

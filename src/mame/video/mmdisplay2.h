@@ -31,6 +31,7 @@ public:
 
 	void latch_w(uint8_t data);
 	void io_w(uint8_t data);
+	u8 io_r() { return m_ctrl; }
 
 protected:
 	// device-level overrides

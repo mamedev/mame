@@ -57,12 +57,14 @@ DEFINE_DEVICE_TYPE(MD_ROM_POKESTAD, md_rom_pokestad_device, "md_rom_pokestad", "
 DEFINE_DEVICE_TYPE(MD_ROM_REALTEC,  md_rom_realtec_device,  "md_rom_realtec",  "MD Realtec")
 DEFINE_DEVICE_TYPE(MD_ROM_REDCL,    md_rom_redcl_device,    "md_rom_redcl",    "MD Redcliff")
 DEFINE_DEVICE_TYPE(MD_ROM_SQUIR,    md_rom_squir_device,    "md_rom_squir",    "MD Squirrel King")
+DEFINE_DEVICE_TYPE(MD_ROM_TC2000,   md_rom_tc2000_device,   "md_rom_tc2000",   "MD TC2000")
 DEFINE_DEVICE_TYPE(MD_ROM_TEKKENSP, md_rom_tekkensp_device, "md_rom_tekkensp", "MD Tekken Special")
 DEFINE_DEVICE_TYPE(MD_ROM_TOPF,     md_rom_topf_device,     "md_rom_topf",     "MD Top Fighter")
 DEFINE_DEVICE_TYPE(MD_ROM_RADICA,   md_rom_radica_device,   "md_rom_radica",   "MD Radica TV games")
 DEFINE_DEVICE_TYPE(MD_ROM_BEGGARP,  md_rom_beggarp_device,  "md_rom_beggarp",  "MD Beggar Prince")
 DEFINE_DEVICE_TYPE(MD_ROM_WUKONG,   md_rom_wukong_device,   "md_rom_wukong",   "MD Legend of Wukong")
 DEFINE_DEVICE_TYPE(MD_ROM_STARODYS, md_rom_starodys_device, "md_rom_starodys", "MD Star Odyssey")
+DEFINE_DEVICE_TYPE(MD_ROM_SRAM_ARG96, md_rom_sram_arg96_device, "md_rom_sram_arg96", "MD Futbol Argentino 96")
 
 
 md_std_rom_device::md_std_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -76,9 +78,21 @@ md_std_rom_device::md_std_rom_device(const machine_config &mconfig, const char *
 }
 
 md_rom_sram_device::md_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: md_std_rom_device(mconfig, MD_ROM_SRAM, tag, owner, clock)
+	: md_rom_sram_device(mconfig, MD_ROM_SRAM, tag, owner, clock)
 {
 }
+
+md_rom_sram_device::md_rom_sram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: md_std_rom_device(mconfig, type, tag, owner, clock)
+{
+}
+
+
+md_rom_sram_arg96_device::md_rom_sram_arg96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: md_rom_sram_device(mconfig, MD_ROM_SRAM_ARG96, tag, owner, clock)
+{
+}
+
 
 md_rom_fram_device::md_rom_fram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: md_std_rom_device(mconfig, MD_ROM_FRAM, tag, owner, clock)
@@ -212,6 +226,11 @@ md_rom_redcl_device::md_rom_redcl_device(const machine_config &mconfig, const ch
 
 md_rom_squir_device::md_rom_squir_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: md_std_rom_device(mconfig, MD_ROM_SQUIR, tag, owner, clock), m_latch(0)
+{
+}
+
+md_rom_tc2000_device::md_rom_tc2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: md_std_rom_device(mconfig, MD_ROM_TC2000, tag, owner, clock)
 {
 }
 
@@ -1225,6 +1244,61 @@ void md_rom_smw64_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 }
 
 /*-------------------------------------------------
+ TC2000 / TRUCO 96
+ -------------------------------------------------*/
+
+void md_rom_tc2000_device::device_start()
+{
+	save_item(NAME(m_retvalue));
+}
+
+void md_rom_tc2000_device::device_reset()
+{
+	m_retvalue = 0;
+}
+
+uint16_t md_rom_tc2000_device::read(offs_t offset)
+{
+	if (offset < 0x100000 / 2)
+	{
+		return md_std_rom_device::read(offset);
+	}
+	else
+	{
+		// this works for game boot and starting a game, are there any further checks?
+		logerror("protection read at offset %08x returning %04x\n", offset*2, m_retvalue);
+
+		return m_retvalue;
+	}
+}
+
+void md_rom_tc2000_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (offset < 0x100000/2)
+	{
+		md_std_rom_device::write(offset, data, mem_mask);
+	}
+	else
+	{
+		if (((offset * 2) & 0xf) == 0x0) // truco96a uses this case
+		{
+			m_retvalue = 0x0000;
+		}
+		else if (((offset * 2) & 0xf) == 0x8)
+		{
+			m_retvalue = 0x5000;
+		}
+		else if (((offset * 2) & 0xf) == 0xc)
+		{
+			m_retvalue = 0xa000;
+		}
+
+		logerror("protection write at offset %08x %04x %04x\n", offset*2, data, mem_mask);
+	}
+}
+
+
+/*-------------------------------------------------
  TEKKEN SPECIAL
  -------------------------------------------------*/
 
@@ -1551,5 +1625,45 @@ void md_rom_starodys_device::write_a13(offs_t offset, uint16_t data)
 
 		if (m_nvram_active)
 			m_nvram_handlers_installed = 1;
+	}
+}
+
+
+/*-------------------------------------------------
+ Futbol Argentino 96 (Argentina)
+ -------------------------------------------------*/
+
+uint16_t md_rom_sram_arg96_device::read(offs_t offset)
+{
+	if (offset < 0x400000 / 2)
+	{
+		return md_rom_sram_device::read(offset);
+	}
+	else
+	{
+		// these return values are probably connected somehow with the writes
+		// but the game only ever looks for these results before doing DMA operations
+		if ((offset * 2) == 0x4c6200)
+			return 0xa;
+		else if ((offset * 2) == 0x4c6600)
+			return 0x9;
+		else if ((offset * 2) == 0x4c6a00)
+			return 0x7;
+		else
+			logerror("unhandled read at offset %08x\n", offset);
+
+		return 0x0000;
+	}
+}
+
+void md_rom_sram_arg96_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (offset < 0x400000/2)
+	{
+		md_rom_sram_device::write(offset, data, mem_mask);
+	}
+	else
+	{
+		logerror("unhandled write at offset %08x %04x %04x\n", offset, data, mem_mask);
 	}
 }

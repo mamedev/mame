@@ -76,7 +76,7 @@
   - racooon (Raccoon World)
 
       Game animation & timers seem too fast? demoted to NOT WORKING as a
-	  result
+      result
 
 -----------------------------------------------------------------------------
  Game Issues (unknown):

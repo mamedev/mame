@@ -17,8 +17,8 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "sound/3812intf.h"
 #include "sound/k053260.h"
+#include "sound/ym3812.h"
 
 #include "emupal.h"
 #include "speaker.h"

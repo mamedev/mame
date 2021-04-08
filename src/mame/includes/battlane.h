@@ -12,15 +12,24 @@
 class battlane_state : public driver_device
 {
 public:
-	battlane_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	battlane_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_tileram(*this, "tileram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
+	void battlane(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_tileram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -47,13 +56,9 @@ public:
 	void battlane_video_ctrl_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILEMAP_MAPPER_MEMBER(battlane_tilemap_scan_rows_2x2);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update_battlane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(battlane_cpu1_interrupt);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void draw_fg_bitmap( bitmap_ind16 &bitmap );
-	void battlane(machine_config &config);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_fg_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void battlane_map(address_map &map);
 };

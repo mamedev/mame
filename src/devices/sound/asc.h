@@ -44,6 +44,8 @@ public:
 
 	asc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
+
 	void set_type(asc_type type) { m_chip_type = type; }
 	auto irqf_callback() { return write_irq.bind(); }
 

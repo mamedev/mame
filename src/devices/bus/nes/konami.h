@@ -157,7 +157,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	required_device<vrc7snd_device> m_vrc7snd;
+	required_device<ds1001_device> m_vrc7snd;
 };
 
 

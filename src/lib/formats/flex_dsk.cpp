@@ -73,14 +73,14 @@ const char *flex_format::extensions() const
 
 int flex_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	int type = find_size(io, form_factor);
+	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
 		return 75;
 	return 0;
 }
 
-int flex_format::find_size(io_generic *io, uint32_t form_factor)
+int flex_format::find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t size = io_generic_size(io);
 	uint8_t boot0[256], boot1[256];

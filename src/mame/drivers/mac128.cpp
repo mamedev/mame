@@ -12,7 +12,7 @@
     Unitron 1024: Brazilian Mac Plus clone.
 
     Driver by R. Belmont and O. Galibert, with thanks to the original Mac
-    driver authors Nathan Woods and Raphel Nabet.
+    driver authors Nathan Woods and Raphael Nabet.
     Thanks also to SCSI guru Patrick Mackinlay and keyboard/mouse wrangler
     Vas Crabb.
 
@@ -74,6 +74,12 @@ requested. The new Rockwell version (R65NC22) is only labeled with Apple
 part number 338-6523 (later Macs use a PLCC version which Apple numbered
 338S6523), but VLSI Technology's VL65C22V-02PC is not so disguised.
 
+Raster timings from the BBU ERS:
+There are 512 visible pixels (32.68 microseconds) per scanline plus 192 pixels
+(12.25 microseconds) of hblank.  Sound/PWM are fetched at the end of hblank.
+Vertically there are 28 lines of vblank followed by 342 displayed lines.
+Scanline 0 is the start of vblank.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -87,11 +93,11 @@ part number 338-6523 (later Macs use a PLCC version which Apple numbered
 #include "bus/scsi/scsihd.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
-#include "machine/applefdc.h"
 #include "machine/iwm.h"
 #include "machine/swim1.h"
 #include "machine/ncr5380n.h"
 #include "machine/nscsi_bus.h"
+#include "machine/rescap.h"
 #include "bus/nscsi/hd.h"
 #include "bus/nscsi/cd.h"
 #include "machine/ncr5380.h"
@@ -101,6 +107,7 @@ part number 338-6523 (later Macs use a PLCC version which Apple numbered
 #include "machine/z80scc.h"
 #include "machine/macadb.h"
 #include "sound/dac.h"
+#include "sound/flt_biquad.h"
 #include "bus/macpds/pds_tpdfpd.h"
 
 #include "formats/ap_dsk35.h"
@@ -120,8 +127,8 @@ static constexpr int MAC_H_TOTAL = 704;       // (512+192)
 static constexpr int MAC_V_TOTAL = 370;       // (342+28)
 
 // sound buffer locations
-static constexpr int MAC_MAIN_SND_BUF_OFFSET = (0x0300>>1);
-static constexpr int MAC_ALT_SND_BUF_OFFSET  = (0x5F00>>1);
+static constexpr int MAC_MAIN_SND_BUF_OFFSET = (0x0300>>1); // (end of memory minus 0x0300; for the typical macplus case, this is 0x3ffd00-0x3fffe3 in 16 bit blocks)
+static constexpr int MAC_ALT_SND_BUF_OFFSET  = (0x5F00>>1); // (end of memory minus 0x5F00)
 
 class mac128_state : public driver_device
 {
@@ -141,6 +148,8 @@ public:
 		m_rtc(*this,"rtc"),
 		m_screen(*this, "screen"),
 		m_dac(*this, "macdac"),
+		m_filter(*this, "dacfilter"),
+		m_volfilter(*this, "volfilter"),
 		m_scc(*this, "scc"),
 		m_mouse0(*this, "MOUSE0"),
 		m_mouse1(*this, "MOUSE1"),
@@ -175,6 +184,8 @@ private:
 	optional_device<rtc3430042_device> m_rtc;
 	required_device<screen_device> m_screen;
 	required_device<dac_8bit_pwm_device> m_dac;
+	required_device<filter_biquad_device> m_filter;
+	required_device<filter_biquad_device> m_volfilter;
 	required_device<z80scc_device> m_scc;
 
 	optional_ioport m_mouse0, m_mouse1, m_mouse2;
@@ -193,6 +204,8 @@ private:
 	void ram_w_se(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t ram_600000_r(offs_t offset);
 	void ram_600000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~ 0);
+	void via_sync();
+	void via_sync_end();
 	uint16_t mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, uint16_t data);
 	uint16_t mac_autovector_r(offs_t offset);
@@ -206,6 +219,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(scsi_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(set_scc_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 	WRITE_LINE_MEMBER(adb_irq_w) { m_adb_irq_pending = state; }
 
@@ -239,7 +253,7 @@ private:
 
 	uint32_t m_overlay;
 
-	int m_irq_count, m_ca1_data, m_ca2_data;
+	int m_irq_count, m_ca2_data;
 	uint8_t m_mouse_bit[2], m_mouse_last[2];
 	int16_t m_mouse_last_m[2], m_mouse_count[2];
 	int m_screen_buffer;
@@ -253,7 +267,6 @@ private:
 	int m_scsi_drq;
 
 	// wait states for accessing the VIA
-	int m_via_cycles;
 	bool m_snd_enable;
 	bool m_main_buffer;
 	int m_snd_vol;
@@ -276,7 +289,6 @@ void mac128_state::machine_start()
 
 	save_item(NAME(m_overlay));
 	save_item(NAME(m_irq_count));
-	save_item(NAME(m_ca1_data));
 	save_item(NAME(m_ca2_data));
 	save_item(NAME(m_mouse_bit));
 	save_item(NAME(m_mouse_last));
@@ -304,7 +316,6 @@ void mac128_state::machine_start()
 
 void mac128_state::machine_reset()
 {
-	m_via_cycles = -10;
 	m_last_taken_interrupt = -1;
 	m_overlay = 1;
 	m_screen_buffer = 1;
@@ -313,7 +324,6 @@ void mac128_state::machine_reset()
 	m_main_buffer = true;
 	m_snd_vol = 3;
 	m_irq_count = 0;
-	m_ca1_data = 0;
 	m_ca2_data = 0;
 	m_adb_irq_pending = 0;
 	m_drive_select = 0;
@@ -407,9 +417,6 @@ void mac128_state::set_via_interrupt(int value)
 
 void mac128_state::vblank_irq()
 {
-	m_ca1_data ^= 1;
-	m_via->write_ca1(m_ca1_data);
-
 	if (m_macadb)
 	{
 		m_macadb->adb_vblank();
@@ -430,39 +437,74 @@ void mac128_state::update_volume()
 	if (!m_snd_enable)
 	{
 		// ls161 clear input
-		m_dac->set_output_gain(ALL_OUTPUTS, 0);
+		m_dac->set_output_gain(ALL_OUTPUTS, 0.0);
 	}
 	else
 	{
-		// sound -> r13 (470k)
-		// sound -> r12 (470k) -> 4016 (pa0 != 0)
-		// sound -> r17 (150k) -> 4016 (pa1 != 0)
-		// sound -> r16 (68k)  -> 4016 (pa2 != 0)
-		m_dac->set_output_gain(ALL_OUTPUTS, 8.0 / (m_snd_vol + 1));
+		m_dac->set_output_gain(ALL_OUTPUTS, 1.0);
 	}
+
+	/* LS161 audio PWM counters TC (SND) -> LS04 inverter (/SND) ->
+	 * -> CD4016 gate A pulling a 5.1V zener-regulated signal to ground if input is high ->
+	 * -> Sallen-key low-pass filter (R1 = 47K, R2 = 47K, C1 = 0.001uF, C2 = 470pF
+	 *  FC of 4939.3903Hz, Q of 0.7293, Gain of 1.0) ->
+	 * ->\-> r13 (470k) ------------------------>|
+	 *   |-> r12 (470k) -> CD4016 D (pa0 != 0) ->|
+	 *   |-> r17 (150k) -> CD4016 C (pa1 != 0) ->|
+	 *   |-> r16 (68k)  -> CD4016 B (pa2 != 0) ->\-> DC blocking caps ->
+	 * -> Push-Pull +12v/-12vb amplifier w/feedback (technically a 1st order multifeedback lowpass filter?) ->
+	 * -> Audio Jack -> Speaker
+	 */
+	const double res_ohm_tbl[8] =
+	{
+		//       R13                  R16                 R17                  R12
+		(1.0 / ( (1.0 / RES_K(470))                                                               ) ),
+		(1.0 / ( (1.0 / RES_K(470))                                          + (1.0 / RES_K(470)) ) ),
+		(1.0 / ( (1.0 / RES_K(470))                     + (1.0 / RES_K(150))                      ) ),
+		(1.0 / ( (1.0 / RES_K(470))                     + (1.0 / RES_K(150)) + (1.0 / RES_K(470)) ) ),
+		(1.0 / ( (1.0 / RES_K(470)) + (1.0 / RES_K(68))                                           ) ),
+		(1.0 / ( (1.0 / RES_K(470)) + (1.0 / RES_K(68))                      + (1.0 / RES_K(470)) ) ),
+		(1.0 / ( (1.0 / RES_K(470)) + (1.0 / RES_K(68)) + (1.0 / RES_K(150))                      ) ),
+		(1.0 / ( (1.0 / RES_K(470)) + (1.0 / RES_K(68)) + (1.0 / RES_K(150)) + (1.0 / RES_K(470)) ) )
+	};
+
+	m_volfilter->opamp_mfb_lowpass_modify(res_ohm_tbl[m_snd_vol&7], RES_K(0), RES_K(200), CAP_U(0), CAP_P(220)); // variable based on cd4016, short, R15, absent, C10
+}
+
+WRITE_LINE_MEMBER(mac128_state::vblank_w)
+{
+	m_via->write_ca1(state);
 }
 
 TIMER_CALLBACK_MEMBER(mac128_state::mac_scanline)
 {
-	int scanline = param;
-	uint16_t *mac_snd_buf_ptr;
+	const int scanline = param;
 
-	if (scanline == MAC_V_VIS)
+	if (scanline == 0)
 	{
 		vblank_irq();
 	}
 
 	/* video beam in display (! VBLANK && ! HBLANK basically) */
-	if (scanline < MAC_V_VIS)
+	if (scanline >= 28)
 	{
 		m_via->write_pb6(1);
-		m_hblank_timer->adjust(m_screen->time_until_pos(scanline, MAC_H_VIS));
 	}
+
+	m_hblank_timer->adjust(m_screen->time_until_pos(scanline, MAC_H_TOTAL));
 
 	if ((!(scanline % 10)) && (!m_macadb))
 	{
 		mouse_callback();
 	}
+
+	m_scan_timer->adjust(m_screen->time_until_pos(scanline+1), (scanline+1) % m_screen->height());
+}
+
+TIMER_CALLBACK_MEMBER(mac128_state::mac_hblank)
+{
+	const int scanline = m_screen->vpos();
+	uint16_t *mac_snd_buf_ptr;
 
 	if (m_main_buffer)
 	{
@@ -475,11 +517,7 @@ TIMER_CALLBACK_MEMBER(mac128_state::mac_scanline)
 
 	m_dac->write(mac_snd_buf_ptr[scanline] >> 8);
 	pwm_push(mac_snd_buf_ptr[scanline] & 0xff);
-	m_scan_timer->adjust(m_screen->time_until_pos(scanline+1), (scanline+1) % m_screen->height());
-}
 
-TIMER_CALLBACK_MEMBER(mac128_state::mac_hblank)
-{
 	m_via->write_pb6(0);
 }
 
@@ -680,6 +718,36 @@ WRITE_LINE_MEMBER(mac128_state::mac_via_irq)
 	set_via_interrupt(state);
 }
 
+void mac128_state::via_sync()
+{
+	// The VIA runs from the E clock of the 68k and uses VPA.
+
+	// That means:
+	// - The 68000 starts the access cycle, with AS and the address bus.  It's validated at cycle+1.
+
+	// - The glue chip sets VPA.  The 68000 sees it and acts on it at cycle+2.
+
+	// - Between cycle+2 and cycle+11, the E clock goes up.  The VIA
+	// is synced on that clock, so that's at a multiple of 10 in
+	// absolute time
+
+	// - 4 cycles later E goes down and that's the end of the access,
+
+	// We sync on the start of cycle (so that the via timings go ok)
+	// then on the end on via_sync_end()
+
+	uint64_t cur_cycle = m_maincpu->total_cycles();
+	uint64_t vpa_cycle = cur_cycle+2;
+	uint64_t via_start_cycle = (vpa_cycle + 9) / 10;
+	uint64_t m68k_start_cycle = via_start_cycle * 10;
+	m_maincpu->adjust_icount(cur_cycle - m68k_start_cycle); // 4 cycles already counted by the core
+}
+
+void mac128_state::via_sync_end()
+{
+	m_maincpu->adjust_icount(-4);
+}
+
 uint16_t mac128_state::mac_via_r(offs_t offset)
 {
 	uint16_t data;
@@ -687,10 +755,11 @@ uint16_t mac128_state::mac_via_r(offs_t offset)
 	offset >>= 8;
 	offset &= 0x0f;
 
+	via_sync();
+
 	data = m_via->read(offset);
 
-	m_maincpu->adjust_icount(m_via_cycles);
-
+	via_sync_end();
 	return (data & 0xff) | (data << 8);
 }
 
@@ -699,9 +768,11 @@ void mac128_state::mac_via_w(offs_t offset, uint16_t data)
 	offset >>= 8;
 	offset &= 0x0f;
 
+	via_sync();
+
 	m_via->write(offset, (data >> 8) & 0xff);
 
-	m_maincpu->adjust_icount(m_via_cycles);
+	via_sync_end();
 }
 
 void mac128_state::mac_autovector_w(offs_t offset, uint16_t data)
@@ -1057,13 +1128,18 @@ void mac128_state::mac512ke(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(15.6672_MHz_XTAL, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS);
 	m_screen->set_screen_update(FUNC(mac128_state::screen_update_mac));
+	m_screen->screen_vblank().set(FUNC(mac128_state::vblank_w));
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_PWM(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 2 x ls161
+	FILTER_BIQUAD(config, m_volfilter).opamp_mfb_lowpass_setup(RES_K(39.020), RES_K(0), RES_K(200), CAP_U(0), CAP_P(220)); // variable based on cd4016, short, R15, absent, C10
+	m_volfilter->add_route(ALL_OUTPUTS, "speaker", 0.195); // this filter has a max gain of ~5.126, so we diminish it by the inverse of that (0.195)
+	FILTER_BIQUAD(config, m_filter).opamp_sk_lowpass_setup(RES_K(47), RES_K(47), RES_M(999.99), RES_R(0.001), CAP_U(0.001), CAP_P(470)); // R18, R14, absent, short, C18, C19
+	m_filter->add_route(ALL_OUTPUTS, m_volfilter, 1.0);
+	DAC_8BIT_PWM(config, m_dac, 0).add_route(ALL_OUTPUTS, m_filter, 1.0); // 2 x ls161
 
 	/* devices */
 	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
@@ -1138,7 +1214,7 @@ void mac128_state::macplus(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", mac_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsibus:7").option_set("ncr5380n", NCR5380N).clock(24_MHz_XTAL).machine_config([this](device_t *device) {
+	NSCSI_CONNECTOR(config, "scsibus:7").option_set("ncr5380n", NCR5380N).machine_config([this](device_t *device) {
 		ncr5380n_device &adapter = downcast<ncr5380n_device &>(*device);
 		adapter.irq_handler().set(*this, FUNC(mac128_state::scsi_irq_w));
 		adapter.drq_handler().set(*this, FUNC(mac128_state::scsi_drq_w));
@@ -1163,7 +1239,7 @@ void mac128_state::macse(machine_config &config)
 	config.device_remove("pds");
 	config.device_remove("scsibus");
 
-	IWM(config.replace(), m_iwm, C7M);
+	IWM(config.replace(), m_iwm, C7M*2);
 	m_iwm->phases_cb().set(FUNC(mac128_state::phases_w));
 	m_iwm->devsel_cb().set(FUNC(mac128_state::devsel_se_w));
 
@@ -1244,6 +1320,28 @@ ROM_START( mactw )
     ROM_REGION16_BE(0x100000, "bootrom", 0)
     ROM_LOAD( "rom4.3t_07-04-83.bin", 0x0000, 0x10000, CRC(d2c42f18) SHA1(f868c09ca70383a69751c37a5a3110a9597462a4) )
 ROM_END
+
+    // one twiggy mac (SN 1042) has the following sum16s on the 4x 16k eproms on the "512 EPROM ADAPTER" daughterboard:
+    // U3 EPROM // 1 HI: "H1 // A04A"
+    // U4 EPROM // 0 HI: "H0 // B6ED"
+    // U5 EPROM // 1 LOW: "Lo1 // 6C8C"
+    // U6 EPROM // 0 LOW: "Lo0 // F332"
+    // This one was publicly dumped by Adam Goolevitch, but one of the SUM16s (B5ED) does not match the ROM label (B6ED).
+    // The ROM has been marked as bad pending a redump or other verification of correctness.
+    ROMX_LOAD("h0__b6ed.u4",  0x00000, 0x04000, BAD_DUMP CRC(87136a61) SHA1(a33fc3b7908783a5742f06884fe44260447e5d55), ROM_SKIP(1) ) // SUM16: B5ED does not match written label
+    ROMX_LOAD("lo0__f332.u6", 0x00001, 0x04000, CRC(3d04b1c5) SHA1(11fe22e8ce415edf4133d7cee559dce4ab0f7974), ROM_SKIP(1) ) // SUM16: F332
+    ROMX_LOAD("h1__a04a.u3",  0x08000, 0x04000, CRC(fa9ae0d1) SHA1(e89826325caf053aad2c09d134c8c7483d442821), ROM_SKIP(1) ) // SUM16: A04A
+    ROMX_LOAD("lo1__6c8c.u5", 0x08001, 0x04000, CRC(ca78a04e) SHA1(724d7d7b585c375cd5797e4334d6ab6267e798dc), ROM_SKIP(1) ) // SUM16: 6C8C
+
+
+    // one twiggy mac (SN 1072, upc MA1M830241240) has the following sum16s on the 4x 16k EPROMs on the "512 EPROM ADAPTER" daughterboard:
+    // U3 EPROM // 1 HI: "Rom 2.45 // H 1 // 1D79"
+    // U4 EPROM // 0 HI: "ROM 2.45 // High0 // D4DF"
+    // U5 EPROM // 1 LOW: "ROM 2.45 // LOW1 // 977F"
+    // U6 EPROM // 0 LOW: "ROM 2.45 // LOW0 // C813"
+    // This Twiggy mac has a prototype IWM labeled "<signetics> 8248 // XXX-X299 (C) // APPLE 82"
+    // The ROM of this twiggy mac has been tentatively dated between March and April 1983, possibly March 11, 1983.
+    // See https://macgui.com/news/article.php?t=517
 */
 
 ROM_START( mac128k )
@@ -1269,6 +1367,15 @@ ROM_START( mac128k )
 	https://68kmla.org/forums/uploads/monthly_12_2014/post-2597-0-46269000-1419299800.jpg
 	http://cdn.cultofmac.com/wp-content/uploads/2014/01/12A-128k-Motherboard.jpg
 	*/
+
+	//ROM_REGION(0x3000, "pals", 0)
+	// @U14E 342-0186-A  PAL16R8  ASG
+	// @U2D  342-0187-A  PAL16L8  BMU1
+	// @U3D  342-0189-A  PAL16R6  TSG
+	// @U2E  342-0191-A  PAL16R4  BMU0
+	// @U1E  342-0251-A  PAL16R8  LAG
+	// @U1D  342-0254-A  PAL16R4A TSM
+
 ROM_END
 
 ROM_START( mac512k )
@@ -1276,11 +1383,20 @@ ROM_START( mac512k )
 	ROMX_LOAD("342-0220-b.u6d",  0x00000, 0x08000, CRC(0dce9a3f) SHA1(101ca6570f5a273e400d1a8bc63e15ee0e94153e), ROM_SKIP(1) ) // "<VTi logo along side> 512 VH 6434 // 23256-1104 // 342-0220-B // (C) APPLE 84 // KOREA-A"
 	ROMX_LOAD("342-0221-b.u8d",  0x00001, 0x08000, CRC(d51f376e) SHA1(575586109e876cffa4a4d472cb38771aa21b70cb), ROM_SKIP(1) ) // "<VTi logo along side> 512 VH 6709 // 23256-1105 // 342-0221-B // (C) APPLE 84 // KOREA-A"
 	// reference: http://i.ebayimg.com/images/g/Uj8AAOSwvzRXy2tW/s-l1600.jpg
+
+	//ROM_REGION(0x3000, "pals", 0)
+	// @U14E 342-0186-A  PAL16R8  ASG
+	// @U2D  342-0187-A  PAL16L8  BMU1
+	// @U3D  342-0189-A  PAL16R6  TSG
+	// @U2E  342-0191-A  PAL16R4  BMU0
+	// @U1E  342-0251-A  PAL16R8  LAG
+	// @U1D  342-0254-A  PAL16R4A TSM
 ROM_END
 
 ROM_START( unitron )
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
 	ROM_LOAD16_WORD( "unitron_512.rom", 0x00000, 0x10000, CRC(1eabd37f) SHA1(a3d3696c08feac6805effb7ee07b68c2bf1a8dd7) )
+	// pals are different from mac 128/512/512ke
 ROM_END
 
 ROM_START( utrn1024 )
@@ -1288,6 +1404,7 @@ ROM_START( utrn1024 )
 	// CRCs match the original "Lonely Hearts" version 1 Mac Plus ROM: 4d1eeee1
 	ROMX_LOAD( "342-0341-a.u6d", 0x000000, 0x010000, CRC(5095fe39) SHA1(be780580033d914b5035d60b5ebbd66bd1d28a9b), ROM_SKIP(1) ) // not correct label
 	ROMX_LOAD( "342-0342-a.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) ) // not correct label
+	// unknown pals
 ROM_END
 
 ROM_START( mac512ke ) // 512ke has been observed with any of the v3, v2 or v1 macplus romsets installed, and v1 romsets are more common here than in the plus, since the 512ke lacks scsi, which is the cause of the major bug fixed between v1 and v2, hence 512ke is unaffected and was a good way for apple to use up the buggy roms rather than destroying them.
@@ -1338,6 +1455,14 @@ ROM_START( mac512ke ) // 512ke has been observed with any of the v3, v2 or v1 ma
 	        GUESSED, since this ROM is very rare: "VTI // 62? V0 86?? // 23512-1008 // 342-0341-A // (C)APPLE '83-'85 // KOREA A"
 	    'ROM-LO' @ U8D is same as v2/4d1eeae1 'ROM-LO' @ U8D
 	*/
+
+	//ROM_REGION(0x3000, "pals", 0)
+	// @U14E 342-0186-A  PAL16R8  ASG
+	// @U2D  342-0187-A  PAL16L8  BMU1
+	// @U3D  342-0189-A  PAL16R6  TSG
+	// @U2E  342-0191-A  PAL16R4  BMU0
+	// @U1E  342-0251-A  PAL16R8  LAG
+	// @U1D  342-0254-A  PAL16R4A TSM
 ROM_END
 
 ROM_START( macplus ) // same notes as above apply here as well
@@ -1362,16 +1487,27 @@ ROM_START( macplus ) // same notes as above apply here as well
 	ROM_SYSTEM_BIOS(4, "romdisk2", "bigmessofwires.com ROMinator (2/25/2015)")
 	ROMX_LOAD( "rominator-20150225-lo.bin", 0x000001, 0x080000, CRC(62cf2a0b) SHA1(f78ebb0919dd9e094bef7952b853b70e66d05e01), ROM_SKIP(1) | ROM_BIOS(4) )
 	ROMX_LOAD( "rominator-20150225-hi.bin", 0x000000, 0x080000, CRC(a28ba8ec) SHA1(9ddcf500727955c60db0ff24b5ca2458f53fd89a), ROM_SKIP(1) | ROM_BIOS(4) )
+
+	//ROM_REGION(0x3000, "pals", 0)
+	// @U11E 342-0517-A  PAL16??  ASG
+	// @U2D  341-0514-A  PAL16L8  BMU1
+	// @U3D  342-0516-A  PAL16R6  TSG
+	// @U3E  342-0519-A  PAL20??  CAS
+	// @U2E  342-0520-A  PAL20R4A BMU2
+	// @U1E  342-0515-A  PAL16R8  LAG
+	// @U1D  342-0522-A  VP16RP8MPC (PAL16R4A on schem) TSM
 ROM_END
 
 ROM_START( macse )
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
 	ROM_LOAD16_WORD( "macse.rom",  0x00000, 0x40000, CRC(0f7ff80c) SHA1(58532b7d0d49659fd5228ac334a1b094f0241968))
+	// GLU HAL (mask PAL)
 ROM_END
 
 ROM_START( macsefd )
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
 	ROM_LOAD( "be06e171.rom", 0x000000, 0x040000, CRC(f530cb10) SHA1(d3670a90273d12e53d86d1228c068cb660b8c9d1) )
+	// GLU HAL (mask PAL)
 ROM_END
 
 ROM_START( macclasc )
@@ -1381,13 +1517,13 @@ ROM_START( macclasc )
 ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS         INIT              COMPANY              FULLNAME */
-//COMP( 1983, mactw,    0,       0,      mac128k,  macplus, mac128_state, mac_driver_init, "Apple Computer",    "Macintosh (4.3T Prototype)",  MACHINE_NOT_WORKING )
+//COMP( 1983, mactw,    0,       0,      mac128k,  macplus, mac128_state, mac_driver_init, "Apple Computer",    "Macintosh (4.3T Prototype)",  MACHINE_SUPPORTS_SAVE )
 COMP( 1984, mac128k,  0,       0,      mac128k,  macplus, mac128_state, mac_driver_init,  "Apple Computer",    "Macintosh 128k",  MACHINE_SUPPORTS_SAVE )
 COMP( 1984, mac512k,  mac128k, 0,      mac512k,  macplus, mac128_state, mac_driver_init,  "Apple Computer",    "Macintosh 512k",  MACHINE_SUPPORTS_SAVE )
 COMP( 1986, mac512ke, macplus, 0,      mac512ke, macplus, mac128_state, mac_driver_init,  "Apple Computer",    "Macintosh 512ke", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, unitron,  macplus, 0,      mac512ke, macplus, mac128_state, mac_driver_init,  "bootleg (Unitron)", "Mac 512",  MACHINE_SUPPORTS_SAVE )
 COMP( 1986, macplus,  0,       0,      macplus,  macplus, mac128_state, mac_driver_init,  "Apple Computer",    "Macintosh Plus",  MACHINE_SUPPORTS_SAVE )
 COMP( 1985, utrn1024, macplus, 0,      macplus,  macplus, mac128_state, mac_driver_init,  "bootleg (Unitron)", "Unitron 1024",  MACHINE_SUPPORTS_SAVE )
-COMP( 1987, macse,    0,       0,      macse,    macadb, mac128_state,  mac_driver_init,  "Apple Computer",   "Macintosh SE",  MACHINE_NOT_WORKING )
+COMP( 1987, macse,    0,       0,      macse,    macadb, mac128_state,  mac_driver_init,  "Apple Computer",   "Macintosh SE",  MACHINE_SUPPORTS_SAVE )
 COMP( 1987, macsefd,  0,       0,      macsefd,  macadb, mac128_state,  mac_driver_init,  "Apple Computer",   "Macintosh SE (FDHD)",  MACHINE_SUPPORTS_SAVE )
 COMP( 1990, macclasc, 0,       0,      macclasc, macadb, mac128_state,  mac_driver_init,  "Apple Computer",   "Macintosh Classic",  MACHINE_SUPPORTS_SAVE )
