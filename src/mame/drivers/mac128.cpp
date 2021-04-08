@@ -489,8 +489,9 @@ TIMER_CALLBACK_MEMBER(mac128_state::mac_scanline)
 	if (scanline >= 28)
 	{
 		m_via->write_pb6(1);
-		m_hblank_timer->adjust(m_screen->time_until_pos(scanline, MAC_H_TOTAL));
 	}
+
+	m_hblank_timer->adjust(m_screen->time_until_pos(scanline, MAC_H_TOTAL));
 
 	if ((!(scanline % 10)) && (!m_macadb))
 	{
