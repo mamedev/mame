@@ -74,6 +74,12 @@ requested. The new Rockwell version (R65NC22) is only labeled with Apple
 part number 338-6523 (later Macs use a PLCC version which Apple numbered
 338S6523), but VLSI Technology's VL65C22V-02PC is not so disguised.
 
+Raster timings from the BBU ERS:
+There are 512 visible pixels (32.68 microseconds) per scanline plus 192 pixels
+(12.25 microseconds) of hblank.  Sound/PWM are fetched at the end of hblank.
+Vertically there are 28 lines of vblank followed by 342 displayed lines.
+Scanline 0 is the start of vblank.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -472,25 +478,32 @@ WRITE_LINE_MEMBER(mac128_state::vblank_w)
 
 TIMER_CALLBACK_MEMBER(mac128_state::mac_scanline)
 {
-	int scanline = param;
-	uint16_t *mac_snd_buf_ptr;
+	const int scanline = param;
 
-	if (scanline == MAC_V_VIS)
+	if (scanline == 0)
 	{
 		vblank_irq();
 	}
 
 	/* video beam in display (! VBLANK && ! HBLANK basically) */
-	if (scanline < MAC_V_VIS)
+	if (scanline >= 28)
 	{
 		m_via->write_pb6(1);
-		m_hblank_timer->adjust(m_screen->time_until_pos(scanline, MAC_H_VIS));
+		m_hblank_timer->adjust(m_screen->time_until_pos(scanline, MAC_H_TOTAL));
 	}
 
 	if ((!(scanline % 10)) && (!m_macadb))
 	{
 		mouse_callback();
 	}
+
+	m_scan_timer->adjust(m_screen->time_until_pos(scanline+1), (scanline+1) % m_screen->height());
+}
+
+TIMER_CALLBACK_MEMBER(mac128_state::mac_hblank)
+{
+	const int scanline = m_screen->vpos();
+	uint16_t *mac_snd_buf_ptr;
 
 	if (m_main_buffer)
 	{
@@ -503,11 +516,7 @@ TIMER_CALLBACK_MEMBER(mac128_state::mac_scanline)
 
 	m_dac->write(mac_snd_buf_ptr[scanline] >> 8);
 	pwm_push(mac_snd_buf_ptr[scanline] & 0xff);
-	m_scan_timer->adjust(m_screen->time_until_pos(scanline+1), (scanline+1) % m_screen->height());
-}
 
-TIMER_CALLBACK_MEMBER(mac128_state::mac_hblank)
-{
 	m_via->write_pb6(0);
 }
 
@@ -1311,27 +1320,27 @@ ROM_START( mactw )
     ROM_LOAD( "rom4.3t_07-04-83.bin", 0x0000, 0x10000, CRC(d2c42f18) SHA1(f868c09ca70383a69751c37a5a3110a9597462a4) )
 ROM_END
 
-	// one twiggy mac (SN 1042) has the following sum16s on the 4x 16k eproms on the "512 EPROM ADAPTER" daughterboard:
-	// U3 EPROM // 1 HI: "H1 // A04A"
-	// U4 EPROM // 0 HI: "H0 // B6ED"
-	// U5 EPROM // 1 LOW: "Lo1 // 6C8C"
-	// U6 EPROM // 0 LOW: "Lo0 // F332"
-	// This one was publicly dumped by Adam Goolevitch, but one of the SUM16s (B5ED) does not match the ROM label (B6ED).
-	// The ROM has been marked as bad pending a redump or other verification of correctness.
-	ROMX_LOAD("h0__b6ed.u4",  0x00000, 0x04000, BAD_DUMP CRC(87136a61) SHA1(a33fc3b7908783a5742f06884fe44260447e5d55), ROM_SKIP(1) ) // SUM16: B5ED does not match written label
-	ROMX_LOAD("lo0__f332.u6", 0x00001, 0x04000, CRC(3d04b1c5) SHA1(11fe22e8ce415edf4133d7cee559dce4ab0f7974), ROM_SKIP(1) ) // SUM16: F332
-	ROMX_LOAD("h1__a04a.u3",  0x08000, 0x04000, CRC(fa9ae0d1) SHA1(e89826325caf053aad2c09d134c8c7483d442821), ROM_SKIP(1) ) // SUM16: A04A
-	ROMX_LOAD("lo1__6c8c.u5", 0x08001, 0x04000, CRC(ca78a04e) SHA1(724d7d7b585c375cd5797e4334d6ab6267e798dc), ROM_SKIP(1) ) // SUM16: 6C8C
+    // one twiggy mac (SN 1042) has the following sum16s on the 4x 16k eproms on the "512 EPROM ADAPTER" daughterboard:
+    // U3 EPROM // 1 HI: "H1 // A04A"
+    // U4 EPROM // 0 HI: "H0 // B6ED"
+    // U5 EPROM // 1 LOW: "Lo1 // 6C8C"
+    // U6 EPROM // 0 LOW: "Lo0 // F332"
+    // This one was publicly dumped by Adam Goolevitch, but one of the SUM16s (B5ED) does not match the ROM label (B6ED).
+    // The ROM has been marked as bad pending a redump or other verification of correctness.
+    ROMX_LOAD("h0__b6ed.u4",  0x00000, 0x04000, BAD_DUMP CRC(87136a61) SHA1(a33fc3b7908783a5742f06884fe44260447e5d55), ROM_SKIP(1) ) // SUM16: B5ED does not match written label
+    ROMX_LOAD("lo0__f332.u6", 0x00001, 0x04000, CRC(3d04b1c5) SHA1(11fe22e8ce415edf4133d7cee559dce4ab0f7974), ROM_SKIP(1) ) // SUM16: F332
+    ROMX_LOAD("h1__a04a.u3",  0x08000, 0x04000, CRC(fa9ae0d1) SHA1(e89826325caf053aad2c09d134c8c7483d442821), ROM_SKIP(1) ) // SUM16: A04A
+    ROMX_LOAD("lo1__6c8c.u5", 0x08001, 0x04000, CRC(ca78a04e) SHA1(724d7d7b585c375cd5797e4334d6ab6267e798dc), ROM_SKIP(1) ) // SUM16: 6C8C
 
 
-	// one twiggy mac (SN 1072, upc MA1M830241240) has the following sum16s on the 4x 16k EPROMs on the "512 EPROM ADAPTER" daughterboard:
-	// U3 EPROM // 1 HI: "Rom 2.45 // H 1 // 1D79"
-	// U4 EPROM // 0 HI: "ROM 2.45 // High0 // D4DF"
-	// U5 EPROM // 1 LOW: "ROM 2.45 // LOW1 // 977F"
-	// U6 EPROM // 0 LOW: "ROM 2.45 // LOW0 // C813"
-	// This Twiggy mac has a prototype IWM labeled "<signetics> 8248 // XXX-X299 (C) // APPLE 82"
-	// The ROM of this twiggy mac has been tentatively dated between March and April 1983, possibly March 11, 1983.
-	// See https://macgui.com/news/article.php?t=517
+    // one twiggy mac (SN 1072, upc MA1M830241240) has the following sum16s on the 4x 16k EPROMs on the "512 EPROM ADAPTER" daughterboard:
+    // U3 EPROM // 1 HI: "Rom 2.45 // H 1 // 1D79"
+    // U4 EPROM // 0 HI: "ROM 2.45 // High0 // D4DF"
+    // U5 EPROM // 1 LOW: "ROM 2.45 // LOW1 // 977F"
+    // U6 EPROM // 0 LOW: "ROM 2.45 // LOW0 // C813"
+    // This Twiggy mac has a prototype IWM labeled "<signetics> 8248 // XXX-X299 (C) // APPLE 82"
+    // The ROM of this twiggy mac has been tentatively dated between March and April 1983, possibly March 11, 1983.
+    // See https://macgui.com/news/article.php?t=517
 */
 
 ROM_START( mac128k )
