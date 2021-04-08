@@ -169,7 +169,7 @@ void vlc34010_state::base(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: all wrong
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_vblank_time(subseconds::from_usec(0));
 	screen.set_size((42+1)*8, (32+1)*8);
 	screen.set_visarea(0*8, 31*8-1, 0*8, 31*8-1);
 	screen.set_screen_update(m_tms, FUNC(tms34010_device::tms340x0_rgb32));

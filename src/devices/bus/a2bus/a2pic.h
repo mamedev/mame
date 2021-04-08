@@ -110,7 +110,12 @@ private:
 	required_ioport                         m_input_sw1;
 	required_ioport                         m_input_x;
 	required_region_ptr<u8>                 m_prom;
-	emu_timer *                             m_strobe_timer;
+	persistent_timer                        m_strobe_timer;
+	transient_timer_factory                 m_set_ack_in;
+	transient_timer_factory                 m_set_perror_in;
+	transient_timer_factory                 m_set_select_in;
+	transient_timer_factory                 m_set_fault_in;
+	transient_timer_factory                 m_data_write;
 
 	u16 m_firmware_base;        // controlled by SW6
 	u8  m_data_latch;           // 9B

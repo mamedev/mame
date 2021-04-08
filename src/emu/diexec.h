@@ -399,13 +399,13 @@ inline subseconds device_execute_interface::run_for(subseconds subs)
 	// icount is negative, then we ran more than requested (this is both
 	// allowed and expected), so the subtract here typically will
 	// increase ran
-	scheduler_assert(ran >= *icountptr);
+	scheduler_assert(s32(ran) >= *icountptr);
 	ran -= *icountptr;
 
 	// if cycles were stolen (i.e., icount was artificially decremented)
 	// then ran isn't actually correct, so remove the number of cycles
 	// that we did that for
-	scheduler_assert(ran >= m_cycles_stolen);
+	scheduler_assert(s32(ran) >= m_cycles_stolen);
 	ran -= m_cycles_stolen;
 
 	// time should never go backwards, nor should we ever attempt to

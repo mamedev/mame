@@ -67,7 +67,6 @@ a2bus_pic_device::a2bus_pic_device(machine_config const &mconfig, char const *ta
 	m_input_sw1(*this, "SW1"),
 	m_input_x(*this, "X"),
 	m_prom(*this, "prom"),
-	m_strobe_timer(nullptr),
 	m_firmware_base(0x0000U),
 	m_data_latch(0x00U),
 	m_autostrobe_disable(0U),
@@ -88,7 +87,7 @@ a2bus_pic_device::a2bus_pic_device(machine_config const &mconfig, char const *ta
 
 INPUT_CHANGED_MEMBER(a2bus_pic_device::sw1_strobe)
 {
-	m_printer_conn->write_strobe(BIT(m_input_sw1->read(), 3) ^ (m_strobe_timer->enabled() ? 0U : 1U));
+	m_printer_conn->write_strobe(BIT(m_input_sw1->read(), 3) ^ (m_strobe_timer.enabled() ? 0U : 1U));
 }
 
 
@@ -181,21 +180,19 @@ void a2bus_pic_device::write_c0nx(u8 offset, u8 data)
 		{
 			// latch output data and start strobe if autostrobe is enabled
 			LOG("Latch data %02X\n", data);
-			machine().scheduler().synchronize(
-					timer_expired_delegate(FUNC(a2bus_pic_device::data_write), this),
-					unsigned(data) | (1 << 8) | ((m_autostrobe_disable ? 0 : 1) << 9));
+			m_data_write.synchronize(unsigned(data) | (1 << 8) | ((m_autostrobe_disable ? 0 : 1) << 9));
 		}
 		else
 		{
 			// just start strobe if autostrobe is enabled
 			LOG("Output disabled, not latching data\n");
 			if (!m_autostrobe_disable)
-				machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::data_write), this), 1 << 9);
+				m_data_write.synchronize(1 << 9);
 		}
 		break;
 
 	case 2U:
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::data_write), this), 1 << 9);
+		m_data_write.synchronize(1 << 9);
 		break;
 
 	case 5U:
@@ -276,7 +273,12 @@ ioport_constructor a2bus_pic_device::device_input_ports() const
 
 void a2bus_pic_device::device_start()
 {
-	m_strobe_timer = timer_alloc(*this, FUNC(a2bus_pic_device::release_strobe));
+	m_strobe_timer.init(*this, FUNC(a2bus_pic_device::release_strobe));
+	m_data_write.init(*this, FUNC(a2bus_pic_device::data_write));
+	m_set_ack_in.init(*this, FUNC(a2bus_pic_device::set_ack_in));
+	m_set_perror_in.init(*this, FUNC(a2bus_pic_device::set_perror_in));
+	m_set_select_in.init(*this, FUNC(a2bus_pic_device::set_select_in));
+	m_set_fault_in.init(*this, FUNC(a2bus_pic_device::set_fault_in));
 
 	m_firmware_base = 0x0100U;
 	m_data_latch = 0xffU;
@@ -306,7 +308,7 @@ void a2bus_pic_device::device_reset()
 		m_printer_out->write(0x00U);
 	}
 
-	m_printer_conn->write_strobe(BIT(sw1, 3) ^ (m_strobe_timer->enabled() ? 0U : 1U));
+	m_printer_conn->write_strobe(BIT(sw1, 3) ^ (m_strobe_timer.enabled() ? 0U : 1U));
 
 	reset_mode();
 }
@@ -319,25 +321,25 @@ void a2bus_pic_device::device_reset()
 
 WRITE_LINE_MEMBER(a2bus_pic_device::ack_w)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::set_ack_in), this), state ? 1 : 0);
+	m_set_ack_in.synchronize(state ? 1 : 0);
 }
 
 
 WRITE_LINE_MEMBER(a2bus_pic_device::perror_w)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::set_perror_in), this), state ? 1 : 0);
+	m_set_perror_in.synchronize(state ? 1 : 0);
 }
 
 
 WRITE_LINE_MEMBER(a2bus_pic_device::select_w)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::set_select_in), this), state ? 1 : 0);
+	m_set_select_in.synchronize(state ? 1 : 0);
 }
 
 
 WRITE_LINE_MEMBER(a2bus_pic_device::fault_w)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::set_fault_in), this), state ? 1 : 0);
+	m_set_fault_in.synchronize(state ? 1 : 0);
 }
 
 
@@ -419,7 +421,7 @@ void a2bus_pic_device::data_write(void *ptr, s32 param)
 		ioport_value const sw1(m_input_sw1->read());
 		unsigned const cycles(15U - ((sw1 & 0x07U) << 1));
 		int const state(BIT(sw1, 3));
-		if (!m_strobe_timer->enabled())
+		if (!m_strobe_timer.enabled())
 		{
 			LOG("Output /STROBE=%d for %u cycles\n", state, cycles);
 			clear_ack_latch();
@@ -429,7 +431,7 @@ void a2bus_pic_device::data_write(void *ptr, s32 param)
 		{
 			LOG("Adjust /STROBE=%d remaining to %u cycles\n", state, cycles);
 		}
-		m_strobe_timer->adjust(attotime::from_ticks(cycles * 7, clock()));
+		m_strobe_timer.adjust(attotime::from_ticks(cycles * 7, clock()));
 	}
 }
 
@@ -453,7 +455,7 @@ void a2bus_pic_device::reset_mode()
 
 void a2bus_pic_device::set_ack_latch()
 {
-	if (m_strobe_timer->enabled())
+	if (m_strobe_timer.enabled())
 	{
 		LOG("Active strobe prevents acknowledge latch from being set\n");
 	}

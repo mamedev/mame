@@ -95,6 +95,10 @@ private:
 	void set_pe_in(void *ptr, s32 param);
 	void set_slct_in(void *ptr, s32 param);
 
+	transient_timer_factory m_set_busy_in;
+	transient_timer_factory m_set_pe_in;
+	transient_timer_factory m_set_slct_in;
+
 	u16 m_rom_bank;     // U2D (pin 13)
 	u8  m_busy_in;      // printer connector pin 21 (synchronised)
 	u8  m_pe_in;        // printer connector pin 23 (synchronised)
@@ -132,6 +136,9 @@ private:
 	u8  m_strobe;       // U3 (pin 4)
 	u8  m_ack_latch;    // U3 (pin 13)
 	u8  m_ack_in;       // printer connector pin 19 (synchronised)
+	transient_timer_factory m_set_data;
+	transient_timer_factory m_set_strobe;
+	transient_timer_factory m_set_ack_in;
 };
 
 
@@ -173,6 +180,8 @@ private:
 
 	u8  m_ack_latch;    // U2C (pin 9)
 	u8  m_ack_in;       // printer connector pin 19 (synchronised)
+
+	transient_timer_factory m_set_ack_in;
 };
 
 
@@ -204,7 +213,7 @@ private:
 	// timer handlers
 	TIMER_CALLBACK_MEMBER(update_strobe);
 
-	emu_timer * m_strobe_timer;
+	persistent_timer m_strobe_timer;
 
 	u8  m_data_latch;   // U10
 	u8  m_irq_disable;  // U2A (pin 4)
@@ -262,6 +271,9 @@ private:
 	u8  m_ibusy;            // U12
 	u8  m_buf_ack_latch;    // U12
 	u8  m_buf_ack_in;       // printer connector pin 19 (synchronised)
+	transient_timer_factory m_set_buf_data;
+	transient_timer_factory m_set_buf_ack_in;
+	transient_timer_factory m_clear_ibusy;
 };
 
 

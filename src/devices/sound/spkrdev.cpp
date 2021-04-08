@@ -116,7 +116,7 @@ void speaker_sound_device::device_start()
 	m_channel_sample_period = subseconds::from_hz(machine().sample_rate());
 	m_channel_sample_period_secfrac = m_channel_sample_period.as_double();
 	m_interm_sample_period = m_channel_sample_period / RATE_MULTIPLIER;
-	m_interm_sample_period_secfrac = subseconds::from_double(m_interm_sample_period);
+	m_interm_sample_period_secfrac = m_interm_sample_period.as_double();
 	m_channel_last_sample_time = m_last_update_time;
 	m_channel_next_sample_time = m_channel_last_sample_time + m_channel_sample_period;
 	m_next_interm_sample_time = m_channel_last_sample_time + m_interm_sample_period;
