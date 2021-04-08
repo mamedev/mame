@@ -26,7 +26,7 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define VERBOSE 1
+#define VERBOSE 0
 
 #define LOG(...)  do { if (VERBOSE) machine().logerror(__VA_ARGS__); } while (0)
 #define PRECISION 18
@@ -628,41 +628,44 @@ device_scheduler::~device_scheduler()
 {
 #if (COLLECT_SCHEDULER_STATS)
 	double seconds = m_basetime.absolute().as_double();
-	printf("%12.2f timeslice\n", m_timeslice / seconds);
-	printf("%12.2f    avg reps until minslice\n", (1.0 * m_timeslice_inner1) / m_timeslice);
-	printf("%12.2f    avg reps through execution loop until timer\n", (1.0 * m_timeslice_inner2) / m_timeslice_inner1);
-	printf("%12.2f    avg run_for called per execution loop\n", (1.0 * m_timeslice_inner3) / m_timeslice_inner2);
-	printf("%12.2f execute_timers: (%.2f avg)\n", m_execute_timers / seconds, 1.0 * m_execute_timers_average / m_execute_timers);
-	printf("%12.2f    update_basetime\n", m_update_basetime / seconds);
-	printf("%12.2f    apply_suspend_changes\n", m_apply_suspend_changes / seconds);
-	printf("%12.2f compute_perfect_interleave\n", m_compute_perfect_interleave / seconds);
-	printf("%12.2f rebuild_execute_list\n", m_rebuild_execute_list / seconds);
-	printf("%12.2f add_scheduling_quantum\n", m_add_scheduling_quantum / seconds);
-	printf("%12.2f instance_alloc (%lld full)\n", m_instance_alloc / seconds, m_instance_alloc_full);
-	u64 total_insert = m_instance_insert_head + m_instance_insert_tail + m_instance_insert_middle;
-	printf("%12.2f instance_insert:\n", total_insert / seconds);
-	printf("%12.2f    head (%.2f%%)\n", m_instance_insert_head / seconds, (100.0 * m_instance_insert_head) / total_insert);
-	printf("%12.2f    tail (%.2f%%)\n", m_instance_insert_tail / seconds, (100.0 * m_instance_insert_tail) / total_insert);
-	printf("%12.2f    middle (%.2f%%, avg search = %.2f)\n", m_instance_insert_middle / seconds, (100.0 * m_instance_insert_middle) / total_insert, 1.0 * m_instance_insert_average / m_instance_insert_middle);
-	printf("%12.2f instance_remove\n", m_instance_remove / seconds);
-	printf("%12.2f empty_timer\n", m_empty_timer_calls / seconds);
-	printf("%12.2f timed_trigger\n", m_timed_trigger_calls / seconds);
-	printf("\ntimers:\n");
+	if (seconds > 0)
+	{
+		printf("%12.2f timeslice\n", m_timeslice / seconds);
+		printf("%12.2f    avg reps until minslice\n", (1.0 * m_timeslice_inner1) / m_timeslice);
+		printf("%12.2f    avg reps through execution loop until timer\n", (1.0 * m_timeslice_inner2) / m_timeslice_inner1);
+		printf("%12.2f    avg run_for called per execution loop\n", (1.0 * m_timeslice_inner3) / m_timeslice_inner2);
+		printf("%12.2f execute_timers: (%.2f avg)\n", m_execute_timers / seconds, 1.0 * m_execute_timers_average / m_execute_timers);
+		printf("%12.2f    update_basetime\n", m_update_basetime / seconds);
+		printf("%12.2f    apply_suspend_changes\n", m_apply_suspend_changes / seconds);
+		printf("%12.2f compute_perfect_interleave\n", m_compute_perfect_interleave / seconds);
+		printf("%12.2f rebuild_execute_list\n", m_rebuild_execute_list / seconds);
+		printf("%12.2f add_scheduling_quantum\n", m_add_scheduling_quantum / seconds);
+		printf("%12.2f instance_alloc (%lld full)\n", m_instance_alloc / seconds, m_instance_alloc_full);
+		u64 total_insert = m_instance_insert_head + m_instance_insert_tail + m_instance_insert_middle;
+		printf("%12.2f instance_insert:\n", total_insert / seconds);
+		printf("%12.2f    head (%.2f%%)\n", m_instance_insert_head / seconds, (100.0 * m_instance_insert_head) / total_insert);
+		printf("%12.2f    tail (%.2f%%)\n", m_instance_insert_tail / seconds, (100.0 * m_instance_insert_tail) / total_insert);
+		printf("%12.2f    middle (%.2f%%, avg search = %.2f)\n", m_instance_insert_middle / seconds, (100.0 * m_instance_insert_middle) / total_insert, 1.0 * m_instance_insert_average / m_instance_insert_middle);
+		printf("%12.2f instance_remove\n", m_instance_remove / seconds);
+		printf("%12.2f empty_timer\n", m_empty_timer_calls / seconds);
+		printf("%12.2f timed_trigger\n", m_timed_trigger_calls / seconds);
+		printf("\ntimers:\n");
 
-	using cbptr = timer_callback *;
-	std::vector<cbptr> timers;
-	for (timer_callback *cb = m_registered_callbacks; cb != nullptr; cb = cb->m_next_registered)
-		if (cb->m_calls != 0)
-			timers.push_back(cb);
-	std::sort(timers.begin(), timers.end(),
-		[](cbptr const &a, cbptr const &b)
-		{
-			return (a->m_calls > b->m_calls);
-		});
+		using cbptr = timer_callback *;
+		std::vector<cbptr> timers;
+		for (timer_callback *cb = m_registered_callbacks; cb != nullptr; cb = cb->m_next_registered)
+			if (cb->m_calls != 0)
+				timers.push_back(cb);
+		std::sort(timers.begin(), timers.end(),
+			[](cbptr const &a, cbptr const &b)
+			{
+				return (a->m_calls > b->m_calls);
+			});
 
-	static char const *forms[] = { "native", " void ", "device", " int  ", "legacy", "intint", " int3 " };
-	for (auto &cb : timers)
-		printf("%12.2f %s %s\n", cb->m_calls / seconds, forms[cb->m_delegate.m_form], cb->m_unique_id.c_str());
+		static char const *forms[] = { "native", " void ", "device", " int  ", "legacy", "intint", " int3 " };
+		for (auto &cb : timers)
+			printf("%12.2f %s %s\n", cb->m_calls / seconds, forms[cb->m_delegate.m_form], cb->m_unique_id.c_str());
+	}
 #endif
 }
 
