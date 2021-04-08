@@ -406,7 +406,8 @@ ROM_START( mt32 )
 
 	// Dumped from "new" board revision single 128K x 8 ROM
 	ROM_SYSTEM_BIOS( 6, "204", "Firmware 2.0.4" )
-	ROMX_LOAD(       "mt32_2.0.4.ic28.bin",          0,   0x8000, CRC(59a49d5c) SHA1(2c16432b6c73dd2a3947cba950a0f4c19d6180eb), ROM_BIOS(6) )
+	ROMX_LOAD(       "mt32_2.0.4.ic28",              0,   0x10000, CRC(59a49d5c) SHA1(2c16432b6c73dd2a3947cba950a0f4c19d6180eb), ROM_BIOS(6) )
+	ROM_IGNORE(0x10000)  // banking needs to be implemented
 
 // We need a bios-like selection for these too
 	ROM_REGION( 0x80000, "la32", 0 )
