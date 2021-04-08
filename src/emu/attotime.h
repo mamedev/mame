@@ -984,8 +984,8 @@ public:
 	s64 as_ticks(const XTAL &xtal) const { return as_ticks(xtal.value()); }
 
 	// conversion to string
-	const char *as_string(int precision = 9) const;
-	std::string to_string(int precision = 9) const;
+	const char *as_string(int precision = 9, bool dividers = false) const;
+	std::string to_string(int precision = 9, bool dividers = true) const;
 
 	// creation from double
 	static attotime from_double(double _time)
@@ -1027,7 +1027,7 @@ public:
 	constexpr attotime &operator+=(attotime const &right) noexcept;
 	constexpr attotime &operator-=(attotime const &right) noexcept;
 	template<typename T> constexpr std::enable_if_t<std::is_integral<T>::value, attotime> &operator*=(T factor);
-	template<typename T> constexpr std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, attotime> &operator/=(T factor);
+	template<typename T> constexpr std::enable_if_t<std::is_integral<T>::value, attotime> &operator/=(T factor);
 	s64 operator/=(subseconds factor);
 
 	// friend math
@@ -1036,7 +1036,7 @@ public:
 	friend constexpr attotime operator-(attotime const &left, attotime const &right) noexcept;
 	template<typename T> friend constexpr std::enable_if_t<std::is_integral<T>::value, attotime> operator*(attotime const &left, T factor);
 	template<typename T> friend constexpr std::enable_if_t<std::is_integral<T>::value, attotime> operator*(T factor, attotime const &right);
-	template<typename T> friend constexpr std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, attotime> operator/(attotime const &left, T factor);
+	template<typename T> friend constexpr std::enable_if_t<std::is_integral<T>::value, attotime> operator/(attotime const &left, T factor);
 	friend s64 operator/(attotime const &left, subseconds factor);
 
 	// friend comparisons
@@ -1053,6 +1053,11 @@ private:
 		m_fine(fine), m_coarse(coarse)
 	{
 	}
+
+	// internal helper for creating strings
+	// maximum length = sign + 9 seconds digits + decimal + 19 sub-digits + 19/3 dividers + terminator
+	static constexpr int MAX_STRING_LEN = 1 + 9 + 1 + 19 + 19/3 + 1;
+	char const *generate_string(char *buffer, int precision = 9, bool dividers = true) const;
 
 	// never check
 	constexpr static bool is_never(u64 fineval) { return (BIT(fineval, 0, 2) != 0); }
@@ -1132,24 +1137,37 @@ inline constexpr attotime &attotime::operator-=(const attotime &right) noexcept
 	return *this;
 }
 
-// multiply an attotime by a 32-bit factor
-template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
-inline constexpr attotime operator*(const attotime &left, T factor)
+// multiply an attotime by an integral factor
+template<typename T>
+inline constexpr std::enable_if_t<std::is_integral<T>::value, attotime> operator*(attotime const &left, T factor)
 {
 	// check for never
 	if (UNEXPECTED(left.is_never()))
 		return attotime::never;
 
-	// multiply the fine part
-	s64 fine = s64(left.m_fine) * s64(factor);
+	if (sizeof(T) <= 4 || factor == s32(factor))
+	{
+		// multiply the fine part; both are 32 bits so this won't overflow
+		s64 fine = s64(left.m_fine) * s64(factor);
 
-	// compute the coarse portion
-	s64 coarse = left.m_coarse * s64(factor) + (fine >> 32);
-	return attotime(coarse, u32(fine));
+		// compute the coarse portion and add the carry from the fine part
+		s64 coarse = left.m_coarse * s64(factor) + (fine >> 32);
+		return attotime(coarse, u32(fine));
+	}
+	else if (sizeof(T) == 8)
+	{
+		// multiply the 32-bit fine value by the 64-bit factor
+		s64 fine_hi;
+		s64 fine = mul_64x64(left.m_fine, factor, fine_hi);
+
+		// compute the coarse portion, adding top 32 bits from fine and lower 32 bits from fine_hi
+		s64 coarse = left.m_coarse * s64(factor) + (fine_hi << 32) + (fine >> 32);
+		return attotime(coarse, u32(fine));
+	}
 }
 
 template<typename T>
-inline constexpr std::enable_if_t<std::is_integral<T>::value, attotime> operator*(T factor, const attotime &right)
+inline constexpr std::enable_if_t<std::is_integral<T>::value, attotime> operator*(T factor, attotime const &right)
 {
 	// multiplication is commutative
 	return operator*(right, factor);
@@ -1162,58 +1180,96 @@ inline constexpr std::enable_if_t<std::is_integral<T>::value, attotime> &attotim
 	if (UNEXPECTED(is_never()))
 		return *this;
 
-	// multiply the fine part
-	s64 fine = s64(m_fine) * s64(factor);
+	if (sizeof(T) <= 4 || factor == s32(factor))
+	{
+		// multiply the fine part; both are 32 bits so this won't overflow
+		s64 fine = s64(m_fine) * s64(factor);
 
-	// compute the coarse portion
-	m_coarse = m_coarse * s64(factor) + (fine >> 32);
-	m_fine = u32(fine);
+		// compute the coarse portion and add the carry from the fine part
+		m_coarse = m_coarse * s64(factor) + (fine >> 32);
+		m_fine = u32(fine);
+	}
+	else if (sizeof(T) == 8)
+	{
+		// multiply the 32-bit fine value by the 64-bit factor
+		s64 fine_hi;
+		s64 fine = mul_64x64(m_fine, factor, fine_hi);
+
+		// compute the coarse portion, adding top 32 bits from fine and lower 32 bits from fine_hi
+		m_coarse = m_coarse * s64(factor) + (fine_hi << 32) + (fine >> 32);
+		m_fine = u32(fine);
+	}
 	return *this;
 }
 
-// divide by a 32-bit factor
+// divide by an integral factor
 // TODO: Upgrade to use CPU-native 128/64 divide
 template<typename T>
-inline constexpr std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, attotime> operator/(const attotime &left, T factor)
+inline constexpr std::enable_if_t<std::is_integral<T>::value, attotime> operator/(const attotime &left, T factor)
 {
 	// check for never
 	if (UNEXPECTED(left.is_never()))
 		return attotime::never;
 
-	// special case the signed divide
+	// handle signed cases up front so the core code is unsigned-only
 	if (UNEXPECTED(left.m_coarse < 0))
 		return -(-left / factor);
 	if (std::is_signed<T>::value && UNEXPECTED(factor < 0))
 		return -(left / -factor);
 
-	// compute the coarse part
-	u64 coarse = u64(left.m_coarse) / u32(factor);
+	if (sizeof(T) <= 4 || factor == u32(factor))
+	{
+		// compute the coarse part; this is a 64/32-bit divide, with a remainder
+		// that fits in 32 bits
+		u32 remainder;
+		u64 coarse = divu_64x32_rem(left.m_coarse, factor, remainder);
 
-	// compute the fine part by combining the remainder with the fine part
-	u64 fine = (((left.m_coarse - coarse * factor) << 32) | left.m_fine) / factor;
-	return attotime(coarse, u32(fine) & ~3);
+		// compute the fine part by combining the remainder with the fine part
+		u64 fine = ((u64(remainder) << 32) | left.m_fine) / factor;
+		return attotime(coarse, u32(fine) & ~3);
+	}
+	else if (sizeof(T) == 8)
+	{
+		// shift the dividend down into a 94-bit value and use the 128-bit divide
+		u64 lower = (left.m_fine >> 2) | (left.m_coarse << 30);
+		s64 upper = left.m_coarse >> 34;
+		s64 result = div_128x64(upper, lower, factor);
+		return attotime(result >> 30, u32(result << 2));
+	}
 }
 
 template<typename T>
-inline constexpr std::enable_if_t<std::is_integral<T>::value && sizeof(T) < 8, attotime> &attotime::operator/=(T factor)
+inline constexpr std::enable_if_t<std::is_integral<T>::value, attotime> &attotime::operator/=(T factor)
 {
 	// check for never
 	if (UNEXPECTED(is_never()))
 		return *this;
 
-	// special case the signed divide
+	// handle signed cases up front so the core code is unsigned-only
 	if (UNEXPECTED(m_coarse < 0))
 		return *this = -(-*this / factor);
 	if (std::is_signed<T>::value && UNEXPECTED(factor < 0))
 		return *this = -(*this / -factor);
 
-	// compute the coarse part
-	u64 coarse = u64(m_coarse) / u32(factor);
+	if (sizeof(T) <= 4 || factor == u32(factor))
+	{
+		// compute the coarse part; this is a 64/32-bit divide, with a remainder
+		// that fits in 32 bits
+		u64 coarse = divu_64x32_rem(m_coarse, factor, remainder);
 
-	// compute the fine part by combining the remainder with the fine part
-	u64 fine = (((m_coarse - coarse * factor) << 32) | m_fine) / factor;
-	m_coarse = coarse;
-	m_fine = u32(fine) & ~3;
+		// compute the fine part by combining the remainder with the fine part
+		u64 fine = ((u64(remainder) << 32) | m_fine) / factor;
+		m_coarse = coarse;
+		m_fine = u32(fine) & ~3;
+	}
+	else if (sizeof(T) == 8)
+	{
+		// shift the dividend down into a 94-bit value and use the 128-bit divide
+		u64 lower = (m_fine >> 2) | (m_coarse << 30);
+		s64 upper = m_coarse >> 34;
+		s64 result = div_128x64(upper, lower, factor);
+		return attotime(result >> 30, u32(result << 2));
+	}
 	return *this;
 }
 
@@ -1278,6 +1334,6 @@ inline constexpr bool operator>=(const attotime &left, const attotime &right) no
 
 
 // select the old implementation for now
-using namespace oldtime;
+using namespace newtime;
 
 #endif // MAME_EMU_ATTOTIME_H
