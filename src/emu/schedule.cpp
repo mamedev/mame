@@ -1122,7 +1122,7 @@ void device_scheduler::compute_perfect_interleave()
 	{
 		// start with a huge time factor and find the 2nd smallest cycle time
 		subseconds smallest = first->minimum_quantum();
-		subseconds perfect = subseconds::max();
+		subseconds perfect = MAX_QUANTUM;
 		for (device_execute_interface *exec = first->m_nextexec; exec != nullptr; exec = exec->m_nextexec)
 		{
 			// find the 2nd smallest cycle interval
@@ -1161,13 +1161,13 @@ void device_scheduler::rebuild_execute_list()
 	// if we haven't yet set a scheduling quantum, do it now
 	if (m_quantum_list.empty())
 	{
-		// set the core scheduling quantum, ensuring it's no longer than 60Hz
-		attotime min_quantum = machine().config().maximum_quantum(attotime::from_hz(60));
+		// set the core scheduling quantum, ensuring it's no longer than the maximum
+		attotime min_quantum = machine().config().maximum_quantum(MAX_QUANTUM);
 
 		// if the configuration specifies a device to make perfect, pick that as the minimum
 		device_execute_interface *const exec(machine().config().perfect_quantum_device());
-		if (exec)
-			min_quantum = (std::min)(attotime(exec->minimum_quantum()), min_quantum);
+		if (exec != nullptr)
+			min_quantum = std::min(attotime(exec->minimum_quantum()), min_quantum);
 
 		// inform the timer system of our decision
 		add_scheduling_quantum(min_quantum, attotime::never);

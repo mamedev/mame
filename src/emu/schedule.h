@@ -694,6 +694,7 @@ private:
 		subseconds              m_requested;                // duration of the requested quantum
 		attotime                m_expire;                   // absolute expiration time of this quantum
 	};
+	static constexpr subseconds MAX_QUANTUM = subseconds::from_hz(10);
 	simple_list<quantum_slot>   m_quantum_list;             // list of active quanta
 	fixed_allocator<quantum_slot> m_quantum_allocator;      // allocator for quanta
 	subseconds                  m_quantum_minimum;          // duration of minimum quantum
