@@ -369,9 +369,12 @@ inline subseconds device_execute_interface::run_for(subseconds subs)
 	g_profiler.start(m_profiler);
 
 	// compute how many cycles we want to execute, rounding up
-	// note that we pre-cache subseconds per cycle
-	subseconds subseconds_per_cycle = m_subseconds_per_cycle;
-	s32 ran = subs / subseconds_per_cycle + 1;
+	// note that we pre-cache subseconds per cycle in raw form
+	// so that we can do unsigned operations, which are faster
+	// in this critical loop
+	u64 subseconds_per_cycle = m_subseconds_per_cycle.raw();
+	scheduler_assert(subs.raw() >= 0);
+	u32 ran = u64(subs.raw()) / subseconds_per_cycle + 1;
 
 	// store the number of cycles we've requested in the executing
 	// device
@@ -407,7 +410,7 @@ inline subseconds device_execute_interface::run_for(subseconds subs)
 
 	// time should never go backwards, nor should we ever attempt to
 	// execute more than a full second (minimum quantum prevents that)
-	scheduler_assert(ran >= 0 && ran < m_cycles_per_second);
+	scheduler_assert(ran < m_cycles_per_second);
 
 	// update the device's count of total cycles executed with the
 	// true number of cycles
@@ -415,7 +418,8 @@ inline subseconds device_execute_interface::run_for(subseconds subs)
 
 	// update the local time for the device so that it represents an
 	// integral number of cycles
-	m_localtime.add(subseconds_per_cycle * ran);
+	u64 ran_subseconds = subseconds_per_cycle * u64(ran);
+	m_localtime.add(subseconds::from_raw(ran_subseconds));
 
 	g_profiler.stop();
 
