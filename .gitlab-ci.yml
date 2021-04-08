@@ -8,6 +8,7 @@
 
 # Core definitions
 include:
+  ################################## DESKTOPS ################################
   # Windows 64-bit
   - project: 'libretro-infrastructure/ci-templates'
     file: '/windows-x64-mingw.yml'
@@ -28,10 +29,16 @@ include:
   - project: 'libretro-infrastructure/ci-templates'
     file: '/osx-x64.yml'
 
+  ################################## CELLULAR ################################
   # Android
   - project: 'libretro-infrastructure/ci-templates'
     file: '/android-make.yml'
-
+    
+  # iOS
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/ios-arm64.yml'
+    
+  ################################## CONSOLES ################################
   # # Nintendo 3DS
   # - project: 'libretro-infrastructure/ci-templates'
   #   file: '/ctr-static.yml'
@@ -47,6 +54,8 @@ include:
   # # PlayStation Vita
   # - project: 'libretro-infrastructure/ci-templates'
   #   file: '/vita-static.yml'
+  
+  #################################### MISC ##################################
 
 # Stages for building
 stages:
@@ -61,6 +70,11 @@ cache: &global_cache
   paths:
     - build/
 
+##############################################################################
+#################################### STAGES ##################################
+##############################################################################
+
+################################### DESKTOPS #################################
 # Windows 64-bit
 libretro-build-windows-x64:
   extends:
@@ -108,17 +122,7 @@ libretro-build-osx-x64:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-osx-x64"
 
-# iOS
-libretro-build-ios-arm64:
-  tags:
-    - macosx-packaging
-  extends:
-    - .libretro-ios-arm64-make-default
-    - .core-defs
-  cache:
-    <<: *global_cache
-    key: "$CI_COMMIT_REF_SLUG-ios-arm64"
-
+################################### CELLULAR #################################
 # Android ARMv7a
 android-armeabi-v7a:
   extends:
@@ -164,6 +168,18 @@ android-x86_64:
 #     - .libretro-android-jni-x86
 #     - .core-defs
 
+# iOS
+libretro-build-ios-arm64:
+  tags:
+    - macosx-packaging
+  extends:
+    - .libretro-ios-arm64-make-default
+    - .core-defs
+  cache:
+    <<: *global_cache
+    key: "$CI_COMMIT_REF_SLUG-ios-arm64"
+
+################################### CONSOLES #################################
 # # Nintendo 3DS
 # libretro-build-ctr:
 #   extends:
