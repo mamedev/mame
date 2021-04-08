@@ -52,4 +52,15 @@ private:
 	static const char *const s_inst_names[256];
 };
 
+class mn1860_disassembler : public mn1880_disassembler
+{
+public:
+	// construction/destruction
+	mn1860_disassembler();
+
+private:
+	// instruction mnemonic table
+	static const char *const s_inst_names[256];
+};
+
 #endif // MAME_CPU_PIC17_PIC17D_H
