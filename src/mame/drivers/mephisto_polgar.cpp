@@ -29,10 +29,10 @@ The 10MHz version has a W65C02P-8 @ 9.83MHz.
 
 namespace {
 
-class mephisto_polgar_state : public driver_device
+class polgar_state : public driver_device
 {
 public:
-	mephisto_polgar_state(const machine_config &mconfig, device_type type, const char *tag)
+	polgar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_keys(*this, "KEY")
@@ -56,7 +56,7 @@ private:
     I/O
 ******************************************************************************/
 
-u8 mephisto_polgar_state::keys_r(offs_t offset)
+u8 polgar_state::keys_r(offs_t offset)
 {
 	return (BIT(m_keys->read(), offset) << 7) | 0x7f;
 }
@@ -67,14 +67,14 @@ u8 mephisto_polgar_state::keys_r(offs_t offset)
     Address Maps
 ******************************************************************************/
 
-void mephisto_polgar_state::polgar_mem(address_map &map)
+void polgar_state::polgar_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
 	map(0x2000, 0x2000).w("display", FUNC(mephisto_display_module2_device::latch_w));
 	map(0x2004, 0x2004).w("display", FUNC(mephisto_display_module2_device::io_w));
 	map(0x2400, 0x2400).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x2800, 0x2800).w("board", FUNC(mephisto_board_device::mux_w));
-	map(0x2c00, 0x2c07).r(FUNC(mephisto_polgar_state::keys_r));
+	map(0x2c00, 0x2c07).r(FUNC(polgar_state::keys_r));
 	map(0x3000, 0x3000).r("board", FUNC(mephisto_board_device::input_r));
 	map(0x3400, 0x3407).w("outlatch", FUNC(hc259_device::write_d7));
 	map(0x4000, 0xffff).rom();
@@ -104,11 +104,11 @@ INPUT_PORTS_END
     Machine Configs
 ******************************************************************************/
 
-void mephisto_polgar_state::polgar(machine_config &config)
+void polgar_state::polgar(machine_config &config)
 {
 	R65C02(config, m_maincpu, 4.9152_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_polgar_state::polgar_mem);
-	m_maincpu->set_periodic_int(FUNC(mephisto_polgar_state::nmi_line_pulse), attotime::from_hz(4.9152_MHz_XTAL / (1 << 13)));
+	m_maincpu->set_addrmap(AS_PROGRAM, &polgar_state::polgar_mem);
+	m_maincpu->set_periodic_int(FUNC(polgar_state::nmi_line_pulse), attotime::from_hz(4.9152_MHz_XTAL / (1 << 13)));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -125,13 +125,13 @@ void mephisto_polgar_state::polgar(machine_config &config)
 	config.set_default_layout(layout_mephisto_polgar);
 }
 
-void mephisto_polgar_state::polgar10(machine_config &config)
+void polgar_state::polgar10(machine_config &config)
 {
 	polgar(config);
 
 	M65C02(config.replace(), m_maincpu, 9.8304_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_polgar_state::polgar_mem);
-	m_maincpu->set_periodic_int(FUNC(mephisto_polgar_state::nmi_line_pulse), attotime::from_hz(9.8304_MHz_XTAL / (1 << 13)));
+	m_maincpu->set_addrmap(AS_PROGRAM, &polgar_state::polgar_mem);
+	m_maincpu->set_periodic_int(FUNC(polgar_state::nmi_line_pulse), attotime::from_hz(9.8304_MHz_XTAL / (1 << 13)));
 }
 
 
@@ -168,8 +168,8 @@ ROM_END
     Game Drivers
 ***************************************************************************/
 
-/*    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT   CLASS                   INIT        COMPANY             FULLNAME                   FLAGS */
-CONS( 1990, polgar,    0,       0,      polgar,   polgar, mephisto_polgar_state,  empty_init, "Hegener + Glaser", "Mephisto Polgar (v1.50)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, polgara,   polgar,  0,      polgar,   polgar, mephisto_polgar_state,  empty_init, "Hegener + Glaser", "Mephisto Polgar (v1.10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, polgar10,  polgar,  0,      polgar10, polgar, mephisto_polgar_state,  empty_init, "Hegener + Glaser", "Mephisto Polgar 10 MHz (v10.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, polgar101, polgar,  0,      polgar10, polgar, mephisto_polgar_state,  empty_init, "Hegener + Glaser", "Mephisto Polgar 10 MHz (v10.1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT   CLASS         INIT        COMPANY             FULLNAME                   FLAGS */
+CONS( 1990, polgar,    0,       0,      polgar,   polgar, polgar_state, empty_init, "Hegener + Glaser", "Mephisto Polgar (v1.50)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, polgara,   polgar,  0,      polgar,   polgar, polgar_state, empty_init, "Hegener + Glaser", "Mephisto Polgar (v1.10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, polgar10,  polgar,  0,      polgar10, polgar, polgar_state, empty_init, "Hegener + Glaser", "Mephisto Polgar 10 MHz (v10.0)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, polgar101, polgar,  0,      polgar10, polgar, polgar_state, empty_init, "Hegener + Glaser", "Mephisto Polgar 10 MHz (v10.1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

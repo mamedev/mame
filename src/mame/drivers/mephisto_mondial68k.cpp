@@ -112,7 +112,7 @@ void mondial68k_state::input_mux_w(u8 data)
 
 u8 mondial68k_state::inputs_r()
 {
-	u8 data = 0x00;
+	u8 data = 0;
 
 	// read buttons
 	for (int i = 0; i < 4; i++)

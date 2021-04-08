@@ -40,15 +40,19 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/mmboard.h"
 #include "sound/dac.h"
+
 #include "speaker.h"
 
 // internal artwork
 #include "mephisto_amsterdam.lh"
 #include "mephisto_glasgow.lh"
 
+
+namespace {
 
 class glasgow_state : public driver_device
 {
@@ -65,10 +69,10 @@ public:
 	void glasgow(machine_config &config);
 
 protected:
-	void glasgow_lcd_w(uint8_t data);
-	void glasgow_lcd_flag_w(uint8_t data);
-	uint8_t glasgow_keys_r();
-	void glasgow_keys_w(uint8_t data);
+	void glasgow_lcd_w(u8 data);
+	void glasgow_lcd_flag_w(u8 data);
+	u8 glasgow_keys_r();
+	void glasgow_keys_w(u8 data);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -81,9 +85,9 @@ protected:
 	required_ioport_array<2> m_keyboard;
 	output_finder<4> m_digits;
 
-	uint8_t m_lcd_shift_counter;
-	uint8_t m_led7;
-	uint8_t m_key_select;
+	u8 m_lcd_shift_counter;
+	u8 m_led7;
+	u8 m_key_select;
 };
 
 
@@ -96,11 +100,11 @@ public:
 	void dallas32(machine_config &config);
 
 protected:
-	void write_lcd(uint8_t data);
-	void write_lcd_flag(uint8_t data);
-	void write_beeper(uint8_t data);
-	void write_board(uint8_t data);
-	uint8_t read_newkeys();
+	void write_lcd(u8 data);
+	void write_lcd_flag(u8 data);
+	void write_beeper(u8 data);
+	void write_board(u8 data);
+	u8 read_newkeys();
 
 	void amsterd_mem(address_map &map);
 	void dallas32_mem(address_map &map);
@@ -108,7 +112,11 @@ protected:
 
 
 
-void glasgow_state::glasgow_lcd_w(uint8_t data)
+/******************************************************************************
+    I/O
+******************************************************************************/
+
+void glasgow_state::glasgow_lcd_w(u8 data)
 {
 	if (m_led7 == 0)
 		m_digits[m_lcd_shift_counter] = data;
@@ -117,9 +125,9 @@ void glasgow_state::glasgow_lcd_w(uint8_t data)
 	m_lcd_shift_counter &= 3;
 }
 
-void glasgow_state::glasgow_lcd_flag_w(uint8_t data)
+void glasgow_state::glasgow_lcd_flag_w(u8 data)
 {
-	uint8_t const lcd_flag = data & 0x81;
+	u8 const lcd_flag = data & 0x81;
 
 	m_dac->write(BIT(lcd_flag, 0));
 
@@ -129,10 +137,10 @@ void glasgow_state::glasgow_lcd_flag_w(uint8_t data)
 		m_led7 = 0;
 }
 
-uint8_t glasgow_state::glasgow_keys_r()
+u8 glasgow_state::glasgow_keys_r()
 {
 	// See if any keys pressed
-	uint8_t data = 3;
+	u8 data = 3;
 
 	if (m_key_select == m_keyboard[0]->read())
 		data &= 1;
@@ -143,12 +151,12 @@ uint8_t glasgow_state::glasgow_keys_r()
 	return data;
 }
 
-void glasgow_state::glasgow_keys_w(uint8_t data)
+void glasgow_state::glasgow_keys_w(u8 data)
 {
 	m_key_select = data;
 }
 
-void amsterd_state::write_lcd(uint8_t data)
+void amsterd_state::write_lcd(u8 data)
 {
 	if (m_lcd_shift_counter & 4)
 		m_digits[m_lcd_shift_counter & 3] = data;
@@ -157,7 +165,7 @@ void amsterd_state::write_lcd(uint8_t data)
 	m_lcd_shift_counter &= 7;
 }
 
-void amsterd_state::write_lcd_flag(uint8_t data)
+void amsterd_state::write_lcd_flag(u8 data)
 {
 	// The key function in the rom expects a value from the
 	// second key row after writing to here
@@ -166,19 +174,19 @@ void amsterd_state::write_lcd_flag(uint8_t data)
 	m_led7 = data ? 255 : 0;
 }
 
-void amsterd_state::write_board(uint8_t data)
+void amsterd_state::write_board(u8 data)
 {
 	m_key_select = 0;
 	m_board->led_w(0);
 	m_board->mux_w(data);
 }
 
-void amsterd_state::write_beeper(uint8_t data)
+void amsterd_state::write_beeper(u8 data)
 {
 	m_dac->write(BIT(data, 0));
 }
 
-uint8_t amsterd_state::read_newkeys()
+u8 amsterd_state::read_newkeys()
 {
 	return m_keyboard[m_key_select & 1]->read();
 }
@@ -200,6 +208,11 @@ void glasgow_state::machine_reset()
 	m_led7 = 0;
 }
 
+
+
+/******************************************************************************
+    Address Maps
+******************************************************************************/
 
 void glasgow_state::glasgow_mem(address_map &map)
 {
@@ -238,6 +251,12 @@ void amsterd_state::dallas32_mem(address_map &map)
 	map(0x800040, 0x800040).r(FUNC(amsterd_state::read_newkeys));
 	map(0x800088, 0x800088).w("board", FUNC(mephisto_board_device::led_w));
 }
+
+
+
+/******************************************************************************
+    Input Ports
+******************************************************************************/
 
 static INPUT_PORTS_START( new_keyboard )
 	PORT_START("LINE0")
@@ -284,6 +303,11 @@ static INPUT_PORTS_START( old_keyboard )
 INPUT_PORTS_END
 
 
+
+/******************************************************************************
+    Machine Configs
+******************************************************************************/
+
 void glasgow_state::glasgow(machine_config &config)
 {
 	/* basic machine hardware */
@@ -323,9 +347,10 @@ void amsterd_state::dallas32(machine_config &config)
 }
 
 
-/***************************************************************************
-  ROM definitions
-***************************************************************************/
+
+/******************************************************************************
+    ROM Definitions
+******************************************************************************/
 
 ROM_START( glasgow )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -387,10 +412,13 @@ ROM_START( roma16a )
 	ROM_LOAD16_BYTE("roma_l_high", 0x08001, 0x04000, CRC(0b20617b) SHA1(f0296c486ce9009a69de1e50b90b0e1b7555f468) )
 ROM_END
 
+} // anonymous namespace
 
-/***************************************************************************
-  Game drivers
-***************************************************************************/
+
+
+/******************************************************************************
+    Drivers
+******************************************************************************/
 
 /*    YEAR, NAME,      PARENT    COMPAT  MACHINE   INPUT         CLASS          INIT        COMPANY             FULLNAME                  FLAGS */
 CONS( 1984, glasgow,   0,        0,      glasgow,  old_keyboard, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto III-S Glasgow", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Sandro Ronco
+// copyright-holders:Sandro Ronco, hap
+// thanks-to:Berger
 /******************************************************************************
 
 Mephisto Milano
@@ -19,8 +20,9 @@ Nigel Short is basically a Milano 2.00
 #include "cpu/m6502/r65c02.h"
 #include "machine/74259.h"
 #include "machine/nvram.h"
-#include "machine/mmboard.h"
+#include "machine/sensorboard.h"
 #include "video/mmdisplay2.h"
+#include "video/pwm.h"
 
 // internal artwork
 #include "mephisto_milano.lh"
@@ -28,31 +30,47 @@ Nigel Short is basically a Milano 2.00
 
 namespace {
 
-class mephisto_milano_state : public driver_device
+class milano_state : public driver_device
 {
 public:
-	mephisto_milano_state(const machine_config &mconfig, device_type type, const char *tag)
+	milano_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_board(*this, "board")
 		, m_display(*this, "display")
+		, m_led_pwm(*this, "led_pwm")
 		, m_keys(*this, "KEY")
 	{ }
 
 	void milano(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<mephisto_board_device> m_board;
+	required_device<sensorboard_device> m_board;
 	required_device<mephisto_display_module2_device> m_display;
+	required_device<pwm_display_device> m_led_pwm;
 	required_ioport m_keys;
 
 	void milano_mem(address_map &map);
 
-	u8 keys_r(offs_t offset);
-	u8 board_r();
+	void update_leds();
 	void io_w(u8 data);
+	void board_w(u8 data);
+	u8 board_r();
+	u8 keys_r(offs_t offset);
+
+	u8 m_board_mux = 0;
+	u8 m_led_data = 0;
 };
+
+void milano_state::machine_start()
+{
+	save_item(NAME(m_board_mux));
+	save_item(NAME(m_led_data));
+}
 
 
 
@@ -60,23 +78,42 @@ private:
     I/O
 ******************************************************************************/
 
-u8 mephisto_milano_state::keys_r(offs_t offset)
+void milano_state::update_leds()
 {
-	return (BIT(m_keys->read(), offset) << 7) | 0x7f;
+	m_led_pwm->matrix(m_board_mux, m_led_data);
 }
 
-u8 mephisto_milano_state::board_r()
-{
-	return m_board->input_r() ^ 0xff;
-}
-
-void mephisto_milano_state::io_w(u8 data)
+void milano_state::io_w(u8 data)
 {
 	// default display module
 	m_display->io_w(data & 0x0f);
 
 	// high bits go to board leds
-	m_board->led_w(data >> 4);
+	m_led_data = data >> 4;
+	update_leds();
+}
+
+void milano_state::board_w(u8 data)
+{
+	m_board_mux = ~data;
+	update_leds();
+}
+
+u8 milano_state::board_r()
+{
+	u8 data = 0;
+
+	// read chessboard sensors
+	for (int i = 0; i < 8; i++)
+		if (BIT(m_board_mux, i))
+			data |= m_board->read_rank(i);
+
+	return data;
+}
+
+u8 milano_state::keys_r(offs_t offset)
+{
+	return (BIT(m_keys->read(), offset) << 7) | 0x7f;
 }
 
 
@@ -85,15 +122,15 @@ void mephisto_milano_state::io_w(u8 data)
     Address Maps
 ******************************************************************************/
 
-void mephisto_milano_state::milano_mem(address_map &map)
+void milano_state::milano_mem(address_map &map)
 {
 	map(0x0000, 0x1fbf).ram().share("nvram");
 	map(0x1fc0, 0x1fc0).w(m_display, FUNC(mephisto_display_module2_device::latch_w));
-	map(0x1fd0, 0x1fd0).w(m_board, FUNC(mephisto_board_device::mux_w));
-	map(0x1fe0, 0x1fe0).r(FUNC(mephisto_milano_state::board_r));
+	map(0x1fd0, 0x1fd0).w(FUNC(milano_state::board_w));
+	map(0x1fe0, 0x1fe0).r(FUNC(milano_state::board_r));
 	map(0x1fe8, 0x1fef).w("outlatch", FUNC(hc259_device::write_d7)).nopr();
-	map(0x1fd8, 0x1fdf).r(FUNC(mephisto_milano_state::keys_r));
-	map(0x1ff0, 0x1ff0).w(FUNC(mephisto_milano_state::io_w));
+	map(0x1fd8, 0x1fdf).r(FUNC(milano_state::keys_r));
+	map(0x1ff0, 0x1ff0).w(FUNC(milano_state::io_w));
 	map(0x2000, 0xffff).rom();
 }
 
@@ -121,11 +158,12 @@ INPUT_PORTS_END
     Machine Configs
 ******************************************************************************/
 
-void mephisto_milano_state::milano(machine_config &config)
+void milano_state::milano(machine_config &config)
 {
+	/* basic machine hardware */
 	R65C02(config, m_maincpu, 4.9152_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_milano_state::milano_mem);
-	m_maincpu->set_periodic_int(FUNC(mephisto_milano_state::nmi_line_pulse), attotime::from_hz(4.9152_MHz_XTAL / (1 << 13)));
+	m_maincpu->set_addrmap(AS_PROGRAM, &milano_state::milano_mem);
+	m_maincpu->set_periodic_int(FUNC(milano_state::nmi_line_pulse), attotime::from_hz(4.9152_MHz_XTAL / (1 << 13)));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -137,7 +175,13 @@ void mephisto_milano_state::milano(machine_config &config)
 	outlatch.q_out_cb<4>().set_output("led104");
 	outlatch.q_out_cb<5>().set_output("led105");
 
-	MEPHISTO_BUTTONS_BOARD(config, m_board); // internal
+	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
+	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
+	m_board->set_delay(attotime::from_msec(150));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_led_pwm).set_size(8, 2);
+
 	MEPHISTO_DISPLAY_MODULE2(config, m_display); // internal
 	config.set_default_layout(layout_mephisto_milano);
 }
@@ -171,8 +215,8 @@ ROM_END
     Game Drivers
 ***************************************************************************/
 
-/*    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT   CLASS                   INIT        COMPANY             FULLNAME                   FLAGS */
-CONS( 1991, milano,    0,       0,      milano,   milano, mephisto_milano_state,  empty_init, "Hegener + Glaser", "Mephisto Milano (v1.02)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1991, milanoa,   milano,  0,      milano,   milano, mephisto_milano_state,  empty_init, "Hegener + Glaser", "Mephisto Milano (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT   CLASS          INIT       COMPANY             FULLNAME                   FLAGS */
+CONS( 1991, milano,    0,       0,      milano,   milano, milano_state, empty_init, "Hegener + Glaser", "Mephisto Milano (v1.02)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, milanoa,   milano,  0,      milano,   milano, milano_state, empty_init, "Hegener + Glaser", "Mephisto Milano (v1.01)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1993, nshort,    0,       0,      milano,   milano, mephisto_milano_state,  empty_init, "Hegener + Glaser", "Mephisto Nigel Short", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1993, nshort,    0,       0,      milano,   milano, milano_state, empty_init, "Hegener + Glaser", "Mephisto Nigel Short", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -31,10 +31,10 @@ Hardware notes:
 
 namespace {
 
-class mephisto_risc_state : public driver_device
+class risc_state : public driver_device
 {
 public:
-	mephisto_risc_state(const machine_config &mconfig, device_type type, const char *tag)
+	risc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_chessm(*this, "chessm")
@@ -60,7 +60,7 @@ private:
 	void chessm_w(u8 data);
 };
 
-void mephisto_risc_state::machine_start()
+void risc_state::machine_start()
 {
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x8000);
 }
@@ -71,18 +71,18 @@ void mephisto_risc_state::machine_start()
     I/O
 ******************************************************************************/
 
-u8 mephisto_risc_state::keys_r(offs_t offset)
+u8 risc_state::keys_r(offs_t offset)
 {
 	return (BIT(m_keys->read(), offset) << 7) | 0x7f;
 }
 
-u8 mephisto_risc_state::chessm_r()
+u8 risc_state::chessm_r()
 {
 	// d0: chessmachine data
 	return m_chessm->data_r();
 }
 
-void mephisto_risc_state::chessm_w(u8 data)
+void risc_state::chessm_w(u8 data)
 {
 	// d0,d7: chessmachine data
 	m_chessm->data0_w(BIT(data, 0));
@@ -98,19 +98,19 @@ void mephisto_risc_state::chessm_w(u8 data)
     Address Maps
 ******************************************************************************/
 
-void mephisto_risc_state::mrisc_mem(address_map &map)
+void risc_state::mrisc_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).ram().share("nvram");
 	map(0x2000, 0x2000).w("display", FUNC(mephisto_display_module2_device::latch_w));
 	map(0x2004, 0x2004).w("display", FUNC(mephisto_display_module2_device::io_w));
-	map(0x2c00, 0x2c07).r(FUNC(mephisto_risc_state::keys_r));
+	map(0x2c00, 0x2c07).r(FUNC(risc_state::keys_r));
 	map(0x2400, 0x2400).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x2800, 0x2800).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0x3000, 0x3000).r("board", FUNC(mephisto_board_device::input_r));
 	map(0x3400, 0x3407).w("outlatch", FUNC(hc259_device::write_d7)).nopr();
-	map(0x3800, 0x3800).w(FUNC(mephisto_risc_state::chessm_w));
-	map(0x3c00, 0x3c00).r(FUNC(mephisto_risc_state::chessm_r));
+	map(0x3800, 0x3800).w(FUNC(risc_state::chessm_w));
+	map(0x3c00, 0x3c00).r(FUNC(risc_state::chessm_r));
 	map(0x4000, 0x7fff).rom();
 	map(0x8000, 0xffff).bankr("rombank");
 }
@@ -139,11 +139,11 @@ INPUT_PORTS_END
     Machine Configs
 ******************************************************************************/
 
-void mephisto_risc_state::mrisc(machine_config &config)
+void risc_state::mrisc(machine_config &config)
 {
 	M65SC02(config, m_maincpu, 10_MHz_XTAL / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_risc_state::mrisc_mem);
-	m_maincpu->set_periodic_int(FUNC(mephisto_risc_state::irq0_line_hold), attotime::from_hz(10_MHz_XTAL / (1 << 14)));
+	m_maincpu->set_addrmap(AS_PROGRAM, &risc_state::mrisc_mem);
+	m_maincpu->set_periodic_int(FUNC(risc_state::irq0_line_hold), attotime::from_hz(10_MHz_XTAL / (1 << 14)));
 
 	CHESSMACHINE(config, m_chessm, 14'000'000); // Mephisto manual says 14MHz (no XTAL)
 	config.set_perfect_quantum(m_maincpu);
@@ -192,6 +192,6 @@ ROM_END
     Game Drivers
 ***************************************************************************/
 
-/*    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT  CLASS                   INIT        COMPANY                    FULLNAME             FLAGS */
-CONS( 1992, mrisc,     0,       0,      mrisc,    mrisc, mephisto_risc_state,    empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc 1MB", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1994, mrisc2,    mrisc,   0,      mrisc,    mrisc, mephisto_risc_state,    empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc II",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE   INPUT  CLASS       INIT        COMPANY                    FULLNAME             FLAGS */
+CONS( 1992, mrisc,   0,       0,      mrisc,    mrisc, risc_state, empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc 1MB", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1994, mrisc2,  mrisc,   0,      mrisc,    mrisc, risc_state, empty_init, "Hegener + Glaser / Tasc", "Mephisto Risc II",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
