@@ -27,6 +27,26 @@
  * TODO: internal ROM has been dumped but isn't used yet
  */
 
+/*
+ * Regarding `svp.bin`:
+ *
+ * There's an internal ROM inside the SVP chip which it's accessible by the DSP's
+ * "internal view" (i.e.: not using the external registers) from 0xFC00 to 0xFFFF
+ * (in word space, byte space addresses would be 0x1F800 - 0x1FFFE).
+ *
+ * Most of what's in that ROM (dumped as `svp.bin`) are routines not used by
+ * Virtua Racing. But part of it is actually used by the game:
+ *
+ * - Reset int. vector at 0xFFFC/0x1FFF8, specifying 0xFC08 as the entry point address.
+ * - Boot-up process: register initialization, checks for "security" string in ROM header
+ *   and reading game entry point address (from 0x1C8 to 0x1CF in ROM byte space).
+ *
+ * At some point it might be interesting to emulate this behavior, reading the reset
+ * interrupt vector handler address in the internal ROM, and letting the boot-up process
+ * to do its thing. This would also allow for the SVP emulation to be always active
+ * (as ROMs that don't contain the "security string" lead the SVP to enter an infinite
+ * loop to avoid bus clashes, etc...) now that SVP homebrew is "a thing".
+*/
 
 #include "emu.h"
 #include "svp.h"
@@ -53,8 +73,8 @@ md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, const char *
 }
 
 ROM_START( svp )
-	ROM_REGION(0x800, "internal_rom", 0)
-	ROM_LOAD("svp.bin", 0x000, 0x800, CRC(2421ec7e) SHA1(0b951ea9c6094b3c34e4f0b64d031c75c237564f))
+	ROM_REGION(0x800, "internal_rom", 0x1F800)
+	ROM_LOAD("svp.bin", 0x1F800, 0x800, CRC(2421ec7e) SHA1(0b951ea9c6094b3c34e4f0b64d031c75c237564f))
 ROM_END
 
 tiny_rom_entry const *md_rom_svp_device::device_rom_region() const
