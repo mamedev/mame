@@ -8,6 +8,12 @@ Mephisto Modena
 The chess engine is by Frans Morsch, same one as Sphinx Dominator 2.05.
 Hold Pawn + Knight buttons at boot for test mode.
 
+Hardware notes:
+- PCB label: MODENA-A-2
+- W65C02SP or RP65C02G @ 4.19MHz
+- 8KB RAM (battery-backed), 32KB ROM
+- 8*8 chessboard buttons, 16+6 leds, piezo
+
 **************************************************************************************************/
 
 #include "emu.h"
@@ -171,7 +177,7 @@ INPUT_PORTS_END
 void modena_state::modena(machine_config &config)
 {
 	/* basic machine hardware */
-	M65C02(config, m_maincpu, 4.194304_MHz_XTAL); // W65C02SP or RP65C02G
+	M65C02(config, m_maincpu, 4.194304_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &modena_state::modena_mem);
 
 	clock_device &nmi_clock(CLOCK(config, "nmi_clock", 4.194304_MHz_XTAL / (1 << 13))); // active for 975us

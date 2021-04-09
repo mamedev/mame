@@ -22782,6 +22782,8 @@ lond32t8
 
 @source:mephisto_mondial.cpp
 mondial                         // 1985 Mephisto Mondial
+
+@source:mephisto_mondial2.cpp
 mondial2                        // 1987 Mephisto Mondial II
 
 @source:mephisto_mondial68k.cpp

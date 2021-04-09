@@ -6,7 +6,7 @@ Mephisto Polgar
 
 Hardware notes:
 - RP65C02G @ 4.91MHz
-- 64KB ROM
+- 64KB ROM (25% unused)
 - Mephisto modular display module
 - Mephisto Exclusive/Muenchen chessboard
 

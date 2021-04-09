@@ -2544,6 +2544,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mephisto_modular.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_modular_tm.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_mondial.cpp",
+	MAME_DIR .. "src/mame/drivers/mephisto_mondial2.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_mondial68k.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_montec.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_polgar.cpp",
