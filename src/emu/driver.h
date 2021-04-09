@@ -158,6 +158,11 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset_after_children() override;
+	virtual void device_register_save(save_registrar &save) override
+	{
+		save.reg(NAME(m_flip_screen_x))
+			.reg(NAME(m_flip_screen_y));
+	}
 
 	// generic video
 	void flip_screen_set(u32 on);

@@ -614,28 +614,42 @@ public:
 
 	// state saving interfaces
 	template<typename ItemType>
-	void ATTR_COLD save_item(ItemType &value, const char *valname, int index = 0)
+	void ATTR_COLD save_item(ItemType &value, const char *valname, int index = -1)
 	{
 		assert(m_save);
-		m_save->save_item(this, name(), tag(), index, value, valname);
+		m_save->save_item(this, name(), tag(), (index == -1) ? 0 : index, value, valname);
+		if (m_legacy_save.get() == nullptr)
+			m_legacy_save = std::make_unique<save_registrar>(m_save->legacy_registrar(), tag());
+		if (index == -1)
+			m_legacy_save->reg(value, valname);
+		else
+			m_legacy_save->reg(value, string_format("%s[%d]", valname, index).c_str());
 	}
 	template<typename ItemType, typename StructType, typename ElementType>
 	void ATTR_COLD save_item(ItemType &value, ElementType StructType::*element, const char *valname, int index = 0)
 	{
 		assert(m_save);
 		m_save->save_item(this, name(), tag(), index, value, element, valname);
+		osd_printf_warning("Legacy save_item not supported of %s:%s/%X/%s\n", tag(), name(), index, valname);
 	}
 	template<typename ItemType>
-	void ATTR_COLD save_pointer(ItemType &&value, const char *valname, u32 count, int index = 0)
+	void ATTR_COLD save_pointer(ItemType &&value, const char *valname, u32 count, int index = -1)
 	{
 		assert(m_save);
-		m_save->save_pointer(this, name(), tag(), index, std::forward<ItemType>(value), valname, count);
+		m_save->save_pointer(this, name(), tag(), (index == -1) ? 0 : index, std::forward<ItemType>(value), valname, count);
+		if (m_legacy_save.get() == nullptr)
+			m_legacy_save = std::make_unique<save_registrar>(m_save->legacy_registrar(), tag());
+		if (index == -1)
+			m_legacy_save->reg(value, valname, count);
+		else
+			m_legacy_save->reg(value, string_format("%s[%d]", valname, index).c_str(), count);
 	}
 	template<typename ItemType, typename StructType, typename ElementType>
 	void ATTR_COLD save_pointer(ItemType &&value, ElementType StructType::*element, const char *valname, u32 count, int index = 0)
 	{
 		assert(m_save);
 		m_save->save_pointer(this, name(), tag(), index, std::forward<ItemType>(value), element, valname, count);
+		osd_printf_warning("Legacy save_pointer not supported of %s:%s/%X/%s\n", tag(), name(), index, valname);
 	}
 
 	// debugging
@@ -648,6 +662,9 @@ public:
 	template <typename Format, typename... Params> void popmessage(Format &&fmt, Params &&... args) const;
 	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
 	void view_register(memory_view *view);
+
+	// save helpers
+	virtual void register_save(save_registrar &save) final;
 
 protected:
 	// miscellaneous helpers
@@ -798,6 +815,7 @@ protected:
 	virtual void device_clock_changed();
 	virtual void device_debug_setup();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_register_save(save_registrar &save);
 
 	//------------------- end derived class overrides
 
@@ -841,6 +859,7 @@ private:
 	mutable std::vector<rom_entry>  m_rom_entries;
 	std::list<devcb_base *> m_callbacks;
 	std::vector<memory_view *> m_viewlist;          // list of views
+	std::unique_ptr<save_registrar> m_legacy_save;  // bucket for legacy save stuff
 
 	// string formatting buffer for logerror
 	mutable util::ovectorstream m_string_buffer;
@@ -1004,6 +1023,7 @@ public:
 
 	virtual void interface_clock_changed();
 	virtual void interface_debug_setup();
+	virtual void interface_register_save(save_registrar &save);
 
 private:
 	// internal state

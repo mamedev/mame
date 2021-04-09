@@ -361,7 +361,7 @@ void tilemap_t::init_common(
 	m_manager = &manager;
 	m_device = dynamic_cast<device_t *>(this);
 	m_palette = &decoder.palette();
-	m_next = nullptr;
+//	m_next = nullptr;
 	m_user_data = nullptr;
 
 	// populate tilemap metrics
@@ -415,20 +415,6 @@ void tilemap_t::init_common(
 	// allocate transparency mapping data
 	for (int group = 0; group < TILEMAP_NUM_GROUPS; group++)
 		map_pens_to_layer(group, 0, 0, TILEMAP_PIXEL_LAYER0);
-
-	// save relevant state
-	int instance = manager.alloc_instance();
-	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_enable));
-	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_attributes));
-	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_palette_offset));
-	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_scrollrows));
-	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_scrollcols));
-	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_rowscroll));
-	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_colscroll));
-	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_dx));
-	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_dx_flipped));
-	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_dy));
-	machine().save().save_item(m_device, "tilemap", nullptr, instance, NAME(m_dy_flipped));
 
 	// reset everything after a load
 	machine().save().register_postload(save_prepost_delegate(FUNC(tilemap_t::postload), this));
@@ -1587,19 +1573,6 @@ tilemap_manager::tilemap_manager(running_machine &machine)
 
 tilemap_manager::~tilemap_manager()
 {
-	// detach all device tilemaps since they will be destroyed as subdevices elsewhere
-	bool found = true;
-	while (found)
-	{
-		found = false;
-		for (tilemap_t &tmap : m_tilemap_list)
-			if (tmap.m_device)
-			{
-				found = true;
-				m_tilemap_list.detach(tmap);
-				break;
-			}
-	}
 }
 
 
@@ -1610,16 +1583,26 @@ tilemap_manager::~tilemap_manager()
 
 tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, tilemap_t *allocated)
 {
-	if (!allocated)
-		allocated = new tilemap_t(machine().root_device());
-	return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, mapper, tilewidth, tileheight, cols, rows));
+	if (allocated != nullptr)
+		m_device_tilemap_list.push_back(allocated);
+	else
+	{
+		m_tilemap_list.push_back(std::make_unique<tilemap_t>(machine().root_device()));
+		allocated = m_tilemap_list.back().get();
+	}
+	return allocated->init(*this, decoder, tile_get_info, mapper, tilewidth, tileheight, cols, rows);
 }
 
 tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, tilemap_t *allocated)
 {
-	if (!allocated)
-		allocated = new tilemap_t(machine().root_device());
-	return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, mapper, tilewidth, tileheight, cols, rows));
+	if (allocated != nullptr)
+		m_device_tilemap_list.push_back(allocated);
+	else
+	{
+		m_tilemap_list.push_back(std::make_unique<tilemap_t>(machine().root_device()));
+		allocated = m_tilemap_list.back().get();
+	}
+	return allocated->init(*this, decoder, tile_get_info, mapper, tilewidth, tileheight, cols, rows);
 }
 
 
@@ -1630,8 +1613,10 @@ tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_in
 
 void tilemap_manager::set_flip_all(u32 attributes)
 {
-	for (tilemap_t &tmap : m_tilemap_list)
-		tmap.set_flip(attributes);
+	for (auto &tmap : m_tilemap_list)
+		tmap->set_flip(attributes);
+	for (auto &tmap : m_device_tilemap_list)
+		tmap->set_flip(attributes);
 }
 
 
@@ -1642,8 +1627,10 @@ void tilemap_manager::set_flip_all(u32 attributes)
 
 void tilemap_manager::mark_all_dirty()
 {
-	for (tilemap_t &tmap : m_tilemap_list)
-		tmap.mark_all_dirty();
+	for (auto &tmap : m_tilemap_list)
+		tmap->mark_all_dirty();
+	for (auto &tmap : m_device_tilemap_list)
+		tmap->mark_all_dirty();
 }
 
 

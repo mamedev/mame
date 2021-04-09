@@ -870,22 +870,6 @@ void screen_device::device_start()
 	if (overname != nullptr && strcmp(overname, "none") != 0)
 		load_effect_overlay(overname);
 
-	// register items for saving
-	save_item(NAME(m_width));
-	save_item(NAME(m_height));
-	save_item(NAME(m_visarea.min_x));
-	save_item(NAME(m_visarea.min_y));
-	save_item(NAME(m_visarea.max_x));
-	save_item(NAME(m_visarea.max_y));
-	save_item(NAME(m_last_partial_scan));
-	save_item(NAME(m_frame_period));
-	save_item(NAME(m_brightness));
-	save_item(NAME(m_scantime));
-	save_item(NAME(m_pixeltime));
-	save_item(NAME(m_vblank_period));
-	save_item(NAME(m_vblank_start_time));
-	save_item(NAME(m_vblank_end_time));
-	save_item(NAME(m_frame_number));
 	if (m_oldstyle_vblank_supplied)
 		logerror("%s: Deprecated legacy Old Style screen configured (MCFG_SCREEN_VBLANK_TIME), please use MCFG_SCREEN_RAW_PARAMS instead.\n",this->tag());
 

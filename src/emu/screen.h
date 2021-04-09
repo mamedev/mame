@@ -447,6 +447,22 @@ private:
 	virtual void device_post_load() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	virtual void device_register_save(save_registrar &save) override
+	{
+		save.reg(NAME(m_width));
+		save.reg(NAME(m_height));
+		save.reg(NAME(m_visarea));
+		save.reg(NAME(m_last_partial_scan));
+		save.reg(NAME(m_frame_period));
+		save.reg(NAME(m_brightness));
+		save.reg(NAME(m_scantime));
+		save.reg(NAME(m_pixeltime));
+		save.reg(NAME(m_vblank_period));
+		save.reg(NAME(m_vblank_start_time));
+		save.reg(NAME(m_vblank_end_time));
+		save.reg(NAME(m_frame_number));
+	}
+
 	// internal helpers
 	void set_container(render_container &container) { m_container = &container; }
 	void realloc_screen_bitmaps();

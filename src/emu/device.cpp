@@ -606,11 +606,6 @@ void device_t::start()
 		debug_setup();
 	}
 
-	// register our save states
-	save_item(NAME(m_clock));
-	save_item(NAME(m_unscaled_clock));
-	save_item(NAME(m_clock_scale));
-
 	// have the views register their state
 	if (!m_viewlist.empty())
 		osd_printf_verbose("%s: Registering %d views\n", m_tag, int(m_viewlist.size()));
@@ -692,6 +687,27 @@ void device_t::post_load()
 
 	// notify the device
 	device_post_load();
+}
+
+
+//-------------------------------------------------
+//  register_save - tell the device and its
+//  interfaces to register their save states
+//-------------------------------------------------
+
+void device_t::register_save(save_registrar &save)
+{
+	// register our save states
+	save.reg(NAME(m_clock))
+		.reg(NAME(m_unscaled_clock))
+		.reg(NAME(m_clock_scale));
+
+	// notify the interface
+	for (device_interface &intf : interfaces())
+		intf.interface_register_save(save);
+
+	// notify the device
+	device_register_save(save);
 }
 
 
@@ -836,6 +852,17 @@ void device_t::device_pre_save()
 //-------------------------------------------------
 
 void device_t::device_post_load()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  device_register_save - called after startup
+//  to register any state to be saved
+//-------------------------------------------------
+
+void device_t::device_register_save(save_registrar &save)
 {
 	// do nothing by default
 }
@@ -1161,6 +1188,17 @@ void device_interface::interface_pre_save()
 //-------------------------------------------------
 
 void device_interface::interface_post_load()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  interface_register_save - called after startup
+//  to register any state to be saved
+//-------------------------------------------------
+
+void device_interface::interface_register_save(save_registrar &save)
 {
 	// do nothing by default
 }

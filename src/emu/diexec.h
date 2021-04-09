@@ -217,6 +217,7 @@ protected:
 	virtual void interface_pre_reset() override;
 	virtual void interface_post_reset() override;
 	virtual void interface_clock_changed() override;
+	virtual void interface_register_save(save_registrar &save) override;
 
 	// for use by devcpu for now...
 	int current_input_state(unsigned i) const { return m_input[i].m_curstate; }
@@ -267,6 +268,13 @@ private:
 		u8              m_curstate;         // most recently processed state
 		s32             m_queue[32];        // queue of pending events
 		int             m_qindex;           // index within the queue
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(m_stored_vector));
+			save.reg(NAME(m_curvector));
+			save.reg(NAME(m_curstate));
+		}
 
 	private:
 		TIMER_CALLBACK_MEMBER(empty_event_queue);

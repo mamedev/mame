@@ -56,6 +56,16 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
+
+	// save states
+	void register_save(save_registrar &save)
+	{
+		save.reg(NAME(m_coin_count))
+			.reg(NAME(m_coinlockedout))
+			.reg(NAME(m_lastcoin))
+			.reg(NAME(m_dispensed_tickets));
+	}
+
 private:
 	void config_load(config_type cfg_type, util::xml::data_node const *parentnode);
 	void config_save(config_type cfg_type, util::xml::data_node *parentnode);

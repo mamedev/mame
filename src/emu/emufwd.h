@@ -209,6 +209,9 @@ class rom_entry;
 // declared in romload.h
 class rom_load_manager;
 
+// declared in save.h
+class save_registrar;
+
 // declared in schedule.h
 class device_scheduler;
 class emu_timer;

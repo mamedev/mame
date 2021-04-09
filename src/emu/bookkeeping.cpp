@@ -32,12 +32,6 @@ bookkeeping_manager::bookkeeping_manager(running_machine &machine)
 		m_coin_count[counternum] = 0;
 	}
 
-	// register coin save state
-	machine.save().save_item(NAME(m_coin_count));
-	machine.save().save_item(NAME(m_coinlockedout));
-	machine.save().save_item(NAME(m_lastcoin));
-	machine.save().save_item(NAME(m_dispensed_tickets));
-
 	// register for configuration
 	machine.configuration().config_register("counters", config_load_delegate(&bookkeeping_manager::config_load, this), config_save_delegate(&bookkeeping_manager::config_save, this));
 }

@@ -270,6 +270,9 @@ public:
 	// used by debug_console to take ownership of the debug.log file
 	std::unique_ptr<emu_file> steal_debuglogfile() { return std::move(m_debuglogfile); }
 
+	// state saving
+	void register_save(save_registrar &save);
+
 private:
 	class side_effects_disabler {
 		running_machine *m_machine;

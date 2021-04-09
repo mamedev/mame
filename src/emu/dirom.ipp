@@ -132,12 +132,13 @@ void device_rom_interface<AddrWidth, DataWidth, AddrShift, Endian>::interface_pr
 }
 
 template<int AddrWidth, int DataWidth, int AddrShift, endianness_t Endian>
-void device_rom_interface<AddrWidth, DataWidth, AddrShift, Endian>::interface_post_start()
+void device_rom_interface<AddrWidth, DataWidth, AddrShift, Endian>::interface_register_save(save_registrar &save)
 {
-	device_memory_interface::interface_post_start();
+	device_memory_interface::interface_register_save(save);
 
-	device().save_item(NAME(m_cur_bank));
-	device().save_item(NAME(m_bank_count));
+	save_registrar(save, "rom")
+		.reg(NAME(m_cur_bank))
+		.reg(NAME(m_bank_count));
 }
 
 #endif // MAME_EMU_DIROM_IPP

@@ -112,13 +112,15 @@ void device_vtlb_interface::interface_pre_start()
 //  actually starting a device
 //-------------------------------------------------
 
-void device_vtlb_interface::interface_post_start()
+void device_vtlb_interface::interface_register_save(save_registrar &save)
 {
-	device().save_item(NAME(m_live));
-	device().save_item(NAME(m_table));
-	device().save_item(NAME(m_refcnt));
+	save_registrar container(save, "vtlb");
+
+	container.reg(NAME(m_live))
+		.reg(NAME(m_table))
+		.reg(NAME(m_refcnt));
 	if (m_fixed > 0)
-		device().save_item(NAME(m_fixedpages));
+		container.reg(NAME(m_fixedpages));
 }
 
 

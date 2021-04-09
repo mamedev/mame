@@ -75,28 +75,29 @@ void device_serial_interface::interface_pre_start()
 	m_tra_clock_state = false;
 }
 
-void device_serial_interface::interface_post_start()
+void device_serial_interface::interface_register_save(save_registrar &save)
 {
-	device().save_item(NAME(m_df_start_bit_count));
-	device().save_item(NAME(m_df_word_length));
-	device().save_item(NAME(m_df_parity));
-	device().save_item(NAME(m_df_stop_bit_count));
-	device().save_item(NAME(m_rcv_register_data));
-	device().save_item(NAME(m_rcv_flags));
-	device().save_item(NAME(m_rcv_bit_count_received));
-	device().save_item(NAME(m_rcv_bit_count));
-	device().save_item(NAME(m_rcv_byte_received));
-	device().save_item(NAME(m_rcv_framing_error));
-	device().save_item(NAME(m_rcv_parity_error));
-	device().save_item(NAME(m_tra_register_data));
-	device().save_item(NAME(m_tra_flags));
-	device().save_item(NAME(m_tra_bit_count_transmitted));
-	device().save_item(NAME(m_tra_bit_count));
-	device().save_item(NAME(m_rcv_rate));
-	device().save_item(NAME(m_tra_rate));
-	device().save_item(NAME(m_rcv_line));
-	device().save_item(NAME(m_tra_clock_state));
-	device().save_item(NAME(m_rcv_clock_state));
+	save_registrar(save, "serial")
+		.reg(NAME(m_df_start_bit_count))
+		.reg(NAME(m_df_word_length))
+		.reg(NAME(m_df_parity))
+		.reg(NAME(m_df_stop_bit_count))
+		.reg(NAME(m_rcv_register_data))
+		.reg(NAME(m_rcv_flags))
+		.reg(NAME(m_rcv_bit_count_received))
+		.reg(NAME(m_rcv_bit_count))
+		.reg(NAME(m_rcv_byte_received))
+		.reg(NAME(m_rcv_framing_error))
+		.reg(NAME(m_rcv_parity_error))
+		.reg(NAME(m_tra_register_data))
+		.reg(NAME(m_tra_flags))
+		.reg(NAME(m_tra_bit_count_transmitted))
+		.reg(NAME(m_tra_bit_count))
+		.reg(NAME(m_rcv_rate))
+		.reg(NAME(m_tra_rate))
+		.reg(NAME(m_rcv_line))
+		.reg(NAME(m_tra_clock_state))
+		.reg(NAME(m_rcv_clock_state));
 }
 
 void device_serial_interface::set_rcv_rate(const attotime &rate)

@@ -238,9 +238,6 @@ void running_machine::start()
 	m_rom_load = std::make_unique<rom_load_manager>(*this);
 	m_memory.initialize();
 
-	// save the random seed or save states might be broken in drivers that use the rand() method
-	save().save_item(NAME(m_rand_seed));
-
 	// initialize image devices
 	m_image = std::make_unique<image_manager>(*this);
 	m_tilemap = std::make_unique<tilemap_manager>(*this);
@@ -263,12 +260,17 @@ void running_machine::start()
 	// register callbacks for the devices, then start them
 	add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&running_machine::reset_all_devices, this));
 	add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&running_machine::stop_all_devices, this));
+	save_registrar device_registrar(m_save.root_registrar(), "devices");
 	save().register_presave(save_prepost_delegate(FUNC(running_machine::presave_all_devices), this));
 	start_all_devices();
+	for (device_t &device : device_enumerator(root_device()))
+		device_registrar.reg(device, device.tag());
 	save().register_postload(save_prepost_delegate(FUNC(running_machine::postload_all_devices), this));
 
 	// save outputs created before start time
 	output().register_save();
+
+	m_save.root_registrar().reg(*this, "machine");
 
 	m_render->resolve_tags();
 
@@ -294,6 +296,8 @@ void running_machine::start()
 		schedule_load("auto");
 
 	manager().update_machine();
+
+	m_save.test_dump();
 }
 
 
@@ -1128,6 +1132,20 @@ void running_machine::postload_all_devices()
 {
 	for (device_t &device : device_enumerator(root_device()))
 		device.post_load();
+}
+
+
+//-------------------------------------------------
+//  register_save - register items for save states
+//-------------------------------------------------
+
+void running_machine::register_save(save_registrar &save)
+{
+	save.reg(NAME(m_rand_seed))
+		.reg(NAME(m_output))
+		.reg(NAME(m_sound))
+		.reg(NAME(m_tilemap))
+		.reg(NAME(m_bookkeeping));
 }
 
 

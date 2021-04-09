@@ -47,6 +47,23 @@ enum save_error
 //  MACROS
 //**************************************************************************
 
+/*
+TEST:
+#define REGISTER_SAVE_1(a) .reg(a, #a)
+#define REGISTER_SAVE_2(a,b) REGISTER_SAVE_1(a) REGISTER_SAVE_1(b)
+#define REGISTER_SAVE_3(a,b,c) REGISTER_SAVE_1(a) REGISTER_SAVE_2(b,c)
+#define REGISTER_SAVE_4(a,b,c,d) REGISTER_SAVE_1(a) REGISTER_SAVE_3(b,c,d)
+#define REGISTER_SAVE_5(a,b,c,d,e) REGISTER_SAVE_1(a) REGISTER_SAVE_4(b,c,d,e)
+#define REGISTER_SAVE_6(a,b,c,d,e,f) REGISTER_SAVE_1(a) REGISTER_SAVE_5(b,c,d,e,f)
+#define REGISTER_SAVE_7(a,b,c,d,e,f,g) REGISTER_SAVE_1(a) REGISTER_SAVE_6(b,c,d,e,f,g)
+#define REGISTER_SAVE_8(a,b,c,d,e,f,g,h) REGISTER_SAVE_1(a) REGISTER_SAVE_7(b,c,d,e,f,g,h)
+#define REGISTER_SAVE_9(a,b,c,d,e,f,g,h,i) REGISTER_SAVE_1(a) REGISTER_SAVE_8(b,c,d,e,f,g,h,i)
+
+#define GET_SAVE_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, NAME, ...) NAME
+#define REGISTER_SAVE(...) GET_SAVE_N(__VA_ARGS__, REGISTER_SAVE_9, REGISTER_SAVE_8, REGISTER_SAVE_7, REGISTER_SAVE_6, REGISTER_SAVE_5, REGISTER_SAVE_4, REGISTER_SAVE_3, REGISTER_SAVE_2, REGISTER_SAVE_1)(__VA_ARGS__)
+*/
+
+
 // callback delegate for presave/postload
 typedef named_delegate<void ()> save_prepost_delegate;
 
@@ -69,6 +86,193 @@ typedef named_delegate<void ()> save_prepost_delegate;
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+class save_registered_item
+{
+public:
+	enum save_type : uint32_t
+	{
+		TYPE_ARRAY = 0xffff0000,
+		TYPE_CONTAINER,
+		TYPE_STRUCT,
+		TYPE_BOOL,
+		TYPE_INT,
+		TYPE_UINT,
+		TYPE_FLOAT
+	};
+
+	// root constructor
+    save_registered_item();
+
+	// constructor for a new item
+    save_registered_item(uintptr_t ptr_offset, save_type type, uint32_t native_size, char const *name);
+
+	// append a new item to the current one
+    save_registered_item &append(uintptr_t ptr_offset, save_type type, uint32_t native_size, char const *name);
+
+	// compute the binary size by just saving with a null
+	uint64_t compute_binary_size() { return save_binary(nullptr, 0); }
+
+	// save this item and all owned items into a binary form
+	uint64_t save_binary(uint8_t *ptr, uint64_t length, uintptr_t objbase = 0);
+
+	// restore this item and all owned items from binary form
+	uint64_t restore_binary(uint8_t const *ptr, uint64_t length, uintptr_t objbase = 0);
+
+	// save this item into a JSON stream
+	void save_json(std::ostringstream &output, int indent = 0, bool inline_form = false, uintptr_t objbase = 0);
+
+	// restore this item from a JSON stream
+	void restore_json(std::istringstream &input, uintptr_t objbase = 0);
+
+private:
+	// internal helpers
+	uint64_t read_int_unsigned(uintptr_t objbase, int size);
+	int64_t read_int_signed(uintptr_t objbase, int size);
+	void write_int(uintptr_t objbase, int size, uint64_t data);
+
+	// internal state
+    std::list<save_registered_item> m_items; // list of embedded items
+    uintptr_t m_ptr_offset;                  // pointer or offset
+	save_type m_type;                        // type of native
+    uint32_t m_native_size;                  // native size of item
+    std::string m_name;                      // name of item
+};
+
+class save_registrar
+{
+	friend class save_manager;
+
+public:
+	// construct a container within parent
+	save_registrar(save_registrar &parent, char const *name) :
+		m_parent(parent.parent_item().append(0, save_registered_item::TYPE_CONTAINER, 0, name)),
+		m_baseptr(0)
+	{
+	}
+
+	// return a reference to the parent item
+	save_registered_item &parent_item() const { return m_parent; }
+
+    // enum types
+    template<typename T, std::enable_if_t<std::is_enum<T>::value, bool> = true>
+    save_registrar &reg(T &data, char const *name) { return register_internal(&data, save_registered_item::TYPE_INT, sizeof(data), name); }
+
+    // signed integral types
+    template<typename T, std::enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value, bool> = true>
+    save_registrar &reg(T &data, char const *name) { return register_internal(&data, save_registered_item::TYPE_INT, sizeof(data), name); }
+
+    // unsigned integral types
+    template<typename T, std::enable_if_t<std::is_integral<T>::value && std::is_unsigned<T>::value, bool> = true>
+    save_registrar &reg(T &data, char const *name) { return register_internal(&data, save_registered_item::TYPE_UINT, sizeof(data), name); }
+
+    // floating-point types
+    template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+    save_registrar &reg(T &data, char const *name) { return register_internal(&data, save_registered_item::TYPE_FLOAT, sizeof(data), name); }
+
+	// unique_ptrs
+	template<typename T>
+	save_registrar &reg(std::unique_ptr<T> &dataptr, char const *name)
+	{
+		if (dataptr.get() == nullptr)
+			throw emu_fatalerror("Passed null pointer to save state registration.");
+		reg(*dataptr.get(), name);
+		return *this;
+	}
+
+    // arrays
+    template<typename T, std::size_t N>
+    save_registrar &reg(T (&data)[N], char const *name)
+    {
+        auto &item = m_parent.append(uintptr_t(&data[0]) - m_baseptr, save_registered_item::save_type(N), sizeof(data[0]), name);
+        save_registrar sub(item, &data[0]);
+        sub.reg(data[0], "");
+        return *this;
+    }
+
+    // vectors
+    template<typename T>
+    save_registrar &reg(std::vector<T> &data, char const *name)
+    {
+        auto &item = m_parent.append(uintptr_t(&data[0]) - m_baseptr, save_registered_item::save_type(data.size()), sizeof(data[0]), name);
+        save_registrar sub(item, &data[0]);
+        sub.reg(data[0], "");
+        return *this;
+    }
+
+	// unique_ptrs with arrays
+	template<typename T>
+	save_registrar &reg(std::unique_ptr<T[]> &dataptr, char const *name, std::size_t count)
+	{
+		if (dataptr.get() == nullptr)
+			throw emu_fatalerror("Passed null pointer to save state registration.");
+		reg(dataptr.get(), name, count);
+		return *this;
+	}
+
+	// pointers
+	template<typename T>
+	save_registrar &reg(T *dataptr, char const *name, std::size_t count)
+	{
+		if (dataptr == nullptr)
+			throw emu_fatalerror("Passed null pointer to save state registration.");
+		auto &item = m_parent.append(uintptr_t(dataptr) - m_baseptr, save_registered_item::save_type(sizeof(*dataptr) * count), sizeof(*dataptr), name);
+		save_registrar sub(item, dataptr);
+		sub.reg(dataptr[0], "");
+		return *this;
+	}
+
+	// structures (must have a _save method)
+    template<typename T, std::enable_if_t<std::is_class<T>::value, bool> = true>
+    save_registrar &reg(T &data, char const *name)
+    {
+        auto &item = m_parent.append(uintptr_t(&data) - m_baseptr, save_registered_item::TYPE_STRUCT, sizeof(data), name);
+        save_registrar sub(item, &data);
+        data.register_save(sub);
+        return *this;
+    }
+
+    // bool as a special case
+    save_registrar &reg(bool &data, char const *name) { return register_internal(&data, save_registered_item::TYPE_BOOL, sizeof(data), name); }
+
+    // rgb_t as a special case
+    save_registrar &reg(rgb_t &data, char const *name) { return register_internal(&data, save_registered_item::TYPE_UINT, sizeof(data), name); }
+
+    // PAIR/PAIR64 as a special case
+    save_registrar &reg(PAIR &data, char const *name) { return register_internal(&data, save_registered_item::TYPE_UINT, sizeof(data), name); }
+    save_registrar &reg(PAIR64 &data, char const *name) { return register_internal(&data, save_registered_item::TYPE_UINT, sizeof(data), name); }
+
+	// rectangle as a special case
+    save_registrar &reg(rectangle &data, char const *name)
+	{
+        auto &item = m_parent.append(uintptr_t(&data) - m_baseptr, save_registered_item::TYPE_STRUCT, sizeof(data), name);
+        save_registrar sub(item, &data);
+		sub.reg(data.min_x, "min_x").reg(data.max_x, "max_x").reg(data.min_y, "min_y").reg(data.max_y, "max_y");
+        return *this;
+	}
+
+private:
+	// internal constructor
+    save_registrar(save_registered_item &parent, void *baseptr = nullptr) :
+        m_parent(parent),
+        m_baseptr(uintptr_t(baseptr))
+    {
+    }
+
+	// internal registration
+    save_registrar &register_internal(void *memptr, save_registered_item::save_type type, std::size_t itemsize, char const *itemname)
+    {
+        m_parent.append(uintptr_t(memptr) - m_baseptr, type, itemsize, itemname);
+        return *this;
+    }
+
+	// internal state
+    save_registered_item &m_parent;
+    uintptr_t m_baseptr;
+};
+
+
+
 
 class ram_state;
 class rewinder;
@@ -292,6 +496,10 @@ public:
 	save_error write_buffer(void *buf, size_t size);
 	save_error read_buffer(const void *buf, size_t size);
 
+	save_registrar &root_registrar() { return m_root_registrar; }
+	save_registrar &legacy_registrar() { return m_legacy_registrar; }
+	void test_dump();
+
 private:
 	// state callback item
 	class state_callback
@@ -317,6 +525,10 @@ private:
 	std::unique_ptr<rewinder> m_rewind;               // rewinder
 	bool                      m_reg_allowed;          // are registrations allowed?
 	s32                       m_illegal_regs;         // number of illegal registrations
+
+	save_registered_item      m_root_item;
+	save_registrar            m_root_registrar;
+	save_registrar            m_legacy_registrar;
 
 	std::vector<std::unique_ptr<state_entry>>    m_entry_list;       // list of registered entries
 	std::vector<std::unique_ptr<ram_state>>      m_ramstate_list;    // list of ram states
@@ -394,6 +606,15 @@ ALLOW_SAVE_TYPE_AND_VECTOR(float)
 ALLOW_SAVE_TYPE_AND_VECTOR(double)
 ALLOW_SAVE_TYPE_AND_VECTOR(endianness_t)
 ALLOW_SAVE_TYPE_AND_VECTOR(rgb_t)
+
+
+
+
+
+
+
+
+
 
 
 #endif // MAME_EMU_SAVE_H

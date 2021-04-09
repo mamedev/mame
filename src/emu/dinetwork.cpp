@@ -23,9 +23,10 @@ void device_network_interface::interface_pre_start()
 	m_recv_timer = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_network_interface::recv_complete), this));
 }
 
-void device_network_interface::interface_post_start()
+void device_network_interface::interface_register_save(save_registrar &save)
 {
-	device().save_item(NAME(m_loopback_control));
+	save_registrar(save, "network")
+		.reg(NAME(m_loopback_control));
 }
 
 int device_network_interface::send(u8 *buf, int len)

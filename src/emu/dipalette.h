@@ -90,6 +90,7 @@ protected:
 	virtual void interface_pre_save() override;
 	virtual void interface_post_load() override;
 	virtual void interface_post_stop() override;
+	virtual void interface_register_save(save_registrar &save) override;
 
 	// configuration-related overrides
 	virtual u32 palette_entries() const = 0;

@@ -94,12 +94,11 @@ output_manager::output_manager(running_machine &machine)
 void output_manager::register_save()
 {
 	assert(m_save_order.empty());
-	assert(!m_save_data);
 
 	// make space for the data
 	m_save_order.clear();
 	m_save_order.reserve(m_itemtable.size());
-	m_save_data = std::make_unique<s32 []>(m_itemtable.size());
+	m_save_data.resize(m_itemtable.size());
 
 	// sort existing outputs by name and register for save
 	for (auto &item : m_itemtable)
@@ -107,7 +106,7 @@ void output_manager::register_save()
 	std::sort(m_save_order.begin(), m_save_order.end(), [] (auto const &l, auto const &r) { return l.get().name() < r.get().name(); });
 
 	// register the reserved space for saving
-	machine().save().save_pointer(nullptr, "output", nullptr, 0, NAME(m_save_data), m_itemtable.size());
+	machine().save().save_pointer(nullptr, "output", nullptr, 0, NAME(&m_save_data[0]), m_itemtable.size());
 	if (OUTPUT_VERBOSE)
 		osd_printf_verbose("Registered %u outputs for save states\n", m_itemtable.size());
 
@@ -135,7 +134,7 @@ output_manager::output_item *output_manager::find_item(std::string_view string)
 output_manager::output_item &output_manager::create_new_item(std::string_view outname, s32 value)
 {
 	if (OUTPUT_VERBOSE)
-		osd_printf_verbose("Creating output %s = %d%s\n", outname, value, m_save_data ? " (will not be saved)" : "");
+		osd_printf_verbose("Creating output %s = %d%s\n", outname, value, m_machine.save().registration_allowed() ? "" : " (will not be saved)");
 
 	auto const ins(m_itemtable.emplace(
 			std::piecewise_construct,

@@ -164,6 +164,9 @@ public:
 	attotime &operator*=(u32 factor);
 	attotime &operator/=(u32 factor);
 
+	// save registration
+	void register_save(save_registrar &save);
+
 	// members
 	seconds_t       m_seconds;
 	attoseconds_t   m_attoseconds;

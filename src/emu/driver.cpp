@@ -235,10 +235,6 @@ void driver_device::device_start()
 		m_callbacks[CB_VIDEO_START]();
 	else
 		video_start();
-
-	// save generic states
-	save_item(NAME(m_flip_screen_x));
-	save_item(NAME(m_flip_screen_y));
 }
 
 

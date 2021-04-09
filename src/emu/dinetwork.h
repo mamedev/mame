@@ -12,7 +12,7 @@ public:
 	virtual ~device_network_interface();
 
 	void interface_pre_start() override;
-	void interface_post_start() override;
+	void interface_register_save(save_registrar &save) override;
 
 	void set_interface(int id);
 	void set_promisc(bool promisc);

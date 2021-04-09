@@ -26,6 +26,8 @@
 #include "emuopts.h"
 #include "coreutil.h"
 
+#include <iomanip>
+
 
 //**************************************************************************
 //  DEBUGGING
@@ -64,6 +66,8 @@ save_manager::save_manager(running_machine &machine)
 	: m_machine(machine)
 	, m_reg_allowed(true)
 	, m_illegal_regs(0)
+	, m_root_registrar(m_root_item)
+	, m_legacy_registrar(m_root_registrar, "legacy")
 {
 	m_rewind = std::make_unique<rewinder>(*this);
 }
@@ -1014,4 +1018,336 @@ void save_manager::state_entry::flip_data()
 			break;
 		}
 	}
+}
+
+
+//**************************************************************************
+//  INITIALIZATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  save_registered_item - constructor
+//-------------------------------------------------
+
+save_registered_item::save_registered_item() :
+	m_ptr_offset(0),
+	m_type(TYPE_STRUCT),
+	m_native_size(0)
+{
+}
+
+// constructor for a new item
+save_registered_item::save_registered_item(uintptr_t ptr_offset, save_type type, uint32_t native_size, char const *name) :
+	m_ptr_offset(ptr_offset),
+	m_type(type),
+	m_native_size(native_size),
+	m_name(name)
+{
+	if (m_name[0] == 'm' && m_name[1] == '_')
+		m_name.erase(0, 2);
+}
+
+
+//-------------------------------------------------
+//  append - append a new item to the current one
+//-------------------------------------------------
+
+save_registered_item &save_registered_item::append(uintptr_t ptr_offset, save_type type, uint32_t native_size, char const *name)
+{
+	m_items.emplace_back(ptr_offset, type, native_size, name);
+	return m_items.back();
+}
+
+
+//-------------------------------------------------
+//  save_binary - save this item and all owned
+//  items into a binary form
+//-------------------------------------------------
+
+uint64_t save_registered_item::save_binary(uint8_t *ptr, uint64_t length, uintptr_t objbase)
+{
+	// update the base pointer with our local base/offset
+	objbase += m_ptr_offset;
+
+	// switch off the type
+	uint64_t offset = 0;
+	switch (m_type)
+	{
+		// boolean types save as a single byte
+		case TYPE_BOOL:
+			if (offset + 1 <= length)
+				ptr[offset] = *reinterpret_cast<bool const *>(objbase) ? 1 : 0;
+			offset++;
+			break;
+
+		// integral/float types save as their native size
+		case TYPE_INT:
+		case TYPE_UINT:
+		case TYPE_FLOAT:
+			if (offset + m_native_size <= length)
+				memcpy(&ptr[offset], reinterpret_cast<void const *>(objbase), m_native_size);
+			offset += m_native_size;
+			break;
+
+		// structs and containers iterate over owned items
+		case TYPE_CONTAINER:
+			objbase = 0;
+		case TYPE_STRUCT:
+			for (auto &item : m_items)
+				offset += item.save_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase);
+			break;
+
+		// arrays are multiples of a single item
+		default:
+			if (m_type < TYPE_ARRAY)
+			{
+				auto &item = m_items.front();
+				for (uint32_t rep = 0; rep < m_type; rep++)
+					offset += item.save_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase + rep * m_native_size);
+			}
+			break;
+	}
+	return offset;
+}
+
+
+//-------------------------------------------------
+//  restore_binary - restore this item and all
+//  owned items from binary form
+//-------------------------------------------------
+
+uint64_t save_registered_item::restore_binary(uint8_t const *ptr, uint64_t length, uintptr_t objbase)
+{
+	// update the base pointer with our local base/offset
+	objbase += m_ptr_offset;
+
+	// switch off the type
+	uint64_t offset = 0;
+	switch (m_type)
+	{
+		// boolean types save as a single byte
+		case TYPE_BOOL:
+			if (offset + 1 <= length)
+				*reinterpret_cast<bool *>(objbase) = (ptr[offset] != 0);
+			offset++;
+			break;
+
+		// integral/float types save as their native size
+		case TYPE_INT:
+		case TYPE_UINT:
+		case TYPE_FLOAT:
+			if (offset + m_native_size <= length)
+				memcpy(reinterpret_cast<void *>(objbase), &ptr[offset], m_native_size);
+			offset += m_native_size;
+			break;
+
+		// structs and containers iterate over owned items
+		case TYPE_CONTAINER:
+			objbase = 0;
+		case TYPE_STRUCT:
+			for (auto &item : m_items)
+				offset += item.restore_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase);
+			break;
+
+		// arrays are multiples of a single item
+		default:
+			if (m_type < TYPE_ARRAY)
+			{
+				auto &item = m_items.front();
+				for (uint32_t rep = 0; rep < m_type; rep++)
+					offset += item.restore_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase + rep * m_native_size);
+			}
+			break;
+	}
+	return offset;
+}
+
+
+//-------------------------------------------------
+//  save_json - save this item into a JSON stream
+//-------------------------------------------------
+
+void save_registered_item::save_json(std::ostringstream &output, int indent, bool inline_form, uintptr_t objbase)
+{
+	// update the base pointer with our local base/offset
+	objbase += m_ptr_offset;
+
+	// output the name if present
+	if (m_name.length() > 0)
+		output << "\"" << m_name << "\": ";
+
+	// switch off the type
+	switch (m_type)
+	{
+		// boolean types
+		case TYPE_BOOL:
+			output << (*reinterpret_cast<bool const *>(objbase) ? "true" : "false");
+			break;
+
+		// signed integral types
+		case TYPE_INT:
+		{
+			int64_t value = read_int_signed(objbase, m_native_size);
+			char const *quote = (value == int64_t(double(value))) ? "" : "\"";
+			output << quote << value << quote;
+			break;
+		}
+
+		// unsigned integral types
+		case TYPE_UINT:
+		{
+			uint64_t value = read_int_unsigned(objbase, m_native_size);
+			char const *quote = (value == uint64_t(double(value))) ? "" : "\"";
+			output << quote << "0x" << std::setw(m_native_size * 2) << std::setfill('0') << std::hex << value << quote;
+			output << std::setw(0) << std::setfill(' ') << std::dec;
+			break;
+		}
+
+		// float types
+		case TYPE_FLOAT:
+		{
+			double value = (m_native_size == 4) ? *reinterpret_cast<float const *>(objbase) : *reinterpret_cast<double const *>(objbase);
+			output << value;
+			break;
+		}
+
+		// structs and containers iterate over owned items
+		case TYPE_CONTAINER:
+			objbase = 0;
+		case TYPE_STRUCT:
+			if (inline_form || compute_binary_size() <= 16)
+			{
+				// inline form outputs everything on a single line
+				output << "{ ";
+				for (auto &item : m_items)
+				{
+					item.save_json(output, indent, true, objbase);
+					if (&item != &m_items.back())
+						output << ", ";
+				}
+				output << " }";
+			}
+			else
+			{
+				// normal form outputs each item on its own line, indented
+				output << "{" << std::endl;
+				for (auto &item : m_items)
+				{
+					output << std::setw(indent + 1) << std::setfill('\t') << "" << std::setw(0);
+					item.save_json(output, indent + 1, false, objbase);
+					if (&item != &m_items.back())
+						output << ",";
+					output << std::endl;
+				}
+				output << std::setw(indent) << std::setfill('\t') << "" << std::setw(0)
+						<< "}";
+			}
+			break;
+
+		// arrays are multiples of a single item
+		default:
+			if (m_type < TYPE_ARRAY)
+			{
+				auto &item = m_items.front();
+				uint32_t item_size = item.compute_binary_size();
+				if (inline_form || m_type * item_size <= 16)
+				{
+					// strictly inline form outputs everything on a single line
+					output << "[ ";
+					for (uint32_t rep = 0; rep < m_type; rep++)
+					{
+						item.save_json(output, 0, true, objbase + rep * m_native_size);
+						if (rep != m_type - 1)
+							output << ",";
+					}
+					output << " ]";
+				}
+				else
+				{
+					// normal form outputs a certain number of items per row
+					output << "[" << std::endl;
+					uint32_t items_per_row = 0;
+					if (item.m_type == TYPE_INT || item.m_type == TYPE_UINT || item.m_type == TYPE_FLOAT)
+						items_per_row = 32 / item_size;
+					if (items_per_row == 0)
+						items_per_row = 1;
+
+					// iterate over the items
+					for (uint32_t rep = 0; rep < m_type; rep++)
+					{
+						if (rep % items_per_row == 0)
+							output << std::setw(indent + 1) << std::setfill('\t') << "" << std::setw(0);
+						item.save_json(output, indent + 1, false, objbase + rep * m_native_size);
+						if (rep != m_type - 1)
+							output << ",";
+						if (rep % items_per_row == items_per_row - 1)
+							output << std::endl;
+					}
+					if (m_type % items_per_row != 0)
+							output << std::endl;
+					output << std::setw(indent) << std::setfill('\t') << "" << std::setw(0)
+							<< "]";
+				}
+			}
+			break;
+	}
+}
+
+
+//-------------------------------------------------
+//  read_int_unsigned - read an unsigned integer
+//  of the given size
+//-------------------------------------------------
+
+uint64_t save_registered_item::read_int_unsigned(uintptr_t objbase, int size)
+{
+	switch (size)
+	{
+		case 1:	return *reinterpret_cast<uint8_t const *>(objbase);
+		case 2:	return *reinterpret_cast<uint16_t const *>(objbase);
+		case 4:	return *reinterpret_cast<uint32_t const *>(objbase);
+		case 8:	return *reinterpret_cast<uint64_t const *>(objbase);
+	}
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  read_int_signed - read a signed integer of the
+//  given size
+//-------------------------------------------------
+
+int64_t save_registered_item::read_int_signed(uintptr_t objbase, int size)
+{
+	switch (size)
+	{
+		case 1:	return *reinterpret_cast<int8_t const *>(objbase);
+		case 2:	return *reinterpret_cast<int16_t const *>(objbase);
+		case 4:	return *reinterpret_cast<int32_t const *>(objbase);
+		case 8:	return *reinterpret_cast<int64_t const *>(objbase);
+	}
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  write_int - write an integer of the given size
+//-------------------------------------------------
+
+void save_registered_item::write_int(uintptr_t objbase, int size, uint64_t data)
+{
+	switch (size)
+	{
+		case 1:	*reinterpret_cast<uint8_t *>(objbase) = uint8_t(data); break;
+		case 2:	*reinterpret_cast<uint16_t *>(objbase) = uint16_t(data); break;
+		case 4:	*reinterpret_cast<uint32_t *>(objbase) = uint32_t(data); break;
+		case 8:	*reinterpret_cast<uint64_t *>(objbase) = uint64_t(data); break;
+	}
+}
+
+void save_manager::test_dump()
+{
+	std::ostringstream json;
+	m_root_item.save_json(json);
+	printf("%s\n", json.str().c_str());
 }

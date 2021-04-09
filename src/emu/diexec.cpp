@@ -401,20 +401,6 @@ void device_execute_interface::interface_post_start()
 	if (!m_icountptr)
 		throw emu_fatalerror("m_icountptr never initialized!");
 
-	// register for save states
-	device().save_item(NAME(m_suspend));
-	device().save_item(NAME(m_nextsuspend));
-	device().save_item(NAME(m_eatcycles));
-	device().save_item(NAME(m_nexteatcycles));
-	device().save_item(NAME(m_trigger));
-	device().save_item(NAME(m_totalcycles));
-	device().save_item(NAME(m_localtime));
-
-	// it's more efficient and causes less clutter to save these this way
-	device().save_item(STRUCT_MEMBER(m_input, m_stored_vector));
-	device().save_item(STRUCT_MEMBER(m_input, m_curvector));
-	device().save_item(STRUCT_MEMBER(m_input, m_curstate));
-
 	// fill in the input states and IRQ callback information
 	for (int line = 0; line < std::size(m_input); line++)
 		m_input[line].start(*this, line);
@@ -504,6 +490,26 @@ void device_execute_interface::interface_clock_changed()
 
 	// re-compute the perfect interleave factor
 	m_scheduler->compute_perfect_interleave();
+}
+
+
+//-------------------------------------------------
+//  interface_register_save - register items for
+//  saving
+//-------------------------------------------------
+
+void device_execute_interface::interface_register_save(save_registrar &save)
+{
+	// put execute items in their own container
+	save_registrar(save, "execute")
+		.reg(NAME(m_suspend))
+		.reg(NAME(m_nextsuspend))
+		.reg(NAME(m_eatcycles))
+		.reg(NAME(m_nexteatcycles))
+		.reg(NAME(m_trigger))
+		.reg(NAME(m_totalcycles))
+		.reg(NAME(m_localtime))
+		.reg(NAME(m_input));
 }
 
 

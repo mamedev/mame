@@ -91,15 +91,26 @@ void device_palette_interface::interface_post_start()
 	// set up save/restore of the palette
 	m_save_pen.resize(m_palette->num_colors());
 	m_save_contrast.resize(m_palette->num_colors());
-	device().save_item(NAME(m_save_pen));
-	device().save_item(NAME(m_save_contrast));
+}
+
+
+
+//-------------------------------------------------
+//  interface_register_save - register for save
+//  states
+//-------------------------------------------------
+
+void device_palette_interface::interface_register_save(save_registrar &save)
+{
+	save_registrar container(save, "palette");
 
 	// save indirection tables if we have them
+	container.reg(NAME(m_save_pen))
+		.reg(NAME(m_save_contrast));
+
 	if (m_indirect_colors.size() > 0)
-	{
-		device().save_item(NAME(m_indirect_colors));
-		device().save_item(NAME(m_indirect_pens));
-	}
+		container.reg(NAME(m_indirect_colors))
+			.reg(NAME(m_indirect_pens));
 }
 
 

@@ -69,8 +69,8 @@ protected:
 	// interface-level overrides
 	virtual void interface_validity_check(validity_checker &valid) const override;
 	virtual void interface_pre_start() override;
-	virtual void interface_post_start() override;
 	virtual void interface_pre_reset() override;
+	virtual void interface_register_save(save_registrar &save) override;
 
 private:
 	// private state

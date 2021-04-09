@@ -364,15 +364,11 @@ sound_stream_output::sound_stream_output() :
 //  init - initialization
 //-------------------------------------------------
 
-void sound_stream_output::init(sound_stream &stream, u32 index, char const *tag)
+void sound_stream_output::init(sound_stream &stream, u32 index)
 {
 	// set the passed-in data
 	m_stream = &stream;
 	m_index = index;
-
-	// save our state
-	auto &save = stream.device().machine().save();
-	save.save_item(&stream.device(), "stream.output", tag, index, NAME(m_gain));
 
 #if (LOG_OUTPUT_WAV)
 	std::string filename = stream.device().machine().basename();
@@ -452,17 +448,12 @@ sound_stream_input::sound_stream_input() :
 //  init - initialization
 //-------------------------------------------------
 
-void sound_stream_input::init(sound_stream &stream, u32 index, char const *tag, sound_stream_output *resampler)
+void sound_stream_input::init(sound_stream &stream, u32 index, sound_stream_output *resampler)
 {
 	// set the passed-in values
 	m_owner = &stream;
 	m_index = index;
 	m_resampler_source = resampler;
-
-	// save our state
-	auto &save = stream.device().machine().save();
-	save.save_item(&stream.device(), "stream.input", tag, index, NAME(m_gain));
-	save.save_item(&stream.device(), "stream.input", tag, index, NAME(m_user_gain));
 }
 
 
@@ -576,10 +567,7 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output
 	m_name += "'";
 
 	// create a unique tag for saving
-	std::string state_tag = string_format("%d", m_device.machine().sound().unique_id());
-	auto &save = m_device.machine().save();
-	save.save_item(&m_device, "stream.sample_rate", state_tag.c_str(), 0, NAME(m_sample_rate));
-	save.register_postload(save_prepost_delegate(FUNC(sound_stream::postload), this));
+	device.machine().save().register_postload(save_prepost_delegate(FUNC(sound_stream::postload), this));
 
 	// initialize all inputs
 	for (unsigned int inputnum = 0; inputnum < m_input.size(); inputnum++)
@@ -593,12 +581,12 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 output
 		}
 
 		// add the new input
-		m_input[inputnum].init(*this, inputnum, state_tag.c_str(), resampler);
+		m_input[inputnum].init(*this, inputnum, resampler);
 	}
 
 	// initialize all outputs
 	for (unsigned int outputnum = 0; outputnum < m_output.size(); outputnum++)
-		m_output[outputnum].init(*this, outputnum, state_tag.c_str());
+		m_output[outputnum].init(*this, outputnum);
 
 	// create an update timer for synchronous streams
 	if (synchronous())
@@ -1095,9 +1083,6 @@ sound_manager::sound_manager(running_machine &machine) :
 	machine.add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(&sound_manager::resume, this));
 	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&sound_manager::reset, this));
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&sound_manager::stop_recording, this));
-
-	// register global states
-	machine.save().save_item(NAME(m_last_update));
 
 	// set the starting attenuation
 	set_attenuation(machine.options().volume());

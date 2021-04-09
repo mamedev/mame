@@ -193,6 +193,9 @@ public:
 	// map a unique ID back to a name
 	const char *id_to_name(u32 id);
 
+	// state saving
+	void register_save(save_registrar &save) { save.reg(NAME(m_save_data)); }
+
 private:
 	output_item *find_item(std::string_view string);
 	output_item &create_new_item(std::string_view outname, s32 value);
@@ -209,7 +212,7 @@ private:
 	std::unordered_map<std::string, output_item> m_itemtable;
 	notify_vector m_global_notifylist;
 	std::vector<std::reference_wrapper<output_item> > m_save_order;
-	std::unique_ptr<s32 []> m_save_data;
+	std::vector<s32> m_save_data;
 	u32 m_uniqueid;
 };
 

@@ -121,7 +121,7 @@ protected:
 
 	// interface-level overrides
 	virtual void interface_pre_start() override;
-	virtual void interface_post_start() override;
+	virtual void interface_register_save(save_registrar &save) override;
 
 	bool m_start_bit_hack_for_external_clocks;
 
@@ -188,14 +188,15 @@ class device_buffered_serial_interface : public device_serial_interface
 protected:
 	using device_serial_interface::device_serial_interface;
 
-	void interface_post_start() override
+	void interface_register_save(save_registrar &save) override
 	{
-		device_serial_interface::interface_post_start();
+		device_serial_interface::interface_register_save(save);
 
-		device().save_item(NAME(m_fifo));
-		device().save_item(NAME(m_head));
-		device().save_item(NAME(m_tail));
-		device().save_item(NAME(m_empty));
+		save_registrar(save, "buffered_serial")
+			.reg(NAME(m_fifo))
+			.reg(NAME(m_head))
+			.reg(NAME(m_tail))
+			.reg(NAME(m_empty));
 	}
 
 	virtual void tra_complete() override

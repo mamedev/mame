@@ -409,7 +409,7 @@ class tilemap_t
 
 	friend class tilemap_device;
 	friend class tilemap_manager;
-	friend class simple_list<tilemap_t>;
+	friend class std::unique_ptr<tilemap_t>;
 	friend resource_pool_object<tilemap_t>::~resource_pool_object();
 
 	// logical index
@@ -427,20 +427,21 @@ class tilemap_t
 	void init_common(tilemap_manager &manager, device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, u16 tilewidth, u16 tileheight, u32 cols, u32 rows);
 
 protected:
-	// tilemap_manager controls our allocations
-	tilemap_t(device_t &owner);
-	virtual ~tilemap_t();
 
 	tilemap_t &init(tilemap_manager &manager, device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows);
 	tilemap_t &init(tilemap_manager &manager, device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows);
 
 public:
+	// tilemap_manager controls our allocations
+	tilemap_t(device_t &owner);
+	virtual ~tilemap_t();
+
 	// getters
 	running_machine &machine() const;
 	device_palette_interface &palette() const { return *m_palette; }
 	device_gfx_interface &decoder() const { return *m_tileinfo.decoder; }
 
-	tilemap_t *next() const { return m_next; }
+//	tilemap_t *next() const { return m_next; }
 	void *user_data() const { return m_user_data; }
 	u32 rows() const { return m_rows; }
 	u32 cols() const { return m_cols; }
@@ -507,6 +508,22 @@ public:
 	tilemap_memory_index scan_cols_flip_y(u32 col, u32 row, u32 num_cols, u32 num_rows);
 	tilemap_memory_index scan_cols_flip_xy(u32 col, u32 row, u32 num_cols, u32 num_rows);
 
+	// register for saves
+	void register_save(save_registrar &save)
+	{
+		save.reg(NAME(m_enable))
+			.reg(NAME(m_attributes))
+			.reg(NAME(m_palette_offset))
+			.reg(NAME(m_scrollrows))
+			.reg(NAME(m_scrollcols))
+			.reg(NAME(m_rowscroll))
+			.reg(NAME(m_colscroll))
+			.reg(NAME(m_dx))
+			.reg(NAME(m_dx_flipped))
+			.reg(NAME(m_dy))
+			.reg(NAME(m_dy_flipped));
+	}
+
 private:
 	// internal set of transparency states for rendering
 	enum trans_t
@@ -563,7 +580,7 @@ private:
 	tilemap_manager *           m_manager;              // reference to the owning manager
 	device_t *                  m_device;               // pointer to our owning device
 	device_palette_interface *  m_palette;              // palette used for drawing
-	tilemap_t *                 m_next;                 // pointer to next tilemap
+//	tilemap_t *                 m_next;                 // pointer to next tilemap
 	void *                      m_user_data;            // user data value
 
 	// basic tilemap metrics
@@ -636,12 +653,20 @@ public:
 	{ return create(decoder, std::forward<T>(tile_get_info), std::forward<U>(mapper), tilewidth, tileheight, cols, rows, &static_cast<tilemap_t &>(allocated)); }
 
 	// tilemap list information
-	tilemap_t *find(int index) { return m_tilemap_list.find(index); }
-	int count() const { return m_tilemap_list.count(); }
+	tilemap_t *find(int index) { return (index < m_tilemap_list.size()) ? m_tilemap_list[index].get() : m_device_tilemap_list[index - m_tilemap_list.size()]; }
+	int count() const { return m_tilemap_list.size() + m_device_tilemap_list.size(); }
 
 	// global operations on all tilemaps
 	void mark_all_dirty();
 	void set_flip_all(u32 attributes);
+
+	// register for saves
+	void register_save(save_registrar &save)
+	{
+		int index = 0;
+		for (auto &tmap : m_tilemap_list)
+			save.reg(tmap, string_format("%d", index++).c_str());
+	}
 
 private:
 	// tilemap creation
@@ -653,7 +678,8 @@ private:
 
 	// internal state
 	running_machine &       m_machine;
-	simple_list<tilemap_t>  m_tilemap_list;
+	std::vector<std::unique_ptr<tilemap_t>> m_tilemap_list;
+	std::vector<tilemap_t *> m_device_tilemap_list;
 	int                     m_instance;
 };
 
@@ -756,6 +782,12 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	// register for save states
+	void device_register_save(save_registrar &save) override
+	{
+		save.reg(*static_cast<tilemap_t *>(this), "tilemap");
+	}
 
 private:
 	// devices

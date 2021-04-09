@@ -476,7 +476,7 @@ public:
 	sound_stream_output();
 
 	// initialization
-	void init(sound_stream &stream, u32 index, char const *tag_base);
+	void init(sound_stream &stream, u32 index);
 
 	// no copying allowed
 	sound_stream_output(sound_stream_output const &src) = delete;
@@ -507,6 +507,12 @@ public:
 	// attempt to optimize resamplers by reusing them where possible
 	sound_stream_output &optimize_resampler(sound_stream_output *input_resampler);
 
+	// register for save states
+	void register_save(save_registrar &save)
+	{
+		save.reg(NAME(m_gain));
+	}
+
 private:
 	// internal state
 	sound_stream *m_stream;               // owning stream
@@ -530,7 +536,7 @@ public:
 	sound_stream_input();
 
 	// initialization
-	void init(sound_stream &stream, u32 index, char const *tag_base, sound_stream_output *resampler);
+	void init(sound_stream &stream, u32 index, sound_stream_output *resampler);
 
 	// no copying allowed
 	sound_stream_input(sound_stream_input const &src) = delete;
@@ -559,6 +565,13 @@ public:
 
 	// tell inputs to apply sample rate changes
 	void apply_sample_rate_changes(u32 updatenum, u32 downstream_rate);
+
+	// register for save states
+	void register_save(save_registrar &save)
+	{
+		save.reg(NAME(m_gain))
+			.reg(NAME(m_user_gain));
+	}
 
 private:
 	// internal state
@@ -645,6 +658,14 @@ public:
 
 	// apply any pending sample rate changes; should only be called by the sound manager
 	void apply_sample_rate_changes(u32 updatenum, u32 downstream_rate);
+
+	// register for saves
+	void register_save(save_registrar &save)
+	{
+		save.reg(NAME(m_sample_rate))
+			.reg(NAME(m_input))
+			.reg(NAME(m_output));
+	}
 
 #if (SOUND_DEBUG)
 	// print one level of the sound graph and recursively tell our inputs to do the same
@@ -785,6 +806,16 @@ public:
 
 	// fill the given buffer with 16-bit stereo audio samples
 	void samples(s16 *buffer);
+
+	// register for saves
+	void register_save(save_registrar &save)
+	{
+		save.reg(NAME(m_last_update));
+
+		save_registrar streams(save, "streams");
+		for (auto &stream : m_stream_list)
+			streams.reg(stream, string_format("%s:%d", stream->device().tag(), stream->output_base()).c_str());
+	}
 
 private:
 	// set/reset the mute state for the given reason
