@@ -73,7 +73,7 @@ md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, const char *
 }
 
 ROM_START( svp )
-	ROM_REGION(0x800, "internal_rom", 0)
+	ROM_REGION(0x20000, "internal_rom", 0)
 	ROM_LOAD("svp.bin", 0x1F800, 0x800, CRC(2421ec7e) SHA1(0b951ea9c6094b3c34e4f0b64d031c75c237564f))
 ROM_END
 
