@@ -202,8 +202,11 @@ private:
 //           0b xxxxxxxx Level control
 //           0c xxxxxxxx Limit address (low)
 //           0d xxxxxxxx Limit address (high)
-//           0e xxxxxxxx DAC data
-//           0f xxxxxxxx PCM data
+//           0e xxxxxxxx DAC data [YM2608/10]
+//           0f xxxxxxxx PCM data [YM2608/10]
+//           0e xxxxxxxx DAC data high [Y8950]
+//           0f xx------ DAC data low [Y8950]
+//           10 -----xxx DAC data exponent [Y8950]
 //
 class ymadpcm_b_registers
 {
@@ -211,7 +214,7 @@ public:
 	// constants
 	static constexpr u32 OUTPUTS = 2;
 	static constexpr u32 CHANNELS = 1;
-	static constexpr u32 REGISTERS = 0x10;
+	static constexpr u32 REGISTERS = 0x11;
 	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
 
 	// constructor

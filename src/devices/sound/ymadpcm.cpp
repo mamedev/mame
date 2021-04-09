@@ -562,7 +562,7 @@ void ymadpcm_b_channel::write(u32 regnum, u8 value)
 				m_regs.speaker(),
 				m_regs.pan_left(),
 				m_regs.pan_right(),
-				m_regs.dac(),
+				m_regs.dac_enable(),
 				m_regs.dram_8bit(),
 				m_regs.rom_ram(),
 				m_regs.external(),
