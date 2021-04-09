@@ -39,22 +39,16 @@
 
 	TODO (PC-386M):
     - "ERR:BR" at boot (BIOS loader error).
-	  Executes some code in text VRAM area ($a00xx), trying to setup a writeable RAM bank
+	  Executes some code in text VRAM area (PC=$a006e), trying to setup a writeable RAM bank
 	  (shadow RAM even?) to IPL window, I/O $c06 seems to be the control port for it;
 
-	TODO: (PC-486SE):
+	TODO: (PC-486SE/PC-486MU):
 	- Verify ROM bankswitch;
-	  Sets up what is normally IPL bankswitch at PC=0xf5115, successive opcode 
+	  On PC-486SE sets up what is normally IPL bankswitch at PC=0xf5115, successive opcode 
 	  is a jmp 0xf8000, pretty unlikely it delays bankswitch so assume it reloads 
 	  the same bank.
 	- Fix POR/ROM bankswitch on soft resets.
 	- Eventually errors with a ERR:VR (GFX VRAM);
-
-    TODO: (PC-486MU)
-    - Fix ROM loading (there's only one valid boot vector?);
-    - Tries to read port C of i8255_sys (-> 0x35) at boot without setting up the control
-      port. This causes a jump to invalid program area;
-    - Eventually dies on ARTIC check;
 
     TODO: (PC-9821AP)
     - No way to exit the initial loop. Code looks broken, bad dump?
@@ -2551,7 +2545,7 @@ void pc9801_state::pc9821ra20(machine_config &config)
 }
 
 // Epson clones
-// TODO: definitely runs on their own state machine 
+// TODO: definitely runs on their own state machine
 // (verify if for instance they need EGC and what kind of FM board they needs up)
 
 void pc9801_state::pc386m(machine_config &config)
@@ -2585,11 +2579,14 @@ void pc9801_state::pc486se(machine_config &config)
 void pc9801_state::pc486mu(machine_config &config)
 {
 	pc9821(config);
-	I486(config.replace(), m_maincpu, 33000000); // i486SX, switchable to I386DX 10MHz/5MHz, Pentium ODP compatible
+	const XTAL xtal = XTAL(33'000'000);
+	I486(config.replace(), m_maincpu, xtal); // i486SX, switchable to I386DX 10MHz/5MHz, Pentium ODP compatible
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821as_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 	
+	pc9801_pit_clock(config, xtal/8); // unknown, passes "ERR:TM" test
+
 	// CL-GD5428
 	// RAM: 5.6 + 61.6MB max
 	// 2 x 3.5 floppy drives
@@ -3064,12 +3061,19 @@ CBus: 3 slots
 */
 
 ROM_START( pc486mu )
-	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x20000, "biosrom", ROMREGION_ERASEFF )
+	ROM_LOAD( "pc-486mu_hn27c1024.bin", 0x00000, 0x20000, CRC(113268e1) SHA1(2a630abc825b2808f9f8fb65c6cb1fb7e7f6c710))
 //	ROM_LOAD( "bios_486mu.rom", 0x00000, 0x18000, BAD_DUMP CRC(57b5d701) SHA1(15029800842e93e07615b0fd91fb9f2bfe3e3c24))
-	// TODO: identify ROM banks
-	ROM_LOAD( "pc-486mu_hn27c1024.bin", 0x10000, 0x08000, CRC(113268e1) SHA1(2a630abc825b2808f9f8fb65c6cb1fb7e7f6c710))
-	ROM_CONTINUE(                       0x08000, 0x08000 )
-	ROM_CONTINUE(                       0x20000, 0x10000 )
+
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// backported from pc486se
+	ROM_COPY( "biosrom", 0x08000, 0x00000, 0x08000 )
+	ROM_COPY( "biosrom", 0x00000, 0x10000, 0x08000 )
+	ROM_COPY( "biosrom", 0x10000, 0x08000, 0x08000 )
+//	ROM_FILL(                     0x18000, 0x08000, 0x90) // untested by BIOS
+	ROM_COPY( "biosrom", 0x10000, 0x20000, 0x08000 )
+	ROM_COPY( "biosrom", 0x18000, 0x28000, 0x08000 )
+
 
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font_486mu.rom", 0x0000, 0x46800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff))
@@ -3233,8 +3237,8 @@ COMP( 1998, pc9821v13,  pc9821,   0, pc9821,    pc9821,   pc9801_state, init_pc9
 COMP( 1998, pc9821v20,  pc9821,   0, pc9821v20, pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE VALUESTAR 20)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // Epson clones
 // TODO: dump chargen/kanji roms to pinpoint proper parent-clone relationships
+COMP( 1990, pc386m,     0,        0, pc386m,    pc9801rs, pc9801_state, init_pc9801_kanji,   "Epson", "PC-386M",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1994, pc486mu,    0,        0, pc486mu,   pc9821,   pc9801_state, init_pc9801_kanji,   "Epson", "PC-486MU",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1990, pc386m,     pc486mu,  0, pc386m,    pc9801rs, pc9801_state, init_pc9801_kanji,   "Epson", "PC-386M",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1993, pc486se,    pc486mu,  0, pc486se,   pc9801rs, pc9801_state, init_pc9801_kanji,   "Epson", "PC-486SE",					   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // PC98DO (PC88+PC98)
 // PC98HA (LCD version)
