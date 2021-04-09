@@ -843,7 +843,6 @@ license:CC0
 		<publisher>シグナワークス (Signa Works)</publisher>
 		<info name="alt_title" value="ベルズ・アベニュー Vol.2" />
 		<info name="release" value="199401xx" />
-		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="bellsav2" sha1="c910ef48ea6677c77d40518f75af2160e58ae763" />
@@ -866,7 +865,6 @@ license:CC0
 		<info name="serial" value="WDM-302T"/>
 		<info name="alt_title" value="ベルズ・アベニュー Vol.3" />
 		<info name="release" value="199504xx" />
-		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="bell's avenue vol. 3 (japan)" sha1="be691be310294eeaf9fd26d4ef9fc9341406842e" />
@@ -1417,7 +1415,6 @@ license:CC0
 		<info name="serial" value="HMS-00269"/>
 		<info name="alt_title" value="デ・ファーナ" />
 		<info name="release" value="199511xx" />
-		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="de.fana (japan)" sha1="58b7981c2acb1e9fe0e3664ccc11119d18306472" />
@@ -2207,7 +2204,6 @@ license:CC0
 		<info name="serial" value="ZYX-0007"/>
 		<info name="alt_title" value="学園爆裂転校生！" />
 		<info name="release" value="199603xx" />
-		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="gakuen bakuretsu tenkousei (japan)" sha1="1ad336ca6f7d057d662a0c8864094cb4e37f2d2b" />
@@ -3459,7 +3455,6 @@ license:CC0
 		<info name="serial" value="2TD-3026"/>
 		<info name="alt_title" value="麻雀幻想曲Ⅲ" />
 		<info name="release" value="199511xx" />
-		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mahjong gensoukyoku iii - mahjong fantasia the 3rd stage (japan)" sha1="152dbdfdc7af5fb988ce5e2e582e60df4c28a8e5" />
@@ -3480,7 +3475,6 @@ license:CC0
 		<info name="serial" value="WIC-5541"/>
 		<info name="alt_title" value="みさとちゃんの夢日記" />
 		<info name="release" value="199704xx" />
-		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="misato-chan no yume nikki (japan)" sha1="7bf75a957370f0e09aa0aa5f1e56fb6e4bbad7aa" />
