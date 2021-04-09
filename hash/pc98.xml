@@ -574,10 +574,14 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="win31">
+	<!-- Throws a non-fatal CD-Rom error during install -->
+	<!-- Text is garbled on arbitrary portions (cfr. disk # during install), last letter of a string cutoff? -->
+	<!-- Tested Solitaire (works), Minesweeper (has slight EGC issues on window move), Paint (has heavy EGC issues) -->
+	<software name="win31" supported="partial">
 		<description>Windows 3.1</description>
 		<year>199?</year>
 		<publisher>Microsoft?</publisher>
+		<info name="usage" value="Needs a DOS install from HDD"/>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1281968">
@@ -19402,13 +19406,14 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="fh2tag">
+	<software name="fh2tag" supported="partial">
 		<description>Finish Hold 2 - Tag</description>
 		<year>1996</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="フィニッシュホールド２ ＴＡＧ" />
 		<info name="release" value="19960322" />
-		<info name="usage" value="Requires HDD installation, and the game manual to pass the protection check. Run INST.EXE from DOS." />
+		 <!-- 001J0283TA 100001 -->
+		<info name="usage" value="Requires HDD installation, and the serial number printed on registration card to pass the protection check. Run INST.EXE or SSHDINST.EXE from DOS." />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1261568">
@@ -23336,7 +23341,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="hercequa">
+	<!-- boot OK, beeps out when it's supposed to play samples (DAC1BIT) -->
+	<software name="hercequa" supported="partial">
 		<description>Hercequary</description>
 		<year>1994</year>
 		<publisher>ジックス (ZyX)</publisher>
@@ -36257,7 +36263,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="puyopuyo" supported="yes">
+	<!-- boot OK, beeps out when it's supposed to play samples (DAC1BIT) -->
+	<software name="puyopuyo" supported="partial">
 		<description>Puyo Puyo</description>
 		<year>1993</year>
 		<publisher>コンパイル (Compile)</publisher>
@@ -38072,12 +38079,15 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+	<!-- boot OK -->
+	<!-- voice pitches are too slow (tested with -26 and -86) -->
 	<software name="rusty">
 		<description>Rusty</description>
 		<year>1993</year>
 		<publisher>シーラボ (C-lab)</publisher>
 		<info name="alt_title" value="ラスティ" />
 		<info name="release" value="19930716" />
+		<!-- Are those mislabeled? flop3 is actually 2 according to first disk swap on new game selection -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -52920,6 +52930,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
+	<!-- doesn't recognize disk swaps -->
 	<software name="mezaset2" supported="no">
 		<description>Mezase! Top Player - Tennis Tennis 2</description>
 		<year>1993</year>
@@ -54847,7 +54858,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="ttennis" supported="no">
+	<!-- boot OK -->
+	<software name="ttennis" supported="yes">
 		<description>Tennis Tennis</description>
 		<year>1992</year>
 		<publisher>日本ソフテック (Nihon Softec)</publisher>
@@ -68988,7 +69000,7 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		</part>
 	</software>
 
-	<!-- boot OK, beeps on intro/start of stages -->
+	<!-- boot OK, beeps on intro/start of stages (DAC1BIT) -->
 	<software name="transbor" supported="partial">
 		<description>TransbOrder</description>
 		<year>1993</year>

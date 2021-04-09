@@ -1978,7 +1978,9 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="fh2tag">
+	<!-- boot OK, no sound (tested -26 and -86 on 98RS, TBD: retest in 9821) -->
+	<!-- Has Tuned Heart demo (which also has no sound and hangs at first battle) -->
+	<software name="fh2tag" supported="partial">
 		<!--
 		Origin: redump.org
 		<rom name="Finish Hold 2 - Tag (Japan).cue" size="93" crc="7cf64221" md5="a2dc55a24539aab103701e08562253fe" sha1="8a49ecb6010ea76deb1bcc3c84a0cfc437de46e3"/>
