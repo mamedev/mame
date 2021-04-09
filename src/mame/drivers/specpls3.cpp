@@ -457,34 +457,50 @@ void specpls3_state::spectrum_plus3(machine_config &config)
 
 ***************************************************************************/
 
+/* Amstrad built +2A/+2B/+3/+3B models:
+
+    +2A/B has built-in tape "datacorder", +3/B has built-in 3" fdd
+    +2A/+3 use common z70830 pcb with v4.0 rom  (fdc etc. unpopulated on +2A)
+    +2B/+3B use unique z70833/z70835 pcbs but use same v4.1 rom
+	 
+   Note, +2 (non-A/B, aka "grey case") although Amstrad built is essentially a re-cased Sinclair 128K, see spec128.cpp
+*/
 ROM_START(specpl2a)
 	ROM_REGION(0x20000,"maincpu",0)
-	ROM_LOAD("p2a41_0.rom",0x10000,0x4000, CRC(30c9f490) SHA1(62ec15a4af56cd1d206d0bd7011eac7c889a595d))
-	ROM_LOAD("p2a41_1.rom",0x14000,0x4000, CRC(a7916b3f) SHA1(1a7812c383a3701e90e88d1da086efb0c033ac72))
-	ROM_LOAD("p2a41_2.rom",0x18000,0x4000, CRC(c9a0b748) SHA1(8df145d10ff78f98138682ea15ebccb2874bf759))
-	ROM_LOAD("p2a41_3.rom",0x1c000,0x4000, CRC(b88fd6e3) SHA1(be365f331942ec7ec35456b641dac56a0dbfe1f0))
+	ROM_SYSTEM_BIOS( 0, "en", "English v4.0" )  // +2A
+	ROMX_LOAD("40092.ic7",0x10000,0x8000, CRC(9bc85686) SHA1(5992daf925f6e225fc0d01f7640282954d092ef4), ROM_BIOS(0))
+	ROMX_LOAD("40093.ic8",0x18000,0x8000, CRC(db551783) SHA1(a0432adcca03f849fb39b6dce6414740cf4aecd2), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS( 1, "sp", "Spanish v4.0" )
+	ROMX_LOAD("40094.ic7",0x10000,0x8000, CRC(392242fb) SHA1(976ae88951f8d1beb5d107f048950118a7133823), ROM_BIOS(1))
+	ROMX_LOAD("40101.ic8",0x18000,0x8000, CRC(5daaae01) SHA1(09ca25b4dbec064a4964ab7a41d48404199afd77), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 2, "enb", "English v4.1" )  // +2B
+	ROMX_LOAD("40092u.ic7",0x10000,0x8000, CRC(80808d82) SHA1(b9e88ec18f844ce42ecb7802d82c2bda65f9c4f2), ROM_BIOS(2))
+	ROMX_LOAD("40093u.ic8",0x18000,0x8000, CRC(61f2b50c) SHA1(d062765ceb1f3cd2c94ea51cb737cac7ad6151b4), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 3, "spb", "Spanish v4.1" )
+	ROMX_LOAD("40094s.ic7",0x10000,0x8000, CRC(9d102acf) SHA1(c525bd23f79ca968d34a0efdcc47b2eb342007f5), ROM_BIOS(3))
+	ROMX_LOAD("40101s.ic8",0x18000,0x8000, CRC(1408ddce) SHA1(56eb124d44ee8c8daef130be4d7e735ec412c4ba), ROM_BIOS(3))
 ROM_END
 
 ROM_START(specpls3)
 	ROM_REGION(0x20000,"maincpu",0)
-	ROM_SYSTEM_BIOS( 0, "en", "English v4.0" )
-	ROMX_LOAD("pl3-0.rom",0x10000,0x4000, CRC(17373da2) SHA1(e319ed08b4d53a5e421a75ea00ea02039ba6555b), ROM_BIOS(0))
-	ROMX_LOAD("pl3-1.rom",0x14000,0x4000, CRC(f1d1d99e) SHA1(c9969fc36095a59787554026a9adc3b87678c794), ROM_BIOS(0))
-	ROMX_LOAD("pl3-2.rom",0x18000,0x4000, CRC(3dbf351d) SHA1(22e50c6ba4157a3f6a821bd9937cd26e292775c6), ROM_BIOS(0))
-	ROMX_LOAD("pl3-3.rom",0x1c000,0x4000, CRC(04448eaa) SHA1(65f031caa8148a5493afe42c41f4929deab26b4e), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS( 1, "sp", "Spanish v.40" )
-	ROMX_LOAD("plus3sp0.rom",0x10000,0x4000, CRC(1f86147a) SHA1(e9b0a60a1a8def511d59090b945d175bdc646346), ROM_BIOS(1))
-	ROMX_LOAD("plus3sp1.rom",0x14000,0x4000, CRC(a8ac4966) SHA1(4e48f196427596c7990c175d135c15a039c274a4), ROM_BIOS(1))
-	ROMX_LOAD("plus3sp2.rom",0x18000,0x4000, CRC(f6bb0296) SHA1(09fc005625589ef5992515957ce7a3167dec24b2), ROM_BIOS(1))
-	ROMX_LOAD("plus3sp3.rom",0x1c000,0x4000, CRC(f6d25389) SHA1(ec8f644a81e2e9bcb58ace974103ea960361bad2), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 2, "en41", "English v4.1" )
-	ROMX_LOAD("plus341.rom",0x10000,0x10000, CRC(be0d9ec4) SHA1(500c0945760abeefcbd08bc22c0d07b14b336cf0), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS( 3, "4ms", "Customize 3.5\" 4ms" )
-	ROMX_LOAD("p3_01_4m.rom",0x10000,0x8000, CRC(ad99380a) SHA1(4e5d114b72d464cefdde0566457f52a3c0c1cae2), ROM_BIOS(3))
-	ROMX_LOAD("p3_23_4m.rom",0x18000,0x8000, CRC(07727895) SHA1(752cdd6a083ab9910348995e483541d60bb6372b), ROM_BIOS(3))
-	ROM_SYSTEM_BIOS( 4, "12ms", "Customize 3.5\" 12ms" )
-	ROMX_LOAD("p3_01_cm.rom",0x10000,0x8000, CRC(ad99380a) SHA1(4e5d114b72d464cefdde0566457f52a3c0c1cae2), ROM_BIOS(4))
-	ROMX_LOAD("p3_23_cm.rom",0x18000,0x8000, CRC(61f2b50c) SHA1(d062765ceb1f3cd2c94ea51cb737cac7ad6151b4), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS( 0, "en", "English v4.0" )  // +3
+	ROMX_LOAD("40092.ic7",0x10000,0x8000, CRC(9bc85686) SHA1(5992daf925f6e225fc0d01f7640282954d092ef4), ROM_BIOS(0))
+	ROMX_LOAD("40093.ic8",0x18000,0x8000, CRC(db551783) SHA1(a0432adcca03f849fb39b6dce6414740cf4aecd2), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS( 1, "sp", "Spanish v4.0" )
+	ROMX_LOAD("40094.ic7",0x10000,0x8000, CRC(392242fb) SHA1(976ae88951f8d1beb5d107f048950118a7133823), ROM_BIOS(1))
+	ROMX_LOAD("40101.ic8",0x18000,0x8000, CRC(5daaae01) SHA1(09ca25b4dbec064a4964ab7a41d48404199afd77), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 2, "enb", "English v4.1" )  // +3B
+	ROMX_LOAD("40092u.ic7",0x10000,0x8000, CRC(80808d82) SHA1(b9e88ec18f844ce42ecb7802d82c2bda65f9c4f2), ROM_BIOS(2))
+	ROMX_LOAD("40093u.ic8",0x18000,0x8000, CRC(61f2b50c) SHA1(d062765ceb1f3cd2c94ea51cb737cac7ad6151b4), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 3, "spb", "Spanish v4.1" )
+	ROMX_LOAD("40094s.ic7",0x10000,0x8000, CRC(9d102acf) SHA1(c525bd23f79ca968d34a0efdcc47b2eb342007f5), ROM_BIOS(3))
+	ROMX_LOAD("40101s.ic8",0x18000,0x8000, CRC(1408ddce) SHA1(56eb124d44ee8c8daef130be4d7e735ec412c4ba), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS( 4, "4ms", "Customize 3.5\" 4ms" )  // unofficial 3.5" fdd hacks by Cristian Secară (v4.1 english)
+	ROMX_LOAD("p3_01_4m.rom",0x10000,0x8000, CRC(ad99380a) SHA1(4e5d114b72d464cefdde0566457f52a3c0c1cae2), ROM_BIOS(4))
+	ROMX_LOAD("p3_23_4m.rom",0x18000,0x8000, CRC(07727895) SHA1(752cdd6a083ab9910348995e483541d60bb6372b), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS( 5, "12ms", "Customize 3.5\" 12ms" )
+	ROMX_LOAD("p3_01_cm.rom",0x10000,0x8000, CRC(ad99380a) SHA1(4e5d114b72d464cefdde0566457f52a3c0c1cae2), ROM_BIOS(5))
+	ROMX_LOAD("p3_23_cm.rom",0x18000,0x8000, CRC(61f2b50c) SHA1(d062765ceb1f3cd2c94ea51cb737cac7ad6151b4), ROM_BIOS(5))
 ROM_END
 
 ROM_START(specpl3e)
@@ -521,10 +537,10 @@ ROM_START(sp3eata)
 	ROMX_LOAD("3ezxaes.rom",0x10000,0x10000, CRC(8f0ae91a) SHA1(71693e18b30c90914be58cba26682ca025c924ea), ROM_BIOS(1))
 ROM_END
 
-/*    YEAR  NAME      PARENT   COMPAT  MACHINE         INPUT      CLASS           INIT        COMPANY                 FULLNAME                         FLAGS */
-COMP( 1987, specpl2a, spec128, 0,      spectrum_plus2, spec_plus, specpls3_state, empty_init, "Amstrad plc",          "ZX Spectrum +2a",               0 )
-COMP( 1987, specpls3, spec128, 0,      spectrum_plus3, spec_plus, specpls3_state, empty_init, "Amstrad plc",          "ZX Spectrum +3",                0 )
-COMP( 2000, specpl3e, spec128, 0,      spectrum_plus3, spec_plus, specpls3_state, empty_init, "Amstrad plc",          "ZX Spectrum +3e",               MACHINE_UNOFFICIAL )
-COMP( 2002, sp3e8bit, spec128, 0,      spectrum_plus3, spec_plus, specpls3_state, empty_init, "Amstrad plc",          "ZX Spectrum +3e 8bit IDE",      MACHINE_UNOFFICIAL )
-COMP( 2002, sp3eata,  spec128, 0,      spectrum_plus3, spec_plus, specpls3_state, empty_init, "Amstrad plc",          "ZX Spectrum +3e 8bit ZXATASP" , MACHINE_UNOFFICIAL )
-COMP( 2002, sp3ezcf,  spec128, 0,      spectrum_plus3, spec_plus, specpls3_state, empty_init, "Amstrad plc",          "ZX Spectrum +3e 8bit ZXCF",     MACHINE_UNOFFICIAL )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE         INPUT      CLASS           INIT        COMPANY        FULLNAME                         FLAGS */
+COMP( 1987, specpl2a, 0,        0,     spectrum_plus2, spec_plus, specpls3_state, empty_init, "Amstrad plc", "ZX Spectrum +2a",              0 )
+COMP( 1987, specpls3, specpl2a, 0,     spectrum_plus3, spec_plus, specpls3_state, empty_init, "Amstrad plc", "ZX Spectrum +3",               0 )
+COMP( 2000, specpl3e, 0,        0,     spectrum_plus3, spec_plus, specpls3_state, empty_init, "Amstrad plc", "ZX Spectrum +3e",              MACHINE_UNOFFICIAL )
+COMP( 2002, sp3e8bit, 0,        0,     spectrum_plus3, spec_plus, specpls3_state, empty_init, "Amstrad plc", "ZX Spectrum +3e 8bit IDE",     MACHINE_UNOFFICIAL )
+COMP( 2002, sp3eata,  0,        0,     spectrum_plus3, spec_plus, specpls3_state, empty_init, "Amstrad plc", "ZX Spectrum +3e 8bit ZXATASP", MACHINE_UNOFFICIAL )
+COMP( 2002, sp3ezcf,  0,        0,     spectrum_plus3, spec_plus, specpls3_state, empty_init, "Amstrad plc", "ZX Spectrum +3e 8bit ZXCF",    MACHINE_UNOFFICIAL )
