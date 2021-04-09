@@ -39,7 +39,7 @@
  *
  * - Reset int. vector at 0xFFFC/0x1FFF8, specifying 0xFC08 as the entry point address.
  * - Boot-up process: register initialization, checks for "security" string in ROM header
- *   and reading game entry point address (from 0x1C8 to 0x1CF in ROM byte space).
+ *   and reading game entry point address (from 0x1C8 to 0x1CF in ROM - byte addresses).
  *
  * At some point it might be interesting to emulate this behavior, reading the reset
  * interrupt vector handler address in the internal ROM, and letting the boot-up process
@@ -73,7 +73,7 @@ md_rom_svp_device::md_rom_svp_device(const machine_config &mconfig, const char *
 }
 
 ROM_START( svp )
-	ROM_REGION(0x800, "internal_rom", 0x1F800)
+	ROM_REGION(0x800, "internal_rom", 0)
 	ROM_LOAD("svp.bin", 0x1F800, 0x800, CRC(2421ec7e) SHA1(0b951ea9c6094b3c34e4f0b64d031c75c237564f))
 ROM_END
 
