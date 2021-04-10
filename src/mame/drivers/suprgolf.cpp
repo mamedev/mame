@@ -659,9 +659,9 @@ ROM_START( albatross )
 	ROM_LOAD( "map.4a",       0x0b0000, 0x010000, CRC(cfec1a0f) SHA1(c09ece059cb3c456b66c016c6fab3139d3f61c6a) )
 
 	ROM_REGION( 0x100000, "user2", ROMREGION_ERASEFF )
-	ROM_LOAD( "cg20.7k",0x000000, 0x10000, BAD_DUMP CRC(1e3fa2fd) SHA1(4771b90e40ebfbae4a98ff7ce6db50f635232597) ) // - empty sockets on PCB :/ (temps from Super Crowns Golf)
-	ROM_LOAD( "cg21.7j",0x010000, 0x10000, BAD_DUMP CRC(0323a2cd) SHA1(d7d4b35ad451acb2fa3d117bb0ae2f8fbd883f17) ) // /
-	ROM_LOAD( "2.4c",   0x020000, 0x20000, CRC(08d4363b) SHA1(60c5543c35f44af2f4a8f7ca4bc10633f5fa67fb) )
+	ROM_LOAD( "cg30.ic14", 0x000000, 0x10000, BAD_DUMP CRC(6b7ffee9) SHA1(7b7f0f9801ab604ea4280c6d75dfcfdb4123520c) ) // - empty sockets on PCB :/ (temps from Super Crowns Golf World version)
+	ROM_LOAD( "cg31.ic13", 0x010000, 0x10000, BAD_DUMP CRC(c5ba8e39) SHA1(aff8d5fd532f1e1d90c21bc42a349e3e83c67064) ) //
+	ROM_LOAD( "2.4c",      0x020000, 0x20000, CRC(08d4363b) SHA1(60c5543c35f44af2f4a8f7ca4bc10633f5fa67fb) ) // matches cg32 + cg33 of the World version
 
 	ROM_REGION( 0x70000, "gfx1", 0 )
 	ROM_LOAD( "chr1.3h",      0x000000, 0x010000, CRC(e62d2bb4) SHA1(f931699114a99b7eb25f8bb841d85de0d6a106a5) )
