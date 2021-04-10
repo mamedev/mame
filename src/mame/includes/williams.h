@@ -140,7 +140,7 @@ protected:
 	required_device<address_map_bank_device> m_bankc000;
 
 private:
-	virtual void machine_start() override { }
+	virtual void machine_start() override { m_deferred_snd_cmd_w.init(*this, FUNC(defender_state::deferred_snd_cmd_w)); }
 	virtual void machine_reset() override;
 
 	void bankc000_map(address_map &map);

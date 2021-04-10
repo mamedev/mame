@@ -94,6 +94,8 @@ void williams2_state::machine_start()
 	m_mainbank->configure_entries(1, 4, memregion("maincpu")->base() + 0x10000, 0x10000);
 	m_mainbank->configure_entry(0, m_videoram);
 	membank("vram8000")->set_base(&m_videoram[0x8000]);
+
+	m_deferred_snd_cmd_w.init(*this, FUNC(williams2_state::deferred_snd_cmd_w));
 }
 
 
@@ -376,6 +378,8 @@ void blaster_state::machine_start()
 
 	m_bankb->configure_entries(1, 16, memregion("maincpu")->base() + 0x10000, 0x0000);
 	m_bankb->configure_entry(0, &m_videoram[0x4000]);
+
+	m_deferred_snd_cmd_w.init(*this, FUNC(blaster_state::deferred_snd_cmd_w));
 
 	/* register for save states */
 	save_item(NAME(m_vram_bank));
