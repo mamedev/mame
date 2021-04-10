@@ -3556,55 +3556,6 @@ ROM_START( totcarnp )
 ROM_END
 
 
-ROM_START( totcarnp3 )
-	ROM_REGION( 0x50000, "adpcm:cpu", 0 )   /* sound CPU */
-	ROM_LOAD (  "sl1_total_carnage_sound_rom_u3.u3", 0x10000, 0x20000, CRC(5bdb4665) SHA1(c6b90b914785b8703790957cc4bb4983a332fba6) )
-	ROM_RELOAD (                                     0x30000, 0x20000 )
-
-	ROM_REGION( 0x100000, "adpcm:oki", 0 )  /* ADPCM */
-	ROM_LOAD ( "sl1_total_carnage_sound_rom_u12.u12", 0x00000, 0x40000, CRC(d0000ac7) SHA1(2d476c7727462623feb2f1a23fb797eaeed5ce30) )
-	ROM_RELOAD(                                       0x40000, 0x40000 )
-	ROM_LOAD ( "sl1_total_carnage_sound_rom_u13.u13", 0x80000, 0x40000, CRC(e48e6f0c) SHA1(bf7d548b6b1901966f99c815129ea160ef36f024) )
-	ROM_RELOAD(                                       0xc0000, 0x40000 )
-
-	ROM_REGION16_LE( 0x100000, "user1", 0 ) /* 34010 code */
-	ROM_LOAD16_BYTE( "proto_v_3.00_total_carnage_game_rom_u105.u105", 0x80000, 0x40000, CRC(6e1cbcfe) SHA1(f9f71ae2e303f26d515561268347f8e154efa772) ) // Yes, these fail internal checksum and show as BAD
-	ROM_LOAD16_BYTE( "proto_v_3.00_total_carnage_game_rom_u89.u89",   0x80001, 0x40000, CRC(c6f22c57) SHA1(dd1d61c183b48153bc3c4d712b55564fa291ac5d) ) // Yes, these fail internal checksum and show as BAD
-
-	ROM_REGION( 0x800000, "gfx1", 0 )
-	ROM_LOAD ( "p3_total_carnage_game_rom_u111.u111", 0x000000, 0x40000, CRC(13f3f231) SHA1(6df0dca72e170818c260d9931477103a38864a1e) ) // == L1 data
-	ROM_LOAD ( "p3_total_carnage_game_rom_u112.u112", 0x040000, 0x40000, CRC(72e45007) SHA1(b6f5dfb844b6ff46a3594d20e85f1f20bdbfb793) ) // == L1 data
-	ROM_LOAD ( "p3_total_carnage_game_rom_u113.u113", 0x080000, 0x0ac00, BAD_DUMP CRC(3bbaf35a) SHA1(736523e11c07c2141d4119b8b33479af3e149efd) ) // == as found is source code release
-	ROM_LOAD ( "p3_total_carnage_game_rom_u114.u114", 0x0c0000, 0x40000, CRC(b0a3faa8) SHA1(8a45b54e8ee72206abb7a443c0e1292cbfd17f8a) ) // unique
-
-	ROM_LOAD ( "p3_total_carnage_game_rom_u95.u95",   0x200000, 0x40000, CRC(579caeba) SHA1(de7d9921a210839e1db4bf54fb96833bcb073862) ) // == L1 data
-	ROM_LOAD ( "p3_total_carnage_game_rom_u96.u96",   0x240000, 0x40000, CRC(f43f1ffe) SHA1(60401092be1fed52a028dc81b7a28ade923c35ea) ) // == L1 data
-	ROM_LOAD ( "p3_total_carnage_game_rom_u97.u97",   0x280000, 0x40000, CRC(c802532a) SHA1(cfe8e3ac1eae7e22d622c51ec8f120e577376f6c) ) // unique
-	ROM_LOAD ( "p3_total_carnage_game_rom_u98.u98",   0x2c0000, 0x40000, CRC(8164c39b) SHA1(fe6740da7409c4b73ffb9d0b4b682738dbd0cdab) ) // unique
-
-	ROM_LOAD ( "p3_total_carnage_game_rom_u106.u106", 0x400000, 0x40000, CRC(146e3863) SHA1(1933e62a060eb667889b1edd5002c30a37ae00a7) ) // == L1 data
-	ROM_LOAD ( "p3_total_carnage_game_rom_u107.u107", 0x440000, 0x40000, CRC(95323320) SHA1(5296206f3d84c21374968ffcacfe59eb3215ca46) ) // == L1 data
-	ROM_LOAD ( "p3_total_carnage_game_rom_u108.u108", 0x480000, 0x40000, CRC(f17fd11c) SHA1(9dd7970f8eea4e528afa625ff3334c08eb8b149f) ) // unique
-	ROM_LOAD ( "p3_total_carnage_game_rom_u109.u109", 0x4c0000, 0x40000, CRC(2c852f0b) SHA1(55aefdcaa4b6ebe1116e117046675638ddffdbda) ) // unique
-
-	ROM_LOAD ( "la1_total_carnage_game_rom_u111.u111", 0x000000, 0x40000, CRC(13f3f231) SHA1(6df0dca72e170818c260d9931477103a38864a1e) ) // Also known to be labeled as PA1
-	ROM_LOAD ( "la1_total_carnage_game_rom_u112.u112", 0x040000, 0x40000, CRC(72e45007) SHA1(b6f5dfb844b6ff46a3594d20e85f1f20bdbfb793) )
-	ROM_LOAD ( "la1_total_carnage_game_rom_u113.u113", 0x080000, 0x40000, CRC(2c8ec753) SHA1(9393179ea19cbec7ac7e4f8e912bb4f86d93e8bd) )
-	ROM_LOAD ( "la1_total_carnage_game_rom_u114.u114", 0x0c0000, 0x40000, CRC(6210c36c) SHA1(607acdf024c1d36238ed19841c3ef2c96f49038f) )
-
-	ROM_LOAD ( "la1_total_carnage_game_rom_u95.u95",   0x200000, 0x40000, CRC(579caeba) SHA1(de7d9921a210839e1db4bf54fb96833bcb073862) )
-	ROM_LOAD ( "la1_total_carnage_game_rom_u96.u96",   0x240000, 0x40000, CRC(f43f1ffe) SHA1(60401092be1fed52a028dc81b7a28ade923c35ea) )
-	ROM_LOAD ( "la1_total_carnage_game_rom_u97.u97",   0x280000, 0x40000, CRC(1675e50d) SHA1(1479712b03fa2b67fcd2d4694f26ce1bd1959b97) )
-	ROM_LOAD ( "la1_total_carnage_game_rom_u98.u98",   0x2c0000, 0x40000, CRC(ab06c885) SHA1(09163060269fed2ebd697b71602166e906c95317) )
-
-	ROM_LOAD ( "la1_total_carnage_game_rom_u106.u106", 0x400000, 0x40000, CRC(146e3863) SHA1(1933e62a060eb667889b1edd5002c30a37ae00a7) )
-	ROM_LOAD ( "la1_total_carnage_game_rom_u107.u107", 0x440000, 0x40000, CRC(95323320) SHA1(5296206f3d84c21374968ffcacfe59eb3215ca46) )
-	ROM_LOAD ( "la1_total_carnage_game_rom_u108.u108", 0x480000, 0x40000, CRC(ed152acc) SHA1(372dbc4fdb581ac00a7eb5669cc1ac7afd6033f8) )
-	ROM_LOAD ( "la1_total_carnage_game_rom_u109.u109", 0x4c0000, 0x40000, CRC(80715252) SHA1(4586a259780963837ce362b526f161122d2e3cb4) )
-ROM_END
-
-
-
 /*************************************
  *
  *  Game drivers
@@ -3673,4 +3624,3 @@ GAME( 1992, mkyawdim4,  mk,       mkyawdim,                mkyawdim, midyunit_st
 
 GAME( 1992, totcarn,    0,        yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  init_totcarn,  ROT0, "Midway",   "Total Carnage (rev LA1 03/10/92)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, totcarnp,   totcarn,  yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  init_totcarn,  ROT0, "Midway",   "Total Carnage (prototype, proto v 1.0 01/25/92)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, totcarnp3,  totcarn,  yunit_adpcm_6bit_fast,   totcarn, midyunit_state,  init_totcarn,  ROT0, "Midway",   "Total Carnage (prototype, proto v 3.00)", MACHINE_SUPPORTS_SAVE )
