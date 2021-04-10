@@ -43,12 +43,6 @@ public:
 	virtual const char *description() const override;
 	virtual const char *extensions() const override;
 	virtual bool supports_save() const override;
-
-protected:
-	//virtual int get_track_dam_fm(const format &f, int head, int track) override;
-
-private:
-	//static const format formats[];
 };
 
 extern const floppy_format_type FLOPPY_JV1_FORMAT;

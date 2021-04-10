@@ -177,7 +177,7 @@ bool jv3_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 				// Make sure we don't have too many sectors
 				if (max_sect >= MAX_SECTORS)
 				{
-					printf("Sector number %d exceeds maximum allowed (MAX_SECTOR).\n",max_sect);
+					printf("Sector number %d exceeds maximum allowed (%d).\n",max_sect,MAX_SECTORS);
 					return false;
 				}
 
