@@ -23220,6 +23220,7 @@ narc1                           // (c) 1988 Williams
 narc2                           // (c) 1988 Williams
 narc3                           // (c) 1988 Williams
 narc4                           // (c) 1988 Williams
+narc6                           // (c) 1988 Williams
 shimpact                        // (c) 1991 Midway
 shimpactp4                      // (c) 1991 Midway
 shimpactp5                      // (c) 1991 Midway
@@ -23238,11 +23239,14 @@ term2lg1                        // (c) 1992 Midway
 term2pa2                        // (c) 1992 Midway
 totcarn                         // (c) 1992 Midway
 totcarnp                        // (c) 1992 Midway
-trog                            // (c) 1990 Midway
-trog3                           // (c) 1990 Midway
-trog4                           // (c) 1990 Midway
-trogpa4                         // (c) 1990 Midway
-trogpa6                         // (c) 1990 Midway
+totcarnp3                       // (c) 1992 Midway
+trog                            // (c) 1990 Midway (rev LA5 3/29/91)
+trog3                           // (c) 1990 Midway (rev LA3 2/14/91)
+trog3a                          // (c) 1990 Midway (rev LA3 2/10/91)
+trog4                           // (c) 1990 Midway (rev LA4 3/11/91)
+trogpa4                         // (c) 1990 Midway (rev 4.00 7/27/90)
+trogpa5                         // (c) 1990 Midway (rev PA5-PAC 8/28/90)
+trogpa6                         // (c) 1990 Midway (rev PA6-PAC 9/09/90)
 
 @source:midzeus.cpp
 crusnexo                        // (c) 1999 Midway (v2.4) Latest offical release
