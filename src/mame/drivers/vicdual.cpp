@@ -3399,6 +3399,33 @@ ROM_START( invho2 )
 	ROM_LOAD( "316-0206.u14", 0x0000, 0x0020, CRC(9617d796) SHA1(7cff2741866095ff42eadd8022bea349ec8d2f39) )    /* control PROM */
 ROM_END
 
+ROM_START( invho2a ) // found on a Gremlin 'EXTENDED ROM VIDEO LOGIC ASSY NO 800-003' PCB, with a 'S-96674-P-BK' sticker and 'rev. D' handwritten
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "326.u33", 0x0000, 0x0400, CRC(35bc6216) SHA1(92a98694807009c41335c2b039a06205102daf44) )
+	ROM_LOAD( "327.u32", 0x0400, 0x0400, CRC(9484a3db) SHA1(73908de15197bfcdbadfd6cadaa8b01863b60e18) )
+	ROM_LOAD( "328.u31", 0x0800, 0x0400, CRC(000cf180) SHA1(685c4bec01a34223cfb68917efdd8873d8d5bac6) )
+	ROM_LOAD( "329.u30", 0x0c00, 0x0400, CRC(12ce15c4) SHA1(56aed8127e02f0ee7ee7a2b617624c8fb968fe7f) )
+	ROM_LOAD( "330.u29", 0x1000, 0x0400, CRC(2f02f721) SHA1(9124eb2eed0cbab02a3f3b5c811da0ef4b1d1a48) )
+	ROM_LOAD( "331.u28", 0x1400, 0x0400, CRC(38f4ab51) SHA1(588c9adbe2cb3c1c287b1f090383ba544b9109fa) )
+	ROM_LOAD( "332.u27", 0x1800, 0x0400, CRC(94b1cacb) SHA1(005e40957926624d8d60cdd96f27c2cfbcd07d6e) )
+	ROM_LOAD( "333.u26", 0x1c00, 0x0400, CRC(455a8f42) SHA1(4609839ff502c128e5692fa6c1ce31e6d32b79eb) )
+	ROM_LOAD( "334.u8",  0x2000, 0x0400, CRC(9c578f37) SHA1(88b97295d0375ada227ade8b9ec5f70086410927) )
+	ROM_LOAD( "335.u7",  0x2400, 0x0400, CRC(56df9e11) SHA1(6e02f0de8621244282504526c99a0e2f5aedf5ed) )
+	ROM_LOAD( "336.u6",  0x2800, 0x0400, CRC(219b2513) SHA1(c5f92c266d6cd82d36961aefbbf8b4d522824e82) )
+	ROM_LOAD( "337.u5",  0x2c00, 0x0400, CRC(d6410227) SHA1(bcdace3d0759df5e6f7dd10a9541db551b129399) )
+	ROM_LOAD( "338.u4",  0x3000, 0x0400, CRC(e4550755) SHA1(f5874cb0d0a8e950de555762cc5bb6697e04888f) )
+	ROM_LOAD( "339.u3",  0x3400, 0x0400, CRC(426dd538) SHA1(cf591b380895478d54018cfbe5fb41c24146c2ea) )
+	ROM_LOAD( "340.u2",  0x3800, 0x0400, CRC(aec47500) SHA1(4500a63967b2b2c52d41cbde9e5e6fe3d39322c2) )
+	ROM_LOAD( "341.u1",  0x3c00, 0x0400, CRC(0b7a0607) SHA1(bdb58da071d9b7d2796b3f244c6a95ce1c9f2833) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "pr-16.u49", 0x0000, 0x0020, CRC(733eac6f) SHA1(3cf488155992977875a76f8aa0ce73c1faf8a1a4) ) // TODO: multiple dump attempts give consistent results, but with this Head On 2 is completely black, while Invinco shows unexpected colors
+
+	ROM_REGION( 0x0040, "user1", 0 )    // timing PROMs
+	ROM_LOAD( "pr-34.u14", 0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )
+	ROM_LOAD( "7603.u15",  0x0020, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) ) // label was peeled off (guess: pr-33)
+ROM_END
+
 ROM_START( sspacaho )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-0001.bin", 0x0000, 0x0800, CRC(ba62f57a) SHA1(7cfc079c6afe317b6c389c06802fdf1f83858510) )
@@ -4120,7 +4147,8 @@ GAME( 1979, hocrash,    headon,   headons,   hocrash,   vicdual_state,  empty_in
 GAME( 1979, headon2,    0,        headon2,   headon2,   vicdual_state,  empty_init, ROT0,   "Sega", "Head On 2",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headon2s,   headon2,  headon2bw, headon2s,  headonsa_state, empty_init, ROT0,   "bootleg (Sidam)", "Head On 2 (Sidam bootleg)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, car2,       headon2,  headon2bw, car2,      vicdual_state,  empty_init, ROT0,   "bootleg (RZ Bologna)", "Car 2 (bootleg of Head On 2)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // title still says 'HeadOn 2'
-GAME( 1979, invho2,     0,        invho2,    invho2,    vicdual_state,  empty_init, ROT270, "Sega", "Invinco / Head On 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, invho2,     0,        invho2,    invho2,    vicdual_state,  empty_init, ROT270, "Sega", "Invinco / Head On 2 (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, invho2a,    invho2,   invho2,    invho2,    vicdual_state,  empty_init, ROT270, "Sega", "Invinco / Head On 2 (set 2)", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // wrong colors make Head On 2 unplayable (all black)
 GAME( 1980, nsub,       0,        nsub,      nsub,      nsub_state,     empty_init, ROT270, "Sega", "N-Sub (upright)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // this is the upright set. cocktail set still needs to be dumped
 GAME( 1980, samurai,    0,        samurai,   samurai,   vicdual_state,  empty_init, ROT270, "Sega", "Samurai", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, invinco,    0,        invinco,   invinco,   vicdual_state,  empty_init, ROT270, "Sega", "Invinco", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
