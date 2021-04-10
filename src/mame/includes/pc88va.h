@@ -11,7 +11,7 @@
 #ifndef MAME_INCLUDES_PC88VA_H
 #define MAME_INCLUDES_PC88VA_H
 
-#include "cpu/nec/nec.h"
+#include "cpu/nec/v5x.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "machine/am9517a.h"

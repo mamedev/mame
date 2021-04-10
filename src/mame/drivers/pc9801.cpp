@@ -3214,18 +3214,47 @@ void pc9801_state::init_pc9801vm_kanji()
 	}
 }
 
+// "vanilla" class (i86, E/F/M)
 COMP( 1983, pc9801f,    0,        0, pc9801,    pc9801,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801F",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // genuine dump
 
-// VM class
+// N5200 (started as a vanilla PC-98 business line derivative, eventually diverged into its own thing and incorporated various Hyper 98 features)
+// APC III (US version of N5200?)
+// ...
+
+// VM class (V30 and/or i286)
 COMP( 1985, pc9801vm,   pc9801ux, 0, pc9801vm,  pc9801rs, pc9801_state, init_pc9801vm_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // genuine dump
-COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1985, pc9801vm11, pc9801ux, 0, pc9801vm,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801VM11",                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-// 386+ class
-COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801RS",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) //TODO: identify proper model
+COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// VX class (first model using an EGC)
+// ...
+
+// XA/XL class (1120 x 750 true color, nicknamed "High-reso")
+// ...
+
+// PC-H98 (Hyper 98, '90-'93 high end line with High-reso, proprietary NESA bus, E²GC)
+// PC-H98T (LCD Hyper 98)
+// SV-H98
+// ...
+
+// RX class (i386SX)
+COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801RS",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1988, pc9801rx,   pc9801rs, 0, pc9801rs,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801RX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// FA class (i486SX)
 COMP( 1993, pc9801bx2,  pc9801rs, 0, pc9801bx2, pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801BX2/U2",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-// PC9821
-COMP( 1994, pc9821,     0,        0, pc9821,    pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) //TODO: identify proper model
+
+// PC-98GS (Multimedia PC, exclusive video mode "Extended Screen Graphics", -73 sound board (a superset of later -86))
+// ...
+
+// Epson class
+COMP( 1990, pc386m,     0,        0, pc386m,    pc9801rs, pc9801_state, init_pc9801_kanji,   "Epson", "PC-386M",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1994, pc486mu,    0,        0, pc486mu,   pc9821,   pc9801_state, init_pc9801_kanji,   "Epson", "PC-486MU",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1993, pc486se,    pc486mu,  0, pc486se,   pc9801rs, pc9801_state, init_pc9801_kanji,   "Epson", "PC-486SE",					   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// PC9821 class
+// TODO: unknown real model of parent, given the BIOS rom size it may be better suited as a "98Multi"?
+// investigate by making genuine BIOS dumps to boot
+COMP( 1994, pc9821,     0,        0, pc9821,    pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1993, pc9821as,   pc9821,   0, pc9821as,  pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE A)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1993, pc9821ap2,  pc9821,   0, pc9821ap2, pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821AP2/U8W (98MATE A)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1994, pc9821xs,   pc9821,   0, pc9821,    pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE Xs)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
@@ -3235,10 +3264,9 @@ COMP( 1996, pc9821xa16, pc9821,   0, pc9821xa16,pc9821,   pc9801_state, init_pc9
 COMP( 1996, pc9821ra20, pc9821,   0, pc9821ra20,pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra20 (98MATE R)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1998, pc9821v13,  pc9821,   0, pc9821,    pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE VALUESTAR 13)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1998, pc9821v20,  pc9821,   0, pc9821v20, pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE VALUESTAR 20)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-// Epson clones
-// TODO: dump chargen/kanji roms to pinpoint proper parent-clone relationships
-COMP( 1990, pc386m,     0,        0, pc386m,    pc9801rs, pc9801_state, init_pc9801_kanji,   "Epson", "PC-386M",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1994, pc486mu,    0,        0, pc486mu,   pc9821,   pc9801_state, init_pc9801_kanji,   "Epson", "PC-486MU",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1993, pc486se,    pc486mu,  0, pc486se,   pc9801rs, pc9801_state, init_pc9801_kanji,   "Epson", "PC-486SE",					   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-// PC98DO (PC88+PC98)
-// PC98HA (LCD version)
+
+// PC98DO (PC88+PC98, V33 + μPD70008AC)
+// PC-98LT, HANDY98 (LCD version, V50)
+// PC-98HA (LCD version)
+// RC-9801 (color LCD, i386SX)
+// PC-9801P (LCD with light pen)

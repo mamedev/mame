@@ -3307,7 +3307,9 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="agumixsl">
+	<!-- boot OK, rectangle selections are doubled to expected behaviour (cfr. main menu, "select" option) -->
+	<!-- Doesn't setup GFX properly in non-interlace mode (double height everything) -->
+	<software name="agumixsl" supported="partial">
 		<description>Agumix Selects! - Agumix Select Tokusen Graphic Shuu</description>
 		<year>1992</year>
 		<publisher>アグミックス (Agumix)</publisher>
