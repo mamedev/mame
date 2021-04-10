@@ -32,6 +32,19 @@ protected:
 		uint32_t noise_counter;
 		int32_t noise_hold;
 		int32_t waveform_select;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(frequency))
+				.reg(NAME(counter))
+				.reg(NAME(volume))
+				.reg(NAME(noise_sw))
+				.reg(NAME(noise_state))
+				.reg(NAME(noise_seed))
+				.reg(NAME(noise_hold))
+				.reg(NAME(noise_counter))
+				.reg(NAME(waveform_select));
+		}
 	};
 
 	namco_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -39,6 +52,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_clock_changed() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	// internal state
 
@@ -86,6 +100,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
@@ -106,6 +121,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 

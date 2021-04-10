@@ -103,15 +103,6 @@ void namco_audio_device::device_start()
 	/* start with sound enabled, many games don't have a sound enable register */
 	m_sound_enable = true;
 
-	/* register with the save state system */
-	if (m_wave_ptr == nullptr)
-		save_pointer(NAME(m_wavedata), 0x400);
-
-	save_item(NAME(m_voices));
-	save_item(NAME(m_sound_enable));
-	for (int v = 0; v < MAX_VOLUME; v++)
-		save_pointer(NAME(m_waveform[v]), 32 * 8 * (1+m_wave_size), v);
-
 	/* reset all the voices */
 	for (sound_channel *voice = m_channel_list; voice < m_last_channel; voice++)
 	{
@@ -125,17 +116,19 @@ void namco_audio_device::device_start()
 		voice->noise_counter = 0;
 		voice->noise_hold = 0;
 	}
+}
 
-	/* register with the save state system */
-	save_pointer(STRUCT_MEMBER(m_channel_list, frequency), m_voices);
-	save_pointer(STRUCT_MEMBER(m_channel_list, counter), m_voices);
-	save_pointer(STRUCT_MEMBER(m_channel_list, volume), m_voices);
-	save_pointer(STRUCT_MEMBER(m_channel_list, noise_sw), m_voices);
-	save_pointer(STRUCT_MEMBER(m_channel_list, noise_state), m_voices);
-	save_pointer(STRUCT_MEMBER(m_channel_list, noise_seed), m_voices);
-	save_pointer(STRUCT_MEMBER(m_channel_list, noise_hold), m_voices);
-	save_pointer(STRUCT_MEMBER(m_channel_list, noise_counter), m_voices);
-	save_pointer(STRUCT_MEMBER(m_channel_list, waveform_select), m_voices);
+void namco_audio_device::device_register_save(save_registrar &save)
+{
+	if (m_wave_ptr == nullptr)
+		save.reg(NAME(m_wavedata), 0x400);
+
+	save.reg(NAME(m_sound_enable));
+	for (int v = 0; v < MAX_VOLUME; v++)
+		save.reg(m_waveform[v], string_format("waveform[%d]", v).c_str(), 32 * 8 * (1+m_wave_size));
+
+//	save.reg(NAME(m_channel_list), m_voices);
+	save.reg(NAME(m_channel_list));
 }
 
 
@@ -144,7 +137,12 @@ void namco_device::device_start()
 	namco_audio_device::device_start();
 
 	m_soundregs = make_unique_clear<uint8_t[]>(0x400);
-	save_pointer(NAME(m_soundregs), 0x400);
+}
+
+void namco_device::device_register_save(save_registrar &save)
+{
+	namco_audio_device::device_register_save(save);
+	save.reg(NAME(m_soundregs), 0x400);
 }
 
 
@@ -153,7 +151,12 @@ void namco_15xx_device::device_start()
 	namco_audio_device::device_start();
 
 	m_soundregs = make_unique_clear<uint8_t[]>(0x400);
-	save_pointer(NAME(m_soundregs), 0x400);
+}
+
+void namco_15xx_device::device_register_save(save_registrar &save)
+{
+	namco_audio_device::device_register_save(save);
+	save.reg(NAME(m_soundregs), 0x400);
 }
 
 

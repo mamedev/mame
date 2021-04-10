@@ -663,9 +663,7 @@ public:
 	// register for saves
 	void register_save(save_registrar &save)
 	{
-		int index = 0;
-		for (auto &tmap : m_tilemap_list)
-			save.reg(tmap, string_format("%d", index++).c_str());
+		save.reg(NAME(m_tilemap_list));
 	}
 
 private:
@@ -784,7 +782,7 @@ protected:
 	virtual void device_start() override;
 
 	// register for save states
-	void device_register_save(save_registrar &save) override
+	virtual void device_register_save(save_registrar &save) override
 	{
 		save.reg(*static_cast<tilemap_t *>(this), "tilemap");
 	}

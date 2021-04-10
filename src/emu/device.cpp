@@ -105,6 +105,7 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 	, m_config_complete(false)
 	, m_started(false)
 	, m_auto_finder_list(nullptr)
+	, m_save_registrations(0)
 {
 	if (owner != nullptr)
 		m_tag.assign((owner->owner() == nullptr) ? "" : owner->tag()).append(":").append(tag);
@@ -575,22 +576,10 @@ void device_t::start()
 	for (device_interface &intf : interfaces())
 		intf.interface_pre_start();
 
-	// remember the number of state registrations
+	// start the device, tracking how many state registrations they did
 	int state_registrations = machine().save().registration_count();
-
-	// start the device
 	device_start();
-
-	// complain if nothing was registered by the device
-	state_registrations = machine().save().registration_count() - state_registrations;
-	device_execute_interface *exec;
-	device_sound_interface *sound;
-	if (state_registrations == 0 && (interface(exec) || interface(sound)) && type() != SPEAKER)
-	{
-		logerror("Device did not register any state to save!\n");
-		if ((machine().system().flags & MACHINE_SUPPORTS_SAVE) != 0)
-			fatalerror("Device '%s' did not register any state to save!\n", tag());
-	}
+	m_save_registrations += machine().save().registration_count() - state_registrations;
 
 	// let the interfaces do their post-work
 	for (device_interface &intf : interfaces())
@@ -707,7 +696,19 @@ void device_t::register_save(save_registrar &save)
 		intf.interface_register_save(save);
 
 	// notify the device
+	int state_registrations = machine().save().registration_count();
 	device_register_save(save);
+	m_save_registrations += machine().save().registration_count() - state_registrations;
+
+	// complain if registrations didn't happen
+	device_execute_interface *exec;
+	device_sound_interface *sound;
+	if (state_registrations == 0 && (interface(exec) || interface(sound)) && type() != SPEAKER)
+	{
+		logerror("Device did not register any state to save!\n");
+		if ((machine().system().flags & MACHINE_SUPPORTS_SAVE) != 0)
+			fatalerror("Device '%s' did not register any state to save!\n", tag());
+	}
 }
 
 

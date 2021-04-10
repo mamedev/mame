@@ -124,12 +124,23 @@ void ym2151_device::device_start()
 	// call this for the variants that need to adjust the rate
 	device_clock_changed();
 
+	// initialize the FM engine
+	m_fm.init();
+}
+
+
+//-------------------------------------------------
+//  device_register_save - register for save state
+//-------------------------------------------------
+
+void ym2151_device::device_register_save(save_registrar &save)
+{
 	// save our data
-	save_item(YMFM_NAME(m_address));
-	save_item(YMFM_NAME(m_reset_state));
+	save.reg(NAME(m_address))
+		.reg(NAME(m_reset_state));
 
 	// save the engines
-	m_fm.save(*this);
+	m_fm.register_save(save);
 }
 
 

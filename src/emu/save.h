@@ -89,16 +89,23 @@ typedef named_delegate<void ()> save_prepost_delegate;
 
 class save_registered_item
 {
+	using generic_unique = std::unique_ptr<int> const;
+	using generic_vector = std::vector<int> const;
+	using generic_pointer = void * const;
+
 public:
 	enum save_type : uint32_t
 	{
-		TYPE_ARRAY = 0xffff0000,
-		TYPE_CONTAINER,
-		TYPE_STRUCT,
-		TYPE_BOOL,
-		TYPE_INT,
-		TYPE_UINT,
-		TYPE_FLOAT
+		TYPE_ARRAY = 0xffff0000, // array is relative, and contains 1 data item that is replicated
+		TYPE_CONTAINER,		// container is absolute, and contains absolute data
+		TYPE_POINTER,		// pointer is absolute, and contains 1 data item pointed to by the pointer
+		TYPE_UNIQUE,		// unique is relative, and contains 1 data item pointed to by std::unique_ptr
+		TYPE_VECTOR,		// vector is relative, and contains an array of items pointed to by std::vector
+		TYPE_STRUCT,		// struct is relative, and contains a list of relative items
+		TYPE_BOOL,			// bool is relative, size 1
+		TYPE_INT,			// int is relative, same size as native
+		TYPE_UINT,			// uint is relative, same size as native
+		TYPE_FLOAT			// float is relative, same size as native
 	};
 
 	// root constructor
@@ -111,13 +118,13 @@ public:
     save_registered_item &append(uintptr_t ptr_offset, save_type type, uint32_t native_size, char const *name);
 
 	// compute the binary size by just saving with a null
-	uint64_t compute_binary_size() { return save_binary(nullptr, 0); }
+	uint64_t compute_binary_size(uintptr_t objbase = 0) const { return save_binary(nullptr, 0, objbase); }
 
 	// save this item and all owned items into a binary form
-	uint64_t save_binary(uint8_t *ptr, uint64_t length, uintptr_t objbase = 0);
+	uint64_t save_binary(uint8_t *ptr, uint64_t length, uintptr_t objbase = 0) const;
 
 	// restore this item and all owned items from binary form
-	uint64_t restore_binary(uint8_t const *ptr, uint64_t length, uintptr_t objbase = 0);
+	uint64_t restore_binary(uint8_t const *ptr, uint64_t length, uintptr_t objbase = 0) const;
 
 	// save this item into a JSON stream
 	void save_json(std::ostringstream &output, int indent = 0, bool inline_form = false, uintptr_t objbase = 0);
@@ -143,70 +150,101 @@ class save_registrar
 {
 	friend class save_manager;
 
+	// extended constructor for internal use only
+	save_registrar(save_registrar &parent, save_registered_item::save_type type, uint32_t native_size, char const *name, void *baseptr = nullptr, void *containerbase = nullptr) :
+		m_parent(parent.parent_item().append((baseptr == nullptr) ? 0 : uintptr_t(baseptr) - parent.m_baseptr, type, native_size, name)),
+		m_baseptr((containerbase == nullptr) ? uintptr_t(baseptr) : uintptr_t(containerbase))
+	{
+	}
+
 public:
 	// construct a container within parent
 	save_registrar(save_registrar &parent, char const *name) :
-		m_parent(parent.parent_item().append(0, save_registered_item::TYPE_CONTAINER, 0, name)),
-		m_baseptr(0)
+		save_registrar(parent, save_registered_item::TYPE_CONTAINER, 0, name)
 	{
 	}
 
 	// return a reference to the parent item
 	save_registered_item &parent_item() const { return m_parent; }
 
-    // enum types
-    template<typename T, std::enable_if_t<std::is_enum<T>::value, bool> = true>
-    save_registrar &reg(T &data, char const *name) { return register_internal(&data, save_registered_item::TYPE_INT, sizeof(data), name); }
+    // enum types -- these are equivalent to ints of the save size
+    template<typename T>
+    std::enable_if_t<std::is_enum<T>::value, save_registrar> &reg(T &data, char const *name)
+	{
+		return register_internal(&data, save_registered_item::TYPE_INT, sizeof(data), name);
+	}
 
     // signed integral types
-    template<typename T, std::enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value, bool> = true>
-    save_registrar &reg(T &data, char const *name) { return register_internal(&data, save_registered_item::TYPE_INT, sizeof(data), name); }
+    template<typename T>
+    std::enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value, save_registrar> &reg(T &data, char const *name)
+	{
+		return register_internal(&data, save_registered_item::TYPE_INT, sizeof(data), name);
+	}
 
     // unsigned integral types
-    template<typename T, std::enable_if_t<std::is_integral<T>::value && std::is_unsigned<T>::value, bool> = true>
-    save_registrar &reg(T &data, char const *name) { return register_internal(&data, save_registered_item::TYPE_UINT, sizeof(data), name); }
+    template<typename T>
+    std::enable_if_t<std::is_integral<T>::value && std::is_unsigned<T>::value, save_registrar> &reg(T &data, char const *name)
+	{
+		return register_internal(&data, save_registered_item::TYPE_UINT, sizeof(data), name);
+	}
 
     // floating-point types
-    template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
-    save_registrar &reg(T &data, char const *name) { return register_internal(&data, save_registered_item::TYPE_FLOAT, sizeof(data), name); }
-
-	// unique_ptrs
-	template<typename T>
-	save_registrar &reg(std::unique_ptr<T> &dataptr, char const *name)
+    template<typename T>
+    std::enable_if_t<std::is_floating_point<T>::value, save_registrar> &reg(T &data, char const *name)
 	{
-		if (dataptr.get() == nullptr)
+		return register_internal(&data, save_registered_item::TYPE_FLOAT, sizeof(data), name);
+	}
+
+	// unique_ptrs -- these are containers with a single "unique" item within
+	template<typename T>
+	save_registrar &reg(std::unique_ptr<T> &data, char const *name)
+	{
+		if (data.get() == nullptr)
 			throw emu_fatalerror("Passed null pointer to save state registration.");
-		reg(*dataptr.get(), name);
+
+		save_registrar container(*this, save_registered_item::TYPE_UNIQUE, sizeof(data), "", &data, data.get());
+		container.reg(*data.get(), name);
 		return *this;
 	}
 
-    // arrays
+    // arrays -- these are containers with a single item representing the underlying data,
+	// which is replicated across the whole array
     template<typename T, std::size_t N>
     save_registrar &reg(T (&data)[N], char const *name)
     {
-        auto &item = m_parent.append(uintptr_t(&data[0]) - m_baseptr, save_registered_item::save_type(N), sizeof(data[0]), name);
-        save_registrar sub(item, &data[0]);
-        sub.reg(data[0], "");
+		save_registrar container(*this, save_registered_item::save_type(N), sizeof(data[0]), name, &data[0]);
+        container.reg(data[0], "");
         return *this;
     }
 
-    // vectors
+    // vectors -- these are treated as arrays, with the size coming from the vector
     template<typename T>
     save_registrar &reg(std::vector<T> &data, char const *name)
     {
-        auto &item = m_parent.append(uintptr_t(&data[0]) - m_baseptr, save_registered_item::save_type(data.size()), sizeof(data[0]), name);
-        save_registrar sub(item, &data[0]);
-        sub.reg(data[0], "");
+		// skip if nothing
+		if (data.size() == 0)
+			return *this;
+
+		// create an outer container for the vector
+		save_registrar container(*this, save_registered_item::TYPE_VECTOR, sizeof(data), "", &data, &data[0]);
+
+		// then an array container within
+		save_registrar subcontainer(container, save_registered_item::save_type(data.size()), sizeof(data[0]), name, &data[0]);
+		subcontainer.reg(data[0], "");
         return *this;
     }
 
 	// unique_ptrs with arrays
 	template<typename T>
-	save_registrar &reg(std::unique_ptr<T[]> &dataptr, char const *name, std::size_t count)
+	save_registrar &reg(std::unique_ptr<T[]> &data, char const *name, std::size_t count)
 	{
-		if (dataptr.get() == nullptr)
+		if (data.get() == nullptr)
 			throw emu_fatalerror("Passed null pointer to save state registration.");
-		reg(dataptr.get(), name, count);
+
+		save_registrar container(*this, save_registered_item::TYPE_UNIQUE, sizeof(data), "", &data, &data[0]);
+
+		save_registrar subcontainer(container, save_registered_item::save_type(count), sizeof(data[0]), name, &data[0]);
+		subcontainer.reg(data[0], "");
 		return *this;
 	}
 
@@ -216,9 +254,9 @@ public:
 	{
 		if (dataptr == nullptr)
 			throw emu_fatalerror("Passed null pointer to save state registration.");
-		auto &item = m_parent.append(uintptr_t(dataptr) - m_baseptr, save_registered_item::save_type(sizeof(*dataptr) * count), sizeof(*dataptr), name);
-		save_registrar sub(item, dataptr);
-		sub.reg(dataptr[0], "");
+
+		save_registrar container(*this, save_registered_item::save_type(count), sizeof(dataptr), name, &dataptr, dataptr);
+		container.reg(dataptr[0], "");
 		return *this;
 	}
 
@@ -226,9 +264,8 @@ public:
     template<typename T, std::enable_if_t<std::is_class<T>::value, bool> = true>
     save_registrar &reg(T &data, char const *name)
     {
-        auto &item = m_parent.append(uintptr_t(&data) - m_baseptr, save_registered_item::TYPE_STRUCT, sizeof(data), name);
-        save_registrar sub(item, &data);
-        data.register_save(sub);
+		save_registrar container(*this, save_registered_item::TYPE_STRUCT, sizeof(data), name, &data);
+        data.register_save(container);
         return *this;
     }
 
@@ -344,7 +381,7 @@ public:
 	// getters
 	running_machine &machine() const { return m_machine; }
 	rewinder *rewind() { return m_rewind.get(); }
-	int registration_count() const { return m_entry_list.size(); }
+	int registration_count() const { return m_entry_list.size() + m_root_item.compute_binary_size(); }
 	bool registration_allowed() const { return m_reg_allowed; }
 
 	// registration control

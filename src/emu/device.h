@@ -860,6 +860,7 @@ private:
 	std::list<devcb_base *> m_callbacks;
 	std::vector<memory_view *> m_viewlist;          // list of views
 	std::unique_ptr<save_registrar> m_legacy_save;  // bucket for legacy save stuff
+	int						m_save_registrations;	// number of save registrations
 
 	// string formatting buffer for logerror
 	mutable util::ovectorstream m_string_buffer;

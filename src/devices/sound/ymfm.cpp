@@ -745,18 +745,18 @@ ymopm_registers::ymopm_registers() :
 
 
 //-------------------------------------------------
-//  save - register for save states
+//  register_save - register for save states
 //-------------------------------------------------
 
-void ymopm_registers::save(device_t &device)
+void ymopm_registers::register_save(save_registrar &save)
 {
-	device.save_item(YMFM_NAME(m_lfo_counter));
-	device.save_item(YMFM_NAME(m_lfo_am));
-	device.save_item(YMFM_NAME(m_noise_lfsr));
-	device.save_item(YMFM_NAME(m_noise_counter));
-	device.save_item(YMFM_NAME(m_noise_state));
-	device.save_item(YMFM_NAME(m_noise_lfo));
-	device.save_item(YMFM_NAME(m_regdata));
+	save.reg(NAME(m_lfo_counter))
+		.reg(NAME(m_lfo_am))
+		.reg(NAME(m_noise_lfsr))
+		.reg(NAME(m_noise_counter))
+		.reg(NAME(m_noise_state))
+		.reg(NAME(m_noise_lfo))
+		.reg(NAME(m_regdata));
 }
 
 
@@ -1063,18 +1063,18 @@ ymopn_registers_base<IsOpnA>::ymopn_registers_base() :
 
 
 //-------------------------------------------------
-//  save - register for save states
+//  register_save - register for save states
 //-------------------------------------------------
 
 template<bool IsOpnA>
-void ymopn_registers_base<IsOpnA>::save(device_t &device)
+void ymopn_registers_base<IsOpnA>::register_save(save_registrar &save)
 {
 	if (IsOpnA)
 	{
-		device.save_item(YMFM_NAME(m_lfo_counter));
-		device.save_item(YMFM_NAME(m_lfo_am));
+		save.reg(NAME(m_lfo_counter))
+			.reg(NAME(m_lfo_am));
 	}
-	device.save_item(YMFM_NAME(m_regdata));
+	save.reg(NAME(m_regdata));
 }
 
 
@@ -1472,17 +1472,17 @@ ymopl_registers_base<Revision>::ymopl_registers_base() :
 
 
 //-------------------------------------------------
-//  save - register for save states
+//  register_save - register for save states
 //-------------------------------------------------
 
 template<int Revision>
-void ymopl_registers_base<Revision>::save(device_t &device)
+void ymopl_registers_base<Revision>::register_save(save_registrar &save)
 {
-	device.save_item(YMFM_NAME(m_lfo_am_counter));
-	device.save_item(YMFM_NAME(m_lfo_pm_counter));
-	device.save_item(YMFM_NAME(m_lfo_am));
-	device.save_item(YMFM_NAME(m_noise_lfsr));
-	device.save_item(YMFM_NAME(m_regdata));
+	save.reg(NAME(m_lfo_am_counter))
+		.reg(NAME(m_lfo_pm_counter))
+		.reg(NAME(m_lfo_am))
+		.reg(NAME(m_noise_lfsr))
+		.reg(NAME(m_regdata));
 }
 
 
@@ -1819,16 +1819,16 @@ ymopll_registers::ymopll_registers() :
 
 
 //-------------------------------------------------
-//  save - register for save states
+//  register_save - register for save states
 //-------------------------------------------------
 
-void ymopll_registers::save(device_t &device)
+void ymopll_registers::register_save(save_registrar &save)
 {
-	device.save_item(YMFM_NAME(m_lfo_am_counter));
-	device.save_item(YMFM_NAME(m_lfo_pm_counter));
-	device.save_item(YMFM_NAME(m_lfo_am));
-	device.save_item(YMFM_NAME(m_noise_lfsr));
-	device.save_item(YMFM_NAME(m_regdata));
+	save.reg(NAME(m_lfo_am_counter))
+		.reg(NAME(m_lfo_pm_counter))
+		.reg(NAME(m_lfo_am))
+		.reg(NAME(m_noise_lfsr))
+		.reg(NAME(m_regdata));
 }
 
 
@@ -2103,21 +2103,19 @@ ymfm_operator<RegisterType>::ymfm_operator(ymfm_engine_base<RegisterType> &owner
 
 
 //-------------------------------------------------
-//  save - register for save states
+//  register_save - register for save states
 //-------------------------------------------------
 
-ALLOW_SAVE_TYPE(ymfm_envelope_state);
-
 template<class RegisterType>
-void ymfm_operator<RegisterType>::save(device_t &device, u32 index)
+void ymfm_operator<RegisterType>::register_save(save_registrar &save)
 {
 	// save our data
-	device.save_item(YMFM_NAME(m_phase), index);
-	device.save_item(YMFM_NAME(m_env_attenuation), index);
-	device.save_item(YMFM_NAME(m_env_state), index);
-	device.save_item(YMFM_NAME(m_ssg_inverted), index);
-	device.save_item(YMFM_NAME(m_key_state), index);
-	device.save_item(YMFM_NAME(m_keyon_live), index);
+	save.reg(NAME(m_phase))
+		.reg(NAME(m_env_attenuation))
+		.reg(NAME(m_env_state))
+		.reg(NAME(m_ssg_inverted))
+		.reg(NAME(m_key_state))
+		.reg(NAME(m_keyon_live));
 }
 
 
@@ -2518,15 +2516,15 @@ ymfm_channel<RegisterType>::ymfm_channel(ymfm_engine_base<RegisterType> &owner, 
 
 
 //-------------------------------------------------
-//  save - register for save states
+//  register_save - register for save states
 //-------------------------------------------------
 
 template<class RegisterType>
-void ymfm_channel<RegisterType>::save(device_t &device, u32 index)
+void ymfm_channel<RegisterType>::register_save(save_registrar &save)
 {
 	// save our data
-	device.save_item(YMFM_NAME(m_feedback), index);
-	device.save_item(YMFM_NAME(m_feedback_in), index);
+	save.reg(NAME(m_feedback))
+		.reg(NAME(m_feedback_in));
 }
 
 
@@ -2893,37 +2891,38 @@ ymfm_engine_base<RegisterType>::ymfm_engine_base(device_t &device) :
 
 
 //-------------------------------------------------
-//  save - register for save states
+//  init - initialize our state
 //-------------------------------------------------
 
 template<class RegisterType>
-void ymfm_engine_base<RegisterType>::save(device_t &device)
+void ymfm_engine_base<RegisterType>::init()
 {
 	// allocate our timers
 	for (int tnum = 0; tnum < 2; tnum++)
-		m_timer[tnum] = device.machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ymfm_engine_base::timer_handler), this));
+		m_timer[tnum] = m_device.machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ymfm_engine_base::timer_handler), this));
 
 	// resolve the IRQ handler while we're here
 	m_irq_handler.resolve();
+}
 
+
+//-------------------------------------------------
+//  register_save - register for save states
+//-------------------------------------------------
+
+template<class RegisterType>
+void ymfm_engine_base<RegisterType>::register_save(save_registrar &save)
+{
 	// save our data
-	device.save_item(YMFM_NAME(m_env_counter));
-	device.save_item(YMFM_NAME(m_status));
-	device.save_item(YMFM_NAME(m_clock_prescale));
-	device.save_item(YMFM_NAME(m_irq_mask));
-	device.save_item(YMFM_NAME(m_irq_state));
-	device.save_item(YMFM_NAME(m_busy_end));
-
-	// save the register/family data
-	m_regs.save(device);
-
-	// save channel data
-	for (int chnum = 0; chnum < CHANNELS; chnum++)
-		m_channel[chnum]->save(device, chnum);
-
-	// save operator data
-	for (int opnum = 0; opnum < OPERATORS; opnum++)
-		m_operator[opnum]->save(device, opnum);
+	save.reg(NAME(m_env_counter))
+		.reg(NAME(m_status))
+		.reg(NAME(m_clock_prescale))
+		.reg(NAME(m_irq_mask))
+		.reg(NAME(m_irq_state))
+		.reg(NAME(m_busy_end))
+		.reg(NAME(m_channel))
+		.reg(NAME(m_operator))
+		.reg(NAME(m_regs));
 }
 
 

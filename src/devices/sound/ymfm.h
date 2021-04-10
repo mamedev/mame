@@ -312,7 +312,7 @@ public:
 	ymopm_registers();
 
 	// register for save states
-	void save(device_t &device);
+	void register_save(save_registrar &save);
 
 	// reset to initial state
 	void reset();
@@ -518,7 +518,7 @@ public:
 	ymopn_registers_base();
 
 	// register for save states
-	void save(device_t &device);
+	void register_save(save_registrar &save);
 
 	// reset to initial state
 	void reset();
@@ -735,7 +735,7 @@ public:
 	ymopl_registers_base();
 
 	// register for save states
-	void save(device_t &device);
+	void register_save(save_registrar &save);
 
 	// reset to initial state
 	void reset();
@@ -948,7 +948,7 @@ public:
 	ymopll_registers();
 
 	// register for save states
-	void save(device_t &device);
+	void register_save(save_registrar &save);
 
 	// reset to initial state
 	void reset();
@@ -1113,7 +1113,7 @@ public:
 	ymfm_operator(ymfm_engine_base<RegisterType> &owner, u32 opoffs);
 
 	// register for save states
-	void save(device_t &device, u32 index);
+	void register_save(save_registrar &save);
 
 	// reset the operator state
 	void reset();
@@ -1185,7 +1185,7 @@ public:
 	ymfm_channel(ymfm_engine_base<RegisterType> &owner, u32 choffs);
 
 	// register for save states
-	void save(device_t &device, u32 index);
+	void register_save(save_registrar &save);
 
 	// reset the channel state
 	void reset();
@@ -1279,8 +1279,11 @@ public:
 	// configuration helpers
 	auto irq_handler() { return m_irq_handler.bind(); }
 
+	// initialize our state
+	void init();
+
 	// register for save states
-	void save(device_t &device);
+	void register_save(save_registrar &device);
 
 	// reset the overall state
 	void reset();

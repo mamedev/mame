@@ -1031,7 +1031,7 @@ void save_manager::state_entry::flip_data()
 
 save_registered_item::save_registered_item() :
 	m_ptr_offset(0),
-	m_type(TYPE_STRUCT),
+	m_type(TYPE_CONTAINER),
 	m_native_size(0)
 {
 }
@@ -1043,6 +1043,9 @@ save_registered_item::save_registered_item(uintptr_t ptr_offset, save_type type,
 	m_native_size(native_size),
 	m_name(name)
 {
+	// cleanup names a bit
+	if (m_name[0] == '*')
+		m_name.erase(0, 1);
 	if (m_name[0] == 'm' && m_name[1] == '_')
 		m_name.erase(0, 2);
 }
@@ -1052,8 +1055,26 @@ save_registered_item::save_registered_item(uintptr_t ptr_offset, save_type type,
 //  append - append a new item to the current one
 //-------------------------------------------------
 
+static std::string type_string(save_registered_item::save_type type, uint32_t native_size)
+{
+	switch (type)
+	{
+	case save_registered_item::TYPE_CONTAINER:	return "CONTAINER";
+	case save_registered_item::TYPE_POINTER:	return "POINTER";
+	case save_registered_item::TYPE_UNIQUE:		return "UNIQUE";
+	case save_registered_item::TYPE_VECTOR:		return "VECTOR";
+	case save_registered_item::TYPE_STRUCT:		return "STRUCT";
+	case save_registered_item::TYPE_BOOL:		return "BOOL";
+	case save_registered_item::TYPE_INT:		return string_format("INT%d", 8 * native_size);
+	case save_registered_item::TYPE_UINT:		return string_format("UINT%d", 8 * native_size);
+	case save_registered_item::TYPE_FLOAT:		return string_format("FLOAT%d", 8 * native_size);
+	default:				return string_format("ARRAY[%d]", int(type));
+	}
+}
+
 save_registered_item &save_registered_item::append(uintptr_t ptr_offset, save_type type, uint32_t native_size, char const *name)
 {
+printf("%s '%s': adding %s '%s' @ %llX, size %d\n", type_string(m_type, m_native_size).c_str(), m_name.c_str(), type_string(type, native_size).c_str(), name, ptr_offset, native_size);
 	m_items.emplace_back(ptr_offset, type, native_size, name);
 	return m_items.back();
 }
@@ -1064,7 +1085,7 @@ save_registered_item &save_registered_item::append(uintptr_t ptr_offset, save_ty
 //  items into a binary form
 //-------------------------------------------------
 
-uint64_t save_registered_item::save_binary(uint8_t *ptr, uint64_t length, uintptr_t objbase)
+uint64_t save_registered_item::save_binary(uint8_t *ptr, uint64_t length, uintptr_t objbase) const
 {
 	// update the base pointer with our local base/offset
 	objbase += m_ptr_offset;
@@ -1087,6 +1108,24 @@ uint64_t save_registered_item::save_binary(uint8_t *ptr, uint64_t length, uintpt
 			if (offset + m_native_size <= length)
 				memcpy(&ptr[offset], reinterpret_cast<void const *>(objbase), m_native_size);
 			offset += m_native_size;
+			break;
+
+		// unique ptrs retrieve the pointer from their container
+		case TYPE_UNIQUE:
+			objbase = reinterpret_cast<uintptr_t>(reinterpret_cast<generic_unique *>(objbase)->get());
+			offset += m_items.front().save_binary(&ptr[offset], length, objbase);
+			break;
+
+			// vectors retrieve the pointer from their container
+		case TYPE_VECTOR:
+			objbase = reinterpret_cast<uintptr_t>(&(*reinterpret_cast<generic_vector *>(objbase))[0]);
+			offset += m_items.front().save_binary(&ptr[offset], length, objbase);
+			break;
+
+		// vectors retrieve the pointer from their container
+		case TYPE_POINTER:
+			objbase = reinterpret_cast<uintptr_t>(*reinterpret_cast<generic_pointer *>(objbase));
+			offset += m_items.front().save_binary(&ptr[offset], length, objbase);
 			break;
 
 		// structs and containers iterate over owned items
@@ -1116,7 +1155,7 @@ uint64_t save_registered_item::save_binary(uint8_t *ptr, uint64_t length, uintpt
 //  owned items from binary form
 //-------------------------------------------------
 
-uint64_t save_registered_item::restore_binary(uint8_t const *ptr, uint64_t length, uintptr_t objbase)
+uint64_t save_registered_item::restore_binary(uint8_t const *ptr, uint64_t length, uintptr_t objbase) const
 {
 	// update the base pointer with our local base/offset
 	objbase += m_ptr_offset;
@@ -1211,17 +1250,34 @@ void save_registered_item::save_json(std::ostringstream &output, int indent, boo
 			break;
 		}
 
+		// unique ptrs retrieve the pointer from their container
+		case TYPE_UNIQUE:
+			objbase = reinterpret_cast<uintptr_t>(reinterpret_cast<generic_unique *>(objbase)->get());
+			m_items.front().save_json(output, indent, inline_form, objbase);
+			break;
+
+		// vectors retrieve the pointer from their container
+		case TYPE_VECTOR:
+			objbase = reinterpret_cast<uintptr_t>(&(*reinterpret_cast<generic_vector *>(objbase))[0]);
+			m_items.front().save_json(output, indent, inline_form, objbase);
+			break;
+
+		// vectors retrieve the pointer from their container
+		case TYPE_POINTER:
+			objbase = reinterpret_cast<uintptr_t>(*reinterpret_cast<generic_pointer *>(objbase));
+			m_items.front().save_json(output, indent, inline_form, objbase);
+			break;
+
 		// structs and containers iterate over owned items
 		case TYPE_CONTAINER:
-			objbase = 0;
 		case TYPE_STRUCT:
-			if (inline_form || compute_binary_size() <= 16)
+			if (inline_form || compute_binary_size(objbase - m_ptr_offset) <= 16)
 			{
 				// inline form outputs everything on a single line
 				output << "{ ";
 				for (auto &item : m_items)
 				{
-					item.save_json(output, indent, true, objbase);
+					item.save_json(output, indent, true, (m_type == TYPE_CONTAINER) ? 0 : objbase);
 					if (&item != &m_items.back())
 						output << ", ";
 				}
@@ -1234,7 +1290,7 @@ void save_registered_item::save_json(std::ostringstream &output, int indent, boo
 				for (auto &item : m_items)
 				{
 					output << std::setw(indent + 1) << std::setfill('\t') << "" << std::setw(0);
-					item.save_json(output, indent + 1, false, objbase);
+					item.save_json(output, indent + 1, false, (m_type == TYPE_CONTAINER) ? 0 : objbase);
 					if (&item != &m_items.back())
 						output << ",";
 					output << std::endl;
@@ -1249,7 +1305,7 @@ void save_registered_item::save_json(std::ostringstream &output, int indent, boo
 			if (m_type < TYPE_ARRAY)
 			{
 				auto &item = m_items.front();
-				uint32_t item_size = item.compute_binary_size();
+				uint32_t item_size = item.compute_binary_size(objbase);
 				if (inline_form || m_type * item_size <= 16)
 				{
 					// strictly inline form outputs everything on a single line
