@@ -15,7 +15,7 @@
 // - IC202: CXD1808AQ      - cdrom decoder
 // - IC203: LH62800K-60    - DRAM 256k*8
 // - IC204: FAS204 2405027 - Fast Architecture SCSI 204, ncr 53c94 compatible
-// - IC205: CXD8532Q       - ? probable logic/processing
+// - IC205: CXD8532Q       - ? probable logic/processing, suspect it handles the jumpers, some dma, that kind of stuff
 // - IC301: pcm-1715u      - DAC
 // - IC401: BA6295AFP      - 2 channel motor driver
 
@@ -38,6 +38,20 @@ void cdu75s_device::device_start()
 	// We're getting interesting results with a basic vectors map,
 	// e.g. vector<n> points to 0x10000+4*n, where there's a jmp to
 	// the final destination
+
+	// Actually used vectors:
+	//  0 00 reset
+	//  7 1c nmi
+	//  9 24 ?
+	// 11 2c ?
+	// 12 30 irq0
+	// 15 3c irq3
+	// 18 48 reserved?
+	// 21 54 reserved?
+	// 25 64 imib0
+	// 26 68 ovi0
+
+	// kinda means it's not just 1:1
 
 	for(u32 i = 0; i != 64; i++) {
 		m_rom[i*2] = 1;
