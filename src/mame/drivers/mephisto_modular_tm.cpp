@@ -147,8 +147,8 @@ void mmtm_state::mmtm_2m_map(address_map &map)
 	map(0xfc020004, 0xfc020007).portr("KEY1");
 	map(0xfc020008, 0xfc02000b).portr("KEY2");
 	map(0xfc020010, 0xfc020013).portr("KEY3");
-	map(0xfc040000, 0xfc040000).w("display", FUNC(mephisto_display_module2_device::latch_w));
-	map(0xfc060000, 0xfc060000).w("display", FUNC(mephisto_display_module2_device::io_w));
+	map(0xfc040000, 0xfc040000).w("display", FUNC(mephisto_display2_device::latch_w));
+	map(0xfc060000, 0xfc060000).w("display", FUNC(mephisto_display2_device::io_w));
 	map(0xfc080000, 0xfc080000).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0xfc0a0000, 0xfc0a0000).w("board", FUNC(mephisto_board_device::led_w));
 	map(0xfc0c0000, 0xfc0c0000).r("board", FUNC(mephisto_board_device::input_r));

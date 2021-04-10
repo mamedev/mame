@@ -47,13 +47,14 @@ license:CC0
 <!-- display -->
 
 	<element name="lcd_bg"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
+	<element name="ldot_hide"><disk><color red="0.54" green="0.57" blue="0.58" /></disk></element>
 
 	<element name="digit" defstate="0">
 		<led7seg><color red="0.2" green="0.16" blue="0.16" /></led7seg>
 	</element>
-	<element name="ldot" defstate="0">
-		<rect state="1"><color red="0.2" green="0.16" blue="0.16" /></rect>
-		<rect state="0"><color red="0.49412" green="0.51765" blue="0.51765" /></rect>
+	<element name="ldot">
+		<rect><color red="0.49412" green="0.51765" blue="0.51765" /></rect>
+		<rect statemask="0x80"><color red="0.2" green="0.16" blue="0.16" /></rect>
 	</element>
 
 	<group name="display">
@@ -66,12 +67,18 @@ license:CC0
 		<element name="digit1" ref="digit"><bounds x="43" y="91" width="4" height="6" /></element>
 		<element name="digit0" ref="digit"><bounds x="48.5" y="91" width="4" height="6" /></element>
 
-		<element name="3.7" ref="ldot"><bounds x="36.25" y="96.42" width="0.6" height="0.6" /></element>
-		<element name="2.7" ref="ldot"><bounds x="41.75" y="96.42" width="0.6" height="0.6" /></element>
-		<element name="1.7" ref="ldot"><bounds x="47.25" y="96.42" width="0.6" height="0.6" /></element>
+		<!-- digits DP are different from normal 7seg -->
+		<element ref="ldot_hide"><bounds x="35.3" y="96.3" width="0.85" height="0.85" /></element>
+		<element ref="ldot_hide"><bounds x="40.8" y="96.3" width="0.85" height="0.85" /></element>
+		<element ref="ldot_hide"><bounds x="46.3" y="96.3" width="0.85" height="0.85" /></element>
+		<element ref="ldot_hide"><bounds x="51.8" y="96.3" width="0.85" height="0.85" /></element>
 
-		<element name="0.7" ref="ldot"><bounds x="42.16" y="92.75" width="0.6" height="0.6" /></element>
-		<element name="0.7" ref="ldot"><bounds x="41.94" y="94.55" width="0.6" height="0.6" /></element>
+		<element name="digit3" ref="ldot"><bounds x="36.22" y="96.42" width="0.6" height="0.6" /></element>
+		<element name="digit2" ref="ldot"><bounds x="41.72" y="96.42" width="0.6" height="0.6" /></element>
+		<element name="digit1" ref="ldot"><bounds x="47.22" y="96.42" width="0.6" height="0.6" /></element>
+
+		<element name="digit0" ref="ldot"><bounds x="42.07" y="92.75" width="0.6" height="0.6" /></element>
+		<element name="digit0" ref="ldot"><bounds x="41.92" y="94.55" width="0.6" height="0.6" /></element>
 	</group>
 
 

@@ -50,7 +50,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
-	required_device<mephisto_display_module2_device> m_display;
+	required_device<mephisto_display2_device> m_display;
 	required_device<pwm_display_device> m_led_pwm;
 	required_ioport m_keys;
 
@@ -125,7 +125,7 @@ u8 milano_state::keys_r(offs_t offset)
 void milano_state::milano_mem(address_map &map)
 {
 	map(0x0000, 0x1fbf).ram().share("nvram");
-	map(0x1fc0, 0x1fc0).w(m_display, FUNC(mephisto_display_module2_device::latch_w));
+	map(0x1fc0, 0x1fc0).w(m_display, FUNC(mephisto_display2_device::latch_w));
 	map(0x1fd0, 0x1fd0).w(FUNC(milano_state::board_w));
 	map(0x1fe0, 0x1fe0).r(FUNC(milano_state::board_r));
 	map(0x1fe8, 0x1fef).w("outlatch", FUNC(hc259_device::write_d7)).nopr();
@@ -142,14 +142,14 @@ void milano_state::milano_mem(address_map &map)
 
 static INPUT_PORTS_START( milano )
 	PORT_START("KEY")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("Training / Pawn")   PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("Info / Knight")     PORT_CODE(KEYCODE_I)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("Memory / Bishop")   PORT_CODE(KEYCODE_M)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("Position / Rook")   PORT_CODE(KEYCODE_O)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("Level / Queen")     PORT_CODE(KEYCODE_L)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("Function / King")   PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("Enter / New Game")  PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_F1) // combine for NEW GAME
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("Clear / New Game")  PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_F1) // "
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)    PORT_NAME("Training / Pawn")   PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)    PORT_NAME("Info / Knight")     PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)    PORT_NAME("Memory / Bishop")   PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD)    PORT_NAME("Position / Rook")   PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD)    PORT_NAME("Level / Queen")     PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)    PORT_NAME("Function / King")   PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)    PORT_NAME("Enter / New Game")  PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_F1) // combine for NEW GAME
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)    PORT_NAME("Clear / New Game")  PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_F1) // "
 INPUT_PORTS_END
 
 
@@ -163,7 +163,9 @@ void milano_state::milano(machine_config &config)
 	/* basic machine hardware */
 	R65C02(config, m_maincpu, 4.9152_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &milano_state::milano_mem);
-	m_maincpu->set_periodic_int(FUNC(milano_state::nmi_line_pulse), attotime::from_hz(4.9152_MHz_XTAL / (1 << 13)));
+
+	const attotime nmi_period = attotime::from_hz(4.9152_MHz_XTAL / 0x2000);
+	m_maincpu->set_periodic_int(FUNC(milano_state::nmi_line_pulse), nmi_period);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

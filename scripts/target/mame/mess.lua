@@ -2551,6 +2551,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/mephisto_risc.cpp",
 	MAME_DIR .. "src/mame/machine/mmboard.cpp",
 	MAME_DIR .. "src/mame/machine/mmboard.h",
+	MAME_DIR .. "src/mame/video/mmdisplay1.cpp",
+	MAME_DIR .. "src/mame/video/mmdisplay1.h",
 	MAME_DIR .. "src/mame/video/mmdisplay2.cpp",
 	MAME_DIR .. "src/mame/video/mmdisplay2.h",
 }

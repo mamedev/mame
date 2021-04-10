@@ -190,7 +190,7 @@ void mephisto_montec_state::montec_mem(address_map &map)
 	map(0x2400, 0x2400).r(FUNC(mephisto_montec_state::montec_input_r));
 	map(0x2800, 0x2800).w(m_board, FUNC(mephisto_board_device::mux_w));
 	map(0x2c00, 0x2c00).w(m_board, FUNC(mephisto_board_device::led_w));
-	map(0x3000, 0x3007).w(m_muxlatch, FUNC(hc259_device::write_d7));
+	map(0x3000, 0x3007).w(m_muxlatch, FUNC(hc259_device::write_d7)).nopr();
 	map(0x3400, 0x3400).w(FUNC(mephisto_montec_state::montec_led_w));
 	map(0x8000, 0xffff).rom();
 }

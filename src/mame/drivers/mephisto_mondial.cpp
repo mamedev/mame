@@ -7,12 +7,13 @@ Mephisto Mondial
 Hardware notes:
 - G65SC02-1 @ 2MHz
 - 2KB RAM(TC5517AP), 16KB ROM
+- expansion slot at underside
 - 8*8 chessboard buttons, 24 leds, active buzzer
 
 TODO:
 - verify XTAL (or maybe RC or LC circuit), 2MHz is correct
 - unknown read from 0x2000
-- add MM 1000 module
+- dump/add MM 1000 module
 
 ******************************************************************************/
 
@@ -156,7 +157,9 @@ void mondial_state::mondial(machine_config &config)
 	/* basic machine hardware */
 	M65SC02(config, m_maincpu, 2000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mondial_state::mondial_mem);
-	m_maincpu->set_periodic_int(FUNC(mondial_state::irq0_line_hold), attotime::from_hz(2000000 / (1 << 12)));
+
+	const attotime irq_period = attotime::from_hz(2000000 / 0x1000);
+	m_maincpu->set_periodic_int(FUNC(mondial_state::irq0_line_hold), irq_period);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));

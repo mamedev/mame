@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Dirk Verwiebe, Cowering
 /***************************************************************************
+
 Mephisto Glasgow 3 S chess computer
 Dirk V.
 sp_rinter@gmx.de
@@ -35,7 +36,8 @@ How to play (quick guide)
 TODO:
 - add waitstates(applies to glasgow, amsterd, others?), CPU is 12MHz but with DTACK
   waitstates for slow EPROMs, effective speed is less than 10MHz
-- LCD module is 8.8.:8.8 like mephisto_brikett/mm1 (so, add ":" in the middle)
+- use mmdisplay1 device
+- split driver (glasgow/amsterdam)
 
 ***************************************************************************/
 
@@ -90,7 +92,6 @@ protected:
 	u8 m_key_select;
 };
 
-
 class amsterd_state : public glasgow_state
 {
 public:
@@ -121,7 +122,7 @@ void glasgow_state::glasgow_lcd_w(u8 data)
 	if (m_led7 == 0)
 		m_digits[m_lcd_shift_counter] = data;
 
-	m_lcd_shift_counter--;
+	m_lcd_shift_counter++;
 	m_lcd_shift_counter &= 3;
 }
 
@@ -161,7 +162,7 @@ void amsterd_state::write_lcd(u8 data)
 	if (m_lcd_shift_counter & 4)
 		m_digits[m_lcd_shift_counter & 3] = data;
 
-	m_lcd_shift_counter--;
+	m_lcd_shift_counter++;
 	m_lcd_shift_counter &= 7;
 }
 
@@ -200,10 +201,9 @@ void glasgow_state::machine_start()
 	save_item(NAME(m_key_select));
 }
 
-
 void glasgow_state::machine_reset()
 {
-	m_lcd_shift_counter = 3;
+	m_lcd_shift_counter = 0;
 	m_key_select = 0;
 	m_led7 = 0;
 }
@@ -230,8 +230,8 @@ void amsterd_state::amsterd_mem(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
 	map(0x800002, 0x800002).w(FUNC(amsterd_state::write_lcd));
-	map(0x800008, 0x800008).w(FUNC(amsterd_state::write_lcd_flag));
 	map(0x800004, 0x800004).w(FUNC(amsterd_state::write_beeper));
+	map(0x800008, 0x800008).w(FUNC(amsterd_state::write_lcd_flag));
 	map(0x800010, 0x800010).w(FUNC(amsterd_state::write_board));
 	map(0x800020, 0x800020).r("board", FUNC(mephisto_board_device::input_r));
 	map(0x800040, 0x800040).r(FUNC(amsterd_state::read_newkeys));
