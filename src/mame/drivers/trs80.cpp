@@ -142,8 +142,12 @@ radionic:  works
            expansion-box?
            uart
 
-2021-03-26 MT 07903 - most floppies no longer boot.
+
+General Issues:
            Most machines have problems loading real tapes.
+           MAME will crash if you try to create a JV1 disk.
+           All known images are the JV1 format, therefore
+           the support for other formats has been removed.
 
 *******************************************************************************************************/
 
@@ -157,7 +161,6 @@ radionic:  works
 
 #include "formats/trs80_dsk.h"
 #include "formats/trs_cas.h"
-#include "formats/dmk_dsk.h"
 
 
 void trs80_state::trs80_mem(address_map &map)
@@ -431,8 +434,7 @@ GFXDECODE_END
 
 void trs80_state::floppy_formats(format_registration &fr)
 {
-	fr.add(FLOPPY_TRS80_FORMAT);
-	fr.add(FLOPPY_DMK_FORMAT);
+	fr.add(FLOPPY_JV1_FORMAT);
 }
 
 static void trs80_floppies(device_slot_interface &device)

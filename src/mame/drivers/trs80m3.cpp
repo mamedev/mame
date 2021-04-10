@@ -57,7 +57,12 @@ Model 4P - is the same as Model 4 except:
 To Do / Status:
 --------------
 
-There's many DSK disks that are rejected by MAME - needs to be investigated.
+JV3: not working. The disk will load, but it's unreadable.
+JV1: if you try to create a disk in the File Manager, MAME will crash.
+JV3, DMK: no option to create.
+IMD: does not work with a quad drive.
+Any disk that has more tracks than the current drive will most likely
+ cause MAME to crash.
 
 trs80m3:   Works
 
@@ -329,13 +334,22 @@ GFXDECODE_END
 void trs80m3_state::floppy_formats(format_registration &fr)
 {
 	fr.add(FLOPPY_IMD_FORMAT);
-	fr.add(FLOPPY_TRS80_FORMAT);
+	fr.add(FLOPPY_JV3_FORMAT);
 	fr.add(FLOPPY_DMK_FORMAT);
+	fr.add(FLOPPY_JV1_FORMAT);
 }
 
+// If you choose a disk that has more tracks than the drive,
+// MAME will probably crash. The default is DD, which allows
+// IMD boot disks to work, and any other disk with up to 40
+// tracks. You need QD to support up to 80 tracks, but it
+// breaks the IMD disks.
 static void trs80_floppies(device_slot_interface &device)
 {
-	device.option_add("sssd", FLOPPY_525_DD);
+	device.option_add("35t_sd", FLOPPY_525_SSSD_35T);
+	device.option_add("40t_sd", FLOPPY_525_SSSD);
+	device.option_add("40t_dd", FLOPPY_525_DD);
+	device.option_add("80t_qd", FLOPPY_525_QD);
 }
 
 
@@ -373,8 +387,8 @@ void trs80m3_state::model3(machine_config &config)
 	m_fdc->drq_wr_callback().set(FUNC(trs80m3_state::drq_w));
 
 	// Internal drives
-	FLOPPY_CONNECTOR(config, "fdc:0", trs80_floppies, "sssd", trs80m3_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", trs80_floppies, "sssd", trs80m3_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", trs80_floppies, "40t_dd", trs80m3_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", trs80_floppies, "40t_dd", trs80m3_state::floppy_formats).enable_sound(true);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit7));
