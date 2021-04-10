@@ -5,11 +5,18 @@
 Mephisto 4 + 5 Chess Computer
 2007 Dirk V.
 
-CPU: G65SC02P-4 or R65C02P3
-Clock: 4.9152 MHz
-NMI CLK: 600 Hz
-IRQ Line is set to VSS
-8 KByte SRAM Sony CXK5864-15L
+TODO:
+- need to emulate TurboKit properly, also for mm5p (it's not as simple as a CPU
+  overclock plus ROM patch)
+
+===============================================================================
+
+Hardware notes:
+- CPU: G65SC02P-4 or R65C02P3/R65C02P4
+- Clock: 4.9152 MHz
+- NMI CLK: 600 Hz
+- IRQ Line is set to VSS
+- 8 KByte SRAM Sony CXK5864-15L
 
 1-CD74HC4060E: 14 Bit Counter
 1-CD74HC166E
@@ -52,6 +59,8 @@ $3000 // Chess Board
 $4000-7FFF Opening Modul HG550
 $8000-$FFF ROM
 
+===============================================================================
+
 Mephisto 4 Turbo Kit 18mhz - (mm4tk)
     This is a replacement rom combining the turbo kit initial rom with the original MM IV.
     The Turbo Kit powers up to it's tiny rom, copies itself to ram, banks in normal rom,
@@ -69,11 +78,6 @@ The MM V prototype was the program that Ed Schroeder participated with as "Rebel
 http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm
 
 MM VI (Saitek, 1994) is on different hardware, H8 CPU.
-
-
-TODO:
-- need to emulate TurboKit properly, also for mm5p (it's not as simple as a CPU
-  overclock plus ROM patch)
 
 ******************************************************************************/
 
@@ -120,7 +124,6 @@ public:
 	void bup(machine_config &config);
 
 protected:
-	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
@@ -139,10 +142,6 @@ private:
 	void lcd_irqack_w(u8 data);
 	u8 keys_r(offs_t offset);
 };
-
-void mm2_state::machine_start()
-{
-}
 
 void mm2_state::machine_reset()
 {
