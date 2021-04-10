@@ -23139,10 +23139,13 @@ mktturbo                        // hack
 nbajam                          // (c) 1993 Midway
 nbajamr1                        // (c) 1993 Midway
 nbajamr2                        // (c) 1993 Midway
-nbajamte                        // (c) 1994 Midway
-nbajamte1                       // (c) 1994 Midway
-nbajamte2                       // (c) 1994 Midway
-nbajamte3                       // (c) 1994 Midway
+nbajamte                        // (c) 1994 Midway (rev 4.0 3/23/94)
+nbajamte1                       // (c) 1994 Midway (rev 1.00 1/17/94)
+nbajamte2                       // (c) 1994 Midway (rev 2.1 2/06/94)
+nbajamte2a                      // (c) 1994 Midway (rev 2.0 1/28/94)
+nbajamte3                       // (c) 1994 Midway (rev 3.0 3/04/94)
+nbajamte3a                      // (c) 1994 Midway (rev 3.0 2/26/94)
+nbajamte4                       // (c) 1994 Midway (rev 4.0 3/03/94)
 nbajamten                       // (c) 1995 Midway
 
 @source:midvunit.cpp
