@@ -887,6 +887,72 @@ INPUT_PORTS_START( barekch ) // TODO: identify dips. PCB has 3 x 8-dip banks, bu
 	PORT_DIPSETTING(    0x00, "6" )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( barek2ch )
+	PORT_INCLUDE( md_common )
+
+	PORT_MODIFY("PAD1")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 ) // also change character during gameplay
+
+	PORT_MODIFY("PAD2")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 ) // also change character during gameplay
+
+	PORT_START("IN0")
+	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNUSED ) // apparently no use for these
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
+
+	PORT_START("DSWB")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW2:1") // at least some of the first 3 seem to control difficulty (enemies attack later / less frequently by switching these)
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW2:3")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME( 0xe0, 0xe0, "Starting Level" ) PORT_DIPLOCATION("SW2:6,7,8")
+	PORT_DIPSETTING(    0xe0, "1" )
+	PORT_DIPSETTING(    0xc0, "2" )
+	PORT_DIPSETTING(    0xa0, "3" )
+	PORT_DIPSETTING(    0x80, "4" )
+	PORT_DIPSETTING(    0x60, "5" )
+	PORT_DIPSETTING(    0x40, "6" )
+	PORT_DIPSETTING(    0x20, "7" )
+	PORT_DIPSETTING(    0x00, "8" )
+
+	PORT_START("DSWC") // present on PCB but there doesn't seem to be any read for them
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW3:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW3:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW3:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW3:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW3:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW3:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW3:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW3:8")
+INPUT_PORTS_END
+
 INPUT_PORTS_START( barek2 )
 	PORT_INCLUDE( aladmdb )
 	// TODO!
@@ -1192,6 +1258,12 @@ void md_boot_state::init_barek2ch()
 	for (int i = 0x000000; i < 0x200000 / 2; i++)
 		src[i] = bitswap<16>(src[i], 8, 11, 10, 13, 12, 14, 15, 9, 7, 6, 5, 4, 3, 2, 1, 0);
 
+	src[0x06 / 2] = 0x0210; // TODO: why is this needed?
+
+	m_maincpu->space(AS_PROGRAM).install_read_port(0x380070, 0x380071, "IN0");
+	m_maincpu->space(AS_PROGRAM).install_read_port(0x380078, 0x380079, "DSWA");
+	m_maincpu->space(AS_PROGRAM).install_read_port(0x38007a, 0x38007b, "DSWB");
+
 	init_megadrij();
 }
 
@@ -1420,7 +1492,7 @@ ROM_END
 
 ROM_START( barek2ch ) // all 27c4001
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "u14", 0x000001, 0x080000, BAD_DUMP CRC(2b8994fd) SHA1(b740a4d31e61c4a89353091c37d38b9ff01348df) ) // FIXED BITS (xxx0xxxx)
+	ROM_LOAD16_BYTE( "u14", 0x000001, 0x080000, CRC(b0ee177f) SHA1(d63e6ee30fe7f4aaab098d3920eabc456730b2c5) )
 	ROM_LOAD16_BYTE( "u15", 0x000000, 0x080000, CRC(09264195) SHA1(c5439731d932c90a57d68c4d82c9ebed8a01bd53) )
 	ROM_LOAD16_BYTE( "u16", 0x100001, 0x080000, CRC(6c814fc4) SHA1(edaf5117b19d3fb40218c5f7c4b5099c9189f1be) )
 	ROM_LOAD16_BYTE( "u17", 0x100000, 0x080000, CRC(cae1922e) SHA1(811c2164b6c467a49af4b0d22f151cd13c9efbc9) )
@@ -1448,4 +1520,4 @@ GAME( 1993, jparkmb,  0, md_bootleg,   twinktmb, md_boot_state, init_jparkmb,  R
 
 // Chinese bootlegs. Very clean looking with custom chips marked TA-04, TA-05 and TA-06.
 GAME( 1994, barekch,  0, megadrvb_6b,  barekch,  md_boot_6button_state, init_barekch,  ROT0, "bootleg",          "Bare Knuckle (Chinese bootleg of Megadrive version)",                           0 )
-GAME( 1994, barek2ch, 0, megadrvb_6b,  barekch,  md_boot_6button_state, init_barek2ch, ROT0, "bootleg",          "Bare Knuckle II (Chinese bootleg of Megadrive version)",                        MACHINE_NOT_WORKING ) // bad dump
+GAME( 1994, barek2ch, 0, md_bootleg,   barek2ch, md_boot_state,         init_barek2ch, ROT0, "bootleg",          "Bare Knuckle II (Chinese bootleg of Megadrive version)",                        0 )
