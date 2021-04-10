@@ -2152,6 +2152,17 @@ ROM_START( trogpa5 )
 ROM_END
 
 
+/*
+Trog's source code release documents an undumped PAC-TROG version PA3-PAC 8/15/90 set with the following unique ROMs:
+
+TROGU105.PP  checksum 2298  program ROM
+TROGU89.PP   checksum E999  program ROM
+TROGU97.PP   checksum 2E80  image ROM
+TROGU113.PP  checksum 737D  image ROM
+
+*/
+
+
 ROM_START( trogpa4 )
 	ROM_REGION( 0x90000, "cvsd:cpu", 0 )    /* sound CPU */
 	ROM_LOAD( "trog_ii_u-4_sl_1.u4",   0x10000, 0x10000, CRC(759d0bf4) SHA1(c4c3fa51c43cf7fd241ac1f33d7d220aa9f9edb3) )

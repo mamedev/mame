@@ -1448,8 +1448,8 @@ ROM_START( nbamhtp )
 	ROM_LOAD16_BYTE( "l1.0_nba_hangtime_u_5_music_spch.u5", 0x600000, 0x100000, CRC(ef19316a) SHA1(d41ae87ab45630a37c73684de42f7f6e0ed8f13b) )
 
 	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
-	ROM_LOAD16_BYTE( "l0.9_maximum_hangtime_u54_m_version.u54", 0x00000, 0x80000, CRC(0fbed60e) SHA1(a017d498a901c1608ffecfe0fb2ec82c7a23f4ea) )
-	ROM_LOAD16_BYTE( "l0.9_maximum_hangtime_u63_m_version.u63", 0x00001, 0x80000, CRC(a064645a) SHA1(43dba6f64ef1d940f1d1b1764addf40359fcdb51) )
+	ROM_LOAD16_BYTE( "l0.9_maximum_hangtime_u54_l_version.u54", 0x00000, 0x80000, CRC(0fbed60e) SHA1(a017d498a901c1608ffecfe0fb2ec82c7a23f4ea) )
+	ROM_LOAD16_BYTE( "l0.9_maximum_hangtime_u63_l_version.u63", 0x00001, 0x80000, CRC(a064645a) SHA1(43dba6f64ef1d940f1d1b1764addf40359fcdb51) )
 
 	ROM_REGION( 0x2000000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "l1.0_nba_hangtime_u_133_image_rom.u133", 0x0000000, 0x100000, CRC(3163feed) SHA1(eb7f128de306933929a0933e36e57760459cb0a1) ) // Uses NBA Hangtime IMAGE ROMs - verified correct
