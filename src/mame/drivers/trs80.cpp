@@ -142,8 +142,12 @@ radionic:  works
            expansion-box?
            uart
 
-2021-03-26 MT 07903 - most floppies no longer boot.
+
+General Issues:
            Most machines have problems loading real tapes.
+           MAME will crash if you try to create a JV1 disk.
+           All known images are the JV1 format, therefore
+           the support for other formats has been removed.
 
 *******************************************************************************************************/
 
@@ -157,7 +161,6 @@ radionic:  works
 
 #include "formats/trs80_dsk.h"
 #include "formats/trs_cas.h"
-#include "formats/dmk_dsk.h"
 
 
 void trs80_state::trs80_mem(address_map &map)
@@ -431,13 +434,18 @@ GFXDECODE_END
 
 void trs80_state::floppy_formats(format_registration &fr)
 {
-	fr.add(FLOPPY_TRS80_FORMAT);
-	fr.add(FLOPPY_DMK_FORMAT);
+	fr.add(FLOPPY_JV1_FORMAT);
 }
 
+// Most images are single-sided, 40 tracks or less.
+// However, the default is QD to prevent MAME from
+// crashing if a disk with more than 40 tracks is used.
 static void trs80_floppies(device_slot_interface &device)
 {
-	device.option_add("sssd", FLOPPY_525_QD); // QD allows the 80-track boot disks to work.
+	device.option_add("35t_sd", FLOPPY_525_SSSD_35T);
+	device.option_add("40t_sd", FLOPPY_525_SSSD);
+	device.option_add("40t_dd", FLOPPY_525_DD);
+	device.option_add("80t_qd", FLOPPY_525_QD);
 }
 
 
@@ -463,6 +471,8 @@ void trs80_state::trs80(machine_config &config)       // the original model I, l
 
 	/* devices */
 	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(trs80l1_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 }
 
@@ -476,15 +486,14 @@ void trs80_state::model1(machine_config &config)      // model I, level II
 
 	/* devices */
 	m_cassette->set_formats(trs80l2_cassette_formats);
-	m_cassette->set_default_state(CASSETTE_PLAY);
 
 	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(trs80_state::quickload_cb));
 
 	FD1771(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(FUNC(trs80_state::intrq_w));
 
-	FLOPPY_CONNECTOR(config, "fdc:0", trs80_floppies, "sssd", trs80_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", trs80_floppies, "sssd", trs80_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", trs80_floppies, "80t_qd", trs80_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", trs80_floppies, "80t_qd", trs80_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:2", trs80_floppies, nullptr, trs80_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", trs80_floppies, nullptr, trs80_state::floppy_formats).enable_sound(true);
 

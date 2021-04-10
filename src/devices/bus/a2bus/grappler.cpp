@@ -1,13 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
 #include "emu.h"
-#include "grapplerplus.h"
+#include "grappler.h"
 
 //#define VERBOSE 1
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 namespace {
+
+ROM_START(grappler)
+	ROM_REGION(0x0800, "rom", 0)
+	ROM_LOAD( "eps-1_c1981.u6", 0x0000, 0x0800, CRC(862773cb) SHA1(791ebae64a7fad8f42bdfaec36b9e2d34f12ded8) )
+ROM_END
+
 
 ROM_START(grapplerplus)
 	// TODO: add other revisions - 3.3 is known to exist
@@ -23,14 +29,22 @@ ROM_END
 
 
 ROM_START(bufgrapplerplus)
-	// TODO: get proper ROM labels and confirm contents
+	// TODO: confirm contents
 	// despite having the same version string, this differs from the Grapper+ 3.2.u9 ROM
 
+	// 9433B-0141
+	// 90ROM00002
+	// GI8603CEY
+	// TAIWAN
 	ROM_REGION(0x1000, "rom", 0)
-	ROM_LOAD( "3.2.u18", 0x0000, 0x1000, CRC(cd07c7ef) SHA1(6c2f1375b5df6bb65dfca1444c064661242fef1a) )
+	ROM_LOAD( "90rom00002.u18", 0x0000, 0x1000, CRC(cd07c7ef) SHA1(6c2f1375b5df6bb65dfca1444c064661242fef1a) )
 
+	// S 8450
+	// SCN8048A
+	// C6N40 B
+	// 95ROM08048
 	ROM_REGION(0x0400, "mcu", 0)
-	ROM_LOAD( "8048.u10", 0x0000, 0x0400, CRC(36c5e2b2) SHA1(65eea4c7352a93f780df6b30ec6c20ee1e87aa30) BAD_DUMP )
+	ROM_LOAD( "95rom08048.u10", 0x0000, 0x0400, CRC(55990f67) SHA1(f0907cf02d8c5dbf1bfacb0d626f2231142f0ff7) )
 ROM_END
 
 
@@ -65,25 +79,24 @@ INPUT_PORTS_END
 
 
 
+DEFINE_DEVICE_TYPE(A2BUS_GRAPPLER, a2bus_grappler_device, "a2grappler", "Orange Micro Grappler Printer Interface")
 DEFINE_DEVICE_TYPE(A2BUS_GRAPPLERPLUS, a2bus_grapplerplus_device, "a2grapplerplus", "Orange Micro Grappler+ Printer Interface")
 DEFINE_DEVICE_TYPE(A2BUS_BUFGRAPPLERPLUS, a2bus_buf_grapplerplus_device, "a2bufgrapplerplus", "Orange Micro Buffered Grappler+ Printer Interface")
+DEFINE_DEVICE_TYPE(A2BUS_BUFGRAPPLERPLUSA, a2bus_buf_grapplerplus_reva_device, "a2bufgrapplerplusa", "Orange Micro Buffered Grappler+ (rev A) Printer Interface")
 
 
 
 //==============================================================
-//  Grappler+ base
+//  Grappler base
 //==============================================================
 
-a2bus_grapplerplus_device_base::a2bus_grapplerplus_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
+a2bus_grappler_device_base::a2bus_grappler_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_printer_conn(*this, "prn"),
 	m_printer_out(*this, "prn_out"),
-	m_s1(*this, "S1"),
 	m_rom(*this, "rom"),
 	m_rom_bank(0x0000U),
-	m_ack_latch(1U),
-	m_ack_in(1U),
 	m_busy_in(1U),
 	m_pe_in(1U),
 	m_slct_in(1U)
@@ -93,20 +106,307 @@ a2bus_grapplerplus_device_base::a2bus_grapplerplus_device_base(machine_config co
 
 
 //--------------------------------------------------
+//  device_a2bus_card_interface implementation
+//--------------------------------------------------
+
+u8 a2bus_grappler_device_base::read_c800(u16 offset)
+{
+	return m_rom[(offset & 0x07ffU) | m_rom_bank];
+}
+
+
+
+//--------------------------------------------------
 //  device_t implementation
 //--------------------------------------------------
 
-void a2bus_grapplerplus_device_base::device_add_mconfig(machine_config &config)
+void a2bus_grappler_device_base::device_add_mconfig(machine_config &config)
 {
 	CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
-	m_printer_conn->busy_handler().set(FUNC(a2bus_grapplerplus_device_base::busy_w));
-	m_printer_conn->perror_handler().set(FUNC(a2bus_grapplerplus_device_base::pe_w));
-	m_printer_conn->select_handler().set(FUNC(a2bus_grapplerplus_device_base::slct_w));
+	m_printer_conn->busy_handler().set(FUNC(a2bus_grappler_device_base::busy_w));
+	m_printer_conn->perror_handler().set(FUNC(a2bus_grappler_device_base::pe_w));
+	m_printer_conn->select_handler().set(FUNC(a2bus_grappler_device_base::slct_w));
 
 	OUTPUT_LATCH(config, m_printer_out);
 	m_printer_conn->set_output_latch(*m_printer_out);
 }
 
+
+void a2bus_grappler_device_base::device_start()
+{
+	save_item(NAME(m_rom_bank));
+	save_item(NAME(m_busy_in));
+	save_item(NAME(m_pe_in));
+	save_item(NAME(m_slct_in));
+}
+
+
+
+//--------------------------------------------------
+//  printer status inputs
+//--------------------------------------------------
+
+void a2bus_grappler_device_base::set_rom_bank(u16 rom_bank)
+{
+	if (m_rom_bank != rom_bank)
+		LOG("Select ROM bank %04X\n", rom_bank);
+	m_rom_bank = rom_bank;
+}
+
+
+
+//--------------------------------------------------
+//  printer status inputs
+//--------------------------------------------------
+
+WRITE_LINE_MEMBER(a2bus_grappler_device_base::busy_w)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device_base::set_busy_in), this), state ? 1 : 0);
+}
+
+
+WRITE_LINE_MEMBER(a2bus_grappler_device_base::pe_w)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device_base::set_pe_in), this), state ? 1 : 0);
+}
+
+
+WRITE_LINE_MEMBER(a2bus_grappler_device_base::slct_w)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device_base::set_slct_in), this), state ? 1 : 0);
+}
+
+
+
+//--------------------------------------------------
+//  synchronised printer status inputs
+//--------------------------------------------------
+
+void a2bus_grappler_device_base::set_busy_in(void *ptr, s32 param)
+{
+	if (u32(param) != m_busy_in)
+	{
+		LOG("BUSY=%d\n", param);
+		m_busy_in = u8(u32(param));
+	}
+}
+
+
+void a2bus_grappler_device_base::set_pe_in(void *ptr, s32 param)
+{
+	if (u32(param) != m_pe_in)
+	{
+		LOG("PAPER EMPTY=%d\n", param);
+		m_pe_in = u8(u32(param));
+	}
+}
+
+
+void a2bus_grappler_device_base::set_slct_in(void *ptr, s32 param)
+{
+	if (u32(param) != m_slct_in)
+	{
+		LOG("SELECT=%d\n", param);
+		m_slct_in = u8(u32(param));
+	}
+}
+
+
+
+//==============================================================
+//  Grappler implementation
+//==============================================================
+
+a2bus_grappler_device::a2bus_grappler_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	a2bus_grappler_device_base(mconfig, A2BUS_GRAPPLER, tag, owner, clock),
+	m_strobe(1U),
+	m_ack_latch(1U),
+	m_ack_in(1U)
+{
+}
+
+
+
+//--------------------------------------------------
+//  device_a2bus_card_interface implementation
+//--------------------------------------------------
+
+u8 a2bus_grappler_device::read_c0nx(u8 offset)
+{
+	LOG("Read C0n%01X\n", offset);
+
+	if (!machine().side_effects_disabled())
+	{
+		if (BIT(offset, 1)) // A1 - assert strobe
+			machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device::set_strobe), this), 0);
+		else if (BIT(offset, 2)) // A2 - release strobe
+			machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device::set_strobe), this), 1);
+	}
+
+	if (BIT(offset, 0)) // A0 - printer status
+	{
+		return
+				0xf0U | // TODO: actually open bus
+				(busy_in() << 3) |
+				(pe_in() << 2) |
+				(slct_in() << 1) |
+				m_ack_latch;
+	}
+	else
+	{
+		return 0xffU; // TODO: actually open bus
+	}
+}
+
+
+void a2bus_grappler_device::write_c0nx(u8 offset, u8 data)
+{
+	LOG("Write C0n%01X=%02X\n", offset, data);
+
+	if (BIT(offset, 0)) // A0 - write data
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device::set_data), this), int(unsigned(data)));
+
+	if (BIT(offset, 1)) // A1 - assert strobe
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device::set_strobe), this), 0);
+	else if (BIT(offset, 2)) // A2 - release strobe
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device::set_strobe), this), 1);
+}
+
+
+u8 a2bus_grappler_device::read_cnxx(u8 offset)
+{
+	return m_rom[offset | (slotno() << 8)];
+}
+
+
+void a2bus_grappler_device::write_cnxx(u8 offset, u8 data)
+{
+	LOG("Write Cn%02X=%02X (bus conflict)\n", offset, data);
+}
+
+
+
+//--------------------------------------------------
+//  device_t implementation
+//--------------------------------------------------
+
+tiny_rom_entry const *a2bus_grappler_device::device_rom_region() const
+{
+	return ROM_NAME(grappler);
+}
+
+
+void a2bus_grappler_device::device_add_mconfig(machine_config &config)
+{
+	a2bus_grappler_device_base::device_add_mconfig(config);
+
+	m_printer_conn->ack_handler().set(FUNC(a2bus_grappler_device::ack_w));
+}
+
+
+void a2bus_grappler_device::device_start()
+{
+	a2bus_grappler_device_base::device_start();
+
+	save_item(NAME(m_strobe));
+	save_item(NAME(m_ack_latch));
+	save_item(NAME(m_ack_in));
+}
+
+
+void a2bus_grappler_device::device_reset()
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device::set_strobe), this), 1);
+}
+
+
+
+//--------------------------------------------------
+//  printer status inputs
+//--------------------------------------------------
+
+WRITE_LINE_MEMBER(a2bus_grappler_device::ack_w)
+{
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grappler_device::set_ack_in), this), state ? 1 : 0);
+}
+
+
+
+//--------------------------------------------------
+//  synchronised signals
+//--------------------------------------------------
+
+void a2bus_grappler_device::set_data(void *ptr, s32 param)
+{
+	LOG("Output data %02X\n", u8(u32(param)));
+	m_printer_out->write(u8(u32(param)));
+}
+
+
+void a2bus_grappler_device::set_strobe(void *ptr, s32 param)
+{
+	LOG("Output /STROBE=%d\n", param);
+	m_printer_conn->write_strobe(param);
+	if (m_strobe && !param)
+	{
+		if (m_ack_in)
+		{
+			if (!m_ack_latch)
+				LOG("Clearing acknowledge latch\n");
+			else
+				LOG("Previous data not acknowledged\n");
+			m_ack_latch = 1U;
+		}
+		else
+		{
+			LOG("/ACK asserted, not clearing acknowledge latch\n");
+		}
+	}
+	m_strobe = u8(u32(param));
+}
+
+
+void a2bus_grappler_device::set_ack_in(void *ptr, s32 param)
+{
+	if (u32(param) != m_ack_in)
+	{
+		LOG("/ACK=%d\n", param);
+		m_ack_in = u8(u32(param));
+		if (!param)
+		{
+			if (m_ack_latch)
+				LOG("Set acknowledge latch\n");
+			else
+				LOG("No data written since previous acknowledge\n");
+			m_ack_latch = 0U;
+		}
+		else if (!m_strobe)
+		{
+			LOG("Clearing acknowledge latch\n");
+			m_ack_latch = 1U;
+		}
+	}
+}
+
+
+
+//==============================================================
+//  Grappler+ base
+//==============================================================
+
+a2bus_grapplerplus_device_base::a2bus_grapplerplus_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
+	a2bus_grappler_device_base(mconfig, type, tag, owner, clock),
+	m_s1(*this, "S1"),
+	m_ack_latch(1U),
+	m_ack_in(1U)
+{
+}
+
+
+
+//--------------------------------------------------
+//  device_t implementation
+//--------------------------------------------------
 
 ioport_constructor a2bus_grapplerplus_device_base::device_input_ports() const
 {
@@ -116,12 +416,10 @@ ioport_constructor a2bus_grapplerplus_device_base::device_input_ports() const
 
 void a2bus_grapplerplus_device_base::device_start()
 {
-	save_item(NAME(m_rom_bank));
+	a2bus_grappler_device_base::device_start();
+
 	save_item(NAME(m_ack_latch));
 	save_item(NAME(m_ack_in));
-	save_item(NAME(m_busy_in));
-	save_item(NAME(m_pe_in));
-	save_item(NAME(m_slct_in));
 }
 
 
@@ -163,24 +461,14 @@ void a2bus_grapplerplus_device_base::write_c0nx(u8 offset, u8 data)
 	}
 
 	if (BIT(offset, 0)) // A0 - select high ROM bank
-	{
-		if (!m_rom_bank)
-			LOG("Select high ROM bank\n");
-		else
-			LOG("High ROM bank already selected\n");
-		m_rom_bank = 0x0800U;
-	}
+		set_rom_bank(0x0800U);
 }
 
 
 u8 a2bus_grapplerplus_device_base::read_cnxx(u8 offset)
 {
 	if (!machine().side_effects_disabled())
-	{
-		if (m_rom_bank)
-			LOG("Select low ROM bank\n");
-		m_rom_bank = 0x0000U;
-	}
+		set_rom_bank(0x0000U);
 	return m_rom[(!m_ack_latch && BIT(offset, 7)) ? (offset & 0xbfU) : offset];
 }
 
@@ -189,44 +477,18 @@ void a2bus_grapplerplus_device_base::write_cnxx(u8 offset, u8 data)
 {
 	LOG("Write Cn%02X=%02X (bus conflict)\n", offset, data);
 
-	if (m_rom_bank)
-		LOG("Select low ROM bank\n");
-	m_rom_bank = 0x0000U;
-}
-
-
-u8 a2bus_grapplerplus_device_base::read_c800(u16 offset)
-{
-	return m_rom[(offset & 0x07ffU) | m_rom_bank];
+	set_rom_bank(0x0000U);
 }
 
 
 
 //--------------------------------------------------
-//  printer status inputs
+//  ACK latch set input
 //--------------------------------------------------
 
 WRITE_LINE_MEMBER(a2bus_grapplerplus_device_base::ack_w)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grapplerplus_device_base::set_ack_in), this), state ? 1 : 0);
-}
-
-
-WRITE_LINE_MEMBER(a2bus_grapplerplus_device_base::busy_w)
-{
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grapplerplus_device_base::set_busy_in), this), state ? 1 : 0);
-}
-
-
-WRITE_LINE_MEMBER(a2bus_grapplerplus_device_base::pe_w)
-{
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grapplerplus_device_base::set_pe_in), this), state ? 1 : 0);
-}
-
-
-WRITE_LINE_MEMBER(a2bus_grapplerplus_device_base::slct_w)
-{
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_grapplerplus_device_base::set_slct_in), this), state ? 1 : 0);
 }
 
 
@@ -250,36 +512,6 @@ void a2bus_grapplerplus_device_base::set_ack_in(void *ptr, s32 param)
 			m_ack_latch = 1U;
 			ack_latch_set();
 		}
-	}
-}
-
-
-void a2bus_grapplerplus_device_base::set_busy_in(void *ptr, s32 param)
-{
-	if (u32(param) != m_busy_in)
-	{
-		LOG("BUSY=%d\n", param);
-		m_busy_in = u8(u32(param));
-	}
-}
-
-
-void a2bus_grapplerplus_device_base::set_pe_in(void *ptr, s32 param)
-{
-	if (u32(param) != m_pe_in)
-	{
-		LOG("PAPER EMPTY=%d\n", param);
-		m_pe_in = u8(u32(param));
-	}
-}
-
-
-void a2bus_grapplerplus_device_base::set_slct_in(void *ptr, s32 param)
-{
-	if (u32(param) != m_slct_in)
-	{
-		LOG("SELECT=%d\n", param);
-		m_slct_in = u8(u32(param));
 	}
 }
 
@@ -482,7 +714,13 @@ TIMER_CALLBACK_MEMBER(a2bus_grapplerplus_device::update_strobe)
 //==============================================================
 
 a2bus_buf_grapplerplus_device::a2bus_buf_grapplerplus_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
-	a2bus_grapplerplus_device_base(mconfig, A2BUS_BUFGRAPPLERPLUS, tag, owner, clock),
+	a2bus_buf_grapplerplus_device(mconfig, A2BUS_BUFGRAPPLERPLUS, tag, owner, clock)
+{
+}
+
+
+a2bus_buf_grapplerplus_device::a2bus_buf_grapplerplus_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
+	a2bus_grapplerplus_device_base(mconfig, type, tag, owner, clock),
 	m_mcu(*this, "mcu"),
 	m_ram(),
 	m_ram_row(0xff00),
@@ -525,17 +763,8 @@ tiny_rom_entry const *a2bus_buf_grapplerplus_device::device_rom_region() const
 
 void a2bus_buf_grapplerplus_device::device_add_mconfig(machine_config &config)
 {
-	a2bus_grapplerplus_device_base::device_add_mconfig(config);
-
-	m_printer_conn->ack_handler().set(FUNC(a2bus_buf_grapplerplus_device::buf_ack_w));
-
-	I8048(config, m_mcu, DERIVED_CLOCK(1, 1));
-	m_mcu->set_addrmap(AS_IO, &a2bus_buf_grapplerplus_device::mcu_io);
-	m_mcu->p2_out_cb().set(FUNC(a2bus_buf_grapplerplus_device::mcu_p2_w));
-	m_mcu->t0_in_cb().set([this] () { return busy_in(); });
-	m_mcu->t1_in_cb().set([this] () { return m_buf_ack_latch; });
-	m_mcu->bus_in_cb().set(FUNC(a2bus_buf_grapplerplus_device::mcu_bus_r));
-	m_mcu->bus_out_cb().set(FUNC(a2bus_buf_grapplerplus_device::mcu_bus_w));
+	// 1982 schematics show MCU driven by 7M clock
+	device_add_mconfig(config, DERIVED_CLOCK(1, 1));
 }
 
 
@@ -578,6 +807,29 @@ void a2bus_buf_grapplerplus_device::device_reset()
 
 	// should only do this on initial reset, but we get away with it here because the MCU is automatically reset even if it shouldn't be
 	m_ram_mask = ioport("CNF")->read();
+}
+
+
+
+//--------------------------------------------------
+//  helpers
+//--------------------------------------------------
+
+template <typename T>
+void a2bus_buf_grapplerplus_device::device_add_mconfig(machine_config &config, T &&mcu_clock)
+{
+	a2bus_grapplerplus_device_base::device_add_mconfig(config);
+
+	m_printer_conn->ack_handler().set(FUNC(a2bus_buf_grapplerplus_device::buf_ack_w));
+
+	// P22 is tied high, pulling it low is used for some factory test mode
+	I8048(config, m_mcu, std::forward<T>(mcu_clock));
+	m_mcu->set_addrmap(AS_IO, &a2bus_buf_grapplerplus_device::mcu_io);
+	m_mcu->p2_out_cb().set(FUNC(a2bus_buf_grapplerplus_device::mcu_p2_w));
+	m_mcu->t0_in_cb().set([this] () { return busy_in(); });
+	m_mcu->t1_in_cb().set([this] () { return m_buf_ack_latch; });
+	m_mcu->bus_in_cb().set(FUNC(a2bus_buf_grapplerplus_device::mcu_bus_r));
+	m_mcu->bus_out_cb().set(FUNC(a2bus_buf_grapplerplus_device::mcu_bus_w));
 }
 
 
@@ -779,4 +1031,30 @@ void a2bus_buf_grapplerplus_device::clear_ibusy(void *ptr, s32 param)
 	{
 		LOG("IBUSY already clear\n");
 	}
+}
+
+
+
+//==============================================================
+//  Buffered Grappler+ rev A implementation
+//==============================================================
+
+a2bus_buf_grapplerplus_reva_device::a2bus_buf_grapplerplus_reva_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	a2bus_buf_grapplerplus_device(mconfig, A2BUS_BUFGRAPPLERPLUSA, tag, owner, clock)
+{
+}
+
+
+
+//--------------------------------------------------
+//  device_t implementation
+//--------------------------------------------------
+
+void a2bus_buf_grapplerplus_reva_device::device_add_mconfig(machine_config &config)
+{
+	// boards with 6 MHz clock crystal for MCU have been seen with both UVEPROM and mask ROM parts
+	// ORANGE MICRO INC., 1983
+	// ASSY NO, 72 BGP 00001 REV A
+	// PART NO. 95PCB00003
+	a2bus_buf_grapplerplus_device::device_add_mconfig(config, 6_MHz_XTAL);
 }

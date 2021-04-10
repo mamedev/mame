@@ -3251,6 +3251,9 @@ redbarnp                        //
 @source:bartop52.cpp
 barbball                        // (proto)          (c) 1983
 
+@source:basf7100.cpp
+basf7120                        //
+
 @source:basic52.cpp
 basic31                         //
 basic52                         //
@@ -11091,6 +11094,7 @@ mmancp2u                        // 06/10/1995 (c) 1995 (USA)
 mmancp2ur1                      // 26/09/1995 (c) 1995 (USA)
 mmancp2ur2                      // 25/09/1995 (c) 1995 (USA)
 mmatrix                         // 12/04/2000 (c) 2000 Takumi (USA)
+mmatrixa                        // 12/04/2000 (c) 2000 Takumi (Asia)
 mmatrixd                        //
 mmatrixj                        // 12/04/2000 (c) 2000 Takumi (Japan)
 mpang                           // 10/10/2000 (c) 2000 Mitchell (Euro)
@@ -11612,6 +11616,8 @@ dai                             // DAI
 
 @source:dai3wksi.cpp
 dai3wksi                        // 1979.09 Dai San Wakusei (The Third Planet)
+warp1                           // 1979.12 Warp-1
+warp1bl                         // bootleg
 
 @source:dambustr.cpp
 dambustr                        // (c) 1981 South West Research
@@ -14889,6 +14895,7 @@ mduckspa                        // Mega Duck / Super Quique (Spain)
 
 @source:gba.cpp
 gba                             // Nintendo Game Boy Advance Handheld
+robotech                        // Coleco
 
 @source:gberet.cpp
 gberet                          // GX577 (c) 1985
@@ -14983,6 +14990,7 @@ jak_gtg
 jak_sspop
 jak_hmhsm
 jak_hmg2
+jak_hmpt
 jak_hsmg2
 jak_umdf
 jak_duck
@@ -19359,6 +19367,7 @@ dmx2m                           // 2000 - Dance Maniax 2nd Mix (G*A39 VER. JAA)
 dmx2majp                        // 2001 - Dance Maniax 2nd Mix Append J-Paradise (G*A38 VER. JAA
 dncfrks                         // 2000 - Dance Freaks (G*874 VER. KAA)
 drmn                            // 1999 - DrumMania (GQ881 VER. JAD)
+drmna                           // 1999 - DrumMania (GQ881 VER. JAB)
 drmn10m                         // 2004 - DrumMania 10th Mix (G*D40 VER. JAA)
 drmn2m                          // 1999 - DrumMania 2nd Mix (GE912 VER. JAB)
 drmn2mpu                        // 1999 - DrumMania 2nd Mix Session Power Up Kit (GE912 VER. JAB)
@@ -19410,8 +19419,9 @@ gtrfrksa                        // 1999 - Guitar Freaks (GQ886 VER. AAC)
 gtrfrksj                        // 1999 - Guitar Freaks (GQ886 VER. JAC)
 gtrfrksu                        // 1999 - Guitar Freaks (GQ886 VER. UAC)
 gunmania                        // 2000 - GunMania (GL906 VER. JAA)
-strgchmp                        // 1997 - Steering Champ (GQ710 VER. UAA)
-hndlchmp                        // 1997 - Handle Champ (GQ710 VER. JAB)
+strgchmp                        // 1997 - Steering Champ (GQ710 97/12/18 VER. UAA)
+hndlchmp                        // 1997 - Handle Champ (GQ710 97/12/18 VER. SAA)
+hndlchmpj                       // 1997 - Handle Champ (GQ710 1997/12/08 VER. JAB)
 hypbbc2p                        // 1999 - Hyper Bishi Bashi Champ - 2 Player (GX908 1999/08/24 VER. JAA)
 hypbbc2pk                       // 1999 - Hyper Bishi Bashi Champ - 2 Player (GX908 1999/08/24 VER. KAA)
 hyperbbc                        // 1998 - Hyper Bishi Bashi (GQ876 VER. EAA)
@@ -19426,6 +19436,10 @@ konam80u                        // 1998 - Konami 80's AC Special (GC826 VER. UAA
 mamboagg                        // 2001 - Mambo A Go-Go (GQA40 VER. JAB)
 mamboagga                       // 2001 - Mambo A Go-Go e-Amusement (GQA40 VER. JRB)
 mrtlbeat                        // 2002 - Martial Beat (Martial Beat (G*B47 VER. JBA)
+pcnfrk                          // 1999 - Percussion Freaks (GQ881 VER. EAB)
+pcnfrka                         // 1999 - Percussion Freaks (GQ881 VER. AAB)
+pcnfrkk                         // 1999 - Percussion Freaks (GQ881 VER. KAB)
+pcnfrku                         // 1999 - Percussion Freaks (GQ881 VER. UAB)
 pcnfrk2m                        // 2000 - Percussion Freaks 2nd Mix (GE912 VER. KAA)
 pcnfrk3m                        // 2000 - Percussion Freaks 3rd Mix (G*A23 VER. KAA)
 pcnfrk4m                        // 2001 - Percussion Freaks 4rd Mix (G*A25 VER. AAA)
@@ -22706,6 +22720,11 @@ roma16                          // Roma
 roma16a                         // Roma
 roma32                          // Roma
 
+@source:mephisto_milano.cpp
+milano                          // 1991 Mephisto Milano
+milanoa                         // 1991 Mephisto Milano
+nshort                          // 1993 Mephisto Nigel Short
+
 @source:mephisto_mm1.cpp
 mm1
 mm1b
@@ -22763,6 +22782,8 @@ lond32t8
 
 @source:mephisto_mondial.cpp
 mondial                         // 1985 Mephisto Mondial
+
+@source:mephisto_mondial2.cpp
 mondial2                        // 1987 Mephisto Mondial II
 
 @source:mephisto_mondial68k.cpp
@@ -22784,11 +22805,10 @@ polgar                          // 1990 Mephisto Polgar
 polgara                         // 1989 Mephisto Polgar
 polgar10                        // 1990 Mephisto Polgar 10MHz
 polgar101                       // 1990 Mephisto Polgar 10MHz
+
+@source:mephisto_risc.cpp
 mrisc                           // 1992 Mephisto RISC 1MB
 mrisc2                          // 1994 Mephisto RISC II
-milano                          // 1991 Mephisto Milano
-milanoa                         // 1991 Mephisto Milano
-nshort                          // 1993 Mephisto Nigel Short
 
 @source:mephistp.cpp
 mephistp                        //
@@ -23119,10 +23139,13 @@ mktturbo                        // hack
 nbajam                          // (c) 1993 Midway
 nbajamr1                        // (c) 1993 Midway
 nbajamr2                        // (c) 1993 Midway
-nbajamte                        // (c) 1994 Midway
-nbajamte1                       // (c) 1994 Midway
-nbajamte2                       // (c) 1994 Midway
-nbajamte3                       // (c) 1994 Midway
+nbajamte                        // (c) 1994 Midway (rev 4.0 3/23/94)
+nbajamte1                       // (c) 1994 Midway (rev 1.00 1/17/94)
+nbajamte2                       // (c) 1994 Midway (rev 2.1 2/06/94)
+nbajamte2a                      // (c) 1994 Midway (rev 2.0 1/28/94)
+nbajamte3                       // (c) 1994 Midway (rev 3.0 3/04/94)
+nbajamte3a                      // (c) 1994 Midway (rev 3.0 2/26/94)
+nbajamte4                       // (c) 1994 Midway (rev 4.0 3/03/94)
 nbajamten                       // (c) 1995 Midway
 
 @source:midvunit.cpp
@@ -23152,9 +23175,16 @@ mk3                             // (c) 1994 Midway
 mk3p40                          // (c) 1994 Midway
 mk3r10                          // (c) 1994 Midway
 mk3r20                          // (c) 1994 Midway
-nbahangt                        // (c) 1996 Midway
-nbamht                          // (c) 1996 Midway
-nbamht1                         // (c) 1996 Midway
+nbahangt                        // (c) 1996 Midway (ver L1.3 10/10/96)
+nbahangtl11                     // (c) 1996 Midway (ver L1.1 4/16/96)
+nbahangtm11                     // (c) 1996 Midway (ver M1.1 4/16/96)
+nbahangtl12                     // (c) 1996 Midway (ver L1.2 8/29/96)
+nbahangtm12                     // (c) 1996 Midway (ver M1.2 8/29/96)
+nbahangtm13                     // (c) 1996 Midway (ver M1.3 10/10/96)
+nbamht                          // (c) 1996 Midway (ver L1.03 06/09/97)
+nbamhtl10                       // (c) 1996 Midway (ver L1.0 11/08/96)
+nbamhtm10                       // (c) 1996 Midway (ver M1.0 11/08/96)
+nbamhtp                         // (c) 1996 Midway (ver L0.9 10/30/96)
 openice                         // (c) 1995 Midway
 openicea                        // (c) 1995 Midway
 rmpgwt                          // (c) 1997 Midway
@@ -23200,6 +23230,7 @@ narc1                           // (c) 1988 Williams
 narc2                           // (c) 1988 Williams
 narc3                           // (c) 1988 Williams
 narc4                           // (c) 1988 Williams
+narc6                           // (c) 1988 Williams
 shimpact                        // (c) 1991 Midway
 shimpactp4                      // (c) 1991 Midway
 shimpactp5                      // (c) 1991 Midway
@@ -23218,11 +23249,13 @@ term2lg1                        // (c) 1992 Midway
 term2pa2                        // (c) 1992 Midway
 totcarn                         // (c) 1992 Midway
 totcarnp                        // (c) 1992 Midway
-trog                            // (c) 1990 Midway
-trog3                           // (c) 1990 Midway
-trog4                           // (c) 1990 Midway
-trogpa4                         // (c) 1990 Midway
-trogpa6                         // (c) 1990 Midway
+trog                            // (c) 1990 Midway (rev LA5 3/29/91)
+trog3                           // (c) 1990 Midway (rev LA3 2/14/91)
+trog3a                          // (c) 1990 Midway (rev LA3 2/10/91)
+trog4                           // (c) 1990 Midway (rev LA4 3/11/91)
+trogpa4                         // (c) 1990 Midway (rev 4.00 7/27/90)
+trogpa5                         // (c) 1990 Midway (rev PA5-PAC 8/28/90)
+trogpa6                         // (c) 1990 Midway (rev PA6-PAC 9/09/90)
 
 @source:midzeus.cpp
 crusnexo                        // (c) 1999 Midway (v2.4) Latest offical release
@@ -32587,6 +32620,7 @@ msimm2
 msinamco
 msisinv
 msifrog
+rbbrite
 rcapnp
 senario25
 ventur25
@@ -32957,8 +32991,9 @@ ssensor4
 supercon
 
 @source:novag_diablo.cpp
-diablo68                        //
-scorpio68                       //
+diablo68
+diablo68a
+scorpio68
 
 @source:novag_micro.cpp
 nmicro
@@ -37086,6 +37121,7 @@ goldnaxejd                      //
 goldnaxeu                       // (c) 1989 (FD1094)
 goldnaxeud                      //
 hwchamp                         // (c) 1987 (Unprotected)
+hwchampa                        // (c) 1987 (Unprotected)
 hwchampj                        // (c) 1987 (FD1094)
 hwchampjd                       //
 isgsm                           //
@@ -38555,7 +38591,7 @@ jak_spdmoa
 conyteni                        //
 conyping                        //
 conyfght
-karaokd2
+sstarkar
 
 @source:spg29x.cpp
 hyprscan                        //
@@ -41641,6 +41677,7 @@ heiankyo                        // (c) [1979?] Denki Onkyo
 hocrash                         // bootleg
 invds                           // 367-382 (c) 1979 Sega
 invho2                          // 271-286 (c) 1979 Sega
+invho2a                         // 326-341 (c) 1979 Sega
 invinco                         // 310-318 (c) 1979 Sega
 nsub                            // 268-275 (c) 1980 Sega
 pulsar                          // 790-805 (c) 1981 Sega

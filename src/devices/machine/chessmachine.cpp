@@ -10,13 +10,14 @@ This is the 2nd (1992) version of The ChessMachine, it is used in:
 - The ChessMachine EC2, Amiga external module
 - Mephisto Risc 1MB/II, chess computer
 
-Unlike the SR model (devices/bus/isa/chessmsr.*), RAM size and CPU type
-are the same on every known device.
-
+Hardware notes:
 - VLSI-ARM VY86C010-12QC (ARM2 CPU)
 - 1MB RAM (8*Siemens HYB514256B-60)
 - 128 bytes PROM (4*DM74S288AN)
 - 2 GALs for I/O handling
+
+Unlike the SR model (devices/bus/isa/chessmsr.*), RAM size and CPU type
+are the same on every known device.
 
 Only 4 lines for I/O, so that part is much slower than the SR model.
 

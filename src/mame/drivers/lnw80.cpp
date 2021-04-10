@@ -94,7 +94,6 @@ To Do / Status:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "formats/dmk_dsk.h"
 #include "formats/td0_dsk.h"
 #include "formats/trs80_dsk.h"
 
@@ -975,9 +974,8 @@ GFXDECODE_END
 
 void lnw80_state::floppy_formats(format_registration &fr)
 {
-	fr.add(FLOPPY_TRS80_FORMAT);
+	fr.add(FLOPPY_JV1_FORMAT);
 	fr.add(FLOPPY_TD0_FORMAT);
-	fr.add(FLOPPY_DMK_FORMAT);
 }
 
 static void lnw80_floppies(device_slot_interface &device)

@@ -13,7 +13,7 @@
    trees (zooming?)
  - not sure if the analog inputs are handled correctly;
  - Fix the framebuffer display in cocktail mode;
- - Albatross: bad graphics, caused by missing rom(s).
+ - Albatross: controls.
 
  Notes:
  - The game uses special control panel with 1 golf club shaped device to select shot
@@ -33,6 +33,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 class suprgolf_state : public driver_device
 {
 public:
@@ -48,6 +50,11 @@ public:
 	void suprgolf(machine_config &config);
 
 	void init_suprgolf();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -92,10 +99,6 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void io_map(address_map &map);
 	void suprgolf_map(address_map &map);
@@ -135,10 +138,9 @@ void suprgolf_state::video_start()
 
 uint32_t suprgolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int count;
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	count = 0;
+	int count = 0;
 
 	for(int y=0;y<256;y++)
 	{
@@ -657,15 +659,18 @@ ROM_START( albatross )
 	ROM_LOAD( "map.4a",       0x0b0000, 0x010000, CRC(cfec1a0f) SHA1(c09ece059cb3c456b66c016c6fab3139d3f61c6a) )
 
 	ROM_REGION( 0x100000, "user2", ROMREGION_ERASEFF )
-	ROM_LOAD( "cg20.7k",0x000000, 0x10000, BAD_DUMP CRC(1e3fa2fd) SHA1(4771b90e40ebfbae4a98ff7ce6db50f635232597) ) // - empty sockets on PCB :/ (temps from Super Crowns Golf)
-	ROM_LOAD( "cg21.7j",0x010000, 0x10000, BAD_DUMP CRC(0323a2cd) SHA1(d7d4b35ad451acb2fa3d117bb0ae2f8fbd883f17) ) // /
-	ROM_LOAD( "2.4c",   0x020000, 0x20000, CRC(08d4363b) SHA1(60c5543c35f44af2f4a8f7ca4bc10633f5fa67fb) )
+	ROM_LOAD( "cg30.ic14", 0x000000, 0x10000, BAD_DUMP CRC(6b7ffee9) SHA1(7b7f0f9801ab604ea4280c6d75dfcfdb4123520c) ) // - empty sockets on PCB :/ (temps from Super Crowns Golf World version)
+	ROM_LOAD( "cg31.ic13", 0x010000, 0x10000, BAD_DUMP CRC(c5ba8e39) SHA1(aff8d5fd532f1e1d90c21bc42a349e3e83c67064) ) //
+	ROM_LOAD( "2.4c",      0x020000, 0x20000, CRC(08d4363b) SHA1(60c5543c35f44af2f4a8f7ca4bc10633f5fa67fb) ) // matches cg32 + cg33 of the World version
 
 	ROM_REGION( 0x70000, "gfx1", 0 )
-	ROM_LOAD( "chr1.3h",      0x000000, 0x020000, CRC(e62d2bb4) SHA1(f931699114a99b7eb25f8bb841d85de0d6a106a5) )
-	ROM_LOAD( "chr2.3g",      0x020000, 0x020000, CRC(808c15e6) SHA1(d7d1ac7456f492dfcc1c1b501f8dde86e405fd7b) )
-	ROM_LOAD( "chr3.3e",      0x040000, 0x020000, CRC(9a60193d) SHA1(d22c958b5bd82626fcfc94f7ad16d8cd4bacdda2) )
-	ROM_LOAD( "chr4.3d",      0x060000, 0x010000, CRC(0fb88270) SHA1(d85a7f1bc5b3c4b13bbd887cea4c055541cbb737) )
+	ROM_LOAD( "chr1.3h",      0x000000, 0x010000, CRC(e62d2bb4) SHA1(f931699114a99b7eb25f8bb841d85de0d6a106a5) )
+	ROM_CONTINUE(             0x040000, 0x010000 )
+	ROM_LOAD( "chr2.3g",      0x010000, 0x010000, CRC(808c15e6) SHA1(d7d1ac7456f492dfcc1c1b501f8dde86e405fd7b) )
+	ROM_CONTINUE(             0x050000, 0x010000 )
+	ROM_LOAD( "chr3.3e",      0x020000, 0x010000, CRC(9a60193d) SHA1(d22c958b5bd82626fcfc94f7ad16d8cd4bacdda2) )
+	ROM_CONTINUE(             0x060000, 0x010000 )
+	ROM_LOAD( "chr4.3d",      0x030000, 0x010000, CRC(0fb88270) SHA1(d85a7f1bc5b3c4b13bbd887cea4c055541cbb737) )
 ROM_END
 
 
@@ -679,6 +684,9 @@ void suprgolf_state::init_suprgolf()
 	ROM[0x74f5-0x4000] = 0x00;
 	ROM[0x6d72+(0x4000*3)-0x4000] = 0x20; //patch ROM check
 }
+
+} // Anonymous namespace
+
 
 GAME( 1989, suprgolf,  0,         suprgolf,  suprgolf, suprgolf_state, empty_init,    ROT0, "Nasco", "Super Crowns Golf (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, suprgolfj, suprgolf,  suprgolf,  suprgolf, suprgolf_state, init_suprgolf, ROT0, "Nasco", "Super Crowns Golf (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

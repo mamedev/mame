@@ -754,6 +754,7 @@ MACHINES["VRENDER0"] = true
 --BUSES["ABCKB"] = true
 --BUSES["ADAM"] = true
 --BUSES["ADAMNET"] = true
+--BUSES["ADB"] = true
 --BUSES["APF"] = true
 BUSES["AMIGA_KEYBOARD"] = true
 --BUSES["ARCADIA"] = true

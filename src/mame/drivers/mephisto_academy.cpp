@@ -7,12 +7,12 @@ Mephisto Academy
 
 Hardware notes:
 - PCB label HGS 10 130 01
-- VL65NC02-04PC, 4.91MHz XTAL
+- VL65NC02-04PC @ 4.91MHz
 - 2*32KB ROM(TC57256AD-12), 1st ROM half-empty
 - 8KB battery-backed RAM(TC5564APL-15)
 - HD44100H, HD44780, 2*16 chars LCD screen
 - 8 tri-color leds (not fully used: always outputs 6 red, 2 green)
-- magnets chessboard with leds, beeper
+- magnets chessboard with leds, piezo
 
 Since the program is on an external module, it appears it was meant to be
 a modular chesscomputer. However, no extra modules were sold separately.
@@ -29,6 +29,7 @@ Module PCB is the same as Super Mondial II College, label HGS 10 116 05.
 #include "video/mmdisplay2.h"
 #include "video/pwm.h"
 
+// internal artwork
 #include "mephisto_academy.lh"
 
 
@@ -125,7 +126,6 @@ INPUT_PORTS_END
 
 void academy_state::academy(machine_config &config)
 {
-	/* basic machine hardware */
 	M65C02(config, m_maincpu, 4.9152_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &academy_state::main_map);
 
@@ -137,7 +137,7 @@ void academy_state::academy(machine_config &config)
 	HC259(config, m_outlatch); // SN74HC259N
 	m_outlatch->parallel_out_cb().set("display:dac", FUNC(dac_byte_interface::write)).rshift(2).mask(0x03);
 
-	MEPHISTO_SENSORS_BOARD(config, "board");
+	MEPHISTO_SENSORS_BOARD(config, "board"); // internal
 	MEPHISTO_DISPLAY_MODULE2(config, "display"); // internal
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(4, 4);
@@ -176,7 +176,7 @@ ROM_END
     Game Drivers
 ***************************************************************************/
 
-/*    YEAR, NAME,      PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS */
+/*    YEAR, NAME,      PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY             FULLNAME                      FLAGS */
 CONS( 1989, academy,   0,       0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1989, academyg,  academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (German, 06-03-89)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1989, academyga, academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (German, 04-10-88)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

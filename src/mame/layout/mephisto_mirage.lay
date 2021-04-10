@@ -11,10 +11,10 @@ license:CC0
 		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
 	</element>
 	<element name="hidew" defstate="0">
-		<disk state="0"><color red="0.81" green="0.8" blue="0.79" /></disk>
+		<rect state="0"><color red="0.81" green="0.8" blue="0.79" /></rect>
 	</element>
 	<element name="hideb" defstate="0">
-		<disk state="0"><color red="0.41" green="0.4" blue="0.39" /></disk>
+		<rect state="0"><color red="0.41" green="0.4" blue="0.39" /></rect>
 	</element>
 
 	<element name="text_1"><text string="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>

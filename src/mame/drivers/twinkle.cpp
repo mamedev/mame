@@ -24,17 +24,18 @@ The following games are known to exist on this hardware (there may be more)
                                                                   Video CD      Security
 Game Title                            Year     Program CD       6/7/8 use DVD   Dongle      HDD label
 -----------------------------------------------------------------------------------------------------
-beatmania IIDX (English)              1999     GQ863 A01        GQ863 A04      *863 A02    863 HDD A01
-beatmania IIDX (Japanese)             1999     GQ863-JA B01     GQ863 A04      *863 A02    863 HDD A01
-beatmania IIDX + DDR Club Kit         1999     896 JA ABM       GQ863 A04      *863 A02    863 HDD A01
+beatmania IIDX (English)              1999     GQ863 A01        GQ863 A04      863 A02!    863 HDD A01
+beatmania IIDX (Japanese)             1999     GQ863-JA B01     GQ863 A04      863 A02!    863 HDD A01
+beatmania IIDX + DDR Club Kit         1999     896 JA ABM       GQ863 A04      863 A02!    863 HDD A01
                                              + 896 JA A01
-beatmania IIDX + DDR Club Kit(newer)  1999     896 JA BBM       GQ863 A04      *863 A02    863 HDD A01
+beatmania IIDX + DDR Club Kit(newer)  1999     896 JA BBM       GQ863 A04      863 A02!    863 HDD A01
                                              + 896 JA A01
-beatmania IIDX Substream              1999     GC983 A01        GC983 A04      *983 A02    983 HDD A01
-beatmania IIDX Substream (Asia)       1999     GC983-AA A01     GC983 A04      *983A A02   983 HDD A01
-beatmania IIDX Club Version 2         1999     GE984 A01(BM)    GC983 A04      *984 A02    983 HDD A01
+beatmania IIDX Substream              1999     GC983 A01        GC983 A04      983 A02!    983 HDD A01
+beatmania IIDX Substream (Asia)       1999     GC983-AA A01     GC983 A04      983A A02!   983 HDD A01
+beatmania IIDX Club Version 2         1999     GE984 A01(BM)    GC983 A04      984 A02!    983 HDD A01
                                              + GE984 A01(DDR)
 beatmania IIDX 2nd Style              1999     GC985 A01        GC985 A04      985         985 HDD A01
+beatstage II 2nd Style                1999     ?                ?              ?           ?
 beatmania IIDX 3rd Style              2000     GC992-JA A01     GC992-JA A04   992         992 HDD A01
 beatmania IIDX 3rd Style(newer)       2000     GC992-JA B01     GC992-JA A04   992         992 HDD A01
 beatmania IIDX 3rd Style(newest)      2000     GC992-JA C01     GC992-JA A04   992         992 HDD A01
@@ -47,9 +48,31 @@ beatmania IIDX 7th Style(newer)       2002     B44 JA B01       B44 JA A02     B
 beatmania IIDX 8th Style              2002     C44 JA A01       C44 JA A02     C44         C44 JA A03
 
 * = Not dumped.
+! = Dumped partially, see security note below.
 ? = Code unknown.
 
-Where there are multiple revisions of the program cd, it has been assumed that the video and hdd are the same.
+All versions of IIDX before 2nd Style use a security dongle containing a X76F041. It contains three
+8 byte passwords for writing to the dongle, reading from the dongle and reading/writing configuration
+registers. Without the password, you cannot perform the desired action. Further, the chip contains
+a feature where a series of bad passwords locks all actions permanently until the chip is reset. The
+only way around this, according to the datasheet, is to submit the correct password or wipe the entire
+chip and reprogram it.
+
+All four secure enclaves making the 512 bytes of data present on the dongle are protected by the read
+password which must be present in some form in the game binary and as such is trivial to recover.
+Additionally, tracing the code reveals unused functions for writing dongles and setting configuration
+registers. Unfortunately, the write and config passwords appear scrubbed from the binaries. However,
+the intended configuration register valuse are still present in the binaries. Thus, we can at least
+infer the read password as well as the config register values, and use the read password to dump the
+512 bytes contained in the secure enclave. The data sheet specifies the reset sequence. With this data,
+we can reconstruct a dongle dump that is missing only the write and config passwords since it is not
+presently possible to read them. Further, a brute-force attack seems impossible due to the config
+register defaults being set to 3 password failures before lockout. All of the dumps taken in this
+manner are labelled "bad dump" since they are incomplete.
+
+Dongles for 2nd Style and newer do not suffer this problem as they use a serial EEPROM with no
+protection. They can be read out and contain a serial number that matches the printed serial on the
+outside of the dongle as well as game-specific bytes to tie the dongle to the specific mix.
 
 The Konami Twinkle hardware basically consists of the following parts....
 3 PCBs sandwiched together in a metal box
@@ -1217,7 +1240,7 @@ ROM_START( bmiidx )
 	TWINKLE_BIOS
 
 	ROM_REGION( 0x224, "security", 0 )
-	ROM_LOAD( "863a02", 0x000000, 0x000224, BAD_DUMP CRC(7b2a429b) SHA1(f710d19c7b900a58584c07ab8fd3ab7b9f0121d7) )
+	ROM_LOAD( "863a02", 0x000000, 0x000224, BAD_DUMP CRC(078be99f) SHA1(7def88d18a9250a8e4b54a51bf663161676cd9be) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" ) // program
 	DISK_IMAGE_READONLY( "gq863-jab01", 0, SHA1(331f80b40ed560c7e017621b7daeeb8275d92b9a) )
@@ -1233,7 +1256,7 @@ ROM_START( bmiidxa )
 	TWINKLE_BIOS
 
 	ROM_REGION( 0x224, "security", 0 )
-	ROM_LOAD( "863a02", 0x000000, 0x000224, BAD_DUMP CRC(7b2a429b) SHA1(f710d19c7b900a58584c07ab8fd3ab7b9f0121d7) )
+	ROM_LOAD( "863a02", 0x000000, 0x000224, BAD_DUMP CRC(078be99f) SHA1(7def88d18a9250a8e4b54a51bf663161676cd9be) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" ) // program
 	DISK_IMAGE_READONLY( "gq863a01", 0, SHA1(07fc467f6500504729becbaf77dabc093a134e65) )
@@ -1425,7 +1448,7 @@ ROM_START( bmiidxc )
 	TWINKLE_BIOS
 
 	ROM_REGION( 0x224, "security", 0 )
-	ROM_LOAD( "896a02", 0x000000, 0x000224, BAD_DUMP CRC(7b2a429b) SHA1(f710d19c7b900a58584c07ab8fd3ab7b9f0121d7) )
+	ROM_LOAD( "863a02", 0x000000, 0x000224, BAD_DUMP CRC(078be99f) SHA1(7def88d18a9250a8e4b54a51bf663161676cd9be) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
 	DISK_IMAGE_READONLY( "896jabbm", 0, SHA1(09fb638bc5b3e64af13ae3df66ba25e490440946) )
@@ -1441,7 +1464,7 @@ ROM_START( bmiidxca )
 	TWINKLE_BIOS
 
 	ROM_REGION( 0x224, "security", 0 )
-	ROM_LOAD( "896a02", 0x000000, 0x000224, BAD_DUMP CRC(7b2a429b) SHA1(f710d19c7b900a58584c07ab8fd3ab7b9f0121d7) )
+	ROM_LOAD( "863a02", 0x000000, 0x000224, BAD_DUMP CRC(078be99f) SHA1(7def88d18a9250a8e4b54a51bf663161676cd9be) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
 	DISK_IMAGE_READONLY( "896jaabm", 0, SHA1(ea7205f86543d9273efcc226666ab530c32b23c1) )
@@ -1457,7 +1480,7 @@ ROM_START( bmiidxs )
 	TWINKLE_BIOS
 
 	ROM_REGION( 0x224, "security", 0 )
-	ROM_LOAD( "983a02", 0x000000, 0x000224, NO_DUMP )
+	ROM_LOAD( "983a02", 0x000000, 0x000224, BAD_DUMP CRC(6a6ace82) SHA1(1e1373f40c469c117316c03db414d9984567dd42) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
 	DISK_IMAGE_READONLY( "gc983a01", 0, SHA1(7a80380f9c18c7da9643e0b9954ad8367eda5948) )
@@ -1473,7 +1496,7 @@ ROM_START( bmiidxsa )
 	TWINKLE_BIOS
 
 	ROM_REGION( 0x224, "security", 0 )
-	ROM_LOAD( "983aa02", 0x000000, 0x000224, NO_DUMP )
+	ROM_LOAD( "983aa02", 0x000000, 0x000224, BAD_DUMP CRC(bcc8965c) SHA1(e152d19a92544212e321a332c6e6678d623dab21) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
 	DISK_IMAGE_READONLY( "gc983aa,a01", 0, SHA1(9ef5725fc79a7f4f524ef93849af42b2758102cd) )
@@ -1489,7 +1512,7 @@ ROM_START( bmiidxc2 )
 	TWINKLE_BIOS
 
 	ROM_REGION( 0x224, "security", 0 )
-	ROM_LOAD( "984a02", 0x000000, 0x000224, BAD_DUMP CRC(5b08e1ef) SHA1(d43ad5d958313ccb2420246621d9180230b4782d) )
+	ROM_LOAD( "984a02", 0x000000, 0x000224, BAD_DUMP CRC(786db814) SHA1(722c709d95d54cd519856ddea64b9176ef191b0d) )
 
 	DISK_REGION( "scsi:" SCSI_PORT_DEVICE1 ":cdrom" )
 	DISK_IMAGE_READONLY( "ge984a01,bm", 0, SHA1(03b083ba09652dfab6f328000c3c9de2a7a4e618) )

@@ -91,7 +91,7 @@ void mondial68k_state::update_display()
 void mondial68k_state::lcd_s_w(u32 data)
 {
 	// output LCD digits (note: last digit DP segment is unused)
-	for (int i=0; i<4; i++)
+	for (int i = 0; i < 4; i++)
 		m_digits[i] = bitswap<8>((data & 0x7fffffff) >> (8 * i), 7,4,5,0,1,2,3,6);
 }
 
@@ -112,15 +112,15 @@ void mondial68k_state::input_mux_w(u8 data)
 
 u8 mondial68k_state::inputs_r()
 {
-	u8 data = 0x00;
+	u8 data = 0;
 
 	// read buttons
-	for (int i=0; i<4; i++)
+	for (int i = 0; i < 4; i++)
 		if (!BIT(m_input_mux, i))
 			data |= m_inputs[i]->read();
 
 	// read chessboard sensors
-	for (int i=0; i<8; i++)
+	for (int i = 0; i < 8; i++)
 		if (!BIT(m_board_mux, i))
 			data |= m_board->read_rank(i);
 

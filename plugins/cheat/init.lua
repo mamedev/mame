@@ -524,7 +524,8 @@ function cheat.startplugin()
 				local scr = manager.machine.screens[screen]
 				if not scr then
 					local tag
-					tag, scr = next(manager.machine.screens) -- get any screen
+					local nxt, coll = manager.machine.screens:pairs()
+					tag, scr = nxt(coll) -- get any screen
 				end
 				cheat.cheat_env[name] = scr
 			end

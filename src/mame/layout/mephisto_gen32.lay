@@ -460,7 +460,7 @@ license:CC0
 		<element ref="cblack"><bounds x="13" y="-2" width="89" height="89" /></element>
 		<element ref="cwhite"><bounds x="17" y="2" width="81" height="81" /></element>
 
-		<element ref="text_lcd"><bounds x="47.5" y="89" width="24.5" height="2" /></element>
+		<element ref="text_lcd"><bounds x="47.5" y="89.3" width="24.5" height="1.5" /></element>
 		<group ref="panel"><bounds x="47.5" y="91.8" width="24.5" height="6.5" /></group>
 		<group ref="buttons"><bounds x="77.5" y="88.5" width="13" height="13" /></group>
 

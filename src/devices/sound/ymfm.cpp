@@ -3103,7 +3103,7 @@ void ymfm_engine_base<RegisterType>::write(u16 regnum, u8 data)
 template<class RegisterType>
 u8 ymfm_engine_base<RegisterType>::status() const
 {
-	u8 result = m_status & ~STATUS_BUSY;
+	u8 result = m_status & ~STATUS_BUSY & ~m_regs.status_mask();
 	if (m_device.machine().time() < m_busy_end)
 		result |= STATUS_BUSY;
 	return result;
@@ -3210,7 +3210,7 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::check_interrupts)
 {
 	// update the state
 	u8 old_state = m_irq_state;
-	m_irq_state = ((m_status & m_irq_mask) != 0);
+	m_irq_state = ((m_status & m_irq_mask & ~m_regs.status_mask()) != 0);
 
 	// set the IRQ status bit
 	if (m_irq_state)
@@ -3232,6 +3232,9 @@ TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::check_interrupts)
 template<class RegisterType>
 TIMER_CALLBACK_MEMBER(ymfm_engine_base<RegisterType>::synced_mode_w)
 {
+	// mark all channels as modified
+	m_modified_channels = ALL_CHANNELS;
+
 	// actually write the mode register now
 	u32 dummy1, dummy2;
 	m_regs.write(RegisterType::REG_MODE, param, dummy1, dummy2);

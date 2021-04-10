@@ -39,6 +39,7 @@
 
 #include "mephisto_montec.lh"
 #include "mephisto_megaiv.lh"
+#include "mephisto_smondial.lh"
 #include "mephisto_smondial2.lh"
 
 
@@ -185,7 +186,7 @@ uint8_t mephisto_montec_state::megaiv_input_r(offs_t offset)
 void mephisto_montec_state::montec_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
-	map(0x2000, 0x2000).noprw(); // ?
+	map(0x2000, 0x2000).nopr(); // ?
 	map(0x2400, 0x2400).r(FUNC(mephisto_montec_state::montec_input_r));
 	map(0x2800, 0x2800).w(m_board, FUNC(mephisto_board_device::mux_w));
 	map(0x2c00, 0x2c00).w(m_board, FUNC(mephisto_board_device::led_w));
@@ -397,6 +398,8 @@ void mephisto_smondial_state::smondial(machine_config &config)
 	m_boardlatch->q_out_cb<5>().set(FUNC(mephisto_smondial_state::led_mux_w<5>));
 	m_boardlatch->q_out_cb<6>().set(FUNC(mephisto_smondial_state::led_mux_w<6>));
 	m_boardlatch->q_out_cb<7>().set(FUNC(mephisto_smondial_state::led_mux_w<7>));
+
+	config.set_default_layout(layout_mephisto_smondial);
 }
 
 void mephisto_montec_state::smondial2(machine_config &config)

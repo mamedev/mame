@@ -3233,8 +3233,8 @@ ROM_START( shufshot )   /* Version 1.40 (PCB P/N 1083 Rev 2) */
 	ROM_LOAD32_BYTE( "shot_prom3_v1.40.prom3", 0x00003, 0x20000, CRC(4b28f28b) SHA1(602e230cc69ae872e40d72c85ec66f111826c15e) )
 
 	ROM_REGION( 0x28000, "soundcpu", 0 )
-	ROM_LOAD( "shotsnd.u88", 0x10000, 0x18000, CRC(e37d599d) SHA1(105f91e968ecf553d910a97726ddc536289bbb2b) )
-	ROM_CONTINUE(            0x08000, 0x08000 )
+	ROM_LOAD( "shotsnd_u88_v1.1.u88", 0x10000, 0x18000, CRC(e37d599d) SHA1(105f91e968ecf553d910a97726ddc536289bbb2b) ) /* labeled SHOTSND U88 V1.1, also known to be labeled SHOTSND U88 */
+	ROM_CONTINUE(                     0x08000, 0x08000 )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
 	ROM_LOAD32_BYTE( "shf_grom0_0.grm0_0",  0x000000, 0x80000, CRC(832a3d6a) SHA1(443328fa61b79c93ec6c9d24893b2ec38358a905) )
@@ -3268,10 +3268,10 @@ ROM_START( shufshot139 )   /* Version 1.39 (PCB P/N 1083 Rev 2) */
 	ROM_LOAD32_BYTE( "shot_prom3_v1.39.prom3", 0x00003, 0x20000, CRC(108a69be) SHA1(1b2ebe4767be084707522a90f009d3a70e03d578) )
 
 	ROM_REGION( 0x28000, "soundcpu", 0 )
-	ROM_LOAD( "shotsnd.u88", 0x10000, 0x18000, CRC(e37d599d) SHA1(105f91e968ecf553d910a97726ddc536289bbb2b) )
-	ROM_CONTINUE(            0x08000, 0x08000 )
+	ROM_LOAD( "shotsnd_u88_v1.1.u88", 0x10000, 0x18000, CRC(e37d599d) SHA1(105f91e968ecf553d910a97726ddc536289bbb2b) ) /* labeled SHOTSND U88 V1.1, also known to be labeled SHOTSND U88 */
+	ROM_CONTINUE(                     0x08000, 0x08000 )
 
-	ROM_REGION( 0x800000, "gfx1", 0 )
+	ROM_REGION( 0x800000, "gfx1", 0 ) /* some Shuffleshot v1.39 PCBs are known to use the older GROM3_0 through GROM3_3 data */
 	ROM_LOAD32_BYTE( "shf_grom0_0.grm0_0",  0x000000, 0x80000, CRC(832a3d6a) SHA1(443328fa61b79c93ec6c9d24893b2ec38358a905) )
 	ROM_LOAD32_BYTE( "shf_grom0_1.grm0_1",  0x000001, 0x80000, CRC(155e48a2) SHA1(187d65423ff9a3d6b6c34c885a1b2397fa5371cf) )
 	ROM_LOAD32_BYTE( "shf_grom0_2.grm0_2",  0x000002, 0x80000, CRC(9f2b470d) SHA1(012e917856042cbe00d476e3220a7f9c841bd199) )
@@ -3303,8 +3303,8 @@ ROM_START( shufshot138 )   /* Version 1.38 (PCB P/N 1083 Rev 2) - Not offically 
 	ROM_LOAD32_BYTE( "shot_prom3_v1.38.prom3", 0x00003, 0x20000, CRC(723cb9a5) SHA1(2ac209053bce245130b6056fe0ebe048596ae3b4) )
 
 	ROM_REGION( 0x28000, "soundcpu", 0 )
-	ROM_LOAD( "shotsnd.u88", 0x10000, 0x18000, CRC(e37d599d) SHA1(105f91e968ecf553d910a97726ddc536289bbb2b) )
-	ROM_CONTINUE(            0x08000, 0x08000 )
+	ROM_LOAD( "shotsnd_u88_v1.1.u88", 0x10000, 0x18000, CRC(e37d599d) SHA1(105f91e968ecf553d910a97726ddc536289bbb2b) ) /* labeled SHOTSND U88 V1.1, also known to be labeled SHOTSND U88 */
+	ROM_CONTINUE(                     0x08000, 0x08000 )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
 	ROM_LOAD32_BYTE( "shf_grom0_0.grm0_0",  0x000000, 0x80000, CRC(832a3d6a) SHA1(443328fa61b79c93ec6c9d24893b2ec38358a905) )
@@ -3338,8 +3338,8 @@ ROM_START( shufshot137 )   /* Version 1.37 (PCB P/N 1083 Rev 2) */
 	ROM_LOAD32_BYTE( "shot_prom3_v1.37.prom3", 0x00003, 0x20000, CRC(efa66ad8) SHA1(d8dc754529284e6c06b912e226c8a4520aab49fc) )
 
 	ROM_REGION( 0x28000, "soundcpu", 0 )
-	ROM_LOAD( "shotsnd.u88", 0x10000, 0x18000, CRC(e37d599d) SHA1(105f91e968ecf553d910a97726ddc536289bbb2b) )
-	ROM_CONTINUE(            0x08000, 0x08000 )
+	ROM_LOAD( "shotsnd_u88_v1.1.u88", 0x10000, 0x18000, CRC(e37d599d) SHA1(105f91e968ecf553d910a97726ddc536289bbb2b) ) /* labeled SHOTSND U88 V1.1, also known to be labeled SHOTSND U88 */
+	ROM_CONTINUE(                     0x08000, 0x08000 )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
 	ROM_LOAD32_BYTE( "shf_grom0_0.grm0_0", 0x000000, 0x80000, CRC(832a3d6a) SHA1(443328fa61b79c93ec6c9d24893b2ec38358a905) )
@@ -3373,8 +3373,8 @@ ROM_START( shufshot135 )   /* Version 1.35 (PCB P/N 1083 Rev 2) - Not offically 
 	ROM_LOAD32_BYTE( "shot_prom3_v1.35.prom3", 0x00003, 0x20000, CRC(bf6fabbb) SHA1(3f52791b974a6170fad492c0270270f5712c8506) )
 
 	ROM_REGION( 0x28000, "soundcpu", 0 )
-	ROM_LOAD( "shotsnd.u88", 0x10000, 0x18000, CRC(e37d599d) SHA1(105f91e968ecf553d910a97726ddc536289bbb2b) )
-	ROM_CONTINUE(            0x08000, 0x08000 )
+	ROM_LOAD( "shotsnd_u88_v1.1.u88", 0x10000, 0x18000, CRC(e37d599d) SHA1(105f91e968ecf553d910a97726ddc536289bbb2b) ) /* labeled SHOTSND U88 V1.1, also known to be labeled SHOTSND U88 */
+	ROM_CONTINUE(                     0x08000, 0x08000 )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
 	ROM_LOAD32_BYTE( "shf_grom0_0.grm0_0", 0x000000, 0x80000, CRC(832a3d6a) SHA1(443328fa61b79c93ec6c9d24893b2ec38358a905) )

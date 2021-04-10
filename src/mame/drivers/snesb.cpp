@@ -30,7 +30,7 @@ TODO:
    so you are awarded 55 credits on a hard reset)
  - sblast2b : dipswitches
  - sblast2b : pressing start during gameplay changes the character used. Intentional?
- - sblast2ba: needs redump of one program ROM and decryption
+ - sblast2ba: needs decryption
  - denseib,2: fix gfx glitches, missing texts
  - legendsb : unknown dipswitches
  - rushbets : dipswitches (stored at memory locations $785006 and $785008)
@@ -1563,7 +1563,7 @@ ROM_START( sblast2ba) // all 27c4000
 	ROM_REGION( 0x400000, "user7", 0 )
 	ROM_LOAD( "u14", 0x000000, 0x080000, CRC(d2bdc126) SHA1(fa8f03b73f2f9b7a159699b764e2c46b5f8a8190) )
 	ROM_LOAD( "u15", 0x080000, 0x080000, CRC(50f9acb1) SHA1(a86bc98f81dc2c9443fbcd9b5f4880b8d5851ed6) )
-	ROM_LOAD( "u16", 0x100000, 0x080000, BAD_DUMP CRC(abc004e6) SHA1(fd2392b070f443ce30f759893b733c18e7121b80) ) // FIXED BITS (xxx0xxxx)
+	ROM_LOAD( "u16", 0x100000, 0x080000, CRC(2a7f40f3) SHA1(e0db49969880af1edbadd8bc5a1bc59a55777d23) )
 	ROM_LOAD( "u17", 0x180000, 0x080000, CRC(09817173) SHA1(e2ad9e7e1a95cde9ee973647dbd5df83b524978b) )
 ROM_END
 
