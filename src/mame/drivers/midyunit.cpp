@@ -31,13 +31,6 @@
             table from the UTILITIES menu.  It's best to do a FULL FACTORY RESTORE
 
 
-Super High Impact
-Midway, 1991
-
-This game runs on (typical) Midway Y-Unit hardware. The PCB is a base
-board 'system' that can run other Y-Unit games by swapping ROMs and
-the protection chip.
-
 *************************************************************************
 
 Notes for NARC based on source code release:
@@ -137,6 +130,12 @@ ARTWORK, ANIMATIONS, CLAY SCULPTING: JACK E. HAEGER
 
 *************************************************************************
 
+Super High Impact
+Midway, 1991
+
+This game runs on (typical) Midway Y-Unit hardware. The PCB is a base
+board 'system' that can run other Y-Unit games by swapping ROMs and
+the protection chip.
 
 PCB Layout
 ----------
