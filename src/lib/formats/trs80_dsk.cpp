@@ -141,6 +141,8 @@ int jv3_format::identify(io_generic *io, uint32_t form_factor, const std::vector
 bool jv3_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	printf("Disk detected as JV3\n");fflush(stdout);
+	int drive_tracks, drive_sides;
+	image->get_maximal_geometry(drive_tracks, drive_sides);
 	uint32_t image_size = io_generic_size(io);
 	const uint32_t entries = 2901;
 	const uint32_t header_size = entries *3 +1;
@@ -234,6 +236,14 @@ bool jv3_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 					}
 					data_ptr += sector_size;
 				}
+
+				// Protect against oversized disk
+				if ((curr_track >= drive_tracks) || (curr_side >= drive_sides))
+				{
+					printf("Disk exceeds drive capabilities\n");
+					return false;
+				}
+
 				//printf("Side %d, Track %d, %s density\n",curr_side,curr_track,density ? "Double" : "Single");
 				if (density)
 				{
