@@ -21,8 +21,9 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_resolve_objects() override;
 
-	// reading and writing
+	// writing
 	virtual DECLARE_WRITE_LINE_MEMBER(write_sscope) override { m_port_3d->write_sscope(state); }
 
 private:

@@ -86,16 +86,16 @@ void sms_3d_glasses_device::screen_sms_ntsc_raw_params(screen_device &screen, X 
 }
 
 template <typename X>
-void sms_3d_glasses_device::screen_sms_3d_glasses_raw_params(screen_device &screen, sms_3d_port_device *port, X &&pixelclock)
+void sms_3d_glasses_device::screen_sms_3d_glasses_raw_params(screen_device &screen, screen_device &main_screen, X &&pixelclock)
 {
 	screen.set_raw(std::forward<X>(pixelclock),
-		port->m_screen->width(),
-		port->m_screen->visible_area().min_x,
-		port->m_screen->visible_area().max_x + 1,
-		port->m_screen->height(),
-		port->m_screen->visible_area().min_y,
-		port->m_screen->visible_area().max_y + 1);
-	screen.set_refresh_hz(pixelclock / (port->m_screen->width() * port->m_screen->height()));
+		main_screen.width(),
+		main_screen.visible_area().min_x,
+		main_screen.visible_area().max_x + 1,
+		main_screen.height(),
+		main_screen.visible_area().min_y,
+		main_screen.visible_area().max_y + 1);
+	screen.set_refresh_hz(pixelclock / (main_screen.width() * main_screen.height()));
 }
 
 //-------------------------------------------------
@@ -104,17 +104,19 @@ void sms_3d_glasses_device::screen_sms_3d_glasses_raw_params(screen_device &scre
 
 void sms_3d_glasses_device::device_start()
 {
-	screen_sms_3d_glasses_raw_params(*m_left_lcd, m_port, ATTOSECONDS_TO_HZ(m_port->m_screen->refresh_attoseconds() / (m_port->m_screen->width() * m_port->m_screen->height())));
-	screen_sms_3d_glasses_raw_params(*m_right_lcd, m_port, ATTOSECONDS_TO_HZ(m_port->m_screen->refresh_attoseconds() / (m_port->m_screen->width() * m_port->m_screen->height())));
+	screen_sms_3d_glasses_raw_params(*m_left_lcd, *m_screen, ATTOSECONDS_TO_HZ(m_screen->refresh_attoseconds() / (m_screen->width() * m_screen->height())));
+	screen_sms_3d_glasses_raw_params(*m_right_lcd, *m_screen, ATTOSECONDS_TO_HZ(m_screen->refresh_attoseconds() / (m_screen->width() * m_screen->height())));
 
-	m_port->m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	m_port->m_screen->register_screen_bitmap(m_tmpbitmap);
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->register_screen_bitmap(m_tmpbitmap);
 
 	m_left_lcd->register_screen_bitmap(m_prevleft_bitmap);
 	m_right_lcd->register_screen_bitmap(m_prevright_bitmap);
 
 	save_item(NAME(m_prevleft_bitmap));
 	save_item(NAME(m_prevright_bitmap));
+
+	save_item(NAME(m_sscope_state));
 
 	// Allow screens to have crosshair, useful for the game missil3d
 	machine().crosshair().get_crosshair(0).set_screen(CROSSHAIR_SCREEN_ALL);
@@ -127,6 +129,8 @@ void sms_3d_glasses_device::device_start()
 
 void sms_3d_glasses_device::device_reset()
 {
+	m_sscope_state = 0;
+
 	uint8_t binocular_hack = m_port_binocular->read();
 
 	if (binocular_hack & 0x01)
@@ -157,25 +161,29 @@ void sms_3d_glasses_device::device_add_mconfig(machine_config &config)
 }
 
 
-void sms_3d_glasses_device::update_displayed_range()
+WRITE_LINE_MEMBER(sms_3d_glasses_device::write_sscope)
 {
-	m_left_lcd->update_partial(m_left_lcd->vpos());
-	m_right_lcd->update_partial(m_right_lcd->vpos());
+	if (state != m_sscope_state)
+	{
+		m_left_lcd->update_partial(m_left_lcd->vpos());
+		m_right_lcd->update_partial(m_right_lcd->vpos());
+		m_sscope_state = state;
+	}
 }
 
 
 void sms_3d_glasses_device::blit_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int min_y = std::max(cliprect.min_y, m_port->m_screen->visible_area().min_y);
-	int max_y = std::min(cliprect.max_y, m_port->m_screen->visible_area().max_y);
+	int min_y = std::max(cliprect.min_y, m_screen->visible_area().min_y);
+	int max_y = std::min(cliprect.max_y, m_screen->visible_area().max_y);
 
-	m_port->m_screen->pixels(&m_tmpbitmap.pix(0));
+	m_screen->pixels(&m_tmpbitmap.pix(0));
 
 	for (int y = min_y; y <= max_y; y++)
 	{
-		int scr_visible_width = m_port->m_screen->visible_area().max_x - m_port->m_screen->visible_area().min_x + 1;
-		int min_x = std::max(cliprect.min_x, m_port->m_screen->visible_area().min_x);
-		int max_x = std::min(cliprect.max_x, m_port->m_screen->visible_area().max_x);
+		int scr_visible_width = m_screen->visible_area().max_x - m_screen->visible_area().min_x + 1;
+		int min_x = std::max(cliprect.min_x, m_screen->visible_area().min_x);
+		int max_x = std::min(cliprect.max_x, m_screen->visible_area().max_x);
 
 		uint32_t *const linedst = &bitmap.pix(y);
 		uint32_t const *const line = &m_tmpbitmap.pix(0) + ((y - min_y) * scr_visible_width) - min_x;
@@ -190,7 +198,7 @@ void sms_3d_glasses_device::blit_bitmap(bitmap_rgb32 &bitmap, const rectangle &c
 
 uint32_t sms_3d_glasses_device::screen_update_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (m_port->m_sscope_state)
+	if (m_sscope_state)
 	{
 		// state 1 = left screen ON, right screen OFF
 
@@ -218,7 +226,7 @@ uint32_t sms_3d_glasses_device::screen_update_left(screen_device &screen, bitmap
 
 uint32_t sms_3d_glasses_device::screen_update_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (!m_port->m_sscope_state)
+	if (m_sscope_state)
 	{
 		// state 0 = left screen OFF, right screen ON
 

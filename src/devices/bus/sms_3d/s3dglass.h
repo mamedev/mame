@@ -37,14 +37,15 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual void update_displayed_range() override;
-
 	// optional information overrides
 	ioport_constructor device_input_ports() const override;
 
+	// writing
+	virtual DECLARE_WRITE_LINE_MEMBER(write_sscope) override;
+
 private:
 	template <typename X> static void screen_sms_ntsc_raw_params(screen_device &screen, X &&pixelclock);
-	template <typename X> static void screen_sms_3d_glasses_raw_params(screen_device &screen, sms_3d_port_device *port, X &&pixelclock);
+	template <typename X> static void screen_sms_3d_glasses_raw_params(screen_device &screen, screen_device &main_screen, X &&pixelclock);
 
 	void blit_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -53,6 +54,7 @@ private:
 	required_device<screen_device> m_left_lcd;
 	required_device<screen_device> m_right_lcd;
 
+	int m_sscope_state;
 	bitmap_rgb32 m_tmpbitmap;
 
 	// for 3D glass binocular hack

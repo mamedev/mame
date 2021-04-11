@@ -52,6 +52,9 @@ public:
 	// construction/destruction
 	virtual ~device_sega8_cart_interface();
 
+	// configuration
+	virtual void set_screen_device(screen_device &screen) { m_screen = &screen; }
+
 	// reading and writing
 	virtual uint8_t read_cart(offs_t offset) { return 0xff; }
 	virtual void write_cart(offs_t offset, uint8_t data) { }
@@ -105,7 +108,7 @@ protected:
 	int m_lphaser_xoffs;
 	int m_sms_mode;
 
-	sega8_cart_slot_device *m_slot;
+	screen_device *m_screen;
 };
 
 
@@ -337,9 +340,18 @@ public:
 	virtual const char *image_interface() const noexcept override { return "sms_card"; }
 	virtual const char *file_extensions() const noexcept override { return "bin,sg"; }
 
-	// required for the 3D glasses
-	DECLARE_WRITE_LINE_MEMBER(write_sscope) { if (m_cart) m_cart->write_sscope(state); }
+	// configuration
 	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
+
+	// writing
+	DECLARE_WRITE_LINE_MEMBER(write_sscope) { if (m_cart) m_cart->write_sscope(state); }
+
+protected:
+	// device-level overrides
+	virtual void device_resolve_objects() override;
+
+private:
+	// required for the 3D glasses
 	required_device<screen_device> m_screen;
 };
 

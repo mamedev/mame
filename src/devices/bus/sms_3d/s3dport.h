@@ -39,22 +39,22 @@ public:
 		set_default_option(dflt);
 		set_fixed(false);
 	}
-
 	sms_3d_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~sms_3d_port_device();
 
+	// configuration
+	void set_screen_device(screen_device &screen) { m_screen = &screen; }
+
+	// writing
 	DECLARE_WRITE_LINE_MEMBER(write_sscope);
-
-	int m_sscope_state;
-
-	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
-
-	required_device<screen_device> m_screen;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_resolve_objects() override;
 
+private:
+	screen_device *m_screen;
 	device_sms_3d_port_interface *m_device;
 };
 
@@ -68,12 +68,16 @@ public:
 	// construction/destruction
 	virtual ~device_sms_3d_port_interface();
 
-	virtual void update_displayed_range() {}
+	// configuration
+	virtual void set_screen_device(screen_device &screen) { m_screen = &screen; }
+
+	// writing
+	virtual DECLARE_WRITE_LINE_MEMBER(write_sscope) {}
 
 protected:
 	device_sms_3d_port_interface(const machine_config &mconfig, device_t &device);
 
-	sms_3d_port_device *m_port;
+	screen_device *m_screen;
 };
 
 

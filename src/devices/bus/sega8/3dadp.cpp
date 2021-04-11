@@ -28,8 +28,11 @@ sega8_3d_adaptor_device::sega8_3d_adaptor_device(const machine_config &mconfig, 
 void sega8_3d_adaptor_device::device_add_mconfig(machine_config &config)
 {
 	SMS_3D_PORT(config, m_port_3d, sms_3d_port_devices, "3dglass");
-	if (dynamic_cast<sms_card_slot_device *>(m_slot)) {
-		m_port_3d->set_screen_tag(dynamic_cast<sms_card_slot_device *>(m_slot)->m_screen);
-	}
+}
+
+
+void sega8_3d_adaptor_device::device_resolve_objects()
+{
+	m_port_3d->set_screen_device(*m_screen);
 }
 

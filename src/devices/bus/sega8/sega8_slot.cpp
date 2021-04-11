@@ -67,8 +67,8 @@ device_sega8_cart_interface::device_sega8_cart_interface(const machine_config &m
 	, m_late_battery_enable(false)
 	, m_lphaser_xoffs(-1)
 	, m_sms_mode(0)
+	, m_screen(nullptr)
 {
-	m_slot = dynamic_cast<sega8_cart_slot_device *>(device.owner());
 }
 
 
@@ -200,6 +200,13 @@ sega8_cart_slot_device::~sega8_cart_slot_device()
 void sega8_cart_slot_device::device_start()
 {
 	m_cart = get_card_device();
+}
+
+void sms_card_slot_device::device_resolve_objects()
+{
+	m_cart = get_card_device();
+	if (m_cart)
+		m_cart->set_screen_device(*m_screen);
 }
 
 //-------------------------------------------------

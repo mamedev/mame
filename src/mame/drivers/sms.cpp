@@ -839,7 +839,7 @@ void sms1_state::sms1_kr(machine_config &config)
 	SMS_EXPANSION_SLOT(config, "smsexp", sms_expansion_devices, nullptr);
 
 	SMS_3D_PORT(config, m_port_3d, sms_3d_port_devices, nullptr);
-	m_port_3d->set_screen_tag(m_main_scr);
+	m_port_3d->set_screen_device(*m_main_scr);
 
 	SOFTWARE_LIST(config, "cart_list2").set_original("sg1000");
 
