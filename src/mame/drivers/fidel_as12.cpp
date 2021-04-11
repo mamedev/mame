@@ -18,13 +18,13 @@ magnetic chess board sensors. See fidel_sc12.cpp for a more technical descriptio
 #include "emu.h"
 #include "machine/fidel_clockdiv.h"
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/sensorboard.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -76,17 +76,13 @@ private:
 	void led_w(offs_t offset, u8 data);
 	u8 input_r(offs_t offset);
 
-	u16 m_inp_mux;
-	u8 m_led_data;
+	u16 m_inp_mux = 0;
+	u8 m_led_data = 0;
 };
 
 void as12_state::machine_start()
 {
 	fidel_clockdiv_state::machine_start();
-
-	// zerofill
-	m_inp_mux = 0;
-	m_led_data = 0;
 
 	// register for savestates
 	save_item(NAME(m_inp_mux));
