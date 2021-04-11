@@ -40,7 +40,15 @@ the protection chip.
 
 *************************************************************************
 
-Notes for NARC (based on source code release):
+Notes for NARC based on source code release:
+
+  DESIGNED BY: EUGENE P. JARVIS, GEORGE N. PETRO, TODD R. ALLEN & JACK E. HAEGER
+PROGRAMMED BY: EUGENE P. JARVIS, GEORGE N. PETRO, TODD R. ALLEN & LAWRENCE E. DEMAR
+   ARTWORK BY: JACK E. HAEGER, JOHN R. NEWCOMER, LIN YOUNG & TIMOTHY J. ELLIOT
+    Z-UNIT BY: MARK "THE LARGE ONE" LOFFREDO & GLENN A. MILLION (SHIPP)
+
+      STARTED:  8/1/87
+RELEASED 2.00:  1/16/89
 
 Revision history for NARC:
 
@@ -50,7 +58,7 @@ Revision history for NARC:
 1.3   Fixed 2nd player buy-in. More audits & core dump software (11/21/88)
 1.8   First game release for PROTO run (250) games released for greed reasons. Not recommended by dev team (12/18/88)
 1.91  Used as location test, no other information, see below
-2.00  Production release number 1. Too much was added / changed from v1.8 for itemized. Considered starting pointer
+2.00  Production release number 1. Too much was added / changed from v1.8 for itemized. Considered starting point
       for production revisions (1/16/89)
 3.00  More data structures initialized on secret bonus.
       Bad trap jumps to secret bonus any time during gameplay.
@@ -89,13 +97,43 @@ Revision history for NARC:
      Only 2 trips to the silver safe
    Times Square ( 876 Plays... 2 "Survived Lockup" ):
      No Mr. Big Kills
-     Continuous By-in obsered in the Silver sage and beyond
+     Continuous Buy-in observed in the silver safe and beyond
    Alladin's Castle ( 704 Plays... 1 Watchdog ):
      Mr. Big killed twice
      Report that helicopter can be made to disappear by violent car action
    Galaxy Game Center ( 617 plays... 1 Lockup ):
      No Mr. Big kills
      Players not able to find blue card in drug lab witnessed
+
+*************************************************************************
+
+TROG development based on notes in source code & dumped sets:
+
+TROG:
+ STARTED:  6/5/89   INTERNATIONAL DUX DAY
+RELEASED:
+  1.00     6/20/90  FINAL VERSION OF ORIGINAL TROG
+  2.00     6/27/90  FIXED NASTY DINO SPACE BUG
+  3.00     7/9/90   A FEW CORRECTIONS
+  4.00     7/27/90
+
+PAC-TROG (prototype & release):
+ STARTED:  7/10/90
+RELEASED:
+   PA3     8/15/90
+   PA5     8/28/90
+   PA6     9/27/90  PROTO PAC-TROG 10 DOMESTIC 10 ABROAD.
+   LA1     1/14/91  MANY CHANGES BEFORE PRODUCTION
+   LA2     2/6/91   FIRST TO BE MASS PRODUCED
+   LA3     2/14/91  HAPPY VALENTINES DAY!
+   LA4     3/11/91
+   LA5     3/29/91
+
+      DESIGN:  GEORGE N. PETRO & JACK E. HAEGER
+GAME PROGRAM:  GEORGE N. PETRO & J. KURT MAHAN
+    HARDWARE:  MARK LOFFREDO, GLENN SHIPP & CARY MEDNICK
+
+ARTWORK, ANIMATIONS, CLAY SCULPTING: JACK E. HAEGER
 
 *************************************************************************
 
@@ -3585,7 +3623,7 @@ GAME( 1990, trog4,      trog,     yunit_cvsd_4bit_slow,    trog,     midyunit_st
 GAME( 1990, trog3,      trog,     yunit_cvsd_4bit_slow,    trog,     midyunit_state, init_trog,     ROT0, "Midway",   "Trog (rev LA3 2/14/91)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, trog3a,     trog,     yunit_cvsd_4bit_slow,    trog,     midyunit_state, init_trog,     ROT0, "Midway",   "Trog (rev LA3 2/10/91)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, trogpa6,    trog,     yunit_cvsd_4bit_slow,    trog,     midyunit_state, init_trog,     ROT0, "Midway",   "Trog (prototype, rev PA6-PAC 9/09/90)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, trogpa5,    trog,     yunit_cvsd_4bit_slow,    trogpa4,  midyunit_state, init_trog,     ROT0, "Midway",   "Trog (prototype, rev PA5-PAC 8/28/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, trogpa5,    trog,     yunit_cvsd_4bit_slow,    trog,     midyunit_state, init_trog,     ROT0, "Midway",   "Trog (prototype, rev PA5-PAC 8/28/90)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, trogpa4,    trog,     yunit_cvsd_4bit_slow,    trogpa4,  midyunit_state, init_trog,     ROT0, "Midway",   "Trog (prototype, rev 4.00 7/27/90)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, mazebl,     trog,     yunit_cvsd_4bit_slow,    trog,     midyunit_state, init_trog,     ROT0, "bootleg",  "Maze (Trog rev LA4 3/11/91 bootleg)", MACHINE_SUPPORTS_SAVE )
 

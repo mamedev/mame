@@ -11,7 +11,24 @@
         * Revolution X
 
 
-Revision history from the source code released on the internet:
+***************************************************************************
+
+Notes based on source code release:
+
+ STARTED:  08/10/92
+RELEASED:  05/23/94
+
+DIRECTED & PRODUCED BY: GEORGE N. PETRO & JACK E. HAEGER
+           GAME DESIGN: GEORGE N. PETRO, JACK E. HAEGER, BILL DABELSTEIN, WARREN B. DAVIS, STEVE BERAN & MARTIN MARTINEZ
+   ARTWORK, ANIMATIONS: JACK E. HAEGER, STEVE BERAN, MARTIN MARTINEZ & JOHN VOGEL
+          GAME PROGRAM: BILL DABELSTEIN, WARREN DAVIS & GEORGE N. PETRO
+        SOUNDS & MUSIC: CHRIS GRANNER
+              HARDWARE: RAY MACIKA, STEVE CORRELL, MARK LOFFREDO, CARY MEDNICK & PAT COX
+          SOUND SYSTEM: MATT BOOTY & RK140
+    MECHANICS, CABINET: TED VALAVANIS, MATT DAVIS & BOB
+               SUPPORT: AL LASKO & DR. SHERIDAN OURSLER	
+
+Revision history:
 
     DATE     REV  DESCRIPTION
     ----     ---  -----------
@@ -21,6 +38,8 @@ Revision history from the source code released on the internet:
     4/15/94  TA3  Second weekend test, $189.00 in 1.5 days
     4/22/94  TA4  Installed 4/22/94 10:00pm at Times Square
     5/5/94   TA5  Put out the weekend before releasing
+    5/23/94  PA5
+    6/16/94  LA1
 
 ***************************************************************************
 
