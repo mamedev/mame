@@ -26,7 +26,7 @@
 class device_sms_3d_port_interface;
 
 class sms_3d_port_device : public device_t,
-								public device_slot_interface
+								public device_single_card_slot_interface<device_sms_3d_port_interface>
 {
 public:
 	// construction/destruction
