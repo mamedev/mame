@@ -8,6 +8,7 @@ Mephisto Mondial II
 Hardware notes:
 - G65SC02 @ 2MHz (unsure about rating)
 - 2KB RAM, 32KB ROM
+- expansion slot at underside (not used)
 - 8*8 chessboard buttons, 24 leds, piezo
 
 ******************************************************************************/
@@ -177,7 +178,9 @@ void mondial2_state::mondial2(machine_config &config)
 	/* basic machine hardware */
 	M65SC02(config, m_maincpu, 2_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mondial2_state::mondial2_mem);
-	m_maincpu->set_periodic_int(FUNC(mondial2_state::nmi_line_pulse), attotime::from_hz(2_MHz_XTAL / (1 << 12)));
+
+	const attotime nmi_period = attotime::from_hz(2_MHz_XTAL / 0x1000);
+	m_maincpu->set_periodic_int(FUNC(mondial2_state::nmi_line_pulse), nmi_period);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));

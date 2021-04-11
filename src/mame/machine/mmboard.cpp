@@ -76,6 +76,9 @@ void mephisto_board_device::device_start()
 {
 	m_led_out.resolve();
 
+	m_mux = 0xff;
+	m_led_data = 0;
+
 	save_item(NAME(m_mux));
 	save_item(NAME(m_led_data));
 

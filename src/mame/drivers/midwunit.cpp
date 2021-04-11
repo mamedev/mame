@@ -28,6 +28,23 @@
 
 ***************************************************************************
 
+Wrestlemania prototype development based on source code release:
+
+2.01   Tues 6 Jun   Initial release.
+2.02   Thurs 8 Jun  Endgame stories added.
+                    Fixed a bug that cut many combos short.
+                    Buddy mode powerup didn't work.  Fixed.
+                    Various minor bug fixes.
+2.03      ???       Fixed a problem with a new watchdog part.
+3.00   Fri 23 Jun   Test version only -- never released.
+                    Attract AAMA transition crash bug fixed.
+                    Various minor bug fixes.
+                    Lots of gameplay tweaking.
+3.01   Tues 27 Jun  Various tweaks and bug fixes.
+                    Buy-in during fireworks bug fixed.
+
+***************************************************************************
+
 MK3/ Ultimate Mortal Kombat 3 / Williams-Midway Wolf hardware
 Midway, 1995
 

@@ -2,7 +2,7 @@
 // copyright-holders:Sandro Ronco
 /**********************************************************************
 
-    Mephisto Sensors Board
+    Mephisto Modular Sensors Board
 
 *********************************************************************/
 

@@ -2534,6 +2534,7 @@ files {
 createMESSProjects(_target, _subtarget, "hegener")
 files {
 	MAME_DIR .. "src/mame/drivers/mephisto_academy.cpp",
+	MAME_DIR .. "src/mame/drivers/mephisto_amsterdam.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_berlin.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_brikett.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_glasgow.cpp",
@@ -2551,6 +2552,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/mephisto_risc.cpp",
 	MAME_DIR .. "src/mame/machine/mmboard.cpp",
 	MAME_DIR .. "src/mame/machine/mmboard.h",
+	MAME_DIR .. "src/mame/video/mmdisplay1.cpp",
+	MAME_DIR .. "src/mame/video/mmdisplay1.h",
 	MAME_DIR .. "src/mame/video/mmdisplay2.cpp",
 	MAME_DIR .. "src/mame/video/mmdisplay2.h",
 }

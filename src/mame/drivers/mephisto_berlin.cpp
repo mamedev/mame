@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Sandro Ronco
+// copyright-holders:Sandro Ronco, hap
 /******************************************************************************
 
 Mephisto Berlin 68000 / Berlin Professional 68020
@@ -41,16 +41,16 @@ public:
 	void berlinp(machine_config &config);
 
 private:
-	u8 input_r();
+	required_device<cpu_device> m_maincpu;
+	required_device<mephisto_board_device> m_board;
+	required_device<mephisto_display2_device> m_display;
+	required_ioport m_keys;
 
 	void berlin_mem(address_map &map);
 	void berlinp_mem(address_map &map);
 	void nvram_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
-	required_device<mephisto_board_device> m_board;
-	required_device<mephisto_display_module2_device> m_display;
-	required_ioport m_keys;
+	u8 input_r();
 };
 
 
@@ -85,8 +85,8 @@ void berlin_state::berlin_mem(address_map &map)
 	map(0x900000, 0x903fff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask16(0xff00);
 	map(0xa00000, 0xa00000).r(FUNC(berlin_state::input_r));
 	map(0xb00000, 0xb00000).w(m_board, FUNC(mephisto_board_device::mux_w));
-	map(0xc00000, 0xc00000).w(m_display, FUNC(mephisto_display_module2_device::latch_w));
-	map(0xd00008, 0xd00008).w(m_display, FUNC(mephisto_display_module2_device::io_w));
+	map(0xc00000, 0xc00000).w(m_display, FUNC(mephisto_display2_device::latch_w));
+	map(0xd00008, 0xd00008).w(m_display, FUNC(mephisto_display2_device::io_w));
 	map(0xe00000, 0xe00000).w(m_board, FUNC(mephisto_board_device::led_w));
 }
 
@@ -97,8 +97,8 @@ void berlin_state::berlinp_mem(address_map &map)
 	map(0x800000, 0x800000).r(FUNC(berlin_state::input_r));
 	map(0x900000, 0x900000).w(m_board, FUNC(mephisto_board_device::mux_w));
 	map(0xa00000, 0xa00000).w(m_board, FUNC(mephisto_board_device::led_w));
-	map(0xb00000, 0xb00000).w(m_display, FUNC(mephisto_display_module2_device::io_w));
-	map(0xc00000, 0xc00000).w(m_display, FUNC(mephisto_display_module2_device::latch_w));
+	map(0xb00000, 0xb00000).w(m_display, FUNC(mephisto_display2_device::io_w));
+	map(0xc00000, 0xc00000).w(m_display, FUNC(mephisto_display2_device::latch_w));
 	map(0xd00000, 0xd07fff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask32(0xff000000);
 }
 

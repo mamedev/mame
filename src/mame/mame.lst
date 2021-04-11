@@ -22690,6 +22690,13 @@ academy
 academyg
 academyga
 
+@source:mephisto_amsterdam.cpp
+amsterd                         // Amsterdam
+dallas16                        // Dallas
+dallas32                        // Dallas
+roma16                          // Roma
+roma32                          // Roma
+
 @source:mephisto_berlin.cpp
 berl16                          // 1992 Mephisto Berlin 68000
 berl16a                         // 1992 Mephisto Berlin 68000
@@ -22710,15 +22717,10 @@ mephisto3c
 mephistoj
 
 @source:mephisto_glasgow.cpp
-amsterd                         // Amsterdam
 amsterda                        // Amsterdam
-dallas16                        // Dallas
 dallas16a                       // Dallas
-dallas32                        // Dallas
 glasgow                         // Glasgow
-roma16                          // Roma
 roma16a                         // Roma
-roma32                          // Roma
 
 @source:mephisto_milano.cpp
 milano                          // 1991 Mephisto Milano
