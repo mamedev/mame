@@ -14,7 +14,7 @@ license:CC0
 			<color red="0.20" green="0.0" blue="0.0" />
 		</disk>
 		<disk state="1">
-			<color red="0.95" green="0.0" blue="0.0" />
+			<color red="1" green="0.1" blue="0.1" />
 		</disk>
 	</element>
 	<element name="ledr" defstate="0">
@@ -22,7 +22,7 @@ license:CC0
 			<color red="0.20" green="0.0" blue="0.0" />
 		</rect>
 		<rect state="1">
-			<color red="0.95" green="0.0" blue="0.0" />
+			<color red="1" green="0.1" blue="0.1" />
 		</rect>
 	</element>
 	<element name="hlb" defstate="0">

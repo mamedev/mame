@@ -12,7 +12,6 @@ Hardware notes:
 
 TODO:
 - verify XTAL (or maybe RC or LC circuit), 2MHz is correct
-- unknown read from 0x2000
 - dump/add MM 1000 module
 
 ******************************************************************************/
@@ -61,6 +60,7 @@ private:
 	void mondial_mem(address_map &map);
 
 	void control_w(u8 data);
+	u8 irq_ack_r();
 	u8 input_r(offs_t offset);
 
 	u8 m_inp_mux = 0;
@@ -77,6 +77,25 @@ void mondial_state::machine_start()
     I/O
 ******************************************************************************/
 
+void mondial_state::control_w(u8 data)
+{
+	// d0-d3: input mux, led select
+	// d4-d6: led data
+	m_inp_mux = data & 0xf;
+	m_led_pwm->matrix(1 << m_inp_mux, ~data >> 4 & 7);
+
+	// d7: enable beeper
+	m_beeper->set_state(BIT(data, 7));
+}
+
+u8 mondial_state::irq_ack_r()
+{
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+
+	return 0;
+}
+
 u8 mondial_state::input_r(offs_t offset)
 {
 	u8 data = 0;
@@ -92,17 +111,6 @@ u8 mondial_state::input_r(offs_t offset)
 	return ~(BIT(data, offset) << 7);
 }
 
-void mondial_state::control_w(u8 data)
-{
-	// d0-d3: input mux, led select
-	// d4-d6: led data
-	m_inp_mux = data & 0xf;
-	m_led_pwm->matrix(1 << m_inp_mux, ~data >> 4 & 7);
-
-	// d7: enable beeper
-	m_beeper->set_state(BIT(data, 7));
-}
-
 
 
 /******************************************************************************
@@ -114,7 +122,7 @@ void mondial_state::mondial_mem(address_map &map)
 	map(0x0000, 0x07ff).ram();
 	map(0x1000, 0x1000).w(FUNC(mondial_state::control_w));
 	map(0x1800, 0x1807).r(FUNC(mondial_state::input_r));
-	map(0x2000, 0x2000).nopr(); // ?
+	map(0x2000, 0x2000).r(FUNC(mondial_state::irq_ack_r));
 	map(0xc000, 0xffff).rom();
 }
 
@@ -126,24 +134,24 @@ void mondial_state::mondial_mem(address_map &map)
 
 static INPUT_PORTS_START( mondial )
 	PORT_START("KEY.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Pawn / 1")   PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Knight / 2") PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Bishop / 3") PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Rook / 4")   PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Queen / 5")  PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("King / 6")   PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Black / 7")  PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("White / 8")  PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Pawn / 1")   PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Knight / 2") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Bishop / 3") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Rook / 4")   PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Queen / 5")  PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("King / 6")   PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Black / 7")  PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("White / 8")  PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD)
 
 	PORT_START("KEY.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("PLAY")       PORT_CODE(KEYCODE_Y)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("POS")        PORT_CODE(KEYCODE_O)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("MEM")        PORT_CODE(KEYCODE_M)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("INFO")       PORT_CODE(KEYCODE_I)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("CL")         PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("CL")         PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("LEV")        PORT_CODE(KEYCODE_L)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("ENT")        PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("RES")        PORT_CODE(KEYCODE_DEL)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("ENT")        PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("RES")        PORT_CODE(KEYCODE_F1)
 INPUT_PORTS_END
 
 
@@ -159,7 +167,7 @@ void mondial_state::mondial(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mondial_state::mondial_mem);
 
 	const attotime irq_period = attotime::from_hz(2000000 / 0x1000);
-	m_maincpu->set_periodic_int(FUNC(mondial_state::irq0_line_hold), irq_period);
+	m_maincpu->set_periodic_int(FUNC(mondial_state::irq0_line_assert), irq_period);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));

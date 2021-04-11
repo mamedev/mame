@@ -55,9 +55,9 @@ private:
 	void mondial2_mem(address_map &map);
 
 	void update_leds();
-	u8 input_r(offs_t offset);
 	void control_w(u8 data);
 	void board_w(u8 data);
+	u8 input_r(offs_t offset);
 
 	u8 m_keypad_mux = 0;
 	u8 m_board_mux = 0;
@@ -83,23 +83,6 @@ void mondial2_state::update_leds()
 	m_led_pwm->matrix(m_board_mux, m_led_data);
 }
 
-u8 mondial2_state::input_r(offs_t offset)
-{
-	u8 data = 0;
-
-	// read chessboard sensors
-	for (int i = 0; i < 8; i++)
-		if (BIT(m_board_mux, i))
-			data |= BIT(m_board->read_rank(i), offset);
-
-	// read keypad
-	for (int i = 0; i < 4; i++)
-		if (BIT(m_keypad_mux, i))
-			data |= BIT(m_keys[i]->read(), offset & 3);
-
-	return ~(data << 7);
-}
-
 void mondial2_state::control_w(u8 data)
 {
 	// d0-d3: keypad mux
@@ -118,6 +101,23 @@ void mondial2_state::board_w(u8 data)
 	// d0-d7: chessboard mux, led select
 	m_board_mux = ~data;
 	update_leds();
+}
+
+u8 mondial2_state::input_r(offs_t offset)
+{
+	u8 data = 0;
+
+	// read chessboard sensors
+	for (int i = 0; i < 8; i++)
+		if (BIT(m_board_mux, i))
+			data |= BIT(m_board->read_rank(i), offset);
+
+	// read keypad
+	for (int i = 0; i < 4; i++)
+		if (BIT(m_keypad_mux, i))
+			data |= BIT(m_keys[i]->read(), offset & 3);
+
+	return ~(data << 7);
 }
 
 
@@ -143,16 +143,16 @@ void mondial2_state::mondial2_mem(address_map &map)
 
 static INPUT_PORTS_START( mondial2 )
 	PORT_START("KEY.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Pawn / 1")   PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Knight / 2") PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Bishop / 3") PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Rook / 4")   PORT_CODE(KEYCODE_4)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Pawn / 1")   PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Knight / 2") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Bishop / 3") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Rook / 4")   PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD)
 
 	PORT_START("KEY.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Queen / 5")  PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("King / 6")   PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Black / 7")  PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("White / 8")  PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Queen / 5")  PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("King / 6")   PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("Black / 7")  PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("White / 8")  PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD)
 
 	PORT_START("KEY.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("PLAY")       PORT_CODE(KEYCODE_Y)
@@ -161,10 +161,10 @@ static INPUT_PORTS_START( mondial2 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("INFO")       PORT_CODE(KEYCODE_I)
 
 	PORT_START("KEY.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("CL")         PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("CL")         PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("LEV")        PORT_CODE(KEYCODE_L)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("ENT")        PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("RES")        PORT_CODE(KEYCODE_DEL)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("ENT")        PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("RES")        PORT_CODE(KEYCODE_F1)
 INPUT_PORTS_END
 
 

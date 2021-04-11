@@ -2550,6 +2550,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mephisto_montec.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_polgar.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_risc.cpp",
+	MAME_DIR .. "src/mame/drivers/mephisto_smondial.cpp",
 	MAME_DIR .. "src/mame/machine/mmboard.cpp",
 	MAME_DIR .. "src/mame/machine/mmboard.h",
 	MAME_DIR .. "src/mame/video/mmdisplay1.cpp",

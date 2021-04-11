@@ -253,7 +253,7 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR, NAME,      PARENT    COMPAT  MACHINE     INPUT      CLASS          INIT          COMPANY             FULLNAME                  FLAGS */
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE     INPUT      CLASS          INIT          COMPANY             FULLNAME                  FLAGS */
 CONS( 1985, amsterd,   0,        0,      amsterdam,  amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Amsterdam",     MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1986, dallas32,  0,        0,      dallas32,   amsterdam, amsterdam_state, empty_init, "Hegener + Glaser", "Mephisto Dallas 68020",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -592,6 +592,7 @@ mephisto_mondial68k.cpp
 mephisto_montec.cpp
 mephisto_polgar.cpp
 mephisto_risc.cpp
+mephisto_smondial.cpp
 meritum.cpp
 mes.cpp
 mfabfz.cpp
