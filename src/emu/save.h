@@ -308,7 +308,7 @@ public:
 	}
 
 	// structures (must have a _save method)
-    template<typename T, std::enable_if_t<std::is_class<T>::value, bool> = true>
+    template<typename T, std::enable_if_t<std::is_class<T>::value && !std::is_base_of<bitmap_t, T>::value, bool> = true>
     save_registrar &reg(T &data, char const *name)
     {
 		save_registrar container(*this, save_registered_item::TYPE_STRUCT, sizeof(data), name, &data);
@@ -329,10 +329,22 @@ public:
 	// rectangle as a special case
     save_registrar &reg(rectangle &data, char const *name)
 	{
-        auto &item = m_parent.append(uintptr_t(&data) - m_baseptr, save_registered_item::TYPE_STRUCT, sizeof(data), name);
-        save_registrar sub(item, &data);
-		sub.reg(data.min_x, "min_x").reg(data.max_x, "max_x").reg(data.min_y, "min_y").reg(data.max_y, "max_y");
+		save_registrar container(*this, save_registered_item::TYPE_STRUCT, sizeof(data), name, &data);
+		container.reg(data.min_x, "min_x")
+			.reg(data.max_x, "max_x")
+			.reg(data.min_y, "min_y")
+			.reg(data.max_y, "max_y");
         return *this;
+	}
+
+	// bitmaps as a special case
+	template<typename BitmapType>
+	std::enable_if_t<std::is_base_of<bitmap_t, BitmapType>::value, save_registrar> &reg(BitmapType &data, char const *name)
+	{
+		save_registrar rows(*this, save_registered_item::save_type(data.height()), data.rowbytes(), name, data.raw_pixptr(0));
+		save_registrar cols(rows, save_registered_item::save_type(data.width()), sizeof(BitmapType::pixel_t), "", data.raw_pixptr(0));
+		cols.register_internal(data.raw_pixptr(0), save_registered_item::TYPE_UINT, sizeof(BitmapType::pixel_t), "");
+		return *this;
 	}
 
 private:
