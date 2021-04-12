@@ -3149,8 +3149,21 @@ void taitoz_state::machine_start()
 
 MACHINE_START_MEMBER(taitoz_state,chasehq)
 {
-	m_lamps.resolve();
 	machine_start();
+
+	m_lamps.resolve();
+}
+
+MACHINE_START_MEMBER(taitoz_state,contcirc)
+{
+	machine_start();
+
+	m_shutter_out.resolve();
+	m_shutter_toggle = 0;
+	m_shutter_control = 0;
+
+	save_item(NAME(m_shutter_toggle));
+	save_item(NAME(m_shutter_control));
 }
 
 void taitoz_state::machine_reset()
@@ -3193,9 +3206,11 @@ void taitoz_state::contcirc(machine_config &config)
 	screen_config(config, 24, 248);
 	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_contcirc));
 	m_screen->set_palette(m_tc0110pcr);
+	m_screen->screen_vblank().set(FUNC(taitoz_state::contcirc_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
+	MCFG_MACHINE_START_OVERRIDE(taitoz_state,contcirc)
 	MCFG_VIDEO_START_OVERRIDE(taitoz_state,taitoz)
 
 	TC0100SCN(config, m_tc0100scn, 0);

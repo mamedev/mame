@@ -9,7 +9,7 @@ Mephisto Mega IV
 
 Hardware notes:
 - G65SC02P-4 @ 4MHz
-- 8KB RAMbattery-backed), 32KB ROM
+- 8KB RAM(battery-backed), 32KB ROM
 - expansion slot at underside (only used for smondial2)
 - 2*PCF2112, 2 7seg LCD screens
 - 8*8 chessboard buttons, 24 tri-color leds, piezo
