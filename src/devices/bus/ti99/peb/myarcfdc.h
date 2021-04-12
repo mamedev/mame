@@ -47,7 +47,7 @@ private:
 	void device_add_mconfig(machine_config &config) override;
 	ioport_constructor device_input_ports() const override;
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	// Callback methods
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );

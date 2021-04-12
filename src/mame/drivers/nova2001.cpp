@@ -570,7 +570,15 @@ static INPUT_PORTS_START( raiders5 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( raiders5ta )
+	PORT_INCLUDE( raiders5 )
 
+	PORT_MODIFY("IN2")
+	// instead of turning Exercise on / off this will flip the screen and swap player 1/2 controls
+	PORT_DIPNAME( 0x40, 0x40, "Swap Controls + Flip Screen" )  PORT_DIPLOCATION("SW1:7")  // Unused in manual
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 /*************************************
  *
@@ -920,7 +928,7 @@ ROM_START( raiders5 )
 	ROM_LOAD( "raiders5.2", 0x4000,  0x4000, CRC(eb2ff410) SHA1(5c995b66b6301cd3cd58efd173481deaa036f842) )
 
 	ROM_REGION( 0x4000, "sub", 0 )
-	ROM_LOAD( "raiders5.2", 0x0000,  0x4000, CRC(eb2ff410) SHA1(5c995b66b6301cd3cd58efd173481deaa036f842) )
+	ROM_COPY( "maincpu", 0x4000, 0x0000, 0x4000 )
 
 	ROM_REGION( 0x8000, "gfx1", 0 ) // (need lineswapping)
 	ROM_LOAD( "raiders3.11f", 0x0000,  0x4000, CRC(30041d58) SHA1(a33087de7afb276925879898a96f418128a5a38c) )
@@ -936,7 +944,7 @@ ROM_START( raiders5t )
 	ROM_LOAD( "raiders2.4d", 0x4000,  0x4000, CRC(c8604be1) SHA1(6d23f26174bb9b2f7db3a5fa6b39674fe237135b) )
 
 	ROM_REGION( 0x4000, "sub", 0 )
-	ROM_LOAD( "raiders2.4d", 0x0000,  0x4000, CRC(c8604be1) SHA1(6d23f26174bb9b2f7db3a5fa6b39674fe237135b) )
+	ROM_COPY( "maincpu", 0x4000, 0x0000, 0x4000 )
 
 	ROM_REGION( 0x8000, "gfx1", 0 ) // (need lineswapping)
 	ROM_LOAD( "raiders3.11f", 0x0000,  0x4000, CRC(30041d58) SHA1(a33087de7afb276925879898a96f418128a5a38c) )
@@ -946,6 +954,22 @@ ROM_START( raiders5t )
 	ROM_LOAD( "raiders5.11n", 0x0000,  0x4000, CRC(c0895090) SHA1(a3a1ae57ed66bc095ea9bfb26470290f67aab1fe) )
 ROM_END
 
+ROM_START( raiders5ta ) // found in Italy, no UPL markings on the PCB? possibly bootleg or locally manufactured with legitimate alt code revision?
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "1.4c", 0x0000,  0x4000, CRC(e6264952) SHA1(c66fe6186ec5611073cac9c154eaf7e064dce1fc) )
+	ROM_LOAD( "2.4d", 0x4000,  0x4000, CRC(06f7c5b0) SHA1(1697c1fc0f37ac75d9df91962187e8eb69c0b9df) )
+
+	ROM_REGION( 0x4000, "sub", 0 )
+	ROM_COPY( "maincpu", 0x4000, 0x0000, 0x4000 )
+
+	ROM_REGION( 0x8000, "gfx1", 0 ) // (need lineswapping)
+	ROM_LOAD( "3.11f", 0x0000,  0x4000, CRC(30041d58) SHA1(a33087de7afb276925879898a96f418128a5a38c) )
+	ROM_LOAD( "4.11g", 0x4000,  0x4000, CRC(e441931c) SHA1(f39b4c25de779c671a6e2b02df64e7fed726f4da) )
+
+	ROM_REGION( 0x4000, "gfx2", 0 ) // (need lineswapping)
+	// single byte different in unused area at 2fff ee -> 2e, possibly bitrot although more than a single bit changed
+	ROM_LOAD( "5.11n", 0x0000,  0x4000, CRC(fb532e4d) SHA1(44da82aafe53884681abf414cb3d7b913d5542c7) )
+ROM_END
 
 
 /*************************************
@@ -1023,11 +1047,12 @@ void nova2001_state::init_raiders5()
 // many of these don't explicitly state Japan, eg. Nova 2001 could easily be used anywhere.
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE,          INIT,          MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1983, nova2001,  0,        nova2001, nova2001, nova2001_state, empty_init,    ROT0,   "UPL", "Nova 2001 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, nova2001h, nova2001, nova2001, nova2001, nova2001_state, empty_init,    ROT0,   "UPL", "Nova 2001 (Japan, hack?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, nova2001u, nova2001, nova2001, nova2001, nova2001_state, empty_init,    ROT0,   "UPL (Universal license)", "Nova 2001 (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ninjakun,  0,        ninjakun, ninjakun, nova2001_state, empty_init,    ROT0,   "UPL (Taito license)", "Ninjakun Majou no Bouken", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pkunwar,   0,        pkunwar,  pkunwar,  nova2001_state, init_pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pkunwarj,  pkunwar,  pkunwar,  pkunwar,  nova2001_state, init_pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, raiders5,  0,        raiders5, raiders5, nova2001_state, init_raiders5, ROT0,   "UPL", "Raiders5", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, raiders5t, raiders5, raiders5, raiders5, nova2001_state, init_raiders5, ROT0,   "UPL (Taito license)", "Raiders5 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nova2001,  0,        nova2001, nova2001,  nova2001_state, empty_init,    ROT0,   "UPL", "Nova 2001 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nova2001h, nova2001, nova2001, nova2001,  nova2001_state, empty_init,    ROT0,   "UPL", "Nova 2001 (Japan, hack?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nova2001u, nova2001, nova2001, nova2001,  nova2001_state, empty_init,    ROT0,   "UPL (Universal license)", "Nova 2001 (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ninjakun,  0,        ninjakun, ninjakun,  nova2001_state, empty_init,    ROT0,   "UPL (Taito license)", "Ninjakun Majou no Bouken", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pkunwar,   0,        pkunwar,  pkunwar,   nova2001_state, init_pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pkunwarj,  pkunwar,  pkunwar,  pkunwar,   nova2001_state, init_pkunwar,  ROT0,   "UPL", "Penguin-Kun Wars (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, raiders5,  0,        raiders5, raiders5,  nova2001_state, init_raiders5, ROT0,   "UPL", "Raiders5", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, raiders5t, raiders5, raiders5, raiders5,  nova2001_state, init_raiders5, ROT0,   "UPL (Taito license)", "Raiders5 (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, raiders5ta,raiders5, raiders5, raiders5ta,nova2001_state, init_raiders5, ROT0,   "UPL (Taito license)", "Raiders5 (Japan, set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )

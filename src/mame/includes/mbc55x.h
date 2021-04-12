@@ -102,8 +102,6 @@ protected:
 	virtual void video_reset() override;
 
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
-
 	uint8_t iodecode_r(offs_t offset);
 	void iodecode_w(offs_t offset, uint8_t data);
 

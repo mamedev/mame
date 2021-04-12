@@ -12,46 +12,30 @@
 #pragma once
 
 #include "formats/flopimg.h"
-#include "formats/d88_dsk.h"
-#include "formats/dfi_dsk.h"
-#include "formats/hxchfe_dsk.h"
-#include "formats/hxcmfm_dsk.h"
-#include "formats/imd_dsk.h"
-#include "formats/ipf_dsk.h"
-#include "formats/mfi_dsk.h"
-#include "formats/td0_dsk.h"
-#include "formats/cqm_dsk.h"
-#include "formats/dsk_dsk.h"
+#include "formats/fsmgr.h"
 #include "sound/samples.h"
 #include "softlist_dev.h"
-
-#define DECLARE_FLOPPY_FORMATS(_name) \
-	static const floppy_format_type _name []
-
-#define FLOPPY_FORMATS_MEMBER(_member) \
-	const floppy_format_type _member [] = {
-#define FLOPPY_FORMATS_END0 \
-		, \
-		nullptr };
-#define FLOPPY_FORMATS_END \
-		, \
-		FLOPPY_D88_FORMAT, \
-		FLOPPY_DFI_FORMAT, \
-		FLOPPY_HFE_FORMAT, \
-		FLOPPY_IMD_FORMAT, \
-		FLOPPY_IPF_FORMAT, \
-		FLOPPY_MFI_FORMAT, \
-		FLOPPY_MFM_FORMAT, \
-		FLOPPY_TD0_FORMAT, \
-		FLOPPY_CQM_FORMAT, \
-		FLOPPY_DSK_FORMAT \
-	FLOPPY_FORMATS_END0
 
 class floppy_sound_device;
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+
+class format_registration {
+public:
+	format_registration();
+
+	void add(floppy_format_type format);
+	void add(filesystem_manager_type fs);
+
+	void add_fm_containers();
+	void add_mfm_containers();
+	void add_pc_formats();
+
+	std::vector<floppy_format_type> m_formats;
+	std::vector<filesystem_manager_type> m_fs;
+};
 
 class floppy_image_device : public device_t,
 							public device_image_interface
@@ -64,14 +48,44 @@ public:
 	typedef delegate<void (floppy_image_device *, int)> wpt_cb;
 	typedef delegate<void (floppy_image_device *, int)> led_cb;
 
+	struct fs_info {
+		const filesystem_manager_t *m_manager;
+		floppy_format_type m_type;
+		u32 m_image_size;
+		const char *m_name;
+		u32 m_key;
+		const char *m_description;
+
+		fs_info(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, u32 key, const char *description) :
+			m_manager(manager),
+			m_type(type),
+			m_image_size(image_size),
+			m_name(name),
+			m_key(key),
+			m_description(description)
+		{}
+
+		fs_info(const filesystem_manager_t *manager, const char *name, u32 key, const char *description) :
+			m_manager(manager),
+			m_type(nullptr),
+			m_image_size(0),
+			m_name(name),
+			m_key(key),
+			m_description(description)
+		{}
+	};
+
 	// construction/destruction
 	virtual ~floppy_image_device();
 
-	void set_formats(const floppy_format_type *formats);
+	void set_formats(std::function<void (format_registration &fr)> formats);
 	floppy_image_format_t *get_formats() const;
+	const std::vector<fs_info> &get_fs() const { return m_fs; }
 	floppy_image_format_t *get_load_format() const;
 	floppy_image_format_t *identify(std::string filename);
 	void set_rpm(float rpm);
+
+	void init_fs(const fs_info *fs);
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -103,6 +117,7 @@ public:
 	bool ready_r();
 	void set_ready(bool state);
 	double get_pos();
+	virtual void tfsel_w(int state) { };    // 35SEL line for Apple Sony drives
 
 	virtual bool wpt_r(); // Mac sony drives using this for various reporting
 	int dskchg_r() { return dskchg; }
@@ -131,19 +146,29 @@ public:
 	uint32_t get_form_factor() const;
 	uint32_t get_variant() const;
 
-	static const floppy_format_type default_floppy_formats[];
+	static void default_fm_floppy_formats(format_registration &fr);
+	static void default_mfm_floppy_formats(format_registration &fr);
+	static void default_pc_floppy_formats(format_registration &fr);
 
 	// Enable sound
 	void    enable_sound(bool doit) { m_make_sound = doit; }
 
 protected:
+	struct fs_enum : public filesystem_manager_t::floppy_enumerator {
+		floppy_image_device *m_fid;
+		fs_enum(floppy_image_device *fid) : filesystem_manager_t::floppy_enumerator(), m_fid(fid) {};
+
+		virtual void add(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, u32 key, const char *description) override;
+		virtual void add_raw(const filesystem_manager_t *manager, const char *name, u32 key, const char *description) override;
+	};
+
 	floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
+	virtual void device_config_complete() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_image_interface implementation
@@ -154,12 +179,15 @@ protected:
 
 	void init_floppy_load(bool write_supported);
 
+	std::function<void (format_registration &fr)> format_registration_cb;
 	floppy_image_format_t *input_format;
 	floppy_image_format_t *output_format;
 	std::vector<uint32_t> variants;
 	std::unique_ptr<floppy_image> image;
 	char                  extension_list[256];
 	floppy_image_format_t *fif_list;
+	std::vector<fs_info>  m_fs;
+	std::vector<std::unique_ptr<filesystem_manager_t>> m_fs_managers;
 	emu_timer             *index_timer;
 
 	/* Physical characteristics, filled by setup_characteristics */
@@ -213,6 +241,8 @@ protected:
 	ready_cb cur_ready_cb;
 	wpt_cb cur_wpt_cb;
 	led_cb cur_led_cb;
+
+	void register_formats();
 
 	void check_led();
 	uint32_t find_position(attotime &base, const attotime &when);
@@ -286,6 +316,7 @@ public:
 
 	virtual bool wpt_r() override;
 	virtual void mon_w(int) override;
+	virtual void tfsel_w(int state) override;
 	virtual void seek_phase_w(int phases) override;
 	virtual const char *image_interface() const noexcept override { return "floppy_3_5"; }
 	virtual bool writing_disabled() const override;
@@ -311,6 +342,7 @@ public:
 	virtual ~oa_d34v_device() = default;
 protected:
 	virtual void setup_characteristics() override;
+	virtual void track_changed() override;
 
 	virtual bool is_2m() const override;
 };
@@ -387,7 +419,7 @@ class floppy_connector: public device_t,
 {
 public:
 	template <typename T>
-	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, const floppy_format_type formats[], bool fixed = false)
+	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, std::function<void (format_registration &fr)> formats, bool fixed = false)
 		: floppy_connector(mconfig, tag, owner, 0)
 	{
 		option_reset();
@@ -396,7 +428,7 @@ public:
 		set_fixed(fixed);
 		set_formats(formats);
 	}
-	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, const char *option, const device_type &devtype, bool is_default, const floppy_format_type formats[])
+	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, const char *option, const device_type &devtype, bool is_default, std::function<void (format_registration &fr)> formats)
 		: floppy_connector(mconfig, tag, owner, 0)
 	{
 		option_reset();
@@ -409,7 +441,7 @@ public:
 	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~floppy_connector();
 
-	void set_formats(const floppy_format_type formats[]);
+	void set_formats(std::function<void (format_registration &fr)> formats);
 	floppy_image_device *get_device();
 	void enable_sound(bool doit) { m_enable_sound = doit; }
 
@@ -418,7 +450,7 @@ protected:
 	virtual void device_config_complete() override;
 
 private:
-	const floppy_format_type *formats;
+	std::function<void (format_registration &fr)> formats;
 	bool m_enable_sound;
 };
 

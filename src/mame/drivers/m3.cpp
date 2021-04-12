@@ -17,13 +17,17 @@
     - M-THREE/345 (SA850, 8" double sided, Winchester 10 MB)
 
     Hardware:
-    - Z80
+    - MK3880N-IRL (Z80)
     - 64 KB RAM
     - Z80 CTC
     - 2x D8255AC PPI
     - D8251A
     - MC6845P CRTC
     - FD1793 FDC
+    - XTAL X1 21.??? Mhz (unreadable)
+    - XTAL X2 16 MHz
+    - XTAL X3 4.9152 MHz
+    - Keyboard XTAL 6.1?? MHz (assumed to be 6.144 MHz)
 
     TODO:
     - Initial PC is currently hacked to f000
@@ -31,6 +35,7 @@
     - Printer interface
     - Buzzer
     - Map the rest of the keys, verify existing keys
+    - Switch FDC to 1 MHz for 5.25" drives
 
     Notes:
     - No offical software available, but a custom version of CP/M
@@ -576,14 +581,15 @@ static void m3_floppies(device_slot_interface &device)
 
 void m3_state::m3(machine_config &config)
 {
-	Z80(config, m_maincpu, 3'000'000); // should be 2.5 MHz, but then it's too slow for the floppy
+	Z80(config, m_maincpu, 4.9152_MHz_XTAL / 2);
+	m_maincpu->set_clock_scale(1.2f); // needs to be overclocked or its too slow for the floppy
 	m_maincpu->set_addrmap(AS_PROGRAM, &m3_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &m3_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
 
 	Z80CTC(config, m_ctc, 0); // unknown clock
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_ctc->set_clk<0>(2'457'600 / 2); // unknown clock. this gives the usart 9600 baud by default
+	m_ctc->set_clk<0>(4.9152_MHz_XTAL / 4);
 	m_ctc->zc_callback<0>().set("usart", FUNC(i8251_device::write_txc));
 	m_ctc->zc_callback<0>().append("usart", FUNC(i8251_device::write_rxc));
 
@@ -606,14 +612,14 @@ void m3_state::m3(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
-	screen.set_raw(10'920'000, 707, 0, 560, 309, 0, 240); // unknown clock, hand-tuned to ~50 fps
+	screen.set_raw(21'840'000 / 2, 707, 0, 560, 309, 0, 240); // unknown clock, hand-tuned to ~50 fps
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	GFXDECODE(config, "gfxdecode", m_palette, chars);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	mc6845_device &crtc(MC6845(config, "crtc", 10'920'000 / 7)); // unknown clock
+	mc6845_device &crtc(MC6845(config, "crtc", 21'840'000 / 2 / 7)); // unknown clock
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(7);
@@ -621,14 +627,14 @@ void m3_state::m3(machine_config &config)
 	crtc.out_vsync_callback().set(m_ctc, FUNC(z80ctc_device::trg2));
 
 	// floppy
-	FD1793(config, m_fdc, 2'000'000); // unknown clock
+	FD1793(config, m_fdc, 16_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(FUNC(m3_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(m3_state::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", m3_floppies, "sa850", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", m3_floppies, "sa850", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", m3_floppies, "sa850", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", m3_floppies, "sa850", floppy_image_device::default_mfm_floppy_formats);
 
 	// keyboard
-	I8035(config, m_kbdmcu, 3'000'000); // unknown clock
+	I8035(config, m_kbdmcu, 6.144_MHz_XTAL);
 	m_kbdmcu->set_addrmap(AS_PROGRAM, &m3_state::kbd_mem_map);
 	m_kbdmcu->set_addrmap(AS_IO, &m3_state::kbd_io_map);
 	m_kbdmcu->p1_in_cb().set(FUNC(m3_state::kbd_p1_r));

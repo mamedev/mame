@@ -22,9 +22,11 @@ DEFINE_DEVICE_TYPE(BBC_AMS3, bbc_ams3_device, "bbc_ams3", "AMS 3\" Microdrive Di
 //  FLOPPY_FORMATS( ams3 )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( bbc_ams3_device::floppy_formats )
-	FLOPPY_ACORN_SSD_FORMAT
-FLOPPY_FORMATS_END
+void bbc_ams3_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ACORN_SSD_FORMAT);
+}
 
 
 //-------------------------------------------------

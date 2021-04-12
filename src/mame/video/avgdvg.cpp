@@ -130,18 +130,11 @@ void avgdvg_device_base::vg_flush()
 			cy0 = m_vectbuf[i].y;
 			cx1 = m_vectbuf[i].arg1;
 			cy1 = m_vectbuf[i].arg2;
+			using std::swap;
 			if (cx0 > cx1)
-			{
-				const int t = cx1;
-				cx1 = cx0;
-				cx0 = t;
-			}
-			if (cy0 > cx1)
-			{
-				const int t = cy1;
-				cy1 = cy0;
-				cy0 = t;
-			}
+				swap(cx0, cx1);
+			if (cy0 > cy1)
+				swap(cy0, cy1);
 		}
 	}
 

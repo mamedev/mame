@@ -1038,7 +1038,7 @@ void ngen_state::ngen(machine_config &config)
 	PIT8253(config, m_hdc_timer, 0);
 	m_hdc_timer->set_clk<2>(20_MHz_XTAL / 10);  // 2MHz
 
-	FLOPPY_CONNECTOR(config, "fdc:0", ngen_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", ngen_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 	HARDDISK(config, "hard0", 0);
 }
 
@@ -1151,7 +1151,7 @@ void ngen386_state::ngen386(machine_config &config)
 	PIT8253(config, m_hdc_timer, 0);
 	m_hdc_timer->set_clk<2>(20_MHz_XTAL / 10);  // 2MHz
 
-	FLOPPY_CONNECTOR(config, "fdc:0", ngen_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", ngen_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 	HARDDISK(config, "hard0", 0);
 }
 

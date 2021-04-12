@@ -223,6 +223,9 @@ public:
 	void ppc640(machine_config &config);
 	void ppc512(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -256,7 +259,7 @@ private:
 	uint8_t m_port62;
 	uint8_t m_port65;
 
-	int m_dipstate;
+	uint8_t m_dipstate;
 	static void cfg_com(device_t *device);
 	static void cfg_fdc(device_t *device);
 
@@ -295,6 +298,23 @@ void amstrad_pc_state::ppc512_io(address_map &map)
 {
 	pc200_io(map);
 	map(0x0070, 0x0071).rw("rtc", FUNC(mc146818_device::read), FUNC(mc146818_device::write));
+}
+
+void amstrad_pc_state::machine_start()
+{
+	m_port60 = 0;
+	m_port61 = 0;
+	m_port62 = 0;
+	m_port65 = 0;
+	m_dipstate = 0;
+
+	save_item(NAME(m_port60));
+	save_item(NAME(m_port61));
+	save_item(NAME(m_port62));
+	save_item(NAME(m_port65));
+	save_item(NAME(m_dipstate));
+	save_item(NAME(m_mouse.x));
+	save_item(NAME(m_mouse.y));
 }
 
 /* pc20 (v2)

@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "imagedev/floppy.h"
+#include "formats/imd_dsk.h"
 #include "machine/upd765.h"
 #include "emupal.h"
 #include "screen.h"
@@ -125,12 +126,11 @@ static void tim011_floppies(device_slot_interface &device)
 	device.option_add("35dd", FLOPPY_35_DD);
 }
 
-static const floppy_format_type tim011_floppy_formats[] = {
-	FLOPPY_IMD_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_MFM_FORMAT,
-	nullptr
-};
+static void tim011_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_IMD_FORMAT);
+}
 
 void tim011_state::tim011(machine_config &config)
 {

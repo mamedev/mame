@@ -317,6 +317,8 @@ void apple2_state::machine_start()
 	m_cassette->output(-1.0f);
 	m_upperbank->set_bank(0);
 	m_inh_bank = 0;
+	m_strobe = 0;
+	m_transchar = 0;
 
 	// precalculate joystick time constants
 	m_x_calibration = attotime::from_nsec(10800).as_double();

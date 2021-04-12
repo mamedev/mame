@@ -74,7 +74,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( mtron_w );
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	// keyboard state
 	uint8_t m_kb;

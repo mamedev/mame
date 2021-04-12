@@ -335,7 +335,7 @@ void debug_watchpoint::triggered(read_or_write type, offs_t address, u64 data, u
 		address += m_space.alignment() - size - address_offset;
 
 	// stash the value that will be written or has just been read
-	debug.cpu().set_wpinfo(address, data);
+	debug.cpu().set_wpinfo(address, data, size * unit_size);
 
 	// protect against recursion
 	debug.cpu().set_within_instruction(true);

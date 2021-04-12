@@ -9,6 +9,19 @@
 #include "emu.h"
 #include "floppy.h"
 
+#include "formats/d88_dsk.h"
+#include "formats/dfi_dsk.h"
+#include "formats/hxchfe_dsk.h"
+#include "formats/hxcmfm_dsk.h"
+#include "formats/imd_dsk.h"
+#include "formats/mfi_dsk.h"
+#include "formats/td0_dsk.h"
+#include "formats/cqm_dsk.h"
+#include "formats/dsk_dsk.h"
+#include "formats/pc_dsk.h"
+
+#include "formats/fs_unformatted.h"
+
 #include "speaker.h"
 #include "formats/imageutl.h"
 #include "zippath.h"
@@ -18,7 +31,7 @@
 */
 
 // Show step operation
-#define TRACE_STEP 1
+#define TRACE_STEP 0
 #define TRACE_AUDIO 0
 
 #define PITCH_SEEK_SAMPLES 1
@@ -124,19 +137,62 @@ DEFINE_DEVICE_TYPE(MFD51W, mfd51w_device,  "mfd51w",  "Apple/Sony 3.5 DD (400/80
 DEFINE_DEVICE_TYPE(MFD75W, mfd75w_device,  "mfd75w",  "Apple/Sony 3.5 HD (Superdrive)")
 
 
-const floppy_format_type floppy_image_device::default_floppy_formats[] = {
-	FLOPPY_D88_FORMAT,
-	FLOPPY_DFI_FORMAT,
-	FLOPPY_HFE_FORMAT,
-	FLOPPY_IMD_FORMAT,
-	FLOPPY_IPF_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_MFM_FORMAT,
-	FLOPPY_TD0_FORMAT,
-	FLOPPY_CQM_FORMAT,
-	FLOPPY_DSK_FORMAT,
-	nullptr
-};
+format_registration::format_registration()
+{
+	add(FLOPPY_MFI_FORMAT); // Our generic format
+	add(FLOPPY_DFI_FORMAT); // Flux format, dying
+
+	add(FS_UNFORMATTED);
+}
+
+void format_registration::add_fm_containers()
+{
+	add(FLOPPY_HFE_FORMAT);
+	add(FLOPPY_MFM_FORMAT);
+	add(FLOPPY_TD0_FORMAT);
+	add(FLOPPY_IMD_FORMAT);
+}
+
+void format_registration::add_mfm_containers()
+{
+	add_fm_containers();
+
+	add(FLOPPY_D88_FORMAT);
+	add(FLOPPY_CQM_FORMAT);
+	add(FLOPPY_DSK_FORMAT);
+}
+
+void format_registration::add_pc_formats()
+{
+	add_mfm_containers();
+
+	add(FLOPPY_PC_FORMAT);
+}
+
+void format_registration::add(floppy_format_type format)
+{
+	m_formats.push_back(format);
+}
+
+void format_registration::add(filesystem_manager_type fs)
+{
+	m_fs.push_back(fs);
+}
+
+void floppy_image_device::default_fm_floppy_formats(format_registration &fr)
+{
+	fr.add_fm_containers();
+}
+
+void floppy_image_device::default_mfm_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+}
+
+void floppy_image_device::default_pc_floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+}
 
 floppy_connector::floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, FLOPPY_CONNECTOR, tag, owner, clock),
@@ -150,7 +206,7 @@ floppy_connector::~floppy_connector()
 {
 }
 
-void floppy_connector::set_formats(const floppy_format_type _formats[])
+void floppy_connector::set_formats(std::function<void (format_registration &fr)> _formats)
 {
 	formats = _formats;
 }
@@ -252,14 +308,28 @@ void floppy_image_device::setup_led_cb(led_cb cb)
 	cur_led_cb = cb;
 }
 
-void floppy_image_device::set_formats(const floppy_format_type *formats)
+void floppy_image_device::fs_enum::add(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, u32 key, const char *description)
 {
+	m_fid->m_fs.emplace_back(fs_info(manager, type, image_size, name, key, description));
+}
+
+void floppy_image_device::fs_enum::add_raw(const filesystem_manager_t *manager, const char *name, u32 key, const char *description)
+{
+	m_fid->m_fs.emplace_back(fs_info(manager, name, key, description));
+}
+
+void floppy_image_device::register_formats()
+{
+	format_registration fr;
+	if(format_registration_cb)
+		format_registration_cb(fr);
+
 	extension_list[0] = '\0';
 	fif_list = nullptr;
-	for(int cnt=0; formats[cnt]; cnt++)
+	for(floppy_format_type fft : fr.m_formats)
 	{
 		// allocate a new format
-		floppy_image_format_t *fif = formats[cnt]();
+		floppy_image_format_t *fif = fft();
 		if(!fif_list)
 			fif_list = fif;
 		else
@@ -269,6 +339,19 @@ void floppy_image_device::set_formats(const floppy_format_type *formats)
 
 		image_specify_extension( extension_list, 256, fif->extensions() );
 	}
+
+	fs_enum fse(this);
+	for(filesystem_manager_type fmt : fr.m_fs)
+	{
+		auto ff = fmt();
+		ff->enumerate(fse, form_factor, variants);
+		m_fs_managers.push_back(std::unique_ptr<filesystem_manager_t>(ff));
+	}
+}
+
+void floppy_image_device::set_formats(std::function<void (format_registration &fr)> formats)
+{
+	format_registration_cb = formats;
 }
 
 floppy_image_format_t *floppy_image_device::get_formats() const
@@ -315,17 +398,24 @@ void floppy_image_device::commit_image()
 	output_format->save(&io, variants, image.get());
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void floppy_image_device::device_start()
+void floppy_image_device::device_config_complete()
 {
 	rpm = 0;
 	motor_always_on = false;
 	dskchg_writable = false;
 	has_trk00_sensor = true;
 
+	setup_characteristics();
+	register_formats();
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void floppy_image_device::device_start()
+{
 	// better would be an extra parameter in the MCFG macro
 	drive_index = atoi(owner()->basetag());
 
@@ -348,7 +438,6 @@ void floppy_image_device::device_start()
 	ready_counter = 0;
 	phases = 0;
 
-	setup_characteristics();
 
 	if (m_make_sound) m_sound_out = subdevice<floppy_sound_device>(FLOPSND_TAG);
 
@@ -546,18 +635,96 @@ image_init_result floppy_image_device::call_create(int format_type, util::option
 			output_format = i;
 			break;
 		}
+
+		// Use MFI as a default.
+		if (!strcmp(i->name(), "mfi"))
+			output_format = i;
 	}
 
-	// did we find a suitable format?
-	if (output_format == nullptr)
-	{
-		seterror(IMAGE_ERROR_INVALIDIMAGE, "Unable to identify the image format");
-		return image_init_result::FAIL;
-	}
-
-	init_floppy_load(output_format != nullptr);
+	init_floppy_load(true);
 
 	return image_init_result::PASS;
+}
+
+// Should that go into ioprocs?  Should ioprocs be turned into something C++?
+
+struct iofile_ram {
+	std::vector<u8> *data;
+	int64_t pos;
+};
+
+static void ram_closeproc(void *file)
+{
+	auto f = (iofile_ram *)file;
+	delete f;
+}
+
+static int ram_seekproc(void *file, int64_t offset, int whence)
+{
+	auto f = (iofile_ram *)file;
+	switch(whence) {
+	case SEEK_SET: f->pos = offset; break;
+	case SEEK_CUR: f->pos += offset; break;
+	case SEEK_END: f->pos = f->data->size() + offset; break;
+	}
+
+	f->pos = std::clamp(f->pos, int64_t(0), int64_t(f->data->size()));
+	return 0;
+}
+
+static size_t ram_readproc(void *file, void *buffer, size_t length)
+{
+	auto f = (iofile_ram *)file;
+	size_t l = std::min(length, size_t(f->data->size() - f->pos));
+	memcpy(buffer, f->data->data() + f->pos, l);
+	return l;
+}
+
+static size_t ram_writeproc(void *file, const void *buffer, size_t length)
+{
+	auto f = (iofile_ram *)file;
+	size_t l = std::min(length, size_t(f->data->size() - f->pos));
+	memcpy(f->data->data() + f->pos, buffer, l);
+	return l;
+}
+
+static uint64_t ram_filesizeproc(void *file)
+{
+	auto f = (iofile_ram *)file;
+	return f->data->size();
+}
+
+
+static const io_procs iop_ram = {
+	ram_closeproc,
+	ram_seekproc,
+	ram_readproc,
+	ram_writeproc,
+	ram_filesizeproc
+};
+
+static io_generic *ram_open(std::vector<u8> &data)
+{
+	iofile_ram *f = new iofile_ram;
+	f->data = &data;
+	f->pos = 0;
+	return new io_generic({ &iop_ram, f });
+}
+
+void floppy_image_device::init_fs(const fs_info *fs)
+{
+	if (fs->m_type)
+	{
+		std::vector<u8> img(fs->m_image_size);
+		fs->m_manager->floppy_instantiate(fs->m_key, img);
+		auto iog = ram_open(img);
+		auto source_format = fs->m_type();
+		source_format->load(iog, floppy_image::FF_UNKNOWN, variants, image.get());
+		delete source_format;
+		delete iog;
+
+	} else
+		fs->m_manager->floppy_instantiate_raw(fs->m_key, image.get());
 }
 
 /* write protect, active high
@@ -633,10 +800,10 @@ void floppy_image_device::index_resync()
 	}
 	int position = int(delta.as_double()*angular_speed + 0.5);
 
-	int new_idx = position < 20000;
+	int new_idx = position < 2000000;
 
 	if(new_idx) {
-		attotime index_up_time = attotime::from_double(20000/angular_speed);
+		attotime index_up_time = attotime::from_double(2000000/angular_speed);
 		index_timer->adjust(index_up_time - delta);
 	} else
 		index_timer->adjust(rev_time - delta);
@@ -990,14 +1157,16 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 		buf.push_back(floppy_image::MG_N);
 	}
 
+	uint32_t cur_mg;
 	if((buf[index] & floppy_image::TIME_MASK) == start_pos) {
 		if(index)
-			index--;
+			cur_mg = buf[index-1];
 		else
-			index = buf.size() - 1;
-	}
+			cur_mg = buf[buf.size() - 1];
+	} else
+			cur_mg = buf[index];
 
-	uint32_t cur_mg = buf[index] & floppy_image::MG_MASK;
+	cur_mg &= floppy_image::MG_MASK;
 	if(cur_mg == floppy_image::MG_N || cur_mg == floppy_image::MG_D)
 		cur_mg = floppy_image::MG_A;
 
@@ -1126,7 +1295,6 @@ void floppy_image_device::write_zone(uint32_t *buf, int &cells, int &index, uint
 				spos = epos;
 			}
 		}
-
 	}
 }
 
@@ -2242,7 +2410,7 @@ void teac_fd_30a::setup_characteristics()
 	sides = 1;
 	set_rpm(300);
 
-	variants.push_back(floppy_image::SSSD);
+	variants.push_back(floppy_image::SSDD);
 }
 
 //-------------------------------------------------
@@ -2464,8 +2632,8 @@ bool mac_floppy_device::wpt_r()
 		return !dskchg;
 
 	case 0x4:
-	case 0xc: // Index pulse, probably only on the superdrive though
-		return !m_has_mfm ? false : !image || mon ? true : idx;
+	case 0xc: // Index pulse, probably only in mfm mode and while writing though
+		return !m_has_mfm ? false : !image || mon ? true : !idx;
 
 	case 0x5: // Is it a superdrive (supports 1.4M MFM) ?
 		return m_has_mfm;
@@ -2593,7 +2761,7 @@ void mac_floppy_device::track_changed()
 
 	float new_rpm;
 	if(m_mfm)
-		new_rpm = 300;
+		new_rpm = is_2m() ? 600 : 300;
 	else if(cyl <= 15)
 		new_rpm = 394;
 	else if(cyl <= 31)
@@ -2614,6 +2782,15 @@ void mac_floppy_device::mon_w(int)
 	// Motor control is through commands
 }
 
+void mac_floppy_device::tfsel_w(int state)
+{
+	// if 35SEL line is clear and the motor is on, turn off the motor
+	if ((state == CLEAR_LINE) && (!floppy_image_device::mon_r()))
+	{
+		floppy_image_device::mon_w(1);
+	}
+}
+
 oa_d34v_device::oa_d34v_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : mac_floppy_device(mconfig, OAD34V, tag, owner, clock)
 {
 }
@@ -2631,6 +2808,14 @@ void oa_d34v_device::setup_characteristics()
 bool oa_d34v_device::is_2m() const
 {
 	return false;
+}
+
+void oa_d34v_device::track_changed()
+{
+	// Skip the rpm-setting mac generic version, the single-sided
+	// drive's rpm is externally controlled through a PWM signal.
+
+	floppy_image_device::track_changed();
 }
 
 mfd51w_device::mfd51w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : mac_floppy_device(mconfig, MFD51W, tag, owner, clock)
@@ -2671,5 +2856,11 @@ void mfd75w_device::setup_characteristics()
 
 bool mfd75w_device::is_2m() const
 {
+	if(!image)
+		return false;
+
+	if(image->get_variant() == floppy_image::SSDD || image->get_variant() == floppy_image::DSDD)
+		return true;
+
 	return false;
 }

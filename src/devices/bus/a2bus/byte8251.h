@@ -26,6 +26,7 @@ protected:
 	// device_a2bus_card_interface overrides
 	virtual u8 read_c0nx(u8 offset) override;
 	virtual void write_c0nx(u8 offset, u8 data) override;
+	virtual bool take_c800() override { return false; }
 
 private:
 	// object finders

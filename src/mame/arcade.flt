@@ -232,6 +232,7 @@ cinemat.cpp
 circus.cpp
 circusc.cpp
 cirsa820xxx.cpp
+cirsa910510.cpp
 cischeat.cpp
 citycon.cpp
 clayshoo.cpp
@@ -1412,6 +1413,7 @@ vigilant.cpp
 vindictr.cpp
 viper.cpp
 vlc.cpp
+vlc34010.cpp
 volfied.cpp
 voyager.cpp
 vp101.cpp

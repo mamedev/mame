@@ -44,9 +44,10 @@ void bbc_cumana68k_device::cumana68k_mem(address_map &map)
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER(bbc_cumana68k_device::floppy_formats)
-	FLOPPY_OS9_FORMAT
-FLOPPY_FORMATS_END
+void bbc_cumana68k_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_OS9_FORMAT);
+}
 
 //-------------------------------------------------
 //  ROM( cumana68k )

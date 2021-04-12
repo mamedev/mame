@@ -14,6 +14,9 @@
 #include "machine/wpc_lamp.h"
 #include "machine/wpc_out.h"
 
+
+namespace {
+
 class wpc_95_state : public driver_device
 {
 public:
@@ -48,6 +51,10 @@ public:
 	void init_cp();
 	void init_ttt();
 
+protected:
+	// driver_device overrides
+	virtual void machine_reset() override;
+
 private:
 	void bank_w(uint8_t data);
 	void watchdog_w(uint8_t data);
@@ -75,10 +82,6 @@ private:
 	required_device<wpc_lamp_device> lamp;
 	required_device<wpc_out_device> out;
 
-	// driver_device overrides
-	virtual void machine_reset() override;
-
-private:
 	static const char *const lamps_afm[64];
 	static const char *const outputs_afm[52];
 	static const char *const lamps_cc[64];
@@ -2999,7 +3002,7 @@ ROM_START(totan_04)
 	ROM_LOAD("an_g11.0_4", 0x00000, 0x80000, CRC(20da3800) SHA1(c8c048f35b1828f9ee1e7fc3201f1a316974b924))
 	ROM_RELOAD(0x80000, 0x80000)
 	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
-	ROM_LOAD16_BYTE("ans2v1_1.rom", 0x000000, 0x100000, CRC(0d023f90) SHA1(e411f7824df89374cf3385a2660d5bc91e0e9ef0))
+	ROM_LOAD16_BYTE("ans2v1_0.rom", 0x000000, 0x100000, CRC(1b78fe52) SHA1(2ad394c2d0f05eac3c32c9957f327d680a734451))
 	ROM_LOAD16_BYTE("ans3v1_0.rom", 0x200000, 0x100000, CRC(3f677813) SHA1(b1e67c74b927c0c8cb76be8794a04a53fdf643d4))
 	ROM_LOAD16_BYTE("ans4v1_0.rom", 0x400000, 0x100000, CRC(c26dff5f) SHA1(d86323f0df15cf7abd4480d173e6b217ef715396))
 	ROM_LOAD16_BYTE("ans5v1_0.rom", 0x600000, 0x080000, CRC(32ca1602) SHA1(e4c7235b5d387bdde16ebef4d3aeeb7276c69d6d))
@@ -3059,6 +3062,9 @@ ROM_START(tf95_12)
 	ROM_REGION16_LE(0x1000000, "dcs", ROMREGION_ERASEFF)
 	ROM_LOAD16_BYTE("s2_10.rom", 0x000000, 0x100000, CRC(ceff7fe4) SHA1(ff2574f65e09d446b9e446abd58159a7d100059b))
 ROM_END
+
+} // Anonymous namespace
+
 
 GAME(1996,  tf95_12,    0,          wpc_95, afm,    wpc_95_state,   init_tf95,   ROT0, "Bally",                "WPC 95 Test Fixture (1.2)",              MACHINE_MECHANICAL)
 GAME(1995,  afm_113,    0,          wpc_95, afm,    wpc_95_state,   init_afm,    ROT0, "Bally",                "Attack From Mars (1.13, Free play)",     MACHINE_MECHANICAL)

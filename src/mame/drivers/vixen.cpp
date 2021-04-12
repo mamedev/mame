@@ -735,8 +735,8 @@ void vixen_state::vixen(machine_config &config)
 
 	FD1797(config, m_fdc, 23.9616_MHz_XTAL / 24);
 	m_fdc->intrq_wr_callback().set(FUNC(vixen_state::fdc_intrq_w));
-	FLOPPY_CONNECTOR(config, FDC1797_TAG":0", vixen_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, FDC1797_TAG":1", vixen_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, FDC1797_TAG":0", vixen_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, FDC1797_TAG":1", vixen_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	IEEE488(config, m_ieee488);
 	m_ieee488->srq_callback().set(FUNC(vixen_state::srq_w));
 	m_ieee488->atn_callback().set(FUNC(vixen_state::atn_w));

@@ -423,8 +423,8 @@ void specpls3_state::spectrum_plus3(machine_config &config)
 
 	UPD765A(config, m_upd765, 16_MHz_XTAL / 4, true, false); // clocked through SED9420
 	m_upd765->us_wr_callback().set(FUNC(specpls3_state::plus3_us_w));
-	FLOPPY_CONNECTOR(config, "upd765:0", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats); // internal drive
-	FLOPPY_CONNECTOR(config, "upd765:1", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats); // external drive
+	FLOPPY_CONNECTOR(config, "upd765:0", specpls3_floppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats); // internal drive
+	FLOPPY_CONNECTOR(config, "upd765:1", specpls3_floppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats); // external drive
 
 	SOFTWARE_LIST(config, "flop_list").set_original("specpls3_flop");
 }

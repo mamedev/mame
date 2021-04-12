@@ -52,7 +52,7 @@ protected:
 private:
 	WRITE_LINE_MEMBER( busy_w );
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	enum
 	{

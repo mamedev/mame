@@ -1114,8 +1114,8 @@ ROM_START( musclhit )
 ROM_END
 
 ROM_START( runpuppy )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "gsan1-a.u17", 0x00000, 0x10000, BAD_DUMP CRC(6ae1d1e8) SHA1(3224e4b8198aa38c094088456281cbd62c085407) ) // original ROM not dumped, temporary use musclhit boot ROM
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "gsan1-a.u17", 0x00000, 0x08000, CRC(515da4bf) SHA1(72062296077db26d6bd1bc47556c2af00d5952e6) )
 
 	ROM_REGION( 0x0f, "rtc", 0 )
 	ROM_LOAD( "nvram.u9", 0x00, 0x0f, CRC(907eb7d3) SHA1(bdbe3618a2c6dd3fb66f8e4c0226c5d827e38d67) )

@@ -9,13 +9,17 @@
 
 #include "emu.h"
 #include "formats/ami_dsk.h"
+#include "formats/ipf_dsk.h"
 #include "amigafdc.h"
 
 DEFINE_DEVICE_TYPE(AMIGA_FDC, amiga_fdc_device, "amiga_fdc", "Amiga FDC")
 
-FLOPPY_FORMATS_MEMBER( amiga_fdc_device::floppy_formats )
-	FLOPPY_ADF_FORMAT
-FLOPPY_FORMATS_END
+void amiga_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ADF_FORMAT);
+	fr.add(FLOPPY_IPF_FORMAT);
+}
 
 amiga_fdc_device::amiga_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, AMIGA_FDC, tag, owner, clock),

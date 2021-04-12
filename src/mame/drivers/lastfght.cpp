@@ -62,6 +62,9 @@ Notes:
                 V106.U16 - MX27C4000 4MBit DIP32 EPROM; Main Program
                 V100.U7  - ST M27C801 8MBit DIP32 EPROM; Audio Samples?
 
+    TODO:
+     - Game speed seems to be completely wrong, timers and player movement too fast?
+
 *********************************************************************************************************************/
 
 #include "emu.h"
@@ -609,4 +612,4 @@ void lastfght_state::init_lastfght()
 } // Anonymous namespace
 
 
-GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght_state, init_lastfght, ROT0, "Subsino", "Last Fighting", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght_state, init_lastfght, ROT0, "Subsino", "Last Fighting", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

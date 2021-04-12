@@ -576,7 +576,7 @@ template<int HighBits, int Width, int AddrShift, endianness_t Endian> void handl
 		u32 dt = lowbits - LowBits;
 		u32 ne = 1 << dt;
 		for(offs_t entry = start_entry; entry <= end_entry; entry++) {
-			m_u_dispatch[entry]->ref(ne);
+			dispatch[entry]->ref(ne);
 			u32 e0 = (entry << dt) & BITMASK;
 			for(offs_t e = 0; e != ne; e++) {
 				m_u_dispatch[e0 | e] = dispatch[entry];

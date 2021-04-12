@@ -77,7 +77,7 @@ rx50img_format::rx50img_format()
 
 const char *rx50img_format::name() const
 {
-	return "img";
+	return "rx50";
 }
 
 const char *rx50img_format::description() const

@@ -226,11 +226,13 @@ void dragon_cart(device_slot_interface &device)
 	device.option_add("sym12", COCO_SYM12);
 }
 
-FLOPPY_FORMATS_MEMBER( dragon_alpha_state::dragon_formats )
-	FLOPPY_VDK_FORMAT,
-	FLOPPY_DMK_FORMAT,
-	FLOPPY_SDF_FORMAT
-FLOPPY_FORMATS_END
+void dragon_alpha_state::dragon_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_VDK_FORMAT);
+	fr.add(FLOPPY_DMK_FORMAT);
+	fr.add(FLOPPY_SDF_FORMAT);
+}
 
 static void dragon_alpha_floppies(device_slot_interface &device)
 {

@@ -611,6 +611,8 @@ if (BUSES["BBC_TUBE"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_cms6809.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_rc6502.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_rc6502.h",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_x25.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/tube/tube_x25.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_z80.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_z80.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_zep100.cpp",
@@ -2629,6 +2631,8 @@ if (BUSES["RS232"]~=null) then
 		MAME_DIR .. "src/devices/bus/rs232/swtpc8212.h",
 		MAME_DIR .. "src/devices/bus/rs232/exorterm.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/exorterm.h",
+		MAME_DIR .. "src/devices/bus/rs232/rs232_sync_io.cpp",
+		MAME_DIR .. "src/devices/bus/rs232/rs232_sync_io.h",
 	}
 end
 

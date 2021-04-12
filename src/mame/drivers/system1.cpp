@@ -3893,7 +3893,7 @@ ROM_START( shtngmst )
 	ROM_LOAD( "epr-7043.ic126",  0x0000, 0x8000, CRC(99a368ab) SHA1(a9451f39ee2613e5c3e2791d4d8d837b4a3ab666) ) /* This rom is located on the main board. */
 
 	ROM_REGION( 0x1000, "mcu", 0 )
-	ROM_LOAD( "315-5159a.ic74", 0x00000, 0x1000, BAD_DUMP CRC(1f774912) SHA1(34d12756735514bea5a513fdf441ae93318747b2) )
+	ROM_LOAD( "315-5159a.ic74", 0x00000, 0x1000, CRC(1f774912) SHA1(34d12756735514bea5a513fdf441ae93318747b2) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
 	ROM_LOAD( "epr-7040.ic4",    0x00000, 0x8000, CRC(f30769fa) SHA1(366c1fbe4e1c8943b209f6c831c9a6b7e4372105) ) /* These roms are located on the main board. */

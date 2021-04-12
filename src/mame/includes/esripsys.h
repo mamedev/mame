@@ -28,12 +28,6 @@
 #define CMOS_RAM_SIZE           (2048)
 #define FDT_RAM_SIZE            (2048 * sizeof(uint16_t))
 
-struct line_buffer_t
-{
-	std::unique_ptr<uint8_t[]> colour_buf;
-	std::unique_ptr<uint8_t[]> intensity_buf;
-	std::unique_ptr<uint8_t[]> priority_buf;
-};
 
 class esripsys_state : public driver_device
 {
@@ -55,6 +49,9 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(keypad_interrupt);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_interrupt);
+
+protected:
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_framecpu;
@@ -83,6 +80,14 @@ private:
 	uint8_t m_tms_data;
 	std::unique_ptr<uint8_t[]> m_fdt_a;
 	std::unique_ptr<uint8_t[]> m_fdt_b;
+
+	struct line_buffer_t
+	{
+		std::unique_ptr<uint8_t[]> colour_buf;
+		std::unique_ptr<uint8_t[]> intensity_buf;
+		std::unique_ptr<uint8_t[]> priority_buf;
+	};
+
 	struct line_buffer_t m_line_buffer[2];
 	int m_fasel;
 	int m_fbsel;
@@ -122,7 +127,6 @@ private:
 	void esripsys_bg_intensity_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
 	void esripsys_dac_w(offs_t offset, uint8_t data);
-	virtual void video_start() override;
 	uint32_t screen_update_esripsys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(esripsys_vblank_irq);
 	TIMER_CALLBACK_MEMBER(delayed_bank_swap);

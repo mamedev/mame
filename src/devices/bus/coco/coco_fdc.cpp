@@ -163,13 +163,15 @@ private:
     LOCAL VARIABLES
 ***************************************************************************/
 
-FLOPPY_FORMATS_MEMBER( coco_family_fdc_device_base::floppy_formats )
-	FLOPPY_DMK_FORMAT,
-	FLOPPY_JVC_FORMAT,
-	FLOPPY_VDK_FORMAT,
-	FLOPPY_SDF_FORMAT,
-	FLOPPY_OS9_FORMAT
-FLOPPY_FORMATS_END
+void coco_family_fdc_device_base::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_DMK_FORMAT);
+	fr.add(FLOPPY_JVC_FORMAT);
+	fr.add(FLOPPY_VDK_FORMAT);
+	fr.add(FLOPPY_SDF_FORMAT);
+	fr.add(FLOPPY_OS9_FORMAT);
+}
 
 static void coco_fdc_floppies(device_slot_interface &device)
 {

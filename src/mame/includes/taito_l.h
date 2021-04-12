@@ -11,7 +11,7 @@
 #include "machine/timer.h"
 #include "machine/upd4701.h"
 #include "sound/msm5205.h"
-#include "sound/2203intf.h"
+#include "sound/ym2203.h"
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -22,9 +22,8 @@ public:
 	taitol_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_main_cpu(*this, "maincpu")
-		, m_vdp(*this, "tc0090lvc")
 		, m_upd4701(*this, "upd4701")
-		, m_main_prg(*this, "tc0090lvc")
+		, m_main_prg(*this, "maincpu")
 	{
 	}
 
@@ -51,8 +50,7 @@ protected:
 	virtual void state_register();
 	virtual void taito_machine_reset();
 
-	required_device<cpu_device>       m_main_cpu;
-	required_device<tc0090lvc_device> m_vdp;
+	required_device<tc0090lvc_device> m_main_cpu;
 	optional_device<upd4701_device>   m_upd4701;
 	required_memory_region            m_main_prg;
 };

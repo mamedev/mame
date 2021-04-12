@@ -239,8 +239,9 @@ private:
 	int m_adb_line;
 	void set_adb_line(int state) { m_adb_line = state; }
 	u8 pmu_adb_r() { return (m_adb_line<<1); }
-	void pmu_adb_w(u8 data) { m_macadb->adb_linechange_w(data & 1); }
+	void pmu_adb_w(u8 data) { m_macadb->adb_linechange_w((data & 1) ^ 1); }
 	u8 pmu_in_r() { return 0x20; }  // bit 5 is 0 if the Target Disk Mode should be enabled on the PB100
+	u8 ad_in_r() { return 0xff; }
 };
 
 void macportable_state::field_interrupts()
@@ -389,6 +390,7 @@ TIMER_CALLBACK_MEMBER(macportable_state::mac_6015_tick)
 	m_via1->write_ca1(m_ca1_data);
 
 	m_pmu->set_input_line(m50753_device::M50753_INT1_LINE, ASSERT_LINE);
+	m_macadb->adb_vblank();
 
 	if (++m_irq_count == 60)
 	{
@@ -441,6 +443,7 @@ void macportable_state::macprtb_map(address_map &map)
 	map(0xfb0000, 0xfbffff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
 	map(0xfc0000, 0xfcffff).r(FUNC(macportable_state::mac_config_r));
 	map(0xfd0000, 0xfdffff).rw(FUNC(macportable_state::mac_scc_r), FUNC(macportable_state::mac_scc_2_w));
+	map(0xfe0000, 0xfe0001).noprw();
 	map(0xfffff0, 0xffffff).rw(FUNC(macportable_state::mac_autovector_r), FUNC(macportable_state::mac_autovector_w));
 }
 
@@ -517,6 +520,8 @@ void macportable_state::macprtb(machine_config &config)
 	m_pmu->read_p<4>().set(FUNC(macportable_state::pmu_adb_r));
 	m_pmu->write_p<4>().set(FUNC(macportable_state::pmu_adb_w));
 	m_pmu->read_in_p().set(FUNC(macportable_state::pmu_in_r));
+	m_pmu->ad_in<0>().set(FUNC(macportable_state::ad_in_r));
+	m_pmu->ad_in<1>().set(FUNC(macportable_state::ad_in_r));
 
 	M50740(config, "kybd", 3.93216_MHz_XTAL).set_disable();
 

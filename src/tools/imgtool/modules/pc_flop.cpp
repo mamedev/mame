@@ -10,7 +10,7 @@
 
 #include "imgtool.h"
 #include "formats/imageutl.h"
-#include "formats/pc_dsk.h"
+#include "formats/pc_dsk_legacy.h"
 #include "fat.h"
 #include "iflopimg.h"
 

@@ -100,6 +100,14 @@ function addprojectflags()
 	end
 end
 
+function opt_tool(hash, entry)
+   if _OPTIONS["with-tools"] then
+	  hash[entry] = true
+	  return true
+   end
+   return hash[entry]
+end
+
 CPUS = {}
 SOUNDS  = {}
 MACHINES  = {}
@@ -1119,6 +1127,12 @@ end
 				"-Wno-unknown-warning-option",
 				"-Wno-unused-value",
 			}
+			if (version < 70000) or ((version < 100001) and (_OPTIONS["targetos"] == 'macosx')) then
+				buildoptions { -- clang 6.0 complains that [[maybe_unused]] is ignored for static data members
+					"-Wno-error=ignored-attributes",
+					"-Wno-error=unused-const-variable",
+				}
+			end
 			if ((version >= 100000) and (_OPTIONS["targetos"] ~= 'macosx')) or (version >= 120000) then
 				buildoptions {
 					"-Wno-xor-used-as-pow", -- clang 10.0 complains that expressions like 10 ^ 7 look like exponention
@@ -1528,8 +1542,8 @@ if (not os.isfile(path.join("src", "osd",  _OPTIONS["osd"] .. ".lua"))) then
 end
 dofile(path.join("src", "osd", _OPTIONS["osd"] .. ".lua"))
 dofile(path.join("src", "lib.lua"))
-if (MACHINES["NETLIST"]~=null or _OPTIONS["with-tools"]) then
-dofile(path.join("src", "netlist.lua"))
+if opt_tool(MACHINES, "NETLIST") then
+   dofile(path.join("src", "netlist.lua"))
 end
 --if (STANDALONE~=true) then
 dofile(path.join("src", "formats.lua"))
@@ -1589,3 +1603,28 @@ if _OPTIONS["with-benchmarks"] then
 	group "benchmarks"
 	dofile(path.join("src", "benchmarks.lua"))
 end
+
+function generate_has_header(hashname, hash)
+   fname = GEN_DIR .. "has_" .. hashname:lower() .. ".h"
+   file = io.open(fname, "w")
+   file:write("// Generated file, edition is futile\n")
+   file:write("\n")
+   file:write(string.format("#ifndef GENERATED_HAS_%s_H\n", hashname))
+   file:write(string.format("#define GENERATED_HAS_%s_H\n", hashname))
+   file:write("\n")
+   for k, v in pairs(hash) do
+	  if v then
+		 file:write(string.format("#define HAS_%s_%s\n", hashname, k))
+	  end
+   end
+   file:write("\n")
+   file:write("#endif\n")
+   file:close()
+end
+
+generate_has_header("CPUS", CPUS)
+generate_has_header("SOUNDS", SOUNDS)
+generate_has_header("MACHINES", MACHINES)
+generate_has_header("VIDEOS", VIDEOS)
+generate_has_header("BUSES", BUSES)
+generate_has_header("FORMATS", FORMATS)

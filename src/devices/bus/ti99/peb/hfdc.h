@@ -62,7 +62,7 @@ private:
 	uint8_t read_buffer();
 	void write_buffer(uint8_t data);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	// Debug accessors
 	void debug_read(offs_t offset, uint8_t* value);

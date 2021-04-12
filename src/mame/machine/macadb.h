@@ -60,6 +60,7 @@ private:
 	int32_t m_adb_stream_ptr;
 	int32_t m_adb_linestate;
 	bool  m_adb_srqflag;
+	int m_adb_linein;
 
 	#define kADBKeyBufSize 32
 	uint8_t m_adb_keybuf[kADBKeyBufSize];

@@ -26,8 +26,8 @@ static constexpr int32_t ADB_STATE_NOTINIT      = 4;
 static constexpr int ADB_CMD_RESET              = 0;
 static constexpr int ADB_CMD_FLUSH              = 1;
 
-// use 1 MHz base to get microseconds
-static constexpr int adb_timebase = 1000000;
+// use 1 MHz base to get microseconds (hack: *2 to get old wrong HC05 numbers to all realign to reality)
+static constexpr int adb_timebase = 2000000;
 
 static constexpr int adb_short = 85;
 static constexpr int adb_long = 157;
@@ -229,6 +229,7 @@ void macadb_device::device_start()
 	m_adb_listenreg = 0;
 	m_adb_listenaddr = 0;
 	m_adb_stream_ptr = 0;
+	m_adb_linein = 0;
 	std::fill(std::begin(m_adb_keybuf), std::end(m_adb_keybuf), 0);
 	std::fill(std::begin(m_adb_pram), std::end(m_adb_pram), 0);
 
@@ -262,6 +263,7 @@ void macadb_device::device_start()
 	save_item(NAME(m_adb_currentkeys));
 	save_item(NAME(m_adb_modifiers));
 	save_item(NAME(m_adb_pram));
+	save_item(NAME(m_adb_linein));
 }
 
 WRITE_LINE_MEMBER(macadb_device::adb_data_w)
@@ -1024,7 +1026,7 @@ void macadb_device::device_reset()
 
 WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
 {
-  /*  static char const *const states[] =
+/*  static char const *const states[] =
     {
         "idle",
         "attention",
@@ -1042,17 +1044,23 @@ WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
         "srqnodata"
     };*/
 
+	if (state == m_adb_linein)
+	{
+		return;
+	}
+	m_adb_linein = state;
+
 	int dtime = (int)(machine().time().as_ticks(adb_timebase) - m_last_adb_time);
 	m_last_adb_time = machine().time().as_ticks(adb_timebase);
 
-	/*if (m_adb_linestate <= 12)
-	{
-	    printf("linechange: %d -> %d, time %d (state %d = %s)\n", state^1, state, dtime, m_adb_linestate, states[m_adb_linestate]);
-	}
-	else
-	{
-	    printf("linechange: %d -> %d, time %d (state %d)\n", state^1, state, dtime, m_adb_linestate);
-	}*/
+/*  if (m_adb_linestate <= 12)
+    {
+        printf("linechange: %d -> %d, time %d (state %d = %s)\n", state^1, state, dtime, m_adb_linestate, states[m_adb_linestate]);
+    }
+    else
+    {
+        printf("linechange: %d -> %d, time %d (state %d)\n", state^1, state, dtime, m_adb_linestate);
+    }*/
 
 	if ((m_adb_direction) && (m_adb_linestate == LST_TSTOP))
 	{
@@ -1076,11 +1084,11 @@ WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
 		case LST_IDLE:
 			if ((state) && (dtime >= 4500))     // reset
 			{
-				LOGMASKED(LOG_LINESTATE, "ADB RESET\n");
+				//printf("ADB RESET\n");
 			}
 			else if ((state) && (dtime >= 1200))    // attention
 			{
-				LOGMASKED(LOG_LINESTATE, "ADB ATTENTION\n");
+				//printf("ADB ATTENTION\n");
 				m_adb_waiting_cmd = 1;
 				m_adb_direction = 0;
 				m_adb_linestate++;
@@ -1090,7 +1098,7 @@ WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
 		case LST_ATTENTION:
 			if ((!state) && (dtime >= 90))     // Tsync
 			{
-				LOGMASKED(LOG_LINESTATE, "ADB Tsync\n");
+				//printf("ADB Tsync\n");
 				m_adb_command = 0;
 				m_adb_linestate++;
 			}

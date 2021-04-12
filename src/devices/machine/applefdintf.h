@@ -48,13 +48,13 @@ public:
 
 	// Floppy formats
 	//   13-sector 5.25
-	DECLARE_FLOPPY_FORMATS(formats_525_13);
+	static void formats_525_13(format_registration &fr);
 
 	//   5.25
-	DECLARE_FLOPPY_FORMATS(formats_525);
+	static void formats_525(format_registration &fr);
 
 	//   3.5
-	DECLARE_FLOPPY_FORMATS(formats_35);
+	static void formats_35(format_registration &fr);
 
 	// Floppy drives slot-level
 	//   5.25

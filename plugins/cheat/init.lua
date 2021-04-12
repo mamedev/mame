@@ -100,8 +100,8 @@ function cheat.startplugin()
 				filename = emu.softname():gsub(":", "/")
 			else
 				for name, image in pairs(manager.machine.images) do
-					if image:exists() and image:software_list_name() ~= "" then
-						filename = image:software_list_name() .. "/" .. emu.softname()
+					if image.exists and image.software_list_name ~= "" then
+						filename = image.software_list_name .. "/" .. emu.softname()
 					end
 				end
 			end
@@ -423,7 +423,7 @@ function cheat.startplugin()
 	local function set_index(cheat, index)
 		local param = cheat.parameter
 		local oldindex = param.index
-		if (param.index < 0) or (param.index >= param.last) or (param.index == index) then
+		if (index < 0) or (index > param.last) or (param.index == index) then
 			return param.index, false
 		end
 		param.index = index

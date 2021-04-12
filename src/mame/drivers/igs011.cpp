@@ -67,9 +67,9 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "sound/ym2413.h"
 #include "sound/3812intf.h"
 #include "sound/ics2115.h"
+#include "sound/ym2413.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "emupal.h"
@@ -621,6 +621,7 @@ void igs011_state::igs011_blit_flags_w(offs_t offset, u16 data, u16 mem_mask)
 void igs011_state::machine_start()
 {
 	m_prot1_addr = 0;
+	m_lhb_irq_enable = 0;
 
 	save_item(NAME(m_igs_dips_sel));
 	save_item(NAME(m_igs_input_sel));

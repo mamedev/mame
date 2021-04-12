@@ -29,6 +29,7 @@ DEFINE_DEVICE_TYPE(K057714, k057714_device, "k057714", "k057714_device GCU")
 
 k057714_device::k057714_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K057714, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
 	, m_irq(*this)
 {
 }
@@ -64,8 +65,15 @@ void k057714_device::device_start()
 	save_item(NAME(m_fb_origin_y));
 	save_item(NAME(m_layer_select));
 	save_item(NAME(m_reg_6c));
-	save_item(NAME(m_display_width));
-	save_item(NAME(m_display_height));
+	save_item(NAME(m_display_h_visarea));
+	save_item(NAME(m_display_h_frontporch));
+	save_item(NAME(m_display_h_backporch));
+	save_item(NAME(m_display_h_syncpulse));
+	save_item(NAME(m_display_v_visarea));
+	save_item(NAME(m_display_v_frontporch));
+	save_item(NAME(m_display_v_backporch));
+	save_item(NAME(m_display_v_syncpulse));
+	save_item(NAME(m_pixclock));
 }
 
 void k057714_device::device_reset()
@@ -75,8 +83,24 @@ void k057714_device::device_reset()
 	// display width/height through registers.
 	// The assumption here is that since beatmania III doesn't set the display width/height
 	// then the game is assuming that it's already at the correct settings upon boot.
-	m_display_width = 639;
-	m_display_height = 479;
+
+	// Timing information taken from table found in all Firebeat games.
+	// table idx (h vis area, front porch, sync pulse, back porch, h total) (v vis area, front porch, sync pulse, back porch, v total)
+	// 0 (640, 16, 96, 48 = 800) (480, 10, 2, 33 = 525)
+	// 1 (512, 5, 96, 72 = 685) (384, 6, 4, 22 = 416)
+	// 2 (800, 40, 128, 88 = 1056) (600, 1, 4, 23 = 628)
+	// 3 (640, 20, 23, 165 = 848) (384, 6, 1, 27 = 418)
+	// 4 (640, 10, 21, 10 = 681) (480, 10, 2, 33 = 525)
+	m_display_h_visarea = 640;
+	m_display_h_frontporch = 16;
+	m_display_h_backporch = 48;
+	m_display_h_syncpulse = 96;
+	m_display_v_visarea = 480;
+	m_display_v_frontporch = 10;
+	m_display_v_backporch = 33;
+	m_display_v_syncpulse = 2;
+	m_pixclock = 25'175'000; // 25.175_MHz_XTAL, default for Firebeat but maybe not other machiness. The value can be changed externally
+	crtc_set_screen_params();
 
 	m_vram_read_addr = 0;
 	m_command_fifo0_ptr = 0;
@@ -121,6 +145,21 @@ void k057714_device::device_stop()
 #endif
 }
 
+void k057714_device::set_pixclock(const XTAL &xtal)
+{
+	xtal.validate(std::string("Setting pixel clock for ") + tag());
+	m_pixclock = xtal.value();
+	crtc_set_screen_params();
+}
+
+inline void k057714_device::crtc_set_screen_params()
+{
+	auto htotal = m_display_h_visarea + m_display_h_frontporch + m_display_h_backporch + m_display_h_syncpulse;
+	auto vtotal = m_display_v_visarea + m_display_v_frontporch + m_display_v_backporch + m_display_v_syncpulse;
+
+	rectangle visarea(0, m_display_h_visarea - 1, 0, m_display_v_visarea - 1);
+	screen().configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(m_pixclock) * htotal * vtotal);
+}
 
 uint32_t k057714_device::read(offs_t offset)
 {
@@ -149,21 +188,40 @@ void k057714_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int reg = offset * 4;
 
-
 	switch (reg)
 	{
 		case 0x00:
 			if (ACCESSING_BITS_16_31)
 			{
-				// Viewport configurations discovered in game code: 640x480, 512x384, 800x600, 640x384
-				m_display_width = (data >> 16) & 0xffff;
+				m_display_h_visarea = ((data >> 16) & 0xffff) + 1;
 			}
+			if (ACCESSING_BITS_0_15)
+			{
+				m_display_h_frontporch = ((data >> 8) & 0xff) + 1;
+				m_display_h_backporch = (data & 0xff) + 1;
+			}
+			crtc_set_screen_params();
 			break;
 
 		case 0x04:
 			if (ACCESSING_BITS_16_31)
 			{
-				m_display_height = (data >> 16) & 0xffff;
+				m_display_v_visarea = ((data >> 16) & 0xffff) + 1;
+			}
+			if (ACCESSING_BITS_0_15)
+			{
+				m_display_v_frontporch = ((data >> 8) & 0xff) + 1;
+				m_display_v_backporch = (data & 0xff) + 1;
+			}
+			crtc_set_screen_params();
+			break;
+
+		case 0x08:
+			if (ACCESSING_BITS_16_31)
+			{
+				m_display_h_syncpulse = ((data >> 24) & 0xff) + 1;
+				m_display_v_syncpulse = ((data >> 16) & 0xff) + 1;
+				crtc_set_screen_params();
 			}
 			break;
 
@@ -462,17 +520,6 @@ void k057714_device::draw_frame(int frame, bitmap_ind16 &bitmap, const rectangle
 
 int k057714_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_display_width != 0 && m_display_height != 0)
-	{
-		rectangle visarea = screen.visible_area();
-		if (visarea.max_x != m_display_width || visarea.max_y != m_display_height)
-		{
-			visarea.max_x = m_display_width;
-			visarea.max_y = m_display_height;
-			screen.configure(m_display_width, m_display_height, visarea, screen.frame_period().attoseconds());
-		}
-	}
-
 	bitmap.fill(0, cliprect);
 
 	bool inverse_trans = false;

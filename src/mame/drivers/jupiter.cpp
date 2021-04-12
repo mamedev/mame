@@ -299,8 +299,8 @@ void jupiter2_state::jupiter2(machine_config &config)
 
 	// devices
 	FD1771(config, INS1771N1_TAG, 1000000);
-	FLOPPY_CONNECTOR(config, INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	ACIA6850(config, m_acia0, XTAL(2'000'000)); // unknown frequency
 	m_acia0->txd_handler().set("serial0", FUNC(rs232_port_device::write_txd));
@@ -347,8 +347,8 @@ void jupiter3_state::jupiter3(machine_config &config)
 
 	// devices
 	FD1771(config, INS1771N1_TAG, 1000000);
-	FLOPPY_CONNECTOR(config, INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(jupiter3_state::kbd_put));

@@ -37,7 +37,7 @@
 class mm5799_device : public cops1_base_device
 {
 public:
-	mm5799_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mm5799_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// device-level overrides
@@ -53,6 +53,60 @@ protected:
 
 	void data_map(address_map &map);
 	void program_map(address_map &map);
+
+	// opcode helpers
+	u8 ram_r();
+	void ram_w(u8 data);
+	void pop_pc();
+	void push_pc();
+
+	// opcode handlers
+	void op_ad();
+	void op_add();
+	void op_sub();
+	void op_comp();
+	void op_0ta();
+	void op_adx();
+	void op_hxa();
+	void op_tam();
+	void op_sc();
+	void op_rsc();
+	void op_tc();
+
+	void op_tin();
+	void op_tf();
+	void op_tkb();
+	void op_tir();
+
+	void op_btd();
+	void op_dspa();
+	void op_dsps();
+	void op_axo();
+	void op_ldf();
+	void op_read();
+
+	void op_go();
+	void op_call();
+	void op_ret();
+	void op_rets();
+	void op_lg();
+	void op_nop();
+
+	void op_exc();
+	void op_excm();
+	void op_excp();
+	void op_mta();
+	void op_lm();
+
+	void op_sm();
+	void op_rsm();
+	void op_tm();
+
+	void op_lb();
+	void op_lbl();
+	void op_atb();
+	void op_bta();
+	void op_hxbr();
 };
 
 

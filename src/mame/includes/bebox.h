@@ -31,11 +31,6 @@
 class bebox_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_GET_DEVICES
-	};
-
 	bebox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_ppc(*this, "ppc%u", 1U)
@@ -51,6 +46,27 @@ public:
 	{
 	}
 
+
+	void bebox_peripherals(machine_config &config);
+	void bebox(machine_config &config);
+	void bebox2(machine_config &config);
+
+	void init_bebox();
+
+	int m_dma_channel; // TODO: move to private once possible
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	enum
+	{
+		TIMER_GET_DEVICES
+	};
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
 	required_device_array<ppc_device, 2> m_ppc;
 	required_device<lsi53c810_device> m_lsi53c810;
 	required_device_array<am9517a_device, 2> m_dma8237;
@@ -64,13 +80,9 @@ public:
 	uint32_t m_cpu_imask[2];
 	uint32_t m_interrupts;
 	uint32_t m_crossproc_interrupts;
-	int m_dma_channel;
 	uint16_t m_dma_offset[2][4];
 	uint8_t m_at_pages[0x10];
 	uint32_t m_scsi53c810_data[0x100 / 4];
-	void init_bebox();
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(bebox_pic8259_master_set_int_line);
 	DECLARE_WRITE_LINE_MEMBER(bebox_pic8259_slave_set_int_line);
 	DECLARE_WRITE_LINE_MEMBER(bebox_dma_hrq_changed);
@@ -109,7 +121,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(bebox_keyboard_interrupt);
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_interrupt );
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	uint32_t scsi_fetch(uint32_t dsp);
 	void scsi_irq_callback(int state);
@@ -122,19 +133,12 @@ public:
 	void cirrus_config(device_t *device);
 
 	pci_connector_device & add_pci_slot(machine_config &config, const char *tag, size_t index, const char *default_tag);
-	void bebox_peripherals(machine_config &config);
-	void bebox(machine_config &config);
-	void bebox2(machine_config &config);
 
 	void main_mem(address_map &map);
 	void slave_mem(address_map &map);
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-#ifdef UNUSED_LEGACY_CODE
-	uint32_t scsi53c810_pci_read(int function, int offset, uint32_t mem_mask);
-	void scsi53c810_pci_write(int function, int offset, uint32_t data, uint32_t mem_mask);
-#endif
+	[[maybe_unused]] uint32_t scsi53c810_pci_read(int function, int offset, uint32_t mem_mask);
+	[[maybe_unused]] void scsi53c810_pci_write(int function, int offset, uint32_t data, uint32_t mem_mask);
 };
 
 

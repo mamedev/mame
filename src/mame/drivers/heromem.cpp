@@ -23,7 +23,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/2610intf.h"
+#include "sound/ym2610.h"
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
@@ -130,16 +130,16 @@ void heromem_state::heromem(machine_config &config)
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	lscreen.set_size(64*8, 32*8);
 	lscreen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	lscreen.set_screen_update("tc0091lvc_vdp_l", FUNC(tc0091lvc_device::screen_update));
-	lscreen.set_palette("tc0091lvc_vdp_l:palette");
+	lscreen.set_screen_update("tc0091lvc_l", FUNC(tc0091lvc_device::screen_update));
+	lscreen.set_palette("tc0091lvc_l:palette");
 
 	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER)); // all wrong
 	rscreen.set_refresh_hz(60);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	rscreen.set_size(64*8, 32*8);
 	rscreen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
-	rscreen.set_screen_update("tc0091lvc_vdp_r", FUNC(tc0091lvc_device::screen_update));
-	rscreen.set_palette("tc0091lvc_vdp_r:palette");
+	rscreen.set_screen_update("tc0091lvc_r", FUNC(tc0091lvc_device::screen_update));
+	rscreen.set_palette("tc0091lvc_r:palette");
 
 	pc060ha_device &ciu_l(PC060HA(config, "ciu_l", 0));
 	ciu_l.set_master_tag("maincpu");
@@ -149,13 +149,11 @@ void heromem_state::heromem(machine_config &config)
 	ciu_r.set_master_tag("maincpu");
 	ciu_r.set_slave_tag("tc0091lvc_r");
 
-	z80_device &vdp_l(Z80(config, "tc0091lvc_l", 16000000 / 4)); // MAME'S TC0091LVC emulation isn't currently derived from the Z80, so needs both
+	tc0091lvc_device &vdp_l(TC0091LVC(config, "tc0091lvc_l", 16000000 / 4));
 	vdp_l.set_addrmap(AS_PROGRAM, &heromem_state::tc0091lvc_l_prg_map);
-	TC0091LVC(config, "tc0091lvc_vdp_l", 0);
 
-	z80_device &vdp_r(Z80(config, "tc0091lvc_r", 16000000 / 4)); // MAME'S TC0091LVC emulation isn't currently derived from the Z80, so needs both
+	tc0091lvc_device &vdp_r(TC0091LVC(config, "tc0091lvc_r", 16000000 / 4));
 	vdp_r.set_addrmap(AS_PROGRAM, &heromem_state::tc0091lvc_r_prg_map);
-	TC0091LVC(config, "tc0091lvc_vdp_r", 0);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -185,31 +183,31 @@ ROM_START( heromem )
 	ROM_REGION( 0x10000, "audiocpu_r", 0 )
 	ROM_LOAD( "e34-04.ic18", 0x00000, 0x10000, CRC(f9b66d64) SHA1(c998b0e2ec6659e3addbcc1602ae62871e010c7e) )
 
-	ROM_REGION( 0x80000, "tc0091lvc_vdp_l", 0 ) // both TC0091LVC have the same ROM content
+	ROM_REGION( 0x80000, "tc0091lvc_l", 0 ) // both TC0091LVC have the same ROM content
 	ROM_LOAD( "e34-07.ic40", 0x00000, 0x80000, CRC(7f4d2664) SHA1(6d249f1e5f341da5923b45c2863ee418bb057586) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x200000, "tc0091lvc_vdp_l:gfx", 0 ) // marked LV-CHR0-3 on PCB (LV probably stands for left video)
+	ROM_REGION( 0x200000, "tc0091lvc_l:gfx", 0 ) // marked LV-CHR0-3 on PCB (LV probably stands for left video)
 	ROM_LOAD( "e34-08.ic41", 0x000000, 0x80000, CRC(a8c572f8) SHA1(f98de6a9eaa49e037f02f9e56da9edbebc535cd7) )
 	ROM_LOAD( "e34-09.ic43", 0x080000, 0x80000, CRC(2c8849b7) SHA1(090ab881b0a98b8b1522282f46b70edeb83681d9) )
 	ROM_LOAD( "e34-10.ic42", 0x100000, 0x80000, CRC(e7986216) SHA1(43fea3f1c80f9e7e051e9321d8d28e9ce5ae22f3) )
 	ROM_LOAD( "e34-11.ic44", 0x180000, 0x80000, CRC(4da5904d) SHA1(280a63444af25d143c7543607cd942d0ffc33a56) )
 
-	ROM_REGION( 0x80000, "tc0091lvc_vdp_r", 0 )
+	ROM_REGION( 0x80000, "tc0091lvc_r", 0 )
 	ROM_LOAD( "e34-07.ic54", 0x00000, 0x80000, CRC(7f4d2664) SHA1(6d249f1e5f341da5923b45c2863ee418bb057586) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x200000, "tc0091lvc_vdp_r:gfx", 0 ) // marked RV-CHR0-3 on PCB (RV probably stands for right video)
+	ROM_REGION( 0x200000, "tc0091lvc_r:gfx", 0 ) // marked RV-CHR0-3 on PCB (RV probably stands for right video)
 	ROM_LOAD( "e34-08.ic55", 0x000000, 0x80000, CRC(a8c572f8) SHA1(f98de6a9eaa49e037f02f9e56da9edbebc535cd7) )
 	ROM_LOAD( "e34-09.ic57", 0x080000, 0x80000, CRC(2c8849b7) SHA1(090ab881b0a98b8b1522282f46b70edeb83681d9) )
 	ROM_LOAD( "e34-10.ic56", 0x100000, 0x80000, CRC(e7986216) SHA1(43fea3f1c80f9e7e051e9321d8d28e9ce5ae22f3) )
 	ROM_LOAD( "e34-11.ic58", 0x180000, 0x80000, CRC(4da5904d) SHA1(280a63444af25d143c7543607cd942d0ffc33a56) )
 
-	ROM_REGION( 0x200000, "ym_l", 0 ) // marked LS-PCM0 to LS-PCM3 on PCB (LS probably stands for left sound), same ROM content for the two YMs
+	ROM_REGION( 0x200000, "ym_l:adpcma", 0 ) // marked LS-PCM0 to LS-PCM3 on PCB (LS probably stands for left sound), same ROM content for the two YMs
 	ROM_LOAD( "e34-12.ic29", 0x000000, 0x80000, CRC(7bb1f476) SHA1(c06c27a2c59953f9ff1eb7679257970fd9c346a3) )
 	ROM_LOAD( "e34-13.ic27", 0x080000, 0x80000, CRC(a43e6cc0) SHA1(090f8f3977c99687dd8461382d0b552c4c3deb9f) )
 	ROM_LOAD( "e34-14.ic30", 0x100000, 0x80000, CRC(0fce5b29) SHA1(aeb626ecead85c5ca926763d928df9eca73acca3) )
 	ROM_LOAD( "e34-15.ic28", 0x180000, 0x80000, CRC(d2403bdd) SHA1(61be189a92c7c5143aa4a06d9bbfc667dd737fd8) )
 
-	ROM_REGION( 0x200000, "ym_r", 0 ) // marked RS-PCM0 to RS-PCM3 on PCB (RS probably stands for right sound)
+	ROM_REGION( 0x200000, "ym_r:adpcma", 0 ) // marked RS-PCM0 to RS-PCM3 on PCB (RS probably stands for right sound)
 	ROM_LOAD( "e34-12.ic15", 0x000000, 0x80000, CRC(7bb1f476) SHA1(c06c27a2c59953f9ff1eb7679257970fd9c346a3) )
 	ROM_LOAD( "e34-13.ic13", 0x080000, 0x80000, CRC(a43e6cc0) SHA1(090f8f3977c99687dd8461382d0b552c4c3deb9f) )
 	ROM_LOAD( "e34-14.ic16", 0x100000, 0x80000, CRC(0fce5b29) SHA1(aeb626ecead85c5ca926763d928df9eca73acca3) )

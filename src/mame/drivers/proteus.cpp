@@ -92,7 +92,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(motor_w);
 	uint8_t fdc_inv_r(offs_t offset);
 	void fdc_inv_w(offs_t offset, uint8_t data);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	void enable_z80_w(uint8_t data);
 	void enable_6809_w(uint8_t data);
@@ -310,10 +310,12 @@ static INPUT_PORTS_START(proteus)
 INPUT_PORTS_END
 
 
-FLOPPY_FORMATS_MEMBER(proteus_state::floppy_formats)
-	FLOPPY_FLEX_FORMAT,
-	FLOPPY_POLY_CPM_FORMAT
-FLOPPY_FORMATS_END
+void proteus_state::floppy_formats(format_registration &fr)
+{
+	fr.add_fm_containers();
+	fr.add(FLOPPY_FLEX_FORMAT);
+	fr.add(FLOPPY_POLY_CPM_FORMAT);
+}
 
 static void proteus_floppies(device_slot_interface &device)
 {

@@ -901,6 +901,7 @@ VIDEO_START_MEMBER(dkong_state,dkong_base)
 	m_palette_bank = 0;
 	m_sprite_bank = 0;
 	m_vidhw = -1;
+	m_grid_col = 0;
 
 	save_item(NAME(m_vidhw));
 	save_item(NAME(m_gfx_bank));

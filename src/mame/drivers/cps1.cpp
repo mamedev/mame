@@ -247,9 +247,9 @@ Stephh's log (2006.09.20) :
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/upd4701.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "sound/qsound.h"
+#include "sound/ym2151.h"
 #include "machine/kabuki.h"
 #include "speaker.h"
 

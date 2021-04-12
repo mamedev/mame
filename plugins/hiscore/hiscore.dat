@@ -916,6 +916,20 @@ asterixj:
 
 ;@s:asteroid.cpp
 
+asteroidb2:
+@:maincpu,program,001c,35,00,00
+@delay=5
+
+
+;******* LET SCORES DISPLAY BEFORE PLAYING ******
+aerolitos:
+asteroid:
+asteroid2:
+asteroidb1:
+@:maincpu,program,001d,35,00,00
+@:maincpu,program,4030,01,01,01
+
+
 ;******* LET SCORES DISPLAY BEFORE PLAYING ******
 ;meteorts:******Meteorites 
 asteroid1:
@@ -933,15 +947,6 @@ asterock:
 asterockv:
 hyperspc:
 @:maincpu,program,1c,35,00,00
-@:maincpu,program,4030,01,01,01
-
-
-;******* LET SCORES DISPLAY BEFORE PLAYING ******
-aerolitos:
-asteroid:
-asteroid2:
-asteroidb1:
-@:maincpu,program,001d,35,00,00
 @:maincpu,program,4030,01,01,01
 
 
@@ -1135,6 +1140,7 @@ cadashg:
 cadashi:
 cadashs:
 cadashu:
+cadashu1:
 @:maincpu,program,103646,185,00,4d
 
 
@@ -2923,6 +2929,12 @@ cosmicgi:
 
 ;@s:cps1.cpp
 
+sf2mkot:
+@:maincpu,program,ffd276,30,00,20
+@:maincpu,program,ffd2c6,14,ff,96
+@:maincpu,program,ffd2ee,04,00,00
+
+
 ;******Street Fighter II' - Hyper Fighting (World 921209)
 sf2acc:
 sf2acca:
@@ -2935,6 +2947,7 @@ sf2ceb:
 sf2ceb2:
 sf2ceb3:
 sf2ceb4:
+sf2ceb5:
 sf2ceblp:
 sf2ceds6:
 sf2ceea:
@@ -2974,6 +2987,19 @@ sf2re:
 @:maincpu,program,ffd276,28,00,20
 @:maincpu,program,ffd2c6,14,ff,96
 @:maincpu,program,ffd2ee,04,00,00
+
+
+forgottn:
+forgottnj:
+forgottnu:
+forgottnua:
+forgottnuaa:
+forgottnuc:
+forgottnue:
+lostwrld:
+lostwrldo:
+@:maincpu,program,ffe142,50,00,20
+@:maincpu,program,ffb2a0,04,00,00
 
 
 ;varthr1:******varth - operation thunderstorm (world 920612)
@@ -3341,18 +3367,6 @@ rockmanj:
 @:maincpu,program,ffef10,28,00,02
 
 
-forgottn:
-forgottnu:
-forgottnua:
-forgottnuaa:
-forgottnuc:
-forgottnue:
-lostwrld:
-lostwrldo:
-@:maincpu,program,ffe142,50,00,20
-@:maincpu,program,ffb2a0,04,00,00
-
-
 ;@s:cps1bl_pic.cpp
 
 dino:
@@ -3376,6 +3390,14 @@ slampic2:
 
 
 ;@s:cps2.cpp
+
+;1944d:******1944: The Loop Master (USA 000620 Phoenix Edition) (bootleg)
+1944:
+1944d:
+1944j:
+1944u:
+@:maincpu,program,921d90,b8,01,18
+
 
 mpang:
 mpanga:
@@ -3709,13 +3731,6 @@ progearjbl:
 progearjd:
 progearud:
 @:maincpu,program,ff3dcf,e5,20,04
-
-
-;1944d:******1944: The Loop Master (USA 000620 Phoenix Edition) (bootleg)
-1944:
-1944d:
-1944j:
-@:maincpu,program,921d90,b8,01,18
 
 
 ;mshud:******Marvel Super Heroes (US 951024 Phoenix Edition) (bootleg)
@@ -4788,6 +4803,19 @@ djboyua:
 
 ;@s:dkong.cpp
 
+radarscp:
+radarscp1:
+radarscpc:
+@:maincpu,program,6307,a2,00,fc
+@:maincpu,program,60a8,3,50,00
+@:maincpu,program,7641,1,00,00
+@:maincpu,program,7621,1,00,00
+@:maincpu,program,7601,1,07,07
+@:maincpu,program,75e1,1,06,06
+@:maincpu,program,75c1,1,05,05
+@:maincpu,program,75a1,1,00,00
+
+
 hunchbkd:
 @:maincpu,program,1c23,50,1b,00
 @:maincpu,program,1c73,1,01,01
@@ -4889,18 +4917,6 @@ drakton:
 drktnjr:
 @:maincpu,program,6449,118,00,00
 @:maincpu,program,655d,1,20,20
-
-
-radarscp:
-radarscp1:
-@:maincpu,program,6307,a2,00,fc
-@:maincpu,program,60a8,3,50,00
-@:maincpu,program,7641,1,00,00
-@:maincpu,program,7621,1,00,00
-@:maincpu,program,7601,1,07,07
-@:maincpu,program,75e1,1,06,06
-@:maincpu,program,75c1,1,05,05
-@:maincpu,program,75a1,1,00,00
 
 
 herbiedk:
@@ -5555,21 +5571,23 @@ exzisust:
 
 ;@s:f1gp.cpp
 
+;(f1 - grand prix) (by GeoMan)
+f1gp:
+f1gpa:
+@:maincpu,program,ff917a,2f0,14,00
+
+
 ;*******(F-1 grand prix part II)
 f1gp2:
 @:maincpu,program,ff91c2,2ee,14,50
 @:maincpu,program,ffa617,3f,59,49
 
 
-;(f1 - grand prix) (by GeoMan)
-f1gp:
-@:maincpu,program,ff917a,2f0,14,00
-
-
 ;@s:fantland.cpp
 
 ;******born to fight
 borntofi:
+borntofiv:
 @:maincpu,program,166,8b,50,0b
 
 
@@ -6093,15 +6111,11 @@ galaxiac:
 
 ;@s:galaxian.cpp
 
-pacmanblc:
-@:maincpu,program,4288,03,00,00
-@:maincpu,program,5180,01,40,40
-@:maincpu,program,51a0,01,40,40
-@:maincpu,program,51c0,01,40,40
-@:maincpu,program,51e0,01,40,40
-@:maincpu,program,5200,01,40,40
-@:maincpu,program,5220,01,40,40
-@delay=1.5
+jumpbug:
+jumpbugb:
+olibug:
+@:maincpu,program,4222,15,00,97
+@:maincpu,program,4208,6,00,00
 
 
 ;(zero time)
@@ -6120,6 +6134,7 @@ galaxiana:
 galaxianbl:
 galaxianbl2:
 galaxianbl3:
+galaxianem:
 galaxiani:
 galaxianm:
 galaxianmo:
@@ -6130,6 +6145,7 @@ galaxrf:
 galaxrfgg:
 galaxyx:
 galemp:
+galkamika:
 galturbo:
 gteikoku:
 gteikokub:
@@ -6155,6 +6171,10 @@ zerotimeu:
 @:maincpu,program,40a8,3,00,00
 
 
+namenayo:
+@:maincpu,program,d0ba,6,00,00
+
+
 ;mooncmw:******Moon War (Moon Cresta bootleg)
 ataqandr:
 eagle:
@@ -6175,6 +6195,7 @@ mooncrstu:
 mooncrstuk:
 mooncrstuku:
 mooncrstuu:
+mouncrst:
 sirio2:
 smooncrs:
 spcdrag:
@@ -6183,6 +6204,17 @@ sstarcrs:
 starfgmc:
 stera:
 @:maincpu,program,8042,54,00,24
+
+
+pacmanblc:
+@:maincpu,program,4288,03,00,00
+@:maincpu,program,5180,01,40,40
+@:maincpu,program,51a0,01,40,40
+@:maincpu,program,51c0,01,40,40
+@:maincpu,program,51e0,01,40,40
+@:maincpu,program,5200,01,40,40
+@:maincpu,program,5220,01,40,40
+@delay=1.5
 
 
 theend:
@@ -6427,12 +6459,6 @@ armorcar2:
 
 anteater:
 @:maincpu,program,80ef,3c,01,4c
-
-
-jumpbug:
-jumpbugb:
-@:maincpu,program,4222,15,00,97
-@:maincpu,program,4208,6,00,00
 
 
 moonal2:
@@ -7826,6 +7852,13 @@ ladyfrog:
 
 ;@s:laserbat.cpp
 
+;catnmous:******Cat and Mouse (set 1)
+catnmous:
+catnmousa:
+@:maincpu,program,1f0a,1e,cb,00
+@:maincpu,program,1f24,1,d4,d4
+
+
 ;lazarian:******lazarian
 lazarian:
 @:maincpu,program,1f07,1e,00,d4
@@ -7835,12 +7868,6 @@ lazarian:
 laserbat:
 @:maincpu,program,1cf1,1e,cb,00
 @:maincpu,program,1d0d,1,60,60
-
-
-;catnmous:******Cat and Mouse (set 1)
-catnmous:
-@:maincpu,program,1f0a,1e,cb,00
-@:maincpu,program,1f24,1,d4,d4
 
 
 ;@s:lasso.cpp
@@ -8048,18 +8075,19 @@ bygone:
 
 ;@s:lsasquad.cpp
 
+storming:
+storminga:
+@:maincpu,program,a814,3,00,01
+@:maincpu,program,a46c,70,69,00
+@:maincpu,program,d754,d,20,30
+
+
 ;******Daikaiju no Gyakushu
 daikaiju:
 @:maincpu,program,bf00,a0,00,33
 @:maincpu,program,a007,3,00,05
 @:maincpu,program,a027,1,23,23
 @:maincpu,program,d798,b,30,30
-
-
-storming:
-@:maincpu,program,a814,3,00,01
-@:maincpu,program,a46c,70,69,00
-@:maincpu,program,d754,d,20,30
 
 
 ;(land sea air squad / riku kai kuu saizensen)
@@ -10167,6 +10195,7 @@ solvalou:
 ;******prop cycle (rev.pr2 ver.a)
 ;** bit dodgy this one - think it saves top ten hiscores tho......  ***
 propcycl:
+propcyclj:
 @:maincpu,program,e04031,76,00,31
 @:maincpu,program,e15bf9,226,00,0f
 
@@ -10515,6 +10544,27 @@ pclubysa:
 
 ;@s:nmk16.cpp
 
+;(stagger i (japan)) (by GeoMan)
+;(sen jin - guardian storm (korea)) (by GeoMan)
+grdnstrm:
+grdnstrmau:
+grdnstrmg:
+grdnstrmj:
+grdnstrmk:
+grdnstrmv:
+redfoxwp2:
+redfoxwp2a:
+redhawk:
+redhawkb:
+redhawke:
+redhawkg:
+redhawki:
+redhawkk:
+redhawks:
+stagger1:
+@:maincpu,program,3c0300,3c,00,98
+
+
 strahljbl:
 @:maincpu,program,f3095,d9,55,2e
 @:maincpu,program,f0d31,3,00,50
@@ -10532,26 +10582,6 @@ gunnailb:
 @:maincpu,program,faf00,6e,00,49
 @:maincpu,program,fa800,78,00,55
 @:maincpu,program,fe004,f93,00,50
-
-
-;(stagger i (japan)) (by GeoMan)
-;(sen jin - guardian storm (korea)) (by GeoMan)
-grdnstrm:
-grdnstrmau:
-grdnstrmg:
-grdnstrmj:
-grdnstrmk:
-grdnstrmv:
-redfoxwp2:
-redfoxwp2a:
-redhawk:
-redhawkb:
-redhawke:
-redhawkg:
-redhawki:
-redhawkk:
-stagger1:
-@:maincpu,program,3c0300,3c,00,98
 
 
 ;(bubble 2000) (by GeoMan)
@@ -10905,12 +10935,11 @@ paclandm2:
 
 ;@s:pacman.cpp
 
-clubpacm:
-clubpacma:
+mspactwin:
 @:maincpu,program,4e88,04,00,00
 @:maincpu,program,43ed,06,40,40
-@:maincpu,program,43d1,01,59,59
-@:maincpu,program,43cb,0a,4f,4d
+@:maincpu,program,43d1,01,48,48
+@:maincpu,program,47ed,06,00,00
 
 
 ;*** puckman/pacman (and clones) for pacmame & regular mame builds **
@@ -10922,6 +10951,7 @@ alibaba:
 alibabab:
 baby2:  ; missing
 baby3:  ; missing
+baracuda:
 bucaner:
 caterpil:  ; missing
 chtmsatk:  ; missing
@@ -10968,6 +10998,7 @@ mspacii2:
 mspacmab:
 mspacmab2:
 mspacmab3:
+mspacmab4:
 mspacman:
 mspacmanbcc:
 mspacmanbco:
@@ -10975,6 +11006,7 @@ mspacmanbg:
 mspacmanbg2:
 mspacmanbgd:
 mspacmanbi:
+mspacmanblt2:
 mspacmancr:
 mspacmat:
 mspacmbe:
@@ -11010,6 +11042,14 @@ titanpac:
 @:maincpu,program,4e88,04,00,00
 @:maincpu,program,43ed,06,40,40
 @:maincpu,program,43d1,01,48,48
+
+
+clubpacm:
+clubpacma:
+@:maincpu,program,4e88,04,00,00
+@:maincpu,program,43ed,06,40,40
+@:maincpu,program,43d1,01,59,59
+@:maincpu,program,43cb,0a,4f,4d
 
 
 ;******Crush Roller (Kural TWT)
@@ -11667,6 +11707,7 @@ pc_smb:
 
 wbeachvl:
 wbeachvl3:
+wbeachvla:
 @:maincpu,program,ffbfb8,8a,31,00
 
 
@@ -11983,6 +12024,7 @@ r2dx_v33_r2:
 ;@s:rabbit.cpp
 
 rabbit:
+rabbitj:
 rabbitjt:
 @:maincpu,program,fffea4,2f,00,4b
 
@@ -12398,7 +12440,9 @@ sandscrpb:
 
 ;(sauro) (by GeoMan) 
 sauro:
+sauroa:
 saurop:
+saurorr:
 @:maincpu,program,e000,b4,00,4f
 
 
@@ -12492,10 +12536,30 @@ scotrsht:
 
 ;@s:scramble.cpp
 
+mars:
+marsarf:
+@:maincpu,program,4200,12,00,01
+@:maincpu,program,40a8,3,00,01
+@:maincpu,program,4a41,1,10,10
+@:maincpu,program,4a21,1,01,01
+@:maincpu,program,4a01,1,00,00
+@:maincpu,program,49e1,1,00,00
+@:maincpu,program,49c1,1,00,00
+@:maincpu,program,49a1,1,00,00
+
+
+hunchbgb:
+hunchbks:
+hunchbks2:
+@:maincpu,program,3c0a,50,1b,00
+@:maincpu,program,3c25,1,20,20
+
+
 ;scramb2:******Scramble (bootleg)
 ;scramble:[Special thanks to Cananas for enhancing this entry]
 800fath:
 800fatha:
+astroamb:
 bomber:
 kamikazesp:
 knockout:
@@ -12525,12 +12589,6 @@ triplepa:
 @:maincpu,program,40a8,03,00,01
 
 
-hunchbks:
-hunchbks2:
-@:maincpu,program,3c0a,50,1b,00
-@:maincpu,program,3c25,1,20,20
-
-
 hotshock:
 hotshockb:
 @:maincpu,program,40a8,3,00,05
@@ -12545,17 +12603,6 @@ devilfsh:
 cavelon:
 @:maincpu,program,42ff,4,00,00
 @:maincpu,program,4304,0d,00,15
-
-
-mars:
-@:maincpu,program,4200,12,00,01
-@:maincpu,program,40a8,3,00,01
-@:maincpu,program,4a41,1,10,10
-@:maincpu,program,4a21,1,01,01
-@:maincpu,program,4a01,1,00,00
-@:maincpu,program,49e1,1,00,00
-@:maincpu,program,49c1,1,00,00
-@:maincpu,program,49a1,1,00,00
 
 
 ;(new sinbad 7) (by GeoMan)
@@ -13778,16 +13825,17 @@ shangha3u:
 
 ;@s:shanghai.cpp
 
+;(shanghai ii (japan))
+blktch2:
+shangha2:
+shangha2a:
+@:maincpu,program,180b,be,90,01
+
+
 ;(shanghai (japan))
 shanghai:
 shanghaij:
 @:maincpu,program,201b,b4,90,1e
-
-
-;(shanghai ii (japan))
-shangha2:
-shangha2a:
-@:maincpu,program,180b,be,90,01
 
 
 ;@s:shangkid.cpp
@@ -14283,6 +14331,7 @@ pballoonr:
 ;@s:snk68.cpp
 
 pow:
+powa:
 powb:
 powj:
 @:maincpu,program,43e8e,4,00,00
@@ -14320,6 +14369,7 @@ streetsmw:
 ;******cookie & bibi 2
 cookbib2:
 cookbib2a:
+cookbib2b:
 @:maincpu,program,1026a2,28,4b,00
 @:maincpu,program,1026c4,1,4d,4d
 
@@ -15278,28 +15328,25 @@ brain:
 
 ;@s:system16.cpp
 
-mwalkbl:
-@:maincpu,program,fffc00,50,00,4a
-@:maincpu,program,ffe020,4,00,00
-
-
-;altbeastj3:******altered beast (japan, fd1094 317-0068)
-;altbeast4:******altered beast (set 4, mc-8123b 317-0066)
-;altbeast5:******altered beast (set 5, 8751 317-0076)
-;altbeastj:******altered beast (set 6, japan, 8751 317-0077)
-;altbeastj1:******altered beast (set 1, japan, fd1094 317-0065)
 altbeast:
 altbeast2:
 altbeast4:
 altbeast5:
+altbeast5d:
 altbeast6:
 altbeastbl:
+altbeastbl2:
 altbeastj:
 altbeastj1:
 altbeastj3:
 mutantwarr:
 @:maincpu,program,fffc00,74,00,33
 @:maincpu,program,fff010,4,00,00
+
+
+mwalkbl:
+@:maincpu,program,fffc00,50,00,4a
+@:maincpu,program,ffe020,4,00,00
 
 
 tetrisbl:
@@ -15338,6 +15385,13 @@ tail2nos:
 
 ;@s:taito_b.cpp
 
+;(ryu jin (japan))
+ryujin:
+ryujina:
+@:maincpu,program,103e3c,63,54,01
+@:maincpu,program,103f20,4,00,00
+
+
 ashura:
 @:maincpu,program,6019ec,64,00,19
 @:maincpu,program,60129b,3,00,00
@@ -15372,12 +15426,6 @@ crimecj:
 crimecu:
 @:maincpu,program,a02fba,4,00,00
 @:maincpu,program,a0e005,4af,54,00
-
-
-;(ryu jin (japan))
-ryujin:
-@:maincpu,program,103e3c,63,54,01
-@:maincpu,program,103f20,4,00,00
 
 
 ;masterwj:******Master of Weapon (Japan)
@@ -15587,6 +15635,12 @@ megablstu:
 
 ;@s:taito_f3.cpp
 
+puchicar:
+puchicarj:
+puchicaru:
+@:maincpu,program,401c7e,348,00,04
+
+
 ;(cleopatras fortune (japan))
 ;** you must wait untill the hiscore table has displayed in attract mode before **
 ;** starting a game, for the save to work **
@@ -15715,11 +15769,6 @@ spcinv95u:
 @:maincpu,program,417485,6b,00,00
 @:maincpu,program,4174e7,1,55,55
 @:maincpu,program,410b82,4,00,00
-
-
-puchicar:
-puchicarj:
-@:maincpu,program,401c7e,348,00,04
 
 
 pbobble2j:
@@ -16067,9 +16116,10 @@ landgear:
 
 tinstar:
 tinstara:
+@:maincpu,program,835c,1,00,00
 @:maincpu,program,835d,1,00,00
 @:maincpu,program,835e,1,01,01
-@:maincpu,program,835f,1,00,00
+@delay=6
 
 
 elevator:
@@ -16200,6 +16250,13 @@ taotaido:
 @:maincpu,program,fe91e4,4e,14,02
 
 
+;@s:tatsumi.cpp
+
+bigfight:
+bigfightj:
+@:maincpu,program,22a8,3a,00,2e
+
+
 ;@s:tbowl.cpp
 
 ;*******tecmo bowl (world? & japan)	
@@ -16255,17 +16312,18 @@ silkwormj:
 
 ;@s:tecmo16.cpp
 
+;******riot
+riot:
+riotw:
+@:maincpu,program,101d3c,f0,64,18
+
+
 ;fstarfrcj:******Final Star Force (Japan)
 fstarfrc:
 fstarfrcj:
 fstarfrcw:
 @:maincpu,program,101272,80,00,00
 @:maincpu,program,1000a9,3,00,a0
-
-
-;******riot
-riot:
-@:maincpu,program,101d3c,f0,64,18
 
 
 ;@s:tehkanwc.cpp
@@ -16378,6 +16436,20 @@ thedeep:
 
 
 ;@s:thepit.cpp
+
+theportr:
+@:maincpu,program,40fd,3,00,00
+@:maincpu,program,9201,1,24,24
+@:maincpu,program,91e1,1,24,24
+@:maincpu,program,91c1,1,24,24
+@:maincpu,program,91a1,1,24,24
+@:maincpu,program,9181,1,00,00
+
+
+thehole:
+@:maincpu,program,8283,1a,19,00
+@:maincpu,program,8039,f,19,00
+
 
 ;porter:******Port Man (bootleg on Moon Cresta hardware)
 dockman:
@@ -17370,8 +17442,10 @@ vulcanb:
 
 fnshark:
 fshark:
+fsharkb:
 fsharkbt:
 hishouza:
+hishouzab:
 skyshark:
 skysharka:
 @:maincpu,program,3016a,16c,00,01
@@ -17962,7 +18036,9 @@ wallca:
 ;** wardner,wardner (japan),pyros all fixed  * 
 pyros:
 wardner:
+wardnerb:
 wardnerj:
+wardnerjb:
 @:maincpu,program,7116,5d,00,01
 @:maincpu,program,711a,1,20,20
 
@@ -18094,13 +18170,6 @@ wgpjoy:
 
 ;@s:williams.cpp
 
-;** this saves the daily hiscores(daily buzzards), the joust champions are saved in nv ram **
-joust:
-joustr:
-jousty:
-@:maincpu,program,cfa4,54,f1,f5
-
-
 ;*********((red label))
 ;*** this saves just the today`s best scores, the all time greatest are ***
 ;*** saved using nvram ***
@@ -18111,9 +18180,17 @@ defender:
 defenderb:
 defenderg:
 defenderw:
+defenseb:
 galwars2:
 startrkd:
 @:maincpu,program,b260,60,00,48
+
+
+;** this saves the daily hiscores(daily buzzards), the joust champions are saved in nv ram **
+joust:
+joustr:
+jousty:
+@:maincpu,program,cfa4,54,f1,f5
 
 
 tornado1:

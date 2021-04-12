@@ -153,6 +153,8 @@ REF. 970429
 
 #include "speaker.h"
 
+#include "speedup.lh"
+
 
 #define LOG             0
 
@@ -539,7 +541,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gaelco3d_state::adsp_autobuffer_irq)
 	if (m_adsp_incs)
 	{
 		for (uint8_t i = 0; i < SOUND_CHANNELS; i++)
-			m_dmadac[i]->transfer(i, m_adsp_incs, SOUND_CHANNELS * m_adsp_incs, m_adsp_size / (SOUND_CHANNELS * m_adsp_incs), (int16_t *)&m_adsp_fastram_base[reg - 0x3800]);
+			m_dmadac[i]->transfer(i, m_adsp_incs, SOUND_CHANNELS * m_adsp_incs, m_adsp_size / (SOUND_CHANNELS * m_adsp_incs), (int16_t *)&m_adsp_fastram_base[(reg - 0x3800) / 2]);
 	}
 
 	// Increment it
@@ -675,10 +677,12 @@ void gaelco3d_state::main_map(address_map &map)
 	map(0x51003c, 0x51003d).portr("IN3");
 	map(0x510041, 0x510041).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x510042, 0x510043).r(FUNC(gaelco3d_state::sound_status_r));
+	map(0x510044, 0x510045).nopw(); // unknown (cabinet control?)
 	map(0x510100, 0x510101).rw(FUNC(gaelco3d_state::eeprom_data_r), FUNC(gaelco3d_state::irq_ack_w));
 	map(0x510103, 0x510103).r(m_serial, FUNC(gaelco_serial_device::data_r));
 	map(0x510103, 0x510103).select(0x000038).lw8(NAME([this] (offs_t offset, u8 data) { m_mainlatch->write_d0(offset >> 3, data); }));
 	map(0x510105, 0x510105).w(m_serial, FUNC(gaelco_serial_device::data_w));
+	map(0x510106, 0x510107).mirror(0x000070).nopr(); // clr.b instructions do dummy reads
 	map(0x510107, 0x510107).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
 	map(0xfe0000, 0xfeffff).ram().share("m68k_ram_base16");
 }
@@ -1143,6 +1147,38 @@ ROM_START( surfplnt40 )
 //  ROM_LOAD( "surfplnt.u30", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) )
 ROM_END
 
+ROM_START( surfplnt30 )
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "pls5_3.0.ic5",   0x000000, 0x80000, CRC(9845d0e9) SHA1(48bbe43aecdf79d095c37d74f84f449e79a2b372) )
+	ROM_LOAD16_BYTE( "pls11_3.0.ic11", 0x000001, 0x80000, CRC(aa3fe4ba) SHA1(5813044fbb3bb7ebccbe77602f30db65926fe8d3) )
+	ROM_LOAD16_BYTE( "pls8.ic8",       0x100000, 0x80000, CRC(aef9e1d0) SHA1(15258e62fbf61e21e7d77aa7a81fdbf842fd4560) )
+	ROM_LOAD16_BYTE( "pls13.ic13",     0x100001, 0x80000, CRC(d9754369) SHA1(0d82569cb925402a9f4634e52f15435112ec4878) )
+
+	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data
+	ROM_LOAD( "pls18.ic18", 0x0000000, 0x400000, CRC(a1b64695) SHA1(7487cd51305e30a5b55aada0bae9161fcb3fcd19) )
+
+	ROM_REGION32_LE( 0x1000000, "user2", 0 )
+	ROM_LOAD32_WORD( "pls40.ic40", 0x000000, 0x400000, CRC(26877ad3) SHA1(2e0c15b0e060e0b3d5b5cdaf1e22b9ec8e1abc9a) )
+	ROM_LOAD32_WORD( "pls37.ic37", 0x000002, 0x400000, CRC(75893062) SHA1(81f10243336a309f8cc8532ee9a130ecc35bbcd6) )
+
+	ROM_REGION( 0x1000000, "gfx1", 0 )
+	ROM_LOAD( "pls7.ic7",   0x0000000, 0x400000, CRC(04bd1605) SHA1(4871758e57af5132c30137cd6c46f1a3a567b640) )
+	ROM_LOAD( "pls9.ic9",   0x0400000, 0x400000, CRC(f4400160) SHA1(206557cd4c73b6b3a04bd35b48de736c7546c5e1) )
+	ROM_LOAD( "pls12.ic12", 0x0800000, 0x400000, CRC(edc2e826) SHA1(48d428f928a9805a62bbeaecffcac21aaa76ce77) )
+	ROM_LOAD( "pls15.ic15", 0x0c00000, 0x400000, CRC(b0f6b8da) SHA1(7404ec7455adf145919a28907443994f6a5706a1) )
+
+	ROM_REGION( 0x0080000, "gfx2", 0 )
+	ROM_LOAD( "pls19.ic19", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) )
+	ROM_LOAD( "pls20.ic20", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) )
+	ROM_LOAD( "pls21.ic21", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) )
+	ROM_LOAD( "pls22.ic22", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) )
+	// These 4 are copies of the previous 4
+//  ROM_LOAD( "pls27.ic27", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) )
+//  ROM_LOAD( "pls28.ic28", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) )
+//  ROM_LOAD( "pls29.ic29", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) )
+//  ROM_LOAD( "pls30.ic30", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) )
+ROM_END
+
 
 ROM_START( radikalb )
 	ROM_REGION( 0x200000, "maincpu", 0 )    // 68020 code
@@ -1151,7 +1187,7 @@ ROM_START( radikalb )
 	ROM_LOAD32_BYTE( "rab.14", 0x000002, 0x80000, CRC(4a0ac8cb) SHA1(4883e5eddb833dcd39376be435aa8e8e2ec47ab5) )
 	ROM_LOAD32_BYTE( "rab19.ic19", 0x000003, 0x80000, CRC(c2d4fcb2) SHA1(8e389d1479ba084e5363aef9c797c65ca7f355d2) )
 
-	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data */
+	ROM_REGION16_LE( 0x400000, "user1", 0 ) // ADSP-2115 code & data
 	ROM_LOAD( "rab.23", 0x0000000, 0x400000, CRC(dcf52520) SHA1(ab54421c182436660d2a56a334c1aa335424644a) )
 
 	ROM_REGION32_LE( 0x1000000, "user2", 0 )
@@ -1258,12 +1294,13 @@ ROM_END
  *
  *************************************/
 
-GAME( 1996, speedup,    0,        gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (Version 2.20)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, speedup12,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (Version 1.20)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, speedup10,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (Version 1.00)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1996, speedup,   0,        gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (Version 2.20)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
+GAMEL( 1996, speedup12, speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (Version 1.20)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
+GAMEL( 1996, speedup10, speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (Version 1.00)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
 
 GAME( 1997, surfplnt,   0,        gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (Version 4.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 GAME( 1997, surfplnt40, surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (Version 4.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1997, surfplnt30, surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Surf Planet (Version 3.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
 GAME( 1998, radikalb,   0,        gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Radikal Bikers (Version 2.02)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 GAME( 1998, radikalba,  radikalb, gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Radikal Bikers (Version 2.02, Atari license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)

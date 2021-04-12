@@ -524,7 +524,6 @@ void address_space_installer::check_optimize_all(const char *function, int width
 	if ((~addrend) & lowbits_mask)
 		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, end address has low bits unset, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, addrend | lowbits_mask);
 
-
 	offs_t set_bits = addrstart | addrend;
 	offs_t changing_bits = addrstart ^ addrend;
 	// Round up to the nearest power-of-two-minus-one
@@ -581,6 +580,56 @@ void address_space_installer::check_optimize_all(const char *function, int width
 	nend = addrend;
 	nmask = (addrmask ? addrmask : changing_bits) | addrselect;
 	nmirror = (addrmirror & m_addrmask) | addrselect;
+
+	if(nmirror & default_lowbits_mask) {
+		// If the mirroring/select "reaches" within the bus
+		// granularity we have to adapt it and the unitmask.
+
+		// We're sure start/end are on the same data-width-sized
+		// entry, because otherwise the previous tests wouldn't have
+		// passed.  So we need to clear the part of the unitmask that
+		// not in the range, then replicate it following the mirror.
+		// The start/end also need to be adjusted to the bus
+		// granularity.
+
+		// 1. Adjusting
+		nstart &= ~default_lowbits_mask;
+		nend |= default_lowbits_mask;
+
+		// 2. Clearing
+		u64 smask, emask;
+		if(m_config.endianness() == ENDIANNESS_BIG) {
+			smask =  make_bitmask<u64>(m_config.data_width() - ((addrstart - nstart) << (3 - m_config.addr_shift())));
+			emask = ~make_bitmask<u64>(m_config.data_width() - ((addrend - nstart + 1) << (3 - m_config.addr_shift())));
+		} else {
+			smask = ~make_bitmask<u64>((addrstart - nstart) << (3 - m_config.addr_shift()));
+			emask =  make_bitmask<u64>((addrend - nstart + 1) << (3 - m_config.addr_shift()));
+		}
+		nunitmask &= smask & emask;
+
+		// 3. Mirroring
+		offs_t to_mirror = nmirror & default_lowbits_mask;
+		if(m_config.endianness() == ENDIANNESS_BIG) {
+			for(int i=0; to_mirror; i++)
+				if((to_mirror >> i) & 1) {
+					to_mirror &= ~(1 << i);
+					nunitmask |= nunitmask >> (1 << (3 + i - m_config.addr_shift()));
+				}
+		} else {
+			for(int i=0; to_mirror; i++)
+				if((to_mirror >> i) & 1) {
+					to_mirror &= ~(1 << i);
+					nunitmask |= nunitmask << (1 << (3 + i - m_config.addr_shift()));
+				}
+		}
+
+		// 4. Ajusting the mirror
+		nmirror &= ~default_lowbits_mask;
+
+		// 5. Recompute changing_bits, it matters for the next optimization.  No need to round up through
+		changing_bits = nstart ^ nend;
+	}
+
 	if(nmirror && !(nstart & changing_bits) && !((~nend) & changing_bits)) {
 		// If the range covers the a complete power-of-two zone, it is
 		// possible to remove 1 bits from the mirror, pushing the end

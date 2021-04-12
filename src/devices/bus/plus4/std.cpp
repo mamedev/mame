@@ -51,19 +51,19 @@ uint8_t plus4_standard_cartridge_device::plus4_cd_r(offs_t offset, uint8_t data,
 {
 	if (!c1l && m_c1l)
 	{
-		data = m_c1l[offset];
+		data = m_c1l[offset & (m_c1l_size - 1)];
 	}
 	else if (!c1h && m_c1h)
 	{
-		data = m_c1h[offset];
+		data = m_c1h[offset & (m_c1h_size - 1)];
 	}
 	else if (!c2l && m_c2l)
 	{
-		data = m_c2l[offset];
+		data = m_c2l[offset & (m_c2l_size - 1)];
 	}
 	else if (!c2h && m_c2h)
 	{
-		data = m_c2h[offset];
+		data = m_c2h[offset & (m_c2h_size - 1)];
 	}
 
 	return data;

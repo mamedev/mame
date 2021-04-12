@@ -53,6 +53,9 @@
 
 #include "logmacro.h"
 
+
+namespace {
+
 class iris3000_state : public driver_device
 {
 public:
@@ -81,10 +84,11 @@ public:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(load_romboard);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+private:
 	void text_data_map(address_map &map);
 	void stack_map(address_map &map);
 	void kernel_map(address_map &map);
@@ -125,7 +129,7 @@ private:
 	uint16_t stack_limit_r(offs_t offset, uint16_t mem_mask = ~0);
 	void stack_limit_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t romboard_r(offs_t offset);
-	void romboard_w(offs_t offset, uint8_t data);
+	[[maybe_unused]] void romboard_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(duarta_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duartb_irq_handler);
 
@@ -512,6 +516,7 @@ void iris3000_state::romboard_w(offs_t offset, uint8_t data)
 
 void iris3000_state::machine_start()
 {
+	m_mouse_buttons = 0;
 }
 
 void iris3000_state::machine_reset()
@@ -709,6 +714,9 @@ ROM_START( iris3130 )
 	ROM_LOAD16_BYTE( "5808423a.bin", 0x0000, 0x8000, CRC(161e6a90) SHA1(d4dcbf630a83e4c5994d8331ac85d81130400e33) )
 	ROM_LOAD16_BYTE( "5808523a.bin", 0x0001, 0x8000, CRC(4c99e4b8) SHA1(899855e54c4520816ad43eb19b972b45783ccb6b) )
 ROM_END
+
+} // Anonymous namespace
+
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME           FLAGS
 COMP( 1985, iris3130, 0,      0,      iris3130, iris3130, iris3000_state, empty_init, "Silicon Graphics Inc", "IRIS 3130 (IP2)", MACHINE_IS_SKELETON )

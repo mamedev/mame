@@ -259,6 +259,7 @@ const double XTAL::known_xtals[] = {
 	 16'400'000, /* 16.4_MHz_XTAL          MS 6102 */
 	 16'572'000, /* 16.572_MHz_XTAL        Micro-Term ACT-5A */
 	 16'588'800, /* 16.5888_MHz_XTAL       SM 7238 */
+	 16'666'600, /* 16.6666_MHz_XTAL       Firebeat GCU */
 	 16'669'800, /* 16.6698_MHz_XTAL       Qume QVT-102 */
 	 16'670'000, /* 16.67_MHz_XTAL         - */
 	 16'777'216, /* 16.777216_MHz_XTAL     Nintendo Game Boy Advance */
@@ -320,6 +321,7 @@ const double XTAL::known_xtals[] = {
 	 22'248'000, /* 22.248_MHz_XTAL        Quantel DPB-7000 */
 	 22'321'000, /* 22.321_MHz_XTAL        Apple LaserWriter II NT */
 	 22'464'000, /* 22.464_MHz_XTAL        CIT-101 132-column display clock */
+	 22'579'000, /* 22.579_MHz_XTAL        Sega System H1 SCSP clock */
 	 22'656'000, /* 22.656_MHz_XTAL        Super Pinball Action (~1440x NTSC line rate) */
 	 22'896'000, /* 22.896_MHz_XTAL        DEC VT220 132-column display clock */
 	 23'200'000, /* 23.2_MHz_XTAL          Roland JV-80 & JV-880 PCM clock */
@@ -358,7 +360,7 @@ const double XTAL::known_xtals[] = {
 	 27'562'000, /* 27.562_MHz_XTAL        Visual 220 */
 	 27'720'000, /* 27.72_MHz_XTAL         AT&T 610 132-column display clock */
 	 27'956'000, /* 27.956_MHz_XTAL        CIT-101e 132-column display clock */
-	 28'000'000, /* 28_MHz_XTAL            - */
+	 28'000'000, /* 28_MHz_XTAL            Sega System H1 SH2 clock */
 	 28'224'000, /* 28.224_MHz_XTAL        Roland JD-800 */
 	 28'322'000, /* 28.322_MHz_XTAL        Saitek RISC 2500, Mephisto Montreux */
 	 28'375'160, /* 28.37516_MHz_XTAL      Amiga PAL systems */
@@ -397,6 +399,7 @@ const double XTAL::known_xtals[] = {
 	 34'291'712, /* 34.291712_MHz_XTAL     Fairlight CMI master card */
 	 34'846'000, /* 34.846_MHz_XTAL        Visual 550 */
 	 35'834'400, /* 35.8344_MHz_XTAL       Tab Products E-22 132-column display clock */
+	 35'840'000, /* 35.84_MHz_XTAL         Akai MPC 60 voice PCB */
 	 35'904'000, /* 35.904_MHz_XTAL        Used on HP98543 graphics board */
 	 36'000'000, /* 36_MHz_XTAL            Sega Model 1 video board */
 	 36'864'000, /* 36.864_MHz_XTAL        Unidesa Cirsa Rock 'n' Roll */

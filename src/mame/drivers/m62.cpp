@@ -4,10 +4,6 @@
 
 Irem "M62" system
 
-TODO:
-- Kid Niki and Horizon are missing the drums. There is an analog section in
-  the sound board.
-
 Notes:
 - I believe that both kungfum bootlegs are derived from an Irem original which we
   don't have (prototype/early revision?). They say "kanfu master" instead of

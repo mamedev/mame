@@ -204,10 +204,10 @@ static void fd4000_floppies(device_slot_interface &device)
 	device.option_add("35ed", FLOPPY_35_ED); // TEAC FD-235J
 }
 /*
-FLOPPY_FORMATS_MEMBER( fd2000_device::floppy_formats )
+void fd2000_device::floppy_formats(format_registration &fr)
     FLOPPY_D81_FORMAT
     FLOPPY_D2M_FORMAT
-FLOPPY_FORMATS_END
+}
 */
 
 
@@ -231,7 +231,7 @@ void fd2000_device::device_add_mconfig(machine_config &config)
 	add_common_devices(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fd2000_device::fd2000_mem);
 	DP8473(config, m_fdc, 24_MHz_XTAL);
-	FLOPPY_CONNECTOR(config, DP8473V_TAG":0", fd2000_floppies, "35hd", floppy_image_device::default_floppy_formats, true);//fd2000_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, DP8473V_TAG":0", fd2000_floppies, "35hd", floppy_image_device::default_mfm_floppy_formats, true);//fd2000_device::floppy_formats);
 }
 
 void fd4000_device::device_add_mconfig(machine_config &config)
@@ -239,7 +239,7 @@ void fd4000_device::device_add_mconfig(machine_config &config)
 	add_common_devices(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fd4000_device::fd4000_mem);
 	PC8477A(config, m_fdc, 24_MHz_XTAL);
-	FLOPPY_CONNECTOR(config, PC8477AV1_TAG":0", fd4000_floppies, "35ed", floppy_image_device::default_floppy_formats, true);//fd2000_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, PC8477AV1_TAG":0", fd4000_floppies, "35ed", floppy_image_device::default_mfm_floppy_formats, true);//fd2000_device::floppy_formats);
 }
 
 

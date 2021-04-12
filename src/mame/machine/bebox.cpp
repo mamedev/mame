@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods, R. Belmont
 /***************************************************************************
 
-    machine/bebox.c
+    machine/bebox.cpp
 
     BeBox
 
@@ -662,8 +662,8 @@ void bebox_state::scsi53c810_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 	}
 }
 
+// the 2 following methods are legacy code, currently unused
 
-#ifdef UNUSED_LEGACY_CODE
 uint32_t bebox_state::scsi53c810_pci_read(int function, int offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
@@ -717,14 +717,13 @@ void bebox_state::scsi53c810_pci_write(int function, int offset, uint32_t data, 
 						address_space &space = m_ppc[0]->space(AS_PROGRAM);
 
 						addr = (m_scsi53c810_data[5] | 0xC0000000) & ~0xFF;
-						space.install_readwrite_handler(addr, addr + 0xFF, read64_delegate(FUNC(bebox_state::scsi53c810_r),this), write64_delegate(FUNC(bebox_state::scsi53c810_w),this));
+						space.install_readwrite_handler(addr, addr + 0xFF, read64s_delegate(*this, FUNC(bebox_state::scsi53c810_r)), write64s_delegate(*this, FUNC(bebox_state::scsi53c810_w)));
 					}
 				}
 				break;
 		}
 	}
 }
-#endif
 
 
 void bebox_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -758,6 +757,7 @@ void bebox_state::machine_reset()
 
 void bebox_state::machine_start()
 {
+	m_interrupts = 0;
 }
 
 void bebox_state::init_bebox()

@@ -10,9 +10,9 @@
 
 #pragma once
 
+#include "sound/es8712.h"
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
-#include "sound/es8712.h"
 #include "video/k053936.h"
 #include "video/imagetek_i4100.h"
 #include "machine/eepromser.h"

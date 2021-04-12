@@ -452,7 +452,8 @@ void melps4_cpu_device::execute_run()
 		m_prohibit_irq = false;
 
 		// fetch next opcode
-		debugger_instruction_hook(m_pc);
+		if (!m_skip)
+			debugger_instruction_hook(m_pc);
 		m_icount--;
 		m_op = m_program->read_word(m_pc) & 0x1ff;
 		m_bitmask = 1 << (m_op & 3);

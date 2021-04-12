@@ -77,7 +77,7 @@ protected:
 	virtual void abcbus_c3(uint8_t data) override;
 	virtual void abcbus_c4(uint8_t data) override;
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;

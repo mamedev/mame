@@ -440,6 +440,8 @@ void sorcerer_state::machine_start_common(offs_t endmem)
 	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
 
+	m_halt = false;
+
 	// register for savestates
 	save_item(NAME(m_portfe));
 	save_item(NAME(m_keyboard_line));

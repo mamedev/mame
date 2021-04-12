@@ -96,7 +96,7 @@ A                                                   12.000MHz
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "sound/2203intf.h"
+#include "sound/ym2203.h"
 #include "screen.h"
 #include "speaker.h"
 

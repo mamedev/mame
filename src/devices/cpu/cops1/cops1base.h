@@ -62,9 +62,12 @@ public:
 	auto &set_option_k_active_high(bool b) { m_option_k_active_high = b; return *this; }
 	auto &set_option_inb_active_high(bool b) { m_option_inb_active_high = b; return *this; }
 
+	// I/O access
+	u8 f_output_r() { return m_f; }
+
 protected:
 	// construction/destruction
-	cops1_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
+	cops1_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -72,10 +75,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
-	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
-	virtual uint32_t execute_max_cycles() const noexcept override { return 2; }
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); }
+	virtual u32 execute_min_cycles() const noexcept override { return 1; }
+	virtual u32 execute_max_cycles() const noexcept override { return 2; }
 	virtual void execute_run() override;
 	virtual void execute_one() = 0;
 	virtual bool op_argument() = 0;
@@ -138,59 +141,6 @@ protected:
 	// misc handlers
 	void cycle();
 	void increment_pc();
-
-	u8 ram_r();
-	void ram_w(u8 data);
-	void pop_pc();
-	void push_pc();
-
-	// opcode handlers
-	void op_ad();
-	void op_add();
-	void op_sub();
-	void op_comp();
-	void op_0ta();
-	void op_adx();
-	void op_hxa();
-	void op_tam();
-	void op_sc();
-	void op_rsc();
-	void op_tc();
-
-	void op_tin();
-	void op_tf();
-	void op_tkb();
-	void op_tir();
-
-	void op_btd();
-	void op_dspa();
-	void op_dsps();
-	void op_axo();
-	void op_ldf();
-	void op_read();
-
-	void op_go();
-	void op_call();
-	void op_ret();
-	void op_rets();
-	void op_lg();
-	void op_nop();
-
-	void op_exc();
-	void op_excm();
-	void op_excp();
-	void op_mta();
-	void op_lm();
-
-	void op_sm();
-	void op_rsm();
-	void op_tm();
-
-	void op_lb();
-	void op_lbl();
-	void op_atb();
-	void op_bta();
-	void op_hxbr();
 };
 
 

@@ -773,7 +773,7 @@ void can09_state::can09(machine_config &config)
 	/* Floppy */
 	WD1770(config, "wd1770", 8_MHz_XTAL); // TODO: Verify 8MHz UKI crystal assumed to be used
 #if 0
-	FLOPPY_CONNECTOR(config, "wd1770:0", candela_floppies, "3dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1770:0", candela_floppies, "3dd", floppy_image_device::default_mfm_floppy_formats);
 	SOFTWARE_LIST(config, "flop3_list").set_original("candela");
 #endif
 

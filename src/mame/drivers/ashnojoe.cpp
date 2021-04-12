@@ -79,7 +79,7 @@ Coin B is not used
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/2203intf.h"
+#include "sound/ym2203.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

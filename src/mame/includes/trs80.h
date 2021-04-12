@@ -70,7 +70,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 	void port_ff_w(uint8_t data);
 	void lnw80_fe_w(uint8_t data);
 	void sys80_fe_w(uint8_t data);
