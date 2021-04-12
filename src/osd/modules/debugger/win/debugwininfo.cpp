@@ -298,6 +298,10 @@ bool debugwin_info::handle_command(WPARAM wparam, LPARAM lparam)
 			debugger().create_points_window();
 			return true;
 
+		case ID_NEW_SAVE_WND:
+			debugger().create_save_window();
+			return true;
+
 		case ID_RUN_AND_HIDE:
 			debugger().hide_all();
 			[[fallthrough]];
@@ -541,6 +545,7 @@ HMENU debugwin_info::create_standard_menubar()
 	AppendMenu(debugmenu, MF_ENABLED, ID_NEW_MEMORY_WND, TEXT("New Memory Window\tCtrl+M"));
 	AppendMenu(debugmenu, MF_ENABLED, ID_NEW_DISASM_WND, TEXT("New Disassembly Window\tCtrl+D"));
 	AppendMenu(debugmenu, MF_ENABLED, ID_NEW_LOG_WND, TEXT("New Error Log Window\tCtrl+L"));
+	AppendMenu(debugmenu, MF_ENABLED, ID_NEW_SAVE_WND, TEXT("New Save State Window\tCtrl+E"));
 	AppendMenu(debugmenu, MF_ENABLED, ID_NEW_POINTS_WND, TEXT("New (Break|Watch)points Window\tCtrl+B"));
 	AppendMenu(debugmenu, MF_DISABLED | MF_SEPARATOR, 0, TEXT(""));
 	AppendMenu(debugmenu, MF_ENABLED, ID_RUN, TEXT("Run\tF5"));

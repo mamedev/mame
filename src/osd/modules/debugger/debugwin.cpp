@@ -20,6 +20,7 @@
 #include "win/logwininfo.h"
 #include "win/memorywininfo.h"
 #include "win/pointswininfo.h"
+#include "win/savewininfo.h"
 #include "win/uimetrics.h"
 
 #include "debugger.h"
@@ -65,6 +66,7 @@ protected:
 	virtual void create_disasm_window() override { create_window<disasmwin_info>(); }
 	virtual void create_log_window() override { create_window<logwin_info>(); }
 	virtual void create_points_window() override { create_window<pointswin_info>(); }
+	virtual void create_save_window() override { create_window<savewin_info>(); }
 	virtual void remove_window(debugwin_info &info) override;
 
 	virtual void show_all() override;

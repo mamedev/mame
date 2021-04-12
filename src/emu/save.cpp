@@ -1081,14 +1081,55 @@ printf("%s '%s': adding %s '%s' @ %llX, size %d\n", type_string(m_type, m_native
 
 
 //-------------------------------------------------
+//  unwrap_and_update_objbase - unwrap trivial
+//  type and update the object base
+//-------------------------------------------------
+
+bool save_registered_item::unwrap_and_update_objbase(uintptr_t &objbase) const
+{
+	// update the base pointer with our local base/offset
+	objbase += m_ptr_offset;
+
+	// switch off the type
+	switch (m_type)
+	{
+		// unique ptrs retrieve the pointer from their container
+		case TYPE_UNIQUE:
+			objbase = reinterpret_cast<uintptr_t>(reinterpret_cast<generic_unique *>(objbase)->get());
+			return true;
+
+		// vectors retrieve the pointer from their container
+		case TYPE_VECTOR:
+			objbase = reinterpret_cast<uintptr_t>(&(*reinterpret_cast<generic_vector *>(objbase))[0]);
+			return true;
+
+		// pointers just extract the pointer directly
+		case TYPE_POINTER:
+			objbase = reinterpret_cast<uintptr_t>(*reinterpret_cast<generic_pointer *>(objbase));
+			return true;
+
+		// containers are always based at 0
+		case TYPE_CONTAINER:
+			objbase = 0;
+			return false;
+
+		// everything else is as-is
+		default:
+			return false;
+	}
+}
+
+
+//-------------------------------------------------
 //  save_binary - save this item and all owned
 //  items into a binary form
 //-------------------------------------------------
 
 uint64_t save_registered_item::save_binary(uint8_t *ptr, uint64_t length, uintptr_t objbase) const
 {
-	// update the base pointer with our local base/offset
-	objbase += m_ptr_offset;
+	// update the base pointer and forward if a trivial unwrap
+	if (unwrap_and_update_objbase(objbase))
+		return m_items.front().save_binary(ptr, length, objbase);
 
 	// switch off the type
 	uint64_t offset = 0;
@@ -1110,27 +1151,8 @@ uint64_t save_registered_item::save_binary(uint8_t *ptr, uint64_t length, uintpt
 			offset += m_native_size;
 			break;
 
-		// unique ptrs retrieve the pointer from their container
-		case TYPE_UNIQUE:
-			objbase = reinterpret_cast<uintptr_t>(reinterpret_cast<generic_unique *>(objbase)->get());
-			offset += m_items.front().save_binary(&ptr[offset], length, objbase);
-			break;
-
-			// vectors retrieve the pointer from their container
-		case TYPE_VECTOR:
-			objbase = reinterpret_cast<uintptr_t>(&(*reinterpret_cast<generic_vector *>(objbase))[0]);
-			offset += m_items.front().save_binary(&ptr[offset], length, objbase);
-			break;
-
-		// vectors retrieve the pointer from their container
-		case TYPE_POINTER:
-			objbase = reinterpret_cast<uintptr_t>(*reinterpret_cast<generic_pointer *>(objbase));
-			offset += m_items.front().save_binary(&ptr[offset], length, objbase);
-			break;
-
 		// structs and containers iterate over owned items
 		case TYPE_CONTAINER:
-			objbase = 0;
 		case TYPE_STRUCT:
 			for (auto &item : m_items)
 				offset += item.save_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase);
@@ -1157,8 +1179,9 @@ uint64_t save_registered_item::save_binary(uint8_t *ptr, uint64_t length, uintpt
 
 uint64_t save_registered_item::restore_binary(uint8_t const *ptr, uint64_t length, uintptr_t objbase) const
 {
-	// update the base pointer with our local base/offset
-	objbase += m_ptr_offset;
+	// update the base pointer and forward if a trivial unwrap
+	if (unwrap_and_update_objbase(objbase))
+		return m_items.front().restore_binary(ptr, length, objbase);
 
 	// switch off the type
 	uint64_t offset = 0;
@@ -1182,7 +1205,6 @@ uint64_t save_registered_item::restore_binary(uint8_t const *ptr, uint64_t lengt
 
 		// structs and containers iterate over owned items
 		case TYPE_CONTAINER:
-			objbase = 0;
 		case TYPE_STRUCT:
 			for (auto &item : m_items)
 				offset += item.restore_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase);
@@ -1206,12 +1228,14 @@ uint64_t save_registered_item::restore_binary(uint8_t const *ptr, uint64_t lengt
 //  save_json - save this item into a JSON stream
 //-------------------------------------------------
 
-void save_registered_item::save_json(std::ostringstream &output, int indent, bool inline_form, uintptr_t objbase)
+void save_registered_item::save_json(save_zip_state &zipstate, int indent, bool inline_form, uintptr_t objbase)
 {
-	// update the base pointer with our local base/offset
-	objbase += m_ptr_offset;
+	// update the base pointer and forward if a trivial unwrap
+	if (unwrap_and_update_objbase(objbase))
+		return m_items.front().save_json(zipstate, indent, inline_form, objbase);
 
 	// output the name if present
+	auto &output = zipstate.json();
 	if (m_name.length() > 0)
 		output << "\"" << m_name << "\": ";
 
@@ -1245,28 +1269,10 @@ void save_registered_item::save_json(std::ostringstream &output, int indent, boo
 		// float types
 		case TYPE_FLOAT:
 		{
-			double value = (m_native_size == 4) ? *reinterpret_cast<float const *>(objbase) : *reinterpret_cast<double const *>(objbase);
+			double value = read_float(objbase, m_native_size);
 			output << value;
 			break;
 		}
-
-		// unique ptrs retrieve the pointer from their container
-		case TYPE_UNIQUE:
-			objbase = reinterpret_cast<uintptr_t>(reinterpret_cast<generic_unique *>(objbase)->get());
-			m_items.front().save_json(output, indent, inline_form, objbase);
-			break;
-
-		// vectors retrieve the pointer from their container
-		case TYPE_VECTOR:
-			objbase = reinterpret_cast<uintptr_t>(&(*reinterpret_cast<generic_vector *>(objbase))[0]);
-			m_items.front().save_json(output, indent, inline_form, objbase);
-			break;
-
-		// vectors retrieve the pointer from their container
-		case TYPE_POINTER:
-			objbase = reinterpret_cast<uintptr_t>(*reinterpret_cast<generic_pointer *>(objbase));
-			m_items.front().save_json(output, indent, inline_form, objbase);
-			break;
 
 		// structs and containers iterate over owned items
 		case TYPE_CONTAINER:
@@ -1277,7 +1283,7 @@ void save_registered_item::save_json(std::ostringstream &output, int indent, boo
 				output << "{ ";
 				for (auto &item : m_items)
 				{
-					item.save_json(output, indent, true, (m_type == TYPE_CONTAINER) ? 0 : objbase);
+					item.save_json(zipstate, indent, true, objbase);
 					if (&item != &m_items.back())
 						output << ", ";
 				}
@@ -1290,7 +1296,7 @@ void save_registered_item::save_json(std::ostringstream &output, int indent, boo
 				for (auto &item : m_items)
 				{
 					output << std::setw(indent + 1) << std::setfill('\t') << "" << std::setw(0);
-					item.save_json(output, indent + 1, false, (m_type == TYPE_CONTAINER) ? 0 : objbase);
+					item.save_json(zipstate, indent + 1, false, objbase);
 					if (&item != &m_items.back())
 						output << ",";
 					output << std::endl;
@@ -1312,7 +1318,7 @@ void save_registered_item::save_json(std::ostringstream &output, int indent, boo
 					output << "[ ";
 					for (uint32_t rep = 0; rep < m_type; rep++)
 					{
-						item.save_json(output, 0, true, objbase + rep * m_native_size);
+						item.save_json(zipstate, 0, true, objbase + rep * m_native_size);
 						if (rep != m_type - 1)
 							output << ",";
 					}
@@ -1333,7 +1339,7 @@ void save_registered_item::save_json(std::ostringstream &output, int indent, boo
 					{
 						if (rep % items_per_row == 0)
 							output << std::setw(indent + 1) << std::setfill('\t') << "" << std::setw(0);
-						item.save_json(output, indent + 1, false, objbase + rep * m_native_size);
+						item.save_json(zipstate, indent + 1, false, objbase + rep * m_native_size);
 						if (rep != m_type - 1)
 							output << ",";
 						if (rep % items_per_row == items_per_row - 1)
@@ -1387,6 +1393,22 @@ int64_t save_registered_item::read_int_signed(uintptr_t objbase, int size)
 
 
 //-------------------------------------------------
+//  read_float - read a floating-point value of the
+//  given size
+//-------------------------------------------------
+
+double save_registered_item::read_float(uintptr_t objbase, int size)
+{
+	switch (size)
+	{
+		case 4:	return *reinterpret_cast<float const *>(objbase);
+		case 8:	return *reinterpret_cast<double const *>(objbase);
+	}
+	return 0;
+}
+
+
+//-------------------------------------------------
 //  write_int - write an integer of the given size
 //-------------------------------------------------
 
@@ -1401,9 +1423,46 @@ void save_registered_item::write_int(uintptr_t objbase, int size, uint64_t data)
 	}
 }
 
+
+//-------------------------------------------------
+//  write_float - write a floating-point value of
+//  the given size
+//-------------------------------------------------
+
+void save_registered_item::write_float(uintptr_t objbase, int size, double data)
+{
+	switch (size)
+	{
+		case 4:	*reinterpret_cast<float *>(objbase) = float(data); break;
+		case 8:	*reinterpret_cast<double *>(objbase) = double(data); break;
+	}
+}
+
 void save_manager::test_dump()
 {
-	std::ostringstream json;
-	m_root_item.save_json(json);
-	printf("%s\n", json.str().c_str());
+	save_zip_state state;
+	m_root_item.save_json(state);
+	printf("%s\n", state.json().str().c_str());
+}
+
+
+save_zip_state::save_zip_state()
+{
+}
+
+void save_zip_state::add_data_file(char const *name, void *base, uint32_t size)
+{
+	m_file_list.emplace_back(name, base, size);
+}
+
+void save_zip_state::commit(FILE &output)
+{
+	add_data_file("save.json", &m_json.str()[0], m_json.str().length());
+}
+
+save_zip_state::file_entry::file_entry(char const *name, void *base, uint32_t size) :
+	m_name(name),
+	m_base(base),
+	m_size(size)
+{
 }

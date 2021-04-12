@@ -30,6 +30,7 @@ enum debug_view_type
 	DVT_NONE,
 	DVT_CONSOLE,
 	DVT_STATE,
+	DVT_SAVE,
 	DVT_DISASSEMBLY,
 	DVT_MEMORY,
 	DVT_LOG,

@@ -12,6 +12,7 @@
 #include "express.h"
 #include "debugvw.h"
 #include "dvtext.h"
+#include "dvsave.h"
 #include "dvstate.h"
 #include "dvdisasm.h"
 #include "dvmemory.h"
@@ -346,6 +347,9 @@ debug_view *debug_view_manager::alloc_view(debug_view_type type, debug_view_osd_
 
 		case DVT_STATE:
 			return append(new debug_view_state(machine(), osdupdate, osdprivate));
+
+		case DVT_SAVE:
+			return append(new debug_view_save(machine(), osdupdate, osdprivate));
 
 		case DVT_DISASSEMBLY:
 			return append(new debug_view_disasm(machine(), osdupdate, osdprivate));

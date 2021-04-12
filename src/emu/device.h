@@ -617,13 +617,10 @@ public:
 	void ATTR_COLD save_item(ItemType &value, const char *valname, int index = -1)
 	{
 		assert(m_save);
-		m_save->save_item(this, name(), tag(), (index == -1) ? 0 : index, value, valname);
-		if (m_legacy_save.get() == nullptr)
-			m_legacy_save = std::make_unique<save_registrar>(m_save->legacy_registrar(), tag());
 		if (index == -1)
-			m_legacy_save->reg(value, valname);
+			m_unstructured_save.reg(value, valname);
 		else
-			m_legacy_save->reg(value, string_format("%s[%d]", valname, index).c_str());
+			m_unstructured_save.reg(value, string_format("%s[%d]", valname, index).c_str());
 	}
 	template<typename ItemType, typename StructType, typename ElementType>
 	void ATTR_COLD save_item(ItemType &value, ElementType StructType::*element, const char *valname, int index = 0)
@@ -636,13 +633,10 @@ public:
 	void ATTR_COLD save_pointer(ItemType &&value, const char *valname, u32 count, int index = -1)
 	{
 		assert(m_save);
-		m_save->save_pointer(this, name(), tag(), (index == -1) ? 0 : index, std::forward<ItemType>(value), valname, count);
-		if (m_legacy_save.get() == nullptr)
-			m_legacy_save = std::make_unique<save_registrar>(m_save->legacy_registrar(), tag());
 		if (index == -1)
-			m_legacy_save->reg(value, valname, count);
+			m_unstructured_save.reg(value, valname, count);
 		else
-			m_legacy_save->reg(value, string_format("%s[%d]", valname, index).c_str(), count);
+			m_unstructured_save.reg(value, string_format("%s[%d]", valname, index).c_str(), count);
 	}
 	template<typename ItemType, typename StructType, typename ElementType>
 	void ATTR_COLD save_pointer(ItemType &&value, ElementType StructType::*element, const char *valname, u32 count, int index = 0)
@@ -859,7 +853,8 @@ private:
 	mutable std::vector<rom_entry>  m_rom_entries;
 	std::list<devcb_base *> m_callbacks;
 	std::vector<memory_view *> m_viewlist;          // list of views
-	std::unique_ptr<save_registrar> m_legacy_save;  // bucket for legacy save stuff
+	save_registered_item    m_unstructured_root;    // root unstructured item
+	save_registrar          m_unstructured_save;    // registrar for unstructured items
 	int						m_save_registrations;	// number of save registrations
 
 	// string formatting buffer for logerror

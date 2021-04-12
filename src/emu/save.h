@@ -42,7 +42,6 @@ enum save_error
 };
 
 
-
 //**************************************************************************
 //  MACROS
 //**************************************************************************
@@ -87,6 +86,30 @@ typedef named_delegate<void ()> save_prepost_delegate;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+class save_zip_state
+{
+public:
+	save_zip_state();
+
+	std::ostringstream &json() { return m_json; }
+
+	void add_data_file(char const *name, void *base, uint32_t size);
+
+	void commit(FILE &output);
+
+private:
+	struct file_entry
+	{
+		file_entry(char const *name, void *base, uint32_t size);
+
+		std::string m_name;
+		void *m_base;
+		uint32_t m_size;
+	};
+	std::ostringstream m_json;
+	std::list<file_entry> m_file_list;
+};
+
 class save_registered_item
 {
 	using generic_unique = std::unique_ptr<int> const;
@@ -114,8 +137,19 @@ public:
 	// constructor for a new item
     save_registered_item(uintptr_t ptr_offset, save_type type, uint32_t native_size, char const *name);
 
+	// getters
+	char const *name() const { return m_name.c_str(); }
+	save_type type() const { return m_type; }
+	std::list<save_registered_item> &subitems() { return m_items; }
+	uint32_t native_size() const { return m_native_size; }
+	uint32_t count() const { return (m_type < TYPE_ARRAY) ? m_type : 1; }
+	uintptr_t ptr_offset() const { return m_ptr_offset; }
+
 	// append a new item to the current one
     save_registered_item &append(uintptr_t ptr_offset, save_type type, uint32_t native_size, char const *name);
+
+	// update the object base and unwrap trivial items
+	bool unwrap_and_update_objbase(uintptr_t &objbase) const;
 
 	// compute the binary size by just saving with a null
 	uint64_t compute_binary_size(uintptr_t objbase = 0) const { return save_binary(nullptr, 0, objbase); }
@@ -127,17 +161,19 @@ public:
 	uint64_t restore_binary(uint8_t const *ptr, uint64_t length, uintptr_t objbase = 0) const;
 
 	// save this item into a JSON stream
-	void save_json(std::ostringstream &output, int indent = 0, bool inline_form = false, uintptr_t objbase = 0);
+	void save_json(save_zip_state &output, int indent = 0, bool inline_form = false, uintptr_t objbase = 0);
 
 	// restore this item from a JSON stream
 	void restore_json(std::istringstream &input, uintptr_t objbase = 0);
 
-private:
 	// internal helpers
 	uint64_t read_int_unsigned(uintptr_t objbase, int size);
 	int64_t read_int_signed(uintptr_t objbase, int size);
+	double read_float(uintptr_t objbase, int size);
 	void write_int(uintptr_t objbase, int size, uint64_t data);
+	void write_float(uintptr_t objbase, int size, double data);
 
+private:
 	// internal state
     std::list<save_registered_item> m_items; // list of embedded items
     uintptr_t m_ptr_offset;                  // pointer or offset
@@ -149,6 +185,7 @@ private:
 class save_registrar
 {
 	friend class save_manager;
+	friend class device_t;
 
 	// extended constructor for internal use only
 	save_registrar(save_registrar &parent, save_registered_item::save_type type, uint32_t native_size, char const *name, void *baseptr = nullptr, void *containerbase = nullptr) :
@@ -166,6 +203,16 @@ public:
 
 	// return a reference to the parent item
 	save_registered_item &parent_item() const { return m_parent; }
+
+	// append a bucket
+	save_registrar &reg(save_registrar &src, char const *name)
+	{
+		save_registrar container(*this, save_registered_item::TYPE_CONTAINER, 0, name);
+		auto &srcitems = src.parent_item().subitems();
+		auto &dstitems = container.parent_item().subitems();
+		dstitems.splice(dstitems.end(), srcitems);
+        return *this;
+	}
 
     // enum types -- these are equivalent to ints of the save size
     template<typename T>

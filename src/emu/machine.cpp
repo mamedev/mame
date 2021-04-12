@@ -260,11 +260,10 @@ void running_machine::start()
 	// register callbacks for the devices, then start them
 	add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&running_machine::reset_all_devices, this));
 	add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&running_machine::stop_all_devices, this));
-	save_registrar device_registrar(m_save.root_registrar(), "devices");
 	save().register_presave(save_prepost_delegate(FUNC(running_machine::presave_all_devices), this));
 	start_all_devices();
 	for (device_t &device : device_enumerator(root_device()))
-		device_registrar.reg(device, device.tag());
+		m_save.root_registrar().reg(device, device.tag());
 	save().register_postload(save_prepost_delegate(FUNC(running_machine::postload_all_devices), this));
 
 	// save outputs created before start time

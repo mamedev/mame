@@ -105,6 +105,7 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 	, m_config_complete(false)
 	, m_started(false)
 	, m_auto_finder_list(nullptr)
+	, m_unstructured_save(m_unstructured_root)
 	, m_save_registrations(0)
 {
 	if (owner != nullptr)
@@ -686,18 +687,22 @@ void device_t::post_load()
 
 void device_t::register_save(save_registrar &save)
 {
-	// register our save states
-	save.reg(NAME(m_clock))
+	// register our save states in a core 'device' container
+	save_registrar(save, "device")
+		.reg(NAME(m_clock))
 		.reg(NAME(m_unscaled_clock))
 		.reg(NAME(m_clock_scale));
 
-	// notify the interface
+	// let the interfaces save their states
 	for (device_interface &intf : interfaces())
 		intf.interface_register_save(save);
 
-	// notify the device
+	// then the device itself
 	int state_registrations = machine().save().registration_count();
 	device_register_save(save);
+
+	// append any unstructured items
+	save.reg(m_unstructured_save, "unstructured");
 	m_save_registrations += machine().save().registration_count() - state_registrations;
 
 	// complain if registrations didn't happen
