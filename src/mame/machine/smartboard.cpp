@@ -4,7 +4,7 @@
 
     Tasc SmartBoard
 
-    SB30 (91 LEDs) is "SmartBoard I"
+    SB30 (81 LEDs) is "SmartBoard I"
     SB20 (64 LEDs) is "SmartBoard II"
 
     The SmartBoard can detect which piece is present on a specific square, more
