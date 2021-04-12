@@ -146,6 +146,16 @@ void sms_3d_glasses_device::device_reset()
 
 void sms_3d_glasses_device::device_add_mconfig(machine_config &config)
 {
+	// Description (partialy copied from the SMS Power website):
+	// The real device has 2 LCD shutters that are alternately closed
+	// by the game in sync with the image displayed on the screen, so
+	// that each eye sees only odd frames and the other only even.
+
+	// The LCD shutters do not have a clock, they are software-driven.
+	// To allow control of the image shown by this implementation, what
+	// made possible to implement 2D view modes through the binocular hack,
+	// the shutters are simulated here using standard LCD screens.
+
 	SCREEN(config, m_left_lcd, SCREEN_TYPE_LCD);
 	m_left_lcd->set_screen_update(FUNC(sms_3d_glasses_device::screen_update_left));
 
