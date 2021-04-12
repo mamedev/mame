@@ -38,14 +38,13 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	TIMER_CALLBACK_MEMBER(leds_off_cb);
 	void out_led(int pos);
 	bool piece_available(uint8_t id);
 	void init_cb(int state);
 	uint8_t spawn_cb(offs_t offset);
 
 	required_device<sensorboard_device> m_board;
-	output_finder<9,9>        m_out_leds;
+	output_finder<8,8>        m_out_leds;
 	emu_timer *               m_leds_off_timer;
 	uint8_t                   m_data;
 	uint8_t                   m_position;

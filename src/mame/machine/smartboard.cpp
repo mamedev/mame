@@ -4,6 +4,9 @@
 
     Tasc SmartBoard
 
+    SB30 (91 LEDs) is "SmartBoard I"
+    SB20 (64 LEDs) is "SmartBoard II"
+
     The SmartBoard can detect which piece is present on a specific square, more
     info on the technology used in the piece recognition system can be found in
     the US patent 5,129,654
@@ -78,7 +81,6 @@ tasc_sb30_device::tasc_sb30_device(const machine_config &mconfig, const char *ta
 void tasc_sb30_device::device_start()
 {
 	m_out_leds.resolve();
-	m_leds_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tasc_sb30_device::leds_off_cb), this));
 
 	save_item(NAME(m_data));
 	save_item(NAME(m_position));
@@ -111,13 +113,6 @@ void tasc_sb30_device::device_add_mconfig(machine_config &config)
 	m_board->spawn_cb().set(FUNC(tasc_sb30_device::spawn_cb));
 }
 
-
-TIMER_CALLBACK_MEMBER(tasc_sb30_device::leds_off_cb)
-{
-	for (int y=0; y<9; y++)
-		for (int x=0; x<9; x++)
-			m_out_leds[y][x] = 0;
-}
 
 void tasc_sb30_device::init_cb(int state)
 {
@@ -242,16 +237,16 @@ uint8_t tasc_sb30_device::read()
 	return BIT(sb30_id, m_shift & 0x1f);
 }
 
-
 void tasc_sb30_device::write(uint8_t data)
 {
 	if (BIT(data, 3) && !BIT(m_data, 3))
 		m_position = 0;
 
-	if (BIT(data, 7) && BIT(data, 6) && !BIT(m_data, 6))
+	if (BIT(data, 6) && !BIT(m_data, 6))
 	{
-		out_led(m_position);
-		m_leds_off_timer->adjust(attotime::from_hz(5));
+		int x = (m_position & 0x3f) / 8;
+		int y = (m_position & 0x3f) % 8;
+		m_out_leds[y][x] = BIT(data, 7);
 	}
 
 	if (!BIT(data, 7) && BIT(m_data, 7))
@@ -266,16 +261,4 @@ void tasc_sb30_device::write(uint8_t data)
 	}
 
 	m_data = data;
-}
-
-
-void tasc_sb30_device::out_led(int pos)
-{
-	pos &= 0x3f;
-	int x = pos / 8;
-	int y = pos % 8;
-	m_out_leds[y + 0][x + 0] = 1;
-	m_out_leds[y + 0][x + 1] = 1;
-	m_out_leds[y + 1][x + 0] = 1;
-	m_out_leds[y + 1][x + 1] = 1;
 }

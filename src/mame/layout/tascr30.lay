@@ -13,9 +13,11 @@ license:CC0
 	<element name="black3b"><rect><color red="0.12" green="0.11" blue="0.10" /></rect></element>
 	<element name="static_lcd"><rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect></element>
 
+	<element name="ledo">
+		<disk><color red="0.1" green="0.05" blue="0.07" /></disk>
+	</element>
 	<element name="ledr" defstate="0">
-		<disk state="0">    <color red="0.12" green="0.11" blue="0.1" />   </disk>
-		<disk state="1">    <color red="1" green="0.01" blue="0.15" />  </disk>
+		<disk state="1">    <color red="1" green="0" blue="0" />  </disk>
 	</element>
 	<element name="ledg" defstate="0">
 		<disk state="0">    <color red="0.05" green="0.15" blue="0.05" />   </disk>
@@ -310,20 +312,43 @@ license:CC0
 			<element name="piece_h~i~" ref="piece"><bounds x="71" y="~y~" width="10" height="10" /></element>
 		</repeat>
 
-		<!-- LEDs -->
+		<!-- 81 LEDs from 64 outputs -->
 		<repeat count="9">
+			<param name="x" start="0.5" increment="10" />
+			<repeat count="9">
+				<param name="y" start="0.5" increment="10" />
+				<element ref="ledo"><bounds x="~x~" y="~y~" width="1" height="1" /></element>
+			</repeat>
+		</repeat>
+
+		<repeat count="8">
 			<param name="x" start="80.5" increment="-10" />
 			<param name="i" start="0" increment="1" />
+			<repeat count="8">
+				<param name="y" start="0.5" increment="10" />
+				<param name="j" start="0" increment="1" />
+				<element name="led_~j~~i~" ref="ledr" blend="add"><bounds x="~x~" y="~y~" width="1" height="1" /></element>
+			</repeat>
+			<repeat count="8">
+				<param name="y" start="10.5" increment="10" />
+				<param name="j" start="0" increment="1" />
+				<element name="led_~j~~i~" ref="ledr" blend="add"><bounds x="~x~" y="~y~" width="1" height="1" /></element>
+			</repeat>
+		</repeat>
 
-			<element name="led_0~i~" ref="ledr"><bounds x="~x~"    y="0.5"    width="1" height="1" /></element>
-			<element name="led_1~i~" ref="ledr"><bounds x="~x~"    y="10.5"   width="1" height="1" /></element>
-			<element name="led_2~i~" ref="ledr"><bounds x="~x~"    y="20.5"   width="1" height="1" /></element>
-			<element name="led_3~i~" ref="ledr"><bounds x="~x~"    y="30.5"   width="1" height="1" /></element>
-			<element name="led_4~i~" ref="ledr"><bounds x="~x~"    y="40.5"   width="1" height="1" /></element>
-			<element name="led_5~i~" ref="ledr"><bounds x="~x~"    y="50.5"   width="1" height="1" /></element>
-			<element name="led_6~i~" ref="ledr"><bounds x="~x~"    y="60.5"   width="1" height="1" /></element>
-			<element name="led_7~i~" ref="ledr"><bounds x="~x~"    y="70.5"   width="1" height="1" /></element>
-			<element name="led_8~i~" ref="ledr"><bounds x="~x~"    y="80.5"   width="1" height="1" /></element>
+		<repeat count="8">
+			<param name="x" start="70.5" increment="-10" />
+			<param name="i" start="0" increment="1" />
+			<repeat count="8">
+				<param name="y" start="0.5" increment="10" />
+				<param name="j" start="0" increment="1" />
+				<element name="led_~j~~i~" ref="ledr" blend="add"><bounds x="~x~" y="~y~" width="1" height="1" /></element>
+			</repeat>
+			<repeat count="8">
+				<param name="y" start="10.5" increment="10" />
+				<param name="j" start="0" increment="1" />
+				<element name="led_~j~~i~" ref="ledr" blend="add"><bounds x="~x~" y="~y~" width="1" height="1" /></element>
+			</repeat>
 		</repeat>
 	</group>
 
