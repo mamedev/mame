@@ -41727,4 +41727,156 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="compuzlr">
+		<description>Compuzzler (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Uptown Software</publisher>
+		<info name="release" value="2021-04-09"/>
+		<!--"Compuzzler" is a 1984 board game developed and distributed by Uptown Software. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="compuzzler (4am crack).dsk" size="143360" crc="60cda369" sha1="a32614f326e5640ec6dca39f75dd133838ae5e39"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="algactn">
+		<description>Algebra Action (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Houghton Mifflin</publisher>
+		<info name="release" value="2021-04-10"/>
+		<!--"Algebra Action" is a 1986 educational program developed by Prentice Associates and distributed by Houghton Mifflin. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="algebra action (4am crack) disk 1.dsk" size="143360" crc="1247633a" sha1="6f775f772644236108493147a4f89e703f7d6359"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="algebra action (4am crack) disk 2.dsk" size="143360" crc="807ee772" sha1="3557fd5ce713b2627ed79cdd5de7b7f556edd1ec"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="algebra action (4am crack) disk 3.dsk" size="143360" crc="cc7d795e" sha1="20172162c015199bf995e39bcae04be619900ec3"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="algebra action (4am crack) disk 4.dsk" size="143360" crc="fb2d4df3" sha1="240a9f8f0fcb5a8cd4b673250b44412b3991e1fa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wzcrwn12">
+		<description>Wizard's Crown (Version 1.2) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2021-04-10"/>
+		<!--"Wizard's Crown" is a 1986 roleplaying game developed by Paul Murray and Keith Brors, and distributed by Strategic Simulations, Inc. This is version 1.2. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - Game disk front"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wizard's crown v1.2 (4am crack) disk 1a - game disk front.dsk" size="143360" crc="3198d3fe" sha1="348fdaeb55c447c40e2e9bfefc364ac37210cd59"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - Game disk back"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wizard's crown v1.2 (4am crack) disk 1b - game disk back.dsk" size="143360" crc="cb8fee67" sha1="4be497844d0a8a4fcfb70d9629ceddab8c45ea3a"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Data disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wizard's crown v1.2 (4am crack) disk 2a - data disk 1.dsk" size="143360" crc="fcc7fdac" sha1="7afa03981c62de9b0deaedd2a6788baae12a54f6"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Data disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wizard's crown v1.2 (4am crack) disk 2b - data disk 2.dsk" size="143360" crc="8b82a2f5" sha1="6186061a89bbcace9fe4c5a7d55c4740ea15a550"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="odystime">
+		<description>Odyssey in Time (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Krell Software</publisher>
+		<info name="release" value="2021-04-10"/>
+		<!--"Odyssey in Time" is a 1981 adventure game developed and distributed by Krell Software. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="odyssey in time (4am crack).dsk" size="143360" crc="77492bd5" sha1="f7770162bfd239fba1e2fd6f260e262bc607e41a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frbdnqst">
+		<description>Forbidden Quest (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Pryority Software</publisher>
+		<info name="release" value="2021-04-10"/>
+		<!--"Forbidden Quest" is a 1983 adventure game developed and distributed by Pryority Software. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="forbidden quest (4am crack).dsk" size="143360" crc="5dc072c2" sha1="f885fbdb12fb2dcb6dd3aedd96b1562d3028d5bb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ftiger13">
+		<description>Flying Tigers (Version 1.3) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Discovery Games</publisher>
+		<info name="release" value="2021-04-10"/>
+		<!--"Flying Tigers" is a 1982 strategy game developed by Ross W. Maker, David A. Wesley, and Stephen Goss and distributed by Discovery Games. This is version 1.3. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="flying tigers (4am crack).dsk" size="143360" crc="c0f8837a" sha1="bb1c2ad481a429dee7f5bd9b297fdcc8f92aa502"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ahtlicac">
+		<description>Apple How To: Lessons in Computing and Calculating (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Apple Computer</publisher>
+		<info name="release" value="2021-04-10"/>
+        <info name="usage" value="Will only run on 2, 2+, and unenhanced 2E models" />
+		<!--"Apple How To: Lessons in Computing and Calculating" is a 1980 educational program developed by Bruce Tognazzini and distributed by Apple Computer. This is version 1.0. It is preserved here for the first time. Due to compatibility issues unrelated to copy protection, it only runs on an original Apple ][, ][+, or unenhanced //e.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="apple how to- lessons in computing and calculating (4am crack).dsk" size="143360" crc="d56fe616" sha1="d8460587c267eac7a0f688d1a0164b61f01e0896"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="descratn">
+		<description>The Desecration (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Mind Games</publisher>
+		<info name="release" value="2021-04-12"/>
+		<!--"The Desecration" is a 1982 adventure game developed and distributed by Mind Games.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the desecration (4am crack).dsk" size="143360" crc="7ea09a12" sha1="b243196d0ca654e775691e89b4aedc5adebf6e66"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
