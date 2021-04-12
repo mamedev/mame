@@ -288,6 +288,7 @@ void md_cons_state::machine_start()
 	// setup timers for 6 button pads
 	for (int i = 0; i < 3; i++)
 		m_io_timeout[i] = timer_alloc(*this, FUNC(md_base_state::io_timeout_timer_callback), (void*)(uintptr_t)i);
+	m_megadriv_z80_run_state.init(*this, FUNC(md_cons_state::megadriv_z80_run_state));
 
 	m_vdp->stop_timers();
 
