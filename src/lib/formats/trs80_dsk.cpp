@@ -289,14 +289,14 @@ bool jv3_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 					return false;
 				}
 
-				printf("Side %d, Track %d, %s density\n",curr_side,curr_track,ddensity ? "Double" : "Single");
+				//printf("Side %d, Track %d, %s density\n",curr_side,curr_track,ddensity ? "Double" : "Single");
 				if (ddensity)
 				{
 					is_dd = true;
-					build_wd_track_mfm(curr_track, curr_side, image, 100000, max_sect, sectors, 32, 22, 31);
+					build_wd_track_mfm(curr_track, curr_side, image, 100000, max_sect, sectors, 32, 31, 22);
 				}
 				else
-					build_wd_track_fm(curr_track, curr_side, image, 50000, max_sect, sectors, 14, 11, 12);
+					build_wd_track_fm(curr_track, curr_side, image, 50000, max_sect, sectors, 14, 12, 11);
 
 				if (curr_side)
 					is_ds = true;
