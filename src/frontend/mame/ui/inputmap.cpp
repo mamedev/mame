@@ -42,6 +42,7 @@ void menu_input_groups::populate(float &customtop, float &custombottom)
 		item_append(s, 0, (void *)uintptr_t(IPG_PLAYER1 + player + 1));
 	}
 	item_append(_("Other Controls"), 0, (void *)uintptr_t(IPG_OTHER + 1));
+	item_append(menu_item_type::SEPARATOR);
 }
 
 void menu_input_groups::handle()
@@ -495,6 +496,8 @@ void menu_input::populate_sorted(float &customtop, float &custombottom)
 		// add the item
 		item_append(std::move(text), std::move(subtext), flags, &item);
 	}
+
+	item_append(menu_item_type::SEPARATOR);
 
 	// pre-format messages
 	assignprompt = util::string_format(_("Press %1$s to set\n"), machine().input().seq_name(machine().ioport().type_seq(IPT_UI_SELECT)));

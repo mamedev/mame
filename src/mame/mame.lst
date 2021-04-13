@@ -22792,15 +22792,9 @@ mondial2                        // 1987 Mephisto Mondial II
 mondl68k                        // 1988 Mephisto Mondial 68000XL
 
 @source:mephisto_montec.cpp
-smondial                        // 1986 Mephisto Super Mondial (Ver A)
-smondialab                      // 1986 Mephisto Super Mondial (Ver AB)
-smondialb                       // 1986 Mephisto Super Mondial (Ver B)
 montec                          // 1987 Mephisto Monte Carlo
 monteca                         // 1987 Mephisto Monte Carlo
-smondial2                       // 1989 Mephisto Super Mondial II
-megaiv                          // 1989 Mephisto Mega IV
-megaiva                         // 1989 Mephisto Mega IV
-monteciv                        // 1990 Mephisto Monte Carlo IV LE
+montec4le                       // 1990 Mephisto Monte Carlo IV LE
 
 @source:mephisto_polgar.cpp
 polgar                          // 1990 Mephisto Polgar
@@ -22811,6 +22805,14 @@ polgar101                       // 1990 Mephisto Polgar 10MHz
 @source:mephisto_risc.cpp
 mrisc                           // 1992 Mephisto RISC 1MB
 mrisc2                          // 1994 Mephisto RISC II
+
+@source:mephisto_smondial.cpp
+mega4                           // 1989 Mephisto Mega IV
+mega4a                          // 1989 Mephisto Mega IV
+smondial                        // 1986 Mephisto Super Mondial (Ver A)
+smondialab                      // 1986 Mephisto Super Mondial (Ver AB)
+smondialb                       // 1986 Mephisto Super Mondial (Ver B)
+smondial2                       // 1989 Mephisto Super Mondial II
 
 @source:mephistp.cpp
 mephistp                        //

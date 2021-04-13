@@ -19,7 +19,6 @@ VIDEO_START_MEMBER(taitoz_state,taitoz)
             SPRITE READ AND WRITE HANDLERS
 ********************************************************/
 
-
 u16 taitoz_state::sci_spriteframe_r()
 {
 	return (m_sci_spriteframe << 8);
@@ -780,14 +779,37 @@ void taitoz_state::contcirc_out_w(u8 data)
 
 	/* bits 1-3 n.c. */
 
-	/* 3d glasses control */
+	/* 3d scope control */
 	/* bit 4 = SCPSW */
-	/* bit 5 = SCP */
+	/* bit 5 = _SCP */
+	if (~m_shutter_control & 2 && data & 0x20)
+		m_shutter_toggle = 0;
+	m_shutter_control = data >> 4 & 3;
 
 	/* bits 6 and 7 select the road palette bank */
 	m_road_palbank = (data & 0xc0) >> 6;
 }
 
+WRITE_LINE_MEMBER(taitoz_state::scope_vblank)
+{
+	if (state)
+	{
+		// it outputs 3d scope shutters at vblank
+		if (m_shutter_control & 1)
+		{
+			m_shutter_out[0] = m_shutter_toggle;
+			m_shutter_out[1] = m_shutter_toggle ^ 1;
+		}
+		else
+		{
+			m_shutter_out[0] = 0;
+			m_shutter_out[1] = 0;
+		}
+
+		if (m_shutter_control & 2)
+			m_shutter_toggle ^= 1;
+	}
+}
 
 u32 taitoz_state::screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

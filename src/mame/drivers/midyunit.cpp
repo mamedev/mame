@@ -31,13 +31,6 @@
             table from the UTILITIES menu.  It's best to do a FULL FACTORY RESTORE
 
 
-Super High Impact
-Midway, 1991
-
-This game runs on (typical) Midway Y-Unit hardware. The PCB is a base
-board 'system' that can run other Y-Unit games by swapping ROMs and
-the protection chip.
-
 *************************************************************************
 
 Notes for NARC based on source code release:
@@ -105,6 +98,16 @@ Revision history for NARC:
      No Mr. Big kills
      Players not able to find blue card in drug lab witnessed
 
+NARC sound program and data ROMs:
+
+The REV1 ROMs have no known build date or revision code.
+The REV2 ROMs have a Version 1.1 1/16/89 string in the U5 ROM starting at 0xC04C, which
+  coincides with the above released date of the 2.00 ROMs for the first production release.
+In the source code archive that was released, there are sound ROMs with a Version 1.0 1/12/89
+  string. It's not known which if any set these should be matched to. Maybe the missing v1.91?
+
+For each sound ROM set, both program ROMs as well as the 4 data ROMs are unique to that build.
+
 *************************************************************************
 
 TROG development based on notes in source code & dumped sets:
@@ -137,6 +140,12 @@ ARTWORK, ANIMATIONS, CLAY SCULPTING: JACK E. HAEGER
 
 *************************************************************************
 
+Super High Impact
+Midway, 1991
+
+This game runs on (typical) Midway Y-Unit hardware. The PCB is a base
+board 'system' that can run other Y-Unit games by swapping ROMs and
+the protection chip.
 
 PCB Layout
 ----------

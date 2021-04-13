@@ -111,7 +111,8 @@ u8 glasgow_state::keys_r()
 			data |= 1 << i;
 
 	// reading keypad also clears irq
-	m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
 
 	return ~data;
 }
@@ -239,7 +240,7 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR, NAME,      PARENT    COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY             FULLNAME                  FLAGS */
+/*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY             FULLNAME                  FLAGS */
 CONS( 1984, glasgow,   0,        0,      glasgow,  glasgow, glasgow_state, empty_init, "Hegener + Glaser", "Mephisto III-S Glasgow", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 // newer chesscomputers on 4-ROM hardware (see mephisto_amsterdam.cpp for parent sets)

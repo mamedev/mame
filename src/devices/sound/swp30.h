@@ -50,6 +50,8 @@ private:
 	u16 m_routing[0x40][3];
 	u16 m_map[8];
 
+	u16 m_internal_adr;
+
 	u16 m_program_address;
 
 	// AWM2 per-channel registers
@@ -87,6 +89,9 @@ private:
 	void dry_rev_w(offs_t offset, u16 data);
 	u16 cho_var_r(offs_t offset);
 	void cho_var_w(offs_t offset, u16 data);
+	u16 internal_adr_r();
+	void internal_adr_w(u16 data);
+	u16 internal_r();
 	template<int sel> u16 routing_r(offs_t offset);
 	template<int sel> void routing_w(offs_t offset, u16 data);
 
