@@ -37,7 +37,7 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	uint32_t m_math_reg[5];
+	uint32_t m_math_reg[6];
 	uint16_t m_multiply_result;
 	uint16_t m_divide_quotient;
 	uint16_t m_divide_remainder;
