@@ -148,10 +148,9 @@ private:
 	u16 sci_spriteframe_r();
 	void sci_spriteframe_w(u16 data);
 	void contcirc_out_w(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(contcirc_vblank);
+	DECLARE_WRITE_LINE_MEMBER(scope_vblank);
 	DECLARE_VIDEO_START(taitoz);
 	DECLARE_MACHINE_START(chasehq);
-	DECLARE_MACHINE_START(contcirc);
 	u32 screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_chasehq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_bshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
