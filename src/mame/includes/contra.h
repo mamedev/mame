@@ -37,6 +37,11 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	uint32_t m_math_reg[5];
+	uint16_t m_multiply_result;
+	uint16_t m_divide_quotient;
+	uint16_t m_divide_remainder;
+	
 	/* memory pointers */
 	std::unique_ptr<uint8_t[]>       m_buffered_spriteram;
 	std::unique_ptr<uint8_t[]>       m_buffered_spriteram_2;
@@ -73,6 +78,8 @@ public:
 	void contra_text_cram_w(offs_t offset, uint8_t data);
 	void contra_K007121_ctrl_0_w(offs_t offset, uint8_t data);
 	void contra_K007121_ctrl_1_w(offs_t offset, uint8_t data);
+	uint8_t contra_K007452_r(offs_t offset);
+	void contra_K007452_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);

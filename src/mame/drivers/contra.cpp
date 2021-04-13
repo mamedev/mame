@@ -59,10 +59,57 @@ void contra_state::contra_coin_counter_w(uint8_t data)
 		machine().bookkeeping().coin_counter_w(1, (data & 0x02) >> 1);
 }
 
+uint8_t contra_state::contra_K007452_r(offs_t offset)
+{
+	switch (offset)
+	{
+		case 0:
+			return m_multiply_result & 0xFF;
+			break;
+		case 1:
+			return (m_multiply_result >> 8) & 0xFF;
+			break;
+		case 2:
+			return m_divide_remainder & 0xFF;
+			break;
+		case 3:
+			return (m_divide_remainder >> 8) & 0xFF;
+			break;
+		case 4:
+			return m_divide_quotient & 0xFF;
+			break;
+		case 5:
+			return (m_divide_quotient >> 8) & 0xFF;
+			break;
+		default:
+			return 0;
+	}
+}
+
+void contra_state::contra_K007452_w(offs_t offset, uint8_t data)
+{
+	m_math_reg[offset] = data;
+	
+	if (offset == 1)
+	{
+		// Starts multiplication process
+		m_multiply_result = m_math_reg[0] * m_math_reg[1];
+	}
+	else if (offset == 5)
+	{	
+		// Starts division process
+		uint16_t dividend = (m_math_reg[4]<<8) + m_math_reg[5];
+		uint16_t divisor = (m_math_reg[2]<<8) + m_math_reg[3];
+		m_divide_quotient = dividend / divisor;
+		m_divide_remainder = dividend % divisor;
+	}
+}
 
 void contra_state::contra_map(address_map &map)
 {
 	map(0x0000, 0x0007).w(FUNC(contra_state::contra_K007121_ctrl_0_w));
+	map(0x0008, 0x000D).r(FUNC(contra_state::contra_K007452_r));
+	map(0x0008, 0x000D).w(FUNC(contra_state::contra_K007452_w));
 	map(0x0010, 0x0010).portr("SYSTEM");
 	map(0x0011, 0x0011).portr("P1");
 	map(0x0012, 0x0012).portr("P2");
