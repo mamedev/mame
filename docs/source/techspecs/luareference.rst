@@ -192,10 +192,6 @@ machine.paused (read-only)
     A Boolean indicating whether emulation is not currently running, usually
     because the session has been paused or the emulated system has not completed
     starting.
-machine.exit_pending (read-only)
-    A Boolean indicating whether the emulation session is scheduled to exit.
-machine.hard_reset_pending (read-only)
-    A Boolean indicating whether a hard reset of the emulated system is pending.
 machine.devices (read-only)
     A :ref:`device enumerator <luareference-dev-enum>` that yields all
     :ref:`devices <luareference-dev-device>` in the emulated system.

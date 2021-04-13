@@ -340,7 +340,7 @@ void debug_qt::wait_for_debugger(device_t &device, bool firststop)
 	}
 
 	// Exit if the machine has been instructed to do so (scheduled event == exit || hard_reset)
-	if (m_machine->scheduled_event_pending())
+	if (m_machine->exit_or_hard_reset_pending())
 	{
 		// Keep a list of windows we want to save.
 		// We need to do this here because by the time xml_configuration_save gets called

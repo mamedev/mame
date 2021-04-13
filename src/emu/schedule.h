@@ -323,17 +323,23 @@ private:
 // ======================> timer_instance_save
 
 // timer_instance_save is an internal structure that holds a single saved
-// timer instance, along with some persistent_timer data for instances that
-// are owned by a persistent_timer
+// timer instance, for active transient timers
 struct timer_instance_save
 {
 	attotime start;                     // saved/restore by timer_instance
 	attotime expire;                    // saved/restore by timer_instance
 	u64 param[3];                       // saved/restore by timer_instance
 	u32 hash;                           // saved/restore by timer_instance/persistent_timer
-	u16 save_index;                     // saved/restore by persistent_timer
-	u8 enabled;                         // saved/restore by persistent_timer
-	attotime period;                    // saved/restore by persistent_timer
+	u32 save_index;                     // saved/restore by persistent_timer
+
+	void register_save(save_manager &save, int index)
+	{
+		save.save_item(nullptr, "timer_instance", "transient", index, NAME(start));
+		save.save_item(nullptr, "timer_instance", "transient", index, NAME(expire));
+		save.save_item(nullptr, "timer_instance", "transient", index, NAME(param));
+		save.save_item(nullptr, "timer_instance", "transient", index, NAME(hash));
+		save.save_item(nullptr, "timer_instance", "transient", index, NAME(save_index));
+	}
 };
 
 
@@ -373,6 +379,15 @@ public:
 	attotime remaining() const noexcept;
 	attotime const &start() const { return m_start; }
 	attotime const &expire() const { return m_expire; }
+
+	// save state for persistent timers that own us
+	void register_save(save_manager &save)
+	{
+		save.save_item(nullptr, "timer_instance", m_callback->unique_id(), m_callback->save_index(), NAME(m_start));
+		save.save_item(nullptr, "timer_instance", m_callback->unique_id(), m_callback->save_index(), NAME(m_expire));
+		save.save_item(nullptr, "timer_instance", m_callback->unique_id(), m_callback->save_index(), NAME(m_param));
+		save.save_item(nullptr, "timer_instance", m_callback->unique_id(), m_callback->save_index(), NAME(m_active));
+	}
 
 private:
 	// internal setters
@@ -488,19 +503,27 @@ public:
 	persistent_timer &reset(attotime const &duration = attotime::never) { return adjust(duration, m_instance.param(), m_period); }
 	persistent_timer &adjust(attotime const &start_delay, s32 param = 0, attotime const &periodicity = attotime::never);
 
+	// save state
+	void register_save(save_manager &save, int index)
+	{
+		save.save_item(nullptr, "persistent_timer", m_callback.unique_id(), m_callback.save_index(), NAME(m_period));
+		save.save_item(nullptr, "persistent_timer", m_callback.unique_id(), m_callback.save_index(), NAME(m_enabled));
+		save.save_item(nullptr, "persistent_timer", m_callback.unique_id(), m_callback.save_index(), NAME(m_modified));
+		m_instance.register_save(save);
+	}
+	void post_restore();
+
 protected:
 	// internal helpers
 	void periodic_callback(timer_instance const &timer);
 	persistent_timer &init_common();
-	persistent_timer &save(timer_instance_save &dst);
 	persistent_timer &restore(timer_instance_save const &src, timer_callback &callback);
-	void register_save();
 
 	// internal state
 	attotime m_period;                  // the timer period, or attotime::never if not periodic
 	bool m_enabled;                     // true if enabled, false if disabled
 	bool m_modified;                    // true if modified
-	timer_instance m_instance;          // the embedded timer instnace
+	timer_instance m_instance;          // the embedded timer instance
 	timer_callback m_callback;          // the embedded timer callback
 	timer_callback m_periodic_callback; // an wrapper callback for periodic timers
 };
@@ -518,9 +541,9 @@ class device_scheduler
 	friend class timer_instance;
 	friend class device_t; // for access to timer_alloc/timer_set device forms
 
-	// due to save state limitations this has to be fixed; vgmplay allocates 256
-	// timers and needs room for active instances, so hoping 512 is enough
-	static constexpr int MAX_SAVE_INSTANCES = 512;
+	// due to save state limitations these have to be fixed
+	static constexpr int TIMER_SAVE_SLOTS = 256;
+	static constexpr int MAX_ACTIVE_QUANTA = 16;
 
 	// inner private class for maintaining base-time relative values for
 	// faster comparisons vs a full attotime
@@ -606,6 +629,9 @@ public:
 	// force immediate exit from the scheduling loop -- for emergencies only!
 	void hard_stop();
 
+	// save state registration
+	void register_save(save_manager &save);
+
 private:
 	// timers, specified by device/id; generally devices should use the device_t methods instead
 	persistent_timer *timer_alloc(device_t &device, device_timer_id id = 0, void *ptr = nullptr);
@@ -686,26 +712,29 @@ private:
 #endif
 
 	// scheduling quanta
+	static constexpr subseconds MAX_QUANTUM = subseconds::from_hz(10);
 	class quantum_slot
 	{
-		friend class simple_list<quantum_slot>;
-
 	public:
-		quantum_slot *next() const { return m_next; }
-
-		quantum_slot *          m_next;
 		subseconds              m_actual;                   // actual duration of the quantum
 		subseconds              m_requested;                // duration of the requested quantum
 		basetime_relative       m_expire;                   // absolute expiration time of this quantum
+
+		void register_save(save_manager &save, int index)
+		{
+			save.save_item(nullptr, "quantum_slot", "", index, NAME(m_actual));
+			save.save_item(nullptr, "quantum_slot", "", index, NAME(m_requested));
+			save.save_item(nullptr, "quantum_slot", "", index, NAME(m_expire.m_absolute));
+			save.save_item(nullptr, "quantum_slot", "", index, NAME(m_expire.m_relative));
+			save.save_item(nullptr, "quantum_slot", "", index, NAME(m_expire.m_base));
+		}
 	};
-	static constexpr subseconds MAX_QUANTUM = subseconds::from_hz(10);
 	subseconds                  m_quantum_minimum;          // duration of minimum quantum
-	quantum_slot *              m_quantum_list;             // simple list of quanta
-	quantum_slot *              m_quantum_free_list;        // list of free quanta
-	std::vector<std::unique_ptr<quantum_slot>> m_allocated_quanta; // allocated quanta
+	u32                         m_quantum_count;            // number of currently active quanta
+	quantum_slot                m_quantum_slot[MAX_ACTIVE_QUANTA]; // array of active quanta
 
 	// put this at the end since it's big
-	timer_instance_save         m_timer_save[MAX_SAVE_INSTANCES]; // state saving area
+	timer_instance_save         m_timer_save[TIMER_SAVE_SLOTS]; // state saving area
 };
 
 

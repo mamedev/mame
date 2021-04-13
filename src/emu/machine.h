@@ -205,8 +205,7 @@ public:
 	bool paused() const { return m_paused || (m_current_phase != machine_phase::RUNNING); }
 	bool event_pending() const { return (m_event_timer.param() != EVENT_NONE); }
 	bool exit_pending() const { return (m_event_timer.param() == EVENT_EXIT); }
-	bool hard_reset_pending() const { return (m_event_timer.param() == EVENT_HARD_RESET); }
-	bool scheduled_event_pending() const { return (exit_pending() || hard_reset_pending()); }
+	bool exit_or_hard_reset_pending() const { return (m_event_timer.param() == EVENT_EXIT || m_event_timer.param() == EVENT_HARD_RESET); }
 	bool save_or_load_pending() const { return !m_saveload_pending_file.empty(); }
 	bool ui_active() const { return m_ui_active; }
 	const std::string &basename() const { return m_basename; }

@@ -373,9 +373,7 @@ timer_instance &timer_instance::remove()
 void timer_instance::dump() const
 {
 	persistent_timer *persistent = m_callback->persistent();
-
-	running_machine &machine = scheduler().machine();
-	machine.logerror("%p: %s exp=%15s start=%15s ptr=%p param=%lld/%lld/%lld",
+	printf("%p: %s exp=%15s start=%15s ptr=%p param=%lld/%lld/%lld",
 		this,
 		(m_callback->persistent() != nullptr) ? "P" : "T",
 		m_expire.as_string(PRECISION),
@@ -384,12 +382,12 @@ void timer_instance::dump() const
 		m_param[0], m_param[1], m_param[2]);
 
 	if (persistent != nullptr)
-		machine.logerror(" per=%15s", persistent->period().as_string(PRECISION));
+		printf(" per=%15s", persistent->period().as_string(PRECISION));
 
 	if (m_callback->device() != nullptr)
-		machine.logerror(" dev=%s id=%d\n", m_callback->device()->tag(), int(param(2)));
+		printf(" dev=%s id=%d\n", m_callback->device()->tag(), int(param(2)));
 	else
-		machine.logerror(" cb=%s\n", m_callback->name());
+		printf(" cb=%s\n", m_callback->name());
 }
 
 
@@ -505,35 +503,20 @@ persistent_timer &persistent_timer::init_common()
 
 
 //-------------------------------------------------
-//  save - save persistent timer data to the given
-//  save data structure
+//  post_restore - update after restoration
 //-------------------------------------------------
 
-persistent_timer &persistent_timer::save(timer_instance_save &dst)
+void persistent_timer::post_restore()
 {
-	m_instance.save(dst);
+	// update the callback to the right one
+	if (periodic())
+		m_instance.m_callback = &m_periodic_callback;
+	else
+		m_instance.m_callback = &m_callback;
 
-	// overwrite the hash/save_index from the instance becuase it could be pointing
-	// to our periodic callback and we want the real underlying callback
-	dst.hash = m_callback.unique_hash();
-	dst.save_index = m_callback.save_index();
-	dst.period = m_period;
-	dst.enabled = enabled();
-	return *this;
-}
-
-
-//-------------------------------------------------
-//  restore - restore persistent timer data from
-//  the given save data structure
-//-------------------------------------------------
-
-persistent_timer &persistent_timer::restore(timer_instance_save const &src, timer_callback &callback)
-{
-	m_period = src.period;
-	m_enabled = src.enabled;
-	m_instance.restore(src, periodic() ? m_periodic_callback : m_callback, m_enabled);
-	return *this;
+	// if we were active at save time, insert us back in the queue
+	if (m_instance.active())
+		m_instance.insert(m_instance.start(), m_instance.expire());
 }
 
 
@@ -590,37 +573,17 @@ device_scheduler::device_scheduler(running_machine &machine) :
 	m_callback_timer_expire_time(attotime::zero),
 	m_suspend_changes_pending(true),
 	m_quantum_minimum(subseconds::from_nsec(1) / 1000),
-	m_quantum_list(nullptr),
-	m_quantum_free_list(nullptr)
+	m_quantum_count(0)
 {
-	// register global states
-	auto &save = machine.save();
-	save.save_item(NAME(m_basetime.m_relative));
-	save.save_item(NAME(m_basetime.m_absolute));
-	save.save_item(NAME(m_basetime.m_base));
-
-	// we could use STRUCT_MEMBER here if it worked on attotimes, but it doesn't
-	// currently, so do it the manual way
-	for (int index = 0; index < MAX_SAVE_INSTANCES; index++)
-	{
-		save.save_item(NAME(m_timer_save[index].start), index);
-		save.save_item(NAME(m_timer_save[index].expire), index);
-		save.save_item(NAME(m_timer_save[index].param), index);
-		save.save_item(NAME(m_timer_save[index].hash), index);
-		save.save_item(NAME(m_timer_save[index].save_index), index);
-		save.save_item(NAME(m_timer_save[index].enabled), index);
-		save.save_item(NAME(m_timer_save[index].period), index);
-	}
-
-	// register for presave and postload
-	save.register_presave(save_prepost_delegate(FUNC(device_scheduler::presave), this));
-	save.register_postload(save_prepost_delegate(FUNC(device_scheduler::postload), this));
-
 	// create a factory for empty timers
 	m_empty_timer.init(*this, *this, FUNC(device_scheduler::empty_timer));
 
 	// create a factory for trigger timers
 	m_timed_trigger.init(*this, *this, FUNC(device_scheduler::timed_trigger));
+
+	// register for presave and postload early so we get called first
+	machine.save().register_presave(save_prepost_delegate(FUNC(device_scheduler::presave), this));
+	machine.save().register_postload(save_prepost_delegate(FUNC(device_scheduler::postload), this));
 }
 
 
@@ -696,6 +659,37 @@ void device_scheduler::finalize()
 	// build the initial list of executing devices and compute the perfect interleave
 	rebuild_execute_list();
 	compute_perfect_interleave();
+
+	// save states
+	register_save(machine().save());
+}
+
+
+//-------------------------------------------------
+//  register_save - register all save states
+//-------------------------------------------------
+
+void device_scheduler::register_save(save_manager &save)
+{
+	// register global states
+	save.save_item(NAME(m_basetime.m_relative));
+	save.save_item(NAME(m_basetime.m_absolute));
+	save.save_item(NAME(m_basetime.m_base));
+
+	// register all initialized persistent timers
+	int index = 0;
+	for (timer_callback *cb = m_registered_callbacks; cb != nullptr; cb = cb->m_next_registered)
+		if (cb->persistent() != nullptr)
+			cb->persistent()->register_save(save, index++);
+
+	// and register our save area for transient timers
+	for (int index = 0; index < TIMER_SAVE_SLOTS; index++)
+		m_timer_save[index].register_save(save, index);
+
+	// and register the quantum slots
+	save.save_item(NAME(m_quantum_count));
+	for (int index = 0; index < MAX_ACTIVE_QUANTA; index++)
+		m_quantum_slot[index].register_save(save, index);
 }
 
 
@@ -726,13 +720,7 @@ bool device_scheduler::can_save() const
 	int index = 0;
 	for (timer_instance *timer = m_active_timers_head; timer != &m_active_timers_tail; timer = timer->next())
 		index++;
-
-	// also count the number of inactive persistent timers
-	for (timer_callback *cb = m_registered_callbacks; cb != nullptr && index < MAX_SAVE_INSTANCES; cb = cb->m_next_registered)
-		if (cb->persistent() != nullptr && !cb->persistent()->instance().active())
-			index++;
-
-	return (index <= MAX_SAVE_INSTANCES);
+	return (index <= TIMER_SAVE_SLOTS);
 }
 
 
@@ -752,19 +740,17 @@ void device_scheduler::timeslice(subseconds minslice)
 	// run at least the given number of subseconds
 	subseconds basetime = m_basetime.relative();
 	subseconds endslice = basetime + minslice;
-	while (basetime < endslice && !machine().event_pending())
+	do
 	{
 		INCREMENT_SCHEDULER_STAT(m_timeslice_inner1);
 
 		LOG("------------------\n");
 
 		// if the current quantum has expired, find a new one
-		while (basetime >= m_quantum_list->m_expire.relative())
+		while (basetime >= m_quantum_slot[0].m_expire.relative())
 		{
-			quantum_slot *newhead = m_quantum_list->m_next;
-			m_quantum_list->m_next = m_quantum_free_list;
-			m_quantum_free_list = m_quantum_list;
-			m_quantum_list = newhead;
+			m_quantum_count--;
+			memmove(&m_quantum_slot[0], &m_quantum_slot[1], m_quantum_count * sizeof(m_quantum_slot[0]));
 		}
 
 		// loop until we hit the next timer
@@ -773,7 +759,7 @@ void device_scheduler::timeslice(subseconds minslice)
 			INCREMENT_SCHEDULER_STAT(m_timeslice_inner2);
 
 			// by default, assume our target is the end of the next quantum
-			subseconds target = basetime + m_quantum_list->m_actual;
+			subseconds target = basetime + m_quantum_slot[0].m_actual;
 
 			// however, if the next timer is going to fire before then, override
 			if (m_first_timer_expire.relative() < target)
@@ -840,7 +826,8 @@ void device_scheduler::timeslice(subseconds minslice)
 		// now that we've reached the expiration time of the first timer in the
 		// queue, execute pending ones
 		execute_timers(m_basetime.absolute());
-	}
+
+	} while (basetime < endslice && !machine().event_pending());
 }
 
 
@@ -947,41 +934,32 @@ persistent_timer *device_scheduler::timer_alloc(device_t &device, device_timer_i
 
 void device_scheduler::presave()
 {
-	int index = 0;
-
-#if VERBOSE
+	// report the timer state after a log
+	LOG("Prior to saving state:\n");
+//#if VERBOSE
 	dump_timers();
-#endif
+//#endif
 
 	// copy in all the timer instance data to the save area
-	for (timer_instance *timer = m_active_timers_head; timer != &m_active_timers_tail && index < MAX_SAVE_INSTANCES; timer = timer->next())
-	{
-		auto *persistent = timer->m_callback->persistent();
-		if (persistent != nullptr)
-			persistent->save(m_timer_save[index++]);
-		else
+	int index = 0;
+	for (timer_instance *timer = m_active_timers_head; timer != &m_active_timers_tail && index < TIMER_SAVE_SLOTS; timer = timer->next())
+		if (timer->m_callback->persistent() == nullptr)
 			timer->save(m_timer_save[index++]);
-	}
 
-	// then copy in inactive persistent timers
-	for (timer_callback *cb = m_registered_callbacks; cb != nullptr && index < MAX_SAVE_INSTANCES; cb = cb->m_next_registered)
-		if (cb->persistent() != nullptr && !cb->persistent()->instance().active())
-			cb->persistent()->save(m_timer_save[index++]);
+	// warn if we ran out of space
+	if (index == TIMER_SAVE_SLOTS)
+		osd_printf_warning("Not enough slots to save all active timers; state may not restore properly.");
 
 	// zero out the remainder
-	for ( ; index < MAX_SAVE_INSTANCES; index++)
+	for ( ; index < TIMER_SAVE_SLOTS; index++)
 	{
 		auto &dest = m_timer_save[index];
 		dest.start = attotime::zero;
 		dest.expire = attotime::never;
-		dest.period = attotime::never;
 		dest.param[0] = dest.param[1] = dest.param[2] = 0;
 		dest.hash = 0;
-		dest.enabled = false;
+		dest.save_index = 0;
 	}
-
-	// report the timer state after a log
-	LOG("Prior to saving state:\n");
 }
 
 
@@ -991,6 +969,10 @@ void device_scheduler::presave()
 
 void device_scheduler::postload()
 {
+	// clear the executing timer and device states
+	m_callback_timer = nullptr;
+	m_executing_device = nullptr;
+
 	// first discard or capture active timers
 	while (m_active_timers_head != &m_active_timers_tail)
 	{
@@ -1000,7 +982,7 @@ void device_scheduler::postload()
 	}
 
 	// now go through the restored save area and recreate all the timers
-	for (int index = 0; index < MAX_SAVE_INSTANCES; index++)
+	for (int index = 0; index < TIMER_SAVE_SLOTS; index++)
 	{
 		// scan until we find a never-expiring timer
 		auto &dest = m_timer_save[index];
@@ -1020,24 +1002,26 @@ void device_scheduler::postload()
 			continue;
 		}
 
-		// if the callback is persistent, just configure the persistent timer
-		auto *persistent = cb->persistent();
-		if (persistent != nullptr)
-			persistent->restore(dest, *cb);
-		else
-			instance_alloc().restore(dest, *cb);
+		// restore into a newly-allocated instance
+		instance_alloc().restore(dest, *cb);
 	}
 
+	// then let all the persistent timers reset their state
+	for (timer_callback *cb = m_registered_callbacks; cb != nullptr; cb = cb->m_next_registered)
+		if (cb->persistent() != nullptr)
+			cb->persistent()->post_restore();
+
 	// force a refresh of things that are lazily updated
+	update_basetime();
 	update_first_timer_expire();
 	m_suspend_changes_pending = true;
 	rebuild_execute_list();
 
 	// report the timer state after a log
 	LOG("After resetting/reordering timers:\n");
-#if VERBOSE
+//#if VERBOSE
 	dump_timers();
-#endif
+//#endif
 }
 
 
@@ -1110,8 +1094,8 @@ void device_scheduler::update_basetime()
 		exec.m_localtime.set_base(basetime);
 
 	// update quantum expirations
-	for (quantum_slot *quantum = m_quantum_list; quantum != nullptr; quantum = quantum->m_next)
-		quantum->m_expire.set_base(basetime);
+	for (int index = 0; index < m_quantum_count; index++)
+		m_quantum_slot[index].m_expire.set_base(basetime);
 
 	// move timers from future list into current list
 	m_first_timer_expire.set_base(basetime);
@@ -1155,8 +1139,8 @@ void device_scheduler::compute_perfect_interleave()
 	{
 		// adjust all the actuals; this doesn't affect the current
 		m_quantum_minimum = perfect;
-		for (quantum_slot *quant = m_quantum_list; quant != nullptr; quant = quant->m_next)
-			quant->m_actual = std::max(quant->m_requested, m_quantum_minimum);
+		for (int index = 0; index < m_quantum_count; index++)
+			m_quantum_slot[index].m_actual = std::max(m_quantum_slot[index].m_requested, m_quantum_minimum);
 	}
 }
 
@@ -1234,6 +1218,11 @@ void device_scheduler::add_scheduling_quantum(subseconds quantum, attotime const
 	// ignore quanta larger than the maximum
 	if (quantum > MAX_QUANTUM)
 		return;
+	if (m_quantum_count == MAX_ACTIVE_QUANTA)
+	{
+		osd_printf_error("Ran out of scheduling quanta!");
+		return;
+	}
 
 	INCREMENT_SCHEDULER_STAT(m_add_scheduling_quantum);
 
@@ -1242,17 +1231,16 @@ void device_scheduler::add_scheduling_quantum(subseconds quantum, attotime const
 	attotime expire = curtime + duration;
 
 	// figure out where to insert ourselves, expiring any quanta that are out-of-date
-	quantum_slot **nextptr;
-	for (nextptr = &m_quantum_list; *nextptr != nullptr; nextptr = &(*nextptr)->m_next)
+	int index;
+	for (index = 0; index < m_quantum_count; index++)
 	{
-		quantum_slot &quant = **nextptr;
+		quantum_slot &quant = m_quantum_slot[index];
 
 		// if this quantum is expired, pull it from the list and add it to the free list
 		if (curtime >= quant.m_expire.absolute())
 		{
-			*nextptr = quant.m_next;
-			quant.m_next = m_quantum_free_list;
-			m_quantum_free_list = &quant;
+			m_quantum_count--;
+			memmove(&m_quantum_slot[index], &m_quantum_slot[index + 1], (m_quantum_count - index) * sizeof(m_quantum_slot[0]));
 		}
 
 		// if the new quantum is equal, just merge entries
@@ -1266,29 +1254,20 @@ void device_scheduler::add_scheduling_quantum(subseconds quantum, attotime const
 		// if the new quantum is larger, we want to be inserted after this entry
 		else if (quantum > quant.m_requested)
 		{
-			nextptr = &(*nextptr)->m_next;
+			index++;
 			break;
 		}
 	}
 
-	// allocate a new slot
-	quantum_slot *newquant = m_quantum_free_list;
-	if (newquant != nullptr)
-		m_quantum_free_list = newquant->m_next;
-	else
-	{
-		m_allocated_quanta.push_back(std::make_unique<quantum_slot>());
-		newquant = m_allocated_quanta.back().get();
-	}
+	// make room for the new item
+	memmove(&m_quantum_slot[index + 1], &m_quantum_slot[index], (m_quantum_count - index) * sizeof(m_quantum_slot[0]));
+	m_quantum_count++;
 
 	// fill it out
-	newquant->m_requested = quantum;
-	newquant->m_actual = std::max(quantum, m_quantum_minimum);
-	newquant->m_expire.set(expire);
-
-	// insert it into the list
-	newquant->m_next = *nextptr;
-	*nextptr = newquant;
+	quantum_slot &newquant = m_quantum_slot[index];
+	newquant.m_requested = quantum;
+	newquant.m_actual = std::max(quantum, m_quantum_minimum);
+	newquant.m_expire.set(expire);
 }
 
 
@@ -1459,8 +1438,8 @@ void device_scheduler::hard_stop()
 {
 	// set the head quantum to max and never expire; this ensures the rest of
 	// the timelice loops will go as quickly as possible
-	m_quantum_list->m_actual = MAX_QUANTUM;
-	m_quantum_list->m_expire.set(attotime::never);
+	m_quantum_slot[0].m_actual = MAX_QUANTUM;
+	m_quantum_slot[0].m_expire.set(attotime::never);
 
 	// set the first timer expire time to never so that we don't check for
 	// any more timers
@@ -1482,9 +1461,9 @@ void device_scheduler::hard_stop()
 
 void device_scheduler::dump_timers() const
 {
-	machine().logerror("=============================================\n");
-	machine().logerror("Timer Dump: Time = %15s\n", time().as_string(PRECISION));
-	for (timer_instance *timer = m_active_timers_head; timer != nullptr; timer = timer->next())
+	printf("=============================================\n");
+	printf("Timer Dump: Time = %15s\n", time().as_string(PRECISION));
+	for (timer_instance *timer = m_active_timers_head; timer != &m_active_timers_tail; timer = timer->next())
 		timer->dump();
-	machine().logerror("=============================================\n");
+	printf("=============================================\n");
 }

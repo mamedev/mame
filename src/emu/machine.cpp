@@ -377,7 +377,7 @@ int running_machine::run(bool quiet)
 
 		// run the CPUs until a reset or exit
 		constexpr subseconds minslice = subseconds::from_hz(100);
-		while (!scheduled_event_pending())
+		while (!exit_or_hard_reset_pending())
 		{
 			g_profiler.start(PROFILER_EXTRA);
 

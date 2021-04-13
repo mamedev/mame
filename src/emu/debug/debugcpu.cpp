@@ -835,7 +835,7 @@ void device_debug::instruction_hook(offs_t curpc)
 			machine.debugger().console().process_source_file();
 
 			// if an event got scheduled, resume
-			if (machine.scheduled_event_pending())
+			if (machine.exit_or_hard_reset_pending())
 				debugcpu.set_execution_running();
 		}
 		machine.sound().debugger_mute(false);
@@ -1597,7 +1597,7 @@ void device_debug::compute_debug_flags()
 	machine.debug_flags |= DEBUG_FLAG_ENABLED;
 
 	// if we are ignoring this CPU, or if events are pending, we're done
-	if ((m_flags & DEBUG_FLAG_OBSERVING) == 0 || machine.scheduled_event_pending() || machine.save_or_load_pending())
+	if ((m_flags & DEBUG_FLAG_OBSERVING) == 0 || machine.exit_or_hard_reset_pending() || machine.save_or_load_pending())
 		return;
 
 	// if we're stopped, keep calling the hook

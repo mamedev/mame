@@ -453,7 +453,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_ingame, this, _1));
 
 	// loop over states
-	for (int state = 0; state < maxstate && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(machine()); state++)
+	for (int state = 0; state < maxstate && !machine().exit_or_hard_reset_pending() && !ui::menu::stack_has_special_main_menu(machine()); state++)
 	{
 		// default to standard colors
 		warning_color = colors().background_color();
@@ -572,7 +572,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 			config_menu = false;
 
 			// loop while we have a handler
-			while (m_handler_callback_type == ui_callback_type::MODAL && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(machine()))
+			while (m_handler_callback_type == ui_callback_type::MODAL && !machine().exit_or_hard_reset_pending() && !ui::menu::stack_has_special_main_menu(machine()))
 				machine().video().frame_update();
 		}
 
@@ -582,7 +582,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	}
 
 	// update last launch time if this was a run that was eligible for emulation warnings
-	if (m_has_warnings && show_warnings && !machine().scheduled_event_pending())
+	if (m_has_warnings && show_warnings && !machine().exit_or_hard_reset_pending())
 		m_last_launch_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
 	// if we're the empty driver, force the menus on
@@ -593,7 +593,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 		show_menu();
 
 		// loop while we have a handler
-		while (m_handler_callback_type != ui_callback_type::GENERAL && !machine().scheduled_event_pending())
+		while (m_handler_callback_type != ui_callback_type::GENERAL && !machine().exit_or_hard_reset_pending())
 			machine().video().frame_update();
 	}
 }

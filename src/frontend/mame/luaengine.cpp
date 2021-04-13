@@ -1294,8 +1294,6 @@ void lua_engine::initialize()
 	machine_type["natkeyboard"] = sol::property(&running_machine::natkeyboard);
 	machine_type["paused"] = sol::property(&running_machine::paused);
 	machine_type["samplerate"] = sol::property(&running_machine::sample_rate);
-	machine_type["exit_pending"] = sol::property(&running_machine::exit_pending);
-	machine_type["hard_reset_pending"] = sol::property(&running_machine::hard_reset_pending);
 	machine_type["devices"] = sol::property([] (running_machine &m) { return devenum<device_enumerator>(m.root_device()); });
 	machine_type["screens"] = sol::property([] (running_machine &m) { return devenum<screen_device_enumerator>(m.root_device()); });
 	machine_type["cassettes"] = sol::property([] (running_machine &m) { return devenum<cassette_device_enumerator>(m.root_device()); });
