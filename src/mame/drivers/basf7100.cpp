@@ -292,7 +292,7 @@ void basf7100_state::basf7100(machine_config &config)
 	// floppy
 	FD1791(config, m_fdc, 2000000);
 	m_fdc->intrq_wr_callback().set_inputline(m_fdccpu, INPUT_LINE_IRQ0);
-	m_fdc->drq_wr_callback().set(NAME(basf7100_state::fdc_drq_w));
+	m_fdc->drq_wr_callback().set(FUNC(basf7100_state::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", basf7100_floppies, "basf6106", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", basf7100_floppies, "basf6106", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:2", basf7100_floppies, "basf6106", floppy_image_device::default_mfm_floppy_formats);
