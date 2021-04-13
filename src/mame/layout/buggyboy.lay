@@ -74,7 +74,7 @@ license:CC0
 				<bounds x="1886" y="414" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
-			<collection name="* Opaque" visible="no">
+			<collection name="Opaque Shifter" visible="no">
 				<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
 					<bounds x="1886" y="414" width="32" height="64" />
 				</element>
@@ -86,7 +86,7 @@ license:CC0
 				<bounds x="1928" y="414" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
-			<collection name="* Opaque " visible="no">
+			<collection name="Opaque Shifter " visible="no">
 				<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
 					<bounds x="1928" y="414" width="32" height="64" />
 				</element>
@@ -98,7 +98,7 @@ license:CC0
 				<bounds x="2" y="414" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
-			<collection name="* Opaque  " visible="no">
+			<collection name="Opaque Shifter  " visible="no">
 				<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
 					<bounds x="2" y="414" width="32" height="64" />
 				</element>
@@ -110,7 +110,7 @@ license:CC0
 				<bounds x="-40" y="414" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
-			<collection name="* Opaque   " visible="no">
+			<collection name="Opaque Shifter   " visible="no">
 				<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
 					<bounds x="-40" y="414" width="32" height="64" />
 				</element>
@@ -129,7 +129,7 @@ license:CC0
 				<bounds x="606" y="414" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
-			<collection name="* Opaque" visible="no">
+			<collection name="Opaque Shifter" visible="no">
 				<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
 					<bounds x="606" y="414" width="32" height="64" />
 				</element>
@@ -141,7 +141,7 @@ license:CC0
 				<bounds x="648" y="414" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
-			<collection name="* Opaque " visible="no">
+			<collection name="Opaque Shifter " visible="no">
 				<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
 					<bounds x="648" y="414" width="32" height="64" />
 				</element>
@@ -153,7 +153,7 @@ license:CC0
 				<bounds x="2" y="414" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
-			<collection name="* Opaque  " visible="no">
+			<collection name="Opaque Shifter  " visible="no">
 				<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
 					<bounds x="2" y="414" width="32" height="64" />
 				</element>
@@ -165,7 +165,7 @@ license:CC0
 				<bounds x="-40" y="414" width="32" height="64" />
 				<color alpha="0.6" />
 			</element>
-			<collection name="* Opaque   " visible="no">
+			<collection name="Opaque Shifter   " visible="no">
 				<element ref="shifter" inputtag="soundbrd:PPI_PORTA" inputmask="0x40">
 					<bounds x="-40" y="414" width="32" height="64" />
 				</element>
