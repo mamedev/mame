@@ -812,11 +812,12 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Requires DOS -->
-	<software name="turbocpp">
-		<description>Turbo C++</description>
+	<!-- installable, bgidemo working -->
+	<software name="turbocpp" supported="yes">
+		<description>Turbo C++ (v1.01)</description>
 		<year>1990</year>
 		<publisher>Borland</publisher>
+		<info name="usage" value="Run INSTALL.EXE to install to HDD" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1281968">
@@ -3308,7 +3309,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<!-- boot OK, rectangle selections are doubled to expected behaviour (cfr. main menu, "select" option) -->
-	<!-- Doesn't setup GFX properly in non-interlace mode (double height everything) -->
+	<!-- double height bitmap on non-interlace mode -->
 	<software name="agumixsl" supported="partial">
 		<description>Agumix Selects! - Agumix Select Tokusen Graphic Shuu</description>
 		<year>1992</year>
@@ -3801,7 +3802,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<!-- Fails to boot with "初期データが設定できません" (cannot set initial data) error -->
-	<!-- (regressed, was working with 9801RS at some point) -->
+	<!-- (regressed, was working with RS class at some point) -->
 	<software name="akitsuka" supported="no">
 		<description>Aki to Tsukasa no Fushigi no Kabe</description>
 		<year>1988</year>
@@ -4947,7 +4948,12 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="applecl1">
+	<!-- boot OK -->
+	<!-- on VM class: key ups strays one extra input (going twice to the left or right on single press) -->
+	<!-- on RS class: kanji doesn't show text properly (scoring) -->
+	<!-- double height bitmap on non-interlace mode -->
+	<!-- can't pass hands (btanb, F1 key) -->
+	<software name="applecl1" supported="partial">
 		<description>Apple Club 1 - Kinjirareta Asobi Series</description>
 		<year>1988</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
@@ -5456,6 +5462,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<!-- This game plays sampled voices through the beeper, but it doesn't work in MAME - it just outputs a constant beep -->
+	<!-- (has a DAC1BIT tester at boot, may be useful) -->
 	<software name="arquelph" supported="partial">
 		<description>Arquelphos</description>
 		<year>1993</year>
@@ -5662,7 +5669,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="asokokof">
+	<!-- boot OK, randomly hangs with stuck note during intro on VM class -->
+	<software name="asokokof" supported="partial">
 		<description>Asoko no Koufuku - Yamamoto-san-chi no Baai ni Okeru Asoko no Fukou ni Tsuite</description>
 		<year>1989</year>
 		<publisher>Zeit (ツァイト)</publisher>
@@ -6929,7 +6937,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="biblems2">
+	<!-- boot OK, keyboard inputs are too fast -->
+	<software name="biblems2" supported="partial">
 		<description>Bible Master 2 - The Chaos of Aglia</description>
 		<year>1994</year>
 		<publisher>グローディア (Glodia)</publisher>
@@ -15269,7 +15278,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<year>1992</year>
 		<publisher>総合ビジネスアシスト (ABA)</publisher>
 		<info name="alt_title" value="ディスクバトラー" />
-		<info name="usage" value="Boot from a DOS floppy with disk 1 in drive 2, then tun DBINST.EXE from disk 1." />
+		<info name="usage" value="Boot DOS from floppy, swap it with disk 1 once on prompt, run DB.EXE" />
+		<!-- Can also be made self bootable via DBINST.EXE, needs write mountable dskbtlr1.d88 in drive 1 -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1281968">
@@ -17417,7 +17427,9 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Doesn't recognize disk changes -->
+	<!-- Doesn't recognize disk changes (regressed) -->
+	<!-- has gfx glitch when intro scrolls to top-left -->
+	<!-- user disk creation screen is offset -->
 	<software name="edge" supported="no">
 		<description>Edge</description>
 		<year>1993</year>
@@ -20886,12 +20898,17 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="hypbingo">
+	<!-- boot OK, has heavy GFX issues if EGC is detected. -->
+	<!-- Uses DAC1BIT for speech -->
+	<!-- Has extensive system check, NESA bus for instance -->
+	<software name="hypbingo" supported="partial">
 		<description>Gals Talk Hyper Bingo</description>
 		<year>1992</year>
 		<publisher>総合ビジネスアシスト (ABA)</publisher>
 		<info name="alt_title" value="ギャルズトーク ハイパービンゴ" />
 		<info name="release" value="19920313" />
+		<info name="usage" value="Boot DOS from floppy, swap it with disk 1 once on prompt, run BG.EXE" />
+		<!-- Can also be made self bootable via HBINST.EXE, needs write mountable hb-1.d88 in drive 1 -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1281968">
@@ -23022,7 +23039,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="hayate">
+	<!-- boot OK -->
+	<software name="hayate" supported="yes">
 		<description>Hayate - The Battle - Hyper Real Battle Action</description>
 		<year>1994</year>
 		<publisher>アルテシア (Altacia)</publisher>
@@ -23092,7 +23110,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="heatpwfl">
+	<!-- boot OK on VM and RS classes -->
+	<software name="heatpwfl" supported="yes">
 		<description>Heater Powerful</description>
 		<year>1993</year>
 		<publisher>アンビシャス (Ambitious)</publisher>
@@ -23112,11 +23131,13 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="hedgehog">
+	<!-- Doesn't do much after install & run with currently available machines -->
+	<software name="hedgehog" supported="no">
 		<description>HedgehoG</description>
 		<year>1996</year>
 		<publisher>電脳山城組 ／ コムレイドシステム (Dennou Yamashiro-gumi / Comrade System)</publisher>
 		<info name="alt_title" value="ヘッジホッグ" />
+		<!-- Minimum requirements: PC9821Cb2 and Win95? -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1265664">
@@ -23143,7 +23164,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="headqrt">
+	<!-- Doesn't recognize disk on disk swap prompt (even if game is actually installed on HDD) -->
+	<software name="headqrt" supported="no">
 		<description>Headquarters - America no Akumu</description>
 		<year>1994</year>
 		<publisher>アルゴラボ  算法研究所 (Algolab)</publisher>
@@ -34087,12 +34109,15 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="pickupmj">
+	<!-- boot OK, -26/-86 sound voices have low pitches (btanb?) -->
+	<software name="pickupmj" supported="partial">
 		<description>Pick Up Mahjong Master</description>
 		<year>1994</year>
 		<publisher>アレックス (Allex)</publisher>
 		<info name="alt_title" value="ピックアップ麻雀マスター" />
 		<info name="release" value="199409xx" />
+		<info name="usage" value="Boot DOS 3.11 or higher from floppy, swap it with Disk A, run INSTALL.EXE and follow on screen instructions" />
+		<!-- Alt version without install: after swap just run MUSIC -> ALBIOS -> _SHELL A:<yen> B:<yen> (aka above AUTOEXEC.BAT output with 2 drives selected) -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
@@ -34113,12 +34138,17 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="pickupy1">
+	<!-- Hangs at first agari on RS class (with keyboard beep feedback) -->
+	<!-- With EMS on and ALBIOS /P prints "cannot keep expand MEMORY", booting it fatal errors after title screen with EMM error. -->
+	<!-- "EMM386 privileged instruction violation #00 has occurred" -->
+	<software name="pickupy1" supported="no">
 		<description>Pick Up Yadokari Eisei Housoukyoku 1</description>
 		<year>1994</year>
 		<publisher>アレックス (Allex)</publisher>
 		<info name="alt_title" value="Ｐｉｃｋ ＵＰ やどかり衛星放送局１" />
 		<info name="release" value="19940420" />
+		<info name="usage" value="Boot DOS 3.11 or higher from floppy, swap it with Disk A, run INSTALL.EXE and follow on screen instructions" />
+		<!-- Alt version without install: after swap just run MUSIC -> ALBIOS -> YBS1 A:<yen> B:<yen> (aka above AUTOEXEC.BAT output with 2 drives selected) -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
@@ -35699,7 +35729,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<!-- pointer stays in place when using mouse (works with keyboard) -->
+	<!-- boot OK, pointer stays in place when using mouse (works with keyboard) -->
 	<software name="prinmak2" supported="partial">
 		<description>Princess Maker 2</description>
 		<year>1993</year>
@@ -36319,7 +36349,10 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="quarth">
+	<!-- boot OK on "vanilla" and VM classes -->
+	<!-- on RS class throws a "packet file is corrupt" during boot, btanb? -->
+	<!-- intro seems very slow, btanb (machine class dependant) -->
+	<software name="quarth" supported="partial">
 		<description>Quarth</description>
 		<year>1990</year>
 		<publisher>コナミ (Konami)</publisher>
@@ -57823,6 +57856,7 @@ SPACE EMPIRE
 			</dataarea>
 		</part>
 	</software>
+
 	<!-- Disk changes don't work -->
 	<software name="elle" supported="no">
 		<description>Elle</description>
@@ -67727,7 +67761,8 @@ doujin?!?
 		</part>
 	</software>
 
-	<software name="pentium">
+	<!-- boot OK, pointer stays in place when using mouse (doesn't work with keyboard) -->
+	<software name="pentium" supported="no">
 		<description>Pentium</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>

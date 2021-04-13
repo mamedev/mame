@@ -21,6 +21,7 @@
       bp f0b31,pc=0xf0b36,g
       Update: it never reaches latter with V30->V50 CPU switch fix;
     - Fix floppy motor hook-up (floppy believes to be always in even if empty drive);
+	- Support for PC8801 compatible mode & PC80S31K (floppy interface);
 
 ********************************************************************************************/
 

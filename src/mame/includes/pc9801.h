@@ -113,20 +113,27 @@ public:
 	{
 	}
 
-	void pc9821v20(machine_config &config);
-	void pc9801ux(machine_config &config);
-	void pc9801vm(machine_config &config);
 	void pc9801(machine_config &config);
-	void pc9801bx2(machine_config &config);
+
+	void pc9801vm(machine_config &config);
+
+	void pc9801ux(machine_config &config);
 	void pc9801rs(machine_config &config);
+
+	void pc9801bx2(machine_config &config);
+
 	void pc9821(machine_config &config);
 	void pc9821as(machine_config &config);
 	void pc9821ap2(machine_config &config);
+	void pc9821xa16(machine_config &config);
+	void pc9821ra20(machine_config &config);
+	void pc9821ra333(machine_config &config);
+	void pc9821v20(machine_config &config);
+
 	void pc386m(machine_config &config);
 	void pc486mu(machine_config &config);
 	void pc486se(machine_config &config);
-	void pc9821xa16(machine_config &config);
-	void pc9821ra20(machine_config &config);
+
 	DECLARE_CUSTOM_INPUT_MEMBER(system_type_r);
 	void init_pc9801_kanji();
 	void init_pc9801vm_kanji();
