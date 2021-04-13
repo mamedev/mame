@@ -1331,7 +1331,7 @@ void homedata_state::reikaids(machine_config &config)
 	screen.set_visarea(0, 255, 16, 256-1-16);
 	screen.set_screen_update(FUNC(homedata_state::screen_update_reikaids));
 	screen.screen_vblank().set(FUNC(homedata_state::screen_vblank));
-	screen.screen_vblank().append([this] (int state) { if (state) m_audiocpu->pulse_input_line(UPD7810_INTF1, m_audiocpu->minimum_quantum_time()); });
+	screen.screen_vblank().append([this] (int state) { if (state) m_audiocpu->pulse_input_line(UPD7810_INTF1, m_audiocpu->minimum_quantum()); });
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_reikaids);
@@ -1388,7 +1388,7 @@ void homedata_state::pteacher(machine_config &config)
 	screen.set_visarea(0*8, 54*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(homedata_state::screen_update_pteacher));
 	screen.screen_vblank().set(FUNC(homedata_state::screen_vblank));
-	screen.screen_vblank().append([this] (int state) { if (state) m_audiocpu->pulse_input_line(UPD7810_INTF1, m_audiocpu->minimum_quantum_time()); });
+	screen.screen_vblank().append([this] (int state) { if (state) m_audiocpu->pulse_input_line(UPD7810_INTF1, m_audiocpu->minimum_quantum()); });
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pteacher);

@@ -316,7 +316,7 @@ INPUT_CHANGED_MEMBER(pntnpuzl_state::coin_inserted)
 {
 	/* TODO: change this! */
 	if(newval)
-		m_maincpu->pulse_input_line((uint8_t)param, m_maincpu->minimum_quantum_time());
+		m_maincpu->pulse_input_line((uint8_t)param, m_maincpu->minimum_quantum());
 }
 
 static INPUT_PORTS_START( pntnpuzl )

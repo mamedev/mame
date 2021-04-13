@@ -118,14 +118,11 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 		m_manager(manager),
 		m_current_phase(machine_phase::PREINIT),
 		m_paused(false),
-		m_hard_reset_pending(false),
-		m_exit_pending(false),
 		m_rand_seed(0x9d14abd7),
 		m_ui_active(_config.options().ui_active()),
 		m_basename(_config.gamedrv().name),
 		m_sample_rate(_config.options().sample_rate()),
 		m_saveload_schedule(saveload_schedule::NONE),
-		m_saveload_schedule_time(attotime::zero),
 		m_saveload_searchpath(nullptr),
 
 		m_save(*this),
@@ -195,11 +192,6 @@ void running_machine::start()
 	m_output = std::make_unique<output_manager>(*this);
 	m_render = std::make_unique<render_manager>(*this);
 	m_bookkeeping = std::make_unique<bookkeeping_manager>(*this);
-
-	// allocate a soft_reset timer
-	m_soft_reset_timer.init(m_scheduler, *this, FUNC(running_machine::soft_reset));
-
-	// initialize UI input
 	m_ui_input = std::make_unique<ui_input_manager>(*this);
 
 	// init the osd layer
@@ -208,6 +200,14 @@ void running_machine::start()
 	// create the video manager
 	m_video = std::make_unique<video_manager>(*this);
 	m_ui = manager().create_ui(*this);
+
+	// allocate a timer to manage scheduled events
+	m_event_timer.init(m_scheduler, *this, FUNC(running_machine::scheduled_event));
+
+	// if we've been requested to run for a fixed period, set a hard stop
+	m_exit_timer.init(m_scheduler, *this, FUNC(running_machine::scheduled_event));
+	if (options().seconds_to_run() != 0)
+		m_exit_timer.adjust(attotime::from_seconds(options().seconds_to_run()), EVENT_EXIT);
 
 	// initialize the base time (needed for doing record/playback)
 	::time(&m_base_time);
@@ -265,6 +265,9 @@ void running_machine::start()
 	save().register_presave(save_prepost_delegate(FUNC(running_machine::presave_all_devices), this));
 	start_all_devices();
 	save().register_postload(save_prepost_delegate(FUNC(running_machine::postload_all_devices), this));
+
+	// tell the scheduler to finalize its calculations now that all devices have started
+	m_scheduler.finalize();
 
 	// save outputs created before start time
 	output().register_save();
@@ -354,14 +357,12 @@ int running_machine::run(bool quiet)
 		if (!quiet)
 			sound().start_recording();
 
-		m_hard_reset_pending = false;
-
 		// initialize ui lists
 		// display the startup screens
 		manager().ui_initialize(*this);
 
 		// perform a soft reset -- this takes us to the running phase
-		soft_reset();
+		scheduled_event(EVENT_SOFT_RESET);
 
 		// handle initial load
 		if (m_saveload_schedule != saveload_schedule::NONE)
@@ -376,7 +377,7 @@ int running_machine::run(bool quiet)
 
 		// run the CPUs until a reset or exit
 		constexpr subseconds minslice = subseconds::from_hz(100);
-		while ((!m_hard_reset_pending && !m_exit_pending) || m_saveload_schedule != saveload_schedule::NONE)
+		while (!scheduled_event_pending())
 		{
 			g_profiler.start(PROFILER_EXTRA);
 
@@ -385,10 +386,6 @@ int running_machine::run(bool quiet)
 				m_scheduler.timeslice(minslice);
 			else
 				m_video->frame_update();
-
-			// handle save/load
-			if (m_saveload_schedule != saveload_schedule::NONE)
-				handle_saveload();
 
 			g_profiler.stop();
 		}
@@ -449,53 +446,6 @@ int running_machine::run(bool quiet)
 	return error;
 }
 
-//-------------------------------------------------
-//  schedule_exit - schedule a clean exit
-//-------------------------------------------------
-
-void running_machine::schedule_exit()
-{
-	m_exit_pending = true;
-
-	// if we're executing, abort out immediately
-	m_scheduler.eat_all_cycles();
-
-	// if we're autosaving on exit, schedule a save as well
-	if (options().autosave() && (m_system.flags & MACHINE_SUPPORTS_SAVE) && this->time() > attotime::zero)
-		schedule_save("auto");
-}
-
-
-//-------------------------------------------------
-//  schedule_hard_reset - schedule a hard-reset of
-//  the machine
-//-------------------------------------------------
-
-void running_machine::schedule_hard_reset()
-{
-	m_hard_reset_pending = true;
-
-	// if we're executing, abort out immediately
-	m_scheduler.eat_all_cycles();
-}
-
-
-//-------------------------------------------------
-//  schedule_soft_reset - schedule a soft-reset of
-//  the system
-//-------------------------------------------------
-
-void running_machine::schedule_soft_reset()
-{
-	m_soft_reset_timer.adjust(attotime::zero);
-
-	// we can't be paused since the timer needs to fire
-	resume();
-
-	// if we're executing, abort out immediately
-	m_scheduler.eat_all_cycles();
-}
-
 
 //-------------------------------------------------
 //  get_statename - allow to specify a subfolder of
@@ -536,7 +486,6 @@ std::string running_machine::get_statename(const char *option) const
 			int end = statename_str.find_first_not_of("abcdefghijklmnopqrstuvwxyz1234567890", pos + 3);
 			if (end == -1)
 				end = statename_str.length();
-
 
 			// copy the device name to an std::string
 			std::string devname_str;
@@ -626,58 +575,20 @@ void running_machine::set_saveload_filename(std::string &&filename)
 
 
 //-------------------------------------------------
-//  schedule_save - schedule a save to occur as
-//  soon as possible
-//-------------------------------------------------
-
-void running_machine::schedule_save(std::string &&filename)
-{
-	// specify the filename to save or load
-	set_saveload_filename(std::move(filename));
-
-	// note the start time and set a timer for the next timeslice to actually schedule it
-	m_saveload_schedule = saveload_schedule::SAVE;
-	m_saveload_schedule_time = this->time();
-
-	// we can't be paused since we need to clear out anonymous timers
-	resume();
-}
-
-
-//-------------------------------------------------
 //  immediate_save - save state.
 //-------------------------------------------------
 
 void running_machine::immediate_save(const char *filename)
 {
 	// specify the filename to save or load
-	set_saveload_filename(filename);
+	if (filename != nullptr)
+		set_saveload_filename(filename);
 
 	// set up some parameters for handle_saveload()
 	m_saveload_schedule = saveload_schedule::SAVE;
-	m_saveload_schedule_time = this->time();
 
 	// jump right into the save, anonymous timers can't hurt us!
 	handle_saveload();
-}
-
-
-//-------------------------------------------------
-//  schedule_load - schedule a load to occur as
-//  soon as possible
-//-------------------------------------------------
-
-void running_machine::schedule_load(std::string &&filename)
-{
-	// specify the filename to save or load
-	set_saveload_filename(std::move(filename));
-
-	// note the start time and set a timer for the next timeslice to actually schedule it
-	m_saveload_schedule = saveload_schedule::LOAD;
-	m_saveload_schedule_time = this->time();
-
-	// we can't be paused since we need to clear out anonymous timers
-	resume();
 }
 
 
@@ -688,11 +599,11 @@ void running_machine::schedule_load(std::string &&filename)
 void running_machine::immediate_load(const char *filename)
 {
 	// specify the filename to save or load
-	set_saveload_filename(filename);
+	if (filename != nullptr)
+		set_saveload_filename(filename);
 
 	// set up some parameters for handle_saveload()
 	m_saveload_schedule = saveload_schedule::LOAD;
-	m_saveload_schedule_time = this->time();
 
 	// jump right into the load, anonymous timers can't hurt us
 	handle_saveload();
@@ -921,11 +832,7 @@ void running_machine::handle_saveload()
 		// because the timers might overwrite data we have loaded
 		if (!m_scheduler.can_save())
 		{
-			// if more than a second has passed, we're probably screwed
-			if ((this->time() - m_saveload_schedule_time) > attotime::from_seconds(1))
-				popmessage("Unable to %s due to pending anonymous timers. See error.log for details.", opname);
-			else
-				return; // return without cancelling the operation
+			return; // return without cancelling the operation
 		}
 		else
 		{
@@ -996,22 +903,47 @@ void running_machine::handle_saveload()
 
 
 //-------------------------------------------------
-//  soft_reset - actually perform a soft-reset
-//  of the system
+//  scheduled_event - handle a scheduled event
 //-------------------------------------------------
 
-void running_machine::soft_reset(void *ptr, s32 param)
+void running_machine::scheduled_event(int event)
 {
-	logerror("Soft reset\n");
+	switch (event)
+	{
+		// handle auto-save, then force an immediate stop
+		case EVENT_EXIT:
+			if (options().autosave() && (m_system.flags & MACHINE_SUPPORTS_SAVE) && this->time() > attotime::zero)
+				immediate_save("auto");
+			m_scheduler.hard_stop();
+			m_event_timer.set_param(EVENT_EXIT);
+			break;
 
-	// temporarily in the reset phase
-	m_current_phase = machine_phase::RESET;
+		// just force an immediate stop
+		case EVENT_HARD_RESET:
+			m_scheduler.hard_stop();
+			m_event_timer.set_param(EVENT_HARD_RESET);
+			break;
 
-	// call all registered reset callbacks
-	call_notifiers(MACHINE_NOTIFY_RESET);
+		// soft reset just runs reset on all the devices and then resumes
+		case EVENT_SOFT_RESET:
+			m_current_phase = machine_phase::RESET;
+			call_notifiers(MACHINE_NOTIFY_RESET);
+			m_current_phase = machine_phase::RUNNING;
+			m_event_timer.set_param(EVENT_NONE);
+			break;
 
-	// now we're running
-	m_current_phase = machine_phase::RUNNING;
+		// save just does an immediate save
+		case EVENT_SAVE:
+			immediate_save();
+			m_event_timer.set_param(EVENT_NONE);
+			break;
+
+		// load just does an immediate save
+		case EVENT_LOAD:
+			immediate_load();
+			m_event_timer.set_param(EVENT_NONE);
+			break;
+	}
 }
 
 

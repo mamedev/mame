@@ -135,6 +135,7 @@ public:
 	static constexpr subseconds max() { return subseconds::from_raw(MAX_RAW); }
 	static constexpr subseconds min() { return subseconds::from_raw(MIN_RAW); }
 	static constexpr subseconds unit() { return subseconds::from_raw(1); }
+	static constexpr subseconds one_second() { return subseconds::from_raw(PER_SECOND); }
 	static constexpr subseconds zero() { return subseconds::from_raw(0); }
 
 	// static creators
@@ -747,6 +748,7 @@ public:
 	static constexpr subseconds max() { return subseconds::from_raw(MAX_RAW); }
 	static constexpr subseconds min() { return subseconds::from_raw(MIN_RAW); }
 	static constexpr subseconds unit() { return subseconds::from_raw(1); }
+	static constexpr subseconds one_second() { return subseconds::from_raw(PER_SECOND); }
 	static constexpr subseconds zero() { return subseconds::from_raw(0); }
 
 	// static creators

@@ -130,7 +130,7 @@ void namcoc65_device::namcos2_mcu_analog_ctrl_w(uint8_t data)
 		/* If the interrupt enable bit is set trigger an A/D IRQ */
 		if (data & 0x20)
 		{
-			m_mcu->pulse_input_line(HD63705_INT_ADCONV, m_mcu->minimum_quantum_time());
+			m_mcu->pulse_input_line(HD63705_INT_ADCONV, m_mcu->minimum_quantum());
 		}
 	}
 }

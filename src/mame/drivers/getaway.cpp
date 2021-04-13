@@ -158,7 +158,7 @@ u32 getaway_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 WRITE_LINE_MEMBER(getaway_state::vblank_irq)
 {
 	if (state)
-		m_maincpu->pulse_input_line(INT_9900_INTREQ, 2 * m_maincpu->minimum_quantum_time());
+		m_maincpu->pulse_input_line(INT_9900_INTREQ, 2 * m_maincpu->minimum_quantum());
 }
 
 void getaway_state::io_w(offs_t offset, u8 data)

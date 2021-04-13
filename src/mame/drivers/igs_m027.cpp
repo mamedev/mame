@@ -313,7 +313,7 @@ INPUT_PORTS_END
 WRITE_LINE_MEMBER(igs_m027_state::vblank_irq)
 {
 	if (state)
-		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
+		m_maincpu->pulse_input_line(ARM7_FIRQ_LINE, m_maincpu->minimum_quantum());
 }
 
 

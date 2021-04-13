@@ -572,6 +572,9 @@ public:
 	device_scheduler(running_machine &machine);
 	~device_scheduler();
 
+	// setup
+	void finalize();
+
 	// getters
 	running_machine &machine() const noexcept { return m_machine; }
 	attotime time() const noexcept;
@@ -582,7 +585,8 @@ public:
 	void timeslice(subseconds minslice);
 	void abort_timeslice();
 	void trigger(int trigid, attotime const &after = attotime::zero);
-	void boost_interleave(attotime const &timeslice_time, attotime const &boost_duration);
+	void boost_interleave(subseconds timeslice, attotime const &boost_duration) { add_scheduling_quantum(timeslice, boost_duration); }
+	void boost_interleave(attotime const &timeslice_time, attotime const &boost_duration) { boost_interleave(timeslice_time.as_subseconds(), boost_duration); }
 	void suspend_resume_changed() { m_suspend_changes_pending = true; }
 
 	// timer callback registration
@@ -599,8 +603,8 @@ public:
 	// debugging
 	void dump_timers() const;
 
-	// for emergencies only!
-	void eat_all_cycles();
+	// force immediate exit from the scheduling loop -- for emergencies only!
+	void hard_stop();
 
 private:
 	// timers, specified by device/id; generally devices should use the device_t methods instead
@@ -620,7 +624,7 @@ private:
 	void compute_perfect_interleave();
 	void rebuild_execute_list();
 	void apply_suspend_changes();
-	void add_scheduling_quantum(attotime const &quantum, attotime const &duration);
+	void add_scheduling_quantum(subseconds quantum, attotime const &duration);
 
 	// timer instance management
 	timer_instance &instance_alloc();
@@ -692,12 +696,13 @@ private:
 		quantum_slot *          m_next;
 		subseconds              m_actual;                   // actual duration of the quantum
 		subseconds              m_requested;                // duration of the requested quantum
-		attotime                m_expire;                   // absolute expiration time of this quantum
+		basetime_relative       m_expire;                   // absolute expiration time of this quantum
 	};
 	static constexpr subseconds MAX_QUANTUM = subseconds::from_hz(10);
-	simple_list<quantum_slot>   m_quantum_list;             // list of active quanta
-	fixed_allocator<quantum_slot> m_quantum_allocator;      // allocator for quanta
 	subseconds                  m_quantum_minimum;          // duration of minimum quantum
+	quantum_slot *              m_quantum_list;             // simple list of quanta
+	quantum_slot *              m_quantum_free_list;        // list of free quanta
+	std::vector<std::unique_ptr<quantum_slot>> m_allocated_quanta; // allocated quanta
 
 	// put this at the end since it's big
 	timer_instance_save         m_timer_save[MAX_SAVE_INSTANCES]; // state saving area

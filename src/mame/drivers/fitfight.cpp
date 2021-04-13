@@ -743,7 +743,7 @@ void fitfight_state::fitfight(machine_config &config)
 	screen.set_visarea(2*8, 39*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(fitfight_state::screen_update_fitfight));
 	screen.set_palette(m_palette);
-	screen.screen_vblank().set([this] (int state) { if (state) m_audiocpu->pulse_input_line(UPD7810_INTF2, m_audiocpu->minimum_quantum_time()); });
+	screen.screen_vblank().set([this] (int state) { if (state) m_audiocpu->pulse_input_line(UPD7810_INTF2, m_audiocpu->minimum_quantum()); });
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x800);
 

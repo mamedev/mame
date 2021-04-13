@@ -225,7 +225,7 @@ void cvs_state::cvs_s2636_2_or_character_ram_w(offs_t offset, uint8_t data)
 
 INTERRUPT_GEN_MEMBER(cvs_state::cvs_main_cpu_interrupt)
 {
-	m_maincpu->pulse_input_line(0, m_maincpu->minimum_quantum_time());
+	m_maincpu->pulse_input_line(0, m_maincpu->minimum_quantum());
 
 	cvs_scroll_stars();
 }

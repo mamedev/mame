@@ -79,6 +79,7 @@ public:
 	void save_snapshot(screen_device *screen, emu_file &file);
 	void save_active_screen_snapshots();
 	void save_input_timecode();
+	void save_final_snapshot();
 
 	// movies
 	void begin_recording(const char *name, movie_recording::format format);
@@ -150,7 +151,6 @@ private:
 	bool                m_throttled;                // flag: true if we're currently throttled
 	float               m_throttle_rate;            // target rate for throttling
 	bool                m_fastforward;              // flag: true if we're currently fast-forwarding
-	u32                 m_seconds_to_run;           // number of seconds to run before quitting
 	bool                m_auto_frameskip;           // flag: true if we're automatically frameskipping
 	u32                 m_speed;                    // overall speed (*1000)
 	bool                m_low_latency;              // flag: true if we are throttling after blitting

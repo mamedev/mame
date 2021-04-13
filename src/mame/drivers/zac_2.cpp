@@ -186,7 +186,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_inttimer)
 {
 	// a pulse is sent via a capacitor (similar to what one finds at a reset pin)
 	if (m_t_c > 0x80)
-		m_maincpu->pulse_input_line(INPUT_LINE_IRQ0, 2 * m_maincpu->minimum_quantum_time());
+		m_maincpu->pulse_input_line(INPUT_LINE_IRQ0, 2 * m_maincpu->minimum_quantum());
 	else
 		m_t_c++;
 }

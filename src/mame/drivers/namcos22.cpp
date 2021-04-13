@@ -2856,7 +2856,7 @@ void namcos22s_state::alpine_mcu_port4_w(u8 data)
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::propcycl_pedal_interrupt)
 {
 	m_mcu->set_input_line(M37710_LINE_TIMERA3OUT, param ? ASSERT_LINE : CLEAR_LINE);
-	m_mcu->pulse_input_line(M37710_LINE_TIMERA3IN, m_mcu->minimum_quantum_time());
+	m_mcu->pulse_input_line(M37710_LINE_TIMERA3IN, m_mcu->minimum_quantum());
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::propcycl_pedal_update)
@@ -2892,7 +2892,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::propcycl_pedal_update)
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::adillor_trackball_interrupt)
 {
 	m_mcu->set_input_line((param & 1) ? M37710_LINE_TIMERA2OUT : M37710_LINE_TIMERA3OUT, (param & 2) ? ASSERT_LINE : CLEAR_LINE);
-	m_mcu->pulse_input_line((param & 1) ? M37710_LINE_TIMERA2IN : M37710_LINE_TIMERA3IN, m_mcu->minimum_quantum_time());
+	m_mcu->pulse_input_line((param & 1) ? M37710_LINE_TIMERA2IN : M37710_LINE_TIMERA3IN, m_mcu->minimum_quantum());
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22s_state::adillor_trackball_update)

@@ -87,7 +87,6 @@ video_manager::video_manager(running_machine &machine)
 	, m_throttled(true)
 	, m_throttle_rate(1.0f)
 	, m_fastforward(false)
-	, m_seconds_to_run(machine.options().seconds_to_run())
 	, m_auto_frameskip(machine.options().auto_frameskip())
 	, m_speed(original_speed_setting())
 	, m_low_latency(machine.options().low_latency())
@@ -524,7 +523,7 @@ void video_manager::exit()
 		osd_ticks_t tps = osd_ticks_per_second();
 		double final_real_time = (double)m_overall_real_seconds + (double)m_overall_real_ticks / (double)tps;
 		double final_emu_time = m_overall_emutime.as_double();
-		osd_printf_info("Average speed: %.2f%% (%d seconds)\n", 100 * final_emu_time / final_real_time, (m_overall_emutime + attotime::from_hz(2)).seconds());
+		osd_printf_info("Average speed: %.2f%% (%d seconds)\n", 100 * final_emu_time / final_real_time, machine().scheduler().time().seconds());
 	}
 }
 
@@ -1000,20 +999,22 @@ void video_manager::recompute_speed(const attotime &emutime)
 			m_overall_emutime += delta_emutime;
 		}
 	}
+}
 
-	// if we're past the "time-to-execute" requested, signal an exit
-	if (m_seconds_to_run != 0 && emutime.seconds() >= m_seconds_to_run)
-	{
-		// create a final screenshot
-		emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		osd_file::error filerr = file.open(machine().basename() + PATH_SEPARATOR "final.png");
-		if (filerr == osd_file::error::NONE)
-			save_snapshot(nullptr, file);
 
-		//printf("Scheduled exit at %f\n", emutime.as_double());
-		// schedule our demise
-		machine().schedule_exit();
-	}
+//-------------------------------------------------
+//  save_final_snapshot - creates a final
+//  snapshot before being forced to exit via
+//  the seconds_to_run option
+//-------------------------------------------------
+
+void video_manager::save_final_snapshot()
+{
+	// create a final screenshot
+	emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	osd_file::error filerr = file.open(machine().basename() + PATH_SEPARATOR "final.png");
+	if (filerr == osd_file::error::NONE)
+		save_snapshot(nullptr, file);
 }
 
 

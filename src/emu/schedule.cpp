@@ -14,10 +14,12 @@
 	- Test out save states
 	- Clean up timer devices
 	- Clean up more timers in devices/drivers
+	- Get rid of eat_all_cycles() and implement hard_stop()
 
 ***************************************************************************/
 
 #include "emu.h"
+#include "emuopts.h"
 #include "debugger.h"
 #include "hashing.h"
 
@@ -587,7 +589,9 @@ device_scheduler::device_scheduler(running_machine &machine) :
 	m_callback_timer(nullptr),
 	m_callback_timer_expire_time(attotime::zero),
 	m_suspend_changes_pending(true),
-	m_quantum_minimum(subseconds::from_nsec(1) / 1000)
+	m_quantum_minimum(subseconds::from_nsec(1) / 1000),
+	m_quantum_list(nullptr),
+	m_quantum_free_list(nullptr)
 {
 	// register global states
 	auto &save = machine.save();
@@ -671,6 +675,31 @@ device_scheduler::~device_scheduler()
 
 
 //-------------------------------------------------
+//  finalize - finalize setup once all the devices
+//  have been started
+//-------------------------------------------------
+
+void device_scheduler::finalize()
+{
+	// set the core scheduling quantum, ensuring it's no longer than the maximum
+	subseconds min_quantum = machine().config().maximum_quantum(MAX_QUANTUM).as_subseconds();
+	min_quantum = std::min(min_quantum, MAX_QUANTUM);
+
+	// if the configuration specifies a device to make perfect, pick that as the minimum
+	device_execute_interface *const exec(machine().config().perfect_quantum_device());
+	if (exec != nullptr)
+		min_quantum = std::min(exec->minimum_quantum(), min_quantum);
+
+	// use this as our baseline quantum
+	add_scheduling_quantum(min_quantum, attotime::never);
+
+	// build the initial list of executing devices and compute the perfect interleave
+	rebuild_execute_list();
+	compute_perfect_interleave();
+}
+
+
+//-------------------------------------------------
 //  time - return the current time
 //-------------------------------------------------
 
@@ -717,21 +746,26 @@ void device_scheduler::timeslice(subseconds minslice)
 	INCREMENT_SCHEDULER_STAT(m_timeslice);
 
 	// subseconds counts up to 2 seconds; once we pass 1 second, reset
-	if (m_basetime.relative() >= subseconds::from_msec(1000))
+	if (m_basetime.relative() >= subseconds::one_second())
 		update_basetime();
 
 	// run at least the given number of subseconds
 	subseconds basetime = m_basetime.relative();
 	subseconds endslice = basetime + minslice;
-	while (basetime < endslice)
+	while (basetime < endslice && !machine().event_pending())
 	{
 		INCREMENT_SCHEDULER_STAT(m_timeslice_inner1);
 
 		LOG("------------------\n");
 
 		// if the current quantum has expired, find a new one
-		while (m_basetime.absolute() >= m_quantum_list.first()->m_expire)
-			m_quantum_allocator.reclaim(m_quantum_list.detach_head());
+		while (basetime >= m_quantum_list->m_expire.relative())
+		{
+			quantum_slot *newhead = m_quantum_list->m_next;
+			m_quantum_list->m_next = m_quantum_free_list;
+			m_quantum_free_list = m_quantum_list;
+			m_quantum_list = newhead;
+		}
 
 		// loop until we hit the next timer
 		while (basetime < m_first_timer_expire.relative())
@@ -739,7 +773,7 @@ void device_scheduler::timeslice(subseconds minslice)
 			INCREMENT_SCHEDULER_STAT(m_timeslice_inner2);
 
 			// by default, assume our target is the end of the next quantum
-			subseconds target = basetime + m_quantum_list.first()->m_actual;
+			subseconds target = basetime + m_quantum_list->m_actual;
 
 			// however, if the next timer is going to fire before then, override
 			if (m_first_timer_expire.relative() < target)
@@ -840,20 +874,6 @@ void device_scheduler::trigger(int trigid, attotime const &after)
 
 
 //-------------------------------------------------
-//  boost_interleave - temporarily boosts the
-//  interleave factor
-//-------------------------------------------------
-
-void device_scheduler::boost_interleave(attotime const &timeslice_time, attotime const &boost_duration)
-{
-	// ignore timeslices > 1 second
-	if (timeslice_time.seconds() > 0)
-		return;
-	add_scheduling_quantum(timeslice_time, boost_duration);
-}
-
-
-//-------------------------------------------------
 //  register_callback - register a timer
 //  expired callback
 //-------------------------------------------------
@@ -918,18 +938,6 @@ persistent_timer *device_scheduler::timer_alloc(device_t &device, device_timer_i
 
 	// initialize the timer instance
 	return &timer.init(device, id, ptr);
-}
-
-
-//-------------------------------------------------
-//  eat_all_cycles - eat a ton of cycles on all
-//  CPUs to force a quick exit
-//-------------------------------------------------
-
-void device_scheduler::eat_all_cycles()
-{
-	for (device_execute_interface *exec = m_execute_list; exec != nullptr; exec = exec->m_nextexec)
-		exec->eat_cycles(1000000000);
 }
 
 
@@ -1101,6 +1109,10 @@ void device_scheduler::update_basetime()
 	for (device_execute_interface &exec : execute_interface_enumerator(machine().root_device()))
 		exec.m_localtime.set_base(basetime);
 
+	// update quantum expirations
+	for (quantum_slot *quantum = m_quantum_list; quantum != nullptr; quantum = quantum->m_next)
+		quantum->m_expire.set_base(basetime);
+
 	// move timers from future list into current list
 	m_first_timer_expire.set_base(basetime);
 }
@@ -1115,38 +1127,36 @@ void device_scheduler::compute_perfect_interleave()
 {
 	INCREMENT_SCHEDULER_STAT(m_compute_perfect_interleave);
 
-	// ensure we have a list of executing devices
-	if (UNEXPECTED(m_execute_list == nullptr))
-		rebuild_execute_list();
-
-	// start with the first one
-	device_execute_interface *first = m_execute_list;
-	if (first != nullptr)
+	// skip if nothing or only one item on our list
+	if (m_execute_list == nullptr || m_execute_list->m_nextexec == nullptr)
 	{
-		// start with a huge time factor and find the 2nd smallest cycle time
-		subseconds smallest = first->minimum_quantum();
-		subseconds perfect = MAX_QUANTUM;
-		for (device_execute_interface *exec = first->m_nextexec; exec != nullptr; exec = exec->m_nextexec)
-		{
-			// find the 2nd smallest cycle interval
-			subseconds curquantum = exec->minimum_quantum();
-			if (curquantum < smallest)
-			{
-				perfect = smallest;
-				smallest = curquantum;
-			}
-			else if (curquantum < perfect)
-				perfect = curquantum;
-		}
+		m_quantum_minimum = MAX_QUANTUM;
+		return;
+	}
 
-		// if this is a new minimum quantum, apply it
-		if (m_quantum_minimum != perfect)
+	// start with a huge time factor and find the 2nd smallest cycle time
+	subseconds smallest = m_execute_list->minimum_quantum();
+	subseconds perfect = MAX_QUANTUM;
+	for (device_execute_interface *exec = m_execute_list->m_nextexec; exec != nullptr; exec = exec->m_nextexec)
+	{
+		// find the 2nd smallest cycle interval
+		subseconds curquantum = exec->minimum_quantum();
+		if (curquantum < smallest)
 		{
-			// adjust all the actuals; this doesn't affect the current
-			m_quantum_minimum = perfect;
-			for (quantum_slot &quant : m_quantum_list)
-				quant.m_actual = std::max(quant.m_requested, m_quantum_minimum);
+			perfect = smallest;
+			smallest = curquantum;
 		}
+		else if (curquantum < perfect)
+			perfect = curquantum;
+	}
+
+	// if this is a new minimum quantum, apply it
+	if (m_quantum_minimum != perfect)
+	{
+		// adjust all the actuals; this doesn't affect the current
+		m_quantum_minimum = perfect;
+		for (quantum_slot *quant = m_quantum_list; quant != nullptr; quant = quant->m_next)
+			quant->m_actual = std::max(quant->m_requested, m_quantum_minimum);
 	}
 }
 
@@ -1160,21 +1170,6 @@ void device_scheduler::compute_perfect_interleave()
 void device_scheduler::rebuild_execute_list()
 {
 	INCREMENT_SCHEDULER_STAT(m_rebuild_execute_list);
-
-	// if we haven't yet set a scheduling quantum, do it now
-	if (m_quantum_list.empty())
-	{
-		// set the core scheduling quantum, ensuring it's no longer than the maximum
-		attotime min_quantum = machine().config().maximum_quantum(MAX_QUANTUM);
-
-		// if the configuration specifies a device to make perfect, pick that as the minimum
-		device_execute_interface *const exec(machine().config().perfect_quantum_device());
-		if (exec != nullptr)
-			min_quantum = std::min(attotime(exec->minimum_quantum()), min_quantum);
-
-		// inform the timer system of our decision
-		add_scheduling_quantum(min_quantum, attotime::never);
-	}
 
 	// start with an empty list
 	device_execute_interface **active_tailptr = &m_execute_list;
@@ -1215,10 +1210,6 @@ inline void device_scheduler::apply_suspend_changes()
 {
 	INCREMENT_SCHEDULER_STAT(m_apply_suspend_changes);
 
-	// ensure we have a list of executing devices to work with
-	if (UNEXPECTED(m_execute_list == nullptr))
-		rebuild_execute_list();
-
 	// update the suspend state on all executing devices
 	u32 suspendchanged = 0;
 	for (device_execute_interface *exec = m_execute_list; exec != nullptr; exec = exec->m_nextexec)
@@ -1238,44 +1229,66 @@ inline void device_scheduler::apply_suspend_changes()
 //  that is in use
 //-------------------------------------------------
 
-void device_scheduler::add_scheduling_quantum(attotime const &quantum, attotime const &duration)
+void device_scheduler::add_scheduling_quantum(subseconds quantum, attotime const &duration)
 {
+	// ignore quanta larger than the maximum
+	if (quantum > MAX_QUANTUM)
+		return;
+
 	INCREMENT_SCHEDULER_STAT(m_add_scheduling_quantum);
 
-	scheduler_assert(quantum.seconds() == 0);
-
+	// compute the expiration time
 	attotime curtime = time();
 	attotime expire = curtime + duration;
-	const subseconds quantum_subs = quantum.frac();
 
 	// figure out where to insert ourselves, expiring any quanta that are out-of-date
-	quantum_slot *insert_after = nullptr;
-	quantum_slot *next;
-	for (quantum_slot *quant = m_quantum_list.first(); quant != nullptr; quant = next)
+	quantum_slot **nextptr;
+	for (nextptr = &m_quantum_list; *nextptr != nullptr; nextptr = &(*nextptr)->m_next)
 	{
-		// if this quantum is expired, nuke it
-		next = quant->next();
-		if (curtime >= quant->m_expire)
-			m_quantum_allocator.reclaim(m_quantum_list.detach(*quant));
+		quantum_slot &quant = **nextptr;
 
-		// if this quantum is shorter than us, we need to be inserted afterwards
-		else if (quant->m_requested <= quantum_subs)
-			insert_after = quant;
+		// if this quantum is expired, pull it from the list and add it to the free list
+		if (curtime >= quant.m_expire.absolute())
+		{
+			*nextptr = quant.m_next;
+			quant.m_next = m_quantum_free_list;
+			m_quantum_free_list = &quant;
+		}
+
+		// if the new quantum is equal, just merge entries
+		else if (quantum == quant.m_requested)
+		{
+			if (expire > quant.m_expire.absolute())
+				quant.m_expire.set(expire);
+			return;
+		}
+
+		// if the new quantum is larger, we want to be inserted after this entry
+		else if (quantum > quant.m_requested)
+		{
+			nextptr = &(*nextptr)->m_next;
+			break;
+		}
 	}
 
-	// if we found an exact match, just take the maximum expiry time
-	if (insert_after != nullptr && insert_after->m_requested == quantum_subs)
-		insert_after->m_expire = std::max(insert_after->m_expire, expire);
-
-	// otherwise, allocate a new quantum and insert it after the one we picked
+	// allocate a new slot
+	quantum_slot *newquant = m_quantum_free_list;
+	if (newquant != nullptr)
+		m_quantum_free_list = newquant->m_next;
 	else
 	{
-		quantum_slot &quant = *m_quantum_allocator.alloc();
-		quant.m_requested = quantum_subs;
-		quant.m_actual = std::max(quantum_subs, m_quantum_minimum);
-		quant.m_expire = expire;
-		m_quantum_list.insert_after(quant, insert_after);
+		m_allocated_quanta.push_back(std::make_unique<quantum_slot>());
+		newquant = m_allocated_quanta.back().get();
 	}
+
+	// fill it out
+	newquant->m_requested = quantum;
+	newquant->m_actual = std::max(quantum, m_quantum_minimum);
+	newquant->m_expire.set(expire);
+
+	// insert it into the list
+	newquant->m_next = *nextptr;
+	*nextptr = newquant;
 }
 
 
@@ -1433,6 +1446,33 @@ void device_scheduler::timed_trigger(timer_instance const &timer)
 {
 	INCREMENT_SCHEDULER_STAT(m_timed_trigger_calls);
 	trigger(timer.param());
+}
+
+
+//-------------------------------------------------
+//  hard_stop - tweak variables to ensure we will
+//  exit out of the core timeslice loop as soon as
+//  possible....
+//-------------------------------------------------
+
+void device_scheduler::hard_stop()
+{
+	// set the head quantum to max and never expire; this ensures the rest of
+	// the timelice loops will go as quickly as possible
+	m_quantum_list->m_actual = MAX_QUANTUM;
+	m_quantum_list->m_expire.set(attotime::never);
+
+	// set the first timer expire time to never so that we don't check for
+	// any more timers
+	if (m_active_timers_head != nullptr)
+		m_active_timers_head->m_expire = attotime::never;
+	m_first_timer_expire.set(attotime::never);
+
+	// mark no changes pending so that we don't recalculate suspend changes anymore
+	m_suspend_changes_pending = false;
+
+	// then reset the execute list so we don't execute anything else
+	m_execute_list = nullptr;
 }
 
 

@@ -188,7 +188,7 @@ public:
 	// time and cycle accounting
 	attotime local_time() noexcept;
 	u64 total_cycles() const noexcept;
-	attotime minimum_quantum_time() const { return attotime(0, minimum_quantum()); }
+	subseconds minimum_quantum() const;
 
 	// required operation overrides
 	void run() { execute_run(); }
@@ -253,7 +253,6 @@ protected:
 
 private:
 	void suspend_resume_changed();
-	subseconds minimum_quantum() const;
 
 	void run_debug();
 	void run_suspend();

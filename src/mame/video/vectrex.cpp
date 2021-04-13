@@ -49,7 +49,7 @@ TIMER_CALLBACK_MEMBER(vectrex_base_state::lightpen_trigger)
 
 	if (m_lightpen_port & 2)
 	{
-		m_maincpu->pulse_input_line(M6809_FIRQ_LINE, m_maincpu->minimum_quantum_time());
+		m_maincpu->pulse_input_line(M6809_FIRQ_LINE, m_maincpu->minimum_quantum());
 	}
 }
 

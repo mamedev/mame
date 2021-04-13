@@ -155,6 +155,17 @@ class running_machine
 	// must be at top of member variables
 	resource_pool           m_respool;              // pool of resources for this machine
 
+	// scheduled event types
+	enum
+	{
+		EVENT_NONE,
+		EVENT_EXIT,
+		EVENT_HARD_RESET,
+		EVENT_SOFT_RESET,
+		EVENT_SAVE,
+		EVENT_LOAD
+	};
+
 public:
 	// construction/destruction
 	running_machine(const machine_config &config, machine_manager &manager);
@@ -192,12 +203,14 @@ public:
 	template <class DriverClass> DriverClass *driver_data() const { return &downcast<DriverClass &>(root_device()); }
 	machine_phase phase() const { return m_current_phase; }
 	bool paused() const { return m_paused || (m_current_phase != machine_phase::RUNNING); }
-	bool exit_pending() const { return m_exit_pending; }
-	bool hard_reset_pending() const { return m_hard_reset_pending; }
+	bool event_pending() const { return (m_event_timer.param() != EVENT_NONE); }
+	bool exit_pending() const { return (m_event_timer.param() == EVENT_EXIT); }
+	bool hard_reset_pending() const { return (m_event_timer.param() == EVENT_HARD_RESET); }
+	bool scheduled_event_pending() const { return (exit_pending() || hard_reset_pending()); }
+	bool save_or_load_pending() const { return !m_saveload_pending_file.empty(); }
 	bool ui_active() const { return m_ui_active; }
 	const std::string &basename() const { return m_basename; }
 	int sample_rate() const { return m_sample_rate; }
-	bool save_or_load_pending() const { return !m_saveload_pending_file.empty(); }
 
 	// RAII-based side effect disable
 	// NOP-ed when passed false, to make it more easily conditional
@@ -207,7 +220,6 @@ public:
 	// additional helpers
 	emu_options &options() const { return m_config.options(); }
 	attotime time() const noexcept { return m_scheduler.time(); }
-	bool scheduled_event_pending() const { return m_exit_pending || m_hard_reset_pending; }
 	bool allow_logging() const { return !m_logerror_list.empty(); }
 
 	// fetch items by name
@@ -226,9 +238,8 @@ public:
 	void debug_break();
 	void export_http_api();
 
-	// TODO: Do saves and loads still require scheduling?
-	void immediate_save(const char *filename);
-	void immediate_load(const char *filename);
+	void immediate_save(const char *filename = nullptr);
+	void immediate_load(const char *filename = nullptr);
 
 	// rewind operations
 	bool rewind_capture();
@@ -236,11 +247,11 @@ public:
 	void rewind_invalidate();
 
 	// scheduled operations
-	void schedule_exit();
-	void schedule_hard_reset();
-	void schedule_soft_reset();
-	void schedule_save(std::string &&filename);
-	void schedule_load(std::string &&filename);
+	void schedule_exit() { schedule_event(EVENT_EXIT); }
+	void schedule_hard_reset() { schedule_event(EVENT_HARD_RESET); }
+	void schedule_soft_reset() { schedule_event(EVENT_SOFT_RESET); }
+	void schedule_save(std::string &&filename) { set_saveload_filename(std::move(filename)); schedule_event(EVENT_SAVE); }
+	void schedule_load(std::string &&filename) { set_saveload_filename(std::move(filename)); schedule_event(EVENT_LOAD); }
 
 	// date & time
 	void base_datetime(system_time &systime);
@@ -299,7 +310,8 @@ private:
 	void start();
 	void set_saveload_filename(std::string &&filename);
 	void handle_saveload();
-	void soft_reset(void *ptr = nullptr, s32 param = 0);
+	void schedule_event(u32 event) { m_event_timer.adjust(attotime::zero, event); resume(); }
+	void scheduled_event(int event);
 	std::string nvram_filename(device_t &device) const;
 	void nvram_load();
 	void nvram_save();
@@ -342,9 +354,8 @@ private:
 	// system state
 	machine_phase           m_current_phase;        // current execution phase
 	bool                    m_paused;               // paused?
-	bool                    m_hard_reset_pending;   // is a hard reset pending?
-	bool                    m_exit_pending;         // is an exit pending?
-	persistent_timer        m_soft_reset_timer;     // timer used to schedule a soft reset
+	persistent_timer        m_event_timer;          // timer used to schedule key events
+	persistent_timer        m_exit_timer;           // timer used to schedule timed exits
 
 	// misc state
 	u32                     m_rand_seed;            // current random number seed
@@ -352,8 +363,8 @@ private:
 	time_t                  m_base_time;            // real time at initial emulation time
 	std::string             m_basename;             // basename used for game-related paths
 	int                     m_sample_rate;          // the digital audio sample rate
-	std::unique_ptr<emu_file>  m_logfile;           // pointer to the active error.log file
-	std::unique_ptr<emu_file>  m_debuglogfile;      // pointer to the active debug.log file
+	std::unique_ptr<emu_file> m_logfile;            // pointer to the active error.log file
+	std::unique_ptr<emu_file> m_debuglogfile;       // pointer to the active debug.log file
 
 	// load/save management
 	enum class saveload_schedule
