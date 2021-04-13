@@ -386,6 +386,7 @@ void qx10_state::fdd_motor_w(uint8_t data)
 	m_fdcmotor = 1;
 
 	m_floppy[0]->get_device()->mon_w(false);
+	m_floppy[1]->get_device()->mon_w(false);
 	// motor off controlled by clock
 }
 
