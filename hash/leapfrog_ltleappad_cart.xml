@@ -67,7 +67,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="poohlovesug" supported="no" cloneof="poohlovesu">
+	<software name="poohlovesug" cloneof="poohlovesu" supported="no">
 		<description>Disney Puuh mag dich! (Germany)</description>
 		<year>2004</year>
 		<publisher>LeapFrog</publisher>
