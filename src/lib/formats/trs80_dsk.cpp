@@ -136,62 +136,94 @@ int jv3_format::identify(io_generic *io, uint32_t form_factor, const std::vector
 {
 	uint32_t image_size = io_generic_size(io);
 
-	//if (image_size == 0x2200)
-		//return 40;  // unformatted disk
+	if (image_size < 0x2200)
+		return 0; // too small, silent return
 
-	if (image_size < 0x2300)
-		return 0;
-
+	std::vector<uint8_t> data(image_size);
+	io_generic_read(io, data.data(), 0, image_size);
 	const uint32_t entries = 2901;
 	const uint32_t header_size = entries *3 +1;
-	uint8_t header[0x2200];
-	io_generic_read(io, header, 0, header_size);
 
 	// check the readonly flag
-	if ((header[0x21ff] != 0) && (header[0x21ff] != 0xff))
-		return 0;
+	if ((data[0x21ff] != 0) && (data[0x21ff] != 0xff))
+		return 0; // flag is incorrect, silent return
 
 	// Check for DMK
 	uint8_t testbyte = 0;
 	for (int i = 5; i < 16; i++)
-		testbyte |= header[i];
+		testbyte |= data[i];
 	if (!testbyte)
-		return 0;
+		return 0; // DMK, silent return
 
 	// Check for other disk formats
-	if (header[1] >= MAX_SECTORS)
-		return 0;
+	if (data[1] >= MAX_SECTORS)
+		return 0; // some other format, silent return
 
-	// Make sure all data is in the image
-	uint32_t data_ptr = header_size;
-	uint32_t sect_ptr = 0;
+	// Full validation of the disk
+	bool sector_array[2][MAX_TRACKS][MAX_SECTORS];
+	for (uint8_t side = 0; side < 2; side++)
+		for (uint8_t track = 0; track < MAX_TRACKS; track++)
+			for (uint8_t sector = 0; sector < MAX_SECTORS; sector++)
+				sector_array[side][track][sector] = false; // fill_n won't compile
 
+	uint32_t data_ptr = header_size, last_data = header_size, size = 0;
+
+	// printf errors may indicate it's another format, and so are ignorable.
 	for (uint32_t sect = 0; sect < entries; sect++)
 	{
-		uint8_t track = header[sect_ptr++];
-		uint8_t sector = header[sect_ptr++];
-		uint8_t flags = header[sect_ptr++];
+		uint8_t track = data[sect*3];
+		uint8_t sector = data[sect*3+1];
+		uint8_t flag_size = data[sect*3+2] & 3;
+		uint8_t flag_side = (data[sect*3+2] & 0x10) ? 1 : 0;
 
-		if (track == 0xff)
-			break;
-		if (track >= MAX_TRACKS)
-			return 0;
-		if (sector >= MAX_SECTORS)
-			return 0;
-		if ((flags & 0xfc) == 0xfc)
-			break;
+		if (track < 0xff)
+		{
+			// validate so we don't overrun the array
+			if (track >= MAX_TRACKS)
+			{
+				printf("jv3_format::identify - track %d exceeds maximum allowed (%d)\n",track,MAX_TRACKS-1);
+				return 0;
+			}
 
-		uint8_t size = (flags & 0x03)^1;
-		data_ptr += 128 << size;
+			if (sector >= MAX_SECTORS)
+			{
+				printf("jv3_format::identify - sector %d exceeds maximum allowed (%d)\n",sector,MAX_SECTORS-1);
+				return 0;
+			}
+
+			// check if sector already exists
+			if (sector_array[flag_side][track][sector])
+			{
+				printf("jv3_format::identify - side %d track %d sector %d is duplicated\n",flag_side,track,sector);
+				return 0;
+			}
+
+			sector_array[flag_side][track][sector] = true;
+
+			size = 128 << (flag_size ^1);
+			data_ptr += size;
+			last_data = data_ptr;
+		}
+		else
+		{
+			size = 128 << (flag_size ^2);
+			data_ptr += size;
+		}
 	}
-	if (data_ptr > image_size)
+
+	// Is all data in the image? (unused tracks at the end are optional)
+	if (last_data > image_size)
+	{
+		printf("jv3_format::identify - disk is missing some data. Expected 0x%X, Actual = 0x%X\n",last_data,image_size);
 		return 0;
+	}
 
 	return 80;
 }
 
 bool jv3_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
+	// disk has already been validated in every way except if it exceeds drive tracks, we do that below
 	printf("Disk detected as JV3\n");fflush(stdout);
 	int drive_tracks, drive_sides;
 	image->get_maximal_geometry(drive_tracks, drive_sides);
@@ -223,17 +255,16 @@ bool jv3_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 			}
 
 			// If there's any data for this track process it
-			// We assume that all sectors from 0 to max_sect exist
 			if (max_sect >= min_sect)
 			{
-				// Make sure we don't have too many sectors
-				if (max_sect >= MAX_SECTORS)
+				// Protect against oversized disk
+				if ((curr_track >= drive_tracks) || (curr_side >= drive_sides))
 				{
-					osd_printf_error("Sector number %d exceeds maximum allowed (%d).\n",max_sect,MAX_SECTORS);
+					osd_printf_error("Disk exceeds drive capabilities\n");
 					return false;
 				}
 
-				max_sect++;  // now it is the number of sectors on this track
+				max_sect++;  // now it is the max possible number of sectors on this track
 
 				desc_pc_sector sectors[MAX_SECTORS];
 				// set defaults in case some sectors are missing from the image
@@ -248,6 +279,7 @@ bool jv3_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 					sectors[i].bad_crc = false;
 					sectors[i].data = 0;
 				}
+
 				uint32_t data_ptr = header_size;
 				bool ddensity = false;
 				// Search for sectors on this track & side
@@ -265,31 +297,20 @@ bool jv3_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 					uint16_t sector_size = 128 << size;
 					if ((track == curr_track) && (side == curr_side))
 					{
-						// If we would exceed the image size then ignore this sector
-						if ((data_ptr + sector_size) <= data.size())
-						{
-							// process the sector
-							sectors[sector].track = curr_track;
-							sectors[sector].head = curr_side;
-							sectors[sector].sector = sector;
-							sectors[sector].actual_size = sector_size;
-							sectors[sector].size = size;
-							uint8_t dam = flags & 0xe0;
-							sectors[sector].deleted = ((dam == 0x60) || (dam == 0xa0)) ? true : false;
-							sectors[sector].bad_crc = (flags & 0x08) ? true : false;
-							sectors[sector].data = &data[data_ptr];
-							if (flags & 0x80)
-								ddensity = true;
-						}
+						// process the sector
+						sectors[sector].track = curr_track;
+						sectors[sector].head = curr_side;
+						sectors[sector].sector = sector;
+						sectors[sector].actual_size = sector_size;
+						sectors[sector].size = size;
+						uint8_t dam = flags & 0xe0;
+						sectors[sector].deleted = ((dam == 0x60) || (dam == 0xa0)) ? true : false;
+						sectors[sector].bad_crc = (flags & 0x08) ? true : false;
+						sectors[sector].data = &data[data_ptr];
+						if (flags & 0x80)
+							ddensity = true;
 					}
 					data_ptr += sector_size;
-				}
-
-				// Protect against oversized disk
-				if ((curr_track >= drive_tracks) || (curr_side >= drive_sides))
-				{
-					osd_printf_error("Disk exceeds drive capabilities\n");
-					return false;
 				}
 
 				//printf("Side %d, Track %d, %s density\n",curr_side,curr_track,ddensity ? "Double" : "Single");
@@ -325,10 +346,20 @@ bool jv3_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 
 bool jv3_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
-	uint32_t data_ptr = 0x2200, sect_ptr = 0;
-
 	int track_count, head_count;
 	image->get_actual_geometry(track_count, head_count);
+
+	if (track_count)
+	{
+		// If the disk already exists, find out if it's writable
+		std::vector<uint8_t> data(io_generic_size(io));
+		io_generic_read(io, data.data(), 0, data.size());
+		if ((data.size() >= 0x2200) && (data[0x21ff] == 0))
+			return false;   // disk is readonly
+	}
+
+	uint32_t data_ptr = 0x2200, sect_ptr = 0;
+
 
 	// prepare default header, which we will partially overwrite later
 	uint8_t header[0x2200];

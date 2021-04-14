@@ -59,7 +59,7 @@ To Do / Status:
 
 JV3: Cannot write, due to an emulation bug causing the machine to hang.
 JV1: if you try to create a disk in the File Manager, MAME will crash.
-JV3, DMK: no option to create.
+DMK: no option to create.
 IMD: does not work with a quad drive.
 
 trs80m3:   Works
