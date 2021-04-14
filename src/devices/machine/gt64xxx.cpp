@@ -232,26 +232,24 @@ void gt64xxx_device::device_start()
 	m_timer[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt64xxx_device::timer_callback), this));
 	m_timer[2].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt64xxx_device::timer_callback), this));
 	m_timer[3].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gt64xxx_device::timer_callback), this));
+}
 
+void gt64xxx_device::device_register_save(save_registrar &save)
+{
 	// Save states
-	save_item(NAME(m_pci_stall_state));
-	save_item(NAME(m_retry_count));
-	save_item(NAME(m_pci_cpu_stalled));
-	save_item(NAME(m_stall_windex));
-	save_item(NAME(m_cpu_stalled_offset));
-	save_item(NAME(m_cpu_stalled_data));
-	save_item(NAME(m_cpu_stalled_mem_mask));
-	save_item(NAME(m_prev_addr));
-	save_item(NAME(m_reg));
-	save_item(STRUCT_MEMBER(m_timer, active));
-	save_item(STRUCT_MEMBER(m_timer, count));
-	save_item(NAME(m_dma_active));
-	// m_ram[4]
-	save_pointer(NAME(m_ram[0].data()), m_simm_size[0] / 4);
-	save_pointer(NAME(m_ram[1].data()), m_simm_size[1] / 4);
-	save_pointer(NAME(m_ram[2].data()), m_simm_size[2] / 4);
-	save_pointer(NAME(m_ram[3].data()), m_simm_size[3] / 4);
-	save_item(NAME(m_last_dma));
+	save.reg(NAME(m_pci_stall_state))
+		.reg(NAME(m_retry_count))
+		.reg(NAME(m_pci_cpu_stalled))
+		.reg(NAME(m_stall_windex))
+		.reg(NAME(m_cpu_stalled_offset))
+		.reg(NAME(m_cpu_stalled_data))
+		.reg(NAME(m_cpu_stalled_mem_mask))
+		.reg(NAME(m_prev_addr))
+		.reg(NAME(m_reg))
+		.reg(NAME(m_timer))
+		.reg(NAME(m_dma_active))
+		.reg(NAME(m_ram))
+		.reg(NAME(m_last_dma));
 }
 
 void gt64xxx_device::device_post_load()

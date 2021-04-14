@@ -92,6 +92,8 @@ protected:
 		uint64_t adr;
 		uint32_t size;
 		int flags;
+
+		void register_save(save_registrar &save) { save.reg(NAME(adr)); }
 	};
 
 	struct bank_reg_info {
@@ -114,6 +116,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	void skip_map_regs(int count);
 	void add_map(uint64_t size, int flags, const address_map_constructor &map, device_t *relative_to = nullptr);

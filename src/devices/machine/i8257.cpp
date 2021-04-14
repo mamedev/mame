@@ -297,22 +297,27 @@ void i8257_device::device_start()
 	m_in_ior_cb.resolve_all_safe(0);
 	m_out_iow_cb.resolve_all_safe();
 	m_out_dack_cb.resolve_all_safe();
+}
 
+
+//-------------------------------------------------
+//  device_register_save - register for save states
+//-------------------------------------------------
+
+void i8257_device::device_register_save(save_registrar &save)
+{
 	// state saving
-	save_item(NAME(m_msb));
-	save_item(NAME(m_hreq));
-	save_item(NAME(m_hack));
-	save_item(NAME(m_ready));
-	save_item(NAME(m_state));
-	save_item(NAME(m_current_channel));
-	save_item(NAME(m_last_channel));
-	save_item(NAME(m_transfer_mode));
-	save_item(NAME(m_status));
-	save_item(NAME(m_request));
-
-	save_item(STRUCT_MEMBER(m_channel, m_address));
-	save_item(STRUCT_MEMBER(m_channel, m_count));
-	save_item(STRUCT_MEMBER(m_channel, m_mode));
+	save.reg(NAME(m_msb))
+		.reg(NAME(m_hreq))
+		.reg(NAME(m_hack))
+		.reg(NAME(m_ready))
+		.reg(NAME(m_state))
+		.reg(NAME(m_current_channel))
+		.reg(NAME(m_last_channel))
+		.reg(NAME(m_transfer_mode))
+		.reg(NAME(m_status))
+		.reg(NAME(m_request))
+		.reg(NAME(m_channel));
 }
 
 

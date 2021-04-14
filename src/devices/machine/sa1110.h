@@ -77,6 +77,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	static constexpr uint32_t INTERNAL_OSC = 3686400;
 
@@ -535,6 +536,19 @@ protected:
 		uint32_t udccs2;
 		uint32_t udcwc;
 		uint32_t udcsr;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(udccr))
+				.reg(NAME(udcar))
+				.reg(NAME(udcomp))
+				.reg(NAME(udcimp))
+				.reg(NAME(udccs0))
+				.reg(NAME(udccs1))
+				.reg(NAME(udccs2))
+				.reg(NAME(udcwc))
+				.reg(NAME(udcsr));
+		}
 	};
 
 	struct uart_regs
@@ -554,6 +568,22 @@ protected:
 		int     tx_fifo_count;
 
 		bool    rx_break_interlock;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(utcr))
+				.reg(NAME(utsr0))
+				.reg(NAME(utsr1))
+				.reg(NAME(rx_fifo))
+				.reg(NAME(rx_fifo_read_idx))
+				.reg(NAME(rx_fifo_write_idx))
+				.reg(NAME(rx_fifo_count))
+				.reg(NAME(tx_fifo))
+				.reg(NAME(tx_fifo_read_idx))
+				.reg(NAME(tx_fifo_write_idx))
+				.reg(NAME(tx_fifo_count))
+				.reg(NAME(rx_break_interlock));
+		}
 	};
 
 	struct hssp_regs
@@ -574,6 +604,22 @@ protected:
 		int tx_fifo_write_idx;
 		int tx_fifo_count;
 		emu_timer *tx_timer;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(hscr0))
+				.reg(NAME(hscr1))
+				.reg(NAME(hssr0))
+				.reg(NAME(hssr1))
+				.reg(NAME(rx_fifo))
+				.reg(NAME(rx_fifo_read_idx))
+				.reg(NAME(rx_fifo_write_idx))
+				.reg(NAME(rx_fifo_count))
+				.reg(NAME(tx_fifo))
+				.reg(NAME(tx_fifo_read_idx))
+				.reg(NAME(tx_fifo_write_idx))
+				.reg(NAME(tx_fifo_count));
+		}
 	};
 
 	struct icp_regs
@@ -584,6 +630,13 @@ protected:
 		emu_timer *uart_tx_timer;
 
 		hssp_regs hssp;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(uart))
+				.reg(NAME(utcr4))
+				.reg(NAME(hssp));
+		}
 	};
 
 	struct mcp_regs
@@ -614,6 +667,30 @@ protected:
 		int      telecom_tx_fifo_write_idx;
 		int      telecom_tx_fifo_count;
 		emu_timer *telecom_tx_timer;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(mccr0))
+				.reg(NAME(mccr1))
+				.reg(NAME(mcdr2))
+				.reg(NAME(mcsr))
+				.reg(NAME(audio_rx_fifo))
+				.reg(NAME(audio_rx_fifo_read_idx))
+				.reg(NAME(audio_rx_fifo_write_idx))
+				.reg(NAME(audio_rx_fifo_count))
+				.reg(NAME(audio_tx_fifo))
+				.reg(NAME(audio_tx_fifo_read_idx))
+				.reg(NAME(audio_tx_fifo_write_idx))
+				.reg(NAME(audio_tx_fifo_count))
+				.reg(NAME(telecom_rx_fifo))
+				.reg(NAME(telecom_rx_fifo_read_idx))
+				.reg(NAME(telecom_rx_fifo_write_idx))
+				.reg(NAME(telecom_rx_fifo_count))
+				.reg(NAME(telecom_tx_fifo))
+				.reg(NAME(telecom_tx_fifo_read_idx))
+				.reg(NAME(telecom_tx_fifo_write_idx))
+				.reg(NAME(telecom_tx_fifo_count));
+		}
 	};
 
 	struct ssp_regs
@@ -633,6 +710,21 @@ protected:
 		int tx_fifo_write_idx;
 		int tx_fifo_count;
 		emu_timer *tx_timer;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(sscr0))
+				.reg(NAME(sscr1))
+				.reg(NAME(sssr))
+				.reg(NAME(rx_fifo))
+				.reg(NAME(rx_fifo_read_idx))
+				.reg(NAME(rx_fifo_write_idx))
+				.reg(NAME(rx_fifo_count))
+				.reg(NAME(tx_fifo))
+				.reg(NAME(tx_fifo_read_idx))
+				.reg(NAME(tx_fifo_write_idx))
+				.reg(NAME(tx_fifo_count));
+		}
 	};
 
 	struct ostimer_regs
@@ -645,6 +737,15 @@ protected:
 
 		emu_timer *timer[4];
 		attotime last_count_sync;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(osmr))
+				.reg(NAME(oscr))
+				.reg(NAME(ossr))
+				.reg(NAME(ower))
+				.reg(NAME(oier));
+		}
 	};
 
 	struct rtc_regs
@@ -655,6 +756,14 @@ protected:
 		uint32_t rtsr;
 
 		emu_timer *tick_timer;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(rtar))
+				.reg(NAME(rcnr))
+				.reg(NAME(rttr))
+				.reg(NAME(rtsr));
+		}
 	};
 
 	struct power_regs
@@ -667,6 +776,18 @@ protected:
 		uint32_t ppcr;
 		uint32_t pgsr;
 		uint32_t posr;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(pmcr))
+				.reg(NAME(pssr))
+				.reg(NAME(pspr))
+				.reg(NAME(pwer))
+				.reg(NAME(pcfr))
+				.reg(NAME(ppcr))
+				.reg(NAME(pgsr))
+				.reg(NAME(posr));
+		}
 	};
 
 	struct gpio_regs
@@ -684,6 +805,21 @@ protected:
 		uint32_t input_latch;
 		uint32_t alt_output_latch;
 		uint32_t alt_input_latch;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(gplr))
+				.reg(NAME(gpdr))
+				.reg(NAME(grer))
+				.reg(NAME(gfer))
+				.reg(NAME(gedr))
+				.reg(NAME(gafr))
+				.reg(NAME(any_edge_mask))
+				.reg(NAME(output_latch))
+				.reg(NAME(input_latch))
+				.reg(NAME(alt_output_latch))
+				.reg(NAME(alt_input_latch));
+		}
 	};
 
 	struct intc_regs
@@ -694,6 +830,16 @@ protected:
 		uint32_t iccr;
 		uint32_t icfp;
 		uint32_t icpr;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(icip))
+				.reg(NAME(icmr))
+				.reg(NAME(iclr))
+				.reg(NAME(iccr))
+				.reg(NAME(icfp))
+				.reg(NAME(icpr));
+		}
 	};
 
 	struct ppc_regs
@@ -705,6 +851,15 @@ protected:
 		uint32_t ppar;
 		uint32_t psdr;
 		uint32_t ppfr;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(ppdr))
+				.reg(NAME(ppsr))
+				.reg(NAME(ppar))
+				.reg(NAME(psdr))
+				.reg(NAME(ppfr));
+		}
 	};
 
 	struct dma_regs
@@ -713,6 +868,14 @@ protected:
 		uint32_t dsr;
 		uint32_t dbs[2];
 		uint32_t dbt[2];
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(ddar))
+				.reg(NAME(dsr))
+				.reg(NAME(dbs))
+				.reg(NAME(dbt));
+		}
 	};
 
 	udc_regs        m_udc_regs;

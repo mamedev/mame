@@ -51,29 +51,15 @@ void hd63450_device::device_start()
 	// Initialise timers and registers
 	for (int x = 0; x < 4; x++)
 		m_timer[x] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hd63450_device::dma_transfer_timer), this));
+}
 
-	save_item(STRUCT_MEMBER(m_reg, csr));
-	save_item(STRUCT_MEMBER(m_reg, cer));
-	save_item(STRUCT_MEMBER(m_reg, dcr));
-	save_item(STRUCT_MEMBER(m_reg, ocr));
-	save_item(STRUCT_MEMBER(m_reg, scr));
-	save_item(STRUCT_MEMBER(m_reg, ccr));
-	save_item(STRUCT_MEMBER(m_reg, mtc));
-	save_item(STRUCT_MEMBER(m_reg, mar));
-	save_item(STRUCT_MEMBER(m_reg, dar));
-	save_item(STRUCT_MEMBER(m_reg, btc));
-	save_item(STRUCT_MEMBER(m_reg, niv));
-	save_item(STRUCT_MEMBER(m_reg, eiv));
-	save_item(STRUCT_MEMBER(m_reg, mfc));
-	save_item(STRUCT_MEMBER(m_reg, cpr));
-	save_item(STRUCT_MEMBER(m_reg, dfc));
-	save_item(STRUCT_MEMBER(m_reg, bfc));
-	save_item(STRUCT_MEMBER(m_reg, gcr));
-
-	save_item(NAME(m_transfer_size));
-	save_item(NAME(m_halted));
-	save_item(NAME(m_drq_state));
-	save_item(NAME(m_irq_channel));
+void hd63450_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_reg))
+		.reg(NAME(m_transfer_size))
+		.reg(NAME(m_halted))
+		.reg(NAME(m_drq_state))
+		.reg(NAME(m_irq_channel));
 }
 
 void hd63450_device::device_reset()

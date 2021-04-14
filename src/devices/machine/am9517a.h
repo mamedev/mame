@@ -80,6 +80,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void execute_run() override;
 
 	virtual void end_of_process();
@@ -99,6 +100,8 @@ protected:
 		uint32_t m_base_address;
 		uint32_t m_base_count;
 		uint8_t m_mode;
+
+		void register_save(save_registrar &save) { save.reg(NAME(m_address)).reg(NAME(m_count)).reg(NAME(m_base_address)).reg(NAME(m_base_count)).reg(NAME(m_mode)); }
 	} m_channel[4];
 
 	int m_msb;

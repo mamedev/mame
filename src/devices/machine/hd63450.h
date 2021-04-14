@@ -56,6 +56,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 private:
 	struct hd63450_regs
@@ -78,6 +79,27 @@ private:
 		uint8_t dfc;  // [31]  Device Function Code (R/W)
 		uint8_t bfc;  // [39]  Base Function Code (R/W)
 		uint8_t gcr;  // [3f]  General Control Register (R/W)
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(csr))
+				.reg(NAME(cer))
+				.reg(NAME(dcr))
+				.reg(NAME(ocr))
+				.reg(NAME(scr))
+				.reg(NAME(ccr))
+				.reg(NAME(mtc))
+				.reg(NAME(mar))
+				.reg(NAME(dar))
+				.reg(NAME(btc))
+				.reg(NAME(niv))
+				.reg(NAME(eiv))
+				.reg(NAME(mfc))
+				.reg(NAME(cpr))
+				.reg(NAME(dfc))
+				.reg(NAME(bfc))
+				.reg(NAME(gcr));
+		}
 	};
 
 	devcb_write_line m_irq_callback;

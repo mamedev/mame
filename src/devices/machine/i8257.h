@@ -66,6 +66,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void execute_run() override;
 
 	int m_icount;
@@ -112,6 +113,8 @@ private:
 		uint16_t m_address;
 		uint16_t m_count;
 		uint8_t m_mode;
+
+		void register_save(save_registrar &save) { save.reg(NAME(m_address)).reg(NAME(m_count)).reg(NAME(m_mode)); }
 	} m_channel[4];
 };
 

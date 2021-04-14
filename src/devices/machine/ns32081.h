@@ -27,6 +27,7 @@ protected:
 	// device_t overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	void execute();
 	void complete(void *buf, s32 param);
@@ -46,6 +47,8 @@ private:
 		unsigned expected;
 		unsigned issued;
 		u64 value;
+
+		void register_save(save_registrar &save) { save.reg(NAME(expected)).reg(NAME(issued)).reg(NAME(value)); }
 	}
 	m_op[3];
 	u16 m_status;

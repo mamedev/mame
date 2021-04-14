@@ -170,6 +170,15 @@ public:
 		uint8_t control_register;
 		uint8_t reserved;
 		uint8_t clock_control_register;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(data_register))
+				.reg(NAME(address_register))
+				.reg(NAME(status_register))
+				.reg(NAME(control_register))
+				.reg(NAME(clock_control_register));
+		}
 	};
 
 	struct uart_regs_t
@@ -195,6 +204,21 @@ public:
 		uint8_t transmit_buffer[32768];
 		emu_timer* tx_timer;
 		bool transmit_ctsn;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(mode_register))
+				.reg(NAME(status_register))
+				.reg(NAME(clock_select))
+				.reg(NAME(command_register))
+				.reg(NAME(receive_holding_register))
+				.reg(NAME(receive_pointer))
+				.reg(NAME(receive_buffer))
+				.reg(NAME(transmit_holding_register))
+				.reg(NAME(transmit_pointer))
+				.reg(NAME(transmit_buffer))
+				.reg(NAME(transmit_ctsn));
+		}
 	};
 
 	struct timer_regs_t
@@ -206,6 +230,16 @@ public:
 		uint16_t timer1;
 		uint16_t timer2;
 		emu_timer* timer0_timer;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(timer_status_register))
+				.reg(NAME(timer_control_register))
+				.reg(NAME(reload_register))
+				.reg(NAME(timer0))
+				.reg(NAME(timer1))
+				.reg(NAME(timer2));
+		}
 	};
 
 	struct dma_channel_t
@@ -231,11 +265,25 @@ public:
 		uint32_t device_address_counter;
 
 		uint8_t reserved3[40];
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(channel_status))
+				.reg(NAME(channel_error))
+				.reg(NAME(device_control))
+				.reg(NAME(operation_control))
+				.reg(NAME(sequence_control))
+				.reg(NAME(channel_control))
+				.reg(NAME(transfer_counter))
+				.reg(NAME(memory_address_counter))
+				.reg(NAME(device_address_counter));
+		}
 	};
 
 	struct dma_regs_t
 	{
 		dma_channel_t channel[2];
+		void register_save(save_registrar &save) { save.reg(NAME(channel)); }
 	};
 
 	struct mmu_desc_t
@@ -245,6 +293,14 @@ public:
 		uint8_t  undefined;
 		uint8_t  segment;
 		uint16_t base;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(attr))
+				.reg(NAME(length))
+				.reg(NAME(segment))
+				.reg(NAME(base));
+		}
 	};
 
 	struct mmu_regs_t
@@ -255,6 +311,8 @@ public:
 		uint8_t reserved[0x3e];
 
 		mmu_desc_t desc[8];
+
+		void register_save(save_registrar &save) { save.reg(NAME(status)).reg(NAME(control)).reg(NAME(desc)); }
 	};
 
 	dma_regs_t& dma() { return m_dma; }
@@ -264,6 +322,7 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_execute_interface overrides

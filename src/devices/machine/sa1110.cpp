@@ -2297,158 +2297,42 @@ void sa1110_periphs_device::dma_w(offs_t offset, uint32_t data, uint32_t mem_mas
 
 void sa1110_periphs_device::device_start()
 {
-	save_item(NAME(m_udc_regs.udccr));
-	save_item(NAME(m_udc_regs.udcar));
-	save_item(NAME(m_udc_regs.udcomp));
-	save_item(NAME(m_udc_regs.udcimp));
-	save_item(NAME(m_udc_regs.udccs0));
-	save_item(NAME(m_udc_regs.udccs1));
-	save_item(NAME(m_udc_regs.udccs2));
-	save_item(NAME(m_udc_regs.udcwc));
-	save_item(NAME(m_udc_regs.udcsr));
-
-	save_item(NAME(m_icp_regs.uart.utcr));
-	save_item(NAME(m_icp_regs.uart.utsr0));
-	save_item(NAME(m_icp_regs.uart.utsr1));
-	save_item(NAME(m_icp_regs.uart.rx_fifo));
-	save_item(NAME(m_icp_regs.uart.rx_fifo_read_idx));
-	save_item(NAME(m_icp_regs.uart.rx_fifo_write_idx));
-	save_item(NAME(m_icp_regs.uart.rx_fifo_count));
 	m_icp_regs.uart_rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::icp_rx_callback), this));
-	save_item(NAME(m_icp_regs.uart.tx_fifo));
-	save_item(NAME(m_icp_regs.uart.tx_fifo_read_idx));
-	save_item(NAME(m_icp_regs.uart.tx_fifo_write_idx));
-	save_item(NAME(m_icp_regs.uart.tx_fifo_count));
 	m_icp_regs.uart_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::icp_tx_callback), this));
-	save_item(NAME(m_icp_regs.uart.rx_break_interlock));
-
-	save_item(NAME(m_icp_regs.utcr4));
-	save_item(NAME(m_icp_regs.hssp.hscr0));
-	save_item(NAME(m_icp_regs.hssp.hscr1));
-	save_item(NAME(m_icp_regs.hssp.hssr0));
-	save_item(NAME(m_icp_regs.hssp.hssr1));
-	save_item(NAME(m_icp_regs.hssp.rx_fifo));
-	save_item(NAME(m_icp_regs.hssp.rx_fifo_read_idx));
-	save_item(NAME(m_icp_regs.hssp.rx_fifo_write_idx));
-	save_item(NAME(m_icp_regs.hssp.rx_fifo_count));
 	m_icp_regs.hssp.rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::hssp_rx_callback), this));
-	save_item(NAME(m_icp_regs.hssp.tx_fifo));
-	save_item(NAME(m_icp_regs.hssp.tx_fifo_read_idx));
-	save_item(NAME(m_icp_regs.hssp.tx_fifo_write_idx));
-	save_item(NAME(m_icp_regs.hssp.tx_fifo_count));
 	m_icp_regs.hssp.tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::hssp_tx_callback), this));
-
-	save_item(NAME(m_uart_regs.utcr));
-	save_item(NAME(m_uart_regs.utsr0));
-	save_item(NAME(m_uart_regs.utsr1));
-	save_item(NAME(m_uart_regs.rx_fifo));
-	save_item(NAME(m_uart_regs.rx_fifo_read_idx));
-	save_item(NAME(m_uart_regs.rx_fifo_write_idx));
-	save_item(NAME(m_uart_regs.rx_fifo_count));
-	save_item(NAME(m_uart_regs.tx_fifo));
-	save_item(NAME(m_uart_regs.tx_fifo_read_idx));
-	save_item(NAME(m_uart_regs.tx_fifo_write_idx));
-	save_item(NAME(m_uart_regs.tx_fifo_count));
-	save_item(NAME(m_uart_regs.rx_break_interlock));
-
-	save_item(NAME(m_mcp_regs.mccr0));
-	save_item(NAME(m_mcp_regs.mccr1));
-	save_item(NAME(m_mcp_regs.mcdr2));
-	save_item(NAME(m_mcp_regs.mcsr));
-	save_item(NAME(m_mcp_regs.audio_rx_fifo));
-	save_item(NAME(m_mcp_regs.audio_rx_fifo_read_idx));
-	save_item(NAME(m_mcp_regs.audio_rx_fifo_write_idx));
-	save_item(NAME(m_mcp_regs.audio_rx_fifo_count));
-	save_item(NAME(m_mcp_regs.audio_tx_fifo));
-	save_item(NAME(m_mcp_regs.audio_tx_fifo_read_idx));
-	save_item(NAME(m_mcp_regs.audio_tx_fifo_write_idx));
-	save_item(NAME(m_mcp_regs.audio_tx_fifo_count));
 	m_mcp_regs.audio_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::mcp_audio_tx_callback), this));
-	save_item(NAME(m_mcp_regs.telecom_rx_fifo));
-	save_item(NAME(m_mcp_regs.telecom_rx_fifo_read_idx));
-	save_item(NAME(m_mcp_regs.telecom_rx_fifo_write_idx));
-	save_item(NAME(m_mcp_regs.telecom_rx_fifo_count));
-	save_item(NAME(m_mcp_regs.telecom_tx_fifo));
-	save_item(NAME(m_mcp_regs.telecom_tx_fifo_read_idx));
-	save_item(NAME(m_mcp_regs.telecom_tx_fifo_write_idx));
-	save_item(NAME(m_mcp_regs.telecom_tx_fifo_count));
 	m_mcp_regs.telecom_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::mcp_telecom_tx_callback), this));
-
-	save_item(NAME(m_ssp_regs.sscr0));
-	save_item(NAME(m_ssp_regs.sscr1));
-	save_item(NAME(m_ssp_regs.sssr));
-	save_item(NAME(m_ssp_regs.rx_fifo));
-	save_item(NAME(m_ssp_regs.rx_fifo_read_idx));
-	save_item(NAME(m_ssp_regs.rx_fifo_write_idx));
-	save_item(NAME(m_ssp_regs.rx_fifo_count));
 	m_ssp_regs.rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::ssp_rx_callback), this));
-	save_item(NAME(m_ssp_regs.tx_fifo));
-	save_item(NAME(m_ssp_regs.tx_fifo_read_idx));
-	save_item(NAME(m_ssp_regs.tx_fifo_write_idx));
-	save_item(NAME(m_ssp_regs.tx_fifo_count));
 	m_ssp_regs.tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::ssp_tx_callback), this));
-
-	save_item(NAME(m_ostmr_regs.osmr));
-	save_item(NAME(m_ostmr_regs.oscr));
-	save_item(NAME(m_ostmr_regs.ossr));
-	save_item(NAME(m_ostmr_regs.ower));
-	save_item(NAME(m_ostmr_regs.oier));
 	for (int i = 0; i < 4; i++)
 	{
 		m_ostmr_regs.timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::ostimer_tick_cb), this));
 	}
 
-	save_item(NAME(m_rtc_regs.rtar));
-	save_item(NAME(m_rtc_regs.rcnr));
-	save_item(NAME(m_rtc_regs.rttr));
-	save_item(NAME(m_rtc_regs.rtsr));
 	m_rtc_regs.tick_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sa1110_periphs_device::rtc_tick_cb), this));
-
-	save_item(NAME(m_power_regs.pmcr));
-	save_item(NAME(m_power_regs.pssr));
-	save_item(NAME(m_power_regs.pspr));
-	save_item(NAME(m_power_regs.pwer));
-	save_item(NAME(m_power_regs.pcfr));
-	save_item(NAME(m_power_regs.ppcr));
-	save_item(NAME(m_power_regs.pgsr));
-	save_item(NAME(m_power_regs.posr));
-
-	save_item(NAME(m_rcsr));
-
-	save_item(NAME(m_gpio_regs.gplr));
-	save_item(NAME(m_gpio_regs.gpdr));
-	save_item(NAME(m_gpio_regs.grer));
-	save_item(NAME(m_gpio_regs.gfer));
-	save_item(NAME(m_gpio_regs.gedr));
-	save_item(NAME(m_gpio_regs.gafr));
-	save_item(NAME(m_gpio_regs.any_edge_mask));
-	save_item(NAME(m_gpio_regs.output_latch));
-	save_item(NAME(m_gpio_regs.input_latch));
-	save_item(NAME(m_gpio_regs.alt_output_latch));
-	save_item(NAME(m_gpio_regs.alt_input_latch));
-
-	save_item(NAME(m_intc_regs.icip));
-	save_item(NAME(m_intc_regs.icmr));
-	save_item(NAME(m_intc_regs.iclr));
-	save_item(NAME(m_intc_regs.iccr));
-	save_item(NAME(m_intc_regs.icfp));
-	save_item(NAME(m_intc_regs.icpr));
-
-	save_item(NAME(m_ppc_regs.ppdr));
-	save_item(NAME(m_ppc_regs.ppsr));
-	save_item(NAME(m_ppc_regs.ppar));
-	save_item(NAME(m_ppc_regs.psdr));
-	save_item(NAME(m_ppc_regs.ppfr));
-
-	save_item(STRUCT_MEMBER(m_dma_regs, ddar));
-	save_item(STRUCT_MEMBER(m_dma_regs, dsr));
-	save_item(STRUCT_MEMBER(m_dma_regs, dbs));
-	save_item(STRUCT_MEMBER(m_dma_regs, dbt));
-	save_item(NAME(m_dma_active_mask));
 
 	m_gpio_out.resolve_all_safe();
 	m_ssp_out.resolve_safe();
 	m_uart3_tx_out.resolve_safe();
+}
+
+void sa1110_periphs_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_udc_regs))
+		.reg(NAME(m_icp_regs))
+		.reg(NAME(m_uart_regs))
+		.reg(NAME(m_mcp_regs))
+		.reg(NAME(m_ssp_regs))
+		.reg(NAME(m_ostmr_regs))
+		.reg(NAME(m_rtc_regs))
+		.reg(NAME(m_power_regs))
+		.reg(NAME(m_rcsr))
+		.reg(NAME(m_gpio_regs))
+		.reg(NAME(m_intc_regs))
+		.reg(NAME(m_ppc_regs))
+		.reg(NAME(m_dma_regs))
+		.reg(NAME(m_dma_active_mask));
 }
 
 void sa1110_periphs_device::device_reset()

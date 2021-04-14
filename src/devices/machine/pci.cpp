@@ -103,13 +103,16 @@ void pci_device::device_start()
 
 	bank_count = 0;
 	bank_reg_count = 0;
+}
 
-	save_item(STRUCT_MEMBER(bank_infos, adr));
-	save_item(NAME(command));
-	save_item(NAME(command_mask));
-	save_item(NAME(status));
-	save_item(NAME(intr_line));
-	save_item(NAME(intr_pin));
+void pci_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(bank_infos))
+		.reg(NAME(command))
+		.reg(NAME(command_mask))
+		.reg(NAME(status))
+		.reg(NAME(intr_line))
+		.reg(NAME(intr_pin));
 }
 
 void pci_device::device_reset()

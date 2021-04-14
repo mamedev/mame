@@ -123,66 +123,6 @@ void scc68070_device::device_start()
 {
 	scc68070_base_device::device_start();
 
-	save_item(NAME(m_ipl));
-
-	save_item(NAME(m_in2_line));
-	save_item(NAME(m_in4_line));
-	save_item(NAME(m_in5_line));
-	save_item(NAME(m_nmi_line));
-
-	save_item(NAME(m_int1_line));
-	save_item(NAME(m_int2_line));
-	save_item(NAME(m_lir));
-
-	save_item(NAME(m_picr1));
-	save_item(NAME(m_picr2));
-	save_item(NAME(m_timer_int));
-	save_item(NAME(m_i2c_int));
-	save_item(NAME(m_uart_rx_int));
-	save_item(NAME(m_uart_tx_int));
-
-	save_item(NAME(m_i2c.data_register));
-	save_item(NAME(m_i2c.address_register));
-	save_item(NAME(m_i2c.status_register));
-	save_item(NAME(m_i2c.control_register));
-	save_item(NAME(m_i2c.clock_control_register));
-
-	save_item(NAME(m_uart.mode_register));
-	save_item(NAME(m_uart.status_register));
-	save_item(NAME(m_uart.clock_select));
-	save_item(NAME(m_uart.command_register));
-	save_item(NAME(m_uart.receive_holding_register));
-	save_item(NAME(m_uart.receive_pointer));
-	save_item(NAME(m_uart.receive_buffer));
-	save_item(NAME(m_uart.transmit_holding_register));
-	save_item(NAME(m_uart.transmit_pointer));
-	save_item(NAME(m_uart.transmit_buffer));
-	save_item(NAME(m_uart.transmit_ctsn));
-
-	save_item(NAME(m_timers.timer_status_register));
-	save_item(NAME(m_timers.timer_control_register));
-	save_item(NAME(m_timers.reload_register));
-	save_item(NAME(m_timers.timer0));
-	save_item(NAME(m_timers.timer1));
-	save_item(NAME(m_timers.timer2));
-
-	save_item(STRUCT_MEMBER(m_dma.channel, channel_status));
-	save_item(STRUCT_MEMBER(m_dma.channel, channel_error));
-	save_item(STRUCT_MEMBER(m_dma.channel, device_control));
-	save_item(STRUCT_MEMBER(m_dma.channel, operation_control));
-	save_item(STRUCT_MEMBER(m_dma.channel, sequence_control));
-	save_item(STRUCT_MEMBER(m_dma.channel, channel_control));
-	save_item(STRUCT_MEMBER(m_dma.channel, transfer_counter));
-	save_item(STRUCT_MEMBER(m_dma.channel, memory_address_counter));
-	save_item(STRUCT_MEMBER(m_dma.channel, device_address_counter));
-
-	save_item(NAME(m_mmu.status));
-	save_item(NAME(m_mmu.control));
-	save_item(STRUCT_MEMBER(m_mmu.desc, attr));
-	save_item(STRUCT_MEMBER(m_mmu.desc, length));
-	save_item(STRUCT_MEMBER(m_mmu.desc, segment));
-	save_item(STRUCT_MEMBER(m_mmu.desc, base));
-
 	m_timers.timer0_timer = timer_alloc(TIMER_TMR0);
 	m_timers.timer0_timer->adjust(attotime::never);
 
@@ -192,6 +132,40 @@ void scc68070_device::device_start()
 	m_uart.tx_timer = timer_alloc(TIMER_UART_TX);
 	m_uart.tx_timer->adjust(attotime::never);
 }
+
+//-------------------------------------------------
+//  device_register_save - register for save states
+//-------------------------------------------------
+
+void scc68070_device::device_register_save(save_registrar &save)
+{
+	scc68070_base_device::device_register_save(save);
+
+	save.reg(NAME(m_ipl))
+
+		.reg(NAME(m_in2_line))
+		.reg(NAME(m_in4_line))
+		.reg(NAME(m_in5_line))
+		.reg(NAME(m_nmi_line))
+
+		.reg(NAME(m_int1_line))
+		.reg(NAME(m_int2_line))
+		.reg(NAME(m_lir))
+
+		.reg(NAME(m_picr1))
+		.reg(NAME(m_picr2))
+		.reg(NAME(m_timer_int))
+		.reg(NAME(m_i2c_int))
+		.reg(NAME(m_uart_rx_int))
+		.reg(NAME(m_uart_tx_int))
+
+		.reg(NAME(m_i2c))
+		.reg(NAME(m_uart))
+		.reg(NAME(m_timers))
+		.reg(NAME(m_dma))
+		.reg(NAME(m_mmu));
+}
+
 
 //-------------------------------------------------
 //  device_reset - device-specific reset

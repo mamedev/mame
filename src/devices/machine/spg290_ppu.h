@@ -31,6 +31,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	uint32_t regs_r(offs_t offset, uint32_t mem_mask);
 	void regs_w(offs_t offset, uint32_t data, uint32_t mem_mask);
@@ -77,6 +78,17 @@ private:
 		uint32_t nptr;
 		uint32_t blend;
 		uint32_t buf_start[3];
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(control))
+				.reg(NAME(attribute))
+				.reg(NAME(posx))
+				.reg(NAME(posy))
+				.reg(NAME(nptr))
+				.reg(NAME(blend))
+				.reg(NAME(buf_start));
+		}
 	} m_txs[3];
 };
 

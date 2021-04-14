@@ -51,30 +51,30 @@ void spg290_ppu_device::device_start()
 {
 	m_vblank_irq_cb.resolve_safe();
 	m_space_read_cb.resolve_safe(0);
+}
 
-	save_item(NAME(m_control));
-	save_item(NAME(m_sprite_control));
-	save_item(NAME(m_irq_control));
-	save_item(NAME(m_irq_status));
-	save_item(NAME(m_sprite_max));
-	save_item(NAME(m_sprite_buf_start));
-	save_item(NAME(m_blend_mode));
-	save_item(NAME(m_frame_buff));
-	save_item(NAME(m_transrgb));
-	save_item(NAME(m_vcomp_value));
-	save_item(NAME(m_vcomp_offset));
-	save_item(NAME(m_vcomp_step));
-	save_item(NAME(m_irq_timing_v));
-	save_item(NAME(m_irq_timing_h));
-	save_item(NAME(m_vblank_lines));
+//-------------------------------------------------
+//  device_register_save - register for save states
+//-------------------------------------------------
 
-	save_item(STRUCT_MEMBER(m_txs, control));
-	save_item(STRUCT_MEMBER(m_txs, attribute));
-	save_item(STRUCT_MEMBER(m_txs, posx));
-	save_item(STRUCT_MEMBER(m_txs, posy));
-	save_item(STRUCT_MEMBER(m_txs, nptr));
-	save_item(STRUCT_MEMBER(m_txs, blend));
-	save_item(STRUCT_MEMBER(m_txs, buf_start));
+void spg290_ppu_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_control))
+		.reg(NAME(m_sprite_control))
+		.reg(NAME(m_irq_control))
+		.reg(NAME(m_irq_status))
+		.reg(NAME(m_sprite_max))
+		.reg(NAME(m_sprite_buf_start))
+		.reg(NAME(m_blend_mode))
+		.reg(NAME(m_frame_buff))
+		.reg(NAME(m_transrgb))
+		.reg(NAME(m_vcomp_value))
+		.reg(NAME(m_vcomp_offset))
+		.reg(NAME(m_vcomp_step))
+		.reg(NAME(m_irq_timing_v))
+		.reg(NAME(m_irq_timing_h))
+		.reg(NAME(m_vblank_lines))
+		.reg(NAME(m_txs));
 }
 
 //-------------------------------------------------

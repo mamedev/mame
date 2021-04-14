@@ -75,6 +75,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 
 private:
@@ -89,6 +90,8 @@ private:
 		emu_timer *     timer;
 		uint32_t          count;
 		uint8_t           active;
+
+		void register_save(save_registrar &save) { save.reg(NAME(count)).reg(NAME(active)); }
 	};
 
 	struct galileo_addr_map

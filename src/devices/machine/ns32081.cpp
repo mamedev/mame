@@ -89,20 +89,21 @@ ns32081_device::ns32081_device(machine_config const &mconfig, char const *tag, d
 
 void ns32081_device::device_start()
 {
-	save_item(NAME(m_fsr));
-	save_item(NAME(m_f));
-
-	save_item(NAME(m_idbyte));
-	save_item(NAME(m_opword));
-	save_item(STRUCT_MEMBER(m_op, expected));
-	save_item(STRUCT_MEMBER(m_op, issued));
-	save_item(STRUCT_MEMBER(m_op, value));
-	save_item(NAME(m_status));
-
-	save_item(NAME(m_state));
-	save_item(NAME(m_tcy));
-
 	m_complete = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ns32081_device::complete), this));
+}
+
+void ns32081_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_fsr))
+		.reg(NAME(m_f))
+
+		.reg(NAME(m_idbyte))
+		.reg(NAME(m_opword))
+		.reg(NAME(m_op))
+		.reg(NAME(m_status))
+
+		.reg(NAME(m_state))
+		.reg(NAME(m_tcy));
 }
 
 void ns32081_device::device_reset()
