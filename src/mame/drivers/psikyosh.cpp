@@ -174,7 +174,7 @@ Notes:
       SH2 - Hitachi HD6417604F28 SH-2 CPU, clock input 28.63635 [57.2727/2] (QFP144)
       YMF278B - Yamaha YMF278B OPL4 sound chip, clock input 28.63635MHz [57.2727/2] (QFP80)
       PROG_H.U17/PROG_L.U18 - 27C4096 DIP40 EPROM
-	  PROG.u16 - 27C802 SOP44 OTP EPROM
+      PROG.u16 - 27C802 SOP44 OTP EPROM
       All other ROMs - 16M/32M SOP44 MaskROM
       * - ROM locations not populated
       VSync - 60Hz
@@ -200,6 +200,7 @@ ROM Usage
 |                                           | 4M          | 32M 32M 32M 32M 32M -   -   -   |           |
 |-------------------------------------------|-------------|---------------------------------|-----------|
 -: Unpopulated
+
 
 Psikyo PS5 hardware readme
 --------------------------
