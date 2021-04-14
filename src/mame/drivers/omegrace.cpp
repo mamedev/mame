@@ -268,7 +268,7 @@ private:
 	uint8_t vg_go_r();
 	uint8_t spinner1_r();
 	uint8_t spinner2_r();
-	void omegrace_leds_w(uint8_t data);
+	void outputs_w(uint8_t data);
 
 	emu_timer *m_gbnmi;
 };
@@ -328,7 +328,7 @@ uint8_t omegrace_state::vg_go_r()
  * Encoder bit mappings
  * The encoder is a 64 way switch, with the inputs scrambled
  * on the input port (and shifted 2 bits to the left for the
- * 1 player encoder
+ * 1 player encoder)
  *
  * 3 6 5 4 7 2 for encoder 1 (shifted two bits left..)
  *
@@ -366,7 +366,7 @@ uint8_t omegrace_state::spinner2_r()
  *
  *************************************/
 
-void omegrace_state::omegrace_leds_w(uint8_t data)
+void omegrace_state::outputs_w(uint8_t data)
 {
 	/* bits 0 and 1 are coin counters */
 	machine().bookkeeping().coin_counter_w(0,data & 0x01);
@@ -410,7 +410,7 @@ void omegrace_state::port_map(address_map &map)
 	map(0x17, 0x17).portr("DSW2");               /* DIP SW C6 */
 	map(0x11, 0x11).portr("IN0");                /* Player 1 input */
 	map(0x12, 0x12).portr("IN1");                /* Player 2 input */
-	map(0x13, 0x13).w(FUNC(omegrace_state::omegrace_leds_w)); /* coin counters, leds, flip screen */
+	map(0x13, 0x13).w(FUNC(omegrace_state::outputs_w)); /* coin counters, leds, flip screen */
 	map(0x14, 0x14).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x15, 0x15).r(FUNC(omegrace_state::spinner1_r)); /* 1st controller */
 	map(0x16, 0x16).r(FUNC(omegrace_state::spinner2_r)); /* 2nd controller (cocktail) */
