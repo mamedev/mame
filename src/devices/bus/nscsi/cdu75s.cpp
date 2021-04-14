@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:AJR
+// copyright-holders:Olivier Galibert
 /*******************************************************************************
 
     Skeleton device for Sony/Apple CDU75S 2x cdrom reader
@@ -7,7 +7,7 @@
 *******************************************************************************/
 
 // Chips:
-// - IC101: CXA1841Q       - ? probably something related to audio
+// - IC101: CXA1841Q       - RF signal analog amplifier
 // - IC102: CXA1182Q-Z     - servo control
 // - IC103: CXD2510Q       - CD DSP
 // - IC105: BU4053BCF      - analog mux/demux
@@ -22,7 +22,7 @@
 #include "emu.h"
 #include "cdu75s.h"
 
-DEFINE_DEVICE_TYPE(CDU75S, cdu75s_device, "cdu75s", "Philips CDU75S CD-R")
+DEFINE_DEVICE_TYPE(CDU75S, cdu75s_device, "cdu75s", "Sony/Apple CDU75S CD-R")
 
 cdu75s_device::cdu75s_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, CDU75S, tag, owner, clock)
@@ -64,7 +64,7 @@ void cdu75s_device::mem_map(address_map &map)
 	map(0x00000, 0x1ffff).rom().region("mcu", 0);
 	map(0x40000, 0x4000f).m(m_scsi, FUNC(ncr53c94_device::map));
 
-	map(0x60000, 0x60007); // General i/o?
+	map(0x60000, 0x60007); // CXD8532Q
 	map(0x60005, 0x60005).r(FUNC(cdu75s_device::jumpers_r));
 
 	map(0xc0000, 0xc003f); // CXD1808AQ
