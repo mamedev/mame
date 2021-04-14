@@ -18,7 +18,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="lsdos631">
+	<software name="lsdos631" supported="no">
 		<description>LS-DOS v6.3.1A</description>
 		<year>1990</year>
 		<publisher>Misosys</publisher>
@@ -66,7 +66,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tdos42" cloneof="tdos12">
+	<software name="tdos42" cloneof="tdos12" supported="no">
 		<description>TRSDOS II v4.2 &amp; TRSDOS16 v4.1</description>
 		<year>1979</year>
 		<publisher>Tandy</publisher>
@@ -104,7 +104,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="xenix302">
+	<software name="xenix302" supported="no">
 		<description>XENIX v3.02</description>
 		<year>198?</year>
 		<publisher>Tandy</publisher>
@@ -140,7 +140,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="xenix32" cloneof="xenix302">
+	<software name="xenix32" cloneof="xenix302" supported="no">
 		<description>XENIX v3.2</description>
 		<year>1987</year>
 		<publisher>Tandy</publisher>
@@ -181,7 +181,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="xenix30d">
+	<software name="xenix30d" supported="no">
 		<description>Xenix Development System v3.0</description>
 		<year>1985</year>
 		<publisher>Tandy</publisher>

@@ -58,14 +58,13 @@ To Do / Status:
 --------------
 
 JV3: Cannot write, due to an emulation bug causing the machine to hang.
-JV1: if you try to create a disk in the File Manager, MAME will crash.
-DMK: no option to create.
-IMD: does not work with a quad drive.
+JV1: If you try to create a disk in the File Manager, MAME will crash.
+DMK: Cannot write (no option).
+IMD: Does not work with a quad drive. Cannot write.
 
 trs80m3:   Works
 
 trs80m4:   Works
-           Need to check banking
 
 trs80m4p:  Floppy not working, so machine is useless.
            In debugger g 402a, then pc=0;g and it will boot.

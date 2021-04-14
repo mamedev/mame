@@ -110,7 +110,7 @@ const jv1_format::format jv1_format::formats[] =
 const floppy_format_type FLOPPY_JV1_FORMAT = &floppy_image_format_creator<jv1_format>;
 
 
-#define MAX_SECTORS 18
+#define MAX_SECTORS 19
 #define MAX_TRACKS 96
 
 jv3_format::jv3_format()
