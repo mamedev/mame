@@ -6,12 +6,17 @@
 
 ****************************************************************************
 
-    Known bugs:
-        * LED connected to stop lights no longer working
+Known bugs:
+* LED connected to stop lights no longer working
 
-    To do for each game:
-        * verify analog input min/max
-        * verify protection
+To do for each game:
+* verify analog input min/max
+* verify protection
+
+BTANB:
+* there are plenty, but the most notorious one is that outrun's opr-10188
+  is bad with a stuck d5. This was fixed by M2/Sega for the 3DS version,
+  and also included in the newer 'enhanced edition'
 
 --
 
@@ -2979,7 +2984,7 @@ void segaorun_state::init_shangon()
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR, NAME,     PARENT,  MACHINE,         INPUT,    INIT,                   MONITOR,COMPANY,FULLNAME,FLAGS,                                                  LAYOUT
+//    YEAR, NAME,      PARENT,  MACHINE,         INPUT,      INIT,                         MONITOR,COMPANY,FULLNAME,FLAGS,                                                  LAYOUT
 GAMEL(1986, outrun,    0,       outrun,          outrun,     segaorun_state, init_outrun,  ROT0,   "Sega",    "Out Run (sitdown/upright, Rev B)", 0,                        layout_outrun ) // Upright/Sitdown determined by dipswitch settings
 GAMEL(1986, outrunra,  outrun,  outrun,          outrun,     segaorun_state, init_outrun,  ROT0,   "Sega",    "Out Run (sitdown/upright, Rev A)", 0,                        layout_outrun ) // Upright/Sitdown determined by dipswitch settings
 GAMEL(1986, outrundx,  outrun,  outrun,          outrundx,   segaorun_state, init_outrun,  ROT0,   "Sega",    "Out Run (deluxe sitdown)", 0,                                layout_outrun )
@@ -2987,11 +2992,17 @@ GAMEL(1986, outrundxj, outrun,  outrun_fd1089a,  outrundx,   segaorun_state, ini
 GAMEL(1986, outrundxa, outrun,  outrundx,        outrundx,   segaorun_state, init_outrun,  ROT0,   "Sega",    "Out Run (deluxe sitdown earlier version)", 0,                layout_outrun )
 GAMEL(1986, outrunb,   outrun,  outrun,          outrun,     segaorun_state, init_outrunb, ROT0,   "bootleg", "Out Run (bootleg)", 0,                                       layout_outrun )
 
+// aftermarket outrun modifications, these fix various issues in the game, including making the attract mode work correctly when set to Free Play.
+// see http://reassembler.blogspot.co.uk/2011/08/outrun-enhanced-edition.html and http://reassembler.blogspot.com/2020/04/outrun-enhanced-edition-201.html
+GAMEL(2013, outrundxeh,  outrun,  outrun,        outrundxeh, segaorun_state, init_outrun,  ROT0,   "hack (Chris White)", "Out Run (deluxe sitdown) (Enhanced Edition v1.0.3)", 0,         layout_outrun ) // Jan 2013
+GAMEL(2014, outruneh,    outrun,  outrun,        outruneh,   segaorun_state, init_outrun,  ROT0,   "hack (Chris White)", "Out Run (sitdown/upright, Rev B) (Enhanced Edition v1.1.0)", 0, layout_outrun ) // Upright/Sitdown determined by dipswitch settings - July 2014
+
 GAME( 1987, shangon,   0,       shangon,         shangon,    segaorun_state, init_shangon, ROT0,   "Sega",    "Super Hang-On (sitdown/upright) (unprotected)", 0 )
 GAME( 1987, shangon3,  shangon, shangon_fd1089b, shangon,    segaorun_state, init_shangon, ROT0,   "Sega",    "Super Hang-On (sitdown/upright) (FD1089B 317-0034)", 0 )
 GAME( 1987, shangon2,  shangon, shangon_fd1089b, shangon,    segaorun_state, init_shangon, ROT0,   "Sega",    "Super Hang-On (mini ride-on, Rev A) (FD1089B 317-0034)", 0 )
 GAME( 1987, shangon1,  shangon, shangon_fd1089b, shangon,    segaorun_state, init_shangon, ROT0,   "Sega",    "Super Hang-On (mini ride-on) (FD1089B 317-0034)", 0 )
 GAME( 1991, shangonle, shangon, shangon,         shangon,    segaorun_state, init_shangon, ROT0,   "Sega",    "Limited Edition Hang-On", 0 )
+GAME( 1987, shangon3d, shangon, shangon,         shangon,    segaorun_state, init_shangon, ROT0,   "bootleg", "Super Hang-On (sitdown/upright) (bootleg of FD1089B 317-0034 set)", 0 )
 
 GAMEL(1989, toutrun,   0,       outrun_fd1094,   toutrun,    segaorun_state, init_outrun,  ROT0,   "Sega",    "Turbo Out Run (Out Run upgrade) (FD1094 317-0118)", 0,        layout_outrun ) // Cabinet determined by dipswitch settings
 GAMEL(1989, toutrunj,  toutrun, outrun_fd1094,   toutrun,    segaorun_state, init_outrun,  ROT0,   "Sega",    "Turbo Out Run (Japan, Out Run upgrade) (FD1094 317-0117)", 0, layout_outrun ) // Cabinet determined by dipswitch settings
@@ -3000,17 +3011,9 @@ GAMEL(1989, toutrun2,  toutrun, outrun_fd1094,   toutrunct,  segaorun_state, ini
 GAMEL(1989, toutrun1,  toutrun, outrun_fd1094,   toutrunm,   segaorun_state, init_outrun,  ROT0,   "Sega",    "Turbo Out Run (deluxe cockpit) (FD1094 317-0109)", 0,         layout_outrun )
 GAMEL(1989, toutrunj1, toutrun, outrun_fd1094,   toutrunct,  segaorun_state, init_outrun,  ROT0,   "Sega",    "Turbo Out Run (Japan, cockpit) (FD1094 317-0101)", 0,         layout_outrun )
 
-// decrypted bootlegs
+// decrypted toutrun bootlegs
 GAMEL(1989, toutrund,  toutrun, outrun,          toutrun,    segaorun_state, init_outrun,  ROT0,   "bootleg",    "Turbo Out Run (Out Run upgrade) (bootleg of FD1094 317-0118 set)", 0,        layout_outrun ) // Cabinet determined by dipswitch settings
 GAMEL(1989, toutrunjd, toutrun, outrun,          toutrun,    segaorun_state, init_outrun,  ROT0,   "bootleg",    "Turbo Out Run (Japan, Out Run upgrade) (bootleg of FD1094 317-0117 set)", 0, layout_outrun ) // Cabinet determined by dipswitch settings
 GAMEL(1989, toutrun3d, toutrun, outrun,          toutrunc,   segaorun_state, init_outrun,  ROT0,   "bootleg",    "Turbo Out Run (cockpit) (bootleg of FD1094 317-0107 set)", 0,                layout_outrun )
 GAMEL(1989, toutrunj1d,toutrun, outrun,          toutrunct,  segaorun_state, init_outrun,  ROT0,   "bootleg",    "Turbo Out Run (Japan, cockpit) (bootleg of FD1094 317-0101 set)", 0,         layout_outrun )
 GAMEL(1989, toutrun2d, toutrun, outrun,          toutrunct,  segaorun_state, init_outrun,  ROT0,   "bootleg",    "Turbo Out Run (cockpit) (bootleg of FD1094 317-0106 set)", 0,                layout_outrun )
-
-
-GAME( 1987, shangon3d, shangon, shangon,         shangon,    segaorun_state, init_shangon, ROT0,   "bootleg",    "Super Hang-On (sitdown/upright) (bootleg of FD1089B 317-0034 set)", 0 )
-
-// aftermarket modifications, these fix various issues in the game, including making the attract mode work correctly when set to Free Play.
-// see http://reassembler.blogspot.co.uk/2011/08/outrun-enhanced-edition.html
-GAMEL(2013, outrundxeh,  outrun,  outrun,        outrundxeh, segaorun_state, init_outrun,  ROT0,   "hack (Chris White)",    "Out Run (deluxe sitdown) (Enhanced Edition v1.0.3)", 0,                                layout_outrun ) // Jan 2013
-GAMEL(2014, outruneh,    outrun,  outrun,        outruneh,   segaorun_state, init_outrun,  ROT0,   "hack (Chris White)",    "Out Run (sitdown/upright, Rev B) (Enhanced Edition v1.1.0)", 0,                        layout_outrun ) // Upright/Sitdown determined by dipswitch settings - July 2014
