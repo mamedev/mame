@@ -203,31 +203,19 @@ void es550x_device::device_start()
 	m_read_port_cb.resolve();
 	m_sample_rate_changed_cb.resolve();
 	m_irqv = 0x80;
+}
 
+void es550x_device::device_register_save(save_registrar &save)
+{
 	// register save
-	save_item(NAME(m_sample_rate));
+	save.reg(NAME(m_sample_rate))
 
-	save_item(NAME(m_current_page));
-	save_item(NAME(m_active_voices));
-	save_item(NAME(m_mode));
-	save_item(NAME(m_irqv));
-	save_item(NAME(m_voice_index));
-
-	save_item(STRUCT_MEMBER(m_voice, control));
-	save_item(STRUCT_MEMBER(m_voice, freqcount));
-	save_item(STRUCT_MEMBER(m_voice, start));
-	save_item(STRUCT_MEMBER(m_voice, end));
-	save_item(STRUCT_MEMBER(m_voice, accum));
-	save_item(STRUCT_MEMBER(m_voice, lvol));
-	save_item(STRUCT_MEMBER(m_voice, rvol));
-	save_item(STRUCT_MEMBER(m_voice, k2));
-	save_item(STRUCT_MEMBER(m_voice, k1));
-	save_item(STRUCT_MEMBER(m_voice, o4n1));
-	save_item(STRUCT_MEMBER(m_voice, o3n1));
-	save_item(STRUCT_MEMBER(m_voice, o3n2));
-	save_item(STRUCT_MEMBER(m_voice, o2n1));
-	save_item(STRUCT_MEMBER(m_voice, o2n2));
-	save_item(STRUCT_MEMBER(m_voice, o1n1));
+		.reg(NAME(m_current_page))
+		.reg(NAME(m_active_voices))
+		.reg(NAME(m_mode))
+		.reg(NAME(m_irqv))
+		.reg(NAME(m_voice_index))
+		.reg(NAME(m_voice));
 }
 
 void es5506_device::device_start()
@@ -272,22 +260,19 @@ void es5506_device::device_start()
 	// 21 bit integer and 11 bit fraction
 	get_accum_mask(ADDRESS_INTEGER_BIT_ES5506, ADDRESS_FRAC_BIT_ES5506);
 
-	// register save
-	save_item(NAME(m_write_latch));
-	save_item(NAME(m_read_latch));
-
-	save_item(NAME(m_wst));
-	save_item(NAME(m_wend));
-	save_item(NAME(m_lrend));
-
-	save_item(STRUCT_MEMBER(m_voice, ecount));
-	save_item(STRUCT_MEMBER(m_voice, lvramp));
-	save_item(STRUCT_MEMBER(m_voice, rvramp));
-	save_item(STRUCT_MEMBER(m_voice, k2ramp));
-	save_item(STRUCT_MEMBER(m_voice, k1ramp));
-	save_item(STRUCT_MEMBER(m_voice, filtcount));
-
 	// success
+}
+
+void es5506_device::device_register_save(save_registrar &save)
+{
+	es550x_device::device_register_save(save);
+
+	// register save
+	save.reg(NAME(m_write_latch))
+		.reg(NAME(m_read_latch))
+		.reg(NAME(m_wst))
+		.reg(NAME(m_wend))
+		.reg(NAME(m_lrend));
 }
 
 //-------------------------------------------------

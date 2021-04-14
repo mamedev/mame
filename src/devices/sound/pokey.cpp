@@ -263,35 +263,6 @@ void pokey_device::device_start()
 	timer_alloc(SYNC_POT);
 	timer_alloc(SYNC_SET_IRQST);
 
-	save_item(STRUCT_MEMBER(m_channel, m_borrow_cnt));
-	save_item(STRUCT_MEMBER(m_channel, m_counter));
-	save_item(STRUCT_MEMBER(m_channel, m_filter_sample));
-	save_item(STRUCT_MEMBER(m_channel, m_output));
-	save_item(STRUCT_MEMBER(m_channel, m_AUDF));
-	save_item(STRUCT_MEMBER(m_channel, m_AUDC));
-
-	save_item(NAME(m_clock_cnt));
-	save_item(NAME(m_p4));
-	save_item(NAME(m_p5));
-	save_item(NAME(m_p9));
-	save_item(NAME(m_p17));
-
-	save_item(NAME(m_POTx));
-	save_item(NAME(m_AUDCTL));
-	save_item(NAME(m_ALLPOT));
-	save_item(NAME(m_KBCODE));
-	save_item(NAME(m_SERIN));
-	save_item(NAME(m_SEROUT));
-	save_item(NAME(m_IRQST));
-	save_item(NAME(m_IRQEN));
-	save_item(NAME(m_SKSTAT));
-	save_item(NAME(m_SKCTL));
-
-	save_item(NAME(m_pot_counter));
-	save_item(NAME(m_kbd_cnt));
-	save_item(NAME(m_kbd_latch));
-	save_item(NAME(m_kbd_state));
-
 	// State support
 
 	state_add(AUDF1_C, "AUDF1", m_channel[0].m_AUDF);
@@ -314,6 +285,38 @@ void pokey_device::device_start()
 
 	// set our instruction counter
 	set_icountptr(m_icount);
+}
+
+
+//-------------------------------------------------
+//  device_register_save - register for save states
+//-------------------------------------------------
+
+void pokey_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_channel))
+
+		.reg(NAME(m_clock_cnt))
+		.reg(NAME(m_p4))
+		.reg(NAME(m_p5))
+		.reg(NAME(m_p9))
+		.reg(NAME(m_p17))
+
+		.reg(NAME(m_POTx))
+		.reg(NAME(m_AUDCTL))
+		.reg(NAME(m_ALLPOT))
+		.reg(NAME(m_KBCODE))
+		.reg(NAME(m_SERIN))
+		.reg(NAME(m_SEROUT))
+		.reg(NAME(m_IRQST))
+		.reg(NAME(m_IRQEN))
+		.reg(NAME(m_SKSTAT))
+		.reg(NAME(m_SKCTL))
+
+		.reg(NAME(m_pot_counter))
+		.reg(NAME(m_kbd_cnt))
+		.reg(NAME(m_kbd_latch))
+		.reg(NAME(m_kbd_state));
 }
 
 //-------------------------------------------------

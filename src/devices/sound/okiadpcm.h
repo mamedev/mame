@@ -34,6 +34,14 @@ public:
 	int32_t   m_loop_step;
 	bool      m_saved;
 
+	void register_save(save_registrar &save)
+	{
+		save.reg(NAME(m_signal))
+			.reg(NAME(m_step))
+			.reg(NAME(m_loop_signal))
+			.reg(NAME(m_loop_step));
+	}
+
 private:
 	static const int8_t s_index_shift[8];
 	static int s_diff_lookup[49*16];
@@ -63,6 +71,14 @@ public:
 	int32_t   m_loop_signal;
 	int32_t   m_loop_step;
 	bool      m_saved;
+
+	void register_save(save_registrar &save)
+	{
+		save.reg(NAME(m_signal))
+			.reg(NAME(m_step))
+			.reg(NAME(m_loop_signal))
+			.reg(NAME(m_loop_step));
+	}
 
 private:
 	static const int8_t s_index_shift[8];

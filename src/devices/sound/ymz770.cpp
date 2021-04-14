@@ -88,50 +88,26 @@ void ymz770_device::device_start()
 		sequence.is_playing = false;
 	for (auto & sqc : m_sqcs)
 		sqc.is_playing = false;
+}
 
+
+//-------------------------------------------------
+//  device_register_save - register for save states
+//-------------------------------------------------
+
+void ymz770_device::device_register_save(save_registrar &save)
+{
 	// register for save states
-	save_item(NAME(m_cur_reg));
-	save_item(NAME(m_mute));
-	save_item(NAME(m_doen));
-	save_item(NAME(m_vlma));
-	save_item(NAME(m_vlma1));
-	save_item(NAME(m_bsl));
-	save_item(NAME(m_cpl));
-
-	save_item(STRUCT_MEMBER(m_channels, phrase));
-	save_item(STRUCT_MEMBER(m_channels, pan));
-	save_item(STRUCT_MEMBER(m_channels, pan_delay));
-	save_item(STRUCT_MEMBER(m_channels, pan1));
-	save_item(STRUCT_MEMBER(m_channels, pan1_delay));
-	save_item(STRUCT_MEMBER(m_channels, volume));
-	save_item(STRUCT_MEMBER(m_channels, volume_target));
-	save_item(STRUCT_MEMBER(m_channels, volume_delay));
-	save_item(STRUCT_MEMBER(m_channels, volume2));
-	save_item(STRUCT_MEMBER(m_channels, loop));
-	save_item(STRUCT_MEMBER(m_channels, is_playing));
-	save_item(STRUCT_MEMBER(m_channels, last_block));
-	save_item(STRUCT_MEMBER(m_channels, is_paused));
-	save_item(STRUCT_MEMBER(m_channels, output_remaining));
-	save_item(STRUCT_MEMBER(m_channels, output_ptr));
-	save_item(STRUCT_MEMBER(m_channels, atbl));
-	save_item(STRUCT_MEMBER(m_channels, pptr));
-	save_item(STRUCT_MEMBER(m_channels, output_data));
-
-	save_item(STRUCT_MEMBER(m_sequences, delay));
-	save_item(STRUCT_MEMBER(m_sequences, sequence));
-	save_item(STRUCT_MEMBER(m_sequences, timer));
-	save_item(STRUCT_MEMBER(m_sequences, stopchan));
-	save_item(STRUCT_MEMBER(m_sequences, loop));
-	save_item(STRUCT_MEMBER(m_sequences, bank));
-	save_item(STRUCT_MEMBER(m_sequences, is_playing));
-	save_item(STRUCT_MEMBER(m_sequences, is_paused));
-	save_item(STRUCT_MEMBER(m_sequences, offset));
-
-	save_item(STRUCT_MEMBER(m_sqcs, sqc));
-	save_item(STRUCT_MEMBER(m_sqcs, loop));
-	save_item(STRUCT_MEMBER(m_sqcs, is_playing));
-	save_item(STRUCT_MEMBER(m_sqcs, is_waiting));
-	save_item(STRUCT_MEMBER(m_sqcs, offset));
+	save.reg(NAME(m_cur_reg))
+		.reg(NAME(m_mute))
+		.reg(NAME(m_doen))
+		.reg(NAME(m_vlma))
+		.reg(NAME(m_vlma1))
+		.reg(NAME(m_bsl))
+		.reg(NAME(m_cpl))
+		.reg(NAME(m_channels))
+		.reg(NAME(m_sequences))
+		.reg(NAME(m_sqcs));
 }
 
 

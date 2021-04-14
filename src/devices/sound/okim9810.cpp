@@ -113,53 +113,36 @@ void okim9810_device::device_start()
 {
 	// create the stream
 	m_stream = stream_alloc(0, 2, clock());
+}
 
+
+//-------------------------------------------------
+//  device_register_save - register for save states
+//-------------------------------------------------
+
+void okim9810_device::device_register_save(save_registrar &save)
+{
 	// save state stuff
-	save_item(NAME(m_TMP_register));
-	save_item(NAME(m_global_volume));
-	save_item(NAME(m_filter_type));
-	save_item(NAME(m_output_level));
+	save.reg(NAME(m_TMP_register))
+		.reg(NAME(m_global_volume))
+		.reg(NAME(m_filter_type))
+		.reg(NAME(m_output_level))
 
-	save_item(NAME(m_dadr));
-	save_item(NAME(m_dadr_start_offset));
-	save_item(NAME(m_dadr_end_offset));
-	save_item(NAME(m_dadr_flags));
+		.reg(NAME(m_dadr))
+		.reg(NAME(m_dadr_start_offset))
+		.reg(NAME(m_dadr_end_offset))
+		.reg(NAME(m_dadr_flags))
 
-	save_item(NAME(m_serial));
-	save_item(NAME(m_serial_read_latch));
-	save_item(NAME(m_serial_write_latch));
-	save_item(NAME(m_serial_bits));
-	save_item(NAME(m_ud));
-	save_item(NAME(m_si));
-	save_item(NAME(m_sd));
-	save_item(NAME(m_cmd));
+		.reg(NAME(m_serial))
+		.reg(NAME(m_serial_read_latch))
+		.reg(NAME(m_serial_write_latch))
+		.reg(NAME(m_serial_bits))
+		.reg(NAME(m_ud))
+		.reg(NAME(m_si))
+		.reg(NAME(m_sd))
+		.reg(NAME(m_cmd))
 
-	for  (int i = 0; i < OKIM9810_VOICES; i++)
-	{
-		okim_voice *voice = &m_voice[i];
-
-		// can't use STRUCT_MEMBER on nested structs
-		save_item(NAME(voice->m_adpcm.m_signal), i);
-		save_item(NAME(voice->m_adpcm.m_step), i);
-		save_item(NAME(voice->m_adpcm2.m_signal), i);
-		save_item(NAME(voice->m_adpcm2.m_step), i);
-	}
-
-	save_item(STRUCT_MEMBER(m_voice, m_playbackAlgo));
-	save_item(STRUCT_MEMBER(m_voice, m_looping));
-	save_item(STRUCT_MEMBER(m_voice, m_startFlags));
-	save_item(STRUCT_MEMBER(m_voice, m_endFlags));
-	save_item(STRUCT_MEMBER(m_voice, m_base_offset));
-	save_item(STRUCT_MEMBER(m_voice, m_count));
-	save_item(STRUCT_MEMBER(m_voice, m_samplingFreq));
-	save_item(STRUCT_MEMBER(m_voice, m_playing));
-	save_item(STRUCT_MEMBER(m_voice, m_sample));
-	save_item(STRUCT_MEMBER(m_voice, m_channel_volume));
-	save_item(STRUCT_MEMBER(m_voice, m_pan_volume_left));
-	save_item(STRUCT_MEMBER(m_voice, m_pan_volume_right));
-	save_item(STRUCT_MEMBER(m_voice, m_startSample));
-	save_item(STRUCT_MEMBER(m_voice, m_endSample));
-	save_item(STRUCT_MEMBER(m_voice, m_interpSampleNum));
+		.reg(NAME(m_voice));
 }
 
 

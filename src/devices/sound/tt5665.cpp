@@ -152,23 +152,21 @@ void tt5665_device::device_start()
 
 	// create the stream
 	m_stream = stream_alloc(0, 2, clock() / freq_divider());
+}
 
-	save_item(NAME(m_command));
-	save_item(NAME(m_ss_state));
-	save_item(NAME(m_s0_s1_state));
-	save_item(NAME(m_daol_output));
-	save_item(NAME(m_daol_timing));
 
-	save_item(STRUCT_MEMBER(m_voice, m_playing));
-	save_item(STRUCT_MEMBER(m_voice, m_sample));
-	save_item(STRUCT_MEMBER(m_voice, m_count));
-	save_item(STRUCT_MEMBER(m_voice, m_volume));
-	save_item(STRUCT_MEMBER(m_voice, m_base_offset));
-	for (int voicenum = 0; voicenum < TT5665_VOICES * 2; voicenum++)
-	{
-		save_item(NAME(m_voice[voicenum].m_adpcm.m_signal), voicenum);
-		save_item(NAME(m_voice[voicenum].m_adpcm.m_step), voicenum);
-	}
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tt5665_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_voice))
+		.reg(NAME(m_command))
+		.reg(NAME(m_ss_state))
+		.reg(NAME(m_s0_s1_state))
+		.reg(NAME(m_daol_output))
+		.reg(NAME(m_daol_timing));
 }
 
 

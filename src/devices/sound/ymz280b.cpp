@@ -566,47 +566,29 @@ void ymz280b_device::device_start()
 	assert(MAX_SAMPLE_CHUNK < 0x10000);
 	m_scratch = std::make_unique<s16[]>(MAX_SAMPLE_CHUNK);
 
-	/* state save */
-	save_item(NAME(m_current_register));
-	save_item(NAME(m_status_register));
-	save_item(NAME(m_irq_state));
-	save_item(NAME(m_irq_mask));
-	save_item(NAME(m_irq_enable));
-	save_item(NAME(m_keyon_enable));
-	save_item(NAME(m_ext_mem_enable));
-	save_item(NAME(m_ext_mem_address));
-	save_item(NAME(m_ext_readlatch));
-	save_item(NAME(m_ext_mem_address_hi));
-	save_item(NAME(m_ext_mem_address_mid));
-
-	save_item(STRUCT_MEMBER(m_voice, playing));
-	save_item(STRUCT_MEMBER(m_voice, ended));
-	save_item(STRUCT_MEMBER(m_voice, keyon));
-	save_item(STRUCT_MEMBER(m_voice, looping));
-	save_item(STRUCT_MEMBER(m_voice, mode));
-	save_item(STRUCT_MEMBER(m_voice, fnum));
-	save_item(STRUCT_MEMBER(m_voice, level));
-	save_item(STRUCT_MEMBER(m_voice, pan));
-	save_item(STRUCT_MEMBER(m_voice, start));
-	save_item(STRUCT_MEMBER(m_voice, stop));
-	save_item(STRUCT_MEMBER(m_voice, loop_start));
-	save_item(STRUCT_MEMBER(m_voice, loop_end));
-	save_item(STRUCT_MEMBER(m_voice, position));
-	save_item(STRUCT_MEMBER(m_voice, signal));
-	save_item(STRUCT_MEMBER(m_voice, step));
-	save_item(STRUCT_MEMBER(m_voice, loop_signal));
-	save_item(STRUCT_MEMBER(m_voice, loop_step));
-	save_item(STRUCT_MEMBER(m_voice, loop_count));
-	save_item(STRUCT_MEMBER(m_voice, output_left));
-	save_item(STRUCT_MEMBER(m_voice, output_right));
-	save_item(STRUCT_MEMBER(m_voice, output_pos));
-	save_item(STRUCT_MEMBER(m_voice, last_sample));
-	save_item(STRUCT_MEMBER(m_voice, curr_sample));
-	save_item(STRUCT_MEMBER(m_voice, irq_schedule));
-
 #if YMZ280B_MAKE_WAVS
 	m_wavresample = wav_open("resamp.wav", INTERNAL_SAMPLE_RATE, 2);
 #endif
+}
+
+//-------------------------------------------------
+//  device_register_save - register for save states
+//-------------------------------------------------
+
+void ymz280b_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_voice))
+		.reg(NAME(m_current_register))
+		.reg(NAME(m_status_register))
+		.reg(NAME(m_irq_state))
+		.reg(NAME(m_irq_mask))
+		.reg(NAME(m_irq_enable))
+		.reg(NAME(m_keyon_enable))
+		.reg(NAME(m_ext_mem_enable))
+		.reg(NAME(m_ext_mem_address))
+		.reg(NAME(m_ext_readlatch))
+		.reg(NAME(m_ext_mem_address_hi))
+		.reg(NAME(m_ext_mem_address_mid));
 }
 
 //-------------------------------------------------

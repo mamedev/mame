@@ -121,18 +121,20 @@ void l7a1045_sound_device::device_start()
 
 	// Allocate the stream
 	m_stream = stream_alloc(0, 2, 66150); //clock() / 384);
+}
 
-	save_item(STRUCT_MEMBER(m_voice, start));
-	save_item(STRUCT_MEMBER(m_voice, end));
-	save_item(STRUCT_MEMBER(m_voice, mode));
-	save_item(STRUCT_MEMBER(m_voice, pos));
-	save_item(STRUCT_MEMBER(m_voice, frac));
-	save_item(STRUCT_MEMBER(m_voice, l_volume));
-	save_item(STRUCT_MEMBER(m_voice, r_volume));
-	save_item(NAME(m_key));
-	save_item(NAME(m_audiochannel));
-	save_item(NAME(m_audioregister));
-	save_item(STRUCT_MEMBER(m_audiodat, dat));
+
+//-------------------------------------------------
+//  device_register_save - register for save states
+//-------------------------------------------------
+
+void l7a1045_sound_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_voice))
+		.reg(NAME(m_key))
+		.reg(NAME(m_audiochannel))
+		.reg(NAME(m_audioregister))
+		.reg(NAME(m_audiodat));
 }
 
 

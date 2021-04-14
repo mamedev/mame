@@ -33,6 +33,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
@@ -60,6 +61,16 @@ private:
 		int volume;     // volume
 		bool key;       // keyon/off
 		s8 waveram[32]; // 32 byte wavetable
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(counter))
+				.reg(NAME(clock))
+				.reg(NAME(frequency))
+				.reg(NAME(volume))
+				.reg(NAME(key))
+				.reg(NAME(waveram));
+		}
 	};
 
 	void make_mixer_table(int voices);

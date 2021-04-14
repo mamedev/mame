@@ -584,43 +584,22 @@ void multipcm_device::device_start()
 		m_linear_to_exp_volume[i] = value_to_fixed(TL_SHIFT, exp_volume);
 	}
 
-	save_item(NAME(m_cur_slot));
-	save_item(NAME(m_address));
-
 	// Slots
 	m_slots = std::make_unique<slot_t []>(28);
 
-	save_pointer(STRUCT_MEMBER(m_slots, m_regs), 28);
-	save_pointer(STRUCT_MEMBER(m_slots, m_playing), 28);
-	save_pointer(STRUCT_MEMBER(m_slots, m_base), 28);
-	save_pointer(STRUCT_MEMBER(m_slots, m_offset), 28);
-	save_pointer(STRUCT_MEMBER(m_slots, m_step), 28);
-	save_pointer(STRUCT_MEMBER(m_slots, m_pan), 28);
-	save_pointer(STRUCT_MEMBER(m_slots, m_total_level), 28);
-	save_pointer(STRUCT_MEMBER(m_slots, m_dest_total_level), 28);
-	save_pointer(STRUCT_MEMBER(m_slots, m_total_level_step), 28);
-	save_pointer(STRUCT_MEMBER(m_slots, m_prev_sample), 28);
-	save_pointer(STRUCT_MEMBER(m_slots, m_format), 28);
-
-	for (int32_t slot = 0; slot < 28; ++slot)
-	{
-		m_slots[slot].m_playing = false;
-
-		save_item(NAME(m_slots[slot].m_envelope_gen.m_volume), slot);
-		save_item(NAME(m_slots[slot].m_envelope_gen.m_state), slot);
-		save_item(NAME(m_slots[slot].m_envelope_gen.step), slot);
-		save_item(NAME(m_slots[slot].m_envelope_gen.m_attack_rate), slot);
-		save_item(NAME(m_slots[slot].m_envelope_gen.m_decay1_rate), slot);
-		save_item(NAME(m_slots[slot].m_envelope_gen.m_decay2_rate), slot);
-		save_item(NAME(m_slots[slot].m_envelope_gen.m_release_rate), slot);
-		save_item(NAME(m_slots[slot].m_envelope_gen.m_decay_level), slot);
-		save_item(NAME(m_slots[slot].m_pitch_lfo.m_phase), slot);
-		save_item(NAME(m_slots[slot].m_pitch_lfo.m_phase_step), slot);
-		save_item(NAME(m_slots[slot].m_amplitude_lfo.m_phase), slot);
-		save_item(NAME(m_slots[slot].m_amplitude_lfo.m_phase_step), slot);
-	}
-
 	lfo_init();
+}
+
+
+//-------------------------------------------------
+//  device_register_save - register for save states
+//-------------------------------------------------
+
+void multipcm_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_slots), 28)
+		.reg(NAME(m_cur_slot))
+		.reg(NAME(m_address));
 }
 
 //-------------------------------------------------

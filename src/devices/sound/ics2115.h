@@ -36,6 +36,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_clock_changed() override;
 
 	// device_sound_interface overrides
@@ -55,6 +56,17 @@ private:
 			u32 acc, start, end; // address counters (20.9 fixed point)
 			u16 fc;              // frequency (6.9 fixed point)
 			u8 ctl, saddr;
+
+			void register_save(save_registrar &save)
+			{
+				save.reg(NAME(left))
+					.reg(NAME(acc))
+					.reg(NAME(start))
+					.reg(NAME(end))
+					.reg(NAME(fc))
+					.reg(NAME(ctl))
+					.reg(NAME(saddr));
+			}
 		} osc;
 
 		struct {
@@ -65,6 +77,19 @@ private:
 			u16 regacc;
 			u8 incr;
 			u8 pan, mode;
+
+			void register_save(save_registrar &save)
+			{
+				save.reg(NAME(left))
+					.reg(NAME(add))
+					.reg(NAME(start))
+					.reg(NAME(end))
+					.reg(NAME(acc))
+					.reg(NAME(regacc))
+					.reg(NAME(incr))
+					.reg(NAME(pan))
+					.reg(NAME(mode));
+			}
 		} vol;
 
 		union {
@@ -80,6 +105,8 @@ private:
 				// IRQ on variable?
 			} bitflags;
 			u8 value;
+
+			void register_save(save_registrar &save) { save.reg(NAME(value)); }
 		} osc_conf;
 
 		union {
@@ -95,6 +122,8 @@ private:
 				// noenvelope == (done | stop)
 			} bitflags;
 			u8 value;
+
+			void register_save(save_registrar &save) { save.reg(NAME(value)); }
 		} vol_ctrl;
 
 		// Possibly redundant state. => improvements of wavetable logic
@@ -102,6 +131,8 @@ private:
 		struct {
 			bool on;
 			int ramp;       // 100 0000 = 0x40 maximum
+
+			void register_save(save_registrar &save) { save.reg(NAME(on)).reg(NAME(ramp)); }
 		} state;
 
 		u16 regs[0x20]; // channel registers
@@ -109,6 +140,16 @@ private:
 		int update_volume_envelope();
 		int update_oscillator();
 		void update_ramp();
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(osc_conf))
+				.reg(NAME(state))
+				.reg(NAME(vol_ctrl))
+				.reg(NAME(osc))
+				.reg(NAME(vol))
+				.reg(NAME(regs));
+		}
 	};
 
 	// internal register helper functions
@@ -139,6 +180,8 @@ private:
 		u8 scale, preset;
 		emu_timer *timer;
 		u64 period;  /* in nsec */
+
+		void register_save(save_registrar &save) { save.reg(NAME(period)).reg(NAME(scale)).reg(NAME(preset)); }
 	} m_timer[2];
 
 	u8 m_active_osc;

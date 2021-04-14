@@ -385,24 +385,14 @@ void c352_device::device_start()
 	}
 	for (int i = 0; i < 128; i++)
 		m_mulawtab[i + 128] = (~m_mulawtab[i]) & 0xffe0;
+}
 
+void c352_device::device_register_save(save_registrar &save)
+{
 	// register save state info
-	save_item(STRUCT_MEMBER(m_c352_v, pos));
-	save_item(STRUCT_MEMBER(m_c352_v, counter));
-	save_item(STRUCT_MEMBER(m_c352_v, sample));
-	save_item(STRUCT_MEMBER(m_c352_v, last_sample));
-	save_item(STRUCT_MEMBER(m_c352_v, vol_f));
-	save_item(STRUCT_MEMBER(m_c352_v, vol_r));
-	save_item(STRUCT_MEMBER(m_c352_v, curr_vol));
-	save_item(STRUCT_MEMBER(m_c352_v, freq));
-	save_item(STRUCT_MEMBER(m_c352_v, flags));
-	save_item(STRUCT_MEMBER(m_c352_v, wave_bank));
-	save_item(STRUCT_MEMBER(m_c352_v, wave_start));
-	save_item(STRUCT_MEMBER(m_c352_v, wave_end));
-	save_item(STRUCT_MEMBER(m_c352_v, wave_loop));
-
-	save_item(NAME(m_random));
-	save_item(NAME(m_control));
+	save.reg(NAME(m_c352_v))
+		.reg(NAME(m_random))
+		.reg(NAME(m_control));
 }
 
 void c352_device::device_reset()

@@ -145,23 +145,12 @@ void c140_device::device_start()
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
 	m_mixer_buffer_left = std::make_unique<s16[]>(m_sample_rate);
 	m_mixer_buffer_right = std::make_unique<s16[]>(m_sample_rate);
+}
 
-	save_item(NAME(m_REG));
-
-	save_item(STRUCT_MEMBER(m_voi, ptoffset));
-	save_item(STRUCT_MEMBER(m_voi, pos));
-	save_item(STRUCT_MEMBER(m_voi, key));
-	save_item(STRUCT_MEMBER(m_voi, lastdt));
-	save_item(STRUCT_MEMBER(m_voi, prevdt));
-	save_item(STRUCT_MEMBER(m_voi, dltdt));
-	save_item(STRUCT_MEMBER(m_voi, rvol));
-	save_item(STRUCT_MEMBER(m_voi, lvol));
-	save_item(STRUCT_MEMBER(m_voi, frequency));
-	save_item(STRUCT_MEMBER(m_voi, bank));
-	save_item(STRUCT_MEMBER(m_voi, mode));
-	save_item(STRUCT_MEMBER(m_voi, sample_start));
-	save_item(STRUCT_MEMBER(m_voi, sample_end));
-	save_item(STRUCT_MEMBER(m_voi, sample_loop));
+void c140_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_REG))
+		.reg(NAME(m_voi));
 }
 
 void c219_device::device_start()
@@ -188,8 +177,13 @@ void c219_device::device_start()
 		m_pcmtbl[i + 128] = (~m_pcmtbl[i]) & 0xffe0;
 
 	m_lfsr = 0x1234;
+}
 
-	save_item(NAME(m_lfsr));
+void c219_device::device_register_save(save_registrar &save)
+{
+	c140_device::device_register_save(save);
+
+	save.reg(NAME(m_lfsr));
 }
 
 void c140_device::device_clock_changed()

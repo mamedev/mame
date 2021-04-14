@@ -162,30 +162,27 @@ void saa1099_device::device_start()
 {
 	/* for each chip allocate one stream */
 	m_stream = stream_alloc(0, 2, clock()/clock_divider);
+}
 
-	save_item(NAME(m_noise_params));
-	save_item(NAME(m_env_enable));
-	save_item(NAME(m_env_reverse_right));
-	save_item(NAME(m_env_mode));
-	save_item(NAME(m_env_bits));
-	save_item(NAME(m_env_clock));
-	save_item(NAME(m_env_step));
-	save_item(NAME(m_all_ch_enable));
-	save_item(NAME(m_sync_state));
-	save_item(NAME(m_selected_reg));
 
-	save_item(STRUCT_MEMBER(m_channels, frequency));
-	save_item(STRUCT_MEMBER(m_channels, freq_enable));
-	save_item(STRUCT_MEMBER(m_channels, noise_enable));
-	save_item(STRUCT_MEMBER(m_channels, octave));
-	save_item(STRUCT_MEMBER(m_channels, amplitude));
-	save_item(STRUCT_MEMBER(m_channels, envelope));
-	save_item(STRUCT_MEMBER(m_channels, counter));
-	save_item(STRUCT_MEMBER(m_channels, level));
+//-------------------------------------------------
+//  device_register_save - register for save states
+//-------------------------------------------------
 
-	save_item(STRUCT_MEMBER(m_noise, counter));
-	save_item(STRUCT_MEMBER(m_noise, freq));
-	save_item(STRUCT_MEMBER(m_noise, level));
+void saa1099_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_noise_params))
+		.reg(NAME(m_env_enable))
+		.reg(NAME(m_env_reverse_right))
+		.reg(NAME(m_env_mode))
+		.reg(NAME(m_env_bits))
+		.reg(NAME(m_env_clock))
+		.reg(NAME(m_env_step))
+		.reg(NAME(m_all_ch_enable))
+		.reg(NAME(m_sync_state))
+		.reg(NAME(m_selected_reg))
+		.reg(NAME(m_channels))
+		.reg(NAME(m_noise));
 }
 
 

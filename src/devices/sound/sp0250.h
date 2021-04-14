@@ -19,6 +19,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// sound stream update overrides
@@ -44,6 +45,14 @@ private:
 		}
 		int16_t F, B;
 		int16_t z1, z2;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(F))
+				.reg(NAME(B))
+				.reg(NAME(z1))
+				.reg(NAME(z2));
+		}
 	};
 
 	// PWM state

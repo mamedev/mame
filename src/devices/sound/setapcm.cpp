@@ -107,22 +107,17 @@ void setapcm_device<MaxVoices, Divider>::device_start()
 	// set host device to each voices
 	for (auto & elem : m_voice)
 		elem.m_host = this;
+}
 
-	save_item(STRUCT_MEMBER(m_voice, m_start));
-	save_item(STRUCT_MEMBER(m_voice, m_flags));
-	save_item(STRUCT_MEMBER(m_voice, m_freq));
-	save_item(STRUCT_MEMBER(m_voice, m_lpstart));
-	save_item(STRUCT_MEMBER(m_voice, m_lpend));
-	save_item(STRUCT_MEMBER(m_voice, m_end));
-	save_item(STRUCT_MEMBER(m_voice, m_vol_r));
-	save_item(STRUCT_MEMBER(m_voice, m_vol_l));
-	save_item(STRUCT_MEMBER(m_voice, m_pos));
-	save_item(STRUCT_MEMBER(m_voice, m_frac));
-	save_item(STRUCT_MEMBER(m_voice, m_lponce));
-	save_item(STRUCT_MEMBER(m_voice, m_keyon));
-	save_item(STRUCT_MEMBER(m_voice, m_out));
+//-------------------------------------------------
+//  device_register_save - register for save states
+//-------------------------------------------------
 
-	save_item(NAME(m_keyctrl));
+template<unsigned MaxVoices, unsigned Divider>
+void setapcm_device<MaxVoices, Divider>::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_voice))
+		.reg(NAME(m_keyctrl));
 }
 
 //-------------------------------------------------

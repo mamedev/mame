@@ -330,22 +330,15 @@ void c6280_device::device_start()
 		level /= pow(10.0, step / 20.0);
 	}
 	m_volume_table[30] = m_volume_table[31] = 0;
+}
 
-	save_item(NAME(m_select));
-	save_item(NAME(m_balance));
-	save_item(NAME(m_lfo_frequency));
-	save_item(NAME(m_lfo_control));
-
-	save_item(STRUCT_MEMBER(m_channel, frequency));
-	save_item(STRUCT_MEMBER(m_channel, control));
-	save_item(STRUCT_MEMBER(m_channel, balance));
-	save_item(STRUCT_MEMBER(m_channel, waveform));
-	save_item(STRUCT_MEMBER(m_channel, index));
-	save_item(STRUCT_MEMBER(m_channel, dda));
-	save_item(STRUCT_MEMBER(m_channel, noise_control));
-	save_item(STRUCT_MEMBER(m_channel, noise_counter));
-	save_item(STRUCT_MEMBER(m_channel, noise_seed));
-	save_item(STRUCT_MEMBER(m_channel, tick));
+void c6280_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_select))
+		.reg(NAME(m_balance))
+		.reg(NAME(m_lfo_frequency))
+		.reg(NAME(m_lfo_control))
+		.reg(NAME(m_channel));
 }
 
 void c6280_device::device_reset()

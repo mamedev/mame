@@ -34,6 +34,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
@@ -60,6 +61,17 @@ private:
 		u16          step;
 		u32          bank;
 		bool         play;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(vol))
+				.reg(NAME(addr))
+				.reg(NAME(counter))
+				.reg(NAME(start))
+				.reg(NAME(step))
+				.reg(NAME(bank))
+				.reg(NAME(play));
+		}
 	};
 
 	u8 read_rom_default(offs_t offset) { return m_rom[(m_bank + (offset & 0x1ffff)) & (m_rom.length() - 1)]; }

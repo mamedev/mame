@@ -161,33 +161,20 @@ void rf5c400_device::device_start()
 
 	m_req_channel = 0;
 
-	save_item(NAME(m_rf5c400_status));
-	save_item(NAME(m_ext_mem_address));
-	save_item(NAME(m_ext_mem_data));
-	save_item(NAME(m_req_channel));
-
-	save_item(STRUCT_MEMBER(m_channels, startH));
-	save_item(STRUCT_MEMBER(m_channels, startL));
-	save_item(STRUCT_MEMBER(m_channels, freq));
-	save_item(STRUCT_MEMBER(m_channels, endL));
-	save_item(STRUCT_MEMBER(m_channels, endHloopH));
-	save_item(STRUCT_MEMBER(m_channels, loopL));
-	save_item(STRUCT_MEMBER(m_channels, pan));
-	save_item(STRUCT_MEMBER(m_channels, effect));
-	save_item(STRUCT_MEMBER(m_channels, volume));
-	save_item(STRUCT_MEMBER(m_channels, attack));
-	save_item(STRUCT_MEMBER(m_channels, decay));
-	save_item(STRUCT_MEMBER(m_channels, release));
-	save_item(STRUCT_MEMBER(m_channels, cutoff));
-	save_item(STRUCT_MEMBER(m_channels, pos));
-	save_item(STRUCT_MEMBER(m_channels, step));
-	save_item(STRUCT_MEMBER(m_channels, keyon));
-	save_item(STRUCT_MEMBER(m_channels, env_phase));
-	save_item(STRUCT_MEMBER(m_channels, env_level));
-	save_item(STRUCT_MEMBER(m_channels, env_step));
-	save_item(STRUCT_MEMBER(m_channels, env_scale));
-
 	m_stream = stream_alloc(0, 4, clock() / 384);
+}
+
+//-------------------------------------------------
+//  device_register_save - register for save states
+//-------------------------------------------------
+
+void rf5c400_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_rf5c400_status))
+		.reg(NAME(m_ext_mem_address))
+		.reg(NAME(m_ext_mem_data))
+		.reg(NAME(m_req_channel))
+		.reg(NAME(m_channels));
 }
 
 //-------------------------------------------------

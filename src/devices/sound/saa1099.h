@@ -29,6 +29,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
@@ -50,6 +51,18 @@ private:
 		inline u32 freq() const { return (511 - frequency) << (8 - octave); } // clock / ((511 - frequency) * 2^(8 - octave))
 		int counter = 0;
 		u8 level = 0;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(frequency))
+				.reg(NAME(freq_enable))
+				.reg(NAME(noise_enable))
+				.reg(NAME(octave))
+				.reg(NAME(amplitude))
+				.reg(NAME(envelope))
+				.reg(NAME(counter))
+				.reg(NAME(level));
+		}
 	};
 
 	struct saa1099_noise
@@ -60,6 +73,13 @@ private:
 		int counter = 0;
 		int freq = 0;
 		u32 level = 0xffffffffU;    // noise polynomial shifter
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(counter))
+				.reg(NAME(freq))
+				.reg(NAME(level));
+		}
 	};
 
 	void envelope_w(int ch);

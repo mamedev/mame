@@ -219,23 +219,17 @@ void es5503_device::device_start()
 
 	rege0 = 0xff;
 
-	save_pointer(STRUCT_MEMBER(oscillators, freq), 32);
-	save_pointer(STRUCT_MEMBER(oscillators, wtsize), 32);
-	save_pointer(STRUCT_MEMBER(oscillators, control), 32);
-	save_pointer(STRUCT_MEMBER(oscillators, vol), 32);
-	save_pointer(STRUCT_MEMBER(oscillators, data), 32);
-	save_pointer(STRUCT_MEMBER(oscillators, wavetblpointer), 32);
-	save_pointer(STRUCT_MEMBER(oscillators, wavetblsize), 32);
-	save_pointer(STRUCT_MEMBER(oscillators, resolution), 32);
-	save_pointer(STRUCT_MEMBER(oscillators, accumulator), 32);
-	save_pointer(STRUCT_MEMBER(oscillators, irqpend), 32);
-
 	output_rate = (clock() / 8) / (2 + oscsenabled);
 	m_stream = stream_alloc(0, output_channels, output_rate);
 
 	m_timer = timer_alloc(0, nullptr);
 	attotime update_rate = output_rate ? attotime::from_hz(output_rate) : attotime::never;
 	m_timer->adjust(update_rate, 0, update_rate);
+}
+
+void es5503_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(oscillators));
 }
 
 void es5503_device::device_clock_changed()

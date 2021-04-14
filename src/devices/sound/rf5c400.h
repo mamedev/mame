@@ -31,6 +31,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
@@ -68,6 +69,30 @@ private:
 		double env_level = 0.0;
 		double env_step = 0.0;
 		double env_scale = 0.0;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(startH))
+				.reg(NAME(startL))
+				.reg(NAME(freq))
+				.reg(NAME(endL))
+				.reg(NAME(endHloopH))
+				.reg(NAME(loopL))
+				.reg(NAME(pan))
+				.reg(NAME(effect))
+				.reg(NAME(volume))
+				.reg(NAME(attack))
+				.reg(NAME(decay))
+				.reg(NAME(release))
+				.reg(NAME(cutoff))
+				.reg(NAME(pos))
+				.reg(NAME(step))
+				.reg(NAME(keyon))
+				.reg(NAME(env_phase))
+				.reg(NAME(env_level))
+				.reg(NAME(env_step))
+				.reg(NAME(env_scale));
+		}
 	};
 
 	class envelope_tables

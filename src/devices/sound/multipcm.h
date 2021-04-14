@@ -26,6 +26,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
@@ -70,6 +71,18 @@ private:
 		int32_t m_decay2_rate = 0;  // Decay2
 		int32_t m_release_rate = 0; // Release
 		int32_t m_decay_level = 0;  // Decay level
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(m_volume))
+				.reg(NAME(m_state))
+				.reg(NAME(step))
+				.reg(NAME(m_attack_rate))
+				.reg(NAME(m_decay1_rate))
+				.reg(NAME(m_decay2_rate))
+				.reg(NAME(m_release_rate))
+				.reg(NAME(m_decay_level));
+		}
 	};
 
 	struct lfo_t
@@ -78,6 +91,8 @@ private:
 		uint32_t m_phase_step = 0;
 		int32_t *m_table = nullptr;
 		int32_t *m_scale = nullptr;
+
+		void register_save(save_registrar &save) { save.reg(NAME(m_phase)).reg(NAME(m_phase_step)); }
 	};
 
 	struct slot_t
@@ -97,6 +112,24 @@ private:
 		lfo_t m_pitch_lfo; // Pitch lfo
 		lfo_t m_amplitude_lfo; // AM lfo
 		uint8_t m_format;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(m_regs))
+				.reg(NAME(m_playing))
+				.reg(NAME(m_base))
+				.reg(NAME(m_offset))
+				.reg(NAME(m_step))
+				.reg(NAME(m_pan))
+				.reg(NAME(m_total_level))
+				.reg(NAME(m_dest_total_level))
+				.reg(NAME(m_total_level_step))
+				.reg(NAME(m_prev_sample))
+				.reg(NAME(m_format))
+				.reg(NAME(m_envelope_gen))
+				.reg(NAME(m_pitch_lfo))
+				.reg(NAME(m_amplitude_lfo));
+		}
 	};
 
 	// internal state

@@ -1661,70 +1661,25 @@ void ymf271_device::calculate_clock_correction()
 	}
 }
 
-void ymf271_device::init_state()
+//-------------------------------------------------
+//  device_register_save - register for save states
+//-------------------------------------------------
+
+void ymf271_device::device_register_save(save_registrar &save)
 {
-	save_item(STRUCT_MEMBER(m_slots, ext_en));
-	save_item(STRUCT_MEMBER(m_slots, ext_out));
-	save_item(STRUCT_MEMBER(m_slots, lfoFreq));
-	save_item(STRUCT_MEMBER(m_slots, pms));
-	save_item(STRUCT_MEMBER(m_slots, ams));
-	save_item(STRUCT_MEMBER(m_slots, detune));
-	save_item(STRUCT_MEMBER(m_slots, multiple));
-	save_item(STRUCT_MEMBER(m_slots, tl));
-	save_item(STRUCT_MEMBER(m_slots, keyscale));
-	save_item(STRUCT_MEMBER(m_slots, ar));
-	save_item(STRUCT_MEMBER(m_slots, decay1rate));
-	save_item(STRUCT_MEMBER(m_slots, decay2rate));
-	save_item(STRUCT_MEMBER(m_slots, decay1lvl));
-	save_item(STRUCT_MEMBER(m_slots, relrate));
-	save_item(STRUCT_MEMBER(m_slots, block));
-	save_item(STRUCT_MEMBER(m_slots, fns_hi));
-	save_item(STRUCT_MEMBER(m_slots, fns));
-	save_item(STRUCT_MEMBER(m_slots, feedback));
-	save_item(STRUCT_MEMBER(m_slots, waveform));
-	save_item(STRUCT_MEMBER(m_slots, accon));
-	save_item(STRUCT_MEMBER(m_slots, algorithm));
-	save_item(STRUCT_MEMBER(m_slots, ch0_level));
-	save_item(STRUCT_MEMBER(m_slots, ch1_level));
-	save_item(STRUCT_MEMBER(m_slots, ch2_level));
-	save_item(STRUCT_MEMBER(m_slots, ch3_level));
-	save_item(STRUCT_MEMBER(m_slots, startaddr));
-	save_item(STRUCT_MEMBER(m_slots, loopaddr));
-	save_item(STRUCT_MEMBER(m_slots, endaddr));
-	save_item(STRUCT_MEMBER(m_slots, altloop));
-	save_item(STRUCT_MEMBER(m_slots, fs));
-	save_item(STRUCT_MEMBER(m_slots, srcnote));
-	save_item(STRUCT_MEMBER(m_slots, srcb));
-	save_item(STRUCT_MEMBER(m_slots, step));
-	save_item(STRUCT_MEMBER(m_slots, stepptr));
-	save_item(STRUCT_MEMBER(m_slots, active));
-	save_item(STRUCT_MEMBER(m_slots, bits));
-	save_item(STRUCT_MEMBER(m_slots, volume));
-	save_item(STRUCT_MEMBER(m_slots, env_state));
-	save_item(STRUCT_MEMBER(m_slots, env_attack_step));
-	save_item(STRUCT_MEMBER(m_slots, env_decay1_step));
-	save_item(STRUCT_MEMBER(m_slots, env_decay2_step));
-	save_item(STRUCT_MEMBER(m_slots, env_release_step));
-	save_item(STRUCT_MEMBER(m_slots, feedback_modulation0));
-	save_item(STRUCT_MEMBER(m_slots, feedback_modulation1));
-	save_item(STRUCT_MEMBER(m_slots, lfo_phase));
-	save_item(STRUCT_MEMBER(m_slots, lfo_step));
-	save_item(STRUCT_MEMBER(m_slots, lfo_amplitude));
-
-	save_item(STRUCT_MEMBER(m_groups, sync));
-	save_item(STRUCT_MEMBER(m_groups, pfm));
-
-	save_item(NAME(m_regs_main));
-	save_item(NAME(m_timerA));
-	save_item(NAME(m_timerB));
-	save_item(NAME(m_irqstate));
-	save_item(NAME(m_status));
-	save_item(NAME(m_end_status));
-	save_item(NAME(m_enable));
-	save_item(NAME(m_ext_address));
-	save_item(NAME(m_ext_rw));
-	save_item(NAME(m_ext_readlatch));
-	save_item(NAME(m_master_clock));
+	save.reg(NAME(m_slots))
+		.reg(NAME(m_groups))
+		.reg(NAME(m_regs_main))
+		.reg(NAME(m_timerA))
+		.reg(NAME(m_timerB))
+		.reg(NAME(m_irqstate))
+		.reg(NAME(m_status))
+		.reg(NAME(m_end_status))
+		.reg(NAME(m_enable))
+		.reg(NAME(m_ext_address))
+		.reg(NAME(m_ext_rw))
+		.reg(NAME(m_ext_readlatch))
+		.reg(NAME(m_master_clock));
 }
 
 //-------------------------------------------------
@@ -1740,7 +1695,6 @@ void ymf271_device::device_start()
 
 	m_master_clock = clock();
 	init_tables();
-	init_state();
 
 	m_mix_buffer.resize(m_master_clock/(384/4));
 	m_stream = stream_alloc(0, 4, m_master_clock/384);

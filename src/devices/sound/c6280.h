@@ -19,6 +19,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
@@ -37,6 +38,20 @@ private:
 		u32 noise_frequency;
 		u32 noise_seed;
 		s32 tick;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(frequency))
+				.reg(NAME(control))
+				.reg(NAME(balance))
+				.reg(NAME(waveform))
+				.reg(NAME(index))
+				.reg(NAME(dda))
+				.reg(NAME(noise_control))
+				.reg(NAME(noise_counter))
+				.reg(NAME(noise_seed))
+				.reg(NAME(tick));
+		}
 	};
 
 	// internal state

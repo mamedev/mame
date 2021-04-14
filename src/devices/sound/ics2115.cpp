@@ -92,46 +92,23 @@ void ics2115_device::device_start()
 		s16 value = lut[exponent] + (mantissa << (exponent + 3));
 		m_ulaw[i] = (i & 0x80) ? -value : value;
 	}
+}
 
-	save_item(NAME(m_timer[0].period));
-	save_item(NAME(m_timer[0].scale));
-	save_item(NAME(m_timer[0].preset));
-	save_item(NAME(m_timer[1].period));
-	save_item(NAME(m_timer[1].scale));
-	save_item(NAME(m_timer[1].preset));
-	save_item(NAME(m_reg_select));
-	save_item(NAME(m_osc_select));
-	save_item(NAME(m_irq_enabled));
-	save_item(NAME(m_irq_pending));
-	save_item(NAME(m_irq_on));
-	save_item(NAME(m_active_osc));
-	save_item(NAME(m_vmode));
-	save_item(NAME(m_regs));
-	save_item(STRUCT_MEMBER(m_voice, regs));
+//-------------------------------------------------
+//  device_register_save - register for save states
+//-------------------------------------------------
 
-	for (int i = 0; i < 32; i++)
-	{
-		save_item(NAME(m_voice[i].osc_conf.value), i);
-		save_item(NAME(m_voice[i].state.on), i);
-		save_item(NAME(m_voice[i].state.ramp), i);
-		save_item(NAME(m_voice[i].vol_ctrl.value), i);
-		save_item(NAME(m_voice[i].osc.left), i);
-		save_item(NAME(m_voice[i].osc.acc), i);
-		save_item(NAME(m_voice[i].osc.start), i);
-		save_item(NAME(m_voice[i].osc.end), i);
-		save_item(NAME(m_voice[i].osc.fc), i);
-		save_item(NAME(m_voice[i].osc.ctl), i);
-		save_item(NAME(m_voice[i].osc.saddr), i);
-		save_item(NAME(m_voice[i].vol.left), i);
-		save_item(NAME(m_voice[i].vol.add), i);
-		save_item(NAME(m_voice[i].vol.start), i);
-		save_item(NAME(m_voice[i].vol.end), i);
-		save_item(NAME(m_voice[i].vol.acc), i);
-		save_item(NAME(m_voice[i].vol.regacc), i);
-		save_item(NAME(m_voice[i].vol.incr), i);
-		save_item(NAME(m_voice[i].vol.pan), i);
-		save_item(NAME(m_voice[i].vol.mode), i);
-	}
+void ics2115_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_timer))
+		.reg(NAME(m_reg_select))
+		.reg(NAME(m_osc_select))
+		.reg(NAME(m_irq_enabled))
+		.reg(NAME(m_irq_pending))
+		.reg(NAME(m_irq_on))
+		.reg(NAME(m_active_osc))
+		.reg(NAME(m_vmode))
+		.reg(NAME(m_regs));
 }
 
 //-------------------------------------------------

@@ -90,15 +90,16 @@ void k007232_device::device_start()
 		elem = 0;
 
 	m_stream = stream_alloc(0, 2, clock()/128);
+}
 
-	save_item(STRUCT_MEMBER(m_channel, vol));
-	save_item(STRUCT_MEMBER(m_channel, addr));
-	save_item(STRUCT_MEMBER(m_channel, counter));
-	save_item(STRUCT_MEMBER(m_channel, start));
-	save_item(STRUCT_MEMBER(m_channel, step));
-	save_item(STRUCT_MEMBER(m_channel, bank));
-	save_item(STRUCT_MEMBER(m_channel, play));
-	save_item(NAME(m_wreg));
+//-------------------------------------------------
+//  device_register_save - register for save states
+//-------------------------------------------------
+
+void k007232_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_channel))
+		.reg(NAME(m_wreg));
 }
 
 //-------------------------------------------------

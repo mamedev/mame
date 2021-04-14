@@ -31,6 +31,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -47,6 +48,17 @@ private:
 		uint32_t frac = 0;
 		uint16_t l_volume = 0;
 		uint16_t r_volume = 0;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(start))
+				.reg(NAME(end))
+				.reg(NAME(mode))
+				.reg(NAME(pos))
+				.reg(NAME(frac))
+				.reg(NAME(l_volume))
+				.reg(NAME(r_volume));
+		}
 	};
 
 	sound_stream *m_stream;
@@ -59,6 +71,7 @@ private:
 
 	struct l7a1045_48bit_data {
 		uint16_t dat[3];
+		void register_save(save_registrar &save) { save.reg(NAME(dat)); }
 	};
 
 	l7a1045_48bit_data m_audiodat[0x10][0x20];

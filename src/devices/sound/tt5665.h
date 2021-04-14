@@ -58,6 +58,7 @@ protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
@@ -82,6 +83,16 @@ private:
 		u32             m_sample;         // current sample number
 		u32             m_count;          // total samples to play
 		stream_buffer::sample_t m_volume; // output volume
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(m_adpcm))
+				.reg(NAME(m_playing))
+				.reg(NAME(m_sample))
+				.reg(NAME(m_count))
+				.reg(NAME(m_volume))
+				.reg(NAME(m_base_offset));
+		}
 	};
 
 	// configuration state

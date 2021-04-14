@@ -23,6 +23,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void device_clock_changed() override;
@@ -85,14 +86,65 @@ private:
 		int lfo_phase, lfo_step;
 		int lfo_amplitude;
 		double lfo_phasemod;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(ext_en))
+				.reg(NAME(ext_out))
+				.reg(NAME(lfoFreq))
+				.reg(NAME(pms))
+				.reg(NAME(ams))
+				.reg(NAME(detune))
+				.reg(NAME(multiple))
+				.reg(NAME(tl))
+				.reg(NAME(keyscale))
+				.reg(NAME(ar))
+				.reg(NAME(decay1rate))
+				.reg(NAME(decay2rate))
+				.reg(NAME(decay1lvl))
+				.reg(NAME(relrate))
+				.reg(NAME(block))
+				.reg(NAME(fns_hi))
+				.reg(NAME(fns))
+				.reg(NAME(feedback))
+				.reg(NAME(waveform))
+				.reg(NAME(accon))
+				.reg(NAME(algorithm))
+				.reg(NAME(ch0_level))
+				.reg(NAME(ch1_level))
+				.reg(NAME(ch2_level))
+				.reg(NAME(ch3_level))
+				.reg(NAME(startaddr))
+				.reg(NAME(loopaddr))
+				.reg(NAME(endaddr))
+				.reg(NAME(altloop))
+				.reg(NAME(fs))
+				.reg(NAME(srcnote))
+				.reg(NAME(srcb))
+				.reg(NAME(step))
+				.reg(NAME(stepptr))
+				.reg(NAME(active))
+				.reg(NAME(bits))
+				.reg(NAME(volume))
+				.reg(NAME(env_state))
+				.reg(NAME(env_attack_step))
+				.reg(NAME(env_decay1_step))
+				.reg(NAME(env_decay2_step))
+				.reg(NAME(env_release_step))
+				.reg(NAME(feedback_modulation0))
+				.reg(NAME(feedback_modulation1))
+				.reg(NAME(lfo_phase))
+				.reg(NAME(lfo_step))
+				.reg(NAME(lfo_amplitude));
+		}
 	};
 
 	struct YMF271Group
 	{
 		uint8_t sync, pfm;
+		void register_save(save_registrar &save) { save.reg(NAME(sync)).reg(NAME(pfm)); }
 	};
 
-	void init_state();
 	void init_tables();
 	void calculate_clock_correction();
 	void calculate_step(YMF271Slot *slot);

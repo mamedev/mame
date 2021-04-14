@@ -74,29 +74,32 @@ void sp0250_device::device_start()
 		attotime period = attotime::from_hz(frame_rate);
 		timer_alloc()->adjust(period, 0, period);
 	}
+}
 
+//-------------------------------------------------
+//  device_register_save - register for save states
+//-------------------------------------------------
+
+void sp0250_device::device_register_save(save_registrar &save)
+{
 	// PWM state
-	save_item(NAME(m_pwm_index));
-	save_item(NAME(m_pwm_count));
-	save_item(NAME(m_pwm_counts));
+	save.reg(NAME(m_pwm_index))
+		.reg(NAME(m_pwm_count))
+		.reg(NAME(m_pwm_counts))
 
 	// LPC state
-	save_item(NAME(m_voiced));
-	save_item(NAME(m_amp));
-	save_item(NAME(m_lfsr));
-	save_item(NAME(m_pitch));
-	save_item(NAME(m_pcount));
-	save_item(NAME(m_repeat));
-	save_item(NAME(m_rcount));
-
-	save_item(STRUCT_MEMBER(m_filter, F));
-	save_item(STRUCT_MEMBER(m_filter, B));
-	save_item(STRUCT_MEMBER(m_filter, z1));
-	save_item(STRUCT_MEMBER(m_filter, z2));
+		.reg(NAME(m_voiced))
+		.reg(NAME(m_amp))
+		.reg(NAME(m_lfsr))
+		.reg(NAME(m_pitch))
+		.reg(NAME(m_pcount))
+		.reg(NAME(m_repeat))
+		.reg(NAME(m_rcount))
+		.reg(NAME(m_filter))
 
 	// FIFO state
-	save_item(NAME(m_fifo));
-	save_item(NAME(m_fifo_pos));
+		.reg(NAME(m_fifo))
+		.reg(NAME(m_fifo_pos));
 }
 
 void sp0250_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

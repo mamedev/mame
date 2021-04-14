@@ -149,29 +149,26 @@ void vr0sound_device::device_start()
 		elem.Cache = &m_fbcache;
 
 	m_stream = stream_alloc(0, 2, clock() / 972); // TODO : Correct source / divider?
+}
 
-	save_item(STRUCT_MEMBER(m_channel, CurSAddr));
-	save_item(STRUCT_MEMBER(m_channel, EnvVol));
-	save_item(STRUCT_MEMBER(m_channel, EnvStage));
-	save_item(STRUCT_MEMBER(m_channel, dSAddr));
-	save_item(STRUCT_MEMBER(m_channel, Modes));
-	save_item(STRUCT_MEMBER(m_channel, LD));
-	save_item(STRUCT_MEMBER(m_channel, LoopBegin));
-	save_item(STRUCT_MEMBER(m_channel, LoopEnd));
-	save_item(STRUCT_MEMBER(m_channel, LChnVol));
-	save_item(STRUCT_MEMBER(m_channel, RChnVol));
-	save_item(STRUCT_MEMBER(m_channel, EnvRate));
-	save_item(STRUCT_MEMBER(m_channel, EnvTarget));
-	save_item(NAME(m_Status));
-	save_item(NAME(m_NoteOn));
-	save_item(NAME(m_RevFactor));
-	save_item(NAME(m_BufferAddr));
-	save_item(NAME(m_BufferSize));
-	save_item(NAME(m_IntMask));
-	save_item(NAME(m_IntPend));
-	save_item(NAME(m_MaxChn));
-	save_item(NAME(m_ChnClkNum));
-	save_item(NAME(m_Ctrl));
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void vr0sound_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_channel))
+		.reg(NAME(m_Status))
+		.reg(NAME(m_NoteOn))
+		.reg(NAME(m_RevFactor))
+		.reg(NAME(m_BufferAddr))
+		.reg(NAME(m_BufferSize))
+		.reg(NAME(m_IntMask))
+		.reg(NAME(m_IntPend))
+		.reg(NAME(m_MaxChn))
+		.reg(NAME(m_ChnClkNum))
+		.reg(NAME(m_Ctrl));
 }
 
 //-------------------------------------------------

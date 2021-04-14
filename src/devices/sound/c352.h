@@ -36,6 +36,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_clock_changed() override;
 
 	// device_sound_interface overrides
@@ -86,6 +87,22 @@ private:
 		u16 wave_end;
 		u16 wave_loop;
 
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(pos))
+				.reg(NAME(counter))
+				.reg(NAME(sample))
+				.reg(NAME(last_sample))
+				.reg(NAME(vol_f))
+				.reg(NAME(vol_r))
+				.reg(NAME(curr_vol))
+				.reg(NAME(freq))
+				.reg(NAME(flags))
+				.reg(NAME(wave_bank))
+				.reg(NAME(wave_start))
+				.reg(NAME(wave_end))
+				.reg(NAME(wave_loop));
+		}
 	};
 
 	void fetch_sample(c352_voice_t &v);

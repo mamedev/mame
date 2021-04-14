@@ -82,18 +82,18 @@ void rf5c68_device::device_start()
 
 	/* allocate the stream */
 	m_stream = stream_alloc(0, 2, clock() / 384);
+}
 
-	save_item(STRUCT_MEMBER(m_chan, enable));
-	save_item(STRUCT_MEMBER(m_chan, env));
-	save_item(STRUCT_MEMBER(m_chan, pan));
-	save_item(STRUCT_MEMBER(m_chan, start));
-	save_item(STRUCT_MEMBER(m_chan, addr));
-	save_item(STRUCT_MEMBER(m_chan, step));
-	save_item(STRUCT_MEMBER(m_chan, loopst));
+//-------------------------------------------------
+//  device_register_save - register for save states
+//-------------------------------------------------
 
-	save_item(NAME(m_cbank));
-	save_item(NAME(m_wbank));
-	save_item(NAME(m_enable));
+void rf5c68_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_chan))
+		.reg(NAME(m_cbank))
+		.reg(NAME(m_wbank))
+		.reg(NAME(m_enable));
 }
 
 //-------------------------------------------------

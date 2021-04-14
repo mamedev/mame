@@ -30,6 +30,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_post_load() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -77,6 +78,34 @@ private:
 		u8 irq_schedule;     /* 1 if the IRQ state is updated by timer */
 
 		emu_timer *timer;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(playing))
+				.reg(NAME(ended))
+				.reg(NAME(keyon))
+				.reg(NAME(looping))
+				.reg(NAME(mode))
+				.reg(NAME(fnum))
+				.reg(NAME(level))
+				.reg(NAME(pan))
+				.reg(NAME(start))
+				.reg(NAME(stop))
+				.reg(NAME(loop_start))
+				.reg(NAME(loop_end))
+				.reg(NAME(position))
+				.reg(NAME(signal))
+				.reg(NAME(step))
+				.reg(NAME(loop_signal))
+				.reg(NAME(loop_step))
+				.reg(NAME(loop_count))
+				.reg(NAME(output_left))
+				.reg(NAME(output_right))
+				.reg(NAME(output_pos))
+				.reg(NAME(last_sample))
+				.reg(NAME(curr_sample))
+				.reg(NAME(irq_schedule));
+		}
 	};
 
 	void update_irq_state();

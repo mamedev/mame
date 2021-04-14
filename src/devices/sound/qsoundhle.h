@@ -27,6 +27,7 @@ protected:
 	// device_t implementation
 	tiny_rom_entry const *device_rom_region() const override;
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_reset() override;
 
 	// device_sound_interface implementation
@@ -71,6 +72,17 @@ private:
 		int16_t m_echo = 0;
 
 		int16_t update(qsound_hle_device &dsp, int32_t *echo_out);
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(m_bank))
+				.reg(NAME(m_addr))
+				.reg(NAME(m_phase))
+				.reg(NAME(m_rate))
+				.reg(NAME(m_loop_len))
+				.reg(NAME(m_end_addr))
+				.reg(NAME(m_volume))
+				.reg(NAME(m_echo));
+		}
 	};
 
 	struct qsound_adpcm {
@@ -84,6 +96,17 @@ private:
 		uint16_t m_cur_addr = 0;
 
 		int16_t update(qsound_hle_device &dsp, int16_t curr_sample, int nibble);
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(m_start_addr))
+				.reg(NAME(m_end_addr))
+				.reg(NAME(m_bank))
+				.reg(NAME(m_volume))
+				.reg(NAME(m_flag))
+				.reg(NAME(m_cur_vol))
+				.reg(NAME(m_step_size))
+				.reg(NAME(m_cur_addr));
+		}
 	};
 
 	// Q1 Filter
@@ -95,6 +118,14 @@ private:
 		int16_t m_delay_line[95] = { 0 };
 
 		int32_t apply(int16_t input);
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(m_tap_count))
+				.reg(NAME(m_delay_pos))
+				.reg(NAME(m_table_pos))
+				.reg(NAME(m_taps))
+				.reg(NAME(m_delay_line));
+		}
 	};
 
 	// Delay line
@@ -107,6 +138,14 @@ private:
 
 		int32_t apply(const int32_t input);
 		void update();
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(m_delay))
+				.reg(NAME(m_volume))
+				.reg(NAME(m_write_pos))
+				.reg(NAME(m_read_pos))
+				.reg(NAME(m_delay_line));
+		}
 	};
 
 	struct qsound_echo {
@@ -119,6 +158,15 @@ private:
 		int16_t m_delay_pos = 0;
 
 		int16_t apply(int32_t input);
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(m_end_pos))
+				.reg(NAME(m_feedback))
+				.reg(NAME(m_length))
+				.reg(NAME(m_last_sample))
+				.reg(NAME(m_delay_line))
+				.reg(NAME(m_delay_pos));
+		}
 	};
 
 	// MAME resources

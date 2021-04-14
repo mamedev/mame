@@ -82,6 +82,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
@@ -129,6 +130,27 @@ protected:
 		uint32_t  m_interpSampleNum;  // interpolation state - fraction between start & end
 
 		static const uint8_t s_volume_table[16];
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(m_adpcm))
+				.reg(NAME(m_adpcm2))
+				.reg(NAME(m_playbackAlgo))
+				.reg(NAME(m_looping))
+				.reg(NAME(m_startFlags))
+				.reg(NAME(m_endFlags))
+				.reg(NAME(m_base_offset))
+				.reg(NAME(m_count))
+				.reg(NAME(m_samplingFreq))
+				.reg(NAME(m_playing))
+				.reg(NAME(m_sample))
+				.reg(NAME(m_channel_volume))
+				.reg(NAME(m_pan_volume_left))
+				.reg(NAME(m_pan_volume_right))
+				.reg(NAME(m_startSample))
+				.reg(NAME(m_endSample))
+				.reg(NAME(m_interpSampleNum));
+		}
 	};
 
 	// internal state

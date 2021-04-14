@@ -187,6 +187,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
@@ -241,6 +242,10 @@ private:
 				return (m_borrow_cnt == 0);
 			}
 			return 0;
+		}
+
+		void register_save(save_registrar &save)
+		{
 		}
 	};
 

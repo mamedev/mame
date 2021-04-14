@@ -42,6 +42,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
@@ -66,6 +67,17 @@ private:
 		u32      addr   = 0;
 		u16      step   = 0;
 		u16      loopst = 0;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(enable))
+				.reg(NAME(env))
+				.reg(NAME(pan))
+				.reg(NAME(start))
+				.reg(NAME(addr))
+				.reg(NAME(step))
+				.reg(NAME(loopst));
+		}
 	};
 
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;

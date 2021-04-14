@@ -31,6 +31,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_reset() override;
 
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -78,6 +79,28 @@ protected:
 		int output_ptr;
 		int atbl;
 		int pptr;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(phrase))
+				.reg(NAME(pan))
+				.reg(NAME(pan_delay))
+				.reg(NAME(pan1))
+				.reg(NAME(pan1_delay))
+				.reg(NAME(volume))
+				.reg(NAME(volume_target))
+				.reg(NAME(volume_delay))
+				.reg(NAME(volume2))
+				.reg(NAME(loop))
+				.reg(NAME(is_playing))
+				.reg(NAME(last_block))
+				.reg(NAME(is_paused))
+				.reg(NAME(output_remaining))
+				.reg(NAME(output_ptr))
+				.reg(NAME(atbl))
+				.reg(NAME(pptr))
+				.reg(NAME(output_data));
+		}
 	};
 	struct ymz_sequence
 	{
@@ -90,6 +113,19 @@ protected:
 		uint8_t bank;
 		bool is_playing;
 		bool is_paused;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(delay))
+				.reg(NAME(sequence))
+				.reg(NAME(timer))
+				.reg(NAME(stopchan))
+				.reg(NAME(loop))
+				.reg(NAME(bank))
+				.reg(NAME(is_playing))
+				.reg(NAME(is_paused))
+				.reg(NAME(offset));
+		}
 	};
 	struct ymz_sqc
 	{
@@ -98,6 +134,15 @@ protected:
 		uint32_t offset;
 		bool is_playing;
 		bool is_waiting;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(sqc))
+				.reg(NAME(loop))
+				.reg(NAME(is_playing))
+				.reg(NAME(is_waiting))
+				.reg(NAME(offset));
+		}
 	};
 
 	ymz_channel m_channels[16];

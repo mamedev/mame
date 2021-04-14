@@ -31,6 +31,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr) override;
@@ -70,6 +71,20 @@ private:
 
 		uint32_t accumulator;
 		uint8_t  irqpend;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(freq))
+				.reg(NAME(wtsize))
+				.reg(NAME(control))
+				.reg(NAME(vol))
+				.reg(NAME(data))
+				.reg(NAME(wavetblpointer))
+				.reg(NAME(wavetblsize))
+				.reg(NAME(resolution))
+				.reg(NAME(accumulator))
+				.reg(NAME(irqpend));
+		}
 	};
 
 	ES5503Osc oscillators[32];

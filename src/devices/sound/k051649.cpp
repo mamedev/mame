@@ -77,15 +77,17 @@ void k051649_device::device_start()
 
 	// build the mixer table
 	make_mixer_table(5);
+}
 
+//-------------------------------------------------
+//  device_register_save - register for save states
+//-------------------------------------------------
+
+void k051649_device::device_register_save(save_registrar &save)
+{
 	// save states
-	save_item(STRUCT_MEMBER(m_channel_list, counter));
-	save_item(STRUCT_MEMBER(m_channel_list, clock));
-	save_item(STRUCT_MEMBER(m_channel_list, frequency));
-	save_item(STRUCT_MEMBER(m_channel_list, volume));
-	save_item(STRUCT_MEMBER(m_channel_list, key));
-	save_item(STRUCT_MEMBER(m_channel_list, waveram));
-	save_item(NAME(m_test));
+	save.reg(NAME(m_channel_list))
+		.reg(NAME(m_test));
 }
 
 

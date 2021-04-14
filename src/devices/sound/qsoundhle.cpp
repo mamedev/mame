@@ -67,72 +67,42 @@ void qsound_hle_device::device_start()
 	m_stream = stream_alloc(0, 2, clock() / 2 / 1248); // DSP program uses 1248 machine cycles per iteration
 
 	init_register_map();
+}
 
+//-------------------------------------------------
+//  device_register_save - register for save states
+//-------------------------------------------------
+
+void qsound_hle_device::device_register_save(save_registrar &save)
+{
 	// state save
 	// PCM registers
 	// PCM voices
-	save_item(STRUCT_MEMBER(m_voice, m_bank));
-	save_item(STRUCT_MEMBER(m_voice, m_addr));
-	save_item(STRUCT_MEMBER(m_voice, m_phase));
-	save_item(STRUCT_MEMBER(m_voice, m_rate));
-	save_item(STRUCT_MEMBER(m_voice, m_loop_len));
-	save_item(STRUCT_MEMBER(m_voice, m_end_addr));
-	save_item(STRUCT_MEMBER(m_voice, m_volume));
-	save_item(STRUCT_MEMBER(m_voice, m_echo));
+	save.reg(NAME(m_voice))
 
 	// ADPCM voices
-	save_item(STRUCT_MEMBER(m_adpcm, m_start_addr));
-	save_item(STRUCT_MEMBER(m_adpcm, m_end_addr));
-	save_item(STRUCT_MEMBER(m_adpcm, m_bank));
-	save_item(STRUCT_MEMBER(m_adpcm, m_volume));
-	save_item(STRUCT_MEMBER(m_adpcm, m_flag));
-	save_item(STRUCT_MEMBER(m_adpcm, m_cur_vol));
-	save_item(STRUCT_MEMBER(m_adpcm, m_step_size));
-	save_item(STRUCT_MEMBER(m_adpcm, m_cur_addr));
+		.reg(NAME(m_adpcm))
 
 	// PCM voices
-	save_item(NAME(m_voice_pan));
+		.reg(NAME(m_voice_pan))
 
 	// QSound registers
-	save_item(NAME(m_echo.m_end_pos));
-	save_item(NAME(m_echo.m_feedback));
-	save_item(NAME(m_echo.m_length));
-	save_item(NAME(m_echo.m_last_sample));
-	save_item(NAME(m_echo.m_delay_line));
-	save_item(NAME(m_echo.m_delay_pos));
+		.reg(NAME(m_echo))
 
 	// left, right
-	save_item(STRUCT_MEMBER(m_filter, m_tap_count));
-	save_item(STRUCT_MEMBER(m_filter, m_delay_pos));
-	save_item(STRUCT_MEMBER(m_filter, m_table_pos));
-	save_item(STRUCT_MEMBER(m_filter, m_taps));
-	save_item(STRUCT_MEMBER(m_filter, m_delay_line));
+		.reg(NAME(m_filter))
+		.reg(NAME(m_alt_filter))
 
-	save_item(STRUCT_MEMBER(m_alt_filter, m_tap_count));
-	save_item(STRUCT_MEMBER(m_alt_filter, m_delay_pos));
-	save_item(STRUCT_MEMBER(m_alt_filter, m_table_pos));
-	save_item(STRUCT_MEMBER(m_alt_filter, m_taps));
-	save_item(STRUCT_MEMBER(m_alt_filter, m_delay_line));
+		.reg(NAME(m_wet))
+		.reg(NAME(m_dry))
 
-	save_item(STRUCT_MEMBER(m_wet, m_delay));
-	save_item(STRUCT_MEMBER(m_wet, m_volume));
-	save_item(STRUCT_MEMBER(m_wet, m_write_pos));
-	save_item(STRUCT_MEMBER(m_wet, m_read_pos));
-	save_item(STRUCT_MEMBER(m_wet, m_delay_line));
-
-	save_item(STRUCT_MEMBER(m_dry, m_delay));
-	save_item(STRUCT_MEMBER(m_dry, m_volume));
-	save_item(STRUCT_MEMBER(m_dry, m_write_pos));
-	save_item(STRUCT_MEMBER(m_dry, m_read_pos));
-	save_item(STRUCT_MEMBER(m_dry, m_delay_line));
-
-	save_item(NAME(m_state));
-	save_item(NAME(m_next_state));
-	save_item(NAME(m_delay_update));
-	save_item(NAME(m_state_counter));
-	save_item(NAME(m_ready_flag));
-	save_item(NAME(m_data_latch));
-	save_item(NAME(m_out));
+		.reg(NAME(m_state))
+		.reg(NAME(m_next_state))
+		.reg(NAME(m_delay_update))
+		.reg(NAME(m_state_counter))
+		.reg(NAME(m_ready_flag))
+		.reg(NAME(m_data_latch))
+		.reg(NAME(m_out));
 }
 
 //-------------------------------------------------

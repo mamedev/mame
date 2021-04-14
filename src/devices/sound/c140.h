@@ -39,6 +39,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_clock_changed() override;
 
 	virtual void rom_bank_updated() override;
@@ -71,6 +72,24 @@ protected:
 		s32    sample_start = 0;
 		s32    sample_end   = 0;
 		s32    sample_loop  = 0;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(ptoffset))
+				.reg(NAME(pos))
+				.reg(NAME(key))
+				.reg(NAME(lastdt))
+				.reg(NAME(prevdt))
+				.reg(NAME(dltdt))
+				.reg(NAME(rvol))
+				.reg(NAME(lvol))
+				.reg(NAME(frequency))
+				.reg(NAME(bank))
+				.reg(NAME(mode))
+				.reg(NAME(sample_start))
+				.reg(NAME(sample_end))
+				.reg(NAME(sample_loop));
+		}
 	};
 
 	void init_voice(C140_VOICE *v);
@@ -114,6 +133,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;

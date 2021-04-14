@@ -35,6 +35,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
@@ -69,6 +70,23 @@ private:
 		bool m_lponce = false;            // Is looped once?
 		bool m_keyon = false;             // Keyon status
 		s32 m_out = 0;                    // output value
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(m_start))
+				.reg(NAME(m_flags))
+				.reg(NAME(m_freq))
+				.reg(NAME(m_lpstart))
+				.reg(NAME(m_lpend))
+				.reg(NAME(m_end))
+				.reg(NAME(m_vol_r))
+				.reg(NAME(m_vol_l))
+				.reg(NAME(m_pos))
+				.reg(NAME(m_frac))
+				.reg(NAME(m_lponce))
+				.reg(NAME(m_keyon))
+				.reg(NAME(m_out));
+		}
 	};
 
 	sound_stream *m_stream;

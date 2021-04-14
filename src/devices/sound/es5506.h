@@ -73,12 +73,38 @@ protected:
 		// internal state
 		u8       index      = 0;         // index of this voice
 		u8       filtcount  = 0;         // filter count
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(control))
+				.reg(NAME(freqcount))
+				.reg(NAME(start))
+				.reg(NAME(lvol))
+				.reg(NAME(end))
+				.reg(NAME(lvramp))
+				.reg(NAME(accum))
+				.reg(NAME(rvol))
+				.reg(NAME(rvramp))
+				.reg(NAME(ecount))
+				.reg(NAME(k2))
+				.reg(NAME(k2ramp))
+				.reg(NAME(k1))
+				.reg(NAME(k1ramp))
+				.reg(NAME(o4n1))
+				.reg(NAME(o3n1))
+				.reg(NAME(o3n2))
+				.reg(NAME(o2n1))
+				.reg(NAME(o2n2))
+				.reg(NAME(o1n1))
+				.reg(NAME(filtcount));
+		}
 	};
 
 	es550x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_clock_changed() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
@@ -168,6 +194,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_reset() override;
 
 	// device_memory_interface configuration

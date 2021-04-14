@@ -74,6 +74,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
 
@@ -130,6 +131,22 @@ private:
 		u8 EnvTarget[4]; // Envelope Target Volume per Each stages, High 7 Bits
 		u16 read(offs_t offset);
 		void write(offs_t offset, u16 data, u16 mem_mask);
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(CurSAddr))
+				.reg(NAME(EnvVol))
+				.reg(NAME(EnvStage))
+				.reg(NAME(dSAddr))
+				.reg(NAME(Modes))
+				.reg(NAME(LD))
+				.reg(NAME(LoopBegin))
+				.reg(NAME(LoopEnd))
+				.reg(NAME(LChnVol))
+				.reg(NAME(RChnVol))
+				.reg(NAME(EnvRate))
+				.reg(NAME(EnvTarget));
+		}
 	};
 
 	memory_access<23, 1, 0, ENDIANNESS_LITTLE>::cache m_texcache;
