@@ -63,7 +63,7 @@ void contra_state::contra_coin_counter_w(uint8_t data)
 void contra_state::contra_map(address_map &map)
 {
 	map(0x0000, 0x0007).w(FUNC(contra_state::contra_K007121_ctrl_0_w));
-	map(0x0008, 0x000F).rw("k007452", FUNC(k007452_device::read), FUNC(k007452_device::write));
+	map(0x0008, 0x000f).rw("k007452", FUNC(k007452_device::read), FUNC(k007452_device::write));
 	map(0x0010, 0x0010).portr("SYSTEM");
 	map(0x0011, 0x0011).portr("P1");
 	map(0x0012, 0x0012).portr("P2");
