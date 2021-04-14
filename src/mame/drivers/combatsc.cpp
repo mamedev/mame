@@ -292,21 +292,6 @@ uint8_t combatsc_state::trackball_r(offs_t offset)
 }
 
 
-/* the protection is a simple multiply */
-void combatsc_state::protection_w(offs_t offset, uint8_t data)
-{
-	m_prot[offset] = data;
-}
-uint8_t combatsc_state::protection_r(offs_t offset)
-{
-	return ((m_prot[0] * m_prot[1]) >> (offset * 8)) & 0xff;
-}
-void combatsc_state::protection_clock_w(uint8_t data)
-{
-	/* 0x3f is written here every time before accessing the other registers */
-}
-
-
 /****************************************************************************/
 
 void combatsc_state::combatsc_sh_irqtrigger_w(uint8_t data)
@@ -659,7 +644,6 @@ MACHINE_START_MEMBER(combatsc_state,combatsc)
 	save_item(NAME(m_bank_select));
 	save_item(NAME(m_video_circuit));
 	save_item(NAME(m_boost));
-	save_item(NAME(m_prot));
 	save_item(NAME(m_pos));
 	save_item(NAME(m_sign));
 	save_pointer(NAME(m_page[0]),0x2000);
@@ -683,8 +667,6 @@ void combatsc_state::machine_reset()
 	m_vreg = -1;
 	m_boost = 1;
 	m_bank_select = -1;
-	m_prot[0] = 0;
-	m_prot[1] = 0;
 
 	for (int i = 0; i < 4; i++)
 	{

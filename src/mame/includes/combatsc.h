@@ -61,7 +61,6 @@ public:
 	/* misc */
 	uint8_t m_pos[4];
 	uint8_t m_sign[4];
-	int m_prot[2];
 	int m_boost;
 	emu_timer *m_interleave_timer;
 
@@ -89,10 +88,7 @@ public:
 	void combatscb_bankselect_w(address_space &space, uint8_t data);
 	void combatsc_coin_counter_w(uint8_t data);
 	uint8_t trackball_r(offs_t offset);
-	void protection_w(offs_t offset, uint8_t data);
-	uint8_t protection_r(offs_t offset);
 	uint8_t unk_r();
-	void protection_clock_w(uint8_t data);
 	void combatsc_sh_irqtrigger_w(uint8_t data);
 	uint8_t combatsc_video_r(offs_t offset);
 	void combatsc_video_w(offs_t offset, uint8_t data);
