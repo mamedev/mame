@@ -120,6 +120,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 3; }
@@ -180,6 +181,16 @@ protected:
 		uint32_t table_bits;
 		uint32_t base_addr;
 		uint8_t type;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(valid))
+				.reg(NAME(domain))
+				.reg(NAME(access))
+				.reg(NAME(table_bits))
+				.reg(NAME(base_addr))
+				.reg(NAME(type));
+		}
 	};
 	tlb_entry m_dtlb_entries[0x2000];
 	tlb_entry m_itlb_entries[0x2000];

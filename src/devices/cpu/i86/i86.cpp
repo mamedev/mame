@@ -478,31 +478,6 @@ void i8086_common_cpu_device::device_start()
 	}
 	m_io = &space(AS_IO);
 
-	save_item(NAME(m_regs.w));
-	save_item(NAME(m_sregs));
-	save_item(NAME(m_ip));
-	save_item(NAME(m_prev_ip));
-	save_item(NAME(m_TF));
-	save_item(NAME(m_IF));
-	save_item(NAME(m_DF));
-	save_item(NAME(m_MF));
-	save_item(NAME(m_NT));
-	save_item(NAME(m_IOPL));
-	save_item(NAME(m_SignVal));
-	save_item(NAME(m_int_vector));
-	save_item(NAME(m_pending_irq));
-	save_item(NAME(m_nmi_state));
-	save_item(NAME(m_irq_state));
-	save_item(NAME(m_AuxVal));
-	save_item(NAME(m_OverVal));
-	save_item(NAME(m_ZeroVal));
-	save_item(NAME(m_CarryVal));
-	save_item(NAME(m_ParityVal));
-	save_item(NAME(m_seg_prefix));
-	save_item(NAME(m_seg_prefix_next));
-	save_item(NAME(m_prefix_seg));
-	save_item(NAME(m_halt));
-
 	// Register state for debugger
 	state_add( I8086_IP, "IP", m_ip         ).callimport().formatstr("%04X");
 	state_add( I8086_AX, "AX", m_regs.w[AX] ).formatstr("%04X");
@@ -528,6 +503,34 @@ void i8086_common_cpu_device::device_start()
 	set_icountptr(m_icount);
 
 	m_lock_handler.resolve_safe();
+}
+
+void i8086_common_cpu_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_regs))
+		.reg(NAME(m_sregs))
+		.reg(NAME(m_ip))
+		.reg(NAME(m_prev_ip))
+		.reg(NAME(m_TF))
+		.reg(NAME(m_IF))
+		.reg(NAME(m_DF))
+		.reg(NAME(m_MF))
+		.reg(NAME(m_NT))
+		.reg(NAME(m_IOPL))
+		.reg(NAME(m_SignVal))
+		.reg(NAME(m_int_vector))
+		.reg(NAME(m_pending_irq))
+		.reg(NAME(m_nmi_state))
+		.reg(NAME(m_irq_state))
+		.reg(NAME(m_AuxVal))
+		.reg(NAME(m_OverVal))
+		.reg(NAME(m_ZeroVal))
+		.reg(NAME(m_CarryVal))
+		.reg(NAME(m_ParityVal))
+		.reg(NAME(m_seg_prefix))
+		.reg(NAME(m_seg_prefix_next))
+		.reg(NAME(m_prefix_seg))
+		.reg(NAME(m_halt));
 }
 
 

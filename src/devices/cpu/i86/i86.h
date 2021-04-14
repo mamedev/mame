@@ -113,6 +113,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
@@ -249,6 +250,8 @@ protected:
 	{                   /* eight general registers */
 		uint16_t w[8];    /* viewed as 16 bits registers */
 		uint8_t  b[16];   /* or as 8 bit registers */
+
+		void register_save(save_registrar &save) { save.reg(NAME(w)); }
 	} m_regs;
 
 	enum BREGS {

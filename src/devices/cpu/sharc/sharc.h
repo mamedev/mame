@@ -72,7 +72,6 @@
 #define OP_USERFLAG_ASTAT_DELAY_COPY        0x001ff000
 #define OP_USERFLAG_CALL                    0x10000000
 
-
 class sharc_frontend;
 
 class adsp21062_device : public cpu_device
@@ -208,6 +207,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 8; }
@@ -229,6 +229,8 @@ private:
 		uint32_t m[8];
 		uint32_t b[8];
 		uint32_t l[8];
+
+		void register_save(save_registrar &save) { save.reg(NAME(i)).reg(NAME(m)).reg(NAME(b)).reg(NAME(l)); }
 	};
 
 	union SHARC_REG
@@ -248,6 +250,19 @@ private:
 		uint32_t ext_index;
 		uint32_t ext_modifier;
 		uint32_t ext_count;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(control))
+				.reg(NAME(int_index))
+				.reg(NAME(int_modifier))
+				.reg(NAME(int_count))
+				.reg(NAME(chain_ptr))
+				.reg(NAME(gen_purpose))
+				.reg(NAME(ext_index))
+				.reg(NAME(ext_modifier))
+				.reg(NAME(ext_count));
+		}
 	};
 
 	struct SHARC_LADDR
@@ -255,6 +270,8 @@ private:
 		uint32_t addr;
 		uint32_t code;
 		uint32_t loop_type;
+
+		void register_save(save_registrar &save) { save.reg(NAME(addr)).reg(NAME(code)).reg(NAME(loop_type)); }
 	};
 
 	struct SHARC_DMA_OP
@@ -270,6 +287,20 @@ private:
 		int32_t chained_direction;
 		emu_timer *timer;
 		bool active;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(src))
+				.reg(NAME(dst))
+				.reg(NAME(chain_ptr))
+				.reg(NAME(src_modifier))
+				.reg(NAME(dst_modifier))
+				.reg(NAME(src_count))
+				.reg(NAME(dst_count))
+				.reg(NAME(pmode))
+				.reg(NAME(chained_direction))
+				.reg(NAME(active));
+		}
 	};
 
 
@@ -363,6 +394,8 @@ private:
 		{
 			uint32_t mode1;
 			uint32_t astat;
+
+			void register_save(save_registrar &save) { save.reg(NAME(mode1)).reg(NAME(astat)); }
 		} status_stack[5];
 		int32_t status_stkp;
 
@@ -418,6 +451,8 @@ private:
 
 		uint32_t force_recompile;
 		uint32_t cache_dirty;
+
+		void register_save(save_registrar &save);
 	};
 
 	sharc_internal_state* m_core;
@@ -649,7 +684,6 @@ private:
 	bool if_condition_always_true(int condition);
 	uint32_t do_condition_astat_bits(int condition);
 };
-
 
 DECLARE_DEVICE_TYPE(ADSP21062, adsp21062_device)
 

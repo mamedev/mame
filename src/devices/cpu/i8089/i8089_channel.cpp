@@ -75,16 +75,21 @@ void i8089_channel_device::device_start()
 
 	// resolve callbacks
 	m_write_sintr.resolve_safe();
+}
 
+//-------------------------------------------------
+//  device_register_save - register for save states
+//-------------------------------------------------
+
+void i8089_channel_device::device_register_save(save_registrar &save)
+{
 	// register for save states
-	save_item(NAME(m_xfer_pending));
-	save_item(NAME(m_dma_value));
-	save_item(NAME(m_dma_state));
-	save_item(NAME(m_drq));
-	save_item(NAME(m_prio));
-
-	save_item(STRUCT_MEMBER(m_r, w));
-	save_item(STRUCT_MEMBER(m_r, t));
+	save.reg(NAME(m_xfer_pending))
+		.reg(NAME(m_dma_value))
+		.reg(NAME(m_dma_state))
+		.reg(NAME(m_drq))
+		.reg(NAME(m_prio))
+		.reg(NAME(m_r));
 }
 
 //-------------------------------------------------

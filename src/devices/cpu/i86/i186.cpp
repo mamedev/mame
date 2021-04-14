@@ -633,35 +633,6 @@ void i80186_cpu_device::device_start()
 	state_add( I80186_I3CON, "I3CON", m_intr.ext[3] ).formatstr("%04X");
 	state_add( I80186_POLLSTS, "POLLSTS", m_intr.poll_status ).formatstr("%04X");
 
-	// register for savestates
-	save_item(STRUCT_MEMBER(m_timer, control));
-	save_item(STRUCT_MEMBER(m_timer, maxA));
-	save_item(STRUCT_MEMBER(m_timer, maxB));
-	save_item(STRUCT_MEMBER(m_timer, count));
-	save_item(STRUCT_MEMBER(m_dma, source));
-	save_item(STRUCT_MEMBER(m_dma, dest));
-	save_item(STRUCT_MEMBER(m_dma, count));
-	save_item(STRUCT_MEMBER(m_dma, control));
-	save_item(NAME(m_intr.vector));
-	save_item(NAME(m_intr.pending));
-	save_item(NAME(m_intr.ack_mask));
-	save_item(NAME(m_intr.priority_mask));
-	save_item(NAME(m_intr.in_service));
-	save_item(NAME(m_intr.request));
-	save_item(NAME(m_intr.status));
-	save_item(NAME(m_intr.poll_status));
-	save_item(NAME(m_intr.timer));
-	save_item(NAME(m_intr.dma));
-	save_item(NAME(m_intr.ext));
-	save_item(NAME(m_intr.ext_state));
-	save_item(NAME(m_mem.lower));
-	save_item(NAME(m_mem.upper));
-	save_item(NAME(m_mem.middle));
-	save_item(NAME(m_mem.middle_size));
-	save_item(NAME(m_mem.peripheral));
-	save_item(NAME(m_reloc));
-	save_item(NAME(m_last_dma));
-
 	// zerofill
 	memset(m_timer, 0, sizeof(m_timer));
 	memset(m_dma, 0, sizeof(m_dma));
@@ -680,6 +651,19 @@ void i80186_cpu_device::device_start()
 	m_out_chip_select_func.resolve_safe();
 	m_irmx_irq_cb.resolve_safe();
 	m_irmx_irq_ack.resolve();
+}
+
+void i80186_cpu_device::device_register_save(save_registrar &save)
+{
+	i8086_common_cpu_device::device_register_save(save);
+
+	// register for savestates
+	save.reg(NAME(m_timer))
+		.reg(NAME(m_dma))
+		.reg(NAME(m_intr))
+		.reg(NAME(m_mem))
+		.reg(NAME(m_reloc))
+		.reg(NAME(m_last_dma));
 }
 
 void i80186_cpu_device::device_reset()

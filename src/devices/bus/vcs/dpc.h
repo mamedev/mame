@@ -37,11 +37,23 @@ protected:
 		uint8_t   flag;
 		uint8_t   music_mode;     /* Only used by data fetchers 5,6, and 7 */
 		uint8_t   osc_clk;        /* Only used by data fetchers 5,6, and 7 */
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(top))
+				.reg(NAME(bottom))
+				.reg(NAME(low))
+				.reg(NAME(high))
+				.reg(NAME(flag))
+				.reg(NAME(music_mode))
+				.reg(NAME(osc_clk));
+		}
 	};
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	df_t    m_df[8];

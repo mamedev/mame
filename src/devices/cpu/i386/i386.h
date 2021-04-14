@@ -47,6 +47,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_debug_setup() override;
 
 	// device_execute_interface overrides
@@ -104,6 +105,8 @@ protected:
 		uint32_t d[8];
 		uint16_t w[16];
 		uint8_t b[32];
+
+		void register_save(save_registrar &save) { save.reg(NAME(d)); }
 	};
 
 	struct I386_SREG {
@@ -113,11 +116,26 @@ protected:
 		uint32_t limit;
 		int d;      // Operand size
 		bool valid;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(selector))
+				.reg(NAME(base))
+				.reg(NAME(limit))
+				.reg(NAME(flags))
+				.reg(NAME(d));
+		}
 	};
 
 	struct I386_SYS_TABLE {
 		uint32_t base;
 		uint16_t limit;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(base))
+				.reg(NAME(limit));
+		}
 	};
 
 	struct I386_SEG_DESC {
@@ -125,7 +143,16 @@ protected:
 		uint16_t flags;
 		uint32_t base;
 		uint32_t limit;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(segment))
+				.reg(NAME(flags))
+				.reg(NAME(base))
+				.reg(NAME(limit));
+		}
 	};
+
 
 	union XMM_REG {
 		uint8_t  b[16];

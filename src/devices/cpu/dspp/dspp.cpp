@@ -176,72 +176,51 @@ void dspp_device::device_start()
 		state_add(DSPP_R0 + regnum, tempstr.format("R%d", regnum), m_src2val[REGBASE + regnum]);
 #endif
 
-	// Register our state for saving
-	save_item(NAME(m_core->m_pc));
-	save_item(NAME(m_core->m_stack));
-	save_item(NAME(m_core->m_stack_ptr));
-	save_item(NAME(m_core->m_rbase));
-	save_item(NAME(m_core->m_acc));
-	save_item(NAME(m_core->m_tclock));
-
-	save_item(NAME(m_core->m_flag_carry));
-	save_item(NAME(m_core->m_flag_zero));
-	save_item(NAME(m_core->m_flag_neg));
-	save_item(NAME(m_core->m_flag_over));
-	save_item(NAME(m_core->m_flag_exact));
-	save_item(NAME(m_core->m_flag_audlock));
-	save_item(NAME(m_core->m_flag_sleep));
-
-	save_item(NAME(m_outputs));
-	save_item(NAME(m_output_fifo_start));
-	save_item(NAME(m_output_fifo_count));
-
-	save_item(STRUCT_MEMBER(m_fifo_dma, m_current_addr));
-	save_item(STRUCT_MEMBER(m_fifo_dma, m_current_count));
-	save_item(STRUCT_MEMBER(m_fifo_dma, m_next_addr));
-	save_item(STRUCT_MEMBER(m_fifo_dma, m_next_count));
-	save_item(STRUCT_MEMBER(m_fifo_dma, m_prev_value));
-	save_item(STRUCT_MEMBER(m_fifo_dma, m_prev_current));
-	save_item(STRUCT_MEMBER(m_fifo_dma, m_go_forever));
-	save_item(STRUCT_MEMBER(m_fifo_dma, m_next_valid));
-	save_item(STRUCT_MEMBER(m_fifo_dma, m_reserved));
-	save_item(STRUCT_MEMBER(m_fifo_dma, m_fifo));
-	save_item(STRUCT_MEMBER(m_fifo_dma, m_dma_ptr));
-	save_item(STRUCT_MEMBER(m_fifo_dma, m_dspi_ptr));
-	save_item(STRUCT_MEMBER(m_fifo_dma, m_depth));
-
-	save_item(NAME(m_last_frame_clock));
-	save_item(NAME(m_last_osc_count));
-	save_item(NAME(m_osc_phase));
-	save_item(NAME(m_osc_freq));
-
-	save_item(NAME(m_core->m_partial_int));
-
-	save_item(NAME(m_core->m_dspx_control));
-	save_item(NAME(m_dspx_reset));
-	save_item(NAME(m_dspx_int_enable));
-	save_item(NAME(m_dspx_channel_enable));
-	save_item(NAME(m_dspx_channel_complete));
-	save_item(NAME(m_dspx_channel_direction));
-	save_item(NAME(m_dspx_channel_8bit));
-	save_item(NAME(m_dspx_channel_sqxd));
-	save_item(NAME(m_dspx_shadow_current_addr));
-	save_item(NAME(m_dspx_shadow_current_count));
-	save_item(NAME(m_dspx_shadow_next_addr));
-	save_item(NAME(m_dspx_shadow_next_count));
-	save_item(NAME(m_dspx_dmanext_int));
-	save_item(NAME(m_dspx_dmanext_enable));
-	save_item(NAME(m_dspx_consumed_int));
-	save_item(NAME(m_dspx_consumed_enable));
-	save_item(NAME(m_dspx_underover_int));
-	save_item(NAME(m_dspx_underover_enable));
-	save_item(NAME(m_dspx_audio_time));
-	save_item(NAME(m_dspx_audio_duration));
-
 	// Set our instruction counter
 	set_icountptr(m_core->m_icount);
 
 	m_cache_dirty = true;
+}
+
+
+//-------------------------------------------------
+//  device_register_save - register our state for
+//  saving
+//-------------------------------------------------
+
+void dspp_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(*m_core))
+		.reg(NAME(m_fifo_dma))
+
+		.reg(NAME(m_outputs))
+		.reg(NAME(m_output_fifo_start))
+		.reg(NAME(m_output_fifo_count))
+
+		.reg(NAME(m_last_frame_clock))
+		.reg(NAME(m_last_osc_count))
+		.reg(NAME(m_osc_phase))
+		.reg(NAME(m_osc_freq))
+
+		.reg(NAME(m_dspx_reset))
+		.reg(NAME(m_dspx_int_enable))
+		.reg(NAME(m_dspx_channel_enable))
+		.reg(NAME(m_dspx_channel_complete))
+		.reg(NAME(m_dspx_channel_direction))
+		.reg(NAME(m_dspx_channel_8bit))
+		.reg(NAME(m_dspx_channel_sqxd))
+		.reg(NAME(m_dspx_shadow_current_addr))
+		.reg(NAME(m_dspx_shadow_current_count))
+		.reg(NAME(m_dspx_shadow_next_addr))
+		.reg(NAME(m_dspx_shadow_next_count))
+		.reg(NAME(m_dspx_dmanext_int))
+		.reg(NAME(m_dspx_dmanext_enable))
+		.reg(NAME(m_dspx_consumed_int))
+		.reg(NAME(m_dspx_consumed_enable))
+		.reg(NAME(m_dspx_underover_int))
+		.reg(NAME(m_dspx_underover_enable))
+		.reg(NAME(m_dspx_audio_time))
+		.reg(NAME(m_dspx_audio_duration));
 }
 
 

@@ -25,6 +25,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	uint16_t dma_r(offs_t offset);
 	void dma_w(offs_t offset, uint16_t data);
@@ -119,6 +120,23 @@ private:
 		bool dma_pri = false; // TODO
 		bool lword = false;
 		bool word = false;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(address))
+				.reg(NAME(tc))
+				.reg(NAME(control))
+				.reg(NAME(irq_level))
+				.reg(NAME(tsz))
+				.reg(NAME(subcount))
+				.reg(NAME(irq))
+				.reg(NAME(ie))
+				.reg(NAME(armed))
+				.reg(NAME(dma_out))
+				.reg(NAME(dma_pri))
+				.reg(NAME(lword))
+				.reg(NAME(word));
+		}
 	} m_regs[2];
 
 	bool m_dmar[2];

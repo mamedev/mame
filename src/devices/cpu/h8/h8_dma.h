@@ -24,6 +24,19 @@ struct h8_dma_state {
 	bool autoreq; // activate by auto-request
 	bool suspended;
 	bool mode_16;
+
+	void register_save(save_registrar &save)
+	{
+		save.reg(NAME(source))
+			.reg(NAME(dest))
+			.reg(NAME(incs))
+			.reg(NAME(incd))
+			.reg(NAME(count))
+			.reg(NAME(id))
+			.reg(NAME(autoreq))
+			.reg(NAME(suspended))
+			.reg(NAME(mode_16));
+	}
 };
 
 class h8_dma_channel_device;
@@ -157,6 +170,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	void h8h_sync(); // call set_bcr with contents from DTCR
 	void start(int submodule);

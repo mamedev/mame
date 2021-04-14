@@ -71,6 +71,8 @@ public:
 	{
 		uint32_t w; // 20-bit address
 		bool t; // tag-bit
+
+		void register_save(save_registrar &save) { save.reg(NAME(w)).reg(NAME(t)); }
 	}
 	m_r[11];
 
@@ -78,6 +80,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 private:
 

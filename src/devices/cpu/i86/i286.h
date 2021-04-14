@@ -90,6 +90,7 @@ protected:
 	virtual void execute_run() override;
 	virtual void device_reset() override;
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -135,12 +136,14 @@ private:
 	struct {
 		uint32_t base;
 		uint16_t limit;
+		void register_save(save_registrar &save) { save.reg(NAME(base)).reg(NAME(limit)); }
 	} m_gdtr, m_idtr;
 	struct {
 		uint16_t sel;
 		uint32_t base;
 		uint16_t limit;
 		uint8_t rights;
+		void register_save(save_registrar &save) { save.reg(NAME(sel)).reg(NAME(base)).reg(NAME(limit)).reg(NAME(rights)); }
 	} m_ldtr, m_tr;
 
 	uint32_t TRAP(uint16_t fault, uint16_t code)  { return ((((uint32_t)fault&0xffff)<<16)|(code&0xffff)); }

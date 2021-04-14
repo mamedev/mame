@@ -77,36 +77,36 @@ void i8x9x_device::device_start()
 	state_add(I8X9X_IOC1,        "IOC1",        ioc1);
 	state_add<u8>(I8X9X_IOS0,    "IOS0",        [this]() -> u8 { return ios0; }, [this](u8 data) { ios0_w(data); });
 	state_add(I8X9X_IOS1,        "IOS1",        ios1);
+}
 
-	save_item(STRUCT_MEMBER(hso_info, command));
-	save_item(STRUCT_MEMBER(hso_info, time));
-	save_item(NAME(hso_cam_hold.command));
-	save_item(NAME(hso_cam_hold.time));
-
-	save_item(NAME(base_timer2));
-	save_item(NAME(ad_done));
-	save_item(NAME(hsi_mode));
-	save_item(NAME(hsi_status));
-	save_item(NAME(hso_command));
-	save_item(NAME(ad_command));
-	save_item(NAME(hso_active));
-	save_item(NAME(hso_time));
-	save_item(NAME(ad_result));
-	save_item(NAME(port1));
-	save_item(NAME(port2));
-	save_item(NAME(pwm_control));
-	save_item(NAME(ios0));
-	save_item(NAME(ios1));
-	save_item(NAME(ioc0));
-	save_item(NAME(ioc1));
-	save_item(NAME(extint));
-	save_item(NAME(sbuf));
-	save_item(NAME(sp_con));
-	save_item(NAME(sp_stat));
-	save_item(NAME(serial_send_buf));
-	save_item(NAME(serial_send_timer));
-	save_item(NAME(baud_reg));
-	save_item(NAME(brh));
+void i8x9x_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(hso_info))
+		.reg(NAME(hso_cam_hold))
+		.reg(NAME(base_timer2))
+		.reg(NAME(ad_done))
+		.reg(NAME(hsi_mode))
+		.reg(NAME(hsi_status))
+		.reg(NAME(hso_command))
+		.reg(NAME(ad_command))
+		.reg(NAME(hso_active))
+		.reg(NAME(hso_time))
+		.reg(NAME(ad_result))
+		.reg(NAME(port1))
+		.reg(NAME(port2))
+		.reg(NAME(pwm_control))
+		.reg(NAME(ios0))
+		.reg(NAME(ios1))
+		.reg(NAME(ioc0))
+		.reg(NAME(ioc1))
+		.reg(NAME(extint))
+		.reg(NAME(sbuf))
+		.reg(NAME(sp_con))
+		.reg(NAME(sp_stat))
+		.reg(NAME(serial_send_buf))
+		.reg(NAME(serial_send_timer))
+		.reg(NAME(baud_reg))
+		.reg(NAME(brh));
 }
 
 void i8x9x_device::device_reset()

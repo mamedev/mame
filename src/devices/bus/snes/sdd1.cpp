@@ -430,18 +430,15 @@ void sns_rom_sdd1_device::device_start()
 
 	m_buffer.data = std::make_unique<uint8_t[]>(0x10000);
 	m_buffer.ready = 0;
+}
 
-	save_item(NAME(m_sdd1_enable));
-	save_item(NAME(m_xfer_enable));
-	save_item(NAME(m_mmc));
-
-	save_item(STRUCT_MEMBER(m_dma, addr));
-	save_item(STRUCT_MEMBER(m_dma, size));
-
-	save_pointer(NAME(m_buffer.data), 0x10000);
-	save_item(NAME(m_buffer.offset));
-	save_item(NAME(m_buffer.size));
-	save_item(NAME(m_buffer.ready));
+void sns_rom_sdd1_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_sdd1_enable))
+		.reg(NAME(m_xfer_enable))
+		.reg(NAME(m_mmc))
+		.reg(NAME(m_dma))
+		.reg(NAME(m_buffer));
 
 	// TODO: save remaining decomp-related items so to fix support if we try to save mid-decompression...
 }

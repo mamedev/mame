@@ -64,6 +64,7 @@ protected:
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 2); }
 	virtual void execute_run() override;
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
@@ -103,6 +104,8 @@ private:
 		uint16_t      middle;
 		uint16_t      middle_size;
 		uint16_t      peripheral;
+
+		void register_save(save_registrar &save) { save.reg(NAME(lower)).reg(NAME(upper)).reg(NAME(middle)).reg(NAME(middle_size)).reg(NAME(peripheral)); }
 	};
 
 	struct timer_state
@@ -112,6 +115,8 @@ private:
 		uint16_t      maxB;
 		uint16_t      count;
 		emu_timer   *int_timer;
+
+		void register_save(save_registrar &save) { save.reg(NAME(control)).reg(NAME(maxA)).reg(NAME(maxB)).reg(NAME(count)); }
 	};
 
 	struct dma_state
@@ -121,6 +126,8 @@ private:
 		uint32_t      dest;
 		uint16_t      count;
 		uint16_t      control;
+
+		void register_save(save_registrar &save) { save.reg(NAME(source)).reg(NAME(dest)).reg(NAME(count)).reg(NAME(control)); }
 	};
 
 	struct intr_state
@@ -137,6 +144,22 @@ private:
 		uint16_t      dma[2];
 		uint16_t      ext[4];
 		uint8_t       ext_state;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(vector))
+				.reg(NAME(pending))
+				.reg(NAME(ack_mask))
+				.reg(NAME(priority_mask))
+				.reg(NAME(in_service))
+				.reg(NAME(request))
+				.reg(NAME(status))
+				.reg(NAME(poll_status))
+				.reg(NAME(timer))
+				.reg(NAME(dma))
+				.reg(NAME(ext))
+				.reg(NAME(ext_state));
+		}
 	};
 
 	timer_state     m_timer[3];

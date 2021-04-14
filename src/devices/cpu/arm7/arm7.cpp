@@ -927,47 +927,6 @@ void arm7_cpu_device::device_start()
 		m_prptr = [this](offs_t address) -> const void * { return m_cachebe.read_ptr(address); };
 	}
 
-	save_item(NAME(m_insn_prefetch_depth));
-	save_item(NAME(m_insn_prefetch_count));
-	save_item(NAME(m_insn_prefetch_index));
-	save_item(NAME(m_insn_prefetch_buffer));
-	save_item(NAME(m_insn_prefetch_address));
-	save_item(NAME(m_insn_prefetch_valid));
-	save_item(NAME(m_tlb_log));
-	save_item(NAME(m_actual_log));
-	save_item(NAME(m_r));
-	save_item(NAME(m_pendingIrq));
-	save_item(NAME(m_pendingFiq));
-	save_item(NAME(m_pendingAbtD));
-	save_item(NAME(m_pendingAbtP));
-	save_item(NAME(m_pendingUnd));
-	save_item(NAME(m_pendingSwi));
-	save_item(NAME(m_pending_interrupt));
-	save_item(NAME(m_control));
-	save_item(NAME(m_tlbBase));
-	save_item(NAME(m_tlb_base_mask));
-	save_item(NAME(m_faultStatus));
-	save_item(NAME(m_faultAddress));
-	save_item(NAME(m_fcsePID));
-	save_item(NAME(m_pid_offset));
-	save_item(NAME(m_domainAccessControl));
-	save_item(NAME(m_decoded_access_control));
-	save_item(STRUCT_MEMBER(m_dtlb_entries, valid));
-	save_item(STRUCT_MEMBER(m_dtlb_entries, domain));
-	save_item(STRUCT_MEMBER(m_dtlb_entries, access));
-	save_item(STRUCT_MEMBER(m_dtlb_entries, table_bits));
-	save_item(STRUCT_MEMBER(m_dtlb_entries, base_addr));
-	save_item(STRUCT_MEMBER(m_dtlb_entries, type));
-	save_item(STRUCT_MEMBER(m_itlb_entries, valid));
-	save_item(STRUCT_MEMBER(m_itlb_entries, domain));
-	save_item(STRUCT_MEMBER(m_itlb_entries, access));
-	save_item(STRUCT_MEMBER(m_itlb_entries, table_bits));
-	save_item(STRUCT_MEMBER(m_itlb_entries, base_addr));
-	save_item(STRUCT_MEMBER(m_itlb_entries, type));
-	save_item(NAME(m_dtlb_entry_index));
-	save_item(NAME(m_itlb_entry_index));
-	machine().save().register_postload(save_prepost_delegate(FUNC(arm7_cpu_device::postload), this));
-
 	set_icountptr(m_icount);
 
 	state_add( ARM7_PC,    "PC", m_pc).callexport().formatstr("%08X");
@@ -1027,6 +986,41 @@ void arm7_cpu_device::device_start()
 		machine().debugger().console().register_command("translate_insn", CMDFLAG_NONE, 0, 1, 1, std::bind(&arm7_cpu_device::translate_insn_command, this, _1, _2));
 		machine().debugger().console().register_command("translate_data", CMDFLAG_NONE, 0, 1, 1, std::bind(&arm7_cpu_device::translate_data_command, this, _1, _2));
 	}
+}
+
+void arm7_cpu_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_insn_prefetch_depth))
+		.reg(NAME(m_insn_prefetch_count))
+		.reg(NAME(m_insn_prefetch_index))
+		.reg(NAME(m_insn_prefetch_buffer))
+		.reg(NAME(m_insn_prefetch_address))
+		.reg(NAME(m_insn_prefetch_valid))
+		.reg(NAME(m_tlb_log))
+		.reg(NAME(m_actual_log))
+		.reg(NAME(m_r))
+		.reg(NAME(m_pendingIrq))
+		.reg(NAME(m_pendingFiq))
+		.reg(NAME(m_pendingAbtD))
+		.reg(NAME(m_pendingAbtP))
+		.reg(NAME(m_pendingUnd))
+		.reg(NAME(m_pendingSwi))
+		.reg(NAME(m_pending_interrupt))
+		.reg(NAME(m_control))
+		.reg(NAME(m_tlbBase))
+		.reg(NAME(m_tlb_base_mask))
+		.reg(NAME(m_faultStatus))
+		.reg(NAME(m_faultAddress))
+		.reg(NAME(m_fcsePID))
+		.reg(NAME(m_pid_offset))
+		.reg(NAME(m_domainAccessControl))
+		.reg(NAME(m_decoded_access_control))
+		.reg(NAME(m_dtlb_entries))
+		.reg(NAME(m_itlb_entries))
+		.reg(NAME(m_dtlb_entry_index))
+		.reg(NAME(m_itlb_entry_index));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(arm7_cpu_device::postload), this));
 }
 
 

@@ -1949,72 +1949,6 @@ void i386_device::i386_common_init()
 
 	zero_state();
 
-	save_item(NAME(m_reg.d));
-	save_item(STRUCT_MEMBER(m_sreg, selector));
-	save_item(STRUCT_MEMBER(m_sreg, base));
-	save_item(STRUCT_MEMBER(m_sreg, limit));
-	save_item(STRUCT_MEMBER(m_sreg, flags));
-	save_item(STRUCT_MEMBER(m_sreg, d));
-	save_item(NAME(m_eip));
-	save_item(NAME(m_prev_eip));
-
-	save_item(NAME(m_CF));
-	save_item(NAME(m_DF));
-	save_item(NAME(m_SF));
-	save_item(NAME(m_OF));
-	save_item(NAME(m_ZF));
-	save_item(NAME(m_PF));
-	save_item(NAME(m_AF));
-	save_item(NAME(m_IF));
-	save_item(NAME(m_TF));
-	save_item(NAME(m_IOP1));
-	save_item(NAME(m_IOP2));
-	save_item(NAME(m_NT));
-	save_item(NAME(m_RF));
-	save_item(NAME(m_VM));
-	save_item(NAME(m_AC));
-	save_item(NAME(m_VIF));
-	save_item(NAME(m_VIP));
-	save_item(NAME(m_ID));
-
-	save_item(NAME(m_CPL));
-
-	save_item(NAME(m_auto_clear_RF));
-	save_item(NAME(m_performed_intersegment_jump));
-
-	save_item(NAME(m_cr));
-	save_item(NAME(m_dr));
-	save_item(NAME(m_tr));
-
-	save_item(NAME(m_idtr.base));
-	save_item(NAME(m_idtr.limit));
-	save_item(NAME(m_gdtr.base));
-	save_item(NAME(m_gdtr.limit));
-	save_item(NAME(m_task.base));
-	save_item(NAME(m_task.segment));
-	save_item(NAME(m_task.limit));
-	save_item(NAME(m_task.flags));
-	save_item(NAME(m_ldtr.base));
-	save_item(NAME(m_ldtr.segment));
-	save_item(NAME(m_ldtr.limit));
-	save_item(NAME(m_ldtr.flags));
-
-	save_item(NAME(m_segment_override));
-
-	save_item(NAME(m_irq_state));
-	save_item(NAME(m_a20_mask));
-
-	save_item(NAME(m_mxcsr));
-
-	save_item(NAME(m_smm));
-	save_item(NAME(m_smi));
-	save_item(NAME(m_smi_latched));
-	save_item(NAME(m_nmi_masked));
-	save_item(NAME(m_nmi_latched));
-	save_item(NAME(m_smbase));
-	save_item(NAME(m_lock));
-	machine().save().register_postload(save_prepost_delegate(FUNC(i386_device::i386_postload), this));
-
 	m_smiact.resolve_safe();
 	m_ferr_handler.resolve_safe();
 	m_ferr_handler(0);
@@ -2024,6 +1958,64 @@ void i386_device::i386_common_init()
 	{
 		dri_changed();
 	});
+}
+
+void i386_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_reg))
+		.reg(NAME(m_sreg))
+		.reg(NAME(m_eip))
+		.reg(NAME(m_prev_eip))
+
+		.reg(NAME(m_CF))
+		.reg(NAME(m_DF))
+		.reg(NAME(m_SF))
+		.reg(NAME(m_OF))
+		.reg(NAME(m_ZF))
+		.reg(NAME(m_PF))
+		.reg(NAME(m_AF))
+		.reg(NAME(m_IF))
+		.reg(NAME(m_TF))
+		.reg(NAME(m_IOP1))
+		.reg(NAME(m_IOP2))
+		.reg(NAME(m_NT))
+		.reg(NAME(m_RF))
+		.reg(NAME(m_VM))
+		.reg(NAME(m_AC))
+		.reg(NAME(m_VIF))
+		.reg(NAME(m_VIP))
+		.reg(NAME(m_ID))
+
+		.reg(NAME(m_CPL))
+
+		.reg(NAME(m_auto_clear_RF))
+		.reg(NAME(m_performed_intersegment_jump))
+
+		.reg(NAME(m_cr))
+		.reg(NAME(m_dr))
+		.reg(NAME(m_tr))
+
+		.reg(NAME(m_idtr))
+		.reg(NAME(m_gdtr))
+		.reg(NAME(m_task))
+		.reg(NAME(m_ldtr))
+
+		.reg(NAME(m_segment_override))
+
+		.reg(NAME(m_irq_state))
+		.reg(NAME(m_a20_mask))
+
+		.reg(NAME(m_mxcsr))
+
+		.reg(NAME(m_smm))
+		.reg(NAME(m_smi))
+		.reg(NAME(m_smi_latched))
+		.reg(NAME(m_nmi_masked))
+		.reg(NAME(m_nmi_latched))
+		.reg(NAME(m_smbase))
+		.reg(NAME(m_lock));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(i386_device::i386_postload), this));
 }
 
 void i386_device::device_start()

@@ -36,26 +36,16 @@ dio16_98620_device::dio16_98620_device(const machine_config &mconfig, device_typ
 void dio16_98620_device::device_start()
 {
 	m_installed_io = false;
+}
 
-	save_item(STRUCT_MEMBER(m_regs, address));
-	save_item(STRUCT_MEMBER(m_regs, tc));
-	save_item(STRUCT_MEMBER(m_regs, control));
-	save_item(STRUCT_MEMBER(m_regs, irq_level));
-	save_item(STRUCT_MEMBER(m_regs, tsz));
-	save_item(STRUCT_MEMBER(m_regs, subcount));
-	save_item(STRUCT_MEMBER(m_regs, irq));
-	save_item(STRUCT_MEMBER(m_regs, ie));
-	save_item(STRUCT_MEMBER(m_regs, armed));
-	save_item(STRUCT_MEMBER(m_regs, dma_out));
-	save_item(STRUCT_MEMBER(m_regs, dma_pri));
-	save_item(STRUCT_MEMBER(m_regs, lword));
-	save_item(STRUCT_MEMBER(m_regs, word));
-
-	save_item(NAME(m_installed_io));
-	save_item(NAME(m_control));
-	save_item(NAME(m_data));
-	save_item(NAME(m_irq_state));
-	save_item(NAME(m_dmar));
+void dio16_98620_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_installed_io))
+		.reg(NAME(m_control))
+		.reg(NAME(m_data))
+		.reg(NAME(m_irq_state))
+		.reg(NAME(m_dmar))
+		.reg(NAME(m_regs));
 }
 
 void dio16_98620_device::device_reset()

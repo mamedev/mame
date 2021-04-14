@@ -73,6 +73,7 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	virtual uint32_t execute_input_lines() const noexcept override { return 5; }
 	virtual void execute_set_input(int linenum, int state) override;
@@ -126,6 +127,7 @@ private:
 	struct hso_cam_entry {
 		u8 command;
 		u16 time;
+		void register_save(save_registrar &save) { save.reg(NAME(command)).reg(NAME(time)); }
 	};
 
 	devcb_read16::array<8> m_ach_cb;

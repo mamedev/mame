@@ -32,6 +32,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	// misc classes for the S-DD1
 
@@ -169,6 +170,8 @@ protected:
 	{
 		uint32_t addr;    // $43x2-$43x4 -- DMA transfer address
 		uint16_t size;    // $43x5-$43x6 -- DMA transfer size
+
+		void register_save(save_registrar &save) { save.reg(NAME(addr)).reg(NAME(size)); }
 	} m_dma[8];
 
 	std::unique_ptr<SDD1_emu> m_sdd1emu;
@@ -179,6 +182,8 @@ protected:
 		uint16_t offset;  // read index into S-DD1 decompression buffer
 		uint32_t size;    // length of data buffer; reads decrement counter, set ready to false at 0
 		uint8_t ready;    // 1 when data[] is valid; 0 to invoke sdd1emu.decompress()
+
+		void register_save(save_registrar &save) { save.reg(NAME(data), 0x10000).reg(NAME(offset)).reg(NAME(size)).reg(NAME(ready)); }
 	} m_buffer;
 };
 

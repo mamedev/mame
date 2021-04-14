@@ -222,26 +222,6 @@ void i80286_cpu_device::device_reset()
 void i80286_cpu_device::device_start()
 {
 	i8086_common_cpu_device::device_start();
-	save_item(NAME(m_trap_level));
-	save_item(NAME(m_msw));
-	save_item(NAME(m_base));
-	save_item(NAME(m_limit));
-	save_item(NAME(m_rights));
-	save_item(NAME(m_valid));
-	save_item(NAME(m_gdtr.base));
-	save_item(NAME(m_gdtr.limit));
-	save_item(NAME(m_idtr.base));
-	save_item(NAME(m_idtr.limit));
-	save_item(NAME(m_ldtr.sel));
-	save_item(NAME(m_ldtr.base));
-	save_item(NAME(m_ldtr.limit));
-	save_item(NAME(m_ldtr.rights));
-	save_item(NAME(m_tr.sel));
-	save_item(NAME(m_tr.base));
-	save_item(NAME(m_tr.limit));
-	save_item(NAME(m_tr.rights));
-	save_item(NAME(m_amask));
-	save_item(NAME(m_shutdown));
 
 	state_add( I286_ES, "ES", m_sregs[ES] ).formatstr("%04X");
 	state_add( I286_ES_BASE, "ESBASE", m_base[ES]).formatstr("%06X");
@@ -279,6 +259,24 @@ void i80286_cpu_device::device_start()
 	state_add( I8086_HALT, "HALT", m_halt ).mask(1);
 
 	m_out_shutdown_func.resolve_safe();
+}
+
+void i80286_cpu_device::device_register_save(save_registrar &save)
+{
+	i8086_common_cpu_device::device_register_save(save);
+
+	save.reg(NAME(m_trap_level))
+		.reg(NAME(m_msw))
+		.reg(NAME(m_base))
+		.reg(NAME(m_limit))
+		.reg(NAME(m_rights))
+		.reg(NAME(m_valid))
+		.reg(NAME(m_gdtr))
+		.reg(NAME(m_idtr))
+		.reg(NAME(m_ldtr))
+		.reg(NAME(m_tr))
+		.reg(NAME(m_amask))
+		.reg(NAME(m_shutdown));
 }
 
 device_memory_interface::space_config_vector i80286_cpu_device::memory_space_config() const

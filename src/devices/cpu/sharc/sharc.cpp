@@ -669,113 +669,6 @@ void adsp21062_device::device_start()
 	m_core->fp0 = 0.0f;
 	m_core->fp1 = 1.0f;
 
-	save_item(NAME(m_core->pc));
-	save_pointer(NAME(&m_core->r[0].r), std::size(m_core->r));
-	save_pointer(NAME(&m_core->reg_alt[0].r), std::size(m_core->reg_alt));
-	save_item(NAME(m_core->mrf));
-	save_item(NAME(m_core->mrb));
-
-	save_item(NAME(m_core->pcstack));
-	save_item(NAME(m_core->lcstack));
-	save_item(NAME(m_core->lastack));
-	save_item(NAME(m_core->lstkp));
-
-	save_item(NAME(m_core->faddr));
-	save_item(NAME(m_core->daddr));
-	save_item(NAME(m_core->pcstk));
-	save_item(NAME(m_core->pcstkp));
-	save_item(NAME(m_core->laddr.addr));
-	save_item(NAME(m_core->laddr.code));
-	save_item(NAME(m_core->laddr.loop_type));
-	save_item(NAME(m_core->curlcntr));
-	save_item(NAME(m_core->lcntr));
-
-	save_item(NAME(m_core->dag1.i));
-	save_item(NAME(m_core->dag1.m));
-	save_item(NAME(m_core->dag1.b));
-	save_item(NAME(m_core->dag1.l));
-	save_item(NAME(m_core->dag2.i));
-	save_item(NAME(m_core->dag2.m));
-	save_item(NAME(m_core->dag2.b));
-	save_item(NAME(m_core->dag2.l));
-	save_item(NAME(m_core->dag1_alt.i));
-	save_item(NAME(m_core->dag1_alt.m));
-	save_item(NAME(m_core->dag1_alt.b));
-	save_item(NAME(m_core->dag1_alt.l));
-	save_item(NAME(m_core->dag2_alt.i));
-	save_item(NAME(m_core->dag2_alt.m));
-	save_item(NAME(m_core->dag2_alt.b));
-	save_item(NAME(m_core->dag2_alt.l));
-
-	save_item(STRUCT_MEMBER(m_core->dma, control));
-	save_item(STRUCT_MEMBER(m_core->dma, int_index));
-	save_item(STRUCT_MEMBER(m_core->dma, int_modifier));
-	save_item(STRUCT_MEMBER(m_core->dma, int_count));
-	save_item(STRUCT_MEMBER(m_core->dma, chain_ptr));
-	save_item(STRUCT_MEMBER(m_core->dma, gen_purpose));
-	save_item(STRUCT_MEMBER(m_core->dma, ext_index));
-	save_item(STRUCT_MEMBER(m_core->dma, ext_modifier));
-	save_item(STRUCT_MEMBER(m_core->dma, ext_count));
-
-	save_item(NAME(m_core->mode1));
-	save_item(NAME(m_core->mode2));
-	save_item(NAME(m_core->astat));
-	save_item(NAME(m_core->stky));
-	save_item(NAME(m_core->irptl));
-	save_item(NAME(m_core->imask));
-	save_item(NAME(m_core->imaskp));
-	save_item(NAME(m_core->ustat1));
-	save_item(NAME(m_core->ustat2));
-
-	save_item(NAME(m_core->flag));
-
-	save_item(NAME(m_core->syscon));
-	save_item(NAME(m_core->sysstat));
-
-	save_item(STRUCT_MEMBER(m_core->status_stack, mode1));
-	save_item(STRUCT_MEMBER(m_core->status_stack, astat));
-	save_item(NAME(m_core->status_stkp));
-
-	save_item(NAME(m_core->px));
-
-	save_item(NAME(m_core->opcode));
-
-	save_item(NAME(m_core->nfaddr));
-
-	save_item(NAME(m_core->idle));
-	save_item(NAME(m_core->irq_pending));
-	save_item(NAME(m_core->active_irq_num));
-
-	save_item(STRUCT_MEMBER(m_core->dma_op, src));
-	save_item(STRUCT_MEMBER(m_core->dma_op, dst));
-	save_item(STRUCT_MEMBER(m_core->dma_op, chain_ptr));
-	save_item(STRUCT_MEMBER(m_core->dma_op, src_modifier));
-	save_item(STRUCT_MEMBER(m_core->dma_op, dst_modifier));
-	save_item(STRUCT_MEMBER(m_core->dma_op, src_count));
-	save_item(STRUCT_MEMBER(m_core->dma_op, dst_count));
-	save_item(STRUCT_MEMBER(m_core->dma_op, pmode));
-	save_item(STRUCT_MEMBER(m_core->dma_op, chained_direction));
-	save_item(STRUCT_MEMBER(m_core->dma_op, active));
-
-	save_item(NAME(m_core->dma_status));
-
-	save_item(NAME(m_core->interrupt_active));
-
-	save_item(NAME(m_core->iop_delayed_reg));
-	save_item(NAME(m_core->iop_delayed_data));
-
-	save_item(NAME(m_core->delay_slot1));
-	save_item(NAME(m_core->delay_slot2));
-
-	save_item(NAME(m_core->systemreg_latency_cycles));
-	save_item(NAME(m_core->systemreg_latency_reg));
-	save_item(NAME(m_core->systemreg_latency_data));
-	save_item(NAME(m_core->systemreg_previous_data));
-
-	save_item(NAME(m_core->astat_old));
-	save_item(NAME(m_core->astat_old_old));
-	save_item(NAME(m_core->astat_old_old_old));
-
 	state_add( SHARC_PC,     "PC", m_core->pc).formatstr("%08X");
 	state_add( SHARC_PCSTK,  "PCSTK", m_core->pcstk).formatstr("%08X");
 	state_add( SHARC_PCSTKP, "PCSTKP", m_core->pcstkp).formatstr("%08X");
@@ -881,6 +774,90 @@ void adsp21062_device::device_start()
 	state_add( STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
 
 	set_icountptr(m_core->icount);
+}
+
+void adsp21062_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(*m_core));
+}
+
+
+SAVE_TYPE_AS_INT(adsp21062_device::SHARC_REG);
+void adsp21062_device::sharc_internal_state::register_save(save_registrar &save)
+{
+	save.reg(NAME(pc))
+		.reg(NAME(r))
+		.reg(NAME(reg_alt))
+		.reg(NAME(mrf))
+		.reg(NAME(mrb))
+
+		.reg(NAME(pcstack))
+		.reg(NAME(lcstack))
+		.reg(NAME(lastack))
+		.reg(NAME(lstkp))
+
+		.reg(NAME(faddr))
+		.reg(NAME(daddr))
+		.reg(NAME(pcstk))
+		.reg(NAME(pcstkp))
+		.reg(NAME(laddr))
+		.reg(NAME(curlcntr))
+		.reg(NAME(lcntr))
+
+		.reg(NAME(dag1))
+		.reg(NAME(dag2))
+		.reg(NAME(dag1_alt))
+		.reg(NAME(dag2_alt))
+		.reg(NAME(dma))
+
+		.reg(NAME(mode1))
+		.reg(NAME(mode2))
+		.reg(NAME(astat))
+		.reg(NAME(stky))
+		.reg(NAME(irptl))
+		.reg(NAME(imask))
+		.reg(NAME(imaskp))
+		.reg(NAME(ustat1))
+		.reg(NAME(ustat2))
+
+		.reg(NAME(flag))
+
+		.reg(NAME(syscon))
+		.reg(NAME(sysstat))
+
+		.reg(NAME(status_stack))
+		.reg(NAME(status_stkp))
+
+		.reg(NAME(px))
+
+		.reg(NAME(opcode))
+
+		.reg(NAME(nfaddr))
+
+		.reg(NAME(idle))
+		.reg(NAME(irq_pending))
+		.reg(NAME(active_irq_num))
+
+		.reg(NAME(dma_op))
+
+		.reg(NAME(dma_status))
+
+		.reg(NAME(interrupt_active))
+
+		.reg(NAME(iop_delayed_reg))
+		.reg(NAME(iop_delayed_data))
+
+		.reg(NAME(delay_slot1))
+		.reg(NAME(delay_slot2))
+
+		.reg(NAME(systemreg_latency_cycles))
+		.reg(NAME(systemreg_latency_reg))
+		.reg(NAME(systemreg_latency_data))
+		.reg(NAME(systemreg_previous_data))
+
+		.reg(NAME(astat_old))
+		.reg(NAME(astat_old_old))
+		.reg(NAME(astat_old_old_old));
 }
 
 void adsp21062_device::device_reset()

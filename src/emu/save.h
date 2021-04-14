@@ -240,6 +240,12 @@ public:
         return *this;
 	}
 
+    // bool as a special case
+    save_registrar &reg(bool &data, char const *name)
+	{
+		return register_internal(&data, save_registered_item::TYPE_BOOL, sizeof(data), name);
+	}
+
     // signed integral types
     template<typename T>
     std::enable_if_t<is_signed_int_like<T>::value, save_registrar> &reg(T &data, char const *name)
@@ -286,8 +292,7 @@ public:
         return *this;
     }
 
-    // std::arrays -- these are containers with a single item representing the underlying data,
-	// which is replicated across the whole array
+    // std::arrays -- these identically to arrays
     template<typename T, std::size_t N>
     save_registrar &reg(std::array<T, N> &data, char const *name)
     {
@@ -296,7 +301,19 @@ public:
         return *this;
     }
 
-    // std::vectors -- these are treated as arrays, with the size coming from the vector
+	// pointers -- treat as an array with a specific count
+	template<typename T>
+	save_registrar &reg(T *data, char const *name, std::size_t count)
+	{
+		if (data == nullptr)
+			throw emu_fatalerror("Passed null pointer to save state registration.");
+
+		save_registrar container(*this, save_registered_item::save_type(count), sizeof(data[0]), name, &data[0]);
+		container.reg(data[0], "");
+		return *this;
+	}
+
+    // std::vectors -- these are treated as arrays, but wrapped
     template<typename T>
     save_registrar &reg(std::vector<T> &data, char const *name)
     {
@@ -327,29 +344,14 @@ public:
 		return *this;
 	}
 
-	// pointers
-	template<typename T>
-	save_registrar &reg(T *dataptr, char const *name, std::size_t count)
-	{
-		if (dataptr == nullptr)
-			throw emu_fatalerror("Passed null pointer to save state registration.");
-
-		save_registrar container(*this, save_registered_item::save_type(count), sizeof(dataptr), name, &dataptr, dataptr);
-		container.reg(dataptr[0], "");
-		return *this;
-	}
-
-	// structures (must have a register_save method)
-    template<typename T, std::enable_if_t<std::is_class<T>::value && !std::is_base_of<bitmap_t, T>::value && !is_atom<T>::value, bool> = true>
+	// structures & unions (must have a register_save method)
+    template<typename T, std::enable_if_t<(std::is_class<T>::value || std::is_union<T>::value) && !std::is_base_of<bitmap_t, T>::value && !is_atom<T>::value, bool> = true>
     save_registrar &reg(T &data, char const *name)
     {
 		save_registrar container(*this, save_registered_item::TYPE_STRUCT, sizeof(data), name, &data);
         data.register_save(container);
         return *this;
     }
-
-    // bool as a special case
-    save_registrar &reg(bool &data, char const *name) { return register_internal(&data, save_registered_item::TYPE_BOOL, sizeof(data), name); }
 
 	// rectangle as a special case, since it's from an external library
     save_registrar &reg(rectangle &data, char const *name)

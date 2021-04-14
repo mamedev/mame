@@ -34,20 +34,16 @@ void dpc_device::device_start()
 {
 	m_oscillator = timer_alloc(TIMER_OSC);
 	m_oscillator->reset();
+}
 
-	save_item(STRUCT_MEMBER(m_df, top));
-	save_item(STRUCT_MEMBER(m_df, bottom));
-	save_item(STRUCT_MEMBER(m_df, low));
-	save_item(STRUCT_MEMBER(m_df, high));
-	save_item(STRUCT_MEMBER(m_df, flag));
-	save_item(STRUCT_MEMBER(m_df, music_mode));
-	save_item(STRUCT_MEMBER(m_df, osc_clk));
-
-	save_item(NAME(m_movamt));
-	save_item(NAME(m_latch_62));
-	save_item(NAME(m_latch_64));
-	save_item(NAME(m_dlc));
-	save_item(NAME(m_shift_reg));
+void dpc_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_df))
+		.reg(NAME(m_movamt))
+		.reg(NAME(m_latch_62))
+		.reg(NAME(m_latch_64))
+		.reg(NAME(m_dlc))
+		.reg(NAME(m_shift_reg));
 }
 
 void dpc_device::device_reset()

@@ -150,25 +150,21 @@ void h8_dma_channel_device::set_info(const char *_intc, int _irq_base, int v0, i
 
 void h8_dma_channel_device::device_start()
 {
-	save_item(STRUCT_MEMBER(state, source));
-	save_item(STRUCT_MEMBER(state, dest));
-	save_item(STRUCT_MEMBER(state, incs));
-	save_item(STRUCT_MEMBER(state, incd));
-	save_item(STRUCT_MEMBER(state, count));
-	save_item(STRUCT_MEMBER(state, id));
-	save_item(STRUCT_MEMBER(state, autoreq));
-	save_item(STRUCT_MEMBER(state, suspended));
-	save_item(STRUCT_MEMBER(state, mode_16));
-	save_item(NAME(mar));
-	save_item(NAME(ioar));
-	save_item(NAME(etcr));
-	save_item(NAME(dmacr));
-	save_item(NAME(dtcr));
-	save_item(NAME(dta));
-	save_item(NAME(dte));
-	save_item(NAME(dtie));
-	save_item(NAME(fae));
-	save_item(NAME(sae));
+}
+
+void h8_dma_channel_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(state))
+		.reg(NAME(mar))
+		.reg(NAME(ioar))
+		.reg(NAME(etcr))
+		.reg(NAME(dmacr))
+		.reg(NAME(dtcr))
+		.reg(NAME(dta))
+		.reg(NAME(dte))
+		.reg(NAME(dtie))
+		.reg(NAME(fae))
+		.reg(NAME(sae));
 }
 
 void h8_dma_channel_device::device_reset()

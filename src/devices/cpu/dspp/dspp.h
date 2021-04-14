@@ -76,6 +76,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override;
@@ -243,6 +244,29 @@ private:
 
 		// External control registers
 		uint32_t    m_dspx_control;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(m_pc))
+				.reg(NAME(m_stack))
+				.reg(NAME(m_stack_ptr))
+				.reg(NAME(m_rbase))
+				.reg(NAME(m_acc))
+				.reg(NAME(m_tclock))
+
+				.reg(NAME(m_flag_carry))
+				.reg(NAME(m_flag_zero))
+				.reg(NAME(m_flag_neg))
+				.reg(NAME(m_flag_over))
+				.reg(NAME(m_flag_exact))
+				.reg(NAME(m_flag_audlock))
+				.reg(NAME(m_flag_sleep))
+
+				.reg(NAME(m_partial_int))
+
+				.reg(NAME(m_dspx_control));
+		}
+
 	} * m_core;
 
 	// DMA
@@ -261,6 +285,23 @@ private:
 		uint32_t    m_dma_ptr;
 		uint32_t    m_dspi_ptr;
 		uint32_t    m_depth;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(m_current_addr))
+				.reg(NAME(m_current_count))
+				.reg(NAME(m_next_addr))
+				.reg(NAME(m_next_count))
+				.reg(NAME(m_prev_value))
+				.reg(NAME(m_prev_current))
+				.reg(NAME(m_go_forever))
+				.reg(NAME(m_next_valid))
+				.reg(NAME(m_reserved))
+				.reg(NAME(m_fifo))
+				.reg(NAME(m_dma_ptr))
+				.reg(NAME(m_dspi_ptr))
+				.reg(NAME(m_depth));
+		}
 	} m_fifo_dma[NUM_DMA_CHANNELS];
 
 	// Oscillator
