@@ -93,7 +93,9 @@ void k007452_device::device_start()
 
 void k007452_device::device_reset()
 {
-	for (int i = 0; i < 6; i++)
-		m_math_regs[i] = 0;
+	std::fill(std::begin(m_math_regs), std::end(m_math_regs), 0);
+	m_multiply_result = 0;
+	m_divide_quotient = 0;
+	m_divide_remainder = 0;
 }
 

@@ -11,6 +11,7 @@
 #pragma once
 
 #include "video/k007121.h"
+#include "machine/k007452.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -31,16 +32,12 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_k007121_1(*this, "k007121_1"),
 		m_k007121_2(*this, "k007121_2"),
+		m_k007452(*this, "k007452"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
 	{ }
-
-	uint32_t m_math_reg[6];
-	uint16_t m_multiply_result;
-	uint16_t m_divide_quotient;
-	uint16_t m_divide_remainder;
 	
 	/* memory pointers */
 	std::unique_ptr<uint8_t[]>       m_buffered_spriteram;
@@ -66,6 +63,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<k007121_device> m_k007121_1;
 	required_device<k007121_device> m_k007121_2;
+	required_device<k007452_device> m_k007452;
 	void contra_bankswitch_w(uint8_t data);
 	void contra_sh_irqtrigger_w(uint8_t data);
 	void sirq_clear_w(uint8_t data);
@@ -78,8 +76,6 @@ public:
 	void contra_text_cram_w(offs_t offset, uint8_t data);
 	void contra_K007121_ctrl_0_w(offs_t offset, uint8_t data);
 	void contra_K007121_ctrl_1_w(offs_t offset, uint8_t data);
-	uint8_t contra_K007452_r(offs_t offset);
-	void contra_K007452_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);

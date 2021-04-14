@@ -20,7 +20,7 @@ class k007452_device : public device_t
 {
 public:
 	// construction/destruction
-	k007452_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	k007452_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// public interface
 	u8 read(offs_t offset);

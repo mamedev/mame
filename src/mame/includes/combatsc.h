@@ -14,6 +14,7 @@
 #include "sound/upd7759.h"
 #include "sound/msm5205.h"
 #include "video/k007121.h"
+#include "machine/k007452.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -27,6 +28,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_k007121_1(*this, "k007121_1"),
 		m_k007121_2(*this, "k007121_2"),
+		m_k007452(*this, "k007452"),
 		m_upd7759(*this, "upd"),
 		m_msm(*this, "msm"),
 		m_screen(*this, "screen"),
@@ -69,6 +71,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	optional_device<k007121_device> m_k007121_1;
 	optional_device<k007121_device> m_k007121_2;
+	optional_device<k007452_device> m_k007452;
 	optional_device<upd7759_device> m_upd7759;
 	optional_device<msm5205_device> m_msm;
 	required_device<screen_device> m_screen;

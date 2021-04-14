@@ -353,8 +353,7 @@ void combatsc_state::combatsc_map(address_map &map)
 	map(0x0020, 0x005f).rw(FUNC(combatsc_state::combatsc_scrollram_r), FUNC(combatsc_state::combatsc_scrollram_w));
 //  map(0x0060, 0x00ff).writeonly();                 /* RAM */
 
-	map(0x0200, 0x0201).rw(FUNC(combatsc_state::protection_r), FUNC(combatsc_state::protection_w));
-	map(0x0206, 0x0206).w(FUNC(combatsc_state::protection_clock_w));
+	map(0x0200, 0x0207).rw("k007452", FUNC(k007452_device::read), FUNC(k007452_device::write));
 
 	map(0x0400, 0x0400).portr("IN0");
 	map(0x0401, 0x0401).portr("DSW3");           /* DSW #3 */
@@ -713,6 +712,8 @@ void combatsc_state::combatsc(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
+	KONAMI_007452_MATH(config, "k007452");
+	
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(60);
