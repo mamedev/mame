@@ -280,7 +280,7 @@ void qx10_state::update_speaker()
 	 * !enable   -----
 	 */
 
-	uint8_t level = !((!((!m_spkr_enable) && m_pit1_out0)) && m_spkr_freq);
+	uint8_t level = (!((!((!m_spkr_enable) && m_pit1_out0)) && m_spkr_freq)) ? 1 : 0;
 	m_speaker->level_w(level);
 }
 
