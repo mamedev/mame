@@ -136,6 +136,9 @@ int jv3_format::identify(io_generic *io, uint32_t form_factor, const std::vector
 {
 	uint32_t image_size = io_generic_size(io);
 
+	//if (image_size == 0x2200)
+		//return 40;  // unformatted disk
+
 	if (image_size < 0x2300)
 		return 0;
 
@@ -322,14 +325,83 @@ bool jv3_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 
 bool jv3_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
-	// To be done
-	return false;
+	uint32_t data_ptr = 0x2200, sect_ptr = 0;
+
+	int track_count, head_count;
+	image->get_actual_geometry(track_count, head_count);
+
+	// prepare default header, which we will partially overwrite later
+	uint8_t header[0x2200];
+	std::fill_n(header, std::size(header), 0xFF);
+
+	if (!track_count)
+	{
+		track_count = 35;
+		head_count = 1;
+	}
+
+	// write disk data
+	for (uint8_t head = 0; head < head_count; head++)
+	{
+		for (uint8_t track = 0; track < track_count; track++)
+		{
+			auto bitstream = generate_bitstream_from_track(track, head, 2000, image);
+			auto sectors = extract_sectors_from_bitstream_mfm_pc(bitstream);
+			bool ddensity = true;
+			if (sectors.empty())
+			{
+				bitstream = generate_bitstream_from_track(track, head, 4000, image);
+				sectors = extract_sectors_from_bitstream_fm_pc(bitstream);
+				ddensity = false;
+			}
+
+			if (sectors.empty())
+			{
+				// write dummy data. If we write nothing at all, mame hangs
+				uint8_t dummy[256];
+				std::fill_n(dummy, std::size(dummy), 0xE5);
+				for (uint8_t i = 0; i < 10; i++)
+				{
+					header[sect_ptr++] = track;
+					header[sect_ptr++] = i;
+					header[sect_ptr++] = head ? 0x10 : 0;
+					io_generic_write(io, &dummy[0], data_ptr, 256);
+					data_ptr += 256;
+				}
+			}
+			else
+			{
+				// How many sectors?
+				uint8_t count = 0;
+				for (const auto &s : sectors)
+					if (!s.empty())
+						count++;
+
+				// Save them
+				for (uint8_t i = 0; i < count; i++)
+				{
+					header[sect_ptr++] = track;
+					header[sect_ptr++] = i;
+					uint8_t flags = (ddensity) ? 0x80 : 0;
+					flags |= (sectors[i].size() >> 8) ^1;
+					flags |= head ? 0x10 : 0;
+					header[sect_ptr++] = flags;
+					io_generic_write(io, sectors[i].data(), data_ptr, sectors[i].size());
+					data_ptr += sectors[i].size();
+				}
+			}
+		}
+	}
+	// Save the header
+	io_generic_write(io, header, 0, 0x2200);
+
+	return true;
 }
 
 
 bool jv3_format::supports_save() const
 {
-	return false;
+	return true;
 }
 
 const floppy_format_type FLOPPY_JV3_FORMAT = &floppy_image_format_creator<jv3_format>;

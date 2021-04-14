@@ -57,12 +57,10 @@ Model 4P - is the same as Model 4 except:
 To Do / Status:
 --------------
 
-JV3: not working. The disk will load, but it's unreadable.
+JV3: Cannot write, due to an emulation bug causing the machine to hang.
 JV1: if you try to create a disk in the File Manager, MAME will crash.
 JV3, DMK: no option to create.
 IMD: does not work with a quad drive.
-Any disk that has more tracks than the current drive will most likely
- cause MAME to crash.
 
 trs80m3:   Works
 
