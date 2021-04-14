@@ -36,6 +36,14 @@ protected:
 		uint8_t read(uint32_t offset);
 		void write(uint32_t offset, uint8_t data);
 
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(regs))
+				.reg(NAME(r2192_counter))
+				.reg(NAME(r2192_hour))
+				.reg(NAME(r2192_second));
+		}
+
 	private:
 		// regs
 		uint8_t regs[0x18];       // 0x2188-0x219f
@@ -51,6 +59,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_reset() override;
 
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -139,6 +148,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_reset() override;
 
 	// flash regs

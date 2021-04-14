@@ -67,7 +67,6 @@ save_manager::save_manager(running_machine &machine)
 	, m_reg_allowed(true)
 	, m_illegal_regs(0)
 	, m_root_registrar(m_root_item)
-	, m_legacy_registrar(m_root_registrar, "legacy")
 {
 	m_rewind = std::make_unique<rewinder>(*this);
 }
@@ -169,38 +168,6 @@ void save_manager::register_postload(save_prepost_delegate func)
 
 	// allocate a new entry
 	m_postload_list.push_back(std::make_unique<state_callback>(func));
-}
-
-
-//-------------------------------------------------
-//  save_memory - register an array of data in
-//  memory
-//-------------------------------------------------
-
-void save_manager::save_memory(device_t *device, const char *module, const char *tag, u32 index, const char *name, void *val, u32 valsize, u32 valcount, u32 blockcount, u32 stride)
-{
-	assert(valsize == 1 || valsize == 2 || valsize == 4 || valsize == 8);
-	assert(((blockcount <= 1) && (stride == 0)) || (stride >= valcount));
-
-	// check for invalid timing
-	if (!m_reg_allowed)
-	{
-		machine().logerror("Attempt to register save state entry after state registration is closed!\nModule %s tag %s name %s\n", module, tag, name);
-		if (machine().system().flags & machine_flags::SUPPORTS_SAVE)
-			fatalerror("Attempt to register save state entry after state registration is closed!\nModule %s tag %s name %s\n", module, tag, name);
-		m_illegal_regs++;
-		return;
-	}
-
-	// create the full name
-	std::string totalname;
-	if (tag)
-		totalname = string_format("%s/%s/%X/%s", module, tag, index, name);
-	else
-		totalname = string_format("%s/%X/%s", module, index, name);
-
-	// insert us into the list
-	m_entry_list.emplace_back(std::make_unique<state_entry>(val, std::move(totalname), device, module, tag ? tag : "", index, valsize, valcount, blockcount, stride));
 }
 
 

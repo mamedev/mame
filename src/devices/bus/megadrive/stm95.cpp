@@ -21,13 +21,6 @@ stm95_eeprom_device::stm95_eeprom_device(running_machine &machine, uint8_t *eepr
 	m_machine(machine)
 {
 	eeprom_data = eeprom;
-	m_machine.save().save_item(latch, "STM95/latch");
-	m_machine.save().save_item(reset_line, "STM95/reset_line");
-	m_machine.save().save_item(sck_line, "STM95/sck_line");
-	m_machine.save().save_item(WEL, "STM95/WEL");
-	m_machine.save().save_item(stream_pos, "STM95/stream_pos");
-	m_machine.save().save_item(stream_data, "STM95/stream_data");
-	m_machine.save().save_item(eeprom_addr, "STM95/eeprom_addr");
 }
 
 void stm95_eeprom_device::set_cs_line(int state)

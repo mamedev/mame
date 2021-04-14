@@ -28,6 +28,10 @@
 
 class gaelco3d_state : public driver_device
 {
+	static constexpr int MAX_POLYGONS = 4096;
+	static constexpr int MAX_POLYDATA = MAX_POLYGONS * 21;
+	static constexpr int MAX_VERTICES = 32;
+
 public:
 	gaelco3d_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
@@ -65,6 +69,29 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+	virtual void device_register_save(save_registrar &save) override
+	{
+		// machine items
+		save.reg(NAME(m_sound_status))
+			.reg(NAME(m_analog_ports))
+			.reg(NAME(m_framenum))
+			.reg(NAME(m_adsp_ireg))
+			.reg(NAME(m_adsp_ireg_base))
+			.reg(NAME(m_adsp_incs))
+			.reg(NAME(m_adsp_size))
+			.reg(NAME(m_fp_clock))
+			.reg(NAME(m_fp_state))
+			.reg(NAME(m_fp_analog_ports))
+			.reg(NAME(m_fp_length))
+
+			// video items
+			.reg(NAME(m_palette), 32768)
+			.reg(NAME(m_polydata_buffer), MAX_POLYDATA)
+			.reg(NAME(m_polydata_count))
+			.reg(NAME(m_lastscan))
+			.reg(NAME(m_poly));
+	}
+
 	struct gaelco3d_object_data
 	{
 		uint32_t tex, color;
@@ -84,6 +111,8 @@ private:
 		uint32_t polygons() { uint32_t result = m_polygons; m_polygons = 0; return result; }
 
 		void render_poly(screen_device &screen, uint32_t *polydata);
+
+		void register_save(save_registrar &save) { save.reg(NAME(m_screenbits)).reg(NAME(m_zbuffer)); }
 
 	protected:
 		gaelco3d_state &m_state;
@@ -127,7 +156,7 @@ private:
 	uint8_t m_sound_status;
 	uint8_t m_analog_ports[4];
 	uint32_t m_fp_analog_ports[2];
-	uint32_t m_fp_lenght[2];
+	uint32_t m_fp_length[2];
 	uint8_t m_fp_clock;
 	uint8_t m_fp_state;
 	uint8_t m_framenum;

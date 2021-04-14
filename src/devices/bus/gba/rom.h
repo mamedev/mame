@@ -22,6 +22,16 @@ public:
 	int read_line();
 	void write(uint16_t data, int gpio_dirs);
 
+	void register_save(save_registrar &save)
+	{
+		save.reg(NAME(m_phase))
+			.reg(NAME(m_data))
+			.reg(NAME(m_last_val))
+			.reg(NAME(m_bits))
+			.reg(NAME(m_command))
+			.reg(NAME(m_data_len));
+	}
+
 protected:
 	enum
 	{
@@ -52,6 +62,16 @@ public:
 
 	uint32_t read();
 	void write(uint32_t data);
+
+	void register_save(save_registrar &save)
+	{
+		save.reg(NAME(m_state))
+			.reg(NAME(m_command))
+			.reg(NAME(m_count))
+			.reg(NAME(m_addr))
+			.reg(NAME(m_bits))
+			.reg(NAME(m_eep_data));
+	}
 
 protected:
 	enum
@@ -104,6 +124,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_reset() override;
 
 private:
@@ -163,6 +184,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_reset() override;
 
 private:
@@ -214,6 +236,7 @@ public:
 
 protected:
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 private:
 	std::unique_ptr<gba_s3511_device> m_rtc;
@@ -260,6 +283,7 @@ public:
 
 protected:
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 private:
 	std::unique_ptr<gba_s3511_device> m_rtc;
@@ -283,6 +307,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 private:
 	std::unique_ptr<gba_eeprom_device> m_eeprom;
@@ -306,6 +331,7 @@ public:
 
 protected:
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_reset() override;
 
 private:
@@ -333,6 +359,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	std::unique_ptr<gba_eeprom_device> m_eeprom;
 };
@@ -354,6 +381,7 @@ public:
 
 private:
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_reset() override;
 
 	std::unique_ptr<gba_s3511_device> m_rtc;
@@ -377,6 +405,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_reset() override;
 
 private:

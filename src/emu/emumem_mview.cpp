@@ -651,8 +651,9 @@ memory_view::~memory_view()
 
 void memory_view::register_state()
 {
-	m_device.machine().save().save_item(&m_device, "view", m_name.c_str(), 0, NAME(m_cur_slot));
-	m_device.machine().save().save_item(&m_device, "view", m_name.c_str(), 0, NAME(m_cur_id));
+	save_registrar container(m_device.machine().memory().view_registrar(), string_format("%d:%d", m_device.tag(), m_name.c_str()).c_str());
+	container.reg(NAME(m_cur_slot))
+		.reg(NAME(m_cur_id));
 	m_device.machine().save().register_postload(save_prepost_delegate(NAME([this]() { m_handler_read->select_a(m_cur_id); m_handler_write->select_a(m_cur_id); })));
 }
 

@@ -31,6 +31,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	class SPC7110_Decomp
 	{
@@ -47,6 +48,50 @@ protected:
 		void mode0(uint8_t init, uint8_t *ROM, uint32_t len);
 		void mode1(uint8_t init, uint8_t *ROM, uint32_t len);
 		void mode2(uint8_t init, uint8_t *ROM, uint32_t len);
+
+		static constexpr int SPC7110_DECOMP_BUFFER_SIZE = 64;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(m_decomp_mode))
+				.reg(NAME(m_decomp_offset))
+				.reg(NAME(m_decomp_buffer), SPC7110_DECOMP_BUFFER_SIZE)
+				.reg(NAME(m_decomp_buffer_rdoffset))
+				.reg(NAME(m_decomp_buffer_wroffset))
+				.reg(NAME(m_decomp_buffer_length))
+				.reg(NAME(m_context))
+
+				.reg(NAME(m_m0_val))
+				.reg(NAME(m_m0_in))
+				.reg(NAME(m_m0_span))
+				.reg(NAME(m_m0_out))
+				.reg(NAME(m_m0_inverts))
+				.reg(NAME(m_m0_lps))
+				.reg(NAME(m_m0_in_count))
+
+				.reg(NAME(m_m1_pixelorder))
+				.reg(NAME(m_m1_realorder))
+				.reg(NAME(m_m1_val))
+				.reg(NAME(m_m1_in))
+				.reg(NAME(m_m1_span))
+				.reg(NAME(m_m1_out))
+				.reg(NAME(m_m1_inverts))
+				.reg(NAME(m_m1_lps))
+				.reg(NAME(m_m1_in_count))
+
+				.reg(NAME(m_m2_pixelorder))
+				.reg(NAME(m_m2_realorder))
+				.reg(NAME(m_m2_bitplanebuffer))
+				.reg(NAME(m_m2_buffer_index))
+				.reg(NAME(m_m2_val))
+				.reg(NAME(m_m2_in))
+				.reg(NAME(m_m2_span))
+				.reg(NAME(m_m2_out0))
+				.reg(NAME(m_m2_out1))
+				.reg(NAME(m_m2_inverts))
+				.reg(NAME(m_m2_lps))
+				.reg(NAME(m_m2_in_count));
+		}
 
 	private:
 
@@ -70,6 +115,8 @@ protected:
 		{
 			uint8_t index;
 			uint8_t invert;
+
+			void register_save(save_registrar &save) { save.reg(NAME(index)).reg(NAME(invert)); }
 		} m_context[32];
 
 		uint32_t m_morton16[2][256];

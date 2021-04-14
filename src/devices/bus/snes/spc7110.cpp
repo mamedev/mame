@@ -127,57 +127,63 @@ void sns_rom_spc7110_device::spc7110_start()
 	m_r4840 = 0x00;
 	m_r4841 = 0x00;
 	m_r4842 = 0x00;
+}
 
-	save_item(NAME(m_r4801));
-	save_item(NAME(m_r4802));
-	save_item(NAME(m_r4803));
-	save_item(NAME(m_r4804));
-	save_item(NAME(m_r4805));
-	save_item(NAME(m_r4806));
-	save_item(NAME(m_r4807));
-	save_item(NAME(m_r4808));
-	save_item(NAME(m_r4809));
-	save_item(NAME(m_r480a));
-	save_item(NAME(m_r480b));
-	save_item(NAME(m_r480c));
-	save_item(NAME(m_r4811));
-	save_item(NAME(m_r4812));
-	save_item(NAME(m_r4813));
-	save_item(NAME(m_r4814));
-	save_item(NAME(m_r4815));
-	save_item(NAME(m_r4816));
-	save_item(NAME(m_r4817));
-	save_item(NAME(m_r4818));
-	save_item(NAME(m_r481x));
-	save_item(NAME(m_r4814_latch));
-	save_item(NAME(m_r4815_latch));
-	save_item(NAME(m_r4820));
-	save_item(NAME(m_r4821));
-	save_item(NAME(m_r4822));
-	save_item(NAME(m_r4823));
-	save_item(NAME(m_r4824));
-	save_item(NAME(m_r4825));
-	save_item(NAME(m_r4826));
-	save_item(NAME(m_r4827));
-	save_item(NAME(m_r4828));
-	save_item(NAME(m_r4829));
-	save_item(NAME(m_r482a));
-	save_item(NAME(m_r482b));
-	save_item(NAME(m_r482c));
-	save_item(NAME(m_r482d));
-	save_item(NAME(m_r482e));
-	save_item(NAME(m_r482f));
-	save_item(NAME(m_r4830));
-	save_item(NAME(m_r4831));
-	save_item(NAME(m_r4832));
-	save_item(NAME(m_r4833));
-	save_item(NAME(m_r4834));
-	save_item(NAME(m_r4840));
-	save_item(NAME(m_r4841));
-	save_item(NAME(m_r4842));
-	save_item(NAME(m_dx_offset));
-	save_item(NAME(m_ex_offset));
-	save_item(NAME(m_fx_offset));
+void sns_rom_spc7110_device::device_register_save(save_registrar &save)
+{
+	sns_rom21_device::device_register_save(save);
+
+	save.reg(NAME(m_r4801))
+		.reg(NAME(m_r4802))
+		.reg(NAME(m_r4803))
+		.reg(NAME(m_r4804))
+		.reg(NAME(m_r4805))
+		.reg(NAME(m_r4806))
+		.reg(NAME(m_r4807))
+		.reg(NAME(m_r4808))
+		.reg(NAME(m_r4809))
+		.reg(NAME(m_r480a))
+		.reg(NAME(m_r480b))
+		.reg(NAME(m_r480c))
+		.reg(NAME(m_decomp))
+		.reg(NAME(m_r4811))
+		.reg(NAME(m_r4812))
+		.reg(NAME(m_r4813))
+		.reg(NAME(m_r4814))
+		.reg(NAME(m_r4815))
+		.reg(NAME(m_r4816))
+		.reg(NAME(m_r4817))
+		.reg(NAME(m_r4818))
+		.reg(NAME(m_r481x))
+		.reg(NAME(m_r4814_latch))
+		.reg(NAME(m_r4815_latch))
+		.reg(NAME(m_r4820))
+		.reg(NAME(m_r4821))
+		.reg(NAME(m_r4822))
+		.reg(NAME(m_r4823))
+		.reg(NAME(m_r4824))
+		.reg(NAME(m_r4825))
+		.reg(NAME(m_r4826))
+		.reg(NAME(m_r4827))
+		.reg(NAME(m_r4828))
+		.reg(NAME(m_r4829))
+		.reg(NAME(m_r482a))
+		.reg(NAME(m_r482b))
+		.reg(NAME(m_r482c))
+		.reg(NAME(m_r482d))
+		.reg(NAME(m_r482e))
+		.reg(NAME(m_r482f))
+		.reg(NAME(m_r4830))
+		.reg(NAME(m_r4831))
+		.reg(NAME(m_r4832))
+		.reg(NAME(m_r4833))
+		.reg(NAME(m_r4834))
+		.reg(NAME(m_r4840))
+		.reg(NAME(m_r4841))
+		.reg(NAME(m_r4842))
+		.reg(NAME(m_dx_offset))
+		.reg(NAME(m_ex_offset))
+		.reg(NAME(m_fx_offset));
 }
 
 void sns_rom_spc7110_device::device_start()
@@ -211,8 +217,6 @@ void sns_rom_spc7110rtc_device::device_start()
 /*-------------------------------------------------
  mapper specific handlers
  -------------------------------------------------*/
-
-#define SPC7110_DECOMP_BUFFER_SIZE 64
 
 static const uint8_t spc7110_evolution_table[53][4] =
 {
@@ -331,50 +335,6 @@ sns_rom_spc7110_device::SPC7110_Decomp::SPC7110_Decomp(running_machine &machine)
 		m_morton32[2][i] = m_morton32[0][i] << 4;
 		m_morton32[3][i] = m_morton32[0][i] << 6;
 	}
-
-	m_machine.save().save_item(m_decomp_mode, "SNES_SPC7110/m_decomp_mode");
-	m_machine.save().save_item(m_decomp_offset, "SNES_SPC7110/m_decomp_offset");
-	m_machine.save().save_pointer(m_decomp_buffer.get(), "SNES_SPC7110/m_decomp_buffer", SPC7110_DECOMP_BUFFER_SIZE);
-	m_machine.save().save_item(m_decomp_buffer_rdoffset, "SNES_SPC7110/m_decomp_buffer_rdoffset");
-	m_machine.save().save_item(m_decomp_buffer_wroffset, "SNES_SPC7110/m_decomp_buffer_wroffset");
-	m_machine.save().save_item(m_decomp_buffer_length, "SNES_SPC7110/m_decomp_buffer_length");
-
-	for (int i = 0; i < 32; i++)
-	{
-		m_machine.save().save_item(m_context[i].index, "SNES_SPC7110/m_context[i].index", i);
-		m_machine.save().save_item(m_context[i].invert, "SNES_SPC7110/m_context[i].invert", i);
-	}
-
-	m_machine.save().save_item(m_m0_val, "SNES_SPC7110/m_m0_val");
-	m_machine.save().save_item(m_m0_in, "SNES_SPC7110/m_m0_in");
-	m_machine.save().save_item(m_m0_span, "SNES_SPC7110/m_m0_span");
-	m_machine.save().save_item(m_m0_out, "SNES_SPC7110/m_m0_out");
-	m_machine.save().save_item(m_m0_inverts, "SNES_SPC7110/m_m0_inverts");
-	m_machine.save().save_item(m_m0_lps, "SNES_SPC7110/m_m0_lps");
-	m_machine.save().save_item(m_m0_in_count, "SNES_SPC7110/m_m0_in_count");
-
-	m_machine.save().save_item(m_m1_pixelorder, "SNES_SPC7110/m_m1_pixelorder");
-	m_machine.save().save_item(m_m1_realorder, "SNES_SPC7110/m_m1_realorder");
-	m_machine.save().save_item(m_m1_val, "SNES_SPC7110/m_m1_val");
-	m_machine.save().save_item(m_m1_in, "SNES_SPC7110/m_m1_in");
-	m_machine.save().save_item(m_m1_span, "SNES_SPC7110/m_m1_span");
-	m_machine.save().save_item(m_m1_out, "SNES_SPC7110/m_m1_out");
-	m_machine.save().save_item(m_m1_inverts, "SNES_SPC7110/m_m1_inverts");
-	m_machine.save().save_item(m_m1_lps, "SNES_SPC7110/m_m1_lps");
-	m_machine.save().save_item(m_m1_in_count, "SNES_SPC7110/m_m1_in_count");
-
-	m_machine.save().save_item(m_m2_pixelorder, "SNES_SPC7110/m_m2_pixelorder");
-	m_machine.save().save_item(m_m2_realorder, "SNES_SPC7110/m_m2_realorder");
-	m_machine.save().save_item(m_m2_bitplanebuffer, "SNES_SPC7110/m_m2_bitplanebuffer");
-	m_machine.save().save_item(m_m2_buffer_index, "SNES_SPC7110/m_m2_buffer_index");
-	m_machine.save().save_item(m_m2_val, "SNES_SPC7110/m_m2_val");
-	m_machine.save().save_item(m_m2_in, "SNES_SPC7110/m_m2_in");
-	m_machine.save().save_item(m_m2_span, "SNES_SPC7110/m_m2_span");
-	m_machine.save().save_item(m_m2_out0, "SNES_SPC7110/m_m2_out0");
-	m_machine.save().save_item(m_m2_out1, "SNES_SPC7110/m_m2_out1");
-	m_machine.save().save_item(m_m2_inverts, "SNES_SPC7110/m_m2_inverts");
-	m_machine.save().save_item(m_m2_lps, "SNES_SPC7110/m_m2_lps");
-	m_machine.save().save_item(m_m2_in_count, "SNES_SPC7110/m_m2_in_count");
 }
 
 void sns_rom_spc7110_device::SPC7110_Decomp::reset()

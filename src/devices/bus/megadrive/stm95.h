@@ -29,6 +29,17 @@ public:
 	void    set_sck_line(int state);
 	int     get_so_line(void);
 
+	void register_save(save_registrar &save)
+	{
+		save.reg(NAME(latch))
+			.reg(NAME(reset_line))
+			.reg(NAME(sck_line))
+			.reg(NAME(WEL))
+			.reg(NAME(stream_pos))
+			.reg(NAME(stream_data))
+			.reg(NAME(eeprom_addr));
+	}
+
 protected:
 	enum STMSTATE
 	{
@@ -73,6 +84,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override { save.reg(NAME(m_stm95)); }
 	virtual void device_reset() override;
 
 private:

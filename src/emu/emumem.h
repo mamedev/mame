@@ -1917,11 +1917,19 @@ public:
 	memory_region *region_find(std::string name);
 	void region_free(std::string name);
 
+	// save registrations
+	save_registrar &bank_registrar() { return m_bank_registrar; }
+	save_registrar &view_registrar() { return m_view_registrar; }
+
 private:
 	struct stdlib_deleter { void operator()(void *p) const { free(p); } };
 
 	// internal state
 	running_machine &           m_machine;              // reference to the machine
+	save_registrar              m_root_registrar;       // outer container for all
+	save_registrar              m_bank_registrar;       // container for banks
+	save_registrar              m_view_registrar;       // container for views
+	save_registrar              m_contents_registrar;   // container for contents
 
 	std::vector<std::unique_ptr<void, stdlib_deleter>>               m_datablocks;           // list of memory blocks to free on exit
 	std::unordered_map<std::string, std::unique_ptr<memory_bank>>    m_banklist;             // map of banks

@@ -45,13 +45,13 @@
 #include "fileio.h"
 #include "delegate.h"
 #include "devdelegate.h"
+#include "save.h"
 
 // memory and address spaces
 #include "emumem.h"
 
 // machine-wide utilities
 #include "romentry.h"
-#include "save.h"
 
 // I/O
 #include "input.h"

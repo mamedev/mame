@@ -284,6 +284,10 @@ template class handler_entry_write<3, -3, ENDIANNESS_BIG>;
 
 memory_manager::memory_manager(running_machine &machine)
 	: m_machine(machine)
+	, m_root_registrar(machine.save().root_registrar(), "memory")
+	, m_bank_registrar(m_root_registrar, "banks")
+	, m_view_registrar(m_root_registrar, "views")
+	, m_contents_registrar(m_root_registrar, "contents")
 {
 }
 
@@ -334,7 +338,15 @@ void *memory_manager::allocate_memory(device_t &dev, int spacenum, std::string n
 {
 	void *const ptr = m_datablocks.emplace_back(malloc(bytes)).get();
 	memset(ptr, 0, bytes);
-	machine().save().save_memory(&dev, "memory", dev.tag(), spacenum, name.c_str(), ptr, width/8, u32(bytes) / (width/8));
+	std::string save_name = string_format("%s:%d:%s", dev.tag(), spacenum, name.c_str());
+	assert(width == 1 || width == 2 || width == 4 || width == 8);
+	switch (width)
+	{
+		case  8: m_contents_registrar.reg(reinterpret_cast<uint8_t *>(ptr), save_name.c_str(), bytes / 1); break;
+		case 16: m_contents_registrar.reg(reinterpret_cast<uint16_t *>(ptr), save_name.c_str(), bytes / 2); break;
+		case 32: m_contents_registrar.reg(reinterpret_cast<uint32_t *>(ptr), save_name.c_str(), bytes / 4); break;
+		case 64: m_contents_registrar.reg(reinterpret_cast<uint64_t *>(ptr), save_name.c_str(), bytes / 8); break;
+	}
 	return ptr;
 }
 
@@ -963,7 +975,9 @@ memory_bank::memory_bank(device_t &device, std::string tag)
 {
 	m_tag = std::move(tag);
 	m_name = string_format("Bank '%s'", m_tag);
-	machine().save().save_item(&device, "memory", m_tag.c_str(), 0, NAME(m_curentry));
+
+	save_registrar container(m_machine.memory().bank_registrar(), string_format("%s:%s", device.tag(), m_tag.c_str()).c_str());
+	container.reg(NAME(m_curentry));
 }
 
 

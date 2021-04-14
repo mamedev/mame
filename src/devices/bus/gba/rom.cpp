@@ -149,9 +149,13 @@ gba_rom_3dmatrix_device::gba_rom_3dmatrix_device(const machine_config &mconfig, 
 
 void gba_rom_device::device_start()
 {
-	save_item(NAME(m_gpio_regs));
-	save_item(NAME(m_gpio_write_only));
-	save_item(NAME(m_gpio_dirs));
+}
+
+void gba_rom_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_gpio_regs))
+		.reg(NAME(m_gpio_write_only))
+		.reg(NAME(m_gpio_dirs));
 }
 
 void gba_rom_device::device_reset()
@@ -174,8 +178,13 @@ void gba_rom_wariotws_device::device_start()
 {
 	gba_rom_device::device_start();
 	m_rumble.resolve();
-	save_item(NAME(m_last_val));
-	save_item(NAME(m_counter));
+}
+
+void gba_rom_wariotws_device::device_register_save(save_registrar &save)
+{
+	gba_rom_sram_device::device_register_save(save);
+	save.reg(NAME(m_last_val))
+		.reg(NAME(m_counter));
 }
 
 void gba_rom_wariotws_device::device_reset()
@@ -204,12 +213,23 @@ void gba_rom_eeprom_device::device_start()
 	m_eeprom = std::make_unique<gba_eeprom_device>(machine(), (uint8_t*)get_nvram_base(), get_nvram_size(), 6);
 }
 
+void gba_rom_eeprom_device::device_register_save(save_registrar &save)
+{
+	gba_rom_device::device_register_save(save);
+	save.reg(NAME(m_eeprom));
+}
+
 void gba_rom_yoshiug_device::device_start()
 {
 	gba_rom_eeprom_device::device_start();
-	save_item(NAME(m_tilt_ready));
-	save_item(NAME(m_xpos));
-	save_item(NAME(m_ypos));
+}
+
+void gba_rom_yoshiug_device::device_register_save(save_registrar &save)
+{
+	gba_rom_eeprom_device::device_register_save(save);
+	save.reg(NAME(m_tilt_ready))
+		.reg(NAME(m_xpos))
+		.reg(NAME(m_ypos));
 }
 
 void gba_rom_yoshiug_device::device_reset()
@@ -227,13 +247,24 @@ void gba_rom_eeprom64_device::device_start()
 	m_eeprom = std::make_unique<gba_eeprom_device>(machine(), (uint8_t*)get_nvram_base(), get_nvram_size(), 14);
 }
 
+void gba_rom_eeprom64_device::device_register_save(save_registrar &save)
+{
+	gba_rom_device::device_register_save(save);
+	save.reg(NAME(m_eeprom));
+}
+
 void gba_rom_boktai_device::device_start()
 {
 	gba_rom_eeprom64_device::device_start();
 	m_rtc = std::make_unique<gba_s3511_device>(machine());
+}
 
-	save_item(NAME(m_last_val));
-	save_item(NAME(m_counter));
+void gba_rom_boktai_device::device_register_save(save_registrar &save)
+{
+	gba_rom_eeprom64_device::device_register_save(save);
+	save.reg(NAME(m_rtc))
+		.reg(NAME(m_last_val))
+		.reg(NAME(m_counter));
 }
 
 void gba_rom_boktai_device::device_reset()
@@ -248,18 +279,36 @@ void gba_rom_flash_rtc_device::device_start()
 	m_rtc = std::make_unique<gba_s3511_device>(machine());
 }
 
+void gba_rom_flash_rtc_device::device_register_save(save_registrar &save)
+{
+	gba_rom_flash_device::device_register_save(save);
+	save.reg(NAME(m_rtc));
+}
+
+
 void gba_rom_flash1m_rtc_device::device_start()
 {
 	gba_rom_device::device_start();
 	m_rtc = std::make_unique<gba_s3511_device>(machine());
 }
 
+void gba_rom_flash1m_rtc_device::device_register_save(save_registrar &save)
+{
+	gba_rom_flash1m_device::device_register_save(save);
+	save.reg(NAME(m_rtc));
+}
+
 void gba_rom_3dmatrix_device::device_start()
 {
 	gba_rom_device::device_start();
-	save_item(NAME(m_src));
-	save_item(NAME(m_dst));
-	save_item(NAME(m_nblock));
+}
+
+void gba_rom_3dmatrix_device::device_register_save(save_registrar &save)
+{
+	gba_rom_device::device_register_save(save);
+	save.reg(NAME(m_src))
+		.reg(NAME(m_dst))
+		.reg(NAME(m_nblock));
 }
 
 void gba_rom_3dmatrix_device::device_reset()
@@ -797,13 +846,6 @@ gba_s3511_device::gba_s3511_device(running_machine &machine) :
 	m_command = 0;
 	m_data_len = 1;
 	m_data[0] = 0;
-
-	m_machine.save().save_item(m_phase, "GBA_RTC/m_phase");
-	m_machine.save().save_item(m_data, "GBA_RTC/m_data");
-	m_machine.save().save_item(m_last_val, "GBA_RTC/m_last_val");
-	m_machine.save().save_item(m_bits, "GBA_RTC/m_bits");
-	m_machine.save().save_item(m_command, "GBA_RTC/m_command");
-	m_machine.save().save_item(m_data_len, "GBA_RTC/m_data_len");
 }
 
 
@@ -962,13 +1004,6 @@ gba_eeprom_device::gba_eeprom_device(running_machine &machine, uint8_t *eeprom, 
 	m_data = eeprom;
 	m_data_size = size;
 	m_addr_bits = addr_bits;
-
-	m_machine.save().save_item(m_state, "GBA_EEPROM/m_state");
-	m_machine.save().save_item(m_command, "GBA_EEPROM/m_command");
-	m_machine.save().save_item(m_count, "GBA_EEPROM/m_count");
-	m_machine.save().save_item(m_addr, "GBA_EEPROM/m_addr");
-	m_machine.save().save_item(m_bits, "GBA_EEPROM/m_bits");
-	m_machine.save().save_item(m_eep_data, "GBA_EEPROM/m_eep_data");
 }
 
 uint32_t gba_eeprom_device::read()

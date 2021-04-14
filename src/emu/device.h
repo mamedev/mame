@@ -622,13 +622,6 @@ public:
 		else
 			m_unstructured_save.reg(value, string_format("%s[%d]", valname, index).c_str());
 	}
-	template<typename ItemType, typename StructType, typename ElementType>
-	void ATTR_COLD save_item(ItemType &value, ElementType StructType::*element, const char *valname, int index = 0)
-	{
-		assert(m_save);
-		m_save->save_item(this, name(), tag(), index, value, element, valname);
-		osd_printf_warning("Legacy save_item not supported of %s:%s/%X/%s\n", tag(), name(), index, valname);
-	}
 	template<typename ItemType>
 	void ATTR_COLD save_pointer(ItemType &&value, const char *valname, u32 count, int index = -1)
 	{
@@ -637,13 +630,6 @@ public:
 			m_unstructured_save.reg(value, valname, count);
 		else
 			m_unstructured_save.reg(value, string_format("%s[%d]", valname, index).c_str(), count);
-	}
-	template<typename ItemType, typename StructType, typename ElementType>
-	void ATTR_COLD save_pointer(ItemType &&value, ElementType StructType::*element, const char *valname, u32 count, int index = 0)
-	{
-		assert(m_save);
-		m_save->save_pointer(this, name(), tag(), index, std::forward<ItemType>(value), element, valname, count);
-		osd_printf_warning("Legacy save_pointer not supported of %s:%s/%X/%s\n", tag(), name(), index, valname);
 	}
 
 	// debugging

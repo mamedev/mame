@@ -14,10 +14,6 @@
 #include "video/rgbutil.h"
 
 
-#define MAX_POLYGONS        4096
-#define MAX_POLYDATA        (MAX_POLYGONS * 21)
-#define MAX_VERTICES        32
-
 #define DISPLAY_TEXTURE     0
 #define LOG_POLYGONS        0
 #define DISPLAY_STATS       0
@@ -36,9 +32,6 @@ gaelco3d_state::gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
 		m_texture(std::make_unique<uint8_t[]>(m_texture_size)),
 		m_texmask(std::make_unique<uint8_t[]>(m_texmask_size))
 {
-	state.machine().save().save_item(NAME(m_screenbits));
-	state.machine().save().save_item(NAME(m_zbuffer));
-
 	/* first expand the pixel data */
 	uint8_t *src = state.memregion("gfx1")->base();
 	uint8_t *dst = m_texture.get();
@@ -72,13 +65,6 @@ void gaelco3d_state::video_start()
 
 	m_palette = std::make_unique<rgb_t[]>(32768);
 	m_polydata_buffer = std::make_unique<uint32_t[]>(MAX_POLYDATA);
-
-	/* save states */
-
-	save_pointer(NAME(m_palette), 32768);
-	save_pointer(NAME(m_polydata_buffer), MAX_POLYDATA);
-	save_item(NAME(m_polydata_count));
-	save_item(NAME(m_lastscan));
 }
 
 

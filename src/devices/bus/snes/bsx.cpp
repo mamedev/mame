@@ -70,15 +70,21 @@ void sns_rom_bsx_device::device_start()
 	m_cart_regs[7] = 0x80;
 	m_cart_regs[8] = 0x80;
 	access_update();
+}
 
-	save_item(NAME(m_cart_regs));
-	save_item(NAME(access_00_1f));
-	save_item(NAME(access_80_9f));
-	save_item(NAME(access_40_4f));
-	save_item(NAME(access_50_5f));
-	save_item(NAME(access_60_6f));
-	save_item(NAME(rom_access));
-	save_item(NAME(m_pram));
+void sns_rom_bsx_device::device_register_save(save_registrar &save)
+{
+	sns_rom_device::device_register_save(save);
+
+	save.reg(NAME(m_base_unit))
+		.reg(NAME(m_cart_regs))
+		.reg(NAME(access_00_1f))
+		.reg(NAME(access_80_9f))
+		.reg(NAME(access_40_4f))
+		.reg(NAME(access_50_5f))
+		.reg(NAME(access_60_6f))
+		.reg(NAME(rom_access))
+		.reg(NAME(m_pram));
 }
 
 void sns_rom_bsx_device::device_reset()
@@ -96,12 +102,18 @@ void sns_rom_bsxhi_device::device_start()
 
 void sns_rom_bsmempak_device::device_start()
 {
-	save_item(NAME(m_command));
-	save_item(NAME(m_write_old));
-	save_item(NAME(m_write_new));
-	save_item(NAME(m_flash_enable));
-	save_item(NAME(m_read_enable));
-	save_item(NAME(m_write_enable));
+}
+
+void sns_rom_bsmempak_device::device_register_save(save_registrar &save)
+{
+	sns_rom_device::device_register_save(save);
+
+	save.reg(NAME(m_command))
+		.reg(NAME(m_write_old))
+		.reg(NAME(m_write_new))
+		.reg(NAME(m_flash_enable))
+		.reg(NAME(m_read_enable))
+		.reg(NAME(m_write_enable));
 }
 
 void sns_rom_bsmempak_device::device_reset()
@@ -122,10 +134,6 @@ void sns_rom_bsmempak_device::device_reset()
 sns_rom_bsx_device::bsx_base::bsx_base(running_machine &machine)
 	: r2192_minute(0), m_machine(machine)
 {
-	m_machine.save().save_item(regs, "SNES_BSX/regs");
-	m_machine.save().save_item(r2192_counter, "SNES_BSX/r2192_counter");
-	m_machine.save().save_item(r2192_hour, "SNES_BSX/r2192_hour");
-	m_machine.save().save_item(r2192_second, "SNES_BSX/r2192_second");
 }
 
 void sns_rom_bsx_device::bsx_base::init()

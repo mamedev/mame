@@ -188,6 +188,9 @@ private:
 	simple_list<quantum_slot>   m_quantum_list;             // list of active quanta
 	fixed_allocator<quantum_slot> m_quantum_allocator;      // allocator for quanta
 	attoseconds_t               m_quantum_minimum;          // duration of minimum quantum
+
+	// state saving
+	save_registrar              m_scheduler_container;
 };
 
 

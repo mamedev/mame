@@ -104,12 +104,6 @@ void output_manager::register_save()
 	for (auto &item : m_itemtable)
 		m_save_order.emplace_back(item.second);
 	std::sort(m_save_order.begin(), m_save_order.end(), [] (auto const &l, auto const &r) { return l.get().name() < r.get().name(); });
-
-	// register the reserved space for saving
-	machine().save().save_pointer(nullptr, "output", nullptr, 0, NAME(&m_save_data[0]), m_itemtable.size());
-	if (OUTPUT_VERBOSE)
-		osd_printf_verbose("Registered %u outputs for save states\n", m_itemtable.size());
-
 }
 
 

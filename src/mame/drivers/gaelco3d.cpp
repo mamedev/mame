@@ -176,18 +176,6 @@ WRITE_LINE_MEMBER(gaelco3d_state::ser_irq)
 
 void gaelco3d_state::machine_start()
 {
-	// Save state support
-	save_item(NAME(m_sound_status));
-	save_item(NAME(m_analog_ports));
-	save_item(NAME(m_framenum));
-	save_item(NAME(m_adsp_ireg));
-	save_item(NAME(m_adsp_ireg_base));
-	save_item(NAME(m_adsp_incs));
-	save_item(NAME(m_adsp_size));
-	save_item(NAME(m_fp_clock));
-	save_item(NAME(m_fp_state));
-	save_item(NAME(m_fp_analog_ports));
-	save_item(NAME(m_fp_lenght));
 }
 
 
@@ -360,9 +348,9 @@ WRITE_LINE_MEMBER(gaelco3d_state::fp_analog_clock_w)
 				s32 aay = ay - 0x80;
 				s32 aax = ax - 0x80;
 				u32 len = aay * aay + aax * aax;
-				if (len <= m_fp_lenght[i])
+				if (len <= m_fp_length[i])
 					m_fp_analog_ports[i] |= 2;
-				m_fp_lenght[i] = len;
+				m_fp_length[i] = len;
 			}
 		}
 	}
