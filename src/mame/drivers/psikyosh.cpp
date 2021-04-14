@@ -139,8 +139,8 @@ Psikyo PS3-V1 hardware readme
 -----------------------------
 
 Strikers 1945 II
-Sol Divid
-Daraku
+Sol Divide
+The Fallen Angels / Daraku Tenshi
 Space Bomber
 
 PCB Layout
@@ -148,10 +148,10 @@ PCB Layout
 
 PS3-V1
 |-------------------------------------------------|
-|HA13118         3771    PROG_L                   |
-|    VOL  YAC513         PROG_H      |-----|      |
+|HA13118         3771    PROG_L.U18               |
+|    VOL  YAC513         PROG_H.U17  |-----|      |
 |      JRC4741                       | SH2 |      |
-|                          *U16      |     |      |
+|                        PROG.U16    |     |      |
 |     YMF278B  SOUND.U32             |-----|      |
 |                                                 |
 |J                                                |
@@ -159,26 +159,47 @@ PS3-V1
 |M                                                |
 |M                 |-------|                      |
 |A                 |PSIKYO |                      |
-|                  |PS6406B|        *4L.10  0L.4  |
+|                  |PS6406B|         4L.10  0L.4  |
 |          62256   |       |                      |
-|93C56     62256   |-------|        *5L.9   1L.3  |
+|93C56     62256   |-------|         5L.9   1L.3  |
 |JP5                                              |
-|   *6H.37  *4H.31   2H.20   0H.13  *6L.8   2L.2  |
+|    6H.37   4H.31   2H.20   0H.13   6L.8   2L.2  |
 |                                                 |
 |                                   *7L.7   3L.1  |
-|   *7H.36  *5H.30   3H.19   1H.12                |
+|   *7H.36   5H.30   3H.19   1H.12                |
 |-------------------------------------------------|
 Notes:
       JP5 - hardwired jumper bank (x4) for region selection. Cut 2ND jumper from left
             for International/English region. All jumpers shorted = Japan region (default)
       SH2 - Hitachi HD6417604F28 SH-2 CPU, clock input 28.63635 [57.2727/2] (QFP144)
       YMF278B - Yamaha YMF278B OPL4 sound chip, clock input 28.63635MHz [57.2727/2] (QFP80)
-      PROG_H/PROG_L - 27C4096 DIP40 EPROM
-      All other ROMs - 32M SOP44 MaskROM
+      PROG_H.U17/PROG_L.U18 - 27C4096 DIP40 EPROM
+	  PROG.u16 - 27C802 SOP44 OTP EPROM
+      All other ROMs - 16M/32M SOP44 MaskROM
       * - ROM locations not populated
       VSync - 60Hz
       HSync - 15.27kHz
 
+ROM Usage
+---------
+
+|-------------------------------------------|-CPU ROMs----|-GFX ROMs------------------------|-Sound ROM-|
+| Game                                      | PROG_L PROG | 0L  1L  2L  3L  4L  5L  6L  7L  |   SOUND   |
+|                                           | PROG_H      | 0H  1H  2H  3H  4H  5H  6H  7H  |           |
+|-------------------------------------------|-------------|---------------------------------|-----------|
+| Sol Divide - The Sword Of Darkness        | 4M     -    | -   -   -   -   32M 32M 32M -   |    32M    |
+|                                           | 4M          | -   -   -   -   32M 32M 32M -   |           |
+|-------------------------------------------|-------------|---------------------------------|-----------|
+| Strikers 1945 II                          | 4M     -    | 32M 32M 32M 32M -   -   -   -   |    32M    |
+|                                           | 4M          | 32M 32M 32M 32M -   -   -   -   |           |
+|-------------------------------------------|-------------|---------------------------------|-----------|
+| The Fallen Angels (World) /               | 4M     8M   | 32M 32M 32M 32M 32M 32M 16M -   |    32M    |
+| Daraku Tenshi - The Fallen Angels (Japan) | 4M          | 32M 32M 32M 32M 32M 32M 16M -   |           |
+|-------------------------------------------|-------------|---------------------------------|-----------|
+| Space Bomber                              | 4M     -    | 32M 32M 32M 32M 32M -   -   -   |    32M    |
+|                                           | 4M          | 32M 32M 32M 32M 32M -   -   -   |           |
+|-------------------------------------------|-------------|---------------------------------|-----------|
+-: Unpopulated
 
 Psikyo PS5 hardware readme
 --------------------------
@@ -223,6 +244,21 @@ Notes:
       VSync - 60Hz
       HSync - 15.27kHz
 
+ROM Usage
+---------
+
+|-----------------------------|-CPU ROMs---------|-GFX ROMs----------------|-Sound ROM-|
+| Game                        | PROG_L DATA      | 0L  1L  2L  3L  4L  5L  |   SOUND   |
+|                             | PROG_H PROG_DATA | 0H  1H  2H  3H  4H  5H  |           |
+|-----------------------------|------------------|-------------------------|-----------|
+| Gunbird 2                   | 4M     4M        | 64M 64M 64M 32M -   -   |    32M    |
+|                             | 4M     -         | 64M 64M 64M 32M -   -   |           |
+|-----------------------------|------------------|-------------------------|-----------|
+| Strikers 1945 III (World) / | 4M     4M        | 64M 64M 64M 32M -   -   |    32M    |
+| Strikers 1999 (Japan)       | 4M     -         | 64M 64M 64M 32M -   -   |           |
+|-----------------------------|------------------|-------------------------|-----------|
+-: Unpopulated
+
 
 Psikyo PS5V2 hardware readme
 ----------------------------
@@ -241,7 +277,7 @@ PS5V2
 |HA13118  PS5-1  SM81C256  PROG_H.U21 *0H.U11 *0L.U3 |
 |VOL  JRC4741    SM81C256  PROG_L.U22                |
 |     YAC516  3771                    *1H.U12 *1L.U4 |
-|              |-----|          *U23                 |
+|              |-----| *PROG_DATA.U23                |
 |              | SH2 |                *2H.U13 *2L.U5 |
 |              |     |                               |
 |J    YMF278B  |-----|                 3H.U14  3L.U6 |
@@ -266,10 +302,32 @@ Notes:
       PROG_H/PROG_L - 27C4096 DIP40 EPROM
       ROMs U1-U59 (at bottom of PCB) - 16M DIP42 MaskROM
       ROMs U3-U10 & U11-U18 (at side of PCB) - 16M TSOP48 Type-II surface-mounted MaskROM
-      ROM U52 - 32M TSOP48 Type-II surface-mounted MaskROM
+      ROM U52 - 16M/32M TSOP48 Type-II surface-mounted MaskROM
       * - ROM locations not populated on tgm2 & tgm2+
       VSync - 60Hz
       HSync - 15.27kHz
+
+ROM Usage
+---------
+
+|-------------------------|-CPU ROMs---------|-GFX ROMs(TSOP48)----------------|-GFX ROMs(DIP42)-----|-Sound ROM-|
+| Game                    | PROG_L PROG_DATA | 0L  1L  2L  3L  4L  5L  6L  7L  | 6L  7L  8L  9L  10L |   SOUND   |
+|                         | PROG_H           | 0H  1H  2H  3H  4H  5H  6H  7H  | 6L  7L  8L  9L  10L |           |
+|-------------------------|------------------|---------------------------------|---------------------|-----------|
+| Dragon Blaze            | 4M     -         | -   16M 16M 16M 16M 16M -   -   | 16M 16M 16M 16M 16M |    16M    |
+|                         | 4M               | -   16M 16M 16M 16M 16M -   -   | 16M 16M 16M 16M 16M |           |
+|-------------------------|------------------|---------------------------------|---------------------|-----------|
+| Tetris: the Absolute -  | 4M     -         | -   -   -   16M 16M 16M -   -   | 16M 16M 16M 16M 16M |    32M    |
+| The Grand Master 2/Plus | 4M               | -   -   -   16M 16M 16M -   -   | 16M 16M 16M 16M 16M |           |
+|-------------------------|------------------|---------------------------------|---------------------|-----------|
+| Gunbarich               | 4M     -         | -   *   *   *   *   *   -   -   | 16M 16M 16M 16M *   |    16M    |
+|                         | 4M               | -   *   *   *   *   *   -   -   | 16M 16M 16M 16M *   |           |
+|-------------------------|------------------|---------------------------------|---------------------|-----------|
+| Mahjong G-Taste         | 4M     -         | -   16M 16M 16M 16M *   -   -   | *   *   *   *   *   |    32M    |
+|                         | 4M               | -   16M 16M 16M 16M *   -   -   | *   *   *   *   *   |           |
+|-------------------------|------------------|---------------------------------|---------------------|-----------|
+-: Unpopulated
+*: Leftover from Dragon Blaze
 
 */
 
@@ -602,7 +660,7 @@ static INPUT_PORTS_START( daraku )
 	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( sbomberb )
+static INPUT_PORTS_START( sbomber )
 	PORT_INCLUDE( common )
 	/* If Debug is HIGH then you can perform rom test, but EEPROM resets? */
 
@@ -809,11 +867,11 @@ void psikyosh_state::psikyo5_240(machine_config &config)
 /* PS3 */
 
 ROM_START( soldivid )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD32_WORD_SWAP( "2-prog_l.u18", 0x000002, 0x080000, CRC(cf179b04) SHA1(343f00a81cffd44334a4db81b6b828b7cf73c1e8) )
 	ROM_LOAD32_WORD_SWAP( "1-prog_h.u17", 0x000000, 0x080000, CRC(f467d1c4) SHA1(a011e6f310a54f09efa0bf4597783cd78c05ad6f) )
 
-	ROM_REGION( 0x3800000, "gfx1", 0 )
+	ROM_REGION( 0x3800000, "gfx1", ROMREGION_ERASE00 )
 	/* This Space Empty! */
 	ROM_LOAD32_WORD_SWAP( "4l.u10", 0x2000000, 0x400000, CRC(9eb9f269) SHA1(4a4d90eefe62b5462f5ed5e062eea7b6b4900f85) )
 	ROM_LOAD32_WORD_SWAP( "4h.u31", 0x2000002, 0x400000, CRC(7c76cfe7) SHA1(14e291e840a4afe3802fe1847615c5e806d7492a) )
@@ -823,15 +881,15 @@ ROM_START( soldivid )
 	ROM_LOAD32_WORD_SWAP( "6h.u37", 0x3000002, 0x400000, CRC(fdd57361) SHA1(f58d91acde1f4e6d4f0e8dcd1b23aa5092d89916) )
 
 	ROM_REGION( 0x400000, "ymf", 0 )
-	ROM_LOAD( "sound.bin", 0x000000, 0x400000, CRC(e98f8d45) SHA1(7791c0f31d08f37c6ec65e7cecf8ef54ca73b1fd) )
+	ROM_LOAD( "sound.u32", 0x000000, 0x400000, CRC(e98f8d45) SHA1(7791c0f31d08f37c6ec65e7cecf8ef54ca73b1fd) )
 ROM_END
 
 ROM_START( soldividk )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD32_WORD_SWAP( "9-prog_lk.u18", 0x000002, 0x080000, CRC(b534029d) SHA1(a96ca55e6694c5537d489d40bc890c376bbce933) )
 	ROM_LOAD32_WORD_SWAP( "8-prog_hk.u17", 0x000000, 0x080000, CRC(a48e3206) SHA1(d560286972de2a0baa5369672a0190b7bd421843) )
 
-	ROM_REGION( 0x3800000, "gfx1", 0 )
+	ROM_REGION( 0x3800000, "gfx1", ROMREGION_ERASE00 )
 	/* This Space Empty! */
 	ROM_LOAD32_WORD_SWAP( "4l.u10", 0x2000000, 0x400000, CRC(9eb9f269) SHA1(4a4d90eefe62b5462f5ed5e062eea7b6b4900f85) )
 	ROM_LOAD32_WORD_SWAP( "4h.u31", 0x2000002, 0x400000, CRC(7c76cfe7) SHA1(14e291e840a4afe3802fe1847615c5e806d7492a) )
@@ -841,11 +899,11 @@ ROM_START( soldividk )
 	ROM_LOAD32_WORD_SWAP( "6h.u37", 0x3000002, 0x400000, CRC(fdd57361) SHA1(f58d91acde1f4e6d4f0e8dcd1b23aa5092d89916) )
 
 	ROM_REGION( 0x400000, "ymf", 0 )
-	ROM_LOAD( "sound.bin", 0x000000, 0x400000, CRC(e98f8d45) SHA1(7791c0f31d08f37c6ec65e7cecf8ef54ca73b1fd) )
+	ROM_LOAD( "sound.u32", 0x000000, 0x400000, CRC(e98f8d45) SHA1(7791c0f31d08f37c6ec65e7cecf8ef54ca73b1fd) )
 ROM_END
 
 ROM_START( s1945ii )
-	ROM_REGION( 0x200000, "maincpu", 0) /* Code */
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 ) /* Code */
 	ROM_LOAD32_WORD_SWAP( "2_prog_l.u18", 0x000002, 0x080000, CRC(20a911b8) SHA1(82ba7b93bd621fc45a4dc2722752077b59a0a233) )
 	ROM_LOAD32_WORD_SWAP( "1_prog_h.u17", 0x000000, 0x080000, CRC(4c0fe85e) SHA1(74f810a1c3e9d629c8b190f68d73ce07b11f77b7) )
 
@@ -868,7 +926,7 @@ ROM_END
 
 ROM_START( daraku )
 	/* main program */
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD32_WORD_SWAP( "4_prog_l.u18", 0x000002, 0x080000, CRC(660b4609) SHA1(ee6b5606fae41881c3e671ee642baae5c03331ca) )
 	ROM_LOAD32_WORD_SWAP( "3_prog_h.u17", 0x000000, 0x080000, CRC(7a9cf601) SHA1(8df464ce3fd02b30dd2ab77828594f4916375fd5) )
 	ROM_LOAD16_WORD_SWAP( "prog.u16",     0x100000, 0x100000, CRC(3742e990) SHA1(dd4b8777e57245151b3d520ed1bdab207530420b) )
@@ -897,7 +955,7 @@ ROM_START( daraku )
 ROM_END
 
 ROM_START( sbomber ) /* Version B - Only shows "Version B" when set to Japan region */
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD32_WORD_SWAP( "1-b_pr_l.u18", 0x000002, 0x080000, CRC(52d12225) SHA1(0a31a5d557414e7bf51dc6f7fbdd417a20b78df1) )
 	ROM_LOAD32_WORD_SWAP( "1-b_pr_h.u17", 0x000000, 0x080000, CRC(1bbd0345) SHA1(c6ccb7c97cc9e9ea298c1883d1dd5563907a7255) )
 
@@ -921,7 +979,7 @@ ROM_START( sbomber ) /* Version B - Only shows "Version B" when set to Japan reg
 ROM_END
 
 ROM_START( sbombera ) /* Original version */
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD32_WORD_SWAP( "2.u18", 0x000002, 0x080000, CRC(57819a26) SHA1(d7a6fc957e39adf97762ab0a35b91aa17ec026e0) )
 	ROM_LOAD32_WORD_SWAP( "1.u17", 0x000000, 0x080000, CRC(c388e847) SHA1(cbf4f2e191894160bdf0290d72cf20c222aaf7a7) )
 
@@ -947,7 +1005,7 @@ ROM_END
 /* PS5 */
 
 ROM_START( gunbird2 ) /* Internal date string shows Oct 07 16:05 */
-	ROM_REGION( 0x180000, "maincpu", 0)
+	ROM_REGION( 0x180000, "maincpu", 0 )
 	ROM_LOAD32_WORD_SWAP( "2_prog_l.u16", 0x000002, 0x080000, CRC(76f934f0) SHA1(cf197796d66f15639a6b3d5311c18da33cefd06b) )
 	ROM_LOAD32_WORD_SWAP( "1_prog_h.u17", 0x000000, 0x080000, CRC(7328d8bf) SHA1(c640de1ab5b32400b2d77e0dc6e3ee0f78ab7803) )
 	ROM_LOAD16_WORD_SWAP( "3_pdata.u1",   0x100000, 0x080000, CRC(a5b697e6) SHA1(947f124fa585c2cf77c6571af7559bd652897b89) )
@@ -985,7 +1043,7 @@ This set can still be set Japan, International Ver A. or International Ver B. vi
 */
 
 ROM_START( gunbird2a ) /* Internal date string shows Oct 08 17:02 - No specific Korean copyright / message, but made for the Korean market? */
-	ROM_REGION( 0x180000, "maincpu", 0)
+	ROM_REGION( 0x180000, "maincpu", 0 )
 	ROM_LOAD32_WORD_SWAP( "prog_l.u16", 0x000002, 0x080000, CRC(974f85ba) SHA1(4e19b12bd5f268088317ea231bbe7f9d2d694b2b) ) /* these roms had no labels */
 	ROM_LOAD32_WORD_SWAP( "prog_h.u17", 0x000000, 0x080000, CRC(cb0cb826) SHA1(8827e9ebfedbc63dbf41c6a5c994a691a6d63fdb) )
 	ROM_LOAD16_WORD_SWAP( "pdata.u1",   0x100000, 0x080000, CRC(23751839) SHA1(4762685d1f6843e8e53eae6c014e66b98fa15eb7) )
@@ -1008,7 +1066,7 @@ ROM_START( gunbird2a ) /* Internal date string shows Oct 08 17:02 - No specific 
 ROM_END
 
 ROM_START( s1945iii )
-	ROM_REGION( 0x180000, "maincpu", 0)
+	ROM_REGION( 0x180000, "maincpu", 0 )
 	ROM_LOAD32_WORD_SWAP( "2_progl.u16", 0x000002, 0x080000, CRC(5d5d385f) SHA1(67b3bcabd71cf084bcea7a59939281a8d6257059) )
 	ROM_LOAD32_WORD_SWAP( "1_progh.u17", 0x000000, 0x080000, CRC(1b8a5a18) SHA1(718a176bd48e16f964fcb07c568b5227cfc0515f) )
 	ROM_LOAD16_WORD_SWAP( "3_data.u1",   0x100000, 0x080000, CRC(8ff5f7d3) SHA1(420a3d7f2d5ab6a56789d36b418431f12f5f73f5) )
@@ -1033,11 +1091,11 @@ ROM_END
 /* PS5v2 */
 
 ROM_START( dragnblz )
-	ROM_REGION( 0x180000, "maincpu", 0)
+	ROM_REGION( 0x180000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD32_WORD_SWAP( "2prog_h.u21",   0x000000, 0x080000, CRC(fc5eade8) SHA1(e5d05543641e4a3900b0d42e0d5f75734683d635) )
 	ROM_LOAD32_WORD_SWAP( "1prog_l.u22",   0x000002, 0x080000, CRC(95d6fd02) SHA1(2b2830e7fa66cbd13666191762bfddc40571caec) )
 
-	ROM_REGION( 0x2c00000, "gfx1", 0 )  /* Sprites */
+	ROM_REGION( 0x2c00000, "gfx1", ROMREGION_ERASE00 )  /* Sprites */
 	ROM_LOAD32_WORD( "1l.u4",  0x0400000, 0x200000, CRC(c2eb565c) SHA1(07e41b36cc03a87f28d091754fdb0d1a7316a532) )
 	ROM_LOAD32_WORD( "1h.u12", 0x0400002, 0x200000, CRC(23cb46b7) SHA1(005b7cc40eea103688a64a72c219c7535970dbfb) )
 	ROM_LOAD32_WORD( "2l.u5",  0x0800000, 0x200000, CRC(bc256aea) SHA1(1f1d678e8a63513a95f296b8a07d2ea485d1e53f) )
@@ -1075,11 +1133,11 @@ Starting with Gunbarich and including Mahjong G-Taste, Psikyo started to "recycl
 */
 
 ROM_START( gnbarich )
-	ROM_REGION( 0x180000, "maincpu", 0)
+	ROM_REGION( 0x180000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD32_WORD_SWAP( "2-prog_l.u21",   0x000000, 0x080000, CRC(c136cd9c) SHA1(ab66c4f5196a66a97dbb5832336a203421cf40fa) )
 	ROM_LOAD32_WORD_SWAP( "1-prog_h.u22",   0x000002, 0x080000, CRC(6588fc96) SHA1(3db29fcf17e8b2aee465319b557bd3e45bc966b2) )
 
-	ROM_REGION( 0x2c00000, "gfx1", 0 )  /* Sprites */
+	ROM_REGION( 0x2c00000, "gfx1", ROMREGION_ERASE00 )  /* Sprites */
 //  ROM_LOAD32_WORD( "1l.u4",  0x0400000, 0x200000, CRC(c2eb565c) SHA1(07e41b36cc03a87f28d091754fdb0d1a7316a532) ) /* From Dragon Blaze */
 //  ROM_LOAD32_WORD( "1h.u12", 0x0400002, 0x200000, CRC(23cb46b7) SHA1(005b7cc40eea103688a64a72c219c7535970dbfb) ) /* From Dragon Blaze */
 //  ROM_LOAD32_WORD( "2l.u5",  0x0800000, 0x200000, CRC(bc256aea) SHA1(1f1d678e8a63513a95f296b8a07d2ea485d1e53f) ) /* From Dragon Blaze */
@@ -1109,7 +1167,7 @@ ROM_START( gnbarich )
 ROM_END
 
 ROM_START( mjgtaste )
-	ROM_REGION( 0x180000, "maincpu", 0)
+	ROM_REGION( 0x180000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD32_WORD_SWAP( "2.u21",   0x000000, 0x080000, CRC(5f2041dc) SHA1(f3862ffdb8df0cf921ce1cb0236935731e7729a7) )
 	ROM_LOAD32_WORD_SWAP( "1.u22",   0x000002, 0x080000, CRC(f5ff7876) SHA1(4c909db9c97f29fd79df6dacd29762688701b973) )
 
@@ -1143,11 +1201,11 @@ ROM_START( mjgtaste )
 ROM_END
 
 ROM_START( tgm2 )
-	ROM_REGION( 0x180000, "maincpu", 0)
+	ROM_REGION( 0x180000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD32_WORD_SWAP( "2.u21",   0x000000, 0x080000, CRC(b19f6c31) SHA1(c58346c575db71262aebc3993743cb031c41e4af) )
 	ROM_LOAD32_WORD_SWAP( "1.u22",   0x000002, 0x080000, CRC(c521bf24) SHA1(0ee5b9f74b6b8bcc01b2270c53f30d99e877ed64) )
 
-	ROM_REGION( 0x3000000, "gfx1", 0 )  /* Sprites */
+	ROM_REGION( 0x3000000, "gfx1", ROMREGION_ERASE00 )  /* Sprites */
 	// Lower positions not populated
 	ROM_LOAD32_WORD( "81ts_3l.u6",   0x0c00000, 0x200000, CRC(d77cff9c) SHA1(93ee48c350110ebf9a80cca95c599c90a523147d) )
 	ROM_LOAD32_WORD( "82ts_3h.u14",  0x0c00002, 0x200000, CRC(f012b583) SHA1(907e1c93cbfa6a0285f96c53f5ccb63e313053d7) )
@@ -1175,11 +1233,11 @@ ROM_START( tgm2 )
 ROM_END
 
 ROM_START( tgm2p )
-	ROM_REGION( 0x180000, "maincpu", 0)
+	ROM_REGION( 0x180000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD32_WORD_SWAP( "2b.u21",   0x000000, 0x080000, CRC(38bc626c) SHA1(783e8413b11f1fa08d331b09ef4ed63f62b87ead) )
 	ROM_LOAD32_WORD_SWAP( "1b.u22",   0x000002, 0x080000, CRC(7599fb19) SHA1(3f7e81756470c173cc17a7e7dee91437571fd0c3) )
 
-	ROM_REGION( 0x3000000, "gfx1", 0 )  /* Sprites */
+	ROM_REGION( 0x3000000, "gfx1", ROMREGION_ERASE00 )  /* Sprites */
 	// Lower positions not populated
 	ROM_LOAD32_WORD( "81ts_3l.u6",   0x0c00000, 0x200000, CRC(d77cff9c) SHA1(93ee48c350110ebf9a80cca95c599c90a523147d) )
 	ROM_LOAD32_WORD( "82ts_3h.u14",  0x0c00002, 0x200000, CRC(f012b583) SHA1(907e1c93cbfa6a0285f96c53f5ccb63e313053d7) )
@@ -1223,24 +1281,24 @@ void psikyosh_state::init_ps5()
 }
 
 
-//    YEAR  NAME       PARENT    MACHINE      INPUT     STATE           INIT      MONITOR COMPANY   FULLNAME FLAGS */
+//    YEAR  NAME       PARENT    MACHINE          INPUT     STATE           INIT      MONITOR COMPANY   FULLNAME                                             FLAGS */
 
 /* ps3-v1 */
-GAME( 1997, soldivid,  0,        psikyo3v1,       soldivid, psikyosh_state, init_ps3, ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, soldividk, soldivid, psikyo3v1,       soldividk,psikyosh_state, init_ps3, ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, s1945ii,   0,        psikyo3v1,       s1945ii,  psikyosh_state, init_ps3, ROT270, "Psikyo", "Strikers 1945 II", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, daraku,    0,        psikyo3v1,       daraku,   psikyosh_state, init_ps3, ROT0,   "Psikyo", "Daraku Tenshi - The Fallen Angels", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbomber,   0,        psikyo3v1,       sbomberb, psikyosh_state, init_ps3, ROT270, "Psikyo", "Space Bomber (ver. B)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, sbombera,  sbomber,  psikyo3v1,       sbomberb, psikyosh_state, init_ps3, ROT270, "Psikyo", "Space Bomber", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, soldivid,  0,        psikyo3v1,       soldivid, psikyosh_state, init_ps3, ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness",                                    MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, soldividk, soldivid, psikyo3v1,       soldividk,psikyosh_state, init_ps3, ROT0,   "Psikyo", "Sol Divide - The Sword Of Darkness (Korea)",                            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, s1945ii,   0,        psikyo3v1,       s1945ii,  psikyosh_state, init_ps3, ROT270, "Psikyo", "Strikers 1945 II",                                                      MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, daraku,    0,        psikyo3v1,       daraku,   psikyosh_state, init_ps3, ROT0,   "Psikyo", "The Fallen Angels (World) / Daraku Tenshi - The Fallen Angels (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbomber,   0,        psikyo3v1,       sbomber,  psikyosh_state, init_ps3, ROT270, "Psikyo", "Space Bomber (ver. B)",                                                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, sbombera,  sbomber,  psikyo3v1,       sbomber,  psikyosh_state, init_ps3, ROT270, "Psikyo", "Space Bomber",                                                          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 /* ps5 */
-GAME( 1998, gunbird2,  0,        psikyo5,         gunbird2, psikyosh_state, init_ps5, ROT270, "Psikyo", "Gunbird 2 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, gunbird2a, gunbird2, psikyo5,         gunbird2, psikyosh_state, init_ps5, ROT270, "Psikyo", "Gunbird 2 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, s1945iii,  0,        psikyo5,         s1945iii, psikyosh_state, init_ps5, ROT270, "Psikyo", "Strikers 1945 III (World) / Strikers 1999 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, gunbird2,  0,        psikyo5,         gunbird2, psikyosh_state, init_ps5, ROT270, "Psikyo", "Gunbird 2 (set 1)",                                                     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, gunbird2a, gunbird2, psikyo5,         gunbird2, psikyosh_state, init_ps5, ROT270, "Psikyo", "Gunbird 2 (set 2)",                                                     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, s1945iii,  0,        psikyo5,         s1945iii, psikyosh_state, init_ps5, ROT270, "Psikyo", "Strikers 1945 III (World) / Strikers 1999 (Japan)",                     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 /* ps5v2 */
-GAME( 2000, dragnblz,  0,        psikyo5,         dragnblz, psikyosh_state, init_ps5, ROT270, "Psikyo", "Dragon Blaze", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, tgm2,      0,        psikyo5_240,     tgm2,     psikyosh_state, init_ps5, ROT0,   "Arika",  "Tetris: The Absolute - The Grand Master 2", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, tgm2p,     tgm2,     psikyo5_240,     tgm2,     psikyosh_state, init_ps5, ROT0,   "Arika",  "Tetris: The Absolute - The Grand Master 2 Plus", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, gnbarich,  0,        psikyo5,         gnbarich, psikyosh_state, init_ps5, ROT270, "Psikyo", "Gunbarich", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, mjgtaste,  0,        psikyo5_mahjong, mjgtaste, psikyosh_state, init_ps5, ROT0,   "Psikyo", "Mahjong G-Taste", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, dragnblz,  0,        psikyo5,         dragnblz, psikyosh_state, init_ps5, ROT270, "Psikyo", "Dragon Blaze",                                                          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, tgm2,      0,        psikyo5_240,     tgm2,     psikyosh_state, init_ps5, ROT0,   "Arika",  "Tetris: The Absolute - The Grand Master 2",                             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, tgm2p,     tgm2,     psikyo5_240,     tgm2,     psikyosh_state, init_ps5, ROT0,   "Arika",  "Tetris: The Absolute - The Grand Master 2 Plus",                        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, gnbarich,  0,        psikyo5,         gnbarich, psikyosh_state, init_ps5, ROT270, "Psikyo", "Gunbarich",                                                             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, mjgtaste,  0,        psikyo5_mahjong, mjgtaste, psikyosh_state, init_ps5, ROT0,   "Psikyo", "Mahjong G-Taste",                                                       MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

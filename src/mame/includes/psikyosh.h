@@ -87,7 +87,10 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	bool const FLIPSCREEN() { return ((m_vidregs[3] & 0x0000c000) == 0x0000c000); } // currently ignored
+	int const screen_width() { return m_screen->visible_area().width(); }
+	int const screen_height() { return m_screen->visible_area().height(); }
+
+	u8 const FLIPSCREEN(u8 bit = ~0) { return (bit < 2) ? BIT(m_vidregs[3], 14 + bit) : BIT(m_vidregs[3], 14, 2); } // currently ignored
 
 	bool const BG_LARGE(u8 const n)        { return ((m_vidregs[7] << (4 * n)) & 0x00001000); }
 	bool const BG_DEPTH_8BPP(u8 const n)   { return ((m_vidregs[7] << (4 * n)) & 0x00004000); }
@@ -119,7 +122,7 @@ private:
 	void prelineblend(bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	void postlineblend(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 const req_pri);
 	void psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx,
-	u32 const code, u16 const color, u8 const flipx, u8 const flipy, s32 const offsx, s32 const offsy,
+	u32 const code, u16 const color, bool flipx, bool flipy, s32 offsx, s32 offsy,
 	s16 const alpha, u32 const zoomx, u32 const zoomy, u8 const wide, u8 const high, u16 const z);
 	void ps3v1_map(address_map &map);
 	void ps5_map(address_map &map);
