@@ -67,6 +67,16 @@ TEST:
 typedef named_delegate<void ()> save_prepost_delegate;
 
 
+#define SAVE_TYPE_AS_INT(Type) \
+	template<> struct save_registrar::is_signed_int_like<Type> { static constexpr bool value = true; };
+
+#define SAVE_TYPE_AS_UINT(Type) \
+	template<> struct save_registrar::is_unsigned_int_like<Type> { static constexpr bool value = true; };
+
+#define SAVE_TYPE_AS_FLOAT(Type) \
+	template<> struct save_registrar::is_floating_point_like<Type> { static constexpr bool value = true; };
+
+
 // use this to declare a given type is a simple, non-pointer type that can be
 // saved; in general, this is intended only to be used for specific enum types
 // defined by your device
@@ -195,6 +205,22 @@ class save_registrar
 	}
 
 public:
+	// items that are signed_int_like are interpreted as 8/16/32/64-bit signed integers; this includes
+	// proper signed integral values and enums by default; additional types may be added via the
+	// SAVE_TYPE_AS_INT macro
+	template<typename T> struct is_signed_int_like { static constexpr bool value = ((std::is_integral<T>::value && std::is_signed<T>::value) || std::is_enum<T>::value); };
+
+	// items that are unsigned_int_like are interpreted as 8/16/32/64-bit unsigned integers; this includes
+	// proper unsigned integral values; additional types may be added via the SAVE_TYPE_AS_UINT macro
+	template<typename T> struct is_unsigned_int_like { static constexpr bool value = (std::is_integral<T>::value && !std::is_signed<T>::value); };
+
+	// items that are floating_point_like are interpreted as 32/64-bit IEEE floating point; this includes
+	// proper float and double values; additional types may be added via the SAVE_TYPE_AS_FLOAT macro
+	template<typename T> struct is_floating_point_like { static constexpr bool value = std::is_floating_point<T>::value; };
+
+	// items are considered atoms if they fall into one of the three classes above
+	template<typename T> struct is_atom { static constexpr bool value = (is_signed_int_like<T>::value || is_unsigned_int_like<T>::value || is_floating_point_like<T>::value); };
+
 	// construct a container within parent
 	save_registrar(save_registrar &parent, char const *name) :
 		save_registrar(parent, save_registered_item::TYPE_CONTAINER, 0, name)
@@ -214,35 +240,31 @@ public:
         return *this;
 	}
 
-    // enum types -- these are equivalent to ints of the save size
-    template<typename T>
-    std::enable_if_t<std::is_enum<T>::value, save_registrar> &reg(T &data, char const *name)
-	{
-		return register_internal(&data, save_registered_item::TYPE_INT, sizeof(data), name);
-	}
-
     // signed integral types
     template<typename T>
-    std::enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value, save_registrar> &reg(T &data, char const *name)
+    std::enable_if_t<is_signed_int_like<T>::value, save_registrar> &reg(T &data, char const *name)
 	{
+		static_assert(sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4 || sizeof(T) == 8);
 		return register_internal(&data, save_registered_item::TYPE_INT, sizeof(data), name);
 	}
 
     // unsigned integral types
     template<typename T>
-    std::enable_if_t<std::is_integral<T>::value && std::is_unsigned<T>::value, save_registrar> &reg(T &data, char const *name)
+    std::enable_if_t<is_unsigned_int_like<T>::value, save_registrar> &reg(T &data, char const *name)
 	{
+		static_assert(sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4 || sizeof(T) == 8);
 		return register_internal(&data, save_registered_item::TYPE_UINT, sizeof(data), name);
 	}
 
     // floating-point types
     template<typename T>
-    std::enable_if_t<std::is_floating_point<T>::value, save_registrar> &reg(T &data, char const *name)
+    std::enable_if_t<is_floating_point_like<T>::value, save_registrar> &reg(T &data, char const *name)
 	{
+		static_assert(sizeof(T) == 4 || sizeof(T) == 8);
 		return register_internal(&data, save_registered_item::TYPE_FLOAT, sizeof(data), name);
 	}
 
-	// unique_ptrs -- these are containers with a single "unique" item within
+	// std::unique_ptrs -- these are containers with a single "unique" item within
 	template<typename T>
 	save_registrar &reg(std::unique_ptr<T> &data, char const *name)
 	{
@@ -264,7 +286,17 @@ public:
         return *this;
     }
 
-    // vectors -- these are treated as arrays, with the size coming from the vector
+    // std::arrays -- these are containers with a single item representing the underlying data,
+	// which is replicated across the whole array
+    template<typename T, std::size_t N>
+    save_registrar &reg(std::array<T, N> &data, char const *name)
+    {
+		save_registrar container(*this, save_registered_item::save_type(N), sizeof(data[0]), name, &data[0]);
+        container.reg(data[0], "");
+        return *this;
+    }
+
+    // std::vectors -- these are treated as arrays, with the size coming from the vector
     template<typename T>
     save_registrar &reg(std::vector<T> &data, char const *name)
     {
@@ -281,7 +313,7 @@ public:
         return *this;
     }
 
-	// unique_ptrs with arrays
+	// std::unique_ptrs with arrays
 	template<typename T>
 	save_registrar &reg(std::unique_ptr<T[]> &data, char const *name, std::size_t count)
 	{
@@ -307,8 +339,8 @@ public:
 		return *this;
 	}
 
-	// structures (must have a _save method)
-    template<typename T, std::enable_if_t<std::is_class<T>::value && !std::is_base_of<bitmap_t, T>::value, bool> = true>
+	// structures (must have a register_save method)
+    template<typename T, std::enable_if_t<std::is_class<T>::value && !std::is_base_of<bitmap_t, T>::value && !is_atom<T>::value, bool> = true>
     save_registrar &reg(T &data, char const *name)
     {
 		save_registrar container(*this, save_registered_item::TYPE_STRUCT, sizeof(data), name, &data);
@@ -319,14 +351,7 @@ public:
     // bool as a special case
     save_registrar &reg(bool &data, char const *name) { return register_internal(&data, save_registered_item::TYPE_BOOL, sizeof(data), name); }
 
-    // rgb_t as a special case
-    save_registrar &reg(rgb_t &data, char const *name) { return register_internal(&data, save_registered_item::TYPE_UINT, sizeof(data), name); }
-
-    // PAIR/PAIR64 as a special case
-    save_registrar &reg(PAIR &data, char const *name) { return register_internal(&data, save_registered_item::TYPE_UINT, sizeof(data), name); }
-    save_registrar &reg(PAIR64 &data, char const *name) { return register_internal(&data, save_registered_item::TYPE_UINT, sizeof(data), name); }
-
-	// rectangle as a special case
+	// rectangle as a special case, since it's from an external library
     save_registrar &reg(rectangle &data, char const *name)
 	{
 		save_registrar container(*this, save_registered_item::TYPE_STRUCT, sizeof(data), name, &data);
@@ -337,7 +362,7 @@ public:
         return *this;
 	}
 
-	// bitmaps as a special case
+	// bitmaps as a special case, since they're from an external library
 	template<typename BitmapType>
 	std::enable_if_t<std::is_base_of<bitmap_t, BitmapType>::value, save_registrar> &reg(BitmapType &data, char const *name)
 	{
@@ -366,6 +391,12 @@ private:
     save_registered_item &m_parent;
     uintptr_t m_baseptr;
 };
+
+// these types are small structures/unions that embed an integral type; treat them as raw
+// integral types for saving purposes
+SAVE_TYPE_AS_UINT(rgb_t);
+SAVE_TYPE_AS_UINT(PAIR);
+SAVE_TYPE_AS_UINT(PAIR64);
 
 
 

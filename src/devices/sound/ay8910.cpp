@@ -1270,35 +1270,25 @@ void ay8910_device::build_mixer_table()
 	}
 }
 
-void ay8910_device::ay8910_statesave()
+
+//-------------------------------------------------
+//  device_register_save - register for save state
+//-------------------------------------------------
+
+void ay8910_device::device_register_save(save_registrar &save)
 {
-	save_item(STRUCT_MEMBER(m_tone, period));
-	save_item(STRUCT_MEMBER(m_tone, volume));
-	save_item(STRUCT_MEMBER(m_tone, duty));
-	save_item(STRUCT_MEMBER(m_tone, count));
-	save_item(STRUCT_MEMBER(m_tone, duty_cycle));
-	save_item(STRUCT_MEMBER(m_tone, output));
-
-	save_item(STRUCT_MEMBER(m_envelope, period));
-	save_item(STRUCT_MEMBER(m_envelope, count));
-	save_item(STRUCT_MEMBER(m_envelope, step));
-	save_item(STRUCT_MEMBER(m_envelope, volume));
-	save_item(STRUCT_MEMBER(m_envelope, hold));
-	save_item(STRUCT_MEMBER(m_envelope, alternate));
-	save_item(STRUCT_MEMBER(m_envelope, attack));
-	save_item(STRUCT_MEMBER(m_envelope, holding));
-
-	save_item(NAME(m_active));
-	save_item(NAME(m_register_latch));
-	save_item(NAME(m_regs));
-	save_item(NAME(m_last_enable));
-
-	save_item(NAME(m_count_noise));
-	save_item(NAME(m_prescale_noise));
-
-	save_item(NAME(m_rng));
-	save_item(NAME(m_mode));
-	save_item(NAME(m_flags));
+	// save our data
+	save.reg(NAME(m_tone))
+		.reg(NAME(m_envelope))
+		.reg(NAME(m_active))
+		.reg(NAME(m_register_latch))
+		.reg(NAME(m_regs))
+		.reg(NAME(m_last_enable))
+		.reg(NAME(m_count_noise))
+		.reg(NAME(m_prescale_noise))
+		.reg(NAME(m_rng))
+		.reg(NAME(m_mode))
+		.reg(NAME(m_flags));
 }
 
 //-------------------------------------------------
@@ -1335,7 +1325,6 @@ void ay8910_device::device_start()
 	m_channel = stream_alloc(0, m_streams, master_clock / 8);
 
 	ay_set_clock(master_clock);
-	ay8910_statesave();
 }
 
 

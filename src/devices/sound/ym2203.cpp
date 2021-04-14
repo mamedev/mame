@@ -108,11 +108,24 @@ void ym2203_device::device_start()
 	// create our stream
 	m_stream = stream_alloc(0, fm_engine::OUTPUTS, m_fm.sample_rate(clock()));
 
-	// save our data
-	save_item(YMFM_NAME(m_address));
+	// initialize the FM engine
+	m_fm.init();
+}
 
-	// save the FM engine
-	m_fm.save(*this);
+
+//-------------------------------------------------
+//  device_register_save - register for save state
+//-------------------------------------------------
+
+void ym2203_device::device_register_save(save_registrar &save)
+{
+	// call our parent
+	save_registrar container(save, "psg");
+	ay8910_device::device_register_save(container);
+
+	// save our data
+	save.reg(NAME(m_address))
+		.reg(NAME(m_fm));
 }
 
 

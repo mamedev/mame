@@ -824,62 +824,24 @@ void ymf278b_device::precompute_rate_tables()
 	}
 }
 
-void ymf278b_device::register_save_state()
+
+void ymf278b_device::device_register_save(save_registrar &save)
 {
-	int i;
-
-	save_item(NAME(m_pcmregs));
-	save_item(NAME(m_wavetblhdr));
-	save_item(NAME(m_memmode));
-	save_item(NAME(m_memadr));
-	save_item(NAME(m_fm_l));
-	save_item(NAME(m_fm_r));
-	save_item(NAME(m_fm_pos));
-	save_item(NAME(m_pcm_l));
-	save_item(NAME(m_pcm_r));
-	save_item(NAME(m_port_AB));
-	save_item(NAME(m_port_C));
-	save_item(NAME(m_lastport));
-	save_item(NAME(m_next_status_id));
-
-	for (i = 0; i < 24; ++i)
-	{
-		save_item(NAME(m_slots[i].wave), i);
-		save_item(NAME(m_slots[i].F_NUMBER), i);
-		save_item(NAME(m_slots[i].octave), i);
-		save_item(NAME(m_slots[i].preverb), i);
-		save_item(NAME(m_slots[i].DAMP), i);
-		save_item(NAME(m_slots[i].CH), i);
-		save_item(NAME(m_slots[i].LD), i);
-		save_item(NAME(m_slots[i].TL), i);
-		save_item(NAME(m_slots[i].pan), i);
-		save_item(NAME(m_slots[i].LFO), i);
-		save_item(NAME(m_slots[i].VIB), i);
-		save_item(NAME(m_slots[i].AM), i);
-
-		save_item(NAME(m_slots[i].AR), i);
-		save_item(NAME(m_slots[i].D1R), i);
-		save_item(NAME(m_slots[i].DL), i);
-		save_item(NAME(m_slots[i].D2R), i);
-		save_item(NAME(m_slots[i].RC), i);
-		save_item(NAME(m_slots[i].RR), i);
-
-		save_item(NAME(m_slots[i].step), i);
-		save_item(NAME(m_slots[i].stepptr), i);
-
-		save_item(NAME(m_slots[i].active), i);
-		save_item(NAME(m_slots[i].KEY_ON), i);
-		save_item(NAME(m_slots[i].bits), i);
-		save_item(NAME(m_slots[i].startaddr), i);
-		save_item(NAME(m_slots[i].loopaddr), i);
-		save_item(NAME(m_slots[i].endaddr), i);
-
-		save_item(NAME(m_slots[i].env_step), i);
-		save_item(NAME(m_slots[i].env_vol), i);
-		save_item(NAME(m_slots[i].env_vol_step), i);
-		save_item(NAME(m_slots[i].env_vol_lim), i);
-		save_item(NAME(m_slots[i].env_preverb), i);
-	}
+	save.reg(NAME(m_pcmregs))
+		.reg(NAME(m_wavetblhdr))
+		.reg(NAME(m_memmode))
+		.reg(NAME(m_memadr))
+		.reg(NAME(m_fm_l))
+		.reg(NAME(m_fm_r))
+		.reg(NAME(m_fm_pos))
+		.reg(NAME(m_pcm_l))
+		.reg(NAME(m_pcm_r))
+		.reg(NAME(m_port_AB))
+		.reg(NAME(m_port_C))
+		.reg(NAME(m_lastport))
+		.reg(NAME(m_next_status_id))
+		.reg(NAME(m_slots))
+		.reg(NAME(m_fm));
 }
 
 //-------------------------------------------------
@@ -926,11 +888,8 @@ void ymf278b_device::device_start()
 		m_mix_level[i] = m_volume[8*i+13];
 	m_mix_level[7] = 0;
 
-	// Register state for saving
-	register_save_state();
-
-	// YMF262 related
-	m_fm.save(*this);
+	// initialize the FM engine
+	m_fm.init();
 }
 
 

@@ -36,6 +36,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// ROM device overrides

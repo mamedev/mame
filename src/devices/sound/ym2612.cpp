@@ -141,14 +141,23 @@ void ym2612_device::device_start()
 	// call this for the variants that need to adjust the rate
 	device_clock_changed();
 
-	// save our data
-	save_item(YMFM_NAME(m_address));
-	save_item(YMFM_NAME(m_dac_data));
-	save_item(YMFM_NAME(m_dac_enable));
-	save_item(YMFM_NAME(m_channel));
+	// initialize the FM engine
+	m_fm.init();
+}
 
-	// save the engines
-	m_fm.save(*this);
+
+//-------------------------------------------------
+//  device_register_save - register for save state
+//-------------------------------------------------
+
+void ym2612_device::device_register_save(save_registrar &save)
+{
+	// save our data
+	save.reg(NAME(m_address))
+		.reg(NAME(m_dac_data))
+		.reg(NAME(m_dac_enable))
+		.reg(NAME(m_channel))
+		.reg(NAME(m_fm));
 }
 
 

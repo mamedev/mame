@@ -133,6 +133,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -211,6 +212,16 @@ private:
 		{
 			duty = val;
 		}
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(period))
+				.reg(NAME(volume))
+				.reg(NAME(duty))
+				.reg(NAME(count))
+				.reg(NAME(duty_cycle))
+				.reg(NAME(output));
+		}
 	};
 
 	struct envelope_t
@@ -256,6 +267,18 @@ private:
 			holding = 0;
 			volume = (step ^ attack);
 		}
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(period))
+				.reg(NAME(count))
+				.reg(NAME(step))
+				.reg(NAME(volume))
+				.reg(NAME(hold))
+				.reg(NAME(alternate))
+				.reg(NAME(attack))
+				.reg(NAME(holding));
+		}
 	};
 
 	// inlines
@@ -277,7 +300,6 @@ private:
 	inline stream_buffer::sample_t mix_3D();
 	void ay8910_write_reg(int r, int v);
 	void build_mixer_table();
-	void ay8910_statesave();
 
 	// internal state
 	psg_type_t m_type;

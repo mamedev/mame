@@ -10,27 +10,16 @@
 
 
 //*********************************************************
-//  MACROS
-//*********************************************************
-
-// special naming helper to keep our namespace isolated from other
-// same-named objects in the device's namespace
-#define ADPCM_A_NAME(x) x, "adpcma." #x
-#define ADPCM_B_NAME(x) x, "adpcmb." #x
-
-
-
-//*********************************************************
 // ADPCM "A" REGISTERS
 //*********************************************************
 
 //-------------------------------------------------
-//  ymadpcm_a_registers - constructor
+//  register_save - register for save states
 //-------------------------------------------------
 
-void ymadpcm_a_registers::save(device_t &device)
+void ymadpcm_a_registers::register_save(save_registrar &save)
 {
-	device.save_item(ADPCM_A_NAME(m_regdata));
+	save.reg(NAME(m_regdata));
 }
 
 
@@ -73,17 +62,17 @@ ymadpcm_a_channel::ymadpcm_a_channel(ymadpcm_a_engine &owner, u32 choffs, read8s
 
 
 //-------------------------------------------------
-//  save - register for save states
+//  register_save - register for save states
 //-------------------------------------------------
 
-void ymadpcm_a_channel::save(device_t &device, u32 index)
+void ymadpcm_a_channel::register_save(save_registrar &save)
 {
-	device.save_item(ADPCM_A_NAME(m_playing), index);
-	device.save_item(ADPCM_A_NAME(m_curnibble), index);
-	device.save_item(ADPCM_A_NAME(m_curbyte), index);
-	device.save_item(ADPCM_A_NAME(m_curaddress), index);
-	device.save_item(ADPCM_A_NAME(m_accumulator), index);
-	device.save_item(ADPCM_A_NAME(m_step_index), index);
+	save.reg(NAME(m_playing))
+		.reg(NAME(m_curnibble))
+		.reg(NAME(m_curbyte))
+		.reg(NAME(m_curaddress))
+		.reg(NAME(m_accumulator))
+		.reg(NAME(m_step_index));
 }
 
 
@@ -239,17 +228,13 @@ ymadpcm_a_engine::ymadpcm_a_engine(device_t &device, read8sm_delegate reader, u3
 
 
 //-------------------------------------------------
-//  save - register for save states
+//  register_save - register for save states
 //-------------------------------------------------
 
-void ymadpcm_a_engine::save(device_t &device)
+void ymadpcm_a_engine::register_save(save_registrar &save)
 {
-	// save register state
-	m_regs.save(device);
-
-	// save channel state
-	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
-		m_channel[chnum]->save(device, chnum);
+	save.reg(NAME(m_regs))
+		.reg(NAME(m_channel));
 }
 
 
@@ -326,9 +311,9 @@ void ymadpcm_a_engine::write(u32 regnum, u8 data)
 //  ymadpcm_b_registers - constructor
 //-------------------------------------------------
 
-void ymadpcm_b_registers::save(device_t &device)
+void ymadpcm_b_registers::register_save(save_registrar &save)
 {
-	device.save_item(ADPCM_B_NAME(m_regdata));
+	save.reg(NAME(m_regdata));
 }
 
 
@@ -372,20 +357,20 @@ ymadpcm_b_channel::ymadpcm_b_channel(ymadpcm_b_engine &owner, read8sm_delegate r
 
 
 //-------------------------------------------------
-//  save - register for save states
+//  register_save - register for save states
 //-------------------------------------------------
 
-void ymadpcm_b_channel::save(device_t &device, u32 index)
+void ymadpcm_b_channel::register_save(save_registrar &save)
 {
-	device.save_item(ADPCM_B_NAME(m_status), index);
-	device.save_item(ADPCM_B_NAME(m_curnibble), index);
-	device.save_item(ADPCM_B_NAME(m_curbyte), index);
-	device.save_item(ADPCM_B_NAME(m_dummy_read), index);
-	device.save_item(ADPCM_B_NAME(m_position), index);
-	device.save_item(ADPCM_B_NAME(m_curaddress), index);
-	device.save_item(ADPCM_B_NAME(m_accumulator), index);
-	device.save_item(ADPCM_B_NAME(m_prev_accum), index);
-	device.save_item(ADPCM_B_NAME(m_adpcm_step), index);
+	save.reg(NAME(m_status))
+		.reg(NAME(m_curnibble))
+		.reg(NAME(m_curbyte))
+		.reg(NAME(m_dummy_read))
+		.reg(NAME(m_position))
+		.reg(NAME(m_curaddress))
+		.reg(NAME(m_accumulator))
+		.reg(NAME(m_prev_accum))
+		.reg(NAME(m_adpcm_step));
 }
 
 
@@ -674,17 +659,13 @@ ymadpcm_b_engine::ymadpcm_b_engine(device_t &device, read8sm_delegate reader, wr
 
 
 //-------------------------------------------------
-//  save - register for save states
+//  register_save - register for save states
 //-------------------------------------------------
 
-void ymadpcm_b_engine::save(device_t &device)
+void ymadpcm_b_engine::register_save(save_registrar &save)
 {
-	// save our state
-	m_regs.save(device);
-
-	// save channel state
-	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
-		m_channel[chnum]->save(device, chnum);
+	save.reg(NAME(m_regs))
+		.reg(NAME(m_channel));
 }
 
 

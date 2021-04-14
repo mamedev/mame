@@ -36,6 +36,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	// memory space configuration
 	virtual space_config_vector memory_space_config() const override;

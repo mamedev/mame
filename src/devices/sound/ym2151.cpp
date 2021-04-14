@@ -137,10 +137,8 @@ void ym2151_device::device_register_save(save_registrar &save)
 {
 	// save our data
 	save.reg(NAME(m_address))
-		.reg(NAME(m_reset_state));
-
-	// save the engines
-	m_fm.register_save(save);
+		.reg(NAME(m_reset_state))
+		.reg(NAME(m_fm));
 }
 
 

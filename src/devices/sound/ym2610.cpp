@@ -192,15 +192,8 @@ void ym2610_device::device_start()
 	// create our stream
 	m_stream = stream_alloc(0, fm_engine::OUTPUTS, m_fm.sample_rate(clock()));
 
-	// save our data
-	save_item(YMFM_NAME(m_address));
-	save_item(YMFM_NAME(m_eos_status));
-	save_item(YMFM_NAME(m_flag_mask));
-
-	// save the engines
-	m_fm.save(*this);
-	m_adpcm_a.save(*this);
-	m_adpcm_b.save(*this);
+	// initialize the FM engine
+	m_fm.init();
 
 	// automatically map memory regions if not configured externally
 	if (!has_configured_map(0) && !has_configured_map(1))
@@ -213,6 +206,26 @@ void ym2610_device::device_start()
 		else if (m_adpcm_a_region)
 			space(1).install_rom(0, m_adpcm_a_region->bytes() - 1, m_adpcm_a_region->base());
 	}
+}
+
+
+//-------------------------------------------------
+//  device_register_save - register for save state
+//-------------------------------------------------
+
+void ym2610_device::device_register_save(save_registrar &save)
+{
+	// call our parent
+	save_registrar container(save, "psg");
+	ay8910_device::device_register_save(container);
+
+	// save our data
+	save.reg(NAME(m_address))
+		.reg(NAME(m_eos_status))
+		.reg(NAME(m_flag_mask))
+		.reg(NAME(m_fm))
+		.reg(NAME(m_adpcm_a))
+		.reg(NAME(m_adpcm_b));
 }
 
 

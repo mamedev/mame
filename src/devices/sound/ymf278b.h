@@ -32,6 +32,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -81,6 +82,45 @@ private:
 		int8_t env_preverb;
 
 		int num;        /* slot number (for debug only) */
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(wave))
+				.reg(NAME(F_NUMBER))
+				.reg(NAME(octave))
+				.reg(NAME(preverb))
+				.reg(NAME(DAMP))
+				.reg(NAME(CH))
+				.reg(NAME(LD))
+				.reg(NAME(TL))
+				.reg(NAME(pan))
+				.reg(NAME(LFO))
+				.reg(NAME(VIB))
+				.reg(NAME(AM))
+
+				.reg(NAME(AR))
+				.reg(NAME(D1R))
+				.reg(NAME(DL))
+				.reg(NAME(D2R))
+				.reg(NAME(RC))
+				.reg(NAME(RR))
+
+				.reg(NAME(step))
+				.reg(NAME(stepptr))
+
+				.reg(NAME(active))
+				.reg(NAME(KEY_ON))
+				.reg(NAME(bits))
+				.reg(NAME(startaddr))
+				.reg(NAME(loopaddr))
+				.reg(NAME(endaddr))
+
+				.reg(NAME(env_step))
+				.reg(NAME(env_vol))
+				.reg(NAME(env_vol_step))
+				.reg(NAME(env_vol_lim))
+				.reg(NAME(env_preverb));
+		}
 	};
 
 	int compute_rate(YMF278BSlot *slot, int val);

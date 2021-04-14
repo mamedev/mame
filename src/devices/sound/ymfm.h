@@ -1283,7 +1283,7 @@ public:
 	void init();
 
 	// register for save states
-	void register_save(save_registrar &device);
+	void register_save(save_registrar &save);
 
 	// reset the overall state
 	void reset();

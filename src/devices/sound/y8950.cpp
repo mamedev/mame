@@ -183,13 +183,22 @@ void y8950_device::device_start()
 	m_io_read_handler.resolve_safe(0);
 	m_io_write_handler.resolve_safe();
 
-	// save our data
-	save_item(YMFM_NAME(m_address));
-	save_item(YMFM_NAME(m_io_ddr));
+	// initialize the FM engine
+	m_fm.init();
+}
 
-	// save the engines
-	m_fm.save(*this);
-	m_adpcm_b.save(*this);
+
+//-------------------------------------------------
+//  device_register_save - register for save state
+//-------------------------------------------------
+
+void y8950_device::device_register_save(save_registrar &save)
+{
+	// save our data
+	save.reg(NAME(m_address))
+		.reg(NAME(m_io_ddr))
+		.reg(NAME(m_fm))
+		.reg(NAME(m_adpcm_b));
 }
 
 

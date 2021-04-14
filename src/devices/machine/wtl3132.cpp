@@ -25,6 +25,7 @@
 #include "logmacro.h"
 
 ALLOW_SAVE_TYPE(float32_t);
+SAVE_TYPE_AS_FLOAT(float32_t);
 
 // helper for extracting opcode fields
 #define OPF(c, x) ((c & M_##x) >> S_##x)

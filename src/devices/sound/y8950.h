@@ -50,6 +50,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	// ROM device overrides
 	virtual void rom_bank_updated() override;

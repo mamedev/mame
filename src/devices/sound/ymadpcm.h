@@ -44,7 +44,7 @@ public:
 	ymadpcm_a_registers() { }
 
 	// register for save states
-	void save(device_t &device);
+	void register_save(save_registrar &save);
 
 	// reset to initial state
 	void reset();
@@ -99,7 +99,7 @@ public:
 	ymadpcm_a_channel(ymadpcm_a_engine &owner, u32 choffs, read8sm_delegate reader, u32 addrshift);
 
 	// register for save states
-	void save(device_t &device, u32 index);
+	void register_save(save_registrar &save);
 
 	// reset the channel state
 	void reset();
@@ -140,7 +140,7 @@ public:
 	ymadpcm_a_engine(device_t &device, read8sm_delegate reader, u32 addrshift);
 
 	// save state handling
-	void save(device_t &device);
+	void register_save(save_registrar &save);
 
 	// reset our status
 	void reset();
@@ -218,7 +218,7 @@ public:
 	ymadpcm_b_registers() { }
 
 	// register for save states
-	void save(device_t &device);
+	void register_save(save_registrar &save);
 
 	// reset to initial state
 	void reset();
@@ -271,7 +271,7 @@ public:
 	ymadpcm_b_channel(ymadpcm_b_engine &owner, read8sm_delegate reader, write8sm_delegate writer, u32 addrshift);
 
 	// register for save states
-	void save(device_t &device, u32 index);
+	void register_save(save_registrar &save);
 
 	// reset the channel state
 	void reset();
@@ -336,7 +336,7 @@ public:
 	ymadpcm_b_engine(device_t &device, read8sm_delegate reader, write8sm_delegate writer, u32 addrshift = 0);
 
 	// save state handling
-	void save(device_t &device);
+	void register_save(save_registrar &save);
 
 	// reset our status
 	void reset();
