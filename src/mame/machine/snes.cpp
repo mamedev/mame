@@ -1071,40 +1071,31 @@ void snes_state::machine_start()
 
 	snes_init_timers();
 
-	save_item(STRUCT_MEMBER(m_dma_channel, dmap));
-	save_item(STRUCT_MEMBER(m_dma_channel, dest_addr));
-	save_item(STRUCT_MEMBER(m_dma_channel, src_addr));
-	save_item(STRUCT_MEMBER(m_dma_channel, bank));
-	save_item(STRUCT_MEMBER(m_dma_channel, trans_size));
-	save_item(STRUCT_MEMBER(m_dma_channel, ibank));
-	save_item(STRUCT_MEMBER(m_dma_channel, hdma_addr));
-	save_item(STRUCT_MEMBER(m_dma_channel, hdma_iaddr));
-	save_item(STRUCT_MEMBER(m_dma_channel, hdma_line_counter));
-	save_item(STRUCT_MEMBER(m_dma_channel, unk));
-	save_item(STRUCT_MEMBER(m_dma_channel, do_transfer));
-	save_item(STRUCT_MEMBER(m_dma_channel, dma_disabled));
-
-	save_item(NAME(m_hblank_offset));
-	save_item(NAME(m_wram_address));
-	save_item(NAME(m_htime));
-	save_item(NAME(m_vtime));
-	save_item(NAME(m_hdmaen));
-	save_item(NAME(m_data1));
-	save_item(NAME(m_data2));
-	save_item(NAME(m_read_idx));
-	save_item(NAME(m_dma_regs));
-	save_item(NAME(m_cpu_regs));
-	save_item(NAME(m_oldjoy1_latch));
-	save_item(NAME(m_input_disabled));
-	save_item(NAME(m_game_over_flag));
-	save_item(NAME(m_joy_flag));
-
 	m_is_nss = 0;
 	m_is_sfcbox = 0;
 	m_input_disabled = 0;
 	m_game_over_flag = 0;
 	m_joy_flag = 1;
 	m_wram_address = 0;
+}
+
+void snes_state::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_dma_channel))
+		.reg(NAME(m_hblank_offset))
+		.reg(NAME(m_wram_address))
+		.reg(NAME(m_htime))
+		.reg(NAME(m_vtime))
+		.reg(NAME(m_hdmaen))
+		.reg(NAME(m_data1))
+		.reg(NAME(m_data2))
+		.reg(NAME(m_read_idx))
+		.reg(NAME(m_dma_regs))
+		.reg(NAME(m_cpu_regs))
+		.reg(NAME(m_oldjoy1_latch))
+		.reg(NAME(m_input_disabled))
+		.reg(NAME(m_game_over_flag))
+		.reg(NAME(m_joy_flag));
 }
 
 void snes_state::machine_reset()

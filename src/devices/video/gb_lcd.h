@@ -66,6 +66,16 @@ protected:
 		/* GBC specific */
 		uint8_t  *gbc_map;
 		int16_t  bgline;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(enabled))
+				.reg(NAME(xindex))
+				.reg(NAME(xshift))
+				.reg(NAME(xstart))
+				.reg(NAME(xend))
+				.reg(NAME(bgline));
+		}
 	};
 
 	inline void plot_pixel(int x, int y, uint16_t color);
@@ -79,6 +89,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -137,6 +148,17 @@ protected:
 			uint8_t flags;
 			uint8_t tile_plane_0;
 			uint8_t tile_plane_1;
+
+			void register_save(save_registrar &save)
+			{
+				save.reg(NAME(enabled))
+					.reg(NAME(x))
+					.reg(NAME(y))
+					.reg(NAME(pattern))
+					.reg(NAME(flags))
+					.reg(NAME(tile_plane_0))
+					.reg(NAME(tile_plane_1));
+			}
 		} sprite[10];
 		uint8_t sprite_delay_cycles;
 		// other internal data
@@ -158,6 +180,37 @@ protected:
 		uint8_t window_enable[16];
 		int window_enable_index;
 		bool window_should_trigger;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(tile_cycle))
+				.reg(NAME(tile_count))
+				.reg(NAME(y))
+				.reg(NAME(pattern_address))
+				.reg(NAME(pattern))
+				.reg(NAME(tile_address))
+				.reg(NAME(plane0))
+				.reg(NAME(plane1))
+				.reg(NAME(shift_register))
+				.reg(NAME(sprite_delay_cycles))
+				.reg(NAME(starting))
+				.reg(NAME(sequence_counter))
+				.reg(NAME(drawing))
+				.reg(NAME(start_drawing))
+				.reg(NAME(scrollx_delay))
+				.reg(NAME(scrollx_to_apply))
+				.reg(NAME(pixels_drawn))
+				.reg(NAME(window_compare_position))
+				.reg(NAME(window_active))
+				.reg(NAME(scrollx))
+				.reg(NAME(window_start_y))
+				.reg(NAME(window_start_x))
+				.reg(NAME(window_start_y_index))
+				.reg(NAME(window_enable))
+				.reg(NAME(window_enable_index))
+				.reg(NAME(window_should_trigger))
+				.reg(NAME(sprite));
+		}
 	} m_line;
 	bool m_frame_window_active;
 
@@ -268,6 +321,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_reset() override;
 
 	virtual void update_sprites() override;

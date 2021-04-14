@@ -30,10 +30,21 @@ public:
 		int x;
 		int y;
 		int alpha;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(base))
+				.reg(NAME(width))
+				.reg(NAME(height))
+				.reg(NAME(x))
+				.reg(NAME(y))
+				.reg(NAME(alpha));
+		}
 	};
 
 protected:
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
 

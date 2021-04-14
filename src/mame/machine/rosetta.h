@@ -54,6 +54,7 @@ protected:
 	// device_t overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 
@@ -93,6 +94,8 @@ protected:
 		u32 field0 = 0; // address tag
 		u32 field1 = 0; // real page, valid, key
 		u32 field2 = 0; // write, transaction identifier, lockbits
+
+		void register_save(save_registrar &save) { save.reg(NAME(field0)).reg(NAME(field1)).reg(NAME(field2)); }
 	};
 	tlb_entry tlb_search(u64 const virtual_address, bool const special);
 	u32 tlb_reload(tlb_entry &tlb_entry, u64 const virtual_address, bool special = false);

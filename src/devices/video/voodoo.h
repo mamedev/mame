@@ -932,6 +932,7 @@ protected:
 	// device-level overrides
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
 
@@ -979,6 +980,17 @@ protected:
 		int32_t             clip_fail = 0;          // clipping fail statistic
 		int32_t             stipple_count = 0;      // stipple statistic
 		int32_t             filler[64/4 - 7];       // pad this structure to 64 bytes
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(pixels_in))
+				.reg(NAME(pixels_out))
+				.reg(NAME(chroma_fail))
+				.reg(NAME(zfunc_fail))
+				.reg(NAME(afunc_fail))
+				.reg(NAME(clip_fail))
+				.reg(NAME(stipple_count));
+		}
 	};
 
 
@@ -997,6 +1009,8 @@ protected:
 		int32_t             size = 0;               // size of the FIFO
 		int32_t             in = 0;                 // input pointer
 		int32_t             out = 0;                // output pointer
+
+		void register_save(save_registrar &save) { save.reg(NAME(in)).reg(NAME(out)).reg(NAME(size)); }
 	};
 
 
@@ -1011,6 +1025,19 @@ protected:
 		uint32_t            amax = 0;               // maximum address
 		uint32_t            depth = 0;              // current depth
 		uint32_t            holes = 0;              // number of holes
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(enable))
+				.reg(NAME(count_holes))
+				.reg(NAME(base))
+				.reg(NAME(end))
+				.reg(NAME(rdptr))
+				.reg(NAME(amin))
+				.reg(NAME(amax))
+				.reg(NAME(depth))
+				.reg(NAME(holes));
+		}
 	};
 
 
@@ -1023,6 +1050,16 @@ protected:
 		attotime            op_end_time = attotime::zero; // time when the pending operation ends
 		emu_timer *         continue_timer = nullptr; // timer to use to continue processing
 		uint32_t            fifo_mem[64*2];         // memory backing the PCI FIFO
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(fifo))
+				.reg(NAME(init_enable))
+				.reg(NAME(stall_state))
+				.reg(NAME(op_pending))
+				.reg(NAME(op_end_time))
+				.reg(NAME(fifo_mem));
+		}
 	};
 
 
@@ -1049,6 +1086,13 @@ protected:
 			rgb_t *             palette = nullptr;      // pointer to associated RGB palette
 			rgb_t *             palettea = nullptr;     // pointer to associated ARGB palette
 			rgb_t               texel[256];             // texel lookup
+
+			void register_save(save_registrar &save)
+			{
+				save.reg(NAME(ir)).reg(NAME(ig)).reg(NAME(ib))
+					.reg(NAME(qr)).reg(NAME(qg)).reg(NAME(qb))
+					.reg(NAME(y));
+			}
 		};
 
 		uint8_t *           ram = nullptr;          // pointer to our RAM
@@ -1086,6 +1130,18 @@ protected:
 
 		rgb_t               palette[256];           // palette lookup table
 		rgb_t               palettea[256];          // palette+alpha lookup table
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(ram), mask + 1)
+				.reg(NAME(starts)).reg(NAME(startt))
+				.reg(NAME(startw))
+				.reg(NAME(dsdx)).reg(NAME(dtdx))
+				.reg(NAME(dwdx))
+				.reg(NAME(dsdy)).reg(NAME(dtdy))
+				.reg(NAME(dwdy))
+				.reg(NAME(ncc));
+		}
 	};
 
 
@@ -1113,6 +1169,15 @@ protected:
 			float               r, g, b, a;             // A, R, G, B values
 			float               s0, t0, w0;             // W, S, T for TMU 0
 			float               s1, t1, w1;             // W, S, T for TMU 1
+
+			void register_save(save_registrar &save)
+			{
+				save.reg(NAME(x)).reg(NAME(y))
+					.reg(NAME(z)).reg(NAME(wb))
+					.reg(NAME(r)).reg(NAME(g)).reg(NAME(b)).reg(NAME(a))
+					.reg(NAME(s0)).reg(NAME(t0)).reg(NAME(w0))
+					.reg(NAME(s1)).reg(NAME(t1)).reg(NAME(w1));
+			}
 		};
 
 		uint8_t *           ram = nullptr;          // pointer to frame buffer RAM
@@ -1180,6 +1245,57 @@ protected:
 		rgb_t               clut[512];              // clut gamma data */
 		uint8_t             clut_dirty = 1;         // do we need to recompute? */
 		rgb_t               rgb565[65536];          // RGB 5-6-5 lookup table */
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(ram), mask + 1)
+				.reg(NAME(rgboffs))
+				.reg(NAME(auxoffs))
+				.reg(NAME(frontbuf))
+				.reg(NAME(backbuf))
+				.reg(NAME(swaps_pending))
+				.reg(NAME(video_changed))
+				.reg(NAME(yorigin))
+				.reg(NAME(lfb_base))
+				.reg(NAME(lfb_stride))
+				.reg(NAME(width))
+				.reg(NAME(height))
+				.reg(NAME(xoffs))
+				.reg(NAME(yoffs))
+				.reg(NAME(vsyncstart))
+				.reg(NAME(vsyncstop))
+				.reg(NAME(rowpixels))
+				.reg(NAME(vblank))
+				.reg(NAME(vblank_count))
+				.reg(NAME(vblank_swap_pending))
+				.reg(NAME(vblank_swap))
+				.reg(NAME(vblank_dont_swap))
+				.reg(NAME(cheating_allowed))
+				.reg(NAME(sign))
+				.reg(NAME(ax))
+				.reg(NAME(ay))
+				.reg(NAME(bx))
+				.reg(NAME(by))
+				.reg(NAME(cx))
+				.reg(NAME(cy))
+				.reg(NAME(startr)).reg(NAME(startg)).reg(NAME(startb)).reg(NAME(starta))
+				.reg(NAME(startz))
+				.reg(NAME(startw))
+				.reg(NAME(drdx)).reg(NAME(dgdx)).reg(NAME(dbdx)).reg(NAME(dadx))
+				.reg(NAME(dzdx))
+				.reg(NAME(dwdx))
+				.reg(NAME(drdy)).reg(NAME(dgdy)).reg(NAME(dbdy)).reg(NAME(dady))
+				.reg(NAME(dzdy))
+				.reg(NAME(dwdy))
+				.reg(NAME(lfb_stats))
+				.reg(NAME(sverts))
+				.reg(NAME(svert))
+				.reg(NAME(fifo))
+				.reg(NAME(cmdfifo))
+				.reg(NAME(fogblend))
+				.reg(NAME(fogdelta))
+				.reg(NAME(clut));
+		}
 	};
 
 
@@ -1190,6 +1306,8 @@ protected:
 
 		uint8_t             reg[8];                 // 8 registers
 		uint8_t             read_result;            // pending read result
+
+		void register_save(save_registrar &save) { save.reg(NAME(reg)).reg(NAME(read_result)); }
 	};
 
 
@@ -1243,6 +1361,18 @@ protected:
 		uint32_t            blt_src_height = 0;
 		uint32_t            blt_src_stride = 0;
 		uint32_t            blt_src_bpp = 0;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(io))
+				.reg(NAME(agp))
+				.reg(NAME(vga))
+				.reg(NAME(crtc))
+				.reg(NAME(seq))
+				.reg(NAME(gc))
+				.reg(NAME(att))
+				.reg(NAME(attff));
+		}
 	};
 
 
@@ -1284,8 +1414,6 @@ protected:
 	static uint32_t cmdfifo_execute(voodoo_device *vd, cmdfifo_info *f);
 	int32_t cmdfifo_execute_if_ready(cmdfifo_info &f);
 	static void cmdfifo_w(voodoo_device *vd, cmdfifo_info *f, offs_t offset, uint32_t data);
-
-	static void init_save_state(voodoo_device *vd);
 
 	static void raster_fastfill(void *dest, int32_t scanline, const poly_extent *extent, const void *extradata, int threadid);
 	static void raster_generic_0tmu(void *dest, int32_t scanline, const poly_extent *extent, const void *extradata, int threadid);

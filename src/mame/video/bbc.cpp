@@ -383,18 +383,6 @@ void bbc_state::video_start()
 	set_pixel_lookup();
 
 	m_video_ram = m_ram->pointer();
-
-	// register save states
-	save_item(NAME(m_vula_ctrl));
-	save_item(NAME(m_vula_palette));
-	save_item(NAME(m_vula_palette_lookup));
-	save_item(STRUCT_MEMBER(m_vnula, palette_mode));
-	save_item(STRUCT_MEMBER(m_vnula, horiz_offset));
-	save_item(STRUCT_MEMBER(m_vnula, left_blank));
-	save_item(STRUCT_MEMBER(m_vnula, disable));
-	save_item(STRUCT_MEMBER(m_vnula, flash));
-	save_item(STRUCT_MEMBER(m_vnula, palette_byte));
-	save_item(STRUCT_MEMBER(m_vnula, palette_write));
 }
 
 void bbc_state::video_reset()

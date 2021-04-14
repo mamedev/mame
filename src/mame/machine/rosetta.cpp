@@ -207,22 +207,6 @@ void rosetta_device::device_start()
 	m_out_mchk.resolve_safe();
 	m_leds.resolve();
 
-	save_item(NAME(m_segment));
-	save_item(NAME(m_control));
-	save_item(NAME(m_mear_lock));
-	save_item(NAME(m_rmdr_lock));
-	save_item(NAME(m_led_lock));
-	save_item(NAME(m_pchk_state));
-
-	save_item(STRUCT_MEMBER(m_tlb, field0));
-	save_item(STRUCT_MEMBER(m_tlb, field1));
-	save_item(STRUCT_MEMBER(m_tlb, field2));
-	save_item(NAME(m_tlb_lru));
-
-	save_pointer(NAME(m_ram), m_ram_size);
-	save_pointer(NAME(m_ecc), m_ram_size);
-	save_pointer(NAME(m_rca), 2048);
-
 	config_tlb();
 
 	m_ram = std::make_unique<u32[]>(m_ram_size);
@@ -232,6 +216,22 @@ void rosetta_device::device_start()
 	offs_t const mask = m_rom.bytes() - 1;
 	m_mem_space->install_rom(0, mask, 0xffffff & ~mask, m_rom);
 	m_mem_space->cache(m_mem);
+}
+
+void rosetta_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_segment))
+		.reg(NAME(m_control))
+		.reg(NAME(m_mear_lock))
+		.reg(NAME(m_rmdr_lock))
+		.reg(NAME(m_led_lock))
+		.reg(NAME(m_pchk_state))
+		.reg(NAME(m_tlb))
+		.reg(NAME(m_tlb_lru))
+
+		.reg(NAME(m_ram), m_ram_size)
+		.reg(NAME(m_ecc), m_ram_size)
+		.reg(NAME(m_rca), 2048);
 }
 
 void rosetta_device::device_reset()

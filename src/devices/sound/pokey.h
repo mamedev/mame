@@ -246,6 +246,12 @@ private:
 
 		void register_save(save_registrar &save)
 		{
+			save.reg(NAME(m_borrow_cnt))
+				.reg(NAME(m_counter))
+				.reg(NAME(m_filter_sample))
+				.reg(NAME(m_output))
+				.reg(NAME(m_AUDF))
+				.reg(NAME(m_AUDC));
 		}
 	};
 

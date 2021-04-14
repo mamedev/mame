@@ -250,122 +250,65 @@ void snes_ppu_device::device_start()
 			set_pen_indirect(DIRECT_COLOUR + c + (group * 256), direct);
 		}
 	}
+}
 
-	save_item(STRUCT_MEMBER(m_scanlines, enable));
-	save_item(STRUCT_MEMBER(m_scanlines, clip));
-	save_item(STRUCT_MEMBER(m_scanlines, buffer));
-	save_item(STRUCT_MEMBER(m_scanlines, priority));
-	save_item(STRUCT_MEMBER(m_scanlines, layer));
-	save_item(STRUCT_MEMBER(m_scanlines, blend_exception));
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
 
-	save_item(STRUCT_MEMBER(m_layer, window1_enabled));
-	save_item(STRUCT_MEMBER(m_layer, window1_invert));
-	save_item(STRUCT_MEMBER(m_layer, window2_enabled));
-	save_item(STRUCT_MEMBER(m_layer, window2_invert));
-	save_item(STRUCT_MEMBER(m_layer, wlog_mask));
-	save_item(STRUCT_MEMBER(m_layer, color_math));
-	save_item(STRUCT_MEMBER(m_layer, charmap));
-	save_item(STRUCT_MEMBER(m_layer, tilemap));
-	save_item(STRUCT_MEMBER(m_layer, tilemap_size));
-	save_item(STRUCT_MEMBER(m_layer, tile_size));
-	save_item(STRUCT_MEMBER(m_layer, tile_mode));
-	save_item(STRUCT_MEMBER(m_layer, mosaic_enabled));
-	save_item(STRUCT_MEMBER(m_layer, main_window_enabled));
-	save_item(STRUCT_MEMBER(m_layer, sub_window_enabled));
-	save_item(STRUCT_MEMBER(m_layer, main_bg_enabled));
-	save_item(STRUCT_MEMBER(m_layer, sub_bg_enabled));
-	save_item(STRUCT_MEMBER(m_layer, hoffs));
-	save_item(STRUCT_MEMBER(m_layer, voffs));
-	save_item(STRUCT_MEMBER(m_layer, priority));
-	save_item(STRUCT_MEMBER(m_layer, mosaic_counter));
-	save_item(STRUCT_MEMBER(m_layer, mosaic_offset));
+void snes_ppu_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_scanlines))
+		.reg(NAME(m_layer))
+		.reg(NAME(m_clipmasks))
+		.reg(NAME(m_oam))
+		.reg(NAME(m_beam))
+		.reg(NAME(m_mode7))
+		.reg(NAME(m_objects))
 
-	save_item(NAME(m_clipmasks));
+		.reg(NAME(m_mosaic_size))
+		.reg(NAME(m_clip_to_black))
+		.reg(NAME(m_prevent_color_math))
+		.reg(NAME(m_sub_add_mode))
+		.reg(NAME(m_bg_priority))
+		.reg(NAME(m_direct_color))
+		.reg(NAME(m_ppu_last_scroll))
+		.reg(NAME(m_mode7_last_scroll))
 
-	save_item(NAME(m_oam.address));
-	save_item(NAME(m_oam.base_address));
-	save_item(NAME(m_oam.priority_rotation));
-	save_item(NAME(m_oam.tile_data_address));
-	save_item(NAME(m_oam.name_select));
-	save_item(NAME(m_oam.base_size));
-	save_item(NAME(m_oam.first));
-	save_item(NAME(m_oam.write_latch));
-	save_item(NAME(m_oam.data_latch));
-	save_item(NAME(m_oam.interlace));
-	save_item(NAME(m_oam.priority));
+		.reg(NAME(m_ppu1_open_bus))
+		.reg(NAME(m_ppu2_open_bus))
+		.reg(NAME(m_ppu1_version))
+		.reg(NAME(m_ppu2_version))
+		.reg(NAME(m_window1_left))
+		.reg(NAME(m_window1_right))
+		.reg(NAME(m_window2_left))
+		.reg(NAME(m_window2_right))
 
-	save_item(NAME(m_beam.latch_horz));
-	save_item(NAME(m_beam.latch_vert));
-	save_item(NAME(m_beam.current_vert));
-	save_item(NAME(m_beam.last_visible_line));
-	save_item(NAME(m_beam.interlace_count));
+		.reg(NAME(m_mode))
+		.reg(NAME(m_interlace))
+		.reg(NAME(m_screen_brightness))
+		.reg(NAME(m_screen_disabled))
+		.reg(NAME(m_pseudo_hires))
+		.reg(NAME(m_color_modes))
+		.reg(NAME(m_stat77))
+		.reg(NAME(m_stat78))
 
-	save_item(NAME(m_mode7.repeat));
-	save_item(NAME(m_mode7.hflip));
-	save_item(NAME(m_mode7.vflip));
-	save_item(NAME(m_mode7.matrix_a));
-	save_item(NAME(m_mode7.matrix_b));
-	save_item(NAME(m_mode7.matrix_c));
-	save_item(NAME(m_mode7.matrix_d));
-	save_item(NAME(m_mode7.origin_x));
-	save_item(NAME(m_mode7.origin_y));
-	save_item(NAME(m_mode7.hor_offset));
-	save_item(NAME(m_mode7.ver_offset));
-	save_item(NAME(m_mode7.extbg));
+		.reg(NAME(m_htmult))
+		.reg(NAME(m_cgram_address))
+		.reg(NAME(m_read_ophct))
+		.reg(NAME(m_read_opvct))
+		.reg(NAME(m_vram_fgr_high))
+		.reg(NAME(m_vram_fgr_increment))
+		.reg(NAME(m_vram_fgr_count))
+		.reg(NAME(m_vram_fgr_mask))
+		.reg(NAME(m_vram_fgr_shift))
+		.reg(NAME(m_vram_read_buffer))
+		.reg(NAME(m_vmadd))
 
-	save_item(STRUCT_MEMBER(m_objects, x));
-	save_item(STRUCT_MEMBER(m_objects, y));
-	save_item(STRUCT_MEMBER(m_objects, character));
-	save_item(STRUCT_MEMBER(m_objects, name_select));
-	save_item(STRUCT_MEMBER(m_objects, vflip));
-	save_item(STRUCT_MEMBER(m_objects, hflip));
-	save_item(STRUCT_MEMBER(m_objects, pri));
-	save_item(STRUCT_MEMBER(m_objects, pal));
-	save_item(STRUCT_MEMBER(m_objects, size));
+		.reg(NAME(m_regs))
 
-	save_item(NAME(m_mosaic_size));
-	save_item(NAME(m_clip_to_black));
-	save_item(NAME(m_prevent_color_math));
-	save_item(NAME(m_sub_add_mode));
-	save_item(NAME(m_bg_priority));
-	save_item(NAME(m_direct_color));
-	save_item(NAME(m_ppu_last_scroll));
-	save_item(NAME(m_mode7_last_scroll));
-
-	save_item(NAME(m_ppu1_open_bus));
-	save_item(NAME(m_ppu2_open_bus));
-	save_item(NAME(m_ppu1_version));
-	save_item(NAME(m_ppu2_version));
-	save_item(NAME(m_window1_left));
-	save_item(NAME(m_window1_right));
-	save_item(NAME(m_window2_left));
-	save_item(NAME(m_window2_right));
-
-	save_item(NAME(m_mode));
-	save_item(NAME(m_interlace));
-	save_item(NAME(m_screen_brightness));
-	save_item(NAME(m_screen_disabled));
-	save_item(NAME(m_pseudo_hires));
-	save_item(NAME(m_color_modes));
-	save_item(NAME(m_stat77));
-	save_item(NAME(m_stat78));
-
-	save_item(NAME(m_htmult));
-	save_item(NAME(m_cgram_address));
-	save_item(NAME(m_read_ophct));
-	save_item(NAME(m_read_opvct));
-	save_item(NAME(m_vram_fgr_high));
-	save_item(NAME(m_vram_fgr_increment));
-	save_item(NAME(m_vram_fgr_count));
-	save_item(NAME(m_vram_fgr_mask));
-	save_item(NAME(m_vram_fgr_shift));
-	save_item(NAME(m_vram_read_buffer));
-	save_item(NAME(m_vmadd));
-
-	save_item(NAME(m_regs));
-
-	save_pointer(NAME(m_vram), SNES_VRAM_SIZE);
-	save_pointer(NAME(m_cgram), SNES_CGRAM_SIZE/2);
+		.reg(NAME(m_vram), SNES_VRAM_SIZE)
+		.reg(NAME(m_cgram), SNES_CGRAM_SIZE/2);
 }
 
 void snes_ppu_device::device_reset()

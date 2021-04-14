@@ -402,6 +402,8 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	virtual void device_register_save(save_registrar &save) override;
+
 private:
 	uint32_t epic_r(offs_t offset);
 	void epic_w(offs_t offset, uint32_t data);
@@ -502,6 +504,16 @@ private:
 		int active;
 		int pending;
 		int mask;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(vector))
+				.reg(NAME(priority))
+				.reg(NAME(destination)) // written but never read
+				.reg(NAME(active))
+				.reg(NAME(pending))
+				.reg(NAME(mask));
+		}
 	};
 
 	struct MPC8240_GLOBAL_TIMER
@@ -509,6 +521,8 @@ private:
 		uint32_t base_count;
 		int enable;
 		emu_timer *timer;
+
+		void register_save(save_registrar &save) { save.reg(NAME(base_count)).reg(NAME(enable)); }
 	};
 
 	struct MPC8240_EPIC
@@ -529,6 +543,21 @@ private:
 
 		MPC8240_GLOBAL_TIMER global_timer[4];
 
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(iack))
+				.reg(NAME(eicr)) // written but never used
+				.reg(NAME(svr))
+				.reg(NAME(active_irq))
+				.reg(NAME(irq))
+				.reg(NAME(i2c_adr))
+				.reg(NAME(i2c_freq_div))
+				.reg(NAME(i2c_freq_sample_rate))
+				.reg(NAME(i2c_cr))
+				.reg(NAME(i2c_sr))
+				.reg(NAME(i2c_state))
+				.reg(NAME(global_timer));
+		}
 	};
 
 	MPC8240_EPIC m_epic;
@@ -2380,44 +2409,6 @@ void viper_state::machine_start()
 	/* configure fast RAM regions for DRC */
 	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x00ffffff, false, m_workram);
 
-	save_item(NAME(m_voodoo3_pci_reg));
-	save_item(NAME(m_mpc8240_regs));
-	save_item(NAME(m_cf_card_ide));
-	save_item(NAME(m_unk_serial_bit_w));
-	save_item(NAME(m_unk_serial_cmd));
-	save_item(NAME(m_unk_serial_data));
-	save_item(NAME(m_unk_serial_data_r));
-	save_item(NAME(m_unk_serial_regs));
-
-	save_item(NAME(m_ds2430_unk_status));
-	save_item(NAME(m_ds2430_data));
-	save_item(NAME(m_ds2430_data_count));
-	save_item(NAME(m_ds2430_reset));
-	save_item(NAME(m_ds2430_state));
-	save_item(NAME(m_ds2430_cmd));
-	save_item(NAME(m_ds2430_addr)); // written but never used
-
-	save_item(NAME(m_epic.iack));
-	save_item(NAME(m_epic.eicr)); // written but never used
-	save_item(NAME(m_epic.svr));
-	save_item(NAME(m_epic.active_irq));
-	save_item(NAME(m_epic.i2c_adr));
-	save_item(NAME(m_epic.i2c_freq_div));
-	save_item(NAME(m_epic.i2c_freq_sample_rate));
-	save_item(NAME(m_epic.i2c_cr));
-	save_item(NAME(m_epic.i2c_sr));
-	save_item(NAME(m_epic.i2c_state));
-
-	save_item(STRUCT_MEMBER(m_epic.irq, vector));
-	save_item(STRUCT_MEMBER(m_epic.irq, priority));
-	save_item(STRUCT_MEMBER(m_epic.irq, destination)); // written but never read
-	save_item(STRUCT_MEMBER(m_epic.irq, active));
-	save_item(STRUCT_MEMBER(m_epic.irq, pending));
-	save_item(STRUCT_MEMBER(m_epic.irq, mask));
-
-	save_item(STRUCT_MEMBER(m_epic.global_timer, base_count));
-	save_item(STRUCT_MEMBER(m_epic.global_timer, enable));
-
 	m_unk_serial_bit_w = 0;
 	std::fill(std::begin(m_unk_serial_regs), std::end(m_unk_serial_regs), 0);
 
@@ -2427,6 +2418,28 @@ void viper_state::machine_start()
 
 	std::fill(std::begin(m_voodoo3_pci_reg), std::end(m_voodoo3_pci_reg), 0);
 	std::fill(std::begin(m_mpc8240_regs), std::end(m_mpc8240_regs), 0);
+}
+
+void viper_state::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_voodoo3_pci_reg))
+		.reg(NAME(m_mpc8240_regs))
+		.reg(NAME(m_cf_card_ide))
+		.reg(NAME(m_unk_serial_bit_w))
+		.reg(NAME(m_unk_serial_cmd))
+		.reg(NAME(m_unk_serial_data))
+		.reg(NAME(m_unk_serial_data_r))
+		.reg(NAME(m_unk_serial_regs))
+
+		.reg(NAME(m_ds2430_unk_status))
+		.reg(NAME(m_ds2430_data))
+		.reg(NAME(m_ds2430_data_count))
+		.reg(NAME(m_ds2430_reset))
+		.reg(NAME(m_ds2430_state))
+		.reg(NAME(m_ds2430_cmd))
+		.reg(NAME(m_ds2430_addr)) // written but never used
+
+		.reg(NAME(m_epic));
 }
 
 void viper_state::machine_reset()

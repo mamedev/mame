@@ -600,23 +600,13 @@ void electron_state::machine_start()
 	m_ula.interrupt_control = 0x00;
 	timer_set(attotime::zero, TIMER_SETUP_BEEP);
 	m_tape_timer = timer_alloc(TIMER_TAPE_HANDLER);
+}
 
-	/* register save states */
-	save_item(STRUCT_MEMBER(m_ula, interrupt_status));
-	save_item(STRUCT_MEMBER(m_ula, interrupt_control));
-	save_item(STRUCT_MEMBER(m_ula, rompage));
-	save_item(STRUCT_MEMBER(m_ula, screen_start));
-	save_item(STRUCT_MEMBER(m_ula, screen_base));
-	save_item(STRUCT_MEMBER(m_ula, screen_size));
-	save_item(STRUCT_MEMBER(m_ula, screen_addr));
-	save_item(STRUCT_MEMBER(m_ula, screen_dispend));
-	save_item(STRUCT_MEMBER(m_ula, current_pal));
-	save_item(STRUCT_MEMBER(m_ula, communication_mode));
-	save_item(STRUCT_MEMBER(m_ula, screen_mode));
-	save_item(STRUCT_MEMBER(m_ula, cassette_motor_mode));
-	save_item(STRUCT_MEMBER(m_ula, capslock_mode));
-	save_item(NAME(m_mrb_mapped));
-	save_item(NAME(m_vdu_drivers));
+void electron_state::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_ula))
+		.reg(NAME(m_mrb_mapped))
+		.reg(NAME(m_vdu_drivers));
 }
 
 void electron_state::machine_reset()
@@ -640,10 +630,13 @@ void electronsp_state::machine_start()
 	electron_state::machine_start();
 
 	m_sp64_ram = std::make_unique<uint8_t[]>(0x2000);
+}
 
-	/* register save states */
-	save_item(NAME(m_sp64_bank));
-	save_pointer(NAME(m_sp64_ram), 0x2000);
+void electronsp_state::device_register_save(save_registrar &save)
+{
+	electron_state::device_register_save(save);
+	save.reg(NAME(m_sp64_bank))
+		.reg(NAME(m_sp64_ram), 0x2000);
 }
 
 

@@ -96,7 +96,6 @@ void usb_sound_device::device_start()
 		m_pit[index]->write_gate1(1);
 		m_pit[index]->write_gate2(1);
 	}
-	save_item(NAME(m_gos_clock));
 
 #else
 
@@ -130,37 +129,29 @@ void usb_sound_device::device_start()
 
 	m_final_filter.configure(100e3, 4.7e-6);
 
-	for (int tgroup = 0; tgroup < 3; tgroup++)
-	{
-		timer8253 &group = m_timer_group[tgroup];
-		save_item(STRUCT_MEMBER(group.chan, holding), tgroup);
-		save_item(STRUCT_MEMBER(group.chan, latchmode), tgroup);
-		save_item(STRUCT_MEMBER(group.chan, latchtoggle), tgroup);
-		save_item(STRUCT_MEMBER(group.chan, clockmode), tgroup);
-		save_item(STRUCT_MEMBER(group.chan, bcdmode), tgroup);
-		save_item(STRUCT_MEMBER(group.chan, output), tgroup);
-		save_item(STRUCT_MEMBER(group.chan, lastgate), tgroup);
-		save_item(STRUCT_MEMBER(group.chan, gate), tgroup);
-		save_item(STRUCT_MEMBER(group.chan, subcount), tgroup);
-		save_item(STRUCT_MEMBER(group.chan, count), tgroup);
-		save_item(STRUCT_MEMBER(group.chan, remain), tgroup);
-		save_item(NAME(group.env), tgroup);
-		save_item(STRUCT_MEMBER(group.chan_filter, capval), tgroup);
-		save_item(NAME(group.gate1.capval), tgroup);
-		save_item(NAME(group.gate2.capval), tgroup);
-		save_item(NAME(group.config), tgroup);
-	}
+#endif
+}
 
-	save_item(NAME(m_timer_mode));
-	save_item(NAME(m_noise_shift));
-	save_item(NAME(m_noise_state));
-	save_item(NAME(m_noise_subcount));
-	save_item(NAME(m_final_filter.capval));
-	save_item(NAME(m_noise_filters[0].capval));
-	save_item(NAME(m_noise_filters[1].capval));
-	save_item(NAME(m_noise_filters[2].capval));
-	save_item(NAME(m_noise_filters[3].capval));
-	save_item(NAME(m_noise_filters[4].capval));
+
+//-------------------------------------------------
+//  device_register_save - register for save states
+//-------------------------------------------------
+
+void usb_sound_device::device_register_save(save_registrar &save)
+{
+#if (ENABLE_SEGAUSB_NETLIST)
+
+	save.reg(NAME(m_gos_clock));
+
+#else
+
+	save.reg(NAME(m_timer_group))
+		.reg(NAME(m_timer_mode))
+		.reg(NAME(m_noise_shift))
+		.reg(NAME(m_noise_state))
+		.reg(NAME(m_noise_subcount))
+		.reg(NAME(m_final_filter))
+		.reg(NAME(m_noise_filters));
 
 #endif
 }

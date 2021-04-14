@@ -106,6 +106,16 @@ protected:
 		uint8_t  priority[SNES_SCR_WIDTH];
 		uint8_t  layer[SNES_SCR_WIDTH];
 		uint8_t  blend_exception[SNES_SCR_WIDTH];
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(enable))
+				.reg(NAME(clip))
+				.reg(NAME(buffer))
+				.reg(NAME(priority))
+				.reg(NAME(layer))
+				.reg(NAME(blend_exception));
+		}
 	};
 
 	uint8_t m_regs[0x40];
@@ -141,6 +151,31 @@ protected:
 
 		uint16_t mosaic_counter;
 		uint16_t mosaic_offset;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(window1_enabled))
+				.reg(NAME(window1_invert))
+				.reg(NAME(window2_enabled))
+				.reg(NAME(window2_invert))
+				.reg(NAME(wlog_mask))
+				.reg(NAME(color_math))
+				.reg(NAME(charmap))
+				.reg(NAME(tilemap))
+				.reg(NAME(tilemap_size))
+				.reg(NAME(tile_size))
+				.reg(NAME(tile_mode))
+				.reg(NAME(mosaic_enabled))
+				.reg(NAME(main_window_enabled))
+				.reg(NAME(sub_window_enabled))
+				.reg(NAME(main_bg_enabled))
+				.reg(NAME(sub_bg_enabled))
+				.reg(NAME(hoffs))
+				.reg(NAME(voffs))
+				.reg(NAME(priority))
+				.reg(NAME(mosaic_counter))
+				.reg(NAME(mosaic_offset));
+		}
 	};
 
 	layer_t m_layer[6]; // this is for the BG1 - BG2 - BG3 - BG4 - OBJ - color layers
@@ -158,6 +193,21 @@ protected:
 		uint8_t data_latch;
 		uint8_t interlace;
 		uint8_t priority[4];
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(address))
+				.reg(NAME(base_address))
+				.reg(NAME(priority_rotation))
+				.reg(NAME(tile_data_address))
+				.reg(NAME(name_select))
+				.reg(NAME(base_size))
+				.reg(NAME(first))
+				.reg(NAME(write_latch))
+				.reg(NAME(data_latch))
+				.reg(NAME(interlace))
+				.reg(NAME(priority));
+		}
 	} m_oam;
 
 	struct
@@ -167,6 +217,15 @@ protected:
 		uint16_t current_vert;
 		uint8_t last_visible_line;
 		uint8_t interlace_count;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(latch_horz))
+				.reg(NAME(latch_vert))
+				.reg(NAME(current_vert))
+				.reg(NAME(last_visible_line))
+				.reg(NAME(interlace_count));
+		}
 	} m_beam;
 
 	struct
@@ -183,6 +242,22 @@ protected:
 		int16_t hor_offset;
 		int16_t ver_offset;
 		uint8_t extbg;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(repeat))
+				.reg(NAME(hflip))
+				.reg(NAME(vflip))
+				.reg(NAME(matrix_a))
+				.reg(NAME(matrix_b))
+				.reg(NAME(matrix_c))
+				.reg(NAME(matrix_d))
+				.reg(NAME(origin_x))
+				.reg(NAME(origin_y))
+				.reg(NAME(hor_offset))
+				.reg(NAME(ver_offset))
+				.reg(NAME(extbg));
+		}
 	} m_mode7;
 
 #if SNES_LAYER_DEBUG
@@ -267,6 +342,19 @@ protected:
 		uint8_t pri;
 		uint8_t pal;
 		uint8_t size;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(x))
+				.reg(NAME(y))
+				.reg(NAME(character))
+				.reg(NAME(name_select))
+				.reg(NAME(vflip))
+				.reg(NAME(hflip))
+				.reg(NAME(pri))
+				.reg(NAME(pal))
+				.reg(NAME(size));
+		}
 	};
 
 	inline uint32_t get_tile(uint8_t layer_idx, uint32_t hoffset, uint32_t voffset);
@@ -311,6 +399,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_reset() override;
 
 	// device_palette_interface overrides

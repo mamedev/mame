@@ -63,15 +63,18 @@ void gomoku_sound_device::device_start()
 		voice->volume = 0;
 		voice->oneshotplaying = 0;
 	}
+}
 
-	save_item(NAME(m_soundregs1));
-	save_item(NAME(m_soundregs2));
-	// save_item(NAME(m_sound_enable)); // set to 1 at device start and never updated?
-	save_item(STRUCT_MEMBER(m_channel_list, channel));
-	save_item(STRUCT_MEMBER(m_channel_list, frequency));
-	save_item(STRUCT_MEMBER(m_channel_list, counter));
-	save_item(STRUCT_MEMBER(m_channel_list, volume));
-	save_item(STRUCT_MEMBER(m_channel_list, oneshotplaying));
+//-------------------------------------------------
+//  device_register_save - register for save states
+//-------------------------------------------------
+
+void gomoku_sound_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_soundregs1))
+		.reg(NAME(m_soundregs2))
+		.reg(NAME(m_channel_list));
+	//  .reg(NAME(m_sound_enable)); // set to 1 at device start and never updated?
 }
 
 

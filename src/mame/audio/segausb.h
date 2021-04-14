@@ -58,6 +58,7 @@ protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_reset() override;
 
 #if (!ENABLE_SEGAUSB_NETLIST)
@@ -113,6 +114,8 @@ private:
 
 		double capval = 0.0; // current capacitor value
 		double exponent = 0.0; // constant exponent
+
+		void register_save(save_registrar &save) { save.reg(NAME(capval)); }
 	};
 
 	struct timer8253
@@ -134,6 +137,21 @@ private:
 			u16 count       = 0; // initial count
 			u16 remain      = 0; // current down counter value
 			s32 subcount    = 0; // subcount (2MHz clocks per input clock)
+
+			void register_save(save_registrar &save)
+			{
+				save.reg(NAME(holding))
+					.reg(NAME(latchmode))
+					.reg(NAME(latchtoggle))
+					.reg(NAME(clockmode))
+					.reg(NAME(bcdmode))
+					.reg(NAME(output))
+					.reg(NAME(lastgate))
+					.reg(NAME(gate))
+					.reg(NAME(subcount))
+					.reg(NAME(count))
+					.reg(NAME(remain));
+			}
 		};
 
 		timer8253() : env{ 0.0, 0.0, 0.0 } { }
@@ -144,6 +162,16 @@ private:
 		g80_filter_state gate1;          // first RC filter state
 		g80_filter_state gate2;          // second RC filter state
 		u8 config = 0;                   // configuration for this timer
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(chan))
+				.reg(NAME(env))
+				.reg(NAME(chan_filter))
+				.reg(NAME(gate1))
+				.reg(NAME(gate2))
+				.reg(NAME(config));
+		}
 	};
 
 	sound_stream *m_stream;      // output stream

@@ -21,6 +21,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -40,6 +41,15 @@ private:
 		int counter = 0;
 		int volume = 0;
 		int oneshotplaying = 0;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(channel))
+				.reg(NAME(frequency))
+				.reg(NAME(counter))
+				.reg(NAME(volume))
+				.reg(NAME(oneshotplaying));
+		}
 	};
 
 

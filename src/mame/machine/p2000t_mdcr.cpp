@@ -103,23 +103,20 @@ void mdcr_device::device_start()
 {
 	m_read_timer = timer_alloc();
 	m_read_timer->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
+}
 
-	save_item(NAME(m_fwd));
-	save_item(NAME(m_rev));
-	save_item(NAME(m_rdc));
-	save_item(NAME(m_rda));
-	save_item(NAME(m_wda));
-	save_item(NAME(m_recording));
-	save_item(NAME(m_fwd_pulse_time));
-	save_item(NAME(m_last_tape_time));
-	save_item(NAME(m_save_tape_time));
-	// Phase decoder
-	save_item(STRUCT_MEMBER(m_phase_decoder, m_last_signal));
-	save_item(STRUCT_MEMBER(m_phase_decoder, m_needs_sync));
-	save_item(STRUCT_MEMBER(m_phase_decoder, m_bit_queue));
-	save_item(STRUCT_MEMBER(m_phase_decoder, m_bit_place));
-	save_item(STRUCT_MEMBER(m_phase_decoder, m_current_clock));
-	save_item(STRUCT_MEMBER(m_phase_decoder, m_clock_period));
+void mdcr_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_fwd))
+		.reg(NAME(m_rev))
+		.reg(NAME(m_rdc))
+		.reg(NAME(m_rda))
+		.reg(NAME(m_wda))
+		.reg(NAME(m_recording))
+		.reg(NAME(m_fwd_pulse_time))
+		.reg(NAME(m_last_tape_time))
+		.reg(NAME(m_save_tape_time))
+		.reg(NAME(m_phase_decoder));
 }
 
 void mdcr_device::device_pre_save()

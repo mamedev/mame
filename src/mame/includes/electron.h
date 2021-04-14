@@ -106,6 +106,7 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+	virtual void device_register_save(save_registrar &save);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<cpu_device> m_maincpu;
@@ -149,6 +150,23 @@ protected:
 		int stop_bit;
 		int tape_running;
 		uint8_t tape_byte;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(interrupt_status))
+				.reg(NAME(interrupt_control))
+				.reg(NAME(rompage))
+				.reg(NAME(screen_start))
+				.reg(NAME(screen_base))
+				.reg(NAME(screen_size))
+				.reg(NAME(screen_addr))
+				.reg(NAME(screen_dispend))
+				.reg(NAME(current_pal))
+				.reg(NAME(communication_mode))
+				.reg(NAME(screen_mode))
+				.reg(NAME(cassette_motor_mode))
+				.reg(NAME(capslock_mode));
+		}
 	};
 
 	ULA m_ula;
@@ -178,6 +196,8 @@ protected:
 	virtual void electron_fred_w(offs_t offset, uint8_t data) override;
 
 	virtual void machine_start() override;
+
+	virtual void device_register_save(save_registrar &save);
 
 private:
 	required_memory_region m_region_sp64;

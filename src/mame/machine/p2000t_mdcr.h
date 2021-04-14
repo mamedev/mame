@@ -73,6 +73,7 @@ public:
 
 protected:
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_pre_save() override;
 	virtual void device_post_load() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -121,6 +122,17 @@ private:
 		/// Reset the clock state, the system will now need to resynchronize on 0xAA.
 		void reset();
 
+		/// Register variables for saving.
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(m_last_signal))
+				.reg(NAME(m_needs_sync))
+				.reg(NAME(m_bit_queue))
+				.reg(NAME(m_bit_place))
+				.reg(NAME(m_current_clock))
+				.reg(NAME(m_clock_period));
+		}
+
 	private:
 		// add a bit and reset the current clock.
 		void add_bit(bool bit);
@@ -137,7 +149,6 @@ private:
 		static constexpr int QUEUE_DELAY = 2;
 
 	public:
-		// Needed for save state.
 		bool m_last_signal{ false };
 		int m_needs_sync{ SYNCBITS };
 		uint8_t m_bit_queue{ 0 };

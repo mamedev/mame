@@ -39,41 +39,39 @@ void k057714_device::device_start()
 	m_irq.resolve_safe();
 
 	m_vram = std::make_unique<uint32_t[]>(VRAM_SIZE/4);
+}
 
-	save_pointer(NAME(m_vram), VRAM_SIZE/4);
-	save_item(NAME(m_vram_read_addr));
-	save_item(NAME(m_vram_fifo0_addr));
-	save_item(NAME(m_vram_fifo1_addr));
-	save_item(NAME(m_vram_fifo0_mode));
-	save_item(NAME(m_vram_fifo1_mode));
-	save_item(NAME(m_command_fifo0));
-	save_item(NAME(m_command_fifo0_ptr));
-	save_item(NAME(m_command_fifo1));
-	save_item(NAME(m_command_fifo1_ptr));
-	save_item(NAME(m_ext_fifo_addr));
-	save_item(NAME(m_ext_fifo_count));
-	save_item(NAME(m_ext_fifo_line));
-	save_item(NAME(m_ext_fifo_num_lines));
-	save_item(NAME(m_ext_fifo_width));
-	save_item(STRUCT_MEMBER(m_frame, base));
-	save_item(STRUCT_MEMBER(m_frame, width));
-	save_item(STRUCT_MEMBER(m_frame, height));
-	save_item(STRUCT_MEMBER(m_frame, x));
-	save_item(STRUCT_MEMBER(m_frame, y));
-	save_item(STRUCT_MEMBER(m_frame, alpha));
-	save_item(NAME(m_fb_origin_x));
-	save_item(NAME(m_fb_origin_y));
-	save_item(NAME(m_layer_select));
-	save_item(NAME(m_reg_6c));
-	save_item(NAME(m_display_h_visarea));
-	save_item(NAME(m_display_h_frontporch));
-	save_item(NAME(m_display_h_backporch));
-	save_item(NAME(m_display_h_syncpulse));
-	save_item(NAME(m_display_v_visarea));
-	save_item(NAME(m_display_v_frontporch));
-	save_item(NAME(m_display_v_backporch));
-	save_item(NAME(m_display_v_syncpulse));
-	save_item(NAME(m_pixclock));
+void k057714_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_vram), VRAM_SIZE/4)
+		.reg(NAME(m_vram_read_addr))
+		.reg(NAME(m_vram_fifo0_addr))
+		.reg(NAME(m_vram_fifo1_addr))
+		.reg(NAME(m_vram_fifo0_mode))
+		.reg(NAME(m_vram_fifo1_mode))
+		.reg(NAME(m_command_fifo0))
+		.reg(NAME(m_command_fifo0_ptr))
+		.reg(NAME(m_command_fifo1))
+		.reg(NAME(m_command_fifo1_ptr))
+		.reg(NAME(m_ext_fifo_addr))
+		.reg(NAME(m_ext_fifo_count))
+		.reg(NAME(m_ext_fifo_line))
+		.reg(NAME(m_ext_fifo_num_lines))
+		.reg(NAME(m_ext_fifo_width))
+		.reg(NAME(m_frame))
+		.reg(NAME(m_fb_origin_x))
+		.reg(NAME(m_fb_origin_y))
+		.reg(NAME(m_layer_select))
+		.reg(NAME(m_reg_6c))
+		.reg(NAME(m_display_h_visarea))
+		.reg(NAME(m_display_h_frontporch))
+		.reg(NAME(m_display_h_backporch))
+		.reg(NAME(m_display_h_syncpulse))
+		.reg(NAME(m_display_v_visarea))
+		.reg(NAME(m_display_v_frontporch))
+		.reg(NAME(m_display_v_backporch))
+		.reg(NAME(m_display_v_syncpulse))
+		.reg(NAME(m_pixclock));
 }
 
 void k057714_device::device_reset()

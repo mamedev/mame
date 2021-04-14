@@ -368,108 +368,73 @@ void dmg_ppu_device::common_start()
 	m_lcd_timer = timer_alloc();
 
 	m_program_space = &m_lr35902->space(AS_PROGRAM);
+}
 
-	save_pointer(NAME(m_oam), m_oam_size);
-	save_pointer(NAME(m_vram), m_vram_size);
-	save_item(NAME(m_window_lines_drawn));
-	save_item(NAME(m_vid_regs));
-	save_item(NAME(m_bg_zbuf));
 
-	save_item(NAME(m_cgb_bpal));
-	save_item(NAME(m_cgb_spal));
+void dmg_ppu_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_oam), m_oam_size)
+		.reg(NAME(m_vram), m_vram_size)
+		.reg(NAME(m_window_lines_drawn))
+		.reg(NAME(m_vid_regs))
+		.reg(NAME(m_bg_zbuf))
 
-	save_item(NAME(m_gb_bpal));
-	save_item(NAME(m_gb_spal0));
-	save_item(NAME(m_gb_spal1));
+		.reg(NAME(m_cgb_bpal))
+		.reg(NAME(m_cgb_spal))
 
-	save_item(NAME(m_current_line));
-	save_item(NAME(m_cmp_line));
-	save_item(NAME(m_sprCount));
-	save_item(NAME(m_sprite));
-	save_item(NAME(m_previous_line));
-	save_item(NAME(m_start_x));
-	save_item(NAME(m_end_x));
-	save_item(NAME(m_mode));
-	save_item(NAME(m_state));
-	save_item(NAME(m_sprite_cycles));
-	save_item(NAME(m_window_cycles));
-	save_item(NAME(m_scrollx_adjust));
-	save_item(NAME(m_oam_locked));
-	save_item(NAME(m_oam_locked_reading));
-	save_item(NAME(m_vram_locked));
-	save_item(NAME(m_pal_locked));
-	save_item(NAME(m_hdma_enabled));
-	save_item(NAME(m_hdma_possible));
-	save_item(NAME(m_hdma_cycles_to_start));
-	save_item(NAME(m_hdma_length));
-	save_item(NAME(m_oam_dma_start_cycles));
-	save_item(NAME(m_oam_dma_cycles_left));
-	save_item(NAME(m_oam_dma_source_address));
-	save_item(NAME(m_gbc_mode));
-	save_item(NAME(m_window_x));
-	save_item(NAME(m_window_y));
-	save_item(NAME(m_stat_mode0_int));
-	save_item(NAME(m_stat_mode1_int));
-	save_item(NAME(m_stat_mode2_int));
-	save_item(NAME(m_stat_lyc_int));
-	save_item(NAME(m_stat_lyc_int_prev));
-	save_item(NAME(m_stat_write_int));
-	save_item(NAME(m_stat_int));
-	save_item(NAME(m_gb_tile_no_mod));
-	save_item(NAME(m_oam_dma_processing));
-	save_item(NAME(m_gb_chrgen_offs));
-	save_item(NAME(m_gb_bgdtab_offs));
-	save_item(NAME(m_gb_wndtab_offs));
-	save_item(NAME(m_gbc_chrgen_offs));
-	save_item(NAME(m_gbc_bgdtab_offs));
-	save_item(NAME(m_gbc_wndtab_offs));
-	save_item(NAME(m_vram_bank));
-	save_item(NAME(m_last_updated));
-	save_item(NAME(m_cycles_left));
-	save_item(NAME(m_next_state));
-	save_item(NAME(m_old_curline));
+		.reg(NAME(m_gb_bpal))
+		.reg(NAME(m_gb_spal0))
+		.reg(NAME(m_gb_spal1))
 
-	save_item(STRUCT_MEMBER(m_layer, enabled));
-	save_item(STRUCT_MEMBER(m_layer, xindex));
-	save_item(STRUCT_MEMBER(m_layer, xshift));
-	save_item(STRUCT_MEMBER(m_layer, xstart));
-	save_item(STRUCT_MEMBER(m_layer, xend));
-	save_item(STRUCT_MEMBER(m_layer, bgline));
-
-	save_item(NAME(m_line.tile_cycle));
-	save_item(NAME(m_line.tile_count));
-	save_item(NAME(m_line.y));
-	save_item(NAME(m_line.pattern_address));
-	save_item(NAME(m_line.pattern));
-	save_item(NAME(m_line.tile_address));
-	save_item(NAME(m_line.plane0));
-	save_item(NAME(m_line.plane1));
-	save_item(NAME(m_line.shift_register));
-	save_item(NAME(m_line.sprite_delay_cycles));
-	save_item(NAME(m_line.starting));
-	save_item(NAME(m_line.sequence_counter));
-	save_item(NAME(m_line.drawing));
-	save_item(NAME(m_line.start_drawing));
-	save_item(NAME(m_line.scrollx_delay));
-	save_item(NAME(m_line.scrollx_to_apply));
-	save_item(NAME(m_line.pixels_drawn));
-	save_item(NAME(m_line.window_compare_position));
-	save_item(NAME(m_line.window_active));
-	save_item(NAME(m_line.scrollx));
-	save_item(NAME(m_line.window_start_y));
-	save_item(NAME(m_line.window_start_x));
-	save_item(NAME(m_line.window_start_y_index));
-	save_item(NAME(m_line.window_enable));
-	save_item(NAME(m_line.window_enable_index));
-	save_item(NAME(m_line.window_should_trigger));
-	save_item(STRUCT_MEMBER(m_line.sprite, enabled));
-	save_item(STRUCT_MEMBER(m_line.sprite, x));
-	save_item(STRUCT_MEMBER(m_line.sprite, y));
-	save_item(STRUCT_MEMBER(m_line.sprite, pattern));
-	save_item(STRUCT_MEMBER(m_line.sprite, flags));
-	save_item(STRUCT_MEMBER(m_line.sprite, tile_plane_0));
-	save_item(STRUCT_MEMBER(m_line.sprite, tile_plane_1));
-	save_item(NAME(m_frame_window_active));
+		.reg(NAME(m_current_line))
+		.reg(NAME(m_cmp_line))
+		.reg(NAME(m_sprCount))
+		.reg(NAME(m_sprite))
+		.reg(NAME(m_previous_line))
+		.reg(NAME(m_start_x))
+		.reg(NAME(m_end_x))
+		.reg(NAME(m_mode))
+		.reg(NAME(m_state))
+		.reg(NAME(m_sprite_cycles))
+		.reg(NAME(m_window_cycles))
+		.reg(NAME(m_scrollx_adjust))
+		.reg(NAME(m_oam_locked))
+		.reg(NAME(m_oam_locked_reading))
+		.reg(NAME(m_vram_locked))
+		.reg(NAME(m_pal_locked))
+		.reg(NAME(m_hdma_enabled))
+		.reg(NAME(m_hdma_possible))
+		.reg(NAME(m_hdma_cycles_to_start))
+		.reg(NAME(m_hdma_length))
+		.reg(NAME(m_oam_dma_start_cycles))
+		.reg(NAME(m_oam_dma_cycles_left))
+		.reg(NAME(m_oam_dma_source_address))
+		.reg(NAME(m_gbc_mode))
+		.reg(NAME(m_window_x))
+		.reg(NAME(m_window_y))
+		.reg(NAME(m_stat_mode0_int))
+		.reg(NAME(m_stat_mode1_int))
+		.reg(NAME(m_stat_mode2_int))
+		.reg(NAME(m_stat_lyc_int))
+		.reg(NAME(m_stat_lyc_int_prev))
+		.reg(NAME(m_stat_write_int))
+		.reg(NAME(m_stat_int))
+		.reg(NAME(m_gb_tile_no_mod))
+		.reg(NAME(m_oam_dma_processing))
+		.reg(NAME(m_gb_chrgen_offs))
+		.reg(NAME(m_gb_bgdtab_offs))
+		.reg(NAME(m_gb_wndtab_offs))
+		.reg(NAME(m_gbc_chrgen_offs))
+		.reg(NAME(m_gbc_bgdtab_offs))
+		.reg(NAME(m_gbc_wndtab_offs))
+		.reg(NAME(m_vram_bank))
+		.reg(NAME(m_last_updated))
+		.reg(NAME(m_cycles_left))
+		.reg(NAME(m_next_state))
+		.reg(NAME(m_old_curline))
+		.reg(NAME(m_layer))
+		.reg(NAME(m_line))
+		.reg(NAME(m_frame_window_active));
 }
 
 
@@ -521,14 +486,19 @@ void sgb_ppu_device::device_start()
 	/* The rest of the colortable can be black */
 	for (int i = 4; i < 8 * 16; i++)
 		m_sgb_pal[i] = 0;
+}
 
-	save_item(NAME(m_sgb_atf_data));
-	save_item(NAME(m_sgb_atf));
-	save_item(NAME(m_sgb_pal_data));
-	save_item(NAME(m_sgb_pal_map));
-	save_item(NAME(m_sgb_pal));
-	save_item(NAME(m_sgb_tile_map));
-	save_item(NAME(m_sgb_window_mask));
+void sgb_ppu_device::device_register_save(save_registrar &save)
+{
+	dmg_ppu_device::device_register_save(save);
+
+	save.reg(NAME(m_sgb_atf_data))
+		.reg(NAME(m_sgb_atf))
+		.reg(NAME(m_sgb_pal_data))
+		.reg(NAME(m_sgb_pal_map))
+		.reg(NAME(m_sgb_pal))
+		.reg(NAME(m_sgb_tile_map))
+		.reg(NAME(m_sgb_window_mask));
 }
 
 void cgb_ppu_device::device_start()

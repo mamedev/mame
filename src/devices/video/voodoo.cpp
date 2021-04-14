@@ -1153,154 +1153,31 @@ void voodoo_device::voodoo_postload()
 		recompute_video_memory();
 }
 
-
-void voodoo_device::init_save_state(voodoo_device *vd)
+SAVE_TYPE_AS_INT(voodoo_reg);
+void voodoo_device::device_register_save(save_registrar &save)
 {
-	vd->machine().save().register_postload(save_prepost_delegate(FUNC(voodoo_device::voodoo_postload), vd));
+	machine().save().register_postload(save_prepost_delegate(FUNC(voodoo_device::voodoo_postload), this));
 
 	/* register states: core */
-	vd->save_item(NAME(vd->extra_cycles));
-	vd->save_pointer(NAME(&vd->reg[0].u), std::size(vd->reg));
-	vd->save_item(NAME(vd->alt_regmap));
+	save.reg(NAME(extra_cycles))
+		.reg(NAME(reg))
+		.reg(NAME(alt_regmap))
 
 	/* register states: pci */
-	vd->save_item(NAME(vd->pci.fifo.in));
-	vd->save_item(NAME(vd->pci.fifo.out));
-	vd->save_item(NAME(vd->pci.init_enable));
-	vd->save_item(NAME(vd->pci.stall_state));
-	vd->save_item(NAME(vd->pci.op_pending));
-	vd->save_item(NAME(vd->pci.op_end_time));
-	vd->save_item(NAME(vd->pci.fifo_mem));
+		.reg(NAME(pci))
 
 	/* register states: dac */
-	vd->save_item(NAME(vd->dac.reg));
-	vd->save_item(NAME(vd->dac.read_result));
+		.reg(NAME(dac))
 
 	/* register states: fbi */
-	vd->save_pointer(NAME(vd->fbi.ram), vd->fbi.mask + 1);
-	vd->save_item(NAME(vd->fbi.rgboffs));
-	vd->save_item(NAME(vd->fbi.auxoffs));
-	vd->save_item(NAME(vd->fbi.frontbuf));
-	vd->save_item(NAME(vd->fbi.backbuf));
-	vd->save_item(NAME(vd->fbi.swaps_pending));
-	vd->save_item(NAME(vd->fbi.video_changed));
-	vd->save_item(NAME(vd->fbi.yorigin));
-	vd->save_item(NAME(vd->fbi.lfb_base));
-	vd->save_item(NAME(vd->fbi.lfb_stride));
-	vd->save_item(NAME(vd->fbi.width));
-	vd->save_item(NAME(vd->fbi.height));
-	vd->save_item(NAME(vd->fbi.xoffs));
-	vd->save_item(NAME(vd->fbi.yoffs));
-	vd->save_item(NAME(vd->fbi.vsyncstart));
-	vd->save_item(NAME(vd->fbi.vsyncstop));
-	vd->save_item(NAME(vd->fbi.rowpixels));
-	vd->save_item(NAME(vd->fbi.vblank));
-	vd->save_item(NAME(vd->fbi.vblank_count));
-	vd->save_item(NAME(vd->fbi.vblank_swap_pending));
-	vd->save_item(NAME(vd->fbi.vblank_swap));
-	vd->save_item(NAME(vd->fbi.vblank_dont_swap));
-	vd->save_item(NAME(vd->fbi.cheating_allowed));
-	vd->save_item(NAME(vd->fbi.sign));
-	vd->save_item(NAME(vd->fbi.ax));
-	vd->save_item(NAME(vd->fbi.ay));
-	vd->save_item(NAME(vd->fbi.bx));
-	vd->save_item(NAME(vd->fbi.by));
-	vd->save_item(NAME(vd->fbi.cx));
-	vd->save_item(NAME(vd->fbi.cy));
-	vd->save_item(NAME(vd->fbi.startr));
-	vd->save_item(NAME(vd->fbi.startg));
-	vd->save_item(NAME(vd->fbi.startb));
-	vd->save_item(NAME(vd->fbi.starta));
-	vd->save_item(NAME(vd->fbi.startz));
-	vd->save_item(NAME(vd->fbi.startw));
-	vd->save_item(NAME(vd->fbi.drdx));
-	vd->save_item(NAME(vd->fbi.dgdx));
-	vd->save_item(NAME(vd->fbi.dbdx));
-	vd->save_item(NAME(vd->fbi.dadx));
-	vd->save_item(NAME(vd->fbi.dzdx));
-	vd->save_item(NAME(vd->fbi.dwdx));
-	vd->save_item(NAME(vd->fbi.drdy));
-	vd->save_item(NAME(vd->fbi.dgdy));
-	vd->save_item(NAME(vd->fbi.dbdy));
-	vd->save_item(NAME(vd->fbi.dady));
-	vd->save_item(NAME(vd->fbi.dzdy));
-	vd->save_item(NAME(vd->fbi.dwdy));
-	vd->save_item(NAME(vd->fbi.lfb_stats.pixels_in));
-	vd->save_item(NAME(vd->fbi.lfb_stats.pixels_out));
-	vd->save_item(NAME(vd->fbi.lfb_stats.chroma_fail));
-	vd->save_item(NAME(vd->fbi.lfb_stats.zfunc_fail));
-	vd->save_item(NAME(vd->fbi.lfb_stats.afunc_fail));
-	vd->save_item(NAME(vd->fbi.lfb_stats.clip_fail));
-	vd->save_item(NAME(vd->fbi.lfb_stats.stipple_count));
-	vd->save_item(NAME(vd->fbi.sverts));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.svert, x));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.svert, y));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.svert, a));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.svert, r));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.svert, g));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.svert, b));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.svert, z));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.svert, wb));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.svert, w0));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.svert, s0));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.svert, t0));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.svert, w1));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.svert, s1));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.svert, t1));
-	vd->save_item(NAME(vd->fbi.fifo.size));
-	vd->save_item(NAME(vd->fbi.fifo.in));
-	vd->save_item(NAME(vd->fbi.fifo.out));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.cmdfifo, enable));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.cmdfifo, count_holes));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.cmdfifo, base));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.cmdfifo, end));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.cmdfifo, rdptr));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.cmdfifo, amin));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.cmdfifo, amax));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.cmdfifo, depth));
-	vd->save_item(STRUCT_MEMBER(vd->fbi.cmdfifo, holes));
-	vd->save_item(NAME(vd->fbi.fogblend));
-	vd->save_item(NAME(vd->fbi.fogdelta));
-	vd->save_item(NAME(vd->fbi.clut));
+		.reg(NAME(fbi))
 
 	/* register states: tmu */
-	for (int index = 0; index < std::size(vd->tmu); index++)
-	{
-		tmu_state *tmu = &vd->tmu[index];
-		if (tmu->ram == nullptr)
-			continue;
-		if (tmu->ram != vd->fbi.ram)
-			vd->save_pointer(NAME(tmu->ram), tmu->mask + 1, index);
-		vd->save_item(NAME(tmu->starts), index);
-		vd->save_item(NAME(tmu->startt), index);
-		vd->save_item(NAME(tmu->startw), index);
-		vd->save_item(NAME(tmu->dsdx), index);
-		vd->save_item(NAME(tmu->dtdx), index);
-		vd->save_item(NAME(tmu->dwdx), index);
-		vd->save_item(NAME(tmu->dsdy), index);
-		vd->save_item(NAME(tmu->dtdy), index);
-		vd->save_item(NAME(tmu->dwdy), index);
-		vd->save_item(STRUCT_MEMBER(tmu->ncc, ir), index);
-		vd->save_item(STRUCT_MEMBER(tmu->ncc, ig), index);
-		vd->save_item(STRUCT_MEMBER(tmu->ncc, ib), index);
-		vd->save_item(STRUCT_MEMBER(tmu->ncc, qr), index);
-		vd->save_item(STRUCT_MEMBER(tmu->ncc, qg), index);
-		vd->save_item(STRUCT_MEMBER(tmu->ncc, qb), index);
-		vd->save_item(STRUCT_MEMBER(tmu->ncc, y), index);
-	}
+		.reg(NAME(tmu));
 
 	/* register states: banshee */
-	if (vd->vd_type >= TYPE_VOODOO_BANSHEE)
-	{
-		vd->save_item(NAME(vd->banshee.io));
-		vd->save_item(NAME(vd->banshee.agp));
-		vd->save_item(NAME(vd->banshee.vga));
-		vd->save_item(NAME(vd->banshee.crtc));
-		vd->save_item(NAME(vd->banshee.seq));
-		vd->save_item(NAME(vd->banshee.gc));
-		vd->save_item(NAME(vd->banshee.att));
-		vd->save_item(NAME(vd->banshee.attff));
-	}
+	if (vd_type >= TYPE_VOODOO_BANSHEE)
+		save.reg(NAME(banshee));
 }
 
 
@@ -5814,9 +5691,6 @@ void voodoo_device::device_start()
 
 	/* do a soft reset to reset everything else */
 	soft_reset();
-
-	/* register for save states */
-	init_save_state(this);
 }
 
 

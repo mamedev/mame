@@ -94,6 +94,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
@@ -169,6 +170,23 @@ private:
 		int stop_bit;
 		int tape_running;
 		uint8_t tape_byte;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(interrupt_status))
+				.reg(NAME(interrupt_control))
+				.reg(NAME(rompage))
+				.reg(NAME(screen_start))
+				.reg(NAME(screen_base))
+				.reg(NAME(screen_size))
+				.reg(NAME(screen_addr))
+				.reg(NAME(screen_dispend))
+				.reg(NAME(current_pal))
+				.reg(NAME(communication_mode))
+				.reg(NAME(screen_mode))
+				.reg(NAME(shiftlock_mode))
+				.reg(NAME(capslock_mode));
+		}
 	};
 
 	ULA m_ula;
@@ -237,21 +255,12 @@ void accomm_state::machine_start()
 
 	m_ula.interrupt_status = 0x82;
 	m_ula.interrupt_control = 0x00;
+}
 
-	save_item(STRUCT_MEMBER(m_ula, interrupt_status));
-	save_item(STRUCT_MEMBER(m_ula, interrupt_control));
-	save_item(STRUCT_MEMBER(m_ula, rompage));
-	save_item(STRUCT_MEMBER(m_ula, screen_start));
-	save_item(STRUCT_MEMBER(m_ula, screen_base));
-	save_item(STRUCT_MEMBER(m_ula, screen_size));
-	save_item(STRUCT_MEMBER(m_ula, screen_addr));
-	save_item(STRUCT_MEMBER(m_ula, screen_dispend));
-	save_item(STRUCT_MEMBER(m_ula, current_pal));
-	save_item(STRUCT_MEMBER(m_ula, communication_mode));
-	save_item(STRUCT_MEMBER(m_ula, screen_mode));
-	save_item(STRUCT_MEMBER(m_ula, shiftlock_mode));
-	save_item(STRUCT_MEMBER(m_ula, capslock_mode));
-	save_item(NAME(m_ch00rom_enabled));
+void accomm_state::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_ula))
+		.reg(NAME(m_ch00rom_enabled));
 }
 
 void accomm_state::video_start()

@@ -320,6 +320,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	enum
@@ -374,6 +375,22 @@ protected:
 		int    do_transfer;
 
 		int    dma_disabled;    // used to stop DMA if HDMA is enabled (currently not implemented, see machine/snes.c)
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(dmap))
+				.reg(NAME(dest_addr))
+				.reg(NAME(src_addr))
+				.reg(NAME(bank))
+				.reg(NAME(trans_size))
+				.reg(NAME(ibank))
+				.reg(NAME(hdma_addr))
+				.reg(NAME(hdma_iaddr))
+				.reg(NAME(hdma_line_counter))
+				.reg(NAME(unk))
+				.reg(NAME(do_transfer))
+				.reg(NAME(dma_disabled));
+		}
 	} m_dma_channel[8];
 	uint8_t                 m_hdmaen; /* channels enabled for HDMA */
 	uint8_t                 m_dma_regs[0x80];

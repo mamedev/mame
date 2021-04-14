@@ -63,32 +63,28 @@ static constexpr int clk_div = 64;
 void wswan_sound_device::device_start()
 {
 	m_channel = stream_alloc(0, 2, clock() / clk_div);
+}
 
-	save_item(NAME(m_sweep_step));
-	save_item(NAME(m_sweep_time));
-	save_item(NAME(m_sweep_count));
-	save_item(NAME(m_noise_type));
-	save_item(NAME(m_noise_reset));
-	save_item(NAME(m_noise_enable));
-	save_item(NAME(m_sample_address));
-	save_item(NAME(m_audio2_voice));
-	save_item(NAME(m_audio3_sweep));
-	save_item(NAME(m_audio4_noise));
-	save_item(NAME(m_mono));
-	save_item(NAME(m_output_volume));
-	save_item(NAME(m_external_stereo));
-	save_item(NAME(m_external_speaker));
-	save_item(NAME(m_noise_shift));
-	save_item(NAME(m_master_volume));
-	save_item(NAME(m_system_volume));
-	save_item(STRUCT_MEMBER(m_audio, freq));
-	save_item(STRUCT_MEMBER(m_audio, period));
-	save_item(STRUCT_MEMBER(m_audio, pos));
-	save_item(STRUCT_MEMBER(m_audio, vol_left));
-	save_item(STRUCT_MEMBER(m_audio, vol_right));
-	save_item(STRUCT_MEMBER(m_audio, on));
-	save_item(STRUCT_MEMBER(m_audio, offset));
-	save_item(STRUCT_MEMBER(m_audio, signal));
+void wswan_sound_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_audio))
+		.reg(NAME(m_sweep_step))
+		.reg(NAME(m_sweep_time))
+		.reg(NAME(m_sweep_count))
+		.reg(NAME(m_noise_type))
+		.reg(NAME(m_noise_reset))
+		.reg(NAME(m_noise_enable))
+		.reg(NAME(m_sample_address))
+		.reg(NAME(m_audio2_voice))
+		.reg(NAME(m_audio3_sweep))
+		.reg(NAME(m_audio4_noise))
+		.reg(NAME(m_mono))
+		.reg(NAME(m_output_volume))
+		.reg(NAME(m_external_stereo))
+		.reg(NAME(m_external_speaker))
+		.reg(NAME(m_noise_shift))
+		.reg(NAME(m_master_volume))
+		.reg(NAME(m_system_volume));
 }
 
 void wswan_sound_device::device_clock_changed()

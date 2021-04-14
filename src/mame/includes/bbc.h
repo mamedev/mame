@@ -212,6 +212,14 @@ protected:
 	virtual void video_start() override;
 	virtual void video_reset() override;
 
+	virtual void device_register_save(save_registrar &save) override
+	{
+		save.reg(NAME(m_vula_ctrl))
+			.reg(NAME(m_vula_palette))
+			.reg(NAME(m_vula_palette_lookup))
+			.reg(NAME(m_vnula));
+	}
+
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<mc6845_device> m_hd6845;
@@ -359,6 +367,17 @@ protected:
 		uint8_t flash[8];
 		uint8_t palette_byte;
 		uint8_t palette_write;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(palette_mode))
+				.reg(NAME(horiz_offset))
+				.reg(NAME(left_blank))
+				.reg(NAME(disable))
+				.reg(NAME(flash))
+				.reg(NAME(palette_byte))
+				.reg(NAME(palette_write));
+		}
 	} m_vnula;
 
 	int m_pixels_per_byte;

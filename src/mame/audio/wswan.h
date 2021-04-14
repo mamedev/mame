@@ -44,10 +44,23 @@ protected:
 		u8   on;
 		u8   offset;
 		u8   signal;
+
+		void register_save(save_registrar &save)
+		{
+			save.reg(NAME(freq))
+				.reg(NAME(period))
+				.reg(NAME(pos))
+				.reg(NAME(vol_left))
+				.reg(NAME(vol_right))
+				.reg(NAME(on))
+				.reg(NAME(offset))
+				.reg(NAME(signal));
+		}
 	};
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_register_save(save_registrar &save) override;
 	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
 
