@@ -12,6 +12,8 @@
  *   - https://github.com/NetBSD/src/tree/trunk/sys/arch/newsmips
  *   - https://github.com/briceonk/news-os
  *
+ *  For an in-depth write-up of the current issues, see: https://github.com/briceonk/news-os/blob/master/nws5000x-mame.md
+ *
  *  CPU configuration:
  *	- CPU card has a 75MHz crystal, multiplier (if any) TBD
  *	- PRId = 0x450
@@ -493,6 +495,7 @@ uint8_t news_r4k_state::debug_ram_r(offs_t offset)
     uint8_t result = 0xff;
     if ((offset <= 0x1ffffff) || (map_shift && offset <= 0x3ffffff) || (!map_shift && offset >= 0x7f00000))
     {
+        // TODO: need to check bigger offsets?
         result = m_ram->read(offset);
     }
     else
