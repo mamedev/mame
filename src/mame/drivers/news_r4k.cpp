@@ -449,7 +449,9 @@ void news_r4k_state::cpu_map_debug(address_map &map)
     map(0x0, 0x7ffffff).rw(FUNC(news_r4k_state::debug_ram_r), FUNC(news_r4k_state::debug_ram_w));
 
     // Data around this range might influence the memory configuration
-    // map(0x14400004, 0x14400007).lr32(NAME([this](offs_t offset) { return 0x3ff17; }));
+    // or, this only works due to coincidence. Also possible.
+    map(0x14400000, 0x14400003).lr32(NAME([this](offs_t offset) { return 0x0; }));
+    map(0x14400004, 0x14400007).lr32(NAME([this](offs_t offset) { return 0x3ff17; }));
     map(0x1440003c, 0x1440003f).lw32(NAME([this](offs_t offset, uint32_t data) {
         if (data == 0x10001)
         {
@@ -466,12 +468,13 @@ void news_r4k_state::cpu_map_debug(address_map &map)
     // APbus region
     map(0x1f520000, 0x1f520013).rw(FUNC(news_r4k_state::apbus_cmd_r), FUNC(news_r4k_state::apbus_cmd_w));
     // 0x14c00000-0x14c40000 also has APbus stuff
+    // map(0x14c00000, 0x14c0000f).lr8(NAME([this](offs_t offset) {return 0x0;}));
 
     map(0x1e980000, 0x1e9fffff).ram(); // This is the RAM that is used before main memory is initialized
                                        // It is also the only RAM avaliable if "no memory mode" is set (DIP switch #8)
 
     // More onboard devices that needs to be mapped for the platform to boot
-    map(0x1fe00000, 0x1fffffff).ram(); // determine mirror of this RAM - it is probably smaller than this size
+    map(0x1fe00000, 0x1fe03fff).ram().mirror(0x1fc000);
     map(0x1f3e0000, 0x1f3efff0).lr8(NAME([this](offs_t offset) {
             if (offset % 4 == 2) { return 0x6f; }
             else if (offset % 4 == 3) { return 0xe0; }
