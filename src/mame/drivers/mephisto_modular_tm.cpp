@@ -76,6 +76,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void device_post_load() override { install_bootrom(m_bootrom_enabled); }
 
 private:
 	// devices/pointers
@@ -90,9 +91,9 @@ private:
 	void mmtm_8m_map(address_map &map);
 	void nvram_map(address_map &map);
 
-	bool m_bootrom_enabled;
-	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { m_bootrom_enabled = false; }
-	u32 bootrom_r(offs_t offset) { return (m_bootrom_enabled) ? m_rom[offset] : m_mainram[offset]; }
+	void install_bootrom(bool enable);
+	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
+	bool m_bootrom_enabled = false;
 
 	void set_cpu_freq();
 };
@@ -107,8 +108,21 @@ void mmtm_state::machine_reset()
 	set_cpu_freq();
 
 	// disable bootrom after reset
-	m_bootrom_enabled = true;
+	install_bootrom(true);
 	m_disable_bootrom->adjust(m_maincpu->cycles_to_attotime(50));
+}
+
+void mmtm_state::install_bootrom(bool enable)
+{
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.unmap_readwrite(0, std::max(m_rom.bytes(), m_mainram.bytes()) - 1);
+
+	if (enable)
+		program.install_rom(0, m_rom.bytes() - 1, m_rom);
+	else
+		program.install_ram(0, m_mainram.bytes() - 1, m_mainram);
+
+	m_bootrom_enabled = enable;
 }
 
 void mmtm_state::set_cpu_freq()
@@ -140,7 +154,6 @@ void mmtm_state::nvram_map(address_map &map)
 void mmtm_state::mmtm_2m_map(address_map &map)
 {
 	map(0x00000000, 0x0003ffff).ram().share("mainram");
-	map(0x00000000, 0x0000000b).r(FUNC(mmtm_state::bootrom_r));
 	map(0x80000000, 0x801fffff).ram();
 	map(0xf0000000, 0xf003ffff).rom().region("maincpu", 0);
 	map(0xfc000000, 0xfc001fff).m("nvram_map", FUNC(address_map_bank_device::amap8));
