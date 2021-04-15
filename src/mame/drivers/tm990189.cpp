@@ -101,12 +101,6 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
 
-protected:
-	virtual void machine_start() override
-	{
-		m_clear_load.init(*this, FUNC(tm990189_state::clear_load));
-	}
-
 private:
 	uint8_t video_vdp_r(offs_t offset);
 	void video_vdp_w(offs_t offset, uint8_t data);
@@ -207,6 +201,7 @@ MACHINE_START_MEMBER(tm990189_state,tm990_189)
 	m_digits.resolve();
 	m_leds.resolve();
 	m_displayena_timer = timer_alloc();
+	m_clear_load.init(*this, FUNC(tm990189_state::clear_load));
 
 	m_digitsel = 0;
 	m_LED_state = 0;
@@ -217,6 +212,7 @@ MACHINE_START_MEMBER(tm990189_state,tm990_189_v)
 	m_digits.resolve();
 	m_leds.resolve();
 	m_displayena_timer = timer_alloc();
+	m_clear_load.init(*this, FUNC(tm990189_state::clear_load));
 
 	m_joy1x_timer = timer_alloc();
 	m_joy1y_timer = timer_alloc();
