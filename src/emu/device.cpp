@@ -467,6 +467,12 @@ void device_t::set_machine(running_machine &machine)
 	m_machine = &machine;
 	m_save = &machine.save();
 	m_scheduler = &machine.scheduler();
+
+	// register our timer callback now; this is a bit unorthodox (should be done
+	// in start), but some devices at startup will touch registers that reach
+	// out to not-yet-started devices, which will attempt to set timers, and thus
+	// blow up
+	m_device_timer.init(*this, FUNC(device_t::device_timer));
 }
 
 
@@ -547,9 +553,6 @@ void device_t::view_register(memory_view *view)
 
 void device_t::start()
 {
-	// register our timer callback
-	m_device_timer.init(*this, FUNC(device_t::device_timer));
-
 	// prepare the logerror buffer
 	if (m_machine->allow_logging())
 		m_string_buffer.reserve(1024);
