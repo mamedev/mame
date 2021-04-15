@@ -285,6 +285,7 @@ public:
 	}
 
 	// getters
+	bool is_initialized() const { return (m_scheduler != nullptr); }
 	device_scheduler &scheduler() const { assert(m_scheduler != nullptr); return *m_scheduler; }
 	char const *name() const { return m_delegate.name(); }
 	void *ptr() const { return m_ptr; }
@@ -821,6 +822,7 @@ inline void timer_expired_delegate::form6_callback(timer_instance const &timer)
 inline void transient_timer_factory::call_after(attotime const &duration, u64 param, u64 param2, u64 param3)
 {
 	scheduler_assert(!duration.is_never());
+	scheduler_assert(m_callback.is_initialized());
 	m_callback.scheduler().instance_alloc().init_transient(m_callback, duration)
 		.set_params(param, param2, param3);
 }
