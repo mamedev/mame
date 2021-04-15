@@ -52,7 +52,7 @@ void menu_control_floppy_image::do_load_create()
 		if (create_fs) {
 			// HACK: ensure the floppy_image structure is created since device_image_interface may not otherwise do so during "init phase"
 			err = fd.finish_load();
-			if (err != image_init_result::PASS)
+			if (err == image_init_result::PASS)
 				fd.init_fs(create_fs);
 		}
 	} else {
