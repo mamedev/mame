@@ -590,7 +590,9 @@ void i8257_device::write(offs_t offset, uint8_t data)
 
 	if ((m_transfer_mode & m_request & 0x0f) != 0)
 	{
-		machine().scheduler().eat_all_cycles();
+		auto *cpu = machine().scheduler().currently_executing();
+		if (cpu != nullptr)
+			cpu->adjust_icount(-cpu->cycles_remaining());
 		trigger(1);
 	}
 }
