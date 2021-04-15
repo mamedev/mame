@@ -1,5 +1,5 @@
 Configuring MAME
-----------------
+================
 
 .. contents:: :local:
 
@@ -9,11 +9,9 @@ Getting Started: A Quick Preface
 Once you have MAME installed, the next step is to configure it. There are
 several ways to do this, and each will be covered in turn.
 
-If you are on Windows, the MAME executable will be called ``mame64.exe`` or
-``mame.exe`` depending on if you have a 64-bit or 32-bit version of MAME.
+If you are on Windows, the MAME executable will be called ``mame.exe``.
 
-If you are on Linux or MacOS, the MAME executable will be called ``mame64`` or
-``mame`` depending on if you have a 64-bit or 32-bit version of MAME.
+If you are on Linux or MacOS, the MAME executable will be called ``mame``.
 
 
 Initial Setup: Creating mame.ini From Command Line on Windows
