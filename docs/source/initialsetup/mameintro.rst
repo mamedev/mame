@@ -104,10 +104,17 @@ BIOS Dumps and Software
 
 Most of the systems emulated by MAME requires a dump of the internal chips of
 the original system. These can be obtained by extracting the data from an
-original unit, or finding them (at your own risk) on the world wide web.
-Being copyrighted material, MAME does not come with any of these.
+original unit, or finding them (at your own risk) on various place on the
+internet. Being copyrighted material, MAME does not come with any of these.
 
-Also, you may want to find some software to be run on the emulated machine.
+Also, you may want to find some software to be run on the emulated machine
+where it does not have internal software (e.g. some computers will want a
+disk to boot to an operating system).
+
 Again, Google and other search engines are your best friends. MAME does not
-provide any software to be run on the emulated machines because it is very
-often (almost always, in the case of console software) copyrighted material.
+provide any software in the MAME package to be run on the emulated machines
+because it is very often (almost always, in the case of console software)
+copyrighted material.
+
+The MAME team has been permitted to redistribute some old software, which can be
+found in the `ROMS section of the MAME site <https://www.mamedev.org/roms/>`_.
