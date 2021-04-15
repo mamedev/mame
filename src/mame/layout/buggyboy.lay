@@ -57,7 +57,7 @@ license:CC0
 
 <!-- build screen -->
 
-	<view name="Triple-Screen + Shifter">
+	<view name="Triple-Screen">
 		<screen index="0">
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
@@ -118,7 +118,7 @@ license:CC0
 		</collection>
 	</view>
 
-	<view name="Single-Screen + Shifter">
+	<view name="Single-Screen">
 		<screen index="1">
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>

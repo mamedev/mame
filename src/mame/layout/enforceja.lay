@@ -61,39 +61,59 @@ license:CC0
 
 <!-- build screen -->
 
-	<view name="Shifter-R">
+	<view name="Standard Screen">
 		<screen index="0">
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
-		<element ref="shifter" inputtag="IN2" inputmask="0x01">
-			<bounds x="606" y="414" width="32" height="64" />
-			<color alpha="0.6" />
-		</element>
-	</view>
-	<view name="Shifter-L">
-		<screen index="0">
-			<bounds x="0" y="0" width="640" height="480" />
-		</screen>
-		<element ref="shifter" inputtag="IN2" inputmask="0x01">
-			<bounds x="2" y="414" width="32" height="64" />
-			<color alpha="0.6" />
-		</element>
-	</view>
-	<view name="Widescreen Shifter-R">
-		<screen index="0">
-			<bounds x="0" y="0" width="640" height="480" />
-		</screen>
-		<element ref="shifter" inputtag="IN2" inputmask="0x01">
-			<bounds x="648" y="414" width="32" height="64" />
-		</element>
-	</view>
-	<view name="Widescreen Shifter-L">
-		<screen index="0">
-			<bounds x="0" y="0" width="640" height="480" />
-		</screen>
-		<element ref="shifter" inputtag="IN2" inputmask="0x01">
-			<bounds x="-40" y="414" width="32" height="64" />
-		</element>
+
+		<!-- shifter options -->
+		<collection name="Shifter-R Overlay" visible="yes">
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="606" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x01">
+					<bounds x="606" y="414" width="32" height="64" />
+				</element>
+			</collection>
+		</collection>
+
+		<collection name="Shifter-R Off-screen" visible="no">
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="648" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter " visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x01">
+					<bounds x="648" y="414" width="32" height="64" />
+				</element>
+			</collection>
+		</collection>
+
+		<collection name="Shifter-L Overlay" visible="no">
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="2" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter  " visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x01">
+					<bounds x="2" y="414" width="32" height="64" />
+				</element>
+			</collection>
+		</collection>
+
+		<collection name="Shifter-L Off-screen" visible="no">
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="-40" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter   " visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x01">
+					<bounds x="-40" y="414" width="32" height="64" />
+				</element>
+			</collection>
+		</collection>
 	</view>
 
 	<view name="3D Scope Straight View">
@@ -105,13 +125,42 @@ license:CC0
 		<element name="shutter0" ref="shutter"><bounds x="644" y="0" width="640" height="480" /></element>
 
 		<!-- shifter options (off-screen shifter is not possible here) -->
-		<collection name="Shifter-R" visible="no">
-			<element ref="shifter" inputtag="IN2" inputmask="0x01"><bounds x="606" y="414" width="32" height="64" /><color alpha="0.6" /></element>
-			<element ref="shifter" inputtag="IN2" inputmask="0x01"><bounds x="1250" y="414" width="32" height="64" /><color alpha="0.6" /></element>
+		<collection name="Shifter-R Overlay" visible="yes">
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="606" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="1250" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x01">
+					<bounds x="606" y="414" width="32" height="64" />
+				</element>
+				<element ref="shifter" inputtag="IN2" inputmask="0x01">
+					<bounds x="1250" y="414" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
-		<collection name="Shifter-L" visible="no">
-			<element ref="shifter" inputtag="IN2" inputmask="0x01"><bounds x="2" y="414" width="32" height="64" /><color alpha="0.6" /></element>
-			<element ref="shifter" inputtag="IN2" inputmask="0x01"><bounds x="646" y="414" width="32" height="64" /><color alpha="0.6" /></element>
+
+		<collection name="Shifter-L Overlay" visible="no">
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="2" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="646" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter " visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x01">
+					<bounds x="2" y="414" width="32" height="64" />
+				</element>
+				<element ref="shifter" inputtag="IN2" inputmask="0x01">
+					<bounds x="646" y="414" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 
@@ -124,13 +173,42 @@ license:CC0
 		<element name="shutter1" ref="shutter"><bounds x="644" y="0" width="640" height="480" /></element>
 
 		<!-- shifter options (off-screen shifter is not possible here) -->
-		<collection name="Shifter-R" visible="no">
-			<element ref="shifter" inputtag="IN2" inputmask="0x01"><bounds x="606" y="414" width="32" height="64" /><color alpha="0.6" /></element>
-			<element ref="shifter" inputtag="IN2" inputmask="0x01"><bounds x="1250" y="414" width="32" height="64" /><color alpha="0.6" /></element>
+		<collection name="Shifter-R Overlay" visible="yes">
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="606" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="1250" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x01">
+					<bounds x="606" y="414" width="32" height="64" />
+				</element>
+				<element ref="shifter" inputtag="IN2" inputmask="0x01">
+					<bounds x="1250" y="414" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
-		<collection name="Shifter-L" visible="no">
-			<element ref="shifter" inputtag="IN2" inputmask="0x01"><bounds x="2" y="414" width="32" height="64" /><color alpha="0.6" /></element>
-			<element ref="shifter" inputtag="IN2" inputmask="0x01"><bounds x="646" y="414" width="32" height="64" /><color alpha="0.6" /></element>
+
+		<collection name="Shifter-L Overlay" visible="no">
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="2" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="646" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter " visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x01">
+					<bounds x="2" y="414" width="32" height="64" />
+				</element>
+				<element ref="shifter" inputtag="IN2" inputmask="0x01">
+					<bounds x="646" y="414" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 
@@ -139,17 +217,52 @@ license:CC0
 		<element name="shutter1" ref="shutter"><bounds x="0" y="0" width="640" height="480" /></element>
 
 		<!-- shifter options -->
-		<collection name="Shifter-R" visible="no">
-			<element ref="shifter" inputtag="IN2" inputmask="0x01"><bounds x="606" y="414" width="32" height="64" /><color alpha="0.6" /></element>
+		<collection name="Shifter-R Overlay" visible="yes">
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="606" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x01">
+					<bounds x="606" y="414" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
-		<collection name="Shifter-L" visible="no">
-			<element ref="shifter" inputtag="IN2" inputmask="0x01"><bounds x="2" y="414" width="32" height="64" /><color alpha="0.6" /></element>
+
+		<collection name="Shifter-R Off-screen" visible="no">
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="648" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter " visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x01">
+					<bounds x="648" y="414" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
-		<collection name="Widescreen Shifter-R" visible="no">
-			<element ref="shifter" inputtag="IN2" inputmask="0x01"><bounds x="648" y="414" width="32" height="64" /></element>
+
+		<collection name="Shifter-L Overlay" visible="no">
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="2" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter  " visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x01">
+					<bounds x="2" y="414" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
-		<collection name="Widescreen Shifter-L" visible="no">
-			<element ref="shifter" inputtag="IN2" inputmask="0x01"><bounds x="-40" y="414" width="32" height="64" /></element>
+
+		<collection name="Shifter-L Off-screen" visible="no">
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="-40" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter   " visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x01">
+					<bounds x="-40" y="414" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 
@@ -158,17 +271,52 @@ license:CC0
 		<element name="shutter0" ref="shutter"><bounds x="0" y="0" width="640" height="480" /></element>
 
 		<!-- shifter options -->
-		<collection name="Shifter-R" visible="no">
-			<element ref="shifter" inputtag="IN2" inputmask="0x01"><bounds x="606" y="414" width="32" height="64" /><color alpha="0.6" /></element>
+		<collection name="Shifter-R Overlay" visible="yes">
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="606" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter" visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x01">
+					<bounds x="606" y="414" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
-		<collection name="Shifter-L" visible="no">
-			<element ref="shifter" inputtag="IN2" inputmask="0x01"><bounds x="2" y="414" width="32" height="64" /><color alpha="0.6" /></element>
+
+		<collection name="Shifter-R Off-screen" visible="no">
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="648" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter " visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x01">
+					<bounds x="648" y="414" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
-		<collection name="Widescreen Shifter-R" visible="no">
-			<element ref="shifter" inputtag="IN2" inputmask="0x01"><bounds x="648" y="414" width="32" height="64" /></element>
+
+		<collection name="Shifter-L Overlay" visible="no">
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="2" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter  " visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x01">
+					<bounds x="2" y="414" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
-		<collection name="Widescreen Shifter-L" visible="no">
-			<element ref="shifter" inputtag="IN2" inputmask="0x01"><bounds x="-40" y="414" width="32" height="64" /></element>
+
+		<collection name="Shifter-L Off-screen" visible="no">
+			<element ref="shifter" inputtag="IN2" inputmask="0x01">
+				<bounds x="-40" y="414" width="32" height="64" />
+				<color alpha="0.6" />
+			</element>
+			<collection name="Opaque Shifter   " visible="no">
+				<element ref="shifter" inputtag="IN2" inputmask="0x01">
+					<bounds x="-40" y="414" width="32" height="64" />
+				</element>
+			</collection>
 		</collection>
 	</view>
 
