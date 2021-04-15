@@ -288,7 +288,6 @@ license:CC0
 		</part>
 	</software>
 
-
 	<software name="mrrobot">
 		<description>Mr. Robot and his Robot Factory</description>
 		<year>1983</year>
@@ -355,17 +354,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="galahad">
-		<description>Galahad and the Holy Grail</description>
-		<year>1982</year>
-		<publisher>Atari Program Exchange</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="92176">
-				<rom name="galahad.atr" size="92176" crc="d575a0bb" sha1="9f03ddbd745919e93113daed1117a59751f22ae5"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="jumpman">
 		<description>Jumpman</description>
 		<year>1983</year>
@@ -417,6 +405,17 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="cvrnmars" supported="partial">
+		<description>Caverns of Mars</description>
+		<year>1982</year>
+		<publisher>Atari</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="caverns of mars (1982)(atari)(us).atr" size="92176" crc="b5b08100" sha1="e4cfd18a24734ae2b038810f10765fd440522adc"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ccchomp">
 		<description>Crush, Crumble and Chomp!</description>
 		<year>1981</year>
@@ -426,6 +425,94 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="crush, crumble and chomp (1981)(epyx)(us)[basic][os-b].atr" size="92176" crc="419fce77" sha1="513ff8617ebf45e95d19a1ec9e067d1a3121ecf6"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dandydgn" supported="partial">
+		<description>Dandy Dungeon</description>
+		<year>1985</year>
+		<publisher>Antic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="dandy dungeon (1985)(antic software)(us)(side a).atr" size="92176" crc="da5f16f3" sha1="fa2e4622eae7db965ae53f21977ead1b0da5aded"/> <!-- Verified -->
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="dandy dungeon (1985)(antic software)(us)(side b)(documentation.atr" size="92176" crc="a9906be8" sha1="c569bc924d6808217c244ebf7eca122c10be60e4"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galahad">
+		<description>Galahad and the Holy Grail</description>
+		<year>1982</year>
+		<publisher>Atari Program Exchange</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="galahad and the holy grail (1982)(apx)(us).atr" size="92176" crc="d575a0bb" sha1="9f03ddbd745919e93113daed1117a59751f22ae5"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phantas">
+		<description>Phantasie</description>
+		<year>1987</year>
+		<publisher>SSI</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="phantasie v1.0 (1987)(ssi)(us)(disk 1 of 2 side a)(disk 1).atr" size="92176" crc="4f6d019f" sha1="d1ddaaac1ec56b6080cf3f28e43a6d021e6089c2"/> <!-- Verified -->
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="phantasie v1.0 (1987)(ssi)(us)(disk 1 of 2 side b)(disk 2).atr" size="92176" crc="d49b5aa8" sha1="fe5adccc9876e1b9568009fb5850f58449199385"/> <!-- Verified -->
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="phantasie v1.0 (1987)(ssi)(us)(disk 2 of 2 side a)(disk 3)[m].atr" size="92176" crc="2be4ac66" sha1="c31cae2144e7eed0695d9453f6407994dc1a6d6a"/> <!-- has user save data on disk -->
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="phantasie v1.0 (1987)(ssi)(us)(disk 2 of 2 side b)(disk 4).atr" size="92176" crc="a7cbc846" sha1="c82837ee05eea44cd407927dc4b9f7de80633c61"/> <!-- also has user save data on disk? -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phobos" supported="no">
+		<description>Phobos v1.1</description>
+		<year>1983</year>
+		<publisher>Atari Program Exchange</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="phobos v1.1 (1983-03-03)(apx)(us).atr" size="92176" crc="d104a7c3" sha1="401464d1ddf55bc29626c39275fddf335be9508d"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shatalli">
+		<description>Chronicles of Osgorth: The Shattered Alliance</description>
+		<year>1981</year>
+		<publisher>SSI</publisher>
+		<sharedfeat name="requirement" value="a800:basicb"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="chronicles of osgorth - the shattered alliance (1981)(ssi)(us)[basic].atr" size="92176" crc="3bed0e22" sha1="e8fd2abf5a8a3666d3872cb8853d9e9f9b6f8560"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="softprna">
+		<description>Softporn Adventure</description>
+		<year>1981</year>
+		<publisher>On-Line Systems</publisher>
+		<sharedfeat name="requirement" value="a800:basicb"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="softporn adventure (1981)(on-line systems)(us)[basic].atr" size="92176" crc="6a0c2d66" sha1="cf0dbfbb3405c9360a14131f3efae7003c4e748d"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
