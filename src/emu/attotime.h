@@ -1308,7 +1308,7 @@ inline constexpr bool operator==(const attotime &left, const attotime &right) no
 
 inline constexpr bool operator!=(const attotime &left, const attotime &right) noexcept
 {
-	return (left.m_coarse != right.m_coarse && left.m_fine != right.m_fine);
+	return (left.m_coarse != right.m_coarse || left.m_fine != right.m_fine);
 }
 
 // less than comparisons
