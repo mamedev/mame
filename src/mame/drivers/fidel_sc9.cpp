@@ -35,20 +35,21 @@ IRQ and write strobe are unused. Maximum known size is 16KB.
 ******************************************************************************/
 
 #include "emu.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/sensorboard.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 
 #include "softlist.h"
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_playmatic.lh" // clickable
-#include "fidel_sc9.lh" // clickable
+#include "fidel_playmatic.lh"
+#include "fidel_sc9.lh"
 
 
 namespace {
@@ -100,16 +101,12 @@ protected:
 	u8 input_r();
 	u8 input_d7_r(offs_t offset);
 
-	u8 m_inp_mux;
-	u8 m_led_data;
+	u8 m_inp_mux = 0;
+	u8 m_led_data = 0;
 };
 
 void sc9_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_led_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_led_data));

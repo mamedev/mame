@@ -8,6 +8,10 @@
 
 #include "dirom.h"
 
+// forward declarations
+class ymadpcm_a_engine;
+class ymadpcm_b_engine;
+
 
 // ======================> ymadpcm_a_registers
 
@@ -29,51 +33,60 @@
 //
 class ymadpcm_a_registers
 {
-	// private constructor to directly specify channel base
-	ymadpcm_a_registers(ymadpcm_a_registers const &src, u8 chbase) :
-		m_chbase(chbase),
-		m_regdata(src.m_regdata)
-	{
-	}
-
 public:
-	// constructor
-	ymadpcm_a_registers(std::vector<u8> &regdata) :
-		m_chbase(0),
-		m_regdata(regdata)
-	{
-	}
+	// constants
+	static constexpr u32 OUTPUTS = 2;
+	static constexpr u32 CHANNELS = 6;
+	static constexpr u32 REGISTERS = 0x30;
+	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
 
-	u8 chbase() const { return m_chbase; }
+	// constructor
+	ymadpcm_a_registers() { }
+
+	// register for save states
+	void save(device_t &device);
+
+	// reset to initial state
+	void reset();
+
+	// map channel number to register offset
+	static constexpr u32 channel_offset(u32 chnum)
+	{
+		assert(chnum < CHANNELS);
+		return chnum;
+	}
 
 	// direct read/write access
-	u8 read(u8 index) { return m_regdata[index]; }
-	void write(u8 index, u8 data) { m_regdata[index] = data; }
-
-	// create a new version of ourself with a different channel/operator base
-	ymadpcm_a_registers channel_registers(u8 chnum) { return ymadpcm_a_registers(*this, chnum); }
+	void write(u32 index, u8 data) { m_regdata[index] = data; }
 
 	// system-wide registers
-	u8 dump() const             /*  1 bit  */ { return BIT(m_regdata[0x00], 7); }
-	u8 dump_mask() const        /*  6 bits */ { return BIT(m_regdata[0x00], 0, 6); }
-	u8 total_level() const      /*  6 bits */ { return BIT(m_regdata[0x01], 0, 6); }
-	u8 test() const             /*  8 bits */ { return m_regdata[0x02]; }
+	u32 dump() const                          { return BIT(m_regdata[0x00], 7); }
+	u32 dump_mask() const                     { return BIT(m_regdata[0x00], 0, 6); }
+	u32 total_level() const                   { return BIT(m_regdata[0x01], 0, 6); }
+	u32 test() const                          { return m_regdata[0x02]; }
 
 	// per-channel registers
-	u8 pan_left() const         /*  1 bit  */ { return BIT(m_regdata[m_chbase + 0x08], 7); }
-	u8 pan_right() const        /*  1 bit  */ { return BIT(m_regdata[m_chbase + 0x08], 6); }
-	u8 instrument_level() const /*  5 bits */ { return BIT(m_regdata[m_chbase + 0x08], 0, 5); }
-	u16 start() const           /* 16 bits */ { return m_regdata[m_chbase + 0x10] | (m_regdata[m_chbase + 0x18] << 8); }
-	u16 end() const             /* 16 bits */ { return m_regdata[m_chbase + 0x20] | (m_regdata[m_chbase + 0x28] << 8); }
+	u32 ch_pan_left(u32 choffs) const         { return BIT(m_regdata[choffs + 0x08], 7); }
+	u32 ch_pan_right(u32 choffs) const        { return BIT(m_regdata[choffs + 0x08], 6); }
+	u32 ch_instrument_level(u32 choffs) const { return BIT(m_regdata[choffs + 0x08], 0, 5); }
+	u32 ch_start(u32 choffs) const            { return m_regdata[choffs + 0x10] | (m_regdata[choffs + 0x18] << 8); }
+	u32 ch_end(u32 choffs) const              { return m_regdata[choffs + 0x20] | (m_regdata[choffs + 0x28] << 8); }
 
 	// per-channel writes
-	void write_start(u16 address) { write(m_chbase + 0x10, address); write(m_chbase + 0x18, address >> 8); }
-	void write_end(u16 address) { write(m_chbase + 0x20, address); write(m_chbase + 0x28, address >> 8); }
+	void write_start(u32 choffs, u32 address)
+	{
+		write(choffs + 0x10, address);
+		write(choffs + 0x18, address >> 8);
+	}
+	void write_end(u32 choffs, u32 address)
+	{
+		write(choffs + 0x20, address);
+		write(choffs + 0x28, address >> 8);
+	}
 
 private:
 	// internal state
-	u8 m_chbase;                   // base offset for channel-specific data
-	std::vector<u8> &m_regdata;    // reference to the raw data
+	u8 m_regdata[REGISTERS];         // register data
 };
 
 
@@ -83,10 +96,10 @@ class ymadpcm_a_channel
 {
 public:
 	// constructor
-	ymadpcm_a_channel(ymadpcm_a_registers regs, read8sm_delegate reader, u8 addrshift);
+	ymadpcm_a_channel(ymadpcm_a_engine &owner, u32 choffs, read8sm_delegate reader, u32 addrshift);
 
 	// register for save states
-	void save(device_t &device, u8 index);
+	void save(device_t &device, u32 index);
 
 	// reset the channel state
 	void reset();
@@ -98,22 +111,20 @@ public:
 	bool clock();
 
 	// return the computed output value, with panning applied
-	void output(s32 &lsum, s32 &rsum) const;
-
-	// direct parameter setting for YM2608 ROM-based samples
-	void set_start_end(u16 start, u16 end) { m_regs.write_start(start); m_regs.write_end(end); }
+	void output(s32 outputs[ymadpcm_a_registers::OUTPUTS]) const;
 
 private:
 	// internal state
-	u8 const m_address_shift;        // address bits shift-left
-	read8sm_delegate const m_reader; // read delegate
-	u8 m_playing;                    // currently playing?
-	u8 m_curnibble;                  // index of the current nibble
-	u8 m_curbyte;                    // current byte of data
+	u32 const m_choffs;              // channel offset
+	u32 const m_address_shift;       // address bits shift-left
+	u32 m_playing;                   // currently playing?
+	u32 m_curnibble;                 // index of the current nibble
+	u32 m_curbyte;                   // current byte of data
 	u32 m_curaddress;                // current address
-	s16 m_accumulator;               // accumulator
-	s8 m_step_index;                 // index in the stepping table
-	ymadpcm_a_registers m_regs;      // register accessor
+	s32 m_accumulator;               // accumulator
+	s32 m_step_index;                // index in the stepping table
+	read8sm_delegate const m_reader; // read delegate
+	ymadpcm_a_registers &m_regs;     // reference to registers
 };
 
 
@@ -121,11 +132,12 @@ private:
 
 class ymadpcm_a_engine
 {
-	static constexpr int CHANNELS = 6;
-
 public:
+	static constexpr int OUTPUTS = ymadpcm_a_registers::OUTPUTS;
+	static constexpr int CHANNELS = ymadpcm_a_registers::CHANNELS;
+
 	// constructor
-	ymadpcm_a_engine(device_t &device, read8sm_delegate reader, u8 addrshift);
+	ymadpcm_a_engine(device_t &device, read8sm_delegate reader, u32 addrshift);
 
 	// save state handling
 	void save(device_t &device);
@@ -134,21 +146,28 @@ public:
 	void reset();
 
 	// master clocking function
-	u8 clock(u8 chanmask);
+	u32 clock(u32 chanmask);
 
 	// compute sum of channel outputs
-	void output(s32 &lsum, s32 &rsum, u8 chanmask);
+	void output(s32 outputs[ymadpcm_a_registers::OUTPUTS], u32 chanmask);
 
 	// write to the ADPCM-A registers
-	void write(u8 regnum, u8 data);
+	void write(u32 regnum, u8 data);
 
 	// set the start/end address for a channel (for hardcoded YM2608 percussion)
-	void set_start_end(u8 chnum, u16 start, u16 end) { m_channel[chnum]->set_start_end(start, end); }
+	void set_start_end(u8 chnum, u16 start, u16 end)
+	{
+		u32 choffs = ymadpcm_a_registers::channel_offset(chnum);
+		m_regs.write_start(choffs, start);
+		m_regs.write_end(choffs, end);
+	}
+
+	// return a reference to our registers
+	ymadpcm_a_registers &regs() { return m_regs; }
 
 private:
 	// internal state
 	std::unique_ptr<ymadpcm_a_channel> m_channel[CHANNELS]; // array of channels
-	std::vector<u8> m_regdata;       // raw register data
 	ymadpcm_a_registers m_regs;      // register accessor
 };
 
@@ -183,48 +202,59 @@ private:
 //           0b xxxxxxxx Level control
 //           0c xxxxxxxx Limit address (low)
 //           0d xxxxxxxx Limit address (high)
-//           0e xxxxxxxx DAC data
-//           0f xxxxxxxx PCM data
+//           0e xxxxxxxx DAC data [YM2608/10]
+//           0f xxxxxxxx PCM data [YM2608/10]
+//           0e xxxxxxxx DAC data high [Y8950]
+//           0f xx------ DAC data low [Y8950]
+//           10 -----xxx DAC data exponent [Y8950]
 //
 class ymadpcm_b_registers
 {
 public:
+	// constants
+	static constexpr u32 OUTPUTS = 2;
+	static constexpr u32 CHANNELS = 1;
+	static constexpr u32 REGISTERS = 0x11;
+	static constexpr u32 ALL_CHANNELS = (1 << CHANNELS) - 1;
+
 	// constructor
-	ymadpcm_b_registers(std::vector<u8> &regdata) :
-		m_regdata(regdata)
-	{
-	}
+	ymadpcm_b_registers() { }
+
+	// register for save states
+	void save(device_t &device);
+
+	// reset to initial state
+	void reset();
 
 	// direct read/write access
-	u8 read(u8 index) { return m_regdata[index]; }
-	void write(u8 index, u8 data) { m_regdata[index] = data; }
+	void write(u32 index, u8 data) { m_regdata[index] = data; }
 
 	// system-wide registers
-	u8 execute() const          /*  1 bit  */ { return BIT(m_regdata[0x00], 7); }
-	u8 record() const           /*  1 bit  */ { return BIT(m_regdata[0x00], 6); }
-	u8 external() const         /*  1 bit  */ { return BIT(m_regdata[0x00], 5); }
-	u8 repeat() const           /*  1 bit  */ { return BIT(m_regdata[0x00], 4); }
-	u8 speaker() const          /*  1 bit  */ { return BIT(m_regdata[0x00], 3); }
-	u8 reset() const            /*  1 bit  */ { return BIT(m_regdata[0x00], 0); }
-	u8 pan_left() const         /*  1 bit  */ { return BIT(m_regdata[0x01], 7); }
-	u8 pan_right() const        /*  1 bit  */ { return BIT(m_regdata[0x01], 6); }
-	u8 start_conversion() const /*  1 bit  */ { return BIT(m_regdata[0x01], 3); }
-	u8 dac_enable() const       /*  1 bit  */ { return BIT(m_regdata[0x01], 2); }
-	u8 dram_8bit() const        /*  1 bit  */ { return BIT(m_regdata[0x01], 1); }
-	u8 rom_ram() const          /*  1 bit  */ { return BIT(m_regdata[0x01], 0); }
-	u16 start() const           /* 16 bits */ { return m_regdata[0x02] | (m_regdata[0x03] << 8); }
-	u16 end() const             /* 16 bits */ { return m_regdata[0x04] | (m_regdata[0x05] << 8); }
-	u16 prescale() const        /* 11 bits */ { return m_regdata[0x06] | (BIT(m_regdata[0x07], 0, 3) << 8); }
-	u8 cpudata() const          /*  8 bits */ { return m_regdata[0x08]; }
-	u16 delta_n() const         /* 16 bits */ { return m_regdata[0x09] | (m_regdata[0x0a] << 8); }
-	u8 level() const            /*  8 bits */ { return m_regdata[0x0b]; }
-	u16 limit() const           /* 16 bits */ { return m_regdata[0x0c] | (m_regdata[0x0d] << 8); }
-	u8 dac() const              /*  8 bits */ { return m_regdata[0x0e]; }
-	u8 pcm() const              /*  8 bits */ { return m_regdata[0x0f]; }
+	u32 execute() const          { return BIT(m_regdata[0x00], 7); }
+	u32 record() const           { return BIT(m_regdata[0x00], 6); }
+	u32 external() const         { return BIT(m_regdata[0x00], 5); }
+	u32 repeat() const           { return BIT(m_regdata[0x00], 4); }
+	u32 speaker() const          { return BIT(m_regdata[0x00], 3); }
+	u32 resetflag() const        { return BIT(m_regdata[0x00], 0); }
+	u32 pan_left() const         { return BIT(m_regdata[0x01], 7); }
+	u32 pan_right() const        { return BIT(m_regdata[0x01], 6); }
+	u32 start_conversion() const { return BIT(m_regdata[0x01], 3); }
+	u32 dac_enable() const       { return BIT(m_regdata[0x01], 2); }
+	u32 dram_8bit() const        { return BIT(m_regdata[0x01], 1); }
+	u32 rom_ram() const          { return BIT(m_regdata[0x01], 0); }
+	u32 start() const            { return m_regdata[0x02] | (m_regdata[0x03] << 8); }
+	u32 end() const              { return m_regdata[0x04] | (m_regdata[0x05] << 8); }
+	u32 prescale() const         { return m_regdata[0x06] | (BIT(m_regdata[0x07], 0, 3) << 8); }
+	u32 cpudata() const          { return m_regdata[0x08]; }
+	u32 delta_n() const          { return m_regdata[0x09] | (m_regdata[0x0a] << 8); }
+	u32 level() const            { return m_regdata[0x0b]; }
+	u32 limit() const            { return m_regdata[0x0c] | (m_regdata[0x0d] << 8); }
+	u32 dac() const              { return m_regdata[0x0e]; }
+	u32 pcm() const              { return m_regdata[0x0f]; }
 
 private:
 	// internal state
-	std::vector<u8> &m_regdata;    // reference to the raw data
+	u8 m_regdata[REGISTERS];         // register data
 };
 
 
@@ -241,10 +271,10 @@ public:
 	static constexpr u8 STATUS_PLAYING = 0x04;
 
 	// constructor
-	ymadpcm_b_channel(ymadpcm_b_registers regs, read8sm_delegate reader, write8sm_delegate writer, u8 addrshift);
+	ymadpcm_b_channel(ymadpcm_b_engine &owner, read8sm_delegate reader, write8sm_delegate writer, u32 addrshift);
 
 	// register for save states
-	void save(device_t &device, u8 index);
+	void save(device_t &device, u32 index);
 
 	// reset the channel state
 	void reset();
@@ -256,20 +286,20 @@ public:
 	void clock();
 
 	// return the computed output value, with panning applied
-	void output(s32 &lsum, s32 &rsum, u8 rshift) const;
+	void output(s32 outputs[ymadpcm_b_registers::OUTPUTS], u32 rshift) const;
 
 	// return the status register
 	u8 status() const { return m_status; }
 
 	// handle special register reads
-	u8 read(u8 regnum);
+	u8 read(u32 regnum);
 
 	// handle special register writes
-	void write(u8 regnum, u8 value);
+	void write(u32 regnum, u8 value);
 
 private:
 	// helper - return the current address shift
-	u8 address_shift() const;
+	u32 address_shift() const;
 
 	// load the start address
 	void load_start();
@@ -281,19 +311,19 @@ private:
 	bool at_end() const { return (m_curaddress >> address_shift()) > m_regs.end(); }
 
 	// internal state
-	read8sm_delegate const m_reader; // read delegate
-	write8sm_delegate const m_writer;// write delegate
-	u8 const m_address_shift;        // address bits shift-left
-	u8 m_status;                     // currently playing?
-	u8 m_curnibble;                  // index of the current nibble
-	u8 m_curbyte;                    // current byte of data
-	u8 m_dummy_read;                 // dummy read tracker
-	u16 m_position;                  // current fractional position
+	u32 const m_address_shift;       // address bits shift-left
+	u32 m_status;                    // currently playing?
+	u32 m_curnibble;                 // index of the current nibble
+	u32 m_curbyte;                   // current byte of data
+	u32 m_dummy_read;                // dummy read tracker
+	u32 m_position;                  // current fractional position
 	u32 m_curaddress;                // current address
 	s32 m_accumulator;               // accumulator
 	s32 m_prev_accum;                // previous accumulator (for linear interp)
 	s32 m_adpcm_step;                // next forecast
-	ymadpcm_b_registers m_regs;      // register accessor
+	read8sm_delegate const m_reader; // read delegate
+	write8sm_delegate const m_writer;// write delegate
+	ymadpcm_b_registers &m_regs;     // reference to registers
 };
 
 
@@ -301,11 +331,12 @@ private:
 
 class ymadpcm_b_engine
 {
-	static constexpr int CHANNELS = 1;
-
 public:
+	static constexpr int OUTPUTS = ymadpcm_b_registers::OUTPUTS;
+	static constexpr int CHANNELS = ymadpcm_b_registers::CHANNELS;
+
 	// constructor
-	ymadpcm_b_engine(device_t &device, read8sm_delegate reader, write8sm_delegate writer, u8 addrshift = 0);
+	ymadpcm_b_engine(device_t &device, read8sm_delegate reader, write8sm_delegate writer, u32 addrshift = 0);
 
 	// save state handling
 	void save(device_t &device);
@@ -314,24 +345,26 @@ public:
 	void reset();
 
 	// master clocking function
-	void clock(u8 chanmask);
+	void clock(u32 chanmask);
 
 	// compute sum of channel outputs
-	void output(s32 &lsum, s32 &rsum, u8 rshift, u8 chanmask);
+	void output(s32 outputs[2], u32 rshift, u32 chanmask);
 
 	// read from the ADPCM-B registers
-	u8 read(u8 regnum) { return m_channel[0]->read(regnum); }
+	u32 read(u32 regnum) { return m_channel[0]->read(regnum); }
 
 	// write to the ADPCM-B registers
-	void write(u8 regnum, u8 data);
+	void write(u32 regnum, u8 data);
 
 	// status
-	u8 status(u8 chnum = 0) const { return m_channel[chnum]->status(); }
+	u8 status() const { return m_channel[0]->status(); }
+
+	// return a reference to our registers
+	ymadpcm_b_registers &regs() { return m_regs; }
 
 private:
 	// internal state
 	std::unique_ptr<ymadpcm_b_channel> m_channel[CHANNELS]; // array of channels
-	std::vector<u8> m_regdata;       // raw register data
 	ymadpcm_b_registers m_regs;      // register accessor
 };
 

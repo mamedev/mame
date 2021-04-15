@@ -30,6 +30,7 @@ TODO:
    so you are awarded 55 credits on a hard reset)
  - sblast2b : dipswitches
  - sblast2b : pressing start during gameplay changes the character used. Intentional?
+ - sblast2ba: needs decryption
  - denseib,2: fix gfx glitches, missing texts
  - legendsb : unknown dipswitches
  - rushbets : dipswitches (stored at memory locations $785006 and $785008)
@@ -1552,7 +1553,18 @@ ROM_START( sblast2b )
 	ROM_LOAD( "1.bin", 0x000000, 0x0080000, CRC(bea10c40) SHA1(d9cc65267b9b57145d714f2c17b436c1fb21513f) )
 	ROM_LOAD( "2.bin", 0x080000, 0x0080000, CRC(57d2b6e9) SHA1(1a7b347101f67b254e2f86294d501b0669431644) )
 	ROM_LOAD( "3.bin", 0x100000, 0x0080000, CRC(9e63a5ce) SHA1(1d18606fbb28b55a921fc37e1af1aff4caae9003) )
+ROM_END
 
+ROM_START( sblast2ba) // all 27c4000
+	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF )
+
+	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
+
+	ROM_REGION( 0x400000, "user7", 0 )
+	ROM_LOAD( "u14", 0x000000, 0x080000, CRC(d2bdc126) SHA1(fa8f03b73f2f9b7a159699b764e2c46b5f8a8190) )
+	ROM_LOAD( "u15", 0x080000, 0x080000, CRC(50f9acb1) SHA1(a86bc98f81dc2c9443fbcd9b5f4880b8d5851ed6) )
+	ROM_LOAD( "u16", 0x100000, 0x080000, CRC(2a7f40f3) SHA1(e0db49969880af1edbadd8bc5a1bc59a55777d23) )
+	ROM_LOAD( "u17", 0x180000, 0x080000, CRC(09817173) SHA1(e2ad9e7e1a95cde9ee973647dbd5df83b524978b) )
 ROM_END
 
 ROM_START( legendsb )
@@ -1664,16 +1676,17 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 199?, kinstb,       0,       kinstb,         kinstb,   snesb_state, init_kinstb,    ROT0, "bootleg",  "Killer Instinct (SNES bootleg)",                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, ffight2b,     0,       ffight2b,       ffight2b, snesb_state, init_ffight2b,  ROT0, "bootleg",  "Final Fight 2 (SNES bootleg)",                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, iron,         0,       kinstb,         iron,     snesb_state, init_iron,      ROT0, "bootleg",  "Iron (SNES bootleg)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, denseib,      0,       kinstb,         denseib,  snesb_state, init_denseib,   ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg, set 1)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, denseib2,     denseib, kinstb,         denseib,  snesb_state, init_denseib2,  ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg, set 2)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, sblast2b,     0,       kinstb,         sblast2b, snesb_state, init_sblast2b,  ROT0, "bootleg",  "Sonic Blast Man 2 Special Turbo (SNES bootleg)",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS)
-GAME( 1996, endless,      0,       kinstb,         endless,  snesb_state, init_endless,   ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg, set 1)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, endlessa,     endless, kinstb,         endless,  snesb_state, init_endless,   ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg, set 2)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, legendsb,     0,       kinstb,         kinstb,   snesb_state, init_legendsb,  ROT0, "bootleg",  "Legend (SNES bootleg)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, rushbets,     0,       kinstb,         rushbets, snesb_state, init_rushbets,  ROT0, "bootleg",  "Rushing Beat Shura (SNES bootleg)",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, venom,        0,       kinstb,         venom,    snesb_state, init_venom,     ROT0, "bootleg",  "Venom & Spider-Man - Separation Anxiety (SNES bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, wldgunsb,     0,       kinstb,         wldgunsb, snesb_state, init_wldgunsb,  ROT0, "bootleg",  "Wild Guns (SNES bootleg)",                               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based off Japanese version
-GAME( 199?, fatfurspb,    0,       kinstb,         venom,    snesb_state, init_fatfurspb, ROT0, "bootleg",  "Fatal Fury Special (SNES bootleg)",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // coinage, etc. handled by protection device
+GAME( 199?, kinstb,       0,        kinstb,         kinstb,   snesb_state, init_kinstb,    ROT0, "bootleg",  "Killer Instinct (SNES bootleg)",                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, ffight2b,     0,        ffight2b,       ffight2b, snesb_state, init_ffight2b,  ROT0, "bootleg",  "Final Fight 2 (SNES bootleg)",                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, iron,         0,        kinstb,         iron,     snesb_state, init_iron,      ROT0, "bootleg",  "Iron (SNES bootleg)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, denseib,      0,        kinstb,         denseib,  snesb_state, init_denseib,   ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg, set 1)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, denseib2,     denseib,  kinstb,         denseib,  snesb_state, init_denseib2,  ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg, set 2)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, sblast2b,     0,        kinstb,         sblast2b, snesb_state, init_sblast2b,  ROT0, "bootleg",  "Sonic Blast Man 2 Special Turbo (SNES bootleg, set 1)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1997, sblast2ba,    sblast2b, kinstb,         sblast2b, snesb_state, empty_init,     ROT0, "bootleg",  "Sonic Blast Man 2 Special Turbo (SNES bootleg, set 2)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad dump, needs to be descrambled, too
+GAME( 1996, endless,      0,        kinstb,         endless,  snesb_state, init_endless,   ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg, set 1)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, endlessa,     endless,  kinstb,         endless,  snesb_state, init_endless,   ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg, set 2)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, legendsb,     0,        kinstb,         kinstb,   snesb_state, init_legendsb,  ROT0, "bootleg",  "Legend (SNES bootleg)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rushbets,     0,        kinstb,         rushbets, snesb_state, init_rushbets,  ROT0, "bootleg",  "Rushing Beat Shura (SNES bootleg)",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, venom,        0,        kinstb,         venom,    snesb_state, init_venom,     ROT0, "bootleg",  "Venom & Spider-Man - Separation Anxiety (SNES bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, wldgunsb,     0,        kinstb,         wldgunsb, snesb_state, init_wldgunsb,  ROT0, "bootleg",  "Wild Guns (SNES bootleg)",                               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based off Japanese version
+GAME( 199?, fatfurspb,    0,        kinstb,         venom,    snesb_state, init_fatfurspb, ROT0, "bootleg",  "Fatal Fury Special (SNES bootleg)",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // coinage, etc. handled by protection device

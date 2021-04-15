@@ -39,8 +39,8 @@ In the same period Electronic Projects also released games on different platform
 #include "speaker.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
-#include "sound/3526intf.h"
 #include "sound/ay8910.h"
+#include "sound/ym3526.h"
 #include "video/mc6845.h"
 
 class jackpot_state : public driver_device

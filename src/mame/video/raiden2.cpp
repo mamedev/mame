@@ -18,22 +18,22 @@ void raiden2_state::m_videoram_private_w(offs_t offset, uint16_t data)
 
 	if (offset < 0x800 / 2)
 	{
-		background_w(offset, data, 0xffff);
+		background_w(offset, data);
 	}
 	else if (offset < 0x1000 /2)
 	{
 		offset -= 0x800 / 2;
-		foreground_w(offset, data, 0xffff);
+		foreground_w(offset, data);
 	}
 	else if (offset < 0x1800/2)
 	{
 		offset -= 0x1000 / 2;
-		midground_w(offset, data, 0xffff);
+		midground_w(offset, data);
 	}
 	else if (offset < 0x2800/2)
 	{
 		offset -= 0x1800 / 2;
-		text_w(offset, data, 0xffff);
+		text_w(offset, data);
 	}
 }
 
@@ -148,28 +148,40 @@ void raiden2_state::draw_sprites(const rectangle &cliprect)
 
 }
 
-void raiden2_state::background_w(offs_t offset, u16 data, u16 mem_mask)
+void raiden2_state::background_w(offs_t offset, u16 data)
 {
-	COMBINE_DATA(&m_back_data[offset]);
-	m_background_layer->mark_tile_dirty(offset);
+	if (m_back_data[offset] != data)
+	{
+		m_back_data[offset] = data;
+		m_background_layer->mark_tile_dirty(offset);
+	}
 }
 
-void raiden2_state::midground_w(offs_t offset, u16 data, u16 mem_mask)
+void raiden2_state::midground_w(offs_t offset, u16 data)
 {
-	COMBINE_DATA(&m_mid_data[offset]);
-	m_midground_layer->mark_tile_dirty(offset);
+	if (m_mid_data[offset] != data)
+	{
+		m_mid_data[offset] = data;
+		m_midground_layer->mark_tile_dirty(offset);
+	}
 }
 
-void raiden2_state::foreground_w(offs_t offset, u16 data, u16 mem_mask)
+void raiden2_state::foreground_w(offs_t offset, u16 data)
 {
-	COMBINE_DATA(&m_fore_data[offset]);
-	m_foreground_layer->mark_tile_dirty(offset);
+	if (m_fore_data[offset] != data)
+	{
+		m_fore_data[offset] = data;
+		m_foreground_layer->mark_tile_dirty(offset);
+	}
 }
 
-void raiden2_state::text_w(offs_t offset, u16 data, u16 mem_mask)
+void raiden2_state::text_w(offs_t offset, u16 data)
 {
-	COMBINE_DATA(&m_text_data[offset]);
-	m_text_layer->mark_tile_dirty(offset);
+	if (m_text_data[offset] != data)
+	{
+		m_text_data[offset] = data;
+		m_text_layer->mark_tile_dirty(offset);
+	}
 }
 
 void raiden2_state::tilemap_enable_w(offs_t offset, u16 data, u16 mem_mask)

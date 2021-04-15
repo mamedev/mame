@@ -85,7 +85,7 @@ video_manager::video_manager(running_machine &machine)
 	, m_overall_real_ticks(0)
 	, m_overall_emutime(attotime::zero)
 	, m_overall_valid_counter(0)
-	, m_throttled(machine.options().throttle())
+	, m_throttled(true)
 	, m_throttle_rate(1.0f)
 	, m_fastforward(false)
 	, m_seconds_to_run(machine.options().seconds_to_run())
@@ -1127,21 +1127,9 @@ osd_file::error video_manager::open_next(emu_file &file, const char *extension, 
 			int name_found = 0;
 
 			// find length of the device name
-			int end1 = snapstr.find('/', pos + 3);
-			int end2 = snapstr.find('%', pos + 3);
-			int end;
-
-			if ((end1 != -1) && (end2 != -1))
-				end = std::min(end1, end2);
-			else if (end1 != -1)
-				end = end1;
-			else if (end2 != -1)
-				end = end2;
-			else
+			int end = snapstr.find_first_not_of("abcdefghijklmnopqrstuvwxyz1234567890", pos + 3);
+			if (end == -1)
 				end = snapstr.length();
-
-			if (end - pos < 3)
-				fatalerror("Something very wrong is going on!!!\n");
 
 			// copy the device name to an std::string
 			std::string snapdevname;

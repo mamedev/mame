@@ -31,7 +31,7 @@
 */
 
 // Show step operation
-#define TRACE_STEP 1
+#define TRACE_STEP 0
 #define TRACE_AUDIO 0
 
 #define PITCH_SEEK_SAMPLES 1
@@ -346,7 +346,7 @@ void floppy_image_device::register_formats()
 		auto ff = fmt();
 		ff->enumerate(fse, form_factor, variants);
 		m_fs_managers.push_back(std::unique_ptr<filesystem_manager_t>(ff));
-	}		
+	}
 }
 
 void floppy_image_device::set_formats(std::function<void (format_registration &fr)> formats)
@@ -1157,14 +1157,16 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 		buf.push_back(floppy_image::MG_N);
 	}
 
+	uint32_t cur_mg;
 	if((buf[index] & floppy_image::TIME_MASK) == start_pos) {
 		if(index)
-			index--;
+			cur_mg = buf[index-1];
 		else
-			index = buf.size() - 1;
-	}
+			cur_mg = buf[buf.size() - 1];
+	} else
+			cur_mg = buf[index];
 
-	uint32_t cur_mg = buf[index] & floppy_image::MG_MASK;
+	cur_mg &= floppy_image::MG_MASK;
 	if(cur_mg == floppy_image::MG_N || cur_mg == floppy_image::MG_D)
 		cur_mg = floppy_image::MG_A;
 
@@ -1293,7 +1295,6 @@ void floppy_image_device::write_zone(uint32_t *buf, int &cells, int &index, uint
 				spos = epos;
 			}
 		}
-
 	}
 }
 
@@ -2779,6 +2780,15 @@ void mac_floppy_device::track_changed()
 void mac_floppy_device::mon_w(int)
 {
 	// Motor control is through commands
+}
+
+void mac_floppy_device::tfsel_w(int state)
+{
+	// if 35SEL line is clear and the motor is on, turn off the motor
+	if ((state == CLEAR_LINE) && (!floppy_image_device::mon_r()))
+	{
+		floppy_image_device::mon_w(1);
+	}
 }
 
 oa_d34v_device::oa_d34v_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : mac_floppy_device(mconfig, OAD34V, tag, owner, clock)

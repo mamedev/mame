@@ -1,43 +1,48 @@
-// license:GPL-2.0+
-// copyright-holders:Jarek Burczynski
+// license:BSD-3-Clause
+// copyright-holders:Aaron Giles
+
 #ifndef MAME_SOUND_YMF262_H
 #define MAME_SOUND_YMF262_H
 
 #pragma once
 
-/* select number of output bits: 8 or 16 */
-#define OPL3_SAMPLE_BITS 16
-
-typedef s32 OPL3SAMPLE;
-/*
-#if (OPL3_SAMPLE_BITS==16)
-typedef int16_t OPL3SAMPLE;
-#endif
-#if (OPL3_SAMPLE_BITS==8)
-typedef int8_t OPL3SAMPLE;
-#endif
-*/
-
-typedef void (*OPL3_TIMERHANDLER)(device_t *device,int timer,const attotime &period);
-typedef void (*OPL3_IRQHANDLER)(device_t *device,int irq);
-typedef void (*OPL3_UPDATEHANDLER)(device_t *device,int min_interval_us);
+#include "ymfm.h"
 
 
-void *ymf262_init(device_t *device, int clock, int rate);
-void *ymf278b_init(device_t *device, int clock, int rate);
+// ======================> ymf262_device
 
-void ymf262_clock_changed(void *chip, int clock, int rate);
-void ymf262_post_load(void *chip);
-void ymf262_shutdown(void *chip);
-void ymf262_reset_chip(void *chip);
-int  ymf262_write(void *chip, int a, int v);
-unsigned char ymf262_read(void *chip, int a);
-int  ymf262_timer_over(void *chip, int c);
-void ymf262_update_one(void *chip, std::vector<write_stream_view> &buffers);
+DECLARE_DEVICE_TYPE(YMF262, ymf262_device);
 
-void ymf262_set_timer_handler(void *chip, OPL3_TIMERHANDLER TimerHandler, device_t *device);
-void ymf262_set_irq_handler(void *chip, OPL3_IRQHANDLER IRQHandler, device_t *device);
-void ymf262_set_update_handler(void *chip, OPL3_UPDATEHANDLER UpdateHandler, device_t *device);
+class ymf262_device : public device_t, public device_sound_interface
+{
+public:
+	// YMF262 is OPL3
+	using fm_engine = ymopl3_engine;
+
+	// constructor
+	ymf262_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type = YMF262);
+
+	// configuration helpers
+	auto irq_handler() { return m_fm.irq_handler(); }
+
+	// read/write access
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
+
+	// sound overrides
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+
+	// internal state
+	u16 m_address;                   // address register
+	sound_stream *m_stream;          // sound stream
+	fm_engine m_fm;                  // core FM engine
+};
 
 
 #endif // MAME_SOUND_YMF262_H

@@ -204,10 +204,10 @@ Reference of music tempo:
 #include "cpu/z80/z80.h"
 #include "machine/nmk004.h"
 #include "machine/nmk112.h"
-#include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 #include "sound/ym2203.h"
+#include "sound/ym3812.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -555,6 +555,26 @@ void nmk16_state::mustangb_map(address_map &map)
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08c000, 0x08c001).w(FUNC(nmk16_state::mustang_scroll_w));
 	map(0x08c002, 0x08c087).nopw();    // ??
+	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
+	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
+	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share("mainram");
+}
+
+void nmk16_state::mustangb3_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x080000, 0x080001).portr("IN0");
+	map(0x080002, 0x080003).portr("IN1");
+	map(0x080004, 0x080005).portr("DSW1");
+	map(0x080006, 0x080007).lr16(NAME([this]() { if (m_maincpu->pc() == 0x416) return 0x9000; if (m_maincpu->pc() == 0x64e) return 0x548d; return 0x0000; })); // TODO: gross hack. Protection? Or probably something more obvious
+	map(0x08000f, 0x08000f).r("soundlatch2", FUNC(generic_latch_8_device::read));
+	map(0x08000e, 0x08000f).nopw();
+	map(0x080015, 0x080015).w(FUNC(nmk16_state::flipscreen_w));
+	map(0x080016, 0x080017).noprw();
+	map(0x08001f, 0x08001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x08c000, 0x08c001).w(FUNC(nmk16_state::mustang_scroll_w));
+	map(0x08c002, 0x08c087).nopw();
 	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
 	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
 	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share("mainram");
@@ -1052,6 +1072,24 @@ void nmk16_state::tdragonb_map(address_map &map)
 	map(0x0d0000, 0x0d07ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
 }
 
+void nmk16_state::tdragonb2_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x0b0000, 0x0bffff).ram().share("mainram");
+	map(0x0c0000, 0x0c0001).portr("IN0");
+	map(0x0c0002, 0x0c0003).portr("IN1");
+	map(0x0c0008, 0x0c0009).portr("DSW1"); // .w TODO oki banking?
+	map(0x0c000a, 0x0c000b).portr("DSW2");
+	//map(0x0c000e, 0x0c000f).r; TODO: what's this?
+	map(0x0c0015, 0x0c0015).w(FUNC(nmk16_state::flipscreen_w)); // Maybe
+	map(0x0c0019, 0x0c0019).w(FUNC(nmk16_state::tilebank_w)); // Tile Bank
+	map(0x0c001f, 0x0c001f).w("oki", FUNC(okim6295_device::write));
+	map(0x0c4000, 0x0c4007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
+	map(0x0c8000, 0x0c87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x0cc000, 0x0cffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
+	map(0x0d0000, 0x0d07ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
+}
+
 void nmk16_state::ssmissin_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
@@ -1175,11 +1213,11 @@ void nmk16_state::gunnailb_map(address_map &map)
 	map(0x080002, 0x080003).portr("IN1");
 	map(0x080008, 0x080009).portr("DSW1");
 	map(0x08000a, 0x08000b).portr("DSW2");
-	// map(0x08000e, 0x08000f).nopr();
+	map(0x08000f, 0x08000f).r("soundlatch2", FUNC(generic_latch_8_device::read));
 	map(0x080015, 0x080015).w(FUNC(nmk16_state::flipscreen_w));
-	// map(0x080016, 0x080017).noprw();
+	//map(0x080016, 0x080017).noprw();
 	map(0x080019, 0x080019).w(FUNC(nmk16_state::tilebank_w));
-	// map(0x08001e, 0x08001f).nopw();
+	map(0x08001f, 0x08001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08c000, 0x08c1ff).writeonly().share("scrollram");
 	map(0x08c200, 0x08c3ff).writeonly().share("scrollramy");
@@ -1187,7 +1225,7 @@ void nmk16_state::gunnailb_map(address_map &map)
 	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
 	map(0x09c000, 0x09cfff).mirror(0x001000).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
 	map(0x0f0000, 0x0fffff).ram().share("mainram");
-	// map(0x194000, 0x194000)
+	map(0x194001, 0x194001).w(m_oki[0], FUNC(okim6295_device::write));
 }
 
 void nmk16_state::gunnailb_sound_map(address_map &map)
@@ -1200,10 +1238,10 @@ void nmk16_state::gunnailb_sound_map(address_map &map)
 void nmk16_state::gunnailb_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	//map(0x00, 0x00).w(FUNC(nmk16_state::macross2_sound_bank_w));
-	//map(0x02, 0x03).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	//map(0x04, 0x04).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	//map(0x06, 0x06).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x00, 0x00).w(FUNC(nmk16_state::macross2_sound_bank_w));
+	map(0x02, 0x03).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0x04, 0x04).noprw(); // since the bootleggers used the same audio CPU ROM as airbustr but a different Oki ROM, they connected the Oki to the main CPU
+	map(0x06, 0x06).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("soundlatch2", FUNC(generic_latch_8_device::write));
 }
 
 void nmk16_state::macross2_map(address_map &map)
@@ -4309,6 +4347,46 @@ void nmk16_state::mustangb(machine_config &config)
 	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 }
 
+void nmk16_state::mustangb3(machine_config &config)
+{
+	// basic machine hardware
+	M68000(config, m_maincpu, 10000000); // 10 MHz ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::mustangb3_map);
+	set_hacky_interrupt_timing(config);
+
+	Z80(config, m_audiocpu, 14318180/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::tharrier_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::tharrier_sound_io_map);
+
+	// video hardware
+	set_hacky_screen_lowres(config);
+	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
+	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, "soundlatch2");
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.50);
+	ymsnd.add_route(2, "mono", 0.50);
+	ymsnd.add_route(3, "mono", 1.20);
+
+	OKIM6295(config, m_oki[0], 16000000/4, okim6295_device::PIN7_LOW);
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
+
+	OKIM6295(config, m_oki[1], 16000000/4, okim6295_device::PIN7_LOW);
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
+}
+
 void nmk16_state::bioship(machine_config &config)
 {
 	// basic machine hardware
@@ -4484,6 +4562,28 @@ void nmk16_state::tdragonb(machine_config &config)    // bootleg using Raiden so
 	seibu_sound.set_rombank_tag("seibu_bank1");
 	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
 	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
+}
+
+void nmk16_state::tdragonb2(machine_config &config)
+{
+	// basic machine hardware
+	M68000(config, m_maincpu, 10000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::tdragonb2_map);
+	set_hacky_interrupt_timing(config);
+
+	// video hardware
+	set_hacky_screen_lowres(config);
+	m_spritegen->set_colpri_callback(FUNC(nmk16_state::get_colour_4bit));
+	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
+	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+
+	OKIM6295(config, "oki", 1320000, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
 void nmk16_state::tdragon(machine_config &config)
@@ -4797,16 +4897,19 @@ void nmk16_state::gunnailb(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::gunnailb_map);
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-
-	Z80(config, m_audiocpu, 4000000); // 4 MHz ?
+	Z80(config, m_audiocpu, 6000000); // 6 MHz ?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::gunnailb_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::gunnailb_sound_io_map);
 
-	subdevice<ym2203_device>("ymsnd")->irq_handler().set_inputline(m_audiocpu, 0);
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	OKIM6295(config.replace(), m_oki[0], XTAL(16'000'000)/4, okim6295_device::PIN7_LOW); // no OKI banking
-	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
+	GENERIC_LATCH_8(config, "soundlatch2");
+
+	subdevice<ym2203_device>("ymsnd")->irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
+
+	OKIM6295(config.replace(), m_oki[0], 12000000 / 4, okim6295_device::PIN7_LOW); // no OKI banking
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	config.device_remove("nmk004");
 	config.device_remove("oki2");
@@ -5892,6 +5995,69 @@ ROM_START( tharrieru )
 	ROM_LOAD( "26.bpr",  0x00120, 0x020, CRC(0cbfb33e) SHA1(5dfee031a0a14bcd667fe2af2fa9cdfac3941d22) )
 ROM_END
 
+ROM_START( tharrierb )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "cpua", 0x00000, 0x20000, CRC(d55d21c7) SHA1(7c66283ca48453cc7eea257d70e5ce09217cfa1e) )
+	ROM_LOAD16_BYTE( "cpub", 0x00001, 0x20000, CRC(65c247f6) SHA1(9f35f2b6f54814b4c4d23e2d78db8043e678fef2) ) // just a BEQ at 0x6b6a changed to BRA and a BPL at 0x6ba0 changed to BRA
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "s1.512", 0x00000, 0x10000, CRC(b959f837) SHA1(073b14935e7d5b0cad19a3471fd26e9e3a363827) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "mc68705r35", 0x0000, 0x1000, NO_DUMP ) // doesn't seem to be used by the game. Possibly empty or leftover from a conversion?
+
+	ROM_REGION( 0x8000, "fgtile", 0 )
+	ROM_LOAD( "t.256", 0x0000, 0x8000, CRC(4e9a7e0b) SHA1(ff143d1e01e865a62ecc695fe3359a2a0eacee05) ) // half size if compared to the original
+
+	ROM_REGION( 0x80000, "bgtile", 0 )
+	ROM_LOAD( "10h.512", 0x00000, 0x10000, CRC(9b97073c) SHA1(963d45bac06ae74872206442d7a7c1bfb142e951) )
+	ROM_LOAD( "21h.512", 0x10000, 0x10000, CRC(d5a90bd5) SHA1(b1bccc11aada4277482f3988f4f3ffa565f15f59) )
+	ROM_LOAD( "12h.512", 0x20000, 0x10000, CRC(3d4a03ac) SHA1(a2840d339249441e191bcee59c1330851b5b1992) )
+	ROM_LOAD( "24h.512", 0x30000, 0x10000, CRC(edecb4c8) SHA1(76190d35e188c5272aa2b0131f28e4edd812237b) )
+	ROM_LOAD( "11h.512", 0x40000, 0x10000, CRC(c20d20ed) SHA1(4d5492fcbff15c727c642a97bdc51bbf43623199) )
+	ROM_LOAD( "23h.512", 0x50000, 0x10000, CRC(c7949c45) SHA1(c0d2f58ec9e7e566980dcc8e93215aef735833d4) )
+	ROM_LOAD( "22h.512", 0x60000, 0x10000, CRC(7f38e700) SHA1(55e135f82154b1ad8210fab5b2aa72d38f4d2f32) ) // 1ST AND 2ND HALF IDENTICAL, original has 0x60000-0x67fff 0xff filled
+	ROM_LOAD( "9h.512",  0x70000, 0x10000, CRC(43499c11) SHA1(9215fa7a76be4e76bf5fdc55c93e635c9b113947) )
+
+	ROM_REGION( 0x100000, "sprites", 0 ) // identical to the original up t0 0xeffff, then this bootleg has more data?
+	ROM_LOAD16_BYTE( "l3.512",  0x00000, 0x10000, CRC(b1537a3b) SHA1(82eb2d5b99f3e42b570a46ad3e9861761522a406) )
+	ROM_LOAD16_BYTE( "l10.512", 0x00001, 0x10000, CRC(203b88f8) SHA1(58441f147719e349f3d7fbf4b21504e417c097f7) )
+	ROM_LOAD16_BYTE( "l1.512",  0x20000, 0x10000, CRC(060ed368) SHA1(bc9e742595f45e4726b449c808d89504e0663df5) )
+	ROM_LOAD16_BYTE( "l15.512", 0x20001, 0x10000, CRC(0c5cef0e) SHA1(6bee6956f52de436c2a06f5b5ff8d08f83a79a2d) )
+	ROM_LOAD16_BYTE( "l2.512",  0x40000, 0x10000, CRC(d62b4a9e) SHA1(b6db3fc00755a2d72effff96e721bfaef4216897) )
+	ROM_LOAD16_BYTE( "l16.512", 0x40001, 0x10000, CRC(6b637cda) SHA1(838b4ad3e3ebf29c6673bf559b9ad7f729ea148d) )
+	ROM_LOAD16_BYTE( "l6.512",  0x60000, 0x10000, CRC(5f249283) SHA1(7c25659a3d8f29ca0235b206fc03dfedf15a88fe) )
+	ROM_LOAD16_BYTE( "l14.512", 0x60001, 0x10000, CRC(dfabc192) SHA1(0d83cfbe308275e8b7e59522eaa49ff778e12713) )
+	ROM_LOAD16_BYTE( "l5.512",  0x80000, 0x10000, CRC(5e51cdfa) SHA1(d3d9d12c2caffabb670ef5d5909a474c52640443) )
+	ROM_LOAD16_BYTE( "l11.512", 0x80001, 0x10000, CRC(3ac04d8f) SHA1(e86f8cd21e70b8dd88fda4931db9b28803d6597f) )
+	ROM_LOAD16_BYTE( "l8.512",  0xa0000, 0x10000, CRC(0a8b8eca) SHA1(6be69a9d2fde671a735bce75fe28503c02062201) )
+	ROM_LOAD16_BYTE( "l12.512", 0xa0001, 0x10000, CRC(85445005) SHA1(ae880382591f707cf9d445fd11f2d182bfe44c79) )
+	ROM_LOAD16_BYTE( "l4.512",  0xc0000, 0x10000, CRC(19f82acd) SHA1(ff88e067b05c2de76f56e1a3ad423d8683b498c6) )
+	ROM_LOAD16_BYTE( "l13.512", 0xc0001, 0x10000, CRC(5cf2b63b) SHA1(2e4d093436a8ade97fe3f62a83d6211111900006) )
+	ROM_LOAD16_BYTE( "l7.512",  0xe0000, 0x10000, CRC(fc99519f) SHA1(35e86f3c86f978f75dcc37acce0b601cb1d65fdf) ) // 1ST AND 2ND HALF IDENTICAL, original has 0xf8000-0xfffff 0xff filled
+	ROM_LOAD16_BYTE( "l9.512",  0xe0001, 0x10000, CRC(4c5a8f33) SHA1(82540da291a1a78c91a47f05d9557c492315ddbc) ) // "
+
+	ROM_REGION(0x80000, "oki1", 0 ) // identical to the original, just smaller ROMs
+	ROM_LOAD( "8h.512", 0x00000, 0x10000, CRC(f509f5ca) SHA1(ebdf80efefa01f82d9b9773110326c17b536bfc9) )
+	ROM_LOAD( "7h.512", 0x10000, 0x10000, CRC(1a0ec174) SHA1(345f707d57311efbcc7a438eff76ae53a2055591) )
+	ROM_LOAD( "6h.512", 0x20000, 0x10000, CRC(55e704f7) SHA1(14142d25a5a3875046fc5284ff6d1fe8147045f0) )
+	ROM_LOAD( "5h.512", 0x30000, 0x10000, CRC(ad459ad3) SHA1(4ca8dcfca5bf5b1645d93b5cd18a645d76a9e2e8) )
+	ROM_LOAD( "4h.512", 0x40000, 0x10000, CRC(5ee53d1d) SHA1(1e7739ef7879f395f986ae04a3779536fee4d377) )
+	ROM_LOAD( "3h.512", 0x50000, 0x10000, CRC(91c27b64) SHA1(4e0e72bfac2eb97f19456a15f1dd14bb9c1f2e00) )
+	ROM_LOAD( "2h.512", 0x60000, 0x10000, CRC(8d11ce0d) SHA1(033ee8c8319a0e930ef10a2545d4d3844fee53ed) )
+	ROM_LOAD( "1h.512", 0x70000, 0x10000, CRC(b42203c4) SHA1(23e07e78d229096a837a496ee7e9826a414b9d6e) )
+
+	ROM_REGION(0x80000, "oki2", 0 ) // identical to the original, just smaller ROMs
+	ROM_LOAD( "13h.512", 0x00000, 0x10000, CRC(024878b1) SHA1(df6073ac12d09e7dede796d9bc4f4e2bd9720ff3) )
+	ROM_LOAD( "14h.512", 0x10000, 0x10000, CRC(3544758d) SHA1(df85c8df1ddaf4433bf33f4b82d9092261da25a3) )
+	ROM_LOAD( "15h.512", 0x20000, 0x10000, CRC(6929577a) SHA1(91c890e4e4aa39e219e8566b903cc1a5a38793d3) )
+	ROM_LOAD( "16h.512", 0x30000, 0x10000, CRC(c909d929) SHA1(45e8ac31a66af26044824159efee5fea87e0176d) )
+	ROM_LOAD( "17h.512", 0x40000, 0x10000, CRC(09e7635b) SHA1(64f8d5a7e5cec8abda4d8adcd595bfbb873d3adc) )
+	ROM_LOAD( "18h.512", 0x50000, 0x10000, CRC(370a2fbd) SHA1(9cdf8a6155a8afb4472f23df9d62f6a4e62fff30) )
+	ROM_LOAD( "19h.512", 0x60000, 0x10000, CRC(64e58cfe) SHA1(0310f5504513a8b0be20cfc337a038fcf7925131) )
+	ROM_LOAD( "20h.512", 0x70000, 0x10000, CRC(5ccd9205) SHA1(6e5443d6af5a896d6dd4b4e06d5c3151826bf8b5) )
+ROM_END
+
 ROM_START( mustang )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "2.bin",    0x00000, 0x20000, CRC(bd9f7c89) SHA1(a0af46a8ff82b90bece2515e1bd74e7a7ddf5379) )
@@ -6005,6 +6171,36 @@ ROM_START( mustangb2 )
 
 	ROM_REGION( 0x040000, "oki", 0 )    // OKIM6295 samples
 	ROM_LOAD( "02.bin",    0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
+ROM_END
+
+// has tharrier derived sound
+ROM_START( mustangb3 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "u2.bin", 0x00000, 0x20000, CRC(1c6c0aaf) SHA1(4c411a814d5edf2ca6630332d3e90c43812e9b95) )
+	ROM_LOAD16_BYTE( "u1.bin", 0x00001, 0x20000, CRC(e954d6da) SHA1(eec51e651eddd6a4b74dc38fc1a17b31c3550379) )
+
+	ROM_REGION(0x10000, "audiocpu", 0 )
+	ROM_LOAD( "u14.bin",  0x00000,  0x10000, CRC(26041abd) SHA1(d7fb475bb44ea5d968e344a38dabb2eb21bb9e4c) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )
+	ROM_LOAD( "mc68705r35", 0x0000, 0x1000, NO_DUMP ) // doesn't seem to be used by the game. Possibly empty or leftover from a conversion?
+
+	// GFX ROMs (3 to 11) aren't dumped yet, using the ones from the original for now
+	ROM_REGION( 0x20000, "fgtile", 0 )
+	ROM_LOAD( "90058-1", 0x00000, 0x20000, BAD_DUMP CRC(81ccfcad) SHA1(70a0f769c0d4588f6f17bd52cc86a745f30e9f00) )
+
+	ROM_REGION( 0x80000, "bgtile", 0 )
+	ROM_LOAD( "90058-4", 0x00000, 0x80000, BAD_DUMP CRC(a07a2002) SHA1(55720d84a251c33c52ae8c33aa41ff8ac9727941) )
+
+	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "90058-8", 0x00000, 0x80000, BAD_DUMP CRC(560bff04) SHA1(b005642adc81d878971ecbdead8ef5e604c90ae2) )
+	ROM_LOAD16_BYTE( "90058-9", 0x00001, 0x80000, BAD_DUMP CRC(b9d72a03) SHA1(43ee9def1b6c491c6832562d66c1af54d81d9b3c) )
+
+	ROM_REGION( 0x20000, "oki1", 0 )
+	ROM_LOAD( "u13.bin", 0x00000, 0x20000, CRC(90961f37) SHA1(e3d905516b1454f05125fed1f2c679423ad5b5f0) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x20000, "oki2", 0 )
+	ROM_LOAD( "u12.bin", 0x00000, 0x20000, CRC(0a28eaca) SHA1(392bd5301904ffb92cf97999e406e238717afa45) )
 ROM_END
 
 ROM_START( acrobatm )
@@ -6290,6 +6486,24 @@ ROM_START( tdragonb )
 
 	ROM_REGION( 0x040000, "oki", 0 )    // OKIM6295 samples
 	ROM_LOAD( "td_01.bin",     0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
+ROM_END
+
+ROM_START( tdragonb2 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "a4", 0x00000, 0x20000, CRC(0cd0581b) SHA1(334f0f04623dbef6ab0d647b2da9c49c56e998a5) )
+	ROM_LOAD16_BYTE( "a3", 0x00001, 0x20000, CRC(f9088e22) SHA1(71c5bcec280e36a72ae3c85a854c24bba55f0863) )
+
+	ROM_REGION( 0x20000, "fgtile", 0 )
+	ROM_LOAD( "1", 0x00000, 0x20000, CRC(fe365920) SHA1(7581931cb95cd5a8ed40e4f5385b533e3d19af22) )
+
+	ROM_REGION( 0x100000, "bgtile", 0 )
+	ROM_LOAD( "a2a205", 0x000000, 0x100000, CRC(d0bde826) SHA1(3b74d5fc88a4a9329e101ee72f393608d327d816) )
+
+	ROM_REGION( 0x100000, "sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "shinea2a2-04", 0x000000, 0x100000, CRC(3eedc2fe) SHA1(9f48986c231a8fbc07f2b39b2017d1e967b2ed3c) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "shinea2a2-01", 0x00000, 0x80000, CRC(4556e717) SHA1(efdec7c989436f97e8f18b157bfd5f9da55b29ba) )
 ROM_END
 
 ROM_START( ssmissin )
@@ -8240,40 +8454,60 @@ Notes:
       * - Unknown PLCC68 IC
       + - Not populated
 
+NOTE:
+The hotbubl set is also known to use double sized EPROMs with the identical halves:
+  Program data on a 27C020 EPROM:
+    ROM @ C1 with a CRC32 of 0x7bb240e9
+    ROM @ C2 with a CRC32 of 0x7917b95d
+  Sprite data on a 27C040 EPROM:
+    ROM @ BR1 with a CRC32 of 0x6fc18de4
+    ROM @ BR3 with a CRC32 of 0xbb677240
+
+All EPROMs had identical AFEGA 8, AFEGA 9 or AFEGA 10 labels, so each was named as found
+and are distinguished by PCB / IC locations.
+
+The hotbubla set also has program data with identical halves. While not confirmed, there
+may be a PCB out there using the smaller 27C010's for the program data. IE:
+    ROM @ C1 with a CRC32 of 0x41c3edbc and 0x20000 bytes in length
+    ROM @ C2 with a CRC32 of 0xf59aea4a and 0x20000 bytes in length
+
+It was not uncommon for manufacturers to use whatever size EPROMs were readily
+available and either double the data or padded the empty space with a fill byte.
+
 ***************************************************************************/
 
 ROM_START( hotbubl ) // Korean release - Nude images of women for backgrounds
 	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
-	ROM_LOAD16_BYTE( "c1.uc1",  0x00001, 0x40000, CRC(7bb240e9) SHA1(99048fa275182c3da3bfb0dedd790f4b5858bd92) )
-	ROM_LOAD16_BYTE( "c2.uc9",  0x00000, 0x40000, CRC(7917b95d) SHA1(0344bae9c373c5943e7693720e5e531bc2e0d7ee) )
+	ROM_LOAD16_BYTE( "afega8.c1.uc1",  0x00001, 0x20000, CRC(d1e72a31) SHA1(abe9113c1dd31fc1a6fc0f479b42e629650ecb1c) )
+	ROM_LOAD16_BYTE( "afega9.c2.uc9",  0x00000, 0x20000, CRC(4537c6d9) SHA1(0b6ea74311389dc592615f0073629d07500cc2c4) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
-	ROM_LOAD( "s1.uc14", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) ) // same as the other games on this driver
+	ROM_LOAD( "afega8.s1.uc14", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) ) // same as the other games on this driver
 
-	ROM_REGION( 0x100000, "sprites", 0 )   // Sprites, 16x16x4
-	ROM_LOAD16_BYTE( "br1.uc3",  0x000000, 0x080000, CRC(6fc18de4) SHA1(57b4823fc41637780f64eadd1ddf61db531a2599) )
-	ROM_LOAD16_BYTE( "br3.uc10", 0x000001, 0x080000, CRC(bb677240) SHA1(d7a26bcd33d491cee441edda6d092a1d08308b0e) )
+	ROM_REGION( 0x80000, "sprites", 0 )   // Sprites, 16x16x4
+	ROM_LOAD16_BYTE( "afega10.br1.uc3",  0x000000, 0x040000, CRC(7e132eff) SHA1(f3ec5750c73017f0a2eb87f6f39ab49e59d39711) )
+	ROM_LOAD16_BYTE( "afega8.br3.uc10",  0x000001, 0x040000, CRC(22707728) SHA1(8a27aa2d1b6f902276c02bd7098526243661cff8) )
 
 	ROM_REGION( 0x300000, "bgtile", 0 )   // Layer 0, 16x16x8
-	ROM_LOAD( "cr6.uc16",  0x100000, 0x080000, CRC(99d6523c) SHA1(0b628585d749e175d5a4dc600af1ba9cb936bfeb) )
-	ROM_LOAD( "cr7.uc19",  0x080000, 0x080000, CRC(a89d9ce4) SHA1(5965b2b4b67bc91bc0e7474e593c7e1953b75adc) )
-	ROM_LOAD( "cr5.uc15",  0x000000, 0x080000, CRC(65bd5159) SHA1(627ccc0ab131e643c3c52ee9bb41c7a85153c35e) )
+	ROM_LOAD( "afega9.cr6.uc16",   0x100000, 0x080000, CRC(99d6523c) SHA1(0b628585d749e175d5a4dc600af1ba9cb936bfeb) )
+	ROM_LOAD( "afega10.cr7.uc19",  0x080000, 0x080000, CRC(a89d9ce4) SHA1(5965b2b4b67bc91bc0e7474e593c7e1953b75adc) )
+	ROM_LOAD( "afega10.cr5.uc15",  0x000000, 0x080000, CRC(65bd5159) SHA1(627ccc0ab131e643c3c52ee9bb41c7a85153c35e) )
 
-	ROM_LOAD( "cr2.uc7",  0x280000, 0x080000, CRC(27ad6fc8) SHA1(00b1a5c5e1a245590b300b9baf71585d41813e3e) )
-	ROM_LOAD( "cr3.uc12", 0x200000, 0x080000, CRC(c841a4f6) SHA1(9b0ee5623c87a0cfc63d3741a65d399bd6593f18) )
-	ROM_LOAD( "cr1.uc6",  0x180000, 0x080000, CRC(fc9101d2) SHA1(1d5b8484264b6d73fe032946096a469226cce901) )
+	ROM_LOAD( "afega9.cr2.uc7",  0x280000, 0x080000, CRC(27ad6fc8) SHA1(00b1a5c5e1a245590b300b9baf71585d41813e3e) )
+	ROM_LOAD( "afega9.cr3.uc12", 0x200000, 0x080000, CRC(c841a4f6) SHA1(9b0ee5623c87a0cfc63d3741a65d399bd6593f18) )
+	ROM_LOAD( "afega8.cr1.uc6",  0x180000, 0x080000, CRC(fc9101d2) SHA1(1d5b8484264b6d73fe032946096a469226cce901) )
 
 	ROM_REGION( 0x10000, "fgtile", 0 )    // Layer 1, 8x8x4
-	ROM_LOAD( "t1.uc2",  0x00000, 0x10000, CRC(ce683a93) SHA1(aeee2671051f1badf2255375cd7c5fa847d1746c) )
+	ROM_LOAD( "afega9.t1.uc2",  0x00000, 0x10000, CRC(ce683a93) SHA1(aeee2671051f1badf2255375cd7c5fa847d1746c) )
 
 	ROM_REGION( 0x40000, "oki1", 0 )    // Samples
-	ROM_LOAD( "s2.uc18", 0x00000, 0x40000, CRC(401c980f) SHA1(e47710c47cfeecce3ccf87f845b219a9c9f21ee3) )
+	ROM_LOAD( "afega8.s2.uc18", 0x00000, 0x40000, CRC(401c980f) SHA1(e47710c47cfeecce3ccf87f845b219a9c9f21ee3) )
 ROM_END
 
 ROM_START( hotbubla ) // Korean release - Nude images replaced with pictures of satellite dishes
 	ROM_REGION( 0x80000, "maincpu", 0 )     // 68000 code
-	ROM_LOAD16_BYTE( "6_c1.uc1",  0x00001, 0x40000, CRC(7c65bf47) SHA1(fe578d3336c5f437bfd1bc81bfe3763b12f3e63f) )
-	ROM_LOAD16_BYTE( "7_c2.uc9",  0x00000, 0x40000, CRC(74eb11c3) SHA1(88aeb02c4088706a56b4c930ffe6fdfbc99031c6) )
+	ROM_LOAD16_BYTE( "6_c1.uc1",  0x00001, 0x40000, CRC(7c65bf47) SHA1(fe578d3336c5f437bfd1bc81bfe3763b12f3e63f) ) // 1st and 2nd half identical
+	ROM_LOAD16_BYTE( "7_c2.uc9",  0x00000, 0x40000, CRC(74eb11c3) SHA1(88aeb02c4088706a56b4c930ffe6fdfbc99031c6) ) // 1st and 2nd half identical
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )        // Z80 code
 	ROM_LOAD( "1_s1.uc14", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) ) // same as the other games on this driver
@@ -8608,7 +8842,6 @@ GAME( 1991, hachamfp,   hachamf,  hachamf,      hachamfp,     nmk16_state, empty
 GAME( 1992, macross,    0,        macross,      macross,      nmk16_state, init_nmk,             ROT270, "Banpresto",                    "Super Spacefortress Macross / Chou-Jikuu Yousai Macross", 0 )
 
 GAME( 1993, gunnail,    0,        gunnail,      gunnail,      nmk16_state, init_nmk,             ROT270, "NMK / Tecmo",                  "GunNail (28th May. 1992)", 0 ) // Tecmo is displayed only when set to Japan
-GAME( 1992, gunnailb,   gunnail,  gunnailb,     gunnail,      nmk16_state, init_gunnailb,        ROT270, "bootleg",                      "GunNail (bootleg)", MACHINE_NO_SOUND ) // different sound hardware not hooked up
 GAME( 1992, gunnailp,   gunnail,  gunnail,      gunnail,      nmk16_state, init_nmk,             ROT270, "NMK",                          "GunNail (location test)", 0 ) // still has the 28th May. 1992 string, so unlikely that was the release date for either version.
 // a 1992 version of Gunnail exists, see https://www.youtube.com/watch?v=tf15Wz0zUiA  3:10; is this bootleg version 'gunnailb'?
 
@@ -8647,10 +8880,20 @@ GAME( 1991, manybloc,   0,        manybloc,     manybloc,     nmk16_state, init_
 GAME( 1997, tomagic,   0,         tomagic,      tomagic,      nmk16_tomagic_state, init_tomagic, ROT0, "Hobbitron T.K.Trading Co. Ltd.", "Tom Tom Magic", 0 )
 
 // these use the Seibu sound system (sound / music stolen from Raiden) rather than the bootleggers copying the nmk004
-GAME( 1990, mustangb,   mustang,  mustangb,     mustang,      nmk16_state, empty_init,           ROT0,   "bootleg",                       "US AAF Mustang (bootleg)", 0 )
+GAME( 1990, mustangb,   mustang,  mustangb,     mustang,      nmk16_state, empty_init,           ROT0,   "bootleg",                       "US AAF Mustang (bootleg, set 1)", 0 )
 GAME( 1990, mustangb2,  mustang,  mustangb,     mustang,      nmk16_state, empty_init,           ROT0,   "bootleg (TAB Austria)",         "US AAF Mustang (TAB Austria bootleg)", 0 ) // PCB and ROMs have TAB Austria stickers
-GAME( 1991, tdragonb,   tdragon,  tdragonb,     tdragonb,     nmk16_state, init_tdragonb,        ROT270, "bootleg",                       "Thunder Dragon (bootleg)", 0 )
+GAME( 1991, tdragonb,   tdragon,  tdragonb,     tdragonb,     nmk16_state, init_tdragonb,        ROT270, "bootleg",                       "Thunder Dragon (bootleg, set 1)", 0 )
 GAME( 1992, strahljbl,  strahl,   strahljbl,    strahljbl,    nmk16_state, empty_init,           ROT0,   "bootleg",                       "Koutetsu Yousai Strahl (Japan, bootleg)", 0 )
+
+// these are bootlegs with tharrier like sound hw
+GAME( 1990, mustangb3,  mustang,  mustangb3,    mustang,      nmk16_state, empty_init,           ROT0,   "bootleg (Lettering)",           "US AAF Mustang (Lettering bootleg)", 0 )
+GAME( 1989, tharrierb,  tharrier, tharrier,     tharrier,     nmk16_state, init_tharrier,        ROT270, "bootleg (Lettering)",           "Task Force Harrier (Lettering bootleg)", 0 )
+
+// bootleg with no audio CPU and only 1 Oki
+GAME( 1991, tdragonb2,  tdragon,  tdragonb2,    tdragon,      nmk16_state, empty_init,           ROT270, "bootleg",                       "Thunder Dragon (bootleg, set 2)", MACHINE_NOT_WORKING ) // GFX and input problems. IRQs related?
+
+// bootleg with cloned airbustr sound hardware
+GAME( 1992, gunnailb,   gunnail,  gunnailb,     gunnail,      nmk16_state, init_gunnailb,        ROT270, "bootleg",                      "GunNail (bootleg)", MACHINE_IMPERFECT_SOUND ) // crappy sound, unknown how much of it is incomplete emulation and how much bootleg quality
 
 // these are from Comad, based on the Thunder Dragon code?
 GAME( 1992, ssmissin,   0,        ssmissin,     ssmissin,     nmk16_state, init_ssmissin,        ROT270, "Comad",                         "S.S. Mission", MACHINE_NO_COCKTAIL )

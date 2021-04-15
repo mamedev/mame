@@ -320,9 +320,9 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
-#include "sound/3526intf.h"
-#include "sound/3812intf.h"
 #include "sound/dac.h"
+#include "sound/ym3526.h"
+#include "sound/ym3812.h"
 #include "speaker.h"
 
 #define LEGION_HACK 0

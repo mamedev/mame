@@ -29,10 +29,10 @@ Year + Game                 By      Board      Hardware
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/3526intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/ym2151.h"
+#include "sound/ym3526.h"
 #include "speaker.h"
 
 

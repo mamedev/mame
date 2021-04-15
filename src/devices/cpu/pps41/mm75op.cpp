@@ -7,8 +7,6 @@
 #include "mm75.h"
 
 
-// opcodes (differences with mm76_device)
-
 // unsupported opcodes
 
 void mm75_device::op_ios()

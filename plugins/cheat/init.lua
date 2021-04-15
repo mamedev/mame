@@ -95,17 +95,13 @@ function cheat.startplugin()
 		local filename = emu.romname()
 		local newcheats = {}
 		local file = emu.file(manager.machine.options.entries.cheatpath:value():gsub("([^;]+)", "%1;%1/cheat") , 1)
-		if emu.softname() ~= "" then
-			if emu.softname():find(":") then
-				filename = emu.softname():gsub(":", "/")
-			else
-				for name, image in pairs(manager.machine.images) do
-					if image.exists and image.software_list_name ~= "" then
-						filename = image.software_list_name .. "/" .. emu.softname()
-					end
-				end
+
+		for name, image in pairs(manager.machine.images) do
+			if image.exists and image.software_list_name ~= "" then
+				filename = image.software_list_name .. "/" .. image.filename
 			end
 		end
+
 		cheatname = filename
 		local function add(addcheats)
 			if not next(newcheats) then
@@ -423,7 +419,7 @@ function cheat.startplugin()
 	local function set_index(cheat, index)
 		local param = cheat.parameter
 		local oldindex = param.index
-		if (param.index < 0) or (param.index >= param.last) or (param.index == index) then
+		if (index < 0) or (index > param.last) or (param.index == index) then
 			return param.index, false
 		end
 		param.index = index
@@ -528,7 +524,8 @@ function cheat.startplugin()
 				local scr = manager.machine.screens[screen]
 				if not scr then
 					local tag
-					tag, scr = next(manager.machine.screens) -- get any screen
+					local nxt, coll = manager.machine.screens:pairs()
+					tag, scr = nxt(coll) -- get any screen
 				end
 				cheat.cheat_env[name] = scr
 			end

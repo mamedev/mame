@@ -69,8 +69,7 @@ license:CC0
 	<view name="Internal Layout">
 		<bounds left="-8.99" right="392.99" top="-104" bottom="186" />
 
-	<!-- bezel -->
-
+		<!-- bezel -->
 		<element ref="static_green"><bounds left="-9" right="393" top="-110" bottom="-60" /></element>
 		<element ref="static_green"><bounds left="-9" right="393" top="111" bottom="200" /></element>
 
@@ -144,8 +143,7 @@ license:CC0
 		<element ref="static_black"><bounds x="-29" y="-200" width="20" height="500" /></element>
 		<element ref="static_black"><bounds x="393" y="-200" width="20" height="500" /></element>
 
-	<!-- leds -->
-
+		<!-- leds -->
 		<element name="digit8" ref="digit"><bounds x="3" y="-15.5" width="24" height="32" /></element>
 		<element name="8.8" ref="seg"><bounds x="7" y="42.5" width="15" height="3" /></element>
 		<element name="8.9" ref="seg"><bounds x="7" y="71.5" width="15" height="3" /></element>

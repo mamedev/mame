@@ -666,6 +666,8 @@ if CPUS["H8"] then
 		MAME_DIR .. "src/devices/cpu/h8/h83006.h",
 		MAME_DIR .. "src/devices/cpu/h8/h83008.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h83008.h",
+		MAME_DIR .. "src/devices/cpu/h8/h83032.cpp",
+		MAME_DIR .. "src/devices/cpu/h8/h83032.h",
 		MAME_DIR .. "src/devices/cpu/h8/h83048.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h83048.h",
 		MAME_DIR .. "src/devices/cpu/h8/h8s2245.cpp",
@@ -2881,6 +2883,7 @@ end
 --@src/devices/cpu/pps41/mm75.h,CPUS["PPS41"] = true
 --@src/devices/cpu/pps41/mm76.h,CPUS["PPS41"] = true
 --@src/devices/cpu/pps41/mm78.h,CPUS["PPS41"] = true
+--@src/devices/cpu/pps41/mm78la.h,CPUS["PPS41"] = true
 --------------------------------------------------
 
 if CPUS["PPS41"] then
@@ -2896,6 +2899,9 @@ if CPUS["PPS41"] then
 		MAME_DIR .. "src/devices/cpu/pps41/mm78.cpp",
 		MAME_DIR .. "src/devices/cpu/pps41/mm78.h",
 		MAME_DIR .. "src/devices/cpu/pps41/mm78op.cpp",
+		MAME_DIR .. "src/devices/cpu/pps41/mm78la.cpp",
+		MAME_DIR .. "src/devices/cpu/pps41/mm78la.h",
+		MAME_DIR .. "src/devices/cpu/pps41/mm78laop.cpp",
 	}
 end
 

@@ -106,6 +106,8 @@ void menu_tape_control::populate(float &customtop, float &custombottom)
 			// fast forward
 			item_append(_("Fast Forward"), 0, TAPECMD_FAST_FORWARD);
 		}
+
+		item_append(menu_item_type::SEPARATOR);
 	}
 }
 

@@ -30,8 +30,8 @@ TODO
 #include "includes/galivan.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/3526intf.h"
 #include "sound/dac.h"
+#include "sound/ym3526.h"
 #include "speaker.h"
 
 
@@ -868,10 +868,10 @@ ROM_START( ninjemak )
 	ROM_LOAD( "ninjemak.pr1", 0x0000, 0x0100, CRC(8a62d4e4) SHA1(99ca4da01ea1b5585f6e3ebf162c3f988ab317e5) )    /* red */
 	ROM_LOAD( "ninjemak.pr2", 0x0100, 0x0100, CRC(2ccf976f) SHA1(b804ee761793697087fbe3372352f301a22feeab) )    /* green */
 	ROM_LOAD( "ninjemak.pr3", 0x0200, 0x0100, CRC(16b2a7a4) SHA1(53c410b439c8a835447f15f2ab250b363b3f7888) )    /* blue */
-	ROM_LOAD( "yncp-2d.bin",  0x0300, 0x0100, BAD_DUMP CRC(23bade78) SHA1(7e2de5eb08d888f97830807b6dbe85d09bb3b7f8)  )  /* sprite lookup table */
+	ROM_LOAD( "yncp-2d.bin",  0x0300, 0x0100, CRC(23bade78) SHA1(7e2de5eb08d888f97830807b6dbe85d09bb3b7f8) )    /* sprite lookup table */
 
 	ROM_REGION( 0x0100, "user1", 0 )
-	ROM_LOAD( "yncp-7f.bin",  0x0000, 0x0100, BAD_DUMP CRC(262d0809) SHA1(a67281af02cef082023c0d7d57e3824aeef67450)  )  /* sprite palette bank */
+	ROM_LOAD( "yncp-7f.bin",  0x0000, 0x0100, CRC(262d0809) SHA1(a67281af02cef082023c0d7d57e3824aeef67450) )    /* sprite palette bank */
 ROM_END
 
 ROM_START( youma )

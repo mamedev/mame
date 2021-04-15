@@ -37,6 +37,10 @@
         { "name": "cornersize",     "type": "vec4", "values": [ 0.01,0.0, 0.0, 0.0 ] },
         { "name": "cornersmooth",   "type": "vec4", "values": [ 1000.0,0.0,0.0,0.0 ] },
         { "name": "aperture_strength",   "type": "vec4", "values": [ 0.25,0.0,0.0,0.0 ] },
-        { "name": "aperture_brightboost","type": "vec4", "values": [ 0.25,0.0,0.0,0.0 ] }
+        { "name": "aperture_brightboost","type": "vec4", "values": [ 0.25,0.0,0.0,0.0 ] },
+        { "name": "spot_size",  "type": "vec4", "values": [ 0.3,0.0,0.0,0.0 ] },
+        { "name": "spot_growth","type": "vec4", "values": [ 0.1,0.0,0.0,0.0 ] },
+        { "name": "spot_growth_power", "type": "vec4", "values": [ 3.0,0.0,0.0,0.0 ] },
+        { "name": "u_interp",   "type": "vec4", "values": [ 2.0,0.0,0.0,0.0 ] }
     ]
 }

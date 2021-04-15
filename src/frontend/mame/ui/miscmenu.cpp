@@ -147,6 +147,8 @@ void menu_network_devices::populate(float &customtop, float &custombottom)
 
 		item_append(network.device().tag(),  (title) ? title : "------", FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)&network);
 	}
+
+	item_append(menu_item_type::SEPARATOR);
 }
 
 /*-------------------------------------------------
@@ -506,6 +508,8 @@ void menu_crosshair::populate(float &customtop, float &custombottom)
 			break;
 		}
 	}
+
+	item_append(menu_item_type::SEPARATOR);
 }
 
 menu_crosshair::~menu_crosshair()
@@ -744,15 +748,15 @@ void menu_machine_configure::handle()
 				break;
 			case CONTROLLER:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<submenu>(ui(), container(), submenu::control_options, &m_drv, &m_opts);
+					menu::stack_push<submenu>(ui(), container(), submenu::control_options(), &m_drv, &m_opts);
 				break;
 			case VIDEO:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<submenu>(ui(), container(), submenu::video_options, &m_drv, &m_opts);
+					menu::stack_push<submenu>(ui(), container(), submenu::video_options(), &m_drv, &m_opts);
 				break;
 			case ADVANCED:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<submenu>(ui(), container(), submenu::advanced_options, &m_drv, &m_opts);
+					menu::stack_push<submenu>(ui(), container(), submenu::advanced_options(), &m_drv, &m_opts);
 				break;
 			default:
 				break;
@@ -784,9 +788,9 @@ void menu_machine_configure::populate(float &customtop, float &custombottom)
 		item_append(_("This machine has no BIOS."), FLAG_DISABLE, nullptr);
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_(submenu::advanced_options[0].description), 0, (void *)(uintptr_t)ADVANCED);
-	item_append(_(submenu::video_options[0].description), 0, (void *)(uintptr_t)VIDEO);
-	item_append(_(submenu::control_options[0].description), 0, (void *)(uintptr_t)CONTROLLER);
+	item_append(_(submenu::advanced_options()[0].description), 0, (void *)(uintptr_t)ADVANCED);
+	item_append(_(submenu::video_options()[0].description), 0, (void *)(uintptr_t)VIDEO);
+	item_append(_(submenu::control_options()[0].description), 0, (void *)(uintptr_t)CONTROLLER);
 	item_append(menu_item_type::SEPARATOR);
 
 	if (!m_want_favorite)
@@ -795,8 +799,8 @@ void menu_machine_configure::populate(float &customtop, float &custombottom)
 		item_append(_("Remove From Favorites"), 0, (void *)DELFAV);
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Save machine configuration"), 0, (void *)(uintptr_t)SAVE);
-	item_append(menu_item_type::SEPARATOR);
+	item_append(_("Save Machine Configuration"), 0, (void *)(uintptr_t)SAVE);
+
 	customtop = 2.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
@@ -806,7 +810,7 @@ void menu_machine_configure::populate(float &customtop, float &custombottom)
 
 void menu_machine_configure::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	char const *const text[] = { _("Configure machine:"), m_drv.type.fullname() };
+	char const *const text[] = { _("Configure Machine:"), m_drv.type.fullname() };
 	draw_text_box(
 			std::begin(text), std::end(text),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),

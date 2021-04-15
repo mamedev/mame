@@ -29,8 +29,8 @@ TODO:
 #include "includes/nbmj8900.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/3812intf.h"
 #include "sound/dac.h"
+#include "sound/ym3812.h"
 #include "speaker.h"
 
 

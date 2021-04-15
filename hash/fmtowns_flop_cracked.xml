@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="fmtowns_flop_cracked" description="Fujitsu FM Towns cracked floppy disk images">
+
+	<!-- Cracked by cyo.the.vile -->
+	<software name="cameltry">
+		<description>Cameltry (cracked)</description>
+		<year>1994</year>
+		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<info name="alt_title" value="キャメルトライ" />
+		<info name="release" value="199411xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="cameltry_fixed.bin" size="1261568" crc="8d98efc1" sha1="1537ea0addb4398b846a7582b54895533a984dd1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Cracked by cyo.the.vile -->
+	<software name="columns">
+		<description>Columns (cracked)</description>
+		<year>1990</year>
+		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<info name="alt_title" value="コラムス" />
+		<info name="release" value="199012xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="columns.hdm" size="1261568" crc="312d2c79" sha1="1c60aaa0028eb6570ecd2303e63e86598362226e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinosaur">
+		<description>Dinosaur (cracked)</description>
+		<year>1991</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<info name="alt_title" value="ダイナソア" />
+		<info name="release" value="199110xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Program Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dinosaur_program_disk.hdm" size="1261568" crc="2f652873" sha1="190dc1a07c1b4ac1ccc96295e8b178c15eaf89b1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Scenario Disk 1" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dinosaur_scenario_disk_1_cracked.hdm" size="1261568" crc="e230629d" sha1="a2d0f382a49bb8b9c71d0cd23c7ec9f7b13f823b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Scenario Disk 2" />
+			<dataarea name="flop" size="1261568">
+				<rom name="dinosaur_scenario_disk_2_cracked.hdm" size="1261568" crc="6a449cdc" sha1="792c40cd43ab723b4832995e55ef1367a6e462ae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supdaisn">
+		<description>Super Daisenryaku (cracked)</description>
+		<year>1990</year>
+		<publisher>システムソフト (SystemSoft)</publisher>
+		<info name="alt_title" value="スーパー大戦略" />
+		<info name="release" value="199003xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1261568">
+				<rom name="superdaisen_1.xdf" size="1261568" crc="49aa5147" sha1="39be212fbef4ef4a93642f6e47dd6d1bae3cb937"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1261568">
+				<rom name="superdaisen_2.xdf" size="1261568" crc="c7f7f2d3" sha1="394ac85565728e69c30c3cf974d4a3031267f86d"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
+

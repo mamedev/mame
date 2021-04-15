@@ -751,6 +751,7 @@ mcr3.cpp
 mcr68.cpp
 meadows.cpp
 meadwttl.cpp
+mechatt.cpp
 mediagx.cpp
 megadriv_acbl.cpp
 megaphx.cpp
@@ -1413,6 +1414,7 @@ vigilant.cpp
 vindictr.cpp
 viper.cpp
 vlc.cpp
+vlc34010.cpp
 volfied.cpp
 voyager.cpp
 vp101.cpp

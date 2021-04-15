@@ -418,14 +418,11 @@ void konendev_state::konendev(machine_config &config)
 	PALETTE(config, "palette", palette_device::RGB_555);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // Not accurate
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 639, 0, 479);
+	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480); // Based on Firebeat settings
 	screen.set_screen_update(FUNC(konendev_state::screen_update));
 	screen.set_palette("palette");
 
-	K057714(config, m_gcu, 0);
+	K057714(config, m_gcu, 0).set_screen("screen");
 	m_gcu->irq_callback().set(FUNC(konendev_state::gcu_interrupt));
 
 	RTC62423(config, m_rtc, XTAL(32'768));

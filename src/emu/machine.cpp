@@ -355,6 +355,8 @@ int running_machine::run(bool quiet)
 		if (!quiet)
 			sound().start_recording();
 
+		m_hard_reset_pending = false;
+
 		// initialize ui lists
 		// display the startup screens
 		manager().ui_initialize(*this);
@@ -367,8 +369,6 @@ int running_machine::run(bool quiet)
 			handle_saveload();
 
 		export_http_api();
-
-		m_hard_reset_pending = false;
 
 #if defined(__EMSCRIPTEN__)
 		// break out to our async javascript loop and halt
@@ -534,21 +534,10 @@ std::string running_machine::get_statename(const char *option) const
 			int name_found = 0;
 
 			// find length of the device name
-			int end1 = statename_str.find('/', pos + 3);
-			int end2 = statename_str.find('%', pos + 3);
-			int end;
-
-			if ((end1 != -1) && (end2 != -1))
-				end = std::min(end1, end2);
-			else if (end1 != -1)
-				end = end1;
-			else if (end2 != -1)
-				end = end2;
-			else
+			int end = statename_str.find_first_not_of("abcdefghijklmnopqrstuvwxyz1234567890", pos + 3);
+			if (end == -1)
 				end = statename_str.length();
 
-			if (end - pos < 3)
-				fatalerror("Something very wrong is going on!!!\n");
 
 			// copy the device name to an std::string
 			std::string devname_str;

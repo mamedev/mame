@@ -21,42 +21,31 @@
 #include "machine/macadb.h"
 #include "bus/nubus/nubus.h"
 #include "bus/macpds/macpds.h"
-#include "machine/applefdc.h"
 #include "machine/applefdintf.h"
-#include "machine/ncr539x.h"
 #include "machine/ncr5380.h"
 #include "machine/macrtc.h"
 #include "sound/asc.h"
-#include "sound/awacs.h"
 #include "sound/dac.h"
 #include "cpu/m68000/m68000.h"
 #include "emupal.h"
 #include "screen.h"
 
-#define NEW_SWIM 0
-
 #define MAC_SCREEN_NAME "screen"
-#define MAC_539X_1_TAG "539x_1"
-#define MAC_539X_2_TAG "539x_2"
 
 // model helpers
-#define ADB_IS_BITBANG_CLASS    ((m_model == MODEL_MAC_SE || m_model == MODEL_MAC_CLASSIC) || (m_model >= MODEL_MAC_II && m_model <= MODEL_MAC_IICI) || (m_model == MODEL_MAC_SE30) || (m_model == MODEL_MAC_QUADRA_700))
+#define ADB_IS_BITBANG_CLASS    ((m_model >= MODEL_MAC_II && m_model <= MODEL_MAC_IICI) || (m_model == MODEL_MAC_SE30))
 #define ADB_IS_EGRET    (m_model >= MODEL_MAC_LC && m_model <= MODEL_MAC_CLASSIC_II) || ((m_model >= MODEL_MAC_IISI) && (m_model <= MODEL_MAC_IIVI))
-#define ADB_IS_CUDA     ((m_model >= MODEL_MAC_COLOR_CLASSIC && m_model <= MODEL_MAC_LC_580) || ((m_model >= MODEL_MAC_QUADRA_660AV) && (m_model <= MODEL_MAC_QUADRA_630)) || (m_model >= MODEL_MAC_POWERMAC_6100))
+#define ADB_IS_CUDA     ((m_model >= MODEL_MAC_COLOR_CLASSIC && m_model <= MODEL_MAC_LC_580) || ((m_model >= MODEL_MAC_QUADRA_660AV) && (m_model <= MODEL_MAC_QUADRA_630)))
 
 // video parameters for classic Macs
 #define MAC_H_VIS   (512)
 #define MAC_V_VIS   (342)
-#define MAC_H_TOTAL (704)       // (512+192)
-#define MAC_V_TOTAL (370)       // (342+28)
+#define MAC_H_TOTAL (704)  // (512+192)
+#define MAC_V_TOTAL (370) // (342+28)
 
-/*----------- defined in machine/mac.c -----------*/
+// Mac driver data
 
-void mac_fdc_set_enable_lines(device_t *device, int enable_mask);
-
-/* Mac driver data */
-
-class mac_state : public driver_device
+class mac_state:public driver_device
 {
 public:
 	mac_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -65,14 +54,11 @@ public:
 		m_via1(*this, "via6522_0"),
 		m_via2(*this, "via6522_1"),
 		m_asc(*this, "asc"),
-		m_awacs(*this, "awacs"),
 		m_egret(*this, EGRET_TAG),
 		m_cuda(*this, CUDA_TAG),
 		m_macadb(*this, "macadb"),
 		m_ram(*this, RAM_TAG),
 		m_scc(*this, "scc"),
-		m_539x_1(*this, MAC_539X_1_TAG),
-		m_539x_2(*this, MAC_539X_2_TAG),
 		m_ncr5380(*this, "ncr5380"),
 		m_fdc(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
@@ -109,7 +95,6 @@ public:
 	void maciici(machine_config &config);
 	void maciix(machine_config &config, bool nubus_bank1 = true, bool nubus_bank2 = true);
 	void maclc520(machine_config &config);
-	void pwrmac(machine_config &config);
 	void maciivx(machine_config &config);
 	void maccclas(machine_config &config);
 	void maciivi(machine_config &config);
@@ -128,12 +113,9 @@ public:
 	void init_maciivx();
 	void init_maciivi();
 	void init_macii();
-	void init_macclassic();
 	void init_macclassic2();
 	void init_maciifx();
 	void init_maclc();
-	void init_macse();
-	void init_macpm6100();
 	void init_maclc520();
 	void init_maciici();
 	void init_maciix();
@@ -142,21 +124,10 @@ public:
 	void init_maciicx();
 	void init_maclc3();
 	void init_maclc3plus();
-	void init_macpm7100();
-	void init_macpm8100();
 
 	/* tells which model is being emulated (set by macxxx_init) */
 	enum model_t
 	{
-		MODEL_MAC_128K512K, // 68000 machines
-		MODEL_MAC_512KE,
-		MODEL_MAC_PLUS,
-		MODEL_MAC_SE,
-		MODEL_MAC_CLASSIC,
-
-		MODEL_MAC_PORTABLE, // Portable/PB100 are sort of hybrid classic and Mac IIs
-		MODEL_MAC_PB100,
-
 		MODEL_MAC_II,       // Mac II class 68020/030 machines
 		MODEL_MAC_II_FDHD,
 		MODEL_MAC_IIX,
@@ -211,10 +182,6 @@ public:
 		MODEL_MAC_PB540c,
 		MODEL_MAC_PB190,
 		MODEL_MAC_PB190cs,
-
-		MODEL_MAC_POWERMAC_6100,    // NuBus PowerMacs
-		MODEL_MAC_POWERMAC_7100,
-		MODEL_MAC_POWERMAC_8100
 	};
 
 	model_t m_model;
@@ -224,22 +191,14 @@ private:
 	required_device<via6522_device> m_via1;
 	optional_device<via6522_device> m_via2;
 	optional_device<asc_device> m_asc;
-	optional_device<awacs_device> m_awacs;
 	optional_device<egret_device> m_egret;
 	optional_device<cuda_device> m_cuda;
 	optional_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
 	required_device<scc8530_legacy_device> m_scc;
-	optional_device<ncr539x_device> m_539x_1;
-	optional_device<ncr539x_device> m_539x_2;
 	optional_device<ncr5380_device> m_ncr5380;
-#if NEW_SWIM
 	required_device<applefdintf_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
-#else
-	required_device<applefdc_base_device> m_fdc;
-	optional_device_array<floppy_connector, 2> m_floppy;
-#endif
 	optional_device<rtc3430042_device> m_rtc;
 
 	//required_ioport m_mouse0, m_mouse1, m_mouse2;
@@ -350,21 +309,12 @@ private:
 	uint8_t scciop_r(offs_t offset);
 	void scciop_w(offs_t offset, uint8_t data);
 
-	uint8_t hmc_r();
-	void hmc_w(offs_t offset, uint8_t data);
-	uint8_t amic_dma_r();
-	void amic_dma_w(offs_t offset, uint8_t data);
-	uint8_t pmac_diag_r(offs_t offset);
-
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_9_w);
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_a_w);
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_b_w);
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_c_w);
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_d_w);
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_e_w);
-
-	DECLARE_WRITE_LINE_MEMBER(irq_539x_1_w);
-	DECLARE_WRITE_LINE_MEMBER(drq_539x_1_w);
 
 	DECLARE_WRITE_LINE_MEMBER(cuda_reset_w);
 
@@ -379,15 +329,7 @@ private:
 	void macse30_map(address_map &map);
 	void pwrmac_map(address_map &map);
 
-	inline bool has_adb() { return m_model >= MODEL_MAC_SE; }
-
 	uint8_t m_oss_regs[0x400];
-
-	// AMIC for x100 PowerMacs
-	uint8_t m_amic_regs[0x200];
-
-	// HMC for x100 PowerMacs
-	uint64_t m_hmc_reg, m_hmc_shiftout;
 
 	int m_via2_ca1_hack;
 	optional_device<screen_device> m_screen;
@@ -406,8 +348,6 @@ private:
 	void sel35_w(int sel35);
 	void devsel_w(uint8_t devsel);
 	void hdsel_w(int hdsel);
-	void devsel_s3_w(uint8_t devsel);
-	void hdsel_s3_w(int hdsel);
 
 	DECLARE_VIDEO_START(mac);
 	DECLARE_VIDEO_START(macsonora);
@@ -416,14 +356,12 @@ private:
 	DECLARE_VIDEO_RESET(macsonora);
 	DECLARE_VIDEO_RESET(maceagle);
 	DECLARE_VIDEO_START(macrbv);
-	uint32_t screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macse30(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macrbv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_pwrmac(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macrbvvram(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macv8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macsonora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_macpbwd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	DECLARE_WRITE_LINE_MEMBER(mac_rbv_vbl);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 	TIMER_CALLBACK_MEMBER(mac_adbrefresh_tick);

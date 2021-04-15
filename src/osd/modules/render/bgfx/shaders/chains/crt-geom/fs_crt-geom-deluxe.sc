@@ -47,6 +47,12 @@ uniform vec4 u_tex_size0;
 uniform vec4 u_tex_size1;
 uniform vec4 u_quad_dims;
 
+uniform vec4 spot_size;
+uniform vec4 spot_growth;
+uniform vec4 spot_growth_power;
+
+uniform vec4 u_interp;
+
 uniform vec4 aperture_strength;
 uniform vec4 aperture_brightboost;
 
@@ -140,14 +146,65 @@ vec4 scanlineWeights(float distance, vec4 color)
   // "weights" should have a higher peak at the center of the
   // scanline than for a wider beam.
 #ifdef USEGAUSSIAN
-  vec4 wid = 0.3 + 0.1 * pow(color, vec4_splat(3.0));
+  vec4 wid = spot_size.x + spot_growth.x * pow(color, vec4_splat(spot_growth_power.x));
   vec4 weights = vec4(distance / wid);
-  return 0.4 * exp(-weights * weights) / wid;
+  float maxwid = spot_size.x + spot_growth.x;
+  float norm = maxwid / ( 1.0 + 2.0 * exp(-1.0/(maxwid*maxwid)) );
+  return norm * exp(-weights * weights) / wid;
 #else
   vec4 wid = 2.0 + 2.0 * pow(color, vec4_splat(4.0));
-  vec4 weights = vec4_splat(distance / 0.3);
+  vec4 weights = vec4_splat(abs(distance) / 0.3);
   return 1.4 * exp(-pow(weights * inversesqrt(0.5 * wid), wid)) / (0.6 + 0.2 * wid);
 #endif
+}
+
+vec4 cubic(vec4 x, float B, float C)
+{
+  // https://en.wikipedia.org/wiki/Mitchell%E2%80%93Netravali_filters
+  vec2 a = x.yz; // components in [0,1]
+  vec2 b = x.xw; // components in [1,2]
+  vec2 a2 = a*a;
+  vec2 b2 = b*b;
+  a = (2.0-1.5*B-1.0*C)*a*a2 + (-3.0+2.0*B+C)*a2 + (1.0-(1.0/3.0)*B);
+  b = ((-1.0/6.0)*B-C)*b*b2 + (B+5.0*C)*b2 + (-2.0*B-8.0*C)*b + ((4.0/3.0)*B+4.0*C);
+  return vec4(b.x,a.x,a.y,b.y);
+}
+
+vec4 x_coeffs(vec4 x, float pos_x)
+{
+  if (u_interp.x < 0.5) { // box
+    float wid = length(vec2(dFdx(pos_x),dFdy(pos_x)));
+    float dx = clamp((0.5 + 0.5*wid - x.y)/wid, 0.0, 1.0);
+    return vec4(0.0,dx,1.0-dx,0.0);
+  } else if (u_interp.x < 1.5) { // linear
+    return vec4(0.0, 1.0-x.y, 1.0-x.z, 0.0);
+  } else if (u_interp.x < 2.5) { // Lanczos
+    // Prevent division by zero.
+    vec4 coeffs = FIX(PI * x);
+    // Lanczos2 kernel.
+    coeffs = 2.0 * sin(coeffs) * sin(coeffs / 2.0) / (coeffs * coeffs);
+    // Normalize.
+    coeffs /= dot(coeffs, vec4_splat(1.0));
+    return coeffs;
+  } else if (u_interp.x < 3.5) { // Catmull-Rom
+    return cubic(x,0.0,0.5);
+  } else if (u_interp.x < 4.5) { // Mitchell-Netravali
+    return cubic(x,1.0/3.0,1.0/3.0);
+  } else /*if (u_interp.x < 5.5)*/ { // B-spline
+    return cubic(x,1.0,0.0);
+  }
+}
+
+vec4 sample_scanline(vec2 xy, vec4 coeffs, float onex)
+{
+  // Calculate the effective colour of the given
+  // scanline at the horizontal location of the current pixel,
+  // using the Lanczos coefficients.
+  vec4 col = clamp(TEX2D(xy + vec2(-onex, 0.0))*coeffs.x +
+                   TEX2D(xy)*coeffs.y +
+                   TEX2D(xy +vec2(onex, 0.0))*coeffs.z +
+                   TEX2D(xy + vec2(2.0 * onex, 0.0))*coeffs.w , 0.0, 1.0);
+  return col;
 }
 
 void main()
@@ -155,6 +212,10 @@ void main()
   // Here's a helpful diagram to keep in mind while trying to
   // understand the code:
   //
+  //  |      |      |      |      |
+  // -------------------------------
+  //  |      |      |      |      |
+  //  |  00  |  10  |  20  |  30  | <-- previous scanline
   //  |      |      |      |      |
   // -------------------------------
   //  |      |      |      |      |
@@ -169,9 +230,10 @@ void main()
   //
   // Each character-cell represents a pixel on the output
   // surface, "@" represents the current pixel (always somewhere
-  // in the bottom half of the current scan-line, or the top-half
-  // of the next scanline). The grid of lines represents the
+  // in the current scan-line). The grid of lines represents the
   // edges of the texels of the underlying texture.
+  // The "deluxe" shader includes contributions from the
+  // previous, current, and next scanlines.
 
   // Texture coordinates of the texel containing the active pixel.
   vec2 xy;
@@ -189,62 +251,47 @@ void main()
 
   // Of all the pixels that are mapped onto the texel we are
   // currently rendering, which pixel are we currently rendering?
-  vec2 ratio_scale = xy * u_tex_size0.xy - vec2_splat(0.5);
+  vec2 ratio_scale = xy * u_tex_size0.xy - vec2(0.5,0.0);
 
 #ifdef OVERSAMPLE
   float filter = fwidth(ratio_scale.y);
 #endif
-  vec2 uv_ratio = fract(ratio_scale);
+  vec2 uv_ratio = fract(ratio_scale) - vec2(0.0,0.5);
 
   // Snap to the center of the underlying texel.
   xy = (floor(ratio_scale) + vec2_splat(0.5)) / u_tex_size0.xy;
 
-  // Calculate Lanczos scaling coefficients describing the effect
+  // Calculate scaling coefficients describing the effect
   // of various neighbour texels in a scanline on the current
   // pixel.
-  vec4 coeffs = PI * vec4(1.0 + uv_ratio.x, uv_ratio.x, 1.0 - uv_ratio.x, 2.0 - uv_ratio.x);
+  vec4 coeffs = x_coeffs(vec4(1.0 + uv_ratio.x, uv_ratio.x, 1.0 - uv_ratio.x, 2.0 - uv_ratio.x), ratio_scale.x);
 
-  // Prevent division by zero.
-  coeffs = FIX(coeffs);
-
-  // Lanczos2 kernel.
-  coeffs = 2.0 * sin(coeffs) * sin(coeffs / 2.0) / (coeffs * coeffs);
-
-  // Normalize.
-  coeffs /= dot(coeffs, vec4_splat(1.0));
-
-  // Calculate the effective colour of the current and next
-  // scanlines at the horizontal location of the current pixel,
-  // using the Lanczos coefficients above.
-  vec4 col = clamp(TEX2D(xy + vec2(-v_one.x, 0.0))*coeffs.x +
-                   TEX2D(xy)*coeffs.y +
-                   TEX2D(xy +vec2(v_one.x, 0.0))*coeffs.z +
-                   TEX2D(xy + vec2(2.0 * v_one.x, 0.0))*coeffs.w , 0.0, 1.0);
-
-  vec4 col2 = clamp(TEX2D(xy + vec2(-v_one.x, v_one.y))*coeffs.x +
-                    TEX2D(xy + vec2(0.0, v_one.y))*coeffs.y +
-                    TEX2D(xy + v_one)*coeffs.z +
-                    TEX2D(xy + vec2(2.0 * v_one.x, v_one.y))*coeffs.w , 0.0, 1.0);
-
+  vec4 col = sample_scanline(xy, coeffs, v_one.x);
+  vec4 col_prev = sample_scanline(xy + vec2(0.0,-v_one.y), coeffs, v_one.x);
+  vec4 col_next = sample_scanline(xy + vec2(0.0, v_one.y), coeffs, v_one.x);
 
 #ifndef LINEAR_PROCESSING
   col  = pow(col , vec4_splat(CRTgamma.x));
-  col2 = pow(col2, vec4_splat(CRTgamma.x));
+  col_prev = pow(col_prev, vec4_splat(CRTgamma.x));
+  col_next = pow(col_next, vec4_splat(CRTgamma.x));
 #endif
 
   // Calculate the influence of the current and next scanlines on
   // the current pixel.
   vec4 weights  = scanlineWeights(uv_ratio.y, col);
-  vec4 weights2 = scanlineWeights(1.0 - uv_ratio.y, col2);
+  vec4 weights_prev = scanlineWeights(uv_ratio.y + 1.0, col_prev);
+  vec4 weights_next = scanlineWeights(uv_ratio.y - 1.0, col_next);
 #ifdef OVERSAMPLE
   uv_ratio.y =uv_ratio.y+1.0/3.0*filter;
   weights = (weights+scanlineWeights(uv_ratio.y, col))/3.0;
-  weights2=(weights2+scanlineWeights(abs(1.0-uv_ratio.y), col2))/3.0;
+  weights_prev=(weights_prev+scanlineWeights(uv_ratio.y+1.0, col_prev))/3.0;
+  weights_next=(weights_next+scanlineWeights(uv_ratio.y-1.0, col_next))/3.0;
   uv_ratio.y =uv_ratio.y-2.0/3.0*filter;
-  weights=weights+scanlineWeights(abs(uv_ratio.y), col)/3.0;
-  weights2=weights2+scanlineWeights(abs(1.0-uv_ratio.y), col2)/3.0;
+  weights=weights+scanlineWeights(uv_ratio.y, col)/3.0;
+  weights_prev=weights_prev+scanlineWeights(uv_ratio.y+1.0, col_prev)/3.0;
+  weights_next=weights_next+scanlineWeights(uv_ratio.y-1.0, col_next)/3.0;
 #endif
-  vec3 mul_res  = (col * weights + col2 * weights2).rgb;
+  vec3 mul_res  = (col * weights + col_prev * weights_prev + col_next * weights_next).rgb;
 
   // halation and corners
   vec3 blur = texblur(xy0);

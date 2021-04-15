@@ -16,11 +16,14 @@ DECLARE_DEVICE_TYPE(YM2151, ym2151_device);
 class ym2151_device : public device_t, public device_sound_interface
 {
 public:
+	// YM2151 is OPM
+	using fm_engine = ymopm_engine;
+
 	// constructor
 	ym2151_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type = YM2151);
 
 	// configuration helpers
-	auto irq_handler() { return m_opm.irq_handler(); }
+	auto irq_handler() { return m_fm.irq_handler(); }
 	auto port_write_handler() { return m_port_w.bind(); }
 
 	// read/write access
@@ -43,7 +46,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// internal state
-	ymopm_engine m_opm;              // core OPM engine
+	fm_engine m_fm;                  // core FM engine
 	sound_stream *m_stream;          // sound stream
 	devcb_write8 m_port_w;           // port write handler
 	attotime m_busy_duration;        // precomputed busy signal duration

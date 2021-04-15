@@ -42,9 +42,6 @@ public:
 protected:
 	virtual void device_start() override;
 
-	virtual u32 execute_input_lines() const noexcept override { return 2; }
-	virtual void execute_set_input(int line, int state) override { if (line < 2) mm76_device::execute_set_input(line, state); }
-
 	// opcode handlers
 	virtual void op_ios() override;
 	virtual void op_i2c() override;

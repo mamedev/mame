@@ -6,8 +6,8 @@
 #include "cpu/i86/i286.h"
 #include "machine/8042kbdc.h"
 #include "machine/at.h"
-#include "sound/262intf.h"
 #include "sound/dac.h"
+#include "sound/ymf262.h"
 #include "video/pc_vga.h"
 #include "speaker.h"
 
@@ -551,7 +551,7 @@ void vis_vga_device::vga_w(offs_t offset, uint8_t data)
 				case 0x01:
 					if(vga.crtc.protect_enable)
 						return;
-					vga.crtc.horz_disp_end = data / (m_interlace && !(vga.sequencer.data[0x25] & 0x20) ? 2 : 1);
+					vga.crtc.horz_disp_end = (data / (m_interlace && !(vga.sequencer.data[0x25] & 0x20) ? 2 : 1)) | 1;
 					recompute_params();
 					return;
 				case 0x02:
@@ -651,7 +651,7 @@ void vis_vga_device::vga_w(offs_t offset, uint8_t data)
 						if(!(vga.sequencer.data[0x25] & 0x20))
 						{
 							vga.crtc.horz_total /= 2;
-							vga.crtc.horz_disp_end /= 2;
+							vga.crtc.horz_disp_end = (vga.crtc.horz_disp_end / 2) | 1;
 							vga.crtc.horz_blank_end /= 2;
 							vga.crtc.horz_retrace_start /= 2;
 							vga.crtc.horz_retrace_end /= 2;
@@ -668,7 +668,7 @@ void vis_vga_device::vga_w(offs_t offset, uint8_t data)
 						if(!(vga.sequencer.data[0x25] & 0x20))
 						{
 							vga.crtc.horz_total *= 2;
-							vga.crtc.horz_disp_end *= 2;
+							vga.crtc.horz_disp_end  = (vga.crtc.horz_disp_end * 2) | 1;
 							vga.crtc.horz_blank_end *= 2;
 							vga.crtc.horz_retrace_start *= 2;
 							vga.crtc.horz_retrace_end *= 2;

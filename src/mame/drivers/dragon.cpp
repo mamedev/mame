@@ -274,6 +274,7 @@ void dragon_state::dragon_base(machine_config &config)
 	pia6821_device &pia0(PIA6821(config, PIA0_TAG, 0));
 	pia0.writepa_handler().set(FUNC(coco_state::pia0_pa_w));
 	pia0.writepb_handler().set(FUNC(coco_state::pia0_pb_w));
+	pia0.tspb_handler().set_constant(0xff);
 	pia0.ca2_handler().set(FUNC(coco_state::pia0_ca2_w));
 	pia0.cb2_handler().set(FUNC(coco_state::pia0_cb2_w));
 	pia0.irqa_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));

@@ -1,33 +1,48 @@
 // license:BSD-3-Clause
-// copyright-holders:Nathan Woods, Raphael Nabet, R. Belmont
+// copyright-holders: R. Belmont, O. Galibert
 /****************************************************************************
 
     drivers/mac128.cpp
-    Original-style Macintosh family emulation
+    Original-style Macintosh emulation
 
-    The cutoff here is Macs with 128k-style video and audio.
-    We also include the SE and Classic, which are basically cost-reduced Mac Pluses with ADB
-    instead of the original keyboard/mouse hardware.
+    These are all 68000 machines in the original Mac form factor with the
+    original Mac audio and video.
 
-    Nate Woods, Raphael Nabet, R. Belmont
+    Unitron Mac 512: Brazilian Mac 512K(E?) clone.
+    Unitron 1024: Brazilian Mac Plus clone.
 
-        0x000000 - 0x3fffff     RAM/ROM (switches based on overlay)
-        0x400000 - 0x4fffff     ROM
-        0x580000 - 0x5fffff     5380 NCR/Symbios SCSI peripherals chip (Mac Plus only)
-        0x600000 - 0x6fffff     RAM
-        0x800000 - 0x9fffff     Zilog 8530 SCC (Serial Communications Controller) Read
-        0xa00000 - 0xbfffff     Zilog 8530 SCC (Serial Communications Controller) Write
-        0xc00000 - 0xdfffff     IWM (Integrated Woz Machine; floppy)
-        0xe80000 - 0xefffff     Rockwell 6522 VIA
-        0xf00000 - 0xffffef     Open bus??? (the ROM appears to be accessing here)
-        0xfffff0 - 0xffffff     Auto Vector
+    Driver by R. Belmont and O. Galibert, with thanks to the original Mac
+    driver authors Nathan Woods and Raphael Nabet.
+    Thanks also to SCSI guru Patrick Mackinlay and keyboard/mouse wrangler
+    Vas Crabb.
+
+    Mac 128K/512K: the original machines with 128K or 512K of RAM.
+    Mac Plus: floppy now double-sided 800K, SIMM slots for memory expansion,
+              SCSI interface added.
+    Mac 512KE: a Mac 512K with the 800K floppy drive and the newer Mac Plus ROMs.
+    Mac SE: Mac Plus with ADB for the keyboard and mouse interface, and an
+            expansion slot.
+    Mac SE FDHD: Mac SE with the IWM and 800K drive upgraded to SWIM and
+                 the 1.44MB "SuperDrive".
+    Mac Classic: Cost-reduced Mac SE FDHD.
+
+    Memory Map:
+    0x000000 - 0x3fffff     RAM/ROM (switches based on overlay)
+    0x400000 - 0x4fffff     ROM
+    0x580000 - 0x5fffff     5380 NCR/Symbios SCSI peripherals chip (Mac Plus only)
+    0x600000 - 0x6fffff     RAM
+    0x800000 - 0x9fffff     Zilog 8530 SCC (Serial Communications Controller) Read
+    0xa00000 - 0xbfffff     Zilog 8530 SCC (Serial Communications Controller) Write
+    0xc00000 - 0xdfffff     IWM (Integrated Woz Machine) floppy controller
+    0xe80000 - 0xefffff     Rockwell 6522 VIA
+    0xf00000 - 0xffffef     Open bus??? (the ROM appears to be accessing here)
+    0xfffff0 - 0xffffff     Auto Vector
 
     Interrupts:
         M68K:
             Level 1 from VIA
             Level 2 from SCC
-            Level 4 : Interrupt switch (not implemented)
-
+            Level 4 from "programmer switch" (not implemented)
         VIA:
             CA1 from VBLANK
             CA2 from 1 Hz clock (RTC)
@@ -41,44 +56,6 @@
 
     The MC68000's FC outputs are not used even for autovectoring. The
     VIA's address range is overdecoded to generate VPA for both.
-
-SCC Init:
-
-Control B:
-09   select reg 9
-40   reset channel B
-04   select WR4
-4c   2 stop bits, x16 clock
-02   select WR2
-00   int vector = 0
-03   select WR3
-oc0   8 data bits, Rx disabled
-0f   select WR15, external interrupt status/control
-08   enable 08
-00   select WR0
-10   reset external status/control interrupt
-00   select wR0
-10   reset external again
-01   select WR1
-01   enable external interrupts
-
-Control A:
-09   select reg 9
-80   reset channel A
-04   select WR4
-4c   2 stop bits, x16 clock
-03   select WR3
-c0   8 data bits, Rx disabled
-0f   select WR15, external interrupt status/control
-08   enable 08
-00   select WR0
-10   reset external status/control interrupt
-00   select WR0
-10   reset again
-01   select WR1
-01   enable external interrupts
-09   select WR9
-0a   enable MIE / NV
 
 VIA notes:
 
@@ -97,11 +74,15 @@ requested. The new Rockwell version (R65NC22) is only labeled with Apple
 part number 338-6523 (later Macs use a PLCC version which Apple numbered
 338S6523), but VLSI Technology's VL65C22V-02PC is not so disguised.
 
+Raster timings from the BBU ERS:
+There are 512 visible pixels (32.68 microseconds) per scanline plus 192 pixels
+(12.25 microseconds) of hblank.  Sound/PWM are fetched at the end of hblank.
+Vertically there are 28 lines of vblank followed by 342 displayed lines.
+Scanline 0 is the start of vblank.
+
 ****************************************************************************/
 
 #include "emu.h"
-
-#define NEW_IWM 0
 
 #include "machine/macrtc.h"
 
@@ -112,20 +93,21 @@ part number 338-6523 (later Macs use a PLCC version which Apple numbered
 #include "bus/scsi/scsihd.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
-#include "machine/applefdc.h"
 #include "machine/iwm.h"
+#include "machine/swim1.h"
+#include "machine/ncr5380n.h"
+#include "machine/nscsi_bus.h"
+#include "machine/rescap.h"
+#include "bus/nscsi/hd.h"
+#include "bus/nscsi/cd.h"
 #include "machine/ncr5380.h"
 #include "machine/ram.h"
-#if NEW_IWM
 #include "machine/applefdintf.h"
-#else
-#include "machine/sonydriv.h"
-#endif
-#include "machine/swim.h"
 #include "machine/timer.h"
 #include "machine/z80scc.h"
 #include "machine/macadb.h"
 #include "sound/dac.h"
+#include "sound/flt_biquad.h"
 #include "bus/macpds/pds_tpdfpd.h"
 
 #include "formats/ap_dsk35.h"
@@ -135,41 +117,18 @@ part number 338-6523 (later Macs use a PLCC version which Apple numbered
 #include "softlist.h"
 #include "speaker.h"
 
-
-#define MAC_SCREEN_NAME "screen"
-#define MAC_539X_1_TAG "539x_1"
-#define MAC_539X_2_TAG "539x_2"
-#define DAC_TAG "macdac"
-#define SCC_TAG "scc"
-
 #define C7M (15.6672_MHz_XTAL / 2)
 #define C3_7M (15.6672_MHz_XTAL / 4).value()
 
-/* tells which model is being emulated (set by macxxx_init) */
-enum mac128model_t
-{
-	MODEL_MAC_128K512K,
-	MODEL_MAC_512KE,
-	MODEL_MAC_PLUS,
-	MODEL_MAC_SE,
-	MODEL_MAC_CLASSIC
-};
-
 // video parameters
-#define MAC_H_VIS   (512)
-#define MAC_V_VIS   (342)
-#define MAC_H_TOTAL (704)       // (512+192)
-#define MAC_V_TOTAL (370)       // (342+28)
+static constexpr int MAC_H_VIS   = 512;
+static constexpr int MAC_V_VIS   = 342;
+static constexpr int MAC_H_TOTAL = 704;       // (512+192)
+static constexpr int MAC_V_TOTAL = 370;       // (342+28)
 
 // sound buffer locations
-#define MAC_MAIN_SND_BUF_OFFSET (0x0300>>1)
-#define MAC_ALT_SND_BUF_OFFSET  (0x5F00>>1)
-
-#define LOG_KEYBOARD    0
-#define LOG_GENERAL     0
-#define LOG_MAC_IWM     0
-#define LOG_VIA         0
-#define LOG_MEMORY      0
+static constexpr int MAC_MAIN_SND_BUF_OFFSET = (0x0300>>1); // (end of memory minus 0x0300; for the typical macplus case, this is 0x3ffd00-0x3fffe3 in 16 bit blocks)
+static constexpr int MAC_ALT_SND_BUF_OFFSET  = (0x5F00>>1); // (end of memory minus 0x5F00)
 
 class mac128_state : public driver_device
 {
@@ -181,34 +140,35 @@ public:
 		m_macadb(*this, "macadb"),
 		m_ram(*this, RAM_TAG),
 		m_ncr5380(*this, "ncr5380"),
+		m_scsibus(*this, "scsibus"),
+		m_ncr5380n(*this, "scsibus:7:ncr5380n"),
 		m_iwm(*this, "fdc"),
-#if NEW_IWM
 		m_floppy(*this, "fdc:%d", 0U),
-#endif
 		m_mackbd(*this, "kbd"),
 		m_rtc(*this,"rtc"),
+		m_screen(*this, "screen"),
+		m_dac(*this, "macdac"),
+		m_filter(*this, "dacfilter"),
+		m_volfilter(*this, "volfilter"),
+		m_scc(*this, "scc"),
 		m_mouse0(*this, "MOUSE0"),
 		m_mouse1(*this, "MOUSE1"),
 		m_mouse2(*this, "MOUSE2"),
-		m_screen(*this, "screen"),
-		m_dac(*this, DAC_TAG),
-		m_scc(*this, SCC_TAG)
+		m_cur_floppy(nullptr),
+		m_hdsel(0),
+		m_devsel(0)
 	{
-		m_cur_floppy = nullptr;
-		m_hdsel = 0;
 	}
 
 	void mac512ke(machine_config &config);
 	void mac128k(machine_config &config);
+	void mac512k(machine_config &config);
 	void macplus(machine_config &config);
 	void macse(machine_config &config);
+	void macsefd(machine_config &config);
 	void macclasc(machine_config &config);
 
-	void init_mac128k512k();
-	void init_mac512ke();
-	void init_macplus();
-	void init_macse();
-	void init_macclassic();
+	void mac_driver_init();
 
 private:
 	required_device<m68000_device> m_maincpu;
@@ -216,14 +176,17 @@ private:
 	optional_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
 	optional_device<ncr5380_device> m_ncr5380;
-	#if NEW_IWM
+	optional_device<nscsi_bus_device> m_scsibus;
+	optional_device<ncr5380n_device> m_ncr5380n;
 	required_device<applefdintf_device> m_iwm;
 	required_device_array<floppy_connector, 2> m_floppy;
-	#else
-	required_device<applefdc_base_device> m_iwm;
-	#endif
 	optional_device<mac_keyboard_port_device> m_mackbd;
 	optional_device<rtc3430042_device> m_rtc;
+	required_device<screen_device> m_screen;
+	required_device<dac_12bit_r2r_device> m_dac; // actually 1-bit pwm w/8-bit counters
+	required_device<filter_biquad_device> m_filter;
+	required_device<filter_biquad_device> m_volfilter;
+	required_device<z80scc_device> m_scc;
 
 	optional_ioport m_mouse0, m_mouse1, m_mouse2;
 
@@ -241,6 +204,8 @@ private:
 	void ram_w_se(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t ram_600000_r(offs_t offset);
 	void ram_600000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~ 0);
+	void via_sync();
+	void via_sync_end();
 	uint16_t mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, uint16_t data);
 	uint16_t mac_autovector_r(offs_t offset);
@@ -249,8 +214,12 @@ private:
 	void mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t macplus_scsi_r(offs_t offset, uint16_t mem_mask = ~0);
 	void macplus_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(mac_scsi_irq);
+	uint16_t macse_scsi_r(offs_t offset, uint16_t mem_mask = ~0);
+	void macse_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	DECLARE_WRITE_LINE_MEMBER(scsi_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(scsi_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(set_scc_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 	WRITE_LINE_MEMBER(adb_irq_w) { m_adb_irq_pending = state; }
 
@@ -266,7 +235,6 @@ private:
 	void mac_via_out_a_se(uint8_t data);
 	void mac_via_out_b_se(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);
-	void mac_driver_init(mac128model_t model);
 	void update_volume();
 
 	void mac512ke_map(address_map &map);
@@ -274,21 +242,19 @@ private:
 	void macse_map(address_map &map);
 
 	floppy_image_device *m_cur_floppy;
-	int m_hdsel;
+	int m_hdsel, m_devsel;
 	int m_pwm_count_total, m_pwm_count_1;
 	float m_pwm_current_rpm[2];
 
 	void phases_w(uint8_t phases);
-	void sel35_w(int sel35);
 	void devsel_w(uint8_t devsel);
-	void hdsel_w(int hdsel);
+	void devsel_se_w(uint8_t devsel);
+	void snd_push(uint8_t data);
 	void pwm_push(uint8_t data);
-
-	mac128model_t m_model;
 
 	uint32_t m_overlay;
 
-	int m_irq_count, m_ca1_data, m_ca2_data;
+	int m_irq_count, m_ca2_data;
 	uint8_t m_mouse_bit[2], m_mouse_last[2];
 	int16_t m_mouse_last_m[2], m_mouse_count[2];
 	int m_screen_buffer;
@@ -298,8 +264,10 @@ private:
 	// interrupts
 	int m_scc_interrupt, m_via_interrupt, m_scsi_interrupt, m_last_taken_interrupt;
 
+	// DRQ
+	int m_scsi_drq;
+
 	// wait states for accessing the VIA
-	int m_via_cycles;
 	bool m_snd_enable;
 	bool m_main_buffer;
 	int m_snd_vol;
@@ -308,10 +276,6 @@ private:
 	int m_scsiirq_enable;
 	u16 *m_ram_ptr, *m_rom_ptr;
 	u32 m_ram_mask, m_ram_size;
-
-	required_device<screen_device> m_screen;
-	required_device<dac_8bit_pwm_device> m_dac;
-	required_device<z80scc_device> m_scc;
 };
 
 void mac128_state::machine_start()
@@ -326,7 +290,6 @@ void mac128_state::machine_start()
 
 	save_item(NAME(m_overlay));
 	save_item(NAME(m_irq_count));
-	save_item(NAME(m_ca1_data));
 	save_item(NAME(m_ca2_data));
 	save_item(NAME(m_mouse_bit));
 	save_item(NAME(m_mouse_last));
@@ -336,6 +299,7 @@ void mac128_state::machine_start()
 	save_item(NAME(m_scc_interrupt));
 	save_item(NAME(m_via_interrupt));
 	save_item(NAME(m_scsi_interrupt));
+	save_item(NAME(m_scsi_drq));
 	save_item(NAME(m_last_taken_interrupt));
 	save_item(NAME(m_snd_enable));
 	save_item(NAME(m_main_buffer));
@@ -353,7 +317,6 @@ void mac128_state::machine_start()
 
 void mac128_state::machine_reset()
 {
-	m_via_cycles = -10;
 	m_last_taken_interrupt = -1;
 	m_overlay = 1;
 	m_screen_buffer = 1;
@@ -362,7 +325,6 @@ void mac128_state::machine_reset()
 	m_main_buffer = true;
 	m_snd_vol = 3;
 	m_irq_count = 0;
-	m_ca1_data = 0;
 	m_ca2_data = 0;
 	m_adb_irq_pending = 0;
 	m_drive_select = 0;
@@ -371,6 +333,7 @@ void mac128_state::machine_reset()
 	m_pwm_count_1 = 0;
 	m_pwm_current_rpm[0] = 302.5; // Speed for 0% duty cycle
 	m_pwm_current_rpm[1] = 302.5;
+	m_scsi_drq = 0;
 
 	const int next_vpos = m_screen->vpos() + 1;
 	m_scan_timer->adjust(m_screen->time_until_pos(next_vpos), next_vpos);
@@ -455,9 +418,6 @@ void mac128_state::set_via_interrupt(int value)
 
 void mac128_state::vblank_irq()
 {
-	m_ca1_data ^= 1;
-	m_via->write_ca1(m_ca1_data);
-
 	if (m_macadb)
 	{
 		m_macadb->adb_vblank();
@@ -475,42 +435,67 @@ void mac128_state::vblank_irq()
 
 void mac128_state::update_volume()
 {
-	if (!m_snd_enable)
+	/* LS161 audio PWM counters TC (SND) -> LS04 inverter (/SND) ->
+	 * -> CD4016 gate A pulling a 5.1V zener-regulated signal to ground if input is high ->
+	 * -> Sallen-key low-pass filter (R1 = 47K, R2 = 47K, C1 = 0.001uF, C2 = 470pF
+	 *  FC of 4939.3903Hz, Q of 0.7293, Gain of 1.0) ->
+	 * ->\-> r13 (470k) ------------------------>|
+	 *   |-> r12 (470k) -> CD4016 D (pa0 != 0) ->|
+	 *   |-> r17 (150k) -> CD4016 C (pa1 != 0) ->|
+	 *   |-> r16 (68k)  -> CD4016 B (pa2 != 0) ->\-> DC blocking caps ->
+	 * -> Push-Pull +12v/-12vb amplifier w/feedback (technically a 1st order multifeedback lowpass filter?) ->
+	 * -> Audio Jack -> Speaker
+	 */
+	const double res_ohm_tbl[8] =
 	{
-		// ls161 clear input
-		m_dac->set_output_gain(ALL_OUTPUTS, 0);
-	}
-	else
-	{
-		// sound -> r13 (470k)
-		// sound -> r12 (470k) -> 4016 (pa0 != 0)
-		// sound -> r17 (150k) -> 4016 (pa1 != 0)
-		// sound -> r16 (68k)  -> 4016 (pa2 != 0)
-		m_dac->set_output_gain(ALL_OUTPUTS, 8.0 / (m_snd_vol + 1));
-	}
+		//       R13                  R16                 R17                  R12
+		(1.0 / ( (1.0 / RES_K(470))                                                               ) ),
+		(1.0 / ( (1.0 / RES_K(470))                                          + (1.0 / RES_K(470)) ) ),
+		(1.0 / ( (1.0 / RES_K(470))                     + (1.0 / RES_K(150))                      ) ),
+		(1.0 / ( (1.0 / RES_K(470))                     + (1.0 / RES_K(150)) + (1.0 / RES_K(470)) ) ),
+		(1.0 / ( (1.0 / RES_K(470)) + (1.0 / RES_K(68))                                           ) ),
+		(1.0 / ( (1.0 / RES_K(470)) + (1.0 / RES_K(68))                      + (1.0 / RES_K(470)) ) ),
+		(1.0 / ( (1.0 / RES_K(470)) + (1.0 / RES_K(68)) + (1.0 / RES_K(150))                      ) ),
+		(1.0 / ( (1.0 / RES_K(470)) + (1.0 / RES_K(68)) + (1.0 / RES_K(150)) + (1.0 / RES_K(470)) ) )
+	};
+
+	m_volfilter->opamp_mfb_lowpass_modify(res_ohm_tbl[m_snd_vol&7], RES_K(0), RES_K(200), CAP_U(0), CAP_P(220)); // variable based on cd4016, short, R15, absent, C10
+}
+
+WRITE_LINE_MEMBER(mac128_state::vblank_w)
+{
+	m_via->write_ca1(state);
 }
 
 TIMER_CALLBACK_MEMBER(mac128_state::mac_scanline)
 {
-	int scanline = param;
-	uint16_t *mac_snd_buf_ptr;
+	const int scanline = param;
 
-	if (scanline == MAC_V_VIS)
+	if (scanline == 0)
 	{
 		vblank_irq();
 	}
 
 	/* video beam in display (! VBLANK && ! HBLANK basically) */
-	if (scanline < MAC_V_VIS)
+	if (scanline >= 28)
 	{
 		m_via->write_pb6(1);
-		m_hblank_timer->adjust(m_screen->time_until_pos(scanline, MAC_H_VIS));
 	}
 
-	if ((!(scanline % 10)) && (m_model < MODEL_MAC_SE))
+	m_hblank_timer->adjust(m_screen->time_until_pos(scanline, MAC_H_TOTAL));
+
+	if ((!(scanline % 10)) && (!m_macadb))
 	{
 		mouse_callback();
 	}
+
+	m_scan_timer->adjust(m_screen->time_until_pos(scanline+1), (scanline+1) % m_screen->height());
+}
+
+TIMER_CALLBACK_MEMBER(mac128_state::mac_hblank)
+{
+	const int scanline = m_screen->vpos();
+	uint16_t *mac_snd_buf_ptr;
 
 	if (m_main_buffer)
 	{
@@ -521,14 +506,38 @@ TIMER_CALLBACK_MEMBER(mac128_state::mac_scanline)
 		mac_snd_buf_ptr = (uint16_t *)(m_ram_ptr + m_ram_size - MAC_ALT_SND_BUF_OFFSET);
 	}
 
-	m_dac->write(mac_snd_buf_ptr[scanline] >> 8);
+	// The sound "DAC" is a 1-bit PWM output driven by two 4-bit LS161 counters
+	// chained together. These counters are reset at the end of HBLANK, and
+	// count up once every C7M clock (2 pixels per clock), with the TC (SND)
+	// output connected (through two inverters) to the speaker filter. The
+	// counters count a max of 256 C7M clocks before reaching terminal count
+	// and halting themselves, and there are 704 / 2 = 352 C7M clocks per
+	// scanline, so this means the TC (SND) output over time is an asymmetric
+	// PWM squarewave, low from between 0 (if the load value is 0xff) and
+	// 255 (if the load value is 0x00) of the 352 C7M clocks per scanline,
+	// and high the remainder of the time. This has a significant DC offset
+	// due to the remaining clocks where the TC signal remains high.
+	// The counters can be forced to reset and be held at a value of 0x00 if
+	// the VIA PB7(/SNDRES) pin is held active(low), and this conversely will
+	// cause the TC (SND) counter pin to output a constant low level for as
+	// long as /SNDRES is held active.
+	// Some games such as Lode Runner use the sound manager "swMode" function,
+	// which uses the /SNDRES pin to alternately force the sound output low
+	// vs running normally in a square wave. During this time, the software is
+	// leaving the actual sound buffer FIFO values at a constant 0x80.
+	// So unless we force the 1-bit PWM to have a value of "always low" while
+	// PB7 is low, we get almost no sound in Lode Runner, and probably other
+	// games/software as well.
+	snd_push(mac_snd_buf_ptr[scanline] >> 8);
 	pwm_push(mac_snd_buf_ptr[scanline] & 0xff);
-	m_scan_timer->adjust(m_screen->time_until_pos(scanline+1), (scanline+1) % m_screen->height());
+
+	m_via->write_pb6(0);
 }
 
-TIMER_CALLBACK_MEMBER(mac128_state::mac_hblank)
+void mac128_state::snd_push(uint8_t data)
 {
-	m_via->write_pb6(0);
+	double frac = (m_snd_enable ? (((double)(~data)) / (MAC_H_TOTAL / 2.0)) : 1.0);
+	m_dac->write((uint16_t)(frac * 4095.0)); // using a fraction of a 12 bit value, so we can handle inputs ranging between 0/352 and 352/352 without losing resolution.
 }
 
 void mac128_state::pwm_push(uint8_t data)
@@ -587,13 +596,11 @@ void mac128_state::pwm_push(uint8_t data)
 		{
 			logerror("PWM index %3d duty cycle %5.1f%% rpm %f\n", internal_index, 100*duty_cycle, rpm);
 
-#if NEW_IWM
 			if (m_cur_floppy && m_cur_floppy->type() == OAD34V)
 			{
 				m_iwm->sync();
 				m_cur_floppy->set_rpm(rpm);
 			}
-#endif
 		}
 
 		m_pwm_current_rpm[0] = m_pwm_current_rpm[1];
@@ -603,11 +610,55 @@ void mac128_state::pwm_push(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(mac128_state::mac_scsi_irq)
+WRITE_LINE_MEMBER(mac128_state::scsi_irq_w)
 {
 }
 
+WRITE_LINE_MEMBER(mac128_state::scsi_drq_w)
+{
+	m_scsi_drq = state;
+}
+
 uint16_t mac128_state::macplus_scsi_r(offs_t offset, uint16_t mem_mask)
+{
+	int reg = (offset >> 3) & 0xf;
+
+	//  logerror("macplus_scsi_r: offset %x mask %x\n", offset, mem_mask);
+
+	if (ACCESSING_BITS_0_7)
+	{
+		if ((offset >= 0x100) && (m_scsi_drq))
+		{
+			return m_ncr5380n->dma_r();
+		}
+
+		return m_ncr5380n->read(reg);
+	}
+
+	if ((offset >= 0x100) && (m_scsi_drq))
+	{
+		return u16(m_ncr5380n->dma_r()) << 8;
+	}
+
+	return u16(m_ncr5380n->read(reg)) << 8;
+}
+
+void mac128_state::macplus_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	int reg = (offset >> 3) & 0xf;
+
+	//  logerror("macplus_scsi_w: data %x offset %x mask %x\n", data, offset, mem_mask);
+
+	// here we can take advantage of 68000 byte smearing
+	if ((offset >= 0x100) && (m_scsi_drq))
+	{
+		m_ncr5380n->dma_w(data & 0xff);
+	}
+
+	m_ncr5380n->write(reg, data & 0xff);
+}
+
+uint16_t mac128_state::macse_scsi_r(offs_t offset, uint16_t mem_mask)
 {
 	int reg = (offset>>3) & 0xf;
 
@@ -621,7 +672,7 @@ uint16_t mac128_state::macplus_scsi_r(offs_t offset, uint16_t mem_mask)
 	return m_ncr5380->ncr5380_read_reg(reg)<<8;
 }
 
-void mac128_state::macplus_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void mac128_state::macse_scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int reg = (offset>>3) & 0xf;
 
@@ -668,21 +719,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 
 uint16_t mac128_state::mac_iwm_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t result = 0;
-
-	result = m_iwm->read((offset >> 8) & 0xf);
-
-	if (LOG_MAC_IWM)
-		printf("mac_iwm_r: offset=0x%08x mem_mask %04x = %02x (PC %x)\n", offset, mem_mask, result, m_maincpu->pc());
-
+	uint16_t result = m_iwm->read((offset >> 8) & 0xf);
 	return (result << 8) | result;
 }
 
 void mac128_state::mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if (LOG_MAC_IWM)
-		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, m_maincpu->pc());
-
 	if (ACCESSING_BITS_0_7)
 		m_iwm->write((offset >> 8) & 0xf, data & 0xff);
 	else
@@ -695,6 +737,36 @@ WRITE_LINE_MEMBER(mac128_state::mac_via_irq)
 	set_via_interrupt(state);
 }
 
+void mac128_state::via_sync()
+{
+	// The VIA runs from the E clock of the 68k and uses VPA.
+
+	// That means:
+	// - The 68000 starts the access cycle, with AS and the address bus.  It's validated at cycle+1.
+
+	// - The glue chip sets VPA.  The 68000 sees it and acts on it at cycle+2.
+
+	// - Between cycle+2 and cycle+11, the E clock goes up.  The VIA
+	// is synced on that clock, so that's at a multiple of 10 in
+	// absolute time
+
+	// - 4 cycles later E goes down and that's the end of the access,
+
+	// We sync on the start of cycle (so that the via timings go ok)
+	// then on the end on via_sync_end()
+
+	uint64_t cur_cycle = m_maincpu->total_cycles();
+	uint64_t vpa_cycle = cur_cycle+2;
+	uint64_t via_start_cycle = (vpa_cycle + 9) / 10;
+	uint64_t m68k_start_cycle = via_start_cycle * 10;
+	m_maincpu->adjust_icount(cur_cycle - m68k_start_cycle); // 4 cycles already counted by the core
+}
+
+void mac128_state::via_sync_end()
+{
+	m_maincpu->adjust_icount(-4);
+}
+
 uint16_t mac128_state::mac_via_r(offs_t offset)
 {
 	uint16_t data;
@@ -702,12 +774,11 @@ uint16_t mac128_state::mac_via_r(offs_t offset)
 	offset >>= 8;
 	offset &= 0x0f;
 
-	if (LOG_VIA)
-		logerror("mac_via_r: offset=0x%02x\n", offset);
+	via_sync();
+
 	data = m_via->read(offset);
 
-	m_maincpu->adjust_icount(m_via_cycles);
-
+	via_sync_end();
 	return (data & 0xff) | (data << 8);
 }
 
@@ -716,31 +787,22 @@ void mac128_state::mac_via_w(offs_t offset, uint16_t data)
 	offset >>= 8;
 	offset &= 0x0f;
 
-	if (LOG_VIA)
-		logerror("mac_via_w: offset=0x%02x data=0x%08x\n", offset, data);
+	via_sync();
 
 	m_via->write(offset, (data >> 8) & 0xff);
 
-	m_maincpu->adjust_icount(m_via_cycles);
+	via_sync_end();
 }
 
 void mac128_state::mac_autovector_w(offs_t offset, uint16_t data)
 {
-	if (LOG_GENERAL)
-		logerror("mac_autovector_w: offset=0x%08x data=0x%04x\n", offset, data);
-
 	/* This should throw an exception */
-
 	/* Not yet implemented */
 }
 
 uint16_t mac128_state::mac_autovector_r(offs_t offset)
 {
-	if (LOG_GENERAL)
-		logerror("mac_autovector_r: offset=0x%08x\n", offset);
-
 	/* This should throw an exception */
-
 	/* Not yet implemented */
 	return 0;
 }
@@ -787,9 +849,7 @@ void mac128_state::mac_via_out_a(uint8_t data)
 
 	//set_scc_waitrequest((data & 0x80) >> 7);
 	m_screen_buffer = (data & 0x40) >> 6;
-	#if !NEW_IWM
-	sony_set_sel_line(m_iwm, (data & 0x20) >> 5);
-	#else
+
 	int hdsel = BIT(data, 5);
 	if (hdsel != m_hdsel)
 	{
@@ -799,7 +859,6 @@ void mac128_state::mac_via_out_a(uint8_t data)
 		}
 		m_hdsel = hdsel;
 	}
-	#endif
 
 	m_main_buffer = ((data & 0x08) == 0x08) ? true : false;
 	m_snd_vol = data & 0x07;
@@ -820,9 +879,7 @@ void mac128_state::mac_via_out_a_se(uint8_t data)
 
 	//set_scc_waitrequest((data & 0x80) >> 7);
 	m_screen_buffer = (data & 0x40) >> 6;
-	#if !NEW_IWM
-	sony_set_sel_line(m_iwm, (data & 0x20) >> 5);
-	#else
+
 	int hdsel = BIT(data, 5);
 	if (hdsel != m_hdsel)
 	{
@@ -832,14 +889,15 @@ void mac128_state::mac_via_out_a_se(uint8_t data)
 		}
 		m_hdsel = hdsel;
 	}
-	#endif
 
 	m_snd_vol = data & 0x07;
 	update_volume();
 
-	if (m_model == MODEL_MAC_SE)    // on SE only this selects which floppy drive (0 = upper, 1 = lower)
+	// on SE only this selects which floppy drive (0 = upper, 1 = lower)
+	if (m_drive_select != BIT(data, 4))
 	{
-		m_drive_select = ((data & 0x10) >> 4);
+		m_drive_select = BIT(data, 4);
+		devsel_se_w(m_devsel);
 	}
 }
 
@@ -939,10 +997,9 @@ void mac128_state::mouse_callback()
 	}
 }
 
-void mac128_state::mac_driver_init(mac128model_t model)
+void mac128_state::mac_driver_init()
 {
 	m_scsi_interrupt = 0;
-	m_model = model;
 
 	memset(m_ram->pointer(), 0, m_ram->size());
 }
@@ -971,15 +1028,11 @@ uint32_t mac128_state::screen_update_mac(screen_device &screen, bitmap_ind16 &bi
 	return 0;
 }
 
-#if NEW_IWM
+
 void mac128_state::phases_w(uint8_t phases)
 {
 	if (m_cur_floppy)
 		m_cur_floppy->seek_phase_w(phases);
-}
-
-void mac128_state::sel35_w(int sel35)
-{
 }
 
 void mac128_state::devsel_w(uint8_t devsel)
@@ -1000,22 +1053,33 @@ void mac128_state::devsel_w(uint8_t devsel)
 	}
 }
 
-void mac128_state::hdsel_w(int hdsel)
+void mac128_state::devsel_se_w(uint8_t devsel)
 {
-}
-#endif
+	// m_drive_select = 0 for the SE's two internal drives, 1 for the single external
+	if (!m_drive_select)
+	{
+		if (devsel == 1)
+			m_cur_floppy = m_floppy[0]->get_device();
+		else if (devsel == 2)
+			m_cur_floppy = m_floppy[1]->get_device();
+		else
+			m_cur_floppy = nullptr;
+	}
+	else
+	{
+		m_cur_floppy = nullptr;
+	}
 
-#define MAC_DRIVER_INIT(label, model)   \
-void mac128_state::init_##label()     \
-{   \
-	mac_driver_init(model); \
-}
+	m_iwm->set_floppy(m_cur_floppy);
+	if (m_cur_floppy)
+	{
+		m_cur_floppy->ss_w(m_hdsel);
+		if (m_cur_floppy->type() == OAD34V)
+			m_cur_floppy->set_rpm(m_pwm_current_rpm[1]);
+	}
 
-MAC_DRIVER_INIT(mac128k512k, MODEL_MAC_128K512K)
-MAC_DRIVER_INIT(mac512ke, MODEL_MAC_512KE)
-MAC_DRIVER_INIT(macplus, MODEL_MAC_PLUS)
-MAC_DRIVER_INIT(macse, MODEL_MAC_SE)
-MAC_DRIVER_INIT(macclassic, MODEL_MAC_CLASSIC)
+	m_devsel = devsel;
+}
 
 /***************************************************************************
     ADDRESS MAPS
@@ -1049,7 +1113,7 @@ void mac128_state::macse_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rw(FUNC(mac128_state::ram_r), FUNC(mac128_state::ram_w_se));
 	map(0x400000, 0x4fffff).rom().region("bootrom", 0);
-	map(0x580000, 0x5fffff).rw(FUNC(mac128_state::macplus_scsi_r), FUNC(mac128_state::macplus_scsi_w));
+	map(0x580000, 0x5fffff).rw(FUNC(mac128_state::macse_scsi_r), FUNC(mac128_state::macse_scsi_w));
 	map(0x900000, 0x9fffff).r(m_scc, FUNC(z80scc_device::dc_ab_r)).umask16(0xff00);
 	map(0xb00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::dc_ab_w)).umask16(0x00ff);
 	map(0xd00000, 0xdfffff).rw(FUNC(mac128_state::mac_iwm_r), FUNC(mac128_state::mac_iwm_w));
@@ -1058,31 +1122,14 @@ void mac128_state::macse_map(address_map &map)
 }
 
 /***************************************************************************
-    DEVICE CONFIG
-***************************************************************************/
-#if !NEW_IWM
-static const applefdc_interface mac_iwm_interface =
-{
-	sony_set_lines,
-	sony_set_enable_lines,
-
-	sony_read_data,
-	sony_write_data,
-	sony_read_status
-};
-#endif
-
-/***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
-#if !NEW_IWM
-static const floppy_interface mac_floppy_interface =
+
+static void mac_scsi_devices(device_slot_interface &device)
 {
-	FLOPPY_STANDARD_3_5_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(apple35_mac),
-	"floppy_3_5"
-};
-#endif
+	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add("cdrom", NSCSI_CDROM);
+}
 
 static void mac_pds_cards(device_slot_interface &device)
 {
@@ -1100,28 +1147,28 @@ void mac128_state::mac512ke(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(15.6672_MHz_XTAL, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS);
 	m_screen->set_screen_update(FUNC(mac128_state::screen_update_mac));
+	m_screen->screen_vblank().set(FUNC(mac128_state::vblank_w));
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_8BIT_PWM(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 2 x ls161
+	FILTER_BIQUAD(config, m_volfilter).opamp_mfb_lowpass_setup(RES_K(39.020), RES_K(0), RES_K(200), CAP_U(0), CAP_P(220)); // variable based on cd4016, short, R15, absent, C10
+	m_volfilter->add_route(ALL_OUTPUTS, "speaker", 0.195); // this filter has a max gain of ~5.126, so we diminish it by the inverse of that (0.195)
+	FILTER_BIQUAD(config, m_filter).opamp_sk_lowpass_setup(RES_K(47), RES_K(47), RES_M(999.99), RES_R(0.001), CAP_U(0.001), CAP_P(470)); // R18, R14, absent, short, C18, C19
+	m_filter->add_route(ALL_OUTPUTS, m_volfilter, 1.0);
+	DAC_12BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, m_filter, 1.0); // 2 x ls161; this is a 1-bit PWM value selecting an 8-bit fraction from 0/352nds to 255/352nds of a scanline, with /SNDRES forcing it active for 352/352nds.
 
 	/* devices */
 	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
-	#if NEW_IWM
+
 	IWM(config, m_iwm, C7M);
 	m_iwm->phases_cb().set(FUNC(mac128_state::phases_w));
-	m_iwm->sel35_cb().set(FUNC(mac128_state::sel35_w));
 	m_iwm->devsel_cb().set(FUNC(mac128_state::devsel_w));
 
 	applefdintf_device::add_35(config, m_floppy[0]);
 	applefdintf_device::add_35(config, m_floppy[1]);
-	#else
-	LEGACY_IWM(config, m_iwm, 0).set_config(&mac_iwm_interface);
-	sonydriv_floppy_image_device::legacy_2_drives_add(config, &mac_floppy_interface);
-	#endif
 
 	SCC85C30(config, m_scc, C7M);
 	m_scc->configure_channels(C3_7M, 0, C3_7M, 0);
@@ -1155,6 +1202,19 @@ void mac128_state::mac128k(machine_config &config)
 {
 	mac512ke(config);
 	m_ram->set_default_size("128K");
+
+	IWM(config.replace(), m_iwm, C7M);
+	m_iwm->phases_cb().set(FUNC(mac128_state::phases_w));
+	m_iwm->devsel_cb().set(FUNC(mac128_state::devsel_w));
+
+	applefdintf_device::add_35_sd(config, m_floppy[0]);
+	applefdintf_device::add_35_sd(config, m_floppy[1]);
+}
+
+void mac128_state::mac512k(machine_config &config)
+{
+	mac128k(config);
+	m_ram->set_default_size("512K");
 }
 
 void mac128_state::macplus(machine_config &config)
@@ -1164,13 +1224,20 @@ void mac128_state::macplus(machine_config &config)
 
 	m_mackbd->set_default_option("usp");
 
-	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
-	scsibus.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
-	scsibus.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_5));
-
-	NCR5380(config, m_ncr5380, C7M);
-	m_ncr5380->set_scsi_port("scsi");
-	m_ncr5380->irq_callback().set(FUNC(mac128_state::mac_scsi_irq));
+	// SCSI bus and devices
+	NSCSI_BUS(config, m_scsibus);
+	NSCSI_CONNECTOR(config, "scsibus:0", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:1", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:2", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:5", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", mac_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsibus:7").option_set("ncr5380n", NCR5380N).machine_config([this](device_t *device) {
+		ncr5380n_device &adapter = downcast<ncr5380n_device &>(*device);
+		adapter.irq_handler().set(*this, FUNC(mac128_state::scsi_irq_w));
+		adapter.drq_handler().set(*this, FUNC(mac128_state::scsi_drq_w));
+	});
 
 	/* internal ram */
 	m_ram->set_default_size("4M");
@@ -1189,6 +1256,22 @@ void mac128_state::macse(machine_config &config)
 
 	config.device_remove("kbd");
 	config.device_remove("pds");
+	config.device_remove("scsibus");
+
+	IWM(config.replace(), m_iwm, C7M*2);
+	m_iwm->phases_cb().set(FUNC(mac128_state::phases_w));
+	m_iwm->devsel_cb().set(FUNC(mac128_state::devsel_se_w));
+
+	applefdintf_device::add_35(config, m_floppy[0]);
+	applefdintf_device::add_35(config, m_floppy[1]);
+
+	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
+	scsibus.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_6));
+	scsibus.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_5));
+
+	NCR5380(config, m_ncr5380, C7M);
+	m_ncr5380->set_scsi_port("scsi");
+	m_ncr5380->irq_callback().set(FUNC(mac128_state::scsi_irq_w));
 
 	MACADB(config, m_macadb, C7M);
 	m_macadb->via_clock_callback().set(m_via, FUNC(via6522_device::write_cb1));
@@ -1211,9 +1294,21 @@ void mac128_state::macse(machine_config &config)
 	MACPDS_SLOT(config, "pds", "sepds", mac_sepds_cards, nullptr);
 }
 
-void mac128_state::macclasc(machine_config &config)
+void mac128_state::macsefd(machine_config &config)
 {
 	macse(config);
+
+	SWIM1(config.replace(), m_iwm, C7M*2);
+	m_iwm->phases_cb().set(FUNC(mac128_state::phases_w));
+	m_iwm->devsel_cb().set(FUNC(mac128_state::devsel_se_w));
+
+	applefdintf_device::add_35_hd(config, m_floppy[0]);
+	applefdintf_device::add_35_hd(config, m_floppy[1]);
+}
+
+void mac128_state::macclasc(machine_config &config)
+{
+	macsefd(config);
 
 	config.device_remove("pds");
 	config.device_remove("sepds");
@@ -1244,6 +1339,28 @@ ROM_START( mactw )
     ROM_REGION16_BE(0x100000, "bootrom", 0)
     ROM_LOAD( "rom4.3t_07-04-83.bin", 0x0000, 0x10000, CRC(d2c42f18) SHA1(f868c09ca70383a69751c37a5a3110a9597462a4) )
 ROM_END
+
+    // one twiggy mac (SN 1042) has the following sum16s on the 4x 16k eproms on the "512 EPROM ADAPTER" daughterboard:
+    // U3 EPROM // 1 HI: "H1 // A04A"
+    // U4 EPROM // 0 HI: "H0 // B6ED"
+    // U5 EPROM // 1 LOW: "Lo1 // 6C8C"
+    // U6 EPROM // 0 LOW: "Lo0 // F332"
+    // This version (Rom Version 4.4T?) was publicly dumped by Adam Goolevitch, but one of the SUM16s (B5ED) does not match the ROM label (B6ED).
+    // The ROM has been marked as bad pending a redump or other verification of correctness.
+    ROMX_LOAD("h0__b6ed.u4",  0x00000, 0x04000, BAD_DUMP CRC(87136a61) SHA1(a33fc3b7908783a5742f06884fe44260447e5d55), ROM_SKIP(1) ) // SUM16: B5ED does not match written label
+    ROMX_LOAD("lo0__f332.u6", 0x00001, 0x04000, CRC(3d04b1c5) SHA1(11fe22e8ce415edf4133d7cee559dce4ab0f7974), ROM_SKIP(1) ) // SUM16: F332
+    ROMX_LOAD("h1__a04a.u3",  0x08000, 0x04000, CRC(fa9ae0d1) SHA1(e89826325caf053aad2c09d134c8c7483d442821), ROM_SKIP(1) ) // SUM16: A04A
+    ROMX_LOAD("lo1__6c8c.u5", 0x08001, 0x04000, CRC(ca78a04e) SHA1(724d7d7b585c375cd5797e4334d6ab6267e798dc), ROM_SKIP(1) ) // SUM16: 6C8C
+
+
+    // one twiggy mac (SN 1072, upc MA1M830241240) has the following sum16s on the 4x 16k EPROMs on the "512 EPROM ADAPTER" daughterboard:
+    // U3 EPROM // 1 HI: "Rom 2.45 // H 1 // 1D79"
+    // U4 EPROM // 0 HI: "ROM 2.45 // High0 // D4DF"
+    // U5 EPROM // 1 LOW: "ROM 2.45 // LOW1 // 977F"
+    // U6 EPROM // 0 LOW: "ROM 2.45 // LOW0 // C813"
+    // This Twiggy mac has a prototype IWM labeled "<signetics> 8248 // XXX-X299 (C) // APPLE 82"
+    // The ROM of this twiggy mac has been tentatively dated between March and April 1983, possibly March 11, 1983.
+    // See https://macgui.com/news/article.php?t=517
 */
 
 ROM_START( mac128k )
@@ -1269,6 +1386,15 @@ ROM_START( mac128k )
 	https://68kmla.org/forums/uploads/monthly_12_2014/post-2597-0-46269000-1419299800.jpg
 	http://cdn.cultofmac.com/wp-content/uploads/2014/01/12A-128k-Motherboard.jpg
 	*/
+
+	//ROM_REGION(0x3000, "pals", 0)
+	// @U14E 342-0186-A  PAL16R8  ASG
+	// @U2D  342-0187-A  PAL16L8  BMU1
+	// @U3D  342-0189-A  PAL16R6  TSG
+	// @U2E  342-0191-A  PAL16R4  BMU0
+	// @U1E  342-0251-A  PAL16R8  LAG
+	// @U1D  342-0254-A  PAL16R4A TSM
+
 ROM_END
 
 ROM_START( mac512k )
@@ -1276,11 +1402,20 @@ ROM_START( mac512k )
 	ROMX_LOAD("342-0220-b.u6d",  0x00000, 0x08000, CRC(0dce9a3f) SHA1(101ca6570f5a273e400d1a8bc63e15ee0e94153e), ROM_SKIP(1) ) // "<VTi logo along side> 512 VH 6434 // 23256-1104 // 342-0220-B // (C) APPLE 84 // KOREA-A"
 	ROMX_LOAD("342-0221-b.u8d",  0x00001, 0x08000, CRC(d51f376e) SHA1(575586109e876cffa4a4d472cb38771aa21b70cb), ROM_SKIP(1) ) // "<VTi logo along side> 512 VH 6709 // 23256-1105 // 342-0221-B // (C) APPLE 84 // KOREA-A"
 	// reference: http://i.ebayimg.com/images/g/Uj8AAOSwvzRXy2tW/s-l1600.jpg
+
+	//ROM_REGION(0x3000, "pals", 0)
+	// @U14E 342-0186-A  PAL16R8  ASG
+	// @U2D  342-0187-A  PAL16L8  BMU1
+	// @U3D  342-0189-A  PAL16R6  TSG
+	// @U2E  342-0191-A  PAL16R4  BMU0
+	// @U1E  342-0251-A  PAL16R8  LAG
+	// @U1D  342-0254-A  PAL16R4A TSM
 ROM_END
 
 ROM_START( unitron )
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
 	ROM_LOAD16_WORD( "unitron_512.rom", 0x00000, 0x10000, CRC(1eabd37f) SHA1(a3d3696c08feac6805effb7ee07b68c2bf1a8dd7) )
+	// pals are different from mac 128/512/512ke
 ROM_END
 
 ROM_START( utrn1024 )
@@ -1288,42 +1423,8 @@ ROM_START( utrn1024 )
 	// CRCs match the original "Lonely Hearts" version 1 Mac Plus ROM: 4d1eeee1
 	ROMX_LOAD( "342-0341-a.u6d", 0x000000, 0x010000, CRC(5095fe39) SHA1(be780580033d914b5035d60b5ebbd66bd1d28a9b), ROM_SKIP(1) ) // not correct label
 	ROMX_LOAD( "342-0342-a.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) ) // not correct label
+	// unknown pals
 ROM_END
-
-/*
- SCC init macplus.rom
- * Channel B and A init - reset command and vector differs
- * 09 <- 40/80 Master Interrup Control: channel B/A reset
- * 04 <- 4c Clocks: x16 mode, 2 stop bits, no parity
- * 02 <- 00 Interrupt vector (just for chan B)
- * 03 <- c0 Receiver: 8 bit data, auto enables, Rx disabled
- * 0f <- 08 External/Status Control: DCD ints enabled
- * 00 <- 10 Reset External/status interrupts
- * 00 <- 10 Reset External/status interrupts
- * 01 <- 01 Enable External Interrupts
- * Above init first for channel B and then for channel A
- * 09 <- 0a Master Interrupt Control: No vector and Interrupts enabled!
- *
- SCC re-init of Channel B booting MacOS 7.0.0 (on Mac plus)
- * 09 <- 40 Master Interrup Control: channel B reset
- * 04 <- 20 x1 clock, Sync Modes Enable, SDLC Mode (01111110 Flag)
- * 0a <- e0 CRC preset to '1's, FM0 encoding scheme
- * 06 <- 00 Receiver SDLC ADR0-ADR7 bits
- * 07 <- 7e Receiver SDLC Flag character (0x7e as expected)
- * 0c <- 06 Low baudrate divider
- * 0d <- 00 Hi baudrate divider
- * 0e <- c0 Set FM Mode Command
- * 03 <- dd Rx 8 bit, Enter Hunt Mode, Rx CRC Enable, Enter SDLC Address Search Mode, Rx enable
- * 02 <- 00 Interrupt vector
- * 0f <- 08 External/Status Control: DCD interrupts enabled
- * 01 <- 09 Enable External Interrupts + Rx Int On First Character or Special Condition
- * 09 <- 0a Master Interrupt Control: No vector and Interrupts enabled!
- * 0b <- 70 Rx Clock is DPLL Output, Tx Clock is BRG output + TTL Clock on RTxC
- * 0e <- 21 Enter Search Mode Command + BRG enable + RTxC as BRG clock
- * 05 <- 60 Tx 8 bit, Tx disable, SDLC CRC Polynomial selected, Tx CRC disabled
- * 06 <- 01 Receiver SDLC ADR0-ADR7 bits updated
- * 0f <- 88 External/Status Control: Abort/Break and DCD interrupts enabled
-*/
 
 ROM_START( mac512ke ) // 512ke has been observed with any of the v3, v2 or v1 macplus romsets installed, and v1 romsets are more common here than in the plus, since the 512ke lacks scsi, which is the cause of the major bug fixed between v1 and v2, hence 512ke is unaffected and was a good way for apple to use up the buggy roms rather than destroying them.
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
@@ -1373,6 +1474,14 @@ ROM_START( mac512ke ) // 512ke has been observed with any of the v3, v2 or v1 ma
 	        GUESSED, since this ROM is very rare: "VTI // 62? V0 86?? // 23512-1008 // 342-0341-A // (C)APPLE '83-'85 // KOREA A"
 	    'ROM-LO' @ U8D is same as v2/4d1eeae1 'ROM-LO' @ U8D
 	*/
+
+	//ROM_REGION(0x3000, "pals", 0)
+	// @U14E 342-0186-A  PAL16R8  ASG
+	// @U2D  342-0187-A  PAL16L8  BMU1
+	// @U3D  342-0189-A  PAL16R6  TSG
+	// @U2E  342-0191-A  PAL16R4  BMU0
+	// @U1E  342-0251-A  PAL16R8  LAG
+	// @U1D  342-0254-A  PAL16R4A TSM
 ROM_END
 
 ROM_START( macplus ) // same notes as above apply here as well
@@ -1397,16 +1506,27 @@ ROM_START( macplus ) // same notes as above apply here as well
 	ROM_SYSTEM_BIOS(4, "romdisk2", "bigmessofwires.com ROMinator (2/25/2015)")
 	ROMX_LOAD( "rominator-20150225-lo.bin", 0x000001, 0x080000, CRC(62cf2a0b) SHA1(f78ebb0919dd9e094bef7952b853b70e66d05e01), ROM_SKIP(1) | ROM_BIOS(4) )
 	ROMX_LOAD( "rominator-20150225-hi.bin", 0x000000, 0x080000, CRC(a28ba8ec) SHA1(9ddcf500727955c60db0ff24b5ca2458f53fd89a), ROM_SKIP(1) | ROM_BIOS(4) )
+
+	//ROM_REGION(0x3000, "pals", 0)
+	// @U11E 342-0517-A  PAL16??  ASG
+	// @U2D  341-0514-A  PAL16L8  BMU1
+	// @U3D  342-0516-A  PAL16R6  TSG
+	// @U3E  342-0519-A  PAL20??  CAS
+	// @U2E  342-0520-A  PAL20R4A BMU2
+	// @U1E  342-0515-A  PAL16R8  LAG
+	// @U1D  342-0522-A  VP16RP8MPC (PAL16R4A on schem) TSM
 ROM_END
 
 ROM_START( macse )
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
 	ROM_LOAD16_WORD( "macse.rom",  0x00000, 0x40000, CRC(0f7ff80c) SHA1(58532b7d0d49659fd5228ac334a1b094f0241968))
+	// GLU HAL (mask PAL)
 ROM_END
 
 ROM_START( macsefd )
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
 	ROM_LOAD( "be06e171.rom", 0x000000, 0x040000, CRC(f530cb10) SHA1(d3670a90273d12e53d86d1228c068cb660b8c9d1) )
+	// GLU HAL (mask PAL)
 ROM_END
 
 ROM_START( macclasc )
@@ -1416,13 +1536,13 @@ ROM_START( macclasc )
 ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS         INIT              COMPANY              FULLNAME */
-//COMP( 1983, mactw,    0,       0,      mac128k,  macplus, mac128_state, init_mac128k512k, "Apple Computer",    "Macintosh (4.3T Prototype)",  MACHINE_NOT_WORKING )
-COMP( 1984, mac128k,  0,       0,      mac128k,  macplus, mac128_state, init_mac128k512k, "Apple Computer",    "Macintosh 128k",  MACHINE_NOT_WORKING )
-COMP( 1984, mac512k,  mac128k, 0,      mac512ke, macplus, mac128_state, init_mac128k512k, "Apple Computer",    "Macintosh 512k",  MACHINE_NOT_WORKING )
-COMP( 1986, mac512ke, macplus, 0,      mac512ke, macplus, mac128_state, init_mac512ke,    "Apple Computer",    "Macintosh 512ke", MACHINE_NOT_WORKING )
-COMP( 1985, unitron,  macplus, 0,      mac512ke, macplus, mac128_state, init_mac512ke,    "bootleg (Unitron)", "Mac 512",  MACHINE_NOT_WORKING )
-COMP( 1986, macplus,  0,       0,      macplus,  macplus, mac128_state, init_macplus,     "Apple Computer",    "Macintosh Plus",  MACHINE_NOT_WORKING )
-COMP( 1985, utrn1024, macplus, 0,      macplus,  macplus, mac128_state, init_macplus,     "bootleg (Unitron)", "Unitron 1024",  MACHINE_NOT_WORKING )
-COMP( 1987, macse,    0,       0,      macse,    macadb, mac128_state, init_macse,        "Apple Computer",   "Macintosh SE",  MACHINE_NOT_WORKING )
-COMP( 1987, macsefd,  0,       0,      macse,    macadb, mac128_state, init_macse,        "Apple Computer",   "Macintosh SE (FDHD)",  MACHINE_NOT_WORKING )
-COMP( 1990, macclasc, 0,       0,      macclasc, macadb, mac128_state, init_macclassic,   "Apple Computer",   "Macintosh Classic",  MACHINE_NOT_WORKING )
+//COMP( 1983, mactw,    0,       0,      mac128k,  macplus, mac128_state, mac_driver_init, "Apple Computer",    "Macintosh (4.3T Prototype)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1984, mac128k,  0,       0,      mac128k,  macplus, mac128_state, mac_driver_init,  "Apple Computer",    "Macintosh 128k",  MACHINE_SUPPORTS_SAVE )
+COMP( 1984, mac512k,  mac128k, 0,      mac512k,  macplus, mac128_state, mac_driver_init,  "Apple Computer",    "Macintosh 512k",  MACHINE_SUPPORTS_SAVE )
+COMP( 1986, mac512ke, macplus, 0,      mac512ke, macplus, mac128_state, mac_driver_init,  "Apple Computer",    "Macintosh 512ke", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, unitron,  macplus, 0,      mac512ke, macplus, mac128_state, mac_driver_init,  "bootleg (Unitron)", "Mac 512",  MACHINE_SUPPORTS_SAVE )
+COMP( 1986, macplus,  0,       0,      macplus,  macplus, mac128_state, mac_driver_init,  "Apple Computer",    "Macintosh Plus",  MACHINE_SUPPORTS_SAVE )
+COMP( 1985, utrn1024, macplus, 0,      macplus,  macplus, mac128_state, mac_driver_init,  "bootleg (Unitron)", "Unitron 1024",  MACHINE_SUPPORTS_SAVE )
+COMP( 1987, macse,    0,       0,      macse,    macadb, mac128_state,  mac_driver_init,  "Apple Computer",   "Macintosh SE",  MACHINE_SUPPORTS_SAVE )
+COMP( 1987, macsefd,  0,       0,      macsefd,  macadb, mac128_state,  mac_driver_init,  "Apple Computer",   "Macintosh SE (FDHD)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1990, macclasc, 0,       0,      macclasc, macadb, mac128_state,  mac_driver_init,  "Apple Computer",   "Macintosh Classic",  MACHINE_SUPPORTS_SAVE )

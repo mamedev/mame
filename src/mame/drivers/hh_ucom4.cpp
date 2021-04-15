@@ -3,22 +3,10 @@
 // thanks-to:Kevin Horton, Sean Riddle
 /***************************************************************************
 
-  NEC uCOM4 MCU tabletops/handhelds or other simple devices,
-  most of them (emulated ones) are VFD electronic games/toys.
+NEC uCOM4 MCU tabletops/handhelds or other simple devices,
+most of them (emulated ones) are VFD electronic games/toys.
 
-  Commonly used VFD(vacuum fluorescent display) are by NEC or Futaba.
-
-  NEC FIP9AM20T (example, Epoch Astro Command)
-         grcss
-
-  FIP = fluorescent indicator panel
-  g = number of grids
-  r = revision of the VFD
-  c = custom display
-  s = unique display part number
-
-
-  known chips:
+known chips:
 
   serial  device   etc.
 ----------------------------------------------------------------
@@ -62,13 +50,33 @@
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
+
+Commonly used VFD(vacuum fluorescent display) are by NEC or Futaba.
+
+NEC FIP9AM20T (example, Epoch Astro Command)
+       grcss
+
+FIP = fluorescent indicator panel
+g = number of grids
+r = revision of the VFD
+c = custom display
+s = unique display part number
+
+
+ROM source notes when dumped from another publisher, but confident it's the same game:
+- astrocmd: Tandy Astro Command
+- caveman: Tandy Caveman
+- grobot9: Mego Fabulous Fred
+
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/ucom4/ucom4.h"
 #include "video/pwm.h"
 #include "video/hlcd0515.h"
 #include "sound/spkrdev.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -232,7 +240,7 @@ namespace {
 
   known releases:
   - Japan: "Missile Guerilla Warfare Maneuvers", published by Tomy
-  - World: UFO Master-Blaster Station
+  - World: UFO Master-Blaster Station, published by Bambino
 
 ***************************************************************************/
 
@@ -929,8 +937,8 @@ ROM_END
   * cyan/red/green VFD display NEC FIP6AM2-T no. 1-8 2, with partial color overlay and bezel
 
   known releases:
-  - Japan: FL Crazy Climbing
-  - USA: Crazy Climber
+  - Japan: FL Crazy Climbing, published by Bandai
+  - USA: Crazy Climber, published by Bandai
 
 ***************************************************************************/
 
@@ -1306,7 +1314,7 @@ ROM_END
   * cyan VFD display NEC FIP9AM18T tube no. 0D, with color overlay
 
   known releases:
-  - USA: Invader From Space
+  - USA: Invader From Space, published by Epoch
   - UK: Invader From Space, published by Grandstand
 
 ***************************************************************************/
@@ -1418,8 +1426,8 @@ ROM_END
   * cyan VFD display NEC FIP10AM15T tube no. 0F, with bezel overlay
 
   known releases:
-  - USA: Electronic Football (aka Pro-Bowl Football)
-  - Japan: American Football
+  - USA: Electronic Football (aka Pro-Bowl Football), published by Epoch
+  - Japan: American Football, published by Epoch
 
 ***************************************************************************/
 
@@ -1474,8 +1482,8 @@ static INPUT_PORTS_START( efball )
 	PORT_CONFNAME( 0x02, 0x02, DEF_STR( Players ) )
 	PORT_CONFSETTING(    0x02, "1" )
 	PORT_CONFSETTING(    0x00, "2" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("P1 Down-Field")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME("P1 Score-Time")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("P1 Down-Field")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("P1 Score-Time")
 
 	PORT_START("IN.1") // port B
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
@@ -1538,8 +1546,8 @@ ROM_END
     revisions exist, with different graphics: rev B no. 1-8, rev. D no. 2-21.
 
   known releases:
-  - USA: Galaxy II
-  - Japan: Astro Wars
+  - USA: Galaxy II, published by Epoch
+  - Japan: Astro Wars, published by Epoch
   - UK: Astro Wars, published by Grandstand
 
 ***************************************************************************/
@@ -1670,7 +1678,7 @@ ROM_END
   * cyan/red VFD display NEC FIP9AM20T no. 42-42, with color overlay + bezel
 
   known releases:
-  - Japan: Astro Command
+  - Japan: Astro Command, published by Epoch
   - USA: Astro Command, published by Tandy
   - UK: Scramble, published by Grandstand
 
@@ -1790,8 +1798,8 @@ ROM_END
   * cyan/red/green VFD display NEC FIP8BM20T no. 2-42
 
   known releases:
-  - Japan: Dracula House, yellow case
-  - USA: Dracula, red case
+  - Japan: Dracula House, yellow case, published by Epoch
+  - USA: Dracula, red case, published by Epoch
   - Other: Dracula, yellow case, published by Hales
 
 ***************************************************************************/
@@ -2099,7 +2107,7 @@ ROM_END
   * 9 lamps behind buttons
 
   known releases:
-  - Japan: Game Robot 9
+  - Japan: Game Robot 9, published by Takatoku Toys
   - USA: Fabulous Fred - The Ultimate Electronic Game, published by Mego
   - Mexico: Fabuloso Fred, published by Ensueño Toys (also released as
     12-button version, a clone of Tandy-12)
@@ -2222,8 +2230,8 @@ ROM_END
   * cyan VFD display NEC FIP32AM18Y tube no. 0E, with color overlay
 
   known releases:
-  - USA: Cosmic Combat
-  - Japan: Space Attack
+  - USA: Cosmic Combat, published by Tomy
+  - Japan: Space Attack, published by Tomy
 
 ***************************************************************************/
 
@@ -2501,8 +2509,8 @@ ROM_END
   * bright yellow round casing
 
   known releases:
-  - Japan: Puck Man
-  - USA: Pac Man
+  - Japan: Puck Man, published by Tomy
+  - USA: Pac Man, published by Tomy
   - UK: Puckman (Tomy), and also published by Grandstand as Munchman
   - Australia: Pac Man-1, published by Futuretronics
 
@@ -2619,10 +2627,10 @@ ROM_END
   * cyan/red/green VFD display NEC FIP10CM20T no. 2-41
 
   known releases:
-  - World: Scramble
+  - World: Scramble, published by Tomy
   - USA: Scramble, published by Tandy
   - UK: Astro Blaster, published by Hales (Epoch Astro Command was named Scramble)
-  - Germany: Rambler
+  - Germany: Rambler, published by Tomy
 
 ***************************************************************************/
 
@@ -2732,7 +2740,7 @@ ROM_END
   * cyan/red/green VFD display NEC FIP8AM20T no. 2-42
 
   known releases:
-  - World: Caveman
+  - World: Caveman, published by Tomy
   - USA: Caveman, published by Tandy
   - UK: Cave Man - Jr. Caveman vs Dinosaur, published by Grandstand
 
@@ -3016,4 +3024,4 @@ CONS( 1982, tcaveman, 0,        0, tcaveman, tcaveman, tcaveman_state, empty_ini
 CONS( 1984, alnchase, 0,        0, alnchase, alnchase, alnchase_state, empty_init, "Tomy", "Alien Chase", MACHINE_SUPPORTS_SAVE )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
-// with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.
+// with other, unemulatable, things eg. game board/pieces, book, playing cards, pen & paper, etc.

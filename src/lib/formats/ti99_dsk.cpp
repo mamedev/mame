@@ -1276,52 +1276,58 @@ int ti99_tdf_format::identify(io_generic *io, uint32_t form_factor, const std::v
 }
 
 /*
-    Find the proper format for a given image file.
+    Find the proper format for a given image file. Tracks are counted per side.
+    Note that only two formats are actually compatible with the PC99 emulator.
 */
 void ti99_tdf_format::determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads, int& tracks)
 {
 	uint64_t file_size = io_generic_size(io);
-	heads = 2;  // TDF only supports two-sided recordings
-	tracks = 40;
+
 	// LOGMASKED(LOG_INFO, "[ti99_dsk] Image size = %ld\n", file_size);   // doesn't compile
 	switch (file_size)
 	{
-	case 260240:   // used in PC99
-		cell_size = 4000;
+	case 260240:            // used in PC99
 		sector_count = 9;
+		tracks = 40;
 		break;
-	case 491520:   // 320K HX5102
-		cell_size = 2000;
+	case 491520:            // 320K HX5102
 		sector_count = 16;
+		tracks = 40;
 		break;
-	case 549760:   // used in PC99
-		cell_size = 2000;
+	case 549760:            // used in PC99
 		sector_count = 18;
+		tracks = 40;
 		break;
+	case 1003520:
+		sector_count = 36;
+		tracks = 40;
+		break;
+
 	case 520480:
-		cell_size = 4000;
 		sector_count = 9;
+		tracks = 80;
 		break;
 	case 983040:
-		cell_size = 2000;
 		sector_count = 16;
 		tracks = 80;
 		break;
 	case 1099520:
-		cell_size = 2000;
 		sector_count = 18;
 		tracks = 80;
 		break;
 	case 2007040:
-		cell_size = 1000;
-		sector_count = 18;
+		sector_count = 36;
 		tracks = 80;
 		break;
+
 	default:
 		cell_size = 0;
 		sector_count = 0;
-		break;
+		return;
 	}
+
+	heads = 2;  // TDF only supports two-sided recordings
+	cell_size = (sector_count <= 9)? 4000 : ((sector_count <= 18)? 2000 : 1000);
 }
 
 /*
@@ -1332,7 +1338,7 @@ void ti99_tdf_format::determine_sizes(io_generic *io, int& cell_size, int& secto
 */
 void ti99_tdf_format::load_track(io_generic *io, uint8_t *sectordata, int *sector, int *secoffset, int head, int track, int sectorcount, int trackcount)
 {
-	uint8_t fulltrack[6872]; // space for a full TDF track
+	uint8_t fulltrack[12544]; // space for a full TDF track
 
 	// Read beginning of track 0. We need this to get the first gap, according
 	// to the format
@@ -1427,7 +1433,7 @@ void ti99_tdf_format::load_track(io_generic *io, uint8_t *sectordata, int *secto
 */
 void ti99_tdf_format::write_track(io_generic *io, uint8_t *sectordata, int *sector, int track, int head, int sector_count, int track_count)
 {
-	uint8_t trackdata[14000];
+	uint8_t trackdata[12544];
 	int offset = ((track_count * head) + track) * get_track_size(sector_count);
 	int a1 = 0;
 

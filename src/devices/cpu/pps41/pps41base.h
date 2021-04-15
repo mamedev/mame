@@ -16,9 +16,7 @@
 enum
 {
 	PPS41_INPUT_LINE_INT0 = 0,
-	PPS41_INPUT_LINE_INT1,
-	PPS41_INPUT_LINE_SDI, // serial data input
-	PPS41_INPUT_LINE_SSC // serial shift clock
+	PPS41_INPUT_LINE_INT1
 };
 
 
@@ -31,17 +29,27 @@ public:
 	// 8-bit P(parallel) input
 	auto read_p() { return m_read_p.bind(); }
 
-	// 10-bit D(discrete) I/O
+	// 10/12-bit D(discrete) I/O
 	auto read_d() { return m_read_d.bind(); }
 	auto write_d() { return m_write_d.bind(); }
 
-	// 8-bit R I/O
+	// 8/10/14-bit R I/O
 	auto read_r() { return m_read_r.bind(); }
 	auto write_r() { return m_write_r.bind(); }
 
 	// serial data/clock
+	auto read_sdi() { return m_read_sdi.bind(); }
 	auto write_sdo() { return m_write_sdo.bind(); }
 	auto write_ssc() { return m_write_ssc.bind(); }
+
+	// speaker output
+	auto write_spk() { return m_write_spk.bind(); }
+
+	// I/O access
+	u16 d_output_r() { return m_d_output; }
+	u16 r_output_r() { return m_r_output; }
+	int sdo_r() { return BIT(m_s, 3); }
+	void ssc_w(int state);
 
 protected:
 	// construction/destruction
@@ -52,11 +60,11 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
-	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 2); }
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); }
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
 	virtual u32 execute_max_cycles() const noexcept override { return 2; }
-	virtual u32 execute_input_lines() const noexcept override { return 4; }
+	virtual u32 execute_input_lines() const noexcept override { return 2; }
 	virtual void execute_set_input(int line, int state) override;
 	virtual void execute_run() override;
 	virtual void execute_one() = 0;
@@ -84,10 +92,12 @@ protected:
 	devcb_read8 m_read_p;
 	devcb_read16 m_read_d;
 	devcb_write16 m_write_d;
-	devcb_read8 m_read_r;
-	devcb_write8 m_write_r;
+	devcb_read16 m_read_r;
+	devcb_write16 m_write_r;
+	devcb_read_line m_read_sdi;
 	devcb_write_line m_write_sdo;
 	devcb_write_line m_write_ssc;
+	devcb_write8 m_write_spk;
 
 	// internal state, regs
 	u16 m_pc;
@@ -115,21 +125,26 @@ protected:
 	int m_skip_count;
 
 	u8 m_s;
-	int m_sdi;
 	int m_sclock_in;
 	int m_sclock_count;
-	bool m_ss_pending;
 
 	int m_d_pins;
 	u16 m_d_mask;
 	u16 m_d_output;
-	u8 m_r_output;
+	int m_r_pins;
+	u16 m_r_mask;
+	u16 m_r_output;
 	int m_int_line[2];
 	int m_int_ff[2];
 
 	// misc handlers
+	void set_d_pins(u8 p) { m_d_pins = p; m_d_mask = (1 << p) - 1; }
+	void set_r_pins(u8 p) { m_r_pins = p; m_r_mask = (1 << p) - 1; }
 	virtual bool op_is_tr(u8 op) = 0;
-	void cycle();
+
+	void serial_shift(int state);
+	void serial_clock();
+	virtual void cycle();
 	void increment_pc();
 };
 

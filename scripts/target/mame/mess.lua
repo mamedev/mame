@@ -314,6 +314,7 @@ SOUNDS["IOPSPU"] = true
 SOUNDS["SWP00"] = true
 SOUNDS["SWP20"] = true
 SOUNDS["SWP30"] = true
+--SOUNDS["XT446"] = true
 SOUNDS["S_DSP"] = true
 SOUNDS["ROLANDPCM"] = true
 --SOUNDS["TT5665"] = true
@@ -762,6 +763,7 @@ MACHINES["IWM"] = true
 MACHINES["SWIM1"] = true
 MACHINES["SWIM2"] = true
 MACHINES["SWIM3"] = true
+MACHINES["MAC_VIDEO_SONORA"] = true
 MACHINES["DIABLO_HD"] = true
 MACHINES["TMS1024"] = true
 MACHINES["NSC810"] = true
@@ -822,6 +824,7 @@ BUSES["ABCKB"] = true
 BUSES["ACORN"] = true
 BUSES["ADAM"] = true
 BUSES["ADAMNET"] = true
+BUSES["ADB"] = true
 BUSES["APF"] = true
 BUSES["APRICOT_EXPANSION"] = true
 BUSES["APRICOT_KEYBOARD"] = true
@@ -1792,6 +1795,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/lwriter.cpp",
 	MAME_DIR .. "src/mame/drivers/mac128.cpp",
 	MAME_DIR .. "src/mame/drivers/macquadra700.cpp",
+	MAME_DIR .. "src/mame/drivers/macpdm.cpp",
 	MAME_DIR .. "src/mame/drivers/macprtb.cpp",
 	MAME_DIR .. "src/mame/drivers/macpwrbk030.cpp",
 	MAME_DIR .. "src/mame/drivers/mac.cpp",
@@ -2530,20 +2534,27 @@ files {
 createMESSProjects(_target, _subtarget, "hegener")
 files {
 	MAME_DIR .. "src/mame/drivers/mephisto_academy.cpp",
+	MAME_DIR .. "src/mame/drivers/mephisto_amsterdam.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_berlin.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_brikett.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_glasgow.cpp",
+	MAME_DIR .. "src/mame/drivers/mephisto_milano.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_mm1.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_mm2.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_modena.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_modular.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_modular_tm.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_mondial.cpp",
+	MAME_DIR .. "src/mame/drivers/mephisto_mondial2.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_mondial68k.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_montec.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto_polgar.cpp",
+	MAME_DIR .. "src/mame/drivers/mephisto_risc.cpp",
+	MAME_DIR .. "src/mame/drivers/mephisto_smondial.cpp",
 	MAME_DIR .. "src/mame/machine/mmboard.cpp",
 	MAME_DIR .. "src/mame/machine/mmboard.h",
+	MAME_DIR .. "src/mame/video/mmdisplay1.cpp",
+	MAME_DIR .. "src/mame/video/mmdisplay1.h",
 	MAME_DIR .. "src/mame/video/mmdisplay2.cpp",
 	MAME_DIR .. "src/mame/video/mmdisplay2.h",
 }
@@ -4047,6 +4058,7 @@ files {
 	MAME_DIR .. "src/mame/includes/dgnalpha.h",
 	MAME_DIR .. "src/mame/video/gime.cpp",
 	MAME_DIR .. "src/mame/video/gime.h",
+	MAME_DIR .. "src/mame/drivers/lnw80.cpp",
 	MAME_DIR .. "src/mame/drivers/trs80.cpp",
 	MAME_DIR .. "src/mame/includes/trs80.h",
 	MAME_DIR .. "src/mame/machine/trs80.cpp",
@@ -4420,6 +4432,7 @@ files {
 	MAME_DIR .. "src/mame/includes/aussiebyte.h",
 	MAME_DIR .. "src/mame/video/aussiebyte.cpp",
 	MAME_DIR .. "src/mame/drivers/ax20.cpp",
+	MAME_DIR .. "src/mame/drivers/basf7100.cpp",
 	MAME_DIR .. "src/mame/drivers/binbug.cpp",
 	MAME_DIR .. "src/mame/drivers/bert.cpp",
 	MAME_DIR .. "src/mame/drivers/besta.cpp",

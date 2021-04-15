@@ -217,7 +217,10 @@ void cli_frontend::start_execution(mame_machine_manager *manager, const std::vec
 	try
 	{
 		m_options.parse_command_line(args, OPTION_PRIORITY_CMDLINE);
-		m_osd.set_verbose(m_options.verbose());
+	}
+	catch (options_warning_exception &ex)
+	{
+		osd_printf_error("%s", ex.message());
 	}
 	catch (options_exception &ex)
 	{
@@ -228,6 +231,7 @@ void cli_frontend::start_execution(mame_machine_manager *manager, const std::vec
 		// otherwise, error on the options
 		throw emu_fatalerror(EMU_ERR_INVALID_CONFIG, "%s", ex.message());
 	}
+	m_osd.set_verbose(m_options.verbose());
 
 	// determine the base name of the EXE
 	std::string_view exename = core_filename_extract_base(args[0], true);

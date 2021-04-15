@@ -29,7 +29,7 @@
  *
  * You can observe sounds at XU1.14 by doing
  *
- * NL_LOGS=XU1.14 ./mame64 kidniki
+ * NL_LOGS=XU1.14 ./mame kidniki
  * nlwav -o x.wav log_XU1.14.log
  * play x.wav
  *

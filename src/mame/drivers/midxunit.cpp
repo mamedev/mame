@@ -10,6 +10,37 @@
     Games supported:
         * Revolution X
 
+
+***************************************************************************
+
+Notes based on source code release:
+
+ STARTED:  08/10/92
+RELEASED:  05/23/94
+
+DIRECTED & PRODUCED BY: GEORGE N. PETRO & JACK E. HAEGER
+           GAME DESIGN: GEORGE N. PETRO, JACK E. HAEGER, BILL DABELSTEIN, WARREN B. DAVIS, STEVE BERAN & MARTIN MARTINEZ
+   ARTWORK, ANIMATIONS: JACK E. HAEGER, STEVE BERAN, MARTIN MARTINEZ & JOHN VOGEL
+          GAME PROGRAM: BILL DABELSTEIN, WARREN DAVIS & GEORGE N. PETRO
+        SOUNDS & MUSIC: CHRIS GRANNER
+              HARDWARE: RAY MACIKA, STEVE CORRELL, MARK LOFFREDO, CARY MEDNICK & PAT COX
+          SOUND SYSTEM: MATT BOOTY & RK140
+    MECHANICS, CABINET: TED VALAVANIS, MATT DAVIS & BOB
+               SUPPORT: AL LASKO & DR. SHERIDAN OURSLER	
+
+Revision history:
+
+    DATE     REV  DESCRIPTION
+    ----     ---  -----------
+    9/1/93    -   Name changed from GENERATION X to REVOLUTION X
+    3/17/94  TA1  ACME show, first showing, 2500 sold
+    4/1/94   TA2  First weekend test, $424.00 in 3 days
+    4/15/94  TA3  Second weekend test, $189.00 in 1.5 days
+    4/22/94  TA4  Installed 4/22/94 10:00pm at Times Square
+    5/5/94   TA5  Put out the weekend before releasing
+    5/23/94  PA5
+    6/16/94  LA1
+
 ***************************************************************************
 
 Revolution X
@@ -322,7 +353,7 @@ void midxunit_state::midxunit(machine_config &config)
 
 ROM_START( revx )
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  // sound data
-	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u2.u2", 0x000000, 0x80000, CRC(4ed9e803) SHA1(ba50f1beb9f2a2cf5110897209b5e9a2951ff165) )
+	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u2.u2", 0x000000, 0x80000, CRC(d2ed9f5e) SHA1(415ce5e41a560d135ea41c7924219fdeda504237) ) // shows as "Sound Software Version - Release 2"
 	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u3.u3", 0x200000, 0x80000, CRC(af8f253b) SHA1(25a0000cab177378070f7a6e3c7378fe87fad63e) )
 	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u4.u4", 0x400000, 0x80000, CRC(3ccce59c) SHA1(e81a31d64c64e7b1d25f178c53da3d68453c203c) )
 	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u5.u5", 0x600000, 0x80000, CRC(a0438006) SHA1(560d216d21cb8073dbee0fd20ebe589932a9144e) )
@@ -332,10 +363,10 @@ ROM_START( revx )
 	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u9.u9", 0xe00000, 0x80000, CRC(14ddbea1) SHA1(8dba9dc5529ea77c4312ea61f825bf9062ffc6c3) )
 
 	ROM_REGION32_LE( 0x200000, "maincpu", 0 )   // 34020 code
-	ROM_LOAD32_BYTE( "revx.u51",  0x00000, 0x80000, CRC(9960ac7c) SHA1(441322f061d627ca7573f612f370a85794681d0f) ) // labels needs to be verified, so far was observed only reprogrammed P5 ROMs
-	ROM_LOAD32_BYTE( "revx.u52",  0x00001, 0x80000, CRC(fbf55510) SHA1(8a5b0004ed09391fe37f0f501b979903d6ae4868) )
-	ROM_LOAD32_BYTE( "revx.u53",  0x00002, 0x80000, CRC(a045b265) SHA1(b294d3a56e41f5ec4ab9bbcc0088833b1cab1879) )
-	ROM_LOAD32_BYTE( "revx.u54",  0x00003, 0x80000, CRC(24471269) SHA1(262345bd147402100785459af422dafd1c562787) )
+	ROM_LOAD32_BYTE( "l1_revolution_x_game_rom_u51.u51",  0x00000, 0x80000, CRC(9960ac7c) SHA1(441322f061d627ca7573f612f370a85794681d0f) ) // labels needs to be verified, so far was observed only reprogrammed P5 ROMs
+	ROM_LOAD32_BYTE( "l1_revolution_x_game_rom_u52.u52",  0x00001, 0x80000, CRC(fbf55510) SHA1(8a5b0004ed09391fe37f0f501b979903d6ae4868) )
+	ROM_LOAD32_BYTE( "l1_revolution_x_game_rom_u53.u53",  0x00002, 0x80000, CRC(a045b265) SHA1(b294d3a56e41f5ec4ab9bbcc0088833b1cab1879) )
+	ROM_LOAD32_BYTE( "l1_revolution_x_game_rom_u54.u54",  0x00003, 0x80000, CRC(24471269) SHA1(262345bd147402100785459af422dafd1c562787) )
 
 	ROM_REGION( 0x2000, "pic", 0 )
 	ROM_LOAD( "419_revolution-x_u444.u444", 0x0000000, 0x2000, BAD_DUMP CRC(517e0110) SHA1(cd603c66794ff426dd2994fc1a0c0c8e6bbd864b) ) // manually restored
@@ -389,7 +420,7 @@ ROM_END
 
 ROM_START( revxp5 )
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  // sound data
-	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u2.u2", 0x000000, 0x80000, CRC(4ed9e803) SHA1(ba50f1beb9f2a2cf5110897209b5e9a2951ff165) )
+	ROM_LOAD16_BYTE( "p5_revolution_x_sound_rom_u2.u2", 0x000000, 0x80000, CRC(4ed9e803) SHA1(ba50f1beb9f2a2cf5110897209b5e9a2951ff165) ) // shows as "Sound Software Version - Release 1"
 	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u3.u3", 0x200000, 0x80000, CRC(af8f253b) SHA1(25a0000cab177378070f7a6e3c7378fe87fad63e) )
 	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u4.u4", 0x400000, 0x80000, CRC(3ccce59c) SHA1(e81a31d64c64e7b1d25f178c53da3d68453c203c) )
 	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u5.u5", 0x600000, 0x80000, CRC(a0438006) SHA1(560d216d21cb8073dbee0fd20ebe589932a9144e) )

@@ -149,7 +149,7 @@ public:
 	void write_bus16(offs_t offset, uint16_t data);
 	void write_bus32(offs_t offset, uint32_t data);
 
-	void * ram_ptr() { return m_ram; }
+	void * ram_ptr() { return m_ram.get(); }
 	offs_t ram_start() { return RAM_BASE; }
 	offs_t ram_end() { return RAM_BASE + m_ram_mask; }
 	uint32_t get_rambank_size(uint32_t bank) const { return m_rambank_size[bank]; }
@@ -215,9 +215,9 @@ public: // TODO: THIS SHOULD NOT BE PUBLIC
 	required_device<m2_te_device>       m_te;
 
 	// System RAM
-	uint32_t                *m_ram;
-	uint32_t                m_rambank_size[2];
-	uint32_t                m_ram_mask;
+	std::unique_ptr<uint32_t[]> m_ram;
+	uint32_t                    m_rambank_size[2];
+	uint32_t                    m_ram_mask;
 
 	devcb_write16       m_dac_l;
 	devcb_write16       m_dac_r;

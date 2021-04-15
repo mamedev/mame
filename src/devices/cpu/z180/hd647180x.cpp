@@ -18,8 +18,7 @@
     TODO: the current emulation is incomplete, implementing mostly
     the internal memory and parallel ports. Timer 2 (which is very
     similar to the additional timer of the HD6301) is not emulated at
-    all. Programs trying to execute from internal RAM will also fail,
-    though this likely capability is merely theoretical so far.
+    all.
 
 **********************************************************************/
 
@@ -33,47 +32,22 @@
 DEFINE_DEVICE_TYPE(HD647180X, hd647180x_device, "hd647180x", "Hitachi HD647180X MCU")
 
 hd647180x_device::hd647180x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z180_device(mconfig, HD647180X, tag, owner, clock, true, address_map_constructor(FUNC(hd647180x_device::prom_map), this))
+	: z180_device(mconfig, HD647180X, tag, owner, clock, true, address_map_constructor(FUNC(hd647180x_device::internal_map), this))
 	, m_port_input_cb(*this)
 	, m_port_output_cb(*this)
-	, m_data_config("data", ENDIANNESS_LITTLE, 8, 9, 0, address_map_constructor(FUNC(hd647180x_device::ram_map), this))
+	, m_ram_view(*this, "ram_view")
 {
 	// arbitrary initial states
 	m_ccsr = 0;
 	std::fill(std::begin(m_odr), std::end(m_odr), 0);
 }
 
-void hd647180x_device::prom_map(address_map &map)
+void hd647180x_device::internal_map(address_map &map)
 {
 	map(0x00000, 0x03fff).rom().region(DEVICE_SELF, 0); // 16 KB internal PROM (not used in mode 1)
-}
-
-void hd647180x_device::ram_map(address_map &map)
-{
-	map(0x000, 0x1ff).ram(); // 512 bytes remappable internal RAM (available in all modes)
-}
-
-device_memory_interface::space_config_vector hd647180x_device::memory_space_config() const
-{
-	auto spaces = z180_device::memory_space_config();
-	spaces.emplace_back(AS_DATA, &m_data_config);
-	return spaces;
-}
-
-uint8_t hd647180x_device::z180_read_memory(offs_t addr)
-{
-	if ((addr & 0xffe00) == (offs_t(m_rmcr) << 12 | 0x0fe00))
-		return m_data->read_byte(addr & 0x1ff);
-	else
-		return z180_device::z180_read_memory(addr);
-}
-
-void hd647180x_device::z180_write_memory(offs_t addr, uint8_t data)
-{
-	if ((addr & 0xffe00) == (offs_t(m_rmcr) << 12 | 0x0fe00))
-		m_data->write_byte(addr & 0x1ff, data);
-	else
-		z180_device::z180_write_memory(addr, data);
+	map(0x00000, 0xfffff).view(m_ram_view);
+	for (unsigned pos = 0; pos < 16; pos++)
+		m_ram_view[pos](offs_t(pos) << 16 | 0xfe00, offs_t(pos) << 16 | 0xffff).ram().share("ram");
 }
 
 uint8_t hd647180x_device::z180_internal_port_read(uint8_t port)
@@ -236,6 +210,7 @@ void hd647180x_device::z180_internal_port_write(uint8_t port, uint8_t data)
 	case 0x51:
 		LOG("HD647180X RMCR wr $%02x\n", data);
 		m_rmcr = data & 0xf0;
+		m_ram_view.select(m_rmcr >> 4);
 		break;
 
 	case 0x53:
@@ -285,8 +260,6 @@ void hd647180x_device::device_start()
 {
 	z180_device::device_start();
 
-	m_data = &space(AS_DATA);
-
 	state_add(HD647180X_T2FRC, "T2FRC", m_t2frc.w);
 	state_add(HD647180X_T2OCR1, "T2OCR1", m_t2ocr[0].w);
 	state_add(HD647180X_T2OCR2, "T2OCR2", m_t2ocr[1].w);
@@ -294,7 +267,7 @@ void hd647180x_device::device_start()
 	state_add(HD647180X_T2CSR1, "T2CSR1", m_t2csr[0]);
 	state_add(HD647180X_T2CSR2, "T2CSR2", m_t2csr[1]).mask(0xef);
 	state_add(HD647180X_CCSR, "CCSR", m_ccsr).mask(0xbf);
-	state_add(HD647180X_RMCR, "RMCR", m_rmcr).mask(0xf0);
+	state_add(HD647180X_RMCR, "RMCR", m_rmcr, [this](u8 data) { m_rmcr = data; m_ram_view.select(data >> 4); }).mask(0xf0);
 	state_add(HD647180X_DERA, "DERA", m_dera);
 	for (int i = 0; i < 6; i++)
 	{
@@ -325,6 +298,7 @@ void hd647180x_device::device_reset()
 	m_t2csr[1] = 0x00;
 	m_ccsr = (m_ccsr & 0x80) | 0x2c;
 	m_rmcr = 0;
+	m_ram_view.select(0);
 	m_dera = 0;
 	std::fill(std::begin(m_ddr), std::end(m_ddr), 0);
 }

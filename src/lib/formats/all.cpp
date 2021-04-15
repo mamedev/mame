@@ -1053,7 +1053,8 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_SDF_FORMAT); // sdf_dsk.h
 #endif
 #ifdef HAS_FORMATS_TRS80_DSK
-	en.add(FLOPPY_TRS80_FORMAT); // trs80_dsk.h
+	en.add(FLOPPY_JV1_FORMAT); // trs80_dsk.h
+	en.add(FLOPPY_JV3_FORMAT); // trs80_dsk.h
 #endif
 
 	en.category("Kaypro");
@@ -1189,6 +1190,7 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 
 	en.category("Tandy");
 #ifdef HAS_FORMATS_TRS_CAS
+	en.add(trs80l1_cassette_formats); // trs_cas.h
 	en.add(trs80l2_cassette_formats); // trs_cas.h
 #endif
 #ifdef HAS_FORMATS_TANDY2K_DSK

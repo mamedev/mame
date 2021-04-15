@@ -504,6 +504,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "mm76",            le,  0, []() -> util::disasm_interface * { return new mm76_disassembler; } },
 	{ "mm78",            le,  0, []() -> util::disasm_interface * { return new mm78_disassembler; } },
 	{ "mn10200",         le,  0, []() -> util::disasm_interface * { return new mn10200_disassembler; } },
+	{ "mn1860",          be,  0, []() -> util::disasm_interface * { return new mn1860_disassembler; } },
 	{ "mn1870",          be,  0, []() -> util::disasm_interface * { return new mn1870_disassembler; } },
 	{ "mn1880",          be,  0, []() -> util::disasm_interface * { return new mn1880_disassembler; } },
 	{ "msm65x2",         le,  0, []() -> util::disasm_interface * { return new msm65x2_disassembler; } },
