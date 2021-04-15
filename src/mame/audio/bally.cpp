@@ -755,6 +755,8 @@ void bally_squawk_n_talk_ay_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 void bally_squawk_n_talk_ay_device::device_start()
 {
+	bally_squawk_n_talk_device::device_start();
+
 	// Set volumes to a sane default.
 	m_ay->set_volume(0, 0);
 	m_ay->set_volume(1, 0);
