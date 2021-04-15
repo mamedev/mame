@@ -87,7 +87,7 @@ public:
 
 	// property setters
 	void set_param(int param) const { if(m_type != TIMER_TYPE_GENERIC) fatalerror("Cannot change parameter on a non-generic timer.\n"); m_timer->set_param(param); }
-	void set_ptr(void *ptr) { m_ptr = ptr; }
+	void set_ptr(void *ptr) { if (!machine().save().registration_allowed()) fatalerror("Timer device pointer must remain constant after creation."); m_ptr = ptr; }
 	void enable(bool enable = true) const { m_timer->enable(enable); }
 
 	// adjustments
