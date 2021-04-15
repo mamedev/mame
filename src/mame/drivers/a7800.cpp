@@ -1325,6 +1325,8 @@ void a7800_pal_state::a7800p_palette(palette_device &palette) const
 
 void a7800_state::machine_start()
 {
+    m_maria_startdma.init(*this, FUNC(a7800_state::maria_startdma));
+
 	save_item(NAME(m_p1_one_button));
 	save_item(NAME(m_p2_one_button));
 	save_item(NAME(m_bios_enabled));
