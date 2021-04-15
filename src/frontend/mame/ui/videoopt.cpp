@@ -162,7 +162,8 @@ void menu_video_options::populate(float &customtop, float &custombottom)
 			bool eclipsed(false);
 			for (auto it = toggles.begin(); !eclipsed && (toggle != it); ++it)
 				eclipsed = ((current_mask & it->mask()) != it->mask()) && ((toggle_mask & it->mask()) == it->mask());
-			item_append_on_off(toggle->name(), enabled, eclipsed ? (FLAG_INVERT | FLAG_DISABLE) : 0U, reinterpret_cast<void *>(ITEM_TOGGLE_FIRST + ref));
+			if (!eclipsed)
+				item_append_on_off(toggle->name(), enabled, 0U, reinterpret_cast<void *>(ITEM_TOGGLE_FIRST + ref));
 		}
 		item_append(menu_item_type::SEPARATOR);
 	}
