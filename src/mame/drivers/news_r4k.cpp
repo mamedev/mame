@@ -834,6 +834,9 @@ INPUT_PORTS_END
 
 // ROM definitions
 ROM_START(nws5000x)
+
+// If you want to run a modified/patched version of this ROM, apply the following change to bypass the MROM's checksum enforcement.
+// Change the instruction at offset 0x70C in the file to `bne $0, $0, $bfc009c4` (0x140000AD in hex).
 ROM_REGION64_BE(0x40000, "mrom", 0)
 ROM_SYSTEM_BIOS(0, "nws5000x", "APbus System Monitor Release 3.201")
 ROMX_LOAD("mpu-33__ver3.201__1994_sony.rom", 0x00000, 0x40000, CRC(8a6ca2b7) SHA1(72d52e24a554c56938d69f7d279b2e65e284fd59), ROM_BIOS(0))
