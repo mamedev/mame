@@ -142,7 +142,6 @@ void debug_view_memory::enumerate_sources()
 {
 	// start with an empty list
 	m_source_list.clear();
-	m_source_list.reserve(machine().save().registration_count());
 
 	// first add all the devices' address spaces
 	for (device_memory_interface &memintf : memory_interface_enumerator(machine().root_device()))
@@ -168,7 +167,7 @@ void debug_view_memory::enumerate_sources()
 					util::string_format("Region '%s'", region.second->name()),
 					*region.second.get()));
 	}
-
+/*
 	// finally add all global array symbols in ASCII order
 	std::string name;
 	std::size_t const firstsave = m_source_list.size();
@@ -190,7 +189,7 @@ void debug_view_memory::enumerate_sources()
 
 	// reset the source to a known good entry
 	if (!m_source_list.empty())
-		set_source(*m_source_list[0]);
+		set_source(*m_source_list[0]);*/
 }
 
 

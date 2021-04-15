@@ -190,7 +190,8 @@ private:
 	attoseconds_t               m_quantum_minimum;          // duration of minimum quantum
 
 	// state saving
-	save_registrar              m_scheduler_container;
+	save_registrar              m_scheduler_registrar;
+	save_registrar              m_timer_registrar;
 };
 
 

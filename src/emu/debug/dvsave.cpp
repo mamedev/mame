@@ -193,12 +193,9 @@ void debug_view_save::view_update()
 				temp[len++] = item.collapsible() ? (item.collapsed() ? '+' : '-') : ' ';
 				temp[len++] = ' ';
 
-				int namelen = strlen(name);
-				if (namelen + len < m_divider)
-				{
-					memcpy(&temp[len], name, namelen);
-					len += namelen;
-				}
+				int namelen = std::min<int>(strlen(name), m_divider - 1 - len);
+				memcpy(&temp[len], name, namelen);
+				len += namelen;
 				while (len < m_divider)
 					temp[len++] = ' ';
 				temp[len++] = ' ';

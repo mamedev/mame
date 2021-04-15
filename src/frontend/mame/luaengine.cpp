@@ -996,6 +996,7 @@ void lua_engine::initialize()
  * item:write(offset, value) - write entry value by index
  */
 
+/*
 	auto item_type = emu.new_usertype<save_item>("item", sol::call_constructor, sol::initializers([this](save_item &item, int index) {
 					if(machine().save().indexed_item(index, item.base, item.size, item.valcount, item.blockcount, item.stride))
 					{
@@ -1081,7 +1082,7 @@ void lua_engine::initialize()
 					break;
 			}
 		});
-
+*/
 
 /* core_options library
  *
@@ -1234,9 +1235,9 @@ void lua_engine::initialize()
 			// right now it's broken by anonymous timers, synchronize, etc.
 			lua_State *L = s;
 			luaL_Buffer buff;
-			int size = ram_state::get_size(m.save());
+			size_t size = m.save().binary_size();
 			u8 *ptr = (u8 *)luaL_buffinitsize(L, &buff, size);
-			save_error error = m.save().write_buffer(ptr, size);
+			save_error error = m.save().save_binary(ptr, size);
 			if (error == STATERR_NONE)
 			{
 				luaL_pushresultsize(&buff, size);
@@ -1250,7 +1251,7 @@ void lua_engine::initialize()
 		{
 			// FIXME: this needs to schedule loading from the buffer and return asynchronously somehow
 			// right now it's broken by anonymous timers, synchronize, etc.
-			save_error error = m.save().read_buffer((u8 *)str.data(), str.size());
+			save_error error = m.save().load_binary((u8 *)str.data(), str.size());
 			if (error == STATERR_NONE)
 			{
 				return true;
@@ -1420,6 +1421,7 @@ void lua_engine::initialize()
 					st_table[s->symbol()] = s.get();
 				return st_table;
 			});
+/*
 	// FIXME: turn into a wrapper - it's stupid slow to walk on every property access
 	// also, this mixes up things like RAM areas with stuff saved by the device itself, so there's potential for key conflicts
 	device_type["items"] = sol::property(
@@ -1442,6 +1444,7 @@ void lua_engine::initialize()
 				}
 				return table;
 			});
+			*/
 	// FIXME: this is useless in its current form
 	device_type["roms"] = sol::property(
 			[this] (device_t &dev)

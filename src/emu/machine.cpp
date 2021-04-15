@@ -295,8 +295,6 @@ void running_machine::start()
 		schedule_load("auto");
 
 	manager().update_machine();
-
-	m_save.test_dump();
 }
 
 
@@ -943,7 +941,7 @@ void running_machine::handle_saveload()
 				const char *const opnamed = (m_saveload_schedule == saveload_schedule::LOAD) ? "loaded" : "saved";
 
 				// read/write the save state
-				save_error saverr = (m_saveload_schedule == saveload_schedule::LOAD) ? m_save.read_file(file) : m_save.write_file(file);
+				save_error saverr = (m_saveload_schedule == saveload_schedule::LOAD) ? m_save.load_file(file) : m_save.save_file(file);
 
 				// handle the result
 				switch (saverr)

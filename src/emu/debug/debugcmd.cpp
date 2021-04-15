@@ -130,6 +130,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	symtable.add("cpunum", std::bind(&debugger_commands::get_cpunum, this));
 
 	/* add all single-entry save state globals */
+#if 0
 	for (int itemnum = 0; itemnum < MAX_GLOBALS; itemnum++)
 	{
 		void *base;
@@ -153,6 +154,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 					std::bind(&debugger_commands::global_set, this, &m_global_array[itemnum], _1));
 		}
 	}
+#endif
 
 	/* add all the commands */
 	m_console.register_command("help",      CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_help, this, _1, _2));

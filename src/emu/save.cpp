@@ -54,19 +54,634 @@ enum
 
 #define STATE_MAGIC_NUM         "MAMESAVE"
 
+
 //**************************************************************************
-//  INITIALIZATION
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  json_append - append a string to the JSON
+//  stream
+//-------------------------------------------------
+
+save_zip_state &save_zip_state::json_append(char const *buffer)
+{
+	json_check_reserve();
+	while (*buffer != 0)
+		json_append(*buffer++);
+	return *this;
+}
+
+
+//-------------------------------------------------
+//  json_append_indent - append an indentation of
+//  the given depth to the JSON stream
+//-------------------------------------------------
+
+save_zip_state &save_zip_state::json_append_indent(int count)
+{
+	for (int index = 0; index < count; index++)
+		json_append('\t');
+	return *this;
+}
+
+
+//-------------------------------------------------
+//  json_append_name - append a string-ified name
+//  to the JSON stream
+//-------------------------------------------------
+
+save_zip_state &save_zip_state::json_append_name(char const *name)
+{
+	if (name == nullptr || name[0] == 0)
+		return *this;
+	return json_append('"').json_append(name).json_append('"').json_append(':');
+}
+
+
+//-------------------------------------------------
+//  json_append_signed - append a signed integer
+//  value to the JSON stream
+//-------------------------------------------------
+
+save_zip_state &save_zip_state::json_append_signed(int64_t value)
+{
+	json_check_reserve();
+
+	// quote values that don't fit into a double
+	bool quote = (int64_t(double(value)) != value);
+	if (quote)
+		json_append('"');
+
+	// just use sprintf -- is there a faster way?
+	char buffer[20];
+	sprintf(buffer, "%lld", value);
+	json_append(buffer);
+
+	// end quotes
+	if (quote)
+		json_append('"');
+	return *this;
+}
+
+
+//-------------------------------------------------
+//  json_append_unsigned - append an unsigned
+//  integer value to the JSON stream
+//-------------------------------------------------
+
+save_zip_state &save_zip_state::json_append_unsigned(uint64_t value)
+{
+	json_check_reserve();
+
+	// quote values that don't fit into a double
+	bool quote = (uint64_t(double(value)) != value);
+	if (quote)
+		json_append('"');
+
+	// just use sprintf -- is there a faster way?
+	char buffer[20];
+	sprintf(buffer, "%llu", value);
+	json_append(buffer);
+
+	// end quotes
+	if (quote)
+		json_append('"');
+	return *this;
+}
+
+
+//-------------------------------------------------
+//  json_append_float - append a floating-point
+//  value to the JSON stream
+//-------------------------------------------------
+
+save_zip_state &save_zip_state::json_append_float(double value)
+{
+	json_check_reserve();
+	char buffer[20];
+	sprintf(buffer, "%g", value);
+	return json_append(buffer);
+}
+
+
+
+//**************************************************************************
+//  SAVE REGISTERED ITEM
+//**************************************************************************
+
+//-------------------------------------------------
+//  save_registered_item - constructor
+//-------------------------------------------------
+
+save_registered_item::save_registered_item() :
+	m_ptr_offset(0),
+	m_type(TYPE_CONTAINER),
+	m_native_size(0)
+{
+}
+
+// constructor for a new item
+save_registered_item::save_registered_item(uintptr_t ptr_offset, save_type type, uint32_t native_size, char const *name) :
+	m_ptr_offset(ptr_offset),
+	m_type(type),
+	m_native_size(native_size),
+	m_name(name)
+{
+	// cleanup names a bit
+	if (m_name[0] == '*')
+		m_name.erase(0, 1);
+	if (m_name[0] == 'm' && m_name[1] == '_')
+		m_name.erase(0, 2);
+}
+
+
+//-------------------------------------------------
+//  append - append a new item to the current one
+//-------------------------------------------------
+
+std::string type_string(save_registered_item::save_type type, uint32_t native_size)
+{
+	switch (type)
+	{
+	case save_registered_item::TYPE_CONTAINER:	return "CONTAINER";
+	case save_registered_item::TYPE_POINTER:	return "POINTER";
+	case save_registered_item::TYPE_UNIQUE:		return "UNIQUE";
+	case save_registered_item::TYPE_VECTOR:		return "VECTOR";
+	case save_registered_item::TYPE_STRUCT:		return "STRUCT";
+	case save_registered_item::TYPE_BOOL:		return "BOOL";
+	case save_registered_item::TYPE_INT:		return string_format("INT%d", 8 * native_size);
+	case save_registered_item::TYPE_UINT:		return string_format("UINT%d", 8 * native_size);
+	case save_registered_item::TYPE_FLOAT:		return string_format("FLOAT%d", 8 * native_size);
+	default:				return string_format("ARRAY[%d]", int(type));
+	}
+}
+
+save_registered_item &save_registered_item::append(uintptr_t ptr_offset, save_type type, uint32_t native_size, char const *name)
+{
+	// make sure there are no duplicates
+	if (find(name) != nullptr)
+		throw emu_fatalerror("Duplicate save state registration '%s'\n", name);
+
+//printf("%s '%s': adding %s '%s' @ %llX, size %d\n", type_string(m_type, m_native_size).c_str(), m_name.c_str(), type_string(type, native_size).c_str(), name, ptr_offset, native_size);
+
+	// add the item to the back of the list
+	m_items.emplace_back(ptr_offset, type, native_size, name);
+	return m_items.back();
+}
+
+
+//-------------------------------------------------
+//  find - find a subitem by name
+//-------------------------------------------------
+
+save_registered_item *save_registered_item::find(char const *name)
+{
+	// blank names can't be found this way
+	if (name[0] == 0)
+		return nullptr;
+
+	// make sure there are no duplicates
+	for (auto &item : m_items)
+		if (strcmp(item.name(), name) == 0)
+			return &item;
+	return nullptr;
+}
+
+
+//-------------------------------------------------
+//  sort_and_prune - prune empty subitems and
+//  sort them by name
+//-------------------------------------------------
+
+bool save_registered_item::sort_and_prune()
+{
+	// only applies to arrays, structs, and containers; don't prune anything else
+	if (m_type >= TYPE_ARRAY && m_type != TYPE_STRUCT && m_type != TYPE_CONTAINER)
+		return false;
+
+	// first prune any empty items
+	for (auto it = m_items.begin(); it != m_items.end(); )
+	{
+		if (it->sort_and_prune())
+			it = m_items.erase(it);
+		else
+			++it;
+	}
+
+	// then sort the rest if we have more than 1
+	if (m_items.size() > 1)
+		m_items.sort([] (auto const &x, auto const &y) { return (std::strcmp(x.name(), y.name()) < 0); });
+
+	// return true if we have nothing
+	return (m_items.size() == 0);
+}
+
+
+//-------------------------------------------------
+//  unwrap_and_update_objbase - unwrap trivial
+//  type and update the object base
+//-------------------------------------------------
+
+bool save_registered_item::unwrap_and_update_objbase(uintptr_t &objbase) const
+{
+	// update the base pointer with our local base/offset
+	objbase += m_ptr_offset;
+
+	// switch off the type
+	switch (m_type)
+	{
+		// unique ptrs retrieve the pointer from their container
+		case TYPE_UNIQUE:
+			objbase = reinterpret_cast<uintptr_t>(reinterpret_cast<generic_unique *>(objbase)->get());
+			return true;
+
+		// vectors retrieve the pointer from their container
+		case TYPE_VECTOR:
+			objbase = reinterpret_cast<uintptr_t>(&(*reinterpret_cast<generic_vector *>(objbase))[0]);
+			return true;
+
+		// pointers just extract the pointer directly
+		case TYPE_POINTER:
+			objbase = reinterpret_cast<uintptr_t>(*reinterpret_cast<generic_pointer *>(objbase));
+			return true;
+
+		// containers are always based at 0
+		case TYPE_CONTAINER:
+			objbase = 0;
+			return false;
+
+		// everything else is as-is
+		default:
+			return false;
+	}
+}
+
+
+//-------------------------------------------------
+//  save_binary - save this item and all owned
+//  items into a binary form
+//-------------------------------------------------
+
+uint64_t save_registered_item::save_binary(uint8_t *ptr, uint64_t length, uintptr_t objbase) const
+{
+	// update the base pointer and forward if a trivial unwrap
+	if (unwrap_and_update_objbase(objbase))
+		return m_items.front().save_binary(ptr, length, objbase);
+
+	// switch off the type
+	uint64_t offset = 0;
+	switch (m_type)
+	{
+		// boolean types save as a single byte
+		case TYPE_BOOL:
+			if (offset + 1 <= length)
+				ptr[offset] = *reinterpret_cast<bool const *>(objbase) ? 1 : 0;
+			offset++;
+			break;
+
+		// integral/float types save as their native size
+		case TYPE_INT:
+		case TYPE_UINT:
+		case TYPE_FLOAT:
+			if (offset + m_native_size <= length)
+				memcpy(&ptr[offset], reinterpret_cast<void const *>(objbase), m_native_size);
+			offset += m_native_size;
+			break;
+
+		// structs and containers iterate over owned items
+		case TYPE_CONTAINER:
+		case TYPE_STRUCT:
+			for (auto &item : m_items)
+				offset += item.save_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase);
+			break;
+
+		// arrays are multiples of a single item
+		default:
+			if (m_type < TYPE_ARRAY)
+			{
+				auto &item = m_items.front();
+				for (uint32_t rep = 0; rep < m_type; rep++)
+					offset += item.save_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase + rep * m_native_size);
+			}
+			break;
+	}
+	return offset;
+}
+
+
+//-------------------------------------------------
+//  restore_binary - restore this item and all
+//  owned items from binary form
+//-------------------------------------------------
+
+uint64_t save_registered_item::restore_binary(uint8_t const *ptr, uint64_t length, uintptr_t objbase) const
+{
+	// update the base pointer and forward if a trivial unwrap
+	if (unwrap_and_update_objbase(objbase))
+		return m_items.front().restore_binary(ptr, length, objbase);
+
+	// switch off the type
+	uint64_t offset = 0;
+	switch (m_type)
+	{
+		// boolean types save as a single byte
+		case TYPE_BOOL:
+			if (offset + 1 <= length)
+				*reinterpret_cast<bool *>(objbase) = (ptr[offset] != 0);
+			offset++;
+			break;
+
+		// integral/float types save as their native size
+		case TYPE_INT:
+		case TYPE_UINT:
+		case TYPE_FLOAT:
+			if (offset + m_native_size <= length)
+				memcpy(reinterpret_cast<void *>(objbase), &ptr[offset], m_native_size);
+			offset += m_native_size;
+			break;
+
+		// structs and containers iterate over owned items
+		case TYPE_CONTAINER:
+		case TYPE_STRUCT:
+			for (auto &item : m_items)
+				offset += item.restore_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase);
+			break;
+
+		// arrays are multiples of a single item
+		default:
+			if (m_type < TYPE_ARRAY)
+			{
+				auto &item = m_items.front();
+				for (uint32_t rep = 0; rep < m_type; rep++)
+					offset += item.restore_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase + rep * m_native_size);
+			}
+			break;
+	}
+	return offset;
+}
+
+
+//-------------------------------------------------
+//  save_json - save this item into a JSON stream
+//-------------------------------------------------
+
+void save_registered_item::save_json(save_zip_state &zipstate, char const *nameprefix, int indent, bool inline_form, uintptr_t objbase)
+{
+	// update the base pointer and forward if a trivial unwrap
+	if (unwrap_and_update_objbase(objbase))
+		return m_items.front().save_json(zipstate, nameprefix, indent, inline_form, objbase);
+
+	// update the name prefix
+	std::string localname = nameprefix;
+	if (m_name.length() != 0)
+	{
+		if (localname.length() != 0)
+			localname += ".";
+		localname += m_name;
+	}
+
+	// output the name if present
+	zipstate.json_append_name(m_name.c_str());
+
+	// switch off the type
+	switch (m_type)
+	{
+		// boolean types
+		case TYPE_BOOL:
+			zipstate.json_append(*reinterpret_cast<bool const *>(objbase) ? "true" : "false");
+			break;
+
+		// signed integral types
+		case TYPE_INT:
+			zipstate.json_append_signed(read_int_signed(objbase, m_native_size));
+			break;
+
+		// unsigned integral types
+		case TYPE_UINT:
+			zipstate.json_append_unsigned(read_int_unsigned(objbase, m_native_size));
+			break;
+
+		// float types
+		case TYPE_FLOAT:
+			zipstate.json_append_float(read_float(objbase, m_native_size));
+			break;
+
+		// structs and containers iterate over owned items
+		case TYPE_CONTAINER:
+		case TYPE_STRUCT:
+			if (inline_form || compute_binary_size(objbase - m_ptr_offset) <= 16)
+			{
+				// inline form outputs everything on a single line
+				zipstate.json_append('{');
+				for (auto &item : m_items)
+				{
+					item.save_json(zipstate, localname.c_str(), indent, true, objbase);
+					if (&item != &m_items.back())
+						zipstate.json_append(',');
+				}
+				zipstate.json_append('}');
+			}
+			else
+			{
+				// normal form outputs each item on its own line, indented
+				zipstate.json_append('{').json_append_eol();
+				for (auto &item : m_items)
+				{
+					zipstate.json_append_indent(indent + 1);
+					item.save_json(zipstate, localname.c_str(), indent + 1, false, objbase);
+					if (&item != &m_items.back())
+						zipstate.json_append(',');
+					zipstate.json_append_eol();
+				}
+				zipstate.json_append_indent(indent).json_append('}');
+			}
+			break;
+
+		// arrays are multiples of a single item
+		default:
+			if (m_type < TYPE_ARRAY)
+			{
+				auto &item = m_items.front();
+
+				// look for large arrays of ints/floats
+				save_registered_item *inner = &item;
+				u32 total = count();
+				while (inner->type() < TYPE_ARRAY)
+				{
+					total *= inner->count();
+					inner = &inner->m_items.front();
+				}
+				if ((inner->type() == TYPE_INT || inner->type() == TYPE_UINT || inner->type() == TYPE_FLOAT) && total * inner->m_native_size >= save_zip_state::JSON_EXTERNAL_BINARY_THRESHOLD)
+				{
+					std::string filename = localname;
+					for (int index = 0; index < filename.length(); )
+						if (strchr("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-.", filename[index]) == nullptr)
+						{
+							if (index != 0 && filename[index - 1] != '.')
+								filename[index++] = '.';
+							else
+								filename.erase(index, 1);
+						}
+						else
+							index++;
+
+					zipstate.json_append('[').json_append('{');
+					zipstate.json_append_name("external_file");
+					zipstate.json_append('"').json_append(filename.c_str()).json_append('"').json_append(',');
+					zipstate.json_append_name("unit");
+					zipstate.json_append_signed(inner->m_native_size).json_append(',');
+					zipstate.json_append_name("count");
+					zipstate.json_append_signed(total).json_append(',');
+					zipstate.json_append_name("little_endian");
+					zipstate.json_append((ENDIANNESS_NATIVE == ENDIANNESS_LITTLE) ? "true" : "false");
+					zipstate.json_append('}').json_append(']');
+
+					zipstate.add_data_file(filename.c_str(), item, reinterpret_cast<void *>(objbase));
+				}
+				else
+				{
+					uint32_t item_size = item.compute_binary_size(objbase);
+					if (inline_form || m_type * item_size <= 16)
+					{
+						// strictly inline form outputs everything on a single line
+						zipstate.json_append('[');
+						for (uint32_t rep = 0; rep < m_type; rep++)
+						{
+							item.save_json(zipstate, localname.c_str(), 0, true, objbase + rep * m_native_size);
+							if (rep != m_type - 1)
+								zipstate.json_append(',');
+						}
+						zipstate.json_append(']');
+					}
+					else
+					{
+						// normal form outputs a certain number of items per row
+						zipstate.json_append('[').json_append_eol();
+						uint32_t items_per_row = 0;
+						if (item.m_type == TYPE_INT || item.m_type == TYPE_UINT || item.m_type == TYPE_FLOAT)
+							items_per_row = 32 / item_size;
+						if (items_per_row == 0)
+							items_per_row = 1;
+
+						// iterate over the items
+						for (uint32_t rep = 0; rep < m_type; rep++)
+						{
+							if (rep % items_per_row == 0)
+								zipstate.json_append_indent(indent + 1);
+							item.save_json(zipstate, localname.c_str(), indent + 1, false, objbase + rep * m_native_size);
+							if (rep != m_type - 1)
+								zipstate.json_append(',');
+							if (rep % items_per_row == items_per_row - 1)
+								zipstate.json_append_eol();
+						}
+						if (m_type % items_per_row != 0)
+							zipstate.json_append_eol();
+						zipstate.json_append_indent(indent).json_append(']');
+					}
+				}
+			}
+			break;
+	}
+}
+
+
+//-------------------------------------------------
+//  read_int_unsigned - read an unsigned integer
+//  of the given size
+//-------------------------------------------------
+
+uint64_t save_registered_item::read_int_unsigned(uintptr_t objbase, int size)
+{
+	switch (size)
+	{
+		case 1:	return *reinterpret_cast<uint8_t const *>(objbase);
+		case 2:	return *reinterpret_cast<uint16_t const *>(objbase);
+		case 4:	return *reinterpret_cast<uint32_t const *>(objbase);
+		case 8:	return *reinterpret_cast<uint64_t const *>(objbase);
+	}
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  read_int_signed - read a signed integer of the
+//  given size
+//-------------------------------------------------
+
+int64_t save_registered_item::read_int_signed(uintptr_t objbase, int size)
+{
+	switch (size)
+	{
+		case 1:	return *reinterpret_cast<int8_t const *>(objbase);
+		case 2:	return *reinterpret_cast<int16_t const *>(objbase);
+		case 4:	return *reinterpret_cast<int32_t const *>(objbase);
+		case 8:	return *reinterpret_cast<int64_t const *>(objbase);
+	}
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  read_float - read a floating-point value of the
+//  given size
+//-------------------------------------------------
+
+double save_registered_item::read_float(uintptr_t objbase, int size)
+{
+	switch (size)
+	{
+		case 4:	return *reinterpret_cast<float const *>(objbase);
+		case 8:	return *reinterpret_cast<double const *>(objbase);
+	}
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  write_int - write an integer of the given size
+//-------------------------------------------------
+
+void save_registered_item::write_int(uintptr_t objbase, int size, uint64_t data)
+{
+	switch (size)
+	{
+		case 1:	*reinterpret_cast<uint8_t *>(objbase) = uint8_t(data); break;
+		case 2:	*reinterpret_cast<uint16_t *>(objbase) = uint16_t(data); break;
+		case 4:	*reinterpret_cast<uint32_t *>(objbase) = uint32_t(data); break;
+		case 8:	*reinterpret_cast<uint64_t *>(objbase) = uint64_t(data); break;
+	}
+}
+
+
+//-------------------------------------------------
+//  write_float - write a floating-point value of
+//  the given size
+//-------------------------------------------------
+
+void save_registered_item::write_float(uintptr_t objbase, int size, double data)
+{
+	switch (size)
+	{
+		case 4:	*reinterpret_cast<float *>(objbase) = float(data); break;
+		case 8:	*reinterpret_cast<double *>(objbase) = double(data); break;
+	}
+}
+
+
+
+//**************************************************************************
+//  SAVE MANAGER
 //**************************************************************************
 
 //-------------------------------------------------
 //  save_manager - constructor
 //-------------------------------------------------
 
-save_manager::save_manager(running_machine &machine)
-	: m_machine(machine)
-	, m_reg_allowed(true)
-	, m_illegal_regs(0)
-	, m_root_registrar(m_root_item)
+save_manager::save_manager(running_machine &machine) :
+	m_machine(machine),
+	m_reg_allowed(true),
+	m_root_registrar(m_root_item)
 {
 	m_rewind = std::make_unique<rewinder>(*this);
 }
@@ -83,49 +698,19 @@ void save_manager::allow_registration(bool allowed)
 	m_reg_allowed = allowed;
 	if (!allowed)
 	{
-		// look for duplicates
-		std::sort(m_entry_list.begin(), m_entry_list.end(),
-				[] (std::unique_ptr<state_entry> const& a, std::unique_ptr<state_entry> const& b) { return a->m_name < b->m_name; });
+		// prune and sort
+		m_root_item.sort_and_prune();
 
-		int dupes_found = 0;
-		for (int i = 1; i < m_entry_list.size(); i++)
+		// dump out a sample JSON
 		{
-			if (m_entry_list[i - 1]->m_name == m_entry_list[i]->m_name)
-			{
-				osd_printf_error("Duplicate save state registration entry (%s)\n", m_entry_list[i]->m_name);
-				dupes_found++;
-			}
+			save_zip_state state;
+			m_root_item.save_json(state);
+			printf("%s\n", state.json_string());
 		}
-
-		if (dupes_found)
-			fatalerror("%d duplicate save state entries found.\n", dupes_found);
-
-		dump_registry();
 
 		// everything is registered by now, evaluate the savestate size
 		m_rewind->clamp_capacity();
 	}
-}
-
-
-//-------------------------------------------------
-//  indexed_item - return an item with the given
-//  index
-//-------------------------------------------------
-
-const char *save_manager::indexed_item(int index, void *&base, u32 &valsize, u32 &valcount, u32 &blockcount, u32 &stride) const
-{
-	if (index >= m_entry_list.size() || index < 0)
-		return nullptr;
-
-	state_entry *entry = m_entry_list.at(index).get();
-	base = entry->m_data;
-	valsize = entry->m_typesize;
-	valcount = entry->m_typecount;
-	blockcount = entry->m_blockcount;
-	stride = entry->m_stride;
-
-	return entry->m_name.c_str();
 }
 
 
@@ -172,33 +757,6 @@ void save_manager::register_postload(save_prepost_delegate func)
 
 
 //-------------------------------------------------
-//  check_file - check if a file is a valid save
-//  state
-//-------------------------------------------------
-
-save_error save_manager::check_file(running_machine &machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...))
-{
-	// if we want to validate the signature, compute it
-	u32 sig;
-	sig = machine.save().signature();
-
-	// seek to the beginning and read the header
-	file.compress(FCOMPRESS_NONE);
-	file.seek(0, SEEK_SET);
-	u8 header[HEADER_SIZE];
-	if (file.read(header, sizeof(header)) != sizeof(header))
-	{
-		if (errormsg != nullptr)
-			(*errormsg)("Could not read %s save file header",emulator_info::get_appname());
-		return STATERR_READ_ERROR;
-	}
-
-	// let the generic header check work out the rest
-	return validate_header(header, gamename, sig, errormsg, "");
-}
-
-
-//-------------------------------------------------
 //  dispatch_postload - invoke all registered
 //  postload callbacks for updates
 //-------------------------------------------------
@@ -223,356 +781,94 @@ void save_manager::dispatch_presave()
 
 
 //-------------------------------------------------
-//  write_file - writes the data to a file
+//  save_binary - invoke all registered presave
+//  callbacks for updates and then generate the
+//  data in binary form
 //-------------------------------------------------
 
-save_error save_manager::write_file(emu_file &file)
+save_error save_manager::save_binary(void *buf, size_t size)
 {
-	return do_write(
-			[] (size_t total_size) { return true; },
-			[&file] (const void *data, size_t size) { return file.write(data, size) == size; },
-			[&file] ()
-			{
-				file.compress(FCOMPRESS_NONE);
-				file.seek(0, SEEK_SET);
-				return true;
-			},
-			[&file] ()
-			{
-				file.compress(FCOMPRESS_MEDIUM);
-				return true;
-			});
-}
-
-
-//-------------------------------------------------
-//  read_file - read the data from a file
-//-------------------------------------------------
-
-save_error save_manager::read_file(emu_file &file)
-{
-	return do_read(
-			[] (size_t total_size) { return true; },
-			[&file] (void *data, size_t size) { return file.read(data, size) == size; },
-			[&file] ()
-			{
-				file.compress(FCOMPRESS_NONE);
-				file.seek(0, SEEK_SET);
-				return true;
-			},
-			[&file] ()
-			{
-				file.compress(FCOMPRESS_MEDIUM);
-				return true;
-			});
-}
-
-
-//-------------------------------------------------
-//  write_stream - write the current machine state
-//  to an output stream
-//-------------------------------------------------
-
-save_error save_manager::write_stream(std::ostream &str)
-{
-	return do_write(
-			[] (size_t total_size) { return true; },
-			[&str] (const void *data, size_t size)
-			{
-				return bool(str.write(reinterpret_cast<const char *>(data), size));
-			},
-			[] () { return true; },
-			[] () { return true; });
-}
-
-
-//-------------------------------------------------
-//  read_stream - restore the machine state from
-//  an input stream
-//-------------------------------------------------
-
-save_error save_manager::read_stream(std::istream &str)
-{
-	return do_read(
-			[] (size_t total_size) { return true; },
-			[&str] (void *data, size_t size)
-			{
-				return bool(str.read(reinterpret_cast<char *>(data), size));
-			},
-			[] () { return true; },
-			[] () { return true; });
-}
-
-
-//-------------------------------------------------
-//  write_buffer - write the current machine state
-//  to an allocated buffer
-//-------------------------------------------------
-
-save_error save_manager::write_buffer(void *buf, size_t size)
-{
-	return do_write(
-			[size] (size_t total_size) { return size == total_size; },
-			[ptr = reinterpret_cast<u8 *>(buf)] (const void *data, size_t size) mutable
-			{
-				memcpy(ptr, data, size);
-				ptr += size;
-				return true;
-			},
-			[] () { return true; },
-			[] () { return true; });
-}
-
-
-//-------------------------------------------------
-//  read_buffer - restore the machine state from a
-//  buffer
-//-------------------------------------------------
-
-save_error save_manager::read_buffer(const void *buf, size_t size)
-{
-	const u8 *ptr = reinterpret_cast<const u8 *>(buf);
-	const u8 *const end = ptr + size;
-	return do_read(
-			[size] (size_t total_size) { return size == total_size; },
-			[&ptr, &end] (void *data, size_t size) -> bool
-			{
-				if ((ptr + size) > end)
-					return false;
-				memcpy(data, ptr, size);
-				ptr += size;
-				return true;
-			},
-			[] () { return true; },
-			[] () { return true; });
-}
-
-
-//-------------------------------------------------
-//  do_write - serialisation logic
-//-------------------------------------------------
-
-template <typename T, typename U, typename V, typename W>
-inline save_error save_manager::do_write(T check_space, U write_block, V start_header, W start_data)
-{
-	// if we have illegal registrations, return an error
-	if (m_illegal_regs > 0)
-		return STATERR_ILLEGAL_REGISTRATIONS;
-
-	// check for sufficient space
-	size_t total_size = HEADER_SIZE;
-	for (const auto &entry : m_entry_list)
-		total_size += entry->m_typesize * entry->m_typecount * entry->m_blockcount;
-	if (!check_space(total_size))
-		return STATERR_WRITE_ERROR;
-
-	// generate the header
-	u8 header[HEADER_SIZE];
-	memcpy(&header[0], STATE_MAGIC_NUM, 8);
-	header[8] = SAVE_VERSION;
-	header[9] = NATIVE_ENDIAN_VALUE_LE_BE(0, SS_MSB_FIRST);
-	strncpy((char *)&header[0x0a], machine().system().name, 0x1c - 0x0a);
-	u32 sig = signature();
-	*(u32 *)&header[0x1c] = little_endianize_int32(sig);
-
-	// write the header and turn on compression for the rest of the file
-	if (!start_header() || !write_block(header, sizeof(header)) || !start_data())
-		return STATERR_WRITE_ERROR;
-
 	// call the pre-save functions
 	dispatch_presave();
 
-	// then write all the data
-	for (auto &entry : m_entry_list)
-	{
-		const u32 blocksize = entry->m_typesize * entry->m_typecount;
-		const u8 *data = reinterpret_cast<const u8 *>(entry->m_data);
-		for (u32 b = 0; entry->m_blockcount > b; ++b, data += entry->m_stride)
-			if (!write_block(data, blocksize))
-				return STATERR_WRITE_ERROR;
-	}
+	// write the output
+	u64 finalsize = m_root_item.save_binary(reinterpret_cast<u8 *>(buf), size);
+	if (finalsize != size)
+		return STATERR_WRITE_ERROR;
+
 	return STATERR_NONE;
 }
 
 
 //-------------------------------------------------
-//  do_read - deserialisation logic
+//  load_binary - restore all data and then call
+//  the postload callbacks
 //-------------------------------------------------
 
-template <typename T, typename U, typename V, typename W>
-inline save_error save_manager::do_read(T check_length, U read_block, V start_header, W start_data)
+save_error save_manager::load_binary(void *buf, size_t size)
 {
-	// if we have illegal registrations, return an error
-	if (m_illegal_regs > 0)
-		return STATERR_ILLEGAL_REGISTRATIONS;
-
-	// check for sufficient space
-	size_t total_size = HEADER_SIZE;
-	for (const auto &entry : m_entry_list)
-		total_size += entry->m_typesize * entry->m_typecount * entry->m_blockcount;
-	if (!check_length(total_size))
+	// read the input
+	u64 finalsize = m_root_item.restore_binary(reinterpret_cast<u8 *>(buf), size);
+	if (finalsize != size)
 		return STATERR_READ_ERROR;
-
-	// read the header and turn on compression for the rest of the file
-	u8 header[HEADER_SIZE];
-	if (!start_header() || !read_block(header, sizeof(header)) || !start_data())
-		return STATERR_READ_ERROR;
-
-	// verify the header and report an error if it doesn't match
-	u32 sig = signature();
-	if (validate_header(header, machine().system().name, sig, nullptr, "Error: ")  != STATERR_NONE)
-		return STATERR_INVALID_HEADER;
-
-	// determine whether or not to flip the data when done
-	const bool flip = NATIVE_ENDIAN_VALUE_LE_BE((header[9] & SS_MSB_FIRST) != 0, (header[9] & SS_MSB_FIRST) == 0);
-
-	// read all the data, flipping if necessary
-	for (auto &entry : m_entry_list)
-	{
-		const u32 blocksize = entry->m_typesize * entry->m_typecount;
-		u8 *data = reinterpret_cast<u8 *>(entry->m_data);
-		for (u32 b = 0; entry->m_blockcount > b; ++b, data += entry->m_stride)
-			if (!read_block(data, blocksize))
-				return STATERR_READ_ERROR;
-
-		// handle flipping
-		if (flip)
-			entry->flip_data();
-	}
 
 	// call the post-load functions
 	dispatch_postload();
+	return STATERR_NONE;
+}
+
+
+//-------------------------------------------------
+//  save_file - invoke all registered presave
+//  callbacks for updates and then generate the
+//  data in JSON/ZIP form
+//-------------------------------------------------
+
+save_error save_manager::save_file(emu_file &file)
+{
+	// call the pre-save functions
+	dispatch_presave();
+
+	// create the JSON and target all the output files
+	save_zip_state state;
+	m_root_item.save_json(state);
+
+	// write the output
+	__debugbreak();
 
 	return STATERR_NONE;
 }
 
 
 //-------------------------------------------------
-//  signature - compute the signature, which
-//  is a CRC over the structure of the data
+//  load_file - restore all data and then call
+//  the postload callbacks
 //-------------------------------------------------
 
-u32 save_manager::signature() const
+save_error save_manager::load_file(emu_file &file)
 {
-	// iterate over entries
-	u32 crc = 0;
-	for (auto &entry : m_entry_list)
-	{
-		// add the entry name to the CRC
-		crc = core_crc32(crc, (u8 *)entry->m_name.c_str(), entry->m_name.length());
+	__debugbreak();
 
-		// add the type and size to the CRC
-		u32 temp[4];
-		temp[0] = little_endianize_int32(entry->m_typesize);
-		temp[1] = little_endianize_int32(entry->m_typecount);
-		temp[2] = little_endianize_int32(entry->m_blockcount);
-		temp[3] = little_endianize_int32(entry->m_stride);
-		crc = core_crc32(crc, (u8 *)&temp[0], sizeof(temp));
-	}
-	return crc;
-}
-
-
-//-------------------------------------------------
-//  dump_registry - dump the registry to the
-//  logfile
-//-------------------------------------------------
-
-void save_manager::dump_registry() const
-{
-	for (auto &entry : m_entry_list)
-		LOG(("%s: %u x %u x %u (%u)\n", entry->m_name.c_str(), entry->m_typesize, entry->m_typecount, entry->m_blockcount, entry->m_stride));
-}
-
-
-//-------------------------------------------------
-//  validate_header - validate the data in the
-//  header
-//-------------------------------------------------
-
-save_error save_manager::validate_header(const u8 *header, const char *gamename, u32 signature,
-	void (CLIB_DECL *errormsg)(const char *fmt, ...), const char *error_prefix)
-{
-	// check magic number
-	if (memcmp(header, STATE_MAGIC_NUM, 8))
-	{
-		if (errormsg != nullptr)
-			(*errormsg)("%sThis is not a %s save file", error_prefix,emulator_info::get_appname());
-		return STATERR_INVALID_HEADER;
-	}
-
-	// check save state version
-	if (header[8] != SAVE_VERSION)
-	{
-		if (errormsg != nullptr)
-			(*errormsg)("%sWrong version in save file (version %d, expected %d)", error_prefix, header[8], SAVE_VERSION);
-		return STATERR_INVALID_HEADER;
-	}
-
-	// check gamename, if we were asked to
-	if (gamename != nullptr && strncmp(gamename, (const char *)&header[0x0a], 0x1c - 0x0a))
-	{
-		if (errormsg != nullptr)
-			(*errormsg)("%s'File is not a valid savestate file for game '%s'.", error_prefix, gamename);
-		return STATERR_INVALID_HEADER;
-	}
-
-	// check signature, if we were asked to
-	if (signature != 0)
-	{
-		u32 rawsig = *(u32 *)&header[0x1c];
-		if (signature != little_endianize_int32(rawsig))
-		{
-			if (errormsg != nullptr)
-				(*errormsg)("%sIncompatible save file (signature %08x, expected %08x)", error_prefix, little_endianize_int32(rawsig), signature);
-			return STATERR_INVALID_HEADER;
-		}
-	}
+	// call the post-load functions
+	dispatch_postload();
 	return STATERR_NONE;
 }
 
 
-//-------------------------------------------------
-//  state_callback - constructor
-//-------------------------------------------------
 
-save_manager::state_callback::state_callback(save_prepost_delegate callback)
-	: m_func(std::move(callback))
-{
-}
-
+//**************************************************************************
+//  RAM STATE
+//**************************************************************************
 
 //-------------------------------------------------
 //  ram_state - constructor
 //-------------------------------------------------
 
-ram_state::ram_state(save_manager &save)
-	: m_save(save)
-	, m_data()
-	, m_valid(false)
-	, m_time(m_save.machine().time())
+ram_state::ram_state(save_manager &save) :
+	m_valid(false),
+	m_time(m_save.machine().time()),
+	m_save(save)
 {
-	m_data.reserve(get_size(save));
-	m_data.clear();
-	m_data.rdbuf()->clear();
-	m_data.seekp(0);
-	m_data.seekg(0);
-}
-
-
-//-------------------------------------------------
-//  get_size - utility function to get the
-//  uncompressed size of a state
-//-------------------------------------------------
-
-size_t ram_state::get_size(save_manager &save)
-{
-	size_t totalsize = 0;
-
-	for (auto &entry : save.m_entry_list)
-		totalsize += entry->m_typesize * entry->m_typecount * entry->m_blockcount;
-
-	return totalsize + HEADER_SIZE;
 }
 
 
@@ -585,10 +881,9 @@ save_error ram_state::save()
 {
 	// initialize
 	m_valid = false;
-	m_data.seekp(0);
 
 	// get the save manager to write state
-	const save_error err = m_save.write_stream(m_data);
+	const save_error err = m_save.save_binary(m_data);
 	if (err != STATERR_NONE)
 		return err;
 
@@ -607,30 +902,28 @@ save_error ram_state::save()
 
 save_error ram_state::load()
 {
-	// initialize
-	m_data.seekg(0);
-
-	// if we have illegal registrations, return an error
-	if (m_save.m_illegal_regs > 0)
-		return STATERR_ILLEGAL_REGISTRATIONS;
-
 	// get the save manager to load state
-	return m_save.read_stream(m_data);
+	return m_save.load_binary(m_data);
 }
 
+
+
+//**************************************************************************
+//  REWINDER
+//**************************************************************************
 
 //-------------------------------------------------
 //  rewinder - constuctor
 //-------------------------------------------------
 
-rewinder::rewinder(save_manager &save)
-	: m_save(save)
-	, m_enabled(save.machine().options().rewind())
-	, m_capacity(save.machine().options().rewind_capacity())
-	, m_current_index(REWIND_INDEX_NONE)
-	, m_first_invalid_index(REWIND_INDEX_NONE)
-	, m_first_time_warning(true)
-	, m_first_time_note(true)
+rewinder::rewinder(save_manager &save) :
+	m_save(save),
+	m_enabled(save.machine().options().rewind()),
+	m_capacity(save.machine().options().rewind_capacity()),
+	m_current_index(REWIND_INDEX_NONE),
+	m_first_invalid_index(REWIND_INDEX_NONE),
+	m_first_time_warning(true),
+	m_first_time_note(true)
 {
 }
 
@@ -646,7 +939,7 @@ void rewinder::clamp_capacity()
 		return;
 
 	const size_t total = m_capacity * 1024 * 1024;
-	const size_t single = ram_state::get_size(m_save);
+	const size_t single = m_save.binary_size();
 
 	// can't set below zero, but allow commandline to override options' upper limit
 	if (total < 0)
@@ -803,7 +1096,7 @@ bool rewinder::check_size()
 		return false;
 
 	// state sizes in bytes
-	const size_t singlesize = ram_state::get_size(m_save);
+	const size_t singlesize = m_save.binary_size();
 	size_t totalsize = m_state_list.size() * singlesize;
 
 	// convert our limit from megabytes
@@ -928,508 +1221,22 @@ void rewinder::report_error(save_error error, rewind_operation operation)
 }
 
 
-//-------------------------------------------------
-//  state_entry - constructor
-//-------------------------------------------------
-
-save_manager::state_entry::state_entry(
-		void *data,
-		std::string &&name, device_t *device, std::string &&module, std::string &&tag, int index,
-		u8 size, u32 valcount, u32 blockcount, u32 stride)
-	: m_data(data)
-	, m_name(std::move(name))
-	, m_device(device)
-	, m_module(std::move(module))
-	, m_tag(std::move(tag))
-	, m_index(index)
-	, m_typesize(size)
-	, m_typecount(valcount)
-	, m_blockcount(blockcount)
-	, m_stride(stride)
-{
-}
-
-
-//-------------------------------------------------
-//  flip_data - reverse the endianness of a
-//  block of data
-//-------------------------------------------------
-
-void save_manager::state_entry::flip_data()
-{
-	u8 *data = reinterpret_cast<u8 *>(m_data);
-	for (u32 b = 0; m_blockcount > b; ++b, data += m_stride)
-	{
-		u16 *data16;
-		u32 *data32;
-		u64 *data64;
-
-		switch (m_typesize)
-		{
-		case 2:
-			data16 = reinterpret_cast<u16 *>(data);
-			for (u32 count = 0; count < m_typecount; count++)
-				data16[count] = swapendian_int16(data16[count]);
-			break;
-
-		case 4:
-			data32 = reinterpret_cast<u32 *>(data);
-			for (u32 count = 0; count < m_typecount; count++)
-				data32[count] = swapendian_int32(data32[count]);
-			break;
-
-		case 8:
-			data64 = reinterpret_cast<u64 *>(data);
-			for (u32 count = 0; count < m_typecount; count++)
-				data64[count] = swapendian_int64(data64[count]);
-			break;
-		}
-	}
-}
-
-
-//**************************************************************************
-//  INITIALIZATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  save_registered_item - constructor
-//-------------------------------------------------
-
-save_registered_item::save_registered_item() :
-	m_ptr_offset(0),
-	m_type(TYPE_CONTAINER),
-	m_native_size(0)
-{
-}
-
-// constructor for a new item
-save_registered_item::save_registered_item(uintptr_t ptr_offset, save_type type, uint32_t native_size, char const *name) :
-	m_ptr_offset(ptr_offset),
-	m_type(type),
-	m_native_size(native_size),
-	m_name(name)
-{
-	// cleanup names a bit
-	if (m_name[0] == '*')
-		m_name.erase(0, 1);
-	if (m_name[0] == 'm' && m_name[1] == '_')
-		m_name.erase(0, 2);
-}
-
-
-//-------------------------------------------------
-//  append - append a new item to the current one
-//-------------------------------------------------
-
-static std::string type_string(save_registered_item::save_type type, uint32_t native_size)
-{
-	switch (type)
-	{
-	case save_registered_item::TYPE_CONTAINER:	return "CONTAINER";
-	case save_registered_item::TYPE_POINTER:	return "POINTER";
-	case save_registered_item::TYPE_UNIQUE:		return "UNIQUE";
-	case save_registered_item::TYPE_VECTOR:		return "VECTOR";
-	case save_registered_item::TYPE_STRUCT:		return "STRUCT";
-	case save_registered_item::TYPE_BOOL:		return "BOOL";
-	case save_registered_item::TYPE_INT:		return string_format("INT%d", 8 * native_size);
-	case save_registered_item::TYPE_UINT:		return string_format("UINT%d", 8 * native_size);
-	case save_registered_item::TYPE_FLOAT:		return string_format("FLOAT%d", 8 * native_size);
-	default:				return string_format("ARRAY[%d]", int(type));
-	}
-}
-
-save_registered_item &save_registered_item::append(uintptr_t ptr_offset, save_type type, uint32_t native_size, char const *name)
-{
-printf("%s '%s': adding %s '%s' @ %llX, size %d\n", type_string(m_type, m_native_size).c_str(), m_name.c_str(), type_string(type, native_size).c_str(), name, ptr_offset, native_size);
-	m_items.emplace_back(ptr_offset, type, native_size, name);
-	return m_items.back();
-}
-
-
-//-------------------------------------------------
-//  unwrap_and_update_objbase - unwrap trivial
-//  type and update the object base
-//-------------------------------------------------
-
-bool save_registered_item::unwrap_and_update_objbase(uintptr_t &objbase) const
-{
-	// update the base pointer with our local base/offset
-	objbase += m_ptr_offset;
-
-	// switch off the type
-	switch (m_type)
-	{
-		// unique ptrs retrieve the pointer from their container
-		case TYPE_UNIQUE:
-			objbase = reinterpret_cast<uintptr_t>(reinterpret_cast<generic_unique *>(objbase)->get());
-			return true;
-
-		// vectors retrieve the pointer from their container
-		case TYPE_VECTOR:
-			objbase = reinterpret_cast<uintptr_t>(&(*reinterpret_cast<generic_vector *>(objbase))[0]);
-			return true;
-
-		// pointers just extract the pointer directly
-		case TYPE_POINTER:
-			objbase = reinterpret_cast<uintptr_t>(*reinterpret_cast<generic_pointer *>(objbase));
-			return true;
-
-		// containers are always based at 0
-		case TYPE_CONTAINER:
-			objbase = 0;
-			return false;
-
-		// everything else is as-is
-		default:
-			return false;
-	}
-}
-
-
-//-------------------------------------------------
-//  save_binary - save this item and all owned
-//  items into a binary form
-//-------------------------------------------------
-
-uint64_t save_registered_item::save_binary(uint8_t *ptr, uint64_t length, uintptr_t objbase) const
-{
-	// update the base pointer and forward if a trivial unwrap
-	if (unwrap_and_update_objbase(objbase))
-		return m_items.front().save_binary(ptr, length, objbase);
-
-	// switch off the type
-	uint64_t offset = 0;
-	switch (m_type)
-	{
-		// boolean types save as a single byte
-		case TYPE_BOOL:
-			if (offset + 1 <= length)
-				ptr[offset] = *reinterpret_cast<bool const *>(objbase) ? 1 : 0;
-			offset++;
-			break;
-
-		// integral/float types save as their native size
-		case TYPE_INT:
-		case TYPE_UINT:
-		case TYPE_FLOAT:
-			if (offset + m_native_size <= length)
-				memcpy(&ptr[offset], reinterpret_cast<void const *>(objbase), m_native_size);
-			offset += m_native_size;
-			break;
-
-		// structs and containers iterate over owned items
-		case TYPE_CONTAINER:
-		case TYPE_STRUCT:
-			for (auto &item : m_items)
-				offset += item.save_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase);
-			break;
-
-		// arrays are multiples of a single item
-		default:
-			if (m_type < TYPE_ARRAY)
-			{
-				auto &item = m_items.front();
-				for (uint32_t rep = 0; rep < m_type; rep++)
-					offset += item.save_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase + rep * m_native_size);
-			}
-			break;
-	}
-	return offset;
-}
-
-
-//-------------------------------------------------
-//  restore_binary - restore this item and all
-//  owned items from binary form
-//-------------------------------------------------
-
-uint64_t save_registered_item::restore_binary(uint8_t const *ptr, uint64_t length, uintptr_t objbase) const
-{
-	// update the base pointer and forward if a trivial unwrap
-	if (unwrap_and_update_objbase(objbase))
-		return m_items.front().restore_binary(ptr, length, objbase);
-
-	// switch off the type
-	uint64_t offset = 0;
-	switch (m_type)
-	{
-		// boolean types save as a single byte
-		case TYPE_BOOL:
-			if (offset + 1 <= length)
-				*reinterpret_cast<bool *>(objbase) = (ptr[offset] != 0);
-			offset++;
-			break;
-
-		// integral/float types save as their native size
-		case TYPE_INT:
-		case TYPE_UINT:
-		case TYPE_FLOAT:
-			if (offset + m_native_size <= length)
-				memcpy(reinterpret_cast<void *>(objbase), &ptr[offset], m_native_size);
-			offset += m_native_size;
-			break;
-
-		// structs and containers iterate over owned items
-		case TYPE_CONTAINER:
-		case TYPE_STRUCT:
-			for (auto &item : m_items)
-				offset += item.restore_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase);
-			break;
-
-		// arrays are multiples of a single item
-		default:
-			if (m_type < TYPE_ARRAY)
-			{
-				auto &item = m_items.front();
-				for (uint32_t rep = 0; rep < m_type; rep++)
-					offset += item.restore_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase + rep * m_native_size);
-			}
-			break;
-	}
-	return offset;
-}
-
-
-//-------------------------------------------------
-//  save_json - save this item into a JSON stream
-//-------------------------------------------------
-
-void save_registered_item::save_json(save_zip_state &zipstate, int indent, bool inline_form, uintptr_t objbase)
-{
-	// update the base pointer and forward if a trivial unwrap
-	if (unwrap_and_update_objbase(objbase))
-		return m_items.front().save_json(zipstate, indent, inline_form, objbase);
-
-	// output the name if present
-	auto &output = zipstate.json();
-	if (m_name.length() > 0)
-		output << "\"" << m_name << "\": ";
-
-	// switch off the type
-	switch (m_type)
-	{
-		// boolean types
-		case TYPE_BOOL:
-			output << (*reinterpret_cast<bool const *>(objbase) ? "true" : "false");
-			break;
-
-		// signed integral types
-		case TYPE_INT:
-		{
-			int64_t value = read_int_signed(objbase, m_native_size);
-			char const *quote = (value == int64_t(double(value))) ? "" : "\"";
-			output << quote << value << quote;
-			break;
-		}
-
-		// unsigned integral types
-		case TYPE_UINT:
-		{
-			uint64_t value = read_int_unsigned(objbase, m_native_size);
-			char const *quote = (value == uint64_t(double(value))) ? "" : "\"";
-			output << quote << "0x" << std::setw(m_native_size * 2) << std::setfill('0') << std::hex << value << quote;
-			output << std::setw(0) << std::setfill(' ') << std::dec;
-			break;
-		}
-
-		// float types
-		case TYPE_FLOAT:
-		{
-			double value = read_float(objbase, m_native_size);
-			output << value;
-			break;
-		}
-
-		// structs and containers iterate over owned items
-		case TYPE_CONTAINER:
-		case TYPE_STRUCT:
-			if (inline_form || compute_binary_size(objbase - m_ptr_offset) <= 16)
-			{
-				// inline form outputs everything on a single line
-				output << "{ ";
-				for (auto &item : m_items)
-				{
-					item.save_json(zipstate, indent, true, objbase);
-					if (&item != &m_items.back())
-						output << ", ";
-				}
-				output << " }";
-			}
-			else
-			{
-				// normal form outputs each item on its own line, indented
-				output << "{" << std::endl;
-				for (auto &item : m_items)
-				{
-					output << std::setw(indent + 1) << std::setfill('\t') << "" << std::setw(0);
-					item.save_json(zipstate, indent + 1, false, objbase);
-					if (&item != &m_items.back())
-						output << ",";
-					output << std::endl;
-				}
-				output << std::setw(indent) << std::setfill('\t') << "" << std::setw(0)
-						<< "}";
-			}
-			break;
-
-		// arrays are multiples of a single item
-		default:
-			if (m_type < TYPE_ARRAY)
-			{
-				auto &item = m_items.front();
-				uint32_t item_size = item.compute_binary_size(objbase);
-				if (inline_form || m_type * item_size <= 16)
-				{
-					// strictly inline form outputs everything on a single line
-					output << "[ ";
-					for (uint32_t rep = 0; rep < m_type; rep++)
-					{
-						item.save_json(zipstate, 0, true, objbase + rep * m_native_size);
-						if (rep != m_type - 1)
-							output << ",";
-					}
-					output << " ]";
-				}
-				else
-				{
-					// normal form outputs a certain number of items per row
-					output << "[" << std::endl;
-					uint32_t items_per_row = 0;
-					if (item.m_type == TYPE_INT || item.m_type == TYPE_UINT || item.m_type == TYPE_FLOAT)
-						items_per_row = 32 / item_size;
-					if (items_per_row == 0)
-						items_per_row = 1;
-
-					// iterate over the items
-					for (uint32_t rep = 0; rep < m_type; rep++)
-					{
-						if (rep % items_per_row == 0)
-							output << std::setw(indent + 1) << std::setfill('\t') << "" << std::setw(0);
-						item.save_json(zipstate, indent + 1, false, objbase + rep * m_native_size);
-						if (rep != m_type - 1)
-							output << ",";
-						if (rep % items_per_row == items_per_row - 1)
-							output << std::endl;
-					}
-					if (m_type % items_per_row != 0)
-							output << std::endl;
-					output << std::setw(indent) << std::setfill('\t') << "" << std::setw(0)
-							<< "]";
-				}
-			}
-			break;
-	}
-}
-
-
-//-------------------------------------------------
-//  read_int_unsigned - read an unsigned integer
-//  of the given size
-//-------------------------------------------------
-
-uint64_t save_registered_item::read_int_unsigned(uintptr_t objbase, int size)
-{
-	switch (size)
-	{
-		case 1:	return *reinterpret_cast<uint8_t const *>(objbase);
-		case 2:	return *reinterpret_cast<uint16_t const *>(objbase);
-		case 4:	return *reinterpret_cast<uint32_t const *>(objbase);
-		case 8:	return *reinterpret_cast<uint64_t const *>(objbase);
-	}
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  read_int_signed - read a signed integer of the
-//  given size
-//-------------------------------------------------
-
-int64_t save_registered_item::read_int_signed(uintptr_t objbase, int size)
-{
-	switch (size)
-	{
-		case 1:	return *reinterpret_cast<int8_t const *>(objbase);
-		case 2:	return *reinterpret_cast<int16_t const *>(objbase);
-		case 4:	return *reinterpret_cast<int32_t const *>(objbase);
-		case 8:	return *reinterpret_cast<int64_t const *>(objbase);
-	}
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  read_float - read a floating-point value of the
-//  given size
-//-------------------------------------------------
-
-double save_registered_item::read_float(uintptr_t objbase, int size)
-{
-	switch (size)
-	{
-		case 4:	return *reinterpret_cast<float const *>(objbase);
-		case 8:	return *reinterpret_cast<double const *>(objbase);
-	}
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  write_int - write an integer of the given size
-//-------------------------------------------------
-
-void save_registered_item::write_int(uintptr_t objbase, int size, uint64_t data)
-{
-	switch (size)
-	{
-		case 1:	*reinterpret_cast<uint8_t *>(objbase) = uint8_t(data); break;
-		case 2:	*reinterpret_cast<uint16_t *>(objbase) = uint16_t(data); break;
-		case 4:	*reinterpret_cast<uint32_t *>(objbase) = uint32_t(data); break;
-		case 8:	*reinterpret_cast<uint64_t *>(objbase) = uint64_t(data); break;
-	}
-}
-
-
-//-------------------------------------------------
-//  write_float - write a floating-point value of
-//  the given size
-//-------------------------------------------------
-
-void save_registered_item::write_float(uintptr_t objbase, int size, double data)
-{
-	switch (size)
-	{
-		case 4:	*reinterpret_cast<float *>(objbase) = float(data); break;
-		case 8:	*reinterpret_cast<double *>(objbase) = double(data); break;
-	}
-}
-
 void save_manager::test_dump()
 {
 	save_zip_state state;
 	m_root_item.save_json(state);
-	printf("%s\n", state.json().str().c_str());
+	printf("%s\n", state.json_string());
 }
 
 
-save_zip_state::save_zip_state()
+save_zip_state::save_zip_state() :
+	m_json_reserved(0),
+	m_json_offset(0)
 {
-}
-
-void save_zip_state::add_data_file(char const *name, void *base, uint32_t size)
-{
-	m_file_list.emplace_back(name, base, size);
+	json_check_reserve();
 }
 
 void save_zip_state::commit(FILE &output)
 {
-	add_data_file("save.json", &m_json.str()[0], m_json.str().length());
-}
-
-save_zip_state::file_entry::file_entry(char const *name, void *base, uint32_t size) :
-	m_name(name),
-	m_base(base),
-	m_size(size)
-{
+//	add_data_file("save.json", &m_json.str()[0], m_json.str().length());
 }

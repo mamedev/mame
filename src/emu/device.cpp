@@ -578,9 +578,9 @@ void device_t::start()
 		intf.interface_pre_start();
 
 	// start the device, tracking how many state registrations they did
-	int state_registrations = machine().save().registration_count();
+	size_t state_registrations = machine().save().binary_size();
 	device_start();
-	m_save_registrations += machine().save().registration_count() - state_registrations;
+	m_save_registrations += machine().save().binary_size() - state_registrations;
 
 	// let the interfaces do their post-work
 	for (device_interface &intf : interfaces())
@@ -698,12 +698,12 @@ void device_t::register_save(save_registrar &save)
 		intf.interface_register_save(save);
 
 	// then the device itself
-	int state_registrations = machine().save().registration_count();
+	int state_registrations = machine().save().binary_size();
 	device_register_save(save);
 
 	// append any unstructured items
 	save.reg(m_unstructured_save, "unstructured");
-	m_save_registrations += machine().save().registration_count() - state_registrations;
+	m_save_registrations += machine().save().binary_size() - state_registrations;
 
 	// complain if registrations didn't happen
 	device_execute_interface *exec;

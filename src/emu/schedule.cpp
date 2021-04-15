@@ -263,7 +263,7 @@ void emu_timer::register_save()
 	}
 
 	// save the bits in their own container
-	save_registrar container(machine().scheduler().m_scheduler_container, string_format("timer:%s[%d]", name.c_str(), index).c_str());
+	save_registrar container(machine().scheduler().m_timer_registrar, string_format("%s[%d]", name.c_str(), index).c_str());
 	container.reg(NAME(m_param))
 		.reg(NAME(m_enabled))
 		.reg(NAME(m_period))
@@ -339,14 +339,15 @@ device_scheduler::device_scheduler(running_machine &machine) :
 	m_callback_timer_expire_time(attotime::zero),
 	m_suspend_changes_pending(true),
 	m_quantum_minimum(ATTOSECONDS_IN_NSEC(1) / 1000),
-	m_scheduler_container(machine.save().root_registrar(), "scheduler")
+	m_scheduler_registrar(machine.save().root_registrar(), "scheduler"),
+	m_timer_registrar(m_scheduler_registrar, "timers")
 {
 	// append a single never-expiring timer so there is always one in the list
 	m_timer_list = &m_timer_allocator.alloc()->init(machine, timer_expired_delegate(), nullptr, true);
 	m_timer_list->adjust(attotime::never);
 
 	// register global states
-	m_scheduler_container.reg(NAME(m_basetime));
+	m_scheduler_registrar.reg(NAME(m_basetime));
 	machine.save().register_presave(save_prepost_delegate(FUNC(device_scheduler::presave), this));
 	machine.save().register_postload(save_prepost_delegate(FUNC(device_scheduler::postload), this));
 }

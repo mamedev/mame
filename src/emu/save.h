@@ -87,37 +87,95 @@ typedef named_delegate<void ()> save_prepost_delegate;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+class save_registered_item;
+class ram_state;
+class rewinder;
+
+
+// ======================> save_zip_state
+
+// this class manages the creation of a ZIP file containing a JSON with most of
+// the save data, plus various binary files containing larger chunks of data
 class save_zip_state
 {
+	// intenral constants
+	static constexpr u32 JSON_EXPAND_CHUNK = 1024 * 1024;
+	static constexpr u32 JSON_EXPAND_THRESH = 1024;
+
 public:
+	// the size threshold in bytes above which we will write an external file
+	static constexpr u32 JSON_EXTERNAL_BINARY_THRESHOLD = 4096;
+
+	// construction
 	save_zip_state();
 
-	std::ostringstream &json() { return m_json; }
+	// simpler getters
+	char const *json_string() { m_json[m_json_offset] = 0; return &m_json[0]; }
+	int json_length() const { return m_json_offset; }
 
-	void add_data_file(char const *name, void *base, uint32_t size);
+	// append a character to the JSON stream
+	save_zip_state &json_append(char ch) { 	m_json[m_json_offset++] = ch; return *this; }
 
+	// append an end-of-line sequence to the JSON stream
+	save_zip_state &json_append_eol() { return json_append(13).json_append(10); }
+
+	// additional JSON output helpers
+	save_zip_state &json_append(char const *buffer);
+	save_zip_state &json_append_indent(int count);
+	save_zip_state &json_append_name(char const *name);
+	save_zip_state &json_append_signed(int64_t value);
+	save_zip_state &json_append_unsigned(uint64_t value);
+	save_zip_state &json_append_float(double value);
+
+	// stage an item to be output as raw data
+	void add_data_file(char const *name, save_registered_item &item, void *base)
+	{
+		m_file_list.emplace_back(name, item, base);
+	}
+
+	// commit the results to the given file
 	void commit(FILE &output);
 
 private:
+	// check the reserve; if we're getting close, expand out one more chunk
+	void json_check_reserve()
+	{
+		if (m_json_reserved - m_json_offset < JSON_EXPAND_THRESH)
+		{
+			m_json_reserved += JSON_EXPAND_CHUNK;
+			m_json.resize(m_json_reserved);
+		}
+	}
+
+	// file_entry represents a single raw data file that will be written
 	struct file_entry
 	{
-		file_entry(char const *name, void *base, uint32_t size);
-
+		file_entry(char const *name, save_registered_item &item, void *base) : m_item(item), m_name(name), m_base(base) { }
+		save_registered_item &m_item;
 		std::string m_name;
 		void *m_base;
-		uint32_t m_size;
 	};
-	std::ostringstream m_json;
+
+	// internal state
 	std::list<file_entry> m_file_list;
+	std::vector<char> m_json;
+	u32 m_json_reserved;
+	u32 m_json_offset;
 };
 
+
+// ======================> save_registered_item
+
+// this class manages a single item node in the hierarchy of registered save items
 class save_registered_item
 {
+	// generic types used as proxies for extracting pointers
 	using generic_unique = std::unique_ptr<int> const;
 	using generic_vector = std::vector<int> const;
 	using generic_pointer = void * const;
 
 public:
+	// the various types supported
 	enum save_type : uint32_t
 	{
 		TYPE_ARRAY = 0xffff0000, // array is relative, and contains 1 data item that is replicated
@@ -138,7 +196,7 @@ public:
 	// constructor for a new item
     save_registered_item(uintptr_t ptr_offset, save_type type, uint32_t native_size, char const *name);
 
-	// getters
+	// simple getters
 	char const *name() const { return m_name.c_str(); }
 	save_type type() const { return m_type; }
 	std::list<save_registered_item> &subitems() { return m_items; }
@@ -148,6 +206,12 @@ public:
 
 	// append a new item to the current one
     save_registered_item &append(uintptr_t ptr_offset, save_type type, uint32_t native_size, char const *name);
+
+	// find an item by name
+	save_registered_item *find(char const *name);
+
+	// sort subitems by name and prune any empty items
+	bool sort_and_prune();
 
 	// update the object base and unwrap trivial items
 	bool unwrap_and_update_objbase(uintptr_t &objbase) const;
@@ -162,12 +226,12 @@ public:
 	uint64_t restore_binary(uint8_t const *ptr, uint64_t length, uintptr_t objbase = 0) const;
 
 	// save this item into a JSON stream
-	void save_json(save_zip_state &output, int indent = 0, bool inline_form = false, uintptr_t objbase = 0);
+	void save_json(save_zip_state &output, char const *nameprefix = "", int indent = 0, bool inline_form = false, uintptr_t objbase = 0);
 
 	// restore this item from a JSON stream
 	void restore_json(std::istringstream &input, uintptr_t objbase = 0);
 
-	// internal helpers
+	// read/write helpers
 	uint64_t read_int_unsigned(uintptr_t objbase, int size);
 	int64_t read_int_signed(uintptr_t objbase, int size);
 	double read_float(uintptr_t objbase, int size);
@@ -183,6 +247,11 @@ private:
     std::string m_name;                      // name of item
 };
 
+
+// ======================> save_registrar
+
+// this class is the public interface to registration; it contains the heavily
+// templated registration helpers that do the right thing for all supported types
 class save_registrar
 {
 	friend class save_manager;
@@ -268,7 +337,7 @@ public:
 		if (data.get() == nullptr)
 			throw emu_fatalerror("Passed null pointer to save state registration.");
 
-		save_registrar container(*this, save_registered_item::TYPE_UNIQUE, sizeof(data), "", &data, data.get());
+		save_registrar container(*this, save_registered_item::TYPE_UNIQUE, sizeof(data), name, &data, data.get());
 		container.reg(*data.get(), name);
 		return *this;
 	}
@@ -313,7 +382,7 @@ public:
 			return *this;
 
 		// create an outer container for the vector
-		save_registrar container(*this, save_registered_item::TYPE_VECTOR, sizeof(data), "", &data, &data[0]);
+		save_registrar container(*this, save_registered_item::TYPE_VECTOR, sizeof(data), name, &data, &data[0]);
 
 		// then an array container within
 		save_registrar subcontainer(container, save_registered_item::save_type(data.size()), uintptr_t(&data[1]) - uintptr_t(&data[0]), name, &data[0]);
@@ -332,7 +401,7 @@ public:
 		if (data.get() == nullptr)
 			throw emu_fatalerror("Passed null pointer to save state registration.");
 
-		save_registrar container(*this, save_registered_item::TYPE_UNIQUE, sizeof(data), "", &data, data.get());
+		save_registrar container(*this, save_registered_item::TYPE_UNIQUE, sizeof(data), name, &data, data.get());
 
 		save_registrar subcontainer(container, save_registered_item::save_type(count), uintptr_t(&data[1]) - uintptr_t(&data[0]), name, &data[0]);
 		subcontainer.reg(data[0], "");
@@ -396,62 +465,10 @@ SAVE_TYPE_AS_UINT(PAIR);
 SAVE_TYPE_AS_UINT(PAIR64);
 
 
-
-
-class ram_state;
-class rewinder;
+// ======================> save_manager
 
 class save_manager
 {
-	// stuff for working with arrays
-	template <typename T> struct array_unwrap
-	{
-		using underlying_type = T;
-		static constexpr std::size_t SAVE_COUNT = 1U;
-		static constexpr std::size_t SIZE = sizeof(underlying_type);
-		static underlying_type *ptr(T &value) { return &value; }
-	};
-	template <typename T, std::size_t N> struct array_unwrap<T [N]>
-	{
-		using underlying_type = typename array_unwrap<T>::underlying_type;
-		static constexpr std::size_t SAVE_COUNT = N * array_unwrap<T>::SAVE_COUNT;
-		static constexpr std::size_t SIZE = sizeof(underlying_type);
-		static underlying_type *ptr(T (&value)[N]) { return array_unwrap<T>::ptr(value[0]); }
-	};
-	template <typename T, std::size_t N> struct array_unwrap<std::array<T, N> >
-	{
-		using underlying_type = typename array_unwrap<T>::underlying_type;
-		static constexpr std::size_t SAVE_COUNT = N * array_unwrap<T>::SAVE_COUNT;
-		static constexpr std::size_t SIZE = sizeof(underlying_type);
-		static underlying_type *ptr(std::array<T, N> &value) { return array_unwrap<T>::ptr(value[0]); }
-	};
-
-	// set of templates to identify valid save types
-	template <typename ItemType> struct is_atom { static constexpr bool value = false; };
-	template <typename ItemType> struct is_vector_safe { static constexpr bool value = false; };
-
-	class state_entry
-	{
-	public:
-		// construction/destruction
-		state_entry(void *data, std::string &&name, device_t *device, std::string &&module, std::string &&tag, int index, u8 size, u32 valcount, u32 blockcount, u32 stride);
-
-		// helpers
-		void flip_data();
-
-		// state
-		void *          m_data;                 // pointer to the memory to save/restore
-		std::string     m_name;                 // full name
-		device_t *      m_device;               // associated device, nullptr if none
-		std::string     m_module;               // module name
-		std::string     m_tag;                  // tag name
-		int             m_index;                // index
-		u8              m_typesize;             // size of the raw data type
-		u32             m_typecount;            // number of items in each block
-		u32             m_blockcount;           // number of blocks of items
-		u32             m_stride;               // stride between blocks of items in units of item size
-	};
-
 	friend class ram_state;
 	friend class rewinder;
 
@@ -462,12 +479,11 @@ public:
 	// getters
 	running_machine &machine() const { return m_machine; }
 	rewinder *rewind() { return m_rewind.get(); }
-	int registration_count() const { return m_entry_list.size() + m_root_item.compute_binary_size(); }
 	bool registration_allowed() const { return m_reg_allowed; }
+	save_registrar &root_registrar() { return m_root_registrar; }
 
 	// registration control
 	void allow_registration(bool allowed = true);
-	const char *indexed_item(int index, void *&base, u32 &valsize, u32 &valcount, u32 &blockcount, u32 &stride) const;
 
 	// function registration
 	void register_presave(save_prepost_delegate func);
@@ -477,18 +493,18 @@ public:
 	void dispatch_presave();
 	void dispatch_postload();
 
-	// file processing
-	static save_error check_file(running_machine &machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...));
-	save_error write_file(emu_file &file);
-	save_error read_file(emu_file &file);
+	// binary file processing (internal)
+	size_t binary_size() { return m_root_item.compute_binary_size(); }
+	save_error save_binary(void *buf, size_t size);
+	save_error save_binary(std::vector<u8> &buffer) { buffer.resize(binary_size()); return save_binary(&buffer[0], buffer.size()); }
+	save_error load_binary(void *buf, size_t size);
+	save_error load_binary(std::vector<u8> &buffer) { return load_binary(&buffer[0], buffer.size()); }
 
-	save_error write_stream(std::ostream &str);
-	save_error read_stream(std::istream &str);
+	// disk file processing (external)
+	save_error save_file(emu_file &file);
+	save_error load_file(emu_file &file);
 
-	save_error write_buffer(void *buf, size_t size);
-	save_error read_buffer(const void *buf, size_t size);
-
-	save_registrar &root_registrar() { return m_root_registrar; }
+	// access to the root regist
 	void test_dump();
 
 private:
@@ -497,52 +513,54 @@ private:
 	{
 	public:
 		// construction/destruction
-		state_callback(save_prepost_delegate callback);
-
+		state_callback(save_prepost_delegate callback) : m_func(std::move(callback)) { }
 		save_prepost_delegate m_func;                 // delegate
 	};
-
-	// internal helpers
-	template <typename T, typename U, typename V, typename W>
-	save_error do_write(T check_space, U write_block, V start_header, W start_data);
-	template <typename T, typename U, typename V, typename W>
-	save_error do_read(T check_length, U read_block, V start_header, W start_data);
-	u32 signature() const;
-	void dump_registry() const;
-	static save_error validate_header(const u8 *header, const char *gamename, u32 signature, void (CLIB_DECL *errormsg)(const char *fmt, ...), const char *error_prefix);
 
 	// internal state
 	running_machine &         m_machine;              // reference to our machine
 	std::unique_ptr<rewinder> m_rewind;               // rewinder
 	bool                      m_reg_allowed;          // are registrations allowed?
-	s32                       m_illegal_regs;         // number of illegal registrations
+	save_registered_item      m_root_item;            // the root item in the hierarchy
+	save_registrar            m_root_registrar;       // a registrar for adding to the root item
 
-	save_registered_item      m_root_item;
-	save_registrar            m_root_registrar;
-
-	std::vector<std::unique_ptr<state_entry>>    m_entry_list;       // list of registered entries
 	std::vector<std::unique_ptr<ram_state>>      m_ramstate_list;    // list of ram states
 	std::vector<std::unique_ptr<state_callback>> m_presave_list;     // list of pre-save functions
 	std::vector<std::unique_ptr<state_callback>> m_postload_list;    // list of post-load functions
 };
 
+
+// ======================> ram_state
+
 class ram_state
 {
-	save_manager &     m_save;                        // reference to save_manager
-	util::vectorstream m_data;                        // save data buffer
-
 public:
 	bool               m_valid;                       // can we load this state?
 	attotime           m_time;                        // machine timestamp
 
 	ram_state(save_manager &save);
-	static size_t get_size(save_manager &save);
 	save_error save();
 	save_error load();
+
+private:
+	save_manager &     m_save;                        // reference to save_manager
+	std::vector<u8>    m_data;                        // save data buffer
 };
+
+
+// ======================> rewinder
 
 class rewinder
 {
+public:
+	rewinder(save_manager &save);
+	bool enabled() { return m_enabled; }
+	void clamp_capacity();
+	void invalidate();
+	bool capture();
+	bool step();
+
+private:
 	save_manager & m_save;                            // reference to save_manager
 	bool           m_enabled;                         // enable rewind savestates
 	size_t         m_capacity;                        // total memory rewind states can occupy (MB, limited to 1-2048 in options)
@@ -568,14 +586,6 @@ class rewinder
 	bool check_size();
 	bool current_index_is_last() { return m_current_index == m_state_list.size() - 1; }
 	void report_error(save_error type, rewind_operation operation);
-
-public:
-	rewinder(save_manager &save);
-	bool enabled() { return m_enabled; }
-	void clamp_capacity();
-	void invalidate();
-	bool capture();
-	bool step();
 };
 
 #endif // MAME_EMU_SAVE_H
