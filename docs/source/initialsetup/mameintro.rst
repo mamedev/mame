@@ -83,9 +83,10 @@ you may find that using an older version of MAME may get you better
 performance, at the cost of greatly lowered accuracy and fewer supported
 systems.
 
-MAME will take advantage of 3D hardware for compositing artwork and scaling the
-games to full screen. To make use of this, you should have a modern computer
-with modern 3D hardware.
+MAME will take advantage of 3D hardware for compositing artwork and scaling
+displayed software to full screen. To make use of this, you should have at least
+a semi-modern computer with semi-modern 3D hardware made within the last five
+to ten years.
 
 HLSL or GLSL special effects such as CRT simulation will put a very heavy load
 on your video card, especially at higher resolutions. You will need a fairly
