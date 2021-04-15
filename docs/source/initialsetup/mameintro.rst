@@ -1,5 +1,5 @@
 An Introduction to MAME
-=======================
+-----------------------
 
 MAME, formerly was an acronym which stood for Multi Arcade Machine Emulator,
 documents and reproduces through emulation the inner components of arcade
@@ -17,7 +17,7 @@ systems from the last 5 decades.
 
 
 Purpose of MAME
-===============
+---------------
 
 The primary purpose of MAME is to preserve decades of arcade, computer, and
 console history. As technology continues to rush forward, MAME prevents these
@@ -25,12 +25,12 @@ important “vintage” systems from being lost and forgotten.
 
 
 Systems Emulated by MAME
-========================
+------------------------
 
 
-ProjectMESS contains a complete list of the systems currently emulated. As you
-will notice, being supported does not always mean that the status of the
-emulation is perfect. You may want
+The `Arcade Database <http://adb.arcadeitalia.net/>`_  contains a complete list
+of the systems currently emulated. As you will notice, being supported does not
+always mean that the status of the emulation is perfect. You may want
 
 1. to check the status of the emulation in the wiki pages of each system,
 accessible from the drivers page (e.g. for Apple Macintosh, from the page for
@@ -43,13 +43,16 @@ Alternatively, you can simply see the status by yourself, launching the system
 emulation and taking a look at the red or yellow warning screen which appears
 before the emulation starts, if any. Notice that if you have information which
 can help to improve the emulation of a supported system, or if you can directly
-contribute fixes and/or addition to the current source, you can follow the
-instructions at the contact page or post to the MAME Forums at
-http://forum.mamedev.org/
+contribute fixes and/or addition to the current source, you can do any of the
+following:
+
+    * Send in a pull request (for code) or open an issue (information) on our Github page.
+    * Post the information or code on the `MAME Forums <https://forum.mamedev.org/>`_
+    * Follow the instructions on our `contact page <https://www.mamedev.org/contact.html>`_
 
 
 Supported OS
-============
+------------
 
 The current source code can be directly compiled under all the main OSes:
 Microsoft Windows (both with DirectX/BGFX native support or with SDL support),
@@ -57,7 +60,7 @@ Linux, FreeBSD, and macOS. Also, both 32-bit and 64-bit are supported, but
 be aware 64-bit often shows a significant speed increase over 32-bit.
 
 System Requirements
-===================
+-------------------
 
 MAME is written in C++, and has been ported to numerous platforms. Over time, as
 computer hardware has evolved, the MAME code has evolved as well to take
