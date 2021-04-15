@@ -440,7 +440,7 @@ license:CC0
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="dandy dungeon (1985)(antic software)(us)(side b)(documentation.atr" size="92176" crc="a9906be8" sha1="c569bc924d6808217c244ebf7eca122c10be60e4"/> <!-- Verified -->
+				<rom name="dandy dungeon (1985)(antic software)(us)(side b)(documentation).atr" size="92176" crc="a9906be8" sha1="c569bc924d6808217c244ebf7eca122c10be60e4"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
