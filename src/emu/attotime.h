@@ -1,35 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-/**************************************************************************/
-/**
- * @file attotime.h
- * Support functions for working with attotime data.
- * @defgroup ATTOTIME
- * @{
- * Support functions for working with attotime data.
- *
- * @class attotime
- *  Attotime is an attosecond-accurate timing system implemented as
- *  96-bit integers.
- *
- *     1 second      = 1e0 seconds
- *     1 millisecond = 1e-3 seconds
- *     1 microsecond = 1e-6 seconds
- *     1 nanosecond  = 1e-9 seconds
- *     1 picosecond  = 1e-12 seconds
- *     1 femtosecond = 1e-15 seconds
- *     1 attosecond  = 1e-18 seconds
- *
- * This may seem insanely accurate, but it has its uses when multiple
- * clocks in the system are run by independent crystals. It is also
- * useful to compute the attotime for something small, say 1 clock tick,
- * and still have it be accurate and useful for scaling.
- *
- * Attotime consists of a 32-bit seconds count and a 64-bit subseconds
- * count. Because the lower bits are kept as subseconds and not as a
- * full 64-bit value, there is headroom to make some operations simpler.
- */
-/**************************************************************************/
+/***************************************************************************
+
+attotime.h
+
+Support functions for working with attotime data.
+
+***************************************************************************/
 #ifndef MAME_EMU_ATTOTIME_H
 #define MAME_EMU_ATTOTIME_H
 
@@ -64,7 +41,7 @@ class save_manager;
 // of fractional seconds, plus 32 bits of seconds, plus 2 bits of flags. A
 // signed 32-bit value for seconds gives +/-2e32 seconds, or about +/-68 years
 // of time, which sould be enough for anyone. ;) The subseconds portion is
-// a 94-bit fractional value, and the 2 bits of flags are used to indicate the
+// a 62-bit fractional value, and the 2 bits of flags are used to indicate the
 // special value of "never".
 //
 // A subsecond is a 64-bit chunk of the full attotime that is used for
