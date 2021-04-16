@@ -294,7 +294,7 @@ void nb1412m2_device::timer_w(uint8_t data)
 	// When changes the DAC clock, Sound driver set wait loop count ($C010)
 	// in the range of 2 to 4 in order to keep the tempo of BGM even if changed clock.
 	// This value verified with BGM tempo of PCB.
-	m_timer->adjust(attotime::from_hz(450 * m_timer_rate));
+	m_timer->adjust(attotime::from_hz(448 * m_timer_rate));
 }
 
 void nb1412m2_device::timer_ack_w(uint8_t data)
