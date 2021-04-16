@@ -11,10 +11,7 @@
     - SASI/SCSI support;
     - Finish DIP-Switches support;
     - text scrolling, upd52611 (cfr. clipping in edge & arcus2, madoum* too?);
-    - upd7220: some later SWs throws "Invalid command byte 05" (Absolutely Mahjong on Epson logo),
-	  actual undocumented command for reset something?
-    - GRCG+ (actual differences with GRCG?);
-    - Remove kludge for POR bit in a20_ctrl_w fn;
+    - AGDC emulation, upd72120;
 	- CMT support (-13/-36 cbus only, identify which models mounted it off the bat);
     - Write a PC80S31K device for 2d type floppies
 	  (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
@@ -22,7 +19,11 @@
 	  dac_bit_interface instead (cfr. DAC1BIT in SW list);
 	- clean-ups & split into separate devices and driver flavours;
     - derive romsets by default options (cfr. 3.5 2HD floppies vs. default 5.25, 2D/2DD etc.);
+    - Remove kludge for POR bit in a20_ctrl_w fn;
 	- floppy sounds never silences when drive is idle (disabled for the time being);
+
+	TODO (PC-9801F)
+	- kanji port 0xa9 readback is broken for several games (balpower, lovelyho). 
 
     TODO (PC-9801RS):
     - several unemulated extra f/f features;
@@ -60,19 +61,12 @@
     floppy issues TODO (* denotes actually fixed, to be moved into specific sheet)
     * bellsave (disk swap? select B on config menu)
     * biblems2 (at new game loading)
-    * birdywld
 
     List of per-game TODO:
-    - alice: doesn't set bitmap interlace properly, can't do disk swaps via the File Manager;
-    - arctic, fsmoon: Doesn't detect sound board (tied to 0x00ec ports);
-    - akitsuka: could not setup "initial data" (regression);
-    - bandkun: can't install to HDD, has unemulated sound boards in settings (Roland MT-32 & D-10/D-110, Kawai MSB-98, Korg M1, MIDI);
     - biblems2: initial GLODIA logo uses raster effects?
     - bishohzx: Soft House logo uses pseudo-ROZ effect (?), no title screen graphics?
     - bishotsu: beeps out before game (missing sound board?), doesn't draw some text?
 
-    - lovelyho: Doesn't show kanjis in PC-9801F version (tries to read them thru the 0xa9 port);
-    - runners: wrong double height on the title screen;
     - win211: EGC drawing issue (byte wide writes?)
 
     Notes:
@@ -1637,10 +1631,10 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("MOUSE_X")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_RESET PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
 
 	PORT_START("MOUSE_Y")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_RESET PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
 
 	PORT_START("MOUSE_B")
 	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1902,6 +1896,30 @@ void pc9801_state::ppi_sys_portc_w(uint8_t data)
 	m_beeper->set_state(!(data & 0x08));
 }
 
+/*
+ * Mouse 8255 I/F
+ *
+ * Port A:
+ * x--- ---- LEFT mouse button
+ * -x-- ---- MIDDLE mouse button
+ *           \- Undocumented, most PC98 mice don't have it
+ * --x- ---- RIGHT mouse button
+ * ---? ---- <unused>
+ * ---- xxxx MD3-0 mouse direction latch
+ *
+ * Port C:
+ *
+ * x--- ---- HC Latch Mode (1=relative, 0=absolute)
+ *           \- (1) fsmoon (0) prinmak2
+ * -x-- ---- SXY Axis select (1=Y 0=X)
+ * --x- ---- SHL Read nibble select (1) upper (0) lower
+ * ---x ---- INT # (1) disable (0) enable
+ *
+ * Reading Port B and Port C low nibble are misc DIPSW selectors,
+ * their meaning diverges on XA/XL/RL classes vs. the rest.
+ *
+ */
+
 uint8_t pc9801_state::ppi_mouse_porta_r()
 {
 	uint8_t res;
@@ -1939,8 +1957,12 @@ void pc9801_state::ppi_mouse_portc_w(uint8_t data)
 {
 	if((m_mouse.control & 0x80) == 0 && data & 0x80)
 	{
-		m_mouse.lx = ioport("MOUSE_X")->read();
-		m_mouse.ly = ioport("MOUSE_Y")->read();
+		const uint8_t dx = ioport("MOUSE_X")->read();
+		const uint8_t dy = ioport("MOUSE_Y")->read();
+		m_mouse.lx = (dx - m_mouse.prev_lx) & 0xff;
+		m_mouse.ly = (dy - m_mouse.prev_ly) & 0xff;
+		m_mouse.prev_lx = dx;
+		m_mouse.prev_ly = dy;
 	}
 
 	m_mouse.control = data;
@@ -2099,6 +2121,7 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 	m_mouse.control = 0xff;
 	m_mouse.freq_reg = 0;
 	m_mouse.freq_index = 0;
+	m_mouse.lx = m_mouse.ly = m_mouse.prev_lx = m_mouse.prev_ly = 0;
 	m_dma_autoinc[0] = m_dma_autoinc[1] = m_dma_autoinc[2] = m_dma_autoinc[3] = 0;
 	memset(&m_egc, 0, sizeof(m_egc));
 }
@@ -3259,8 +3282,8 @@ void pc9801_state::init_pc9801vm_kanji()
 // "vanilla" class (i86, E/F/M)
 COMP( 1983, pc9801f,    0,        0, pc9801,    pc9801,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801F",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // genuine dump
 
-// N5200 (started as a vanilla PC-98 business line derivative, eventually diverged into its own thing and incorporated various Hyper 98 features. Runs proprietary PTOS.)
-// APC III (US version of either vanilla PC9801 or N5200. Partial source code available on the net shows very similar patterns )
+// N5200 (started as a vanilla PC-98 business line derivative, eventually diverged into its own thing and incorporated various Hyper 98 features. Runs proprietary PTOS)
+// APC III (US version of either vanilla PC9801 or N5200, aimed at business market. Runs MS-DOS 2.11/3.xx or PC-UX)
 // ...
 
 // VM class (V30 and/or i286)
@@ -3309,7 +3332,8 @@ COMP( 1998, pc9821v13,   pc9821,   0, pc9821,      pc9821,   pc9801_state, init_
 COMP( 1998, pc9821v20,   pc9821,   0, pc9821v20,   pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE VALUESTAR 20)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // PC98DO (PC88+PC98, V33 + μPD70008AC)
-// PC-98LT, HANDY98 (LCD version, V50)
-// PC-98HA (LCD version)
-// RC-9801 (color LCD, i386SX)
+
+// PC-98LT (laptop b&w LCD version V50, no upd7220, just one single bitmap layer)
+// PC-98HA aka HANDY98 (portable b&w LCD version, V50, apparently compatible with LT)
+// RC-9801 (portable (color?) LCD, i386SX, wireless 9600bps modem)
 // PC-9801P (LCD with light pen)
