@@ -3,9 +3,6 @@
 license:CC0
 -->
 <mamelayout version="2">
-
-<!-- define elements -->
-
 	<element name="shifter" defstate="0">
 		<rect>
 			<bounds left="0" right="32" top="0" bottom="64" />
@@ -54,10 +51,7 @@ license:CC0
 		</disk>
 	</element>
 
-
-<!-- build screen -->
-
-	<view name="Quadruple (P1/P2 side)">
+	<view name="Quadruple (1P/2P side)">
 		<screen index="0">
 			<bounds x="0" y="3.25" width="4" height="3" />
 		</screen>
@@ -70,166 +64,37 @@ license:CC0
 		<screen index="3">
 			<bounds x="4.25" y="0" width="4" height="3" />
 		</screen>
-
-		<!-- shifter options (no off-screen shifters towards inner side) -->
 		<collection name="Shifters">
-
-			<!-- player 1 -->
-			<collection name="P1 Shifter-R Overlay" visible="no">
+			<collection name="1P Shifter">
 				<element ref="shifter" inputtag="IN0" inputmask="0x0001" >
 					<bounds x="3.7875" y="5.8375" width="0.2" height="0.4" />
 					<color alpha="0.6" />
 				</element>
-				<collection name="Opaque Shifter" visible="no">
-					<element ref="shifter" inputtag="IN0" inputmask="0x0001" >
-						<bounds x="3.7875" y="5.8375" width="0.2" height="0.4" />
-					</element>
-				</collection>
 			</collection>
-			<collection name="P1 Shifter-L Overlay" visible="yes">
-				<element ref="shifter" inputtag="IN0" inputmask="0x0001" >
-					<bounds x="0.0125" y="5.8375" width="0.2" height="0.4" />
-					<color alpha="0.6" />
-				</element>
-				<collection name="Opaque Shifter " visible="no">
-					<element ref="shifter" inputtag="IN0" inputmask="0x0001" >
-						<bounds x="0.0125" y="5.8375" width="0.2" height="0.4" />
-					</element>
-				</collection>
-			</collection>
-			<collection name="P1 Shifter-L Off-screen" visible="no">
-				<element ref="shifter" inputtag="IN0" inputmask="0x0001" >
-					<bounds x="-0.2125" y="5.8375" width="0.2" height="0.4" />
-					<color alpha="0.6" />
-				</element>
-				<collection name="Opaque Shifter  " visible="no">
-					<element ref="shifter" inputtag="IN0" inputmask="0x0001" >
-						<bounds x="-0.2125" y="5.8375" width="0.2" height="0.4" />
-					</element>
-				</collection>
-			</collection>
-
-			<!-- player 2 -->
-			<collection name="P2 Shifter-R Overlay" visible="yes">
+			<collection name="2P Shifter">
 				<element ref="shifter" inputtag="IN0" inputmask="0x0010">
 					<bounds x="8.0375" y="5.8375" width="0.2" height="0.4" />
 					<color alpha="0.6" />
 				</element>
-				<collection name="Opaque Shifter   " visible="no">
-					<element ref="shifter" inputtag="IN0" inputmask="0x0010">
-						<bounds x="8.0375" y="5.8375" width="0.2" height="0.4" />
-					</element>
-				</collection>
 			</collection>
-			<collection name="P2 Shifter-R Off-screen" visible="no">
-				<element ref="shifter" inputtag="IN0" inputmask="0x0010">
-					<bounds x="8.2625" y="5.8375" width="0.2" height="0.4" />
-					<color alpha="0.6" />
-				</element>
-				<collection name="Opaque Shifter    " visible="no">
-					<element ref="shifter" inputtag="IN0" inputmask="0x0010">
-						<bounds x="8.2625" y="5.8375" width="0.2" height="0.4" />
-					</element>
-				</collection>
-			</collection>
-			<collection name="P2 Shifter-L Overlay" visible="no">
-				<element ref="shifter" inputtag="IN0" inputmask="0x0010">
-					<bounds x="4.2625" y="5.8375" width="0.2" height="0.4" />
-					<color alpha="0.6" />
-				</element>
-				<collection name="Opaque Shifter     " visible="no">
-					<element ref="shifter" inputtag="IN0" inputmask="0x0010">
-						<bounds x="4.2625" y="5.8375" width="0.2" height="0.4" />
-					</element>
-				</collection>
-			</collection>
-
-			<!-- player 3 -->
-			<collection name="P3 Shifter-R Overlay" visible="yes">
+			<collection name="3P Shifter">
 				<element ref="shifter" inputtag="IN1" inputmask="0x0001" >
 					<bounds x="0.0125" y="0.0125" width="0.2" height="0.4" />
 					<color alpha="0.6" />
 					<orientation rotate="180" />
 				</element>
-				<collection name="Opaque Shifter      " visible="no">
-					<element ref="shifter" inputtag="IN1" inputmask="0x0001" >
-						<bounds x="0.0125" y="0.0125" width="0.2" height="0.4" />
-						<orientation rotate="180" />
-					</element>
-				</collection>
 			</collection>
-			<collection name="P3 Shifter-R Off-screen" visible="no">
-				<element ref="shifter" inputtag="IN1" inputmask="0x0001" >
-					<bounds x="-0.2125" y="0.0125" width="0.2" height="0.4" />
-					<color alpha="0.6" />
-					<orientation rotate="180" />
-				</element>
-				<collection name="Opaque Shifter       " visible="no">
-					<element ref="shifter" inputtag="IN1" inputmask="0x0001" >
-						<bounds x="-0.2125" y="0.0125" width="0.2" height="0.4" />
-						<orientation rotate="180" />
-					</element>
-				</collection>
-			</collection>
-			<collection name="P3 Shifter-L Overlay" visible="no">
-				<element ref="shifter" inputtag="IN1" inputmask="0x0001" >
-					<bounds x="3.7875" y="0.0125" width="0.2" height="0.4" />
-					<color alpha="0.6" />
-					<orientation rotate="180" />
-				</element>
-				<collection name="Opaque Shifter        " visible="no">
-					<element ref="shifter" inputtag="IN1" inputmask="0x0001" >
-						<bounds x="3.7875" y="0.0125" width="0.2" height="0.4" />
-						<orientation rotate="180" />
-					</element>
-				</collection>
-			</collection>
-
-			<!-- player 4 -->
-			<collection name="P4 Shifter-R Overlay" visible="no">
+			<collection name="4P Shifter">
 				<element ref="shifter" inputtag="IN1" inputmask="0x0010" >
 					<bounds x="4.2625" y="0.0125" width="0.2" height="0.4" />
 					<color alpha="0.6" />
 					<orientation rotate="180" />
 				</element>
-				<collection name="Opaque Shifter         " visible="no">
-					<element ref="shifter" inputtag="IN1" inputmask="0x0010" >
-						<bounds x="4.2625" y="0.0125" width="0.2" height="0.4" />
-						<orientation rotate="180" />
-					</element>
-				</collection>
 			</collection>
-			<collection name="P4 Shifter-L Overlay" visible="yes">
-				<element ref="shifter" inputtag="IN1" inputmask="0x0010" >
-					<bounds x="8.0375" y="0.0125" width="0.2" height="0.4" />
-					<color alpha="0.6" />
-					<orientation rotate="180" />
-				</element>
-				<collection name="Opaque Shifter          " visible="no">
-					<element ref="shifter" inputtag="IN1" inputmask="0x0010" >
-						<bounds x="8.0375" y="0.0125" width="0.2" height="0.4" />
-						<orientation rotate="180" />
-					</element>
-				</collection>
-			</collection>
-			<collection name="P4 Shifter-L Off-screen" visible="no">
-				<element ref="shifter" inputtag="IN1" inputmask="0x0010" >
-					<bounds x="8.2625" y="0.0125" width="0.2" height="0.4" />
-					<color alpha="0.6" />
-					<orientation rotate="180" />
-				</element>
-				<collection name="Opaque Shifter           " visible="no">
-					<element ref="shifter" inputtag="IN1" inputmask="0x0010" >
-						<bounds x="8.2625" y="0.0125" width="0.2" height="0.4" />
-						<orientation rotate="180" />
-					</element>
-				</collection>
-			</collection>
-
 		</collection>
 	</view>
 
-	<view name="Quadruple (P3/P4 side)">
+	<view name="Quadruple (3P/4P side)">
 		<screen index="0">
 			<bounds x="4.25" y="0" width="4" height="3" />
 			<orientation rotate="180" />
@@ -246,162 +111,115 @@ license:CC0
 			<bounds x="0" y="3.25" width="4" height="3" />
 			<orientation rotate="180" />
 		</screen>
-
-		<!-- shifter options (no off-screen shifters towards inner side) -->
 		<collection name="Shifters">
-
-			<!-- player 1 -->
-			<collection name="P1 Shifter-R Overlay" visible="no">
+			<collection name="1P Shifter">
 				<element ref="shifter" inputtag="IN0" inputmask="0x0001" >
 					<bounds x="4.2625" y="0.0125" width="0.2" height="0.4" />
 					<color alpha="0.6" />
 					<orientation rotate="180" />
 				</element>
-				<collection name="Opaque Shifter" visible="no">
-					<element ref="shifter" inputtag="IN0" inputmask="0x0001" >
-						<bounds x="4.2625" y="0.0125" width="0.2" height="0.4" />
-						<orientation rotate="180" />
-					</element>
-				</collection>
 			</collection>
-			<collection name="P1 Shifter-L Overlay" visible="yes">
-				<element ref="shifter" inputtag="IN0" inputmask="0x0001" >
-					<bounds x="8.0375" y="0.0125" width="0.2" height="0.4" />
-					<color alpha="0.6" />
-					<orientation rotate="180" />
-				</element>
-				<collection name="Opaque Shifter " visible="no">
-					<element ref="shifter" inputtag="IN0" inputmask="0x0001" >
-						<bounds x="8.0375" y="0.0125" width="0.2" height="0.4" />
-						<orientation rotate="180" />
-					</element>
-				</collection>
-			</collection>
-			<collection name="P1 Shifter-L Off-screen" visible="no">
-				<element ref="shifter" inputtag="IN0" inputmask="0x0001" >
-					<bounds x="8.2625" y="0.0125" width="0.2" height="0.4" />
-					<color alpha="0.6" />
-					<orientation rotate="180" />
-				</element>
-				<collection name="Opaque Shifter  " visible="no">
-					<element ref="shifter" inputtag="IN0" inputmask="0x0001" >
-						<bounds x="8.2625" y="0.0125" width="0.2" height="0.4" />
-						<orientation rotate="180" />
-					</element>
-				</collection>
-			</collection>
-
-			<!-- player 2 -->
-			<collection name="P2 Shifter-R Overlay   " visible="yes">
-				<element ref="shifter" inputtag="IN0" inputmask="0x0010" >
+			<collection name="2P Shifter">
+				<element ref="shifter" inputtag="IN0" inputmask="0x0010">
 					<bounds x="0.0125" y="0.0125" width="0.2" height="0.4" />
 					<color alpha="0.6" />
 					<orientation rotate="180" />
 				</element>
-				<collection name="Opaque Shifter   " visible="no">
-					<element ref="shifter" inputtag="IN0" inputmask="0x0010" >
-						<bounds x="0.0125" y="0.0125" width="0.2" height="0.4" />
-						<orientation rotate="180" />
-					</element>
-				</collection>
 			</collection>
-			<collection name="P2 Shifter-R Off-screen" visible="no">
-				<element ref="shifter" inputtag="IN0" inputmask="0x0010" >
-					<bounds x="-0.2125" y="0.0125" width="0.2" height="0.4" />
-					<color alpha="0.6" />
-					<orientation rotate="180" />
-				</element>
-				<collection name="Opaque Shifter    " visible="no">
-					<element ref="shifter" inputtag="IN0" inputmask="0x0010" >
-						<bounds x="-0.2125" y="0.0125" width="0.2" height="0.4" />
-						<orientation rotate="180" />
-					</element>
-				</collection>
-			</collection>
-			<collection name="P2 Shifter-L Overlay" visible="no">
-				<element ref="shifter" inputtag="IN0" inputmask="0x0010" >
-					<bounds x="3.7875" y="0.0125" width="0.2" height="0.4" />
-					<color alpha="0.6" />
-					<orientation rotate="180" />
-				</element>
-				<collection name="Opaque Shifter     " visible="no">
-					<element ref="shifter" inputtag="IN0" inputmask="0x0010" >
-						<bounds x="3.7875" y="0.0125" width="0.2" height="0.4" />
-						<orientation rotate="180" />
-					</element>
-				</collection>
-			</collection>
-
-			<!-- player 3 -->
-			<collection name="P3 Shifter-R Overlay" visible="yes">
-				<element ref="shifter" inputtag="IN1" inputmask="0x0001">
+			<collection name="3P Shifter">
+				<element ref="shifter" inputtag="IN1" inputmask="0x0001" >
 					<bounds x="8.0375" y="5.8375" width="0.2" height="0.4" />
 					<color alpha="0.6" />
 				</element>
-				<collection name="Opaque Shifter      " visible="no">
-					<element ref="shifter" inputtag="IN1" inputmask="0x0001">
-						<bounds x="8.0375" y="5.8375" width="0.2" height="0.4" />
-					</element>
-				</collection>
 			</collection>
-			<collection name="P3 Shifter-R Off-screen" visible="no">
-				<element ref="shifter" inputtag="IN1" inputmask="0x0001">
-					<bounds x="8.2625" y="5.8375" width="0.2" height="0.4" />
-					<color alpha="0.6" />
-				</element>
-				<collection name="Opaque Shifter       " visible="no">
-					<element ref="shifter" inputtag="IN1" inputmask="0x0001">
-						<bounds x="8.2625" y="5.8375" width="0.2" height="0.4" />
-					</element>
-				</collection>
-			</collection>
-			<collection name="P3 Shifter-L Overlay" visible="no">
-				<element ref="shifter" inputtag="IN1" inputmask="0x0001">
-					<bounds x="4.2625" y="5.8375" width="0.2" height="0.4" />
-					<color alpha="0.6" />
-				</element>
-				<collection name="Opaque Shifter        " visible="no">
-					<element ref="shifter" inputtag="IN1" inputmask="0x0001">
-						<bounds x="4.2625" y="5.8375" width="0.2" height="0.4" />
-					</element>
-				</collection>
-			</collection>
-
-			<!-- player 4 -->
-			<collection name="P4 Shifter-R Overlay" visible="no">
+			<collection name="4P Shifter">
 				<element ref="shifter" inputtag="IN1" inputmask="0x0010" >
 					<bounds x="3.7875" y="5.8375" width="0.2" height="0.4" />
 					<color alpha="0.6" />
 				</element>
-				<collection name="Opaque Shifter         " visible="no">
-					<element ref="shifter" inputtag="IN1" inputmask="0x0010" >
-						<bounds x="3.7875" y="5.8375" width="0.2" height="0.4" />
-					</element>
-				</collection>
 			</collection>
-			<collection name="P4 Shifter-L Overlay" visible="yes">
-				<element ref="shifter" inputtag="IN1" inputmask="0x0010" >
-					<bounds x="0.0125" y="5.8375" width="0.2" height="0.4" />
-					<color alpha="0.6" />
+		</collection>
+	</view>
+
+	<view name="Widescreen Quadruple (1P/2P side)">
+		<screen index="0">
+			<bounds x="0" y="3.25" width="4" height="3" />
+		</screen>
+		<screen index="1">
+			<bounds x="4.25" y="3.25" width="4" height="3" />
+		</screen>
+		<screen index="2">
+			<bounds x="0" y="0" width="4" height="3" />
+		</screen>
+		<screen index="3">
+			<bounds x="4.25" y="0" width="4" height="3" />
+		</screen>
+		<collection name="Shifters">
+			<collection name="1P Shifter">
+				<element ref="shifter" inputtag="IN0" inputmask="0x0001" >
+					<bounds x="-0.2125" y="5.8375" width="0.2" height="0.4" />
 				</element>
-				<collection name="Opaque Shifter          " visible="no">
-					<element ref="shifter" inputtag="IN1" inputmask="0x0010" >
-						<bounds x="0.0125" y="5.8375" width="0.2" height="0.4" />
-					</element>
-				</collection>
 			</collection>
-			<collection name="P4 Shifter-L Off-screen" visible="no">
+			<collection name="2P Shifter">
+				<element ref="shifter" inputtag="IN0" inputmask="0x0010">
+					<bounds x="8.2625" y="5.8375" width="0.2" height="0.4" />
+				</element>
+			</collection>
+			<collection name="3P Shifter">
+				<element ref="shifter" inputtag="IN1" inputmask="0x0001" >
+					<bounds x="-0.2125" y="0.0125" width="0.2" height="0.4" />
+					<orientation rotate="180" />
+				</element>
+			</collection>
+			<collection name="4P Shifter">
+				<element ref="shifter" inputtag="IN1" inputmask="0x0010" >
+					<bounds x="8.2625" y="0.0125" width="0.2" height="0.4" />
+					<orientation rotate="180" />
+				</element>
+			</collection>
+		</collection>
+	</view>
+
+	<view name="Widescreen Quadruple (3P/4P side)">
+		<screen index="0">
+			<bounds x="4.25" y="0" width="4" height="3" />
+			<orientation rotate="180" />
+		</screen>
+		<screen index="1">
+			<bounds x="0" y="0" width="4" height="3" />
+			<orientation rotate="180" />
+		</screen>
+		<screen index="2">
+			<bounds x="4.25" y="3.25" width="4" height="3" />
+			<orientation rotate="180" />
+		</screen>
+		<screen index="3">
+			<bounds x="0" y="3.25" width="4" height="3" />
+			<orientation rotate="180" />
+		</screen>
+		<collection name="Shifters">
+			<collection name="1P Shifter">
+				<element ref="shifter" inputtag="IN0" inputmask="0x0001" >
+					<bounds x="8.2625" y="0.0125" width="0.2" height="0.4" />
+					<orientation rotate="180" />
+				</element>
+			</collection>
+			<collection name="2P Shifter">
+				<element ref="shifter" inputtag="IN0" inputmask="0x0010">
+					<bounds x="-0.2125" y="0.0125" width="0.2" height="0.4" />
+					<orientation rotate="180" />
+				</element>
+			</collection>
+			<collection name="3P Shifter">
+				<element ref="shifter" inputtag="IN1" inputmask="0x0001" >
+					<bounds x="8.2625" y="5.8375" width="0.2" height="0.4" />
+				</element>
+			</collection>
+			<collection name="4P Shifter">
 				<element ref="shifter" inputtag="IN1" inputmask="0x0010" >
 					<bounds x="-0.2125" y="5.8375" width="0.2" height="0.4" />
-					<color alpha="0.6" />
 				</element>
-				<collection name="Opaque Shifter           " visible="no">
-					<element ref="shifter" inputtag="IN1" inputmask="0x0010" >
-						<bounds x="-0.2125" y="5.8375" width="0.2" height="0.4" />
-					</element>
-				</collection>
 			</collection>
-
 		</collection>
 	</view>
 </mamelayout>

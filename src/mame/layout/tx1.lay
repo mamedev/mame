@@ -3,9 +3,6 @@
 license:CC0
 -->
 <mamelayout version="2">
-
-<!-- define elements -->
-
 	<element name="shifter" defstate="0">
 		<rect>
 			<bounds left="0" right="32" top="0" bottom="64" />
@@ -54,10 +51,7 @@ license:CC0
 		</disk>
 	</element>
 
-
-<!-- build screen -->
-
-	<view name="Triple-Screen">
+	<view name="Triple-Screen Shifter-R">
 		<screen index="0">
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
@@ -68,109 +62,45 @@ license:CC0
 			<bounds x="1280" y="0" width="640" height="480" />
 		</screen>
 
-		<!-- shifter options -->
-		<collection name="Shifter-R Overlay" visible="yes">
-			<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
-				<bounds x="1886" y="414" width="32" height="64" />
-				<color alpha="0.6" />
-			</element>
-			<collection name="Opaque Shifter" visible="no">
-				<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
-					<bounds x="1886" y="414" width="32" height="64" />
-				</element>
-			</collection>
-		</collection>
-
-		<collection name="Shifter-R Off-screen" visible="no">
-			<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
-				<bounds x="1928" y="414" width="32" height="64" />
-				<color alpha="0.6" />
-			</element>
-			<collection name="Opaque Shifter " visible="no">
-				<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
-					<bounds x="1928" y="414" width="32" height="64" />
-				</element>
-			</collection>
-		</collection>
-
-		<collection name="Shifter-L Overlay" visible="no">
-			<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
-				<bounds x="2" y="414" width="32" height="64" />
-				<color alpha="0.6" />
-			</element>
-			<collection name="Opaque Shifter  " visible="no">
-				<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
-					<bounds x="2" y="414" width="32" height="64" />
-				</element>
-			</collection>
-		</collection>
-
-		<collection name="Shifter-L Off-screen" visible="no">
-			<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
-				<bounds x="-40" y="414" width="32" height="64" />
-				<color alpha="0.6" />
-			</element>
-			<collection name="Opaque Shifter   " visible="no">
-				<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
-					<bounds x="-40" y="414" width="32" height="64" />
-				</element>
-			</collection>
-		</collection>
+		<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
+			<bounds x="1886" y="414" width="32" height="64" />
+			<color alpha="0.6" />
+		</element>
 	</view>
+	<view name="Triple-Screen Shifter-L">
+		<screen index="0">
+			<bounds x="0" y="0" width="640" height="480" />
+		</screen>
+		<screen index="1">
+			<bounds x="640" y="0" width="640" height="480" />
+		</screen>
+		<screen index="2">
+			<bounds x="1280" y="0" width="640" height="480" />
+		</screen>
 
-	<view name="Single-Screen">
+		<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
+			<bounds x="2" y="414" width="32" height="64" />
+			<color alpha="0.6" />
+		</element>
+	</view>
+	<view name="Single-Screen Shifter-R">
 		<screen index="1">
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>
 
-		<!-- shifter options -->
-		<collection name="Shifter-R Overlay" visible="yes">
-			<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
-				<bounds x="606" y="414" width="32" height="64" />
-				<color alpha="0.6" />
-			</element>
-			<collection name="Opaque Shifter" visible="no">
-				<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
-					<bounds x="606" y="414" width="32" height="64" />
-				</element>
-			</collection>
-		</collection>
-
-		<collection name="Shifter-R Off-screen" visible="no">
-			<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
-				<bounds x="648" y="414" width="32" height="64" />
-				<color alpha="0.6" />
-			</element>
-			<collection name="Opaque Shifter " visible="no">
-				<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
-					<bounds x="648" y="414" width="32" height="64" />
-				</element>
-			</collection>
-		</collection>
-
-		<collection name="Shifter-L Overlay" visible="no">
-			<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
-				<bounds x="2" y="414" width="32" height="64" />
-				<color alpha="0.6" />
-			</element>
-			<collection name="Opaque Shifter  " visible="no">
-				<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
-					<bounds x="2" y="414" width="32" height="64" />
-				</element>
-			</collection>
-		</collection>
-
-		<collection name="Shifter-L Off-screen" visible="no">
-			<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
-				<bounds x="-40" y="414" width="32" height="64" />
-				<color alpha="0.6" />
-			</element>
-			<collection name="Opaque Shifter   " visible="no">
-				<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
-					<bounds x="-40" y="414" width="32" height="64" />
-				</element>
-			</collection>
-		</collection>
+		<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
+			<bounds x="606" y="414" width="32" height="64" />
+			<color alpha="0.6" />
+		</element>
 	</view>
+	<view name="Single-Screen Shifter-L">
+		<screen index="1">
+			<bounds x="0" y="0" width="640" height="480" />
+		</screen>
 
+		<element ref="shifter" inputtag="soundbrd:PPI_PORTC" inputmask="0x08">
+			<bounds x="2" y="414" width="32" height="64" />
+			<color alpha="0.6" />
+		</element>
+	</view>
 </mamelayout>

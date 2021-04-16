@@ -34,8 +34,6 @@ TODO:
 - right side of screen should not be rendered? but speedrs sprite collision
   check wouldn't work then. Video recording(pcb to monitor, not cabinet)
   of lbeach shows right side is cropped - it is handled in the .lay file
-- due to explicit bounds in the .lay file, off-screen shifter options are
-  not visible when in windowed mode
 
 ***************************************************************************/
 
