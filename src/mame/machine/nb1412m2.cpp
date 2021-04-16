@@ -102,7 +102,7 @@ void nb1412m2_device::nb1412m2_map(address_map &map)
 	map(0x42, 0x43).nopw(); // always 0x03
 
 	// DAC control
-	map(0x11, 0x11).w(FUNC(nb1412m2_device::dac_control_w)); // volume/channel control?
+	map(0x11, 0x11).w(FUNC(nb1412m2_device::dac_control_w));
 	map(0x18, 0x18).w(FUNC(nb1412m2_device::dac_timer_w)); // timer frequency
 	map(0x19, 0x19).nopw(); // 2 written at POST
 	map(0x51, 0x52).w(FUNC(nb1412m2_device::dac_address_w)); //  start address
