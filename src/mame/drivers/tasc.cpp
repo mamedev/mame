@@ -36,7 +36,6 @@ notes:
 TODO:
 - bootrom disable timer shouldn't be needed, real ARM has already fetched the next opcode
 - sound is too high pitched, same problem as in risc2500
-- "disable leds" setting breaks smartboard controls
 
 ******************************************************************************/
 

@@ -278,10 +278,10 @@ u8 tasc_sb30_device::read()
 
 void tasc_sb30_device::write(u8 data)
 {
-	if (BIT(data, 3) && !BIT(m_data, 3))
+	if (!BIT(data, 3) && BIT(m_data, 3))
 		m_position = 0;
 
-	if (BIT(data, 6) && !BIT(m_data, 6))
+	if (!BIT(data, 6) && BIT(m_data, 6))
 	{
 		if (m_position < 0x40)
 		{
@@ -289,17 +289,16 @@ void tasc_sb30_device::write(u8 data)
 			int y = m_position % 8;
 			m_out_leds[y][x] = BIT(data, 7);
 		}
+
+		m_shift = 0;
 	}
 
 	if (!BIT(data, 7) && BIT(m_data, 7))
 	{
 		m_position++;
-		if (m_position >= 0x40)
-		{
+
+		if (m_position == 0x40)
 			m_shift++;
-			if (m_position & 1)
-				m_shift = 0;
-		}
 	}
 
 	m_data = data;
