@@ -47,7 +47,7 @@ private:
 	output_finder<8,8>        m_out_leds;
 	emu_timer *               m_leds_off_timer;
 	uint8_t                   m_data;
-	uint8_t                   m_position;
+	uint32_t                  m_position;
 	uint8_t                   m_shift;
 };
 

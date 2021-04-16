@@ -225,16 +225,21 @@ uint8_t tasc_sb30_device::spawn_cb(offs_t offset)
 
 uint8_t tasc_sb30_device::read()
 {
-	int x = (m_position & 0x3f) / 8;
-	int y = (m_position & 0x3f) % 8;
-	int piece_id = m_board->read_sensor(7 - x, 7 - y);
+	if (m_position < 0x40)
+	{
+		int x = 7 - m_position / 8;
+		int y = 7 - m_position % 8;
+		int piece_id = m_board->read_sensor(x, y);
 
-	// each piece is identified by a single bit in a 32-bit sequence, if multiple bits are active the MSB is used
-	uint32_t sb30_id = 0;
-	if (piece_id > 0)
-		sb30_id = 1UL << (piece_id - 1);
+		// each piece is identified by a single bit in a 32-bit sequence, if multiple bits are active the MSB is used
+		uint32_t sb30_id = 0;
+		if (piece_id > 0)
+			sb30_id = 1UL << (piece_id - 1);
 
-	return BIT(sb30_id, m_shift & 0x1f);
+		return BIT(sb30_id, m_shift & 0x1f);
+	}
+
+	return 0;
 }
 
 void tasc_sb30_device::write(uint8_t data)
@@ -244,15 +249,18 @@ void tasc_sb30_device::write(uint8_t data)
 
 	if (BIT(data, 6) && !BIT(m_data, 6))
 	{
-		int x = (m_position & 0x3f) / 8;
-		int y = (m_position & 0x3f) % 8;
-		m_out_leds[y][x] = BIT(data, 7);
+		if (m_position < 0x40)
+		{
+			int x = m_position / 8;
+			int y = m_position % 8;
+			m_out_leds[y][x] = BIT(data, 7);
+		}
 	}
 
 	if (!BIT(data, 7) && BIT(m_data, 7))
 	{
 		m_position++;
-		if (m_position & 0x40)
+		if (m_position >= 0x40)
 		{
 			m_shift++;
 			if (m_position & 1)
