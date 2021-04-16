@@ -66,7 +66,7 @@ DEFINE_DEVICE_TYPE(TASC_SB30, tasc_sb30_device, "tasc_sb30", "Tasc SmartBoard SB
 //  tasc_sb30_device - constructor
 //-------------------------------------------------
 
-tasc_sb30_device::tasc_sb30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tasc_sb30_device::tasc_sb30_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, TASC_SB30, tag, owner, clock)
 	, m_board(*this, "board")
 	, m_out_leds(*this, "led_%u%u", 0U, 0U)
@@ -141,10 +141,10 @@ void tasc_sb30_device::init_cb(int state)
 	}
 }
 
-bool tasc_sb30_device::piece_available(uint8_t id)
+bool tasc_sb30_device::piece_available(u8 id)
 {
-	for (int y=0; y<8; y++)
-		for (int x=0; x<8; x++)
+	for (int y = 0; y < 8; y++)
+		for (int x = 0; x < 8; x++)
 		{
 			if (m_board->read_piece(x, y) == id)
 				return false;
@@ -153,77 +153,103 @@ bool tasc_sb30_device::piece_available(uint8_t id)
 	return true;
 }
 
-uint8_t tasc_sb30_device::spawn_cb(offs_t offset)
+u8 tasc_sb30_device::spawn_cb(offs_t offset)
 {
 	int piece_id = -1;
-	if (offset == 1)
-	{
-		for (int p = 0; p < 8; p++)
-			if (piece_available(1 + SB30_WHITE_PAWN1 + p))
-			{
-				piece_id = SB30_WHITE_PAWN1 + p;
-				break;
-			}
-	}
-	else if (offset == 7)
-	{
-		for (int p = 0; p < 8; p++)
-			if (piece_available(1 + SB30_BLACK_PAWN1 + p))
-			{
-				piece_id = SB30_BLACK_PAWN1 + p;
-				break;
-			}
-	}
-	else if (offset == 2)
-	{
-		if      (piece_available(1 + SB30_WHITE_KNIGHT1)) piece_id = SB30_WHITE_KNIGHT1;
-		else if (piece_available(1 + SB30_WHITE_KNIGHT2)) piece_id = SB30_WHITE_KNIGHT2;
-	}
-	else if (offset == 3)
-	{
-		if      (piece_available(1 + SB30_WHITE_BISHOP1)) piece_id = SB30_WHITE_BISHOP1;
-		else if (piece_available(1 + SB30_WHITE_BISHOP2)) piece_id = SB30_WHITE_BISHOP2;
-	}
-	else if (offset == 4)
-	{
-		if      (piece_available(1 + SB30_WHITE_ROOK1)) piece_id = SB30_WHITE_ROOK1;
-		else if (piece_available(1 + SB30_WHITE_ROOK2)) piece_id = SB30_WHITE_ROOK2;
-	}
-	else if (offset == 5 && piece_available(1 + SB30_WHITE_QUEEN))
-		piece_id = SB30_WHITE_QUEEN;
 
-	else if (offset == 6 && piece_available(1 + SB30_WHITE_KING))
-		piece_id = SB30_WHITE_KING;
-
-	else if (offset == 8)
+	switch (offset)
 	{
-		if      (piece_available(1 + SB30_BLACK_KNIGHT1)) piece_id = SB30_BLACK_KNIGHT1;
-		else if (piece_available(1 + SB30_BLACK_KNIGHT2)) piece_id = SB30_BLACK_KNIGHT2;
-	}
-	else if (offset == 9)
-	{
-		if      (piece_available(1 + SB30_BLACK_BISHOP1)) piece_id = SB30_BLACK_BISHOP1;
-		else if (piece_available(1 + SB30_BLACK_BISHOP2)) piece_id = SB30_BLACK_BISHOP2;
-	}
+		case 1+0:
+			for (int p = 0; p < 8; p++)
+				if (piece_available(1 + SB30_WHITE_PAWN1 + p))
+				{
+					piece_id = SB30_WHITE_PAWN1 + p;
+					break;
+				}
+			break;
 
-	else if (offset == 10)
-	{
-		if      (piece_available(1 + SB30_BLACK_ROOK1)) piece_id = SB30_BLACK_ROOK1;
-		else if (piece_available(1 + SB30_BLACK_ROOK2)) piece_id = SB30_BLACK_ROOK2;
-	}
-	else if (offset == 11 && piece_available(1 + SB30_BLACK_QUEEN))
-		piece_id = SB30_BLACK_QUEEN;
+		case 1+6:
+			for (int p = 0; p < 8; p++)
+				if (piece_available(1 + SB30_BLACK_PAWN1 + p))
+				{
+					piece_id = SB30_BLACK_PAWN1 + p;
+					break;
+				}
+			break;
 
-	else if (offset == 12 && piece_available(1 + SB30_BLACK_KING))
-		piece_id = SB30_BLACK_KING;
+		case 2+0:
+			if (piece_available(1 + SB30_WHITE_KNIGHT1))
+				piece_id = SB30_WHITE_KNIGHT1;
+			else if (piece_available(1 + SB30_WHITE_KNIGHT2))
+				piece_id = SB30_WHITE_KNIGHT2;
+			break;
+
+		case 2+6:
+			if (piece_available(1 + SB30_BLACK_KNIGHT1))
+				piece_id = SB30_BLACK_KNIGHT1;
+			else if (piece_available(1 + SB30_BLACK_KNIGHT2))
+				piece_id = SB30_BLACK_KNIGHT2;
+			break;
+
+		case 3+0:
+			if (piece_available(1 + SB30_WHITE_BISHOP1))
+				piece_id = SB30_WHITE_BISHOP1;
+			else if (piece_available(1 + SB30_WHITE_BISHOP2))
+				piece_id = SB30_WHITE_BISHOP2;
+			break;
+
+		case 3+6:
+			if (piece_available(1 + SB30_BLACK_BISHOP1))
+				piece_id = SB30_BLACK_BISHOP1;
+			else if (piece_available(1 + SB30_BLACK_BISHOP2))
+				piece_id = SB30_BLACK_BISHOP2;
+			break;
+
+		case 4+0:
+			if (piece_available(1 + SB30_WHITE_ROOK1))
+				piece_id = SB30_WHITE_ROOK1;
+			else if (piece_available(1 + SB30_WHITE_ROOK2))
+				piece_id = SB30_WHITE_ROOK2;
+			break;
+
+		case 4+6:
+			if (piece_available(1 + SB30_BLACK_ROOK1))
+				piece_id = SB30_BLACK_ROOK1;
+			else if (piece_available(1 + SB30_BLACK_ROOK2))
+				piece_id = SB30_BLACK_ROOK2;
+			break;
+
+		case 5+0:
+			if (piece_available(1 + SB30_WHITE_QUEEN))
+				piece_id = SB30_WHITE_QUEEN;
+			break;
+
+		case 5+6:
+			if (piece_available(1 + SB30_BLACK_QUEEN))
+				piece_id = SB30_BLACK_QUEEN;
+			break;
+
+		case 6+0:
+			if (piece_available(1 + SB30_WHITE_KING))
+				piece_id = SB30_WHITE_KING;
+			break;
+
+		case 6+6:
+			if (piece_available(1 + SB30_BLACK_KING))
+				piece_id = SB30_BLACK_KING;
+			break;
+
+		default:
+			break;
+	}
 
 	if (piece_id >= 0)
 		return piece_id + 1;
 	else
-		return 0;   // not available
+		return 0; // not available
 }
 
-uint8_t tasc_sb30_device::read()
+u8 tasc_sb30_device::read()
 {
 	if (m_position < 0x40)
 	{
@@ -232,7 +258,7 @@ uint8_t tasc_sb30_device::read()
 		int piece_id = m_board->read_sensor(x, y);
 
 		// each piece is identified by a single bit in a 32-bit sequence, if multiple bits are active the MSB is used
-		uint32_t sb30_id = 0;
+		u32 sb30_id = 0;
 		if (piece_id > 0)
 			sb30_id = 1UL << (piece_id - 1);
 
@@ -242,7 +268,7 @@ uint8_t tasc_sb30_device::read()
 	return 0;
 }
 
-void tasc_sb30_device::write(uint8_t data)
+void tasc_sb30_device::write(u8 data)
 {
 	if (BIT(data, 3) && !BIT(m_data, 3))
 		m_position = 0;
