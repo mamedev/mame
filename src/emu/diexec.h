@@ -303,23 +303,35 @@ private:
 			device().debug()->stop_hook();
 	}
 
-	// scheduler
-	device_scheduler *      m_scheduler;                // pointer to the machine scheduler
-
 	// core execution state: keep all these members close to the top
 	// so they live within the first 128 bytes of the object; this helps
 	// the super-hot execution loop stay lean & mean on x64 systems
 	device_execute_interface *m_nextexec;               // pointer to the next device to execute, in order
-	execute_delegate *      m_run_delegate;             // currently active run delegate
 	int *                   m_icountptr;                // pointer to the icount
-	int                     m_cycles_running;           // number of cycles we are executing
-	int                     m_cycles_stolen;            // number of cycles we artificially stole
+	union
+	{
+		u64                 combined;                   // running+stolen as a single 64-bit value
+		struct
+		{
+#ifdef LSB_FIRST
+			u32             running;                    // number of cycles we are executing
+			u32             stolen;                     // number of cycles we artificially stole
+#else
+			u32             stolen;                     // number of cycles we artificially stole
+			u32             running;                    // number of cycles we are executing
+#endif
+		} separate;
+	} m_cycles;
 	u32                     m_cycles_per_second;        // cycles per second, adjusted for multipliers
 	subseconds              m_subseconds_per_cycle;     // subseconds per adjusted clock cycle
 	u64                     m_totalcycles;              // total device cycles executed
 	device_scheduler::basetime_relative m_localtime;    // local time, relative to the scheduler's base
+	execute_delegate        m_run_delegate;             // currently active run delegate
 	profile_type            m_profiler;                 // profiler tag
 	// end core execution state
+
+	// scheduler
+	device_scheduler *      m_scheduler;                // pointer to the machine scheduler
 
 	// suspend states
 	u32                     m_suspend;                  // suspend reason mask (0 = not suspended)
@@ -367,57 +379,67 @@ inline subseconds device_execute_interface::run_for(subseconds subs)
 {
 	g_profiler.start(m_profiler);
 
-	// compute how many cycles we want to execute, rounding up
-	// note that we pre-cache subseconds per cycle in raw form
-	// so that we can do unsigned operations, which are faster
-	// in this critical loop
+	// compute how many cycles we want to execute, rounding up; note that we
+	// pre-cache subseconds per cycle prior to execution, since the clock can
+	// be changed dynamically; we also keep it in raw unsigned form since we
+	// know it is positive, and the compiler does smarter things with unsigned
+	// values in this critical loop
 	u64 subseconds_per_cycle = m_subseconds_per_cycle.raw();
+
+	// in a similar vein, ensure that the subseconds value we are passaed is
+	// also positive
 	scheduler_assert(subs.raw() >= 0);
-	u32 ran = u64(subs.raw()) / subseconds_per_cycle + 1;
 
-	// store the number of cycles we've requested in the executing
-	// device
-	// TODO: do we need to do this?
-	m_cycles_running = ran;
+	// compute the number of cycles; we could divide subseconds by the
+	// subseconds per cycle value we cached above, but that's a 64/64-bit
+	// divide and expensive; instead, we take advantage of the fact that
+	// subseconds is just 2 bits away from being a 64-bit fractional value;
+	// so we just left-shift it by 2 to get it into that form, and then do
+	// a much cheaper 64x64 multiply by the cycles per second value (which
+	// subseconds per cycle is derived from), keeping the upper half as our
+	// final result
+	u64 ran64 = mulu_64x64_hi(u64(subs.raw()) << 2, m_cycles_per_second) + 1;
 
-	// set the device's icount value to the number of cycles we want
-	// the fact that we have a direct point to this is an artifact of
-	// the original MAME design
+	// ran64 will fit in 32 bits, so we take advantage of that fact to write
+	// to 2 neighboring 32-bit values at once, with the lower 32 bits setting
+	// the number of cycles we will run, while the zeroed upper 32 bits will
+	// reset the count of cycles stolen
+	m_cycles.combined = ran64;
+
+	// set the device's icount value to the number of cycles we want; again
+	// we pre-cache the pointer so that we don't have to re-fetch it when we
+	// come from from execution; the fact that we have a direct pointer to the
+	// icount is an artifact of the original  MAME design; it would also better
+	// be an explicit s32 instead of an int
 	auto *icountptr = m_icountptr;
+	u32 ran = u32(ran64);
 	*icountptr = ran;
 
-	// clear m_cycles_stolen, which gets updated if the timeslice
-	// is aborted (due to synchronization or setting a new timer to
-	// expire before the original timeslice end)
-	m_cycles_stolen = 0;
+	// now run the device for the number of cycles; note that m_run_delegate is
+	// dynamically switched based on the suspend and debugging states
+	m_run_delegate();
 
-	// now run the device for the number of cycles
-	(*m_run_delegate)();
-
-	// now let's see how many cycles we actually ran; if the device's
-	// icount is negative, then we ran more than requested (this is both
-	// allowed and expected), so the subtract here typically will
-	// increase ran
-	scheduler_assert(s32(ran) >= *icountptr);
+	// now let's see how many cycles we actually ran; if the device's icount is
+	// negative, then we ran more than requested (this is both allowed and
+	// expected), so the subtract here typically will increase ran
+	scheduler_assert(int(ran) >= *icountptr);
 	ran -= *icountptr;
 
-	// if cycles were stolen (i.e., icount was artificially decremented)
-	// then ran isn't actually correct, so remove the number of cycles
-	// that we did that for
-	scheduler_assert(s32(ran) >= m_cycles_stolen);
-	ran -= m_cycles_stolen;
+	// if cycles were stolen (i.e., icount was artificially decremented), then
+	// ran isn't actually correct, so remove the number of cycles that we did
+	// that for
+	scheduler_assert(ran >= m_cycles.separate.stolen);
+	ran -= m_cycles.separate.stolen;
 
-	// time should never go backwards, nor should we ever attempt to
-	// execute more than a full second (minimum quantum prevents that)
+	// time should never go backwards, nor should we ever attempt to execute
+	// more than a full second (minimum quantum prevents that)
 	scheduler_assert(ran < m_cycles_per_second);
 
-	// update the device's count of total cycles executed with the
-	// true number of cycles
+	// update our count of total cycles executed with the true number of cycles
 	m_totalcycles += ran;
 
-	// update the local time for the device so that it represents an
-	// integral number of cycles
-	u64 ran_subseconds = subseconds_per_cycle * u64(ran);
+	// update our local time so that it represents an integral number of cycles
+	u64 ran_subseconds = subseconds_per_cycle * ran;
 	m_localtime.add(subseconds::from_raw(ran_subseconds));
 
 	g_profiler.stop();
@@ -443,11 +465,11 @@ inline u32 device_execute_interface::update_suspend()
 
 	// update the execution delegate
 	if (m_suspend != 0)
-		m_run_delegate = &m_suspend_delegate;
+		m_run_delegate = m_suspend_delegate;
 	else if (!m_scheduler->machine().debug_enabled())
-		m_run_delegate = &m_run_fast_delegate;
+		m_run_delegate = m_run_fast_delegate;
 	else
-		m_run_delegate = &m_run_debug_delegate;
+		m_run_delegate = m_run_debug_delegate;
 
 	return delta;
 }

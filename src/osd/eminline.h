@@ -439,6 +439,30 @@ inline uint64_t mulu_64x64(uint64_t a, uint64_t b, uint64_t &hi)
 
 
 /*-------------------------------------------------
+    mulu_64x64_hi - perform an unsigned 64 bit x 64
+    bit multiply and return the upper 64 bits
+-------------------------------------------------*/
+
+#ifndef mulu_64x64_hi
+inline uint64_t mulu_64x64_hi(uint64_t a, uint64_t b)
+{
+	uint64_t const a_hi = uint32_t(a >> 32);
+	uint64_t const b_hi = uint32_t(b >> 32);
+	uint64_t const a_lo = uint32_t(a);
+	uint64_t const b_lo = uint32_t(b);
+
+	uint64_t const ab_lo = a_lo * b_lo;
+	uint64_t const ab_m1 = a_hi * b_lo;
+	uint64_t const ab_m2 = a_lo * b_hi;
+	uint64_t const ab_hi = a_hi * b_hi;
+	uint64_t const carry = ((ab_lo >> 32) + uint32_t(ab_m1) + uint32_t(ab_m2)) >> 32;
+
+	return ab_hi + (ab_m1 >> 32) + (ab_m2 >> 32) + carry;
+}
+#endif
+
+
+/*-------------------------------------------------
     div_128x64 - perform a signed 128 bit x 64
     bit divide and return the 64 bit result
 -------------------------------------------------*/

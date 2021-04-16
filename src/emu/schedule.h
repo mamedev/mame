@@ -42,7 +42,7 @@
 #define SET_SCHEDULER_STAT(x, y) do { x = y; } while (0)
 #else
 #define INCREMENT_SCHEDULER_STAT(x)
-#define SET_SCHEDULER_STAT(x)
+#define SET_SCHEDULER_STAT(x, y)
 #endif
 
 

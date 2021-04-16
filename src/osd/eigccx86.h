@@ -524,6 +524,22 @@ _mulu_64x64(uint64_t a, uint64_t b, uint64_t &hi)
 
 
 /*-------------------------------------------------
+    mulu_64x64_hi - perform an unsigned 64 bit x 64
+    bit multiply and return the upper 64 bits
+-------------------------------------------------*/
+
+#ifdef __x86_64__
+#define mulu_64x64_hi _mulu_64x64_hi
+inline uint64_t ATTR_FORCE_INLINE
+_mulu_64x64_hi(uint64_t a, uint64_t b)
+{
+	unsigned __int128 const r((unsigned __int128)a * b);
+	return uint64_t(r >> 64);
+}
+#endif
+
+
+/*-------------------------------------------------
     div_128x64 - perform a signed 128 bit x 64 bit
     divide and return the 64 bit quotient
 -------------------------------------------------*/

@@ -433,6 +433,51 @@ __forceinline int64_t _mulu_64x64(uint64_t a, uint64_t b, uint64_t &hi)
 #endif
 
 
+
+/*-------------------------------------------------
+    mulu_64x64_hi - perform an unsigned 64 bit x 64
+    bit multiply and return the upper 64 bits
+-------------------------------------------------*/
+
+#ifdef PTR64
+#define mulu_64x64_hi _mulu_64x64_hi
+__forceinline uint64_t _mulu_64x64_hi(uint64_t a, uint64_t b)
+{
+	return __umulh(a, b);
+}
+#endif
+
+
+/*-------------------------------------------------
+    div_128x64 - perform a signed 128 bit x 64 bit
+    divide and return the 64 bit quotient
+-------------------------------------------------*/
+
+#ifdef PTR64
+#define div_128x64 _div_128x64
+__forceinline int64_t _div_128x64(int64_t a_hi, uint64_t a_lo, int64_t b)
+{
+	int64_t remainder;
+	return _div128(a_hi, a_lo, b, &remainder);
+}
+#endif
+
+
+/*-------------------------------------------------
+    divu_128x64 - perform an unsigned 128 bit x 64 bit
+    divide and return the 64 bit quotient
+-------------------------------------------------*/
+
+#ifdef PTR64
+#define divu_128x64 _divu_128x64
+__forceinline uint64_t _divu_128x64(uint64_t a_hi, uint64_t a_lo, uint64_t b)
+{
+	uint64_t remainder;
+	return _udiv128(a_hi, a_lo, b, &remainder);
+}
+#endif
+
+
 /*-------------------------------------------------
     addu_32x32_co - perform an unsigned 32 bit + 32
     bit addition and return the result with carry

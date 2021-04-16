@@ -44,15 +44,12 @@ const int TRIGGER_SUSPENDTIME   = -4000;
 
 device_execute_interface::device_execute_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "execute")
-	, m_scheduler(nullptr)
 	, m_nextexec(nullptr)
-	, m_run_delegate(nullptr)
 	, m_icountptr(nullptr)
-	, m_cycles_running(0)
-	, m_cycles_stolen(0)
 	, m_cycles_per_second(0)
 	, m_totalcycles(0)
 	, m_profiler(PROFILER_IDLE)
+	, m_scheduler(nullptr)
 	, m_suspend(0)
 	, m_nextsuspend(0)
 	, m_eatcycles(0)
@@ -66,6 +63,8 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 	, m_timed_interrupt_period(attotime::zero)
 	, m_driver_irq(device)
 {
+	m_cycles.combined = 0;
+
 	// configure the fast accessor
 	assert(!device.interfaces().m_execute);
 	device.interfaces().m_execute = this;
@@ -97,8 +96,9 @@ void device_execute_interface::abort_timeslice() noexcept
 	if (m_icountptr != nullptr)
 	{
 		int delta = *m_icountptr;
-		m_cycles_stolen += delta;
-		m_cycles_running -= delta;
+		m_cycles.separate.stolen += delta;
+		scheduler_assert(int(m_cycles.separate.running) >= delta);
+		m_cycles.separate.running -= delta;
 		*m_icountptr -= delta;
 	}
 }
@@ -207,8 +207,8 @@ attotime device_execute_interface::local_time() noexcept
 	// if we're active, add in the time from the current slice
 	if (executing())
 	{
-		assert(m_cycles_running >= *m_icountptr);
-		int cycles = m_cycles_running - *m_icountptr;
+		scheduler_assert(int(m_cycles.separate.running) >= *m_icountptr);
+		int cycles = m_cycles.separate.running - *m_icountptr;
 		return m_localtime.absolute() + cycles_to_attotime(cycles);
 	}
 	return m_localtime.absolute();
@@ -224,8 +224,8 @@ u64 device_execute_interface::total_cycles() const noexcept
 {
 	if (executing())
 	{
-		assert(m_cycles_running >= *m_icountptr);
-		return m_totalcycles + m_cycles_running - *m_icountptr;
+		scheduler_assert(int(m_cycles.separate.running) >= *m_icountptr);
+		return m_totalcycles + m_cycles.separate.running - *m_icountptr;
 	}
 	else
 		return m_totalcycles;
@@ -373,7 +373,7 @@ void device_execute_interface::interface_pre_start()
 	m_run_fast_delegate = execute_delegate(&device_execute_interface::execute_run, this);
 	m_run_debug_delegate = execute_delegate(&device_execute_interface::run_debug, this);
 	m_suspend_delegate = execute_delegate(&device_execute_interface::run_suspend, this);
-	m_run_delegate = &m_run_fast_delegate;
+	m_run_delegate = m_run_fast_delegate;
 
 	// bind delegates
 	m_vblank_interrupt.resolve();

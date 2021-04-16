@@ -84,40 +84,4 @@ __forceinline uint8_t _count_leading_ones_64(uint32_t value)
 #endif
 #endif
 
-
-/***************************************************************************
-    INLINE MATH FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    div_128x64 - perform a signed 128 bit x 64 bit
-    divide and return the 64 bit quotient
--------------------------------------------------*/
-
-#if defined(_WIN64)
-#define div_128x64 _div_128x64
-inline int64_t ATTR_CONST ATTR_FORCE_INLINE
-_div_128x64(int64_t a_hi, uint64_t a_lo, int64_t b)
-{
-	int64_t remainder;
-	return _div128(a_hi, a_lo, b, &remainder);
-}
-#endif
-
-
-/*-------------------------------------------------
-    divu_128x64 - perform an unsigned 128 bit x 64 bit
-    divide and return the 64 bit quotient
--------------------------------------------------*/
-
-#if defined(_WIN64)
-#define divu_128x64 _divu_128x64
-inline uint64_t ATTR_CONST ATTR_FORCE_INLINE
-_divu_128x64(uint64_t a_hi, uint64_t a_lo, uint64_t b)
-{
-	uint64_t remainder;
-	return _udiv128(a_hi, a_lo, b, &remainder);
-}
-#endif
-
 #endif // MAME_OSD_EIVC_H
