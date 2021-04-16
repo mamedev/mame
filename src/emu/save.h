@@ -24,6 +24,8 @@
 #include <type_traits>
 #include <vector>
 
+#include <hashing.h>
+
 
 
 //**************************************************************************
@@ -88,6 +90,7 @@ typedef named_delegate<void ()> save_prepost_delegate;
 //**************************************************************************
 
 class save_registered_item;
+class zlib_streamer;
 class ram_state;
 class rewinder;
 
@@ -104,7 +107,7 @@ class save_zip_state
 
 public:
 	// the size threshold in bytes above which we will write an external file
-	static constexpr u32 JSON_EXTERNAL_BINARY_THRESHOLD = 4096;
+	static constexpr u32 JSON_EXTERNAL_BINARY_THRESHOLD = 16 * 1024;
 
 	// construction
 	save_zip_state();
@@ -128,13 +131,10 @@ public:
 	save_zip_state &json_append_float(double value);
 
 	// stage an item to be output as raw data
-	void add_data_file(char const *name, save_registered_item &item, void *base)
-	{
-		m_file_list.emplace_back(name, item, base);
-	}
+	char const *add_data_file(char const *proposed_name, save_registered_item &item, uintptr_t base);
 
 	// commit the results to the given file
-	void commit(FILE &output);
+	bool commit(emu_file &output);
 
 private:
 	// check the reserve; if we're getting close, expand out one more chunk
@@ -147,18 +147,32 @@ private:
 		}
 	}
 
+	void create_end_of_central_directory(std::vector<u8> &header, u32 central_dir_entries, u64 central_dir_offset, u32 central_dir_size);
+	void create_zip_file_header(std::vector<u8> &local, std::vector<u8> &central, char const *filename, u64 local_offset);
+	void create_zip_file_footer(std::vector<u8> &local, std::vector<u8> &central, u32 filesize, u32 compressed, u32 crc);
+	bool write_data_recursive(zlib_streamer &zlib, save_registered_item &item, uintptr_t base);
+
 	// file_entry represents a single raw data file that will be written
 	struct file_entry
 	{
-		file_entry(char const *name, save_registered_item &item, void *base) : m_item(item), m_name(name), m_base(base) { }
+		file_entry(char const *name, save_registered_item &item, uintptr_t base) :
+			m_item(item),
+			m_name(name),
+			m_base(base) { }
+
 		save_registered_item &m_item;
 		std::string m_name;
-		void *m_base;
+		uintptr_t m_base;
+		std::vector<u8> m_central_directory;
 	};
 
 	// internal state
 	std::list<file_entry> m_file_list;
 	std::vector<char> m_json;
+	util::crc32_creator m_file_crc_accum;
+	u32 m_file_size_accum;
+	u16 m_archive_date;
+	u16 m_archive_time;
 	u32 m_json_reserved;
 	u32 m_json_offset;
 };
@@ -199,9 +213,13 @@ public:
 	// simple getters
 	char const *name() const { return m_name.c_str(); }
 	save_type type() const { return m_type; }
+	bool is_struct_or_container() const { return (m_type == TYPE_STRUCT || m_type == TYPE_CONTAINER); }
+	bool is_array() const { return (m_type < TYPE_ARRAY); }
+	bool is_int() const { return (m_type == TYPE_INT || m_type == TYPE_UINT); }
+	bool is_int_or_float() const { return (is_int() || m_type == TYPE_FLOAT); }
 	std::list<save_registered_item> &subitems() { return m_items; }
 	uint32_t native_size() const { return m_native_size; }
-	uint32_t count() const { return (m_type < TYPE_ARRAY) ? m_type : 1; }
+	uint32_t count() const { return is_array() ? m_type : 1; }
 	uintptr_t ptr_offset() const { return m_ptr_offset; }
 
 	// append a new item to the current one
@@ -503,9 +521,6 @@ public:
 	// disk file processing (external)
 	save_error save_file(emu_file &file);
 	save_error load_file(emu_file &file);
-
-	// access to the root regist
-	void test_dump();
 
 private:
 	// state callback item

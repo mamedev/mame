@@ -27,6 +27,7 @@
 #include "coreutil.h"
 
 #include <iomanip>
+#include <zlib.h>
 
 
 //**************************************************************************
@@ -257,7 +258,7 @@ save_registered_item *save_registered_item::find(char const *name)
 bool save_registered_item::sort_and_prune()
 {
 	// only applies to arrays, structs, and containers; don't prune anything else
-	if (m_type >= TYPE_ARRAY && m_type != TYPE_STRUCT && m_type != TYPE_CONTAINER)
+	if (!is_array() && !is_struct_or_container())
 		return false;
 
 	// first prune any empty items
@@ -358,7 +359,7 @@ uint64_t save_registered_item::save_binary(uint8_t *ptr, uint64_t length, uintpt
 
 		// arrays are multiples of a single item
 		default:
-			if (m_type < TYPE_ARRAY)
+			if (is_array())
 			{
 				auto &item = m_items.front();
 				for (uint32_t rep = 0; rep < m_type; rep++)
@@ -410,7 +411,7 @@ uint64_t save_registered_item::restore_binary(uint8_t const *ptr, uint64_t lengt
 
 		// arrays are multiples of a single item
 		default:
-			if (m_type < TYPE_ARRAY)
+			if (is_array())
 			{
 				auto &item = m_items.front();
 				for (uint32_t rep = 0; rep < m_type; rep++)
@@ -500,35 +501,25 @@ void save_registered_item::save_json(save_zip_state &zipstate, char const *namep
 
 		// arrays are multiples of a single item
 		default:
-			if (m_type < TYPE_ARRAY)
+			if (is_array())
 			{
 				auto &item = m_items.front();
 
 				// look for large arrays of ints/floats
 				save_registered_item *inner = &item;
 				u32 total = count();
-				while (inner->type() < TYPE_ARRAY)
+				while (inner->is_array())
 				{
 					total *= inner->count();
 					inner = &inner->m_items.front();
 				}
-				if ((inner->type() == TYPE_INT || inner->type() == TYPE_UINT || inner->type() == TYPE_FLOAT) && total * inner->m_native_size >= save_zip_state::JSON_EXTERNAL_BINARY_THRESHOLD)
+				if (inner->is_int_or_float() && total * inner->m_native_size >= save_zip_state::JSON_EXTERNAL_BINARY_THRESHOLD)
 				{
-					std::string filename = localname;
-					for (int index = 0; index < filename.length(); )
-						if (strchr("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-.", filename[index]) == nullptr)
-						{
-							if (index != 0 && filename[index - 1] != '.')
-								filename[index++] = '.';
-							else
-								filename.erase(index, 1);
-						}
-						else
-							index++;
+					char const *filename = zipstate.add_data_file(localname.c_str(), *this, objbase);
 
 					zipstate.json_append('[').json_append('{');
 					zipstate.json_append_name("external_file");
-					zipstate.json_append('"').json_append(filename.c_str()).json_append('"').json_append(',');
+					zipstate.json_append('"').json_append(filename).json_append('"').json_append(',');
 					zipstate.json_append_name("unit");
 					zipstate.json_append_signed(inner->m_native_size).json_append(',');
 					zipstate.json_append_name("count");
@@ -536,8 +527,6 @@ void save_registered_item::save_json(save_zip_state &zipstate, char const *namep
 					zipstate.json_append_name("little_endian");
 					zipstate.json_append((ENDIANNESS_NATIVE == ENDIANNESS_LITTLE) ? "true" : "false");
 					zipstate.json_append('}').json_append(']');
-
-					zipstate.add_data_file(filename.c_str(), item, reinterpret_cast<void *>(objbase));
 				}
 				else
 				{
@@ -558,11 +547,9 @@ void save_registered_item::save_json(save_zip_state &zipstate, char const *namep
 					{
 						// normal form outputs a certain number of items per row
 						zipstate.json_append('[').json_append_eol();
-						uint32_t items_per_row = 0;
-						if (item.m_type == TYPE_INT || item.m_type == TYPE_UINT || item.m_type == TYPE_FLOAT)
-							items_per_row = 32 / item_size;
-						if (items_per_row == 0)
-							items_per_row = 1;
+						uint32_t items_per_row = 1;
+						if (item.is_int_or_float())
+							items_per_row = (item_size <= 2) ? 32 : 16;
 
 						// iterate over the items
 						for (uint32_t rep = 0; rep < m_type; rep++)
@@ -833,10 +820,8 @@ save_error save_manager::save_file(emu_file &file)
 	save_zip_state state;
 	m_root_item.save_json(state);
 
-	// write the output
-	__debugbreak();
-
-	return STATERR_NONE;
+	// then commit the state to the file
+	return state.commit(file) ? STATERR_NONE : STATERR_WRITE_ERROR;
 }
 
 
@@ -1221,13 +1206,100 @@ void rewinder::report_error(save_error error, rewind_operation operation)
 }
 
 
-void save_manager::test_dump()
-{
-	save_zip_state state;
-	m_root_item.save_json(state);
-	printf("%s\n", state.json_string());
-}
 
+//**************************************************************************
+//  ZLIB STREAMER
+//**************************************************************************
+
+class zlib_streamer
+{
+public:
+	// construction
+	zlib_streamer(emu_file &output) :
+		m_output(output)
+	{
+		m_stream.zalloc = Z_NULL;
+		m_stream.zfree = Z_NULL;
+		m_stream.opaque = Z_NULL;
+		m_stream.avail_in = m_stream.avail_out = 0;
+	}
+
+	// initialize compression
+	bool begin()
+	{
+		// reset the output buffer
+		m_stream.next_out = &m_buffer[0];
+		m_stream.avail_out = sizeof(m_buffer);
+
+		// initialize the zlib engine; the negative window size means
+		// no headers, which is what a .ZIP file wants
+		return (deflateInit2(&m_stream, Z_BEST_COMPRESSION, Z_DEFLATED, -15, 8, Z_DEFAULT_STRATEGY) == Z_OK);
+	}
+
+	// add more compressed data
+	bool write(void const *data, u32 count)
+	{
+		// point the input buffer to the data
+		m_stream.next_in = const_cast<Bytef *>(reinterpret_cast<Bytef const *>(data));
+		m_stream.avail_in = count;
+
+		// loop until all consumed
+		while (m_stream.avail_in != 0)
+		{
+			// deflate as much as possible
+			if (deflate(&m_stream, Z_NO_FLUSH) != Z_OK)
+				return false;
+
+			// if we ran out of output space, flush to the file and reset
+			if (m_stream.avail_out == 0)
+			{
+				m_output.write(&m_buffer[0], sizeof(m_buffer));
+				m_stream.next_out = &m_buffer[0];
+				m_stream.avail_out = sizeof(m_buffer);
+			}
+		}
+		return true;
+	}
+
+	// finish cmopression
+	bool end()
+	{
+		// loop until all data processed
+		int zerr = Z_OK;
+		while (zerr != Z_STREAM_END)
+		{
+			// deflate and attempt to finish
+			zerr = deflate(&m_stream, Z_FINISH);
+			if (zerr != Z_OK && zerr != Z_STREAM_END)
+				return false;
+
+			// if there's any output data, flush it to the file and reset
+			if (m_stream.avail_out != sizeof(m_buffer))
+			{
+				m_output.write(&m_buffer[0], sizeof(m_buffer) - m_stream.avail_out);
+				m_stream.next_out = &m_buffer[0];
+				m_stream.avail_out = sizeof(m_buffer);
+			}
+		}
+		return true;
+	}
+
+private:
+	// internal state
+	emu_file &m_output;
+	z_stream m_stream;
+	u8 m_buffer[4096];
+};
+
+
+
+//**************************************************************************
+//  SAVE ZIP STATE
+//**************************************************************************
+
+//-------------------------------------------------
+//  save_zip_state - constuctor
+//-------------------------------------------------
 
 save_zip_state::save_zip_state() :
 	m_json_reserved(0),
@@ -1236,7 +1308,335 @@ save_zip_state::save_zip_state() :
 	json_check_reserve();
 }
 
-void save_zip_state::commit(FILE &output)
+
+//-------------------------------------------------
+//  add_data_file - add a data file to the ZIP
+//  file, creating a clean, unique filename for it
+//-------------------------------------------------
+
+char const *save_zip_state::add_data_file(char const *proposed_name, save_registered_item &item, uintptr_t base)
 {
-//	add_data_file("save.json", &m_json.str()[0], m_json.str().length());
+	// first sanitize the filename
+	std::string base_filename = proposed_name;
+	for (int index = 0; index < base_filename.length(); )
+	{
+		if (strchr("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-.", base_filename[index]) == nullptr)
+		{
+			if (index != 0 && base_filename[index - 1] != '.')
+				base_filename[index++] = '.';
+			else
+				base_filename.erase(index, 1);
+		}
+		else
+			index++;
+	}
+
+	// now ensure it is unique
+	std::string filename;
+	bool retry = true;
+	for (int index = 1; retry; index++)
+	{
+		if (index == 1)
+			filename = string_format("%s.bin", base_filename.c_str());
+		else
+			filename = string_format("%s.%d.bin", base_filename.c_str(), index);
+
+		// see if anyone else has this name; if so, retry it
+		retry = false;
+		for (auto &file : m_file_list)
+			if (filename == file.m_name)
+			{
+				retry = true;
+				break;
+			}
+	}
+
+	// add to the list
+	m_file_list.emplace_back(filename.c_str(), item, base);
+	return m_file_list.back().m_name.c_str();
+}
+
+
+//-------------------------------------------------
+//  commit - assemble all the files into their
+//  final forms and write the ZIP data to the
+//  output file
+//-------------------------------------------------
+
+bool save_zip_state::commit(emu_file &output)
+{
+	zlib_streamer zlib(output);
+	std::vector<u8> local_header;
+	std::vector<u8> local_footer;
+
+	// determine the MS-DOS formatted time
+	time_t rawtime;
+	::time(&rawtime);
+	struct tm &timeinfo = *localtime(&rawtime);
+	m_archive_date = timeinfo.tm_mday | ((timeinfo.tm_mon + 1) << 5) | ((timeinfo.tm_year - 1980) << 9);
+	m_archive_time = (timeinfo.tm_sec / 2) | (timeinfo.tm_min << 5) | (timeinfo.tm_hour << 11);
+
+	// write the local header (and create the central directory entry) for the JSON itself
+	std::vector<u8> json_central_directory;
+	u64 local_header_offset = output.tell();
+	create_zip_file_header(local_header, json_central_directory, "save.json", local_header_offset);
+	output.write(&local_header[0], local_header.size());
+
+	// stream the JSON and compress it
+	u64 start = output.tell();
+	if (!zlib.begin() || !zlib.write(&m_json[0], m_json_offset) || !zlib.end())
+		return false;
+
+	// write the local footer and update the central directory entry
+	create_zip_file_footer(local_footer, json_central_directory, m_json_offset, output.tell() - start, util::crc32_creator::simple(&m_json[0], m_json_offset));
+	output.seek(local_header_offset + 0xe, SEEK_SET);
+	output.write(&local_footer[0], local_footer.size());
+	output.seek(0, SEEK_END);
+
+	// then write out the other files
+	for (auto &file : m_file_list)
+	{
+		// reset the accumulators
+		m_file_crc_accum.reset();
+		m_file_size_accum = 0;
+
+		// write the local header (and create the central directory entry) for the file
+		u64 local_header_offset = output.tell();
+		create_zip_file_header(local_header, file.m_central_directory, file.m_name.c_str(), local_header_offset);
+		output.write(&local_header[0], local_header.size());
+
+		// write the file header and compress it
+		u64 start = output.tell();
+		if (!zlib.begin() || !write_data_recursive(zlib, file.m_item, file.m_base) || !zlib.end())
+			return false;
+
+		// write the local footer and update the central directory entry
+		create_zip_file_footer(local_footer, file.m_central_directory, m_file_size_accum, output.tell() - start, m_file_crc_accum.finish());
+		output.seek(local_header_offset + 0xe, SEEK_SET);
+		output.write(&local_footer[0], local_footer.size());
+		output.seek(0, SEEK_END);
+	}
+
+	// remember the base of the central directory, then write it
+	u64 central_dir_offset = output.tell();
+	output.write(&json_central_directory[0], json_central_directory.size());
+	for (auto &file : m_file_list)
+		output.write(&file.m_central_directory[0], file.m_central_directory.size());
+
+	// now create the
+	std::vector<u8> eocd;
+	create_end_of_central_directory(eocd, m_file_list.size() + 1, central_dir_offset, output.tell() - central_dir_offset);
+	output.write(&eocd[0], eocd.size());
+	return true;
+}
+
+
+//-------------------------------------------------
+//  create_zip_file_header - create both the local
+//  and central file headers; the CRC and size
+//  information is stored as 0 at this stage
+//-------------------------------------------------
+
+void save_zip_state::create_zip_file_header(std::vector<u8> &local, std::vector<u8> &central, char const *filename, u64 local_offset)
+{
+	// reset the headers
+	local.clear();
+	central.clear();
+
+	// write the standard headers
+	local.push_back(0x50);	central.push_back(0x50);
+	local.push_back(0x4b);	central.push_back(0x4b);
+	local.push_back(0x03);	central.push_back(0x01);
+	local.push_back(0x04);	central.push_back(0x02);
+
+	// version created by = 3.0 / 0 (MS-DOS) (central directory only)
+							central.push_back(0x1e);
+							central.push_back(0x00);
+
+	// version to extract = 2.0
+	local.push_back(0x14);	central.push_back(0x14);
+	local.push_back(0x00);	central.push_back(0x00);
+
+	// general purpose bit flag = 0x02 (2=max compression)
+	local.push_back(0x02);	central.push_back(0x02);
+	local.push_back(0x00);	central.push_back(0x00);
+
+	// compression method = 8 (deflate)
+	local.push_back(0x08);	central.push_back(0x08);
+	local.push_back(0x00);	central.push_back(0x00);
+
+	// last mod file time
+	local.push_back(BIT(m_archive_time, 0, 8));	central.push_back(BIT(m_archive_time, 0, 8));
+	local.push_back(BIT(m_archive_time, 8, 8));	central.push_back(BIT(m_archive_time, 8, 8));
+
+	// last mod file date
+	local.push_back(BIT(m_archive_date, 0, 8));	central.push_back(BIT(m_archive_date, 0, 8));
+	local.push_back(BIT(m_archive_date, 8, 8));	central.push_back(BIT(m_archive_date, 8, 8));
+
+	// crc-32 -- to be written later
+	local.push_back(0x00);	central.push_back(0x00);
+	local.push_back(0x00);	central.push_back(0x00);
+	local.push_back(0x00);	central.push_back(0x00);
+	local.push_back(0x00);	central.push_back(0x00);
+
+	// compressed size -- to be written later
+	local.push_back(0x00);	central.push_back(0x00);
+	local.push_back(0x00);	central.push_back(0x00);
+	local.push_back(0x00);	central.push_back(0x00);
+	local.push_back(0x00);	central.push_back(0x00);
+
+	// uncompressed size -- to be written later
+	local.push_back(0x00);	central.push_back(0x00);
+	local.push_back(0x00);	central.push_back(0x00);
+	local.push_back(0x00);	central.push_back(0x00);
+	local.push_back(0x00);	central.push_back(0x00);
+
+	// file name length
+	u16 len = strlen(filename);
+	local.push_back(BIT(len, 0, 8)); central.push_back(BIT(len, 0, 8));
+	local.push_back(BIT(len, 8, 8)); central.push_back(BIT(len, 8, 8));
+
+	// extra field length
+	local.push_back(0x00);	central.push_back(0x00);
+	local.push_back(0x00);	central.push_back(0x00);
+
+	// file comment length (central directory only)
+							central.push_back(0x00);
+							central.push_back(0x00);
+
+	// disk number start (central directory only)
+							central.push_back(0x00);
+							central.push_back(0x00);
+
+	// internal file attributes (central directory only)
+							central.push_back(0x00);
+							central.push_back(0x00);
+
+	// external file attributes (central directory only)
+							central.push_back(0x00);
+							central.push_back(0x00);
+							central.push_back(0x00);
+							central.push_back(0x00);
+
+	// relative offset of local header (central directory only)
+							central.push_back(BIT(local_offset, 0, 8));
+							central.push_back(BIT(local_offset, 8, 8));
+							central.push_back(BIT(local_offset, 16, 8));
+							central.push_back(BIT(local_offset, 24, 8));
+
+	// filename
+	for ( ; *filename != 0; filename++)
+	{
+		local.push_back(*filename);
+		central.push_back(*filename);
+	}
+}
+
+
+//-------------------------------------------------
+//  create_zip_file_footer - create the CRC and
+//  size information, and update the central
+//  directory entry with the data
+//-------------------------------------------------
+
+void save_zip_state::create_zip_file_footer(std::vector<u8> &local, std::vector<u8> &central, u32 filesize, u32 compressed, u32 crc)
+{
+	// reset the local footer data
+	local.clear();
+
+	// crc-32 -- to be written later
+	local.push_back(central[16] = BIT(crc, 0, 8));
+	local.push_back(central[17] = BIT(crc, 8, 8));
+	local.push_back(central[18] = BIT(crc, 16, 8));
+	local.push_back(central[19] = BIT(crc, 24, 8));
+
+	// compressed size -- to be written later
+	local.push_back(central[20] = BIT(compressed, 0, 8));
+	local.push_back(central[21] = BIT(compressed, 8, 8));
+	local.push_back(central[22] = BIT(compressed, 16, 8));
+	local.push_back(central[23] = BIT(compressed, 24, 8));
+
+	// uncompressed size -- to be written later
+	local.push_back(central[24] = BIT(filesize, 0, 8));
+	local.push_back(central[25] = BIT(filesize, 8, 8));
+	local.push_back(central[26] = BIT(filesize, 16, 8));
+	local.push_back(central[27] = BIT(filesize, 24, 8));
+}
+
+
+//-------------------------------------------------
+//  write_data_recursive - write potentially
+//  multi-dimensional arrays to the compressed
+//  output, computing size and CRC
+//-------------------------------------------------
+
+bool save_zip_state::write_data_recursive(zlib_streamer &zlib, save_registered_item &item, uintptr_t base)
+{
+	save_registered_item &inner = item.subitems().front();
+	if (inner.is_array())
+	{
+		for (int index = 0; index < item.count(); index++)
+		{
+			if (!write_data_recursive(zlib, inner, base))
+				return false;
+			base += item.native_size();
+		}
+	}
+	else
+	{
+		u32 size = item.count() * item.native_size();
+		if (!zlib.write(reinterpret_cast<void *>(base), size))
+			return false;
+		m_file_crc_accum.append(reinterpret_cast<void *>(base), size);
+		m_file_size_accum += size;
+	}
+	return true;
+}
+
+
+//-------------------------------------------------
+//  create_end_of_central_directory - create a
+//  buffer containing the end of central directory
+//  record
+//-------------------------------------------------
+
+void save_zip_state::create_end_of_central_directory(std::vector<u8> &header, u32 central_dir_entries, u64 central_dir_offset, u32 central_dir_size)
+{
+	// end of central directory header
+	header.push_back(0x50);
+	header.push_back(0x4b);
+	header.push_back(0x05);
+	header.push_back(0x06);
+
+	// number of this disk
+	header.push_back(0x00);
+	header.push_back(0x00);
+
+	// number of disk with start of central directory
+	header.push_back(0x00);
+	header.push_back(0x00);
+
+	// total central directory entries on this disk
+	header.push_back(BIT(central_dir_entries, 0, 8));
+	header.push_back(BIT(central_dir_entries, 8, 8));
+
+	// total central directory entries
+	header.push_back(BIT(central_dir_entries, 0, 8));
+	header.push_back(BIT(central_dir_entries, 8, 8));
+
+	// size of the central directory
+	header.push_back(BIT(central_dir_size, 0, 8));
+	header.push_back(BIT(central_dir_size, 8, 8));
+	header.push_back(BIT(central_dir_size, 16, 8));
+	header.push_back(BIT(central_dir_size, 24, 8));
+
+	// offset of central directory
+	header.push_back(BIT(central_dir_offset, 0, 8));
+	header.push_back(BIT(central_dir_offset, 8, 8));
+	header.push_back(BIT(central_dir_offset, 16, 8));
+	header.push_back(BIT(central_dir_offset, 24, 8));
+
+	// ZIP comment length
+	header.push_back(0x00);
+	header.push_back(0x00);
 }
