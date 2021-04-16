@@ -20393,6 +20393,9 @@ matrix                          //
 @source:mattelchess.cpp
 mchess
 
+@source:max80.cpp
+max80
+
 @source:maxaflex.cpp
 maxaflex                        //
 mf_achas                        // (c) 1982 Exidy / First Star Software
