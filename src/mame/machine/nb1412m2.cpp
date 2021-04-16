@@ -331,8 +331,8 @@ void nb1412m2_device::dac_control_w(uint8_t data)
 void nb1412m2_device::dac_timer_w(uint8_t data)
 {
 	// TODO: Argo is unknown
-	m_timer_rate = (data >> 4) - 11;
-	m_dac_frequency = m_timer_rate * 71 * 18;
+	m_timer_rate = ((data & 0x30) >> 4) + 1;
+	m_dac_frequency = m_timer_rate * 1280;
 }
 
 // controls music tempo
