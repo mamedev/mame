@@ -179,7 +179,7 @@ void nb1412m2_device::device_reset()
 	m_const90 = 0x18; // fixes coin sample if inserted at first title screen
 	m_dac_current_address = m_dac_start_address = 0;
 	m_timer_rate = 2;
-	m_dac_frequency = m_timer_rate * 71 * 18;
+	m_dac_frequency = m_timer_rate * 1280;
 	m_timer_reg = false;
 	m_dac_playback = false;
 	m_dac_timer->adjust(attotime::never);
