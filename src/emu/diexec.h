@@ -315,9 +315,9 @@ private:
 		{
 #ifdef LSB_FIRST
 			u32             running;                    // number of cycles we are executing
-			u32             stolen;                     // number of cycles we artificially stole
+			s32             stolen;                     // number of cycles we artificially stole
 #else
-			u32             stolen;                     // number of cycles we artificially stole
+			s32             stolen;                     // number of cycles we artificially stole
 			u32             running;                    // number of cycles we are executing
 #endif
 		} separate;
@@ -408,8 +408,8 @@ inline subseconds device_execute_interface::run_for(subseconds subs)
 
 	// set the device's icount value to the number of cycles we want; again
 	// we pre-cache the pointer so that we don't have to re-fetch it when we
-	// come from from execution; the fact that we have a direct pointer to the
-	// icount is an artifact of the original  MAME design; it would also better
+	// come back from execution; the fact that we have a direct pointer to the
+	// icount is an artifact of the original MAME design; it would also better
 	// be an explicit s32 instead of an int
 	auto *icountptr = m_icountptr;
 	u32 ran = u32(ran64);
@@ -428,7 +428,7 @@ inline subseconds device_execute_interface::run_for(subseconds subs)
 	// if cycles were stolen (i.e., icount was artificially decremented), then
 	// ran isn't actually correct, so remove the number of cycles that we did
 	// that for
-	scheduler_assert(ran >= m_cycles.separate.stolen);
+	scheduler_assert(s32(ran) >= m_cycles.separate.stolen);
 	ran -= m_cycles.separate.stolen;
 
 	// time should never go backwards, nor should we ever attempt to execute

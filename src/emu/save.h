@@ -238,64 +238,33 @@ public:
 
 	// specializations for attotimes
 	template <typename ItemType>
-	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, oldtime::attotime>::value> save_item(device_t *device, const char *module, const char *tag, int index, ItemType &value, const char *valname)
-	{
-		std::string tempstr;
-		tempstr.assign(valname).append(".subseconds");
-		save_item(device, module, tag, index, value, &oldtime::attotime::m_subseconds, tempstr.c_str());
-		tempstr.assign(valname).append(".seconds");
-		save_item(device, module, tag, index, value, &oldtime::attotime::m_seconds, tempstr.c_str());
-	}
-
-	template <typename ItemType>
-	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, oldtime::attotime>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, ItemType *value, const char *valname, u32 count)
-	{
-		std::string tempstr;
-		tempstr.assign(valname).append(".subseconds");
-		save_item(device, module, tag, index, value, &oldtime::attotime::m_subseconds, tempstr.c_str(), count);
-		tempstr.assign(valname).append(".seconds");
-		save_item(device, module, tag, index, value, &oldtime::attotime::m_seconds, tempstr.c_str(), count);
-	}
-
-	template <typename ItemType>
-	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, oldtime::attotime>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, const std::unique_ptr<ItemType []> &value, const char *valname, u32 count)
-	{
-		std::string tempstr;
-		tempstr.assign(valname).append(".subseconds");
-		save_item(device, module, tag, index, value, &oldtime::attotime::m_subseconds, tempstr.c_str(), count);
-		tempstr.assign(valname).append(".seconds");
-		save_item(device, module, tag, index, value, &oldtime::attotime::m_seconds, tempstr.c_str(), count);
-	}
-
-	// specializations for attotimes
-	template <typename ItemType>
-	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, newtime::attotime>::value> save_item(device_t *device, const char *module, const char *tag, int index, ItemType &value, const char *valname)
+	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, attotime>::value> save_item(device_t *device, const char *module, const char *tag, int index, ItemType &value, const char *valname)
 	{
 		std::string tempstr;
 		tempstr.assign(valname).append(".coarse");
-		save_item(device, module, tag, index, value, &newtime::attotime::m_coarse, tempstr.c_str());
+		save_item(device, module, tag, index, value, &attotime::m_coarse, tempstr.c_str());
 		tempstr.assign(valname).append(".fine");
-		save_item(device, module, tag, index, value, &newtime::attotime::m_fine, tempstr.c_str());
+		save_item(device, module, tag, index, value, &attotime::m_fine, tempstr.c_str());
 	}
 
 	template <typename ItemType>
-	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, newtime::attotime>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, ItemType *value, const char *valname, u32 count)
+	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, attotime>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, ItemType *value, const char *valname, u32 count)
 	{
 		std::string tempstr;
 		tempstr.assign(valname).append(".coarse");
-		save_item(device, module, tag, index, value, &newtime::attotime::m_coarse, tempstr.c_str(), count);
+		save_item(device, module, tag, index, value, &attotime::m_coarse, tempstr.c_str(), count);
 		tempstr.assign(valname).append(".fine");
-		save_item(device, module, tag, index, value, &newtime::attotime::m_fine, tempstr.c_str(), count);
+		save_item(device, module, tag, index, value, &attotime::m_fine, tempstr.c_str(), count);
 	}
 
 	template <typename ItemType>
-	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, newtime::attotime>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, const std::unique_ptr<ItemType []> &value, const char *valname, u32 count)
+	std::enable_if_t<std::is_same<typename save_manager::array_unwrap<ItemType>::underlying_type, attotime>::value> save_pointer(device_t *device, const char *module, const char *tag, int index, const std::unique_ptr<ItemType []> &value, const char *valname, u32 count)
 	{
 		std::string tempstr;
 		tempstr.assign(valname).append(".coarse");
-		save_item(device, module, tag, index, value, &newtime::attotime::m_coarse, tempstr.c_str(), count);
+		save_item(device, module, tag, index, value, &attotime::m_coarse, tempstr.c_str(), count);
 		tempstr.assign(valname).append(".fine");
-		save_item(device, module, tag, index, value, &newtime::attotime::m_fine, tempstr.c_str(), count);
+		save_item(device, module, tag, index, value, &attotime::m_fine, tempstr.c_str(), count);
 	}
 
 	// specializations for subseconds
