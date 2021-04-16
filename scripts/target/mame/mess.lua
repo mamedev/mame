@@ -4538,6 +4538,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/jade.cpp",
 	MAME_DIR .. "src/mame/drivers/jonos.cpp",
 	MAME_DIR .. "src/mame/drivers/juku.cpp",
+	MAME_DIR .. "src/mame/drivers/junior80.cpp",
 	MAME_DIR .. "src/mame/drivers/krokha.cpp",
 	MAME_DIR .. "src/mame/drivers/kron.cpp",
 	MAME_DIR .. "src/mame/drivers/lee1214.cpp",
