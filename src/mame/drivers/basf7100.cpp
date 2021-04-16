@@ -220,7 +220,7 @@ void basf7100_state::sod_low_w(uint8_t data)
 
 uint32_t basf7100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int y = 0; y < 26; y++)
+	for (int y = 0; y < 24; y++)
 	{
 		for (int x = 0; x < 80; x++)
 		{
