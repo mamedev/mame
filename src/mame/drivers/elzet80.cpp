@@ -78,8 +78,6 @@ private:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
-	void drive_w(offs_t offset, u8 data);
-
 	floppy_image_device *m_floppy;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
@@ -179,5 +177,5 @@ ROM_START(elzet80p)
 ROM_END
 
 //    YEAR  NAME        PARENT    COMPAT    MACHINE     INPUT        CLASS           INIT             COMPANY          FULLNAME               FLAGS
-COMP( 1982, elzet80k,   elzet80p, 0,        elzet80,   elzet80,    elzet80_state, empty_init,     "Elektronikladen",  "Elzet/K 80",        MACHINE_IS_SKELETON )
-COMP( 1982, elzet80p,   0,        0,        elzet80,   elzet80,    elzet80_state, empty_init,     "Elektronikladen",  "Elzet/P 80",        MACHINE_IS_SKELETON )
+COMP( 1982, elzet80k,   elzet80p, 0,        elzet80,   elzet80,    elzet80_state, empty_init,     "Giesler & Danne GmbH & Co. KG",  "Elzet/K 80",        MACHINE_IS_SKELETON )
+COMP( 1982, elzet80p,   0,        0,        elzet80,   elzet80,    elzet80_state, empty_init,     "Giesler & Danne GmbH & Co. KG",  "Elzet/P 80",        MACHINE_IS_SKELETON )
