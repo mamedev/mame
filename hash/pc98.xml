@@ -97,7 +97,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<software name="msdos33">
-		<description>MS-DOS 3.3D</description>
+		<description>MS-DOS 3.30D</description>
 		<year>1991</year>
 		<publisher>NEC / Microsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1541,10 +1541,10 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="msdos33d" supported="no">
-		<description>MS-DOS 3.3D</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="msdos33d" cloneof="msdos33" supported="no">
+		<description>MS-DOS 3.30D (Alt)</description>
+		<year>1991</year>
+		<publisher>NEC / Microsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1261568">
@@ -9360,13 +9360,14 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Runs too fast on anything except (presumably) a 8086 CPU, but it doesn't boot on the PC-9801F -->
-	<software name="castle">
+	<!-- boot OK -->
+	<software name="castle" supported="yes">
 		<description>The Castle and Princess.</description>
 		<year>1985</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ザ・キャッスル" />
 		<info name="release" value="198507xx" />
+		<info name="usage" value="Use a vanilla 8086 class machine with 2HD floppy mounted for proper speed" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1142928">
 				<rom name="castle.d88" size="1142928" crc="77db8f90" sha1="07ac9159e906da1f97da601cd7da5c63ad2713a5" offset="0" />
@@ -9482,6 +9483,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<!-- "データ・ファイルが見つかりません" (data file not found) on PC-9801UX, "Packed file is corrupt" on anything else -->
+	<!-- boot OK by running CENTURIO.EXE from MSDOS -->
 	<software name="centurio" supported="no">
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Centurion - Defender of Rome</description>
@@ -9501,7 +9503,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Crashes MAME on PC-9801UX, "Packed file is corrupt" on anything else -->
+	<!-- Hardlocks MAME on PC-9801UX, "Packed file is corrupt" on anything else -->
+	<!-- boot OK by running CENTURIO.EXE from MSDOS -->
 	<software name="centurioa" cloneof="centurio" supported="no">
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Centurion - Defender of Rome (Alt)</description>
@@ -17197,7 +17200,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="dconqest">
+	<!-- randomly hangs with a stuck note -->
+	<software name="dconqest" supported="no">
 		<description>Dungeon Conquest</description>
 		<year>1993</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -41268,7 +41272,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="streetm2">
+	<!-- boot OK -->
+	<software name="streetm2" supported="yes">
 		<description>Street Mahjong 2</description>
 		<year>1996</year>
 		<publisher>ブラッキー (Blucky)</publisher>
@@ -43761,13 +43766,14 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-<!-- requires DOS and HD install -->
-	<software name="tetr2bmb" supported="no">
+	<!-- boot OK -->
+	<software name="tetr2bmb" supported="yes">
 		<description>Tetris 2 + Bombliss</description>
 		<year>1994</year>
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
 		<info name="alt_title" value="スーパーテトリス２ ＋ ボンブリス" />
 		<info name="release" value="19941015" />
+		<info name="usage" value="Needs MSDOS, run SETUP.EXE to install to HDD" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="super tetris 2 + bombliss (1994)(bps).fdi" size="1265664" crc="f087e8a4" sha1="3354a5702e7ba64508a69d2bf749791560922221" offset="0" />
@@ -43990,7 +43996,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="tokio">
+	<!-- boot OK -->
+	<software name="tokio" supported="yes">
 		<description>Tokio - Tokyo-to Dai 24 Ku</description>
 		<year>1992</year>
 		<publisher>アートディンク (Artdink)</publisher>
@@ -50735,7 +50742,8 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		</part>
 	</software>
 
-	<software name="f1datad">
+	<!-- boot OK -->
+	<software name="f1datad" supported="yes">
 		<description>F-1 Databox (Demo)</description>
 		<year>1990</year>
 		<publisher>リード・レックス (Reed Rex)</publisher>
@@ -61792,7 +61800,8 @@ SPACE EMPIRE
 		</part>
 	</software>
 
-	<software name="ranmahd" supported="no">
+	<!-- boot OK -->
+	<software name="ranmahd" supported="yes">
 		<description>Ranma½ - Hiryuu Densetsu</description>
 		<year>1991</year>
 		<publisher>ボーステック (Bothtec)</publisher>
