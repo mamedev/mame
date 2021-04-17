@@ -152,18 +152,15 @@ configuration::
 Building with Microsoft Visual Studio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* You can generate Visual Studio 2017 projects using **make vs2017**.  The
+* You can generate Visual Studio 2019 projects using **make vs2019**.  The
   solution and project files will be created in
-  ``build/projects/windows/mame/vs2017`` by default (the name of the ``build``
+  ``build/projects/windows/mame/vs2019`` by default (the name of the ``build``
   folder can be changed using the ``BUILDDIR`` option).  This will always
   regenerate the settings, so **REGENIE=1** is *not* needed.
-* Adding **MSBUILD=1** to the make options will build build the solution using
+* Adding **MSBUILD=1** to the make options will build the solution using
   the Microsoft Build Engine after generating the project files.  Note that this
   requires paths and environment variables to be configured so the correct
   Visual Studio tools can be located.
-* MAME can only be compiled with the Visual Studio 15.7.6 tools.  Bugs in newer
-  versions of the Microsoft Visual C/C++ compiler prevent it from compiling
-  MAME.
 * The MSYS2 environment is still required to generate the project files, convert
   built-in layouts, compile UI translations, etc.
 
