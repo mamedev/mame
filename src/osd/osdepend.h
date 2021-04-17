@@ -15,7 +15,6 @@
 
 #include "emucore.h"
 #include "osdcore.h"
-#include "unicode.h"
 #include "../frontend/mame/ui/menuitem.h"
 
 #include <memory>

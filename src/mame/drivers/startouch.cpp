@@ -19,7 +19,7 @@
 
     MicroTouch ISA
     ExpertColor Med3931 ISA sound card or other 82C931-based similar card (e.g. BTC 1817DS OPTi ISA)
-    S3 Trio64V2/DX PCI VGA (86C775, 512KB RAM)
+    PCI VGA ExpertColor M50-02 (S3, Trio64V2/DX 86C775, 512KB RAM)
     Parallel port dongle HASP4
     Creative Video Blaster camera (parallel port)
     HDD Samsung SV0322A or other IDE HDD with similar capacity (e.g. Seagate ST32122A).
@@ -30,6 +30,7 @@
 #include "cpu/i386/i386.h"
 #include "speaker.h"
 
+namespace {
 
 class startouch_state : public driver_device
 {
@@ -80,9 +81,6 @@ ROM_START(europl01)
 	ROM_SYSTEM_BIOS(3, "bst_m5atd1228b_2", "Biostar M5ATD (Award BIOS ATD1228B, set 2)")                                                           // Biostar M5ATD
 	ROMX_LOAD("award_1998_pci-pnp_586_149278871.bin", 0x00000, 0x20000, CRC(3c6aea4d) SHA1(9e56b0f27c204a0eaaf1174070fc95faacc84b0b), ROM_BIOS(3)) //   W29C011
 
-	ROM_REGION(0x8000, "vga_bios", 0)
-	ROM_LOAD("s3_86c775-86c785_video_bios_v1.01.04.u5", 0x0000, 0x8000, CRC(e718418f) SHA1(1288ce51bb732a346eb7c61d5bdf80ea22454d45))
-
 	ROM_REGION(0x20000, "hd_firmware", 0) // Samsung SV0322A
 	ROM_LOAD("jk200-35.bin", 0x00000, 0x20000, CRC(601fa709) SHA1(13ded4826a64209faac8bc81708172b81195ab96))
 
@@ -93,5 +91,6 @@ ROM_START(europl01)
 	DISK_IMAGE("sleic-petaco_startouch_2001_v2.0", 0, SHA1(3164a5786d6b9bb0dd9910b4d27a77a6b746dedf)) // Labeled "Star Touch 2001" but when run game title is EuroPlay 2001
 ROM_END
 
+} // Anonymous namespace
 
 GAME(2001, europl01, 0, europl01, europl01, startouch_state, empty_init, ROT0, "Sleic / Petaco", "EuroPlay 2001", MACHINE_IS_SKELETON)

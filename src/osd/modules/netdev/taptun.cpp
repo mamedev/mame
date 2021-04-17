@@ -17,6 +17,7 @@
 #include "osdnet.h"
 #include "modules/osdmodule.h"
 #include "netdev_module.h"
+#include "unicode.h"
 
 #ifdef __linux__
 #define IFF_TAP     0x0002

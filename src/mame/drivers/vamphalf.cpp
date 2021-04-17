@@ -72,6 +72,8 @@ TODO:
 #include "speaker.h"
 
 
+namespace {
+
 class vamphalf_state : public driver_device
 {
 public:
@@ -86,7 +88,7 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 		, m_eeprom(*this, "eeprom")
 		, m_gfxdecode(*this, "gfxdecode")
-		, m_tiles(*this,"tiles")
+		, m_tiles(*this,"tiles", 0x40000, ENDIANNESS_BIG)
 		, m_okiregion(*this, "oki%u", 1)
 		, m_photosensors(*this, "PHOTO_SENSORS")
 		, m_has_extra_gfx(false)
@@ -174,7 +176,7 @@ protected:
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	optional_shared_ptr<u16> m_tiles;
+	memory_share_creator<u16> m_tiles;
 
 	optional_memory_region_array<2> m_okiregion;
 
@@ -510,7 +512,7 @@ void vamphalf_state::qs1000_p3_w(u8 data)
 void vamphalf_state::common_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().share("wram");
-	map(0x40000000, 0x4003ffff).ram().share("tiles");
+	map(0x40000000, 0x4003ffff).rw(FUNC(vamphalf_state::vram_r), FUNC(vamphalf_state::vram_w));;
 	map(0x80000000, 0x8000ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfff00000, 0xffffffff).rom().region("maincpu", 0);
 }
@@ -518,7 +520,7 @@ void vamphalf_state::common_map(address_map &map)
 void vamphalf_state::common_32bit_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().share("wram32");
-	map(0x40000000, 0x4003ffff).rw(FUNC(vamphalf_state::vram_r), FUNC(vamphalf_state::vram_w)).share("tiles");
+	map(0x40000000, 0x4003ffff).rw(FUNC(vamphalf_state::vram_r), FUNC(vamphalf_state::vram_w));
 	map(0x80000000, 0x8000ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0xfff00000, 0xffffffff).rom().region("maincpu", 0);
 }
@@ -526,7 +528,7 @@ void vamphalf_state::common_32bit_map(address_map &map)
 void vamphalf_qdsp_state::yorijori_32bit_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram().share("wram32");
-	map(0x40000000, 0x4003ffff).rw(FUNC(vamphalf_state::vram_r), FUNC(vamphalf_state::vram_w)).share("tiles");
+	map(0x40000000, 0x4003ffff).rw(FUNC(vamphalf_state::vram_r), FUNC(vamphalf_state::vram_w));
 	map(0x80000000, 0x8000ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0xffe00000, 0xffffffff).rom().region("maincpu", 0);
 }
@@ -670,7 +672,7 @@ void vamphalf_state::mrdig_io(address_map &map)
 void vamphalf_state::aoh_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share("wram32");
-	map(0x40000000, 0x4003ffff).rw(FUNC(vamphalf_state::vram_r), FUNC(vamphalf_state::vram_w)).share("tiles");
+	map(0x40000000, 0x4003ffff).rw(FUNC(vamphalf_state::vram_r), FUNC(vamphalf_state::vram_w));
 	map(0x80000000, 0x8000ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 	map(0x80210000, 0x80210003).portr("SYSTEM");
 	map(0x80220000, 0x80220003).portr("P1_P2");
@@ -737,6 +739,8 @@ Offset+3
 void vamphalf_state::video_start()
 {
 	save_item(NAME(m_flipscreen));
+
+	m_flipscreen = 0;
 }
 
 void vamphalf_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -3572,6 +3576,9 @@ void vamphalf_state::init_boonggab()
 	m_has_extra_gfx = true;
 	m_flip_bit = 1;
 }
+
+} // Anonymous namespace
+
 
 GAME( 1999, coolmini,   0,        coolmini,  common,   vamphalf_state,      init_coolmini,  ROT0,   "SemiCom",                       "Cool Minigame Collection", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, coolminii,  coolmini, coolmini,  common,   vamphalf_state,      init_coolminii, ROT0,   "SemiCom",                       "Cool Minigame Collection (Italy)", MACHINE_SUPPORTS_SAVE )

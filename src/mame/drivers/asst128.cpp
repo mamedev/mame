@@ -6,6 +6,7 @@
 #include "cpu/i86/i86.h"
 #include "bus/pc_joy/pc_joy.h"
 #include "bus/pc_kbd/keyboards.h"
+#include "bus/pc_kbd/pc_kbdc.h"
 #include "imagedev/floppy.h"
 #include "machine/pc_fdc.h"
 
@@ -18,7 +19,7 @@ class asst128_mb_device : public ibm5150_mb_device
 {
 public:
 	// construction/destruction
-	asst128_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	asst128_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0)
 		: ibm5150_mb_device(mconfig, ASST128_MOTHERBOARD, tag, owner, clock)
 	{
 	}
@@ -53,7 +54,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_fdc_xt_device> m_fdc;
 
-	DECLARE_FLOPPY_FORMATS(asst128_formats);
+	static void asst128_formats(format_registration &fr);
 	void asst128_fdc_dor_w(uint8_t data);
 
 	void machine_start() override;
@@ -94,9 +95,11 @@ static void asst128_floppies(device_slot_interface &device)
 	device.option_add("525ssqd", FLOPPY_525_SSQD);
 }
 
-FLOPPY_FORMATS_MEMBER( asst128_state::asst128_formats )
-	FLOPPY_ASST128_FORMAT
-FLOPPY_FORMATS_END
+void asst128_state::asst128_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ASST128_FORMAT);
+}
 
 static DEVICE_INPUT_DEFAULTS_START( asst128 )
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x30, 0x20)
@@ -109,10 +112,12 @@ void asst128_state::asst128(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &asst128_state::asst128_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	asst128_mb_device &mb(ASST128_MOTHERBOARD(config, "mb", 0));
+	asst128_mb_device &mb(ASST128_MOTHERBOARD(config, "mb"));
 	mb.set_cputag(m_maincpu);
 	mb.int_callback().set_inputline(m_maincpu, 0);
 	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(asst128));
 
 	subdevice<cassette_image_device>("mb:cassette")->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
@@ -121,7 +126,9 @@ void asst128_state::asst128(machine_config &config)
 	ISA8_SLOT(config, "board0", 0, "mb:isa", pc_isa8_cards, "cga_mc1502", true);
 	ISA8_SLOT(config, "board1", 0, "mb:isa", pc_isa8_cards, "lpt", true);
 
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
+	kbd.out_clock_cb().set("mb", FUNC(asst128_mb_device::keyboard_clock_w));
+	kbd.out_data_cb().set("mb", FUNC(asst128_mb_device::keyboard_data_w));
 
 	PC_FDC_XT(config, m_fdc, 0);
 	m_fdc->intrq_wr_callback().set("mb:pic8259", FUNC(pic8259_device::ir6_w));

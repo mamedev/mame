@@ -9,7 +9,7 @@ template<int Width, int AddrShift, endianness_t Endian> typename emu::detail::ha
 {
 	this->ref();
 
-	uX data = inh::m_next->read(offset, mem_mask);
+	uX data = this->m_next->read(offset, mem_mask);
 	m_tap(offset, data, mem_mask);
 
 	this->unref();
@@ -18,12 +18,12 @@ template<int Width, int AddrShift, endianness_t Endian> typename emu::detail::ha
 
 template<int Width, int AddrShift, endianness_t Endian> std::string handler_entry_read_tap<Width, AddrShift, Endian>::name() const
 {
-	return '(' + m_name + ") " + inh::m_next->name();
+	return '(' + m_name + ") " + this->m_next->name();
 }
 
 template<int Width, int AddrShift, endianness_t Endian> handler_entry_read_tap<Width, AddrShift, Endian> *handler_entry_read_tap<Width, AddrShift, Endian>::instantiate(handler_entry_read<Width, AddrShift, Endian> *next) const
 {
-	return new handler_entry_read_tap<Width, AddrShift, Endian>(inh::m_space, inh::m_mph, next, m_name, m_tap);
+	return new handler_entry_read_tap<Width, AddrShift, Endian>(this->m_space, this->m_mph, next, m_name, m_tap);
 }
 
 
@@ -32,20 +32,20 @@ template<int Width, int AddrShift, endianness_t Endian> void handler_entry_write
 	this->ref();
 
 	m_tap(offset, data, mem_mask);
-	inh::m_next->write(offset, data, mem_mask);
+	this->m_next->write(offset, data, mem_mask);
 
 	this->unref();
 }
 
 template<int Width, int AddrShift, endianness_t Endian> std::string handler_entry_write_tap<Width, AddrShift, Endian>::name() const
 {
-	return '(' + m_name + ") " + inh::m_next->name();
+	return '(' + m_name + ") " + this->m_next->name();
 }
 
 
 template<int Width, int AddrShift, endianness_t Endian> handler_entry_write_tap<Width, AddrShift, Endian> *handler_entry_write_tap<Width, AddrShift, Endian>::instantiate(handler_entry_write<Width, AddrShift, Endian> *next) const
 {
-	return new handler_entry_write_tap<Width, AddrShift, Endian>(inh::m_space, inh::m_mph, next, m_name, m_tap);
+	return new handler_entry_write_tap<Width, AddrShift, Endian>(this->m_space, this->m_mph, next, m_name, m_tap);
 }
 
 

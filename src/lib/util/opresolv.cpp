@@ -8,14 +8,15 @@
 
 ****************************************************************************/
 
+#include "opresolv.h"
+
+#include "strformat.h"
+
+#include <algorithm>
+#include <cassert>
 #include <cctype>
 #include <cstdlib>
 #include <cstring>
-#include <cassert>
-
-#include "pool.h"
-#include "corestr.h"
-#include "opresolv.h"
 
 
 namespace util {

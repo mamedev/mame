@@ -3579,6 +3579,25 @@ ROM_START( sackids )
 	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */
 ROM_END
 
+ROM_START( dfeverg )
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) // SH2 code
+	ROM_LOAD16_WORD_SWAP( "13",    0x0000000, 0x080000, CRC(ecd7ac4b) SHA1(9bb4ae5ac236192bb6e927a3b5b75f84264e36aa) )
+	ROM_LOAD16_WORD_SWAP( "1",     0x0400000, 0x400000, CRC(d72f1640) SHA1(6a2ef0ca2b525d9ef0a817bb1d99275cf954242e) )
+	ROM_LOAD16_WORD_SWAP( "2",     0x0800000, 0x400000, CRC(c2e8aee5) SHA1(f7e404be93f99c8206636dc3391f162fc83abe2f) )
+	ROM_LOAD16_WORD_SWAP( "3",     0x0c00000, 0x400000, CRC(cb5b2744) SHA1(18d42bb6ced01e3e9fa1ed66c07bf91e34811510) )
+	ROM_LOAD16_WORD_SWAP( "4",     0x1000000, 0x400000, CRC(7eca59b2) SHA1(e03d71e1e9a67dadb2b76dde87f01147afe9ce34) )
+	ROM_LOAD16_WORD_SWAP( "5",     0x1400000, 0x400000, CRC(c3450f2b) SHA1(52dbfc8900d569debd92d2dd0d7fc25e133c5fbb) )
+	ROM_LOAD16_WORD_SWAP( "6",     0x1800000, 0x400000, CRC(1ac57ed5) SHA1(a34fb91818b586813d5f7ff5885bc07211189751) )
+	ROM_LOAD16_WORD_SWAP( "8",     0x1c00000, 0x400000, CRC(acc78f10) SHA1(9081d3006cc2f4daac1a8b99b729ac17bd6fed52) )
+	ROM_LOAD16_WORD_SWAP( "9",     0x2000000, 0x400000, CRC(4ffbba8d) SHA1(526b5ba3b874c0ee7ce3fca7631bed1e0b84fea1) )
+	ROM_LOAD16_WORD_SWAP( "10",    0x2400000, 0x400000, CRC(4b2a4397) SHA1(e8499e20939f26009f4678b85d3bfb5f02f4ddcb) )
+	ROM_LOAD16_WORD_SWAP( "11",    0x2800000, 0x400000, CRC(58877b19) SHA1(fff50cc05ae39a3b8313756d606e27ae2e62af26) )
+	// IC12 is tested but wasn't included in the dump. This causes missing backgrounds
+	ROM_LOAD16_WORD_SWAP( "12",    0x2c00000, 0x400000, NO_DUMP )
+ROM_END
+
 ROM_START( skychal )
 	STV_BIOS
 
@@ -3781,7 +3800,8 @@ GAME( 1998, twsoc98,   twcup98, stv_5881, stv,      stv_state,   init_twcup98,  
 GAME( 1996, magzun,    stvbios, magzun,   stv,      stv_state,   init_magzun,     ROT0,   "Sega",                         "Magical Zunou Power (J 961031 V1.000)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_MICROPHONE )
 GAME( 1998, choroqhr,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega / Takara",                "Choro Q Hyper Racing 5 (J 981230 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, fanzonem,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Fantasy Zone (medal game, REV.A) (J 990202 V1.000)", MACHINE_NOT_WORKING ) // require SH2's SCI serial port emulated, to communicate with coin/medal-related I/O board
-GAME( 2000, sackids,   stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,    "Sega",                         "Soreyuke Anpanman Crayon Kids (J 001026 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, sackids,   stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Soreyuke Anpanman Crayon Kids (J 001026 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, dfeverg,   stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Dancing Fever Gold (J 000821 V2.001)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 /* CD games */
 GAME( 1995, sfish2,    0,       stvcd,    stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Sport Fishing 2 (UET 951106 V1.10e)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )

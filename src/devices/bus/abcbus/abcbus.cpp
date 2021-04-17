@@ -89,9 +89,10 @@ void abcbus_slot_device::device_start()
 // slot devices
 #include "abc890.h"
 #include "cadmouse.h"
-#include "db411223.h"
+#include "db4106.h"
+#include "db4107.h"
+#include "db4112.h"
 #include "fd2.h"
-#include "hdc.h"
 #include "lux10828.h"
 #include "lux21046.h"
 #include "lux21056.h"
@@ -116,7 +117,9 @@ void abc80_cards(device_slot_interface &device)
 	device.option_add("abc830", ABC830);
 	device.option_add("abcexp", ABC_EXPANSION_UNIT);
 	device.option_add("cadabc", ABC_CADMOUSE);
-	device.option_add("db411223", DATABOARD_4112_23);
+	device.option_add("db4106", DATABOARD_4106);
+	device.option_add("db4107", DATABOARD_4107);
+	device.option_add("db4112", DATABOARD_4112);
 	device.option_add("fd2", ABC_FD2);
 	device.option_add("memcard", ABC_MEMORY_CARD);
 	device.option_add("slow", LUXOR_55_10828);
@@ -141,8 +144,9 @@ void abcbus_cards(device_slot_interface &device)
 	device.option_add("abc856", ABC856);
 	device.option_add("abc890", ABC890);
 	device.option_add("abc894", ABC894);
-	device.option_add("db411223", DATABOARD_4112_23);
-	device.option_add("hdc", ABC_HDC);
+	device.option_add("db4106", DATABOARD_4106);
+	device.option_add("db4107", DATABOARD_4107);
+	device.option_add("db4112", DATABOARD_4112);
 	device.option_add("sio", ABC_SIO);
 	device.option_add("slow", LUXOR_55_10828);
 	device.option_add("slutprov", ABC_SLUTPROV);

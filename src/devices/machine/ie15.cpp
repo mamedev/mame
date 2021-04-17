@@ -616,8 +616,8 @@ void ie15_device::update_leds()
 
 /*
     VBlank is active for 3 topmost on-screen rows and 1 at the bottom.
-	However, control flag 3 overrides VBlank, allowing status line
-	to be switched on and off.
+    However, control flag 3 overrides VBlank, allowing status line
+    to be switched on and off.
 */
 void ie15_device::scanline_callback()
 {

@@ -40,6 +40,7 @@
     special blending effects.  It's exact effect is unclear.
 
     Video backgrounds(intel DVI) in Dragongun?
+    reference video(dragngunj): https://youtu.be/TVc0SsTVJ94
 
     Locked 'n Loaded (parent set) is a slightly different hardware
     revision: board # DE-0420-1 where the US set is DE-0359-2.
@@ -2105,6 +2106,10 @@ void dragngun_state::dragngun(machine_config &config)
 
 	DECO_ZOOMSPR(config, m_sprgenzoom, 0);
 	m_sprgenzoom->set_gfxdecode(m_gfxdecode);
+
+	// I750, these aren't emulated
+	//I82750PB(config, m_i82750pb, XTAL(25'000'000));
+	//I82750DB(config, m_i82750db, XTAL(25'000'000));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dragngun);
 	PALETTE(config, m_palette).set_entries(2048);

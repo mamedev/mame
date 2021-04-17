@@ -29,14 +29,15 @@ const wd177x_format::format &wd177x_format::get_track_format(const format &f, in
 /*
     Default implementation for find_size. May be overwritten by subclasses.
 */
-int wd177x_format::find_size(io_generic *io, uint32_t form_factor)
+int wd177x_format::find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t size = io_generic_size(io);
 	for(int i=0; formats[i].form_factor; i++) {
 		const format &f = formats[i];
 		if(form_factor != floppy_image::FF_UNKNOWN && form_factor != f.form_factor)
 			continue;
-
+		if(!variants.empty() && !has_variant(variants, f.variant))
+			continue;
 		uint64_t format_size = 0;
 		for(int track=0; track < f.track_count; track++) {
 			for(int head=0; head < f.head_count; head++) {
@@ -51,9 +52,9 @@ int wd177x_format::find_size(io_generic *io, uint32_t form_factor)
 	return -1;
 }
 
-int wd177x_format::identify(io_generic *io, uint32_t form_factor)
+int wd177x_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	int type = find_size(io, form_factor);
+	int type = find_size(io, form_factor, variants);
 
 	if(type != -1)
 		return 50;
@@ -196,9 +197,9 @@ floppy_image_format_t::desc_e* wd177x_format::get_desc_mfm(const format &f, int 
 	return desc;
 }
 
-bool wd177x_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool wd177x_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
-	int type = find_size(io, form_factor);
+	int type = find_size(io, form_factor, variants);
 	if(type == -1)
 		return false;
 
@@ -247,7 +248,7 @@ bool wd177x_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 			generate_track(desc, track, head, sectors, tf.sector_count, total_size, image);
 		}
 
-	image->set_variant(f.variant);
+	image->set_form_variant(f.form_factor, f.variant);
 
 	return true;
 }
@@ -257,7 +258,7 @@ bool wd177x_format::supports_save() const
 	return true;
 }
 
-bool wd177x_format::save(io_generic *io, floppy_image *image)
+bool wd177x_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	// Count the number of formats
 	int formats_count;
@@ -422,26 +423,23 @@ void wd177x_format::check_compatibility(floppy_image *image, std::vector<int> &c
 		const format &f = formats[candidates[i]];
 		for(int track=0; track < f.track_count; track++) {
 			for(int head=0; head < f.head_count; head++) {
-				uint8_t bitstream[500000/8];
-				uint8_t sectdata[50000];
-				desc_xs sectors[256];
-				int track_size;
 				const format &tf = get_track_format(f, head, track);
 
-				generate_bitstream_from_track(track, head, tf.cell_size, bitstream, track_size, image);
+				auto bitstream = generate_bitstream_from_track(track, head, tf.cell_size, image);
+				std::vector<std::vector<uint8_t>> sectors;
 
 				switch (tf.encoding)
 				{
 				case floppy_image::FM:
-					extract_sectors_from_bitstream_fm_pc(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
+					sectors = extract_sectors_from_bitstream_fm_pc(bitstream);
 					break;
 				case floppy_image::MFM:
-					extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
+					sectors = extract_sectors_from_bitstream_mfm_pc(bitstream);
 					break;
 				}
 				int ns = 0;
-				for(int j=0; j<256; j++)
-					if(sectors[j].data) {
+				for(int j = 0; j < 256 && j < sectors.size(); j++)
+					if(!sectors[j].empty()) {
 						int sid;
 						if(tf.sector_base_id == -1) {
 							for(sid=0; sid < tf.sector_count; sid++)
@@ -452,10 +450,10 @@ void wd177x_format::check_compatibility(floppy_image *image, std::vector<int> &c
 						if(sid < 0 || sid > tf.sector_count)
 							goto fail;
 						if(tf.sector_base_size) {
-							if(sectors[j].size != tf.sector_base_size)
+							if(sectors[j].size() != tf.sector_base_size)
 								goto fail;
 						} else {
-							if(sectors[j].size != tf.per_sector_size[sid])
+							if(sectors[j].size() != tf.per_sector_size[sid])
 								goto fail;
 						}
 						ns++;
@@ -479,33 +477,30 @@ void wd177x_format::check_compatibility(floppy_image *image, std::vector<int> &c
 // A track specific format is to be supplied.
 void wd177x_format::extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head)
 {
-	uint8_t bitstream[500000/8];
-	uint8_t sectdata[50000];
-	desc_xs sectors[256];
-	int track_size;
-
 	// Extract the sectors
-	generate_bitstream_from_track(track, head, f.cell_size, bitstream, track_size, image);
+	auto bitstream = generate_bitstream_from_track(track, head, f.cell_size, image);
+	std::vector<std::vector<uint8_t>> sectors;
 
 	switch (f.encoding)
 	{
 	case floppy_image::FM:
-		extract_sectors_from_bitstream_fm_pc(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
+		sectors = extract_sectors_from_bitstream_fm_pc(bitstream);
 		break;
 	case floppy_image::MFM:
-		extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
+		sectors = extract_sectors_from_bitstream_mfm_pc(bitstream);
 		break;
 	}
 
 	for(int i=0; i<f.sector_count; i++) {
 		desc_s &ds = sdesc[i];
-		desc_xs &xs = sectors[ds.sector_id];
-		if(!xs.data)
+		if(ds.sector_id >= sectors.size() || sectors[ds.sector_id].empty())
 			memset((void *)ds.data, 0, ds.size);
-		else if(xs.size < ds.size) {
-			memcpy((void *)ds.data, xs.data, xs.size);
-			memset((uint8_t *)ds.data + xs.size, 0, xs.size - ds.size);
+
+		else if(sectors[ds.sector_id].size() < ds.size) {
+			memcpy((void *)ds.data, sectors[ds.sector_id].data(), sectors[ds.sector_id].size());
+			memset((uint8_t *)ds.data + sectors[ds.sector_id].size(), 0, sectors[ds.sector_id].size() - ds.size);
+
 		} else
-			memcpy((void *)ds.data, xs.data, ds.size);
+			memcpy((void *)ds.data, sectors[ds.sector_id].data(), ds.size);
 	}
 }

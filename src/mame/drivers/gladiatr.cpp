@@ -196,8 +196,8 @@ TODO:
 #include "machine/clock.h"
 #include "machine/nvram.h"
 
-#include "sound/2203intf.h"
 #include "sound/msm5205.h"
+#include "sound/ym2203.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -863,7 +863,7 @@ static INPUT_PORTS_START( gladiatr )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )                                   PORT_CHANGED_MEMBER(DEVICE_SELF, gladiatr_state, p1_s1, 0)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )                                   PORT_CHANGED_MEMBER(DEVICE_SELF, gladiatr_state, p2_s2, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )                                   PORT_CHANGED_MEMBER(DEVICE_SELF, gladiatr_state, p1_s2, 0)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 

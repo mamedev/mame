@@ -13,6 +13,7 @@
 
 #include "ui/moptions.h"
 
+#include "corestr.h"
 #include "drivenum.h"
 #include "softlist_dev.h"
 
@@ -98,7 +99,7 @@ void inifile_manager::init_category(std::string &&filename, emu_file &file)
 	categoryindex index;
 	char rbuf[MAX_CHAR_INFO];
 	std::string name;
-	while (file.gets(rbuf, ARRAY_LENGTH(rbuf)))
+	while (file.gets(rbuf, std::size(rbuf)))
 	{
 		if ('[' == rbuf[0])
 		{
@@ -142,7 +143,7 @@ bool favorite_manager::favorite_compare::operator()(ui_software_info const &lhs,
 		return true;
 	}
 
-	return 0 > std::strncmp(lhs.driver->name, rhs.driver->name, ARRAY_LENGTH(lhs.driver->name));
+	return 0 > std::strncmp(lhs.driver->name, rhs.driver->name, std::size(lhs.driver->name));
 }
 
 bool favorite_manager::favorite_compare::operator()(ui_software_info const &lhs, game_driver const &rhs) const
@@ -152,7 +153,7 @@ bool favorite_manager::favorite_compare::operator()(ui_software_info const &lhs,
 	if (!lhs.startempty)
 		return false;
 	else
-		return 0 > std::strncmp(lhs.driver->name, rhs.name, ARRAY_LENGTH(rhs.name));
+		return 0 > std::strncmp(lhs.driver->name, rhs.name, std::size(rhs.name));
 }
 
 bool favorite_manager::favorite_compare::operator()(game_driver const &lhs, ui_software_info const &rhs) const
@@ -162,7 +163,7 @@ bool favorite_manager::favorite_compare::operator()(game_driver const &lhs, ui_s
 	if (!rhs.startempty)
 		return true;
 	else
-		return 0 > std::strncmp(lhs.name, rhs.driver->name, ARRAY_LENGTH(lhs.name));
+		return 0 > std::strncmp(lhs.name, rhs.driver->name, std::size(lhs.name));
 }
 
 bool favorite_manager::favorite_compare::operator()(ui_software_info const &lhs, running_software_key const &rhs) const
@@ -181,7 +182,7 @@ bool favorite_manager::favorite_compare::operator()(ui_software_info const &lhs,
 	else if (lhs.shortname > std::get<2>(rhs))
 		return false;
 	else
-		return 0 > std::strncmp(lhs.driver->name, std::get<0>(rhs).name, ARRAY_LENGTH(lhs.driver->name));
+		return 0 > std::strncmp(lhs.driver->name, std::get<0>(rhs).name, std::size(lhs.driver->name));
 }
 
 bool favorite_manager::favorite_compare::operator()(running_software_key const &lhs, ui_software_info const &rhs) const
@@ -200,7 +201,7 @@ bool favorite_manager::favorite_compare::operator()(running_software_key const &
 	else if (std::get<2>(lhs) > rhs.shortname)
 		return false;
 	else
-		return 0 > std::strncmp(std::get<0>(lhs).name, rhs.driver->name, ARRAY_LENGTH(rhs.driver->name));
+		return 0 > std::strncmp(std::get<0>(lhs).name, rhs.driver->name, std::size(rhs.driver->name));
 }
 
 
@@ -298,11 +299,11 @@ void favorite_manager::add_favorite(running_machine &machine)
 
 					// start with simple stuff that can just be copied
 					info.shortname = software->shortname();
-					info.longname = imagedev->longname();
+					info.longname = software->longname();
 					info.parentname = software->parentname();
-					info.year = imagedev->year();
-					info.publisher = imagedev->manufacturer();
-					info.supported = imagedev->supported();
+					info.year = software->year();
+					info.publisher = software->publisher();
+					info.supported = software->supported();
 					info.part = part->name();
 					info.driver = &driver;
 					info.listname = imagedev->software_list_name();
@@ -470,7 +471,7 @@ void favorite_manager::apply_running_machine(running_machine &machine, T &&actio
 	else
 	{
 		bool have_software(false);
-		for (device_image_interface &image_dev : image_interface_iterator(machine.root_device()))
+		for (device_image_interface &image_dev : image_interface_enumerator(machine.root_device()))
 		{
 			software_info const *const sw(image_dev.software_entry());
 			if (image_dev.exists() && image_dev.loaded_through_softlist() && sw)
@@ -570,8 +571,7 @@ void favorite_manager::save_favorites()
 				buf << info.devicetype << '\n';
 				util::stream_format(buf, "%d\n", info.available);
 
-				buf.put('\0');
-				file.puts(&buf.vec()[0]);
+				file.puts(util::buf_to_string_view(buf));
 			}
 		}
 		file.close();

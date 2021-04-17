@@ -94,7 +94,7 @@ private:
 	required_shared_ptr<uint8_t> m_spriteno;
 	required_shared_ptr<uint8_t> m_sprite_enable;
 	required_shared_ptr<uint8_t> m_color_latch;
-	required_shared_ptr<uint8_t> m_characterram;
+	optional_shared_ptr<uint8_t> m_characterram;
 
 	uint8_t m_last_dial;
 	uint8_t m_collision_mask;

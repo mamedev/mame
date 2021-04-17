@@ -823,7 +823,7 @@ ROM_END
 
 //    YEAR  NAME      PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1981, csc,      0,      0, csc,      csc,  csc_state, empty_init, "Fidelity Electronics", "Champion Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1981, csce,     0,      0, csce,     csc,  csc_state, empty_init, "Fidelity Electronics", u8"Elite Champion Challenger (Travemünde version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1981, csce,     0,      0, csce,     csc,  csc_state, empty_init, "Fidelity Electronics", u8"Elite Champion Challenger (Travemünde TM version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1983, super9cc, 0,      0, su9,      su9,  su9_state, empty_init, "Fidelity Electronics", "Super \"9\" Sensory Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 

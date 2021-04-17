@@ -993,13 +993,12 @@ void debug_imgui::refresh_filelist()
 	{
 		int x = 0;
 		// add drives
-		const char *volume_name;
-		while((volume_name = osd_get_volume_name(x))!=nullptr)
+		for(std::string const &volume_name : osd_get_volume_names())
 		{
 			file_entry temp;
 			temp.type = file_entry_type::DRIVE;
-			temp.basename = std::string(volume_name);
-			temp.fullpath = std::string(volume_name);
+			temp.basename = volume_name;
+			temp.fullpath = volume_name;
 			m_filelist.emplace_back(std::move(temp));
 			x++;
 		}
@@ -1059,7 +1058,7 @@ void debug_imgui::draw_images_menu()
 	if(ImGui::BeginMenu("Images"))
 	{
 		int x = 0;
-		for (device_image_interface &img : image_interface_iterator(m_machine->root_device()))
+		for (device_image_interface &img : image_interface_enumerator(m_machine->root_device()))
 		{
 			x++;
 			std::string str = string_format(" %s : %s##%i",img.device().name(),img.exists() ? img.filename() : "[Empty slot]",x);
@@ -1417,7 +1416,7 @@ void debug_imgui::init_debugger(running_machine &machine)
 		fatalerror("Error: ImGui debugger requires the BGFX renderer.\n");
 
 	// check for any image devices (cassette, floppy, etc...)
-	image_interface_iterator iter(m_machine->root_device());
+	image_interface_enumerator iter(m_machine->root_device());
 	if (iter.first() != nullptr)
 		m_has_images = true;
 

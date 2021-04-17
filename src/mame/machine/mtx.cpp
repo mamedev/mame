@@ -468,7 +468,7 @@ SNAPSHOT_LOAD_MEMBER(mtx_state::snapshot_cb)
 	}
 
 	// write actual image data
-	uint16_t data_size = snapshot_size - 18 - system_variables_size;
+	uint16_t data_size = image.length() - 18 - system_variables_size;
 	for (int i = 0; i < data_size; i++)
 		program.write_byte(0x4000 + i, data[18 + system_variables_size + i]);
 
@@ -486,7 +486,7 @@ QUICKLOAD_LOAD_MEMBER(mtx_state::quickload_cb)
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	uint8_t *data = (uint8_t*)image.ptr();
 
-	if (quickload_size < 4)
+	if (image.length() < 4)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
 		return image_init_result::FAIL;
@@ -495,7 +495,7 @@ QUICKLOAD_LOAD_MEMBER(mtx_state::quickload_cb)
 	uint16_t code_base = pick_integer_le(data, 0, 2);
 	uint16_t code_length = pick_integer_le(data, 2, 2);
 
-	if (quickload_size < code_length)
+	if (image.length() < code_length)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
 		return image_init_result::FAIL;

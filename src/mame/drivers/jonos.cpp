@@ -23,6 +23,8 @@ There are interrupt handlers at 5.5 (0x002c) and 6.5 (0x0034).
 #include "screen.h"
 
 
+namespace {
+
 class jonos_state : public driver_device
 {
 public:
@@ -34,6 +36,10 @@ public:
 	{ }
 
 	void jonos(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 
 private:
 	u8 keyboard_r(offs_t offset);
@@ -47,8 +53,6 @@ private:
 	u8 m_term_data;
 	u8 m_curs_ctrl;
 	u16 m_curs_pos;
-	void machine_reset() override;
-	void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u8> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
@@ -119,6 +123,7 @@ void jonos_state::machine_reset()
 	m_curs_ctrl = 0;
 	m_curs_pos = 0;
 	m_term_data = 0;
+	m_framecnt = 0;
 }
 
 uint32_t jonos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -218,6 +223,9 @@ ROM_START( jonos )
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "jochset0.rom", 0x0000, 0x0800, CRC(1d8e9640) SHA1(74f3604acc71f9bc1e1f9479f6438feda79293a2) )
 ROM_END
+
+} // Anonymous namespace
+
 
 /* Driver */
 

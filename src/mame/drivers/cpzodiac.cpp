@@ -33,7 +33,7 @@ TODO:
 #include "audio/taitosnd.h"
 #include "machine/te7750.h"
 #include "machine/z80ctc.h"
-#include "sound/2610intf.h"
+#include "sound/ym2610.h"
 #include "speaker.h"
 
 
@@ -217,7 +217,7 @@ ROM_START( cpzodiac ) // this set looks like a conversion from JP version
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "14.ic14", 0x00000, 0x10000, CRC(eb1a77bb) SHA1(7a9ed992144d4aade6fefbcb78b6737924fcca01) ) // M27C512
 
-	ROM_REGION( 0x200000, "ymsnd", 0 ) // daughterboard with 4*27C040 at ic32
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) // daughterboard with 4*27C040 at ic32
 	ROM_LOAD( "17", 0x000000, 0x80000, CRC(0b457444) SHA1(022d9f030c9e9461a2ec954c9df00626e459d74a) )
 	ROM_LOAD( "18", 0x080000, 0x80000, CRC(4edf3a9b) SHA1(95021ca153f842958176c35430ed58fc897c6d2e) )
 	ROM_LOAD( "19", 0x100000, 0x80000, CRC(7c04ef12) SHA1(f5c5b2b1e28a65b0a33b332bcbf046aa462565c0) )
@@ -234,7 +234,7 @@ ROM_START( cpzodiacj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "d52_04.ic14", 0x00000, 0x10000, CRC(804b45d4) SHA1(db3296558077c7c4eea968417d3edf2509d3742b) )
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "d52-01.ic32", 0x00000, 0x200000, CRC(3bde2b85) SHA1(4cf3cf88f7b227ac6d31ede7cdeffe6adcac5529) )
 
 	ROM_REGION( 0x1000, "pals", 0 )

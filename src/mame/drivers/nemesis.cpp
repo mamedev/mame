@@ -116,9 +116,9 @@ initials
 #include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "sound/ym2151.h"
-#include "sound/3812intf.h"
 #include "sound/k051649.h"
+#include "sound/ym2151.h"
+#include "sound/ym3812.h"
 #include "speaker.h"
 
 #include "konamigt.lh"

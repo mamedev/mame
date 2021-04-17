@@ -152,6 +152,8 @@ void pacman_state::init_save_state()
 	save_item(NAME(m_colortablebank));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_bgpriority));
+	save_item(NAME(m_irq_mask));
+	save_item(NAME(m_interrupt_vector));
 }
 
 
@@ -166,6 +168,7 @@ VIDEO_START_MEMBER(pacman_state,pacman)
 	m_flipscreen = 0;
 	m_bgpriority = 0;
 	m_inv_spr = 0;
+	m_interrupt_vector = 0;
 
 	/* In the Pac Man based games (NOT Pengo) the first two sprites must be offset */
 	/* one pixel to the left to get a more correct placement */
@@ -197,6 +200,21 @@ WRITE_LINE_MEMBER(pacman_state::flipscreen_w)
 {
 	m_flipscreen = state;
 	m_bg_tilemap->set_flip(m_flipscreen * ( TILEMAP_FLIPX + TILEMAP_FLIPY ) );
+}
+
+
+void mspactwin_state::mspactwin_videoram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset );
+	m_screen->update_partial(m_screen->vpos());
+}
+
+WRITE_LINE_MEMBER(mspactwin_state::flipscreen_w)
+{
+	m_flipscreen = state;
+	m_bg_tilemap->set_flip(m_flipscreen * ( TILEMAP_FLIPX + TILEMAP_FLIPY ) );
+//  logerror("Flip: %02x\n", state);
 }
 
 

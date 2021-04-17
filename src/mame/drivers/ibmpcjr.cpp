@@ -580,8 +580,8 @@ void pcjr_state::ibmpcjr_io(address_map &map)
 void pcjr_state::ibmpcjx_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x80000, 0xb7fff).rom().region("kanji", 0);
 	map(0x80000, 0x9ffff).ram().share("vram"); // TODO: remove this part of vram hack
+	map(0x80000, 0xb7fff).rom().region("kanji", 0);
 	map(0xb8000, 0xbffff).m("pcvideo_pcjr:vram", FUNC(address_map_bank_device::amap8));
 	map(0xd0000, 0xdffff).r(m_cart1, FUNC(generic_slot_device::read_rom));
 	map(0xe0000, 0xfffff).rom().region("bios", 0);

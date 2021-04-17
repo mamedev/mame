@@ -68,7 +68,7 @@ private:
 };
 
 // iterator
-typedef device_interface_iterator<device_video_interface> video_interface_iterator;
+typedef device_interface_enumerator<device_video_interface> video_interface_enumerator;
 
 
 #endif  /* MAME_EMU_DIVIDEO_H */

@@ -669,7 +669,7 @@ void g65816_device::g65816i_check_maskable_interrupt()
 	{
 		g65816i_interrupt_hardware((FLAG_E) ? VECTOR_IRQ_E : VECTOR_IRQ_N);
 		CPU_STOPPED &= ~STOP_LEVEL_WAI;
-		LINE_IRQ=0;
+		LINE_IRQ=0; // FIXME: IRQ is level triggered, this makes it act as a HOLD_LINE
 	}
 }
 

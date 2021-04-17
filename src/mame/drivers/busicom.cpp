@@ -81,9 +81,9 @@ void busicom_state::printer_w(uint8_t data)
 
 	if (BIT(data, 3))
 	{
-		for (u8 j = 0; j < (ARRAY_LENGTH(m_printer_line) - 1); j++)
+		for (u8 j = 0; j < (std::size(m_printer_line) - 1); j++)
 			std::copy(std::begin(m_printer_line[j + 1]), std::end(m_printer_line[j + 1]), std::begin(m_printer_line[j]));
-		std::copy_n(&m_printer_line_color[1], ARRAY_LENGTH(m_printer_line_color) - 1, &m_printer_line_color[0]);
+		std::copy_n(&m_printer_line_color[1], std::size(m_printer_line_color) - 1, &m_printer_line_color[0]);
 
 		std::fill(std::begin(m_printer_line[10]), std::end(m_printer_line[10]), 0);
 		m_printer_line_color[10] = 0;
@@ -226,7 +226,7 @@ void busicom_state::machine_reset()
 	m_keyboard_shifter = 0;
 	m_printer_shifter = 0;
 
-	for (int i = 0; i < ARRAY_LENGTH(m_printer_line); i++)
+	for (int i = 0; i < std::size(m_printer_line); i++)
 		std::fill(std::begin(m_printer_line[i]), std::end(m_printer_line[i]), 0);
 	std::fill(std::begin(m_printer_line_color), std::end(m_printer_line_color), 0);
 }

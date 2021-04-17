@@ -448,32 +448,34 @@ void corcomp_fdc_device::connect_drives()
 
 INPUT_PORTS_START( cc_fdc )
 	PORT_START( "HEADSTEP" )
-	PORT_DIPNAME( 0x03, 0x00, "DSK1 head step time" )
+	PORT_DIPNAME( 0x03, 0x02, "DSK1 head step time" )
 		PORT_DIPSETTING( 0x00, "15 ms")
 		PORT_DIPSETTING( 0x01, "10 ms")
 		PORT_DIPSETTING( 0x02, "6 ms")
 		PORT_DIPSETTING( 0x03, "3 ms")
-	PORT_DIPNAME( 0x0c, 0x00, "DSK2 head step time" )
+	PORT_DIPNAME( 0x0c, 0x08, "DSK2 head step time" )
 		PORT_DIPSETTING( 0x00, "15 ms")
 		PORT_DIPSETTING( 0x04, "10 ms")
 		PORT_DIPSETTING( 0x08, "6 ms")
 		PORT_DIPSETTING( 0x0c, "3 ms")
-	PORT_DIPNAME( 0x30, 0x00, "DSK3 head step time" )
+	PORT_DIPNAME( 0x30, 0x20, "DSK3 head step time" )
 		PORT_DIPSETTING( 0x00, "15 ms")
 		PORT_DIPSETTING( 0x10, "10 ms")
 		PORT_DIPSETTING( 0x20, "6 ms")
 		PORT_DIPSETTING( 0x30, "3 ms")
-	PORT_DIPNAME( 0xc0, 0x00, "DSK4 head step time" )
+	PORT_DIPNAME( 0xc0, 0x80, "DSK4 head step time" )
 		PORT_DIPSETTING( 0x00, "15 ms")
 		PORT_DIPSETTING( 0x40, "10 ms")
 		PORT_DIPSETTING( 0x80, "6 ms")
 		PORT_DIPSETTING( 0xc0, "3 ms")
 INPUT_PORTS_END
 
-FLOPPY_FORMATS_MEMBER(corcomp_fdc_device::floppy_formats)
-	FLOPPY_TI99_SDF_FORMAT,
-	FLOPPY_TI99_TDF_FORMAT
-FLOPPY_FORMATS_END
+void corcomp_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_TI99_SDF_FORMAT);
+	fr.add(FLOPPY_TI99_TDF_FORMAT);
+}
 
 static void ccfdc_floppies(device_slot_interface &device)
 {
@@ -518,7 +520,7 @@ void corcomp_fdc_device::common_config(machine_config& config)
 
 	// Motor monoflop
 	TTL74123(config, m_motormf, 0);
-	m_motormf->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	m_motormf->set_connection_type(TTL74123_GROUNDED);
 	m_motormf->set_resistor_value(RES_K(100));
 	m_motormf->set_capacitor_value(CAP_U(47));
 	m_motormf->set_a_pin_value(0);

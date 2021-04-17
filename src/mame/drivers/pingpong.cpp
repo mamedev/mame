@@ -142,7 +142,7 @@ void pingpong_state::cashquiz_map(address_map &map)
 	map(0x5400, 0x54ff).bankr("bank5");
 	map(0x5500, 0x55ff).bankr("bank6");
 	map(0x5600, 0x56ff).bankr("bank7");
-	map(0x5700, 0x57ff).bankr("bank8");	
+	map(0x5700, 0x57ff).bankr("bank8");
 }
 
 

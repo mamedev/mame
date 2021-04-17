@@ -223,17 +223,16 @@ void k007232_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			{
 				char filebuf[256];
 				snprintf(filebuf, 256, "pcm%08x.wav", channel->start);
-				wav_file *file = wav_open(filebuf, stream.sample_rate(), 1);
-				if (file != nullptr)
+				util::wav_file_ptr file = util::wav_open(filebuf, stream.sample_rate(), 1);
+				if (file)
 				{
 					u32 addr = channel->start;
 					while (!BIT(read_sample(i, addr), 7) && addr < m_pcmlimit)
 					{
 						int16_t out = ((read_sample(i, addr) & 0x7f) - 0x40) << 7;
-						wav_add_data_16(file, &out, 1);
+						util::wav_add_data_16(*file, &out, 1);
 						addr++;
 					}
-					wav_close(file);
 				}
 			}
 		}

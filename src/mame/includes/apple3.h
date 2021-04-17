@@ -123,7 +123,7 @@ public:
 	virtual void device_post_load() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(paddle_timer);
 	void pdl_handler(int offset);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
 	DECLARE_WRITE_LINE_MEMBER(vbl_w);

@@ -232,18 +232,29 @@ AICA PCB
 --------------
 
 837-13629  171-7911B  SEGA 1998
-|------------------|
-|    K4S641632     |
-|                  |
-|                  |
-|                  |
-|     315-6232     |
-|                  |
-|                  |
-|------------------|
+|------------------------|
+|       K4S641632        |
+|                        |
+|                        |
+|                        |
+| C                      |
+| N                    C |
+| 1      315-6232      N |
+|                      3 |
+|                        |
+|                        |
+|      CN4         CN2   |
+|------------------------|
 Notes:
       K4S641632 - Samsung K4S641632 64Mbit SDRAM (1M x 16Bit x 4 Banks Synchronous DRAM)
-
+      CN2       - AICA JTAG connector. Pinout:
+                   VTref  1  8  GND
+                   nTRST  2  9  GND
+                   TDI    3 10  GND
+                   TMS    4 11  GND
+                   TCK    5 12  GND
+                   TDO    6 13  RESET
+                   VTref  7 14  GND
 
 Network PCB
 -----------

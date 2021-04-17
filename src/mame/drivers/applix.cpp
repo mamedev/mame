@@ -133,7 +133,7 @@ private:
 	u16 fdc_stat_r(offs_t offset);
 	void fdc_data_w(u16 data);
 	void fdc_cmd_w(u16 data);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 	u8 internal_data_read(offs_t offset);
 	void internal_data_write(offs_t offset, u8 data);
 	u8 p1_read();
@@ -748,9 +748,11 @@ void applix_state::machine_reset()
 	m_maincpu->reset();
 }
 
-FLOPPY_FORMATS_MEMBER( applix_state::floppy_formats )
-	FLOPPY_APPLIX_FORMAT
-FLOPPY_FORMATS_END
+void applix_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_APPLIX_FORMAT);
+}
 
 static void applix_floppies(device_slot_interface &device)
 {
@@ -785,6 +787,8 @@ void applix_state::applix_palette(palette_device &palette) const
 
 void applix_state::machine_start()
 {
+	std::fill(std::begin(m_palette_latch), std::end(m_palette_latch), 0);
+
 	save_item(NAME(m_video_latch));
 	save_item(NAME(m_pa));
 	save_item(NAME(m_palette_latch));
@@ -917,7 +921,7 @@ void applix_state::applix(machine_config &config)
 	m_crtc->set_begin_update_callback(FUNC(applix_state::crtc_update_border));
 	m_crtc->out_vsync_callback().set(FUNC(applix_state::vsync_w));
 
-	VIA6522(config, m_via, 30_MHz_XTAL / 4 / 10); // VIA uses 68000 E clock
+	MOS6522(config, m_via, 30_MHz_XTAL / 4 / 10); // VIA uses 68000 E clock
 	m_via->readpb_handler().set(FUNC(applix_state::applix_pb_r));
 	// in CB1 kbd clk
 	// in CA2 vsync

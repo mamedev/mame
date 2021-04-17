@@ -193,7 +193,7 @@ void real_profiler_state::update_text(running_machine &machine)
 	}
 
 	// loop over all types and generate the string
-	device_iterator iter(machine.root_device());
+	device_enumerator iter(machine.root_device());
 	std::ostringstream stream;
 	for (curtype = PROFILER_DEVICE_FIRST; curtype < PROFILER_TOTAL; ++curtype)
 	{

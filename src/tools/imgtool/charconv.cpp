@@ -8,32 +8,12 @@
 
 ***************************************************************************/
 
-#include "corestr.h"
 #include "charconv.h"
-#include "unicode.h"
+
+#include "corestr.h"
 #include "coretmpl.h"
 
 imgtool::simple_charconverter imgtool::charconverter_iso_8859_1(nullptr, nullptr);
-
-
-//-------------------------------------------------
-//  from_utf8
-//-------------------------------------------------
-
-void imgtool::charconverter::from_utf8(std::ostream &dest, const std::string &src) const
-{
-	from_utf8(dest, src.c_str(), src.size());
-}
-
-
-//-------------------------------------------------
-//  to_utf8
-//-------------------------------------------------
-
-void imgtool::charconverter::to_utf8(std::ostream &dest, const std::string &src) const
-{
-	to_utf8(dest, src.c_str(), src.size());
-}
 
 
 //-------------------------------------------------
@@ -63,23 +43,23 @@ imgtool::simple_charconverter::simple_charconverter(const char32_t lowpage[0x80]
 //  from_utf8
 //-------------------------------------------------
 
-void imgtool::simple_charconverter::from_utf8(std::ostream &dest, const char *src, size_t src_length) const
+void imgtool::simple_charconverter::from_utf8(std::ostream &dest, std::string_view src) const
 {
 	// normalize the incoming unicode
-	std::string normalized_src = normalize_unicode(src, src_length, m_norm);
+	std::string const normalized_src = normalize_unicode(src, m_norm);
 
-	auto iter = normalized_src.begin();
-	while (iter != normalized_src.end())
+	auto nsrc = std::string_view(normalized_src);
+	while (!nsrc.empty())
 	{
 		// get the next character
 		char32_t ch;
-		int rc = uchar_from_utf8(&ch, &*iter, normalized_src.end() - iter);
+		int rc = uchar_from_utf8(&ch, nsrc);
 		if (rc < 0)
 		{
 			ch = 0xFFFD;
 			rc = 1;
 		}
-		iter += rc;
+		nsrc.remove_prefix(rc);
 
 		// do the reverse lookup
 		auto lookup = std::lower_bound(m_reverse_lookup.begin(), m_reverse_lookup.end(), ch, [](const std::pair<char32_t, char> &a, const char32_t &b)
@@ -99,24 +79,24 @@ void imgtool::simple_charconverter::from_utf8(std::ostream &dest, const char *sr
 //  to_utf8
 //-------------------------------------------------
 
-void imgtool::simple_charconverter::to_utf8(std::ostream &dest, const char *src, size_t src_length) const
+void imgtool::simple_charconverter::to_utf8(std::ostream &dest, std::string_view src) const
 {
-	for (size_t i = 0; i < src_length; i++)
+	for (uint8_t c : src)
 	{
 		// which page is this in?
-		const char32_t *page = ((src[i] & 0x80) == 0) ? m_lowpage : m_highpage;
+		const char32_t *page = ((c & 0x80) == 0) ? m_lowpage : m_highpage;
 
 		// is this page present?
-		if ((src[i] & 0x80) == 0)
+		if ((c & 0x80) == 0)
 		{
 			// no - pass it on
-			dest << src[i];
+			dest << c;
 		}
 		else
 		{
 			// yes - we need to do a lookup
-			size_t base = ((src[i] & 0x80) == 0) ? 0x00 : 0x80;
-			char32_t ch = page[((unsigned char)(src[i])) - base];
+			size_t base = ((c & 0x80) == 0) ? 0x00 : 0x80;
+			char32_t ch = page[((unsigned char)(c)) - base];
 			if (ch == 0)
 				throw charconverter_exception();
 

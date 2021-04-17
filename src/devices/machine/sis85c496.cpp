@@ -101,13 +101,12 @@ void sis85c496_host_device::device_add_mconfig(machine_config &config)
 	m_keybc->hot_res().set(FUNC(sis85c496_host_device::cpu_reset_w));
 	m_keybc->gate_a20().set(FUNC(sis85c496_host_device::cpu_a20_w));
 	m_keybc->kbd_irq().set("pic8259_master", FUNC(pic8259_device::ir1_w));
-	m_keybc->kbd_clk().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_keybc->kbd_data().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
+	m_keybc->kbd_clk().set(m_pc_kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_keybc->kbd_data().set(m_pc_kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
 
-	PC_KBDC(config, m_pc_kbdc, 0);
+	PC_KBDC(config, m_pc_kbdc, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
 	m_pc_kbdc->out_clock_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_clk_w));
 	m_pc_kbdc->out_data_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_data_w));
-	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL).set_pc_kbdc_slot(subdevice("pc_kbdc"));
 
 	DS12885(config, m_ds12885);
 	m_ds12885->irq().set(m_pic8259_slave, FUNC(pic8259_device::ir0_w));
@@ -130,7 +129,7 @@ sis85c496_host_device::sis85c496_host_device(const machine_config &mconfig, cons
 	m_keybc(*this, "keybc"),
 	m_speaker(*this, "speaker"),
 	m_ds12885(*this, "rtc"),
-	m_pc_kbdc(*this, "pc_kbdc"),
+	m_pc_kbdc(*this, "kbd"),
 	m_at_spkrdata(0), m_pit_out2(0), m_dma_channel(0), m_cur_eop(false), m_dma_high_byte(0), m_at_speaker(0), m_refresh(false), m_channel_check(0), m_nmi_enabled(0)
 {
 }

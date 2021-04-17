@@ -383,7 +383,7 @@ void d9060_device_base::device_add_mconfig(machine_config &config)
 	M6502(config, m_hdccpu, XTAL(4'000'000)/4);
 	m_hdccpu->set_addrmap(AS_PROGRAM, &d9060_device::hdc_mem);
 
-	VIA6522(config, m_via, XTAL(4'000'000)/4);
+	MOS6522(config, m_via, XTAL(4'000'000)/4);
 	m_via->writepa_handler().set(FUNC(d9060_device_base::scsi_data_w));
 	m_via->writepb_handler().set(FUNC(d9060_device_base::via_pb_w));
 	m_via->ca2_handler().set(FUNC(d9060_device_base::ack_w));

@@ -630,7 +630,7 @@ ROM_END
 
 void dgpix_state::init_elfin()
 {
-	u8 *rom = (u8 *)(u32 *)m_flash + 0x1c00000;
+	u8 *rom = memregion("flash")->base() + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3a9e94)] = 3;
 	rom[BYTE4_XOR_BE(0x3a9e95)] = 0;
@@ -644,7 +644,7 @@ void dgpix_state::init_elfin()
 
 void dgpix_state::init_jumpjump()
 {
-	u8 *rom = (u8 *)(u32 *)m_flash + 0x1c00000;
+	u8 *rom = memregion("flash")->base() + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3a829a)] = 3;
 	rom[BYTE4_XOR_BE(0x3a829b)] = 0;
@@ -658,7 +658,7 @@ void dgpix_state::init_jumpjump()
 
 void dgpix_state::init_xfiles()
 {
-	u8 *rom = (u8 *)(u32 *)m_flash + 0x1c00000;
+	u8 *rom = memregion("flash")->base() + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3a9a2a)] = 3;
 	rom[BYTE4_XOR_BE(0x3a9a2b)] = 0;
@@ -672,7 +672,7 @@ void dgpix_state::init_xfiles()
 
 void dgpix_state::init_xfilesk()
 {
-	u8 *rom = (u8 *)(u32 *)m_flash + 0x1c00000;
+	u8 *rom = memregion("flash")->base() + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3aa92e)] = 3;
 	rom[BYTE4_XOR_BE(0x3aa92f)] = 0;
@@ -689,7 +689,7 @@ void dgpix_state::init_xfilesk()
 
 void dgpix_state::init_kdynastg()
 {
-	u8 *rom = (u8 *)(u32 *)m_flash + 0x1c00000;
+	u8 *rom = memregion("flash")->base() + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3aaa10)] = 3; // 129f0 - nopped call
 	rom[BYTE4_XOR_BE(0x3aaa11)] = 0;

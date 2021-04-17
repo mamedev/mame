@@ -96,34 +96,34 @@ license:CC0
 	</element>
 
 	<element name="piece" defstate="0">
-		<image file="chess/wp.png" state="1"/>
-		<image file="chess/wn.png" state="2"/>
-		<image file="chess/wb.png" state="3"/>
-		<image file="chess/wr.png" state="4"/>
-		<image file="chess/wq.png" state="5"/>
-		<image file="chess/wk.png" state="6"/>
+		<image file="chess/wp.svg" state="1"/>
+		<image file="chess/wn.svg" state="2"/>
+		<image file="chess/wb.svg" state="3"/>
+		<image file="chess/wr.svg" state="4"/>
+		<image file="chess/wq.svg" state="5"/>
+		<image file="chess/wk.svg" state="6"/>
 
-		<image file="chess/bp.png" state="7"/>
-		<image file="chess/bn.png" state="8"/>
-		<image file="chess/bb.png" state="9"/>
-		<image file="chess/br.png" state="10"/>
-		<image file="chess/bq.png" state="11"/>
-		<image file="chess/bk.png" state="12"/>
+		<image file="chess/bp.svg" state="7"/>
+		<image file="chess/bn.svg" state="8"/>
+		<image file="chess/bb.svg" state="9"/>
+		<image file="chess/br.svg" state="10"/>
+		<image file="chess/bq.svg" state="11"/>
+		<image file="chess/bk.svg" state="12"/>
 
 		<!-- selected pieces -->
-		<image file="chess/wp.png" state="13"><color alpha="0.5" /></image>
-		<image file="chess/wn.png" state="14"><color alpha="0.5" /></image>
-		<image file="chess/wb.png" state="15"><color alpha="0.5" /></image>
-		<image file="chess/wr.png" state="16"><color alpha="0.5" /></image>
-		<image file="chess/wq.png" state="17"><color alpha="0.5" /></image>
-		<image file="chess/wk.png" state="18"><color alpha="0.5" /></image>
+		<image file="chess/wp.svg" state="13"><color alpha="0.5" /></image>
+		<image file="chess/wn.svg" state="14"><color alpha="0.5" /></image>
+		<image file="chess/wb.svg" state="15"><color alpha="0.5" /></image>
+		<image file="chess/wr.svg" state="16"><color alpha="0.5" /></image>
+		<image file="chess/wq.svg" state="17"><color alpha="0.5" /></image>
+		<image file="chess/wk.svg" state="18"><color alpha="0.5" /></image>
 
-		<image file="chess/bp.png" state="19"><color alpha="0.5" /></image>
-		<image file="chess/bn.png" state="20"><color alpha="0.5" /></image>
-		<image file="chess/bb.png" state="21"><color alpha="0.5" /></image>
-		<image file="chess/br.png" state="22"><color alpha="0.5" /></image>
-		<image file="chess/bq.png" state="23"><color alpha="0.5" /></image>
-		<image file="chess/bk.png" state="24"><color alpha="0.5" /></image>
+		<image file="chess/bp.svg" state="19"><color alpha="0.5" /></image>
+		<image file="chess/bn.svg" state="20"><color alpha="0.5" /></image>
+		<image file="chess/bb.svg" state="21"><color alpha="0.5" /></image>
+		<image file="chess/br.svg" state="22"><color alpha="0.5" /></image>
+		<image file="chess/bq.svg" state="23"><color alpha="0.5" /></image>
+		<image file="chess/bk.svg" state="24"><color alpha="0.5" /></image>
 	</element>
 
 	<group name="sb_board">
@@ -205,7 +205,7 @@ license:CC0
 		<!-- leds -->
 		<repeat count="8">
 			<param name="y" start="8.3" increment="10" />
-			<param name="i1" start="11" increment="-1" />
+			<param name="i1" start="7" increment="-1" />
 
 			<repeat count="8">
 				<param name="x" start="8.3" increment="10" />
@@ -423,13 +423,14 @@ license:CC0
 <!-- display -->
 
 	<element name="lcd_bg"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
+	<element name="ldot_hide"><disk><color red="0.54" green="0.57" blue="0.58" /></disk></element>
 
 	<element name="digit" defstate="0">
 		<led7seg><color red="0.2" green="0.16" blue="0.16" /></led7seg>
 	</element>
-	<element name="ldot" defstate="0">
-		<rect state="1"><color red="0.2" green="0.16" blue="0.16" /></rect>
-		<rect state="0"><color red="0.49412" green="0.51765" blue="0.51765" /></rect>
+	<element name="ldot">
+		<rect><color red="0.49412" green="0.51765" blue="0.51765" /></rect>
+		<rect statemask="0x80"><color red="0.2" green="0.16" blue="0.16" /></rect>
 	</element>
 
 	<group name="display">
@@ -442,12 +443,18 @@ license:CC0
 		<element name="digit1" ref="digit"><bounds x="43" y="91" width="4" height="6" /></element>
 		<element name="digit0" ref="digit"><bounds x="48.5" y="91" width="4" height="6" /></element>
 
-		<element name="3.7" ref="ldot"><bounds x="36.25" y="96.42" width="0.6" height="0.6" /></element>
-		<element name="2.7" ref="ldot"><bounds x="41.75" y="96.42" width="0.6" height="0.6" /></element>
-		<element name="1.7" ref="ldot"><bounds x="47.25" y="96.42" width="0.6" height="0.6" /></element>
+		<!-- digits DP are different from normal 7seg -->
+		<element ref="ldot_hide"><bounds x="35.3" y="96.3" width="0.85" height="0.85" /></element>
+		<element ref="ldot_hide"><bounds x="40.8" y="96.3" width="0.85" height="0.85" /></element>
+		<element ref="ldot_hide"><bounds x="46.3" y="96.3" width="0.85" height="0.85" /></element>
+		<element ref="ldot_hide"><bounds x="51.8" y="96.3" width="0.85" height="0.85" /></element>
 
-		<element name="0.7" ref="ldot"><bounds x="42.16" y="92.75" width="0.6" height="0.6" /></element>
-		<element name="0.7" ref="ldot"><bounds x="41.94" y="94.55" width="0.6" height="0.6" /></element>
+		<element name="digit3" ref="ldot"><bounds x="36.22" y="96.42" width="0.6" height="0.6" /></element>
+		<element name="digit2" ref="ldot"><bounds x="41.72" y="96.42" width="0.6" height="0.6" /></element>
+		<element name="digit1" ref="ldot"><bounds x="47.22" y="96.42" width="0.6" height="0.6" /></element>
+
+		<element name="digit0" ref="ldot"><bounds x="42.07" y="92.75" width="0.6" height="0.6" /></element>
+		<element name="digit0" ref="ldot"><bounds x="41.92" y="94.55" width="0.6" height="0.6" /></element>
 	</group>
 
 
@@ -487,12 +494,12 @@ license:CC0
 	<element name="text_b8"><text string="8" align="2"><color red="0.75" green="0.75" blue="0.75" /></text></element>
 	<element name="text_b9"><text string="9" align="2"><color red="0.75" green="0.75" blue="0.75" /></text></element>
 
-	<element name="text_p1"><image file="chess/wk.png"><color alpha="0.9" /></image></element>
-	<element name="text_p2"><image file="chess/wq.png"><color alpha="0.9" /></image></element>
-	<element name="text_p3"><image file="chess/wr.png"><color alpha="0.9" /></image></element>
-	<element name="text_p4"><image file="chess/wb.png"><color alpha="0.9" /></image></element>
-	<element name="text_p5"><image file="chess/wn.png"><color alpha="0.9" /></image></element>
-	<element name="text_p6"><image file="chess/wp.png"><color alpha="0.9" /></image></element>
+	<element name="text_p1"><image file="chess/wk.svg"><color alpha="0.9" /></image></element>
+	<element name="text_p2"><image file="chess/wq.svg"><color alpha="0.9" /></image></element>
+	<element name="text_p3"><image file="chess/wr.svg"><color alpha="0.9" /></image></element>
+	<element name="text_p4"><image file="chess/wb.svg"><color alpha="0.9" /></image></element>
+	<element name="text_p5"><image file="chess/wn.svg"><color alpha="0.9" /></image></element>
+	<element name="text_p6"><image file="chess/wp.svg"><color alpha="0.9" /></image></element>
 
 	<group name="buttons">
 		<bounds x="0" y="0" width="18.7" height="23.7" />

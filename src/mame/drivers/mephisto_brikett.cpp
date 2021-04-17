@@ -69,12 +69,15 @@ is completely different, based on a 68000.
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/cosmac/cosmac.h"
 #include "machine/cdp1852.h"
 #include "machine/sensorboard.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
+#include "video/mmdisplay1.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -95,6 +98,7 @@ public:
 		m_extport(*this, "extport"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
+		m_led_pwm(*this, "led_pwm"),
 		m_dac(*this, "dac"),
 		m_speaker_off(*this, "speaker_off"),
 		m_inputs(*this, "IN.%u", 0)
@@ -119,7 +123,8 @@ private:
 	required_device<cdp1802_device> m_maincpu;
 	optional_device<cdp1852_device> m_extport;
 	optional_device<sensorboard_device> m_board;
-	required_device<pwm_display_device> m_display;
+	required_device<mephisto_display1_device> m_display;
+	optional_device<pwm_display_device> m_led_pwm;
 	required_device<dac_bit_interface> m_dac;
 	required_device<timer_device> m_speaker_off;
 	optional_ioport_array<4+2> m_inputs;
@@ -138,8 +143,6 @@ private:
 	// I/O handlers
 	INTERRUPT_GEN_MEMBER(interrupt);
 	DECLARE_READ_LINE_MEMBER(clear_r);
-	DECLARE_WRITE_LINE_MEMBER(q_w);
-	void lcd_w(u8 data);
 	u8 input_r(offs_t offset);
 	u8 sound_r();
 
@@ -148,34 +151,16 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(speaker_off) { m_dac->write(0); }
 
-	bool m_reset;
-	u8 m_lcd_mask;
-	u8 m_digit_idx;
-	u8 m_digit_data[4];
-
-	u8 m_esb_led;
-	u8 m_esb_row;
-	u8 m_esb_select;
+	bool m_reset = false;
+	u8 m_esb_led = 0;
+	u8 m_esb_row = 0;
+	u8 m_esb_select = 0;
 };
 
 void brikett_state::machine_start()
 {
-	// zerofill
-	m_reset = false;
-	m_lcd_mask = 0;
-	m_digit_idx = 0;
-	memset(m_digit_data, 0, sizeof(m_digit_data));
-
-	m_esb_led = 0;
-	m_esb_row = 0;
-	m_esb_select = 0;
-
 	// register for savestates
 	save_item(NAME(m_reset));
-	save_item(NAME(m_lcd_mask));
-	save_item(NAME(m_digit_idx));
-	save_item(NAME(m_digit_data));
-
 	save_item(NAME(m_esb_led));
 	save_item(NAME(m_esb_row));
 	save_item(NAME(m_esb_select));
@@ -184,8 +169,6 @@ void brikett_state::machine_start()
 void brikett_state::machine_reset()
 {
 	m_reset = true;
-	m_digit_idx = 0;
-
 	set_cpu_freq();
 }
 
@@ -222,28 +205,6 @@ READ_LINE_MEMBER(brikett_state::clear_r)
 	return ret;
 }
 
-WRITE_LINE_MEMBER(brikett_state::q_w)
-{
-	// Q: LCD digit data mask
-	// also assume LCD update on rising edge
-	if (state && !m_lcd_mask)
-	{
-		for (int i = 0; i < 4; i++)
-			m_display->write_row(i, m_digit_data[i]);
-		m_display->update();
-	}
-
-	m_lcd_mask = state ? 0xff : 0;
-}
-
-void brikett_state::lcd_w(u8 data)
-{
-	// d0-d7: write/shift LCD digit (4*CD4015)
-	// note: last digit "dp" is the colon in the middle
-	m_digit_data[m_digit_idx] = data ^ m_lcd_mask;
-	m_digit_idx = (m_digit_idx + 1) & 3;
-}
-
 u8 brikett_state::sound_r()
 {
 	// port 1 read enables the speaker
@@ -274,7 +235,7 @@ void brikett_state::esb_w(u8 data)
 	if (!m_inputs[5].read_safe(0))
 	{
 		// chessboard disabled
-		m_display->matrix_partial(4, 8, 0, 0);
+		m_led_pwm->clear();
 		return;
 	}
 
@@ -296,7 +257,7 @@ void brikett_state::esb_w(u8 data)
 		m_esb_row = data;
 
 	// update chessboard leds
-	m_display->matrix_partial(4, 8, ~m_esb_row, m_esb_led);
+	m_led_pwm->matrix(~m_esb_row, m_esb_led);
 }
 
 READ_LINE_MEMBER(brikett_state::esb_r)
@@ -318,7 +279,7 @@ void brikett_state::mephisto_map(address_map &map)
 {
 	map(0x0000, 0x17ff).rom();
 	map(0xf400, 0xf7ff).ram();
-	map(0xfb00, 0xfb00).mirror(0x00ff).w(FUNC(brikett_state::lcd_w));
+	map(0xfb00, 0xfb00).mirror(0x00ff).w(m_display, FUNC(mephisto_display1_device::data_w));
 	map(0xfff0, 0xffff).r(FUNC(brikett_state::input_r));
 }
 
@@ -459,14 +420,13 @@ void brikett_state::mephistoj(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephistoj_map);
 	m_maincpu->set_addrmap(AS_IO, &brikett_state::mephistoj_io);
 	m_maincpu->clear_cb().set(FUNC(brikett_state::clear_r));
-	m_maincpu->q_cb().set(FUNC(brikett_state::q_w)).invert();
+	m_maincpu->q_cb().set(m_display, FUNC(mephisto_display1_device::strobe_w)).invert();
 
 	const attotime irq_period = attotime::from_hz(4.194304_MHz_XTAL / 0x10000); // through SAJ300T
 	m_maincpu->set_periodic_int(FUNC(brikett_state::interrupt), irq_period);
 
 	/* video hardware */
-	PWM_DISPLAY(config, m_display).set_size(4, 8);
-	m_display->set_segmask(0xf, 0x7f);
+	MEPHISTO_DISPLAY_MODULE1(config, m_display); // internal
 	config.set_default_layout(layout_mephisto_junior);
 
 	/* sound hardware */
@@ -519,7 +479,7 @@ void brikett_state::mephisto2e(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(250));
 
-	m_display->set_size(4+8, 8);
+	PWM_DISPLAY(config, m_led_pwm).set_size(8, 8);
 	config.set_default_layout(layout_mephisto_esb2);
 }
 
@@ -530,7 +490,7 @@ void brikett_state::mephisto3(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_clock(6.144_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &brikett_state::mephisto3_map);
-	m_maincpu->q_cb().set(FUNC(brikett_state::q_w));
+	m_maincpu->q_cb().set(m_display, FUNC(mephisto_display1_device::strobe_w));
 
 	config.set_default_layout(layout_mephisto_3);
 }

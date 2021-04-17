@@ -118,7 +118,7 @@ void victor_9000_fdc_device::add_floppy_drive(machine_config &config, const char
 	connector.option_add("525ssqd", FLOPPY_525_SSQD); // Tandon TM100-3 with custom electronics
 	connector.option_add("525qd", FLOPPY_525_QD); // Tandon TM100-4 with custom electronics
 	connector.set_default_option("525qd");
-	connector.set_formats(victor_9000_fdc_device::floppy_formats);
+	connector.set_formats(floppy_formats);
 }
 
 image_init_result victor_9000_fdc_device::load0_cb(floppy_image_device *device)
@@ -149,10 +149,10 @@ void victor_9000_fdc_device::unload1_cb(floppy_image_device *device)
 	m_via4->write_cb1(1);
 }
 
-FLOPPY_FORMATS_MEMBER( victor_9000_fdc_device::floppy_formats )
-	FLOPPY_VICTOR_9000_FORMAT
-FLOPPY_FORMATS_END
-
+void victor_9000_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_VICTOR_9000_FORMAT);
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -169,7 +169,7 @@ void victor_9000_fdc_device::device_add_mconfig(machine_config &config)
 	m_maincpu->t1_in_cb().set(FUNC(victor_9000_fdc_device::tach1_r));
 	m_maincpu->bus_out_cb().set(FUNC(victor_9000_fdc_device::da_w));
 
-	VIA6522(config, m_via4, XTAL(30'000'000)/30);
+	MOS6522(config, m_via4, XTAL(30'000'000)/30);
 	m_via4->readpa_handler().set(FUNC(victor_9000_fdc_device::via4_pa_r));
 	m_via4->writepa_handler().set(FUNC(victor_9000_fdc_device::via4_pa_w));
 	m_via4->readpb_handler().set(FUNC(victor_9000_fdc_device::via4_pb_r));
@@ -177,12 +177,12 @@ void victor_9000_fdc_device::device_add_mconfig(machine_config &config)
 	m_via4->ca2_handler().set(FUNC(victor_9000_fdc_device::wrsync_w));
 	m_via4->irq_handler().set(FUNC(victor_9000_fdc_device::via4_irq_w));
 
-	VIA6522(config, m_via5, XTAL(30'000'000)/30);
+	MOS6522(config, m_via5, XTAL(30'000'000)/30);
 	m_via5->irq_handler().set(FUNC(victor_9000_fdc_device::via5_irq_w));
 	m_via5->readpa_handler().set(FUNC(victor_9000_fdc_device::via5_pa_r));
 	m_via5->writepb_handler().set(FUNC(victor_9000_fdc_device::via5_pb_w));
 
-	VIA6522(config, m_via6, XTAL(30'000'000)/30);
+	MOS6522(config, m_via6, XTAL(30'000'000)/30);
 	m_via6->readpa_handler().set(FUNC(victor_9000_fdc_device::via6_pa_r));
 	m_via6->readpb_handler().set(FUNC(victor_9000_fdc_device::via6_pb_r));
 	m_via6->writepa_handler().set(FUNC(victor_9000_fdc_device::via6_pa_w));

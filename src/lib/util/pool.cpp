@@ -8,11 +8,14 @@
 
 ***************************************************************************/
 
-#include <cstdarg>
-#include <cstddef>
-#include <cstdlib>
 #include "pool.h"
+
 #include "coreutil.h"
+#include "osdcomm.h"
+
+#include <cstdarg>
+#include <cstdlib>
+#include <iterator>
 
 
 /***************************************************************************
@@ -32,7 +35,7 @@
 struct objtype_entry
 {
 	objtype_entry *     next;
-	uint32_t              type;
+	uint32_t            type;
 	const char *        friendly;
 	void                (*destructor)(void *, size_t);
 };
@@ -293,7 +296,7 @@ void *pool_object_add_file_line(object_pool *pool, object_type _type, void *obje
 		pool->blocklist = block;
 
 		/* add all entries to the free list */
-		for (entrynum = 0; entrynum < ARRAY_LENGTH(block->entry); entrynum++)
+		for (entrynum = 0; entrynum < std::size(block->entry); entrynum++)
 		{
 			block->entry[entrynum].next = pool->freelist;
 			pool->freelist = &block->entry[entrynum];
@@ -612,8 +615,8 @@ bool test_memory_pools()
 	/* some heavier stress tests */
 	for (i = 0; i < 512; i++)
 	{
-		ptrs[i % ARRAY_LENGTH(ptrs)] = pool_realloc_lib(pool,
-			ptrs[i % ARRAY_LENGTH(ptrs)], rand() % 1000);
+		ptrs[i % std::size(ptrs)] = pool_realloc_lib(pool,
+			ptrs[i % std::size(ptrs)], rand() % 1000);
 	}
 
 	pool_free_lib(pool);

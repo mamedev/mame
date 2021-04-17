@@ -206,8 +206,7 @@ private:
 	int cur_rate;
 	int idle_icnt;
 
-	static std::string tts(attotime t);
-	std::string ttsn();
+	std::string ttsn() const;
 
 	enum {
 		C_FORMAT_TRACK,

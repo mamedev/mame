@@ -186,9 +186,9 @@ wangpc_mvc_device::wangpc_mvc_device(const machine_config &mconfig, const char *
 	device_t(mconfig, WANGPC_MVC, tag, owner, clock),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_crtc(*this, MC6845_TAG),
-	m_video_ram(*this, "video_ram", VIDEO_RAM_SIZE, ENDIANNESS_LITTLE),
-	m_char_ram(*this, "char_ram", CHAR_RAM_SIZE, ENDIANNESS_LITTLE),
-	m_bitmap_ram(*this, "bitmap_ram", BITMAP_RAM_SIZE, ENDIANNESS_LITTLE),
+	m_video_ram(*this, "video_ram", VIDEO_RAM_SIZE*2, ENDIANNESS_LITTLE),
+	m_char_ram(*this, "char_ram", CHAR_RAM_SIZE*2, ENDIANNESS_LITTLE),
+	m_bitmap_ram(*this, "bitmap_ram", BITMAP_RAM_SIZE*2, ENDIANNESS_LITTLE),
 	m_option(0),
 	m_irq(CLEAR_LINE)
 {

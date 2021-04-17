@@ -215,7 +215,7 @@ license:CC0
 			<bounds left="0" top="29.5" right="150" bottom="45" />
 		</element>
 
-<!-- draw element around 2nd line -->
+<!-- draw bezel around 2nd line -->
 
 		<element ref="static_bg2">
 			<bounds x="0" y="18.7" width="150" height="2.5" />

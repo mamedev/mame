@@ -14,10 +14,10 @@
 #pragma once
 
 #include "cpu/m6502/m6502.h"
-#include "sound/tms5220.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "sound/pokey.h"
+#include "sound/tms5220.h"
+#include "sound/ym2151.h"
 #include "machine/atariscom.h"
 
 
@@ -169,6 +169,9 @@ public:
 	// construction/destruction
 	atari_jsa_i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// configuration
+	void set_inverted_coins() { m_inverted_coins = true; } // for Xybots
+
 	// read/write handlers
 	uint8_t rdio_r();
 	void wrio_w(uint8_t data);
@@ -196,6 +199,9 @@ protected:
 	// internal state
 	double              m_pokey_volume;
 	double              m_tms5220_volume;
+
+private:
+	bool m_inverted_coins;
 };
 
 

@@ -145,7 +145,7 @@ uint32_t i82439tx_device::pci_read(pci_bus_device *pcibus, int function, int off
 		case 0xF4:
 		case 0xF8:
 		case 0xFC:
-			assert(((offset - 0x50) / 4) >= 0 && ((offset - 0x50) / 4) < ARRAY_LENGTH(m_regs));
+			assert(((offset - 0x50) / 4) >= 0 && ((offset - 0x50) / 4) < std::size(m_regs));
 			result = m_regs[(offset - 0x50) / 4];
 			break;
 
@@ -294,7 +294,7 @@ void i82439tx_device::pci_write(pci_bus_device *pcibus, int function, int offset
 		case 0xF4:
 		case 0xF8:
 		case 0xFC:
-			assert(((offset - 0x50) / 4) >= 0 && ((offset - 0x50) / 4) < ARRAY_LENGTH(m_regs));
+			assert(((offset - 0x50) / 4) >= 0 && ((offset - 0x50) / 4) < std::size(m_regs));
 			COMBINE_DATA(&m_regs[(offset - 0x50) / 4]);
 			break;
 

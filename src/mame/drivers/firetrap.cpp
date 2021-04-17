@@ -176,7 +176,7 @@ the MSM5205-derived interrupt assigned to the NMI line instead.
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/3526intf.h"
+#include "sound/ym3526.h"
 #include "screen.h"
 #include "speaker.h"
 

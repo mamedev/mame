@@ -8,12 +8,14 @@
 
 ***************************************************************************/
 
+#include "aviio.h"
+#include "osdcomm.h"
+#include "osdfile.h"
+
 #include <array>
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
-
-#include "aviio.h"
 
 
 /***************************************************************************

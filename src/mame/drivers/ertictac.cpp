@@ -224,7 +224,7 @@ void ertictac_state::ertictac(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ertictac_state::ertictac_map);
 	m_maincpu->set_periodic_int(FUNC(ertictac_state::ertictac_podule_irq), attotime::from_hz(60)); // FIXME: timing of this
 
-	I2C_24C02(config, "i2cmem", 0); // TODO: PCF8583 // TODO: Are we sure that this HW have I2C device?
+	PCF8583(config, "i2cmem", 32.768_kHz_XTAL); // TODO: Are we sure that this HW have I2C device?
 
 //  AAKART(config, m_kart, 24_MHz_XTAL/3); // TODO: frequency
 

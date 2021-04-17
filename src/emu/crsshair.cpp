@@ -123,7 +123,7 @@ render_crosshair::render_crosshair(running_machine &machine, int player)
 	, m_time(0)
 {
 	// for now, use the main screen
-	m_screen = screen_device_iterator(machine.root_device()).first();
+	m_screen = screen_device_enumerator(machine.root_device()).first();
 }
 
 
@@ -172,7 +172,7 @@ void render_crosshair::set_default_bitmap()
 
 void render_crosshair::create_bitmap()
 {
-	rgb_t color = m_player < ARRAY_LENGTH(crosshair_colors) ? crosshair_colors[m_player] : rgb_t::white();
+	rgb_t color = m_player < std::size(crosshair_colors) ? crosshair_colors[m_player] : rgb_t::white();
 
 	// if we have a bitmap and texture for this player, kill it
 	if (!m_bitmap)
@@ -377,8 +377,8 @@ crosshair_manager::crosshair_manager(running_machine &machine)
 		machine.configuration().config_register("crosshairs", config_load_delegate(&crosshair_manager::config_load, this), config_save_delegate(&crosshair_manager::config_save, this));
 
 	/* register the animation callback */
-	screen_device *first_screen = screen_device_iterator(machine.root_device()).first();
-	if (first_screen != nullptr)
+	screen_device *first_screen = screen_device_enumerator(machine.root_device()).first();
+	if (first_screen)
 		first_screen->register_vblank_callback(vblank_state_delegate(&crosshair_manager::animate, this));
 }
 

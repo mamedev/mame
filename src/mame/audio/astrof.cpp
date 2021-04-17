@@ -72,7 +72,7 @@ void astrof_state::astrof_audio_1_w(uint8_t data)
 	/* D6 - don't know. Probably something to do with the explosion sounds */
 
 	/* D7 - sound enable bit */
-	machine().sound().system_enable(data & 0x80);
+	machine().sound().system_mute(!BIT(data, 7));
 
 	m_port_1_last = data;
 }
@@ -193,7 +193,7 @@ void astrof_state::tomahawk_audio_w(uint8_t data)
 	/* D6 - explosion */
 
 	/* D7 - sound enable bit */
-	machine().sound().system_enable(data & 0x80);
+	machine().sound().system_mute(!BIT(data, 7));
 }
 
 

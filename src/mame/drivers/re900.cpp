@@ -55,10 +55,10 @@
     You can select the player number through key "L" (the respective player light will
     lite on). Key-In for all 6 players are keys 1-2-3-4-5-6 and Key-Out are Q-W-E-R-T-Y
     respectively. Up-Down-Left-Right to place cursor, and left CTRL to place a bet.
-    After a short time without activity, the roulette start to play, simulating the ball
+    After a short time without activity, the roulette starts to play, simulating the ball
     with an array of leds...
 
-    We made a full artwork that allow you to play this game with bells and whistles.
+    We made a full artwork that allows you to play this game with bells and whistles.
 
 
     * Buena Suerte ?94 Video Poker Game w/ Double Up feature - 1 Player.
@@ -83,6 +83,8 @@
 #include "re900.lh"
 
 
+namespace {
+
 #define MAIN_CLOCK      XTAL(11'059'200)
 #define VDP_CLOCK       XTAL(10'730'000)
 #define TMS_CLOCK       VDP_CLOCK / 24
@@ -94,7 +96,6 @@ public:
 	re900_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_rom(*this, "rom"),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
@@ -102,6 +103,9 @@ public:
 	void bs94(machine_config &config);
 
 	void init_re900();
+
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
 
 private:
 	// common
@@ -118,11 +122,7 @@ private:
 	void mem_io(address_map &map);
 	void mem_prg(address_map &map);
 
-	virtual void machine_start() override { m_lamps.resolve(); }
-
 	required_device<cpu_device> m_maincpu;
-
-	required_shared_ptr<uint8_t> m_rom;
 
 	// re900 specific
 	uint8_t m_psg_pa;
@@ -204,11 +204,6 @@ uint8_t re900_state::re_psg_portB_r()
 	return retval;
 }
 
-uint8_t re900_state::rom_r(offs_t offset)
-{
-	return m_rom[offset];
-}
-
 
 /***********************
 *    Write Handlers    *
@@ -256,12 +251,12 @@ void re900_state::watchdog_reset_w(uint8_t data)
 
 void re900_state::mem_prg(address_map &map)
 {
-	map(0x0000, 0xffff).rom().share("rom");
+	map(0x0000, 0xffff).rom().region("maincpu", 0);
 }
 
 void re900_state::mem_io(address_map &map)
 {
-	map(0x0000, 0xbfff).r(FUNC(re900_state::rom_r));
+	map(0x0000, 0xbfff).rom().region("maincpu", 0);
 	map(0xc000, 0xdfff).ram().share("nvram");
 	map(0xe000, 0xefff).w(FUNC(re900_state::watchdog_reset_w));
 	map(0xe000, 0xe001).w("tms9128", FUNC(tms9928a_device::write));
@@ -459,6 +454,8 @@ void re900_state::init_re900()
 	save_item(NAME(m_player));
 	save_item(NAME(m_stat_a));
 }
+
+} // Anonymous namespace
 
 
 /*************************

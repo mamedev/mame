@@ -110,7 +110,7 @@ void menu_confswitch::populate(float &customtop, float &custombottom)
 						first_entry = false;
 					else
 						item_append(menu_item_type::SEPARATOR);
-					item_append(string_format("[root%s]", prev_owner->tag()), "", 0, nullptr);
+					item_append(string_format("[root%s]", prev_owner->tag()), 0, nullptr);
 				}
 
 				// set the left/right flags appropriately
@@ -159,7 +159,7 @@ void menu_confswitch::populate(float &customtop, float &custombottom)
 	}
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Reset"), "", 0, (void *)1);
+	item_append(_("Reset"), 0, (void *)1);
 }
 
 

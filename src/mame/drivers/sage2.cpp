@@ -359,7 +359,6 @@ WRITE_LINE_MEMBER( sage2_state::fdc_irq )
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_19200 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_19200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
@@ -480,8 +479,8 @@ void sage2_state::sage2(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", sage2_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", sage2_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", sage2_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", sage2_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 
 	IEEE488(config, m_ieee488);
 

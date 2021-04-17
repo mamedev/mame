@@ -39,6 +39,15 @@
 #include "emu.h"
 #include "st2205u.h"
 
+#define LOG_DAC (1 << 1U)
+#define LOG_DMA (1 << 2U)
+//#define VERBOSE (LOG_DMA)
+#include "logmacro.h"
+
+#define LOGDAC(...) LOGMASKED(LOG_DAC, __VA_ARGS__)
+#define LOGDMA(...) LOGMASKED(LOG_DMA, __VA_ARGS__)
+
+
 DEFINE_DEVICE_TYPE(ST2205U, st2205u_device, "st2205u", "Sitronix ST2205U Integrated Microcontroller")
 DEFINE_DEVICE_TYPE(ST2302U, st2302u_device, "st2302u", "Sitronix ST2302U Integrated Microcontroller")
 
@@ -58,6 +67,7 @@ st2205u_base_device::st2205u_base_device(const machine_config &mconfig, device_t
 	, m_psg_on(0)
 	, m_psg_vol{0}
 	, m_psg_volm{0}
+	, m_mul(0)
 	, m_usbcon(0)
 	, m_usbien(0)
 	, m_dptr{0}
@@ -112,6 +122,7 @@ void st2205u_base_device::base_init(std::unique_ptr<mi_st2xxx> &&intf)
 	save_item(NAME(m_psg_on));
 	save_item(NAME(m_psg_vol));
 	save_item(NAME(m_psg_volm));
+	save_item(NAME(m_mul));
 	save_item(NAME(m_usbcon));
 	save_item(NAME(m_usbien));
 	save_item(NAME(m_dptr));
@@ -184,6 +195,7 @@ void st2205u_device::device_start()
 		state_add(ST_VOL0 + i, string_format("VOL%d", i).c_str(), m_psg_vol[i]).mask(0xbf);
 	state_add(ST_VOLM0, "VOLM0", m_psg_volm[0]).mask(0x3f);
 	state_add(ST_VOLM1, "VOLM1", m_psg_volm[1]).mask(0x7f);
+	state_add(ST_MUL, "MUL", m_mul);
 	state_add(ST_LSSA, "LSSA", m_lssa);
 	state_add(ST_LVPW, "LVPW", m_lvpw);
 	state_add(ST_LXMAX, "LXMAX", m_lxmax);
@@ -267,6 +279,7 @@ void st2302u_device::device_start()
 		state_add(ST_VOL0 + i, string_format("VOL%d", i).c_str(), m_psg_vol[i]).mask(0xbf);
 	state_add(ST_VOLM0, "VOLM0", m_psg_volm[0]).mask(0x3f);
 	state_add(ST_VOLM1, "VOLM1", m_psg_volm[1]).mask(0x7f);
+	state_add(ST_MUL, "MUL", m_mul);
 	state_add(ST_SCTR, "SCTR", m_sctr);
 	state_add(ST_SCKR, "SCKR", m_sckr).mask(0x7f);
 	state_add(ST_SSR, "SSR", m_ssr).mask(0x77);
@@ -305,6 +318,7 @@ void st2205u_base_device::device_reset()
 	m_psg_on = 0;
 	std::fill(std::begin(m_psg_vol), std::end(m_psg_vol), 0);
 	std::fill(std::begin(m_psg_volm), std::end(m_psg_volm), 0);
+	m_mul = 0;
 
 	m_usbcon = 0;
 	m_usbien = 0x20;
@@ -709,9 +723,9 @@ void st2205u_base_device::timer_12bit_process(int t)
 
 			u16 psg_data = m_dac_fifo[t][m_fifo_pos[t]];
 			if (BIT(m_psgm, 2 * t + 1))
-				logerror("Playing ADPCM sample %c%02X on channel %d\n", BIT(psg_data, 8) ? '-' : '+', psg_data & 0xff, t);
+				LOGDAC("Playing ADPCM sample %c%02X on channel %d\n", BIT(psg_data, 8) ? '-' : '+', psg_data & 0xff, t);
 			else
-				logerror("Playing %s sample %02X on channel %d\n", BIT(m_psgm, 2 * t) ? "tone" : "DAC", psg_data & 0xff, t);
+				LOGDAC("Playing %s sample %02X on channel %d\n", BIT(m_psgm, 2 * t) ? "tone" : "DAC", psg_data & 0xff, t);
 
 			--m_fifo_filled[t];
 			m_fifo_pos[t] = (m_fifo_pos[t] + 1) & 15;
@@ -929,22 +943,61 @@ void st2205u_base_device::dcnth_w(u8 data)
 	m_dcnt[m_dctr >> 1] = (data & 0x7f) << 8 | (m_dcnt[m_dctr >> 1] & 0x00ff);
 
 	// start DMA
-	int source = m_dptr[(m_dctr & 2) + 0];
-	int dest = m_dptr[(m_dctr & 2) + 1];
-	int length = m_dcnt[m_dctr >> 1] << 1;
+	u16 srcp = m_dptr[m_dctr & 2];
+	u16 srcb = m_dbkr[m_dctr & 2];
+	u16 dstp = m_dptr[m_dctr | 1];
+	u16 dstb = m_dbkr[m_dctr | 1];
+	u16 count = m_dcnt[m_dctr >> 1] + 1;
+	const u8 mode = m_dmod[m_dctr >> 1];
 
-	if ((m_dbkr[(m_dctr & 2) + 0] != 0x8000) || (m_dbkr[(m_dctr & 2) + 1] != 0x8000) || (m_dmod[m_dctr >> 1] != 0x30))
-		logerror("%s: unhandled DMA parameter %04x %04x %02x\n", machine().describe_context(), m_dbkr[(m_dctr & 2) + 0], m_dbkr[(m_dctr & 2) + 1], m_dmod[m_dctr >> 1]);
-
-	address_space& mem = this->space(AS_PROGRAM);
+	LOGDMA("%s: DMA%d $%X bytes in mode $%02X from $%X (%s) to $%X (%s)\n",
+			machine().describe_context(),
+			m_dctr >> 1, count, mode,
+			srcp | (srcb & 0x7ff) << 15, BIT(srcb, 15) ? "RAM" : "ROM",
+			dstp | (dstb & 0x7ff) << 15, BIT(dstb, 15) ? "RAM" : "ROM");
 
 	// FIXME: DMA should be performed in the execution loop and consume bus cycles, not happen instantly
-	for (int i = 0; i < length; i++)
+	while (count-- != 0)
 	{
-		uint8_t byte = mem.read_byte(source);
-		mem.write_byte(dest, byte);
-		source++;
-		dest++;
+		uint8_t data;
+		if (BIT(srcb, 15))
+			data = mintf->cprogram.read_byte(srcp); // FIXME: 0080-7FFF should be all RAM on ST2205U
+		else
+			data = downcast<mi_st2xxx &>(*mintf).dcache.read_byte(srcp | u32(srcb << 15));
+		if (!BIT(mode, 1))
+		{
+			if (srcp++ == 0x7fff)
+			{
+				srcp = 0;
+				srcb++;
+			}
+		}
+
+		// TODO: XOR/OR/AND logic for DMA0 three-cycle modes (different on ST23XX?)
+		if (BIT(dstb, 15))
+			mintf->cprogram.write_byte(dstp, data); // FIXME: 0080-7FFF should be all RAM on ST2205U
+		else
+			downcast<mi_st2xxx &>(*mintf).dcache.write_byte(dstp | u32(dstb << 15), data);
+		if (!BIT(mode, 3))
+		{
+			if (dstp++ == 0x7fff)
+			{
+				dstp = 0;
+				dstb++;
+			}
+		}
+	}
+
+	// update pointers for continue mode
+	if ((mode & 0x03) == 0x00)
+	{
+		m_dptr[m_dctr & 2] = srcp;
+		m_dbkr[m_dctr & 2] = srcb & 0x87ff;
+	}
+	if ((mode & 0x0c) == 0x00)
+	{
+		m_dptr[m_dctr | 1] = dstp;
+		m_dbkr[m_dctr | 1] = dstb & 0x87ff;
 	}
 }
 
@@ -986,6 +1039,79 @@ u8 st2205u_base_device::lvctr_r()
 void st2205u_base_device::lvctr_w(u8 data)
 {
 	m_lvctr = data & 0x0f;
+}
+
+u8 st2205u_base_device::mull_r()
+{
+	return m_mul & 0x00ff;
+}
+
+void st2205u_base_device::mull_w(u8 data)
+{
+	// TODO: result loaded 6 cycles after multiplier is written
+	m_mul = (s32(s16(m_mul)) * s8(data)) >> 8;
+}
+
+u8 st2205u_base_device::mulh_r()
+{
+	return m_mul >> 8;
+}
+
+void st2205u_base_device::mulh_w(u8 data)
+{
+	// write low byte of multiplicand, then high byte
+	m_mul = u16(data) << 8 | m_mul >> 8;
+}
+
+void st2302u_device::unk18_w(u8 data)
+{
+	logerror("%s: Writing %02X to unknown register $18\n", machine().describe_context(), data);
+}
+
+void st2302u_device::unk6d_w(u8 data)
+{
+	// $6D is PCMH on ST2205U, but probably not here
+	logerror("%s: Writing %02X to unknown register $6D\n", machine().describe_context(), data);
+}
+
+void st2302u_device::unk6e_w(u8 data)
+{
+	// $6E is MULL on ST2205U, but definitely not here
+	logerror("%s: Writing %02X to unknown register $6E\n", machine().describe_context(), data);
+}
+
+u8 st2302u_device::unk7b_r()
+{
+	// code usually waits for bit 3 to set itself after writing #$01 to this address
+	return 0x08;
+}
+
+void st2302u_device::unk7b_w(u8 data)
+{
+	logerror("%s: Writing %02X to unknown register $7B\n", machine().describe_context(), data);
+}
+
+void st2302u_device::unk7c_w(u8 data)
+{
+	logerror("%s: Writing %02X to unknown register $7C\n", machine().describe_context(), data);
+}
+
+void st2302u_device::unk7d_w(u8 data)
+{
+	// usually written with #$05 after the $7B wait is over
+	logerror("%s: Writing %02X to unknown register $7D\n", machine().describe_context(), data);
+}
+
+void st2302u_device::unk7e_w(u8 data)
+{
+	// written in succession with $7F, sometimes several times
+	logerror("%s: Writing %02X to unknown register $7E\n", machine().describe_context(), data);
+}
+
+void st2302u_device::unk7f_w(u8 data)
+{
+	// written in succession with $7E, sometimes several times
+	logerror("%s: Writing %02X to unknown register $7F\n", machine().describe_context(), data);
 }
 
 u8 st2205u_device::ram_r(offs_t offset)
@@ -1126,6 +1252,8 @@ void st2205u_device::int_map(address_map &map)
 	map(0x0064, 0x0064).rw(FUNC(st2205u_device::udata_r), FUNC(st2205u_device::udata_w));
 	map(0x0066, 0x0066).rw(FUNC(st2205u_device::brs_r), FUNC(st2205u_device::brs_w));
 	map(0x0067, 0x0067).rw(FUNC(st2205u_device::bdiv_r), FUNC(st2205u_device::bdiv_w));
+	map(0x006e, 0x006e).rw(FUNC(st2205u_device::mull_r), FUNC(st2205u_device::mull_w));
+	map(0x006f, 0x006f).rw(FUNC(st2205u_device::mulh_r), FUNC(st2205u_device::mulh_w));
 	map(0x0080, 0x1fff).rw(FUNC(st2205u_device::ram_r), FUNC(st2205u_device::ram_w)); // assumed to be shared with banked RAM
 	map(0x2000, 0x3fff).rw(FUNC(st2205u_device::bmem_r), FUNC(st2205u_device::bmem_w));
 	map(0x4000, 0x7fff).rw(FUNC(st2205u_device::pmem_r), FUNC(st2205u_device::pmem_w));
@@ -1144,12 +1272,21 @@ void st2302u_device::int_map(address_map &map)
 	map(0x0013, 0x0013).rw(FUNC(st2302u_device::sckr_r), FUNC(st2302u_device::sckr_w));
 	map(0x0014, 0x0014).rw(FUNC(st2302u_device::ssr_r), FUNC(st2302u_device::ssr_w));
 	map(0x0015, 0x0015).rw(FUNC(st2302u_device::smod_r), FUNC(st2302u_device::smod_w));
-	//map(0x0018, 0x0018).(?);
+	map(0x0016, 0x0016).rw(FUNC(st2302u_device::mull_r), FUNC(st2302u_device::mull_w));
+	map(0x0017, 0x0017).rw(FUNC(st2302u_device::mulh_r), FUNC(st2302u_device::mulh_w));
+	map(0x0018, 0x0018).w(FUNC(st2302u_device::unk18_w));
 	map(0x0040, 0x0047).rw(FUNC(st2302u_device::psg_r), FUNC(st2302u_device::psg_w));
 	map(0x0048, 0x004b).rw(FUNC(st2302u_device::vol_r), FUNC(st2302u_device::vol_w));
 	map(0x004c, 0x004d).rw(FUNC(st2302u_device::volm_r), FUNC(st2302u_device::volm_w));
 	map(0x004e, 0x004e).rw(FUNC(st2302u_device::psgc_r), FUNC(st2302u_device::psgc_w));
 	map(0x004f, 0x004f).rw(FUNC(st2302u_device::psgm_r), FUNC(st2302u_device::psgm_w));
+	map(0x006d, 0x006d).w(FUNC(st2302u_device::unk6d_w));
+	map(0x006e, 0x006e).w(FUNC(st2302u_device::unk6e_w));
+	map(0x007b, 0x007b).rw(FUNC(st2302u_device::unk7b_r), FUNC(st2302u_device::unk7b_w));
+	map(0x007c, 0x007c).w(FUNC(st2302u_device::unk7c_w));
+	map(0x007d, 0x007d).w(FUNC(st2302u_device::unk7d_w));
+	map(0x007e, 0x007e).w(FUNC(st2302u_device::unk7e_w));
+	map(0x007f, 0x007f).w(FUNC(st2302u_device::unk7f_w));
 	map(0x0080, 0x07ff).ram();
 	map(0x4000, 0x7fff).rw(FUNC(st2302u_device::pmem_r), FUNC(st2302u_device::pmem_w));
 	map(0x8000, 0xffff).rw(FUNC(st2302u_device::dmem_r), FUNC(st2302u_device::dmem_w));

@@ -83,17 +83,19 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2bus/a2zipdrive.h"
 #include "bus/a2bus/byte8251.h"
 #include "bus/a2bus/computereyes2.h"
+#include "bus/a2bus/ccs7710.h"
 #include "bus/a2bus/ezcgi.h"
-#include "bus/a2bus/grapplerplus.h"
+#include "bus/a2bus/grappler.h"
 #include "bus/a2bus/laser128.h"
 #include "bus/a2bus/mouse.h"
 #include "bus/a2bus/ramcard128k.h"
 #include "bus/a2bus/ramcard16k.h"
 #include "bus/a2bus/ssbapple.h"
 #include "bus/a2bus/ssprite.h"
+#include "bus/a2bus/suprterminal.h"
 #include "bus/a2bus/timemasterho.h"
 #include "bus/a2bus/transwarp.h"
-#include "bus/a2bus/suprterminal.h"
+#include "bus/a2bus/uniprint.h"
 
 #include "bus/a2gameio/gameio.h"
 
@@ -315,6 +317,8 @@ void apple2_state::machine_start()
 	m_cassette->output(-1.0f);
 	m_upperbank->set_bank(0);
 	m_inh_bank = 0;
+	m_strobe = 0;
+	m_transchar = 0;
 
 	// precalculate joystick time constants
 	m_x_calibration = attotime::from_nsec(10800).as_double();
@@ -1289,6 +1293,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("softcard", A2BUS_SOFTCARD);  /* Microsoft SoftCard */
 	device.option_add("videoterm", A2BUS_VIDEOTERM);    /* Videx VideoTerm */
 	device.option_add("ssc", A2BUS_SSC);    /* Apple Super Serial Card */
+	device.option_add("ssi", APRICORN_SSI);    /* Apricorn Super Serial Imager */
 	device.option_add("swyft", A2BUS_SWYFT);    /* IAI SwyftCard */
 	device.option_add("themill", A2BUS_THEMILL);    /* Stellation Two The Mill (6809 card) */
 	device.option_add("sam", A2BUS_SAM);    /* SAM Software Automated Mouth (8-bit DAC + speaker) */
@@ -1309,7 +1314,10 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("aevm80", A2BUS_AEVIEWMASTER80);    /* Applied Engineering ViewMaster 80 */
 	device.option_add("parprn", A2BUS_PARPRN);   /* Apple II Parallel Printer Interface Card */
 	device.option_add("parallel", A2BUS_PIC);   /* Apple II Parallel Interface Card */
-	device.option_add("grapplerplus", A2BUS_GRAPPLERPLUS); /* Orange Micro Grappler+ Printer Interface card */
+	device.option_add("grappler", A2BUS_GRAPPLER); /* Orange Micro Grappler Printer Interface card */
+	device.option_add("grapplus", A2BUS_GRAPPLERPLUS); /* Orange Micro Grappler+ Printer Interface card */
+	device.option_add("bufgrapplus", A2BUS_BUFGRAPPLERPLUS); /* Orange Micro Buffered Grappler+ Printer Interface card */
+	device.option_add("bufgrapplusa", A2BUS_BUFGRAPPLERPLUSA); /* Orange Micro Buffered Grappler+ (rev A) Printer Interface card */
 	device.option_add("corvus", A2BUS_CORVUS);  /* Corvus flat-cable HDD interface (see notes in a2corvus.c) */
 	device.option_add("mcms1", A2BUS_MCMS1);  /* Mountain Computer Music System, card 1 of 2 */
 	device.option_add("mcms2", A2BUS_MCMS2);  /* Mountain Computer Music System, card 2 of 2.  must be in card 1's slot + 1! */
@@ -1328,6 +1336,8 @@ static void apple2_cards(device_slot_interface &device)
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);    /* Magic Musician Card */
 	device.option_add("byte8251", A2BUS_BYTE8251); /* BYTE Magazine 8251 serial card */
 	device.option_add("suprterm", A2BUS_SUPRTERMINAL); /* M&R Enterprises SUP'R'TERMINAL 80-column card */
+	device.option_add("uniprint", A2BUS_UNIPRINT);     /* Videx Uniprint parallel printer card */
+	device.option_add("ccs7710", A2BUS_CCS7710); /* California Computer Systems Model 7710 Asynchronous Serial Interface */
 }
 
 void apple2_state::apple2_common(machine_config &config)
@@ -1500,6 +1510,19 @@ ROM_START(apple2p) /* the autoboot apple2+ with applesoft (microsoft-written) ba
 	ROM_LOAD ( "341-0014.e8", 0x2800, 0x0800, CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
 	ROM_LOAD ( "341-0015.f0", 0x3000, 0x0800, CRC(9a04eecf) SHA1(e6bf91ed28464f42b807f798fc6422e5948bf581))
 	ROM_LOAD ( "341-0020-00.f8", 0x3800, 0x0800, CRC(079589c4) SHA1(a28852ff997b4790e53d8d0352112c4b1a395098)) /* 341-0020-00: Autostart Monitor/Applesoft Basic $f800; Was sometimes mounted on Language card; Label(from Apple Language Card - Front.jpg): S 8115 // C68018 // 341-0020-00 */
+ROM_END
+
+ROM_START(ace1000)
+	ROM_REGION(0x1000,"gfx1",0)
+	ROM_LOAD ( "1331409.u7", 0x0000, 0x1000, CRC(744c06e1) SHA1(e1c11495ee538f658d2918bfece8c4629f60fa13))
+
+	ROM_REGION(0x4000, "maincpu", ROMREGION_LE)
+	ROM_LOAD ( "1331401.g2", 0x3800, 0x0800, CRC(047d6fed) SHA1(83d225dc3f1a7bd6901cc24cd02287402022469f))
+	ROM_LOAD ( "1331402.g3", 0x3000, 0x0800, CRC(9a04eecf) SHA1(e6bf91ed28464f42b807f798fc6422e5948bf581))
+	ROM_LOAD ( "1331403.g5", 0x2800, 0x0800, CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
+	ROM_LOAD ( "1331404.g7", 0x2000, 0x0800, CRC(1bee5169) SHA1(0cd57b4a2a79e0fc7f35619edc1be00952947b82))
+	ROM_LOAD ( "1331405.g8", 0x1800, 0x0800, CRC(2a63f50a) SHA1(7cf424e7adbc84a4aa6f11d0132bf494bbb6a247))
+	ROM_LOAD ( "1331406.g10", 0x1000, 0x0800, CRC(bfdd3cc6) SHA1(20067d27eb3b5bb03e7b560e44383e0926e39cbb))
 ROM_END
 
 ROM_START(elppa)
@@ -1799,6 +1822,7 @@ COMP( 1982, microeng, apple2, 0,      apple2p,  apple2p, apple2_state, empty_ini
 COMP( 1982, maxxi,    apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Polymax",             "Maxxi", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, prav82,   apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Pravetz",             "Pravetz 82", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, ace100,   apple2, 0,      apple2,   apple2p, apple2_state, empty_init, "Franklin Computer",   "Franklin Ace 100", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, ace1000,   apple2, 0,      apple2p,   apple2p, apple2_state, empty_init, "Franklin Computer",   "Franklin ACE 1000", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, uniap2en, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II (in English)", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, uniap2pt, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II (in Brazilian Portuguese)", MACHINE_SUPPORTS_SAVE )
 COMP( 1984, uniap2ti, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II+ (Teclado Inteligente)", MACHINE_SUPPORTS_SAVE )

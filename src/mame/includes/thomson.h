@@ -207,7 +207,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_FLOPPY_FORMATS(cd90_640_formats);
+	static void cd90_640_formats(format_registration &fr);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( to7_cartridge );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mo5_cartridge );

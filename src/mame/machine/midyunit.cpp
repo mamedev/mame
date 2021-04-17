@@ -369,6 +369,8 @@ void midyunit_state::init_smashtv()
 {
 	/* common init */
 	init_generic(6, SOUND_CVSD_SMALL, 0x9cf6, 0x9d21);
+
+	m_prot_data = nullptr;
 }
 
 

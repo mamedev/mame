@@ -30,6 +30,7 @@ public:
 	void intrepid(machine_config &config);
 	void thepit(machine_config &config);
 	void fitter(machine_config &config);
+	void theportr(machine_config &config);
 
 	void init_rtriv();
 
@@ -92,6 +93,7 @@ private:
 	void dockmanb_main_map(address_map &map);
 	void intrepid_main_map(address_map &map);
 	void thepit_main_map(address_map &map);
+	void theportr_main_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_THEPIT_H

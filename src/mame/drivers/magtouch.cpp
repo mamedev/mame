@@ -92,6 +92,7 @@ public:
 		: pcat_base_state(mconfig, type, tag)
 		, m_isabus(*this, "isa")
 		, m_rombank(*this, "rombank")
+		, m_shadow(*this, "shadow")
 		, m_in0(*this, "IN0")
 	{ }
 
@@ -100,12 +101,14 @@ public:
 private:
 	required_device<isa8_device> m_isabus;
 	required_memory_bank m_rombank;
+	required_shared_ptr<uint32_t> m_shadow;
 	required_ioport m_in0;
 
 	uint8_t magtouch_io_r(offs_t offset);
 	void magtouch_io_w(offs_t offset, uint8_t data);
 	void dma8237_1_dack_w(uint8_t data);
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	static void magtouch_sb_conf(device_t *device);
 	void magtouch_io(address_map &map);
 	void magtouch_map(address_map &map);
@@ -145,7 +148,7 @@ void magtouch_state::magtouch_map(address_map &map)
 	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
 	map(0x000d0000, 0x000d1fff).ram().share("nvram");
 	map(0x000d8000, 0x000dffff).bankr("rombank");
-	map(0x000f0000, 0x000fffff).rom().region("bios", 0);
+	map(0x000f0000, 0x000fffff).ram().share(m_shadow);
 	map(0xffff0000, 0xffffffff).rom().region("bios", 0);
 }
 
@@ -176,6 +179,12 @@ void magtouch_state::machine_start()
 	m_rombank->configure_entries(0, 0x80, memregion("game_prg")->base(), 0x8000 );
 	m_rombank->set_entry(0);
 	subdevice<nvram_device>("nvram")->set_base(memshare("nvram")->ptr(), 0x2000);
+}
+
+void magtouch_state::machine_reset()
+{
+	// Rom shadow is not handled, well, at all
+	memcpy(m_shadow, memregion("bios")->base(), 0x10000);
 }
 
 static void magtouch_isa8_cards(device_slot_interface &device)

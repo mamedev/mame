@@ -11,6 +11,7 @@
 
     Done:
     - preliminary memory map
+    - sound
     - floppy (upd765)
     - DMA
     - Interrupts (pic8295)
@@ -45,6 +46,8 @@
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "machine/z80sio.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
 #include "video/upd7220.h"
 #include "emupal.h"
 
@@ -79,6 +82,7 @@ public:
 		m_hgdc(*this, "upd7220"),
 		m_rtc(*this, "rtc"),
 		m_kbd(*this, "kbd"),
+		m_speaker(*this, "speaker"),
 		m_vram_bank(0),
 		m_char_rom(*this, "chargen"),
 		m_maincpu(*this, "maincpu"),
@@ -99,6 +103,8 @@ private:
 	virtual void video_start() override;
 
 	void update_memory_mapping();
+
+	void update_speaker();
 
 	void qx10_18_w(uint8_t data);
 	void prom_sel_w(uint8_t data);
@@ -121,6 +127,8 @@ private:
 	void memory_write_byte(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_clk);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_irq);
+	DECLARE_WRITE_LINE_MEMBER(speaker_freq);
+	DECLARE_WRITE_LINE_MEMBER(speaker_duration);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
@@ -147,6 +155,7 @@ private:
 	required_device<upd7220_device> m_hgdc;
 	required_device<mc146818_device> m_rtc;
 	required_device<rs232_port_device> m_kbd;
+	required_device<speaker_sound_device>   m_speaker;
 	uint8_t m_vram_bank;
 	//required_shared_ptr<uint8_t> m_video_ram;
 	std::unique_ptr<uint16_t[]> m_video_ram;
@@ -161,6 +170,10 @@ private:
 	int     m_fdcint;
 	int     m_fdcmotor;
 	//int     m_fdcready;
+
+	int m_spkr_enable;
+	int m_spkr_freq;
+	int m_pit1_out0;
 
 	/* memory */
 	int     m_membank;
@@ -255,6 +268,23 @@ uint32_t qx10_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap,
 }
 
 /*
+    Sound
+*/
+void qx10_state::update_speaker()
+{
+
+	/*
+	 *                 freq -----
+	 * pit1_out0 -----            NAND ---- level
+	 *                 NAND -----
+	 * !enable   -----
+	 */
+
+	uint8_t level = ((!m_spkr_enable && m_pit1_out0) || !m_spkr_freq) ? 1 : 0;
+	m_speaker->level_w(level);
+}
+
+/*
     Memory
 */
 void qx10_state::update_memory_mapping()
@@ -299,6 +329,9 @@ void qx10_state::update_memory_mapping()
 void qx10_state::qx10_18_w(uint8_t data)
 {
 	m_membank = (data >> 4) & 0x0f;
+	m_spkr_enable = (data >> 2) & 0x01;
+	m_pit_1->write_gate0(data & 1);
+	update_speaker();
 	update_memory_mapping();
 }
 
@@ -329,7 +362,7 @@ QUICKLOAD_LOAD_MEMBER(qx10_state::quickload_cb)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
-	if (quickload_size >= 0xfd00)
+	if (image.length() >= 0xfd00)
 		return image_init_result::FAIL;
 
 	/* The right RAM bank must be active */
@@ -344,6 +377,7 @@ QUICKLOAD_LOAD_MEMBER(qx10_state::quickload_cb)
 	}
 
 	/* Load image to the TPA (Transient Program Area) */
+	uint16_t quickload_size = image.length();
 	for (uint16_t i = 0; i < quickload_size; i++)
 	{
 		uint8_t data;
@@ -385,6 +419,7 @@ void qx10_state::fdd_motor_w(uint8_t data)
 	m_fdcmotor = 1;
 
 	m_floppy[0]->get_device()->mon_w(false);
+	m_floppy[1]->get_device()->mon_w(false);
 	// motor off controlled by clock
 }
 
@@ -478,6 +513,18 @@ WRITE_LINE_MEMBER(qx10_state::keyboard_clk)
 	// clock keyboard too
 	m_scc->rxca_w(state);
 	m_scc->txca_w(state);
+}
+
+WRITE_LINE_MEMBER(qx10_state::speaker_duration)
+{
+	m_pit1_out0 = state;
+	update_speaker();
+}
+
+WRITE_LINE_MEMBER(qx10_state::speaker_freq)
+{
+	m_spkr_freq = state;
+	update_speaker();
 }
 
 /*
@@ -628,6 +675,9 @@ void qx10_state::machine_reset()
 {
 	m_dma_1->dreq0_w(1);
 
+	m_spkr_enable = 0;
+	m_pit1_out0 = 1;
+
 	m_memprom = 0;
 	m_memcmos = 0;
 	m_membank = 0;
@@ -743,6 +793,7 @@ void qx10_state::qx10(machine_config &config)
 */
 	PIT8253(config, m_pit_1, 0);
 	m_pit_1->set_clk<0>(1200);
+	m_pit_1->out_handler<0>().set(FUNC(qx10_state::speaker_duration));
 	m_pit_1->set_clk<1>(1200);
 	m_pit_1->set_clk<2>(MAIN_CLK / 8);
 
@@ -755,6 +806,7 @@ void qx10_state::qx10(machine_config &config)
 */
 	PIT8253(config, m_pit_2, 0);
 	m_pit_2->set_clk<0>(MAIN_CLK / 8);
+	m_pit_2->out_handler<0>().set(FUNC(qx10_state::speaker_freq));
 	m_pit_2->set_clk<1>(MAIN_CLK / 8);
 	m_pit_2->out_handler<1>().set(FUNC(qx10_state::keyboard_clk));
 	m_pit_2->set_clk<2>(MAIN_CLK / 8);
@@ -805,14 +857,18 @@ void qx10_state::qx10(machine_config &config)
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(FUNC(qx10_state::qx10_upd765_interrupt));
 	m_fdc->drq_wr_callback().set(m_dma_1, FUNC(am9517a_device::dreq0_w)).invert();
-	FLOPPY_CONNECTOR(config, m_floppy[0], qx10_floppies, "525dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[1], qx10_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], qx10_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], qx10_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_scc, FUNC(upd7201_device::rxb_w));
 
 	RS232_PORT(config, m_kbd, keyboard, "qx10");
 	m_kbd->rxd_handler().set(m_scc, FUNC(upd7201_device::rxa_w));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256K");
@@ -846,4 +902,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY  FULLNAME  FLAGS */
-COMP( 1983, qx10, 0,      0,      qx10,    qx10,  qx10_state, empty_init, "Epson", "QX-10",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1983, qx10, 0,      0,      qx10,    qx10,  qx10_state, empty_init, "Epson", "QX-10",  MACHINE_NOT_WORKING )

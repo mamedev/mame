@@ -126,8 +126,7 @@ private:
 };
 
 // iterator
-typedef device_interface_iterator<device_memory_interface> memory_interface_iterator;
+typedef device_interface_enumerator<device_memory_interface> memory_interface_enumerator;
 
 
-
-#endif  /* MAME_EMU_DIMEMORY_H */
+#endif // MAME_EMU_DIMEMORY_H

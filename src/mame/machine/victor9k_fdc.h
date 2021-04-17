@@ -194,7 +194,7 @@ private:
 	void live_abort();
 	void live_run(const attotime &limit = attotime::never);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	uint8_t floppy_p1_r();
 	void floppy_p1_w(uint8_t data);

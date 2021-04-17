@@ -5,6 +5,7 @@
 
 #include "emu.h"
 #include "cpu/tlcs90/tlcs90.h"
+#include "sound/okim6295.h"
 #include "sound/okim6376.h"
 #include "speaker.h"
 
@@ -30,7 +31,28 @@ NMK MEC95110-SUB2
 
 NMK MEC95110-SUB3
 - 3 x connectors
+
+-------
+Happy Pierrot by NMK
+
+Video of the game: https://www.youtube.com/watch?v=t4-IN1v_DOQ
+
+PCBs:
+
+NMK MAC96112 - maincpu board, stickered 961409
+- Toshiba TMP90C041AN
+- 16.0000 MHz XTAL
+- main CPU ROM
+- Oki M6295
+- Oki ROM
+- 2 x 8-dip banks
+- 7 x connectors
+
+Other PCBs unknown
 */
+
+
+namespace {
 
 class nmkmedal_state : public driver_device
 {
@@ -38,6 +60,17 @@ public:
 	nmkmedal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+	{ }
+
+protected:
+	required_device<cpu_device> m_maincpu;
+};
+
+class trocana_state : public nmkmedal_state
+{
+public:
+	trocana_state(const machine_config &mconfig, device_type type, const char *tag)
+		: nmkmedal_state(mconfig, type, tag)
 		, m_oki(*this, "oki")
 	{ }
 
@@ -48,18 +81,34 @@ private:
 
 	void mem_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
 	required_device<okim6650_device> m_oki;
 };
 
-void nmkmedal_state::adpcm_control_w(u8 data)
+class hpierrot_state : public nmkmedal_state
+{
+public:
+	hpierrot_state(const machine_config &mconfig, device_type type, const char *tag)
+		: nmkmedal_state(mconfig, type, tag)
+		, m_oki(*this, "oki")
+	{ }
+
+	void hpierrot(machine_config &config);
+
+private:
+	void mem_map(address_map &map);
+
+	required_device<okim6295_device> m_oki;
+};
+
+
+void trocana_state::adpcm_control_w(u8 data)
 {
 	m_oki->ch2_w(BIT(data, 0));
 	m_oki->cmd_w(BIT(data, 1));
 	m_oki->st_w(BIT(data, 2) || !BIT(data, 1));
 }
 
-void nmkmedal_state::mem_map(address_map &map)
+void trocana_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x8000, 0x8000).portr("IN0");
@@ -69,8 +118,13 @@ void nmkmedal_state::mem_map(address_map &map)
 	map(0x8004, 0x8004).portr("IN4");
 	map(0x8005, 0x8005).portr("IN5");
 	map(0xa003, 0xa003).w(m_oki, FUNC(okim6376_device::write));
-	map(0xa004, 0xa004).w(FUNC(nmkmedal_state::adpcm_control_w));
+	map(0xa004, 0xa004).w(FUNC(trocana_state::adpcm_control_w));
 	map(0xc000, 0xc7ff).ram();
+}
+
+void hpierrot_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 }
 
 static INPUT_PORTS_START( trocana )
@@ -129,16 +183,26 @@ static INPUT_PORTS_START( trocana )
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-void nmkmedal_state::trocana(machine_config &config)
+void trocana_state::trocana(machine_config &config)
 {
-	TMP90841(config, m_maincpu, 16500000 / 2); // actually TMP90C041AN
-	m_maincpu->set_addrmap(AS_PROGRAM, &nmkmedal_state::mem_map);
+	TMP90841(config, m_maincpu, 16000000 / 2); // actually TMP90C041AN
+	m_maincpu->set_addrmap(AS_PROGRAM, &trocana_state::mem_map);
 
 	SPEAKER(config, "mono").front_center();
 	OKIM6650(config, m_oki, 16500000 / 4).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-ROM_START( trocana)
+void hpierrot_state::hpierrot(machine_config &config)
+{
+	TMP90841(config, m_maincpu, 16000000 / 2); // actually TMP90C041AN
+	m_maincpu->set_addrmap(AS_PROGRAM, &hpierrot_state::mem_map);
+
+	SPEAKER(config, "mono").front_center();
+	OKIM6295(config, m_oki, 16000000 / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // divider and pin not verified
+}
+
+
+ROM_START( trocana )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "tro1e.u12", 0x00000, 0x10000, CRC(f285043f) SHA1(6691091c1ecdab10c390db1d82c9d1d1dd0ded1f) ) // 1xxxxxxxxxxxxxxx = 0xFF
 
@@ -146,5 +210,16 @@ ROM_START( trocana)
 	ROM_LOAD( "tro2.u16",  0x00000, 0x80000, CRC(c801d8ca) SHA1(f57026f5386467c054299556dd8665e62557aa91) )
 ROM_END
 
+ROM_START( hpierrot )
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "v8210.u44", 0x00000, 0x10000, CRC(313d5d07) SHA1(2802c88a21a311d552e8f2bd9e588ca7450f695d) ) //  1xxxxxxxxxxxxxxx = 0xFF
 
-GAME( 1996, trocana, 0, trocana, trocana, nmkmedal_state, empty_init, ROT0, "NTC / NMK", "Trocana", MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, NTC LTD, V96313 strings
+	ROM_REGION(0x80000, "oki", 0)
+	ROM_LOAD( "sound.u27",  0x00000, 0x80000, CRC(fb6b4361) SHA1(7aaecf55efe219cb0b5eb93fee329b8e6ce0b307) )
+ROM_END
+
+} // Anonymous namespace
+
+
+GAME( 1996, trocana,  0, trocana,  trocana, trocana_state,  empty_init, ROT0, "NTC / NMK", "Trocana",       MACHINE_IS_SKELETON_MECHANICAL ) // NMK LTD, NTC LTD, V96313 strings
+GAME( 1996, hpierrot, 0, hpierrot, trocana, hpierrot_state, empty_init, ROT0, "NTC / NMK", "Happy Pierrot", MACHINE_IS_SKELETON_MECHANICAL ) // NTC LTD, NMK LTD, V96821 strings

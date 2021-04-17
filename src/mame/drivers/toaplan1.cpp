@@ -973,8 +973,8 @@ void toaplan1_state::vimana_hd647180_io_map(address_map &map)
 	map(0x82, 0x82).portr("DSWA");
 	map(0x83, 0x83).portr("SYSTEM");
 	map(0x84, 0x84).w(FUNC(toaplan1_state::coin_w));  // Coin counter/lockout // needs verify
-	map(0x87, 0x87).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
-	map(0x8f, 0x8f).rw("ymsnd", FUNC(ym3812_device::read_port_r), FUNC(ym3812_device::write_port_w));
+	map(0x87, 0x87).rw("ymsnd", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
+	map(0x8f, 0x8f).w("ymsnd", FUNC(ym3812_device::data_w));
 }
 
 u8 toaplan1_state::vimana_dswb_invert_r()
@@ -1018,8 +1018,7 @@ void toaplan1_samesame_state::hd647180_io_map(address_map &map)
 	map(0xa0, 0xa0).r(FUNC(toaplan1_samesame_state::soundlatch_r));
 	map(0xb0, 0xb0).w(FUNC(toaplan1_samesame_state::sound_done_w));
 
-	map(0x80, 0x80).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
-	map(0x81, 0x81).rw("ymsnd", FUNC(ym3812_device::read_port_r), FUNC(ym3812_device::write_port_w));
+	map(0x80, 0x81).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 }
 
 /*****************************************************************************
@@ -2486,6 +2485,7 @@ ROM_START( zerowingw ) /* 2 player simultaneous version (Williams Electronics) *
 	ROM_LOAD( "tp015_15.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )   /* ??? */
 ROM_END
 
+// Demon's World uses an undumped D70016U GXC-04 MCU ^ 91300, the currently used MCU code comes from a bootleg and is thus flagged as bad
 ROM_START( demonwld )
 	ROM_REGION( 0x040000, "maincpu", 0 )    /* Main 68K code */
 	ROM_LOAD16_BYTE( "o16-10.v2", 0x000000, 0x20000, CRC(ca8194f3) SHA1(176da6739b35ba38b40150fc62380108bcae5a24) )
@@ -2495,8 +2495,8 @@ ROM_START( demonwld )
 	ROM_LOAD( "rom11.v2",  0x0000, 0x8000, CRC(dbe08c85) SHA1(536a242bfe916d15744b079261507af6f12b5b50) )
 
 	ROM_REGION( 0x2000, "dsp", 0 )  /* Co-Processor TMS320C10 MCU code */
-	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
-	ROM_LOAD16_BYTE( "dsp_22.bin",  0x0001, 0x0800, CRC(79389a71) SHA1(14ec4c1c9b06702319e89a7a250d0038393437f4) )
+	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, BAD_DUMP CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
+	ROM_LOAD16_BYTE( "dsp_22.bin",  0x0001, 0x0800, BAD_DUMP CRC(79389a71) SHA1(14ec4c1c9b06702319e89a7a250d0038393437f4) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "rom05",  0x00000, 0x20000, CRC(6506c982) SHA1(6d4c1ef91e5617724789ff196abb7abf23e4a7fb) )
@@ -2526,8 +2526,8 @@ ROM_START( demonwld1 )
 	ROM_LOAD( "o16-11.bin",  0x0000, 0x8000, CRC(dbe08c85) SHA1(536a242bfe916d15744b079261507af6f12b5b50) )
 
 	ROM_REGION( 0x2000, "dsp", 0 )  /* Co-Processor TMS320C10 MCU code */
-	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
-	ROM_LOAD16_BYTE( "dsp_22.bin",  0x0001, 0x0800, CRC(79389a71) SHA1(14ec4c1c9b06702319e89a7a250d0038393437f4) )
+	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, BAD_DUMP CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
+	ROM_LOAD16_BYTE( "dsp_22.bin",  0x0001, 0x0800, BAD_DUMP CRC(79389a71) SHA1(14ec4c1c9b06702319e89a7a250d0038393437f4) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "rom05",  0x00000, 0x20000, CRC(6506c982) SHA1(6d4c1ef91e5617724789ff196abb7abf23e4a7fb) )
@@ -2555,8 +2555,8 @@ ROM_START( demonwld2 )
 	ROM_LOAD( "rom11",  0x0000, 0x8000, CRC(397eca1b) SHA1(84073ff6d1bc46ec6162d66ec5de305700938380) )
 
 	ROM_REGION( 0x2000, "dsp", 0 )  /* Co-Processor TMS320C10 MCU code */
-	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
-	ROM_LOAD16_BYTE( "dsp_22.bin",  0x0001, 0x0800, CRC(79389a71) SHA1(14ec4c1c9b06702319e89a7a250d0038393437f4) )
+	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, BAD_DUMP CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
+	ROM_LOAD16_BYTE( "dsp_22.bin",  0x0001, 0x0800, BAD_DUMP CRC(79389a71) SHA1(14ec4c1c9b06702319e89a7a250d0038393437f4) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "rom05",  0x00000, 0x20000, CRC(6506c982) SHA1(6d4c1ef91e5617724789ff196abb7abf23e4a7fb) )
@@ -2584,8 +2584,8 @@ ROM_START( demonwld3 )
 	ROM_LOAD( "rom11",  0x0000, 0x8000, CRC(397eca1b) SHA1(84073ff6d1bc46ec6162d66ec5de305700938380) )
 
 	ROM_REGION( 0x2000, "dsp", 0 )  /* Co-Processor TMS320C10 MCU code */
-	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
-	ROM_LOAD16_BYTE( "dsp_22.bin",  0x0001, 0x0800, CRC(79389a71) SHA1(14ec4c1c9b06702319e89a7a250d0038393437f4) )
+	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, BAD_DUMP CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
+	ROM_LOAD16_BYTE( "dsp_22.bin",  0x0001, 0x0800, BAD_DUMP CRC(79389a71) SHA1(14ec4c1c9b06702319e89a7a250d0038393437f4) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "rom05",  0x00000, 0x20000, CRC(6506c982) SHA1(6d4c1ef91e5617724789ff196abb7abf23e4a7fb) )
@@ -2613,8 +2613,8 @@ ROM_START( demonwld4 )
 	ROM_LOAD( "rom11",  0x0000, 0x8000, CRC(397eca1b) SHA1(84073ff6d1bc46ec6162d66ec5de305700938380) )
 
 	ROM_REGION( 0x2000, "dsp", 0 )  /* Co-Processor TMS320C10 MCU code */
-	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
-	ROM_LOAD16_BYTE( "dsp_22.bin",  0x0001, 0x0800, CRC(79389a71) SHA1(14ec4c1c9b06702319e89a7a250d0038393437f4) )
+	ROM_LOAD16_BYTE( "dsp_21.bin",  0x0000, 0x0800, BAD_DUMP CRC(2d135376) SHA1(67a2cc774d272ee1cd6e6bc1c5fc33fc6968837e) )
+	ROM_LOAD16_BYTE( "dsp_22.bin",  0x0001, 0x0800, BAD_DUMP CRC(79389a71) SHA1(14ec4c1c9b06702319e89a7a250d0038393437f4) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "rom05",  0x00000, 0x20000, CRC(6506c982) SHA1(6d4c1ef91e5617724789ff196abb7abf23e4a7fb) )

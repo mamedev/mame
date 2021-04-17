@@ -43,7 +43,6 @@
 
  ***********************************************************************************************************/
 
-
 #include "emu.h"
 #include "md_slot.h"
 
@@ -271,6 +270,7 @@ static const md_slot slot_list[] =
 	{ SMOUSE, "rom_smouse" },
 	{ SOULBLAD, "rom_soulblad" },
 	{ SQUIRRELK, "rom_squir" },
+	{ SRAM_ARG96, "rom_sram_arg96" },
 	{ TEKKENSP, "rom_tekkesp" },
 	{ TOPFIGHTER, "rom_topf" },
 
@@ -282,7 +282,7 @@ static int md_get_pcb_id(const char *slot)
 {
 	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(elem.slot_option, slot))
+		if (!strcmp(elem.slot_option, slot))
 			return elem.pcb_id;
 	}
 
@@ -615,6 +615,7 @@ void base_md_cart_slot_device::setup_nvram()
 
 		// These types only come from softlist loading
 		case SEGA_SRAM:
+		case SRAM_ARG96:
 			m_cart->m_nvram_start = 0x200000;
 			m_cart->m_nvram_end = m_cart->m_nvram_start + get_software_region_length("sram") - 1;
 			m_cart->nvram_alloc(m_cart->m_nvram_end - m_cart->m_nvram_start + 1);

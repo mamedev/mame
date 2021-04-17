@@ -45,7 +45,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "sound/3812intf.h"
+#include "sound/ym3812.h"
 #include "sound/ymf278b.h"
 #include "speaker.h"
 
@@ -172,7 +172,7 @@ void lordgun_state::lordgun_eeprom_w(uint8_t data)
 {
 	int i;
 
-	if (data & ~0xfd)
+	if (data & 2)
 	{
 //      popmessage("EE: %02x", data);
 		logerror("%s: Unknown EEPROM bit written %02X\n",machine().describe_context(),data);
@@ -186,7 +186,7 @@ void lordgun_state::lordgun_eeprom_w(uint8_t data)
 			lordgun_update_gun(i);
 
 	// latch the bit
-	m_eeprom->di_write((data & 0x40) >> 6);
+	m_eeprom->di_write(BIT(data, 6));
 
 	// reset line asserted: reset.
 	m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE );
@@ -201,7 +201,7 @@ void lordgun_state::lordgun_eeprom_w(uint8_t data)
 
 void lordgun_state::aliencha_eeprom_w(uint8_t data)
 {
-	if (~data & ~0xf8)
+	if (~data & 7)
 	{
 //      popmessage("EE: %02x", data);
 		logerror("%s: Unknown EEPROM bit written %02X\n",machine().describe_context(),data);
@@ -214,7 +214,7 @@ void lordgun_state::aliencha_eeprom_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(1, data & 0x10);
 
 	// latch the bit
-	m_eeprom->di_write((data & 0x80) >> 7);
+	m_eeprom->di_write(BIT(data, 7));
 
 	// reset line asserted: reset.
 	m_eeprom->cs_write((data & 0x20) ? ASSERT_LINE : CLEAR_LINE );

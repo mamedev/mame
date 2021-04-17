@@ -63,7 +63,7 @@ f5d6    print 7 digit BCD number: d0.l to (a1)+ color $3000
 #include "cpu/m6809/m6809.h"
 #include "machine/6840ptm.h"
 #include "sound/ay8910.h"
-#include "sound/8950intf.h"
+#include "sound/y8950.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -315,7 +315,7 @@ ROM_START( ginganin )
 	ROM_REGION( 0x08000, "bgrom", 0 )    /* background tilemaps */
 	ROM_LOAD( "gn_11.bin", 0x00000, 0x08000, CRC(f0d0e605) SHA1(0c541e8e036573be1d99ecb71fdb4568ca8cc269) )
 
-	ROM_REGION( 0x20000, "ymsnd", 0 )   /* samples */
+	ROM_REGION( 0x20000, "ymsnd:adpcma", 0 )   /* samples */
 	ROM_LOAD( "gn_04.bin", 0x00000, 0x10000, CRC(0ed9133b) SHA1(77f628e8ec28016efac2d906146865ca4ec54bd5) )
 	ROM_LOAD( "gn_03.bin", 0x10000, 0x10000, CRC(f1ba222c) SHA1(780c0bd0045bac1e1bb3209576383db90504fbf3) )
 
@@ -350,7 +350,7 @@ ROM_START( ginganina )
 	ROM_REGION( 0x08000, "bgrom", 0 )    /* background tilemaps */
 	ROM_LOAD( "gn_11.bin", 0x00000, 0x08000, CRC(f0d0e605) SHA1(0c541e8e036573be1d99ecb71fdb4568ca8cc269) )
 
-	ROM_REGION( 0x20000, "ymsnd", 0 )   /* samples */
+	ROM_REGION( 0x20000, "ymsnd:adpcma", 0 )   /* samples */
 	ROM_LOAD( "gn_04.bin", 0x00000, 0x10000, CRC(0ed9133b) SHA1(77f628e8ec28016efac2d906146865ca4ec54bd5) )
 	ROM_LOAD( "gn_03.bin", 0x10000, 0x10000, CRC(f1ba222c) SHA1(780c0bd0045bac1e1bb3209576383db90504fbf3) )
 ROM_END

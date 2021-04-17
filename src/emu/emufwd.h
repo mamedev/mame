@@ -52,9 +52,6 @@ class chd_file;
 // declared in unzip.h
 namespace util { class archive_file; }
 
-// declared in wavwrite.h
-struct wav_file;
-
 // declared in xmlfile.h
 namespace util::xml { class data_node; }
 
@@ -81,7 +78,7 @@ class crosshair_manager;
 // declared in debug/debugcmd.h
 class debugger_commands;
 
-// declared in debug/debugcmd.h
+// declared in debug/debugcon.h
 class debugger_console;
 
 // declared in debug/debugcpu.h
@@ -149,6 +146,7 @@ class memory_bank;
 class memory_manager;
 class memory_region;
 class memory_share;
+class memory_view;
 
 // declared in emuopts.h
 class emu_options;
@@ -196,6 +194,7 @@ class output_manager;
 // declared in render.h
 class layout_element;
 class layout_view;
+class layout_file;
 class render_container;
 class render_manager;
 class render_target;

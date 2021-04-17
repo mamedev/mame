@@ -1219,7 +1219,6 @@ void ti85_state::ti86_setup_snapshot (uint8_t * data)
 SNAPSHOT_LOAD_MEMBER(ti85_state::snapshot_cb)
 {
 	int expected_snapshot_size = 0;
-	std::vector<uint8_t> ti8x_snapshot_data;
 
 	if (!strncmp(machine().system().name, "ti85", 4))
 		expected_snapshot_size = TI85_SNAPSHOT_SIZE;
@@ -1228,15 +1227,14 @@ SNAPSHOT_LOAD_MEMBER(ti85_state::snapshot_cb)
 
 	logerror("Snapshot loading\n");
 
-	if (snapshot_size != expected_snapshot_size)
+	if (image.length() != expected_snapshot_size)
 	{
 		logerror ("Incomplete snapshot file\n");
 		return image_init_result::FAIL;
 	}
 
-	ti8x_snapshot_data.resize(snapshot_size);
-
-	image.fread( &ti8x_snapshot_data[0], snapshot_size);
+	std::vector<uint8_t> ti8x_snapshot_data(image.length());
+	image.fread( &ti8x_snapshot_data[0], image.length());
 
 	if (!strncmp(machine().system().name, "ti85", 4))
 		ti85_setup_snapshot(&ti8x_snapshot_data[0]);

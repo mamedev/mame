@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /*********************************************************************
 
-    a2mockingboard.c
+    a2mockingboard.cpp
 
     Implementation of the Sweet Micro Systems Mockingboard card
     and friends.
@@ -40,12 +40,12 @@ DEFINE_DEVICE_TYPE(A2BUS_ECHOPLUS,     a2bus_echoplus_device,     "a2echop",  "S
 
 void a2bus_ayboard_device::add_common_devices(machine_config &config)
 {
-	VIA6522(config, m_via1, 1022727);
+	MOS6522(config, m_via1, 1022727);
 	m_via1->writepa_handler().set(FUNC(a2bus_ayboard_device::via1_out_a));
 	m_via1->writepb_handler().set(FUNC(a2bus_ayboard_device::via1_out_b));
 	m_via1->irq_handler().set(FUNC(a2bus_ayboard_device::via1_irq_w));
 
-	VIA6522(config, m_via2, 1022727);
+	MOS6522(config, m_via2, 1022727);
 	m_via2->writepa_handler().set(FUNC(a2bus_ayboard_device::via2_out_a));
 	m_via2->writepb_handler().set(FUNC(a2bus_ayboard_device::via2_out_b));
 	m_via2->irq_handler().set(FUNC(a2bus_ayboard_device::via2_irq_w));
@@ -167,10 +167,14 @@ void a2bus_ayboard_device::device_reset()
 
 uint8_t a2bus_ayboard_device::read_cnxx(uint8_t offset)
 {
-	if (offset <= 0x10)
+	if (offset <= 0x7f)
+	{
 		return m_via1->read(offset & 0xf);
-	else if (offset >= 0x80 && offset <= 0x90)
+	}
+	else
+	{
 		return m_via2->read(offset & 0xf);
+	}
 
 	return 0;
 }
@@ -181,17 +185,24 @@ uint8_t a2bus_phasor_device::read_cnxx(uint8_t offset)
 	int via_sel;
 
 	if (m_native)
+	{
 		via_sel = ((offset & 0x80) >> 6) | ((offset & 0x10) >> 4);
+	}
 	else
+	{
 		via_sel = (offset & 0x80) ? 2 : 1;
+	}
 
-	if ((offset <= 0x20) || (offset >= 0x80 && offset <= 0xa0))
+	if ((offset < 0x20) || (offset >= 0x80 && offset < 0xa0))
 	{
 		if (BIT(via_sel, 0))
+		{
 			ret |= m_via1->read(offset & 0xf);
-
+		}
 		if (BIT(via_sel, 1))
+		{
 			ret |= m_via2->read(offset & 0xf);
+		}
 	}
 
 	return ret;
@@ -203,47 +214,67 @@ uint8_t a2bus_phasor_device::read_cnxx(uint8_t offset)
 
 void a2bus_ayboard_device::write_cnxx(uint8_t offset, uint8_t data)
 {
-	if (offset <= 0x10)
+	// When the SSI-263 is emulated, Cn40 will write to both the VIA and
+	// the first SSI-263, and Cn20 will write to both the VIA and the
+	// second SSI-263.  Reads only select the VIA.
+	if (offset <= 0x7f)
+	{
 		m_via1->write(offset & 0xf, data);
-	else if (offset >= 0x80 && offset <= 0x90)
-		m_via2->write(offset & 0xf, data);
+	}
 	else
-		logerror("Mockingboard(%d): unk write %02x to Cn%02X (%s)\n", slotno(), data, offset, machine().describe_context());
+	{
+		m_via2->write(offset & 0xf, data);
+	}
 }
 
 void a2bus_phasor_device::write_cnxx(uint8_t offset, uint8_t data)
 {
-	if ((offset <= 0x20) || (offset >= 0x80 && offset <= 0xa0))
+	if ((offset < 0x20) || (offset >= 0x80 && offset < 0xa0))
 	{
 		int via_sel;
 
 		if (m_native)
+		{
 			via_sel = ((offset & 0x80) >> 6) | ((offset & 0x10) >> 4);
+		}
 		else
+		{
 			via_sel = (offset & 0x80) ? 2 : 1;
+		}
 
 		if (BIT(via_sel, 0))
+		{
 			m_via1->write(offset & 0xf, data);
-
+		}
 		if (BIT(via_sel, 1))
+		{
 			m_via2->write(offset & 0xf, data);
+		}
 	}
 }
 
 WRITE_LINE_MEMBER( a2bus_ayboard_device::via1_irq_w )
 {
 	if (state)
+	{
 		raise_slot_irq();
+	}
 	else
+	{
 		lower_slot_irq();
+	}
 }
 
 WRITE_LINE_MEMBER( a2bus_ayboard_device::via2_irq_w )
 {
 	if (state)
+	{
 		raise_slot_irq();
+	}
 	else
+	{
 		lower_slot_irq();
+	}
 }
 
 void a2bus_ayboard_device::via1_out_a(uint8_t data)
@@ -477,6 +508,7 @@ WRITE_LINE_MEMBER( a2bus_mockingboard_device::write_via1_cb2 )
 	if ((state == CLEAR_LINE) && (m_last_cb2_state == ASSERT_LINE))
 	{
 		m_sc01->write(m_portb1);
+		m_sc01->inflection_w(m_portb1 >> 6);
 	}
 	m_last_cb2_state = state;
 }

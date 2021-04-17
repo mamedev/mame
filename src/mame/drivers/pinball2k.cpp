@@ -96,6 +96,7 @@ private:
 	void memory_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t biu_ctrl_r(offs_t offset);
 	void biu_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	[[maybe_unused]] void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	uint32_t parallel_port_r();
 	void parallel_port_w(uint32_t data);
 	uint8_t io20_r(offs_t offset);
@@ -398,11 +399,9 @@ void pinball2k_state::biu_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask
 	}
 }
 
-#ifdef UNUSED_FUNCTION
 void pinball2k_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
-#endif
 
 uint8_t pinball2k_state::io20_r(offs_t offset)
 {

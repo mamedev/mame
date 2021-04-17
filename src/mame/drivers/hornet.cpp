@@ -281,7 +281,7 @@
     GFX PCB:  GQ871 PWB(B)A    (C) 1999 Konami
     ------------------------------------------
 
-    There are no ROMs on the two GFX PCBs, all sockets are empty. They are loacted on the LAN PCB.
+    There are no ROMs on the two GFX PCBs, all sockets are empty. They are located on the LAN PCB.
     Prior to the game starting there is a message saying downloading data.
 
 
@@ -360,10 +360,13 @@
 #include "video/voodoo.h"
 #include "video/k037122.h"
 #include "emupal.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 
+#include "layout/generic.h"
+
+
+namespace {
 
 class hornet_state : public driver_device
 {
@@ -410,6 +413,10 @@ public:
 	void init_terabrst();
 	void init_sscope();
 	void init_sscope2();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	// TODO: Needs verification on real hardware
@@ -474,9 +481,6 @@ private:
 	uint8_t comm_eeprom_r();
 	void comm_eeprom_w(uint8_t data);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	DECLARE_MACHINE_RESET(hornet_2board);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sound_irq);
@@ -1557,8 +1561,8 @@ ROM_START(sscope2)
 	ROM_LOAD32_WORD_SWAP("931a04.bin", 0x000000, 0x200000, CRC(4f5917e6) SHA1(a63a107f1d6d9756e4ab0965d72ea446f0692814) )
 
 	ROM_REGION32_BE(0x800000, "user3", 0)   /* Comm board roms */
-	ROM_LOAD("931a19.bin", 0x000000, 0x400000, BAD_DUMP CRC(8b25a6f1) SHA1(41f9c2046a6aae1e9f5f3ffa3e0ffb15eba46211) )
-	ROM_LOAD("931a20.bin", 0x400000, 0x400000, BAD_DUMP CRC(ecf665f6) SHA1(5a73e87435560a7bb2d0f9be7fba12254b18708d) )
+	ROM_LOAD("931a19.bin", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
+	ROM_LOAD("931a20.bin", 0x400000, 0x400000, CRC(d367a4c9) SHA1(8bf029841d9d3be20dea0423240bfec825477a1d) )
 
 	ROM_REGION(0x800000, "user5", ROMREGION_ERASE00)    /* CG Board texture roms */
 
@@ -1574,10 +1578,10 @@ ROM_START(sscope2)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(d4e69d7a) SHA1(1e29eecf4886e5e098a388dedd5f3901c2bb65e5) )
 
 	ROM_REGION(0x8, "lan_serial_id", 0)     /* LAN Board DS2401 */
-	ROM_LOAD( "ds2401.8b", 0x000000, 0x000008, BAD_DUMP CRC(bae36d0b) SHA1(4dd5915888d5718356b40bbe897f2470e410176a) ) // hand built
+	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, BAD_DUMP CRC(bae36d0b) SHA1(4dd5915888d5718356b40bbe897f2470e410176a) ) // hand built
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       /* LAN Board AT93C46 */
-	ROM_LOAD( "at93c46.16g", 0x000000, 0x000080, BAD_DUMP CRC(cc63c213) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152) ) // hand built
+	ROM_LOAD( "at93c46.8g", 0x000000, 0x000080, BAD_DUMP CRC(cc63c213) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152) ) // hand built
 ROM_END
 
 ROM_START(gradius4)
@@ -1715,6 +1719,9 @@ ROM_START(terabrsta)
 	ROM_REGION(0x2000, "m48t58",0)
 	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(62fecb78) SHA1(09509be8a947cf2d38e12a6ea755ec0de4aa9bd4) )
 ROM_END
+
+} // Anonymous namespace
+
 
 /*************************************************************************/
 

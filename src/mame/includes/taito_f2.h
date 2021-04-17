@@ -68,6 +68,7 @@ public:
 	void qcrayon2(machine_config &config);
 	void qtorimon(machine_config &config);
 	void driftout(machine_config &config);
+	void driftoutct(machine_config &config);
 	void solfigtr(machine_config &config);
 	void qzquest(machine_config &config);
 	void liquidk(machine_config &config);
@@ -258,6 +259,7 @@ protected:
 	void dinorex_map(address_map &map);
 	void dondokod_map(address_map &map);
 	void driftout_map(address_map &map);
+	void driftoutct_map(address_map &map);
 	void driveout_map(address_map &map);
 	void driveout_oki_map(address_map &map);
 	void driveout_sound_map(address_map &map);

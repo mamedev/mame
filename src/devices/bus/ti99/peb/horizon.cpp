@@ -167,6 +167,7 @@ horizon_ramdisk_device::horizon_ramdisk_device(const machine_config &mconfig, co
 	m_phoenix_split(false),
 	m_hideswitch(false),
 	m_rambo_supported(false),
+	m_modified(false),
 	m_page(0),
 	m_bank(0),
 	m_ramsize(0),
@@ -304,7 +305,10 @@ void horizon_ramdisk_device::read_write(offs_t offset, uint8_t *value, bool writ
 		if (ramaddress < m_ramsize)
 		{
 			if (write)
+			{
+				m_modified = true;
 				m_ram->write(ramaddress, *value);
+			}
 			else
 				*value = m_ram->read(ramaddress);
 
@@ -451,6 +455,9 @@ void horizon_ramdisk_device::nvram_read(emu_file &file)
 	int ramsize, dsrsize;
 	get_mem_size(ramsize, dsrsize);
 
+	if (file.size() != ramsize + dsrsize)
+		LOGMASKED(LOG_WARN, "NVRAM file size (%d) does not match the current configuration. Check settings.\n", file.size());
+
 	// NVRAM plus ROS, according to the current configuration
 	auto buffer = make_unique_clear<uint8_t []>(ramsize + dsrsize);
 
@@ -485,6 +492,15 @@ void horizon_ramdisk_device::nvram_write(emu_file &file)
 	// Store both parts in one file
 	file.write(buffer.get(), ramsize + dsrsize);
 }
+
+bool horizon_ramdisk_device::nvram_can_write()
+{
+	// Do not save if nothing was written. This is helpful to avoid loss of the
+	// contents when the settings were found to be different, and the emulation
+	// has to be restarted after restoring the settings.
+	return m_modified;
+}
+
 
 void horizon_ramdisk_device::get_mem_size(int& ramsize, int& dsrsize)
 {

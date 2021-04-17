@@ -67,7 +67,7 @@ static const uint8_t *get_untranslate6_map(void)
 	if (!map_inited)
 	{
 		memset(map, 0xff, sizeof(map));
-		for (i = 0; i < ARRAY_LENGTH(translate6); i++)
+		for (i = 0; i < std::size(translate6); i++)
 			map[translate6[i]] = i;
 		map_inited = 1;
 	}
@@ -559,7 +559,7 @@ bool a2_16sect_format::supports_save() const
 		return true;
 }
 
-int a2_16sect_format::identify(io_generic *io, uint32_t form_factor)
+int a2_16sect_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 		uint64_t size = io_generic_size(io);
 		//uint32_t expected_size = 35 * 16 * 256;
@@ -574,39 +574,11 @@ int a2_16sect_format::identify(io_generic *io, uint32_t form_factor)
 		return 0;
 }
 
-// following is placeholder, is completely wrong.
-const floppy_image_format_t::desc_e a2_16sect_format::mac_gcr[] = {
-		{ SECTOR_LOOP_START, 0, -1 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xd5aa96, 24 },
-		{   CRC_MACHEAD_START, 0 },
-		{     TRACK_ID_GCR6 },
-		{     SECTOR_ID_GCR6 },
-		{     TRACK_HEAD_ID_GCR6 },
-		{     SECTOR_INFO_GCR6 },
-		{   CRC_END, 0 },
-		{   CRC, 0 },
-		{   RAWBITS, 0xdeaaff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xd5aaad, 24 },
-		{   SECTOR_ID_GCR6 },
-		{   SECTOR_DATA_MAC, -1 },
-		{   RAWBITS, 0xdeaaff, 24 },
-		{   RAWBITS, 0xff, 8 },
-		{ SECTOR_LOOP_END },
-		{ END },
-};
-
-bool a2_16sect_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool a2_16sect_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint64_t size = io_generic_size(io);
+
+	image->set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
 
 	m_prodos_order = false;
 	m_tracks = (size == (40 * 16 * 256)) ? 40 : 35;
@@ -747,14 +719,14 @@ bool a2_16sect_format::load(io_generic *io, uint32_t form_factor, floppy_image *
 	return true;
 }
 
-uint8_t a2_16sect_format::gb(const uint8_t *buf, int ts, int &pos, int &wrap)
+uint8_t a2_16sect_format::gb(const std::vector<bool> &buf, int &pos, int &wrap)
 {
 		uint8_t v = 0;
 		int w1 = wrap;
 		while(wrap != w1+2 && !(v & 0x80)) {
-				v = v << 1 | ((buf[pos >> 3] >> (7-(pos & 7))) & 1);
+				v = (v << 1) | buf[pos];
 				pos++;
-				if(pos == ts) {
+				if(pos == buf.size()) {
 						pos = 0;
 						wrap++;
 				}
@@ -768,7 +740,7 @@ void a2_16sect_format::update_chk(const uint8_t *data, int size, uint32_t &chk)
 
 //#define VERBOSE_SAVE
 
-bool a2_16sect_format::save(io_generic *io, floppy_image *image)
+bool a2_16sect_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 		int g_tracks, g_heads;
 		int visualgrid[16][APPLE2_TRACK_COUNT]; // visualizer grid, cleared/initialized below
@@ -798,6 +770,9 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 		}
 		image->get_actual_geometry(g_tracks, g_heads);
 
+		if(!m_tracks)
+				m_tracks = g_tracks;
+
 		int head = 0;
 
 		int pos_data = 0;
@@ -806,12 +781,10 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 				uint8_t sectdata[(256)*16];
 				memset(sectdata, 0, sizeof(sectdata));
 				int nsect = 16;
-				uint8_t buf[10000]; // normal is 51090 cells, e.g. 6387 bytes, add 50% and round up for denser than normal disks
-				int ts;
 				#ifdef VERBOSE_SAVE
 				fprintf(stderr,"DEBUG: a2_16sect_format::save() about to generate bitstream from track %d...", track);
 				#endif
-				generate_bitstream_from_track(track, head, 3915, buf, ts, image);
+				auto buf = generate_bitstream_from_track(track, head, 3915, image);
 				#ifdef VERBOSE_SAVE
 				fprintf(stderr,"done.\n");
 				#endif
@@ -820,7 +793,7 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 				int hb = 0;
 				int dosver = 0; // apple dos version; 0 = >=3.3, 1 = <3.3
 				for(;;) {
-						uint8_t v = gb(buf, ts, pos, wrap);
+						uint8_t v = gb(buf, pos, wrap);
 						if(v == 0xff)               {
 								hb = 1;
 							}
@@ -840,7 +813,7 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 						if(hb == 4) {
 								uint8_t h[11];
 								for(auto & elem : h)
-										elem = gb(buf, ts, pos, wrap);
+										elem = gb(buf, pos, wrap);
 								//uint8_t v2 = gcr6bw_tb[h[2]];
 								uint8_t vl = gcr4_decode(h[0],h[1]);
 								uint8_t tr = gcr4_decode(h[2],h[3]);
@@ -863,7 +836,7 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 										int owrap = wrap;
 										hb = 0;
 										for(int i=0; i<20 && hb != 4; i++) {
-												v = gb(buf, ts, pos, wrap);
+												v = gb(buf, pos, wrap);
 												if(v == 0xff)
 														hb = 1;
 												else if(hb == 1 && v == 0xd5)
@@ -893,17 +866,17 @@ bool a2_16sect_format::save(io_generic *io, floppy_image *image)
 
 												// first read in sector and decode to 6bit form
 												for(int i=0; i<0x156; i++) {
-														data[i] = gcr6bw_tb[gb(buf, ts, pos, wrap)] ^ c;
+														data[i] = gcr6bw_tb[gb(buf, pos, wrap)] ^ c;
 														c = data[i];
 												//  printf("%02x ", c);
 												//  if (((i&0xf)+1)==0x10) printf("\n");
 												}
 												// read the checksum byte
-												data[0x156] = gcr6bw_tb[gb(buf,ts,pos,wrap)];
+												data[0x156] = gcr6bw_tb[gb(buf,pos,wrap)];
 												// now read the postamble bytes
 												for(int i=0; i<3; i++) {
 														dpost <<= 8;
-														dpost |= gb(buf, ts, pos, wrap);
+														dpost |= gb(buf, pos, wrap);
 												}
 												// next combine in the upper 2 bits of each byte
 												uint8_t bit_swap[4] = { 0, 2, 1, 3 };
@@ -1046,45 +1019,14 @@ bool a2_rwts18_format::supports_save() const
 		return true;
 }
 
-int a2_rwts18_format::identify(io_generic *io, uint32_t form_factor)
+int a2_rwts18_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 		uint64_t size = io_generic_size(io);
 		uint32_t expected_size = APPLE2_TRACK_COUNT * 16 * 256;
 		return size == expected_size;
 }
 
-// following is placeholder, is completely wrong.
-const floppy_image_format_t::desc_e a2_rwts18_format::mac_gcr[] = {
-		{ SECTOR_LOOP_START, 0, -1 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xd5aa96, 24 },
-		{   CRC_MACHEAD_START, 0 },
-		{     TRACK_ID_GCR6 },
-		{     SECTOR_ID_GCR6 },
-		{     TRACK_HEAD_ID_GCR6 },
-		{     SECTOR_INFO_GCR6 },
-		{   CRC_END, 0 },
-		{   CRC, 0 },
-		{   RAWBITS, 0xdeaaff, 24 },
-		{   RAWBITS, 0xff3fcf, 24 }, { RAWBITS, 0xf3fcff, 24 },
-		{   RAWBITS, 0xd5aaad, 24 },
-		{   SECTOR_ID_GCR6 },
-		{   SECTOR_DATA_MAC, -1 },
-		{   RAWBITS, 0xdeaaff, 24 },
-		{   RAWBITS, 0xff, 8 },
-		{ SECTOR_LOOP_END },
-		{ END },
-};
-
-
-bool a2_rwts18_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool a2_rwts18_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 /*      TODO: rewrite me properly
         uint8_t sector_data[(256)*16];
@@ -1114,14 +1056,14 @@ bool a2_rwts18_format::load(io_generic *io, uint32_t form_factor, floppy_image *
 		return false; // I hope that throws an error...
 }
 
-uint8_t a2_rwts18_format::gb(const uint8_t *buf, int ts, int &pos, int &wrap)
+uint8_t a2_rwts18_format::gb(const std::vector<bool> &buf, int &pos, int &wrap)
 {
 		uint8_t v = 0;
 		int w1 = wrap;
 		while(wrap != w1+2 && !(v & 0x80)) {
-				v = v << 1 | ((buf[pos >> 3] >> (7-(pos & 7))) & 1);
+				v = (v << 1) | buf[pos];
 				pos++;
-				if(pos == ts) {
+				if(pos == buf.size()) {
 						pos = 0;
 						wrap++;
 				}
@@ -1133,7 +1075,7 @@ void a2_rwts18_format::update_chk(const uint8_t *data, int size, uint32_t &chk)
 {
 }
 
-bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
+bool a2_rwts18_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 		int g_tracks, g_heads;
 		int visualgrid[18][APPLE2_TRACK_COUNT]; // visualizer grid, cleared/initialized below
@@ -1172,18 +1114,16 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 		uint8_t sectdata[(768)*6];
 		memset(sectdata, 0, sizeof(sectdata));
 		int nsect = 18;
-		uint8_t buf[130000]; // originally 13000, multiread dfi disks need larger
-		int ts;
 //fprintf(stderr,"DEBUG: a2_rwts18_format::save() about to generate bitstream from physical track %d (logical %d)...", track, track/2);
 		//~332 samples per cell, times 3+8+3 (14) for address mark, 24 for sync, 3+343+3 (349) for data mark, 24 for sync is around 743, near 776 expected
-		generate_bitstream_from_track(0, head, 200000000/((3004*nsect*6)/2), buf, ts, image); // 3104 needs tweaking
+		auto buf = generate_bitstream_from_track(0, head, 200000000/((3004*nsect*6)/2), image); // 3104 needs tweaking
 //fprintf(stderr,"done.\n");
 		int pos = 0;
 		int wrap = 0;
 		int hb = 0;
 		int dosver = 0; // apple dos version; 0 = >=3.3, 1 = <3.3
 		for(;;) {
-				uint8_t v = gb(buf, ts, pos, wrap);
+				uint8_t v = gb(buf, pos, wrap);
 				if(v == 0xff)
 						hb = 1;
 				else if(hb == 1 && v == 0xd5)
@@ -1200,7 +1140,7 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 				if(hb == 4) {
 						uint8_t h[11];
 						for(auto & elem : h)
-								elem = gb(buf, ts, pos, wrap);
+								elem = gb(buf, pos, wrap);
 						//uint8_t v2 = gcr6bw_tb[h[2]];
 						uint8_t vl = gcr4_decode(h[0],h[1]);
 						uint8_t tr = gcr4_decode(h[2],h[3]);
@@ -1221,7 +1161,7 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 								int owrap = wrap;
 								hb = 0;
 								for(int i=0; i<20 && hb != 4; i++) {
-										v = gb(buf, ts, pos, wrap);
+										v = gb(buf, pos, wrap);
 										if(v == 0xff)
 												hb = 1;
 										else if(hb == 1 && v == 0xd5)
@@ -1256,17 +1196,17 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 										uint8_t c = 0;
 										// first read in sector and decode to 6bit form
 										for(int i=0; i<0x156; i++) {
-												data[i] = gcr6bw_tb[gb(buf, ts, pos, wrap)] ^ c;
+												data[i] = gcr6bw_tb[gb(buf, pos, wrap)] ^ c;
 												c = data[i];
 										//  printf("%02x ", c);
 										//  if (((i&0xf)+1)==0x10) printf("\n");
 										}
 										// read the checksum byte
-										data[0x156] = gcr6bw_tb[gb(buf,ts,pos,wrap)];
+										data[0x156] = gcr6bw_tb[gb(buf,pos,wrap)];
 										// now read the postamble bytes
 										for(int i=0; i<3; i++) {
 												dpost <<= 8;
-												dpost |= gb(buf, ts, pos, wrap);
+												dpost |= gb(buf, pos, wrap);
 										}
 										// next combine in the upper 2 bits of each byte
 										uint8_t bit_swap[4] = { 0, 2, 1, 3 };
@@ -1336,18 +1276,16 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 				uint8_t sectdata[(768)*6];
 				memset(sectdata, 0, sizeof(sectdata));
 				int nsect = 18;
-				uint8_t buf[130000]; // originally 13000, multiread dfi disks need larger
-				int ts;
 //fprintf(stderr,"DEBUG: a2_rwts18_format::save() about to generate bitstream from physical track %d (logical %d)...", track, track/2);
 				//~332 samples per cell, times 3+8+3 (14) for address mark, 24 for sync, 3+343+3 (349) for data mark, 24 for sync is around 743, near 776 expected
-				generate_bitstream_from_track(track, head, 200000000/((3004*nsect*6)/2), buf, ts, image); // 3104 needs tweaking
+				auto buf = generate_bitstream_from_track(track, head, 200000000/((3004*nsect*6)/2), image); // 3104 needs tweaking
 //fprintf(stderr,"done.\n");
 				int oldpos = 0; // DEBUG
 				int pos = 0;
 				int wrap = 0;
 				int hb = 0;
 				for(;;) {
-						uint8_t v = gb(buf, ts, pos, wrap);
+						uint8_t v = gb(buf, pos, wrap);
 						if((v == 0xff) || (v == 0x9a)) // note 0x9a varies per title! this is an LFSR? generated value intended to throw off copiers, and only appears after the track splice (before sector 5)
 								hb = 1;
 						else if(hb == 1 && v == 0xd5)
@@ -1363,7 +1301,7 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 								uint8_t h[7];
 								// grab exactly 7 bytes: should be Track, Sector, Checksum, AA, FF and FF and the Br0derbund Title ID
 								for(auto & elem : h)
-										elem = gb(buf, ts, pos, wrap);
+										elem = gb(buf, pos, wrap);
 								uint8_t tr = gcr6bw_tb[h[0]];
 								uint8_t se = gcr6bw_tb[h[1]];
 								uint8_t chk = gcr6bw_tb[h[2]];
@@ -1390,7 +1328,7 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 										//dest = sectdata+(768)*se;
 										// now read in the sector and decode to 6bit form
 										for(int i=0; i<0x400; i++) {
-											data[i] = gcr6bw_tb[gb(buf, ts, pos, wrap)] ;//^ c;
+											data[i] = gcr6bw_tb[gb(buf, pos, wrap)] ;//^ c;
 											c ^= data[i];
 											/*if (((i&0x3)+1)==0x04) {
 											    printf("%c", ((((data[i-3]&0x30)<<2)|((data[i-2]&0x3F)>>0))&0x3F)+0x40);
@@ -1404,18 +1342,18 @@ bool a2_rwts18_format::save(io_generic *io, floppy_image *image)
 										//  if (((i&0xf)+1)==0x10) printf("\n");
 										}
 										// read the checksum byte (checksum is calced by xoring all data together)
-										data[0x400] = gcr6bw_tb[gb(buf,ts,pos,wrap)];
+										data[0x400] = gcr6bw_tb[gb(buf,pos,wrap)];
 										// now read the postamble bytes
 										for(int i=0; i<4; i++) {
 												dpost <<= 8;
-												dpost |= gb(buf, ts, pos, wrap);
+												dpost |= gb(buf, pos, wrap);
 										}
 
 										/*if (se == 0) // dump some debug data to help find the lfsr before sector 5
 										{
 										    printf("Data Postamble was 0x%08x\n", dpost);
 										    for(int i=0; i<0x400; i++) {
-										        data[i] = gcr6bw_tb[gb(buf, ts, pos, wrap)] ;//^ c;
+										        data[i] = gcr6bw_tb[gb(buf, pos, wrap)] ;//^ c;
 										        c ^= data[i];
 										  printf("%02x ", data[i]);
 										  if (((i&0xf)+1)==0x10) printf("\n");
@@ -1562,7 +1500,7 @@ bool a2_edd_format::supports_save() const
 	return false;
 }
 
-int a2_edd_format::identify(io_generic *io, uint32_t form_factor)
+int a2_edd_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	return ((io_generic_size(io) == 2244608) || (io_generic_size(io) == 2310144)) ? 50 : 0;
 }
@@ -1572,7 +1510,7 @@ uint8_t a2_edd_format::pick(const uint8_t *data, int pos)
 	return ((data[pos>>3] << 8) | data[(pos>>3)+1]) >> (8-(pos & 7));
 }
 
-bool a2_edd_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool a2_edd_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t *img;
 	uint8_t nibble[16384], stream[16384];
@@ -1653,6 +1591,9 @@ bool a2_edd_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 		image->set_write_splice_position(i >> 2, 0, uint32_t(uint64_t(200'000'000)*splice/len), i & 3);
 	}
 	free(img);
+
+	image->set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
+
 	return true;
 }
 
@@ -1680,13 +1621,13 @@ const char *a2_woz_format::extensions() const
 
 bool a2_woz_format::supports_save() const
 {
-	return false;
+	return true;
 }
 
 const uint8_t a2_woz_format::signature[8] = { 0x57, 0x4f, 0x5a, 0x31, 0xff, 0x0a, 0x0d, 0x0a };
 const uint8_t a2_woz_format::signature2[8] = { 0x57, 0x4f, 0x5a, 0x32, 0xff, 0x0a, 0x0d, 0x0a };
 
-int a2_woz_format::identify(io_generic *io, uint32_t form_factor)
+int a2_woz_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t header[8];
 	io_generic_read(io, header, 0, 8);
@@ -1695,7 +1636,7 @@ int a2_woz_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool a2_woz_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool a2_woz_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	std::vector<uint8_t> img(io_generic_size(io));
 	io_generic_read(io, &img[0], 0, img.size());
@@ -1731,7 +1672,13 @@ bool a2_woz_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 
 	unsigned int limit = is_35 ? 160 : 141;
 
+	if(is_35)
+		image->set_form_variant(floppy_image::FF_35, floppy_image::SSDD);
+	else
+		image->set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
+
 	if (woz_vers == 1) {
+
 		for (unsigned int trkid = 0; trkid != limit; trkid++) {
 			int head = is_35 && trkid >= 80 ? 1 : 0;
 			int track = is_35 ? trkid % 80 : trkid / 4;
@@ -1743,6 +1690,8 @@ bool a2_woz_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 				if (r16(img, boff + 6648) == 0)
 					return false;
 				generate_track_from_bitstream(track, head, &img[boff], r16(img, boff + 6648), image, subtrack, r16(img, boff + 6650));
+				if(is_35 && !track && head)
+					image->set_variant(floppy_image::DSDD);
 			}
 		}
 	} else if (woz_vers == 2) {
@@ -1757,11 +1706,13 @@ bool a2_woz_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 
 				uint32_t boff = (uint32_t)r16(img, trks_off + 0) * 512;
 
-				if (r16(img, trks_off + 4) == 0)
+				if (r32(img, trks_off + 4) == 0)
 					return false;
 
-				// TODO: when write capability is added, use the WRIT chunk data if it's present
-				generate_track_from_bitstream(track, head, &img[boff], r16(img, trks_off + 4), image, subtrack, 0xffff);
+				generate_track_from_bitstream(track, head, &img[boff], r32(img, trks_off + 4), image, subtrack, 0xffff);
+
+				if(is_35 && !track && head)
+					image->set_variant(r32(img, trks_off + 4) >= 90000 ? floppy_image::DSHD : floppy_image::DSDD);
 			}
 		}
 	}
@@ -1769,6 +1720,113 @@ bool a2_woz_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 
 	return true;
 }
+
+bool a2_woz_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+{
+	std::vector<std::vector<bool>> tracks(160);
+	bool twosided = false;
+
+	if(image->get_form_factor() == floppy_image::FF_525) {
+		for(unsigned int i=0; i != 160; i++)
+			if(image->track_is_formatted(i >> 2, 0, i & 3))
+				tracks[i] = generate_bitstream_from_track(i >> 2, 0, 3915, image, i & 3);
+
+	} else if(image->get_variant() == floppy_image::DSHD) {
+		for(unsigned int i=0; i != 160; i++)
+			if(image->track_is_formatted(i >> 1, i & 1)) {
+				tracks[i] = generate_bitstream_from_track(i >> 1, i & 1, 1000, image);
+				if(i & 1)
+					twosided = true;
+			}
+
+	} else {
+		// 200000000 / 60.0 * 1.979e-6 ~= 6.5967
+		static const int cell_size_per_speed_zone[5] = {
+			394 * 65967 / 10000,
+			429 * 65967 / 10000,
+			472 * 65967 / 10000,
+			525 * 65967 / 10000,
+			590 * 65967 / 10000
+		};
+
+		for(unsigned int i=0; i != 160; i++)
+			if(image->track_is_formatted(i >> 1, i & 1)) {
+				tracks[i] = generate_bitstream_from_track(i >> 1, i & 1, cell_size_per_speed_zone[i / (2*16)], image);
+				if(i & 1)
+					twosided = true;
+			}
+	}
+
+	int max_blocks = 0;
+	int total_blocks = 0;
+	for(const auto &t : tracks) {
+		int blocks = (t.size() + 4095) / 4096;
+		total_blocks += blocks;
+		if(max_blocks < blocks)
+			max_blocks = blocks;
+	}
+
+	std::vector<uint8_t> data(1536 + total_blocks*512, 0);
+
+	memcpy(&data[0], signature2, 8);
+
+	w32(data, 12, 0x4F464E49);  // INFO
+	w32(data, 16, 60);          // size
+	data[20] = 2;               // chunk version
+	data[21] = image->get_form_factor() == floppy_image::FF_525 ? 1 : 2;
+	data[22] = 0;               // not write protected
+	data[23] = 1;               // synchronized, since our internal format is
+	data[24] = 1;               // weak bits are generated, not stored
+	data[25] = 'M';
+	data[26] = 'A';
+	data[27] = 'M';
+	data[28] = 'E';
+	memset(&data[29], ' ', 32-4);
+	data[57] = twosided ? 2 : 1;
+	data[58] = 0;               // boot sector unknown
+	data[59] = image->get_form_factor() == floppy_image::FF_525 ? 32 : image->get_variant() == floppy_image::DSHD ? 8 : 16;
+	w16(data, 60, 0);           // compatibility unknown
+	w16(data, 62, 0);           // needed ram unknown
+	w16(data, 64, max_blocks);
+	w32(data, 80, 0x50414D54);  // TMAP
+	w32(data, 84, 160);         // size
+
+	uint8_t tcount = 0;
+	for(int i=0; i != 160 ; i++)
+		data[88 + i] = tracks[i].empty() ? 0xff : tcount++;
+
+	w32(data, 248, 0x534B5254); // TRKS
+	w32(data, 252, 1280 + total_blocks*512);   // size
+
+	uint8_t tid = 0;
+	uint16_t tb = 3;
+	for(int i=0; i != 160 ; i++)
+		if(!tracks[i].empty()) {
+			int blocks = (tracks[i].size() + 4095) / 4096;
+			w16(data, 256 + tid*8, tb);
+			w16(data, 256 + tid*8 + 2, blocks);
+			w32(data, 256 + tid*8 + 4, tracks[i].size());
+			tb += blocks;
+			tid ++;
+		}
+
+	tb = 3;
+	for(int i=0; i != 160 ; i++)
+		if(!tracks[i].empty()) {
+			int off = tb * 512;
+			int size = tracks[i].size();
+			for(int j=0; j != size; j++)
+				if(tracks[i][j])
+					data[off + (j >> 3)] |= 0x80 >> (j & 7);
+			tb += (size + 4095) / 4096;
+		}
+
+	w32(data, 8, crc32r(&data[12], data.size() - 12));
+
+	io_generic_write(io, data.data(), 0, data.size());
+	return true;
+}
+
 
 uint32_t a2_woz_format::find_tag(const std::vector<uint8_t> &data, uint32_t tag)
 {
@@ -1796,6 +1854,20 @@ uint8_t a2_woz_format::r8(const std::vector<uint8_t> &data, uint32_t offset)
 	return data[offset];
 }
 
+void a2_woz_format::w32(std::vector<uint8_t> &data, int offset, uint32_t value)
+{
+	data[offset] = value;
+	data[offset+1] = value >> 8;
+	data[offset+2] = value >> 16;
+	data[offset+3] = value >> 24;
+}
+
+void a2_woz_format::w16(std::vector<uint8_t> &data, int offset, uint16_t value)
+{
+	data[offset] = value;
+	data[offset+1] = value >> 8;
+}
+
 uint32_t a2_woz_format::crc32r(const uint8_t *data, uint32_t size)
 {
 	// Reversed crc32
@@ -1813,3 +1885,174 @@ uint32_t a2_woz_format::crc32r(const uint8_t *data, uint32_t size)
 
 
 const floppy_format_type FLOPPY_WOZ_FORMAT = &floppy_image_format_creator<a2_woz_format>;
+
+
+a2_nib_format::a2_nib_format() : floppy_image_format_t()
+{
+}
+
+const char *a2_nib_format::name() const
+{
+	return "a2_nib";
+}
+
+const char *a2_nib_format::description() const
+{
+	return "Apple II NIB Image";
+}
+
+const char *a2_nib_format::extensions() const
+{
+	return "nib";
+}
+
+bool a2_nib_format::supports_save() const
+{
+	return false;
+}
+
+int a2_nib_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+{
+	const auto size = io_generic_size(io);
+	if (size == expected_size_35t || size == expected_size_40t) {
+		return 50;
+	}
+	return 0;
+}
+
+
+template<class It>
+static
+size_t count_leading_FFs(const It first, const It last)
+{
+	auto curr = first;
+	for (; curr != last; ++curr) {
+		if (*curr != 0xFF) {
+			break;
+		}
+	}
+	return curr - first;
+}
+
+static
+size_t count_trailing_padding(const std::vector<uint8_t>& nibbles) {
+	const auto b = nibbles.rbegin();
+	const auto e = nibbles.rend();
+	auto i = b;
+
+	// skip until the first valid nibble...
+	for (; i != e; ++i) {
+		if ((*i & 0x80) != 0) { // valid nibble
+			break;
+		}
+	}
+	return i - b;
+}
+
+std::vector<uint32_t> a2_nib_format::generate_levels_from_nibbles(const std::vector<uint8_t>& nibbles)
+{
+	std::vector<uint32_t> levels;
+	const auto append_FFs = [&] (size_t count) {
+		while (count-- > 0) {
+			raw_w(levels, 8, 0xFF);
+		}
+	};
+	const auto append_syncs = [&] (size_t count) {
+		while (count-- > 0) {
+			raw_w(levels, 10, 0x00FF << 2);
+		}
+	};
+	const auto append_byte = [&] (uint8_t byte) {
+		raw_w(levels, 8, byte);
+	};
+
+
+	const auto leading_FF_count =
+		count_leading_FFs(nibbles.begin(), nibbles.end());
+
+	if (leading_FF_count >= nibbles.size()) { // all are 0xFF !?!?
+		assert(leading_FF_count >= min_sync_bytes);
+		append_syncs(leading_FF_count);
+		return levels;
+	}
+
+	const auto trailing_padding_size = count_trailing_padding(nibbles);
+	const auto trailing_FF_count =
+		count_leading_FFs(nibbles.rbegin() + trailing_padding_size,
+						  nibbles.rend());
+	const auto wrapped_FF_count = leading_FF_count + trailing_FF_count;
+	const bool wrapped_FF_are_syncs = wrapped_FF_count >= min_sync_bytes;
+
+	if (wrapped_FF_are_syncs) {
+		append_syncs(leading_FF_count);
+	} else {
+		append_FFs(leading_FF_count);
+	}
+
+	{
+		size_t FF_count = 0;
+		const auto flush_FFs = [&] {
+			if (FF_count == 0) {
+				return;
+			}
+
+			if (FF_count >= a2_nib_format::min_sync_bytes) {
+				append_syncs(FF_count);
+			} else {
+				append_FFs(FF_count);
+			}
+			FF_count = 0;
+		};
+
+		const auto end = nibbles.end() - trailing_padding_size - trailing_FF_count;
+		for (auto i = nibbles.begin() + leading_FF_count; i != end; ++i) {
+			const auto nibble = *i;
+			if ((nibble & 0x80) == 0) {
+				continue;
+			}
+
+			if (nibble == 0xFF) {
+				++FF_count;
+				continue;
+			}
+
+			flush_FFs();
+			append_byte(nibble);
+		}
+		flush_FFs();
+	}
+
+	if (wrapped_FF_are_syncs) {
+		append_syncs(trailing_FF_count);
+	} else {
+		append_FFs(trailing_FF_count);
+	}
+
+	return levels;
+}
+
+bool a2_nib_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+{
+	auto size = io_generic_size(io);
+	if (size != expected_size_35t && size != expected_size_40t) {
+		return false;
+	}
+	const auto nr_tracks = size == expected_size_35t? 35 : 40;
+
+	std::vector<uint8_t> nibbles(nibbles_per_track);
+	for (unsigned track = 0; track < nr_tracks; ++track) {
+		io_generic_read(io, &nibbles[0],
+						track * nibbles_per_track, nibbles_per_track);
+		auto levels = generate_levels_from_nibbles(nibbles);
+		generate_track_from_levels(track, 0,
+								   levels,
+								   0, image);
+	}
+
+	image->set_form_variant(floppy_image::FF_525, floppy_image::SSSD);
+
+	return true;
+}
+
+
+const floppy_format_type FLOPPY_NIB_FORMAT = &floppy_image_format_creator<a2_nib_format>;

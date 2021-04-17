@@ -43,7 +43,6 @@ public:
 	memory_bank_creator m_cavelon_bank_object;
 
 	DECLARE_CUSTOM_INPUT_MEMBER(darkplnt_dial_r);
-	template <int Mask> DECLARE_READ_LINE_MEMBER(ckongs_coinage_r);
 	uint8_t hncholms_prot_r();
 	uint8_t scramble_soundram_r(offs_t offset);
 	uint8_t mars_ppi8255_0_r(offs_t offset);
@@ -68,7 +67,6 @@ public:
 	void init_mariner();
 	void init_scramble_ppi();
 	void init_mars();
-	void init_mimonscr();
 	void init_hotshock();
 	void init_ad2083();
 	void init_devilfsh();
@@ -81,8 +79,6 @@ public:
 	void init_tazmani2();
 	void init_tazmaniet();
 	void init_darkplnt();
-	void init_mimonkey();
-	void init_mimonsco();
 	void init_rescue();
 	void init_minefld();
 	void init_hustler();
@@ -117,13 +113,10 @@ public:
 	void devilfsh(machine_config &config);
 	void triplep(machine_config &config);
 	void newsin7(machine_config &config);
-	void mimonscr(machine_config &config);
-	void ckongs(machine_config &config);
 	void mrkougb(machine_config &config);
 	void ad2083_map(address_map &map);
 	void ad2083_sound_io_map(address_map &map);
 	void ad2083_sound_map(address_map &map);
-	void ckongs_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 	void harem_map(address_map &map);
 	void harem_sound_io_map(address_map &map);
@@ -133,7 +126,6 @@ public:
 	void hunchbks_map(address_map &map);
 	void hunchbks_readport(address_map &map);
 	void mars_map(address_map &map);
-	void mimonscr_map(address_map &map);
 	void mrkougar_map(address_map &map);
 	void newsin7_map(address_map &map);
 	void scramble_map(address_map &map);

@@ -47,7 +47,7 @@ void media_identifier::file_info::match(
 		m_matches.emplace_back(
 				util::string_format("%s:%s", list, software.shortname()),
 				std::string(software.longname()),
-				ROM_GETNAME(&rom),
+				std::string(rom.name()),
 				hashes.flag(util::hash_collection::FLAG_BAD_DUMP),
 				false);
 	}
@@ -353,7 +353,7 @@ void media_identifier::match_hashes(std::vector<file_info> &info)
 				}
 
 				// next iterate over softlists
-				for (software_list_device &swlistdev : software_list_device_iterator(device))
+				for (software_list_device &swlistdev : software_list_device_enumerator(device))
 				{
 					if (!listnames.insert(swlistdev.list_name()).second)
 						continue;
@@ -366,7 +366,7 @@ void media_identifier::match_hashes(std::vector<file_info> &info)
 							{
 								for (rom_entry const *rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 								{
-									util::hash_collection romhashes(ROM_GETHASHDATA(rom));
+									util::hash_collection romhashes(rom->hashdata());
 									if (!romhashes.flag(util::hash_collection::FLAG_NO_DUMP))
 									{
 										for (file_info &file : info)

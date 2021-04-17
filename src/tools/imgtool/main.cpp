@@ -29,7 +29,7 @@
 
 static void writeusage(std::wostream &output, bool write_word_usage, const struct command *c, char *argv[])
 {
-	std::string cmdname = core_filename_extract_base(argv[0]);
+	std::string cmdname(core_filename_extract_base(argv[0]));
 
 	util::stream_format(output,
 		L"%s %s %s %s\n",
@@ -97,7 +97,7 @@ static int parse_options(int argc, char *argv[], int minunnamed, int maxunnamed,
 				if (*fork)
 					goto optionalreadyspecified;
 
-				snprintf(buf, ARRAY_LENGTH(buf), "%s", value);
+				snprintf(buf, std::size(buf), "%s", value);
 				*fork = buf;
 			}
 			else
@@ -248,7 +248,7 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	{
 		std::string filesize_string = ent.directory
 			? "<DIR>"
-			: string_format("%u", (unsigned int) ent.filesize);
+			: util::string_format("%u", (unsigned int) ent.filesize);
 
 		if (!ent.lastmodified_time.empty())
 		{
@@ -564,7 +564,7 @@ static int cmd_identify(const struct command *c, int argc, char *argv[])
 	imgtoolerr_t err;
 	int i;
 
-	err = imgtool::image::identify_file(argv[0], modules, ARRAY_LENGTH(modules));
+	err = imgtool::image::identify_file(argv[0], modules, std::size(modules));
 	if (err)
 	{
 		reporterror(err, c, nullptr, argv[0], nullptr, nullptr, nullptr);
@@ -748,7 +748,7 @@ static void listoptions(const util::option_guide &opt_guide, const char *opt_spe
 		const util::option_resolution::entry &entry = *iter;
 				std::stringstream description_buffer;
 
-		std::string opt_name = string_format("--%s", entry.identifier());
+		std::string opt_name = util::string_format("--%s", entry.identifier());
 		const char *opt_desc = entry.display_name();
 
 		// is this option relevant?
@@ -873,7 +873,7 @@ int main(int argc, char *argv[])
 	int result;
 	const struct command *c;
 	const char *sample_format = "coco_jvc_rsdos";
-	std::string cmdname = core_filename_extract_base(argv[0]);
+	std::string cmdname(core_filename_extract_base(argv[0]));
 
 #ifdef _WIN32
 	_setmode(_fileno(stdout), _O_U8TEXT);
@@ -895,7 +895,7 @@ int main(int argc, char *argv[])
 	if (argc > 1)
 	{
 		/* figure out what command they are running, and run it */
-		for (i = 0; i < ARRAY_LENGTH(cmds); i++)
+		for (i = 0; i < std::size(cmds); i++)
 		{
 			c = &cmds[i];
 			if (!core_stricmp(c->name, argv[1]))
@@ -934,7 +934,7 @@ int main(int argc, char *argv[])
 
 	// Usage
 	util::stream_format(std::wcerr, L"imgtool - Generic image manipulation tool for use with MAME\n\n");
-	for (i = 0; i < ARRAY_LENGTH(cmds); i++)
+	for (i = 0; i < std::size(cmds); i++)
 	{
 		writeusage(std::wcerr, (i == 0), &cmds[i], argv);
 	}

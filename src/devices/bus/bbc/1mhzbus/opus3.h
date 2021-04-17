@@ -45,7 +45,7 @@ protected:
 	virtual void jim_w(offs_t offset, uint8_t data) override;
 
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	required_device<ram_device> m_ramdisk;
 	required_device<wd1770_device> m_fdc;

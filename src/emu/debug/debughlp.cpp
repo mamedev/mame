@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "debughlp.h"
+#include "corestr.h"
 #include <cctype>
 
 
@@ -100,6 +101,7 @@ static const help_item static_help_list[] =
 		"  stateload[sl] <filename> -- load a state file for the current driver\n"
 		"  snap [<filename>] -- save a screen snapshot.\n"
 		"  source <filename> -- reads commands from <filename> and executes them one by one\n"
+		"  cls -- clears the console text buffer\n"
 		"  quit -- exits MAME and the debugger\n"
 	},
 	{
@@ -126,9 +128,11 @@ static const help_item static_help_list[] =
 		"  save <filename>,<address>,<length>[,<CPU>] -- save binary program memory to the given file\n"
 		"  saved <filename>,<address>,<length>[,<CPU>] -- save binary data memory to the given file\n"
 		"  savei <filename>,<address>,<length>[,<CPU>] -- save binary I/O memory to the given file\n"
+		"  saver <filename>,<address>,<length>,<region> -- save binary memory region to the given file\n"
 		"  load <filename>,<address>[,<length>,<CPU>] -- load binary program memory from the given file\n"
 		"  loadd <filename>,<address>[,<length>,<CPU>] -- load binary data memory from the given file\n"
 		"  loadi <filename>,<address>[,<length>,<CPU>] -- load binary I/O memory from the given file\n"
+		"  loadr <filename>,<address>,<length>,<region> -- load binary memory region from the given file\n"
 		"  map <address> -- map logical program address to physical address and bank\n"
 		"  mapd <address> -- map logical data address to physical address and bank\n"
 		"  mapi <address> -- map logical I/O address to physical address and bank\n"
@@ -688,13 +692,28 @@ static const help_item static_help_list[] =
 		"  Saves data memory addresses 3000-3fff from CPU #3 to the binary file 'harddriv.bin'.\n"
 	},
 	{
+		"saver",
+		"\n"
+		"  saver <filename>,<address>,<length>,<region>\n"
+		"\n"
+		"The saver command saves the raw content of memory region <region> to the binary file specified in the "
+		"<filename> parameter. <address> indicates the address of the start of saving, and <length> indicates "
+		"how much memory to save. The range <address> through <address>+<length>-1 inclusive will be output to "
+		"the file.\n"
+		"\n"
+		"Example:\n"
+		"\n"
+		"saver harddriv.bin,80000,40000,:maincpu\n"
+		"  Saves :maincpu region addresses 80000-bffff to the binary file 'harddriv.bin'.\n"
+	},
+	{
 		"load",
 		"\n"
 		"  load[{d|i}] <filename>,<address>[,<length>,<CPU>]\n"
 		"\n"
 		"The load/loadd/loadi commands load raw memory from the binary file specified in the <filename> "
 		"parameter. 'load' will load program space memory, while 'loadd' will load data space memory "
-		"and 'loadi' will load I/O space memory. <address> indicates the address of the start of saving, "
+		"and 'loadi' will load I/O space memory. <address> indicates the address of the start of loading, "
 		"and <length> indicates how much memory to load. The range <address> through <address>+<length>-1 "
 		"inclusive will be read in from the file. If you specify <length> = 0 or a length greater than the "
 		"total length of the file it will load the entire contents of the file and no more. You can also load "
@@ -708,6 +727,22 @@ static const help_item static_help_list[] =
 		"\n"
 		"loadd harddriv.bin,3000,1000,3\n"
 		"  Loads data memory addresses 3000-3fff from CPU #3 from the binary file 'harddriv.bin'.\n"
+	},
+	{
+		"loadr",
+		"\n"
+		"  loadr <filename>,<address>,<length>,<region>\n"
+		"\n"
+		"The loadr command loads raw memory in the memory region <region> from the binary file specified "
+		"in the <filename> parameter. <address> indicates the address of the start of loading, and <length> "
+		"indicates how much memory to load. The range <address> through <address>+<length>-1 inclusive will "
+		"be read in from the file. If you specify <length> = 0 or a length greater than the total length of "
+		"the file it will load the entire contents of the file and no more.\n"
+		"\n"
+		"Example:\n"
+		"\n"
+		"loadr harddriv.bin,80000,40000,:maincpu\n"
+		"  Loads addresses 80000-bffff in the :maincpu region from the binary file 'harddriv.bin'.\n"
 	},
 	{
 		"step",
@@ -1603,7 +1638,7 @@ const char *debug_get_help(const char *tag)
 	size_t taglen = strlen(tag);
 
 	/* find a match */
-	for (i = 0; i < ARRAY_LENGTH(static_help_list); i++)
+	for (i = 0; i < std::size(static_help_list); i++)
 		if (!core_strnicmp(static_help_list[i].tag, tag, taglen))
 		{
 			foundcount++;
@@ -1625,7 +1660,7 @@ const char *debug_get_help(const char *tag)
 
 	/* otherwise, indicate ambiguous help */
 	msglen = sprintf(ambig_message, "Ambiguous help request, did you mean:\n");
-	for (i = 0; i < ARRAY_LENGTH(static_help_list); i++)
+	for (i = 0; i < std::size(static_help_list); i++)
 		if (!core_strnicmp(static_help_list[i].tag, tag, taglen))
 			msglen += sprintf(&ambig_message[msglen], "  help %s?\n", static_help_list[i].tag);
 	return ambig_message;

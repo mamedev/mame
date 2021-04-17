@@ -57,6 +57,7 @@ public:
 	// mapping helpers
 	void map_as_rom(u32 offset, u32 length, offs_t mirror, const char *bank_name, const char *decrypted_bank_name, offs_t rgnoffset, write16_delegate whandler);
 	void map_as_ram(u32 offset, u32 length, offs_t mirror, const char *bank_share_name, write16_delegate whandler);
+	void map_as_region(u32 offset, u32 length, offs_t mirror, const char *region_name, write16_delegate whandler);
 	void map_as_handler(u32 offset, u32 length, offs_t mirror, read16_delegate rhandler, write16_delegate whandler);
 
 	// perform an explicit configuration (for bootlegs with hard-coded mappings)

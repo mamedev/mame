@@ -4,7 +4,7 @@
 
     machine/mac.c
 
-    Mac hardware - Mac 128k, 512k, 512ke, Plus, SE, Classic, II, PowerBook (SCSI, SCC, ADB, etc)
+    Mac II series hardware
 
     Nate Woods
     Ernesto Corvi
@@ -13,14 +13,6 @@
 
     Mac Model Feature Summary:
                                 CPU             FDC     Kbd/Mouse  PRAM     Video
-         - Mac 128k             68k             IWM     orig       orig     Original
-         - Mac 512k             68k             IWM     orig       orig     Original
-         - Mac 512ke            68k             IWM     orig       orig     Original
-         - Mac Plus             68k             IWM     orig       ext      Original
-         - Mac SE               68k             IWM     MacII ADB  ext      Original
-         - Mac Classic          68k             SWIM    MacII ADB  ext      Original
-         - Mac Portable         68k (16 MHz)    SWIM    ADB-PMU    PMU      640x400 B&W
-         - PowerBook 100        68k (16 MHz)    SWIM    ADB-PMU    PMU      640x400 B&W
          - Mac II               020             IWM     MacII ADB  ext      NuBus card
          - Mac IIx              030             SWIM    MacII ADB  ext      NuBus card
          - Mac IIfx             030             SWIM    IOP ADB    ext      NuBus card
@@ -28,22 +20,14 @@
          - Mac IIcx             030             SWIM    MacII ADB  ext      NuBus card
          - Mac IIci             030             SWIM    MacII ADB  ext      Internal "RBV" type
          - Mac IIsi             030             SWIM    Egret ADB  n/a      Internal "RBV" type
-         - PowerBook 140/145(B) 030 (16/25 MHz) SWIM    ADB-PMU    PMU      640x400 B&W (passive matrix)
-         - PowerBook 170        030 (25 MHz)    SWIM    ADB-PMU    PMU      640x400 B&W (active matrix)
          - Mac IIvx/IIvi        030             SWIM    Egret ADB  n/a      Internal "VASP" type
          - Mac LC               020             SWIM    Egret ADB  n/a      Internal "V8" type
          - Mac LC II            030             SWIM    Egret ADB  n/a      Internal "V8" type
          - Mac LC III           030             SWIM    Egret ADB  n/a      Internal "Sonora" type
          - Mac Classic II       030             SWIM    Egret ADB  n/a      Internal "Eagle" type (V8 clone)
          - Mac Color Classic    030             SWIM    Cuda ADB   n/a      Internal "Spice" type (V8 clone)
-         - Mac Quadra 700       040 (25 MHz)    SWIM II MacII ADB  ext      Internal "DAFB" type
-         - Mac Quadra 900       040 (33 MHz)    SWIM II IOP ADB    ext      Internal "DAFB" type
 
     Notes:
-        - The Mac Plus boot code seems to check to see the extent of ROM
-          mirroring to determine if SCSI is available.  If the ROM is mirrored,
-          then SCSI is not available.  Thanks to R. Belmont for making this
-          discovery.
         - On the SE and most later Macs, the first access to ROM turns off the overlay.
           However, the Mac II/IIx/IIcx (and others?) have the old-style VIA overlay control bit!
         - The Mac II can have either a 68551 PMMU fitted or an Apple custom that handles 24 vs. 32
@@ -93,14 +77,10 @@
 #include "emu.h"
 #include "includes/mac.h"
 #include "machine/sonydriv.h"
-
-#define AUDIO_IS_CLASSIC (m_model <= MODEL_MAC_CLASSIC)
-#define MAC_HAS_VIA2    ((m_model >= MODEL_MAC_II) && (m_model != MODEL_MAC_IIFX))
+#include "machine/iwm.h"
+#include "machine/swim1.h"
 
 #define INTS_RBV    ((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIVI)) || ((m_model >= MODEL_MAC_LC) && (m_model <= MODEL_MAC_LC_580))
-
-#define MAC_MAIN_SND_BUF_OFFSET 0x0300
-#define MAC_ALT_SND_BUF_OFFSET  0x5F00
 
 #ifdef MAME_DEBUG
 #define LOG_ADB         0
@@ -160,18 +140,7 @@ void mac_state::field_interrupts()
 {
 	int take_interrupt = -1;
 
-	if (m_model < MODEL_MAC_PORTABLE)
-	{
-		if ((m_scc_interrupt) || (m_scsi_interrupt))
-		{
-			take_interrupt = 2;
-		}
-		else if (m_via_interrupt)
-		{
-			take_interrupt = 1;
-		}
-	}
-	else if ((m_model < MODEL_MAC_POWERMAC_6100) && (m_model != MODEL_MAC_IIFX))
+	if (m_model != MODEL_MAC_IIFX)
 	{
 		if (m_scc_interrupt)
 		{
@@ -188,7 +157,7 @@ void mac_state::field_interrupts()
 	}
 	else
 	{
-		return; // no interrupts for PowerPC yet
+		return; // no interrupts for IIfx yet
 	}
 
 	if (m_last_taken_interrupt > -1)
@@ -238,7 +207,7 @@ WRITE_LINE_MEMBER(mac_state::mac_asc_irq)
 			rbv_recalc_irqs();
 		}
 	}
-	else if ((m_model >= MODEL_MAC_II) && (m_model != MODEL_MAC_IIFX))
+	else if (m_model != MODEL_MAC_IIFX)
 	{
 		m_via2->write_cb1(state^1);
 	}
@@ -409,12 +378,6 @@ void mac_state::set_memory_overlay(int overlay)
 			space.unmap_write(0x000000, 0x9fffff);
 			mac_install_memory(0x000000, memory_size-1, memory_size, memory_data, is_rom);
 		}
-		else if ((m_model == MODEL_MAC_PB140) || (m_model == MODEL_MAC_PB160) || ((m_model >= MODEL_MAC_PBDUO_210) && (m_model <= MODEL_MAC_PBDUO_270c)))
-		{
-			address_space& space = m_maincpu->space(AS_PROGRAM);
-			space.unmap_write(0x000000, 0xffffff);
-			mac_install_memory(0x000000, memory_size-1, memory_size, memory_data, is_rom);
-		}
 		else if ((m_model >= MODEL_MAC_II) && (m_model <= MODEL_MAC_SE30) && (m_model != MODEL_MAC_IIVX) && (m_model != MODEL_MAC_IIVI))
 		{
 			mac_install_memory(0x00000000, 0x3fffffff, memory_size, memory_data, is_rom);
@@ -432,14 +395,6 @@ void mac_state::set_memory_overlay(int overlay)
 				size_t rom_mirror = 0xfffffff ^ (m_rom_size - 1);
 				m_maincpu->space(AS_PROGRAM).install_rom(0x40000000, 0x4fffffff & ~rom_mirror, rom_mirror, m_rom_ptr);
 			}
-		}
-		else if (m_model == MODEL_MAC_QUADRA_700)
-		{
-			if (!is_rom)
-			{
-				mac_install_memory(0x40000000, 0x400fffff, m_rom_size, m_rom_ptr, true);
-			}
-			mac_install_memory(0x00000000, memory_size-1, memory_size, memory_data, is_rom);
 		}
 		else
 		{
@@ -622,6 +577,9 @@ WRITE_LINE_MEMBER(mac_state::mac_scsi_irq)
  * *************************************************************************/
 uint16_t mac_state::mac_scc_r(offs_t offset)
 {
+	if (!machine().side_effects_disabled())
+		mac_via_sync();
+
 	uint16_t result;
 
 	result = m_scc->reg_r(offset);
@@ -630,11 +588,13 @@ uint16_t mac_state::mac_scc_r(offs_t offset)
 
 void mac_state::mac_scc_w(offs_t offset, uint16_t data)
 {
+	mac_via_sync();
 	m_scc->reg_w(offset, data);
 }
 
 void mac_state::mac_scc_2_w(offs_t offset, uint16_t data)
 {
+	mac_via_sync();
 	m_scc->reg_w(offset, data >> 8);
 }
 
@@ -654,6 +614,9 @@ uint16_t mac_state::mac_iwm_r(offs_t offset, uint16_t mem_mask)
 
 	uint16_t result = m_fdc->read(offset >> 8);
 
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-5);
+
 	if (LOG_MAC_IWM)
 		printf("%s mac_iwm_r: offset=0x%08x mem_mask %04x = %02x\n", machine().describe_context().c_str(), offset, mem_mask, result);
 
@@ -669,6 +632,9 @@ void mac_state::mac_iwm_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_fdc->write((offset >> 8), data & 0xff);
 	else
 		m_fdc->write((offset >> 8), data>>8);
+
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-5);
 }
 
 WRITE_LINE_MEMBER(mac_state::mac_adb_via_out_cb2)
@@ -733,13 +699,9 @@ uint8_t mac_state::mac_via_in_a()
 
 	switch (m_model)
 	{
-		case MODEL_MAC_CLASSIC:
 		case MODEL_MAC_II:
 		case MODEL_MAC_II_FDHD:
 		case MODEL_MAC_IIX:
-		case MODEL_MAC_POWERMAC_6100:
-		case MODEL_MAC_POWERMAC_7100:
-		case MODEL_MAC_POWERMAC_8100:
 			return 0x81;        // bit 0 must be set on most Macs to avoid attempting to boot from AppleTalk
 
 		case MODEL_MAC_SE30:
@@ -763,14 +725,9 @@ uint8_t mac_state::mac_via_in_a()
 		case MODEL_MAC_IICX:
 			return 0x81 | PA6;
 
-		case MODEL_MAC_PB140:   // since the ASICs are different, these are allowed to "collide"
-		case MODEL_MAC_PB160:
 		case MODEL_MAC_CLASSIC_II:
 		case MODEL_MAC_QUADRA_800:
 			return 0x81 | PA4 | PA1;
-
-		case MODEL_MAC_QUADRA_700:
-			return 0x81 | PA6;
 
 		case MODEL_MAC_QUADRA_900:
 			return 0x81 | PA6 | PA4;
@@ -807,6 +764,7 @@ uint8_t mac_state::mac_via_in_b()
 	}
 	else if (ADB_IS_CUDA)
 	{
+		logerror("%s cuda treq %d\n", machine().time().to_string(), m_cuda->get_treq());
 		val |= m_cuda->get_treq()<<3;
 	}
 
@@ -850,7 +808,8 @@ void mac_state::mac_via_out_a(uint8_t data)
 
 	set_scc_waitrequest((data & 0x80) >> 7);
 	m_screen_buffer = (data & 0x40) >> 6;
-	sony_set_sel_line(m_fdc.target(), (data & 0x20) >> 5);
+	if (m_cur_floppy)
+		m_cur_floppy->ss_w((data & 0x20) >> 5);
 }
 
 void mac_state::mac_via_out_b(uint8_t data)
@@ -912,8 +871,34 @@ WRITE_LINE_MEMBER(mac_state::mac_via_irq)
 	set_via_interrupt(state);
 }
 
+void mac_state::mac_via_sync()
+{
+	// The via runs at 783.36KHz while the main cpu runs at 15MHz or
+	// more, so we need to sync the access with the via clock.  Plus
+	// the whole access takes half a (via) cycle and ends when synced
+	// with the main cpu again.
+
+	// Get the main cpu time
+	u64 cycle = m_maincpu->total_cycles();
+
+	// Get the number of the cycle the via is in at that time
+	u64 via_cycle = cycle * m_via1->clock() / m_maincpu->clock();
+
+	// The access is going to start at via_cycle+1 and end at
+	// via_cycle+1.5, compute what that means in maincpu cycles (the
+	// +1 rounds up, since the clocks are too different to ever be
+	// synced).
+	u64 main_cycle = (via_cycle*2+3) * m_maincpu->clock() / (2*m_via1->clock()) + 1;
+
+	// Finally adjust the main cpu icount as needed.
+	m_maincpu->adjust_icount(-int(main_cycle - cycle));
+}
+
 uint16_t mac_state::mac_via_r(offs_t offset)
 {
+	if (!machine().side_effects_disabled())
+		mac_via_sync();
+
 	uint16_t data;
 
 	offset >>= 8;
@@ -923,13 +908,13 @@ uint16_t mac_state::mac_via_r(offs_t offset)
 		logerror("mac_via_r: offset=0x%02x\n", offset);
 	data = m_via1->read(offset);
 
-	m_maincpu->adjust_icount(m_via_cycles);
-
 	return (data & 0xff) | (data << 8);
 }
 
 void mac_state::mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	mac_via_sync();
+
 	offset >>= 8;
 	offset &= 0x0f;
 
@@ -940,8 +925,6 @@ void mac_state::mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_via1->write(offset, data & 0xff);
 	if (ACCESSING_BITS_8_15)
 		m_via1->write(offset, (data >> 8) & 0xff);
-
-	m_maincpu->adjust_icount(m_via_cycles);
 }
 
 /* *************************************************************************
@@ -1075,66 +1058,10 @@ void mac_state::machine_reset()
 
 	m_rbv_vbltime = 0;
 
-	if (m_model >= MODEL_MAC_POWERMAC_6100 && m_model <= MODEL_MAC_POWERMAC_8100)
-	{
-		m_awacs->set_dma_base(m_maincpu->space(AS_PROGRAM), 0x10000, 0x12000);
-	}
-
 	// start 60.15 Hz timer for most systems
 	if (((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIVI)) || (m_model >= MODEL_MAC_LC))
 	{
 		m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
-	}
-
-	// we use the CPU clock divided by the VIA clock (783360 Hz) rounded up as
-	// an approximation for the right number of wait states.  this yields good
-	// results - it's towards the end of the worst-case delay on h/w.
-	switch (m_maincpu->clock())
-	{
-		case 7833600:   // C7M on classic Macs
-			m_via_cycles = -10;
-			break;
-
-		case 7833600*2: // "16 MHz" Macs
-			m_via_cycles = -32;
-			break;
-
-		case 20000000:  // 20 MHz Macs
-			m_via_cycles = -40;
-			break;
-
-		case 25000000:  // 25 MHz Macs
-			m_via_cycles = -50;
-			break;
-
-		case 7833600*4: // 32 MHz Macs (these are C7M * 4 like IIvx)
-			m_via_cycles = -62;
-			break;
-
-		case 33000000:  // 33 MHz Macs ('040s)
-			m_via_cycles = -64;
-			break;
-
-		case 40000000:  // 40 MHz Macs
-			m_via_cycles = -80;
-			break;
-
-		case 60000000:  // 60 MHz PowerMac
-			m_via_cycles = -120;
-			break;
-
-		case 66000000:  // 66 MHz PowerMac
-			m_via_cycles = -128;
-			break;
-
-		default:
-			fatalerror("mac: unknown clock\n");
-	}
-
-	// Egret currently needs more dramatic VIA slowdowns.  Need to determine what's realistic.
-	if (ADB_IS_EGRET)
-	{
-		m_via_cycles *= 35;
 	}
 
 	// default to 32-bit mode on LC
@@ -1147,11 +1074,8 @@ void mac_state::machine_reset()
 	m_last_taken_interrupt = -1;
 
 	/* setup the memory overlay */
-	if (m_model < MODEL_MAC_POWERMAC_6100)  // no overlay for PowerPC
-	{
-		m_overlay = -1; // insure no match
-		this->set_memory_overlay(1);
-	}
+	m_overlay = -1; // insure no match
+	this->set_memory_overlay(1);
 
 	if (m_overlay_timeout != (emu_timer *)nullptr)
 	{
@@ -1176,7 +1100,7 @@ void mac_state::machine_reset()
 	/* setup videoram */
 	this->m_screen_buffer = 1;
 
-	if (MAC_HAS_VIA2)  // prime CB1 for ASC and slot interrupts
+	if (m_model != MODEL_MAC_IIFX)  // prime CB1 for ASC and slot interrupts
 	{
 		m_via2_ca1_hack = 1;
 		m_via2->write_ca1(1);
@@ -1193,7 +1117,7 @@ void mac_state::machine_reset()
 
 WRITE_LINE_MEMBER(mac_state::cuda_reset_w)
 {
-	if ((state == ASSERT_LINE) && (m_model < MODEL_MAC_POWERMAC_6100))
+	if (state == ASSERT_LINE)
 	{
 		set_memory_overlay(0);
 		set_memory_overlay(1);
@@ -1207,11 +1131,8 @@ void mac_state::mac_state_load()
 {
 	int overlay;
 	overlay = m_overlay;
-	if (m_model < MODEL_MAC_POWERMAC_6100) // no overlay for PowerPC
-	{
-		m_overlay = -1;
-		set_memory_overlay(overlay);
-	}
+	m_overlay = -1;
+	set_memory_overlay(overlay);
 }
 
 
@@ -1250,15 +1171,6 @@ uint32_t mac_state::mac_read_id()
 		case MODEL_MAC_LC_575:
 			return 0xa55a222e;
 
-		case MODEL_MAC_POWERMAC_6100:
-			return 0xa55a3011;
-
-		case MODEL_MAC_POWERMAC_7100:
-			return 0xa55a3012;
-
-		case MODEL_MAC_POWERMAC_8100:
-			return 0xa55a3013;
-
 		case MODEL_MAC_PBDUO_210:
 			return 0xa55a1004;
 
@@ -1288,6 +1200,8 @@ uint32_t mac_state::mac_read_id()
 	}
 }
 
+#include "cpu/powerpc/ppc.h"
+
 void mac_state::mac_driver_init(model_t model)
 {
 	m_overlay = 1;
@@ -1297,25 +1211,12 @@ void mac_state::mac_driver_init(model_t model)
 	m_rom_size = memregion("bootrom")->bytes();
 	m_rom_ptr = reinterpret_cast<uint32_t *>(memregion("bootrom")->base());
 
-	if (model < MODEL_MAC_PORTABLE)
-	{
-		/* set up RAM mirror at 0x600000-0x6fffff (0x7fffff ???) */
-		mac_install_memory(0x600000, 0x6fffff, m_ram->size(), m_ram->pointer(), false);
-
-		/* set up ROM at 0x400000-0x4fffff (-0x5fffff for mac 128k/512k/512ke) */
-		mac_install_memory(0x400000, (model >= MODEL_MAC_PLUS) ? 0x4fffff : 0x5fffff,
-			m_rom_size, m_rom_ptr, true);
-	}
-
 	m_overlay = -1;
-	if (m_model < MODEL_MAC_POWERMAC_6100) // no overlay for PowerPC
-	{
-		set_memory_overlay(1);
-	}
+	set_memory_overlay(1);
 
 	memset(m_ram->pointer(), 0, m_ram->size());
 
-	if ((model == MODEL_MAC_SE) || (model == MODEL_MAC_CLASSIC) || (model == MODEL_MAC_CLASSIC_II) || (model == MODEL_MAC_LC) || (model == MODEL_MAC_COLOR_CLASSIC) || (model >= MODEL_MAC_LC_475 && model <= MODEL_MAC_LC_580) ||
+	if ((model == MODEL_MAC_CLASSIC_II) || (model == MODEL_MAC_LC) || (model == MODEL_MAC_COLOR_CLASSIC) || (model >= MODEL_MAC_LC_475 && model <= MODEL_MAC_LC_580) ||
 		(model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || (model == MODEL_MAC_LC_III_PLUS) || ((m_model >= MODEL_MAC_II) && (m_model <= MODEL_MAC_SE30)))
 	{
 		m_overlay_timeout = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::overlay_timeout_func),this));
@@ -1335,8 +1236,6 @@ void mac_state::init_##label()     \
 	mac_driver_init(model); \
 }
 
-MAC_DRIVER_INIT(macse, MODEL_MAC_SE)
-MAC_DRIVER_INIT(macclassic, MODEL_MAC_CLASSIC)
 MAC_DRIVER_INIT(maclc, MODEL_MAC_LC)
 MAC_DRIVER_INIT(maclc2, MODEL_MAC_LC_II)
 MAC_DRIVER_INIT(maclc3, MODEL_MAC_LC_III)
@@ -1347,9 +1246,6 @@ MAC_DRIVER_INIT(macii, MODEL_MAC_II)
 MAC_DRIVER_INIT(macse30, MODEL_MAC_SE30)
 MAC_DRIVER_INIT(macclassic2, MODEL_MAC_CLASSIC_II)
 MAC_DRIVER_INIT(maclrcclassic, MODEL_MAC_COLOR_CLASSIC)
-MAC_DRIVER_INIT(macpm6100, MODEL_MAC_POWERMAC_6100)
-MAC_DRIVER_INIT(macpm7100, MODEL_MAC_POWERMAC_7100)
-MAC_DRIVER_INIT(macpm8100, MODEL_MAC_POWERMAC_8100)
 MAC_DRIVER_INIT(maciivx, MODEL_MAC_IIVX)
 MAC_DRIVER_INIT(maciivi, MODEL_MAC_IIVI)
 MAC_DRIVER_INIT(maciifx, MODEL_MAC_IIFX)
@@ -1404,16 +1300,9 @@ void mac_state::nubus_slot_interrupt(uint8_t slot, uint32_t state)
 void mac_state::vblank_irq()
 {
 	/* handle ADB keyboard/mouse */
-	if (has_adb() && m_macadb)
+	if (m_macadb)
 	{
 		m_macadb->adb_vblank();
-	}
-
-	/* signal VBlank on CA1 input on the VIA */
-	if ((m_model < MODEL_MAC_II) || (m_model == MODEL_MAC_PB140) || (m_model == MODEL_MAC_PB160) || (m_model == MODEL_MAC_QUADRA_700))
-	{
-		ca1_data ^= 1;
-		m_via1->write_ca1(ca1_data);
 	}
 
 	if (++irq_count == 60)
@@ -2314,7 +2203,7 @@ const char *lookup_trap(uint16_t opcode)
 
 	int i;
 
-	for (i = 0; i < ARRAY_LENGTH(traps); i++)
+	for (i = 0; i < std::size(traps); i++)
 	{
 		if (traps[i].trap == opcode)
 			return traps[i].name;
@@ -2411,7 +2300,7 @@ void mac_state::mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 		csCode = *((uint16_t*) (mem + a0 + 26));
 		sprintf(s->state().state_int(" ioVRefNum=%i ioCRefNum=%i csCode=%i", ioVRefNum, ioCRefNum, csCode);
 
-		for (i = 0; i < ARRAY_LENGTH(cscodes); i++)
+		for (i = 0; i < std::size(cscodes); i++)
 		{
 			if (cscodes[i].csCode == csCode)
 			{
@@ -2447,7 +2336,7 @@ void mac_state::mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 
 	case 0xa815:    /* _SCSIDispatch */
 		i = *((uint16_t*) (mem + a7));
-		if (i < ARRAY_LENGTH(scsisels))
+		if (i < std::size(scsisels))
 			if (scsisels[i])
 				sprintf(s, " (%s)", scsisels[i]);
 		break;
@@ -2456,3 +2345,31 @@ void mac_state::mac_tracetrap(const char *cpu_name_local, int addr, int trap)
 	logerror("mac_trace_trap: %s at 0x%08x: %s\n",cpu_name_local, addr, buf);
 }
 #endif
+
+void mac_state::phases_w(uint8_t phases)
+{
+	if(m_cur_floppy)
+		m_cur_floppy->seek_phase_w(phases);
+}
+
+void mac_state::sel35_w(int sel35)
+{
+	logerror("fdc mac sel35 %d\n", sel35);
+}
+
+void mac_state::devsel_w(uint8_t devsel)
+{
+	if(devsel == 1)
+		m_cur_floppy = m_floppy[0]->get_device();
+	else if(devsel == 2)
+		m_cur_floppy = m_floppy[1]->get_device();
+	else
+		m_cur_floppy = nullptr;
+	m_fdc->set_floppy(m_cur_floppy);
+	if(m_cur_floppy)
+		m_cur_floppy->ss_w((m_via1->read_pa() & 0x20) >> 5);
+}
+
+void mac_state::hdsel_w(int hdsel)
+{
+}

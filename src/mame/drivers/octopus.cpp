@@ -288,8 +288,8 @@ private:
 
 void octopus_state::octopus_mem(address_map &map)
 {
-	map(0x00000, 0xcffff).bankrw("main_ram_bank");
-	map(0xd0000, 0xdffff).ram().share("vram");
+	map(0x00000, 0xcffff).rw(m_ram, FUNC(ram_device::read), FUNC(ram_device::write));
+	//map(0xd0000, 0xdffff).ram().share("vram");
 	map(0xe0000, 0xe3fff).noprw();
 	map(0xe4000, 0xe5fff).ram().share("fram");
 	map(0xe6000, 0xe7fff).rom().region("chargen", 0);
@@ -975,8 +975,8 @@ void octopus_state::octopus(machine_config &config)
 	FD1793(config, m_fdc, 16_MHz_XTAL / 8);
 	m_fdc->intrq_wr_callback().set(m_pic1, FUNC(pic8259_device::ir5_w));
 	m_fdc->drq_wr_callback().set(m_dma2, FUNC(am9517a_device::dreq1_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", octopus_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", octopus_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 	SOFTWARE_LIST(config, "fd_list").set_original("octopus");
 
 	PIT8253(config, m_pit, 0);
@@ -1024,7 +1024,7 @@ void octopus_state::octopus(machine_config &config)
 	m_crtc->set_addrmap(0, &octopus_state::octopus_vram);
 	m_crtc->set_screen("screen");
 
-	ADDRESS_MAP_BANK(config, "z80_bank").set_map(&octopus_state::octopus_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x10000);
+	ADDRESS_MAP_BANK(config, m_z80_bankdev).set_map(&octopus_state::octopus_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x10000);
 
 	RAM(config, "ram").set_default_size("256K").set_extra_options("128K,512K,768K");
 }

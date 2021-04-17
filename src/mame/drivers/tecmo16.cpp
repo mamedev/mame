@@ -17,8 +17,12 @@ TODO:
   fstarfrc relies on the interrupt being held for a while,
   otherwise the titlescreen background goes wrong.
   If I had to guess: 24/4(6MHz) pixel clock, 384 hclocks, 264 scanlines
+  riot does not like multiple interrupts per frame and will start to
+  fail towards the end of level 1 (bad palette) then randomly lock up
+  on level 2, see irq_150021_w / irq_150031_w for notes
 - there could be some priorities problems in riot
   (more noticeable in level 2)
+- check layer offsets
 
 Notes:
 - To enter into service mode in Final Star Force press and hold start
@@ -41,55 +45,76 @@ Notes:
 
 /******************************************************************************/
 
-void tecmo16_state::fstarfrc_map(address_map &map)
+
+/*
+(without setting D0)
+move.b D0, $150031.l  (start of interupt)
+move.b D0, $150021.l  (end of interrupt in riot, straight after above in ginkun, not used in fstarfrc?)
+*/
+
+void tecmo16_state::irq_150021_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	// does this disable the vblank IRQ until next frame? fstarfrc expects multiple interrupts per
+	// frame and never writes it, while the others do. riot will start to glitch towards the end
+	// of stage 1, locking up on stage 2 if you allow multiple interrupts per frame.
+	m_maincpu->set_input_line(5, CLEAR_LINE);
+}
+
+void tecmo16_state::irq_150031_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	// all games write this at the start of interrupt, is it the basic 'irq ack' (but without
+	// disabling further interrupts?) could also be some kind of DMA trigger (palette or similar)
+}
+
+void tecmo16_state::common_map(address_map& map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram(); /* Main RAM */
-	map(0x110000, 0x110fff).ram().w(FUNC(tecmo16_state::charram_w)).share("charram");
-	map(0x120000, 0x1207ff).ram().w(FUNC(tecmo16_state::videoram_w)).share("videoram");
-	map(0x120800, 0x120fff).ram().w(FUNC(tecmo16_state::colorram_w)).share("colorram");
-	map(0x121000, 0x1217ff).ram().w(FUNC(tecmo16_state::videoram2_w)).share("videoram2");
-	map(0x121800, 0x121fff).ram().w(FUNC(tecmo16_state::colorram2_w)).share("colorram2");
-	map(0x122000, 0x127fff).ram(); /* work area */
+
+	// tilemap sizes differ between games, probably configurable
+	// but for now we add them in different maps
+
 	map(0x130000, 0x130fff).ram().share("spriteram");
 	map(0x140000, 0x141fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x150000, 0x150001).w(FUNC(tecmo16_state::flipscreen_w));
 	map(0x150011, 0x150011).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x150030, 0x150031).portr("DSW2").nopw();   /* ??? */
+	map(0x150020, 0x150021).portr("EXTRA").w(FUNC(tecmo16_state::irq_150021_w));
+	map(0x150030, 0x150031).portr("DSW2").w(FUNC(tecmo16_state::irq_150031_w));
 	map(0x150040, 0x150041).portr("DSW1");
 	map(0x150050, 0x150051).portr("P1_P2");
 //  map(0x160000, 0x160001).nopr();   /* ??? Read at every scene changes */
-	map(0x160000, 0x160001).w(FUNC(tecmo16_state::scroll_char_x_w));
-	map(0x16000c, 0x16000d).w(FUNC(tecmo16_state::scroll_x_w));
-	map(0x160012, 0x160013).w(FUNC(tecmo16_state::scroll_y_w));
-	map(0x160018, 0x160019).w(FUNC(tecmo16_state::scroll2_x_w));
-	map(0x16001e, 0x16001f).w(FUNC(tecmo16_state::scroll2_y_w));
-}
-
-void tecmo16_state::ginkun_map(address_map &map)
-{
-	map(0x000000, 0x07ffff).rom();
-	map(0x100000, 0x103fff).ram(); /* Main RAM */
-	map(0x110000, 0x110fff).ram().w(FUNC(tecmo16_state::charram_w)).share("charram");
-	map(0x120000, 0x120fff).ram().w(FUNC(tecmo16_state::videoram_w)).share("videoram");
-	map(0x121000, 0x121fff).ram().w(FUNC(tecmo16_state::colorram_w)).share("colorram");
-	map(0x122000, 0x122fff).ram().w(FUNC(tecmo16_state::videoram2_w)).share("videoram2");
-	map(0x123000, 0x123fff).ram().w(FUNC(tecmo16_state::colorram2_w)).share("colorram2");
-	map(0x124000, 0x124fff).ram(); /* extra RAM for Riot */
-	map(0x130000, 0x130fff).ram().share("spriteram");
-	map(0x140000, 0x141fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x150000, 0x150001).w(FUNC(tecmo16_state::flipscreen_w));
-	map(0x150011, 0x150011).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x150020, 0x150021).portr("EXTRA").nopw();  /* ??? */
-	map(0x150030, 0x150031).portr("DSW2").nopw();   /* ??? */
-	map(0x150040, 0x150041).portr("DSW1");
-	map(0x150050, 0x150051).portr("P1_P2");
 	map(0x160000, 0x160001).w(FUNC(tecmo16_state::scroll_char_x_w));
 	map(0x160006, 0x160007).w(FUNC(tecmo16_state::scroll_char_y_w));
 	map(0x16000c, 0x16000d).w(FUNC(tecmo16_state::scroll_x_w));
 	map(0x160012, 0x160013).w(FUNC(tecmo16_state::scroll_y_w));
 	map(0x160018, 0x160019).w(FUNC(tecmo16_state::scroll2_x_w));
 	map(0x16001e, 0x16001f).w(FUNC(tecmo16_state::scroll2_y_w));
+}
+
+
+
+void tecmo16_state::fstarfrc_map(address_map &map)
+{
+	map(0x110000, 0x110fff).ram().w(FUNC(tecmo16_state::charram_w)).share("charram");
+	map(0x120000, 0x1207ff).ram().w(FUNC(tecmo16_state::videoram_w)).share("videoram");
+	map(0x120800, 0x120fff).ram().w(FUNC(tecmo16_state::colorram_w)).share("colorram");
+	map(0x121000, 0x1217ff).ram().w(FUNC(tecmo16_state::videoram2_w)).share("videoram2");
+	map(0x121800, 0x121fff).ram().w(FUNC(tecmo16_state::colorram2_w)).share("colorram2");
+	map(0x122000, 0x127fff).ram(); /* work area */
+
+	common_map(map);
+}
+
+void tecmo16_state::ginkun_map(address_map &map)
+{
+	map(0x110000, 0x110fff).ram().w(FUNC(tecmo16_state::charram_w)).share("charram");
+	map(0x120000, 0x120fff).ram().w(FUNC(tecmo16_state::videoram_w)).share("videoram");
+	map(0x121000, 0x121fff).ram().w(FUNC(tecmo16_state::colorram_w)).share("colorram");
+	map(0x122000, 0x122fff).ram().w(FUNC(tecmo16_state::videoram2_w)).share("videoram2");
+	map(0x123000, 0x123fff).ram().w(FUNC(tecmo16_state::colorram2_w)).share("colorram2");
+	map(0x124000, 0x124fff).ram(); /* extra RAM for Riot */
+
+	common_map(map);
 }
 
 void tecmo16_state::sound_map(address_map &map)
@@ -169,6 +194,9 @@ static INPUT_PORTS_START( fstarfrc )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_COIN2 )
+
+	PORT_START("EXTRA")
+	/* Not used */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ginkun )
@@ -331,7 +359,7 @@ GFXDECODE_END
 #define MASTER_CLOCK XTAL(24'000'000)
 #define OKI_CLOCK XTAL(8'000'000)
 
-void tecmo16_state::fstarfrc(machine_config &config)
+void tecmo16_state::base(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, MASTER_CLOCK/2);          /* 12MHz */
@@ -385,7 +413,7 @@ void tecmo16_state::fstarfrc(machine_config &config)
 
 void tecmo16_state::ginkun(machine_config &config)
 {
-	fstarfrc(config);
+	base(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &tecmo16_state::ginkun_map);
 
@@ -624,10 +652,34 @@ ROM_START( riot )
 	ROM_LOAD( "8.ic18", 0x00000, 0x20000, CRC(4b70e266) SHA1(4ed23de9223cc7359fbaff9dd500ef6daee00fb0) )
 ROM_END
 
+ROM_START( riotw )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "riotw1.ic1", 0x00000, 0x40000, CRC(c1849b44) SHA1(a47fa87b0c73e766e3aee935fdb58341ae8856cb) )
+	ROM_LOAD16_BYTE( "riotw2.ic2", 0x00001, 0x40000, CRC(d6dc0c09) SHA1(1ccce338ee7ed0b909323a1649ffdffc6784f980) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "7.ic17", 0x00000, 0x10000, CRC(0a95b8f3) SHA1(cc6bdeeeb184eb4f3867eb9c961b0b82743fac9f) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "3.ic3", 0x00000, 0x20000, CRC(f60f5c96) SHA1(56ea21f22d3cf47071bfb3555b331a676463b63e) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "5.ic9", 0x00000, 0x80000, CRC(056fce78) SHA1(25234fa0282fdbefefb06e6aa5a467f9d08ed534) )
+	ROM_LOAD16_BYTE( "4.ic5", 0x00001, 0x80000, CRC(0894e7b4) SHA1(37a04476770942f292d836997c649a343f71e317) )
+
+	ROM_REGION( 0x100000, "gfx3", 0 )
+	ROM_LOAD16_BYTE( "9.ic22", 0x00000, 0x80000, CRC(0ead54f3) SHA1(4848eb158d9e2279332225e0b25f1c96a8a5a0c4) )
+	ROM_LOAD16_BYTE( "6.ic16", 0x00001, 0x80000, CRC(96ef61da) SHA1(c306e4d1eee19af0229a47c2f115f98c74f33d33) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "8.ic18", 0x00000, 0x20000, CRC(4b70e266) SHA1(4ed23de9223cc7359fbaff9dd500ef6daee00fb0) )
+ROM_END
+
 /******************************************************************************/
 
-GAME( 1992, fstarfrc,  0,        fstarfrc, fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo", "Final Star Force (US)",     MACHINE_SUPPORTS_SAVE ) // Has 'Recycle it, don't trash it"  and 'Winners don't use drugs' screens after first attract cycle
-GAME( 1992, fstarfrcj, fstarfrc, fstarfrc, fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo", "Final Star Force (Japan)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fstarfrcw, fstarfrc, fstarfrc, fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo", "Final Star Force (World?)", MACHINE_SUPPORTS_SAVE ) // more similar the to the Japanese version than to the US one, not the parent because not sure it's the world version
-GAME( 1992, riot,      0,        riot,     riot,     tecmo16_state, empty_init, ROT0,  "NMK",   "Riot",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, ginkun,    0,        ginkun,   ginkun,   tecmo16_state, empty_init, ROT0,  "Tecmo", "Ganbare Ginkun",            MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fstarfrc,  0,        base,     fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo",    "Final Star Force (US)",     MACHINE_SUPPORTS_SAVE ) // Has 'Recycle it, don't trash it"  and 'Winners don't use drugs' screens after first attract cycle
+GAME( 1992, fstarfrcj, fstarfrc, base,     fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo",    "Final Star Force (Japan)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fstarfrcw, fstarfrc, base,     fstarfrc, tecmo16_state, empty_init, ROT90, "Tecmo",    "Final Star Force (World?)", MACHINE_SUPPORTS_SAVE ) // more similar the to the Japanese version than to the US one, not the parent because not sure it's the world version
+GAME( 1992, riot,      0,        riot,     riot,     tecmo16_state, empty_init, ROT0,  "NMK",      "Riot",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1992, riotw,     riot,     riot,     riot,     tecmo16_state, empty_init, ROT0,  "Woong Bi", "Riot (Woong Bi license)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ginkun,    0,        ginkun,   ginkun,   tecmo16_state, empty_init, ROT0,  "Tecmo",    "Ganbare Ginkun",            MACHINE_SUPPORTS_SAVE )

@@ -14,6 +14,8 @@
 
 #include "debugviewinfo.h"
 
+#include <string>
+
 
 class memoryview_info : public debugview_info
 {
@@ -31,6 +33,19 @@ public:
 	void set_chunks_per_row(uint32_t rowchunks);
 	void set_reverse(bool reverse);
 	void set_physical(bool physical);
+
+protected:
+	enum
+	{
+		ID_CONTEXT_LAST_PC = 101
+	};
+
+	virtual void add_items_to_context_menu(HMENU menu) override;
+	virtual void update_context_menu(HMENU menu) override;
+	virtual void handle_context_menu(unsigned command) override;
+
+private:
+	std::string m_lastpc;
 };
 
 #endif // MAME_DEBUGGER_WIN_MEMORYVIEWINFO_H

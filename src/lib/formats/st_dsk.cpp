@@ -47,7 +47,7 @@ void st_format::find_size(io_generic *io, uint8_t &track_count, uint8_t &head_co
 	track_count = head_count = sector_count = 0;
 }
 
-int st_format::identify(io_generic *io, uint32_t form_factor)
+int st_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -57,7 +57,7 @@ int st_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool st_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool st_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t track_count, head_count, sector_count;
 	find_size(io, track_count, head_count, sector_count);
@@ -84,7 +84,7 @@ bool st_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 	return true;
 }
 
-bool st_format::save(io_generic *io, floppy_image *image)
+bool st_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int track_count, head_count, sector_count;
 	get_geometry_mfm_pc(image, 2000, track_count, head_count, sector_count);
@@ -206,7 +206,7 @@ bool msa_format::compress(const uint8_t *buffer, int usize, uint8_t *dest, int &
 	return dst < usize;
 }
 
-int msa_format::identify(io_generic *io, uint32_t form_factor)
+int msa_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint16_t sign, sect, head, strack, etrack;
 	read_header(io, sign, sect, head, strack, etrack);
@@ -220,7 +220,7 @@ int msa_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool msa_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool msa_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint16_t sign, sect, heads, strack, etrack;
 	read_header(io, sign, sect, heads, strack, etrack);
@@ -258,7 +258,7 @@ bool msa_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 }
 
 
-bool msa_format::save(io_generic *io, floppy_image *image)
+bool msa_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int track_count, head_count, sector_count;
 	get_geometry_mfm_pc(image, 2000, track_count, head_count, sector_count);

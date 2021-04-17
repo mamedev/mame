@@ -42,7 +42,7 @@ public:
 		, m_slave_bankslot(*this, "slavebank")
 		, m_slave_base(*this, "slave")
 		, m_eeprom(*this, "eeprom")
-		, m_battery_ram(*this, "battery", 0x3000, ENDIANNESS_LITTLE)
+		, m_battery_ram(*this, "battery", 0x4000, ENDIANNESS_LITTLE)
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")

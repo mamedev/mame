@@ -40,20 +40,16 @@ class sym1_state : public driver_device
 {
 public:
 	sym1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_ram_1k(*this, "ram_1k"),
-		m_ram_2k(*this, "ram_2k"),
-		m_ram_3k(*this, "ram_3k"),
-		m_monitor(*this, "monitor"),
-		m_riot_ram(*this, "riot_ram"),
-		m_maincpu(*this, "maincpu"),
-		m_ram(*this, RAM_TAG),
-		m_ttl74145(*this, "ttl74145"),
-		m_crt(*this, "crt"),
-		m_tty(*this, "tty"),
-		m_row(*this, "ROW-%u", 0),
-		m_wp(*this, "WP"),
-		m_digits(*this, "digit%u", 0U)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+		, m_banks(*this, "bank%u", 0U)
+		, m_ttl74145(*this, "ttl74145")
+		, m_crt(*this, "crt")
+		, m_tty(*this, "tty")
+		, m_row(*this, "ROW-%u", 0U)
+		, m_wp(*this, "WP")
+		, m_digits(*this, "digit%u", 0U)
 		{ }
 
 	void sym1(machine_config &config);
@@ -61,11 +57,6 @@ public:
 	void init_sym1();
 
 private:
-	required_shared_ptr<uint8_t> m_ram_1k;
-	required_shared_ptr<uint8_t> m_ram_2k;
-	required_shared_ptr<uint8_t> m_ram_3k;
-	required_shared_ptr<uint8_t> m_monitor;
-	required_shared_ptr<uint8_t> m_riot_ram;
 	uint8_t m_riot_port_a;
 	uint8_t m_riot_port_b;
 	emu_timer *m_led_update;
@@ -78,16 +69,20 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_3_w);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_4_w);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_5_w);
+	DECLARE_WRITE_LINE_MEMBER(via1_ca2_w);
 	uint8_t riot_a_r();
 	uint8_t riot_b_r();
 	void riot_a_w(uint8_t data);
 	void riot_b_w(uint8_t data);
 	void via3_a_w(uint8_t data);
 
+	std::unique_ptr<u8[]> m_riot_ram;
+	std::unique_ptr<u8[]> m_dummy_ram;
 	void sym1_map(address_map &map);
 
 	required_device<m6502_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	required_memory_bank_array<10> m_banks;
 	required_device<ttl74145_device> m_ttl74145;
 	required_device<rs232_port_device> m_crt;
 	required_device<rs232_port_device> m_tty;
@@ -246,6 +241,13 @@ INPUT_PORTS_END
 //  MACHINE EMULATION
 //**************************************************************************
 
+// CA2 will be forced high when the VIA is reset, causing the ROM to be switched in
+// When the bios clears POR, FF80-FFFF becomes a mirror of A600-A67F
+WRITE_LINE_MEMBER( sym1_state::via1_ca2_w )
+{
+	m_banks[8]->set_entry(state);
+}
+
 /*
     PA0: Write protect R6532 RAM
     PA1: Write protect RAM 0x400-0x7ff
@@ -254,39 +256,63 @@ INPUT_PORTS_END
  */
 void sym1_state::via3_a_w(uint8_t data)
 {
-	address_space &cpu0space = m_maincpu->space( AS_PROGRAM );
-
 	logerror("SYM1 VIA2 W 0x%02x\n", data);
 
-	if ((m_wp->read() & 0x01) && !(data & 0x01)) {
-		cpu0space.nop_write(0xa600, 0xa67f);
-	} else {
-		cpu0space.install_write_bank(0xa600, 0xa67f, membank("bank5"));
+	u8 sw = m_wp->read();
+
+	// apply or remove write-protection as directed
+	for (u8 i = 0; i < 4; i++)
+	{
+		// considered readonly if DIP is on AND databit is low; OR if memory not fitted
+		if ((BIT(sw, i) && !BIT(data, i)) || m_banks[i*2]->entry() )
+			m_banks[i*2+1]->set_entry(1);  // readonly
+		else
+			m_banks[i*2+1]->set_entry(0);  // readwrite
+		//printf("Bank %d has entry %d\n",i*2+1,m_banks[i*2+1]->entry());
 	}
-	if ((m_wp->read() & 0x02) && !(data & 0x02)) {
-		cpu0space.nop_write(0x0400, 0x07ff);
-	} else {
-		cpu0space.install_write_bank(0x0400, 0x07ff, membank("bank2"));
-	}
-	if ((m_wp->read() & 0x04) && !(data & 0x04)) {
-		cpu0space.nop_write(0x0800, 0x0bff);
-	} else {
-		cpu0space.install_write_bank(0x0800, 0x0bff, membank("bank3"));
-	}
-	if ((m_wp->read() & 0x08) && !(data & 0x08)) {
-		cpu0space.nop_write(0x0c00, 0x0fff);
-	} else {
-		cpu0space.install_write_bank(0x0c00, 0x0fff, membank("bank4"));
-	}
+
+	// POR write is same as bank1
+	m_banks[9]->set_entry(m_banks[1]->entry());
 }
 
 void sym1_state::init_sym1()
 {
-	// wipe expansion memory banks that are not installed
-	if (m_ram->size() < 4*1024)
-	{
-		m_maincpu->space(AS_PROGRAM).nop_readwrite(m_ram->size(), 0x0fff);
-	}
+	// m_ram 000-3FF not allocated to anything, so we use it as a dummy write area
+	u8 *const m = memregion("maincpu")->base()+0x8f80;
+	m_riot_ram = make_unique_clear<u8[]>(0x80);
+	m_dummy_ram = make_unique_clear<u8[]>(0x400); // dummy read area, preset to FF
+	u8 *w = m_riot_ram.get();
+	u8 *x = m_dummy_ram.get();
+	std::memset(x, 0xff, 0x400);
+	u8 *r = m_ram->pointer();
+	// RAM 400-7FF
+	m_banks[2]->configure_entry(0, r+0x400);    // ram exist, readable
+	m_banks[2]->configure_entry(1, x);          // ram not present
+	m_banks[3]->configure_entry(0, r+0x400);    // ram exist, writable
+	m_banks[3]->configure_entry(1, r);          // ram not present or readonly
+	// RAM 800-BFF
+	m_banks[4]->configure_entry(0, r+0x800);
+	m_banks[4]->configure_entry(1, x);
+	m_banks[5]->configure_entry(0, r+0x800);
+	m_banks[5]->configure_entry(1, r);
+	// RAM C00-FFF
+	m_banks[6]->configure_entry(0, r+0xc00);
+	m_banks[6]->configure_entry(1, x);
+	m_banks[7]->configure_entry(0, r+0xc00);
+	m_banks[7]->configure_entry(1, r);
+	// RIOT RAM A600-A67F
+	m_banks[0]->configure_entry(0, w);          // riot ram, readable
+	m_banks[0]->configure_entry(1, w);
+	m_banks[1]->configure_entry(0, w);          // riot ram, writable
+	m_banks[1]->configure_entry(1, r);          // riot ram, readonly
+	// POR
+	m_banks[8]->configure_entry(0, w);          // point at riot-ram
+	m_banks[8]->configure_entry(1, m);          // point at rom
+	m_banks[9]->configure_entry(0, w);          // riot ram, writable
+	m_banks[9]->configure_entry(1, r);          // riot ram, readonly
+
+	for (auto &bank : m_banks)
+		bank->set_entry(1);
 
 	// allocate a timer to refresh the led display
 	m_led_update = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sym1_state::led_refresh), this));
@@ -294,11 +320,25 @@ void sym1_state::init_sym1()
 
 void sym1_state::machine_reset()
 {
-	// make 0xf800 to 0xffff point to the last half of the monitor ROM
-	// so that the CPU can find its reset vectors
-	m_maincpu->space(AS_PROGRAM).install_rom(0xf800, 0xffff, m_monitor + 0x800);
-	m_maincpu->space(AS_PROGRAM).nop_write(0xf800, 0xffff);
-	m_maincpu->reset();
+	// Enable extra ram if it is fitted
+	switch (m_ram->size())
+	{
+		case 4*1024:
+			m_banks[6]->set_entry(0);
+			[[fallthrough]];
+		case 3*1024:
+			m_banks[4]->set_entry(0);
+			[[fallthrough]];
+		case 2*1024:
+			m_banks[2]->set_entry(0);
+			[[fallthrough]];
+		default:
+			m_banks[0]->set_entry(0);
+			break;
+	}
+
+	// Enable POR
+	via1_ca2_w(1);
 }
 
 
@@ -309,16 +349,17 @@ void sym1_state::machine_reset()
 void sym1_state::sym1_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram(); // U12/U13 RAM
-	map(0x0400, 0x07ff).bankrw("bank2").share("ram_1k");
-	map(0x0800, 0x0bff).bankrw("bank3").share("ram_2k");
-	map(0x0c00, 0x0fff).bankrw("bank4").share("ram_3k");
-	map(0x8000, 0x8fff).rom().share("monitor"); // U20 Monitor ROM
+	map(0x0400, 0x07ff).bankr("bank2").bankw("bank3");  // U14/U15 OPT RAM
+	map(0x0800, 0x0bff).bankr("bank4").bankw("bank5");  // U16/U17 OPT RAM
+	map(0x0c00, 0x0fff).bankr("bank6").bankw("bank7");  // U18/U19 OPT RAM
+	map(0x8000, 0x8fff).rom(); // U20 Monitor ROM
 	map(0xa000, 0xa00f).m("via1", FUNC(via6522_device::map));  // U25 VIA #1
 	map(0xa400, 0xa41f).m("riot", FUNC(mos6532_new_device::io_map));  // U27 RIOT
-	map(0xa600, 0xa67f).bankrw("bank5").share("riot_ram");   // U27 RIOT RAM
+	map(0xa600, 0xa67f).bankr("bank0").bankw("bank1");   // U27 RIOT RAM
 	map(0xa800, 0xa80f).m("via2", FUNC(via6522_device::map));  // U28 VIA #2
 	map(0xac00, 0xac0f).m("via3", FUNC(via6522_device::map));  // U29 VIA #3
 	map(0xb000, 0xefff).rom();
+	map(0xff80, 0xffff).bankr("bank8").bankw("bank9");   // POR
 }
 
 
@@ -355,10 +396,13 @@ void sym1_state::sym1(machine_config &config)
 	m_ttl74145->output_line_callback<6>().set("speaker", FUNC(speaker_sound_device::level_w));
 	// lines 7-9 not connected
 
-	VIA6522(config, "via1", SYM1_CLOCK).irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
-	VIA6522(config, "via2", SYM1_CLOCK).irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	via6522_device &via1(MOS6522(config, "via1", SYM1_CLOCK));
+	via1.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	via1.ca2_handler().set(FUNC(sym1_state::via1_ca2_w));
 
-	via6522_device &via3(VIA6522(config, "via3", SYM1_CLOCK));
+	MOS6522(config, "via2", SYM1_CLOCK).irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
+
+	via6522_device &via3(MOS6522(config, "via3", SYM1_CLOCK));
 	via3.writepa_handler().set(FUNC(sym1_state::via3_a_w));
 	via3.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 

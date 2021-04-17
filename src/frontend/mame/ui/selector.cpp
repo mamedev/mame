@@ -14,6 +14,9 @@
 #include "ui/ui.h"
 #include "ui/utils.h"
 
+#include "corestr.h"
+#include "unicode.h"
+
 
 namespace ui {
 
@@ -88,7 +91,7 @@ void menu_selector::populate(float &customtop, float &custombottom)
 		find_matches(m_search.c_str());
 
 		for (int curitem = 0; m_searchlist[curitem]; ++curitem)
-			item_append(*m_searchlist[curitem], "", 0, (void *)m_searchlist[curitem]);
+			item_append(*m_searchlist[curitem], 0, (void *)m_searchlist[curitem]);
 	}
 	else
 	{
@@ -97,7 +100,7 @@ void menu_selector::populate(float &customtop, float &custombottom)
 			if ((0 <= m_initial) && (unsigned(m_initial) == index))
 				set_selected_index(index);
 
-			item_append(m_str_items[index], "", 0, (void *)&m_str_items[index]);
+			item_append(m_str_items[index], 0, (void *)&m_str_items[index]);
 		}
 	}
 

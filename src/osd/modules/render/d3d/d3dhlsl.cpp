@@ -10,6 +10,7 @@
 #include "emu.h"
 #include "drivenum.h"
 #include "render.h"
+#include "rendlay.h"
 #include "rendutil.h"
 #include "emuopts.h"
 #include "aviio.h"
@@ -360,8 +361,8 @@ void shaders::render_snapshot(IDirect3DSurface9 *surface)
 	std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
 	std::string text2 = std::string(machine->system().manufacturer).append(" ").append(machine->system().type.fullname());
 	util::png_info pnginfo;
-	pnginfo.add_text("Software", text1.c_str());
-	pnginfo.add_text("System", text2.c_str());
+	pnginfo.add_text("Software", text1);
+	pnginfo.add_text("System", text2);
 
 	// now do the actual work
 	util::png_error error = util::png_write_bitmap(file, &pnginfo, snapshot, 1 << 24, nullptr);
@@ -1163,7 +1164,7 @@ int shaders::scanline_pass(d3d_render_target *rt, int source_index, poly_info *p
 		return next_index;
 
 	auto win = d3d->assert_window();
-	screen_device_iterator screen_iterator(machine->root_device());
+	screen_device_enumerator screen_iterator(machine->root_device());
 	screen_device *screen = screen_iterator.byindex(curr_screen);
 	render_container &screen_container = screen->container();
 	float xscale = 1.0f / screen_container.xscale();
@@ -1244,7 +1245,7 @@ int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 
 	auto win = d3d->assert_window();
 
-	screen_device_iterator screen_iterator(machine->root_device());
+	screen_device_enumerator screen_iterator(machine->root_device());
 	screen_device *screen = screen_iterator.byindex(curr_screen);
 	render_container &screen_container = screen->container();
 
@@ -1794,7 +1795,7 @@ bool shaders::add_render_target(renderer_d3d9* d3d, render_primitive *prim, int 
 //============================================================
 void shaders::enumerate_screens()
 {
-	screen_device_iterator iter(machine->root_device());
+	screen_device_enumerator iter(machine->root_device());
 	num_screens = iter.count();
 }
 
@@ -1986,23 +1987,10 @@ static void get_vector(const char *data, int count, float *out, bool report_erro
 //  be done in a more ideal way.
 //============================================================
 
-std::unique_ptr<slider_state> shaders::slider_alloc(int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg)
+std::unique_ptr<slider_state> shaders::slider_alloc(std::string &&title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, slider *arg)
 {
-	auto state = std::make_unique<slider_state>();
-
-	state->minval = minval;
-	state->defval = defval;
-	state->maxval = maxval;
-	state->incval = incval;
-
 	using namespace std::placeholders;
-	state->update = std::bind(&shaders::slider_changed, this, _1, _2, _3, _4, _5);
-
-	state->arg = arg;
-	state->id = id;
-	state->description = title;
-
-	return state;
+	return std::make_unique<slider_state>(std::move(title), minval, defval, maxval, incval, std::bind(&slider::update, arg, _1, _2));
 }
 
 
@@ -2064,15 +2052,6 @@ int32_t slider::update(std::string *str, int32_t newval)
 			}
 			return (int32_t)floor(*val_ptr / m_desc->scale + 0.5f);
 		}
-	}
-	return 0;
-}
-
-int32_t shaders::slider_changed(running_machine& /*machine*/, void *arg, int /*id*/, std::string *str, int32_t newval)
-{
-	if (arg != nullptr)
-	{
-		return reinterpret_cast<slider *>(arg)->update(str, newval);
 	}
 	return 0;
 }
@@ -2336,7 +2315,7 @@ void shaders::init_slider_list()
 	}
 	internal_sliders.clear();
 
-	const screen_device *first_screen = screen_device_iterator(machine->root_device()).first();;
+	const screen_device *first_screen = screen_device_enumerator(machine->root_device()).first();;
 	if (first_screen == nullptr)
 	{
 		return;
@@ -2387,7 +2366,7 @@ void shaders::init_slider_list()
 						break;
 				}
 
-				std::unique_ptr<slider_state> core_slider = slider_alloc(desc->id, name.c_str(), desc->minval, desc->defval, desc->maxval, desc->step, slider_arg);
+				std::unique_ptr<slider_state> core_slider = slider_alloc(std::move(name), desc->minval, desc->defval, desc->maxval, desc->step, slider_arg);
 
 				ui::menu_item item;
 				item.text = core_slider->description;
@@ -2427,7 +2406,7 @@ void uniform::update()
 	renderer_d3d9 *d3d = shadersys->d3d;
 
 	auto win = d3d->assert_window();
-	const screen_device *first_screen = screen_device_iterator(win->machine().root_device()).first();
+	const screen_device *first_screen = screen_device_enumerator(win->machine().root_device()).first();
 
 	bool vector_screen =
 		first_screen != nullptr &&

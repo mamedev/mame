@@ -90,7 +90,7 @@ Notes:
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 
-#include "sound/2203intf.h"
+#include "sound/ym2203.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -273,7 +273,9 @@ void quizpun2_state::machine_reset()
 {
 	membank("bank1")->set_entry(0);
 
-	// quizpun
+	// quizpun2 service mode needs this to fix a race condition since the MCU takes a while to start up
+	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+
 	m_mcu_data_port = m_mcu_control_port = 0;
 	m_mcu_pending = m_mcu_written = m_mcu_repeat = false;
 }

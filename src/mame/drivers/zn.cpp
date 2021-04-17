@@ -187,9 +187,9 @@ void zn_state::zn_1mb_vram(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, subdevice<psxcpu_device>("maincpu")));
-	spu.add_route(0, "lspeaker", 0.35);
-	spu.add_route(1, "rspeaker", 0.35);
+	SPU(config, m_spu, XTAL(67'737'600)/2, subdevice<psxcpu_device>("maincpu"));
+	m_spu->add_route(0, "lspeaker", 0.35);
+	m_spu->add_route(1, "rspeaker", 0.35);
 
 	AT28C16(config, "at28c16", 0);
 }
@@ -232,9 +232,9 @@ void zn_state::zn2(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, subdevice<psxcpu_device>("maincpu")));
-	spu.add_route(0, "lspeaker", 0.35);
-	spu.add_route(1, "rspeaker", 0.35);
+	SPU(config, m_spu, XTAL(67'737'600)/2, subdevice<psxcpu_device>("maincpu"));
+	m_spu->add_route(0, "lspeaker", 0.35);
+	m_spu->add_route(1, "rspeaker", 0.35);
 
 	AT28C16(config, "at28c16", 0);
 }
@@ -2148,6 +2148,10 @@ void atlus_zn_state::coh1001l(machine_config &config)
 
 	GENERIC_LATCH_16(config, m_soundlatch16);
 	m_soundlatch16->data_pending_callback().set_inputline(m_audiocpu, 3);
+
+	m_spu->reset_routes();
+	m_spu->add_route(0, "lspeaker", 0.175);
+	m_spu->add_route(1, "rspeaker", 0.175);
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400)));
 	ymz.irq_handler().set_inputline(m_audiocpu, 2);
@@ -4292,7 +4296,7 @@ ROM_START( coh1000t )
 
 	ROM_REGION32_LE( 0x01000000, "bankedroms", ROMREGION_ERASE00 )
 	ROM_REGION( 0x080000, "audiocpu", ROMREGION_ERASE00 )
-	ROM_REGION( 0x200000, "ymsnd", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "ymsnd:adpcma", ROMREGION_ERASE00 )
 	ROM_REGION( 0x8, "cat702_2", 0 ) ROM_COPY( "cat702_1", 0x0, 0x0, 0x8 )
 ROM_END
 
@@ -4473,7 +4477,7 @@ ROM_START( mgcldate )
 	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e32-07.22",           0x0000000, 0x020000, CRC(adf3feb5) SHA1(bae5bc3fad99a92a3492be1b775dab861007eb3b) ) // 0x4000 - 0x20000 banked
 
-	ROM_REGION( 0x400000, "ymsnd", 0 )
+	ROM_REGION( 0x400000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "e32-04.15",           0x0000000, 0x400000, CRC(c72f9eea) SHA1(7ab8b412a8ed00a42016acb7d13d3b074155780a) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
@@ -4493,7 +4497,7 @@ ROM_START( mgcldtex )
 	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e32-10.22",           0x0000000, 0x020000, CRC(adf3feb5) SHA1(bae5bc3fad99a92a3492be1b775dab861007eb3b) ) // 0x4000 - 0x20000 banked
 
-	ROM_REGION( 0x400000, "ymsnd", 0 )
+	ROM_REGION( 0x400000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "e32-04.15",           0x0000000, 0x400000, CRC(c72f9eea) SHA1(7ab8b412a8ed00a42016acb7d13d3b074155780a) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
@@ -4514,7 +4518,7 @@ ROM_START( psyforce )
 	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e22-07.22",           0x0000000, 0x020000, CRC(739af589) SHA1(dbb4d1c6d824a99ccf27168e2c21644e19811523) )// 0x4000 - 0x20000 banked
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "e22-01.15",           0x000000,  0x200000, CRC(808b8340) SHA1(d8bde850dd9b5b71e94ea707d2d728754f907977) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
@@ -4534,7 +4538,7 @@ ROM_START( psyforcej )
 	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e22-07.22",           0x0000000, 0x020000, CRC(739af589) SHA1(dbb4d1c6d824a99ccf27168e2c21644e19811523) )// 0x4000 - 0x20000 banked
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "e22-01.15",           0x000000,  0x200000, CRC(808b8340) SHA1(d8bde850dd9b5b71e94ea707d2d728754f907977) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
@@ -4554,7 +4558,7 @@ ROM_START( psyforcex )
 	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e22-07.22",           0x0000000, 0x020000, CRC(739af589) SHA1(dbb4d1c6d824a99ccf27168e2c21644e19811523) )// 0x4000 - 0x20000 banked
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "e22-01.15",           0x000000,  0x200000, CRC(808b8340) SHA1(d8bde850dd9b5b71e94ea707d2d728754f907977) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
@@ -4651,7 +4655,7 @@ ROM_START( sfchamp )
 	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e18-09.22",           0x0000000, 0x020000, CRC(bb5a5319) SHA1(0bb700cafc157d3af663cc9bebb8167487ff2852) ) // 0x4000 - 0x20000 banked
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "e18-01.15",           0x0000000, 0x200000, CRC(dbd1408c) SHA1(ef81064f2f95e5ae25eb1f10d1e78f27f9e294f5) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
@@ -4672,7 +4676,7 @@ ROM_START( sfchampo )
 	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e18-09.22",           0x0000000, 0x020000, CRC(bb5a5319) SHA1(0bb700cafc157d3af663cc9bebb8167487ff2852) ) // 0x4000 - 0x20000 banked
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "e18-01.15",           0x0000000, 0x200000, CRC(dbd1408c) SHA1(ef81064f2f95e5ae25eb1f10d1e78f27f9e294f5) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
@@ -4693,7 +4697,7 @@ ROM_START( sfchampu )
 	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e18-09.22",           0x0000000, 0x020000, CRC(bb5a5319) SHA1(0bb700cafc157d3af663cc9bebb8167487ff2852) ) // 0x4000 - 0x20000 banked
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "e18-01.15",           0x0000000, 0x200000, CRC(dbd1408c) SHA1(ef81064f2f95e5ae25eb1f10d1e78f27f9e294f5) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
@@ -4714,7 +4718,7 @@ ROM_START( sfchampj )
 	ROM_REGION( 0x24000, "audiocpu", ROMREGION_ERASE00 )     /* 64k for Z80 code */
 	ROM_LOAD( "e18-09.22",           0x0000000, 0x020000, CRC(bb5a5319) SHA1(0bb700cafc157d3af663cc9bebb8167487ff2852) ) // 0x4000 - 0x20000 banked
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )
 	ROM_LOAD( "e18-01.15",           0x0000000, 0x200000, CRC(dbd1408c) SHA1(ef81064f2f95e5ae25eb1f10d1e78f27f9e294f5) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )

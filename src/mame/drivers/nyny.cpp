@@ -97,10 +97,8 @@ class nyny_state : public driver_device
 public:
 	nyny_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_videoram1(*this, "videoram1"),
-		m_colorram1(*this, "colorram1"),
-		m_videoram2(*this, "videoram2"),
-		m_colorram2(*this, "colorram2"),
+		m_videoram(*this, "videoram%u", 1U),
+		m_colorram(*this, "colorram%u", 1U),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_audiocpu2(*this, "audio2"),
@@ -118,13 +116,12 @@ public:
 
 private:
 	/* memory pointers */
-	required_shared_ptr<uint8_t> m_videoram1;
-	required_shared_ptr<uint8_t> m_colorram1;
-	required_shared_ptr<uint8_t> m_videoram2;
-	required_shared_ptr<uint8_t> m_colorram2;
+	required_shared_ptr_array<uint8_t, 4> m_videoram;
+	required_shared_ptr_array<uint8_t, 2> m_colorram;
 
 	/* video-related */
-	int      m_flipscreen;
+	bool     m_flipscreen;
+	bool     m_flipchars;
 	uint8_t    m_star_enable;
 	uint16_t   m_star_delay_counter;
 	uint16_t   m_star_shift_reg;
@@ -152,6 +149,7 @@ private:
 	void pia_2_port_a_w(uint8_t data);
 	void pia_2_port_b_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(flipchars_w);
 	void nyny_ay8910_37_port_a_w(uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -161,9 +159,9 @@ private:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_END_UPDATE(crtc_end_update);
-	void nyny_audio_1_map(address_map &map);
-	void nyny_audio_2_map(address_map &map);
-	void nyny_main_map(address_map &map);
+	void audio_1_map(address_map &map);
+	void audio_2_map(address_map &map);
+	void main_map(address_map &map);
 };
 
 
@@ -262,51 +260,52 @@ WRITE_LINE_MEMBER(nyny_state::ic48_1_74123_output_changed)
 
 WRITE_LINE_MEMBER(nyny_state::flipscreen_w)
 {
-	m_flipscreen = state ? 0 : 1;
+	m_flipscreen = !state;
+}
+
+
+WRITE_LINE_MEMBER(nyny_state::flipchars_w)
+{
+	m_flipchars = state;
 }
 
 
 MC6845_UPDATE_ROW( nyny_state::crtc_update_row )
 {
-	uint8_t x = 0;
+	uint32_t *pix = &bitmap.pix(y);
 
 	for (uint8_t cx = 0; cx < x_count; cx++)
 	{
-		uint8_t data1, data2, color1, color2;
-
 		/* the memory is hooked up to the MA, RA lines this way */
-		offs_t offs = ((ma << 5) & 0x8000) |
-						((ma << 3) & 0x1f00) |
+		offs_t offs = ((ma << 3) & 0x3f00) |
 						((ra << 5) & 0x00e0) |
 						((ma << 0) & 0x001f);
 
 		if (m_flipscreen)
-			offs = offs ^ 0x9fff;
+			offs ^= 0x3fff;
 
-		data1 = m_videoram1[offs];
-		data2 = m_videoram2[offs];
-		color1 = m_colorram1[offs] & 0x07;
-		color2 = m_colorram2[offs] & 0x07;
+		uint8_t data1 = m_videoram[offs >= 0x2000 ? 2 : 0][offs & 0x1fff];
+		uint8_t data2 = m_videoram[offs >= 0x2000 ? 3 : 1][offs & 0x1fff];
+		uint8_t color1 = offs >= 0x2000 ? 0 : m_colorram[0][offs] & 0x07;
+		uint8_t color2 = offs >= 0x2000 ? 0 : m_colorram[1][offs] & 0x07;
 
 		for (int i = 0; i < 8; i++)
 		{
 			uint8_t bit1, bit2, color;
 
-			if (m_flipscreen)
+			if (m_flipchars)
 			{
 				bit1 = BIT(data1, 7);
 				bit2 = BIT(data2, 7);
-
-				data1 = data1 << 1;
-				data2 = data2 << 1;
+				data1 <<= 1;
+				data2 <<= 1;
 			}
 			else
 			{
 				bit1 = BIT(data1, 0);
 				bit2 = BIT(data2, 0);
-
-				data1 = data1 >> 1;
-				data2 = data2 >> 1;
+				data1 >>= 1;
+				data2 >>= 1;
 			}
 
 			/* plane 1 has priority over plane 2 */
@@ -315,12 +314,10 @@ MC6845_UPDATE_ROW( nyny_state::crtc_update_row )
 			else
 				color = bit2 ? color2 : 0;
 
-			bitmap.pix(y, x) = m_palette->pen_color(color);
-
-			x += 1;
+			*pix++ = m_palette->pen_color(color);
 		}
 
-		ma += 1;
+		ma++;
 	}
 }
 
@@ -429,13 +426,13 @@ void nyny_state::nyny_pia_1_2_w(offs_t offset, uint8_t data)
 }
 
 
-void nyny_state::nyny_main_map(address_map &map)
+void nyny_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("videoram1");
 	map(0x2000, 0x3fff).ram().share("colorram1");
 	map(0x4000, 0x5fff).ram().share("videoram2");
 	map(0x6000, 0x7fff).ram().share("colorram2");
-	map(0x8000, 0x9fff).ram();
+	map(0x8000, 0x9fff).ram().share("videoram3");
 	map(0xa000, 0xa0ff).ram().share("nvram"); /* SRAM (coin counter, shown when holding F2) */
 	map(0xa100, 0xa100).mirror(0x00fe).w(m_mc6845, FUNC(mc6845_device::address_w));
 	map(0xa101, 0xa101).mirror(0x00fe).w(m_mc6845, FUNC(mc6845_device::register_w));
@@ -443,12 +440,12 @@ void nyny_state::nyny_main_map(address_map &map)
 	map(0xa300, 0xa300).mirror(0x00ff).r(m_soundlatch3, FUNC(generic_latch_8_device::read)).w(FUNC(nyny_state::audio_1_command_w));
 	map(0xa400, 0xa7ff).noprw();
 	map(0xa800, 0xbfff).rom();
-	map(0xc000, 0xdfff).ram();
+	map(0xc000, 0xdfff).ram().share("videoram4");
 	map(0xe000, 0xffff).rom();
 }
 
 
-void nyny_state::nyny_audio_1_map(address_map &map)
+void nyny_state::audio_1_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0080, 0x0fff).noprw();
@@ -465,7 +462,7 @@ void nyny_state::nyny_audio_1_map(address_map &map)
 }
 
 
-void nyny_state::nyny_audio_2_map(address_map &map)
+void nyny_state::audio_2_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0080, 0x0fff).noprw();
@@ -572,8 +569,12 @@ INPUT_PORTS_END
 
 void nyny_state::machine_start()
 {
+	m_flipscreen = false;
+	m_flipchars = false;
+
 	/* setup for save states */
 	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_flipchars));
 	save_item(NAME(m_star_enable));
 	save_item(NAME(m_star_delay_counter));
 	save_item(NAME(m_star_shift_reg));
@@ -581,7 +582,6 @@ void nyny_state::machine_start()
 
 void nyny_state::machine_reset()
 {
-	m_flipscreen = 0;
 	m_star_enable = 0;
 	m_star_delay_counter = 0;
 	m_star_shift_reg = 0;
@@ -597,20 +597,20 @@ void nyny_state::nyny(machine_config &config)
 {
 	/* basic machine hardware */
 	MC6809(config, m_maincpu, 5600000); /* 1.40 MHz? The clock signal is generated by analog chips */
-	m_maincpu->set_addrmap(AS_PROGRAM, &nyny_state::nyny_main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nyny_state::main_map);
 	m_maincpu->set_periodic_int(FUNC(nyny_state::update_pia_1), attotime::from_hz(25));
 
 	M6802(config, m_audiocpu, AUDIO_CPU_1_CLOCK);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &nyny_state::nyny_audio_1_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nyny_state::audio_1_map);
 
 	M6802(config, m_audiocpu2, AUDIO_CPU_2_CLOCK);
-	m_audiocpu2->set_addrmap(AS_PROGRAM, &nyny_state::nyny_audio_2_map);
+	m_audiocpu2->set_addrmap(AS_PROGRAM, &nyny_state::audio_2_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256);   /* temporary, CRTC will configure screen */
+	screen.set_raw(PIXEL_CLOCK, 360, 0, 256, 276, 0, 224);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::RGB_3BIT);
@@ -633,16 +633,17 @@ void nyny_state::nyny(machine_config &config)
 	m_ic48_1->set_clear_pin_value(1);                   /* Clear pin - pulled high */
 	m_ic48_1->out_cb().set(FUNC(nyny_state::ic48_1_74123_output_changed));
 
-	PIA6821(config, m_pia1, 0);
+	PIA6821(config, m_pia1);
 	m_pia1->readpa_handler().set_ioport("IN0");
 	m_pia1->readpb_handler().set_ioport("IN1");
 	m_pia1->irqa_handler().set(FUNC(nyny_state::main_cpu_irq));
 	m_pia1->irqb_handler().set(FUNC(nyny_state::main_cpu_irq));
 
-	PIA6821(config, m_pia2, 0);
+	PIA6821(config, m_pia2);
 	m_pia2->writepa_handler().set(FUNC(nyny_state::pia_2_port_a_w));
 	m_pia2->writepb_handler().set(FUNC(nyny_state::pia_2_port_b_w));
 	m_pia2->ca2_handler().set(FUNC(nyny_state::flipscreen_w));
+	m_pia2->cb2_handler().set(FUNC(nyny_state::flipchars_w));
 	m_pia2->irqa_handler().set(FUNC(nyny_state::main_cpu_firq));
 	m_pia2->irqb_handler().set(FUNC(nyny_state::main_cpu_irq));
 

@@ -20,7 +20,7 @@ static char const *const gpr[16] =
 static char const *const scr[16] =
 {
 	"scr0", "scr1", "scr2", "scr3", "scr4", "scr5", "cous", "cou",
-	"ts",   "scr9", "mq",   "mpcs", "irb",  "iar",  "ics",  "cs",
+	"ts",   "ecr",  "mq",   "mpcs", "irb",  "iar",  "ics",  "cs",
 };
 
 static char const *const cc[16] =

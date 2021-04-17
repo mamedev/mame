@@ -274,21 +274,7 @@ uint32_t midzeus_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 	m_poly->wait("VIDEO_UPDATE");
 
-	/* normal update case */
-	if (!machine().input().code_pressed(KEYCODE_V))
-	{
-		const void *base = waveram1_ptr_from_expanded_addr(m_zeusbase[0xcc]);
-		int xoffs = screen.visible_area().min_x;
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-		{
-			uint16_t *const dest = &bitmap.pix(y);
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-				dest[x] = WAVERAM_READPIX(base, y, x - xoffs) & 0x7fff;
-		}
-	}
-
-	/* waveram drawing case */
-	else
+	if (DEBUG_KEYS && machine().input().code_pressed(KEYCODE_V)) /* waveram drawing case */
 	{
 		const void *base;
 
@@ -309,8 +295,21 @@ uint32_t midzeus_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 				dest[x] = (tex << 8) | tex;
 			}
 		}
+
 		popmessage("offs = %06X", m_yoffs << 12);
 	}
+	else /* normal update case */
+	{
+		const void *base = waveram1_ptr_from_expanded_addr(m_zeusbase[0xcc]);
+		int xoffs = screen.visible_area().min_x;
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		{
+			uint16_t *const dest = &bitmap.pix(y);
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+				dest[x] = WAVERAM_READPIX(base, y, x - xoffs) & 0x7fff;
+		}
+	}
+
 
 	return 0;
 }
@@ -699,7 +698,12 @@ void midzeus_state::zeus_register_update(offs_t offset)
 
 		case 0xcc:
 			m_screen->update_partial(m_screen->vpos());
-			m_log_fifo = machine().input().code_pressed(KEYCODE_L);
+
+			if (DEBUG_KEYS)
+				m_log_fifo = machine().input().code_pressed(KEYCODE_L);
+			else
+				m_log_fifo = 0;
+
 			break;
 
 		case 0xe0:
@@ -1466,14 +1470,14 @@ void midzeus_state::log_waveram(uint32_t length_and_base)
 	for (i = 0; i < numoctets; i++)
 		checksum += ptr[i*2] + ptr[i*2+1];
 
-	for (i = 0; i < ARRAY_LENGTH(recent_entries); i++)
+	for (i = 0; i < std::size(recent_entries); i++)
 		if (recent_entries[i].lab == length_and_base && recent_entries[i].checksum == checksum)
 		{
 			foundit = true;
 			break;
 		}
 
-	if (i == ARRAY_LENGTH(recent_entries))
+	if (i == std::size(recent_entries))
 		i--;
 	if (i != 0)
 	{

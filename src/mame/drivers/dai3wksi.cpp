@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Hau,Derrick Renaud
+// copyright-holders:Hau, Derrick Renaud
 /*
 
 -Galaxy Force
@@ -14,8 +14,9 @@ TVG_14.7     [d48cbabe]
 TVG_15.8     [cf44bd60]
 TVG_16.9     [ae723f56]
 --------------------------
--Warp 1
 
+-Warp 1
+SIV-01-C
 
 Dumped by Chack'n
 01/04/2009
@@ -27,13 +28,18 @@ Written by Hau
 Discrete by Andy
 11/11/2009
 
+Bellybuttons by Osso & hap
+04/16/2021
 
-Driver Notes:
-
+TODO:
 - Two player games are automatically displayed in cocktail mode.
   Is this by design (a cocktail only romset)?
-
 - Discrete audio needs adding to replace hardcoded samples
+- Is warp1 sound same as dai3wksi?
+- Dips need identifying
+- warp1 service mode is started by booting with coin1 held down,
+  the service switch can still be tested there but otherwise has no function?
+  In warp1bl, it is a service coin input.
 
 */
 
@@ -43,10 +49,13 @@ Driver Notes:
 #include "machine/rescap.h"
 #include "sound/samples.h"
 #include "sound/sn76477.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 #define USE_SAMPLES     (1)
 
@@ -64,14 +73,20 @@ public:
 		m_ic80(*this, "ic80"),
 		m_ic81(*this, "ic81"),
 		m_palette(*this, "palette"),
-		m_dai3wksi_videoram(*this, "videoram"),
-		m_in2(*this, "IN2")
+		m_videoram(*this, "videoram"),
+		m_inputs(*this, "IN%u", 0)
 	{ }
 
 	void dai3wksi(machine_config &config);
+	void warp1bl(machine_config &config);
+
+	int warp1_protection_r() { return m_audio_data[0] & 1; }
+
+protected:
+	virtual void machine_start() override;
 
 private:
-	/* devices */
+	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
 	optional_device<sn76477_device> m_ic77;
@@ -80,30 +95,38 @@ private:
 	optional_device<sn76477_device> m_ic80;
 	optional_device<sn76477_device> m_ic81;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<u8> m_videoram;
+	required_ioport_array<3> m_inputs;
 
-	/* video */
-	required_shared_ptr<uint8_t> m_dai3wksi_videoram;
-	int         m_dai3wksi_flipscreen;
-	int         m_dai3wksi_redscreen;
-	int         m_dai3wksi_redterop;
-	uint32_t screen_update_dai3wksi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	/* sound */
-	uint8_t       m_port_last1;
-	uint8_t       m_port_last2;
-	int         m_enabled_sound;
-	int         m_sound3_counter;
-	void dai3wksi_audio_1_w(uint8_t data);
-	void dai3wksi_audio_2_w(uint8_t data);
-	void dai3wksi_audio_3_w(uint8_t data);
-
-	/* i/o ports */
-	required_ioport m_in2;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	void main_map(address_map &map);
+
+	// video
+	u8 m_flipscreen = 0;
+	u8 m_redscreen = 0;
+	u8 m_redterop = 0;
+	u32 screen_update_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	// sound
+	u8 m_audio_data[3] = { 0, 0, 0 };
+	u8 m_port_last2 = 0;
+	u8 m_enabled_sound = 0;
+	u8 m_sound3_counter = 0;
+	void audio_1_w(u8 data);
+	void audio_2_w(u8 data);
+	void audio_3_w(u8 data);
 };
+
+void dai3wksi_state::machine_start()
+{
+	// Set up save state
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_redscreen));
+	save_item(NAME(m_redterop));
+	save_item(NAME(m_audio_data));
+	save_item(NAME(m_enabled_sound));
+	save_item(NAME(m_sound3_counter));
+}
 
 
 /*************************************
@@ -112,7 +135,7 @@ private:
  *
  *************************************/
 
-static const uint8_t vr_prom1[64*8*2]={
+static const u8 vr_prom1[64*8*2]={
 	6, 6,6,6,6,6,6,6,6, 6,6,6,6,6,6,6,6, 3,3,3,3,3,3,3,3, 5,5,5,5,5,5,5,5, 3,3,3,3,3,3,3,3, 2,2,2,2,2,2,2,2, 6,6,6,6,6,6,6,6, 4,4,4,4,4,4,4,
 	6, 6,6,6,6,6,6,6,6, 6,6,6,6,6,6,6,6, 3,3,3,3,3,3,3,3, 5,5,5,5,5,5,5,5, 3,3,3,3,3,3,3,3, 2,2,2,2,2,2,2,2, 6,6,6,6,6,6,6,6, 4,4,4,4,4,4,4,
 	6, 6,6,6,6,6,6,6,6, 6,6,6,6,6,6,6,6, 3,3,3,3,3,3,3,3, 5,5,5,5,5,5,5,5, 3,3,3,3,3,3,3,3, 2,2,2,2,2,2,2,2, 6,6,6,6,6,6,6,6, 4,4,4,4,4,4,4,
@@ -132,7 +155,7 @@ static const uint8_t vr_prom1[64*8*2]={
 	3, 3,3,2,2,6,6,6,6, 6,6,6,6,6,6,6,6, 3,3,3,3,3,3,3,3, 5,5,5,5,5,5,5,5, 3,3,3,3,3,3,3,3, 2,2,2,2,2,2,2,2, 6,6,6,6,6,6,6,6, 4,4,4,4,4,4,4,
 };
 
-static const uint8_t vr_prom2[64*8*2]={
+static const u8 vr_prom2[64*8*2]={
 	6, 6,6,6,6,6,6,6,6, 6,6,6,6,6,6,6,6, 3,3,3,3,3,3,3,3, 7,7,7,7,7,7,7,7, 3,3,3,3,3,3,3,3, 2,2,2,2,2,2,2,2, 6,6,6,6,6,6,6,6, 4,4,4,4,4,4,4,
 	6, 6,6,6,6,6,6,6,6, 6,6,6,6,6,6,6,6, 3,3,3,3,3,3,3,3, 7,7,7,7,7,7,7,7, 3,3,3,3,3,3,3,3, 2,2,2,2,2,2,2,2, 6,6,6,6,6,6,6,6, 4,4,4,4,4,4,4,
 	6, 6,6,6,6,6,6,6,6, 6,6,6,6,6,6,6,6, 3,3,3,3,3,3,3,3, 7,7,7,7,7,7,7,7, 3,3,3,3,3,3,3,3, 2,2,2,2,2,2,2,2, 6,6,6,6,6,6,6,6, 4,4,4,4,4,4,4,
@@ -152,23 +175,23 @@ static const uint8_t vr_prom2[64*8*2]={
 	3, 3,3,2,2,6,6,6,6, 6,6,6,6,6,6,6,6, 3,3,3,3,3,3,3,3, 7,7,7,7,7,7,7,7, 3,3,3,3,3,3,3,3, 2,2,2,2,2,2,2,2, 6,6,6,6,6,6,6,6, 4,4,4,4,4,4,4,
 };
 
-uint32_t dai3wksi_state::screen_update_dai3wksi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 dai3wksi_state::screen_update_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (offs_t offs = 0; offs < m_dai3wksi_videoram.bytes(); offs++)
+	for (offs_t offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		uint8_t x = offs << 2;
-		uint8_t y = offs >> 6;
-		uint8_t data = m_dai3wksi_videoram[offs];
-		uint8_t color;
-		int value = (x >> 2) + ((y >> 5) << 6) + 64 * 8 * (m_dai3wksi_redterop ? 1 : 0);
+		u8 x = offs << 2;
+		u8 y = offs >> 6;
+		u8 data = m_videoram[offs];
+		u8 color;
+		int value = (x >> 2) + ((y >> 5) << 6) + 64 * 8 * (m_redterop ? 1 : 0);
 
-		if (m_dai3wksi_redscreen)
+		if (m_redscreen)
 		{
 			color = 0x02;
 		}
 		else
 		{
-			if (m_in2->read() & 0x03)
+			if (m_inputs[2]->read() & 0x03)
 				color = vr_prom2[value];
 			else
 				color = vr_prom1[value];
@@ -178,7 +201,7 @@ uint32_t dai3wksi_state::screen_update_dai3wksi(screen_device &screen, bitmap_rg
 		{
 			rgb_t pen = (data & (1 << i)) ? m_palette->pen_color(color) : rgb_t::black();
 
-			if (m_dai3wksi_flipscreen)
+			if (m_flipscreen)
 				bitmap.pix(255-y, 255-x) = pen;
 			else
 				bitmap.pix(y, x) = pen;
@@ -190,6 +213,29 @@ uint32_t dai3wksi_state::screen_update_dai3wksi(screen_device &screen, bitmap_rg
 	return 0;
 }
 
+u32 dai3wksi_state::screen_update_bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	for (offs_t offs = 0; offs < m_videoram.bytes(); offs++)
+	{
+		u8 x = offs << 2;
+		u8 y = offs >> 6;
+		u8 data = m_videoram[offs];
+
+		for (int i = 0; i <= 3; i++)
+		{
+			rgb_t pen = (data & (1 << i)) ? rgb_t::white() : rgb_t::black();
+
+			if (m_flipscreen)
+				bitmap.pix(255-y, 255-x) = pen;
+			else
+				bitmap.pix(y, x) = pen;
+
+			x++;
+		}
+	}
+
+	return 0;
+}
 
 /*************************************
  *
@@ -215,9 +261,9 @@ uint32_t dai3wksi_state::screen_update_dai3wksi(screen_device &screen, bitmap_rg
 
 
 #if (USE_SAMPLES)
-void dai3wksi_state::dai3wksi_audio_1_w(uint8_t data)
+void dai3wksi_state::audio_1_w(u8 data)
 {
-	uint8_t rising_bits = data & ~m_port_last1;
+	u8 rising_bits = data & ~m_audio_data[0];
 
 	m_enabled_sound = data & 0x80;
 
@@ -228,19 +274,19 @@ void dai3wksi_state::dai3wksi_audio_1_w(uint8_t data)
 		else
 			m_samples->start(CHANNEL_SOUND5, SAMPLE_SOUND5, true);
 	}
-	if (!(data & 0x20) && (m_port_last1 & 0x20))
+	if (!(data & 0x20) && (m_audio_data[0] & 0x20))
 		m_samples->stop(CHANNEL_SOUND5);
 
-	m_port_last1 = data;
+	m_audio_data[0] = data;
 }
 
-void dai3wksi_state::dai3wksi_audio_2_w(uint8_t data)
+void dai3wksi_state::audio_2_w(u8 data)
 {
-	uint8_t rising_bits = data & ~m_port_last2;
+	u8 rising_bits = data & ~m_audio_data[1];
 
-	m_dai3wksi_flipscreen = data & 0x10;
-	m_dai3wksi_redscreen  = ~data & 0x20;
-	m_dai3wksi_redterop   = data & 0x40;
+	m_flipscreen = data & 0x10;
+	m_redscreen  = ~data & 0x20;
+	m_redterop   = data & 0x40;
 
 	if (m_enabled_sound)
 	{
@@ -258,10 +304,10 @@ void dai3wksi_state::dai3wksi_audio_2_w(uint8_t data)
 		}
 	}
 
-	m_port_last2 = data;
+	m_audio_data[1] = data;
 }
 
-void dai3wksi_state::dai3wksi_audio_3_w(uint8_t data)
+void dai3wksi_state::audio_3_w(u8 data)
 {
 	if (m_enabled_sound)
 	{
@@ -270,6 +316,8 @@ void dai3wksi_state::dai3wksi_audio_3_w(uint8_t data)
 		else if (data & 0x80)
 			m_samples->start(CHANNEL_SOUND6, SAMPLE_SOUND6_2);
 	}
+
+	m_audio_data[2] = data;
 }
 
 
@@ -290,30 +338,36 @@ static const char *const dai3wksi_sample_names[] =
 
 #else
 
-void dai3wksi_state::dai3wksi_audio_1_w(uint8_t data)
+void dai3wksi_state::audio_1_w(u8 data)
 {
 	machine().sound().system_enable(data & 0x80);
 
-	m_ic79->enable_w((~data >> 5) & 0x01);        /* invader movement enable */
-	m_ic79->envelope_1_w((~data >> 2) & 0x01);    /* invader movement envelope control*/
+	m_ic79->enable_w((~data >> 5) & 0x01);        // invader movement enable
+	m_ic79->envelope_1_w((~data >> 2) & 0x01);    // invader movement envelope control
+
+	m_audio_data[0] = data;
 }
 
-void dai3wksi_state::dai3wksi_audio_2_w(uint8_t data)
+void dai3wksi_state::audio_2_w(u8 data)
 {
-	m_dai3wksi_flipscreen =  data & 0x10;
-	m_dai3wksi_redscreen  = ~data & 0x20;
-	m_dai3wksi_redterop   =  data & 0x40;
+	m_flipscreen =  data & 0x10;
+	m_redscreen  = ~data & 0x20;
+	m_redterop   =  data & 0x40;
 
-	m_ic77->enable_w((~data >> 0) & 0x01);    /* ship movement */
-	m_ic78->enable_w((~data >> 1) & 0x01);    /* danger text */
-	/* ic76 - invader hit  (~data >> 2) & 0x01 */
-	m_ic80->enable_w((~data >> 3) & 0x01);    /* planet explosion */
+	m_ic77->enable_w((~data >> 0) & 0x01);    // ship movement
+	m_ic78->enable_w((~data >> 1) & 0x01);    // danger text
+	// ic76 - invader hit  (~data >> 2) & 0x01
+	m_ic80->enable_w((~data >> 3) & 0x01);    // planet explosion
+
+	m_audio_data[1] = data;
 }
 
-void dai3wksi_state::dai3wksi_audio_3_w(uint8_t data)
+void dai3wksi_state::audio_3_w(u8 data)
 {
-	m_ic81->enable_w((~data >> 2) & 0x01);    /* player shoot enable */
-	m_ic81->vco_w((~data >> 3) & 0x01);       /* player shoot vco control */
+	m_ic81->enable_w((~data >> 2) & 0x01);    // player shoot enable
+	m_ic81->vco_w((~data >> 3) & 0x01);       // player shoot vco control
+
+	m_audio_data[2] = data;
 }
 
 #endif
@@ -331,10 +385,10 @@ void dai3wksi_state::main_map(address_map &map)
 	map(0x2000, 0x23ff).ram();
 	map(0x2400, 0x24ff).mirror(0x100).portr("IN0");
 	map(0x2800, 0x28ff).mirror(0x100).portr("IN1");
-	map(0x3000, 0x3000).w(FUNC(dai3wksi_state::dai3wksi_audio_1_w));
-	map(0x3400, 0x3400).w(FUNC(dai3wksi_state::dai3wksi_audio_2_w));
-	map(0x3800, 0x3800).w(FUNC(dai3wksi_state::dai3wksi_audio_3_w));
-	map(0x8000, 0xbfff).ram().share("videoram");
+	map(0x3000, 0x3000).w(FUNC(dai3wksi_state::audio_1_w));
+	map(0x3400, 0x3400).w(FUNC(dai3wksi_state::audio_2_w));
+	map(0x3800, 0x3800).w(FUNC(dai3wksi_state::audio_3_w));
+	map(0x8000, 0xbfff).ram().share(m_videoram);
 }
 
 
@@ -379,6 +433,44 @@ static INPUT_PORTS_START( dai3wksi )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( warp1 )
+	PORT_INCLUDE( dai3wksi )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(dai3wksi_state, warp1_protection_r)
+	PORT_DIPNAME( 0x20, 0x20, "High Score Table" )              PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("IN1") // active-low
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( warp1bl ) // the bootleg seems to expect active low
+	PORT_INCLUDE( warp1 )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
+INPUT_PORTS_END
+
 
 /*************************************
  *
@@ -386,40 +478,19 @@ INPUT_PORTS_END
  *
  *************************************/
 
-void dai3wksi_state::machine_start()
-{
-	/* Set up save state */
-	save_item(NAME(m_dai3wksi_flipscreen));
-	save_item(NAME(m_dai3wksi_redscreen));
-	save_item(NAME(m_dai3wksi_redterop));
-	save_item(NAME(m_port_last1));
-	save_item(NAME(m_port_last2));
-	save_item(NAME(m_enabled_sound));
-	save_item(NAME(m_sound3_counter));
-}
-
-void dai3wksi_state::machine_reset()
-{
-	m_port_last1 = 0;
-	m_port_last2 = 0;
-	m_enabled_sound = 0;
-	m_sound3_counter = 0;
-}
-
-
 void dai3wksi_state::dai3wksi(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(10'000'000)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dai3wksi_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(dai3wksi_state::irq0_line_hold));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_size(256, 256);
 	screen.set_visarea(4, 251, 8, 247);
 	screen.set_refresh_hz(60);
-	screen.set_screen_update(FUNC(dai3wksi_state::screen_update_dai3wksi));
+	screen.set_screen_update(FUNC(dai3wksi_state::screen_update_color));
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
@@ -535,6 +606,15 @@ void dai3wksi_state::dai3wksi(machine_config &config)
 #endif
 }
 
+void dai3wksi_state::warp1bl(machine_config &config)
+{
+	dai3wksi(config);
+
+	// the bootleg is in b&w
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(dai3wksi_state::screen_update_bw));
+	PALETTE(config.replace(), m_palette, palette_device::MONOCHROME);
+}
+
 
 /*************************************
  *
@@ -550,6 +630,27 @@ ROM_START( dai3wksi )
 	ROM_LOAD( "tvg_16.9",  0x1800, 0x0400, CRC(ae723f56) SHA1(c25c27d6144533b2b2a888bfa8dbf48ed8d8b09a) )
 ROM_END
 
+ROM_START( warp1 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tvg_23.6",  0x0000, 0x0800, CRC(2025a316) SHA1(704798ec1d0039cb977396330801a625c8b02cff) )
+	ROM_LOAD( "tvg_24.7",  0x0800, 0x0800, CRC(6cca323d) SHA1(e5dc4f09990c3f9e408e25e189a9355d7c021128) )
+	ROM_LOAD( "tvg_25.8",  0x1000, 0x0800, CRC(5aa6eb1e) SHA1(ccf18d9618635c38747a57dad2214e6ca14c835d) )
+	ROM_LOAD( "tvg_26.9",  0x1800, 0x0400, CRC(6bf25327) SHA1(ee9f635d70a97628ab82efa12efdb39349b52e2b) )
+ROM_END
+
+ROM_START( warp1bl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "warp1_0.bin",  0x0000, 0x0400, CRC(d4383a9a) SHA1(eda0b388bd0adf22059f0848ce91fee889700f0c) )
+	ROM_LOAD( "warp1_1.bin",  0x0400, 0x0400, CRC(6005eddc) SHA1(a06dbdbe3356eb011dbce756e6c76adef4c50beb) )
+	ROM_LOAD( "warp1_2.bin",  0x0800, 0x0400, CRC(76ea7ebc) SHA1(60eb870f30aaf95589c7326ca6664974e39f3e27) )
+	ROM_LOAD( "warp1_3.bin",  0x0c00, 0x0400, CRC(0c34ef33) SHA1(513fe5a875746d94d2ea0b7eed81ca0cf869c457) )
+	ROM_LOAD( "warp1_4.bin",  0x1000, 0x0400, CRC(41ffad36) SHA1(479af4506f3637a95d2d41d04e1d66debb28da03) )
+	ROM_LOAD( "warp1_5.bin",  0x1400, 0x0400, CRC(f67a1e1d) SHA1(aeb7b018889de4bd32ee8f65d8c0c32bbee07440) )
+	ROM_LOAD( "warp1_6.bin",  0x1800, 0x0400, CRC(44e9327f) SHA1(aa217b0fbbef6a408231dc0dfedd94167c351c28) )
+ROM_END
+
+} // Anonymous namespace
+
 
 /*************************************
  *
@@ -557,4 +658,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, dai3wksi, 0, dai3wksi, dai3wksi, dai3wksi_state, empty_init, ROT270, "Sun Electronics", "Dai 3 Wakusei (Japan)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, dai3wksi, 0,     dai3wksi, dai3wksi, dai3wksi_state, empty_init, ROT270, "Sun Electronics", "Dai 3 Wakusei (Japan)",   MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1979, warp1,    0,     dai3wksi, warp1,    dai3wksi_state, empty_init, ROT90,  "Sun Electronics", "Warp-1 (Japan)",          MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, warp1bl,  warp1, warp1bl,  warp1bl,  dai3wksi_state, empty_init, ROT270, "bootleg",         "Warp-1 (Japan, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

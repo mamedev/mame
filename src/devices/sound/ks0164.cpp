@@ -355,7 +355,7 @@ void ks0164_device::irqen_76_w(u8 data)
 		m_cpu->set_input_line(14, CLEAR_LINE);
 	}
 
-	//	logerror("irqen_76 = %02x (%04x)\n", m_irqen_76, m_cpu->pc());
+	//  logerror("irqen_76 = %02x (%04x)\n", m_irqen_76, m_cpu->pc());
 }
 
 u8 ks0164_device::irqen_77_r()

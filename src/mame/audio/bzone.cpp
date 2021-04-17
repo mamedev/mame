@@ -393,7 +393,7 @@ void bzone_state::bzone_sounds_w(uint8_t data)
 	m_discrete->write(BZ_INPUT, data);
 
 	m_startled = BIT(data, 6);
-	machine().sound().system_enable(data & 0x20);
+	machine().sound().system_mute(!BIT(data, 5));
 }
 
 void bzone_state::bzone_audio(machine_config &config)

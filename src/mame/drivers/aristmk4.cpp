@@ -1805,7 +1805,7 @@ void aristmk4_state::aristmk4(machine_config &config)
 	ppi.in_pb_callback().set(FUNC(aristmk4_state::pb1_r));
 	ppi.in_pc_callback().set(FUNC(aristmk4_state::pc1_r));
 
-	via6522_device &via(VIA6522(config, "via6522_0", MAIN_CLOCK/8)); // R65C22P2
+	via6522_device &via(R65C22(config, "via6522_0", MAIN_CLOCK/8)); // R65C22P2
 	via.readpa_handler().set(FUNC(aristmk4_state::via_a_r));
 	via.readpb_handler().set(FUNC(aristmk4_state::via_b_r));
 	via.writepa_handler().set(FUNC(aristmk4_state::via_a_w));

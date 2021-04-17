@@ -24,8 +24,9 @@
 #include "pluginopts.h"
 #include "drivenum.h"
 #include "romload.h"
-
 #include "uiinput.h"
+
+#include "corestr.h"
 
 #include <algorithm>
 #include <cstring>
@@ -51,7 +52,7 @@ menu_bios_selection::menu_bios_selection(mame_ui_manager &mui, render_container 
 void menu_bios_selection::populate(float &customtop, float &custombottom)
 {
 	// cycle through all devices for this system
-	for (device_t &device : device_iterator(machine().root_device()))
+	for (device_t &device : device_enumerator(machine().root_device()))
 	{
 		device_t const *const parent(device.owner());
 		device_slot_interface const *const slot(dynamic_cast<device_slot_interface const *>(parent));
@@ -73,7 +74,7 @@ void menu_bios_selection::populate(float &customtop, float &custombottom)
 	}
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Reset"), "", 0, (void *)1);
+	item_append(_("Reset"), 0, (void *)1);
 }
 
 menu_bios_selection::~menu_bios_selection()
@@ -132,7 +133,7 @@ menu_network_devices::~menu_network_devices()
 void menu_network_devices::populate(float &customtop, float &custombottom)
 {
 	/* cycle through all devices for this system */
-	for (device_network_interface &network : network_interface_iterator(machine().root_device()))
+	for (device_network_interface &network : network_interface_enumerator(machine().root_device()))
 	{
 		int curr = network.get_interface();
 		const char *title = nullptr;
@@ -146,6 +147,8 @@ void menu_network_devices::populate(float &customtop, float &custombottom)
 
 		item_append(network.device().tag(),  (title) ? title : "------", FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)&network);
 	}
+
+	item_append(menu_item_type::SEPARATOR);
 }
 
 /*-------------------------------------------------
@@ -176,33 +179,23 @@ void menu_network_devices::handle()
     information menu
 -------------------------------------------------*/
 
-void menu_bookkeeping::handle()
-{
-	attotime curtime;
-
-	/* if the time has rolled over another second, regenerate */
-	curtime = machine().time();
-	if (prevtime.seconds() != curtime.seconds())
-	{
-		prevtime = curtime;
-		repopulate(reset_options::SELECT_FIRST);
-	}
-
-	/* process the menu */
-	process(0);
-}
-
-
-/*-------------------------------------------------
-    menu_bookkeeping - handle the bookkeeping
-    information menu
--------------------------------------------------*/
 menu_bookkeeping::menu_bookkeeping(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
 }
 
 menu_bookkeeping::~menu_bookkeeping()
 {
+}
+
+void menu_bookkeeping::handle()
+{
+	/* process the menu */
+	process(0);
+
+	/* if the time has rolled over another second, regenerate */
+	attotime const curtime = machine().time();
+	if (prevtime.seconds() != curtime.seconds())
+		reset(reset_options::REMEMBER_POSITION);
 }
 
 void menu_bookkeeping::populate(float &customtop, float &custombottom)
@@ -212,6 +205,7 @@ void menu_bookkeeping::populate(float &customtop, float &custombottom)
 	int ctrnum;
 
 	/* show total time first */
+	prevtime = machine().time();
 	if (prevtime.seconds() >= (60 * 60))
 		util::stream_format(tempstring, _("Uptime: %1$d:%2$02d:%3$02d\n\n"), prevtime.seconds() / (60 * 60), (prevtime.seconds() / 60) % 60, prevtime.seconds() % 60);
 	else
@@ -237,7 +231,7 @@ void menu_bookkeeping::populate(float &customtop, float &custombottom)
 	}
 
 	/* append the single item */
-	item_append(tempstring.str(), "", FLAG_MULTILINE, nullptr);
+	item_append(tempstring.str(), FLAG_MULTILINE, nullptr);
 }
 
 /*-------------------------------------------------
@@ -514,6 +508,8 @@ void menu_crosshair::populate(float &customtop, float &custombottom)
 			break;
 		}
 	}
+
+	item_append(menu_item_type::SEPARATOR);
 }
 
 menu_crosshair::~menu_crosshair()
@@ -649,7 +645,7 @@ void menu_export::handle()
 					// iterate through drivers and output the info
 					while (drvlist.next())
 						util::stream_format(buffer, "%-18s\"%s\"\n", drvlist.driver().name, drvlist.driver().type.fullname());
-					file.puts(buffer.str().c_str());
+					file.puts(buffer.str());
 					file.close();
 					machine().popmessage(_("%s.txt saved under ui folder."), filename);
 				}
@@ -668,9 +664,9 @@ void menu_export::handle()
 void menu_export::populate(float &customtop, float &custombottom)
 {
 	// add options items
-	item_append(_("Export list in XML format (like -listxml)"), "", 0, (void *)(uintptr_t)1);
-	item_append(_("Export list in XML format (like -listxml, but exclude devices)"), "", 0, (void *)(uintptr_t)3);
-	item_append(_("Export list in TXT format (like -listfull)"), "", 0, (void *)(uintptr_t)2);
+	item_append(_("Export list in XML format (like -listxml)"), 0, (void *)(uintptr_t)1);
+	item_append(_("Export list in XML format (like -listxml, but exclude devices)"), 0, (void *)(uintptr_t)3);
+	item_append(_("Export list in TXT format (like -listfull)"), 0, (void *)(uintptr_t)2);
 	item_append(menu_item_type::SEPARATOR);
 }
 
@@ -737,7 +733,7 @@ void menu_machine_configure::handle()
 					if (filerr == osd_file::error::NONE)
 					{
 						std::string inistring = m_opts.output_ini();
-						file.puts(inistring.c_str());
+						file.puts(inistring);
 						ui().popup_time(2, "%s", _("\n    Configuration saved    \n\n"));
 					}
 				}
@@ -752,15 +748,15 @@ void menu_machine_configure::handle()
 				break;
 			case CONTROLLER:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<submenu>(ui(), container(), submenu::control_options, &m_drv, &m_opts);
+					menu::stack_push<submenu>(ui(), container(), submenu::control_options(), &m_drv, &m_opts);
 				break;
 			case VIDEO:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<submenu>(ui(), container(), submenu::video_options, &m_drv, &m_opts);
+					menu::stack_push<submenu>(ui(), container(), submenu::video_options(), &m_drv, &m_opts);
 				break;
 			case ADVANCED:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<submenu>(ui(), container(), submenu::advanced_options, &m_drv, &m_opts);
+					menu::stack_push<submenu>(ui(), container(), submenu::advanced_options(), &m_drv, &m_opts);
 				break;
 			default:
 				break;
@@ -782,29 +778,29 @@ void menu_machine_configure::handle()
 void menu_machine_configure::populate(float &customtop, float &custombottom)
 {
 	// add options items
-	item_append(_("BIOS"), "", FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
+	item_append(_("BIOS"), FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
 	if (!m_bios.empty())
 	{
 		uint32_t arrows = get_arrow_flags(std::size_t(0), m_bios.size() - 1, m_curbios);
 		item_append(_("Driver"), m_bios[m_curbios].first, arrows, (void *)(uintptr_t)BIOS);
 	}
 	else
-		item_append(_("This machine has no BIOS."), "", FLAG_DISABLE, nullptr);
+		item_append(_("This machine has no BIOS."), FLAG_DISABLE, nullptr);
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_(submenu::advanced_options[0].description), "", 0, (void *)(uintptr_t)ADVANCED);
-	item_append(_(submenu::video_options[0].description), "", 0, (void *)(uintptr_t)VIDEO);
-	item_append(_(submenu::control_options[0].description), "", 0, (void *)(uintptr_t)CONTROLLER);
+	item_append(_(submenu::advanced_options()[0].description), 0, (void *)(uintptr_t)ADVANCED);
+	item_append(_(submenu::video_options()[0].description), 0, (void *)(uintptr_t)VIDEO);
+	item_append(_(submenu::control_options()[0].description), 0, (void *)(uintptr_t)CONTROLLER);
 	item_append(menu_item_type::SEPARATOR);
 
 	if (!m_want_favorite)
-		item_append(_("Add To Favorites"), "", 0, (void *)ADDFAV);
+		item_append(_("Add To Favorites"), 0, (void *)ADDFAV);
 	else
-		item_append(_("Remove From Favorites"), "", 0, (void *)DELFAV);
+		item_append(_("Remove From Favorites"), 0, (void *)DELFAV);
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Save machine configuration"), "", 0, (void *)(uintptr_t)SAVE);
-	item_append(menu_item_type::SEPARATOR);
+	item_append(_("Save Machine Configuration"), 0, (void *)(uintptr_t)SAVE);
+
 	customtop = 2.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
@@ -814,7 +810,7 @@ void menu_machine_configure::populate(float &customtop, float &custombottom)
 
 void menu_machine_configure::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	char const *const text[] = { _("Configure machine:"), m_drv.type.fullname() };
+	char const *const text[] = { _("Configure Machine:"), m_drv.type.fullname() };
 	draw_text_box(
 			std::begin(text), std::end(text),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
@@ -877,7 +873,7 @@ menu_plugins_configure::~menu_plugins_configure()
 		// throw emu_fatalerror("Unable to create file plugin.ini\n");
 		return;
 	// generate the updated INI
-	file_plugin.puts(mame_machine_manager::instance()->plugins().output_ini().c_str());
+	file_plugin.puts(mame_machine_manager::instance()->plugins().output_ini());
 }
 
 //-------------------------------------------------
@@ -895,7 +891,7 @@ void menu_plugins_configure::handle()
 	{
 		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT || menu_event->iptkey == IPT_UI_SELECT)
 		{
-			plugin *p = plugins.find((const char*)menu_event->itemref);
+			plugin_options::plugin *p = plugins.find((const char*)menu_event->itemref);
 			if (p)
 			{
 				p->m_start = !p->m_start;

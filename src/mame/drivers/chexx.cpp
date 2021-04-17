@@ -381,7 +381,7 @@ void chexx_state::chexx(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &chexx_state::mem);
 
 	// via
-	VIA6522(config, m_via, MAIN_CLOCK/4);
+	MOS6522(config, m_via, MAIN_CLOCK/4);
 
 	m_via->readpa_handler().set(FUNC(chexx_state::via_a_in));
 	m_via->readpb_handler().set(FUNC(chexx_state::via_b_in));

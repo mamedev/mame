@@ -588,7 +588,7 @@ void splus_state::init_splus()
 
 void splus_state::splus_map(address_map &map)
 {
-	map(0x0000, 0xffff).rom().share("prograram");
+	map(0x0000, 0xffff).rom();
 }
 
 void splus_state::splus_iomap(address_map &map)

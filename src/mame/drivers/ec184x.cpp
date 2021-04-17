@@ -14,6 +14,7 @@
 #include "machine/genpc.h"
 #include "bus/isa/xsu_cards.h"
 #include "bus/pc_kbd/keyboards.h"
+#include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/i86/i86.h"
 #include "machine/ram.h"
 #include "softlist.h"
@@ -231,10 +232,12 @@ void ec184x_state::ec1840(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ec184x_state::ec1840_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	ec1840_mb_device &mb(EC1840_MOTHERBOARD(config, "mb", 0));
+	ec1840_mb_device &mb(EC1840_MOTHERBOARD(config, "mb"));
 	mb.set_cputag(m_maincpu);
 	mb.int_callback().set_inputline(m_maincpu, 0);
 	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	// FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", ec184x_isa8_cards, "ec1840.0002", false);
@@ -246,7 +249,9 @@ void ec184x_state::ec1840(machine_config &config)
 
 	SOFTWARE_LIST(config, "flop_list").set_original("ec1841");
 
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_EC_1841).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_EC_1841));
+	kbd.out_clock_cb().set("mb", FUNC(ec1840_mb_device::keyboard_clock_w));
+	kbd.out_data_cb().set("mb", FUNC(ec1840_mb_device::keyboard_data_w));
 
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("128K,256K,384K,512K");
 }
@@ -260,10 +265,12 @@ void ec184x_state::ec1841(machine_config &config)
 
 	MCFG_MACHINE_RESET_OVERRIDE(ec184x_state, ec1841)
 
-	ec1841_mb_device &mb(EC1841_MOTHERBOARD(config, "mb", 0));
+	ec1841_mb_device &mb(EC1841_MOTHERBOARD(config, "mb"));
 	mb.set_cputag(m_maincpu);
 	mb.int_callback().set_inputline(m_maincpu, 0);
 	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	// FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", ec184x_isa8_cards, "ec1841.0002", false);   // cga
@@ -275,7 +282,9 @@ void ec184x_state::ec1841(machine_config &config)
 
 	SOFTWARE_LIST(config, "flop_list").set_original("ec1841");
 
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_EC_1841).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_EC_1841));
+	kbd.out_clock_cb().set("mb", FUNC(ec1841_mb_device::keyboard_clock_w));
+	kbd.out_data_cb().set("mb", FUNC(ec1841_mb_device::keyboard_data_w));
 
 	RAM(config, m_ram).set_default_size("640K").set_extra_options("512K,1024K,1576K,2048K");
 }
@@ -288,10 +297,12 @@ void ec184x_state::ec1847(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ec184x_state::ec1847_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb"));
 	mb.set_cputag(m_maincpu);
 	mb.int_callback().set_inputline(m_maincpu, 0);
 	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
 	// FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "hercules", false);  // cga, ega and vga(?) are options too
@@ -301,7 +312,9 @@ void ec184x_state::ec1847(machine_config &config)
 	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270));
+	kbd.out_clock_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_clock_w));
+	kbd.out_data_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_data_w));
 
 	RAM(config, m_ram).set_default_size("640K");
 }

@@ -82,8 +82,13 @@
 #include "formats/sdf_dsk.h"
 #include "formats/os9_dsk.h"
 
-// #define VERBOSE (LOG_GENERAL )
+//#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
+#define LOG_WDFDC   (1U << 1) // Shows register setup
+
+//#define VERBOSE (LOG_GENERAL )
 #include "logmacro.h"
+
+#define LOGWDFDC(...)   LOGMASKED(LOG_WDFDC,  __VA_ARGS__)
 
 /***************************************************************************
     PARAMETERS
@@ -158,13 +163,15 @@ private:
     LOCAL VARIABLES
 ***************************************************************************/
 
-FLOPPY_FORMATS_MEMBER( coco_family_fdc_device_base::floppy_formats )
-	FLOPPY_DMK_FORMAT,
-	FLOPPY_JVC_FORMAT,
-	FLOPPY_VDK_FORMAT,
-	FLOPPY_SDF_FORMAT,
-	FLOPPY_OS9_FORMAT
-FLOPPY_FORMATS_END
+void coco_family_fdc_device_base::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_DMK_FORMAT);
+	fr.add(FLOPPY_JVC_FORMAT);
+	fr.add(FLOPPY_VDK_FORMAT);
+	fr.add(FLOPPY_SDF_FORMAT);
+	fr.add(FLOPPY_OS9_FORMAT);
+}
 
 static void coco_fdc_floppies(device_slot_interface &device)
 {
@@ -265,6 +272,8 @@ coco_fdc_device_base::coco_fdc_device_base(const machine_config &mconfig, device
 
 void coco_fdc_device_base::device_start()
 {
+	coco_family_fdc_device_base::device_start();
+	
 	install_readwrite_handler(0xFF74, 0xFF76,
 			read8sm_delegate(*this, FUNC(coco_fdc_device_base::ff74_read)),
 			write8sm_delegate(*this, FUNC(coco_fdc_device_base::ff74_write)));
@@ -514,19 +523,19 @@ u8 coco_fdc_device_base::scs_read(offs_t offset)
 	{
 		case 8:
 			result = m_wd17xx->status_r();
-			LOG("m_wd17xx->status_r: %2.2x\n", result );
+			LOGWDFDC("m_wd17xx->status_r: %2.2x\n", result );
 			break;
 		case 9:
 			result = m_wd17xx->track_r();
-			LOG("m_wd17xx->track_r: %2.2x\n", result );
+			LOGWDFDC("m_wd17xx->track_r: %2.2x\n", result );
 			break;
 		case 10:
 			result = m_wd17xx->sector_r();
-			LOG("m_wd17xx->sector_r: %2.2x\n", result );
+			LOGWDFDC("m_wd17xx->sector_r: %2.2x\n", result );
 			break;
 		case 11:
 			result = m_wd17xx->data_r();
-			LOG("m_wd17xx->data_r: %2.2x\n", result );
+			LOGWDFDC("m_wd17xx->data_r: %2.2x\n", result );
 			break;
 	}
 
@@ -571,19 +580,19 @@ void coco_fdc_device_base::scs_write(offs_t offset, u8 data)
 			dskreg_w(data);
 			break;
 		case 8:
-			LOG("m_wd17xx->cmd_w: %2.2x\n", data );
+			LOGWDFDC("m_wd17xx->cmd_w: %2.2x\n", data );
 			m_wd17xx->cmd_w(data);
 			break;
 		case 9:
-			LOG("m_wd17xx->track_w: %2.2x\n", data );
+			LOGWDFDC("m_wd17xx->track_w: %2.2x\n", data );
 			m_wd17xx->track_w(data);
 			break;
 		case 10:
-			LOG("m_wd17xx->sector_w: %2.2x\n", data );
+			LOGWDFDC("m_wd17xx->sector_w: %2.2x\n", data );
 			m_wd17xx->sector_w(data);
 			break;
 		case 11:
-			LOG("m_wd17xx->data_w: %2.2x\n", data );
+			LOGWDFDC("m_wd17xx->data_w: %2.2x\n", data );
 			m_wd17xx->data_w(data);
 			break;
 	};

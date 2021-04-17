@@ -141,7 +141,6 @@ public:
 	void init_demndrgn();
 	void init_ebases();
 	void init_gorf();
-	void init_astrocde();
 	void astrocade_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(profpac);
 	void profpac_palette(palette_device &palette) const;

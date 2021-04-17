@@ -157,7 +157,6 @@ void kyugo_state::kyugo_main_map(address_map &map)
 void kyugo_state::srdmissn_main_map(address_map &map)
 {
 	kyugo_main_map(map);
-	map(0x8000, 0x8fff).ram();
 	map(0xe000, 0xe7ff).ram().share(m_shared_ram);
 }
 
@@ -219,6 +218,7 @@ void kyugo_state::srdmissn_sub_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share(m_shared_ram);
+	map(0x8800, 0x8fff).ram();
 	map(0xf400, 0xf400).portr("SYSTEM");
 	map(0xf401, 0xf401).portr("P1");
 	map(0xf402, 0xf402).portr("P2");

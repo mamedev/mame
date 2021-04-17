@@ -96,6 +96,7 @@ private:
 	uint16_t m_rf5c400_status;
 	uint32_t m_ext_mem_address;
 	uint16_t m_ext_mem_data;
+	uint16_t m_req_channel;
 };
 
 DECLARE_DEVICE_TYPE(RF5C400, rf5c400_device)

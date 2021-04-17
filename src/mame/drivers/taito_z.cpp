@@ -1121,8 +1121,6 @@ True to original?
 
 Some layer offsets are out a little.
 
-Road layer has wrong colors--regression?
-
 
 Battle Shark
 ------------
@@ -1276,12 +1274,13 @@ DIP switches are not verified
 #include "cpu/z80/z80.h"
 #include "machine/adc0808.h"
 #include "machine/eepromser.h"
-#include "sound/2610intf.h"
+#include "sound/ym2610.h"
 #include "speaker.h"
 
+#include "chasehq.lh"
 #include "contcirc.lh"
 #include "dblaxle.lh"
-#include "enforce.lh"
+#include "enforceja.lh"
 
 
 void taitoz_state::parse_cpu_control()
@@ -1678,7 +1677,7 @@ void taitoz_state::enforce_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x103fff).ram();
 	map(0x104000, 0x107fff).ram().share("share1");
-	map(0x200000, 0x200001).w(FUNC(taitoz_state::cpua_ctrl_w));  // works without?
+	map(0x200001, 0x200001).w(FUNC(taitoz_state::contcirc_out_w));
 	map(0x300000, 0x3006ff).ram().share("spriteram");
 	map(0x400000, 0x401fff).rw(m_tc0150rod, FUNC(tc0150rod_device::word_r), FUNC(tc0150rod_device::word_w));    /* "root ram" ??? */
 	map(0x500000, 0x500007).rw(m_tc0110pcr, FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_rbswap_word_w));   /* palette */
@@ -3145,12 +3144,21 @@ void taitoz_state::machine_start()
 	/* these are specific to various games: we ought to split the inits */
 	save_item(NAME(m_sci_int6));
 	save_item(NAME(m_ioc220_port));
+
+	// 3d scope on contcirc/enforceja
+	m_shutter_out.resolve();
+	m_shutter_toggle = 0;
+	m_shutter_control = 0;
+
+	save_item(NAME(m_shutter_toggle));
+	save_item(NAME(m_shutter_control));
 }
 
 MACHINE_START_MEMBER(taitoz_state,chasehq)
 {
-	m_lamps.resolve();
 	machine_start();
+
+	m_lamps.resolve();
 }
 
 void taitoz_state::machine_reset()
@@ -3193,6 +3201,7 @@ void taitoz_state::contcirc(machine_config &config)
 	screen_config(config, 24, 248);
 	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_contcirc));
 	m_screen->set_palette(m_tc0110pcr);
+	m_screen->screen_vblank().set(FUNC(taitoz_state::scope_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
@@ -3319,6 +3328,7 @@ void taitoz_state::enforce(machine_config &config)
 	screen_config(config, 24, 248);
 	m_screen->set_screen_update(FUNC(taitoz_state::screen_update_contcirc));
 	m_screen->set_palette(m_tc0110pcr);
+	m_screen->screen_vblank().set(FUNC(taitoz_state::scope_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_tc0110pcr, gfx_taitoz);
 
@@ -3844,11 +3854,11 @@ ROM_START( contcirc ) /* 3D Effects controlled via dipswitch, when on can toggle
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b33-07.64", 0x00000, 0x80000, CRC(151e1f52) SHA1(118c673d74f27c4e76b321cc0e84f166d9f0d412) )  /* STY spritemap */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "b33-09.18", 0x00000, 0x80000, CRC(1e6724b5) SHA1(48bb96b648605a9ceb88ff3b175a87226583c3d6) )
 	ROM_LOAD( "b33-10.17", 0x80000, 0x80000, CRC(e9ce03ab) SHA1(17324e8f0422118bc0912eba5750d80469f40b78) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b33-08.19", 0x00000, 0x80000, CRC(caa1c4c8) SHA1(15ef4f36e56fab793d2249252c456677ca6a85c9) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -3885,11 +3895,11 @@ ROM_START( contcircu ) /* 3D Effects controlled via dipswitch, when on can toggl
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b33-07.64", 0x00000, 0x80000, CRC(151e1f52) SHA1(118c673d74f27c4e76b321cc0e84f166d9f0d412) )  /* STY spritemap */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "b33-09.18", 0x00000, 0x80000, CRC(1e6724b5) SHA1(48bb96b648605a9ceb88ff3b175a87226583c3d6) )
 	ROM_LOAD( "b33-10.17", 0x80000, 0x80000, CRC(e9ce03ab) SHA1(17324e8f0422118bc0912eba5750d80469f40b78) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b33-08.19", 0x00000, 0x80000, CRC(caa1c4c8) SHA1(15ef4f36e56fab793d2249252c456677ca6a85c9) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -3926,11 +3936,11 @@ ROM_START( contcircua )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b33-07.64", 0x00000, 0x80000, CRC(151e1f52) SHA1(118c673d74f27c4e76b321cc0e84f166d9f0d412) )  /* STY spritemap */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "b33-09.18", 0x00000, 0x80000, CRC(1e6724b5) SHA1(48bb96b648605a9ceb88ff3b175a87226583c3d6) )
 	ROM_LOAD( "b33-10.17", 0x80000, 0x80000, CRC(e9ce03ab) SHA1(17324e8f0422118bc0912eba5750d80469f40b78) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b33-08.19", 0x00000, 0x80000, CRC(caa1c4c8) SHA1(15ef4f36e56fab793d2249252c456677ca6a85c9) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -3967,11 +3977,11 @@ ROM_START( contcircj )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b33-07.64", 0x00000, 0x80000, CRC(151e1f52) SHA1(118c673d74f27c4e76b321cc0e84f166d9f0d412) )  /* STY spritemap */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "b33-09.18", 0x00000, 0x80000, CRC(1e6724b5) SHA1(48bb96b648605a9ceb88ff3b175a87226583c3d6) )
 	ROM_LOAD( "b33-10.17", 0x80000, 0x80000, CRC(e9ce03ab) SHA1(17324e8f0422118bc0912eba5750d80469f40b78) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b33-08.19", 0x00000, 0x80000, CRC(caa1c4c8) SHA1(15ef4f36e56fab793d2249252c456677ca6a85c9) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -4019,12 +4029,12 @@ ROM_START( chasehq )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b52-38.34", 0x00000, 0x80000, CRC(5b5bf7f6) SHA1(71dd5b40b83870d351c9ecaccc4fb98c3a6740ae) )  /* STY spritemap */
 
-	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x180000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "b52-115.71", 0x000000, 0x080000, CRC(4e117e93) SHA1(51d893fa21793335878c76f6d5987d99da60be04) )
 	ROM_LOAD( "b52-114.72", 0x080000, 0x080000, CRC(3a73d6b1) SHA1(419f02a875b30913331db207e344d0eaa275297e) )
 	ROM_LOAD( "b52-113.73", 0x100000, 0x080000, CRC(2c6a3a05) SHA1(f2f0dfbbbb6930bf53025064ebae9c07a95c6deb) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b52-116.70", 0x00000, 0x80000, CRC(ad46983c) SHA1(6fcad67456fbd8c967cd4786815f70b57a24a969) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -4101,12 +4111,12 @@ ROM_START( chasehqj )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b52-38.34", 0x00000, 0x80000, CRC(5b5bf7f6) SHA1(71dd5b40b83870d351c9ecaccc4fb98c3a6740ae) )  /* STY spritemap */
 
-	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x180000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "b52-41.71", 0x000000, 0x80000, CRC(8204880c) SHA1(4dfd6454b4a4c04db3593e98648afbfe8d1f59ed) )
 	ROM_LOAD( "b52-40.72", 0x080000, 0x80000, CRC(f0551055) SHA1(4498cd058a52d5e87c6d502e844908a5df3abf2a) )
 	ROM_LOAD( "b52-39.73", 0x100000, 0x80000, CRC(ac9cbbd3) SHA1(792f41fef37ff35067fd0173d944f90279176649) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b52-42.70", 0x00000, 0x80000, CRC(6e617df1) SHA1(e3d1678132130c66506f2e1419db2f6b5b062f74) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -4180,12 +4190,12 @@ ROM_START( chasehqju )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b52-38.34", 0x00000, 0x80000, CRC(5b5bf7f6) SHA1(71dd5b40b83870d351c9ecaccc4fb98c3a6740ae) )  /* STY spritemap */
 
-	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x180000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "b52-41.71", 0x000000, 0x80000, CRC(8204880c) SHA1(4dfd6454b4a4c04db3593e98648afbfe8d1f59ed) )
 	ROM_LOAD( "b52-40.72", 0x080000, 0x80000, CRC(f0551055) SHA1(4498cd058a52d5e87c6d502e844908a5df3abf2a) )
 	ROM_LOAD( "b52-39.73", 0x100000, 0x80000, CRC(ac9cbbd3) SHA1(792f41fef37ff35067fd0173d944f90279176649) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b52-42.70", 0x00000, 0x80000, CRC(6e617df1) SHA1(e3d1678132130c66506f2e1419db2f6b5b062f74) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -4262,12 +4272,12 @@ ROM_START( chasehqu )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b52-38.34", 0x00000, 0x80000, CRC(5b5bf7f6) SHA1(71dd5b40b83870d351c9ecaccc4fb98c3a6740ae) )  /* STY spritemap */
 
-	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x180000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "b52-115.71", 0x000000, 0x080000, CRC(4e117e93) SHA1(51d893fa21793335878c76f6d5987d99da60be04) )
 	ROM_LOAD( "b52-114.72", 0x080000, 0x080000, CRC(3a73d6b1) SHA1(419f02a875b30913331db207e344d0eaa275297e) )
 	ROM_LOAD( "b52-113.73", 0x100000, 0x080000, CRC(2c6a3a05) SHA1(f2f0dfbbbb6930bf53025064ebae9c07a95c6deb) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b52-116.70", 0x00000, 0x80000, CRC(ad46983c) SHA1(6fcad67456fbd8c967cd4786815f70b57a24a969) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -4333,11 +4343,11 @@ ROM_START( enforce )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b58-05.71", 0x00000, 0x80000, CRC(d1f4991b) SHA1(f1c5a9b8dce994d013290e98fda7bedf73e95900) )  /* STY spritemap */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "b58-07.11", 0x000000, 0x080000, CRC(eeb5ba08) SHA1(fe40333e09339c76e503ce87b42a89b48d487016) )
 	ROM_LOAD( "b58-08.12", 0x080000, 0x080000, CRC(049243cf) SHA1(1f3099b6d764114dc4161ed308369d0f3148dc4e) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples ??? */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples ??? */
 	ROM_LOAD( "b58-10.14", 0x00000, 0x80000, CRC(edce0cc1) SHA1(1f6cbc60502b8b12b349e48446ce3a4a1f76bccd) ) /* ??? */
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -4376,11 +4386,11 @@ ROM_START( enforcej )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b58-05.71", 0x00000, 0x80000, CRC(d1f4991b) SHA1(f1c5a9b8dce994d013290e98fda7bedf73e95900) )  /* STY spritemap */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "b58-07.11", 0x000000, 0x080000, CRC(eeb5ba08) SHA1(fe40333e09339c76e503ce87b42a89b48d487016) )
 	ROM_LOAD( "b58-08.12", 0x080000, 0x080000, CRC(049243cf) SHA1(1f3099b6d764114dc4161ed308369d0f3148dc4e) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples ??? */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples ??? */
 	ROM_LOAD( "b58-10.14", 0x00000, 0x80000, CRC(edce0cc1) SHA1(1f6cbc60502b8b12b349e48446ce3a4a1f76bccd) ) /* ??? */
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -4419,11 +4429,11 @@ ROM_START( enforceja )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b58-05.71", 0x00000, 0x80000, CRC(d1f4991b) SHA1(f1c5a9b8dce994d013290e98fda7bedf73e95900) )  /* STY spritemap */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "b58-07.11", 0x000000, 0x080000, CRC(eeb5ba08) SHA1(fe40333e09339c76e503ce87b42a89b48d487016) )
 	ROM_LOAD( "b58-08.12", 0x080000, 0x080000, CRC(049243cf) SHA1(1f3099b6d764114dc4161ed308369d0f3148dc4e) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples ??? */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples ??? */
 	ROM_LOAD( "b58-10.14", 0x00000, 0x80000, CRC(edce0cc1) SHA1(1f6cbc60502b8b12b349e48446ce3a4a1f76bccd) ) /* ??? */
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -4463,10 +4473,10 @@ ROM_START( bshark )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c34_06.12", 0x00000, 0x80000, CRC(d200b6eb) SHA1(6bfe3a7dde8d4e983521877d2bb176f5d126b763) )  /* STY spritemap */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c34_08.127", 0x00000, 0x80000, CRC(89a30450) SHA1(96b96ca5a3e20cdceb9ac5ddf377fb21a9a529fb) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c34_09.126", 0x00000, 0x80000, CRC(39d12b50) SHA1(5c5d1369597604376943e4825f6c09cc28d66047) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -4505,10 +4515,10 @@ ROM_START( bsharku )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c34_06.12", 0x00000, 0x80000, CRC(d200b6eb) SHA1(6bfe3a7dde8d4e983521877d2bb176f5d126b763) )  /* STY spritemap */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c34_08.127", 0x00000, 0x80000, CRC(89a30450) SHA1(96b96ca5a3e20cdceb9ac5ddf377fb21a9a529fb) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c34_09.126", 0x00000, 0x80000, CRC(39d12b50) SHA1(5c5d1369597604376943e4825f6c09cc28d66047) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -4547,10 +4557,10 @@ ROM_START( bsharkj )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c34_06.12", 0x00000, 0x80000, CRC(d200b6eb) SHA1(6bfe3a7dde8d4e983521877d2bb176f5d126b763) )  /* STY spritemap */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c34_08.127", 0x00000, 0x80000, CRC(89a30450) SHA1(96b96ca5a3e20cdceb9ac5ddf377fb21a9a529fb) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c34_09.126", 0x00000, 0x80000, CRC(39d12b50) SHA1(5c5d1369597604376943e4825f6c09cc28d66047) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -4589,10 +4599,10 @@ ROM_START( bsharkjjs )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c34_06.12", 0x00000, 0x80000, CRC(d200b6eb) SHA1(6bfe3a7dde8d4e983521877d2bb176f5d126b763) )  /* STY spritemap */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c34_08.127", 0x00000, 0x80000, CRC(89a30450) SHA1(96b96ca5a3e20cdceb9ac5ddf377fb21a9a529fb) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c34_09.126", 0x00000, 0x80000, CRC(39d12b50) SHA1(5c5d1369597604376943e4825f6c09cc28d66047) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -4632,12 +4642,12 @@ ROM_START( sci )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c09-06.37", 0x00000, 0x80000, CRC(12df6d7b) SHA1(8ce742eb3f7eb6283b5ca32bb520d1cc7684d515) )  /* STY spritemap */
 
-	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x180000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c09-14.42", 0x000000, 0x080000, CRC(ad78bf46) SHA1(4020744bbdc4b9ec3dee1a9d7b5ffa8def43d7b2) )
 	ROM_LOAD( "c09-13.43", 0x080000, 0x080000, CRC(d57c41d3) SHA1(3375a1fc6389840544b9fdb96b2fafbc8e3276e2) )
 	ROM_LOAD( "c09-12.44", 0x100000, 0x080000, CRC(56c99fa5) SHA1(3f9a6bc89d847cc4c99d35f98157ea3f187c0f98) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c09-15.29", 0x00000, 0x80000, CRC(e63b9095) SHA1(c6ea670b5a90ab39429259ec1fefb2bde5d0213f) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -4683,12 +4693,12 @@ ROM_START( scia )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c09-06.37", 0x00000, 0x80000, CRC(12df6d7b) SHA1(8ce742eb3f7eb6283b5ca32bb520d1cc7684d515) )  /* STY spritemap */
 
-	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x180000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c09-14.42", 0x000000, 0x080000, CRC(ad78bf46) SHA1(4020744bbdc4b9ec3dee1a9d7b5ffa8def43d7b2) )
 	ROM_LOAD( "c09-13.43", 0x080000, 0x080000, CRC(d57c41d3) SHA1(3375a1fc6389840544b9fdb96b2fafbc8e3276e2) )
 	ROM_LOAD( "c09-12.44", 0x100000, 0x080000, CRC(56c99fa5) SHA1(3f9a6bc89d847cc4c99d35f98157ea3f187c0f98) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c09-15.29", 0x00000, 0x80000, CRC(e63b9095) SHA1(c6ea670b5a90ab39429259ec1fefb2bde5d0213f) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -4734,12 +4744,12 @@ ROM_START( scij )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c09-06.37", 0x00000, 0x80000, CRC(12df6d7b) SHA1(8ce742eb3f7eb6283b5ca32bb520d1cc7684d515) )  /* STY spritemap */
 
-	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x180000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c09-10.42", 0x000000, 0x080000, CRC(ad78bf46) SHA1(4020744bbdc4b9ec3dee1a9d7b5ffa8def43d7b2) )
 	ROM_LOAD( "c09-09.43", 0x080000, 0x080000, CRC(6a655c00) SHA1(5ae1ee422226e386550b69a1f35668c10d3bdcc2) )
 	ROM_LOAD( "c09-08.44", 0x100000, 0x080000, CRC(7ddfc316) SHA1(47f0ed8eecd4719b4c5cb8762ee6b8bb01686812) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c09-11.29", 0x00000, 0x80000, CRC(6b1a11e1) SHA1(4304d029ecf91fa5b779057f195f75ebdd0a7c1c) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -4785,12 +4795,12 @@ ROM_START( sciu )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c09-06.37", 0x00000, 0x80000, CRC(12df6d7b) SHA1(8ce742eb3f7eb6283b5ca32bb520d1cc7684d515) )  /* STY spritemap */
 
-	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x180000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c09-14.42", 0x000000, 0x080000, CRC(ad78bf46) SHA1(4020744bbdc4b9ec3dee1a9d7b5ffa8def43d7b2) )
 	ROM_LOAD( "c09-13.43", 0x080000, 0x080000, CRC(d57c41d3) SHA1(3375a1fc6389840544b9fdb96b2fafbc8e3276e2) )
 	ROM_LOAD( "c09-12.44", 0x100000, 0x080000, CRC(56c99fa5) SHA1(3f9a6bc89d847cc4c99d35f98157ea3f187c0f98) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c09-15.29", 0x00000, 0x80000, CRC(e63b9095) SHA1(c6ea670b5a90ab39429259ec1fefb2bde5d0213f) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -4836,12 +4846,12 @@ ROM_START( scin )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c09-06.37", 0x00000, 0x80000, CRC(12df6d7b) SHA1(8ce742eb3f7eb6283b5ca32bb520d1cc7684d515) )  /* STY spritemap */
 
-	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x180000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c09-14.42", 0x000000, 0x080000, CRC(ad78bf46) SHA1(4020744bbdc4b9ec3dee1a9d7b5ffa8def43d7b2) )
 	ROM_LOAD( "c09-13.43", 0x080000, 0x080000, CRC(d57c41d3) SHA1(3375a1fc6389840544b9fdb96b2fafbc8e3276e2) )
 	ROM_LOAD( "c09-12.44", 0x100000, 0x080000, CRC(56c99fa5) SHA1(3f9a6bc89d847cc4c99d35f98157ea3f187c0f98) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c09-15.29", 0x00000, 0x80000, CRC(e63b9095) SHA1(c6ea670b5a90ab39429259ec1fefb2bde5d0213f) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -4894,11 +4904,11 @@ ROM_START( nightstr )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b91-09.bin", 0x00000, 0x80000, CRC(5f247ca2) SHA1(3b89e5d035f27f62a14c5c7a976c804f9bb5c04d) ) /* STY spritemap */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "b91-13.bin", 0x00000, 0x80000, CRC(8c7bf0f5) SHA1(6e18531991225c24a9722c9fbe1af6ae6e9b866b) )
 	ROM_LOAD( "b91-12.bin", 0x80000, 0x80000, CRC(da77c7af) SHA1(49662a69b83739e2e0209cabff83995a951383f4) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b91-14.bin", 0x00000, 0x80000, CRC(6bc314d3) SHA1(ae3e9c6b853bab4ec81a6bd951b39a4bc883f456) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -4947,11 +4957,11 @@ ROM_START( nightstru )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b91-09.bin", 0x00000, 0x80000, CRC(5f247ca2) SHA1(3b89e5d035f27f62a14c5c7a976c804f9bb5c04d) ) /* STY spritemap */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "b91-13.bin", 0x00000, 0x80000, CRC(8c7bf0f5) SHA1(6e18531991225c24a9722c9fbe1af6ae6e9b866b) )
 	ROM_LOAD( "b91-12.bin", 0x80000, 0x80000, CRC(da77c7af) SHA1(49662a69b83739e2e0209cabff83995a951383f4) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b91-14.bin", 0x00000, 0x80000, CRC(6bc314d3) SHA1(ae3e9c6b853bab4ec81a6bd951b39a4bc883f456) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -5000,11 +5010,11 @@ ROM_START( nightstrj )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b91-09.bin", 0x00000, 0x80000, CRC(5f247ca2) SHA1(3b89e5d035f27f62a14c5c7a976c804f9bb5c04d) ) /* STY spritemap */
 
-	ROM_REGION( 0x100000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "b91-13.bin", 0x00000, 0x80000, CRC(8c7bf0f5) SHA1(6e18531991225c24a9722c9fbe1af6ae6e9b866b) )
 	ROM_LOAD( "b91-12.bin", 0x80000, 0x80000, CRC(da77c7af) SHA1(49662a69b83739e2e0209cabff83995a951383f4) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b91-14.bin", 0x00000, 0x80000, CRC(6bc314d3) SHA1(ae3e9c6b853bab4ec81a6bd951b39a4bc883f456) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -5045,10 +5055,10 @@ ROM_START( aquajack )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b77-06.ic39", 0x00000, 0x80000, CRC(ce2aed00) SHA1(9c992717914b13eb271122ecf7cca3634b013e56) )    /* STY spritemap */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b77-09.ic58", 0x00000, 0x80000, CRC(948e5ad9) SHA1(35cd6706470f01b5a244817d10fc65c075ff29b1) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b77-08.ic57", 0x00000, 0x80000, CRC(119b9485) SHA1(2c9cd90be20df769e09016abccf59c8f119da286) )
 
 	ROM_REGION( 0x00200, "user2", 0 )   /* unused PROMs */
@@ -5085,10 +5095,10 @@ ROM_START( aquajacku )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b77-06.ic39", 0x00000, 0x80000, CRC(ce2aed00) SHA1(9c992717914b13eb271122ecf7cca3634b013e56) )    /* STY spritemap */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b77-09.ic58", 0x00000, 0x80000, CRC(948e5ad9) SHA1(35cd6706470f01b5a244817d10fc65c075ff29b1) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b77-08.ic57", 0x00000, 0x80000, CRC(119b9485) SHA1(2c9cd90be20df769e09016abccf59c8f119da286) )
 
 	ROM_REGION( 0x00200, "user2", 0 )   /* unused PROMs */
@@ -5125,10 +5135,10 @@ ROM_START( aquajackj )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "b77-06.ic39", 0x00000, 0x80000, CRC(ce2aed00) SHA1(9c992717914b13eb271122ecf7cca3634b013e56) )    /* STY spritemap */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b77-09.ic58", 0x00000, 0x80000, CRC(948e5ad9) SHA1(35cd6706470f01b5a244817d10fc65c075ff29b1) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "b77-08.ic57", 0x00000, 0x80000, CRC(119b9485) SHA1(2c9cd90be20df769e09016abccf59c8f119da286) )
 
 	ROM_REGION( 0x00200, "user2", 0 )   /* unused PROMs */
@@ -5161,10 +5171,10 @@ ROM_START( spacegun )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c57-05.36", 0x00000, 0x80000, CRC(6a70eb2e) SHA1(307dd876af65204e86e094b4015ffb4a655824f8) )  /* STY spritemap */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c57-07.76", 0x00000, 0x80000, CRC(ad653dc1) SHA1(2ec440f793b0a686233fbe61c9462f8365c42b65) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c57-08.75", 0x00000, 0x80000, CRC(22593550) SHA1(e802e947e6947d146e1b57dbff7ac021e19e7b2b) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -5199,10 +5209,10 @@ ROM_START( spacegunu )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c57-05.36", 0x00000, 0x80000, CRC(6a70eb2e) SHA1(307dd876af65204e86e094b4015ffb4a655824f8) )  /* STY spritemap */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c57-07.76", 0x00000, 0x80000, CRC(ad653dc1) SHA1(2ec440f793b0a686233fbe61c9462f8365c42b65) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c57-08.75", 0x00000, 0x80000, CRC(22593550) SHA1(e802e947e6947d146e1b57dbff7ac021e19e7b2b) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -5237,10 +5247,10 @@ ROM_START( spacegunj )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c57-05.36", 0x00000, 0x80000, CRC(6a70eb2e) SHA1(307dd876af65204e86e094b4015ffb4a655824f8) )  /* STY spritemap */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c57-07.76", 0x00000, 0x80000, CRC(ad653dc1) SHA1(2ec440f793b0a686233fbe61c9462f8365c42b65) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c57-08.75", 0x00000, 0x80000, CRC(22593550) SHA1(e802e947e6947d146e1b57dbff7ac021e19e7b2b) )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
@@ -5284,11 +5294,11 @@ ROM_START( dblaxle ) /* Manual refers to this version as the "Version Without Co
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c78-04.3", 0x00000, 0x80000, CRC(cc1aa37c) SHA1(cfa2eb338dc81c98c637c2f0b14d2baea8b115f5) )   /* STY spritemap */
 
-	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x180000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c78-12.33", 0x000000, 0x100000, CRC(b0267404) SHA1(ffd337336ff9b096e3725f733364762f6e6d3fab) )
 	ROM_LOAD( "c78-13.46", 0x100000, 0x080000, CRC(1b363aa2) SHA1(0aae3988024654e98cc0c784307b1c329c8f0783) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c78-14.31",  0x00000, 0x80000, CRC(9cad4dfb) SHA1(9187ef827a3f1bc9233d0e45e72c72c0956c5912) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -5331,11 +5341,11 @@ ROM_START( dblaxleu ) /* Manual refers to this version as the "Version Without C
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c78-04.3", 0x00000, 0x80000, CRC(cc1aa37c) SHA1(cfa2eb338dc81c98c637c2f0b14d2baea8b115f5) )   /* STY spritemap */
 
-	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x180000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c78-12.33", 0x000000, 0x100000, CRC(b0267404) SHA1(ffd337336ff9b096e3725f733364762f6e6d3fab) )
 	ROM_LOAD( "c78-13.46", 0x100000, 0x080000, CRC(1b363aa2) SHA1(0aae3988024654e98cc0c784307b1c329c8f0783) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c78-14.31",  0x00000, 0x80000, CRC(9cad4dfb) SHA1(9187ef827a3f1bc9233d0e45e72c72c0956c5912) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -5378,11 +5388,11 @@ ROM_START( dblaxleul ) /* Side by side linkable version */
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c78-04.3", 0x00000, 0x80000, CRC(cc1aa37c) SHA1(cfa2eb338dc81c98c637c2f0b14d2baea8b115f5) )   /* STY spritemap */
 
-	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x180000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c78-12.33", 0x000000, 0x100000, CRC(b0267404) SHA1(ffd337336ff9b096e3725f733364762f6e6d3fab) )
 	ROM_LOAD( "c78-13.46", 0x100000, 0x080000, CRC(1b363aa2) SHA1(0aae3988024654e98cc0c784307b1c329c8f0783) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c78-14.31",  0x00000, 0x80000, CRC(9cad4dfb) SHA1(9187ef827a3f1bc9233d0e45e72c72c0956c5912) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -5423,11 +5433,11 @@ ROM_START( pwheelsj ) /* Side by side linkable version */
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c78-04.3", 0x00000, 0x80000, CRC(cc1aa37c) SHA1(cfa2eb338dc81c98c637c2f0b14d2baea8b115f5) )   /* STY spritemap */
 
-	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x180000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c78-01.33", 0x000000, 0x100000, CRC(90ff1e72) SHA1(6115e3683bc701922953b644427d1ddb471bf037) )
 	ROM_LOAD( "c78-02.46", 0x100000, 0x080000, CRC(8882d2b7) SHA1(4d3abac1e50cd5ae79a562f430563032a11e8390) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c78-03.31",  0x00000, 0x80000, CRC(9b926a2f) SHA1(cc2d612441a5cc587e097bb8380b56753b9a4f7c) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -5468,11 +5478,11 @@ ROM_START( racingb )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c84-88.3", 0x00000, 0x80000, CRC(edd1f49c) SHA1(f11c419dcc7da03ef1f1665c1344c27ff35fe867) )   /* STY spritemap */
 
-	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x180000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c84-86.33", 0x000000, 0x100000, CRC(98d9771e) SHA1(0cbb6b08e1fa5e632309962d7ad7dca448ef4d78) )
 	ROM_LOAD( "c84-87.46", 0x100000, 0x080000, CRC(9c1dd80c) SHA1(e1bae4e02fd94413fac4683e39e530f9d508d658) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c84-85.31",  0x00000, 0x80000, CRC(24cd838d) SHA1(18139f7df191ff2d005d76b3a85a6fafb630ea42) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -5513,11 +5523,11 @@ ROM_START( racingbj )
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "c84-88.3", 0x00000, 0x80000, CRC(edd1f49c) SHA1(f11c419dcc7da03ef1f1665c1344c27ff35fe867) )   /* STY spritemap */
 
-	ROM_REGION( 0x180000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x180000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "c84-86.33", 0x000000, 0x100000, CRC(98d9771e) SHA1(0cbb6b08e1fa5e632309962d7ad7dca448ef4d78) )
 	ROM_LOAD( "c84-87.46", 0x100000, 0x080000, CRC(9c1dd80c) SHA1(e1bae4e02fd94413fac4683e39e530f9d508d658) )
 
-	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcmb", 0 )    /* Delta-T samples */
 	ROM_LOAD( "c84-85.31",  0x00000, 0x80000, CRC(24cd838d) SHA1(18139f7df191ff2d005d76b3a85a6fafb630ea42) )
 
 	ROM_REGION( 0x10000, "user2", 0 )   /* unused ROMs */
@@ -5540,27 +5550,27 @@ void taitoz_state::init_bshark()
 GAMEL(1987, contcirc,   0,        contcirc,  contcirc,  taitoz_state, empty_init,  ROT0,               "Taito Corporation Japan",   "Continental Circus (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
 GAMEL(1987, contcircu,  contcirc, contcirc,  contcrcu,  taitoz_state, empty_init,  ROT0,               "Taito America Corporation", "Continental Circus (US set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
 GAMEL(1987, contcircua, contcirc, contcirc,  contcrcj,  taitoz_state, empty_init,  ROT0,               "Taito America Corporation", "Continental Circus (US set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1987, contcircj , contcirc, contcirc,  contcrcj,  taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Continental Circus (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1987, contcircj,  contcirc, contcirc,  contcrcj,  taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Continental Circus (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
 
-GAMEL(1988, chasehq,    0,        chasehq,   chasehq,   taitoz_state, empty_init,  ROT0,               "Taito Corporation Japan",   "Chase H.Q. (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1988, chasehqj,   chasehq,  chasehq,   chasehqj,  taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Chase H.Q. (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1988, chasehqju,  chasehq,  chasehq,   chasehq,   taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Chase H.Q. (Japan, upright?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc ) // same code rev as Chase H.Q. (World)
-GAMEL(1988, chasehqu,   chasehq,  chasehq,   chasehq,   taitoz_state, empty_init,  ROT0,               "Taito America Corporation", "Chase H.Q. (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1988, chasehq,    0,        chasehq,   chasehq,   taitoz_state, empty_init,  ROT0,               "Taito Corporation Japan",   "Chase H.Q. (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
+GAMEL(1988, chasehqj,   chasehq,  chasehq,   chasehqj,  taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Chase H.Q. (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
+GAMEL(1988, chasehqju,  chasehq,  chasehq,   chasehq,   taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Chase H.Q. (Japan, upright?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq ) // same code rev as Chase H.Q. (World)
+GAMEL(1988, chasehqu,   chasehq,  chasehq,   chasehq,   taitoz_state, empty_init,  ROT0,               "Taito America Corporation", "Chase H.Q. (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
 
 GAME( 1988, enforce,    0,        enforce,   enforce,   taitoz_state, empty_init,  ROT0,               "Taito Corporation Japan",   "Enforce (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, enforcej,   enforce,  enforce,   enforcej,  taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Enforce (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAMEL( 1988, enforceja,  enforce,  enforce,  enforceja, taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Enforce (Japan, Analog Controls)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_enforce )
+GAMEL(1988, enforceja,  enforce,  enforce,   enforceja, taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Enforce (Japan, Analog Controls)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_enforceja )
 
 GAME( 1989, bshark,     0,        bshark,    bshark,    taitoz_state, init_bshark, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Battle Shark (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, bsharku,    bshark,   bshark,    bsharku,   taitoz_state, init_bshark, ORIENTATION_FLIP_X, "Taito America Corporation", "Battle Shark (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, bsharkj,    bshark,   bshark,    bsharkj,   taitoz_state, init_bshark, ORIENTATION_FLIP_X, "Taito Corporation",         "Battle Shark (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, bsharkjjs,  bshark,   bsharkjjs, bsharkjjs, taitoz_state, init_bshark, ORIENTATION_FLIP_X, "Taito Corporation",         "Battle Shark (Japan, Joystick)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1989, sci,        0,        sci,       sci,       taitoz_state, empty_init,  ROT0,               "Taito Corporation Japan",   "Special Criminal Investigation (World set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1989, scia,       sci,      sci,       sci,       taitoz_state, empty_init,  ROT0,               "Taito Corporation Japan",   "Special Criminal Investigation (World set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1989, scij,       sci,      sci,       scij,      taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Special Criminal Investigation (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1989, sciu,       sci,      sci,       sciu,      taitoz_state, empty_init,  ROT0,               "Taito America Corporation", "Special Criminal Investigation (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
-GAMEL(1991, scin,       sci,      sci,       sci,       taitoz_state, empty_init,  ROT0,               "hack (Negro Torino)",       "Super Special Criminal Investigation (Negro Torino hack)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_contcirc )
+GAMEL(1989, sci,        0,        sci,       sci,       taitoz_state, empty_init,  ROT0,               "Taito Corporation Japan",   "Special Criminal Investigation (World set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
+GAMEL(1989, scia,       sci,      sci,       sci,       taitoz_state, empty_init,  ROT0,               "Taito Corporation Japan",   "Special Criminal Investigation (World set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
+GAMEL(1989, scij,       sci,      sci,       scij,      taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Special Criminal Investigation (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
+GAMEL(1989, sciu,       sci,      sci,       sciu,      taitoz_state, empty_init,  ROT0,               "Taito America Corporation", "Special Criminal Investigation (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
+GAMEL(1991, scin,       sci,      sci,       sci,       taitoz_state, empty_init,  ROT0,               "hack (Negro Torino)",       "Super Special Criminal Investigation (Negro Torino hack)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_chasehq )
 
 GAME( 1989, nightstr,   0,        nightstr,  nightstr,  taitoz_state, empty_init,  ROT0,               "Taito Corporation Japan",   "Night Striker (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, nightstrj,  nightstr, nightstr,  nghtstrj,  taitoz_state, empty_init,  ROT0,               "Taito Corporation",         "Night Striker (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -12,8 +12,6 @@
 
 #pragma once
 
-#include "iptseqpoll.h"
-
 #include <condition_variable>
 #include <functional>
 #include <map>
@@ -33,6 +31,15 @@ struct lua_State;
 class lua_engine
 {
 public:
+	// helper structures
+	template <typename T> struct devenum;
+	template <typename T> struct simple_list_wrapper;
+	template <typename T> struct tag_object_ptr_map;
+	template <typename T> using standard_tag_object_ptr_map = tag_object_ptr_map<std::unordered_map<std::string, std::unique_ptr<T> > >;
+	template <typename T> struct immutable_container_helper;
+	template <typename T, typename C, typename I = typename C::iterator> struct immutable_collection_helper;
+	template <typename T, typename C, typename I = typename C::iterator> struct immutable_sequence_helper;
+
 	// construction/destruction
 	lua_engine();
 	~lua_engine();
@@ -55,12 +62,12 @@ public:
 	bool on_missing_mandatory_image(const std::string &instance_name);
 	void on_machine_before_load_settings();
 
-	template<typename T, typename U>
-	bool call_plugin(const std::string &name, const T in, U &out)
+	template <typename T, typename U>
+	bool call_plugin(const std::string &name, T &&in, U &out)
 	{
 		bool ret = false;
-		sol::object outobj = call_plugin(name, sol::make_object(sol(), in));
-		if(outobj.is<U>())
+		sol::object outobj = call_plugin(name, sol::make_object(sol(), std::forward<T>(in)));
+		if (outobj.is<U>())
 		{
 			out = outobj.as<U>();
 			ret = true;
@@ -68,16 +75,16 @@ public:
 		return ret;
 	}
 
-	template<typename T, typename U>
-	bool call_plugin(const std::string &name, const T in, std::vector<U> &out)
+	template <typename T, typename U>
+	bool call_plugin(const std::string &name, T &&in, std::vector<U> &out)
 	{
 		bool ret = false;
-		sol::object outobj = call_plugin(name, sol::make_object(sol(), in));
-		if(outobj.is<sol::table>())
+		sol::object outobj = call_plugin(name, sol::make_object(sol(), std::forward<T>(in)));
+		if (outobj.is<sol::table>())
 		{
-			for(auto &entry : outobj.as<sol::table>())
+			for (auto &entry : outobj.as<sol::table>())
 			{
-				if(entry.second.template is<U>())
+				if (entry.second.template is<U>())
 				{
 					out.push_back(entry.second.template as<U>());
 					ret = true;
@@ -88,26 +95,26 @@ public:
 	}
 
 	// this can also check if a returned table contains type T
-	template<typename T, typename U>
-	bool call_plugin_check(const std::string &name, const U in, bool table = false)
+	template <typename T, typename U>
+	bool call_plugin_check(const std::string &name, U &&in, bool table = false)
 	{
 		bool ret = false;
-		sol::object outobj = call_plugin(name, sol::make_object(sol(), in));
-		if(outobj.is<T>() && !table)
+		sol::object outobj = call_plugin(name, sol::make_object(sol(), std::forward<U>(in)));
+		if (outobj.is<T>() && !table)
 			ret = true;
-		else if(outobj.is<sol::table>() && table)
+		else if (outobj.is<sol::table>() && table)
 		{
 			// check just one entry, checking the whole thing shouldn't be necessary as this only supports homogeneous tables
-			if(outobj.as<sol::table>().begin().operator*().second.template is<T>())
+			if (outobj.as<sol::table>().begin().operator*().second.template is<T>())
 				ret = true;
 		}
 		return ret;
 	}
 
-	template<typename T>
-	void call_plugin_set(const std::string &name, const T in)
+	template <typename T>
+	void call_plugin_set(const std::string &name, T &&in)
 	{
-		call_plugin(name, sol::make_object(sol(), in));
+		call_plugin(name, sol::make_object(sol(), std::forward<T>(in)));
 	}
 
 	sol::state_view &sol() const { return *m_sol_state; }
@@ -115,13 +122,35 @@ public:
 private:
 	template<typename T, size_t SIZE> class enum_parser;
 
+	struct addr_space;
+
+	struct save_item {
+		void *base;
+		unsigned int size;
+		unsigned int count;
+		unsigned int valcount;
+		unsigned int blockcount;
+		unsigned int stride;
+	};
+
+	struct context
+	{
+		context() { busy = false; yield = false; }
+		std::string result;
+		std::condition_variable sync;
+		bool busy;
+		bool yield;
+	};
+
 	// internal state
 	lua_State *m_lua_state;
 	std::unique_ptr<sol::state_view> m_sol_state;
 	running_machine *m_machine;
-	std::unique_ptr<input_sequence_poller> m_seq_poll;
 
 	std::vector<std::string> m_menu;
+
+	template <typename R, typename T, typename D>
+	auto make_simple_callback_setter(void (T::*setter)(delegate<R ()> &&), D &&dflt, const char *name, const char *desc);
 
 	running_machine &machine() const { return *m_machine; }
 
@@ -138,36 +167,17 @@ private:
 	bool execute_function(const char *id);
 	sol::object call_plugin(const std::string &name, sol::object in);
 
-	struct addr_space;
-
-	struct save_item {
-		void *base;
-		unsigned int size;
-		unsigned int count;
-		unsigned int valcount;
-		unsigned int blockcount;
-		unsigned int stride;
-	};
-
 	void close();
 
 	void run(sol::load_result res);
 
-	struct context
-	{
-		context() { busy = false; yield = false; }
-		std::string result;
-		std::condition_variable sync;
-		bool busy;
-		bool yield;
-	};
-
-	template<typename TFunc, typename... TArgs>
+	template <typename TFunc, typename... TArgs>
 	sol::protected_function_result invoke(TFunc &&func, TArgs&&... args);
 
-	void initialize_input();
-	void initialize_memory();
-	void initialize_render();
+	void initialize_debug(sol::table &emu);
+	void initialize_input(sol::table &emu);
+	void initialize_memory(sol::table &emu);
+	void initialize_render(sol::table &emu);
 };
 
 #endif // MAME_FRONTEND_MAME_LUAENGINE_H

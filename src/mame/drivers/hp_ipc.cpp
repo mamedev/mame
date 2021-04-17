@@ -343,7 +343,7 @@ http://www.brouhaha.com/~eric/hpcalc/chips/
 Software to look for
 --------------------
 
-00095-60978 "Service ROM - Used in trobleshooting the integral PC" via ambry
+00095-60978 "Service ROM - Used in troubleshooting the integral PC" via ambry
 00095-60925 "Service ROM" via service manual
 00095-60969 "Service Diagnostic Disc" via service manual
 00095-60950 "I/O Component-Level Diagnostic Disc" via serial interface service manual
@@ -374,10 +374,13 @@ Software to look for
 #include "sound/dac.h"
 #include "machine/input_merger.h"
 #include "bus/hp_ipc_io/hp_ipc_io.h"
+#include "machine/hp_ipc_optrom.h"
 
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
 
 class hp_ipc_state : public driver_device
 {
@@ -398,16 +401,19 @@ public:
 		, m_irq6_merger(*this , "merge_irq6")
 		, m_io_slot_a(*this , "slot_a")
 		, m_io_slot_b(*this , "slot_b")
+		, m_rom_slots(*this , "rom%u" , 0)
 	{ }
 
 	void hp_ipc_base(machine_config &config);
 	void hp_ipc(machine_config &config);
 	void hp9808a(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+private:
 	uint16_t mem_r(offs_t offset, uint16_t mem_mask);
 	void mem_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t mmu_r(offs_t offset);
@@ -420,14 +426,14 @@ private:
 
 	uint8_t floppy_id_r();
 	void floppy_id_w(uint8_t data);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	DECLARE_WRITE_LINE_MEMBER(irq_1);
 	DECLARE_WRITE_LINE_MEMBER(irq_2);
 	DECLARE_WRITE_LINE_MEMBER(irq_3);
-	DECLARE_WRITE_LINE_MEMBER(irq_4);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(irq_4);
 	DECLARE_WRITE_LINE_MEMBER(irq_5);
-	DECLARE_WRITE_LINE_MEMBER(irq_6);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(irq_6);
 	DECLARE_WRITE_LINE_MEMBER(irq_7);
 
 	emu_timer *m_bus_error_timer;
@@ -452,6 +458,7 @@ private:
 	required_device<input_merger_any_high_device> m_irq6_merger;
 	required_device<hp_ipc_io_slot_device> m_io_slot_a;
 	required_device<hp_ipc_io_slot_device> m_io_slot_b;
+	required_device_array<hp_ipc_optrom_device , 2> m_rom_slots;
 
 	uint32_t m_mmu[4], m_lowest_ram_addr;
 	uint16_t *m_internal_ram;
@@ -464,7 +471,6 @@ private:
 		return (m_mmu[(m_maincpu->get_fc() >> 1) & 3] + offset) & 0x3FFFFF;
 	}
 
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void set_bus_error(uint32_t address, bool write, uint16_t mem_mask);
 	bool m_bus_error;
 };
@@ -728,6 +734,7 @@ WRITE_LINE_MEMBER(hp_ipc_state::irq_7)
 void hp_ipc_state::machine_start()
 {
 	m_bus_error_timer = timer_alloc(0);
+	m_bus_error = false;
 
 	m_bankdev->set_bank(1);
 
@@ -744,12 +751,23 @@ void hp_ipc_state::machine_reset()
 	m_spkr->cs_w(1);
 	m_spkr->sk_w(0);
 	m_spkr->di_w(0);
+
+	// Load optional ROMs (if any)
+	// But first unload anything in opt ROM range
+	m_bankdev->space().unmap_read(0x100000 , 0x4fffff);
+	m_bankdev->space().unmap_read(0x100000 + 0x1800000, 0x4fffff + 0x1800000);
+
+	for (auto& slot : m_rom_slots) {
+		slot->install_read_handler(m_bankdev->space());
+	}
 }
 
 
-FLOPPY_FORMATS_MEMBER( hp_ipc_state::floppy_formats )
-	FLOPPY_HP_IPC_FORMAT
-FLOPPY_FORMATS_END
+void hp_ipc_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_HP_IPC_FORMAT);
+}
 
 static void hp_ipc_floppies(device_slot_interface &device)
 {
@@ -781,6 +799,7 @@ void hp_ipc_state::hp_ipc_base(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", hp_ipc_floppies, "35dd", hp_ipc_state::floppy_formats);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("hp_ipc");
+	SOFTWARE_LIST(config, "rom_list").set_original("hp_ipc_rom");
 
 	mm58167_device &rtc(MM58167(config, "rtc", 32.768_kHz_XTAL));
 	rtc.irq().set(FUNC(hp_ipc_state::irq_1));
@@ -840,6 +859,11 @@ void hp_ipc_state::hp_ipc_base(machine_config &config)
 	m_io_slot_b->irq4_cb().set(m_irq4_merger , FUNC(input_merger_any_high_device::in_w<2>));
 	m_io_slot_b->irq5_cb().set(m_irq5_merger , FUNC(input_merger_any_high_device::in_w<2>));
 	m_io_slot_b->irq6_cb().set(m_irq6_merger , FUNC(input_merger_any_high_device::in_w<2>));
+
+	// Optional ROMs
+	for (auto& finder : m_rom_slots) {
+		HP_IPC_OPTROM(config, finder);
+	}
 
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("768K,1M,1576K,2M,3M,4M,5M,6M,7M,7680K");
 }
@@ -911,6 +935,9 @@ ROM_START(hp_ipc)
 ROM_END
 
 #define rom_hp9808a rom_hp_ipc
+
+} // Anonymous namespace
+
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY            FULLNAME                            FLAGS
 COMP( 1985, hp_ipc,  0,      0,      hp_ipc,  hp_ipc, hp_ipc_state, empty_init, "Hewlett-Packard", "Integral Personal Computer 9807A", 0)

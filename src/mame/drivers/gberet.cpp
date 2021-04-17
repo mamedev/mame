@@ -394,14 +394,14 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(gberet_state,gberet)
+void gberet_state::machine_start()
 {
 	save_item(NAME(m_interrupt_mask));
 	save_item(NAME(m_interrupt_ticks));
 	save_item(NAME(m_spritebank));
 }
 
-MACHINE_RESET_MEMBER(gberet_state,gberet)
+void gberet_state::machine_reset()
 {
 	m_interrupt_mask = 0;
 	m_interrupt_ticks = 0;
@@ -416,9 +416,6 @@ void gberet_state::gberet(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(gberet_state::gberet_interrupt_tick), "screen", 0, 16);
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_MACHINE_START_OVERRIDE(gberet_state,gberet)
-	MCFG_MACHINE_RESET_OVERRIDE(gberet_state,gberet)
-
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60.60);
@@ -430,7 +427,6 @@ void gberet_state::gberet(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gberet);
 	PALETTE(config, m_palette, FUNC(gberet_state::gberet_palette), 2*16*16, 32);
-	MCFG_VIDEO_START_OVERRIDE(gberet_state,gberet)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -454,9 +450,6 @@ void gberet_state::gberetb(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(gberet_state::irq0_line_assert));
 	m_maincpu->set_periodic_int(FUNC(gberet_state::nmi_line_assert), attotime::from_hz(XTAL(20'000'000)/0x8000)); // divider guessed
 
-	MCFG_MACHINE_START_OVERRIDE(gberet_state,gberet)
-	MCFG_MACHINE_RESET_OVERRIDE(gberet_state,gberet)
-
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -468,7 +461,6 @@ void gberet_state::gberetb(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gberetb);
 	PALETTE(config, m_palette, FUNC(gberet_state::gberet_palette), 2*16*16, 32);
-	MCFG_VIDEO_START_OVERRIDE(gberet_state,gberet)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

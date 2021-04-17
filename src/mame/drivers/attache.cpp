@@ -345,8 +345,8 @@ uint32_t attache_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 		for(uint8_t x=0;x<(bitmap.width()-1)/8;x++)  // columns
 		{
-			assert(((y*128)+x) >= 0 && ((y*128)+x) < ARRAY_LENGTH(m_char_ram));
-			assert(((vy*128)+x) >= 0 && ((vy*128)+x) < ARRAY_LENGTH(m_char_ram));
+			assert(((y*128)+x) >= 0 && ((y*128)+x) < std::size(m_char_ram));
+			assert(((vy*128)+x) >= 0 && ((vy*128)+x) < std::size(m_char_ram));
 			uint8_t ch = m_char_ram[(vy*128)+x];
 			pen_t fg = m_palette->pen(m_attr_ram[(vy*128)+x] & 0x08 ? 2 : 1); // brightness
 			if(m_attr_ram[(vy*128)+x] & 0x10) // double-size
@@ -1180,8 +1180,8 @@ void attache_state::attache(machine_config &config)
 	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
 	m_fdc->intrq_wr_callback().set(m_ctc, FUNC(z80ctc_device::trg3));
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(am9517a_device::dreq0_w)).invert();
-	FLOPPY_CONNECTOR(config, "fdc:0", attache_floppies, "525dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", attache_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", attache_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", attache_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	TMS9927(config, m_crtc, 12.324_MHz_XTAL / 8);
 	m_crtc->set_char_width(8);
@@ -1269,8 +1269,8 @@ void attache816_state::attache816(machine_config &config)
 	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
 	m_fdc->intrq_wr_callback().set(m_ctc, FUNC(z80ctc_device::trg3));
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(am9517a_device::dreq0_w)).invert();
-	FLOPPY_CONNECTOR(config, "fdc:0", attache_floppies, "525dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", attache_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", attache_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", attache_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	TMS9927(config, m_crtc, 12.324_MHz_XTAL / 8);
 	m_crtc->set_char_width(8);

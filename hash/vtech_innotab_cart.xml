@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="vtech_innotab_cart" description="VTech InnoTAB 1/2/3 Cartridges">
+	<!-- NOT InnoTAB Max - those are compatible with InnoTV instead -->
+
+	<!-- These are NAND Flash ROMs containing a FAT16 filesystem -->
+	<!-- Some cartridges contain no ROM, but just bridges between edge connector pins. -->
+
+	<!-- pinout is identical to Storio cartridges -->
+
+	<software name="mmousec" supported="no">
+		<description>Mickey Mouse Clubhouse (UK)</description>
+		<year>2011</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vtech_storio_cart">
+			<dataarea name="rom" size="0x8400000">
+				<rom name="80-230403-103 - Mickey Mouse Clubhouse (UK).bin" size="0x8400000" crc="839567a9" sha1="bd4e2c8138d6f62bcac1978745a2b752bcefb07d" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

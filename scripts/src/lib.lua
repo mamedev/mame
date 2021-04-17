@@ -28,6 +28,7 @@ project "utils"
 	files {
 		MAME_DIR .. "src/lib/util/bitstream.h",
 		MAME_DIR .. "src/lib/util/coretmpl.h",
+		MAME_DIR .. "src/lib/util/lrucache.h",
 		MAME_DIR .. "src/lib/util/avhuff.cpp",
 		MAME_DIR .. "src/lib/util/avhuff.h",
 		MAME_DIR .. "src/lib/util/aviio.cpp",

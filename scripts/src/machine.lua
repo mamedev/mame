@@ -72,6 +72,30 @@ files {
 
 --------------------------------------------------
 --
+--@src/devices/machine/acorn_ioc.h,MACHINES["ACORN_IOC"] = true
+--------------------------------------------------
+
+if (MACHINES["ACORN_IOC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/acorn_ioc.cpp",
+		MAME_DIR .. "src/devices/machine/acorn_ioc.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/machine/acorn_memc.h,MACHINES["ACORN_MEMC"] = true
+--------------------------------------------------
+
+if (MACHINES["ACORN_MEMC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/acorn_memc.cpp",
+		MAME_DIR .. "src/devices/machine/acorn_memc.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/machine/acorn_vidc.h,MACHINES["ACORN_VIDC"] = true
 --------------------------------------------------
 
@@ -985,6 +1009,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/com52c50.h,MACHINES["COM52C50"] = true
+---------------------------------------------------
+
+if (MACHINES["COM52C50"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/com52c50.cpp",
+		MAME_DIR .. "src/devices/machine/com52c50.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/com8116.h,MACHINES["COM8116"] = true
 ---------------------------------------------------
 
@@ -1176,6 +1212,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ds8874.h,MACHINES["DS8874"] = true
+---------------------------------------------------
+
+if (MACHINES["DS8874"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ds8874.cpp",
+		MAME_DIR .. "src/devices/machine/ds8874.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/e0516.h,MACHINES["E0516"] = true
 ---------------------------------------------------
 
@@ -1281,6 +1329,18 @@ if (MACHINES["F3853"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/f3853.cpp",
 		MAME_DIR .. "src/devices/machine/f3853.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/f4702.h,MACHINES["F4702"] = true
+---------------------------------------------------
+
+if (MACHINES["F4702"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/f4702.cpp",
+		MAME_DIR .. "src/devices/machine/f4702.h",
 	}
 end
 
@@ -1699,6 +1759,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/m950x0.h,MACHINES["M950X0"] = true
+---------------------------------------------------
+
+if (MACHINES["M950X0"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/m950x0.cpp",
+		MAME_DIR .. "src/devices/machine/m950x0.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/mm5740.h,MACHINES["MM5740"] = true
 ---------------------------------------------------
 
@@ -1852,6 +1924,18 @@ if (MACHINES["LINFLASH"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/linflash.cpp",
 		MAME_DIR .. "src/devices/machine/linflash.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/locomo.h,MACHINES["LOCOMO"] = true
+---------------------------------------------------
+
+if (MACHINES["LOCOMO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/locomo.cpp",
+		MAME_DIR .. "src/devices/machine/locomo.h",
 	}
 end
 
@@ -2432,6 +2516,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/pcf8573.h,MACHINES["PCF8573"] = true
+---------------------------------------------------
+
+if (MACHINES["PCF8573"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/pcf8573.cpp",
+		MAME_DIR .. "src/devices/machine/pcf8573.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/pcf8583.h,MACHINES["PCF8583"] = true
 ---------------------------------------------------
 
@@ -2840,6 +2936,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/sa1111.h,MACHINES["SA1111"] = true
+---------------------------------------------------
+
+if (MACHINES["SA1111"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/sa1111.cpp",
+		MAME_DIR .. "src/devices/machine/sa1111.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/saa1043.h,MACHINES["SAA1043"] = true
 ---------------------------------------------------
 
@@ -2870,6 +2978,17 @@ if (MACHINES["SCN_PCI"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/scn_pci.cpp",
 		MAME_DIR .. "src/devices/machine/scn_pci.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/scoop.h,MACHINES["SCOOP"] = true
+---------------------------------------------------
+if (MACHINES["SCOOP"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/scoop.cpp",
+		MAME_DIR .. "src/devices/machine/scoop.h",
 	}
 end
 
@@ -3242,6 +3361,18 @@ if (MACHINES["TUBE"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/tube.cpp",
 		MAME_DIR .. "src/devices/machine/tube.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/ucb1200.h,MACHINES["UCB1200"] = true
+---------------------------------------------------
+
+if (MACHINES["UCB1200"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ucb1200.cpp",
+		MAME_DIR .. "src/devices/machine/ucb1200.h",
 	}
 end
 
@@ -4483,7 +4614,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/applefdc.h,MACHINES["APPLE_FDINTF"] = true
+--@src/devices/machine/applefdintf.h,MACHINES["APPLE_FDINTF"] = true
 ---------------------------------------------------
 if (MACHINES["APPLE_FDINTF"]~=null) then
 	files {
@@ -4493,10 +4624,10 @@ if (MACHINES["APPLE_FDINTF"]~=null) then
 end
 
 ---------------------------------------------------
- --
- --@src/devices/machine/iwm.h,MACHINES["IWM"] = true
- ---------------------------------------------------
- if (MACHINES["IWM"]~=null) then
+--
+--@src/devices/machine/iwm.h,MACHINES["IWM"] = true
+---------------------------------------------------
+if (MACHINES["IWM"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/iwm.cpp",
 		MAME_DIR .. "src/devices/machine/iwm.h",
@@ -4533,6 +4664,17 @@ if (MACHINES["SWIM3"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/swim3.cpp",
 		MAME_DIR .. "src/devices/machine/swim3.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/mv_sonora.h,MACHINES["MAC_VIDEO_SONORA"] = true
+---------------------------------------------------
+if (MACHINES["MAC_VIDEO_SONORA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mv_sonora.cpp",
+		MAME_DIR .. "src/devices/machine/mv_sonora.h",
 	}
 end
 

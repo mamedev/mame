@@ -57,16 +57,6 @@
 #include "coco_multi.h"
 
 #include "cococart.h"
-#include "coco_dcmodem.h"
-#include "coco_fdc.h"
-#include "coco_gmc.h"
-#include "coco_orch90.h"
-#include "coco_pak.h"
-#include "coco_ram.h"
-#include "coco_rs232.h"
-#include "coco_ssc.h"
-#include "coco_stecomp.h"
-#include "coco_sym12.h"
 
 #define SLOT1_TAG           "slot1"
 #define SLOT2_TAG           "slot2"
@@ -75,6 +65,15 @@
 
 #define SWITCH_CONFIG_TAG   "switch"
 
+//#define LOG_GENERAL   (1U << 0) //defined in logmacro.h already
+#define LOG_CART   (1U << 1) // shows cart line changes
+#define LOG_SWITCH (1U << 2) // shows switch changes
+//#define VERBOSE (LOG_CART|LOG_SWITCH)
+
+#include "logmacro.h"
+
+#define LOGCART(...)     LOGMASKED(LOG_CART,  __VA_ARGS__)
+#define LOGSWITCH(...)   LOGMASKED(LOG_SWITCH,  __VA_ARGS__)
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -163,32 +162,13 @@ namespace
 
 static void coco_cart_slot1_3(device_slot_interface &device)
 {
-	device.option_add("banked_16k", COCO_PAK_BANKED);
-	device.option_add("dcmodem", COCO_DCMODEM);
-	device.option_add("games_master", COCO_PAK_GMC);
-	device.option_add("orch90", COCO_ORCH90);
-	device.option_add("pak", COCO_PAK);
-	device.option_add("ram", COCO_PAK_RAM);
-	device.option_add("rs232", COCO_RS232);
-	device.option_add("ssc", COCO_SSC);
-	device.option_add("stecomp", COCO_STEREO_COMPOSER);
-	device.option_add("sym12", COCO_SYM12);
+	coco_cart_add_basic_devices(device);
 }
+
 static void coco_cart_slot4(device_slot_interface &device)
 {
-	device.option_add("banked_16k", COCO_PAK_BANKED);
-	device.option_add("cc2hdb1", COCO2_HDB1);
-	device.option_add("cc3hdb1", COCO3_HDB1);
-	device.option_add("dcmodem", COCO_DCMODEM);
-	device.option_add("fdcv11", COCO_FDC_V11);
-	device.option_add("games_master", COCO_PAK_GMC);
-	device.option_add("orch90", COCO_ORCH90);
-	device.option_add("pak", COCO_PAK);
-	device.option_add("ram", COCO_PAK_RAM);
-	device.option_add("rs232", COCO_RS232);
-	device.option_add("ssc", COCO_SSC);
-	device.option_add("stecomp", COCO_STEREO_COMPOSER);
-	device.option_add("sym12", COCO_SYM12);
+	coco_cart_add_basic_devices(device);
+	coco_cart_add_fdcs(device);
 }
 
 
@@ -362,6 +342,8 @@ cococart_slot_device &coco_multipak_device::active_cts_slot()
 
 void coco_multipak_device::set_select(u8 new_select)
 {
+	LOGSWITCH( "set_select: 0x%02X\n", new_select);
+
 	// identify old value for CART, in case this needs to change
 	cococart_slot_device::line_value old_cart = active_cts_slot().get_line_value(line::CART);
 
@@ -411,6 +393,7 @@ void coco_multipak_device::update_line(int slot_number, line ln)
 	case line::CART:
 		// only propagate if this is coming from the slot specified
 		propagate = slot_number == active_cts_slot_number();
+		LOGCART( "update_line: slot: %d, line: CART, value: %s, propogate: %s\n", slot_number, owning_slot().line_value_string(slot(slot_number).get_line_value(ln)), propagate ? "yes" : "no" );
 		break;
 
 	case line::NMI:

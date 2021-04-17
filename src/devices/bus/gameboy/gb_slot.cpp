@@ -17,7 +17,6 @@
 
  ***********************************************************************************************************/
 
-
 #include "emu.h"
 #include "gb_slot.h"
 
@@ -222,7 +221,7 @@ static int gb_get_pcb_id(const char *slot)
 {
 	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(elem.slot_option, slot))
+		if (!strcmp(elem.slot_option, slot))
 			return elem.pcb_id;
 	}
 
@@ -314,13 +313,13 @@ image_init_result gb_cart_slot_device_base::call_load()
 
 			if (get_feature("rumble"))
 			{
-				if (!core_stricmp(get_feature("rumble"), "yes"))
+				if (!strcmp(get_feature("rumble"), "yes"))
 					m_cart->set_has_rumble(true);
 			}
 
 			if (get_feature("rtc"))
 			{
-				if (!core_stricmp(get_feature("rtc"), "yes"))
+				if (!strcmp(get_feature("rtc"), "yes"))
 					m_cart->set_has_timer(true);
 			}
 		}
@@ -383,7 +382,7 @@ image_init_result gb_cart_slot_device_base::call_load()
 
 		//printf("Type: %s\n", gb_get_slot(m_type));
 
-		internal_header_logging(ROM + offset, len);
+		internal_header_logging(ROM + offset, len - offset);
 
 		return image_init_result::PASS;
 	}
@@ -477,7 +476,7 @@ bool gb_cart_slot_device_base::is_mbc1col_game(const uint8_t *ROM, uint32_t len)
 		"SUPERCHINESE 123"
 	};
 
-	const uint8_t rows = ARRAY_LENGTH(internal_names);
+	const uint8_t rows = std::size(internal_names);
 
 	for (uint8_t i = 0x00; i < rows; ++i) {
 		if (0 == memcmp(&ROM[0x134], &internal_names[i][0], name_length))
@@ -804,10 +803,10 @@ void gb_cart_slot_device_base::internal_header_logging(uint8_t *ROM, uint32_t le
 	logerror("\tRAM Size:         %d kB [0x%02X]\n", ramsize[ROM[0x0149] & 0x07], ROM[0x0149]);
 	logerror("\tLicense code:     0x%02X%02X\n", ROM[0x0145], ROM[0x0144] );
 	tmp = (ROM[0x014b] << 8) + ROM[0x014a];
-	for (i = 0; i < ARRAY_LENGTH(companies); i++)
+	for (i = 0; i < std::size(companies); i++)
 		if (tmp == companies[i].code)
 			break;
-	logerror("\tManufacturer ID:  0x%02X [%s]\n", tmp, (i < ARRAY_LENGTH(companies)) ? companies[i].name : "?");
+	logerror("\tManufacturer ID:  0x%02X [%s]\n", tmp, (i < std::size(companies)) ? companies[i].name : "?");
 	logerror("\tVersion Number:   0x%02X\n", ROM[0x014c]);
 	logerror("\tComplement Check: 0x%02X\n", ROM[0x014d]);
 	logerror("\tChecksum:         0x%04X\n", ((ROM[0x014e] << 8) + ROM[0x014f]));
@@ -819,8 +818,8 @@ void gb_cart_slot_device_base::internal_header_logging(uint8_t *ROM, uint32_t le
 		logerror("\nWarning loading cartridge: Unknown ROM size in header [0x%x].\n", ROM[0x0148]);
 
 	if ((len / 0x4000) != rom_banks)
-		logerror("\nWarning loading cartridge: Filesize (0x%x) and reported ROM banks (0x%x) don't match.\n",
-					len, rom_banks * 0x4000);
+		logerror("\nWarning loading cartridge: Filesize (0x%x) and reported ROM banks (0x%x) don't match.\n", len, rom_banks * 0x4000);
+
 	/* Calculate and check checksum */
 	tmp = (ROM[0x014e] << 8) + ROM[0x014f];
 	for (int i = 0; i < len; i++)
@@ -830,5 +829,4 @@ void gb_cart_slot_device_base::internal_header_logging(uint8_t *ROM, uint32_t le
 
 	if (csum != tmp)
 		logerror("\nWarning loading cartridge: Checksum is wrong (Actual 0x%04X vs Internal 0x%04X)\n", csum, tmp);
-
 }

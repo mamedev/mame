@@ -177,29 +177,25 @@ void a2bus_pic_device::write_c0nx(u8 offset, u8 data)
 	switch (offset & 0x07U)
 	{
 	case 0U:
+		if (BIT(m_input_x->read(), 1))
 		{
-			ioport_value const x(m_input_x->read());
-
-			// latch output data - remember MSB can be forced low by jumper
-			if (BIT(x, 1))
-			{
-				LOG("Latch data %02X\n", data);
-				m_data_latch = data;
-				m_printer_out->write(data & (BIT(x, 2) ? 0xffU : 0x7fU));
-			}
-			else
-			{
-				LOG("Output disabled, not latching data\n");
-			}
-
-			// start strobe if autostrobe is enabled
+			// latch output data and start strobe if autostrobe is enabled
+			LOG("Latch data %02X\n", data);
+			machine().scheduler().synchronize(
+					timer_expired_delegate(FUNC(a2bus_pic_device::data_write), this),
+					unsigned(data) | (1 << 8) | ((m_autostrobe_disable ? 0 : 1) << 9));
+		}
+		else
+		{
+			// just start strobe if autostrobe is enabled
+			LOG("Output disabled, not latching data\n");
 			if (!m_autostrobe_disable)
-				start_strobe();
+				machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::data_write), this), 1 << 9);
 		}
 		break;
 
 	case 2U:
-		start_strobe();
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::data_write), this), 1 << 9);
 		break;
 
 	case 5U:
@@ -323,46 +319,25 @@ void a2bus_pic_device::device_reset()
 
 WRITE_LINE_MEMBER(a2bus_pic_device::ack_w)
 {
-	if (bool(state) != bool(m_ack_in))
-	{
-		m_ack_in = state ? 1U : 0U;
-		LOG("/ACK=%u\n", m_ack_in);
-		if (started() && (m_ack_in != BIT(m_input_sw1->read(), 4)))
-		{
-			LOG("Active /ACK edge\n");
-			set_ack_latch();
-		}
-	}
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::set_ack_in), this), state ? 1 : 0);
 }
 
 
 WRITE_LINE_MEMBER(a2bus_pic_device::perror_w)
 {
-	if (bool(state) != bool(m_perror_in))
-	{
-		m_perror_in = state ? 1U : 0U;
-		LOG("PAPER EMPTY=%u\n", m_perror_in);
-	}
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::set_perror_in), this), state ? 1 : 0);
 }
 
 
 WRITE_LINE_MEMBER(a2bus_pic_device::select_w)
 {
-	if (bool(state) != bool(m_select_in))
-	{
-		m_select_in = state ? 1U : 0U;
-		LOG("SELECT=%u\n", m_select_in);
-	}
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::set_select_in), this), state ? 1 : 0);
 }
 
 
 WRITE_LINE_MEMBER(a2bus_pic_device::fault_w)
 {
-	if (bool(state) != bool(m_fault_in))
-	{
-		m_fault_in = state ? 1U : 0U;
-		LOG("/FAULT=%u\n", m_fault_in);
-	}
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(a2bus_pic_device::set_fault_in), this), state ? 1 : 0);
 }
 
 
@@ -381,6 +356,86 @@ TIMER_CALLBACK_MEMBER(a2bus_pic_device::release_strobe)
 
 
 //----------------------------------------------
+//  synchronised inputs
+//----------------------------------------------
+
+void a2bus_pic_device::set_ack_in(void *ptr, s32 param)
+{
+	if (u32(param) != m_ack_in)
+	{
+		m_ack_in = u8(u32(param));
+		LOG("/ACK=%u\n", m_ack_in);
+		if (started() && (m_ack_in != BIT(m_input_sw1->read(), 4)))
+		{
+			LOG("Active /ACK edge\n");
+			set_ack_latch();
+		}
+	}
+}
+
+
+void a2bus_pic_device::set_perror_in(void *ptr, s32 param)
+{
+	if (u32(param) != m_perror_in)
+	{
+		m_perror_in = u8(u32(param));
+		LOG("PAPER EMPTY=%u\n", m_perror_in);
+	}
+}
+
+
+void a2bus_pic_device::set_select_in(void *ptr, s32 param)
+{
+	if (u32(param) != m_select_in)
+	{
+		m_select_in = u8(u32(param));
+		LOG("SELECT=%u\n", m_select_in);
+	}
+}
+
+
+void a2bus_pic_device::set_fault_in(void *ptr, s32 param)
+{
+	if (u32(param) != m_fault_in)
+	{
+		m_fault_in = u8(u32(param));
+		LOG("/FAULT=%u\n", m_fault_in);
+	}
+}
+
+
+void a2bus_pic_device::data_write(void *ptr, s32 param)
+{
+	// latch output data - remember MSB can be forced low by jumper
+	if (BIT(param, 8))
+	{
+		m_data_latch = u8(u32(param));
+		m_printer_out->write(m_data_latch & (BIT(m_input_x->read(), 2) ? 0xffU : 0x7fU));
+	}
+
+	// start/extend strobe output
+	if (BIT(param, 9))
+	{
+		ioport_value const sw1(m_input_sw1->read());
+		unsigned const cycles(15U - ((sw1 & 0x07U) << 1));
+		int const state(BIT(sw1, 3));
+		if (!m_strobe_timer->enabled())
+		{
+			LOG("Output /STROBE=%d for %u cycles\n", state, cycles);
+			clear_ack_latch();
+			m_printer_conn->write_strobe(state);
+		}
+		else
+		{
+			LOG("Adjust /STROBE=%d remaining to %u cycles\n", state, cycles);
+		}
+		m_strobe_timer->adjust(attotime::from_ticks(cycles * 7, clock()));
+	}
+}
+
+
+
+//----------------------------------------------
 //  helpers
 //----------------------------------------------
 
@@ -393,25 +448,6 @@ void a2bus_pic_device::reset_mode()
 	m_autostrobe_disable = 1U;
 	disable_irq();
 	set_ack_latch();
-}
-
-
-void a2bus_pic_device::start_strobe()
-{
-	ioport_value const sw1(m_input_sw1->read());
-	unsigned const cycles(15U - ((sw1 & 0x07U) << 1));
-	int const state(BIT(sw1, 3));
-	if (!m_strobe_timer->enabled())
-	{
-		LOG("Output /STROBE=%d for %u cycles\n", state, cycles);
-		clear_ack_latch();
-		m_printer_conn->write_strobe(state);
-	}
-	else
-	{
-		LOG("Adjust /STROBE=%d remaining to %u cycles\n", state, cycles);
-	}
-	m_strobe_timer->adjust(attotime::from_ticks(cycles, clock()));
 }
 
 

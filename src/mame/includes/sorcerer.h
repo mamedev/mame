@@ -27,25 +27,26 @@
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
-#define ES_CPU_CLOCK (12638000 / 6)
-#define ES_UART_CLOCK (ES_CPU_CLOCK / 440)
-
-struct cass_data_t {
-	struct {
-		int length;     // time cassette level is at input.level
-		int level;      // cassette level
-		int bit;        // bit being read
-	} input;
-	struct {
-		int length;     // time cassette level is at output.level
-		int level;      // cassette level
-		int bit;        // bit to output
-	} output;
-};
-
 
 class sorcerer_state : public driver_device
 {
+	static constexpr XTAL ES_VIDEO_CLOCK = 12.638_MHz_XTAL;
+	static constexpr XTAL ES_CPU_CLOCK = ES_VIDEO_CLOCK / 6;
+	static constexpr XTAL ES_UART_CLOCK = ES_CPU_CLOCK / 440;
+
+	struct cass_data_t {
+		struct {
+			int length;     // time cassette level is at input.level
+			int level;      // cassette level
+			int bit;        // bit being read
+		} input;
+		struct {
+			int length;     // time cassette level is at output.level
+			int level;      // cassette level
+			int bit;        // bit to output
+		} output;
+	};
+
 public:
 	sorcerer_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)

@@ -637,6 +637,7 @@ void kikikai_state::kicknrun(machine_config& config)
 
 	// Not too sure IRQs are triggered by MCU..
 	m_maincpu->set_vblank_int("screen", FUNC(kikikai_state::kikikai_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(kikikai_state::mcram_vect_r));
 
 	M6801(config, m_mcu, XTAL(4'000'000)); // actually 6801U4 - xtal is 4MHz, divided by 4 internally
 	m_mcu->set_addrmap(AS_PROGRAM, &kikikai_state::mcu_map);
@@ -656,12 +657,14 @@ void kikikai_simulation_state::kikikai(machine_config &config)
 
 	// IRQs should be triggered by the MCU, but we don't have it
 	m_maincpu->set_vblank_int("screen", FUNC(kikikai_simulation_state::kikikai_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(kikikai_simulation_state::mcram_vect_r));
 }
 
 
 void mexico86_state::mexico86_68705(machine_config& config)
 {
 	base(config);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(mexico86_state::mcram_vect_r));
 
 	M68705P3(config, m_68705mcu, 4000000); /* xtal is 4MHz, divided by 4 internally */
 	m_68705mcu->portc_r().set_ioport("IN0");

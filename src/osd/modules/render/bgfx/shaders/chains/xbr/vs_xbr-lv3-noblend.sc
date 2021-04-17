@@ -6,7 +6,7 @@ $output v_texcoord0, v_texcoord1, v_texcoord2, v_texcoord3, v_texcoord4, v_texco
 
 /*
    Hyllian's xBR-lv3-noblend - Shader
-   
+
    Copyright (C) 2011/2016 Hyllian - sergiogdb@gmail.com
 
    Permission is hereby granted, free of charge, to any person obtaining a copy

@@ -94,8 +94,6 @@ public:
 private:
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	void decode_penta(int end, int nodecend);
 
@@ -144,11 +142,6 @@ WRITE_LINE_MEMBER(pengo_state::coin_counter_1_w)
 WRITE_LINE_MEMBER(pengo_state::coin_counter_2_w)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
-}
-
-WRITE_LINE_MEMBER(pengo_state::irq_mask_w)
-{
-	m_irq_mask = state;
 }
 
 void pengo_state::pengo_map(address_map &map)
@@ -380,12 +373,6 @@ GFXDECODE_END
  *  Machine drivers
  *
  *************************************/
-
-WRITE_LINE_MEMBER(pengo_state::vblank_irq)
-{
-	if (state && m_irq_mask)
-		m_maincpu->set_input_line(0, HOLD_LINE);
-}
 
 void pengo_state::pengo(machine_config &config)
 {

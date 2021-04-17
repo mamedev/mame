@@ -23,14 +23,15 @@ DEFINE_DEVICE_TYPE(BBC_ACORN1770, bbc_acorn1770_device, "bbc_acorn1770", "Acorn 
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( bbc_acorn8271_device::floppy_formats )
-	FLOPPY_ACORN_SSD_FORMAT,
-	FLOPPY_ACORN_DSD_FORMAT,
-	FLOPPY_ACORN_ADFS_OLD_FORMAT,
-	FLOPPY_ACORN_DOS_FORMAT,
-	FLOPPY_FSD_FORMAT,
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
+void bbc_acorn8271_device::floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_ACORN_SSD_FORMAT);
+	fr.add(FLOPPY_ACORN_DSD_FORMAT);
+	fr.add(FLOPPY_ACORN_ADFS_OLD_FORMAT);
+	fr.add(FLOPPY_ACORN_DOS_FORMAT);
+	fr.add(FLOPPY_FSD_FORMAT);
+}
 
 static void bbc_floppies_525(device_slot_interface &device)
 {

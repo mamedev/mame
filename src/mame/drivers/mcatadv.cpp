@@ -143,7 +143,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/2610intf.h"
+#include "sound/ym2610.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -510,7 +510,7 @@ ROM_START( mcatadv )
 	ROM_LOAD( "mca-u61.bin", 0x100000, 0x100000, CRC(51af66c9) SHA1(1055cf78ea286f02003b0d1bf08c2d7829b36f90) )
 	ROM_LOAD( "mca-u100",    0x200000, 0x080000, CRC(b273f1b0) SHA1(39318fe2aaf2792b85426ec6791b3360ac964de3) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 ) /* Samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "mca-u53.bin", 0x00000, 0x80000, CRC(64c76e05) SHA1(379cef5e0cba78d0e886c9cede41985850a3afb7) )
 ROM_END
 
@@ -538,7 +538,7 @@ ROM_START( mcatadvj )
 	ROM_LOAD( "mca-u61.bin", 0x100000, 0x100000, CRC(51af66c9) SHA1(1055cf78ea286f02003b0d1bf08c2d7829b36f90) )
 	ROM_LOAD( "u100.bin",    0x200000, 0x080000, CRC(e2c311da) SHA1(cc3217484524de94704869eaa9ce1b90393039d8) )
 
-	ROM_REGION( 0x80000, "ymsnd", 0 ) /* Samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "mca-u53.bin", 0x00000, 0x80000, CRC(64c76e05) SHA1(379cef5e0cba78d0e886c9cede41985850a3afb7) )
 ROM_END
 
@@ -566,7 +566,7 @@ ROM_START( catt )
 	ROM_LOAD( "mca-u61.bin", 0x100000, 0x100000, CRC(51af66c9) SHA1(1055cf78ea286f02003b0d1bf08c2d7829b36f90) )
 	ROM_LOAD( "mca-u100",    0x200000, 0x080000, CRC(b273f1b0) SHA1(39318fe2aaf2792b85426ec6791b3360ac964de3) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "u53.bin",     0x00000, 0x100000, CRC(99f2a624) SHA1(799e8e40e8bdcc8fa4cd763a366cc32473038a49) )
 
 	ROM_REGION( 0x0400, "plds", 0 )
@@ -598,7 +598,7 @@ ROM_START( nost )
 	ROM_LOAD( "nos-b1-0.u60", 0x000000, 0x100000, CRC(ba6fd0c7) SHA1(516d6e0c4dc6fb12ec9f30877ea1c582e7440a19) )
 	ROM_LOAD( "nos-b1-1.u61", 0x100000, 0x080000, CRC(dabd8009) SHA1(1862645b8d6216c3ec2b8dbf74816b8e29dea14f) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "nossn-00.u53", 0x00000, 0x100000, CRC(3bd1bcbc) SHA1(1bcad43792e985402db4eca122676c2c555f3313) )
 ROM_END
 
@@ -626,7 +626,7 @@ ROM_START( nostj )
 	ROM_LOAD( "nos-b1-0.u60", 0x000000, 0x100000, CRC(ba6fd0c7) SHA1(516d6e0c4dc6fb12ec9f30877ea1c582e7440a19) )
 	ROM_LOAD( "nos-b1-1.u61", 0x100000, 0x080000, CRC(dabd8009) SHA1(1862645b8d6216c3ec2b8dbf74816b8e29dea14f) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "nossn-00.u53", 0x00000, 0x100000, CRC(3bd1bcbc) SHA1(1bcad43792e985402db4eca122676c2c555f3313) )
 ROM_END
 
@@ -654,7 +654,7 @@ ROM_START( nostk )
 	ROM_LOAD( "nos-b1-0.u60", 0x000000, 0x100000, CRC(ba6fd0c7) SHA1(516d6e0c4dc6fb12ec9f30877ea1c582e7440a19) )
 	ROM_LOAD( "nos-b1-1.u61", 0x100000, 0x080000, CRC(dabd8009) SHA1(1862645b8d6216c3ec2b8dbf74816b8e29dea14f) )
 
-	ROM_REGION( 0x100000, "ymsnd", 0 ) /* Samples */
+	ROM_REGION( 0x100000, "ymsnd:adpcma", 0 ) /* Samples */
 	ROM_LOAD( "nossn-00.u53", 0x00000, 0x100000, CRC(3bd1bcbc) SHA1(1bcad43792e985402db4eca122676c2c555f3313) )
 ROM_END
 

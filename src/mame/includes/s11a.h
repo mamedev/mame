@@ -25,9 +25,6 @@ public:
 	void init_s11a();
 
 	void dig0_w(uint8_t data);
-
-private:
-	DECLARE_MACHINE_RESET(s11a);
 };
 
 #endif // MAME_INCLUDES_S11A_H

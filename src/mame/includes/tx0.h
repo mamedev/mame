@@ -11,7 +11,7 @@
 #pragma once
 
 #include "video/crt.h"
-#include "cpu/pdp1/tx0.h"
+#include "cpu/tx0/tx0.h"
 #include "emupal.h"
 
 enum state_t

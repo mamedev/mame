@@ -179,7 +179,7 @@ void ef9345_device::device_reset()
 	m_latchm = 0;
 	m_latchi = 0;
 	m_latchu = 0;
-	m_char_mode = 0;
+	m_char_mode = MODE24x40;
 
 	memset(m_last_dial, 0, sizeof(m_last_dial));
 	memset(m_registers, 0, sizeof(m_registers));
@@ -396,7 +396,7 @@ uint16_t ef9345_device::indexblock(uint16_t x, uint16_t y)
 }
 
 // draw bichrome character (40 columns)
-void ef9345_device::bichrome40(uint8_t type, uint16_t address, uint8_t dial, uint16_t iblock, uint16_t x, uint16_t y, uint8_t c0, uint8_t c1, uint8_t insert, uint8_t flash, uint8_t hided, uint8_t negative, uint8_t underline)
+void ef9345_device::bichrome40(uint8_t type, uint16_t address, uint8_t dial, uint16_t iblock, uint16_t x, uint16_t y, uint8_t c0, uint8_t c1, uint8_t insert, uint8_t flash, uint8_t conceal, uint8_t negative, uint8_t underline)
 {
 	uint16_t i;
 	uint8_t pix[80];
@@ -408,8 +408,8 @@ void ef9345_device::bichrome40(uint8_t type, uint16_t address, uint8_t dial, uin
 
 	if (flash && m_pat & 0x40 && m_blink)
 		c1 = c0;                    //flash
-	if (hided && m_pat & 0x08)
-		c1 = c0;                    //hided
+	if (conceal && m_pat & 0x08)
+		c1 = c0;                    //conceal
 	if (negative)                   //negative
 	{
 		i = c1;
@@ -628,35 +628,36 @@ void ef9345_device::makechar_16x40(uint16_t x, uint16_t y)
 	type = ((b & 0x80) >> 4) | ((a & 0x80) >> 6);
 	address = ((b & 0x7f) >> 2) * 0x40 + (b & 0x03);
 
-		//negative space
-	if ((b & 0xe0) == 0x80)
-	{
-		address = 0;
-		type = 3;
-	}
-
 	//reset attributes latch
 	if (x == 0)
-		m_latchm = m_latchi = m_latchu = m_latchc0 = 0;
-
-	if (type == 4)
 	{
+		m_latchm = m_latchi = m_latchu = m_latchc0 = 0;
+	}
+
+	//delimiter
+	if ((b & 0xe0) == 0x80)
+	{
+		type = 0;
+		address = ((127) >> 2) * 0x40 + (127 & 0x03); // Force character 127 (negative space) of first type.
+
 		m_latchm = b & 1;
 		m_latchi = (b & 2) >> 1;
 		m_latchu = (b & 4) >> 2;
 	}
 
 	if (a & 0x80)
+	{
 		m_latchc0 = (a & 0x70) >> 4;
+	}
 
 	//char attributes
 	c0 = m_latchc0;                         //background
 	c1 = a & 0x07;                          //foreground
-	i = m_latchi;                               //insert mode
+	i = m_latchi;                           //insert mode
 	f  = (a & 0x08) >> 3;                   //flash
-	m = m_latchm;                               //hided
+	m = m_latchm;                           //conceal
 	n  = (a & 0x80) ? 0: ((a & 0x40) >> 6); //negative
-	u = m_latchu;                               //underline
+	u = m_latchu;                           //underline
 
 	bichrome40(type, address, dial, iblock, x, y, c0, c1, i, f, m, n, u);
 }
@@ -689,7 +690,7 @@ void ef9345_device::makechar_24x40(uint16_t x, uint16_t y)
 	c1 = (a & 0x70) >> 4;           //foreground
 	i = b & 0x01;                   //insert
 	f = (a & 0x08) >> 3;            //flash
-	m = (b & 0x04) >> 2;            //hided
+	m = (b & 0x04) >> 2;            //conceal
 	n = ((a & 0x80) >> 7);          //negative
 	u = (((b & 0x60) == 0) || ((b & 0xc0) == 0x40)) ? ((b & 0x10) >> 4) : 0; //underline
 

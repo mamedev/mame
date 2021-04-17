@@ -6,7 +6,7 @@
 #pragma once
 
 #include "bus/msx_cart/cartridge.h"
-#include "sound/8950intf.h"
+#include "sound/y8950.h"
 #include "machine/6850acia.h"
 #include "bus/midi/midi.h"
 

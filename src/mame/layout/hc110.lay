@@ -1,0 +1,772 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+
+<mamelayout version="2">
+
+	<element name="background">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="led_red" defstate="0">
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+		<disk state="0"><color red="0.17" green="0.015" blue="0.02" /></disk>
+	</element>
+
+	<element name="led_green" defstate="0">
+		<disk state="1"><color red="0.1" green="0.95" blue="0.05" /></disk>
+		<disk state="0"><color red="0.015" green="0.16" blue="0.01" /></disk>
+	</element>
+
+	<element name="cell_cmd">
+		<rect>
+			<color red="0.89" green="0.89" blue="1.00" />
+			<bounds left="0.0" top="0.0" right="1.0" bottom="1.0" />
+		</rect>
+	</element>
+
+	<element name="cell_lvl1">
+		<rect>
+			<color red="0.80" green="0.25" blue="0.30" />
+			<bounds left="0.0" top="0.0" right="1.0" bottom="1.0" />
+		</rect>
+	</element>
+
+	<element name="cell_lvl2">
+		<rect>
+			<color red="1.00" green="0.80" blue="0.10" />
+			<bounds left="0.0" top="0.0" right="1.0" bottom="1.0" />
+		</rect>
+	</element>
+
+	<element name="cell_lvl3">
+		<rect>
+			<color red="0.00" green="0.60" blue="0.96" />
+			<bounds left="0.0" top="0.0" right="1.0" bottom="1.0" />
+		</rect>
+	</element>
+
+	<element name="cell_lvl4">
+		<rect>
+			<color red="1.00" green="0.55" blue="0.40" />
+			<bounds left="0.0" top="0.0" right="1.0" bottom="1.0" />
+		</rect>
+	</element>
+
+	<element name="cell_lvls">
+		<rect>
+			<color red="0.80" green="0.25" blue="0.30" />
+			<bounds left="0.0" top="0.0" right="1.0" bottom="0.25" />
+		</rect>
+		<rect>
+			<color red="1.00" green="0.80" blue="0.10" />
+			<bounds left="0.0" top="0.25" right="1.0" bottom="0.5" />
+		</rect>
+		<rect>
+			<color red="0.00" green="0.60" blue="0.96" />
+			<bounds left="0.0" top="0.5" right="1.0" bottom="0.75" />
+		</rect>
+		<rect>
+			<color red="1.00" green="0.55" blue="0.40" />
+			<bounds left="0.0" top="0.75" right="1.0" bottom="1.0" />
+		</rect>
+	</element>
+
+	<element name="cell_lvls_cmd">
+		<rect>
+			<color red="0.89" green="0.89" blue="1.00" />
+			<bounds left="0.0" top="0.0" right="1.0" bottom="0.25" />
+		</rect>
+		<rect>
+			<color red="1.00" green="0.80" blue="0.10" />
+			<bounds left="0.0" top="0.25" right="1.0" bottom="0.5" />
+		</rect>
+		<rect>
+			<color red="0.00" green="0.60" blue="0.96" />
+			<bounds left="0.0" top="0.5" right="1.0" bottom="0.75" />
+		</rect>
+		<rect>
+			<color red="1.00" green="0.55" blue="0.40" />
+			<bounds left="0.0" top="0.75" right="1.0" bottom="1.0" />
+		</rect>
+	</element>
+
+	<!-- command labels -->
+
+	<element name="label_talk"><text string="Talk"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label_master"><text string="Master"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label_clear"><text string="Clear"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label_repeat"><text string="Repeat"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label_level"><text string="Level"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<repeat count="4">
+		<param name="labelnum" start="1" increment="1" />
+		<element name="label_~labelnum~">
+			<text string="~labelnum~"><color red="0.0" green="0.0" blue="0.0" /></text>
+		</element>
+	</repeat>
+
+	<!-- level 1 labels -->
+
+	<element name="label1_1_0"><text string="I"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_2_0"><text string="you"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_3_0"><text string="my"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_4_0"><text string="mom"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_5_0"><text string="dad"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_6_0"><text string="sister"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_7_0"><text string="brother"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_8_0"><text string="baby"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_9_0"><text string="grandmother"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_10_0"><text string="grandfather"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_11_0"><text string="girl"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_12_0"><text string="boy"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_13_0"><text string="woman"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_14_0"><text string="man"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_15_0"><text string="friend"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label1_1_1"><text string="it"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_2_1"><text string="we"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_3_1"><text string="they"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_4_1"><text string="she"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_5_1"><text string="he"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_6_1"><text string="policeman"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_7_1"><text string="teacher"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_8_1"><text string="therapist"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_9_1"><text string="family"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_10_1"><text string="be"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_11_1"><text string="been"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_12_1"><text string="was"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_13_1"><text string="have"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_14_1"><text string="are"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_15_1"><text string="is"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label1_1_2"><text string="will"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_2_2"><text string="need"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_3_2"><text string="help"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_4_2"><text string="like"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_5_2"><text string="want"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_6_2"><text string="eat"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_7_2"><text string="talk"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_8_2"><text string="look"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_9_2"><text string="listen"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_10_2"><text string="move"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_11_2"><text string="run"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_12_2"><text string="walk"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_13_2"><text string="play"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_14_2"><text string="work"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_15_2"><text string="there"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label1_1_3"><text string="give"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_2_3"><text string="take"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_3_3"><text string="keep"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_4_3"><text string="open"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_5_3"><text string="close"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_6_3"><text string="come"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_7_3"><text string="go"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_8_3"><text string="went"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_9_3"><text string="start"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_10_3"><text string="stop"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_11_3"><text string="try"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_12_3"><text string="can"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_13_3"><text string="can't"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_14_3"><text string="do"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_15_3"><text string="don't"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label1_1_4"><text string="more"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_2_4"><text string="feel"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_3_4"><text string="excited"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_4_4"><text string="embarrassed"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_5_4"><text string="sorry"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_6_4"><text string="tired"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_7_4"><text string="hungry"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_8_4"><text string="angry"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_9_4"><text string="afraid"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_10_4"><text string="upset"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_11_4"><text string="sick"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_12_4"><text string="hurt"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_13_4"><text string="sad"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_14_4"><text string="happy"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_15_4"><text string="love"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label1_1_5"><text string="think"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_2_5"><text string="understand"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_3_5"><text string="cry"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_4_5"><text string="see"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_5_5"><text string="hear"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_6_5"><text string="smell"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_7_5"><text string="smile"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_8_5"><text string="question"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_9_5"><text string="which"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_10_5"><text string="when"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_11_5"><text string="how"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_12_5"><text string="why"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_13_5"><text string="where"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_14_5"><text string="who"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_15_5"><text string="what"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label1_1_6"><text string="My name is . ."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_2_6"><text string="I am . . ."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_3_6"><text string="I have . . ."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_4_6"><text string="I want . . ."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_5_6"><text string="I'd like . . ."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_6_6"><text string="I'm going. . ."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_7_6"><text string="How are you?"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_8_6"><text string="I'm fine."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_9_6"><text string="I'm ready."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_10_6"><text string="I need help."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_11_6"><text string="I don't understand"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_12_6"><text string="Would you come here?"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_13_6"><text string="My feelings are hurt."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_14_6"><text string="Please leave me alone."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_15_6"><text string="me"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label1_1_7"><text string="Pause"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_2_7"><text string="Echo On"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_3_7"><text string="Echo Off"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_4_7"><text string="Beep On/Off"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_5_7"><text string="Phrase Mode Save/New"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_6_7"><text string="Memory 1"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_7_7"><text string="Memory 2"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_8_7"><text string="thank you"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_9_7"><text string="please"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_10_7"><text string="hello"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_11_7"><text string="bye"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_12_7"><text string="okay"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_13_7"><text string="yes"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_14_7"><text string="no"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label1_15_7"><text string="I am using an artificial voice"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<!-- level 2 labels -->
+
+	<element name="label2_1_0"><text string="A"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_2_0"><text string="B"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_3_0"><text string="C"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_4_0"><text string="D"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_5_0"><text string="E"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_6_0"><text string="F"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_7_0"><text string="G"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_8_0"><text string="H"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_9_0"><text string="I"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_10_0"><text string="J"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_11_0"><text string="K"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_12_0"><text string="L"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_13_0"><text string="M"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_14_0"><text string="N"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_15_0"><text string="O"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label2_1_1"><text string="P"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_2_1"><text string="Q"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_3_1"><text string="R"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_4_1"><text string="S"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_5_1"><text string="T"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_6_1"><text string="U"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_7_1"><text string="V"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_8_1"><text string="W"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_9_1"><text string="X"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_10_1"><text string="Y"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_11_1"><text string="Z"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_12_1"><text string="spell"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_13_1"><text string="word"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_14_1"><text string="letter"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_15_1"><text string="The next word is spelled"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label2_1_2"><text string="0"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_2_2"><text string="1"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_3_2"><text string="2"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_4_2"><text string="3"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_5_2"><text string="4"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_6_2"><text string="5"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_7_2"><text string="6"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_8_2"><text string="7"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_9_2"><text string="8"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_10_2"><text string="9"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_11_2"><text string="10"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_12_2"><text string="11"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_13_2"><text string="12"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_14_2"><text string="number"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_15_2"><text string="time"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label2_1_3"><text string="week"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_2_3"><text string="Monday"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_3_3"><text string="Tuesday"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_4_3"><text string="Wednesday"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_5_3"><text string="Thursday"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_6_3"><text string="Friday"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_7_3"><text string="Saturday"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_8_3"><text string="Sunday"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_9_3"><text string="yesterday"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_10_3"><text string="today"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_11_3"><text string="tomorrow"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_12_3"><text string="morning"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_13_3"><text string="afternoon"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_14_3"><text string="night"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_15_3"><text string="day"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label2_1_4"><text string="year"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_2_4"><text string="January"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_3_4"><text string="February"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_4_4"><text string="March"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_5_4"><text string="April"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_6_4"><text string="May"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_7_4"><text string="June"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_8_4"><text string="July"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_9_4"><text string="August"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_10_4"><text string="September"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_11_4"><text string="October"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_12_4"><text string="November"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_13_4"><text string="December"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_14_4"><text string="minute"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_15_4"><text string="hour"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label2_1_5"><text string="spring"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_2_5"><text string="summer"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_3_5"><text string="fall"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_4_5"><text string="winter"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_5_5"><text string="sun"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_6_5"><text string="rain"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_7_5"><text string="snow"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_8_5"><text string="wind"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_9_5"><text string="sky"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_10_5"><text string="cloud"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_11_5"><text string="smoke"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_12_5"><text string="fire"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_13_5"><text string="wet"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_14_5"><text string="dry"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_15_5"><text string="second"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label2_1_6"><text string="wake"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_2_6"><text string="sleep"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_3_6"><text string="show"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_4_6"><text string="watch"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_5_6"><text string="fight"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_6_6"><text string="turn"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_7_6"><text string="read"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_8_6"><text string="write"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_9_6"><text string="add"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_10_6"><text string="subtract"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_11_6"><text string="learn"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_12_6"><text string="thought"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_13_6"><text string="enough"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_14_6"><text string="all"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_15_6"><text string="some"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label2_1_7"><text string="body"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_2_7"><text string="hair"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_3_7"><text string="head"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_4_7"><text string="face"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_5_7"><text string="eye"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_6_7"><text string="ear"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_7_7"><text string="nose"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_8_7"><text string="teeth"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_9_7"><text string="back"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_10_7"><text string="arm"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_11_7"><text string="hand"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_12_7"><text string="finger"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_13_7"><text string="leg"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_14_7"><text string="feet"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label2_15_7"><text string="pain"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<!-- level 3 labels -->
+
+	<element name="label3_1_0"><text string="address"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_2_0"><text string="animal"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_3_0"><text string="answer"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_4_0"><text string="apartment"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_5_0"><text string="appointment"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_6_0"><text string="art"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_7_0"><text string="ball"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_8_0"><text string="balloon"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_9_0"><text string="bath"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_10_0"><text string="bathroom"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_11_0"><text string="bike"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_12_0"><text string="birthday"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_13_0"><text string="boat"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_14_0"><text string="book"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_15_0"><text string="breakfast"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label3_1_1"><text string="brush"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_2_1"><text string="bus"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_3_1"><text string="cab"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_4_1"><text string="cake"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_5_1"><text string="candy"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_6_1"><text string="car"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_7_1"><text string="cat"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_8_1"><text string="chair"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_9_1"><text string="cheese"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_10_1"><text string="church"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_11_1"><text string="circle"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_12_1"><text string="city"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_13_1"><text string="class"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_14_1"><text string="clock"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_15_1"><text string="clothes"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label3_1_2"><text string="coat"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_2_2"><text string="coffee"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_3_2"><text string="comb"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_4_2"><text string="company"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_5_2"><text string="country"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_6_2"><text string="cup"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_7_2"><text string="cupboard"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_8_2"><text string="dinner"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_9_2"><text string="dish"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_10_2"><text string="dog"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_11_2"><text string="doll"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_12_2"><text string="door"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_13_2"><text string="drawer"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_14_2"><text string="dress"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_15_2"><text string="drink"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label3_1_3"><text string="egg"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_2_3"><text string="elevator"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_3_3"><text string="farm"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_4_3"><text string="food"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_5_3"><text string="fork"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_6_3"><text string="fruit"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_7_3"><text string="fun"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_8_3"><text string="game"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_9_3"><text string="glass"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_10_3"><text string="hat"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_11_3"><text string="hospital"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_12_3"><text string="house"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_13_3"><text string="ice cream"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_14_3"><text string="jacket"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_15_3"><text string="knife"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label3_1_4"><text string="light"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_2_4"><text string="lock"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_3_4"><text string="lunch"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_4_4"><text string="machine"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_5_4"><text string="meat"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_6_4"><text string="milk"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_7_4"><text string="mistake"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_8_4"><text string="mittens"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_9_4"><text string="music"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_10_4"><text string="name"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_11_4"><text string="pants"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_12_4"><text string="paper"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_13_4"><text string="park"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_14_4"><text string="pen"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_15_4"><text string="pencil"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label3_1_5"><text string="picture"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_2_5"><text string="pill"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_3_5"><text string="problem"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_4_5"><text string="purse"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_5_5"><text string="radio"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_6_5"><text string="room"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_7_5"><text string="sandwich"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_8_5"><text string="school"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_9_5"><text string="sex"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_10_5"><text string="shave"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_11_5"><text string="shirt"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_12_5"><text string="shoe"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_13_5"><text string="soak"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_14_5"><text string="sock"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_15_5"><text string="someone"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label3_1_6"><text string="something"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_2_6"><text string="spoon"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_3_6"><text string="square"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_4_6"><text string="store"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_5_6"><text string="sugar"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_6_6"><text string="suit"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_7_6"><text string="surprise"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_8_6"><text string="sweater"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_9_6"><text string="table"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_10_6"><text string="telephone"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_11_6"><text string="thing"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_12_6"><text string="toothbrush"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_13_6"><text string="toothpaste"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_14_6"><text string="towel"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_15_6"><text string="T.V."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label3_1_7"><text string="typewriter"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_2_7"><text string="vacation"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_3_7"><text string="vegetable"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_4_7"><text string="water"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_5_7"><text string="new"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_6_7"><text string="old"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_7_7"><text string="young"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_8_7"><text string="empty"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_9_7"><text string="full"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_10_7"><text string="dirt"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_11_7"><text string="clean"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_12_7"><text string="big"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_13_7"><text string="small"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_14_7"><text string="good"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label3_15_7"><text string="bad"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<!-- level 4 labels -->
+
+	<element name="label4_1_0"><text string="/A1//e₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_2_0"><text string="/A2//e₂/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_3_0"><text string="//AE1//ae₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_4_0"><text string="/AH1//a₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_5_0"><text string="/AH2//a₂/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_6_0"><text string="/AW1//ɔ₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_7_0"><text string="/AW2//ɔ₂/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_8_0"><text string="/AY//iⱽ/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_9_0"><text string="/E1//i₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_10_0"><text string="/EH1//ɛ₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_11_0"><text string="/EH3//ɛ₃/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_12_0"><text string="/I1//I₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_13_0"><text string="/I3//I₃/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_14_0"><text string="/IU//ʉ/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_15_0"><text string="/O1//o₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label4_1_1"><text string="/O2//o₂/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_2_1"><text string="/OO1//ʊ₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_3_1"><text string="/U1//u₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_4_1"><text string="/UH1//ʌ₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_5_1"><text string="/UH3//ə₃/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_6_1"><text string="/Y1//j₁/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_7_1"><text string="/B//b/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_8_1"><text string="/CH//ʧ/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_9_1"><text string="/D//d/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_10_1"><text string="/F//f/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_11_1"><text string="/G//g/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_12_1"><text string="/H//h/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_13_1"><text string="/J//ʤ/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_14_1"><text string="/K//k/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_15_1"><text string="/L//l/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label4_1_2"><text string="/M//m/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_2_2"><text string="/N//n/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_3_2"><text string="/NG//ŋ/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_4_2"><text string="/P//p/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_5_2"><text string="/R//r/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_6_2"><text string="/S//s/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_7_2"><text string="/SH//ʃ/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_8_2"><text string="/T/ /t/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_9_2"><text string="/TH//θ/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_10_2"><text string="/THV//ð/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_11_2"><text string="/V//v/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_12_2"><text string="/W//w/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_13_2"><text string="/Y//j/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_14_2"><text string="/Z//z/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_15_2"><text string="/ZH//ʒ/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label4_1_3"><text string="con . . ."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_2_3"><text string="dis . . ."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_3_3"><text string=". . . ed"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_4_3"><text string=". . . en"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_5_3"><text string=". . . er/ə^/"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_6_3"><text string=". . . es"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_7_3"><text string=". . . et"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_8_3"><text string=". . . ez"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_9_3"><text string=". . . ful"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_10_3"><text string=". . . ing"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_11_3"><text string=". . . less"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_12_3"><text string=". . . ly"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_13_3"><text string="un . . ."><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_14_3"><text string="again"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_15_3"><text string="at"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label4_1_4"><text string="because"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_2_4"><text string="but"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_3_4"><text string="by"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_4_4"><text string="fine"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_5_4"><text string="for"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_6_4"><text string="from"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_7_4"><text string="if"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_8_4"><text string="in"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_9_4"><text string="not"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_10_4"><text string="now"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_11_4"><text string="of"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_12_4"><text string="or"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_13_4"><text string="out"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_14_4"><text string="to"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_15_4"><text string="with"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label4_1_5"><text string="black"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_2_5"><text string="blue"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_3_5"><text string="brown"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_4_5"><text string="green"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_5_5"><text string="orange"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_6_5"><text string="purple"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_7_5"><text string="red"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_8_5"><text string="white"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_9_5"><text string="yellow"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_10_5"><text string="am"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_11_5"><text string="an"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_12_5"><text string="that"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_13_5"><text string="a"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_14_5"><text string="the"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_15_5"><text string="and"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label4_1_6"><text string="ate"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_2_6"><text string="break"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_3_6"><text string="bring"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_4_6"><text string="buy"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_5_6"><text string="call"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_6_6"><text string="change"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_7_6"><text string="cook"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_8_6"><text string="cost"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_9_6"><text string="get"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_10_6"><text string="got"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_11_6"><text string="make"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_12_6"><text string="speak"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_13_6"><text string="swim"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_14_6"><text string="wash"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_15_6"><text string="wear"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<element name="label4_1_7"><text string="on"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_2_7"><text string="off"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_3_7"><text string="up"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_4_7"><text string="down"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_5_7"><text string="first"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_6_7"><text string="last"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_7_7"><text string="easy"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_8_7"><text string="hard"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_9_7"><text string="fast"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_10_7"><text string="slow"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_11_7"><text string="cold"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_12_7"><text string="hot"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_13_7"><text string="left"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_14_7"><text string="right"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+	<element name="label4_15_7"><text string="wrong"><color red="0.0" green="0.0" blue="0.0" /></text></element>
+
+	<!-- keyboard -->
+
+	<group name="keyboard">
+
+		<element ref="background">
+			<bounds left="0" top="0" right="1600" bottom="800" />
+		</element>
+
+		<!-- command cells -->
+		<repeat count="4">
+			<param name="cell_yc" start="50" increment="100" />
+			<param name="bitmask" start="0x80" rshift="1" />
+			<element ref="cell_cmd" inputtag="SW.0" inputmask="~bitmask~">
+				<bounds xc="50" yc="~cell_yc~" width="95" height="95" />
+			</element>
+		</repeat>
+
+		<!-- level cells -->
+
+		<element ref="cell_lvl1" inputtag="SW.0" inputmask="0x08">
+			<bounds xc="50" yc="450" width="95" height="95" />
+		</element>
+
+		<element ref="cell_lvl2" inputtag="SW.0" inputmask="0x04">
+			<bounds xc="50" yc="550" width="95" height="95" />
+		</element>
+
+		<element ref="cell_lvl3" inputtag="SW.0" inputmask="0x02">
+			<bounds xc="50" yc="650" width="95" height="95" />
+		</element>
+
+		<element ref="cell_lvl4" inputtag="SW.0" inputmask="0x01">
+			<bounds xc="50" yc="750" width="95" height="95" />
+		</element>
+
+		<!-- main cells -->
+
+		<repeat count="15">
+			<param name="cell_col" start="1" increment="1" />
+			<param name="cell_xc" start="150" increment="100" />
+			<repeat count="8">
+				<param name="cell_yc" start="50" increment="100" />
+				<param name="bitmask" start="0x80" rshift="1" />
+				<element ref="cell_lvls" inputtag="SW.~cell_col~" inputmask="~bitmask~">
+					<bounds xc="~cell_xc~" yc="~cell_yc~" width="95" height="95" />
+				</element>
+			</repeat>
+		</repeat>
+
+		<!-- main cells with command-->
+
+		<repeat count="6">
+			<param name="cell_col" start="2" increment="1" />
+			<param name="cell_xc" start="250" increment="100" />
+			<element ref="cell_lvls_cmd" inputtag="SW.~cell_col~" inputmask="0x01">
+				<bounds xc="~cell_xc~" yc="750" width="95" height="95" />
+			</element>
+		</repeat>
+
+		<!-- main text -->
+
+		<repeat count="4">
+			<param name="level" start="1" increment="1" />
+			<param name="cell_yc_start" start="12.5" increment="25" />
+			<repeat count="15">
+				<param name="cell_col" start="1" increment="1" />
+				<param name="cell_xc" start="150" increment="100" />
+				<repeat count="8">
+					<param name="cell_row" start="0" increment="1" />
+					<param name="cell_yc" start="~cell_yc_start~" increment="100" />
+					<element ref="label~level~_~cell_col~_~cell_row~">
+						<bounds xc="~cell_xc~" yc="~cell_yc~" width="95" height="18" />
+					</element>
+				</repeat>
+			</repeat>
+		</repeat>
+
+		<!-- command text -->
+
+		<element ref="label_talk">
+			<bounds xc="50" yc="50" width="90" height="30" />
+		</element>
+
+		<element ref="label_master">
+			<bounds xc="50" yc="130" width="90" height="30" />
+		</element>
+		<element ref="label_clear">
+			<bounds xc="50" yc="160" width="90" height="30" />
+		</element>
+
+		<element ref="label_clear">
+			<bounds xc="50" yc="250" width="90" height="30" />
+		</element>
+
+		<element ref="label_talk">
+			<bounds xc="50" yc="330" width="90" height="30" />
+		</element>
+		<element ref="label_repeat">
+			<bounds xc="50" yc="360" width="90" height="30" />
+		</element>
+
+		<repeat count="4">
+			<param name="cell_yc_lvl" start="430" increment="100" />
+			<param name="cell_yc_num" start="460" increment="100" />
+			<param name="levelnum" start="1" increment="1" />
+			<element ref="label_level">
+				<bounds xc="50" yc="~cell_yc_lvl~" width="90" height="30" />
+			</element>
+			<element ref="label_~levelnum~">
+				<bounds xc="50" yc="~cell_yc_num~" width="90" height="30" />
+			</element>
+		</repeat>
+
+	</group>
+
+	<!-- build screen -->
+
+	<view name="Internal Layout">
+
+		<element ref="background"><bounds left="-50" top="0" right="1600" bottom="800" /></element>
+
+		<element name="led_0" ref="led_red">
+			<bounds xc="-25" yc="450" width="15" height="15" />
+		</element>
+		<element name="led_1" ref="led_red">
+			<bounds xc="-25" yc="550" width="15" height="15" />
+		</element>
+		<element name="led_2" ref="led_red">
+			<bounds xc="-25" yc="650" width="15" height="15" />
+		</element>
+		<element name="led_3" ref="led_red">
+			<bounds xc="-25" yc="750" width="15" height="15" />
+		</element>
+		<element name="led_4" ref="led_green">
+			<bounds xc="-25" yc="50" width="15" height="15" />
+		</element>
+
+		<group ref="keyboard"><bounds x="0" y="0" width="1600" height="800" /></group>
+
+	</view>
+
+</mamelayout>

@@ -731,6 +731,10 @@ ROM_END
 
 
 
+ROM_START( dancmix3 )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "e28f008sa.u5", 0x00000, 0x100000, CRC(faf6480c) SHA1(68bf79910e091443aecc7bf256cd5378a04c550e) )
+ROM_END
 
 CONS( 200?, maxx5in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_state,  init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 5-in-1 Casino / Senario Card & Casino Games", 0 ) // advertised on box as 'With Solitaire" (was there an even older version without it?)
 
@@ -768,3 +772,6 @@ CONS( 200?, cpatrolm,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_state, i
 // Super Moto 3 https://youtu.be/DR5Y_r6C_qk - has JungleTac copyrights intact, and appears to have the SH6578 versions of the games
 
 // Handy Max 15-in-1 https://youtu.be/jQTUHj1cP-k - has JungleTac copyrights intact, and appears to have the SH6578 versions of the games
+
+// has sampled audio, not supported (make sure it isn't being done by an external device)
+CONS( 201?, dancmix3, 0, 0, nes_sh6578_pal, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Venom", "TV Dance Mat 4 Games in 1 (Mix Party 3 / Dance Mix 3)", MACHINE_NOT_WORKING )

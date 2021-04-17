@@ -397,8 +397,8 @@ To reset the NVRAM in Othello Derby, hold P1 Button 1 down while booting.
 #include "cpu/z80/z80.h"
 #include "cpu/z180/hd647180x.h"
 #include "machine/nvram.h"
-#include "sound/3812intf.h"
 #include "sound/ym2151.h"
+#include "sound/ym3812.h"
 #include "sound/ymz280b.h"
 #include "speaker.h"
 
@@ -1487,8 +1487,8 @@ void toaplan2_state::hd647180_io_map(address_map &map)
 	map(0x70, 0x75).nopw(); // DDRs are written with the wrong upper addresses!
 	map(0x84, 0x84).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 
-	map(0x82, 0x82).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
-	map(0x83, 0x83).rw("ymsnd", FUNC(ym3812_device::read_port_r), FUNC(ym3812_device::write_port_w));
+	map(0x82, 0x82).rw("ymsnd", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
+	map(0x83, 0x83).w("ymsnd", FUNC(ym3812_device::data_w));
 }
 
 
@@ -4183,7 +4183,7 @@ void toaplan2_state::bbakraid(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(32'000'000)/6);     /* 5.3333MHz , 32MHz Oscillator */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::bbakraid_sound_z80_mem);
 	m_audiocpu->set_addrmap(AS_IO, &toaplan2_state::bbakraid_sound_z80_port);
-	m_audiocpu->set_periodic_int(FUNC(toaplan2_state::bbakraid_snd_interrupt), attotime::from_hz(448));
+	m_audiocpu->set_periodic_int(FUNC(toaplan2_state::bbakraid_snd_interrupt), attotime::from_hz(XTAL(32'000'000) / 6 / 12000)); // sound CPU clock (divider unverified)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
@@ -5822,8 +5822,8 @@ ROM_START( nprobowl )
 	ROM_LOAD16_BYTE( "newprobowl-prg1-u024", 0x000001, 0x080000, CRC(9e9bb58a) SHA1(3d2159bde418dee5d89e3df9a248b4b1989e6ee9) ) // 11xxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x200000, "gp9001_0", 0 )
-	ROM_LOAD16_BYTE( "newprobowl-chr0-u0518", 0x000000, 0x80000, CRC(0736cccd) SHA1(5a4b691be1df697fef3847456c0f4bb3466c403f) )
-	ROM_LOAD16_BYTE( "newprobowl-chr1-u0519", 0x000001, 0x80000, CRC(6700a9bf) SHA1(12a72aa0b91119fbbed994aec702a6869af6f287) )
+	ROM_LOAD16_BYTE( "newprobowl-chr1-u0519", 0x000000, 0x80000, CRC(6700a9bf) SHA1(12a72aa0b91119fbbed994aec702a6869af6f287) )
+	ROM_LOAD16_BYTE( "newprobowl-chr0-u0518", 0x000001, 0x80000, CRC(0736cccd) SHA1(5a4b691be1df697fef3847456c0f4bb3466c403f) )
 	ROM_LOAD16_BYTE( "newprobowl-chr2-u0520", 0x100000, 0x80000, CRC(e5f6d0b6) SHA1(6e1a4792698be4b478118e8c82edb0cf3e2286f2) )
 	ROM_LOAD16_BYTE( "newprobowl-chr3-u0521", 0x100001, 0x80000, CRC(00c21951) SHA1(922abde172fb82b504dce41b95227740f16208a7) )
 

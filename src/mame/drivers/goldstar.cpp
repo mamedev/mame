@@ -660,7 +660,7 @@ void cb3_state::chryangla_map(address_map &map) // most to be verified when the 
 
 void cb3_state::chryangla_decrypted_opcodes_map(address_map &map)
 {
-	map(0x0000, 0xbfff).rom().share("decrypted_opcodes");
+	map(0x0000, 0xffff).rom().share("decrypted_opcodes");
 	map(0xf800, 0xffff).ram();
 }
 
@@ -876,7 +876,7 @@ void cmaster_state::ss2001_portmap(address_map &map) // TODO: everything but ay
 
 void cmaster_state::chryangl_decrypted_opcodes_map(address_map &map)
 {
-	map(0x0000, 0xf7ff).rom().share("decrypted_opcodes");
+	map(0x0000, 0xffff).rom().share("decrypted_opcodes");
 	map(0xf800, 0xffff).ram();
 }
 
@@ -989,6 +989,29 @@ void goldstar_state::lucky8_map(address_map &map)
 	map(0xf800, 0xffff).ram();
 }
 
+void wingco_state::nd8lines_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().share("nvram");
+	map(0x8800, 0x8fff).ram().w(FUNC(goldstar_state::goldstar_fg_vidram_w)).share("fg_vidram");
+	map(0x9000, 0x97ff).ram().w(FUNC(goldstar_state::goldstar_fg_atrram_w)).share("fg_atrram");
+	map(0x9800, 0x99ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xa000, 0xa1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xa800, 0xa9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xb040, 0xb07f).ram().share("reel1_scroll");
+	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
+	map(0xb100, 0xb17f).ram().share("reel3_scroll");
+	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xb820, 0xb820).w(FUNC(wingco_state::system_outputc_w));
+	map(0xb830, 0xb830).portr("DSW1");
+	map(0xb840, 0xb840).portr("DSW3");
+	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
+	map(0xb860, 0xb860).w(FUNC(goldstar_state::p2_lamps_w));
+	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489a_device::write)); // seems to write with swapped nibbles if compared to lucky8
+	map(0xf800, 0xffff).ram();
+}
+
 void goldstar_state::common_decrypted_opcodes_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
@@ -996,7 +1019,7 @@ void goldstar_state::common_decrypted_opcodes_map(address_map &map)
 
 void goldstar_state::super972_decrypted_opcodes_map(address_map &map)
 {
-	map(0x0000, 0xefff).rom().share("decrypted_opcodes");
+	map(0x0000, 0xffff).rom().share("decrypted_opcodes");
 }
 
 void goldstar_state::flaming7_map(address_map &map)
@@ -3661,6 +3684,90 @@ static INPUT_PORTS_START( ns8linew )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW4:8")              /* not checked */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( nd8lines ) // TODO: need to be done once palette is figured out and effects can be verified
+	PORT_START("IN0") // b800
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Odds table") // Only works with coins inserted
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1") // b801
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2") // b802
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN3") // b810
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Key Out / Attendant")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Settings / Test Mode") PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Stats")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_IMPULSE(2) // should be coins, PORT_IMPULSE needed or the game laments 'coin jam'
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_IMPULSE(2) // should be coins, PORT_IMPULSE needed or the game laments 'coin jam'
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_IMPULSE(2) // should be coins,  PORT_IMPULSE needed or the game laments 'coin jam'
+
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW1:4")
+	PORT_DIPNAME( 0x10, 0x10, "Double Up Game Pay Rate" )   PORT_DIPLOCATION("DSW1:5") // ok
+	PORT_DIPSETTING(    0x10, "80%" )
+	PORT_DIPSETTING(    0x00, "90%" )
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW1:8")
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW2:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW2:8")
+
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW3:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW3:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW3:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW3:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW3:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW3:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW3:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW3:8")
+
+	PORT_START("DSW4")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW4:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW4:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW4:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW4:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW4:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW4:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW4:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW4:8")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ns8linwa )
@@ -9052,6 +9159,23 @@ void wingco_state::lucky8(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
+void wingco_state::nd8lines(machine_config &config)
+{
+	lucky8(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::nd8lines_map);
+
+	m_ppi[1]->in_pb_callback().set_ioport("DSW2");
+	m_ppi[1]->in_pc_callback().set_ioport("DSW4");
+
+	PALETTE(config.replace(), "palette", FUNC(wingco_state::cm_palette), 256); // wrong
+
+	SN76489A(config.replace(), "snsnd", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
+
+	config.device_remove("ppi8255_2");
+	config.device_remove("aysnd");
+}
+
 void wingco_state::lucky8f(machine_config &config)
 {
 	lucky8(config);
@@ -12438,6 +12562,28 @@ ROM_START( lucky8l )
 
 	ROM_REGION( 0x117, "unkprom2", 0 )
 	ROM_LOAD( "w4.d12", 0x0000, 0x0117, CRC(41b55fb0) SHA1(f31a31dc2c0789d08957785e8c8f804690133450) ) // GAL16V8D
+ROM_END
+
+
+// TMPZ84C00AP-6 main CPU, 2 x D71055C, 1 x SN76489AN, 4 x 8-dip banks
+ROM_START( nd8lines )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dw8-055-8.u58", 0x0000, 0x8000, CRC(3d5d3882) SHA1(a7bc24d1e78ae2f74caba95935d3751c4d7fdf55) ) // encrypted, 27c256
+
+	ROM_REGION( 0x18000, "gfx1", 0 ) // all 27c256
+	ROM_LOAD( "dw8-055-5.u28",  0x00000, 0x8000, CRC(6a77f98c) SHA1(abc7f7e4f30e9a5d95682aa9d6a64d347ae883c4) )
+	ROM_LOAD( "dw8-055-6.u27",  0x08000, 0x8000, CRC(78c5f704) SHA1(59c67cd1220e90eff867e25143d9d1f95de2ff0c) )
+	ROM_LOAD( "dw8-055-7.u26",  0x10000, 0x8000, CRC(3ec8b05b) SHA1(418e6c563f2e3537fd58631d30b8863c6838a2e4) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 ) // all 27c64
+	ROM_LOAD( "dw8-055-4.u37",   0x0000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "dw8-055-3.u36",   0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "dw8-055-2.u35",   0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "dw8-055-1.u34",   0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "he82s129.u33", 0x0000, 0x0100, CRC(3d2f1893) SHA1(927916856b25dfd6ded04c26714313bc49f7e220) )
+	ROM_LOAD( "met47s01.u66", 0x0100, 0x0200, BAD_DUMP CRC(78b6701e) SHA1(27b3d47b0a3637d3a92bf535b34d301e5a3aff8c) ) // unidentified chip, read as 82s147 for now, bad dump until it's known if it's the correct equivalent
 ROM_END
 
 /*
@@ -18579,6 +18725,21 @@ void wingco_state::init_lucky8l()
 	}
 }
 
+void wingco_state::init_nd8lines()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0x0000; i < 0x2000; i++)
+		rom[i] = bitswap<8>(rom[i] ^ 0xa3, 6, 1, 3, 5, 7, 0, 2, 4);
+
+	for (int i = 0x2000; i < 0x4000; i++)
+		rom[i] = bitswap<8>(rom[i] ^ 0xd0, 0, 4, 3, 1, 7, 5, 2, 6);
+
+	for (int i = 0x4000; i < 0x8000; i++)
+		rom[i] = bitswap<8>(rom[i] ^ 0x6c, 6, 0, 4, 3, 1, 2, 5, 7);
+}
+
+
 void wingco_state::init_super972()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -19383,6 +19544,7 @@ GAMEL( 198?, ns8lines,  0,        lucky8,   lucky8b,  wingco_state,   empty_init
 GAMEL( 1985, ns8linesa, ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, ns8linew,  ns8lines, lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 198?, ns8linewa, ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus)", 0,                     layout_lucky8p1 )  // only 1 control set...
+GAMEL( 1991, nd8lines,  lucky8,   nd8lines, nd8lines, wingco_state,   init_nd8lines,  ROT0, "Yamate (bootleg)",  "New Draw 8 Lines (Version 2.1)",                           MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND, layout_lucky8 ) // PROM decode wrong, SN emits terrible sound, inputs not done yet
 GAMEL( 198?, super972,  ns8lines, super972, ns8linwa, wingco_state,   init_super972,  ROT0, "<unknown>",         "Super 97-2 (Witch Bonus)",                                 MACHINE_NOT_WORKING,   layout_lucky8p1 )  // decrypted, needs correct inputs
 GAME(  198?, luckybar,  0,        lucky8,   ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "Lucky Bar (W-4 with mc68705 MCU)",                         MACHINE_NOT_WORKING )  // MC68705 MCU
 GAMEL( 198?, kkotnoli,  0,        kkotnoli, kkotnoli, goldstar_state, empty_init,     ROT0, "hack",              "Kkot No Li (Kill the Bees)",                               MACHINE_IMPERFECT_COLORS, layout_lucky8 )

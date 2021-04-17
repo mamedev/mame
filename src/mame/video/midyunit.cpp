@@ -199,16 +199,36 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(midyunit_state::from_shiftreg)
 void midyunit_state::midyunit_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
-	 * Narc system register
+	 * Narc 'Z-unit' system register, accessed via '/SEL.MISC' being asserted
 	 * ------------------
 	 *
 	 *   | Bit              | Use
 	 * --+-FEDCBA9876543210-+------------
-	 *   | xxxxxxxx-------- |   7 segment led on CPU board
-	 *   | --------xx------ |   CMOS page
-	 *   | ----------x----- | - OBJ PAL RAM select
-	 *   | -----------x---- | - autoerase enable
-	 *   | ---------------- | - watchdog
+	 *   | xxxxxxxx-------- | 7 segment led on CPU board
+	 *   | --------xx------ | CMOS page, selected by feeding the '/SPK.0' D6 and '/SPK.1' D7 through an EP800 PLD @U12
+	 *   | ----------x----- | /OBJ PAL RAM select
+	 *   | -----------x---- | /autoerase enable
+	 *   | ------------x--- | /bg enable
+	 *   | -------------x-- | /bg priority
+	 *   | --------------x- | fg scroll 1
+	 *   | ---------------x | fg scroll 0
+	 *   | --------xx----xx | watchdog is triggered on any (state change? rising edge? needs testing, the EP800 @U12 controls this) of these bits, and the EP800 likely also counts pulses the /BLANK bit from the tms34010
+	 *
+	 */
+	/*
+	 * Y-unit system register, accessed via '/SEL.MISC' being asserted ('later' is from the super high impact schematics vs main labels are from the trog schematics)
+	 * ------------------
+	 *
+	 *   | Bit              | Use
+	 * --+-FEDCBA9876543210-+------------
+	 *   | OPEN_BUS-------- |  upper 8 bits are open bus
+	 *   |   " "   xx------ |  CMOS page, selected by feeding the '/SPK.0' (later CBANK1) D6 and '/SPK.1' (later CBANK0) D7 through an EP800 PLD @U12
+	 *   |   " "   --x----- |  /OBJ PAL RAM select
+	 *   |   " "   ---x---- |  /autoerase enable
+	 *   |   " "   ----x--- |  N/C (later 'EXT')
+	 *   |   " "   -----x-- |  /LED
+	 *   |   " "   ------x- |  fg scroll 1 (later 'WD.DAT')
+	 *   |   " "   -------x |  fg scroll 0 (later 'WD.CLK')
 	 *
 	 */
 

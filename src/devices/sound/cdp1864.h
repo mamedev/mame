@@ -152,7 +152,7 @@ private:
 	int m_disp;                     // display on
 	int m_dmaout;                   // DMA request active
 	int m_bgcolor;                  // background color
-	int m_con;                      // color on
+	bool m_con;                     // color on
 
 	// sound state
 	int m_aoe;                      // audio on

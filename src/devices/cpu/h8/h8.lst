@@ -1079,7 +1079,7 @@ macro jsr32 %opc %spreg
 	prefetch();
 
 10f0         fff8         0 shal.l   two      r32l     s20
-	r32_w(IR[0], do_shal32(r32_r(IR[0])));
+	r32_w(IR[0], do_shal2_32(r32_r(IR[0])));
 	prefetch();
 
 1100         fff0         0 shlr.b   r8l      -

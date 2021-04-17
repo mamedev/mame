@@ -590,7 +590,7 @@ private:
 	required_shared_ptr<uint8_t> m_shared;
 	required_memory_region m_chargen;
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
@@ -939,9 +939,11 @@ static void fanuc_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-FLOPPY_FORMATS_MEMBER( fanucspmg_state::floppy_formats )
-	FLOPPY_IMD_FORMAT
-FLOPPY_FORMATS_END
+void fanucspmg_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_IMD_FORMAT);
+}
 
 void fanucspmg_state::fanucspmg(machine_config &config)
 {

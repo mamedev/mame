@@ -188,7 +188,7 @@ void nubus_device::install_writeonly_device(offs_t start, offs_t end, write32_de
 void nubus_device::install_bank(offs_t start, offs_t end, uint8_t *data)
 {
 //  printf("install_bank: %s @ %x->%x\n", tag, start, end);
-	m_space->install_rom(start, end, data);
+	m_space->install_ram(start, end, data);
 }
 
 void nubus_device::set_irq_line(int slot, int state)

@@ -6,11 +6,15 @@
 #pragma once
 
 
-class k057714_device : public device_t
+class k057714_device : public device_t, public device_video_interface
 {
 public:
+	// construction/destruction
 	k057714_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 	auto irq_callback() { return m_irq.bind(); }
+
+	void set_pixclock(const XTAL &xtal);
 
 	int draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -25,6 +29,7 @@ public:
 		int height;
 		int x;
 		int y;
+		int alpha;
 	};
 
 protected:
@@ -33,6 +38,13 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	enum {
+		VRAM_SIZE = 0x2000000,
+		VRAM_SIZE_HALF = 0x2000000 / 2
+	};
+
+	void crtc_set_screen_params();
+
 	void execute_command(uint32_t *cmd);
 	void execute_display_list(uint32_t addr);
 	void draw_object(uint32_t *cmd);
@@ -63,6 +75,17 @@ private:
 	uint32_t m_fb_origin_y;
 	uint32_t m_layer_select;
 	uint32_t m_reg_6c;
+
+	uint32_t m_display_h_visarea;
+	uint32_t m_display_h_frontporch;
+	uint32_t m_display_h_backporch;
+	uint32_t m_display_h_syncpulse;
+	uint32_t m_display_v_visarea;
+	uint32_t m_display_v_frontporch;
+	uint32_t m_display_v_backporch;
+	uint32_t m_display_v_syncpulse;
+
+	uint32_t m_pixclock;
 
 	devcb_write_line m_irq;
 };

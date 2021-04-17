@@ -12,7 +12,7 @@ template<int Width, int AddrShift, endianness_t Endian, typename READ> template<
 					 std::is_same<R, read64_delegate>::value,
 					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, Endian, READ>::read_impl(offs_t offset, uX mem_mask) const
 {
-	return m_delegate(*inh::m_space, ((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift), mem_mask);
+	return m_delegate(*this->m_space, ((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift), mem_mask);
 }
 
 template<int Width, int AddrShift, endianness_t Endian, typename READ> template<typename R>
@@ -22,7 +22,7 @@ template<int Width, int AddrShift, endianness_t Endian, typename READ> template<
 					 std::is_same<R, read64m_delegate>::value,
 					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, Endian, READ>::read_impl(offs_t offset, uX mem_mask) const
 {
-	return m_delegate(*inh::m_space, ((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift));
+	return m_delegate(*this->m_space, ((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift));
 }
 
 template<int Width, int AddrShift, endianness_t Endian, typename READ> template<typename R>
@@ -32,7 +32,7 @@ template<int Width, int AddrShift, endianness_t Endian, typename READ> template<
 					 std::is_same<R, read64s_delegate>::value,
 					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, Endian, READ>::read_impl(offs_t offset, uX mem_mask) const
 {
-	return m_delegate(((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift), mem_mask);
+	return m_delegate(((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift), mem_mask);
 }
 
 template<int Width, int AddrShift, endianness_t Endian, typename READ> template<typename R>
@@ -42,7 +42,7 @@ template<int Width, int AddrShift, endianness_t Endian, typename READ> template<
 					 std::is_same<R, read64sm_delegate>::value,
 					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, Endian, READ>::read_impl(offs_t offset, uX mem_mask) const
 {
-	return m_delegate(((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift));
+	return m_delegate(((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift));
 }
 
 template<int Width, int AddrShift, endianness_t Endian, typename READ> template<typename R>
@@ -52,7 +52,7 @@ template<int Width, int AddrShift, endianness_t Endian, typename READ> template<
 					 std::is_same<R, read64mo_delegate>::value,
 					 typename emu::detail::handler_entry_size<Width>::uX> handler_entry_read_delegate<Width, AddrShift, Endian, READ>::read_impl(offs_t offset, uX mem_mask) const
 {
-	return m_delegate(*inh::m_space);
+	return m_delegate(*this->m_space);
 }
 
 template<int Width, int AddrShift, endianness_t Endian, typename READ> template<typename R>
@@ -82,7 +82,7 @@ template<int Width, int AddrShift, endianness_t Endian, typename WRITE> template
 					 std::is_same<W, write64_delegate>::value,
 					 void> handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>::write_impl(offs_t offset, uX data, uX mem_mask) const
 {
-	m_delegate(*inh::m_space, ((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift), data, mem_mask);
+	m_delegate(*this->m_space, ((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift), data, mem_mask);
 }
 
 template<int Width, int AddrShift, endianness_t Endian, typename WRITE> template<typename W>
@@ -92,7 +92,7 @@ template<int Width, int AddrShift, endianness_t Endian, typename WRITE> template
 					 std::is_same<W, write64m_delegate>::value,
 					 void> handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>::write_impl(offs_t offset, uX data, uX mem_mask) const
 {
-	m_delegate(*inh::m_space, ((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift), data);
+	m_delegate(*this->m_space, ((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift), data);
 }
 
 template<int Width, int AddrShift, endianness_t Endian, typename WRITE> template<typename W>
@@ -102,7 +102,7 @@ template<int Width, int AddrShift, endianness_t Endian, typename WRITE> template
 					 std::is_same<W, write64s_delegate>::value,
 					 void> handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>::write_impl(offs_t offset, uX data, uX mem_mask) const
 {
-	m_delegate(((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift), data, mem_mask);
+	m_delegate(((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift), data, mem_mask);
 }
 
 template<int Width, int AddrShift, endianness_t Endian, typename WRITE> template<typename W>
@@ -112,7 +112,7 @@ template<int Width, int AddrShift, endianness_t Endian, typename WRITE> template
 					 std::is_same<W, write64sm_delegate>::value,
 					 void> handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>::write_impl(offs_t offset, uX data, uX mem_mask) const
 {
-	m_delegate(((offset - inh::m_address_base) & inh::m_address_mask) >> (Width + AddrShift), data);
+	m_delegate(((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift), data);
 }
 
 template<int Width, int AddrShift, endianness_t Endian, typename WRITE> template<typename W>
@@ -122,7 +122,7 @@ template<int Width, int AddrShift, endianness_t Endian, typename WRITE> template
 					 std::is_same<W, write64mo_delegate>::value,
 					 void> handler_entry_write_delegate<Width, AddrShift, Endian, WRITE>::write_impl(offs_t offset, uX data, uX mem_mask) const
 {
-  m_delegate(*inh::m_space, data);
+	m_delegate(*this->m_space, data);
 }
 
 template<int Width, int AddrShift, endianness_t Endian, typename WRITE> template<typename W>

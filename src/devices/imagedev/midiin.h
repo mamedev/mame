@@ -72,6 +72,6 @@ private:
 DECLARE_DEVICE_TYPE(MIDIIN, midiin_device)
 
 // device iterator
-typedef device_type_iterator<midiin_device> midiin_device_iterator;
+typedef device_type_enumerator<midiin_device> midiin_device_enumerator;
 
 #endif // MAME_IMAGEDEV_MIDIIN_H

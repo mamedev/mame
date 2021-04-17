@@ -150,7 +150,6 @@ void windows_osd_interface::extract_video_config()
 	video_config.windowed      = options().window();
 	video_config.prescale      = options().prescale();
 	video_config.filter        = options().filter();
-	video_config.keepaspect    = options().keep_aspect();
 	video_config.numscreens    = options().numscreens();
 
 	// if we are in debug mode, never go full screen

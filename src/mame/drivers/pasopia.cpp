@@ -1,22 +1,17 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese
+// copyright-holders:Angelo Salese, AJR
 /***************************************************************************
 
     Toshiba Pasopia
 
-    Machine unusable due to keyboard issues.
     Cassette works.
     Sound uses the beeper, and works. Try SOUND a,b where a=1-82, b=1-255.
 
     TODO:
     - machine emulation needs merging with Pasopia 7 (video emulation is
       completely different tho)
-    - screen resolution switching
     - Centronics printer interface
     - FDC and other I/O expansions
-    - fix keyboard
-    - colours
-    - graphics
 
 
 ****************************************************************************/
@@ -97,6 +92,7 @@ private:
 	bool m_video_wl;
 	bool m_ram_bank;
 	bool m_spr_sw;
+	u8 m_dclr;
 	emu_timer *m_pio_timer;
 	std::unique_ptr<u16[]> m_p_vram;
 
@@ -126,21 +122,53 @@ TIMER_CALLBACK_MEMBER( pasopia_state::pio_timer )
 MC6845_UPDATE_ROW( pasopia_state::crtc_update_row )
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
-	u8 fg=7,bg=0; // colours need to be determined
-	uint32_t *p = &bitmap.pix(y);
+	rgb_t dclr = palette[m_dclr];
+	const rgb_t bclr = palette[m_gfx_mode & 0x07];
+	u32 *p = &bitmap.pix(y);
+	const bool text = (m_gfx_mode & 0xc0) == 0;
+	const u16 *const vram = &m_p_vram[text ? 0 : u16(BIT(m_gfx_mode, 7) ? ra & 7 : ra & 6) << 11];
 
 	for (u16 x = 0; x < x_count; x++)
 	{
-		u8 inv = (x == cursor_x) ? 0xff : 0;
-		u16 mem = ma + x;
-		u16 chr = m_p_vram[mem & 0x7ff];
+		const u16 chr = vram[(ma + x) & 0x7ff];
+		if ((chr & 0x1f8) == 0x0f8)
+		{
+			m_dclr = chr & 0x007;
+			dclr = palette[m_dclr];
+		}
 
-		/* get pattern of pixels for that character scanline */
-		u8 gfx = m_p_chargen[((chr & 0xff)<<3) | ra] ^ inv;
+		if (x == cursor_x)
+		{
+			// Cursor is always white
+			std::fill_n(p, 8, palette[7]);
+			p += 8;
+		}
+		else if (BIT(m_gfx_mode, 6) && BIT(chr, 8))
+		{
+			// DGR graphic characters: 3-bit colors for each half
+			const rgb_t uclr(palette[BIT(chr, 4, 3)]);
+			const rgb_t lclr(palette[BIT(chr, 0, 3)]);
 
-		/* Display a scanline of a character */
-		for (u8 xi = 0; xi < 8; xi++)
-			*p++ = palette[BIT(gfx, 7-xi) ? fg : bg];
+			std::fill_n(p, 4, uclr);
+			p += 4;
+			std::fill_n(p, 4, lclr);
+			p += 4;
+		}
+		else if (BIT(ra, 3) || (chr & 0x1f8) == 0x0f8)
+		{
+			std::fill_n(p, 8, bclr);
+			p += 8;
+		}
+		else
+		{
+			// DHR graphic characters, normal or inverted text
+			u8 gfx = BIT(chr, 8) && BIT(m_gfx_mode, 7) ? (chr & 0xff) : m_p_chargen[((chr & 0xff)<<3) | (ra & 7)];
+			if (BIT(chr, 8) && text)
+				gfx ^= 0xff;
+
+			for (u8 xi = 0; xi < 8; xi++)
+				*p++ = BIT(gfx, 7-xi) ? dclr : bclr;
+		}
 	}
 }
 
@@ -194,22 +222,41 @@ void pasopia_state::machine_start()
 	m_pio_timer->adjust(attotime::from_hz(50), 0, attotime::from_hz(50));
 
 	m_hblank = 0;
+	m_spr_sw = false;
+	m_dclr = 7;
+
+	save_item(NAME(m_hblank));
+	save_item(NAME(m_vram_addr));
+	save_item(NAME(m_vram_latch));
+	save_item(NAME(m_gfx_mode));
+	save_item(NAME(m_mux_data));
+	save_item(NAME(m_porta_2));
+	save_item(NAME(m_video_wl));
+	save_item(NAME(m_ram_bank));
+	save_item(NAME(m_spr_sw));
+	save_item(NAME(m_dclr));
+	save_pointer(NAME(m_p_vram), 0x4000);
 }
 
 void pasopia_state::machine_reset()
 {
 	m_porta_2 = 0xFF;
 	m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	m_ram_bank = false;
 }
 
 void pasopia_state::vram_addr_lo_w(u8 data)
 {
 	m_vram_addr = (m_vram_addr & 0x3f00) | data;
+	if (!m_video_wl)
+		m_p_vram[m_vram_addr] = m_vram_latch;
 }
 
 void pasopia_state::vram_latch_w(u8 data)
 {
 	m_vram_latch = (m_vram_latch & 0x100) | data;
+	if (!m_video_wl)
+		m_p_vram[m_vram_addr] = m_vram_latch;
 }
 
 u8 pasopia_state::vram_latch_r()
@@ -274,21 +321,18 @@ WRITE_LINE_MEMBER( pasopia_state::speaker_w )
 
 void pasopia_state::vram_addr_hi_w(u8 data)
 {
-	m_vram_latch = u16(data & 0x80) << 1 | m_vram_latch;
-	if ( BIT(data, 6) && !m_video_wl )
-	{
-		m_p_vram[m_vram_addr] = m_vram_latch;
-	}
-
 	m_video_wl = BIT(data, 6);
 	m_vram_addr = (m_vram_addr & 0xff) | ((data & 0x3f) << 8);
+	m_vram_latch = u16(data & 0x80) << 1 | (m_vram_latch & 0xff);
+	if (!m_video_wl)
+		m_p_vram[m_vram_addr] = m_vram_latch;
 }
 
 void pasopia_state::screen_mode_w(u8 data)
 {
-	m_gfx_mode = (data & 0xe0) >> 5;
-	//m_attr_latch = (m_attr_latch & 0x80) | (data & 7);
-	printf("Screen Mode=%02x\n",data);
+	if (BIT(m_gfx_mode, 5) != BIT(data, 5))
+		m_crtc->set_unscaled_clock(14.318181_MHz_XTAL / (BIT(data, 5) ? 8 : 16));
+	m_gfx_mode = data & 0xe7;
 }
 
 u8 pasopia_state::rombank_r()
@@ -311,6 +355,7 @@ u8 pasopia_state::keyb_r()
 void pasopia_state::mux_w(u8 data)
 {
 	m_mux_data = data;
+	m_pio->port_b_write(keyb_r());
 }
 
 static const gfx_layout p7_chars_8x8 =
@@ -351,7 +396,7 @@ void pasopia_state::pasopia(machine_config &config)
 	screen.set_raw(14.318181_MHz_XTAL / 2, 456, 0, 296, 262, 0, 192);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pasopia);
-	PALETTE(config, m_palette).set_entries(8);
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
 	/* Devices */
 	HD6845S(config, m_crtc, 14.318181_MHz_XTAL / 16);
@@ -414,4 +459,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME   FLAGS
-COMP( 1982, pasopia, 0,      0,      pasopia, pasopia, pasopia_state, empty_init, "Toshiba", "Personal Computer Pasopia PA7010", MACHINE_NOT_WORKING )
+COMP( 1982, pasopia, 0,      0,      pasopia, pasopia, pasopia_state, empty_init, "Toshiba", "Personal Computer Pasopia PA7010", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

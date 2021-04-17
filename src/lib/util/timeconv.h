@@ -13,11 +13,11 @@
 
 #pragma once
 
-#include "osdcore.h"
 #include "coreutil.h"
 
-#include <chrono>
 #include <algorithm>
+#include <chrono>
+#include <cstring>
 #include <stdexcept>
 
 

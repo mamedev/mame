@@ -100,12 +100,11 @@ Normal: Store $08 to $C05A (Zip compatible)
 Lock: Store $A5 to $C05A (Zip compatible).
 Unlock: Store $5A 4 times in a row to $C05A (Zip compatible).
 Read state: Cached by the firmware in MIG RAM (see below).
-Write state: Store speaker/slot byte at $C05C (NOT Zip compatible).  Firmware always enables the paddle
+Write state: Store speaker/slot byte at $C05C (Zip compatible).  Firmware always enables the paddle
 delay at $C05F, regardless of what you pass in.
 
-For the $C05C slot/speaker delay, the Zip has bit 0 = speaker, 7-1 = slots 7-1, and 1=normal, 0=fast.
-The IIc+ instead is as documented in the IIc Technical Reference Manual, Second Edition: bit 7=speaker,
-bits 6-0 = slots 7-1, and 1=fast, 0=normal.
+Previous versions of this driver stated that the IIc+ speaker/slot control byte was not Zip compatible; that
+was a misunderstanding.
 
 Accelerator control firmware saves/restores zero page locations 0-7 in MIG RAM page 2 locations $CE10-$CE17.
 MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accelerator bitfield.
@@ -114,6 +113,8 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 
 #include "emu.h"
 #include "video/apple2.h"
+
+#define IICP_NEW_IWM (0)
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65c02.h"
@@ -130,6 +131,8 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "machine/timer.h"
 #include "machine/ds1315.h"
 #include "machine/apple2common.h"
+#include "machine/applefdintf.h"
+#include "machine/iwm.h"
 
 #include "bus/a2bus/4play.h"
 #include "bus/a2bus/a2alfam2.h"
@@ -168,8 +171,9 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "bus/a2bus/byte8251.h"
 #include "bus/a2bus/cmsscsi.h"
 #include "bus/a2bus/computereyes2.h"
+#include "bus/a2bus/ccs7710.h"
 #include "bus/a2bus/ezcgi.h"
-#include "bus/a2bus/grapplerplus.h"
+#include "bus/a2bus/grappler.h"
 #include "bus/a2bus/laser128.h"
 #include "bus/a2bus/mouse.h"
 #include "bus/a2bus/pc_xporter.h"
@@ -178,6 +182,7 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "bus/a2bus/ssprite.h"
 #include "bus/a2bus/timemasterho.h"
 #include "bus/a2bus/transwarp.h"
+#include "bus/a2bus/uniprint.h"
 #include "bus/a2bus/uthernet.h"
 #include "bus/a2gameio/gameio.h"
 
@@ -198,7 +203,6 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #define A2_UPPERBANK_TAG "inhbank"
 #define IIC_ACIA1_TAG "acia1"
 #define IIC_ACIA2_TAG "acia2"
-#define IICP_IWM_TAG    "fdc"
 #define LASER128_UDC_TAG "l128udc"
 #define PRINTER_PORT_TAG "printer"
 #define MODEM_PORT_TAG "modem"
@@ -269,7 +273,12 @@ public:
 		m_acia1(*this, IIC_ACIA1_TAG),
 		m_acia2(*this, IIC_ACIA2_TAG),
 		m_laserudc(*this, LASER128_UDC_TAG),
-		m_iicpiwm(*this, IICP_IWM_TAG),
+#if IICP_NEW_IWM
+		m_iicpiwm(*this, "fdc"),
+		m_floppy(*this, "fdc:%d", 0U),
+#else
+		m_iicpiwm(*this, "fdc"),
+#endif
 		m_ds1315(*this, "nsc")
 	{
 		m_accel_laser = false;
@@ -280,6 +289,10 @@ public:
 		m_iscec2000 = false;
 		m_spectrum_text = false;
 		m_pal = false;
+#if IICP_NEW_IWM
+		m_cur_floppy = nullptr;
+		m_devsel = 0;
+#endif
 	}
 
 	required_device<cpu_device> m_maincpu;
@@ -314,7 +327,12 @@ public:
 	required_device<address_map_bank_device> m_lcbank;
 	optional_device<mos6551_device> m_acia1, m_acia2;
 	optional_device<applefdc_base_device> m_laserudc;
+#if IICP_NEW_IWM
+	optional_device<applefdintf_device> m_iicpiwm;
+	optional_device_array<floppy_connector, 4> m_floppy;
+#else
 	optional_device<legacy_iwm_device> m_iicpiwm;
+#endif
 	required_device<ds1315_device> m_ds1315;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
@@ -528,6 +546,16 @@ private:
 
 	u8 mig_r(u16 offset);
 	void mig_w(u16 offset, u8 data);
+#if IICP_NEW_IWM
+	void phases_w(uint8_t phases);
+	void sel35_w(int sel35);
+	void devsel_w(uint8_t devsel);
+	void hdsel_w(int hdsel);
+	void recalc_active_device();
+
+	floppy_image_device *m_cur_floppy;
+	int m_devsel;
+#endif
 
 	offs_t dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 };
@@ -559,13 +587,27 @@ u8 apple2e_state::mig_r(u16 offset)
 	if ((offset >= 0x240) && (offset < 0x260))
 	{
 		m_hdsel = false;
+#if IICP_NEW_IWM
+		if (m_cur_floppy)
+		{
+			m_cur_floppy->ss_w(0);
+		}
+#else
 		sony_set_sel_line(m_iicpiwm, 0);
+#endif
 	}
 
 	if ((offset >= 0x260) && (offset < 0x280))
 	{
 		m_hdsel = true;
+#if IICP_NEW_IWM
+		if (m_cur_floppy)
+		{
+			m_cur_floppy->ss_w(1);
+		}
+#else
 		sony_set_sel_line(m_iicpiwm, 0x80);
+#endif
 	}
 
 	// reset MIG RAM window
@@ -583,7 +625,11 @@ void apple2e_state::mig_w(u16 offset, u8 data)
 
 	if (offset == 0x40)
 	{
+#if IICP_NEW_IWM
+		m_iicpiwm->reset();
+#else
 		m_iicpiwm->device_reset();
+#endif
 		return;
 	}
 
@@ -591,6 +637,9 @@ void apple2e_state::mig_w(u16 offset, u8 data)
 	{
 		//printf("MIG: enable internal drive on d2\n");
 		m_intdrive = true;
+#if IICP_NEW_IWM
+		recalc_active_device();
+#endif
 		return;
 	}
 
@@ -598,6 +647,9 @@ void apple2e_state::mig_w(u16 offset, u8 data)
 	{
 		//printf("MIG: disable internal drive\n");
 		m_intdrive = false;
+#if IICP_NEW_IWM
+		recalc_active_device();
+#endif
 		return;
 	}
 
@@ -620,12 +672,18 @@ void apple2e_state::mig_w(u16 offset, u8 data)
 	if ((offset >= 0x240) && (offset < 0x260))
 	{
 		m_35sel = false;
+#if IICP_NEW_IWM
+		recalc_active_device();
+#endif
 		return;
 	}
 
 	if ((offset >= 0x260) && (offset < 0x280))
 	{
 		m_35sel = true;
+#if IICP_NEW_IWM
+		recalc_active_device();
+#endif
 		return;
 	}
 
@@ -635,6 +693,68 @@ void apple2e_state::mig_w(u16 offset, u8 data)
 		m_migpage = 0;
 	}
 }
+#if IICP_NEW_IWM
+void apple2e_state::phases_w(uint8_t phases)
+{
+	if (m_cur_floppy)
+	{
+		m_cur_floppy->seek_phase_w(phases);
+	}
+}
+
+void apple2e_state::devsel_w(uint8_t devsel)
+{
+	m_devsel = devsel;
+	recalc_active_device();
+}
+
+void apple2e_state::sel35_w(int sel35)
+{
+}
+
+void apple2e_state::recalc_active_device()
+{
+	if (m_devsel == 1)
+	{
+		if (!m_35sel)
+		{
+			m_cur_floppy = m_floppy[0]->get_device();
+		}
+		else
+		{
+			m_cur_floppy = m_floppy[3]->get_device();
+		}
+	}
+	else if (m_devsel == 2)
+	{
+		// as per http://apple2.guidero.us/doku.php/mg_notes/apple_iic/mig_chip intdrive + devsel = 2 enables
+		// the internal drive, no 35sel is necessary.  If intdrive is clear, 35sel and devsel work as normal.
+		if (m_intdrive)
+		{
+			m_cur_floppy = m_floppy[2]->get_device();
+		}
+		else if (!m_35sel)
+		{
+			m_cur_floppy = m_floppy[1]->get_device();
+		}
+		else    // should be external 3.5 #2, for a 3rd drive
+		{
+			m_cur_floppy = nullptr;
+		}
+	}
+	else
+	{
+		m_cur_floppy = nullptr;
+	}
+
+	m_iicpiwm->set_floppy(m_cur_floppy);
+
+	if (m_cur_floppy)
+	{
+		m_cur_floppy->ss_w(m_hdsel ? 1 : 0);
+	}
+}
+#endif
 
 WRITE_LINE_MEMBER(apple2e_state::a2bus_irq_w)
 {
@@ -1171,6 +1291,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 		if ((m_kbspecial->read() & 0x88) == 0x88)
 		{
 			m_maincpu->reset();
+
+			// reset intcxrom to default
+			if (m_isiic)
+			{
+				m_intcxrom = true;
+			}
+			else
+			{
+				m_intcxrom = false;
+			}
+			update_slotrom_banks();
 		}
 	}
 }
@@ -2141,7 +2272,7 @@ u8 apple2e_state::c000_iic_r(offs_t offset)
 			}
 
 		case 0x11:  // read LCRAM2 (LC Dxxx bank), also reads like $C010 without strobe reset
-			return (m_lcram2 ? 0x80 : 0x00) | m_strobe | m_transchar;
+			return (m_lcram2 ? 0x80 : 0x00) | m_transchar;
 
 		case 0x12:  // read LCRAM (is LC readable?)
 			return (m_lcram ? 0x80 : 0x00) | m_transchar;
@@ -2242,9 +2373,7 @@ u8 apple2e_state::c000_iic_r(offs_t offset)
 			do_io(offset, true);
 			if ((m_accel_unlocked) && (offset == 0x5c))
 			{
-				u8 temp = (m_accel_slotspk ^ 0xff) >> 2;
-				temp |= (m_accel_slotspk & 1) ? 0 : 1;
-				return temp;
+				return m_accel_slotspk;
 			}
 			break;
 	}
@@ -2376,8 +2505,7 @@ void apple2e_state::c000_iic_w(offs_t offset, u8 data)
 		case 0x5c:
 			if (m_accel_unlocked)
 			{
-				u8 temp = data ^ 0xff;
-				m_accel_slotspk = (temp << 1) | ((temp & 0x80) ? 1 : 0);
+				m_accel_slotspk = data;
 			}
 			break;
 
@@ -4514,6 +4642,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("softcard", A2BUS_SOFTCARD);  /* Microsoft SoftCard */
 	device.option_add("videoterm", A2BUS_VIDEOTERM);    /* Videx VideoTerm */
 	device.option_add("ssc", A2BUS_SSC);    /* Apple Super Serial Card */
+	device.option_add("ssi", APRICORN_SSI);    /* Apricorn Super Serial Imager */
 	device.option_add("swyft", A2BUS_SWYFT);    /* IAI SwyftCard */
 	device.option_add("themill", A2BUS_THEMILL);    /* Stellation Two The Mill (6809 card) */
 	device.option_add("sam", A2BUS_SAM);    /* SAM Software Automated Mouth (8-bit DAC + speaker) */
@@ -4536,7 +4665,10 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("aevm80", A2BUS_AEVIEWMASTER80);    /* Applied Engineering ViewMaster 80 */
 	device.option_add("parprn", A2BUS_PARPRN);   /* Apple II Parallel Printer Interface Card */
 	device.option_add("parallel", A2BUS_PIC);   /* Apple II Parallel Interface Card */
-	device.option_add("grapplerplus", A2BUS_GRAPPLERPLUS); /* Orange Micro Grappler+ Printer Interface card */
+	device.option_add("grappler", A2BUS_GRAPPLER); /* Orange Micro Grappler Printer Interface card */
+	device.option_add("grapplus", A2BUS_GRAPPLERPLUS); /* Orange Micro Grappler+ Printer Interface card */
+	device.option_add("bufgrapplus", A2BUS_BUFGRAPPLERPLUS); /* Orange Micro Buffered Grappler+ Printer Interface card */
+	device.option_add("bufgrapplusa", A2BUS_BUFGRAPPLERPLUSA); /* Orange Micro Buffered Grappler+ (rev A) Printer Interface card */
 	device.option_add("corvus", A2BUS_CORVUS);  /* Corvus flat-cable HDD interface (see notes in a2corvus.c) */
 	device.option_add("mcms1", A2BUS_MCMS1);  /* Mountain Computer Music System, card 1 of 2 */
 	device.option_add("mcms2", A2BUS_MCMS2);  /* Mountain Computer Music System, card 2 of 2.  must be in card 1's slot + 1! */
@@ -4560,6 +4692,8 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("uthernet", A2BUS_UTHERNET); /* A2RetroSystems Uthernet card */
 	device.option_add("sider2", A2BUS_SIDER2); /* Advanced Tech Systems / First Class Peripherals Sider 2 SASI card */
 	device.option_add("sider1", A2BUS_SIDER1); /* Advanced Tech Systems / First Class Peripherals Sider 1 SASI card */
+	device.option_add("uniprint", A2BUS_UNIPRINT); /* Videx Uniprint parallel printer card */
+	device.option_add("ccs7710", A2BUS_CCS7710); /* California Computer Systems Model 7710 Asynchronous Serial Interface */
 }
 
 static void apple2eaux_cards(device_slot_interface &device)
@@ -4795,7 +4929,8 @@ void apple2e_state::apple2c(machine_config &config)
 
 	m_ram->set_default_size("128K").set_extra_options("128K");
 }
-
+#if IICP_NEW_IWM
+#else
 static void apple2cp_set_lines(device_t *device, u8 lines)
 {
 	apple2e_state *state = device->machine().driver_data<apple2e_state>();
@@ -4890,6 +5025,7 @@ static const floppy_interface apple2cp_floppy35_floppy_interface =
 	LEGACY_FLOPPY_OPTIONS_NAME(apple35_iigs),
 	"floppy_3_5"
 };
+#endif
 
 static const floppy_interface floppy_interface =
 {
@@ -4907,11 +5043,23 @@ void apple2e_state::apple2cp(machine_config &config)
 
 	config.device_remove("sl4");
 	config.device_remove("sl6");
+	#if IICP_NEW_IWM
+	IWM(config, m_iicpiwm, A2BUS_7M_CLOCK, 1021800*2);
+	m_iicpiwm->phases_cb().set(FUNC(apple2e_state::phases_w));
+	m_iicpiwm->sel35_cb().set(FUNC(apple2e_state::sel35_w));
+	m_iicpiwm->devsel_cb().set(FUNC(apple2e_state::devsel_w));
+
+	applefdintf_device::add_525(config, m_floppy[0]);
+	applefdintf_device::add_525(config, m_floppy[1]);
+	applefdintf_device::add_35(config, m_floppy[2]);
+	applefdintf_device::add_35(config, m_floppy[3]);
+	#else
 	LEGACY_IWM(config, m_iicpiwm, &a2cp_interface);
 	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
 	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
 	FLOPPY_SONY(config, FLOPPY_2, &apple2cp_floppy35_floppy_interface);
 	FLOPPY_SONY(config, FLOPPY_3, &apple2cp_floppy35_floppy_interface);
+	#endif
 
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
 }

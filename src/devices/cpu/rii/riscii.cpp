@@ -89,6 +89,7 @@ riscii_series_device::riscii_series_device(const machine_config &mconfig, device
 	, m_port_dcr{0, 0, 0, 0, 0, 0}
 	, m_port_control{0, 0}
 	, m_stbcon(0)
+	, m_pa(0xff)
 	, m_painten(0)
 	, m_paintsta(0)
 	, m_pawake(0)
@@ -138,7 +139,7 @@ void epg3231_device::regs_map(address_map &map)
 	map(0x0026, 0x0026).rw(FUNC(epg3231_device::trl1_r), FUNC(epg3231_device::trl1_w));
 	map(0x0027, 0x0027).rw(FUNC(epg3231_device::tr01con_r), FUNC(epg3231_device::tr01con_w));
 	map(0x0028, 0x0028).rw(FUNC(epg3231_device::tr2con_r), FUNC(epg3231_device::tr2con_w));
-	map(0x0028, 0x0028).rw(FUNC(epg3231_device::trlir_r), FUNC(epg3231_device::trlir_w));
+	map(0x0029, 0x0029).rw(FUNC(epg3231_device::trlir_r), FUNC(epg3231_device::trlir_w));
 	// R2Ah is reserved
 	map(0x002b, 0x002b).rw(FUNC(epg3231_device::post_id_r), FUNC(epg3231_device::post_id_w));
 	// TODO: ADCON (R2Ch)
@@ -205,6 +206,7 @@ void riscii_series_device::device_start()
 
 	set_icountptr(m_icount);
 
+	m_timer0 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(riscii_series_device::timer0), this));
 	m_speech_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(riscii_series_device::speech_timer), this));
 
 	state_add<u32>(RII_PC, "PC", [this]() { return m_pc; }, [this](u32 pc) { debug_set_pc(pc); }).mask(m_pcmask);
@@ -286,6 +288,7 @@ void riscii_series_device::device_start()
 	save_item(NAME(m_port_dcr));
 	save_item(NAME(m_port_control));
 	save_item(NAME(m_stbcon));
+	save_item(NAME(m_pa));
 	save_item(NAME(m_painten));
 	save_item(NAME(m_paintsta));
 	save_item(NAME(m_pawake));
@@ -349,6 +352,7 @@ void riscii_series_device::device_reset()
 	m_tr01con = 0x00;
 	m_tr2con = 0x00;
 	m_sfcr = 0x00;
+	m_timer0->adjust(attotime::never);
 
 	// reset synthesizer
 	std::fill_n(&m_env[0], 4, 0x00);
@@ -580,7 +584,7 @@ void riscii_series_device::post_id_w(u8 data)
 u8 riscii_series_device::porta_r()
 {
 	// Port A is read-only
-	return m_porta_in_cb();
+	return m_pa & m_porta_in_cb();
 }
 
 u8 riscii_series_device::port_r(offs_t offset)
@@ -795,6 +799,31 @@ void riscii_series_device::sprh_w(u8 data)
 //  TIMER HANDLERS
 //**************************************************************************
 
+void riscii_series_device::timer0_reload()
+{
+	const unsigned prescale = 1 << ((m_tr01con & 0x03) << 1);
+	if (BIT(m_tr01con, 2))
+		m_timer0->adjust(cycles_to_attotime((m_trl0 + 1) * prescale * 2));
+	else
+		m_timer0->adjust(attotime::from_ticks((m_trl0 + 1) * prescale, 32768));
+}
+
+TIMER_CALLBACK_MEMBER(riscii_series_device::timer0)
+{
+	m_intsta |= 0x01;
+	timer0_reload();
+}
+
+u16 riscii_series_device::timer0_count() const
+{
+	if (!m_timer0->enabled())
+		return 0;
+	else if (BIT(m_tr01con, 2))
+		return m_trl0 - m_timer0->remaining().as_ticks(32768);
+	else
+		return m_trl0 - attotime_to_cycles(m_timer0->remaining()) / 2;
+}
+
 u8 riscii_series_device::trl0l_r()
 {
 	return m_trl0 & 0x00ff;
@@ -852,6 +881,11 @@ u8 riscii_series_device::tr2con_r()
 
 void riscii_series_device::tr2con_w(u8 data)
 {
+	// TODO: capture mode, event counter mode
+	if ((data & 0x30) == 0x10 && (m_tr2con & 0x30) == 0)
+		timer0_reload();
+	else if ((data & 0x30) == 0x10 && (m_tr2con & 0x30) == 0)
+		m_timer0->adjust(attotime::never);
 	m_tr2con = data;
 }
 
@@ -867,12 +901,12 @@ void riscii_series_device::trlir_w(u8 data)
 
 u8 riscii_series_device::t0cl_r()
 {
-	return 0x00;
+	return timer0_count() & 0x00ff;
 }
 
 u8 riscii_series_device::t0ch_r()
 {
-	return 0x00;
+	return timer0_count() >> 8;
 }
 
 u8 riscii_series_device::tr1c_r()
@@ -1163,8 +1197,11 @@ void riscii_series_device::execute_sub(u8 reg, bool a, bool c)
 {
 	u16 addr = get_banked_address(reg);
 	u8 data = m_regs.read_byte(addr);
+	// HACK: BSR1 needs to be decremented when FSR1 rolls under 0x80
+	if (!a && addr == 0x0009)
+		data &= 0x7f;
 	s16 tmp = s16(s8(data)) - s8(m_acc) - (c ? ~m_status & 0x01 : 0);
-	bool cy = u16(data) >= m_acc + (c ? m_status & 0x01 : 0); // borrow is inverted
+	bool cy = u16(data) >= m_acc + (c ? ~m_status & 0x01 : 0); // borrow is inverted
 	bool dc = (data & 0x0f) >= (m_acc & 0x0f) + (c ? ~m_status & 0x01 : 0);
 	if (a)
 		acc_w(tmp & 0xff);
@@ -1200,7 +1237,7 @@ void riscii_series_device::execute_add_imm(u8 data, bool c)
 void riscii_series_device::execute_sub_imm(u8 data, bool c)
 {
 	s16 tmp = s16(s8(data)) - s8(m_acc) - (c ? ~m_status & 0x01 : 0);
-	bool cy = u8(data) >= m_acc + (c ? m_status & 0x01 : 0); // borrow is inverted
+	bool cy = u8(data) >= m_acc + (c ? ~m_status & 0x01 : 0); // borrow is inverted
 	bool dc = (data & 0x0f) + (m_acc & 0x0f) + (c ? ~m_status & 0x01 : 0) >= 0x10;
 	acc_w(tmp & 0xff);
 	m_status = (m_status & 0xc0)
@@ -1236,6 +1273,9 @@ void riscii_series_device::execute_subdb(u8 reg, bool a)
 {
 	u16 addr = get_banked_address(reg);
 	u8 data = m_regs.read_byte(addr);
+	// HACK: BSR1 needs to be decremented when FSR1 rolls under 0x80
+	if (!a && addr == 0x0009)
+		data &= 0x7f;
 	u16 tmp = u16(data) - m_acc - (~m_status & 0x01);
 	bool dc = (data & 0x0f) + (~m_acc & 0x0f) + (m_status & 0x01) >= 0x0a;
 	if (dc)
@@ -1262,6 +1302,7 @@ void riscii_series_device::execute_mul_imm(u8 data)
 	int mier = BIT(m_cpucon, 3) ? int(s8(m_acc)) : int(m_acc);
 	int mcand = BIT(m_cpucon, 4) ? int(s8(data)) : int(data);
 	m_prod = u16(mier * mcand);
+	logerror("%s: %d * %d = %04X\n", machine().describe_context(), mier, mcand, m_prod);
 }
 
 void riscii_series_device::execute_or(u8 reg, bool a)
@@ -1495,7 +1536,7 @@ void riscii_series_device::execute_inc(u8 reg, bool a)
 		m_regs.write_byte(addr, tmp & 0xff);
 		multi_byte_carry(addr, (tmp >> 8) != 0);
 	}
-	m_status = (m_status & 0xfa) | ((tmp & 0xff) == 0 ? 0x04 : 0x00) | (tmp >> 8);
+	m_status = (m_status & 0xfa) | (tmp == 0x100 ? 0x04 : 0x00) | (tmp >> 8);
 }
 
 void riscii_series_device::execute_dec(u8 reg, bool a)
@@ -1507,9 +1548,10 @@ void riscii_series_device::execute_dec(u8 reg, bool a)
 	else
 	{
 		m_regs.write_byte(addr, tmp & 0xff);
-		multi_byte_borrow(addr, (tmp >> 8) != 0);
+		// HACK: BSR1 needs to be decremented when FSR1 rolls under 0x80
+		multi_byte_borrow(addr, tmp == (addr == 0x0009 ? 0x7f : 0xff));
 	}
-	m_status = (m_status & 0xfa) | ((tmp & 0xff) == 0 ? 0x04 : 0x00) | (tmp >> 8);
+	m_status = (m_status & 0xfa) | (tmp == 0x100 ? 0x04 : 0x00) | (tmp >> 8);
 }
 
 void riscii_series_device::execute_rpt(u8 reg)
@@ -1540,6 +1582,7 @@ void riscii_series_device::execute_wdtc()
 void riscii_series_device::execute_slep()
 {
 	logerror("%s mode entered (PC = %05X)\n", BIT(m_cpucon, 1) ? "Idle" : "Sleep", m_ppc);
+	m_exec_state = EXEC_IDLE;
 }
 
 void riscii_series_device::execute_undef(u16 opcode)
@@ -1971,15 +2014,40 @@ void riscii_series_device::execute_run()
 			(void)fetch_program_word();
 			m_exec_state = EXEC_CYCLE1;
 			break;
+
+		case EXEC_IDLE:
+			m_icount = 0;
+			return;
 		}
 
 		m_icount--;
 	}
 }
 
+void riscii_series_device::idle_wakeup()
+{
+	if (m_exec_state == EXEC_IDLE)
+		m_exec_state = EXEC_CYCLE1;
+}
+
 void riscii_series_device::execute_set_input(int inputnum, int state)
 {
-	// TODO
+	if (inputnum >= PA0_LINE && inputnum <= PA7_LINE)
+	{
+		if (state != CLEAR_LINE)
+		{
+			// Interrupt/wake-up on pin falling edge
+			if (BIT(m_pa, inputnum - PA0_LINE))
+			{
+				m_pa &= ~(1 << (inputnum - PA0_LINE));
+				m_paintsta |= 1 << (inputnum - PA0_LINE);
+				if (BIT(m_pawake, inputnum - PA0_LINE))
+					idle_wakeup();
+			}
+		}
+		else
+			m_pa |= 1 << (inputnum - PA0_LINE);
+	}
 }
 
 void riscii_series_device::state_string_export(const device_state_entry &entry, std::string &str) const

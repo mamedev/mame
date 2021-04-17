@@ -8,7 +8,7 @@
  * byte PS/2 mouse protocol. Serial I/O is driven at 10kHz by a 40kHz timer
  * to generate somewhat accurate clock rising and falling edges, as well as
  * sampling or writing the data line in the middle of each high or low cycle
- * as exoected by the protocol.
+ * as expected by the protocol.
  *
  * The original IBM PS/2 mouse had only two buttons and the documented protocol
  * reflects this, however it also allows a third button to be added without any

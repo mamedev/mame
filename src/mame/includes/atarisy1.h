@@ -34,6 +34,7 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 		, m_mainlatch(*this, "mainlatch")
 		, m_slapstic(*this, "slapstic")
+		, m_slapstic_bank(*this, "slapstic_bank")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_mob(*this, "mob")
@@ -75,6 +76,7 @@ protected:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_mainlatch;
 	required_device<atari_slapstic_device> m_slapstic;
+	required_memory_bank m_slapstic_bank;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -150,6 +152,8 @@ protected:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 	void sound_ext_map(address_map &map);
+
+	void init_slapstic();
 };
 
 class atarisy1r_state : public atarisy1_state

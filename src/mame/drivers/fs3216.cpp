@@ -494,7 +494,7 @@ void fs3216_state::fs3216(machine_config &config)
 	m_fdc->us_wr_callback().set(FUNC(fs3216_state::fdc_us_w));
 
 	for (int i = 0; i < 4; i++)
-		FLOPPY_CONNECTOR(config, m_floppy[i], fs3216_floppies, i < 1 ? "525dd" : nullptr, floppy_image_device::default_floppy_formats);
+		FLOPPY_CONNECTOR(config, m_floppy[i], fs3216_floppies, i < 1 ? "525dd" : nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	X2212(config, m_earom);
 

@@ -183,8 +183,11 @@ void ncr5380n_device::scsi_ctrl_changed()
 			else
 			{
 				LOG("phase mismatch %d != %d\n", (ctrl & S_PHASE_MASK), (m_tcmd & TC_PHASE));
+
+				m_state = IDLE;
 				m_state_timer->enable(false);
 
+				set_drq(true);
 				set_irq(true);
 			}
 		}

@@ -75,7 +75,7 @@ image_init_result hp9845_optrom_device::call_load()
 	logerror("hp9845_optrom: base_addr = %06x end_addr = %06x\n" , base_addr , end_addr);
 
 	// Install ROM in address space of every CPU
-	for (hp_hybrid_cpu_device& cpu : device_interface_iterator<hp_hybrid_cpu_device>(machine().root_device())) {
+	for (hp_hybrid_cpu_device& cpu : device_interface_enumerator<hp_hybrid_cpu_device>(machine().root_device())) {
 		logerror("hp9845_optrom: install in %s AS\n" , cpu.tag());
 		cpu.space(AS_PROGRAM).install_rom(base_addr , end_addr , get_software_region("rom"));
 	}
@@ -90,7 +90,7 @@ void hp9845_optrom_device::call_unload()
 {
 	logerror("hp9845_optrom: call_unload\n");
 	if (m_base_addr != 0 && m_end_addr != 0) {
-		for (hp_hybrid_cpu_device& cpu : device_interface_iterator<hp_hybrid_cpu_device>(machine().root_device())) {
+		for (hp_hybrid_cpu_device& cpu : device_interface_enumerator<hp_hybrid_cpu_device>(machine().root_device())) {
 			cpu.space(AS_PROGRAM).unmap_read(m_base_addr , m_end_addr);
 		}
 		m_base_addr = 0;

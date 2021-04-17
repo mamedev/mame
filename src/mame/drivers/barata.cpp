@@ -36,7 +36,6 @@
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
-#include "rendlay.h"
 #include "speaker.h"
 
 #include "barata.lh"

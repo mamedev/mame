@@ -207,7 +207,7 @@ void menu_analog::populate(float &customtop, float &custombottom)
 					first_entry = false;
 				else
 					item_append(menu_item_type::SEPARATOR);
-				item_append(string_format("[root%s]", prev_owner->tag()), "", 0, nullptr);
+				item_append(string_format("[root%s]", prev_owner->tag()), 0, nullptr);
 			}
 		}
 
@@ -250,6 +250,8 @@ void menu_analog::populate(float &customtop, float &custombottom)
 		// append a menu item
 		item_append(std::move(text), std::move(subtext), flags, &data);
 	}
+
+	item_append(menu_item_type::SEPARATOR);
 
 	// space for live display
 	custombottom = (ui().get_line_height() * m_visible_fields) + (ui().box_tb_border() * 3.0f);

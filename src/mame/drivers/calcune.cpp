@@ -24,6 +24,8 @@
 #include "emupal.h"
 #include "speaker.h"
 
+namespace {
+
 #define OSC1_CLOCK 53693175 // same as NTSC genesis / mega drive master clock
 
 class calcune_state : public driver_device
@@ -39,6 +41,10 @@ public:
 
 	void calcune(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<sega315_5313_device, 2> m_vdp;
@@ -48,9 +54,6 @@ private:
 	WRITE_LINE_MEMBER(vdp_sndirqline_callback_genesis_z80);
 	WRITE_LINE_MEMBER(vdp_lv6irqline_callback_genesis_68k);
 	WRITE_LINE_MEMBER(vdp_lv4irqline_callback_genesis_68k);
-
-	DECLARE_MACHINE_START(calcune);
-	DECLARE_MACHINE_RESET(calcune);
 
 	IRQ_CALLBACK_MEMBER(genesis_int_callback);
 
@@ -197,7 +200,7 @@ uint32_t calcune_state::screen_update_calcune(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-MACHINE_RESET_MEMBER(calcune_state,calcune)
+void calcune_state::machine_reset()
 {
 	m_vdp[0]->device_reset_old();
 	m_vdp[1]->device_reset_old();
@@ -241,7 +244,7 @@ WRITE_LINE_MEMBER(calcune_state::vdp_lv4irqline_callback_genesis_68k)
 		m_maincpu->set_input_line(4, CLEAR_LINE);
 }
 
-MACHINE_START_MEMBER(calcune_state,calcune)
+void calcune_state::machine_start()
 {
 	m_vdp[0]->stop_timers();
 	m_vdp[1]->stop_timers();
@@ -256,9 +259,6 @@ void calcune_state::calcune(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(calcune_state::genesis_int_callback));
 
 	Z80(config, "z80", OSC1_CLOCK / 15).set_disable(); /* 3.58 MHz, no code is ever uploaded for the Z80, so it's unused here even if it is present on the PCB */
-
-	MCFG_MACHINE_START_OVERRIDE(calcune_state,calcune)
-	MCFG_MACHINE_RESET_OVERRIDE(calcune_state,calcune)
 
 	screen_device &screen(SCREEN(config, "megadriv", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(double(OSC1_CLOCK) / 10.0 / 262.0 / 342.0); // same as SMS?
@@ -328,6 +328,7 @@ ROM_START( calcune )
 	ROM_LOAD( "sound4.4b.27c4001", 0x180000, 0x080000, CRC(61a8510b) SHA1(177e56c374aa5697545ede28140cb42b5a4b737b) )
 ROM_END
 
+} // Anonymous namespace
 
 
 GAME( 1996, calcune, 0, calcune, calcune, calcune_state, init_calcune, ROT0, "Yuvo", "Calcune (Japan, prototype)", 0 )

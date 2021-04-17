@@ -1,10 +1,12 @@
+.. _layfile:
+
 MAME Layout Files
 =================
 
 .. contents:: :local:
 
 
-.. _layout-intro:
+.. _layfile-intro:
 
 Introduction
 ------------
@@ -18,12 +20,12 @@ screens, built and linked into the MAME binary, or provided externally.  MAME
 layout files are an XML application, using the ``.lay`` filename extension.
 
 
-.. _layout-concepts:
+.. _layfile-concepts:
 
 Core concepts
 -------------
 
-.. _layout-concepts-numbers:
+.. _layfile-concepts-numbers:
 
 Numbers
 ~~~~~~~
@@ -53,7 +55,7 @@ found, the number will be interpreted as an integer.
 Numbers are parsed using the "C" locale for portability.
 
 
-.. _layout-concepts-coordinates:
+.. _layfile-concepts-coordinates:
 
 Coordinates
 ~~~~~~~~~~~
@@ -103,7 +105,7 @@ It is an error if ``width`` or ``height`` are negative, if ``right`` is less
 than ``left``, or if ``bottom`` is less than ``top``.
 
 
-.. _layout-concepts-colours:
+.. _layfile-concepts-colours:
 
 Colours
 ~~~~~~~
@@ -128,7 +130,7 @@ is an error if any channel value falls outside the range of 0.0 to 1.0
 (inclusive).
 
 
-.. _layout-concepts-params:
+.. _layfile-concepts-params:
 
 Parameters
 ~~~~~~~~~~
@@ -183,7 +185,7 @@ Here’s an example assigning the value “4” to the value parameter “firstd
 Generator parameters are assigned using a ``param`` element with ``name`` and
 ``start`` attributes, and ``increment``, ``lshift`` and/or ``rshift``
 attributes.  Generator parameters may only appear inside ``repeat`` elements
-(see :ref:`layout-parts-repeats` for details).  A generator parameter must not
+(see :ref:`layfile-parts-repeats` for details).  A generator parameter must not
 be reassigned in the same scope (an identically named parameter may be defined
 in a child scope).  Here are some example generator parameters:
 
@@ -230,7 +232,7 @@ innermost scope.  It is not possible to define or reassign parameters in a
 containing scope.
 
 
-.. _layout-concepts-predef-params:
+.. _layfile-concepts-predef-params:
 
 Pre-defined parameters
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -340,7 +342,7 @@ end of configuration.  Values are not updated and layouts are not recomputed if
 the system reconfigures the screen while running.
 
 
-.. _layout-parts:
+.. _layfile-parts:
 
 Parts of a layout
 -----------------
@@ -368,26 +370,27 @@ and groups that appear after them.
 The following elements are allowed inside the top-level ``mamelayout`` element:
 
 param
-    Defines or reassigns a value parameter.  See :ref:`layout-concepts-params`
+    Defines or reassigns a value parameter.  See :ref:`layfile-concepts-params`
     for details.
 element
     Defines an element – one of the basic objects that can be arranged in a
-    view.  See :ref:`layout-parts-elements` for details.
+    view.  See :ref:`layfile-parts-elements` for details.
 group
     Defines a reusable group of elements/screens that may be referenced from
-    views or other groups.  See :ref:`layout-parts-groups` for details.
+    views or other groups.  See :ref:`layfile-parts-groups` for details.
 repeat
     A repeating group of elements – may contain ``param``, ``element``,
-    ``group``, and ``repeat`` elements.  See :ref:`layout-parts-repeats` for
+    ``group``, and ``repeat`` elements.  See :ref:`layfile-parts-repeats` for
     details.
 view
     An arrangement of elements and/or screens that can be displayed on an output
-    device (a host screen/window).  See :ref:`layout-parts-views` for details.
+    device (a host screen/window).  See :ref:`layfile-parts-views` for details.
 script
-    Allows lua script to be supplied for enhanced interactive layouts.
+    Allows Lua script to be supplied for enhanced interactive layouts.  See
+    :ref:`layscript` for details.
 
 
-.. _layout-parts-elements:
+.. _layfile-parts-elements:
 
 Elements
 ~~~~~~~~
@@ -400,7 +403,7 @@ multiple times within a view.
 
 An element’s appearance depends on its *state*.  The state is an integer which
 usually comes from an I/O port field or an emulated output (see
-:ref:`layout-interact-elemstate` for information on connecting an element to an
+:ref:`layfile-interact-elemstate` for information on connecting an element to an
 emulated I/O port or output).  Any component of an element may be restricted to
 only drawing when the element’s state is a particular value.  Some components
 (e.g.  multi-segment displays and reels) use the state directly to determine
@@ -438,9 +441,9 @@ them).  All components support a few common features:
   (The component will always be drawn if neither ``state`` nor ``statemask``
   attributes are present, or if the ``statemask`` attribute’s value is zero.)
 * Each component may have a ``bounds`` child element specifying its position and
-  size (see :ref:`layout-concepts-coordinates`).  If no such element is present,
-  the bounds default to a unit square (width and height of 1.0) with the top
-  left corner at (0,0).
+  size (see :ref:`layfile-concepts-coordinates`).  If no such element is
+  present, the bounds default to a unit square (width and height of 1.0) with
+  the top left corner at (0,0).
 
   A component’s position and/or size may be animated according to the element’s
   state by supplying multiple ``bounds`` child elements with ``state``
@@ -457,9 +460,9 @@ them).  All components support a few common features:
   values of two ``bounds`` child elements, the position/size will be
   interpolated linearly.
 * Each component may have a ``color`` child element specifying an RGBA colour
-  (see :ref:`layout-concepts-colours` for details).  This can be used to control
-  the colour of geometric, algorithmically drawn, or textual components.  For
-  ``image`` components, the colour of the image pixels is multiplied by the
+  (see :ref:`layfile-concepts-colours` for details).  This can be used to
+  control the colour of geometric, algorithmically drawn, or textual components.
+  For ``image`` components, the colour of the image pixels is multiplied by the
   specified colour.  If no such element is present, the colour defaults to
   opaque white.
 
@@ -485,10 +488,14 @@ disk
 image
     Draws an image loaded from a PNG, JPEG, Windows DIB (BMP) or SVG file.  The
     name of the file to load (including the file name extension) is supplied
-    using the required ``file`` attribute.  Additionally, an optional
-    ``alphafile`` attribute may be used to specify the name of a PNG file
-    (including the file name extension) to load into the alpha channel of the
-    image.
+    using the ``file`` attribute.  Additionally, an optional ``alphafile``
+    attribute may be used to specify the name of a PNG file (including the file
+    name extension) to load into the alpha channel of the image.
+
+    Alternatively, image data may be supplied in the layout file itself using a
+    ``data`` child element.  This can be useful for supplying simple,
+    human-readable SVG graphics.  A ``file`` attribute or ``data`` child element
+    must be supplied; it is an error if neither or both are supplied.
 
     If the ``alphafile`` attribute refers  refers to a file, it must have the
     same dimensions (in pixels) as the file referred to by the ``file``
@@ -497,7 +504,8 @@ image
     alpha channel, with full intensity (white in a greyscale image)
     corresponding to fully opaque, and black corresponding to fully transparent.
     The ``alphafile`` attribute will be ignored if the ``file`` attribute refers
-    to an SVG image; it is only used in conjunction with bitmap images.
+    to an SVG image or the ``data`` child element contains SVG data; it is only
+    used in conjunction with bitmap images.
 
     The image file(s) should be placed in the same directory/archive as the
     layout file.  Image file formats are detected by examining the content of
@@ -602,8 +610,8 @@ the state of an active-high output:
 .. code-block:: XML
 
     <element name="led" defstate="0">
-        <rect state="0"><color red="0.43" green="0.35" blue="0.39" /></rect>
-        <rect state="1"><color red="1.0" green="0.18" blue="0.20" /></rect>
+        <disk state="0"><color red="0.43" green="0.35" blue="0.39" /></disk>
+        <disk state="1"><color red="1.0" green="0.18" blue="0.20" /></disk>
     </element>
 
 An example element for a button that gives visual feedback when clicked:
@@ -671,7 +679,7 @@ neutral position:
     </element>
 
 
-.. _layout-parts-views:
+.. _layfile-parts-views:
 
 Views
 ~~~~~
@@ -713,7 +721,7 @@ The following child elements are allowed inside a ``view`` element:
 
 bounds
     Sets the origin and size of the view’s internal coordinate system if
-    present.  See :ref:`layout-concepts-coordinates` for details.  If absent,
+    present.  See :ref:`layfile-concepts-coordinates` for details.  If absent,
     the bounds of the view are computed as the union of the bounds of all
     screens and elements within the view.  It only makes sense to have one
     ``bounds`` as a direct child of a view element.  Any content outside the
@@ -721,18 +729,18 @@ bounds
     output window or screen.
 param
     Defines or reassigns a value parameter in the view’s scope.  See
-    :ref:`layout-concepts-params` for details.
+    :ref:`layfile-concepts-params` for details.
 element
-    Adds an element to the view (see :ref:`layout-parts-elements`).  The name of
-    the element to add is specified using the required ``ref`` attribute.  It is
-    an error if no element with this name is defined in the layout file.  Within
-    a view, elements are drawn in the order they appear in the layout file, from
-    front to back.  See below for more details.
+    Adds an element to the view (see :ref:`layfile-parts-elements`).  The name
+    of the element to add is specified using the required ``ref`` attribute.  It
+    is an error if no element with this name is defined in the layout file.
+    Within a view, elements are drawn in the order they appear in the layout
+    file, from front to back.  See below for more details.
 
     May optionally be connected to an emulated I/O port using ``inputtag`` and
     ``inputmask`` attributes, and/or an emulated output using a ``name``
-    attribute.  See :ref:`layout-interact-clickable` for details.  See
-    :ref:`layout-interact-elemstate` for details on supplying a state value to
+    attribute.  See :ref:`layfile-interact-clickable` for details.  See
+    :ref:`layfile-interact-elemstate` for details on supplying a state value to
     the instantiated element.
 screen
     Adds an emulated screen image to the view.  The screen must be identified
@@ -746,14 +754,14 @@ screen
 
     May optionally be connected to an emulated I/O port using ``inputtag`` and
     ``inputmask`` attributes, and/or an emulated output using a ``name``
-    attribute.  See :ref:`layout-interact-clickable` for details.
+    attribute.  See :ref:`layfile-interact-clickable` for details.
 collection
     Adds screens and/or items in a collection that can be shown or hidden by the
-    user (see :ref:`layout-parts-collections`).  The name of the collection is
+    user (see :ref:`layfile-parts-collections`).  The name of the collection is
     specified using the required ``name`` attribute..  There is a limit of 32
     collections per view.
 group
-    Adds the content of the group to the view (see :ref:`layout-parts-groups`).
+    Adds the content of the group to the view (see :ref:`layfile-parts-groups`).
     The name of the group to add is specified using the required ``ref``
     attribute.  It is an error if no group with this name is defined in the
     layout file.  See below for more details on positioning.
@@ -762,8 +770,14 @@ repeat
     attribute.  The ``count`` attribute must be a positive integer.  A
     ``repeat`` element in a view may contain ``element``, ``screen``, ``group``,
     and further ``repeat`` elements, which function the same way they do when
-    placed in a view directly.  See :ref:`layout-parts-repeats` for discussion
+    placed in a view directly.  See :ref:`layfile-parts-repeats` for discussion
     on using ``repeat`` elements.
+
+Screens (``screen`` elements) and layout elements (``element`` elements) may
+have an ``id`` attribute.  If present, the ``id`` attribute must not be empty,
+and must be unique within a view, including screens and elements instantiated
+via reusable groups and repeating blocks.  Screens and layout elements with
+``id`` attributes can be looked up by Lua scripts (see :ref:`layscript`).
 
 Screens (``screen`` elements), layout elements (``element`` elements) and groups
 (``group`` elements) may have their orientation altered using an ``orientation``
@@ -773,7 +787,7 @@ The ``orientation`` element supports the following attributes, all of which are
 optional:
 
 rotate
-    If present, applies clockwise rotation in ninety degree implements.  Must be
+    If present, applies clockwise rotation in ninety degree increments.  Must be
     an integer equal to 0, 90, 180 or 270.
 swapxy
     Allows the screen, element or group to be mirrored along a line at
@@ -798,8 +812,8 @@ layout elements is alpha blending.
 
 Screens (``screen`` elements), layout elements (``element`` elements) and groups
 (``group`` elements) may be positioned and sized using a ``bounds`` child
-element (see :ref:`layout-concepts-coordinates` for details).  In the absence of
-a ``bounds`` child element, screens’ and layout elements’ bounds default to a
+element (see :ref:`layfile-concepts-coordinates` for details).  In the absence
+of a ``bounds`` child element, screens’ and layout elements’ bounds default to a
 unit square (origin at 0,0 and height and width both equal to 1).  In the
 absence of a ``bounds`` child element, groups are expanded with no
 translation/scaling (note that groups may position screens/elements outside
@@ -817,16 +831,16 @@ screen, an individual layout element, and two element groups:
 
 Screens (``screen`` elements), layout elements (``element`` elements) and groups
 (``group`` elements) may have a ``color`` child element (see
-:ref:`layout-concepts-colours`) specifying a modifier colour.  The component
+:ref:`layfile-concepts-colours`) specifying a modifier colour.  The component
 colours of the screen or layout element(s) are multiplied by this colour.
 
 Screens (``screen`` elements) and layout elements (``element`` elements) may
 have their colour and position/size animated by supplying multiple ``color``
 and/or ``bounds`` child elements with ``state`` attributes.  See
-:ref:`layout-interact-itemanim` for details.
+:ref:`layfile-interact-itemanim` for details.
 
 
-.. _layout-parts-collections:
+.. _layfile-parts-collections:
 
 Collections
 ~~~~~~~~~~~
@@ -862,13 +876,14 @@ to be hidden by the user:
 
 A collection creates a nested parameter scope.  Any ``param`` elements inside
 the collection element set parameters in the local scope for the collection.
-See :ref:`layout-concepts-params` for more detail on parameters.  (Note that the
-collection’s name and default visibility are not part of its content, and any
-parameter references in the ``name`` and ``visible`` attributes themselves will
-be substituted using parameter values from the collection’s parent’s scope.)
+See :ref:`layfile-concepts-params` for more detail on parameters.  (Note that
+the collection’s name and default visibility are not part of its content, and
+any parameter references in the ``name`` and ``visible`` attributes themselves
+will be substituted using parameter values from the collection’s parent’s
+scope.)
 
 
-.. _layout-parts-groups:
+.. _layfile-parts-groups:
 
 Reusable groups
 ~~~~~~~~~~~~~~~
@@ -902,7 +917,7 @@ instantiate – in this example, destination bounds are supplied:
 
 Group definition elements allow all the same child elements as views.
 Positioning and orienting screens, layout elements and nested groups works the
-same way as for views.  See :ref:`layout-parts-views` for details.  A group may
+same way as for views.  See :ref:`layfile-parts-views` for details.  A group may
 instantiate other groups, but recursive loops are not permitted.  It is an error
 if a group directly or indirectly instantiates itself.
 
@@ -910,7 +925,7 @@ Groups have their own internal coordinate systems.  If a group definition
 element has no ``bounds`` element as a direct child, its bounds are computed as
 the union of the bounds of all the screens, layout elements and/or nested groups
 it instantiates.  A ``bounds`` child element may be used to explicitly specify
-group bounds (see :ref:`layout-concepts-coordinates` for details).  Note that
+group bounds (see :ref:`layfile-concepts-coordinates` for details).  Note that
 groups’ bounds are only used for the purpose of calculating the coordinate
 transform when instantiating a group.  A group may position screens and/or
 elements outside its bounds, and they will not be cropped.
@@ -970,20 +985,20 @@ the group is instantiated (*not* its lexical parent, the top-level
 ``mamelayout`` element).  Any ``param`` elements inside the group definition
 element set parameters in the local scope for the group instantiation.  Local
 parameters do not persist across multiple instantiations.  See
-:ref:`layout-concepts-params` for more detail on parameters.  (Note that the
+:ref:`layfile-concepts-params` for more detail on parameters.  (Note that the
 group’s name is not part of its content, and any parameter references in the
 ``name`` attribute itself will be substituted at the point where the group
 definition appears in the top-level ``mamelayout`` element’s scope.)
 
 
-.. _layout-parts-repeats:
+.. _layfile-parts-repeats:
 
 Repeating blocks
 ~~~~~~~~~~~~~~~~
 
 Repeating blocks provide a concise way to generate or arrange large numbers of
 similar elements.  Repeating blocks are generally used in conjunction with
-generator parameters (see :ref:`layout-concepts-params`).  Repeating blocks may
+generator parameters (see :ref:`layfile-concepts-params`).  Repeating blocks may
 be nested for more complex arrangements.
 
 Repeating blocks are created with ``repeat`` elements.  Each ``repeat`` element
@@ -1001,8 +1016,8 @@ elements allowed inside a ``repeat`` element depend on where it appears:
 
 A repeating block effectively repeats its contents the number of times specified
 by its ``count`` attribute.  See the relevant sections for details on how the
-child elements are used (:ref:`layout-parts`, :ref:`layout-parts-groups`, and
-:ref:`layout-parts-views`).  A repeating block creates a nested parameter scope
+child elements are used (:ref:`layfile-parts`, :ref:`layfile-parts-groups`, and
+:ref:`layfile-parts-views`).  A repeating block creates a nested parameter scope
 inside the parameter scope of its lexical (DOM) parent element.
 
 Generating white number labels from zero to eleven named ``label_0``,
@@ -1121,7 +1136,7 @@ tiles on each iteration.  Rows are connected to I/O ports ``board:IN.7`` at the
 top to ``board.IN.0`` at the bottom.
 
 
-.. _layout-interact:
+.. _layfile-interact:
 
 Interactivity
 -------------
@@ -1135,23 +1150,23 @@ Clickable items
 State-dependent components
     Some components will be drawn differently depending on the containing
     element’s state.  These include the dot matrix, multi-segment LED display,
-    simple counter and reel elements.  See :ref:`layout-parts-elements` for
+    simple counter and reel elements.  See :ref:`layfile-parts-elements` for
     details.
 Conditionally-drawn components
     Components may be conditionally drawn or hidden depending on the containing
     element’s state by supplying ``state`` and/or ``statemask`` attributes.  See
-    :ref:`layout-parts-elements` for details.
+    :ref:`layfile-parts-elements` for details.
 Component parameter animation
     Components’ colour and position/size within their containing element may be
     animated according the element’s state by providing multiple ``color``
     and/or ``bounds`` elements with ``state`` attributes.  See
-    :ref:`layout-parts-elements` for details.
+    :ref:`layfile-parts-elements` for details.
 Item parameter animation
     Items’ colour and position/size within their containing view may be animated
     according to their animation state.
 
 
-.. _layout-interact-clickable:
+.. _layfile-interact-clickable:
 
 Clickable items
 ~~~~~~~~~~~~~~~
@@ -1161,7 +1176,7 @@ If a view item (``element`` or ``screen`` element) has ``inputtag`` and
 emulated system, clicking the element will activate the switch.  The switch
 will remain active as long as the mouse button is held down and the pointer is
 within the item’s current bounds.  (Note that the bounds may change depending on
-the item’s animation state, see :ref:`layout-interact-itemanim`).
+the item’s animation state, see :ref:`layfile-interact-itemanim`).
 
 The ``inputtag`` attribute specifies the tag path of an I/O port relative to the
 device that caused the layout file to be loaded.  The ``inputmask`` attribute
@@ -1185,14 +1200,14 @@ and only activates the first clickable item whose area includes the location of
 the mouse pointer.
 
 
-.. _layout-interact-elemstate:
+.. _layfile-interact-elemstate:
 
 Element state
 ~~~~~~~~~~~~~
 
 A view item that instantiates an element (``element`` element) may supply a
 state value to the element from an emulated I/O port or output.  See
-:ref:`layout-parts-elements` for details on how an element’s state affects its
+:ref:`layfile-parts-elements` for details on how an element’s state affects its
 appearance.
 
 If the ``element`` element has a ``name`` attribute, the element state value
@@ -1232,7 +1247,7 @@ in the value being shifted four bits to the right).  This is useful for
 obtaining the value of analog or positional inputs.
 
 
-.. _layout-interact-itemanim:
+.. _layfile-interact-itemanim:
 
 View item animation
 ~~~~~~~~~~~~~~~~~~~
@@ -1265,7 +1280,7 @@ An item’s animation state may be bound to an emulated output or input port by
 supplying an ``animate`` child element.  If present, the ``animate`` element
 must have either an ``inputtag`` attribute or a ``name`` attribute (but not
 both).  If the ``animate`` child element is not present, the item’s animation
-state is the same as its element state (see :ref:`layout-interact-elemstate`).
+state is the same as its element state (see :ref:`layfile-interact-elemstate`).
 
 If the ``animate`` child element is present and has an ``inputtag``
 attribute, the item’s animation state will be taken from the value of the
@@ -1330,7 +1345,7 @@ their positions:
         </repeat>
 
 
-.. _layout-errors:
+.. _layfile-errors:
 
 Error handling
 --------------
@@ -1346,7 +1361,7 @@ Error handling
   screens are considered unviable and not available to the user.
 
 
-.. _layout-autogen:
+.. _layfile-autogen:
 
 Automatically-generated views
 -----------------------------
@@ -1389,7 +1404,7 @@ The following views will be automatically generated:
   will be displayed at physical aspect ratio, with rotation applied.
 
 
-.. _layout-complay:
+.. _layfile-complay:
 
 Using complay.py
 ----------------
@@ -1419,12 +1434,12 @@ in case of an I/O error.  If an output file name is specified, the file will be
 created/overwritten on success or removed on failure.
 
 To check a layout file for common errors, run the script with the path to the
-file no check and no output file name or base variable name.  For example:
+file to check and no output file name or base variable name.  For example:
 
     **python scripts/build/complay.py artwork/dino/default.lay**
 
 
-.. _layout-examples:
+.. _layfile-examples:
 
 Example layout files
 --------------------

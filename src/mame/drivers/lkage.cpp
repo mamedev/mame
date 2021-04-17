@@ -90,7 +90,7 @@ TODO:
 
 #include "cpu/m6805/m6805.h"
 #include "cpu/z80/z80.h"
-#include "sound/2203intf.h"
+#include "sound/ym2203.h"
 
 #include "screen.h"
 #include "speaker.h"

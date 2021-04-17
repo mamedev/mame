@@ -14,15 +14,7 @@
 #include "cpu/m6502/n2a03.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/sh/sh2.h"
-#include "sound/2203intf.h"
-#include "sound/2608intf.h"
-#include "sound/2610intf.h"
-#include "sound/2612intf.h"
-#include "sound/262intf.h"
-#include "sound/3526intf.h"
-#include "sound/3812intf.h"
 #include "sound/ay8910.h"
-#include "sound/8950intf.h"
 #include "sound/c140.h"
 #include "sound/c352.h"
 #include "sound/c6280.h"
@@ -46,9 +38,17 @@
 #include "sound/upd7759.h"
 #include "sound/vgm_visualizer.h"
 #include "sound/x1_010.h"
+#include "sound/y8950.h"
 #include "sound/ym2151.h"
+#include "sound/ym2203.h"
 #include "sound/ym2413.h"
+#include "sound/ym2608.h"
+#include "sound/ym2610.h"
+#include "sound/ym2612.h"
+#include "sound/ym3526.h"
+#include "sound/ym3812.h"
 #include "sound/ymf271.h"
+#include "sound/ymf262.h"
 #include "sound/ymf278b.h"
 #include "sound/ymz280b.h"
 #include "audio/vboy.h"
@@ -70,7 +70,7 @@
 #include <vector>
 
 #define AS_IO16LE           1
-#define AS_IO16BE           2
+#define AS_IO16BE           4
 
 class vgmplay_disassembler : public util::disasm_interface
 {
@@ -1329,7 +1329,7 @@ void vgmplay_device::execute_run()
 				uint8_t id = m_file->read_byte(m_pc + 1);
 				if (id == 0xff)
 					for (int i = 0; i < 0xff; i++)
-						m_streams[id].timer->enable(false);
+						m_streams[i].timer->enable(false);
 				else
 					m_streams[id].timer->enable(false);
 
@@ -2712,10 +2712,10 @@ QUICKLOAD_LOAD_MEMBER(vgmplay_state::load_file)
 {
 	m_vgmplay->stop();
 
-	m_file_data.resize(quickload_size);
+	m_file_data.resize(image.length());
 
-	if (!quickload_size ||
-		image.fread(&m_file_data[0], quickload_size) != quickload_size)
+	if (image.length() == 0 ||
+		image.fread(&m_file_data[0], image.length()) != image.length())
 	{
 		m_file_data.clear();
 		return image_init_result::FAIL;
@@ -3383,10 +3383,6 @@ void vgmplay_state::soundchips_map(address_map &map)
 	map(vgmplay_device::A_POKEY_0, vgmplay_device::A_POKEY_0 + 0xf).w(m_pokey[0], FUNC(pokey_device::write));
 	map(vgmplay_device::A_POKEY_1, vgmplay_device::A_POKEY_1 + 0xf).w(m_pokey[1], FUNC(pokey_device::write));
 	map(vgmplay_device::A_QSOUND, vgmplay_device::A_QSOUND + 0x2).w(m_qsound, FUNC(qsound_device::qsound_w));
-	map(vgmplay_device::A_WSWAN_0, vgmplay_device::A_WSWAN_0 + 0xff).w(m_wswan[0], FUNC(wswan_sound_device::port_w));
-	map(vgmplay_device::A_WSWAN_1, vgmplay_device::A_WSWAN_1 + 0xff).w(m_wswan[1], FUNC(wswan_sound_device::port_w));
-	map(vgmplay_device::A_WSWAN_RAM_0, vgmplay_device::A_WSWAN_RAM_0 + 0x3fff).ram().share("wswan_ram.0");
-	map(vgmplay_device::A_WSWAN_RAM_1, vgmplay_device::A_WSWAN_RAM_1 + 0x3fff).ram().share("wswan_ram.1");
 	map(vgmplay_device::A_VSU_VUE_0, vgmplay_device::A_VSU_VUE_0 + 0x5ff).w(m_vsu_vue[0], FUNC(vboysnd_device::write));
 	map(vgmplay_device::A_VSU_VUE_1, vgmplay_device::A_VSU_VUE_1 + 0x5ff).w(m_vsu_vue[1], FUNC(vboysnd_device::write));
 	map(vgmplay_device::A_SAA1099_0, vgmplay_device::A_SAA1099_0 + 1).w(m_saa1099[0], FUNC(saa1099_device::write));
@@ -3407,6 +3403,10 @@ void vgmplay_state::soundchips16le_map(address_map &map)
 	map(vgmplay_device::A_32X_PWM, vgmplay_device::A_32X_PWM + 0xf).w(m_sega32x, FUNC(sega_32x_device::pwm_w));
 	map(vgmplay_device::A_C352_0, vgmplay_device::A_C352_0 + 0x7fff).w(m_c352[0], FUNC(c352_device::write));
 	map(vgmplay_device::A_C352_1, vgmplay_device::A_C352_1 + 0x7fff).w(m_c352[1], FUNC(c352_device::write));
+	map(vgmplay_device::A_WSWAN_0, vgmplay_device::A_WSWAN_0 + 0xff).w(m_wswan[0], FUNC(wswan_sound_device::port_w));
+	map(vgmplay_device::A_WSWAN_1, vgmplay_device::A_WSWAN_1 + 0xff).w(m_wswan[1], FUNC(wswan_sound_device::port_w));
+	map(vgmplay_device::A_WSWAN_RAM_0, vgmplay_device::A_WSWAN_RAM_0 + 0x3fff).ram().share("wswan_ram.0");
+	map(vgmplay_device::A_WSWAN_RAM_1, vgmplay_device::A_WSWAN_RAM_1 + 0x3fff).ram().share("wswan_ram.1");
 }
 
 void vgmplay_state::soundchips16be_map(address_map &map)
@@ -3751,13 +3751,13 @@ void vgmplay_state::vgmplay(machine_config &config)
 	// TODO: prevent error.log spew
 	YMZ280B(config, m_ymz280b[0], 0);
 	m_ymz280b[0]->set_addrmap(0, &vgmplay_state::ymz280b_map<0>);
-	m_ymz280b[0]->add_route(0, m_mixer, 0.25, AUTO_ALLOC_INPUT, 0);
-	m_ymz280b[0]->add_route(1, m_mixer, 0.25, AUTO_ALLOC_INPUT, 1);
+	m_ymz280b[0]->add_route(0, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
+	m_ymz280b[0]->add_route(1, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
 
 	YMZ280B(config, m_ymz280b[1], 0);
 	m_ymz280b[1]->set_addrmap(0, &vgmplay_state::ymz280b_map<1>);
-	m_ymz280b[1]->add_route(0, m_mixer, 0.25, AUTO_ALLOC_INPUT, 0);
-	m_ymz280b[1]->add_route(1, m_mixer, 0.25, AUTO_ALLOC_INPUT, 1);
+	m_ymz280b[1]->add_route(0, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
+	m_ymz280b[1]->add_route(1, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
 
 	RF5C164(config, m_rf5c164, 0);
 	m_rf5c164->set_addrmap(0, &vgmplay_state::rf5c164_map<0>);

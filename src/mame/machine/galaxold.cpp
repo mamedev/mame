@@ -74,11 +74,6 @@ MACHINE_RESET_MEMBER(galaxold_state,galaxold)
 	machine_reset_common(INPUT_LINE_NMI);
 }
 
-MACHINE_RESET_MEMBER(galaxold_state,devilfsg)
-{
-	machine_reset_common(0);
-}
-
 MACHINE_RESET_MEMBER(galaxold_state,hunchbkg)
 {
 	machine_reset_common(0);
@@ -159,11 +154,6 @@ void galaxold_state::init_4in1()
 	_4in1_bank_w(0); /* set the initial CPU bank */
 
 	save_item(NAME(m__4in1_bank));
-}
-
-INTERRUPT_GEN_MEMBER(galaxold_state::hunchbks_vh_interrupt)
-{
-	m_maincpu->pulse_input_line(0, m_maincpu->minimum_quantum_time());
 }
 
 void galaxold_state::init_bullsdrtg()

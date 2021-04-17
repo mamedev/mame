@@ -13,8 +13,6 @@
 #ifndef MAME_LIB_UTIL_UNZIP_H
 #define MAME_LIB_UTIL_UNZIP_H
 
-#include "osdcore.h"
-
 #include <chrono>
 #include <cstdint>
 #include <memory>

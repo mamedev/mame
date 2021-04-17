@@ -128,7 +128,8 @@ void pc6001mk2_state::video_start()
 void pc6001sr_state::video_start()
 {
 //  m_video_ram = auto_alloc_array_clear(machine(), uint8_t, 0x4000);
-	m_gvram = auto_alloc_array_clear(machine(), uint8_t, 320*256*8); // TODO: size
+	m_gvram = std::make_unique<uint8_t []>(320*256*8); // TODO: size
+	std::fill_n(m_gvram.get(), 320*256*8, 0);
 	save_pointer(NAME(m_gvram), 320*256*8);
 }
 

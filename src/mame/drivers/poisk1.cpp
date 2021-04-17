@@ -232,20 +232,15 @@ void p1_state::p1_ppi2_porta_w(uint8_t data)
 	// NMI DISABLE
 	if (BIT((data ^ m_video.color_select_68), 3))
 	{
-		program.unmap_readwrite(0xb8000, 0xbbfff, 0);
 		if (BIT(data, 3))
-		{
-			program.install_ram(0xb8000, 0xbbfff, m_video.videoram);
-		}
+			program.install_writeonly(0xb8000, 0xbbfff, m_video.videoram_base.get());
 		else
-		{
-			program.install_rom(0xb8000, 0xbbfff, m_video.videoram);
 			program.install_write_handler(0xb8000, 0xbbfff, write8sm_delegate(*this, FUNC(p1_state::p1_vram_w)));
-		}
 	}
 	// DISPLAY BANK
 	if (BIT((data ^ m_video.color_select_68), 6))
 	{
+
 		if (BIT(data, 6))
 			m_video.videoram = m_video.videoram_base.get() + 0x4000;
 		else
@@ -417,8 +412,7 @@ void p1_state::video_start()
 	m_video.videoram = m_video.videoram_base.get();
 	m_video.stride = 80;
 
-	space.install_ram(0xb8000, 0xbbfff, m_video.videoram);
-	space.install_ram(0xbc000, 0xbffff, m_video.videoram + 0x4000);
+	space.install_ram(0xb8000, 0xbffff, m_video.videoram);
 }
 
 uint32_t p1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

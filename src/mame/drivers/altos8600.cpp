@@ -788,10 +788,10 @@ void altos8600_state::altos8600(machine_config &config)
 	FD1797(config, m_fdc, 2000000);
 	m_fdc->intrq_wr_callback().set(m_pic[1], FUNC(pic8259_device::ir1_w));
 	m_fdc->drq_wr_callback().set(FUNC(altos8600_state::fddrq_w));
-	FLOPPY_CONNECTOR(config, "fd1797:0", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fd1797:1", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fd1797:2", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fd1797:3", altos8600_floppies, "8dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fd1797:0", altos8600_floppies, "8dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fd1797:1", altos8600_floppies, "8dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fd1797:2", altos8600_floppies, "8dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fd1797:3", altos8600_floppies, "8dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	ACS8600_ICS(config, m_ics, 0);
 	m_ics->set_host_space(m_dmac, AS_PROGRAM); // TODO: fixme

@@ -86,7 +86,7 @@ void debug_view_disasm::enumerate_sources()
 	m_source_list.clear();
 
 	// iterate over devices with disassembly interfaces
-	for (device_disasm_interface &dasm : disasm_interface_iterator(machine().root_device()))
+	for (device_disasm_interface &dasm : disasm_interface_enumerator(machine().root_device()))
 	{
 		if (dasm.device().memory().space_config(AS_PROGRAM))
 		{

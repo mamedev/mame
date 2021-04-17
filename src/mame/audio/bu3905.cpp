@@ -29,3 +29,7 @@ void bu3905_device::write(offs_t offset, u8 data)
 {
 	logerror("%s: Writing %02X to offset %X\n", machine().describe_context(), data, offset & 0xf);
 }
+
+WRITE_LINE_MEMBER(bu3905_device::axi_w)
+{
+}

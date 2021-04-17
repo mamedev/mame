@@ -51,12 +51,21 @@ public:
 		set_tmap_flip_yoffsets(-y1, -y2, -y3);
 	}
 
-	auto blit_irq_cb() { return m_blit_irq_cb.bind(); }
+	auto irq_cb() { return m_irq_cb.bind(); }
+	void set_vblank_irq_level(int level) { m_vblank_irq_level = level; }
+	void set_blit_irq_level(int level) { m_blit_irq_level = level; }
 	void set_spriteram_buffered(bool buffer) { m_spriteram_buffered = buffer; }
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_foreground(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_eof);
+
+	// TODO: privatize eventually
+	u8 irq_enable() const { return m_irq_enable; }
+	void irq_enable_w(u8 data);
+	void set_irq(int level);
+	void clear_irq(int level);
+	u8 irq_cause_r();
 
 protected:
 	imagetek_i4100_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool has_ext_tiles);
@@ -67,6 +76,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	virtual void update_irq_state();
 
 	required_shared_ptr_array<u16, 3> m_vram;
 	required_shared_ptr<u16> m_scratchram;
@@ -81,7 +92,12 @@ protected:
 
 	std::unique_ptr<u8[]>   m_expanded_gfx1;
 
-	devcb_write_line m_blit_irq_cb;
+	devcb_write8 m_irq_cb;
+
+	int m_vblank_irq_level;
+	int m_blit_irq_level;
+	u8 m_requested_int;
+	u8 m_irq_enable;
 
 	struct sprite_t
 	{
@@ -100,6 +116,8 @@ protected:
 	u16 m_rombank;
 	size_t m_gfxrom_size;
 	bool m_crtc_unlock;
+	u16 m_crtc_horz;
+	u16 m_crtc_vert;
 	u16 m_sprite_count;
 	u16 m_sprite_priority;
 	u16 m_sprite_xoffset,m_sprite_yoffset;
@@ -127,6 +145,7 @@ protected:
 	emu_timer *m_blit_done_timer;
 
 	// I/O operations
+	void irq_cause_w(u8 data);
 	inline u16 vram_r(offs_t offset, int layer) { return m_vram[layer][offset]; }
 	inline void vram_w(offs_t offset, u16 data, u16 mem_mask, int layer) { COMBINE_DATA(&m_vram[layer][offset]); }
 	uint16_t vram_0_r(offs_t offset);
@@ -225,6 +244,19 @@ public:
 	imagetek_i4300_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void v3_map(address_map &map);
+	u8 irq_vector_r(offs_t offset);
+
+protected:
+	virtual void device_start() override;
+
+	virtual void update_irq_state() override;
+
+private:
+	void irq_level_w(offs_t offset, u8 data);
+	void irq_vector_w(offs_t offset, u8 data);
+
+	u8 m_irq_levels[8];
+	u8 m_irq_vectors[8];
 };
 
 // device type definition

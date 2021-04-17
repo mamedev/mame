@@ -281,7 +281,7 @@ INPUT_PORTS_START(kaypro_keyboard_typewriter)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)           PORT_NAME("SHIFT")
 INPUT_PORTS_END
 
-INPUT_PORTS_START(kaypro_keyboard_bitshift)
+[[maybe_unused]] INPUT_PORTS_START(kaypro_keyboard_bitshift)
 	PORT_INCLUDE(kaypro_keyboard_typewriter)
 
 	PORT_MODIFY("ROW.2")
@@ -366,7 +366,6 @@ void kaypro_10_keyboard_device::device_add_mconfig(machine_config &config)
 
 ioport_constructor kaypro_10_keyboard_device::device_input_ports() const
 {
-	(void)&INPUT_PORTS_NAME(kaypro_keyboard_bitshift);
 	return INPUT_PORTS_NAME(kaypro_keyboard_typewriter);
 }
 

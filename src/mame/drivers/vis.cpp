@@ -6,8 +6,8 @@
 #include "cpu/i86/i286.h"
 #include "machine/8042kbdc.h"
 #include "machine/at.h"
-#include "sound/262intf.h"
 #include "sound/dac.h"
+#include "sound/ymf262.h"
 #include "video/pc_vga.h"
 #include "speaker.h"
 
@@ -538,7 +538,7 @@ void vis_vga_device::vga_w(offs_t offset, uint8_t data)
 			break;
 		case 0x05:
 		case 0x25:
-			assert(vga.crtc.index < ARRAY_LENGTH(m_crtc_regs));
+			assert(vga.crtc.index < std::size(m_crtc_regs));
 			m_crtc_regs[vga.crtc.index] = data;
 			switch(vga.crtc.index)
 			{
@@ -551,7 +551,7 @@ void vis_vga_device::vga_w(offs_t offset, uint8_t data)
 				case 0x01:
 					if(vga.crtc.protect_enable)
 						return;
-					vga.crtc.horz_disp_end = data / (m_interlace && !(vga.sequencer.data[0x25] & 0x20) ? 2 : 1);
+					vga.crtc.horz_disp_end = (data / (m_interlace && !(vga.sequencer.data[0x25] & 0x20) ? 2 : 1)) | 1;
 					recompute_params();
 					return;
 				case 0x02:
@@ -651,7 +651,7 @@ void vis_vga_device::vga_w(offs_t offset, uint8_t data)
 						if(!(vga.sequencer.data[0x25] & 0x20))
 						{
 							vga.crtc.horz_total /= 2;
-							vga.crtc.horz_disp_end /= 2;
+							vga.crtc.horz_disp_end = (vga.crtc.horz_disp_end / 2) | 1;
 							vga.crtc.horz_blank_end /= 2;
 							vga.crtc.horz_retrace_start /= 2;
 							vga.crtc.horz_retrace_end /= 2;
@@ -668,7 +668,7 @@ void vis_vga_device::vga_w(offs_t offset, uint8_t data)
 						if(!(vga.sequencer.data[0x25] & 0x20))
 						{
 							vga.crtc.horz_total *= 2;
-							vga.crtc.horz_disp_end *= 2;
+							vga.crtc.horz_disp_end  = (vga.crtc.horz_disp_end * 2) | 1;
 							vga.crtc.horz_blank_end *= 2;
 							vga.crtc.horz_retrace_start *= 2;
 							vga.crtc.horz_retrace_end *= 2;
@@ -903,10 +903,9 @@ void vis_state::vis(machine_config &config)
 	maincpu.shutdown_callback().set("mb", FUNC(at_mb_device::shutdown));
 	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	AT_MB(config, "mb", 0);
+	AT_MB(config, "mb");
 	// the vis doesn't have a real keyboard controller
 	config.device_remove("mb:keybc");
-	config.device_remove("mb:pc_kbdc");
 
 	kbdc8042_device &kbdc(KBDC8042(config, "kbdc"));
 	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);

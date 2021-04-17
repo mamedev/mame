@@ -4,7 +4,7 @@
 
     fixfreq.h
 
-    2013-2020 Couriersud
+    2013-2021 Couriersud
 
     Fixed frequency monochrome monitor emulation
 

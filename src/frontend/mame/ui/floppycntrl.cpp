@@ -26,6 +26,7 @@ menu_control_floppy_image::menu_control_floppy_image(mame_ui_manager &mui, rende
 	fd(dynamic_cast<floppy_image_device &>(image)),
 	input_format(nullptr),
 	output_format(nullptr),
+	create_fs(nullptr),
 	input_filename(),
 	output_filename()
 {
@@ -47,6 +48,12 @@ void menu_control_floppy_image::do_load_create()
 		if (err != image_init_result::PASS) {
 			machine().popmessage("Error: %s", fd.error());
 			return;
+		}
+		if (create_fs) {
+			// HACK: ensure the floppy_image structure is created since device_image_interface may not otherwise do so during "init phase"
+			err = fd.finish_load();
+			if (err == image_init_result::PASS)
+				fd.init_fs(create_fs);
 		}
 	} else {
 		image_init_result err = fd.load(input_filename);
@@ -122,8 +129,27 @@ void menu_control_floppy_image::handle()
 			m_state = START_FILE;
 			handle();
 		} else {
+			const auto &fs = fd.get_fs();
 			output_filename = util::zippath_combine(m_current_directory, m_current_file);
 			output_format = format_array[m_submenu_result.i];
+			if(fs.size() == 1) {
+				create_fs = &fs[0];
+				do_load_create();
+				stack_pop();
+			} else {
+				m_submenu_result.i = -1;
+				menu::stack_push<menu_select_floppy_init>(ui(), container(), fs, &m_submenu_result.i);
+				m_state = SELECT_INIT;
+			}
+		}
+		break;
+
+	case SELECT_INIT:
+		if(m_submenu_result.i == -1) {
+			m_state = START_FILE;
+			handle();
+		} else {
+			create_fs = &fd.get_fs()[m_submenu_result.i];
 			do_load_create();
 			stack_pop();
 		}

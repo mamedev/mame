@@ -31,7 +31,7 @@ public:
 	// construction/destruction
 	acorn_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 protected:
 	// device-level overrides

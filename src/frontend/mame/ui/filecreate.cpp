@@ -76,10 +76,10 @@ menu_confirm_save_as::~menu_confirm_save_as()
 
 void menu_confirm_save_as::populate(float &customtop, float &custombottom)
 {
-	item_append(_("File Already Exists - Override?"), "", FLAG_DISABLE, nullptr);
+	item_append(_("File Already Exists - Override?"), FLAG_DISABLE, nullptr);
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("No"), "", 0, ITEMREF_NO);
-	item_append(_("Yes"), "", 0, ITEMREF_YES);
+	item_append(_("No"), 0, ITEMREF_NO);
+	item_append(_("Yes"), 0, ITEMREF_YES);
 }
 
 //-------------------------------------------------
@@ -143,8 +143,8 @@ menu_file_create::~menu_file_create()
 void menu_file_create::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	extra_text_render(top, bottom, origx1, origy1, origx2, origy2,
-		m_current_directory.c_str(),
-		nullptr);
+		m_current_directory,
+		std::string_view());
 }
 
 
@@ -180,7 +180,7 @@ void menu_file_create::populate(float &customtop, float &custombottom)
 
 	// finish up the menu
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Create"), "", 0, ITEMREF_CREATE);
+	item_append(_("Create"), 0, ITEMREF_CREATE);
 
 	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
@@ -263,7 +263,7 @@ menu_select_format::~menu_select_format()
 
 void menu_select_format::populate(float &customtop, float &custombottom)
 {
-	item_append(_("Select image format"), "", FLAG_DISABLE, nullptr);
+	item_append(_("Select image format"), FLAG_DISABLE, nullptr);
 	for (int i = 0; i < m_total_usable; i++)
 	{
 		const floppy_image_format_t *fmt = m_formats[i];
@@ -280,6 +280,61 @@ void menu_select_format::populate(float &customtop, float &custombottom)
 //-------------------------------------------------
 
 void menu_select_format::handle()
+{
+	// process the menu
+	const event *event = process(0);
+	if (event != nullptr && event->iptkey == IPT_UI_SELECT)
+	{
+		*m_result = int(uintptr_t(event->itemref));
+		stack_pop();
+	}
+}
+
+
+/***************************************************************************
+SELECT FORMAT MENU
+***************************************************************************/
+
+//-------------------------------------------------
+//  ctor
+//-------------------------------------------------
+
+menu_select_floppy_init::menu_select_floppy_init(mame_ui_manager &mui, render_container &container, const std::vector<floppy_image_device::fs_info> &fs, int *result)
+	: menu(mui, container),
+	  m_fs(fs),
+	  m_result(result)
+
+{
+}
+
+
+//-------------------------------------------------
+//  dtor
+//-------------------------------------------------
+
+menu_select_floppy_init::~menu_select_floppy_init()
+{
+}
+
+
+//-------------------------------------------------
+//  populate
+//-------------------------------------------------
+
+void menu_select_floppy_init::populate(float &customtop, float &custombottom)
+{
+	item_append(_("Select initial contents"), FLAG_DISABLE, nullptr);
+	int id = 0;
+	for (const auto &fmt : m_fs)
+		item_append(fmt.m_description, fmt.m_name, 0, (void *)(uintptr_t)(id++));
+}
+
+
+//-------------------------------------------------
+//  handle
+//-------------------------------------------------
+
+void menu_select_floppy_init::handle()
 {
 	// process the menu
 	const event *event = process(0);

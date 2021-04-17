@@ -1548,9 +1548,11 @@ void pc88va_state::fdc_dma_w(uint8_t data)
 	m_fdc->dma_w(data);
 }
 
-FLOPPY_FORMATS_MEMBER( pc88va_state::floppy_formats )
-	FLOPPY_XDF_FORMAT
-FLOPPY_FORMATS_END
+void pc88va_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_XDF_FORMAT);
+}
 
 static void pc88va_floppies(device_slot_interface &device)
 {

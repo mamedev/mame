@@ -48,7 +48,7 @@ protected:
 	ioport_constructor device_input_ports() const override;
 
 private:
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );

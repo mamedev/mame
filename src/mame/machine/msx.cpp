@@ -37,14 +37,8 @@ void msx2_state::machine_start()
 {
 	msx_state::machine_start();
 
-	for (device_t &device : device_iterator(*this))
-	{
-		msx_switched_interface *switched;
-		if (device.interface(switched))
-		{
-			m_switched.push_back(switched);
-		}
-	}
+	for (msx_switched_interface &switched : device_interface_enumerator<msx_switched_interface>(*this))
+		m_switched.push_back(&switched);
 
 	save_item(NAME(m_rtc_latch));
 }

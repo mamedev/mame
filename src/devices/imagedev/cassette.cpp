@@ -364,7 +364,7 @@ std::string cassette_image_device::call_display()
 		cassette_state uistate = get_state() & CASSETTE_MASK_UISTATE;
 
 		// choose which frame of the animation we are at
-		int n = (int(position) / ANIMATION_FPS) % ARRAY_LENGTH(shapes);
+		int n = (int(position) / ANIMATION_FPS) % std::size(shapes);
 
 		// play or record
 		const char *status_icon = (uistate == CASSETTE_PLAY)

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="leapfrog_turbotwistbrainquest_cart" description="LeapFrog Turbo Twist Brain Quest cartridges">
+	<!-- also compatible with Fact Blaster -->
+
+	<software name="grades5_6" supported="no">
+		<description>Grades 5 &amp; 6 (500-00745)</description>
+		<year>2002</year>
+		<publisher>LeapFrog</publisher>
+		<part name="cart" interface="leapfrog_turbotwistbrainquest_cart">
+			<dataarea name="rom" size="0x400000">
+				<rom name="turbotwistbq56.bin" size="0x400000" crc="9a9ff65a" sha1="0d598f5d1b53c844ca9802535a6a3a1c91bf736f" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

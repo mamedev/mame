@@ -75,7 +75,7 @@ T share_read(memory_share &share, offs_t address)
 {
 	T mem_content = 0;
 	const offs_t lowmask = share.bytewidth() - 1;
-	uint8_t *ptr = (uint8_t *)share.ptr();
+	u8 *ptr = (u8 *)share.ptr();
 	for (int i = 0; i < sizeof(T); i++)
 	{
 		int addr = share.endianness() == ENDIANNESS_LITTLE ? address + sizeof(T) - 1 - i : address + i;
@@ -102,7 +102,7 @@ template <typename T>
 void share_write(memory_share &share, offs_t address, T val)
 {
 	const offs_t lowmask = share.bytewidth() - 1;
-	uint8_t *ptr = (uint8_t *)share.ptr();
+	u8 *ptr = (u8 *)share.ptr();
 	for (int i = 0; i < sizeof(T); i++)
 	{
 		int addr = share.endianness() == ENDIANNESS_BIG ? address + sizeof(T) - 1 - i : address + i;
@@ -120,6 +120,77 @@ void share_write(memory_share &share, offs_t address, T val)
 
 } // anonymous namespace
 
+
+
+//-------------------------------------------------
+//  sol_lua_push - automatically convert
+//  map_handler_type to a string
+//-------------------------------------------------
+
+int sol_lua_push(sol::types<map_handler_type>, lua_State *L, map_handler_type &&value)
+{
+	const char *typestr;
+	switch(value)
+	{
+	case AMH_NONE:
+		typestr = "none";
+		break;
+	case AMH_RAM:
+		typestr = "ram";
+		break;
+	case AMH_ROM:
+		typestr = "rom";
+		break;
+	case AMH_NOP:
+		typestr = "nop";
+		break;
+	case AMH_UNMAP:
+		typestr = "unmap";
+		break;
+	case AMH_DEVICE_DELEGATE:
+	case AMH_DEVICE_DELEGATE_M:
+	case AMH_DEVICE_DELEGATE_S:
+	case AMH_DEVICE_DELEGATE_SM:
+	case AMH_DEVICE_DELEGATE_MO:
+	case AMH_DEVICE_DELEGATE_SMO:
+		typestr = "delegate";
+		break;
+	case AMH_PORT:
+		typestr = "port";
+		break;
+	case AMH_BANK:
+		typestr = "bank";
+		break;
+	case AMH_DEVICE_SUBMAP:
+		typestr = "submap";
+		break;
+	default:
+		typestr = "unknown";
+		break;
+	}
+	return sol::stack::push(L, typestr);
+}
+
+
+//-------------------------------------------------
+//  sol_lua_push - automatically convert
+//  endianness_t to a string
+//-------------------------------------------------
+
+int sol_lua_push(sol::types<endianness_t>, lua_State *L, endianness_t &&value)
+{
+	char const *endianness = "unknown";
+	switch (value)
+	{
+	case endianness_t::ENDIANNESS_BIG:
+		endianness = "big";
+		break;
+	case endianness_t::ENDIANNESS_LITTLE:
+		endianness = "little";
+		break;
+	}
+	return sol::stack::push(L, endianness);
+}
 
 
 //-------------------------------------------------
@@ -291,7 +362,7 @@ T lua_engine::addr_space::direct_mem_read(offs_t address)
 	for (int i = 0; i < sizeof(T); i++)
 	{
 		int addr = space.endianness() == ENDIANNESS_LITTLE ? address + sizeof(T) - 1 - i : address + i;
-		uint8_t *base = (uint8_t *)space.get_read_ptr(addr & ~lowmask);
+		u8 *base = (u8 *)space.get_read_ptr(addr & ~lowmask);
 		if (base)
 		{
 			if constexpr (sizeof(T) > 1)
@@ -318,7 +389,7 @@ void lua_engine::addr_space::direct_mem_write(offs_t address, T val)
 	for (int i = 0; i < sizeof(T); i++)
 	{
 		int addr = space.endianness() == ENDIANNESS_BIG ? address + sizeof(T) - 1 - i : address + i;
-		uint8_t *base = (uint8_t *)space.get_read_ptr(addr & ~lowmask);
+		u8 *base = (u8 *)space.get_read_ptr(addr & ~lowmask);
 		if (base)
 		{
 			if (space.endianness() == ENDIANNESS_BIG)
@@ -335,85 +406,61 @@ void lua_engine::addr_space::direct_mem_write(offs_t address, T val)
 //  initialize_memory - register memory user types
 //-------------------------------------------------
 
-void lua_engine::initialize_memory()
+void lua_engine::initialize_memory(sol::table &emu)
 {
 
-/* addr_space library
- *
- * manager:machine().devices[device_tag].spaces[space]
- *
- * read/write by signedness u/i and bit-width 8/16/32/64:
- * space:read_*(addr)
- * space:write_*(addr, val)
- * space:read_log_*(addr)
- * space:write_log_*(addr, val)
- * space:read_direct_*(addr)
- * space:write_direct_*(addr, val)
- * space:read_range(first_addr, last_addr, width, [opt] step) - read range of addresses and
- *                                                              return as a binary string
- *
- * space.name - address space name
- * space.shift - address bus shift, bitshift required for a bytewise address
- *               to map onto this space's address resolution (addressing granularity).
- *               positive value means leftshift, negative means rightshift.
- * space.index
- * space.address_mask
- * space.data_width
- * space.endianness
- *
- * space.map[] - table of address map entries (k=index, v=address_map_entry)
- */
-
-	auto addr_space_type = sol().registry().new_usertype<addr_space>("addr_space", sol::call_constructor, sol::constructors<sol::types<address_space &, device_memory_interface &>>());
-	addr_space_type.set("read_i8", &addr_space::mem_read<int8_t>);
-	addr_space_type.set("read_u8", &addr_space::mem_read<uint8_t>);
-	addr_space_type.set("read_i16", &addr_space::mem_read<int16_t>);
-	addr_space_type.set("read_u16", &addr_space::mem_read<uint16_t>);
-	addr_space_type.set("read_i32", &addr_space::mem_read<int32_t>);
-	addr_space_type.set("read_u32", &addr_space::mem_read<uint32_t>);
-	addr_space_type.set("read_i64", &addr_space::mem_read<int64_t>);
-	addr_space_type.set("read_u64", &addr_space::mem_read<uint64_t>);
-	addr_space_type.set("write_i8", &addr_space::mem_write<int8_t>);
-	addr_space_type.set("write_u8", &addr_space::mem_write<uint8_t>);
-	addr_space_type.set("write_i16", &addr_space::mem_write<int16_t>);
-	addr_space_type.set("write_u16", &addr_space::mem_write<uint16_t>);
-	addr_space_type.set("write_i32", &addr_space::mem_write<int32_t>);
-	addr_space_type.set("write_u32", &addr_space::mem_write<uint32_t>);
-	addr_space_type.set("write_i64", &addr_space::mem_write<int64_t>);
-	addr_space_type.set("write_u64", &addr_space::mem_write<uint64_t>);
-	addr_space_type.set("read_log_i8", &addr_space::log_mem_read<int8_t>);
-	addr_space_type.set("read_log_u8", &addr_space::log_mem_read<uint8_t>);
-	addr_space_type.set("read_log_i16", &addr_space::log_mem_read<int16_t>);
-	addr_space_type.set("read_log_u16", &addr_space::log_mem_read<uint16_t>);
-	addr_space_type.set("read_log_i32", &addr_space::log_mem_read<int32_t>);
-	addr_space_type.set("read_log_u32", &addr_space::log_mem_read<uint32_t>);
-	addr_space_type.set("read_log_i64", &addr_space::log_mem_read<int64_t>);
-	addr_space_type.set("read_log_u64", &addr_space::log_mem_read<uint64_t>);
-	addr_space_type.set("write_log_i8", &addr_space::log_mem_write<int8_t>);
-	addr_space_type.set("write_log_u8", &addr_space::log_mem_write<uint8_t>);
-	addr_space_type.set("write_log_i16", &addr_space::log_mem_write<int16_t>);
-	addr_space_type.set("write_log_u16", &addr_space::log_mem_write<uint16_t>);
-	addr_space_type.set("write_log_i32", &addr_space::log_mem_write<int32_t>);
-	addr_space_type.set("write_log_u32", &addr_space::log_mem_write<uint32_t>);
-	addr_space_type.set("write_log_i64", &addr_space::log_mem_write<int64_t>);
-	addr_space_type.set("write_log_u64", &addr_space::log_mem_write<uint64_t>);
-	addr_space_type.set("read_direct_i8", &addr_space::direct_mem_read<int8_t>);
-	addr_space_type.set("read_direct_u8", &addr_space::direct_mem_read<uint8_t>);
-	addr_space_type.set("read_direct_i16", &addr_space::direct_mem_read<int16_t>);
-	addr_space_type.set("read_direct_u16", &addr_space::direct_mem_read<uint16_t>);
-	addr_space_type.set("read_direct_i32", &addr_space::direct_mem_read<int32_t>);
-	addr_space_type.set("read_direct_u32", &addr_space::direct_mem_read<uint32_t>);
-	addr_space_type.set("read_direct_i64", &addr_space::direct_mem_read<int64_t>);
-	addr_space_type.set("read_direct_u64", &addr_space::direct_mem_read<uint64_t>);
-	addr_space_type.set("write_direct_i8", &addr_space::direct_mem_write<int8_t>);
-	addr_space_type.set("write_direct_u8", &addr_space::direct_mem_write<uint8_t>);
-	addr_space_type.set("write_direct_i16", &addr_space::direct_mem_write<int16_t>);
-	addr_space_type.set("write_direct_u16", &addr_space::direct_mem_write<uint16_t>);
-	addr_space_type.set("write_direct_i32", &addr_space::direct_mem_write<int32_t>);
-	addr_space_type.set("write_direct_u32", &addr_space::direct_mem_write<uint32_t>);
-	addr_space_type.set("write_direct_i64", &addr_space::direct_mem_write<int64_t>);
-	addr_space_type.set("write_direct_u64", &addr_space::direct_mem_write<uint64_t>);
-	addr_space_type.set("read_range", [](addr_space &sp, sol::this_state s, u64 first, u64 last, int width, sol::object opt_step) {
+	auto addr_space_type = sol().registry().new_usertype<addr_space>("addr_space", sol::no_constructor);
+	addr_space_type["read_i8"] = &addr_space::mem_read<s8>;
+	addr_space_type["read_u8"] = &addr_space::mem_read<u8>;
+	addr_space_type["read_i16"] = &addr_space::mem_read<s16>;
+	addr_space_type["read_u16"] = &addr_space::mem_read<u16>;
+	addr_space_type["read_i32"] = &addr_space::mem_read<s32>;
+	addr_space_type["read_u32"] = &addr_space::mem_read<u32>;
+	addr_space_type["read_i64"] = &addr_space::mem_read<s64>;
+	addr_space_type["read_u64"] = &addr_space::mem_read<u64>;
+	addr_space_type["write_i8"] = &addr_space::mem_write<s8>;
+	addr_space_type["write_u8"] = &addr_space::mem_write<u8>;
+	addr_space_type["write_i16"] = &addr_space::mem_write<s16>;
+	addr_space_type["write_u16"] = &addr_space::mem_write<u16>;
+	addr_space_type["write_i32"] = &addr_space::mem_write<s32>;
+	addr_space_type["write_u32"] = &addr_space::mem_write<u32>;
+	addr_space_type["write_i64"] = &addr_space::mem_write<s64>;
+	addr_space_type["write_u64"] = &addr_space::mem_write<u64>;
+	addr_space_type["readv_i8"] = &addr_space::log_mem_read<s8>;
+	addr_space_type["readv_u8"] = &addr_space::log_mem_read<u8>;
+	addr_space_type["readv_i16"] = &addr_space::log_mem_read<s16>;
+	addr_space_type["readv_u16"] = &addr_space::log_mem_read<u16>;
+	addr_space_type["readv_i32"] = &addr_space::log_mem_read<s32>;
+	addr_space_type["readv_u32"] = &addr_space::log_mem_read<u32>;
+	addr_space_type["readv_i64"] = &addr_space::log_mem_read<s64>;
+	addr_space_type["readv_u64"] = &addr_space::log_mem_read<u64>;
+	addr_space_type["writev_i8"] = &addr_space::log_mem_write<s8>;
+	addr_space_type["writev_u8"] = &addr_space::log_mem_write<u8>;
+	addr_space_type["writev_i16"] = &addr_space::log_mem_write<s16>;
+	addr_space_type["writev_u16"] = &addr_space::log_mem_write<u16>;
+	addr_space_type["writev_i32"] = &addr_space::log_mem_write<s32>;
+	addr_space_type["writev_u32"] = &addr_space::log_mem_write<u32>;
+	addr_space_type["writev_i64"] = &addr_space::log_mem_write<s64>;
+	addr_space_type["writev_u64"] = &addr_space::log_mem_write<u64>;
+	addr_space_type["read_direct_i8"] = &addr_space::direct_mem_read<s8>;
+	addr_space_type["read_direct_u8"] = &addr_space::direct_mem_read<u8>;
+	addr_space_type["read_direct_i16"] = &addr_space::direct_mem_read<s16>;
+	addr_space_type["read_direct_u16"] = &addr_space::direct_mem_read<u16>;
+	addr_space_type["read_direct_i32"] = &addr_space::direct_mem_read<s32>;
+	addr_space_type["read_direct_u32"] = &addr_space::direct_mem_read<u32>;
+	addr_space_type["read_direct_i64"] = &addr_space::direct_mem_read<s64>;
+	addr_space_type["read_direct_u64"] = &addr_space::direct_mem_read<u64>;
+	addr_space_type["write_direct_i8"] = &addr_space::direct_mem_write<s8>;
+	addr_space_type["write_direct_u8"] = &addr_space::direct_mem_write<u8>;
+	addr_space_type["write_direct_i16"] = &addr_space::direct_mem_write<s16>;
+	addr_space_type["write_direct_u16"] = &addr_space::direct_mem_write<u16>;
+	addr_space_type["write_direct_i32"] = &addr_space::direct_mem_write<s32>;
+	addr_space_type["write_direct_u32"] = &addr_space::direct_mem_write<u32>;
+	addr_space_type["write_direct_i64"] = &addr_space::direct_mem_write<s64>;
+	addr_space_type["write_direct_u64"] = &addr_space::direct_mem_write<u64>;
+	addr_space_type["read_range"] =
+		[] (addr_space &sp, sol::this_state s, u64 first, u64 last, int width, sol::object opt_step) -> sol::object
+		{
 			lua_State *L = s;
 			luaL_Buffer buff;
 			offs_t space_size = sp.space.addrmask();
@@ -424,186 +471,148 @@ void lua_engine::initialize_memory()
 				if (step < 1 || step > last - first)
 				{
 					luaL_error(L, "Invalid step");
-					return sol::make_reference(L, nullptr);
+					return sol::lua_nil;
 				}
 			}
 			if (first > space_size || last > space_size || last < first)
 			{
 				luaL_error(L, "Invalid offset");
-				return sol::make_reference(L, nullptr);
+				return sol::lua_nil;
 			}
 			int byte_count = width / 8 * (last - first + 1) / step;
 			switch (width)
 			{
 			case 8:
-			{
-				u8 *dest = (u8 *)luaL_buffinitsize(L, &buff, byte_count);
-				for(; first <= last; first += step)
-					*dest++ = sp.mem_read<u8>(first);
-				break;
-			}
+				{
+					u8 *dest = (u8 *)luaL_buffinitsize(L, &buff, byte_count);
+					for ( ; first <= last; first += step)
+						*dest++ = sp.mem_read<u8>(first);
+					break;
+				}
 			case 16:
-			{
-				u16 *dest = (u16 *)luaL_buffinitsize(L, &buff, byte_count);
-				for(; first <= last; first += step)
-					*dest++ = sp.mem_read<u16>(first);
-				break;
-			}
+				{
+					u16 *dest = (u16 *)luaL_buffinitsize(L, &buff, byte_count);
+					for ( ; first <= last; first += step)
+						*dest++ = sp.mem_read<u16>(first);
+					break;
+				}
 			case 32:
-			{
-				u32 *dest = (u32 *)luaL_buffinitsize(L, &buff, byte_count);
-				for(; first <= last; first += step)
-					*dest++ = sp.mem_read<u32>(first);
-				break;
-			}
+				{
+					u32 *dest = (u32 *)luaL_buffinitsize(L, &buff, byte_count);
+					for(; first <= last; first += step)
+						*dest++ = sp.mem_read<u32>(first);
+					break;
+				}
 			case 64:
-			{
-				u64 *dest = (u64 *)luaL_buffinitsize(L, &buff, byte_count);
-				for(; first <= last; first += step)
-					*dest++ = sp.mem_read<u64>(first);
-				break;
-			}
+				{
+					u64 *dest = (u64 *)luaL_buffinitsize(L, &buff, byte_count);
+					for(; first <= last; first += step)
+						*dest++ = sp.mem_read<u64>(first);
+					break;
+				}
 			default:
 				luaL_error(L, "Invalid width. Must be 8/16/32/64");
-				return sol::make_reference(L, nullptr);
+				return sol::lua_nil;
 			}
 			luaL_pushresultsize(&buff, byte_count);
 			return sol::make_reference(L, sol::stack_reference(L, -1));
-		});
-	addr_space_type.set("name", sol::property([](addr_space &sp) { return sp.space.name(); }));
-	addr_space_type.set("shift", sol::property([](addr_space &sp) { return sp.space.addr_shift(); }));
-	addr_space_type.set("index", sol::property([](addr_space &sp) { return sp.space.spacenum(); }));
-	addr_space_type.set("address_mask", sol::property([](addr_space &sp) { return sp.space.addrmask(); }));
-	addr_space_type.set("data_width", sol::property([](addr_space &sp) { return sp.space.data_width(); }));
-	addr_space_type.set("endianness", sol::property([](addr_space &sp) {
-			std::string endianness;
-			switch (sp.space.endianness())
-			{
-				case endianness_t::ENDIANNESS_BIG:
-					endianness = "big";
-					break;
-				case endianness_t::ENDIANNESS_LITTLE:
-					endianness = "little";
-					break;
-			}
-			return endianness;
-		}));
+		};
+	addr_space_type["name"] = sol::property([] (addr_space &sp) { return sp.space.name(); });
+	addr_space_type["shift"] = sol::property([] (addr_space &sp) { return sp.space.addr_shift(); });
+	addr_space_type["index"] = sol::property([] (addr_space &sp) { return sp.space.spacenum(); });
+	addr_space_type["address_mask"] = sol::property([] (addr_space &sp) { return sp.space.addrmask(); });
+	addr_space_type["data_width"] = sol::property([] (addr_space &sp) { return sp.space.data_width(); });
+	addr_space_type["endianness"] = sol::property([] (addr_space &sp) { return sp.space.endianness(); });
+	addr_space_type["map"] = sol::property([] (addr_space &sp) { return sp.space.map(); });
 
 
-/* address_map_entry library
- *
- * manager:machine().devices[device_tag].spaces[space].map[entry_index]
- *
- * mapentry.offset - address start
- * mapentry.endoff - address end
- * mapentry.readtype
- * mapentry.writetype
- */
-	addr_space_type.set("map", sol::property([this](addr_space &sp) {
-			address_space &space = sp.space;
-			sol::table map = sol().create_table();
-			for (address_map_entry &entry : space.map()->m_entrylist)
-			{
-				sol::table mapentry = sol().create_table();
-				mapentry["offset"] = entry.m_addrstart & space.addrmask();
-				mapentry["endoff"] = entry.m_addrend & space.addrmask();
-				mapentry["readtype"] = entry.m_read.m_type;
-				mapentry["writetype"] = entry.m_write.m_type;
-				map.add(mapentry);
-			}
-			return map;
-		}));
+	auto addrmap_type = sol().registry().new_usertype<address_map>("addrmap", sol::no_constructor);
+	addrmap_type["spacenum"] = sol::readonly(&address_map::m_spacenum);
+	addrmap_type["device"] = sol::readonly(&address_map::m_device);
+	addrmap_type["unmap_value"] = sol::readonly(&address_map::m_unmapval);
+	addrmap_type["global_mask"] = sol::readonly(&address_map::m_globalmask);
+	addrmap_type["entries"] = sol::property([] (address_map &m) { return simple_list_wrapper<address_map_entry>(m.m_entrylist); });
 
 
-/* memory_manager library
- *
- * manager:machine():memory()
- *
- * memory.banks[] - table of memory banks (k=tag, v=memory_bank)
- * memory.regions[] - table of memory regions (k=tag, v=memory_region)
- * memory.shares[] - table of memory shares (k=tag, v=memory_share)
- */
-
-	auto memory_type = sol().registry().new_usertype<memory_manager>("memory", "new", sol::no_constructor);
-	memory_type.set("banks", sol::property([this](memory_manager &mm) {
-			sol::table table = sol().create_table();
-			for (auto &bank : mm.banks())
-				table[bank.second->tag()] = bank.second.get();
-			return table;
-		}));
-	memory_type.set("regions", sol::property([this](memory_manager &mm) {
-			sol::table table = sol().create_table();
-			for (auto &region : mm.regions())
-				table[region.second->name()] = region.second.get();
-			return table;
-		}));
-	memory_type.set("shares", sol::property([this](memory_manager &mm) {
-			sol::table table = sol().create_table();
-			for (auto &share : mm.shares())
-				table[share.first] = share.second.get();
-			return table;
-		}));
+	auto mapentry_type = sol().registry().new_usertype<address_map_entry>("mapentry", sol::no_constructor);
+	mapentry_type["address_start"] = sol::readonly(&address_map_entry::m_addrstart);
+	mapentry_type["address_end"] = sol::readonly(&address_map_entry::m_addrend);
+	mapentry_type["address_mirror"] = sol::readonly(&address_map_entry::m_addrmirror);
+	mapentry_type["address_mask"] = sol::readonly(&address_map_entry::m_addrmask);
+	mapentry_type["mask"] = sol::readonly(&address_map_entry::m_mask);
+	mapentry_type["cswidth"] = sol::readonly(&address_map_entry::m_cswidth);
+	mapentry_type["read"] = sol::readonly(&address_map_entry::m_read);
+	mapentry_type["write"] = sol::readonly(&address_map_entry::m_write);
+	mapentry_type["share"] = sol::readonly(&address_map_entry::m_share);
+	mapentry_type["region"] = sol::readonly(&address_map_entry::m_region);
+	mapentry_type["region_offset"] = sol::readonly(&address_map_entry::m_rgnoffs);
 
 
-/* memory_region library
- *
- * manager:machine():memory().regions[region_tag]
- *
- * read/write by signedness u/i and bit-width 8/16/32/64:
- * region:read_*(addr)
- * region:write_*(addr, val)
- *
- * region.size
- */
-
-	auto region_type = sol().registry().new_usertype<memory_region>("region", "new", sol::no_constructor);
-	region_type.set("read_i8", &region_read<int8_t>);
-	region_type.set("read_u8", &region_read<uint8_t>);
-	region_type.set("read_i16", &region_read<int16_t>);
-	region_type.set("read_u16", &region_read<uint16_t>);
-	region_type.set("read_i32", &region_read<int32_t>);
-	region_type.set("read_u32", &region_read<uint32_t>);
-	region_type.set("read_i64", &region_read<int64_t>);
-	region_type.set("read_u64", &region_read<uint64_t>);
-	region_type.set("write_i8", &region_write<int8_t>);
-	region_type.set("write_u8", &region_write<uint8_t>);
-	region_type.set("write_i16", &region_write<int16_t>);
-	region_type.set("write_u16", &region_write<uint16_t>);
-	region_type.set("write_i32", &region_write<int32_t>);
-	region_type.set("write_u32", &region_write<uint32_t>);
-	region_type.set("write_i64", &region_write<int64_t>);
-	region_type.set("write_u64", &region_write<uint64_t>);
-	region_type.set("size", sol::property(&memory_region::bytes));
+	auto handler_data_type = sol().registry().new_usertype<map_handler_data>("handlerdata", sol::no_constructor);
+	handler_data_type["handlertype"] = sol::property([] (map_handler_data const &hd) { return hd.m_type; }); // can't use member pointer or won't be converted to string
+	handler_data_type["bits"] = sol::readonly(&map_handler_data::m_bits);
+	handler_data_type["name"] = sol::readonly(&map_handler_data::m_name);
+	handler_data_type["tag"] = sol::readonly(&map_handler_data::m_tag);
 
 
-/* memory_share library
- *
- * manager:machine():memory().shares[share_tag]
- *
- * read/write by signedness u/i and bit-width 8/16/32/64:
- * share:read_*(addr)
- * share:write_*(addr, val)
- *
- * region.size
-*/
+	auto memory_type = sol().registry().new_usertype<memory_manager>("memory", sol::no_constructor);
+	memory_type["banks"] = sol::property([] (memory_manager &mm) { return standard_tag_object_ptr_map<memory_bank>(mm.banks()); });
+	memory_type["regions"] = sol::property([] (memory_manager &mm) { return standard_tag_object_ptr_map<memory_region>(mm.regions()); });
+	memory_type["shares"] = sol::property([] (memory_manager &mm) { return standard_tag_object_ptr_map<memory_share>(mm.shares()); });
 
-	auto share_type = sol().registry().new_usertype<memory_share>("share", "new", sol::no_constructor);
-	share_type.set("read_i8", &share_read<int8_t>);
-	share_type.set("read_u8", &share_read<uint8_t>);
-	share_type.set("read_i16", &share_read<int16_t>);
-	share_type.set("read_u16", &share_read<uint16_t>);
-	share_type.set("read_i32", &share_read<int32_t>);
-	share_type.set("read_u32", &share_read<uint32_t>);
-	share_type.set("read_i64", &share_read<int64_t>);
-	share_type.set("read_u64", &share_read<uint64_t>);
-	share_type.set("write_i8", &share_write<int8_t>);
-	share_type.set("write_u8", &share_write<uint8_t>);
-	share_type.set("write_i16", &share_write<int16_t>);
-	share_type.set("write_u16", &share_write<uint16_t>);
-	share_type.set("write_i32", &share_write<int32_t>);
-	share_type.set("write_u32", &share_write<uint32_t>);
-	share_type.set("write_i64", &share_write<int64_t>);
-	share_type.set("write_u64", &share_write<uint64_t>);
-	share_type.set("size", sol::property(&memory_share::bytes));
+
+	auto bank_type = sol().registry().new_usertype<memory_bank>("membank", sol::no_constructor);
+	bank_type["tag"] = sol::property(&memory_bank::tag);
+	bank_type["entry"] = sol::property(&memory_bank::entry, &memory_bank::set_entry);
+
+
+	auto region_type = sol().registry().new_usertype<memory_region>("region", sol::no_constructor);
+	region_type["read_i8"] = &region_read<s8>;
+	region_type["read_u8"] = &region_read<u8>;
+	region_type["read_i16"] = &region_read<s16>;
+	region_type["read_u16"] = &region_read<u16>;
+	region_type["read_i32"] = &region_read<s32>;
+	region_type["read_u32"] = &region_read<u32>;
+	region_type["read_i64"] = &region_read<s64>;
+	region_type["read_u64"] = &region_read<u64>;
+	region_type["write_i8"] = &region_write<s8>;
+	region_type["write_u8"] = &region_write<u8>;
+	region_type["write_i16"] = &region_write<s16>;
+	region_type["write_u16"] = &region_write<u16>;
+	region_type["write_i32"] = &region_write<s32>;
+	region_type["write_u32"] = &region_write<u32>;
+	region_type["write_i64"] = &region_write<s64>;
+	region_type["write_u64"] = &region_write<u64>;
+	region_type["tag"] = sol::property(&memory_region::name);
+	region_type["size"] = sol::property(&memory_region::bytes);
+	region_type["length"] = sol::property([] (memory_region &r) { return r.bytes() / r.bytewidth(); });
+	region_type["endianness"] = sol::property(&memory_region::endianness);
+	region_type["bitwidth"] = sol::property(&memory_region::bitwidth);
+	region_type["bytewidth"] = sol::property(&memory_region::bytewidth);
+
+
+	auto share_type = sol().registry().new_usertype<memory_share>("share", sol::no_constructor);
+	share_type["read_i8"] = &share_read<s8>;
+	share_type["read_u8"] = &share_read<u8>;
+	share_type["read_i16"] = &share_read<s16>;
+	share_type["read_u16"] = &share_read<u16>;
+	share_type["read_i32"] = &share_read<s32>;
+	share_type["read_u32"] = &share_read<u32>;
+	share_type["read_i64"] = &share_read<s64>;
+	share_type["read_u64"] = &share_read<u64>;
+	share_type["write_i8"] = &share_write<s8>;
+	share_type["write_u8"] = &share_write<u8>;
+	share_type["write_i16"] = &share_write<s16>;
+	share_type["write_u16"] = &share_write<u16>;
+	share_type["write_i32"] = &share_write<s32>;
+	share_type["write_u32"] = &share_write<u32>;
+	share_type["write_i64"] = &share_write<s64>;
+	share_type["write_u64"] = &share_write<u64>;
+	share_type["tag"] = sol::property(&memory_share::name);
+	share_type["size"] = sol::property(&memory_share::bytes);
+	share_type["length"] = sol::property([] (memory_share &s) { return s.bytes() / s.bytewidth(); });
+	share_type["endianness"] = sol::property(&memory_share::endianness);
+	share_type["bitwidth"] = sol::property(&memory_share::bitwidth);
+	share_type["bytewidth"] = sol::property(&memory_share::bytewidth);
 
 }

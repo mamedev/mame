@@ -26,12 +26,17 @@ public:
 
 	// getters
 	running_machine &machine() const { return m_machine; }
+
+	std::string setup_working_directory();
+
 private:
 	void config_load(config_type cfg_type, util::xml::data_node const *parentnode);
 	void config_save(config_type cfg_type, util::xml::data_node *parentnode);
 
 	void options_extract();
 	int write_config(emu_options &options, const char *filename, const game_driver *gamedrv);
+
+	bool try_change_working_directory(std::string &working_directory, const std::string &subdir);;
 
 	// internal state
 	running_machine &   m_machine;                  // reference to our machine

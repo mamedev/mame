@@ -58,6 +58,7 @@ public:
 	void sftm(machine_config &config);
 	void bloodstm(machine_config &config);
 	void timekill(machine_config &config);
+	void pubball(machine_config &config);
 
 	void init_gtclasscp();
 	void init_shufshot();
@@ -76,6 +77,7 @@ public:
 	void init_timekill();
 	void init_gt3d();
 	void init_gt3dl();
+	void init_pubball();
 
 	DECLARE_READ_LINE_MEMBER(special_port_r);
 
@@ -190,6 +192,7 @@ protected:
 	virtual void logblit(const char *tag);
 	void update_interrupts(int fast);
 	void draw_raw(u16 *base, u16 color);
+	void draw_raw_widthpix(u16 *base, u16 color);
 	virtual void command_blit_raw();
 	virtual void command_shift_reg();
 	inline void draw_rle_fast(u16 *base, u16 color);
@@ -204,6 +207,7 @@ protected:
 	void sound_020_map(address_map &map);
 	void sound_map(address_map &map);
 	void timekill_map(address_map &map);
+	void pubball_map(address_map &map);
 };
 
 class drivedge_state : public itech32_state
@@ -278,7 +282,6 @@ public:
 		m_dips(*this, "DIPS"),
 		m_gun_x(*this, "GUNX%u", 1U),
 		m_gun_y(*this, "GUNY%u", 1U),
-		m_nvram_b(*this, "nvram_b"),
 		m_gun_timer(nullptr)
 	{ }
 
@@ -298,7 +301,6 @@ private:
 	required_ioport m_dips;
 	required_ioport_array<2> m_gun_x;
 	required_ioport_array<2> m_gun_y;
-	optional_shared_ptr<u16> m_nvram_b;
 	emu_timer *m_gun_timer;
 };
 

@@ -28,7 +28,6 @@ public:
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
 		m_spriteram(*this, "spriteram"),
-		m_protdata(*this, "protdata"),
 		m_bitmap_mode(*this, "bitmap_mode")
 	{ }
 
@@ -53,7 +52,6 @@ protected:
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_vregs;
 	required_shared_ptr<uint16_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_protdata;
 	optional_shared_ptr<uint16_t> m_bitmap_mode;
 
 	// driver init configuration

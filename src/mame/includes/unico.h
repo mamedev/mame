@@ -21,9 +21,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_oki(*this, "oki"),
 		m_leds(*this, "led%u", 0U),
-		m_vram(*this, "vram"),
-		m_scroll(*this, "scroll"),
-		m_spriteram(*this, "spriteram")
+		m_vram(*this, "vram", 0xc000, ENDIANNESS_BIG),
+		m_scroll(*this, "scroll", 22, ENDIANNESS_BIG),
+		m_spriteram(*this, "spriteram", 0x800, ENDIANNESS_BIG)
 	{ }
 
 	void burglarx(machine_config &config);
@@ -53,12 +53,12 @@ protected:
 	output_finder<2> m_leds;
 
 private:
-	required_shared_ptr<uint16_t> m_vram;
-	required_shared_ptr<uint16_t> m_scroll;
+	memory_share_creator<uint16_t> m_vram;
+	memory_share_creator<uint16_t> m_scroll;
 	tilemap_t *m_tilemap[3];
 	int m_sprites_scrolldx;
 	int m_sprites_scrolldy;
-	required_shared_ptr<uint16_t> m_spriteram;
+	memory_share_creator<uint16_t> m_spriteram;
 };
 
 class zeropnt_state : public unico_state

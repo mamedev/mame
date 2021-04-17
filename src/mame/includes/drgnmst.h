@@ -7,11 +7,10 @@
 
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/okim6295.h"
-#include "sound/3812intf.h"
-#include "sound/okim6295.h"
 #include "sound/ym2151.h"
 #include "emupal.h"
 #include "tilemap.h"
+#include "video/bufsprite.h"
 
 class drgnmst_base_state : public driver_device
 {
@@ -56,7 +55,7 @@ private:
 	required_shared_ptr<uint16_t> m_md_videoram;
 	required_shared_ptr<uint16_t> m_rowscrollram;
 	required_shared_ptr<uint16_t> m_vidregs2;
-	required_shared_ptr<uint16_t> m_spriteram;
+	required_device<buffered_spriteram16_device> m_spriteram;
 
 	/* devices */
 	void coin_w(uint16_t data);

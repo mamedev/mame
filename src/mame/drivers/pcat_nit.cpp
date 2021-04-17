@@ -98,10 +98,10 @@ public:
 		: pcat_base_state(mconfig, type, tag),
 			m_uart(*this, "ns16450_0"),
 			m_microtouch(*this, "microtouch"),
-		    m_bios_region(*this, "bios"),
-		    m_disk_bios_region(*this, "disk_bios"),
-		    m_bios_share(*this, "bios"),
-		    m_disk_bios_share(*this, "disk_bios")
+			m_bios_region(*this, "bios"),
+			m_disk_bios_region(*this, "disk_bios"),
+			m_bios_share(*this, "bios"),
+			m_disk_bios_share(*this, "disk_bios")
 	{ }
 
 	void bonanza(machine_config &config);

@@ -32,7 +32,7 @@ All rights reserved.
 /* Interrupt lines - used with g65816_set_irq_line() */
 enum
 {
-	G65816_LINE_NONE,
+	G65816_LINE_NONE, // FIXME: there is no such pin
 	G65816_LINE_IRQ,
 	G65816_LINE_NMI,
 	G65816_LINE_ABORT,

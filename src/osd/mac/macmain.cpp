@@ -17,6 +17,7 @@
 #include <unistd.h>
 
 // MAME headers
+#include "corestr.h"
 #include "osdepend.h"
 #include "emu.h"
 #include "emuopts.h"
@@ -58,7 +59,7 @@ mac_options::mac_options()
 	std::string ini_path(INI_PATH);
 	add_entries(mac_options::s_option_entries);
 	strreplace(ini_path,"APP_NAME", emulator_info::get_appname_lower());
-	set_default_value(MACOPTION_INIPATH, ini_path.c_str());
+	set_default_value(MACOPTION_INIPATH, std::move(ini_path));
 }
 
 //============================================================
@@ -231,6 +232,7 @@ void mac_osd_interface::init(running_machine &machine)
 	int bench = options().bench();
 	if (bench > 0)
 	{
+		options().set_value(OPTION_SLEEP, false, OPTION_PRIORITY_MAXIMUM);
 		options().set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
 		options().set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM);
 		options().set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM);

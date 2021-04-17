@@ -86,23 +86,9 @@ void sdl_event_manager::process_window_event(running_machine &machine, SDL_Event
 
 	switch (sdlevent.window.event)
 	{
-	case SDL_WINDOWEVENT_SHOWN:
-		m_has_focus = true;
-		break;
-
-	case SDL_WINDOWEVENT_CLOSE:
-		machine.schedule_exit();
-		break;
-
-	case SDL_WINDOWEVENT_LEAVE:
-		machine.ui_input().push_mouse_leave_event(window->target());
-		m_mouse_over_window = 0;
-		break;
-
 	case SDL_WINDOWEVENT_MOVED:
 		window->notify_changed();
 		m_focus_window = window;
-		m_has_focus = true;
 		break;
 
 	case SDL_WINDOWEVENT_RESIZED:
@@ -116,24 +102,28 @@ void sdl_event_manager::process_window_event(running_machine &machine, SDL_Event
 			//printf("event data1,data2 %d x %d %ld\n", event.window.data1, event.window.data2, sizeof(SDL_Event));
 			window->resize(sdlevent.window.data1, sdlevent.window.data2);
 		}
-		m_focus_window = window;
-		m_has_focus = true;
 		break;
 
 	case SDL_WINDOWEVENT_ENTER:
 		m_mouse_over_window = 1;
-		[[fallthrough]];
-	case SDL_WINDOWEVENT_FOCUS_GAINED:
-	case SDL_WINDOWEVENT_EXPOSED:
-	case SDL_WINDOWEVENT_MAXIMIZED:
-	case SDL_WINDOWEVENT_RESTORED:
-		m_focus_window = window;
-		m_has_focus = true;
 		break;
 
-	case SDL_WINDOWEVENT_MINIMIZED:
+	case SDL_WINDOWEVENT_LEAVE:
+		machine.ui_input().push_mouse_leave_event(window->target());
+		m_mouse_over_window = 0;
+		break;
+
+	case SDL_WINDOWEVENT_FOCUS_GAINED:
+		m_focus_window = window;
+		machine.ui_input().push_window_focus_event(window->target());
+		break;
+
 	case SDL_WINDOWEVENT_FOCUS_LOST:
-		m_has_focus = false;
+		machine.ui_input().push_window_defocus_event(window->target());
+		break;
+
+	case SDL_WINDOWEVENT_CLOSE:
+		machine.schedule_exit();
 		break;
 	}
 }
@@ -195,21 +185,11 @@ void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> 
 			// various dipswitches, and pressing them together with
 			// LCTRL will still press/toggle these dipswitches.
 
-			// LCTRL-F3 to toggle fullstretch
-		case IPT_OSD_2:
-			entry.configure_osd("TOGGLE_FULLSTRETCH", "Toggle Uneven stretch");
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F3, KEYCODE_LCONTROL);
-			break;
 			// add a Not lcrtl condition to the reset key
 		case IPT_UI_SOFT_RESET:
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F3, input_seq::not_code, KEYCODE_LCONTROL, input_seq::not_code, KEYCODE_LSHIFT);
 			break;
 
-			// LCTRL-F4 to toggle keep aspect
-		case IPT_OSD_4:
-			entry.configure_osd("TOGGLE_KEEP_ASPECT", "Toggle Keepaspect");
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F4, KEYCODE_LCONTROL);
-			break;
 			// add a Not lcrtl condition to the show gfx key
 		case IPT_UI_SHOW_GFX:
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F4, input_seq::not_code, KEYCODE_LCONTROL);

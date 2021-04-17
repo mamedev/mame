@@ -25,9 +25,11 @@
 #include "eigccx86.h"
 #elif defined(__ppc__) || defined (__PPC__) || defined(__ppc64__) || defined(__PPC64__)
 #include "eigccppc.h"
-#else
-#error "no matching assembler implementations found - please compile with NOASM=1"
+#elif defined(__arm__) || defined(__aarch64__)
+#include "eigccarm.h"
 #endif
+
+#include "eigcc.h"
 
 #elif defined(_MSC_VER)
 
@@ -36,10 +38,6 @@
 #endif
 
 #include "eivc.h"
-
-#else
-
-#error "no matching assembler implementations found - please compile with NOASM=1"
 
 #endif
 
@@ -56,7 +54,7 @@
 -------------------------------------------------*/
 
 #ifndef mul_32x32
-inline int64_t mul_32x32(int32_t a, int32_t b)
+constexpr int64_t mul_32x32(int32_t a, int32_t b)
 {
 	return int64_t(a) * int64_t(b);
 }
@@ -70,7 +68,7 @@ inline int64_t mul_32x32(int32_t a, int32_t b)
 -------------------------------------------------*/
 
 #ifndef mulu_32x32
-inline uint64_t mulu_32x32(uint32_t a, uint32_t b)
+constexpr uint64_t mulu_32x32(uint32_t a, uint32_t b)
 {
 	return uint64_t(a) * uint64_t(b);
 }
@@ -84,7 +82,7 @@ inline uint64_t mulu_32x32(uint32_t a, uint32_t b)
 -------------------------------------------------*/
 
 #ifndef mul_32x32_hi
-inline int32_t mul_32x32_hi(int32_t a, int32_t b)
+constexpr int32_t mul_32x32_hi(int32_t a, int32_t b)
 {
 	return uint32_t((int64_t(a) * int64_t(b)) >> 32);
 }
@@ -98,7 +96,7 @@ inline int32_t mul_32x32_hi(int32_t a, int32_t b)
 -------------------------------------------------*/
 
 #ifndef mulu_32x32_hi
-inline uint32_t mulu_32x32_hi(uint32_t a, uint32_t b)
+constexpr uint32_t mulu_32x32_hi(uint32_t a, uint32_t b)
 {
 	return uint32_t((uint64_t(a) * uint64_t(b)) >> 32);
 }
@@ -113,7 +111,7 @@ inline uint32_t mulu_32x32_hi(uint32_t a, uint32_t b)
 -------------------------------------------------*/
 
 #ifndef mul_32x32_shift
-inline int32_t mul_32x32_shift(int32_t a, int32_t b, uint8_t shift)
+constexpr int32_t mul_32x32_shift(int32_t a, int32_t b, uint8_t shift)
 {
 	return int32_t((int64_t(a) * int64_t(b)) >> shift);
 }
@@ -128,7 +126,7 @@ inline int32_t mul_32x32_shift(int32_t a, int32_t b, uint8_t shift)
 -------------------------------------------------*/
 
 #ifndef mulu_32x32_shift
-inline uint32_t mulu_32x32_shift(uint32_t a, uint32_t b, uint8_t shift)
+constexpr uint32_t mulu_32x32_shift(uint32_t a, uint32_t b, uint8_t shift)
 {
 	return uint32_t((uint64_t(a) * uint64_t(b)) >> shift);
 }
@@ -141,7 +139,7 @@ inline uint32_t mulu_32x32_shift(uint32_t a, uint32_t b, uint8_t shift)
 -------------------------------------------------*/
 
 #ifndef div_64x32
-inline int32_t div_64x32(int64_t a, int32_t b)
+constexpr int32_t div_64x32(int64_t a, int32_t b)
 {
 	return a / int64_t(b);
 }
@@ -154,7 +152,7 @@ inline int32_t div_64x32(int64_t a, int32_t b)
 -------------------------------------------------*/
 
 #ifndef divu_64x32
-inline uint32_t divu_64x32(uint64_t a, uint32_t b)
+constexpr uint32_t divu_64x32(uint64_t a, uint32_t b)
 {
 	return a / uint64_t(b);
 }
@@ -168,10 +166,10 @@ inline uint32_t divu_64x32(uint64_t a, uint32_t b)
 -------------------------------------------------*/
 
 #ifndef div_64x32_rem
-inline int32_t div_64x32_rem(int64_t a, int32_t b, int32_t *remainder)
+inline int32_t div_64x32_rem(int64_t a, int32_t b, int32_t &remainder)
 {
-	int32_t const res = div_64x32(a, b);
-	*remainder = a - (int64_t(b) * res);
+	int32_t const res(div_64x32(a, b));
+	remainder = a - (int64_t(b) * res);
 	return res;
 }
 #endif
@@ -184,10 +182,10 @@ inline int32_t div_64x32_rem(int64_t a, int32_t b, int32_t *remainder)
 -------------------------------------------------*/
 
 #ifndef divu_64x32_rem
-inline uint32_t divu_64x32_rem(uint64_t a, uint32_t b, uint32_t *remainder)
+inline uint32_t divu_64x32_rem(uint64_t a, uint32_t b, uint32_t &remainder)
 {
-	uint32_t const res = divu_64x32(a, b);
-	*remainder = a - (uint64_t(b) * res);
+	uint32_t const res(divu_64x32(a, b));
+	remainder = a - (uint64_t(b) * res);
 	return res;
 }
 #endif
@@ -200,7 +198,7 @@ inline uint32_t divu_64x32_rem(uint64_t a, uint32_t b, uint32_t *remainder)
 -------------------------------------------------*/
 
 #ifndef div_32x32_shift
-inline int32_t div_32x32_shift(int32_t a, int32_t b, uint8_t shift)
+constexpr int32_t div_32x32_shift(int32_t a, int32_t b, uint8_t shift)
 {
 	return (int64_t(a) << shift) / int64_t(b);
 }
@@ -214,7 +212,7 @@ inline int32_t div_32x32_shift(int32_t a, int32_t b, uint8_t shift)
 -------------------------------------------------*/
 
 #ifndef divu_32x32_shift
-inline uint32_t divu_32x32_shift(uint32_t a, uint32_t b, uint8_t shift)
+constexpr uint32_t divu_32x32_shift(uint32_t a, uint32_t b, uint8_t shift)
 {
 	return (uint64_t(a) << shift) / uint64_t(b);
 }
@@ -227,7 +225,7 @@ inline uint32_t divu_32x32_shift(uint32_t a, uint32_t b, uint8_t shift)
 -------------------------------------------------*/
 
 #ifndef mod_64x32
-inline int32_t mod_64x32(int64_t a, int32_t b)
+constexpr int32_t mod_64x32(int64_t a, int32_t b)
 {
 	return a - (b * div_64x32(a, b));
 }
@@ -240,7 +238,7 @@ inline int32_t mod_64x32(int64_t a, int32_t b)
 -------------------------------------------------*/
 
 #ifndef modu_64x32
-inline uint32_t modu_64x32(uint64_t a, uint32_t b)
+constexpr uint32_t modu_64x32(uint64_t a, uint32_t b)
 {
 	return a - (b * divu_64x32(a, b));
 }
@@ -253,7 +251,7 @@ inline uint32_t modu_64x32(uint64_t a, uint32_t b)
 -------------------------------------------------*/
 
 #ifndef recip_approx
-inline float recip_approx(float value)
+constexpr float recip_approx(float value)
 {
 	return 1.0f / value;
 }
@@ -266,7 +264,7 @@ inline float recip_approx(float value)
 -------------------------------------------------*/
 
 #ifndef mul_64x64
-inline int64_t mul_64x64(int64_t a, int64_t b, int64_t *hi)
+inline int64_t mul_64x64(int64_t a, int64_t b, int64_t &hi)
 {
 	uint64_t const a_hi = uint64_t(a) >> 32;
 	uint64_t const b_hi = uint64_t(b) >> 32;
@@ -279,13 +277,13 @@ inline int64_t mul_64x64(int64_t a, int64_t b, int64_t *hi)
 	uint64_t const ab_hi = a_hi * b_hi;
 	uint64_t const carry = ((ab_lo >> 32) + uint32_t(ab_m1) + uint32_t(ab_m2)) >> 32;
 
-	*hi = ab_hi + (ab_m1 >> 32) + (ab_m2 >> 32) + carry;
+	hi = ab_hi + (ab_m1 >> 32) + (ab_m2 >> 32) + carry;
 
 	// adjust for sign
 	if (a < 0)
-		*hi -= b;
+		hi -= b;
 	if (b < 0)
-		*hi -= a;
+		hi -= a;
 
 	return ab_lo + (ab_m1 << 32) + (ab_m2 << 32);
 }
@@ -298,7 +296,7 @@ inline int64_t mul_64x64(int64_t a, int64_t b, int64_t *hi)
 -------------------------------------------------*/
 
 #ifndef mulu_64x64
-inline uint64_t mulu_64x64(uint64_t a, uint64_t b, uint64_t *hi)
+inline uint64_t mulu_64x64(uint64_t a, uint64_t b, uint64_t &hi)
 {
 	uint64_t const a_hi = uint32_t(a >> 32);
 	uint64_t const b_hi = uint32_t(b >> 32);
@@ -311,9 +309,39 @@ inline uint64_t mulu_64x64(uint64_t a, uint64_t b, uint64_t *hi)
 	uint64_t const ab_hi = a_hi * b_hi;
 	uint64_t const carry = ((ab_lo >> 32) + uint32_t(ab_m1) + uint32_t(ab_m2)) >> 32;
 
-	*hi = ab_hi + (ab_m1 >> 32) + (ab_m2 >> 32) + carry;
+	hi = ab_hi + (ab_m1 >> 32) + (ab_m2 >> 32) + carry;
 
 	return ab_lo + (ab_m1 << 32) + (ab_m2 << 32);
+}
+#endif
+
+
+/*-------------------------------------------------
+    addu_32x32_co - perform an unsigned 32 bit + 32
+    bit addition and return the result with carry
+    out
+-------------------------------------------------*/
+
+#ifndef addu_32x32_co
+inline bool addu_32x32_co(uint32_t a, uint32_t b, uint32_t &sum)
+{
+	sum = a + b;
+	return (a > sum) || (b > sum);
+}
+#endif
+
+
+/*-------------------------------------------------
+    addu_64x64_co - perform an unsigned 64 bit + 64
+    bit addition and return the result with carry
+    out
+-------------------------------------------------*/
+
+#ifndef addu_64x64_co
+inline bool addu_64x64_co(uint64_t a, uint64_t b, uint64_t &sum)
+{
+	sum = a + b;
+	return (a > sum) || (b > sum);
 }
 #endif
 
@@ -360,15 +388,10 @@ inline uint8_t count_leading_ones(uint32_t val)
 -------------------------------------------------*/
 
 #ifndef population_count_32
-#if defined(__NetBSD__)
-#define population_count_32 popcount32
-#else
 inline unsigned population_count_32(uint32_t val)
 {
-#if defined(__GNUC__)
-	// uses CPU feature if available, otherwise falls back to implementation similar to what follows
-	static_assert(sizeof(val) == sizeof(unsigned), "expected 32-bit unsigned int");
-	return unsigned(__builtin_popcount(static_cast<unsigned>(val)));
+#if defined(__NetBSD__)
+	return popcount32(val);
 #else
 	// optimal Hamming weight assuming fast 32*32->32
 	constexpr uint32_t m1(0x55555555);
@@ -382,7 +405,6 @@ inline unsigned population_count_32(uint32_t val)
 #endif
 }
 #endif
-#endif
 
 
 /*-------------------------------------------------
@@ -391,15 +413,10 @@ inline unsigned population_count_32(uint32_t val)
 -------------------------------------------------*/
 
 #ifndef population_count_64
-#if defined(__NetBSD__)
-#define population_count_64 popcount64
-#else
 inline unsigned population_count_64(uint64_t val)
 {
-#if defined(__GNUC__)
-	// uses CPU feature if available, otherwise falls back to implementation similar to what follows
-	static_assert(sizeof(val) == sizeof(unsigned long long), "expected 64-bit unsigned long long int");
-	return unsigned(__builtin_popcountll(static_cast<unsigned long long>(val)));
+#if defined(__NetBSD__)
+	return popcount64(val);
 #else
 	// guess that architectures with 64-bit pointers have 64-bit multiplier
 	if (sizeof(void *) >= sizeof(uint64_t))
@@ -421,7 +438,6 @@ inline unsigned population_count_64(uint64_t val)
 	}
 #endif
 }
-#endif
 #endif
 
 

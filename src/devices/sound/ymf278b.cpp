@@ -50,12 +50,23 @@
 
 #include "emu.h"
 #include "ymf278b.h"
-#include "ymf262.h"
 
 #include <algorithm>
 
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+
+
+// Using the nominal datasheet frequency of 33.868MHz, the output of
+// the chip will be clock/768 = 44.1kHz. However, the FM engine is
+// clocked internally at clock/(19*36), or 49.515kHz, so the FM output
+// needs to be downsampled. The calculations below produce the fractional
+// number of extra FM samples we need to consume for each output sample,
+// as a 0.24 fixed point fraction.
+static constexpr double NOMINAL_CLOCK = 33868800;
+static constexpr double NOMINAL_FM_RATE = NOMINAL_CLOCK / double(ymopl4_registers::DEFAULT_PRESCALE * ymopl4_registers::OPERATORS);
+static constexpr double NOMINAL_OUTPUT_RATE = NOMINAL_CLOCK / 768.0;
+static constexpr uint32_t FM_STEP = uint32_t((NOMINAL_FM_RATE / NOMINAL_OUTPUT_RATE - 1.0) * double(1 << 24));
 
 
 /**************************************************************************/
@@ -221,17 +232,6 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	YMF278BSlot *slot;
 	int16_t sample = 0;
 	int32_t *mixp;
-	int32_t vl, vr;
-
-	ymf262_update_one(m_ymf262, outputs);
-	stream_buffer::sample_t fvl = stream_buffer::sample_t(m_mix_level[m_fm_l]) * (1.0 / 65536.0);
-	stream_buffer::sample_t fvr = stream_buffer::sample_t(m_mix_level[m_fm_r]) * (1.0 / 65536.0);
-	for (i = 0; i < outputs[0].samples(); i++)
-	{
-		// DO2 mixing
-		outputs[0].put(i, outputs[0].get(i) * fvl);
-		outputs[1].put(i, outputs[1].get(i) * fvr);
-	}
 
 	std::fill(m_mix_buffer.begin(), m_mix_buffer.end(), 0);
 
@@ -314,29 +314,46 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	}
 
 	mixp = &m_mix_buffer[0];
-	vl = m_mix_level[m_pcm_l];
-	vr = m_mix_level[m_pcm_r];
+	stream_buffer::sample_t wtl = stream_buffer::sample_t(m_mix_level[m_pcm_l]) / (65536.0f * 32768.0f);
+	stream_buffer::sample_t wtr = stream_buffer::sample_t(m_mix_level[m_pcm_r]) / (65536.0f * 32768.0f);
+	stream_buffer::sample_t fml = stream_buffer::sample_t(m_mix_level[m_fm_l]) / (65536.0f * 32768.0f);
+	stream_buffer::sample_t fmr = stream_buffer::sample_t(m_mix_level[m_fm_r]) / (65536.0f * 32768.0f);
 	for (i = 0; i < outputs[0].samples(); i++)
 	{
-		outputs[0].add_int(i, (*mixp++ * vl) >> 16, 32768);
-		outputs[1].add_int(i, (*mixp++ * vr) >> 16, 32768);
+		// the FM_STEP value is the fractional number of extra samples consumed per
+		// output sample; when this overflows, we need to clock the FM engine an
+		// extra time; since the PCM side of the chip doesn't do interpolation, I'm
+		// assuming this resampling stage doesn't either
+		m_fm_pos += FM_STEP;
+		if (BIT(m_fm_pos, 24))
+		{
+			m_fm.clock(fm_engine::ALL_CHANNELS);
+			m_fm_pos &= 0xffffff;
+		}
+
+		// clock the system
+		m_fm.clock(fm_engine::ALL_CHANNELS);
+
+		// update the FM content; clipping is unknown
+		s32 sums[fm_engine::OUTPUTS] = { 0 };
+		m_fm.output(sums, 1, 32767, fm_engine::ALL_CHANNELS);
+
+		// DO2 output: mixed FM channels 0+1 and wavetable channels 0+1
+		outputs[0].put(i, stream_buffer::sample_t(*mixp++) * wtl + stream_buffer::sample_t(sums[0]) * fml);
+		outputs[1].put(i, stream_buffer::sample_t(*mixp++) * wtr + stream_buffer::sample_t(sums[1]) * fmr);
+
+		// DO0 output: FM channels 2+3 only
+		outputs[2].put_int(i, sums[2], 32768);
+		outputs[3].put_int(i, sums[3], 32768);
+
+		// DO1 output: wavetable channels 2+3 only
 		outputs[4].put_int(i, *mixp++, 32768);
 		outputs[5].put_int(i, *mixp++, 32768);
 	}
 }
 
-void ymf278b_device::irq_check()
-{
-	int prev_line = m_irq_line;
-	m_irq_line = m_current_irq ? 1 : 0;
-	if (m_irq_line != prev_line && !m_irq_handler.isnull())
-		m_irq_handler(m_irq_line);
-}
-
 enum
 {
-	TIMER_A = 0,
-	TIMER_B,
 	TIMER_BUSY_CLEAR,
 	TIMER_LD_CLEAR
 };
@@ -345,28 +362,12 @@ void ymf278b_device::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	switch(id)
 	{
-	case TIMER_A:
-		if(!(m_enable & 0x40))
-		{
-			m_current_irq |= 0x40;
-			irq_check();
-		}
-		break;
-
-	case TIMER_B:
-		if(!(m_enable & 0x20))
-		{
-			m_current_irq |= 0x20;
-			irq_check();
-		}
-		break;
-
 	case TIMER_BUSY_CLEAR:
-		m_status_busy = 0;
+		m_fm.set_reset_status(0, STATUS_BUSY);
 		break;
 
 	case TIMER_LD_CLEAR:
-		m_status_ld = 0;
+		m_fm.set_reset_status(0, STATUS_LD);
 		break;
 	}
 }
@@ -374,92 +375,7 @@ void ymf278b_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 /**************************************************************************/
 
-void ymf278b_device::A_w(uint8_t reg, uint8_t data)
-{
-	// FM register array 0 (compatible with YMF262)
-	switch(reg)
-	{
-		// LSI TEST
-		case 0x00:
-		case 0x01:
-			break;
-
-		// timer a count
-		case 0x02:
-			if (data != m_timer_a_count)
-			{
-				m_timer_a_count = data;
-
-				// change period, ~80.8us * t
-				if (m_enable & 1)
-					m_timer_a->adjust(m_timer_a->remaining(), 0, m_timer_base * (256-data) * 4);
-			}
-			break;
-
-		// timer b count
-		case 0x03:
-			if (data != m_timer_b_count)
-			{
-				m_timer_b_count = data;
-
-				// change period, ~323.1us * t
-				if (m_enable & 2)
-					m_timer_b->adjust(m_timer_b->remaining(), 0, m_timer_base * (256-data) * 16);
-			}
-			break;
-
-		// timer control
-		case 0x04:
-			if(data & 0x80)
-				m_current_irq = 0;
-			else
-			{
-				// reset timers
-				if((m_enable ^ data) & 1)
-				{
-					attotime period = (data & 1) ? m_timer_base * (256-m_timer_a_count) * 4 : attotime::never;
-					m_timer_a->adjust(period, 0, period);
-				}
-				if((m_enable ^ data) & 2)
-				{
-					attotime period = (data & 2) ? m_timer_base * (256-m_timer_b_count) * 16 : attotime::never;
-					m_timer_b->adjust(period, 0, period);
-				}
-
-				m_enable = data;
-				m_current_irq &= ~data;
-			}
-			irq_check();
-			break;
-
-		default:
-			logerror("YMF278B:  Port A write %02x, %02x\n", reg, data);
-			break;
-	}
-}
-
-void ymf278b_device::B_w(uint8_t reg, uint8_t data)
-{
-	// FM register array 1 (compatible with YMF262)
-	switch(reg)
-	{
-		// LSI TEST
-		case 0x00:
-		case 0x01:
-			break;
-
-		// expansion register (NEW2/NEW)
-		case 0x05:
-			m_exp = data;
-			break;
-
-		default:
-			logerror("YMF278B:  Port B write %02x, %02x\n", reg, data);
-			break;
-	}
-}
-
-void ymf278b_device::retrigger_note(YMF278BSlot *slot)
+void ymf278b_device::retrigger_sample(YMF278BSlot *slot)
 {
 	// activate channel
 	if (slot->octave != 8)
@@ -515,13 +431,13 @@ void ymf278b_device::C_w(uint8_t reg, uint8_t data)
 					C_w(8 + snum + (i-2) * 24, p[i]);
 
 				// status register LD bit is on for approx 300us
-				m_status_ld = 1;
+				m_fm.set_reset_status(STATUS_LD, 0);
 				period = clocks_to_attotime(10);
 				m_timer_ld->adjust(period);
 
 				// retrigger if key is on
 				if (slot->KEY_ON)
-					retrigger_note(slot);
+					retrigger_sample(slot);
 				else if (slot->active)
 				{
 					// deactivate channel
@@ -589,7 +505,7 @@ void ymf278b_device::C_w(uint8_t reg, uint8_t data)
 						break;
 					}
 
-					retrigger_note(slot);
+					retrigger_sample(slot);
 				}
 				else if (slot->active)
 				{
@@ -689,29 +605,32 @@ void ymf278b_device::C_w(uint8_t reg, uint8_t data)
 void ymf278b_device::timer_busy_start(int is_pcm)
 {
 	// status register BUSY bit is on for 56(FM) or 88(PCM) cycles
-	m_status_busy = 1;
+	m_fm.set_reset_status(STATUS_BUSY, 0);
 	m_timer_busy->adjust(attotime::from_hz(m_clock / (is_pcm ? 88 : 56)));
 }
 
 void ymf278b_device::write(offs_t offset, u8 data)
 {
-	switch (offset)
+	uint32_t old;
+	switch (offset & 7)
 	{
 		case 0:
 		case 2:
 			timer_busy_start(0);
 			m_port_AB = data;
-			m_lastport = offset>>1 & 1;
-			ymf262_write(m_ymf262, offset, data);
+			m_lastport = BIT(offset, 1);
 			break;
 
 		case 1:
 		case 3:
 			timer_busy_start(0);
-			if (m_lastport) B_w(m_port_AB, data);
-			else A_w(m_port_AB, data);
-			m_last_fm_data = data;
-			ymf262_write(m_ymf262, offset, data);
+			old = m_fm.regs().new2flag();
+			m_fm.write(m_port_AB | (m_lastport << 8), data);
+
+			// if the new2 flag is turned on, the next status read will set bit 1
+			// but only for the first status read after new2 is set
+			if (old == 0 && m_fm.regs().new2flag() != 0)
+				m_next_status_id = true;
 			break;
 
 		case 4:
@@ -721,7 +640,7 @@ void ymf278b_device::write(offs_t offset, u8 data)
 
 		case 5:
 			// PCM regs are only accessible if NEW2 is set
-			if (~m_exp & 2)
+			if (!m_fm.regs().new2flag())
 				break;
 
 			m_stream->update();
@@ -741,32 +660,45 @@ u8 ymf278b_device::read(offs_t offset)
 {
 	uint8_t ret = 0;
 
-	switch (offset)
+	switch (offset & 7)
 	{
 		// status register
 		case 0:
-		{
-			// bits 0 and 1 are only valid if NEW2 is set
-			uint8_t newbits = 0;
-			if (m_exp & 2)
-				newbits = (m_status_ld << 1) | m_status_busy;
 
-			ret = newbits | m_current_irq | (m_irq_line ? 0x80 : 0x00);
+			// first status read after initialization returns a chip ID, which
+			// varies based on the "new" flags, indicating the mode
+			if (m_next_status_id)
+			{
+				if (m_fm.regs().new2flag())
+					ret = 0x02;
+				else if (m_fm.regs().newflag())
+					ret = 0x00;
+				else
+					ret = 0x06;
+				m_next_status_id = false;
+			}
+			else
+			{
+				ret = m_fm.status();
+
+				// if new2 flag is not set, we're in OPL2 or OPL3 mode
+				if (!m_fm.regs().new2flag())
+					ret &= ~(STATUS_BUSY | STATUS_LD);
+			}
 			break;
-		}
 
 		// FM regs can be read too (on contrary to what the datasheet says)
 		case 1:
 		case 3:
 			// but they're not implemented here yet
 			// This may be incorrect, but it makes the mbwave moonsound detection in msx drivers pass.
-			ret = m_last_fm_data;
+			ret = m_fm.regs().read(m_port_AB | (m_lastport << 8));
 			break;
 
 		// PCM regs
 		case 5:
 			// only accessible if NEW2 is set
-			if (~m_exp & 2)
+			if (!m_fm.regs().new2flag())
 				break;
 
 			switch (m_port_C)
@@ -798,15 +730,6 @@ u8 ymf278b_device::read(offs_t offset)
 /**************************************************************************/
 
 //-------------------------------------------------
-//  device_post_load - device-specific post load
-//-------------------------------------------------
-
-void ymf278b_device::device_post_load()
-{
-	ymf262_post_load(m_ymf262);
-}
-
-//-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
@@ -815,9 +738,6 @@ void ymf278b_device::device_reset()
 	int i;
 
 	// clear registers
-	for (i = 0; i <= 4; i++)
-		A_w(i, 0);
-	B_w(5, 0);
 	for (i = 0; i < 8; i++)
 		C_w(i, 0);
 	for (i = 0xff; i >= 8; i--)
@@ -826,6 +746,7 @@ void ymf278b_device::device_reset()
 
 	m_port_AB = m_port_C = 0;
 	m_lastport = 0;
+	m_next_status_id = true;
 	m_memadr = 0;
 
 	// init/silence channels
@@ -851,23 +772,10 @@ void ymf278b_device::device_reset()
 		compute_envelope(slot);
 	}
 
-	m_timer_a->reset();
-	m_timer_b->reset();
-	m_timer_busy->reset();  m_status_busy = 0;
-	m_timer_ld->reset();    m_status_ld = 0;
+	m_timer_busy->reset();
+	m_timer_ld->reset();
 
-	m_irq_line = 0;
-	m_current_irq = 0;
-	if (!m_irq_handler.isnull())
-		m_irq_handler(0);
-
-	ymf262_reset_chip(m_ymf262);
-}
-
-void ymf278b_device::device_stop()
-{
-	ymf262_shutdown(m_ymf262);
-	m_ymf262 = nullptr;
+	m_fm.reset();
 }
 
 void ymf278b_device::device_clock_changed()
@@ -875,18 +783,13 @@ void ymf278b_device::device_clock_changed()
 	int old_rate = m_rate;
 	m_clock = clock();
 	m_rate = m_clock/768;
+	m_fm_pos = 0;
 
 	if (m_rate > old_rate)
 	{
 		m_mix_buffer.resize(m_rate*4,0);
 	}
 	m_stream->set_sample_rate(m_rate);
-
-	m_timer_base = m_clock ? attotime::from_hz(m_clock) * (19 * 36) : attotime::zero;
-
-	// YMF262 related
-
-	ymf262_clock_changed(m_ymf262, clock(), m_rate);
 }
 
 void ymf278b_device::rom_bank_updated()
@@ -929,22 +832,15 @@ void ymf278b_device::register_save_state()
 	save_item(NAME(m_wavetblhdr));
 	save_item(NAME(m_memmode));
 	save_item(NAME(m_memadr));
-	save_item(NAME(m_status_busy));
-	save_item(NAME(m_status_ld));
-	save_item(NAME(m_exp));
 	save_item(NAME(m_fm_l));
 	save_item(NAME(m_fm_r));
+	save_item(NAME(m_fm_pos));
 	save_item(NAME(m_pcm_l));
 	save_item(NAME(m_pcm_r));
-	save_item(NAME(m_timer_a_count));
-	save_item(NAME(m_timer_b_count));
-	save_item(NAME(m_enable));
-	save_item(NAME(m_current_irq));
-	save_item(NAME(m_irq_line));
 	save_item(NAME(m_port_AB));
 	save_item(NAME(m_port_C));
 	save_item(NAME(m_lastport));
-	save_item(NAME(m_last_fm_data));
+	save_item(NAME(m_next_status_id));
 
 	for (i = 0; i < 24; ++i)
 	{
@@ -996,11 +892,8 @@ void ymf278b_device::device_start()
 
 	m_clock = clock();
 	m_rate = m_clock / 768;
-	m_irq_handler.resolve();
+	m_fm_pos = 0;
 
-	m_timer_base = m_clock ? attotime::from_hz(m_clock) * (19*36) : attotime::zero;
-	m_timer_a = timer_alloc(TIMER_A);
-	m_timer_b = timer_alloc(TIMER_B);
 	m_timer_busy = timer_alloc(TIMER_BUSY_CLEAR);
 	m_timer_ld = timer_alloc(TIMER_LD_CLEAR);
 
@@ -1037,16 +930,7 @@ void ymf278b_device::device_start()
 	register_save_state();
 
 	// YMF262 related
-
-	/* stream system initialize */
-	m_ymf262 = ymf278b_init(this, clock(), m_rate);
-	if (!m_ymf262)
-		throw emu_fatalerror("ymf278b_device(%s): Error creating YMF262 chip", tag());
-
-	/* YMF262 setup */
-	ymf262_set_timer_handler (m_ymf262, ymf278b_device::static_timer_handler, this);
-	ymf262_set_irq_handler   (m_ymf262, ymf278b_device::static_irq_handler, this);
-	ymf262_set_update_handler(m_ymf262, ymf278b_device::static_update_request, this);
+	m_fm.save(*this);
 }
 
 
@@ -1056,7 +940,6 @@ ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, YMF278B, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)
-	, m_irq_handler(*this)
-	, m_last_fm_data(0)
+	, m_fm(*this)
 {
 }

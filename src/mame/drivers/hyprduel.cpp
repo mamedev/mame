@@ -49,6 +49,8 @@ fix comms so it boots, it's a bit of a hack for hyperduel at the moment ;-)
 #include "speaker.h"
 
 
+namespace {
+
 #define RASTER_LINES 262
 #define FIRST_VISIBLE_LINE 0
 #define LAST_VISIBLE_LINE 223
@@ -58,7 +60,6 @@ class hyprduel_state : public driver_device
 public:
 	hyprduel_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_irq_enable(*this, "irq_enable")
 		, m_sharedram(*this, "sharedram%u", 1)
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "sub")
@@ -68,22 +69,22 @@ public:
 	void magerror(machine_config &config);
 	void hyprduel(machine_config &config);
 
-	void init_magerror();
 	void init_hyprduel();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
-	uint8_t irq_cause_r();
-	void irq_cause_w(uint8_t data);
 	void subcpu_control_w(uint16_t data);
 	uint16_t hyprduel_cpusync_trigger1_r(offs_t offset);
 	void hyprduel_cpusync_trigger1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t hyprduel_cpusync_trigger2_r(offs_t offset);
 	void hyprduel_cpusync_trigger2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	DECLARE_MACHINE_START(hyprduel);
-	DECLARE_MACHINE_START(magerror);
 	TIMER_CALLBACK_MEMBER(vblank_end_callback);
-	DECLARE_WRITE_LINE_MEMBER(vdp_blit_end_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	void hyprduel_int_enable_w(uint8_t data);
+	void magerror_int_enable_w(uint8_t data);
 
 	void i4220_config(machine_config &config);
 
@@ -92,26 +93,18 @@ private:
 	void magerror_map(address_map &map);
 	void magerror_map2(address_map &map);
 
-	virtual void machine_reset() override;
-
 	/* memory pointers */
-	required_shared_ptr<uint16_t> m_irq_enable;
 	required_shared_ptr_array<uint16_t, 3> m_sharedram;
 
 	/* misc */
 	emu_timer *m_vblank_end_timer;
-	int       m_blitter_bit;
-	int       m_requested_int;
 	int       m_subcpu_resetline;
 	int       m_cpu_trigger;
-	int       m_int_num;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<imagetek_i4220_device> m_vdp;
-
-	void update_irq_state(  );
 };
 
 
@@ -119,16 +112,9 @@ private:
                                 Interrupts
 ***************************************************************************/
 
-void hyprduel_state::update_irq_state(  )
-{
-	int irq = m_requested_int & ~*m_irq_enable;
-
-	m_maincpu->set_input_line(3, (irq & m_int_num) ? ASSERT_LINE : CLEAR_LINE);
-}
-
 TIMER_CALLBACK_MEMBER(hyprduel_state::vblank_end_callback)
 {
-	m_requested_int &= ~param;
+	m_vdp->clear_irq(param);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(hyprduel_state::interrupt)
@@ -137,31 +123,27 @@ TIMER_DEVICE_CALLBACK_MEMBER(hyprduel_state::interrupt)
 
 	if (line == 0) /* TODO: fix this! */
 	{
-		m_requested_int |= 0x01;        /* vblank */
-		m_requested_int |= 0x20;
+		m_vdp->set_irq(0);      /* vblank */
+		m_vdp->set_irq(5);
 		m_maincpu->set_input_line(2, HOLD_LINE);
 		/* the duration is a guess */
-		m_vblank_end_timer->adjust(attotime::from_usec(2500), 0x20);
+		m_vblank_end_timer->adjust(attotime::from_usec(2500), 5);
 	}
 	else
-		m_requested_int |= 0x12;        /* hsync */
-
-	update_irq_state();
+	{
+		m_vdp->set_irq(1);      /* hsync */
+		m_vdp->set_irq(4);
+	}
 }
 
-uint8_t hyprduel_state::irq_cause_r()
+void hyprduel_state::hyprduel_int_enable_w(u8 data)
 {
-	return m_requested_int;
+	m_vdp->irq_enable_w(data | 0xfd);
 }
 
-void hyprduel_state::irq_cause_w(uint8_t data)
+void hyprduel_state::magerror_int_enable_w(u8 data)
 {
-	if (data == m_int_num)
-		m_requested_int &= ~(m_int_num & ~*m_irq_enable);
-	else
-		m_requested_int &= ~(data & *m_irq_enable);
-
-	update_irq_state();
+	m_vdp->irq_enable_w(data | 0xfe);
 }
 
 
@@ -247,12 +229,6 @@ void hyprduel_state::hyprduel_cpusync_trigger2_w(offs_t offset, uint16_t data, u
 	}
 }
 
-WRITE_LINE_MEMBER(hyprduel_state::vdp_blit_end_w)
-{
-	m_requested_int |= 1 << m_blitter_bit;
-	update_irq_state();
-}
-
 /***************************************************************************
                                 Memory Maps
 ***************************************************************************/
@@ -261,8 +237,7 @@ void hyprduel_state::hyprduel_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x400000, 0x47ffff).m(m_vdp, FUNC(imagetek_i4220_device::v2_map));
-	map(0x4788a3, 0x4788a3).rw(FUNC(hyprduel_state::irq_cause_r), FUNC(hyprduel_state::irq_cause_w));   /* IRQ Cause,Acknowledge */
-	map(0x4788a4, 0x4788a5).ram().share("irq_enable");      /* IRQ Enable */
+	map(0x4788a5, 0x4788a5).w(FUNC(hyprduel_state::hyprduel_int_enable_w));
 	map(0x800000, 0x800001).w(FUNC(hyprduel_state::subcpu_control_w));
 	map(0xc00000, 0xc07fff).ram().share("sharedram1");
 	map(0xe00000, 0xe00001).portr("SERVICE").nopw();
@@ -294,8 +269,7 @@ void hyprduel_state::magerror_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x400000, 0x400001).w(FUNC(hyprduel_state::subcpu_control_w));
 	map(0x800000, 0x87ffff).m(m_vdp, FUNC(imagetek_i4220_device::v2_map));
-	map(0x8788a3, 0x8788a3).rw(FUNC(hyprduel_state::irq_cause_r), FUNC(hyprduel_state::irq_cause_w));   /* IRQ Cause, Acknowledge */
-	map(0x8788a4, 0x8788a5).ram().share("irq_enable");      /* IRQ Enable */
+	map(0x8788a5, 0x8788a5).w(FUNC(hyprduel_state::magerror_int_enable_w));
 	map(0xc00000, 0xc1ffff).ram().share("sharedram1");
 	map(0xe00000, 0xe00001).portr("SERVICE").nopw();
 	map(0xe00002, 0xe00003).portr("DSW");
@@ -418,16 +392,10 @@ void hyprduel_state::machine_reset()
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_subcpu_resetline = 1;
 	m_cpu_trigger = 0;
-
-	m_requested_int = 0x00;
-	m_blitter_bit = 2;
-	*m_irq_enable = 0xff;
 }
 
-MACHINE_START_MEMBER(hyprduel_state,hyprduel)
+void hyprduel_state::machine_start()
 {
-	save_item(NAME(m_blitter_bit));
-	save_item(NAME(m_requested_int));
 	save_item(NAME(m_subcpu_resetline));
 	save_item(NAME(m_cpu_trigger));
 
@@ -437,7 +405,8 @@ MACHINE_START_MEMBER(hyprduel_state,hyprduel)
 void hyprduel_state::i4220_config(machine_config &config)
 {
 	I4220(config, m_vdp, XTAL(26'666'000));
-	m_vdp->blit_irq_cb().set(FUNC(hyprduel_state::vdp_blit_end_w));
+	m_vdp->irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);
+	m_vdp->set_blit_irq_level(2);
 	m_vdp->set_spriteram_buffered(true); // sprites are 1 frame delayed
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -460,8 +429,6 @@ void hyprduel_state::hyprduel(machine_config &config)
 
 	M68000(config, m_subcpu, 20000000/2);      /* 10MHz */
 	m_subcpu->set_addrmap(AS_PROGRAM, &hyprduel_state::hyprduel_map2);
-
-	MCFG_MACHINE_START_OVERRIDE(hyprduel_state,hyprduel)
 
 	/* video hardware */
 	i4220_config(config);
@@ -488,8 +455,6 @@ void hyprduel_state::magerror(machine_config &config)
 	M68000(config, m_subcpu, 20000000/2);      /* 10MHz */
 	m_subcpu->set_addrmap(AS_PROGRAM, &hyprduel_state::magerror_map2);
 	m_subcpu->set_periodic_int(FUNC(hyprduel_state::irq1_line_hold), attotime::from_hz(968));        /* tempo? */
-
-	MCFG_MACHINE_START_OVERRIDE(hyprduel_state,hyprduel)
 
 	/* video hardware */
 	i4220_config(config);
@@ -554,8 +519,6 @@ ROM_END
 
 void hyprduel_state::init_hyprduel()
 {
-	m_int_num = 0x02;
-
 	/* cpu synchronization (severe timings) */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc0040e, 0xc00411, write16s_delegate(*this, FUNC(hyprduel_state::hyprduel_cpusync_trigger1_w)));
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0xc00408, 0xc00409, read16sm_delegate(*this, FUNC(hyprduel_state::hyprduel_cpusync_trigger1_r)));
@@ -563,12 +526,9 @@ void hyprduel_state::init_hyprduel()
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0xfff34c, 0xfff34d, read16sm_delegate(*this, FUNC(hyprduel_state::hyprduel_cpusync_trigger2_r)));
 }
 
-void hyprduel_state::init_magerror()
-{
-	m_int_num = 0x01;
-}
+} // Anonymous namespace
 
 
 GAME( 1993, hyprduel,  0,        hyprduel, hyprduel, hyprduel_state, init_hyprduel, ROT0, "Technosoft",          "Hyper Duel (Japan set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, hyprduel2, hyprduel, hyprduel, hyprduel, hyprduel_state, init_hyprduel, ROT0, "Technosoft",          "Hyper Duel (Japan set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, magerror,  0,        magerror, magerror, hyprduel_state, init_magerror, ROT0, "Technosoft / Jaleco", "Magical Error wo Sagase",  MACHINE_SUPPORTS_SAVE )
+GAME( 1994, magerror,  0,        magerror, magerror, hyprduel_state, empty_init,    ROT0, "Technosoft / Jaleco", "Magical Error wo Sagase",  MACHINE_SUPPORTS_SAVE )

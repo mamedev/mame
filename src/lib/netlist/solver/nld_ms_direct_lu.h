@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 /*
  * nld_ms_direct.h
@@ -426,8 +426,8 @@ void matrix_solver_direct_t<m_N, storage_N>::LE_solve()
 {
 	const unsigned kN = N();
 
-	ATTR_UNUSED int imax;
-	ATTR_UNUSED double big,temp;
+	[[maybe_unused]] int imax;
+	[[maybe_unused]] double big,temp;
 
 #if 0
 	double vv[storage_N];

@@ -82,7 +82,7 @@ a joystick.  This is not an emulation bug.
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
-#include "sound/3812intf.h"
+#include "sound/ym3812.h"
 
 #include "speaker.h"
 
@@ -228,17 +228,17 @@ void snowbros_state::sound_io_map(address_map &map)
 // probably not endian safe
 void snowbros_state::prot_p0_w(uint8_t data)
 {
-	uint16_t word = m_hyperpac_ram[(0xe000/2)+m_semicom_prot_offset];
+	uint16_t word = m_hyperpac_ram[m_semicom_prot_base + m_semicom_prot_offset];
 	word = (word & 0xff00) | (data << 0);
-	m_hyperpac_ram[(0xe000/2)+m_semicom_prot_offset] = word;
+	m_hyperpac_ram[m_semicom_prot_base + m_semicom_prot_offset] = word;
 }
 
 // probably not endian safe
 void snowbros_state::prot_p1_w(uint8_t data)
 {
-	uint16_t word = m_hyperpac_ram[(0xe000/2)+m_semicom_prot_offset];
+	uint16_t word = m_hyperpac_ram[m_semicom_prot_base + m_semicom_prot_offset];
 	word = (word & 0x00ff) | (data << 8);
-	m_hyperpac_ram[(0xe000/2)+m_semicom_prot_offset] = word;
+	m_hyperpac_ram[m_semicom_prot_base + m_semicom_prot_offset] = word;
 }
 
 void snowbros_state::prot_p2_w(uint8_t data)
@@ -2327,8 +2327,8 @@ ROM_START( hyperpac )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "hyperpac.u1", 0x00000, 0x10000 , CRC(03faf88e) SHA1(a8da883d4b765b809452bbffca37ff224edbe86d) )
 
-	ROM_REGION( 0x10000, "protection", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "at89c52.bin", 0x00000, 0x2000 , CRC(291f9326) SHA1(e440ce7d92188faa86e02e7f9db4ec6bce21efd3) ) /* decapped */
+	ROM_REGION( 0x2000, "protection", 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "at89c52.bin", 0x0000, 0x2000 , CRC(291f9326) SHA1(e440ce7d92188faa86e02e7f9db4ec6bce21efd3) ) /* decapped */
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "hyperpac.j15", 0x00000, 0x40000, CRC(fb9f468d) SHA1(52857b1a04c64ac853340ebb8e92d98eabea8bc1) )
@@ -2379,6 +2379,27 @@ ROM_START( twinkle )
 	ROM_LOAD( "ua4.bin", 0x000000, 0x80000, CRC(6b64bb09) SHA1(547eac1ad931a6b937dff0b922d06af92cc7ab73) )
 ROM_END
 
+ROM_START( twinklea )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "uh12.bin", 0x00001, 0x20000, CRC(6cc6e53c) SHA1(26584d2b99878230a33c1c2c8d71e758b0c09cac) ) // sldh
+	ROM_LOAD16_BYTE( "ui12.bin", 0x00000, 0x20000, CRC(79420382) SHA1(13183d819f5b7699e8e0974c193796151a0a9617) ) // sldh
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "u1.bin", 0x00000, 0x10000 , CRC(e40481da) SHA1(1c1fabcb67693235eaa6ff59ae12a35854b5564a) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 ) // Intel 87C52 MCU Code
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) // needs decapping
+
+	ROM_REGION16_BE( 0x200, "user1", 0 ) // Data from Shared RAM
+	// this is not a real rom but instead the data extracted from shared ram, the MCU puts it there
+	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200, BAD_DUMP CRC(00d3e4b4) SHA1(afa359a8b48605ff034133bad2a0a182429dec71) ) // this has been extracted for the parent set, seems to work for this set, too
+
+	ROM_REGION( 0x040000, "oki", 0 )
+	ROM_LOAD( "uj15.bin", 0x00000, 0x40000, CRC(0a534b37) SHA1(b7d780eb4668f1f757a60884c022f5bbc424dc97) )
+
+	ROM_REGION( 0x080000, "gfx1", 0 ) // Sprites
+	ROM_LOAD( "ua4.bin", 0x000000, 0x80000, CRC(6b64bb09) SHA1(547eac1ad931a6b937dff0b922d06af92cc7ab73) )
+ROM_END
 
 ROM_START( pzlbreak )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
@@ -2574,13 +2595,8 @@ ROM_START( cookbib2 )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "unico_07.u1", 0x00000, 0x10000 , CRC(f59f1c9a) SHA1(2830261fd55249e015514fcb4cf8392e83b7fd0d) ) // 27C512
 
-	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
-
-	ROM_REGION( 0x200, "user1", 0 ) /* Data from Shared RAM */
-	/* this is not a real rom but instead the data extracted from
-	   shared ram, the MCU puts it there */
-	ROM_LOAD16_WORD_SWAP( "protdata.bin", 0x00000, 0x200 , CRC(ae6d8ed5) SHA1(410cdacb9b90ea345c0e4be85e60a138f45a51f1) )
+	ROM_REGION( 0x2000, "protection", 0 ) /* P87C52EBPN (XSC6407A) Code (8052) */
+	ROM_LOAD( "p87c52ebpn.bin", 0x0000, 0x2000 , CRC(ef042cef) SHA1(3089d5a3cb5ed663a8d89d59e427a06cffcd6219) ) /* dumped via laser glitching */
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "unico_06.uj15", 0x00000, 0x20000, CRC(5e6f76b8) SHA1(725800143dfeaa6093ed5fcc5b9f15678ae9e547) ) // 27C010
@@ -2600,13 +2616,8 @@ ROM_START( cookbib2a )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "unico_07.u1", 0x00000, 0x10000 , CRC(f59f1c9a) SHA1(2830261fd55249e015514fcb4cf8392e83b7fd0d) ) // 27C512
 
-	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
-
-	ROM_REGION( 0x200, "user1", 0 ) /* Data from Shared RAM */
-	/* this is not a real rom but instead the data extracted from
-	   shared ram, the MCU puts it there */
-	ROM_LOAD16_WORD_SWAP( "protdata.bin", 0x00000, 0x200 , CRC(ae6d8ed5) SHA1(410cdacb9b90ea345c0e4be85e60a138f45a51f1) )
+	ROM_REGION( 0x2000, "protection", 0 ) /* P87C52EBPN (XSC6407A) Code (8052) */
+	ROM_LOAD( "p87c52ebpn.bin", 0x0000, 0x2000 , CRC(ef042cef) SHA1(3089d5a3cb5ed663a8d89d59e427a06cffcd6219) ) /* dumped via laser glitching */
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "unico_06.uj15", 0x00000, 0x20000, CRC(5e6f76b8) SHA1(725800143dfeaa6093ed5fcc5b9f15678ae9e547) ) // 27C010
@@ -2626,15 +2637,15 @@ ROM_START( cookbib2b )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "u1.512", 0x00000, 0x10000 , CRC(f59f1c9a) SHA1(2830261fd55249e015514fcb4cf8392e83b7fd0d) )
 
-	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_REGION( 0x2000, "protection", 0 ) /* P87C52EBPN (XSC6407A) Code (8052) */
+	ROM_LOAD( "87c52.mcu", 0x0000, 0x2000 , NO_DUMP ) /* not dumped yet */
 
 	ROM_REGION( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from
 	   shared ram, the MCU puts it there
 
 	   this one is hacked from the cookbib2 one, absolute code jump needed to be changed at least */
-	ROM_LOAD16_WORD_SWAP( "protdata_alt.bin", 0x00000, 0x200, BAD_DUMP CRC(bc136ead) SHA1(96459c2ccf7f95880421ba082c2414fa1040f3ed) )
+	ROM_LOAD16_WORD_SWAP( "protdata_alt.bin", 0x000, 0x200, BAD_DUMP CRC(bc136ead) SHA1(96459c2ccf7f95880421ba082c2414fa1040f3ed) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "uj15.010", 0x00000, 0x20000, CRC(5e6f76b8) SHA1(725800143dfeaa6093ed5fcc5b9f15678ae9e547) )
@@ -2822,6 +2833,9 @@ ROM_END
 
 void snowbros_state::init_cookbib2()
 {
+	save_item(NAME(m_semicom_prot_offset));
+
+	m_semicom_prot_base = 0xf000 / 2;
 }
 
 
@@ -2937,6 +2951,7 @@ void snowbros_state::init_toto()
 void snowbros_state::init_hyperpac()
 {
 	save_item(NAME(m_semicom_prot_offset));
+	m_semicom_prot_base = 0xe000 / 2;
 }
 
 
@@ -2964,14 +2979,15 @@ GAME( 1996, toto,       0,        snowbros,    snowbros, snowbros_state, init_to
 GAME( 1993, finalttr,   0,        finalttr,    finalttr, snowbros_state, empty_init,    ROT0, "Jeil Computer System", "Final Tetris", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, hyperpac,   0,        semicom_mcu, hyperpac, snowbros_state, init_hyperpac, ROT0, "SemiCom",              "Hyper Pacman", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, hyperpacb,  hyperpac, semicom,     hyperpac, snowbros_state, empty_init,    ROT0, "bootleg",              "Hyper Pacman (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, cookbib2,   0,        semiprot,    cookbib2, snowbros_state, init_cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, cookbib2a,  cookbib2, semiprot,    cookbib2, snowbros_state, init_cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, cookbib2,   0,        semicom_mcu, cookbib2, snowbros_state, init_cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, cookbib2a,  cookbib2, semicom_mcu, cookbib2, snowbros_state, init_cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, cookbib2b,  cookbib2, semiprot,    cookbib2, snowbros_state, init_cookbib2, ROT0, "SemiCom",              "Cookie & Bibi 2 (set 3)", MACHINE_SUPPORTS_SAVE ) // older? test mode looks even worse on this, but neither shows the correct dip info anyway
 GAME( 1996, toppyrap,   0,        semiprot,    toppyrap, snowbros_state, empty_init,    ROT0, "SemiCom",              "Toppy & Rappy", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, cookbib3,   0,        semiprot,    cookbib3, snowbros_state, init_cookbib3, ROT0, "SemiCom",              "Cookie & Bibi 3", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, pzlbreak,   0,        semiprot,    pzlbreak, snowbros_state, init_pzlbreak, ROT0, "SemiCom / Tirano",     "Puzzle Break", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, suhosong,   0,        semiprot,    suhosong, snowbros_state, empty_init,    ROT0, "SemiCom",              "Su Ho Seong", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, twinkle,    0,        semiprot,    twinkle,  snowbros_state, empty_init,    ROT0, "SemiCom / Tirano",     "Twinkle", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, twinkle,    0,        semiprot,    twinkle,  snowbros_state, empty_init,    ROT0, "SemiCom / Tirano",     "Twinkle (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, twinklea,   twinkle,  semiprot,    twinkle,  snowbros_state, empty_init,    ROT0, "SemiCom / Tirano",     "Twinkle (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, 3in1semi,   0,        semiprot,    moremore, snowbros_state, init_3in1semi, ROT0, "SemiCom / XESS",       "New HyperMan (3-in-1 with Cookie & Bibi & HyperMan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, mcheonru,   0,        semiprot,    mcheonru, snowbros_state, init_3in1semi, ROT0, "SemiCom / AceVer",     "Ma Cheon Ru", MACHINE_SUPPORTS_SAVE ) // a flyer exists for an English version called Arirang, AceVer team logo is displayed on it
 GAME( 1999, moremore,   0,        semiprot,    moremore, snowbros_state, init_3in1semi, ROT0, "SemiCom / Exit",       "More More", MACHINE_SUPPORTS_SAVE )

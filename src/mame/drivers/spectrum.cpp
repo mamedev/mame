@@ -718,17 +718,10 @@ INPUT_PORTS_END
 
 void spectrum_state::init_spectrum()
 {
-	switch (m_ram->size())
-	{
-		case 48*1024:
-			m_specmem->space(AS_PROGRAM).install_ram(0x8000, 0xffff, m_ram->pointer() + 0x4000);
-			[[fallthrough]];
-		case 16*1024:
-			m_specmem->space(AS_PROGRAM).install_ram(0x5b00, 0x7fff, m_ram->pointer() + 0x1b00);
-	}
+	m_specmem->space(AS_PROGRAM).install_ram(0x5b00, m_ram->size() + 0x3fff, m_ram->pointer() + 0x1b00);
 }
 
-MACHINE_RESET_MEMBER(spectrum_state,spectrum)
+void spectrum_state::machine_reset()
 {
 	m_port_7ffd_data = -1;
 	m_port_1ffd_data = -1;
@@ -791,8 +784,6 @@ void spectrum_state::spectrum_common(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 #endif
 
-	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum )
-
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(X1 / 2, 448, 0, 352, 312, 0, 296);
@@ -802,8 +793,6 @@ void spectrum_state::spectrum_common(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(spectrum_state::spectrum_palette), 16);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_spectrum);
-
-	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#ifndef MAME_EMU_EMUMEM_HEDP_H
+#define MAME_EMU_EMUMEM_HEDP_H
+
+#pragma once
 
 // handler_entry_read_delegate/handler_entry_write_delegate
 
@@ -9,7 +13,6 @@ template<int Width, int AddrShift, endianness_t Endian, typename READ> class han
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
-	using inh = handler_entry_read_address<Width, AddrShift, Endian>;
 
 	handler_entry_read_delegate(address_space *space, const READ &delegate) : handler_entry_read_address<Width, AddrShift, Endian>(space, 0), m_delegate(delegate) {}
 	~handler_entry_read_delegate() = default;
@@ -68,7 +71,6 @@ template<int Width, int AddrShift, endianness_t Endian, typename WRITE> class ha
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
-	using inh = handler_entry_write_address<Width, AddrShift, Endian>;
 
 	handler_entry_write_delegate(address_space *space, const WRITE &delegate) : handler_entry_write_address<Width, AddrShift, Endian>(space, 0), m_delegate(delegate) {}
 	~handler_entry_write_delegate() = default;
@@ -132,7 +134,6 @@ template<int Width, int AddrShift, endianness_t Endian> class handler_entry_read
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
-	using inh = handler_entry_read<Width, AddrShift, Endian>;
 
 	handler_entry_read_ioport(address_space *space, ioport_port *port) : handler_entry_read<Width, AddrShift, Endian>(space, 0), m_port(port) {}
 	~handler_entry_read_ioport() = default;
@@ -149,7 +150,6 @@ template<int Width, int AddrShift, endianness_t Endian> class handler_entry_writ
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
-	using inh = handler_entry_write<Width, AddrShift, Endian>;
 
 	handler_entry_write_ioport(address_space *space, ioport_port *port) : handler_entry_write<Width, AddrShift, Endian>(space, 0), m_port(port) {}
 	~handler_entry_write_ioport() = default;
@@ -161,3 +161,5 @@ public:
 private:
 	ioport_port *m_port;
 };
+
+#endif // MAME_EMU_EMUMEM_HEDP_H

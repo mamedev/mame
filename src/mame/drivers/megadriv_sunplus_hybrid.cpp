@@ -2,14 +2,14 @@
 // copyright-holders:David Haywood
 
 /*
-	This is an enhanced 'Mega Drive / Genesis on a Chip' combined with a SunPlus SPG2xx system for the 'Bonus Games' menu
+    This is an enhanced 'Mega Drive / Genesis on a Chip' combined with a SunPlus SPG2xx system for the 'Bonus Games' menu
 
-	It can take MegaDrive cartridges
+    It can take MegaDrive cartridges
 
-	The MD side of things doesn't work as it needs enhanced chipset emulation?
+    The MD side of things doesn't work as it needs enhanced chipset emulation?
 
-	TODO:
-	hook up the SunPlus side again (see spg2xx_zone.cpp for hookup)
+    TODO:
+    hook up the SunPlus side again (see spg2xx_zone.cpp for hookup)
 
 */
 
@@ -138,8 +138,8 @@ void megadriv_sunplus_state::megadriv_sunplus_pal(machine_config &config)
 	md_pal(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_sunplus_state::megadriv_sunplus_map);
 
-	m_screen->set_screen_update(FUNC(megadriv_sunplus_state::screen_update_hybrid)); 
-	m_screen->screen_vblank().set(FUNC(megadriv_sunplus_state::screen_vblank_hybrid)); 
+	m_screen->set_screen_update(FUNC(megadriv_sunplus_state::screen_update_hybrid));
+	m_screen->screen_vblank().set(FUNC(megadriv_sunplus_state::screen_vblank_hybrid));
 }
 
 

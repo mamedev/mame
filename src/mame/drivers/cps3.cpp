@@ -98,6 +98,9 @@ JoJo no Kimyou na Bouken                                   JJK98c00F  CP300000G 
 JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA        X                                           981202
 JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA        X                                           990108
 JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA        X                                           990128
+JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA    X          CAP-JJK0A0  CAP-JJK000  CAP-JJK-140  981202
+JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA    X          CAP-JJK0A0  CAP-JJK-2   CAP-JJK-160  990108
+JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA    X          CAP-JJK0A0  CAP-JJK-3   CAP-JJK-161  990128
 JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK000  CAP-JJK-140  981202
 JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK-2   CAP-JJK-160  990108
 JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK-3   CAP-JJK-161  990128
@@ -2772,6 +2775,30 @@ ROM_START( jojojr2 )
 	DISK_IMAGE_READONLY( "cap-jjk000", 0, SHA1(a24e174aaaf47f98312a38129645026a613cd344) )
 ROM_END
 
+ROM_START( jojoa )
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_LOAD( "jojo_asia.29f400.u2", 0x000000, 0x080000, CRC(789aa72a) SHA1(afcefb963d7c103514585f4a6738b2deb5b7d27a) )
+
+	DISK_REGION( "scsi:1:cdrom" )
+	DISK_IMAGE_READONLY( "cap-jjk-3", 0, SHA1(dc6e74b5e02e13f62cb8c4e234dd6061501e49c1) )
+ROM_END
+
+ROM_START( jojoar1 )
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_LOAD( "jojo_asia.29f400.u2", 0x000000, 0x080000, CRC(789aa72a) SHA1(afcefb963d7c103514585f4a6738b2deb5b7d27a) )
+
+	DISK_REGION( "scsi:1:cdrom" )
+	DISK_IMAGE_READONLY( "cap-jjk-2", 0, SHA1(ce22d10f2b35a0e00f8d83642b97842c9b2327fa) )
+ROM_END
+
+ROM_START( jojoar2 )
+	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
+	ROM_LOAD( "jojo_asia.29f400.u2", 0x000000, 0x080000, CRC(789aa72a) SHA1(afcefb963d7c103514585f4a6738b2deb5b7d27a) )
+
+	DISK_REGION( "scsi:1:cdrom" )
+	DISK_IMAGE_READONLY( "cap-jjk000", 0, SHA1(a24e174aaaf47f98312a38129645026a613cd344) )
+ROM_END
+
 
 ROM_START( sfiii3 )
 	ROM_REGION32_BE( 0x080000, "bios", 0 ) /* bios region */
@@ -3912,17 +3939,15 @@ ROM_END
 
 *****************************************************************************************/
 
-#define GAME_FLAGS (MACHINE_SUPPORTS_SAVE)
-
 /* Red Earth / Warzard */
 
 // 961121
-GAME( 1996, redearth,    0,        redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Red Earth (Euro 961121)", GAME_FLAGS )
-GAME( 1996, warzard,     redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Warzard (Japan 961121)", GAME_FLAGS )
+GAME( 1996, redearth,    0,        redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Red Earth (Euro 961121)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, warzard,     redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Warzard (Japan 961121)", MACHINE_SUPPORTS_SAVE )
 
 // 961023
-GAME( 1996, redearthr1,  redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Red Earth (Euro 961023)", GAME_FLAGS )
-GAME( 1996, warzardr1,   redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Warzard (Japan 961023)", GAME_FLAGS )
+GAME( 1996, redearthr1,  redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Red Earth (Euro 961023)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, warzardr1,   redearth, redearth, cps3_re,   cps3_state, init_redearth, ROT0, "Capcom", "Warzard (Japan 961023)", MACHINE_SUPPORTS_SAVE )
 
 /* Street Fighter III: New Generation */
 
@@ -3933,13 +3958,13 @@ GAME( 1996, warzardr1,   redearth, redearth, cps3_re,   cps3_state, init_redeart
 // not dumped
 
 // 970204
-GAME( 1997, sfiii,       0,        sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Euro 970204)", GAME_FLAGS )
-GAME( 1997, sfiiiu,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (USA 970204)", GAME_FLAGS )
-GAME( 1997, sfiiia,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204)", GAME_FLAGS )
-GAME( 1997, sfiiij,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Japan 970204)", GAME_FLAGS )
-GAME( 1997, sfiiih,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Hispanic 970204)", GAME_FLAGS )
-GAME( 1997, sfiiin,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD, bios set 1)", GAME_FLAGS )
-GAME( 1997, sfiiina,     sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD, bios set 2)", GAME_FLAGS )
+GAME( 1997, sfiii,       0,        sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Euro 970204)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sfiiiu,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (USA 970204)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sfiiia,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sfiiij,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Japan 970204)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sfiiih,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Hispanic 970204)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sfiiin,      sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD, bios set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sfiiina,     sfiii,    sfiii,    cps3,      cps3_state, init_sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD, bios set 2)", MACHINE_SUPPORTS_SAVE )
 
 /* Street Fighter III 2nd Impact: Giant Attack */
 
@@ -3947,70 +3972,73 @@ GAME( 1997, sfiiina,     sfiii,    sfiii,    cps3,      cps3_state, init_sfiii, 
 // not dumped
 
 // 970930
-GAMEL(1997, sfiii2,      0,        sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (USA 970930)", GAME_FLAGS, layout_sfiii2 ) // layout is for widescreen support
-GAMEL(1997, sfiii2j,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Japan 970930)", GAME_FLAGS, layout_sfiii2 )
-GAMEL(1997, sfiii2n,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Asia 970930, NO CD)", GAME_FLAGS, layout_sfiii2 )
+GAMEL(1997, sfiii2,      0,        sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (USA 970930)", MACHINE_SUPPORTS_SAVE, layout_sfiii2 ) // layout is for widescreen support
+GAMEL(1997, sfiii2j,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Japan 970930)", MACHINE_SUPPORTS_SAVE, layout_sfiii2 )
+GAMEL(1997, sfiii2n,     sfiii2,   sfiii2,   cps3,      cps3_state, init_sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Asia 970930, NO CD)", MACHINE_SUPPORTS_SAVE, layout_sfiii2 )
 
 /* JoJo's Venture / JoJo no Kimyou na Bouken */
 
 // 990128
-GAME( 1998, jojo,        0,        jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Euro 990128)", GAME_FLAGS )
-GAME( 1998, jojou,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990128)", GAME_FLAGS )
-GAME( 1998, jojoj,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 990128)", GAME_FLAGS )
-GAME( 1998, jojon,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990128, NO CD)", GAME_FLAGS )
+GAME( 1998, jojo,        0,        jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Euro 990128)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojou,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990128)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojoa,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990128)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojoj,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 990128)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojon,       jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990128, NO CD)", MACHINE_SUPPORTS_SAVE )
 
 // 990108
-GAME( 1998, jojor1,      jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Euro 990108)", GAME_FLAGS )
-GAME( 1998, jojour1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990108)", GAME_FLAGS )
-GAME( 1998, jojojr1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 990108)", GAME_FLAGS )
-GAME( 1998, jojonr1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990108, NO CD)", GAME_FLAGS )
+GAME( 1998, jojor1,      jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Euro 990108)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojour1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990108)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojoar1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990108)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojojr1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 990108)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojonr1,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990108, NO CD)", MACHINE_SUPPORTS_SAVE )
 
 // 981202
-GAME( 1998, jojor2,      jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Euro 981202)", GAME_FLAGS )
-GAME( 1998, jojour2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 981202)", GAME_FLAGS )
-GAME( 1998, jojojr2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 981202)", GAME_FLAGS )
-GAME( 1998, jojonr2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 981202, NO CD)", GAME_FLAGS )
+GAME( 1998, jojor2,      jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Euro 981202)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojour2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (USA 981202)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojoar2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 981202)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojojr2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo no Kimyou na Bouken (Japan 981202)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, jojonr2,     jojo,     jojo,     cps3_jojo, cps3_state, init_jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 981202, NO CD)", MACHINE_SUPPORTS_SAVE )
 
 /* Street Fighter III 3rd Strike: Fight for the Future */
 
 // 990608
-GAME( 1999, sfiii3,      0,        sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Euro 990608)", GAME_FLAGS )
-GAME( 1999, sfiii3u,     sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990608)", GAME_FLAGS )
-GAME( 1999, sfiii3j,     sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990608)", GAME_FLAGS )
-GAME( 1999, sfiii3n,     sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990608, NO CD)", GAME_FLAGS )
+GAME( 1999, sfiii3,      0,        sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Euro 990608)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, sfiii3u,     sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990608)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, sfiii3j,     sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990608)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, sfiii3n,     sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990608, NO CD)", MACHINE_SUPPORTS_SAVE )
 
 // 990512
-GAME( 1999, sfiii3r1,    sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Euro 990512)", GAME_FLAGS )
-GAME( 1999, sfiii3ur1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990512)", GAME_FLAGS )
-GAME( 1999, sfiii3jr1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990512)", GAME_FLAGS )
-GAME( 1999, sfiii3nr1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990512, NO CD)", GAME_FLAGS )
+GAME( 1999, sfiii3r1,    sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Euro 990512)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, sfiii3ur1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990512)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, sfiii3jr1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990512)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, sfiii3nr1,   sfiii3,   sfiii3,   cps3,      cps3_state, init_sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990512, NO CD)", MACHINE_SUPPORTS_SAVE )
 
 /* JoJo's Bizarre Adventure / JoJo no Kimyou na Bouken: Mirai e no Isan */
 
 // 990927
-GAME( 1999, jojoba,      0,        jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990927)", GAME_FLAGS )
-GAME( 1999, jojobaj,     jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927)", GAME_FLAGS )
-GAME( 1999, jojoban,     jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927, NO CD)", GAME_FLAGS )
-GAME( 1999, jojobane,    jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990927, NO CD)", GAME_FLAGS )
+GAME( 1999, jojoba,      0,        jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990927)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jojobaj,     jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jojoban,     jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990927, NO CD)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jojobane,    jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990927, NO CD)", MACHINE_SUPPORTS_SAVE )
 
 // 990913
-GAME( 1999, jojobar1,    jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913)", GAME_FLAGS )
-GAME( 1999, jojobajr1,   jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913)", GAME_FLAGS )
-GAME( 1999, jojobanr1,   jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913, NO CD)", GAME_FLAGS )
-GAME( 1999, jojobaner1,  jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913, NO CD)", GAME_FLAGS )
+GAME( 1999, jojobar1,    jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jojobajr1,   jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jojobanr1,   jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo no Kimyou na Bouken: Mirai e no Isan (Japan 990913, NO CD)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jojobaner1,  jojoba,   jojoba,   cps3_jojo, cps3_state, init_jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913, NO CD)", MACHINE_SUPPORTS_SAVE )
 
 // bootlegs, hold START1 during bootup to change games
 
 // newest revision, fixes some issues with Warzard decryption.
-GAME( 1999, cps3boot,    0,        sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (V4)", GAME_FLAGS )
-GAME( 1999, cps3boota,   cps3boot, sfiii3,   cps3,      cps3_state, init_sfiii2,   ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (V5)", GAME_FLAGS )
+GAME( 1999, cps3boot,    0,        sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (V4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, cps3boota,   cps3boot, sfiii3,   cps3,      cps3_state, init_sfiii2,   ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (V5)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999, cps3booto,   cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (older)", GAME_FLAGS )
-GAME( 1999, cps3bootao,  cps3boot, sfiii3,   cps3,      cps3_state, init_sfiii2,   ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (older)", GAME_FLAGS )
+GAME( 1999, cps3booto,   cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, cps3bootao,  cps3boot, sfiii3,   cps3,      cps3_state, init_sfiii2,   ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (older)", MACHINE_SUPPORTS_SAVE )
 // this doesn't play 2nd Impact despite it being listed.  2nd Impact uses separate data/code encryption and can't be decrypted cleanly for a standard SH2.  Selecting it just flashes in a copy of 3rd Strike with the 2nd Impact loading screen
-GAME( 1999, cps3booto2,  cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (oldest) (New Generation, 3rd Strike, JoJo's Venture, JoJo's Bizarre Adventure and Red Earth only)", GAME_FLAGS )
+GAME( 1999, cps3booto2,  cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "CPS3 Multi-game bootleg for HD6417095 type SH2 (oldest) (New Generation, 3rd Strike, JoJo's Venture, JoJo's Bizarre Adventure and Red Earth only)", MACHINE_SUPPORTS_SAVE )
 // this does not play Red Earth or the 2 Jojo games.  New Generation and 3rd Strike have been heavily modified to work with the separate code/data encryption a dead cart / 2nd Impact cart has.  Selecting the other games will give an 'invalid CD' message.
-GAME( 1999, cps3bootao2, cps3boot, sfiii3,   cps3,      cps3_state, init_sfiii2,   ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (oldest) (New Generation, 2nd Impact and 3rd Strike only)", GAME_FLAGS )
+GAME( 1999, cps3bootao2, cps3boot, sfiii3,   cps3,      cps3_state, init_sfiii2,   ROT0, "bootleg", "CPS3 Multi-game bootleg for dead security cart (oldest) (New Generation, 2nd Impact and 3rd Strike only)", MACHINE_SUPPORTS_SAVE )
 // these are test bootleg CDs for running 2nd Impact on a standard SH2
-GAME( 1999, cps3bs32,    cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, V3)", GAME_FLAGS )
-GAME( 1999, cps3bs32a,   cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, older)", GAME_FLAGS ) // older / buggier hack
+GAME( 1999, cps3bs32,    cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, V3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, cps3bs32a,   cps3boot, sfiii3,   cps3,      cps3_state, init_cps3boot, ROT0, "bootleg", "Street Fighter III 2nd Impact: Giant Attack (USA 970930, bootleg for HD6417095 type SH2, older)", MACHINE_SUPPORTS_SAVE ) // older / buggier hack

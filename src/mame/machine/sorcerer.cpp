@@ -440,6 +440,8 @@ void sorcerer_state::machine_start_common(offs_t endmem)
 	m_cassette_timer = timer_alloc(TIMER_CASSETTE);
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
 
+	m_halt = false;
+
 	// register for savestates
 	save_item(NAME(m_portfe));
 	save_item(NAME(m_keyboard_line));
@@ -539,7 +541,7 @@ SNAPSHOT_LOAD_MEMBER(sorcerer_state::snapshot_cb)
 	unsigned char s_byte;
 
 	/* check size */
-	if (snapshot_size != 0x1001c)
+	if (image.length() != 0x1001c)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Snapshot must be 65564 bytes");
 		image.message("Snapshot must be 65564 bytes");
@@ -591,7 +593,7 @@ QUICKLOAD_LOAD_MEMBER(sorcerer_state::quickload_cb)
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* load the binary into memory */
-	if (z80bin_load_file(&image, space, file_type, &execute_address, &start_address, &end_address) != image_init_result::PASS)
+	if (z80bin_load_file(image, space, execute_address, start_address, end_address) != image_init_result::PASS)
 		return image_init_result::FAIL;
 
 	/* is this file executable? */
@@ -613,7 +615,6 @@ QUICKLOAD_LOAD_MEMBER(sorcerer_state::quickload_cb)
 
 		if (((start_address == 0x1d5) || (execute_address == 0xc858)) && (space.read_byte(0xdffa) == 0xc3))
 		{
-			u8 i;
 			static const u8 data[]={
 				0xcd, 0x26, 0xc4,   // CALL C426    ;set up other pointers
 				0x21, 0xd4, 1,      // LD HL,01D4   ;start of program address (used by C689)
@@ -621,7 +622,7 @@ QUICKLOAD_LOAD_MEMBER(sorcerer_state::quickload_cb)
 				0xc3, 0x89, 0xc6    // JP C689  ;run program
 			};
 
-			for (i = 0; i < ARRAY_LENGTH(data); i++)
+			for (u8 i = 0; i < std::size(data); i++)
 				space.write_byte(0xf01f + i, data[i]);
 
 			if (!autorun)

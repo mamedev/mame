@@ -25,7 +25,6 @@
 
  ***********************************************************************************************************/
 
-
 #include "emu.h"
 #include "a78_slot.h"
 
@@ -315,7 +314,7 @@ static int a78_get_pcb_id(const char *slot)
 {
 	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(elem.slot_option, slot))
+		if (!strcmp(elem.slot_option, slot))
 			return elem.pcb_id;
 	}
 
@@ -492,6 +491,7 @@ image_verify_result a78_cart_slot_device::verify_header(char *header)
 	if (strncmp(magic, header + 1, 9))
 	{
 		logerror("Not a valid A7800 image\n");
+		seterror(IMAGE_ERROR_UNSPECIFIED, "File is not a valid A7800 image");
 		return image_verify_result::FAIL;
 	}
 

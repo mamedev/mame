@@ -192,6 +192,9 @@ Known Issues (MZ, 2019-05-10)
 
 #include "logmacro.h"
 
+
+namespace {
+
 /*
     READY bits.
 */
@@ -231,10 +234,6 @@ public:
 	void driver_reset() override;
 
 private:
-	// Machine management
-	DECLARE_MACHINE_START(ti99_8);
-	DECLARE_MACHINE_RESET(ti99_8);
-
 	// Processor connections with the main board
 	uint8_t cruread(offs_t offset);
 	void cruwrite(offs_t offset, uint8_t data);
@@ -629,7 +628,7 @@ WRITE_LINE_MEMBER( ti99_8_state::extint )
 	m_tms9901->set_int_line(1, state);
 }
 
-WRITE_LINE_MEMBER( ti99_8_state::notconnected )
+[[maybe_unused]] WRITE_LINE_MEMBER( ti99_8_state::notconnected )
 {
 	LOGMASKED(LOG_INTERRUPTS, "Setting a not connected line ... ignored\n");
 }
@@ -887,6 +886,9 @@ ROM_START(ti99_8)
 ROM_END
 
 #define rom_ti99_8e rom_ti99_8
+
+} // Anonymous namespace
+
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE      INPUT   CLASS         INIT        COMPANY              FULLNAME                     FLAGS
 COMP( 1983, ti99_8,  0,      0,      ti99_8_60hz, ti99_8, ti99_8_state, empty_init, "Texas Instruments", "TI-99/8 Computer (US)",     MACHINE_SUPPORTS_SAVE )

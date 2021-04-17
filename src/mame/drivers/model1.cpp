@@ -727,6 +727,8 @@ void model1_state::r360_w(uint8_t data)
 	    ba = ingame
 	    b9 = game over
 
+	    af = throttle
+
 	    results:
 	    40 = default status
 	    41 = * (setup #1 ack)
@@ -761,6 +763,9 @@ void model1_state::r360_w(uint8_t data)
 		case 0xba:
 		case 0xb9:
 			m_r360_state = ~0x40;
+			break;
+		case 0xaf:
+			m_r360_state = ~m_throttle->read();
 			break;
 	}
 }

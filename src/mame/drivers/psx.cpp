@@ -29,6 +29,9 @@
 
 #include <zlib.h>
 
+
+namespace {
+
 class psx1_state : public driver_device
 {
 public:
@@ -46,18 +49,8 @@ public:
 	void psu(machine_config &config);
 	void psj(machine_config &config);
 
-protected:
+private:
 	std::vector<uint8_t> m_exe_buffer;
-	int m_cd_param_p;
-	int m_cd_result_p;
-	int m_cd_result_c;
-	int m_cd_result_ready;
-	int m_cd_reset;
-	uint8_t m_cd_stat;
-	uint8_t m_cd_io_status;
-	uint8_t m_cd_param[8];
-	uint8_t m_cd_result[8];
-	DECLARE_MACHINE_RESET(psx);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	void psxexe_conv32(uint32_t *uint32);
 	int load_psxexe(std::vector<uint8_t> buffer);
@@ -74,7 +67,7 @@ protected:
 
 	void psx_map(address_map &map);
 	void subcpu_map(address_map &map);
-private:
+
 	required_device<psx_parallel_slot_device> m_parallel;
 	required_device<psxcd_device> m_psxcd;
 };
@@ -484,9 +477,9 @@ void psx1_state::parallel_w(offs_t offset, uint16_t data)
 
 QUICKLOAD_LOAD_MEMBER(psx1_state::quickload_exe)
 {
-	m_exe_buffer.resize(quickload_size);
+	m_exe_buffer.resize(image.length());
 
-	if (image.fread(reinterpret_cast<void *>(&m_exe_buffer[0]), quickload_size) != quickload_size)
+	if (image.fread(reinterpret_cast<void *>(&m_exe_buffer[0]), image.length()) != image.length())
 	{
 		m_exe_buffer.resize(0);
 		return image_init_result::FAIL;
@@ -707,6 +700,9 @@ Version 4.2 E
 Version 4.3 E
 
 */
+
+} // Anonymous namespace
+
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                            FULLNAME                            FLAGS
 CONS( 1994, psj,  0,      0,      psj,     0,     psx1_state, empty_init, "Sony Computer Entertainment Inc", "Sony PlayStation (Japan)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

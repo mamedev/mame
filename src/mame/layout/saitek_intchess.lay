@@ -56,12 +56,12 @@ license:CC0
 	<element name="text_l25"><text string="CLEAR"><color red="0.66" green="0.66" blue="0.66" /></text></element>
 	<element name="text_l26"><text string="ENTER"><color red="0.66" green="0.66" blue="0.66" /></text></element>
 
-	<element name="text_p1"><image file="chess/bp.png" /></element>
-	<element name="text_p2"><image file="chess/bn.png" /></element>
-	<element name="text_p3"><image file="chess/bb.png" /></element>
-	<element name="text_p4"><image file="chess/br.png" /></element>
-	<element name="text_p5"><image file="chess/bq.png" /></element>
-	<element name="text_p6"><image file="chess/bk.png" /></element>
+	<element name="text_p1"><image file="chess/bp.svg" /></element>
+	<element name="text_p2"><image file="chess/bn.svg" /></element>
+	<element name="text_p3"><image file="chess/bb.svg" /></element>
+	<element name="text_p4"><image file="chess/br.svg" /></element>
+	<element name="text_p5"><image file="chess/bq.svg" /></element>
+	<element name="text_p6"><image file="chess/bk.svg" /></element>
 
 
 <!-- chesscomputer -->

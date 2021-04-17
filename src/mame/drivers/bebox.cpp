@@ -15,7 +15,7 @@
 /* Components */
 #include "video/clgd542x.h"
 #include "bus/lpci/cirrus.h"
-#include "sound/3812intf.h"
+#include "sound/ym3812.h"
 #include "machine/mc146818.h"
 #include "machine/pckeybrd.h"
 #include "bus/lpci/mpc105.h"
@@ -110,10 +110,6 @@ void bebox_state::scsi_irq_callback(int state)
 void bebox_state::scsi_dma_callback(uint32_t src, uint32_t dst, int length, int byteswap)
 {
 }
-
-FLOPPY_FORMATS_MEMBER( bebox_state::floppy_formats )
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
 
 void bebox_state::mpc105_config(device_t *device)
 {
@@ -237,7 +233,7 @@ void bebox_state::bebox_peripherals(machine_config &config)
 	floppy_connector &fdc(FLOPPY_CONNECTOR(config, "smc37c78:0"));
 	fdc.option_add("35hd", FLOPPY_35_HD);
 	fdc.set_default_option("35hd");
-	fdc.set_formats(bebox_state::floppy_formats);
+	fdc.set_formats(floppy_image_device::default_pc_floppy_formats);
 
 	MC146818(config, "rtc", 32.768_kHz_XTAL);
 

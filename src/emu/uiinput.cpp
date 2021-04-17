@@ -138,11 +138,11 @@ bool ui_input_manager::push_event(ui_event evt)
 	}
 
 	// is the queue filled up?
-	if ((m_events_end + 1) % ARRAY_LENGTH(m_events) == m_events_start)
+	if ((m_events_end + 1) % std::size(m_events) == m_events_start)
 		return false;
 
 	m_events[m_events_end++] = evt;
-	m_events_end %= ARRAY_LENGTH(m_events);
+	m_events_end %= std::size(m_events);
 	return true;
 }
 
@@ -156,7 +156,7 @@ bool ui_input_manager::pop_event(ui_event *evt)
 	if (m_events_start != m_events_end)
 	{
 		*evt = m_events[m_events_start++];
-		m_events_start %= ARRAY_LENGTH(m_events);
+		m_events_start %= std::size(m_events);
 		return true;
 	}
 	else
@@ -295,11 +295,37 @@ g_profiler.stop();
 }
 
 /*-------------------------------------------------
+    push_window_focus_event - pushes a focus
+    event to the specified render_target
+-------------------------------------------------*/
+
+void ui_input_manager::push_window_focus_event(render_target *target)
+{
+	ui_event event = { ui_event::type::NONE };
+	event.event_type = ui_event::type::WINDOW_FOCUS;
+	event.target = target;
+	push_event(event);
+}
+
+/*-------------------------------------------------
+    push_window_defocus_event - pushes a defocus
+    event to the specified render_target
+-------------------------------------------------*/
+
+void ui_input_manager::push_window_defocus_event(render_target *target)
+{
+	ui_event event = { ui_event::type::NONE };
+	event.event_type = ui_event::type::WINDOW_DEFOCUS;
+	event.target = target;
+	push_event(event);
+}
+
+/*-------------------------------------------------
     push_mouse_move_event - pushes a mouse
     move event to the specified render_target
 -------------------------------------------------*/
 
-void ui_input_manager::push_mouse_move_event(render_target* target, s32 x, s32 y)
+void ui_input_manager::push_mouse_move_event(render_target *target, s32 x, s32 y)
 {
 	ui_event event = { ui_event::type::NONE };
 	event.event_type = ui_event::type::MOUSE_MOVE;
@@ -314,7 +340,7 @@ void ui_input_manager::push_mouse_move_event(render_target* target, s32 x, s32 y
     mouse leave event to the specified render_target
 -------------------------------------------------*/
 
-void ui_input_manager::push_mouse_leave_event(render_target* target)
+void ui_input_manager::push_mouse_leave_event(render_target *target)
 {
 	ui_event event = { ui_event::type::NONE };
 	event.event_type = ui_event::type::MOUSE_LEAVE;
@@ -327,7 +353,7 @@ void ui_input_manager::push_mouse_leave_event(render_target* target)
     down event to the specified render_target
 -------------------------------------------------*/
 
-void ui_input_manager::push_mouse_down_event(render_target* target, s32 x, s32 y)
+void ui_input_manager::push_mouse_down_event(render_target *target, s32 x, s32 y)
 {
 	ui_event event = { ui_event::type::NONE };
 	event.event_type = ui_event::type::MOUSE_DOWN;
@@ -342,7 +368,7 @@ void ui_input_manager::push_mouse_down_event(render_target* target, s32 x, s32 y
     down event to the specified render_target
 -------------------------------------------------*/
 
-void ui_input_manager::push_mouse_up_event(render_target* target, s32 x, s32 y)
+void ui_input_manager::push_mouse_up_event(render_target *target, s32 x, s32 y)
 {
 	ui_event event = { ui_event::type::NONE };
 	event.event_type = ui_event::type::MOUSE_UP;
@@ -357,7 +383,7 @@ push_mouse_down_event - pushes a mouse
 down event to the specified render_target
 -------------------------------------------------*/
 
-void ui_input_manager::push_mouse_rdown_event(render_target* target, s32 x, s32 y)
+void ui_input_manager::push_mouse_rdown_event(render_target *target, s32 x, s32 y)
 {
 	ui_event event = { ui_event::type::NONE };
 	event.event_type = ui_event::type::MOUSE_RDOWN;
@@ -372,7 +398,7 @@ push_mouse_down_event - pushes a mouse
 down event to the specified render_target
 -------------------------------------------------*/
 
-void ui_input_manager::push_mouse_rup_event(render_target* target, s32 x, s32 y)
+void ui_input_manager::push_mouse_rup_event(render_target *target, s32 x, s32 y)
 {
 	ui_event event = { ui_event::type::NONE };
 	event.event_type = ui_event::type::MOUSE_RUP;
@@ -387,7 +413,7 @@ void ui_input_manager::push_mouse_rup_event(render_target* target, s32 x, s32 y)
     a mouse double-click event to the specified
     render_target
 -------------------------------------------------*/
-void ui_input_manager::push_mouse_double_click_event(render_target* target, s32 x, s32 y)
+void ui_input_manager::push_mouse_double_click_event(render_target *target, s32 x, s32 y)
 {
 	ui_event event = { ui_event::type::NONE };
 	event.event_type = ui_event::type::MOUSE_DOUBLE_CLICK;
@@ -401,7 +427,7 @@ void ui_input_manager::push_mouse_double_click_event(render_target* target, s32 
     push_char_event - pushes a char event
     to the specified render_target
 -------------------------------------------------*/
-void ui_input_manager::push_char_event(render_target* target, char32_t ch)
+void ui_input_manager::push_char_event(render_target *target, char32_t ch)
 {
 	ui_event event = { ui_event::type::NONE };
 	event.event_type = ui_event::type::IME_CHAR;

@@ -40,7 +40,7 @@ public:
 	uint8_t mem6502_r(offs_t offset);
 	void mem6502_w(offs_t offset, uint8_t data);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 protected:
 	// device-level overrides

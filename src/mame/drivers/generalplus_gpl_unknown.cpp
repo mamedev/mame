@@ -56,9 +56,9 @@ INPUT_PORTS_END
 
 void generalplus_gpl_unknown_state::map(address_map &map)
 {
-	map(0x000000, 0x00ffff).ram(); // unknown, RAM/ROM? there are jumps to this region, doesn't seem the usual unSP 8000-ffff ROM mapping
+	map(0x000000, 0x00bfff).ram(); // unknown, RAM?
+	map(0x00c000, 0x00ffff).ram(); // unknown, ROM? there are jumps to this region, doesn't seem the usual unSP 8000-ffff ROM mapping
 
-	// there are calls to 0x0f000 (internal ROM?)
 	map(0x200000, 0x3fffff).ram(); // almost certainly RAM where the SPI ROM gets copied
 }
 
@@ -97,22 +97,34 @@ void generalplus_gpl_unknown_state::generalplus_gpl_unknown(machine_config &conf
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x8000);
 }
 
+// exact size of internal ROM is unknown, but it appears to occupy at least 0xc000 - 0xffff (word addresses) in unSP space
+
 ROM_START( mapacman )
-	//ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x2000, NO_DUMP ) // exact size unknown
+	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
 	ROM_LOAD( "fm25q16a.bin", 0x000000, 0x200000, CRC(aeb472ac) SHA1(500c24b725f6d3308ef8cbdf4259f5be556c7c92) )
 ROM_END
 
 ROM_START( taspinv )
-	//ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
-	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x2000, NO_DUMP ) // exact size unknown
+	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
 	ROM_LOAD( "tinyarcade_spaceinvaders.bin", 0x000000, 0x200000, CRC(11ac4c77) SHA1(398d5eff83a4e94487ed810819085a0e44582908) )
 ROM_END
 
+ROM_START( parcade )
+	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x000000, 0x8000, NO_DUMP )
+
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
+	ROM_LOAD( "palacearcade_gpr25l3203_c22016.bin", 0x000000, 0x400000, CRC(98fbd2a1) SHA1(ffc19aadd53ead1f9f3472475606941055ca09f9) )
+ROM_END
+
+// for correctly offset disassembly use
+// unidasm palacearcade_gpr25l3203_c22016.bin -arch unsp12 -xchbytes -basepc 200000 >palace.txt
 
 // first 0x2000 bytes in ROM are blank, ROM data maps fully in RAM at 200000, but there are calls to lower regions
 // is it possible the SunPlus here is only handling sound / graphics, not gameplay?
@@ -121,3 +133,5 @@ CONS( 2017, mapacman,      0,       0,      generalplus_gpl_unknown,   generalpl
 
 // multiple different units appear to share the same ROM with a jumper to select game, it should be verified in each case that the external ROM was not changed.
 CONS( 2017, taspinv,       0,       0,      generalplus_gpl_unknown,   generalplus_gpl_unknown, generalplus_gpl_unknown_state, empty_init, "Super Impulse", "Space Invaders (Tiny Arcade)", MACHINE_IS_SKELETON )
+
+CONS( 2017, parcade,       0,       0,      generalplus_gpl_unknown,   generalplus_gpl_unknown, generalplus_gpl_unknown_state, empty_init, "Hasbro", "Palace Arcade", MACHINE_IS_SKELETON )

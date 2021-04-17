@@ -1204,9 +1204,9 @@ uint8_t towns_state::towns_cmos_low_r(offs_t offset)
 		return m_ram->pointer()[offset + 0xd8000];
 
 	if(m_nvram)
-		return m_nvram[offset];
+		return m_nvram[offset >> 2] >> ((offset & 3) << 3);
 	else
-		return m_nvram16[offset];
+		return m_nvram16[offset >> 1] >> ((offset & 1) << 3);
 }
 
 void towns_state::towns_cmos_low_w(offs_t offset, uint8_t data)
@@ -1215,25 +1215,41 @@ void towns_state::towns_cmos_low_w(offs_t offset, uint8_t data)
 		m_ram->pointer()[offset+0xd8000] = data;
 	else
 		if(m_nvram)
-			m_nvram[offset] = data;
+		{
+			uint8_t shift = (offset & 3) << 3;
+			m_nvram[offset >> 2] &= ~(0xff << shift);
+			m_nvram[offset >> 2] |= (uint32_t)data << shift;
+		}
 		else
-			m_nvram16[offset] = data;
+		{
+			uint8_t shift = (offset & 1) << 3;
+			m_nvram16[offset >> 1] &= ~(0xff << shift);
+			m_nvram16[offset >> 1] |= (uint16_t)data << shift;
+		}
 }
 
 uint8_t towns_state::towns_cmos_r(offs_t offset)
 {
 	if(m_nvram)
-		return m_nvram[offset];
+		return m_nvram[offset >> 2] >> ((offset & 3) << 3);
 	else
-		return m_nvram16[offset];
+		return m_nvram16[offset >> 1] >> ((offset & 1) << 3);
 }
 
 void towns_state::towns_cmos_w(offs_t offset, uint8_t data)
 {
 	if(m_nvram)
-		m_nvram[offset] = data;
+	{
+		uint8_t shift = (offset & 3) << 3;
+		m_nvram[offset >> 2] &= ~(0xff << shift);
+		m_nvram[offset >> 2] |= (uint32_t)data << shift;
+	}
 	else
-		m_nvram16[offset] = data;
+	{
+		uint8_t shift = (offset & 1) << 3;
+		m_nvram16[offset >> 1] &= ~(0xff << shift);
+		m_nvram16[offset >> 1] |= (uint16_t)data << shift;
+	}
 }
 
 void towns_state::towns_update_video_banks()
@@ -1598,7 +1614,7 @@ void towns_state::towns_cdrom_play_cdda(cdrom_image_device* device)
 	lba2 += m_towns_cd.parameter[3] << 8;
 	lba2 += m_towns_cd.parameter[2];
 	m_towns_cd.cdda_current = msf_to_lbafm(lba1);
-	m_towns_cd.cdda_length = msf_to_lbafm(lba2) - m_towns_cd.cdda_current;
+	m_towns_cd.cdda_length = msf_to_lbafm(lba2) - m_towns_cd.cdda_current + 1;
 
 	m_cdda->set_cdrom(device->get_cdrom_file());
 	m_cdda->start_audio(m_towns_cd.cdda_current,m_towns_cd.cdda_length);
@@ -1821,7 +1837,6 @@ uint8_t towns_state::towns_cdrom_r(offs_t offset)
 									{
 										int track = (m_towns_cd.extra_status/2)-4;
 										addr = cdrom_get_track_start(m_cdrom->get_cdrom_file(),track);
-										addr += cdrom_get_toc(m_cdrom->get_cdrom_file())->tracks[track].pregap;
 										addr = lba_to_msf(addr + 150);
 										towns_cd_set_status(0x17,
 											(addr & 0xff0000) >> 16,(addr & 0x00ff00) >> 8,addr & 0x0000ff);
@@ -2746,6 +2761,10 @@ void towns_state::machine_start()
 		m_flop[0]->get_device()->set_rpm(360);
 	if (m_flop[1]->get_device())
 		m_flop[1]->get_device()->set_rpm(360);
+
+	m_timer0 = 0;
+	m_timer1 = 0;
+	m_serial_irq_enable = 0;
 }
 
 void towns_state::machine_reset()
@@ -2788,9 +2807,11 @@ uint8_t towns_state::get_slave_ack(offs_t offset)
 	return 0x00;
 }
 
-FLOPPY_FORMATS_MEMBER( towns_state::floppy_formats )
-	FLOPPY_FMTOWNS_FORMAT
-FLOPPY_FORMATS_END
+void towns_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_FMTOWNS_FORMAT);
+}
 
 static void towns_floppies(device_slot_interface &device)
 {
@@ -2905,7 +2926,9 @@ void towns_state::towns_base(machine_config &config)
 	m_fdc->drq_wr_callback().set(FUNC(towns_state::mb8877a_drq_w));
 	FLOPPY_CONNECTOR(config, m_flop[0], towns_floppies, "35hd", towns_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, m_flop[1], towns_floppies, "35hd", towns_state::floppy_formats);
-	SOFTWARE_LIST(config, "fd_list").set_original("fmtowns_flop");
+	SOFTWARE_LIST(config, "fd_list_orig").set_original("fmtowns_flop_orig");
+	SOFTWARE_LIST(config, "fd_list_cracked").set_original("fmtowns_flop_cracked");
+	SOFTWARE_LIST(config, "fd_list_misc").set_original("fmtowns_flop_misc");
 
 	CDROM(config, m_cdrom, 0).set_interface("fmt_cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("fmtowns_cd");

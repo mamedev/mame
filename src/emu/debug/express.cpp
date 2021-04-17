@@ -31,6 +31,8 @@
 
 #include "emu.h"
 #include "express.h"
+
+#include "corestr.h"
 #include <cctype>
 
 
@@ -39,7 +41,9 @@
     DEBUGGING
 ***************************************************************************/
 
-#define DEBUG_TOKENS            0
+#define LOG_OUTPUT_FUNC         osd_printf_info
+#define VERBOSE                 0
+#include "logmacro.h"
 
 
 
@@ -543,9 +547,7 @@ void symbol_table::write_memory(address_space &space, offs_t address, u64 data, 
 device_t *symbol_table::expression_get_device(const char *tag)
 {
 	// convert to lowercase then lookup the name (tags are enforced to be all lower case)
-	std::string fullname(tag);
-	strmakelower(fullname);
-	return m_machine.root_device().subdevice(fullname.c_str());
+	return m_machine.root_device().subdevice(strmakelower(tag));
 }
 
 
@@ -1119,89 +1121,72 @@ void parsed_expression::copy(const parsed_expression &src)
 //  human readable token representation
 //-------------------------------------------------
 
-void parsed_expression::print_tokens(FILE *out)
+void parsed_expression::print_tokens()
 {
-#if DEBUG_TOKENS
-	osd_printf_debug("----\n");
-	for (parse_token *token = m_tokens.first(); token != nullptr; token = token->next())
+	LOG("----\n");
+	for (parse_token &token : m_tokenlist)
 	{
-		switch (token->type)
+		if (token.is_number())
+			LOG("NUMBER: %016X\n", token.value());
+		else if (token.is_string())
+			LOG("STRING: ""%s""\n", token.string());
+		else if (token.is_symbol())
+			LOG("SYMBOL: %s%s%s\n", token.symbol().name(), token.symbol().is_function() ? "()" : "", token.symbol().is_lval() ? " &" : "");
+		else if (token.is_operator())
 		{
-			default:
-			case parse_token::INVALID:
-				fprintf(out, "INVALID\n");
-				break;
-
-			case parse_token::END:
-				fprintf(out, "END\n");
-				break;
-
-			case parse_token::NUMBER:
-				fprintf(out, "NUMBER: %08X%08X\n", (u32)(token->value.i >> 32), u32(token->value.i));
-				break;
-
-			case parse_token::STRING:
-				fprintf(out, "STRING: ""%s""\n", token->string);
-				break;
-
-			case parse_token::SYMBOL:
-				fprintf(out, "SYMBOL: %08X%08X\n", u32(token->value.i >> 32), u32(token->value.i));
-				break;
-
-			case parse_token::OPERATOR:
-				switch (token->value.i)
-				{
-					case TVL_LPAREN:        fprintf(out, "(\n");                    break;
-					case TVL_RPAREN:        fprintf(out, ")\n");                    break;
-					case TVL_PLUSPLUS:      fprintf(out, "++ (unspecified)\n");     break;
-					case TVL_MINUSMINUS:    fprintf(out, "-- (unspecified)\n");     break;
-					case TVL_PREINCREMENT:  fprintf(out, "++ (prefix)\n");          break;
-					case TVL_PREDECREMENT:  fprintf(out, "-- (prefix)\n");          break;
-					case TVL_POSTINCREMENT: fprintf(out, "++ (postfix)\n");         break;
-					case TVL_POSTDECREMENT: fprintf(out, "-- (postfix)\n");         break;
-					case TVL_COMPLEMENT:    fprintf(out, "!\n");                    break;
-					case TVL_NOT:           fprintf(out, "~\n");                    break;
-					case TVL_UPLUS:         fprintf(out, "+ (unary)\n");            break;
-					case TVL_UMINUS:        fprintf(out, "- (unary)\n");            break;
-					case TVL_MULTIPLY:      fprintf(out, "*\n");                    break;
-					case TVL_DIVIDE:        fprintf(out, "/\n");                    break;
-					case TVL_MODULO:        fprintf(out, "%%\n");                   break;
-					case TVL_ADD:           fprintf(out, "+\n");                    break;
-					case TVL_SUBTRACT:      fprintf(out, "-\n");                    break;
-					case TVL_LSHIFT:        fprintf(out, "<<\n");                   break;
-					case TVL_RSHIFT:        fprintf(out, ">>\n");                   break;
-					case TVL_LESS:          fprintf(out, "<\n");                    break;
-					case TVL_LESSOREQUAL:   fprintf(out, "<=\n");                   break;
-					case TVL_GREATER:       fprintf(out, ">\n");                    break;
-					case TVL_GREATEROREQUAL:fprintf(out, ">=\n");                   break;
-					case TVL_EQUAL:         fprintf(out, "==\n");                   break;
-					case TVL_NOTEQUAL:      fprintf(out, "!=\n");                   break;
-					case TVL_BAND:          fprintf(out, "&\n");                    break;
-					case TVL_BXOR:          fprintf(out, "^\n");                    break;
-					case TVL_BOR:           fprintf(out, "|\n");                    break;
-					case TVL_LAND:          fprintf(out, "&&\n");                   break;
-					case TVL_LOR:           fprintf(out, "||\n");                   break;
-					case TVL_ASSIGN:        fprintf(out, "=\n");                    break;
-					case TVL_ASSIGNMULTIPLY:fprintf(out, "*=\n");                   break;
-					case TVL_ASSIGNDIVIDE:  fprintf(out, "/=\n");                   break;
-					case TVL_ASSIGNMODULO:  fprintf(out, "%%=\n");                  break;
-					case TVL_ASSIGNADD:     fprintf(out, "+=\n");                   break;
-					case TVL_ASSIGNSUBTRACT:fprintf(out, "-=\n");                   break;
-					case TVL_ASSIGNLSHIFT:  fprintf(out, "<<=\n");                  break;
-					case TVL_ASSIGNRSHIFT:  fprintf(out, ">>=\n");                  break;
-					case TVL_ASSIGNBAND:    fprintf(out, "&=\n");                   break;
-					case TVL_ASSIGNBXOR:    fprintf(out, "^=\n");                   break;
-					case TVL_ASSIGNBOR:     fprintf(out, "|=\n");                   break;
-					case TVL_COMMA:         fprintf(out, ",\n");                    break;
-					case TVL_MEMORYAT:      fprintf(out, token.memory_size_effect() ? "mem!\n" : "mem@\n");break;
-					case TVL_EXECUTEFUNC:   fprintf(out, "execute\n");              break;
-					default:                fprintf(out, "INVALID OPERATOR\n");     break;
-				}
-				break;
+			switch (token.optype())
+			{
+			case TVL_LPAREN:        LOG("(\n");                    break;
+			case TVL_RPAREN:        LOG(")\n");                    break;
+			case TVL_PLUSPLUS:      LOG("++ (unspecified)\n");     break;
+			case TVL_MINUSMINUS:    LOG("-- (unspecified)\n");     break;
+			case TVL_PREINCREMENT:  LOG("++ (prefix)\n");          break;
+			case TVL_PREDECREMENT:  LOG("-- (prefix)\n");          break;
+			case TVL_POSTINCREMENT: LOG("++ (postfix)\n");         break;
+			case TVL_POSTDECREMENT: LOG("-- (postfix)\n");         break;
+			case TVL_COMPLEMENT:    LOG("!\n");                    break;
+			case TVL_NOT:           LOG("~\n");                    break;
+			case TVL_UPLUS:         LOG("+ (unary)\n");            break;
+			case TVL_UMINUS:        LOG("- (unary)\n");            break;
+			case TVL_MULTIPLY:      LOG("*\n");                    break;
+			case TVL_DIVIDE:        LOG("/\n");                    break;
+			case TVL_MODULO:        LOG("%%\n");                   break;
+			case TVL_ADD:           LOG("+\n");                    break;
+			case TVL_SUBTRACT:      LOG("-\n");                    break;
+			case TVL_LSHIFT:        LOG("<<\n");                   break;
+			case TVL_RSHIFT:        LOG(">>\n");                   break;
+			case TVL_LESS:          LOG("<\n");                    break;
+			case TVL_LESSOREQUAL:   LOG("<=\n");                   break;
+			case TVL_GREATER:       LOG(">\n");                    break;
+			case TVL_GREATEROREQUAL:LOG(">=\n");                   break;
+			case TVL_EQUAL:         LOG("==\n");                   break;
+			case TVL_NOTEQUAL:      LOG("!=\n");                   break;
+			case TVL_BAND:          LOG("&\n");                    break;
+			case TVL_BXOR:          LOG("^\n");                    break;
+			case TVL_BOR:           LOG("|\n");                    break;
+			case TVL_LAND:          LOG("&&\n");                   break;
+			case TVL_LOR:           LOG("||\n");                   break;
+			case TVL_ASSIGN:        LOG("=\n");                    break;
+			case TVL_ASSIGNMULTIPLY:LOG("*=\n");                   break;
+			case TVL_ASSIGNDIVIDE:  LOG("/=\n");                   break;
+			case TVL_ASSIGNMODULO:  LOG("%%=\n");                  break;
+			case TVL_ASSIGNADD:     LOG("+=\n");                   break;
+			case TVL_ASSIGNSUBTRACT:LOG("-=\n");                   break;
+			case TVL_ASSIGNLSHIFT:  LOG("<<=\n");                  break;
+			case TVL_ASSIGNRSHIFT:  LOG(">>=\n");                  break;
+			case TVL_ASSIGNBAND:    LOG("&=\n");                   break;
+			case TVL_ASSIGNBXOR:    LOG("^=\n");                   break;
+			case TVL_ASSIGNBOR:     LOG("|=\n");                   break;
+			case TVL_COMMA:         LOG(",\n");                    break;
+			case TVL_MEMORYAT:      LOG(token.memory_side_effects() ? "mem!\n" : "mem@\n");break;
+			case TVL_EXECUTEFUNC:   LOG("execute\n");              break;
+			default:                LOG("INVALID OPERATOR\n");     break;
+			}
 		}
+		else
+			LOG("INVALID\n");
 	}
-	osd_printf_debug("----\n");
-#endif
+	LOG("----\n");
 }
 
 
@@ -1696,9 +1681,8 @@ void parsed_expression::parse_memory_operator(parse_token &token, const char *st
 //  ambiguities based on neighboring tokens
 //-------------------------------------------------
 
-void parsed_expression::normalize_operator(parse_token *prevtoken, parse_token &thistoken, const std::list<parse_token> &stack, bool was_rparen)
+void parsed_expression::normalize_operator(parse_token &thistoken, parse_token *prevtoken, parse_token *nexttoken, const std::list<parse_token> &stack, bool was_rparen)
 {
-	parse_token *nexttoken = thistoken.next();
 	switch (thistoken.optype())
 	{
 		// Determine if an open paren is part of a function or not
@@ -1791,7 +1775,7 @@ void parsed_expression::infix_to_postfix()
 		else if (token->is_operator())
 		{
 			// normalize the operator based on neighbors
-			normalize_operator(prev, *token, stack, was_rparen);
+			normalize_operator(*token, prev, next != m_tokenlist.end() ? &*next : nullptr, stack, was_rparen);
 			was_rparen = false;
 
 			// if the token is an opening parenthesis, push it onto the stack.
@@ -2206,8 +2190,7 @@ u64 parsed_expression::execute_tokens()
 //-------------------------------------------------
 
 parsed_expression::parse_token::parse_token(int offset)
-	: m_next(nullptr),
-		m_type(INVALID),
+	: m_type(INVALID),
 		m_offset(offset),
 		m_value(0),
 		m_flags(0),
@@ -2274,7 +2257,7 @@ void parsed_expression::execute_function(parse_token &token)
 		// if it is a function symbol, break out of the loop
 		if (peek.is_symbol())
 		{
-			symbol = peek.symbol();
+			symbol = &peek.symbol();
 			if (symbol->is_function())
 			{
 				m_token_stack.pop_back();

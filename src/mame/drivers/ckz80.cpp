@@ -202,7 +202,7 @@ void ckz80_state::ckz80(machine_config &config)
 	GENERIC_TERMINAL(config, m_terminal, 0);
 	m_terminal->set_keyboard_callback(FUNC(ckz80_state::kbd_put));
 	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
-	FLOPPY_CONNECTOR(config, "fdc:0", ckz80_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", ckz80_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	z80ctc_device& ctc(Z80CTC(config, "ctc", 16_MHz_XTAL / 4));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);

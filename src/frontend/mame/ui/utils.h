@@ -19,6 +19,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "unicode.h"
+
 
 class mame_ui_manager;
 class render_container;

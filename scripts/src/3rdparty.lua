@@ -2144,6 +2144,7 @@ end
 
 		buildoptions_c {
 			"-Wno-bad-function-cast",
+			"-Wno-strict-prototypes",
 		}
 
 	configuration { "android-*"}

@@ -38,15 +38,16 @@ This does not work for model 1 (no parallel printer support in ROM).
 Status:
 - Starts up, runs Basic. Cassette works. Quickload mostly works.
 - Some quickloads have corrupt text due to no lowercase.
-- Some quickloads don't run at all. Some may crash the emulator.
+- Some quickloads don't run at all.
 - Intel chips need adding, along with the peripherals they control.
 - A speaker has been included (which works), but real machine might not have
-  one at that address. To be checked.
+    one at that address. To be checked.
 - On meritum1, type SYSTEM then /12288 to enter the Monitor.
 - On meritum_net, type NET to activate the networking features.
 - Add Reset key and 2 blank keys.
 - Need software specific to test the hardware.
 - Need boot disks (MER-DOS, CP/M 2.2)
+- Due to faster CPU clock, no TRS-80 cassettes can be loaded.
 
 For Model III:
 - Add 4-colour mode, 4 shades of grey mode, and 512x192 monochrome.
@@ -341,20 +342,15 @@ void meritum_state::port_ff_w(u8 data)
     d1, d0 Cassette output */
 
 	static const double levels[4] = { 0.0, 1.0, -1.0, 0.0 };
-	static bool init = 0; // FIXME: static variable, breaks hard reset and multiple runs from system selection menu
-
 	m_cassette->change_state(BIT(data, 2) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 	m_cassette->output(levels[data & 3]);
 	m_cassette_data = false;
 
 	m_mode = BIT(data, 3);
 
-	if (!init)
-	{
-		init = 1;
-		static double const speaker_levels[4] = { 0.0, -1.0, 0.0, 1.0 };
-		m_speaker->set_levels(4, speaker_levels);
-	}
+	static double const speaker_levels[4] = { 0.0, -1.0, 0.0, 1.0 };
+	m_speaker->set_levels(4, speaker_levels);
+	m_speaker->level_w(data & 3); // see note about the speaker
 }
 
 u8 meritum_state::keyboard_r(offs_t offset)
@@ -406,9 +402,9 @@ QUICKLOAD_LOAD_MEMBER(meritum_state::quickload_cb)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	u8 type, length;
-	u8 data[0x100];
-	u8 addr[2];
+	uint8_t type, length;
+	uint8_t data[0x100];
+	uint8_t addr[2];
 	void *ptr;
 
 	while (!image.image_feof())
@@ -416,39 +412,49 @@ QUICKLOAD_LOAD_MEMBER(meritum_state::quickload_cb)
 		image.fread( &type, 1);
 		image.fread( &length, 1);
 
-		length -= 2;
-		int block_length = length ? length : 256;
-
 		switch (type)
 		{
-		case CMD_TYPE_OBJECT_CODE:
+			case CMD_TYPE_OBJECT_CODE:  // 01 - block of data
 			{
+				length -= 2;
+				u16 block_length = length ? length : 256;
 				image.fread( &addr, 2);
-				uint16_t address = (addr[1] << 8) | addr[0];
+				u16 address = (addr[1] << 8) | addr[0];
+				logerror("/CMD object code block: address %04x length %u\n", address, block_length);
+				if (address < 0x3c00)
+				{
+					image.message("Attempting to write outside of RAM");
+					return image_init_result::FAIL;
+				}
 				ptr = program.get_write_ptr(address);
 				image.fread( ptr, block_length);
 			}
 			break;
 
-		case CMD_TYPE_TRANSFER_ADDRESS:
+			case CMD_TYPE_TRANSFER_ADDRESS: // 02 - go address
 			{
 				image.fread( &addr, 2);
-				uint16_t address = (addr[1] << 8) | addr[0];
+				u16 address = (addr[1] << 8) | addr[0];
+				logerror("/CMD transfer address %04x\n", address);
 				m_maincpu->set_state_int(Z80_PC, address);
 			}
+			return image_init_result::PASS;
+
+		case CMD_TYPE_LOAD_MODULE_HEADER: // 05 - name
+			image.fread( &data, length);
+			logerror("/CMD load module header '%s'\n", data);
 			break;
 
-		case CMD_TYPE_LOAD_MODULE_HEADER:
-			image.fread( &data, block_length);
-			break;
-
-		case CMD_TYPE_COPYRIGHT_BLOCK:
-			image.fread( &data, block_length);
+		case CMD_TYPE_COPYRIGHT_BLOCK: // 1F - copyright info
+			image.fread( &data, length);
+			logerror("/CMD copyright block '%s'\n", data);
 			break;
 
 		default:
-			image.fread( &data, block_length);
+			image.fread( &data, length);
 			logerror("/CMD unsupported block type %u!\n", type);
+			image.message("Unsupported or invalid block type");
+			return image_init_result::FAIL;
 		}
 	}
 

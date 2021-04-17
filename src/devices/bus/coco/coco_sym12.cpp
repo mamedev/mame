@@ -5,12 +5,12 @@
     coco_sym12.cpp
 
 
-	Code for emulating The Symphony 12
+    Code for emulating The Symphony 12
 
-	Made by Speech Systems, 1982.
+    Made by Speech Systems, 1982.
 
-	This cartridge is a complex sound cartridge. It had 4 AY-3-8910 PSG
-	connected thru a PIA. It contained no ROM.
+    This cartridge is a complex sound cartridge. It had 4 AY-3-8910 PSG
+    connected thru a PIA. It contained no ROM.
 
 ***************************************************************************/
 
@@ -40,7 +40,7 @@ namespace
 			: device_t(mconfig, COCO_SYM12, tag, owner, clock)
 			, device_cococart_interface(mconfig, *this)
 			, m_pia(*this, "s12_pia")
-			, m_ay8910(*this, "s12_ay8910-%u", 1)
+			, m_ay8910(*this, "s12_ay8910.%u", 1)
 		{
 		}
 
@@ -52,7 +52,7 @@ namespace
 		virtual void device_start() override
 		{
 			// install handlers
- 			install_readwrite_handler( 0xff60, 0xff63, read8sm_delegate(*m_pia, FUNC(pia6821_device::read)), write8sm_delegate(*m_pia, FUNC(pia6821_device::write)));
+			install_readwrite_handler( 0xff60, 0xff63, read8sm_delegate(*m_pia, FUNC(pia6821_device::read)), write8sm_delegate(*m_pia, FUNC(pia6821_device::write)));
 		}
 
 		u8 read_porta();

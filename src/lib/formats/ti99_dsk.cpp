@@ -80,7 +80,7 @@ int ti99_floppy_format::get_encoding(int cell_size)
 /*
     Load the image from disk and convert it into a sequence of flux levels.
 */
-bool ti99_floppy_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool ti99_floppy_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	int cell_size = 0;
 	int sector_count = 0;
@@ -211,11 +211,8 @@ bool ti99_floppy_format::load(io_generic *io, uint32_t form_factor, floppy_image
 /*
     Save all tracks to the image file.
 */
-bool ti99_floppy_format::save(io_generic *io, floppy_image *image)
+bool ti99_floppy_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
-	int act_track_size = 0;
-
-	uint8_t bitstream[500000/8];
 	uint8_t sectordata[9216];   // max size (36*256)
 
 	int cellsizes[] = { 2000, 4000, 1000, 2000 };
@@ -246,13 +243,10 @@ bool ti99_floppy_format::save(io_generic *io, floppy_image *image)
 		for (int track = 0; track < track_count; track++)
 		{
 			// Retrieve the cells from the flux sequence. This also delivers the actual track size.
-			generate_bitstream_from_track(track, head, cell_size, bitstream, act_track_size, image);
-
-			// Maybe the track has become longer due to moving splices
-			if (act_track_size > 200000000/cell_size) act_track_size = 200000000/cell_size;
+			auto bitstream = generate_bitstream_from_track(track, head, cell_size, image);
 
 			LOGMASKED(LOG_DETAIL, "[ti99_dsk] Getting sectors from track %d, head %d\n", track, head);
-			seccount = get_sectors(bitstream, act_track_size, encoding, track, head, expected_sectors, sectordata, sector);
+			seccount = get_sectors(bitstream, encoding, track, head, expected_sectors, sectordata, sector);
 			LOGMASKED(LOG_DETAIL, "[ti99_dsk] Seccount = %d\n", seccount);
 
 			// We may have more sectors in MFM (18). This is OK in track 0; otherwise we need to restart the process.
@@ -564,14 +558,13 @@ enum
     The sectors are assumed to have a length of 256 byte, and their sequence
     is stored in the secnumber array.
 */
-int ti99_floppy_format::get_sectors(const uint8_t *bitstream, int cell_count, int encoding, int track, int head, int sectors, uint8_t *sectordata, int *secnumber)
+int ti99_floppy_format::get_sectors(const std::vector<bool> &bitstream, int encoding, int track, int head, int sectors, uint8_t *sectordata, int *secnumber)
 {
 	int bitpos = 0;
 	int lastpos = 0;
 	int spos = 0;
 	int seccount = 0;
 	uint16_t shift_reg = 0;
-	int bytepos = 0;
 	uint8_t databyte = 0;
 	uint8_t curbyte = 0;
 	int rep = 0;
@@ -584,12 +577,10 @@ int ti99_floppy_format::get_sectors(const uint8_t *bitstream, int cell_count, in
 	int first = (encoding==floppy_image::MFM)? A1IDAM1 : FMIDAM;
 	int state = first;
 
-	while (bitpos < cell_count)
+	while (bitpos < bitstream.size())
 	{
 		LOGMASKED(LOG_SHIFT, "[ti99_dsk] shift = %04x\n", shift_reg);
-		shift_reg = (shift_reg << 1) & 0xffff;
-		if ((bitpos & 0x07)==0) curbyte = bitstream[bytepos++];
-		if ((curbyte & 0x80) != 0) shift_reg |= 1;
+		shift_reg = (shift_reg << 1) | bitstream[bitpos];
 
 		if (((bitpos - lastpos) & 1)==0)
 		{
@@ -912,7 +903,7 @@ uint8_t ti99_floppy_format::get_data_from_encoding(uint16_t raw)
 */
 const char *ti99_sdf_format::name() const
 {
-	return "sdf";
+	return "ti99";
 }
 
 const char *ti99_sdf_format::description() const
@@ -925,7 +916,7 @@ const char *ti99_sdf_format::extensions() const
 	return "dsk";
 }
 
-int ti99_sdf_format::identify(io_generic *io, uint32_t form_factor)
+int ti99_sdf_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint64_t file_size = io_generic_size(io);
 	int vote = 0;
@@ -1218,7 +1209,7 @@ const char *ti99_tdf_format::extensions() const
 /*
     Determine whether the image file can be interpreted as a track dump
 */
-int ti99_tdf_format::identify(io_generic *io, uint32_t form_factor)
+int ti99_tdf_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	int vote = 0;
 	uint8_t fulltrack[6872];
@@ -1285,52 +1276,58 @@ int ti99_tdf_format::identify(io_generic *io, uint32_t form_factor)
 }
 
 /*
-    Find the proper format for a given image file.
+    Find the proper format for a given image file. Tracks are counted per side.
+    Note that only two formats are actually compatible with the PC99 emulator.
 */
 void ti99_tdf_format::determine_sizes(io_generic *io, int& cell_size, int& sector_count, int& heads, int& tracks)
 {
 	uint64_t file_size = io_generic_size(io);
-	heads = 2;  // TDF only supports two-sided recordings
-	tracks = 40;
+
 	// LOGMASKED(LOG_INFO, "[ti99_dsk] Image size = %ld\n", file_size);   // doesn't compile
 	switch (file_size)
 	{
-	case 260240:   // used in PC99
-		cell_size = 4000;
+	case 260240:            // used in PC99
 		sector_count = 9;
+		tracks = 40;
 		break;
-	case 491520:   // 320K HX5102
-		cell_size = 2000;
+	case 491520:            // 320K HX5102
 		sector_count = 16;
+		tracks = 40;
 		break;
-	case 549760:   // used in PC99
-		cell_size = 2000;
+	case 549760:            // used in PC99
 		sector_count = 18;
+		tracks = 40;
 		break;
+	case 1003520:
+		sector_count = 36;
+		tracks = 40;
+		break;
+
 	case 520480:
-		cell_size = 4000;
 		sector_count = 9;
+		tracks = 80;
 		break;
 	case 983040:
-		cell_size = 2000;
 		sector_count = 16;
 		tracks = 80;
 		break;
 	case 1099520:
-		cell_size = 2000;
 		sector_count = 18;
 		tracks = 80;
 		break;
 	case 2007040:
-		cell_size = 1000;
-		sector_count = 18;
+		sector_count = 36;
 		tracks = 80;
 		break;
+
 	default:
 		cell_size = 0;
 		sector_count = 0;
-		break;
+		return;
 	}
+
+	heads = 2;  // TDF only supports two-sided recordings
+	cell_size = (sector_count <= 9)? 4000 : ((sector_count <= 18)? 2000 : 1000);
 }
 
 /*
@@ -1341,7 +1338,7 @@ void ti99_tdf_format::determine_sizes(io_generic *io, int& cell_size, int& secto
 */
 void ti99_tdf_format::load_track(io_generic *io, uint8_t *sectordata, int *sector, int *secoffset, int head, int track, int sectorcount, int trackcount)
 {
-	uint8_t fulltrack[6872]; // space for a full TDF track
+	uint8_t fulltrack[12544]; // space for a full TDF track
 
 	// Read beginning of track 0. We need this to get the first gap, according
 	// to the format
@@ -1436,7 +1433,7 @@ void ti99_tdf_format::load_track(io_generic *io, uint8_t *sectordata, int *secto
 */
 void ti99_tdf_format::write_track(io_generic *io, uint8_t *sectordata, int *sector, int track, int head, int sector_count, int track_count)
 {
-	uint8_t trackdata[14000];
+	uint8_t trackdata[12544];
 	int offset = ((track_count * head) + track) * get_track_size(sector_count);
 	int a1 = 0;
 

@@ -34,7 +34,7 @@
         * Galileo GT64010 system controller
         * National Semiconductor PC87415 IDE controller
         * 3dfx FBI with 2MB frame buffer
-        * 3dfx TMU with 4MB txture memory
+        * 3dfx TMU with 4MB texture memory
         * Midway I/O ASIC
         * 4MB DRAM for main CPU
         * 512KB boot ROM
@@ -48,7 +48,7 @@
         * Galileo GT64010 system controller
         * National Semiconductor PC87415 IDE controller
         * 3dfx FBI with 2MB frame buffer
-        * 3dfx TMU with 4MB txture memory
+        * 3dfx TMU with 4MB texture memory
         * Midway I/O ASIC
         * 8MB DRAM for main CPU
         * 512KB boot ROM
@@ -64,7 +64,7 @@
         * SMC91C94 ethernet controller
         * ADC0848 8 x A-to-D converters
         * 3dfx FBI with 2MB frame buffer
-        * 2 x 3dfx TMU with 4MB txture memory
+        * 2 x 3dfx TMU with 4MB texture memory
         * Midway I/O ASIC
         * 8MB DRAM for main CPU
         * 512KB boot ROM
@@ -89,7 +89,7 @@
         1x ADSP-2115
         1x Midway security PIC Blitz 99 25" 481xxxxxx (U96)
         1x mid sized QFP (Galileo?) has heatsink (u86)
-        1x mid sized QFP (PixelFX?) heakstink (u17)
+        1x mid sized QFP (PixelFX?) heatsink (u17)
         1x mid sized QFP, smaller (TexelFX?) heatsink (u87)
         12x v53c16258hk40 256Kx16 RAM (near Voodoo section)
         1x PC87415VCG IDE controller
@@ -266,16 +266,6 @@ namespace {
 *  Structures
 *************************************/
 
-struct widget_data
-{
-	// ethernet register address
-	uint8_t           ethernet_addr;
-
-	// IRQ information
-	uint8_t           irq_num;
-	uint8_t           irq_mask;
-};
-
 class seattle_state : public driver_device
 {
 public:
@@ -343,6 +333,10 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(i40_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gearshift_r);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<nvram_device> m_nvram;
 	required_device<mips3_device> m_maincpu;
@@ -368,6 +362,16 @@ private:
 	output_finder<24> m_leds;
 
 	static const uint8_t translate49[7];
+
+	struct widget_data
+	{
+		// ethernet register address
+		uint8_t           ethernet_addr;
+
+		// IRQ information
+		uint8_t           irq_num;
+		uint8_t           irq_mask;
+	};
 
 	widget_data m_widget;
 	uint32_t m_interrupt_enable;
@@ -423,9 +427,6 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(ethernet_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(ioasic_irq);
@@ -483,6 +484,13 @@ void seattle_state::machine_start()
 	m_wheel_driver.resolve();
 	m_lamps.resolve();
 	m_leds.resolve();
+
+	m_pending_analog_read = 0;
+	m_ethernet_irq_state = 0;
+
+	m_widget.ethernet_addr = 0;
+	m_widget.irq_num = 0;
+	m_widget.irq_mask = 0;
 }
 
 
@@ -714,7 +722,7 @@ void seattle_state::analog_port_w(uint32_t data)
 	// Declare calibration finished as soon as a SYSTEM button is hit
 	if (!m_wheel_calibrated && ((~m_io_system->read()) & 0xffff)) {
 		m_wheel_calibrated = true;
-		//osd_printf_info("wheel calibration comlete wheel: %02x\n", currValue);
+		//osd_printf_info("wheel calibration complete wheel: %02x\n", currValue);
 	}
 }
 
@@ -2105,7 +2113,6 @@ void seattle_state::wg3dh(machine_config &config)
 	m_ioasic->irq_handler().set(FUNC(seattle_state::ioasic_irq));
 }
 
-
 void seattle_state::mace(machine_config &config)
 {
 	seattle150(config);
@@ -2280,17 +2287,39 @@ void seattle_state::hyprdriv(machine_config &config)
  *
  *************************************/
 
+#define WG3DH_BIOS \
+		ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) \
+		ROM_SYSTEM_BIOS( 0, "l01", "Boot Code L0.1?" ) \
+		ROMX_LOAD( "l0.1_gretzky_video_system_boot_u32.u32", 0x000000, 0x80000, CRC(80fb6dfd) SHA1(b78d1c8abdb875196c5cd9afc986f54865a90aba), ROM_BIOS(0) ) /* Boot Code Version ? (Aug 13 1996 16:59:47 @ 0x599D0 in ROM) */ \
+		ROM_SYSTEM_BIOS( 1, "l12", "Boot Code L1.2" ) \
+		ROMX_LOAD( "l1.2_gretzky_video_system_boot_u32.u32", 0x000000, 0x80000, CRC(15e4cea2) SHA1(72c0db7dc53ce645ba27a5311b5ce803ad39f131), ROM_BIOS(1) ) /* Boot Code Version L1.2 (Oct  8 1996 12:55:39 @ 0x5CDE0 in ROM) */
+
 ROM_START( wg3dh )
-	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Code Version L1.2 (10/8/96)
-	ROM_LOAD( "wg3dh_12.u32", 0x000000, 0x80000, CRC(15e4cea2) SHA1(72c0db7dc53ce645ba27a5311b5ce803ad39f131) )
+	WG3DH_BIOS
+	ROM_DEFAULT_BIOS("l12")
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.3 (Guts 10/15/96, Main 10/15/96)
-	DISK_IMAGE( "wg3dh", 0, SHA1(4fc6f25d7f043d9bcf8743aa8df1d9be3cbc375b) )
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.3 (Guts: Oct 15 1996 16:57:13, Main: Oct 15 1996 17:36:39)
+	DISK_IMAGE( "wg3dh", 0, SHA1(4fc6f25d7f043d9bcf8743aa8df1d9be3cbc375b) ) // ST94420AG hard drive
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version L1.1
-	ROM_LOAD16_BYTE( "soundl11.u95", 0x000000, 0x8000, CRC(c589458c) SHA1(0cf970a35910a74cdcf3bd8119bfc0c693e19b00) )
+	ROM_LOAD16_BYTE( "l1.1_gretzky_video_system_boot_u95.u95", 0x000000, 0x8000, CRC(c589458c) SHA1(0cf970a35910a74cdcf3bd8119bfc0c693e19b00) )
+ROM_END
+
+
+ROM_START( wg3dhfe ) // Original PCB board with PIC security chip labeled as  310  Gretzky Hockey  U96   *310300003*   (IE: serial number 00003)
+	WG3DH_BIOS
+	ROM_DEFAULT_BIOS("l01") // disk was paired with a board populated with this early boot ROM
+
+	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
+
+	// Disk caddy stickered:  3DHOCKEY FATALITY EDITION, another sticker stated:  PHX-HDsisk -0006    <-- Yes, it's "HDsisk" and not HDisk
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version ? (Guts: Feb 4 1997 17:08:22, Main: Mar 21 1997 12:15:39)
+	DISK_IMAGE( "wg3dhfe", 0, SHA1(49b72e7e76036b119bfc8b9a0ef8b9acd346d0be) ) // ST94420AG hard drive
+
+	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version L1.1
+	ROM_LOAD16_BYTE( "l0.1_gretzky_video_system_boot_u95.u95", 0x000000, 0x8000, CRC(c589458c) SHA1(0cf970a35910a74cdcf3bd8119bfc0c693e19b00) ) // labeled as L0.1 == l1.1_gretzky_video_system_boot_u95.u95
 ROM_END
 
 
@@ -2347,6 +2376,7 @@ ROM_START( sfrush )
 	DISK_IMAGE( "sfrush", 0, SHA1(e2db0270a707fb2115207f988d5751081d6b4994) )
 ROM_END
 
+
 ROM_START( sfrusha )
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Code Version L1.06A
 	ROM_LOAD( "hdbootv1_06a.bin", 0x000000, 0x80000, CRC(f247ba60) SHA1(850f97002eb1e362c3df870d7b6a1b5524ab983d) )
@@ -2365,7 +2395,6 @@ ROM_START( sfrusha )
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version L1.06
 	DISK_IMAGE( "sfrush", 0, SHA1(e2db0270a707fb2115207f988d5751081d6b4994) )
 ROM_END
-
 
 
 ROM_START( sfrushrk )
@@ -2407,6 +2436,7 @@ ROM_START( sfrushrkw )
 	DISK_IMAGE( "sfrushrk", 0, SHA1(e763f26aca67ebc17fe8b8df4fba91d492cf7837) )
 ROM_END
 
+
 ROM_START( sfrushrkwo )
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Code
 	ROM_LOAD( "boottest.bin",   0x000000, 0x080000, CRC(3f83f8e0) SHA1(c1862fc35c119586f79f23c52ecea6c35c37828a) ) // Labeled "Rush The Rock Boot Eeprom Test Only"
@@ -2426,6 +2456,7 @@ ROM_START( sfrushrkwo )
 	DISK_IMAGE( "sfrushrk", 0, SHA1(e763f26aca67ebc17fe8b8df4fba91d492cf7837) )
 ROM_END
 
+
 ROM_START( calspeed )
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Code Version 1.2 (2/18/98)
 	ROM_LOAD( "caspd1_2.u32", 0x000000, 0x80000, CRC(0a235e4e) SHA1(b352f10fad786260b58bd344b5002b6ea7aaf76d) )
@@ -2438,6 +2469,7 @@ ROM_START( calspeed )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 ROM_END
+
 
 ROM_START( calspeeda )
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 )  /* Boot Code Version 1.2 (2/18/98) */
@@ -2464,6 +2496,7 @@ ROM_START( calspeeda )
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 ROM_END
 
+
 ROM_START( calspeedb )
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 )  // Boot Code Version 1.2 (2/18/98)
 	ROM_LOAD( "caspd1_2.u32", 0x000000, 0x80000, CRC(0a235e4e) SHA1(b352f10fad786260b58bd344b5002b6ea7aaf76d) )
@@ -2476,6 +2509,7 @@ ROM_START( calspeedb )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 ROM_END
+
 
 ROM_START( vaportrx )
 	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 )
@@ -2518,6 +2552,13 @@ ROM_START( biofreak )
 	DISK_IMAGE( "biofreak", 0, SHA1(711241642f92ded8eaf20c418ea748989183fe10) )
 ROM_END
 
+#define BLITZ_BIOS \
+		ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) \
+		ROM_DEFAULT_BIOS("l12") \
+		ROM_SYSTEM_BIOS( 0, "l11", "Boot Code L1.1" ) \
+		ROMX_LOAD( "blitz1_1.u32", 0x000000, 0x80000, CRC(8163ce02) SHA1(89b432d8879052f6c5534ee49599f667f50a010f), ROM_BIOS(0) ) \
+		ROM_SYSTEM_BIOS( 1, "l12", "Boot Code L1.2" ) \
+		ROMX_LOAD( "blitz1_2.u32", 0x000000, 0x80000, CRC(38dbecf5) SHA1(7dd5a5b3baf83a7f8f877ff4cd3f5e8b5201b36f), ROM_BIOS(1) )
 
 ROM_START( blitz )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
@@ -2525,22 +2566,7 @@ ROM_START( blitz )
 
 	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
 
-	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Code Version 1.2
-	ROM_LOAD( "blitz1_2.u32", 0x000000, 0x80000, CRC(38dbecf5) SHA1(7dd5a5b3baf83a7f8f877ff4cd3f5e8b5201b36f) )
-
-	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.21
-	DISK_IMAGE( "blitz", 0, SHA1(9131c7888e89b3c172780156ed3fe1fe46f78b0a) )
-ROM_END
-
-
-ROM_START( blitz11 )
-	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
-	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
-
-	ROM_REGION32_LE( 0x100000, PCI_ID_GALILEO":update", ROMREGION_ERASEFF )
-
-	ROM_REGION32_LE( 0x80000, PCI_ID_GALILEO":rom", 0 ) // Boot Code Version 1.1
-	ROM_LOAD( "blitz1_1.u32", 0x000000, 0x80000, CRC(8163ce02) SHA1(89b432d8879052f6c5534ee49599f667f50a010f) )
+	BLITZ_BIOS
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.21
 	DISK_IMAGE( "blitz", 0, SHA1(9131c7888e89b3c172780156ed3fe1fe46f78b0a) )
@@ -2562,6 +2588,7 @@ ROM_START( blitz99 )
 	ROM_REGION( 0x2000, "serial_security_pic", 0 ) // security PIC (provides game ID code and serial number)
 	ROM_LOAD( "481_blitz-99.u96", 0x0000, 0x2000, CRC(f58df548) SHA1(5bda123035f49f06b4721ab4a1577a115470aa02) )
 ROM_END
+
 
 ROM_START( blitz99a )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
@@ -2826,6 +2853,7 @@ void seattle_state::init_hyprdriv()
 
 // Atari
 GAME(  1996, wg3dh,      0,        wg3dh,     wg3dh,    seattle_state, init_wg3dh,    ROT0, "Atari Games",  "Wayne Gretzky's 3D Hockey (ver 1.3)", MACHINE_SUPPORTS_SAVE )
+GAME(  1996, wg3dhfe,    wg3dh,    wg3dh,     wg3dh,    seattle_state, init_wg3dh,    ROT0, "Atari Games",  "Wayne Gretzky's 3D Hockey Fatality Edition (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME(  1996, mace,       0,        mace,      mace,     seattle_state, init_mace,     ROT0, "Atari Games",  "Mace: The Dark Age (boot ROM 1.0ce, HDD 1.0b)", MACHINE_SUPPORTS_SAVE )
 GAME(  1997, macea,      mace,     mace,      mace,     seattle_state, init_mace,     ROT0, "Atari Games",  "Mace: The Dark Age (HDD 1.0a)", MACHINE_SUPPORTS_SAVE )
 GAMEL( 1996, sfrush,     0,        sfrush,    sfrush,   seattle_state, init_sfrush,   ROT0, "Atari Games",  "San Francisco Rush (boot rom L 1.0)", MACHINE_SUPPORTS_SAVE, layout_sfrush )
@@ -2844,8 +2872,7 @@ GAMEL( 1998, vaportrxp,  vaportrx, vaportrx,  vaportrx, seattle_state, init_vapo
 
 // Midway
 GAME(  1997, biofreak,   0,        biofreak,  biofreak, seattle_state, init_biofreak, ROT0, "Midway Games", "Bio F.R.E.A.K.S (prototype, boot ROM 0.1i)", MACHINE_SUPPORTS_SAVE )
-GAME(  1997, blitz,      0,        blitz,     blitz,    seattle_state, init_blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.2)", MACHINE_SUPPORTS_SAVE )
-GAME(  1997, blitz11,    blitz,    blitz,     blitz,    seattle_state, init_blitz,    ROT0, "Midway Games", "NFL Blitz (boot ROM 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME(  1997, blitz,      0,        blitz,     blitz,    seattle_state, init_blitz,    ROT0, "Midway Games", "NFL Blitz (ver 1.21, Dec 5 1987)", MACHINE_SUPPORTS_SAVE )
 GAME(  1998, blitz99,    0,        blitz99,   blitz99,  seattle_state, init_blitz99,  ROT0, "Midway Games", "NFL Blitz '99 (ver 1.30, Sep 22 1998)", MACHINE_SUPPORTS_SAVE )
 GAME(  1998, blitz99a,   blitz99,  blitz99,   blitz99,  seattle_state, init_blitz99,  ROT0, "Midway Games", "NFL Blitz '99 (ver 1.2, Aug 28 1998)", MACHINE_SUPPORTS_SAVE )
 GAME(  1999, blitz2k,    0,        blitz2k,   blitz99,  seattle_state, init_blitz2k,  ROT0, "Midway Games", "NFL Blitz 2000 Gold Edition (ver 1.2, Sep 22 1999)", MACHINE_SUPPORTS_SAVE )

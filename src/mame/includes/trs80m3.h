@@ -69,7 +69,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 	void port_ff_w(uint8_t data);
 	void port_f4_w(uint8_t data);
 	void port_ec_w(uint8_t data);
@@ -145,7 +145,7 @@ private:
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<cassette_image_device> m_cassette;
+	optional_device<cassette_image_device> m_cassette;
 	optional_ioport m_io_config;
 	required_ioport_array<8> m_io_keyboard;
 	optional_device<ram_device>                 m_mainram;

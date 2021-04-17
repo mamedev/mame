@@ -15,6 +15,7 @@
 
 #include "rendertypes.h"
 
+#include <algorithm>
 #include <cmath>
 
 
@@ -126,11 +127,7 @@ static inline float apply_brightness_contrast_gamma_fp(float srcval, float brigh
 	srcval = (srcval * contrast) + brightness - 1.0f;
 
 	/* clamp and return */
-	if (srcval < 0.0f)
-		srcval = 0.0f;
-	if (srcval > 1.0f)
-		srcval = 1.0f;
-	return srcval;
+	return std::clamp(srcval, 0.0f, 1.0f);
 }
 
 

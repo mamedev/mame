@@ -54,7 +54,7 @@ const char *fdd_format::extensions() const
 	return "fdd";
 }
 
-int fdd_format::identify(io_generic *io, uint32_t form_factor)
+int fdd_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t h[7];
 	io_generic_read(io, h, 0, 7);
@@ -65,7 +65,7 @@ int fdd_format::identify(io_generic *io, uint32_t form_factor)
 	return 0;
 }
 
-bool fdd_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
+bool fdd_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t hsec[0x0c];
 

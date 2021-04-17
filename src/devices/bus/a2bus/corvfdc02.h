@@ -54,7 +54,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
 
-	DECLARE_FLOPPY_FORMATS(corv_floppy_formats);
+	static void corv_floppy_formats(format_registration &fr);
 
 	uint8_t *m_rom;
 	uint8_t m_fdc_local_status, m_fdc_local_command;

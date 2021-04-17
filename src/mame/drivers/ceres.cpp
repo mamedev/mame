@@ -32,6 +32,7 @@
 #include "bus/rs232/rs232.h"
 #include "imagedev/harddriv.h"
 #include "imagedev/floppy.h"
+#include "formats/imd_dsk.h"
 
 // video
 #include "screen.h"
@@ -85,8 +86,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_y);
 
 protected:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
-
 	required_device<ns32032_device> m_cpu;
 	required_device<ns32081_device> m_fpu;
 	required_device<ram_device> m_ram;
@@ -200,13 +199,15 @@ void ceres1_state::wfc_command(u8 command)
 	case 2:
 		LOG("read sector drive %d chs %d,%d,%d count %d\n",
 			(m_wfc_sdh >> 3) & 3, m_wfc_cylinder & 0x3ff, (m_wfc_sdh >> 0) & 7, m_wfc_sector, m_wfc_count);
-		hard_disk_read(hdf, get_lbasector(hdf), m_wfc_sram);
+		if (hdf)
+			hard_disk_read(hdf, get_lbasector(hdf), m_wfc_sram);
 		m_wfc_offset = 0;
 		break;
 	case 3:
 		LOG("write sector drive %d chs %d,%d,%d count %d\n",
 			(m_wfc_sdh >> 3) & 3, m_wfc_cylinder & 0x3ff, (m_wfc_sdh >> 0) & 7, m_wfc_sector, m_wfc_count);
-		hard_disk_write(hdf, get_lbasector(hdf), m_wfc_sram);
+		if (hdf)
+			hard_disk_write(hdf, get_lbasector(hdf), m_wfc_sram);
 		m_wfc_offset = 0;
 		break;
 	case 4:
@@ -377,7 +378,7 @@ void ceres1_state::ceres1(machine_config &config)
 	HARDDISK(config, m_hdd[2], 0);
 
 	WD2797(config, m_fdc, 20_MHz_XTAL / 20);
-	FLOPPY_CONNECTOR(config, "fdc:0", "fdd", FLOPPY_35_DD, true, floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", "fdd", FLOPPY_35_DD, true, floppy_image_device::default_mfm_floppy_formats);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(70'000'000, 1344, 0, 1024, 838, 0, 800);
@@ -405,10 +406,6 @@ u32 ceres1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rec
 
 	return 0;
 }
-
-FLOPPY_FORMATS_MEMBER(ceres1_state::floppy_formats)
-	FLOPPY_IMD_FORMAT
-FLOPPY_FORMATS_END
 
 ROM_START(ceres1)
 	ROM_REGION32_LE(0x8000, "eprom", 0)

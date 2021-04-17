@@ -88,10 +88,25 @@
 #define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_NO_SOUND|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL|MACHINE_CLICKABLE_ARTWORK
 
 // I assume all sets have this, or is M1B different? We don't use it right now anyway.
+// TODO: Add these to appropriate boards as a BIOS or similar, for now we expect all sets to have them
 #define ROM_END_M1A_MCU \
-	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00  ) \
+	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00  ) /* 80c51 */  \
 	ROM_LOAD( "m1a-mcu.bin", 0x0000, 0x1000, CRC(ae957b00) SHA1(83267b64335b4ab33cc033d5003c4c93c813fc37) ) \
+	ROM_REGION( 0x100000, "gals", ROMREGION_ERASE00  ) \
+	ROM_LOAD( "gal16v8a.m1a.a.u32", 0x0000, 0x000117, CRC(5da2b5ab) SHA1(7af5ee675e280905fa41aee23b06394a59c8758d) ) /* M1a,b mainboards */  \
+	ROM_LOAD( "gal16v8.digi.a.u5", 0x0000, 0x000117, CRC(137c8d65) SHA1(c86d8ae7e0c99c4f179810dd12e7f412f167093e) ) /* FM + DIGITAL sound/rom card */  \
+	ROM_LOAD( "gal16v8.digi.b.u5", 0x0000, 0x000117, CRC(98dc995a) SHA1(13056e0b2a979a92279b668ce570b80bb75654f9) ) /* DIGITAL sound/rom card */  \
+	ROM_LOAD( "gal16v8.esp.b.u9", 0x0000, 0x000117, CRC(d0ea9b54) SHA1(b7611fb4004431a21f81be10934392bea8dc00a0) ) /* E.S.P. sound/rom card */  \
 	ROM_END
+
+/*******************************************************************************************************************************************************************************************************
+  SPRINT
+  (uses onboard sound)
+******************************************************************************************************************************************************************************************************/
+
+ROM_START( m1sprint )   ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )    ROM_LOAD( "sa1-084.bin", 0x0000, 0x010000, CRC(c4ac0892) SHA1(f20b1f50aedeb7e554cf1b210fc442763086f781) ) ROM_END_M1A_MCU
+
+GAME( 1990, m1sprint, 0, maygay_m1_no_oki, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "SPRINT (Maygay) (M1A/B)",GAME_FLAGS )
 
 /*******************************************************************************************************************************************************************************************************
   Black Hole (Dutch)
@@ -812,6 +827,7 @@ ROM_START( m1dkong81 )   ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  ) RO
 ROM_START( m1dkong81p )  ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  ) ROM_LOAD( "sa7-116", 0x0000, 0x020000, CRC(1a28ddbb) SHA1(e28297885c1321cff5bf87cbf9d98f3b6ae005d6) ) m1_dkong_sound ROM_END_M1A_MCU //8_1 Protocol
 ROM_START( m1dkong41 )   ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  ) ROM_LOAD( "sa7-109", 0x0000, 0x020000, CRC(06aec0d7) SHA1(aa1dd411aa43ecf0908cb9db64636de319041159) ) m1_dkong_sound ROM_END_M1A_MCU //4_1
 ROM_START( m1dkong41p )  ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  ) ROM_LOAD( "sa7-110", 0x0000, 0x020000, CRC(7f2bd92c) SHA1(d0f41d63db4e71ee4a7cc2ea878add0c72b1c7bb) ) m1_dkong_sound ROM_END_M1A_MCU //4_1 Protocol
+ROM_START( m1dkonga2 )   ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  ) ROM_LOAD( "sa7-364.bin", 0x0000, 0x020000, CRC(2EB63913) SHA1(7F7FCD894878E2565A50FCA6D59CF8EFA2C31859) ) m1_dkong_sound ROM_END_M1A_MCU
 
 GAMEL( 1996, m1dkong,     0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.2 (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
 GAMEL( 1996, m1dkongp,    m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v9.2 (Protocol) (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
@@ -840,6 +856,7 @@ GAMEL( 1996, m1dkong21,   m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1
 GAMEL( 1996, m1dkong21p,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v2.1 (Older) (Protocol) (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
 GAMEL( 1996, m1dkong11,   m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v1.1 (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
 GAMEL( 1996, m1dkong11p,  m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v1.1 (M1A/B) (Protocol?)",GAME_FLAGS,layout_m1dkong91n)
+GAMEL( 1996, m1dkonga2,   m1dkong, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "Donkey Kong (Maygay) v?.? (M1A/B)",GAME_FLAGS,layout_m1dkong91n)
 
 /*******************************************************************************************************************************************************************************************************
   Apollo 9
@@ -1301,12 +1318,10 @@ GAMEL( 199?, m1monoaa,m1mono, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1n
 ******************************************************************************************************************************************************************************************************/
 
 #define m1_glad_sound \
-	ROM_REGION( 0x100000, "gals", ROMREGION_ERASE00  ) /* these might be protected? */ \
-	ROM_LOAD( "gal16v8.esp.b.u9", 0x0000, 0x000117, CRC(d0ea9b54) SHA1(b7611fb4004431a21f81be10934392bea8dc00a0) ) \
-	ROM_LOAD( "gal16v8a.m1a.a.u32", 0x0000, 0x000117, CRC(5da2b5ab) SHA1(7af5ee675e280905fa41aee23b06394a59c8758d) ) \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00  ) \
 	ROM_LOAD( "sound1.dig1-049.u2", 0x000000, 0x080000, CRC(ab0ef8aa) SHA1(e9cd8c7c0fd0bec44d0531eff6272aa10b88b08c) ) \
 	ROM_LOAD( "sound2.dig1-049.u3", 0x080000, 0x080000, CRC(44c05fb6) SHA1(8d40d62d7c55224ddca8ff2f90779d5fad2af3ba) )
+
 ROM_START( m1glad )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("game.gladiatorsstd,fb8b,1.u6", 0x0000, 0x010000, CRC(eae9f323) SHA1(1a345480b37ff88f263beb0ba3715954e0c6ecb0) )  m1_glad_sound ROM_END_M1A_MCU
 ROM_START( m1glada ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("glad20p", 0x0000, 0x010000, CRC(b8803541) SHA1(a7c96501c031a84638bacf34a3e2c76dcd26bfe2) )                       m1_glad_sound ROM_END_M1A_MCU
 ROM_START( m1gladb ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("glad5.10", 0x0000, 0x010000, CRC(1562bfcb) SHA1(294a770e42143b7a009a9f071b00a1ef0da20ae6) )                      m1_glad_sound ROM_END_M1A_MCU
@@ -2810,6 +2825,7 @@ ROM_START( m1simpsd ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LO
 ROM_START( m1simpse ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa4-448",       0x0000, 0x010000, CRC(e9afaa51) SHA1(fbce125e9874167b42a56f0ad38ecb21897f76b0) ) m1_simps_sound ROM_END_M1A_MCU
 ROM_START( m1simpsf ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa4-460",       0x0000, 0x010000, CRC(17c1ad7a) SHA1(97ed56dbd2a926b92fbde12587984737c558c0f6) ) m1_simps_sound ROM_END_M1A_MCU
 ROM_START( m1simpsg ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("si_x6__d.2_1",  0x0000, 0x010000, CRC(5dca0be1) SHA1(ade490360e70fb0c5184a72520735d31579893bd) ) m1_simps_sound ROM_END_M1A_MCU
+ROM_START( m1simpsh ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("sa4-352.bin",   0x0000, 0x010000, CRC(48C5EFCC) SHA1(CD45B8290DD3D0A98FB55C4152EBCA12C462AF38) ) m1_simps_sound ROM_END_M1A_MCU
 
 GAME( 199?, m1simps,  0,       maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Simpsons (Maygay) (M1A/B) (set 1)",GAME_FLAGS )
 GAME( 199?, m1simpsa, m1simps, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Simpsons (Maygay) (M1A/B) (set 2)",GAME_FLAGS )
@@ -2819,6 +2835,7 @@ GAME( 199?, m1simpsd, m1simps, maygay_m1, maygay_m1, maygay1b_state, init_m1, RO
 GAME( 199?, m1simpse, m1simps, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Simpsons (Maygay) (M1A/B) (set 6)",GAME_FLAGS )
 GAME( 199?, m1simpsf, m1simps, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Simpsons (Maygay) (M1A/B) (set 7)",GAME_FLAGS )
 GAME( 199?, m1simpsg, m1simps, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Simpsons (Maygay) (M1A/B) (set 8)",GAME_FLAGS )
+GAME( 1993, m1simpsh, m1simps, maygay_m1, maygay_m1, maygay1b_state, init_m1, ROT0, "Maygay", "The Simpsons (Maygay) (M1A/B) (set 9)",GAME_FLAGS )
 
 /*******************************************************************************************************************************************************************************************************
   Trick Or Treat Club

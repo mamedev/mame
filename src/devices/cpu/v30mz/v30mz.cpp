@@ -2,43 +2,20 @@
 // copyright-holders:Wilbert Pol,Bryan McPhail
 /****************************************************************************
 
-    NEC V20/V30/V33 emulator modified to a v30mz emulator
+    v30mz emulator based on NEC V20/V30/V33 emulator.
 
-    (Re)Written June-September 2000 by Bryan McPhail (mish@tendril.co.uk) based
-    on code by Oliver Bergmann (Raul_Bloodworth@hotmail.com) who based code
-    on the i286 emulator by Fabrice Frances which had initial work based on
-    David Hedley's pcemu(!).
-
-    This new core features 99% accurate cycle counts for each processor,
-    there are still some complex situations where cycle counts are wrong,
-    typically where a few instructions have differing counts for odd/even
-    source and odd/even destination memory operands.
-
-    Flag settings are also correct for the NEC processors rather than the
-    I86 versions.
-
-    Changelist:
-
-    22/02/2003:
-        Removed cycle counts from memory accesses - they are certainly wrong,
-        and there is already a memory access cycle penalty in the opcodes
-        using them.
-
-        Fixed save states.
-
-        Fixed ADJBA/ADJBS/ADJ4A/ADJ4S flags/return values for all situations.
-        (Fixes bugs in Geostorm and Thunderblaster)
-
-        Fixed carry flag on NEG (I thought this had been fixed circa Mame 0.58,
-        but it seems I never actually submitted the fix).
-
-        Fixed many cycle counts in instructions and bug in cycle count
-        macros (odd word cases were testing for odd instruction word address
-        not data address).
+    The internal details of the prefetch queue are not exactly known. We
+    keep a prefetch queue a 8 bytes even though the documentation mentions
+    a prefetch queue of 8 words/16 bytes. Using 8 bytes keeps the amount of
+    fetches limited on tight loops and is more than enough for the longest
+    instruction.
 
     Todo!
-        Double check cycle timing is 100%.
-        Fix memory interface (should be 16 bit).
+      - Double check cycle timing is 100%.
+            - Add penalties when BW, BP, SP, IX, IY etc are changed in the immediately
+              preceding instruction.
+            - wswan mjkiwame (at 0x40141) has rep in al,$b5 (f3 e4 b5). Should this
+              repeat the in instruction or is this a bug made by the programmer?
 
 ****************************************************************************/
 
@@ -48,10 +25,8 @@
 #include "debugger.h"
 
 
-enum SREGS { ES=0, CS, SS, DS };
+enum SREGS { DS1=0, PS, SS, DS0 };
 enum WREGS { AW=0, CW, DW, BW, SP, BP, IX, IY };
-
-#define NEC_NMI_INT_VECTOR 2
 
 enum BREGS {
 	AL = NATIVE_ENDIAN_VALUE_LE_BE(0x0, 0x1),
@@ -72,6 +47,15 @@ enum BREGS {
 	IYH = NATIVE_ENDIAN_VALUE_LE_BE(0xf, 0xe)
 };
 
+enum nec_irqs {
+	DIVIDE_ERROR_INT = 0,
+	BREAK_INT = 1,
+	NMI_INT = 2,
+	BRK_3_INT = 3,
+	BRKV_INT = 4,
+	CHKIND_INT = 5
+};
+
 
 #define CF      (m_CarryVal!=0)
 #define SF      (m_SignVal<0)
@@ -82,35 +66,30 @@ enum BREGS {
 #define MD      (m_MF!=0)
 
 
-/***************************************************************************/
-/* cpu state                                                               */
-/***************************************************************************/
-
-
-/* The interrupt number of a pending external interrupt pending NMI is 2.   */
-/* For INTR interrupts, the level is caught on the bus during an INTA cycle */
+// The interrupt number of a pending external interrupt pending NMI is 2.
+// For INTR interrupts, the level is caught on the bus during an INTA cycle
 
 #define INT_IRQ 0x01
 #define NMI_IRQ 0x02
 
-/***************************************************************************/
 
 DEFINE_DEVICE_TYPE(V30MZ, v30mz_cpu_device, "v30mz", "NEC V30MZ")
 
 
 v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, V30MZ, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, 20, 0)
+	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, 0)
 	, m_ip(0)
 	, m_TF(0)
 	, m_int_vector(0)
 	, m_pc(0)
+	, m_vector_func(*this)
 {
 	static const BREGS reg_name[8]={ AL, CL, DL, BL, AH, CH, DH, BH };
 
-	/* Set up parity lookup table. */
-	for (uint16_t i = 0;i < 256; i++)
+	// Set up parity lookup table.
+	for (uint16_t i = 0; i < 256; i++)
 	{
 		uint16_t c = 0;
 		for (uint16_t j = i; j > 0; j >>= 1)
@@ -128,11 +107,12 @@ v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *ta
 
 	for (uint16_t i = 0xc0; i < 0x100; i++)
 	{
-		m_Mod_RM.RM.w[i] = (WREGS)( i & 7 );
+		m_Mod_RM.RM.w[i] = (WREGS)(i & 7);
 		m_Mod_RM.RM.b[i] = (BREGS)reg_name[i & 7];
 	}
 
-	memset(&m_regs, 0x00, sizeof(m_regs));
+	std::fill(std::begin(m_regs.w), std::end(m_regs.w), 0);
+	std::fill(std::begin(m_prefetch_queue), std::end(m_prefetch_queue), 0);
 }
 
 device_memory_interface::space_config_vector v30mz_cpu_device::memory_space_config() const
@@ -149,6 +129,8 @@ void v30mz_cpu_device::device_start()
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
 	space(AS_IO).specific(m_io);
+
+	m_vector_func.resolve_safe(0);
 
 	save_item(NAME(m_regs.w));
 	save_item(NAME(m_sregs));
@@ -169,23 +151,28 @@ void v30mz_cpu_device::device_start()
 	save_item(NAME(m_ParityVal));
 	save_item(NAME(m_seg_prefix));
 	save_item(NAME(m_seg_prefix_next));
+	save_item(NAME(m_pfp));
+	save_item(NAME(m_prefetch_queue));
+	save_item(NAME(m_prefetch_queue_head));
+	save_item(NAME(m_prefetch_queue_tail));
 
 	// Register state for debugger
-//  state_add( NEC_PC, "PC", m_PC ).callimport().callexport().formatstr("%04X");
-	state_add( NEC_IP, "IP", m_ip         ).callimport().callexport().formatstr("%04X");
-	state_add( NEC_SP, "SP", m_regs.w[SP] ).callimport().callexport().formatstr("%04X");
-	state_add( NEC_AW, "AW", m_regs.w[AW] ).callimport().callexport().formatstr("%04X");
-	state_add( NEC_CW, "CW", m_regs.w[CS] ).callimport().callexport().formatstr("%04X");
-	state_add( NEC_DW, "DW", m_regs.w[DW] ).callimport().callexport().formatstr("%04X");
-	state_add( NEC_BW, "BW", m_regs.w[BW] ).callimport().callexport().formatstr("%04X");
-	state_add( NEC_BP, "BP", m_regs.w[BP] ).callimport().callexport().formatstr("%04X");
-	state_add( NEC_IX, "IX", m_regs.w[IX] ).callimport().callexport().formatstr("%04X");
-	state_add( NEC_IY, "IY", m_regs.w[IY] ).callimport().callexport().formatstr("%04X");
-	state_add( NEC_ES, "ES", m_sregs[ES] ).callimport().callexport().formatstr("%04X");
-	state_add( NEC_CS, "CS", m_sregs[CS] ).callimport().callexport().formatstr("%04X");
-	state_add( NEC_SS, "SS", m_sregs[SS] ).callimport().callexport().formatstr("%04X");
-	state_add( NEC_DS, "DS", m_sregs[DS] ).callimport().callexport().formatstr("%04X");
-	state_add( NEC_VECTOR, "V", m_int_vector).callimport().callexport().formatstr("%02X");
+	state_add(NEC_IP, "IP", m_ip).callimport().callexport().formatstr("%04X");
+	state_add(NEC_SP, "SP", m_regs.w[SP]).callimport().callexport().formatstr("%04X");
+	state_add(NEC_AW, "AW", m_regs.w[AW]).callimport().callexport().formatstr("%04X");
+	state_add(NEC_BW, "BW", m_regs.w[BW]).callimport().callexport().formatstr("%04X");
+	state_add(NEC_CW, "CW", m_regs.w[CW]).callimport().callexport().formatstr("%04X");
+	state_add(NEC_DW, "DW", m_regs.w[DW]).callimport().callexport().formatstr("%04X");
+	state_add(NEC_BP, "BP", m_regs.w[BP]).callimport().callexport().formatstr("%04X");
+	state_add(NEC_IX, "IX", m_regs.w[IX]).callimport().callexport().formatstr("%04X");
+	state_add(NEC_IY, "IY", m_regs.w[IY]).callimport().callexport().formatstr("%04X");
+	state_add(NEC_PS, "PS", m_sregs[PS]).callimport().callexport().formatstr("%04X");
+	state_add(NEC_SS, "SS", m_sregs[SS]).callimport().callexport().formatstr("%04X");
+	state_add(NEC_DS0, "DS0", m_sregs[DS0]).callimport().callexport().formatstr("%04X");
+	state_add(NEC_DS1, "DS1", m_sregs[DS1]).callimport().callexport().formatstr("%04X");
+	state_add(NEC_FLAGS, "PSW", m_debugger_temp).callimport().callexport().formatstr("%04X");
+	state_add(NEC_VECTOR, "V", m_int_vector).callimport().callexport().formatstr("%02X");
+	state_add(NEC_PFP, "PFP", m_pfp).callimport().callexport().formatstr("%04X");
 
 	state_add(STATE_GENPC, "GENPC", m_pc).callexport().formatstr("%05X");
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).callexport().formatstr("%05X");
@@ -195,18 +182,40 @@ void v30mz_cpu_device::device_start()
 }
 
 
+void v30mz_cpu_device::state_import(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+	case NEC_FLAGS:
+		expand_flags(m_debugger_temp);
+		break;
+	}
+}
+
+
+void v30mz_cpu_device::state_export(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+	case NEC_FLAGS:
+		m_debugger_temp = compress_flags();
+		break;
+	}
+}
+
+
 void v30mz_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
 		case STATE_GENPC:
 		case STATE_GENPCBASE:
-			str = string_format("%08X", ( m_sregs[CS] << 4 ) + m_ip);
+			str = string_format("%08X", (m_sregs[PS] << 4) + m_ip);
 			break;
 
 		case STATE_GENFLAGS:
 			{
-				uint16_t flags = CompressFlags();
+				uint16_t flags = compress_flags();
 				str = string_format("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 					flags & 0x8000 ? 'M':'.',
 					flags & 0x4000 ? '?':'.',
@@ -222,7 +231,7 @@ void v30mz_cpu_device::state_string_export(const device_state_entry &entry, std:
 					flags & 0x0010 ? 'A':'.',
 					flags & 0x0008 ? '?':'.',
 					flags & 0x0004 ? 'P':'.',
-					flags & 0x0002 ? 'N':'.',
+					flags & 0x0002 ? '?':'.',
 					flags & 0x0001 ? 'C':'.');
 			}
 			break;
@@ -242,11 +251,12 @@ void v30mz_cpu_device::device_reset()
 	m_regs.w[BP] = 0;
 	m_regs.w[IX] = 0;
 	m_regs.w[IY] = 0;
-	m_sregs[ES] = 0;
-	m_sregs[CS] = 0xffff;
+	m_sregs[DS1] = 0;
+	m_sregs[PS] = 0xffff;
 	m_sregs[SS] = 0;
-	m_sregs[DS] = 0;
+	m_sregs[DS0] = 0;
 	m_ip = 0;
+	m_pfp = 0;
 	m_SignVal = 0;
 	m_AuxVal = 0;
 	m_OverVal = 0;
@@ -264,44 +274,77 @@ void v30mz_cpu_device::device_reset()
 	m_prefix_base = 0;
 	m_seg_prefix = false;
 	m_seg_prefix_next = false;
-	m_ea = 0;
+	m_ea_seg = 0;
 	m_eo = 0;
-	m_e16 = 0;
 	m_modrm = 0;
 	m_dst = 0;
 	m_src = 0;
+	init_prefetch();
 }
 
 
-inline uint32_t v30mz_cpu_device::pc()
+uint32_t v30mz_cpu_device::pc()
 {
-	m_pc = ( m_sregs[CS] << 4 ) + m_ip;
+	m_pc = (m_sregs[PS] << 4) + m_ip;
 	return m_pc;
 }
 
 
-inline uint8_t v30mz_cpu_device::read_byte(uint32_t addr)
+void v30mz_cpu_device::read_prefetch()
 {
-	return m_program.read_byte(addr);
+	uint8_t data = m_cache.read_byte((m_sregs[PS] << 4) + m_pfp);
+	m_prefetch_queue[m_prefetch_queue_head] = data;
+	m_prefetch_queue_head = (m_prefetch_queue_head + 1) % PREFETCH_MAX_SIZE;
+	m_pfp++;
 }
 
 
-inline uint16_t v30mz_cpu_device::read_word(uint32_t addr)
+void v30mz_cpu_device::init_prefetch()
 {
-	return m_program.read_byte(addr) | ( m_program.read_byte(addr+1) << 8 );
+	m_pfp = m_ip;
+	m_prefetch_queue_tail = 0;
+	m_prefetch_queue_head = 0;
+	m_prefetch_fill_needed = true;
+	if (m_ip & 1)
+		clk(1);
 }
 
 
-inline void v30mz_cpu_device::write_byte(uint32_t addr, uint8_t data)
+inline uint8_t v30mz_cpu_device::read_byte(uint16_t segment, uint16_t addr)
 {
-	m_program.write_byte(addr, data);
+	return m_program.read_byte((segment << 4) + addr);
 }
 
 
-inline void v30mz_cpu_device::write_word(uint32_t addr, uint16_t data)
+inline uint16_t v30mz_cpu_device::read_word(uint16_t segment, uint16_t addr)
 {
-	m_program.write_byte( addr, data & 0xff );
-	m_program.write_byte( addr + 1, data >> 8 );
+	if (addr & 1) {
+		// penalty cycle when reading from an unaligned address
+		clk(1);
+		return m_program.read_byte((segment << 4)+ addr) |
+			(m_program.read_byte((segment << 4) + ((addr + 1) & 0xffff)) << 8);
+	} else {
+		return m_program.read_word((segment << 4) + addr);
+	}
+}
+
+
+inline void v30mz_cpu_device::write_byte(uint16_t segment, uint16_t addr, uint8_t data)
+{
+	m_program.write_byte((segment << 4) + addr, data);
+}
+
+
+inline void v30mz_cpu_device::write_word(uint16_t segment, uint16_t addr, uint16_t data)
+{
+	if (addr & 1) {
+		m_program.write_byte((segment << 4) + addr, data);
+		m_program.write_byte((segment << 4) + ((addr + 1) & 0xffff), data >> 8);
+		// penalty cycle when writing to an unaligned address
+		clk(1);
+	} else {
+		m_program.write_word((segment << 4) + addr, data);
+	}
 }
 
 
@@ -311,15 +354,35 @@ inline uint8_t v30mz_cpu_device::read_port(uint16_t port)
 }
 
 
+inline uint16_t v30mz_cpu_device::read_port_word(uint16_t port)
+{
+	if (port & 1)
+		// penalty cycle when reading from an unaligned address
+		clk(1);
+	return m_io.read_word_unaligned(port);
+}
+
+
 inline void v30mz_cpu_device::write_port(uint16_t port, uint8_t data)
 {
 	m_io.write_byte(port, data);
 }
 
 
+inline void v30mz_cpu_device::write_port_word(uint16_t port, uint16_t data)
+{
+	if (port & 1)
+		// penalty cycle when writing to an unaligned address
+		clk(1);
+	m_io.write_word_unaligned(port, data);
+}
+
+
 inline uint8_t v30mz_cpu_device::fetch_op()
 {
-	uint8_t data = m_cache.read_byte( pc() );
+	uint8_t data = m_prefetch_queue[m_prefetch_queue_tail];
+	m_prefetch_queue_tail = (m_prefetch_queue_tail + 1) % PREFETCH_MAX_SIZE;
+	read_prefetch();
 	m_ip++;
 	return data;
 }
@@ -327,7 +390,9 @@ inline uint8_t v30mz_cpu_device::fetch_op()
 
 inline uint8_t v30mz_cpu_device::fetch()
 {
-	uint8_t data = m_cache.read_byte( pc() );
+	uint8_t data = m_prefetch_queue[m_prefetch_queue_tail];
+	m_prefetch_queue_tail = (m_prefetch_queue_tail + 1) % PREFETCH_MAX_SIZE;
+	read_prefetch();
 	m_ip++;
 	return data;
 }
@@ -336,7 +401,7 @@ inline uint8_t v30mz_cpu_device::fetch()
 inline uint16_t v30mz_cpu_device::fetch_word()
 {
 	uint16_t data = fetch();
-	data |= ( fetch() << 8 );
+	data |= (fetch() << 8);
 	return data;
 }
 
@@ -351,11 +416,11 @@ inline uint8_t v30mz_cpu_device::repx_op()
 	{
 	case 0x26:
 		seg_prefix = true;
-		seg = ES;
+		seg = DS1;
 		break;
 	case 0x2e:
 		seg_prefix = true;
-		seg = CS;
+		seg = PS;
 		break;
 	case 0x36:
 		seg_prefix = true;
@@ -363,438 +428,430 @@ inline uint8_t v30mz_cpu_device::repx_op()
 		break;
 	case 0x3e:
 		seg_prefix = true;
-		seg = DS;
+		seg = DS0;
 		break;
 	}
 
-	if ( seg_prefix )
+	if (seg_prefix)
 	{
 		m_seg_prefix = true;
 		m_seg_prefix_next = true;
-		m_prefix_base = m_sregs[seg] << 4;
+		m_prefix_base = m_sregs[seg];
 		next = fetch_op();
-		CLK(2);
+		clk(2);
 	}
 
 	return next;
 }
 
 
-inline void v30mz_cpu_device::CLK(uint32_t cycles)
+inline void v30mz_cpu_device::clk(uint32_t cycles)
 {
 	m_icount -= cycles;
 }
 
 
-inline void v30mz_cpu_device::CLKM(uint32_t cycles_reg, uint32_t cycles_mem)
+inline void v30mz_cpu_device::clkm(uint32_t cycles_reg, uint32_t cycles_mem)
 {
-	m_icount -= ( m_modrm >= 0xc0 ) ? cycles_reg : cycles_mem;
+	m_icount -= (m_modrm >= 0xc0) ? cycles_reg : cycles_mem;
 }
 
 
-inline uint32_t v30mz_cpu_device::default_base(int seg)
+inline uint16_t v30mz_cpu_device::default_base(int seg)
 {
-	if ( m_seg_prefix && (seg==DS || seg==SS) )
+	if (m_seg_prefix && (seg==DS0 || seg==SS))
 	{
 		return m_prefix_base;
 	}
 	else
 	{
-		return m_sregs[seg] << 4;
+		return m_sregs[seg];
 	}
 }
 
 
-inline uint32_t v30mz_cpu_device::get_ea()
+inline void v30mz_cpu_device::get_ea()
 {
-	switch( m_modrm & 0xc7 )
+	switch (m_modrm & 0xc7)
 	{
 	case 0x00:
 		m_eo = m_regs.w[BW] + m_regs.w[IX];
-		m_ea = default_base(DS) + m_eo;
+		m_ea_seg = default_base(DS0);
+		clk(1);
 		break;
 	case 0x01:
 		m_eo = m_regs.w[BW] + m_regs.w[IY];
-		m_ea = default_base(DS) + m_eo;
+		m_ea_seg = default_base(DS0);
+		clk(1);
 		break;
 	case 0x02:
 		m_eo = m_regs.w[BP] + m_regs.w[IX];
-		m_ea = default_base(SS) + m_eo;
+		m_ea_seg = default_base(SS);
+		clk(1);
 		break;
 	case 0x03:
 		m_eo = m_regs.w[BP] + m_regs.w[IY];
-		m_ea = default_base(SS) + m_eo;
+		m_ea_seg = default_base(SS);
+		clk(1);
 		break;
 	case 0x04:
 		m_eo = m_regs.w[IX];
-		m_ea = default_base(DS) + m_eo;
+		m_ea_seg = default_base(DS0);
 		break;
 	case 0x05:
 		m_eo = m_regs.w[IY];
-		m_ea = default_base(DS) + m_eo;
+		m_ea_seg = default_base(DS0);
 		break;
 	case 0x06:
 		m_eo = fetch_word();
-		m_ea = default_base(DS) + m_eo;
+		m_ea_seg = default_base(DS0);
 		break;
 	case 0x07:
 		m_eo = m_regs.w[BW];
-		m_ea = default_base(DS) + m_eo;
+		m_ea_seg = default_base(DS0);
 		break;
 
 	case 0x40:
 		m_eo = m_regs.w[BW] + m_regs.w[IX] + (int8_t)fetch();
-		m_ea = default_base(DS) + m_eo;
+		m_ea_seg = default_base(DS0);
+		clk(1);
 		break;
 	case 0x41:
 		m_eo = m_regs.w[BW] + m_regs.w[IY] + (int8_t)fetch();
-		m_ea = default_base(DS) + m_eo;
+		m_ea_seg = default_base(DS0);
+		clk(1);
 		break;
 	case 0x42:
 		m_eo = m_regs.w[BP] + m_regs.w[IX] + (int8_t)fetch();
-		m_ea = default_base(SS) + m_eo;
+		m_ea_seg = default_base(SS);
+		clk(1);
 		break;
 	case 0x43:
 		m_eo = m_regs.w[BP] + m_regs.w[IY] + (int8_t)fetch();
-		m_ea = default_base(SS) + m_eo;
+		m_ea_seg = default_base(SS);
+		clk(1);
 		break;
 	case 0x44:
 		m_eo = m_regs.w[IX] + (int8_t)fetch();
-		m_ea = default_base(DS) + m_eo;
+		m_ea_seg = default_base(DS0);
 		break;
 	case 0x45:
 		m_eo = m_regs.w[IY] + (int8_t)fetch();
-		m_ea = default_base(DS) + m_eo;
+		m_ea_seg = default_base(DS0);
 		break;
 	case 0x46:
 		m_eo = m_regs.w[BP] + (int8_t)fetch();
-		m_ea = default_base(SS) + m_eo;
+		m_ea_seg = default_base(SS);
 		break;
 	case 0x47:
 		m_eo = m_regs.w[BW] + (int8_t)fetch();
-		m_ea = default_base(DS) + m_eo;
+		m_ea_seg = default_base(DS0);
 		break;
 
 	case 0x80:
-		m_e16 = fetch_word();
-		m_eo = m_regs.w[BW] + m_regs.w[IX] + (int16_t)m_e16;
-		m_ea = default_base(DS) + m_eo;
+		m_eo = m_regs.w[BW] + m_regs.w[IX] + (int16_t)fetch_word();
+		m_ea_seg = default_base(DS0);
+		clk(1);
 		break;
 	case 0x81:
-		m_e16 = fetch_word();
-		m_eo = m_regs.w[BW] + m_regs.w[IY] + (int16_t)m_e16;
-		m_ea = default_base(DS) + m_eo;
+		m_eo = m_regs.w[BW] + m_regs.w[IY] + (int16_t)fetch_word();
+		m_ea_seg = default_base(DS0);
+		clk(1);
 		break;
 	case 0x82:
-		m_e16 = fetch_word();
-		m_eo = m_regs.w[BP] + m_regs.w[IX] + (int16_t)m_e16;
-		m_ea = default_base(SS) + m_eo;
+		m_eo = m_regs.w[BP] + m_regs.w[IX] + (int16_t)fetch_word();
+		m_ea_seg = default_base(SS);
+		clk(1);
 		break;
 	case 0x83:
-		m_e16 = fetch_word();
-		m_eo = m_regs.w[BP] + m_regs.w[IY] + (int16_t)m_e16;
-		m_ea = default_base(SS) + m_eo;
+		m_eo = m_regs.w[BP] + m_regs.w[IY] + (int16_t)fetch_word();
+		m_ea_seg = default_base(SS);
+		clk(1);
 		break;
 	case 0x84:
-		m_e16 = fetch_word();
-		m_eo = m_regs.w[IX] + (int16_t)m_e16;
-		m_ea = default_base(DS) + m_eo;
+		m_eo = m_regs.w[IX] + (int16_t)fetch_word();
+		m_ea_seg = default_base(DS0);
 		break;
 	case 0x85:
-		m_e16 = fetch_word();
-		m_eo = m_regs.w[IY] + (int16_t)m_e16;
-		m_ea = default_base(DS) + m_eo;
+		m_eo = m_regs.w[IY] + (int16_t)fetch_word();
+		m_ea_seg = default_base(DS0);
 		break;
 	case 0x86:
-		m_e16 = fetch_word();
-		m_eo = m_regs.w[BP] + (int16_t)m_e16;
-		m_ea = default_base(SS) + m_eo;
+		m_eo = m_regs.w[BP] + (int16_t)fetch_word();
+		m_ea_seg = default_base(SS);
 		break;
 	case 0x87:
-		m_e16 = fetch_word();
-		m_eo = m_regs.w[BW] + (int16_t)m_e16;
-		m_ea = default_base(DS) + m_eo;
+		m_eo = m_regs.w[BW] + (int16_t)fetch_word();
+		m_ea_seg = default_base(DS0);
 		break;
 	}
-
-	return m_ea;
 }
 
 
-inline void v30mz_cpu_device::PutbackRMByte(uint8_t data)
+inline void v30mz_cpu_device::store_ea_rm_byte(uint8_t data)
 {
-	if ( m_modrm >= 0xc0 )
+	if (m_modrm >= 0xc0)
 	{
-		m_regs.b[ m_Mod_RM.RM.b[ m_modrm ] ] = data;
+		m_regs.b[m_Mod_RM.RM.b[m_modrm]] = data;
 	}
 	else
 	{
-		write_byte( m_ea, data );
+		write_byte(m_ea_seg, m_eo, data);
 	}
 }
 
 
-inline void v30mz_cpu_device::PutbackRMWord(uint16_t data)
+inline void v30mz_cpu_device::store_ea_rm_word(uint16_t data)
 {
-	if ( m_modrm >= 0xc0 )
+	if (m_modrm >= 0xc0)
 	{
-		m_regs.w[ m_Mod_RM.RM.w[ m_modrm ] ] = data;
+		m_regs.w[m_Mod_RM.RM.w[m_modrm]] = data;
 	}
 	else
 	{
-		write_word( m_ea, data );
+		write_word(m_ea_seg, m_eo, data);
 	}
 }
 
-inline void v30mz_cpu_device::PutImmRMWord()
+
+inline void v30mz_cpu_device::put_imm_rm_word()
 {
-	if ( m_modrm >= 0xc0 )
+	if (m_modrm >= 0xc0)
 	{
-		m_regs.w[ m_Mod_RM.RM.w[ m_modrm ] ] = fetch_word();
+		m_regs.w[m_Mod_RM.RM.w[m_modrm]] = fetch_word();
 	}
 	else
 	{
-		uint32_t addr = get_ea();
-		write_word( addr, fetch_word() );
+		get_ea();
+		write_word(m_ea_seg, m_eo, fetch_word());
 	}
 }
 
-inline void v30mz_cpu_device::PutRMWord(uint16_t val)
+
+inline void v30mz_cpu_device::put_rm_word(uint16_t val)
 {
-	if ( m_modrm >= 0xc0 )
+	if (m_modrm >= 0xc0)
 	{
-		m_regs.w[ m_Mod_RM.RM.w[ m_modrm ] ] = val;
+		m_regs.w[m_Mod_RM.RM.w[m_modrm]] = val;
 	}
 	else
 	{
-		write_word( get_ea(), val );
+		get_ea();
+		write_word(m_ea_seg, m_eo, val);
 	}
 }
 
 
-inline void v30mz_cpu_device::PutRMByte(uint8_t val)
+inline void v30mz_cpu_device::put_rm_byte(uint8_t val)
 {
-	if ( m_modrm >= 0xc0 )
+	if (m_modrm >= 0xc0)
 	{
-		m_regs.b[ m_Mod_RM.RM.b[ m_modrm ] ] = val;
+		m_regs.b[m_Mod_RM.RM.b[m_modrm]] = val;
 	}
 	else
 	{
-		write_byte( get_ea(), val );
+		get_ea();
+		write_byte(m_ea_seg, m_eo, val);
 	}
 }
 
 
-inline void v30mz_cpu_device::PutImmRMByte()
+inline void v30mz_cpu_device::put_imm_rm_byte()
 {
-	if ( m_modrm >= 0xc0 )
+	if (m_modrm >= 0xc0)
 	{
-		m_regs.b[ m_Mod_RM.RM.b[ m_modrm ] ] = fetch();
+		m_regs.b[m_Mod_RM.RM.b[m_modrm]] = fetch();
 	}
 	else
 	{
-		uint32_t addr = get_ea();
-		write_byte( addr, fetch() );
+		get_ea();
+		write_byte(m_ea_seg, m_eo, fetch());
 	}
 }
 
 
-inline void v30mz_cpu_device::DEF_br8()
+inline void v30mz_cpu_device::def_br8()
 {
 	m_modrm = fetch();
-	m_src = RegByte();
-	m_dst = GetRMByte();
+	m_src = reg_byte();
+	m_dst = get_rm_byte();
 }
 
 
-inline void v30mz_cpu_device::DEF_wr16()
+inline void v30mz_cpu_device::def_wr16()
 {
 	m_modrm = fetch();
-	m_src = RegWord();
-	m_dst = GetRMWord();
+	m_src = reg_word();
+	m_dst = get_rm_word();
 }
 
 
-inline void v30mz_cpu_device::DEF_r8b()
+inline void v30mz_cpu_device::def_r8b()
 {
 	m_modrm = fetch();
-	m_dst = RegByte();
-	m_src = GetRMByte();
+	m_src = get_rm_byte();
+	m_dst = reg_byte();
 }
 
 
-inline void v30mz_cpu_device::DEF_r16w()
+inline void v30mz_cpu_device::def_r16w()
 {
 	m_modrm = fetch();
-	m_dst = RegWord();
-	m_src = GetRMWord();
+	m_src = get_rm_word();
+	m_dst = reg_word();
 }
 
 
-inline void v30mz_cpu_device::DEF_ald8()
+inline void v30mz_cpu_device::def_ald8()
 {
 	m_src = fetch();
 	m_dst = m_regs.b[AL];
 }
 
 
-inline void v30mz_cpu_device::DEF_axd16()
+inline void v30mz_cpu_device::def_awd16()
 {
 	m_src = fetch_word();
 	m_dst = m_regs.w[AW];
 }
 
 
-
-inline void v30mz_cpu_device::RegByte(uint8_t data)
+inline void v30mz_cpu_device::reg_byte(uint8_t data)
 {
-	m_regs.b[ m_Mod_RM.reg.b[ m_modrm ] ] = data;
+	m_regs.b[m_Mod_RM.reg.b[m_modrm]] = data;
 }
 
 
-inline void v30mz_cpu_device::RegWord(uint16_t data)
+inline void v30mz_cpu_device::reg_word(uint16_t data)
 {
-	m_regs.w[ m_Mod_RM.reg.w[ m_modrm ] ] = data;
+	m_regs.w[m_Mod_RM.reg.w[m_modrm]] = data;
 }
 
 
-inline uint8_t v30mz_cpu_device::RegByte()
+inline uint8_t v30mz_cpu_device::reg_byte()
 {
-	return m_regs.b[ m_Mod_RM.reg.b[ m_modrm ] ];
+	return m_regs.b[m_Mod_RM.reg.b[m_modrm]];
 }
 
 
-inline uint16_t v30mz_cpu_device::RegWord()
+inline uint16_t v30mz_cpu_device::reg_word()
 {
-	return m_regs.w[ m_Mod_RM.reg.w[ m_modrm ] ];
+	return m_regs.w[m_Mod_RM.reg.w[m_modrm]];
 }
 
 
-inline uint16_t v30mz_cpu_device::GetRMWord()
+inline uint16_t v30mz_cpu_device::get_rm_word()
 {
-	if ( m_modrm >= 0xc0 )
+	if (m_modrm >= 0xc0)
 	{
-		return m_regs.w[ m_Mod_RM.RM.w[ m_modrm ] ];
+		return m_regs.w[m_Mod_RM.RM.w[m_modrm]];
 	}
 	else
 	{
-		return read_word( get_ea() );
+		get_ea();
+		return read_word(m_ea_seg, m_eo);
 	}
 }
 
 
-inline uint16_t v30mz_cpu_device::GetnextRMWord()
+inline uint16_t v30mz_cpu_device::get_next_rm_word()
 {
-	uint32_t addr = ( m_ea & 0xf0000 ) | ( ( m_ea + 2 ) & 0xffff );
-
-	return read_word( addr );
+	return read_word(m_ea_seg, m_eo + 2);
 }
 
 
-inline uint8_t v30mz_cpu_device::GetRMByte()
+inline uint8_t v30mz_cpu_device::get_rm_byte()
 {
-	if ( m_modrm >= 0xc0 )
+	if (m_modrm >= 0xc0)
 	{
-		return m_regs.b[ m_Mod_RM.RM.b[ m_modrm ] ];
+		return m_regs.b[m_Mod_RM.RM.b[m_modrm]];
 	}
 	else
 	{
-		return read_byte( get_ea() );
+		get_ea();
+		return read_byte(m_ea_seg, m_eo);
 	}
-}
-
-
-inline void v30mz_cpu_device::PutMemB(int seg, uint16_t offset, uint8_t data)
-{
-	write_byte( default_base( seg ) + offset, data);
-}
-
-
-inline void v30mz_cpu_device::PutMemW(int seg, uint16_t offset, uint16_t data)
-{
-	PutMemB( seg, offset, data & 0xff);
-	PutMemB( seg, offset+1, data >> 8);
-}
-
-
-inline uint8_t v30mz_cpu_device::GetMemB(int seg, uint16_t offset)
-{
-	return read_byte( default_base(seg) + offset );
-}
-
-
-inline uint16_t v30mz_cpu_device::GetMemW(int seg, uint16_t offset)
-{
-	return GetMemB(seg, offset) | ( GetMemB(seg, offset + 1) << 8 );
 }
 
 
 // Setting flags
 
-inline void v30mz_cpu_device::set_CFB(uint32_t x)
+inline void v30mz_cpu_device::set_CF_byte(uint32_t x)
 {
 	m_CarryVal = x & 0x100;
 }
 
-inline void v30mz_cpu_device::set_CFW(uint32_t x)
+
+inline void v30mz_cpu_device::set_CF_word(uint32_t x)
 {
 	m_CarryVal = x & 0x10000;
 }
 
-inline void v30mz_cpu_device::set_AF(uint32_t x,uint32_t y,uint32_t z)
+
+inline void v30mz_cpu_device::set_AF(uint32_t x, uint32_t y, uint32_t z)
 {
 	m_AuxVal = (x ^ (y ^ z)) & 0x10;
 }
+
 
 inline void v30mz_cpu_device::set_SF(uint32_t x)
 {
 	m_SignVal = x;
 }
 
+
 inline void v30mz_cpu_device::set_ZF(uint32_t x)
 {
 	m_ZeroVal = x;
 }
+
 
 inline void v30mz_cpu_device::set_PF(uint32_t x)
 {
 	m_ParityVal = x;
 }
 
-inline void v30mz_cpu_device::set_SZPF_Byte(uint32_t x)
+
+inline void v30mz_cpu_device::set_SZPF_byte(uint32_t x)
 {
 	m_SignVal = m_ZeroVal = m_ParityVal = (int8_t)x;
 }
 
-inline void v30mz_cpu_device::set_SZPF_Word(uint32_t x)
+
+inline void v30mz_cpu_device::set_SZPF_word(uint32_t x)
 {
 	m_SignVal = m_ZeroVal = m_ParityVal = (int16_t)x;
 }
 
-inline void v30mz_cpu_device::set_OFW_Add(uint32_t x,uint32_t y,uint32_t z)
+
+inline void v30mz_cpu_device::set_OF_word_add(uint32_t x, uint32_t y, uint32_t z)
 {
 	m_OverVal = (x ^ y) & (x ^ z) & 0x8000;
 }
 
-inline void v30mz_cpu_device::set_OFB_Add(uint32_t x,uint32_t y,uint32_t z)
+
+inline void v30mz_cpu_device::set_OF_byte_add(uint32_t x, uint32_t y, uint32_t z)
 {
 	m_OverVal = (x ^ y) & (x ^ z) & 0x80;
 }
 
-inline void v30mz_cpu_device::set_OFW_Sub(uint32_t x,uint32_t y,uint32_t z)
+
+inline void v30mz_cpu_device::set_OF_word_sub(uint32_t x, uint32_t y, uint32_t z)
 {
 	m_OverVal = (z ^ y) & (z ^ x) & 0x8000;
 }
 
-inline void v30mz_cpu_device::set_OFB_Sub(uint32_t x,uint32_t y,uint32_t z)
+
+inline void v30mz_cpu_device::set_OF_byte_sub(uint32_t x, uint32_t y, uint32_t z)
 {
 	m_OverVal = (z ^ y) & (z ^ x) & 0x80;
 }
 
 
-inline uint16_t v30mz_cpu_device::CompressFlags() const
+inline uint16_t v30mz_cpu_device::compress_flags() const
 {
-	return (CF ? 1 : 0)
+	return 0x7002
+	  | (CF ? 1 : 0)
 		| (PF ? 4 : 0)
 		| (AF ? 0x10 : 0)
 		| (ZF ? 0x40 : 0)
@@ -806,7 +863,8 @@ inline uint16_t v30mz_cpu_device::CompressFlags() const
 		| (MD << 15);
 }
 
-inline void v30mz_cpu_device::ExpandFlags(uint16_t f)
+
+inline void v30mz_cpu_device::expand_flags(uint16_t f)
 {
 	m_CarryVal = (f) & 1;
 	m_ParityVal = !((f) & 4);
@@ -820,127 +878,139 @@ inline void v30mz_cpu_device::ExpandFlags(uint16_t f)
 	m_MF = ((f) & 0x8000) == 0x8000;
 }
 
+
 inline void v30mz_cpu_device::i_insb()
 {
-	PutMemB( ES, m_regs.w[IY], read_port( m_regs.w[DW] ) );
+	write_byte(m_sregs[DS1], m_regs.w[IY], read_port(m_regs.w[DW]));
 	m_regs.w[IY] += -2 * m_DF + 1;
-	CLK(6);
+	clk(6);
 }
+
 
 inline void v30mz_cpu_device::i_insw()
 {
-	PutMemB( ES, m_regs.w[IY], read_port( m_regs.w[DW] ) );
-	PutMemB( ES, (m_regs.w[IY] + 1) & 0xffff, read_port((m_regs.w[DW]+1)&0xffff));
+	write_word(m_sregs[DS1], m_regs.w[IY], read_port_word(m_regs.w[DW]));
 	m_regs.w[IY] += -4 * m_DF + 2;
-	CLK(6);
+	clk(6);
 }
+
 
 inline void v30mz_cpu_device::i_outsb()
 {
-	write_port( m_regs.w[DW], GetMemB( DS, m_regs.w[IX] ) );
+	write_port(m_regs.w[DW], read_byte(default_base(DS0), m_regs.w[IX]));
 	m_regs.w[IX] += -2 * m_DF + 1;
-	CLK(7);
+	clk(7);
 }
+
 
 inline void v30mz_cpu_device::i_outsw()
 {
-	write_port( m_regs.w[DW], GetMemB( DS, m_regs.w[IX] ) );
-	write_port( (m_regs.w[DW]+1)&0xffff, GetMemB( DS, (m_regs.w[IX]+1)&0xffff ) );
+	write_port_word(m_regs.w[DW], read_word(default_base(DS0), m_regs.w[IX]));
 	m_regs.w[IX] += -4 * m_DF + 2;
-	CLK(7);
+	clk(7);
 }
+
 
 inline void v30mz_cpu_device::i_movsb()
 {
-	uint8_t tmp = GetMemB( DS, m_regs.w[IX] );
-	PutMemB( ES, m_regs.w[IY], tmp);
+	uint8_t tmp = read_byte(default_base(DS0), m_regs.w[IX]);
+	write_byte(m_sregs[DS1], m_regs.w[IY], tmp);
 	m_regs.w[IY] += -2 * m_DF + 1;
 	m_regs.w[IX] += -2 * m_DF + 1;
-	CLK(5);
+	clk(5);
 }
+
 
 inline void v30mz_cpu_device::i_movsw()
 {
-	uint16_t tmp = GetMemW( DS, m_regs.w[IX] );
-	PutMemW( ES, m_regs.w[IY], tmp );
+	uint16_t tmp = read_word(default_base(DS0), m_regs.w[IX]);
+	write_word(m_sregs[DS1], m_regs.w[IY], tmp);
 	m_regs.w[IY] += -4 * m_DF + 2;
 	m_regs.w[IX] += -4 * m_DF + 2;
-	CLK(5);
+	clk(5);
 }
+
 
 inline void v30mz_cpu_device::i_cmpsb()
 {
-	m_src = GetMemB( ES, m_regs.w[IY] );
-	m_dst = GetMemB( DS, m_regs.w[IX] );
-	SUBB();
+	m_src = read_byte(m_sregs[DS1], m_regs.w[IY]);
+	m_dst = read_byte(default_base(DS0), m_regs.w[IX]);
+	sub_byte();
 	m_regs.w[IY] += -2 * m_DF + 1;
 	m_regs.w[IX] += -2 * m_DF + 1;
-	CLK(6);
+	clk(6);
 }
+
 
 inline void v30mz_cpu_device::i_cmpsw()
 {
-	m_src = GetMemW( ES, m_regs.w[IY] );
-	m_dst = GetMemW( DS, m_regs.w[IX] );
-	SUBW();
+	m_src = read_word(m_sregs[DS1], m_regs.w[IY]);
+	m_dst = read_word(default_base(DS0), m_regs.w[IX]);
+	sub_word();
 	m_regs.w[IY] += -4 * m_DF + 2;
 	m_regs.w[IX] += -4 * m_DF + 2;
-	CLK(6);
+	clk(6);
 }
+
 
 inline void v30mz_cpu_device::i_stosb()
 {
-	PutMemB( ES, m_regs.w[IY], m_regs.b[AL] );
+	write_byte(m_sregs[DS1], m_regs.w[IY], m_regs.b[AL]);
 	m_regs.w[IY] += -2 * m_DF + 1;
-	CLK(3);
+	clk(3);
 }
+
 
 inline void v30mz_cpu_device::i_stosw()
 {
-	PutMemW( ES, m_regs.w[IY], m_regs.w[AW] );
+	write_word(m_sregs[DS1], m_regs.w[IY], m_regs.w[AW]);
 	m_regs.w[IY] += -4 * m_DF + 2;
-	CLK(3);
+	clk(3);
 }
+
 
 inline void v30mz_cpu_device::i_lodsb()
 {
-	m_regs.b[AL] = GetMemB( DS, m_regs.w[IX] );
+	m_regs.b[AL] = read_byte(default_base(DS0), m_regs.w[IX]);
 	m_regs.w[IX] += -2 * m_DF + 1;
-	CLK(3);
+	clk(3);
 }
+
 
 inline void v30mz_cpu_device::i_lodsw()
 {
-	m_regs.w[AW] = GetMemW( DS, m_regs.w[IX] );
+	m_regs.w[AW] = read_word(default_base(DS0), m_regs.w[IX]);
 	m_regs.w[IX] += -4 * m_DF + 2;
-	CLK(3);
+	clk(3);
 }
+
 
 inline void v30mz_cpu_device::i_scasb()
 {
-	m_src = GetMemB( ES, m_regs.w[IY] );
+	m_src = read_byte(m_sregs[DS1], m_regs.w[IY]);
 	m_dst = m_regs.b[AL];
-	SUBB();
+	sub_byte();
 	m_regs.w[IY] += -2 * m_DF + 1;
-	CLK(4);
+	clk(4);
 }
+
 
 inline void v30mz_cpu_device::i_scasw()
 {
-	m_src = GetMemW( ES, m_regs.w[IY] );
+	m_src = read_word(m_sregs[DS1], m_regs.w[IY]);
 	m_dst = m_regs.w[AW];
-	SUBW();
+	sub_word();
 	m_regs.w[IY] += -4 * m_DF + 2;
-	CLK(4);
+	clk(4);
 }
 
 
 inline void v30mz_cpu_device::i_popf()
 {
-	uint32_t tmp = POP();
+	uint32_t tmp = pop();
 
-	ExpandFlags(tmp);
-	CLK(3);
+	expand_flags(tmp);
+	clk(3);
 	if (m_TF)
 	{
 		m_fire_trap = 1;
@@ -948,212 +1018,225 @@ inline void v30mz_cpu_device::i_popf()
 }
 
 
-inline void v30mz_cpu_device::ADDB()
+inline void v30mz_cpu_device::add_byte()
 {
-	uint32_t res = m_dst + m_src;
+	uint32_t res = (m_dst & 0xff) + (m_src & 0xff);
 
-	set_CFB(res);
-	set_OFB_Add(res,m_src,m_dst);
-	set_AF(res,m_src,m_dst);
-	set_SZPF_Byte(res);
+	set_CF_byte(res);
+	set_OF_byte_add(res, m_src, m_dst);
+	set_AF(res, m_src, m_dst);
+	set_SZPF_byte(res);
 	m_dst = res & 0xff;
 }
 
 
-inline void v30mz_cpu_device::ADDW()
+inline void v30mz_cpu_device::add_word()
 {
-	uint32_t res = m_dst + m_src;
+	uint32_t res = (m_dst & 0xffff) + (m_src & 0xffff);
 
-	set_CFW(res);
-	set_OFW_Add(res,m_src,m_dst);
-	set_AF(res,m_src,m_dst);
-	set_SZPF_Word(res);
+	set_CF_word(res);
+	set_OF_word_add(res, m_src, m_dst);
+	set_AF(res, m_src, m_dst);
+	set_SZPF_word(res);
 	m_dst = res & 0xffff;
 }
 
 
-inline void v30mz_cpu_device::SUBB()
+inline void v30mz_cpu_device::sub_byte()
 {
-	uint32_t res = m_dst - m_src;
+	uint32_t res = (m_dst & 0xff) - (m_src & 0xff);
 
-	set_CFB(res);
-	set_OFB_Sub(res,m_src,m_dst);
-	set_AF(res,m_src,m_dst);
-	set_SZPF_Byte(res);
+	set_CF_byte(res);
+	set_OF_byte_sub(res, m_src, m_dst);
+	set_AF(res, m_src, m_dst);
+	set_SZPF_byte(res);
 	m_dst = res & 0xff;
 }
 
 
-inline void v30mz_cpu_device::SUBW()
+inline void v30mz_cpu_device::sub_word()
 {
-	uint32_t res = m_dst - m_src;
+	uint32_t res = (m_dst & 0xffff) - (m_src & 0xffff);
 
-	set_CFW(res);
-	set_OFW_Sub(res,m_src,m_dst);
-	set_AF(res,m_src,m_dst);
-	set_SZPF_Word(res);
+	set_CF_word(res);
+	set_OF_word_sub(res, m_src, m_dst);
+	set_AF(res, m_src, m_dst);
+	set_SZPF_word(res);
 	m_dst = res & 0xffff;
 }
 
 
-inline void v30mz_cpu_device::ORB()
+inline void v30mz_cpu_device::or_byte()
 {
 	m_dst |= m_src;
 	m_CarryVal = m_OverVal = m_AuxVal = 0;
-	set_SZPF_Byte(m_dst);
+	set_SZPF_byte(m_dst);
 }
 
 
-inline void v30mz_cpu_device::ORW()
+inline void v30mz_cpu_device::or_word()
 {
 	m_dst |= m_src;
 	m_CarryVal = m_OverVal = m_AuxVal = 0;
-	set_SZPF_Word(m_dst);
+	set_SZPF_word(m_dst);
 }
 
 
-inline void v30mz_cpu_device::ANDB()
+inline void v30mz_cpu_device::and_byte()
 {
 	m_dst &= m_src;
 	m_CarryVal = m_OverVal = m_AuxVal = 0;
-	set_SZPF_Byte(m_dst);
+	set_SZPF_byte(m_dst);
 }
 
 
-inline void v30mz_cpu_device::ANDW()
+inline void v30mz_cpu_device::and_word()
 {
 	m_dst &= m_src;
 	m_CarryVal = m_OverVal = m_AuxVal = 0;
-	set_SZPF_Word(m_dst);
+	set_SZPF_word(m_dst);
 }
 
 
-inline void v30mz_cpu_device::XORB()
+inline void v30mz_cpu_device::xor_byte()
 {
 	m_dst ^= m_src;
 	m_CarryVal = m_OverVal = m_AuxVal = 0;
-	set_SZPF_Byte(m_dst);
+	set_SZPF_byte(m_dst);
 }
 
 
-inline void v30mz_cpu_device::XORW()
+inline void v30mz_cpu_device::xor_word()
 {
 	m_dst ^= m_src;
 	m_CarryVal = m_OverVal = m_AuxVal = 0;
-	set_SZPF_Word(m_dst);
+	set_SZPF_word(m_dst);
 }
 
 
-inline void v30mz_cpu_device::ROL_BYTE()
+inline void v30mz_cpu_device::rol_byte()
 {
 	m_CarryVal = m_dst & 0x80;
-	m_dst = (m_dst << 1) | ( CF ? 1 : 0 );
+	m_dst = (m_dst << 1) | (CF ? 1 : 0);
 }
 
-inline void v30mz_cpu_device::ROL_WORD()
+
+inline void v30mz_cpu_device::rol_word()
 {
 	m_CarryVal = m_dst & 0x8000;
-	m_dst = (m_dst << 1) | ( CF ? 1 : 0 );
+	m_dst = (m_dst << 1) | (CF ? 1 : 0);
 }
 
-inline void v30mz_cpu_device::ROR_BYTE()
+
+inline void v30mz_cpu_device::ror_byte()
 {
 	m_CarryVal = m_dst & 0x1;
 	m_dst = (m_dst >> 1) | (CF ? 0x80 : 0x00);
 }
 
-inline void v30mz_cpu_device::ROR_WORD()
+
+inline void v30mz_cpu_device::ror_word()
 {
 	m_CarryVal = m_dst & 0x1;
 	m_dst = (m_dst >> 1) + (CF ? 0x8000 : 0x0000);
 }
 
-inline void v30mz_cpu_device::ROLC_BYTE()
+
+inline void v30mz_cpu_device::rolc_byte()
 {
-	m_dst = (m_dst << 1) | ( CF ? 1 : 0 );
-	set_CFB(m_dst);
+	m_dst = (m_dst << 1) | (CF ? 1 : 0);
+	set_CF_byte(m_dst);
 }
 
-inline void v30mz_cpu_device::ROLC_WORD()
+
+inline void v30mz_cpu_device::rolc_word()
 {
-	m_dst = (m_dst << 1) | ( CF ? 1 : 0 );
-	set_CFW(m_dst);
+	m_dst = (m_dst << 1) | (CF ? 1 : 0);
+	set_CF_word(m_dst);
 }
 
-inline void v30mz_cpu_device::RORC_BYTE()
+
+inline void v30mz_cpu_device::rorc_byte()
 {
-	m_dst |= ( CF ? 0x100 : 0x00);
+	m_dst |= (CF ? 0x100 : 0x00);
 	m_CarryVal = m_dst & 0x01;
 	m_dst >>= 1;
 }
 
-inline void v30mz_cpu_device::RORC_WORD()
+
+inline void v30mz_cpu_device::rorc_word()
 {
-	m_dst |= ( CF ? 0x10000 : 0);
+	m_dst |= (CF ? 0x10000 : 0);
 	m_CarryVal = m_dst & 0x01;
 	m_dst >>= 1;
 }
 
-inline void v30mz_cpu_device::SHL_BYTE(uint8_t c)
+
+inline void v30mz_cpu_device::shl_byte(uint8_t c)
 {
 	m_icount -= c;
 	m_dst <<= c;
-	set_CFB(m_dst);
-	set_SZPF_Byte(m_dst);
-	PutbackRMByte(m_dst);
+	set_CF_byte(m_dst);
+	set_SZPF_byte(m_dst);
+	store_ea_rm_byte(m_dst);
 }
 
-inline void v30mz_cpu_device::SHL_WORD(uint8_t c)
+
+inline void v30mz_cpu_device::shl_word(uint8_t c)
 {
 	m_icount -= c;
 	m_dst <<= c;
-	set_CFW(m_dst);
-	set_SZPF_Word(m_dst);
-	PutbackRMWord(m_dst);
+	set_CF_word(m_dst);
+	set_SZPF_word(m_dst);
+	store_ea_rm_word(m_dst);
 }
 
-inline void v30mz_cpu_device::SHR_BYTE(uint8_t c)
+
+inline void v30mz_cpu_device::shr_byte(uint8_t c)
 {
 	m_icount -= c;
 	m_dst >>= c-1;
 	m_CarryVal = m_dst & 0x1;
 	m_dst >>= 1;
-	set_SZPF_Byte(m_dst);
-	PutbackRMByte(m_dst);
+	set_SZPF_byte(m_dst);
+	store_ea_rm_byte(m_dst);
 }
 
-inline void v30mz_cpu_device::SHR_WORD(uint8_t c)
+
+inline void v30mz_cpu_device::shr_word(uint8_t c)
 {
 	m_icount -= c;
 	m_dst >>= c-1;
 	m_CarryVal = m_dst & 0x1;
 	m_dst >>= 1;
-	set_SZPF_Word(m_dst);
-	PutbackRMWord(m_dst);
+	set_SZPF_word(m_dst);
+	store_ea_rm_word(m_dst);
 }
 
-inline void v30mz_cpu_device::SHRA_BYTE(uint8_t c)
+
+inline void v30mz_cpu_device::shra_byte(uint8_t c)
 {
 	m_icount -= c;
 	m_dst = ((int8_t)m_dst) >> (c-1);
 	m_CarryVal = m_dst & 0x1;
 	m_dst = m_dst >> 1;
-	set_SZPF_Byte(m_dst);
-	PutbackRMByte(m_dst);
+	set_SZPF_byte(m_dst);
+	store_ea_rm_byte(m_dst);
 }
 
-inline void v30mz_cpu_device::SHRA_WORD(uint8_t c)
+
+inline void v30mz_cpu_device::shra_word(uint8_t c)
 {
 	m_icount -= c;
 	m_dst = ((int16_t)m_dst) >> (c-1);
 	m_CarryVal = m_dst & 0x1;
 	m_dst = m_dst >> 1;
-	set_SZPF_Word(m_dst);
-	PutbackRMWord(m_dst);
+	set_SZPF_word(m_dst);
+	store_ea_rm_word(m_dst);
 }
 
 
-inline void v30mz_cpu_device::XchgAWReg(uint8_t reg)
+inline void v30mz_cpu_device::xchg_AW_reg(uint8_t reg)
 {
 	uint16_t tmp = m_regs.w[reg];
 
@@ -1162,60 +1245,61 @@ inline void v30mz_cpu_device::XchgAWReg(uint8_t reg)
 }
 
 
-inline void v30mz_cpu_device::IncWordReg(uint8_t reg)
+inline void v30mz_cpu_device::inc_word_reg(uint8_t reg)
 {
 	uint32_t tmp = m_regs.w[reg];
 	uint32_t tmp1 = tmp+1;
 
 	m_OverVal = (tmp == 0x7fff);
-	set_AF(tmp1,tmp,1);
-	set_SZPF_Word(tmp1);
+	set_AF(tmp1, tmp, 1);
+	set_SZPF_word(tmp1);
 	m_regs.w[reg] = tmp1;
 }
 
 
-inline void v30mz_cpu_device::DecWordReg(uint8_t reg)
+inline void v30mz_cpu_device::dec_word_reg(uint8_t reg)
 {
 	uint32_t tmp = m_regs.w[reg];
 	uint32_t tmp1 = tmp-1;
 
 	m_OverVal = (tmp == 0x8000);
-	set_AF(tmp1,tmp,1);
-	set_SZPF_Word(tmp1);
+	set_AF(tmp1, tmp, 1);
+	set_SZPF_word(tmp1);
 	m_regs.w[reg] = tmp1;
 }
 
 
-inline void v30mz_cpu_device::PUSH(uint16_t data)
+inline void v30mz_cpu_device::push(uint16_t data)
 {
 	m_regs.w[SP] -= 2;
-	write_word( ( m_sregs[SS] << 4 ) + m_regs.w[SP], data );
+	write_word(m_sregs[SS], m_regs.w[SP], data);
 }
 
 
-inline uint16_t v30mz_cpu_device::POP()
+inline uint16_t v30mz_cpu_device::pop()
 {
-	uint16_t data = read_word( ( m_sregs[SS] << 4 ) + m_regs.w[SP] );
+	uint16_t data = read_word(m_sregs[SS], m_regs.w[SP]);
 
 	m_regs.w[SP] += 2;
 	return data;
 }
 
 
-inline void v30mz_cpu_device::JMP(bool cond)
+inline void v30mz_cpu_device::jmp(bool cond)
 {
 	int rel  = (int)((int8_t)fetch());
 
 	if (cond)
 	{
 		m_ip += rel;
-		CLK(9);
+		init_prefetch();
+		clk(9);
 	}
-	CLK(1);
+	clk(1);
 }
 
 
-inline void v30mz_cpu_device::ADJ4(int8_t param1,int8_t param2)
+inline void v30mz_cpu_device::adj4(int8_t param1, int8_t param2)
 {
 	if (AF || ((m_regs.b[AL] & 0xf) > 9))
 	{
@@ -1230,18 +1314,18 @@ inline void v30mz_cpu_device::ADJ4(int8_t param1,int8_t param2)
 		m_regs.b[AL] += param2;
 		m_CarryVal = 1;
 	}
-	set_SZPF_Byte(m_regs.b[AL]);
+	set_SZPF_byte(m_regs.b[AL]);
 }
 
 
-inline void v30mz_cpu_device::ADJB(int8_t param1, int8_t param2)
+inline void v30mz_cpu_device::adjb(int8_t param1, int8_t param2)
 {
 	if (AF || ((m_regs.b[AL] & 0xf) > 9))
 	{
 		m_regs.b[AL] += param1;
 		m_regs.b[AH] += param2;
+		m_CarryVal = m_AuxVal;
 		m_AuxVal = 1;
-		m_CarryVal = 1;
 	}
 	else
 	{
@@ -1254,33 +1338,35 @@ inline void v30mz_cpu_device::ADJB(int8_t param1, int8_t param2)
 
 void v30mz_cpu_device::interrupt(int int_num)
 {
-	PUSH( CompressFlags() );
-	CLK(2);
+	push(compress_flags());
+	clk(2);
 	m_TF = m_IF = 0;
 
 	if (int_num == -1)
 	{
-		int_num = standard_irq_callback(0);
+		standard_irq_callback(0);
+		int_num = m_vector_func();
 
 		m_irq_state = CLEAR_LINE;
 		m_pending_irq &= ~INT_IRQ;
 	}
 
-	uint16_t dest_off = read_word( int_num * 4 + 0 );
-	uint16_t dest_seg = read_word( int_num * 4 + 2 );
+	uint16_t dest_off = read_word(0, int_num * 4 + 0);
+	uint16_t dest_seg = read_word(0, int_num * 4 + 2);
 
-	PUSH(m_sregs[CS]);
-	PUSH(m_ip);
+	push(m_sregs[PS]);
+	push(m_ip);
 	m_ip = dest_off;
-	m_sregs[CS] = dest_seg;
+	m_sregs[PS] = dest_seg;
+	init_prefetch();
 }
 
 
-void v30mz_cpu_device::execute_set_input( int inptnum, int state )
+void v30mz_cpu_device::execute_set_input(int inptnum, int state)
 {
 	if (inptnum == INPUT_LINE_NMI)
 	{
-		if ( m_nmi_state == state )
+		if (m_nmi_state == state)
 		{
 			return;
 		}
@@ -1313,9 +1399,9 @@ std::unique_ptr<util::disasm_interface> v30mz_cpu_device::create_disassembler()
 
 void v30mz_cpu_device::execute_run()
 {
-	while(m_icount > 0 )
+	while (m_icount > 0)
 	{
-		if ( m_seg_prefix_next )
+		if (m_seg_prefix_next)
 		{
 			m_seg_prefix = true;
 			m_seg_prefix_next = false;
@@ -1324,34 +1410,34 @@ void v30mz_cpu_device::execute_run()
 		{
 			m_seg_prefix = false;
 
-				/* Dispatch IRQ */
-			if ( m_pending_irq && m_no_interrupt == 0 )
+			// Dispatch IRQ
+			if (m_pending_irq && m_no_interrupt == 0)
 			{
-				if ( m_pending_irq & NMI_IRQ )
+				if (m_pending_irq & NMI_IRQ)
 				{
-					interrupt(NEC_NMI_INT_VECTOR);
+					interrupt(NMI_INT);
 					m_pending_irq &= ~NMI_IRQ;
 				}
-				else if ( m_IF )
+				else if (m_IF)
 				{
-					/* the actual vector is retrieved after pushing flags */
-					/* and clearing the IF */
+					// the actual vector is retrieved after pushing flags
+					// and clearing the IF
 					interrupt(-1);
 				}
 			}
 
-			/* No interrupt allowed between last instruction and this one */
-			if ( m_no_interrupt )
+			// No interrupt allowed between last instruction and this one
+			if (m_no_interrupt)
 			{
 				m_no_interrupt--;
 			}
 
-			/* trap should allow one instruction to be executed */
-			if ( m_fire_trap )
+			// trap should allow one instruction to be executed
+			if (m_fire_trap)
 			{
-				if ( m_fire_trap >= 2 )
+				if (m_fire_trap >= 2)
 				{
-					interrupt(1);
+					interrupt(BREAK_INT);
 					m_fire_trap = 0;
 				}
 				else
@@ -1361,880 +1447,613 @@ void v30mz_cpu_device::execute_run()
 			}
 		}
 
-		debugger_instruction_hook( pc() );
+		if (m_prefetch_fill_needed) {
+			for (int i = 0; i < PREFETCH_QUEUE_SIZE; i++) {
+				read_prefetch();
+			}
+			m_prefetch_fill_needed = false;
+		}
+
+		debugger_instruction_hook(pc());
 
 		uint8_t op = fetch_op();
 
-		switch(op)
+		switch (op)
 		{
 			case 0x00: // i_add_br8
-				DEF_br8();
-				ADDB();
-				PutbackRMByte(m_dst);
-				CLKM(1,3);
+				def_br8();
+				add_byte();
+				store_ea_rm_byte(m_dst);
+				clkm(1,3);
 				break;
 
 			case 0x01: // i_add_wr16
-				DEF_wr16();
-				ADDW();
-				PutbackRMWord(m_dst);
-				CLKM(1,3);
+				def_wr16();
+				add_word();
+				store_ea_rm_word(m_dst);
+				clkm(1,3);
 				break;
 
 			case 0x02: // i_add_r8b
-				DEF_r8b();
-				ADDB();
-				RegByte(m_dst);
-				CLKM(1,2);
+				def_r8b();
+				add_byte();
+				reg_byte(m_dst);
+				clkm(1,2);
 				break;
 
 			case 0x03: // i_add_r16w
-				DEF_r16w();
-				ADDW();
-				RegWord(m_dst);
-				CLKM(1,2);
+				def_r16w();
+				add_word();
+				reg_word(m_dst);
+				clkm(1,2);
 				break;
 
 			case 0x04: // i_add_ald8
-				DEF_ald8();
-				ADDB();
+				def_ald8();
+				add_byte();
 				m_regs.b[AL] = m_dst;
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0x05: // i_add_axd16
-				DEF_axd16();
-				ADDW();
+				def_awd16();
+				add_word();
 				m_regs.w[AW] = m_dst;
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0x06: // i_push_es
-				PUSH(m_sregs[ES]);
-				CLK(2);
+				push(m_sregs[DS1]);
+				clk(2);
 				break;
 
 			case 0x07: // i_pop_es
-				m_sregs[ES] = POP();
-				CLK(3);
+				m_sregs[DS1] = pop();
+				clk(3);
 				break;
 
 			case 0x08: // i_or_br8
-				DEF_br8();
-				ORB();
-				PutbackRMByte(m_dst);
-				CLKM(1,3);
+				def_br8();
+				or_byte();
+				store_ea_rm_byte(m_dst);
+				clkm(1,3);
 				break;
 
 			case 0x09: // i_or_wr16
-				DEF_wr16();
-				ORW();
-				PutbackRMWord(m_dst);
-				CLKM(1,3);
+				def_wr16();
+				or_word();
+				store_ea_rm_word(m_dst);
+				clkm(1,3);
 				break;
 
 			case 0x0a: // i_or_r8b
-				DEF_r8b();
-				ORB();
-				RegByte(m_dst);
-				CLKM(1,2);
+				def_r8b();
+				or_byte();
+				reg_byte(m_dst);
+				clkm(1,2);
 				break;
 
 			case 0x0b: // i_or_r16w
-				DEF_r16w();
-				ORW();
-				RegWord(m_dst);
-				CLKM(1,2);
+				def_r16w();
+				or_word();
+				reg_word(m_dst);
+				clkm(1,2);
 				break;
 
 			case 0x0c: // i_or_ald8
-				DEF_ald8();
-				ORB();
+				def_ald8();
+				or_byte();
 				m_regs.b[AL] = m_dst;
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0x0d: // i_or_axd16
-				DEF_axd16();
-				ORW();
+				def_awd16();
+				or_word();
 				m_regs.w[AW] = m_dst;
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0x0e: // i_push_cs
-				PUSH(m_sregs[CS]);
-				CLK(2);
+				push(m_sregs[PS]);
+				clk(2);
 				break;
 
 			case 0x0f: // i_pre_nec
-				{
-					uint32_t tmp, tmp2;
-
-					switch ( fetch() )
-					{
-					case 0x10:  /* Test */
-						m_modrm = fetch();
-						tmp = GetRMByte();
-						tmp2 = m_regs.b[CL] & 0x7;
-						m_ZeroVal = (tmp & (1<<tmp2)) ? 1 : 0;
-						m_CarryVal = m_OverVal = 0;
-						break;
-					case 0x11:  /* Test */
-						m_modrm = fetch();
-						tmp = GetRMWord();
-						tmp2 = m_regs.b[CL] & 0xf;
-						m_ZeroVal = (tmp & (1<<tmp2)) ? 1 : 0;
-						m_CarryVal = m_OverVal = 0;
-						break;
-					case 0x12:  /* Clr */
-						m_modrm = fetch();
-						tmp = GetRMByte();
-						tmp2 = m_regs.b[CL] & 0x7;
-						tmp &= ~(1<<tmp2);
-						PutbackRMByte(tmp);
-						break;
-					case 0x13:  /* Clr */
-						m_modrm = fetch();
-						tmp = GetRMWord();
-						tmp2 = m_regs.b[CL] & 0xf;
-						tmp &= ~(1<<tmp2);
-						PutbackRMWord(tmp);
-						break;
-					case 0x14:  /* Set */
-						m_modrm = fetch();
-						tmp = GetRMByte();
-						tmp2 = m_regs.b[CL] & 0x7;
-						tmp |= (1<<tmp2);
-						PutbackRMByte(tmp);
-						break;
-					case 0x15:  /* Set */
-						m_modrm = fetch();
-						tmp = GetRMWord();
-						tmp2 = m_regs.b[CL] & 0xf;
-						tmp |= (1<<tmp2);
-						PutbackRMWord(tmp);
-						break;
-					case 0x16:  /* Not */
-						m_modrm = fetch();
-						tmp = GetRMByte();
-						tmp2 = m_regs.b[CL] & 0x7;
-						tmp ^= (1 << tmp2);
-						PutbackRMByte(tmp);
-						break;
-					case 0x17:  /* Not */
-						m_modrm = fetch();
-						tmp = GetRMWord();
-						tmp2 = m_regs.b[CL] & 0xf;
-						tmp ^= (1 << tmp2);
-						PutbackRMWord(tmp);
-						break;
-
-					case 0x18:  /* Test */
-						m_modrm = fetch();
-						tmp = GetRMByte();
-						tmp2 = fetch() & 0x7;
-						m_ZeroVal = (tmp & (1<<tmp2)) ? 1 : 0;
-						m_CarryVal = m_OverVal = 0;
-						break;
-					case 0x19:  /* Test */
-						m_modrm = fetch();
-						tmp = GetRMWord();
-						tmp2 = fetch() & 0xf;
-						m_ZeroVal = (tmp & (1<<tmp2)) ? 1 : 0;
-						m_CarryVal = m_OverVal = 0;
-						break;
-					case 0x1a:  /* Clr */
-						m_modrm = fetch();
-						tmp = GetRMByte();
-						tmp2 = fetch() & 0x7;
-						tmp &= ~(1<<tmp2);
-						PutbackRMByte(tmp);
-						break;
-					case 0x1b:  /* Clr */
-						m_modrm = fetch();
-						tmp = GetRMWord();
-						tmp2 = fetch() & 0xf;
-						tmp &= ~(1<<tmp2);
-						PutbackRMWord(tmp);
-						break;
-					case 0x1c:  /* Set */
-						m_modrm = fetch();
-						tmp = GetRMByte();
-						tmp2 = fetch() & 0x7;
-						tmp |= (1<<tmp2);
-						PutbackRMByte(tmp);
-						break;
-					case 0x1d:  /* Set */
-						m_modrm = fetch();
-						tmp = GetRMWord();
-						tmp2 = fetch() & 0xf;
-						tmp |= (1<<tmp2);
-						PutbackRMWord(tmp);
-						break;
-					case 0x1e:  /* Not */
-						m_modrm = fetch();
-						tmp = GetRMByte();
-						tmp2 = fetch() & 0x7;
-						tmp ^= (1 << tmp2);
-						PutbackRMByte(tmp);
-						break;
-					case 0x1f:  /* Not */
-						m_modrm = fetch();
-						tmp = GetRMWord();
-						tmp2 = fetch() & 0xf;
-						tmp ^= (1 << tmp2);
-						PutbackRMWord(tmp);
-						break;
-
-					case 0x20:
-						{
-							int count = (m_regs.b[CL]+1)/2;
-							uint16_t di = m_regs.w[IY];
-							uint16_t si = m_regs.w[IX];
-							if (m_seg_prefix)
-							{
-								logerror("%s: %06x: Warning: seg_prefix defined for add4s\n", tag(), pc());
-							}
-							m_ZeroVal = m_CarryVal = 0;
-							for (int i=0;i<count;i++)
-							{
-								CLK(19);
-								tmp = GetMemB(DS, si);
-								tmp2 = GetMemB(ES, di);
-								int v1 = (tmp>>4)*10 + (tmp&0xf);
-								int v2 = (tmp2>>4)*10 + (tmp2&0xf);
-								int result = v1 + v2 + m_CarryVal;
-								m_CarryVal = result > 99 ? 1 : 0;
-								result = result % 100;
-								v1 = ((result/10)<<4) | (result % 10);
-								PutMemB(ES, di,v1);
-								if (v1)
-								{
-									m_ZeroVal = 1;
-								}
-								si++;
-								di++;
-							}
-						}
-						break;
-					case 0x22:
-						{
-							int count = (m_regs.b[CL]+1)/2;
-							uint16_t di = m_regs.w[IY];
-							uint16_t si = m_regs.w[IX];
-							if (m_seg_prefix)
-							{
-								logerror("%s: %06x: Warning: seg_prefix defined for sub4s\n", tag(), pc());
-							}
-							m_ZeroVal = m_CarryVal = 0;
-							for (int i=0; i<count; i++)
-							{
-								int result;
-								CLK(19);
-								tmp = GetMemB(ES, di);
-								tmp2 = GetMemB(DS, si);
-								int v1 = (tmp>>4)*10 + (tmp&0xf);
-								int v2 = (tmp2>>4)*10 + (tmp2&0xf);
-								if (v1 < (v2+m_CarryVal))
-								{
-									v1+=100;
-									result = v1-(v2+m_CarryVal);
-									m_CarryVal = 1;
-								}
-								else
-								{
-									result = v1-(v2+m_CarryVal);
-									m_CarryVal = 0;
-								}
-								v1 = ((result/10)<<4) | (result % 10);
-								PutMemB(ES, di,v1);
-								if (v1)
-								{
-									m_ZeroVal = 1;
-								}
-								si++;
-								di++;
-							}
-						}
-						break;
-					case 0x26:
-						{
-							int count = (m_regs.b[CL]+1)/2;
-							uint16_t di = m_regs.w[IY];
-							uint16_t si = m_regs.w[IX];
-							if (m_seg_prefix)
-							{
-								logerror("%s: %06x: Warning: seg_prefix defined for cmp4s\n", tag(), pc());
-							}
-							m_ZeroVal = m_CarryVal = 0;
-							for (int i=0; i<count; i++)
-							{
-								int result;
-								CLK(19);
-								tmp = GetMemB(ES, di);
-								tmp2 = GetMemB(DS, si);
-								int v1 = (tmp>>4)*10 + (tmp&0xf);
-								int v2 = (tmp2>>4)*10 + (tmp2&0xf);
-								if (v1 < (v2+m_CarryVal))
-								{
-									v1+=100;
-									result = v1-(v2+m_CarryVal);
-									m_CarryVal = 1;
-								}
-								else
-								{
-									result = v1-(v2+m_CarryVal);
-									m_CarryVal = 0;
-								}
-								v1 = ((result/10)<<4) | (result % 10);
-								if (v1)
-								{
-									m_ZeroVal = 1;
-								}
-								si++;
-								di++;
-							}
-						}
-						break;
-					case 0x28:
-						m_modrm = fetch();
-						tmp = GetRMByte();
-						tmp <<= 4;
-						tmp |= m_regs.b[AL] & 0xf;
-						m_regs.b[AL] = (m_regs.b[AL] & 0xf0) | ((tmp>>8)&0xf);
-						tmp &= 0xff;
-						PutbackRMByte(tmp);
-						CLKM(9,15);
-						break;
-					case 0x2a:
-						m_modrm = fetch();
-						tmp = GetRMByte();
-						tmp2 = (m_regs.b[AL] & 0xf)<<4;
-						m_regs.b[AL] = (m_regs.b[AL] & 0xf0) | (tmp&0xf);
-						tmp = tmp2 | (tmp>>4);
-						PutbackRMByte(tmp);
-						CLKM(13,19);
-						break;
-					case 0x31:
-						m_modrm = fetch(); m_modrm = 0; logerror("%s: %06x: Unimplemented bitfield INS\n", tag(), pc()); break;
-					case 0x33:
-						m_modrm = fetch(); m_modrm = 0; logerror("%s: %06x: Unimplemented bitfield EXT\n", tag(), pc()); break;
-					case 0x92:  /* V25/35 FINT */
-						CLK(2);
-						break;
-					case 0xe0:
-						m_modrm = fetch();
-						m_modrm = 0;
-						logerror("%s: %06x: V33 unimplemented BRKXA (break to expansion address)\n", tag(), pc());
-						break;
-					case 0xf0:
-						m_modrm = fetch();
-						m_modrm = 0;
-						logerror("%s: %06x: V33 unimplemented RETXA (return from expansion address)\n", tag(), pc());
-						break;
-					case 0xff:
-						m_modrm = fetch();
-						m_modrm = 0;
-						logerror("%s: %06x: unimplemented BRKEM (break to 8080 emulation mode)\n", tag(), pc());
-						break;
-					default:
-						logerror("%s: %06x: Unknown V20 instruction\n", tag(), pc());
-						break;
-					}
-				}
+				clk(1);
 				break;
 
 
 			case 0x10: // i_adc_br8
-				DEF_br8();
+				def_br8();
 				m_src += CF ? 1 : 0;
-				ADDB();
-				PutbackRMByte(m_dst);
-				CLKM(1,3);
+				add_byte();
+				store_ea_rm_byte(m_dst);
+				clkm(1,3);
 				break;
 
 			case 0x11: // i_adc_wr16
-				DEF_wr16();
+				def_wr16();
 				m_src += CF ? 1 : 0;
-				ADDW();
-				PutbackRMWord(m_dst);
-				CLKM(1,3);
+				add_word();
+				store_ea_rm_word(m_dst);
+				clkm(1,3);
 				break;
 
 			case 0x12: // i_adc_r8b
-				DEF_r8b();
+				def_r8b();
 				m_src += CF ? 1 : 0;
-				ADDB();
-				RegByte(m_dst);
-				CLKM(1,2);
+				add_byte();
+				reg_byte(m_dst);
+				clkm(1,2);
 				break;
 
 			case 0x13: // i_adc_r16w
-				DEF_r16w();
+				def_r16w();
 				m_src += CF ? 1 : 0;
-				ADDW();
-				RegWord(m_dst);
-				CLKM(1,2);
+				add_word();
+				reg_word(m_dst);
+				clkm(1,2);
 				break;
 
 			case 0x14: // i_adc_ald8
-				DEF_ald8();
+				def_ald8();
 				m_src += CF ? 1 : 0;
-				ADDB();
+				add_byte();
 				m_regs.b[AL] = m_dst;
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0x15: // i_adc_axd16
-				DEF_axd16();
+				def_awd16();
 				m_src += CF ? 1 : 0;
-				ADDW();
+				add_word();
 				m_regs.w[AW] = m_dst;
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0x16: // i_push_ss
-				PUSH(m_sregs[SS]);
-				CLK(2);
+				push(m_sregs[SS]);
+				clk(2);
 				break;
 
 			case 0x17: // i_pop_ss
-				m_sregs[SS] = POP();
-				CLK(3);
+				m_sregs[SS] = pop();
+				clk(3);
 				m_no_interrupt = 1;
 				break;
 
 
 			case 0x18: // i_sbb_br8
-				DEF_br8();
+				def_br8();
 				m_src += CF ? 1 : 0;
-				SUBB();
-				PutbackRMByte(m_dst);
-				CLKM(1,3);
+				sub_byte();
+				store_ea_rm_byte(m_dst);
+				clkm(1,3);
 				break;
 
 			case 0x19: // i_sbb_wr16
-				DEF_wr16();
+				def_wr16();
 				m_src += CF ? 1 : 0;
-				SUBW();
-				PutbackRMWord(m_dst);
-				CLKM(1,3);
+				sub_word();
+				store_ea_rm_word(m_dst);
+				clkm(1,3);
 				break;
 
 			case 0x1a: // i_sbb_r8b
-				DEF_r8b();
+				def_r8b();
 				m_src += CF ? 1 : 0;
-				SUBB();
-				RegByte(m_dst);
-				CLKM(1,2);
+				sub_byte();
+				reg_byte(m_dst);
+				clkm(1,2);
 				break;
 
 			case 0x1b: // i_sbb_r16w
-				DEF_r16w();
+				def_r16w();
 				m_src += CF ? 1 : 0;
-				SUBW();
-				RegWord(m_dst);
-				CLKM(1,2);
+				sub_word();
+				reg_word(m_dst);
+				clkm(1,2);
 				break;
 
 			case 0x1c: // i_sbb_ald8
-				DEF_ald8();
+				def_ald8();
 				m_src += CF ? 1 : 0;
-				SUBB();
+				sub_byte();
 				m_regs.b[AL] = m_dst;
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0x1d: // i_sbb_axd16
-				DEF_axd16();
+				def_awd16();
 				m_src += CF ? 1 : 0;
-				SUBW();
+				sub_word();
 				m_regs.w[AW] = m_dst;
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0x1e: // i_push_ds
-				PUSH(m_sregs[DS]);
-				CLK(2);
+				push(m_sregs[DS0]);
+				clk(2);
 				break;
 
 			case 0x1f: // i_pop_ds
-				m_sregs[DS] = POP();
-				CLK(3);
+				m_sregs[DS0] = pop();
+				clk(3);
 				break;
 
 
 			case 0x20: // i_and_br8
-				DEF_br8();
-				ANDB();
-				PutbackRMByte(m_dst);
-				CLKM(1,3);
+				def_br8();
+				and_byte();
+				store_ea_rm_byte(m_dst);
+				clkm(1,3);
 				break;
 
 			case 0x21: // i_and_wr16
-				DEF_wr16();
-				ANDW();
-				PutbackRMWord(m_dst);
-				CLKM(1,3);
+				def_wr16();
+				and_word();
+				store_ea_rm_word(m_dst);
+				clkm(1,3);
 				break;
 
 			case 0x22: // i_and_r8b
-				DEF_r8b();
-				ANDB();
-				RegByte(m_dst);
-				CLKM(1,2);
+				def_r8b();
+				and_byte();
+				reg_byte(m_dst);
+				clkm(1,2);
 				break;
 
 			case 0x23: // i_and_r16w
-				DEF_r16w();
-				ANDW();
-				RegWord(m_dst);
-				CLKM(1,2);
+				def_r16w();
+				and_word();
+				reg_word(m_dst);
+				clkm(1,2);
 				break;
 
 			case 0x24: // i_and_ald8
-				DEF_ald8();
-				ANDB();
+				def_ald8();
+				and_byte();
 				m_regs.b[AL] = m_dst;
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0x25: // i_and_axd16
-				DEF_axd16();
-				ANDW();
+				def_awd16();
+				and_word();
 				m_regs.w[AW] = m_dst;
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0x26: // i_es
 				m_seg_prefix_next = true;
-				m_prefix_base = m_sregs[ES]<<4;
-				CLK(1);
+				m_prefix_base = m_sregs[DS1];
+				clk(1);
 				break;
 
 			case 0x27: // i_daa
-				ADJ4(6,0x60);
-				CLK(10);
+				adj4(6,0x60);
+				clk(10);
 				break;
 
 
 			case 0x28: // i_sub_br8
-				DEF_br8();
-				SUBB();
-				PutbackRMByte(m_dst);
-				CLKM(1,3);
+				def_br8();
+				sub_byte();
+				store_ea_rm_byte(m_dst);
+				clkm(1,3);
 				break;
 
 			case 0x29: // i_sub_wr16
-				DEF_wr16();
-				SUBW();
-				PutbackRMWord(m_dst);
-				CLKM(1,3);
+				def_wr16();
+				sub_word();
+				store_ea_rm_word(m_dst);
+				clkm(1,3);
 				break;
 
 			case 0x2a: // i_sub_r8b
-				DEF_r8b();
-				SUBB();
-				RegByte(m_dst);
-				CLKM(1,2);
+				def_r8b();
+				sub_byte();
+				reg_byte(m_dst);
+				clkm(1,2);
 				break;
 
 			case 0x2b: // i_sub_r16w
-				DEF_r16w();
-				SUBW();
-				RegWord(m_dst);
-				CLKM(1,2);
+				def_r16w();
+				sub_word();
+				reg_word(m_dst);
+				clkm(1,2);
 				break;
 
 			case 0x2c: // i_sub_ald8
-				DEF_ald8();
-				SUBB();
+				def_ald8();
+				sub_byte();
 				m_regs.b[AL] = m_dst;
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0x2d: // i_sub_axd16
-				DEF_axd16();
-				SUBW();
+				def_awd16();
+				sub_word();
 				m_regs.w[AW] = m_dst;
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0x2e: // i_cs
 				m_seg_prefix_next = true;
-				m_prefix_base = m_sregs[CS]<<4;
-				CLK(1);
+				m_prefix_base = m_sregs[PS];
+				clk(1);
 				break;
 
 			case 0x2f: // i_das
-				ADJ4(-6,-0x60);
-				CLK(10);
+				adj4(-6, -0x60);
+				clk(10);
 				break;
 
 
 			case 0x30: // i_xor_br8
-				DEF_br8();
-				XORB();
-				PutbackRMByte(m_dst);
-				CLKM(1,3);
+				def_br8();
+				xor_byte();
+				store_ea_rm_byte(m_dst);
+				clkm(1,3);
 				break;
 
 			case 0x31: // i_xor_wr16
-				DEF_wr16();
-				XORW();
-				PutbackRMWord(m_dst);
-				CLKM(1,3);
+				def_wr16();
+				xor_word();
+				store_ea_rm_word(m_dst);
+				clkm(1,3);
 				break;
 
 			case 0x32: // i_xor_r8b
-				DEF_r8b();
-				XORB();
-				RegByte(m_dst);
-				CLKM(1,2);
+				def_r8b();
+				xor_byte();
+				reg_byte(m_dst);
+				clkm(1,2);
 				break;
 
 			case 0x33: // i_xor_r16w
-				DEF_r16w();
-				XORW();
-				RegWord(m_dst);
-				CLKM(1,2);
+				def_r16w();
+				xor_word();
+				reg_word(m_dst);
+				clkm(1,2);
 				break;
 
 			case 0x34: // i_xor_ald8
-				DEF_ald8();
-				XORB();
+				def_ald8();
+				xor_byte();
 				m_regs.b[AL] = m_dst;
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0x35: // i_xor_axd16
-				DEF_axd16();
-				XORW();
+				def_awd16();
+				xor_word();
 				m_regs.w[AW] = m_dst;
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0x36: // i_ss
 				m_seg_prefix_next = true;
-				m_prefix_base = m_sregs[SS]<<4;
-				CLK(1);
+				m_prefix_base = m_sregs[SS];
+				clk(1);
 				break;
 
 			case 0x37: // i_aaa
-				ADJB(6, (m_regs.b[AL] > 0xf9) ? 2 : 1);
-				CLK(9);
+				adjb(6, (m_regs.b[AL] > 0xf9) ? 2 : 1);
+				clk(9);
 				break;
 
 
 			case 0x38: // i_cmp_br8
-				DEF_br8();
-				SUBB();
-				CLKM(1,2);
+				def_br8();
+				sub_byte();
+				clkm(1,2);
 				break;
 
 			case 0x39: // i_cmp_wr16
-				DEF_wr16();
-				SUBW();
-				CLKM(1,2);
+				def_wr16();
+				sub_word();
+				clkm(1,2);
 				break;
 
 			case 0x3a: // i_cmp_r8b
-				DEF_r8b();
-				SUBB();
-				CLKM(1,2);
+				def_r8b();
+				sub_byte();
+				clkm(1,2);
 				break;
 
 			case 0x3b: // i_cmp_r16w
-				DEF_r16w();
-				SUBW();
-				CLKM(1,2);
+				def_r16w();
+				sub_word();
+				clkm(1,2);
 				break;
 
 			case 0x3c: // i_cmp_ald8
-				DEF_ald8();
-				SUBB();
-				CLK(1);
+				def_ald8();
+				sub_byte();
+				clk(1);
 				break;
 
 			case 0x3d: // i_cmp_axd16
-				DEF_axd16();
-				SUBW();
-				CLK(1);
+				def_awd16();
+				sub_word();
+				clk(1);
 				break;
 
 			case 0x3e: // i_ds
 				m_seg_prefix_next = true;
-				m_prefix_base = m_sregs[DS]<<4;
-				CLK(1);
+				m_prefix_base = m_sregs[DS0];
+				clk(1);
 				break;
 
 			case 0x3f: // i_aas
-				ADJB(-6, (m_regs.b[AL] < 6) ? -2 : -1);
-				CLK(9);
+				adjb(-6, (m_regs.b[AL] < 6) ? -2 : -1);
+				clk(9);
 				break;
 
 
 			case 0x40: // i_inc_ax
-				IncWordReg(AW);
-				CLK(1);
+				inc_word_reg(AW);
+				clk(1);
 				break;
 
 			case 0x41: // i_inc_cx
-				IncWordReg(CW);
-				CLK(1);
+				inc_word_reg(CW);
+				clk(1);
 				break;
 
 			case 0x42: // i_inc_dx
-				IncWordReg(DW);
-				CLK(1);
+				inc_word_reg(DW);
+				clk(1);
 				break;
 
 			case 0x43: // i_inc_bx
-				IncWordReg(BW);
-				CLK(1);
+				inc_word_reg(BW);
+				clk(1);
 				break;
 
 			case 0x44: // i_inc_sp
-				IncWordReg(SP);
-				CLK(1);
+				inc_word_reg(SP);
+				clk(1);
 				break;
 
 			case 0x45: // i_inc_bp
-				IncWordReg(BP);
-				CLK(1);
+				inc_word_reg(BP);
+				clk(1);
 				break;
 
 			case 0x46: // i_inc_si
-				IncWordReg(IX);
-				CLK(1);
+				inc_word_reg(IX);
+				clk(1);
 				break;
 
 			case 0x47: // i_inc_di
-				IncWordReg(IY);
-				CLK(1);
+				inc_word_reg(IY);
+				clk(1);
 				break;
 
 
 			case 0x48: // i_dec_ax
-				DecWordReg(AW);
-				CLK(1);
+				dec_word_reg(AW);
+				clk(1);
 				break;
 
 			case 0x49: // i_dec_cx
-				DecWordReg(CW);
-				CLK(1);
+				dec_word_reg(CW);
+				clk(1);
 				break;
 
 			case 0x4a: // i_dec_dx
-				DecWordReg(DW);
-				CLK(1);
+				dec_word_reg(DW);
+				clk(1);
 				break;
 
 			case 0x4b: // i_dec_bx
-				DecWordReg(BW);
-				CLK(1);
+				dec_word_reg(BW);
+				clk(1);
 				break;
 
 			case 0x4c: // i_dec_sp
-				DecWordReg(SP);
-				CLK(1);
+				dec_word_reg(SP);
+				clk(1);
 				break;
 
 			case 0x4d: // i_dec_bp
-				DecWordReg(BP);
-				CLK(1);
+				dec_word_reg(BP);
+				clk(1);
 				break;
 
 			case 0x4e: // i_dec_si
-				DecWordReg(IX);
-				CLK(1);
+				dec_word_reg(IX);
+				clk(1);
 				break;
 
 			case 0x4f: // i_dec_di
-				DecWordReg(IY);
-				CLK(1);
+				dec_word_reg(IY);
+				clk(1);
 				break;
 
 
 			case 0x50: // i_push_ax
-				PUSH(m_regs.w[AW]);
-				CLK(1);
+				push(m_regs.w[AW]);
+				clk(1);
 				break;
 
 			case 0x51: // i_push_cx
-				PUSH(m_regs.w[CW]);
-				CLK(1);
+				push(m_regs.w[CW]);
+				clk(1);
 				break;
 
 			case 0x52: // i_push_dx
-				PUSH(m_regs.w[DW]);
-				CLK(1);
+				push(m_regs.w[DW]);
+				clk(1);
 				break;
 
 			case 0x53: // i_push_bx
-				PUSH(m_regs.w[BW]);
-				CLK(1);
+				push(m_regs.w[BW]);
+				clk(1);
 				break;
 
 			case 0x54: // i_push_sp
-				PUSH(m_regs.w[SP]);
-				CLK(1);
+				push(m_regs.w[SP]);
+				clk(1);
 				break;
 
 			case 0x55: // i_push_bp
-				PUSH(m_regs.w[BP]);
-				CLK(1);
+				push(m_regs.w[BP]);
+				clk(1);
 				break;
 
 			case 0x56: // i_push_si
-				PUSH(m_regs.w[IX]);
-				CLK(1);
+				push(m_regs.w[IX]);
+				clk(1);
 				break;
 
 			case 0x57: // i_push_di
-				PUSH(m_regs.w[IY]);
-				CLK(1);
+				push(m_regs.w[IY]);
+				clk(1);
 				break;
 
 
 			case 0x58: // i_pop_ax
-				m_regs.w[AW] = POP();
-				CLK(1);
+				m_regs.w[AW] = pop();
+				clk(1);
 				break;
 
 			case 0x59: // i_pop_cx
-				m_regs.w[CW] = POP();
-				CLK(1);
+				m_regs.w[CW] = pop();
+				clk(1);
 				break;
 
 			case 0x5a: // i_pop_dx
-				m_regs.w[DW] = POP();
-				CLK(1);
+				m_regs.w[DW] = pop();
+				clk(1);
 				break;
 
 			case 0x5b: // i_pop_bx
-				m_regs.w[BW] = POP();
-				CLK(1);
+				m_regs.w[BW] = pop();
+				clk(1);
 				break;
 
 			case 0x5c: // i_pop_sp
-				m_regs.w[SP] = POP();
-				CLK(1);
+				m_regs.w[SP] = pop();
+				clk(1);
 				break;
 
 			case 0x5d: // i_pop_bp
-				m_regs.w[BP] = POP();
-				CLK(1);
+				m_regs.w[BP] = pop();
+				clk(1);
 				break;
 
 			case 0x5e: // i_pop_si
-				m_regs.w[IX] = POP();
-				CLK(1);
+				m_regs.w[IX] = pop();
+				clk(1);
 				break;
 
 			case 0x5f: // i_pop_di
-				m_regs.w[IY] = POP();
-				CLK(1);
+				m_regs.w[IY] = pop();
+				clk(1);
 				break;
 
 
@@ -2242,106 +2061,126 @@ void v30mz_cpu_device::execute_run()
 				{
 					uint32_t tmp = m_regs.w[SP];
 
-					PUSH(m_regs.w[AW]);
-					PUSH(m_regs.w[CW]);
-					PUSH(m_regs.w[DW]);
-					PUSH(m_regs.w[BW]);
-					PUSH(tmp);
-					PUSH(m_regs.w[BP]);
-					PUSH(m_regs.w[IX]);
-					PUSH(m_regs.w[IY]);
-					CLK(9);
+					push(m_regs.w[AW]);
+					push(m_regs.w[CW]);
+					push(m_regs.w[DW]);
+					push(m_regs.w[BW]);
+					push(tmp);
+					push(m_regs.w[BP]);
+					push(m_regs.w[IX]);
+					push(m_regs.w[IY]);
+					clk(9);
 				}
 				break;
 
 			case 0x61: // i_popa
-				m_regs.w[IY] = POP();
-				m_regs.w[IX] = POP();
-				m_regs.w[BP] = POP();
-								POP();
-				m_regs.w[BW] = POP();
-				m_regs.w[DW] = POP();
-				m_regs.w[CW] = POP();
-				m_regs.w[AW] = POP();
-				CLK(8);
+				m_regs.w[IY] = pop();
+				m_regs.w[IX] = pop();
+				m_regs.w[BP] = pop();
+								pop();
+				m_regs.w[BW] = pop();
+				m_regs.w[DW] = pop();
+				m_regs.w[CW] = pop();
+				m_regs.w[AW] = pop();
+				clk(8);
 				break;
 
 			case 0x62: // i_chkind
 				{
 					uint32_t low,high,tmp;
 					m_modrm = fetch();
-					low = GetRMWord();
-					high = GetnextRMWord();
-					tmp = RegWord();
-					if (tmp<low || tmp>high)
+					low = get_rm_word();
+					high = get_next_rm_word();
+					tmp = reg_word();
+					if (tmp < low || tmp > high)
 					{
-						interrupt(5);
-						CLK(20);
+						interrupt(CHKIND_INT);
+						clk(20);
 					}
 					else
 					{
-						CLK(13);
+						clk(13);
 					}
 					logerror("%s: %06x: bound %04x high %04x low %04x tmp\n", tag(), pc(), high, low, tmp);
 				}
 				break;
 
-			case 0x64: // i_repnc
+			case 0x64:  // REPNC not supported by v30mz
+				fatalerror("%s: %06x: REPNC is not supported by v30mz\n", tag(), pc());
 				{
 					uint8_t next = repx_op();
 					uint16_t c = m_regs.w[CW];
 
 					switch (next)
 					{
-					case 0x6c:  CLK(2); if (c) do { i_insb();  c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0x6d:  CLK(2); if (c) do { i_insw();  c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0x6e:  CLK(2); if (c) do { i_outsb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0x6f:  CLK(2); if (c) do { i_outsw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa4:  CLK(2); if (c) do { i_movsb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa5:  CLK(2); if (c) do { i_movsw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa6:  CLK(2); if (c) do { i_cmpsb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa7:  CLK(2); if (c) do { i_cmpsw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xaa:  CLK(2); if (c) do { i_stosb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xab:  CLK(2); if (c) do { i_stosw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xac:  CLK(2); if (c) do { i_lodsb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xad:  CLK(2); if (c) do { i_lodsw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xae:  CLK(2); if (c) do { i_scasb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xaf:  CLK(2); if (c) do { i_scasw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6c:  clk(2); if (c) do { i_insb();  c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6d:  clk(2); if (c) do { i_insw();  c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6e:  clk(2); if (c) do { i_outsb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6f:  clk(2); if (c) do { i_outsw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa4:  clk(2); if (c) do { i_movsb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa5:  clk(2); if (c) do { i_movsw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa6:  clk(2); if (c) do { i_cmpsb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa7:  clk(2); if (c) do { i_cmpsw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xaa:  clk(2); if (c) do { i_stosb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xab:  clk(2); if (c) do { i_stosw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xac:  clk(2); if (c) do { i_lodsb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xad:  clk(2); if (c) do { i_lodsw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xae:  clk(2); if (c) do { i_scasb(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xaf:  clk(2); if (c) do { i_scasw(); c--; } while (c>0 && !CF); m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 					default:
-						logerror("%s: %06x: REPNC invalid\n", tag(), pc() );
+						logerror("%s: %06x: REPNC invalid\n", tag(), pc());
 						// Decrement IP so the normal instruction will be executed next
 						m_ip--;
+						m_pfp--;
+						if (m_prefetch_queue_tail == 0)
+							m_prefetch_queue_tail = PREFETCH_QUEUE_SIZE - 1;
+						else
+							m_prefetch_queue_tail--;
+						if (m_prefetch_queue_head == 0)
+							m_prefetch_queue_head = PREFETCH_QUEUE_SIZE - 1;
+						else
+							m_prefetch_queue_head--;
 						break;
 					}
 				}
 				break;
 
 
-			case 0x65: // i_repc
+			case 0x65: // REPC not supported by v30mz
+				fatalerror("%s: %06x: REPC is not supported by v30mz\n", tag(), pc());
 				{
 					uint8_t next = repx_op();
 					uint16_t c = m_regs.w[CW];
 
 					switch (next)
 					{
-					case 0x6c:  CLK(2); if (c) do { i_insb();  c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0x6d:  CLK(2); if (c) do { i_insw();  c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0x6e:  CLK(2); if (c) do { i_outsb(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0x6f:  CLK(2); if (c) do { i_outsw(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa4:  CLK(2); if (c) do { i_movsb(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa5:  CLK(2); if (c) do { i_movsw(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa6:  CLK(2); if (c) do { i_cmpsb(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa7:  CLK(2); if (c) do { i_cmpsw(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xaa:  CLK(2); if (c) do { i_stosb(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xab:  CLK(2); if (c) do { i_stosw(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xac:  CLK(2); if (c) do { i_lodsb(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xad:  CLK(2); if (c) do { i_lodsw(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xae:  CLK(2); if (c) do { i_scasb(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xaf:  CLK(2); if (c) do { i_scasw(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6c:  clk(2); if (c) do { i_insb();  c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6d:  clk(2); if (c) do { i_insw();  c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6e:  clk(2); if (c) do { i_outsb(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6f:  clk(2); if (c) do { i_outsw(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa4:  clk(2); if (c) do { i_movsb(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa5:  clk(2); if (c) do { i_movsw(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa6:  clk(2); if (c) do { i_cmpsb(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa7:  clk(2); if (c) do { i_cmpsw(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xaa:  clk(2); if (c) do { i_stosb(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xab:  clk(2); if (c) do { i_stosw(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xac:  clk(2); if (c) do { i_lodsb(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xad:  clk(2); if (c) do { i_lodsw(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xae:  clk(2); if (c) do { i_scasb(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xaf:  clk(2); if (c) do { i_scasw(); c--; } while (c>0 && CF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 					default:
 						logerror("%s: %06x: REPC invalid\n", tag(), pc());
 						// Decrement IP so the normal instruction will be executed next
 						m_ip--;
+						m_pfp--;
+						if (m_prefetch_queue_tail == 0)
+							m_prefetch_queue_tail = PREFETCH_QUEUE_SIZE - 1;
+						else
+							m_prefetch_queue_tail--;
+						if (m_prefetch_queue_head == 0)
+							m_prefetch_queue_head = PREFETCH_QUEUE_SIZE - 1;
+						else
+							m_prefetch_queue_head--;
 						break;
 					}
 				}
@@ -2349,36 +2188,36 @@ void v30mz_cpu_device::execute_run()
 
 
 			case 0x68: // i_push_d16
-				PUSH( fetch_word() );
-				CLK(1);
+				push(fetch_word());
+				clk(1);
 				break;
 
 			case 0x69: // i_imul_d16
 				{
 					uint32_t tmp;
-					DEF_r16w();
+					def_r16w();
 					tmp = fetch_word();
-					m_dst = (int32_t)((int16_t)m_src)*(int32_t)((int16_t)tmp);
+					m_dst = (int32_t)((int16_t)m_src) * (int32_t)((int16_t)tmp);
 					m_CarryVal = m_OverVal = (((int32_t)m_dst) >> 15 != 0) && (((int32_t)m_dst) >> 15 != -1);
-					RegWord(m_dst);
-					CLKM(3,4);
+					reg_word(m_dst);
+					clkm(3,4);
 				}
 				break;
 
 			case 0x6a: // i_push_d8
-				PUSH( (uint16_t)((int16_t)((int8_t)fetch())) );
-				CLK(1);
+				push( (uint16_t)((int16_t)((int8_t)fetch())));
+				clk(1);
 				break;
 
 			case 0x6b: // i_imul_d8
 				{
 					uint32_t src2;
-					DEF_r16w();
-					src2= (uint16_t)((int16_t)((int8_t)fetch()));
-					m_dst = (int32_t)((int16_t)m_src)*(int32_t)((int16_t)src2);
+					def_r16w();
+					src2 = (uint16_t)((int16_t)((int8_t)fetch()));
+					m_dst = (int32_t)((int16_t)m_src) * (int32_t)((int16_t)src2);
 					m_CarryVal = m_OverVal = (((int32_t)m_dst) >> 15 != 0) && (((int32_t)m_dst) >> 15 != -1);
-					RegWord(m_dst);
-					CLKM(3,4);
+					reg_word(m_dst);
+					clkm(3,4);
 				}
 				break;
 
@@ -2400,239 +2239,239 @@ void v30mz_cpu_device::execute_run()
 
 
 			case 0x70: // i_jo
-				JMP( OF);
+				jmp( OF);
 				break;
 
 			case 0x71: // i_jno
-				JMP(!OF);
+				jmp(!OF);
 				break;
 
 			case 0x72: // i_jc
-				JMP( CF);
+				jmp( CF);
 				break;
 
 			case 0x73: // i_jnc
-				JMP(!CF);
+				jmp(!CF);
 				break;
 
 			case 0x74: // i_jz
-				JMP( ZF);
+				jmp( ZF);
 				break;
 
 			case 0x75: // i_jnz
-				JMP(!ZF);
+				jmp(!ZF);
 				break;
 
 			case 0x76: // i_jce
-				JMP(CF || ZF);
+				jmp(CF || ZF);
 				break;
 
 			case 0x77: // i_jnce
-				JMP(!(CF || ZF));
+				jmp(!(CF || ZF));
 				break;
 
 			case 0x78: // i_js
-				JMP( SF);
+				jmp( SF);
 				break;
 
 			case 0x79: // i_jns
-				JMP(!SF);
+				jmp(!SF);
 				break;
 
 			case 0x7a: // i_jp
-				JMP( PF);
+				jmp( PF);
 				break;
 
 			case 0x7b: // i_jnp
-				JMP(!PF);
+				jmp(!PF);
 				break;
 
 			case 0x7c: // i_jl
-				JMP((SF!=OF)&&(!ZF));
+				jmp((SF != OF) && (!ZF));
 				break;
 
 			case 0x7d: // i_jnl
-				JMP((ZF)||(SF==OF));
+				jmp((ZF) || (SF == OF));
 				break;
 
 			case 0x7e: // i_jle
-				JMP((ZF)||(SF!=OF));
+				jmp((ZF) || (SF != OF));
 				break;
 
 			case 0x7f: // i_jnle
-				JMP((SF==OF)&&(!ZF));
+				jmp((SF == OF) && (!ZF));
 				break;
 
 
 			case 0x80: // i_80pre
 				m_modrm = fetch();
-				m_dst = GetRMByte();
+				m_dst = get_rm_byte();
 				m_src = fetch();
-				if (m_modrm >=0xc0 )             { CLK(1); }
-				else if ((m_modrm & 0x38)==0x38) { CLK(2); }
-				else                             { CLK(3); }
+				if (m_modrm >=0xc0)              { clk(1); }
+				else if ((m_modrm & 0x38)==0x38) { clk(2); }
+				else                             { clk(3); }
 				switch (m_modrm & 0x38)
 				{
-				case 0x00:                      ADDB(); PutbackRMByte(m_dst);   break;
-				case 0x08:                      ORB();  PutbackRMByte(m_dst);   break;
-				case 0x10: m_src += CF ? 1 : 0; ADDB(); PutbackRMByte(m_dst);   break;
-				case 0x18: m_src += CF ? 1 : 0; SUBB(); PutbackRMByte(m_dst);   break;
-				case 0x20:                      ANDB(); PutbackRMByte(m_dst);   break;
-				case 0x28:                      SUBB(); PutbackRMByte(m_dst);   break;
-				case 0x30:                      XORB(); PutbackRMByte(m_dst);   break;
-				case 0x38:                      SUBB();                         break;  /* CMP */
+				case 0x00:                      add_byte(); store_ea_rm_byte(m_dst);   break;
+				case 0x08:                      or_byte();  store_ea_rm_byte(m_dst);   break;
+				case 0x10: m_src += CF ? 1 : 0; add_byte(); store_ea_rm_byte(m_dst);   break;
+				case 0x18: m_src += CF ? 1 : 0; sub_byte(); store_ea_rm_byte(m_dst);   break;
+				case 0x20:                      and_byte(); store_ea_rm_byte(m_dst);   break;
+				case 0x28:                      sub_byte(); store_ea_rm_byte(m_dst);   break;
+				case 0x30:                      xor_byte(); store_ea_rm_byte(m_dst);   break;
+				case 0x38:                      sub_byte();                         break;  // CMP
 				}
 				break;
 
 
 			case 0x81: // i_81pre
 				m_modrm = fetch();
-				m_dst = GetRMWord();
+				m_dst = get_rm_word();
 				m_src = fetch_word();
-				if (m_modrm >=0xc0 )             { CLK(1); }
-				else if ((m_modrm & 0x38)==0x38) { CLK(2); }
-				else                             { CLK(3); }
+				if (m_modrm >=0xc0)              { clk(1); }
+				else if ((m_modrm & 0x38)==0x38) { clk(2); }
+				else                             { clk(3); }
 				switch (m_modrm & 0x38)
 				{
-				case 0x00:                      ADDW(); PutbackRMWord(m_dst);   break;
-				case 0x08:                      ORW();  PutbackRMWord(m_dst);   break;
-				case 0x10: m_src += CF ? 1 : 0; ADDW(); PutbackRMWord(m_dst);   break;
-				case 0x18: m_src += CF ? 1 : 0; SUBW(); PutbackRMWord(m_dst);   break;
-				case 0x20:                      ANDW(); PutbackRMWord(m_dst);   break;
-				case 0x28:                      SUBW(); PutbackRMWord(m_dst);   break;
-				case 0x30:                      XORW(); PutbackRMWord(m_dst);   break;
-				case 0x38:                      SUBW();                         break;  /* CMP */
+				case 0x00:                      add_word(); store_ea_rm_word(m_dst);   break;
+				case 0x08:                      or_word();  store_ea_rm_word(m_dst);   break;
+				case 0x10: m_src += CF ? 1 : 0; add_word(); store_ea_rm_word(m_dst);   break;
+				case 0x18: m_src += CF ? 1 : 0; sub_word(); store_ea_rm_word(m_dst);   break;
+				case 0x20:                      and_word(); store_ea_rm_word(m_dst);   break;
+				case 0x28:                      sub_word(); store_ea_rm_word(m_dst);   break;
+				case 0x30:                      xor_word(); store_ea_rm_word(m_dst);   break;
+				case 0x38:                      sub_word();                         break;  // CMP
 				}
 				break;
 
 
 			case 0x82: // i_82pre
 				m_modrm = fetch();
-				m_dst = GetRMByte();
+				m_dst = get_rm_byte();
 				m_src = (int8_t)fetch();
-				if (m_modrm >=0xc0 )             { CLK(1); }
-				else if ((m_modrm & 0x38)==0x38) { CLK(2); }
-				else                             { CLK(3); }
+				if (m_modrm >=0xc0)                { clk(1); }
+				else if ((m_modrm & 0x38) == 0x38) { clk(2); }
+				else                               { clk(3); }
 				switch (m_modrm & 0x38)
 				{
-				case 0x00:                      ADDB(); PutbackRMByte(m_dst);   break;
-				case 0x08:                      ORB();  PutbackRMByte(m_dst);   break;
-				case 0x10: m_src += CF ? 1 : 0; ADDB(); PutbackRMByte(m_dst);   break;
-				case 0x18: m_src += CF ? 1 : 0; SUBB(); PutbackRMByte(m_dst);   break;
-				case 0x20:                      ANDB(); PutbackRMByte(m_dst);   break;
-				case 0x28:                      SUBB(); PutbackRMByte(m_dst);   break;
-				case 0x30:                      XORB(); PutbackRMByte(m_dst);   break;
-				case 0x38:                      SUBB();                         break; /* CMP */
+				case 0x00:                      add_byte(); store_ea_rm_byte(m_dst);   break;
+				case 0x08:                      or_byte();  store_ea_rm_byte(m_dst);   break;
+				case 0x10: m_src += CF ? 1 : 0; add_byte(); store_ea_rm_byte(m_dst);   break;
+				case 0x18: m_src += CF ? 1 : 0; sub_byte(); store_ea_rm_byte(m_dst);   break;
+				case 0x20:                      and_byte(); store_ea_rm_byte(m_dst);   break;
+				case 0x28:                      sub_byte(); store_ea_rm_byte(m_dst);   break;
+				case 0x30:                      xor_byte(); store_ea_rm_byte(m_dst);   break;
+				case 0x38:                      sub_byte();                         break; // CMP
 				}
 				break;
 
 
 			case 0x83: // i_83pre
 				m_modrm = fetch();
-				m_dst = GetRMWord();
-				m_src = ((int16_t)((int8_t)fetch()));
-				if ( m_modrm >= 0xc0 )               { CLK(1); }
-				else if (( m_modrm & 0x38 ) == 0x38) { CLK(2); }
-				else                                 { CLK(3); }
+				m_dst = get_rm_word();
+				m_src = (int8_t)fetch();
+				if ( m_modrm >= 0xc0)              { clk(1); }
+				else if ((m_modrm & 0x38) == 0x38) { clk(2); }
+				else                               { clk(3); }
 				switch (m_modrm & 0x38)
 				{
-				case 0x00:                      ADDW(); PutbackRMWord(m_dst); break;
-				case 0x08:                      ORW();  PutbackRMWord(m_dst); break;
-				case 0x10: m_src += CF ? 1 : 0; ADDW(); PutbackRMWord(m_dst); break;
-				case 0x18: m_src += CF ? 1 : 0; SUBW(); PutbackRMWord(m_dst); break;
-				case 0x20:                      ANDW(); PutbackRMWord(m_dst); break;
-				case 0x28:                      SUBW(); PutbackRMWord(m_dst); break;
-				case 0x30:                      XORW(); PutbackRMWord(m_dst); break;
-				case 0x38:                      SUBW();                       break; /* CMP */
+				case 0x00:                      add_word(); store_ea_rm_word(m_dst); break;
+				case 0x08:                      or_word();  store_ea_rm_word(m_dst); break;
+				case 0x10: m_src += CF ? 1 : 0; add_word(); store_ea_rm_word(m_dst); break;
+				case 0x18: m_src += CF ? 1 : 0; sub_word(); store_ea_rm_word(m_dst); break;
+				case 0x20:                      and_word(); store_ea_rm_word(m_dst); break;
+				case 0x28:                      sub_word(); store_ea_rm_word(m_dst); break;
+				case 0x30:                      xor_word(); store_ea_rm_word(m_dst); break;
+				case 0x38:                      sub_word();                       break; // CMP
 				}
 				break;
 
 
 			case 0x84: // i_test_br8
-				DEF_br8();
-				ANDB();
-				CLKM(1,2);
+				def_br8();
+				and_byte();
+				clkm(1,2);
 				break;
 
 			case 0x85: // i_test_wr16
-				DEF_wr16();
-				ANDW();
-				CLKM(1,2);
+				def_wr16();
+				and_word();
+				clkm(1,2);
 				break;
 
 			case 0x86: // i_xchg_br8
-				DEF_br8();
-				RegByte(m_dst);
-				PutbackRMByte(m_src);
-				CLKM(3,5);
+				def_br8();
+				reg_byte(m_dst);
+				store_ea_rm_byte(m_src);
+				clkm(3,5);
 				break;
 
 			case 0x87: // i_xchg_wr16
-				DEF_wr16();
-				RegWord(m_dst);
-				PutbackRMWord(m_src);
-				CLKM(3,5);
+				def_wr16();
+				reg_word(m_dst);
+				store_ea_rm_word(m_src);
+				clkm(3,5);
 				break;
 
 
 			case 0x88: // i_mov_br8
 				m_modrm = fetch();
-				m_src = RegByte();
-				PutRMByte(m_src);
-				CLK(1);
+				m_src = reg_byte();
+				put_rm_byte(m_src);
+				clk(1);
 				break;
 
 			case 0x89: // i_mov_wr16
 				m_modrm = fetch();
-				m_src = RegWord();
-				PutRMWord(m_src);
-				CLK(1);
+				m_src = reg_word();
+				put_rm_word(m_src);
+				clk(1);
 				break;
 
 			case 0x8a: // i_mov_r8b
 				m_modrm = fetch();
-				m_src = GetRMByte();
-				RegByte(m_src);
-				CLK(1);
+				m_src = get_rm_byte();
+				reg_byte(m_src);
+				clk(1);
 				break;
 
 			case 0x8b: // i_mov_r16w
 				m_modrm = fetch();
-				m_src = GetRMWord();
-				RegWord(m_src);
-				CLK(1);
+				m_src = get_rm_word();
+				reg_word(m_src);
+				clk(1);
 				break;
 
 			case 0x8c: // i_mov_wsreg
 				m_modrm = fetch();
-				PutRMWord(m_sregs[(m_modrm & 0x38) >> 3]);
-				CLKM(1,3);
+				put_rm_word(m_sregs[(m_modrm & 0x38) >> 3]);
+				clkm(1,3);
 				break;
 
 			case 0x8d: // i_lea
 				m_modrm = fetch();
 				get_ea();
-				RegWord(m_eo);
-				CLK(1);
+				reg_word(m_eo);
+				clk(1);
 				break;
 
 			case 0x8e: // i_mov_sregw
 				m_modrm = fetch();
-				m_src = GetRMWord();
-				CLKM(2,3);
+				m_src = get_rm_word();
+				clkm(2,3);
 				switch (m_modrm & 0x38)
 				{
-				case 0x00:  /* mov es,ew */
-					m_sregs[ES] = m_src;
+				case 0x00:  // mov ds1,ew
+					m_sregs[DS1] = m_src;
 					break;
-				case 0x08:  /* mov cs,ew */
-					m_sregs[CS] = m_src;
+				case 0x08:  // mov cs,ew
+					m_sregs[PS] = m_src;
 					break;
-				case 0x10:  /* mov ss,ew */
+				case 0x10:  // mov ss,ew
 					m_sregs[SS] = m_src;
 					break;
-				case 0x18:  /* mov ds,ew */
-					m_sregs[DS] = m_src;
+				case 0x18:  // mov ds0,ew
+					m_sregs[DS0] = m_src;
 					break;
 				default:
 					logerror("%s: %06x: Mov Sreg - Invalid register\n", tag(), pc());
@@ -2642,69 +2481,70 @@ void v30mz_cpu_device::execute_run()
 
 			case 0x8f: // i_popw
 				m_modrm = fetch();
-				PutRMWord( POP() );
-				CLKM(1,3);
+				put_rm_word(pop());
+				clkm(1,3);
 				break;
 
 			case 0x90: // i_nop
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0x91: // i_xchg_axcx
-				XchgAWReg(CW);
-				CLK(3);
+				xchg_AW_reg(CW);
+				clk(3);
 				break;
 
 			case 0x92: // i_xchg_axdx
-				XchgAWReg(DW);
-				CLK(3);
+				xchg_AW_reg(DW);
+				clk(3);
 				break;
 
 			case 0x93: // i_xchg_axbx
-				XchgAWReg(BW);
-				CLK(3);
+				xchg_AW_reg(BW);
+				clk(3);
 				break;
 
 			case 0x94: // i_xchg_axsp
-				XchgAWReg(SP);
-				CLK(3);
+				xchg_AW_reg(SP);
+				clk(3);
 				break;
 
 			case 0x95: // i_xchg_axbp
-				XchgAWReg(BP);
-				CLK(3);
+				xchg_AW_reg(BP);
+				clk(3);
 				break;
 
 			case 0x96: // i_xchg_axsi
-				XchgAWReg(IX);
-				CLK(3);
+				xchg_AW_reg(IX);
+				clk(3);
 				break;
 
 			case 0x97: // i_xchg_axdi
-				XchgAWReg(IY);
-				CLK(3);
+				xchg_AW_reg(IY);
+				clk(3);
 				break;
 
 
 			case 0x98: // i_cbw
 				m_regs.b[AH] = (m_regs.b[AL] & 0x80) ? 0xff : 0;
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0x99: // i_cwd
 				m_regs.w[DW] = (m_regs.b[AH] & 0x80) ? 0xffff : 0;
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0x9a: // i_call_far
 				{
 					uint16_t tmp = fetch_word();
 					uint16_t tmp2 = fetch_word();
-					PUSH(m_sregs[CS]);
-					PUSH(m_ip);
+					push(m_sregs[PS]);
+					push(m_ip);
 					m_ip = tmp;
-					m_sregs[CS] = tmp2;
-					CLK(10);
+					m_sregs[PS] = tmp2;
+					init_prefetch();
+					clk(10);
 				}
 				break;
 
@@ -2713,8 +2553,8 @@ void v30mz_cpu_device::execute_run()
 				break;
 
 			case 0x9c: // i_pushf
-				PUSH( CompressFlags() );
-				CLK(2);
+				push(compress_flags());
+				clk(2);
 				break;
 
 			case 0x9d: // i_popf
@@ -2723,50 +2563,36 @@ void v30mz_cpu_device::execute_run()
 
 			case 0x9e: // i_sahf
 				{
-					uint32_t tmp = (CompressFlags() & 0xff00) | (m_regs.b[AH] & 0xd5);
-					ExpandFlags(tmp);
-					CLK(4);
+					uint32_t tmp = (compress_flags() & 0xff00) | (m_regs.b[AH] & 0xd5);
+					expand_flags(tmp);
+					clk(4);
 				}
 				break;
 
 			case 0x9f: // i_lahf
-				m_regs.b[AH] = CompressFlags();
-				CLK(2);
+				m_regs.b[AH] = compress_flags();
+				clk(2);
 				break;
 
 
 			case 0xa0: // i_mov_aldisp
-				{
-					uint32_t addr = fetch_word();
-					m_regs.b[AL] = GetMemB(DS, addr);
-					CLK(1);
-				}
+				m_regs.b[AL] = read_byte(default_base(DS0), fetch_word());
+				clk(1);
 				break;
 
 			case 0xa1: // i_mov_axdisp
-				{
-					uint32_t addr = fetch_word();
-					m_regs.b[AL] = GetMemB(DS, addr);
-					m_regs.b[AH] = GetMemB(DS, addr+1);
-					CLK(1);
-				}
+				m_regs.w[AW] = read_word(default_base(DS0), fetch_word());
+				clk(1);
 				break;
 
 			case 0xa2: // i_mov_dispal
-				{
-					uint32_t addr = fetch_word();
-					PutMemB(DS, addr, m_regs.b[AL]);
-					CLK(1);
-				}
+				write_byte(default_base(DS0), fetch_word(), m_regs.b[AL]);
+				clk(1);
 				break;
 
 			case 0xa3: // i_mov_dispax
-				{
-					uint32_t addr = fetch_word();
-					PutMemB(DS, addr, m_regs.b[AL]);
-					PutMemB(DS, addr+1, m_regs.b[AH]);
-					CLK(1);
-				}
+				write_word(default_base(DS0), fetch_word(), m_regs.w[AW]);
+				clk(1);
 				break;
 
 			case 0xa4: // i_movsb
@@ -2787,15 +2613,15 @@ void v30mz_cpu_device::execute_run()
 
 
 			case 0xa8: // i_test_ald8
-				DEF_ald8();
-				ANDB();
-				CLK(1);
+				def_ald8();
+				and_byte();
+				clk(1);
 				break;
 
 			case 0xa9: // i_test_axd16
-				DEF_axd16();
-				ANDW();
-				CLK(1);
+				def_awd16();
+				and_word();
+				clk(1);
 				break;
 
 			case 0xaa: // i_stosb
@@ -2825,91 +2651,83 @@ void v30mz_cpu_device::execute_run()
 
 			case 0xb0: // i_mov_ald8
 				m_regs.b[AL] = fetch();
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0xb1: // i_mov_cld8
 				m_regs.b[CL] = fetch();
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0xb2: // i_mov_dld8
 				m_regs.b[DL] = fetch();
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0xb3: // i_mov_bld8
 				m_regs.b[BL] = fetch();
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0xb4: // i_mov_ahd8
 				m_regs.b[AH] = fetch();
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0xb5: // i_mov_chd8
 				m_regs.b[CH] = fetch();
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0xb6: // i_mov_dhd8
 				m_regs.b[DH] = fetch();
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0xb7: // i_mov_bhd8
 				m_regs.b[BH] = fetch();
-				CLK(1);
+				clk(1);
 				break;
 
 
 			case 0xb8: // i_mov_axd16
-				m_regs.b[AL] = fetch();
-				m_regs.b[AH] = fetch();
-				CLK(1);
+				m_regs.w[AW] = fetch_word();
+				clk(1);
 				break;
 
 			case 0xb9: // i_mov_cxd16
-				m_regs.b[CL] = fetch();
-				m_regs.b[CH] = fetch();
-				CLK(1);
+				m_regs.w[CW] = fetch_word();
+				clk(1);
 				break;
 
 			case 0xba: // i_mov_dxd16
-				m_regs.b[DL] = fetch();
-				m_regs.b[DH] = fetch();
-				CLK(1);
+				m_regs.w[DW] = fetch_word();
+				clk(1);
 				break;
 
 			case 0xbb: // i_mov_bxd16
-				m_regs.b[BL] = fetch();
-				m_regs.b[BH] = fetch();
-				CLK(1);
+				m_regs.w[BW] = fetch_word();
+				clk(1);
 				break;
 
 			case 0xbc: // i_mov_spd16
-				m_regs.b[SPL] = fetch();
-				m_regs.b[SPH] = fetch();
-				CLK(1);
+				m_regs.w[SP] = fetch_word();
+				clk(1);
 				break;
 
 			case 0xbd: // i_mov_bpd16
-				m_regs.b[BPL] = fetch();
-				m_regs.b[BPH] = fetch();
-				CLK(1);
+				m_regs.w[BP] = fetch_word();
+				clk(1);
 				break;
 
 			case 0xbe: // i_mov_sid16
-				m_regs.b[IXL] = fetch();
-				m_regs.b[IXH] = fetch();
-				CLK(1);
+				m_regs.w[IX] = fetch_word();
+				clk(1);
 				break;
 
 			case 0xbf: // i_mov_did16
-				m_regs.b[IYL] = fetch();
-				m_regs.b[IYH] = fetch();
-				CLK(1);
+				m_regs.w[IY] = fetch_word();
+				clk(1);
 				break;
 
 
@@ -2917,22 +2735,22 @@ void v30mz_cpu_device::execute_run()
 				{
 					uint8_t c;
 					m_modrm = fetch();
-					m_src = GetRMByte();
+					m_src = get_rm_byte();
 					m_dst = m_src;
 					c = fetch();
-					CLKM(3,5);
+					clkm(3,5);
 					if (c)
 					{
-						switch ( m_modrm & 0x38 )
+						switch (m_modrm & 0x38)
 						{
-						case 0x00: do { ROL_BYTE();  c--; } while (c>0); PutbackRMByte(m_dst); break;
-						case 0x08: do { ROR_BYTE();  c--; } while (c>0); PutbackRMByte(m_dst); break;
-						case 0x10: do { ROLC_BYTE(); c--; } while (c>0); PutbackRMByte(m_dst); break;
-						case 0x18: do { RORC_BYTE(); c--; } while (c>0); PutbackRMByte(m_dst); break;
-						case 0x20: SHL_BYTE(c); break;
-						case 0x28: SHR_BYTE(c); break;
+						case 0x00: do { rol_byte();  c--; } while (c > 0); store_ea_rm_byte(m_dst); break;
+						case 0x08: do { ror_byte();  c--; } while (c > 0); store_ea_rm_byte(m_dst); break;
+						case 0x10: do { rolc_byte(); c--; } while (c > 0); store_ea_rm_byte(m_dst); break;
+						case 0x18: do { rorc_byte(); c--; } while (c > 0); store_ea_rm_byte(m_dst); break;
+						case 0x20: shl_byte(c); break;
+						case 0x28: shr_byte(c); break;
 						case 0x30: logerror("%s: %06x: Undefined opcode 0xc0 0x30 (SHLA)\n", tag(), pc()); break;
-						case 0x38: SHRA_BYTE(c); break;
+						case 0x38: shra_byte(c); break;
 						}
 					}
 				}
@@ -2942,22 +2760,22 @@ void v30mz_cpu_device::execute_run()
 				{
 					uint8_t c;
 					m_modrm = fetch();
-					m_src = GetRMWord();
+					m_src = get_rm_word();
 					m_dst = m_src;
 					c = fetch();
-					CLKM(3,5);
+					clkm(3,5);
 					if (c)
 					{
-						switch ( m_modrm & 0x38 )
+						switch (m_modrm & 0x38)
 						{
-						case 0x00: do { ROL_WORD();  c--; } while (c>0); PutbackRMWord(m_dst); break;
-						case 0x08: do { ROR_WORD();  c--; } while (c>0); PutbackRMWord(m_dst); break;
-						case 0x10: do { ROLC_WORD(); c--; } while (c>0); PutbackRMWord(m_dst); break;
-						case 0x18: do { RORC_WORD(); c--; } while (c>0); PutbackRMWord(m_dst); break;
-						case 0x20: SHL_WORD(c); break;
-						case 0x28: SHR_WORD(c); break;
+						case 0x00: do { rol_word();  c--; } while (c > 0); store_ea_rm_word(m_dst); break;
+						case 0x08: do { ror_word();  c--; } while (c > 0); store_ea_rm_word(m_dst); break;
+						case 0x10: do { rolc_word(); c--; } while (c > 0); store_ea_rm_word(m_dst); break;
+						case 0x18: do { rorc_word(); c--; } while (c > 0); store_ea_rm_word(m_dst); break;
+						case 0x20: shl_word(c); break;
+						case 0x28: shr_word(c); break;
 						case 0x30: logerror("%s: %06x: Undefined opcode 0xc1 0x30 (SHLA)\n", tag(), pc()); break;
-						case 0x38: SHRA_WORD(c); break;
+						case 0x38: shra_word(c); break;
 						}
 					}
 				}
@@ -2967,41 +2785,43 @@ void v30mz_cpu_device::execute_run()
 			case 0xc2: // i_ret_d16
 				{
 					uint32_t count = fetch_word();
-					m_ip = POP();
+					m_ip = pop();
 					m_regs.w[SP] += count;
-					CLK(6);
+					init_prefetch();
+					clk(6);
 				}
 				break;
 
 			case 0xc3: // i_ret
-				m_ip = POP();
-				CLK(6);
+				m_ip = pop();
+				init_prefetch();
+				clk(6);
 				break;
 
 			case 0xc4: // i_les_dw
 				m_modrm = fetch();
-				RegWord( GetRMWord() );
-				m_sregs[ES] = GetnextRMWord();
-				CLK(6);
+				reg_word(get_rm_word());
+				m_sregs[DS1] = get_next_rm_word();
+				clk(6);
 				break;
 
 			case 0xc5: // i_lds_dw
 				m_modrm = fetch();
-				RegWord( GetRMWord() );
-				m_sregs[DS] = GetnextRMWord();
-				CLK(6);
+				reg_word(get_rm_word());
+				m_sregs[DS0] = get_next_rm_word();
+				clk(6);
 				break;
 
 			case 0xc6: // i_mov_bd8
 				m_modrm = fetch();
-				PutImmRMByte();
-				CLK(1);
+				put_imm_rm_byte();
+				clk(1);
 				break;
 
 			case 0xc7: // i_mov_wd16
 				m_modrm = fetch();
-				PutImmRMWord();
-				CLK(1);
+				put_imm_rm_word();
+				clk(1);
 				break;
 
 
@@ -3010,107 +2830,110 @@ void v30mz_cpu_device::execute_run()
 					uint16_t nb = fetch();
 					uint32_t level;
 
-					CLK(8);
+					clk(8);
 					nb |= fetch() << 8;
 					level = fetch();
-					PUSH(m_regs.w[BP]);
+					push(m_regs.w[BP]);
 					m_regs.w[BP] = m_regs.w[SP];
 					m_regs.w[SP] -= nb;
-					for (int i=1; i<level; i++)
+					for (int i = 1; i < level; i++)
 					{
-						PUSH( GetMemW(SS,m_regs.w[BP] - i*2) );
-						CLK(4);
+						push(read_word(default_base(SS), m_regs.w[BP] - i*2));
+						clk(4);
 					}
 					if (level)
 					{
-						PUSH(m_regs.w[BP]);
-						CLK( ( level == 1 ) ? 2 : 3 );
+						push(m_regs.w[BP]);
+						clk((level == 1) ? 2 : 3);
 					}
 				}
 				break;
 
 			case 0xc9: // i_leave
 				m_regs.w[SP] = m_regs.w[BP];
-				m_regs.w[BP] = POP();
-				CLK(2);
+				m_regs.w[BP] = pop();
+				clk(2);
 				break;
 
 			case 0xca: // i_retf_d16
 				{
 					uint32_t count = fetch_word();
-					m_ip = POP();
-					m_sregs[CS] = POP();
+					m_ip = pop();
+					m_sregs[PS] = pop();
 					m_regs.w[SP] += count;
-					CLK(9);
+					init_prefetch();
+					clk(9);
 				}
 				break;
 
 			case 0xcb: // i_retf
-				m_ip = POP();
-				m_sregs[CS] = POP();
-				CLK(8);
+				m_ip = pop();
+				m_sregs[PS] = pop();
+				init_prefetch();
+				clk(8);
 				break;
 
 			case 0xcc: // i_int3
-				interrupt(3);
-				CLK(9);
+				interrupt(BRK_3_INT);
+				clk(9);
 				break;
 
 			case 0xcd: // i_int
 				interrupt(fetch());
-				CLK(10);
+				clk(10);
 				break;
 
 			case 0xce: // i_into
 				if (OF)
 				{
-					interrupt(4);
-					CLK(7);
+					interrupt(BRKV_INT);
+					clk(7);
 				}
-				CLK(6);
+				clk(6);
 				break;
 
 			case 0xcf: // i_iret
-				m_ip = POP();
-				m_sregs[CS] = POP();
+				m_ip = pop();
+				m_sregs[PS] = pop();
 				i_popf();
-				CLK(10);
+				init_prefetch();
+				clk(10);
 				break;
 
 
 			case 0xd0: // i_rotshft_b
 				m_modrm = fetch();
-				m_src = GetRMByte();
+				m_src = get_rm_byte();
 				m_dst = m_src;
-				CLKM(1,3);
-				switch ( m_modrm & 0x38 )
+				clkm(1,3);
+				switch (m_modrm & 0x38)
 				{
-				case 0x00: ROL_BYTE();  PutbackRMByte(m_dst); m_OverVal = (m_src ^ m_dst) & 0x80; break;
-				case 0x08: ROR_BYTE();  PutbackRMByte(m_dst); m_OverVal = (m_src ^ m_dst) & 0x80; break;
-				case 0x10: ROLC_BYTE(); PutbackRMByte(m_dst); m_OverVal = (m_src ^ m_dst) & 0x80; break;
-				case 0x18: RORC_BYTE(); PutbackRMByte(m_dst); m_OverVal = (m_src ^ m_dst) & 0x80; break;
-				case 0x20: SHL_BYTE(1); m_OverVal = (m_src ^ m_dst) & 0x80; break;
-				case 0x28: SHR_BYTE(1); m_OverVal = (m_src ^ m_dst) & 0x80; break;
+				case 0x00: rol_byte();  store_ea_rm_byte(m_dst); m_OverVal = (m_src ^ m_dst) & 0x80; break;
+				case 0x08: ror_byte();  store_ea_rm_byte(m_dst); m_OverVal = (m_src ^ m_dst) & 0x80; break;
+				case 0x10: rolc_byte(); store_ea_rm_byte(m_dst); m_OverVal = (m_src ^ m_dst) & 0x80; break;
+				case 0x18: rorc_byte(); store_ea_rm_byte(m_dst); m_OverVal = (m_src ^ m_dst) & 0x80; break;
+				case 0x20: shl_byte(1); m_OverVal = (m_src ^ m_dst) & 0x80; break;
+				case 0x28: shr_byte(1); m_OverVal = (m_src ^ m_dst) & 0x80; break;
 				case 0x30: logerror("%s: %06x: Undefined opcode 0xd0 0x30 (SHLA)\n", tag(), pc()); break;
-				case 0x38: SHRA_BYTE(1); m_OverVal = 0; break;
+				case 0x38: shra_byte(1); m_OverVal = 0; break;
 				}
 				break;
 
 			case 0xd1: // i_rotshft_w
 				m_modrm = fetch();
-				m_src = GetRMWord();
+				m_src = get_rm_word();
 				m_dst = m_src;
-				CLKM(1,3);
-				switch ( m_modrm & 0x38 )
+				clkm(1,3);
+				switch (m_modrm & 0x38)
 				{
-				case 0x00: ROL_WORD();  PutbackRMWord(m_dst); m_OverVal = (m_src ^ m_dst) & 0x8000; break;
-				case 0x08: ROR_WORD();  PutbackRMWord(m_dst); m_OverVal = (m_src ^ m_dst) & 0x8000; break;
-				case 0x10: ROLC_WORD(); PutbackRMWord(m_dst); m_OverVal = (m_src ^ m_dst) & 0x8000; break;
-				case 0x18: RORC_WORD(); PutbackRMWord(m_dst); m_OverVal = (m_src ^ m_dst) & 0x8000; break;
-				case 0x20: SHL_WORD(1); m_OverVal = (m_src ^ m_dst) & 0x8000;  break;
-				case 0x28: SHR_WORD(1); m_OverVal = (m_src ^ m_dst) & 0x8000;  break;
+				case 0x00: rol_word();  store_ea_rm_word(m_dst); m_OverVal = (m_src ^ m_dst) & 0x8000; break;
+				case 0x08: ror_word();  store_ea_rm_word(m_dst); m_OverVal = (m_src ^ m_dst) & 0x8000; break;
+				case 0x10: rolc_word(); store_ea_rm_word(m_dst); m_OverVal = (m_src ^ m_dst) & 0x8000; break;
+				case 0x18: rorc_word(); store_ea_rm_word(m_dst); m_OverVal = (m_src ^ m_dst) & 0x8000; break;
+				case 0x20: shl_word(1); m_OverVal = (m_src ^ m_dst) & 0x8000;  break;
+				case 0x28: shr_word(1); m_OverVal = (m_src ^ m_dst) & 0x8000;  break;
 				case 0x30: logerror("%s: %06x: Undefined opcode 0xd1 0x30 (SHLA)\n", tag(), pc()); break;
-				case 0x38: SHRA_WORD(1); m_OverVal = 0; break;
+				case 0x38: shra_word(1); m_OverVal = 0; break;
 				}
 				break;
 
@@ -3119,22 +2942,22 @@ void v30mz_cpu_device::execute_run()
 					uint8_t c;
 
 					m_modrm = fetch();
-					m_src = GetRMByte();
+					m_src = get_rm_byte();
 					m_dst = m_src;
 					c = m_regs.b[CL];
-					CLKM(3,5);
+					clkm(3,5);
 					if (c)
 					{
-						switch ( m_modrm & 0x38 )
+						switch (m_modrm & 0x38)
 						{
-						case 0x00: do { ROL_BYTE();  c--; } while (c>0); PutbackRMByte(m_dst); break;
-						case 0x08: do { ROR_BYTE();  c--; } while (c>0); PutbackRMByte(m_dst); break;
-						case 0x10: do { ROLC_BYTE(); c--; } while (c>0); PutbackRMByte(m_dst); break;
-						case 0x18: do { RORC_BYTE(); c--; } while (c>0); PutbackRMByte(m_dst); break;
-						case 0x20: SHL_BYTE(c); break;
-						case 0x28: SHR_BYTE(c); break;
+						case 0x00: do { rol_byte();  c--; } while (c > 0); store_ea_rm_byte(m_dst); break;
+						case 0x08: do { ror_byte();  c--; } while (c > 0); store_ea_rm_byte(m_dst); break;
+						case 0x10: do { rolc_byte(); c--; } while (c > 0); store_ea_rm_byte(m_dst); break;
+						case 0x18: do { rorc_byte(); c--; } while (c > 0); store_ea_rm_byte(m_dst); break;
+						case 0x20: shl_byte(c); break;
+						case 0x28: shr_byte(c); break;
 						case 0x30: logerror("%s: %06x: Undefined opcode 0xd2 0x30 (SHLA)\n", tag(), pc()); break;
-						case 0x38: SHRA_BYTE(c); break;
+						case 0x38: shra_byte(c); break;
 						}
 					}
 				}
@@ -3145,57 +2968,57 @@ void v30mz_cpu_device::execute_run()
 					uint8_t c;
 
 					m_modrm = fetch();
-					m_src = GetRMWord();
+					m_src = get_rm_word();
 					m_dst = m_src;
 					c = m_regs.b[CL];
-					CLKM(3,5);
+					clkm(3,5);
 					if (c)
 					{
-						switch ( m_modrm & 0x38 )
+						switch (m_modrm & 0x38)
 						{
-							case 0x00: do { ROL_WORD();  c--; } while (c>0); PutbackRMWord(m_dst); break;
-							case 0x08: do { ROR_WORD();  c--; } while (c>0); PutbackRMWord(m_dst); break;
-							case 0x10: do { ROLC_WORD(); c--; } while (c>0); PutbackRMWord(m_dst); break;
-							case 0x18: do { RORC_WORD(); c--; } while (c>0); PutbackRMWord(m_dst); break;
-							case 0x20: SHL_WORD(c); break;
-							case 0x28: SHR_WORD(c); break;
+							case 0x00: do { rol_word();  c--; } while (c > 0); store_ea_rm_word(m_dst); break;
+							case 0x08: do { ror_word();  c--; } while (c > 0); store_ea_rm_word(m_dst); break;
+							case 0x10: do { rolc_word(); c--; } while (c > 0); store_ea_rm_word(m_dst); break;
+							case 0x18: do { rorc_word(); c--; } while (c > 0); store_ea_rm_word(m_dst); break;
+							case 0x20: shl_word(c); break;
+							case 0x28: shr_word(c); break;
 							case 0x30: logerror("%s: %06x: Undefined opcode 0xd3 0x30 (SHLA)\n", tag(), pc()); break;
-							case 0x38: SHRA_WORD(c); break;
+							case 0x38: shra_word(c); break;
 						}
 					}
 				}
 				break;
 
-			case 0xd4: // i_aam
+			case 0xd4: // cvtbd
 				fetch();
 				m_regs.b[AH] = m_regs.b[AL] / 10;
 				m_regs.b[AL] %= 10;
-				set_SZPF_Word(m_regs.w[AW]);
-				CLK(17);
+				set_SZPF_word(m_regs.w[AW]);
+				clk(17);
 				break;
 
-			case 0xd5: // i_aad
+			case 0xd5: // cvtdb
 				fetch();
 				m_regs.b[AL] = m_regs.b[AH] * 10 + m_regs.b[AL];
 				m_regs.b[AH] = 0;
-				set_SZPF_Byte(m_regs.b[AL]);
-				CLK(5);
+				set_SZPF_byte(m_regs.b[AL]);
+				clk(5);
 				break;
 
 			case 0xd6: // i_setalc
 				m_regs.b[AL] = (CF) ? 0xff : 0x00;
-				CLK(3);
-				logerror("%s: %06x: Undefined opcode (SETALC)\n", tag(), pc() );
+				clk(3);
+				logerror("%s: %06x: Undefined opcode (SETALC)\n", tag(), pc());
 				break;
 
 			case 0xd7: // i_trans
-				m_regs.b[AL] = GetMemB( DS, m_regs.w[BW] + m_regs.b[AL] );
-				CLK(5);
+				m_regs.b[AL] = read_byte(default_base(DS0), m_regs.w[BW] + m_regs.b[AL]);
+				clk(5);
 				break;
 
-			case 0xd8: // i_fpo
+			case 0xd8: // FPO1 not supported by v30mz
 				m_modrm = fetch();
-				CLK(1);
+				clk(1);
 				logerror("%s: %06x: Unimplemented floating point control %04x\n", tag(), pc(), m_modrm);
 				break;
 
@@ -3208,9 +3031,10 @@ void v30mz_cpu_device::execute_run()
 					if (!ZF && m_regs.w[CW])
 					{
 						m_ip = m_ip + disp;
-						CLK(3);
+						init_prefetch();
+						clk(3);
 					}
-					CLK(3);
+					clk(3);
 				}
 				break;
 
@@ -3222,9 +3046,10 @@ void v30mz_cpu_device::execute_run()
 					if (ZF && m_regs.w[CW])
 					{
 						m_ip = m_ip + disp;
-						CLK(3);
+						init_prefetch();
+						clk(3);
 					}
-					CLK(3);
+					clk(3);
 				}
 				break;
 
@@ -3236,9 +3061,10 @@ void v30mz_cpu_device::execute_run()
 					if (m_regs.w[CW])
 					{
 						m_ip = m_ip + disp;
-						CLK(3);
+						init_prefetch();
+						clk(3);
 					}
-					CLK(2);
+					clk(2);
 				}
 				break;
 
@@ -3249,40 +3075,31 @@ void v30mz_cpu_device::execute_run()
 					if (m_regs.w[CW] == 0)
 					{
 						m_ip = m_ip + disp;
-						CLK(3);
+						init_prefetch();
+						clk(3);
 					}
-					CLK(1);
+					clk(1);
 				}
 				break;
 
 			case 0xe4: // i_inal
-				m_regs.b[AL] = read_port( fetch() );
-				CLK(6);
+				m_regs.b[AL] = read_port(fetch());
+				clk(6);
 				break;
 
 			case 0xe5: // i_inax
-				{
-					uint8_t port = fetch();
-
-					m_regs.b[AL] = read_port(port);
-					m_regs.b[AH] = read_port(port+1);
-					CLK(6);
-				}
+				m_regs.w[AW] = read_port_word(fetch());
+				clk(6);
 				break;
 
 			case 0xe6: // i_outal
-				write_port( fetch(), m_regs.b[AL]);
-				CLK(6);
+				write_port(fetch(), m_regs.b[AL]);
+				clk(6);
 				break;
 
 			case 0xe7: // i_outax
-				{
-					uint8_t port = fetch();
-
-					write_port(port, m_regs.b[AL]);
-					write_port(port+1, m_regs.b[AH]);
-					CLK(6);
-				}
+				write_port_word(fetch(), m_regs.w[AW]);
+				clk(6);
 				break;
 
 
@@ -3290,9 +3107,10 @@ void v30mz_cpu_device::execute_run()
 				{
 					int16_t tmp = (int16_t)fetch_word();
 
-					PUSH(m_ip);
+					push(m_ip);
 					m_ip = m_ip + tmp;
-					CLK(5);
+					init_prefetch();
+					clk(5);
 				}
 				break;
 
@@ -3300,7 +3118,8 @@ void v30mz_cpu_device::execute_run()
 				{
 					int16_t offset = (int16_t)fetch_word();
 					m_ip += offset;
-					CLK(4);
+					init_prefetch();
+					clk(4);
 				}
 				break;
 
@@ -3309,9 +3128,10 @@ void v30mz_cpu_device::execute_run()
 					uint16_t tmp = fetch_word();
 					uint16_t tmp1 = fetch_word();
 
-					m_sregs[CS] = tmp1;
+					m_sregs[PS] = tmp1;
 					m_ip = tmp;
-					CLK(7);
+					init_prefetch();
+					clk(7);
 				}
 				break;
 
@@ -3319,50 +3139,41 @@ void v30mz_cpu_device::execute_run()
 				{
 					int tmp = (int)((int8_t)fetch());
 
-					CLK(4);
-					if (tmp==-2 && m_no_interrupt==0 && (m_pending_irq==0) && m_icount>0)
+					clk(4);
+					if (tmp == -2 && m_no_interrupt == 0 && (m_pending_irq == 0) && m_icount > 0)
 					{
-						m_icount%=12; /* cycle skip */
+						m_icount %= 12; // cycle skip
 					}
-					m_ip = (uint16_t)(m_ip+tmp);
+					m_ip = (uint16_t)(m_ip + tmp);
+					init_prefetch();
 				}
 				break;
 
 			case 0xec: // i_inaldx
 				m_regs.b[AL] = read_port(m_regs.w[DW]);
-				CLK(6);
+				clk(6);
 				break;
 
 			case 0xed: // i_inaxdx
-				{
-					uint32_t port = m_regs.w[DW];
-
-					m_regs.b[AL] = read_port(port);
-					m_regs.b[AH] = read_port(port+1);
-					CLK(6);
-				}
+				m_regs.w[AW] = read_port_word(m_regs.w[DW]);
+				clk(6);
 				break;
 
 			case 0xee: // i_outdxal
 				write_port(m_regs.w[DW], m_regs.b[AL]);
-				CLK(6);
+				clk(6);
 				break;
 
 			case 0xef: // i_outdxax
-				{
-					uint32_t port = m_regs.w[DW];
-
-					write_port(port, m_regs.b[AL]);
-					write_port(port+1, m_regs.b[AH]);
-					CLK(6);
-				}
+				write_port_word(m_regs.w[DW], m_regs.w[AW]);
+				clk(6);
 				break;
 
 
 			case 0xf0: // i_lock
 				logerror("%s: %06x: Warning - BUSLOCK\n", tag(), pc());
 				m_no_interrupt = 1;
-				CLK(1);
+				clk(1);
 				break;
 
 			case 0xf2: // i_repne
@@ -3372,24 +3183,33 @@ void v30mz_cpu_device::execute_run()
 
 					switch (next)
 					{
-					case 0x6c:  CLK(3); if (c) do { i_insb();  c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0x6d:  CLK(3); if (c) do { i_insw();  c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0x6e:  CLK(3); if (c) do { i_outsb(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0x6f:  CLK(3); if (c) do { i_outsw(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa4:  CLK(3); if (c) do { i_movsb(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa5:  CLK(3); if (c) do { i_movsw(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa6:  CLK(3); if (c) do { i_cmpsb(); c--; } while (c>0 && !ZF);   m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa7:  CLK(3); if (c) do { i_cmpsw(); c--; } while (c>0 && !ZF);   m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xaa:  CLK(3); if (c) do { i_stosb(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xab:  CLK(3); if (c) do { i_stosw(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xac:  CLK(3); if (c) do { i_lodsb(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xad:  CLK(3); if (c) do { i_lodsw(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xae:  CLK(3); if (c) do { i_scasb(); c--; } while (c>0 && !ZF);   m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xaf:  CLK(3); if (c) do { i_scasw(); c--; } while (c>0 && !ZF);   m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6c:  clk(3); if (c) do { i_insb();  c--; } while (c > 0);          m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6d:  clk(3); if (c) do { i_insw();  c--; } while (c > 0);          m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6e:  clk(3); if (c) do { i_outsb(); c--; } while (c > 0);          m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6f:  clk(3); if (c) do { i_outsw(); c--; } while (c > 0);          m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa4:  clk(3); if (c) do { i_movsb(); c--; } while (c > 0);          m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa5:  clk(3); if (c) do { i_movsw(); c--; } while (c > 0);          m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa6:  clk(3); if (c) do { i_cmpsb(); c--; } while (c > 0 && !ZF);   m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa7:  clk(3); if (c) do { i_cmpsw(); c--; } while (c > 0 && !ZF);   m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xaa:  clk(3); if (c) do { i_stosb(); c--; } while (c > 0);          m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xab:  clk(3); if (c) do { i_stosw(); c--; } while (c > 0);          m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xac:  clk(3); if (c) do { i_lodsb(); c--; } while (c > 0);          m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xad:  clk(3); if (c) do { i_lodsw(); c--; } while (c > 0);          m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xae:  clk(3); if (c) do { i_scasb(); c--; } while (c > 0 && !ZF);   m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xaf:  clk(3); if (c) do { i_scasw(); c--; } while (c > 0 && !ZF);   m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 					default:
 						logerror("%s: %06x: REPNE invalid\n", tag(), pc());
 						// Decrement IP so the normal instruction will be executed next
 						m_ip--;
+						m_pfp--;
+						if (m_prefetch_queue_tail == 0)
+							m_prefetch_queue_tail = PREFETCH_MAX_SIZE - 1;
+						else
+							m_prefetch_queue_tail--;
+						if (m_prefetch_queue_head == 0)
+							m_prefetch_queue_head = PREFETCH_MAX_SIZE - 1;
+						else
+							m_prefetch_queue_head--;
 						break;
 					}
 				}
@@ -3402,89 +3222,97 @@ void v30mz_cpu_device::execute_run()
 
 					switch (next)
 					{
-					case 0x6c:  CLK(3); if (c) do { i_insb();  c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0x6d:  CLK(3); if (c) do { i_insw();  c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0x6e:  CLK(3); if (c) do { i_outsb(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0x6f:  CLK(3); if (c) do { i_outsw(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa4:  CLK(3); if (c) do { i_movsb(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa5:  CLK(3); if (c) do { i_movsw(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa6:  CLK(3); if (c) do { i_cmpsb(); c--; } while (c>0 && ZF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xa7:  CLK(3); if (c) do { i_cmpsw(); c--; } while (c>0 && ZF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xaa:  CLK(3); if (c) do { i_stosb(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xab:  CLK(3); if (c) do { i_stosw(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xac:  CLK(3); if (c) do { i_lodsb(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xad:  CLK(3); if (c) do { i_lodsw(); c--; } while (c>0);          m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xae:  CLK(3); if (c) do { i_scasb(); c--; } while (c>0 && ZF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
-					case 0xaf:  CLK(3); if (c) do { i_scasw(); c--; } while (c>0 && ZF);    m_regs.w[CW]=c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6c:  clk(3); if (c) do { i_insb();  c--; } while (c > 0);          m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6d:  clk(3); if (c) do { i_insw();  c--; } while (c > 0);          m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6e:  clk(3); if (c) do { i_outsb(); c--; } while (c > 0);          m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0x6f:  clk(3); if (c) do { i_outsw(); c--; } while (c > 0);          m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa4:  clk(3); if (c) do { i_movsb(); c--; } while (c > 0);          m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa5:  clk(3); if (c) do { i_movsw(); c--; } while (c > 0);          m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa6:  clk(3); if (c) do { i_cmpsb(); c--; } while (c > 0 && ZF);    m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xa7:  clk(3); if (c) do { i_cmpsw(); c--; } while (c > 0 && ZF);    m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xaa:  clk(3); if (c) do { i_stosb(); c--; } while (c > 0);          m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xab:  clk(3); if (c) do { i_stosw(); c--; } while (c > 0);          m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xac:  clk(3); if (c) do { i_lodsb(); c--; } while (c > 0);          m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xad:  clk(3); if (c) do { i_lodsw(); c--; } while (c > 0);          m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xae:  clk(3); if (c) do { i_scasb(); c--; } while (c > 0 && ZF);    m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
+					case 0xaf:  clk(3); if (c) do { i_scasw(); c--; } while (c > 0 && ZF);    m_regs.w[CW] = c; m_seg_prefix = false; m_seg_prefix_next = false; break;
 					default:
 						logerror("%s: %06x: REPE invalid\n", tag(), pc());
 						// Decrement IP so the normal instruction will be executed next
 						m_ip--;
+						m_pfp--;
+						if (m_prefetch_queue_tail == 0)
+							m_prefetch_queue_tail = PREFETCH_MAX_SIZE - 1;
+						else
+							m_prefetch_queue_tail--;
+						if (m_prefetch_queue_head == 0)
+							m_prefetch_queue_head = PREFETCH_MAX_SIZE - 1;
+						else
+							m_prefetch_queue_head--;
 						break;
 					}
 				}
 				break;
 
 			case 0xf4: // i_hlt
-				logerror("%s: %06x: HALT\n", tag(), pc());
 				m_icount = 0;
 				break;
 
 			case 0xf5: // i_cmc
-				m_CarryVal ^= 1;
-				CLK(4);
+				m_CarryVal = (CF ? 0 : 1);
+				clk(4);
 				break;
 
 			case 0xf6: // i_f6pre
 				{
-					uint32_t tmp;
-					uint32_t uresult,uresult2;
-					int32_t result,result2;
-
 					m_modrm = fetch();
-					tmp = GetRMByte();
-					switch ( m_modrm & 0x38 )
+					uint32_t tmp = get_rm_byte();
+					switch (m_modrm & 0x38)
 					{
-					case 0x00:  /* TEST */
+					case 0x00:  // TEST
 						tmp &= fetch();
 						m_CarryVal = m_OverVal = 0;
-						set_SZPF_Byte(tmp);
-						CLKM(1,2);
+						set_SZPF_byte(tmp);
+						clkm(1,2);
 						break;
 					case 0x08:
 						logerror("%s: %06x: Undefined opcode 0xf6 0x08\n", tag(), pc());
 						break;
-					case 0x10:  /* NOT */
-						PutbackRMByte(~tmp);
-						CLKM(1,3);
+					case 0x10:  // NOT
+						store_ea_rm_byte(~tmp);
+						clkm(1,3);
 						break;
-					case 0x18:  /* NEG */
-						m_CarryVal = (tmp!=0) ? 1 : 0;
-						tmp = (~tmp)+1;
-						set_SZPF_Byte(tmp);
-						PutbackRMByte(tmp&0xff);
-						CLKM(1,3);
+					case 0x18:  // NEG, AF?
+						m_CarryVal = (tmp != 0) ? 1 : 0;
+						tmp = (~tmp) + 1;
+						set_SZPF_byte(tmp);
+						store_ea_rm_byte(tmp & 0xff);
+						clkm(1,3);
 						break;
-					case 0x20:  /* MULU */
-						uresult = m_regs.b[AL] * tmp;
-						m_regs.w[AW] = (uint16_t)uresult;
-						m_CarryVal = m_OverVal = (m_regs.b[AH]!=0) ? 1 : 0;
-						CLKM(3,4);
+					case 0x20:  // MULU
+						{
+							uint32_t uresult = m_regs.b[AL] * tmp;
+							m_regs.w[AW] = (uint16_t)uresult;
+							m_CarryVal = m_OverVal = (m_regs.b[AH] != 0) ? 1 : 0;
+							clkm(3,4);
+						}
 						break;
-					case 0x28:  /* MUL */
-						result = (int16_t)((int8_t)m_regs.b[AL])*(int16_t)((int8_t)tmp);
-						m_regs.w[AW] = (uint16_t)result;
-						m_CarryVal = m_OverVal = (m_regs.b[AH]!=0) ? 1 : 0;
-						CLKM(3,4);
+					case 0x28:  // MUL
+						{
+							int32_t result = (int16_t)((int8_t)m_regs.b[AL]) * (int16_t)((int8_t)tmp);
+							m_regs.w[AW] = (uint16_t)result;
+							m_CarryVal = m_OverVal = (m_regs.b[AH] != 0) ? 1 : 0;
+							clkm(3,4);
+						}
 						break;
-					case 0x30:  /* DIVU */
+					case 0x30:  // DIVU
 						if (tmp)
 						{
-							uresult = m_regs.w[AW];
-							uresult2 = uresult % tmp;
+							uint32_t uresult = m_regs.w[AW];
+							uint32_t uresult2 = uresult % tmp;
 							if ((uresult /= tmp) > 0xff)
 							{
-								interrupt(0);
+								interrupt(DIVIDE_ERROR_INT);
 							}
 							else
 							{
@@ -3494,18 +3322,18 @@ void v30mz_cpu_device::execute_run()
 						}
 						else
 						{
-							interrupt(0);
+							interrupt(DIVIDE_ERROR_INT);
 						}
-						CLKM(15,16);
+						clkm(15,16);
 						break;
-					case 0x38:  /* DIV */
+					case 0x38:  // DIV
 						if (tmp)
 						{
-							result = (int16_t)m_regs.w[AW];
-							result2 = result % (int16_t)((int8_t)tmp);
+							int32_t result = (int16_t)m_regs.w[AW];
+							int32_t result2 = result % (int16_t)((int8_t)tmp);
 							if ((result /= (int16_t)((int8_t)tmp)) > 0xff)
 							{
-								interrupt(0);
+								interrupt(DIVIDE_ERROR_INT);
 							}
 							else
 							{
@@ -3515,9 +3343,9 @@ void v30mz_cpu_device::execute_run()
 						}
 						else
 						{
-							interrupt(0);
+							interrupt(DIVIDE_ERROR_INT);
 						}
-						CLKM(17,18);
+						clkm(17,18);
 						break;
 					}
 				}
@@ -3531,52 +3359,52 @@ void v30mz_cpu_device::execute_run()
 					int32_t result,result2;
 
 					m_modrm = fetch();
-					tmp = GetRMWord();
-					switch ( m_modrm & 0x38 )
+					tmp = get_rm_word();
+					switch (m_modrm & 0x38)
 					{
-					case 0x00:  /* TEST */
+					case 0x00:  // TEST
 						tmp2 = fetch_word();
 						tmp &= tmp2;
 						m_CarryVal = m_OverVal = 0;
-						set_SZPF_Word(tmp);
-						CLKM(1,2);
+						set_SZPF_word(tmp);
+						clkm(1,2);
 						break;
 					case 0x08:
 						logerror("%s: %06x: Undefined opcode 0xf7 0x08\n", tag(), pc());
 						break;
-					case 0x10:  /* NOT */
-						PutbackRMWord(~tmp);
-						CLKM(1,3);
+					case 0x10:  // NOT
+						store_ea_rm_word(~tmp);
+						clkm(1,3);
 						break;
-					case 0x18:  /* NEG */
+					case 0x18:  // NEG
 						m_CarryVal = (tmp!=0) ? 1 : 0;
 						tmp = (~tmp) + 1;
-						set_SZPF_Word(tmp);
-						PutbackRMWord(tmp);
-						CLKM(1,3);
+						set_SZPF_word(tmp);
+						store_ea_rm_word(tmp);
+						clkm(1,3);
 						break;
-					case 0x20:  /* MULU */
+					case 0x20:  // MULU
 						uresult = m_regs.w[AW]*tmp;
 						m_regs.w[AW] = uresult & 0xffff;
-						m_regs.w[DW] = ((uint32_t)uresult)>>16;
+						m_regs.w[DW] = ((uint32_t)uresult) >> 16;
 						m_CarryVal = m_OverVal = (m_regs.w[DW] != 0) ? 1 : 0;
-						CLKM(3,4);
+						clkm(3,4);
 						break;
-					case 0x28:  /* MUL */
+					case 0x28:  // MUL
 						result = (int32_t)((int16_t)m_regs.w[AW]) * (int32_t)((int16_t)tmp);
 						m_regs.w[AW] = result & 0xffff;
 						m_regs.w[DW] = result >> 16;
 						m_CarryVal = m_OverVal = (m_regs.w[DW] != 0) ? 1 : 0;
-						CLKM(3,4);
+						clkm(3,4);
 						break;
-					case 0x30:  /* DIVU */
+					case 0x30:  // DIVU
 						if (tmp)
 						{
 							uresult = (((uint32_t)m_regs.w[DW]) << 16) | m_regs.w[AW];
 							uresult2 = uresult % tmp;
 							if ((uresult /= tmp) > 0xffff)
 							{
-								interrupt(0);
+								interrupt(DIVIDE_ERROR_INT);
 							}
 							else
 							{
@@ -3586,18 +3414,18 @@ void v30mz_cpu_device::execute_run()
 						}
 						else
 						{
-							interrupt(0);
+							interrupt(DIVIDE_ERROR_INT);
 						}
-						CLKM(23,24);
+						clkm(23,24);
 						break;
-					case 0x38:  /* DIV */
+					case 0x38:  // DIV
 						if (tmp)
 						{
 							result = ((uint32_t)m_regs.w[DW] << 16) + m_regs.w[AW];
 							result2 = result % (int32_t)((int16_t)tmp);
 							if ((result /= (int32_t)((int16_t)tmp)) > 0xffff)
 							{
-								interrupt(0);
+								interrupt(DIVIDE_ERROR_INT);
 							}
 							else
 							{
@@ -3607,9 +3435,9 @@ void v30mz_cpu_device::execute_run()
 						}
 						else
 						{
-							interrupt(0);
+							interrupt(DIVIDE_ERROR_INT);
 						}
-						CLKM(24,25);
+						clkm(24,25);
 						break;
 					}
 				}
@@ -3618,56 +3446,56 @@ void v30mz_cpu_device::execute_run()
 
 			case 0xf8: // i_clc
 				m_CarryVal = 0;
-				CLK(4);
+				clk(4);
 				break;
 
 			case 0xf9: // i_stc
 				m_CarryVal = 1;
-				CLK(4);
+				clk(4);
 				break;
 
 			case 0xfa: // i_di
 				m_IF = 0;
-				CLK(4);
+				clk(4);
 				break;
 
 			case 0xfb: // i_ei
 				m_IF = 1;
-				CLK(4);
+				clk(4);
 				break;
 
 			case 0xfc: // i_cld
 				m_DF = 0;
-				CLK(4);
+				clk(4);
 				break;
 
 			case 0xfd: // i_std
 				m_DF = 1;
-				CLK(4);
+				clk(4);
 				break;
 
 			case 0xfe: // i_fepre
 				{
 					uint32_t tmp, tmp1;
 					m_modrm = fetch();
-					tmp = GetRMByte();
-					switch ( m_modrm & 0x38 )
+					tmp = get_rm_byte();
+					switch (m_modrm & 0x38)
 					{
-					case 0x00:  /* INC */
-						tmp1 = tmp+1;
-						m_OverVal = (tmp==0x7f);
+					case 0x00:  // INC
+						tmp1 = tmp + 1;
+						m_OverVal = (tmp == 0x7f);
 						set_AF(tmp1,tmp,1);
-						set_SZPF_Byte(tmp1);
-						PutbackRMByte(tmp1);
-						CLKM(1,3);
+						set_SZPF_byte(tmp1);
+						store_ea_rm_byte(tmp1);
+						clkm(1,3);
 						break;
-					case 0x08:  /* DEC */
-						tmp1 = tmp-1;
-						m_OverVal = (tmp==0x80);
+					case 0x08:  // DEC
+						tmp1 = tmp - 1;
+						m_OverVal = (tmp == 0x80);
 						set_AF(tmp1,tmp,1);
-						set_SZPF_Byte(tmp1);
-						PutbackRMByte(tmp1);
-						CLKM(1,3);
+						set_SZPF_byte(tmp1);
+						store_ea_rm_byte(tmp1);
+						clkm(1,3);
 						break;
 					default:
 						logerror("%s: %06x: FE Pre with unimplemented mod\n", tag(), pc());
@@ -3680,50 +3508,54 @@ void v30mz_cpu_device::execute_run()
 				{
 					uint32_t tmp, tmp1;
 					m_modrm = fetch();
-					tmp = GetRMWord();
-					switch ( m_modrm & 0x38 )
+					tmp = get_rm_word();
+					switch (m_modrm & 0x38)
 					{
-					case 0x00:  /* INC */
-						tmp1 = tmp+1;
-						m_OverVal = (tmp==0x7fff);
-						set_AF(tmp1,tmp,1);
-						set_SZPF_Word(tmp1);
-						PutbackRMWord(tmp1);
-						CLKM(1,3);
+					case 0x00:  // INC
+						tmp1 = tmp + 1;
+						m_OverVal = (tmp == 0x7fff);
+						set_AF(tmp1, tmp, 1);
+						set_SZPF_word(tmp1);
+						store_ea_rm_word(tmp1);
+						clkm(1,3);
 						break;
-					case 0x08:  /* DEC */
-						tmp1 = tmp-1;
-						m_OverVal = (tmp==0x8000);
-						set_AF(tmp1,tmp,1);
-						set_SZPF_Word(tmp1);
-						PutbackRMWord(tmp1);
-						CLKM(1,3);
+					case 0x08:  // DEC
+						tmp1 = tmp - 1;
+						m_OverVal = (tmp == 0x8000);
+						set_AF(tmp1, tmp, 1);
+						set_SZPF_word(tmp1);
+						store_ea_rm_word(tmp1);
+						clkm(1,3);
 						break;
-					case 0x10:  /* CALL */
-						PUSH(m_ip);
+					case 0x10:  // CALL
+						push(m_ip);
 						m_ip = tmp;
-						CLKM(5,6);
+						init_prefetch();
+						clkm(5,6);
 						break;
-					case 0x18:  /* CALL FAR */
-						tmp1 = m_sregs[CS];
-						m_sregs[CS] = GetnextRMWord();
-						PUSH(tmp1);
-						PUSH(m_ip);
+					case 0x18:  // CALL FAR
+						tmp1 = m_sregs[PS];
+						m_sregs[PS] = get_next_rm_word();
+						push(tmp1);
+						push(m_ip);
 						m_ip = tmp;
-						CLKM(5,12);
+						init_prefetch();
+						clkm(5,12);
 						break;
-					case 0x20:  /* JMP */
+					case 0x20:  // jmp
 						m_ip = tmp;
-						CLKM(4,5);
+						init_prefetch();
+						clkm(4,5);
 						break;
-					case 0x28:  /* JMP FAR */
+					case 0x28:  // jmp FAR
 						m_ip = tmp;
-						m_sregs[CS] = GetnextRMWord();
-						CLK(10);
+						m_sregs[PS] = get_next_rm_word();
+						init_prefetch();
+						clk(10);
 						break;
 					case 0x30:
-						PUSH(tmp);
-						CLK(1);
+						push(tmp);
+						clk(1);
 						break;
 					default:
 						logerror("%s: %06x: FF Pre with unimplemented mod\n", tag(), pc());

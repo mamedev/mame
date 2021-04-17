@@ -1,0 +1,187 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+<softwarelist name="next_hdd" description="Hard disk images for NeXT">
+
+	<!--
+	To boot from hard disk enter the ROM monitor (Command + `) and enter "p" to
+	set the boot command to "sd".
+	-->
+
+	<software name="nextstep_0_8" supported="no">
+		<!-- hangs while loading from disk -->
+		<description>NeXTSTEP 0.8</description>
+		<year>1988</year>
+		<publisher>NeXT</publisher>
+		<part name="hdd" interface="scsi_hdd">
+			<!-- Origin: archive.org -->
+			<diskarea name="harddriv">
+				<disk name="nextstep_0_8" sha1="d1eab343485e57e002ad1b9dae6d8028d72b2536" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nextstep_0_9" supported="no">
+		<!-- hangs while loading from disk -->
+		<description>NeXTSTEP 0.9</description>
+		<year>1988</year>
+		<publisher>NeXT</publisher>
+		<part name="hdd" interface="scsi_hdd">
+			<!-- Origin: archive.org -->
+			<diskarea name="harddriv">
+				<disk name="nextstep_0_9" sha1="ed8526a5fabe7fa9d5bb7c7b9be8fbc9663e7263" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nextstep_1_0" supported="no">
+		<!-- never completes loading from disk -->
+		<description>NeXTSTEP 1.0</description>
+		<year>1989</year>
+		<publisher>NeXT</publisher>
+		<part name="hdd" interface="scsi_hdd">
+			<!-- Origin: archive.org -->
+			<diskarea name="harddriv">
+				<disk name="nextstep_1_0" sha1="8e4b2c90c417c6d7c1acbc92ee5dddfab4496f1c" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nextstep_1_0a" supported="no">
+	  <!-- never completes loading from disk -->
+		<description>NeXTSTEP 1.0a</description>
+		<year>1989</year>
+		<publisher>NeXT</publisher>
+		<part name="hdd" interface="scsi_hdd">
+			<!-- Origin: archive.org -->
+			<diskarea name="harddriv">
+				<disk name="nextstep_1_0a" sha1="f15339ab2536d306387246968a0cc5c0ad1872b9" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nextstep_2_0">
+		<description>NeXTSTEP 2.0</description>
+		<year>1990</year>
+		<publisher>NeXT</publisher>
+		<part name="hdd" interface="scsi_hdd">
+			<!-- Origin: archive.org -->
+			<diskarea name="harddriv">
+				<disk name="nextstep_2_0" sha1="4bea08ef68276bdac261fb3268f2637d09d45521" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nextstep_2_1">
+		<description>NeXTSTEP 2.1</description>
+		<year>1991</year>
+		<publisher>NeXT</publisher>
+		<part name="hdd" interface="scsi_hdd">
+			<!-- Origin: archive.org -->
+			<diskarea name="harddriv">
+				<disk name="nextstep_2_1" sha1="b94b1da9a4c53d12b40ea5edb45b98ca61ff81d3" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nextstep_2_2">
+		<description>NeXTSTEP 2.2</description>
+		<year>199?</year>
+		<publisher>NeXT</publisher>
+		<part name="hdd" interface="scsi_hdd">
+			<!-- Origin: archive.org -->
+			<diskarea name="harddriv">
+				<disk name="nextstep_2_2" sha1="71b6bf591df1179ad6f11935f9b990b4aec11c75" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nextstep_3_0">
+		<description>NeXTSTEP 3.0</description>
+		<year>1992</year>
+		<publisher>NeXT</publisher>
+		<part name="hdd" interface="scsi_hdd">
+			<!-- Origin: archive.org -->
+			<diskarea name="harddriv">
+				<disk name="nextstep_3_0" sha1="1058eec09ec92720c71dd1508677598e02c90559" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nextstep_3_1" supported="no">
+		<!-- never completes checking system files -->
+		<description>NeXTSTEP 3.1</description>
+		<year>1993</year>
+		<publisher>NeXT</publisher>
+		<part name="hdd" interface="scsi_hdd">
+			<!-- Origin: archive.org -->
+			<diskarea name="harddriv">
+				<disk name="nextstep_3_1" sha1="03712c34b83fa59d76d3ba2724b4712a2d4b488c" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nextstep_3_2" supported="no">
+		<!-- Fatal error: M680x0: FMOVEM: mode 3 unimplemented at 06033FFE -->
+		<description>NeXTSTEP 3.2</description>
+		<year>1993</year>
+		<publisher>NeXT</publisher>
+		<part name="hdd" interface="scsi_hdd">
+			<!-- Origin: archive.org -->
+			<diskarea name="harddriv">
+				<disk name="nextstep_3_2" sha1="5627632b4ef545806278309c4e42193937960df3" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nextstep_3_3">
+		<description>NeXTSTEP 3.3</description>
+		<year>1995</year>
+		<publisher>NeXT</publisher>
+		<part name="hdd" interface="scsi_hdd">
+			<!-- Origin: archive.org -->
+			<diskarea name="harddriv">
+				<disk name="nextstep_3_3" sha1="1471b1669fd00410b21d9c6bc11809dcbf742e0e" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="nextstep_4_0">
+		<description>NeXTSTEP 4.0</description>
+		<year>1996</year>
+		<publisher>NeXT</publisher>
+		<part name="hdd" interface="scsi_hdd">
+			<!-- Origin: archive.org -->
+			<diskarea name="harddriv">
+				<disk name="nextstep_4_0" sha1="9a1a2a57eb21890f1801ead003cc83474d2fdf58" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="openstep_4_0">
+		<description>OPENSTEP 4.0</description>
+		<year>1996</year>
+		<publisher>NeXT</publisher>
+		<part name="hdd" interface="scsi_hdd">
+			<!-- Origin: archive.org -->
+			<diskarea name="harddriv">
+				<disk name="openstep_4_0" sha1="72e727c9e97a37eb0220eb7a2e93a5f992b4482d" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="openstep_4_2">
+		<description>OPENSTEP 4.2</description>
+		<year>1997</year>
+		<publisher>NeXT</publisher>
+		<part name="hdd" interface="scsi_hdd">
+			<!-- Origin: archive.org -->
+			<diskarea name="harddriv">
+				<disk name="openstep_4_2" sha1="4039e1b2a36088faca891568e0f63b4d03821673" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

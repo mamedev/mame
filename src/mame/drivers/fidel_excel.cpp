@@ -205,20 +205,14 @@ private:
 	void ttl_w(offs_t offset, u8 data);
 	u8 ttl_r(offs_t offset);
 
-	u8 m_select;
-	u8 m_7seg_data;
-	u8 m_speech_data;
-	u8 m_speech_bank;
+	u8 m_select = 0;
+	u8 m_7seg_data = 0;
+	u8 m_speech_data = 0;
+	u8 m_speech_bank = 0;
 };
 
 void excel_state::machine_start()
 {
-	// zerofill
-	m_select = 0;
-	m_7seg_data = 0;
-	m_speech_data = 0;
-	m_speech_bank = 0;
-
 	// register for savestates
 	save_item(NAME(m_select));
 	save_item(NAME(m_7seg_data));

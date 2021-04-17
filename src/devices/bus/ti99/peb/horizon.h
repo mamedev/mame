@@ -44,6 +44,7 @@ protected:
 	void nvram_default() override;
 	void nvram_read(emu_file &file) override;
 	void nvram_write(emu_file &file) override;
+	bool nvram_can_write() override;
 
 private:
 	required_device<ram_device> m_ram;
@@ -64,6 +65,9 @@ private:
 	bool    m_phoenix_split;
 	bool    m_hideswitch;
 	bool    m_rambo_supported;
+
+	// Do not save if nothing was modified.
+	bool    m_modified;
 
 	int     m_page;
 	int     m_bank;

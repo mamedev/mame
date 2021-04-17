@@ -215,6 +215,9 @@ VIDEO_START_MEMBER(astrocde_state,profpac)
 	save_item(NAME(m_profpac_vw));
 
 	std::fill(std::begin(m_profpac_palette), std::end(m_profpac_palette), 0);
+
+	m_pattern_height = 0;
+	m_pattern_width = 0;
 }
 
 

@@ -89,7 +89,7 @@ TODO :  This is a partially working driver.  Most of the memory maps for
 #include "sound/dac.h"
 #include "video/mc6845.h"
 #include "video/tlc34076.h"
-#include "rendlay.h"
+#include "layout/generic.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -108,7 +108,14 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_vid(*this, "vid_%u", 0U),
 		m_dac(*this, "dac"),
-		m_crtc(*this, "crtc") { }
+		m_crtc(*this, "crtc"),
+		m_vid_0_ram(*this, "vid_0_ram"),
+		m_vid_1_ram(*this, "vid_1_ram"),
+		m_m0_p0_c1(*this, "m0_p0_c1"),
+		m_m0_p0_c2(*this, "m0_p0_c2"),
+		m_m0_p1_c1(*this, "m0_p1_c1"),
+		m_m0_p1_c2(*this, "m0_p1_c2")
+	{ }
 
 	void init_shadfgtr();
 	void init_vcombat();
@@ -127,6 +134,12 @@ private:
 	optional_device_array<i860_cpu_device, 2> m_vid;
 	required_device<dac_word_interface> m_dac;
 	optional_device<mc6845_device> m_crtc;
+	required_shared_ptr<uint64_t> m_vid_0_ram;
+	optional_shared_ptr<uint64_t> m_vid_1_ram;
+	required_shared_ptr<uint64_t> m_m0_p0_c1;
+	required_shared_ptr<uint64_t> m_m0_p0_c2;
+	optional_shared_ptr<uint64_t> m_m0_p1_c1;
+	optional_shared_ptr<uint64_t> m_m0_p1_c2;
 
 	std::unique_ptr<uint16_t[]> m_m68k_framebuffer[2];
 	std::unique_ptr<uint16_t[]> m_i860_framebuffer[2][2];
@@ -151,10 +164,31 @@ private:
 	uint32_t screen_update_vcombat_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_vcombat_aux(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void main_map(address_map &map);
+	void single_i860_map(address_map &map);
+	void dual_i860_map(address_map &map);
 	void sound_map(address_map &map);
 	void vid_0_map(address_map &map);
 	void vid_1_map(address_map &map);
+
+	uint16_t m_c_r(offs_t offset, uint64_t *v);
+	void m_c_w(offs_t offset, uint16_t data, uint16_t mem_mask, uint64_t *v);
+
+	uint16_t m0_p0_c1_r(offs_t offset);
+	void m0_p0_c1_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t m0_p0_c2_r(offs_t offset);
+	void m0_p0_c2_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t m0_p1_c1_r(offs_t offset);
+	void m0_p1_c1_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t m0_p1_c2_r(offs_t offset);
+	void m0_p1_c2_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+
+	uint16_t vram_r(offs_t offset, uint64_t *v);
+	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, uint64_t *v);
+
+	uint16_t vram_0_r(offs_t offset);
+	void vram_0_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t vram_1_r(offs_t offset);
+	void vram_1_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 };
 
 uint32_t vcombat_state::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index)
@@ -363,21 +397,105 @@ void vcombat_state::vcombat_dac_w(uint16_t data)
 		LOG("dac overflow %04x\n", data & 0x801f);
 }
 
-void vcombat_state::main_map(address_map &map)
+uint16_t vcombat_state::m_c_r(offs_t offset, uint64_t *v)
+{
+	return (*v) >> (offset << 4);
+}
+
+void vcombat_state::m_c_w(offs_t offset, uint16_t data, uint16_t mem_mask, uint64_t *v)
+{
+	uint64_t d = uint64_t(data) << (offset << 4);
+	uint64_t m = uint64_t(mem_mask) << (offset << 4);
+
+	*v = ((*v) & ~m) | d;
+}
+
+uint16_t vcombat_state::m0_p0_c1_r(offs_t offset)
+{
+	return m_c_r(offset, m_m0_p0_c1);
+}
+
+void vcombat_state::m0_p0_c1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	m_c_w(offset, data, mem_mask, m_m0_p0_c1);
+}
+
+uint16_t vcombat_state::m0_p0_c2_r(offs_t offset)
+{
+	return m_c_r(offset, m_m0_p0_c2);
+}
+
+void vcombat_state::m0_p0_c2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	m_c_w(offset, data, mem_mask, m_m0_p0_c2);
+}
+
+uint16_t vcombat_state::m0_p1_c1_r(offs_t offset)
+{
+	return m_c_r(offset, m_m0_p1_c1);
+}
+
+void vcombat_state::m0_p1_c1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	m_c_w(offset, data, mem_mask, m_m0_p1_c1);
+}
+
+uint16_t vcombat_state::m0_p1_c2_r(offs_t offset)
+{
+	return m_c_r(offset, m_m0_p1_c2);
+}
+
+void vcombat_state::m0_p1_c2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	m_c_w(offset, data, mem_mask, m_m0_p1_c2);
+}
+
+
+uint16_t vcombat_state::vram_r(offs_t offset, uint64_t *v)
+{
+	v += offset >> 2;
+	return (*v) >> ((offset & 3) << 4);
+}
+
+void vcombat_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, uint64_t *v)
+{
+	uint64_t d = uint64_t(data) << ((offset & 3) << 4);
+	uint64_t m = uint64_t(mem_mask) << ((offset & 3) << 4);
+
+	v += offset >> 2;
+	*v = ((*v) & ~m) | d;
+}
+
+uint16_t vcombat_state::vram_0_r(offs_t offset)
+{
+	return vram_r(offset, m_vid_0_ram);
+}
+
+void vcombat_state::vram_0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	vram_w(offset, data, mem_mask, m_vid_0_ram);
+}
+
+uint16_t vcombat_state::vram_1_r(offs_t offset)
+{
+	return vram_r(offset, m_vid_1_ram);
+}
+
+void vcombat_state::vram_1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	vram_w(offset, data, mem_mask, m_vid_1_ram);
+}
+
+void vcombat_state::single_i860_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x200000, 0x20ffff).ram();
 	map(0x300000, 0x30ffff).w(FUNC(vcombat_state::main_video_write));
 
-	map(0x400000, 0x43ffff).ram().share("vid_0_ram");   /* First i860 shared RAM */
-	map(0x440000, 0x440003).ram().share("share6");      /* M0->P0 i860 #1 com 1 */
-	map(0x480000, 0x480003).ram().share("share7");      /* M0<-P0 i860 #1 com 2 */
+	map(0x400000, 0x43ffff).rw(FUNC(vcombat_state::vram_0_r), FUNC(vcombat_state::vram_0_w));   /* First i860 shared RAM */
+	map(0x440000, 0x440003).rw(FUNC(vcombat_state::m0_p0_c1_r), FUNC(vcombat_state::m0_p0_c1_w));      /* M0->P0 i860 #1 com 1 */
+	map(0x480000, 0x480003).rw(FUNC(vcombat_state::m0_p0_c2_r), FUNC(vcombat_state::m0_p0_c2_w));      /* M0<-P0 i860 #1 com 2 */
 	map(0x4c0000, 0x4c0003).w(FUNC(vcombat_state::wiggle_i860p0_pins_w)); /* i860 #1 stop/start/reset */
-
-	map(0x500000, 0x53ffff).ram().share("vid_1_ram");   /* Second i860 shared RAM */
-	map(0x540000, 0x540003).ram().share("share8");      /* M0->P1 i860 #2 com 1 */
-	map(0x580000, 0x580003).ram().share("share9");      /* M0<-P1 i860 #2 com 2 */
-	map(0x5c0000, 0x5c0003).w(FUNC(vcombat_state::wiggle_i860p1_pins_w)); /* i860 #2 stop/start/reset */
 
 	map(0x600000, 0x600001).r(FUNC(vcombat_state::control_1_r));   /* IN0 port */
 	map(0x600004, 0x600005).ram().share("share5");      /* M0<-M1 */
@@ -398,13 +516,24 @@ void vcombat_state::main_map(address_map &map)
 }
 
 
+void vcombat_state::dual_i860_map(address_map &map)
+{
+	single_i860_map(map);
+
+	map(0x500000, 0x53ffff).rw(FUNC(vcombat_state::vram_1_r), FUNC(vcombat_state::vram_1_w));   /* Second i860 shared RAM */
+	map(0x540000, 0x540003).rw(FUNC(vcombat_state::m0_p1_c1_r), FUNC(vcombat_state::m0_p1_c1_w));      /* M0->P1 i860 #2 com 1 */
+	map(0x580000, 0x580003).rw(FUNC(vcombat_state::m0_p1_c2_r), FUNC(vcombat_state::m0_p1_c2_w));      /* M0<-P1 i860 #2 com 2 */
+	map(0x5c0000, 0x5c0003).w(FUNC(vcombat_state::wiggle_i860p1_pins_w)); /* i860 #2 stop/start/reset */
+}
+
+
 /* The first i860 - middle board */
 void vcombat_state::vid_0_map(address_map &map)
 {
 	map(0x00000000, 0x0001ffff).ram().w(FUNC(vcombat_state::v0_fb_w));      /* Shared framebuffer - half of the bits lost to 32-bit bus */
-	map(0x20000000, 0x20000007).ram().share("share6");      /* M0<-P0 com 1 (0x440000 in 68k-land) */
+	map(0x20000000, 0x20000007).ram().share("m0_p0_c1");      /* M0<-P0 com 1 (0x440000 in 68k-land) */
 	map(0x40000000, 0x401fffff).rom().region("gfx", 0);
-	map(0x80000000, 0x80000007).ram().share("share7");      /* M0->P0 com 2 (0x480000 in 68k-land) */
+	map(0x80000000, 0x80000007).ram().share("m0_p0_c2");      /* M0->P0 com 2 (0x480000 in 68k-land) */
 	map(0xc0000000, 0xc0000fff).noprw();                     /* Dummy D$ flush page. */
 	map(0xfffc0000, 0xffffffff).ram().share("vid_0_ram");           /* Shared RAM with main */
 }
@@ -414,9 +543,9 @@ void vcombat_state::vid_0_map(address_map &map)
 void vcombat_state::vid_1_map(address_map &map)
 {
 	map(0x00000000, 0x0001ffff).ram().w(FUNC(vcombat_state::v1_fb_w));      /* Half of the bits lost to 32-bit bus */
-	map(0x20000000, 0x20000007).ram().share("share8");      /* M0->P1 com 1 (0x540000 in 68k-land) */
+	map(0x20000000, 0x20000007).ram().share("m0_p1_c1");      /* M0->P1 com 1 (0x540000 in 68k-land) */
 	map(0x40000000, 0x401fffff).rom().region("gfx", 0);
-	map(0x80000000, 0x80000007).ram().share("share9");          /* M0<-P1 com 2      (0x580000 in 68k-land) */
+	map(0x80000000, 0x80000007).ram().share("m0_p1_c2");      /* M0<-P1 com 2      (0x580000 in 68k-land) */
 	map(0xc0000000, 0xc0000fff).noprw();                     /* Dummy D$ flush page. */
 	map(0xfffc0000, 0xffffffff).ram().share("vid_1_ram");           /* Shared RAM with main */
 }
@@ -558,7 +687,7 @@ WRITE_LINE_MEMBER(vcombat_state::sound_update)
 void vcombat_state::vcombat(machine_config &config)
 {
 	M68000(config, m_maincpu, XTAL(12'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &vcombat_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vcombat_state::dual_i860_map);
 	m_maincpu->set_vblank_int("screen", FUNC(vcombat_state::irq1_line_assert));
 
 	/* The middle board i860 */
@@ -605,7 +734,7 @@ void vcombat_state::vcombat(machine_config &config)
 void vcombat_state::shadfgtr(machine_config &config)
 {
 	M68000(config, m_maincpu, XTAL(12'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &vcombat_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vcombat_state::single_i860_map);
 	m_maincpu->set_vblank_int("screen", FUNC(vcombat_state::irq1_line_assert));
 
 	/* The middle board i860 */

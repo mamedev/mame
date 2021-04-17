@@ -18,7 +18,6 @@
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/ym2151.h"
-#include "rendlay.h"
 #include "speaker.h"
 
 #include "tceptor2.lh"
@@ -344,7 +343,7 @@ void tceptor_state::tceptor(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tceptor);
 	PALETTE(config, m_palette, FUNC(tceptor_state::tceptor_palette), 4096, 1024);
 
-	NAMCO_C45_ROAD(config, m_c45_road, 0);
+	NAMCO_C45_ROAD(config, m_c45_road);
 	m_c45_road->set_palette(m_palette);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

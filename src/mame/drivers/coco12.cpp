@@ -26,19 +26,7 @@
 #include "emu.h"
 #include "includes/coco12.h"
 
-#include "bus/coco/coco_dcmodem.h"
-#include "bus/coco/coco_dwsock.h"
-#include "bus/coco/coco_fdc.h"
-#include "bus/coco/coco_gmc.h"
-#include "bus/coco/coco_multi.h"
-#include "bus/coco/coco_orch90.h"
-#include "bus/coco/coco_pak.h"
-#include "bus/coco/coco_psg.h"
-#include "bus/coco/coco_ram.h"
-#include "bus/coco/coco_rs232.h"
-#include "bus/coco/coco_ssc.h"
-#include "bus/coco/coco_stecomp.h"
-#include "bus/coco/coco_sym12.h"
+#include "bus/coco/cococart.h"
 #include "bus/coco/coco_t4426.h"
 
 #include "cpu/m6809/m6809.h"
@@ -402,30 +390,16 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  SLOT_INTERFACE_START(coco_cart)
+//  coco_cart
 //-------------------------------------------------
 
 void coco_cart(device_slot_interface &device)
 {
-	device.option_add("banked_16k", COCO_PAK_BANKED);
-	device.option_add("cc2hdb1", COCO2_HDB1);
-	device.option_add("cc3hdb1", COCO3_HDB1);
-	device.option_add("ccpsg", COCO_PSG);
-	device.option_add("cd6809_fdc", CD6809_FDC);
-	device.option_add("cp450_fdc", CP450_FDC);
-	device.option_add("dcmodem", COCO_DCMODEM);
-	device.option_add("fdc", COCO_FDC);
-	device.option_add("fdcv11", COCO_FDC_V11);
-	device.option_add("games_master", COCO_PAK_GMC);
-	device.option_add("multi", COCO_MULTIPAK);
-	device.option_add("orch90", COCO_ORCH90);
-	device.option_add("pak", COCO_PAK);
-	device.option_add("ram", COCO_PAK_RAM);
-	device.option_add("rs232", COCO_RS232);
-	device.option_add("ssc", COCO_SSC);
-	device.option_add("stecomp", COCO_STEREO_COMPOSER);
-	device.option_add("sym12", COCO_SYM12);
+	coco_cart_add_basic_devices(device);
+	coco_cart_add_fdcs(device);
+	coco_cart_add_multi_pak(device);
 }
+
 
 //-------------------------------------------------
 //  SLOT_INTERFACE_START(t4426_cart)
@@ -472,9 +446,8 @@ void coco_state::coco_floating(machine_config &config)
 //  DEVICE_INPUT_DEFAULTS_START( printer )
 //-------------------------------------------------
 
-static DEVICE_INPUT_DEFAULTS_START( printer )
+static DEVICE_INPUT_DEFAULTS_START( rs_printer )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
@@ -500,6 +473,7 @@ void coco12_state::coco(machine_config &config)
 	pia6821_device &pia0(PIA6821(config, PIA0_TAG, 0));
 	pia0.writepa_handler().set(FUNC(coco_state::pia0_pa_w));
 	pia0.writepb_handler().set(FUNC(coco_state::pia0_pb_w));
+	pia0.tspb_handler().set_constant(0xff);
 	pia0.ca2_handler().set(FUNC(coco_state::pia0_ca2_w));
 	pia0.cb2_handler().set(FUNC(coco_state::pia0_cb2_w));
 	pia0.irqa_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
@@ -535,9 +509,9 @@ void coco12_state::coco(machine_config &config)
 	m_cassette->set_formats(coco_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 
-	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, "printer"));
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, "rs_printer"));
 	rs232.dcd_handler().set(PIA1_TAG, FUNC(pia6821_device::ca1_w));
-	rs232.set_option_device_input_defaults("printer", DEVICE_INPUT_DEFAULTS_NAME(printer));
+	rs232.set_option_device_input_defaults("rs_printer", DEVICE_INPUT_DEFAULTS_NAME(rs_printer));
 
 	cococart_slot_device &cartslot(COCOCART_SLOT(config, CARTRIDGE_TAG, DERIVED_CLOCK(1, 1), coco_cart, "pak"));
 	cartslot.cart_callback().set([this] (int state) { cart_w(state != 0); }); // lambda because name is overloaded

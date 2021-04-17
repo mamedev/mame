@@ -49,7 +49,7 @@ class midvunit_state : public driver_device
 public:
 	midvunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
+		m_videoram(*this, "videoram", 0x200000, ENDIANNESS_LITTLE),
 		m_textureram(*this, "textureram"),
 		m_screen(*this, "screen"),
 		m_nvram(*this, "nvram"),
@@ -89,7 +89,7 @@ public:
 	uint16_t m_dma_data[16];
 	uint8_t m_video_changed;
 
-	required_shared_ptr<uint16_t> m_videoram;
+	memory_share_creator<uint16_t> m_videoram;
 	required_shared_ptr<uint32_t> m_textureram;
 	required_device<screen_device> m_screen;
 

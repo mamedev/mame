@@ -16,7 +16,6 @@
 #include "emupal.h"
 #include "screen.h"
 
-#define COSMICG_MASTER_CLOCK     XTAL(9'828'000)
 #define Z80_MASTER_CLOCK         XTAL(10'816'000)
 
 
@@ -27,6 +26,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
+		m_sound_enabled(0),
 		m_in_ports(*this, "IN%u", 0),
 		m_dsw(*this, "DSW"),
 		m_maincpu(*this, "maincpu"),
@@ -37,9 +37,31 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void cosmic(machine_config &config);
+	void cosmica(machine_config &config);
+	void nomnlnd(machine_config &config);
+	void devzone(machine_config &config);
+	void panic(machine_config &config);
+	void magspot(machine_config &config);
+
+	void init_devzone();
+	void init_nomnlnd();
+	void init_cosmica();
+	void init_panic();
+
+	DECLARE_WRITE_LINE_MEMBER(panic_coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(cosmica_coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq0);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
-	optional_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
 	typedef pen_t (cosmic_state::*color_func)(uint8_t x, uint8_t y);
@@ -50,13 +72,9 @@ public:
 
 	/* sound-related */
 	int            m_sound_enabled;
-	int            m_march_select;
-	int            m_gun_die_select;
 	int            m_dive_bomb_b_select;
 
 	/* misc */
-	uint32_t         m_pixel_clock;
-	int            m_ic_state;   // for 9980
 	optional_ioport_array<4> m_in_ports;
 	optional_ioport m_dsw;
 
@@ -64,42 +82,24 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<samples_device> m_samples;
 	optional_device<dac_bit_interface> m_dac;
-	optional_device<gfxdecode_device> m_gfxdecode;
+	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	void panic_sound_output_w(offs_t offset, uint8_t data);
 	void panic_sound_output2_w(offs_t offset, uint8_t data);
-	void cosmicg_output_w(offs_t offset, uint8_t data);
 	void cosmica_sound_output_w(offs_t offset, uint8_t data);
 	void dac_w(uint8_t data);
 	uint8_t cosmica_pixel_clock_r();
-	uint8_t cosmicg_port_0_r(offs_t offset);
-	uint8_t cosmicg_port_1_r(offs_t offset);
 	uint8_t magspot_coinage_dip_r(offs_t offset);
 	uint8_t nomnlnd_port_0_1_r(offs_t offset);
 	void flip_screen_w(uint8_t data);
 	void cosmic_color_register_w(offs_t offset, uint8_t data);
 	void cosmic_background_enable_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(panic_coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(cosmica_coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(cosmicg_coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq0);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi);
-	void init_devzone();
-	void init_cosmicg();
-	void init_nomnlnd();
-	void init_cosmica();
-	void init_panic();
-	DECLARE_MACHINE_START(cosmic);
-	DECLARE_MACHINE_RESET(cosmic);
-	DECLARE_MACHINE_RESET(cosmicg);
 	void panic_palette(palette_device &palette);
 	void cosmica_palette(palette_device &palette);
-	void cosmicg_palette(palette_device &palette);
 	void magspot_palette(palette_device &palette);
 	void nomnlnd_palette(palette_device &palette);
-	uint32_t screen_update_cosmicg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_panic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cosmica(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_magspot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -113,18 +113,8 @@ public:
 	void nomnlnd_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	pen_t panic_map_color(uint8_t x, uint8_t y);
 	pen_t cosmica_map_color(uint8_t x, uint8_t y);
-	pen_t cosmicg_map_color(uint8_t x, uint8_t y);
 	pen_t magspot_map_color(uint8_t x, uint8_t y);
-	void cosmic(machine_config &config);
-	void cosmica(machine_config &config);
-	void cosmicg(machine_config &config);
-	void nomnlnd(machine_config &config);
-	void devzone(machine_config &config);
-	void panic(machine_config &config);
-	void magspot(machine_config &config);
 	void cosmica_map(address_map &map);
-	void cosmicg_io_map(address_map &map);
-	void cosmicg_map(address_map &map);
 	void magspot_map(address_map &map);
 	void panic_map(address_map &map);
 };

@@ -275,7 +275,7 @@ static imgtoolerr_t os9_decode_file_header(imgtool::image &image,
 
 	/* read all sector map entries */
 	max_entries = (disk_info->sector_size - 16) / 5;
-	max_entries = (std::min<std::size_t>)(max_entries, ARRAY_LENGTH(info->sector_map) - 1);
+	max_entries = (std::min<std::size_t>)(max_entries, std::size(info->sector_map) - 1);
 	for (i = 0; i < max_entries; i++)
 	{
 		lsn = pick_integer_be(header, 16 + (i * 5) + 0, 3);
@@ -393,7 +393,7 @@ static imgtoolerr_t os9_set_file_size(imgtool::image &image,
 		/* first find out the size of our sector map */
 		sector_map_length = 0;
 		lsn = 0;
-		while((lsn < current_lsn_count) && (sector_map_length < ARRAY_LENGTH(file_info->sector_map)))
+		while((lsn < current_lsn_count) && (sector_map_length < std::size(file_info->sector_map)))
 		{
 			if (file_info->sector_map[sector_map_length].count == 0)
 				return os9_corrupt_file_error(file_info);
@@ -434,7 +434,7 @@ static imgtoolerr_t os9_set_file_size(imgtool::image &image,
 			{
 				file_info->sector_map[sector_map_length - 1].count++;
 			}
-			else if (sector_map_length >= ARRAY_LENGTH(file_info->sector_map))
+			else if (sector_map_length >= std::size(file_info->sector_map))
 			{
 				return IMGTOOLERR_NOSPACE;
 			}
@@ -461,7 +461,7 @@ static imgtoolerr_t os9_set_file_size(imgtool::image &image,
 	/* do we have to write the sector map? */
 	if (sector_map_length >= 0)
 	{
-		for (i = 0; i < (std::min<std::size_t>)(sector_map_length + 1, ARRAY_LENGTH(file_info->sector_map)); i++)
+		for (i = 0; i < (std::min<std::size_t>)(sector_map_length + 1, std::size(file_info->sector_map)); i++)
 		{
 			place_integer_be(header, 16 + (i * 5) + 0, 3, file_info->sector_map[i].lsn);
 			place_integer_be(header, 16 + (i * 5) + 3, 2, file_info->sector_map[i].count);
@@ -952,8 +952,8 @@ static imgtoolerr_t os9_diskimage_nextenum(imgtool::directory &enumeration, imgt
 		return err;
 
 	/* fill out imgtool_dirent structure */
-	snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", filename);
-	snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%c%c%c%c%c%c%c%c",
+	snprintf(ent.filename, std::size(ent.filename), "%s", filename);
+	snprintf(ent.attr, std::size(ent.attr), "%c%c%c%c%c%c%c%c",
 		file_info.directory      ? 'd' : '-',
 		file_info.non_sharable   ? 's' : '-',
 		file_info.public_execute ? 'x' : '-',
@@ -1143,7 +1143,7 @@ static imgtoolerr_t os9_diskimage_delete(imgtool::partition &partition, const ch
 		if (err)
 			return err;
 
-		for (i = 0; (i < ARRAY_LENGTH(file_info.sector_map)) && file_info.sector_map[i].count; i++)
+		for (i = 0; (i < std::size(file_info.sector_map)) && file_info.sector_map[i].count; i++)
 		{
 			lsn = file_info.sector_map[i].lsn;
 			for (j = 0;  j < file_info.sector_map[i].count; j++)

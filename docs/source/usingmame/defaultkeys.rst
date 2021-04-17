@@ -94,8 +94,6 @@ and saving/loading save states.
     Performs a “hard reset”, which tears everything down and re-creates it from
     scratch. This is a more thorough and complete reset than the reset you get
     from hitting F3.
-**Left Ctrl+F3**
-    Toggle uneven stretch. (*SDL ONLY*)
 **F4**
     Shows the game palette, decoded graphics tiles/characters and any tilemaps.
 
@@ -136,11 +134,8 @@ and saving/loading save states.
     * **Enter** - switch to palette/colortable mode.
 
     Note: Not all games have decoded graphics and/or tilemaps.
-**Left Ctrl+F4**
-    Toggles keeping aspect ratio.
-    (*SDL MAME only*)
 **Left Ctrl+F5**
-    Toggle Filter. (*SDL ONLY*)
+    Toggle Filter.
     (*SDL MAME only*)
 **Left Alt+Left Ctrl+F5**
     Toggle HLSL Post-Processing.
@@ -191,7 +186,7 @@ and saving/loading save states.
 **Page Down**
     Fast forward. While held, runs game with throttling disabled and with the
     maximum frameskip.
-    (*Windows non-SDL MAME only*)
+    (*SDL MAME only*)
 **Left Alt+Enter**
     Toggles between full-screen and windowed mode.
 **Scroll Lock**/**Forward Delete** (Mac Desktop)/**fn-Delete** (Mac Laptop)
