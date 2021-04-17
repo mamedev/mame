@@ -67,26 +67,26 @@ using device_timer_id = u32;
 using timer_expired_delegate_native = named_delegate<void (timer_instance const &)>;
 
 // alternate form #1 takes no parameters
-using timer_expired_delegate_form1 = named_delegate<void ()>;
+using timer_expired_delegate_form1 = delegate<void ()>;
 
 // alternate form #2 matches the device_timer callback used by devices
-using timer_expired_delegate_form2 = named_delegate<void (timer_instance const &, device_timer_id, int, void *)>;
+using timer_expired_delegate_form2 = delegate<void (timer_instance const &, device_timer_id, int, void *)>;
 
 // alternate form #3 takes a single integer parameter of any type
 template<typename IntType>
-using timer_expired_delegate_form3 = named_delegate<void (IntType)>;
+using timer_expired_delegate_form3 = delegate<void (IntType)>;
 
 // alternate form #4 takes a pointer value and an integer parameter; this is the classic TIMER_CALLBACK
 template<typename IntType>
-using timer_expired_delegate_form4 = named_delegate<void (void *, IntType)>;
+using timer_expired_delegate_form4 = delegate<void (void *, IntType)>;
 
 // alternate form #5 takes two integer parameters of any type; maps to some write handlers
 template<typename IntType, typename IntType2>
-using timer_expired_delegate_form5 = named_delegate<void (IntType, IntType2)>;
+using timer_expired_delegate_form5 = delegate<void (IntType, IntType2)>;
 
 // alternate form #6 takes three integer parameters of any type; maps to some write handlers
 template<typename IntType, typename IntType2, typename IntType3>
-using timer_expired_delegate_form6 = named_delegate<void (IntType, IntType2, IntType3)>;
+using timer_expired_delegate_form6 = delegate<void (IntType, IntType2, IntType3)>;
 
 
 // ======================> timer_expired_delegate
@@ -97,7 +97,7 @@ class timer_expired_delegate : public timer_expired_delegate_native
 {
 	// this is just a substitute for an arbitrary delegate; it presumes that
 	// all delegates are equivalent from a size/copy/move perspective
-	using generic_delegate = named_delegate<void ()>;
+	using generic_delegate = delegate<void ()>;
 
 public:
 	// import direct constructors for native callbacks
@@ -147,65 +147,65 @@ public:
 	// form 1 constructor: void timer_callback()
 	template<typename FuncDeviceType, typename DeviceType>
 	timer_expired_delegate(void (FuncDeviceType::*cb)(), char const *name, DeviceType *bindto) :
-		timer_expired_delegate_native(FUNC(timer_expired_delegate::form1_callback), this)
+		timer_expired_delegate_native(&timer_expired_delegate::form1_callback, name, this)
 	{
-		static_assert(sizeof(timer_expired_delegate_form1) == sizeof(generic_delegate));
-		reinterpret_cast<timer_expired_delegate_form1 &>(m_sub_delegate) = timer_expired_delegate_form1(cb, name, bindto);
+		static_assert(sizeof(timer_expired_delegate_form1) == sizeof(m_sub_delegate));
+		reinterpret_cast<timer_expired_delegate_form1 &>(m_sub_delegate) = timer_expired_delegate_form1(cb, bindto);
 		SET_SCHEDULER_STAT(m_form, 1);
 	}
 
 	// form 2 constructor: void timer_callback(timer_instance const &timer, device_timer_id id, int param, void *ptr)
 	template<typename FuncDeviceType, typename DeviceType>
 	timer_expired_delegate(void (FuncDeviceType::*cb)(timer_instance const &, device_timer_id, int, void *), char const *name, DeviceType *bindto) :
-		timer_expired_delegate_native(FUNC(timer_expired_delegate::form2_callback), this)
+		timer_expired_delegate_native(&timer_expired_delegate::form2_callback, name, this)
 	{
-		static_assert(sizeof(timer_expired_delegate_form2) == sizeof(generic_delegate));
-		reinterpret_cast<timer_expired_delegate_form2 &>(m_sub_delegate) = timer_expired_delegate_form2(cb, name, bindto);
+		static_assert(sizeof(timer_expired_delegate_form2) == sizeof(m_sub_delegate));
+		reinterpret_cast<timer_expired_delegate_form2 &>(m_sub_delegate) = timer_expired_delegate_form2(cb, bindto);
 		SET_SCHEDULER_STAT(m_form, 2);
 	}
 
 	// form 3 constructor: void timer_callback(int param)
 	template<typename FuncDeviceType, typename DeviceType, typename IntType, std::enable_if_t<std::is_integral<IntType>::value, bool> = true>
 	timer_expired_delegate(void (FuncDeviceType::*cb)(IntType), char const *name, DeviceType *bindto) :
-		timer_expired_delegate_native(FUNC(timer_expired_delegate::form3_callback<IntType>), this)
+		timer_expired_delegate_native(&timer_expired_delegate::form3_callback<IntType>, name, this)
 	{
-		static_assert(sizeof(timer_expired_delegate_form3<IntType>) == sizeof(generic_delegate));
-		reinterpret_cast<timer_expired_delegate_form3<IntType> &>(m_sub_delegate) = timer_expired_delegate_form3<IntType>(cb, name, bindto);
+		static_assert(sizeof(timer_expired_delegate_form3<IntType>) == sizeof(m_sub_delegate));
+		reinterpret_cast<timer_expired_delegate_form3<IntType> &>(m_sub_delegate) = timer_expired_delegate_form3<IntType>(cb, bindto);
 		SET_SCHEDULER_STAT(m_form, 3);
 	}
 
 	// form 4 constructor: void timer_callback(void *ptr, int param)
 	template<typename FuncDeviceType, typename DeviceType, typename IntType, std::enable_if_t<std::is_integral<IntType>::value, bool> = true>
 	timer_expired_delegate(void (FuncDeviceType::*cb)(void *ptr, IntType), char const *name, DeviceType *bindto) :
-		timer_expired_delegate_native(FUNC(timer_expired_delegate::form4_callback<IntType>), this)
+		timer_expired_delegate_native(&timer_expired_delegate::form4_callback<IntType>, name, this)
 	{
-		static_assert(sizeof(timer_expired_delegate_form4<IntType>) == sizeof(generic_delegate));
-		reinterpret_cast<timer_expired_delegate_form4<IntType> &>(m_sub_delegate) = timer_expired_delegate_form4<IntType>(cb, name, bindto);
+		static_assert(sizeof(timer_expired_delegate_form4<IntType>) == sizeof(m_sub_delegate));
+		reinterpret_cast<timer_expired_delegate_form4<IntType> &>(m_sub_delegate) = timer_expired_delegate_form4<IntType>(cb, bindto);
 		SET_SCHEDULER_STAT(m_form, 4);
 	}
 
 	// form 5 constructor: void timer_callback(int param, int param2)
 	template<typename FuncDeviceType, typename DeviceType, typename IntType, typename IntType2, std::enable_if_t<std::is_integral<IntType>::value && std::is_integral<IntType2>::value, bool> = true>
 	timer_expired_delegate(void (FuncDeviceType::*cb)(u32, IntType), char const *name, DeviceType *bindto) :
-		timer_expired_delegate_native(FUNC((timer_expired_delegate::form5_callback<IntType, IntType2>)), this)
+		timer_expired_delegate_native(&timer_expired_delegate::form5_callback<IntType, IntType2>, name, this)
 	{
-		static_assert(sizeof(timer_expired_delegate_form5<IntType, IntType2>) == sizeof(generic_delegate));
-		reinterpret_cast<timer_expired_delegate_form5<IntType, IntType2> &>(m_sub_delegate) = timer_expired_delegate_form5<IntType, IntType2>(cb, name, bindto);
+		static_assert(sizeof(timer_expired_delegate_form5<IntType, IntType2>) == sizeof(m_sub_delegate));
+		reinterpret_cast<timer_expired_delegate_form5<IntType, IntType2> &>(m_sub_delegate) = timer_expired_delegate_form5<IntType, IntType2>(cb, bindto);
 		SET_SCHEDULER_STAT(m_form, 5);
 	}
 
 	// form 6 constructor: void timer_callback(int param, int param2, int param3)
 	template<typename FuncDeviceType, typename DeviceType, typename IntType, typename IntType2, typename IntType3, std::enable_if_t<std::is_integral<IntType>::value && std::is_integral<IntType2>::value && std::is_integral<IntType3>::value, bool> = true>
 	timer_expired_delegate(void (FuncDeviceType::*cb)(u32, IntType, IntType), char const *name, DeviceType *bindto) :
-		timer_expired_delegate_native(FUNC((timer_expired_delegate::form6_callback<IntType, IntType2, IntType3>)), this)
+		timer_expired_delegate_native(timer_expired_delegate::form6_callback<IntType, IntType2, IntType3>, name, this)
 	{
-		static_assert(sizeof(timer_expired_delegate_form6<IntType, IntType2, IntType3>) == sizeof(generic_delegate));
-		reinterpret_cast<timer_expired_delegate_form6<IntType, IntType2, IntType3> &>(m_sub_delegate) = timer_expired_delegate_form6<IntType, IntType2, IntType3>(cb, name, bindto);
+		static_assert(sizeof(timer_expired_delegate_form6<IntType, IntType2, IntType3>) == sizeof(m_sub_delegate));
+		reinterpret_cast<timer_expired_delegate_form6<IntType, IntType2, IntType3> &>(m_sub_delegate) = timer_expired_delegate_form6<IntType, IntType2, IntType3>(cb, bindto);
 		SET_SCHEDULER_STAT(m_form, 6);
 	}
 
 	// return the name
-	char const *name() const { return has_sub_delegate() ? m_sub_delegate.name() : timer_expired_delegate_native::name(); }
+	char const *name() const { return timer_expired_delegate_native::name(); }
 
 #if (COLLECT_SCHEDULER_STATS)
 	int m_form = 0;
