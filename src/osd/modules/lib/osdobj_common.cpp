@@ -226,6 +226,9 @@ void osd_common_t::register_options()
 #ifndef NO_USE_PORTAUDIO
 	REGISTER_MODULE(m_mod_man, SOUND_PORTAUDIO);
 #endif
+#ifndef NO_USE_PULSEAUDIO
+	REGISTER_MODULE(m_mod_man, SOUND_PULSEAUDIO);
+#endif
 	REGISTER_MODULE(m_mod_man, SOUND_NONE);
 
 	REGISTER_MODULE(m_mod_man, MONITOR_SDL);

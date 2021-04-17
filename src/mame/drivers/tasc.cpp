@@ -40,6 +40,7 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/arm/arm.h"
 #include "machine/bankdev.h"
 #include "machine/nvram.h"
@@ -47,8 +48,10 @@ TODO:
 #include "machine/timer.h"
 #include "video/t6963c.h"
 #include "sound/spkrdev.h"
+
 #include "speaker.h"
 
+// internal artwork
 #include "tascr30.lh"
 
 
@@ -60,11 +63,11 @@ public:
 	tasc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_rom(*this, "maincpu"),
+		m_mainram(*this, "mainram"),
 		m_lcd(*this, "lcd"),
 		m_smartboard(*this, "smartboard"),
-		m_rom(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
-		m_mainram(*this, "mainram"),
 		m_disable_bootrom(*this, "disable_bootrom"),
 		m_inputs(*this, "IN.%u", 0U),
 		m_out_leds(*this, "pled%u", 0U)
@@ -74,16 +77,17 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_reset() override { install_bootrom(true); }
+	virtual void device_post_load() override { install_bootrom(m_bootrom_enabled); }
 
 private:
 	// devices/pointers
 	required_device<arm_cpu_device> m_maincpu;
+	required_region_ptr<u32> m_rom;
+	required_shared_ptr<u32> m_mainram;
 	required_device<lm24014h_device> m_lcd;
 	required_device<tasc_sb30_device> m_smartboard;
-	required_region_ptr<u32> m_rom;
 	required_device<speaker_sound_device> m_speaker;
-	required_shared_ptr<u32> m_mainram;
 	required_device<timer_device> m_disable_bootrom;
 	required_ioport_array<4> m_inputs;
 	output_finder<2> m_out_leds;
@@ -91,27 +95,23 @@ private:
 	void main_map(address_map &map);
 	void nvram_map(address_map &map);
 
-	bool m_bootrom_enabled;
-	uint32_t m_mux;
-	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { m_bootrom_enabled = false; }
-
 	// I/O handlers
-	uint32_t bootrom_r(offs_t offset);
-	uint32_t p1000_r();
-	void p1000_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	u32 p1000_r();
+	void p1000_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+
+	void install_bootrom(bool enable);
+	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
+	bool m_bootrom_enabled = false;
+
+	u32 m_mux = 0;
 };
 
 void tasc_state::machine_start()
 {
 	m_out_leds.resolve();
+
 	save_item(NAME(m_bootrom_enabled));
 	save_item(NAME(m_mux));
-}
-
-void tasc_state::machine_reset()
-{
-	m_bootrom_enabled = true;
-	m_mux = 0;
 }
 
 
@@ -120,20 +120,28 @@ void tasc_state::machine_reset()
     I/O
 ******************************************************************************/
 
-uint32_t tasc_state::bootrom_r(offs_t offset)
+void tasc_state::install_bootrom(bool enable)
 {
-	return (m_bootrom_enabled) ? m_rom[offset] : m_mainram[offset];
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.unmap_readwrite(0, std::max(m_rom.bytes(), m_mainram.bytes()) - 1);
+
+	if (enable)
+		program.install_rom(0, m_rom.bytes() - 1, m_rom);
+	else
+		program.install_ram(0, m_mainram.bytes() - 1, m_mainram);
+
+	m_bootrom_enabled = enable;
 }
 
-uint32_t tasc_state::p1000_r()
+u32 tasc_state::p1000_r()
 {
 	// disconnect bootrom from the bus after next opcode
 	if (m_bootrom_enabled && !m_disable_bootrom->enabled() && !machine().side_effects_disabled())
 		m_disable_bootrom->adjust(m_maincpu->cycles_to_attotime(5));
 
-	uint32_t data = m_smartboard->read();
+	u32 data = m_smartboard->read();
 
-	for(int i=0; i<4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		if (BIT(m_mux, i))
 			data |= (m_inputs[i]->read() << 24);
@@ -142,7 +150,7 @@ uint32_t tasc_state::p1000_r()
 	return data;
 }
 
-void tasc_state::p1000_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void tasc_state::p1000_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -170,7 +178,6 @@ void tasc_state::p1000_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 void tasc_state::main_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).ram().share("mainram");
-	map(0x00000000, 0x0000000b).r(FUNC(tasc_state::bootrom_r));
 	map(0x01000000, 0x01000003).rw(FUNC(tasc_state::p1000_r), FUNC(tasc_state::p1000_w));
 	map(0x02000000, 0x0203ffff).rom().region("maincpu", 0);
 	map(0x03000000, 0x0307ffff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask32(0x000000ff);

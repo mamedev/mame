@@ -1399,6 +1399,7 @@ apple1                          // Jul 1976 Apple 1
 
 @source:apple2.cpp
 ace100                          // ??? 1982 Franklin Ace 100
+ace1000                         // 1982 Franklin ACE 1000
 am64                            // 1985 ASEM AM 64 (motherboard is marked AM-100 but it boots as "AM 64")
 apple2                          // Apr 1977 Apple ][
 apple2jp                        // ??? ???? Apple ][j+
@@ -11311,6 +11312,9 @@ cps3booto2                      // bootleg
 cps3bs32                        //
 cps3bs32a                       //
 jojo                            // 28/01/1999 (c) 1998 (Euro)
+jojoa                           // 28/01/1999 (c) 1998 (Asia)
+jojoar1                         // 08/01/1999 (c) 1998 (Asia)
+jojoar2                         // 02/12/1998 (c) 1998 (Asia)
 jojoba                          // 27/09/1999 (c) 1999 (Euro)
 jojobaj                         // 27/09/1999 (c) 1999 (Japan)
 jojobajr1                       // 13/09/1999 (c) 1999 (Japan)
@@ -18907,6 +18911,9 @@ jungleyo
 @source:junior.cpp
 junior                          //
 
+@source:junior80.cpp
+junior80                        //
+
 @source:juno106.cpp
 juno106                         //
 mks7                            //
@@ -20388,6 +20395,9 @@ matrix                          //
 
 @source:mattelchess.cpp
 mchess
+
+@source:max80.cpp
+max80
 
 @source:maxaflex.cpp
 maxaflex                        //
@@ -36969,8 +36979,10 @@ outrunb                         // 1986 (protected beta bootleg)
 outrundx                        // Deluxe version
 outrundxa                       // Deluxe version (ealier??)
 outrundxeh                      // hack
+outrundxeha                     // hack
 outrundxj                       // 1986.09 Deluxe version (Japan, FD1089A)
 outruneh                        // hack
+outruneha                       // hack
 outrunra                        // Revision A (added support for Standard and Mini cabinets)
 shangon                         // 1987 (unprotected)
 shangon1                        // 1987 (FD1089B)
@@ -37537,6 +37549,7 @@ daioh                           // (C) 1993 Athena
 daioha                          // (C) 1993 Athena
 daiohc                          // (C) 1993 Athena (93111A PCB conversion)
 daiohp                          // (C) 1993 Athena (prototype)
+daiohp2                         // (C) 1993 Athena (prototype, earlier)
 downtown                        // UD-2 (c) 1989 + Romstar or Taito license (DSW)
 downtown2                       // UD-2 (c) 1989 + Romstar or Taito license (DSW)
 downtownj                       // UD-2 (c) 1989 + Romstar or Taito license (DSW)

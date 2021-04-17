@@ -103,16 +103,6 @@ license:CC0
 
 		<screen index="0"><bounds x="644" y="0" width="640" height="480" /></screen>
 		<element name="shutter0" ref="shutter"><bounds x="644" y="0" width="640" height="480" /></element>
-
-		<!-- shifter options (off-screen shifter is not possible here) -->
-		<collection name="Shifter-R" visible="no">
-			<element ref="shifter" inputtag="IN1" inputmask="0x10"><bounds x="606" y="414" width="32" height="64" /><color alpha="0.6" /></element>
-			<element ref="shifter" inputtag="IN1" inputmask="0x10"><bounds x="1250" y="414" width="32" height="64" /><color alpha="0.6" /></element>
-		</collection>
-		<collection name="Shifter-L" visible="no">
-			<element ref="shifter" inputtag="IN1" inputmask="0x10"><bounds x="2" y="414" width="32" height="64" /><color alpha="0.6" /></element>
-			<element ref="shifter" inputtag="IN1" inputmask="0x10"><bounds x="646" y="414" width="32" height="64" /><color alpha="0.6" /></element>
-		</collection>
 	</view>
 
 	<view name="3D Scope Cross View">
@@ -122,54 +112,16 @@ license:CC0
 
 		<screen index="0"><bounds x="644" y="0" width="640" height="480" /></screen>
 		<element name="shutter1" ref="shutter"><bounds x="644" y="0" width="640" height="480" /></element>
-
-		<!-- shifter options (off-screen shifter is not possible here) -->
-		<collection name="Shifter-R" visible="no">
-			<element ref="shifter" inputtag="IN1" inputmask="0x10"><bounds x="606" y="414" width="32" height="64" /><color alpha="0.6" /></element>
-			<element ref="shifter" inputtag="IN1" inputmask="0x10"><bounds x="1250" y="414" width="32" height="64" /><color alpha="0.6" /></element>
-		</collection>
-		<collection name="Shifter-L" visible="no">
-			<element ref="shifter" inputtag="IN1" inputmask="0x10"><bounds x="2" y="414" width="32" height="64" /><color alpha="0.6" /></element>
-			<element ref="shifter" inputtag="IN1" inputmask="0x10"><bounds x="646" y="414" width="32" height="64" /><color alpha="0.6" /></element>
-		</collection>
 	</view>
 
 	<view name="3D Scope Left">
 		<screen index="0"><bounds x="0" y="0" width="640" height="480" /></screen>
 		<element name="shutter1" ref="shutter"><bounds x="0" y="0" width="640" height="480" /></element>
-
-		<!-- shifter options -->
-		<collection name="Shifter-R" visible="no">
-			<element ref="shifter" inputtag="IN1" inputmask="0x10"><bounds x="606" y="414" width="32" height="64" /><color alpha="0.6" /></element>
-		</collection>
-		<collection name="Shifter-L" visible="no">
-			<element ref="shifter" inputtag="IN1" inputmask="0x10"><bounds x="2" y="414" width="32" height="64" /><color alpha="0.6" /></element>
-		</collection>
-		<collection name="Widescreen Shifter-R" visible="no">
-			<element ref="shifter" inputtag="IN1" inputmask="0x10"><bounds x="648" y="414" width="32" height="64" /></element>
-		</collection>
-		<collection name="Widescreen Shifter-L" visible="no">
-			<element ref="shifter" inputtag="IN1" inputmask="0x10"><bounds x="-40" y="414" width="32" height="64" /></element>
-		</collection>
 	</view>
 
 	<view name="3D Scope Right">
 		<screen index="0"><bounds x="0" y="0" width="640" height="480" /></screen>
 		<element name="shutter0" ref="shutter"><bounds x="0" y="0" width="640" height="480" /></element>
-
-		<!-- shifter options -->
-		<collection name="Shifter-R" visible="no">
-			<element ref="shifter" inputtag="IN1" inputmask="0x10"><bounds x="606" y="414" width="32" height="64" /><color alpha="0.6" /></element>
-		</collection>
-		<collection name="Shifter-L" visible="no">
-			<element ref="shifter" inputtag="IN1" inputmask="0x10"><bounds x="2" y="414" width="32" height="64" /><color alpha="0.6" /></element>
-		</collection>
-		<collection name="Widescreen Shifter-R" visible="no">
-			<element ref="shifter" inputtag="IN1" inputmask="0x10"><bounds x="648" y="414" width="32" height="64" /></element>
-		</collection>
-		<collection name="Widescreen Shifter-L" visible="no">
-			<element ref="shifter" inputtag="IN1" inputmask="0x10"><bounds x="-40" y="414" width="32" height="64" /></element>
-		</collection>
 	</view>
 
 </mamelayout>

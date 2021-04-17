@@ -2507,6 +2507,8 @@ if (BUSES["NSCSI"]~=null) then
 		MAME_DIR .. "src/devices/bus/nscsi/cdu75s.h",
 		MAME_DIR .. "src/devices/bus/nscsi/cdu415.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/cdu415.h",
+		MAME_DIR .. "src/devices/bus/nscsi/cdu561.cpp",
+		MAME_DIR .. "src/devices/bus/nscsi/cdu561.h",
 		MAME_DIR .. "src/devices/bus/nscsi/cw7501.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/cw7501.h",
 		MAME_DIR .. "src/devices/bus/nscsi/devices.cpp",
