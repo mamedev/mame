@@ -52,6 +52,8 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+#include "warp1bl.lh"
+
 
 namespace {
 
@@ -637,13 +639,13 @@ ROM_END
 
 ROM_START( warp1bl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "warp1_0.bin",  0x0000, 0x0400, CRC(d4383a9a) SHA1(eda0b388bd0adf22059f0848ce91fee889700f0c) )
-	ROM_LOAD( "warp1_1.bin",  0x0400, 0x0400, CRC(6005eddc) SHA1(a06dbdbe3356eb011dbce756e6c76adef4c50beb) )
-	ROM_LOAD( "warp1_2.bin",  0x0800, 0x0400, CRC(76ea7ebc) SHA1(60eb870f30aaf95589c7326ca6664974e39f3e27) )
-	ROM_LOAD( "warp1_3.bin",  0x0c00, 0x0400, CRC(0c34ef33) SHA1(513fe5a875746d94d2ea0b7eed81ca0cf869c457) )
-	ROM_LOAD( "warp1_4.bin",  0x1000, 0x0400, CRC(41ffad36) SHA1(479af4506f3637a95d2d41d04e1d66debb28da03) )
-	ROM_LOAD( "warp1_5.bin",  0x1400, 0x0400, CRC(f67a1e1d) SHA1(aeb7b018889de4bd32ee8f65d8c0c32bbee07440) )
-	ROM_LOAD( "warp1_6.bin",  0x1800, 0x0400, CRC(44e9327f) SHA1(aa217b0fbbef6a408231dc0dfedd94167c351c28) )
+	ROM_LOAD( "0",  0x0000, 0x0400, CRC(d4383a9a) SHA1(eda0b388bd0adf22059f0848ce91fee889700f0c) )
+	ROM_LOAD( "1",  0x0400, 0x0400, CRC(6005eddc) SHA1(a06dbdbe3356eb011dbce756e6c76adef4c50beb) )
+	ROM_LOAD( "2",  0x0800, 0x0400, CRC(76ea7ebc) SHA1(60eb870f30aaf95589c7326ca6664974e39f3e27) )
+	ROM_LOAD( "3",  0x0c00, 0x0400, CRC(0c34ef33) SHA1(513fe5a875746d94d2ea0b7eed81ca0cf869c457) )
+	ROM_LOAD( "4",  0x1000, 0x0400, CRC(41ffad36) SHA1(479af4506f3637a95d2d41d04e1d66debb28da03) )
+	ROM_LOAD( "5",  0x1400, 0x0400, CRC(f67a1e1d) SHA1(aeb7b018889de4bd32ee8f65d8c0c32bbee07440) )
+	ROM_LOAD( "6",  0x1800, 0x0400, CRC(44e9327f) SHA1(aa217b0fbbef6a408231dc0dfedd94167c351c28) )
 ROM_END
 
 } // Anonymous namespace
@@ -657,5 +659,5 @@ ROM_END
 
 GAME( 1979, dai3wksi, 0,     dai3wksi, dai3wksi, dai3wksi_state, empty_init, ROT270, "Sun Electronics", "Dai 3 Wakusei (Japan)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1980, warp1,    0,     dai3wksi, warp1,    dai3wksi_state, empty_init, ROT90,  "Taito",   "Warp 1",           MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, warp1bl,  warp1, warp1bl,  warp1bl,  dai3wksi_state, empty_init, ROT270, "bootleg", "Warp 1 (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, warp1,    0,     dai3wksi, warp1,    dai3wksi_state, empty_init, ROT90,  "Sun Electronics (Taito license)", "Warp-1", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAMEL(1979, warp1bl,  warp1, warp1bl,  warp1bl,  dai3wksi_state, empty_init, ROT270, "bootleg (Igleck)", "Warp-1 (Japan bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_warp1bl )
