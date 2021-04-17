@@ -114,6 +114,7 @@ void menu_input_general::populate(float &customtop, float &custombottom)
 
 	// populate the menu in a standard fashion
 	populate_sorted(customtop, custombottom);
+	item_append(menu_item_type::SEPARATOR);
 }
 
 void menu_input_general::update_input(input_item_data &seqchangeditem)
@@ -220,7 +221,12 @@ void menu_input_specific::populate(float &customtop, float &custombottom)
 	}
 
 	// populate the menu in a standard fashion
-	populate_sorted(customtop, custombottom);
+	if (!data.empty())
+		populate_sorted(customtop, custombottom);
+	else
+		item_append(_("This machine has no input map."), FLAG_DISABLE, nullptr);
+
+	item_append(menu_item_type::SEPARATOR);
 }
 
 void menu_input_specific::update_input(input_item_data &seqchangeditem)
@@ -496,8 +502,6 @@ void menu_input::populate_sorted(float &customtop, float &custombottom)
 		// add the item
 		item_append(std::move(text), std::move(subtext), flags, &item);
 	}
-
-	item_append(menu_item_type::SEPARATOR);
 
 	// pre-format messages
 	assignprompt = util::string_format(_("Press %1$s to set\n"), machine().input().seq_name(machine().ioport().type_seq(IPT_UI_SELECT)));
