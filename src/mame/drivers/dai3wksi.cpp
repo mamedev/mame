@@ -111,7 +111,6 @@ private:
 
 	// sound
 	u8 m_audio_data[3] = { 0, 0, 0 };
-	u8 m_port_last2 = 0;
 	u8 m_enabled_sound = 0;
 	u8 m_sound3_counter = 0;
 	void audio_1_w(u8 data);
