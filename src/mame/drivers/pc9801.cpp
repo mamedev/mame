@@ -58,12 +58,6 @@
 	TODO: (PC-9821Xa16/PC-9821Ra20/PC-9821Ra333)
 	- "MICON ERROR" at POST (generic HW fault, PCI?);
 
-    List of per-game TODO:
-    - win211: EGC drawing issue (byte wide writes?)
-
-    Notes:
-    - To deprotect BASIC modules set 0xcd7 in ram to 0
-
 ===================================================================================================
 
     This series features a huge number of models released between 1982 and 1997. They
