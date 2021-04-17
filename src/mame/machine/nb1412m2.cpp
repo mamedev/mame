@@ -179,7 +179,7 @@ void nb1412m2_device::device_reset()
 	m_const90 = 0x18; // fixes coin sample if inserted at first title screen
 	m_dac_current_address = m_dac_start_address = 0;
 	m_timer_rate = 2;
-	m_dac_frequency = m_timer_rate * 1296;
+	m_dac_frequency = m_timer_rate * 1296; // TODO: This frequency was guesswork from the pitch of the sound
 	m_timer_reg = false;
 	m_dac_playback = false;
 	m_dac_timer->adjust(attotime::never);
@@ -332,6 +332,7 @@ void nb1412m2_device::dac_timer_w(uint8_t data)
 {
 	// TODO: Argo is unknown
 	m_timer_rate = ((data & 0x30) >> 4) + 1;
+	// TODO: This frequency was guesswork from the pitch of the sound
 	m_dac_frequency = m_timer_rate * 1296;
 }
 
