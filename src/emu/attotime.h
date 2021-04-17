@@ -187,13 +187,13 @@ public:
 		assert(hz > 0);
 		return (m_subseconds >> 62) * hz + mulu_64x64_hi(m_subseconds << 2, hz);
 	}
-	constexpr s64 as_ticks(double hz) const noexcept
+	s64 as_ticks(double hz) const noexcept
 	{
 		assert(hz > 0);
 		return as_ticks(s64(hz * 2e31)) >> 31;
 	}
-	constexpr s64 as_ticks(XTAL const &xtal) const noexcept { return as_ticks(xtal.dvalue()); }
-	constexpr s64 as_ticks(subseconds period) const noexcept { return *this / period; }
+	s64 as_ticks(XTAL const &xtal) const noexcept { return as_ticks(xtal.dvalue()); }
+	s64 as_ticks(subseconds period) const noexcept { return *this / period; }
 
 	// conversion to string
 	const char *as_string(int precision = 9, bool dividers = false) const noexcept;
