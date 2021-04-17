@@ -4638,7 +4638,9 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="animjv3">
+	<!-- boot OK -->
+	<!-- At some point it was possible to mount a -86 and a -26 to split BGMs and SFXs, regressed -->
+	<software name="animjv3" supported="partial">
 		<description>Animahjong V3</description>
 		<year>1993</year>
 		<publisher>ソニア (Sogna)</publisher>
@@ -4769,12 +4771,14 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="annivers">
+	<!-- randomly hangs with stuck note -->
+	<software name="annivers" supported="no">
 		<description>Anniversary - Memories of Summer Vacation - Natsuyasumi no Omoide</description>
 		<year>1993</year>
 		<publisher>ジャニス (Janis)</publisher>
 		<info name="alt_title" value="アニヴァーサリー ～夏休みの想い出～" />
 		<info name="release" value="19931203" />
+		<!-- GRPH key: cycles thru different video modes (Analog, B&W, Digital) -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
@@ -6752,7 +6756,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="bellsave">
+	<!-- boot OK -->
+	<software name="bellsave" supported="yes">
 		<description>Bell's Avenue</description>
 		<year>1993</year>
 		<publisher>ウェンディマガジン (Wendy Magazine)</publisher>
@@ -6950,8 +6955,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- boot OK, keyboard inputs are too fast -->
-	<software name="biblems2" supported="partial">
+	<!-- boot OK -->
+	<software name="biblems2" supported="yes">
 		<description>Bible Master 2 - The Chaos of Aglia</description>
 		<year>1994</year>
 		<publisher>グローディア (Glodia)</publisher>
@@ -7163,7 +7168,9 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="bishohzx">
+	<!-- boot OK -->
+	<!-- no title screen GFXs (btanb, displayed during intro) -->
+	<software name="bishohzx" supported="yes">
 		<description>Bishoujo Hunter ZX</description>
 		<year>1993</year>
 		<publisher>ボンびいボンボン！ (Bonbee Bonbon!)</publisher>
@@ -7275,7 +7282,9 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="bishotsu">
+	<!-- boot OK on RS class, on intro uses PCM1BIT and some text doesn't seem to be drawn? -->
+	<!-- black screen after Cocktail Soft logo on VM class (btanb?) -->
+	<software name="bishotsu" supported="partial">
 		<description>Bishoujo Tsuushin - Chat no Susume</description>
 		<year>1992</year>
 		<publisher>カクテル・ソフト (Cocktail Soft)</publisher>

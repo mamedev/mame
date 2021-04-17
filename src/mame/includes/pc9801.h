@@ -384,10 +384,9 @@ private:
 
 	struct{
 		uint8_t control;
-		uint8_t lx;
-		uint8_t ly;
-		uint8_t prev_lx;
-		uint8_t prev_ly;
+		uint8_t lx, ly;
+		uint8_t dx, dy;
+		uint8_t prev_dx, prev_dy;
 		uint8_t freq_reg;
 		uint8_t freq_index;
 	}m_mouse;

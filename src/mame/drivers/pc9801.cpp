@@ -58,22 +58,10 @@
 	TODO: (PC-9821Xa16/PC-9821Ra20/PC-9821Ra333)
 	- "MICON ERROR" at POST (generic HW fault, PCI?);
 
-    floppy issues TODO (* denotes actually fixed, to be moved into specific sheet)
-    * bellsave (disk swap? select B on config menu)
-    * biblems2 (at new game loading)
-
     List of per-game TODO:
-    - biblems2: initial GLODIA logo uses raster effects?
-    - bishohzx: Soft House logo uses pseudo-ROZ effect (?), no title screen graphics?
-    - bishotsu: beeps out before game (missing sound board?), doesn't draw some text?
-
     - win211: EGC drawing issue (byte wide writes?)
 
     Notes:
-    - annivers: GRPH (ALT) key cycles through different color schemes (normal, b&w, legacy);
-    - Animahjong V3 makes advantage of the possibility of installing 2 sound boards, where SFX and BGMs are played on separate chips.
-    - Apple Club 1/2 needs data disks to load properly;
-    - Beast Lord: needs a titan.fnt via MS-DOS
     - To deprotect BASIC modules set 0xcd7 in ram to 0
 
 ===================================================================================================
@@ -942,10 +930,12 @@ void pc9801_state::pc9801rs_a0_w(offs_t offset, uint8_t data)
 			case 0x0e: m_analog16.b[m_analog16.pal_entry] = data & 0xf; break;
 		}
 
-		m_palette->set_pen_color((m_analog16.pal_entry)+0x10,
-												pal4bit(m_analog16.r[m_analog16.pal_entry]),
-												pal4bit(m_analog16.g[m_analog16.pal_entry]),
-												pal4bit(m_analog16.b[m_analog16.pal_entry]));
+		m_palette->set_pen_color(
+			m_analog16.pal_entry + 0x10,
+			pal4bit(m_analog16.r[m_analog16.pal_entry]),
+			pal4bit(m_analog16.g[m_analog16.pal_entry]),
+			pal4bit(m_analog16.b[m_analog16.pal_entry])
+		);
 		return;
 	}
 
@@ -1133,10 +1123,12 @@ void pc9801_state::pc9821_a0_w(offs_t offset, uint8_t data)
 			case 0x0e: m_analog256.b[m_analog256.pal_entry] = data & 0xff; break;
 		}
 
-		m_palette->set_pen_color((m_analog256.pal_entry)+0x20,
-												m_analog256.r[m_analog256.pal_entry],
-												m_analog256.g[m_analog256.pal_entry],
-												m_analog256.b[m_analog256.pal_entry]);
+		m_palette->set_pen_color(
+			m_analog256.pal_entry + 0x20,
+			m_analog256.r[m_analog256.pal_entry],
+			m_analog256.g[m_analog256.pal_entry],
+			m_analog256.b[m_analog256.pal_entry]
+		);
 		return;
 	}
 
@@ -1909,8 +1901,8 @@ void pc9801_state::ppi_sys_portc_w(uint8_t data)
  *
  * Port C:
  *
- * x--- ---- HC Latch Mode (1=relative, 0=absolute)
- *           \- (1) fsmoon (0) prinmak2
+ * x--- ---- HC Latch Mode (1=read latch, 0=read delta)
+ *           \- on 0->1 transition reset delta
  * -x-- ---- SXY Axis select (1=Y 0=X)
  * --x- ---- SHL Read nibble select (1) upper (0) lower
  * ---x ---- INT # (1) disable (0) enable
@@ -1922,18 +1914,19 @@ void pc9801_state::ppi_sys_portc_w(uint8_t data)
 
 uint8_t pc9801_state::ppi_mouse_porta_r()
 {
-	uint8_t res;
-	uint8_t isporthi;
-	const char *const mousenames[] = { "MOUSE_X", "MOUSE_Y" };
+	uint8_t res = ioport("MOUSE_B")->read() & 0xf0;
+	const uint8_t isporthi = ((m_mouse.control & 0x20) >> 5)*4;
 
-	res = ioport("MOUSE_B")->read() & 0xf0;
-	isporthi = ((m_mouse.control & 0x20) >> 5)*4;
-
-	if((m_mouse.control & 0x80) == 0)
-		res |= ioport(mousenames[(m_mouse.control & 0x40) >> 6])->read() >> (isporthi) & 0xf;
+	if ((m_mouse.control & 0x80) == 0)
+	{
+		if (m_mouse.control & 0x40)
+			res |= (m_mouse.dy >> isporthi) & 0xf;
+		else
+			res |= (m_mouse.dx >> isporthi) & 0xf;
+	}
 	else
 	{
-		if(m_mouse.control & 0x40)
+		if (m_mouse.control & 0x40)
 			res |= (m_mouse.ly >> isporthi) & 0xf;
 		else
 			res |= (m_mouse.lx >> isporthi) & 0xf;
@@ -1955,14 +1948,24 @@ void pc9801_state::ppi_mouse_portb_w(uint8_t data)
 
 void pc9801_state::ppi_mouse_portc_w(uint8_t data)
 {
-	if((m_mouse.control & 0x80) == 0 && data & 0x80)
+	// fsmoon:   0x00 -> 0x80 -> 0xa0 -> 0xc0 -> 0xf0
+	//           (read latch as relative)
+	// prinmak2: 0x00 -> 0x20 -> 0x40 -> 0x60 -> 0x60
+	//           (keeps reading "delta" but never reset it, absolute mode)
+	// biblems2: 0x0f -> 0x2f -> 0x4f -> 0x6f -> 0xef
+	//           (latches a delta reset then reads delta diff, relative mode)
+
+	const u8 mouse_x = ioport("MOUSE_X")->read();
+	const u8 mouse_y = ioport("MOUSE_Y")->read();
+	m_mouse.dx = (mouse_x - m_mouse.prev_dx) & 0xff;
+	m_mouse.dy = (mouse_y - m_mouse.prev_dy) & 0xff;
+
+	if ((m_mouse.control & 0x80) == 0 && data & 0x80)
 	{
-		const uint8_t dx = ioport("MOUSE_X")->read();
-		const uint8_t dy = ioport("MOUSE_Y")->read();
-		m_mouse.lx = (dx - m_mouse.prev_lx) & 0xff;
-		m_mouse.ly = (dy - m_mouse.prev_ly) & 0xff;
-		m_mouse.prev_lx = dx;
-		m_mouse.prev_ly = dy;
+		m_mouse.lx = m_mouse.dx & 0xff;
+		m_mouse.ly = m_mouse.dy & 0xff;
+		m_mouse.prev_dx = mouse_x;
+		m_mouse.prev_dy = mouse_y;
 	}
 
 	m_mouse.control = data;
@@ -2121,7 +2124,7 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 	m_mouse.control = 0xff;
 	m_mouse.freq_reg = 0;
 	m_mouse.freq_index = 0;
-	m_mouse.lx = m_mouse.ly = m_mouse.prev_lx = m_mouse.prev_ly = 0;
+	m_mouse.lx = m_mouse.ly = m_mouse.prev_dx = m_mouse.prev_dy = m_mouse.dx = m_mouse.dy = 0;
 	m_dma_autoinc[0] = m_dma_autoinc[1] = m_dma_autoinc[2] = m_dma_autoinc[3] = 0;
 	memset(&m_egc, 0, sizeof(m_egc));
 }
