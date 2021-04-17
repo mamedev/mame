@@ -501,7 +501,7 @@ public:
 		return double(seconds()) * hz + frac().as_ticks(hz);
 	}
 	constexpr s64 as_ticks(XTAL const &xtal) const noexcept { return as_ticks(xtal.dvalue()); }
-	constexpr s64 as_ticks(subseconds period) const noexcept { return *this / period; }
+	s64 as_ticks(subseconds period) const noexcept { return *this / period; }
 
 	// conversion to subseconds
 	constexpr subseconds as_subseconds() const noexcept
@@ -528,13 +528,13 @@ public:
 	friend constexpr attotime operator-(attotime const &left, attotime const &right) noexcept;
 
 	// functions for multiplication of attotime by an integral factor
-	template<typename T> constexpr std::enable_if_t<std::is_integral<T>::value, attotime> &operator*=(T factor) noexcept;
-	template<typename T> friend constexpr std::enable_if_t<std::is_integral<T>::value, attotime> operator*(attotime const &left, T factor) noexcept;
+	template<typename T> std::enable_if_t<std::is_integral<T>::value, attotime> &operator*=(T factor) noexcept;
+	template<typename T> friend std::enable_if_t<std::is_integral<T>::value, attotime> operator*(attotime const &left, T factor) noexcept;
 	template<typename T> friend constexpr std::enable_if_t<std::is_integral<T>::value, attotime> operator*(T factor, attotime const &right) noexcept;
 
 	// functions for division of attotime by an integral factor
 	template<typename T> constexpr std::enable_if_t<std::is_integral<T>::value, attotime> &operator/=(T factor) noexcept;
-	template<typename T> friend constexpr std::enable_if_t<std::is_integral<T>::value, attotime> operator/(attotime const &left, T factor) noexcept;
+	template<typename T> friend std::enable_if_t<std::is_integral<T>::value, attotime> operator/(attotime const &left, T factor) noexcept;
 
 	// functions for division of attotime by a subseconds value
 	constexpr s64 operator/=(subseconds factor) noexcept;
@@ -630,7 +630,7 @@ inline constexpr attotime &attotime::operator-=(const attotime &right) noexcept
 
 // functions for multiplication of attotime by an integral factor
 template<typename T>
-inline constexpr std::enable_if_t<std::is_integral<T>::value, attotime> operator*(attotime const &left, T factor) noexcept
+inline std::enable_if_t<std::is_integral<T>::value, attotime> operator*(attotime const &left, T factor) noexcept
 {
 	// check for never
 	if (UNEXPECTED(left.is_never()))
@@ -665,7 +665,7 @@ inline constexpr std::enable_if_t<std::is_integral<T>::value, attotime> operator
 }
 
 template<typename T>
-inline constexpr std::enable_if_t<std::is_integral<T>::value, attotime> &attotime::operator*=(T factor) noexcept
+inline std::enable_if_t<std::is_integral<T>::value, attotime> &attotime::operator*=(T factor) noexcept
 {
 	// check for never
 	if (UNEXPECTED(is_never()))
@@ -695,7 +695,7 @@ inline constexpr std::enable_if_t<std::is_integral<T>::value, attotime> &attotim
 
 // functions for division of attotime by an integral factor
 template<typename T>
-inline constexpr std::enable_if_t<std::is_integral<T>::value, attotime> operator/(const attotime &left, T factor) noexcept
+inline std::enable_if_t<std::is_integral<T>::value, attotime> operator/(const attotime &left, T factor) noexcept
 {
 	// check for never
 	if (UNEXPECTED(left.is_never()))
