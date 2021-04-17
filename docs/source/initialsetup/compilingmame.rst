@@ -248,8 +248,9 @@ Compilation is exactly as described above in All Platforms.
 Apple macOS
 -----------
 
-You'll need a few prerequisites to get started. Make sure you're on macOS 10.14
-Mavericks or later. You will need SDL2 2.0.4 or later for macOS.
+You’ll need a few prerequisites to get started. Make sure you’re on OS X 10.14
+Mojave or later for Intel Macs or macOS 11.0 Big Sur for Apple Silicon. You will
+need SDL2 2.0.4 or later for Intel or SDL2 2.0.14 on Apple Silicon.
 
 * Install **Xcode** from the Mac App Store
 * Launch **Xcode**. It will download a few additional prerequisites. Let this run through before proceeding.
@@ -260,7 +261,7 @@ Next you'll need to get SDL2 installed.
 
 * Go to `this site <http://libsdl.org/download-2.0.php>`_ and download the *macOS* .dmg file
 * If the .dmg doesn't auto-open, open it
-* Click 'Macintosh HD' (or whatever your Mac's hard disk is named) in the left pane of a **Finder** window, then open the **Library** folder and drag the **SDL2.framework** folder from the SDL disk image into the **Frameworks** folder
+* Click 'Macintosh HD' (or whatever your Mac's hard disk is named) in the left pane of a **Finder** window, then open the **Library** folder and drag the **SDL2.framework** folder from the SDL disk image into the **Frameworks** folder. You will have to authenticate with your user password.
 
 Lastly to begin compiling, use Terminal to navigate to where you have the MAME
 source tree (*cd* command) and follow the normal compilation instructions from
