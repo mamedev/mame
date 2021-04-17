@@ -290,9 +290,9 @@ void nb1412m2_device::timer_w(uint8_t data)
 		logerror("nb1412m2: timer_w with data == %02x\n",data);
 
 	// The DAC frequency and timer clock are linked.
-	// When changes the DAC clock, Sound driver set wait loop count ($C010)
-	// in the range of 2 to 4 in order to keep the tempo of BGM even if changed clock.
-	m_timer->adjust(attotime::from_hz((clock()) / (256 * 35) * m_timer_rate));
+	// When the DAC clock changes, sound driver sets wait loop count ($C010)
+	// in the range of 2 to 4 in order to keep the tempo of BGM even if clock changed.
+	m_timer->adjust(attotime::from_hz(double(clock()) / (256 * 35) * m_timer_rate));
 }
 
 void nb1412m2_device::timer_ack_w(uint8_t data)
@@ -319,7 +319,7 @@ void nb1412m2_device::dac_control_w(uint8_t data)
 {
 	if (data == 0)
 	{
-		// Mighty Guy is use this to stop psycho gun sound.
+		// Mighty Guy is uses this to stop psycho gun sound.
 		m_dac_playback = false;
 	}
 }
@@ -330,7 +330,7 @@ void nb1412m2_device::dac_timer_w(uint8_t data)
 {
 	// TODO: Algorithm is unknown
 	m_timer_rate = ((data & 0x30) >> 4) + 1;
-	m_dac_frequency = m_timer_rate * (clock()) / (256 * 12);
+	m_dac_frequency = double(clock()) / (256 * 12) * m_timer_rate;
 }
 
 // controls music tempo
