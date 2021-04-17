@@ -89,93 +89,11 @@ typedef named_delegate<void ()> save_prepost_delegate;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class save_registered_item;
+class save_zip_state;
+class load_zip_state;
 class zlib_streamer;
 class ram_state;
 class rewinder;
-
-
-// ======================> save_zip_state
-
-// this class manages the creation of a ZIP file containing a JSON with most of
-// the save data, plus various binary files containing larger chunks of data
-class save_zip_state
-{
-	// intenral constants
-	static constexpr u32 JSON_EXPAND_CHUNK = 1024 * 1024;
-	static constexpr u32 JSON_EXPAND_THRESH = 1024;
-
-public:
-	// the size threshold in bytes above which we will write an external file
-	static constexpr u32 JSON_EXTERNAL_BINARY_THRESHOLD = 16 * 1024;
-
-	// construction
-	save_zip_state();
-
-	// simpler getters
-	char const *json_string() { m_json[m_json_offset] = 0; return &m_json[0]; }
-	int json_length() const { return m_json_offset; }
-
-	// append a character to the JSON stream
-	save_zip_state &json_append(char ch) { 	m_json[m_json_offset++] = ch; return *this; }
-
-	// append an end-of-line sequence to the JSON stream
-	save_zip_state &json_append_eol() { return json_append(13).json_append(10); }
-
-	// additional JSON output helpers
-	save_zip_state &json_append(char const *buffer);
-	save_zip_state &json_append_indent(int count);
-	save_zip_state &json_append_name(char const *name);
-	save_zip_state &json_append_signed(int64_t value);
-	save_zip_state &json_append_unsigned(uint64_t value);
-	save_zip_state &json_append_float(double value);
-
-	// stage an item to be output as raw data
-	char const *add_data_file(char const *proposed_name, save_registered_item &item, uintptr_t base);
-
-	// commit the results to the given file
-	bool commit(emu_file &output);
-
-private:
-	// check the reserve; if we're getting close, expand out one more chunk
-	void json_check_reserve()
-	{
-		if (m_json_reserved - m_json_offset < JSON_EXPAND_THRESH)
-		{
-			m_json_reserved += JSON_EXPAND_CHUNK;
-			m_json.resize(m_json_reserved);
-		}
-	}
-
-	void create_end_of_central_directory(std::vector<u8> &header, u32 central_dir_entries, u64 central_dir_offset, u32 central_dir_size);
-	void create_zip_file_header(std::vector<u8> &local, std::vector<u8> &central, char const *filename, u64 local_offset);
-	void create_zip_file_footer(std::vector<u8> &local, std::vector<u8> &central, u32 filesize, u32 compressed, u32 crc);
-	bool write_data_recursive(zlib_streamer &zlib, save_registered_item &item, uintptr_t base);
-
-	// file_entry represents a single raw data file that will be written
-	struct file_entry
-	{
-		file_entry(char const *name, save_registered_item &item, uintptr_t base) :
-			m_item(item),
-			m_name(name),
-			m_base(base) { }
-
-		save_registered_item &m_item;
-		std::string m_name;
-		uintptr_t m_base;
-		std::vector<u8> m_central_directory;
-	};
-
-	// internal state
-	std::list<file_entry> m_file_list;
-	std::vector<char> m_json;
-	util::crc32_creator m_file_crc_accum;
-	u32 m_file_size_accum;
-	u16 m_archive_date;
-	u16 m_archive_time;
-	u32 m_json_reserved;
-	u32 m_json_offset;
-};
 
 
 // ======================> save_registered_item
@@ -247,16 +165,21 @@ public:
 	void save_json(save_zip_state &output, char const *nameprefix = "", int indent = 0, bool inline_form = false, uintptr_t objbase = 0);
 
 	// restore this item from a JSON stream
-	void restore_json(std::istringstream &input, uintptr_t objbase = 0);
+	void restore_json(load_zip_state &input, char const *nameprefix = "", bool parseonly = false, uintptr_t objbase = 0);
 
 	// read/write helpers
-	uint64_t read_int_unsigned(uintptr_t objbase, int size);
-	int64_t read_int_signed(uintptr_t objbase, int size);
-	double read_float(uintptr_t objbase, int size);
-	void write_int(uintptr_t objbase, int size, uint64_t data);
-	void write_float(uintptr_t objbase, int size, double data);
+	bool read_bool(uintptr_t objbase) const { return *reinterpret_cast<bool const *>(objbase); }
+	uint64_t read_int_unsigned(uintptr_t objbase, int size) const;
+	int64_t read_int_signed(uintptr_t objbase, int size) const;
+	double read_float(uintptr_t objbase, int size) const;
+	void write_bool(uintptr_t objbase, bool data) const { *reinterpret_cast<bool *>(objbase) = data; }
+	void write_int(uintptr_t objbase, int size, uint64_t data) const;
+	void write_float(uintptr_t objbase, int size, double data) const;
 
 private:
+	// parse out an external file spec from the JSON
+	bool parse_external_data(load_zip_state &input, save_registered_item &baseitem, char const *localname, bool parseonly, uintptr_t objbase);
+
 	// internal state
     std::list<save_registered_item> m_items; // list of embedded items
     uintptr_t m_ptr_offset;                  // pointer or offset
