@@ -178,10 +178,9 @@ void nb1412m2_device::device_reset()
 	m_rom_op = 0;
 	m_const90 = 0x18; // fixes coin sample if inserted at first title screen
 	m_dac_current_address = m_dac_start_address = 0;
-	m_timer_rate = 2;
-	m_dac_frequency = m_timer_rate * 1296; // TODO: This frequency was guesswork from the pitch of the sound
 	m_timer_reg = false;
 	m_dac_playback = false;
+	dac_timer_w(0xd0);
 	m_dac_timer->adjust(attotime::never);
 }
 
@@ -293,8 +292,7 @@ void nb1412m2_device::timer_w(uint8_t data)
 	// The DAC frequency and timer clock are linked.
 	// When changes the DAC clock, Sound driver set wait loop count ($C010)
 	// in the range of 2 to 4 in order to keep the tempo of BGM even if changed clock.
-	// This value verified with BGM tempo of PCB.
-	m_timer->adjust(attotime::from_hz(448 * m_timer_rate));
+	m_timer->adjust(attotime::from_hz((clock()) / (256 * 35) * m_timer_rate));
 }
 
 void nb1412m2_device::timer_ack_w(uint8_t data)
@@ -330,10 +328,9 @@ void nb1412m2_device::dac_control_w(uint8_t data)
 // 0xd0 - 0xe0 - 0xf0 are the settings used
 void nb1412m2_device::dac_timer_w(uint8_t data)
 {
-	// TODO: Argo is unknown
+	// TODO: Algorithm is unknown
 	m_timer_rate = ((data & 0x30) >> 4) + 1;
-	// TODO: This frequency was guesswork from the pitch of the sound
-	m_dac_frequency = m_timer_rate * 1296;
+	m_dac_frequency = m_timer_rate * (clock()) / (256 * 12);
 }
 
 // controls music tempo
