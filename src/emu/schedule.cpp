@@ -373,7 +373,7 @@ timer_instance &timer_instance::remove()
 void timer_instance::dump() const
 {
 	persistent_timer *persistent = m_callback->persistent();
-	printf("%p: %s exp=%15s start=%15s ptr=%p param=%lld/%lld/%lld",
+	printf("%p: %s exp=%15s start=%15s ptr=%p param=%llu/%llu/%llu",
 		this,
 		(m_callback->persistent() != nullptr) ? "P" : "T",
 		m_expire.as_string(PRECISION),
@@ -607,7 +607,7 @@ device_scheduler::~device_scheduler()
 		printf("%12.2f compute_perfect_interleave\n", m_compute_perfect_interleave / seconds);
 		printf("%12.2f rebuild_execute_list\n", m_rebuild_execute_list / seconds);
 		printf("%12.2f add_scheduling_quantum\n", m_add_scheduling_quantum / seconds);
-		printf("%12.2f instance_alloc (%lld full)\n", m_instance_alloc / seconds, m_instance_alloc_full);
+		printf("%12.2f instance_alloc (%llu full)\n", m_instance_alloc / seconds, m_instance_alloc_full);
 		u64 total_insert = m_instance_insert_head + m_instance_insert_tail + m_instance_insert_middle;
 		printf("%12.2f instance_insert:\n", total_insert / seconds);
 		printf("%12.2f    head (%.2f%%)\n", m_instance_insert_head / seconds, (100.0 * m_instance_insert_head) / total_insert);
