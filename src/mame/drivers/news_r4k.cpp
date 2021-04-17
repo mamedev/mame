@@ -101,9 +101,6 @@
 #include "debugger.h"
 #include "logmacro.h"
 
-// Uncomment to use "accurate" freerun_timer (too slow??)
-// #define USE_ACCURATE_FREERUN
-
 class news_r4k_state : public driver_device
 {
 public:
@@ -238,10 +235,11 @@ protected:
     uint32_t m_inten[6] = {0, 0, 0, 0, 0, 0};
     uint32_t m_intst[6] = {0, 0, 0, 0, 0, 0};
 
-    // Freerun timer
+    // Freerun timer (1us period)
+    // NetBSD source code corroborates the period (https://github.com/NetBSD/src/blob/229cf3aa2cda57ba5f0c244a75ae83090e59c716/sys/arch/newsmips/newsmips/news5000.c#L259)
     emu_timer* m_freerun_timer;
     uint32_t freerun_timer_val;
-    const int FREERUN_FREQUENCY = 1000000; // one tick per us, see comments in freerun function
+    const int FREERUN_FREQUENCY = 1000000;
     TIMER_CALLBACK_MEMBER(freerun_clock);
     uint32_t freerun_r(offs_t offset);
     void freerun_w(offs_t offset, uint32_t data);
@@ -367,7 +365,11 @@ void news_r4k_state::nws5000x(machine_config &config) { machine_common(config); 
  */
 void news_r4k_state::cpu_map(address_map &map)
 {
-    map.unmap_value_high();
+    // Unmapping to high causes the MROM to wait a huge amount of time in between
+    // printing serial characters - what is weird is that manually setting the unmapped
+    // reads to return zero while unmapping everything high doesn't fix this issue, so
+    // there must be a side effect caused by unmapping high somewhere.
+    map.unmap_value_low();
 
     // NEWS firmware
     map(0x1fc00000, 0x1fc3ffff).rom().region("mrom", 0);  // Monitor ROM
@@ -669,14 +671,7 @@ void news_r4k_state::apbus_cmd_w(offs_t offset, uint32_t data)
  */
 uint32_t news_r4k_state::freerun_r(offs_t offset)
 {
-    // With an unscientific method, I calculated the timer value to increment roughly once per us
-    // NetBSD source code seems to corroborate this (https://github.com/NetBSD/src/blob/229cf3aa2cda57ba5f0c244a75ae83090e59c716/sys/arch/newsmips/newsmips/news5000.c#L259)
-    // The timer callback seemed to be too slow (although this is likely a sign that there is something wrong with how this is handled)
-#ifdef USE_ACCURATE_FREERUN
     return freerun_timer_val;
-#else
-    return freerun_timer_val << 10;
-#endif
 }
 
 /*
