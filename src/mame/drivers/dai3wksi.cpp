@@ -2,37 +2,33 @@
 // copyright-holders:Hau, Derrick Renaud
 /*
 
--Galaxy Force
--Run Away
 --------------------------
 Dai 3 Wakusei
 (c)1979 Sun Electronics
 
-SIV-01-B
+PCB: SIV-01-B
 TVG_13.6     [8e8b40b1]
 TVG_14.7     [d48cbabe]
 TVG_15.8     [cf44bd60]
 TVG_16.9     [ae723f56]
 --------------------------
 
--Warp 1
-SIV-01-C
+Warp 1
+PCB: SIV-01-C, Taito logo
 
-Dumped by Chack'n
-01/04/2009
+Z80 @ 2.5MHz
+1KB SRAM (2*MB8114)
+16KB(nibbles) DRAM (4*UPD416C)
+5*SN76477, dai3wksi has 6
+--------------------------
 
-Written by Hau
-02/18/2009
-12/14/2010
-
-Discrete by Andy
-11/11/2009
-
-Bellybuttons by Osso & hap
-04/16/2021
+Galaxy Force?
+Run Away?
+--------------------------
 
 TODO:
-- Get rid of those big lookup tables, I see no proms on the PCB so it's a color overlay?
+- Get rid of those big lookup tables, I see no proms on the PCB so it's hardcoded
+  logic somehow, or a color overlay?
   Note: warp1 colors more or less match the ones of dai3wksi according to flyers
 - Two player games are automatically displayed in cocktail mode.
   Is this by design (a cocktail only romset)?
@@ -90,7 +86,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<samples_device> m_samples;
+	optional_device<samples_device> m_samples;
 	optional_device<sn76477_device> m_ic77;
 	optional_device<sn76477_device> m_ic78;
 	optional_device<sn76477_device> m_ic79;
@@ -198,7 +194,7 @@ u32 dai3wksi_state::screen_update_color(screen_device &screen, bitmap_rgb32 &bit
 				color = vr_prom1[value];
 		}
 
-		for (int i = 0; i <= 3; i++)
+		for (int i = 0; i < 4; i++)
 		{
 			rgb_t pen = (data & (1 << i)) ? m_palette->pen_color(color) : rgb_t::black();
 
@@ -222,7 +218,7 @@ u32 dai3wksi_state::screen_update_bw(screen_device &screen, bitmap_rgb32 &bitmap
 		u8 y = offs >> 6;
 		u8 data = m_videoram[offs];
 
-		for (int i = 0; i <= 3; i++)
+		for (int i = 0; i < 4; i++)
 		{
 			rgb_t pen = (data & (1 << i)) ? rgb_t::white() : rgb_t::black();
 
@@ -244,6 +240,8 @@ u32 dai3wksi_state::screen_update_bw(screen_device &screen, bitmap_rgb32 &bitmap
  *
  *************************************/
 
+#if (USE_SAMPLES)
+
 #define SAMPLE_SOUND1       0
 #define SAMPLE_SOUND2       1
 #define SAMPLE_SOUND3_1     2
@@ -260,8 +258,6 @@ u32 dai3wksi_state::screen_update_bw(screen_device &screen, bitmap_rgb32 &bitmap
 #define CHANNEL_SOUND5      4
 #define CHANNEL_SOUND6      5
 
-
-#if (USE_SAMPLES)
 void dai3wksi_state::audio_1_w(u8 data)
 {
 	u8 rising_bits = data & ~m_audio_data[0];
@@ -341,7 +337,7 @@ static const char *const dai3wksi_sample_names[] =
 
 void dai3wksi_state::audio_1_w(u8 data)
 {
-	machine().sound().system_enable(data & 0x80);
+	machine().sound().system_mute(!BIT(data, 7));
 
 	m_ic79->enable_w((~data >> 5) & 0x01);        // invader movement enable
 	m_ic79->envelope_1_w((~data >> 2) & 0x01);    // invader movement envelope control
@@ -403,7 +399,7 @@ static INPUT_PORTS_START( dai3wksi )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
-	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) // hold down at boot for service mode
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_DIPNAME( 0x10, 0x00, "DIPSW #7" )                      PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -489,7 +485,7 @@ void dai3wksi_state::dai3wksi(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_size(256, 256);
-	screen.set_visarea(4, 251, 8, 247);
+	screen.set_visarea(0, 255, 8, 247);
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(dai3wksi_state::screen_update_color));
 
@@ -659,7 +655,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, dai3wksi, 0,     dai3wksi, dai3wksi, dai3wksi_state, empty_init, ROT270, "Sun Electronics", "Dai 3 Wakusei (Japan)",   MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, dai3wksi, 0,     dai3wksi, dai3wksi, dai3wksi_state, empty_init, ROT270, "Sun Electronics", "Dai 3 Wakusei (Japan)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1979, warp1,    0,     dai3wksi, warp1,    dai3wksi_state, empty_init, ROT90,  "Sun Electronics", "Warp-1 (Japan)",          MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, warp1bl,  warp1, warp1bl,  warp1bl,  dai3wksi_state, empty_init, ROT270, "bootleg",         "Warp-1 (Japan, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, warp1,    0,     dai3wksi, warp1,    dai3wksi_state, empty_init, ROT90,  "Taito",   "Warp 1",           MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, warp1bl,  warp1, warp1bl,  warp1bl,  dai3wksi_state, empty_init, ROT270, "bootleg", "Warp 1 (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
