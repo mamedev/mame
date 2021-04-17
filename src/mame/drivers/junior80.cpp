@@ -133,7 +133,6 @@ Status: Just a closet skeleton
 #include "machine/z80sio.h"
 #include "machine/z80pio.h"
 //#include "bus/rs232/rs232.h"
-#include "machine/wd_fdc.h"
 
 class junior80_state : public driver_device
 {

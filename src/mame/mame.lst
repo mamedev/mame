@@ -13167,6 +13167,10 @@ elf2                            //
 @source:elwro800.cpp
 elwro800                        //
 
+@source:elzet80.cpp
+elzet80k                        //
+elzet80p                        //
+
 @source:emax.cpp
 emax                            //
 emax2                           //
