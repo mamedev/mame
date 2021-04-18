@@ -35913,6 +35913,9 @@ mc50mk2                         //
 cm32l                           //
 mt32                            //
 
+@source:roland_pr100.cpp
+pr100                           //
+
 @source:roland_r8.cpp
 r8                              //
 r8m                             //

@@ -3436,6 +3436,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/roland_jx8p.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_mc50.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_mt32.cpp",
+	MAME_DIR .. "src/mame/drivers/roland_pr100.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_r8.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_ra30.cpp",
 	MAME_DIR .. "src/mame/drivers/roland_s10.cpp",
@@ -3460,6 +3461,8 @@ files {
 	MAME_DIR .. "src/mame/machine/mb62h195.h",
 	MAME_DIR .. "src/mame/machine/mb63h149.cpp",
 	MAME_DIR .. "src/mame/machine/mb63h149.h",
+	MAME_DIR .. "src/mame/machine/mb87013.cpp",
+	MAME_DIR .. "src/mame/machine/mb87013.h",
 	MAME_DIR .. "src/mame/machine/pg200.cpp",
 	MAME_DIR .. "src/mame/machine/pg200.h",
 }

@@ -858,6 +858,7 @@ roland_jx3p.cpp
 roland_jx8p.cpp
 roland_mc50.cpp
 roland_mt32.cpp
+roland_pr100.cpp
 roland_r8.cpp
 roland_ra30.cpp
 roland_s10.cpp
