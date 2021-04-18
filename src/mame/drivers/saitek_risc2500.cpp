@@ -190,7 +190,7 @@ SED1520_UPDATE_CB(risc2500_state::screen_update_cb)
 void risc2500_state::install_bootrom(bool enable)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	program.unmap_readwrite(0, std::max(m_rom.bytes(), m_ram->size()) - 1);
+	program.unmap_readwrite(0, std::max(m_rom.bytes(), size_t(m_ram->size()) - 1));
 
 	if (enable)
 		program.install_rom(0, m_rom.bytes() - 1, m_rom);
