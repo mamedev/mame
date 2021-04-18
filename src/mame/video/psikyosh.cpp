@@ -240,13 +240,13 @@ void psikyosh_state::draw_bglayer(u8 const layer, bitmap_rgb32 &bitmap, const re
 		// apply flip screen
 		if (FLIPSCREEN(FLIPSCREEN_X)) // horizontal flip
 		{
-			scrollx = screen_width() - scrollx;
+			scrollx = 176 - scrollx;
 			incx = -1;
 		}
 
 		if (FLIPSCREEN(FLIPSCREEN_Y)) // vertical flip
 		{
-			scrolly = screen_height() - scrolly;
+			scrolly = 272 - scrolly;
 			incy = -1;
 		}
 
@@ -362,9 +362,9 @@ void psikyosh_state::draw_bglayerscroll(u8 const layer, bitmap_rgb32 &bitmap, co
 
 				// apply flip screen
 				if (FLIPSCREEN(FLIPSCREEN_X)) // horizontal flip
-					scrollx = screen_width() - scrollx;
+					scrollx = 176 - scrollx;
 				if (FLIPSCREEN(FLIPSCREEN_Y)) // vertical flip
-					dy = screen_height() - dy;
+					dy = 272 - dy;
 
 				u16 const tilemap_scanline = (dy + 0x400) & (height - 1);
 
