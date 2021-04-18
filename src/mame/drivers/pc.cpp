@@ -73,6 +73,7 @@ public:
 	void mbc16lt(machine_config &config);
 	void modernxt(machine_config &config);
 	void earthst(machine_config &config);
+	void vpcii(machine_config &config);	
 
 	void init_bondwell();
 
@@ -2166,6 +2167,38 @@ ROM_START( earthst )
 	ROM_LOAD("earthstation.bin", 0x8000, 0x8000, CRC(a56d3d6d) SHA1(98b17579b15e4da69054ab971ce6cebe06d05c51))
 ROM_END
 
+
+/*********************************************************** Victor VPC II ***
+
+Some of the information found online is contradictory, especially when it comes to 
+distinguish between the VPC II, VPC IIc and VPC IIe models.
+The computer was originally shipped with a Hercules/CGA card and a monochrome monitor.
+It's possible that the "c" and "e" denote CGA and EGA color monitors respectively.
+
+Form factor: desktop
+CPU: 8086 at 4.77 or 7.16MHz
+RAM: depending on the mainboard version, the RAM can be 64KB-256KB
+     or up to 640KB
+Video: CGA/Hercules or EGA
+On board: ser, par, Bus mouse (c model)
+Mass storage: 1 or 2 Floppy 5,25" 360KB, optional 15MB, 20MB or 30MB HD 
+
+*****************************************************************************/
+void pc_state::vpcii(machine_config &config)
+{
+	pccga(config);
+	
+	i8086_cpu_device &maincpu(I8086(config.replace(), "maincpu", XTAL(14'318'181)/3)); // 4.77 MHz, Crystal needs to be verified; other examples ran at 7.16MHz
+	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc16_map);
+	maincpu.set_addrmap(AS_IO, &pc_state::pc16_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
+}
+
+ROM_START( vpcii ) // The BIOS was dumped the "MESS" way using DOS DEBUG
+	ROM_REGION16_LE(0x10000, "bios", 0)
+	ROM_LOAD("victor_vpcii_bios.bin", 0xc000, 0x4000, CRC(6a214121) SHA1(5426ce641bd7dc03e8189b0a4736e0d70232335b))
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -2220,6 +2253,7 @@ COMP( 1987, to16,           ibm5150, 0,      pccga,          pccga,    pc_state,
 COMP( 1985, alphatp10,      ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Triumph-Adler",                   "Alphatronic P10",       0 )
 COMP( 1985, alphatp50,      ibm5150, 0,      alphatp50,      pccga,    pc_state, empty_init,    "Triumph-Adler",                   "Alphatronic P50",       0 )
 COMP( 198?, hstrtpls,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Vendex",                          "HeadStart Plus",        MACHINE_NOT_WORKING )
+COMP( 1987, vpcii,          ibm5150, 0,      vpcii,          pccga,    pc_state, empty_init,    "Victor",                          "VPC II",                MACHINE_NOT_WORKING )
 COMP( 1988, laser_turbo_xt, ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "VTech",                           "Laser Turbo XT",        0 )
 COMP( 1989, laser_xt3,      ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "VTech",                           "Laser XT/3",            0 )
 COMP( 1987, zdsupers,       ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "SuperSport",            0 )
