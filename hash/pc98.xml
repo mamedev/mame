@@ -26192,15 +26192,17 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="kingdung">
+	<!-- boot OK -->
+	<software name="kingdung" supported="yes"	>
 		<description>King's Dungeon - The Story of Heroes</description>
 		<year>1992</year>
 		<publisher>ソフトプラン (Soft Plan)</publisher>
 		<info name="alt_title" value="キングスダンジョン" />
 		<info name="release" value="19921217" />
+		<!-- has end game save files -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
-				<rom name="kingdung.fdi" size="1265664" crc="b7f4f600" sha1="7bd2ac05e849fa884734b77aca5661382ee5009f" offset="0" />
+				<rom name="kingdung.fdi" size="1265664" crc="b7f4f600" sha1="7bd2ac05e849fa884734b77aca5661382ee5009f" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -35034,6 +35036,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<info name="alt_title" value="ポリスノーツ" />
 		<info name="release" value="19940729" />
 		<!-- TODO: describe install instructions (known to be annoying) -->
+		<!-- TODO: why it has mixed interfaces? Do we even need the User Disk? -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk"/>
 			<dataarea name="flop" size="1265664">

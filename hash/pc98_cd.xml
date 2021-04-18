@@ -3473,6 +3473,7 @@ license:CC0
 	</software>
 
 	<!-- Can randomly lock up on prolonged sessions (1+ hours) -->
+	<!-- Most likely down to -86 misfired irq (stuck note) -->
 	<software name="pnauts" supported="partial">
 		<!--
 		Origin: redump.org

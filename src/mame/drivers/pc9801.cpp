@@ -27,14 +27,14 @@
 
     TODO (PC-9801RS):
     - several unemulated extra f/f features;
-    - keyboard shift doesn't seem to disable properly;
+    - keyboard shift doesn't seem to disable properly (fixed by now?);
+	- Several games hangs with stuck note by misfired/not catched up -26 / -86 irq;
     - clean-up duplicate code;
 
     TODO (PC-9821):
     - fix CPU for some clones;
     - "cache error"
     - undumped IDE ROM, kludged to work;
-    - CD-Rom SW compatibility is hit or miss;
 
     TODO (PC-9821AS)
     - IPL ROM banking contradicts greatly from the other machines;
