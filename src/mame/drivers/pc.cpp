@@ -72,6 +72,7 @@ public:
 	void alphatp50(machine_config &config);
 	void mbc16lt(machine_config &config);
 	void modernxt(machine_config &config);
+	void earthst(machine_config &config);
 
 	void init_bondwell();
 
@@ -2117,6 +2118,54 @@ ROM_START( mononuxt2 ) // constant beep but boots, keyboard not working
 	ROM_LOAD( "nuxt_128k image_0.9.8_hybrid.bin", 0x00000, 0x20000, CRC(ca22cc53) SHA1(57e04285ca7920afe38366c90d6f0359b398367b))
 ROM_END
 
+/**************************************************** Alloy EarthStation-I ***
+
+This is an x86-compatible, ARCnet based thin client built into an AT-style keyboard. 
+It needs to get a V40 CPU and an emulation of the Arcnet part.
+
+Form factor: keyboard
+CPU: NEC V40
+RAM: 256K, 512K, 768KB
+Video: NCR7280 based, Hercules, CGA, MCGA (an enhanced CGA mode, not the PS/2 one)
+Connectors: LPT1, COM1, Arcnet (BNC)
+Mass storage: No internal mass storage possible, boot via Arcnet or a project like BootLPT/86
+
+*****************************************************************************/
+
+void pc_state::earthst(machine_config &config)
+{
+	/* basic machine hardware */
+	v20_device &maincpu(V20(config, "maincpu", 8000000));
+	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc8_map);
+	maincpu.set_addrmap(AS_IO, &pc_state::pc8_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
+
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb"));
+	mb.set_cputag(m_maincpu);
+	mb.int_callback().set_inputline(m_maincpu, 0);
+	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	mb.kbdclk_callback().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	mb.kbddata_callback().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
+
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "com", false);
+	
+	/* keyboard */
+	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270));
+	kbd.out_clock_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_clock_w));
+	kbd.out_data_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_data_w));
+
+	/* internal ram */
+	RAM(config, RAM_TAG).set_default_size("768K").set_extra_options("512K");
+}
+
+ROM_START( earthst )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("earthstation.bin", 0x8000, 0x8000, CRC(a56d3d6d) SHA1(98b17579b15e4da69054ab971ce6cebe06d05c51))
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -2129,6 +2178,7 @@ COMP( 1991, poisk2,         ibm5150, 0,      poisk2,         pccga,    pc_state,
 COMP( 1990, mc1702,         ibm5150, 0,      eagle1600,      pccga,    pc_state, empty_init,    "<unknown>",                       "Elektronika MC-1702",   MACHINE_NOT_WORKING )
 COMP( 198?, olystar20f,     ibm5150, 0,      olystar20f,     pccga,    pc_state, empty_init,    "AEG Olympia",                     "Olystar 20F",           MACHINE_NOT_WORKING )
 COMP( 198?, olytext30,      ibm5150, 0,      olytext30,      pccga,    pc_state, empty_init,    "AEG Olympia",                     "Olytext 30",            MACHINE_NOT_WORKING )
+COMP( 1987, earthst,        ibm5150, 0,      earthst,        pccga,    pc_state, empty_init,    "Alloy",                           "EarthStation-I",        MACHINE_NOT_WORKING )
 COMP( 1987, ataripc1,       ibm5150, 0,      ataripc1,       pccga,    pc_state, empty_init,    "Atari",                           "PC1",                   0 )
 COMP( 1988, ataripc3,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Atari",                           "PC3",                   0 )
 COMP( 1985, bw230,          ibm5150, 0,      bondwell,       bondwell, pc_state, init_bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)",  0 )
