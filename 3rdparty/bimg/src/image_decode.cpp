@@ -110,8 +110,8 @@ namespace bimg
 				case 1:
 				case 2:
 				case 4:
-					format    = bimg::TextureFormat::R8;
-					palette   = false;
+					palette   = LCT_PALETTE == state.info_raw.colortype;
+					format    = palette ? bimg::TextureFormat::RGBA8 : bimg::TextureFormat::R8;
 					supported = true;
 					break;
 
@@ -215,7 +215,10 @@ namespace bimg
 				const uint8_t* copyData = data;
 
 				TextureFormat::Enum dstFormat = format;
-				if (1 == state.info_raw.bitdepth
+				if (palette) {
+					copyData = NULL;
+				}
+				else if (1 == state.info_raw.bitdepth
 				||  2 == state.info_raw.bitdepth
 				||  4 == state.info_raw.bitdepth)
 				{
@@ -226,10 +229,6 @@ namespace bimg
 				{
 					dstFormat = bimg::TextureFormat::RGBA16;
 					copyData  = NULL;
-				}
-				else if (palette)
-				{
-					copyData = NULL;
 				}
 
 				output = imageAlloc(_allocator
@@ -243,7 +242,48 @@ namespace bimg
 					, copyData
 					);
 
-				if (1 == state.info_raw.bitdepth)
+				if (palette)
+				{
+					if (1 == state.info_raw.bitdepth) {
+						for (uint32_t ii = 0, num = width*height/8; ii < num; ++ii)
+						{
+							uint8_t* dst = (uint8_t*)output->m_data + ii*32;
+							bx::memCopy(dst,      state.info_raw.palette + ( (data[ii]>>7)&0x1)*4, 4);
+							bx::memCopy(dst +  4, state.info_raw.palette + ( (data[ii]>>6)&0x1)*4, 4);
+							bx::memCopy(dst +  8, state.info_raw.palette + ( (data[ii]>>5)&0x1)*4, 4);
+							bx::memCopy(dst + 12, state.info_raw.palette + ( (data[ii]>>4)&0x1)*4, 4);
+							bx::memCopy(dst + 16, state.info_raw.palette + ( (data[ii]>>3)&0x1)*4, 4);
+							bx::memCopy(dst + 20, state.info_raw.palette + ( (data[ii]>>2)&0x1)*4, 4);
+							bx::memCopy(dst + 24, state.info_raw.palette + ( (data[ii]>>1)&0x1)*4, 4);
+							bx::memCopy(dst + 28, state.info_raw.palette + (  data[ii]    &0x1)*4, 4);
+						}
+					}
+					else if (2 == state.info_raw.bitdepth) {
+						for (uint32_t ii = 0, num = width*height/4; ii < num; ++ii)
+						{
+							uint8_t* dst = (uint8_t*)output->m_data + ii*16;
+							bx::memCopy(dst,      state.info_raw.palette + ( (data[ii]>>6)&0x3)*4, 4);
+							bx::memCopy(dst +  4, state.info_raw.palette + ( (data[ii]>>4)&0x3)*4, 4);
+							bx::memCopy(dst +  8, state.info_raw.palette + ( (data[ii]>>2)&0x3)*4, 4);
+							bx::memCopy(dst + 12, state.info_raw.palette + (  data[ii]    &0x3)*4, 4);
+						}
+					}
+					else if (4 == state.info_raw.bitdepth) {
+						for (uint32_t ii = 0, num = width*height/2; ii < num; ++ii)
+						{
+							uint8_t* dst = (uint8_t*)output->m_data + ii*8;
+							bx::memCopy(dst,      state.info_raw.palette + ( (data[ii]>>4)&0xf)*4, 4);
+							bx::memCopy(dst +  4, state.info_raw.palette + (  data[ii]    &0xf)*4, 4);
+						}
+					}
+					else {
+						for (uint32_t ii = 0, num = width*height; ii < num; ++ii)
+						{
+							bx::memCopy( (uint8_t*)output->m_data + ii*4, state.info_raw.palette + data[ii]*4, 4);
+						}
+					}
+				}
+				else if (1 == state.info_raw.bitdepth)
 				{
 					for (uint32_t ii = 0, num = width*height/8; ii < num; ++ii)
 					{
@@ -303,13 +343,6 @@ namespace bimg
 						dst[1] = src[1];
 						dst[2] = src[2];
 						dst[3] = UINT16_MAX;
-					}
-				}
-				else if (palette)
-				{
-					for (uint32_t ii = 0, num = width*height; ii < num; ++ii)
-					{
-						bx::memCopy( (uint8_t*)output->m_data + ii*4, state.info_raw.palette + data[ii]*4, 4);
 					}
 				}
 
