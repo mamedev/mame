@@ -73,7 +73,8 @@ public:
 	void mbc16lt(machine_config &config);
 	void modernxt(machine_config &config);
 	void earthst(machine_config &config);
-	void vpcii(machine_config &config);	
+	void vpcii(machine_config &config);
+	void fraking(machine_config &config);
 
 	void init_bondwell();
 
@@ -2121,7 +2122,7 @@ ROM_END
 
 /**************************************************** Alloy EarthStation-I ***
 
-This is an x86-compatible, ARCnet based thin client built into an AT-style keyboard. 
+This is an x86-compatible, ARCnet based thin client built into an AT-style keyboard.
 It needs to get a V40 CPU and an emulation of the Arcnet part.
 
 Form factor: keyboard
@@ -2152,7 +2153,7 @@ void pc_state::earthst(machine_config &config)
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false); // FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "lpt", false);
 	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "com", false);
-	
+
 	/* keyboard */
 	pc_kbdc_device &kbd(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270));
 	kbd.out_clock_cb().set("mb", FUNC(ibm5160_mb_device::keyboard_clock_w));
@@ -2170,7 +2171,7 @@ ROM_END
 
 /*********************************************************** Victor VPC II ***
 
-Some of the information found online is contradictory, especially when it comes to 
+Some of the information found online is contradictory, especially when it comes to
 distinguish between the VPC II, VPC IIc and VPC IIe models.
 The computer was originally shipped with a Hercules/CGA card and a monochrome monitor.
 It's possible that the "c" and "e" denote CGA and EGA color monitors respectively.
@@ -2181,13 +2182,13 @@ RAM: depending on the mainboard version, the RAM can be 64KB-256KB
      or up to 640KB
 Video: CGA/Hercules or EGA
 On board: ser, par, Bus mouse (c model)
-Mass storage: 1 or 2 Floppy 5,25" 360KB, optional 15MB, 20MB or 30MB HD 
+Mass storage: 1 or 2 Floppy 5,25" 360KB, optional 15MB, 20MB or 30MB HD
 
 *****************************************************************************/
 void pc_state::vpcii(machine_config &config)
 {
 	pccga(config);
-	
+
 	i8086_cpu_device &maincpu(I8086(config.replace(), "maincpu", XTAL(14'318'181)/3)); // 4.77 MHz, Crystal needs to be verified; other examples ran at 7.16MHz
 	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc16_map);
 	maincpu.set_addrmap(AS_IO, &pc_state::pc16_io);
@@ -2197,6 +2198,51 @@ void pc_state::vpcii(machine_config &config)
 ROM_START( vpcii ) // The BIOS was dumped the "MESS" way using DOS DEBUG
 	ROM_REGION16_LE(0x10000, "bios", 0)
 	ROM_LOAD("victor_vpcii_bios.bin", 0xc000, 0x4000, CRC(6a214121) SHA1(5426ce641bd7dc03e8189b0a4736e0d70232335b))
+ROM_END
+
+
+/************************************************************** Frael King ***
+
+Form factor: Desktop
+CPU: NEC V20 @ 8MHz
+RAM: 256KB (King 1) or 512KB (King 2), upgradeable to 768KB
+Video: CGA (on board)
+Keyboard: 84 keys with 10 function keys
+On board: par, cass, RF out, beeper
+Mass storage: none (King 1), 720KB floppy (King 2)
+One ISA slot, riser card with 3 slots, one occupied by the floppy controller (King 2)
+
+The original HD capable FD controller needs to be emulated in order to boot the course
+disks for the IT class that the King was used for in Italy.
+The King 1 used ROM Basic, with audio cassette as mass storage.
+If you bought the King 1, you could send the computer in to the factory to have it upgraded
+to King 2 specs, they would upgrade the RAM and add the floppy drive and controller.
+No HD capable 8bit ISA Floppy controller present in MAME works with the King, so the floppy
+crive is set to DD for the time being.
+
+*****************************************************************************/
+
+void pc_state::fraking(machine_config &config)
+{
+	pccga(config);
+
+	v20_device &maincpu(V20(config.replace(), "maincpu", 8000000));
+	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc8_map);
+	maincpu.set_addrmap(AS_IO, &pc_state::pc8_io);
+	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
+
+	subdevice<isa8_slot_device>("isa2")->set_option_machine_config("fdc_xt", cfg_single_720K);
+	subdevice<isa8_slot_device>("isa3")->set_default_option(nullptr);
+	subdevice<isa8_slot_device>("isa5")->set_default_option(nullptr);
+	subdevice<ram_device>(RAM_TAG)->set_default_size("768K");
+}
+
+ROM_START( fraking ) // boots but doesn't fall back to ROM BASIC
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_SYSTEM_BIOS(0, "3.40", "3.40")
+	ROMX_LOAD("king3-40.rom", 0x00000, 0x20000, CRC(7d64186c) SHA1(6e3c0d836903bda8c2512fde3bb2ba432705ce27), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "3.42", "3.42")
+	ROMX_LOAD("king3-42.rom", 0x00000, 0x20000, CRC(7c040fda) SHA1(c5aaa795d773d41c086a80bc43ee7200f53c3a0c), ROM_BIOS(1))
 ROM_END
 
 /***************************************************************************
@@ -2226,6 +2272,7 @@ COMP( 1983, eagle1600,      ibm5150, 0,      eagle1600,      pccga,    pc_state,
 COMP( 1983, eaglespirit,    ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Eagle",                           "Eagle PC Spirit",       MACHINE_NOT_WORKING )
 COMP( 198?, eaglepc2,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Eagle",                           "PC-2",                  MACHINE_NOT_WORKING )
 COMP( 1985, eppc,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson Portable PC",  MACHINE_NOT_WORKING )
+COMP( 1989, fraking,        ibm5150, 0,      modernxt,       pccga,    pc_state, empty_init,    "Frael",                           "King",                  MACHINE_NOT_WORKING )
 COMP( 198?, hyo88t,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Hyosung",                         "Topstar 88T",           MACHINE_NOT_WORKING )
 COMP( 1983, ibm5550,        ibm5150, 0,      ibm5550,        pccga,    pc_state, empty_init,    "International Business Machines", "5550",                  MACHINE_NOT_WORKING )
 COMP( 1984, ittxtra,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "ITT Information Systems",         "ITT XTRA",              MACHINE_NOT_WORKING )
