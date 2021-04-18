@@ -35605,6 +35605,9 @@ rk7007                          //
 rk700716                        //
 spektr01                        //
 
+@source:radionic.cpp
+radionic                        // Komtek 1
+
 @source:raiden.cpp
 raiden                          // (c) 1990 Seibu Kaihatsu
 raidena                         // (c) 1990 Seibu Kaihatsu
@@ -41129,7 +41132,6 @@ eg3003                          //
 ht108064                        // Hradstechnika Szvetkezet HT-1080Z/64
 ht1080z                         // Hradstechnika Szvetkezet HT-1080Z
 ht1080z2                        // Hradstechnika Szvetkezet HT-1080Z Series II
-radionic                        // Radionic
 sys80                           // EACA System 80
 sys80p                          // EACA System 80
 trs80                           // TRS-80 Model I - Level I BASIC

@@ -6,7 +6,7 @@
 TRS80 memory map
 
 0000-2fff ROM                            R   D0-D7
-3000-37ff ROM on Model III               R   D0-D7
+3000-37ff ROM on EACA models             R   D0-D7
           unused on Model I
 37de      UART status                    R/W D0-D7
 37df      UART data                      R/W D0-D7
@@ -152,25 +152,11 @@ ht1080z    works
            verify clock for AY-3-8910
            investigate expansion-box
 
-radionic:  works
-           floppy not working (@6C0, DRQ never gets set)
-           add colour
-           expansion-box?
-           uart
-
-
 *******************************************************************************************************/
 
 #include "emu.h"
 #include "includes/trs80.h"
-
-#include "machine/com8116.h"
 #include "sound/ay8910.h"
-#include "screen.h"
-#include "speaker.h"
-
-#include "formats/trs80_dsk.h"
-#include "formats/trs_cas.h"
 
 
 void trs80_state::trs80_mem(address_map &map)
@@ -231,17 +217,6 @@ void trs80_state::ht1080z_io(address_map &map)
 	sys80_io(map);
 	map(0x1e, 0x1e).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0x1f, 0x1f).w("ay1", FUNC(ay8910_device::address_w));
-}
-
-void trs80_state::radionic_mem(address_map &map)
-{
-	m1_mem(map);
-	// Optional external RS232 module with 8251
-	//map(0x3400, 0x3401).mirror(0xfe).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
-	// Internal colour controls (need details)
-	//map(0x3500, 0x35ff).w(FUNC(trs80_state::colour_w));
-	// Internal interface to external slots
-	map(0x3600, 0x3603).mirror(0xfc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
 /**************************************************************************
@@ -416,29 +391,12 @@ static const gfx_layout ht1080z_charlayout =
 	8*16           /* every char takes 16 bytes */
 };
 
-static const gfx_layout radionic_charlayout =
-{
-	8, 16,          /* 8 x 16 characters */
-	256,            /* 256 characters */
-	1,          /* 1 bits per pixel */
-	{ 0 },          /* no bitplanes */
-	/* x offsets */
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	/* y offsets */
-	{  0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 2048*8, 2049*8, 2050*8, 2051*8, 2052*8, 2053*8, 2054*8, 2055*8 },
-	8*8        /* every char takes 16 bytes */
-};
-
 static GFXDECODE_START(gfx_trs80)
 	GFXDECODE_ENTRY( "chargen", 0, trs80_charlayout, 0, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START(gfx_ht1080z)
 	GFXDECODE_ENTRY( "chargen", 0, ht1080z_charlayout, 0, 1 )
-GFXDECODE_END
-
-static GFXDECODE_START(gfx_radionic)
-	GFXDECODE_ENTRY( "chargen", 0, radionic_charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -561,28 +519,6 @@ void trs80_state::ht1080z(machine_config &config)
 	//ay1.port_b_read_callback(FUNC(trs80_state::...);
 }
 
-void trs80_state::radionic(machine_config &config)
-{
-	model1(config);
-	m_maincpu->set_clock(12_MHz_XTAL / 6); // or 3.579MHz / 2 (selectable?)
-	// Komtek I "User Friendly Manual" calls for "Z80 running at 1.97 MHz." This likely refers to an alternate NTSC version
-	// whose master clock was approximately 11.8005 MHz (6 times ~1.966 MHz and 750 times 15.734 kHz). Though the schematics
-	// provide the main XTAL frequency as 12 MHz, that they also include a 3.579 MHz XTAL suggests this possibility.
-	m_maincpu->set_periodic_int(FUNC(trs80_state::nmi_line_pulse), attotime::from_hz(12_MHz_XTAL / 12 / 16384));
-	m_maincpu->set_addrmap(AS_PROGRAM, &trs80_state::radionic_mem);
-
-	subdevice<screen_device>("screen")->set_raw(12_MHz_XTAL, 768, 0, 512, 312, 0, 256);
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(trs80_state::screen_update_radionic));
-	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_radionic);
-
-	// Interface to external circuits
-	I8255(config, m_ppi);
-	//m_ppi->in_pc_callback().set(FUNC(pulsar_state::ppi_pc_r));      // Sensing from external and printer status
-	//m_ppi->out_pa_callback().set(FUNC(pulsar_state::ppi_pa_w));    // Data for external plugin printer module
-	//m_ppi->out_pb_callback().set(FUNC(pulsar_state::ppi_pb_w));    // Control data to external
-	//m_ppi->out_pc_callback().set(FUNC(pulsar_state::ppi_pc_w));    // Printer strobe
-}
-
 
 /***************************************************************************
 
@@ -628,18 +564,6 @@ ROM_START(trs80l2)
 	ROM_LOAD("mcm6670p.z29",   0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7) )
 ROM_END
 
-
-ROM_START(radionic)
-	ROM_REGION(0x3800, "maincpu", 0)
-	ROM_LOAD("ep1.z37",        0x0000, 0x1000, CRC(e8908f44) SHA1(7a5a60c3afbeb6b8434737dd302332179a7fca59) )
-	ROM_LOAD("ep2.z36",        0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155) )
-	ROM_LOAD("ep3.z35",        0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369) )
-	ROM_LOAD("ep4.z34",        0x3000, 0x0800, CRC(70f90f26) SHA1(cbee70da04a3efac08e50b8e3a270262c2440120) )
-	ROM_CONTINUE(              0x3000, 0x0800)
-
-	ROM_REGION(0x1000, "chargen", 0)
-	ROM_LOAD("trschar.z58",    0x0000, 0x1000, CRC(02e767b6) SHA1(c431fcc6bd04ce2800ca8c36f6f8aeb2f91ce9f7) )
-ROM_END
 
 // From here are EACA-made clones
 
@@ -722,7 +646,6 @@ void trs80_state::init_trs80l2()
 //    YEAR  NAME         PARENT    COMPAT  MACHINE   INPUT    CLASS        INIT           COMPANY                        FULLNAME                           FLAGS
 COMP( 1977, trs80,       0,        0,       trs80,    trs80,   trs80_state, init_trs80,    "Tandy Radio Shack",           "TRS-80 Model I (Level I Basic)",  MACHINE_SUPPORTS_SAVE )
 COMP( 1978, trs80l2,     0,        0,       model1,   trs80l2, trs80_state, init_trs80l2,  "Tandy Radio Shack",           "TRS-80 Model I (Level II Basic)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1983, radionic,    trs80l2,  0,       radionic, trs80l2, trs80_state, init_trs80,    "Komtek",                      "Radionic",                        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, eg3003,      0,        trs80l2, sys80,    sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "Video Genie EG3003",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, sys80,       eg3003,   0,       sys80,    sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (60 Hz)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, sys80p,      eg3003,   0,       sys80p,   sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (50 Hz)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
