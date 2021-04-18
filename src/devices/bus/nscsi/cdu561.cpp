@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /*******************************************************************************
 
-    Skeleton device for Sony CDU561-52 CD-ROM drive.
+    Skeleton device for Sony CDU561-25 CD-ROM drive.
 
     PCB: MAIN 1-644-812-13
 
@@ -20,12 +20,13 @@
     - Sony CXD1186Q CD-ROM Decoder
     - Sony CXD1198AQ CD-ROM Subcode Decoder
     - Sony CXD2500BQ CD Digital Signal Processor
-    - Sony CXD2568M
     - Sony CXD8416Q
 
     Linear ICs:
     - Sony CXA1372AQ RF Signal Processing Servo Amplifier for CD Player
     - Sony CXA1571M RF Amplifier for CD Player
+    - Sony CXD2568M (apparently a RF amplifier, similar to CXA1821M but with
+      hold and AGC controls)
     - Toshiba TA8406P Dual Power Operational Amplifier (x3)
 
     XTALs:
@@ -76,6 +77,8 @@ ROM_START(cdu561_25)
 	ROMX_LOAD("apl1.9a_83fb.ic302", 0x00000, 0x20000, CRC(0efc50eb) SHA1(8bfd6ebc0863017914808e8282a5914cdc828f56), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "18f", "apl1.8F")
 	ROMX_LOAD("apl1.8f_d905.ic302", 0x00000, 0x20000, CRC(3ea92e48) SHA1(2f409fd59c5f09d22e00b39f4b0b57e16316090d), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "17w", "apl1.7w")
+	ROMX_LOAD("apl_1.7w.bin", 0x00000, 0x20000, CRC(12ba5843) SHA1(70aa550693020431ccbd374ff85e4de8809431df), ROM_BIOS(2))
 ROM_END
 
 const tiny_rom_entry *cdu561_25_device::device_rom_region() const
