@@ -104,6 +104,7 @@ void corona_state::machine_reset()
 {
 	saitek_stratos_state::machine_reset();
 
+	m_control2 = 0;
 	m_rombank.select(0);
 }
 

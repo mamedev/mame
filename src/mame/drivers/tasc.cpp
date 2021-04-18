@@ -47,7 +47,7 @@ TODO:
 #include "machine/smartboard.h"
 #include "machine/timer.h"
 #include "video/t6963c.h"
-#include "sound/spkrdev.h"
+#include "sound/dac.h"
 
 #include "speaker.h"
 
@@ -67,7 +67,7 @@ public:
 		m_mainram(*this, "mainram"),
 		m_lcd(*this, "lcd"),
 		m_smartboard(*this, "smartboard"),
-		m_speaker(*this, "speaker"),
+		m_dac(*this, "dac"),
 		m_disable_bootrom(*this, "disable_bootrom"),
 		m_inputs(*this, "IN.%u", 0U),
 		m_out_leds(*this, "pled%u", 0U)
@@ -87,7 +87,7 @@ private:
 	required_shared_ptr<u32> m_mainram;
 	required_device<lm24014h_device> m_lcd;
 	required_device<tasc_sb30_device> m_smartboard;
-	required_device<speaker_sound_device> m_speaker;
+	required_device<dac_byte_interface> m_dac;
 	required_device<timer_device> m_disable_bootrom;
 	required_ioport_array<4> m_inputs;
 	output_finder<2> m_out_leds;
@@ -96,14 +96,15 @@ private:
 	void nvram_map(address_map &map);
 
 	// I/O handlers
-	u32 p1000_r();
-	void p1000_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 input_r();
+	void control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	void install_bootrom(bool enable);
+	void disable_bootrom_next();
 	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
 	bool m_bootrom_enabled = false;
 
-	u32 m_mux = 0;
+	u32 m_control = 0;
 };
 
 void tasc_state::machine_start()
@@ -111,7 +112,7 @@ void tasc_state::machine_start()
 	m_out_leds.resolve();
 
 	save_item(NAME(m_bootrom_enabled));
-	save_item(NAME(m_mux));
+	save_item(NAME(m_control));
 }
 
 
@@ -119,6 +120,8 @@ void tasc_state::machine_start()
 /******************************************************************************
     I/O
 ******************************************************************************/
+
+// bootrom bankswitch
 
 void tasc_state::install_bootrom(bool enable)
 {
@@ -133,24 +136,34 @@ void tasc_state::install_bootrom(bool enable)
 	m_bootrom_enabled = enable;
 }
 
-u32 tasc_state::p1000_r()
+void tasc_state::disable_bootrom_next()
 {
 	// disconnect bootrom from the bus after next opcode
 	if (m_bootrom_enabled && !m_disable_bootrom->enabled() && !machine().side_effects_disabled())
 		m_disable_bootrom->adjust(m_maincpu->cycles_to_attotime(5));
+}
 
+
+// main I/O
+
+u32 tasc_state::input_r()
+{
+	disable_bootrom_next();
+
+	// read chessboard
 	u32 data = m_smartboard->read();
 
+	// read keypad
 	for (int i = 0; i < 4; i++)
 	{
-		if (BIT(m_mux, i))
+		if (BIT(m_control, i))
 			data |= (m_inputs[i]->read() << 24);
 	}
 
 	return data;
 }
 
-void tasc_state::p1000_w(offs_t offset, u32 data, u32 mem_mask)
+void tasc_state::control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -163,10 +176,10 @@ void tasc_state::p1000_w(offs_t offset, u32 data, u32 mem_mask)
 	{
 		m_out_leds[0] = BIT(data, 0);
 		m_out_leds[1] = BIT(data, 1);
-		m_speaker->level_w((data >> 2) & 3);
+		m_dac->write((data >> 2) & 3);
 	}
 
-	COMBINE_DATA(&m_mux);
+	COMBINE_DATA(&m_control);
 }
 
 
@@ -178,7 +191,7 @@ void tasc_state::p1000_w(offs_t offset, u32 data, u32 mem_mask)
 void tasc_state::main_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).ram().share("mainram");
-	map(0x01000000, 0x01000003).rw(FUNC(tasc_state::p1000_r), FUNC(tasc_state::p1000_w));
+	map(0x01000000, 0x01000003).rw(FUNC(tasc_state::input_r), FUNC(tasc_state::control_w));
 	map(0x02000000, 0x0203ffff).rom().region("maincpu", 0);
 	map(0x03000000, 0x0307ffff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask32(0x000000ff);
 }
@@ -236,19 +249,18 @@ void tasc_state::tasc(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	ADDRESS_MAP_BANK(config, "nvram_map").set_map(&tasc_state::nvram_map).set_options(ENDIANNESS_LITTLE, 8, 17);
 
-	LM24014H(config, m_lcd, 0);
-	m_lcd->set_fs(1); // font size 6x8
-
 	TASC_SB30(config, m_smartboard);
 	subdevice<sensorboard_device>("smartboard:board")->set_nvram_enable(true);
+
+	/* video hardware */
+	LM24014H(config, m_lcd, 0);
+	m_lcd->set_fs(1); // font size 6x8
 
 	config.set_default_layout(layout_tascr30);
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.75);
-	m_speaker->set_levels(4, speaker_levels);
+	SPEAKER(config, "speaker").front_center();
+	DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 

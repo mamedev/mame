@@ -118,6 +118,7 @@ void simultano_state::machine_start()
 void simultano_state::machine_reset()
 {
 	m_power = true;
+	m_control = 0;
 	m_rombank.select(0);
 }
 
