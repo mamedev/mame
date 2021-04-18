@@ -2245,6 +2245,18 @@ ROM_START( fraking ) // boots but doesn't fall back to ROM BASIC
 	ROMX_LOAD("king3-42.rom", 0x00000, 0x20000, CRC(7c040fda) SHA1(c5aaa795d773d41c086a80bc43ee7200f53c3a0c), ROM_BIOS(1))
 ROM_END
 
+
+/******************************************************* MY-COM MPU-9088-VF ***
+
+*****************************************************************************/
+
+ROM_START( mpu9088vf ) // From a motherboard marked MY-COM MPU-9088-VF SAN-MS94VO
+	ROM_REGION(0x10000, "bios", 0) // ROM BASIC doesn't load
+	ROM_LOAD( "27256-mpu-9088-vf_rom2.bin", 0x6000, 0x8000, CRC(e077c7c8) SHA1(f58f57f522b48f3aa4c381afb42e04795bcfbbad))
+	ROM_LOAD( "27128-mpu-9088-vf_rom1.bin", 0xc000, 0x4000, CRC(a211e539) SHA1(1a45627fb34e38f6e3485c1526ff1d9a645c8683))
+ROM_END
+
+
 /***************************************************************************
 
   Game driver(s)
@@ -2284,6 +2296,7 @@ COMP( 198?, kyoxt,          ibm5150, 0,      pccga,          pccga,    pc_state,
 COMP( 198?, ledgmodd,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Leading Edge Hardware Products, Inc.", "Model D",          MACHINE_NOT_WORKING )
 COMP( 198?, ledgmodm,       ibm5150, 0,      siemens,        pccga,    pc_state, empty_init,    "Leading Edge Hardware Products, Inc.", "Model M",          MACHINE_NOT_WORKING )
 COMP( 198?, mpx16,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Micromint",                       "MPX-16",                MACHINE_NOT_WORKING )
+COMP( 198?, mpu9088vf,      ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "MY-COM",                          "MPU-9088-VF",           MACHINE_NOT_WORKING )
 COMP( 1985, ncrpc4i,        ibm5150, 0,      ncrpc4i,        pccga,    pc_state, empty_init,    "NCR",                             "PC4i",                  MACHINE_NOT_WORKING )
 COMP( 198?, nixpc01,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Nixdorf Computer AG",             "8810/25 CPC - PC01",    MACHINE_NOT_WORKING )
 COMP( 198?, olivm15,        ibm5150, 0,      m15,            pccga,    pc_state, empty_init,    "Olivetti",                        "M15",                   0 )

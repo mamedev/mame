@@ -33556,6 +33556,7 @@ mononuxt2                       // monotech NuXT v2
 earthst                         // Alloy EarthStation-I
 vpcii                           // Victor VPC II
 fraking                         // Frael King
+mpu9088vf                       // MY-COM MPU-9088-VF SAN-MS94VO
 
 @source:pc100.cpp
 pc100                           //
