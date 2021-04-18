@@ -836,7 +836,7 @@ WRITE_LINE_MEMBER(apple2gs_state::ay3600_data_ready_w)
 		trans |= (special & 0x01) ? 0x0000 : 0x0200;    // caps lock is bit 9 (active low)
 
 		// hack in keypad equals because we can't find it in the IIe keymap (Sather doesn't show it in the matrix, but it's clearly on real platinum IIes)
-		if (m_lastchar == 0x146)
+		if (m_lastchar == 0x106)
 		{
 			m_transchar = '=';
 		}
@@ -2457,7 +2457,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 				{
 					ret |= 0x10;
 				}
-				else if ((m_lastchar >= 0x109 && m_lastchar <= 0x10a) || (m_lastchar == 0x146))
+				else if ((m_lastchar >= 0x109 && m_lastchar <= 0x10a) || (m_lastchar == 0x106))
 				{
 					ret |= 0x10;
 				}
