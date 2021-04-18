@@ -35,10 +35,13 @@
 enum save_error
 {
 	STATERR_NONE,
+	STATERR_MISMATCH_WARNING,
 	STATERR_NOT_FOUND,
-	STATERR_ILLEGAL_REGISTRATIONS,
-	STATERR_INVALID_HEADER,
+	STATERR_INVALID_FILE,
 	STATERR_READ_ERROR,
+	STATERR_MALFORMED_JSON,
+	STATERR_MISSING_FILE,
+	STATERR_INCOMPATIBLE_DATA,
 	STATERR_WRITE_ERROR,
 	STATERR_DISABLED
 };
@@ -455,6 +458,7 @@ public:
 	// disk file processing (external)
 	save_error save_file(emu_file &file);
 	save_error load_file(emu_file &file);
+	save_error compare_file(emu_file &file);
 
 private:
 	// state callback item

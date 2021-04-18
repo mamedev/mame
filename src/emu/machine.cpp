@@ -938,7 +938,9 @@ void running_machine::handle_saveload()
 			auto const filerr = file.open(m_saveload_pending_file);
 			if (filerr == osd_file::error::NONE)
 			{
+				osd_ticks_t start = osd_ticks();
 				const char *const opnamed = (m_saveload_schedule == saveload_schedule::LOAD) ? "loaded" : "saved";
+				osd_ticks_t end = osd_ticks();
 
 				// read/write the save state
 				save_error saverr = (m_saveload_schedule == saveload_schedule::LOAD) ? m_save.load_file(file) : m_save.save_file(file);
@@ -946,27 +948,39 @@ void running_machine::handle_saveload()
 				// handle the result
 				switch (saverr)
 				{
-				case STATERR_ILLEGAL_REGISTRATIONS:
-					popmessage("Error: Unable to %s state due to illegal registrations. See error.log for details.", opname);
-					break;
-
-				case STATERR_INVALID_HEADER:
-					popmessage("Error: Unable to %s state due to an invalid header. Make sure the save state is correct for this machine.", opname);
+				case STATERR_INVALID_FILE:
+					popmessage("Error: Unable to %s state due to an invalid file. Make sure the save state is correct for this machine.", opname);
 					break;
 
 				case STATERR_READ_ERROR:
 					popmessage("Error: Unable to %s state due to a read error (file is likely corrupt).", opname);
 					break;
 
+				case STATERR_MALFORMED_JSON:
+					popmessage("Error: Unable to %s state due to malformed JSON data (file is likely corrupt).", opname);
+					break;
+
+				case STATERR_MISSING_FILE:
+					popmessage("Error: Unable to %s state due to missing file (file is likely corrupt).", opname);
+					break;
+
+				case STATERR_INCOMPATIBLE_DATA:
+					popmessage("Error: Unable to %s state due to incompatible data (file is likely corrupt).", opname);
+					break;
+
 				case STATERR_WRITE_ERROR:
 					popmessage("Error: Unable to %s state due to a write error. Verify there is enough disk space.", opname);
 					break;
 
+				case STATERR_MISMATCH_WARNING:
 				case STATERR_NONE:
-					if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
+					if (saverr == STATERR_MISMATCH_WARNING)
+						popmessage("State was %sed successfully.\nWarning: Some missing/extra data was detected in the state; system may not behave 100%% correctly.", opnamed);
+					else if (!(m_system.flags & MACHINE_SUPPORTS_SAVE))
 						popmessage("State successfully %s.\nWarning: Save states are not officially supported for this machine.", opnamed);
 					else
 						popmessage("State successfully %s.", opnamed);
+					osd_printf_info("%s took %.3f seconds\n", opname, double(end - start) / double(osd_ticks_per_second()));
 					break;
 
 				default:
@@ -987,6 +1001,18 @@ void running_machine::handle_saveload()
 			{
 				popmessage("Error: Failed to open file for %s operation.", opname);
 			}
+		}
+
+		// for save, try reload
+		if (m_saveload_schedule == saveload_schedule::SAVE)
+		{
+			osd_printf_info("Comparing load of just-saved data....\n");
+			emu_file file(m_saveload_searchpath ? m_saveload_searchpath : "", OPEN_FLAG_READ);
+			auto const filerr = file.open(m_saveload_pending_file);
+			osd_ticks_t start = osd_ticks();
+			m_save.compare_file(file);
+			osd_ticks_t end = osd_ticks();
+			osd_printf_info("Compare took %.3f seconds\n", double(end - start) / double(osd_ticks_per_second()));
 		}
 	}
 

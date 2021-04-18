@@ -1252,7 +1252,7 @@ void lua_engine::initialize()
 			// FIXME: this needs to schedule loading from the buffer and return asynchronously somehow
 			// right now it's broken by anonymous timers, synchronize, etc.
 			save_error error = m.save().load_binary((u8 *)str.data(), str.size());
-			if (error == STATERR_NONE)
+			if (error == STATERR_NONE || error == STATERR_MISMATCH_WARNING)
 			{
 				return true;
 			}

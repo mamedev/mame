@@ -388,8 +388,8 @@ save_zip_state &save_zip_state::json_append_unsigned(uint64_t value)
 save_zip_state &save_zip_state::json_append_float(double value)
 {
 	json_check_reserve();
-	char buffer[20];
-	sprintf(buffer, "%g", value);
+	char buffer[32];
+	sprintf(buffer, "%1.17g", value);
 	return json_append(buffer);
 }
 
@@ -879,7 +879,16 @@ class load_zip_state
 {
 public:
 	// load_error is the exception we throw if anything bad happens
-	class load_error : public std::exception { };
+	class load_error : public std::exception
+	{
+	public:
+		load_error(save_error err) :
+			m_error(err) { }
+		save_error error() const { return m_error; }
+
+	private:
+		save_error m_error;
+	};
 
 	// construction
 	load_zip_state(emu_file &file);
@@ -926,11 +935,11 @@ public:
 
 	// report an error; this implicitly throws to exit
 	template<typename... Params>
-	void report_error(char const *format, Params &&... args)
+	void report_error(save_error type, char const *format, Params &&... args)
 	{
 		m_errors.append(string_format(format, std::forward<Params>(args)...));
 		m_errors += "\n";
-		throw load_error();
+		throw load_error(type);
 	}
 
 private:
@@ -1127,7 +1136,7 @@ save_error load_zip_state::init()
 
 	// if nothing found, it's an error
 	if (dir_entries == 0)
-		return STATERR_INVALID_HEADER;
+		return STATERR_INVALID_FILE;
 
 	// read the central directory
 	std::vector<u8> central(dir_size);
@@ -1141,13 +1150,13 @@ save_error load_zip_state::init()
 	{
 		// find the start of entry
 		if (offset + 46 >= dir_size)
-			return STATERR_INVALID_HEADER;
+			return STATERR_INVALID_FILE;
 		if (central[offset] != 0x50 && central[offset + 1] != 0x4b && central[offset + 2] != 0x01 && central[offset + 3] != 0x02)
-			return STATERR_INVALID_HEADER;
+			return STATERR_INVALID_FILE;
 
 		// only deflate is supported; anything else will be an error
 		if (central[offset + 10] != 8)
-			return STATERR_INVALID_HEADER;
+			return STATERR_INVALID_FILE;
 
 		// pull out all the interesting data
 		u32 compsize = central[offset + 20] | (central[offset + 21] << 8) | (central[offset + 22] << 16) | (central[offset + 23] << 24);
@@ -1229,27 +1238,27 @@ bool load_zip_state::read_data_recursive(zlib_read_streamer &zlib, save_register
 		if (flip)
 			switch (item.native_size())
 			{
-			case 2:
-			{
-				u16 *data = reinterpret_cast<u16 *>(base);
-				for (int index = 0; index < item.count(); index++)
-					data[index] = swapendian_int16(data[index]);
-				break;
-			}
-			case 4:
-			{
-				u32 *data = reinterpret_cast<u32 *>(base);
-				for (int index = 0; index < item.count(); index++)
-					data[index] = swapendian_int32(data[index]);
-				break;
-			}
-			case 8:
-			{
-				u64 *data = reinterpret_cast<u64 *>(base);
-				for (int index = 0; index < item.count(); index++)
-					data[index] = swapendian_int64(data[index]);
-				break;
-			}
+				case 2:
+				{
+					u16 *data = reinterpret_cast<u16 *>(base);
+					for (int index = 0; index < item.count(); index++)
+						data[index] = swapendian_int16(data[index]);
+					break;
+				}
+				case 4:
+				{
+					u32 *data = reinterpret_cast<u32 *>(base);
+					for (int index = 0; index < item.count(); index++)
+						data[index] = swapendian_int32(data[index]);
+					break;
+				}
+				case 8:
+				{
+					u64 *data = reinterpret_cast<u64 *>(base);
+					for (int index = 0; index < item.count(); index++)
+						data[index] = swapendian_int64(data[index]);
+					break;
+				}
 			}
 	}
 	return true;
@@ -1695,7 +1704,7 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 			else if (input.json_matches("false"))
 				value = false;
 			else
-				input.report_error("%s: Unknown boolean value", localname.c_str());
+				input.report_error(STATERR_MALFORMED_JSON, "%s: Unknown boolean value", localname.c_str());
 			if (mode == RESTORE_DATA)
 				write_bool(objbase, value);
 			else if (mode == COMPARE_DATA && read_bool(objbase) != value)
@@ -1711,9 +1720,9 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 			if (input.json_parse_number(dvalue))
 			{
 				if (mode == RESTORE_DATA && !write_int_signed(objbase, m_native_size, dvalue))
-					input.report_warning("%s: Value of out range: %g", localname.c_str(), dvalue);
+					input.report_warning("%s: Value of out range: %1.17g", localname.c_str(), dvalue);
 				else if (mode == COMPARE_DATA && read_int_signed(objbase, m_native_size) != int64_t(dvalue))
-					input.report_warning("%s: Compare failed: JSON says %I64d, data says %g", localname.c_str(), dvalue, read_int_signed(objbase, m_native_size));
+					input.report_warning("%s: Compare failed: JSON says %I64d, data says %1.17g", localname.c_str(), dvalue, read_int_signed(objbase, m_native_size));
 			}
 			else if (input.json_parse_int_string(ivalue))
 			{
@@ -1723,7 +1732,7 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 					input.report_warning("%s: Compare failed: JSON says %I64d, data says %I64d", localname.c_str(), ivalue, read_int_signed(objbase, m_native_size));
 			}
 			else
-				input.report_error("%s: Expected integer value", localname.c_str());
+				input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Expected integer value", localname.c_str());
 			break;
 		}
 
@@ -1735,9 +1744,9 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 			if (input.json_parse_number(dvalue))
 			{
 				if (mode == RESTORE_DATA && !write_int_unsigned(objbase, m_native_size, dvalue))
-					input.report_warning("%s: Value of out range: %g", localname.c_str(), dvalue);
+					input.report_warning("%s: Value of out range: %1.17g", localname.c_str(), dvalue);
 				else if (mode == COMPARE_DATA && read_int_unsigned(objbase, m_native_size) != uint64_t(dvalue))
-					input.report_warning("%s: Compare failed: JSON says %I64d, data says %g", localname.c_str(), dvalue, read_int_unsigned(objbase, m_native_size));
+					input.report_warning("%s: Compare failed: JSON says %I64d, data says %1.17g", localname.c_str(), dvalue, read_int_unsigned(objbase, m_native_size));
 			}
 			else if (input.json_parse_uint_string(ivalue))
 			{
@@ -1747,7 +1756,7 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 					input.report_warning("%s: Compare failed: JSON says %I64d, data says %I64d", localname.c_str(), ivalue, read_int_unsigned(objbase, m_native_size));
 			}
 			else
-				input.report_error("%s: Expected integer value", localname.c_str());
+				input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Expected integer value", localname.c_str());
 			break;
 		}
 
@@ -1756,11 +1765,11 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 		{
 			double value;
 			if (!input.json_parse_number(value))
-				input.report_error("%s: Expected number", localname.c_str());
+				input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Expected number", localname.c_str());
 			if (mode == RESTORE_DATA && !write_float(objbase, m_native_size, value))
-				input.report_warning("%s: Value of out range: %g", localname.c_str(), value);
+				input.report_warning("%s: Value of out range: %1.17g", localname.c_str(), value);
 			else if (mode == COMPARE_DATA && read_float(objbase, m_native_size) != value)
-				input.report_warning("%s: Compare failed: JSON says %g, data says %g", localname.c_str(), value, read_float(objbase, m_native_size));
+				input.report_warning("%s: Compare failed: JSON says %1.17g, data says %1.17g", localname.c_str(), value, read_float(objbase, m_native_size));
 			break;
 		}
 
@@ -1768,15 +1777,15 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 		case TYPE_CONTAINER:
 		case TYPE_STRUCT:
 			if (!input.json_matches('{'))
-				input.report_error("%s: Expected '{'", localname.c_str());
+				input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Expected '{'", localname.c_str());
 			if (!input.json_matches('}'))
 				while (1)
 				{
 					std::string name;
 					if (!input.json_parse_string(name) || name == "")
-						input.report_error("%s: Expected name within struct", localname.c_str());
+						input.report_error(STATERR_MALFORMED_JSON, "%s: Expected name within struct", localname.c_str());
 					if (!input.json_matches(':'))
-						input.report_error("%s: Expected ':'", localname.c_str());
+						input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ':'", localname.c_str());
 					save_registered_item *target = find(name.c_str());
 					if (target == nullptr)
 						input.report_warning("%s: Found extraneous item '%s'", localname.c_str(), name.c_str());
@@ -1784,7 +1793,7 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 					if (input.json_matches('}'))
 						break;
 					if (!input.json_matches(','))
-						input.report_error("%s: Expected ','", localname.c_str());
+						input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ','", localname.c_str());
 				}
 			break;
 
@@ -1794,11 +1803,11 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 			{
 				auto &item = m_items.front();
 				if (!input.json_matches('['))
-					input.report_error("%s: Expected '['", localname.c_str());
+					input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Expected '['", localname.c_str());
 				if (parse_external_data(input, *this, localname.c_str(), mode, objbase))
 				{
 					if (!input.json_matches(']'))
-						input.report_error("%s: Expected ']'", localname.c_str());
+						input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ']'", localname.c_str());
 				}
 				else
 				{
@@ -1811,7 +1820,7 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 							if (input.json_matches(']'))
 								break;
 							if (!input.json_matches(','))
-								input.report_error("%s: Expected ','", localname.c_str());
+								input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ','", localname.c_str());
 						}
 					if (rep != count())
 						input.report_warning("%s: Found %s array items than expected", localname.c_str(), (rep < count()) ? "fewer" : "more");
@@ -1845,9 +1854,9 @@ bool save_registered_item::parse_external_data(load_zip_state &input, save_regis
 	{
 		std::string name;
 		if (!input.json_parse_string(name) || name == "")
-			input.report_error("%s: Expected name within struct", localname);
+			input.report_error(STATERR_MALFORMED_JSON, "%s: Expected name within struct", localname);
 		if (!input.json_matches(':'))
-			input.report_error("%s: Expected ':'", localname);
+			input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ':'", localname);
 		valid = false;
 		if (name == "external_file" && parsed_filename == "" && input.json_parse_string(parsed_filename) && parsed_filename != "")
 			valid = true;
@@ -1867,7 +1876,7 @@ bool save_registered_item::parse_external_data(load_zip_state &input, save_regis
 		if (input.json_matches('}'))
 			break;
 		if (!input.json_matches(','))
-			input.report_error("%s: Expected ','", localname);
+			input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ','", localname);
 	}
 	if (!valid)
 	{
@@ -1879,11 +1888,11 @@ bool save_registered_item::parse_external_data(load_zip_state &input, save_regis
 	u64 offset;
 	u32 size;
 	if (!input.find_file(parsed_filename.c_str(), offset, size))
-		input.report_error("%s: Unable to find file '%s' in archive", localname, parsed_filename.c_str());
+		input.report_error(STATERR_MISSING_FILE, "%s: Unable to find file '%s' in archive", localname, parsed_filename.c_str());
 	if (parsed_unit != 1 && parsed_unit != 2 && parsed_unit != 4 && parsed_unit != 8)
-		input.report_error("%s: Invalid unit size for external file, expected 1, 2, 4, or 8", localname);
+		input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Invalid unit size for external file, expected 1, 2, 4, or 8", localname);
 	if (parsed_count == 0)
-		input.report_error("%s: Invalid count for external file", localname);
+		input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Invalid count for external file", localname);
 
 	// look for the innermost registered item
 	save_registered_item *inner = &baseitem.subitems().front();
@@ -1894,9 +1903,9 @@ bool save_registered_item::parse_external_data(load_zip_state &input, save_regis
 		inner = &inner->subitems().front();
 	}
 	if (!inner->is_int_or_float())
-		input.report_error("%s: External file specified, but not valid for this type", localname);
+		input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: External file specified, but not valid for this type", localname);
 	if (parsed_unit != inner->native_size())
-		input.report_error("%s: External file has mismatched unit size", localname);
+		input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: External file has mismatched unit size", localname);
 
 	// if parseonly, we're done
 	if (parseonly)
@@ -1906,7 +1915,7 @@ bool save_registered_item::parse_external_data(load_zip_state &input, save_regis
 	bool flip = (parsed_little_endian != native_little_endian);
 	zlib_read_streamer reader(input.file());
 	if (!reader.begin(offset) || !input.read_data_recursive(reader, *this, flip, size, objbase) || !reader.end())
-		input.report_error("%s: Error reading file '%s' in archive", localname, parsed_filename.c_str());
+		input.report_error(STATERR_READ_ERROR, "%s: Error reading file '%s' in archive", localname, parsed_filename.c_str());
 
 	return true;
 }
@@ -2218,19 +2227,57 @@ save_error save_manager::load_file(emu_file &file)
 		m_root_item.restore_json(state);
 		char const *warnings = state.warnings();
 		if (warnings != nullptr)
-			printf("WARNINGS during state load:\n%s", warnings);
+		{
+			osd_printf_warning("WARNINGS during state load:\n%s", warnings);
+			err = STATERR_MISMATCH_WARNING;
+		}
 	}
-	catch (load_zip_state::load_error &)
+	catch (load_zip_state::load_error &loaderr)
 	{
 		char const *errors = state.errors();
 		if (errors != nullptr)
-			printf("ERRORS during state load:\n%s", errors);
-		return STATERR_READ_ERROR;
+			osd_printf_error("ERRORS during state load:\n%s", errors);
+		return loaderr.error();
 	}
 
 	// call the post-load functions
 	dispatch_postload();
-	return STATERR_NONE;
+	return err;
+}
+
+
+//-------------------------------------------------
+//  compare_file - act as if we're loading the
+//  file, but just compare data instead
+//-------------------------------------------------
+
+save_error save_manager::compare_file(emu_file &file)
+{
+	// create the JSON and target all the output files
+	load_zip_state state(file);
+	save_error err = state.init();
+	if (err != STATERR_NONE)
+		return err;
+
+	// restore_json will throw on parse errors and the like
+	try
+	{
+		m_root_item.restore_json(state, "", save_registered_item::COMPARE_DATA);
+		char const *warnings = state.warnings();
+		if (warnings != nullptr)
+		{
+			osd_printf_warning("WARNINGS during state compare:\n%s", warnings);
+			err = STATERR_MISMATCH_WARNING;
+		}
+	}
+	catch (load_zip_state::load_error &loaderr)
+	{
+		char const *errors = state.errors();
+		if (errors != nullptr)
+			osd_printf_error("ERRORS during state compare:\n%s", errors);
+		return loaderr.error();
+	}
+	return err;
 }
 
 
@@ -2535,13 +2582,8 @@ void rewinder::report_error(save_error error, rewind_operation operation)
 	switch (error)
 	{
 	// internal saveload failures
-	case STATERR_ILLEGAL_REGISTRATIONS:
-		m_save.machine().logerror("Rewind error: Unable to %s state due to illegal registrations.", opname);
-		m_save.machine().popmessage("Rewind error occured. See error.log for details.");
-		break;
-
-	case STATERR_INVALID_HEADER:
-		m_save.machine().logerror("Rewind error: Unable to %s state due to an invalid header. "
+	case STATERR_INVALID_FILE:
+		m_save.machine().logerror("Rewind error: Unable to %s state due to an invalid file. "
 			"Make sure the save state is correct for this machine.\n", opname);
 		m_save.machine().popmessage("Rewind error occured. See error.log for details.");
 		break;
