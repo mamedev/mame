@@ -107,21 +107,21 @@ Not dumped (to our knowledge):
  TRS80 Katakana Character Generator
  TRS80 Small English Character Generator
  TRS80 Model III old version Character Generator
- TRS80 Model II bios and boot disk
 
 Not emulated:
  TRS80 Japanese kana/ascii switch and alternate keyboard
  TRS80 Model III/4 Hard drive, Graphics board, Alternate Character set
  Radionic has 16 colours with a byte at 350B controlling the operation. See manual.
 
-Virtual floppy disk formats are JV1, JV3, and DMK. JV3 is not emulated.
 
 ********************************************************************************************************
 
 To Do / Status:
 --------------
 
-For those machines that allow it, add cass2 as an image device and hook it up.
+- For those machines that allow it, add cass2 as an image device and hook it up.
+- Difficulty loading real tapes.
+- Writing to floppy is problematic; freezing/crashing are common issues.
 
 trs80:     works
 
@@ -142,12 +142,6 @@ radionic:  works
            expansion-box?
            uart
 
-
-General Issues:
-           Most machines have problems loading real tapes.
-           MAME will crash if you try to create a JV1 disk.
-           All known images are the JV1 format, therefore
-           the support for other formats has been removed.
 
 *******************************************************************************************************/
 
@@ -180,7 +174,7 @@ void trs80_state::trs80_io(address_map &map)
 
 void trs80_state::m1_mem(address_map &map)
 {
-	map(0x0000, 0x377f).rom(); // sys80,ht1080 needs up to 375F
+	map(0x0000, 0x37ff).rom();
 	map(0x37de, 0x37de).rw(FUNC(trs80_state::sys80_f9_r), FUNC(trs80_state::sys80_f8_w));
 	map(0x37df, 0x37df).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
 	map(0x37e0, 0x37e3).rw(FUNC(trs80_state::irq_status_r), FUNC(trs80_state::motor_w));
@@ -581,85 +575,108 @@ void trs80_state::radionic(machine_config &config)
 ***************************************************************************/
 
 ROM_START(trs80)
-	ROM_REGION(0x3800, "maincpu",0)
-	ROM_LOAD("level1.rom",   0x0000, 0x1000, CRC(70d06dff) SHA1(20d75478fbf42214381e05b14f57072f3970f765))
+	ROM_REGION(0x3800, "maincpu", ROMREGION_ERASEFF)
+	// These roms had many names due to multiple suppliers
+	// Memory   Location    Maker and type                Label
+	// 000-7FF  Z33         Intel 2716                    ROM-A
+	// 800-FFF  Z34         Intel 2716                    ROM-B
+	// 000-7FF  Z33         National Semiconductor 2316   MM2316_R/D
+	// 800-FFF  Z34         National Semiconductor 2316   MM2316_S/D
+	// 000-7FF  Z33         National Semiconductor 2316   M2316E_R/N
+	// 800-FFF  Z34         National Semiconductor 2316   M2316E_S/N
+	// 000-7FF  Z33         Motorola                      7807
+	// 800-FFF  Z34         Motorola                      7804
+	// 000-FFF  Z33         Motorola                      7809_BASIC I
+	ROM_LOAD("level1.rom",     0x0000, 0x1000, CRC(70d06dff) SHA1(20d75478fbf42214381e05b14f57072f3970f765))
 
-	ROM_REGION(0x0400, "chargen",0)
-	ROM_LOAD("trs80m1.chr",  0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_REGION(0x0400, "chargen", 0)
+	ROM_LOAD("mcm6670p.z29",   0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
 ROM_END
 
 
 ROM_START(trs80l2)
-	ROM_REGION(0x3800, "maincpu",0)
+	ROM_REGION(0x3800, "maincpu", ROMREGION_ERASEFF)
+	// There's no space for these roms on a Model 1 board, so an extra ROM board was created to hold them.
+	// This board plugs into either Z33 or Z34. Confusingly, the locations on this board are also Z numbers.
+	// The last version of the board only holds 2 roms - Z1 as 8K (ROM A/B), and Z2 as 4K (ROM C).
 	ROM_SYSTEM_BIOS(0, "level2", "Radio Shack Level II Basic")
-	ROMX_LOAD("trs80.z33",   0x0000, 0x1000, CRC(37c59db2) SHA1(e8f8f6a4460a6f6755873580be6ff70cebe14969), ROM_BIOS(0))
-	ROMX_LOAD("trs80.z34",   0x1000, 0x1000, CRC(05818718) SHA1(43c538ca77623af6417474ca5b95fb94205500c1), ROM_BIOS(0))
-	ROMX_LOAD("trs80.zl2",   0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369), ROM_BIOS(0))
+	ROMX_LOAD("rom-a.z1",      0x0000, 0x1000, CRC(37c59db2) SHA1(e8f8f6a4460a6f6755873580be6ff70cebe14969), ROM_BIOS(0))
+	ROMX_LOAD("rom-b.z2",      0x1000, 0x1000, CRC(05818718) SHA1(43c538ca77623af6417474ca5b95fb94205500c1), ROM_BIOS(0))
+	ROMX_LOAD("rom-c.z3",      0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "rsl2", "R/S L2 Basic")
-	ROMX_LOAD("trs80alt.z33",0x0000, 0x1000, CRC(be46faf5) SHA1(0e63fc11e207bfd5288118be5d263e7428cc128b), ROM_BIOS(1))
-	ROMX_LOAD("trs80alt.z34",0x1000, 0x1000, CRC(6c791c2d) SHA1(2a38e0a248f6619d38f1a108eea7b95761cf2aee), ROM_BIOS(1))
-	ROMX_LOAD("trs80alt.zl2",0x2000, 0x1000, CRC(55b3ad13) SHA1(6279f6a68f927ea8628458b278616736f0b3c339), ROM_BIOS(1))
+	ROMX_LOAD("rom-a_alt.z1",  0x0000, 0x1000, CRC(be46faf5) SHA1(0e63fc11e207bfd5288118be5d263e7428cc128b), ROM_BIOS(1))
+	ROMX_LOAD("rom-b_alt.z2",  0x1000, 0x1000, CRC(6c791c2d) SHA1(2a38e0a248f6619d38f1a108eea7b95761cf2aee), ROM_BIOS(1))
+	ROMX_LOAD("rom-c_alt.z3",  0x2000, 0x1000, CRC(55b3ad13) SHA1(6279f6a68f927ea8628458b278616736f0b3c339), ROM_BIOS(1))
 
-	ROM_REGION(0x0400, "chargen",0)
-	ROM_LOAD("trs80m1.chr",  0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_REGION(0x0400, "chargen", 0)
+	ROM_LOAD("mcm6670p.z29",   0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
 ROM_END
 
 
 ROM_START(radionic)
-	ROM_REGION(0x3800, "maincpu",0)
-	ROM_LOAD("ep1.bin",      0x0000, 0x1000, CRC(e8908f44) SHA1(7a5a60c3afbeb6b8434737dd302332179a7fca59))
-	ROM_LOAD("ep2.bin",      0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155))
-	ROM_LOAD("ep3.bin",      0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
-	ROM_LOAD("ep4.bin",      0x3000, 0x0800, CRC(70f90f26) SHA1(cbee70da04a3efac08e50b8e3a270262c2440120))
-	ROM_CONTINUE(            0x3000, 0x0800)
+	ROM_REGION(0x3800, "maincpu", 0)
+	ROM_LOAD("ep1.z37",        0x0000, 0x1000, CRC(e8908f44) SHA1(7a5a60c3afbeb6b8434737dd302332179a7fca59))
+	ROM_LOAD("ep2.z36",        0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155))
+	ROM_LOAD("ep3.z35",        0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
+	ROM_LOAD("ep4.z34",        0x3000, 0x0800, CRC(70f90f26) SHA1(cbee70da04a3efac08e50b8e3a270262c2440120))
+	ROM_CONTINUE(              0x3000, 0x0800)
 
-	ROM_REGION(0x1000, "chargen",0)
-	ROM_LOAD("trschar.bin",  0x0000, 0x1000, CRC(02e767b6) SHA1(c431fcc6bd04ce2800ca8c36f6f8aeb2f91ce9f7))
+	ROM_REGION(0x1000, "chargen", 0)
+	ROM_LOAD("trschar.z58",    0x0000, 0x1000, CRC(02e767b6) SHA1(c431fcc6bd04ce2800ca8c36f6f8aeb2f91ce9f7))
 ROM_END
 
+// From here are EACA-made clones
 
 ROM_START(sys80)
-	ROM_REGION(0x3800, "maincpu",0)
-	ROM_LOAD("sys80rom.1",   0x0000, 0x1000, CRC(8f5214de) SHA1(d8c052be5a2d0ec74433043684791d0554bf203b))
-	ROM_LOAD("sys80rom.2",   0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155))
-	ROM_LOAD("trs80.zl2",    0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
+	ROM_REGION(0x3800, "maincpu", 0)
+	ROM_LOAD("3001.z10",       0x0000, 0x1000, CRC(8f5214de) SHA1(d8c052be5a2d0ec74433043684791d0554bf203b))
+	ROM_LOAD("3002.z11",       0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155))
+	ROM_LOAD("3003.z12",       0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
 	/* This rom turns the system80 into the "blue label" version. SYSTEM then /12288 to activate. */
-	ROM_LOAD("sys80.ext",    0x3000, 0x0800, CRC(2a851e33) SHA1(dad21ec60973eb66e499fe0ecbd469118826a715))
+	ROM_LOAD("sys80.z13",      0x3000, 0x0800, CRC(2a851e33) SHA1(dad21ec60973eb66e499fe0ecbd469118826a715))
 
-	ROM_REGION(0x0400, "chargen",0)
-	ROM_LOAD("trs80m1.chr",  0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_REGION(0x0400, "chargen", 0)
+	// Z25 could be 2513 (early version) or 52116 (later version)
+	// This rom is Z25 on the video board, not Z25 on the CPU board.
+	ROM_LOAD("2513.z25",       0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
 ROM_END
 
 #define rom_sys80p rom_sys80
 
-
+// Although I don't have schematics for the HT-series, it would be reasonable to expect the board locations to be the same
 ROM_START(ht1080z)
-	ROM_REGION(0x3800, "maincpu",0)
-	ROM_LOAD("ht1080z.rom",  0x0000, 0x3000, CRC(2bfef8f7) SHA1(7a350925fd05c20a3c95118c1ae56040c621be8f))
-	ROM_LOAD("sys80.ext",    0x3000, 0x0800, CRC(2a851e33) SHA1(dad21ec60973eb66e499fe0ecbd469118826a715))
+	ROM_REGION(0x3800, "maincpu", 0)
+	ROM_LOAD("3001.z10",       0x0000, 0x1000, CRC(8f5214de) SHA1(d8c052be5a2d0ec74433043684791d0554bf203b))
+	ROM_LOAD("3002.z11",       0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155))
+	ROM_LOAD("3003.z12",       0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
+	ROM_LOAD("sys80.z13",      0x3000, 0x0800, CRC(2a851e33) SHA1(dad21ec60973eb66e499fe0ecbd469118826a715))
 
-	ROM_REGION(0x0800, "chargen",0)
-	ROM_LOAD("ht1080z.chr",  0x0000, 0x0800, CRC(e8c59d4f) SHA1(a15f30a543e53d3e30927a2e5b766fcf80f0ae31))
+	ROM_REGION(0x0800, "chargen", 0)
+	ROM_LOAD("ht1080z.z25",    0x0000, 0x0800, CRC(e8c59d4f) SHA1(a15f30a543e53d3e30927a2e5b766fcf80f0ae31))
 ROM_END
 
 
 ROM_START(ht1080z2)
-	ROM_REGION(0x3800, "maincpu",0)
-	ROM_LOAD("ht1080z.rom",  0x0000, 0x3000, CRC(2bfef8f7) SHA1(7a350925fd05c20a3c95118c1ae56040c621be8f))
-	ROM_LOAD("ht1080z2.ext", 0x3000, 0x0800, CRC(07415ac6) SHA1(b08746b187946e78c4971295c0aefc4e3de97115))
+	ROM_REGION(0x3800, "maincpu", 0)
+	ROM_LOAD("3001.z10",       0x0000, 0x1000, CRC(8f5214de) SHA1(d8c052be5a2d0ec74433043684791d0554bf203b))
+	ROM_LOAD("3002.z11",       0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155))
+	ROM_LOAD("3003.z12",       0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
+	ROM_LOAD("ht1080z2.z13",   0x3000, 0x0800, CRC(07415ac6) SHA1(b08746b187946e78c4971295c0aefc4e3de97115))
 
-	ROM_REGION(0x0800, "chargen",0)
-	ROM_LOAD("ht1080z2.chr", 0x0000, 0x0800, CRC(6728f0ab) SHA1(1ba949f8596f1976546f99a3fdcd3beb7aded2c5))
+	ROM_REGION(0x0800, "chargen", 0)
+	ROM_LOAD("ht1080z2.z25",   0x0000, 0x0800, CRC(6728f0ab) SHA1(1ba949f8596f1976546f99a3fdcd3beb7aded2c5))
 ROM_END
 
 
 ROM_START(ht108064)
-	ROM_REGION(0x3800, "maincpu",0)
-	ROM_LOAD("ht108064.rom", 0x0000, 0x3000, CRC(48985a30) SHA1(e84cf3121f9e0bb9e1b01b095f7a9581dcfaaae4))
-	ROM_LOAD("ht108064.ext", 0x3000, 0x0800, CRC(fc12bd28) SHA1(0da93a311f99ec7a1e77486afe800a937778e73b))
+	ROM_REGION(0x3800, "maincpu", 0)
+	ROM_LOAD("3001_64.z10",    0x0000, 0x1000, CRC(59ec132e) SHA1(232c04827e494ea49931d7ab9a5b87b76c81aef1) )
+	ROM_LOAD("3002_64.z11",    0x1000, 0x1000, CRC(a7a73e8c) SHA1(6e0f232b8666744328853cef6bb72b8e44b4c184) )
+	ROM_LOAD("3003.z12",       0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
+	ROM_LOAD("ht108064.z13",   0x3000, 0x0800, CRC(fc12bd28) SHA1(0da93a311f99ec7a1e77486afe800a937778e73b))
 
-	ROM_REGION(0x0800, "chargen",0)
-	ROM_LOAD("ht108064.chr", 0x0000, 0x0800, CRC(e76b73a4) SHA1(6361ee9667bf59d50059d09b0baf8672fdb2e8af))
+	ROM_REGION(0x0800, "chargen", 0)
+	ROM_LOAD("ht108064.z25",   0x0000, 0x0800, CRC(e76b73a4) SHA1(6361ee9667bf59d50059d09b0baf8672fdb2e8af))
 ROM_END
 
 
