@@ -41122,6 +41122,7 @@ abl4play
 shtscore
 
 @source:trs80.cpp
+eg3003                          //
 ht108064                        // Hradstechnika Szvetkezet HT-1080Z/64
 ht1080z                         // Hradstechnika Szvetkezet HT-1080Z
 ht1080z2                        // Hradstechnika Szvetkezet HT-1080Z Series II

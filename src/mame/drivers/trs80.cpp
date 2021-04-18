@@ -97,6 +97,22 @@ About the ht1080z - This was made for schools in Hungary. Each comes with a BASI
     The ht1080z is identical to the System 80, apart from the character rom.
     The ht1080z2 has a modified extension rom and character generator.
 
+About the eg3003 - This is the original of the EACA clones, and enjoyed success in Europe,
+    particularly in Germany. The normal roms would make it exactly a System-80, however we've
+    added the TCS ROM extension for something different. To activate - enter SYSTEM
+    Enter /12345 and the inbuilt monitor will be ready to go. To start the monitor, hold
+    up-arrow and hit M. You get a # prompt. The keyboard is also now in lower-case, even
+    though monitor commands are required to be in upper-case. Monitor commands:
+    - A : Ascii Dump
+    - D : Hex dump
+    - E : Edit Memory
+    - H : Hex converter
+    - J : Jump (Go)
+    - P : Punch
+    - R : Return to BASIC
+    - S : Search
+    - X : Hex Calculator
+
 About the RTC - The time is incremented while ever the cursor is flashing. It is stored in a series
     of bytes in the computer's work area. The bytes are in a certain order, this is:
     seconds, minutes, hours, year, day, month. The seconds are stored at 0x4041.
@@ -587,10 +603,10 @@ ROM_START(trs80)
 	// 000-7FF  Z33         Motorola                      7807
 	// 800-FFF  Z34         Motorola                      7804
 	// 000-FFF  Z33         Motorola                      7809_BASIC I
-	ROM_LOAD("level1.rom",     0x0000, 0x1000, CRC(70d06dff) SHA1(20d75478fbf42214381e05b14f57072f3970f765))
+	ROM_LOAD("level1.rom",     0x0000, 0x1000, CRC(70d06dff) SHA1(20d75478fbf42214381e05b14f57072f3970f765) )
 
 	ROM_REGION(0x0400, "chargen", 0)
-	ROM_LOAD("mcm6670p.z29",   0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_LOAD("mcm6670p.z29",   0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7) )
 ROM_END
 
 
@@ -600,45 +616,57 @@ ROM_START(trs80l2)
 	// This board plugs into either Z33 or Z34. Confusingly, the locations on this board are also Z numbers.
 	// The last version of the board only holds 2 roms - Z1 as 8K (ROM A/B), and Z2 as 4K (ROM C).
 	ROM_SYSTEM_BIOS(0, "level2", "Radio Shack Level II Basic")
-	ROMX_LOAD("rom-a.z1",      0x0000, 0x1000, CRC(37c59db2) SHA1(e8f8f6a4460a6f6755873580be6ff70cebe14969), ROM_BIOS(0))
-	ROMX_LOAD("rom-b.z2",      0x1000, 0x1000, CRC(05818718) SHA1(43c538ca77623af6417474ca5b95fb94205500c1), ROM_BIOS(0))
-	ROMX_LOAD("rom-c.z3",      0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369), ROM_BIOS(0))
+	ROMX_LOAD("rom-a.z1",      0x0000, 0x1000, CRC(37c59db2) SHA1(e8f8f6a4460a6f6755873580be6ff70cebe14969), ROM_BIOS(0) )
+	ROMX_LOAD("rom-b.z2",      0x1000, 0x1000, CRC(05818718) SHA1(43c538ca77623af6417474ca5b95fb94205500c1), ROM_BIOS(0) )
+	ROMX_LOAD("rom-c.z3",      0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "rsl2", "R/S L2 Basic")
-	ROMX_LOAD("rom-a_alt.z1",  0x0000, 0x1000, CRC(be46faf5) SHA1(0e63fc11e207bfd5288118be5d263e7428cc128b), ROM_BIOS(1))
-	ROMX_LOAD("rom-b_alt.z2",  0x1000, 0x1000, CRC(6c791c2d) SHA1(2a38e0a248f6619d38f1a108eea7b95761cf2aee), ROM_BIOS(1))
-	ROMX_LOAD("rom-c_alt.z3",  0x2000, 0x1000, CRC(55b3ad13) SHA1(6279f6a68f927ea8628458b278616736f0b3c339), ROM_BIOS(1))
+	ROMX_LOAD("rom-a_alt.z1",  0x0000, 0x1000, CRC(be46faf5) SHA1(0e63fc11e207bfd5288118be5d263e7428cc128b), ROM_BIOS(1) )
+	ROMX_LOAD("rom-b_alt.z2",  0x1000, 0x1000, CRC(6c791c2d) SHA1(2a38e0a248f6619d38f1a108eea7b95761cf2aee), ROM_BIOS(1) )
+	ROMX_LOAD("rom-c_alt.z3",  0x2000, 0x1000, CRC(55b3ad13) SHA1(6279f6a68f927ea8628458b278616736f0b3c339), ROM_BIOS(1) )
 
 	ROM_REGION(0x0400, "chargen", 0)
-	ROM_LOAD("mcm6670p.z29",   0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_LOAD("mcm6670p.z29",   0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7) )
 ROM_END
 
 
 ROM_START(radionic)
 	ROM_REGION(0x3800, "maincpu", 0)
-	ROM_LOAD("ep1.z37",        0x0000, 0x1000, CRC(e8908f44) SHA1(7a5a60c3afbeb6b8434737dd302332179a7fca59))
-	ROM_LOAD("ep2.z36",        0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155))
-	ROM_LOAD("ep3.z35",        0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
-	ROM_LOAD("ep4.z34",        0x3000, 0x0800, CRC(70f90f26) SHA1(cbee70da04a3efac08e50b8e3a270262c2440120))
+	ROM_LOAD("ep1.z37",        0x0000, 0x1000, CRC(e8908f44) SHA1(7a5a60c3afbeb6b8434737dd302332179a7fca59) )
+	ROM_LOAD("ep2.z36",        0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155) )
+	ROM_LOAD("ep3.z35",        0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369) )
+	ROM_LOAD("ep4.z34",        0x3000, 0x0800, CRC(70f90f26) SHA1(cbee70da04a3efac08e50b8e3a270262c2440120) )
 	ROM_CONTINUE(              0x3000, 0x0800)
 
 	ROM_REGION(0x1000, "chargen", 0)
-	ROM_LOAD("trschar.z58",    0x0000, 0x1000, CRC(02e767b6) SHA1(c431fcc6bd04ce2800ca8c36f6f8aeb2f91ce9f7))
+	ROM_LOAD("trschar.z58",    0x0000, 0x1000, CRC(02e767b6) SHA1(c431fcc6bd04ce2800ca8c36f6f8aeb2f91ce9f7) )
 ROM_END
 
 // From here are EACA-made clones
 
+ROM_START(eg3003)
+	ROM_REGION(0x3800, "maincpu", 0)
+	ROM_LOAD("3001.z10",       0x0000, 0x1000, CRC(8f5214de) SHA1(d8c052be5a2d0ec74433043684791d0554bf203b) )
+	ROM_LOAD("3002.z11",       0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155) )
+	ROM_LOAD("3003.z12",       0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369) )
+	ROM_LOAD("tcs-ext.z13",    0x3000, 0x0800, CRC(8f2ac112) SHA1(be0c2a5fb9cb01173c4da6dc8c71ca5975f441bb) )
+
+	ROM_REGION(0x0800, "chargen", 0)
+	ROM_LOAD("tcs-ext.z25",    0x0000, 0x0800, CRC(150c5f1f) SHA1(afbce73ab0360108b32e75eb75a3966eb5c503e7) )
+ROM_END
+
+
 ROM_START(sys80)
 	ROM_REGION(0x3800, "maincpu", 0)
-	ROM_LOAD("3001.z10",       0x0000, 0x1000, CRC(8f5214de) SHA1(d8c052be5a2d0ec74433043684791d0554bf203b))
-	ROM_LOAD("3002.z11",       0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155))
-	ROM_LOAD("3003.z12",       0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
+	ROM_LOAD("3001.z10",       0x0000, 0x1000, CRC(8f5214de) SHA1(d8c052be5a2d0ec74433043684791d0554bf203b) )
+	ROM_LOAD("3002.z11",       0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155) )
+	ROM_LOAD("3003.z12",       0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369) )
 	/* This rom turns the system80 into the "blue label" version. SYSTEM then /12288 to activate. */
-	ROM_LOAD("sys80.z13",      0x3000, 0x0800, CRC(2a851e33) SHA1(dad21ec60973eb66e499fe0ecbd469118826a715))
+	ROM_LOAD("sys80.z13",      0x3000, 0x0800, CRC(2a851e33) SHA1(dad21ec60973eb66e499fe0ecbd469118826a715) )
 
 	ROM_REGION(0x0400, "chargen", 0)
 	// Z25 could be 2513 (early version) or 52116 (later version)
 	// This rom is Z25 on the video board, not Z25 on the CPU board.
-	ROM_LOAD("2513.z25",       0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_LOAD("2513.z25",       0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7) )
 ROM_END
 
 #define rom_sys80p rom_sys80
@@ -646,25 +674,25 @@ ROM_END
 // Although I don't have schematics for the HT-series, it would be reasonable to expect the board locations to be the same
 ROM_START(ht1080z)
 	ROM_REGION(0x3800, "maincpu", 0)
-	ROM_LOAD("3001.z10",       0x0000, 0x1000, CRC(8f5214de) SHA1(d8c052be5a2d0ec74433043684791d0554bf203b))
-	ROM_LOAD("3002.z11",       0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155))
-	ROM_LOAD("3003.z12",       0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
-	ROM_LOAD("sys80.z13",      0x3000, 0x0800, CRC(2a851e33) SHA1(dad21ec60973eb66e499fe0ecbd469118826a715))
+	ROM_LOAD("3001.z10",       0x0000, 0x1000, CRC(8f5214de) SHA1(d8c052be5a2d0ec74433043684791d0554bf203b) )
+	ROM_LOAD("3002.z11",       0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155) )
+	ROM_LOAD("3003.z12",       0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369) )
+	ROM_LOAD("sys80.z13",      0x3000, 0x0800, CRC(2a851e33) SHA1(dad21ec60973eb66e499fe0ecbd469118826a715) )
 
 	ROM_REGION(0x0800, "chargen", 0)
-	ROM_LOAD("ht1080z.z25",    0x0000, 0x0800, CRC(e8c59d4f) SHA1(a15f30a543e53d3e30927a2e5b766fcf80f0ae31))
+	ROM_LOAD("ht1080z.z25",    0x0000, 0x0800, CRC(e8c59d4f) SHA1(a15f30a543e53d3e30927a2e5b766fcf80f0ae31) )
 ROM_END
 
 
 ROM_START(ht1080z2)
 	ROM_REGION(0x3800, "maincpu", 0)
-	ROM_LOAD("3001.z10",       0x0000, 0x1000, CRC(8f5214de) SHA1(d8c052be5a2d0ec74433043684791d0554bf203b))
-	ROM_LOAD("3002.z11",       0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155))
-	ROM_LOAD("3003.z12",       0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
-	ROM_LOAD("ht1080z2.z13",   0x3000, 0x0800, CRC(07415ac6) SHA1(b08746b187946e78c4971295c0aefc4e3de97115))
+	ROM_LOAD("3001.z10",       0x0000, 0x1000, CRC(8f5214de) SHA1(d8c052be5a2d0ec74433043684791d0554bf203b) )
+	ROM_LOAD("3002.z11",       0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155) )
+	ROM_LOAD("3003.z12",       0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369) )
+	ROM_LOAD("ht1080z2.z13",   0x3000, 0x0800, CRC(07415ac6) SHA1(b08746b187946e78c4971295c0aefc4e3de97115) )
 
 	ROM_REGION(0x0800, "chargen", 0)
-	ROM_LOAD("ht1080z2.z25",   0x0000, 0x0800, CRC(6728f0ab) SHA1(1ba949f8596f1976546f99a3fdcd3beb7aded2c5))
+	ROM_LOAD("ht1080z2.z25",   0x0000, 0x0800, CRC(6728f0ab) SHA1(1ba949f8596f1976546f99a3fdcd3beb7aded2c5) )
 ROM_END
 
 
@@ -672,11 +700,11 @@ ROM_START(ht108064)
 	ROM_REGION(0x3800, "maincpu", 0)
 	ROM_LOAD("3001_64.z10",    0x0000, 0x1000, CRC(59ec132e) SHA1(232c04827e494ea49931d7ab9a5b87b76c81aef1) )
 	ROM_LOAD("3002_64.z11",    0x1000, 0x1000, CRC(a7a73e8c) SHA1(6e0f232b8666744328853cef6bb72b8e44b4c184) )
-	ROM_LOAD("3003.z12",       0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
-	ROM_LOAD("ht108064.z13",   0x3000, 0x0800, CRC(fc12bd28) SHA1(0da93a311f99ec7a1e77486afe800a937778e73b))
+	ROM_LOAD("3003.z12",       0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369) )
+	ROM_LOAD("ht108064.z13",   0x3000, 0x0800, CRC(fc12bd28) SHA1(0da93a311f99ec7a1e77486afe800a937778e73b) )
 
 	ROM_REGION(0x0800, "chargen", 0)
-	ROM_LOAD("ht108064.z25",   0x0000, 0x0800, CRC(e76b73a4) SHA1(6361ee9667bf59d50059d09b0baf8672fdb2e8af))
+	ROM_LOAD("ht108064.z25",   0x0000, 0x0800, CRC(e76b73a4) SHA1(6361ee9667bf59d50059d09b0baf8672fdb2e8af) )
 ROM_END
 
 
@@ -692,11 +720,12 @@ void trs80_state::init_trs80l2()
 
 
 //    YEAR  NAME         PARENT    COMPAT  MACHINE   INPUT    CLASS        INIT           COMPANY                        FULLNAME                           FLAGS
-COMP( 1977, trs80,       0,        0,      trs80,    trs80,   trs80_state, init_trs80,    "Tandy Radio Shack",           "TRS-80 Model I (Level I Basic)",  MACHINE_SUPPORTS_SAVE )
-COMP( 1978, trs80l2,     0,        0,      model1,   trs80l2, trs80_state, init_trs80l2,  "Tandy Radio Shack",           "TRS-80 Model I (Level II Basic)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1983, radionic,    trs80l2,  0,      radionic, trs80l2, trs80_state, init_trs80,    "Komtek",                      "Radionic",                        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1980, sys80,       trs80l2,  0,      sys80,    sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (60 Hz)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1980, sys80p,      trs80l2,  0,      sys80p,   sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (50 Hz)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1983, ht1080z,     trs80l2,  0,      ht1080z,  sys80,   trs80_state, init_trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series I",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1984, ht1080z2,    trs80l2,  0,      ht1080z,  sys80,   trs80_state, init_trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series II",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1985, ht108064,    trs80l2,  0,      ht1080z,  sys80,   trs80_state, init_trs80,    "Hiradastechnika Szovetkezet", "HT-1080Z/64",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1977, trs80,       0,        0,       trs80,    trs80,   trs80_state, init_trs80,    "Tandy Radio Shack",           "TRS-80 Model I (Level I Basic)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1978, trs80l2,     0,        0,       model1,   trs80l2, trs80_state, init_trs80l2,  "Tandy Radio Shack",           "TRS-80 Model I (Level II Basic)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, radionic,    trs80l2,  0,       radionic, trs80l2, trs80_state, init_trs80,    "Komtek",                      "Radionic",                        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, eg3003,      0,        trs80l2, sys80,    sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "Video Genie EG3003",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, sys80,       eg3003,   0,       sys80,    sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (60 Hz)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, sys80p,      eg3003,   0,       sys80p,   sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (50 Hz)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, ht1080z,     eg3003,   0,       ht1080z,  sys80,   trs80_state, init_trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series I",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, ht1080z2,    eg3003,   0,       ht1080z,  sys80,   trs80_state, init_trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series II",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ht108064,    eg3003,   0,       ht1080z,  sys80,   trs80_state, init_trs80,    "Hiradastechnika Szovetkezet", "HT-1080Z/64",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
