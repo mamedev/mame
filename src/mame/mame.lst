@@ -16989,6 +16989,9 @@ inteladv
 intlc44                         //
 intlc440                        //
 
+@source:intellec8.cpp
+intlc8                          //
+
 @source:intellect02.cpp
 intel02                         //
 

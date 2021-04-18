@@ -2689,6 +2689,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/basic52.cpp",
 	MAME_DIR .. "src/mame/drivers/imds2.cpp",
 	MAME_DIR .. "src/mame/drivers/intellec4.cpp",
+	MAME_DIR .. "src/mame/drivers/intellec8.cpp",
 	MAME_DIR .. "src/mame/drivers/ipc.cpp",
 	MAME_DIR .. "src/mame/drivers/ipds.cpp",
 	MAME_DIR .. "src/mame/drivers/isbc.cpp",
