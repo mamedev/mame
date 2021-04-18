@@ -45,95 +45,152 @@
 //  ZLIB WRITE STREAMER
 //**************************************************************************
 
+// this class wraps the logic needed to stream compressed (deflated) data to
+// a file in a .ZIP-compatible format
 class zlib_write_streamer
 {
 public:
 	// construction
-	zlib_write_streamer(emu_file &output) :
-		m_output(output)
-	{
-		m_stream.zalloc = Z_NULL;
-		m_stream.zfree = Z_NULL;
-		m_stream.opaque = Z_NULL;
-		m_stream.avail_in = m_stream.avail_out = 0;
-	}
+	zlib_write_streamer(emu_file &output);
+
+	// simple getters
+	util::crc32_t crc() const { return m_crc_accum.finish(); }
+	u32 uncompressed_bytes() const { return m_uncompressed_bytes; }
+	u32 compressed_bytes() const { return m_compressed_bytes; }
 
 	// initialize compression
-	bool begin()
-	{
-		// reset the output buffer
-		m_stream.next_out = &m_buffer[0];
-		m_stream.avail_out = sizeof(m_buffer);
-
-		// initialize the zlib engine; the negative window size means
-		// no headers, which is what a .ZIP file wants
-		return (deflateInit2(&m_stream, Z_BEST_COMPRESSION, Z_DEFLATED, -15, 8, Z_DEFAULT_STRATEGY) == Z_OK);
-	}
+	bool begin();
 
 	// add more compressed data
-	bool write(void const *data, u32 count)
-	{
-		// point the input buffer to the data
-		m_stream.next_in = const_cast<Bytef *>(reinterpret_cast<Bytef const *>(data));
-		m_stream.avail_in = count;
+	bool write(void const *data, u32 count);
 
-		// loop until all consumed
-		while (m_stream.avail_in != 0)
-		{
-			// deflate as much as possible
-			if (deflate(&m_stream, Z_NO_FLUSH) != Z_OK)
-			{
-				deflateEnd(&m_stream);
-				return false;
-			}
-
-			// if we ran out of output space, flush to the file and reset
-			if (m_stream.avail_out == 0)
-			{
-				if (m_output.write(&m_buffer[0], sizeof(m_buffer)) != sizeof(m_buffer))
-				{
-					deflateEnd(&m_stream);
-					return false;
-				}
-				m_stream.next_out = &m_buffer[0];
-				m_stream.avail_out = sizeof(m_buffer);
-			}
-		}
-		return true;
-	}
-
-	// finish cmopression
-	bool end()
-	{
-		// loop until all data processed
-		int zerr = Z_OK;
-		while (zerr != Z_STREAM_END)
-		{
-			// deflate and attempt to finish
-			zerr = deflate(&m_stream, Z_FINISH);
-			if (zerr != Z_OK && zerr != Z_STREAM_END)
-			{
-				deflateEnd(&m_stream);
-				return false;
-			}
-
-			// if there's any output data, flush it to the file and reset
-			if (m_stream.avail_out != sizeof(m_buffer))
-			{
-				m_output.write(&m_buffer[0], sizeof(m_buffer) - m_stream.avail_out);
-				m_stream.next_out = &m_buffer[0];
-				m_stream.avail_out = sizeof(m_buffer);
-			}
-		}
-		return (deflateEnd(&m_stream) == Z_OK);
-	}
+	// finish compression
+	bool end();
 
 private:
 	// internal state
-	emu_file &m_output;
-	z_stream m_stream;
-	u8 m_buffer[4096];
+	emu_file &m_output;                    // the file to spill data to
+	z_stream m_stream;                     // the current zlib stream
+	util::crc32_creator m_crc_accum;       // accumulated CRC value
+	u32 m_uncompressed_bytes;              // accumulated uncompressed bytes
+	u32 m_compressed_bytes;                // accumulated compressed bytes
+	u8 m_buffer[4096];                     // temporary buffer to accumulate
 };
+
+
+//-------------------------------------------------
+//  zlib_write_streamer - constuctor
+//-------------------------------------------------
+
+zlib_write_streamer::zlib_write_streamer(emu_file &output) :
+	m_output(output)
+{
+	m_stream.zalloc = Z_NULL;
+	m_stream.zfree = Z_NULL;
+	m_stream.opaque = Z_NULL;
+	m_stream.avail_in = m_stream.avail_out = 0;
+}
+
+
+//-------------------------------------------------
+//  begin - initialize compression
+//-------------------------------------------------
+
+bool zlib_write_streamer::begin()
+{
+	// reset the output buffer
+	m_stream.next_out = &m_buffer[0];
+	m_stream.avail_out = sizeof(m_buffer);
+
+	// reset our accumulators
+	m_crc_accum.reset();
+	m_uncompressed_bytes = 0;
+	m_compressed_bytes = 0;
+
+	// initialize the zlib engine; the negative window size means
+	// no headers, which is what a .ZIP file wants
+	return (deflateInit2(&m_stream, Z_BEST_COMPRESSION, Z_DEFLATED, -15, 8, Z_DEFAULT_STRATEGY) == Z_OK);
+}
+
+
+//-------------------------------------------------
+//  write - add more compressed data
+//-------------------------------------------------
+
+bool zlib_write_streamer::write(void const *data, u32 count)
+{
+	// point the input buffer to the data
+	m_stream.next_in = const_cast<Bytef *>(reinterpret_cast<Bytef const *>(data));
+	m_stream.avail_in = count;
+
+	// loop until all consumed
+	while (m_stream.avail_in != 0)
+	{
+		// deflate as much as possible
+		if (deflate(&m_stream, Z_NO_FLUSH) != Z_OK)
+		{
+			deflateEnd(&m_stream);
+			return false;
+		}
+
+		// if we ran out of output space, flush to the file and reset
+		if (m_stream.avail_out == 0)
+		{
+			if (m_output.write(&m_buffer[0], sizeof(m_buffer)) != sizeof(m_buffer))
+			{
+				deflateEnd(&m_stream);
+				return false;
+			}
+			m_compressed_bytes += sizeof(m_buffer);
+			m_stream.next_out = &m_buffer[0];
+			m_stream.avail_out = sizeof(m_buffer);
+		}
+	}
+
+	// update accumulators
+	m_uncompressed_bytes += count;
+	m_crc_accum.append(data, count);
+	return true;
+}
+
+
+//-------------------------------------------------
+//  end - finish cmopression
+//-------------------------------------------------
+
+bool zlib_write_streamer::end()
+{
+	// loop until all data processed
+	int zerr = Z_OK;
+	while (zerr != Z_STREAM_END)
+	{
+		// deflate and attempt to finish
+		zerr = deflate(&m_stream, Z_FINISH);
+		if (zerr != Z_OK && zerr != Z_STREAM_END)
+		{
+			deflateEnd(&m_stream);
+			return false;
+		}
+
+		// if there's any output data, flush it to the file and reset
+		if (m_stream.avail_out != sizeof(m_buffer))
+		{
+			u32 bytes = sizeof(m_buffer) - m_stream.avail_out;
+			if (m_output.write(&m_buffer[0], bytes) != bytes)
+			{
+				deflateEnd(&m_stream);
+				return false;
+			}
+			m_compressed_bytes += bytes;
+			m_stream.next_out = &m_buffer[0];
+			m_stream.avail_out = sizeof(m_buffer);
+		}
+	}
+
+	// finalize the CRC
+	m_crc_accum.finish();
+	return (deflateEnd(&m_stream) == Z_OK);
+}
 
 
 
@@ -145,7 +202,7 @@ private:
 // the save data, plus various binary files containing larger chunks of data
 class save_zip_state
 {
-	// intenral constants
+	// internal constants
 	static constexpr u32 JSON_EXPAND_CHUNK = 1024 * 1024;
 	static constexpr u32 JSON_EXPAND_THRESH = 1024;
 
@@ -156,7 +213,7 @@ public:
 	// construction
 	save_zip_state();
 
-	// simpler getters
+	// simple getters
 	char const *json_string() { m_json[m_json_offset] = 0; return &m_json[0]; }
 	int json_length() const { return m_json_offset; }
 
@@ -191,6 +248,7 @@ private:
 		}
 	}
 
+	// other internal helpers
 	void create_end_of_central_directory(std::vector<u8> &header, u32 central_dir_entries, u64 central_dir_offset, u32 central_dir_size);
 	void create_zip_file_header(std::vector<u8> &local, std::vector<u8> &central, char const *filename, u64 local_offset);
 	void create_zip_file_footer(std::vector<u8> &local, std::vector<u8> &central, u32 filesize, u32 compressed, u32 crc);
@@ -200,9 +258,7 @@ private:
 	struct file_entry
 	{
 		file_entry(char const *name, save_registered_item &item, uintptr_t base) :
-			m_item(item),
-			m_name(name),
-			m_base(base) { }
+			m_item(item), m_name(name), m_base(base) { }
 
 		save_registered_item &m_item;
 		std::string m_name;
@@ -211,14 +267,12 @@ private:
 	};
 
 	// internal state
-	std::list<file_entry> m_file_list;
-	std::vector<char> m_json;
-	util::crc32_creator m_file_crc_accum;
-	u32 m_file_size_accum;
-	u16 m_archive_date;
-	u16 m_archive_time;
-	u32 m_json_reserved;
-	u32 m_json_offset;
+	std::list<file_entry> m_file_list;     // list of files to be output
+	std::vector<char> m_json;              // accumulated JSON data
+	u32 m_json_offset;                     // current output offset in JSON stream
+	u32 m_json_reserved;                   // current total reserved size for JSON stream
+	u16 m_archive_date;                    // precomputed archive date, in MS-DOS format
+	u16 m_archive_time;                    // precomputed archive time, in MS-DOS format
 };
 
 
@@ -227,8 +281,8 @@ private:
 //-------------------------------------------------
 
 save_zip_state::save_zip_state() :
-	m_json_reserved(0),
-	m_json_offset(0)
+	m_json_offset(0),
+	m_json_reserved(0)
 {
 	json_check_reserve();
 }
@@ -414,12 +468,11 @@ bool save_zip_state::commit(emu_file &output)
 	output.write(&local_header[0], local_header.size());
 
 	// stream the JSON and compress it
-	u64 start = output.tell();
 	if (!zlib.begin() || !zlib.write(&m_json[0], m_json_offset) || !zlib.end())
 		return false;
 
 	// write the local footer and update the central directory entry
-	create_zip_file_footer(local_footer, json_central_directory, m_json_offset, output.tell() - start, util::crc32_creator::simple(&m_json[0], m_json_offset));
+	create_zip_file_footer(local_footer, json_central_directory, zlib.uncompressed_bytes(), zlib.compressed_bytes(), zlib.crc());
 	output.seek(local_header_offset + 0xe, SEEK_SET);
 	output.write(&local_footer[0], local_footer.size());
 	output.seek(0, SEEK_END);
@@ -427,22 +480,17 @@ bool save_zip_state::commit(emu_file &output)
 	// then write out the other files
 	for (auto &file : m_file_list)
 	{
-		// reset the accumulators
-		m_file_crc_accum.reset();
-		m_file_size_accum = 0;
-
 		// write the local header (and create the central directory entry) for the file
 		u64 local_header_offset = output.tell();
 		create_zip_file_header(local_header, file.m_central_directory, file.m_name.c_str(), local_header_offset);
 		output.write(&local_header[0], local_header.size());
 
 		// write the file header and compress it
-		u64 start = output.tell();
 		if (!zlib.begin() || !write_data_recursive(zlib, file.m_item, file.m_base) || !zlib.end())
 			return false;
 
 		// write the local footer and update the central directory entry
-		create_zip_file_footer(local_footer, file.m_central_directory, m_file_size_accum, output.tell() - start, m_file_crc_accum.finish());
+		create_zip_file_footer(local_footer, file.m_central_directory, zlib.uncompressed_bytes(), zlib.compressed_bytes(), zlib.crc());
 		output.seek(local_header_offset + 0xe, SEEK_SET);
 		output.write(&local_footer[0], local_footer.size());
 		output.seek(0, SEEK_END);
@@ -618,8 +666,6 @@ bool save_zip_state::write_data_recursive(zlib_write_streamer &zlib, save_regist
 		u32 size = item.count() * item.native_size();
 		if (!zlib.write(reinterpret_cast<void *>(base), size))
 			return false;
-		m_file_crc_accum.append(reinterpret_cast<void *>(base), size);
-		m_file_size_accum += size;
 	}
 	return true;
 }
@@ -682,92 +728,144 @@ class zlib_read_streamer
 {
 public:
 	// construction
-	zlib_read_streamer(emu_file &input) :
-		m_input(input)
-	{
-		m_stream.zalloc = Z_NULL;
-		m_stream.zfree = Z_NULL;
-		m_stream.opaque = Z_NULL;
-		m_stream.avail_in = m_stream.avail_out = 0;
-	}
+	zlib_read_streamer(emu_file &input);
 
-	// initialize compression
-	bool begin(u64 offset)
-	{
-		// read the local file header
-		u8 local[30];
-		m_input.seek(offset, SEEK_SET);
-		if (m_input.read(&local[0], sizeof(local)) != sizeof(local))
-			return false;
+	// simple getters
+	util::crc32_t crc() const { return m_crc_accum.finish(); }
+	util::crc32_t expected_crc() const { return m_expected_crc; }
+	u32 uncompressed_bytes() const { return m_uncompressed_bytes; }
+	u32 compressed_bytes() const { return m_compressed_bytes; }
 
-		// validate header
-		if (local[0] != 0x50 || local[1] != 0x4b || local[2] != 0x03 || local[3] != 0x04)
-			return false;
-		if (local[8] != 0x08)
-			return false;
-
-		// determine the compressed size and start of stream
-		m_input_remaining = local[18] | (local[19] << 8) | (local[20] << 16) | (local[21] << 24);
-		u32 name_len = local[26] | (local[27] << 8);
-		u32 extra_len = local[28] | (local[29] << 8);
-		offset += 30 + name_len + extra_len;
-		m_input.seek(offset, SEEK_SET);
-
-		// reset the input buffer
-		m_stream.avail_in = 0;
-
-		// initialize the zlib engine; the negative window size means
-		// no headers, which is what a .ZIP file wants
-		return (inflateInit2(&m_stream, -MAX_WBITS) == Z_OK);
-	}
+	// initialize decompression
+	bool begin(u64 offset);
 
 	// read more compressed data
-	bool read(void *data, u32 count)
+	bool read(void *data, u32 count);
+
+	// finish decompression
+	bool end();
+
+private:
+	// internal state
+	emu_file &m_input;                     // the file to read from
+	z_stream m_stream;                     // the current zlib stream
+	util::crc32_creator m_crc_accum;       // accumulated CRC value
+	u32 m_uncompressed_bytes;              // accumulated uncompressed bytes
+	u32 m_compressed_bytes;                // accumulated compressed bytes
+	u32 m_input_remaining;                 // number of input bytes remaining
+	u32 m_expected_crc;                    // expected CRC value
+	u8 m_buffer[4096];                     // temporary buffer to accumulate
+};
+
+
+//-------------------------------------------------
+//  zlib_read_streamer - constuctor
+//-------------------------------------------------
+
+zlib_read_streamer::zlib_read_streamer(emu_file &input) :
+	m_input(input)
+{
+	m_stream.zalloc = Z_NULL;
+	m_stream.zfree = Z_NULL;
+	m_stream.opaque = Z_NULL;
+	m_stream.avail_in = m_stream.avail_out = 0;
+}
+
+
+//-------------------------------------------------
+//  begin - initialize decompression
+//-------------------------------------------------
+
+bool zlib_read_streamer::begin(u64 offset)
+{
+	// read the local file header
+	u8 local[30];
+	m_input.seek(offset, SEEK_SET);
+	if (m_input.read(&local[0], sizeof(local)) != sizeof(local))
+		return false;
+
+	// validate header
+	if (local[0] != 0x50 || local[1] != 0x4b || local[2] != 0x03 || local[3] != 0x04)
+		return false;
+
+	// only deflate is supported
+	if (local[8] != 0x08)
+		return false;
+
+	// parse data from the header
+	m_expected_crc = local[14] | (local[15] << 8) | (local[16] << 16) | (local[17] << 24);
+	m_compressed_bytes = local[18] | (local[19] << 8) | (local[20] << 16) | (local[21] << 24);
+	m_uncompressed_bytes = local[22] | (local[23] << 8) | (local[24] << 16) | (local[25] << 24);
+	u32 name_len = local[26] | (local[27] << 8);
+	u32 extra_len = local[28] | (local[29] << 8);
+
+	// advance past the header to the actual start of data
+	offset += 30 + name_len + extra_len;
+	m_input.seek(offset, SEEK_SET);
+
+	// reset the input buffer
+	m_stream.avail_in = 0;
+
+	// reset our accumulators
+	m_crc_accum.reset();
+	m_input_remaining = m_compressed_bytes;
+
+	// initialize the zlib engine; the negative window size means
+	// no headers, which is what a .ZIP file wants
+	return (inflateInit2(&m_stream, -MAX_WBITS) == Z_OK);
+}
+
+
+//-------------------------------------------------
+//  read - read more compressed data
+//-------------------------------------------------
+
+bool zlib_read_streamer::read(void *data, u32 count)
+{
+	// point the output buffer to the target buffer
+	m_stream.next_out = reinterpret_cast<Bytef *>(data);
+	m_stream.avail_out = count;
+
+	// loop until all consumed
+	while (m_stream.avail_out != 0)
 	{
-		// point the output buffer to the data
-		m_stream.next_out = reinterpret_cast<Bytef *>(data);
-		m_stream.avail_out = count;
-
-		// loop until all consumed
-		while (m_stream.avail_out != 0)
+		// if we need more data, fetch it
+		if (m_stream.avail_in == 0)
 		{
-			// if we need more data, fetch it
-			if (m_stream.avail_in == 0)
-			{
-				m_stream.next_in = &m_buffer[0];
-				m_stream.avail_in = std::min<u32>(sizeof(m_buffer), m_input_remaining);
-				m_input_remaining -= m_stream.avail_in;
-				if (m_input.read(&m_buffer[0], m_stream.avail_in) != m_stream.avail_in)
-				{
-					inflateEnd(&m_stream);
-					return false;
-				}
-			}
-
-			// deflate as much as possible
-			auto zerr = inflate(&m_stream, Z_NO_FLUSH);
-			if (zerr != Z_OK && (zerr != Z_STREAM_END || m_stream.avail_out != 0))
+			m_stream.next_in = &m_buffer[0];
+			m_stream.avail_in = std::min<u32>(sizeof(m_buffer), m_input_remaining);
+			m_input_remaining -= m_stream.avail_in;
+			if (m_input.read(&m_buffer[0], m_stream.avail_in) != m_stream.avail_in)
 			{
 				inflateEnd(&m_stream);
 				return false;
 			}
 		}
-		return true;
+
+		// deflate as much as possible
+		auto zerr = inflate(&m_stream, Z_NO_FLUSH);
+		if (zerr != Z_OK && (zerr != Z_STREAM_END || m_stream.avail_out != 0))
+		{
+			inflateEnd(&m_stream);
+			return false;
+		}
 	}
 
-	// finish decompression
-	bool end()
-	{
-		return (inflateEnd(&m_stream) == Z_OK);
-	}
+	// update accumulators
+	m_crc_accum.append(data, count);
+	return true;
+}
 
-private:
-	// internal state
-	emu_file &m_input;
-	z_stream m_stream;
-	u32 m_input_remaining;
-	u8 m_buffer[4096];
-};
+
+//-------------------------------------------------
+//  end - finish cmopression
+//-------------------------------------------------
+
+bool zlib_read_streamer::end()
+{
+	// fail if CRCs didn't match
+	return (inflateEnd(&m_stream) == Z_OK && crc() == expected_crc());
+}
 
 
 
@@ -780,139 +878,45 @@ private:
 class load_zip_state
 {
 public:
+	// load_error is the exception we throw if anything bad happens
 	class load_error : public std::exception { };
 
+	// construction
 	load_zip_state(emu_file &file);
 
-	save_error init();
-
+	// simple getters
 	emu_file &file() const { return m_file; }
 	char const *warnings() const { return (m_warnings.length() == 0) ? nullptr : m_warnings.c_str(); }
 	char const *errors() const { return (m_errors.length() == 0) ? nullptr : m_errors.c_str(); }
+	char const *json_position() const { return m_json_ptr; }
 
-	bool find_file(char const *name, u64 &offset, u32 &size);
-
-	bool read_data_recursive(zlib_read_streamer &zlib, save_registered_item &item, bool flip, u32 &remaining, uintptr_t base);
-
-	u64 json_position() const { return m_json_offset; }
-	void json_set_position(u64 pos) { m_json_offset = pos; }
+	// simple setters
+	void json_set_position(char const *pos) { m_json_ptr = pos; }
 
 	// return the next character in the buffer
-	char json_peek() const { return m_json_data[m_json_offset]; }
+	char json_peek() const { return *m_json_ptr; }
 
 	// advance to the next non-whitespace character
-	void json_skip_whitespace() { while (isspace(json_peek())) m_json_offset++; }
+	void json_skip_whitespace() { while (isspace(*m_json_ptr)) m_json_ptr++; }
 
-	// return true and advance if the next character matches the target
-	bool json_matches(char target)
-	{
-		json_skip_whitespace();
-		if (json_peek() == target)
-		{
-			m_json_offset++;
-			return true;
-		}
-		return false;
-	}
+	// various JSON parsing helpers
+	bool json_matches(char target);
+	bool json_matches(char const *target);
+	bool json_parse_number(double &result);
+	bool json_parse_int_string(int64_t &result);
+	bool json_parse_uint_string(uint64_t &result);
+	bool json_parse_string(std::string &result);
 
-	// return true and advance if the string matches the target
-	bool json_matches(char const *target)
-	{
-		json_skip_whitespace();
-		u32 start = m_json_offset;
-		for ( ; *target != 0; target++)
-			if (!json_matches(*target))
-				break;
-		if (*target == 0)
-			return true;
-		m_json_offset = start;
-		return false;
-	}
+	// initialize, checking the input file basic validity
+	save_error init();
 
-	// extract a standard JSON number
-	bool json_parse_float(double &result)
-	{
-		json_skip_whitespace();
-		char *start = reinterpret_cast<char *>(&m_json_data[m_json_offset]);
-		char *end;
-		result = strtod(start, &end);
-		m_json_offset += end - start;
-		return (start != end);
-	}
+	// find a file in the ZIP, returning its uncompressed size and offset to local header
+	bool find_file(char const *name, u64 &offset, u32 &size);
 
-	bool json_parse_int(int64_t &result)
-	{
-		if (!json_matches('"'))
-		{
-			double value;
-			bool ret = json_parse_float(value);
-			result = int64_t(value);
-			return ret;
-		}
-		char *start = reinterpret_cast<char *>(&m_json_data[m_json_offset]);
-		char *end;
-		result = strtoll(start, &end, 10);
-		m_json_offset += end - start;
-		return (json_matches('"') && start != end);
-	}
+	// recursively read data using
+	bool read_data_recursive(zlib_read_streamer &zlib, save_registered_item &item, bool flip, u32 &remaining, uintptr_t base);
 
-	bool json_parse_uint(uint64_t &result)
-	{
-		if (!json_matches('"'))
-		{
-			double value;
-			bool ret = json_parse_float(value);
-			result = uint64_t(value);
-			return ret;
-		}
-		char *start = reinterpret_cast<char *>(&m_json_data[m_json_offset]);
-		char *end;
-		result = strtoull(start, &end, 10);
-		m_json_offset += end - start;
-		return (json_matches('"') && start != end);
-	}
-
-	bool json_parse_string(std::string &result)
-	{
-		if (!json_matches('"'))
-			return false;
-		u32 start = m_json_offset;
-		char ch;
-		bool found_controls = false;
-		while ((ch = json_peek()) != 0)
-		{
-			m_json_offset++;
-			if (ch == '\\')
-			{
-				m_json_offset++;
-				found_controls = true;
-			}
-			else if (ch == '"')
-				break;
-		}
-		result = std::string(reinterpret_cast<char *>(&m_json_data[start]), m_json_offset - 1 - start);
-		if (found_controls)
-			for (int index = 0; index < result.length(); index++)
-				if (result[index] == '\\')
-				{
-					char ch = result[index + 1];
-					result.erase(index + 1, 1);
-					switch (ch)
-					{
-						case '/':	result[index] = ch;	break;
-						case '\\':	result[index] = ch;	break;
-						case '"':	result[index] = ch;	break;
-						case 'b':	result[index] = 8;	break;
-						case 'f':	result[index] = 12;	break;
-						case 'n':	result[index] = 10;	break;
-						case 'r':	result[index] = 13;	break;
-						case 't':	result[index] = 9;	break;
-						case 'u':	result[index] = '?'; result.erase(index + 1, 4); break;
-					}
-				}
-		return true;
-	}
-
+	// report a warning
 	template<typename... Params>
 	void report_warning(char const *format, Params &&... args)
 	{
@@ -920,6 +924,7 @@ public:
 		m_warnings += "\n";
 	}
 
+	// report an error; this implicitly throws to exit
 	template<typename... Params>
 	void report_error(char const *format, Params &&... args)
 	{
@@ -929,13 +934,11 @@ public:
 	}
 
 private:
+	// file_entry represents a single file within the ZIP
 	struct file_entry
 	{
 		file_entry(char const *name, u64 offset, u32 compsize, u32 uncompsize) :
-			m_name(name),
-			m_offset(offset),
-			m_compsize(compsize),
-			m_uncompsize(uncompsize) { }
+			m_name(name), m_offset(offset), m_compsize(compsize), m_uncompsize(uncompsize) { }
 
 		std::string m_name;
 		u64 m_offset;
@@ -943,19 +946,160 @@ private:
 		u32 m_uncompsize;
 	};
 
-	emu_file &m_file;
-	std::vector<u8> m_json_data;
-	u32 m_json_offset;
-	std::list<file_entry> m_file_list;
-	std::string m_warnings;
-	std::string m_errors;
+	// internal state
+	emu_file &m_file;                      // input file
+	std::vector<u8> m_json_data;           // buffered JSON file
+	char const *m_json_ptr;                // current input pointer to data
+	std::list<file_entry> m_file_list;     // list of files to be output
+	std::string m_warnings;                // accumulated warnings string
+	std::string m_errors;                  // accumulated errors string
 };
+
+
+//-------------------------------------------------
+//  load_zip_state - constructor
+//-------------------------------------------------
 
 load_zip_state::load_zip_state(emu_file &file) :
 	m_file(file),
-	m_json_offset(0)
+	m_json_ptr(nullptr)
 {
 }
+
+
+//-------------------------------------------------
+//  json_matches - return true and advance if the
+//  next character matches the target
+//-------------------------------------------------
+
+bool load_zip_state::json_matches(char target)
+{
+	json_skip_whitespace();
+	if (*m_json_ptr == target)
+	{
+		m_json_ptr++;
+		return true;
+	}
+	return false;
+}
+
+
+//-------------------------------------------------
+//  json_matches - return true and advance if the
+//  next characters match the target string
+//-------------------------------------------------
+
+bool load_zip_state::json_matches(char const *target)
+{
+	json_skip_whitespace();
+	char const *start = m_json_ptr;
+	for ( ; *target != 0; target++)
+		if (!json_matches(*target))
+			break;
+	if (*target == 0)
+		return true;
+	m_json_ptr = start;
+	return false;
+}
+
+
+//-------------------------------------------------
+//  json_parse_number - parse a floating-point
+//  number from the JSON
+//-------------------------------------------------
+
+bool load_zip_state::json_parse_number(double &result)
+{
+	json_skip_whitespace();
+	char const *start = m_json_ptr;
+	result = strtod(start, const_cast<char **>(&m_json_ptr));
+	return (start != m_json_ptr);
+}
+
+
+//-------------------------------------------------
+//  json_parse_int_string - parse a 64-bit signed
+//  integer from a string
+//-------------------------------------------------
+
+bool load_zip_state::json_parse_int_string(int64_t &result)
+{
+	if (!json_matches('"'))
+		return false;
+	char const *start = m_json_ptr;
+	result = strtoll(start, const_cast<char **>(&m_json_ptr), 10);
+	return (start != m_json_ptr && json_matches('"'));
+}
+
+
+//-------------------------------------------------
+//  json_parse_int_string - parse a 64-bit unsigned
+//  integer from a string
+//-------------------------------------------------
+
+bool load_zip_state::json_parse_uint_string(uint64_t &result)
+{
+	if (!json_matches('"'))
+		return false;
+	char const *start = m_json_ptr;
+	result = strtoull(start, const_cast<char **>(&m_json_ptr), 10);
+	return (start != m_json_ptr && json_matches('"'));
+}
+
+
+//-------------------------------------------------
+//  json_parse_int_string - parse a 64-bit unsigned
+//  integer from a string
+//-------------------------------------------------
+
+bool load_zip_state::json_parse_string(std::string &result)
+{
+	if (!json_matches('"'))
+		return false;
+	char const *start = m_json_ptr;
+	char ch;
+	bool found_controls = false;
+	while ((ch = *m_json_ptr) != 0)
+	{
+		m_json_ptr++;
+		if (ch == '\\')
+		{
+			m_json_ptr++;
+			found_controls = true;
+		}
+		else if (ch == '"')
+			break;
+	}
+	result = std::string(start, m_json_ptr - 1 - start);
+
+	// if we saw any control characters, go back and fix them up
+	if (found_controls)
+		for (int index = 0; index < result.length(); index++)
+			if (result[index] == '\\')
+			{
+				char ch = result[index + 1];
+				result.erase(index + 1, 1);
+				switch (ch)
+				{
+					case '/':	result[index] = ch;	break;
+					case '\\':	result[index] = ch;	break;
+					case '"':	result[index] = ch;	break;
+					case 'b':	result[index] = 8;	break;
+					case 'f':	result[index] = 12;	break;
+					case 'n':	result[index] = 10;	break;
+					case 'r':	result[index] = 13;	break;
+					case 't':	result[index] = 9;	break;
+					case 'u':	result[index] = '?'; result.erase(index + 1, 4); break;
+				}
+			}
+	return true;
+}
+
+
+//-------------------------------------------------
+//  init - initialize by parsing the ZIP structure
+//  and loading the JSON data
+//-------------------------------------------------
 
 save_error load_zip_state::init()
 {
@@ -972,8 +1116,7 @@ save_error load_zip_state::init()
 	u32 dir_size = 0;
 	u32 dir_entries = 0;
 	for (int scan = bufread - 20; scan >= 0; scan--)
-		if (buffer[scan + 0] == 0x50 && buffer[scan + 1] == 0x4b &&
-			buffer[scan + 2] == 0x05 && buffer[scan + 3] == 0x06)
+		if (buffer[scan + 0] == 0x50 && buffer[scan + 1] == 0x4b && buffer[scan + 2] == 0x05 && buffer[scan + 3] == 0x06)
 		{
 			u8 *eocd = &buffer[scan];
 			dir_entries = eocd[10] | (eocd[11] << 8);
@@ -997,9 +1140,9 @@ save_error load_zip_state::init()
 	for ( ; dir_entries != 0 && offset < central.size() - 46; dir_entries--)
 	{
 		// find the start of entry
-		while (offset < central.size() && central[offset] != 0x50 && central[offset + 1] != 0x4b && central[offset + 2] != 0x01 && central[offset + 3] != 0x02)
-			offset++;
-		if (offset >= central.size())
+		if (offset + 46 >= dir_size)
+			return STATERR_INVALID_HEADER;
+		if (central[offset] != 0x50 && central[offset + 1] != 0x4b && central[offset + 2] != 0x01 && central[offset + 3] != 0x02)
 			return STATERR_INVALID_HEADER;
 
 		// only deflate is supported; anything else will be an error
@@ -1032,10 +1175,16 @@ save_error load_zip_state::init()
 	if (!reader.begin(json_offset) || !reader.read(&m_json_data[0], json_size) || !reader.end())
 		return STATERR_READ_ERROR;
 	m_json_data[json_size] = 0;
+	m_json_ptr = reinterpret_cast<char *>(&m_json_data[0]);
 
 	return STATERR_NONE;
 }
 
+
+//-------------------------------------------------
+//  find_file - find a file by name and return the
+//  uncompressed size plus the file offset
+//-------------------------------------------------
 
 bool load_zip_state::find_file(char const *name, u64 &offset, u32 &uncompsize)
 {
@@ -1105,7 +1254,6 @@ bool load_zip_state::read_data_recursive(zlib_read_streamer &zlib, save_register
 	}
 	return true;
 }
-
 
 
 
@@ -1520,11 +1668,11 @@ void save_registered_item::save_json(save_zip_state &zipstate, char const *namep
 //  the target containers
 //-------------------------------------------------
 
-void save_registered_item::restore_json(load_zip_state &input, char const *nameprefix, bool parseonly, uintptr_t objbase)
+void save_registered_item::restore_json(load_zip_state &input, char const *nameprefix, json_restore_mode mode, uintptr_t objbase)
 {
 	// update the base pointer and forward if a trivial unwrap
 	if (unwrap_and_update_objbase(objbase))
-		return m_items.front().restore_json(input, nameprefix, parseonly, objbase);
+		return m_items.front().restore_json(input, nameprefix, mode, objbase);
 
 	// update the name prefix
 	std::string localname = nameprefix;
@@ -1547,31 +1695,59 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 			else if (input.json_matches("false"))
 				value = false;
 			else
-				input.report_error("Unknown boolean value");
-			if (!parseonly)
+				input.report_error("%s: Unknown boolean value", localname.c_str());
+			if (mode == RESTORE_DATA)
 				write_bool(objbase, value);
+			else if (mode == COMPARE_DATA && read_bool(objbase) != value)
+				input.report_warning("%s: Compare failed: JSON says %d, data says %d", localname.c_str(), value, read_bool(objbase));
 			break;
 		}
 
 		// signed integral types
 		case TYPE_INT:
 		{
-			int64_t value;
-			if (!input.json_parse_int(value))
-				input.report_error("Expected integer value");
-			if (!parseonly)
-				write_int(objbase, m_native_size, value);
+			double dvalue;
+			int64_t ivalue;
+			if (input.json_parse_number(dvalue))
+			{
+				if (mode == RESTORE_DATA && !write_int_signed(objbase, m_native_size, dvalue))
+					input.report_warning("%s: Value of out range: %g", localname.c_str(), dvalue);
+				else if (mode == COMPARE_DATA && read_int_signed(objbase, m_native_size) != int64_t(dvalue))
+					input.report_warning("%s: Compare failed: JSON says %I64d, data says %g", localname.c_str(), dvalue, read_int_signed(objbase, m_native_size));
+			}
+			else if (input.json_parse_int_string(ivalue))
+			{
+				if (mode == RESTORE_DATA && !write_int_signed(objbase, m_native_size, ivalue))
+					input.report_warning("%s: Value of out range: %I64d", localname.c_str(), ivalue);
+				else if (mode == COMPARE_DATA && read_int_signed(objbase, m_native_size) != ivalue)
+					input.report_warning("%s: Compare failed: JSON says %I64d, data says %I64d", localname.c_str(), ivalue, read_int_signed(objbase, m_native_size));
+			}
+			else
+				input.report_error("%s: Expected integer value", localname.c_str());
 			break;
 		}
 
 		// unsigned integral types
 		case TYPE_UINT:
 		{
-			uint64_t value;
-			if (!input.json_parse_uint(value))
-				input.report_error("Expected integer value");
-			if (!parseonly)
-				write_int(objbase, m_native_size, value);
+			double dvalue;
+			uint64_t ivalue;
+			if (input.json_parse_number(dvalue))
+			{
+				if (mode == RESTORE_DATA && !write_int_unsigned(objbase, m_native_size, dvalue))
+					input.report_warning("%s: Value of out range: %g", localname.c_str(), dvalue);
+				else if (mode == COMPARE_DATA && read_int_unsigned(objbase, m_native_size) != uint64_t(dvalue))
+					input.report_warning("%s: Compare failed: JSON says %I64d, data says %g", localname.c_str(), dvalue, read_int_unsigned(objbase, m_native_size));
+			}
+			else if (input.json_parse_uint_string(ivalue))
+			{
+				if (mode == RESTORE_DATA && !write_int_unsigned(objbase, m_native_size, ivalue))
+					input.report_warning("%s: Value of out range: %I64d", localname.c_str(), ivalue);
+				else if (mode == COMPARE_DATA && read_int_unsigned(objbase, m_native_size) != ivalue)
+					input.report_warning("%s: Compare failed: JSON says %I64d, data says %I64d", localname.c_str(), ivalue, read_int_unsigned(objbase, m_native_size));
+			}
+			else
+				input.report_error("%s: Expected integer value", localname.c_str());
 			break;
 		}
 
@@ -1579,10 +1755,12 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 		case TYPE_FLOAT:
 		{
 			double value;
-			if (!input.json_parse_float(value))
-				input.report_error("Expected number");
-			if (!parseonly)
-				write_float(objbase, m_native_size, value);
+			if (!input.json_parse_number(value))
+				input.report_error("%s: Expected number", localname.c_str());
+			if (mode == RESTORE_DATA && !write_float(objbase, m_native_size, value))
+				input.report_warning("%s: Value of out range: %g", localname.c_str(), value);
+			else if (mode == COMPARE_DATA && read_float(objbase, m_native_size) != value)
+				input.report_warning("%s: Compare failed: JSON says %g, data says %g", localname.c_str(), value, read_float(objbase, m_native_size));
 			break;
 		}
 
@@ -1590,23 +1768,23 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 		case TYPE_CONTAINER:
 		case TYPE_STRUCT:
 			if (!input.json_matches('{'))
-				input.report_error("Expected '{'");
+				input.report_error("%s: Expected '{'", localname.c_str());
 			if (!input.json_matches('}'))
 				while (1)
 				{
 					std::string name;
 					if (!input.json_parse_string(name) || name == "")
-						input.report_error("Expected name within struct");
+						input.report_error("%s: Expected name within struct", localname.c_str());
 					if (!input.json_matches(':'))
-						input.report_error("Expected ':'");
+						input.report_error("%s: Expected ':'", localname.c_str());
 					save_registered_item *target = find(name.c_str());
 					if (target == nullptr)
-						input.report_warning("Found extraneous item %s.%s", nameprefix, name.c_str());
-					target->restore_json(input, nameprefix, parseonly || (target == nullptr), objbase);
+						input.report_warning("%s: Found extraneous item '%s'", localname.c_str(), name.c_str());
+					target->restore_json(input, nameprefix, (target == nullptr) ? PARSE_ONLY : mode, objbase);
 					if (input.json_matches('}'))
 						break;
 					if (!input.json_matches(','))
-						input.report_error("Expected ','");
+						input.report_error("%s: Expected ','", localname.c_str());
 				}
 			break;
 
@@ -1616,11 +1794,11 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 			{
 				auto &item = m_items.front();
 				if (!input.json_matches('['))
-					input.report_error("Expected '['");
-				if (parse_external_data(input, *this, localname.c_str(), parseonly, objbase))
+					input.report_error("%s: Expected '['", localname.c_str());
+				if (parse_external_data(input, *this, localname.c_str(), mode, objbase))
 				{
 					if (!input.json_matches(']'))
-						input.report_error("Expected ']'");
+						input.report_error("%s: Expected ']'", localname.c_str());
 				}
 				else
 				{
@@ -1628,15 +1806,15 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 					if (!input.json_matches(']'))
 						while (1)
 						{
-							item.restore_json(input, nameprefix, parseonly || rep >= count(), objbase + rep * m_native_size);
+							item.restore_json(input, nameprefix, (rep >= count()) ? PARSE_ONLY : mode, objbase + rep * m_native_size);
 							rep++;
 							if (input.json_matches(']'))
 								break;
 							if (!input.json_matches(','))
-								input.report_error("Expected ','");
+								input.report_error("%s: Expected ','", localname.c_str());
 						}
 					if (rep != count())
-						input.report_warning("Found %s array items than expected for %ss", (rep < count()) ? "fewer" : "more", localname.c_str());
+						input.report_warning("%s: Found %s array items than expected", localname.c_str(), (rep < count()) ? "fewer" : "more");
 				}
 			}
 			break;
@@ -1654,28 +1832,28 @@ bool save_registered_item::parse_external_data(load_zip_state &input, save_regis
 {
 	const bool native_little_endian = (ENDIANNESS_NATIVE == ENDIANNESS_LITTLE);
 
-	u64 pos = input.json_position();
+	char const *pos = input.json_position();
 	if (!input.json_matches('{'))
 		return false;
 
 	std::string parsed_filename;
-	u64 parsed_unit = 0;
-	u64 parsed_count = 0;
+	double parsed_unit = 0;
+	double parsed_count = 0;
 	bool parsed_little_endian = native_little_endian;
 	bool valid = false;
 	while (1)
 	{
 		std::string name;
 		if (!input.json_parse_string(name) || name == "")
-			input.report_error("Expected name within struct");
+			input.report_error("%s: Expected name within struct", localname);
 		if (!input.json_matches(':'))
-			input.report_error("Expected ':'");
+			input.report_error("%s: Expected ':'", localname);
 		valid = false;
 		if (name == "external_file" && parsed_filename == "" && input.json_parse_string(parsed_filename) && parsed_filename != "")
 			valid = true;
-		else if (name == "unit" && parsed_unit == 0 && input.json_parse_uint(parsed_unit) && parsed_unit != 0)
+		else if (name == "unit" && parsed_unit == 0 && input.json_parse_number(parsed_unit) && parsed_unit != 0)
 			valid = true;
-		else if (name == "count" && parsed_count == 0 && input.json_parse_uint(parsed_count) && parsed_count != 0)
+		else if (name == "count" && parsed_count == 0 && input.json_parse_number(parsed_count) && parsed_count != 0)
 			valid = true;
 		else if (name == "little_endian")
 		{
@@ -1689,7 +1867,7 @@ bool save_registered_item::parse_external_data(load_zip_state &input, save_regis
 		if (input.json_matches('}'))
 			break;
 		if (!input.json_matches(','))
-			input.report_error("Expected ','");
+			input.report_error("%s: Expected ','", localname);
 	}
 	if (!valid)
 	{
@@ -1701,11 +1879,11 @@ bool save_registered_item::parse_external_data(load_zip_state &input, save_regis
 	u64 offset;
 	u32 size;
 	if (!input.find_file(parsed_filename.c_str(), offset, size))
-		input.report_error("Unable to find file '%s' in archive", parsed_filename.c_str());
+		input.report_error("%s: Unable to find file '%s' in archive", localname, parsed_filename.c_str());
 	if (parsed_unit != 1 && parsed_unit != 2 && parsed_unit != 4 && parsed_unit != 8)
-		input.report_error("Invalid unit size for external file, expected 1, 2, 4, or 8");
+		input.report_error("%s: Invalid unit size for external file, expected 1, 2, 4, or 8", localname);
 	if (parsed_count == 0)
-		input.report_error("Invalid count for external file");
+		input.report_error("%s: Invalid count for external file", localname);
 
 	// look for the innermost registered item
 	save_registered_item *inner = &baseitem.subitems().front();
@@ -1716,9 +1894,9 @@ bool save_registered_item::parse_external_data(load_zip_state &input, save_regis
 		inner = &inner->subitems().front();
 	}
 	if (!inner->is_int_or_float())
-		input.report_error("External file specified for %s, but not valid for this type", localname);
+		input.report_error("%s: External file specified, but not valid for this type", localname);
 	if (parsed_unit != inner->native_size())
-		input.report_error("Item %s has external file but mismatched unit size", localname);
+		input.report_error("%s: External file has mismatched unit size", localname);
 
 	// if parseonly, we're done
 	if (parseonly)
@@ -1728,7 +1906,7 @@ bool save_registered_item::parse_external_data(load_zip_state &input, save_regis
 	bool flip = (parsed_little_endian != native_little_endian);
 	zlib_read_streamer reader(input.file());
 	if (!reader.begin(offset) || !input.read_data_recursive(reader, *this, flip, size, objbase) || !reader.end())
-		input.report_error("Error reading file '%s' in archive", parsed_filename.c_str());
+		input.report_error("%s: Error reading file '%s' in archive", localname, parsed_filename.c_str());
 
 	return true;
 }
@@ -1787,18 +1965,52 @@ double save_registered_item::read_float(uintptr_t objbase, int size) const
 
 
 //-------------------------------------------------
-//  write_int - write an integer of the given size
+//  write_int_signed - write a signed integer of
+//  the given size
 //-------------------------------------------------
 
-void save_registered_item::write_int(uintptr_t objbase, int size, uint64_t data) const
+bool save_registered_item::write_int_signed(uintptr_t objbase, int size, int64_t data) const
 {
 	switch (size)
 	{
-		case 1:	*reinterpret_cast<uint8_t *>(objbase) = uint8_t(data); break;
-		case 2:	*reinterpret_cast<uint16_t *>(objbase) = uint16_t(data); break;
-		case 4:	*reinterpret_cast<uint32_t *>(objbase) = uint32_t(data); break;
-		case 8:	*reinterpret_cast<uint64_t *>(objbase) = uint64_t(data); break;
+		case 1:	*reinterpret_cast<int8_t *>(objbase) = int8_t(data); return (data >= -0x80 && data <= 0x7f);
+		case 2:	*reinterpret_cast<int16_t *>(objbase) = int16_t(data); return (data >= -0x8000 && data <= 0x7fff);
+		case 4:	*reinterpret_cast<int32_t *>(objbase) = int32_t(data); return (data >= -0x80000000ll && data <= 0x7fffffffll);
+		case 8:	*reinterpret_cast<int64_t *>(objbase) = int64_t(data); return true;
 	}
+	return false;
+}
+
+bool save_registered_item::write_int_signed(uintptr_t objbase, int size, double data) const
+{
+	int64_t converted = int64_t(data);
+	bool ok = (double(converted) == data);
+	return write_int_signed(objbase, size, converted) && ok;
+}
+
+
+//-------------------------------------------------
+//  write_int_unsigned - write an unsigned integer
+//  of the given size
+//-------------------------------------------------
+
+bool save_registered_item::write_int_unsigned(uintptr_t objbase, int size, uint64_t data) const
+{
+	switch (size)
+	{
+		case 1:	*reinterpret_cast<uint8_t *>(objbase) = uint8_t(data); return (data <= 0xff);
+		case 2:	*reinterpret_cast<uint16_t *>(objbase) = uint16_t(data); return (data <= 0xffff);
+		case 4:	*reinterpret_cast<uint32_t *>(objbase) = uint32_t(data); return (data <= 0xffffffffull);
+		case 8:	*reinterpret_cast<uint64_t *>(objbase) = uint64_t(data); return true;
+	}
+	return false;
+}
+
+bool save_registered_item::write_int_unsigned(uintptr_t objbase, int size, double data) const
+{
+	uint64_t converted = uint64_t(data);
+	bool ok = (data >= 0 && double(converted) == data);
+	return write_int_unsigned(objbase, size, converted) && ok;
 }
 
 
@@ -1807,13 +2019,14 @@ void save_registered_item::write_int(uintptr_t objbase, int size, uint64_t data)
 //  the given size
 //-------------------------------------------------
 
-void save_registered_item::write_float(uintptr_t objbase, int size, double data) const
+bool save_registered_item::write_float(uintptr_t objbase, int size, double data) const
 {
 	switch (size)
 	{
-		case 4:	*reinterpret_cast<float *>(objbase) = float(data); break;
-		case 8:	*reinterpret_cast<double *>(objbase) = double(data); break;
+		case 4:	*reinterpret_cast<float *>(objbase) = float(data); return true;
+		case 8:	*reinterpret_cast<double *>(objbase) = double(data); return true;
 	}
+	return false;
 }
 
 

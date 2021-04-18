@@ -107,6 +107,14 @@ class save_registered_item
 	using generic_pointer = void * const;
 
 public:
+	// various modes for restoring JSON data
+	enum json_restore_mode
+	{
+		RESTORE_DATA,
+		COMPARE_DATA,
+		PARSE_ONLY
+	};
+
 	// the various types supported
 	enum save_type : uint32_t
 	{
@@ -165,7 +173,7 @@ public:
 	void save_json(save_zip_state &output, char const *nameprefix = "", int indent = 0, bool inline_form = false, uintptr_t objbase = 0);
 
 	// restore this item from a JSON stream
-	void restore_json(load_zip_state &input, char const *nameprefix = "", bool parseonly = false, uintptr_t objbase = 0);
+	void restore_json(load_zip_state &input, char const *nameprefix = "", json_restore_mode mode = RESTORE_DATA, uintptr_t objbase = 0);
 
 	// read/write helpers
 	bool read_bool(uintptr_t objbase) const { return *reinterpret_cast<bool const *>(objbase); }
@@ -173,8 +181,11 @@ public:
 	int64_t read_int_signed(uintptr_t objbase, int size) const;
 	double read_float(uintptr_t objbase, int size) const;
 	void write_bool(uintptr_t objbase, bool data) const { *reinterpret_cast<bool *>(objbase) = data; }
-	void write_int(uintptr_t objbase, int size, uint64_t data) const;
-	void write_float(uintptr_t objbase, int size, double data) const;
+	bool write_int_signed(uintptr_t objbase, int size, int64_t data) const;
+	bool write_int_signed(uintptr_t objbase, int size, double data) const;
+	bool write_int_unsigned(uintptr_t objbase, int size, uint64_t data) const;
+	bool write_int_unsigned(uintptr_t objbase, int size, double data) const;
+	bool write_float(uintptr_t objbase, int size, double data) const;
 
 private:
 	// parse out an external file spec from the JSON

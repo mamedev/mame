@@ -164,7 +164,7 @@ public:
 	void append(const void *data, uint32_t length);
 
 	// finalize and compute the final digest
-	crc32_t finish() { return m_accum; }
+	crc32_t finish() const { return m_accum; }
 
 	// static wrapper to just get the digest from a block
 	static crc32_t simple(const void *data, uint32_t length)
