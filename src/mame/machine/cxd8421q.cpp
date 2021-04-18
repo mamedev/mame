@@ -34,7 +34,7 @@ void cxd8421q_device::device_add_mconfig(machine_config &config)
     SCC85230(config, m_escc, 9.8304_MHz_XTAL); // 9.8304MHz per NetBSD source
     m_escc->out_int_callback().set(FUNC(cxd8421q_device::escc_irq_w));
 
-    RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
+    RS232_PORT(config, m_serial[0], default_rs232_devices, "pty");
     m_serial[0]->cts_handler().set(m_escc, FUNC(z80scc_device::ctsa_w));
     m_serial[0]->dcd_handler().set(m_escc, FUNC(z80scc_device::dcda_w));
     m_serial[0]->rxd_handler().set(m_escc, FUNC(z80scc_device::rxa_w));
