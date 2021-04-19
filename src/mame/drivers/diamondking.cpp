@@ -230,7 +230,7 @@ ROM_START(diamondkinp) // Without Euro support, just Ptas
 	ROM_REGION(0x100000, "iocpu", 0)
 	ROM_LOAD("io_na_6.0_segasa_m-12_diamond_king_8e96_01-1105_b-00-2194.u2", 0x00000, 0x100000, CRC(e0760b1f) SHA1(eafdab3832a70e3f848a2cb9a3cb4ff6f36815db))
 
-        ROM_REGION( 0x080000, "oki", 0 ) // M6376 Samples
+	ROM_REGION( 0x080000, "oki", 0 ) // M6376 Samples
 	ROM_LOAD( "b_segasa_m-12_diamond_king_sonido.ci4", 0x00000, 0x80000, CRC(1c0f8b4d) SHA1(38cf35e545db8f24320b0c80e6655d0a59aaec10) )
 ROM_END
 
