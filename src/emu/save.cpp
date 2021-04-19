@@ -1367,7 +1367,8 @@ bool save_registered_item::is_replicatable(bool parent_is_array) const
 		// unique pointers, vectors, and runtime arrays are non-replicatable
 		case TYPE_UNIQUE:
 		case TYPE_VECTOR:
-		case TYPE_RUNTIME_ARRAY:
+		case TYPE_VECTOR_ARRAY:
+		case TYPE_RAW_ARRAY:
 			return false;
 
 		// structs, containers, and static arrays are replicatable if all their owned items are
@@ -1490,7 +1491,8 @@ u64 save_registered_item::save_binary(u8 *ptr, u64 length, uintptr_t objbase) co
 
 		// arrays are multiples of a single item
 		case TYPE_STATIC_ARRAY:
-		case TYPE_RUNTIME_ARRAY:
+		case TYPE_VECTOR_ARRAY:
+		case TYPE_RAW_ARRAY:
 		{
 			auto item = m_items.begin();
 			auto last = std::prev(m_items.end());
@@ -1547,7 +1549,8 @@ u64 save_registered_item::restore_binary(u8 const *ptr, u64 length, uintptr_t ob
 
 		// arrays are multiples of a single item
 		case TYPE_STATIC_ARRAY:
-		case TYPE_RUNTIME_ARRAY:
+		case TYPE_VECTOR_ARRAY:
+		case TYPE_RAW_ARRAY:
 		{
 			auto item = m_items.begin();
 			auto last = std::prev(m_items.end());
@@ -1642,7 +1645,8 @@ void save_registered_item::save_json(save_zip_state &zipstate, char const *namep
 
 		// arrays are multiples of a single item
 		case TYPE_STATIC_ARRAY:
-		case TYPE_RUNTIME_ARRAY:
+		case TYPE_VECTOR_ARRAY:
+		case TYPE_RAW_ARRAY:
 		{
 			// look for large arrays of ints/floats
 			u32 total, unitsize;
@@ -1841,7 +1845,8 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 
 		// arrays are multiples of a single item
 		case TYPE_STATIC_ARRAY:
-		case TYPE_RUNTIME_ARRAY:
+		case TYPE_VECTOR_ARRAY:
+		case TYPE_RAW_ARRAY:
 		{
 			auto item = m_items.begin();
 			auto last = std::prev(m_items.end());
@@ -2112,6 +2117,92 @@ bool save_registered_item::is_endpoint_array(u32 &total, u32 &unitsize) const
 	// set the unit size and return true
 	unitsize = current->native_size();
 	return true;
+}
+
+
+
+//**************************************************************************
+//  SAVE REGISTRAR
+//**************************************************************************
+
+//-------------------------------------------------
+//  save_registrar - minimal internal constructor
+//-------------------------------------------------
+
+save_registrar::save_registrar(save_registered_item &item, void *baseptr) :
+	m_item(item),
+	m_regcontainerbase(uintptr_t(baseptr)),
+	m_regcontainersize(0)
+{
+}
+
+
+//-------------------------------------------------
+//  save_registrar - extended internal constructor
+//-------------------------------------------------
+
+save_registrar::save_registrar(save_registrar &parent, void *baseptr, save_registered_item::save_type type, u32 size, char const *name, u32 count, void *regcontainerbase, u32 regcontainersize) :
+	m_item(parent.item().append(parent.ptr_to_offset(baseptr, size, type), type, size, name, count)),
+	m_regcontainerbase(uintptr_t(regcontainerbase)),
+	m_regcontainersize(regcontainersize)
+{
+}
+
+
+//-------------------------------------------------
+//  reg - append all items from the source 
+//  registrar into a new container; note that the 
+//  items are stolen, not copied
+//-------------------------------------------------
+
+save_registrar &save_registrar::reg(save_registrar &src, char const *name)
+{
+	save_registrar container(*this, name);
+	auto &srcitems = src.item().subitems();
+	auto &dstitems = container.item().subitems();
+	dstitems.splice(dstitems.end(), srcitems);
+	return *this;
+}
+
+
+//-------------------------------------------------
+//  ptr_to_offset - given a pointer and size,
+//  make sure the item fits within its container,
+//  applying rules based on the container's type
+//  and the new item's type
+//-------------------------------------------------
+
+uintptr_t save_registrar::ptr_to_offset(void *ptr, u32 size, save_registered_item::save_type type)
+{
+	save_registered_item::save_type parent_type = m_item.type();
+
+	// anything you add to a container is at an absolute offset, so just return
+	// the unadjusted value
+	if (parent_type == save_registered_item::TYPE_CONTAINER)
+		return uintptr_t(ptr);
+
+	// if you are adding a container, the base pointer doesn't matter, so treat it as 0;
+	// if you are adding a unique or vector, the pointer for owned objects comes from the
+	// object itself, so also treat those as 0
+	else if (type == save_registered_item::TYPE_CONTAINER || 
+		parent_type == save_registered_item::TYPE_UNIQUE || 
+		parent_type == save_registered_item::TYPE_VECTOR)
+		return 0;
+
+	// compute the offset relative to the container base
+	uintptr_t offset = uintptr_t(ptr) - m_regcontainerbase;
+
+	// raw arrays get a pass (though they should be rare)
+	if (type == save_registered_item::TYPE_RAW_ARRAY)
+	{
+		osd_printf_warning("Raw array registered for saving; should be moved to a container\n");
+		return offset;
+	}
+
+	// everyone else gets a full check
+	if (m_regcontainersize != 0 && offset + size > m_regcontainersize)
+		throw emu_fatalerror("Attempted to register item outside of parent element's bounds");
+	return offset;
 }
 
 

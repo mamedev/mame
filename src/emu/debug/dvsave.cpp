@@ -86,7 +86,8 @@ void debug_view_save::build_list_recursive(save_registered_item &item, uintptr_t
 
 		// arrays are multiples of a single item
 		case save_registered_item::TYPE_STATIC_ARRAY:
-		case save_registered_item::TYPE_RUNTIME_ARRAY:
+		case save_registered_item::TYPE_VECTOR_ARRAY:
+		case save_registered_item::TYPE_RAW_ARRAY:
 		{
 			m_save_list.push_back(save_item(item, objbase, depth, count));
 			auto subitem = item.subitems().begin();
@@ -123,7 +124,7 @@ void debug_view_save::recompute()
 	reset();
 
 	// build the list of items
-	build_list_recursive(machine().save().root_registrar().parent_item(), 0, 0);
+	build_list_recursive(machine().save().root_registrar().item(), 0, 0);
 	m_save_list[0].set_collapse(false);
 	for (auto &item : m_save_list)
 		item.update_value();
@@ -386,7 +387,8 @@ std::string debug_view_save::save_item::value(save_registered_item &item, int co
 
 		// arrays are multiples of a single item
 		case save_registered_item::TYPE_STATIC_ARRAY:
-		case save_registered_item::TYPE_RUNTIME_ARRAY:
+		case save_registered_item::TYPE_VECTOR_ARRAY:
+		case save_registered_item::TYPE_RAW_ARRAY:
 		{
 			if (!collapsed)
 				catprintf(tempbuf, pos, "[%d]", item.count());

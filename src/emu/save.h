@@ -108,11 +108,12 @@ public:
 
 		TYPE_CONTAINER,     // 0                     0            list of contained items
 		TYPE_STRUCT,        // sizeof(struct)        relative     list of contained items
-		TYPE_STATIC_ARRAY,  // space-between-elems   relative     l
-		TYPE_RUNTIME_ARRAY, // space-between-elems   relative
+		TYPE_STATIC_ARRAY,  // space-between-elems   relative     either 1 replicated item, or n items
+		TYPE_VECTOR_ARRAY,  // space-between-elems   relative     either 1 replicated item, or n items
+		TYPE_RAW_ARRAY,     // space-between-elems   relative     either 1 replicated item, or n items
 
 		TYPE_UNIQUE,        // sizeof(unique_ptr)    relative     item at pointer
-		TYPE_VECTOR,        // sizeof(vector)        relative     TYPE_RUNTIME_ARRAY at pointer
+		TYPE_VECTOR,        // sizeof(vector)        relative     TYPE_VECTOR_ARRAY at pointer
 	};
 
 	// root constructor
@@ -126,7 +127,7 @@ public:
 	save_type type() const { return save_type(m_type_count & 15); }
 	u32 count() const { return m_type_count >> 4; }
 	bool is_struct_or_container() const { return (type() == TYPE_STRUCT || type() == TYPE_CONTAINER); }
-	bool is_array() const { return (type() == TYPE_STATIC_ARRAY || type() == TYPE_RUNTIME_ARRAY); }
+	bool is_array() const { return (type() == TYPE_STATIC_ARRAY || type() == TYPE_VECTOR_ARRAY || type() == TYPE_RAW_ARRAY); }
 	bool is_int() const { return (type() == TYPE_INT || type() == TYPE_UINT); }
 	bool is_int_or_float() const { return (is_int() || type() == TYPE_FLOAT); }
 	std::list<save_registered_item> &subitems() { return m_items; }
@@ -206,21 +207,9 @@ class save_registrar
 	friend class save_manager;
 	friend class device_t;
 
-	// extended constructor for internal use only
-	save_registrar(save_registrar &parent, void *baseptr, save_registered_item::save_type type, u32 native_size, char const *name, u32 count, void *regcontainerbase, u32 regcontainersize) :
-		m_parent_item(parent.parent_item().append((baseptr == nullptr) ? 0 : uintptr_t(baseptr) - parent.m_regcontainerbase, type, native_size, name, count)),
-		m_regcontainerbase(uintptr_t(regcontainerbase)),
-		m_regcontainersize(regcontainersize)
-	{
-	}
-
-	// internal constructor
-    save_registrar(save_registered_item &parent, void *baseptr = nullptr) :
-        m_parent_item(parent),
-        m_regcontainerbase(uintptr_t(baseptr)),
-		m_regcontainersize(0)
-    {
-    }
+	// internal constructors
+	save_registrar(save_registrar &parent, void *baseptr, save_registered_item::save_type type, u32 size, char const *name, u32 count, void *regcontainerbase, u32 regcontainersize);
+    save_registrar(save_registered_item &item, void *baseptr = nullptr);
 
 public:
 	// items that are signed_int_like are interpreted as 8/16/32/64-bit signed integers; this includes
@@ -246,17 +235,10 @@ public:
 	}
 
 	// return a reference to the parent item
-	save_registered_item &parent_item() const { return m_parent_item; }
+	save_registered_item &item() const { return m_item; }
 
 	// append a bucket by stealing its items
-	save_registrar &reg(save_registrar &src, char const *name)
-	{
-		save_registrar container(*this, name);
-		auto &srcitems = src.parent_item().subitems();
-		auto &dstitems = container.parent_item().subitems();
-		dstitems.splice(dstitems.end(), srcitems);
-        return *this;
-	}
+	save_registrar &reg(save_registrar &src, char const *name);
 
     // bool as a special case
     save_registrar &reg(bool &data, char const *name)
@@ -304,7 +286,7 @@ public:
 	template<typename T>
 	save_registrar &reg(T *data, char const *name, std::size_t count)
 	{
-		return register_array(data, save_registered_item::TYPE_RUNTIME_ARRAY, name, count);
+		return register_array(data, save_registered_item::TYPE_RAW_ARRAY, name, count);
 	}
 
     // arrays -- these are containers with a single item representing the underlying data,
@@ -332,7 +314,7 @@ public:
 
 		// create an outer container for the vector, then a regular array container within
 		save_registrar container(*this, &data, save_registered_item::TYPE_VECTOR, sizeof(data), name, 0, &data[0], sizeof(T));
-		container.register_array(&data[0], save_registered_item::TYPE_RUNTIME_ARRAY, name, data.size());
+		container.register_array(&data[0], save_registered_item::TYPE_VECTOR_ARRAY, name, data.size());
 		return *this;
     }
 
@@ -346,7 +328,7 @@ public:
 
 		// create an outer container for the unique_ptr, then a regular array container within
 		save_registrar container(*this, &data, save_registered_item::TYPE_UNIQUE, sizeof(data), name, 0, data.get(), sizeof(T));
-		container.register_array(&data[0], save_registered_item::TYPE_RUNTIME_ARRAY, name, count);
+		container.register_array(&data[0], save_registered_item::TYPE_RAW_ARRAY, name, count);
 		return *this;
 	}
 
@@ -371,9 +353,10 @@ public:
 	template<typename BitmapType>
 	std::enable_if_t<std::is_base_of<bitmap_t, BitmapType>::value, save_registrar> &reg(BitmapType &data, char const *name)
 	{
+		save_registrar container(*this, name);
 		void *pixbase = data.raw_pixptr(0);
-		save_registrar rows(*this, pixbase, save_registered_item::TYPE_RUNTIME_ARRAY, data.rowbytes(), name, data.height(), pixbase, 0);
-		save_registrar cols(rows, pixbase, save_registered_item::TYPE_RUNTIME_ARRAY, sizeof(BitmapType::pixel_t), "", data.width(), pixbase, 0);
+		save_registrar rows(container, pixbase, save_registered_item::TYPE_RAW_ARRAY, data.rowbytes(), name, data.height(), pixbase, 0);
+		save_registrar cols(rows, pixbase, save_registered_item::TYPE_STATIC_ARRAY, sizeof(BitmapType::pixel_t), "", data.width(), pixbase, 0);
 		cols.register_endpoint(pixbase, save_registered_item::TYPE_UINT, sizeof(BitmapType::pixel_t), "");
 		return *this;
 	}
@@ -382,10 +365,7 @@ private:
 	// register an endpoint item (containing no subitems)
     save_registrar &register_endpoint(void *memptr, save_registered_item::save_type type, std::size_t itemsize, char const *itemname)
     {
-		uintptr_t delta = uintptr_t(memptr) - m_regcontainerbase;
-		if (m_regcontainersize != 0 && delta >= m_regcontainersize)
-			throw emu_fatalerror("Attempted to register item outside of parent element's bounds");
-        m_parent_item.append(delta, type, itemsize, itemname);
+        m_item.append(ptr_to_offset(memptr, itemsize, type), type, itemsize, itemname);
         return *this;
     }
 
@@ -406,7 +386,7 @@ private:
 		container.reg(data[0], "");
 
 		// if the first item was non-replicatable, register remaining items independently
-		if (!container.m_parent_item.subitems().front().is_replicatable(true))
+		if (!container.m_item.subitems().front().is_replicatable(true))
 			for (int index = 1; index < count; index++)
 			{
 				container.m_regcontainerbase = uintptr_t(&data[index]);
@@ -415,8 +395,11 @@ private:
 		return *this;
 	}
 
+	// helper to verify an item against its container, and also compute the offset to store
+	uintptr_t ptr_to_offset(void *ptr, u32 size, save_registered_item::save_type type);
+
 	// internal state
-    save_registered_item &m_parent_item;
+    save_registered_item &m_item;
 	uintptr_t m_regcontainerbase;
 	u32 m_regcontainersize;
 };
