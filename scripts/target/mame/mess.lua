@@ -4437,6 +4437,8 @@ files {
 	MAME_DIR .. "src/mame/video/aussiebyte.cpp",
 	MAME_DIR .. "src/mame/drivers/ax20.cpp",
 	MAME_DIR .. "src/mame/drivers/basf7100.cpp",
+	MAME_DIR .. "src/mame/machine/basf7100_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/basf7100_kbd.h",
 	MAME_DIR .. "src/mame/drivers/binbug.cpp",
 	MAME_DIR .. "src/mame/drivers/bert.cpp",
 	MAME_DIR .. "src/mame/drivers/besta.cpp",
