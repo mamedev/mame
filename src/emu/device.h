@@ -219,6 +219,7 @@ private:
 
 	create_func const m_creator;
 	std::type_info const &m_type;
+	std::size_t const m_size;
 	char const *const m_shortname;
 	char const *const m_fullname;
 	char const *const m_source;
@@ -233,6 +234,7 @@ public:
 	device_type_impl_base(std::nullptr_t)
 		: m_creator(nullptr)
 		, m_type(typeid(std::nullptr_t))
+		, m_size(sizeof(std::nullptr_t))
 		, m_shortname(nullptr)
 		, m_fullname(nullptr)
 		, m_source(nullptr)
@@ -246,6 +248,7 @@ public:
 	device_type_impl_base(device_tag_struct<DeviceClass, ShortName, FullName, Source> (*)())
 		: m_creator(&create_device<DeviceClass>)
 		, m_type(typeid(DeviceClass))
+		, m_size(sizeof(DeviceClass))
 		, m_shortname(ShortName)
 		, m_fullname(FullName)
 		, m_source(Source)
@@ -259,6 +262,7 @@ public:
 	device_type_impl_base(driver_tag_struct<DriverClass, ShortName, FullName, Source, Unemulated, Imperfect> (*)())
 		: m_creator(&create_driver<DriverClass>)
 		, m_type(typeid(DriverClass))
+		, m_size(sizeof(DriverClass))
 		, m_shortname(ShortName)
 		, m_fullname(FullName)
 		, m_source(Source)
@@ -269,6 +273,7 @@ public:
 	}
 
 	std::type_info const &type() const { return m_type; }
+	std::size_t const size() const { return m_size; }
 	char const *shortname() const { return m_shortname; }
 	char const *fullname() const { return m_fullname; }
 	char const *source() const { return m_source; }
