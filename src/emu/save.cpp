@@ -1275,6 +1275,7 @@ bool load_zip_state::read_data_recursive(zlib_read_streamer &zlib, save_register
 //-------------------------------------------------
 
 save_registered_item::save_registered_item() :
+	m_parent(nullptr),
 	m_ptr_offset(0),
 	m_type_count(TYPE_CONTAINER),
 	m_native_size(0)
@@ -1282,7 +1283,8 @@ save_registered_item::save_registered_item() :
 }
 
 // constructor for a new item
-save_registered_item::save_registered_item(uintptr_t ptr_offset, save_type type, u32 native_size, char const *name, u32 count) :
+save_registered_item::save_registered_item(save_registered_item &parent, uintptr_t ptr_offset, save_type type, u32 native_size, char const *name, u32 count) :
+	m_parent(&parent),
 	m_ptr_offset(ptr_offset),
 	m_type_count(u32(type) | (count << 4)),
 	m_native_size(native_size),
@@ -1297,24 +1299,35 @@ save_registered_item::save_registered_item(uintptr_t ptr_offset, save_type type,
 
 
 //-------------------------------------------------
-//  append - append a new item to the current one
+//  full_name - return the full name of this item
 //-------------------------------------------------
 
-std::string type_string(save_registered_item::save_type type, u32 native_size)
+std::string save_registered_item::full_name() const
 {
-	switch (type)
-	{
-	case save_registered_item::TYPE_CONTAINER:	return "CONTAINER";
-	case save_registered_item::TYPE_UNIQUE:		return "UNIQUE";
-	case save_registered_item::TYPE_VECTOR:		return "VECTOR";
-	case save_registered_item::TYPE_STRUCT:		return "STRUCT";
-	case save_registered_item::TYPE_BOOL:		return "BOOL";
-	case save_registered_item::TYPE_INT:		return string_format("INT%d", 8 * native_size);
-	case save_registered_item::TYPE_UINT:		return string_format("UINT%d", 8 * native_size);
-	case save_registered_item::TYPE_FLOAT:		return string_format("FLOAT%d", 8 * native_size);
-	default:				return string_format("ARRAY[%d]", int(type));
-	}
+	// no parent? we're done
+	if (m_parent == nullptr)
+		return m_name;
+
+	// get the parent's full name
+	std::string result = m_parent->full_name();
+
+	// maybe add a separator
+	char end = result[result.length() - 1];
+	if (end != ':' && end != '.' && result.length() != 0)
+		result += ".";
+
+	// then append our bit
+	if (m_name.length() == 0 && m_parent->is_array())
+		result += "[]";
+	else
+		result += m_name;
+	return result;
 }
+
+
+//-------------------------------------------------
+//  append - append a new item to the current one
+//-------------------------------------------------
 
 save_registered_item &save_registered_item::append(uintptr_t ptr_offset, save_type type, u32 native_size, char const *name, u32 count)
 {
@@ -1325,7 +1338,7 @@ save_registered_item &save_registered_item::append(uintptr_t ptr_offset, save_ty
 //printf("%s '%s': adding %s '%s' @ %llX, size %d\n", type_string(m_type, m_native_size).c_str(), m_name.c_str(), type_string(type, native_size).c_str(), name, ptr_offset, native_size);
 
 	// add the item to the back of the list
-	m_items.emplace_back(ptr_offset, type, native_size, name, count);
+	m_items.emplace_back(*this, ptr_offset, type, native_size, name, count);
 	return m_items.back();
 }
 
@@ -1571,20 +1584,11 @@ u64 save_registered_item::restore_binary(u8 const *ptr, u64 length, uintptr_t ob
 //  save_json - save this item into a JSON stream
 //-------------------------------------------------
 
-void save_registered_item::save_json(save_zip_state &zipstate, char const *nameprefix, int indent, bool inline_form, uintptr_t objbase)
+void save_registered_item::save_json(save_zip_state &zipstate, int indent, bool inline_form, uintptr_t objbase)
 {
 	// update the base pointer and forward if a trivial unwrap
 	if (unwrap_and_update_base(objbase))
-		return m_items.front().save_json(zipstate, nameprefix, indent, inline_form, objbase);
-
-	// update the name prefix
-	std::string localname = nameprefix;
-	if (m_name.length() != 0)
-	{
-		if (localname.length() != 0)
-			localname += ".";
-		localname += m_name;
-	}
+		return m_items.front().save_json(zipstate, indent, inline_form, objbase);
 
 	// output the name if present
 	zipstate.json_append_name(m_name.c_str());
@@ -1621,7 +1625,7 @@ void save_registered_item::save_json(save_zip_state &zipstate, char const *namep
 				zipstate.json_append('{');
 				for (auto &item : m_items)
 				{
-					item.save_json(zipstate, localname.c_str(), indent, true, objbase);
+					item.save_json(zipstate, indent, true, objbase);
 					if (&item != &m_items.back())
 						zipstate.json_append(',');
 				}
@@ -1634,7 +1638,7 @@ void save_registered_item::save_json(save_zip_state &zipstate, char const *namep
 				for (auto &item : m_items)
 				{
 					zipstate.json_append_indent(indent + 1);
-					item.save_json(zipstate, localname.c_str(), indent + 1, false, objbase);
+					item.save_json(zipstate, indent + 1, false, objbase);
 					if (&item != &m_items.back())
 						zipstate.json_append(',');
 					zipstate.json_append_eol();
@@ -1652,7 +1656,7 @@ void save_registered_item::save_json(save_zip_state &zipstate, char const *namep
 			u32 total, unitsize;
 			if (is_endpoint_array(total, unitsize) && total * unitsize >= save_zip_state::JSON_EXTERNAL_BINARY_THRESHOLD)
 			{
-				char const *filename = zipstate.add_data_file(localname.c_str(), *this, objbase);
+				char const *filename = zipstate.add_data_file(full_name().c_str(), *this, objbase);
 
 				zipstate.json_append('[').json_append('{');
 				zipstate.json_append_name("external_file");
@@ -1678,7 +1682,7 @@ void save_registered_item::save_json(save_zip_state &zipstate, char const *namep
 					zipstate.json_append('[');
 					for (u32 rep = 0; rep < count(); rep++)
 					{
-						item->save_json(zipstate, localname.c_str(), 0, true, objbase + rep * m_native_size);
+						item->save_json(zipstate, 0, true, objbase + rep * m_native_size);
 						if (rep != count() - 1)
 							zipstate.json_append(',');
 						if (item != last)
@@ -1699,7 +1703,7 @@ void save_registered_item::save_json(save_zip_state &zipstate, char const *namep
 					{
 						if (rep % items_per_row == 0)
 							zipstate.json_append_indent(indent + 1);
-						item->save_json(zipstate, localname.c_str(), indent + 1, false, objbase + rep * m_native_size);
+						item->save_json(zipstate, indent + 1, false, objbase + rep * m_native_size);
 						if (rep != count() - 1)
 							zipstate.json_append(',');
 						if (rep % items_per_row == items_per_row - 1)
@@ -1723,20 +1727,11 @@ void save_registered_item::save_json(save_zip_state &zipstate, char const *namep
 //  the target containers
 //-------------------------------------------------
 
-void save_registered_item::restore_json(load_zip_state &input, char const *nameprefix, json_restore_mode mode, uintptr_t objbase)
+void save_registered_item::restore_json(load_zip_state &input, json_restore_mode mode, uintptr_t objbase)
 {
 	// update the base pointer and forward if a trivial unwrap
 	if (unwrap_and_update_base(objbase))
-		return m_items.front().restore_json(input, nameprefix, mode, objbase);
-
-	// update the name prefix
-	std::string localname = nameprefix;
-	if (m_name.length() != 0)
-	{
-		if (localname.length() != 0)
-			localname += ".";
-		localname += m_name;
-	}
+		return m_items.front().restore_json(input, mode, objbase);
 
 	// switch off the type
 	switch (type())
@@ -1750,11 +1745,11 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 			else if (input.json_matches("false"))
 				value = false;
 			else
-				input.report_error(STATERR_MALFORMED_JSON, "%s: Unknown boolean value", localname.c_str());
+				input.report_error(STATERR_MALFORMED_JSON, "%s: Unknown boolean value", full_name().c_str());
 			if (mode == RESTORE_DATA)
 				write_bool(objbase, value);
 			else if (mode == COMPARE_DATA && read_bool(objbase) != value)
-				input.report_warning("%s: Compare failed: JSON says %d, data says %d", localname.c_str(), value, read_bool(objbase));
+				input.report_warning("%s: Compare failed: JSON says %d, data says %d", full_name().c_str(), value, read_bool(objbase));
 			break;
 		}
 
@@ -1766,19 +1761,19 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 			if (input.json_parse_number(dvalue))
 			{
 				if (mode == RESTORE_DATA && !write_int_signed(objbase, m_native_size, dvalue))
-					input.report_warning("%s: Value of out range: %1.17g", localname.c_str(), dvalue);
+					input.report_warning("%s: Value of out range: %1.17g", full_name().c_str(), dvalue);
 				else if (mode == COMPARE_DATA && read_int_signed(objbase, m_native_size) != s64(dvalue))
-					input.report_warning("%s: Compare failed: JSON says %I64d, data says %1.17g", localname.c_str(), dvalue, read_int_signed(objbase, m_native_size));
+					input.report_warning("%s: Compare failed: JSON says %I64d, data says %1.17g", full_name().c_str(), dvalue, read_int_signed(objbase, m_native_size));
 			}
 			else if (input.json_parse_int_string(ivalue))
 			{
 				if (mode == RESTORE_DATA && !write_int_signed(objbase, m_native_size, ivalue))
-					input.report_warning("%s: Value of out range: %I64d", localname.c_str(), ivalue);
+					input.report_warning("%s: Value of out range: %I64d", full_name().c_str(), ivalue);
 				else if (mode == COMPARE_DATA && read_int_signed(objbase, m_native_size) != ivalue)
-					input.report_warning("%s: Compare failed: JSON says %I64d, data says %I64d", localname.c_str(), ivalue, read_int_signed(objbase, m_native_size));
+					input.report_warning("%s: Compare failed: JSON says %I64d, data says %I64d", full_name().c_str(), ivalue, read_int_signed(objbase, m_native_size));
 			}
 			else
-				input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Expected integer value", localname.c_str());
+				input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Expected integer value", full_name().c_str());
 			break;
 		}
 
@@ -1790,19 +1785,19 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 			if (input.json_parse_number(dvalue))
 			{
 				if (mode == RESTORE_DATA && !write_int_unsigned(objbase, m_native_size, dvalue))
-					input.report_warning("%s: Value of out range: %1.17g", localname.c_str(), dvalue);
+					input.report_warning("%s: Value of out range: %1.17g", full_name().c_str(), dvalue);
 				else if (mode == COMPARE_DATA && read_int_unsigned(objbase, m_native_size) != u64(dvalue))
-					input.report_warning("%s: Compare failed: JSON says %I64d, data says %1.17g", localname.c_str(), dvalue, read_int_unsigned(objbase, m_native_size));
+					input.report_warning("%s: Compare failed: JSON says %I64d, data says %1.17g", full_name().c_str(), dvalue, read_int_unsigned(objbase, m_native_size));
 			}
 			else if (input.json_parse_uint_string(ivalue))
 			{
 				if (mode == RESTORE_DATA && !write_int_unsigned(objbase, m_native_size, ivalue))
-					input.report_warning("%s: Value of out range: %I64d", localname.c_str(), ivalue);
+					input.report_warning("%s: Value of out range: %I64d", full_name().c_str(), ivalue);
 				else if (mode == COMPARE_DATA && read_int_unsigned(objbase, m_native_size) != ivalue)
-					input.report_warning("%s: Compare failed: JSON says %I64d, data says %I64d", localname.c_str(), ivalue, read_int_unsigned(objbase, m_native_size));
+					input.report_warning("%s: Compare failed: JSON says %I64d, data says %I64d", full_name().c_str(), ivalue, read_int_unsigned(objbase, m_native_size));
 			}
 			else
-				input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Expected integer value", localname.c_str());
+				input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Expected integer value", full_name().c_str());
 			break;
 		}
 
@@ -1811,11 +1806,11 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 		{
 			double value;
 			if (!input.json_parse_number(value))
-				input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Expected number", localname.c_str());
+				input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Expected number", full_name().c_str());
 			if (mode == RESTORE_DATA && !write_float(objbase, m_native_size, value))
-				input.report_warning("%s: Value of out range: %1.17g", localname.c_str(), value);
+				input.report_warning("%s: Value of out range: %1.17g", full_name().c_str(), value);
 			else if (mode == COMPARE_DATA && read_float(objbase, m_native_size) != value)
-				input.report_warning("%s: Compare failed: JSON says %1.17g, data says %1.17g", localname.c_str(), value, read_float(objbase, m_native_size));
+				input.report_warning("%s: Compare failed: JSON says %1.17g, data says %1.17g", full_name().c_str(), value, read_float(objbase, m_native_size));
 			break;
 		}
 
@@ -1823,23 +1818,23 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 		case TYPE_CONTAINER:
 		case TYPE_STRUCT:
 			if (!input.json_matches('{'))
-				input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Expected '{'", localname.c_str());
+				input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Expected '{'", full_name().c_str());
 			if (!input.json_matches('}'))
 				while (1)
 				{
 					std::string name;
 					if (!input.json_parse_string(name) || name == "")
-						input.report_error(STATERR_MALFORMED_JSON, "%s: Expected name within struct", localname.c_str());
+						input.report_error(STATERR_MALFORMED_JSON, "%s: Expected name within struct", full_name().c_str());
 					if (!input.json_matches(':'))
-						input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ':'", localname.c_str());
+						input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ':'", full_name().c_str());
 					save_registered_item *target = find(name.c_str());
 					if (target == nullptr)
-						input.report_warning("%s: Found extraneous item '%s'", localname.c_str(), name.c_str());
-					target->restore_json(input, localname.c_str(), (target == nullptr) ? PARSE_ONLY : mode, objbase);
+						input.report_warning("%s: Found extraneous item '%s'", full_name().c_str(), name.c_str());
+					target->restore_json(input, (target == nullptr) ? PARSE_ONLY : mode, objbase);
 					if (input.json_matches('}'))
 						break;
 					if (!input.json_matches(','))
-						input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ','", localname.c_str());
+						input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ','", full_name().c_str());
 				}
 			break;
 
@@ -1851,11 +1846,11 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 			auto item = m_items.begin();
 			auto last = std::prev(m_items.end());
 			if (!input.json_matches('['))
-				input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Expected '['", localname.c_str());
-			if (parse_external_data(input, *this, localname.c_str(), mode, objbase))
+				input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Expected '['", full_name().c_str());
+			if (parse_external_data(input, mode, objbase))
 			{
 				if (!input.json_matches(']'))
-					input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ']'", localname.c_str());
+					input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ']'", full_name().c_str());
 			}
 			else
 			{
@@ -1863,17 +1858,17 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 				if (!input.json_matches(']'))
 					while (1)
 					{
-						item->restore_json(input, localname.c_str(), (rep >= count()) ? PARSE_ONLY : mode, objbase + rep * m_native_size);
+						item->restore_json(input, (rep >= count()) ? PARSE_ONLY : mode, objbase + rep * m_native_size);
 						rep++;
 						if (item != last)
 							++item;
 						if (input.json_matches(']'))
 							break;
 						if (!input.json_matches(','))
-							input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ','", localname.c_str());
+							input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ','", full_name().c_str());
 					}
 				if (rep != count())
-					input.report_warning("%s: Found %s array items than expected", localname.c_str(), (rep < count()) ? "fewer" : "more");
+					input.report_warning("%s: Found %s array items than expected", full_name().c_str(), (rep < count()) ? "fewer" : "more");
 			}
 			break;
 		}
@@ -1887,7 +1882,7 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 //  it; returns false if not an external file spec
 //-------------------------------------------------
 
-bool save_registered_item::parse_external_data(load_zip_state &input, save_registered_item &baseitem, char const *localname, bool parseonly, uintptr_t objbase)
+bool save_registered_item::parse_external_data(load_zip_state &input, bool parseonly, uintptr_t objbase)
 {
 	const bool native_little_endian = (ENDIANNESS_NATIVE == ENDIANNESS_LITTLE);
 
@@ -1904,9 +1899,9 @@ bool save_registered_item::parse_external_data(load_zip_state &input, save_regis
 	{
 		std::string name;
 		if (!input.json_parse_string(name) || name == "")
-			input.report_error(STATERR_MALFORMED_JSON, "%s: Expected name within struct", localname);
+			input.report_error(STATERR_MALFORMED_JSON, "%s: Expected name within struct", full_name().c_str());
 		if (!input.json_matches(':'))
-			input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ':'", localname);
+			input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ':'", full_name().c_str());
 		valid = false;
 		if (name == "external_file" && parsed_filename == "" && input.json_parse_string(parsed_filename) && parsed_filename != "")
 			valid = true;
@@ -1926,7 +1921,7 @@ bool save_registered_item::parse_external_data(load_zip_state &input, save_regis
 		if (input.json_matches('}'))
 			break;
 		if (!input.json_matches(','))
-			input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ','", localname);
+			input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ','", full_name().c_str());
 	}
 	if (!valid)
 	{
@@ -1938,14 +1933,14 @@ bool save_registered_item::parse_external_data(load_zip_state &input, save_regis
 	u64 offset;
 	u32 size;
 	if (!input.find_file(parsed_filename.c_str(), offset, size))
-		input.report_error(STATERR_MISSING_FILE, "%s: Unable to find file '%s' in archive", localname, parsed_filename.c_str());
+		input.report_error(STATERR_MISSING_FILE, "%s: Unable to find file '%s' in archive", full_name().c_str(), parsed_filename.c_str());
 	if (parsed_unit != 1 && parsed_unit != 2 && parsed_unit != 4 && parsed_unit != 8)
-		input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Invalid unit size for external file, expected 1, 2, 4, or 8", localname);
+		input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Invalid unit size for external file, expected 1, 2, 4, or 8", full_name().c_str());
 	if (parsed_count == 0)
-		input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Invalid count for external file", localname);
+		input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Invalid count for external file", full_name().c_str());
 
 	// look for the innermost registered item
-	save_registered_item *inner = &baseitem.subitems().front();
+	save_registered_item *inner = &m_items.front();
 	u32 total = count();
 	while (inner->is_array())
 	{
@@ -1953,9 +1948,9 @@ bool save_registered_item::parse_external_data(load_zip_state &input, save_regis
 		inner = &inner->subitems().front();
 	}
 	if (!inner->is_int_or_float())
-		input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: External file specified, but not valid for this type", localname);
+		input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: External file specified, but not valid for this type", full_name().c_str());
 	if (parsed_unit != inner->native_size())
-		input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: External file has mismatched unit size", localname);
+		input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: External file has mismatched unit size", full_name().c_str());
 
 	// if parseonly, we're done
 	if (parseonly)
@@ -1965,7 +1960,7 @@ bool save_registered_item::parse_external_data(load_zip_state &input, save_regis
 	bool flip = (parsed_little_endian != native_little_endian);
 	zlib_read_streamer reader(input.file());
 	if (!reader.begin(offset) || !input.read_data_recursive(reader, *this, flip, size, objbase) || !reader.end())
-		input.report_error(STATERR_READ_ERROR, "%s: Error reading file '%s' in archive", localname, parsed_filename.c_str());
+		input.report_error(STATERR_READ_ERROR, "%s: Error reading file '%s' in archive", full_name().c_str(), parsed_filename.c_str());
 
 	return true;
 }
@@ -2120,6 +2115,30 @@ bool save_registered_item::is_endpoint_array(u32 &total, u32 &unitsize) const
 }
 
 
+//-------------------------------------------------
+//  type_string - return a string describing the
+//  given type
+//-------------------------------------------------
+
+std::string save_registered_item::type_string(save_registered_item::save_type type, u32 native_size, u32 count)
+{
+	switch (type)
+	{
+		case save_registered_item::TYPE_CONTAINER:		return "CONTAINER";
+		case save_registered_item::TYPE_UNIQUE:			return "UNIQUE";
+		case save_registered_item::TYPE_VECTOR:			return "VECTOR";
+		case save_registered_item::TYPE_STRUCT:			return "STRUCT";
+		case save_registered_item::TYPE_STATIC_ARRAY:	return string_format("STATIC_ARRAY[%d]", count);
+		case save_registered_item::TYPE_VECTOR_ARRAY:	return string_format("VECTOR_ARRAY[%d]", count);
+		case save_registered_item::TYPE_RAW_ARRAY:		return string_format("RAW_ARRAY[%d]", count);
+		case save_registered_item::TYPE_BOOL:			return "BOOL";
+		case save_registered_item::TYPE_INT:			return string_format("INT%d", 8 * native_size);
+		case save_registered_item::TYPE_UINT:			return string_format("UINT%d", 8 * native_size);
+		case save_registered_item::TYPE_FLOAT:			return string_format("FLOAT%d", 8 * native_size);
+		default:				return string_format("UNKNOWN(%d)", int(type));
+	}
+}
+
 
 //**************************************************************************
 //  SAVE REGISTRAR
@@ -2150,8 +2169,8 @@ save_registrar::save_registrar(save_registrar &parent, void *baseptr, save_regis
 
 
 //-------------------------------------------------
-//  reg - append all items from the source 
-//  registrar into a new container; note that the 
+//  reg - append all items from the source
+//  registrar into a new container; note that the
 //  items are stolen, not copied
 //-------------------------------------------------
 
@@ -2184,8 +2203,8 @@ uintptr_t save_registrar::ptr_to_offset(void *ptr, u32 size, save_registered_ite
 	// if you are adding a container, the base pointer doesn't matter, so treat it as 0;
 	// if you are adding a unique or vector, the pointer for owned objects comes from the
 	// object itself, so also treat those as 0
-	else if (type == save_registered_item::TYPE_CONTAINER || 
-		parent_type == save_registered_item::TYPE_UNIQUE || 
+	else if (type == save_registered_item::TYPE_CONTAINER ||
+		parent_type == save_registered_item::TYPE_UNIQUE ||
 		parent_type == save_registered_item::TYPE_VECTOR)
 		return 0;
 
@@ -2429,7 +2448,7 @@ save_error save_manager::compare_file(emu_file &file)
 	// restore_json will throw on parse errors and the like
 	try
 	{
-		m_root_item.restore_json(state, "", save_registered_item::COMPARE_DATA);
+		m_root_item.restore_json(state, save_registered_item::COMPARE_DATA);
 		char const *warnings = state.warnings();
 		if (warnings != nullptr)
 		{

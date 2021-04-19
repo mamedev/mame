@@ -120,19 +120,25 @@ public:
     save_registered_item();
 
 	// constructor for a new item
-    save_registered_item(uintptr_t ptr_offset, save_type type, u32 native_size, char const *name, u32 count = 0);
+    save_registered_item(save_registered_item &parent, uintptr_t ptr_offset, save_type type, u32 native_size, char const *name, u32 count = 0);
 
 	// simple getters
+	std::list<save_registered_item> &subitems() { return m_items; }
+	save_registered_item *parent() const { return m_parent; }
 	char const *name() const { return m_name.c_str(); }
 	save_type type() const { return save_type(m_type_count & 15); }
 	u32 count() const { return m_type_count >> 4; }
+	u32 native_size() const { return m_native_size; }
+	uintptr_t ptr_offset() const { return m_ptr_offset; }
+
+	// type helpers
 	bool is_struct_or_container() const { return (type() == TYPE_STRUCT || type() == TYPE_CONTAINER); }
 	bool is_array() const { return (type() == TYPE_STATIC_ARRAY || type() == TYPE_VECTOR_ARRAY || type() == TYPE_RAW_ARRAY); }
 	bool is_int() const { return (type() == TYPE_INT || type() == TYPE_UINT); }
 	bool is_int_or_float() const { return (is_int() || type() == TYPE_FLOAT); }
-	std::list<save_registered_item> &subitems() { return m_items; }
-	u32 native_size() const { return m_native_size; }
-	uintptr_t ptr_offset() const { return m_ptr_offset; }
+
+	// return the full name of this item
+	std::string full_name() const;
 
 	// append a new item to the current one
     save_registered_item &append(uintptr_t ptr_offset, save_type type, u32 native_size, char const *name, u32 count = 0);
@@ -159,10 +165,10 @@ public:
 	u64 restore_binary(u8 const *ptr, u64 length, uintptr_t parentbase = 0) const;
 
 	// save this item into a JSON stream
-	void save_json(save_zip_state &output, char const *nameprefix = "", int indent = 0, bool inline_form = false, uintptr_t parentbase = 0);
+	void save_json(save_zip_state &output, int indent = 0, bool inline_form = false, uintptr_t parentbase = 0);
 
 	// restore this item from a JSON stream
-	void restore_json(load_zip_state &input, char const *nameprefix = "", json_restore_mode mode = RESTORE_DATA, uintptr_t parentbase = 0);
+	void restore_json(load_zip_state &input, json_restore_mode mode = RESTORE_DATA, uintptr_t parentbase = 0);
 
 	// read/write helpers for bools
 	bool read_bool(uintptr_t objptr) const { return *reinterpret_cast<bool const *>(objptr); }
@@ -187,10 +193,15 @@ private:
 	bool is_endpoint_array(u32 &total, u32 &unitsize) const;
 
 	// parse out an external file spec from the JSON
-	bool parse_external_data(load_zip_state &input, save_registered_item &baseitem, char const *localname, bool parseonly, uintptr_t parentbase);
+	bool parse_external_data(load_zip_state &input, bool parseonly, uintptr_t parentbase);
+
+	// return a string for a type
+	static std::string type_string(save_type type, u32 native_sizem, u32 conunt);
+	std::string type_string() { return type_string(type(), native_size(), count()); }
 
 	// internal state
     std::list<save_registered_item> m_items; // list of embedded items
+	save_registered_item *m_parent;          // pointer to parent item
     uintptr_t m_ptr_offset;                  // pointer or offset
 	u32 m_type_count;                        // type and count
     u32 m_native_size;                       // native size of item
