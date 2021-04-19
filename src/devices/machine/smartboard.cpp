@@ -73,6 +73,7 @@ tasc_sb30_device::tasc_sb30_device(const machine_config &mconfig, const char *ta
 	: device_t(mconfig, TASC_SB30, tag, owner, clock)
 	, m_board(*this, "board")
 	, m_out_leds(*this, "sb30_led_%u.%u", 0U, 0U)
+	, m_conf(*this, "CONF")
 	, m_data_out(*this)
 	, m_led_out(*this)
 { }
@@ -100,6 +101,23 @@ void tasc_sb30_device::device_start()
 	save_item(NAME(m_pos));
 	save_item(NAME(m_shift));
 	save_item(NAME(m_squares));
+}
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+static INPUT_PORTS_START( smartboard )
+	PORT_START("CONF")
+	PORT_CONFNAME( 0x01, 0x00, "Duplicate Piece IDs" )
+	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
+INPUT_PORTS_END
+
+ioport_constructor tasc_sb30_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(smartboard);
 }
 
 
@@ -155,7 +173,7 @@ bool tasc_sb30_device::piece_available(u8 id)
 		for (int x = 0; x < 8; x++)
 		{
 			if (m_board->read_piece(x, y) == id)
-				return false;
+				return bool(m_conf->read() & 1);
 		}
 
 	return true;

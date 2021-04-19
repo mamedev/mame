@@ -32,10 +32,12 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 private:
 	required_device<sensorboard_device> m_board;
-	output_finder<8,8> m_out_leds;
+	output_finder<8, 8> m_out_leds;
+	required_ioport m_conf;
 
 	devcb_write_line m_data_out;
 	devcb_write8 m_led_out;
