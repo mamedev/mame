@@ -1909,6 +1909,20 @@ ROM_START( alphatp50 )
 ROM_END
 
 
+/************************************************ Triumph-Adler TA 1700-PC ***
+Another 80186 PC compatible from Triumph-Adler, looks very similar to the P50 that is already in MAME.
+In this case, a hard card with a Lapine 20MB harddisk is inside, and the floppy controller is included
+on the mainboard on the area that is left blank on the P50.
+
+Both mainboards are B301-30747
+*****************************************************************************/
+
+ROM_START( ta1700pc )
+	ROM_REGION16_LE(0x10000, "bios", 0)
+	ROMX_LOAD("ta1700pc_ceab06_02_103.bin", 0x8000, 0x4000, CRC(2a6a116a) SHA1(459c7533f56c358a9f63469ad43904f3bdf851ae), ROM_SKIP(1))
+	ROMX_LOAD("ta1700pc_ceab07_02_104.bin", 0x8001, 0x4000, CRC(4313d4db) SHA1(36ece348c2369be6bb2d6895fb7e99d3fa944ac5), ROM_SKIP(1))
+ROM_END
+
 /********************************************************** Sanyo MBC-16LT ***
 Form factor: Laptop
 Motherboard ID: SPC-500B, ROM BIOS Version 1.03, at least a Version 1.06 exists as well
@@ -2312,6 +2326,7 @@ COMP( 1985, pc7000,         ibm5150, 0,      eagle1600,      pccga,    pc_state,
 COMP( 1987, to16,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Thomson SIMIV",                   "TO16",                  MACHINE_NOT_WORKING )
 COMP( 1985, alphatp10,      ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Triumph-Adler",                   "Alphatronic P10",       0 )
 COMP( 1985, alphatp50,      ibm5150, 0,      alphatp50,      pccga,    pc_state, empty_init,    "Triumph-Adler",                   "Alphatronic P50",       0 )
+COMP( 1984, ta1700pc,       ibm5150, 0,      alphatp50,      pccga,    pc_state, empty_init,    "Triumph-Adler",                   "TA 1700-PC",            0 )
 COMP( 198?, hstrtpls,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Vendex",                          "HeadStart Plus",        MACHINE_NOT_WORKING )
 COMP( 1987, vpcii,          ibm5150, 0,      vpcii,          pccga,    pc_state, empty_init,    "Victor",                          "VPC II",                MACHINE_NOT_WORKING )
 COMP( 1988, laser_turbo_xt, ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "VTech",                           "Laser Turbo XT",        0 )
