@@ -35,28 +35,6 @@ cdu75s_device::cdu75s_device(const machine_config &mconfig, const char *tag, dev
 
 void cdu75s_device::device_start()
 {
-	// We're getting interesting results with a basic vectors map,
-	// e.g. vector<n> points to 0x10000+4*n, where there's a jmp to
-	// the final destination
-
-	// Actually used vectors:
-	//  0 00 reset
-	//  7 1c nmi
-	//  9 24 ?
-	// 11 2c ?
-	// 12 30 irq0
-	// 15 3c irq3
-	// 18 48 reserved?
-	// 21 54 reserved?
-	// 25 64 imib0
-	// 26 68 ovi0
-
-	// kinda means it's not just 1:1
-
-	for(u32 i = 0; i != 64; i++) {
-		m_rom[i*2] = 1;
-		m_rom[i*2+1] = i*4;
-	}
 }
 
 void cdu75s_device::mem_map(address_map &map)
@@ -85,7 +63,7 @@ void cdu75s_device::device_add_mconfig(machine_config &config)
 
 ROM_START(cdu75s)
 	ROM_REGION(0x20000, "mcu", 0)
-	ROM_FILL(0x00000, 0x10000, 0x00) // Internal rom not yet dumped
+	ROM_LOAD("ic201.bin",                       0x00000, 0x10000, CRC(8781ad49) SHA1(abdfb2561f2420a7f462e3bd5c8bd4d6eb0a9dfb))
 	ROM_LOAD("cdu-75s_1.0j_95.03.14_apple.bin", 0x10000, 0x10000, CRC(f4ad4d48) SHA1(7d674116304bc6948fe4a52d9859b4eb5d40b914))
 ROM_END
 
