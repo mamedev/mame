@@ -157,8 +157,8 @@ const char *const mn1860_disassembler::s_inst_names[256] =
 	"call", "call", "call", "call", "call", "call", "call", "call",
 	"br", "br", "br", "br", "br", "br", "br", "br",
 	"br", "br", "br", "br", "br", "br", "br", "br",
-	nullptr, "pop", nullptr, "pop", "pop", "pop", "pop", "pop",
-	nullptr, "push", nullptr, "push", "push", "push", "push", "push",
+	nullptr, "pop", "divl", "pop", "pop", "pop", "pop", "pop",
+	nullptr, "push", "mull", "push", "push", "push", "push", "push",
 	"subcl", "div", "subcl", "subcl", "xch", "xch", "xch", "xch",
 	"addcl", "mul", "addcl", "addcl", "mov", "mov", "mov", "mov",
 	"cmp", "cmp", "cmp", "cmp", "xch", "xch", nullptr, "xch",
@@ -303,7 +303,7 @@ void mn1880_disassembler::dasm_operands(std::ostream &stream, u8 opcode, offs_t 
 		stream << ", ";
 		format_imm(stream, opcodes.r8(pc++));
 	}
-	else if (opcode < 0x50 || (opcode & 0xf7) == 0xb5 || ((opcode & 0xf7) == 0xc3 && m_inst_names[opcode][4] == 0))
+	else if (opcode < 0x50 || (opcode & 0xf7) == 0xb5 || ((opcode & 0xf7) == 0xc3 && m_inst_names[opcode][4] == '\0'))
 	{
 		// Unary operations
 		if (BIT(opcode, 0))
@@ -428,7 +428,7 @@ void mn1880_disassembler::dasm_operands(std::ostream &stream, u8 opcode, offs_t 
 	{
 		if (BIT(opcode, 0))
 			stream << "fs";
-		else
+		else if (m_inst_names[opcode][0] == 't' || m_inst_names[opcode][3] == '\0')
 		{
 			// CLR, SET, T1BNZ, T1BZ indirect (MN1870 only)
 			format_indirect_bp(stream, "xp", opcodes.r8(pc++) & 0x07);
@@ -438,6 +438,16 @@ void mn1880_disassembler::dasm_operands(std::ostream &stream, u8 opcode, offs_t 
 				format_rel(stream, pc + 1, opcodes.r8(pc));
 				++pc;
 			}
+		}
+		else
+		{
+			// 3 direct operands? (MN1880 only)
+			format_direct(stream, opcodes.r8(pc + 2));
+			stream << ", ";
+			format_direct(stream, opcodes.r8(pc));
+			stream << ", ";
+			format_direct(stream, opcodes.r8(pc + 1));
+			pc += 3;
 		}
 	}
 	else if (opcode < 0xc0 || (opcode & 0xfc) == 0xe4 || (opcode & 0xfe) == 0xfc)
