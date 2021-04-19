@@ -141,7 +141,7 @@ const char *const mn1860_disassembler::s_inst_names[256] =
 	"set", "set", "set", "set", "set", "set", "set", "set",
 	"t1bnz", "t1bnz", "t1bnz", "t1bnz", "t1bnz", "t1bnz", "t1bnz", "t1bnz",
 	"t1bz", "t1bz", "t1bz", "t1bz", "t1bz", "t1bz", "t1bz", "t1bz",
-	nullptr, "movl", nullptr, "movl", "movl", "movl", "mov", "mov",
+	"addrl", "movl", "addrl", "movl", "movl", "movl", "mov", "mov",
 	"movl", "movl", "movl", "movl", "asl", "asl", "asr", "asr",
 	"dec", "dec", "not", "not", "cmpm", "cmpm", "xch4", "xch4",
 	"inc", "inc", "clr", "clr", "rol", "rol", "ror", "ror",
@@ -254,15 +254,21 @@ void mn1880_disassembler::dasm_operands(std::ostream &stream, u8 opcode, offs_t 
 	}
 	else if (opcode < 0x34)
 	{
-		// MOVL immediate to pointer register
+		util::stream_format(stream, "%s, ", BIT(opcode, 1) ? "yp" : "xp");
 		if (BIT(opcode, 0))
 		{
-			util::stream_format(stream, "%s, ", BIT(opcode, 1) ? "yp" : "xp");
+			// MOVL immediate to pointer register
 			format_imm16(stream, swapendian_int16(opcodes.r16(pc)));
 			pc += 2;
 		}
 		else
-			stream << "(unknown)";
+		{
+			// ADDRL direct + immediate? (MN1860 only)
+			format_direct(stream, opcodes.r8(pc + 1));
+			stream << ", ";
+			format_imm16(stream, u16(opcodes.r8(pc + 2)) << 8 | opcodes.r8(pc));
+			pc += 3;
+		}
 	}
 	else if (opcode < 0x3c)
 	{
