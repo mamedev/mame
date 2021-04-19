@@ -25,9 +25,6 @@
 
 DEFINE_DEVICE_TYPE(UPD7004, upd7004_device, "upd7004", "UPD7004 A/D Converter")
 
-// permit our enum to be saved
-ALLOW_SAVE_TYPE(upd7004_device::state);
-
 
 //**************************************************************************
 //  LIVE DEVICE

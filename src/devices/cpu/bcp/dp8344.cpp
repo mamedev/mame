@@ -56,8 +56,6 @@ DEFINE_DEVICE_TYPE(DP8344B, dp8344b_device, "dp8344b", "National Semiconductor D
 //  DEVICE CONSTRUCTION AND INITIALIZATION
 //**************************************************************************
 
-ALLOW_SAVE_TYPE(dp8344_device::inst_state);
-
 //-------------------------------------------------
 //  dp8344_device - constructor
 //-------------------------------------------------

@@ -44,8 +44,6 @@
 #define VDP_BAGC3   m_address_regs[6]
 #define VDP_BAMTF   m_address_regs[7]
 
-ALLOW_SAVE_TYPE(tms3556_device::dma_mode_tt);
-
 
 
 //**************************************************************************

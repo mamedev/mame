@@ -31,11 +31,6 @@
 #define LOGCONFIG(...)   LOGMASKED(LOG_CONFIG, __VA_ARGS__)
 #define LOGOTHER(...)    LOGMASKED(LOG_OTHER, __VA_ARGS__)
 
-ALLOW_SAVE_TYPE(mas3507d_device::i2c_bus_state_t)
-ALLOW_SAVE_TYPE(mas3507d_device::i2c_bus_address_t)
-ALLOW_SAVE_TYPE(mas3507d_device::i2c_subdest_t)
-ALLOW_SAVE_TYPE(mas3507d_device::i2c_command_t)
-
 // device type definition
 DEFINE_DEVICE_TYPE(MAS3507D, mas3507d_device, "mas3507d", "MAS 3507D MPEG decoder")
 

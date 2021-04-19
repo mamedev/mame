@@ -29,8 +29,6 @@ DEFINE_DEVICE_TYPE(NCR5380N, ncr5380n_device, "ncr5380_new", "NCR 5380 SCSI (new
 DEFINE_DEVICE_TYPE(NCR53C80, ncr53c80_device, "ncr53c80",    "NCR 53C80 SCSI")
 DEFINE_DEVICE_TYPE(CXD1180,  cxd1180_device,  "cxd1180",     "Sony CXD1180")
 
-ALLOW_SAVE_TYPE(ncr5380n_device::state);
-
 ncr5380n_device::ncr5380n_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock, bool has_lbs)
 	: nscsi_device(mconfig, type, tag, owner, clock)
 	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)

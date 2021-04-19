@@ -111,11 +111,6 @@ DEFINE_DEVICE_TYPE(DSP16A, dsp16a_device, "dsp16a", "WE|AT&T DSP16A")
     DSP16 SERIES BASE IMPLEMENTATION
 ***************************************************************************/
 
-ALLOW_SAVE_TYPE(dsp16_device_base::cache);
-ALLOW_SAVE_TYPE(dsp16_device_base::phase);
-ALLOW_SAVE_TYPE(dsp16_device_base::flags);
-ALLOW_SAVE_TYPE(dsp16_device_base::sio_flags);
-
 WRITE_LINE_MEMBER(dsp16_device_base::exm_w)
 {
 	if (bool(state) != bool(m_exm_in))

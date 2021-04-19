@@ -210,8 +210,6 @@ s14001a_device::s14001a_device(const machine_config &mconfig, const char *tag, d
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-ALLOW_SAVE_TYPE(s14001a_device::states); // allow save_item on a non-fundamental type
-
 void s14001a_device::device_start()
 {
 	m_stream = stream_alloc(0, 1, clock() ? clock() : machine().sample_rate());

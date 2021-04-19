@@ -33,9 +33,6 @@
 // device type definition
 DEFINE_DEVICE_TYPE(FILTER_BIQUAD, filter_biquad_device, "filter_biquad", "Biquad Filter")
 
-// allow the enum class for the biquad filter type to be saved by the savestate system
-ALLOW_SAVE_TYPE(filter_biquad_device::biquad_type);
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************

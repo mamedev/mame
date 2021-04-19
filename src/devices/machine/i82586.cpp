@@ -42,9 +42,6 @@
 
 #include "logmacro.h"
 
-ALLOW_SAVE_TYPE(i82586_base_device::cu_state);
-ALLOW_SAVE_TYPE(i82586_base_device::ru_state);
-
 DEFINE_DEVICE_TYPE(I82586, i82586_device, "i82586", "Intel 82586 IEEE 802.3 Ethernet LAN Coprocessor")
 DEFINE_DEVICE_TYPE(I82596_LE16, i82596_le16_device, "i82596sx_le", "Intel 82596 SX High-Performance 32-Bit Local Area Network Coprocessor (little)")
 DEFINE_DEVICE_TYPE(I82596_BE16, i82596_be16_device, "i82596sx_be", "Intel 82596 SX High-Performance 32-Bit Local Area Network Coprocessor (big)")

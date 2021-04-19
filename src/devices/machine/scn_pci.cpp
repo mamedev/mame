@@ -150,9 +150,6 @@ const u16 scn2641_device::s_br_divisors[16] = {
 //  DEVICE CONSTRUCTION & INITIALIZATION
 //**************************************************************************
 
-ALLOW_SAVE_TYPE(scn_pci_device::rcvr_state);
-ALLOW_SAVE_TYPE(scn_pci_device::xmtr_state);
-
 //-------------------------------------------------
 //  scn_pci_device - constructor
 //-------------------------------------------------

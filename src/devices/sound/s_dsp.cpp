@@ -135,9 +135,6 @@ static const int ENVCNT[0x20]
 	};
 
 
-ALLOW_SAVE_TYPE(s_dsp_device::env_state_t32);
-
-
 DEFINE_DEVICE_TYPE(S_DSP, s_dsp_device, "s_dsp", "Nintendo/Sony S-DSP")
 
 

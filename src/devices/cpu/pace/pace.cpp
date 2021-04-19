@@ -56,8 +56,6 @@ DEFINE_DEVICE_TYPE(INS8900, ins8900_device, "ins8900", "National Semiconductor I
 //  DEVICE CONSTRUCTION AND INITIALIZATION
 //**************************************************************************
 
-ALLOW_SAVE_TYPE(pace_device::cycle);
-
 //-------------------------------------------------
 //  pace_device - constructor
 //-------------------------------------------------

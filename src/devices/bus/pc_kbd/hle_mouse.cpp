@@ -49,8 +49,6 @@
 
 DEFINE_DEVICE_TYPE(HLE_PS2_MOUSE, hle_ps2_mouse_device, "hle_ps2_mouse", "HLE PS/2 Mouse")
 
-ALLOW_SAVE_TYPE(hle_ps2_mouse_device::serial_state);
-
 INPUT_PORTS_START(hle_ps2_mouse_device)
 	PORT_START("mouse_x_axis")
 	PORT_BIT(0xffff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(100)

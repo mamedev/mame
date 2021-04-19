@@ -23,19 +23,6 @@
 #include "logmacro.h"
 DEFINE_DEVICE_TYPE(I8291A, i8291a_device, "i8291a", "Intel I8291A GPIB Talker/Listener")
 
-ALLOW_SAVE_TYPE(i8291a_device::listener_state);
-ALLOW_SAVE_TYPE(i8291a_device::talker_state);
-ALLOW_SAVE_TYPE(i8291a_device::talker_primary_state);
-ALLOW_SAVE_TYPE(i8291a_device::listener_primary_state);
-ALLOW_SAVE_TYPE(i8291a_device::parallel_poll_state);
-ALLOW_SAVE_TYPE(i8291a_device::device_trigger_state);
-ALLOW_SAVE_TYPE(i8291a_device::device_clear_state);
-ALLOW_SAVE_TYPE(i8291a_device::talker_serial_poll_state);
-ALLOW_SAVE_TYPE(i8291a_device::serial_poll_state);
-ALLOW_SAVE_TYPE(i8291a_device::remote_local_state);
-ALLOW_SAVE_TYPE(i8291a_device::source_handshake_state);
-ALLOW_SAVE_TYPE(i8291a_device::acceptor_handshake_state);
-
 i8291a_device::i8291a_device(const machine_config &mconfig, const char *tag,
 		device_t *owner, uint32_t clock) :
 		device_t{mconfig, I8291A, tag, owner, clock},

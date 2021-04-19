@@ -80,9 +80,6 @@ enum {
 	DVSSR = 0x13
 };
 
-ALLOW_SAVE_TYPE(huc6270_device::v_state);
-ALLOW_SAVE_TYPE(huc6270_device::h_state);
-
 
 /* Bits in the VDC status register */
 #define HUC6270_BSY         0x40    /* Set when the VDC accesses VRAM */

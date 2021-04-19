@@ -46,8 +46,6 @@ DEFINE_DEVICE_TYPE(INTEL_28F010, intel_28f010_device, "intel_28f010", "Intel 28F
 DEFINE_DEVICE_TYPE(AMD_28F010, amd_28f010_device, "amd_28f010", "Am28F010 1 Megabit (128K x 8-Bit) CMOS 12.0 Volt, Bulk Erase Flash Memory")
 DEFINE_DEVICE_TYPE(AMD_28F020, amd_28f020_device, "amd_28f020", "Am28F020 2 Megabit (256K x 8-Bit) CMOS 12.0 Volt, Bulk Erase Flash Memory")
 
-ALLOW_SAVE_TYPE(base_28fxxx_device::state);
-
 base_28fxxx_device::base_28fxxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 size, u8 manufacturer_code, u8 device_code)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)

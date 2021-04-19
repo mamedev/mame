@@ -73,11 +73,6 @@ DEFINE_DEVICE_TYPE(I4004, i4004_cpu_device, "i4004", "Intel 4004")
 DEFINE_DEVICE_TYPE(I4040, i4040_cpu_device, "i4040", "Intel 4040")
 
 
-ALLOW_SAVE_TYPE(mcs40_cpu_device_base::cycle);
-ALLOW_SAVE_TYPE(mcs40_cpu_device_base::pmem);
-ALLOW_SAVE_TYPE(mcs40_cpu_device_base::phase);
-
-
 static constexpr u8 f_cm_ram_table[8] = { 0x0eU, 0x0dU, 0x0bU, 0x07U, 0x09U, 0x05U, 0x03U, 0x01U };
 
 

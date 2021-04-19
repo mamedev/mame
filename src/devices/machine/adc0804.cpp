@@ -46,8 +46,6 @@
 DEFINE_DEVICE_TYPE(ADC0803, adc0803_device, "adc0803", "ADC0803 A/D Converter")
 DEFINE_DEVICE_TYPE(ADC0804, adc0804_device, "adc0804", "ADC0804 A/D Converter")
 
-ALLOW_SAVE_TYPE(adc0804_device::read_mode);
-
 
 //**************************************************************************
 //  DEVICE CONSTRUCTION AND INITIALIZATION

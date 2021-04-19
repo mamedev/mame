@@ -32,9 +32,6 @@ DEFINE_DEVICE_TYPE(M58990, m58990_device, "m58990", "M58990 A/D Converter")
 //  LIVE DEVICE
 //**************************************************************************
 
-// permit our enum to be saved
-ALLOW_SAVE_TYPE(adc0808_device::state);
-
 //-------------------------------------------------
 //  adc0808_device - constructor
 //-------------------------------------------------

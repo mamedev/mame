@@ -39,9 +39,6 @@
 /******************* utilitiy function and macros ********************/
 
 
-ALLOW_SAVE_TYPE( mea8000_device::mea8000_state );
-
-
 /* digital filters work at 8 kHz */
 #define F0 (clock() / 480)
 

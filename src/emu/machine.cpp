@@ -263,7 +263,7 @@ void running_machine::start()
 	save().register_presave(save_prepost_delegate(FUNC(running_machine::presave_all_devices), this));
 	start_all_devices();
 	for (device_t &device : device_enumerator(root_device()))
-		m_save.root_registrar().reg(device, device.tag());
+		m_save.root_registrar().reg(device, device.tag(), device.type().size());
 	save().register_postload(save_prepost_delegate(FUNC(running_machine::postload_all_devices), this));
 
 	// save outputs created before start time

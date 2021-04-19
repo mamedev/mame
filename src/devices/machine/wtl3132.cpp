@@ -24,7 +24,6 @@
 //#define VERBOSE (LOG_GENERAL|LOG_REGS|LOG_IO|LOG_BYPASS)
 #include "logmacro.h"
 
-ALLOW_SAVE_TYPE(float32_t);
 SAVE_TYPE_AS_FLOAT(float32_t);
 
 // helper for extracting opcode fields

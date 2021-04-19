@@ -17,8 +17,6 @@
 #include "tlcs90.h"
 #include "tlcs90d.h"
 
-ALLOW_SAVE_TYPE(tlcs90_device::e_mode); // allow save_item on a non-fundamental type
-
 
 DEFINE_DEVICE_TYPE(TMP90840,  tmp90840_device,  "tmp90840",  "Toshiba TMP90840")
 DEFINE_DEVICE_TYPE(TMP90841,  tmp90841_device,  "tmp90841",  "Toshiba TMP90841")

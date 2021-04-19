@@ -227,8 +227,8 @@ public:
 	save_zip_state &json_append(char const *buffer);
 	save_zip_state &json_append_indent(int count);
 	save_zip_state &json_append_name(char const *name);
-	save_zip_state &json_append_signed(int64_t value);
-	save_zip_state &json_append_unsigned(uint64_t value);
+	save_zip_state &json_append_signed(s64 value);
+	save_zip_state &json_append_unsigned(u64 value);
 	save_zip_state &json_append_float(double value);
 
 	// stage an item to be output as raw data
@@ -333,12 +333,12 @@ save_zip_state &save_zip_state::json_append_name(char const *name)
 //  value to the JSON stream
 //-------------------------------------------------
 
-save_zip_state &save_zip_state::json_append_signed(int64_t value)
+save_zip_state &save_zip_state::json_append_signed(s64 value)
 {
 	json_check_reserve();
 
 	// quote values that don't fit into a double
-	bool quote = (int64_t(double(value)) != value);
+	bool quote = (s64(double(value)) != value);
 	if (quote)
 		json_append('"');
 
@@ -359,12 +359,12 @@ save_zip_state &save_zip_state::json_append_signed(int64_t value)
 //  integer value to the JSON stream
 //-------------------------------------------------
 
-save_zip_state &save_zip_state::json_append_unsigned(uint64_t value)
+save_zip_state &save_zip_state::json_append_unsigned(u64 value)
 {
 	json_check_reserve();
 
 	// quote values that don't fit into a double
-	bool quote = (uint64_t(double(value)) != value);
+	bool quote = (u64(double(value)) != value);
 	if (quote)
 		json_append('"');
 
@@ -912,8 +912,8 @@ public:
 	bool json_matches(char target);
 	bool json_matches(char const *target);
 	bool json_parse_number(double &result);
-	bool json_parse_int_string(int64_t &result);
-	bool json_parse_uint_string(uint64_t &result);
+	bool json_parse_int_string(s64 &result);
+	bool json_parse_uint_string(u64 &result);
 	bool json_parse_string(std::string &result);
 
 	// initialize, checking the input file basic validity
@@ -1031,7 +1031,7 @@ bool load_zip_state::json_parse_number(double &result)
 //  integer from a string
 //-------------------------------------------------
 
-bool load_zip_state::json_parse_int_string(int64_t &result)
+bool load_zip_state::json_parse_int_string(s64 &result)
 {
 	if (!json_matches('"'))
 		return false;
@@ -1046,7 +1046,7 @@ bool load_zip_state::json_parse_int_string(int64_t &result)
 //  integer from a string
 //-------------------------------------------------
 
-bool load_zip_state::json_parse_uint_string(uint64_t &result)
+bool load_zip_state::json_parse_uint_string(u64 &result)
 {
 	if (!json_matches('"'))
 		return false;
@@ -1276,15 +1276,15 @@ bool load_zip_state::read_data_recursive(zlib_read_streamer &zlib, save_register
 
 save_registered_item::save_registered_item() :
 	m_ptr_offset(0),
-	m_type(TYPE_CONTAINER),
+	m_type_count(TYPE_CONTAINER),
 	m_native_size(0)
 {
 }
 
 // constructor for a new item
-save_registered_item::save_registered_item(uintptr_t ptr_offset, save_type type, uint32_t native_size, char const *name) :
+save_registered_item::save_registered_item(uintptr_t ptr_offset, save_type type, u32 native_size, char const *name, u32 count) :
 	m_ptr_offset(ptr_offset),
-	m_type(type),
+	m_type_count(u32(type) | (count << 4)),
 	m_native_size(native_size),
 	m_name(name)
 {
@@ -1300,12 +1300,11 @@ save_registered_item::save_registered_item(uintptr_t ptr_offset, save_type type,
 //  append - append a new item to the current one
 //-------------------------------------------------
 
-std::string type_string(save_registered_item::save_type type, uint32_t native_size)
+std::string type_string(save_registered_item::save_type type, u32 native_size)
 {
 	switch (type)
 	{
 	case save_registered_item::TYPE_CONTAINER:	return "CONTAINER";
-	case save_registered_item::TYPE_POINTER:	return "POINTER";
 	case save_registered_item::TYPE_UNIQUE:		return "UNIQUE";
 	case save_registered_item::TYPE_VECTOR:		return "VECTOR";
 	case save_registered_item::TYPE_STRUCT:		return "STRUCT";
@@ -1317,7 +1316,7 @@ std::string type_string(save_registered_item::save_type type, uint32_t native_si
 	}
 }
 
-save_registered_item &save_registered_item::append(uintptr_t ptr_offset, save_type type, uint32_t native_size, char const *name)
+save_registered_item &save_registered_item::append(uintptr_t ptr_offset, save_type type, u32 native_size, char const *name, u32 count)
 {
 	// make sure there are no duplicates
 	if (find(name) != nullptr)
@@ -1326,7 +1325,7 @@ save_registered_item &save_registered_item::append(uintptr_t ptr_offset, save_ty
 //printf("%s '%s': adding %s '%s' @ %llX, size %d\n", type_string(m_type, m_native_size).c_str(), m_name.c_str(), type_string(type, native_size).c_str(), name, ptr_offset, native_size);
 
 	// add the item to the back of the list
-	m_items.emplace_back(ptr_offset, type, native_size, name);
+	m_items.emplace_back(ptr_offset, type, native_size, name, count);
 	return m_items.back();
 }
 
@@ -1346,6 +1345,44 @@ save_registered_item *save_registered_item::find(char const *name)
 		if (strcmp(item.name(), name) == 0)
 			return &item;
 	return nullptr;
+}
+
+
+//-------------------------------------------------
+//  is_replicatable - can this item be replicated
+//  across an array?
+//-------------------------------------------------
+
+bool save_registered_item::is_replicatable(bool parent_is_array) const
+{
+	switch (type())
+	{
+		// numeric types are always replicatable
+		case TYPE_BOOL:
+		case TYPE_INT:
+		case TYPE_UINT:
+		case TYPE_FLOAT:
+			return true;
+
+		// unique pointers, vectors, and runtime arrays are non-replicatable
+		case TYPE_UNIQUE:
+		case TYPE_VECTOR:
+		case TYPE_RUNTIME_ARRAY:
+			return false;
+
+		// structs, containers, and static arrays are replicatable if all their owned items are
+		case TYPE_STATIC_ARRAY:
+		case TYPE_CONTAINER:
+		case TYPE_STRUCT:
+			for (auto &item : m_items)
+				if (!item.is_replicatable(false))
+					return false;
+			return true;
+
+		// when it doubt, no
+		default:
+			return false;
+	}
 }
 
 
@@ -1370,7 +1407,7 @@ bool save_registered_item::sort_and_prune()
 	}
 
 	// then sort the rest if we have more than 1
-	if (m_items.size() > 1)
+	if (is_struct_or_container() && m_items.size() > 1)
 		m_items.sort([] (auto const &x, auto const &y) { return (std::strcmp(x.name(), y.name()) < 0); });
 
 	// return true if we have nothing
@@ -1379,17 +1416,17 @@ bool save_registered_item::sort_and_prune()
 
 
 //-------------------------------------------------
-//  unwrap_and_update_objbase - unwrap trivial
-//  type and update the object base
+//  unwrap_and_update_base - unwrap special
+//  types and update the object base
 //-------------------------------------------------
 
-bool save_registered_item::unwrap_and_update_objbase(uintptr_t &objbase) const
+bool save_registered_item::unwrap_and_update_base(uintptr_t &objbase) const
 {
 	// update the base pointer with our local base/offset
 	objbase += m_ptr_offset;
 
 	// switch off the type
-	switch (m_type)
+	switch (type())
 	{
 		// unique ptrs retrieve the pointer from their container
 		case TYPE_UNIQUE:
@@ -1399,11 +1436,6 @@ bool save_registered_item::unwrap_and_update_objbase(uintptr_t &objbase) const
 		// vectors retrieve the pointer from their container
 		case TYPE_VECTOR:
 			objbase = reinterpret_cast<uintptr_t>(&(*reinterpret_cast<generic_vector *>(objbase))[0]);
-			return true;
-
-		// pointers just extract the pointer directly
-		case TYPE_POINTER:
-			objbase = reinterpret_cast<uintptr_t>(*reinterpret_cast<generic_pointer *>(objbase));
 			return true;
 
 		// containers are always based at 0
@@ -1423,15 +1455,15 @@ bool save_registered_item::unwrap_and_update_objbase(uintptr_t &objbase) const
 //  items into a binary form
 //-------------------------------------------------
 
-uint64_t save_registered_item::save_binary(uint8_t *ptr, uint64_t length, uintptr_t objbase) const
+u64 save_registered_item::save_binary(u8 *ptr, u64 length, uintptr_t objbase) const
 {
-	// update the base pointer and forward if a trivial unwrap
-	if (unwrap_and_update_objbase(objbase))
+	// update the base pointer and forward if a special unwrap
+	if (unwrap_and_update_base(objbase))
 		return m_items.front().save_binary(ptr, length, objbase);
 
 	// switch off the type
-	uint64_t offset = 0;
-	switch (m_type)
+	u64 offset = 0;
+	switch (type())
 	{
 		// boolean types save as a single byte
 		case TYPE_BOOL:
@@ -1457,14 +1489,19 @@ uint64_t save_registered_item::save_binary(uint8_t *ptr, uint64_t length, uintpt
 			break;
 
 		// arrays are multiples of a single item
-		default:
-			if (is_array())
+		case TYPE_STATIC_ARRAY:
+		case TYPE_RUNTIME_ARRAY:
+		{
+			auto item = m_items.begin();
+			auto last = std::prev(m_items.end());
+			for (u32 rep = 0; rep < count(); rep++)
 			{
-				auto &item = m_items.front();
-				for (uint32_t rep = 0; rep < m_type; rep++)
-					offset += item.save_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase + rep * m_native_size);
+				offset += item->save_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase + rep * m_native_size);
+				if (item != last)
+					++item;
 			}
 			break;
+		}
 	}
 	return offset;
 }
@@ -1475,15 +1512,15 @@ uint64_t save_registered_item::save_binary(uint8_t *ptr, uint64_t length, uintpt
 //  owned items from binary form
 //-------------------------------------------------
 
-uint64_t save_registered_item::restore_binary(uint8_t const *ptr, uint64_t length, uintptr_t objbase) const
+u64 save_registered_item::restore_binary(u8 const *ptr, u64 length, uintptr_t objbase) const
 {
 	// update the base pointer and forward if a trivial unwrap
-	if (unwrap_and_update_objbase(objbase))
+	if (unwrap_and_update_base(objbase))
 		return m_items.front().restore_binary(ptr, length, objbase);
 
 	// switch off the type
-	uint64_t offset = 0;
-	switch (m_type)
+	u64 offset = 0;
+	switch (type())
 	{
 		// boolean types save as a single byte
 		case TYPE_BOOL:
@@ -1509,14 +1546,19 @@ uint64_t save_registered_item::restore_binary(uint8_t const *ptr, uint64_t lengt
 			break;
 
 		// arrays are multiples of a single item
-		default:
-			if (is_array())
+		case TYPE_STATIC_ARRAY:
+		case TYPE_RUNTIME_ARRAY:
+		{
+			auto item = m_items.begin();
+			auto last = std::prev(m_items.end());
+			for (u32 rep = 0; rep < count(); rep++)
 			{
-				auto &item = m_items.front();
-				for (uint32_t rep = 0; rep < m_type; rep++)
-					offset += item.restore_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase + rep * m_native_size);
+				offset += item->restore_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase + rep * m_native_size);
+				if (item != last)
+					++item;
 			}
 			break;
+		}
 	}
 	return offset;
 }
@@ -1529,7 +1571,7 @@ uint64_t save_registered_item::restore_binary(uint8_t const *ptr, uint64_t lengt
 void save_registered_item::save_json(save_zip_state &zipstate, char const *nameprefix, int indent, bool inline_form, uintptr_t objbase)
 {
 	// update the base pointer and forward if a trivial unwrap
-	if (unwrap_and_update_objbase(objbase))
+	if (unwrap_and_update_base(objbase))
 		return m_items.front().save_json(zipstate, nameprefix, indent, inline_form, objbase);
 
 	// update the name prefix
@@ -1545,7 +1587,7 @@ void save_registered_item::save_json(save_zip_state &zipstate, char const *namep
 	zipstate.json_append_name(m_name.c_str());
 
 	// switch off the type
-	switch (m_type)
+	switch (type())
 	{
 		// boolean types
 		case TYPE_BOOL:
@@ -1599,75 +1641,75 @@ void save_registered_item::save_json(save_zip_state &zipstate, char const *namep
 			break;
 
 		// arrays are multiples of a single item
-		default:
-			if (is_array())
+		case TYPE_STATIC_ARRAY:
+		case TYPE_RUNTIME_ARRAY:
+		{
+			// look for large arrays of ints/floats
+			u32 total, unitsize;
+			if (is_endpoint_array(total, unitsize) && total * unitsize >= save_zip_state::JSON_EXTERNAL_BINARY_THRESHOLD)
 			{
-				auto &item = m_items.front();
+				char const *filename = zipstate.add_data_file(localname.c_str(), *this, objbase);
 
-				// look for large arrays of ints/floats
-				save_registered_item *inner = &item;
-				u32 total = count();
-				while (inner->is_array())
-				{
-					total *= inner->count();
-					inner = &inner->m_items.front();
-				}
-				if (inner->is_int_or_float() && total * inner->m_native_size >= save_zip_state::JSON_EXTERNAL_BINARY_THRESHOLD)
-				{
-					char const *filename = zipstate.add_data_file(localname.c_str(), *this, objbase);
+				zipstate.json_append('[').json_append('{');
+				zipstate.json_append_name("external_file");
+				zipstate.json_append('"').json_append(filename).json_append('"').json_append(',');
+				zipstate.json_append_name("unit");
+				zipstate.json_append_signed(unitsize).json_append(',');
+				zipstate.json_append_name("count");
+				zipstate.json_append_signed(total).json_append(',');
+				zipstate.json_append_name("little_endian");
+				zipstate.json_append((ENDIANNESS_NATIVE == ENDIANNESS_LITTLE) ? "true" : "false");
+				zipstate.json_append('}').json_append(']');
+			}
+			else
+			{
+				auto item = m_items.begin();
+				auto last = std::prev(m_items.end());
 
-					zipstate.json_append('[').json_append('{');
-					zipstate.json_append_name("external_file");
-					zipstate.json_append('"').json_append(filename).json_append('"').json_append(',');
-					zipstate.json_append_name("unit");
-					zipstate.json_append_signed(inner->m_native_size).json_append(',');
-					zipstate.json_append_name("count");
-					zipstate.json_append_signed(total).json_append(',');
-					zipstate.json_append_name("little_endian");
-					zipstate.json_append((ENDIANNESS_NATIVE == ENDIANNESS_LITTLE) ? "true" : "false");
-					zipstate.json_append('}').json_append(']');
+				// compute the size of an item to determine if we show it inline
+				u32 item_size = item->compute_binary_size(objbase);
+				if (inline_form || count() * item_size <= 16)
+				{
+					// strictly inline form outputs everything on a single line
+					zipstate.json_append('[');
+					for (u32 rep = 0; rep < count(); rep++)
+					{
+						item->save_json(zipstate, localname.c_str(), 0, true, objbase + rep * m_native_size);
+						if (rep != count() - 1)
+							zipstate.json_append(',');
+						if (item != last)
+							++item;
+					}
+					zipstate.json_append(']');
 				}
 				else
 				{
-					uint32_t item_size = item.compute_binary_size(objbase);
-					if (inline_form || m_type * item_size <= 16)
-					{
-						// strictly inline form outputs everything on a single line
-						zipstate.json_append('[');
-						for (uint32_t rep = 0; rep < m_type; rep++)
-						{
-							item.save_json(zipstate, localname.c_str(), 0, true, objbase + rep * m_native_size);
-							if (rep != m_type - 1)
-								zipstate.json_append(',');
-						}
-						zipstate.json_append(']');
-					}
-					else
-					{
-						// normal form outputs a certain number of items per row
-						zipstate.json_append('[').json_append_eol();
-						uint32_t items_per_row = 1;
-						if (item.is_int_or_float())
-							items_per_row = (item_size <= 2) ? 32 : 16;
+					// normal form outputs a certain number of items per row
+					zipstate.json_append('[').json_append_eol();
+					u32 items_per_row = 1;
+					if (item->is_int_or_float())
+						items_per_row = (item_size <= 2) ? 32 : 16;
 
-						// iterate over the items
-						for (uint32_t rep = 0; rep < m_type; rep++)
-						{
-							if (rep % items_per_row == 0)
-								zipstate.json_append_indent(indent + 1);
-							item.save_json(zipstate, localname.c_str(), indent + 1, false, objbase + rep * m_native_size);
-							if (rep != m_type - 1)
-								zipstate.json_append(',');
-							if (rep % items_per_row == items_per_row - 1)
-								zipstate.json_append_eol();
-						}
-						if (m_type % items_per_row != 0)
+					// iterate over the items
+					for (u32 rep = 0; rep < count(); rep++)
+					{
+						if (rep % items_per_row == 0)
+							zipstate.json_append_indent(indent + 1);
+						item->save_json(zipstate, localname.c_str(), indent + 1, false, objbase + rep * m_native_size);
+						if (rep != count() - 1)
+							zipstate.json_append(',');
+						if (rep % items_per_row == items_per_row - 1)
 							zipstate.json_append_eol();
-						zipstate.json_append_indent(indent).json_append(']');
+						if (item != last)
+							++item;
 					}
+					if (count() % items_per_row != 0)
+						zipstate.json_append_eol();
+					zipstate.json_append_indent(indent).json_append(']');
 				}
 			}
 			break;
+		}
 	}
 }
 
@@ -1680,7 +1722,7 @@ void save_registered_item::save_json(save_zip_state &zipstate, char const *namep
 void save_registered_item::restore_json(load_zip_state &input, char const *nameprefix, json_restore_mode mode, uintptr_t objbase)
 {
 	// update the base pointer and forward if a trivial unwrap
-	if (unwrap_and_update_objbase(objbase))
+	if (unwrap_and_update_base(objbase))
 		return m_items.front().restore_json(input, nameprefix, mode, objbase);
 
 	// update the name prefix
@@ -1693,7 +1735,7 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 	}
 
 	// switch off the type
-	switch (m_type)
+	switch (type())
 	{
 		// boolean types
 		case TYPE_BOOL:
@@ -1716,12 +1758,12 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 		case TYPE_INT:
 		{
 			double dvalue;
-			int64_t ivalue;
+			s64 ivalue;
 			if (input.json_parse_number(dvalue))
 			{
 				if (mode == RESTORE_DATA && !write_int_signed(objbase, m_native_size, dvalue))
 					input.report_warning("%s: Value of out range: %1.17g", localname.c_str(), dvalue);
-				else if (mode == COMPARE_DATA && read_int_signed(objbase, m_native_size) != int64_t(dvalue))
+				else if (mode == COMPARE_DATA && read_int_signed(objbase, m_native_size) != s64(dvalue))
 					input.report_warning("%s: Compare failed: JSON says %I64d, data says %1.17g", localname.c_str(), dvalue, read_int_signed(objbase, m_native_size));
 			}
 			else if (input.json_parse_int_string(ivalue))
@@ -1740,12 +1782,12 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 		case TYPE_UINT:
 		{
 			double dvalue;
-			uint64_t ivalue;
+			u64 ivalue;
 			if (input.json_parse_number(dvalue))
 			{
 				if (mode == RESTORE_DATA && !write_int_unsigned(objbase, m_native_size, dvalue))
 					input.report_warning("%s: Value of out range: %1.17g", localname.c_str(), dvalue);
-				else if (mode == COMPARE_DATA && read_int_unsigned(objbase, m_native_size) != uint64_t(dvalue))
+				else if (mode == COMPARE_DATA && read_int_unsigned(objbase, m_native_size) != u64(dvalue))
 					input.report_warning("%s: Compare failed: JSON says %I64d, data says %1.17g", localname.c_str(), dvalue, read_int_unsigned(objbase, m_native_size));
 			}
 			else if (input.json_parse_uint_string(ivalue))
@@ -1789,7 +1831,7 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 					save_registered_item *target = find(name.c_str());
 					if (target == nullptr)
 						input.report_warning("%s: Found extraneous item '%s'", localname.c_str(), name.c_str());
-					target->restore_json(input, nameprefix, (target == nullptr) ? PARSE_ONLY : mode, objbase);
+					target->restore_json(input, localname.c_str(), (target == nullptr) ? PARSE_ONLY : mode, objbase);
 					if (input.json_matches('}'))
 						break;
 					if (!input.json_matches(','))
@@ -1798,35 +1840,38 @@ void save_registered_item::restore_json(load_zip_state &input, char const *namep
 			break;
 
 		// arrays are multiples of a single item
-		default:
-			if (is_array())
+		case TYPE_STATIC_ARRAY:
+		case TYPE_RUNTIME_ARRAY:
+		{
+			auto item = m_items.begin();
+			auto last = std::prev(m_items.end());
+			if (!input.json_matches('['))
+				input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Expected '['", localname.c_str());
+			if (parse_external_data(input, *this, localname.c_str(), mode, objbase))
 			{
-				auto &item = m_items.front();
-				if (!input.json_matches('['))
-					input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Expected '['", localname.c_str());
-				if (parse_external_data(input, *this, localname.c_str(), mode, objbase))
-				{
-					if (!input.json_matches(']'))
-						input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ']'", localname.c_str());
-				}
-				else
-				{
-					u32 rep = 0;
-					if (!input.json_matches(']'))
-						while (1)
-						{
-							item.restore_json(input, nameprefix, (rep >= count()) ? PARSE_ONLY : mode, objbase + rep * m_native_size);
-							rep++;
-							if (input.json_matches(']'))
-								break;
-							if (!input.json_matches(','))
-								input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ','", localname.c_str());
-						}
-					if (rep != count())
-						input.report_warning("%s: Found %s array items than expected", localname.c_str(), (rep < count()) ? "fewer" : "more");
-				}
+				if (!input.json_matches(']'))
+					input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ']'", localname.c_str());
+			}
+			else
+			{
+				u32 rep = 0;
+				if (!input.json_matches(']'))
+					while (1)
+					{
+						item->restore_json(input, localname.c_str(), (rep >= count()) ? PARSE_ONLY : mode, objbase + rep * m_native_size);
+						rep++;
+						if (item != last)
+							++item;
+						if (input.json_matches(']'))
+							break;
+						if (!input.json_matches(','))
+							input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ','", localname.c_str());
+					}
+				if (rep != count())
+					input.report_warning("%s: Found %s array items than expected", localname.c_str(), (rep < count()) ? "fewer" : "more");
 			}
 			break;
+		}
 	}
 }
 
@@ -1926,14 +1971,14 @@ bool save_registered_item::parse_external_data(load_zip_state &input, save_regis
 //  of the given size
 //-------------------------------------------------
 
-uint64_t save_registered_item::read_int_unsigned(uintptr_t objbase, int size) const
+u64 save_registered_item::read_int_unsigned(uintptr_t objbase, int size) const
 {
 	switch (size)
 	{
-		case 1:	return *reinterpret_cast<uint8_t const *>(objbase);
-		case 2:	return *reinterpret_cast<uint16_t const *>(objbase);
-		case 4:	return *reinterpret_cast<uint32_t const *>(objbase);
-		case 8:	return *reinterpret_cast<uint64_t const *>(objbase);
+		case 1:	return *reinterpret_cast<u8 const *>(objbase);
+		case 2:	return *reinterpret_cast<u16 const *>(objbase);
+		case 4:	return *reinterpret_cast<u32 const *>(objbase);
+		case 8:	return *reinterpret_cast<u64 const *>(objbase);
 	}
 	return 0;
 }
@@ -1944,14 +1989,14 @@ uint64_t save_registered_item::read_int_unsigned(uintptr_t objbase, int size) co
 //  given size
 //-------------------------------------------------
 
-int64_t save_registered_item::read_int_signed(uintptr_t objbase, int size) const
+s64 save_registered_item::read_int_signed(uintptr_t objbase, int size) const
 {
 	switch (size)
 	{
-		case 1:	return *reinterpret_cast<int8_t const *>(objbase);
-		case 2:	return *reinterpret_cast<int16_t const *>(objbase);
-		case 4:	return *reinterpret_cast<int32_t const *>(objbase);
-		case 8:	return *reinterpret_cast<int64_t const *>(objbase);
+		case 1:	return *reinterpret_cast<s8 const *>(objbase);
+		case 2:	return *reinterpret_cast<s16 const *>(objbase);
+		case 4:	return *reinterpret_cast<s32 const *>(objbase);
+		case 8:	return *reinterpret_cast<s64 const *>(objbase);
 	}
 	return 0;
 }
@@ -1978,21 +2023,21 @@ double save_registered_item::read_float(uintptr_t objbase, int size) const
 //  the given size
 //-------------------------------------------------
 
-bool save_registered_item::write_int_signed(uintptr_t objbase, int size, int64_t data) const
+bool save_registered_item::write_int_signed(uintptr_t objbase, int size, s64 data) const
 {
 	switch (size)
 	{
-		case 1:	*reinterpret_cast<int8_t *>(objbase) = int8_t(data); return (data >= -0x80 && data <= 0x7f);
-		case 2:	*reinterpret_cast<int16_t *>(objbase) = int16_t(data); return (data >= -0x8000 && data <= 0x7fff);
-		case 4:	*reinterpret_cast<int32_t *>(objbase) = int32_t(data); return (data >= -0x80000000ll && data <= 0x7fffffffll);
-		case 8:	*reinterpret_cast<int64_t *>(objbase) = int64_t(data); return true;
+		case 1:	*reinterpret_cast<s8 *>(objbase) = s8(data); return (data >= -0x80 && data <= 0x7f);
+		case 2:	*reinterpret_cast<s16 *>(objbase) = s16(data); return (data >= -0x8000 && data <= 0x7fff);
+		case 4:	*reinterpret_cast<s32 *>(objbase) = s32(data); return (data >= -0x80000000ll && data <= 0x7fffffffll);
+		case 8:	*reinterpret_cast<s64 *>(objbase) = s64(data); return true;
 	}
 	return false;
 }
 
 bool save_registered_item::write_int_signed(uintptr_t objbase, int size, double data) const
 {
-	int64_t converted = int64_t(data);
+	s64 converted = s64(data);
 	bool ok = (double(converted) == data);
 	return write_int_signed(objbase, size, converted) && ok;
 }
@@ -2003,21 +2048,21 @@ bool save_registered_item::write_int_signed(uintptr_t objbase, int size, double 
 //  of the given size
 //-------------------------------------------------
 
-bool save_registered_item::write_int_unsigned(uintptr_t objbase, int size, uint64_t data) const
+bool save_registered_item::write_int_unsigned(uintptr_t objbase, int size, u64 data) const
 {
 	switch (size)
 	{
-		case 1:	*reinterpret_cast<uint8_t *>(objbase) = uint8_t(data); return (data <= 0xff);
-		case 2:	*reinterpret_cast<uint16_t *>(objbase) = uint16_t(data); return (data <= 0xffff);
-		case 4:	*reinterpret_cast<uint32_t *>(objbase) = uint32_t(data); return (data <= 0xffffffffull);
-		case 8:	*reinterpret_cast<uint64_t *>(objbase) = uint64_t(data); return true;
+		case 1:	*reinterpret_cast<u8 *>(objbase) = u8(data); return (data <= 0xff);
+		case 2:	*reinterpret_cast<u16 *>(objbase) = u16(data); return (data <= 0xffff);
+		case 4:	*reinterpret_cast<u32 *>(objbase) = u32(data); return (data <= 0xffffffffull);
+		case 8:	*reinterpret_cast<u64 *>(objbase) = u64(data); return true;
 	}
 	return false;
 }
 
 bool save_registered_item::write_int_unsigned(uintptr_t objbase, int size, double data) const
 {
-	uint64_t converted = uint64_t(data);
+	u64 converted = u64(data);
 	bool ok = (data >= 0 && double(converted) == data);
 	return write_int_unsigned(objbase, size, converted) && ok;
 }
@@ -2036,6 +2081,37 @@ bool save_registered_item::write_float(uintptr_t objbase, int size, double data)
 		case 8:	*reinterpret_cast<double *>(objbase) = double(data); return true;
 	}
 	return false;
+}
+
+
+//-------------------------------------------------
+//  is_endpoint_array - return true if this item
+//  is a (multi-dimensional) array of an endpoint
+//  type
+//-------------------------------------------------
+
+bool save_registered_item::is_endpoint_array(u32 &total, u32 &unitsize) const
+{
+	// we must be an array ourselves
+	if (!is_array())
+		return false;
+
+	// scan downward through simple arrays
+	save_registered_item const *current = this;
+	total = 1;
+	while (current->is_array() && current->m_items.size() == 1)
+	{
+		total *= current->count();
+		current = &current->m_items.front();
+	}
+
+	// if we didn't end at an endpoint type, fail
+	if (!current->is_int_or_float())
+		return false;
+
+	// set the unit size and return true
+	unitsize = current->native_size();
+	return true;
 }
 
 

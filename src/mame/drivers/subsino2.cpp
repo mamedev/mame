@@ -65,8 +65,6 @@ enum tilesize_t : uint8_t
 	TILE_64x32
 };
 
-ALLOW_SAVE_TYPE(tilesize_t);
-
 enum vram_t
 {
 	VRAM_LO,

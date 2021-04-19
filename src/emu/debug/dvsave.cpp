@@ -60,7 +60,7 @@ void debug_view_save::reset()
 void debug_view_save::build_list_recursive(save_registered_item &item, uintptr_t objbase, int depth, int count)
 {
 	// update the base pointer and forward if a trivial unwrap
-	if (item.unwrap_and_update_objbase(objbase))
+	if (item.unwrap_and_update_base(objbase))
 		return build_list_recursive(item.subitems().front(), objbase, depth, count);
 
 	// switch off the type
@@ -85,27 +85,35 @@ void debug_view_save::build_list_recursive(save_registered_item &item, uintptr_t
 			break;
 
 		// arrays are multiples of a single item
-		default:
-			if (m_type < save_registered_item::TYPE_ARRAY)
+		case save_registered_item::TYPE_STATIC_ARRAY:
+		case save_registered_item::TYPE_RUNTIME_ARRAY:
+		{
+			m_save_list.push_back(save_item(item, objbase, depth, count));
+			auto subitem = item.subitems().begin();
+			auto last = std::prev(item.subitems().end());
+			int items_per_row = 1;
+			if (subitem == last)
 			{
-				m_save_list.push_back(save_item(item, objbase, depth, count));
-				auto &subitem = item.subitems().front();
-				int items_per_row = 1;
-				if (subitem.type() == save_registered_item::TYPE_BOOL)
+				if (subitem->type() == save_registered_item::TYPE_BOOL)
 					items_per_row = 32;
-				else if (subitem.type() == save_registered_item::TYPE_INT || subitem.type() == save_registered_item::TYPE_UINT)
+				else if (subitem->is_int())
 				{
-					if (subitem.native_size() <= 2)
-						items_per_row = 16 / subitem.native_size();
+					if (subitem->native_size() <= 2)
+						items_per_row = 16 / subitem->native_size();
 					else
-						items_per_row = 32 / subitem.native_size();
+						items_per_row = 32 / subitem->native_size();
 				}
-				else if (subitem.type() == save_registered_item::TYPE_FLOAT)
+				else if (subitem->type() == save_registered_item::TYPE_FLOAT)
 					items_per_row = 4;
-				for (uint32_t rep = 0; rep < item.count(); rep += items_per_row)
-					build_list_recursive(subitem, objbase + rep * item.native_size(), depth + 1, std::min<int>(items_per_row, item.count() - rep));
+			}
+			for (uint32_t rep = 0; rep < item.count(); rep += items_per_row)
+			{
+				build_list_recursive(*subitem, objbase + rep * item.native_size(), depth + 1, std::min<int>(items_per_row, item.count() - rep));
+				if (subitem != last)
+					++subitem;
 			}
 			break;
+		}
 	}
 }
 
@@ -293,7 +301,7 @@ std::string debug_view_save::save_item::value()
 std::string debug_view_save::save_item::value(save_registered_item &item, int count, uintptr_t objbase, bool collapsed)
 {
 	// update the base pointer and forward if a trivial unwrap
-	if (item.unwrap_and_update_objbase(objbase))
+	if (item.unwrap_and_update_base(objbase))
 		return value(item.subitems().front(), 0, objbase, collapsed);
 
 	char tempbuf[256];
@@ -377,25 +385,30 @@ std::string debug_view_save::save_item::value(save_registered_item &item, int co
 			}
 
 		// arrays are multiples of a single item
-		default:
-			if (item.type() < save_registered_item::TYPE_ARRAY)
+		case save_registered_item::TYPE_STATIC_ARRAY:
+		case save_registered_item::TYPE_RUNTIME_ARRAY:
+		{
+			if (!collapsed)
+				catprintf(tempbuf, pos, "[%d]", item.count());
+			else
 			{
-				if (!collapsed)
-					catprintf(tempbuf, pos, "[%d]", item.count());
-				else
+				catprintf(tempbuf, pos, "[");
+				auto subitem = item.subitems().begin();
+				auto last = std::prev(item.subitems().end());
+				for (int num = 0; num < item.count(); num++)
 				{
-					catprintf(tempbuf, pos, "[");
-					auto &subitem = item.subitems().front();
-					for (int num = 0; num < item.count(); num++)
-					{
-						std::string val = value(subitem, 0, objbase + num * item.native_size(), true);
-						if (!catprintf(tempbuf, pos, "%s%s", (num == 0) ? "" : ",", val.c_str()))
-							break;
-					}
-					catprintf(tempbuf, pos, "]");
+					std::string val = value(*subitem, 0, objbase + num * item.native_size(), true);
+					if (!catprintf(tempbuf, pos, "%s%s", (num == 0) ? "" : ",", val.c_str()))
+						break;
+					if (subitem != last)
+						++subitem;
 				}
-				return tempbuf;
+				catprintf(tempbuf, pos, "]");
 			}
+			return tempbuf;
+		}
+
+		default:
 			return "(unknown)";
 	}
 }

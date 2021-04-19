@@ -38,7 +38,6 @@
 #include "multipcm.h"
 #include "wavwrite.h"
 
-ALLOW_SAVE_TYPE(multipcm_device::state_t); // allow save_item on a non-fundamental type
 
 /*******************************
         ENVELOPE SECTION

@@ -28,8 +28,6 @@ DEFINE_DEVICE_TYPE(M3000, m3000_device, "m3000", "EM M 3000 Real Time Clock")
 //  DEVICE CONSTRUCTION AND INITIALIZATION
 //**************************************************************************
 
-ALLOW_SAVE_TYPE(m3002_device::mux_state);
-
 //-------------------------------------------------
 //  m3002_device - constructor
 //-------------------------------------------------

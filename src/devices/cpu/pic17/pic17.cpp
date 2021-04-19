@@ -62,8 +62,6 @@
 #include "pic17.h"
 #include "pic17d.h"
 
-ALLOW_SAVE_TYPE(pic17_cpu_device::exec_phase);
-
 pic17_cpu_device::pic17_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 rom_size, address_map_constructor data_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, address_map_constructor(FUNC(pic17_cpu_device::program_map), this))

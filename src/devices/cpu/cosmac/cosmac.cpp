@@ -20,10 +20,6 @@ TODO:
 #include "cosmac.h"
 #include "coreutil.h"
 
-// permit our enums to be saved
-ALLOW_SAVE_TYPE(cosmac_device::cosmac_mode);
-ALLOW_SAVE_TYPE(cosmac_device::cosmac_state);
-
 
 //**************************************************************************
 //  CONSTANTS

@@ -164,8 +164,6 @@ protected:
 
 };
 
-ALLOW_SAVE_TYPE(ay31015_device::state_t);
-
 DECLARE_DEVICE_TYPE(AY31015, ay31015_device)   // For AY-3-1014A, AY-3-1015(D) and HD6402 variants
 DECLARE_DEVICE_TYPE(AY51013, ay51013_device)   // For AY-3-1014, AY-5-1013 and AY-6-1013 variants
 

@@ -50,12 +50,7 @@ private:
 		{
 		}
 
-		bool collapsible() const
-		{
-			return (m_item.type() == save_registered_item::TYPE_CONTAINER ||
-					m_item.type() == save_registered_item::TYPE_STRUCT ||
-					m_item.type() < save_registered_item::TYPE_ARRAY);
-		}
+		bool collapsible() const { return (m_item.is_struct_or_container() || m_item.is_array()); }
 		char const *name() const { return m_item.name(); }
 		std::string value();
 		save_registered_item::save_type type() const { return m_item.type(); }

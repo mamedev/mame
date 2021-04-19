@@ -58,8 +58,6 @@ private:
 	uint8_t m_raw_data[8*8];
 };
 
-ALLOW_SAVE_TYPE(ds1315_device::mode_t);
-
 DECLARE_DEVICE_TYPE(DS1315, ds1315_device)
 
 #endif // MAME_MACHINE_DS1315_H

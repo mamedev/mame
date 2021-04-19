@@ -836,8 +836,6 @@ enum : uint8_t
 
 DEFINE_DEVICE_TYPE(THMFC1, thmfc1_device, "thmfc1", "Thomson THMFC1 floppy controller")
 
-ALLOW_SAVE_TYPE(thmfc1_device::thmfc1_op);
-
 thmfc1_device::thmfc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, THMFC1, tag, owner, clock)
 	, thomson_legacy_floppy_interface(mconfig, *this)

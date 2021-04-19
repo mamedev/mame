@@ -25,8 +25,6 @@
 // device type definitions
 DEFINE_DEVICE_TYPE(EPG3231, epg3231_device, "epg3231", "Elan ePG3231")
 
-ALLOW_SAVE_TYPE(riscii_series_device::exec_state);
-
 
 //**************************************************************************
 //  DEVICE CONSTRUCTION AND INITIALIZATION

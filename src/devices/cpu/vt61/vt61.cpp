@@ -15,9 +15,6 @@
 // device type definition
 DEFINE_DEVICE_TYPE(VT61_CPU, vt61_cpu_device, "vt61_cpu", "DEC VT61 CPU")
 
-ALLOW_SAVE_TYPE(vt61_cpu_device::state);
-ALLOW_SAVE_TYPE(vt61_cpu_device::pc_mode);
-
 vt61_cpu_device::vt61_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, VT61_CPU, tag, owner, clock)
 	, m_program_config("microprogram", ENDIANNESS_LITTLE, 16, 10, -1)

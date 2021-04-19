@@ -3607,9 +3607,6 @@ void namcos22_state::device_post_load()
 	m_gfxdecode->gfx(0)->mark_all_dirty();
 }
 
-// allow save_item on a non-fundamental type
-ALLOW_SAVE_TYPE(namcos22_dsp_upload_state);
-
 void namcos22_state::machine_start()
 {
 	m_mcu_out.resolve();

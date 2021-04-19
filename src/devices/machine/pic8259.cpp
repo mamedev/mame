@@ -27,8 +27,6 @@
 #define LOGOCW(...) LOGMASKED(LOG_OCW, __VA_ARGS__)
 
 
-ALLOW_SAVE_TYPE(pic8259_device::state_t); // allow save_item on a non-fundamental type
-
 void pic8259_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	/* check the various IRQs */

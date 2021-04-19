@@ -149,8 +149,6 @@ private:
 	void ttchamp_map(address_map &map);
 };
 
-ALLOW_SAVE_TYPE(ttchamp_state::picmode);
-
 
 void ttchamp_state::machine_start()
 {
