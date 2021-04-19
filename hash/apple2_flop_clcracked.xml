@@ -41879,4 +41879,26 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="jatblock">
+		<description>Just Around The Block (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>D.C. Heath</publisher>
+		<info name="release" value="2021-04-18"/>
+		<info name="programmer" value="Rob Shaver and Peter Andrews "/>
+		<!--"Just Around The Block" is a 1987 educational game developed by Rob Shaver and Peter Andrews, and distributed by D.C. Heath. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="just around the block (4am crack) disk 1 - program disk.dsk" size="143360" crc="c0a419d5" sha1="fd2f7948968b90edb492e71bc28ce9cb9221d71f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Student disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="just around the block (4am crack) disk 2 - student disk.dsk" size="143360" crc="0fde4d61" sha1="c50ecec8a66db902e062ca65da1810d81c4b5386"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
