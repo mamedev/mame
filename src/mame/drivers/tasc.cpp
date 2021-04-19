@@ -151,7 +151,7 @@ u32 tasc_state::input_r()
 	disable_bootrom_next();
 
 	// read chessboard
-	u32 data = m_smartboard->read();
+	u32 data = m_smartboard->data_r();
 
 	// read keypad
 	for (int i = 0; i < 4; i++)
@@ -170,7 +170,9 @@ void tasc_state::control_w(offs_t offset, u32 data, u32 mem_mask)
 		if (BIT(data, 27))
 			m_lcd->write(BIT(data, 26), data & 0xff);
 
-		m_smartboard->write((data >> 24) & 0xff);
+		m_smartboard->reset_w(BIT(data, 27));
+		m_smartboard->data0_w(BIT(data, 30));
+		m_smartboard->data1_w(BIT(data, 31));
 	}
 	else
 	{

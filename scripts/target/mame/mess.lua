@@ -689,6 +689,7 @@ MACHINES["SPG290"] = true
 MACHINES["STVCD"] = true
 MACHINES["SUN4C_MMU"] = true
 MACHINES["SWTPC8212"] = true
+MACHINES["TASC_SB30"] = true
 MACHINES["TC0091LVC"] = true
 MACHINES["TDC1008"] = true
 --MACHINES["TE7750"] = true
@@ -3860,8 +3861,6 @@ files {
 createMESSProjects(_target, _subtarget, "tasc")
 files {
 	MAME_DIR .. "src/mame/drivers/tasc.cpp",
-	MAME_DIR .. "src/mame/machine/smartboard.cpp",
-	MAME_DIR .. "src/mame/machine/smartboard.h",
 }
 
 createMESSProjects(_target, _subtarget, "tatung")

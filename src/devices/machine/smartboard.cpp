@@ -1,15 +1,17 @@
 // license:BSD-3-Clause
-// copyright-holders:Sandro Ronco
+// copyright-holders:Sandro Ronco, hap
 /******************************************************************************
 
-    Tasc SmartBoard
+Tasc SmartBoard SB30
 
-    SB30 (81 LEDs) is "SmartBoard I"
-    SB20 (64 LEDs) is "SmartBoard II"
+Chessboard controller for use with Tasc R30 chesscomputer, or as PC peripheral.
 
-    The SmartBoard can detect which piece is present on a specific square, more
-    info on the technology used in the piece recognition system can be found in
-    the US patent 5,129,654
+SB30 (81 LEDs) is "SmartBoard I"
+SB20 (64 LEDs) is "SmartBoard II"
+
+The SmartBoard can detect which piece is present on a specific square, more
+info on the technology used in the piece recognition system can be found in
+the US patent 5,129,654
 
 ******************************************************************************/
 
@@ -70,9 +72,10 @@ DEFINE_DEVICE_TYPE(TASC_SB30, tasc_sb30_device, "tasc_sb30", "Tasc SmartBoard SB
 tasc_sb30_device::tasc_sb30_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, TASC_SB30, tag, owner, clock)
 	, m_board(*this, "board")
-	, m_out_leds(*this, "led_%u%u", 0U, 0U)
-{
-}
+	, m_out_leds(*this, "sb30_led_%u.%u", 0U, 0U)
+	, m_data_out(*this)
+	, m_led_out(*this)
+{ }
 
 
 //-------------------------------------------------
@@ -81,23 +84,22 @@ tasc_sb30_device::tasc_sb30_device(const machine_config &mconfig, const char *ta
 
 void tasc_sb30_device::device_start()
 {
-	m_out_leds.resolve();
+	m_led_out.resolve();
+	if (m_led_out.isnull())
+		m_out_leds.resolve();
 
-	save_item(NAME(m_data));
-	save_item(NAME(m_position));
+	m_data_out.resolve_safe();
+
+	std::fill(std::begin(m_squares), std::end(m_squares), 0);
+
+	// register for savestates
+	save_item(NAME(m_reset));
+	save_item(NAME(m_data0));
+	save_item(NAME(m_data1));
+	save_item(NAME(m_output));
+	save_item(NAME(m_pos));
 	save_item(NAME(m_shift));
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void tasc_sb30_device::device_reset()
-{
-	m_data = 0;
-	m_position = 0;
-	m_shift = 0;
+	save_item(NAME(m_squares));
 }
 
 
@@ -163,6 +165,8 @@ u8 tasc_sb30_device::spawn_cb(offs_t offset)
 {
 	int piece_id = 0;
 
+	// While most software works fine as long as color and piece type can be distinguished,
+	// each individual chesspiece is expected to have a unique id.
 	switch (offset)
 	{
 		case 1+0:
@@ -257,49 +261,75 @@ u8 tasc_sb30_device::spawn_cb(offs_t offset)
 //  I/O handlers
 //-------------------------------------------------
 
-u8 tasc_sb30_device::read()
+void tasc_sb30_device::reset_w(int state)
 {
-	if (m_position < 0x40)
+	state = state ? 1 : 0;
+
+	if (!state && m_reset)
 	{
-		int x = 7 - m_position / 8;
-		int y = 7 - m_position % 8;
-		int piece_id = m_board->read_sensor(x, y);
-
-		// each piece is identified by a single bit in a 32-bit sequence, if multiple bits are active the MSB is used
-		u32 sb30_id = 0;
-		if (piece_id > 0)
-			sb30_id = 1UL << (piece_id - 1);
-
-		return BIT(sb30_id, m_shift & 0x1f);
+		m_pos = 0;
+		update_output();
 	}
 
-	return 0;
+	m_reset = state;
 }
 
-void tasc_sb30_device::write(u8 data)
+void tasc_sb30_device::data0_w(int state)
 {
-	if (!BIT(data, 3) && BIT(m_data, 3))
-		m_position = 0;
+	state = state ? 1 : 0;
 
-	if (!BIT(data, 6) && BIT(m_data, 6))
+	if (!state && m_data0)
 	{
-		if (m_position < 0x40)
+		if (m_pos < 0x40)
 		{
-			int x = m_position / 8;
-			int y = m_position % 8;
-			m_out_leds[y][x] = BIT(data, 7);
+			// output board led(s)
+			if (m_led_out.isnull())
+				m_out_leds[m_pos & 7][m_pos >> 3] = m_data1;
+			else
+				m_led_out(m_pos, m_data1);
+		}
+	}
+
+	m_data0 = state;
+}
+
+void tasc_sb30_device::data1_w(int state)
+{
+	state = state ? 1 : 0;
+
+	if (!state && m_data1)
+	{
+		m_pos++;
+
+		if ((m_pos & 0x3f) == 0)
+			m_shift++;
+
+		if (m_data0)
+		{
+			m_shift = 0;
+
+			// start scan
+			scan_board();
 		}
 
-		m_shift = 0;
+		update_output();
 	}
 
-	if (!BIT(data, 7) && BIT(m_data, 7))
+	m_data1 = state;
+}
+
+void tasc_sb30_device::scan_board()
+{
+	for (int i = 0; i < 64; i++)
 	{
-		m_position++;
-
-		if (m_position == 0x40)
-			m_shift++;
+		// each piece is identified by a single bit in a 32-bit sequence
+		int piece_id = m_board->read_sensor(i >> 3 ^ 7, ~i & 7);
+		m_squares[i] = piece_id ? (1 << (piece_id - 1)) : 0;
 	}
+}
 
-	m_data = data;
+void tasc_sb30_device::update_output()
+{
+	m_output = BIT(m_squares[m_pos & 0x3f], m_shift & 0x1f);
+	m_data_out(m_output);
 }

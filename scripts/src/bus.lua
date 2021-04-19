@@ -2587,6 +2587,8 @@ if (BUSES["CENTRONICS"]~=null) then
 		MAME_DIR .. "src/devices/bus/centronics/comxpl80.h",
 		MAME_DIR .. "src/devices/bus/centronics/covox.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/covox.h",
+		MAME_DIR .. "src/devices/bus/centronics/digiblst.cpp",
+		MAME_DIR .. "src/devices/bus/centronics/digiblst.h",
 		MAME_DIR .. "src/devices/bus/centronics/dsjoy.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/dsjoy.h",
 		MAME_DIR .. "src/devices/bus/centronics/epson_ex800.cpp",
@@ -2599,10 +2601,10 @@ if (BUSES["CENTRONICS"]~=null) then
 		MAME_DIR .. "src/devices/bus/centronics/nec_p72.h",
 		MAME_DIR .. "src/devices/bus/centronics/printer.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/printer.h",
-		MAME_DIR .. "src/devices/bus/centronics/digiblst.cpp",
-		MAME_DIR .. "src/devices/bus/centronics/digiblst.h",
 		MAME_DIR .. "src/devices/bus/centronics/samdac.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/samdac.h",
+		MAME_DIR .. "src/devices/bus/centronics/smartboard.cpp",
+		MAME_DIR .. "src/devices/bus/centronics/smartboard.h",
 	}
 
 	dependency {
