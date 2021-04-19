@@ -28,8 +28,8 @@ Run Away?
 
 TODO:
 - Get rid of those big lookup tables, I see no proms on the PCB so it's hardcoded
-  logic somehow, or a color overlay?
-  Note: warp1 colors more or less match the ones of dai3wksi according to flyers
+  logic somehow? it's 3bpp colors, not b&w + color overlay
+  Note: warp1 colors match the ones of dai3wksi according to flyer and game photos
 - Two player games are automatically displayed in cocktail mode.
   Is this by design (a cocktail only romset)?
 - Discrete audio needs adding to replace hardcoded samples
