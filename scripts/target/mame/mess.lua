@@ -3945,8 +3945,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/thomson.cpp",
 	MAME_DIR .. "src/mame/includes/thomson.h",
 	MAME_DIR .. "src/mame/machine/thomson.cpp",
-	MAME_DIR .. "src/mame/machine/thomflop.cpp",
-	MAME_DIR .. "src/mame/machine/thomflop.h",
 	MAME_DIR .. "src/mame/video/thomson.cpp",
 }
 

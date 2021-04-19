@@ -19,6 +19,9 @@
 // - IC301: pcm-1715u      - DAC
 // - IC401: BA6295AFP      - 2 channel motor driver
 
+// irq1 on CXD1808AQ
+// irq3 on FAS204
+
 #include "emu.h"
 #include "cdu75s.h"
 
