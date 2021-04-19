@@ -2611,11 +2611,13 @@ if (BUSES["CENTRONICS"]~=null) then
 		{ MAME_DIR .. "src/devices/bus/centronics/epson_ex800.cpp",  GEN_DIR .. "emu/layout/ex800.lh" },
 		{ MAME_DIR .. "src/devices/bus/centronics/epson_lx800.cpp",  GEN_DIR .. "emu/layout/lx800.lh" },
 		{ MAME_DIR .. "src/devices/bus/centronics/epson_lx810l.cpp", GEN_DIR .. "emu/layout/lx800.lh" },
+		{ MAME_DIR .. "src/devices/bus/centronics/smartboard.cpp",   GEN_DIR .. "emu/layout/smartboard.lh" },
 	}
 
 	custombuildtask {
 		layoutbuildtask("emu/layout", "ex800"),
 		layoutbuildtask("emu/layout", "lx800"),
+		layoutbuildtask("emu/layout", "smartboard"),
 	}
 end
 
