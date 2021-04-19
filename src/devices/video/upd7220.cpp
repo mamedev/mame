@@ -25,7 +25,9 @@
     - QX-10 diagnostic test misses the zooming factor (external pin);
     - compis2 SAD address for bitmap is 0x20000 for whatever reason (presumably missing banking);
     - A5105 has a FIFO bug with the RDAT, should be a lot larger when it scrolls up.
-      The problem is that DMA-ing with RDAT/WDAT shouldn't be instant;
+      Can be fixed with a DRDY mechanism for RDAT/WDAT;
+    - Some later SWs on PC-98 throws "Invalid command byte 05" (zettmj on Epson logo),
+	  actual undocumented command to reset something?
 
     - honor visible area
     - wide mode (32-bit access)

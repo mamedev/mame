@@ -2115,7 +2115,9 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="fh2tag">
+	<!-- boot OK, no sound (tested -26 and -86 on 98RS, TBD: retest in 9821) -->
+	<!-- Has Tuned Heart demo (which also has no sound and hangs at first battle) -->
+	<software name="fh2tag" supported="partial">
 		<!--
 		Origin: redump.org
 		<rom name="Finish Hold 2 - Tag (Japan).cue" size="93" crc="7cf64221" md5="a2dc55a24539aab103701e08562253fe" sha1="8a49ecb6010ea76deb1bcc3c84a0cfc437de46e3"/>
@@ -3936,7 +3938,9 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pnauts">
+	<!-- Can randomly lock up on prolonged sessions (1+ hours) -->
+	<!-- Most likely down to -86 misfired irq (stuck note) -->
+	<software name="pnauts" supported="partial">
 		<!--
 		Origin: redump.org
 		<rom name="Policenauts (Japan).cue" size="591" crc="33715417" md5="ae17a348af34b2f7bddd0695d976f61c" sha1="2e41266a1a1e82eaa6a2b85858aec7af8ad93e33"/>
