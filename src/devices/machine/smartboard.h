@@ -23,7 +23,6 @@ public:
 	auto led_out() { return m_led_out.bind(); } // optional, outputs to sb30_ledy.x when not used
 
 	// external read/write lines
-	void reset_w(int state);
 	void data0_w(int state);
 	void data1_w(int state);
 	int data_r() { return m_output; }
@@ -42,21 +41,19 @@ private:
 	devcb_write_line m_data_out;
 	devcb_write8 m_led_out;
 
-	void scan_board();
 	void update_output();
 	bool piece_available(u8 id);
 	void init_cb(int state);
 	u8 spawn_cb(offs_t offset);
 
 	// i/o lines
-	int m_reset = 0;
 	int m_data0 = 0;
 	int m_data1 = 0;
 	int m_output = 0;
 
 	// internal use
+	bool m_scan_pending = false;
 	u32 m_pos = 0;
-	u8 m_shift = 0;
 	u32 m_squares[64]; // board state
 };
 

@@ -170,7 +170,6 @@ void tasc_state::control_w(offs_t offset, u32 data, u32 mem_mask)
 		if (BIT(data, 27))
 			m_lcd->write(BIT(data, 26), data & 0xff);
 
-		m_smartboard->reset_w(BIT(data, 27));
 		m_smartboard->data0_w(BIT(data, 30));
 		m_smartboard->data1_w(BIT(data, 31));
 	}

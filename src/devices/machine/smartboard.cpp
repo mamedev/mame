@@ -94,12 +94,11 @@ void tasc_sb30_device::device_start()
 	std::fill(std::begin(m_squares), std::end(m_squares), 0);
 
 	// register for savestates
-	save_item(NAME(m_reset));
 	save_item(NAME(m_data0));
 	save_item(NAME(m_data1));
 	save_item(NAME(m_output));
+	save_item(NAME(m_scan_pending));
 	save_item(NAME(m_pos));
-	save_item(NAME(m_shift));
 	save_item(NAME(m_squares));
 }
 
@@ -279,32 +278,33 @@ u8 tasc_sb30_device::spawn_cb(offs_t offset)
 //  I/O handlers
 //-------------------------------------------------
 
-void tasc_sb30_device::reset_w(int state)
-{
-	state = state ? 1 : 0;
-
-	if (!state && m_reset)
-	{
-		m_pos = 0;
-		update_output();
-	}
-
-	m_reset = state;
-}
-
 void tasc_sb30_device::data0_w(int state)
 {
 	state = state ? 1 : 0;
 
 	if (!state && m_data0)
 	{
-		if (m_pos < 0x40)
+		if (m_scan_pending)
+		{
+			for (int i = 0; i < 64; i++)
+			{
+				// each piece is identified by a single bit in a 32-bit sequence
+				int piece_id = m_board->read_sensor(i >> 3 ^ 7, ~i & 7);
+				m_squares[i] = piece_id ? (1 << (piece_id - 1)) : 0;
+			}
+
+			m_pos = 0;
+			update_output();
+
+			m_scan_pending = false;
+		}
+		else
 		{
 			// output board led(s)
 			if (m_led_out.isnull())
-				m_out_leds[m_pos & 7][m_pos >> 3] = m_data1;
+				m_out_leds[m_pos & 7][m_pos >> 3 & 7] = m_data1;
 			else
-				m_led_out(m_pos, m_data1);
+				m_led_out(m_pos & 0x3f, m_pos >> 6 & 1);
 		}
 	}
 
@@ -315,20 +315,13 @@ void tasc_sb30_device::data1_w(int state)
 {
 	state = state ? 1 : 0;
 
+	// clock position counter
 	if (!state && m_data1)
 	{
 		m_pos++;
 
-		if ((m_pos & 0x3f) == 0)
-			m_shift++;
-
 		if (m_data0)
-		{
-			m_shift = 0;
-
-			// start scan
-			scan_board();
-		}
+			m_scan_pending = true;
 
 		update_output();
 	}
@@ -336,18 +329,8 @@ void tasc_sb30_device::data1_w(int state)
 	m_data1 = state;
 }
 
-void tasc_sb30_device::scan_board()
-{
-	for (int i = 0; i < 64; i++)
-	{
-		// each piece is identified by a single bit in a 32-bit sequence
-		int piece_id = m_board->read_sensor(i >> 3 ^ 7, ~i & 7);
-		m_squares[i] = piece_id ? (1 << (piece_id - 1)) : 0;
-	}
-}
-
 void tasc_sb30_device::update_output()
 {
-	m_output = BIT(m_squares[m_pos & 0x3f], m_shift & 0x1f);
+	m_output = BIT(m_squares[m_pos & 0x3f], m_pos >> 6 & 0x1f);
 	m_data_out(m_output);
 }
