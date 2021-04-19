@@ -959,6 +959,7 @@ BUSES["SVI_EXPANDER"] = true
 BUSES["SVI_SLOT"] = true
 BUSES["TANBUS"] = true
 BUSES["TATUNG_PIPE"] = true
+BUSES["THOMSON"] = true
 BUSES["TMC600"] = true
 BUSES["TI8X"] = true
 BUSES["TI99"] = true
