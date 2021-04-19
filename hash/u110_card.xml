@@ -15,9 +15,9 @@ Release dates were taken from http://www.rolandmuseum.de/z_syn_wc.php
 -->
 
 <softwarelist name="u110_card" description="Roland U-110 PCM memory cards">
-	<software name="mus1-akk">
+	<software name="mus1_akk">
 		<description>Musitronics 1 Akkordeon (U-25)</description>
-		<year>199x</year>
+		<year>199?</year>
 		<publisher>musitronics GmbH</publisher>
 		<part name="card" interface="u110_card">
 			<dataarea name="rom" size="0x80000">
@@ -26,7 +26,7 @@ Release dates were taken from http://www.rolandmuseum.de/z_syn_wc.php
 			</dataarea>
 		</part>
 	</software>
-	<software name="sn-mv30-01">
+	<software name="sn_mv30_01">
 		<description>SN-MV30-01 Rhythm Section (U-31)</description>
 		<year>1991</year>
 		<publisher>Roland</publisher>
@@ -36,7 +36,7 @@ Release dates were taken from http://www.rolandmuseum.de/z_syn_wc.php
 			</dataarea>
 		</part>
 	</software>
-	<software name="sn-mv30-02">
+	<software name="sn_mv30_02">
 		<description>SN-MV30-02 Orchestral (U-30)</description>
 		<year>1991</year>
 		<publisher>Roland</publisher>
@@ -46,7 +46,7 @@ Release dates were taken from http://www.rolandmuseum.de/z_syn_wc.php
 			</dataarea>
 		</part>
 	</software>
-	<software name="sn-u110-01">
+	<software name="sn_u110_01">
 		<description>SN-U110-01 Pipe Organ &amp; Harpsichord</description>
 		<year>1989</year>
 		<publisher>Roland</publisher>
@@ -56,7 +56,7 @@ Release dates were taken from http://www.rolandmuseum.de/z_syn_wc.php
 			</dataarea>
 		</part>
 	</software>
-	<software name="sn-u110-02">
+	<software name="sn_u110_02">
 		<description>SN-U110-02 Latin &amp; F.X. Percussions</description>
 		<year>1989</year>
 		<publisher>Roland</publisher>
@@ -66,7 +66,7 @@ Release dates were taken from http://www.rolandmuseum.de/z_syn_wc.php
 			</dataarea>
 		</part>
 	</software>
-	<software name="sn-u110-03">
+	<software name="sn_u110_03">
 		<description>SN-U110-03 Ethnic</description>
 		<year>1989</year>
 		<publisher>Roland</publisher>
@@ -76,7 +76,7 @@ Release dates were taken from http://www.rolandmuseum.de/z_syn_wc.php
 			</dataarea>
 		</part>
 	</software>
-	<software name="sn-u110-04">
+	<software name="sn_u110_04">
 		<description>SN-U110-04 Electric Grand &amp; Clavi</description>
 		<year>1989</year>
 		<publisher>Roland</publisher>
@@ -86,7 +86,7 @@ Release dates were taken from http://www.rolandmuseum.de/z_syn_wc.php
 			</dataarea>
 		</part>
 	</software>
-	<software name="sn-u110-05">
+	<software name="sn_u110_05">
 		<description>SN-U110-05 Orchestral Strings</description>
 		<year>1989</year>
 		<publisher>Roland</publisher>
@@ -96,7 +96,7 @@ Release dates were taken from http://www.rolandmuseum.de/z_syn_wc.php
 			</dataarea>
 		</part>
 	</software>
-	<software name="sn-u110-06">
+	<software name="sn_u110_06">
 		<description>SN-U110-06 Orchestral Winds</description>
 		<year>1989</year>
 		<publisher>Roland</publisher>
@@ -106,7 +106,7 @@ Release dates were taken from http://www.rolandmuseum.de/z_syn_wc.php
 			</dataarea>
 		</part>
 	</software>
-	<software name="sn-u110-07">
+	<software name="sn_u110_07">
 		<description>SN-U110-07 Electric Guitar</description>
 		<year>1989</year>
 		<publisher>Roland</publisher>
@@ -116,7 +116,7 @@ Release dates were taken from http://www.rolandmuseum.de/z_syn_wc.php
 			</dataarea>
 		</part>
 	</software>
-	<software name="sn-u110-08">
+	<software name="sn_u110_08">
 		<description>SN-U110-08 Synthesizer</description>
 		<year>1989</year>
 		<publisher>Roland</publisher>
@@ -126,7 +126,7 @@ Release dates were taken from http://www.rolandmuseum.de/z_syn_wc.php
 			</dataarea>
 		</part>
 	</software>
-	<software name="sn-u110-09">
+	<software name="sn_u110_09">
 		<description>SN-U110-09 Guitar &amp; Keyboards</description>
 		<year>1989</year>
 		<publisher>Roland</publisher>
@@ -136,7 +136,7 @@ Release dates were taken from http://www.rolandmuseum.de/z_syn_wc.php
 			</dataarea>
 		</part>
 	</software>
-	<software name="sn-u110-10">
+	<software name="sn_u110_10">
 		<description>SN-U110-10 Rock Drums</description>
 		<year>1989</year>
 		<publisher>Roland</publisher>
@@ -146,7 +146,7 @@ Release dates were taken from http://www.rolandmuseum.de/z_syn_wc.php
 			</dataarea>
 		</part>
 	</software>
-	<software name="sn-u110-11">
+	<software name="sn_u110_11">
 		<description>SN-U110-11 Sound Effects</description>
 		<year>1989</year>
 		<publisher>Roland</publisher>
@@ -156,7 +156,7 @@ Release dates were taken from http://www.rolandmuseum.de/z_syn_wc.php
 			</dataarea>
 		</part>
 	</software>
-	<software name="sn-u110-12">
+	<software name="sn_u110_12">
 		<description>SN-U110-12 Sax &amp; Trombone</description>
 		<year>1989</year>
 		<publisher>Roland</publisher>
@@ -166,7 +166,7 @@ Release dates were taken from http://www.rolandmuseum.de/z_syn_wc.php
 			</dataarea>
 		</part>
 	</software>
-	<software name="sn-u110-13">
+	<software name="sn_u110_13">
 		<description>SN-U110-13 Super Strings</description>
 		<year>1992</year>
 		<publisher>Roland</publisher>
@@ -176,7 +176,7 @@ Release dates were taken from http://www.rolandmuseum.de/z_syn_wc.php
 			</dataarea>
 		</part>
 	</software>
-	<software name="sn-u110-14">
+	<software name="sn_u110_14">
 		<description>SN-U110-14 Super Ac Guitar</description>
 		<year>1992</year>
 		<publisher>Roland</publisher>
@@ -186,7 +186,7 @@ Release dates were taken from http://www.rolandmuseum.de/z_syn_wc.php
 			</dataarea>
 		</part>
 	</software>
-	<software name="sn-u110-15">
+	<software name="sn_u110_15">
 		<description>SN-U110-15 Super Brass</description>
 		<year>1992</year>
 		<publisher>Roland</publisher>
