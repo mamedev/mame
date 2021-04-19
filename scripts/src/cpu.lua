@@ -2784,8 +2784,8 @@ end
 
 if CPUS["Z180"] then
 	files {
-		MAME_DIR .. "src/devices/cpu/z180/hd647180x.cpp",
-		MAME_DIR .. "src/devices/cpu/z180/hd647180x.h",
+		MAME_DIR .. "src/devices/cpu/z180/hd64x180x.cpp",
+		MAME_DIR .. "src/devices/cpu/z180/hd64x180x.h",
 		MAME_DIR .. "src/devices/cpu/z180/z180.cpp",
 		MAME_DIR .. "src/devices/cpu/z180/z180.h",
 		MAME_DIR .. "src/devices/cpu/z180/z180cb.hxx",

@@ -76,7 +76,7 @@
 
 
 #include "emu.h"
-#include "cpu/z180/hd647180x.h"
+#include "cpu/z180/hd64x180x.h"
 #include "machine/msm6242.h"
 #include "video/mc6845.h"
 #include "emupal.h"
@@ -922,7 +922,7 @@ void luckgrln_state::init_luckgrln()
 
 
 ROM_START( luckgrln )
-	ROM_REGION( 0x4000, "maincpu", 0 ) // internal Z180 rom
+	ROM_REGION( 0x4000, "maincpu:internal", 0 ) // internal Z180 rom
 	ROM_LOAD( "lucky74.bin",  0x00000, 0x4000, CRC(fa128e05) SHA1(97a9534b8414f984159271db48b153b0724d22f9) )
 
 	ROM_REGION( 0x20000, "rom_data", 0 ) // external data / cpu rom
@@ -942,7 +942,9 @@ ROM_END
 ROM_START( 7smash )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "eagle.8",      0x000000, 0x020000, CRC(b115c5d5) SHA1(3f80613886b7f8092ec914c9bfb416078aca82a3) )
-	ROM_LOAD( "7smash.bin",   0x000000, 0x004000, CRC(58396efa) SHA1(b957d28e321a5c4f9a90e0a7eaf8f01450662c0e) ) // internal Z180 rom
+
+	ROM_REGION( 0x4000, "maincpu:internal", 0 ) // internal Z180 rom
+	ROM_LOAD( "7smash.bin",   0x000000, 0x004000, CRC(58396efa) SHA1(b957d28e321a5c4f9a90e0a7eaf8f01450662c0e) )
 
 	ROM_REGION( 0x20000, "rom_data", ROMREGION_ERASEFF ) // external data / cpu rom
 

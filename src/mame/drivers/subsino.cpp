@@ -223,7 +223,7 @@ To Do:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z180/hd647180x.h"
+#include "cpu/z180/hd64x180x.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/subsino.h"
@@ -2693,9 +2693,10 @@ GFXDECODE_END
 void subsino_state::victor21(machine_config &config)
 {
 	/* basic machine hardware */
-	HD647180X(config, m_maincpu, XTAL(12'000'000));   /* Unknown clock */
-	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::victor21_map);
-	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
+	hd647180x_device &maincpu(HD647180X(config, m_maincpu, XTAL(12'000'000)));   /* Unknown clock */
+	maincpu.set_addrmap(AS_PROGRAM, &subsino_state::victor21_map);
+	maincpu.set_addrmap(AS_IO, &subsino_state::subsino_iomap);
+	maincpu.set_mp(hd647180x_device::hd64x180x_mp_t::MP_EXPANDED_WITHOUT_ROM);
 
 	i8255_device &ppi(I8255A(config, "ppi"));
 	ppi.out_pa_callback().set(FUNC(subsino_state::out_a_w));
@@ -2742,9 +2743,10 @@ void subsino_state::victor5(machine_config &config)
 void subsino_state::crsbingo(machine_config &config)
 {
 	/* basic machine hardware */
-	HD647180X(config, m_maincpu, XTAL(12'000'000));   /* Unknown CPU and clock */
-	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::crsbingo_map);
-	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
+	hd647180x_device &maincpu(HD647180X(config, m_maincpu, XTAL(12'000'000)));   /* Unknown CPU and clock */
+	maincpu.set_addrmap(AS_PROGRAM, &subsino_state::crsbingo_map);
+	maincpu.set_addrmap(AS_IO, &subsino_state::subsino_iomap);
+	maincpu.set_mp(hd647180x_device::hd64x180x_mp_t::MP_EXPANDED_WITHOUT_ROM);
 
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
@@ -2773,9 +2775,10 @@ void subsino_state::crsbingo(machine_config &config)
 void subsino_state::srider(machine_config &config)
 {
 	/* basic machine hardware */
-	HD647180X(config, m_maincpu, XTAL(12'000'000));   /* Unknown clock */
-	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::srider_map);
-	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
+	hd647180x_device &maincpu(HD647180X(config, m_maincpu, XTAL(12'000'000)));   /* Unknown clock */
+	maincpu.set_addrmap(AS_PROGRAM, &subsino_state::srider_map);
+	maincpu.set_addrmap(AS_IO, &subsino_state::subsino_iomap);
+	maincpu.set_mp(hd647180x_device::hd64x180x_mp_t::MP_EXPANDED_WITHOUT_ROM);
 
 	i8255_device &ppi1(I8255A(config, "ppi1"));
 	ppi1.in_pa_callback().set_ioport("SW1");
@@ -2824,9 +2827,10 @@ void subsino_state::sharkpy(machine_config &config)
 void subsino_state::tisub(machine_config &config)
 {
 	/* basic machine hardware */
-	HD647180X(config, m_maincpu, XTAL(12'000'000));   /* Unknown CPU and clock */
-	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::tisub_map);
-	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
+	hd647180x_device &maincpu(HD647180X(config, m_maincpu, XTAL(12'000'000)));   /* Unknown CPU and clock */
+	maincpu.set_addrmap(AS_PROGRAM, &subsino_state::tisub_map);
+	maincpu.set_addrmap(AS_IO, &subsino_state::subsino_iomap);
+	maincpu.set_mp(hd647180x_device::hd64x180x_mp_t::MP_EXPANDED_WITHOUT_ROM);
 
 	i8255_device &ppi1(I8255A(config, "ppi1"));
 	ppi1.in_pa_callback().set_ioport("SW1");
@@ -2864,9 +2868,10 @@ void subsino_state::tisub(machine_config &config)
 void subsino_state::stbsub(machine_config &config)
 {
 	/* basic machine hardware */
-	HD647180X(config, m_maincpu, XTAL(12'000'000));   /* Unknown clock */
-	m_maincpu->set_addrmap(AS_PROGRAM, &subsino_state::stbsub_map);
-	m_maincpu->set_addrmap(AS_IO, &subsino_state::subsino_iomap);
+	hd647180x_device &maincpu(HD647180X(config, m_maincpu, XTAL(12'000'000)));   /* Unknown clock */
+	maincpu.set_addrmap(AS_PROGRAM, &subsino_state::stbsub_map);
+	maincpu.set_addrmap(AS_IO, &subsino_state::subsino_iomap);
+	maincpu.set_mp(hd647180x_device::hd64x180x_mp_t::MP_EXPANDED_WITHOUT_ROM);
 
 	i8255_device &ppi1(I8255A(config, "ppi1"));
 	ppi1.in_pa_callback().set_ioport("SW1");
@@ -3064,7 +3069,7 @@ ROM_END
 /***************************************************************************
 
   Treasure Island
-  -- this has an extra layer for the reels, exactly the same as goldstar.c
+  -- this has an extra layer for the reels, exactly the same as goldstar.cpp
 
 ***************************************************************************/
 
