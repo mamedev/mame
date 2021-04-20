@@ -60,7 +60,7 @@ offs_t rx01_disassembler::disassemble(std::ostream &stream, offs_t pc, const rx0
 		util::stream_format(stream, "%sBR %s ",
 							BIT(opcode, 7) ? "W" : "",
 							s_conditions[(opcode & 074) >> 2]);
-		if ((opcode & 074) == 020)
+		if ((opcode & 074) == 010 || (opcode & 074) == 020)
 			stream << s_0_or_1[BIT(opcode, 1)];
 		else
 			stream << (BIT(opcode, 1) ? "T" : "F");
