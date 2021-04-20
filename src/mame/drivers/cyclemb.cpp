@@ -95,7 +95,7 @@ public:
 		m_obj1_ram(*this, "obj1_ram"),
 		m_obj2_ram(*this, "obj2_ram"),
 		m_obj3_ram(*this, "obj3_ram"),
-		m_pad(*this, "PAD_P%u", 1U)
+		m_dial(*this, "PAD_P%u", 1U)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -110,12 +110,12 @@ public:
 	required_shared_ptr<uint8_t> m_obj2_ram;
 	required_shared_ptr<uint8_t> m_obj3_ram;
 
-	optional_ioport_array<2> m_pad;
+	optional_ioport_array<2> m_dial;
 	struct
 	{
 		uint8_t curent_value;
 		bool reverse;
-	} m_dial[2];
+	} m_dial_status[2];
 
 	struct
 	{
@@ -701,8 +701,8 @@ void cyclemb_state::machine_start()
 
 	for (int i = 0; i < 2; i++)
 	{
-		save_item(NAME(m_dial[i].curent_value), i);
-		save_item(NAME(m_dial[i].reverse), i);
+		save_item(NAME(m_dial_status[i].curent_value), i);
+		save_item(NAME(m_dial_status[i].reverse), i);
 	}
 
 	save_item(NAME(m_screen_display));
@@ -718,16 +718,16 @@ void cyclemb_state::machine_reset()
 template <int P>
 CUSTOM_INPUT_MEMBER(cyclemb_state::dial_r)
 {
-	int8_t input_value = m_pad[P]->read();
+	int8_t input_value = m_dial[P]->read();
 	int delta = std::clamp((int)input_value, -0x1f, 0x1f);
 
 	if (delta != 0)
 	{
-		m_dial[P].reverse = (delta < 0);
-		m_dial[P].curent_value = (m_dial[P].curent_value + (uint8_t)abs(delta)) & 0x7f;
+		m_dial_status[P].reverse = (delta < 0);
+		m_dial_status[P].curent_value = (m_dial_status[P].curent_value + (uint8_t)abs(delta)) & 0x7f;
 	}
 
-	return m_dial[P].curent_value | (m_dial[P].reverse ? 0x80 : 0x00);
+	return m_dial_status[P].curent_value | (m_dial_status[P].reverse ? 0x80 : 0x00);
 }
 
 
