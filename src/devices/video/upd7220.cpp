@@ -21,7 +21,6 @@
         - read data
         - modify data
         - write data
-    - QX-10 diagnostic test has positioning bugs with the bitmap display test;
     - QX-10 diagnostic test misses the zooming factor (external pin);
     - compis2 SAD address for bitmap is 0x20000 for whatever reason (presumably missing banking);
     - A5105 has a FIFO bug with the RDAT, should be a lot larger when it scrolls up.
@@ -1648,8 +1647,6 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 
 		if (im || force_bitmap)
 		{
-			//get_graphics_partition(area, &sad, &len, &im, &wd);
-
 			if(area >= 3) // TODO: most likely to be correct, Quarth (PC-98xx) definitely draws with area 2. We might see an area 3 someday ...
 				break;
 
@@ -1670,8 +1667,6 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 		}
 		else
 		{
-			get_text_partition(area, &sad, &len, &im, &wd);
-
 			if(m_lr)
 			{
 				for (y = 0; y < len; y+=m_lr)
