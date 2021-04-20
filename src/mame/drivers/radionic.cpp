@@ -372,10 +372,10 @@ void radionic_state::radionic(machine_config &config)
 	FD1771(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(FUNC(radionic_state::intrq_w));
 
-	FLOPPY_CONNECTOR(config, "fdc:0", radionic_floppies, "80t_qd", radionic_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", radionic_floppies, "80t_qd", radionic_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:2", radionic_floppies, nullptr, radionic_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:3", radionic_floppies, nullptr, radionic_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], radionic_floppies, "80t_qd", radionic_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], radionic_floppies, "80t_qd", radionic_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[2], radionic_floppies, nullptr, radionic_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[3], radionic_floppies, nullptr, radionic_state::floppy_formats).enable_sound(true);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit7));

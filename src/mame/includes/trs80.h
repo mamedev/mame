@@ -41,15 +41,12 @@ public:
 		, m_uart(*this, "uart")
 		, m_uart_clock(*this, "uart_clock")
 		, m_fdc(*this, "fdc")
-		, m_floppy0(*this, "fdc:0")
-		, m_floppy1(*this, "fdc:1")
-		, m_floppy2(*this, "fdc:2")
-		, m_floppy3(*this, "fdc:3")
+		, m_floppy(*this, "flop%u", 0U)
 		, m_speaker(*this, "speaker")
 		, m_cassette(*this, "cassette")
 		, m_io_baud(*this, "BAUD")
 		, m_io_config(*this, "CONFIG")
-		, m_io_keyboard(*this, "LINE%u", 0)
+		, m_io_keyboard(*this, "LINE%u", 0U)
 	{ }
 
 	void sys80(machine_config &config);
@@ -99,7 +96,7 @@ protected:
 	double m_old_cassette_val;
 	uint8_t m_size_store;
 	uint16_t m_timeout;
-	floppy_image_device *m_floppy;
+	floppy_image_device *m_fdd;
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_region_maincpu;
 	required_region_ptr<u8> m_p_chargen;
@@ -110,10 +107,7 @@ protected:
 	optional_device<ay31015_device> m_uart;
 	optional_device<clock_device> m_uart_clock;
 	optional_device<fd1771_device> m_fdc;
-	optional_device<floppy_connector> m_floppy0;
-	optional_device<floppy_connector> m_floppy1;
-	optional_device<floppy_connector> m_floppy2;
-	optional_device<floppy_connector> m_floppy3;
+	optional_device_array<floppy_connector, 4> m_floppy;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	optional_ioport m_io_baud;
