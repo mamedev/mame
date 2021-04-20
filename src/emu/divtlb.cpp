@@ -114,13 +114,11 @@ void device_vtlb_interface::interface_pre_start()
 
 void device_vtlb_interface::interface_register_save(save_registrar &save)
 {
-	save_registrar container(save, "vtlb");
-
-	container.reg(NAME(m_live))
+	save.reg(NAME(m_live))
 		.reg(NAME(m_table))
 		.reg(NAME(m_refcnt));
 	if (m_fixed > 0)
-		container.reg(NAME(m_fixedpages));
+		save.reg(NAME(m_fixedpages));
 }
 
 

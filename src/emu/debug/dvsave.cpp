@@ -63,6 +63,11 @@ void debug_view_save::build_list_recursive(save_registered_item &item, uintptr_t
 	if (item.unwrap_and_update_base(objbase))
 		return build_list_recursive(item.subitems().front(), objbase, depth, count);
 
+	// only containers are allowed to have null bases past this point; treat
+	// everything else as non-existent
+	if (objbase == 0 && item.type() != save_registered_item::TYPE_CONTAINER)
+		return;
+
 	// switch off the type
 	switch (item.type())
 	{
@@ -304,6 +309,11 @@ std::string debug_view_save::save_item::value(save_registered_item &item, int co
 	// update the base pointer and forward if a trivial unwrap
 	if (item.unwrap_and_update_base(objbase))
 		return value(item.subitems().front(), 0, objbase, collapsed);
+
+	// only containers are allowed to have null bases past this point; treat
+	// everything else as non-existent
+	if (objbase == 0 && item.type() != save_registered_item::TYPE_CONTAINER)
+		return "(null)";
 
 	char tempbuf[256];
 	tempbuf[0] = 0;

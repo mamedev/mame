@@ -39,6 +39,8 @@
 
 #define LOG(x) do { if (VERBOSE) machine().logerror x; } while (0)
 
+#define DUMP_INITIAL_JSON_SAVE (0)
+
 
 
 //**************************************************************************
@@ -109,7 +111,7 @@ bool zlib_write_streamer::begin()
 
 	// initialize the zlib engine; the negative window size means
 	// no headers, which is what a .ZIP file wants
-	return (deflateInit2(&m_stream, Z_BEST_COMPRESSION, Z_DEFLATED, -15, 8, Z_DEFAULT_STRATEGY) == Z_OK);
+	return (deflateInit2(&m_stream, Z_DEFAULT_COMPRESSION, Z_DEFLATED, -15, 8, Z_DEFAULT_STRATEGY) == Z_OK);
 }
 
 
@@ -215,10 +217,13 @@ public:
 
 	// simple getters
 	char const *json_string() { m_json[m_json_offset] = 0; return &m_json[0]; }
-	int json_length() const { return m_json_offset; }
+	u32 json_length() const { return m_json_offset; }
+
+	// setters
+	void json_set_length(u32 length) { m_json_offset = length; }
 
 	// append a character to the JSON stream
-	save_zip_state &json_append(char ch) { 	m_json[m_json_offset++] = ch; return *this; }
+	save_zip_state &json_append(char ch) { m_json[m_json_offset++] = ch; return *this; }
 
 	// append an end-of-line sequence to the JSON stream
 	save_zip_state &json_append_eol() { return json_append(13).json_append(10); }
@@ -915,6 +920,7 @@ public:
 	bool json_parse_int_string(s64 &result);
 	bool json_parse_uint_string(u64 &result);
 	bool json_parse_string(std::string &result);
+	void json_parse_remaining_value(save_registered_item &item);
 
 	// initialize, checking the input file basic validity
 	save_error init();
@@ -927,18 +933,24 @@ public:
 
 	// report a warning
 	template<typename... Params>
-	void report_warning(char const *format, Params &&... args)
+	void report_warning(save_registered_item &item, char const *format, Params &&... args)
 	{
-		m_warnings.append(string_format(format, std::forward<Params>(args)...));
-		m_warnings += "\n";
+		m_warnings.append(item.full_name()).append(": ").append(string_format(format, std::forward<Params>(args)...)).append("\n");
+	}
+
+	// report a warning and consume the remaining value
+	template<typename... Params>
+	void report_warning_and_consume(save_registered_item &item, char const *format, Params &&... args)
+	{
+		m_warnings.append(item.full_name()).append(": ").append(string_format(format, std::forward<Params>(args)...)).append("\n");
+		json_parse_remaining_value(item);
 	}
 
 	// report an error; this implicitly throws to exit
 	template<typename... Params>
-	void report_error(save_error type, char const *format, Params &&... args)
+	void report_error(save_registered_item &item, save_error type, char const *format, Params &&... args)
 	{
-		m_errors.append(string_format(format, std::forward<Params>(args)...));
-		m_errors += "\n";
+		m_errors.append(item.full_name()).append(": ").append(string_format(format, std::forward<Params>(args)...)).append("\n");
 		throw load_error(type);
 	}
 
@@ -1102,6 +1114,67 @@ bool load_zip_state::json_parse_string(std::string &result)
 				}
 			}
 	return true;
+}
+
+
+//-------------------------------------------------
+//  json_parse_remaining_value - parse and throw
+//  away any remaining value data
+//-------------------------------------------------
+
+void load_zip_state::json_parse_remaining_value(save_registered_item &item)
+{
+	// value ends at a comma or end of struct/array
+	while (json_peek() != 0 && json_peek() != ',' && json_peek() != ']' && json_peek() != '}')
+	{
+		// skip any leading whitespace
+		if (json_matches('['))
+		{
+			// if a start of array marker, parse until done
+			while (1)
+			{
+				json_parse_remaining_value(item);
+				if (json_matches(']'))
+					break;
+				if (!json_matches(','))
+					report_error(item, STATERR_MALFORMED_JSON, "Expected ','");
+			}
+		}
+		else if (json_matches('{'))
+		{
+			// if a start of struct market, parse until done
+			while (1)
+			{
+				std::string name;
+				if (!json_parse_string(name) || name == "")
+					report_error(item, STATERR_MALFORMED_JSON, "Expected name within struct");
+				if (!json_matches(':'))
+					report_error(item, STATERR_MALFORMED_JSON, "Expected ':'");
+				json_parse_remaining_value(item);
+				if (json_matches('}'))
+					break;
+				if (!json_matches(','))
+					report_error(item, STATERR_MALFORMED_JSON, "Expected ','");
+			}
+		}
+		else if (json_peek() == '"')
+		{
+			// if a string, consume it
+			std::string dummy;
+			json_parse_string(dummy);
+		}
+		else if (isdigit(json_peek()) || json_peek() == '-' || json_peek() == '+')
+		{
+			// if a number, consume it
+			double dummy;
+			json_parse_number(dummy);
+		}
+		else
+		{
+			// otherwise, just advance until we see something interesting
+			json_set_position(json_position() + 1);
+		}
+	}
 }
 
 
@@ -1290,11 +1363,6 @@ save_registered_item::save_registered_item(save_registered_item &parent, uintptr
 	m_native_size(native_size),
 	m_name(name)
 {
-	// cleanup names a bit
-	if (m_name[0] == '*')
-		m_name.erase(0, 1);
-	if (m_name[0] == 'm' && m_name[1] == '_')
-		m_name.erase(0, 2);
 }
 
 
@@ -1311,17 +1379,21 @@ std::string save_registered_item::full_name() const
 	// get the parent's full name
 	std::string result = m_parent->full_name();
 
+	// if we're a unique or vector, just pass it through without adding more
+	if (type() == TYPE_UNIQUE || type() == TYPE_VECTOR)
+		return result;
+
+	// if we're an array item, append an array indicator
+	if (is_array())
+		return result.append("[]");
+
 	// maybe add a separator
 	char end = result[result.length() - 1];
 	if (end != ':' && end != '.' && result.length() != 0)
-		result += ".";
+		result.append(".");
 
 	// then append our bit
-	if (m_name.length() == 0 && m_parent->is_array())
-		result += "[]";
-	else
-		result += m_name;
-	return result;
+	return result.append(m_name);
 }
 
 
@@ -1331,11 +1403,17 @@ std::string save_registered_item::full_name() const
 
 save_registered_item &save_registered_item::append(uintptr_t ptr_offset, save_type type, u32 native_size, char const *name, u32 count)
 {
+	// cleanup names a bit
+	if (name[0] == '*')
+		name++;
+	if (name[0] == 'm' && name[1] == '_')
+		name += 2;
+
 	// make sure there are no duplicates
 	if (find(name) != nullptr)
-		throw emu_fatalerror("Duplicate save state registration '%s'\n", name);
+		throw emu_fatalerror("%s: Duplicate save state registration '%s'\n", full_name().c_str(), name);
 
-//printf("%s '%s': adding %s '%s' @ %llX, size %d\n", type_string(m_type, m_native_size).c_str(), m_name.c_str(), type_string(type, native_size).c_str(), name, ptr_offset, native_size);
+printf("%s: adding %s '%s' @ %I64X, size %d\n", full_name().c_str(), type_string().c_str(), name, ptr_offset, native_size);
 
 	// add the item to the back of the list
 	m_items.emplace_back(*this, ptr_offset, type, native_size, name, count);
@@ -1347,17 +1425,27 @@ save_registered_item &save_registered_item::append(uintptr_t ptr_offset, save_ty
 //  find - find a subitem by name
 //-------------------------------------------------
 
-save_registered_item *save_registered_item::find(char const *name)
+save_registered_item *save_registered_item::find(char const *name, u32 &index)
 {
 	// blank names can't be found this way
 	if (name[0] == 0)
 		return nullptr;
 
 	// make sure there are no duplicates
+	index = 0;
 	for (auto &item : m_items)
+	{
 		if (strcmp(item.name(), name) == 0)
 			return &item;
+		index++;
+	}
 	return nullptr;
+}
+
+save_registered_item *save_registered_item::find(char const *name)
+{
+	u32 dummy;
+	return find(name, dummy);
 }
 
 
@@ -1407,25 +1495,26 @@ bool save_registered_item::is_replicatable(bool parent_is_array) const
 
 bool save_registered_item::sort_and_prune()
 {
-	// only applies to arrays, structs, and containers; don't prune anything else
-	if (!is_array() && !is_struct_or_container())
-		return false;
-
-	// first prune any empty items
-	for (auto it = m_items.begin(); it != m_items.end(); )
+	// structs and containers prune empty items and sort them
+	if (is_struct_or_container())
 	{
-		if (it->sort_and_prune())
-			it = m_items.erase(it);
-		else
-			++it;
+		// first prune any empty items
+		for (auto it = m_items.begin(); it != m_items.end(); )
+		{
+			if (it->sort_and_prune())
+				it = m_items.erase(it);
+			else
+				++it;
+		}
+
+		// then sort the rest if we have more than 1
+		if (m_items.size() > 1)
+			m_items.sort([] (auto const &x, auto const &y) { return (std::strcmp(x.name(), y.name()) < 0); });
+
+		// prune if nothing is left
+		return (m_items.size() == 0);
 	}
-
-	// then sort the rest if we have more than 1
-	if (is_struct_or_container() && m_items.size() > 1)
-		m_items.sort([] (auto const &x, auto const &y) { return (std::strcmp(x.name(), y.name()) < 0); });
-
-	// return true if we have nothing
-	return (m_items.size() == 0);
+	return false;
 }
 
 
@@ -1475,6 +1564,11 @@ u64 save_registered_item::save_binary(u8 *ptr, u64 length, uintptr_t objbase) co
 	if (unwrap_and_update_base(objbase))
 		return m_items.front().save_binary(ptr, length, objbase);
 
+	// only containers are allowed to have null bases past this point; treat
+	// everything else as non-existent
+	if (objbase == 0 && type() != TYPE_CONTAINER)
+		return 0;
+
 	// switch off the type
 	u64 offset = 0;
 	switch (type())
@@ -1496,8 +1590,8 @@ u64 save_registered_item::save_binary(u8 *ptr, u64 length, uintptr_t objbase) co
 			break;
 
 		// structs and containers iterate over owned items
-		case TYPE_CONTAINER:
 		case TYPE_STRUCT:
+		case TYPE_CONTAINER:
 			for (auto &item : m_items)
 				offset += item.save_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase);
 			break;
@@ -1507,13 +1601,27 @@ u64 save_registered_item::save_binary(u8 *ptr, u64 length, uintptr_t objbase) co
 		case TYPE_VECTOR_ARRAY:
 		case TYPE_RAW_ARRAY:
 		{
+			// nothing to do if count is 0
+			if (count() == 0)
+				break;
+
+			// special case arrays of ints and floats
 			auto item = m_items.begin();
 			auto last = std::prev(m_items.end());
-			for (u32 rep = 0; rep < count(); rep++)
+			if (item == last && item->is_int_or_float())
 			{
-				offset += item->save_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase + rep * m_native_size);
-				if (item != last)
-					++item;
+				u32 size = std::min<u32>(count() * item->native_size(), (offset < length) ? length - offset : 0);
+				memcpy(&ptr[offset], reinterpret_cast<void const *>(objbase), size);
+				offset += count() * item->native_size();
+			}
+			else
+			{
+				for (u32 rep = 0; rep < count(); rep++)
+				{
+					offset += item->save_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase + rep * m_native_size);
+					if (item != last)
+						++item;
+				}
 			}
 			break;
 		}
@@ -1532,6 +1640,11 @@ u64 save_registered_item::restore_binary(u8 const *ptr, u64 length, uintptr_t ob
 	// update the base pointer and forward if a trivial unwrap
 	if (unwrap_and_update_base(objbase))
 		return m_items.front().restore_binary(ptr, length, objbase);
+
+	// only containers are allowed to have null bases past this point; treat
+	// everything else as non-existent
+	if (objbase == 0 && type() != TYPE_CONTAINER)
+		return 0;
 
 	// switch off the type
 	u64 offset = 0;
@@ -1554,8 +1667,8 @@ u64 save_registered_item::restore_binary(u8 const *ptr, u64 length, uintptr_t ob
 			break;
 
 		// structs and containers iterate over owned items
-		case TYPE_CONTAINER:
 		case TYPE_STRUCT:
+		case TYPE_CONTAINER:
 			for (auto &item : m_items)
 				offset += item.restore_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase);
 			break;
@@ -1565,13 +1678,27 @@ u64 save_registered_item::restore_binary(u8 const *ptr, u64 length, uintptr_t ob
 		case TYPE_VECTOR_ARRAY:
 		case TYPE_RAW_ARRAY:
 		{
+			// nothing to do if count is 0
+			if (count() == 0)
+				break;
+
+			// special case arrays of ints and floats
 			auto item = m_items.begin();
 			auto last = std::prev(m_items.end());
-			for (u32 rep = 0; rep < count(); rep++)
+			if (item == last && item->is_int_or_float())
 			{
-				offset += item->restore_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase + rep * m_native_size);
-				if (item != last)
-					++item;
+				u32 size = std::min<u32>(count() * item->native_size(), (offset < length) ? length - offset : 0);
+				memcpy(reinterpret_cast<void *>(objbase), &ptr[offset], size);
+				offset += count() * item->native_size();
+			}
+			else
+			{
+				for (u32 rep = 0; rep < count(); rep++)
+				{
+					offset += item->restore_binary(&ptr[offset], (offset < length) ? length - offset : 0, objbase + rep * m_native_size);
+					if (item != last)
+						++item;
+				}
 			}
 			break;
 		}
@@ -1592,6 +1719,14 @@ void save_registered_item::save_json(save_zip_state &zipstate, int indent, bool 
 
 	// output the name if present
 	zipstate.json_append_name(m_name.c_str());
+
+	// only containers are allowed to have null bases past this point; treat
+	// everything else as non-existent
+	if (objbase == 0 && type() != TYPE_CONTAINER)
+	{
+		zipstate.json_append('n').json_append('u').json_append('l').json_append('l');
+		return;
+	}
 
 	// switch off the type
 	switch (type())
@@ -1652,6 +1787,13 @@ void save_registered_item::save_json(save_zip_state &zipstate, int indent, bool 
 		case TYPE_VECTOR_ARRAY:
 		case TYPE_RAW_ARRAY:
 		{
+			// zero count is just an empty array
+			if (count() == 0)
+			{
+				zipstate.json_append('[').json_append(']');
+				break;
+			}
+
 			// look for large arrays of ints/floats
 			u32 total, unitsize;
 			if (is_endpoint_array(total, unitsize) && total * unitsize >= save_zip_state::JSON_EXTERNAL_BINARY_THRESHOLD)
@@ -1733,145 +1875,235 @@ void save_registered_item::restore_json(load_zip_state &input, json_restore_mode
 	if (unwrap_and_update_base(objbase))
 		return m_items.front().restore_json(input, mode, objbase);
 
+	// "null" is a placeholder for a missing struct or array item; just parse and return
+	// which will leave the item alone and allow us to move onto the next
+	if (input.json_matches("null"))
+		return;
+
+	// only containers are allowed to have null bases past this point; treat
+	// everything else as non-existent
+	if (objbase == 0 && type() != TYPE_CONTAINER)
+		return;
+
 	// switch off the type
 	switch (type())
 	{
 		// boolean types
 		case TYPE_BOOL:
 		{
+			bool valid = false;
 			bool value = false;
+
+			// must match 'true' or 'false'
 			if (input.json_matches("true"))
-				value = true;
+				value = true, valid = true;
 			else if (input.json_matches("false"))
-				value = false;
-			else
-				input.report_error(STATERR_MALFORMED_JSON, "%s: Unknown boolean value", full_name().c_str());
-			if (mode == RESTORE_DATA)
+				value = false, valid = true;
+
+			// warn if not valid, otherwise process
+			if (!valid)
+				input.report_warning_and_consume(*this, "Expected boolean value, ignoring");
+			else if (mode == RESTORE_DATA)
 				write_bool(objbase, value);
 			else if (mode == COMPARE_DATA && read_bool(objbase) != value)
-				input.report_warning("%s: Compare failed: JSON says %d, data says %d", full_name().c_str(), value, read_bool(objbase));
+				input.report_warning(*this, "Compare failed: JSON says %d, data says %d", value, read_bool(objbase));
 			break;
 		}
 
 		// signed integral types
 		case TYPE_INT:
 		{
+			bool dvalid = false, ivalid = false;
+			std::string svalue;
 			double dvalue;
-			s64 ivalue;
+			s64 ivalue = 0;
+
+			// attempt to parse as a double, and then as a string with an integer
 			if (input.json_parse_number(dvalue))
+				dvalid = true;
+			else if (input.json_parse_string(svalue))
 			{
-				if (mode == RESTORE_DATA && !write_int_signed(objbase, m_native_size, dvalue))
-					input.report_warning("%s: Value of out range: %1.17g", full_name().c_str(), dvalue);
-				else if (mode == COMPARE_DATA && read_int_signed(objbase, m_native_size) != s64(dvalue))
-					input.report_warning("%s: Compare failed: JSON says %I64d, data says %1.17g", full_name().c_str(), dvalue, read_int_signed(objbase, m_native_size));
+				char *end;
+				ivalue = strtoll(&svalue[0], &end, 10);
+				ivalid = (end != &svalue[0]);
 			}
-			else if (input.json_parse_int_string(ivalue))
+
+			// warn if not valid, otherwise process
+			if (!dvalid && !ivalid)
+				input.report_warning_and_consume(*this, "Expected integer value, ignoring");
+			else if (mode == RESTORE_DATA)
 			{
-				if (mode == RESTORE_DATA && !write_int_signed(objbase, m_native_size, ivalue))
-					input.report_warning("%s: Value of out range: %I64d", full_name().c_str(), ivalue);
-				else if (mode == COMPARE_DATA && read_int_signed(objbase, m_native_size) != ivalue)
-					input.report_warning("%s: Compare failed: JSON says %I64d, data says %I64d", full_name().c_str(), ivalue, read_int_signed(objbase, m_native_size));
+				if (dvalid && !write_int_signed(objbase, m_native_size, dvalue))
+					input.report_warning(*this, "Value of out range: %g", dvalue);
+				else if (ivalid && !write_int_signed(objbase, m_native_size, ivalue))
+					input.report_warning(*this, "Value of out range: %I64d", ivalue);
 			}
-			else
-				input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Expected integer value", full_name().c_str());
+			else if (mode == COMPARE_DATA)
+			{
+				if (dvalid && read_int_signed(objbase, m_native_size) != s64(dvalue))
+					input.report_warning(*this, "Compare failed: JSON says %g, data says %I64d", dvalue, read_int_signed(objbase, m_native_size));
+				else if (ivalid && read_int_signed(objbase, m_native_size) != ivalue)
+					input.report_warning(*this, "Compare failed: JSON says %I64d, data says %I64d", ivalue, read_int_signed(objbase, m_native_size));
+			}
 			break;
 		}
 
 		// unsigned integral types
 		case TYPE_UINT:
 		{
+			bool dvalid = false, ivalid = false;
+			std::string svalue;
 			double dvalue;
-			u64 ivalue;
+			u64 ivalue = 0;
+
+			// attempt to parse as a double, and then as a string with an integer
 			if (input.json_parse_number(dvalue))
+				dvalid = true;
+			else if (input.json_parse_string(svalue))
 			{
-				if (mode == RESTORE_DATA && !write_int_unsigned(objbase, m_native_size, dvalue))
-					input.report_warning("%s: Value of out range: %1.17g", full_name().c_str(), dvalue);
-				else if (mode == COMPARE_DATA && read_int_unsigned(objbase, m_native_size) != u64(dvalue))
-					input.report_warning("%s: Compare failed: JSON says %I64d, data says %1.17g", full_name().c_str(), dvalue, read_int_unsigned(objbase, m_native_size));
+				char *end;
+				ivalue = strtoull(&svalue[0], &end, 10);
+				ivalid = (end != &svalue[0]);
 			}
-			else if (input.json_parse_uint_string(ivalue))
+
+			// warn if not valid, otherwise process
+			if (!dvalid && !ivalid)
+				input.report_warning_and_consume(*this, "Expected integer value, ignoring");
+			else if (mode == RESTORE_DATA)
 			{
-				if (mode == RESTORE_DATA && !write_int_unsigned(objbase, m_native_size, ivalue))
-					input.report_warning("%s: Value of out range: %I64d", full_name().c_str(), ivalue);
-				else if (mode == COMPARE_DATA && read_int_unsigned(objbase, m_native_size) != ivalue)
-					input.report_warning("%s: Compare failed: JSON says %I64d, data says %I64d", full_name().c_str(), ivalue, read_int_unsigned(objbase, m_native_size));
+				if (dvalid && !write_int_unsigned(objbase, m_native_size, dvalue))
+					input.report_warning(*this, "Value of out range: %1.17g", dvalue);
+				else if (ivalid && !write_int_unsigned(objbase, m_native_size, ivalue))
+					input.report_warning(*this, "Value of out range: %I64u", ivalue);
 			}
-			else
-				input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Expected integer value", full_name().c_str());
+			else if (mode == COMPARE_DATA)
+			{
+				if (dvalid && read_int_unsigned(objbase, m_native_size) != u64(dvalue))
+					input.report_warning(*this, "Compare failed: JSON says %1.17g, data says %I64u", dvalue, read_int_unsigned(objbase, m_native_size));
+				else if (ivalid && read_int_unsigned(objbase, m_native_size) != ivalue)
+					input.report_warning(*this, "Compare failed: JSON says %I64u, data says %I64u", ivalue, read_int_unsigned(objbase, m_native_size));
+			}
 			break;
 		}
 
 		// float types
 		case TYPE_FLOAT:
 		{
+			bool valid = false;
 			double value;
-			if (!input.json_parse_number(value))
-				input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Expected number", full_name().c_str());
-			if (mode == RESTORE_DATA && !write_float(objbase, m_native_size, value))
-				input.report_warning("%s: Value of out range: %1.17g", full_name().c_str(), value);
+
+			// attempt to parse as a double
+			if (input.json_parse_number(value))
+				valid = true;
+
+			// warn if not valid, otherwise process
+			if (!valid)
+				input.report_warning_and_consume(*this, "Expected number, ignoring");
+			else if (mode == RESTORE_DATA && !write_float(objbase, m_native_size, value))
+				input.report_warning(*this, "Value of out range: %1.17g", value);
 			else if (mode == COMPARE_DATA && read_float(objbase, m_native_size) != value)
-				input.report_warning("%s: Compare failed: JSON says %1.17g, data says %1.17g", full_name().c_str(), value, read_float(objbase, m_native_size));
+				input.report_warning(*this, "Compare failed: JSON says %1.17g, data says %1.17g", value, read_float(objbase, m_native_size));
 			break;
 		}
 
 		// structs and containers iterate over owned items
 		case TYPE_CONTAINER:
 		case TYPE_STRUCT:
+
+			// must start with an open brace
 			if (!input.json_matches('{'))
-				input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Expected '{'", full_name().c_str());
-			if (!input.json_matches('}'))
-				while (1)
+				input.report_warning_and_consume(*this, "Expected structure, ignoring");
+			else
+			{
+				// track which items we've found
+				std::vector<bool> found(m_items.size(), false);
+				int numfound = 0;
+				if (!input.json_matches('}'))
+					while (1)
+					{
+						// parse the name
+						std::string name;
+						if (!input.json_parse_string(name) || name == "")
+							input.report_error(*this, STATERR_MALFORMED_JSON, "Expected name within struct");
+
+						// followed by a colon
+						if (!input.json_matches(':'))
+							input.report_error(*this, STATERR_MALFORMED_JSON, "Expected ':'");
+
+						// look up the name; warn if not found or if we already got that one;
+						// otherwise process and mark found
+						u32 index;
+						save_registered_item *target = find(name.c_str(), index);
+						if (target == nullptr)
+							input.report_warning_and_consume(*this, "Found extraneous item '%s'", name.c_str());
+						else if (found[index])
+							input.report_warning_and_consume(*this, "Found duplicate item '%s'", name.c_str());
+						else
+						{
+							found[index] = true;
+							numfound++;
+							target->restore_json(input, mode, objbase);
+						}
+
+						// end with close brace, or a comma to indicate more
+						if (input.json_matches('}'))
+							break;
+						if (!input.json_matches(','))
+							input.report_error(*this, STATERR_MALFORMED_JSON, "Expected ','");
+					}
+
+				// report any missing items
+				if (numfound != m_items.size())
 				{
-					std::string name;
-					if (!input.json_parse_string(name) || name == "")
-						input.report_error(STATERR_MALFORMED_JSON, "%s: Expected name within struct", full_name().c_str());
-					if (!input.json_matches(':'))
-						input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ':'", full_name().c_str());
-					save_registered_item *target = find(name.c_str());
-					if (target == nullptr)
-						input.report_warning("%s: Found extraneous item '%s'", full_name().c_str(), name.c_str());
-					target->restore_json(input, (target == nullptr) ? PARSE_ONLY : mode, objbase);
-					if (input.json_matches('}'))
-						break;
-					if (!input.json_matches(','))
-						input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ','", full_name().c_str());
+					int index = 0;
+					for (auto &item : m_items)
+						if (!found[index++])
+							input.report_warning(*this, "Missing item '%s'", item.name());
 				}
+			}
 			break;
 
 		// arrays are multiples of a single item
 		case TYPE_STATIC_ARRAY:
 		case TYPE_VECTOR_ARRAY:
 		case TYPE_RAW_ARRAY:
-		{
-			auto item = m_items.begin();
-			auto last = std::prev(m_items.end());
+
+			// must start with an open bracket
 			if (!input.json_matches('['))
-				input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Expected '['", full_name().c_str());
-			if (parse_external_data(input, mode, objbase))
+				input.report_error(*this, STATERR_INCOMPATIBLE_DATA, "Expected '['");
+
+			// handle empty arrays or external data
+			if (count() == 0 || parse_external_data(input, mode, objbase))
 			{
 				if (!input.json_matches(']'))
-					input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ']'", full_name().c_str());
+					input.report_error(*this, STATERR_MALFORMED_JSON, "Expected ']'");
 			}
 			else
 			{
+				auto item = m_items.begin();
+				auto last = std::prev(m_items.end());
 				u32 rep = 0;
 				if (!input.json_matches(']'))
 					while (1)
 					{
+						// parse the next item
 						item->restore_json(input, (rep >= count()) ? PARSE_ONLY : mode, objbase + rep * m_native_size);
 						rep++;
 						if (item != last)
 							++item;
+
+						// end with close bracket, or a comma to indicate more
 						if (input.json_matches(']'))
 							break;
 						if (!input.json_matches(','))
-							input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ','", full_name().c_str());
+							input.report_error(*this, STATERR_MALFORMED_JSON, "Expected ','");
 					}
+
+				// report missing or extraneous items
 				if (rep != count())
-					input.report_warning("%s: Found %s array items than expected", full_name().c_str(), (rep < count()) ? "fewer" : "more");
+					input.report_warning(*this, "Found %s array items than expected", (rep < count()) ? "fewer" : "more");
 			}
 			break;
-		}
 	}
 }
 
@@ -1899,9 +2131,9 @@ bool save_registered_item::parse_external_data(load_zip_state &input, bool parse
 	{
 		std::string name;
 		if (!input.json_parse_string(name) || name == "")
-			input.report_error(STATERR_MALFORMED_JSON, "%s: Expected name within struct", full_name().c_str());
+			input.report_error(*this, STATERR_MALFORMED_JSON, "Expected name within struct");
 		if (!input.json_matches(':'))
-			input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ':'", full_name().c_str());
+			input.report_error(*this, STATERR_MALFORMED_JSON, "Expected ':'");
 		valid = false;
 		if (name == "external_file" && parsed_filename == "" && input.json_parse_string(parsed_filename) && parsed_filename != "")
 			valid = true;
@@ -1921,7 +2153,7 @@ bool save_registered_item::parse_external_data(load_zip_state &input, bool parse
 		if (input.json_matches('}'))
 			break;
 		if (!input.json_matches(','))
-			input.report_error(STATERR_MALFORMED_JSON, "%s: Expected ','", full_name().c_str());
+			input.report_error(*this, STATERR_MALFORMED_JSON, "Expected ','");
 	}
 	if (!valid)
 	{
@@ -1933,11 +2165,11 @@ bool save_registered_item::parse_external_data(load_zip_state &input, bool parse
 	u64 offset;
 	u32 size;
 	if (!input.find_file(parsed_filename.c_str(), offset, size))
-		input.report_error(STATERR_MISSING_FILE, "%s: Unable to find file '%s' in archive", full_name().c_str(), parsed_filename.c_str());
+		input.report_error(*this, STATERR_MISSING_FILE, "Unable to find file '%s' in archive", parsed_filename.c_str());
 	if (parsed_unit != 1 && parsed_unit != 2 && parsed_unit != 4 && parsed_unit != 8)
-		input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Invalid unit size for external file, expected 1, 2, 4, or 8", full_name().c_str());
+		input.report_error(*this, STATERR_INCOMPATIBLE_DATA, "Invalid unit size for external file, expected 1, 2, 4, or 8");
 	if (parsed_count == 0)
-		input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: Invalid count for external file", full_name().c_str());
+		input.report_error(*this, STATERR_INCOMPATIBLE_DATA, "Invalid count for external file");
 
 	// look for the innermost registered item
 	save_registered_item *inner = &m_items.front();
@@ -1948,9 +2180,9 @@ bool save_registered_item::parse_external_data(load_zip_state &input, bool parse
 		inner = &inner->subitems().front();
 	}
 	if (!inner->is_int_or_float())
-		input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: External file specified, but not valid for this type", full_name().c_str());
+		input.report_error(*this, STATERR_INCOMPATIBLE_DATA, "External file specified, but not valid for this type");
 	if (parsed_unit != inner->native_size())
-		input.report_error(STATERR_INCOMPATIBLE_DATA, "%s: External file has mismatched unit size", full_name().c_str());
+		input.report_error(*this, STATERR_INCOMPATIBLE_DATA, "External file has mismatched unit size");
 
 	// if parseonly, we're done
 	if (parseonly)
@@ -1960,7 +2192,7 @@ bool save_registered_item::parse_external_data(load_zip_state &input, bool parse
 	bool flip = (parsed_little_endian != native_little_endian);
 	zlib_read_streamer reader(input.file());
 	if (!reader.begin(offset) || !input.read_data_recursive(reader, *this, flip, size, objbase) || !reader.end())
-		input.report_error(STATERR_READ_ERROR, "%s: Error reading file '%s' in archive", full_name().c_str(), parsed_filename.c_str());
+		input.report_error(*this, STATERR_READ_ERROR, "Error reading file '%s' in archive", parsed_filename.c_str());
 
 	return true;
 }
@@ -2258,6 +2490,7 @@ void save_manager::allow_registration(bool allowed)
 		m_root_item.sort_and_prune();
 
 		// dump out a sample JSON
+		if (DUMP_INITIAL_JSON_SAVE)
 		{
 			save_zip_state state;
 			m_root_item.save_json(state);

@@ -25,8 +25,7 @@ void device_network_interface::interface_pre_start()
 
 void device_network_interface::interface_register_save(save_registrar &save)
 {
-	save_registrar(save, "network")
-		.reg(NAME(m_loopback_control));
+	save.reg(NAME(m_loopback_control));
 }
 
 int device_network_interface::send(u8 *buf, int len)

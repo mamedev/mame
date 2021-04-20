@@ -501,8 +501,7 @@ void device_execute_interface::interface_clock_changed()
 void device_execute_interface::interface_register_save(save_registrar &save)
 {
 	// put execute items in their own container
-	save_registrar(save, "execute")
-		.reg(NAME(m_suspend))
+	save.reg(NAME(m_suspend))
 		.reg(NAME(m_nextsuspend))
 		.reg(NAME(m_eatcycles))
 		.reg(NAME(m_nexteatcycles))

@@ -136,8 +136,7 @@ void device_rom_interface<AddrWidth, DataWidth, AddrShift, Endian>::interface_re
 {
 	device_memory_interface::interface_register_save(save);
 
-	save_registrar(save, "rom")
-		.reg(NAME(m_cur_bank))
+	save.reg(NAME(m_cur_bank))
 		.reg(NAME(m_bank_count));
 }
 

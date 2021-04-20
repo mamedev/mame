@@ -263,7 +263,7 @@ void running_machine::start()
 	save().register_presave(save_prepost_delegate(FUNC(running_machine::presave_all_devices), this));
 	start_all_devices();
 	for (device_t &device : device_enumerator(root_device()))
-		m_save.root_registrar().reg(device, device.tag(), device.type().size());
+		m_save.root_registrar().reg(device, string_format("device%s", device.tag()).c_str(), device.type().size());
 	save().register_postload(save_prepost_delegate(FUNC(running_machine::postload_all_devices), this));
 
 	// save outputs created before start time
@@ -938,12 +938,12 @@ void running_machine::handle_saveload()
 			auto const filerr = file.open(m_saveload_pending_file);
 			if (filerr == osd_file::error::NONE)
 			{
-				osd_ticks_t start = osd_ticks();
 				const char *const opnamed = (m_saveload_schedule == saveload_schedule::LOAD) ? "loaded" : "saved";
-				osd_ticks_t end = osd_ticks();
 
 				// read/write the save state
+				osd_ticks_t start = osd_ticks();
 				save_error saverr = (m_saveload_schedule == saveload_schedule::LOAD) ? m_save.load_file(file) : m_save.save_file(file);
+				osd_ticks_t end = osd_ticks();
 
 				// handle the result
 				switch (saverr)

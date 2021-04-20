@@ -144,6 +144,7 @@ public:
     save_registered_item &append(uintptr_t ptr_offset, save_type type, u32 native_size, char const *name, u32 count = 0);
 
 	// find an item by name
+	save_registered_item *find(char const *name, u32 &index);
 	save_registered_item *find(char const *name);
 
 	// is this item replicatable (i.e., can we replicate it for all elements in an array?)
@@ -285,11 +286,9 @@ public:
 	template<typename T>
 	std::enable_if_t<!std::is_array<T>::value, save_registrar> &reg(std::unique_ptr<T> &data, char const *name)
 	{
-		if (data.get() == nullptr)
-			throw emu_fatalerror("Passed null pointer to save state registration.");
-
 		save_registrar container(*this, &data, save_registered_item::TYPE_UNIQUE, sizeof(data), name, 0, data.get(), sizeof(T));
-		container.reg(*data.get(), name);
+		if (data.get() != nullptr)
+			container.reg(*data.get(), name);
 		return *this;
 	}
 
@@ -319,10 +318,6 @@ public:
     template<typename T>
     save_registrar &reg(std::vector<T> &data, char const *name)
     {
-		// skip if no items
-		if (data.size() == 0)
-			return *this;
-
 		// create an outer container for the vector, then a regular array container within
 		save_registrar container(*this, &data, save_registered_item::TYPE_VECTOR, sizeof(data), name, 0, &data[0], sizeof(T));
 		container.register_array(&data[0], save_registered_item::TYPE_VECTOR_ARRAY, name, data.size());
@@ -333,10 +328,6 @@ public:
 	template<typename T>
 	save_registrar &reg(std::unique_ptr<T[]> &data, char const *name, std::size_t count)
 	{
-		// skip if no items
-		if (count == 0)
-			return *this;
-
 		// create an outer container for the unique_ptr, then a regular array container within
 		save_registrar container(*this, &data, save_registered_item::TYPE_UNIQUE, sizeof(data), name, 0, data.get(), sizeof(T));
 		container.register_array(&data[0], save_registered_item::TYPE_RAW_ARRAY, name, count);
@@ -384,17 +375,14 @@ private:
 	template<typename T>
 	save_registrar &register_array(T *data, save_registered_item::save_type type, char const *name, std::size_t count)
 	{
-		// skip 0-length items
-		if (count == 0)
-			return *this;
-
-		// error on null pointer
-		if (data == nullptr)
-			throw emu_fatalerror("Passed null pointer to save state registration.");
+		// nullptr only allowed if the count is 0
+		if (data == nullptr && count != 0)
+			throw emu_fatalerror("Save: registered pointer with a null pointer (%s.%s)", m_item.full_name().c_str(), name);
 
 		// create a container and register the first item
 		save_registrar container(*this, data, type, uintptr_t(&data[1]) - uintptr_t(&data[0]), name, count, &data[0], sizeof(T));
-		container.reg(data[0], "");
+		if (count != 0)
+			container.reg(data[0], "");
 
 		// if the first item was non-replicatable, register remaining items independently
 		if (!container.m_item.subitems().front().is_replicatable(true))

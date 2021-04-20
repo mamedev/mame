@@ -694,8 +694,12 @@ void device_t::register_save(save_registrar &save)
 		.reg(NAME(m_clock_scale));
 
 	// let the interfaces save their states
+	save_registrar intf_container(save, "interfaces");
 	for (device_interface &intf : interfaces())
-		intf.interface_register_save(save);
+	{
+		save_registrar container(intf_container, intf.interface_type());
+		intf.interface_register_save(container);
+	}
 
 	// then the device itself
 	int state_registrations = machine().save().binary_size();

@@ -77,8 +77,7 @@ void device_serial_interface::interface_pre_start()
 
 void device_serial_interface::interface_register_save(save_registrar &save)
 {
-	save_registrar(save, "serial")
-		.reg(NAME(m_df_start_bit_count))
+	save.reg(NAME(m_df_start_bit_count))
 		.reg(NAME(m_df_word_length))
 		.reg(NAME(m_df_parity))
 		.reg(NAME(m_df_stop_bit_count))

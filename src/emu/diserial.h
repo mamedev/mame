@@ -192,8 +192,7 @@ protected:
 	{
 		device_serial_interface::interface_register_save(save);
 
-		save_registrar(save, "buffered_serial")
-			.reg(NAME(m_fifo))
+		save.reg(NAME(m_fifo))
 			.reg(NAME(m_head))
 			.reg(NAME(m_tail))
 			.reg(NAME(m_empty));
