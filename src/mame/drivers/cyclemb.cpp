@@ -115,6 +115,7 @@ public:
 	{
 		uint8_t curent_value;
 		bool reverse;
+		bool update;
 	} m_dial_status[2];
 
 	struct
@@ -156,6 +157,7 @@ public:
 	void skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void skydest_i8741_reset();
+	void cyclemb_dial_reset();
 	void cyclemb(machine_config &config);
 	void skydest(machine_config &config);
 	void cyclemb_io(address_map &map);
@@ -471,6 +473,16 @@ void cyclemb_state::skydest_i8741_reset()
 	m_mcu[0].packet_type = 0;
 }
 
+void cyclemb_state::cyclemb_dial_reset()
+{
+	for (int i = 0; i < 2; i++)
+	{
+		m_dial_status[i].curent_value = 0;
+		m_dial_status[i].reverse = false;
+		m_dial_status[i].update = false;
+	}
+}
+
 uint8_t cyclemb_state::skydest_i8741_0_r(offs_t offset)
 {
 	if(offset == 1) //status port
@@ -508,6 +520,7 @@ uint8_t cyclemb_state::skydest_i8741_0_r(offs_t offset)
 						m_mcu[0].packet_type^=0x20;
 						if(m_mcu[0].packet_type & 0x20)
 						{
+							m_dial_status[0].update = true;
 							m_mcu[0].rxd = ((ioport("P1_1")->read()) & 0x9f) | (m_mcu[0].packet_type);
 						}
 						else
@@ -522,6 +535,7 @@ uint8_t cyclemb_state::skydest_i8741_0_r(offs_t offset)
 						m_mcu[0].packet_type^=0x20;
 						if(m_mcu[0].packet_type & 0x20)
 						{
+							m_dial_status[0].update = true;
 							m_mcu[0].rxd = ((ioport("P2_1")->read()) & 0x9f) | (m_mcu[0].packet_type);
 						}
 						else
@@ -703,28 +717,36 @@ void cyclemb_state::machine_start()
 	{
 		save_item(NAME(m_dial_status[i].curent_value), i);
 		save_item(NAME(m_dial_status[i].reverse), i);
+		save_item(NAME(m_dial_status[i].update), i);
 	}
 
 	save_item(NAME(m_screen_display));
+
+	cyclemb_dial_reset();
+	m_screen_display = true;
 }
 
 void cyclemb_state::machine_reset()
 {
 	skydest_i8741_reset();
-
-	m_screen_display = true;
+	cyclemb_dial_reset();
 }
 
 template <int P>
 CUSTOM_INPUT_MEMBER(cyclemb_state::dial_r)
 {
-	int8_t input_value = m_dial[P]->read();
-	int delta = std::clamp((int)input_value, -0x1f, 0x1f);
-
-	if (delta != 0)
+	if (m_dial_status[P].update)
 	{
-		m_dial_status[P].reverse = (delta < 0);
-		m_dial_status[P].curent_value = (m_dial_status[P].curent_value + (uint8_t)abs(delta)) & 0x7f;
+		m_dial_status[P].update = false;
+
+		int8_t input_value = m_dial[P]->read();
+		int delta = std::clamp((int)input_value, -0x1f, 0x1f);
+
+		if (delta != 0)
+		{
+			m_dial_status[P].reverse = (delta < 0);
+			m_dial_status[P].curent_value = (m_dial_status[P].curent_value + (uint8_t)abs(delta)) & 0x7f;
+		}
 	}
 
 	return m_dial_status[P].curent_value | (m_dial_status[P].reverse ? 0x80 : 0x00);
