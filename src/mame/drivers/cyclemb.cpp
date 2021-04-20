@@ -535,7 +535,7 @@ uint8_t cyclemb_state::skydest_i8741_0_r(offs_t offset)
 						m_mcu[0].packet_type^=0x20;
 						if(m_mcu[0].packet_type & 0x20)
 						{
-							m_dial_status[0].update = true;
+							m_dial_status[1].update = true;
 							m_mcu[0].rxd = ((ioport("P2_1")->read()) & 0x9f) | (m_mcu[0].packet_type);
 						}
 						else
