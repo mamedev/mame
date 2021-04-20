@@ -89,8 +89,6 @@ void rfslots8085_state::sound_io_map(address_map &map)
 
 static INPUT_PORTS_START(unkrfslt)
 	PORT_START("DSW") // 1 x 6-dips bank
-	PORT_BIT(0x80, 0x80, IPT_UNKNOWN)
-	PORT_BIT(0x40, 0x40, IPT_UNKNOWN)
 	PORT_BIT(0x20, 0x20, IPT_UNKNOWN)
 	PORT_BIT(0x10, 0x10, IPT_UNKNOWN)
 	PORT_BIT(0x08, 0x08, IPT_UNKNOWN)
