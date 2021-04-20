@@ -236,6 +236,8 @@ void gt64xxx_device::device_start()
 
 void gt64xxx_device::device_register_save(save_registrar &save)
 {
+	pci_host_device::device_register_save(save);
+
 	// Save states
 	save.reg(NAME(m_pci_stall_state))
 		.reg(NAME(m_retry_count))
