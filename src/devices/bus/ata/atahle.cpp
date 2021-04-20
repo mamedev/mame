@@ -80,37 +80,41 @@ void ata_hle_device::device_start()
 	m_pdiag_handler.resolve_safe();
 
 	m_buffer.resize(sector_length());
-	save_item(NAME(m_buffer));
-	save_item(NAME(m_buffer_offset));
-	save_item(NAME(m_buffer_size));
-	save_item(NAME(m_error));
-	save_item(NAME(m_feature));
-	save_item(NAME(m_sector_count));
-	save_item(NAME(m_sector_number));
-	save_item(NAME(m_cylinder_low));
-	save_item(NAME(m_cylinder_high));
-	save_item(NAME(m_device_head));
-	save_item(NAME(m_status));
-	save_item(NAME(m_command));
-	save_item(NAME(m_device_control));
-	save_item(NAME(m_revert_to_defaults));
-
-	save_item(NAME(m_single_device));
-	save_item(NAME(m_resetting));
-
-	save_item(NAME(m_csel));
-	save_item(NAME(m_daspin));
-	save_item(NAME(m_daspout));
-	save_item(NAME(m_dmack));
-	save_item(NAME(m_dmarq));
-	save_item(NAME(m_irq));
-	save_item(NAME(m_pdiagin));
-	save_item(NAME(m_pdiagout));
-
-	save_item(NAME(m_identify_buffer));
 
 	m_busy_timer = timer_alloc(TID_BUSY);
 	m_buffer_empty_timer = timer_alloc(TID_BUFFER_EMPTY);
+}
+
+void ata_hle_device::device_register_save(save_registrar &save)
+{
+	save.reg(NAME(m_buffer))
+		.reg(NAME(m_buffer_offset))
+		.reg(NAME(m_buffer_size))
+		.reg(NAME(m_error))
+		.reg(NAME(m_feature))
+		.reg(NAME(m_sector_count))
+		.reg(NAME(m_sector_number))
+		.reg(NAME(m_cylinder_low))
+		.reg(NAME(m_cylinder_high))
+		.reg(NAME(m_device_head))
+		.reg(NAME(m_status))
+		.reg(NAME(m_command))
+		.reg(NAME(m_device_control))
+		.reg(NAME(m_revert_to_defaults))
+
+		.reg(NAME(m_single_device))
+		.reg(NAME(m_resetting))
+
+		.reg(NAME(m_csel))
+		.reg(NAME(m_daspin))
+		.reg(NAME(m_daspout))
+		.reg(NAME(m_dmack))
+		.reg(NAME(m_dmarq))
+		.reg(NAME(m_irq))
+		.reg(NAME(m_pdiagin))
+		.reg(NAME(m_pdiagout))
+
+		.reg(NAME(m_identify_buffer));
 }
 
 void ata_hle_device::device_reset()
