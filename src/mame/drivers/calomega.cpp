@@ -13,8 +13,8 @@
 
     --- Technical Notes ---
 
-    Name:    System 903, System 904, System 905 & System 906 III.
-    Company: Cal Omega / Omega Products / Casino Electronics Inc.
+    Name:    System 903, System 904, System 905 & System 906-III.
+    Company: Cal Omega / Casino Electronics Inc. (CEI) / UCMC.
     Year:    1981-1989
 
 
@@ -75,7 +75,7 @@
 
 
 
-    System 906 III:
+    System 906-III:
     ---------------
 
     PCB silkscreened "CEI 906 III GAMEBOARD" "ASSY 4029063 REV"
@@ -130,137 +130,137 @@
 ***********************************************************************************
 
 
-   ++++ System 903/904/906III official list of games (not complete) ++++
+   ++++ System 903/904/906-III official list of games (not complete) ++++
 
-   -----+--------------------------+--------+---------+----------+---------+----------+---------+---------------+------+------+-------
-    VER |  NAME                    | SYSTEM | PROGRAM | CHAR GEN | CG P/N  | CLR PROM | CP P/N  | GAME TYPE     | DUMP | STAT | ADDED
-   -----+--------------------------+--------+---------+----------+---------+----------+---------+---------------+------+------+-------
- *  7.4 | Gaming Poker (w. export) |  903   | AUG/81  | PKCG     | 6300010 | unknown  | 6600020 | Gaming        | Yes  | OK   | Yes
-    7.6 | Poker                    |  903   | AUG/81  | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
- *  7.9 | Arcade Poker             |  903   | AUG/81  | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | BD   | Yes
- *  8.0 | Arcade Black Jack        |  903   | SEP/81  | CPKCG    | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | BD   | Yes
- *  9.4 | Keno                     |  903   | DEC/81  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
- * 10.7 | Big Game                 |  903   | MAR/82  | LOTCG    | unknown | BCLR     | unknown | Amusement?    | Yes  | OK   | Yes
- * 11.3 | Black Jack               |  903   |         | CPKCG?   | 6300010 | POKCLR   | 6600020 | Amusement?    | No   |      | No
- * 12.3 | Ticket Poker             |  903   | JUN/82  | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | BD   | Yes
- * 12.5 | Bingo                    |  903   | JUN/82  | NBCG     | unknown | BCLR     | unknown | Amusement     | Yes  | OK   | Yes
- * 12.7 | Keno                     | 903/4? | JUL/82  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
- * 12.8 | Arcade Game (Draw Poker) |  903   | JUL/82  | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
-   13.4 | Nudge Bingo              |  903   | SEP/82  | NBCG     | 6300040 | BCLR     | 6600040 | Amusement     | Yes  | OK   | Yes
-   14.5 | Pixels                   |  903   | DEC/82  | PIXCG    | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | OK   | Yes
-   14.7 | Nudge Bingo              |  903   |         | NBCG     | 6300040 | BCLR     | 6600040 | Amusement     | No   |      | No
-   15.0 | Punchboard               |  903   |         | PBCG     | 6300190 | PBCLR    | 6600130 | Gaming Wash   | No   |      | No
-   15.7 | Double-Draw Poker        |  903   | JAN/83  | CPKCG    | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
-   15.8 | Poker Montana            |   ?    |         | CPKCG    | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   15.9 | Wild Double-Up           |  905   | JAN/83  | JKR2CG   | 6300100 | WLDCLR   | 6600010 | Amusement     | Yes  | OK   | Yes
-   16.2 | Gaming Lottery           |   ?    |         | LCG      | 6300050 | LOTCLR   | 6600030 | Gaming        | No   |      | No
-   16.3 | Black Jack               |   ?    |         | CPKCG    | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
-   16.4 | K.I.S.S. Keno            |  904   | MAY/83  | KCG      | 6300060 | PCLR     | 6600020 | Amusement     | Yes  | IC   | Yes
-   16.5 | K.I.S.S. Poker           |   ?    |         | POKER    | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
-   16.6 | Nudge Bingo              |   ?    |         | NBCG     | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
-   16.7 | Poker                    |   ?    |         | PCG      | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
-   16.8 | Keno                     |  903   | MAR/83  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
-   17.0 | Poker                    |  905   |         | POKERCGs | 6300010 | PKRCLR   | 6600020 | Amusement     | No   |      | No
-   17.1 | Nudge Bingo              |   ?    |         | NBCG     | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
-   17.2 | Double/Double Poker      |  905   | MAY/83  | JKRPKR   | 6300100 | WLDCLR   | 6600010 | Amusement     | Yes  | OK   | Yes
-   17.3 | Casino Poker             |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   17.4 | Gin Gaming               |   ?    |         | GCG0.2   | 6300080 | GINCLR   | 6600060 | Nevada Gaming | No   |      | No
-   17.5 | Gaming Draw Poker        |  903   | DEC/84  | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | Yes  | OK   | Yes
-   17.6 | Nudge                    |  903   | SEP/82  | NBCG     | 6300040 | BCLR     | 6600040 | Amusement     | Yes  | OK   | Yes
-   17.7 | Keno                     |   ?    |         | KCG      | 6300060 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   17.9 | AWP Poker                |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
- * 18.0 | Gin                      |  905   |         | GCG2     | 6300110 | MLTCLR   | 6600070 | Amusement     | No   |      | No
-   18.1 | Nudge                    |   ?    | JUL/83  | NBCG     | 6300040 | BCLR     | 6600040 | Amusement     | Yes  | OK   | Yes
-   18.2 | Amusement Poker          |  905   |         | JKRCG02  | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
-   18.3 | Pixels                   |  905   | AUG/83  | PXCG     | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | OK   | Yes
-   18.4 | Double Draw-Lebanon      |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
-   18.5 | Pixels                   |  905   | AUG/83  | PXCG     | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | OK   | Yes
-   18.6 | Pixels                   |  905   | AUG/83  | PXCG     | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | OK   | Yes
-   18.7 | Amusement Poker (skill)  |  905   | AUG/83  | JKRTWO   | 6300100 | MLTCLR   | 6600070 | Amusement     | Yes  | BD   | Yes
-   18.8 | Poker-Lebanon            |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
-   18.9 | Pixels (french)          |   ?    |         | PIXCG    | 6300070 | PIXCLR   | 6600050 | Amusement     | No   |      | No
-   19.0 | Hi-Score Poker           |   ?    |         | JKRTWO   | 6300100 | WLDCLR   | 6600070 | Amusement     | No   |      | No
- * 19.1 | Super Blackjack          |  905   | AUG/83  | JKRTWO?  | 6300100 | MLTCLR   | 6600070 | Amusement     | No   |      | No
-   19.2 | AWP Poker                |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   19.3 | Gin                      |  905   |         | GCG2     | 6300110 | MLTCLR   | 6600070 | Amusement     | No   |      | No
-   19.4 | Pixels (french)          |   ?    |         | PIXCG    | 6300070 | PIXCLR   | 6600050 | Amusement     | No   |      | No
-   19.7 | Ind. Wild Double-Up      |   ?    |         | JKRCG    | 6300100 | WLDCLR   | 6600070 | Amusement     | No   |      | No
-   19.9 | Double-Up Nudge          |   ?    |         | NUDGE    | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
-   20.1 | Poker                    |   ?    |         | GPKCG    | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
-   20.4 | Super Blackjack          |  905   | FEB/84  | JKRTWO   | 6300100 | MLTCLR   | 6600070 | Amusement     | Yes  | OK   | Yes
- * 20.5 | Blackjack?               |  905   | FEB/84  | JKRTWO?  | 6300100 | MLTCLR   | 6600070 | Amusement     | No   |      | No
-   20.7 | Double-Up Nudge          |   ?    |         | NUDGECG  | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
-   20.8 | Winner's Choice          |   ?    | FEB/84  | MLT2CG   | 6300130 | MLTCLR   | 6600070 | Amusement     | Yes  | OK   | Yes
-   20.9 | Gaming Poker-Europe      |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   21.1 | AWP Poker                |   ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   21.2 | Video Slot               |   ?    |         | SL1CG    | 6300180 | SLC1     | 6600120 | Gaming        | No   |      | No
-   21.4 | Wild Double-Up Poker     |   ?    |         | WLDCG    | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
-   21.5 | Double/Double Poker      |   ?    |         | JKRTWO   | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
- * 21.6 | Wild Double-Up?          |  905   | JUN/84  | WLDCG    | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
- * 21.7 | Poker?                   |  905   | MAY/84  | GPKCG?   | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
-   21.9 | Amusement Poker          |   ?    |         | JKRCG    | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
-   22.1 | Poker                    |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   22.7 | Amusement Poker (dbl/dbl)|  905   | JUL/84  | JKRPKR   | 6300100 | WLDCLR   | 6600010 | Amusement     | Yes  | OK   | Yes
-   22.8 | Tennesee Wild Poker      |  905   |         | JKR2CG   | 6300100 | MLTCLR   | 6600070 | Amusement     | No   |      | No
-   22.9 | Double/Double Poker      |  905   |         | JKRTWO   | 6300100 | MLTCLR   | 6600010 | Amusement     | No   |      | No
-   23.0 | FC Bingo (4-card)        |  905   | JUN/84  | FCBCG    | 6300150 | FCBCLR   | 6600100 | Amusement     | Yes  | BD   | Yes
-   23.2 | Pixels                   |   ?    |         | PIXCG    | 6300070 | PIXCLR   | 6600050 | Amusement     | No   |      | No
- * 23.6 | Hotline                  |  905   | OCT/84  | HLCG     | 6300160 | HLCLR    | 6600110 | Amusement     | Yes  | OK   | Yes
-   23.7 | AWP Blackjack            |   ?    |         | POKER    | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   23.9 | G.Draw Poker (discard)   |  904   | JAN/85  | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | Yes  | OK   | Yes
-   24.0 | Gaming Draw Poker (hold) |  904   | MAY/85  | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | Yes  | OK   | Yes
-   24.2 | Export Poker             |   ?    |         | GPKCG    | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   24.3 | Gaming Blackjack         |   ?    |         | GPKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   24.5 | Wild Double-Up           |   ?    |         | JKPKCG   | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
-   24.6 | Hotline                  |  905   | JAN/85  | HLCG     | 6300160 | HLCLR    | 6600110 | Amusement     | Yes  | OK   | Yes
-   24.8 | Poker (discard)          |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   24.9 | Poker (hold)             |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   25.3 | 4-Card Bingo-Gaming      |   ?    |         | FCB1CG   | 6300150 | FCB1CLR  | 6600100 | Gaming        | No   |      | No
-   25.4 | Indian 4-Card Bingo      |   ?    |         | FCBCG    | 6300150 | FCB1CLR  | 6600100 | Amer-Indian   | No   |      | No
-   25.5 | Wild Double-Up Poker     |   ?    |         | JKRCG    | 6300100 | WILD     | 6600010 | Amusement     | No   |      | No
-   25.6 | Mr. Domino               |   ?    |         | DOMCG    | 6300140 | DOMCLR   | 6600080 | Amusement     | No   |      | No
-   25.7 | Mr. Domino               |   ?    |         | DOMCG    | 6300140 | DOMCLR   | 6600080 | Amusement     | No   |      | No
-   25.8 | Poker                    |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   26.3 | Wild Double-Up Poker     |   ?    |         | JKRCG    | 6300100 | WILD     | 6600010 | Amusement     | No   |      | No
-   26.5 | 4-Reel Slot              |   ?    |         | SLOT4CG  | 6300220 | SL4CLR   | 6600140 | Gaming        | No   |      | No
-   26.6 | Poker                    |   ?    |         | GPKCG    | 6300250 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   26.8 | Wild Double-Up Poker     |   ?    |         | JKRCG    | 6300260 | WILD     | 6600010 | Nevada Gaming | No   |      | No
-   27.1 | Tourney Gaming Poker     |   ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   27.2 | Arcade Keno              |   ?    | AUG/85  | KJCG     | 6300060 | POKCLR   | 6600020 | Montana       | Yes  | OK   | Yes
- * 27.2 | Arcade Keno              |   ?    | AUG/85  | KJCG     | 6300060 | POKCLR   | 6600020 | Gaming        | Yes  | OK   | Yes
-   27.3 | Export Poker             |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   27.4 | Keno II                  |   ?    |         | KJCG     | 6300060 | POKCLR   | 6600020 | Montana       | No   |      | No
-   27.5 | Keno (Austria)           |   ?    |         | KENOCG   | 6300060 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   27.6 | Slot 8                   |   ?    |         | SL8CG    | 6300290 | SLOT4CLR | 6600140 | Gaming        | No   |      | No
-   27.9 | 3-Reel Slot, Gaming      |   ?    |         | SL2CG    | 6300280 | SL2CLR   | 6600120 | Nevada Gaming | No   |      | No
-   28.0 | 3-Reel Slot              |   ?    |         | SL2CG    | 6300180 | SL2CLR   | 6600120 | Gaming        | No   |      | No
-   28.2 | Hotline                  |   ?    |         | HLCG     | 6300160 | HLCLR    | 6600110 | Amusement     | No   |      | No
-   28.5 | Hotline                  |   ?    |         | HLCG     | 6300130 | HLCLR    | 6600110 | Amusement     | No   |      | No
-   29.0x| Stand or Draw Poker      |   ?    |         | ST2CG    | 6300270 | ST2CLR   | 6600150 | Nevada Gaming | No   |      | No
-   30.0x| Casino 21                |   ?    |         | GPKCG    | 6300250 | WILD     | 6600010 | Nevada Gaming | No   |      | No
-   31.0x| Poker (discard)          |   ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   32.0x| Poker (hold)             |   ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   33.0x| Keno                     |   ?    |         | KJCG     | 6300060 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   34.0x| Keno (Austria)           |   ?    |         | KJCG     | 6300060 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   35.0x| 1-3 Sign Poker (discard) |   ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   36.0x| 1-3 Sign Poker (hold)    |   ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   37.0x| Amusement Keno           |   ?    |         | KJCG     | 6300060 | POKCLR   | 6600020 | Montana       | No   |      | No
-   39.0x| 3-Reel Slot              |   ?    |         | SBARCG   | 6300305 | JKRSLOT  | 6600170 | Nevada Gaming | No   |      | No
-   39.0x| 3-Reel Slot              |   ?    |         | PLAIN7CG | 6300309 | JKRSLOT  | 6600170 | Nevada Gaming | No   |      | No
-   39.0x| 3-Reel Slot              |   ?    |         | JWCG     | 6300313 | JKRSLOT  | 6600170 | Nevada Gaming | No   |      | No
-   40.0x| Poker w/Wild Card        |  903   |         | JKRCG    | 6300260 | WLDCLR   | 6600010 | Nevada Gaming | No   |      | No
-   41.0x| Do-it-yourself Bingo     |   ?    |         | KCG      | 6300060 | PKRCLR   | 6600020 | Amer-Indian   | No   |      | No
-   42.0x| Mr. Domino               |   ?    |         | NDMCG    | 6300300 | DOMCLR   | 6600080 | Amusement     | No   |      | No
-   43.0x| Export Poker             |   ?    |         | GPKCG    | 6300170 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   44.0x| Tourney Poker (discard)  |   ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   45.0x| Tourney Poker (hold)     |   ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   46.0x| Gaming Poker             |   ?    |         | GPKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   47.0x| 4-Card Indian Bingo      |   ?    |         | FCB7CG   | 6300150 | FCB7CLR  | 6600100 | Amer-Indian   | No   |      | No
-   48.0x| Keno                     |   ?    |         | KJCG     | 6300060 | POKCLR   | 6600020 | Montana       | No   |      | No
-   51.08| Poker (906-III)          |  906   |         | GP2CG    | unknown | WILD     | unknown | Nevada Gaming | Yes  | OK   | Yes
-        |                          |        |         |          |         |          |         |               |      |      |
- * 903d | System 903 Diag.PROM     |  903   | unknown | any      | unknown | any      | unknown | Testing H/W   | Yes  | OK   | Yes
- * 905d | System 905 Diag.PROM     |  905   | unknown | any      | unknown | any      | unknown | Testing H/W   | Yes  | OK   | Yes
+   -----+--------------------------+---------+---------+----------+---------+----------+---------+---------------+------+------+-------
+    VER |  NAME                    | SYSTEM  | PROGRAM | CHAR GEN | CG P/N  | CLR PROM | CP P/N  | GAME TYPE     | DUMP | STAT | ADDED
+   -----+--------------------------+---------+---------+----------+---------+----------+---------+---------------+------+------+-------
+ *  7.4 | Gaming Poker (w. export) |   903   | AUG/81  | PKCG     | 6300010 | unknown  | 6600020 | Gaming        | Yes  | OK   | Yes
+    7.6 | Poker                    |   903   | AUG/81  | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
+ *  7.9 | Arcade Poker             |   903   | AUG/81  | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | BD   | Yes
+ *  8.0 | Arcade Black Jack        |   903   | SEP/81  | CPKCG    | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | BD   | Yes
+ *  9.4 | Keno                     |   903   | DEC/81  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
+ * 10.7 | Big Game                 |   903   | MAR/82  | LOTCG    | unknown | BCLR     | unknown | Amusement?    | Yes  | OK   | Yes
+ * 11.3 | Black Jack               |   903   |         | CPKCG?   | 6300010 | POKCLR   | 6600020 | Amusement?    | No   |      | No
+ * 12.3 | Ticket Poker             |   903   | JUN/82  | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | BD   | Yes
+ * 12.5 | Bingo                    |   903   | JUN/82  | NBCG     | unknown | BCLR     | unknown | Amusement     | Yes  | OK   | Yes
+ * 12.7 | Keno                     |  903/4? | JUL/82  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
+ * 12.8 | Arcade Game (Draw Poker) |   903   | JUL/82  | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
+   13.4 | Nudge Bingo              |   903   | SEP/82  | NBCG     | 6300040 | BCLR     | 6600040 | Amusement     | Yes  | OK   | Yes
+   14.5 | Pixels                   |   903   | DEC/82  | PIXCG    | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | OK   | Yes
+   14.7 | Nudge Bingo              |   903   |         | NBCG     | 6300040 | BCLR     | 6600040 | Amusement     | No   |      | No
+   15.0 | Punchboard               |   903   |         | PBCG     | 6300190 | PBCLR    | 6600130 | Gaming Wash   | No   |      | No
+   15.7 | Double-Draw Poker        |   903   | JAN/83  | CPKCG    | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
+   15.8 | Poker Montana            |    ?    |         | CPKCG    | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   15.9 | Wild Double-Up           |   905   | JAN/83  | JKR2CG   | 6300100 | WLDCLR   | 6600010 | Amusement     | Yes  | OK   | Yes
+   16.2 | Gaming Lottery           |    ?    |         | LCG      | 6300050 | LOTCLR   | 6600030 | Gaming        | No   |      | No
+   16.3 | Black Jack               |    ?    |         | CPKCG    | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
+   16.4 | K.I.S.S. Keno            |   904   | MAY/83  | KCG      | 6300060 | PCLR     | 6600020 | Amusement     | Yes  | IC   | Yes
+   16.5 | K.I.S.S. Poker           |    ?    |         | POKER    | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
+   16.6 | Nudge Bingo              |    ?    |         | NBCG     | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
+   16.7 | Poker                    |    ?    |         | PCG      | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
+   16.8 | Keno                     |   903   | MAR/83  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
+   17.0 | Poker                    |   905   |         | POKERCGs | 6300010 | PKRCLR   | 6600020 | Amusement     | No   |      | No
+   17.1 | Nudge Bingo              |    ?    |         | NBCG     | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
+   17.2 | Double/Double Poker      |   905   | MAY/83  | JKRPKR   | 6300100 | WLDCLR   | 6600010 | Amusement     | Yes  | OK   | Yes
+   17.3 | Casino Poker             |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   17.4 | Gin Gaming               |    ?    |         | GCG0.2   | 6300080 | GINCLR   | 6600060 | Nevada Gaming | No   |      | No
+   17.5 | Gaming Draw Poker        |   903   | DEC/84  | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | Yes  | OK   | Yes
+   17.6 | Nudge                    |   903   | SEP/82  | NBCG     | 6300040 | BCLR     | 6600040 | Amusement     | Yes  | OK   | Yes
+   17.7 | Keno                     |    ?    |         | KCG      | 6300060 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   17.9 | AWP Poker                |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
+ * 18.0 | Gin                      |   905   |         | GCG2     | 6300110 | MLTCLR   | 6600070 | Amusement     | No   |      | No
+   18.1 | Nudge                    |    ?    | JUL/83  | NBCG     | 6300040 | BCLR     | 6600040 | Amusement     | Yes  | OK   | Yes
+   18.2 | Amusement Poker          |   905   |         | JKRCG02  | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
+   18.3 | Pixels                   |   905   | AUG/83  | PXCG     | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | OK   | Yes
+   18.4 | Double Draw-Lebanon      |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
+   18.5 | Pixels                   |   905   | AUG/83  | PXCG     | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | OK   | Yes
+   18.6 | Pixels                   |   905   | AUG/83  | PXCG     | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | OK   | Yes
+   18.7 | Amusement Poker (skill)  |   905   | AUG/83  | JKRTWO   | 6300100 | MLTCLR   | 6600070 | Amusement     | Yes  | BD   | Yes
+   18.8 | Poker-Lebanon            |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
+   18.9 | Pixels (french)          |    ?    |         | PIXCG    | 6300070 | PIXCLR   | 6600050 | Amusement     | No   |      | No
+   19.0 | Hi-Score Poker           |    ?    |         | JKRTWO   | 6300100 | WLDCLR   | 6600070 | Amusement     | No   |      | No
+ * 19.1 | Super Blackjack          |   905   | AUG/83  | JKRTWO?  | 6300100 | MLTCLR   | 6600070 | Amusement     | No   |      | No
+   19.2 | AWP Poker                |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   19.3 | Gin                      |   905   |         | GCG2     | 6300110 | MLTCLR   | 6600070 | Amusement     | No   |      | No
+   19.4 | Pixels (french)          |    ?    |         | PIXCG    | 6300070 | PIXCLR   | 6600050 | Amusement     | No   |      | No
+   19.7 | Ind. Wild Double-Up      |    ?    |         | JKRCG    | 6300100 | WLDCLR   | 6600070 | Amusement     | No   |      | No
+   19.9 | Double-Up Nudge          |    ?    |         | NUDGE    | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
+   20.1 | Poker                    |    ?    |         | GPKCG    | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
+   20.4 | Super Blackjack          |   905   | FEB/84  | JKRTWO   | 6300100 | MLTCLR   | 6600070 | Amusement     | Yes  | OK   | Yes
+ * 20.5 | Blackjack?               |   905   | FEB/84  | JKRTWO?  | 6300100 | MLTCLR   | 6600070 | Amusement     | No   |      | No
+   20.7 | Double-Up Nudge          |    ?    |         | NUDGECG  | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
+   20.8 | Winner's Choice          |    ?    | FEB/84  | MLT2CG   | 6300130 | MLTCLR   | 6600070 | Amusement     | Yes  | OK   | Yes
+   20.9 | Gaming Poker-Europe      |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   21.1 | AWP Poker                |    ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   21.2 | Video Slot               |    ?    |         | SL1CG    | 6300180 | SLC1     | 6600120 | Gaming        | No   |      | No
+   21.4 | Wild Double-Up Poker     |    ?    |         | WLDCG    | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
+   21.5 | Double/Double Poker      |    ?    |         | JKRTWO   | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
+ * 21.6 | Wild Double-Up?          |   905   | JUN/84  | WLDCG    | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
+ * 21.7 | Poker?                   |   905   | MAY/84  | GPKCG?   | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
+   21.9 | Amusement Poker          |    ?    |         | JKRCG    | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
+   22.1 | Poker                    |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   22.7 | Amusement Poker (dbl/dbl)|   905   | JUL/84  | JKRPKR   | 6300100 | WLDCLR   | 6600010 | Amusement     | Yes  | OK   | Yes
+   22.8 | Tennesee Wild Poker      |   905   |         | JKR2CG   | 6300100 | MLTCLR   | 6600070 | Amusement     | No   |      | No
+   22.9 | Double/Double Poker      |   905   |         | JKRTWO   | 6300100 | MLTCLR   | 6600010 | Amusement     | No   |      | No
+   23.0 | FC Bingo (4-card)        |   905   | JUN/84  | FCBCG    | 6300150 | FCBCLR   | 6600100 | Amusement     | Yes  | BD   | Yes
+   23.2 | Pixels                   |    ?    |         | PIXCG    | 6300070 | PIXCLR   | 6600050 | Amusement     | No   |      | No
+ * 23.6 | Hotline                  |   905   | OCT/84  | HLCG     | 6300160 | HLCLR    | 6600110 | Amusement     | Yes  | OK   | Yes
+   23.7 | AWP Blackjack            |    ?    |         | POKER    | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   23.9 | G.Draw Poker (discard)   |   904   | JAN/85  | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | Yes  | OK   | Yes
+   24.0 | Gaming Draw Poker (hold) |   904   | MAY/85  | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | Yes  | OK   | Yes
+   24.2 | Export Poker             |    ?    |         | GPKCG    | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   24.3 | Gaming Blackjack         |    ?    |         | GPKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   24.5 | Wild Double-Up           |    ?    |         | JKPKCG   | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
+   24.6 | Hotline                  |   905   | JAN/85  | HLCG     | 6300160 | HLCLR    | 6600110 | Amusement     | Yes  | OK   | Yes
+   24.8 | Poker (discard)          |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   24.9 | Poker (hold)             |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   25.3 | 4-Card Bingo-Gaming      |    ?    |         | FCB1CG   | 6300150 | FCB1CLR  | 6600100 | Gaming        | No   |      | No
+   25.4 | Indian 4-Card Bingo      |    ?    |         | FCBCG    | 6300150 | FCB1CLR  | 6600100 | Amer-Indian   | No   |      | No
+   25.5 | Wild Double-Up Poker     |    ?    |         | JKRCG    | 6300100 | WILD     | 6600010 | Amusement     | No   |      | No
+   25.6 | Mr. Domino               |    ?    |         | DOMCG    | 6300140 | DOMCLR   | 6600080 | Amusement     | No   |      | No
+   25.7 | Mr. Domino               |    ?    |         | DOMCG    | 6300140 | DOMCLR   | 6600080 | Amusement     | No   |      | No
+   25.8 | Poker                    |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   26.3 | Wild Double-Up Poker     |    ?    |         | JKRCG    | 6300100 | WILD     | 6600010 | Amusement     | No   |      | No
+   26.5 | 4-Reel Slot              |    ?    |         | SLOT4CG  | 6300220 | SL4CLR   | 6600140 | Gaming        | No   |      | No
+   26.6 | Poker                    |    ?    |         | GPKCG    | 6300250 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   26.8 | Wild Double-Up Poker     |    ?    |         | JKRCG    | 6300260 | WILD     | 6600010 | Nevada Gaming | No   |      | No
+   27.1 | Tourney Gaming Poker     |    ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   27.2 | Arcade Keno              |    ?    | AUG/85  | KJCG     | 6300060 | POKCLR   | 6600020 | Montana       | Yes  | OK   | Yes
+ * 27.2 | Arcade Keno              |    ?    | AUG/85  | KJCG     | 6300060 | POKCLR   | 6600020 | Gaming        | Yes  | OK   | Yes
+   27.3 | Export Poker             |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   27.4 | Keno II                  |    ?    |         | KJCG     | 6300060 | POKCLR   | 6600020 | Montana       | No   |      | No
+   27.5 | Keno (Austria)           |    ?    |         | KENOCG   | 6300060 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   27.6 | Slot 8                   |    ?    |         | SL8CG    | 6300290 | SLOT4CLR | 6600140 | Gaming        | No   |      | No
+   27.9 | 3-Reel Slot, Gaming      |    ?    |         | SL2CG    | 6300280 | SL2CLR   | 6600120 | Nevada Gaming | No   |      | No
+   28.0 | 3-Reel Slot              |    ?    |         | SL2CG    | 6300180 | SL2CLR   | 6600120 | Gaming        | No   |      | No
+   28.2 | Hotline                  |    ?    |         | HLCG     | 6300160 | HLCLR    | 6600110 | Amusement     | No   |      | No
+   28.5 | Hotline                  |    ?    |         | HLCG     | 6300130 | HLCLR    | 6600110 | Amusement     | No   |      | No
+   29.0x| Stand or Draw Poker      |    ?    |         | ST2CG    | 6300270 | ST2CLR   | 6600150 | Nevada Gaming | No   |      | No
+   30.0x| Casino 21                |    ?    |         | GPKCG    | 6300250 | WILD     | 6600010 | Nevada Gaming | No   |      | No
+   31.0x| Poker (discard)          |    ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   32.0x| Poker (hold)             |    ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   33.0x| Keno                     |    ?    |         | KJCG     | 6300060 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   34.0x| Keno (Austria)           |    ?    |         | KJCG     | 6300060 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   35.0x| 1-3 Sign Poker (discard) |    ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   36.0x| 1-3 Sign Poker (hold)    |    ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   37.0x| Amusement Keno           |    ?    |         | KJCG     | 6300060 | POKCLR   | 6600020 | Montana       | No   |      | No
+   39.0x| 3-Reel Slot              |    ?    |         | SBARCG   | 6300305 | JKRSLOT  | 6600170 | Nevada Gaming | No   |      | No
+   39.0x| 3-Reel Slot              |    ?    |         | PLAIN7CG | 6300309 | JKRSLOT  | 6600170 | Nevada Gaming | No   |      | No
+   39.0x| 3-Reel Slot              |    ?    |         | JWCG     | 6300313 | JKRSLOT  | 6600170 | Nevada Gaming | No   |      | No
+   40.0x| Poker w/Wild Card        |   903   |         | JKRCG    | 6300260 | WLDCLR   | 6600010 | Nevada Gaming | No   |      | No
+   41.0x| Do-it-yourself Bingo     |    ?    |         | KCG      | 6300060 | PKRCLR   | 6600020 | Amer-Indian   | No   |      | No
+   42.0x| Mr. Domino               |    ?    |         | NDMCG    | 6300300 | DOMCLR   | 6600080 | Amusement     | No   |      | No
+   43.0x| Export Poker             |    ?    |         | GPKCG    | 6300170 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   44.0x| Tourney Poker (discard)  |    ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   45.0x| Tourney Poker (hold)     |    ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   46.0x| Gaming Poker             |    ?    |         | GPKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   47.0x| 4-Card Indian Bingo      |    ?    |         | FCB7CG   | 6300150 | FCB7CLR  | 6600100 | Amer-Indian   | No   |      | No
+   48.0x| Keno                     |    ?    |         | KJCG     | 6300060 | POKCLR   | 6600020 | Montana       | No   |      | No
+   51.08| Poker (906-III)          | 906-III |         | GP2CG    | unknown | WILD     | unknown | Nevada Gaming | Yes  | OK   | Yes
+        |                          |         |         |          |         |          |         |               |      |      |
+ * 903d | System 903 Diag.PROM     |   903   | unknown | any      | unknown | any      | unknown | Testing H/W   | Yes  | OK   | Yes
+ * 905d | System 905 Diag.PROM     |   905   | unknown | any      | unknown | any      | unknown | Testing H/W   | Yes  | OK   | Yes
 
 
    (*) Not in the original list.
@@ -394,7 +394,7 @@
     The whole map is mirrored to $8000-$FFFF.
 
 
-    --- System 906 III ---
+    --- System 906-III ---
 
     $0000 - $07FF   NVRAM           ; All registers and settings.
     $2C08 - $2C08   AY-8912         ; Read/Control.
@@ -435,6 +435,18 @@
 
     DRIVER UPDATES
     --------------
+
+
+    [2021-04-20]
+
+    - Reworked a lot of things to get the 906-III platform playable.
+	- Switched to Rockwell R65C02 CPU.
+    - Added missing 906-III inputs, timers, clocks and connections.
+    - Renamed Game 58.01 to CEI 51.08 (CEI 906-III Poker).
+      The game is promoted to WORKING.
+    - Added Casino 21 UCMC/IWC (ver 30.08). The game is working.
+    - Added Poker UCMC/IWC (ver 162.03). The game is working.
+    - Added Poker UCMC/IWC (ver 162.03 20-6-91). The game is working.
 
 
     [2010-08-20]
@@ -632,7 +644,10 @@
     - Improve 903/905 inputs.
     - Interrupts for System 903/904 UART.
     - Complete the PIAs connection.
-    - 906III: PIAs & AY8912 ports, inputs, etc...
+    - 906III: Proper PIATs 65C24 devices.
+    - 906III: GFX banks, proper bank3 selector.
+    - 906III: EX and Turbo+ platforms support.
+	- Hopper support.
     - Parent/clone relationship.
     - Fix lamps.
 
@@ -642,20 +657,10 @@
 #include "emu.h"
 #include "includes/calomega.h"
 
-#include "cpu/m6502/m6502.h"
-#include "cpu/m6502/m65c02.h"
-#include "machine/nvram.h"
-#include "sound/ay8910.h"
-#include "video/mc6845.h"
-
-#include "screen.h"
-#include "speaker.h"
-
-
-#define MASTER_CLOCK    XTAL(10'000'000)
-#define CPU_CLOCK   (MASTER_CLOCK/16)
-#define UART_CLOCK  (MASTER_CLOCK/16)
-#define SND_CLOCK   (MASTER_CLOCK/8)
+#define MASTER_CLOCK		XTAL(10'000'000)
+#define CPU_CLOCK			(MASTER_CLOCK/16)
+#define UART_CLOCK			(MASTER_CLOCK/16)
+#define SND_CLOCK			(MASTER_CLOCK/8)
 
 
 /**************************************************
@@ -687,8 +692,6 @@ void calomega_state::s903_mux_w(uint8_t data)
 	m_s903_mux_data = data ^ 0xff;  /* inverted */
 }
 
-
-
 uint8_t calomega_state::s905_mux_port_r()
 {
 	switch( m_s905_mux_data & 0x0f )    /* bits 0-3 */
@@ -707,62 +710,102 @@ void calomega_state::s905_mux_w(uint8_t data)
 	m_s905_mux_data = data ^ 0xff;  /* inverted */
 }
 
-
 /********* 906III PIAs debug *********/
-
-uint8_t calomega_state::pia0_ain_r()
-{
-	/* Valid input port. Each polled value is stored at $0538 */
-	logerror("PIA0: Port A in\n");
-	return m_in0->read();
-}
 
 uint8_t calomega_state::pia0_bin_r()
 {
-	logerror("PIA0: Port B in\n");
+	//logerror("PIA0: Port B in\n");
 	return 0xff;
 }
 
 void calomega_state::pia0_aout_w(uint8_t data)
 {
-	logerror("PIA0: Port A out: %02X\n", data);
+	//logerror("PIA0: Port A out: %02X\n", data);
 }
 
 void calomega_state::pia0_bout_w(uint8_t data)
 {
-	logerror("PIA0: Port B out: %02X\n", data);
+	//logerror("PIA0: Port B out: %02X\n", data);
 }
-
-WRITE_LINE_MEMBER(calomega_state::pia0_ca2_w)
-{
-	/* Seems a kind of "heartbit" watchdog, switching 1's and 0's */
-	logerror("PIA0: CA2: %02X\n", state);
-}
-
-
 
 uint8_t calomega_state::pia1_ain_r()
 {
-	logerror("PIA1: Port A in\n");
-	return 0xff;
+	switch( m_s905_mux_data & 0x03 )    /* bits 0-3 */
+	{
+		case 0x00: return m_in0_0->read();
+		case 0x01: return m_in0_1->read();
+		case 0x02: return m_in0_2->read();
+		case 0x03: return m_in0_3->read();
+	}
+	return m_frq->read();   /* bit6 used for 50/60 Hz selector */
 }
 
 uint8_t calomega_state::pia1_bin_r()
 {
-	logerror("PIA1: Port B in\n");
+	//logerror("PIA1: Port B in\n");
 	return 0xff;
 }
 
 void calomega_state::pia1_aout_w(uint8_t data)
 {
-	logerror("PIA1: Port A out: %02X\n", data);
+	m_s905_mux_data = data >> 6;
+	//logerror("PIA1: Port A out (906III mux): %02X\n", m_s905_mux_data);
 }
 
 void calomega_state::pia1_bout_w(uint8_t data)
 {
-	logerror("PIA1: Port B out: %02X\n", data);
+	//logerror("PIA1: Port B out: %02X\n", data);
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER( calomega_state::timer_a )
+{
+	m_timera=!m_timera;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( calomega_state::timer_b )
+{
+	m_timerb = !m_timerb;
+	if( m_timerb & !piat_state){
+		piat_state = true;
+		piat_b_ctl_r = 0xe0;
+		m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+	}
+	else
+		piat_state=false;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( calomega_state::timer_c )
+{
+	m_timerc=!m_timerc;
+    //logerror("TIMER A: %02X\n", m_timera);
+}
+
+READ_LINE_MEMBER(calomega_state::timera_r)
+{
+    //logerror("%TIMER_A_READ_IRQ 11.6f at %s \n",machine().time().as_double(),machine().describe_context());
+	return m_timera;
+}
+
+READ_LINE_MEMBER(calomega_state::timerc_r)
+{
+	return !m_timerc;
+}
+
+WRITE_LINE_MEMBER(calomega_state::pia0_ca2_w)
+{
+	// Seems a kind of "heartbit" watchdog, switching 1's and 0's 
+
+    //m_xxx = state;
+	//logerror("PIA0: CA2: %02X\n", state);
+}
+
+WRITE_LINE_MEMBER(calomega_state::cpu_sync)
+{
+	//CA1 & CB1 updates
+	m_pia[1]->read(3);
+	m_pia[1]->read(1);
+	
+};
 
 /********  Lamps debug  ********
 
@@ -816,6 +859,33 @@ void calomega_state::lamps_905_w(uint8_t data)
 	m_lamps[7] = BIT(~data, 7);  /* L8 (unknown) */
 }
 
+uint8_t calomega_state::piat_read(offs_t offset)
+{
+    uint8_t ret=0;
+	switch( offset & 0x03 )
+	{
+		case 0x00: ret = 0; break;
+		case 0x01: ret = 0; break;
+		case 0x02: ret = 0; break;
+		case 0x03: if(piat_b_ctl_r == 0xe0){
+                        ret = piat_b_ctl_r;
+                        piat_b_ctl_r = 0;
+                        //logerror("Piat Control Read %x \n", ret);
+                        }; break;
+	}
+	return ret;
+}
+
+void calomega_state::piat_write(offs_t offset, uint8_t data)
+{
+	switch( offset & 0x03 )
+	{
+		case 0x00: piat_b_thi = data; piat_b_timer = piat_b_tlo + (piat_b_thi * 0x100); break;
+		case 0x01: piat_01 = data; break;
+		case 0x02: piat_b_tlo = data; piat_b_timer = piat_b_tlo + (piat_b_thi * 0x100); piat_b_enable = true; break;
+		case 0x03: piat_b_ctl_w = data; break;
+	}
+}
 
 /*************************************************
 *             Memory map information             *
@@ -866,8 +936,11 @@ void calomega_state::sys905_map(address_map &map)
 
 void calomega_state::sys906_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().share("nvram");
+	//map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0000, 0x1fff).ram().share("nvram"); 
 	map(0x280c, 0x280f).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2810, 0x2811).rw(m_acia6850_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x2820, 0x2823).rw(FUNC(calomega_state::piat_read), FUNC(calomega_state::piat_write));     // 16/4 15:25
 	map(0x2824, 0x2827).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x2c04, 0x2c04).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2c05, 0x2c05).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -2275,41 +2348,194 @@ static INPUT_PORTS_START( ssipkr )
 	PORT_DIPSETTING(    0x00, "50Hz." )
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( stand906 )
 
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-1") PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-2") PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-3") PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-4") PORT_CODE(KEYCODE_4)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-5") PORT_CODE(KEYCODE_5)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-6") PORT_CODE(KEYCODE_6)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-7") PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-8") PORT_CODE(KEYCODE_8)
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) /* credits */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel Discards")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) PORT_NAME("Stand/DVTR")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+    
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME("Coin Out")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_H) PORT_NAME("Hopper Height") PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Door") PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Menu")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Hand Pay")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE) PORT_CODE(KEYCODE_R) PORT_NAME("Error Reset")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW2")   /* Tied to AY8912 port. Covered with tape except SW2-8 */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Discard 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Discard 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Discard 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Discard 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Discard 5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_D) PORT_NAME("Drop Door") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_8)PORT_NAME("Change")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0)PORT_NAME("Prog. Hip")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SW1")    // settings (PIAT1)
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW2")    // Tied to AY8912 port. Covered with tape except SW2-8
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( cas21iwc )
+
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME("Coin In (Fichas Entrada)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )  PORT_NAME("Take (Cobrar)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+    
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_IMPULSE(2) PORT_NAME("Coin Out (Fichas Salida)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_H) PORT_NAME("Hopper Height (Peso Tolva)") PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Door (Puerta)") PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Menu")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Hand Pay (Pago Manual)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE) PORT_CODE(KEYCODE_R) PORT_NAME("Error Reset (Correccion Error)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")  // TODO: BJ predef inputs...
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_CODE(KEYCODE_X) PORT_NAME("Deal (Dar) / Cierre")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_CODE(KEYCODE_C) PORT_NAME("Double-Up (Doblar)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_CODE(KEYCODE_V) PORT_NAME("Hit (Pedir)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) PORT_CODE(KEYCODE_B) PORT_NAME("Stand (Plantar) / Desv")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_D) PORT_NAME("Drop Door (Cajon Abierto)") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )	PORT_NAME("Bet (Apuesta)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_8)PORT_NAME("Attendant (Asistente)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SW1")    // settings (PIAT1)
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW2")    // Tied to AY8912 port. Covered with tape except SW2-8
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2566,6 +2792,7 @@ WRITE_LINE_MEMBER(calomega_state::write_acia_clock)
 	update_aciabaud_scale(0);
 }
 
+
 /*************************************************
 *                Machine Drivers                 *
 *************************************************/
@@ -2657,34 +2884,46 @@ void calomega_state::sys905(machine_config &config)
 	config.device_remove("aciabaud");
 }
 
-
 void calomega_state::sys906(machine_config &config)
 {
 	sys903(config);
 
 	/* basic machine hardware */
-
-	M65C02(config.replace(), m_maincpu, CPU_CLOCK);   /* guess */
+	R65C02(config.replace(), m_maincpu, CPU_CLOCK);	// confirmed
 	m_maincpu->set_addrmap(AS_PROGRAM, &calomega_state::sys906_map);
+	m_maincpu->sync_cb().set(FUNC(calomega_state::cpu_sync));
 
-	m_pia[0]->readpa_handler().set(FUNC(calomega_state::pia0_ain_r));
+	m_pia[0]->readpa_handler().set_ioport("SW1");
 	m_pia[0]->readpb_handler().set(FUNC(calomega_state::pia0_bin_r));
 	m_pia[0]->writepa_handler().set(FUNC(calomega_state::pia0_aout_w));
 	m_pia[0]->writepb_handler().set(FUNC(calomega_state::pia0_bout_w));
 	m_pia[0]->ca2_handler().set(FUNC(calomega_state::pia0_ca2_w));
+	m_pia[0]->irqa_handler().set_inputline("maincpu", M6502_IRQ_LINE); //* 280D 13/04
+	//m_pia[0]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE); 13/04
 
 	m_pia[1]->readpa_handler().set(FUNC(calomega_state::pia1_ain_r));
 	m_pia[1]->readpb_handler().set(FUNC(calomega_state::pia1_bin_r));
+	//m_pia[1]->readca1_handler().set(FUNC(calomega_state::vblank_r));
+	m_pia[1]->readca1_handler().set(FUNC(calomega_state::timera_r));
+	m_pia[1]->readcb1_handler().set(FUNC(calomega_state::timerc_r));
 	m_pia[1]->writepa_handler().set(FUNC(calomega_state::pia1_aout_w));
 	m_pia[1]->writepb_handler().set(FUNC(calomega_state::pia1_bout_w));
+	m_pia[1]->irqa_handler().set_inputline("maincpu", M6502_IRQ_LINE); //* 2825  13/04
+	m_pia[1]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE); //* 2827  13/04
 
 	m_gfxdecode->set_info(gfx_sys906);
 
 	/* sound hardware */
-	subdevice<ay8912_device>("ay8912")->port_a_read_callback().set_ioport("SW2");    /* From PCB pic. Value is stored at $0539 */
+    ay8912_device &ay8912(AY8912(config.replace(), "ay8912", SND_CLOCK));	// confirmed
+	ay8912.port_a_read_callback().set_ioport("SW2");						// from schematics
+	ay8912.add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	config.device_remove("acia6850_0");
-	config.device_remove("aciabaud");
+	TIMER(config, "timer_a").configure_periodic(FUNC(calomega_state::timer_a), attotime::from_hz(610)); //960
+	TIMER(config, "timer_c").configure_periodic(FUNC(calomega_state::timer_c), attotime::from_hz(60)); //1111
+    TIMER(config, "timer_b").configure_periodic(FUNC(calomega_state::timer_b), attotime::from_hz(100));
+	//config.device_remove("acia6850_0");
+	//config.device_remove("aciabaud");
+
 }
 
 
@@ -3638,6 +3877,78 @@ ROM_START( ssipkr40 )   /* (gfx and prom from jjpoker) */
 	ROM_LOAD( "tunipoker.u28",  0x0000, 0x0100, BAD_DUMP CRC(5101a33b) SHA1(a36bc421064d0ed96beb27b549f69adce0a553c2) )
 ROM_END
 
+/*
+  Casino 21 / Black Jack
+  UMCM / IWC
+  Ver 30.08
+
+  Looks like a sort of 906 III hardware
+
+*/
+ROM_START( cas21iwc )   // still need the complete title
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",   0x6000, 0x2000, CRC(c6c60700) SHA1(8c613211a22f5c23a9971092b996d29a4e0ae83d) )  // not program... just some data to be checked.
+	ROM_LOAD( "2.bin",   0x8000, 0x2000, CRC(c7bc884e) SHA1(e3a610362dc04d977b8bbd8549b9ce26a716867f) )
+	ROM_LOAD( "3.bin",   0xa000, 0x2000, CRC(2be52026) SHA1(8318b340e2a5b6127c459d140078d105f16d8f32) )
+	ROM_LOAD( "4.bin",   0xc000, 0x2000, CRC(0289aeac) SHA1(44bbbf4703c5dee460915e44839a53b97797f09d) )
+	ROM_LOAD( "5.bin",   0xe000, 0x2000, CRC(e53b0112) SHA1(cff4d2467a6e3d322cdf5ddd9034099c8a0b7a8c) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "cgc.bin",    0x0000, 0x2000, CRC(c69ab916) SHA1(316fabf35184007b29da91b3fec0a5c4ce8cded3) )
+	ROM_LOAD( "cgb.bin",    0x2000, 0x2000, CRC(62630d24) SHA1(88e89b41cae02b34767fac0a75506ee44f033422) )
+	ROM_LOAD( "cga.bin",    0x4000, 0x2000, CRC(ce444eb6) SHA1(3d8c6f047c141931e55ff9101832fa5cae73576d) )
+
+	ROM_REGION( 0x200, "proms", 0 )  // borrowed from other set, upper half is empty
+	ROM_LOAD( "n82s129n.u16",  0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
+ROM_END
+
+/*
+  Poker
+  UCMC / IWC
+  Ver 162.03
+  Looks like a sort of 906 III hardware
+
+*/
+ROM_START( pokeriwc )   // still need the complete title
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "numeral_1.bin",   0x6000, 0x2000, CRC(c099dc4c) SHA1(4eec1fb0d8f1d2b31ac397991594e02bd9156348) )
+	ROM_LOAD( "numeral_2.bin",   0x8000, 0x2000, CRC(20d42fb2) SHA1(aae6704719b80f3c8c994d91ceebaae070d1153f) )
+	ROM_LOAD( "numeral_3.bin",   0xa000, 0x2000, CRC(2cea3ba1) SHA1(c0edc7e9102744362bdca63a75c7ba344cbb0e6c) )
+	ROM_LOAD( "numeral_4.bin",   0xc000, 0x2000, CRC(742676b0) SHA1(28f565fe75120000e049fb099bced4297a0bab1f) )
+	ROM_LOAD( "numeral_5.bin",   0xe000, 0x2000, CRC(d9b7c85c) SHA1(bec03c0cef38d0d4a93a8ef4c4ddbed0b67ebaf3) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "cgc.bin",    0x0000, 0x2000, CRC(c69ab916) SHA1(316fabf35184007b29da91b3fec0a5c4ce8cded3) )
+	ROM_LOAD( "cgb.bin",    0x2000, 0x2000, CRC(62630d24) SHA1(88e89b41cae02b34767fac0a75506ee44f033422) )
+	ROM_LOAD( "cga.bin",    0x4000, 0x2000, CRC(ce444eb6) SHA1(3d8c6f047c141931e55ff9101832fa5cae73576d) )
+
+	ROM_REGION( 0x200, "proms", 0 )  // borrowed from other set, upper half is empty
+	ROM_LOAD( "n82s129n.u16",  0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
+ROM_END
+
+/*
+  Poker
+  IWC
+  Ver 162  20-6-91
+  906 III hardware
+
+*/
+ROM_START( pokiwc162 )   // Joker Wild?
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "j_k.u28",                              0x6000, 0x2000, CRC(8a6e93b0) SHA1(a411cb4cd3980934cbc9b170b118348a9a4ac896) )
+	ROM_LOAD( "v162_n2_spanish_pok_20-6-91_iwc.u29",  0x8000, 0x2000, CRC(20d42fb2) SHA1(aae6704719b80f3c8c994d91ceebaae070d1153f) )
+	ROM_LOAD( "v162_n3_spanish_pok_20-6-91_iwc.u30",  0xa000, 0x2000, CRC(2cea3ba1) SHA1(c0edc7e9102744362bdca63a75c7ba344cbb0e6c) )
+	ROM_LOAD( "v162_n4_spanish_pok_20-6-91_iwc.u31",  0xc000, 0x2000, CRC(742676b0) SHA1(28f565fe75120000e049fb099bced4297a0bab1f) )
+	ROM_LOAD( "v162_n5_spanish_pok_20-6-91_iwc.u32",  0xe000, 0x2000, CRC(d9b7c85c) SHA1(bec03c0cef38d0d4a93a8ef4c4ddbed0b67ebaf3) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "v162_cgc_iwc_argentina.u4",  0x0000, 0x2000, CRC(c69ab916) SHA1(316fabf35184007b29da91b3fec0a5c4ce8cded3) )
+	ROM_LOAD( "v162_cgb_iwc_argentina.u5",  0x2000, 0x2000, CRC(62630d24) SHA1(88e89b41cae02b34767fac0a75506ee44f033422) )
+	ROM_LOAD( "v162_cga_iwc_argentina.u6",  0x4000, 0x2000, CRC(ce444eb6) SHA1(3d8c6f047c141931e55ff9101832fa5cae73576d) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "n82s129n.u16",  0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
+ROM_END
 
 /*************************************************
 *                  Driver Init                   *
@@ -3678,56 +3989,89 @@ void calomega_state::init_comg080()
 	PRGROM[0x3fff] = 0x26;
 }
 
+void calomega_state::init_comg5108()
+{
+	uint8_t *PRGROM = memregion( "maincpu" )->base();
+	PRGROM[0xc080] = 0xff;   // CHECKSUM ERROR FLAG - No changes for now.
+	// Debug
+	//PRGROM[0xc080] = 0x00; // CHECKSUM ERROR FLAG (at start)
+	//PRGROM[0xbf0e] = 0x00; // CHECKSUM ERROR FLAG (on the fly)
+	//PRGROM[0xbfb4] = 0x00; // RAM ERROR FLAG
+	//PRGROM[0xb6A0] = 0x00; // ERROR LOW BATTERY FLAG
+	//PRGROM[0xb6AA] = 0x00; // ERROR LOW BATTERY FLAG
+}
+
+void calomega_state::init_cas21iwc()
+{
+	uint8_t *PRGROM = memregion( "maincpu" )->base();
+
+	PRGROM[0xB603] = 0xff;		// Checksum flag. No changes for now.
+}
+
+void calomega_state::init_pokeriwc()
+{
+	uint8_t *PRGROM = memregion( "maincpu" )->base();
+
+	PRGROM[0x8000] = 0xa2;		// Checksum flag. No changes for now.
+}
+
 
 /*************************************************
 *                  Game Drivers                  *
 *************************************************/
 
-/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT          ROT    COMPANY                                  FULLNAME                                                    FLAGS   */
-GAME( 1981, comg074,  0,        sys903,   comg074,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.4 (Gaming Poker, W.Export)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1981, comg076,  0,        sys903,   comg076,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.6 (Arcade Poker)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1981, comg079,  0,        sys903,   comg076,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.9 (Arcade Poker)",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
-GAME( 1981, comg080,  0,        sys903,   arcadebj, calomega_state, init_comg080, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 8.0 (Arcade Black Jack)",                  MACHINE_SUPPORTS_SAVE )                          /* bad dump */
-GAME( 1981, comg094,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 9.4 (Keno)",                               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg107,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 10.7c (Big Game)",                         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg123,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.3 (Ticket Poker)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
-GAME( 1982, comg125,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.5 (Bingo)",                             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg127,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.7 (Keno)",                              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg128,  0,        sys903,   comg128,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.8 (Arcade Game)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg134,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 13.4 (Nudge Bingo)",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg145,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 14.5 (Pixels)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg157,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.7 (Double-Draw Poker)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg159,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.9 (Wild Double-Up)",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg164,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.4 (Keno)",                              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* incomplete dump */
-GAME( 1983, comg168,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.8 (Keno)",                              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg172,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.2 (Double Double Poker)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, comg175,  0,        sys903,   gdrwpkrd, calomega_state, init_sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 17.51 (Gaming Draw Poker)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg176,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.6 (Nudge Bingo)",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg181,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.1 (Nudge Bingo)",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg183,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.3 (Pixels)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg185,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.5 (Pixels)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg186,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.6 (Pixels)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg187,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.7 (Amusement Poker)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
-GAME( 1984, comg204,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.4 (Super Blackjack)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, comg208,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.8 (Winner's Choice)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, comg227,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 22.7 (Amusement Poker, d/d)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, comg230,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.0 (FC Bingo (4-card))",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
-GAME( 1984, comg236,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.6 (Hotline)",                           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, comg239,  0,        sys903,   gdrwpkrd, calomega_state, init_sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 23.9 (Gaming Draw Poker)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1985, comg240,  0,        sys903,   gdrwpkrh, calomega_state, init_sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 24.0 (Gaming Draw Poker, hold)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1985, comg246,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 24.6 (Hotline)",                           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, comg272a, 0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, amusement)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, comg272b, 0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, gaming)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 198?, comg5108, 0,        sys906,   stand906, calomega_state, empty_init,   ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 51.08 (CEI Video Poker, Jacks or Better)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT          ROT    COMPANY                                  FULLNAME                                           FLAGS   */
+GAME( 1981, comg074,  0,        sys903,   comg074,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.4 (Gaming Poker, W.Export)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1981, comg076,  0,        sys903,   comg076,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.6 (Arcade Poker)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1981, comg079,  0,        sys903,   comg076,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.9 (Arcade Poker)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
+GAME( 1981, comg080,  0,        sys903,   arcadebj, calomega_state, init_comg080, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 8.0 (Arcade Black Jack)",         MACHINE_SUPPORTS_SAVE )                          /* bad dump */
+GAME( 1981, comg094,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 9.4 (Keno)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg107,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 10.7c (Big Game)",                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg123,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.3 (Ticket Poker)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
+GAME( 1982, comg125,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.5 (Bingo)",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg127,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.7 (Keno)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg128,  0,        sys903,   comg128,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.8 (Arcade Game)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg134,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 13.4 (Nudge Bingo)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg145,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 14.5 (Pixels)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg157,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.7 (Double-Draw Poker)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg159,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.9 (Wild Double-Up)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg164,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.4 (Keno)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* incomplete dump */
+GAME( 1983, comg168,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.8 (Keno)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg172,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.2 (Double Double Poker)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, comg175,  0,        sys903,   gdrwpkrd, calomega_state, init_sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 17.51 (Gaming Draw Poker)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg176,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.6 (Nudge Bingo)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg181,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.1 (Nudge Bingo)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg183,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.3 (Pixels)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg185,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.5 (Pixels)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg186,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.6 (Pixels)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg187,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.7 (Amusement Poker)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
+GAME( 1984, comg204,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.4 (Super Blackjack)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, comg208,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.8 (Winner's Choice)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, comg227,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 22.7 (Amusement Poker, d/d)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, comg230,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.0 (FC Bingo (4-card))",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
+GAME( 1984, comg236,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.6 (Hotline)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, comg239,  0,        sys903,   gdrwpkrd, calomega_state, init_sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 23.9 (Gaming Draw Poker)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, comg240,  0,        sys903,   gdrwpkrh, calomega_state, init_sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 24.0 (Gaming Draw Poker, hold)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, comg246,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 24.6 (Hotline)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, comg272a, 0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, amusement)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, comg272b, 0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, gaming)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-/************ Diagnostic PROMs ************/
-GAME( 198?, comg903d, 0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - System 903 Diag.PROM",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 198?, comg905d, 0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - System 905 Diag.PROM",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//************ Diagnostic Sets ************
+GAME( 198?, comg903d, 0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - System 903 Diag.PROM",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, comg905d, 0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - System 905 Diag.PROM",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-/****** Unofficial / 3rd part games *******/
-GAME( 1982, elgrande, 0,        s903mod,  elgrande, calomega_state, init_s903mod, ROT0, "Enter-Tech, Ltd. / Tuni Electro Service", "El Grande - 5 Card Draw (New)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jjpoker,  0,        s903mod,  jjpoker,  calomega_state, init_s903mod, ROT0, "Enter-Tech, Ltd.",                        "Jackpot Joker Poker (set 1)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jjpokerb, jjpoker,  s903mod,  jjpoker,  calomega_state, init_s903mod, ROT0, "Enter-Tech, Ltd.",                        "Jackpot Joker Poker (set 2)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ssipkr24, 0,        s903mod,  ssipkr,   calomega_state, init_s903mod, ROT0, "SSI",                                     "SSI Poker (v2.4)",                                        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ssipkr30, ssipkr24, s903mod,  ssipkr,   calomega_state, init_s903mod, ROT0, "SSI",                                     "SSI Poker (v3.0)",                                        MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ssipkr40, ssipkr24, s903mod,  ssipkr,   calomega_state, init_s903mod, ROT0, "SSI",                                     "SSI Poker (v4.0)",                                        MACHINE_SUPPORTS_SAVE )
+//************* 906-III games **************
+GAME( 198?, comg5108, 0,        sys906,   stand906, calomega_state, init_comg5108, ROT0, "Casino Electronics Inc.",              "CEI 51.08 (CEI 906-III Poker)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+
+//****** Unofficial 903/904/905 3rd part games *******
+GAME( 1982, elgrande,  0,        s903mod,  elgrande, calomega_state, init_s903mod, ROT0, "Enter-Tech, Ltd. / Tuni Electro Service", "El Grande - 5 Card Draw (New)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jjpoker,   0,        s903mod,  jjpoker,  calomega_state, init_s903mod, ROT0, "Enter-Tech, Ltd.",                        "Jackpot Joker Poker (set 1)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jjpokerb,  jjpoker,  s903mod,  jjpoker,  calomega_state, init_s903mod, ROT0, "Enter-Tech, Ltd.",                        "Jackpot Joker Poker (set 2)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ssipkr24,  0,        s903mod,  ssipkr,   calomega_state, init_s903mod, ROT0, "SSI",                                     "SSI Poker (v2.4)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ssipkr30,  ssipkr24, s903mod,  ssipkr,   calomega_state, init_s903mod, ROT0, "SSI",                                     "SSI Poker (v3.0)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ssipkr40,  ssipkr24, s903mod,  ssipkr,   calomega_state, init_s903mod, ROT0, "SSI",                                     "SSI Poker (v4.0)",                              MACHINE_SUPPORTS_SAVE )
+
+//****** Unofficial 906-III family 3rd part games *******
+GAME( 1990, cas21iwc,  0,        sys906,   cas21iwc, calomega_state, init_cas21iwc, ROT0, "UCMC/IWC",                               "Casino 21 UCMC/IWC (ver 30.08)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pokeriwc,  0,        sys906,   stand906, calomega_state, init_pokeriwc, ROT0, "UCMC/IWC",                               "Poker UCMC/IWC (ver 162.03)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pokiwc162, pokeriwc, sys906,   stand906, calomega_state, init_pokeriwc, ROT0, "UCMC/IWC",                               "Poker UCMC/IWC (ver 162.03 20-6-91)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
