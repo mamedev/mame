@@ -8,6 +8,15 @@
 #define LOG_OUTPUT_FUNC osd_printf_verbose
 #include "logmacro.h"
 
+
+//*********************************************************
+//  DEBUGGING
+//*********************************************************
+
+// set this mask to only play certain channels
+constexpr u32 global_chanmask = 0xffffffff;
+
+
 //
 // ONE FM CORE TO RULE THEM ALL
 //
@@ -1011,6 +1020,10 @@ void ymopm_registers::log_keyon(u32 choffs, u32 opoffs)
 {
 	u32 chnum = choffs;
 	u32 opnum = opoffs;
+
+	// don't log masked channels
+	if (((global_chanmask >> chnum) & 1) == 0)
+		return;
 
 	LOG("%d.%02d freq=%04X dt2=%d dt=%d fb=%d alg=%X mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X out=%c%c",
 		chnum, opnum,
@@ -3009,6 +3022,9 @@ u32 ymfm_engine_base<RegisterType>::clock(u32 chanmask)
 template<class RegisterType>
 void ymfm_engine_base<RegisterType>::output(s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax, u32 chanmask) const
 {
+	// mask out some channels for debug purposes
+	chanmask &= global_chanmask;
+
 	// mask out inactive channels
 	chanmask &= m_active_channels;
 
