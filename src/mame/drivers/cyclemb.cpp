@@ -705,12 +705,14 @@ void cyclemb_state::machine_start()
 		save_item(NAME(m_dial[i].reverse), i);
 	}
 
-	m_screen_display = true;
+	save_item(NAME(m_screen_display));
 }
 
 void cyclemb_state::machine_reset()
 {
 	skydest_i8741_reset();
+
+	m_screen_display = true;
 }
 
 template <int P>
