@@ -76,7 +76,7 @@ void output_software_lists(infoprotobuf::machine *machine, device_t &root, const
 void output_ramoptions(infoprotobuf::machine *machine, device_t &root);
 
 void output_one_device(infoprotobuf::machine *machine, machine_config &config, device_t &device, const char *devtag);
-void output_devices(infoprotobuf::mame *mame, emu_options &lookup_options, device_type_set const *filter);
+void output_devices(std::ostream &out, emu_options &lookup_options, device_type_set const *filter);
 
 const char *get_merge_name(driver_enumerator &drivlist, const game_driver &driver, util::hash_collection const &romhashes);
 
@@ -306,7 +306,7 @@ void info_protobuf_creator::output(std::ostream& out, const std::function<bool(c
 	{
 		output_header_if_necessary(mame);
 
-		output_devices(mame, m_lookup_options, devfilter.get());
+		output_devices(out, m_lookup_options, devfilter.get());
 	}
 }
 
@@ -519,12 +519,12 @@ void output_one_device(infoprotobuf::machine* machine, machine_config &config, d
 //  registered device types
 //-------------------------------------------------
 
-void output_devices(infoprotobuf::mame *mame, emu_options &lookup_options, device_type_set const *filter)
+void output_devices(std::ostream &out, emu_options &lookup_options, device_type_set const *filter)
 {
 	// get config for empty machine
 	machine_config config(GAME_NAME(___empty), lookup_options);
 
-	auto const action = [&config, mame] (device_type type)
+	auto const action = [&config, &out] (device_type type)
 			{
 				// add it at the root of the machine config
 				device_t *dev;
@@ -539,8 +539,9 @@ void output_devices(infoprotobuf::mame *mame, emu_options &lookup_options, devic
 						device.config_complete();
 
 				// print details and remove it
-				infoprotobuf::machine* machine = mame->add_machine();
+				infoprotobuf::machine *machine = new infoprotobuf::machine();
 				output_one_device(machine, config, *dev, dev->tag());
+				google::protobuf::util::SerializeDelimitedToOstream(*machine, &out);
 				machine_config::token const tok(config.begin_configuration(config.root_device()));
 				config.device_remove("_tmp");
 			};
