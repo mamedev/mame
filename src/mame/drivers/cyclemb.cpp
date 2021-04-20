@@ -1194,8 +1194,6 @@ void cyclemb_state::init_cyclemb()
 	rom[0xa36] = 0x00;
 	rom[0xa37] = 0x00;
 	rom[0xa38] = 0x00;
-
-	machine_reset();
 }
 
 void cyclemb_state::init_skydest()
@@ -1213,8 +1211,6 @@ void cyclemb_state::init_skydest()
 	rom[0xa36] = 0x00;
 	rom[0xa37] = 0x00;
 	rom[0xa38] = 0x00;
-
-	machine_reset();
 }
 
 GAME( 1984, cyclemb, 0, cyclemb,  cyclemb, cyclemb_state, init_cyclemb, ROT0, "Taito Corporation", "Cycle Maabou (Japan)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
