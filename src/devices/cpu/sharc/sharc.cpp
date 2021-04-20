@@ -778,7 +778,8 @@ void adsp21062_device::device_start()
 
 void adsp21062_device::device_register_save(save_registrar &save)
 {
-	save.reg(NAME(*m_core));
+	save_registrar container(save, "drc_near_cache");
+	container.reg(NAME(*m_core));
 }
 
 

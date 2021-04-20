@@ -1133,8 +1133,7 @@ protected:
 
 		void register_save(save_registrar &save)
 		{
-			save.reg(NAME(ram), mask + 1)
-				.reg(NAME(starts)).reg(NAME(startt))
+			save.reg(NAME(starts)).reg(NAME(startt))
 				.reg(NAME(startw))
 				.reg(NAME(dsdx)).reg(NAME(dtdx))
 				.reg(NAME(dwdx))
@@ -1248,8 +1247,7 @@ protected:
 
 		void register_save(save_registrar &save)
 		{
-			save.reg(NAME(ram), mask + 1)
-				.reg(NAME(rgboffs))
+			save.reg(NAME(rgboffs))
 				.reg(NAME(auxoffs))
 				.reg(NAME(frontbuf))
 				.reg(NAME(backbuf))

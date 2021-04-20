@@ -1162,9 +1162,14 @@ void voodoo_device::device_register_save(save_registrar &save)
 	save.reg(NAME(extra_cycles))
 		.reg(NAME(reg))
 		.reg(NAME(alt_regmap))
+		.reg(NAME(m_fbmem_alloc), m_fbmem << 20);
+	if (m_tmumem_alloc[0])
+		save.reg(NAME(m_tmumem_alloc[0]), m_tmumem0 << 20);
+	if (m_tmumem_alloc[1])
+		save.reg(NAME(m_tmumem_alloc[1]), m_tmumem1 << 20);
 
 	/* register states: pci */
-		.reg(NAME(pci))
+	save.reg(NAME(pci))
 
 	/* register states: dac */
 		.reg(NAME(dac))
