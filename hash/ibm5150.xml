@@ -2921,6 +2921,24 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="cpanel">
+		<description>Control Panel</description>
+		<year>1988</year>
+		<publisher>Promark</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Installation Disk" />
+			<dataarea name="flop" size = "368640">
+				<rom name="control_panel_disk1.img" size="368640" crc="089953f7" sha1="3febb682ac08e13f6812ad296dcb95e89e0eb229"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Installation Disk 2" />
+			<dataarea name="flop" size = "368640">
+				<rom name="control_panel_disk2.img" size="368640" crc="093cfa2a" sha1="a7c42bf78997a7b568d82555fabeb817050a9b02"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="croschex">
 		<description>Cross-chex</description>
 		<year>198?</year>
