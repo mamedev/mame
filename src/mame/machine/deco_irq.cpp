@@ -29,7 +29,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(DECO_IRQ, deco_irq_device, "deco_irq", "Data East IRQ Controller")
+DEFINE_DEVICE_TYPE(DECO_IRQ, deco_irq_device, "deco_irq", "DECO IRQ Controller")
 
 
 //**************************************************************************
