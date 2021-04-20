@@ -704,6 +704,8 @@ void cyclemb_state::machine_start()
 		save_item(NAME(m_dial[i].curent_value), i);
 		save_item(NAME(m_dial[i].reverse), i);
 	}
+
+	m_screen_display = true;
 }
 
 void cyclemb_state::machine_reset()
