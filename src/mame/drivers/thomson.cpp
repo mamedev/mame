@@ -86,7 +86,6 @@
 #include "bus/thomson/cd90_351.h"
 #include "bus/thomson/cd90_640.h"
 #include "bus/thomson/nanoreseau.h"
-#include "imagedev/flopdrv.h"
 #include "machine/6821pia.h"
 #include "machine/clock.h"
 #include "machine/ram.h"
