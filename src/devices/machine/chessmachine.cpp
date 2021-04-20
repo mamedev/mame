@@ -62,10 +62,6 @@ void chessmachine_device::device_start()
 	// resolve callbacks
 	m_data_out.resolve_safe();
 
-	// zerofill
-	m_bootrom_enabled = false;
-	m_latch[0] = m_latch[1] = 0;
-
 	// register for savestates
 	save_item(NAME(m_bootrom_enabled));
 	save_item(NAME(m_latch));
