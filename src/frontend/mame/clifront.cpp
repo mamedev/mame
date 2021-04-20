@@ -15,6 +15,7 @@
 
 #include "audit.h"
 #include "infoxml.h"
+#include "infoprotobuf.h"
 #include "language.h"
 #include "luaengine.h"
 #include "mame.h"
@@ -55,6 +56,7 @@
 
 // frontend commands
 #define CLICOMMAND_LISTXML              "listxml"
+#define CLICOMMAND_LISTPB               "listpb"
 #define CLICOMMAND_LISTFULL             "listfull"
 #define CLICOMMAND_LISTSOURCE           "listsource"
 #define CLICOMMAND_LISTCLONES           "listclones"
@@ -99,6 +101,7 @@ const options_entry cli_option_entries[] =
 	/* frontend commands */
 	{ nullptr,                              nullptr,   OPTION_HEADER,     "FRONTEND COMMANDS" },
 	{ CLICOMMAND_LISTXML        ";lx",      "0",       OPTION_COMMAND,    "all available info on driver in XML format" },
+	{ CLICOMMAND_LISTPB         ";lp",      "0",       OPTION_COMMAND,    "all available info on driver in Protobuf format" },
 	{ CLICOMMAND_LISTFULL       ";ll",      "0",       OPTION_COMMAND,    "short name, full name" },
 	{ CLICOMMAND_LISTSOURCE     ";ls",      "0",       OPTION_COMMAND,    "driver sourcefile" },
 	{ CLICOMMAND_LISTCLONES     ";lc",      "0",       OPTION_COMMAND,    "show clones" },
@@ -358,6 +361,13 @@ void cli_frontend::listxml(const std::vector<std::string> &args)
 {
 	// create the XML and print it to stdout
 	info_xml_creator creator(m_options, m_options.bool_value(CLIOPTION_DTD));
+	creator.output(std::cout, args);
+}
+
+void cli_frontend::listpb(const std::vector<std::string> &args)
+{
+	// create the XML and print it to stdout
+	info_protobuf_creator creator(m_options, m_options.bool_value(CLIOPTION_DTD));
 	creator.output(std::cout, args);
 }
 
@@ -1572,6 +1582,7 @@ const cli_frontend::info_command_struct *cli_frontend::find_command(const std::s
 	static const info_command_struct s_info_commands[] =
 	{
 		{ CLICOMMAND_LISTXML,           0, -1, &cli_frontend::listxml,          "[pattern] ..." },
+		{ CLICOMMAND_LISTPB,            0, -1, &cli_frontend::listpb,           "[pattern] ..." },
 		{ CLICOMMAND_LISTFULL,          0, -1, &cli_frontend::listfull,         "[pattern] ..." },
 		{ CLICOMMAND_LISTSOURCE,        0, -1, &cli_frontend::listsource,       "[system name]" },
 		{ CLICOMMAND_LISTCLONES,        0,  1, &cli_frontend::listclones,       "[system name]" },

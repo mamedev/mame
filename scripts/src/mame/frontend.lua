@@ -66,6 +66,10 @@ files {
 	MAME_DIR .. "src/frontend/mame/clifront.h",
 	MAME_DIR .. "src/frontend/mame/infoxml.cpp",
 	MAME_DIR .. "src/frontend/mame/infoxml.h",
+  MAME_DIR .. "src/frontend/mame/infoprotobuf.cpp",
+	MAME_DIR .. "src/frontend/mame/infoprotobuf.h",
+  MAME_DIR .. "src/frontend/mame/proto/info.pb.cc",
+	MAME_DIR .. "src/frontend/mame/proto/info.pb.h",
 	MAME_DIR .. "src/frontend/mame/iptseqpoll.cpp",
 	MAME_DIR .. "src/frontend/mame/iptseqpoll.h",
 	MAME_DIR .. "src/frontend/mame/language.cpp",
@@ -184,6 +188,10 @@ files {
 }
 
 pchsource(MAME_DIR .. "src/frontend/mame/audit.cpp")
+
+links {
+  ext_lib("protobuf")
+}
 
 dependency {
 	{ MAME_DIR .. "src/frontend/mame/ui/about.cpp", GEN_DIR .. "emu/copying.ipp" },

@@ -1585,6 +1585,9 @@ function generate_has_header(hashname, hash)
    file:close()
 end
 
+links {
+  ext_lib("protobuf")
+}
 generate_has_header("CPUS", CPUS)
 generate_has_header("SOUNDS", SOUNDS)
 generate_has_header("MACHINES", MACHINES)

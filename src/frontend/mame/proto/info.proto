@@ -1,0 +1,344 @@
+syntax = "proto2";
+
+package infoprotobuf;
+
+message mame {
+  optional string build = 1;
+  optional bool debug = 2 [default = false];
+  required uint32 mameconfig = 3;
+  repeated machine machine = 4;
+}
+
+message machine {
+  required string name = 1;
+  optional string sourcefile = 2;
+  optional bool isbios = 3 [default = false];
+  optional bool isdevice = 4 [default = false];
+  optional bool ismechanical = 5 [default = false];
+  optional bool runnable = 6 [default = true];
+  optional string cloneof = 7;
+  optional string romof = 8;
+  optional string sampleof = 9;
+  required string description = 10;
+  optional string year = 11;
+  optional string manufacturer = 12;
+  repeated biosset biosset = 13;
+  repeated rom rom = 14;
+  repeated disk disk = 15;
+  repeated device_ref device_ref = 16;
+  repeated sample sample = 17;
+  repeated chip chip = 18;
+  repeated display display = 19;
+  optional sound sound = 20;
+  optional input input = 21;
+  repeated dipswitch dipswitch = 22;
+  repeated configuration configuration = 23;
+  repeated port port = 24;
+  repeated adjuster adjuster = 25;
+  repeated driver driver = 26;
+  repeated feature feature = 27;
+  repeated device device = 28;
+  repeated slot slot = 29;
+  repeated softwarelist softwarelist = 30;
+  repeated ramoption ramoption = 31;
+}
+
+message biosset {
+  required string name = 1;
+  required string description = 2;
+  optional bool default = 3 [default=false];
+}
+
+message rom {
+  required string name = 1;
+  optional string sha1  = 2;
+  optional string merge = 3;
+  optional string region  = 4;
+  optional status status = 5 [default = good];
+  optional bool optional = 6 [default = false];
+
+  optional string bios = 7;
+  required uint32 size  = 8;
+  optional uint32 crc = 9;
+  optional string offset = 10;
+
+
+}
+
+message disk {
+  required string name = 1;
+  optional string sha1  = 2;
+  optional string merge = 3;
+  optional string region = 4;
+  optional status status  = 5 [default = good];
+  optional bool optional = 6 [default = false];
+  required uint32 size  = 7;
+
+  optional string index=8;
+  optional bool writable = 9 [default=false];
+}
+
+message hashes {
+  optional string sha1 = 1;
+  optional uint32 crc = 2;
+  optional status status = 3 [default = good];
+}
+
+message device_ref {
+  required string name = 1;
+}
+
+message chip {
+  required string name = 1;
+  optional string tag = 2;
+  required chip_type type = 3;
+  optional uint32 clock = 4;
+}
+
+message sample {
+  required string name = 1;
+}
+
+message display {
+  optional string tag = 1;
+  required display_type type = 2;
+  optional display_rotation rotate = 3;
+  optional bool flipx = 4 [default=false];
+  optional uint32 width = 5;
+  optional uint32 height = 6;
+  required double refresh = 7;
+  optional int32 pixclock = 8;
+  optional int32 htotal = 9;
+  optional int32 hbend = 10;
+  optional int32 hbstart = 11;
+  optional int32 vtotal = 12;
+  optional int32 vbend = 13;
+  optional int32 vbstart = 14;
+}
+
+message sound {
+  required int32 channels = 1;
+}
+
+message condition {
+  required string tag = 1;
+  required uint32 mask = 2;
+  enum condition_relation {
+    eq = 1;
+    ne = 2;
+    gt = 3;
+    le = 4;
+    lt = 5;
+    ge = 6;
+  }
+  required condition_relation relation = 3;
+  required uint32 value = 4;
+}
+
+message input {
+  optional bool service = 1 [default=false];
+  optional bool tilt = 2 [default=false];
+  required int32 players = 3;
+  optional int32 coins = 4;
+
+  message Control {
+    required string type = 1;
+    optional int32 player = 2;
+    optional int32 buttons = 3;
+    optional int32 reqbuttons = 4;
+    optional int32 minimum = 5;
+    optional int32 maximum = 6;
+    optional int32 sensitivity = 7;
+    optional int32 keydelta = 8;
+    optional bool reverse = 9 [default=false];
+    optional string ways = 10;
+    optional string ways2 = 11;
+    optional string ways3 = 12;
+  }
+
+  repeated Control control = 5;
+}
+
+message dipswitch {
+  required string name = 1;
+  required string tag = 2;
+  required uint32 mask = 3;
+
+  message DipLocation {
+    required string name = 1;
+    required uint32 number = 2;
+    optional bool inverted = 3 [default=false];
+  }
+
+  repeated DipLocation diplocation = 4;
+
+  optional condition condition = 5;
+
+  message DipValue {
+    optional condition condition = 1;
+    required string name =2;
+    required uint32 value = 3;
+    optional bool default = 4 [default=false];
+  }
+
+  repeated DipValue dipvalue = 6;
+}
+
+message configuration {
+  optional condition condition = 1;
+  required string name = 2;
+  required string tag = 3;
+  required string mask = 4;
+  message ConfLocation {
+    required string name = 1;
+    required uint32 number = 2;
+    optional bool inverted = 3 [default=false];
+  }
+  repeated ConfLocation conflocation = 5;
+  message ConfSetting {
+    optional condition condition = 1;
+    required string name =2;
+    required string value = 3;
+    optional bool default = 4 [default=false];
+  }
+  repeated ConfSetting confsetting = 6;
+}
+
+message port {
+  required string tag = 1;
+  message Analog {
+    required uint32 mask = 1;
+  }
+  repeated Analog analog =2;
+}
+
+message adjuster {
+  optional condition condition = 1;
+  required string name = 2;
+  required uint32 default = 3;
+}
+
+message driver {
+  enum driver_status {
+    good = 1;
+    imperfect = 2;
+    preliminary = 3;
+  }
+
+  required driver_status status  = 1;
+  required driver_status emulation = 2;
+  optional driver_status cocktail = 3;
+  enum Supported {
+    supported =1;
+    unsupported =2;
+  }
+  required Supported savestate = 4;
+  optional bool requireartwork = 5 [default=false];
+  optional bool unofficial = 6 [default=false];
+  optional bool nosoundhardware = 7 [default=false];
+  optional bool incomplete = 8 [default=false];
+}
+
+message feature {
+  enum Type {
+    protection= 1;
+    timing= 2;
+    graphics= 3;
+    palette= 4;
+    sound= 5;
+    capture= 6;
+    camera= 7;
+    microphone= 8;
+    controls= 9;
+    keyboard= 10;
+    mouse= 11;
+    media= 12;
+    disk= 13;
+    printer= 14;
+    tape= 15;
+    punch= 16;
+    drum= 17;
+    rom= 18;
+    comms= 19;
+    lan= 20;
+    wan = 21;
+  }
+  required string type = 1;
+  enum feature_status {
+    unemulated =1;
+    imperfect =2;
+  }
+  optional feature_status status = 2;
+  optional feature_status overall = 3;
+}
+
+message device {
+  required string type = 1;
+  optional string tag =2;
+  optional string fixed_image =3;
+  optional string mandatory = 4;
+  optional string interface = 5;
+  message DeviceInstance {
+    required string name = 1;
+    required string briefname = 2;
+  }
+  optional DeviceInstance device_instance = 6;
+  message Extension {
+    required string name = 1;
+  }
+  repeated Extension extension = 7;
+}
+
+message slot {
+  required string name = 1;
+  message SlotOption {
+    required string name = 1;
+    required string devname = 2;
+    optional bool default = 3 [default=false];
+  }
+  repeated SlotOption slotoption = 2;
+}
+
+message softwarelist {
+  required string tag = 1;
+  required string name = 2;
+  enum Status {
+    original = 0;
+    compatibile = 1;
+  }
+  required Status status = 3;
+  optional string filter = 4;
+}
+
+message ramoption {
+  required string name = 1;
+  optional bool default = 2;
+  optional uint32 value = 3;
+}
+
+
+enum display_type {
+  rastar = 1;
+  vector = 2;
+  lcd = 3;
+  svg = 4;
+  unknown = 5;
+}
+
+enum display_rotation {
+  deg0 = 1;
+  deg90 = 2;
+  deg180 = 3;
+  deg270 = 4;
+}
+
+enum status {
+  baddump = 1;
+  nodump = 2;
+  good = 3;
+}
+
+enum chip_type {
+  cpu = 1;
+  audio = 2;
+}
