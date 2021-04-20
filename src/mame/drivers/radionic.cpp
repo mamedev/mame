@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
 /***************************************************************************
-Komtek 1 (Radionic) memory map
+Komtek 1 (Radionic R1001) memory map
 
 0000-37ff ROM                            R   D0-D7
 37de      UART status                    R/W D0-D7
@@ -28,10 +28,6 @@ Komtek 1 (Radionic) memory map
 3c00-3fff video RAM                      R/W D0-D5,D7 (or D0-D7)
 4000-ffff RAM
 
-Interrupts:
-IRQ mode 1
-NMI
-
 Printer: Level II usually 37e8
 
 Cassette baud rate: 500 baud
@@ -44,7 +40,7 @@ FF:
 - bit 6 remembers the 32/64 screen mode (inverted)
 - bit 7 is for reading from a cassette
 
-Shift and Right-arrow will enable 32 cpl, if the hardware allows it.
+Shift and Right-arrow will enable 32 cpl.
 
 SYSTEM commands:
     - Press Break (End key) to quit
@@ -55,7 +51,7 @@ SYSTEM commands:
 
 About the RTC - The time is incremented while ever the cursor is flashing. It is stored in a series
     of bytes in the computer's work area. The bytes are in a certain order, this is:
-    seconds, minutes, hours, year, day, month. The seconds are stored at 0x4041.
+    seconds, minutes, hours, days. The seconds are stored at 0x4041.
     A reboot always sets the time to zero.
 
 Radionic has 16 colours with a byte at 350B controlling the operation. See manual.
@@ -71,8 +67,8 @@ To Do / Status:
 - Writing to floppy is problematic; freezing/crashing are common issues.
 
 radionic:  works
-           floppy not working (@6C0, DRQ never gets set)
-           add colour
+           add colour (no schematic; manual says jumpers set the Auto-Colour, but this isn't
+             documented anywhere).
            expansion-box?
            uart
 
@@ -81,6 +77,7 @@ radionic:  works
 #include "emu.h"
 #include "includes/trs80.h"
 #include "machine/i8255.h"
+#define MASTER_XTAL 12164800
 
 
 class radionic_state : public trs80_state
@@ -94,6 +91,7 @@ public:
 	void radionic(machine_config &config);
 
 private:
+	INTERRUPT_GEN_MEMBER(rtc_via_nmi);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void mem_map(address_map &map);
@@ -236,10 +234,14 @@ static INPUT_PORTS_START( radionic )
 	PORT_BIT(0xfe, 0x00, IPT_UNUSED)
 
 	PORT_START("CONFIG")
-	PORT_CONFNAME(    0x80, 0x00,   "Floppy Disc Drives")
-	PORT_CONFSETTING(   0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(   0x80, DEF_STR( On ) )
-	PORT_BIT(0x7f, 0x7f, IPT_UNUSED)
+	PORT_CONFNAME(    0xc0, 0x00,   "Floppy and RTC") // Floppy doesn't work if RTC is on, so interlink them.
+	PORT_CONFSETTING(   0x00, "Both Off" )
+	PORT_CONFSETTING(   0x80, "RTC off, Floppy On" )
+	PORT_CONFSETTING(   0x40, "RTC on, Floppy Off" )
+	PORT_CONFNAME(    0x30, 0x00,   "Colour")  // This isn't hooked up yet
+	PORT_CONFSETTING(   0x00, "Monochrome" )
+	PORT_CONFSETTING(   0x10, "Auto Colour" )
+	PORT_CONFSETTING(   0x30, "Programmable Colour" )
 
 	PORT_START("E9")    // these are the power-on uart settings
 	PORT_BIT(0x07, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -318,6 +320,12 @@ uint32_t radionic_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
+INTERRUPT_GEN_MEMBER(radionic_state::rtc_via_nmi)
+{
+	if (BIT(m_io_config->read(), 6))
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::from_nsec(1));
+}
+
 void radionic_state::floppy_formats(format_registration &fr)
 {
 	fr.add(FLOPPY_JV1_FORMAT);
@@ -334,23 +342,18 @@ static void radionic_floppies(device_slot_interface &device)
 	device.option_add("80t_qd", FLOPPY_525_QD);
 }
 
-
 void radionic_state::radionic(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 3579000 / 2);
-	//m_maincpu->set_clock(12_MHz_XTAL / 6); // or 3.579MHz / 2 (selectable?)
+	// Photos from Incog show 12.1648, and 3.579545 xtals. The schematic seems to just approximate these values.
+	Z80(config, m_maincpu, 3.579545_MHz_XTAL / 2);
+	//m_maincpu->set_clock(MASTER_XTAL / 6); // or 3.579545_MHz_XTAL / 2 (selectable?)
 	m_maincpu->set_addrmap(AS_PROGRAM, &radionic_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &radionic_state::io_map);
-	// Komtek I "User Friendly Manual" calls for "Z80 running at 1.97 MHz." This likely refers to an alternate NTSC version
-	// whose master clock was approximately 11.8005 MHz (6 times ~1.966 MHz and 750 times 15.734 kHz). Though the schematics
-	// provide the main XTAL frequency as 12 MHz, that they also include a 3.579 MHz XTAL suggests this possibility.
-	m_maincpu->set_periodic_int(FUNC(radionic_state::rtc_interrupt), attotime::from_hz(40));
-	m_maincpu->set_periodic_int(FUNC(radionic_state::nmi_line_pulse), attotime::from_hz(12_MHz_XTAL / 12 / 16384));
+	m_maincpu->set_periodic_int(FUNC(radionic_state::rtc_via_nmi), attotime::from_hz(MASTER_XTAL / 12 / 16384));  // breaks floppy
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(12_MHz_XTAL, 768, 0, 512, 312, 0, 256);
+	screen.set_raw(MASTER_XTAL, 768, 0, 512, 312, 0, 256);
 	screen.set_screen_update(FUNC(radionic_state::screen_update));
 	screen.set_palette("palette");
 
@@ -427,5 +430,5 @@ ROM_START(radionic)
 ROM_END
 
 
-//    YEAR  NAME         PARENT   COMPAT   MACHINE   INPUT     CLASS           INIT           COMPANY         FULLNAME         FLAGS
-COMP( 1983, radionic,    0,       trs80l2, radionic, radionic, radionic_state, empty_init,    "Komtek",       "Radionic",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME         PARENT   COMPAT   MACHINE   INPUT     CLASS           INIT           COMPANY     FULLNAME                    FLAGS
+COMP( 1983, radionic,    0,       trs80l2, radionic, radionic, radionic_state, empty_init,    "Komtek",   "Radionic R1001/Komtek 1",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
