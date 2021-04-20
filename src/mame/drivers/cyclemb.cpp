@@ -113,7 +113,6 @@ public:
 	optional_ioport_array<2> m_pad;
 	struct
 	{
-		uint8_t preview_input;
 		uint8_t curent_value;
 		bool reverse;
 	} m_dial[2];
@@ -128,7 +127,6 @@ public:
 	} m_mcu[2];
 
 	uint16_t m_dsw_pc_hack;
-	bool m_use_dial;
 	bool m_screen_display;
 
 	void cyclemb_bankswitch_w(uint8_t data);
@@ -142,8 +140,6 @@ public:
 	uint8_t skydest_i8741_1_r(offs_t offset);
 	void skydest_i8741_1_w(offs_t offset, uint8_t data);
 //  DECLARE_WRITE_LINE_MEMBER(ym_irq);
-
-	void update_dial(int player);
 
 	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(pad_r);
 
@@ -512,7 +508,6 @@ uint8_t cyclemb_state::skydest_i8741_0_r(offs_t offset)
 						m_mcu[0].packet_type^=0x20;
 						if(m_mcu[0].packet_type & 0x20)
 						{
-							update_dial(0);
 							m_mcu[0].rxd = ((ioport("P1_1")->read()) & 0x9f) | (m_mcu[0].packet_type);
 						}
 						else
@@ -527,7 +522,6 @@ uint8_t cyclemb_state::skydest_i8741_0_r(offs_t offset)
 						m_mcu[0].packet_type^=0x20;
 						if(m_mcu[0].packet_type & 0x20)
 						{
-							update_dial(1);
 							m_mcu[0].rxd = ((ioport("P2_1")->read()) & 0x9f) | (m_mcu[0].packet_type);
 						}
 						else
@@ -707,7 +701,6 @@ void cyclemb_state::machine_start()
 
 	for (int i = 0; i < 2; i++)
 	{
-		save_item(NAME(m_dial[i].preview_input), i);
 		save_item(NAME(m_dial[i].curent_value), i);
 		save_item(NAME(m_dial[i].reverse), i);
 	}
@@ -718,41 +711,19 @@ void cyclemb_state::machine_reset()
 	skydest_i8741_reset();
 }
 
-void cyclemb_state::update_dial(int P)
-{
-	if (!m_use_dial)
-	{
-		return;
-	}
-
-	uint8_t dial_input = m_pad[P]->read();
-	int8_t dial_delta = ((int8_t)dial_input - (int8_t)m_dial[P].preview_input);
-	m_dial[P].preview_input = dial_input;
-
-	if (dial_delta > 0)
-	{
-		if (dial_delta > 0x1f)
-		{
-			dial_delta = 0x1f;
-		}
-		m_dial[P].curent_value = (m_dial[P].curent_value + (uint8_t)dial_delta) & 0x7f;
-		m_dial[P].reverse = true;
-	}
-	else if (dial_delta < 0)
-	{
-		if (dial_delta < -0x1f)
-		{
-			dial_delta = -0x1f;
-		}
-		m_dial[P].curent_value = (m_dial[P].curent_value + (uint8_t)abs(dial_delta)) & 0x7f;
-		m_dial[P].reverse = false;
-	}
-}
-
 template <int P>
 CUSTOM_INPUT_MEMBER(cyclemb_state::pad_r)
 {
-	return (ioport_value)((m_dial[P].reverse ? 0x80 : 0x00) | m_dial[P].curent_value);
+	int8_t input_value = m_pad[P]->read();
+	int delta = std::clamp((int)input_value, -0x1f, 0x1f);
+
+	if (delta != 0)
+	{
+		m_dial[P].reverse = (delta < 0);
+		m_dial[P].curent_value = (m_dial[P].curent_value + (uint8_t)abs(delta)) & 0x7f;
+	}
+
+	return m_dial[P].curent_value | (m_dial[P].reverse ? 0x80 : 0x00);
 }
 
 
@@ -793,7 +764,7 @@ static INPUT_PORTS_START( cyclemb )
 	// PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("PAD_P1")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(15) PORT_KEYDELTA(8) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(15) PORT_KEYDELTA(8) PORT_PLAYER(1) PORT_RESET PORT_REVERSE
 
 	PORT_START("P2_0")
 /*	PORT_DIPNAME( 0x01, 0x00, "IN1" )
@@ -816,7 +787,7 @@ static INPUT_PORTS_START( cyclemb )
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("PAD_P2")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(15) PORT_KEYDELTA(8) PORT_PLAYER(2) PORT_COCKTAIL
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(15) PORT_KEYDELTA(8) PORT_PLAYER(2) PORT_RESET PORT_REVERSE PORT_COCKTAIL
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x02, "Difficulty (Stage 1-3)" )
@@ -1185,7 +1156,6 @@ void cyclemb_state::init_cyclemb()
 
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x1000);
 	m_dsw_pc_hack = 0x760;
-	m_use_dial = true;
 
 	// patch audio CPU crash + ROM checksum
 	rom[0x282] = 0x00;
@@ -1202,7 +1172,6 @@ void cyclemb_state::init_skydest()
 
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x1000);
 	m_dsw_pc_hack = 0x554;
-	m_use_dial = false;
 
 	// patch audio CPU crash + ROM checksum
 	rom[0x286] = 0x00;
