@@ -95,7 +95,7 @@ public:
 		m_obj1_ram(*this, "obj1_ram"),
 		m_obj2_ram(*this, "obj2_ram"),
 		m_obj3_ram(*this, "obj3_ram"),
-		m_dial(*this, "PAD_P%u", 1U)
+		m_dial(*this, "DIAL_P%u", 1U)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -746,7 +746,7 @@ static INPUT_PORTS_START( cyclemb )
 	PORT_START("P1_1")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(cyclemb_state, dial_r<0>)
 
-	PORT_START("PAD_P1")
+	PORT_START("DIAL_P1")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(15) PORT_KEYDELTA(8) PORT_PLAYER(1) PORT_RESET PORT_REVERSE
 
 	PORT_START("P2_0")
@@ -758,7 +758,7 @@ static INPUT_PORTS_START( cyclemb )
 	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(cyclemb_state, dial_r<1>)
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("PAD_P2")
+	PORT_START("DIAL_P2")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(15) PORT_KEYDELTA(8) PORT_PLAYER(2) PORT_RESET PORT_REVERSE PORT_COCKTAIL
 
 	PORT_START("DSW1")
