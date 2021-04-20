@@ -25,6 +25,7 @@
 
 #include "corestr.h"
 #include "proto/info.pb.h"
+#include <google/protobuf/util/delimited_message_util.h>
 
 #include <algorithm>
 #include <cctype>
@@ -211,8 +212,8 @@ void info_protobuf_creator::output(std::ostream& out, const std::function<bool(c
 {
 	struct prepared_info
 	{
-		std::string     m_pb_snippet;
-		device_type_set m_dev_set;
+		infoprotobuf::machine *m_pb_machine;
+		device_type_set        m_dev_set;
 	};
 
 	// prepare a driver enumerator and the queue
@@ -260,7 +261,7 @@ void info_protobuf_creator::output(std::ostream& out, const std::function<bool(c
 					prepared_info result;
 					std::ostringstream stream;
 					output_one(machine, drivlist, driver, devfilter ? &result.m_dev_set : nullptr);
-					result.m_pb_snippet = machine->SerializeAsString();
+					result.m_pb_machine = machine;
 					return result;
 				});
 				queue.push(std::move(future_pi));
@@ -276,7 +277,7 @@ void info_protobuf_creator::output(std::ostream& out, const std::function<bool(c
 
 			// emit the Protobuf
 			output_header_if_necessary(mame);
-			out << pi.m_pb_snippet;
+			google::protobuf::util::SerializeDelimitedToOstream(*pi.m_pb_machine, &out);
 
 			// merge devices into devfilter, if appropriate
 			if (devfilter)
@@ -563,12 +564,9 @@ void output_devices(infoprotobuf::mame *mame, emu_options &lookup_options, devic
 
 void output_device_refs(infoprotobuf::machine *machine, device_t &root)
 {
-	std::vector<infoprotobuf::device_ref> device_refs;
 	for (device_t &device : device_enumerator(root))
 		if (&device != &root) {
-			infoprotobuf::device_ref device_ref;
-			device_ref.set_name(device.shortname());
-			device_refs.push_back(device_ref);
+			machine->add_device_ref()->set_name(device.shortname());
 		}
 }
 
@@ -806,7 +804,6 @@ void output_rom(infoprotobuf::machine *machine, driver_enumerator *drivlist, con
 
 void output_sample(infoprotobuf::machine *machine, device_t &device)
 {
-	std::vector<infoprotobuf::sample> samples_list;
 	// iterate over sample devices
 	for (samples_device &samples : samples_device_enumerator(device))
 	{
@@ -819,9 +816,7 @@ void output_sample(infoprotobuf::machine *machine, device_t &device)
 				continue;
 
 			// output the sample name
-			infoprotobuf::sample sample;
-			sample.set_name(samplename);
-			samples_list.push_back(sample);
+			machine->add_sample()->set_name(samplename);
 		}
 	}
 }
@@ -834,7 +829,6 @@ void output_sample(infoprotobuf::machine *machine, device_t &device)
 
 void output_chips(infoprotobuf::machine *machine, device_t &device, const char *root_tag)
 {
-	std::vector<infoprotobuf::chip> chips;
 	// iterate over executable devices
 	for (device_execute_interface &exec : execute_interface_enumerator(device))
 	{
@@ -843,12 +837,11 @@ void output_chips(infoprotobuf::machine *machine, device_t &device, const char *
 			std::string newtag(exec.device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
-			infoprotobuf::chip chip;
-			chip.set_type(infoprotobuf::chip_type::cpu);
-			chip.set_tag(newtag);
-			chip.set_name(exec.device().name());
-			chip.set_clock(exec.device().clock());
-			chips.push_back(chip);
+			infoprotobuf::chip *chip = machine->add_chip();
+			chip->set_type(infoprotobuf::chip_type::cpu);
+			chip->set_tag(newtag);
+			chip->set_name(exec.device().name());
+			chip->set_clock(exec.device().clock());
 		}
 	}
 
@@ -860,12 +853,11 @@ void output_chips(infoprotobuf::machine *machine, device_t &device, const char *
 			std::string newtag(sound.device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
-			infoprotobuf::chip chip;
-			chip.set_type(infoprotobuf::chip_type::audio);
-			chip.set_tag(newtag);
-			chip.set_name(sound.device().name());
-			chip.set_clock(sound.device().clock());
-			chips.push_back(chip);
+			infoprotobuf::chip *chip = machine->add_chip();
+			chip->set_type(infoprotobuf::chip_type::audio);
+			chip->set_tag(newtag);
+			chip->set_name(sound.device().name());
+			chip->set_clock(sound.device().clock());
 		}
 	}
 }
@@ -878,7 +870,6 @@ void output_chips(infoprotobuf::machine *machine, device_t &device, const char *
 
 void output_display(infoprotobuf::machine *machine, device_t &device, machine_flags::type const *flags, const char *root_tag)
 {
-	std::vector<infoprotobuf::display> displays;
 	// iterate over screens
 	for (const screen_device &screendev : screen_device_enumerator(device))
 	{
@@ -887,49 +878,48 @@ void output_display(infoprotobuf::machine *machine, device_t &device, machine_fl
 			std::string newtag(screendev.tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
-			infoprotobuf::display display;
-			display.set_tag(newtag);
-
+			infoprotobuf::display *display = machine->add_display();
+			display->set_tag(newtag);
 
 			switch (screendev.screen_type())
 			{
-			case SCREEN_TYPE_RASTER:		display.set_type(infoprotobuf::rastar);  break;
-				case SCREEN_TYPE_VECTOR:    display.set_type(infoprotobuf::vector);  break;
-				case SCREEN_TYPE_LCD:       display.set_type(infoprotobuf::lcd);     break;
-				case SCREEN_TYPE_SVG:       display.set_type(infoprotobuf::svg);     break;
-				default:                    display.set_type(infoprotobuf::unknown); break;
+			case SCREEN_TYPE_RASTER:		display->set_type(infoprotobuf::rastar);  break;
+				case SCREEN_TYPE_VECTOR:    display->set_type(infoprotobuf::vector);  break;
+				case SCREEN_TYPE_LCD:       display->set_type(infoprotobuf::lcd);     break;
+				case SCREEN_TYPE_SVG:       display->set_type(infoprotobuf::svg);     break;
+				default:                    display->set_type(infoprotobuf::unknown); break;
 			}
 
 			// output the orientation as a string
 			switch (screendev.orientation())
 			{
 			case ORIENTATION_FLIP_X:
-				display.set_flipx(true);
-				display.set_rotate(infoprotobuf::deg0);
+				display->set_flipx(true);
+				display->set_rotate(infoprotobuf::deg0);
 				break;
 			case ORIENTATION_FLIP_Y:
-				display.set_flipx(true);
-				display.set_rotate(infoprotobuf::deg180);
+				display->set_flipx(true);
+				display->set_rotate(infoprotobuf::deg180);
 				break;
 			case ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
-				display.set_rotate(infoprotobuf::deg180);
+				display->set_rotate(infoprotobuf::deg180);
 				break;
 			case ORIENTATION_SWAP_XY:
-				display.set_flipx(true);
-				display.set_rotate(infoprotobuf::deg90);
+				display->set_flipx(true);
+				display->set_rotate(infoprotobuf::deg90);
 				break;
 			case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X:
-				display.set_rotate(infoprotobuf::deg90);
+				display->set_rotate(infoprotobuf::deg90);
 				break;
 			case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_Y:
-				display.set_rotate(infoprotobuf::deg270);
+				display->set_rotate(infoprotobuf::deg270);
 				break;
 			case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
-				display.set_flipx(true);
-				display.set_rotate(infoprotobuf::deg270);
+				display->set_flipx(true);
+				display->set_rotate(infoprotobuf::deg270);
 				break;
 			default:
-				display.set_rotate(infoprotobuf::deg0);
+				display->set_rotate(infoprotobuf::deg0);
 				break;
 			}
 
@@ -937,12 +927,12 @@ void output_display(infoprotobuf::machine *machine, device_t &device, machine_fl
 			if (screendev.screen_type() != SCREEN_TYPE_VECTOR)
 			{
 				const rectangle &visarea = screendev.visible_area();
-				display.set_width(visarea.width());
-				display.set_height(visarea.height());
+				display->set_width(visarea.width());
+				display->set_height(visarea.height());
 			}
 
 			// output refresh rate
-			display.set_refresh(ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds()));
+			display->set_refresh(ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds()));
 
 			// output raw video parameters only for games that are not vector
 			// and had raw parameters specified
@@ -950,16 +940,15 @@ void output_display(infoprotobuf::machine *machine, device_t &device, machine_fl
 			{
 				int pixclock = screendev.width() * screendev.height() * ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds());
 
-				display.set_pixclock(pixclock);
+				display->set_pixclock(pixclock);
 
-				display.set_htotal(screendev.width());
-				display.set_hbend(screendev.visible_area().min_x);
-				display.set_hbstart(screendev.visible_area().max_x+1);
-				display.set_vtotal(screendev.height());
-				display.set_vbend(screendev.visible_area().min_y);
-				display.set_vbstart(screendev.visible_area().max_y+1);
+				display->set_htotal(screendev.width());
+				display->set_hbend(screendev.visible_area().min_x);
+				display->set_hbstart(screendev.visible_area().max_x+1);
+				display->set_vtotal(screendev.height());
+				display->set_vbend(screendev.visible_area().min_y);
+				display->set_vbstart(screendev.visible_area().max_y+1);
 			}
-			displays.push_back(display);
 		}
 	}
 }
@@ -980,8 +969,7 @@ void output_sound(infoprotobuf::machine *machine, device_t &device)
 	if (snditer.first() == nullptr)
 		speakers = 0;
 
-	infoprotobuf::sound sound;
-	sound.set_channels(speakers);
+	machine->mutable_sound()->set_channels(speakers);
 }
 
 
@@ -1419,17 +1407,17 @@ void output_input(infoprotobuf::machine *machine, const ioport_list &portlist)
 
 	// Output the input info
 	// First basic info
-	infoprotobuf::input input;
-	input.set_players(nplayer);
-	input.set_coins(ncoin);
-	input.set_service(service);
-	input.set_tilt(tilt);
+	infoprotobuf::input *input = machine->mutable_input();
+	input->set_players(nplayer);
+	input->set_coins(ncoin);
+	input->set_service(service);
+	input->set_tilt(tilt);
 
 	// Then controller specific ones
 	for (auto & elem : control_info)
 		if (elem.type != nullptr)
 		{
-			infoprotobuf::input::Control *control = input.add_control();
+			infoprotobuf::input::Control *control = input->add_control();
 			//printf("type %s - player %d - buttons %d\n", elem.type, elem.player, elem.nbuttons);
 			if (elem.analog)
 			{
