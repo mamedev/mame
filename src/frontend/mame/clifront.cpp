@@ -1442,7 +1442,7 @@ void cli_frontend::romident(const std::vector<std::string> &args)
 	// create our own copy of options for the purposes of ROM identification
 	// so we are not "polluted" with driver-specific slot/image options
 	emu_options options;
-	options.set_value(OPTION_MEDIAPATH, m_options.media_path(), OPTION_PRIORITY_DEFAULT);
+	options.set_value(OPTION_HASHPATH, m_options.hash_path(), OPTION_PRIORITY_DEFAULT);
 
 	media_identifier ident(options);
 
