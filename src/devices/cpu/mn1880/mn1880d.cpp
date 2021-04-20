@@ -47,7 +47,7 @@ mn1880_disassembler::mn1880_disassembler()
 {
 }
 
-// MOV, RDTBL, MOV1 and MOV1N may also be known as MV, MVROM, MV1 and MV1CPL
+// MOV, RDTBL, MOV1, MOV1N, ADDC and SUBC may also be known as MV, MVROM, MV1, MV1CPL, ADD and SUB
 const char *const mn1880_disassembler::s_inst_names[256] =
 {
 	"nop", "rep", "rep", "rep", "rep", "rep", "rep", "rep",
@@ -441,7 +441,7 @@ void mn1880_disassembler::dasm_operands(std::ostream &stream, u8 opcode, offs_t 
 		}
 		else
 		{
-			// 3 direct operands? (MN1880 only)
+			// 3 direct operands? (MN1860 only)
 			format_direct(stream, opcodes.r8(pc + 2));
 			stream << ", ";
 			format_direct(stream, opcodes.r8(pc));
