@@ -5202,8 +5202,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Contains drivers for various makes and models; the MAME ATAPI CD-ROM device is compatible with e.g. the "COMPAQ", "NEC", and "TATUNG" drivers -->
 	<software name="cdgod55">
+		<!-- Contains drivers for various makes and models; the MAME ATAPI CD-ROM device is compatible with e.g. the "COMPAQ", "NEC", and "TATUNG" drivers -->
 		<description>CD-ROM God Boot Disk Version 5.5 BETA2</description>
 		<year>1998</year>
 		<publisher>Kristopher Marciniak</publisher>
@@ -5812,6 +5812,21 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="4236544">
 				<rom name="scroll 3d mouse setup disk for ps2 and serial 2.0.mfm" size="4236544" crc="7e408ad4" sha1="7f88263de01478f42f2a937540fee0a70eae5dc5" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smartbrd">
+		<!-- Latest official Tasc SmartBoard DOS driver downloaded from archived (now-defunct) tasc.nl -->
+		<!-- INSTALL.EXE: SmartBoard drivers V1.1 (TASCDRV), 21-Aug-95 -->
+		<!-- SMARTBRD.EXE: SmartBoard test program V1.04, 30-Dec-94 -->
+		<description>SmartBoard Driver (DOS)</description>
+		<year>1995</year>
+		<info name="usage" value="SmartBoard SB20 or SB30 required." />
+		<publisher>Tasc</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="smartboard.img" size="737280" crc="bf1ca15d" sha1="d3d5a45d8cc0c08fdf8e249630da89090f79acbe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8382,6 +8397,20 @@ license:CC0
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="photdev3.img" size="1474560" crc="8dc746f1" sha1="32592ca550ee99e24515f7f9d295ae3cb6f559b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smbdrvk">
+		<!-- Like smartbrd, this was downloaded from tasc.nl and copied to a disk image -->
+		<!-- This package also includes SMARTMON.EXE, a small tool for testing the SmartBoard -->
+		<description>SmartBoard Driver SDK (Win32)</description>
+		<year>1998</year>
+		<publisher>Tasc</publisher>
+		<info name="usage" value="SmartBoard SB20 or SB30 required." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="smbdrvk.img" size="1474560" crc="95a31678" sha1="0a814d0c7f43abf45dd85c10721a09106f0fa6ec"/>
 			</dataarea>
 		</part>
 	</software>

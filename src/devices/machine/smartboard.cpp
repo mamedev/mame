@@ -6,12 +6,15 @@ Tasc SmartBoard SB30
 
 Chessboard controller for use with Tasc R30 chesscomputer, or as PC peripheral.
 
-SB30 (81 LEDs) is "SmartBoard I"
-SB20 (64 LEDs) is "SmartBoard II"
-
 The SmartBoard can detect which piece is present on a specific square, more
 info on the technology used in the piece recognition system can be found in
 the US patent 5,129,654
+
+SB30 (81 LEDs) is "SmartBoard I"
+SB20 (64 LEDs) is "SmartBoard II"
+
+SB20 is not emulated. It's on different hardware, with embedded CPU to reduce
+I/O overhead. Note, SB20 is not compatible with old versions of Tasc R30.
 
 ******************************************************************************/
 
@@ -304,7 +307,7 @@ void tasc_sb30_device::data0_w(int state)
 			if (m_led_out.isnull())
 				m_out_leds[m_pos & 7][m_pos >> 3 & 7] = m_data1;
 			else
-				m_led_out(m_pos & 0x3f, m_pos >> 6 & 1);
+				m_led_out(m_pos & 0x3f, m_data1);
 		}
 	}
 
