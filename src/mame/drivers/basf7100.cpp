@@ -267,7 +267,6 @@ void basf7100_state::highlight_w(uint8_t data)
 
 void basf7100_state::roll_offset_w(uint8_t data)
 {
-	logerror("roll offset = %02x\n", data);
 	m_roll_offset = data;
 }
 
@@ -294,10 +293,13 @@ void basf7100_state::vblank_w(int state)
 
 uint32_t basf7100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint16_t addr = m_sod + (m_roll_offset * 16);
 
 	for (int y = 0; y < 24; y++)
 	{
+		uint8_t line_attr = 0x00;
+
 		for (int x = 0; x < 80; x++)
 		{
 			if (addr >= (m_sod + 0x780))
@@ -310,22 +312,63 @@ uint32_t basf7100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 			{
 				uint8_t data = m_chargen[(((code & 0x7f) << 4) + i)];
 
-				// wrong
-				if (BIT(code, 7))
+				// character attributes
+				bool inverse = false;
+				bool half = false;
+				bool underline = false;
+				bool blink = false;
+
+				// global attributes
+				if (BIT(m_highlight, 3) && BIT(code, 7))
+				{
+					inverse = bool(BIT(m_highlight, 4));
+					half = bool(BIT(m_highlight, 5));
+					underline = bool(BIT(m_highlight, 6));
+					blink = bool(BIT(m_highlight, 7));
+				}
+
+				// line attribute
+				if (BIT(m_highlight, 1))
+				{
+					// control characters
+					if ((code & 0x70) == 0x10)
+						line_attr = code & 0x0f;
+
+					inverse = bool(BIT(line_attr, 0));
+					half = bool(BIT(line_attr, 1));
+					underline = bool(BIT(line_attr, 2));
+					blink = bool(BIT(line_attr, 3));
+				}
+
+				// correct some issues because of the wrong charrom
+				if ((code & 0x7f) == 0 || ((code & 0x7f) >= 0x10 && (code & 0x7f) <= 0x14))
+					data = 0x00;
+
+				// display of control characters
+				if (BIT(m_highlight, 0) == 0 && (code & 0x60) == 0)
+					data = 0x00;
+
+				if (underline && i == 10)
+					data = 0xff;
+
+				if (blink && m_screen->frame_number() & 0x08) // timing?
+					data = 0x00;
+
+				if (inverse)
 					data ^= 0xff;
 
-				if (y == m_cursor_row && x == m_cursor_col)
-					data ^= 0xff;
+				if (y == m_cursor_row && x == m_cursor_col && m_screen->frame_number() & 0x08)
+					data = 0xff;
 
 				// 8 pixels of the character
-				bitmap.pix(y * 12 + i, x * 8 + 0) = BIT(data, 7) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(y * 12 + i, x * 8 + 1) = BIT(data, 6) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(y * 12 + i, x * 8 + 2) = BIT(data, 5) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(y * 12 + i, x * 8 + 3) = BIT(data, 4) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(y * 12 + i, x * 8 + 4) = BIT(data, 3) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(y * 12 + i, x * 8 + 5) = BIT(data, 2) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(y * 12 + i, x * 8 + 6) = BIT(data, 1) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(y * 12 + i, x * 8 + 7) = BIT(data, 0) ? rgb_t::white() : rgb_t::black();
+				bitmap.pix(y * 12 + i, x * 8 + 0) = palette[BIT(data, 7) ? 2 - (half ? 1 : 0) : 0];
+				bitmap.pix(y * 12 + i, x * 8 + 1) = palette[BIT(data, 6) ? 2 - (half ? 1 : 0) : 0];
+				bitmap.pix(y * 12 + i, x * 8 + 2) = palette[BIT(data, 5) ? 2 - (half ? 1 : 0) : 0];
+				bitmap.pix(y * 12 + i, x * 8 + 3) = palette[BIT(data, 4) ? 2 - (half ? 1 : 0) : 0];
+				bitmap.pix(y * 12 + i, x * 8 + 4) = palette[BIT(data, 3) ? 2 - (half ? 1 : 0) : 0];
+				bitmap.pix(y * 12 + i, x * 8 + 5) = palette[BIT(data, 2) ? 2 - (half ? 1 : 0) : 0];
+				bitmap.pix(y * 12 + i, x * 8 + 6) = palette[BIT(data, 1) ? 2 - (half ? 1 : 0) : 0];
+				bitmap.pix(y * 12 + i, x * 8 + 7) = palette[BIT(data, 0) ? 2 - (half ? 1 : 0) : 0];
 			}
 
 			// next char
@@ -510,7 +553,7 @@ void basf7100_state::basf7100(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_crt8002);
 
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	// floppy
 	FD1791(config, m_fdc, 1000000);
