@@ -331,9 +331,9 @@ void cyclemb_state::skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bi
 
 			if (flip_screen())
 			{
-				gfx->opaque(bitmap,cliprect,tile,color,1,1,504-x*8+scrollx,248-((y*8)-scrolly)&0xff);
-				gfx->opaque(bitmap,cliprect,tile,color,1,1,504-x*8+scrollx-480,248-((y*8)-scrolly)&0xff);
-				gfx->opaque(bitmap,cliprect,tile,color,1,1,504-x*8+scrollx+480,248-((y*8)-scrolly)&0xff);
+				gfx->opaque(bitmap,cliprect,tile,color,1,1,504-x*8+scrollx,(248-(y*8)-scrolly)&0xff);
+				gfx->opaque(bitmap,cliprect,tile,color,1,1,504-x*8+scrollx-480,(248-(y*8)-scrolly)&0xff);
+				gfx->opaque(bitmap,cliprect,tile,color,1,1,504-x*8+scrollx+480,(248-(y*8)-scrolly)&0xff);
 			}
 			else
 			{
