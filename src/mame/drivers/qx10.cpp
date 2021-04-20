@@ -112,8 +112,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( qx10_upd765_interrupt );
 	void fdd_motor_w(uint8_t data);
 	uint8_t qx10_30_r();
-	uint8_t gdc_dack_r();
-	void gdc_dack_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( tc_w );
 	uint8_t mc146818_r(offs_t offset);
 	void mc146818_w(offs_t offset, uint8_t data);
@@ -445,17 +443,6 @@ WRITE_LINE_MEMBER(qx10_state::dma_hrq_changed)
 	m_dma_1->hack_w(state);
 }
 
-uint8_t qx10_state::gdc_dack_r()
-{
-	logerror("GDC DACK read\n");
-	return 0;
-}
-
-void qx10_state::gdc_dack_w(uint8_t data)
-{
-	logerror("GDC DACK write %02x\n", data);
-}
-
 WRITE_LINE_MEMBER( qx10_state::tc_w )
 {
 	/* floppy terminal count */
@@ -674,6 +661,7 @@ void qx10_state::machine_start()
 void qx10_state::machine_reset()
 {
 	m_dma_1->dreq0_w(1);
+	m_dma_1->dreq1_w(1);
 
 	m_spkr_enable = 0;
 	m_pit1_out0 = 1;
@@ -836,11 +824,9 @@ void qx10_state::qx10(machine_config &config)
 	m_dma_1->in_memr_callback().set(FUNC(qx10_state::memory_read_byte));
 	m_dma_1->out_memw_callback().set(FUNC(qx10_state::memory_write_byte));
 	m_dma_1->in_ior_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_r));
-	m_dma_1->in_ior_callback<1>().set(FUNC(qx10_state::gdc_dack_r));
-	//m_dma_1->in_ior_callback<2>().set(m_hgdc, FUNC(upd7220_device::dack_r));
+	m_dma_1->in_ior_callback<1>().set(m_hgdc, FUNC(upd7220_device::dack_r));
 	m_dma_1->out_iow_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_w));
-	m_dma_1->out_iow_callback<1>().set(FUNC(qx10_state::gdc_dack_w));
-	//m_dma_1->out_iow_callback<2>().set(m_hgdc, FUNC(upd7220_device::dack_w));
+	m_dma_1->out_iow_callback<1>().set(m_hgdc, FUNC(upd7220_device::dack_w));
 	AM9517A(config, m_dma_2, MAIN_CLK/4);
 
 	I8255(config, m_ppi, 0);
@@ -849,6 +835,7 @@ void qx10_state::qx10(machine_config &config)
 	m_hgdc->set_addrmap(0, &qx10_state::upd7220_map);
 	m_hgdc->set_display_pixels(FUNC(qx10_state::hgdc_display_pixels));
 	m_hgdc->set_draw_text(FUNC(qx10_state::hgdc_draw_text));
+	m_hgdc->drq_wr_callback().set(m_dma_1, FUNC(am9517a_device::dreq1_w)).invert();
 	m_hgdc->set_screen("screen");
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
