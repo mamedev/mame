@@ -715,7 +715,7 @@ GFXDECODE_END
 void qx10_state::video_start()
 {
 	// allocate memory
-	m_video_ram = make_unique_clear<uint16_t[]>(0x30000);
+	m_video_ram = make_unique_clear<uint16_t[]>(0x60000);
 }
 
 void qx10_state::qx10_palette(palette_device &palette) const
