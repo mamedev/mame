@@ -2,21 +2,21 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************************************
 
-    Cycle Maabou (c) 1984 Taito Corporation / Seta
-    Sky Destroyer (c) 1985 Taito Corporation
+Cycle Maabou (c) 1984 Taito Corporation / Seta
+Sky Destroyer (c) 1985 Taito Corporation
 
-    appears to be in the exact middle between the gsword / josvolly HW and the ppking / gladiator HW
+appears to be in the exact middle between the gsword / josvolly HW and the ppking / gladiator HW
 
-    driver by Angelo Salese
+driver by Angelo Salese
 
-    TODO:
-    - separate driver into 2 classes
-    - reduce tagmap lookups
-    - sound (controlled by three i8741);
-    - coinage (controlled by i8741, like Gladiator / Ougon no Shiro);
-    - color prom resistor network is guessed, cyclemb yellows are more reddish on pcb video and photos;
+TODO:
+- separate driver into 2 classes
+- reduce tagmap lookups
+- sound (controlled by three i8741);
+- coinage (controlled by i8741, like Gladiator / Ougon no Shiro);
+- color prom resistor network is guessed, cyclemb yellows are more reddish on pcb video and photos;
 
-    BTANB verified on pcb: cyclemb standing cones are reddish-yellow/black instead of red/white
+BTANB verified on pcb: cyclemb standing cones are reddish-yellow/black instead of red/white
 
 =====================================================================================================
 
@@ -62,7 +62,6 @@ P2.4E        [70a09cc5] /
 
 P0_3.11T     [be89c1f7] 82S129
 P0_4.11U     [4886d832] /
-
 
 
 --- Team Japump!!! ---
@@ -241,16 +240,6 @@ void cyclemb_state::cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bi
 }
 
 
-	/*
-	bank 1
-	xxxx xxxx [0] sprite offset
-	---x xxxx [1] color offset
-	bank 2
-	xxxx xxxx [0] y offs
-	xxxx xxxx [1] x offs
-	bank 3
-	---- ---x [1] sprite enable flag?
-	*/
 void cyclemb_state::cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t col,fx,fy,region;
@@ -270,6 +259,20 @@ void cyclemb_state::cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 
 	for(i=0+page_start;i<0x80+page_start;i+=2)
 	{
+		/*** sprite format: ***
+
+		bank 1
+		xxxx xxxx [0] sprite offset
+		---x xxxx [1] color offset
+
+		bank 2
+		xxxx xxxx [0] y offs
+		xxxx xxxx [1] x offs
+
+		bank 3
+		---- ---x [1] sprite enable flag?
+		*/
+
 		y = 0xf1 - m_obj2_ram[i];
 		x = m_obj2_ram[i+1] - 56;
 		spr_offs = (m_obj1_ram[i+0]);
@@ -305,7 +308,6 @@ void cyclemb_state::skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bi
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int x,y;
 
-
 	for (y=0;y<32;y++)
 	{
 		for (x=2;x<62;x++)
@@ -332,7 +334,6 @@ void cyclemb_state::skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bi
 			else
 				scrolly = m_vram[(x-32)*64+1];
 
-
 			if (flip_screen())
 			{
 				gfx->opaque(bitmap,cliprect,tile,color,1,1,504-x*8+scrollx, 248-(((y*8)-scrolly)&0xff));
@@ -345,22 +346,9 @@ void cyclemb_state::skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bi
 				gfx->opaque(bitmap,cliprect,tile,color,0,0,x*8+scrollx-480,((y*8)-scrolly)&0xff);
 				gfx->opaque(bitmap,cliprect,tile,color,0,0,x*8+scrollx+480,((y*8)-scrolly)&0xff);
 			}
-
-
 		}
 	}
 }
-
-/*
-    bank 1
-    xxxx xxxx [0] sprite offset
-    ---x xxxx [1] color offset
-    bank 2
-    xxxx xxxx [0] y offs
-    xxxx xxxx [1] x offs
-    bank 3
-    ---- ---x [1] sprite enable flag?
-*/
 
 void cyclemb_state::skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -374,6 +362,20 @@ void cyclemb_state::skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 
 	for(i=0+page_start;i<0x80+page_start;i+=2)
 	{
+		/*** sprite format ***
+
+		bank 1
+		xxxx xxxx [0] sprite offset
+		---x xxxx [1] color offset
+
+		bank 2
+		xxxx xxxx [0] y offs
+		xxxx xxxx [1] x offs
+
+		bank 3
+		---- ---x [1] sprite enable flag?
+		*/
+
 		y = m_obj2_ram[i] - 1;
 		x = m_obj2_ram[i+1];
 
@@ -392,7 +394,6 @@ void cyclemb_state::skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		//  spr_offs += ((m_obj3_ram[i+0] & 3) << 5);
 			x-=16;
 		}
-
 
 		fx = (m_obj3_ram[i+0] & 4) >> 2;
 		fy = (m_obj3_ram[i+0] & 8) >> 3;
@@ -733,7 +734,7 @@ void cyclemb_state::machine_start()
 
 	save_item(NAME(m_screen_display));
 	save_item(NAME(m_sprite_page));
-	
+
 	cyclemb_dial_reset();
 	m_screen_display = true;
 	m_sprite_page = 0;
@@ -1058,6 +1059,12 @@ ROM_START( cyclemb )
 	ROM_LOAD( "p0_15.10c",   0x0000, 0x2000, CRC(9cc52c32) SHA1(05d4e7c8ce8fdfc995013c0ed693b4d4778acc25) )
 	ROM_LOAD( "p0_16.10d",   0x2000, 0x2000, CRC(8d03227e) SHA1(7e90437cbe5e854025e799348bb2cbca98368bd9) )
 
+	ROM_REGION( 0x0400, "mcu1", 0 )
+	ROM_LOAD( "ap_002.7b", 0x00000, 0x0400, NO_DUMP )
+
+	ROM_REGION( 0x0400, "mcu2", 0 )
+	ROM_LOAD( "ap-003.7c", 0x00000, 0x0400, NO_DUMP )
+
 	ROM_REGION( 0x4000, "tilemap_data", 0 )
 	ROM_LOAD( "p0_21.3e",   0x0000, 0x2000, CRC(a7dab6d8) SHA1(c5802e76abd394a2ce1526815bfbfc12e5e57587) )
 	ROM_LOAD( "p0_20.3d",   0x2000, 0x2000, CRC(53e3a36e) SHA1(d95c1dfe216bb8b1f3e14c72a480eb2befa9d1dd) )
@@ -1151,5 +1158,7 @@ void cyclemb_state::init_skydest()
 	m_use_dial = false;
 }
 
-GAME( 1984, cyclemb, 0, cyclemb,  cyclemb, cyclemb_state, init_cyclemb, ROT0, "Taito Corporation", "Cycle Maabou (Japan)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, skydest, 0, skydest,  skydest, cyclemb_state, init_skydest, ROT0, "Taito Corporation", "Sky Destroyer (Japan)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+
+//    year  name      parent  machine   input    class          init          rot   company              fullname                 flags
+GAME( 1984, cyclemb,  0,      cyclemb,  cyclemb, cyclemb_state, init_cyclemb, ROT0, "Taito Corporation", "Cycle Maabou (Japan)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, skydest,  0,      skydest,  skydest, cyclemb_state, init_skydest, ROT0, "Taito Corporation", "Sky Destroyer (Japan)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
