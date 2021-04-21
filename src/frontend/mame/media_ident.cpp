@@ -209,12 +209,12 @@ void media_identifier::digest_file(std::vector<file_info> &info, char const *pat
 		m_total++;
 		if (err != CHDERR_NONE)
 		{
-			osd_printf_info("%-20sNOT A CHD\n", core_filename_extract_base(path));
+			osd_printf_info("%-20s NOT A CHD\n", core_filename_extract_base(path));
 			m_nonroms++;
 		}
 		else if (!chd.compressed())
 		{
-			osd_printf_info("%-20sis a writeable CHD\n", core_filename_extract_base(path));
+			osd_printf_info("%-20s is a writeable CHD\n", core_filename_extract_base(path));
 		}
 		else
 		{
@@ -404,7 +404,7 @@ void media_identifier::print_results(std::vector<file_info> const &info)
 {
 	for (file_info const &file : info)
 	{
-		osd_printf_info("%-20s", core_filename_extract_base(file.name()));
+		osd_printf_info("%-20s ", core_filename_extract_base(file.name()));
 		if (file.matches().empty())
 		{
 			osd_printf_info("NO MATCH\n");
@@ -416,10 +416,10 @@ void media_identifier::print_results(std::vector<file_info> const &info)
 			for (match_data const &match : file.matches())
 			{
 				if (!first)
-					osd_printf_info("%-20s", "");
+					osd_printf_info("%-20s ", "");
 				first = false;
 				osd_printf_info(
-						"= %s%-20s  %-10s %s%s\n",
+						"= %s%-20s  %-10s  %s%s\n",
 						match.bad() ? "(BAD) " : "",
 						match.romname().c_str(),
 						match.shortname().c_str(),

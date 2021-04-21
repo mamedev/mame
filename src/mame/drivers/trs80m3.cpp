@@ -384,8 +384,8 @@ void trs80m3_state::model3(machine_config &config)
 	m_fdc->drq_wr_callback().set(FUNC(trs80m3_state::drq_w));
 
 	// Internal drives
-	FLOPPY_CONNECTOR(config, "fdc:0", trs80_floppies, "40t_dd", trs80m3_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", trs80_floppies, "40t_dd", trs80m3_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], trs80_floppies, "40t_dd", trs80m3_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], trs80_floppies, "40t_dd", trs80m3_state::floppy_formats).enable_sound(true);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit7));

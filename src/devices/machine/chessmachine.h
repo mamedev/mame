@@ -46,11 +46,11 @@ private:
 
 	devcb_write_line m_data_out;
 
-	u8 m_latch[2];
+	u8 m_latch[2] = { 0, 0 };
 	void sync0_callback(void *ptr, s32 param);
 	void sync1_callback(void *ptr, s32 param);
 
-	bool m_bootrom_enabled;
+	bool m_bootrom_enabled = false;
 	void install_bootrom(bool enable);
 	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
 	u32 disable_bootrom_r();

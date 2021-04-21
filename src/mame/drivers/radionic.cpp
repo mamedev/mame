@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
 /***************************************************************************
-Komtek 1 (Radionic) memory map
+Komtek 1 (Radionic R1001) memory map
 
 0000-37ff ROM                            R   D0-D7
 37de      UART status                    R/W D0-D7
@@ -25,14 +25,10 @@ Komtek 1 (Radionic) memory map
 37ef      data                           R/W D0-D7
 3800-38ff keyboard matrix                R   D0-D7
 3900-3bff unused - kbd mirrored
-3c00-3fff video RAM                      R/W D0-D5,D7 (or D0-D7)
-4000-ffff RAM
+3c00-3fff static video RAM and colour ram, banked
+4000-ffff dynamic main RAM
 
-Interrupts:
-IRQ mode 1
-NMI
-
-Printer: Level II usually 37e8
+Printer: Usually 37e8, but you can use the PPI instead.
 
 Cassette baud rate: 500 baud
 
@@ -44,7 +40,7 @@ FF:
 - bit 6 remembers the 32/64 screen mode (inverted)
 - bit 7 is for reading from a cassette
 
-Shift and Right-arrow will enable 32 cpl, if the hardware allows it.
+Shift and Right-arrow will enable 32 cpl.
 
 SYSTEM commands:
     - Press Break (End key) to quit
@@ -53,34 +49,71 @@ SYSTEM commands:
     - / to execute last program loaded
     - /nnnnn to execute program at nnnnn (decimal)
 
-About the RTC - The time is incremented while ever the cursor is flashing. It is stored in a series
-    of bytes in the computer's work area. The bytes are in a certain order, this is:
-    seconds, minutes, hours, year, day, month. The seconds are stored at 0x4041.
-    A reboot always sets the time to zero.
+Inbuilt Monitor - its existence is not revealed to the user.
+    - SYSTEM then /12710 = enter machine-language monitor
+    Monitor commands:
+    - B : return to Basic
+    - Dnnnn : Dump hex to screen. Press down-arrow for more. Press enter to quit.
+    - Mnnnn : Modify memory. Enter new byte and it increments to next address. X to quit.
+    - Gnnnn : Execute program at nnnn
+    - Gnnnn,tttt : as above, breakpoint at tttt
+    - R : modify registers
+    The monitor appears to end at 33D3, however the rom contains more code through to 35EB.
+    But, the 34xx area is overwitten by the optional RS-232 expansion box.
 
-Radionic has 16 colours with a byte at 350B controlling the operation. See manual.
+About the RTC - The time is incremented while it is enabled via the Machine Configuration. The time
+    is stored in a series of bytes in the computer's work area. The bytes are in a certain order,
+    this being: seconds, minutes, hours, days. The seconds are stored at 0x4041. A reboot always
+    sets the time to zero.
 
+About colours - The computer has 16 colours with a byte at 350B controlling the operation.
+    POKE 13579,2  : monochrome
+    POKE 13579,4  : programmable colour
+    POKE 13579,12 : automatic colour
+    More information was discovered, this being
+    - It doesn't have to be 350B (13579), anything in the 35xx range will do.
+    - d0 : write of vram goes to vram (0 = yes, 1 = no)
+    - d1 : write of vram goes to colour ram (0 = yes, 1 = no)
+    - d2 : colour enable (0 = monochrome, 1 = colour)
+    - d3 : programmable or automatic (0 = programmable, 1 = automatic)
+    The colour codes and names are listed in the palette below. The descriptions are quite vague,
+    and appear to be background only. The foreground is assumed to always be white.
+    Automatic is a preset colour set by internal jumpers.
+    - No schematic or technical info for the colour board
+    - No information on the settings of the Automatic mode
+    - The "User Friendly Manual" has a bunch of mistakes (page 15).
+    - It's not known if colour ram can be read. But LDOS won't scroll if it can't always read vram.
+    - No colour programs exist in the wild, so nothing can be verified.
+    So, some guesswork has been done.
+
+About the PPI - A selling point of this computer was the ability to sense and control external gadgets.
+    For example, it could join to a temperature sensor, and when the temperature reached a certain value
+    the computer could instruct a device to turn on or off. There's 4 input jacks and 6 output jacks.
+    The PPI can also control a parallel printer. To enable this, enter SYSTEM then /12367 .
+
+About the RS-232 unit - This is an external box that plugs into the expansion port. It takes over memory
+    region 3400-34FF, although it only uses 3400 and 3401. It has a baud generator consisting of 2x 74LS163
+    and a dipswitch block to choose one of 5 possible rates. The UART and RS-232 parts are conventional.
+    There's no programming of the unit from the inbuilt roms; you need to write your own.
 
 ********************************************************************************************************
 
 To Do / Status:
 --------------
 
-- For those machines that allow it, add cass2 as an image device and hook it up.
 - Difficulty loading real tapes.
 - Writing to floppy is problematic; freezing/crashing are common issues.
-
-radionic:  works
-           floppy not working (@6C0, DRQ never gets set)
-           add colour
-           expansion-box?
-           uart
+- Add fdc doubler (only some info available)
 
 *******************************************************************************************************/
 
 #include "emu.h"
 #include "includes/trs80.h"
+#include "machine/i8251.h"
 #include "machine/i8255.h"
+#include "machine/clock.h"
+#include "bus/rs232/rs232.h"
+#define MASTER_XTAL 12164800
 
 
 class radionic_state : public trs80_state
@@ -89,50 +122,47 @@ public:
 	radionic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: trs80_state(mconfig, type, tag)
 		, m_ppi(*this, "ppi")
+		, m_uart2(*this, "uart2")
+		, m_clock(*this, "uclock")
 	{ }
 
 	void radionic(machine_config &config);
 
 private:
+	INTERRUPT_GEN_MEMBER(rtc_via_nmi);
+	void radionic_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
+	std::unique_ptr<u8[]> m_vram;  // video ram
+	std::unique_ptr<u8[]> m_cram;  // colour ram
+	void machine_start() override;
+	void machine_reset() override;
+	void cctrl_w(offs_t offset, u8 data);
+	void video_w(offs_t offset, u8 data);
+	u8 video_r(offs_t offset);
+	void ppi_pa_w(offs_t offset, u8 data);
+	void ppi_pb_w(offs_t offset, u8 data);
+	void ppi_pc_w(offs_t offset, u8 data);
+	u8 ppi_pc_r(offs_t offset);
 	void mem_map(address_map &map);
-	void io_map(address_map &map);
-
 	static void floppy_formats(format_registration &fr);
-
+	u8 m_cctrl = 2;
 	required_device<i8255_device> m_ppi;
+	required_device<i8251_device> m_uart2;
+	required_device<clock_device> m_clock;
 };
 
 void radionic_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x37ff).rom();
-	// Optional external RS232 module with 8251
-	//map(0x3400, 0x3401).mirror(0xfe).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
-	// Internal colour controls (need details)
-	//map(0x3500, 0x35ff).w(FUNC(radionic_state::colour_w));
-	// Internal interface to external slots
-	map(0x3600, 0x3603).mirror(0xfc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x37de, 0x37de).rw(FUNC(radionic_state::sys80_f9_r), FUNC(radionic_state::sys80_f8_w));
-	map(0x37df, 0x37df).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
+	map(0x3400, 0x3401).mirror(0xfe).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));  // optional RS-232
+	map(0x3500, 0x35ff).w(FUNC(radionic_state::cctrl_w));
+	map(0x3600, 0x3603).mirror(0xfc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));  // interface to external sensors
 	map(0x37e0, 0x37e3).rw(FUNC(radionic_state::irq_status_r), FUNC(radionic_state::motor_w));
-	map(0x37e4, 0x37e7).w(FUNC(radionic_state::cassunit_w));
 	map(0x37e8, 0x37eb).rw(FUNC(radionic_state::printer_r), FUNC(radionic_state::printer_w));
 	map(0x37ec, 0x37ef).rw(FUNC(radionic_state::fdc_r), FUNC(radionic_state::fdc_w));
 	map(0x3800, 0x3bff).r(FUNC(radionic_state::keyboard_r));
-	map(0x3c00, 0x3fff).ram().share(m_p_videoram);
+	map(0x3c00, 0x3fff).rw(FUNC(radionic_state::video_r), FUNC(radionic_state::video_w));
 	map(0x4000, 0xffff).ram();
-}
-
-void radionic_state::io_map(address_map &map)
-{
-	map.global_mask(0xff);
-	map.unmap_value_high();
-	map(0xe8, 0xe8).rw(FUNC(radionic_state::port_e8_r), FUNC(radionic_state::port_e8_w));
-	map(0xe9, 0xe9).portr("E9").w("brg", FUNC(com8116_device::stt_str_w));
-	map(0xea, 0xea).rw(FUNC(radionic_state::port_ea_r), FUNC(radionic_state::port_ea_w));
-	map(0xeb, 0xeb).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
-	map(0xff, 0xff).rw(FUNC(radionic_state::port_ff_r), FUNC(radionic_state::port_ff_w));
 }
 
 /**************************************************************************
@@ -236,27 +266,52 @@ static INPUT_PORTS_START( radionic )
 	PORT_BIT(0xfe, 0x00, IPT_UNUSED)
 
 	PORT_START("CONFIG")
-	PORT_CONFNAME(    0x80, 0x00,   "Floppy Disc Drives")
-	PORT_CONFSETTING(   0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(   0x80, DEF_STR( On ) )
-	PORT_BIT(0x7f, 0x7f, IPT_UNUSED)
-
-	PORT_START("E9")    // these are the power-on uart settings
-	PORT_BIT(0x07, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x88, 0x08, "Parity")
-	PORT_DIPSETTING(    0x08, DEF_STR(None))
-	PORT_DIPSETTING(    0x00, "Odd")
-	PORT_DIPSETTING(    0x80, "Even")
-	PORT_DIPNAME( 0x10, 0x10, "Stop Bits")
-	PORT_DIPSETTING(    0x10, "2")
-	PORT_DIPSETTING(    0x00, "1")
-	PORT_DIPNAME( 0x60, 0x60, "Bits")
-	PORT_DIPSETTING(    0x00, "5")
-	PORT_DIPSETTING(    0x20, "6")
-	PORT_DIPSETTING(    0x40, "7")
-	PORT_DIPSETTING(    0x60, "8")
+	PORT_CONFNAME(  0xc0, 0x00, "Floppy and RTC") // Floppy doesn't work if RTC is on, so interlink them.
+	PORT_CONFSETTING(   0x00, "Both Off" )
+	PORT_CONFSETTING(   0x80, "RTC off, Floppy On" )
+	PORT_CONFSETTING(   0x40, "RTC on, Floppy Off" )
+	PORT_CONFNAME(  0x30, 0x00, "Colour")  // 2 switches on the side
+	PORT_CONFSETTING(   0x00, "Monochrome" )
+	PORT_CONFSETTING(   0x10, "Auto Colour" )
+	PORT_CONFSETTING(   0x30, "Programmable Colour" )
+	PORT_CONFNAME(  0x07, 0x00, "Serial Port" ) // a jumper on the board? (not documented)
+	PORT_CONFSETTING(   0x00, "300 baud" )
+	PORT_CONFSETTING(   0x01, "600 baud" )
+	PORT_CONFSETTING(   0x02, "1200 baud" )
+	PORT_CONFSETTING(   0x03, "2400 baud" )
+	PORT_CONFSETTING(   0x04, "4800 baud" )
 INPUT_PORTS_END
 
+
+/* Levels are unknown - guessing */
+static constexpr rgb_t radionic_pens[] =
+{
+	// colour
+	{ 200, 200, 200 }, // 0 off white
+	{   0, 255,   0 }, // 1 light green
+	{ 255,   0,   0 }, // 2 red
+	{   0, 128,   0 }, // 3 dark green
+	{   0,   0, 255 }, // 4 blue
+	{   0, 255, 255 }, // 5 greenish blue
+	{ 255,   3,  62 }, // 6 rose red
+	{ 136, 155, 174 }, // 7 dusty blue
+	{ 200, 200,   0 }, // 8 greenish yellow
+	{ 173, 255,  47 }, // 9 light yellow (greenish)
+	{ 207,  33,  33 }, // 10 golden red
+	{ 128, 128, 128 }, // 11 grey
+	{ 220, 255,   0 }, // 12 reddish green
+	{ 255, 255, 191 }, // 13 pale yellow
+	{ 247, 170,   0 }, // 14 orange
+	{  90, 156,  57 }, // 15 ogre green
+	// monochrome
+	{ 250, 250, 250 }, // 16 white
+	{   0,   0,   0 }  // 17 black
+};
+
+void radionic_state::radionic_palette(palette_device &palette) const
+{
+	palette.set_pen_colors(0, radionic_pens);
+}
 
 /**************************** F4 CHARACTER DISPLAYER ***********************************************************/
 static const gfx_layout radionic_charlayout =
@@ -282,6 +337,12 @@ uint32_t radionic_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	uint16_t sy=0,ma=0;
 	uint8_t cols = BIT(m_mode, 0) ? 32 : 64;
 	uint8_t skip = BIT(m_mode, 0) ? 2 : 1;
+	// colours have to be enabled both by a poke and by switches on the side of the unit
+	bool col_en = BIT(m_cctrl, 2) && BIT(m_io_config->read(), 4);
+	bool auto_en = BIT(m_cctrl, 3) || !BIT(m_io_config->read(), 5);
+	u8 fg = 16, bg = 17;   // monochrome
+	if (col_en && auto_en)
+		bg = 4;    // automatic colour
 
 	if (m_mode != m_size_store)
 	{
@@ -297,25 +358,106 @@ uint32_t radionic_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 			for (uint16_t x = ma; x < ma + 64; x+=skip)
 			{
-				uint8_t chr = m_p_videoram[x];
+				uint8_t chr = m_vram[x];
+				if (col_en && !auto_en)
+					bg = m_cram[x] & 15;
 
 				/* get pattern of pixels for that character scanline */
 				uint8_t gfx = m_p_chargen[(chr<<3) | (ra & 7) | (ra & 8) << 8];
 
 				/* Display a scanline of a character (8 pixels) */
-				*p++ = BIT(gfx, 0);
-				*p++ = BIT(gfx, 1);
-				*p++ = BIT(gfx, 2);
-				*p++ = BIT(gfx, 3);
-				*p++ = BIT(gfx, 4);
-				*p++ = BIT(gfx, 5);
-				*p++ = BIT(gfx, 6);
-				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 0) ? fg : bg;
+				*p++ = BIT(gfx, 1) ? fg : bg;
+				*p++ = BIT(gfx, 2) ? fg : bg;
+				*p++ = BIT(gfx, 3) ? fg : bg;
+				*p++ = BIT(gfx, 4) ? fg : bg;
+				*p++ = BIT(gfx, 5) ? fg : bg;
+				*p++ = BIT(gfx, 6) ? fg : bg;
+				*p++ = BIT(gfx, 7) ? fg : bg;
 			}
 		}
 		ma+=64;
 	}
 	return 0;
+}
+
+void radionic_state::machine_start()
+{
+	trs80_state::machine_start();
+	save_item(NAME(m_cctrl));
+
+	// video ram
+	m_vram = make_unique_clear<u8[]>(0x0800);
+	save_pointer(NAME(m_vram), 0x0800);
+
+	// colour
+	m_cram = make_unique_clear<u8[]>(0x0800);
+	save_pointer(NAME(m_cram), 0x0800);
+}
+
+void radionic_state::machine_reset()
+{
+	trs80_state::machine_reset();
+	m_cctrl = 2;
+
+	u8 sw = m_io_config->read() & 7;
+	u16 baud = 300;
+	for (u8 i = 0; i < sw; i++)
+		baud <<= 1;
+	m_clock->set_unscaled_clock(baud*16); // It's designed on the assumption that the uart will divide by 16
+	//printf("%d\n",baud);
+}
+
+INTERRUPT_GEN_MEMBER(radionic_state::rtc_via_nmi)
+{
+	if (BIT(m_io_config->read(), 6))
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::from_usec(100));
+}
+
+u8 radionic_state::video_r(offs_t offset)
+{
+	return m_vram[offset];
+}
+
+void radionic_state::video_w(offs_t offset, u8 data)
+{
+	if (!BIT(m_cctrl, 0))
+		m_vram[offset] = data;
+	if (!BIT(m_cctrl, 1))
+		m_cram[offset] = data;
+}
+
+void radionic_state::cctrl_w(offs_t offset, u8 data)
+{
+	m_cctrl = data & 15;
+}
+
+void radionic_state::ppi_pa_w(offs_t offset, u8 data)
+{
+	// d0-7: Data to extra printer
+}
+
+void radionic_state::ppi_pb_w(offs_t offset, u8 data)
+{
+	// d0-7: Outputs to control jacks (only 6 connected up by default)
+}
+
+void radionic_state::ppi_pc_w(offs_t offset, u8 data)
+{
+	// Printer control
+	// d0: Strobe
+}
+
+u8 radionic_state::ppi_pc_r(offs_t offset)
+{
+	// Printer Status
+	// d1: Busy
+	// d2: out of paper
+	// d3: Unit select
+
+	// Sensor Status
+	// d4-7: sensing inputs
+	return 0xFF;
 }
 
 void radionic_state::floppy_formats(format_registration &fr)
@@ -334,28 +476,23 @@ static void radionic_floppies(device_slot_interface &device)
 	device.option_add("80t_qd", FLOPPY_525_QD);
 }
 
-
 void radionic_state::radionic(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 3579000 / 2);
-	//m_maincpu->set_clock(12_MHz_XTAL / 6); // or 3.579MHz / 2 (selectable?)
+	// Photos from Incog show 12.1648, and 3.579545 xtals. The schematic seems to just approximate these values.
+	Z80(config, m_maincpu, 3.579545_MHz_XTAL / 2);
+	//m_maincpu->set_clock(MASTER_XTAL / 6); // early machines only, before the floppy interface was added
 	m_maincpu->set_addrmap(AS_PROGRAM, &radionic_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &radionic_state::io_map);
-	// Komtek I "User Friendly Manual" calls for "Z80 running at 1.97 MHz." This likely refers to an alternate NTSC version
-	// whose master clock was approximately 11.8005 MHz (6 times ~1.966 MHz and 750 times 15.734 kHz). Though the schematics
-	// provide the main XTAL frequency as 12 MHz, that they also include a 3.579 MHz XTAL suggests this possibility.
-	m_maincpu->set_periodic_int(FUNC(radionic_state::rtc_interrupt), attotime::from_hz(40));
-	m_maincpu->set_periodic_int(FUNC(radionic_state::nmi_line_pulse), attotime::from_hz(12_MHz_XTAL / 12 / 16384));
+	m_maincpu->set_addrmap(AS_IO, &radionic_state::trs80_io);
+	m_maincpu->set_periodic_int(FUNC(radionic_state::rtc_via_nmi), attotime::from_hz(MASTER_XTAL / 12 / 16384));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(12_MHz_XTAL, 768, 0, 512, 312, 0, 256);
+	screen.set_raw(MASTER_XTAL, 768, 0, 512, 312, 0, 256);
 	screen.set_screen_update(FUNC(radionic_state::screen_update));
 	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_radionic);
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	PALETTE(config, "palette", FUNC(radionic_state::radionic_palette), 18);   // 16 colours + monochrome
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -369,13 +506,13 @@ void radionic_state::radionic(machine_config &config)
 
 	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(radionic_state::quickload_cb));
 
-	FD1771(config, m_fdc, 4_MHz_XTAL / 4);
+	FD1771(config, m_fdc, 16_MHz_XTAL / 16);
 	m_fdc->intrq_wr_callback().set(FUNC(radionic_state::intrq_w));
 
-	FLOPPY_CONNECTOR(config, "fdc:0", radionic_floppies, "80t_qd", radionic_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", radionic_floppies, "80t_qd", radionic_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:2", radionic_floppies, nullptr, radionic_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:3", radionic_floppies, nullptr, radionic_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], radionic_floppies, "80t_qd", radionic_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], radionic_floppies, "80t_qd", radionic_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[2], radionic_floppies, nullptr, radionic_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[3], radionic_floppies, nullptr, radionic_state::floppy_formats).enable_sound(true);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit7));
@@ -388,23 +525,26 @@ void radionic_state::radionic(machine_config &config)
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
 
-	com8116_device &brg(COM8116(config, "brg", 5.0688_MHz_XTAL));   // BR1941L
-	brg.fr_handler().set(m_uart, FUNC(ay31015_device::write_rcp));
-	brg.ft_handler().set(m_uart, FUNC(ay31015_device::write_tcp));
+	CLOCK(config, m_clock, 4'800);
+	m_clock->signal_handler().set(m_uart2, FUNC(i8251_device::write_txc));
+	m_clock->signal_handler().set(m_uart2, FUNC(i8251_device::write_rxc));
 
-	AY31015(config, m_uart);
-	m_uart->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
-	m_uart->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
-	//MCFG_AY31015_WRITE_DAV_CB(WRITELINE( , , ))
-	m_uart->set_auto_rdav(true);
-	RS232_PORT(config, "rs232", default_rs232_devices, nullptr);
+	// RS232 port: the schematic is missing most of the info, so guessing
+	I8251(config, m_uart2, 3.579545_MHz_XTAL / 2 );
+	m_uart2->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_uart2->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_uart2->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart2, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(m_uart2, FUNC(i8251_device::write_dsr));
 
 	// Interface to external circuits
 	I8255(config, m_ppi);
-	//m_ppi->in_pc_callback().set(FUNC(pulsar_state::ppi_pc_r));      // Sensing from external and printer status
-	//m_ppi->out_pa_callback().set(FUNC(pulsar_state::ppi_pa_w));    // Data for external plugin printer module
-	//m_ppi->out_pb_callback().set(FUNC(pulsar_state::ppi_pb_w));    // Control data to external
-	//m_ppi->out_pc_callback().set(FUNC(pulsar_state::ppi_pc_w));    // Printer strobe
+	m_ppi->in_pc_callback().set(FUNC(radionic_state::ppi_pc_r));      // Sensing from external and printer status
+	m_ppi->out_pa_callback().set(FUNC(radionic_state::ppi_pa_w));    // Data for external plugin printer module
+	m_ppi->out_pb_callback().set(FUNC(radionic_state::ppi_pb_w));    // Control data to external
+	m_ppi->out_pc_callback().set(FUNC(radionic_state::ppi_pc_w));    // Printer strobe
 }
 
 
@@ -427,5 +567,5 @@ ROM_START(radionic)
 ROM_END
 
 
-//    YEAR  NAME         PARENT   COMPAT   MACHINE   INPUT     CLASS           INIT           COMPANY         FULLNAME         FLAGS
-COMP( 1983, radionic,    0,       trs80l2, radionic, radionic, radionic_state, empty_init,    "Komtek",       "Radionic",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME         PARENT   COMPAT   MACHINE   INPUT     CLASS           INIT           COMPANY     FULLNAME                    FLAGS
+COMP( 1983, radionic,    0,       trs80l2, radionic, radionic, radionic_state, empty_init,    "Komtek",   "Radionic R1001/Komtek 1",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -8,7 +8,7 @@ license:CC0
 
 	<element name="digit" defstate="0">
 		<led7seg>
-			<color red="0.2" green="0.16" blue="0.16" />
+			<color red="0.200" green="0.164" blue="0.169" />
 		</led7seg>
 	</element>
 	<element name="led" defstate="0">
@@ -66,22 +66,22 @@ license:CC0
 	<element name="sym_colon">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text state="0" string=":"> <color red="0.49412" green="0.51765" blue="0.51765" /></text>
-		<text state="1" string=":"> <color red="0.2" green="0.16" blue="0.16" /></text>
+		<text state="1" string=":"> <color red="0.200" green="0.164" blue="0.169" /></text>
 	</element>
 	<element name="sym_left">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text state="0" string="&#x2190;">  <color red="0.49412" green="0.51765" blue="0.51765" /></text>
-		<text state="1" string="&#x2190;">  <color red="0.2" green="0.16" blue="0.16" /></text>
+		<text state="1" string="&#x2190;">  <color red="0.200" green="0.164" blue="0.169" /></text>
 	</element>
 	<element name="sym_right">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text state="0" string="&#x2192;">  <color red="0.49412" green="0.51765" blue="0.51765" /></text>
-		<text state="1" string="&#x2192;">  <color red="0.2" green="0.16" blue="0.16" /></text>
+		<text state="1" string="&#x2192;">  <color red="0.200" green="0.164" blue="0.169" /></text>
 	</element>
 	<element name="sym_white">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text state="0" string="&#x25cb;">  <color red="0.49412" green="0.51765" blue="0.51765" /></text>
-		<text state="1" string="&#x25cb;">  <color red="0.2" green="0.16" blue="0.16" /></text>
+		<text state="1" string="&#x25cb;">  <color red="0.200" green="0.164" blue="0.169" /></text>
 	</element>
 	<element name="sym_black">
 		<rect><color red="1.0" green="1.0" blue="1.0" /></rect>

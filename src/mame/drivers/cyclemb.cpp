@@ -2,20 +2,21 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************************************
 
-    Cycle Maabou (c) 1984 Taito Corporation / Seta
-    Sky Destroyer (c) 1985 Taito Corporation
+Cycle Maabou (c) 1984 Taito Corporation / Seta
+Sky Destroyer (c) 1985 Taito Corporation
 
-    appears to be in the exact middle between the gsword / josvolly HW and the ppking / gladiator HW
+appears to be in the exact middle between the gsword / josvolly HW and the ppking / gladiator HW
 
-    driver by Angelo Salese
+driver by Angelo Salese
 
-    TODO:
-    - inputs in Cycle Maabou (weird dial/positional input);
-    - sound (controlled by three i8741);
-    - add flipscreen;
-    - color prom resistor network is guessed, cyclemb yellows are more reddish on pcb video and photos;
+TODO:
+- separate driver into 2 classes
+- reduce tagmap lookups
+- sound (controlled by three i8741);
+- coinage (controlled by i8741, like Gladiator / Ougon no Shiro);
+- color prom resistor network is guessed, cyclemb yellows are more reddish on pcb video and photos;
 
-    BTANB verified on pcb: cyclemb standing cones are reddish-yellow/black instead of red/white
+BTANB verified on pcb: cyclemb standing cones are reddish-yellow/black instead of red/white
 
 =====================================================================================================
 
@@ -63,7 +64,6 @@ P0_3.11T     [be89c1f7] 82S129
 P0_4.11U     [4886d832] /
 
 
-
 --- Team Japump!!! ---
 Dumped by Chack'n
 27/Nov/2009
@@ -96,7 +96,7 @@ public:
 		m_obj1_ram(*this, "obj1_ram"),
 		m_obj2_ram(*this, "obj2_ram"),
 		m_obj3_ram(*this, "obj3_ram"),
-		m_pad(*this, "PAD_P%u", 1U)
+		m_dial(*this, "DIAL_P%u", 1U)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -111,7 +111,12 @@ public:
 	required_shared_ptr<uint8_t> m_obj2_ram;
 	required_shared_ptr<uint8_t> m_obj3_ram;
 
-	optional_ioport_array<2> m_pad;
+	optional_ioport_array<2> m_dial;
+	struct
+	{
+		uint8_t current_value;
+		bool reverse;
+	} m_dial_status[2];
 
 	struct
 	{
@@ -123,8 +128,13 @@ public:
 	} m_mcu[2];
 
 	uint16_t m_dsw_pc_hack;
+	bool m_use_dial;
+	bool m_screen_display;
+	int m_sprite_page;
 
 	void cyclemb_bankswitch_w(uint8_t data);
+	void skydest_bankswitch_w(uint8_t data);
+	void cyclemb_screen_display_w(uint8_t data);
 //  uint8_t mcu_status_r();
 //  void sound_cmd_w(uint8_t data);
 	void cyclemb_flip_w(uint8_t data);
@@ -134,7 +144,8 @@ public:
 	void skydest_i8741_1_w(offs_t offset, uint8_t data);
 //  DECLARE_WRITE_LINE_MEMBER(ym_irq);
 
-	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(pad_r);
+	void update_dial(int P);
+	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(dial_r);
 
 	void init_skydest();
 	void init_cyclemb();
@@ -149,6 +160,7 @@ public:
 	void skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void skydest_i8741_reset();
+	void cyclemb_dial_reset();
 	void cyclemb(machine_config &config);
 	void skydest(machine_config &config);
 	void cyclemb_io(address_map &map);
@@ -211,9 +223,9 @@ void cyclemb_state::cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bi
 
 			if(flip_screen())
 			{
-				gfx->opaque(bitmap,cliprect,tile,color,1,1,512-(x*8)-scrollx,256-(y*8));
+				gfx->opaque(bitmap,cliprect,tile,color,1,1,504-(x*8)-scrollx,248-(y*8));
 				/* wrap-around */
-				gfx->opaque(bitmap,cliprect,tile,color,1,1,512-(x*8)-scrollx+512,256-(y*8));
+				gfx->opaque(bitmap,cliprect,tile,color,1,1,504-(x*8)-scrollx+512,248-(y*8));
 			}
 			else
 			{
@@ -228,16 +240,6 @@ void cyclemb_state::cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bi
 }
 
 
-	/*
-	bank 1
-	xxxx xxxx [0] sprite offset
-	---x xxxx [1] color offset
-	bank 2
-	xxxx xxxx [0] y offs
-	xxxx xxxx [1] x offs
-	bank 3
-	---- ---x [1] sprite enable flag?
-	*/
 void cyclemb_state::cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t col,fx,fy,region;
@@ -253,8 +255,24 @@ void cyclemb_state::cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 	0x27 cone (0x13 0x00)
 	*/
 
-	for(i=0;i<0x80;i+=2)
+	int page_start = m_sprite_page * 0x80;
+
+	for(i=0+page_start;i<0x80+page_start;i+=2)
 	{
+		/*** sprite format: ***
+
+		bank 1
+		xxxx xxxx [0] sprite offset
+		---x xxxx [1] color offset
+
+		bank 2
+		xxxx xxxx [0] y offs
+		xxxx xxxx [1] x offs
+
+		bank 3
+		---- ---x [1] sprite enable flag?
+		*/
+
 		y = 0xf1 - m_obj2_ram[i];
 		x = m_obj2_ram[i+1] - 56;
 		spr_offs = (m_obj1_ram[i+0]);
@@ -290,7 +308,6 @@ void cyclemb_state::skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bi
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int x,y;
 
-
 	for (y=0;y<32;y++)
 	{
 		for (x=2;x<62;x++)
@@ -317,26 +334,21 @@ void cyclemb_state::skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bi
 			else
 				scrolly = m_vram[(x-32)*64+1];
 
-
-			gfx->opaque(bitmap,cliprect,tile,color,0,0,x*8+scrollx,((y*8)-scrolly)&0xff);
-			gfx->opaque(bitmap,cliprect,tile,color,0,0,x*8+scrollx-480,((y*8)-scrolly)&0xff);
-			gfx->opaque(bitmap,cliprect,tile,color,0,0,x*8+scrollx+480,((y*8)-scrolly)&0xff);
-
-
+			if (flip_screen())
+			{
+				gfx->opaque(bitmap,cliprect,tile,color,1,1,504-x*8+scrollx, 248-(((y*8)-scrolly)&0xff));
+				gfx->opaque(bitmap,cliprect,tile,color,1,1,504-x*8+scrollx-480, 248-(((y*8)-scrolly)&0xff));
+				gfx->opaque(bitmap,cliprect,tile,color,1,1,504-x*8+scrollx+480, 248-(((y*8)-scrolly)&0xff));
+			}
+			else
+			{
+				gfx->opaque(bitmap,cliprect,tile,color,0,0,x*8+scrollx,((y*8)-scrolly)&0xff);
+				gfx->opaque(bitmap,cliprect,tile,color,0,0,x*8+scrollx-480,((y*8)-scrolly)&0xff);
+				gfx->opaque(bitmap,cliprect,tile,color,0,0,x*8+scrollx+480,((y*8)-scrolly)&0xff);
+			}
 		}
 	}
 }
-
-/*
-    bank 1
-    xxxx xxxx [0] sprite offset
-    ---x xxxx [1] color offset
-    bank 2
-    xxxx xxxx [0] y offs
-    xxxx xxxx [1] x offs
-    bank 3
-    ---- ---x [1] sprite enable flag?
-*/
 
 void cyclemb_state::skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -346,8 +358,24 @@ void cyclemb_state::skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 
 //  popmessage("%d %d",m_obj2_ram[0x0d], 0xf1 - m_obj2_ram[0x0c+1] + 68);
 
-	for(i=0;i<0x80;i+=2)
+	int page_start = m_sprite_page * 0x80;
+
+	for(i=0+page_start;i<0x80+page_start;i+=2)
 	{
+		/*** sprite format ***
+
+		bank 1
+		xxxx xxxx [0] sprite offset
+		---x xxxx [1] color offset
+
+		bank 2
+		xxxx xxxx [0] y offs
+		xxxx xxxx [1] x offs
+
+		bank 3
+		---- ---x [1] sprite enable flag?
+		*/
+
 		y = m_obj2_ram[i] - 1;
 		x = m_obj2_ram[i+1];
 
@@ -367,7 +395,6 @@ void cyclemb_state::skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 			x-=16;
 		}
 
-
 		fx = (m_obj3_ram[i+0] & 4) >> 2;
 		fy = (m_obj3_ram[i+0] & 8) >> 3;
 
@@ -382,8 +409,13 @@ void cyclemb_state::skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 
 uint32_t cyclemb_state::screen_update_cyclemb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cyclemb_draw_tilemap(screen,bitmap,cliprect);
-	cyclemb_draw_sprites(screen,bitmap,cliprect);
+	bitmap.fill(0, cliprect);
+
+	if (m_screen_display)
+	{
+		cyclemb_draw_tilemap(screen,bitmap,cliprect);
+		cyclemb_draw_sprites(screen,bitmap,cliprect);
+	}
 	return 0;
 }
 
@@ -391,14 +423,30 @@ uint32_t cyclemb_state::screen_update_skydest(screen_device &screen, bitmap_ind1
 {
 	bitmap.fill(0, cliprect);
 
-	skydest_draw_tilemap(screen,bitmap,cliprect);
-	skydest_draw_sprites(screen,bitmap,cliprect);
+	if (m_screen_display)
+	{
+		skydest_draw_tilemap(screen,bitmap,cliprect);
+		skydest_draw_sprites(screen,bitmap,cliprect);
+	}
 	return 0;
 }
 
 void cyclemb_state::cyclemb_bankswitch_w(uint8_t data)
 {
-	membank("bank1")->set_entry(data & 3);
+	membank("bank1")->set_entry(data & 0x03);
+	m_sprite_page = (data & 0x04) >> 2;
+}
+
+void cyclemb_state::skydest_bankswitch_w(uint8_t data)
+{
+	membank("bank1")->set_entry(data & 0x03);
+	m_sprite_page = (data & 0x04) >> 2;
+	flip_screen_set((data & 0x40) == 0);
+}
+
+void cyclemb_state::cyclemb_screen_display_w(uint8_t data)
+{
+	m_screen_display = (data & 0x01) != 0;
 }
 
 #if 0
@@ -439,6 +487,15 @@ void cyclemb_state::skydest_i8741_reset()
 	m_mcu[0].packet_type = 0;
 }
 
+void cyclemb_state::cyclemb_dial_reset()
+{
+	for (int i = 0; i < 2; i++)
+	{
+		m_dial_status[i].current_value = 0;
+		m_dial_status[i].reverse = false;
+	}
+}
+
 uint8_t cyclemb_state::skydest_i8741_0_r(offs_t offset)
 {
 	if(offset == 1) //status port
@@ -476,6 +533,7 @@ uint8_t cyclemb_state::skydest_i8741_0_r(offs_t offset)
 						m_mcu[0].packet_type^=0x20;
 						if(m_mcu[0].packet_type & 0x20)
 						{
+							update_dial(0);
 							m_mcu[0].rxd = ((ioport("P1_1")->read()) & 0x9f) | (m_mcu[0].packet_type);
 						}
 						else
@@ -489,7 +547,10 @@ uint8_t cyclemb_state::skydest_i8741_0_r(offs_t offset)
 					{
 						m_mcu[0].packet_type^=0x20;
 						if(m_mcu[0].packet_type & 0x20)
+						{
+							update_dial(1);
 							m_mcu[0].rxd = ((ioport("P2_1")->read()) & 0x9f) | (m_mcu[0].packet_type);
+						}
 						else
 						{
 							m_mcu[0].rxd = ((ioport("P2_0")->read()) & 0x1f) | (m_mcu[0].packet_type);
@@ -561,7 +622,6 @@ void cyclemb_state::skydest_i8741_0_w(offs_t offset, uint8_t data)
 		m_mcu[0].txd = data;
 
 		m_mcu[1].rst = 0;
-		m_soundlatch->write(data & 0xff);
 
 		if(m_mcu[0].txd == 0x41)
 			m_mcu[0].state = 1;
@@ -571,6 +631,7 @@ void cyclemb_state::skydest_i8741_0_w(offs_t offset, uint8_t data)
 			m_mcu[0].state = 3;
 		else
 		{
+			m_soundlatch->write(data & 0xff);
 
 			//m_audiocpu->set_input_line(0, HOLD_LINE);
 		}
@@ -594,7 +655,7 @@ void cyclemb_state::cyclemb_io(address_map &map)
 {
 //  map.global_mask(0xff);
 	map(0xc000, 0xc000).w(FUNC(cyclemb_state::cyclemb_bankswitch_w));
-	//map(0xc020, 0xc020).nopw(); // ?
+	map(0xc020, 0xc020).w(FUNC(cyclemb_state::cyclemb_screen_display_w));
 	map(0xc09e, 0xc09f).rw(FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
 	map(0xc0bf, 0xc0bf).w(FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
 }
@@ -603,11 +664,11 @@ void cyclemb_state::cyclemb_io(address_map &map)
 void cyclemb_state::skydest_io(address_map &map)
 {
 //  map.global_mask(0xff);
-	map(0xc000, 0xc000).w(FUNC(cyclemb_state::cyclemb_bankswitch_w));
-	//map(0xc020, 0xc020).nopw(); // ?
+	map(0xc000, 0xc000).w(FUNC(cyclemb_state::skydest_bankswitch_w));
+	map(0xc020, 0xc020).w(FUNC(cyclemb_state::cyclemb_screen_display_w));
 	map(0xc080, 0xc081).rw(FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
 	//map(0xc0a0, 0xc0a0).nopw(); // ?
-	map(0xc0bf, 0xc0bf).w(FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
+	//map(0xc0bf, 0xc0bf).w(FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
 }
 
 
@@ -627,7 +688,10 @@ uint8_t cyclemb_state::skydest_i8741_1_r(offs_t offset)
 	if(m_mcu[1].rst == 1)
 		return 0x40;
 
-	return m_soundlatch->read();
+	uint8_t ret = m_soundlatch->read();
+	m_soundlatch->clear_w();
+
+	return ret;
 }
 
 void cyclemb_state::skydest_i8741_1_w(offs_t offset, uint8_t data)
@@ -661,17 +725,48 @@ void cyclemb_state::machine_start()
 		save_item(NAME(m_mcu[i].state), i);
 		save_item(NAME(m_mcu[i].packet_type), i);
 	}
+
+	for (int i = 0; i < 2; i++)
+	{
+		save_item(NAME(m_dial_status[i].current_value), i);
+		save_item(NAME(m_dial_status[i].reverse), i);
+	}
+
+	save_item(NAME(m_screen_display));
+	save_item(NAME(m_sprite_page));
+
+	cyclemb_dial_reset();
+	m_screen_display = true;
+	m_sprite_page = 0;
 }
 
 void cyclemb_state::machine_reset()
 {
 	skydest_i8741_reset();
+	cyclemb_dial_reset();
+}
+
+void cyclemb_state::update_dial(int P)
+{
+	if (!m_use_dial)
+	{
+		return;
+	}
+
+	int8_t input_value = m_dial[P]->read();
+	int delta = std::clamp((int)input_value, -0x1f, 0x1f);
+
+	if (delta != 0)
+	{
+		m_dial_status[P].reverse = (delta < 0);
+		m_dial_status[P].current_value = (m_dial_status[P].current_value + (uint8_t)abs(delta)) & 0x1f;
+	}
 }
 
 template <int P>
-CUSTOM_INPUT_MEMBER(cyclemb_state::pad_r)
+CUSTOM_INPUT_MEMBER(cyclemb_state::dial_r)
 {
-	return m_pad[P]->read();
+	return m_dial_status[P].current_value | (m_dial_status[P].reverse ? 0x80 : 0x00);
 }
 
 
@@ -679,95 +774,59 @@ static INPUT_PORTS_START( cyclemb )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_DIPNAME( 0x04, 0x00, "SYSTEM" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x7c, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
 
 	PORT_START("P1_0")
-	PORT_DIPNAME( 0x01, 0x00, "IN1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P1_1")
-	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(cyclemb_state, pad_r<0>)
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(cyclemb_state, dial_r<0>)
 
-	PORT_START("PAD_P1")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(30) PORT_KEYDELTA(16) PORT_PLAYER(1)
+	PORT_START("DIAL_P1")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(16) PORT_PLAYER(1) PORT_RESET PORT_REVERSE
 
 	PORT_START("P2_0")
-	PORT_DIPNAME( 0x01, 0x00, "IN1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2_1")
-	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(cyclemb_state, pad_r<1>)
+	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(cyclemb_state, dial_r<1>)
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("PAD_P2")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(15) PORT_KEYDELTA(8) PORT_PLAYER(2)
+	PORT_START("DIAL_P2")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(16) PORT_PLAYER(2) PORT_RESET PORT_REVERSE PORT_COCKTAIL
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "DSW1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x02, "Difficulty (Stage 1-3)" )
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x08, "Difficulty (Stage 4-5)" )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "DSW2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
@@ -775,16 +834,16 @@ static INPUT_PORTS_START( cyclemb )
 
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPNAME( 0x02, 0x00, "Disallow Game Over (Cheat)" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPNAME( 0x0c, 0x00, "Stage Start" )
-	PORT_DIPSETTING(    0x00, "Tutorial" )
-	PORT_DIPSETTING(    0x04, "1" )
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x0c, "Bonus Game" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0c, 0x00, "Starting Stage" )
+	PORT_DIPSETTING(    0x00, "Stage 1" )
+	PORT_DIPSETTING(    0x04, "Stage 3" )
+	PORT_DIPSETTING(    0x08, "Stage 4" )
+	PORT_DIPSETTING(    0x0c, "Bonus Game Only" )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
@@ -798,135 +857,90 @@ static INPUT_PORTS_START( skydest )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_DIPNAME( 0x04, 0x00, "SYSTEM" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x7c, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
 
 	PORT_START("P1_0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_DIPNAME( 0x04, 0x00, "P1_0" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P1_1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_DIPNAME( 0x04, 0x00, "P1_1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2_0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_DIPNAME( 0x04, 0x00, "P1_0" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2_1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_DIPNAME( 0x04, 0x00, "P1_1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x07, "1 (Easiest)" )
+	PORT_DIPSETTING(    0x06, "2" )
+	PORT_DIPSETTING(    0x05, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x03, "5" )
+	PORT_DIPSETTING(    0x02, "6" )
+	PORT_DIPSETTING(    0x01, "7" )
+	PORT_DIPSETTING(    0x00, "8 (Hardest)" )
 	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPSETTING(    0x10, "2" )
-	PORT_DIPSETTING(    0x18, "1" )
+	PORT_DIPSETTING(    0x18, "2" )
+	PORT_DIPSETTING(    0x10, "3" )
+	PORT_DIPSETTING(    0x08, "4" )
+	PORT_DIPSETTING(    0x00, "5" )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPNAME( 0x80, 0x00, "Invincibility (Cheat)" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-
-
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -1045,6 +1059,12 @@ ROM_START( cyclemb )
 	ROM_LOAD( "p0_15.10c",   0x0000, 0x2000, CRC(9cc52c32) SHA1(05d4e7c8ce8fdfc995013c0ed693b4d4778acc25) )
 	ROM_LOAD( "p0_16.10d",   0x2000, 0x2000, CRC(8d03227e) SHA1(7e90437cbe5e854025e799348bb2cbca98368bd9) )
 
+	ROM_REGION( 0x0400, "mcu1", 0 )
+	ROM_LOAD( "ap_002.7b", 0x00000, 0x0400, NO_DUMP )
+
+	ROM_REGION( 0x0400, "mcu2", 0 )
+	ROM_LOAD( "ap-003.7c", 0x00000, 0x0400, NO_DUMP )
+
 	ROM_REGION( 0x4000, "tilemap_data", 0 )
 	ROM_LOAD( "p0_21.3e",   0x0000, 0x2000, CRC(a7dab6d8) SHA1(c5802e76abd394a2ce1526815bfbfc12e5e57587) )
 	ROM_LOAD( "p0_20.3d",   0x2000, 0x2000, CRC(53e3a36e) SHA1(d95c1dfe216bb8b1f3e14c72a480eb2befa9d1dd) )
@@ -1116,6 +1136,8 @@ void cyclemb_state::init_cyclemb()
 	rom[0xa36] = 0x00;
 	rom[0xa37] = 0x00;
 	rom[0xa38] = 0x00;
+
+	m_use_dial = true;
 }
 
 void cyclemb_state::init_skydest()
@@ -1132,7 +1154,11 @@ void cyclemb_state::init_skydest()
 	rom[0xa36] = 0x00;
 	rom[0xa37] = 0x00;
 	rom[0xa38] = 0x00;
+
+	m_use_dial = false;
 }
 
-GAME( 1984, cyclemb, 0, cyclemb,  cyclemb, cyclemb_state, init_cyclemb, ROT0, "Taito Corporation", "Cycle Maabou (Japan)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, skydest, 0, skydest,  skydest, cyclemb_state, init_skydest, ROT0, "Taito Corporation", "Sky Destroyer (Japan)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+
+//    year  name      parent  machine   input    class          init          rot   company              fullname                 flags
+GAME( 1984, cyclemb,  0,      cyclemb,  cyclemb, cyclemb_state, init_cyclemb, ROT0, "Taito Corporation", "Cycle Maabou (Japan)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, skydest,  0,      skydest,  skydest, cyclemb_state, init_skydest, ROT0, "Taito Corporation", "Sky Destroyer (Japan)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

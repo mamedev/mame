@@ -50,7 +50,7 @@ FE:
 - bit 2 enables colour on a lnw80
 - bit 3 is for selecting roms (low) or 16k hires area (high) on a lnw80
 
-Shift and Right-arrow will enable 32 cpl, if the hardware allows it.
+Shift and Right-arrow will enable 32 cpl.
 
 SYSTEM commands:
     - Press Break (End key) to quit
@@ -59,10 +59,8 @@ SYSTEM commands:
     - / to execute last program loaded
     - /nnnnn to execute program at nnnnn (decimal)
 
-About the RTC - The time is incremented while ever the cursor is flashing. It is stored in a series
-    of bytes in the computer's work area. The bytes are in a certain order, this is:
-    seconds, minutes, hours, year, day, month. The seconds are stored at 0x4041.
-    A reboot always sets the time to zero.
+About the RTC - The hardware side exists, but special software is needed to get the clock to work.
+    By default, nothing happens.
 
 ********************************************************************************************************
 
@@ -70,8 +68,6 @@ To Do / Status:
 --------------
 
 - basically works
-- add 1.77 / 4 MHz switch
-- find out if it really did support 32-cpl mode or not
 - hi-res and colour are coded but do not work
 - investigate expansion-box
 - none of my collection of lnw80-specific floppies will work; some crash MAME
@@ -123,7 +119,9 @@ void lnw80_state::lnw80_mem(address_map &map)
 void lnw80_state::lnw_banked_mem(address_map &map)
 {
 	map(0x0000, 0x2fff).rom().region("maincpu", 0);
+	map(0x37de, 0x37de).rw(FUNC(lnw80_state::sys80_f9_r), FUNC(lnw80_state::sys80_f8_w));
 	map(0x37e0, 0x37e3).rw(FUNC(lnw80_state::irq_status_r), FUNC(lnw80_state::motor_w));
+	map(0x37e4, 0x37e7).w(FUNC(lnw80_state::cassunit_w));
 	map(0x37e8, 0x37eb).rw(FUNC(lnw80_state::printer_r), FUNC(lnw80_state::printer_w));
 	map(0x37ec, 0x37ef).rw(FUNC(lnw80_state::fdc_r), FUNC(lnw80_state::fdc_w));
 	map(0x3800, 0x3bff).r(FUNC(lnw80_state::keyboard_r));
@@ -202,29 +200,24 @@ static INPUT_PORTS_START( lnw80 )
 	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X)          PORT_CHAR('X') PORT_CHAR('x')
 	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y)          PORT_CHAR('Y') PORT_CHAR('y')
 	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z)          PORT_CHAR('Z') PORT_CHAR('z')
-	// These keys produce output on all systems, the shift key having no effect. They display arrow symbols and underscore.
-	// On original lnw80, shift cancels all keys except F3 which becomes backspace.
-	// On the radionic, Shift works, and the symbols display correctly.
-	// PORT_CHAR('_') is correct for all systems, however the others are only for radionic.
-	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("[") PORT_CODE(KEYCODE_F1)  PORT_CHAR('[') PORT_CHAR('{')  // radionic: F1
-	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("\\") PORT_CODE(KEYCODE_F2) PORT_CHAR('\\') PORT_CHAR('}') // radionic: F2 ; sys80 mkII: F2 ; lnw80: F1
-	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("]") PORT_CODE(KEYCODE_F3)  PORT_CHAR(']') PORT_CHAR('|')  // radionic: F3 ; sys80 mkII: F3
-	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_F4)  PORT_CHAR('^')                 // radionic: F4 ; sys80 mkII: F4 ; lnw80: F2
-	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("_") PORT_CODE(KEYCODE_F5)  PORT_CHAR('_')                 // radionic: LF ; sys80 mkII: F1 ; lnw80: _
+	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)        PORT_CHAR(UCHAR_MAMEKEY(F1))
+	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)        PORT_CHAR(UCHAR_MAMEKEY(F2))
+	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("_") PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR('_')
+	PORT_BIT(0x28, 0x00, IPT_UNUSED)
 
-	PORT_START("LINE4") // Number pad: System 80 Mk II only
-	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD)          PORT_CHAR('0')
-	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD)          PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD)          PORT_CHAR('2') PORT_CHAR('"')
-	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD)          PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD)          PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD)          PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD)          PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD)          PORT_CHAR('7') PORT_CHAR('\'')
+	PORT_START("LINE4")
+	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)          PORT_CHAR('0')
+	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('"')
+	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)          PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)          PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)          PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)          PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('\'')
 
 	PORT_START("LINE5")
-	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD)          PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD)          PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME(": *") PORT_CODE(KEYCODE_MINUS)    PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME("; +") PORT_CODE(KEYCODE_COLON)    PORT_CHAR(';') PORT_CHAR('+')
 	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME(", <") PORT_CODE(KEYCODE_COMMA)    PORT_CHAR(',') PORT_CHAR('<')
@@ -234,25 +227,27 @@ static INPUT_PORTS_START( lnw80 )
 
 	PORT_START("LINE6")
 	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD)      PORT_CHAR(13)
-	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("Clear") PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(F8))   // Missing from early System 80
+	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("Clear") PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(F8))
 	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_END)        PORT_CHAR(UCHAR_MAMEKEY(F9))
 	PORT_BIT(0x08, 0x00, IPT_KEYBOARD) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP)         PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)        PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	/* backspace do the same as cursor left */
 	PORT_BIT(0x20, 0x00, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_BACKSPACE)   PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))   // Missing from early System 80
+	PORT_BIT(0x40, 0x00, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)      PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT(0x80, 0x00, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(' ')
 
 	PORT_START("LINE7")
-	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("Left Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("Control") PORT_CODE(KEYCODE_LCONTROL) // LNW80 only
+	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x10, 0x00, IPT_KEYBOARD) PORT_NAME("Control") PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT(0xee, 0x00, IPT_UNUSED)
 
 	PORT_START("CONFIG")
 	PORT_CONFNAME(    0x80, 0x00,   "Floppy Disc Drives")
 	PORT_CONFSETTING(   0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(   0x80, DEF_STR( On ) )
-	PORT_BIT(0x7f, 0x7f, IPT_UNUSED)
+	PORT_CONFNAME(    0x40, 0x00,   "CPU Speed")
+	PORT_CONFSETTING(   0x00, "1.77 MHz" )
+	PORT_CONFSETTING(   0x40, "4 MHz" )
 
 	PORT_START("E9")    // these are the power-on uart settings
 	PORT_BIT(0x07, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -341,6 +336,7 @@ void lnw80_state::machine_reset()
 	u16 s_clock = s_bauds[m_io_baud->read()] << 4;
 	m_uart_clock->set_unscaled_clock(s_clock);
 
+	m_maincpu->set_unscaled_clock(BIT(m_io_config->read(), 6) ? (16_MHz_XTAL / 4) : (16_MHz_XTAL / 9));  // HI-LO switch
 	m_reg_load = 1;
 	m_lnw_mode = 0;
 	lnw80_fe_w(0);
@@ -352,11 +348,13 @@ uint32_t lnw80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	static const uint16_t rows[] = { 0, 0x200, 0x100, 0x300, 1, 0x201, 0x101, 0x301 };
 	uint16_t sy=0,ma=0;
 	uint8_t cols = BIT(m_lnw_mode, 1) ? 80 : 64;
+	uint8_t skip = BIT(m_mode, 0) ? 2 : 1;
+	if (BIT(m_mode, 0))
+		cols >>= 1;
 
-	/* Although the OS can select 32-character mode, it is not supported by hardware */
-	if (m_lnw_mode != m_size_store)
+	if (cols != m_size_store)
 	{
-		m_size_store = m_lnw_mode;
+		m_size_store = cols;
 		screen.set_visible_area(0, cols*6-1, 0, 16*12-1);
 	}
 
@@ -376,7 +374,7 @@ uint32_t lnw80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				{
 					uint16_t *p = &bitmap.pix(sy++);
 
-					for (uint16_t x = ma; x < ma + 64; x++)
+					for (uint16_t x = ma; x < ma + 64; x+=skip)
 					{
 						uint8_t chr = m_p_videoram[x];
 
@@ -576,7 +574,6 @@ void lnw80_state::lnw80(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 16_MHz_XTAL / 9);
-	//m_maincpu->set_clock(16_MHz_XTAL / 4); // or 16MHz / 9; 4MHz or 1.77MHz operation selected by HI/LO switch
 	m_maincpu->set_addrmap(AS_PROGRAM, &lnw80_state::lnw80_mem);
 	m_maincpu->set_addrmap(AS_IO, &lnw80_state::lnw80_io);
 
@@ -595,18 +592,19 @@ void lnw80_state::lnw80(machine_config &config)
 
 	/* devices */
 	CASSETTE(config, m_cassette);
-	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_formats(trs80l2_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(lnw80_state::quickload_cb));
 
 	FD1771(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(FUNC(lnw80_state::intrq_w));
 
-	FLOPPY_CONNECTOR(config, "fdc:0", lnw80_floppies, "sssd", lnw80_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", lnw80_floppies, "sssd", lnw80_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:2", lnw80_floppies, nullptr, lnw80_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:3", lnw80_floppies, nullptr, lnw80_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], lnw80_floppies, "sssd", lnw80_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], lnw80_floppies, "sssd", lnw80_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[2], lnw80_floppies, nullptr, lnw80_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[3], lnw80_floppies, nullptr, lnw80_state::floppy_formats).enable_sound(true);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit7));
@@ -645,16 +643,16 @@ void lnw80_state::lnw80(machine_config &config)
 ***************************************************************************/
 
 ROM_START(lnw80)
-	ROM_REGION(0x3800, "maincpu",0)
-	ROM_LOAD("lnw_a.bin",    0x0000, 0x0800, CRC(e09f7e91) SHA1(cd28e72efcfebde6cf1c7dbec4a4880a69e683da))
-	ROM_LOAD("lnw_a1.bin",   0x0800, 0x0800, CRC(ac297d99) SHA1(ccf31d3f9d02c3b68a0ee3be4984424df0e83ab0))
-	ROM_LOAD("lnw_b.bin",    0x1000, 0x0800, CRC(c4303568) SHA1(13e3d81c6f0de0e93956fa58c465b5368ea51682))
-	ROM_LOAD("lnw_b1.bin",   0x1800, 0x0800, CRC(3a5ea239) SHA1(8c489670977892d7f2bfb098f5df0b4dfa8fbba6))
-	ROM_LOAD("lnw_c.bin",    0x2000, 0x0800, CRC(2ba025d7) SHA1(232efbe23c3f5c2c6655466ebc0a51cf3697be9b))
-	ROM_LOAD("lnw_c1.bin",   0x2800, 0x0800, CRC(ed547445) SHA1(20102de89a3ee4a65366bc2d62be94da984a156b))
+	ROM_REGION(0x3000, "maincpu",0)
+	ROM_LOAD("lnw_a.u78",    0x0000, 0x0800, CRC(e09f7e91) SHA1(cd28e72efcfebde6cf1c7dbec4a4880a69e683da))
+	ROM_LOAD("lnw_a1.u75",   0x0800, 0x0800, CRC(ac297d99) SHA1(ccf31d3f9d02c3b68a0ee3be4984424df0e83ab0))
+	ROM_LOAD("lnw_b.u79",    0x1000, 0x0800, CRC(c4303568) SHA1(13e3d81c6f0de0e93956fa58c465b5368ea51682))
+	ROM_LOAD("lnw_b1.u76",   0x1800, 0x0800, CRC(3a5ea239) SHA1(8c489670977892d7f2bfb098f5df0b4dfa8fbba6))
+	ROM_LOAD("lnw_c.u80",    0x2000, 0x0800, CRC(2ba025d7) SHA1(232efbe23c3f5c2c6655466ebc0a51cf3697be9b))
+	ROM_LOAD("lnw_c1.u77",   0x2800, 0x0800, CRC(ed547445) SHA1(20102de89a3ee4a65366bc2d62be94da984a156b))
 
 	ROM_REGION(0x0800, "chargen",0)
-	ROM_LOAD("lnw_chr.bin",  0x0000, 0x0800, CRC(c89b27df) SHA1(be2a009a07e4378d070002a558705e9a0de59389))
+	ROM_LOAD("lnw_chr.u100", 0x0000, 0x0800, CRC(c89b27df) SHA1(be2a009a07e4378d070002a558705e9a0de59389))
 ROM_END
 
 

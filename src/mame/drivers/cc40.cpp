@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
+// thanks-to:Jon Guidry
 /***************************************************************************
 
   Texas Instruments Compact Computer 40 (aka CC-40)
@@ -38,7 +39,7 @@
   ---------
 
   HM6116LP-4    - Hitachi 2KB SRAM (newer 18KB version has two HM6264 8KB chips)
-  HN61256PC09   - Hitachi DIP-28 32KB CMOS Mask PROM
+  HN61256PC09   - Hitachi DIP-28 32KB CMOS Mask PROM (also seen with HN61256PB02, earlier version?)
   TMX70C20N2L   - Texas Instruments TMS70C20 CPU (128 bytes RAM, 2KB ROM) @ 2.5MHz, 40 pins - "X" implies prototype
   AMI 1041036-1 - 68-pin QFP AMI Gate Array
   HD44100H      - 60-pin QFP Hitachi HD44100 LCD Driver
@@ -59,6 +60,15 @@
   can be loaded. Load a program by pressing the [RUN] key while viewing the list,
   or manually with the command RUN "<shortname of program in list>"
 
+  As for the CC-40+, the product was finalized, but in the end it wasn't released.
+  The hardware is very similar to CC-40. The main differences are the CPU:
+  a TMS70C40 (twice larger internal ROM), and a cassette port separate from Hexbus.
+  The controller chip is a TI TP0373 this time, it appears that the basic functionality
+  is the same as the one by AMI. Like the CC-40, it had either 6KB or 18KB RAM.
+
+  The CC-40+ cassette device number is 1, eg. SAVE"1.FILENAME" to save, and
+  OLD"1.FILENAME" to load.
+
 
   TODO:
   - external RAM cartridge (bus_control_w cartridge memory addressing)
@@ -73,9 +83,11 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/tms7000/tms7000.h"
+#include "imagedev/cassette.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "video/hd44780.h"
@@ -88,17 +100,21 @@
 #include "cc40.lh"
 
 
+namespace {
+
 class cc40_state : public driver_device
 {
 public:
 	cc40_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_cart(*this, "cartslot"),
-		m_key_matrix(*this, "IN.%u", 0),
-		m_battery_inp(*this, "BATTERY"),
 		m_nvram(*this, "sysram.%u", 1U),
-		m_lamps(*this, "lamp%u", 0U)
+		m_sysbank(*this, "sysbank"),
+		m_cartbank(*this, "cartbank"),
+		m_cart(*this, "cartslot"),
+		m_cass(*this, "cassette"),
+		m_key_matrix(*this, "IN.%u", 0),
+		m_segs(*this, "seg%u", 0U)
 	{
 		m_sysram[0] = nullptr;
 		m_sysram[1] = nullptr;
@@ -107,13 +123,14 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(sysram_size_changed);
 
 	void cc40(machine_config &config);
+	void cc40p(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
+	virtual void device_post_load() override;
 
 private:
-	void postload();
 	void init_sysram(int chip, u16 size);
 	void update_lcd_indicator(u8 y, u8 x, int state);
 	void update_clock_divider();
@@ -122,41 +139,46 @@ private:
 	void sysram_w(offs_t offset, u8 data);
 	u8 bus_control_r();
 	void bus_control_w(u8 data);
+	u8 power_r();
 	void power_w(u8 data);
-	u8 battery_r();
 	u8 bankswitch_r();
 	void bankswitch_w(u8 data);
 	u8 clock_control_r();
 	void clock_control_w(u8 data);
 	u8 keyboard_r();
 	void keyboard_w(u8 data);
+	u8 cass_r();
+	void cass_w(u8 data);
 
 	void cc40_palette(palette_device &palette) const;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	HD44780_PIXEL_UPDATE(cc40_pixel_update);
 
-	void main_map(address_map &map);
+	void cc40_map(address_map &map);
+	void cc40p_map(address_map &map);
 
-	required_device<tms70c20_device> m_maincpu;
-	required_device<generic_slot_device> m_cart;
-	required_ioport_array<8> m_key_matrix;
-	required_ioport m_battery_inp;
+	required_device<tms7000_device> m_maincpu;
 	required_device_array<nvram_device, 2> m_nvram;
+	required_memory_bank m_sysbank;
+	required_memory_bank m_cartbank;
+	required_device<generic_slot_device> m_cart;
+	optional_device<cassette_image_device> m_cass;
+	required_ioport_array<8> m_key_matrix;
+	output_finder<80> m_segs;
 
 	memory_region *m_cart_rom;
 
-	u8 m_bus_control;
-	u8 m_power;
-	u8 m_banks;
-	u8 m_clock_control;
-	u8 m_clock_divider;
-	u8 m_key_select;
+	u8 m_bus_control = 0;
+	u8 m_power = 0;
+	u8 m_banks = 0;
+	u8 m_clock_control = 0;
+	u8 m_clock_divider = 0;
+	u8 m_key_select = 0;
 
 	std::unique_ptr<u8[]> m_sysram[2];
 	u16 m_sysram_size[2];
 	u16 m_sysram_end[2];
 	u16 m_sysram_mask[2];
-	output_finder<80> m_lamps;
 };
 
 
@@ -195,7 +217,7 @@ DEVICE_IMAGE_LOAD_MEMBER(cc40_state::cart_load)
 void cc40_state::cc40_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
-	palette.set_pen_color(1, rgb_t(92, 83, 88)); // lcd pixel on
+	palette.set_pen_color(1, rgb_t(50, 45, 60)); // lcd pixel on
 	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
 }
 
@@ -207,7 +229,7 @@ void cc40_state::update_lcd_indicator(u8 y, u8 x, int state)
 	// ---- raw lcd screen here ----
 	// under    |    ERROR   v      v      v      v      v      v    _LOW
 	// output#  |    60     61     62     63     50     51     52     53
-	m_lamps[y * 10 + x] = state ? 1 : 0;
+	m_segs[y * 10 + x] = state ? 1 : 0;
 }
 
 HD44780_PIXEL_UPDATE(cc40_state::cc40_pixel_update)
@@ -290,6 +312,11 @@ void cc40_state::bus_control_w(u8 data)
 	m_bus_control = data;
 }
 
+u8 cc40_state::power_r()
+{
+	return m_power;
+}
+
 void cc40_state::power_w(u8 data)
 {
 	// d0: power-on hold latch
@@ -298,12 +325,6 @@ void cc40_state::power_w(u8 data)
 	// stop running
 	if (!m_power)
 		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-}
-
-u8 cc40_state::battery_r()
-{
-	// d0: low battery sense line (0 = low power)
-	return m_battery_inp->read();
 }
 
 u8 cc40_state::bankswitch_r()
@@ -316,11 +337,11 @@ void cc40_state::bankswitch_w(u8 data)
 	data &= 0x0f;
 
 	// d0-d1: system rom bankswitch
-	membank("sysbank")->set_entry(data & 3);
+	m_sysbank->set_entry(data & 3);
 
 	// d2-d3: cartridge 32KB page bankswitch
 	if (m_cart_rom)
-		membank("cartbank")->set_entry(data >> 2 & 3);
+		m_cartbank->set_entry(data >> 2 & 3);
 
 	m_banks = data;
 }
@@ -353,35 +374,50 @@ void cc40_state::clock_control_w(u8 data)
 
 u8 cc40_state::keyboard_r()
 {
-	u8 ret = 0;
+	u8 data = 0;
 
 	// read selected keyboard rows
 	for (int i = 0; i < 8; i++)
 	{
 		if (m_key_select >> i & 1)
-			ret |= m_key_matrix[i]->read();
+			data |= m_key_matrix[i]->read();
 	}
 
-	return ret;
+	return data;
 }
 
 void cc40_state::keyboard_w(u8 data)
 {
-	// d(0-7): select keyboard column
+	// d0-d7: select keyboard column
 	m_key_select = data;
 }
 
-void cc40_state::main_map(address_map &map)
+u8 cc40_state::cass_r()
+{
+	// d3: cass data in
+	return (m_cass->input() > 0.04) ? 8 : 0;
+}
+
+void cc40_state::cass_w(u8 data)
+{
+	// d4: cass motor
+	m_cass->set_motor((data & 0x10) ? 1 : 0);
+
+	// d3: cass data out
+	m_cass->output((data & 8) ? +1.0 : -1.0);
+}
+
+void cc40_state::cc40_map(address_map &map)
 {
 	map.unmap_value_high();
 
 	map(0x0110, 0x0110).rw(FUNC(cc40_state::bus_control_r), FUNC(cc40_state::bus_control_w));
-	map(0x0111, 0x0111).w(FUNC(cc40_state::power_w));
+	map(0x0111, 0x0111).rw(FUNC(cc40_state::power_r), FUNC(cc40_state::power_w));
 	map(0x0112, 0x0112).noprw(); // d0-d3: Hexbus data
 	map(0x0113, 0x0113).noprw(); // d0: Hexbus available
 	map(0x0114, 0x0114).noprw(); // d0,d1: Hexbus handshake
-	map(0x0115, 0x0115).w("dac", FUNC(dac_bit_interface::data_w)); // d0: piezo control
-	map(0x0116, 0x0116).r(FUNC(cc40_state::battery_r));
+	map(0x0115, 0x0115).w("dac", FUNC(dac_bit_interface::data_w));
+	map(0x0116, 0x0116).portr("BATTERY");
 	map(0x0119, 0x0119).rw(FUNC(cc40_state::bankswitch_r), FUNC(cc40_state::bankswitch_w));
 	map(0x011a, 0x011a).rw(FUNC(cc40_state::clock_control_r), FUNC(cc40_state::clock_control_w));
 	map(0x011e, 0x011f).rw("hd44780", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
@@ -390,6 +426,12 @@ void cc40_state::main_map(address_map &map)
 	map(0x1000, 0x4fff).rw(FUNC(cc40_state::sysram_r), FUNC(cc40_state::sysram_w));
 	map(0x5000, 0xcfff).bankr("cartbank");
 	map(0xd000, 0xefff).bankr("sysbank");
+}
+
+void cc40_state::cc40p_map(address_map &map)
+{
+	cc40_map(map);
+	map(0x0121, 0x0121).rw(FUNC(cc40_state::cass_r), FUNC(cc40_state::cass_w));
 }
 
 
@@ -518,7 +560,6 @@ void cc40_state::machine_reset()
 	m_power = 1;
 
 	update_clock_divider();
-
 	bankswitch_w(0);
 }
 
@@ -539,7 +580,7 @@ void cc40_state::init_sysram(int chip, u16 size)
 	m_sysram_size[chip] = size;
 }
 
-void cc40_state::postload()
+void cc40_state::device_post_load()
 {
 	init_sysram(0, m_sysram_size[0]);
 	init_sysram(1, m_sysram_size[1]);
@@ -550,26 +591,21 @@ void cc40_state::postload()
 void cc40_state::machine_start()
 {
 	// init
-	m_lamps.resolve();
+	m_segs.resolve();
 	std::string region_tag;
 	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
 
-	membank("sysbank")->configure_entries(0, 4, memregion("system")->base(), 0x2000);
+	m_sysbank->configure_entries(0, 4, memregion("system")->base(), 0x2000);
 	if (m_cart_rom)
-		membank("cartbank")->configure_entries(0, 4, m_cart_rom->base(), 0x8000);
+		m_cartbank->configure_entries(0, 4, m_cart_rom->base(), 0x8000);
 	else
-		membank("cartbank")->set_base(memregion("maincpu")->base() + 0x5000);
+		m_cartbank->set_base(memregion("maincpu")->base() + 0x5000);
 
 	init_sysram(0, 0x800); // default to 6KB
 	init_sysram(1, 0x800); // "
 
 	bus_control_w(0);
 	bankswitch_w(0);
-
-	// zerofill other
-	m_power = 0;
-	m_clock_control = 0;
-	m_key_select = 0;
 
 	// register for savestates
 	save_item(NAME(m_bus_control));
@@ -578,15 +614,13 @@ void cc40_state::machine_start()
 	save_item(NAME(m_clock_control));
 	save_item(NAME(m_clock_divider));
 	save_item(NAME(m_key_select));
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(cc40_state::postload), this));
 }
 
 void cc40_state::cc40(machine_config &config)
 {
-	/* basic machine hardware */
-	TMS70C20(config, m_maincpu, XTAL(5'000'000) / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cc40_state::main_map);
+	// basic machine hardware
+	TMS70C20(config, m_maincpu, 5_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cc40_state::cc40_map);
 	m_maincpu->in_porta().set(FUNC(cc40_state::keyboard_r));
 	m_maincpu->out_portb().set(FUNC(cc40_state::keyboard_w));
 
@@ -594,7 +628,7 @@ void cc40_state::cc40(machine_config &config)
 	NVRAM(config, "sysram.1", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "sysram.2", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60); // arbitrary
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
@@ -610,13 +644,30 @@ void cc40_state::cc40(machine_config &config)
 	hd44780.set_lcd_size(2, 16); // 2*16 internal
 	hd44780.set_pixel_update_cb(FUNC(cc40_state::cc40_pixel_update));
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "cc40_cart", "bin,rom,256").set_device_load(FUNC(cc40_state::cart_load));
 	SOFTWARE_LIST(config, "cart_list").set_original("cc40_cart");
+}
+
+void cc40_state::cc40p(machine_config &config)
+{
+	cc40(config);
+
+	// basic machine hardware
+	TMS70C40(config.replace(), m_maincpu, 5_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cc40_state::cc40p_map);
+	m_maincpu->in_porta().set(FUNC(cc40_state::keyboard_r));
+	m_maincpu->out_portb().set(FUNC(cc40_state::keyboard_w));
+
+	// cassette
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_MUTED | CASSETTE_MOTOR_DISABLED);
+	SPEAKER(config, "cass_output").front_center(); // on data recorder
+	m_cass->add_route(ALL_OUTPUTS, "cass_output", 0.05);
 }
 
 
@@ -628,13 +679,24 @@ void cc40_state::cc40(machine_config &config)
 ***************************************************************************/
 
 ROM_START( cc40 )
-	ROM_REGION( 0x800, "maincpu", 0 )
-	ROM_LOAD( "tms70c20.bin", 0x000, 0x800, CRC(a21bf6ab) SHA1(3da8435ecbee143e7fa149ee8e1c92949bade1d8) ) // internal cpu rom
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "c11002", 0x0000, 0x0800, CRC(a21bf6ab) SHA1(3da8435ecbee143e7fa149ee8e1c92949bade1d8) ) // internal cpu rom
 
 	ROM_REGION( 0x8000, "system", 0 )
-	ROM_LOAD( "hn61256pc09.bin", 0x0000, 0x8000, CRC(f5322fab) SHA1(1b5c4052a53654363c458f75eac7a27f0752def6) ) // system rom, banked
+	ROM_LOAD( "hn61256pc09", 0x0000, 0x8000, CRC(f5322fab) SHA1(1b5c4052a53654363c458f75eac7a27f0752def6) ) // system rom, banked
 ROM_END
+
+ROM_START( cc40p )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "75305.u200", 0x0000, 0x1000, CRC(42bb6af2) SHA1(642dede16cb4ef2c5b9eaae79e28054f1111eef8) ) // internal cpu rom
+
+	ROM_REGION( 0x8000, "system", 0 )
+	ROM_LOAD( "hn61256pc09.u205", 0x0000, 0x8000, CRC(f5322fab) SHA1(1b5c4052a53654363c458f75eac7a27f0752def6) ) // system rom, banked
+ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME  PARENT CMP MACHINE  INPUT  CLASS       INIT        COMPANY              FULLNAME               FLAGS
-COMP( 1983, cc40, 0,      0, cc40,    cc40,  cc40_state, empty_init, "Texas Instruments", "Compact Computer 40", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, cc40,  0,     0, cc40,    cc40,  cc40_state, empty_init, "Texas Instruments", "Compact Computer 40", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cc40p, cc40,  0, cc40p,   cc40,  cc40_state, empty_init, "Texas Instruments", "Compact Computer 40 Plus (prototype)", MACHINE_SUPPORTS_SAVE )

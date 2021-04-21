@@ -382,8 +382,8 @@ void dai3wksi_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1bff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0x2400, 0x24ff).mirror(0x100).portr("IN0");
-	map(0x2800, 0x28ff).mirror(0x100).portr("IN1");
+	map(0x2400, 0x2400).mirror(0x1ff).portr("IN0");
+	map(0x2800, 0x2800).mirror(0x1ff).portr("IN1");
 	map(0x3000, 0x3000).w(FUNC(dai3wksi_state::audio_1_w));
 	map(0x3400, 0x3400).w(FUNC(dai3wksi_state::audio_2_w));
 	map(0x3800, 0x3800).w(FUNC(dai3wksi_state::audio_3_w));
