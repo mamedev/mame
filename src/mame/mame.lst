@@ -10058,6 +10058,7 @@ twocrudea                       // MAB (c) 1990 Data East USA (US)
 
 @source:cc40.cpp
 cc40                            // 1983 TI CC-40
+cc40p                           // 1983 TI CC-40+
 
 @source:ccastles.cpp
 ccastles                        // 136022           (c) 1983

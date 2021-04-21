@@ -76,7 +76,7 @@ Mephisto 4 Turbo Kit 18mhz - (mm4tk)
 
 The MM V prototype was the program that Ed Schroeder participated with as "Rebel" at the
 1989 WMCCC in Portorose. It was used with the TK20 TurboKit.
-http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm
+For more information, see: http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm
 
 MM VI (Saitek, 1994) is on different hardware, H8 CPU.
 
@@ -514,4 +514,4 @@ CONS( 1987, mm4tk,   mm4,    0,      mm4tk,    mm2,   mm2_state, empty_init, "ha
 
 CONS( 1990, mm5,     0,      0,      mm5,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1990, mm5a,    mm5,    0,      mm5,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, mm5p,    mm5,    0,      mm5p,     mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (Portorose TM version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1989, mm5p,    mm5,    0,      mm5p,     mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (Portorose TM version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING ) // aka Rebel

@@ -8,12 +8,16 @@ Commonly known as Tasc R30, it's basically a dedicated ChessMachine.
 The King chess engines are also compatible with Tasc's The ChessMachine software
 on PC, however the prototype Gideon 2.1(internally: Rebel 2.01) is not.
 
+The King 2.23 version was not released to the public. It has an opening book
+meant for chesscomputer competitions.
+For more information, see: http://chesseval.com/ChessEvalJournal/R30v223.htm
+
 R30 hardware notes:
 - ARM6 CPU(P60ARM/CG) @ 30MHz
 - 256KB system ROM (2*27C010)
 - 512KB program RAM (4*MT5C1008), 128KB permanent RAM (KM681000ALP-7L)
 - Toshiba LCD drivers (3*T7778A, T7900, T6963C), TC5565AFL-15
-- SB20 or SB30 "Smartboard" chessboard with piece recognition
+- SB20 or SB30 "SmartBoard" chessboard with piece recognition
 
 R40 hardware notes:
 - ARM6 CPU(VY86C061PSTC) @ 40MHz
@@ -305,5 +309,5 @@ ROM_END
 //    YEAR  NAME      PARENT  CMP MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
 CONS( 1995, tascr30,  0,       0, tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30 (The King 2.50)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
 CONS( 1993, tascr30a, tascr30, 0, tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30 (The King 2.20)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
-CONS( 1993, tascr30b, tascr30, 0, tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30 (The King 2.23, unreleased)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
+CONS( 1993, tascr30b, tascr30, 0, tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30 (The King 2.23, TM version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND ) // competed in several chesscomputer tournaments
 CONS( 1993, tascr30g, tascr30, 0, tasc,    tasc,  tasc_state, empty_init, "Tasc", "ChessSystem R30 (Gideon 2.1, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND ) // made in 1993, later released in 2012
