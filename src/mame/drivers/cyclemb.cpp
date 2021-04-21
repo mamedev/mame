@@ -131,6 +131,7 @@ public:
 	uint16_t m_dsw_pc_hack;
 	bool m_use_dial;
 	bool m_screen_display;
+	int m_sprite_page;
 
 	void cyclemb_bankswitch_w(uint8_t data);
 	void skydest_bankswitch_w(uint8_t data);
@@ -265,7 +266,9 @@ void cyclemb_state::cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 	0x27 cone (0x13 0x00)
 	*/
 
-	for(i=0;i<0x80;i+=2)
+	int page_start = m_sprite_page * 0x80;
+
+	for(i=0+page_start;i<0x80+page_start;i+=2)
 	{
 		y = 0xf1 - m_obj2_ram[i];
 		x = m_obj2_ram[i+1] - 56;
@@ -367,7 +370,9 @@ void cyclemb_state::skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 
 //  popmessage("%d %d",m_obj2_ram[0x0d], 0xf1 - m_obj2_ram[0x0c+1] + 68);
 
-	for(i=0;i<0x80;i+=2)
+	int page_start = m_sprite_page * 0x80;
+
+	for(i=0+page_start;i<0x80+page_start;i+=2)
 	{
 		y = m_obj2_ram[i] - 1;
 		x = m_obj2_ram[i+1];
@@ -424,12 +429,14 @@ uint32_t cyclemb_state::screen_update_skydest(screen_device &screen, bitmap_ind1
 
 void cyclemb_state::cyclemb_bankswitch_w(uint8_t data)
 {
-	membank("bank1")->set_entry(data & 3);
+	membank("bank1")->set_entry(data & 0x03);
+	m_sprite_page = (data & 0x04) >> 2;
 }
 
 void cyclemb_state::skydest_bankswitch_w(uint8_t data)
 {
-	membank("bank1")->set_entry(data & 3);
+	membank("bank1")->set_entry(data & 0x03);
+	m_sprite_page = (data & 0x04) >> 2;
 	flip_screen_set((data & 0x40) == 0);
 }
 
@@ -722,9 +729,11 @@ void cyclemb_state::machine_start()
 	}
 
 	save_item(NAME(m_screen_display));
-
+	save_item(NAME(m_sprite_page));
+	
 	cyclemb_dial_reset();
 	m_screen_display = true;
+	m_sprite_page = 0;
 }
 
 void cyclemb_state::machine_reset()
