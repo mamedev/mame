@@ -2406,10 +2406,16 @@ void ymfm_operator<RegisterType>::clock_ssg_eg_state()
 template<class RegisterType>
 void ymfm_operator<RegisterType>::clock_envelope(u32 env_counter)
 {
-	// handle attack->decay and decay->sustain transitions
+	// handle attack->decay transitions
 	if (m_env_state == YMFM_ENV_ATTACK && m_env_attenuation == 0)
 		m_env_state = YMFM_ENV_DECAY;
-	else if (m_env_state == YMFM_ENV_DECAY && m_env_attenuation >= m_cache.eg_sustain)
+
+	// handle decay->sustain transitions; it is important to do this immediately
+	// after the attack->decay transition above in the event that the sustain level
+	// is set to 0 (in which case we will skip right to sustain without doing any
+	// decay); as an example where this can be heard, check the cymbals sound
+	// in channel 0 of shinobi's test mode sound #5
+	if (m_env_state == YMFM_ENV_DECAY && m_env_attenuation >= m_cache.eg_sustain)
 		m_env_state = YMFM_ENV_SUSTAIN;
 
 	// fetch the appropriate 6-bit rate value from the cache
