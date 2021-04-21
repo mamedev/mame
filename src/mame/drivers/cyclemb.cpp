@@ -432,7 +432,7 @@ void cyclemb_state::skydest_bankswitch_w(uint8_t data)
 
 void cyclemb_state::cyclemb_screen_display_w(uint8_t data)
 {
-	m_screen_display = (data != 0);
+	m_screen_display = (data & 0x01) != 0;
 }
 
 #if 0
