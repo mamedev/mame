@@ -1209,13 +1209,13 @@ public:
 	void clock(u32 env_counter, s32 lfo_raw_pm);
 
 	// specific 2-operator and 4-operator output handlers
-	void output_2op(s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax) const;
-	void output_4op(s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax) const;
+	void output_2op(s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax);
+	void output_4op(s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax);
 
 	// compute the special OPL rhythm channel outputs
-	void output_rhythm_ch6(s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax) const;
-	void output_rhythm_ch7(u32 phase_select, s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax) const;
-	void output_rhythm_ch8(u32 phase_select, s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax) const;
+	void output_rhythm_ch6(s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax);
+	void output_rhythm_ch7(u32 phase_select, s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax);
+	void output_rhythm_ch8(u32 phase_select, s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax);
 
 	// are we a 4-operator channel or a 2-operator one?
 	bool is4op() const
@@ -1245,8 +1245,8 @@ private:
 	// internal state
 	u32 m_choffs;                         // channel offset in registers
 	s16 m_feedback[2];                    // feedback memory for operator 1
-	mutable s16 m_feedback_in;            // next input value for op 1 feedback (set in output)
-	mutable s16 m_delay_in;               // next delay value (set in output)
+	s16 m_feedback_in;                    // next input value for op 1 feedback (set in output)
+	s16 m_delay_in;                       // next delay value (set in output)
 	ymfm_operator<RegisterType> *m_op[4]; // up to 4 operators
 	RegisterType &m_regs;                 // direct reference to registers
 	ymfm_engine_base<RegisterType> &m_owner; // reference to the owning engine

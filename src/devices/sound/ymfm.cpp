@@ -2622,7 +2622,7 @@ void ymfm_channel<RegisterType>::clock(u32 env_counter, s32 lfo_raw_pm)
 //-------------------------------------------------
 
 template<class RegisterType>
-void ymfm_channel<RegisterType>::output_2op(s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax) const
+void ymfm_channel<RegisterType>::output_2op(s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax)
 {
 	// The first 2 operators should be populated
 	assert(m_op[0] != nullptr);
@@ -2676,7 +2676,7 @@ void ymfm_channel<RegisterType>::output_2op(s32 outputs[RegisterType::OUTPUTS], 
 //-------------------------------------------------
 
 template<class RegisterType>
-void ymfm_channel<RegisterType>::output_4op(s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax) const
+void ymfm_channel<RegisterType>::output_4op(s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax)
 {
 	// all 4 operators should be populated
 	assert(m_op[0] != nullptr);
@@ -2728,15 +2728,18 @@ void ymfm_channel<RegisterType>::output_4op(s32 outputs[RegisterType::OUTPUTS], 
 		(op2in | (op3in << 1) | (op4in << 4) | (delay << 7) | (op1out << 10) | (op2out << 11) | (op3out << 12))
 	static u16 const s_algorithm_ops[8+4] =
 	{
-		ALGORITHM(1,4,3, 2, 0,0,0),    //  0: O1 -> O2 -> (delay) -> O3 -> O4 -> out (O4)
-		ALGORITHM(0,4,3, 5, 0,0,0),    //  1: (O1 + O2) -> (delay) -> O3 -> O4 -> out (O4)
-		ALGORITHM(0,4,6, 2, 0,0,0),    //  2: (O1 + (O2 -> (delay) -> O3)) -> O4 -> out (O4)
-		ALGORITHM(1,0,7, 2, 0,0,0),    //  3: ((O1 -> O2 -> (delay)) + O3) -> O4 -> out (O4)
+		// OPM/OPN algorithms
+		ALGORITHM(1,4,3, 2, 0,0,0),    //  0: O1 -> O2 -> delay -> O3 -> O4 -> out (O4)
+		ALGORITHM(0,4,3, 5, 0,0,0),    //  1: (O1 + O2) -> delay -> O3 -> O4 -> out (O4)
+		ALGORITHM(0,4,6, 2, 0,0,0),    //  2: (O1 + (O2 -> delay -> O3)) -> O4 -> out (O4)
+		ALGORITHM(1,0,7, 2, 0,0,0),    //  3: ((O1 -> O2 -> delay) + O3) -> O4 -> out (O4)
 		ALGORITHM(1,0,3, 0, 0,1,0),    //  4: ((O1 -> O2) + (O3 -> O4)) -> out (O2+O4)
-		ALGORITHM(1,4,1, 1, 0,1,1),    //  5: ((O1 -> O2) + (O1 -> (delay) -> O3) + (O1 -> O4)) -> out (O2+O3+O4)
+		ALGORITHM(1,4,1, 1, 0,1,1),    //  5: ((O1 -> O2) + (O1 -> delay -> O3) + (O1 -> O4)) -> out (O2+O3+O4)
 		ALGORITHM(1,0,0, 0, 0,1,1),    //  6: ((O1 -> O2) + O3 + O4) -> out (O2+O3+O4)
 		ALGORITHM(0,0,0, 0, 1,1,1),    //  7: (O1 + O2 + O3 + O4) -> out (O1+O2+O3+O4)
-		ALGORITHM(1,2,3, 0, 0,0,0),    //  8: O1 -> O2 -> O3 -> O4 -> out (O4)         [same as 0]
+
+		// OPL3+ algorithms
+		ALGORITHM(1,2,3, 0, 0,0,0),    //  8: O1 -> O2 -> O3 -> O4 -> out (O4)         [same as 0, but no delay]
 		ALGORITHM(0,2,3, 0, 1,0,0),    //  9: (O1 + (O2 -> O3 -> O4)) -> out (O1+O4)   [unique]
 		ALGORITHM(1,0,3, 0, 0,1,0),    // 10: ((O1 -> O2) + (O3 -> O4)) -> out (O2+O4) [same as 4]
 		ALGORITHM(0,2,0, 0, 1,0,1)     // 11: (O1 + (O2 -> O3) + O4) -> out (O1+O3+O4) [unique]
@@ -2753,6 +2756,15 @@ void ymfm_channel<RegisterType>::output_4op(s32 outputs[RegisterType::OUTPUTS], 
 	opmod = opout[BIT(algorithm_ops, 0, 1)] >> 1;
 	opout[2] = m_op[1]->compute_volume(m_op[1]->phase() + opmod, am_offset);
 	opout[5] = opout[1] + opout[2];
+
+	// set the delay value for the next sample; delay only depends on the output
+	// of operators 1 or 2 (or their sum)
+	m_delay_in = opout[BIT(algorithm_ops, 7, 3)];
+
+	// now that both feedback and delay have been computed, skip the rest if all
+	// volumes are clear; no need to do all this work for nothing
+	if (m_regs.ch_output_any(m_choffs) == 0)
+		return;
 
 	// compute the 14-bit volume/value of operator 3
 	opmod = opout[BIT(algorithm_ops, 1, 3)] >> 1;
@@ -2771,9 +2783,6 @@ void ymfm_channel<RegisterType>::output_4op(s32 outputs[RegisterType::OUTPUTS], 
 		result = m_op[3]->compute_volume(m_op[3]->phase() + opmod, am_offset);
 	}
 	result >>= rshift;
-
-	// set the delay value for the next sample
-	m_delay_in = opout[BIT(algorithm_ops, 7, 3)];
 
 	// optionally add OP1, OP2, OP3
 	s32 clipmin = -clipmax - 1;
@@ -2796,7 +2805,7 @@ void ymfm_channel<RegisterType>::output_4op(s32 outputs[RegisterType::OUTPUTS], 
 //-------------------------------------------------
 
 template<class RegisterType>
-void ymfm_channel<RegisterType>::output_rhythm_ch6(s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax) const
+void ymfm_channel<RegisterType>::output_rhythm_ch6(s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax)
 {
 	// AM amount is the same across all operators; compute it once
 	u32 am_offset = m_regs.lfo_am_offset(m_choffs);
@@ -2831,7 +2840,7 @@ void ymfm_channel<RegisterType>::output_rhythm_ch6(s32 outputs[RegisterType::OUT
 //-------------------------------------------------
 
 template<class RegisterType>
-void ymfm_channel<RegisterType>::output_rhythm_ch7(u32 phase_select, s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax) const
+void ymfm_channel<RegisterType>::output_rhythm_ch7(u32 phase_select, s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax)
 {
 	// AM amount is the same across all operators; compute it once
 	u32 am_offset = m_regs.lfo_am_offset(m_choffs);
@@ -2841,7 +2850,7 @@ void ymfm_channel<RegisterType>::output_rhythm_ch7(u32 phase_select, s32 outputs
 	// and a combination of noise and the operator 13/17 phase select
 	// to compute the phase
 	u32 phase = (phase_select << 9) | (0xd0 >> (2 * (noise_state ^ phase_select)));
-	s32 result = m_op[0]->compute_volume(phase, am_offset) >> rshift;
+	s32 result = m_feedback_in = m_op[0]->compute_volume(phase, am_offset) >> rshift;
 
 	// Snare Drum: this uses the envelope from operator 16 (channel 7),
 	// and a combination of noise and operator 13 phase to pick a phase
@@ -2862,13 +2871,13 @@ void ymfm_channel<RegisterType>::output_rhythm_ch7(u32 phase_select, s32 outputs
 //-------------------------------------------------
 
 template<class RegisterType>
-void ymfm_channel<RegisterType>::output_rhythm_ch8(u32 phase_select, s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax) const
+void ymfm_channel<RegisterType>::output_rhythm_ch8(u32 phase_select, s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax)
 {
 	// AM amount is the same across all operators; compute it once
 	u32 am_offset = m_regs.lfo_am_offset(m_choffs);
 
 	// Tom Tom: this is just a single operator processed normally
-	s32 result = m_op[0]->compute_volume(m_op[0]->phase(), am_offset) >> rshift;
+	s32 result = m_feedback_in = m_op[0]->compute_volume(m_op[0]->phase(), am_offset) >> rshift;
 
 	// Top Cymbal: this uses the envelope from operator 17 (channel 8),
 	// and the operator 13/17 phase select to compute the phase
