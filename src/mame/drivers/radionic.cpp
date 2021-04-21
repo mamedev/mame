@@ -25,8 +25,8 @@ Komtek 1 (Radionic R1001) memory map
 37ef      data                           R/W D0-D7
 3800-38ff keyboard matrix                R   D0-D7
 3900-3bff unused - kbd mirrored
-3c00-3fff video RAM                      R/W D0-D5,D7 (or D0-D7)
-4000-ffff RAM
+3c00-3fff static video RAM and colour ram, banked
+4000-ffff dynamic main RAM
 
 Printer: Level II usually 37e8
 
@@ -54,23 +54,39 @@ About the RTC - The time is incremented while ever the cursor is flashing. It is
     seconds, minutes, hours, days. The seconds are stored at 0x4041.
     A reboot always sets the time to zero.
 
-Radionic has 16 colours with a byte at 350B controlling the operation. See manual.
-
+About colours - The computer has 16 colours with a byte at 350B controlling the operation.
+    POKE 13579,2  : monochrome
+    POKE 13579,4  : programmable colour
+    POKE 13579,12 : automatic colour
+    There's no schematic or documentation of the Colour Board, however some more information...
+    - It doesn't have to be 350B (13579), anything in the 35xx range will do.
+    - d0 : write of vram goes to vram (0 = yes, 1 = no)
+    - d1 : write of vram goes to colour ram (0 = yes, 1 = no)
+    - d2 : colour enable (0 = monochrome, 1 = colour)
+    - d3 : programmable or automatic (0 = programmable, 1 = automatic)
+    List of colour codes:
+    0 = off white; 1 = light green; 2 = red; 3 = dark green; 4 = blue; 5 = greenish blue;
+    6 = rose red; 7 = dusty blue; 8 = greenish yellow; 9 = light yellow (greenish); 10 = golden red
+    11 = grey; 12 = reddish green; 13 = pale yellow; 14 = orange; 15 = ogre green.
+    As you can see, the descriptions are quite vague, and appear to be background only. The foreground
+    is assumed to always be white.
+    Automatic is a preset colour set by internal jumpers.
+    - No schematic or technical info for the colour board
+    - No information on the settings of the Automatic mode
+    - The "User Friendly Manual" has a bunch of mistakes (page 15).
+    - When reading video ram, it is not known how this is affected if colour ram is enabled
+    - No colour programs exist in the wild, so nothing can be verified.
+    So, some guesswork has been done.
 
 ********************************************************************************************************
 
 To Do / Status:
 --------------
 
-- For those machines that allow it, add cass2 as an image device and hook it up.
 - Difficulty loading real tapes.
 - Writing to floppy is problematic; freezing/crashing are common issues.
-
-radionic:  works
-           add colour (no schematic; manual says jumpers set the Auto-Colour, but this isn't
-             documented anywhere).
-           expansion-box?
-           uart
+- Add rs232 board
+- Add fdc doubler (only some info available)
 
 *******************************************************************************************************/
 
@@ -92,13 +108,18 @@ public:
 
 private:
 	INTERRUPT_GEN_MEMBER(rtc_via_nmi);
+	void radionic_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
+	std::unique_ptr<u8[]> m_vram;  // video ram
+	std::unique_ptr<u8[]> m_cram;  // colour ram
+	void machine_start() override;
+	void cctrl_w(offs_t offset, u8 data);
+	void video_w(offs_t offset, u8 data);
+	u8 video_r(offs_t offset);
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
-
 	static void floppy_formats(format_registration &fr);
-
+	u8 m_cctrl = 0;
 	required_device<i8255_device> m_ppi;
 };
 
@@ -107,8 +128,7 @@ void radionic_state::mem_map(address_map &map)
 	map(0x0000, 0x37ff).rom();
 	// Optional external RS232 module with 8251
 	//map(0x3400, 0x3401).mirror(0xfe).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
-	// Internal colour controls (need details)
-	//map(0x3500, 0x35ff).w(FUNC(radionic_state::colour_w));
+	map(0x3500, 0x35ff).w(FUNC(radionic_state::cctrl_w));
 	// Internal interface to external slots
 	map(0x3600, 0x3603).mirror(0xfc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x37de, 0x37de).rw(FUNC(radionic_state::sys80_f9_r), FUNC(radionic_state::sys80_f8_w));
@@ -118,7 +138,7 @@ void radionic_state::mem_map(address_map &map)
 	map(0x37e8, 0x37eb).rw(FUNC(radionic_state::printer_r), FUNC(radionic_state::printer_w));
 	map(0x37ec, 0x37ef).rw(FUNC(radionic_state::fdc_r), FUNC(radionic_state::fdc_w));
 	map(0x3800, 0x3bff).r(FUNC(radionic_state::keyboard_r));
-	map(0x3c00, 0x3fff).ram().share(m_p_videoram);
+	map(0x3c00, 0x3fff).rw(FUNC(radionic_state::video_r), FUNC(radionic_state::video_w));
 	map(0x4000, 0xffff).ram();
 }
 
@@ -238,7 +258,7 @@ static INPUT_PORTS_START( radionic )
 	PORT_CONFSETTING(   0x00, "Both Off" )
 	PORT_CONFSETTING(   0x80, "RTC off, Floppy On" )
 	PORT_CONFSETTING(   0x40, "RTC on, Floppy Off" )
-	PORT_CONFNAME(    0x30, 0x00,   "Colour")  // This isn't hooked up yet
+	PORT_CONFNAME(    0x30, 0x00,   "Colour")  // 2 switches on the side
 	PORT_CONFSETTING(   0x00, "Monochrome" )
 	PORT_CONFSETTING(   0x10, "Auto Colour" )
 	PORT_CONFSETTING(   0x30, "Programmable Colour" )
@@ -259,6 +279,36 @@ static INPUT_PORTS_START( radionic )
 	PORT_DIPSETTING(    0x60, "8")
 INPUT_PORTS_END
 
+
+/* Levels are unknown - guessing */
+static constexpr rgb_t radionic_pens[] =
+{
+	// colour
+	{ 200, 200, 200 }, // 0 off white
+	{   0, 255,   0 }, // 1 light green
+	{ 255,   0,   0 }, // 2 red
+	{   0, 128,   0 }, // 3 dark green
+	{   0,   0, 255 }, // 4 blue
+	{   0, 255, 255 }, // 5 greenish blue
+	{ 255,   3,  62 }, // 6 rose red
+	{ 136, 155, 174 }, // 7 dusty blue
+	{ 200, 200,   0 }, // 8 greenish yellow
+	{ 173, 255,  47 }, // 9 light yellow (greenish)
+	{ 207,  33,  33 }, // 10 golden red
+	{ 128, 128, 128 }, // 11 grey
+	{ 220, 255,   0 }, // 12 reddish green
+	{ 255, 255, 191 }, // 13 pale yellow
+	{ 247, 170,   0 }, // 14 orange
+	{  90, 156,  57 }, // 15 ogre green
+	// monochrome
+	{ 250, 250, 250 }, // 16 white
+	{   0,   0,   0 }  // 17 black
+};
+
+void radionic_state::radionic_palette(palette_device &palette) const
+{
+	palette.set_pen_colors(0, radionic_pens);
+}
 
 /**************************** F4 CHARACTER DISPLAYER ***********************************************************/
 static const gfx_layout radionic_charlayout =
@@ -284,6 +334,12 @@ uint32_t radionic_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	uint16_t sy=0,ma=0;
 	uint8_t cols = BIT(m_mode, 0) ? 32 : 64;
 	uint8_t skip = BIT(m_mode, 0) ? 2 : 1;
+	// colours have to be enabled both by a poke and by switches on the side of the unit
+	bool col_en = BIT(m_cctrl, 2) && BIT(m_io_config->read(), 4);
+	bool auto_en = BIT(m_cctrl, 3) || !BIT(m_io_config->read(), 5);
+	u8 fg = 16, bg = 17;   // monochrome
+	if (col_en && auto_en)
+		bg = 4;    // automatic colour
 
 	if (m_mode != m_size_store)
 	{
@@ -299,20 +355,22 @@ uint32_t radionic_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 			for (uint16_t x = ma; x < ma + 64; x+=skip)
 			{
-				uint8_t chr = m_p_videoram[x];
+				uint8_t chr = m_vram[x];
+				if (col_en && !auto_en)
+					bg = m_cram[x] & 15;
 
 				/* get pattern of pixels for that character scanline */
 				uint8_t gfx = m_p_chargen[(chr<<3) | (ra & 7) | (ra & 8) << 8];
 
 				/* Display a scanline of a character (8 pixels) */
-				*p++ = BIT(gfx, 0);
-				*p++ = BIT(gfx, 1);
-				*p++ = BIT(gfx, 2);
-				*p++ = BIT(gfx, 3);
-				*p++ = BIT(gfx, 4);
-				*p++ = BIT(gfx, 5);
-				*p++ = BIT(gfx, 6);
-				*p++ = BIT(gfx, 7);
+				*p++ = BIT(gfx, 0) ? fg : bg;
+				*p++ = BIT(gfx, 1) ? fg : bg;
+				*p++ = BIT(gfx, 2) ? fg : bg;
+				*p++ = BIT(gfx, 3) ? fg : bg;
+				*p++ = BIT(gfx, 4) ? fg : bg;
+				*p++ = BIT(gfx, 5) ? fg : bg;
+				*p++ = BIT(gfx, 6) ? fg : bg;
+				*p++ = BIT(gfx, 7) ? fg : bg;
 			}
 		}
 		ma+=64;
@@ -320,10 +378,46 @@ uint32_t radionic_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
+void radionic_state::machine_start()
+{
+	trs80_state::machine_start();
+	save_item(NAME(m_cctrl));
+
+	// video ram
+	m_vram = make_unique_clear<u8[]>(0x0800);
+	save_pointer(NAME(m_vram), 0x0800);
+
+	// colour
+	m_cram = make_unique_clear<u8[]>(0x0800);
+	save_pointer(NAME(m_cram), 0x0800);
+}
+
 INTERRUPT_GEN_MEMBER(radionic_state::rtc_via_nmi)
 {
 	if (BIT(m_io_config->read(), 6))
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::from_nsec(1));
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::from_usec(100));
+}
+
+u8 radionic_state::video_r(offs_t offset)
+{
+	// undocumented; guessing
+	if ((m_cctrl & 3) == 2)
+		return m_cram[offset];
+	else
+		return m_vram[offset];
+}
+
+void radionic_state::video_w(offs_t offset, u8 data)
+{
+	if (!BIT(m_cctrl, 0))
+		m_vram[offset] = data;
+	if (!BIT(m_cctrl, 1))
+		m_cram[offset] = data;
+}
+
+void radionic_state::cctrl_w(offs_t offset, u8 data)
+{
+	m_cctrl = data & 15;
 }
 
 void radionic_state::floppy_formats(format_registration &fr)
@@ -346,10 +440,10 @@ void radionic_state::radionic(machine_config &config)
 {
 	// Photos from Incog show 12.1648, and 3.579545 xtals. The schematic seems to just approximate these values.
 	Z80(config, m_maincpu, 3.579545_MHz_XTAL / 2);
-	//m_maincpu->set_clock(MASTER_XTAL / 6); // or 3.579545_MHz_XTAL / 2 (selectable?)
+	//m_maincpu->set_clock(MASTER_XTAL / 6); // early machines only, before the floppy interface was added
 	m_maincpu->set_addrmap(AS_PROGRAM, &radionic_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &radionic_state::io_map);
-	m_maincpu->set_periodic_int(FUNC(radionic_state::rtc_via_nmi), attotime::from_hz(MASTER_XTAL / 12 / 16384));  // breaks floppy
+	m_maincpu->set_periodic_int(FUNC(radionic_state::rtc_via_nmi), attotime::from_hz(MASTER_XTAL / 12 / 16384));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -358,7 +452,7 @@ void radionic_state::radionic(machine_config &config)
 	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_radionic);
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	PALETTE(config, "palette", FUNC(radionic_state::radionic_palette), 18);   // 16 colours + monochrome
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

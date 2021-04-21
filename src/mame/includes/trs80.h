@@ -100,7 +100,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_region_maincpu;
 	required_region_ptr<u8> m_p_chargen;
-	required_shared_ptr<u8> m_p_videoram;
+	optional_shared_ptr<u8> m_p_videoram;
 	optional_device<centronics_device> m_centronics;
 	optional_device<output_latch_device> m_cent_data_out;
 	optional_device<input_buffer_device> m_cent_status_in;
