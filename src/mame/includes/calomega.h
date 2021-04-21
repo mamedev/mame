@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Roberto Fresca
+// copyright-holders: Roberto Fresca
 
 #ifndef MAME_INCLUDES_CALOMEGA_H
 #define MAME_INCLUDES_CALOMEGA_H
@@ -63,8 +63,6 @@ protected:
 	virtual void video_start() override;
 
 private:
-	uint8_t piat_read(offs_t offset);
-	void piat_write(offs_t offset, uint8_t data);
 	void calomega_videoram_w(offs_t offset, uint8_t data);
 	void calomega_colorram_w(offs_t offset, uint8_t data);
 	uint8_t s903_mux_port_r();
@@ -76,11 +74,9 @@ private:
 	void pia0_bout_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_b);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);    
 	DECLARE_READ_LINE_MEMBER(timera_r);
-	DECLARE_READ_LINE_MEMBER(timerc_r);    
-	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
+	DECLARE_READ_LINE_MEMBER(vblank_r);
+	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
 	uint8_t pia1_ain_r();
 	uint8_t pia1_bin_r();
 	void pia1_aout_w(uint8_t data);
@@ -88,7 +84,8 @@ private:
 	void lamps_903a_w(uint8_t data);
 	void lamps_903b_w(uint8_t data);
 	void lamps_905_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(cpu_sync);
+//	DECLARE_WRITE_LINE_MEMBER(cpu_sync);
+	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_tx);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_WRITE_LINE_MEMBER(update_aciabaud_scale);
@@ -121,23 +118,11 @@ private:
 	optional_ioport m_sw2;
 	output_finder<9> m_lamps;
 
-	bool m_sync;
-	bool m_timera, m_timerb, m_timerc;
-	uint8_t m_vblank, m_tx_line;
-	
+// 	uint8_t m_vblank, m_timera,m_sync, m_tx_line;
+	uint8_t m_vblank, m_timera, m_tx_line;
 	int m_s903_mux_data;
 	int m_s905_mux_data;
 	tilemap_t *m_bg_tilemap;
-
-	// PIAT
-	uint8_t piat_b_thi = 0;
-	uint8_t piat_01 = 0;
-	uint8_t piat_b_tlo = 0;
-	uint8_t piat_b_ctl_w;
-	uint8_t piat_b_ctl_r;
-	uint16_t piat_b_timer = 0;
-	bool piat_b_enable = false;
-	bool piat_state = false;
 };
 
 #endif // MAME_INCLUDES_CALOMEGA_H
