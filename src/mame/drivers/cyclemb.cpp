@@ -413,7 +413,7 @@ uint32_t cyclemb_state::screen_update_cyclemb(screen_device &screen, bitmap_ind1
 	if (m_screen_display)
 	{
 		cyclemb_draw_tilemap(screen,bitmap,cliprect);
-		cyclemb_draw_sprites(screen, bitmap, cliprect);
+		cyclemb_draw_sprites(screen,bitmap,cliprect);
 	}
 	return 0;
 }
@@ -422,8 +422,11 @@ uint32_t cyclemb_state::screen_update_skydest(screen_device &screen, bitmap_ind1
 {
 	bitmap.fill(0, cliprect);
 
-	skydest_draw_tilemap(screen,bitmap,cliprect);
-	skydest_draw_sprites(screen,bitmap,cliprect);
+	if (m_screen_display)
+	{
+		skydest_draw_tilemap(screen,bitmap,cliprect);
+		skydest_draw_sprites(screen,bitmap,cliprect);
+	}
 	return 0;
 }
 
@@ -661,7 +664,7 @@ void cyclemb_state::skydest_io(address_map &map)
 {
 //  map.global_mask(0xff);
 	map(0xc000, 0xc000).w(FUNC(cyclemb_state::skydest_bankswitch_w));
-	//map(0xc020, 0xc020).nopw(); // ?
+	map(0xc020, 0xc020).w(FUNC(cyclemb_state::cyclemb_screen_display_w));
 	map(0xc080, 0xc081).rw(FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
 	//map(0xc0a0, 0xc0a0).nopw(); // ?
 	//map(0xc0bf, 0xc0bf).w(FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
