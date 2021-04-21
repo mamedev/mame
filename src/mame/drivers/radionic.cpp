@@ -92,7 +92,10 @@ To Do / Status:
 
 #include "emu.h"
 #include "includes/trs80.h"
+#include "machine/i8251.h"
 #include "machine/i8255.h"
+#include "machine/clock.h"
+#include "bus/rs232/rs232.h"
 #define MASTER_XTAL 12164800
 
 
@@ -102,6 +105,8 @@ public:
 	radionic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: trs80_state(mconfig, type, tag)
 		, m_ppi(*this, "ppi")
+		, m_uart2(*this, "uart2")
+		, m_clock(*this, "uclock")
 	{ }
 
 	void radionic(machine_config &config);
@@ -113,44 +118,30 @@ private:
 	std::unique_ptr<u8[]> m_vram;  // video ram
 	std::unique_ptr<u8[]> m_cram;  // colour ram
 	void machine_start() override;
+	void machine_reset() override;
 	void cctrl_w(offs_t offset, u8 data);
 	void video_w(offs_t offset, u8 data);
 	u8 video_r(offs_t offset);
 	void mem_map(address_map &map);
-	void io_map(address_map &map);
 	static void floppy_formats(format_registration &fr);
-	u8 m_cctrl = 0;
+	u8 m_cctrl = 2;
 	required_device<i8255_device> m_ppi;
+	required_device<i8251_device> m_uart2;
+	required_device<clock_device> m_clock;
 };
 
 void radionic_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x37ff).rom();
-	// Optional external RS232 module with 8251
-	//map(0x3400, 0x3401).mirror(0xfe).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x3400, 0x3401).mirror(0xfe).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));  // optional RS-232
 	map(0x3500, 0x35ff).w(FUNC(radionic_state::cctrl_w));
-	// Internal interface to external slots
-	map(0x3600, 0x3603).mirror(0xfc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x37de, 0x37de).rw(FUNC(radionic_state::sys80_f9_r), FUNC(radionic_state::sys80_f8_w));
-	map(0x37df, 0x37df).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
+	map(0x3600, 0x3603).mirror(0xfc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));  // interface to external sensors
 	map(0x37e0, 0x37e3).rw(FUNC(radionic_state::irq_status_r), FUNC(radionic_state::motor_w));
-	map(0x37e4, 0x37e7).w(FUNC(radionic_state::cassunit_w));
 	map(0x37e8, 0x37eb).rw(FUNC(radionic_state::printer_r), FUNC(radionic_state::printer_w));
 	map(0x37ec, 0x37ef).rw(FUNC(radionic_state::fdc_r), FUNC(radionic_state::fdc_w));
 	map(0x3800, 0x3bff).r(FUNC(radionic_state::keyboard_r));
 	map(0x3c00, 0x3fff).rw(FUNC(radionic_state::video_r), FUNC(radionic_state::video_w));
 	map(0x4000, 0xffff).ram();
-}
-
-void radionic_state::io_map(address_map &map)
-{
-	map.global_mask(0xff);
-	map.unmap_value_high();
-	map(0xe8, 0xe8).rw(FUNC(radionic_state::port_e8_r), FUNC(radionic_state::port_e8_w));
-	map(0xe9, 0xe9).portr("E9").w("brg", FUNC(com8116_device::stt_str_w));
-	map(0xea, 0xea).rw(FUNC(radionic_state::port_ea_r), FUNC(radionic_state::port_ea_w));
-	map(0xeb, 0xeb).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
-	map(0xff, 0xff).rw(FUNC(radionic_state::port_ff_r), FUNC(radionic_state::port_ff_w));
 }
 
 /**************************************************************************
@@ -254,29 +245,20 @@ static INPUT_PORTS_START( radionic )
 	PORT_BIT(0xfe, 0x00, IPT_UNUSED)
 
 	PORT_START("CONFIG")
-	PORT_CONFNAME(    0xc0, 0x00,   "Floppy and RTC") // Floppy doesn't work if RTC is on, so interlink them.
+	PORT_CONFNAME(  0xc0, 0x00, "Floppy and RTC") // Floppy doesn't work if RTC is on, so interlink them.
 	PORT_CONFSETTING(   0x00, "Both Off" )
 	PORT_CONFSETTING(   0x80, "RTC off, Floppy On" )
 	PORT_CONFSETTING(   0x40, "RTC on, Floppy Off" )
-	PORT_CONFNAME(    0x30, 0x00,   "Colour")  // 2 switches on the side
+	PORT_CONFNAME(  0x30, 0x00, "Colour")  // 2 switches on the side
 	PORT_CONFSETTING(   0x00, "Monochrome" )
 	PORT_CONFSETTING(   0x10, "Auto Colour" )
 	PORT_CONFSETTING(   0x30, "Programmable Colour" )
-
-	PORT_START("E9")    // these are the power-on uart settings
-	PORT_BIT(0x07, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x88, 0x08, "Parity")
-	PORT_DIPSETTING(    0x08, DEF_STR(None))
-	PORT_DIPSETTING(    0x00, "Odd")
-	PORT_DIPSETTING(    0x80, "Even")
-	PORT_DIPNAME( 0x10, 0x10, "Stop Bits")
-	PORT_DIPSETTING(    0x10, "2")
-	PORT_DIPSETTING(    0x00, "1")
-	PORT_DIPNAME( 0x60, 0x60, "Bits")
-	PORT_DIPSETTING(    0x00, "5")
-	PORT_DIPSETTING(    0x20, "6")
-	PORT_DIPSETTING(    0x40, "7")
-	PORT_DIPSETTING(    0x60, "8")
+	PORT_CONFNAME(  0x07, 0x00, "Serial Port" ) // a jumper on the board? (not documented)
+	PORT_CONFSETTING(   0x00, "300 baud" )
+	PORT_CONFSETTING(   0x01, "600 baud" )
+	PORT_CONFSETTING(   0x02, "1200 baud" )
+	PORT_CONFSETTING(   0x03, "2400 baud" )
+	PORT_CONFSETTING(   0x04, "4800 baud" )
 INPUT_PORTS_END
 
 
@@ -392,6 +374,19 @@ void radionic_state::machine_start()
 	save_pointer(NAME(m_cram), 0x0800);
 }
 
+void radionic_state::machine_reset()
+{
+	trs80_state::machine_reset();
+	m_cctrl = 2;
+
+	u8 sw = m_io_config->read() & 7;
+	u16 baud = 300;
+	for (u8 i = 0; i < sw; i++)
+		baud <<= 1;
+	m_clock->set_unscaled_clock(baud*16); // It's designed on the assumption that the uart will divide by 16
+	//printf("%d\n",baud);
+}
+
 INTERRUPT_GEN_MEMBER(radionic_state::rtc_via_nmi)
 {
 	if (BIT(m_io_config->read(), 6))
@@ -400,11 +395,7 @@ INTERRUPT_GEN_MEMBER(radionic_state::rtc_via_nmi)
 
 u8 radionic_state::video_r(offs_t offset)
 {
-	// undocumented; guessing
-	if ((m_cctrl & 3) == 2)
-		return m_cram[offset];
-	else
-		return m_vram[offset];
+	return m_vram[offset];
 }
 
 void radionic_state::video_w(offs_t offset, u8 data)
@@ -442,7 +433,7 @@ void radionic_state::radionic(machine_config &config)
 	Z80(config, m_maincpu, 3.579545_MHz_XTAL / 2);
 	//m_maincpu->set_clock(MASTER_XTAL / 6); // early machines only, before the floppy interface was added
 	m_maincpu->set_addrmap(AS_PROGRAM, &radionic_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &radionic_state::io_map);
+	m_maincpu->set_addrmap(AS_IO, &radionic_state::trs80_io);
 	m_maincpu->set_periodic_int(FUNC(radionic_state::rtc_via_nmi), attotime::from_hz(MASTER_XTAL / 12 / 16384));
 
 	/* video hardware */
@@ -466,7 +457,7 @@ void radionic_state::radionic(machine_config &config)
 
 	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(radionic_state::quickload_cb));
 
-	FD1771(config, m_fdc, 4_MHz_XTAL / 4);
+	FD1771(config, m_fdc, 16_MHz_XTAL / 16);
 	m_fdc->intrq_wr_callback().set(FUNC(radionic_state::intrq_w));
 
 	FLOPPY_CONNECTOR(config, m_floppy[0], radionic_floppies, "80t_qd", radionic_state::floppy_formats).enable_sound(true);
@@ -485,16 +476,19 @@ void radionic_state::radionic(machine_config &config)
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
 
-	com8116_device &brg(COM8116(config, "brg", 5.0688_MHz_XTAL));   // BR1941L
-	brg.fr_handler().set(m_uart, FUNC(ay31015_device::write_rcp));
-	brg.ft_handler().set(m_uart, FUNC(ay31015_device::write_tcp));
+	CLOCK(config, m_clock, 4'800);
+	m_clock->signal_handler().set(m_uart2, FUNC(i8251_device::write_txc));
+	m_clock->signal_handler().set(m_uart2, FUNC(i8251_device::write_rxc));
 
-	AY31015(config, m_uart);
-	m_uart->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
-	m_uart->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
-	//MCFG_AY31015_WRITE_DAV_CB(WRITELINE( , , ))
-	m_uart->set_auto_rdav(true);
-	RS232_PORT(config, "rs232", default_rs232_devices, nullptr);
+	// RS232 port: the schematic is missing most of the info, so guessing
+	I8251(config, m_uart2, 3.579545_MHz_XTAL / 2 );
+	m_uart2->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_uart2->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_uart2->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart2, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(m_uart2, FUNC(i8251_device::write_dsr));
 
 	// Interface to external circuits
 	I8255(config, m_ppi);

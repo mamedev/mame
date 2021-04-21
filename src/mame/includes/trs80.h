@@ -96,6 +96,7 @@ protected:
 	double m_old_cassette_val;
 	uint8_t m_size_store;
 	uint16_t m_timeout;
+	void trs80_io(address_map &map);
 	floppy_image_device *m_fdd;
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_region_maincpu;
@@ -118,7 +119,6 @@ private:
 	void m1_io(address_map &map);
 	void m1_mem(address_map &map);
 	void sys80_io(address_map &map);
-	void trs80_io(address_map &map);
 	void trs80_mem(address_map &map);
 	void ht1080z_io(address_map &map);
 
