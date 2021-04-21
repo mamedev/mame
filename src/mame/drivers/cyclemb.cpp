@@ -10,8 +10,10 @@
     driver by Angelo Salese
 
     TODO:
+    - separate driver into 2 classes
+    - reduce tagmap lookups
     - sound (controlled by three i8741);
-    - Coinage (controlled by i8741, like Gladiator / Ougon no Shiro);
+    - coinage (controlled by i8741, like Gladiator / Ougon no Shiro);
     - color prom resistor network is guessed, cyclemb yellows are more reddish on pcb video and photos;
 
     BTANB verified on pcb: cyclemb standing cones are reddish-yellow/black instead of red/white
@@ -115,7 +117,6 @@ public:
 	{
 		uint8_t current_value;
 		bool reverse;
-		bool update;
 	} m_dial_status[2];
 
 	struct
@@ -142,6 +143,7 @@ public:
 	void skydest_i8741_1_w(offs_t offset, uint8_t data);
 //  DECLARE_WRITE_LINE_MEMBER(ym_irq);
 
+	void update_dial(int P);
 	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(dial_r);
 
 	void init_skydest();
@@ -479,7 +481,6 @@ void cyclemb_state::cyclemb_dial_reset()
 	{
 		m_dial_status[i].current_value = 0;
 		m_dial_status[i].reverse = false;
-		m_dial_status[i].update = false;
 	}
 }
 
@@ -520,7 +521,7 @@ uint8_t cyclemb_state::skydest_i8741_0_r(offs_t offset)
 						m_mcu[0].packet_type^=0x20;
 						if(m_mcu[0].packet_type & 0x20)
 						{
-							m_dial_status[0].update = true;
+							update_dial(0);
 							m_mcu[0].rxd = ((ioport("P1_1")->read()) & 0x9f) | (m_mcu[0].packet_type);
 						}
 						else
@@ -535,7 +536,7 @@ uint8_t cyclemb_state::skydest_i8741_0_r(offs_t offset)
 						m_mcu[0].packet_type^=0x20;
 						if(m_mcu[0].packet_type & 0x20)
 						{
-							m_dial_status[1].update = true;
+							update_dial(1);
 							m_mcu[0].rxd = ((ioport("P2_1")->read()) & 0x9f) | (m_mcu[0].packet_type);
 						}
 						else
@@ -717,7 +718,6 @@ void cyclemb_state::machine_start()
 	{
 		save_item(NAME(m_dial_status[i].current_value), i);
 		save_item(NAME(m_dial_status[i].reverse), i);
-		save_item(NAME(m_dial_status[i].update), i);
 	}
 
 	save_item(NAME(m_screen_display));
@@ -732,23 +732,21 @@ void cyclemb_state::machine_reset()
 	cyclemb_dial_reset();
 }
 
+void cyclemb_state::update_dial(int P)
+{
+	int8_t input_value = m_dial[P]->read();
+	int delta = std::clamp((int)input_value, -0x1f, 0x1f);
+
+	if (delta != 0)
+	{
+		m_dial_status[P].reverse = (delta < 0);
+		m_dial_status[P].current_value = (m_dial_status[P].current_value + (uint8_t)abs(delta)) & 0x1f;
+	}
+}
+
 template <int P>
 CUSTOM_INPUT_MEMBER(cyclemb_state::dial_r)
 {
-	if (m_dial_status[P].update)
-	{
-		m_dial_status[P].update = false;
-
-		int8_t input_value = m_dial[P]->read();
-		int delta = std::clamp((int)input_value, -0x1f, 0x1f);
-
-		if (delta != 0)
-		{
-			m_dial_status[P].reverse = (delta < 0);
-			m_dial_status[P].current_value = (m_dial_status[P].current_value + (uint8_t)abs(delta)) & 0x1f;
-		}
-	}
-
 	return m_dial_status[P].current_value | (m_dial_status[P].reverse ? 0x80 : 0x00);
 }
 
