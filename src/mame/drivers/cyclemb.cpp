@@ -129,6 +129,7 @@ public:
 	} m_mcu[2];
 
 	uint16_t m_dsw_pc_hack;
+	bool m_use_dial;
 	bool m_screen_display;
 
 	void cyclemb_bankswitch_w(uint8_t data);
@@ -734,6 +735,11 @@ void cyclemb_state::machine_reset()
 
 void cyclemb_state::update_dial(int P)
 {
+	if (!m_use_dial)
+	{
+		return;
+	}
+
 	int8_t input_value = m_dial[P]->read();
 	int delta = std::clamp((int)input_value, -0x1f, 0x1f);
 
@@ -1111,6 +1117,8 @@ void cyclemb_state::init_cyclemb()
 	rom[0xa36] = 0x00;
 	rom[0xa37] = 0x00;
 	rom[0xa38] = 0x00;
+
+	m_use_dial = true;
 }
 
 void cyclemb_state::init_skydest()
@@ -1127,6 +1135,8 @@ void cyclemb_state::init_skydest()
 	rom[0xa36] = 0x00;
 	rom[0xa37] = 0x00;
 	rom[0xa38] = 0x00;
+
+	m_use_dial = false;
 }
 
 GAME( 1984, cyclemb, 0, cyclemb,  cyclemb, cyclemb_state, init_cyclemb, ROT0, "Taito Corporation", "Cycle Maabou (Japan)",  MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
