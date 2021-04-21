@@ -113,7 +113,7 @@ public:
 	optional_ioport_array<2> m_dial;
 	struct
 	{
-		uint8_t curent_value;
+		uint8_t current_value;
 		bool reverse;
 		bool update;
 	} m_dial_status[2];
@@ -405,7 +405,7 @@ uint32_t cyclemb_state::screen_update_cyclemb(screen_device &screen, bitmap_ind1
 	if (m_screen_display)
 	{
 		cyclemb_draw_tilemap(screen,bitmap,cliprect);
-		cyclemb_draw_sprites(screen,bitmap,cliprect);
+		cyclemb_draw_sprites(screen, bitmap, cliprect);
 	}
 	return 0;
 }
@@ -477,7 +477,7 @@ void cyclemb_state::cyclemb_dial_reset()
 {
 	for (int i = 0; i < 2; i++)
 	{
-		m_dial_status[i].curent_value = 0;
+		m_dial_status[i].current_value = 0;
 		m_dial_status[i].reverse = false;
 		m_dial_status[i].update = false;
 	}
@@ -715,7 +715,7 @@ void cyclemb_state::machine_start()
 
 	for (int i = 0; i < 2; i++)
 	{
-		save_item(NAME(m_dial_status[i].curent_value), i);
+		save_item(NAME(m_dial_status[i].current_value), i);
 		save_item(NAME(m_dial_status[i].reverse), i);
 		save_item(NAME(m_dial_status[i].update), i);
 	}
@@ -745,11 +745,11 @@ CUSTOM_INPUT_MEMBER(cyclemb_state::dial_r)
 		if (delta != 0)
 		{
 			m_dial_status[P].reverse = (delta < 0);
-			m_dial_status[P].curent_value = (m_dial_status[P].curent_value + (uint8_t)abs(delta)) & 0x7f;
+			m_dial_status[P].current_value = (m_dial_status[P].current_value + (uint8_t)abs(delta)) & 0x1f;
 		}
 	}
 
-	return m_dial_status[P].curent_value | (m_dial_status[P].reverse ? 0x80 : 0x00);
+	return m_dial_status[P].current_value | (m_dial_status[P].reverse ? 0x80 : 0x00);
 }
 
 
