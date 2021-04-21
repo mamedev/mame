@@ -89,7 +89,6 @@ About the system80 - Asian version of trs80l2, known as EACA Video Genie. In USA
     - Gnnnn : Execute program at nnnn
     - Gnnnn,tttt : as above, breakpoint at tttt
     - R : modify registers
-    The monitor works on the radionic too.
 
 About the ht1080z - This was made for schools in Hungary. Each comes with a BASIC extension roms
     which activated Hungarian features. To activate - start emulation - enter SYSTEM
