@@ -21,7 +21,7 @@ Recreativos Franco used this hardware from 1987 to 1992 on several machines, inc
   -Baby Formula
   -Limon y Baby
   -Limon y Baby 100
-  -Baby Afrojin Dakar 3
+  -Baby Ajofrin Dakar 3
   -El Tren
   -Baby Derby
   Etc.
