@@ -1995,6 +1995,9 @@ void segas16a_state::system16a(machine_config &config)
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
 	m_screen->set_screen_update(FUNC(segas16a_state::screen_update));
 	m_screen->set_palette(m_palette);
+	// see MT1852 (glitch in fantzone after stage intro text vanishes)
+	// this is a hack, but the scroll values must be latched at some point, when is unknown
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 
 	SEGA_SYS16A_SPRITES(config, m_sprites, 0);
 	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
@@ -2056,6 +2059,9 @@ void segas16a_state::system16a_i8751(machine_config &config)
 	m_mcu->port_out_cb<1>().set(FUNC(segas16a_state::mcu_control_w));
 
 	m_screen->screen_vblank().set(FUNC(segas16a_state::i8751_main_cpu_vblank_w));
+
+	// prevent glitchy background scroll on quartet stage 18
+	config.set_maximum_quantum(attotime::from_hz(6000));
 }
 
 void segas16a_state::system16a_no7751(machine_config &config)
