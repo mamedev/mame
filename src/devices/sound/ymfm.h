@@ -1246,6 +1246,7 @@ private:
 	u32 m_choffs;                         // channel offset in registers
 	s16 m_feedback[2];                    // feedback memory for operator 1
 	mutable s16 m_feedback_in;            // next input value for op 1 feedback (set in output)
+	mutable s16 m_delay_in;               // next delay value (set in output)
 	ymfm_operator<RegisterType> *m_op[4]; // up to 4 operators
 	RegisterType &m_regs;                 // direct reference to registers
 	ymfm_engine_base<RegisterType> &m_owner; // reference to the owning engine

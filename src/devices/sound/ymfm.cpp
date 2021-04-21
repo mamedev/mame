@@ -2529,6 +2529,7 @@ ymfm_channel<RegisterType>::ymfm_channel(ymfm_engine_base<RegisterType> &owner, 
 	m_choffs(choffs),
 	m_feedback{ 0, 0 },
 	m_feedback_in(0),
+	m_delay_in(0),
 	m_op{ nullptr, nullptr, nullptr, nullptr },
 	m_regs(owner.regs()),
 	m_owner(owner)
@@ -2546,6 +2547,7 @@ void ymfm_channel<RegisterType>::save(device_t &device, u32 index)
 	// save our data
 	device.save_item(YMFM_NAME(m_feedback), index);
 	device.save_item(YMFM_NAME(m_feedback_in), index);
+	device.save_item(YMFM_NAME(m_delay_in), index);
 }
 
 
@@ -2559,6 +2561,7 @@ void ymfm_channel<RegisterType>::reset()
 	// reset our data
 	m_feedback[0] = m_feedback[1] = 0;
 	m_feedback_in = 0;
+	m_delay_in = 0;
 }
 
 
@@ -2693,11 +2696,6 @@ void ymfm_channel<RegisterType>::output_4op(s32 outputs[RegisterType::OUTPUTS], 
 	// compute the 14-bit volume/value of operator 1 and update the feedback
 	s32 op1value = m_feedback_in = m_op[0]->compute_volume(m_op[0]->phase() + opmod, am_offset);
 
-	// now that the feedback has been computed, skip the rest if all volumes
-	// are clear; no need to do all this work for nothing
-	if (m_regs.ch_output_any(m_choffs) == 0)
-		return;
-
 	// OPM/OPN offer 8 different connection algorithms for 4 operators,
 	// and OPL3 offers 4 more, which we designate here as 8-11.
 	//
@@ -2707,36 +2705,41 @@ void ymfm_channel<RegisterType>::output_4op(s32 outputs[RegisterType::OUTPUTS], 
 	//    1 = O1
 	//    2 = O2
 	//    3 = O3
-	//    4 = (O4)
+	//    4 = delay
 	//    5 = O1+O2
 	//    6 = O1+O3
-	//    7 = O2+O3
+	//    7 = delay+O3
+	//
+	// Several algorithms consume data from the previous sample; this is
+	// designated as 'delay' here. Inputs to 'delay' are stored for later,
+	// and consumers of 'delay' pull from the previous value.
 	//
 	// The s_algorithm_ops table describes the inputs and outputs of each
 	// algorithm as follows:
 	//
-	//      ---------x use opout[x] as operator 2 input
-	//      ------xxx- use opout[x] as operator 3 input
-	//      ---xxx---- use opout[x] as operator 4 input
-	//      --x------- include opout[1] in final sum
-	//      -x-------- include opout[2] in final sum
-	//      x--------- include opout[3] in final sum
-	#define ALGORITHM(op2in, op3in, op4in, op1out, op2out, op3out) \
-		(op2in | (op3in << 1) | (op4in << 4) | (op1out << 7) | (op2out << 8) | (op3out << 9))
+	//      ------------x use opout[x] as operator 2 input
+	//      ---------xxx- use opout[x] as operator 3 input
+	//      ------xxx---- use opout[x] as operator 4 input
+	//      ---xxx------- use opout[x] as delay value for next sample
+	//      --x---------- include opout[1] in final sum
+	//      -x----------- include opout[2] in final sum
+	//      x------------ include opout[3] in final sum
+	#define ALGORITHM(op2in, op3in, op4in, delay, op1out, op2out, op3out) \
+		(op2in | (op3in << 1) | (op4in << 4) | (delay << 7) | (op1out << 10) | (op2out << 11) | (op3out << 12))
 	static u16 const s_algorithm_ops[8+4] =
 	{
-		ALGORITHM(1,2,3, 0,0,0),    //  0: O1 -> O2 -> O3 -> O4 -> out (O4)
-		ALGORITHM(0,5,3, 0,0,0),    //  1: (O1 + O2) -> O3 -> O4 -> out (O4)
-		ALGORITHM(0,2,6, 0,0,0),    //  2: (O1 + (O2 -> O3)) -> O4 -> out (O4)
-		ALGORITHM(1,0,7, 0,0,0),    //  3: ((O1 -> O2) + O3) -> O4 -> out (O4)
-		ALGORITHM(1,0,3, 0,1,0),    //  4: ((O1 -> O2) + (O3 -> O4)) -> out (O2+O4)
-		ALGORITHM(1,1,1, 0,1,1),    //  5: ((O1 -> O2) + (O1 -> O3) + (O1 -> O4)) -> out (O2+O3+O4)
-		ALGORITHM(1,0,0, 0,1,1),    //  6: ((O1 -> O2) + O3 + O4) -> out (O2+O3+O4)
-		ALGORITHM(0,0,0, 1,1,1),    //  7: (O1 + O2 + O3 + O4) -> out (O1+O2+O3+O4)
-		ALGORITHM(1,2,3, 0,0,0),    //  8: O1 -> O2 -> O3 -> O4 -> out (O4)         [same as 0]
-		ALGORITHM(0,2,3, 1,0,0),    //  9: (O1 + (O2 -> O3 -> O4)) -> out (O1+O4)   [unique]
-		ALGORITHM(1,0,3, 0,1,0),    // 10: ((O1 -> O2) + (O3 -> O4)) -> out (O2+O4) [same as 4]
-		ALGORITHM(0,2,0, 1,0,1)     // 11: (O1 + (O2 -> O3) + O4) -> out (O1+O3+O4) [unique]
+		ALGORITHM(1,4,3, 2, 0,0,0),    //  0: O1 -> O2 -> (delay) -> O3 -> O4 -> out (O4)
+		ALGORITHM(0,4,3, 5, 0,0,0),    //  1: (O1 + O2) -> (delay) -> O3 -> O4 -> out (O4)
+		ALGORITHM(0,4,6, 2, 0,0,0),    //  2: (O1 + (O2 -> (delay) -> O3)) -> O4 -> out (O4)
+		ALGORITHM(1,0,7, 2, 0,0,0),    //  3: ((O1 -> O2 -> (delay)) + O3) -> O4 -> out (O4)
+		ALGORITHM(1,0,3, 0, 0,1,0),    //  4: ((O1 -> O2) + (O3 -> O4)) -> out (O2+O4)
+		ALGORITHM(1,4,1, 1, 0,1,1),    //  5: ((O1 -> O2) + (O1 -> (delay) -> O3) + (O1 -> O4)) -> out (O2+O3+O4)
+		ALGORITHM(1,0,0, 0, 0,1,1),    //  6: ((O1 -> O2) + O3 + O4) -> out (O2+O3+O4)
+		ALGORITHM(0,0,0, 0, 1,1,1),    //  7: (O1 + O2 + O3 + O4) -> out (O1+O2+O3+O4)
+		ALGORITHM(1,2,3, 0, 0,0,0),    //  8: O1 -> O2 -> O3 -> O4 -> out (O4)         [same as 0]
+		ALGORITHM(0,2,3, 0, 1,0,0),    //  9: (O1 + (O2 -> O3 -> O4)) -> out (O1+O4)   [unique]
+		ALGORITHM(1,0,3, 0, 0,1,0),    // 10: ((O1 -> O2) + (O3 -> O4)) -> out (O2+O4) [same as 4]
+		ALGORITHM(0,2,0, 0, 1,0,1)     // 11: (O1 + (O2 -> O3) + O4) -> out (O1+O3+O4) [unique]
 	};
 	u32 algorithm_ops = s_algorithm_ops[m_regs.ch_algorithm(m_choffs)];
 
@@ -2744,6 +2747,7 @@ void ymfm_channel<RegisterType>::output_4op(s32 outputs[RegisterType::OUTPUTS], 
 	s16 opout[8];
 	opout[0] = 0;
 	opout[1] = op1value;
+	opout[4] = m_delay_in;
 
 	// compute the 14-bit volume/value of operator 2
 	opmod = opout[BIT(algorithm_ops, 0, 1)] >> 1;
@@ -2754,7 +2758,7 @@ void ymfm_channel<RegisterType>::output_4op(s32 outputs[RegisterType::OUTPUTS], 
 	opmod = opout[BIT(algorithm_ops, 1, 3)] >> 1;
 	opout[3] = m_op[2]->compute_volume(m_op[2]->phase() + opmod, am_offset);
 	opout[6] = opout[1] + opout[3];
-	opout[7] = opout[2] + opout[3];
+	opout[7] = opout[4] + opout[3];
 
 	// compute the 14-bit volume/value of operator 4; this could be a noise
 	// value on the OPM; all algorithms consume OP4 output at a minimum
@@ -2768,13 +2772,16 @@ void ymfm_channel<RegisterType>::output_4op(s32 outputs[RegisterType::OUTPUTS], 
 	}
 	result >>= rshift;
 
+	// set the delay value for the next sample
+	m_delay_in = opout[BIT(algorithm_ops, 7, 3)];
+
 	// optionally add OP1, OP2, OP3
 	s32 clipmin = -clipmax - 1;
-	if (BIT(algorithm_ops, 7) != 0)
+	if (BIT(algorithm_ops, 10) != 0)
 		result = std::clamp(result + (opout[1] >> rshift), clipmin, clipmax);
-	if (BIT(algorithm_ops, 8) != 0)
+	if (BIT(algorithm_ops, 11) != 0)
 		result = std::clamp(result + (opout[2] >> rshift), clipmin, clipmax);
-	if (BIT(algorithm_ops, 9) != 0)
+	if (BIT(algorithm_ops, 12) != 0)
 		result = std::clamp(result + (opout[3] >> rshift), clipmin, clipmax);
 
 	// add to the output
