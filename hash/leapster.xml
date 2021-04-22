@@ -1686,7 +1686,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="spongeblmlmx" cloneof="spongeb">
+	<software name="spongeblmx" cloneof="spongeb">
 		<description>Spongebob Squarepants - Saves the Day (USA, L-MAX)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
@@ -1698,7 +1698,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		</part>
 	</software>
 
-	<software name="spidermnlmlmx" cloneof="spidermn">
+	<software name="spidermnlmx" cloneof="spidermn">
 		<description>Spider-Man - The Case of the Sinister Speller (USA, L-MAX)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
