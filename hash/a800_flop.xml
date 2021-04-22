@@ -482,7 +482,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="phobos" supported="no">
+	<software name="phobos">
 		<description>Phobos v1.1</description>
 		<year>1983</year>
 		<publisher>Atari Program Exchange</publisher>
