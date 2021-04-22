@@ -81,8 +81,8 @@ void stfight_state::machine_start()
 	m_int1_timer = timer_alloc(TIMER_STFIGHT_INTERRUPT_1);
 
 	// Set clock prescaler FM:1/2 PSG:1/1
-	m_ym1->write(0, 0x2f); 
-	m_ym2->write(0, 0x2f);
+	m_ym[0]->write(0, 0x2f);
+	m_ym[1]->write(0, 0x2f);
 
 	save_item(NAME(m_coin_state));
 

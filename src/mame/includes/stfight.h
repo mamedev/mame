@@ -21,8 +21,7 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_mcu(*this, "mcu")
 		, m_msm(*this, "msm")
-		, m_ym1(*this, "ym1")
-		, m_ym2(*this, "ym2")
+		, m_ym(*this, "ym%u", 0)
 		, m_main_bank(*this, "mainbank")
 		, m_samples(*this, "adpcm")
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
@@ -90,9 +89,7 @@ private:
 	required_device<cpu_device>      m_audiocpu;
 	required_device<m68705p5_device> m_mcu;
 	required_device<msm5205_device>  m_msm;
-
-	required_device<ym2203_device>   m_ym1;
-	required_device<ym2203_device>   m_ym2;
+	required_device_array<ym2203_device, 2> m_ym;
 
 	required_memory_bank             m_main_bank;
 
