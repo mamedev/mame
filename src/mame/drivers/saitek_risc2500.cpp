@@ -5,11 +5,27 @@
 Saitek RISC 2500, Mephisto Montreux
 
 The chess engine is also compatible with Tasc's The ChessMachine software.
-The hardware+software appears to have been subcontracted to Tasc. It has similarities
-with Tasc R30, PCB label and Montreux repair manual schematics footnotes say TASC23C.
+The hardware+software appears to have been subcontracted to Tasc. It has
+similarities with Tasc R30.
 
 To make sure it continues the game at next power-on, press the OFF button before
 exiting MAME. If nvram is broken somehow, boot with the BACK button held down.
+
+Hardware notes:
+- PCB label: TASC23C
+- ARM2 CPU(VY86C010) @ 14.16MHz
+- 128KB ROM, 128KB RAM*
+- SED1520, custom LCD screen
+- 8*8 chessboard buttons, 16 leds, piezo
+
+*: Sold with 128KB RAM by default. This can be easily increased up to 2MB
+by the user(chesscomputer owner, but also the MAME user in this case).
+The manual also says that RAM is expandable.
+
+According to Saitek's repair manual, there is a GAL and a clock frequency
+divider chip, ROM access goes through it. This allows reading from slow EPROM
+while the chess engine resides in faster RAM. The piezo output routine is
+also in ROM, it would be way too high-pitched at full speed.
 
 Undocumented buttons:
 - hold LEFT+RIGHT on boot to start the QC TestMode
@@ -17,22 +33,19 @@ Undocumented buttons:
 
 TODO:
 - bootrom disable timer shouldn't be needed, real ARM has already fetched the next opcode
-- Sound is too short and high pitched, better when you underclock the cpu.
-  Is cpu cycle timing wrong? I suspect conditional branch timing due to cache miss
-  (pipeline has to refill). The delay loop between writing to the speaker is simply:
-  SUBS R2, R2, #$1, BNE $2000cd8
+- more accurate dynamic cpu clock divider (without the cost of emulation speed)
 
 ******************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/arm/arm.h"
-#include "machine/ram.h"
 #include "machine/nvram.h"
+#include "machine/ram.h"
 #include "machine/sensorboard.h"
 #include "machine/timer.h"
 #include "video/sed1520.h"
-#include "sound/dac.h"
+#include "sound/spkrdev.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -54,7 +67,7 @@ public:
 		, m_ram(*this, "ram")
 		, m_nvram(*this, "nvram")
 		, m_disable_bootrom(*this, "disable_bootrom")
-		, m_dac(*this, "dac")
+		, m_speaker(*this, "speaker")
 		, m_lcdc(*this, "lcdc")
 		, m_board(*this, "board")
 		, m_inputs(*this, "P%u", 0)
@@ -79,7 +92,7 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<nvram_device> m_nvram;
 	required_device<timer_device> m_disable_bootrom;
-	required_device<dac_byte_interface> m_dac;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<sed1520_device> m_lcdc;
 	required_device<sensorboard_device> m_board;
 	required_ioport_array<8> m_inputs;
@@ -93,6 +106,7 @@ private:
 	SED1520_UPDATE_CB(screen_update_cb);
 	u32 input_r();
 	void control_w(u32 data);
+	u32 rom_r(offs_t offset);
 	void power_off();
 
 	u32 disable_boot_rom_r();
@@ -100,8 +114,10 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
 	bool m_bootrom_enabled = false;
 
-	u32 m_control = 0;
 	bool m_power = false;
+	u32 m_control = 0;
+	u32 m_prev_pc = 0;
+	u64 m_prev_cycle = 0;
 };
 
 void risc2500_state::machine_start()
@@ -116,6 +132,8 @@ void risc2500_state::machine_start()
 	save_item(NAME(m_power));
 	save_item(NAME(m_bootrom_enabled));
 	save_item(NAME(m_control));
+	save_item(NAME(m_prev_pc));
+	save_item(NAME(m_prev_cycle));
 }
 
 void risc2500_state::machine_reset()
@@ -124,6 +142,8 @@ void risc2500_state::machine_reset()
 
 	m_power = true;
 	m_control = 0;
+	m_prev_pc = m_maincpu->pc();
+	m_prev_cycle = m_maincpu->total_cycles();
 }
 
 
@@ -190,10 +210,10 @@ SED1520_UPDATE_CB(risc2500_state::screen_update_cb)
 void risc2500_state::install_bootrom(bool enable)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	program.unmap_readwrite(0, std::max(m_rom.bytes(), size_t(m_ram->size()) - 1));
+	program.unmap_readwrite(0, std::max(m_rom.bytes(), size_t(m_ram->size())) - 1);
 
 	if (enable)
-		program.install_rom(0, m_rom.bytes() - 1, m_rom);
+		program.install_read_handler(0, m_rom.bytes() - 1, read32sm_delegate(*this, FUNC(risc2500_state::rom_r)));
 	else
 		program.install_ram(0, m_ram->size() - 1, m_ram->pointer());
 
@@ -238,7 +258,7 @@ void risc2500_state::power_off()
 
 u32 risc2500_state::input_r()
 {
-	u32 data = 0;
+	u32 data = (u32)m_lcdc->status_read() << 16;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -249,7 +269,10 @@ u32 risc2500_state::input_r()
 		}
 	}
 
-	return data | ((u32)m_lcdc->status_read() << 16);
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(ARM_FIRQ_LINE, CLEAR_LINE);
+
+	return data;
 }
 
 void risc2500_state::control_w(u32 data)
@@ -278,13 +301,45 @@ void risc2500_state::control_w(u32 data)
 	}
 
 	// speaker
-	m_dac->write(data >> 28 & 3);
+	m_speaker->level_w(data >> 28 & 3);
 
 	// power-off
 	if (BIT(m_control & ~data, 24))
 		power_off();
 
 	m_control = data;
+}
+
+u32 risc2500_state::rom_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+	{
+		// handle dynamic cpu clock divider when accessing rom
+		u64 cur_cycle = m_maincpu->total_cycles();
+		u64 prev_cycle = m_prev_cycle;
+		s64 diff = cur_cycle - prev_cycle;
+
+		u32 pc = m_maincpu->pc();
+		u32 prev_pc = m_prev_pc;
+		m_prev_pc = pc;
+
+		if (diff >= 0)
+		{
+			static constexpr int arm_branch_cycles = 3;
+			static constexpr int arm_max_cycles = 17; // block data transfer
+			static constexpr int divider = -8 + 1;
+
+			// this takes care of almost all cases, otherwise, total cycles taken can't be determined
+			if (diff <= arm_branch_cycles || (diff <= arm_max_cycles && (pc - prev_pc) == 4 && (pc & ~0x02000000) == (offset * 4)))
+				m_maincpu->adjust_icount(divider * (int)diff);
+			else
+				m_maincpu->adjust_icount(divider);
+		}
+
+		m_prev_cycle = m_maincpu->total_cycles();
+	}
+
+	return m_rom[offset];
 }
 
 
@@ -297,7 +352,7 @@ void risc2500_state::risc2500_mem(address_map &map)
 {
 	map(0x01800000, 0x01800003).r(FUNC(risc2500_state::disable_boot_rom_r));
 	map(0x01000000, 0x01000003).rw(FUNC(risc2500_state::input_r), FUNC(risc2500_state::control_w));
-	map(0x02000000, 0x0203ffff).rom().region("maincpu", 0);
+	map(0x02000000, 0x0203ffff).r(FUNC(risc2500_state::rom_r));
 }
 
 
@@ -353,15 +408,17 @@ INPUT_PORTS_END
 void risc2500_state::risc2500(machine_config &config)
 {
 	/* basic machine hardware */
-	ARM(config, m_maincpu, 28.322_MHz_XTAL / 2); // VY86C010
+	ARM(config, m_maincpu, 28.322_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &risc2500_state::risc2500_mem);
 	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
-	m_maincpu->set_periodic_int(FUNC(risc2500_state::irq1_line_hold), attotime::from_hz(32.768_kHz_XTAL/128)); // 256Hz
+
+	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL / 128); // 256Hz
+	m_maincpu->set_periodic_int(FUNC(risc2500_state::irq1_line_assert), irq_period);
 
 	TIMER(config, "disable_bootrom").configure_generic(FUNC(risc2500_state::disable_bootrom));
 
 	RAM(config, m_ram).set_extra_options("128K, 256K, 512K, 1M, 2M");
-	m_ram->set_default_size("2M");
+	m_ram->set_default_size("128K");
 	m_ram->set_default_value(0);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
@@ -389,8 +446,10 @@ void risc2500_state::risc2500(machine_config &config)
 	m_lcdc->set_screen_update_cb(FUNC(risc2500_state::screen_update_cb));
 
 	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-	DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	SPEAKER(config, "mono").front_center();
+	static const double speaker_levels[4] = { 0.0, 1.0, -1.0, 0.0 };
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_speaker->set_levels(4, speaker_levels);
 }
 
 
@@ -423,7 +482,7 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1992, risc2500,  0,        0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Kasparov RISC 2500 (v1.04)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
-CONS( 1992, risc2500a, risc2500, 0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Kasparov RISC 2500 (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND )
+CONS( 1992, risc2500,  0,        0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Kasparov RISC 2500 (v1.04)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1992, risc2500a, risc2500, 0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Kasparov RISC 2500 (v1.03)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1995, montreux,  0,        0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND ) // after Saitek bought Hegener + Glaser
+CONS( 1995, montreux,  0,        0,      risc2500, risc2500, risc2500_state, empty_init, "Saitek / Tasc", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // after Saitek bought Hegener + Glaser

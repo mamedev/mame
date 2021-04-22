@@ -5,12 +5,12 @@
 Mephisto Berlin 68000 / Berlin Professional 68020
 Berlin Professional has the same engine as Mephisto Genius.
 
-TODO:
-- does it have ROM waitstates like mephisto_modular?
-
 Undocumented buttons:
 - holding ENTER and LEFT cursor on boot runs diagnostics
 - holding CLEAR on boot clears battery backed RAM
+
+TODO:
+- does it have ROM waitstates like mephisto_modular?
 
 ******************************************************************************/
 
