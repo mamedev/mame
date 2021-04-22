@@ -154,7 +154,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		<info name="serial" value="500-11000" /> <!-- Same ROM as 500-01169 -->
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-11000.bin" size="8388608" crc="597418d4" sha1="9f9509313a0ebdac84c2dc02566fedf04ea0eee7" />
+				<rom name="500-11000.bin" size="8388608" crc="db36283f" sha1="9f9509313a0ebdac84c2dc02566fedf04ea0eee7" />
 			</dataarea>
 		</part>
 	</software>
@@ -166,7 +166,7 @@ Entries are ordered by title of the parent, clones are list after the parent, Le
 		<info name="serial" value="500-10957-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="2nd Grade [500-10957-A].bin" size="8388608" crc="db36283f" sha1="b3933dca626e930fa89001fb256b5765e4d0a1f6" />
+				<rom name="2nd Grade [500-10957-A].bin" size="8388608" crc="597418d4" sha1="b3933dca626e930fa89001fb256b5765e4d0a1f6" />
 			</dataarea>
 		</part>
 	</software>
