@@ -402,6 +402,25 @@ ROM_START( funkyjeta )
 	ROM_LOAD( "jk03.15h",    0x00000, 0x20000, CRC(69a0eaf7) SHA1(05038e82ee03106625f05082fe9912e16be181ee) )
 ROM_END
 
+ROM_START( funkyjeta2 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "jk00-1.12f", 0x00000, 0x40000, CRC(a18de697) SHA1(063f7f4c31c80b8fd807699e0412abb9271ddc59) ) /* sldh */
+	ROM_LOAD16_BYTE( "jk01-1.13f", 0x00001, 0x40000, CRC(695a27cd) SHA1(79b4e61e7c6bdab439d70993c296443f97339351) ) /* sldh */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_LOAD( "jk02.16f",    0x00000, 0x10000, CRC(748c0bd8) SHA1(35910e6a4c4f198fb76bde0f5b053e2c66cfa0ff) )
+
+	ROM_REGION( 0x080000, "gfx1", 0 )
+	ROM_LOAD( "mat02", 0x000000, 0x80000, CRC(e4b94c7e) SHA1(7b6ddd0bd388c8d32277fce4b3abb102724bc7d1) ) /* Encrypted chars */
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD( "mat01", 0x000000, 0x80000, CRC(24093a8d) SHA1(71f76ddd8a4b6e05ceb2fff4e20b6edb5e011e79) ) /* sprites */
+	ROM_LOAD( "mat00", 0x080000, 0x80000, CRC(fbda0228) SHA1(815d49898d02e699393e370209181f2ca8301949) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "jk03.15h",    0x00000, 0x20000, CRC(d7c0f0fe) SHA1(7a4a21bbf0da27767de099fba66011732b2c835a) ) /* sldh */
+ROM_END
+
 ROM_START( funkyjetj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "jh00-2.11f", 0x00000, 0x40000, CRC(5b98b700) SHA1(604bd04f4031b0a3b53db2fab4a0e160dff6936d) )
@@ -449,5 +468,6 @@ void funkyjet_state::init_funkyjet()
 
 GAME( 1992, funkyjet,  0,        funkyjet, funkyjet,  funkyjet_state, init_funkyjet, ROT0, "Mitchell", "Funky Jet (World, rev 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, funkyjeta, funkyjet, funkyjet, funkyjet,  funkyjet_state, init_funkyjet, ROT0, "Mitchell", "Funky Jet (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, funkyjeta2,funkyjet, funkyjet, funkyjet,  funkyjet_state, init_funkyjet, ROT0, "Mitchell", "Funky Jet (World, alternate demo)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, funkyjetj, funkyjet, funkyjet, funkyjetj, funkyjet_state, init_funkyjet, ROT0, "Mitchell (Data East Corporation license)", "Funky Jet (Japan, rev 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, sotsugyo,  0,        funkyjet, sotsugyo,  funkyjet_state, init_funkyjet, ROT0, "Mitchell (Atlus license)", "Sotsugyo Shousho", MACHINE_SUPPORTS_SAVE )
