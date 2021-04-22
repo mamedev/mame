@@ -245,11 +245,10 @@ conventional RAM. See the memory map for sprite data format.
 TODO:
 - handle transparency in text layer properly (how?)
 - second bank of sf02 is this used? (probably NOT)
-- stfight/empcity YM2203s should be clocked at 1.5MHz but this results in
-  the sound and music being 1/3 of the pitch they should be. The game never
-  writes the YM2203s' divider registers yet other games (e.g. Lock-On)
-  suggest the default values are correct.
-  cshootert however, sounds too high-pitched at 1.5MHz*3.
+- empcity/stfight never writes the YM2203s' divider registers but it expects
+  0x2f, there's a workaround for it in machine_start
+- empcity/stfight has an NMI handler, but it's not hooked up in MAME, missing
+  comms somewhere?
 - Each version of empcity/stfight has a different protection code stored in the
   MCU (at $1D2) so each 68705 will need to be dumped.
   We currently use hacked versions of the empcityu MCU for each different set.
