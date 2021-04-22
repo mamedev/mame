@@ -483,14 +483,13 @@ void stfight_state::stfight_base(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	// YM2203_PITCH_HACK - These should be clocked at 1.5Mhz (see TODO list)
-	ym2203_device &ym1(YM2203(config, "ym1", 12_MHz_XTAL / 8 * 3));
+	ym2203_device &ym1(YM2203(config, m_ym1, 12_MHz_XTAL / 8));
 	ym1.add_route(0, "mono", 0.15);
 	ym1.add_route(1, "mono", 0.15);
 	ym1.add_route(2, "mono", 0.15);
 	ym1.add_route(3, "mono", 0.10);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 12_MHz_XTAL / 8 * 3));
+	ym2203_device &ym2(YM2203(config, m_ym2, 12_MHz_XTAL / 8));
 	ym2.add_route(0, "mono", 0.15);
 	ym2.add_route(1, "mono", 0.15);
 	ym2.add_route(2, "mono", 0.15);

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "cpu/m6805/m68705.h"
+#include "sound/ym2203.h"
 #include "sound/msm5205.h"
 #include "video/stfight_dev.h"
 #include "video/airraid_dev.h"
@@ -20,6 +21,8 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_mcu(*this, "mcu")
 		, m_msm(*this, "msm")
+		, m_ym1(*this, "ym1")
+		, m_ym2(*this, "ym2")
 		, m_main_bank(*this, "mainbank")
 		, m_samples(*this, "adpcm")
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
@@ -87,6 +90,9 @@ private:
 	required_device<cpu_device>      m_audiocpu;
 	required_device<m68705p5_device> m_mcu;
 	required_device<msm5205_device>  m_msm;
+
+	required_device<ym2203_device>   m_ym1;
+	required_device<ym2203_device>   m_ym2;
 
 	required_memory_bank             m_main_bank;
 
