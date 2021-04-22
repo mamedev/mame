@@ -4,6 +4,8 @@
 
     BASF 7100
 
+	This system is based on (or even identical to) the DigiLog Microterm II 
+
     Models:
     - 7120: 24k disk controller memory, 3x 5.25" single sided
     - 7125: 32k disk controller memory, 3x 5.25" double sided
@@ -38,7 +40,7 @@
     TODO:
     - Dump real character ROM
 	- Improve video emulation
-	- Hook up switches
+	- Find documentation for switches
 	- Hook up serial ports
 	- Hook up parallel port
 
@@ -49,6 +51,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/com8116.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
 #include "machine/wd_fdc.h"
@@ -176,12 +179,15 @@ void basf7100_state::io_map(address_map &map)
 	map(0x08, 0x09).mirror(0x02).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0c, 0x0f).rw(m_ppi[2], FUNC(i8255_device::read), FUNC(i8255_device::write));
 //	map(0x10, 0x11) 8251 (primary)
-//	map(0x12, 0x12) baud rate
+	map(0x12, 0x12).w("com8116_0", FUNC(com8116_device::stt_str_w)); // or str_stt_w
 //	map(0x14, 0x15) 8251 (secondary)
-//	map(0x16, 0x16) baud rate
+	map(0x16, 0x16).w("com8116_1", FUNC(com8116_device::stt_str_w)); // or str_stt_w
 //	map(0x17, 0x17) rs232 flags/control
 	map(0x18, 0x18).lr8(NAME([this] () -> uint8_t { return m_int_flags; }));
-//	map(0x1c, 0x1f) switches
+	map(0x1c, 0x1c).portr("S1");
+	map(0x1d, 0x1d).portr("S2");
+	map(0x1e, 0x1e).portr("S3");
+	map(0x1f, 0x1f).portr("S4");
 //	map(0xb0, 0xb3) display hardware clear
 	map(0xb8, 0xbb).rw(m_ppi[3], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xbc, 0xbf).lr8(NAME([this] (offs_t offset) -> uint8_t { return m_ppi[4]->read(offset ^ 3); }));
@@ -212,6 +218,58 @@ void basf7100_state::fdc_io_map(address_map &map)
 //**************************************************************************
 
 static INPUT_PORTS_START( basf7100 )
+	PORT_START("S1")
+	PORT_DIPNAME(0x0f, 0x0e, "Baud Rate") PORT_DIPLOCATION("S1:1,2,3,4")
+	PORT_DIPSETTING(   0x00, "50")
+	PORT_DIPSETTING(   0x01, "75")
+	PORT_DIPSETTING(   0x02, "110")
+	PORT_DIPSETTING(   0x03, "135")
+	PORT_DIPSETTING(   0x04, "150")
+	PORT_DIPSETTING(   0x05, "300")
+	PORT_DIPSETTING(   0x06, "600")
+	PORT_DIPSETTING(   0x07, "1200")
+	PORT_DIPSETTING(   0x08, "1800")
+	PORT_DIPSETTING(   0x09, "2005")
+	PORT_DIPSETTING(   0x0a, "2400")
+	PORT_DIPSETTING(   0x0b, "3600")
+	PORT_DIPSETTING(   0x0c, "4800")
+	PORT_DIPSETTING(   0x0d, "7200")
+	PORT_DIPSETTING(   0x0e, "9600")
+	PORT_DIPSETTING(   0x0f, "19800")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "S1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "S1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "S1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "S1:8")
+
+	PORT_START("S2")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "S2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "S2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "S2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "S2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "S2:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "S2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "S2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "S2:8")
+
+	PORT_START("S3")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "S3:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "S3:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "S3:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "S3:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "S3:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "S3:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "S3:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "S3:8")
+
+	PORT_START("S4")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "S4:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "S4:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "S4:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "S4:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "S4:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "S4:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "S4:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "S4:8")
 INPUT_PORTS_END
 
 void basf7100_state::keyboard_w(uint8_t data)
@@ -515,6 +573,10 @@ void basf7100_state::basf7100(machine_config &config)
 
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
+	COM8116(config, "com8116_0", 5.0688_MHz_XTAL);
+
+	COM8116(config, "com8116_1", 5.0688_MHz_XTAL);
 
 	I8255(config, m_ppi[0]);
 	// port a: input (switches?)
