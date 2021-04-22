@@ -331,7 +331,7 @@ uint32_t basf7100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 				if (BIT(m_highlight, 1))
 				{
 					// control characters
-					if ((code & 0x70) == 0x10)
+					if ((code & 0xf0) == 0x90) // only 0x90-0x9f, not 0x10-0x1f?
 						line_attr = code & 0x0f;
 
 					inverse = bool(BIT(line_attr, 0));
@@ -588,7 +588,7 @@ ROM_START( basf7120 )
 	ROM_LOAD("video.30", 0x000, 0x100, CRC(89175ac9) SHA1(69b2055bee87e11cc74c70cef2f2bebcbd0004c9)) // N82S129N (label missing)
 
 	ROM_REGION(0x800, "chargen", 0)
-	ROM_LOAD("8002.bin", 0x000, 0x800, CRC(fdd6eb13) SHA1(a094d416e66bdab916e72238112a6265a75ca690)) // placeholder, wrong
+	ROM_LOAD("160a002-b.bin", 0x000, 0x800, BAD_DUMP CRC(8787145c) SHA1(91d8c79f901a41117e99325a53b677f06baf1074)) // handcrafted, wrong
 ROM_END
 
 
