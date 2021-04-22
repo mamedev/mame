@@ -373,13 +373,13 @@ timer_instance &timer_instance::remove()
 void timer_instance::dump() const
 {
 	persistent_timer *persistent = m_callback->persistent();
-	printf("%p: %s exp=%15s start=%15s ptr=%p param=%llu/%llu/%llu",
+	printf("%p: %s exp=%15s start=%15s ptr=%p param=%p/%p/%p",
 		this,
 		(m_callback->persistent() != nullptr) ? "P" : "T",
 		m_expire.as_string(PRECISION),
 		m_start.as_string(PRECISION),
 		m_callback->ptr(),
-		m_param[0], m_param[1], m_param[2]);
+		(void *)m_param[0], (void *)m_param[1], (void *)m_param[2]);
 
 	if (persistent != nullptr)
 		printf(" per=%15s", persistent->period().as_string(PRECISION));
@@ -607,7 +607,7 @@ device_scheduler::~device_scheduler()
 		printf("%12.2f compute_perfect_interleave\n", m_compute_perfect_interleave / seconds);
 		printf("%12.2f rebuild_execute_list\n", m_rebuild_execute_list / seconds);
 		printf("%12.2f add_scheduling_quantum\n", m_add_scheduling_quantum / seconds);
-		printf("%12.2f instance_alloc (%llu full)\n", m_instance_alloc / seconds, m_instance_alloc_full);
+		printf("%12.2f instance_alloc (%u full)\n", m_instance_alloc / seconds, u32(m_instance_alloc_full));
 		u64 total_insert = m_instance_insert_head + m_instance_insert_tail + m_instance_insert_middle;
 		printf("%12.2f instance_insert:\n", total_insert / seconds);
 		printf("%12.2f    head (%.2f%%)\n", m_instance_insert_head / seconds, (100.0 * m_instance_insert_head) / total_insert);
@@ -1241,6 +1241,7 @@ void device_scheduler::add_scheduling_quantum(subseconds quantum, attotime const
 		{
 			m_quantum_count--;
 			memmove(&m_quantum_slot[index], &m_quantum_slot[index + 1], (m_quantum_count - index) * sizeof(m_quantum_slot[0]));
+			index--;
 		}
 
 		// if the new quantum is equal, just merge entries
@@ -1251,12 +1252,9 @@ void device_scheduler::add_scheduling_quantum(subseconds quantum, attotime const
 			return;
 		}
 
-		// if the new quantum is larger, we want to be inserted after this entry
-		else if (quantum > quant.m_requested)
-		{
-			index++;
+		// if the new quantum is smaller, we want to be inserted before this entry
+		else if (quantum < quant.m_requested)
 			break;
-		}
 	}
 
 	// make room for the new item
