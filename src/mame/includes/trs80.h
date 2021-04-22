@@ -56,7 +56,6 @@ public:
 	void ht1080z(machine_config &config);
 
 	void init_trs80l2();
-	void init_trs80();
 
 protected:
 	void machine_start() override;
@@ -86,16 +85,16 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(intrq_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
-	uint8_t m_mode;
-	uint8_t m_irq;
-	uint8_t m_mask;
-	uint8_t m_tape_unit;
-	bool m_reg_load;
-	bool m_cassette_data;
+	uint8_t m_mode = 0;
+	uint8_t m_irq = 0;
+	uint8_t m_mask = 0;
+	uint8_t m_tape_unit = 1;
+	bool m_reg_load = true;
+	bool m_cassette_data = false;
 	emu_timer *m_cassette_data_timer;
-	double m_old_cassette_val;
-	uint8_t m_size_store;
-	uint16_t m_timeout;
+	double m_old_cassette_val = 0;
+	uint8_t m_size_store = 0xFF;
+	uint16_t m_timeout = 600;
 	void trs80_io(address_map &map);
 	floppy_image_device *m_fdd;
 	required_device<cpu_device> m_maincpu;

@@ -46,9 +46,10 @@ FF:
 - bit 7 is for reading from a cassette
 
 FE:
-- bit 0 is for selecting inverse video of the whole screen on a lnw80
-- bit 2 enables colour on a lnw80
-- bit 3 is for selecting roms (low) or 16k hires area (high) on a lnw80
+- bit 0 is for selecting inverse video of the whole screen
+- bit 1 chooses text or graphics screen
+- bit 2 enables colour
+- bit 3 is for selecting roms (low) or 16k hires area (high)
 
 Shift and Right-arrow will enable 32 cpl.
 
@@ -68,7 +69,7 @@ To Do / Status:
 --------------
 
 - basically works
-- hi-res and colour are coded but do not work
+- hi-res and colour are coded and pass the test suite, but need some real programs to check with.
 - investigate expansion-box
 - none of my collection of lnw80-specific floppies will work; some crash MAME
 
@@ -95,16 +96,16 @@ protected:
 
 private:
 	static void floppy_formats(format_registration &fr);
-	void lnw80_fe_w(uint8_t data);
-	uint8_t lnw80_fe_r();
+	void lnw80_fe_w(u8 data);
+	u8 lnw80_fe_r();
 	void lnw80_palette(palette_device &palette) const;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void lnw80_io(address_map &map);
 	void lnw80_mem(address_map &map);
 	void lnw_banked_mem(address_map &map);
 
-	u8 m_lnw_mode;
+	u8 m_lnw_mode = 0;
 	required_shared_ptr<u8> m_p_gfxram;
 	required_device<address_map_bank_device> m_lnw_bank;
 };
@@ -284,14 +285,14 @@ INPUT_PORTS_END
  *************************************/
 
 
-uint8_t lnw80_state::lnw80_fe_r()
+u8 lnw80_state::lnw80_fe_r()
 {
 	return m_lnw_mode;
 }
 
 
 /* lnw80 can switch out all the devices, roms and video ram to be replaced by graphics ram. */
-void lnw80_state::lnw80_fe_w(uint8_t data)
+void lnw80_state::lnw80_fe_w(u8 data)
 {
 /* lnw80 video options
     d3 bankswitch lower 16k between roms and hires ram (1=hires)
@@ -332,25 +333,30 @@ void lnw80_state::machine_reset()
 {
 	m_mode = 0;
 	m_cassette_data = false;
-	const uint16_t s_bauds[8]={ 110, 300, 600, 1200, 2400, 4800, 9600, 19200 };
+	const u16 s_bauds[8]={ 110, 300, 600, 1200, 2400, 4800, 9600, 19200 };
 	u16 s_clock = s_bauds[m_io_baud->read()] << 4;
 	m_uart_clock->set_unscaled_clock(s_clock);
 
 	m_maincpu->set_unscaled_clock(BIT(m_io_config->read(), 6) ? (16_MHz_XTAL / 4) : (16_MHz_XTAL / 9));  // HI-LO switch
 	m_reg_load = 1;
-	m_lnw_mode = 0;
 	lnw80_fe_w(0);
 }
 
 /* 8-bit video, 64/80 characters per line = lnw80 */
-uint32_t lnw80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 lnw80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	static const uint16_t rows[] = { 0, 0x200, 0x100, 0x300, 1, 0x201, 0x101, 0x301 };
-	uint16_t sy=0,ma=0;
-	uint8_t cols = BIT(m_lnw_mode, 1) ? 80 : 64;
-	uint8_t skip = BIT(m_mode, 0) ? 2 : 1;
-	if (BIT(m_mode, 0))
-		cols >>= 1;
+	static const u16 rows[] = { 0, 0x200, 0x100, 0x300, 1, 0x201, 0x101, 0x301 };
+	u16 sy=0,ma=0;
+	bool inv = BIT(m_lnw_mode, 0);
+	u8 mode = BIT(m_lnw_mode, 1, 2);
+	u8 cols = BIT(mode, 0) ? 80 : 64;
+	u8 skip = 1;
+	if (mode == 0)
+	{
+		skip = BIT(m_mode, 0) ? 2 : 1;
+		if (skip == 2)
+			cols >>= 1;
+	}
 
 	if (cols != m_size_store)
 	{
@@ -358,29 +364,29 @@ uint32_t lnw80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 		screen.set_visible_area(0, cols*6-1, 0, 16*12-1);
 	}
 
-	uint8_t bg=7,fg=0;
-	if (BIT(m_lnw_mode, 1))
+	u8 bg=7,fg=0;
+	if (inv)
 	{
 		bg = 0;
 		fg = 7;
 	}
 
-	switch (m_lnw_mode & 0x06)
+	switch (mode)
 	{
 		case 0:                 // MODE 0
-			for (uint16_t y = 0; y < 16; y++)
+			for (u16 y = 0; y < 16; y++)
 			{
-				for (uint16_t ra = 0; ra < 12; ra++)
+				for (u16 ra = 0; ra < 12; ra++)
 				{
-					uint16_t *p = &bitmap.pix(sy++);
+					u16 *p = &bitmap.pix(sy++);
 
-					for (uint16_t x = ma; x < ma + 64; x+=skip)
+					for (u16 x = ma; x < ma + 64; x+=skip)
 					{
-						uint8_t chr = m_p_videoram[x];
+						u8 chr = m_p_videoram[x];
 
 						if (chr & 0x80)
 						{
-							uint8_t gfxbit = (ra & 0x0c)>>1;
+							u8 gfxbit = (ra & 0x0c)>>1;
 							/* Display one line of a lores character (6 pixels) */
 							*p++ = BIT(chr, gfxbit) ? fg : bg;
 							*p++ = BIT(chr, gfxbit) ? fg : bg;
@@ -393,7 +399,7 @@ uint32_t lnw80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 						else
 						{
 							/* get pattern of pixels for that character scanline */
-							uint8_t gfx;
+							u8 gfx;
 							if (ra < 8)
 								gfx = m_p_chargen[(chr<<1) | rows[ra] ];
 							else
@@ -413,16 +419,16 @@ uint32_t lnw80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			}
 			break;
 
-		case 0x02:                  // MODE 1
-			for (uint16_t y = 0; y < 0x400; y+=0x40)
+		case 1:                  // MODE 1
+			for (u16 y = 0; y < 0x400; y+=0x40)
 			{
-				for (uint16_t ra = 0; ra < 0x3000; ra+=0x400)
+				for (u16 ra = 0; ra < 0x3000; ra+=0x400)
 				{
-					uint16_t *p = &bitmap.pix(sy++);
+					u16 *p = &bitmap.pix(sy++);
 
-					for (uint16_t x = 0; x < 0x40; x++)
+					for (u16 x = 0; x < 0x40; x++)
 					{
-						uint8_t gfx = m_p_gfxram[ y | x | ra];
+						u8 gfx = m_p_gfxram[ y | x | ra];
 						/* Display 6 pixels in normal region */
 						*p++ = BIT(gfx, 0) ? fg : bg;
 						*p++ = BIT(gfx, 1) ? fg : bg;
@@ -432,9 +438,9 @@ uint32_t lnw80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 						*p++ = BIT(gfx, 5) ? fg : bg;
 					}
 
-					for (uint16_t x = 0; x < 0x10; x++)
+					for (u16 x = 0; x < 0x10; x++)
 					{
-						uint8_t gfx = m_p_gfxram[ 0x3000 | x | (ra & 0xc00) | ((ra & 0x3000) >> 8)];
+						u8 gfx = m_p_gfxram[ 0x3000 | x | (ra & 0xc00) | ((ra & 0x3000) >> 8)];
 						/* Display 6 pixels in extended region */
 						*p++ = BIT(gfx, 0) ? fg : bg;
 						*p++ = BIT(gfx, 1) ? fg : bg;
@@ -447,24 +453,24 @@ uint32_t lnw80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			}
 			break;
 
-		case 0x04:                  // MODE 2
+		case 2:                  // MODE 2
 			/* it seems the text video ram can have an effect in this mode,
 			    not explained clearly, so not emulated */
-			for (uint16_t y = 0; y < 0x400; y+=0x40)
+			for (u16 y = 0; y < 0x400; y+=0x40)
 			{
-				for (uint16_t ra = 0; ra < 0x3000; ra+=0x400)
+				for (u16 ra = 0; ra < 0x3000; ra+=0x400)
 				{
-					uint16_t *p = &bitmap.pix(sy++);
+					u16 *p = &bitmap.pix(sy++);
 
-					for (uint16_t x = 0; x < 0x40; x++)
+					for (u16 x = 0; x < 0x40; x++)
 					{
-						uint8_t gfx = m_p_gfxram[ y | x | ra];
+						u8 gfx = m_p_gfxram[ y | x | ra];
 						/* Display 6 pixels in normal region */
-						fg = (gfx & 0x38) >> 3;
+						fg = BIT(gfx, 3, 3);
 						*p++ = fg;
 						*p++ = fg;
 						*p++ = fg;
-						fg = gfx & 0x07;
+						fg = BIT(gfx, 0, 3);
 						*p++ = fg;
 						*p++ = fg;
 						*p++ = fg;
@@ -473,39 +479,39 @@ uint32_t lnw80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			}
 			break;
 
-		case 0x06:                  // MODE 3
+		case 3:                  // MODE 3
 			/* the manual does not explain at all how colour is determined
 			    for the extended area. Further, the background colour
 			    is not mentioned anywhere. Black is assumed. */
-			for (uint16_t y = 0; y < 0x400; y+=0x40)
+			for (u16 y = 0; y < 0x400; y+=0x40)
 			{
-				for (uint16_t ra = 0; ra < 0x3000; ra+=0x400)
+				for (u16 ra = 0; ra < 0x3000; ra+=0x400)
 				{
-					uint16_t *p = &bitmap.pix(sy++);
+					u16 *p = &bitmap.pix(sy++);
 
-					for (uint16_t x = 0; x < 0x40; x++)
+					for (u16 x = 0; x < 0x40; x++)
 					{
-						uint8_t gfx = m_p_gfxram[ y | x | ra];
-						fg = (m_p_videoram[ x | y ] & 0x38) >> 3;
+						u8 gfx = m_p_gfxram[ y | x | ra];
+						fg = BIT(m_p_videoram[ x | y ], 3, 3);
 						/* Display 6 pixels in normal region */
 						*p++ = BIT(gfx, 0) ? fg : bg;
 						*p++ = BIT(gfx, 1) ? fg : bg;
 						*p++ = BIT(gfx, 2) ? fg : bg;
-						fg = m_p_videoram[ 0x3c00 | x | y ] & 0x07;
+						fg = BIT(m_p_videoram[ 0x3c00 | x | y ], 0, 3);
 						*p++ = BIT(gfx, 3) ? fg : bg;
 						*p++ = BIT(gfx, 4) ? fg : bg;
 						*p++ = BIT(gfx, 5) ? fg : bg;
 					}
 
-					for (uint16_t x = 0; x < 0x10; x++)
+					for (u16 x = 0; x < 0x10; x++)
 					{
-						uint8_t gfx = m_p_gfxram[ 0x3000 | x | (ra & 0xc00) | ((ra & 0x3000) >> 8)];
-						fg = (m_p_gfxram[ 0x3c00 | x | y ] & 0x38) >> 3;
+						u8 gfx = m_p_gfxram[ 0x3000 | x | (ra & 0xc00) | ((ra & 0x3000) >> 8)];
+						fg = BIT(m_p_gfxram[ 0x3c00 | x | y ], 3, 3);
 						/* Display 6 pixels in extended region */
 						*p++ = BIT(gfx, 0) ? fg : bg;
 						*p++ = BIT(gfx, 1) ? fg : bg;
 						*p++ = BIT(gfx, 2) ? fg : bg;
-						fg = m_p_gfxram[ 0x3c00 | x | y ] & 0x07;
+						fg = BIT(m_p_gfxram[ 0x3c00 | x | y ], 0, 3);
 						*p++ = BIT(gfx, 3) ? fg : bg;
 						*p++ = BIT(gfx, 4) ? fg : bg;
 						*p++ = BIT(gfx, 5) ? fg : bg;
@@ -643,16 +649,19 @@ void lnw80_state::lnw80(machine_config &config)
 ***************************************************************************/
 
 ROM_START(lnw80)
-	ROM_REGION(0x3000, "maincpu",0)
-	ROM_LOAD("lnw_a.u78",    0x0000, 0x0800, CRC(e09f7e91) SHA1(cd28e72efcfebde6cf1c7dbec4a4880a69e683da))
-	ROM_LOAD("lnw_a1.u75",   0x0800, 0x0800, CRC(ac297d99) SHA1(ccf31d3f9d02c3b68a0ee3be4984424df0e83ab0))
-	ROM_LOAD("lnw_b.u79",    0x1000, 0x0800, CRC(c4303568) SHA1(13e3d81c6f0de0e93956fa58c465b5368ea51682))
-	ROM_LOAD("lnw_b1.u76",   0x1800, 0x0800, CRC(3a5ea239) SHA1(8c489670977892d7f2bfb098f5df0b4dfa8fbba6))
-	ROM_LOAD("lnw_c.u80",    0x2000, 0x0800, CRC(2ba025d7) SHA1(232efbe23c3f5c2c6655466ebc0a51cf3697be9b))
-	ROM_LOAD("lnw_c1.u77",   0x2800, 0x0800, CRC(ed547445) SHA1(20102de89a3ee4a65366bc2d62be94da984a156b))
+	ROM_REGION(0x3000, "maincpu", 0)
+	ROM_LOAD("lnw_a.u78",      0x0000, 0x0800, CRC(e09f7e91) SHA1(cd28e72efcfebde6cf1c7dbec4a4880a69e683da) )
+	ROM_LOAD("lnw_a1.u75",     0x0800, 0x0800, CRC(ac297d99) SHA1(ccf31d3f9d02c3b68a0ee3be4984424df0e83ab0) )
+	ROM_LOAD("lnw_b.u79",      0x1000, 0x0800, CRC(c4303568) SHA1(13e3d81c6f0de0e93956fa58c465b5368ea51682) )
+	ROM_LOAD("lnw_b1.u76",     0x1800, 0x0800, CRC(3a5ea239) SHA1(8c489670977892d7f2bfb098f5df0b4dfa8fbba6) )
+	ROM_LOAD("lnw_c.u80",      0x2000, 0x0800, CRC(2ba025d7) SHA1(232efbe23c3f5c2c6655466ebc0a51cf3697be9b) )
+	ROM_LOAD("lnw_c1.u77",     0x2800, 0x0800, CRC(ed547445) SHA1(20102de89a3ee4a65366bc2d62be94da984a156b) )
 
-	ROM_REGION(0x0800, "chargen",0)
-	ROM_LOAD("lnw_chr.u100", 0x0000, 0x0800, CRC(c89b27df) SHA1(be2a009a07e4378d070002a558705e9a0de59389))
+	ROM_REGION(0x0800, "chargen", 0)
+	ROM_LOAD("lnw_chr.u100",   0x0000, 0x0800, CRC(c89b27df) SHA1(be2a009a07e4378d070002a558705e9a0de59389) )
+
+	ROM_REGION(0x0020, "proms", 0)
+	ROM_LOAD_OPTIONAL("lnw_ntsc.u130",  0x0000, 0x0020, CRC(b990a207) SHA1(1a1cc3150cbfed76b1c88c0d561f9bee954f3234) )
 ROM_END
 
 

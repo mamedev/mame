@@ -631,11 +631,6 @@ ROM_START(ht108064)
 ROM_END
 
 
-void trs80_state::init_trs80()
-{
-	m_mode = 0;
-}
-
 void trs80_state::init_trs80l2()
 {
 	m_mode = 2;
@@ -643,11 +638,11 @@ void trs80_state::init_trs80l2()
 
 
 //    YEAR  NAME         PARENT    COMPAT  MACHINE   INPUT    CLASS        INIT           COMPANY                        FULLNAME                           FLAGS
-COMP( 1977, trs80,       0,        0,       trs80,    trs80,   trs80_state, init_trs80,    "Tandy Radio Shack",           "TRS-80 Model I (Level I Basic)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1977, trs80,       0,        0,       trs80,    trs80,   trs80_state, empty_init,    "Tandy Radio Shack",           "TRS-80 Model I (Level I Basic)",  MACHINE_SUPPORTS_SAVE )
 COMP( 1978, trs80l2,     0,        0,       model1,   trs80l2, trs80_state, init_trs80l2,  "Tandy Radio Shack",           "TRS-80 Model I (Level II Basic)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, eg3003,      0,        trs80l2, sys80,    sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "Video Genie EG3003",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, sys80,       eg3003,   0,       sys80,    sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (60 Hz)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, sys80p,      eg3003,   0,       sys80p,   sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (50 Hz)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1983, ht1080z,     eg3003,   0,       ht1080z,  sys80,   trs80_state, init_trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series I",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1984, ht1080z2,    eg3003,   0,       ht1080z,  sys80,   trs80_state, init_trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series II",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1985, ht108064,    eg3003,   0,       ht1080z,  sys80,   trs80_state, init_trs80,    "Hiradastechnika Szovetkezet", "HT-1080Z/64",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ht108064,    eg3003,   0,       ht1080z,  sys80,   trs80_state, empty_init,    "Hiradastechnika Szovetkezet", "HT-1080Z/64",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
