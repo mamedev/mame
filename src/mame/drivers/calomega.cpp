@@ -772,7 +772,19 @@ void calomega_state::pia1_aout_w(uint8_t data)
 
 void calomega_state::pia1_bout_w(uint8_t data)
 {
-	// Whole 8 bits of PIA0 port B
+/* System 906-III Lamps...
+
+  7654 3210
+  ---- ---x  Hold 1 lamp.
+  ---- --x-  Hold 2 lamp.
+  ---- -x--  Hold 3 lamp.
+  ---- x---  Hold 4 lamp.
+  ---x ----  Hold 5 lamp.
+  --x- ----  (unknown)
+  -x-- ----  (unknown)
+  x--- ----  (unknown)
+
+*/
 	m_lamps[0] = BIT(~data, 0);  // L1 (Hold 1)
 	m_lamps[1] = BIT(~data, 1);  // L2 (Hold 2)
 	m_lamps[2] = BIT(~data, 2);  // L3 (Hold 3)
@@ -789,7 +801,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( calomega_state::timer_a )
 {
 	m_timera =! m_timera;
 	m_pia[1]->ca1_w(m_timera);
-	m_pia[1]->read(1);  //CRA
+	m_pia[1]->read(1);  // CRA
 	//logerror("Timer_A event : state=%d\n", m_timera);
 }
 
@@ -805,7 +817,7 @@ WRITE_LINE_MEMBER(calomega_state::vblank_w)
 	m_pia[1]->read(0); 
 	m_pia[1]->read(0);
 	m_pia[1]->cb1_w(state);
-	m_pia[1]->read(3);  //CRB
+	m_pia[1]->read(3);  // CRB
 	//logerror("V_BLANK event : state=%d\n", m_vblank);
 }
 
@@ -822,15 +834,6 @@ WRITE_LINE_MEMBER(calomega_state::pia1_cb2_w)
 	//logerror("PIA1: CB2: %02X\n", state);
 }
 
-/*
-WRITE_LINE_MEMBER(calomega_state::cpu_sync)
-{
-	//CA1 & CB1 updates
-	m_pia[1]->read(3);
-	m_pia[1]->read(1);
-	
-};
-*/
 
 /********  Lamps debug  ********
 
@@ -883,6 +886,7 @@ void calomega_state::lamps_905_w(uint8_t data)
 	m_lamps[6] = BIT(~data, 6);  // L7 (unknown)
 	m_lamps[7] = BIT(~data, 7);  // L8 (unknown)
 }
+
 
 /*************************************************
 *             Memory map information             *
@@ -1804,7 +1808,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( comg076 )
 	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* credits */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  // credits
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Draw")
@@ -2652,7 +2656,7 @@ static const gfx_layout tilelayout =
 	8, 8,
 	RGN_FRAC(1,3),
 	3,
-	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },    /* bitplanes are separated */
+	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },    // bitplanes are separated
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
@@ -2866,6 +2870,7 @@ GFXDECODE_END
 
 */
 
+
 /*************************************************
 *                 ACIA Interface                 *
 *************************************************/
@@ -2890,8 +2895,8 @@ WRITE_LINE_MEMBER(calomega_state::write_acia_clock)
 
 void calomega_state::sys903(machine_config &config)
 {
-	/* basic machine hardware */
-	M6502(config, m_maincpu, CPU_CLOCK);   /* confirmed */
+	// basic machine hardware
+	M6502(config, m_maincpu, CPU_CLOCK);   // confirmed
 	m_maincpu->set_addrmap(AS_PROGRAM, &calomega_state::sys903_map);
 	m_maincpu->set_vblank_int("screen", FUNC(calomega_state::irq0_line_hold));
 
@@ -2906,29 +2911,29 @@ void calomega_state::sys903(machine_config &config)
 	m_pia[1]->writepa_handler().set(FUNC(calomega_state::lamps_903b_w));
 	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s903_mux_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size((39+1)*8, (31+1)*8);                  /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
-	screen.set_visarea(0*8, 32*8-1, 0*8, 31*8-1);    /* Taken from MC6845 init, registers 01 & 06 */
+	screen.set_size((39+1)*8, (31+1)*8);             // Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1).
+	screen.set_visarea(0*8, 32*8-1, 0*8, 31*8-1);    // Taken from MC6845 init, registers 01 & 06.
 	screen.set_screen_update(FUNC(calomega_state::screen_update_calomega));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_calomega);
-	PALETTE(config, m_palette, FUNC(calomega_state::calomega_palette), 256); // or 128? is the upper half of the PROMs really valid colors?
+	PALETTE(config, m_palette, FUNC(calomega_state::calomega_palette), 256);
 
-	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK)); /* 6845 @ CPU clock */
+	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK));  // 6845 @ CPU clock
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	ay8912_device &ay8912(AY8912(config, "ay8912", SND_CLOCK)); /* confirmed */
-	ay8912.port_a_read_callback().set_ioport("SW3");                /* from schematics */
+	ay8912_device &ay8912(AY8912(config, "ay8912", SND_CLOCK));  // confirmed
+	ay8912.port_a_read_callback().set_ioport("SW3");             // from schematics
 	ay8912.add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	/* acia */
+	// acia
 	ACIA6850(config, m_acia6850_0, 0);
 	m_acia6850_0->txd_handler().set(FUNC(calomega_state::write_acia_tx));
 
@@ -2941,15 +2946,14 @@ void calomega_state::s903mod(machine_config &config)
 {
 	sys903(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &calomega_state::s903mod_map);
 
-	/* sound hardware */
+	// sound hardware
 	subdevice<ay8912_device>("ay8912")->port_a_read_callback().set_constant(0);
 
 	config.device_remove("acia6850_0");
-
 	config.device_remove("aciabaud");
 }
 
@@ -2958,7 +2962,7 @@ void calomega_state::sys905(machine_config &config)
 {
 	sys903(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &calomega_state::sys905_map);
 
@@ -2967,7 +2971,7 @@ void calomega_state::sys905(machine_config &config)
 
 	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s905_mux_w));
 
-	/* sound hardware */
+	// sound hardware
 	subdevice<ay8912_device>("ay8912")->port_a_read_callback().set_constant(0);
 
 	config.device_remove("acia6850_0");
@@ -3029,9 +3033,9 @@ void calomega_state::sys906(machine_config &config)
 *
 *************************************************/
 
-ROM_START( comg074 )    /* Cal Omega v7.4 (Gaming Poker) */
+ROM_START( comg074 )  // Cal Omega v7.4 (Gaming Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1800.u5",    0x1800, 0x0800, CRC(69759432) SHA1(d64646476b4f67088bf5996ffc272d2571e62c53) )  /* Seems to be from v6.5. Unused. */
+	ROM_LOAD( "1800.u5",    0x1800, 0x0800, CRC(69759432) SHA1(d64646476b4f67088bf5996ffc272d2571e62c53) )  // Seems to be from v6.5. Unused.
 	ROM_LOAD( "2000.u6",    0x2000, 0x0800, CRC(bd9044f6) SHA1(9ebfc8379fe79a84982a0176a6b26267580272de) )
 	ROM_LOAD( "2800.u7",    0x2800, 0x0800, CRC(d1d2e111) SHA1(2e5b6fbaf04539851d0f0674f0fd86e9be90c0fd) )
 	ROM_LOAD( "3000.u8",    0x3000, 0x0800, CRC(cac4af01) SHA1(aed2986575b8d5539581515d818cb5bb9054c7c9) )
@@ -3045,13 +3049,13 @@ ROM_START( comg074 )    /* Cal Omega v7.4 (Gaming Poker) */
 	ROM_LOAD( "poker_cg2b.u69", 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )
 	ROM_LOAD( "poker_cg2a.u68", 0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )
 
-	ROM_REGION( 0x100, "proms", 0 ) /* from other set */
+	ROM_REGION( 0x100, "proms", 0 ) // from other set
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, BAD_DUMP CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg076 )    /* Cal Omega v7.6 (Arcade Poker) */
+ROM_START( comg076 )  // Cal Omega v7.6 (Arcade Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "07-62.u6",   0x2000, 0x0800, CRC(99ffa2a4) SHA1(07fd182ff86f9ab09bbf09f51d655811a09ffa03) )
 	ROM_LOAD( "07-63.u7",   0x2800, 0x0800, CRC(9ed58bc5) SHA1(c545053847ec7585e4ac97c70cf33529ed0f1111) )
 	ROM_LOAD( "07-64.u8",   0x3000, 0x0800, CRC(95714680) SHA1(26938903600bd0920b1dd1c6900c56c6b749976a) )
@@ -3069,7 +3073,7 @@ ROM_START( comg076 )    /* Cal Omega v7.6 (Arcade Poker) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg079 )    /* Cal Omega v7.9 (Arcade Poker) */
+ROM_START( comg079 )  // Cal Omega v7.9 (Arcade Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "07-91.u5",   0x1800, 0x0800, CRC(da415c27) SHA1(be42f1d36579ff8fafd6df4e30a64a6141a7a2ae) )
 	ROM_LOAD( "07-92.u6",   0x2000, 0x0800, CRC(31211ed3) SHA1(799bc4ca77ee01a4d45320263e4cc2d066ec26e5) )
@@ -3093,13 +3097,13 @@ ROM_START( comg079 )    /* Cal Omega v7.9 (Arcade Poker) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg080 )    /* Cal Omega v8.0 (Arcade Black Jack) */
+ROM_START( comg080 )  // Cal Omega v8.0 (Arcade Black Jack)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "08-02.u6",   0x2000, 0x0800, CRC(abf8c48e) SHA1(fea059af900fd6d17725ccf7a5ff2eb0af5c8e0a) )
 	ROM_LOAD( "08-03.u7",   0x2800, 0x0800, CRC(e9ccb5af) SHA1(68a45d839afba3c6eafb7c75e5660de3a6be4eb5) )
 	ROM_LOAD( "08-04.u8",   0x3000, 0x0800, CRC(325bdae8) SHA1(5a94c96ec3980361570da58fb407a1dba38064b8) )
-	ROM_LOAD( "08-05.u9",   0x3800, 0x0800, BAD_DUMP CRC(71bd14d2) SHA1(00b3e2d965ac7ae1fc994b81246ad2c29ef4834c) ) /* bad dump. 2nd half is blank */
+	ROM_LOAD( "08-05.u9",   0x3800, 0x0800, BAD_DUMP CRC(71bd14d2) SHA1(00b3e2d965ac7ae1fc994b81246ad2c29ef4834c) )  // bad dump. 2nd half is blank
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "gpkcg0.u67", 0x0000, 0x0800, CRC(b626ad89) SHA1(551b75f4559d11a4f8f56e38982114a21c77d4e7) )
@@ -3113,16 +3117,16 @@ ROM_START( comg080 )    /* Cal Omega v8.0 (Arcade Black Jack) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg094 )    /* Cal Omega v9.4 (Keno) */
+ROM_START( comg094 )  // Cal Omega v9.4 (Keno)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "09-42.u6",   0x2000, 0x0800, CRC(1cff1319) SHA1(97b7ed54d398f36dc476028471784fc4e50bc378) )
 	ROM_LOAD( "09-43.u7",   0x2800, 0x0800, CRC(e6b123be) SHA1(f89df2dc6deeecff41be83d7a9040cfe5d872bad) )
 	ROM_LOAD( "09-44.u8",   0x3000, 0x0800, CRC(13939de9) SHA1(b2f97828808f6001846049cbf9af40e32908a58f) )
 	ROM_LOAD( "09-45.u9",   0x3800, 0x0800, CRC(7508de2e) SHA1(62faf65a1b815e11158cfb807090923ab368784d) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x0800, 0xff )  /* empty socket (requested by the manual) */
+	ROM_FILL(               0x0000, 0x0800, 0xff )  // empty socket (requested by the manual)
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
 	ROM_LOAD( "kcgc.u70",   0x0000, 0x0800, CRC(fb721236) SHA1(33ef355913b8acb5017a24ca1c46dec1c391a528) )
@@ -3133,9 +3137,9 @@ ROM_START( comg094 )    /* Cal Omega v9.4 (Keno) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg107 )    /* Cal Omega v10.7c (Big Game) */
+ROM_START( comg107 )  // Cal Omega v10.7c (Big Game)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "10-72.u6",   0x2000, 0x0800, CRC(dd0fbefb) SHA1(caed286ba1adb4d5c5c874c56339b9d71dd41bc6) )
 	ROM_LOAD( "10-73.u7",   0x2800, 0x0800, CRC(fcb7774d) SHA1(d3c89e0df0005e4bc4894156622b3d1e4cd09f2a) )
 	ROM_LOAD( "10-74.u8",   0x3000, 0x0800, CRC(d19ed885) SHA1(c41e59e87ce88a5b229e334b6a563a3b21d12b15) )
@@ -3149,14 +3153,14 @@ ROM_START( comg107 )    /* Cal Omega v10.7c (Big Game) */
 	ROM_LOAD( "lotcgb.u69", 0x1000, 0x1000, CRC(5bda0f42) SHA1(d4b3340e9c8ca49483fa846103f0bd81d57a5ab3) )
 	ROM_LOAD( "lotcga.u68", 0x2000, 0x1000, CRC(0975e360) SHA1(7b9dbbae50c43ad99ee11798ada0a44e71c611f9) )
 
-	ROM_REGION( 0x0800, "user1", 0 )    /* keyboard interfase ROM */
+	ROM_REGION( 0x0800, "user1", 0 )  // keyboard interfase ROM
 	ROM_LOAD( "lotkbd.sub", 0x0000, 0x0800, CRC(c1636ab5) SHA1(5a3ad24918751ca6a6640807e421e80f6b4cc844) )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "bclr.u28",   0x0000, 0x0100, CRC(0ec45d01) SHA1(da73ae7e1c74913921dc378a97795c6da47dcbfb) )
 ROM_END
 
-ROM_START( comg123 )    /* Cal Omega v12.3 (Ticket Poker) */
+ROM_START( comg123 )  // Cal Omega v12.3 (Ticket Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "12-31.u5",   0x1800, 0x0800, BAD_DUMP CRC(8a1e9b03) SHA1(d57548226a695eb43d491dd953ad0b9b8ff8eb82) )
 	ROM_LOAD( "12-32.u6",   0x2000, 0x0800, CRC(c30eb9c4) SHA1(bf3c2e069ecb9763028738c29054802b605cfa92) )
@@ -3176,9 +3180,9 @@ ROM_START( comg123 )    /* Cal Omega v12.3 (Ticket Poker) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg125 )    /* Cal Omega v12.5 (Bingo) */
+ROM_START( comg125 )  // Cal Omega v12.5 (Bingo)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "12-52.u6",   0x2000, 0x0800, CRC(ea0a6bd6) SHA1(f138d2f29252d95dea93a1e936725de99c714b35) )
 	ROM_LOAD( "12-53.u7",   0x2800, 0x0800, CRC(c888ee34) SHA1(2796c6ae196b046f12b75b1c095a430fa4be0da2) )
 	ROM_LOAD( "12-54.u8",   0x3000, 0x0800, CRC(4c7d11a6) SHA1(0131f077e204250d594c9baadc0596efeb7639cc) )
@@ -3196,16 +3200,16 @@ ROM_START( comg125 )    /* Cal Omega v12.5 (Bingo) */
 	ROM_LOAD( "bclr.u28",   0x0000, 0x0100, CRC(0ec45d01) SHA1(da73ae7e1c74913921dc378a97795c6da47dcbfb) )
 ROM_END
 
-ROM_START( comg127 )    /* Cal Omega v12.7 (Keno) */
+ROM_START( comg127 )  // Cal Omega v12.7 (Keno)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "12-72.u6",   0x2000, 0x0800, CRC(091a4b32) SHA1(3600854152482bf18d2377aa635a9fd7f3d4b2f7) )
 	ROM_LOAD( "12-73.u7",   0x2800, 0x0800, CRC(c1fb5293) SHA1(f20cdddb4c89cb2fc647ddfcff6bd6f5095a0a28) )
 	ROM_LOAD( "12-74.u8",   0x3000, 0x0800, CRC(de277137) SHA1(127b95616824dfb1025f3346c1335a8bf4835e68) )
 	ROM_LOAD( "12-75.u9",   0x3800, 0x0800, CRC(04485ba3) SHA1(ee22396fc23508635e43ca8b17fc1f23e670fe85) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x0800, 0xff )  /* empty socket (requested by the manual) */
+	ROM_FILL(               0x0000, 0x0800, 0xff )  // empty socket (requested by the manual)
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
 	ROM_LOAD( "kcgc.u70",   0x0000, 0x0800, CRC(fb721236) SHA1(33ef355913b8acb5017a24ca1c46dec1c391a528) )
@@ -3216,9 +3220,9 @@ ROM_START( comg127 )    /* Cal Omega v12.7 (Keno) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg128 )    /* Cal Omega v12.8 (Arcade Game) */
+ROM_START( comg128 )  // Cal Omega v12.8 (Arcade Game)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "12-82.u6",   0x2000, 0x0800, CRC(85f0c548) SHA1(f08e26a7acb883a92e73e564fb2b58422d1784c6) )
 	ROM_LOAD( "12-83.u7",   0x2800, 0x0800, CRC(57212e46) SHA1(d0bac63e0efcdb8ef4a1b6c4d53776447557e4d0) )
 	ROM_LOAD( "12-84.u8",   0x3000, 0x0800, CRC(00ab3cd8) SHA1(da00457c49d3a101dc31578d07b2e986f0d73919) )
@@ -3236,9 +3240,9 @@ ROM_START( comg128 )    /* Cal Omega v12.8 (Arcade Game) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg134 )    /* Cal Omega 13.4 (Nudge Keno) */
+ROM_START( comg134 )  // Cal Omega 13.4 (Nudge Keno)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "13-42.u6",   0x2000, 0x0800, CRC(3ff1e83d) SHA1(0c2d2faed1148909dd7d50e9eda76c6403181435) )
 	ROM_LOAD( "13-43.u7",   0x2800, 0x0800, CRC(cf2125f4) SHA1(32678f3ac82c76fb8116de77ce332fe098d5e8c0) )
 	ROM_LOAD( "13-44.u8",   0x3000, 0x0800, CRC(09a8d3c4) SHA1(60937b386a7fa8c30bd509633b5e98e79a1189d4) )
@@ -3256,7 +3260,7 @@ ROM_START( comg134 )    /* Cal Omega 13.4 (Nudge Keno) */
 	ROM_LOAD( "bclr.u28",   0x0000, 0x0100, CRC(0ec45d01) SHA1(da73ae7e1c74913921dc378a97795c6da47dcbfb) )
 ROM_END
 
-ROM_START( comg145 )    /* Cal Omega v14.5 (Pixels) */
+ROM_START( comg145 )  // Cal Omega v14.5 (Pixels)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "14-51.u5",   0x1800, 0x0800, CRC(b173af4b) SHA1(2fd7d391c765e8e5bf148d92223ffc2a2619dcfd) )
 	ROM_LOAD( "14-52.u6",   0x2000, 0x0800, CRC(f12434c5) SHA1(f957831867cc8c98fb479cd2d859790d19883d26) )
@@ -3276,7 +3280,7 @@ ROM_START( comg145 )    /* Cal Omega v14.5 (Pixels) */
 	ROM_LOAD( "pixclr.u28", 0x0000, 0x0100, CRC(67d23e76) SHA1(826cf77ca5a4d492d66e45ee96a7780a94fbe634) )
 ROM_END
 
-ROM_START( comg157 )    /* Cal Omega v15.7 (Double-Draw Poker) */
+ROM_START( comg157 )  // Cal Omega v15.7 (Double-Draw Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "15-71.u5",   0x1800, 0x0800, CRC(e0c89569) SHA1(68f32b00dd8ceb08e9677438c2bfec86e1a7fe6a) )
 	ROM_LOAD( "15-72.u6",   0x2000, 0x0800, CRC(a3ebd1af) SHA1(a31eff7fe205efeb5b6fe1adaed66d2f23f91844) )
@@ -3296,10 +3300,10 @@ ROM_START( comg157 )    /* Cal Omega v15.7 (Double-Draw Poker) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg159 )    /* Cal Omega v15.9 (Wild Double-Up) */
+ROM_START( comg159 )  // Cal Omega v15.9 (Wild Double-Up)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x3000, 0x1000, 0xff )  /* empty socket */
-	ROM_FILL(               0x4000, 0x1000, 0xff )  /* empty socket */
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
+	ROM_FILL(               0x4000, 0x1000, 0xff )  // empty socket
 	ROM_LOAD( "15-93.u7",   0x5000, 0x1000, CRC(a1ca1fc0) SHA1(a751dba148c818a25237c2ac95328b6a5643f4e0) )
 	ROM_LOAD( "15-94.u8",   0x6000, 0x1000, CRC(849595ea) SHA1(c28629de84b0c0d389c52490677ecb9139fd738d) )
 	ROM_LOAD( "15-95.u9",   0x7000, 0x1000, CRC(c858ea24) SHA1(c7ecaddd4064b352c061b9164f2f347c310fab39) )
@@ -3316,16 +3320,16 @@ ROM_START( comg159 )    /* Cal Omega v15.9 (Wild Double-Up) */
 	ROM_LOAD( "wldclr.u28", 0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
 ROM_END
 
-ROM_START( comg164 )    /* Cal Omega v16.4 (Keno) */
+ROM_START( comg164 )  // Cal Omega v16.4 (Keno)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "16-41.u5",   0x1800, 0x0800, CRC(fae6b065) SHA1(a123f98e4b4815a06d62d0429697cdce71756b94) )
-	ROM_LOAD( "16-42.u6",   0x2000, 0x0800, NO_DUMP )   /* missing ROM??? */
+	ROM_LOAD( "16-42.u6",   0x2000, 0x0800, NO_DUMP )   // missing ROM???
 	ROM_LOAD( "16-43.u7",   0x2800, 0x0800, CRC(15974dbc) SHA1(fe2979861b8021949c127b182b9b50975b77bdd1) )
 	ROM_LOAD( "16-44.u8",   0x3000, 0x0800, CRC(64f06a75) SHA1(1cf4d89d2ee60200f84d47a3a637471e0af9239c) )
 	ROM_LOAD( "16-45.u9",   0x3800, 0x0800, CRC(3a8bc80e) SHA1(a1fb58b30850b1fe2bf976b8b99c8c540d67534a) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x0800, 0xff )  /* empty socket (requested by the manual) */
+	ROM_FILL(               0x0000, 0x0800, 0xff )  // empty socket (requested by the manual)
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
 	ROM_LOAD( "kcgc.u70",   0x0000, 0x0800, CRC(fb721236) SHA1(33ef355913b8acb5017a24ca1c46dec1c391a528) )
@@ -3336,16 +3340,16 @@ ROM_START( comg164 )    /* Cal Omega v16.4 (Keno) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg168 )    /* Cal Omega v16.8 (Keno) */
+ROM_START( comg168 )  // Cal Omega v16.8 (Keno)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "16-82.u6",   0x2000, 0x0800, CRC(ba044cd6) SHA1(659ec979e61baf4e871af857b722bb6fd789ff75) )
 	ROM_LOAD( "16-83.u7",   0x2800, 0x0800, CRC(e3326b68) SHA1(7326f87319c363161ba8571dd983b070ef4f8694) )
 	ROM_LOAD( "16-84.u8",   0x3000, 0x0800, CRC(1f72acea) SHA1(26d0e5a36f14ccae22d216a13d0459f0389ea6c0) )
 	ROM_LOAD( "16-85.u9",   0x3800, 0x0800, CRC(4f38e3b3) SHA1(4d034959f665f0fdb5a4df85bae67dbd3d38077f) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x0800, 0xff )  /* empty socket (requested by the manual) */
+	ROM_FILL(               0x0000, 0x0800, 0xff )  // empty socket (requested by the manual)
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
 	ROM_LOAD( "kcgc.u70",   0x0000, 0x0800, CRC(fb721236) SHA1(33ef355913b8acb5017a24ca1c46dec1c391a528) )
@@ -3356,10 +3360,10 @@ ROM_START( comg168 )    /* Cal Omega v16.8 (Keno) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg172 )    /* Cal Omega v17.2 (Double Double Poker) */
+ROM_START( comg172 )  // Cal Omega v17.2 (Double Double Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x3000, 0x1000, 0xff )  /* empty socket */
-	ROM_FILL(               0x4000, 0x1000, 0xff )  /* empty socket */
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
+	ROM_FILL(               0x4000, 0x1000, 0xff )  // empty socket
 	ROM_LOAD( "17-23.u7",   0x5000, 0x1000, CRC(96efc8d1) SHA1(96836ca7188dc53e3a8af64f1fed9fe1c0c4e056) )
 	ROM_LOAD( "17-24.u8",   0x6000, 0x1000, CRC(08d31a98) SHA1(85e23ffeb8fa82ec0155f54d2193511517e6ec8c) )
 	ROM_LOAD( "17-25.u9",   0x7000, 0x1000, CRC(82508c71) SHA1(dd44e949f36e04ceaf1e527615c7003d0a9c0073) )
@@ -3376,7 +3380,7 @@ ROM_START( comg172 )    /* Cal Omega v17.2 (Double Double Poker) */
 	ROM_LOAD( "wldclr.u28", 0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
 ROM_END
 
-ROM_START( comg175 )    /* Cal Omega v17.5 (Gaming Draw Poker) */
+ROM_START( comg175 )  // Cal Omega v17.5 (Gaming Draw Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "17-51.u5",   0x1800, 0x0800, CRC(5450b90a) SHA1(4e67a17b2353bbe89fb6be4951efd09a948a987e) )
 	ROM_LOAD( "17-52.u6",   0x2000, 0x0800, CRC(29d787fd) SHA1(3f8c46f928c7fc3e68fe47efe23505f393bdb577) )
@@ -3396,7 +3400,7 @@ ROM_START( comg175 )    /* Cal Omega v17.5 (Gaming Draw Poker) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg176 )    /* Cal Omega 17.6 (Nudge Keno) */
+ROM_START( comg176 )  // Cal Omega 17.6 (Nudge Keno)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "17-61.u5",   0x1800, 0x0800, CRC(7b201d27) SHA1(142d25c424e6bfd4327bb796f8dc9d0e6cb21797) )
 	ROM_LOAD( "17-62.u6",   0x2000, 0x0800, CRC(0ce87971) SHA1(ad1fecf4ed34eccd2a5b09e8847cb4a011875b73) )
@@ -3416,9 +3420,9 @@ ROM_START( comg176 )    /* Cal Omega 17.6 (Nudge Keno) */
 	ROM_LOAD( "bclr.u28",   0x0000, 0x0100, CRC(0ec45d01) SHA1(da73ae7e1c74913921dc378a97795c6da47dcbfb) )
 ROM_END
 
-ROM_START( comg181 )    /* Cal Omega 18.1 (Nudge Keno) */
+ROM_START( comg181 )  // Cal Omega 18.1 (Nudge Keno)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "18-12.u6",   0x2000, 0x0800, CRC(dd867180) SHA1(caf703f45dea980e84fc29d2ea0d3f4e211aaa3f) )
 	ROM_LOAD( "18-13.u7",   0x2800, 0x0800, CRC(39ccbddd) SHA1(1c027957ad6a3346dd3bcc0b422d2e854c6f5439) )
 	ROM_LOAD( "18-14.u8",   0x3000, 0x0800, CRC(ddf23ef1) SHA1(8340a2b0125e42602045fea2a248f1ec9e9915c0) )
@@ -3436,9 +3440,9 @@ ROM_START( comg181 )    /* Cal Omega 18.1 (Nudge Keno) */
 	ROM_LOAD( "bclr.u28",   0x0000, 0x0100, CRC(0ec45d01) SHA1(da73ae7e1c74913921dc378a97795c6da47dcbfb) )
 ROM_END
 
-ROM_START( comg183 )    /* Cal Omega v18.3 (Pixels) */
+ROM_START( comg183 )  // Cal Omega v18.3 (Pixels)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x3000, 0x1000, 0xff )  /* empty socket */
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
 	ROM_LOAD( "18-32.u6",   0x4000, 0x1000, CRC(c793ffc1) SHA1(f2ef82f92a9e18128d28973bcf050d0c3e1819f3) )
 	ROM_LOAD( "18-33.u7",   0x5000, 0x1000, CRC(415a6599) SHA1(648986310a3864652897e5d18b8be06819cce7a8) )
 	ROM_LOAD( "18-34.u8",   0x6000, 0x1000, CRC(fc5d3b89) SHA1(3601401d00d7a0621eac4254da238e9c8929cac4) )
@@ -3456,9 +3460,9 @@ ROM_START( comg183 )    /* Cal Omega v18.3 (Pixels) */
 	ROM_LOAD( "pixclr.u28", 0x0000, 0x0100, CRC(67d23e76) SHA1(826cf77ca5a4d492d66e45ee96a7780a94fbe634) )
 ROM_END
 
-ROM_START( comg185 )    /* Cal Omega v18.5 (Pixels) */
+ROM_START( comg185 )  // Cal Omega v18.5 (Pixels)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x3000, 0x1000, 0xff )  /* empty socket */
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
 	ROM_LOAD( "18-52.u6",   0x4000, 0x1000, CRC(19225f7d) SHA1(73d713ee86886f935d9b2c2ca670d8e00d466b7f) )
 	ROM_LOAD( "18-53.u7",   0x5000, 0x1000, CRC(797e2b70) SHA1(83f974c6c1886eab5c90782766b72900c73045e1) )
 	ROM_LOAD( "18-54.u8",   0x6000, 0x1000, CRC(6becc802) SHA1(e72783db52bffd3fa2f7d35cd8a004415e37b004) )
@@ -3476,9 +3480,9 @@ ROM_START( comg185 )    /* Cal Omega v18.5 (Pixels) */
 	ROM_LOAD( "pixclr.u28", 0x0000, 0x0100, CRC(67d23e76) SHA1(826cf77ca5a4d492d66e45ee96a7780a94fbe634) )
 ROM_END
 
-ROM_START( comg186 )    /* Cal Omega v18.6 (Pixels) */
+ROM_START( comg186 )  // Cal Omega v18.6 (Pixels)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x3000, 0x1000, 0xff )  /* empty socket */
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
 	ROM_LOAD( "18-62.u6",   0x4000, 0x1000, CRC(025f4268) SHA1(750a5417fe2b077893d8252dd5eafc42fafd965e) )
 	ROM_LOAD( "18-63.u7",   0x5000, 0x1000, CRC(948a6ef1) SHA1(6aeb244209f3376042a32d9accb38e3f09cb192a) )
 	ROM_LOAD( "18-64.u8",   0x6000, 0x1000, CRC(9fb6e82b) SHA1(db38564e8060f1c67183f3f412a24439b2253e13) )
@@ -3496,10 +3500,10 @@ ROM_START( comg186 )    /* Cal Omega v18.6 (Pixels) */
 	ROM_LOAD( "pixclr.u28", 0x0000, 0x0100, CRC(67d23e76) SHA1(826cf77ca5a4d492d66e45ee96a7780a94fbe634) )
 ROM_END
 
-ROM_START( comg187 )    /* Cal Omega v18.7 (Amusement Poker) */
+ROM_START( comg187 )  // Cal Omega v18.7 (Amusement Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x3000, 0x1000, 0xff )  /* empty socket */
-	ROM_LOAD( "18-72.u6",   0x4000, 0x1000, BAD_DUMP CRC(1a4bd46a) SHA1(76101271ff9b98c3310e1666dfba34a01a0f0bcd) ) /* 1st half seems to be the 2nd one, and 2nd half is filled of 0xff */
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
+	ROM_LOAD( "18-72.u6",   0x4000, 0x1000, BAD_DUMP CRC(1a4bd46a) SHA1(76101271ff9b98c3310e1666dfba34a01a0f0bcd) )  // 1st half seems to be the 2nd one, and 2nd half is filled of 0xff
 	ROM_LOAD( "18-73.u7",   0x5000, 0x1000, CRC(ca374ecb) SHA1(113495afa88da97cb7239f645fabba7125ce2b4b) )
 	ROM_LOAD( "18-74.u8",   0x6000, 0x1000, CRC(5bb57ca8) SHA1(22dc6f0e2fee5408fa70e4bc60f1833534ee038f) )
 	ROM_LOAD( "18-75.u9",   0x7000, 0x1000, CRC(70a8ccb3) SHA1(b5b7d6a8262ab6e47a1400681c414fd3edd0d7a8) )
@@ -3516,7 +3520,7 @@ ROM_START( comg187 )    /* Cal Omega v18.7 (Amusement Poker) */
 	ROM_LOAD( "mltclr.u28", 0x0000, 0x0100, CRC(fefb0fa8) SHA1(66d86aa19d9d37ffd2840d6653fcec667bc716d4) )
 ROM_END
 
-ROM_START( comg204 )    /* Cal Omega v20.4 (Super Blackjack) */
+ROM_START( comg204 )  // Cal Omega v20.4 (Super Blackjack)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "20-41.u5",   0x3000, 0x1000, CRC(9c2203f7) SHA1(fd566683e887cf80cd0e6c82a413aebc378397f8) )
 	ROM_LOAD( "20-42.u6",   0x4000, 0x1000, CRC(31b37010) SHA1(c35ef77725c6c6dd9f369d50d9a8e55c2e3644af) )
@@ -3536,7 +3540,7 @@ ROM_START( comg204 )    /* Cal Omega v20.4 (Super Blackjack) */
 	ROM_LOAD( "mltclr.u28", 0x0000, 0x0100, CRC(fefb0fa8) SHA1(66d86aa19d9d37ffd2840d6653fcec667bc716d4) )
 ROM_END
 
-ROM_START( comg208 )    /* Cal Omega v20.8 (Winner's Choice) */
+ROM_START( comg208 )  // Cal Omega v20.8 (Winner's Choice)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "20-81.u5",   0x3000, 0x1000, CRC(938be03a) SHA1(606252b5160a7af340faa3d4ed6af9dff849c9ac) )
 	ROM_LOAD( "20-82.u6",   0x4000, 0x1000, CRC(7d42257c) SHA1(f1487bcc2475d1bcdfbc9bf866adcb0d510acef5) )
@@ -3556,10 +3560,10 @@ ROM_START( comg208 )    /* Cal Omega v20.8 (Winner's Choice) */
 	ROM_LOAD( "mltclr.u28", 0x0000, 0x0100, CRC(fefb0fa8) SHA1(66d86aa19d9d37ffd2840d6653fcec667bc716d4) )
 ROM_END
 
-ROM_START( comg227 )    /* Cal Omega v22.7 (Amusement Poker (Double Double)) */
+ROM_START( comg227 )  // Cal Omega v22.7 (Amusement Poker (Double Double))
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x3000, 0x1000, 0xff )  /* empty socket */
-	ROM_FILL(               0x4000, 0x1000, 0xff )  /* empty socket */
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
+	ROM_FILL(               0x4000, 0x1000, 0xff )  // empty socket
 	ROM_LOAD( "22-73.u7",   0x5000, 0x1000, CRC(152d1ff9) SHA1(8bbfea1bae9e4fe2a2ac52507dc8dd0e33fbbd06) )
 	ROM_LOAD( "22-74.u8",   0x6000, 0x1000, CRC(3af0f69d) SHA1(c34a0eab3ad4e4db310727805ba1ddc73533bfa6) )
 	ROM_LOAD( "22-75.u9",   0x7000, 0x1000, CRC(d1f3fe24) SHA1(8b43b521fb1be8ef4286b4bfee99b654c49cf9de) )
@@ -3576,9 +3580,9 @@ ROM_START( comg227 )    /* Cal Omega v22.7 (Amusement Poker (Double Double)) */
 	ROM_LOAD( "wldclr.u28", 0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
 ROM_END
 
-ROM_START( comg230 )    /* Cal Omega v23.0 (FC Bingo (4-card)) */
+ROM_START( comg230 )  // Cal Omega v23.0 (FC Bingo (4-card))
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x3000, 0x1000, 0xff )  /* empty socket */
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
 	ROM_LOAD( "23-02.u6",   0x4000, 0x1000, BAD_DUMP CRC(f154670a) SHA1(e0c66649d1434eca3435033a32634cb90cef0f31) )
 	ROM_LOAD( "23-03.u7",   0x5000, 0x1000, BAD_DUMP CRC(daf93757) SHA1(27d57007a24a5f892f7ee201072fcd5817373cad) )
 	ROM_LOAD( "23-04.u8",   0x6000, 0x1000, CRC(ebb5531a) SHA1(9fd003fcba5a5120332bcbd3c845d555c60875e9) )
@@ -3596,9 +3600,9 @@ ROM_START( comg230 )    /* Cal Omega v23.0 (FC Bingo (4-card)) */
 	ROM_LOAD( "fcbclr.u28", 0x0000, 0x0100, BAD_DUMP CRC(6db5a344) SHA1(5f1a81ac02a2a74252decd3bb95a5436cc943930) )
 ROM_END
 
-ROM_START( comg236 )    /* Cal Omega v23.6 (Hotline) */
+ROM_START( comg236 )  // Cal Omega v23.6 (Hotline)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x3000, 0x1000, 0xff )  /* empty socket */
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
 	ROM_LOAD( "23-62.u6",   0x4000, 0x1000, CRC(6f3dd409) SHA1(8112c3114609317fe5543bf26fa426d36d60c5e1) )
 	ROM_LOAD( "23-63.u7",   0x5000, 0x1000, CRC(76e96865) SHA1(03055751efa143cff0501aaa9b2beb9d533e13e7) )
 	ROM_LOAD( "23-64.u8",   0x6000, 0x1000, CRC(26a18d82) SHA1(1ca036c014f180fb1720150642be3986c053c1c9) )
@@ -3649,7 +3653,7 @@ ROM_END
 
 */
 
-ROM_START( comg239 )    /* Cal Omega v23.9 (Gaming Draw Poker) */
+ROM_START( comg239 )  // Cal Omega v23.9 (Gaming Draw Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "23-91.u5",   0x1800, 0x0800, CRC(b49035e2) SHA1(b94a0245ca64d15b1496d1b272ffc0ce80f85526) )
 	ROM_LOAD( "23-92.u6",   0x2000, 0x0800, CRC(d9ffaa73) SHA1(e39d10121e16f89cd8d30a5391a14dc3d4b13a46) )
@@ -3669,7 +3673,7 @@ ROM_START( comg239 )    /* Cal Omega v23.9 (Gaming Draw Poker) */
 	ROM_LOAD( "82s129n.u28",    0x0000, 0x0100, CRC(6db5a344) SHA1(5f1a81ac02a2a74252decd3bb95a5436cc943930) )
 ROM_END
 
-ROM_START( comg240 )    /* Cal Omega v24.0 (Gaming Draw Poker) */
+ROM_START( comg240 )  // Cal Omega v24.0 (Gaming Draw Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "24-01.u5",       0x1800, 0x0800, CRC(445e4e1e) SHA1(11f1b2652fce0e507bde66296f57d689a8460df5) )
 	ROM_LOAD( "24-02.u6",       0x2000, 0x0800, CRC(53ef572d) SHA1(14c99f94a22d93de998f6418ea9dc3eab5119a82) )
@@ -3685,13 +3689,13 @@ ROM_START( comg240 )    /* Cal Omega v24.0 (Gaming Draw Poker) */
 	ROM_LOAD( "cgb.u69",    0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )
 	ROM_LOAD( "cga.u68",    0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )
 
-	ROM_REGION( 0x100, "proms", 0 ) /* is this prom ok? */
+	ROM_REGION( 0x100, "proms", 0 )  // is this prom ok?
 	ROM_LOAD( "pok-6301.u28",   0x0000, 0x0100, CRC(56c2577b) SHA1(cb75882067e1e0d9f9369a37b5a829dd091d473e) )
 ROM_END
 
-ROM_START( comg246 )    /* Cal Omega v24.6 (Hotline) */
+ROM_START( comg246 )  // Cal Omega v24.6 (Hotline)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x3000, 0x1000, 0xff )  /* empty socket */
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
 	ROM_LOAD( "24-62.u6",   0x4000, 0x1000, CRC(41f7b882) SHA1(4b532d70d5a7101952085a8fcdc0568c4266a72a) )
 	ROM_LOAD( "24-63.u7",   0x5000, 0x1000, CRC(226580b7) SHA1(07e6332ace45e0ced57aed6e348ab12c1f07ff34) )
 	ROM_LOAD( "24-64.u8",   0x6000, 0x1000, CRC(bf402e32) SHA1(436670b8f37caac14bb578a31dddbc0e2b0fd1ae) )
@@ -3709,16 +3713,16 @@ ROM_START( comg246 )    /* Cal Omega v24.6 (Hotline) */
 	ROM_LOAD( "hlclr.u28",  0x0000, 0x0100, CRC(1c994cda) SHA1(5c8698b4c5e43146106c9da8a306e3099b26ca2d) )
 ROM_END
 
-ROM_START( comg272a )   /* Cal Omega v27.2 (Keno (amusement)) */
+ROM_START( comg272a )  // Cal Omega v27.2 (Keno (amusement))
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "27-22.u6",   0x2000, 0x0800, CRC(db3e1918) SHA1(4b8f33103f093ddbe750b536abc4545cf262d2e5) )
 	ROM_LOAD( "27-23.u7",   0x2800, 0x0800, CRC(c9e9cfd8) SHA1(dd0615ac579331330bda070f9ed68d7972436781) )
 	ROM_LOAD( "27-24.u8",   0x3000, 0x0800, CRC(d3fbab7f) SHA1(805510356bd52cf698a838daeaf16096eedcfd37) )
 	ROM_LOAD( "27-25.u9",   0x3800, 0x0800, CRC(22dc5b5e) SHA1(4442b7ac0516fdad8c81687fa9683eeace5b6c2d) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x0800, 0xff )  /* empty socket (requested by the manual) */
+	ROM_FILL(               0x0000, 0x0800, 0xff )  // empty socket (requested by the manual)
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
 	ROM_LOAD( "kcgc.u70",   0x0000, 0x0800, CRC(fb721236) SHA1(33ef355913b8acb5017a24ca1c46dec1c391a528) )
@@ -3729,16 +3733,16 @@ ROM_START( comg272a )   /* Cal Omega v27.2 (Keno (amusement)) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg272b )   /* Cal Omega v27.2 (Keno (gaming)) */
+ROM_START( comg272b )  // Cal Omega v27.2 (Keno (gaming))
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "27-22m.u6",  0x2000, 0x0800, CRC(6dc6ec9c) SHA1(dd80d0e544ad51d1b950970e735d7ce1e05062e3) )
 	ROM_LOAD( "27-23m.u7",  0x2800, 0x0800, CRC(242ce2ed) SHA1(e114cec7eb7554de14561e7c0e6aed01d7e72ca6) )
 	ROM_LOAD( "27-24m.u8",  0x3000, 0x0800, CRC(e191b0e1) SHA1(cc476efa194c1b2cd0035e9b4725e81d3a6f381c) )
 	ROM_LOAD( "27-25m.u9",  0x3800, 0x0800, CRC(4152b53d) SHA1(6fe577045d03362b8b988c7a9cd0542c9a20d7a7) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x0800, 0xff )  /* empty socket (requested by the manual) */
+	ROM_FILL(               0x0000, 0x0800, 0xff )  // empty socket (requested by the manual)
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
 	ROM_LOAD( "kcgc.u70",   0x0000, 0x0800, CRC(fb721236) SHA1(33ef355913b8acb5017a24ca1c46dec1c391a528) )
@@ -3755,14 +3759,14 @@ ROM_END
   Jacks or Better
   V 51.08
   Pay Schedule 05F Controled by EPR1- 50.081
-  906 board
+  906-III board
   PROMS 2764
 
 */
 
-ROM_START( comg5108 )   /* Cal Omega v51.08 (Gaming Poker) */
+ROM_START( comg5108 )  // Cal Omega v51.08 (Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr1.u28",   0x6000, 0x2000, CRC(3d6abca9) SHA1(54a802f89bd64380abf269a2b507513c8db5319b) )  /* checked in offset $8034 */
+	ROM_LOAD( "epr1.u28",   0x6000, 0x2000, CRC(3d6abca9) SHA1(54a802f89bd64380abf269a2b507513c8db5319b) )  // checked in offset $8034
 	ROM_LOAD( "epr2.u29",   0x8000, 0x2000, CRC(72cf8376) SHA1(fa1682244402e1b36164c670241f585bf4017ad9) )
 	ROM_LOAD( "epr3.u30",   0xa000, 0x2000, CRC(c79957e5) SHA1(64afdedf5369d56790e9ae7a8d3be5f52125ca1f) )
 	ROM_LOAD( "epr4.u31",   0xc000, 0x2000, CRC(eb0b0a86) SHA1(4fd29700db8fe183392cc66a54a128657c7e05e0) )
@@ -3773,7 +3777,7 @@ ROM_START( comg5108 )   /* Cal Omega v51.08 (Gaming Poker) */
 	ROM_LOAD( "cg2b.u5",    0x2000, 0x2000, CRC(1f79f76d) SHA1(b2bce60e24dd61977f7bf6ee4705ca7d104ab388) )
 	ROM_LOAD( "cg2a.u6",    0x4000, 0x2000, CRC(d5fd9fc2) SHA1(68472e7271f835656197109620bb3988fc52308a) )
 
-	ROM_REGION( 0x200, "proms", 0 ) /* from other set, upper half is empty */
+	ROM_REGION( 0x200, "proms", 0 )  // from other set, second half is empty
 	ROM_LOAD( "bprom.u16",  0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
 ROM_END
 
@@ -3781,37 +3785,37 @@ ROM_END
 
 /*********************** Diagnostic PROMs ***********************/
 
-ROM_START( comg903d )   /* Cal Omega 903d (System 903 diag.PROM) */
+ROM_START( comg903d )  // Cal Omega 903d (System 903 diag.PROM)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket (requested by the manual) */
-	ROM_FILL(               0x2000, 0x0800, 0xff )  /* empty socket (requested by the manual) */
-	ROM_FILL(               0x2800, 0x0800, 0xff )  /* empty socket (requested by the manual) */
-	ROM_FILL(               0x3000, 0x0800, 0xff )  /* empty socket (requested by the manual) */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket (requested by the manual)
+	ROM_FILL(               0x2000, 0x0800, 0xff )  // empty socket (requested by the manual)
+	ROM_FILL(               0x2800, 0x0800, 0xff )  // empty socket (requested by the manual)
+	ROM_FILL(               0x3000, 0x0800, 0xff )  // empty socket (requested by the manual)
 	ROM_LOAD( "903diag.u9", 0x3800, 0x0800, CRC(f8092cea) SHA1(0c864419a4e1956c030b185739eca59313f20e8a) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "testcg0.u67",    0x0000, 0x0800, CRC(b626ad89) SHA1(551b75f4559d11a4f8f56e38982114a21c77d4e7) )
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_FILL(                   0x0000, 0x1800, 0xff )  /* removed all ROMs (requested by the manual) */
+	ROM_FILL(                   0x0000, 0x1800, 0xff )  // removed all ROMs (requested by the manual)
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "testclr.u28",    0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg905d )   /* Cal Omega 905d (System 905 diag.PROM) */
+ROM_START( comg905d )  // Cal Omega 905d (System 905 diag.PROM)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x3000, 0x1000, 0xff )  /* empty socket (requested by the manual) */
-	ROM_FILL(               0x4000, 0x1000, 0xff )  /* empty socket (requested by the manual) */
-	ROM_FILL(               0x5000, 0x1000, 0xff )  /* empty socket (requested by the manual) */
-	ROM_FILL(               0x6000, 0x1000, 0xff )  /* empty socket (requested by the manual) */
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket (requested by the manual)
+	ROM_FILL(               0x4000, 0x1000, 0xff )  // empty socket (requested by the manual)
+	ROM_FILL(               0x5000, 0x1000, 0xff )  // empty socket (requested by the manual)
+	ROM_FILL(               0x6000, 0x1000, 0xff )  // empty socket (requested by the manual)
 	ROM_LOAD( "905diag.u9", 0x7000, 0x1000, CRC(6c20dbc7) SHA1(dbab0d2cf07bade2e3619bd5f29d406f3498a278) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "testcg0.u67",    0x0000, 0x0800, CRC(b626ad89) SHA1(551b75f4559d11a4f8f56e38982114a21c77d4e7) )
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_FILL(                   0x0000, 0x1800, 0xff )  /* removed all ROMs (requested by the manual) */
+	ROM_FILL(                   0x0000, 0x1800, 0xff )  // removed all ROMs (requested by the manual)
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "testclr.u28",    0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
@@ -3850,7 +3854,7 @@ ROM_END
 
 ROM_START( elgrande )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(           0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(           0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "d1.u6",  0x2000, 0x0800, CRC(8b6b505c) SHA1(5f89bb1b50b9dfacf23c50e3016b9258b0e15084) )
 	ROM_LOAD( "d1.u7",  0x2800, 0x0800, CRC(d803a978) SHA1(682b73c968ef57007397d3e5eb0e78a97722da5e) )
 	ROM_LOAD( "d1.u8",  0x3000, 0x0800, CRC(291fa93b) SHA1(1d57f736b11ddc916effde78e2cd08c313a62901) )
@@ -3868,7 +3872,7 @@ ROM_START( elgrande )
 	ROM_LOAD( "d1.u28", 0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
 ROM_END
 
-ROM_START( jjpoker )    /* tuni-83 */
+ROM_START( jjpoker )  // tuni-83
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tuni-83.u5", 0x1800, 0x0800, CRC(46c542ee) SHA1(0b3832d8ab69427298de03d18984a220a9a35c30) )
 	ROM_LOAD( "tuni-83.u6", 0x2000, 0x0800, CRC(e24b392a) SHA1(3b705b5cc60d2b33375f52958b72e70ce36fa216) )
@@ -3888,7 +3892,7 @@ ROM_START( jjpoker )    /* tuni-83 */
 	ROM_LOAD( "tunipoker.u28",  0x0000, 0x0100, CRC(5101a33b) SHA1(a36bc421064d0ed96beb27b549f69adce0a553c2) )
 ROM_END
 
-ROM_START( jjpokerb )   /* pokr_j */
+ROM_START( jjpokerb )  // pokr_j
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pokr_j.01.u5",   0x1800, 0x0800, CRC(d0004eda) SHA1(2fd39213e3028066fd4f9b8db206f036b566e2f7) )
 	ROM_LOAD( "pokr_j.02.u6",   0x2000, 0x0800, CRC(6809ccd9) SHA1(2573194a13ddf0270bccd456bda84b822036c660) )
@@ -3908,7 +3912,7 @@ ROM_START( jjpokerb )   /* pokr_j */
 	ROM_LOAD( "tunipoker.u28",  0x0000, 0x0100, CRC(5101a33b) SHA1(a36bc421064d0ed96beb27b549f69adce0a553c2) )
 ROM_END
 
-ROM_START( ssipkr24 )   /* pokr02_4 (gfx and prom from jjpoker) */
+ROM_START( ssipkr24 )  // pokr02_4 (gfx and prom from jjpoker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pokr02_4.01.u5", 0x1800, 0x0800, CRC(8adf1d6d) SHA1(d83677eed9426841767d947919f6da671b5fbed4) )
 	ROM_LOAD( "pokr02_4.02.u6", 0x2000, 0x0800, CRC(5298a01c) SHA1(a0085498699bc15cc6ada9e4e9541bd84b97eeae) )
@@ -3928,7 +3932,7 @@ ROM_START( ssipkr24 )   /* pokr02_4 (gfx and prom from jjpoker) */
 	ROM_LOAD( "tunipoker.u28",  0x0000, 0x0100, BAD_DUMP CRC(5101a33b) SHA1(a36bc421064d0ed96beb27b549f69adce0a553c2) )
 ROM_END
 
-ROM_START( ssipkr30 )   /* pokr03_0 (gfx and prom from jjpoker) */
+ROM_START( ssipkr30 )  // pokr03_0 (gfx and prom from jjpoker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pokr03_0.01.u5", 0x1800, 0x0800, CRC(db9581fe) SHA1(605b254e0ebb96423eb522ce75242083d70f01ca) )
 	ROM_LOAD( "pokr03_0.02.u6", 0x2000, 0x0800, CRC(861243ad) SHA1(290eba5c820177669e5adeac1e2f172b73789542) )
@@ -3948,7 +3952,7 @@ ROM_START( ssipkr30 )   /* pokr03_0 (gfx and prom from jjpoker) */
 	ROM_LOAD( "tunipoker.u28",  0x0000, 0x0100, BAD_DUMP CRC(5101a33b) SHA1(a36bc421064d0ed96beb27b549f69adce0a553c2) )
 ROM_END
 
-ROM_START( ssipkr40 )   /* (gfx and prom from jjpoker) */
+ROM_START( ssipkr40 )  // (gfx and prom from jjpoker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "40-1.903.u5",    0x1800, 0x0800, CRC(461eb68c) SHA1(54781670930c723c993ca9ad80e06e38ddd2f035) )
 	ROM_LOAD( "40-2.903.u6",    0x2000, 0x0800, CRC(099094a9) SHA1(c5a6ccb5ec0bebc79ef0b9c98595ef87c65ce361) )
@@ -3977,7 +3981,7 @@ ROM_END
   It seems to run in 906-III hardware
 
 */
-ROM_START( cas21iwc )
+ROM_START( cas21iwc )  // UCMC Casino 21
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.bin",   0x6000, 0x2000, CRC(c6c60700) SHA1(8c613211a22f5c23a9971092b996d29a4e0ae83d) )  // just tables and data to be checked.
 	ROM_LOAD( "2.bin",   0x8000, 0x2000, CRC(c7bc884e) SHA1(e3a610362dc04d977b8bbd8549b9ce26a716867f) )
@@ -4003,7 +4007,7 @@ ROM_END
   It seems to run in 906-III hardware
 
 */
-ROM_START( pokeriwc )
+ROM_START( pokeriwc )  // UCMC Poker (ver 162.03)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "numeral_1.bin",   0x6000, 0x2000, CRC(c099dc4c) SHA1(4eec1fb0d8f1d2b31ac397991594e02bd9156348) )  // just tables and data to be checked.
 	ROM_LOAD( "numeral_2.bin",   0x8000, 0x2000, CRC(20d42fb2) SHA1(aae6704719b80f3c8c994d91ceebaae070d1153f) )
@@ -4029,7 +4033,7 @@ ROM_END
   It seems to run in 906-III hardware
 
 */
-ROM_START( pokiwc162 )   // Joker Wild?...
+ROM_START( pokiwc162 )  // UCMC Poker (ver 162.03) alt. Joker Wild?...
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "j_k.u28",                              0x6000, 0x2000, CRC(8a6e93b0) SHA1(a411cb4cd3980934cbc9b170b118348a9a4ac896) )  // just tables and data to be checked.
 	ROM_LOAD( "v162_n2_spanish_pok_20-6-91_iwc.u29",  0x8000, 0x2000, CRC(20d42fb2) SHA1(aae6704719b80f3c8c994d91ceebaae070d1153f) )
@@ -4045,6 +4049,7 @@ ROM_START( pokiwc162 )   // Joker Wild?...
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "n82s129n.u16",  0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
 ROM_END
+
 
 /*************************************************
 *                  Driver Init                   *
@@ -4076,12 +4081,12 @@ void calomega_state::init_comg080()
 	*/
 	uint8_t *PRGROM = memregion( "maincpu" )->base();
 
-	PRGROM[0x3ff8] = 0x8e; /* checked by code */
-	PRGROM[0x3ff9] = 0x97; /* checked by code */
+	PRGROM[0x3ff8] = 0x8e;  // checked by code
+	PRGROM[0x3ff9] = 0x97;  // checked by code
 
-	PRGROM[0x3ffc] = 0x42; /* Start vector */
+	PRGROM[0x3ffc] = 0x42;  // start vector
 	PRGROM[0x3ffd] = 0x20;
-	PRGROM[0x3ffe] = 0xf8; /* NMI vector */
+	PRGROM[0x3ffe] = 0xf8;  // NMI vector
 	PRGROM[0x3fff] = 0x26;
 }
 
@@ -4090,11 +4095,11 @@ void calomega_state::init_comg5108()
 	uint8_t *PRGROM = memregion( "maincpu" )->base();
 	PRGROM[0xc080] = 0xff;   // CHECKSUM ERROR FLAG - No changes for now.
 	// Debug
-	//PRGROM[0xc080] = 0x00; // CHECKSUM ERROR FLAG (at start)
-	//PRGROM[0xbf0e] = 0x00; // CHECKSUM ERROR FLAG (on the fly)
-	//PRGROM[0xbfb4] = 0x00; // RAM ERROR FLAG
-	//PRGROM[0xb6A0] = 0x00; // ERROR LOW BATTERY FLAG
-	//PRGROM[0xb6AA] = 0x00; // ERROR LOW BATTERY FLAG
+	// PRGROM[0xc080] = 0x00; // CHECKSUM ERROR FLAG (at start)
+	// PRGROM[0xbf0e] = 0x00; // CHECKSUM ERROR FLAG (on the fly)
+	// PRGROM[0xbfb4] = 0x00; // RAM ERROR FLAG
+	// PRGROM[0xb6A0] = 0x00; // ERROR LOW BATTERY FLAG
+	// PRGROM[0xb6AA] = 0x00; // ERROR LOW BATTERY FLAG
 }
 
 void calomega_state::init_cas21iwc()

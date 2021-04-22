@@ -84,7 +84,6 @@ private:
 	void lamps_903a_w(uint8_t data);
 	void lamps_903b_w(uint8_t data);
 	void lamps_905_w(uint8_t data);
-//	DECLARE_WRITE_LINE_MEMBER(cpu_sync);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_tx);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
@@ -118,7 +117,6 @@ private:
 	optional_ioport m_sw2;
 	output_finder<9> m_lamps;
 
-// 	uint8_t m_vblank, m_timera,m_sync, m_tx_line;
 	uint8_t m_vblank, m_timera, m_tx_line;
 	int m_s903_mux_data;
 	int m_s905_mux_data;
