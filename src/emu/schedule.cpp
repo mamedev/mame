@@ -785,20 +785,22 @@ void device_scheduler::timeslice(subseconds minslice)
 
 				INCREMENT_SCHEDULER_STAT(m_timeslice_inner3);
 
+#if VERBOSE
+				u64 start_cycles = exec->total_cycles();
+				LOG("  %12.12s: t=%018I64das %018I64das = %dc; ", exec->device().tag(), exec->m_localtime.relative().raw(), delta.raw(), delta / exec->m_subseconds_per_cycle + 1);
+#endif
+
 				// store a pointer to the executing device so that we know the
 				// relevant active context
 				m_executing_device = exec;
-
-#if VERBOSE
-				u64 start_cycles = exec->total_cycles();
-				LOG("  %12.12s: t=%018lldas %018lldas = %dc; ", exec->device().tag(), exec->m_localtime.relative().raw(), delta.raw(), delta / exec->m_subseconds_per_cycle + 1);
-#endif
 
 				// execute for the given number of subseconds
 				subseconds localtime = exec->run_for(delta);
 
 #if VERBOSE
-				LOG(" ran %dc, %dc total", s32(exec->total_cycles() - start_cycles), s32(exec->total_cycles()));
+				m_executing_device = nullptr;
+				u64 end_cycles = exec->total_cycles();
+				LOG(" ran %dc, %1I64dc total", s32(end_cycles - start_cycles), end_cycles);
 #endif
 
 				// if the new local device time is less than our target, move the
