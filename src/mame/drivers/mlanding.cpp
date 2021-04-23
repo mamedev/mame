@@ -147,6 +147,8 @@ private:
 	u8   m_msm2_vck;
 	u8   m_msm2_vck2;
 
+	device_persistent_timer m_dma_timer;
+
 	void dma_start_w(u16 data = 0);
 	void dma_stop_w(u16 data = 0);
 	void output_w(u16 data);
@@ -201,6 +203,8 @@ void mlanding_state::machine_start()
 	// Allocate two DMA RAM banks
 	m_dma_ram = std::make_unique<u16[]>(c_dma_bank_words * 2);
 	m_dma_bank->configure_entries(0, 2, m_dma_ram.get(), c_dma_bank_words * 2);
+
+	m_dma_timer.init(*this, TIMER_DMA_COMPLETE);
 
 	// Register state for saving
 	save_pointer(NAME(m_dma_ram), c_dma_bank_words * 2);
@@ -282,7 +286,7 @@ void mlanding_state::dma_start_w(u16 data)
 		m_dma_busy = 1;
 
 		// This is a rather crude estimate!
-		timer_set(attotime::from_hz(16000000) * pixels, TIMER_DMA_COMPLETE);
+		m_dma_timer.adjust(attotime::from_hz(16000000) * pixels);
 	}
 }
 
@@ -290,7 +294,7 @@ void mlanding_state::dma_start_w(u16 data)
 void mlanding_state::dma_stop_w(u16 data)
 {
 	m_dma_busy = 0;
-	timer_set(attotime::never);
+	m_dma_timer.adjust(attotime::never);
 }
 
 
