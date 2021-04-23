@@ -152,7 +152,8 @@ public:
 	static constexpr subseconds from_hz(double hz) noexcept
 	{
 		// prefer to use integral logic if the value is effectively an integer
-		assert(hz > 0);
+		if (hz <= 0)
+			return max();
 		s64 const hz_int = s64(hz);
 		if (hz == double(hz_int))
 			return subseconds(divide_up(PER_SECOND, hz_int));
@@ -461,12 +462,16 @@ public:
 	template<typename T>
 	static constexpr std::enable_if_t<std::is_integral<T>::value, attotime> from_ticks(s64 ticks, T hz) noexcept
 	{
+		if (hz <= 0)
+			return never;
 		return attotime(ticks / s64(hz), subseconds::from_ticks(ticks % s64(hz), hz));
 	}
 	static constexpr attotime from_ticks(s64 ticks, double hz) noexcept
 	{
+		if (hz <= 0)
+			return never;
+
 		// prefer to use integral logic if the value is effectively an integer
-		assert(hz > 0);
 		s64 const hz_int = s64(hz);
 		if (hz == double(hz_int))
 			return from_ticks(ticks, hz_int);
