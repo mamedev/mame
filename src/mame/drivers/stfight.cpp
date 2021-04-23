@@ -245,11 +245,10 @@ conventional RAM. See the memory map for sprite data format.
 TODO:
 - handle transparency in text layer properly (how?)
 - second bank of sf02 is this used? (probably NOT)
-- stfight/empcity YM2203s should be clocked at 1.5MHz but this results in
-  the sound and music being 1/3 of the pitch they should be. The game never
-  writes the YM2203s' divider registers yet other games (e.g. Lock-On)
-  suggest the default values are correct.
-  cshootert however, sounds too high-pitched at 1.5MHz*3.
+- empcity/stfight never writes the YM2203s' divider registers but it expects
+  0x2f, there's a workaround for it in machine_start
+- empcity/stfight has an NMI handler, but it's not hooked up in MAME, missing
+  comms somewhere?
 - Each version of empcity/stfight has a different protection code stored in the
   MCU (at $1D2) so each 68705 will need to be dumped.
   We currently use hacked versions of the empcityu MCU for each different set.
@@ -324,8 +323,8 @@ void stfight_state::cshooter_cpu1_map(address_map &map)
 void stfight_state::cpu2_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xc000, 0xc001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0xc800, 0xc801).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xc000, 0xc001).rw(m_ym[0], FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xc800, 0xc801).rw(m_ym[1], FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xd000, 0xd000).nopr();
 	map(0xd800, 0xd800).nopw();
 	map(0xe800, 0xe800).nopw();
@@ -483,18 +482,17 @@ void stfight_state::stfight_base(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	// YM2203_PITCH_HACK - These should be clocked at 1.5Mhz (see TODO list)
-	ym2203_device &ym1(YM2203(config, "ym1", 12_MHz_XTAL / 8 * 3));
-	ym1.add_route(0, "mono", 0.15);
-	ym1.add_route(1, "mono", 0.15);
-	ym1.add_route(2, "mono", 0.15);
-	ym1.add_route(3, "mono", 0.10);
+	YM2203(config, m_ym[0], 12_MHz_XTAL / 8);
+	m_ym[0]->add_route(0, "mono", 0.15);
+	m_ym[0]->add_route(1, "mono", 0.15);
+	m_ym[0]->add_route(2, "mono", 0.15);
+	m_ym[0]->add_route(3, "mono", 0.10);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 12_MHz_XTAL / 8 * 3));
-	ym2.add_route(0, "mono", 0.15);
-	ym2.add_route(1, "mono", 0.15);
-	ym2.add_route(2, "mono", 0.15);
-	ym2.add_route(3, "mono", 0.10);
+	YM2203(config, m_ym[1], 12_MHz_XTAL / 8);
+	m_ym[1]->add_route(0, "mono", 0.15);
+	m_ym[1]->add_route(1, "mono", 0.15);
+	m_ym[1]->add_route(2, "mono", 0.15);
+	m_ym[1]->add_route(3, "mono", 0.10);
 
 	MSM5205(config, m_msm, 384_kHz_XTAL);
 	m_msm->vck_callback().set(FUNC(stfight_state::stfight_adpcm_int)); // Interrupt function

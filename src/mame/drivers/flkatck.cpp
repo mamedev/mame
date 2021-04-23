@@ -7,9 +7,6 @@
     Driver by:
         Manuel Abadia <emumanu+mame@gmail.com>
 
-    TO DO:
-        -What does 0x900X do? (Z80)
-
 NOTE: There is known to exist a USA version of Flak Attack - currently not dumped
 
 24MHz & 3.579545MHz OSCs
@@ -22,6 +19,7 @@ NOTE: There is known to exist a USA version of Flak Attack - currently not dumpe
 
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/hd6309.h"
+#include "machine/k007452.h"
 #include "sound/ym2151.h"
 #include "screen.h"
 #include "speaker.h"
@@ -84,18 +82,6 @@ void flkatck_state::flkatck_ls138_w(offs_t offset, uint8_t data)
 	}
 }
 
-/* Protection - an external multiplier connected to the sound CPU */
-uint8_t flkatck_state::multiply_r()
-{
-	return (m_multiply_reg[0] * m_multiply_reg[1]) & 0xff;
-}
-
-void flkatck_state::multiply_w(offs_t offset, uint8_t data)
-{
-	m_multiply_reg[offset] = data;
-}
-
-
 void flkatck_state::flkatck_map(address_map &map)
 {
 	map(0x0000, 0x0007).ram().w(FUNC(flkatck_state::flkatck_k007121_regs_w));                                   /* 007121 registers */
@@ -113,11 +99,7 @@ void flkatck_state::flkatck_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();                                             /* ROM */
 	map(0x8000, 0x87ff).ram();                                             /* RAM */
-	map(0x9000, 0x9000).r(FUNC(flkatck_state::multiply_r));                                // 007452: Protection (see wecleman, but unused here?)
-	map(0x9001, 0x9001).nopr();                                         // 007452: ?
-	map(0x9000, 0x9001).w(FUNC(flkatck_state::multiply_w));                               // 007452: Protection (see wecleman, but unused here?)
-	map(0x9004, 0x9004).nopr();                                         // 007452: ?
-	map(0x9006, 0x9006).nopw();                                        // 007452: ?
+	map(0x9000, 0x9007).rw("k007452", FUNC(k007452_device::read), FUNC(k007452_device::write));    // Protection (see wecleman, but unused here?)
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write)); /* 007232 registers */
 	map(0xc000, 0xc001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));           /* YM2151 */
@@ -201,7 +183,6 @@ void flkatck_state::machine_start()
 	membank("bank1")->configure_entries(0, 3, &ROM[0x10000], 0x2000);
 
 	save_item(NAME(m_irq_enabled));
-	save_item(NAME(m_multiply_reg));
 	save_item(NAME(m_flipscreen));
 }
 
@@ -210,8 +191,6 @@ void flkatck_state::machine_reset()
 	m_k007232->set_bank(0, 1);
 
 	m_irq_enabled = 0;
-	m_multiply_reg[0] = 0;
-	m_multiply_reg[1] = 0;
 	m_flipscreen = 0;
 }
 
@@ -228,6 +207,8 @@ void flkatck_state::flkatck(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(600));
 
 	WATCHDOG_TIMER(config, m_watchdog);
+	
+	KONAMI_007452_MATH(config, "k007452");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

@@ -11,13 +11,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/8530scc.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/applefdc.h"
-#include "machine/sonydriv.h"
 #include "includes/macpci.h"
-#include "machine/ram.h"
-#include "debugger.h"
 
 #define LOG_ADB         0
 #define LOG_VIA         0

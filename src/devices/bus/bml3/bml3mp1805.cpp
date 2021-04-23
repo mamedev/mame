@@ -23,22 +23,6 @@
 
 DEFINE_DEVICE_TYPE(BML3BUS_MP1805, bml3bus_mp1805_device, "bml3mp1805", "Hitachi MP-1805 Floppy Controller Card")
 
-static const floppy_interface bml3_mp1805_floppy_interface =
-{
-	FLOPPY_STANDARD_3_SSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	nullptr
-};
-
-WRITE_LINE_MEMBER( bml3bus_mp1805_device::bml3_mc6843_intrq_w )
-{
-	if (state)
-	{
-		raise_slot_nmi();
-		lower_slot_nmi();
-	}
-}
-
 #define MP1805_ROM_REGION  "mp1805_rom"
 
 ROM_START( mp1805 )
@@ -46,6 +30,11 @@ ROM_START( mp1805 )
 	// MP-1805 disk controller ROM, which replaces part of the system ROM
 	ROM_LOAD( "mp1805.rom", 0xf800, 0x0800, BAD_DUMP CRC(b532d8d9) SHA1(6f1160356d5bf64b5926b1fdb60db414edf65f22))
 ROM_END
+
+void bml3bus_mp1805_device::floppy_drives(device_slot_interface &device)
+{
+	device.option_add("mb_6890", FLOPPY_3_SSDD);
+}
 
 
 /***************************************************************************
@@ -58,12 +47,14 @@ ROM_END
 
 void bml3bus_mp1805_device::device_add_mconfig(machine_config &config)
 {
-	MC6843(config, m_mc6843, 0);
-	m_mc6843->set_floppy_drives(m_floppy[0], m_floppy[1], m_floppy[2], m_floppy[3]);
-	m_mc6843->irq().set(FUNC(bml3bus_mp1805_device::bml3_mc6843_intrq_w));
+	MC6843(config, m_mc6843, 500000);
+	m_mc6843->force_ready();
+	m_mc6843->irq().set(FUNC(bml3bus_mp1805_device::nmi_w));
 
-	for (auto &floppy : m_floppy)
-		LEGACY_FLOPPY(config, floppy, 0, &bml3_mp1805_floppy_interface);
+	FLOPPY_CONNECTOR(config, m_floppy[0], floppy_drives, "mb_6890", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], floppy_drives, nullptr,   floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[2], floppy_drives, nullptr,   floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[3], floppy_drives, nullptr,   floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 //-------------------------------------------------
@@ -88,33 +79,29 @@ void bml3bus_mp1805_device::bml3_mp1805_w(uint8_t data)
 	// MT ?  ?  ?  D3 D2 D1 D0
 	// MT: 0=motor off, 1=motor on
 	// Dn: 1=select drive <n>
-	int drive_select = data & 0x0f;
-	int drive;
-	// TODO: MESS UI for flipping disk? Note that D88 images are double-sided, but the physical drive is single-sided
-	int side = 0;
-	int motor = BIT(data, 7);
-	switch (drive_select) {
-	case 1:
-		drive = 0;
-		break;
-	case 2:
-		drive = 1;
-		break;
-	case 4:
-		drive = 2;
-		break;
-	case 8:
-		drive = 3;
-		break;
-	default:
-		// TODO: what's the correct behaviour if more than one drive select bit is set? Or no bit set?
-		drive = 0;
-		break;
+
+	logerror("control_w %02x\n", data);
+	int prev, next;
+	for(prev = 0; prev != 4; prev++)
+		if(m_control & (1 << prev))
+			break;
+	m_control = data;
+	for(next = 0; next != 4; next++)
+		if(m_control & (1 << next))
+			break;
+
+	auto fprev = m_floppy[prev]->get_device();
+	auto fnext = m_floppy[next]->get_device();
+
+	if(fprev && fprev != fnext)
+		m_floppy[prev]->get_device()->mon_w(1);
+
+	if((m_control & 0x80) && fnext) {
+		logerror("motor on\n");
+		fnext->mon_w(0);
 	}
-	m_mc6843->set_drive(drive);
-	m_floppy[drive]->floppy_mon_w(motor);
-	m_floppy[drive]->floppy_drive_set_ready_state(ASSERT_LINE, 0);
-	m_mc6843->set_side(side);
+
+	m_mc6843->set_floppy(fnext);
 }
 
 
@@ -125,7 +112,7 @@ void bml3bus_mp1805_device::bml3_mp1805_w(uint8_t data)
 bml3bus_mp1805_device::bml3bus_mp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, BML3BUS_MP1805, tag, owner, clock),
 	device_bml3bus_card_interface(mconfig, *this),
-	m_floppy(*this, "floppy%u", 0U),
+	m_floppy(*this, "%u", 0U),
 	m_mc6843(*this, "mc6843"), m_rom(nullptr)
 {
 }
@@ -141,13 +128,16 @@ void bml3bus_mp1805_device::device_start()
 
 	// install into memory
 	address_space &space_prg = space();
-	space_prg.install_readwrite_handler(0xff18, 0xff1f, read8sm_delegate(*m_mc6843, FUNC(mc6843_device::read)), write8sm_delegate(*m_mc6843, FUNC(mc6843_device::write)));
+	space_prg.install_device(0xff18, 0xff1f, *m_mc6843, &mc6843_device::map);
 	space_prg.install_readwrite_handler(0xff20, 0xff20, read8smo_delegate(*this, FUNC(bml3bus_mp1805_device::bml3_mp1805_r)), write8smo_delegate(*this, FUNC(bml3bus_mp1805_device::bml3_mp1805_w)));
 	// overwriting the main ROM (rather than using e.g. install_rom) should mean that bank switches for RAM expansion still work...
 	uint8_t *mainrom = device().machine().root_device().memregion("maincpu")->base();
 	memcpy(mainrom + 0xf800, m_rom + 0xf800, 0x800);
+
+	save_item(NAME(m_control));
 }
 
 void bml3bus_mp1805_device::device_reset()
 {
+	m_control = 0;
 }

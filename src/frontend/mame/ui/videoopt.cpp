@@ -59,6 +59,7 @@ void menu_video_targets::populate(float &customtop, float &custombottom)
 
 	// add option for snapshot target
 	item_append("Snapshot", 0, &machine().video().snapshot_target());
+	item_append(menu_item_type::SEPARATOR);
 }
 
 /*-------------------------------------------------
@@ -212,6 +213,8 @@ void menu_video_options::populate(float &customtop, float &custombottom)
 		// keep aspect
 		item_append_on_off(_("Maintain Aspect Ratio"), m_target.keepaspect(), 0, reinterpret_cast<void *>(ITEM_KEEPASPECT));
 	}
+
+	item_append(menu_item_type::SEPARATOR);
 }
 
 

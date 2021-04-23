@@ -86,6 +86,7 @@ TODO:
 - Lucky Boom has some minor colour issue with the background - see the title screen. The
   game selects the wrong colour for some tiles. The tiles should be colour 0x01 not 0x02.
   Affects the backgrounds in game however it's barely noticeable.
+- Fix banking for both World Beach Volleyball configurations (PIC and MCS MCUs)
 
 ***************************************************************************/
 
@@ -252,6 +253,29 @@ void playmark_state::hrdtimes_snd_control_w(u8 data)
 	}
 }
 
+uint8_t playmark_state::wbeachvla_snd_command_r() // TODO: convert the rest of the driver to use generic_latch_8_device and merge this with playmark_snd_command_r
+{
+	uint8_t data = 0;
+
+	if ((m_oki_control & 0x38) == 0x30)
+		data = m_soundlatch->read();
+	else if ((m_oki_control & 0x38) == 0x28)
+		data = (m_oki->read() & 0x0f);
+
+	return data;
+}
+
+void playmark_state::wbeachvla_snd_control_w(uint8_t data) // TODO: merge this with playmark_snd_control_w
+{
+	m_oki_control = data;
+
+	m_okibank->set_entry(data & 7);
+
+	if ((data & 0x38) == 0x18)
+	{
+		m_oki->write(m_oki_command);
+	}
+}
 
 /***************************** 68000 Memory Maps ****************************/
 
@@ -319,6 +343,13 @@ void playmark_state::wbeachvl_main_map(address_map &map)
 	map(0x71001f, 0x71001f).w(FUNC(playmark_state::playmark_snd_command_w));
 	map(0x780000, 0x780fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xff0000, 0xffffff).ram();
+}
+
+void playmark_state::wbeachvla_main_map(address_map &map)
+{
+	wbeachvl_main_map(map);
+
+	map(0x71001f, 0x71001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
 void playmark_state::excelsr_main_map(address_map &map)
@@ -1157,9 +1188,18 @@ void playmark_state::wbeachvl_mcs(machine_config &config)
 {
 	wbeachvl_base(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &playmark_state::wbeachvla_main_map);
+
 	I87C51(config, m_audio_mcs, 24'000'000 / 2); // actually S87C751, clock unverified, near a 24 MHz XTAL
+	//m_audio_mcs->port_in_cb<1>().set(); // TODO: reads something here. pending_r?
+	m_audio_mcs->port_out_cb<1>().set(FUNC(playmark_state::wbeachvla_snd_control_w));
+	m_audio_mcs->port_in_cb<3>().set(FUNC(playmark_state::wbeachvla_snd_command_r));
+	m_audio_mcs->port_out_cb<3>().set(FUNC(playmark_state::playmark_oki_w));
 
 	I87C51(config, "extracpu", 12'000'000); // actually S87C751, clock unverified, on a sub PCB near a 12 MHz XTAL
+
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audio_mcs, MCS51_INT1_LINE, HOLD_LINE);
 }
 
 void playmark_state::excelsr(machine_config &config)
@@ -1822,7 +1862,7 @@ void playmark_state::init_pic_decode()
 GAME( 1995, bigtwin,   0,        bigtwin,      bigtwin,   playmark_state, init_pic_decode, ROT0, "Playmark", "Big Twin", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, bigtwinb,  bigtwin,  bigtwinb,     bigtwinb,  playmark_state, init_pic_decode, ROT0, "Playmark", "Big Twin (No Girls Conversion)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, wbeachvl,  0,        wbeachvl_pic, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 1, PIC16C57 audio CPU)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // no music due to incorrect OKI banking / PIC hookup
-GAME( 1995, wbeachvla, wbeachvl, wbeachvl_mcs, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 1, S87C751 audio CPU)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // S87C751 not hooked up
+GAME( 1995, wbeachvla, wbeachvl, wbeachvl_mcs, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 1, S87C751 audio CPU)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // wrong banking, so some sounds are played at the wrong time
 GAME( 1995, wbeachvl2, wbeachvl, wbeachvl_pic, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, wbeachvl3, wbeachvl, wbeachvl_pic, wbeachvl,  playmark_state, empty_init,      ROT0, "Playmark", "World Beach Volley (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, excelsr,   0,        excelsr,      excelsr,   playmark_state, init_pic_decode, ROT0, "Playmark", "Excelsior (set 1)", MACHINE_SUPPORTS_SAVE )

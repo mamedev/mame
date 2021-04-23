@@ -11,9 +11,6 @@
     TODO:
 
     - implement FIFO as ring buffer
-    - commands
-        - DMAR
-        - DMAW
     - incomplete / unimplemented FIGD / GCHRD draw modes
         - FIGD character
         - slanted character
@@ -21,11 +18,12 @@
         - read data
         - modify data
         - write data
-    - QX-10 diagnostic test has positioning bugs with the bitmap display test;
     - QX-10 diagnostic test misses the zooming factor (external pin);
     - compis2 SAD address for bitmap is 0x20000 for whatever reason (presumably missing banking);
     - A5105 has a FIFO bug with the RDAT, should be a lot larger when it scrolls up.
-      The problem is that DMA-ing with RDAT/WDAT shouldn't be instant;
+      Can be fixed with a DRDY mechanism for RDAT/WDAT;
+    - Some later SWs on PC-98 throws "Invalid command byte 05" (zettmj on Epson logo),
+	  actual undocumented command to reset something?
 
     - honor visible area
     - wide mode (32-bit access)
@@ -455,9 +453,20 @@ inline void upd7220_device::reset_figs_param()
 //-------------------------------------------------
 //  read_vram -
 //-------------------------------------------------
-
-inline void upd7220_device::read_vram(uint8_t type, uint8_t mod)
+inline uint16_t upd7220_device::read_vram()
 {
+	uint16_t data;
+
+	data = readword(m_ead*2);
+	m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
+	m_ead &= 0x3ffff;
+
+	return data;
+}
+
+inline void upd7220_device::rdat(uint8_t type, uint8_t mod)
+{
+	uint16_t data;
 	if (type == 1)
 	{
 		LOG("uPD7220 invalid type 1 RDAT parameter\n");
@@ -469,35 +478,74 @@ inline void upd7220_device::read_vram(uint8_t type, uint8_t mod)
 
 	while (m_figs.m_dc && m_fifo_ptr < (type ? 15 : 14))
 	{
+		data = read_vram();
 		switch(type)
 		{
 			case 0:
-				queue(readbyte(m_ead*2), 0);
-				queue(readbyte(m_ead*2+1), 0);
+				queue(data & 0xff, 0);
+				queue((data >> 8) & 0xff, 0);
 				break;
 			case 2:
-				queue(readbyte(m_ead*2), 0);
+				queue(data & 0xff, 0);
 				break;
 			case 3:
-				queue(readbyte(m_ead*2+1), 0);
+				queue((data >> 8) & 0xff, 0);
 				break;
 		}
 
 		m_figs.m_dc--;
-		m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
-		m_ead &= 0x3ffff;
 	}
 
 	if (m_figs.m_dc == 0)
 		reset_figs_param();
 }
 
-
 //-------------------------------------------------
 //  write_vram -
 //-------------------------------------------------
+inline void upd7220_device::write_vram(uint8_t type, uint8_t mod, uint16_t data)
+{
+	switch(mod & 3)
+	{
+		case 0x00: //replace
+			if(type == 0)
+				writeword(m_ead*2+0, data);
+			if(type == 2)
+				writebyte(m_ead*2+0, data & 0xff);
+			if(type == 3)
+				writebyte(m_ead*2+1, data >> 8);
+			break;
+		case 0x01: //complement
+			if(type == 0)
+				writeword(m_ead*2+0, readword(m_ead*2+0) ^ data);
+			if(type == 2)
+				writebyte(m_ead*2+0, readbyte(m_ead*2+0) ^ (data & 0xff));
+			if(type == 3)
+				writebyte(m_ead*2+1, readbyte(m_ead*2+1) ^ (data >> 8));
+			break;
+		case 0x02: //reset to zero
+			if(type == 0)
+				writeword(m_ead*2+0, readword(m_ead*2+0) & ~data);
+			if(type == 2)
+				writebyte(m_ead*2+0, readbyte(m_ead*2+0) & ~(data & 0xff));
+			if(type == 3)
+				writebyte(m_ead*2+1, readbyte(m_ead*2+1) & ~(data >> 8));
+			break;
+		case 0x03: //set to one
+			if(type == 0)
+				writeword(m_ead*2+0, readword(m_ead*2+0) | data);
+			if(type == 2)
+				writebyte(m_ead*2+0, readbyte(m_ead*2+0) | (data & 0xff));
+			if(type == 3)
+				writebyte(m_ead*2+1, readbyte(m_ead*2+1) | (data >> 8));
+			break;
+	}
 
-inline void upd7220_device::write_vram(uint8_t type, uint8_t mod)
+	m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
+	m_ead &= 0x3ffff;
+}
+
+inline void upd7220_device::wdat(uint8_t type, uint8_t mod)
 {
 	uint16_t result;
 
@@ -534,44 +582,7 @@ inline void upd7220_device::write_vram(uint8_t type, uint8_t mod)
 
 	for(int i = 0; i < m_figs.m_dc + 1; i++)
 	{
-		switch(mod & 3)
-		{
-			case 0x00: //replace
-				if(type == 0)
-					writeword(m_ead*2+0, result);
-				if(type == 2)
-					writebyte(m_ead*2+0, result & 0xff);
-				if(type == 3)
-					writebyte(m_ead*2+1, result >> 8);
-				break;
-			case 0x01: //complement
-				if(type == 0)
-					writeword(m_ead*2+0, readword(m_ead*2+0) ^ result);
-				if(type == 2)
-					writebyte(m_ead*2+0, readbyte(m_ead*2+0) ^ (result & 0xff));
-				if(type == 3)
-					writebyte(m_ead*2+1, readbyte(m_ead*2+1) ^ (result >> 8));
-				break;
-			case 0x02: //reset to zero
-				if(type == 0)
-					writeword(m_ead*2+0, readword(m_ead*2+0) & ~result);
-				if(type == 2)
-					writebyte(m_ead*2+0, readbyte(m_ead*2+0) & ~(result & 0xff));
-				if(type == 3)
-					writebyte(m_ead*2+1, readbyte(m_ead*2+1) & ~(result >> 8));
-				break;
-			case 0x03: //set to one
-				if(type == 0)
-					writeword(m_ead*2+0, readword(m_ead*2+0) | result);
-				if(type == 2)
-					writebyte(m_ead*2+0, readbyte(m_ead*2+0) | (result & 0xff));
-				if(type == 3)
-					writebyte(m_ead*2+1, readbyte(m_ead*2+1) | (result >> 8));
-				break;
-		}
-
-		m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
-		m_ead &= 0x3ffff;
+		write_vram(type, mod, result);
 	}
 }
 
@@ -1333,7 +1344,7 @@ void upd7220_device::process_fifo()
 			LOG("%02x = %02x %02x (%c) %06x %04x\n",m_cr,m_pr[2],m_pr[1],m_pr[1]?m_pr[1]:' ',m_ead,m_figs.m_dc);
 			fifo_set_direction(FIFO_WRITE);
 
-			write_vram((m_cr & 0x18) >> 3,m_cr & 3);
+			wdat((m_cr & 0x18) >> 3,m_cr & 3);
 			reset_figs_param();
 			m_param_ptr = 1;
 		}
@@ -1412,7 +1423,7 @@ void upd7220_device::process_fifo()
 	case COMMAND_RDAT: /* read data from display memory */
 		fifo_set_direction(FIFO_READ);
 
-		read_vram((m_cr & 0x18) >> 3,m_cr & 3);
+		rdat((m_cr & 0x18) >> 3,m_cr & 3);
 
 		m_sr |= UPD7220_SR_DATA_READY;
 		break;
@@ -1444,11 +1455,17 @@ void upd7220_device::process_fifo()
 		break;
 
 	case COMMAND_DMAR: /* DMA read request */
-		logerror("uPD7220 Unimplemented command DMAR\n");
+		m_dma_type = (m_cr >> 3) & 3;
+		m_dma_mod = m_cr & 3;
+		m_dma_transfer_length = (m_figs.m_dc + 1) * (m_figs.m_d + 2);
+		start_dma();
 		break;
 
 	case COMMAND_DMAW: /* DMA write request */
-		logerror("uPD7220 Unimplemented command DMAW\n");
+		m_dma_type = (m_cr >> 3) & 3;
+		m_dma_mod = m_cr & 3;
+		m_dma_transfer_length = (m_figs.m_dc + 1) * (m_figs.m_d + 1);
+		start_dma();
 		break;
 	}
 }
@@ -1463,7 +1480,7 @@ void upd7220_device::continue_command()
 	// continue RDAT command when data to read are larger than the FIFO (a5105 and dmv text scrolling)
 	if (m_figs.m_dc && translate_command(m_cr) == COMMAND_RDAT)
 	{
-		read_vram((m_cr & 0x18) >> 3, m_cr & 3);
+		rdat((m_cr & 0x18) >> 3, m_cr & 3);
 		m_sr |= UPD7220_SR_DATA_READY;
 	}
 }
@@ -1493,7 +1510,6 @@ uint8_t upd7220_device::read(offs_t offset)
 
 		/* TODO: timing of these */
 		m_sr &= ~UPD7220_SR_DRAWING_IN_PROGRESS;
-		m_sr &= ~UPD7220_SR_DMA_EXECUTE;
 	}
 
 	return data;
@@ -1529,7 +1545,31 @@ void upd7220_device::write(offs_t offset, uint8_t data)
 
 uint8_t upd7220_device::dack_r()
 {
-	return 0;
+	uint8_t result = 0;
+	switch(m_dma_type) {
+	case 0:
+		if (m_dma_transfer_length % 2 == 0) {
+			m_dma_data = read_vram();
+			result = m_dma_data & 0xff;
+		} else {
+			result = (m_dma_data >> 8) & 0xff;
+		}
+		break;
+	case 2:
+		m_dma_data = read_vram();
+		result = m_dma_data & 0xff;
+		break;
+	case 3:
+		m_dma_data = read_vram();
+		result = (m_dma_data >> 8) & 0xff;
+		break;
+	default:
+		logerror("uPD7220 Invalid DMA Transfer Type\n");
+	}
+	if (--m_dma_transfer_length == 0) {
+		stop_dma();
+	}
+	return result;
 }
 
 
@@ -1539,6 +1579,46 @@ uint8_t upd7220_device::dack_r()
 
 void upd7220_device::dack_w(uint8_t data)
 {
+	switch(m_dma_type) {
+	case 0:
+		if (m_dma_transfer_length % 2) {
+			m_dma_data = ((m_dma_data & 0xff) | data << 8) & m_mask;
+			write_vram(m_dma_type, m_dma_mod, m_dma_data);
+		} else {
+			m_dma_data = (m_dma_data & 0xff00) | data;
+		}
+		break;
+	case 2:
+		m_dma_data = data & (m_mask & 0xff);
+		write_vram(m_dma_type, m_dma_mod, m_dma_data);
+		break;
+	case 3:
+		m_dma_data = (data << 8) & (m_mask & 0xff);
+		write_vram(m_dma_type, m_dma_mod, m_dma_data);
+		break;
+	default:
+		logerror("uPD7220 Invalid DMA Transfer Type\n");
+	}
+	if (--m_dma_transfer_length == 0) {
+		stop_dma();
+	}
+}
+
+void upd7220_device::start_dma()
+{
+	if ((m_sr & UPD7220_SR_DMA_EXECUTE) == 0) {
+		m_write_drq(ASSERT_LINE);
+		m_sr |= UPD7220_SR_DMA_EXECUTE;
+	}
+}
+
+void upd7220_device::stop_dma()
+{
+	if ((m_sr & UPD7220_SR_DMA_EXECUTE) == UPD7220_SR_DMA_EXECUTE) {
+		m_write_drq(CLEAR_LINE);
+		m_sr &= ~UPD7220_SR_DMA_EXECUTE;
+		reset_figs_param();
+	}
 }
 
 
@@ -1646,8 +1726,6 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 
 		if (im || force_bitmap)
 		{
-			//get_graphics_partition(area, &sad, &len, &im, &wd);
-
 			if(area >= 3) // TODO: most likely to be correct, Quarth (PC-98xx) definitely draws with area 2. We might see an area 3 someday ...
 				break;
 
@@ -1668,8 +1746,6 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 		}
 		else
 		{
-			get_text_partition(area, &sad, &len, &im, &wd);
-
 			if(m_lr)
 			{
 				for (y = 0; y < len; y+=m_lr)

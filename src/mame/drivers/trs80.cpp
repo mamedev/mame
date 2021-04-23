@@ -6,7 +6,7 @@
 TRS80 memory map
 
 0000-2fff ROM                            R   D0-D7
-3000-37ff ROM on Model III               R   D0-D7
+3000-37ff ROM on EACA models             R   D0-D7
           unused on Model I
 37de      UART status                    R/W D0-D7
 37df      UART data                      R/W D0-D7
@@ -89,13 +89,28 @@ About the system80 - Asian version of trs80l2, known as EACA Video Genie. In USA
     - Gnnnn : Execute program at nnnn
     - Gnnnn,tttt : as above, breakpoint at tttt
     - R : modify registers
-    The monitor works on the radionic too.
 
 About the ht1080z - This was made for schools in Hungary. Each comes with a BASIC extension roms
     which activated Hungarian features. To activate - start emulation - enter SYSTEM
     Enter /12288 and the extensions will be installed and you are returned to READY.
     The ht1080z is identical to the System 80, apart from the character rom.
     The ht1080z2 has a modified extension rom and character generator.
+
+About the eg3003 - This is the original of the EACA clones, and enjoyed success in Europe,
+    particularly in Germany. The normal roms would make it exactly a System-80, however we've
+    added the TCS ROM extension for something different. To activate - enter SYSTEM
+    Enter /12345 and the inbuilt monitor will be ready to go. To start the monitor, hold
+    up-arrow and hit M. You get a # prompt. The keyboard is also now in lower-case, even
+    though monitor commands are required to be in upper-case. Monitor commands:
+    - A : Ascii Dump
+    - D : Hex dump
+    - E : Edit Memory
+    - H : Hex converter
+    - J : Jump (Go)
+    - P : Punch
+    - R : Return to BASIC
+    - S : Search
+    - X : Hex Calculator
 
 About the RTC - The time is incremented while ever the cursor is flashing. It is stored in a series
     of bytes in the computer's work area. The bytes are in a certain order, this is:
@@ -107,21 +122,21 @@ Not dumped (to our knowledge):
  TRS80 Katakana Character Generator
  TRS80 Small English Character Generator
  TRS80 Model III old version Character Generator
- TRS80 Model II bios and boot disk
 
 Not emulated:
  TRS80 Japanese kana/ascii switch and alternate keyboard
  TRS80 Model III/4 Hard drive, Graphics board, Alternate Character set
  Radionic has 16 colours with a byte at 350B controlling the operation. See manual.
 
-Virtual floppy disk formats are JV1, JV3, and DMK. JV3 is not emulated.
 
 ********************************************************************************************************
 
 To Do / Status:
 --------------
 
-For those machines that allow it, add cass2 as an image device and hook it up.
+- For those machines that allow it, add cass2 as an image device and hook it up.
+- Difficulty loading real tapes.
+- Writing to floppy is problematic; freezing/crashing are common issues.
 
 trs80:     works
 
@@ -136,28 +151,11 @@ ht1080z    works
            verify clock for AY-3-8910
            investigate expansion-box
 
-radionic:  works
-           floppy not working (@6C0, DRQ never gets set)
-           add colour
-           expansion-box?
-           uart
-
-2021-03-26 MT 07903 - most floppies no longer boot.
-           Most machines have problems loading real tapes.
-
 *******************************************************************************************************/
 
 #include "emu.h"
 #include "includes/trs80.h"
-
-#include "machine/com8116.h"
 #include "sound/ay8910.h"
-#include "screen.h"
-#include "speaker.h"
-
-#include "formats/trs80_dsk.h"
-#include "formats/trs_cas.h"
-#include "formats/dmk_dsk.h"
 
 
 void trs80_state::trs80_mem(address_map &map)
@@ -177,7 +175,7 @@ void trs80_state::trs80_io(address_map &map)
 
 void trs80_state::m1_mem(address_map &map)
 {
-	map(0x0000, 0x377f).rom(); // sys80,ht1080 needs up to 375F
+	map(0x0000, 0x37ff).rom();
 	map(0x37de, 0x37de).rw(FUNC(trs80_state::sys80_f9_r), FUNC(trs80_state::sys80_f8_w));
 	map(0x37df, 0x37df).rw(m_uart, FUNC(ay31015_device::receive), FUNC(ay31015_device::transmit));
 	map(0x37e0, 0x37e3).rw(FUNC(trs80_state::irq_status_r), FUNC(trs80_state::motor_w));
@@ -218,17 +216,6 @@ void trs80_state::ht1080z_io(address_map &map)
 	sys80_io(map);
 	map(0x1e, 0x1e).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0x1f, 0x1f).w("ay1", FUNC(ay8910_device::address_w));
-}
-
-void trs80_state::radionic_mem(address_map &map)
-{
-	m1_mem(map);
-	// Optional external RS232 module with 8251
-	//map(0x3400, 0x3401).mirror(0xfe).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write));
-	// Internal colour controls (need details)
-	//map(0x3500, 0x35ff).w(FUNC(trs80_state::colour_w));
-	// Internal interface to external slots
-	map(0x3600, 0x3603).mirror(0xfc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
 /**************************************************************************
@@ -403,19 +390,6 @@ static const gfx_layout ht1080z_charlayout =
 	8*16           /* every char takes 16 bytes */
 };
 
-static const gfx_layout radionic_charlayout =
-{
-	8, 16,          /* 8 x 16 characters */
-	256,            /* 256 characters */
-	1,          /* 1 bits per pixel */
-	{ 0 },          /* no bitplanes */
-	/* x offsets */
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	/* y offsets */
-	{  0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 2048*8, 2049*8, 2050*8, 2051*8, 2052*8, 2053*8, 2054*8, 2055*8 },
-	8*8        /* every char takes 16 bytes */
-};
-
 static GFXDECODE_START(gfx_trs80)
 	GFXDECODE_ENTRY( "chargen", 0, trs80_charlayout, 0, 1 )
 GFXDECODE_END
@@ -424,20 +398,21 @@ static GFXDECODE_START(gfx_ht1080z)
 	GFXDECODE_ENTRY( "chargen", 0, ht1080z_charlayout, 0, 1 )
 GFXDECODE_END
 
-static GFXDECODE_START(gfx_radionic)
-	GFXDECODE_ENTRY( "chargen", 0, radionic_charlayout, 0, 1 )
-GFXDECODE_END
-
 
 void trs80_state::floppy_formats(format_registration &fr)
 {
-	fr.add(FLOPPY_TRS80_FORMAT);
-	fr.add(FLOPPY_DMK_FORMAT);
+	fr.add(FLOPPY_JV1_FORMAT);
 }
 
+// Most images are single-sided, 40 tracks or less.
+// However, the default is QD to prevent MAME from
+// crashing if a disk with more than 40 tracks is used.
 static void trs80_floppies(device_slot_interface &device)
 {
-	device.option_add("sssd", FLOPPY_525_QD); // QD allows the 80-track boot disks to work.
+	device.option_add("35t_sd", FLOPPY_525_SSSD_35T);
+	device.option_add("40t_sd", FLOPPY_525_SSSD);
+	device.option_add("40t_dd", FLOPPY_525_DD);
+	device.option_add("80t_qd", FLOPPY_525_QD);
 }
 
 
@@ -484,10 +459,10 @@ void trs80_state::model1(machine_config &config)      // model I, level II
 	FD1771(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(FUNC(trs80_state::intrq_w));
 
-	FLOPPY_CONNECTOR(config, "fdc:0", trs80_floppies, "sssd", trs80_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", trs80_floppies, "sssd", trs80_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:2", trs80_floppies, nullptr, trs80_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:3", trs80_floppies, nullptr, trs80_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], trs80_floppies, "80t_qd", trs80_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], trs80_floppies, "80t_qd", trs80_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[2], trs80_floppies, nullptr, trs80_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[3], trs80_floppies, nullptr, trs80_state::floppy_formats).enable_sound(true);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit7));
@@ -543,28 +518,6 @@ void trs80_state::ht1080z(machine_config &config)
 	//ay1.port_b_read_callback(FUNC(trs80_state::...);
 }
 
-void trs80_state::radionic(machine_config &config)
-{
-	model1(config);
-	m_maincpu->set_clock(12_MHz_XTAL / 6); // or 3.579MHz / 2 (selectable?)
-	// Komtek I "User Friendly Manual" calls for "Z80 running at 1.97 MHz." This likely refers to an alternate NTSC version
-	// whose master clock was approximately 11.8005 MHz (6 times ~1.966 MHz and 750 times 15.734 kHz). Though the schematics
-	// provide the main XTAL frequency as 12 MHz, that they also include a 3.579 MHz XTAL suggests this possibility.
-	m_maincpu->set_periodic_int(FUNC(trs80_state::nmi_line_pulse), attotime::from_hz(12_MHz_XTAL / 12 / 16384));
-	m_maincpu->set_addrmap(AS_PROGRAM, &trs80_state::radionic_mem);
-
-	subdevice<screen_device>("screen")->set_raw(12_MHz_XTAL, 768, 0, 512, 312, 0, 256);
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(trs80_state::screen_update_radionic));
-	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_radionic);
-
-	// Interface to external circuits
-	I8255(config, m_ppi);
-	//m_ppi->in_pc_callback().set(FUNC(pulsar_state::ppi_pc_r));      // Sensing from external and printer status
-	//m_ppi->out_pa_callback().set(FUNC(pulsar_state::ppi_pa_w));    // Data for external plugin printer module
-	//m_ppi->out_pb_callback().set(FUNC(pulsar_state::ppi_pb_w));    // Control data to external
-	//m_ppi->out_pc_callback().set(FUNC(pulsar_state::ppi_pc_w));    // Printer strobe
-}
-
 
 /***************************************************************************
 
@@ -573,92 +526,110 @@ void trs80_state::radionic(machine_config &config)
 ***************************************************************************/
 
 ROM_START(trs80)
-	ROM_REGION(0x3800, "maincpu",0)
-	ROM_LOAD("level1.rom",   0x0000, 0x1000, CRC(70d06dff) SHA1(20d75478fbf42214381e05b14f57072f3970f765))
+	ROM_REGION(0x3800, "maincpu", ROMREGION_ERASEFF)
+	// These roms had many names due to multiple suppliers
+	// Memory   Location    Maker and type                Label
+	// 000-7FF  Z33         Intel 2716                    ROM-A
+	// 800-FFF  Z34         Intel 2716                    ROM-B
+	// 000-7FF  Z33         National Semiconductor 2316   MM2316_R/D
+	// 800-FFF  Z34         National Semiconductor 2316   MM2316_S/D
+	// 000-7FF  Z33         National Semiconductor 2316   M2316E_R/N
+	// 800-FFF  Z34         National Semiconductor 2316   M2316E_S/N
+	// 000-7FF  Z33         Motorola                      7807
+	// 800-FFF  Z34         Motorola                      7804
+	// 000-FFF  Z33         Motorola                      7809_BASIC I
+	ROM_LOAD("level1.rom",     0x0000, 0x1000, CRC(70d06dff) SHA1(20d75478fbf42214381e05b14f57072f3970f765) )
 
-	ROM_REGION(0x0400, "chargen",0)
-	ROM_LOAD("trs80m1.chr",  0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_REGION(0x0400, "chargen", 0)
+	ROM_LOAD("mcm6670p.z29",   0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7) )
 ROM_END
 
 
 ROM_START(trs80l2)
-	ROM_REGION(0x3800, "maincpu",0)
+	ROM_REGION(0x3800, "maincpu", ROMREGION_ERASEFF)
+	// There's no space for these roms on a Model 1 board, so an extra ROM board was created to hold them.
+	// This board plugs into either Z33 or Z34. Confusingly, the locations on this board are also Z numbers.
+	// The last version of the board only holds 2 roms - Z1 as 8K (ROM A/B), and Z2 as 4K (ROM C).
 	ROM_SYSTEM_BIOS(0, "level2", "Radio Shack Level II Basic")
-	ROMX_LOAD("trs80.z33",   0x0000, 0x1000, CRC(37c59db2) SHA1(e8f8f6a4460a6f6755873580be6ff70cebe14969), ROM_BIOS(0))
-	ROMX_LOAD("trs80.z34",   0x1000, 0x1000, CRC(05818718) SHA1(43c538ca77623af6417474ca5b95fb94205500c1), ROM_BIOS(0))
-	ROMX_LOAD("trs80.zl2",   0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369), ROM_BIOS(0))
+	ROMX_LOAD("rom-a.z1",      0x0000, 0x1000, CRC(37c59db2) SHA1(e8f8f6a4460a6f6755873580be6ff70cebe14969), ROM_BIOS(0) )
+	ROMX_LOAD("rom-b.z2",      0x1000, 0x1000, CRC(05818718) SHA1(43c538ca77623af6417474ca5b95fb94205500c1), ROM_BIOS(0) )
+	ROMX_LOAD("rom-c.z3",      0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "rsl2", "R/S L2 Basic")
-	ROMX_LOAD("trs80alt.z33",0x0000, 0x1000, CRC(be46faf5) SHA1(0e63fc11e207bfd5288118be5d263e7428cc128b), ROM_BIOS(1))
-	ROMX_LOAD("trs80alt.z34",0x1000, 0x1000, CRC(6c791c2d) SHA1(2a38e0a248f6619d38f1a108eea7b95761cf2aee), ROM_BIOS(1))
-	ROMX_LOAD("trs80alt.zl2",0x2000, 0x1000, CRC(55b3ad13) SHA1(6279f6a68f927ea8628458b278616736f0b3c339), ROM_BIOS(1))
+	ROMX_LOAD("rom-a_alt.z1",  0x0000, 0x1000, CRC(be46faf5) SHA1(0e63fc11e207bfd5288118be5d263e7428cc128b), ROM_BIOS(1) )
+	ROMX_LOAD("rom-b_alt.z2",  0x1000, 0x1000, CRC(6c791c2d) SHA1(2a38e0a248f6619d38f1a108eea7b95761cf2aee), ROM_BIOS(1) )
+	ROMX_LOAD("rom-c_alt.z3",  0x2000, 0x1000, CRC(55b3ad13) SHA1(6279f6a68f927ea8628458b278616736f0b3c339), ROM_BIOS(1) )
 
-	ROM_REGION(0x0400, "chargen",0)
-	ROM_LOAD("trs80m1.chr",  0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_REGION(0x0400, "chargen", 0)
+	ROM_LOAD("mcm6670p.z29",   0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7) )
 ROM_END
 
 
-ROM_START(radionic)
-	ROM_REGION(0x3800, "maincpu",0)
-	ROM_LOAD("ep1.bin",      0x0000, 0x1000, CRC(e8908f44) SHA1(7a5a60c3afbeb6b8434737dd302332179a7fca59))
-	ROM_LOAD("ep2.bin",      0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155))
-	ROM_LOAD("ep3.bin",      0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
-	ROM_LOAD("ep4.bin",      0x3000, 0x0800, CRC(70f90f26) SHA1(cbee70da04a3efac08e50b8e3a270262c2440120))
-	ROM_CONTINUE(            0x3000, 0x0800)
+// From here are EACA-made clones
 
-	ROM_REGION(0x1000, "chargen",0)
-	ROM_LOAD("trschar.bin",  0x0000, 0x1000, CRC(02e767b6) SHA1(c431fcc6bd04ce2800ca8c36f6f8aeb2f91ce9f7))
+ROM_START(eg3003)
+	ROM_REGION(0x3800, "maincpu", 0)
+	ROM_LOAD("3001.z10",       0x0000, 0x1000, CRC(8f5214de) SHA1(d8c052be5a2d0ec74433043684791d0554bf203b) )
+	ROM_LOAD("3002.z11",       0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155) )
+	ROM_LOAD("3003.z12",       0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369) )
+	ROM_LOAD("tcs-ext.z13",    0x3000, 0x0800, CRC(8f2ac112) SHA1(be0c2a5fb9cb01173c4da6dc8c71ca5975f441bb) )
+
+	ROM_REGION(0x0800, "chargen", 0)
+	ROM_LOAD("tcs-ext.z25",    0x0000, 0x0800, CRC(150c5f1f) SHA1(afbce73ab0360108b32e75eb75a3966eb5c503e7) )
 ROM_END
 
 
 ROM_START(sys80)
-	ROM_REGION(0x3800, "maincpu",0)
-	ROM_LOAD("sys80rom.1",   0x0000, 0x1000, CRC(8f5214de) SHA1(d8c052be5a2d0ec74433043684791d0554bf203b))
-	ROM_LOAD("sys80rom.2",   0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155))
-	ROM_LOAD("trs80.zl2",    0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369))
+	ROM_REGION(0x3800, "maincpu", 0)
+	ROM_LOAD("3001.z10",       0x0000, 0x1000, CRC(8f5214de) SHA1(d8c052be5a2d0ec74433043684791d0554bf203b) )
+	ROM_LOAD("3002.z11",       0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155) )
+	ROM_LOAD("3003.z12",       0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369) )
 	/* This rom turns the system80 into the "blue label" version. SYSTEM then /12288 to activate. */
-	ROM_LOAD("sys80.ext",    0x3000, 0x0800, CRC(2a851e33) SHA1(dad21ec60973eb66e499fe0ecbd469118826a715))
+	ROM_LOAD("sys80.z13",      0x3000, 0x0800, CRC(2a851e33) SHA1(dad21ec60973eb66e499fe0ecbd469118826a715) )
 
-	ROM_REGION(0x0400, "chargen",0)
-	ROM_LOAD("trs80m1.chr",  0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7))
+	ROM_REGION(0x0400, "chargen", 0)
+	// Z25 could be 2513 (early version) or 52116 (later version)
+	// This rom is Z25 on the video board, not Z25 on the CPU board.
+	ROM_LOAD("2513.z25",       0x0000, 0x0400, CRC(0033f2b9) SHA1(0d2cd4197d54e2e872b515bbfdaa98efe502eda7) )
 ROM_END
 
 #define rom_sys80p rom_sys80
 
-
+// Although I don't have schematics for the HT-series, it would be reasonable to expect the board locations to be the same
 ROM_START(ht1080z)
-	ROM_REGION(0x3800, "maincpu",0)
-	ROM_LOAD("ht1080z.rom",  0x0000, 0x3000, CRC(2bfef8f7) SHA1(7a350925fd05c20a3c95118c1ae56040c621be8f))
-	ROM_LOAD("sys80.ext",    0x3000, 0x0800, CRC(2a851e33) SHA1(dad21ec60973eb66e499fe0ecbd469118826a715))
+	ROM_REGION(0x3800, "maincpu", 0)
+	ROM_LOAD("3001.z10",       0x0000, 0x1000, CRC(8f5214de) SHA1(d8c052be5a2d0ec74433043684791d0554bf203b) )
+	ROM_LOAD("3002.z11",       0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155) )
+	ROM_LOAD("3003.z12",       0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369) )
+	ROM_LOAD("sys80.z13",      0x3000, 0x0800, CRC(2a851e33) SHA1(dad21ec60973eb66e499fe0ecbd469118826a715) )
 
-	ROM_REGION(0x0800, "chargen",0)
-	ROM_LOAD("ht1080z.chr",  0x0000, 0x0800, CRC(e8c59d4f) SHA1(a15f30a543e53d3e30927a2e5b766fcf80f0ae31))
+	ROM_REGION(0x0800, "chargen", 0)
+	ROM_LOAD("ht1080z.z25",    0x0000, 0x0800, CRC(e8c59d4f) SHA1(a15f30a543e53d3e30927a2e5b766fcf80f0ae31) )
 ROM_END
 
 
 ROM_START(ht1080z2)
-	ROM_REGION(0x3800, "maincpu",0)
-	ROM_LOAD("ht1080z.rom",  0x0000, 0x3000, CRC(2bfef8f7) SHA1(7a350925fd05c20a3c95118c1ae56040c621be8f))
-	ROM_LOAD("ht1080z2.ext", 0x3000, 0x0800, CRC(07415ac6) SHA1(b08746b187946e78c4971295c0aefc4e3de97115))
+	ROM_REGION(0x3800, "maincpu", 0)
+	ROM_LOAD("3001.z10",       0x0000, 0x1000, CRC(8f5214de) SHA1(d8c052be5a2d0ec74433043684791d0554bf203b) )
+	ROM_LOAD("3002.z11",       0x1000, 0x1000, CRC(46e88fbf) SHA1(a3ca32757f269e09316e1e91ba1502774e2f5155) )
+	ROM_LOAD("3003.z12",       0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369) )
+	ROM_LOAD("ht1080z2.z13",   0x3000, 0x0800, CRC(07415ac6) SHA1(b08746b187946e78c4971295c0aefc4e3de97115) )
 
-	ROM_REGION(0x0800, "chargen",0)
-	ROM_LOAD("ht1080z2.chr", 0x0000, 0x0800, CRC(6728f0ab) SHA1(1ba949f8596f1976546f99a3fdcd3beb7aded2c5))
+	ROM_REGION(0x0800, "chargen", 0)
+	ROM_LOAD("ht1080z2.z25",   0x0000, 0x0800, CRC(6728f0ab) SHA1(1ba949f8596f1976546f99a3fdcd3beb7aded2c5) )
 ROM_END
 
 
 ROM_START(ht108064)
-	ROM_REGION(0x3800, "maincpu",0)
-	ROM_LOAD("ht108064.rom", 0x0000, 0x3000, CRC(48985a30) SHA1(e84cf3121f9e0bb9e1b01b095f7a9581dcfaaae4))
-	ROM_LOAD("ht108064.ext", 0x3000, 0x0800, CRC(fc12bd28) SHA1(0da93a311f99ec7a1e77486afe800a937778e73b))
+	ROM_REGION(0x3800, "maincpu", 0)
+	ROM_LOAD("3001_64.z10",    0x0000, 0x1000, CRC(59ec132e) SHA1(232c04827e494ea49931d7ab9a5b87b76c81aef1) )
+	ROM_LOAD("3002_64.z11",    0x1000, 0x1000, CRC(a7a73e8c) SHA1(6e0f232b8666744328853cef6bb72b8e44b4c184) )
+	ROM_LOAD("3003.z12",       0x2000, 0x1000, CRC(306e5d66) SHA1(1e1abcfb5b02d4567cf6a81ffc35318723442369) )
+	ROM_LOAD("ht108064.z13",   0x3000, 0x0800, CRC(fc12bd28) SHA1(0da93a311f99ec7a1e77486afe800a937778e73b) )
 
-	ROM_REGION(0x0800, "chargen",0)
-	ROM_LOAD("ht108064.chr", 0x0000, 0x0800, CRC(e76b73a4) SHA1(6361ee9667bf59d50059d09b0baf8672fdb2e8af))
+	ROM_REGION(0x0800, "chargen", 0)
+	ROM_LOAD("ht108064.z25",   0x0000, 0x0800, CRC(e76b73a4) SHA1(6361ee9667bf59d50059d09b0baf8672fdb2e8af) )
 ROM_END
 
-
-void trs80_state::init_trs80()
-{
-	m_mode = 0;
-}
 
 void trs80_state::init_trs80l2()
 {
@@ -667,11 +638,11 @@ void trs80_state::init_trs80l2()
 
 
 //    YEAR  NAME         PARENT    COMPAT  MACHINE   INPUT    CLASS        INIT           COMPANY                        FULLNAME                           FLAGS
-COMP( 1977, trs80,       0,        0,      trs80,    trs80,   trs80_state, init_trs80,    "Tandy Radio Shack",           "TRS-80 Model I (Level I Basic)",  MACHINE_SUPPORTS_SAVE )
-COMP( 1978, trs80l2,     0,        0,      model1,   trs80l2, trs80_state, init_trs80l2,  "Tandy Radio Shack",           "TRS-80 Model I (Level II Basic)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1983, radionic,    trs80l2,  0,      radionic, trs80l2, trs80_state, init_trs80,    "Komtek",                      "Radionic",                        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1980, sys80,       trs80l2,  0,      sys80,    sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (60 Hz)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1980, sys80p,      trs80l2,  0,      sys80p,   sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (50 Hz)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1983, ht1080z,     trs80l2,  0,      ht1080z,  sys80,   trs80_state, init_trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series I",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1984, ht1080z2,    trs80l2,  0,      ht1080z,  sys80,   trs80_state, init_trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series II",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1985, ht108064,    trs80l2,  0,      ht1080z,  sys80,   trs80_state, init_trs80,    "Hiradastechnika Szovetkezet", "HT-1080Z/64",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1977, trs80,       0,        0,       trs80,    trs80,   trs80_state, empty_init,    "Tandy Radio Shack",           "TRS-80 Model I (Level I Basic)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1978, trs80l2,     0,        0,       model1,   trs80l2, trs80_state, init_trs80l2,  "Tandy Radio Shack",           "TRS-80 Model I (Level II Basic)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, eg3003,      0,        trs80l2, sys80,    sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "Video Genie EG3003",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, sys80,       eg3003,   0,       sys80,    sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (60 Hz)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, sys80p,      eg3003,   0,       sys80p,   sys80,   trs80_state, init_trs80l2,  "EACA Computers Ltd",          "System-80 (50 Hz)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1983, ht1080z,     eg3003,   0,       ht1080z,  sys80,   trs80_state, init_trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series I",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, ht1080z2,    eg3003,   0,       ht1080z,  sys80,   trs80_state, init_trs80l2,  "Hiradastechnika Szovetkezet", "HT-1080Z Series II",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ht108064,    eg3003,   0,       ht1080z,  sys80,   trs80_state, empty_init,    "Hiradastechnika Szovetkezet", "HT-1080Z/64",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

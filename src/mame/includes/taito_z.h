@@ -2,7 +2,6 @@
 // copyright-holders:David Graves
 /*************************************************************************
 
-
     Taito Z system
 
 *************************************************************************/
@@ -51,7 +50,8 @@ public:
 		m_stickx(*this, "STICKX"),
 		m_sticky(*this, "STICKY"),
 		m_io_eepromout(*this, "EEPROMOUT"),
-		m_lamps(*this, "lamp%u", 0U)
+		m_lamps(*this, "lamp%u", 0U),
+		m_shutter_out(*this, "shutter%u", 0U)
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(gas_pedal_r);
@@ -101,6 +101,8 @@ private:
 	s32      m_sci_int6;
 	s32      m_ioc220_port;
 	u8       m_eep_latch;
+	int      m_shutter_toggle;
+	u8       m_shutter_control;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -125,6 +127,7 @@ private:
 	optional_ioport m_sticky;
 	optional_ioport m_io_eepromout;
 	output_finder<2> m_lamps;
+	output_finder<2> m_shutter_out;
 
 	void cpua_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void chasehq_cpua_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -145,6 +148,7 @@ private:
 	u16 sci_spriteframe_r();
 	void sci_spriteframe_w(u16 data);
 	void contcirc_out_w(u8 data);
+	DECLARE_WRITE_LINE_MEMBER(scope_vblank);
 	DECLARE_VIDEO_START(taitoz);
 	DECLARE_MACHINE_START(chasehq);
 	u32 screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

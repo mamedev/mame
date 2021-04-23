@@ -183,7 +183,7 @@ private:
 	optional_device<mac_keyboard_port_device> m_mackbd;
 	optional_device<rtc3430042_device> m_rtc;
 	required_device<screen_device> m_screen;
-	required_device<dac_8bit_pwm_device> m_dac;
+	required_device<dac_12bit_r2r_device> m_dac; // actually 1-bit pwm w/8-bit counters
 	required_device<filter_biquad_device> m_filter;
 	required_device<filter_biquad_device> m_volfilter;
 	required_device<z80scc_device> m_scc;
@@ -249,6 +249,7 @@ private:
 	void phases_w(uint8_t phases);
 	void devsel_w(uint8_t devsel);
 	void devsel_se_w(uint8_t devsel);
+	void snd_push(uint8_t data);
 	void pwm_push(uint8_t data);
 
 	uint32_t m_overlay;
@@ -434,16 +435,6 @@ void mac128_state::vblank_irq()
 
 void mac128_state::update_volume()
 {
-	if (!m_snd_enable)
-	{
-		// ls161 clear input
-		m_dac->set_output_gain(ALL_OUTPUTS, 0.0);
-	}
-	else
-	{
-		m_dac->set_output_gain(ALL_OUTPUTS, 1.0);
-	}
-
 	/* LS161 audio PWM counters TC (SND) -> LS04 inverter (/SND) ->
 	 * -> CD4016 gate A pulling a 5.1V zener-regulated signal to ground if input is high ->
 	 * -> Sallen-key low-pass filter (R1 = 47K, R2 = 47K, C1 = 0.001uF, C2 = 470pF
@@ -515,10 +506,38 @@ TIMER_CALLBACK_MEMBER(mac128_state::mac_hblank)
 		mac_snd_buf_ptr = (uint16_t *)(m_ram_ptr + m_ram_size - MAC_ALT_SND_BUF_OFFSET);
 	}
 
-	m_dac->write(mac_snd_buf_ptr[scanline] >> 8);
+	// The sound "DAC" is a 1-bit PWM output driven by two 4-bit LS161 counters
+	// chained together. These counters are reset at the end of HBLANK, and
+	// count up once every C7M clock (2 pixels per clock), with the TC (SND)
+	// output connected (through two inverters) to the speaker filter. The
+	// counters count a max of 256 C7M clocks before reaching terminal count
+	// and halting themselves, and there are 704 / 2 = 352 C7M clocks per
+	// scanline, so this means the TC (SND) output over time is an asymmetric
+	// PWM squarewave, low from between 0 (if the load value is 0xff) and
+	// 255 (if the load value is 0x00) of the 352 C7M clocks per scanline,
+	// and high the remainder of the time. This has a significant DC offset
+	// due to the remaining clocks where the TC signal remains high.
+	// The counters can be forced to reset and be held at a value of 0x00 if
+	// the VIA PB7(/SNDRES) pin is held active(low), and this conversely will
+	// cause the TC (SND) counter pin to output a constant low level for as
+	// long as /SNDRES is held active.
+	// Some games such as Lode Runner use the sound manager "swMode" function,
+	// which uses the /SNDRES pin to alternately force the sound output low
+	// vs running normally in a square wave. During this time, the software is
+	// leaving the actual sound buffer FIFO values at a constant 0x80.
+	// So unless we force the 1-bit PWM to have a value of "always low" while
+	// PB7 is low, we get almost no sound in Lode Runner, and probably other
+	// games/software as well.
+	snd_push(mac_snd_buf_ptr[scanline] >> 8);
 	pwm_push(mac_snd_buf_ptr[scanline] & 0xff);
 
 	m_via->write_pb6(0);
+}
+
+void mac128_state::snd_push(uint8_t data)
+{
+	double frac = (m_snd_enable ? (((double)(~data)) / (MAC_H_TOTAL / 2.0)) : 1.0);
+	m_dac->write((uint16_t)(frac * 4095.0)); // using a fraction of a 12 bit value, so we can handle inputs ranging between 0/352 and 352/352 without losing resolution.
 }
 
 void mac128_state::pwm_push(uint8_t data)
@@ -1139,7 +1158,7 @@ void mac128_state::mac512ke(machine_config &config)
 	m_volfilter->add_route(ALL_OUTPUTS, "speaker", 0.195); // this filter has a max gain of ~5.126, so we diminish it by the inverse of that (0.195)
 	FILTER_BIQUAD(config, m_filter).opamp_sk_lowpass_setup(RES_K(47), RES_K(47), RES_M(999.99), RES_R(0.001), CAP_U(0.001), CAP_P(470)); // R18, R14, absent, short, C18, C19
 	m_filter->add_route(ALL_OUTPUTS, m_volfilter, 1.0);
-	DAC_8BIT_PWM(config, m_dac, 0).add_route(ALL_OUTPUTS, m_filter, 1.0); // 2 x ls161
+	DAC_12BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, m_filter, 1.0); // 2 x ls161; this is a 1-bit PWM value selecting an 8-bit fraction from 0/352nds to 255/352nds of a scanline, with /SNDRES forcing it active for 352/352nds.
 
 	/* devices */
 	RTC3430042(config, m_rtc, 32.768_kHz_XTAL);
@@ -1326,7 +1345,7 @@ ROM_END
     // U4 EPROM // 0 HI: "H0 // B6ED"
     // U5 EPROM // 1 LOW: "Lo1 // 6C8C"
     // U6 EPROM // 0 LOW: "Lo0 // F332"
-    // This one was publicly dumped by Adam Goolevitch, but one of the SUM16s (B5ED) does not match the ROM label (B6ED).
+    // This version (Rom Version 4.4T?) was publicly dumped by Adam Goolevitch, but one of the SUM16s (B5ED) does not match the ROM label (B6ED).
     // The ROM has been marked as bad pending a redump or other verification of correctness.
     ROMX_LOAD("h0__b6ed.u4",  0x00000, 0x04000, BAD_DUMP CRC(87136a61) SHA1(a33fc3b7908783a5742f06884fe44260447e5d55), ROM_SKIP(1) ) // SUM16: B5ED does not match written label
     ROMX_LOAD("lo0__f332.u6", 0x00001, 0x04000, CRC(3d04b1c5) SHA1(11fe22e8ce415edf4133d7cee559dce4ab0f7974), ROM_SKIP(1) ) // SUM16: F332

@@ -113,21 +113,41 @@ public:
 	{
 	}
 
-	void pc9821v20(machine_config &config);
-	void pc9801ux(machine_config &config);
-	void pc9801vm(machine_config &config);
 	void pc9801(machine_config &config);
-	void pc9801bx2(machine_config &config);
+
+	void pc9801vm(machine_config &config);
+
+	void pc9801ux(machine_config &config);
 	void pc9801rs(machine_config &config);
+
+	void pc9801bx2(machine_config &config);
+
 	void pc9821(machine_config &config);
 	void pc9821as(machine_config &config);
 	void pc9821ap2(machine_config &config);
+	void pc9821xa16(machine_config &config);
+	void pc9821ra20(machine_config &config);
+	void pc9821ra333(machine_config &config);
+	void pc9821v20(machine_config &config);
+
+	void pc386m(machine_config &config);
+	void pc486mu(machine_config &config);
+	void pc486se(machine_config &config);
+
 	DECLARE_CUSTOM_INPUT_MEMBER(system_type_r);
 	void init_pc9801_kanji();
 	void init_pc9801vm_kanji();
 
 protected:
 	virtual void video_start() override;
+
+	void pc9801_keyboard(machine_config &config);
+	void pc9801_mouse(machine_config &config);
+	void pc9801_cbus(machine_config &config);
+	void pc9801_sasi(machine_config &config);
+	void pc9801_ide(machine_config &config);
+	void pc9801_common(machine_config &config);
+	void pc9801_pit_clock(machine_config &config, const XTAL clock);
 
 private:
 	static void cdrom_headphones(device_t *device);
@@ -314,12 +334,6 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t a20_286(bool state);
 
-	void pc9801_keyboard(machine_config &config);
-	void pc9801_mouse(machine_config &config);
-	void pc9801_cbus(machine_config &config);
-	void pc9801_sasi(machine_config &config);
-	void pc9801_ide(machine_config &config);
-	void pc9801_common(machine_config &config);
 	void ipl_bank(address_map &map);
 	void pc9801_common_io(address_map &map);
 	void pc9801_io(address_map &map);
@@ -370,8 +384,9 @@ private:
 
 	struct{
 		uint8_t control;
-		uint8_t lx;
-		uint8_t ly;
+		uint8_t lx, ly;
+		uint8_t dx, dy;
+		uint8_t prev_dx, prev_dy;
 		uint8_t freq_reg;
 		uint8_t freq_index;
 	}m_mouse;

@@ -678,29 +678,33 @@ ROM_END
 Oriental Legend / Xi You Shi E Zhuan (CHINA 111 Ver.)
 (c)1997 IGS
 
-PGM system
-IGS PCB NO-0134-1
-IGS PCB NO-0135
+Top board
+---------
+PCB Number: IGS PCB NO-0134-2
 
-OLV 111 CHINA U11.U11 [b80ddd3c]
 OLV 111 CHINA U6.U6   [5fb86373]
 OLV 111 CHINA U7.U7   [6ee79faf]
 OLV 111 CHINA U9.U9   [83cf09c8]
+OLV 111 CHINA U11.U11 [b80ddd3c]
 
-T0100.U8
+PGM T0100.U8
 
-A0100.U5
-A0101.U6
-A0102.U7
-A0103.U8
-A0104.U11
-A0105.U12
+Bottom Board
+------------
+PCB Number: IGS PCB NO-0135
 
-B0100.U9
-B0101.U10
-B0102.U15
+PGM A0100.U5
+PGM A0101.U6
+PGM A0102.U7
+PGM A0103.U8
+PGM A0104.U11
+PGM A0105.U12
 
-M0100.U1
+PGM B0100.U9
+PGM B0101.U10
+PGM B0102.U15
+
+PGM M0100.U1
 
 */
 
@@ -734,6 +738,40 @@ ROM_START( orlegend111c )
 	ROM_LOAD( "pgm_m0100.u1",     0x400000, 0x200000, CRC(e5c36c83) SHA1(50c6f66770e8faa3df349f7d68c407a7ad021716) )
 ROM_END
 
+/*
+
+Oriental Legend / Xi You Shi E Zhuan (TAIWAN 111 Ver.)
+(c)1997 IGS
+
+Top board
+---------
+PCB Number: IGS PCB NO-0134-2
+
+OLV 111 TAIWAN U6.U6   [b205a733]
+OLV 111 TAIWAN U7.U7   [27628e87]
+OLV 111 TAIWAN U9.U9   [6d9d29b4]
+OLV 111 TAIWAN U11.U11 [23f33bc9]
+
+PGM T0100.U8
+
+Bottom Board
+------------
+PCB Number: IGS PCB NO-0135-1
+
+PGM A0100B.U5
+PGM A0101B.U8
+PGM A0102B.U6
+PGM A0103B.U9
+PGM A0104B.U7
+PGM A0105B.U10
+
+PGM B0100B.U11
+PGM B0101B.U12
+PGM B0102.U2
+
+PGM M0100.U1
+
+*/
 
 ROM_START( orlegend111t )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code  */
@@ -772,29 +810,33 @@ ROM_END
 Oriental Legend / Xi You Shi E Zhuan (KOREA 111 Ver.)
 (c)1997 IGS
 
-PGM system
-IGS PCB NO-0134-2
-IGS PCB NO-0135
+Top board
+---------
+PCB Number: IGS PCB NO-0134-2
 
-OLV 111 KOREA U11.U11 [23f33bc9]
 OLV 111 KOREA U6.U6   [1ff35baa]
 OLV 111 KOREA U7.U7   [27628e87]
 OLV 111 KOREA U9.U9   [87b6d202]
+OLV 111 KOREA U11.U11 [23f33bc9]
 
-T0100.U8
+PGM T0100.U8
 
-A0100.U5
-A0101.U6
-A0102.U7
-A0103.U8
-A0104.U11
-A0105.U12
+Bottom Board
+------------
+PCB Number: IGS PCB NO-0135
 
-B0100.U9
-B0101.U10
-B0102.U15
+PGM A0100.U5
+PGM A0101.U6
+PGM A0102.U7
+PGM A0103.U8
+PGM A0104.U11
+PGM A0105.U12
 
-M0100.U1
+PGM B0100.U9
+PGM B0101.U10
+PGM B0102.U15
+
+PGM M0100.U1
 
 */
 
@@ -827,6 +869,42 @@ ROM_START( orlegend111k )
 	PGM_AUDIO_BIOS
 	ROM_LOAD( "pgm_m0100.u1",     0x400000, 0x200000, CRC(e5c36c83) SHA1(50c6f66770e8faa3df349f7d68c407a7ad021716) )
 ROM_END
+
+
+/*
+
+Oriental Legend / Xi You Shi E Zhuan (TAIWAN 105 Ver.)
+(c)1997 IGS
+
+Top board
+---------
+PCB Number: IGS PCB NO-0134-2
+
+OLV 105 TAIWAN U6.U6   [2b14331f]
+OLV 105 TAIWAN U7.U7   [5712facc]
+OLV 105 TAIWAN U9.U9   [ae9d71e4]
+OLV 105 TAIWAN U11.U11 [40ae4d9e]
+
+PGM T0100.U8
+
+Bottom Board
+------------
+PCB Number: IGS PCB NO-0135
+
+PGM A0100.U5
+PGM A0101.U6
+PGM A0102.U7
+PGM A0103.U8
+PGM A0104.U11
+PGM A0105.U12
+
+PGM B0100.U9
+PGM B0101.U10
+PGM B0102.U15
+
+PGM M0100.U1
+
+*/
 
 ROM_START( orlegend105t )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code  */
@@ -863,39 +941,44 @@ ROM_END
 Oriental Legend / Xi You Shi E Zhuan (KOREA 105 Ver.)
 (c)1997 IGS
 
-PGM system
-IGS PCB NO-0134-2
+Top board
+---------
+PCB Number: IGS PCB NO-0134-2
 IGS PCB NO-0135
 
-OLV105KO.U11 [40ae4d9e]
-OLV105KO.U6  [b86703fe]
-OLV105KO.U7  [5712facc]
-OLV105KO.U9  [5a108e39]
+OLV 105 KOREA U6.U6   [b86703fe]
+OLV 105 KOREA U7.U7   [5712facc]
+OLV 105 KOREA U9.U9   [5a108e39]
+OLV 105 KOREA U11.U11 [40ae4d9e]
 
-T0100.U8
+PGM T0100.U8
 
-A0100.U5
-A0101.U6
-A0102.U7
-A0103.U8
-A0104.U11
-A0105.U12
+Bottom Board
+------------
+PCB Number: IGS PCB NO-0135
 
-B0100.U9
-B0101.U10
-B0102.U15
+PGM A0100.U5
+PGM A0101.U6
+PGM A0102.U7
+PGM A0103.U8
+PGM A0104.U11
+PGM A0105.U12
 
-M0100.U1
+PGM B0100.U9
+PGM B0101.U10
+PGM B0102.U15
+
+PGM M0100.U1
 
 */
 
 ROM_START( orlegend105k )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code  */
 	PGM_68K_BIOS
-	ROM_LOAD16_BYTE( "olv105ko.u6",     0x100001, 0x080000, CRC(b86703fe) SHA1(a3529b45efd400ecd5e76f764b528ebce46e24ab) )
-	ROM_LOAD16_BYTE( "olv105ko.u9",     0x100000, 0x080000, CRC(5a108e39) SHA1(2033f4fe3f2dfd725dac535324f58348b9ac3914) )
-	ROM_LOAD16_BYTE( "olv105ko.u7",     0x200001, 0x080000, CRC(5712facc) SHA1(2d95ebd1703874e89ac3a206f8c1f0ece6e833e0) )
-	ROM_LOAD16_BYTE( "olv105ko.u11",    0x200000, 0x080000, CRC(40ae4d9e) SHA1(62d7a96438b7fe93f74753333f50e077d417971e) )
+	ROM_LOAD16_BYTE( "olv_105_korea_u6.u6",     0x100001, 0x080000, CRC(b86703fe) SHA1(a3529b45efd400ecd5e76f764b528ebce46e24ab) )
+	ROM_LOAD16_BYTE( "olv_105_korea_u9.u9",     0x100000, 0x080000, CRC(5a108e39) SHA1(2033f4fe3f2dfd725dac535324f58348b9ac3914) )
+	ROM_LOAD16_BYTE( "olv_105_korea_u7.u7",     0x200001, 0x080000, CRC(5712facc) SHA1(2d95ebd1703874e89ac3a206f8c1f0ece6e833e0) )
+	ROM_LOAD16_BYTE( "olv_105_korea_u11.u11",   0x200000, 0x080000, CRC(40ae4d9e) SHA1(62d7a96438b7fe93f74753333f50e077d417971e) )
 
 	ROM_REGION( 0xa00000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
@@ -1104,17 +1187,30 @@ ROM_END
 
 /*
 
-Dragon World 3 (KOREA 106 Ver.)
+Dragon World 3 (CHINA 106 Ver.)
 (c)1998 IGS
 
-PGM system
-IGS PCB NO-0189
-IGS PCB NO-0178
+Top board
+---------
+PCB Number: IGS PCB NO-0189-1
 
+DW3 V106 U12.U12 [c3f6838b]
+DW3 V106 U13.U13 [28284e22]
 
-DW3_V106.U12 [c3f6838b]
-DW3_V106.U13 [28284e22]
+DW3 TEXT U15.U15
 
+PGM T0400.U18
+
+Bottom Board
+------------
+PCB Number: IGS PCB NO-0178
+
+PGM A0400.U9
+PGM A0401.U10
+
+PGM B0400.U13
+
+PGM M0400.U1
 
 */
 
@@ -1151,7 +1247,7 @@ ROM_START( drgw3105 )
 	ROM_LOAD16_BYTE( "dw3_v105_u13.u13",     0x100000, 0x080000,  CRC(8d6c9d39) SHA1(cb79303ab551e91f07e11414db4254d5b161d415) )
 
 	ROM_REGION( 0x010000, "igs022", 0 ) /* Protection Data - is it correct for this set? */
-	ROM_LOAD( "dw3_v100.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
+	ROM_LOAD( "dw3_v100_u15.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
 
 	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
@@ -1193,14 +1289,17 @@ ROM_START( drgw3103 )
 	PGM_AUDIO_BIOS
 	ROM_LOAD( "pgm_m0400.u1",  0x400000, 0x400000, CRC(031eb9ce) SHA1(0673ec194732becc6648c2ae1396e894aa269f9a) )
 ROM_END
+
+
 /*
 
-Dragon World 3
+Chuugokuryuu 3 Special (JAPAN 100 Ver.)
 Alta Co./IGS, 1998
 
-Cart for IGS PGM system
+Top board
+---------
+PCB Number: IGS PCB-0189
 
-Top board of cart contains.....
 8MHz Xtal
 32.768kHz Xtal
 UM6164 (RAM x 2)
@@ -1208,12 +1307,28 @@ MACH211 CPLD
 IGS022 ASIC
 IGS025 ASIC
 1x PAL
-2x 27C040 EPROMs (main 68k program)
-1x 27C512 EPROM (protection code?)
-1x 32MBit smt mask ROM (T0400)
 
-Bottom board contains.....
-4x 32MBit smt mask ROMs (A0400, A0401, B0400, M0400)
+2x 27C040 EPROMs (main 68k program)
+DW3 V100 U12.U12
+DW3 V100 U13.U13
+
+1x 27C512 EPROM (protection code?)
+DW3 V100 U15.U15
+
+1x 32MBit smt mask ROM
+PGM T0400.U18
+
+Bottom Board
+------------
+PCB Number: IGS PCB-0178
+
+4x 32MBit smt mask ROMs
+PGM A0400.U9
+PGM A0401.U10
+
+PGM B0400.U13
+
+PGM M0400.U1
 
 */
 
@@ -1320,10 +1435,39 @@ ROM_START( dwex101cn )
 ROM_END
 
 
+/*
+
+Sangoku Senki / Knights of Valour (HONG KONG 117 Ver.)
+(c)1999 ALTA / IGS
+
+Top board
+---------
+PCB Number: IGS PCB NO-0212-2
+
+PGM P0601 V117.U1   [c4d19fe6]
+
+PGM T0600.U11
+
+Bottom Board
+------------
+PCB Number: IGS PCB NO-0213T
+
+PGM A0600.U2
+PGM A0601.U4
+PGM A0602.U6
+PGM A0603.U9
+
+PGM M0600.U3
+
+PGM B0600.U5
+PGM B0601.U7
+
+*/
+
 ROM_START( kov )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "p0600.117",    0x100000, 0x400000, CRC(c4d19fe6) SHA1(14ef31539bfbc665e76c9703ee01b12228344052) )
+	ROM_LOAD16_WORD_SWAP( "pgm_p0601_v117.u1",    0x100000, 0x400000, CRC(c4d19fe6) SHA1(14ef31539bfbc665e76c9703ee01b12228344052) )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kov_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
@@ -1374,6 +1518,39 @@ ROM_START( kov115 )
 	ROM_LOAD( "pgm_m0600.u3",    0x400000, 0x400000, CRC(3ada4fd6) SHA1(4c87adb25d31cbd41f04fbffe31f7bc37173da76) )
 ROM_END
 
+/*
+
+Sangoku Senki / Knights of Valour (HONG KONG 114 Ver.)
+(c)1999 ALTA / IGS
+
+Top board
+---------
+PCB Number: IGS PCB NO-0212-1
+
+SAV111 U4.U4    [ae2f1b4e]
+SAV111 U5.U5    [5fdd4aa8]
+SAV111 U7.U7    [95eedf0e]
+SAV111 U8.U8    [003cbf49]
+SAV111 U10.U10  [d5536107]
+
+T0600.U11
+
+Bottom Board
+------------
+PCB Number: IGS PCB NO-0213T
+
+PGM A0600.U2
+PGM A0601.U4
+PGM A0602.U6
+PGM A0603.U9
+
+PGM M0600.U3
+
+PGM B0600.U5
+PGM B0601.U7
+
+*/
+
 ROM_START( kov114 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code  */
 	PGM_68K_BIOS
@@ -1407,32 +1584,35 @@ ROM_END
 
 /*
 
-Sangoku Senki / Knights of Valour (JPN 111 Ver.)
+Sangoku Senki / Knights of Valour (JAPAN 111 Ver.)
 (c)1999 ALTA / IGS
 
-PGM system
-IGS PCB NO-0212-1
+Top board
+---------
+PCB Number: IGS PCB NO-0212-1
 IGS PCB NO-0213T
 
+SAV111 U4.U4    [ae2f1b4e]
+SAV111 U5.U5    [5fdd4aa8]
+SAV111 U7.U7    [95eedf0e]
+SAV111 U8.U8    [003cbf49]
+SAV111 U10.U10  [d5536107]
 
-SAV111.U10   [d5536107]
-SAV111.U4    [ae2f1b4e]
-SAV111.U5    [5fdd4aa8]
-SAV111.U7    [95eedf0e]
-SAV111.U8    [003cbf49]
+PGM T0600.U11
 
-T0600.U11
+Bottom Board
+------------
+PCB Number: IGS PCB NO-0213T
 
+PGM A0600.U2
+PGM A0601.U4
+PGM A0602.U6
+PGM A0603.U9
 
-A0600.U2
-A0601.U4
-A0602.U6
-A0603.U9
+PGM M0600.U3
 
-M0600.U3
-
-B0600.U5
-B0601.U7
+PGM B0600.U5
+PGM B0601.U7
 
 */
 
@@ -3266,7 +3446,7 @@ ROM_START( dwpc101j )
 
 	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
-	ROM_LOAD( "dwpc_v100jp_u11.u11",    0x180000, 0x400000, CRC(3aa5a787) SHA1(ef7bb83f7141b24621c86237244fd9f280923ed1) )
+	ROM_LOAD( "dwpc_v100jp_u11.u11",    0x180000, 0x400000, CRC(c29d8831) SHA1(0ae93ef31fffc244111f636d47e5762d3ba23fe5) )
 
 	ROM_REGION16_LE( 0x0400000, "sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "dwpc_v100jp_u2.u2",    0x000000, 0x200000, CRC(e7115763) SHA1(f1bf06e9434a3b962166849f51b9dc3a74d7f2a4) )
@@ -3749,13 +3929,13 @@ ROM_END
 ROM_START( dmnfrntpcb )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "pgm_p02s.u42",    0x00000, 0x020000, CRC(78c15fa2) SHA1(885a6558e022602cc6f482ac9667ba9f61e75092) ) /* IGS PGM P02S 1A3708A1A0 S002838  (uses standard PGM v2 bios) */
-	ROM_LOAD16_WORD_SWAP( "demonfront_v107kr_u43.u43",    0x100000, 0x200000,  CRC(671d8a31) SHA1(a0c2af67d7c56b4b355883892a47640fc72408a1) )
+	ROM_LOAD16_WORD_SWAP( "demon_front_v107kr_u43.u43",    0x100000, 0x200000,  CRC(671d8a31) SHA1(a0c2af67d7c56b4b355883892a47640fc72408a1) )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "dmnfrnt_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
-	ROM_LOAD( "demonfront_v107kr_u62.u62",     0x000000, 0x400000, CRC(cb94772e) SHA1(4213600be41fd9ea295dd308920b1d89b635724f) )
+	ROM_LOAD( "demon_front_v107kr_u62.u62",     0x000000, 0x400000, CRC(cb94772e) SHA1(4213600be41fd9ea295dd308920b1d89b635724f) )
 
 	ROM_REGION( 0xa00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
@@ -5354,7 +5534,7 @@ GAME( 1998, olds103t,     olds,      pgm,                    pgm,       pgm_stat
 
 //三国战纪/Sānguó zhàn jì (China, Hong Kong; Simplified Chinese)
 //三國戰紀/Sānguó zhàn jì (Taiwan, Japan; Traditional Chinese)
-GAME( 1999, kov,          pgm,       pgm_arm_type1_sim,      sango,     pgm_arm_type1_state,  init_kov,     ROT0,   "IGS", "Knights of Valour / Sanguo Zhan Ji / Sangoku Senki (ver. 117)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */                 // V0008 04/27/99 10:33:33
+GAME( 1999, kov,          pgm,       pgm_arm_type1_sim,      sango,     pgm_arm_type1_state,  init_kov,     ROT0,   "IGS", "Knights of Valour / Sanguo Zhan Ji / Sangoku Senki (ver. 117, Hong Kong)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */                 // V0008 04/27/99 10:33:33
 GAME( 1999, kov115,       kov,       pgm_arm_type1_sim,      sango,     pgm_arm_type1_state,  init_kov,     ROT0,   "IGS", "Knights of Valour / Sanguo Zhan Ji / Sangoku Senki (ver. 115)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */                 // V0006 02/22/99 11:53:18
 GAME( 1999, kov114,       kov,       pgm_arm_type1_sim,      sango,     pgm_arm_type1_state,  init_kov,     ROT0,   "IGS", "Knights of Valour / Sanguo Zhan Ji / Sangoku Senki (ver. 114, Hong Kong)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 GAME( 1999, kov111,       kov,       pgm_arm_type1_sim,      sango,     pgm_arm_type1_state,  init_kov,     ROT0,   "IGS", "Knights of Valour / Sanguo Zhan Ji / Sangoku Senki (ver. 111, Japanese Board)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // V0002 01/31/99 01:54:16

@@ -5202,8 +5202,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Contains drivers for various makes and models; the MAME ATAPI CD-ROM device is compatible with e.g. the "COMPAQ", "NEC", and "TATUNG" drivers -->
 	<software name="cdgod55">
+		<!-- Contains drivers for various makes and models; the MAME ATAPI CD-ROM device is compatible with e.g. the "COMPAQ", "NEC", and "TATUNG" drivers -->
 		<description>CD-ROM God Boot Disk Version 5.5 BETA2</description>
 		<year>1998</year>
 		<publisher>Kristopher Marciniak</publisher>
@@ -5812,6 +5812,21 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="4236544">
 				<rom name="scroll 3d mouse setup disk for ps2 and serial 2.0.mfm" size="4236544" crc="7e408ad4" sha1="7f88263de01478f42f2a937540fee0a70eae5dc5" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smartbrd">
+		<!-- Latest official Tasc SmartBoard DOS driver downloaded from archived (now-defunct) tasc.nl -->
+		<!-- INSTALL.EXE: SmartBoard drivers V1.1 (TASCDRV), 21-Aug-95 -->
+		<!-- SMARTBRD.EXE: SmartBoard test program V1.04, 30-Dec-94 -->
+		<description>SmartBoard Driver (DOS)</description>
+		<year>1995</year>
+		<publisher>Tasc</publisher>
+		<info name="usage" value="SmartBoard SB20 or SB30 required." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="smartboard.img" size="737280" crc="bf1ca15d" sha1="d3d5a45d8cc0c08fdf8e249630da89090f79acbe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8386,6 +8401,20 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="smbdrvk">
+		<!-- Like smartbrd, this was downloaded from tasc.nl and copied to a disk image -->
+		<!-- This package also includes SMARTMON.EXE, a small tool for testing the SmartBoard -->
+		<description>SmartBoard Driver SDK (Win32)</description>
+		<year>1998</year>
+		<publisher>Tasc</publisher>
+		<info name="usage" value="SmartBoard SB20 or SB30 required." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="smbdrvk.img" size="1474560" crc="95a31678" sha1="0a814d0c7f43abf45dd85c10721a09106f0fa6ec"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="win13sdk">
 		<description>Windows 1.03 SDK</description>
 		<year>1986</year>
@@ -10183,6 +10212,127 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="darkland">
+		<description>Darklands (3.5")</description>
+		<year>1992</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MPS Labs" />
+		<info name="version" value="v483.05" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Darklands [Microprose] [1992] [3.5HD] [Disk 01 of 10].img" size="1474560" crc="806c59d6" sha1="56dc83db4dca5a991cd18d4330d2489fe0911c52"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Darklands [Microprose] [1992] [3.5HD] [Disk 02 of 10].img" size="1474560" crc="1b9102df" sha1="34abbf4a79d06bee01388313e405b9efc6d72109"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Darklands [Microprose] [1992] [3.5HD] [Disk 03 of 10].img" size="1474560" crc="9408b5a2" sha1="02db610fadfc95a8b20dae3712e39fc7ee7c1fef"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Darklands [Microprose] [1992] [3.5HD] [Disk 04 of 10].img" size="1474560" crc="c88c524c" sha1="b0e3edcb8359e6d43d3b5a6af1967c3964e29700"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Darklands [Microprose] [1992] [3.5HD] [Disk 05 of 10].img" size="1474560" crc="732a678a" sha1="9d10df9f9dfddc26020c22902b90701a065ba082"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Darklands [Microprose] [1992] [3.5HD] [Disk 06 of 10].img" size="1474560" crc="a8ebb500" sha1="ebd68b3a35062fda066b1e14817598e7b846c2e5"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Darklands [Microprose] [1992] [3.5HD] [Disk 07 of 10].img" size="1474560" crc="b7f8dcba" sha1="466961a68c2f898d704bbdd4c72255bf7244f1ca"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Darklands [Microprose] [1992] [3.5HD] [Disk 08 of 10].img" size="1474560" crc="5b2aa9c3" sha1="3bc4ff26eb9134a302211c861651237fb0f75290"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Darklands [Microprose] [1992] [3.5HD] [Disk 09 of 10].img" size="1474560" crc="8e112d5b" sha1="075f82d983ab62f8bbdce3c2673b7809115a81e8"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Darklands [Microprose] [1992] [3.5HD] [Disk 10 of 10].img" size="1474560" crc="246ab74b" sha1="81508c98fd6aa8db7fba8d1b8d77a48c3a22dbca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="darkland525" cloneof="darkland">
+		<description>Darklands (5.25")</description>
+		<year>1992</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MPS Labs" />
+		<info name="version" value="v483.05" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Darklands [Microprose] [1992] [5.25HD] [Disk 01 of 11].img" size="1228800" crc="a59bb645" sha1="fd591eadf87fdac8165111aac89aeecf6fa61c6d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Darklands [Microprose] [1992] [5.25HD] [Disk 02 of 11].img" size="1228800" crc="65448f5d" sha1="55c0a863e6de5211ca7fdc1d9ce87bd110d2e391"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Darklands [Microprose] [1992] [5.25HD] [Disk 03 of 11].img" size="1228800" crc="639b52bc" sha1="9e98bb0f50598d09deb6aca0109b68d27a856a03"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Darklands [Microprose] [1992] [5.25HD] [Disk 04 of 11].img" size="1228800" crc="91dacd0b" sha1="818584591f09b2c0e7ae9c1e9b287068ab138203"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Darklands [Microprose] [1992] [5.25HD] [Disk 05 of 11].img" size="1228800" crc="b83db651" sha1="a4ea459852c7973974f79e95ee3e70672f4897bb"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Darklands [Microprose] [1992] [5.25HD] [Disk 06 of 11].img" size="1228800" crc="db131829" sha1="38e47d2b7269da0728abb0cc32f30627c65d4fa4"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Darklands [Microprose] [1992] [5.25HD] [Disk 07 of 11].img" size="1228800" crc="11281eaf" sha1="8e70cf9f458c28b7414304eeb11ab8b285ecbf4a"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Darklands [Microprose] [1992] [5.25HD] [Disk 08 of 11].img" size="1228800" crc="25dbd972" sha1="e01a8521bd3e162f7301ccd32beb191078bd2b60"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Darklands [Microprose] [1992] [5.25HD] [Disk 09 of 11].img" size="1228800" crc="7aa056a2" sha1="9ec79df6a22d62255a6dab94639d00cd45c0d505"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Darklands [Microprose] [1992] [5.25HD] [Disk 10 of 11].img" size="1228800" crc="58299455" sha1="865e7c2e60507e1a6e188e3a6a753eae86d982b4"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Darklands [Microprose] [1992] [5.25HD] [Disk 11 of 11].img" size="1228800" crc="ac217161" sha1="28084173e94a7b67d1421a91ea1d7ba15509b15b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="darkseed">
 		<description>Dark Seed</description>
 		<year>1992</year>
@@ -10380,11 +10530,39 @@ license:CC0
 	</software>
 
 	<software name="doom">
-		<description>DOOM (1.2)</description>
-		<year>1993</year>
+		<description>DOOM (v1.666)</description>
+		<year>1994</year>
 		<publisher>GT Interactive</publisher>
 		<info name="developer" value="id Software" />
-		<info name="version" value="1.2" />
+		<info name="version" value="v1.666" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Doom [GT Interactive] [1994] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="1cdf7059" sha1="1fb830ef75ba3e57b63e89f90c876ccdcee41a7c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Doom [GT Interactive] [1994] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="103571ad" sha1="fb4f92a0c524e9db348c2527b2430ec791171ea8"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Doom [GT Interactive] [1994] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="131ed889" sha1="f5c90bb3c1176d4cee6d1744f38f070533406daf"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Doom [GT Interactive] [1994] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="f72af17f" sha1="abfade00089d31e55a177ecdacd94b6279645f3f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doom12" cloneof="doom">
+		<description>DOOM (v1.2)</description>
+		<year>1994</year>
+		<publisher>GT Interactive</publisher>
+		<info name="developer" value="id Software" />
+		<info name="version" value="v1.2" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Doom 1 1.2 #1.img" size="1474560" crc="749f9b21" sha1="117637a9e42b59f75ce6b7e17be21370c3ca4ee1"/>
@@ -10408,11 +10586,11 @@ license:CC0
 	</software>
 
 	<software name="doom11" cloneof="doom">
-		<description>DOOM (1.1)</description>
+		<description>DOOM (v1.1)</description>
 		<year>1993</year>
 		<publisher>GT Interactive</publisher>
 		<info name="developer" value="id Software" />
-		<info name="version" value="1.1" />
+		<info name="version" value="v1.1" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Doom 1 1.1 #1.img" size="1474560" crc="68d914ac" sha1="f3d942e0a57dcf157a7610a886d98680d42033b9"/>
@@ -10435,12 +10613,13 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Bad Dump Status: Modified OEM ID and modified root -->
 	<software name="doombbs" cloneof="doom">
-		<description>DOOM (1.2, Shareware for BBS SysOps)</description>
+		<description>DOOM (v1.2, shareware for BBS SysOps)</description>
 		<year>1994</year>
 		<publisher>Sybex</publisher>
 		<info name="developer" value="id Software" />
-		<info name="version" value="1.2" />
+		<info name="version" value="v1.2" />
 		<!-- Origin: archive.org -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_number" value="0863-1"/>
@@ -10459,12 +10638,12 @@ license:CC0
 	</software>
 
 	<software name="doomsw" cloneof="doom">
-		<!-- Companion Disk for The Official DOOM™ Survivor's Strategies & Secrets -->
-		<description>DOOM (1.25, Shareware)</description>
+		<!-- Companion Disk for The Official DOOM™ Survivor's Strategies & Secrets book -->
+		<description>DOOM (v1.25, shareware, companion disk of "The Official DOOM Survivor's Strategies &amp; Secrets" book)</description>
 		<year>1994</year>
 		<publisher>Sybex</publisher>
 		<info name="developer" value="id Software" />
-		<info name="version" value="1.25" />
+		<info name="version" value="v1.25" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="DOOM1.img" size="1474560" crc="72ece6a4" sha1="90837dab320489bda5a608e911ae51144e1377e5"/>
@@ -10477,20 +10656,39 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Bad Dump Status: Modified OEM ID and modified root -->
 	<software name="doomsw11" cloneof="doom">
-		<description>DOOM (1.1, Shareware)</description>
-		<year>1993</year>
+		<description>DOOM (v1.1, shareware)</description>
+		<year>1994</year>
 		<publisher>Micro Star</publisher>
 		<info name="developer" value="id Software" />
-		<info name="version" value="1.1" />
+		<info name="version" value="v1.1" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Doom 1 1.1 shareware #1.img" size="1474560" crc="9e7ba36d" sha1="8891709abd4ba5fe40db61a6e32f6fe9595f2423"/>
+				<rom name="Doom 1 1.1 shareware #1.img" size="1474560" crc="9e7ba36d" sha1="8891709abd4ba5fe40db61a6e32f6fe9595f2423" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
-				<rom name="Doom 1 1.1 shareware #2.img" size="1474560" crc="6bb6e2a4" sha1="71a8ce1ed6c6c40ce32acf0b745dea8bebda703b"/>
+				<rom name="Doom 1 1.1 shareware #2.img" size="1474560" crc="6bb6e2a4" sha1="71a8ce1ed6c6c40ce32acf0b745dea8bebda703b" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doomswa" cloneof="doom">
+		<description>DOOM (v1.2, shareware, Titanium Seal release)</description>
+		<year>1994</year>
+		<publisher>SoftKey</publisher>
+		<info name="developer" value="id Software" />
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Doom (shareware) [Titanium Seal] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="e9eaf74f" sha1="61c9f2afb4f300a062b6091e709df2145dc51d41"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Doom (shareware) [Titanium Seal] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="c8f90647" sha1="973ecdf5cea1276e31436ef123a9ced9dde840fb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12345,6 +12543,43 @@ license:CC0
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk3.img" size="1474560" crc="3e6fc1d5" sha1="45ee9c088ebee47ebc6be7e7d4337962c42a5887"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inhearth">
+		<description>Inherit the Earth: Quest for the Orb</description>
+		<year>1994</year>
+		<publisher>New World Computing</publisher>
+		<info name="developer" value="Dreamers Guild" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inherit the Earth [1994] [New World Computing] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="f5167baf" sha1="cda97392ff3cd5d6194a191fedbc675a552e46b2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inherit the Earth [1994] [New World Computing] [3.5HD] [Disk 2 of 6].img" size="1474560" crc="0b51d115" sha1="161fcd6c045f4ba9284c17d64f91bb1f94ad1596"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inherit the Earth [1994] [New World Computing] [3.5HD] [Disk 3 of 6].img" size="1474560" crc="cdf8465c" sha1="379ab24b8a239d73babfcc3773f3005ce61b1cf0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inherit the Earth [1994] [New World Computing] [3.5HD] [Disk 4 of 6].img" size="1474560" crc="05d15c6b" sha1="7ac6d86e6a4f906707437a83570d054d29ca62cd"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inherit the Earth [1994] [New World Computing] [3.5HD] [Disk 5 of 6].img" size="1474560" crc="4c30c054" sha1="321fab84716ad171ba635889f0066271ae16d440"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inherit the Earth [1994] [New World Computing] [3.5HD] [Disk 6 of 6].img" size="1474560" crc="d94ce671" sha1="a33f42313560a50321a8e1762cb82e67960b5c00"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15777,6 +16012,24 @@ license:CC0
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="strike commander tactical operations disk 3.img" size="1474560" crc="8b2304c2" sha1="5942808d9d3d1409d6330dfa6a908f7751370f46"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stronghld">
+		<description>Stronghold</description>
+		<year>1993</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="Stormfront Studios" />
+		<info name="version" value="V1.00" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Stronghold [SSI] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="6cb53c3b" sha1="a5b7bdb5b20bed3959e3955dd8949d0a84574102"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Stronghold [SSI] [1993] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="f824d36f" sha1="c9d87517ad298bbe82611e3e644df466745dd8fb"/>
 			</dataarea>
 		</part>
 	</software>

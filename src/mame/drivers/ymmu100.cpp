@@ -176,6 +176,7 @@ public:
 	void regs_int_read_tap(offs_t address, u16 data, u16 mem_mask);
 	void regs_int_write_tap(offs_t address, u16 data, u16 mem_mask);
 	void voice_write_tap(offs_t address, u16 data, u16 mem_mask);
+	void voice_read_tap(offs_t address, u16 data, u16 mem_mask);
 	void chan_write_tap(offs_t address, u16 data, u16 mem_mask);
 	void prg_write_tap(offs_t address, u16 data, u16 mem_mask);
 
@@ -188,9 +189,13 @@ public:
 		m_maincpu->space(0).install_write_tap(0x20cb10, 0x20cb10 + 0x122*0x22 - 1, "chan debug", [this](offs_t offset, u16 &data, u16 mem_mask) {
 												   chan_write_tap(offset, data, mem_mask);
 											   });
-		if(0)
+		if(1)
 		m_maincpu->space(0).install_write_tap(0x20f03e, 0x20f03e + 0x92*0x40 - 1, "voice debug", [this](offs_t offset, u16 &data, u16 mem_mask) {
 												  voice_write_tap(offset, data, mem_mask);
+											   });
+		if(1)
+		m_maincpu->space(0).install_read_tap(0x20f03e, 0x20f03e + 0x92*0x40 - 1, "voice debug", [this](offs_t offset, u16 &data, u16 mem_mask) {
+												  voice_read_tap(offset, data, mem_mask);
 											   });
 		if(0)
 		m_maincpu->space(0).install_readwrite_tap(0x214ca2+0x20, 0x214ca2+0x320-1, "regs fp",
@@ -411,20 +416,71 @@ void mu100_state::regs_int_write_tap(offs_t address, u16 data, u16 mem_mask)
 	logerror("regs_int_w %03x, %04x @ %04x (%06x)\n", reg, data, mem_mask, pc);
 }
 
+struct xmap {
+	int slot;
+	const char *name;
+};
+
+static xmap vmap[] = {
+	{ 0x00, "instrumenthi" },
+	{ 0x02, "instrumentlo" },
+	{ 0x04, "midi_channelhi" },
+	{ 0x06, "midi_channello" },
+	{ 0x0c, "lpf_cutoff" },
+	{ 0x42, "delay_time" },
+	{ 0x48, "active" },
+	{ 0x4a, "velocity" },
+	{ 0x51, "inverse_velocity" },
+	{ -1, "" },
+};
+
 void mu100_state::voice_write_tap(offs_t address, u16 data, u16 mem_mask)
 {
 	offs_t pc = m_maincpu->pc();
 	offs_t off = address - 0x20f03e;
 	int voice = off / 0x92;
 	int slot = off % 0x92;
+
+	if(mem_mask == 0xff00)
+		data >>= 8;
+	else if(mem_mask == 0x00ff)
+		slot++;
+
+	std::string slotname = util::string_format("%02x", slot);
+	for(int i=0; vmap[i].slot != -1; i++)
+		if(vmap[i].slot == slot)
+			slotname = vmap[i].name;
+
 	if(mem_mask == 0xffff) {
-		logerror("voice_w %02x:%02x, %04x (%06x)\n", voice, slot, data, pc);
+		logerror("voice_w %02x:%s, %04x (%06x)\n", voice, slotname, data, pc);
 	} else {
-		if(mem_mask == 0xff00)
-			data >>= 8;
-		else
-			slot++;
-		logerror("voice_w %02x:%02x, %02x (%06x)\n", voice, slot, data, pc);
+		logerror("voice_w %02x:%s, %02x (%06x)\n", voice, slotname, data, pc);
+	}
+}
+
+void mu100_state::voice_read_tap(offs_t address, u16 data, u16 mem_mask)
+{
+	offs_t pc = m_maincpu->pc();
+	offs_t off = address - 0x20f03e;
+	int voice = off / 0x92;
+	int slot = off % 0x92;
+
+	logerror("off %x voice %x slot %x mask %04x\n", off, voice, slot, mem_mask);
+	data &= mem_mask;
+	if(mem_mask == 0xff00)
+		data >>= 8;
+	else if(mem_mask == 0x00ff)
+		slot++;
+
+	std::string slotname = util::string_format("%02x", slot);
+	for(int i=0; vmap[i].slot != -1; i++)
+		if(vmap[i].slot == slot)
+			slotname = vmap[i].name;
+
+	if(mem_mask == 0xffff) {
+		logerror("voice_r %02x:%s, %04x (%06x)\n", voice, slotname, data, pc);
+	} else {
+		logerror("voice_r %02x:%s, %02x (%06x)\n", voice, slotname, data, pc);
 	}
 }
 

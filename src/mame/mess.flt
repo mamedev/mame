@@ -268,6 +268,7 @@ elekscmp.cpp
 elektronmono.cpp
 elf.cpp
 elwro800.cpp
+elzet80.cpp
 emax.cpp
 emma2.cpp
 emu2.cpp
@@ -448,6 +449,7 @@ innotv_innotabmax.cpp
 instruct.cpp
 inteladv.cpp
 intellec4.cpp
+intellec8.cpp
 intellect02.cpp
 interpro.cpp
 intv.cpp
@@ -479,6 +481,7 @@ jtc.cpp
 juicebox.cpp
 juku.cpp
 junior.cpp
+junior80.cpp
 juno106.cpp
 juno6.cpp
 jupace.cpp
@@ -531,6 +534,7 @@ lisa.cpp
 llc1.cpp
 llc2.cpp
 lms46.cpp
+lnw80.cpp
 lola8a.cpp
 lviv.cpp
 lwriter.cpp
@@ -552,6 +556,7 @@ macquadra700.cpp
 magiceyes_pollux_vr3520f.cpp
 magnum.cpp
 mattelchess.cpp
+max80.cpp
 mbc020.cpp
 mbc200.cpp
 mbc55x.cpp
@@ -575,6 +580,7 @@ mekd3.cpp
 mekd4.cpp
 mekd5.cpp
 mephisto_academy.cpp
+mephisto_amsterdam.cpp
 mephisto_berlin.cpp
 mephisto_brikett.cpp
 mephisto_glasgow.cpp
@@ -585,10 +591,12 @@ mephisto_modena.cpp
 mephisto_modular.cpp
 mephisto_modular_tm.cpp
 mephisto_mondial.cpp
+mephisto_mondial2.cpp
 mephisto_mondial68k.cpp
 mephisto_montec.cpp
 mephisto_polgar.cpp
 mephisto_risc.cpp
+mephisto_smondial.cpp
 meritum.cpp
 mes.cpp
 mfabfz.cpp
@@ -828,6 +836,7 @@ qvt70.cpp
 qx10.cpp
 r9751.cpp
 radio86.cpp
+radionic.cpp
 rainbow.cpp
 rambo.cpp
 ravens.cpp
@@ -849,6 +858,7 @@ roland_jx3p.cpp
 roland_jx8p.cpp
 roland_mc50.cpp
 roland_mt32.cpp
+roland_pr100.cpp
 roland_r8.cpp
 roland_ra30.cpp
 roland_s10.cpp

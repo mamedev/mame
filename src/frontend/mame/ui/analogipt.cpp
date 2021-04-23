@@ -251,6 +251,8 @@ void menu_analog::populate(float &customtop, float &custombottom)
 		item_append(std::move(text), std::move(subtext), flags, &data);
 	}
 
+	item_append(menu_item_type::SEPARATOR);
+
 	// space for live display
 	custombottom = (ui().get_line_height() * m_visible_fields) + (ui().box_tb_border() * 3.0f);
 }

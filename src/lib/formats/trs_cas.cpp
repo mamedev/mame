@@ -157,7 +157,8 @@ static int trs80m3_handle_cas(int16_t *buffer, const uint8_t *casdata)
 		if (!sw && (casdata[data_pos] != 0x55))
 		{
 			sw = 1;
-			// This 1ms of silence isn't absolutely necessary, but the system writes it, so we may as emulate it.
+			// This 1ms of silence isn't absolutely necessary, but the system
+			// writes it, so we may as well emulate it.
 			sample_count += trs80m1_cas_cycle( buffer, sample_count, false );
 		}
 

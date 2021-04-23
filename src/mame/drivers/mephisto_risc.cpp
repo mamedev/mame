@@ -12,7 +12,7 @@ Hardware notes:
 - 128KB ROM
 - Tasc ChessMachine EC PCB
 - Mephisto modular display module
-- Mephisto Exclusive/Muenchen chessboard
+- Mephisto modular chessboard
 
 ******************************************************************************/
 
@@ -73,7 +73,7 @@ void risc_state::machine_start()
 
 u8 risc_state::keys_r(offs_t offset)
 {
-	return (BIT(m_keys->read(), offset) << 7) | 0x7f;
+	return ~(BIT(m_keys->read(), offset) << 7);
 }
 
 u8 risc_state::chessm_r()
@@ -102,8 +102,8 @@ void risc_state::mrisc_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).ram().share("nvram");
-	map(0x2000, 0x2000).w("display", FUNC(mephisto_display_module2_device::latch_w));
-	map(0x2004, 0x2004).w("display", FUNC(mephisto_display_module2_device::io_w));
+	map(0x2000, 0x2000).w("display", FUNC(mephisto_display2_device::latch_w));
+	map(0x2004, 0x2004).w("display", FUNC(mephisto_display2_device::io_w));
 	map(0x2c00, 0x2c07).r(FUNC(risc_state::keys_r));
 	map(0x2400, 0x2400).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x2800, 0x2800).w("board", FUNC(mephisto_board_device::mux_w));
@@ -123,14 +123,14 @@ void risc_state::mrisc_mem(address_map &map)
 
 static INPUT_PORTS_START( mrisc )
 	PORT_START("KEY")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("TRN / Pawn")      PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("INFO / Knight")   PORT_CODE(KEYCODE_I)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("MEM / Bishop")    PORT_CODE(KEYCODE_M)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("POS / Rook")      PORT_CODE(KEYCODE_O)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("LEV / Queen")     PORT_CODE(KEYCODE_L)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("FCT / King")      PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("ENT / New Game")  PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_F1) // combine for NEW GAME
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)     PORT_NAME("CL / New Game")   PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_F1) // "
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("TRN / Pawn")      PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("INFO / Knight")   PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("MEM / Bishop")    PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("POS / Rook")      PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("LEV / Queen")     PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("FCT / King")      PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("ENT / New Game")  PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_F1) // combine for NEW GAME
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("CL / New Game")   PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_F1) // "
 INPUT_PORTS_END
 
 
@@ -143,7 +143,9 @@ void risc_state::mrisc(machine_config &config)
 {
 	M65SC02(config, m_maincpu, 10_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &risc_state::mrisc_mem);
-	m_maincpu->set_periodic_int(FUNC(risc_state::irq0_line_hold), attotime::from_hz(10_MHz_XTAL / (1 << 14)));
+
+	const attotime irq_period = attotime::from_hz(10_MHz_XTAL / 0x4000);
+	m_maincpu->set_periodic_int(FUNC(risc_state::irq0_line_hold), irq_period);
 
 	CHESSMACHINE(config, m_chessm, 14'000'000); // Mephisto manual says 14MHz (no XTAL)
 	config.set_perfect_quantum(m_maincpu);
@@ -189,7 +191,7 @@ ROM_END
 
 
 /***************************************************************************
-    Game Drivers
+    Drivers
 ***************************************************************************/
 
 /*    YEAR  NAME     PARENT   COMPAT  MACHINE   INPUT  CLASS       INIT        COMPANY                    FULLNAME             FLAGS */

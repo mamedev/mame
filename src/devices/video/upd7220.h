@@ -90,6 +90,8 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual space_config_vector memory_space_config() const override;
 
+	void start_dma();
+	void stop_dma();
 private:
 	enum
 	{
@@ -112,8 +114,10 @@ private:
 	inline void update_blank_timer(int state);
 	inline void recompute_parameters();
 	inline void reset_figs_param();
-	inline void read_vram(uint8_t type, uint8_t mod);
-	inline void write_vram(uint8_t type, uint8_t mod);
+	inline void rdat(uint8_t type, uint8_t mod);
+	inline uint16_t read_vram();
+	inline void wdat(uint8_t type, uint8_t mod);
+	inline void write_vram(uint8_t type, uint8_t mod, uint16_t data);
 	inline void get_text_partition(int index, uint32_t *sad, uint16_t *len, int *im, int *wd);
 	inline void get_graphics_partition(int index, uint32_t *sad, uint16_t *len, int *im, int *wd);
 
@@ -138,6 +142,11 @@ private:
 	devcb_write_line   m_write_hsync;
 	devcb_write_line   m_write_vsync;
 	devcb_write_line   m_write_blank;
+
+	uint8_t m_dma_type;               // DMA transfer type
+	uint8_t m_dma_mod;                // DMA transfer mode
+	uint16_t m_dma_data;              // current word transferred via DMA
+	uint32_t m_dma_transfer_length;   // DMA transfer length in bytes
 
 	uint16_t m_mask;                  // mask register
 	uint8_t m_pitch;                  // number of word addresses in display memory in the horizontal direction

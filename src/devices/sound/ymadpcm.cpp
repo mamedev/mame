@@ -4,9 +4,19 @@
 #include "emu.h"
 #include "ymadpcm.h"
 
-#define VERBOSE 1
+//#define VERBOSE 1
 #define LOG_OUTPUT_FUNC osd_printf_verbose
 #include "logmacro.h"
+
+
+//*********************************************************
+//  DEBUGGING
+//*********************************************************
+
+// set this to only play certain channels: bits 0-5 are ADPCM-A
+// channels and bit 0x80 is the ADPCM-B channel
+constexpr u8 global_chanmask = 0xff;
+
 
 
 //*********************************************************
@@ -117,13 +127,16 @@ void ymadpcm_a_channel::keyonoff(bool on)
 		m_curbyte = 0;
 		m_accumulator = 0;
 		m_step_index = 0;
-		LOG("KeyOn ADPCM-A%d: pan=%d%d start=%04X end=%04X level=%02X\n",
-			m_choffs,
-			m_regs.ch_pan_left(m_choffs),
-			m_regs.ch_pan_right(m_choffs),
-			m_regs.ch_start(m_choffs),
-			m_regs.ch_end(m_choffs),
-			m_regs.ch_instrument_level(m_choffs));
+
+		// don't log masked channels
+		if (((global_chanmask >> m_choffs) & 1) != 0)
+			LOG("KeyOn ADPCM-A%d: pan=%d%d start=%04X end=%04X level=%02X\n",
+				m_choffs,
+				m_regs.ch_pan_left(m_choffs),
+				m_regs.ch_pan_right(m_choffs),
+				m_regs.ch_start(m_choffs),
+				m_regs.ch_end(m_choffs),
+				m_regs.ch_instrument_level(m_choffs));
 	}
 }
 
@@ -141,8 +154,11 @@ bool ymadpcm_a_channel::clock()
 		return false;
 	}
 
-	// stop when we hit the end address
-	if ((m_curaddress >> m_address_shift) >= m_regs.ch_end(m_choffs))
+	// stop when we hit the end address; apparently only low 20 bits are used for
+	// comparison on the YM2610: this affects sample playback in some games, for
+	// example twinspri character select screen music will skip some samples if
+	// this is not correct
+	if (((m_curaddress ^ (m_regs.ch_end(m_choffs) << m_address_shift)) & 0xfffff) == 0)
 	{
 		m_playing = m_accumulator = 0;
 		return true;
@@ -292,6 +308,9 @@ u32 ymadpcm_a_engine::clock(u32 chanmask)
 
 void ymadpcm_a_engine::output(s32 outputs[2], u32 chanmask)
 {
+	// mask out some channels for debug purposes
+	chanmask &= global_chanmask;
+
 	// compute the output of each channel
 	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
 		if (BIT(chanmask, chnum))
@@ -494,6 +513,10 @@ void ymadpcm_b_channel::clock()
 
 void ymadpcm_b_channel::output(s32 outputs[2], u32 rshift) const
 {
+	// mask out some channels for debug purposes
+	if ((global_chanmask & 0x80) == 0)
+		return;
+
 	// do a linear interpolation between samples
 	s32 result = (m_prev_accum * s32((m_position ^ 0xffff) + 1) + m_accumulator * s32(m_position)) >> 16;
 
@@ -557,22 +580,25 @@ void ymadpcm_b_channel::write(u32 regnum, u8 value)
 		if (m_regs.execute())
 		{
 			load_start();
-			LOG("KeyOn ADPCM-B: rep=%d spk=%d pan=%d%d dac=%d 8b=%d rom=%d ext=%d rec=%d start=%04X end=%04X pre=%04X dn=%04X lvl=%02X lim=%04X\n",
-				m_regs.repeat(),
-				m_regs.speaker(),
-				m_regs.pan_left(),
-				m_regs.pan_right(),
-				m_regs.dac(),
-				m_regs.dram_8bit(),
-				m_regs.rom_ram(),
-				m_regs.external(),
-				m_regs.record(),
-				m_regs.start(),
-				m_regs.end(),
-				m_regs.prescale(),
-				m_regs.delta_n(),
-				m_regs.level(),
-				m_regs.limit());
+
+			// don't log masked channels
+			if ((global_chanmask & 0x80) != 0)
+				LOG("KeyOn ADPCM-B: rep=%d spk=%d pan=%d%d dac=%d 8b=%d rom=%d ext=%d rec=%d start=%04X end=%04X pre=%04X dn=%04X lvl=%02X lim=%04X\n",
+					m_regs.repeat(),
+					m_regs.speaker(),
+					m_regs.pan_left(),
+					m_regs.pan_right(),
+					m_regs.dac_enable(),
+					m_regs.dram_8bit(),
+					m_regs.rom_ram(),
+					m_regs.external(),
+					m_regs.record(),
+					m_regs.start(),
+					m_regs.end(),
+					m_regs.prescale(),
+					m_regs.delta_n(),
+					m_regs.level(),
+					m_regs.limit());
 		}
 		else
 			m_status &= ~STATUS_EOS;

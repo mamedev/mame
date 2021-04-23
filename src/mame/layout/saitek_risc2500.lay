@@ -3,18 +3,20 @@
 license:CC0
 -->
 <mamelayout version="2">
+
 <!-- define elements -->
+
 	<element name="digit" defstate="0">
 		<led7seg>
-			<color red="0.2" green="0.16" blue="0.16" />
+			<color red="0.200" green="0.164" blue="0.169" />
 		</led7seg>
 	</element>
-	<element name="led" defstate="1">
+	<element name="led" defstate="0">
 		<rect state="0">
-			<color red="0.95" green="0.0" blue="0.0" />
+			<color red="0.20" green="0.0" blue="0.0" />
 		</rect>
 		<rect state="1">
-			<color red="0.20" green="0.0" blue="0.0" />
+			<color red="0.95" green="0.0" blue="0.0" />
 		</rect>
 	</element>
 	<element name="hlb" defstate="0">
@@ -64,22 +66,22 @@ license:CC0
 	<element name="sym_colon">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text state="0" string=":"> <color red="0.49412" green="0.51765" blue="0.51765" /></text>
-		<text state="1" string=":"> <color red="0.2" green="0.16" blue="0.16" /></text>
+		<text state="1" string=":"> <color red="0.200" green="0.164" blue="0.169" /></text>
 	</element>
 	<element name="sym_left">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text state="0" string="&#x2190;">  <color red="0.49412" green="0.51765" blue="0.51765" /></text>
-		<text state="1" string="&#x2190;">  <color red="0.2" green="0.16" blue="0.16" /></text>
+		<text state="1" string="&#x2190;">  <color red="0.200" green="0.164" blue="0.169" /></text>
 	</element>
 	<element name="sym_right">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text state="0" string="&#x2192;">  <color red="0.49412" green="0.51765" blue="0.51765" /></text>
-		<text state="1" string="&#x2192;">  <color red="0.2" green="0.16" blue="0.16" /></text>
+		<text state="1" string="&#x2192;">  <color red="0.200" green="0.164" blue="0.169" /></text>
 	</element>
 	<element name="sym_white">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
 		<text state="0" string="&#x25cb;">  <color red="0.49412" green="0.51765" blue="0.51765" /></text>
-		<text state="1" string="&#x25cb;">  <color red="0.2" green="0.16" blue="0.16" /></text>
+		<text state="1" string="&#x25cb;">  <color red="0.200" green="0.164" blue="0.169" /></text>
 	</element>
 	<element name="sym_black">
 		<rect><color red="1.0" green="1.0" blue="1.0" /></rect>
@@ -397,7 +399,8 @@ license:CC0
 	</group>
 
 
-	<!-- LCD panel -->
+<!-- LCD panel -->
+
 	<group name="lcd">
 		<bounds x="0" y="0" width="30" height="11.2" />
 		<element ref="lcd_bg"><bounds x="0" y="0" width="30.0" height="11.2" /></element>
@@ -431,7 +434,9 @@ license:CC0
 		<element name="sym11" ref="sym_left" >  <bounds x="0.40"   y="7.7" width="3"   height="3" /></element>
 	</group>
 
+
 <!-- build screen -->
+
 	<view name="Internal Layout (Full)">
 		<bounds x="0" y="0" width="167" height="90" />
 
@@ -464,7 +469,7 @@ license:CC0
 		<element ref="text_g"     ><bounds x="85" y="83.5" width="2" height="2" /></element>
 		<element ref="text_h"     ><bounds x="95" y="83.5" width="2" height="2" /></element>
 
-	<!-- LEDs -->
+		<!-- LEDs -->
 		<element name="led0" ref="led"><bounds x="15" y="76.5" width="2" height="1" /></element>
 		<element name="led1" ref="led"><bounds x="15" y="66.5" width="2" height="1" /></element>
 		<element name="led2" ref="led"><bounds x="15" y="56.5" width="2" height="1" /></element>
@@ -482,7 +487,7 @@ license:CC0
 		<element name="led14" ref="led"><bounds x="85.5" y="86.5" width="1" height="2" /></element>
 		<element name="led15" ref="led"><bounds x="95.5" y="86.5" width="1" height="2" /></element>
 
-	<!-- right side -->
+		<!-- right side -->
 		<element ref="text_on"      ><bounds x="109"  y="37" width="8" height="2" /></element>
 		<element ref="text_off"     ><bounds x="120" y="37" width="8" height="2" /></element>
 		<element ref="text_newgame" ><bounds x="131" y="37" width="8" height="2" /></element>
@@ -496,28 +501,28 @@ license:CC0
 		<element ref="text_down"  ><bounds x="145" y="51" width="7" height="3" /></element>
 		<element ref="text_enter" ><bounds x="154" y="52" width="7" height="2" /></element>
 
-		<element ref="hlb" inputtag="RESET" inputmask="0x00000001"><bounds x="109"  y="40" width="8" height="2" /></element>
-		<element ref="hlb" inputtag="P7" inputmask="0x80000000"><bounds x="120" y="40" width="8" height="2" /></element>
-		<element ref="hlb" inputtag="P6" inputmask="0x80000000"><bounds x="131" y="40" width="8" height="2" /></element>
-		<element ref="hlb" inputtag="P5" inputmask="0x80000000"><bounds x="142" y="40" width="8" height="2" /></element>
-		<element ref="hlb" inputtag="P0" inputmask="0x80000000"><bounds x="153" y="40" width="8" height="2" /></element>
+		<element ref="hlb" inputtag="RESET" inputmask="0x01"><bounds x="109"  y="40" width="8" height="2" /></element>
+		<element ref="hlb" inputtag="P7" inputmask="0x80"><bounds x="120" y="40" width="8" height="2" /></element>
+		<element ref="hlb" inputtag="P6" inputmask="0x80"><bounds x="131" y="40" width="8" height="2" /></element>
+		<element ref="hlb" inputtag="P5" inputmask="0x80"><bounds x="142" y="40" width="8" height="2" /></element>
+		<element ref="hlb" inputtag="P0" inputmask="0x80"><bounds x="153" y="40" width="8" height="2" /></element>
 
-		<element ref="hlb" inputtag="P7" inputmask="0x40000000"><bounds x="109"  y="55" width="7" height="2" /></element>
-		<element ref="hlb" inputtag="P6" inputmask="0x40000000"><bounds x="118" y="55" width="7" height="2" /></element>
-		<element ref="hlb" inputtag="P4" inputmask="0x80000000"><bounds x="127" y="55" width="7" height="2" /></element>
-		<element ref="hlb" inputtag="P3" inputmask="0x80000000"><bounds x="136" y="55" width="7" height="2" /></element>
-		<element ref="hlb" inputtag="P2" inputmask="0x80000000"><bounds x="145" y="55" width="7" height="2" /></element>
-		<element ref="hlb" inputtag="P1" inputmask="0x80000000"><bounds x="154" y="55" width="7" height="2" /></element>
+		<element ref="hlb" inputtag="P7" inputmask="0x40"><bounds x="109"  y="55" width="7" height="2" /></element>
+		<element ref="hlb" inputtag="P6" inputmask="0x40"><bounds x="118" y="55" width="7" height="2" /></element>
+		<element ref="hlb" inputtag="P4" inputmask="0x80"><bounds x="127" y="55" width="7" height="2" /></element>
+		<element ref="hlb" inputtag="P3" inputmask="0x80"><bounds x="136" y="55" width="7" height="2" /></element>
+		<element ref="hlb" inputtag="P2" inputmask="0x80"><bounds x="145" y="55" width="7" height="2" /></element>
+		<element ref="hlb" inputtag="P1" inputmask="0x80"><bounds x="154" y="55" width="7" height="2" /></element>
 
-		<element ref="hlb" inputtag="P5" inputmask="0x40000000"><bounds x="109"  y="70" width="7" height="2" /></element>
-		<element ref="hlb" inputtag="P4" inputmask="0x40000000"><bounds x="118" y="70" width="7" height="2" /></element>
-		<element ref="hlb" inputtag="P3" inputmask="0x40000000"><bounds x="127" y="70" width="7" height="2" /></element>
-		<element ref="hlb" inputtag="P2" inputmask="0x40000000"><bounds x="136" y="70" width="7" height="2" /></element>
-		<element ref="hlb" inputtag="P1" inputmask="0x40000000"><bounds x="145" y="70" width="7" height="2" /></element>
-		<element ref="hlb" inputtag="P0" inputmask="0x40000000"><bounds x="154" y="70" width="7" height="2" /></element>
+		<element ref="hlb" inputtag="P5" inputmask="0x40"><bounds x="109"  y="70" width="7" height="2" /></element>
+		<element ref="hlb" inputtag="P4" inputmask="0x40"><bounds x="118" y="70" width="7" height="2" /></element>
+		<element ref="hlb" inputtag="P3" inputmask="0x40"><bounds x="127" y="70" width="7" height="2" /></element>
+		<element ref="hlb" inputtag="P2" inputmask="0x40"><bounds x="136" y="70" width="7" height="2" /></element>
+		<element ref="hlb" inputtag="P1" inputmask="0x40"><bounds x="145" y="70" width="7" height="2" /></element>
+		<element ref="hlb" inputtag="P0" inputmask="0x40"><bounds x="154" y="70" width="7" height="2" /></element>
 
-		<element ref="blackb"><bounds x="107.8" y="10.4" width="30.4" height="11.6" /></element>
-		<group ref="lcd"><bounds x="108" y="10.6" width="30" height="11.2" /></group>
+		<element ref="blackb"><bounds x="108.8" y="10.4" width="30.4" height="11.6" /></element>
+		<group ref="lcd"><bounds x="109" y="10.6" width="30" height="11.2" /></group>
 
 		<group ref="sb_board"><bounds x="21" y="2" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="1.5" y="2" width="10" height="80" /></group>

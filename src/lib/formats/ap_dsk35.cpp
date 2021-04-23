@@ -1244,6 +1244,14 @@ int dc42_format::identify(io_generic *io, uint32_t form_factor, const std::vecto
 	uint32_t dsize = (h[0x40] << 24) | (h[0x41] << 16) | (h[0x42] << 8) | h[0x43];
 	uint32_t tsize = (h[0x44] << 24) | (h[0x45] << 16) | (h[0x46] << 8) | h[0x47];
 
+	uint8_t encoding = h[0x50];
+	uint8_t format = h[0x51];
+	// if it's a 1.44MB DC42 image, reject it so the generic PC MFM handler picks it up
+	if ((encoding == 0x03) && (format == 0x02))
+	{
+		return 0;
+	}
+
 	return size == 0x54+tsize+dsize && h[0] < 64 && h[0x52] == 1 && h[0x53] == 0 ? 100 : 0;
 }
 

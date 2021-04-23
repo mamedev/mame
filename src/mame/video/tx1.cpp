@@ -862,7 +862,7 @@ void tx1_state::tx1_draw_objects(uint8_t *bitmap)
 
 	const uint8_t *const pixdata_rgn = &m_obj_tiles[0];
 
-	for (offs = 0x0; offs <= 0x300; offs += 8)
+	for (offs = 0x0; offs < 0x300 / 2; offs += 8)
 	{
 		uint32_t  x;
 		uint32_t  y;
@@ -1067,7 +1067,6 @@ void tx1_state::tx1_draw_objects(uint8_t *bitmap)
 					}
 
 					/* Check if we've stepped into a new 8x8 tile */
-
 					if ((((x_acc + x_step) >> (OBJ_FRAC + 3)) & TX1_MASK) != ((x_acc >> (OBJ_FRAC + 3)) & TX1_MASK))
 					{
 						if (lasttile)
@@ -2590,7 +2589,7 @@ void tx1_state::buggyboy_draw_objs(uint8_t *bitmap, bool wide)
 		x_stride = 256;
 	}
 
-	for (offs = 0; offs <= 0x300; offs += 8)
+	for (offs = 0; offs < 0x300 / 2; offs += 8)
 	{
 		uint32_t  x;
 		uint32_t  y;

@@ -18,6 +18,7 @@
 #include "machine/i8251.h"
 #include "machine/mb62h195.h"
 #include "machine/mb63h149.h"
+#include "machine/mb87013.h"
 #include "machine/nvram.h"
 #include "machine/rescap.h"
 #include "machine/upd7001.h"
@@ -32,7 +33,6 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_io(*this, "io")
-		, m_usart(*this, "usart")
 		, m_lcdc(*this, "lcdc")
 		, m_sampler(*this, "sampler")
 	{
@@ -44,8 +44,6 @@ public:
 protected:
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
-	u8 qdd_r(offs_t offset);
-	void qdd_w(offs_t offset, u8 data);
 	void lcd_data_w(offs_t offset, u8 data);
 	void led_data_w(offs_t offset, u8 data);
 	u8 sw_scan_r(offs_t offset);
@@ -60,7 +58,6 @@ protected:
 
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<mb62h195_device> m_io;
-	required_device<i8251_device> m_usart;
 	required_device<hd44780_device> m_lcdc;
 	required_device<sa16_base_device> m_sampler;
 };
@@ -100,20 +97,6 @@ HD44780_PIXEL_UPDATE(roland_s220_state::lcd_pixel_update)
 {
 	if (x < 5 && y < 8 && line < 2 && pos < 16)
 		bitmap.pix(line * 8 + y, pos * 6 + x) = state;
-}
-
-u8 roland_s10_state::qdd_r(offs_t offset)
-{
-	if (!BIT(offset, 1))
-		return m_usart->read(offset);
-
-	return 0;
-}
-
-void roland_s10_state::qdd_w(offs_t offset, u8 data)
-{
-	if (!BIT(offset, 1))
-		m_usart->write(offset, data);
 }
 
 void roland_s10_state::lcd_data_w(offs_t offset, u8 data)
@@ -165,7 +148,7 @@ void roland_s10_state::prog_map(address_map &map)
 
 void roland_s10_state::mks100_ext_map(address_map &map)
 {
-	map(0x4000, 0x4003).mirror(0xffc).rw(FUNC(roland_s10_state::qdd_r), FUNC(roland_s10_state::qdd_w));
+	map(0x4000, 0x4003).mirror(0xffc).rw("qddia", FUNC(mb87013_device::read), FUNC(mb87013_device::write));
 	map(0x6000, 0x7fff).ram().share("nvram");
 	map(0x8000, 0x80ff).mirror(0xf00).w(FUNC(roland_s10_state::lcd_data_w));
 	map(0x9000, 0x90ff).mirror(0xf00).w(FUNC(roland_s10_state::led_data_w));
@@ -184,7 +167,7 @@ void roland_s10_state::s10_ext_map(address_map &map)
 void roland_s220_state::s220_ext_map(address_map &map)
 {
 	map(0x0000, 0x000f).mirror(0x3ff0).w(FUNC(roland_s220_state::output_control_w));
-	map(0x4000, 0x4003).mirror(0xffc).rw(FUNC(roland_s220_state::qdd_r), FUNC(roland_s220_state::qdd_w));
+	map(0x4000, 0x4003).mirror(0xffc).rw("qddia", FUNC(mb87013_device::read), FUNC(mb87013_device::write));
 	map(0x5000, 0x5000).mirror(0xfff).w(FUNC(roland_s220_state::led_latch1_w));
 	map(0x6000, 0x7fff).ram().share("nvram");
 	map(0x8000, 0x80ff).mirror(0xf00).w(FUNC(roland_s220_state::lcd_data_w));
@@ -225,9 +208,18 @@ void roland_s10_state::s10(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5564PL-20 + battery
 
-	I8251(config, m_usart, 6.5_MHz_XTAL / 2); // MB89251A
+	i8251_device &usart(I8251(config, "usart", 6.5_MHz_XTAL)); // MB89251A
+	usart.dtr_handler().set("qddia", FUNC(mb87013_device::dtr_w));
+	usart.txd_handler().set("qddia", FUNC(mb87013_device::txd_w));
 
-	//MB87013(config, "qddia", 6.5_MHz_XTAL);
+	mb87013_device &qddia(MB87013(config, "qddia", 6.5_MHz_XTAL));
+	qddia.sio_rd_callback().set("usart", FUNC(i8251_device::read));
+	qddia.sio_wr_callback().set("usart", FUNC(i8251_device::write));
+	qddia.txc_callback().set("usart", FUNC(i8251_device::write_txc));
+	qddia.rxc_callback().set("usart", FUNC(i8251_device::write_rxc));
+	qddia.rxd_callback().set("usart", FUNC(i8251_device::write_rxd));
+	qddia.dsr_callback().set("usart", FUNC(i8251_device::write_dsr));
+	qddia.op4_callback().set("qddia", FUNC(mb87013_device::rts_w));
 
 	mb63h149_device &keyscan(MB63H149(config, "keyscan", 12_MHz_XTAL));
 	keyscan.int_callback().set_inputline(m_maincpu, MCS51_T1_LINE);

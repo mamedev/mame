@@ -25,6 +25,7 @@ Dip locations and factory settings verified with manual
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
+#include "machine/k007452.h"
 #include "sound/ym2151.h"
 #include "speaker.h"
 
@@ -59,10 +60,10 @@ void contra_state::contra_coin_counter_w(uint8_t data)
 		machine().bookkeeping().coin_counter_w(1, (data & 0x02) >> 1);
 }
 
-
 void contra_state::contra_map(address_map &map)
 {
 	map(0x0000, 0x0007).w(FUNC(contra_state::contra_K007121_ctrl_0_w));
+	map(0x0008, 0x000f).rw("k007452", FUNC(k007452_device::read), FUNC(k007452_device::write));
 	map(0x0010, 0x0010).portr("SYSTEM");
 	map(0x0011, 0x0011).portr("P1");
 	map(0x0012, 0x0012).portr("P2");
@@ -217,6 +218,7 @@ void contra_state::contra(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));  /* enough for the sound CPU to read all commands */
 
+	KONAMI_007452_MATH(config, "k007452");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

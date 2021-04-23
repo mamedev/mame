@@ -46,6 +46,7 @@
 #include "emu.h"
 #include "includes/kaypro.h"
 #include "machine/kay_kbd.h"
+#include "formats/kaypro_dsk.h"
 
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
@@ -194,6 +195,12 @@ static void kaypro_floppies(device_slot_interface &device)
 	device.option_add("525qd", FLOPPY_525_QD);
 }
 
+void kaypro_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_KAYPROII_FORMAT);
+	fr.add(FLOPPY_KAYPRO2X_FORMAT);
+}
 
 void kaypro_state::kayproii(machine_config &config)
 {
@@ -265,8 +272,8 @@ void kaypro_state::kayproii(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(kaypro_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(kaypro_state::fdc_drq_w));
 	m_fdc->set_force_ready(true);
-	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525ssdd", kaypro_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525ssdd", kaypro_state::floppy_formats).enable_sound(true);
 	SOFTWARE_LIST(config, "flop_list").set_original("kaypro").set_filter("A");
 }
 
@@ -276,8 +283,8 @@ void kaypro_state::kayproiv(machine_config &config)
 	m_pio_s->out_pa_callback().set(FUNC(kaypro_state::kayproiv_pio_system_w));
 	config.device_remove("fdc:0");
 	config.device_remove("fdc:1");
-	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525dd", kaypro_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525dd", kaypro_state::floppy_formats).enable_sound(true);
 	SOFTWARE_LIST(config.replace(), "flop_list").set_original("kaypro").set_filter("D");
 }
 
@@ -365,8 +372,8 @@ void kaypro_state::kaypro484(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(kaypro_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(kaypro_state::fdc_drq_w));
 	m_fdc->set_force_ready(true);
-	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525dd", kaypro_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525dd", kaypro_state::floppy_formats).enable_sound(true);
 	SOFTWARE_LIST(config, "flop_list").set_original("kaypro").set_filter("C");
 }
 
@@ -402,8 +409,8 @@ void kaypro_state::kaypro284(machine_config &config)
 	kaypro484(config);
 	config.device_remove("fdc:0");
 	config.device_remove("fdc:1");
-	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", kaypro_floppies, "525ssdd", kaypro_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", kaypro_floppies, "525ssdd", kaypro_state::floppy_formats).enable_sound(true);
 	SOFTWARE_LIST(config.replace(), "flop_list").set_original("kaypro").set_filter("B");
 }
 

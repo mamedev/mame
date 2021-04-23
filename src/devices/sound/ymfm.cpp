@@ -8,6 +8,15 @@
 #define LOG_OUTPUT_FUNC osd_printf_verbose
 #include "logmacro.h"
 
+
+//*********************************************************
+//  DEBUGGING
+//*********************************************************
+
+// set this mask to only play certain channels
+constexpr u32 global_chanmask = 0xffffffff;
+
+
 //
 // ONE FM CORE TO RULE THEM ALL
 //
@@ -1011,6 +1020,10 @@ void ymopm_registers::log_keyon(u32 choffs, u32 opoffs)
 {
 	u32 chnum = choffs;
 	u32 opnum = opoffs;
+
+	// don't log masked channels
+	if (((global_chanmask >> chnum) & 1) == 0)
+		return;
 
 	LOG("%d.%02d freq=%04X dt2=%d dt=%d fb=%d alg=%X mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X out=%c%c",
 		chnum, opnum,
@@ -2393,10 +2406,16 @@ void ymfm_operator<RegisterType>::clock_ssg_eg_state()
 template<class RegisterType>
 void ymfm_operator<RegisterType>::clock_envelope(u32 env_counter)
 {
-	// handle attack->decay and decay->sustain transitions
+	// handle attack->decay transitions
 	if (m_env_state == YMFM_ENV_ATTACK && m_env_attenuation == 0)
 		m_env_state = YMFM_ENV_DECAY;
-	else if (m_env_state == YMFM_ENV_DECAY && m_env_attenuation >= m_cache.eg_sustain)
+
+	// handle decay->sustain transitions; it is important to do this immediately
+	// after the attack->decay transition above in the event that the sustain level
+	// is set to 0 (in which case we will skip right to sustain without doing any
+	// decay); as an example where this can be heard, check the cymbals sound
+	// in channel 0 of shinobi's test mode sound #5
+	if (m_env_state == YMFM_ENV_DECAY && m_env_attenuation >= m_cache.eg_sustain)
 		m_env_state = YMFM_ENV_SUSTAIN;
 
 	// fetch the appropriate 6-bit rate value from the cache
@@ -3012,6 +3031,9 @@ u32 ymfm_engine_base<RegisterType>::clock(u32 chanmask)
 template<class RegisterType>
 void ymfm_engine_base<RegisterType>::output(s32 outputs[RegisterType::OUTPUTS], u32 rshift, s32 clipmax, u32 chanmask) const
 {
+	// mask out some channels for debug purposes
+	chanmask &= global_chanmask;
+
 	// mask out inactive channels
 	chanmask &= m_active_channels;
 

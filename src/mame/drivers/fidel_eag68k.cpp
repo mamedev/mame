@@ -161,6 +161,9 @@ B0000x-xxxxxx: see V7, -800000
 ******************************************************************************/
 
 #include "emu.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
 #include "machine/ram.h"
@@ -169,8 +172,6 @@ B0000x-xxxxxx: see V7, -800000
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 
 #include "softlist.h"
 #include "speaker.h"

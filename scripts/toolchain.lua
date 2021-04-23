@@ -1009,12 +1009,6 @@ function toolchain(_buildDir, _subDir)
 	configuration { "asmjs" }
 		targetdir (_buildDir .. "asmjs" .. "/bin")
 		objdir (_buildDir .. "asmjs" .. "/obj")
-		includedirs {
-			"$(EMSCRIPTEN)/system/include",
-			"$(EMSCRIPTEN)/system/include/compat",
-			"$(EMSCRIPTEN)/system/include/libc",
-			"$(EMSCRIPTEN)/system/lib/libcxxabi/include",
-		}
 		buildoptions {
 			"-Wno-cast-align",
 			"-Wno-tautological-compare",

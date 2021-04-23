@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco, hap
 // thanks-to:yoyo_chessboard
-/***************************************************************************
+/******************************************************************************
 
 Mephisto Academy
 
@@ -18,7 +18,7 @@ Since the program is on an external module, it appears it was meant to be
 a modular chesscomputer. However, no extra modules were sold separately.
 Module PCB is the same as Super Mondial II College, label HGS 10 116 05.
 
-***************************************************************************/
+******************************************************************************/
 
 #include "emu.h"
 
@@ -108,14 +108,14 @@ void academy_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( academy )
 	PORT_START("KEY")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("TRAIN")  PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("INFO")   PORT_CODE(KEYCODE_I)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("MEM")    PORT_CODE(KEYCODE_M)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("POS")    PORT_CODE(KEYCODE_O)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("LEV")    PORT_CODE(KEYCODE_L)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("FCT")    PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("ENT")    PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_F1) // combine for NEW GAME
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)     PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_F1) // "
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("TRAIN")  PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("INFO")   PORT_CODE(KEYCODE_I)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("MEM")    PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("POS")    PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("LEV")    PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("FCT")    PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("ENT")    PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_F1) // combine for NEW GAME
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD)    PORT_NAME("CL")     PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_F1) // "
 INPUT_PORTS_END
 
 
@@ -126,10 +126,11 @@ INPUT_PORTS_END
 
 void academy_state::academy(machine_config &config)
 {
+	/* basic machine hardware */
 	M65C02(config, m_maincpu, 4.9152_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &academy_state::main_map);
 
-	const attotime nmi_period = attotime::from_hz(4.9152_MHz_XTAL / (1 << 13));
+	const attotime nmi_period = attotime::from_hz(4.9152_MHz_XTAL / 0x2000);
 	m_maincpu->set_periodic_int(FUNC(academy_state::nmi_line_pulse), nmi_period);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -140,6 +141,7 @@ void academy_state::academy(machine_config &config)
 	MEPHISTO_SENSORS_BOARD(config, "board"); // internal
 	MEPHISTO_DISPLAY_MODULE2(config, "display"); // internal
 
+	/* video hardware */
 	PWM_DISPLAY(config, m_led_pwm).set_size(4, 4);
 	config.set_default_layout(layout_mephisto_academy);
 }
@@ -173,10 +175,10 @@ ROM_END
 
 
 /***************************************************************************
-    Game Drivers
+    Drivers
 ***************************************************************************/
 
-/*    YEAR, NAME,      PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY             FULLNAME                      FLAGS */
+/*    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY             FULLNAME                      FLAGS */
 CONS( 1989, academy,   0,       0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1989, academyg,  academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (German, 06-03-89)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1989, academyga, academy, 0,      academy,  academy, academy_state, empty_init, "Hegener + Glaser", "Mephisto Academy (German, 04-10-88)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

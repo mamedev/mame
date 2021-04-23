@@ -288,7 +288,6 @@ license:CC0
 		</part>
 	</software>
 
-
 	<software name="mrrobot">
 		<description>Mr. Robot and his Robot Factory</description>
 		<year>1983</year>
@@ -355,17 +354,6 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="galahad">
-		<description>Galahad and the Holy Grail</description>
-		<year>1982</year>
-		<publisher>Atari Program Exchange</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="92176">
-				<rom name="galahad.atr" size="92176" crc="d575a0bb" sha1="9f03ddbd745919e93113daed1117a59751f22ae5"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="jumpman">
 		<description>Jumpman</description>
 		<year>1983</year>
@@ -417,6 +405,49 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="ballyhoo">
+		<description>Ballyhoo</description>
+		<year>1986</year>
+		<publisher>Infocom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="ballyhoo rel 97 (1986)(infocom)(us)(side a).atr" size="92176" crc="c00ee466" sha1="529fc60d79c3a4b4d9b4d394ef869a9b441c36ae"/>  <!-- Verified -->
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="ballyhoo rel 97 (1986)(infocom)(us)(side b).atr" size="92176" crc="0b532b18" sha1="ce13da4e8a2f557983142384adfebffd7a5641f3"/>  <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cutthroa">
+		<description>Cutthroats</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="cutthroats rel 23 (1984-08-09)(infocom)(us)(side a).atr" size="92176" crc="15e554b5" sha1="e02c321efa35fcde2ce43e9ea755d73c30beebe2"/>  <!-- Verified -->
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="cutthroats rel 23 (1984-08-09)(infocom)(us)(side b).atr" size="92176" crc="ec7cd1cf" sha1="3c63670d88e7238cce902cb689e6764152941bff"/>  <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cvrnmars" supported="partial">
+		<description>Caverns of Mars</description>
+		<year>1982</year>
+		<publisher>Atari</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="caverns of mars (1982)(atari)(us).atr" size="92176" crc="b5b08100" sha1="e4cfd18a24734ae2b038810f10765fd440522adc"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ccchomp">
 		<description>Crush, Crumble and Chomp!</description>
 		<year>1981</year>
@@ -426,6 +457,206 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="crush, crumble and chomp (1981)(epyx)(us)[basic][os-b].atr" size="92176" crc="419fce77" sha1="513ff8617ebf45e95d19a1ec9e067d1a3121ecf6"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dandydgn" supported="partial">
+		<description>Dandy Dungeon</description>
+		<year>1985</year>
+		<publisher>Antic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="dandy dungeon (1985)(antic software)(us)(side a).atr" size="92176" crc="da5f16f3" sha1="fa2e4622eae7db965ae53f21977ead1b0da5aded"/> <!-- Verified -->
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="dandy dungeon (1985)(antic software)(us)(side b)(documentation).atr" size="92176" crc="a9906be8" sha1="c569bc924d6808217c244ebf7eca122c10be60e4"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enchantr">
+		<description>Enchanter</description>
+		<year>1985</year>
+		<publisher>Infocom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="enchanter rel 16 (1983)(infocom)(us)(side a).atr" size="92176" crc="835bb352" sha1="e1d1e3faf0a44612de187701dd4dee568879d966"/> <!-- Verified -->
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="enchanter rel 16 (1983)(infocom)(us)(side b).atr" size="92176" crc="6bcf1f25" sha1="82ed9f84b24ea45fa947f655ea9bfdd22ec135c3"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="essex">
+		<description>Essex</description>
+		<year>1985</year>
+		<publisher>Synapse Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="essex (1985)(synapse software)(us)(disk 1 of 2 side a)(disk 1, side 1).atr" size="92176" crc="551e10de" sha1="9bd38275b73a9f5b814dc7375ee7139693bc179b"/> <!-- Verified -->
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="essex (1985)(synapse software)(us)(disk 1 of 2 side b)(disk 1, side 2).atr" size="92176" crc="61416032" sha1="fca4ceee1fde5f140f10a836f2958cd629dbaed8"/> <!-- Verified -->
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="essex (1985)(synapse software)(us)(disk 2 of 2 side a)(disk 2, side 1).atr" size="92176" crc="68e9cfc6" sha1="90e6bd592d99d7d10e2d0c8ee896424cba6b8bdc"/> <!-- Verified -->
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="essex (1985)(synapse software)(us)(disk 2 of 2 side b)(disk 2, side 2).atr" size="92176" crc="70b697d2" sha1="a26e4765740e9e4986cd55b3209de4bd77503d90"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galahad">
+		<description>Galahad and the Holy Grail</description>
+		<year>1982</year>
+		<publisher>Atari Program Exchange</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="galahad and the holy grail (1982)(apx)(us).atr" size="92176" crc="d575a0bb" sha1="9f03ddbd745919e93113daed1117a59751f22ae5"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kangaroo">
+		<description>Kangaroo</description>
+		<year>1982</year>
+		<publisher>Atari Program Exchange</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="kangaroo v1.0 (1982)(apx)(us).atr" size="92176" crc="2ca28d46" sha1="6df7378e51465bca6f7c64bbd7d736354d24680e"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moonmist">
+		<description>Moonmist</description>
+		<year>1986</year>
+		<publisher>Infocom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="moonmist rel 4 (1986-09-18)(infocom)(us)(side a).atr" size="92176" crc="64d2f0a5" sha1="037d34f53e7b74c86cf86ba3cbcf8971dc374190"/> <!-- Verified -->
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="moonmist rel 4 (1986-09-18)(infocom)(us)(side b).atr" size="92176" crc="b08d5f2e" sha1="e2ca92e25bc0a472f54ecb3be42f87e60848e0f1"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phantas">
+		<description>Phantasie</description>
+		<year>1987</year>
+		<publisher>SSI</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="phantasie v1.0 (1987)(ssi)(us)(disk 1 of 2 side a)(disk 1).atr" size="92176" crc="4f6d019f" sha1="d1ddaaac1ec56b6080cf3f28e43a6d021e6089c2"/> <!-- Verified -->
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="phantasie v1.0 (1987)(ssi)(us)(disk 1 of 2 side b)(disk 2).atr" size="92176" crc="d49b5aa8" sha1="fe5adccc9876e1b9568009fb5850f58449199385"/> <!-- Verified -->
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="phantasie v1.0 (1987)(ssi)(us)(disk 2 of 2 side a)(disk 3)[m].atr" size="92176" crc="2be4ac66" sha1="c31cae2144e7eed0695d9453f6407994dc1a6d6a"/> <!-- has user save data on disk -->
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="phantasie v1.0 (1987)(ssi)(us)(disk 2 of 2 side b)(disk 4).atr" size="92176" crc="a7cbc846" sha1="c82837ee05eea44cd407927dc4b9f7de80633c61"/> <!-- also has user save data on disk? -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phobos">
+		<description>Phobos v1.1</description>
+		<year>1983</year>
+		<publisher>Atari Program Exchange</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="phobos v1.1 (1983-03-03)(apx)(us).atr" size="92176" crc="d104a7c3" sha1="401464d1ddf55bc29626c39275fddf335be9508d"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="planetfa">
+		<description>Planetfall</description>
+		<year>1983</year>
+		<publisher>Infocom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="planetfall rel 20 (1983)(infocom)(us)(side a).atr" size="92176" crc="72322fd8" sha1="e5fc69a474c11468e3c2422fc0ce75a4366b3943"/> <!-- Verified -->
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="planetfall rel 20 (1983)(infocom)(us)(side b).atr" size="92176" crc="8d7c4c39" sha1="8f5a2619743b1144af8a1db0df878e6f69603802"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pogoman">
+		<description>Pogoman</description>
+		<year>1982</year>
+		<publisher>Computer Magic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="pogoman (1982)(computer magic)(us).atr" size="92176" crc="6d1cc0dc" sha1="872f39d0ede185b4eff5391a50055ca3d1d53fed"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shatalli">
+		<description>Chronicles of Osgorth: The Shattered Alliance</description>
+		<year>1981</year>
+		<publisher>SSI</publisher>
+		<sharedfeat name="requirement" value="a800:basicb"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="chronicles of osgorth - the shattered alliance (1981)(ssi)(us)[basic].atr" size="92176" crc="3bed0e22" sha1="e8fd2abf5a8a3666d3872cb8853d9e9f9b6f8560"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="softprna">
+		<description>Softporn Adventure</description>
+		<year>1981</year>
+		<publisher>On-Line Systems</publisher>
+		<sharedfeat name="requirement" value="a800:basicb"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="softporn adventure (1981)(on-line systems)(us)[basic].atr" size="92176" crc="6a0c2d66" sha1="cf0dbfbb3405c9360a14131f3efae7003c4e748d"/> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spellbrk">
+		<description>Spellbreaker</description>
+		<year>1985</year>
+		<publisher>Infocom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="spellbreaker rel 63 (1985-09-16)(infocom)(us)(side a).atr" size="92176" crc="c8d46edd" sha1="5f7aef1cff9ba58f4a2178c967e2c9b49fce9e34"/> <!-- Verified -->
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="92176">
+				<rom name="spellbreaker rel 63 (1985-09-16)(infocom)(us)(side b).atr" size="92176" crc="27595ca6" sha1="ca66381b5b28da9838b3416985c06b3530efbe34"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
