@@ -47,7 +47,7 @@ mn1880_disassembler::mn1880_disassembler()
 {
 }
 
-// MOV, RDTBL, MOV1, MOV1N, ADDC and SUBC may also be known as MV, MVROM, MV1, MV1CPL, ADD and SUB
+// MOV, RDTBL, MOV1, MOV1N, ADDC, SUBC and NOT may also be known as MV, MVROM, MV1, MV1CPL, ADD, SUB and CPL
 const char *const mn1880_disassembler::s_inst_names[256] =
 {
 	"nop", "rep", "rep", "rep", "rep", "rep", "rep", "rep",
@@ -157,8 +157,8 @@ const char *const mn1860_disassembler::s_inst_names[256] =
 	"call", "call", "call", "call", "call", "call", "call", "call",
 	"br", "br", "br", "br", "br", "br", "br", "br",
 	"br", "br", "br", "br", "br", "br", "br", "br",
-	nullptr, "pop", "divl", "pop", "pop", "pop", "pop", "pop",
-	nullptr, "push", "mull", "push", "push", "push", "push", "push",
+	nullptr, "asll", "divl", "pop", "pop", "pop", "pop", "pop",
+	nullptr, "asrl", "mull", "push", "push", "push", "push", "push",
 	"subcl", "div", "subcl", "subcl", "xch", "xch", "xch", "xch",
 	"addcl", "mul", "addcl", "addcl", "mov", "mov", "mov", "mov",
 	"cmp", "cmp", "cmp", "cmp", "xch", "xch", nullptr, "xch",
@@ -303,7 +303,7 @@ void mn1880_disassembler::dasm_operands(std::ostream &stream, u8 opcode, offs_t 
 		stream << ", ";
 		format_imm(stream, opcodes.r8(pc++));
 	}
-	else if (opcode < 0x50 || (opcode & 0xf7) == 0xb5 || ((opcode & 0xf7) == 0xc3 && m_inst_names[opcode][4] == '\0'))
+	else if (opcode < 0x50 || (opcode & 0xf7) == 0xb5 || ((opcode & 0xf7) == 0xb1 && m_inst_names[opcode][0] != 'p') || ((opcode & 0xf7) == 0xc3 && m_inst_names[opcode][4] == '\0'))
 	{
 		// Unary operations
 		if (BIT(opcode, 0))
