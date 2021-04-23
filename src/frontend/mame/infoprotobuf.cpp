@@ -52,7 +52,7 @@ public:
 typedef std::set<std::add_pointer_t<device_type>, device_type_compare> device_type_set;
 
 // internal helper
-void output_header(infoprotobuf::mame* mame);
+void output_header(std::ostream &out);
 
 void output_one(infoprotobuf::machine *machine, driver_enumerator &drivlist, const game_driver &driver, device_type_set *devtypes);
 void output_sampleof(infoprotobuf::machine *machine, device_t &device);
@@ -221,13 +221,12 @@ void info_protobuf_creator::output(std::ostream& out, const std::function<bool(c
 	bool drivlist_done = false;
 	bool filter_done = false;
 	bool header_outputted = false;
-	infoprotobuf::mame* mame = new infoprotobuf::mame();
 
-	auto output_header_if_necessary = [this, &header_outputted](infoprotobuf::mame* mame)
+	auto output_header_if_necessary = [this, &header_outputted](std::ostream& out)
 	{
 		if (!header_outputted)
 		{
-			output_header(mame);
+			output_header(out);
 			header_outputted = true;
 		}
 	};
@@ -255,11 +254,12 @@ void info_protobuf_creator::output(std::ostream& out, const std::function<bool(c
 			else if (!filter || filter(drivlist.driver().name, filter_done))
 			{
 				const game_driver &driver(drivlist.driver());
-				infoprotobuf::machine *machine = mame->add_machine();
-				std::future<prepared_info> future_pi = std::async(std::launch::async, [&drivlist, &driver, &devfilter, machine]
+
+				std::future<prepared_info> future_pi = std::async(std::launch::async, [&drivlist, &driver, &devfilter]
 				{
 					prepared_info result;
 					std::ostringstream stream;
+					infoprotobuf::machine *machine = new infoprotobuf::machine();
 					output_one(machine, drivlist, driver, devfilter ? &result.m_dev_set : nullptr);
 					result.m_pb_machine = machine;
 					return result;
@@ -276,9 +276,9 @@ void info_protobuf_creator::output(std::ostream& out, const std::function<bool(c
 			queue.pop();
 
 			// emit the Protobuf
-			output_header_if_necessary(mame);
+			output_header_if_necessary(out);
 			google::protobuf::util::SerializeDelimitedToOstream(*pi.m_pb_machine, &out);
-
+			delete pi.m_pb_machine;
 			// merge devices into devfilter, if appropriate
 			if (devfilter)
 			{
@@ -304,7 +304,7 @@ void info_protobuf_creator::output(std::ostream& out, const std::function<bool(c
 	// output devices (both devices with roms and slot devices)
 	if (include_devices && (!devfilter || !devfilter->empty()))
 	{
-		output_header_if_necessary(mame);
+		output_header_if_necessary(out);
 
 		output_devices(out, m_lookup_options, devfilter.get());
 	}
@@ -322,15 +322,17 @@ namespace
 //  output_header - set up the root element
 //-------------------------------------------------
 
-void output_header(infoprotobuf::mame *mame)
+void output_header(std::ostream& out)
 {
-	mame->set_build(emulator_info::get_build_version());
+	infoprotobuf::mame mame;
+	mame.set_build(emulator_info::get_build_version());
 #ifdef MAME_DEBUG
-	mame->set_debug(true);
+	mame.set_debug(true);
 #else
-	mame->set_debug(false);
+	mame.set_debug(false);
 #endif
-	mame->set_mameconfig(CONFIG_VERSION);
+	mame.set_mameconfig(CONFIG_VERSION);
+	google::protobuf::util::SerializeDelimitedToOstream(mame, &out);
 }
 
 //-------------------------------------------------
@@ -542,6 +544,7 @@ void output_devices(std::ostream &out, emu_options &lookup_options, device_type_
 				infoprotobuf::machine *machine = new infoprotobuf::machine();
 				output_one_device(machine, config, *dev, dev->tag());
 				google::protobuf::util::SerializeDelimitedToOstream(*machine, &out);
+				delete machine;
 				machine_config::token const tok(config.begin_configuration(config.root_device()));
 				config.device_remove("_tmp");
 			};
