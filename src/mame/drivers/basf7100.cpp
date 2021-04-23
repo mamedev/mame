@@ -4,7 +4,7 @@
 
     BASF 7100
 
-	This system is based on (or even identical to) the DigiLog Microterm II 
+    This system is based on (or even identical to) the DigiLog Microterm II 
 
     Models:
     - 7120: 24k disk controller memory, 3x 5.25" single sided
@@ -42,7 +42,6 @@
 	- Improve video emulation
 	- Find documentation for switches
 	- Hook up serial ports
-	- Hook up parallel port
 
     Notes:
     - Runs the BOS operating system, possibly also CP/M?
@@ -55,6 +54,7 @@
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
 #include "machine/wd_fdc.h"
+#include "bus/centronics/ctronics.h"
 #include "imagedev/floppy.h"
 #include "machine/basf7100_kbd.h"
 #include "emupal.h"
@@ -77,6 +77,7 @@ public:
 		m_fdccpu(*this, "fdccpu"),
 		m_pic(*this, "pic"),
 		m_ppi(*this, "ppi%u", 0U),
+		m_centronics(*this, "centronics"),
 		m_fdc(*this, "fdc"),
 		m_floppy(*this, "fdc:%u", 0),
 		m_screen(*this, "screen"),
@@ -104,6 +105,7 @@ private:
 	required_device<z80_device> m_fdccpu;
 	required_device<pic8259_device> m_pic;
 	required_device_array<i8255_device, 5> m_ppi;
+	required_device<centronics_device> m_centronics;
 	required_device<fd1791_device> m_fdc;
 	required_device_array<floppy_connector, 3> m_floppy;
 	required_device<screen_device> m_screen;
@@ -114,8 +116,9 @@ private:
 
 	enum : uint8_t
 	{
-		INT_KEYBOARD = 0x08,
-		INT_VBLANK   = 0x10
+		INT_KEYBOARD   = 0x08,
+		INT_VBLANK     = 0x10,
+		INT_CENTRONICS = 0x40
 	};
 
 	void mem_map(address_map &map);
@@ -137,6 +140,9 @@ private:
 	void sod_low_w(uint8_t data);
 	void vblank_w(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void centronics_ctrl_w(uint8_t data);
+	void centronics_busy_w(int state);
 
 	void fdc_drq_w(int state);
 	uint8_t fdc_ctrl_r();
@@ -439,6 +445,25 @@ uint32_t basf7100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 
 //**************************************************************************
+//  CENTRONICS
+//**************************************************************************
+
+void basf7100_state::centronics_ctrl_w(uint8_t data)
+{
+	// ppi configured in mode1 (strobed output)
+	m_centronics->write_strobe(BIT(data, 7));
+}
+
+void basf7100_state::centronics_busy_w(int state)
+{
+	m_int_flags &= ~INT_CENTRONICS;
+	m_int_flags |= state ? 0x00 : INT_CENTRONICS;
+
+	m_pic->ir6_w(state);
+}
+
+
+//**************************************************************************
 //  FLOPPY
 //**************************************************************************
 
@@ -584,9 +609,9 @@ void basf7100_state::basf7100(machine_config &config)
 	m_ppi[0]->out_pc_callback().set(FUNC(basf7100_state::keyboard_w));
 
 	I8255(config, m_ppi[1]);
-	// port a: output (printer data)
+	m_ppi[1]->out_pa_callback().set("centronics_latch", FUNC(output_latch_device::write));
 	// port b: output (leds?)
-	// port c: input (printer handshake)
+	m_ppi[1]->out_pc_callback().set(FUNC(basf7100_state::centronics_ctrl_w));
 
 	I8255(config, m_ppi[2]);
 	// port a: input (rs232 flags, auto dial)
@@ -616,6 +641,14 @@ void basf7100_state::basf7100(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_crt8002);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
+
+	// centronics
+	output_latch_device &centronics_latch(OUTPUT_LATCH(config, "centronics_latch"));
+
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->set_output_latch(centronics_latch);
+	m_centronics->ack_handler().set(m_ppi[1], FUNC(i8255_device::pc6_w));
+	m_centronics->busy_handler().set(FUNC(basf7100_state::centronics_busy_w));
 
 	// floppy
 	FD1791(config, m_fdc, 1000000);
