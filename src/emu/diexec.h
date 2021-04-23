@@ -432,8 +432,9 @@ inline subseconds device_execute_interface::run_for(subseconds subs)
 	ran -= m_cycles.separate.stolen;
 
 	// time should never go backwards, nor should we ever attempt to execute
-	// more than a full second (minimum quantum prevents that)
-	scheduler_assert(ran < m_cycles_per_second);
+	// more than a full second (minimum quantum prevents that); special case if
+	// the clock is 0, as rounding guarantees we ask for at least 1 cycle
+	scheduler_assert(ran < m_cycles_per_second || (ran <= 1 && m_cycles_per_second == 0));
 
 	// update our count of total cycles executed with the true number of cycles
 	m_totalcycles += ran;
