@@ -431,6 +431,7 @@ license:CC0
 
 
 <!-- build screen -->
+
 	<view name="Internal Layout">
 		<bounds left="1" right="129" top="0.5" bottom="90" />
 
