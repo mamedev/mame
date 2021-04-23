@@ -466,7 +466,6 @@ inline uint16_t upd7220_device::read_vram()
 
 inline void upd7220_device::rdat(uint8_t type, uint8_t mod)
 {
-	uint16_t data;
 	if (type == 1)
 	{
 		LOG("uPD7220 invalid type 1 RDAT parameter\n");
@@ -478,6 +477,7 @@ inline void upd7220_device::rdat(uint8_t type, uint8_t mod)
 
 	while (m_figs.m_dc && m_fifo_ptr < (type ? 15 : 14))
 	{
+		uint16_t data;
 		data = read_vram();
 		switch(type)
 		{
@@ -1546,27 +1546,32 @@ void upd7220_device::write(offs_t offset, uint8_t data)
 uint8_t upd7220_device::dack_r()
 {
 	uint8_t result = 0;
-	switch(m_dma_type) {
-	case 0:
-		if (m_dma_transfer_length % 2 == 0) {
+	switch(m_dma_type)
+	{
+		case 0:
+			if (m_dma_transfer_length % 2 == 0)
+			{
+				m_dma_data = read_vram();
+				result = m_dma_data & 0xff;
+			}
+			else
+			{
+				result = (m_dma_data >> 8) & 0xff;
+			}
+			break;
+		case 2:
 			m_dma_data = read_vram();
 			result = m_dma_data & 0xff;
-		} else {
+			break;
+		case 3:
+			m_dma_data = read_vram();
 			result = (m_dma_data >> 8) & 0xff;
-		}
-		break;
-	case 2:
-		m_dma_data = read_vram();
-		result = m_dma_data & 0xff;
-		break;
-	case 3:
-		m_dma_data = read_vram();
-		result = (m_dma_data >> 8) & 0xff;
-		break;
-	default:
-		logerror("uPD7220 Invalid DMA Transfer Type\n");
+			break;
+		default:
+			logerror("uPD7220 Invalid DMA Transfer Type\n");
 	}
-	if (--m_dma_transfer_length == 0) {
+	if (--m_dma_transfer_length == 0)
+	{
 		stop_dma();
 	}
 	return result;
@@ -1579,34 +1584,40 @@ uint8_t upd7220_device::dack_r()
 
 void upd7220_device::dack_w(uint8_t data)
 {
-	switch(m_dma_type) {
-	case 0:
-		if (m_dma_transfer_length % 2) {
-			m_dma_data = ((m_dma_data & 0xff) | data << 8) & m_mask;
+	switch(m_dma_type)
+	{
+		case 0:
+			if (m_dma_transfer_length % 2)
+			{
+				m_dma_data = ((m_dma_data & 0xff) | data << 8) & m_mask;
+				write_vram(m_dma_type, m_dma_mod, m_dma_data);
+			}
+			else
+			{
+				m_dma_data = (m_dma_data & 0xff00) | data;
+			}
+			break;
+		case 2:
+			m_dma_data = data & (m_mask & 0xff);
 			write_vram(m_dma_type, m_dma_mod, m_dma_data);
-		} else {
-			m_dma_data = (m_dma_data & 0xff00) | data;
-		}
-		break;
-	case 2:
-		m_dma_data = data & (m_mask & 0xff);
-		write_vram(m_dma_type, m_dma_mod, m_dma_data);
-		break;
-	case 3:
-		m_dma_data = (data << 8) & (m_mask & 0xff);
-		write_vram(m_dma_type, m_dma_mod, m_dma_data);
-		break;
-	default:
-		logerror("uPD7220 Invalid DMA Transfer Type\n");
+			break;
+		case 3:
+			m_dma_data = (data << 8) & (m_mask & 0xff00);
+			write_vram(m_dma_type, m_dma_mod, m_dma_data);
+			break;
+		default:
+			logerror("uPD7220 Invalid DMA Transfer Type\n");
 	}
-	if (--m_dma_transfer_length == 0) {
+	if (--m_dma_transfer_length == 0)
+	{
 		stop_dma();
 	}
 }
 
 void upd7220_device::start_dma()
 {
-	if ((m_sr & UPD7220_SR_DMA_EXECUTE) == 0) {
+	if ((m_sr & UPD7220_SR_DMA_EXECUTE) == 0)
+	{
 		m_write_drq(ASSERT_LINE);
 		m_sr |= UPD7220_SR_DMA_EXECUTE;
 	}
@@ -1614,7 +1625,8 @@ void upd7220_device::start_dma()
 
 void upd7220_device::stop_dma()
 {
-	if ((m_sr & UPD7220_SR_DMA_EXECUTE) == UPD7220_SR_DMA_EXECUTE) {
+	if ((m_sr & UPD7220_SR_DMA_EXECUTE) == UPD7220_SR_DMA_EXECUTE)
+	{
 		m_write_drq(CLEAR_LINE);
 		m_sr &= ~UPD7220_SR_DMA_EXECUTE;
 		reset_figs_param();
