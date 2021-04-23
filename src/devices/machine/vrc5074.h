@@ -93,7 +93,7 @@ private:
 	emu_timer* m_dma_timer;
 	TIMER_CALLBACK_MEMBER(dma_transfer);
 	emu_timer *m_timer[4];
-	double m_timer_period[4];
+	attotime m_timer_period[4];
 	TIMER_CALLBACK_MEMBER(nile_timer_callback);
 
 	required_memory_region m_romRegion;

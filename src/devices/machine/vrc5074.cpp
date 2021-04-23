@@ -746,11 +746,11 @@ TIMER_CALLBACK_MEMBER(vrc5074_device::nile_timer_callback)
 {
 	int which = param;
 
-	if (LOG_TIMERS | LOG_NILE_IRQS) logerror("timer %d fired period: %e\n", which, m_timer_period[which]);
+	if (LOG_TIMERS | LOG_NILE_IRQS) logerror("timer %d fired period: %s\n", which, m_timer_period[which].as_string());
 
 	/* adjust the timer to fire again */
 	{
-		m_timer[which]->adjust(attotime::from_double(m_timer_period[which]), which);
+		m_timer[which]->adjust(m_timer_period[which], which);
 	}
 
 	/* trigger the interrupt */
@@ -834,7 +834,7 @@ uint32_t vrc5074_device::cpu_reg_r(offs_t offset)
 		if (m_cpu_regs[offset - 1] & 1)
 		{
 			// Should check for cascaded timer
-			result = m_cpu_regs[offset] = m_timer[which]->remaining().as_double() * clock();
+			result = m_cpu_regs[offset] = m_timer[which]->remaining().as_ticks(clock());
 		}
 
 		if (LOG_TIMERS) logerror("%s NILE READ: timer %d counter(%03X) = %08X\n", machine().describe_context(), which, offset * 4, result);
@@ -956,24 +956,24 @@ void vrc5074_device::cpu_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		which = (offset - NREG_T0CTRL) / 4;
 		if (LOG_NILE | LOG_TIMERS) logerror("%s NILE WRITE: timer %d control(%03X) = %08X & %08X\n", machine().describe_context(), which, offset * 4, data, mem_mask);
 		logit = 0;
-		m_timer_period[which] = (uint64_t(m_cpu_regs[NREG_T0CTRL + which * 4]) + 1) * attotime::from_hz(clock()).as_double();
+		m_timer_period[which] = attotime::from_ticks(uint64_t(m_cpu_regs[NREG_T0CTRL + which * 4]) + 1, clock());
 		if (m_cpu_regs[offset] & 2) {
 			// Cascade timer
 			uint32_t scaleSrc = (m_cpu_regs[offset] >> 2) & 0x3;
-			m_timer_period[which] += (uint64_t(m_cpu_regs[NREG_T0CTRL + scaleSrc * 4]) + 1) * attotime::from_hz(clock()).as_double();
+			m_timer_period[which] += attotime::from_ticks(uint64_t(m_cpu_regs[NREG_T0CTRL + scaleSrc * 4]) + 1, clock());
 			logerror("Timer scale: timer %d is scaled by %08X\n", which, m_cpu_regs[NREG_T0CTRL + which * 4]);
 		}
 		/* timer just enabled? */
 		if (!(olddata & 1) && (m_cpu_regs[offset] & 1))
 		{
-			m_timer[which]->adjust(attotime::from_hz(clock()) * m_cpu_regs[NREG_T0CNTR + which * 4], which);
-			if (LOG_TIMERS) logerror("Starting timer %d at a rate of %f Hz\n", which, attotime::from_double(m_timer_period[which]).as_hz());
+			m_timer[which]->adjust(attotime::from_ticks(m_cpu_regs[NREG_T0CNTR + which * 4], clock()), which);
+			if (LOG_TIMERS) logerror("Starting timer %d at a rate of %f Hz\n", which, m_timer_period[which].as_hz());
 		}
 
 		/* timer disabled? */
 		else if ((olddata & 1) && !(m_cpu_regs[offset] & 1))
 		{
-			m_cpu_regs[offset + 1] = m_timer[which]->remaining().as_double() * clock();
+			m_cpu_regs[offset + 1] = m_timer[which]->remaining().as_ticks(clock());
 			m_timer[which]->adjust(attotime::never, which);
 		}
 		break;
@@ -988,7 +988,7 @@ void vrc5074_device::cpu_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 		if (m_cpu_regs[offset - 1] & 1)
 		{
-			m_timer[which]->adjust(attotime::from_hz(clock()) * m_cpu_regs[offset], which);
+			m_timer[which]->adjust(attotime::from_ticks(m_cpu_regs[offset], clock()), which);
 		}
 		break;
 	}

@@ -24,7 +24,6 @@
  *
  *************************************/
 
-#define TIMER_PERIOD        attotime::from_hz(clock())
 #define PCI_BUS_CLOCK       33000000
 // Number of dma words to transfer at a time, real hardware configurable between 8-32
 #define DMA_BURST_SIZE      32
@@ -635,7 +634,7 @@ uint32_t gt64xxx_device::cpu_if_r(offs_t offset)
 			result = timer->count;
 			if (timer->active)
 			{
-				uint32_t elapsed = (timer->timer->elapsed() * clock()).as_double();
+				uint32_t elapsed = timer->timer->elapsed().as_ticks(clock());
 				result = (result > elapsed) ? (result - elapsed) : 0;
 			}
 
@@ -773,12 +772,12 @@ void gt64xxx_device::cpu_if_w(address_space &space, offs_t offset, uint32_t data
 						if (which != 0)
 							timer->count &= 0xffffff;
 					}
-					timer->timer->adjust(TIMER_PERIOD * timer->count, which);
-					LOGTIMERS("Adjusted timer to fire in %f secs\n", (TIMER_PERIOD * timer->count).as_double());
+					timer->timer->adjust(attotime::from_ticks(timer->count, clock()), which);
+					LOGTIMERS("Adjusted timer to fire in %s secs\n", attotime::from_ticks(timer->count, clock()).as_string());
 				}
 				else if (timer->active && !(data & mask))
 				{
-					uint32_t elapsed = (timer->timer->elapsed() * clock()).as_double();
+					uint32_t elapsed = timer->timer->elapsed().as_ticks(clock());
 					timer->active = 0;
 					timer->count = (timer->count > elapsed) ? (timer->count - elapsed) : 0;
 					timer->timer->adjust(attotime::never, which);
@@ -873,7 +872,7 @@ TIMER_CALLBACK_MEMBER(gt64xxx_device::timer_callback)
 
 	/* if we're a timer, adjust the timer to fire again */
 	if (m_reg[GREG_TIMER_CONTROL] & (2 << (2 * which)))
-		timer->timer->adjust(TIMER_PERIOD * timer->count, which);
+		timer->timer->adjust(attotime::from_ticks(timer->count, clock()), which);
 	else
 		timer->active = timer->count = 0;
 
