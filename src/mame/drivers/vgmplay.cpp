@@ -355,6 +355,7 @@ private:
 	address_space *m_file = nullptr, *m_io = nullptr, *m_io16le = nullptr, *m_io16be = nullptr;
 
 	int m_icount = 0;
+	int m_leftover_icount = 0;
 	int m_state = RESET;
 	bool m_paused = false;
 	bool m_loop = false;
@@ -968,6 +969,9 @@ TIMER_CALLBACK_MEMBER(vgmplay_device::stream_timer_expired)
 
 void vgmplay_device::execute_run()
 {
+	if (m_leftover_icount > 0)
+		m_icount -= m_leftover_icount;
+
 	while (m_icount > 0)
 	{
 		switch (m_state)
@@ -1941,6 +1945,16 @@ void vgmplay_device::execute_run()
 			break;
 		}
 		}
+	}
+
+	// we can end up with a large negative icount when there is a long delay;
+	// scheduler gets grumpy if we return with too big of a negative icount
+	// (more than 1 second), so guard against that by remembering our negative
+	// icount and reapplying it on the next execution
+	if (m_icount < 0)
+	{
+		m_leftover_icount = -m_icount;
+		m_icount = 0;
 	}
 }
 
