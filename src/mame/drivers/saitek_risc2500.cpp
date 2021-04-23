@@ -33,7 +33,11 @@ Undocumented buttons:
 
 TODO:
 - bootrom disable timer shouldn't be needed, real ARM has already fetched the next opcode
-- more accurate dynamic cpu clock divider (without the cost of emulation speed)
+- More accurate dynamic cpu clock divider, without the cost of emulation speed.
+  The current implementation catches almost everything, luckily ARM opcodes have a
+  fixed length. It only fails to detect ALU opcodes that directly modify pc(R15).
+  It also possibly has problems with very short subroutine calls from ROM to RAM,
+  but I tested for those and the shortest one is more than 50 cycles.
 
 ******************************************************************************/
 
@@ -224,7 +228,7 @@ u32 risc2500_state::disable_boot_rom_r()
 {
 	// disconnect bootrom from the bus after next opcode
 	if (m_bootrom_enabled && !m_disable_bootrom->enabled() && !machine().side_effects_disabled())
-		m_disable_bootrom->adjust(m_maincpu->cycles_to_attotime(5));
+		m_disable_bootrom->adjust(m_maincpu->cycles_to_attotime(10));
 
 	return 0;
 }
@@ -326,7 +330,7 @@ u32 risc2500_state::rom_r(offs_t offset)
 		if (diff >= 0)
 		{
 			static constexpr int arm_branch_cycles = 3;
-			static constexpr int arm_max_cycles = 17; // block data transfer
+			static constexpr int arm_max_cycles = 17; // datablock transfer
 			static constexpr int divider = -8 + 1;
 
 			// this takes care of almost all cases, otherwise, total cycles taken can't be determined

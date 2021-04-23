@@ -180,7 +180,7 @@ u32 tasc_state::input_r()
 	{
 		// disconnect bootrom from the bus after next opcode
 		if (m_bootrom_enabled && !m_disable_bootrom->enabled())
-			m_disable_bootrom->adjust(m_maincpu->cycles_to_attotime(5));
+			m_disable_bootrom->adjust(m_maincpu->cycles_to_attotime(10));
 
 		m_maincpu->set_input_line(ARM_FIRQ_LINE, CLEAR_LINE);
 	}
@@ -234,7 +234,7 @@ u32 tasc_state::rom_r(offs_t offset)
 		if (diff >= 0)
 		{
 			static constexpr int arm_branch_cycles = 3;
-			static constexpr int arm_max_cycles = 17; // block data transfer
+			static constexpr int arm_max_cycles = 17; // datablock transfer
 			static constexpr int divider = -7 + 1;
 
 			// this takes care of almost all cases, otherwise, total cycles taken can't be determined
