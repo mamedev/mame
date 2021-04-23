@@ -41901,4 +41901,74 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="deplog">
+		<description>Depreciation Log (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Harvest Computer Systems</publisher>
+		<info name="release" value="2021-04-22"/>
+		<!--"Depreciation Log" is a 1985 productivity program developed by Gary Randolph and distributed by Harvest Computer Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="depreciation log (4am crack).dsk" size="143360" crc="408a78da" sha1="5692f9a325d2920c6d783f5312aff40059e4b400"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advinspc">
+		<description>Adventures in Space (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Intellectual Software</publisher>
+		<info name="release" value="2021-04-22"/>
+		<!--"Adventures in Space" is a 1983 educational program developed and distributed by Intellectual Software. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="adventures in space (4am crack).dsk" size="143360" crc="e0c1bf7b" sha1="34c02fa6158c91faa1525d72ecf3d64bf1aae44b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ugtabsys">
+		<description>Utopia Graphics Tablet System (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Utopia Software Development</publisher>
+		<info name="release" value="2021-04-22"/>
+		<info name="usage" value="Requires an Apple Graphics Tablet or compatible hardware" />
+		<!--"Utopia Graphics Tablet System" is a 1980 graphics program developed and distributed by Utopia Software Development. It requires an Apple Graphics Tablet or compatible hardware. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="utopia graphics tablet system (4am and san inc crack).dsk" size="143360" crc="b29b01c0" sha1="e92de955703d05316208cd19fefa72566e8fa5c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="schltool">
+		<description>The School Tool (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Encyclopaedia Britannica</publisher>
+		<info name="release" value="2021-04-22"/>
+		<!--"The School Tool" is a 1983 educational program developed and distributed by Encyclopaedia Britannica Educational Corporation. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the school tool (4am crack) disk 1.dsk" size="143360" crc="87c7f19c" sha1="57c6d5cfdb053e650c7835773813795b6a636365"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Boot"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the school tool (4am crack) disk 2 (boot).dsk" size="143360" crc="fef65f33" sha1="4209c6c2df974f6ec05db07c3871d0705395ef14"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the school tool (4am crack) disk 3.dsk" size="143360" crc="8b1b0641" sha1="65b78d70baab3cd4b04089eab8e8f9f21fdc86fe"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
