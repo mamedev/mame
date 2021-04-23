@@ -264,7 +264,6 @@ function xml.conv_cheat(data)
 		if next(spaces) then
 			data["cheat"][count]["space"] = {}
 			for name, space in pairs(spaces) do
-				data["cheat"][count]["space"] = {}
 				data["cheat"][count]["space"][name] = { type = space["type"], tag = space["tag"] }
 			end
 		end
