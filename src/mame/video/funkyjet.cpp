@@ -41,4 +41,3 @@ uint32_t funkyjet_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	return 0;
 }
-
