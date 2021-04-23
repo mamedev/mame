@@ -270,7 +270,6 @@ function xml.conv_cheat(data)
 		if next(regions) then
 			data["cheat"][count]["region"] = {}
 			for name, region in pairs(regions) do
-				data["cheat"][count]["region"] = {}
 				data["cheat"][count]["region"][name] = region
 			end
 		end
