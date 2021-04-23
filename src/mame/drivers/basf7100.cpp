@@ -40,8 +40,8 @@
     TODO:
     - Dump real character ROM
 	- Improve video emulation
-	- Find documentation for switches
-	- Hook up serial ports
+	- Find documentation for switches S2, S3, S4 (might app. specific)
+	- Serial interrupts, flags, control
 
     Notes:
     - Runs the BOS operating system, possibly also CP/M?
@@ -51,10 +51,12 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/com8116.h"
+#include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
 #include "machine/wd_fdc.h"
 #include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
 #include "imagedev/floppy.h"
 #include "machine/basf7100_kbd.h"
 #include "emupal.h"
@@ -77,6 +79,7 @@ public:
 		m_fdccpu(*this, "fdccpu"),
 		m_pic(*this, "pic"),
 		m_ppi(*this, "ppi%u", 0U),
+		m_usart(*this, "usart%u", 0U),
 		m_centronics(*this, "centronics"),
 		m_fdc(*this, "fdc"),
 		m_floppy(*this, "fdc:%u", 0),
@@ -105,6 +108,7 @@ private:
 	required_device<z80_device> m_fdccpu;
 	required_device<pic8259_device> m_pic;
 	required_device_array<i8255_device, 5> m_ppi;
+	required_device_array<i8251_device, 2> m_usart;
 	required_device<centronics_device> m_centronics;
 	required_device<fd1791_device> m_fdc;
 	required_device_array<floppy_connector, 3> m_floppy;
@@ -184,10 +188,10 @@ void basf7100_state::io_map(address_map &map)
 	map(0x04, 0x07).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x09).mirror(0x02).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0c, 0x0f).rw(m_ppi[2], FUNC(i8255_device::read), FUNC(i8255_device::write));
-//	map(0x10, 0x11) 8251 (primary)
-	map(0x12, 0x12).w("com8116_0", FUNC(com8116_device::stt_str_w)); // or str_stt_w
-//	map(0x14, 0x15) 8251 (secondary)
-	map(0x16, 0x16).w("com8116_1", FUNC(com8116_device::stt_str_w)); // or str_stt_w
+	map(0x10, 0x11).rw(m_usart[0], FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x12, 0x12).w("brg0", FUNC(com8116_device::stt_str_w)); // or str_stt_w
+	map(0x14, 0x15).rw(m_usart[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x16, 0x16).w("brg1", FUNC(com8116_device::stt_str_w)); // or str_stt_w
 //	map(0x17, 0x17) rs232 flags/control
 	map(0x18, 0x18).lr8(NAME([this] () -> uint8_t { return m_int_flags; }));
 	map(0x1c, 0x1c).portr("S1");
@@ -225,7 +229,7 @@ void basf7100_state::fdc_io_map(address_map &map)
 
 static INPUT_PORTS_START( basf7100 )
 	PORT_START("S1")
-	PORT_DIPNAME(0x0f, 0x0e, "Baud Rate") PORT_DIPLOCATION("S1:1,2,3,4")
+	PORT_DIPNAME(0x0f, 0x0e, "Baud Rate")      PORT_DIPLOCATION("S1:1,2,3,4")
 	PORT_DIPSETTING(   0x00, "50")
 	PORT_DIPSETTING(   0x01, "75")
 	PORT_DIPSETTING(   0x02, "110")
@@ -242,10 +246,17 @@ static INPUT_PORTS_START( basf7100 )
 	PORT_DIPSETTING(   0x0d, "7200")
 	PORT_DIPSETTING(   0x0e, "9600")
 	PORT_DIPSETTING(   0x0f, "19800")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "S1:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "S1:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "S1:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "S1:8")
+	PORT_DIPNAME(0x30, 0x30, "Data Bits")      PORT_DIPLOCATION("S1:5,6")
+	PORT_DIPSETTING(   0x00, "5")
+	PORT_DIPSETTING(   0x10, "6")
+	PORT_DIPSETTING(   0x20, "7")
+	PORT_DIPSETTING(   0x30, "8")
+	PORT_DIPNAME(0x40, 0x00, "Parity Enabled") PORT_DIPLOCATION("S1:7")
+	PORT_DIPSETTING(   0x00, DEF_STR(No))
+	PORT_DIPSETTING(   0x40, DEF_STR(Yes))
+	PORT_DIPNAME(0x80, 0x80, "Parity")         PORT_DIPLOCATION("S1:8")
+	PORT_DIPSETTING(   0x00, "Odd")
+	PORT_DIPSETTING(   0x80, "Even")
 
 	PORT_START("S2")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "S2:1")
@@ -599,9 +610,33 @@ void basf7100_state::basf7100(machine_config &config)
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	COM8116(config, "com8116_0", 5.0688_MHz_XTAL);
+	I8251(config, m_usart[0], 0); // unknown clock
+	m_usart[0]->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_usart[0]->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_usart[0]->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
-	COM8116(config, "com8116_1", 5.0688_MHz_XTAL);
+	com8116_device &brg0(COM8116(config, "brg0", 5.0688_MHz_XTAL));
+	brg0.fr_handler().set(m_usart[0], FUNC(i8251_device::write_rxc));
+	brg0.ft_handler().set(m_usart[0], FUNC(i8251_device::write_txc));
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_usart[0], FUNC(i8251_device::write_rxd));
+	rs232.cts_handler().set(m_usart[0], FUNC(i8251_device::write_cts));
+	rs232.dsr_handler().set(m_usart[0], FUNC(i8251_device::write_dsr));
+
+	I8251(config, m_usart[1], 0); // unknown clock
+	m_usart[1]->txd_handler().set("auxrs232", FUNC(rs232_port_device::write_txd));
+	m_usart[1]->rts_handler().set("auxrs232", FUNC(rs232_port_device::write_rts));
+	m_usart[1]->dtr_handler().set("auxrs232", FUNC(rs232_port_device::write_dtr));
+
+	com8116_device &brg1(COM8116(config, "brg1", 5.0688_MHz_XTAL));
+	brg1.fr_handler().set(m_usart[1], FUNC(i8251_device::write_rxc));
+	brg1.ft_handler().set(m_usart[1], FUNC(i8251_device::write_txc));
+
+	rs232_port_device &auxrs232(RS232_PORT(config, "auxrs232", default_rs232_devices, nullptr));
+	auxrs232.rxd_handler().set(m_usart[1], FUNC(i8251_device::write_rxd));
+	auxrs232.cts_handler().set(m_usart[1], FUNC(i8251_device::write_cts));
+	auxrs232.dsr_handler().set(m_usart[1], FUNC(i8251_device::write_dsr));
 
 	I8255(config, m_ppi[0]);
 	// port a: input (switches?)
