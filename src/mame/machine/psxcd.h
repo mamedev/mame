@@ -46,6 +46,7 @@ private:
 	typedef void (psxcd_device::*cdcmd)();
 	struct command_result
 	{
+		bool allocated = false;
 		uint8_t data[32], sz, res;
 		command_result *next;
 	};
@@ -148,6 +149,7 @@ private:
 	uint32_t m_param_count;
 	uint32_t m_sysclock;
 	emu_timer *m_timers[MAX_PSXCD_TIMERS];
+	command_result m_command_result[MAX_PSXCD_TIMERS];
 	bool m_timerinuse[MAX_PSXCD_TIMERS];
 
 	devcb_write_line m_irq_handler;

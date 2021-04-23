@@ -114,7 +114,7 @@ void psxcd_device::device_start()
 
 	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
 	{
-		m_timers[i] = timer_alloc(i);
+		m_timers[i] = timer_alloc(i, &m_command_result[i]);
 		m_timerinuse[i] = false;
 	}
 
@@ -139,19 +139,18 @@ void psxcd_device::device_start()
 	save_item(NAME(next_sector_t));
 	save_item(NAME(autopause_sector));
 	save_item(NAME(m_param_count));
+	save_item(STRUCT_MEMBER(m_command_result, data));
+	save_item(STRUCT_MEMBER(m_command_result, sz));
+	save_item(STRUCT_MEMBER(m_command_result, res));
 }
 
 void psxcd_device::device_stop()
 {
-	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
-	{
-		if(m_timerinuse[i] && m_timers[i]->ptr())
-			delete (command_result *)m_timers[i]->ptr();
-	}
 	while(res_queue)
 	{
 		command_result *res = res_queue->next;
-		delete res_queue;
+		if (res->allocated)
+			delete res_queue;
 		res_queue = res;
 	}
 }
@@ -163,8 +162,6 @@ void psxcd_device::device_reset()
 
 	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
 	{
-		if(m_timerinuse[i] && m_timers[i]->ptr())
-			delete (command_result *)m_timers[i]->ptr();
 		m_timers[i]->adjust(attotime::never, 0, attotime::never);
 		m_timerinuse[i] = false;
 	}
@@ -175,7 +172,8 @@ void psxcd_device::device_reset()
 	while(res_queue)
 	{
 		command_result *res = res_queue->next;
-		delete res_queue;
+		if (res->allocated)
+			delete res_queue;
 		res_queue = res;
 	}
 
@@ -363,7 +361,8 @@ void psxcd_device::write(offs_t offset, uint8_t data)
 						m_int1 = nullptr;
 
 					res_queue = res->next;
-					delete res;
+					if (res->allocated)
+						delete res;
 					m_regs.sr &= ~0x20;
 					rdp = 0;
 					if(res_queue)
@@ -868,6 +867,7 @@ void psxcd_device::cmd_complete(command_result *res)
 psxcd_device::command_result *psxcd_device::prepare_result(uint8_t res, uint8_t *data, int sz, uint8_t errcode)
 {
 	auto cr=new command_result;
+	cr->allocated = true;
 
 	cr->res=res;
 	if (sz)
@@ -1225,7 +1225,13 @@ int psxcd_device::add_system_event(int type, uint64_t t, command_result *ptr)
 		if(!m_timerinuse[i])
 		{
 			m_timers[i]->adjust(attotime::from_hz(hz), type, attotime::never);
-			m_timers[i]->set_ptr(ptr);
+			if (ptr != nullptr)
+			{
+				m_command_result[i] = *ptr;
+				if (ptr->allocated)
+					delete ptr;
+				m_command_result[i].allocated = false;
+			}
 			m_timerinuse[i] = true;
 			return i;
 		}
