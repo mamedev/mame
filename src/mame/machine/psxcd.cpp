@@ -149,7 +149,7 @@ void psxcd_device::device_stop()
 	while(res_queue)
 	{
 		command_result *res = res_queue->next;
-		if (res->allocated)
+		if (res_queue->allocated)
 			delete res_queue;
 		res_queue = res;
 	}
@@ -172,7 +172,7 @@ void psxcd_device::device_reset()
 	while(res_queue)
 	{
 		command_result *res = res_queue->next;
-		if (res->allocated)
+		if (res_queue->allocated)
 			delete res_queue;
 		res_queue = res;
 	}
