@@ -820,7 +820,7 @@ TIMER_CALLBACK_MEMBER(viper_state::epic_global_timer_callback)
 
 	if (m_epic.global_timer[timer_num].enable && m_epic.global_timer[timer_num].base_count > 0)
 	{
-		attotime timer_duration =  attotime::from_hz((SDRAM_CLOCK / 8) / m_epic.global_timer[timer_num].base_count);
+		attotime timer_duration = attotime::from_ticks(m_epic.global_timer[timer_num].base_count, SDRAM_CLOCK / 8);
 		m_epic.global_timer[timer_num].timer->adjust(timer_duration, timer_num);
 
 #if VIPER_DEBUG_EPIC_TIMERS
@@ -1253,7 +1253,7 @@ void viper_state::epic_w(offs_t offset, uint32_t data)
 
 					if (m_epic.global_timer[timer_num].enable && m_epic.global_timer[timer_num].base_count > 0)
 					{
-						attotime timer_duration =  attotime::from_hz((SDRAM_CLOCK / 8) / m_epic.global_timer[timer_num].base_count);
+						attotime timer_duration = attotime::from_ticks(m_epic.global_timer[timer_num].base_count, SDRAM_CLOCK / 8);
 						m_epic.global_timer[timer_num].timer->adjust(timer_duration, timer_num);
 
 #if VIPER_DEBUG_EPIC_TIMERS
