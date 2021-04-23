@@ -745,6 +745,7 @@ inline std::enable_if_t<std::is_integral<T>::value, attotime> &attotime::operato
 	{
 		// compute the coarse part; this is a 64/32-bit divide, with a remainder
 		// that fits in 32 bits
+		u32 remainder;
 		u64 coarse = divu_64x32_rem(m_coarse, factor, remainder);
 
 		// compute the fine part by combining the remainder with the fine part
