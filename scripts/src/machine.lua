@@ -4619,6 +4619,7 @@ end
 ---------------------------------------------------
 
 if (MACHINES["CXD1185"]~=null) then
+	MACHINES["NSCSI"] = true
 	files {
 		MAME_DIR .. "src/devices/machine/cxd1185.cpp",
 		MAME_DIR .. "src/devices/machine/cxd1185.h",
