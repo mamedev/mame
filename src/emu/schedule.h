@@ -649,7 +649,6 @@ private:
 
 	// scheduling helpers
 	void compute_perfect_interleave();
-	void rebuild_execute_list();
 	void apply_suspend_changes();
 	void add_scheduling_quantum(subseconds quantum, attotime const &duration);
 
@@ -698,7 +697,6 @@ private:
 	u64                         m_execute_timers_average = 0;
 	u64                         m_update_basetime = 0;
 	u64                         m_compute_perfect_interleave = 0;
-	u64                         m_rebuild_execute_list = 0;
 	u64                         m_apply_suspend_changes = 0;
 	u64                         m_add_scheduling_quantum = 0;
 	u64                         m_instance_alloc = 0;

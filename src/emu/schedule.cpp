@@ -476,6 +476,11 @@ persistent_timer &persistent_timer::adjust(attotime const &start_delay, s32 para
 		m_instance.remove();
 	if (!expire.is_never())
 		m_instance.insert(start, expire);
+	else
+	{
+		m_instance.m_start = start;
+		m_instance.m_expire = expire;
+	}
 
 	// mark as modified
 	m_modified = true;
@@ -604,7 +609,6 @@ device_scheduler::~device_scheduler()
 		printf("%12.2f    update_basetime\n", m_update_basetime / seconds);
 		printf("%12.2f    apply_suspend_changes\n", m_apply_suspend_changes / seconds);
 		printf("%12.2f compute_perfect_interleave\n", m_compute_perfect_interleave / seconds);
-		printf("%12.2f rebuild_execute_list\n", m_rebuild_execute_list / seconds);
 		printf("%12.2f add_scheduling_quantum\n", m_add_scheduling_quantum / seconds);
 		printf("%12.2f instance_alloc (%u full)\n", m_instance_alloc / seconds, u32(m_instance_alloc_full));
 		u64 total_insert = m_instance_insert_head + m_instance_insert_tail + m_instance_insert_middle;
@@ -647,6 +651,16 @@ void device_scheduler::finalize()
 	subseconds min_quantum = machine().config().maximum_quantum(MAX_QUANTUM).as_subseconds();
 	min_quantum = std::min(min_quantum, MAX_QUANTUM);
 
+	// create a fast list of executing devices
+	device_execute_interface **tailptr = &m_execute_list;
+	*tailptr = nullptr;
+	for (device_execute_interface &exec : execute_interface_enumerator(machine().root_device()))
+	{
+		exec.m_nextexec = nullptr;
+		*tailptr = &exec;
+		tailptr = &exec.m_nextexec;
+	}
+
 	// if the configuration specifies a device to make perfect, pick that as the minimum
 	device_execute_interface *const exec(machine().config().perfect_quantum_device());
 	if (exec != nullptr)
@@ -656,7 +670,6 @@ void device_scheduler::finalize()
 	add_scheduling_quantum(min_quantum, attotime::never);
 
 	// build the initial list of executing devices and compute the perfect interleave
-	rebuild_execute_list();
 	compute_perfect_interleave();
 
 	// save states
@@ -1016,7 +1029,6 @@ void device_scheduler::postload()
 	update_basetime();
 	update_first_timer_expire();
 	m_suspend_changes_pending = true;
-	rebuild_execute_list();
 
 	// report the timer state after a log
 	LOG("After resetting/reordering timers:\n");
@@ -1147,46 +1159,6 @@ void device_scheduler::compute_perfect_interleave()
 
 
 //-------------------------------------------------
-//  rebuild_execute_list - rebuild the list of
-//  executing CPUs, moving suspended CPUs to the
-//  end
-//-------------------------------------------------
-
-void device_scheduler::rebuild_execute_list()
-{
-	INCREMENT_SCHEDULER_STAT(m_rebuild_execute_list);
-
-	// start with an empty list
-	device_execute_interface **active_tailptr = &m_execute_list;
-	*active_tailptr = nullptr;
-
-	// also make an empty list of suspended devices
-	device_execute_interface *suspend_list = nullptr;
-	device_execute_interface **suspend_tailptr = &suspend_list;
-
-	// iterate over all devices
-	for (device_execute_interface &exec : execute_interface_enumerator(machine().root_device()))
-	{
-		// append to the appropriate list
-		exec.m_nextexec = nullptr;
-		if (exec.m_suspend == 0)
-		{
-			*active_tailptr = &exec;
-			active_tailptr = &exec.m_nextexec;
-		}
-		else
-		{
-			*suspend_tailptr = &exec;
-			suspend_tailptr = &exec.m_nextexec;
-		}
-	}
-
-	// append the suspend list to the end of the active list
-	*active_tailptr = suspend_list;
-}
-
-
-//-------------------------------------------------
 //  apply_suspend_changes - applies suspend/resume
 //  changes to all device_execute_interfaces
 //-------------------------------------------------
@@ -1200,11 +1172,8 @@ inline void device_scheduler::apply_suspend_changes()
 	for (device_execute_interface *exec = m_execute_list; exec != nullptr; exec = exec->m_nextexec)
 		suspendchanged |= exec->update_suspend();
 
-	// recompute the execute list if any CPUs changed their suspension state
-	if (suspendchanged != 0)
-		rebuild_execute_list();
-	else
-		m_suspend_changes_pending = false;
+	// no more pending
+	m_suspend_changes_pending = false;
 }
 
 
