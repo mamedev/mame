@@ -9,12 +9,11 @@
 ---
 
 	Still to do:
-	- Verify performance of calling through delegate ptr vs copying the delegate
-	- Rebuilding suspend/execute lists seems like it's doing a lot of work, consolidate?
-	- Test out save states
+	- Fix remaining drivers that are buggy
 	- Clean up timer devices
+	- Allow saving/restoring in the middle of a timeslice
+	- Rebuilding suspend/execute lists seems like it's doing a lot of work, consolidate?
 	- Clean up more timers in devices/drivers
-	- Get rid of eat_all_cycles() and implement hard_stop()
 
 ***************************************************************************/
 
