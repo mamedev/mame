@@ -457,10 +457,6 @@ void dgn_beta_state::d_pia1_pa_w(uint8_t data)
 		LOG_HALT(("DMA_CPU HALT=%d\n", HALT_DMA));
 		m_dmacpu->set_input_line(INPUT_LINE_HALT, HALT_DMA);
 
-		/* CPU un-halted let it run ! */
-		if (HALT_DMA == CLEAR_LINE)
-			m_maincpu->yield();
-
 		m_d_pia1_pa_last = data & 0x80;
 	}
 
@@ -509,10 +505,6 @@ void dgn_beta_state::d_pia1_pb_w(uint8_t data)
 		m_maincpu->set_input_line(INPUT_LINE_HALT, HALT_CPU);
 
 		m_d_pia1_pb_last = data & 0x02;
-
-		/* CPU un-halted let it run ! */
-		if (HALT_CPU == CLEAR_LINE)
-			m_dmacpu->yield();
 	}
 }
 
@@ -559,8 +551,6 @@ void dgn_beta_state::d_pia2_pa_w(uint8_t data)
 		if(!NMI)
 		{
 			m_dmacpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-			logerror("device_yield()\n");
-			m_dmacpu->yield();    /* Let DMA CPU run */
 		}
 		else
 		{
