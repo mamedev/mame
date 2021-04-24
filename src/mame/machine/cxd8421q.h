@@ -2,7 +2,7 @@
 // copyright-holders:Brice Onken
 
 /*
- * Sony CXD8421Q WSC-ESCC1 Serial Controller AP-Bus Interface
+ * Sony CXD8421Q WSC-ESCC1 Serial Controller APbus Interface
  *
  * Only the direct passthrough to the ESCC is working. However, the monitor ROM only uses the
  * passthrough capability, so this actually is all that is needed to get to the monitor ROM prompt.

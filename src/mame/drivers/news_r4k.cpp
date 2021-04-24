@@ -54,18 +54,18 @@
  *   - Main memory: partially emulated (hack required for the monitor ROM to enumerate RAM correctly)
  *  I/O board:
  *   - Sony CXD8409Q Parallel Interface: not emulated
- *   - National Semi PC8477B Floppy Controller: partially emulated (MAME only has the -A version currently)
+ *   - National Semi PC8477B Floppy Controller: emulated (uses the -A version currently, but it seems to work)
  *   - Zilog Z8523010VSC ESCC serial interface: emulated (see following)
- *   - Sony CXD8421Q WSC-ESCC1 serial AP-Bus interface controller: skeleton (ESCC connections, probably DMA, AP-Bus interface, etc. handled by this chip)
- *   - 2x Sony CXD8442Q WSC-FIFO AP-Bus FIFO/interface chips: not emulated (handles AP-bus connections and probably DMA for sound, floppy, etc.)
+ *   - Sony CXD8421Q WSC-ESCC1 serial APbus interface controller: skeleton (ESCC connections, probably DMA, APbus interface, etc. handled by this chip)
+ *   - 2x Sony CXD8442Q WSC-FIFO APbus FIFO/interface chips: partially emulated (handles APbus connections and probably DMA for sound, floppy, etc.)
  *   - National Semi DP83932B-VF SONIC Ethernet controller: not emulated (also, MAME only has the -C version currently)
- *   - Sony CXD8452AQ WSC-SONIC3 SONIC Ethernet AP-Bus interface controller: not emulated
+ *   - Sony CXD8452AQ WSC-SONIC3 SONIC Ethernet APbus interface controller: not emulated
  *   - Sony CXD8418Q WSC-PARK3: not emulated (most likely a gate array based on what the PARK2 was in older gen NEWS systems)
  *   - Sony CXD8403Q DMAC3Q DMA controller: skeleton
  *   - 2x HP 1TV3-0302 SPIFI3 SCSI controllers: skeleton
  *   - ST Micro M58T02-150PC1 Timekeeper RAM: emulated
  *  DSC-39 XB Framebuffer/video card:
- *   - Sony CXD8486Q XB: not emulated (most likely AP-Bus interface)
+ *   - Sony CXD8486Q XB: not emulated (most likely APbus interface)
  *   - 16x NEC D482235G5 Dual Port Graphics Buffers: not emulated
  *   - Brooktree Bt468KG220 RAMDAC: not emulated
  */
@@ -86,6 +86,7 @@
 #include "machine/news_hid.h"
 #include "machine/spifi3.h"
 #include "machine/upd765.h"
+#include "machine/cxd8442q.h"
 #include "machine/cxd8421q.h"
 
 // Buses
@@ -111,6 +112,7 @@ public:
           m_ram(*this, "ram"),
           m_rtc(*this, "rtc"),
           m_escc(*this, "escc1"),
+          m_fifo0(*this, "fifo0"),
           m_fdc(*this, "fdc"),
           m_hid(*this, "hid"),
           m_dmac(*this, "dmac"),
@@ -185,10 +187,6 @@ protected:
     void irq_w(int state) { generic_irq_w(4, Number, state); }
     void int_check();
 
-    // this is temporary and will be moved to a device once I get it working
-    void fdc_fifo_irq_w(int state);
-    void fdc_fifo_drq_w(int state);
-
 #ifndef NO_MIPS3
     const int interrupt_map[6] = {MIPS3_IRQ0, MIPS3_IRQ1, MIPS3_IRQ2, MIPS3_IRQ3, MIPS3_IRQ4, MIPS3_IRQ5};
 #else
@@ -211,6 +209,9 @@ protected:
     // Sony CXD8421Q ESCC1 serial controller (includes a Zilog ESCC)
     required_device<cxd8421q_device> m_escc;
 
+    // Sony CXD8442Q APbus FIFO (2x, but only one set up so far)
+    required_device<cxd8442q_device> m_fifo0;
+
     // SONIC ethernet controller - a different rev, the DP83932C, is emulated in MAME
     // so it hopefully will work with just a little modification.
     // required_device<dp83932c_device> m_net;
@@ -218,70 +219,54 @@ protected:
     // National Semiconductor PC8477B floppy controller
     required_device<pc8477a_device> m_fdc;
 
-    // this is temporary and will be moved to a device once I get it working
-    void fdc_fifo_mask_w(offs_t offset, uint32_t count);
-    void fdc_fifo_dmaen_w(offs_t offset, uint32_t state);
-    uint32_t fdc_fifo_data_r(uint32_t offset);
-    TIMER_CALLBACK_MEMBER(fdc_fifo_dma_execute);
-    bool fdc_fifo_dmaen = false;
-    uint32_t fdc_fifo_mask = 0;
-    int fdc_fifo_drq = 0;
-    int fdc_fifo_rawint = 0;
-    uint32_t fdc_fifo_count = 0;
-    uint32_t fdc_fifo_w_position = 0;
-    uint32_t fdc_fifo_r_position = 0;
-    std::unique_ptr<uint32_t[]> fdc_fifo_ram;
-    emu_timer *fdc_fifo_timer;
-    const int FIFO_RAM_SIZE = 524288; // supposedly the max FIFO ram size
+    // NEWS keyboard and mouse
+    required_device<news_hid_hle_device> m_hid;
 
-        // NEWS keyboard and mouse
-        required_device<news_hid_hle_device> m_hid;
+    // DMAC3 DMA controller
+    required_device<dmac3_device> m_dmac;
 
-        // DMAC3 DMA controller
-        required_device<dmac3_device> m_dmac;
+    // HP SPIFI3 SCSI controller (2x)
+    required_device<spifi3_device> m_scsi0;
+    required_device<spifi3_device> m_scsi1;
+    required_device<nscsi_bus_device> m_scsibus0;
+    required_device<nscsi_bus_device> m_scsibus1;
 
-        // HP SPIFI3 SCSI controller (2x)
-        required_device<spifi3_device> m_scsi0;
-        required_device<spifi3_device> m_scsi1;
-        required_device<nscsi_bus_device> m_scsibus0;
-        required_device<nscsi_bus_device> m_scsibus1;
+    // LED control
+    output_finder<6> m_led;
+    void led_state_w(offs_t offset, uint32_t data);
+    const std::string LED_MAP[6] = {"LED_POWER", "LED_DISK", "LED_FLOPPY", "LED_SEC", "LED_NET", "LED_CD"};
 
-        // LED control
-        output_finder<6> m_led;
-        void led_state_w(offs_t offset, uint32_t data);
-        const std::string LED_MAP[6] = {"LED_POWER", "LED_DISK", "LED_FLOPPY", "LED_SEC", "LED_NET", "LED_CD"};
+    // Interrupts and other platform state
+    bool m_int_state[6] = {false, false, false, false, false, false};
+    uint32_t m_inten[6] = {0, 0, 0, 0, 0, 0};
+    uint32_t m_intst[6] = {0, 0, 0, 0, 0, 0};
 
-        // Interrupts and other platform state
-        bool m_int_state[6] = {false, false, false, false, false, false};
-        uint32_t m_inten[6] = {0, 0, 0, 0, 0, 0};
-        uint32_t m_intst[6] = {0, 0, 0, 0, 0, 0};
+    // Freerun timer (1us period)
+    // NetBSD source code corroborates the period (https://github.com/NetBSD/src/blob/229cf3aa2cda57ba5f0c244a75ae83090e59c716/sys/arch/newsmips/newsmips/news5000.c#L259)
+    emu_timer *m_freerun_timer;
+    uint32_t freerun_timer_val;
+    const int FREERUN_FREQUENCY = 1000000;
+    TIMER_CALLBACK_MEMBER(freerun_clock);
+    uint32_t freerun_r(offs_t offset);
+    void freerun_w(offs_t offset, uint32_t data);
 
-        // Freerun timer (1us period)
-        // NetBSD source code corroborates the period (https://github.com/NetBSD/src/blob/229cf3aa2cda57ba5f0c244a75ae83090e59c716/sys/arch/newsmips/newsmips/news5000.c#L259)
-        emu_timer *m_freerun_timer;
-        uint32_t freerun_timer_val;
-        const int FREERUN_FREQUENCY = 1000000;
-        TIMER_CALLBACK_MEMBER(freerun_clock);
-        uint32_t freerun_r(offs_t offset);
-        void freerun_w(offs_t offset, uint32_t data);
+    // APbus control (should be split into a device eventually)
+    uint8_t apbus_cmd_r(offs_t offset);
+    void apbus_cmd_w(offs_t offset, uint32_t data);
 
-        // APBus control (should be split into a device eventually)
-        uint8_t apbus_cmd_r(offs_t offset);
-        void apbus_cmd_w(offs_t offset, uint32_t data);
+    // Other platform hardware emulation methods
+    u32 bus_error();
+    uint64_t front_panel_r(offs_t offset);
 
-        // Other platform hardware emulation methods
-        u32 bus_error();
-        uint64_t front_panel_r(offs_t offset);
+    // Constants
+    const uint32_t ICACHE_SIZE = 16384;
+    const uint32_t DCACHE_SIZE = 16384;
+    const char *MAIN_MEMORY_DEFAULT = "64M";
 
-        // Constants
-        const uint32_t ICACHE_SIZE = 16384;
-        const uint32_t DCACHE_SIZE = 16384;
-        const char *MAIN_MEMORY_DEFAULT = "64M";
-
-        // RAM debug
-        bool map_shift = false;
-        uint8_t debug_ram_r(offs_t offset);
-        void debug_ram_w(offs_t offset, uint8_t data);
+    // RAM debug
+    bool map_shift = false;
+    uint8_t debug_ram_r(offs_t offset);
+    void debug_ram_w(offs_t offset, uint8_t data);
 };
 
 /*
@@ -326,6 +311,9 @@ void news_r4k_state::machine_common(machine_config &config)
     CXD8421Q(config, m_escc, 0);
     m_escc->out_int_callback().set(FUNC(news_r4k_state::irq_w<ESCC>));
 
+    // APbus FIFOs
+    CXD8442Q(config, m_fifo0, 0);
+
     // Keyboard and mouse
     // Unlike 68k and R3000 NEWS machines, the keyboard and mouse seem to share an interrupt
     // See https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/ms_ap.c#L103
@@ -335,15 +323,12 @@ void news_r4k_state::machine_common(machine_config &config)
     m_hid->irq_out<news_hid_hle_device::MOUSE>().set(FUNC(news_r4k_state::irq_w<KBD>));
 
     // Floppy controller - National Semiconductor PC8477B
-    // TODO: find out the difference between B and A - only A is emulated in MAME ATM
-    // TODO: frequency? datasheet implies only 24MHz is valid. There is a 24MHz crystal on the I/O board, so this is probably right
-    //       but it needs to be confirmed before locking it in with the XTAL macro
-    // TODO: interrupts
-    PC8477A(config, m_fdc, 24'000'000, pc8477a_device::mode_t::PS2);
+    // TODO: find out the difference between B and A - only A is emulated in MAME ATM - A works so might not be significant
+    PC8477A(config, m_fdc, 24_MHz_XTAL, pc8477a_device::mode_t::PS2);
     FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
-    //m_fdc->intrq_wr_callback().set(FUNC(news_r4k_state::irq_w<irq0_number::FDC>));
-    m_fdc->intrq_wr_callback().set(FUNC(news_r4k_state::fdc_fifo_irq_w));
-    m_fdc->drq_wr_callback().set(FUNC(news_r4k_state::fdc_fifo_drq_w));
+    m_fdc->intrq_wr_callback().set(FUNC(news_r4k_state::irq_w<irq0_number::FDC>)); // TODO: FIFO IRQ handling
+    m_fdc->drq_wr_callback().set([this](int status) { m_fifo0->drq_w<cxd8442q_device::FifoChannelNumber::CH2>(status); });
+    m_fifo0->bind_dma_r<cxd8442q_device::FifoChannelNumber::CH2>([this]() { return (uint32_t)(m_fdc->dma_r()); });
 
     // DMA controller
     // TODO: interrupts, join bus, etc.
@@ -373,8 +358,8 @@ void news_r4k_state::machine_common(machine_config &config)
 
     // Connect SPIFI3s to the buses
     // TODO: Actual clock and SCSI config (see news_r3k for what this might look like in the future)
-    NSCSI_CONNECTOR(config, "scsi0:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config([this](device_t *device) { });
-    NSCSI_CONNECTOR(config, "scsi1:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config([this](device_t *device) { });
+    NSCSI_CONNECTOR(config, "scsi0:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config([this](device_t *device) {});
+    NSCSI_CONNECTOR(config, "scsi1:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config([this](device_t *device) {});
 }
 
 void news_r4k_state::nws5000x(machine_config &config) { machine_common(config); }
@@ -452,34 +437,19 @@ void news_r4k_state::cpu_map(address_map &map)
     // TODO: to be hardware accurate, these shouldn't be umasked.
     // instead, they should be duplicated across each 32-bit segment to emulate the open address lines
     // (i.e. status register A and B values of 56 c0 look like 56565656 c0c0c0c0)
+    // Note: for this to work, line 411 in upd765.cpp must be commented out. The NEWS monitor ROM uses that bit as some kind of
+    // ready signal even though the documentation for the chip says it is used for a second drive. It must be clear for the 5000X.
+    // I need to find a way to patch that behavior for this machine only, maybe by intercepting `sra` reads.
     map(0x1ed60000, 0x1ed6001f).m(m_fdc, FUNC(pc8477a_device::map)).umask32(0x000000ff);
     //map(0x1ed60200, 0x1ed60207).noprw(); // TODO: Floppy aux registers
     map(0x1ed60200, 0x1ed60207).lr8(NAME([this](offs_t offset) { return 0x1; }));
-    map(0x1ed20000, 0x1ed20007).w(FUNC(news_r4k_state::fdc_fifo_mask_w));
-    map(0x1ed20008, 0x1ed2000f).w(FUNC(news_r4k_state::fdc_fifo_dmaen_w));
-    map(0x1ed20030, 0x1ed20037).r(FUNC(news_r4k_state::fdc_fifo_data_r));
 
-    // Questionable hack that just redirects the fd FIFO data register to the FDC's DMA read - this is sketch af
-    /*map(0x1ed20030, 0x1ed2003f).lr32(NAME([this](offs_t offset) {
-        LOG("here yo, offset = %d\n", offset);
-        uint32_t result = 0;
-        if (offset == 1) // FIFO data register = 0x34
-        {
-            // guessing here
-            for (int i = 0; i < 4; ++i) {
-                uint8_t byte = m_fdc->dma_r();
-                LOG("byte %d = 0x%x", i, byte);
-                result |= ((uint32_t)byte) << (8 * i);
-            }
-            result = m_fdc->fifo_r();
-            LOG("Got 0x%x from FDC\n", result);
-        }
-        return result;
-    }));*/
+    // Map FDCAUX interrupt read (still need to implement button interrupt mask from 208-20b)
+    map(0x1ed60208, 0x1ed6020f).lr32(NAME([this](offs_t offset) { return (offset == 1) && ((m_intst[0] & irq0_number::FDC) > 0) ? 0x2 : 0x0; }));
 
-    // need to map 8-b too
-    /*LOG("Offset 0x%x: Request for FDC IRQ or BTN IRQ - returning %d\n", offset, (m_intst[0] & 0x10) > 0 ? 0x2 : 0x0)*/
-    map(0x1ed60208, 0x1ed6020f).lr32(NAME([this](offs_t offset) { return fdc_fifo_rawint << 1; }));
+    // Map FDC FIFO TODO: is it aligned so CH0 is 1ed00000?
+    map(0x1ed00000, 0x1ed8ffff).m(m_fifo0, FUNC(cxd8442q_device::map));
+
     // Assign debug mappings
     cpu_map_debug(map);
 }
@@ -529,9 +499,18 @@ void news_r4k_state::cpu_map_debug(address_map &map)
     // More onboard devices that needs to be mapped for the platform to boot
     map(0x1fe00000, 0x1fe03fff).ram().mirror(0x1fc000);
     map(0x1f3e0000, 0x1f3efff0).lr8(NAME([this](offs_t offset) {
-            if (offset % 4 == 2) { return 0x6f; }
-            else if (offset % 4 == 3) { return 0xe0; }
-            else { return 0x0;}
+        if (offset % 4 == 2)
+        {
+            return 0x6f;
+        }
+        else if (offset % 4 == 3)
+        {
+            return 0xe0;
+        }
+        else
+        {
+            return 0x0;
+        }
     })); // monitor ROM doesn't boot without this
 }
 
@@ -590,23 +569,8 @@ void news_r4k_state::machine_start()
     save_item(NAME(m_int_state));
     save_item(NAME(freerun_timer_val));
 
-    // FDC FIFO RAM
-    fdc_fifo_ram = std::make_unique<uint32_t[]>(FIFO_RAM_SIZE);
-    save_pointer(NAME(fdc_fifo_ram), FIFO_RAM_SIZE);
-    
-    // fdc fifo reset
-    fdc_fifo_dmaen = false;
-    fdc_fifo_mask = 0;
-    fdc_fifo_drq = 0;
-    fdc_fifo_rawint = 0;
-    fdc_fifo_count = 0;
-    fdc_fifo_w_position = 0;
-    fdc_fifo_r_position = 0;
-
     // Allocate freerunning clock
     m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
-
-    fdc_fifo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::fdc_fifo_dma_execute), this));
 }
 
 /*
@@ -716,7 +680,7 @@ uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
 void news_r4k_state::apbus_cmd_w(offs_t offset, uint32_t data)
 {
     // map(0x1f520004, 0x1f520007); // WBFLUSH
-    // map(0x14c00004, 0x14c00007).ram(); // some kind of AP-bus register? Fully booted 5000X yields: 14c00004: 00007316
+    // map(0x14c00004, 0x14c00007).ram(); // some kind of APbus register? Fully booted 5000X yields: 14c00004: 00007316
     // map(0x14c0000c, 0x14c0000c); // APBUS_INTMSK - interrupt mask
     // map(0x14c00014, 0x14c00014); // APBUS_INTST - interrupt status
     // map(0x14c0001c, 0x14c0001c); // APBUS_BER_A - Bus error address
@@ -725,7 +689,7 @@ void news_r4k_state::apbus_cmd_w(offs_t offset, uint32_t data)
     // map(0x14c0006c, 0x14c0006c); // APBUS_DER_S - DMA error slot
     // map(0x14c00084, 0x14c00084); // APBUS_DMA - unmapped DMA coherency
     // map(0x14c20000, 0x14c40000); // APBUS_DMAMAP - DMA mapping RAM
-    LOG("AP-Bus command called, offset 0x%x, set to 0x%x\n", offset, data);
+    LOG("APbus command called, offset 0x%x, set to 0x%x\n", offset, data);
 }
 
 /*
@@ -840,113 +804,6 @@ void news_r4k_state::int_check()
     }
 }
 
-    void news_r4k_state::fdc_fifo_mask_w(offs_t offset, uint32_t count)
-    {
-        if(offset == 0)
-        {
-            LOG("FDC FIFO: Setting mask to 0x%x\n", count);
-            fdc_fifo_mask = count;
-        }
-    }
-
-    void news_r4k_state::fdc_fifo_dmaen_w(offs_t offset, uint32_t state)
-    {
-        LOG("FDC FIFO: DMAEN region write to offset %d: 0x%x\n", offset, state);
-        if (offset == 1)
-        {
-            LOG("FDC FIFO: Setting DMAEN to 0x%x\n", state);
-            fdc_fifo_dmaen = (state & 0x1) > 0;
-            if (fdc_fifo_dmaen)
-            {
-                // reset counter and pointers - not sure if this is hw accurate though
-                fdc_fifo_count = 0;
-                fdc_fifo_w_position = 0;
-                fdc_fifo_r_position = 0;
-                
-                // kick off the DMA transfer cause we gotta
-                fdc_fifo_timer->adjust(attotime::zero, 0, attotime::from_usec(1)); // actual clock rate? this is a "guess" (read: I tried it and it happened to work)
-            }
-        }
-    }
-
-    void news_r4k_state::fdc_fifo_drq_w(int state)
-    {
-        if(!fdc_fifo_dmaen) {
-            LOG("FDC FIFO: Uh oh! DRQ set when we aren't doing a transfer. That's awkward. Hopefully the CPU will handle this one.\n");
-            fdc_fifo_drq = 0;
-        } else {
-            LOG("FDC FIFO: DRQ set to 0x%x!\n", state);
-            fdc_fifo_drq = state;
-        }
-    }
-
-    void news_r4k_state::fdc_fifo_irq_w(int state)
-    {
-        fdc_fifo_rawint = state > 0 ? 1 : 0; // FDCAUX seems to expose this, so we route the IRQ through this function
-        LOG("FDC FIFO: Setting IRQ to 0x%x\n", state);
-        this->irq_w<irq0_number::FDC>(state);
-    }
-
-    uint32_t news_r4k_state::fdc_fifo_data_r(uint32_t offset)
-    {
-        if(offset == 1) {
-            auto value = fdc_fifo_ram[fdc_fifo_r_position];
-            LOG("FDC FIFO: Count 0x%x, Returning 0x%x %s\n", fdc_fifo_r_position, value, machine().describe_context());
-            ++fdc_fifo_r_position; // todo: sanity checking of FIFO position
-            if(fdc_fifo_r_position > FIFO_RAM_SIZE)
-            {
-                LOG("FDC FIFO: FIFO read pointer rolled over\n");
-                fdc_fifo_r_position = 0;
-            }
-            if(fdc_fifo_r_position == fdc_fifo_w_position) {
-                LOG("FDC FIFO: FIFO read caught up to write\n");
-            }
-            return (value << 24) | (value << 16) | (value << 8) | value; // gotta make sure the r4k picks up the value regardless of the byte offset
-                                                                         // the monitor ROM uses `lb`, not sure yet if all FIFO configs match this
-                                                                         // if so, might make more sense to change how this works
-                                                                         // this is just a hack for testing right now anyways
-        } else {
-            LOG("you got the offset wrong!\n");
-            return 0;
-        }
-    }
-
-    TIMER_CALLBACK_MEMBER(news_r4k_state::fdc_fifo_dma_execute)
-    {
-        if (!fdc_fifo_dmaen)
-        {
-            LOG("FDC FIFO: DMA not active.\n");
-            fdc_fifo_timer->adjust(attotime::never);
-            return;
-        }
-
-        // ok now we have stuff to do... maybe
-        if(fdc_fifo_drq > 0) {
-            // we get data
-            // main FIFO turn on!!!
-            uint8_t nextByte = m_fdc->dma_r(); // TODO: actually save this lol
-            fdc_fifo_ram[fdc_fifo_w_position] = (uint32_t)nextByte; // TODO: safety check of FIFO position, just checking logs for now.
-            ++fdc_fifo_w_position;
-            --fdc_fifo_mask;
-            ++fdc_fifo_count;
-            LOG("FDC FIFO: Count %d, FIFO pos 0x%x: Got dbyte 0x%x\n", fdc_fifo_count, fdc_fifo_w_position, nextByte);
-            if(fdc_fifo_w_position > FIFO_RAM_SIZE)
-            {
-                LOG("FDC FIFO: FIFO write pointer rolled over\n");
-                fdc_fifo_w_position = 0;
-            }
-            if(fdc_fifo_w_position == fdc_fifo_r_position) {
-                // we caught up to the r pointer with this increment, no more room!
-                LOG("FDC FIFO: FIFO full\n");
-            }
-        }
-
-        bool done = fdc_fifo_mask == std::numeric_limits<uint32_t>::max();
-        if(done) // done with the initial mask
-        {
-            fdc_fifo_timer->adjust(attotime::never);
-        }
-    }
 /*
  * bus_error
  *
@@ -1018,4 +875,4 @@ ROM_END
 
 // Machine definitions
 //   YEAR  NAME      PARENT COMPAT MACHINE   INPUT    CLASS           INIT           COMPANY FULLNAME                      FLAGS
-COMP(1994, nws5000x, 0,     0,     nws5000x, nws5000, news_r4k_state, init_nws5000x, "Sony", "NET WORK STATION NWS-5000X", MACHINE_TYPE_COMPUTER | MACHINE_IS_INCOMPLETE | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+COMP(1994, nws5000x, 0, 0, nws5000x, nws5000, news_r4k_state, init_nws5000x, "Sony", "NET WORK STATION NWS-5000X", MACHINE_TYPE_COMPUTER | MACHINE_IS_INCOMPLETE | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
