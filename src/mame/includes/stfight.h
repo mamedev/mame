@@ -42,8 +42,6 @@ public:
 	void cshooter(machine_config &config);
 
 	void init_stfight();
-	void init_empcity();
-	void init_cshooter();
 
 protected:
 	enum
