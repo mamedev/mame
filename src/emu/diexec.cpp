@@ -379,7 +379,7 @@ void device_execute_interface::interface_pre_start()
 
 	// fill in the initial states
 	int const index = device_enumerator(device().machine().root_device()).indexof(*this);
-	m_suspend = SUSPEND_REASON_RESET;
+	suspend(SUSPEND_REASON_RESET);
 	m_profiler = profile_type(index + PROFILER_DEVICE_FIRST);
 	m_inttrigger = index + TRIGGER_INT;
 
