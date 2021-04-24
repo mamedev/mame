@@ -5,13 +5,21 @@
     Funky Jet
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_FUNKYJET_H
+#define MAME_INCLUDES_FUNKYJET_H
 
-#include "screen.h"
+#pragma once
 
-#include "cpu/h6280/h6280.h"
-#include "video/decospr.h"
-#include "video/deco16ic.h"
+// mame
 #include "machine/deco146.h"
+#include "video/deco16ic.h"
+#include "video/decospr.h"
+
+// devices
+#include "cpu/h6280/h6280.h"
+
+// emu
+#include "screen.h"
 
 
 class funkyjet_state : public driver_device
@@ -34,11 +42,11 @@ public:
 	void init_funkyjet();
 
 private:
-	/* memory pointers */
+	// memory pointers
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr_array<uint16_t, 2> m_pf_rowscroll;
 
-	/* devices */
+	// devices
 	required_device<screen_device> m_screen;
 	required_device<cpu_device> m_maincpu;
 	required_device<h6280_device> m_audiocpu;
@@ -53,3 +61,5 @@ private:
 	void funkyjet_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_FUNKYJET_H

@@ -180,7 +180,7 @@ static inline uint32_t logical_to_chd_lba(cdrom_file *file, uint32_t loglba, uin
 	uint32_t chdlba, physlba;
 	int track;
 
-	/* loop until our current LBA is less than the start LBA of the next track */
+	// loop until our current LBA is less than the start LBA of the next track
 	for (track = 0; track < file->cdtoc.numtrks; track++)
 	{
 		if (loglba < file->cdtoc.tracks[track + 1].logframeofs)
@@ -217,12 +217,12 @@ cdrom_file *cdrom_open(const char *inputfile)
 	cdrom_file *file;
 	uint32_t physofs, logofs;
 
-	/* allocate memory for the CD-ROM file */
+	// allocate memory for the CD-ROM file
 	file = new (std::nothrow) cdrom_file();
 	if (file == nullptr)
 		return nullptr;
 
-	/* setup the CDROM module and get the disc info */
+	// set up the CD-ROM module and get the disc info
 	chd_error err = chdcd_parse_toc(inputfile, file->cdtoc, file->track_info);
 	if (err != CHDERR_NONE)
 	{
@@ -231,7 +231,7 @@ cdrom_file *cdrom_open(const char *inputfile)
 		return nullptr;
 	}
 
-	/* fill in the data */
+	// fill in the data
 	file->chd = nullptr;
 
 	LOG(("CD has %d tracks\n", file->cdtoc.numtrks));
@@ -291,7 +291,7 @@ cdrom_file *cdrom_open(const char *inputfile)
             file->cdtoc.tracks[i].logframes);*/
 	}
 
-	/* fill out dummy entries for the last track to help our search */
+	// fill out dummy entries for the last track to help our search
 	file->cdtoc.tracks[i].physframeofs = physofs;
 	file->cdtoc.tracks[i].logframeofs = logofs;
 	file->cdtoc.tracks[i].chdframeofs = 0;
@@ -317,12 +317,7 @@ cdrom_file *cdrom_open(const char *inputfile)
 
 cdrom_file *cdrom_open(chd_file *chd)
 {
-	int i;
-	cdrom_file *file;
-	uint32_t physofs, chdofs, logofs;
-	chd_error err;
-
-	/* punt if no CHD */
+	// punt if no CHD
 	if (!chd)
 		return nullptr;
 
@@ -333,15 +328,15 @@ cdrom_file *cdrom_open(chd_file *chd)
 		return nullptr;
 
 	/* allocate memory for the CD-ROM file */
-	file = new (std::nothrow) cdrom_file();
-	if (file == nullptr)
+	cdrom_file *file = new (std::nothrow) cdrom_file();
+	if (!file)
 		return nullptr;
 
 	/* fill in the data */
 	file->chd = chd;
 
 	/* read the CD-ROM metadata */
-	err = cdrom_parse_metadata(chd, &file->cdtoc);
+	chd_error err = cdrom_parse_metadata(chd, &file->cdtoc);
 	if (err != CHDERR_NONE)
 	{
 		delete file;
@@ -353,7 +348,8 @@ cdrom_file *cdrom_open(chd_file *chd)
 	/* calculate the starting frame for each track, keeping in mind that CHDMAN
 	   pads tracks out with extra frames to fit 4-frame size boundries
 	*/
-	physofs = chdofs = logofs = 0;
+	uint32_t physofs = 0, chdofs = 0, logofs = 0;
+	int i;
 	for (i = 0; i < file->cdtoc.numtrks; i++)
 	{
 		file->cdtoc.tracks[i].logframeofs = 0;
@@ -388,7 +384,7 @@ cdrom_file *cdrom_open(chd_file *chd)
 		chdofs  += file->cdtoc.tracks[i].extraframes;
 		logofs  += file->cdtoc.tracks[i].frames;
 
-      printf("Track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d logframes %d\n", i+1,
+/*      printf("Track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d pregap %d pgmode %d presize %d postgap %d logofs %d physofs %d chdofs %d logframes %d\n", i+1,
             file->cdtoc.tracks[i].trktype,
             file->cdtoc.tracks[i].subtype,
             file->cdtoc.tracks[i].datasize,
@@ -402,10 +398,10 @@ cdrom_file *cdrom_open(chd_file *chd)
             file->cdtoc.tracks[i].logframeofs,
             file->cdtoc.tracks[i].physframeofs,
             file->cdtoc.tracks[i].chdframeofs,
-            file->cdtoc.tracks[i].logframes);
+            file->cdtoc.tracks[i].logframes);*/
 	}
 
-	/* fill out dummy entries for the last track to help our search */
+	// fill out dummy entries for the last track to help our search
 	file->cdtoc.tracks[i].physframeofs = physofs;
 	file->cdtoc.tracks[i].logframeofs = logofs;
 	file->cdtoc.tracks[i].chdframeofs = chdofs;
@@ -569,7 +565,7 @@ uint32_t cdrom_read_data(cdrom_file *file, uint32_t lbasector, void *buffer, uin
 		chdsector = logical_to_chd_lba(file, lbasector, tracknum);
 	}
 
-	/* copy out the requested sector */
+	// copy out the requested sector
 	uint32_t tracktype = file->cdtoc.tracks[tracknum].trktype;
 
 	if ((datatype == tracktype) || (datatype == CD_TRACK_RAW_DONTCARE))
@@ -578,13 +574,13 @@ uint32_t cdrom_read_data(cdrom_file *file, uint32_t lbasector, void *buffer, uin
 	}
 	else
 	{
-		/* return 2048 bytes of mode 1 data from a 2352 byte mode 1 raw sector */
+		// return 2048 bytes of mode 1 data from a 2352 byte mode 1 raw sector
 		if ((datatype == CD_TRACK_MODE1) && (tracktype == CD_TRACK_MODE1_RAW))
 		{
 			return (read_partial_sector(file, buffer, lbasector, chdsector, tracknum, 16, 2048, phys) == CHDERR_NONE);
 		}
 
-		/* return 2352 byte mode 1 raw sector from 2048 bytes of mode 1 data */
+		// return 2352 byte mode 1 raw sector from 2048 bytes of mode 1 data
 		if ((datatype == CD_TRACK_MODE1_RAW) && (tracktype == CD_TRACK_MODE1))
 		{
 			auto *bufptr = (uint8_t *)buffer;
@@ -600,19 +596,19 @@ uint32_t cdrom_read_data(cdrom_file *file, uint32_t lbasector, void *buffer, uin
 			return (read_partial_sector(file, bufptr+16, lbasector, chdsector, tracknum, 0, 2048, phys) == CHDERR_NONE);
 		}
 
-		/* return 2048 bytes of mode 1 data from a mode2 form1 or raw sector */
+		// return 2048 bytes of mode 1 data from a mode2 form1 or raw sector
 		if ((datatype == CD_TRACK_MODE1) && ((tracktype == CD_TRACK_MODE2_FORM1)||(tracktype == CD_TRACK_MODE2_RAW)))
 		{
 			return (read_partial_sector(file, buffer, lbasector, chdsector, tracknum, 24, 2048, phys) == CHDERR_NONE);
 		}
 
-		/* return 2048 bytes of mode 1 data from a mode2 form2 or XA sector */
+		// return 2048 bytes of mode 1 data from a mode2 form2 or XA sector
 		if ((datatype == CD_TRACK_MODE1) && (tracktype == CD_TRACK_MODE2_FORM_MIX))
 		{
 			return (read_partial_sector(file, buffer, lbasector, chdsector, tracknum, 8, 2048, phys) == CHDERR_NONE);
 		}
 
-		/* return mode 2 2336 byte data from a 2352 byte mode 1 or 2 raw sector (skip the header) */
+		// return mode 2 2336 byte data from a 2352 byte mode 1 or 2 raw sector (skip the header)
 		if ((datatype == CD_TRACK_MODE2) && ((tracktype == CD_TRACK_MODE1_RAW) || (tracktype == CD_TRACK_MODE2_RAW)))
 		{
 			return (read_partial_sector(file, buffer, lbasector, chdsector, tracknum, 16, 2336, phys) == CHDERR_NONE);

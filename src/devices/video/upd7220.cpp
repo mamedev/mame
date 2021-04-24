@@ -455,9 +455,7 @@ inline void upd7220_device::reset_figs_param()
 //-------------------------------------------------
 inline uint16_t upd7220_device::read_vram()
 {
-	uint16_t data;
-
-	data = readword(m_ead*2);
+	uint16_t const data = readword(m_ead*2);
 	m_ead += x_dir[m_figs.m_dir] + (y_dir[m_figs.m_dir] * m_pitch);
 	m_ead &= 0x3ffff;
 
@@ -477,8 +475,7 @@ inline void upd7220_device::rdat(uint8_t type, uint8_t mod)
 
 	while (m_figs.m_dc && m_fifo_ptr < (type ? 15 : 14))
 	{
-		uint16_t data;
-		data = read_vram();
+		uint16_t const data = read_vram();
 		switch(type)
 		{
 			case 0:
@@ -547,17 +544,13 @@ inline void upd7220_device::write_vram(uint8_t type, uint8_t mod, uint16_t data)
 
 inline void upd7220_device::wdat(uint8_t type, uint8_t mod)
 {
-	uint16_t result;
-
-	if (type == 1)
+	if(type == 1)
 	{
 		logerror("uPD7220 invalid type 1 WDAT parameter\n");
 		return;
 	}
 
-	result = 0;
-
-	result = m_pr[1] | (m_pr[2] << 8);
+	uint16_t result = m_pr[1] | (m_pr[2] << 8);
 
 	switch(type)
 	{
@@ -953,7 +946,6 @@ void upd7220_device::draw_arc(int x, int y)
 
 void upd7220_device::draw_rectangle(int x, int y)
 {
-	int i;
 	const int rect_x_dir[8] = { 0, 1, 0,-1, 1, 1,-1,-1 };
 	const int rect_y_dir[8] = { 1, 0,-1, 0, 1,-1,-1, 1 };
 	uint8_t rect_type,rect_dir;
@@ -964,7 +956,7 @@ void upd7220_device::draw_rectangle(int x, int y)
 	rect_type = (m_figs.m_dir & 1) << 2;
 	rect_dir = rect_type | (((m_figs.m_dir >> 1) + 0) & 3);
 
-	for(i = 0;i < m_figs.m_d;i++)
+	for(int i = 0; i < m_figs.m_d; i++)
 	{
 		draw_pixel(x,y,i,pattern);
 		x+=rect_x_dir[rect_dir];
@@ -973,7 +965,7 @@ void upd7220_device::draw_rectangle(int x, int y)
 
 	rect_dir = rect_type | (((m_figs.m_dir >> 1) + 1) & 3);
 
-	for(i = 0;i < m_figs.m_d2;i++)
+	for(int i = 0; i < m_figs.m_d2; i++)
 	{
 		draw_pixel(x,y,i,pattern);
 		x+=rect_x_dir[rect_dir];
@@ -982,7 +974,7 @@ void upd7220_device::draw_rectangle(int x, int y)
 
 	rect_dir = rect_type | (((m_figs.m_dir >> 1) + 2) & 3);
 
-	for(i = 0;i < m_figs.m_d;i++)
+	for(int i = 0; i < m_figs.m_d; i++)
 	{
 		draw_pixel(x,y,i,pattern);
 		x+=rect_x_dir[rect_dir];
@@ -991,7 +983,7 @@ void upd7220_device::draw_rectangle(int x, int y)
 
 	rect_dir = rect_type | (((m_figs.m_dir >> 1) + 3) & 3);
 
-	for(i = 0;i < m_figs.m_d2;i++)
+	for(int i = 0; i < m_figs.m_d2; i++)
 	{
 		draw_pixel(x,y,i,pattern);
 		x+=rect_x_dir[rect_dir];
@@ -1000,7 +992,6 @@ void upd7220_device::draw_rectangle(int x, int y)
 
 	m_ead = (x >> 4) + (y * (m_pitch >> m_figs.m_gd));
 	m_dad = x & 0x0f;
-
 }
 
 
@@ -1679,18 +1670,19 @@ WRITE_LINE_MEMBER( upd7220_device::lpen_w )
 
 void upd7220_device::update_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t addr, sad;
+	uint32_t sad;
 	uint16_t len;
 	int im, wd;
-	int y, sy = 0;
+	int sy = 0;
 
 	for (int area = 0; area < 4; area++)
 	{
 		get_text_partition(area, &sad, &len, &im, &wd);
 
+		int y;
 		for (y = sy; y < sy + len; y++)
 		{
-			addr = sad + (y * m_pitch);
+			uint32_t const addr = sad + (y * m_pitch);
 
 			if (!m_draw_text_cb.isnull())
 				m_draw_text_cb(bitmap, addr, (y * m_lr) + m_vbp, wd, m_pitch, m_lr, m_dc, m_ead);
@@ -1707,9 +1699,9 @@ void upd7220_device::update_text(bitmap_rgb32 &bitmap, const rectangle &cliprect
 
 void upd7220_device::draw_graphics_line(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch)
 {
-	int sx, al = bitmap.cliprect().height();
+	int al = bitmap.cliprect().height();
 
-	for (sx = 0; sx < pitch; sx++)
+	for (int sx = 0; sx < pitch; sx++)
 	{
 		if((sx << 4) < m_aw * 16 && y < al)
 			m_display_cb(bitmap, y, sx << 4, addr);
@@ -1725,18 +1717,18 @@ void upd7220_device::draw_graphics_line(bitmap_rgb32 &bitmap, uint32_t addr, int
 
 void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &cliprect, int force_bitmap)
 {
-	uint32_t addr, sad;
+	uint32_t sad;
 	uint16_t len;
-	int im, wd, area;
+	int im, wd;
 	int y = 0, tsy = 0, bsy = 0;
 	bool mixed = ((m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_MIXED);
 	uint8_t interlace = ((m_mode & UPD7220_MODE_INTERLACE_MASK) == UPD7220_MODE_INTERLACE_ON) ? 0 : 1;
 
-	for (area = 0; area < 4; area++)
+	for(int area = 0; area < 4; area++)
 	{
 		get_graphics_partition(area, &sad, &len, &im, &wd);
 
-		if (im || force_bitmap)
+		if(im || force_bitmap)
 		{
 			if(area >= 3) // TODO: most likely to be correct, Quarth (PC-98xx) definitely draws with area 2. We might see an area 3 someday ...
 				break;
@@ -1744,13 +1736,13 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 			if(!interlace)
 				len <<= 1;
 
-			for (y = 0; y < len; y++)
+			for(y = 0; y < len; y++)
 			{
 				/* TODO: again correct?
 				         Quarth (PC-98xx) doesn't seem to use pitch here and it definitely wants bsy to be /2 to make scrolling to work.
 				         Xevious (PC-98xx) wants the pitch to be fixed at 80, and wants bsy to be /1
 				         Dragon Buster (PC-98xx) contradicts with Xevious with regards of the pitch tho ... */
-				addr = ((sad << 1) & 0x3ffff) + ((y / (mixed ? 1 : m_lr)) * (m_pitch << (im ? 0 : 1)));
+				uint32_t const addr = ((sad << 1) & 0x3ffff) + ((y / (mixed ? 1 : m_lr)) * (m_pitch << (im ? 0 : 1)));
 
 				if (!m_display_cb.isnull())
 					draw_graphics_line(bitmap, addr, y + bsy + m_vbp, wd, (m_pitch << interlace));
@@ -1760,11 +1752,11 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 		{
 			if(m_lr)
 			{
-				for (y = 0; y < len; y+=m_lr)
+				for(y = 0; y < len; y += m_lr)
 				{
-					addr = (sad & 0x3ffff) + ((y / m_lr) * m_pitch);
+					uint32_t const addr = (sad & 0x3ffff) + ((y / m_lr) * m_pitch);
 
-					if (!m_draw_text_cb.isnull())
+					if(!m_draw_text_cb.isnull())
 						m_draw_text_cb(bitmap, addr, y + tsy + m_vbp, wd, m_pitch, m_lr, m_dc, m_ead);
 				}
 			}
