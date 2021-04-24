@@ -317,7 +317,7 @@ void ngp_state::ngp_io_w(offs_t offset, uint8_t data)
 			m_z80->set_input_line(0, CLEAR_LINE);
 			break;
 		case 0xAA:      /* Disable Z80 */
-			m_z80->suspend(SUSPEND_REASON_HALT, 1);
+			m_z80->suspend(SUSPEND_REASON_HALT);
 			break;
 		}
 		break;
@@ -731,7 +731,7 @@ void ngp_state::machine_reset()
 {
 	m_old_to3 = 0;
 
-	m_z80->suspend(SUSPEND_REASON_HALT, 1);
+	m_z80->suspend(SUSPEND_REASON_HALT);
 	m_z80->set_input_line(0, CLEAR_LINE);
 
 	if (m_nvram_loaded)

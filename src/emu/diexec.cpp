@@ -52,8 +52,6 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 	, m_scheduler(nullptr)
 	, m_suspend(0)
 	, m_nextsuspend(0)
-	, m_eatcycles(0)
-	, m_nexteatcycles(0)
 	, m_trigger(0)
 	, m_inttrigger(0)
 	, m_disabled(false)
@@ -122,12 +120,11 @@ void device_execute_interface::suspend_resume_changed()
 //  suspend - set a suspend reason for this device
 //-------------------------------------------------
 
-void device_execute_interface::suspend(u32 reason, bool eatcycles)
+void device_execute_interface::suspend(u32 reason)
 {
 if (TEMPLOG) printf("suspend %s (%X)\n", device().tag(), reason);
 	// set the suspend reason and eat cycles flag
 	m_nextsuspend |= reason;
-	m_nexteatcycles = eatcycles;
 	suspend_resume_changed();
 }
 
@@ -172,7 +169,7 @@ void device_execute_interface::spin_until_time(const attotime &duration)
 void device_execute_interface::suspend_until_trigger(int trigid, bool eatcycles)
 {
 	// suspend the device immediately if it's not already
-	suspend(SUSPEND_REASON_TRIGGER, eatcycles);
+	suspend(eatcycles ? SUSPEND_REASON_SPIN_TRIGGER : SUSPEND_REASON_YIELD_TRIGGER);
 
 	// set the trigger
 	m_trigger = trigid;
@@ -189,9 +186,9 @@ void device_execute_interface::trigger(int trigid)
 	abort_timeslice();
 
 	// see if this is a matching trigger
-	if ((m_nextsuspend & SUSPEND_REASON_TRIGGER) != 0 && m_trigger == trigid)
+	if ((m_nextsuspend & SUSPEND_TRIGGER_REASONS) != 0 && m_trigger == trigid)
 	{
-		resume(SUSPEND_REASON_TRIGGER);
+		resume(SUSPEND_TRIGGER_REASONS);
 		m_trigger = 0;
 	}
 }
@@ -410,8 +407,6 @@ void device_execute_interface::interface_post_start()
 	// register for save states
 	device().save_item(NAME(m_suspend));
 	device().save_item(NAME(m_nextsuspend));
-	device().save_item(NAME(m_eatcycles));
-	device().save_item(NAME(m_nexteatcycles));
 	device().save_item(NAME(m_trigger));
 	device().save_item(NAME(m_totalcycles));
 	device().save_item(NAME(m_localtime.m_relative));
@@ -441,7 +436,7 @@ void device_execute_interface::interface_pre_reset()
 
 	// enable all devices (except for disabled and unclocked devices)
 	if (disabled())
-		suspend(SUSPEND_REASON_DISABLE, true);
+		suspend(SUSPEND_REASON_DISABLE);
 	else if (device().clock() != 0)
 		resume(SUSPEND_ANY_REASON);
 }
@@ -487,7 +482,7 @@ void device_execute_interface::interface_clock_changed()
 	// a clock of zero disables the device
 	if (device().clock() == 0)
 	{
-		suspend(SUSPEND_REASON_CLOCK, true);
+		suspend(SUSPEND_REASON_CLOCK);
 		m_subseconds_per_cycle = subseconds::max();
 		m_cycles_per_second = 0;
 		return;
@@ -725,7 +720,7 @@ if (TEMPLOG) printf(" (%d,%d)\n", m_curstate, m_curvector);
 			// if we're asserting the line, just halt the device
 			// FIXME: outputs of onboard peripherals also need to be deactivated at this time
 			if (m_curstate == ASSERT_LINE)
-				m_execute->suspend(SUSPEND_REASON_RESET, true);
+				m_execute->suspend(SUSPEND_REASON_RESET);
 
 			// if we're clearing the line that was previously asserted, reset the device
 			else if (m_execute->suspended(SUSPEND_REASON_RESET))
@@ -740,7 +735,7 @@ if (TEMPLOG) printf(" (%d,%d)\n", m_curstate, m_curvector);
 		{
 			// if asserting, halt the device
 			if (m_curstate == ASSERT_LINE)
-				m_execute->suspend(SUSPEND_REASON_HALT, true);
+				m_execute->suspend(SUSPEND_REASON_HALT);
 
 			// if clearing, unhalt the device
 			else if (m_curstate == CLEAR_LINE)
@@ -816,7 +811,7 @@ void device_execute_interface::run_debug()
 
 void device_execute_interface::run_suspend()
 {
-	// do nothing except eat cycles if that's what we're supposed to do
-	if (m_eatcycles)
+	// eat all the cycles unless we're yielding
+	if ((m_suspend & SUSPEND_YIELD_REASONS) == 0)
 		*m_icountptr = 0;
 }

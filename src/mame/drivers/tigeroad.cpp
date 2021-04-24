@@ -93,7 +93,7 @@ void f1dream_state::to_mcu_w(u16 data)
 	   the MCU isn't that fast, so either the CPU is suspended on write, or when bit 0x20 of MCU Port 3 toggles in the
 	   MCU interrupt code, however no combination of increasing the clock / boosting interleave etc. allows the MCU code
 	   to get there in time before the 68k is already expecting a result */
-	m_maincpu->suspend(SUSPEND_REASON_HALT, true);
+	m_maincpu->suspend(SUSPEND_REASON_HALT);
 }
 
 /***************************************************************************/

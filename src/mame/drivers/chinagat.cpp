@@ -426,7 +426,7 @@ uint8_t chinagat_state::saiyugoub1_mcu_command_r()
 #if 0
 	if (m_mcu_command == 0x78)
 	{
-		m_mcu->suspend(SUSPEND_REASON_HALT, 1); /* Suspend (speed up) */
+		m_mcu->suspend(SUSPEND_REASON_HALT); /* Suspend (speed up) */
 	}
 #endif
 	return m_mcu_command;

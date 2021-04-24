@@ -107,7 +107,7 @@ void midway_cheap_squeak_deluxe_device::device_timer(timer_instance const &timer
 
 void midway_cheap_squeak_deluxe_device::suspend_cpu()
 {
-	m_cpu->suspend(SUSPEND_REASON_DISABLE, 1);
+	m_cpu->suspend(SUSPEND_REASON_DISABLE);
 }
 
 //-------------------------------------------------

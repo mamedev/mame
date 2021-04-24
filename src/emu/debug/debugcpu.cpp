@@ -899,7 +899,7 @@ void device_debug::suspend(bool suspend)
 
 	if (suspend) {
 		m_flags |= DEBUG_FLAG_SUSPENDED;
-		m_exec->suspend(SUSPEND_REASON_HALT, 1);
+		m_exec->suspend(SUSPEND_REASON_HALT);
 	}
 	else {
 		m_flags &= ~DEBUG_FLAG_SUSPENDED;

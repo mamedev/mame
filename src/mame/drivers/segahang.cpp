@@ -290,7 +290,7 @@ void segahang_state::device_timer(timer_instance const &timer, device_timer_id i
 		// if we have a fake i8751 handler, disable the actual 8751, otherwise crank the interleave
 		case TID_INIT_I8751:
 			if (!m_i8751_vblank_hook.isnull())
-				m_mcu->suspend(SUSPEND_REASON_DISABLE, 1);
+				m_mcu->suspend(SUSPEND_REASON_DISABLE);
 			else if (m_mcu != nullptr)
 				machine().scheduler().boost_interleave(attotime::zero, attotime::from_msec(10));
 			break;

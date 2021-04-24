@@ -4640,7 +4640,7 @@ void blitz_state::mcu_command_w(uint8_t data)
 	if (BIT(m_portc_data, 0))
 	{
 		m_mcu->set_input_line(M6805_IRQ_LINE, ASSERT_LINE);
-		m_maincpu->suspend(SUSPEND_REASON_HALT, true);
+		m_maincpu->suspend(SUSPEND_REASON_HALT);
 	}
 }
 

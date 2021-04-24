@@ -558,7 +558,7 @@ void bionicc_state::mcu_p3_w(u8 data)
 void bionicc_state::dmaon_w(u16 data)
 {
 	m_mcu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
-	m_maincpu->suspend(SUSPEND_REASON_HALT, true);
+	m_maincpu->suspend(SUSPEND_REASON_HALT);
 }
 
 

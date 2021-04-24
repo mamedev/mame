@@ -122,7 +122,7 @@ void psion_state::io_rw(uint16_t offset)
 		/* switch off, CPU goes into standby mode */
 		m_enable_nmi = 0;
 		m_stby_pwr = 1;
-		m_maincpu->suspend(SUSPEND_REASON_HALT, 1);
+		m_maincpu->suspend(SUSPEND_REASON_HALT);
 		break;
 	case 0x100:
 		m_pulse = 1;

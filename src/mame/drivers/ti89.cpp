@@ -58,7 +58,7 @@ void ti68k_state::ti68k_io_w(offs_t offset, uint16_t data)
 			break;
 		case 0x02:
 			if (!(data & 0x10) && data != m_io_hw1[offset])
-				m_maincpu->suspend(SUSPEND_REASON_DISABLE, 1);
+				m_maincpu->suspend(SUSPEND_REASON_DISABLE);
 			break;
 		case 0x08:
 				m_lcd_base = data << 3;

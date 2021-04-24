@@ -289,9 +289,9 @@ private:
 		TID_GPU_SYNC
 	};
 
-	void gpu_suspend() { m_gpu->suspend(SUSPEND_REASON_SPIN, 1); }
+	void gpu_suspend() { m_gpu->suspend(SUSPEND_REASON_SPIN); }
 	void gpu_resume() { m_gpu->resume(SUSPEND_REASON_SPIN); }
-	void dsp_suspend() { m_dsp->suspend(SUSPEND_REASON_SPIN, 1); }
+	void dsp_suspend() { m_dsp->suspend(SUSPEND_REASON_SPIN); }
 	void dsp_resume() { m_dsp->resume(SUSPEND_REASON_SPIN); }
 
 	void fix_endian( void *base, uint32_t size );

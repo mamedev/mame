@@ -51,7 +51,7 @@ void namcos21_dsp_device::device_start()
 
 TIMER_CALLBACK_MEMBER(namcos21_dsp_device::suspend_callback)
 {
-	m_dsp->suspend(SUSPEND_REASON_HALT, true);
+	m_dsp->suspend(SUSPEND_REASON_HALT);
 }
 
 void namcos21_dsp_device::device_reset()

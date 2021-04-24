@@ -71,7 +71,7 @@ midway_ssio_device::midway_ssio_device(const machine_config &mconfig, const char
 
 void midway_ssio_device::suspend_cpu()
 {
-	m_cpu->suspend(SUSPEND_REASON_DISABLE, 1);
+	m_cpu->suspend(SUSPEND_REASON_DISABLE);
 }
 
 //-------------------------------------------------

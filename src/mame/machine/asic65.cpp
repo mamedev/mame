@@ -145,7 +145,7 @@ void asic65_device::reset_line(int state)
 	/* otherwise, do it manually */
 	else
 	{
-		m_ourcpu->suspend(SUSPEND_REASON_DISABLE, 1);
+		m_ourcpu->suspend(SUSPEND_REASON_DISABLE);
 
 		/* if reset is being signalled, clear everything */
 		if (state && !m_reset_state)

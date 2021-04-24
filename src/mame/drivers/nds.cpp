@@ -347,7 +347,7 @@ void nds_state::arm7_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 				if ((data>>8) & 0x80)
 				{
 					printf("arm7: HALT\n"); // halts the arm7 until an interrupt occurs
-					m_arm7->suspend(SUSPEND_REASON_HALT, 1);
+					m_arm7->suspend(SUSPEND_REASON_HALT);
 					m_arm7halted = true;
 				}
 			}

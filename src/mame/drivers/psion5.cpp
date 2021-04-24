@@ -499,7 +499,7 @@ void psion5mx_state::periphs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			LOGMASKED(LOG_POWER_WRITES, "%s: peripheral write, PWRCNT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		case REG_HALT:
-			m_maincpu->suspend(SUSPEND_REASON_HALT, 1);
+			m_maincpu->suspend(SUSPEND_REASON_HALT);
 			LOGMASKED(LOG_POWER_WRITES, "%s: peripheral write, HALT = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 		case REG_STBY:

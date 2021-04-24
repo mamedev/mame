@@ -749,6 +749,6 @@ WRITE_LINE_MEMBER(vrender0soc_device::idle_skip_speedup_w)
 {
 	m_FlipCntRead++;
 	if (m_FlipCntRead >= 16 && irq_pending() == false && state == ASSERT_LINE)
-		m_host_cpu->suspend(SUSPEND_REASON_SPIN, 1);
+		m_host_cpu->suspend(SUSPEND_REASON_SPIN);
 }
 #endif

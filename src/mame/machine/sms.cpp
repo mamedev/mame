@@ -1225,7 +1225,7 @@ void smssdisp_state::sms_store_control_w(uint8_t data)
 	{
 		/* Pull reset line of CPU #0 low */
 		m_maincpu->reset();
-		m_maincpu->suspend(SUSPEND_REASON_HALT, 1);
+		m_maincpu->suspend(SUSPEND_REASON_HALT);
 	}
 	m_store_control = data;
 }

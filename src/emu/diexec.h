@@ -21,14 +21,20 @@
 //**************************************************************************
 
 // suspension reasons for executing devices
-constexpr u32 SUSPEND_REASON_HALT       = 0x0001;   // HALT line set (or equivalent)
-constexpr u32 SUSPEND_REASON_RESET      = 0x0002;   // RESET line set (or equivalent)
-constexpr u32 SUSPEND_REASON_SPIN       = 0x0004;   // currently spinning
-constexpr u32 SUSPEND_REASON_TRIGGER    = 0x0008;   // waiting for a trigger
-constexpr u32 SUSPEND_REASON_DISABLE    = 0x0010;   // disabled (due to disable flag)
-constexpr u32 SUSPEND_REASON_TIMESLICE  = 0x0020;   // waiting for the next timeslice
-constexpr u32 SUSPEND_REASON_CLOCK      = 0x0040;   // currently not clocked
-constexpr u32 SUSPEND_ANY_REASON        = ~0;       // all of the above
+constexpr u32 SUSPEND_REASON_HALT          = 0x0001;   // HALT line set (or equivalent)
+constexpr u32 SUSPEND_REASON_RESET         = 0x0002;   // RESET line set (or equivalent)
+constexpr u32 SUSPEND_REASON_DISABLE       = 0x0004;   // disabled (due to disable flag)
+constexpr u32 SUSPEND_REASON_CLOCK         = 0x0008;   // currently not clocked
+constexpr u32 SUSPEND_REASON_SPIN          = 0x0010;   // currently spinning
+constexpr u32 SUSPEND_REASON_SPIN_TRIGGER  = 0x0020;   // spinning until a trigger
+constexpr u32 SUSPEND_REASON_SPIN_SLICE    = 0x0040;   // spinning until the next timeslice
+constexpr u32 SUSPEND_REASON_YIELD_TRIGGER = 0x0100;   // yielding until a trigger
+constexpr u32 SUSPEND_REASON_YIELD_SLICE   = 0x0200;   // yielding until the next timeslice
+
+constexpr u32 SUSPEND_ANY_REASON           = ~0;       // all of the above
+constexpr u32 SUSPEND_YIELD_REASONS        = SUSPEND_REASON_YIELD_TRIGGER | SUSPEND_REASON_YIELD_SLICE;
+constexpr u32 SUSPEND_TRIGGER_REASONS      = SUSPEND_REASON_SPIN_TRIGGER | SUSPEND_REASON_YIELD_TRIGGER;
+constexpr u32 SUSPEND_SLICE_REASONS        = SUSPEND_REASON_SPIN_SLICE | SUSPEND_REASON_YIELD_SLICE;
 
 
 // I/O line states
@@ -171,11 +177,11 @@ public:
 	void pulse_input_line(int irqline, const attotime &duration);
 
 	// suspend/resume
-	void suspend(u32 reason, bool eatcycles);
+	void suspend(u32 reason);
 	void resume(u32 reason);
 	bool suspended(u32 reason = SUSPEND_ANY_REASON) const noexcept { return (m_nextsuspend & reason) != 0; }
-	void yield() { suspend(SUSPEND_REASON_TIMESLICE, false); }
-	void spin() { suspend(SUSPEND_REASON_TIMESLICE, true); }
+	void yield() { suspend(SUSPEND_REASON_YIELD_SLICE); }
+	void spin() { suspend(SUSPEND_REASON_SPIN_SLICE); }
 	void spin_until_trigger(int trigid) { suspend_until_trigger(trigid, true); }
 	void spin_until_time(const attotime &duration);
 	void spin_until_interrupt() { spin_until_trigger(m_inttrigger); }
@@ -224,7 +230,7 @@ protected:
 
 	// device_scheduler helpers
 	subseconds run_for(subseconds subs);
-	u32 update_suspend();
+	bool update_suspend();
 
 	// for use by devcpu for now...
 	int current_input_state(unsigned i) const { return m_input[i].m_curstate; }
@@ -336,8 +342,6 @@ private:
 	// suspend states
 	u32                     m_suspend;                  // suspend reason mask (0 = not suspended)
 	u32                     m_nextsuspend;              // pending suspend reason mask
-	u8                      m_eatcycles;                // true if we eat cycles while suspended
-	u8                      m_nexteatcycles;            // pending value
 	s32                     m_trigger;                  // pending trigger to release a trigger suspension
 	s32                     m_inttrigger;               // interrupt trigger index
 
@@ -453,26 +457,32 @@ inline subseconds device_execute_interface::run_for(subseconds subs)
 //-------------------------------------------------
 //  update_suspend - clock the pending suspension
 //  states forward, updating execution delegates
-//  along the way
+//  along the way; return true if a timeslice
+//  suspend is active
 //-------------------------------------------------
 
-inline u32 device_execute_interface::update_suspend()
+inline bool device_execute_interface::update_suspend()
 {
-	// update the suspend and eatcycles states
+	// update suspend state
 	u32 delta = m_suspend ^ m_nextsuspend;
 	m_suspend = m_nextsuspend;
-	m_nextsuspend &= ~SUSPEND_REASON_TIMESLICE;
-	m_eatcycles = m_nexteatcycles;
+
+	// clear the timeslice reasons always for the next round
+	m_nextsuspend &= ~SUSPEND_SLICE_REASONS;
 
 	// update the execution delegate
-	if (m_suspend != 0)
-		m_run_delegate = m_suspend_delegate;
-	else if (!m_scheduler->machine().debug_enabled())
-		m_run_delegate = m_run_fast_delegate;
-	else
-		m_run_delegate = m_run_debug_delegate;
+	if (delta != 0)
+	{
+		if (m_suspend != 0)
+			m_run_delegate = m_suspend_delegate;
+		else if (!m_scheduler->machine().debug_enabled())
+			m_run_delegate = m_run_fast_delegate;
+		else
+			m_run_delegate = m_run_debug_delegate;
+	}
 
-	return delta;
+	// return true if a timeslice suspend is active
+	return (m_suspend != m_nextsuspend);
 }
 
 #endif // MAME_EMU_DIEXEC_H

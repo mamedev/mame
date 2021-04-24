@@ -180,7 +180,7 @@ uint16_t tomcat_state::tomcat_inputs2_r()
 uint16_t tomcat_state::tomcat_320bio_r()
 {
 	m_dsp_bio = 1;
-	m_maincpu->suspend(SUSPEND_REASON_SPIN, 1);
+	m_maincpu->suspend(SUSPEND_REASON_SPIN);
 	return 0;
 }
 

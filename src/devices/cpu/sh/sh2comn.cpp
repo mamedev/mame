@@ -380,7 +380,7 @@ void sh2_device::sh2_do_dma(int dmach)
 		// fever soccer uses cycle-stealing mode, resume the CPU now DMA has finished
 		if (m_active_dma_steal[dmach])
 		{
-			resume(SUSPEND_REASON_HALT );
+			resume(SUSPEND_REASON_HALT);
 		}
 
 
@@ -456,7 +456,7 @@ void sh2_device::sh2_dmac_check(int dmach)
 			if (m_active_dma_steal[dmach])
 			{
 				//printf("cycle stealing DMA\n");
-				suspend(SUSPEND_REASON_HALT, 1 );
+				suspend(SUSPEND_REASON_HALT);
 			}
 
 			m_dma_current_active_timer[dmach]->adjust(cycles_to_attotime(2), dmach);

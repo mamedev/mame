@@ -305,7 +305,7 @@ void dp8344_device::device_reset()
 	m_ric = m_auto_start ? 0x03 : 0x01;
 	m_hib = false;
 	if (!m_auto_start)
-		suspend(SUSPEND_REASON_HALT, true);
+		suspend(SUSPEND_REASON_HALT);
 
 	// Reset execution state
 	m_nmi_pending = false;

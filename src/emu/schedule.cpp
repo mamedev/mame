@@ -1168,12 +1168,10 @@ inline void device_scheduler::apply_suspend_changes()
 	INCREMENT_SCHEDULER_STAT(m_apply_suspend_changes);
 
 	// update the suspend state on all executing devices
-	u32 suspendchanged = 0;
+	m_suspend_changes_pending = false;
 	for (device_execute_interface *exec = m_execute_list; exec != nullptr; exec = exec->m_nextexec)
-		suspendchanged |= exec->update_suspend();
-
-	// no more pending
-	m_suspend_changes_pending = ((suspendchanged & SUSPEND_REASON_TIMESLICE) != 0);
+		if (exec->update_suspend())
+			m_suspend_changes_pending = true;
 }
 
 

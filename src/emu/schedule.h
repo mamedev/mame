@@ -26,7 +26,7 @@
 #ifdef MAME_DEBUG
 #define SCHEDULER_DEBUG (1)
 #else
-#define SCHEDULER_DEBUG (1)
+#define SCHEDULER_DEBUG (0)
 #endif
 
 // if SCHEDULER_DEBUG is on, make assertions fire regardless of MAME_DEBUG
@@ -36,7 +36,7 @@
 #define scheduler_assert assert
 #endif
 
-#define COLLECT_SCHEDULER_STATS (1)
+#define COLLECT_SCHEDULER_STATS (0)
 #if (COLLECT_SCHEDULER_STATS)
 #define INCREMENT_SCHEDULER_STAT(x) do { x += 1; } while (0)
 #define SET_SCHEDULER_STAT(x, y) do { x = y; } while (0)

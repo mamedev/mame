@@ -567,7 +567,7 @@ TIMER_CALLBACK_MEMBER(md_base_state::megadriv_z80_run_state)
 	if (m_genz80.z80_is_reset)
 	{
 		m_z80snd->reset();
-		m_z80snd->suspend(SUSPEND_REASON_HALT, 1);
+		m_z80snd->suspend(SUSPEND_REASON_HALT);
 		m_ymsnd->reset();
 	}
 	else
@@ -576,7 +576,7 @@ TIMER_CALLBACK_MEMBER(md_base_state::megadriv_z80_run_state)
 		if (m_genz80.z80_has_bus)
 			m_z80snd->resume(SUSPEND_REASON_HALT);
 		else
-			m_z80snd->suspend(SUSPEND_REASON_HALT, 1);
+			m_z80snd->suspend(SUSPEND_REASON_HALT);
 	}
 }
 

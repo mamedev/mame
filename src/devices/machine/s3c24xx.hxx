@@ -1088,7 +1088,7 @@ void S3C24_CLASS_NAME::s3c24xx_clkpow_w(offs_t offset, uint32_t data, uint32_t m
 		LOGMASKED(LOG_CLKPOW, "%s: clock/power write: CLKCON = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 		if (BIT(data, 2) && !BIT(old, 2))
 		{
-			m_cpu->suspend(SUSPEND_REASON_HALT, 1);
+			m_cpu->suspend(SUSPEND_REASON_HALT);
 		}
 		break;
 	default:
