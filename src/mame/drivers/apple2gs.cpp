@@ -2180,31 +2180,12 @@ void apple2gs_state::do_io(int offset)
 	}
 }
 
-// apple2gs_get_vpos - return the correct vertical counter value for the current scanline,
-// keeping borders in mind.
-
+// apple2gs_get_vpos - return the correct vertical counter value for the current scanline.
 int apple2gs_state::get_vpos()
 {
-	int result, scan;
-	static const u8 top_border_vert[BORDER_TOP] =
-	{
-		0xfa, 0xfa, 0xfa, 0xfa, 0xfb, 0xfb, 0xfb, 0xfb,
-		0xfc, 0xfc, 0xfc, 0xfd, 0xfd, 0xfe, 0xfe, 0xff,
-
-	};
-
-	scan = m_screen->vpos();
-
-	if (scan < BORDER_TOP)
-	{
-		result = top_border_vert[scan];
-	}
-	else
-	{
-		result = scan - BORDER_TOP + 0x100 + 1;
-	}
-
-	return result;
+	// as per IIgs Tech Note #39, this is simply scanline + 250 on NTSC (262 lines),
+	// or scanline + 200 on PAL (312 lines)
+	return ((m_screen->vpos() + BORDER_TOP) % 262) + 250;
 }
 
 void apple2gs_state::process_clock()
