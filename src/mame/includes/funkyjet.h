@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "screen.h"
+
 #include "cpu/h6280/h6280.h"
 #include "video/decospr.h"
 #include "video/deco16ic.h"
@@ -19,6 +21,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_spriteram(*this, "spriteram")
 		, m_pf_rowscroll(*this, "pf%u_rowscroll", 1)
+		, m_screen(*this, "screen")
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_deco146(*this, "ioprot")
@@ -36,6 +39,7 @@ private:
 	required_shared_ptr_array<uint16_t, 2> m_pf_rowscroll;
 
 	/* devices */
+	required_device<screen_device> m_screen;
 	required_device<cpu_device> m_maincpu;
 	required_device<h6280_device> m_audiocpu;
 	required_device<deco146_device> m_deco146;
