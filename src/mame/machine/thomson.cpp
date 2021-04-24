@@ -1597,7 +1597,7 @@ MACHINE_START_MEMBER( mo5_state, mo5 )
 	to7_game_init();
 	to7_modem_init();
 	to7_midi_init();
-	m_mo5_periodic_timer = timer_alloc(*this, FUNC(thomson_state::mo5_periodic_cb));
+	m_mo5_periodic_timer = timer_alloc(*this, FUNC(mo5_state::mo5_periodic_cb));
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xa000, 0xa7bf);
 	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xa7d0, 0xa7df);
@@ -2423,7 +2423,7 @@ void to9_state::to9_kbd_reset()
 void to9_state::to9_kbd_init()
 {
 	LOG(( "to9_kbd_init called\n" ));
-	m_to9_kbd_timer = timer_alloc(*this, FUNC(thomson_state::to9_kbd_timer_cb));
+	m_to9_kbd_timer = timer_alloc(*this, FUNC(to9_state::to9_kbd_timer_cb));
 	save_item(NAME(m_to9_kbd_parity));
 	save_item(NAME(m_to9_kbd_intr));
 	save_item(NAME(m_to9_kbd_in));
@@ -2877,7 +2877,7 @@ void to9_state::to8_kbd_reset()
 
 void to9_state::to8_kbd_init()
 {
-	m_to8_kbd_timer = timer_alloc(*this, FUNC(thomson_state::to8_kbd_timer_cb));
+	m_to8_kbd_timer = timer_alloc(*this, FUNC(to9_state::to8_kbd_timer_cb));
 	m_to8_kbd_signal = timer_alloc();
 	save_item(NAME(m_to8_kbd_ack));
 	save_item(NAME(m_to8_kbd_data));
@@ -4001,7 +4001,7 @@ TIMER_CALLBACK_MEMBER(mo6_state::mo6_game_update_cb)
 void mo6_state::mo6_game_init()
 {
 	LOG (( "mo6_game_init called\n" ));
-	m_to7_game_timer = timer_alloc(*this, FUNC(thomson_state::mo6_game_update_cb));
+	m_to7_game_timer = timer_alloc(*this, FUNC(mo6_state::mo6_game_update_cb));
 	m_to7_game_timer->adjust(TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD);
 	save_item(NAME(m_to7_game_sound));
 	save_item(NAME(m_to7_game_mute));
@@ -4303,7 +4303,7 @@ MACHINE_START_MEMBER( mo6_state, mo6 )
 	to9_palette_init();
 	to7_modem_init();
 	to7_midi_init();
-	m_mo5_periodic_timer = timer_alloc(*this, FUNC(thomson_state::mo5_periodic_cb));
+	m_mo5_periodic_timer = timer_alloc(*this, FUNC(mo6_state::mo5_periodic_cb));
 
 	m_extension->rom_map(m_maincpu->space(AS_PROGRAM), 0xa000, 0xa7bf);
 	m_extension->io_map (m_maincpu->space(AS_PROGRAM), 0xa7d0, 0xa7df);
@@ -4423,7 +4423,7 @@ void mo5nr_state::mo5nr_sys_porta_out(uint8_t data)
 void mo5nr_state::mo5nr_game_init()
 {
 	LOG (( "mo5nr_game_init called\n" ));
-	m_to7_game_timer = timer_alloc(*this, FUNC(thomson_state::mo6_game_update_cb));
+	m_to7_game_timer = timer_alloc(*this, FUNC(mo5nr_state::mo6_game_update_cb));
 	m_to7_game_timer->adjust( TO7_GAME_POLL_PERIOD, 0, TO7_GAME_POLL_PERIOD );
 	save_item(NAME(m_to7_game_sound));
 	save_item(NAME(m_to7_game_mute));
@@ -4505,7 +4505,7 @@ MACHINE_START_MEMBER( mo5nr_state, mo5nr )
 	to9_palette_init();
 	to7_modem_init();
 	to7_midi_init();
-	m_mo5_periodic_timer = timer_alloc(*this, FUNC(thomson_state::mo5_periodic_cb));
+	m_mo5_periodic_timer = timer_alloc(*this, FUNC(mo5nr_state::mo5_periodic_cb));
 
 	m_extension->rom_map(m_extension_view[0], 0xa000, 0xa7bf);
 	m_extension->io_map (m_extension_view[0], 0xa7d0, 0xa7df);

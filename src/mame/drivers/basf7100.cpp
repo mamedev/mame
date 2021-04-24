@@ -669,7 +669,7 @@ void basf7100_state::basf7100(machine_config &config)
 	m_screen->set_size(640, 288); // wrong because of wrong charrom
 	m_screen->set_visarea_full();
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	m_screen->set_vblank_time(subseconds::from_usec(2500)); // not accurate
 	m_screen->set_screen_update(FUNC(basf7100_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(basf7100_state::vblank_w));
 

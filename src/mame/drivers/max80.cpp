@@ -332,7 +332,7 @@ u8 max80_state::keyboard_r(offs_t offset)
 
 u8 max80_state::fdc_status_r(offs_t offset)
 {
-	u8 data = 0xfc | m_fdc_drq | (m_fdc_int << 1);
+	u8 data = 0xfc | (m_fdc_drq ? 1 : 0) | (m_fdc_int << 1);
 	return data;
 }
 
@@ -448,7 +448,7 @@ void max80_state::max80(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2000)); // not accurate
+	screen.set_vblank_time(subseconds::from_usec(2000)); // not accurate
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 639, 0, 479);

@@ -2989,7 +2989,7 @@ void calomega_state::sys906(machine_config &config)
 
 	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(100));
+	screen.set_vblank_time(subseconds::from_usec(100));
 	screen.set_size((39+1)*8, (31+1)*8);             // Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1).
 	screen.set_visarea(0*8, 32*8-1, 0*8, 31*8-1);    // Taken from MC6845 init, registers 01 & 06.
 	screen.set_screen_update(FUNC(calomega_state::screen_update_calomega));
