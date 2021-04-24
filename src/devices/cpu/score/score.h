@@ -119,8 +119,7 @@ private:
 	uint32_t              m_cr[0x20];
 	uint32_t              m_sr[3];
 	uint32_t              m_ce[2];
-	bool                  m_has_pending_interrupt;
-	bool                  m_pending_interrupt[64];
+	uint64_t              m_pending_interrupt;
 
 	// opcodes tables
 	typedef void (score7_cpu_device::*op_handler)();
