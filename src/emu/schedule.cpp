@@ -114,7 +114,7 @@ timer_callback &timer_callback::set_ptr(void *ptr)
 {
 	// only allowed to set pointers prior to execution; use the save state
 	// registration_allowed() as a proxy for this
-	if (!m_scheduler->machine().save().registration_allowed())
+	if (m_scheduler != nullptr && !m_scheduler->machine().save().registration_allowed())
 		throw emu_fatalerror("Timer pointers must remain constant after creation.");
 	m_ptr = ptr;
 	return *this;
@@ -141,7 +141,7 @@ timer_callback &timer_callback::set_device(device_t &device)
 //  init_base - register a callback
 //-------------------------------------------------
 
-timer_callback &timer_callback::init_base(device_scheduler &scheduler, timer_expired_delegate const &delegate, char const *unique, const char *unique2)
+timer_callback &timer_callback::init_base(device_scheduler *scheduler, timer_expired_delegate const &delegate, char const *unique, const char *unique2)
 {
 	// build the full name, appending the unique identifier(s) if present
 	std::string fullid = delegate.name();
@@ -160,7 +160,7 @@ timer_callback &timer_callback::init_base(device_scheduler &scheduler, timer_exp
 	if (m_next_registered == nullptr)
 	{
 		m_delegate = delegate;
-		m_scheduler = &scheduler;
+		m_scheduler = scheduler;
 		m_unique_id = fullid;
 		m_unique_hash = util::crc32_creator::simple(fullid.c_str(), fullid.length());
 		m_save_index = m_scheduler->register_callback(*this);
@@ -185,7 +185,7 @@ timer_callback &timer_callback::init_base(device_scheduler &scheduler, timer_exp
 
 timer_callback &timer_callback::init_device(device_t &device, timer_expired_delegate const &delegate, char const *unique)
 {
-	return init(device.machine().scheduler(), delegate, device.tag(), unique).set_device(device);
+	return init_base(device.has_running_machine() ? &device.machine().scheduler() : nullptr, delegate, device.tag(), unique).set_device(device);
 }
 
 
@@ -1173,7 +1173,7 @@ inline void device_scheduler::apply_suspend_changes()
 		suspendchanged |= exec->update_suspend();
 
 	// no more pending
-	m_suspend_changes_pending = false;
+	m_suspend_changes_pending = ((suspendchanged & SUSPEND_REASON_TIMESLICE) != 0);
 }
 
 

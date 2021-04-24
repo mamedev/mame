@@ -258,7 +258,7 @@ public:
 	// registration of a delegate directly
 	timer_callback &init(device_scheduler &scheduler, timer_expired_delegate const &delegate, char const *unique = nullptr, char const *unique2 = nullptr)
 	{
-		return init_base(scheduler, delegate, unique, unique2);
+		return init_base(&scheduler, delegate, unique, unique2);
 	}
 
 	// registration of an arbitrary member function bound to an arbitrary object; requires the
@@ -266,7 +266,7 @@ public:
 	template<typename ObjectType, typename FuncType, std::enable_if_t<std::is_member_function_pointer<FuncType>::value, bool> = true>
 	timer_callback &init(device_scheduler &scheduler, ObjectType &object, FuncType callback, char const *string, char const *unique = nullptr)
 	{
-		return init_base(scheduler, timer_expired_delegate(callback, string, &object), unique);
+		return init_base(&scheduler, timer_expired_delegate(callback, string, &object), unique);
 	}
 
 	// registration of a device member function bound to that device
@@ -301,7 +301,7 @@ public:
 
 private:
 	// registration helpers
-	timer_callback &init_base(device_scheduler &scheduler, timer_expired_delegate const &delegate, char const *unique = nullptr, char const *unique2 = nullptr);
+	timer_callback &init_base(device_scheduler *scheduler, timer_expired_delegate const &delegate, char const *unique = nullptr, char const *unique2 = nullptr);
 	timer_callback &init_device(device_t &device, timer_expired_delegate const &delegate, char const *unique);
 	timer_callback &init_clone(timer_callback const &src, timer_expired_delegate const &delegate);
 
