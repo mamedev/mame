@@ -112,6 +112,7 @@ void score7_cpu_device::device_start()
 	save_item(NAME(m_sr));
 	save_item(NAME(m_ce));
 	save_item(NAME(m_pending_interrupt));
+	save_item(NAME(m_has_pending_interrupt));
 }
 
 
@@ -127,6 +128,7 @@ void score7_cpu_device::device_reset()
 	memset(m_sr, 0, sizeof(m_sr));
 	memset(m_ce, 0, sizeof(m_ce));
 	memset(m_pending_interrupt, 0, sizeof(m_pending_interrupt));
+	m_has_pending_interrupt = false;
 
 	REG_EXCPVEC = m_pc = 0x9f000000;
 }
@@ -180,7 +182,8 @@ void score7_cpu_device::execute_run()
 		m_ppc = m_pc;
 		debugger_instruction_hook(m_pc);
 
-		check_irq();
+		if (m_has_pending_interrupt)
+			check_irq();
 
 		uint32_t op = fetch();
 
@@ -225,6 +228,7 @@ void score7_cpu_device::execute_set_input(int inputnum, int state)
 		if (inputnum > 0 && inputnum < 64)
 		{
 			m_pending_interrupt[inputnum] = true;
+			m_has_pending_interrupt = true;
 		}
 	}
 }
@@ -330,6 +334,8 @@ void score7_cpu_device::check_irq()
 				return;
 			}
 		}
+
+		m_has_pending_interrupt = false;
 	}
 }
 
