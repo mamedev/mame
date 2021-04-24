@@ -503,8 +503,11 @@ void radionic_state::radionic(machine_config &config)
 	m_cassette->set_formats(trs80l2_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("trs80_cass");
 
-	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(radionic_state::quickload_cb));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)));
+	quickload.set_load_callback(FUNC(radionic_state::quickload_cb));
+	quickload.set_interface("trs80_quik");
 
 	FD1771(config, m_fdc, 16_MHz_XTAL / 16);
 	m_fdc->intrq_wr_callback().set(FUNC(radionic_state::intrq_w));
@@ -545,6 +548,10 @@ void radionic_state::radionic(machine_config &config)
 	m_ppi->out_pa_callback().set(FUNC(radionic_state::ppi_pa_w));    // Data for external plugin printer module
 	m_ppi->out_pb_callback().set(FUNC(radionic_state::ppi_pb_w));    // Control data to external
 	m_ppi->out_pc_callback().set(FUNC(radionic_state::ppi_pc_w));    // Printer strobe
+
+	SOFTWARE_LIST(config, "cass_list").set_original("trs80_cass").set_filter("1"); // R
+	SOFTWARE_LIST(config, "quik_list").set_original("trs80_quik").set_filter("1"); // R
+	SOFTWARE_LIST(config, "flop_list").set_original("trs80_flop").set_filter("1"); // R
 }
 
 

@@ -601,8 +601,11 @@ void lnw80_state::lnw80(machine_config &config)
 	m_cassette->set_formats(trs80l2_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("trs80_cass");
 
-	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(lnw80_state::quickload_cb));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)));
+	quickload.set_load_callback(FUNC(lnw80_state::quickload_cb));
+	quickload.set_interface("trs80_quik");
 
 	FD1771(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(FUNC(lnw80_state::intrq_w));
@@ -639,6 +642,10 @@ void lnw80_state::lnw80(machine_config &config)
 	m_lnw_bank->set_data_width(8);
 	m_lnw_bank->set_addr_width(16);
 	m_lnw_bank->set_stride(0x4000);
+
+	SOFTWARE_LIST(config, "cass_list").set_original("trs80_cass").set_filter("1"); // L
+	SOFTWARE_LIST(config, "quik_list").set_original("trs80_quik").set_filter("1"); // L
+	SOFTWARE_LIST(config, "flop_list").set_original("trs80_flop").set_filter("1"); // L
 }
 
 

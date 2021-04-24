@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+Cassettes for the TRS-80 Model 1 Level 2, and clones.
+
+Compatibility flags:
+0 = trs80
+1 = trs80l2 and clones
+3 = trs80m3
+4 = trs80m4
+H = HT series
+M = meritum
+
+If no flag is specified, it's assumed it works on all of them.
+
+Baud rates: trs80 (250 baud), meritum (700 baud), lnw80 at HI speed (1000 baud), all others (500 baud).
+            Tapes meant for one baud cannot be used on a machine that expects a different baud.
+            trs80m3 and trs80m4 have a question at start, it says Cass? if you answer L the speed is 500,
+            otherwise it is 1500.
+
+Note that trs80m4p doesn't physically have a cassette interface, so no tapes can be used.
+
+-->
+<softwarelist name="trs80_cass" description="Radio Shack TRS-80 cassettes">
+
+	<software name="android">
+		<description>Android Nim</description>
+		<year>1978</year>
+		<publisher>80-NW Publishing Co</publisher>
+		<info name="author" value="Leo Christopherson" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt) CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass1" interface="trs80_cass">
+			<dataarea name="cass" size="0x3785">
+				<rom name="android1.cas" size="0x3785" crc="4f72e456" sha1="d53a619c8f3d734f08db6ade979cdb267097e2cf"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="meteor2">
+		<description>Meteor Mission 2</description>
+		<year>1982</year>
+		<publisher>Big Five Software</publisher>
+		<info name="author" value="Bill Hogue and Jeff Konyu" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt) SYSTEM then METEOR then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" /><!-- Graphics are better on 3,4 -->
+		<part name="cass1" interface="trs80_cass">
+			<dataarea name="cass" size="0x2ff8">
+				<rom name="meteor2.cas" size="0x2ff8" crc="144417c0" sha1="26b441bd494ddbce478239c1727087e64a95e447"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -441,6 +441,10 @@ void trs80_state::trs80(machine_config &config)       // the original model I, l
 	m_cassette->set_formats(trs80l1_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("trs80_cass");
+
+	/* software lists */
+	SOFTWARE_LIST(config, "cass_list").set_original("trs80_cass").set_filter("0");
 }
 
 void trs80_state::model1(machine_config &config)      // model I, level II
@@ -454,7 +458,9 @@ void trs80_state::model1(machine_config &config)      // model I, level II
 	/* devices */
 	m_cassette->set_formats(trs80l2_cassette_formats);
 
-	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(trs80_state::quickload_cb));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)));
+	quickload.set_load_callback(FUNC(trs80_state::quickload_cb));
+	quickload.set_interface("trs80_quik");
 
 	FD1771(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(FUNC(trs80_state::intrq_w));
@@ -485,6 +491,10 @@ void trs80_state::model1(machine_config &config)      // model I, level II
 	//MCFG_AY31015_WRITE_DAV_CB(WRITELINE( , , ))
 	m_uart->set_auto_rdav(true);
 	RS232_PORT(config, "rs232", default_rs232_devices, nullptr);
+
+	SOFTWARE_LIST(config.replace(), "cass_list").set_original("trs80_cass").set_filter("1");
+	SOFTWARE_LIST(config, "quik_list").set_original("trs80_quik").set_filter("1");
+	SOFTWARE_LIST(config, "flop_list").set_original("trs80_flop").set_filter("1");
 }
 
 void trs80_state::sys80(machine_config &config)
@@ -516,6 +526,9 @@ void trs80_state::ht1080z(machine_config &config)
 	AY8910(config, "ay1", 1'500'000).add_route(ALL_OUTPUTS, "mono", 0.25); // guess of clock
 	//ay1.port_a_read_callback(FUNC(trs80_state::...);  // ports are some kind of expansion slot
 	//ay1.port_b_read_callback(FUNC(trs80_state::...);
+
+	SOFTWARE_LIST(config.replace(), "cass_list").set_original("trs80_cass").set_filter("H");
+	SOFTWARE_LIST(config.replace(), "quik_list").set_original("trs80_quik").set_filter("H");
 }
 
 

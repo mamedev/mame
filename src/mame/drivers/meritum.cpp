@@ -527,9 +527,13 @@ void meritum_state::meritum1(machine_config &config)
 
 	// media
 	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_PLAY);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(meritum_state::quickload_cb));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)));
+	quickload.set_load_callback(FUNC(meritum_state::quickload_cb));
+	quickload.set_interface("trs80_quik");
+	SOFTWARE_LIST(config, "quik_list").set_original("trs80_quik").set_filter("M");
 }
 
 void meritum_state::meritum2(machine_config &config)
