@@ -662,6 +662,9 @@ void memory_view::disable()
 	m_cur_id = -1;
 	m_handler_read->select_a(-1);
 	m_handler_write->select_a(-1);
+
+	if(m_space)
+		m_space->invalidate_caches(read_or_write::READWRITE);	
 }
 
 void memory_view::select(int slot)
@@ -674,6 +677,9 @@ void memory_view::select(int slot)
 	m_cur_id = i->second;
 	m_handler_read->select_a(m_cur_id);
 	m_handler_write->select_a(m_cur_id);
+
+	if(m_space)
+		m_space->invalidate_caches(read_or_write::READWRITE);
 }
 
 int memory_view::id_to_slot(int id) const

@@ -438,7 +438,7 @@ void wd177x_format::check_compatibility(floppy_image *image, std::vector<int> &c
 					break;
 				}
 				int ns = 0;
-				for(int j=0; j<256; j++)
+				for(int j=0; j<int(sectors.size()); j++)
 					if(!sectors[j].empty()) {
 						int sid;
 						if(tf.sector_base_id == -1) {

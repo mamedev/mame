@@ -20,10 +20,10 @@ license:CC0
 
 	<element name="led" defstate="0">
 		<disk state="0">
-			<color red="0.20" green="0.0" blue="0.0" />
+			<color red="0.2" green="0" blue="0" />
 		</disk>
 		<disk state="1">
-			<color red="0.95" green="0.0" blue="0.0" />
+			<color red="1" green="0.1" blue="0.1" />
 		</disk>
 	</element>
 	<element name="hlbr" defstate="0">

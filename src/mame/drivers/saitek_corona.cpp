@@ -14,7 +14,6 @@ different compared to Stratos/Turbo King.
 #include "includes/saitek_stratos.h"
 
 #include "cpu/m6502/m65c02.h"
-#include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
@@ -52,13 +51,12 @@ protected:
 
 private:
 	// devices/pointers
-	required_device<address_map_bank_device> m_rombank;
+	memory_view m_rombank;
 	required_device<sensorboard_device> m_board;
 	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<8+1> m_inputs;
 
 	void main_map(address_map &map);
-	void rombank_map(address_map &map);
 
 	// I/O handlers
 	void update_leds();
@@ -106,7 +104,8 @@ void corona_state::machine_reset()
 {
 	saitek_stratos_state::machine_reset();
 
-	m_rombank->set_bank(0);
+	m_control2 = 0;
+	m_rombank.select(0);
 }
 
 
@@ -120,11 +119,11 @@ void corona_state::machine_reset()
 void corona_state::update_leds()
 {
 	// button leds
-	m_display->matrix_partial(0, 2, 1 << (m_control1 >> 5 & 1), ~m_led_data1 & 0xff, false);
+	m_display->matrix_partial(0, 2, 1 << (m_control1 >> 5 & 1), ~m_led_data1 & 0xff);
 	m_display->write_row(2, ~m_select1 >> 4 & 0xf);
 
 	// chessboard leds
-	m_display->matrix_partial(3, 8, 1 << (m_select1 & 0xf), m_led_data2, true);
+	m_display->matrix_partial(3, 8, 1 << (m_select1 & 0xf), m_led_data2);
 }
 
 void corona_state::leds1_w(u8 data)
@@ -169,7 +168,7 @@ void corona_state::control1_w(u8 data)
 void corona_state::control2_w(u8 data)
 {
 	// d0,d1: rombank
-	m_rombank->set_bank(data & 3);
+	m_rombank.select(data & 3);
 
 	// d2 rising edge: write to lcd
 	if (~m_control2 & data & 4)
@@ -239,14 +238,12 @@ void corona_state::main_map(address_map &map)
 	map(0x6200, 0x6200).w(FUNC(corona_state::lcd_reset_w));
 	map(0x6400, 0x6400).w(FUNC(corona_state::leds2_w));
 	map(0x6600, 0x6600).rw(FUNC(corona_state::control2_r), FUNC(corona_state::control2_w));
-	map(0x8000, 0xffff).m(m_rombank, FUNC(address_map_bank_device::amap8));
-}
 
-void corona_state::rombank_map(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x00000, 0x0ffff).rom().region("maincpu", 0);
-	map(0x10000, 0x17fff).r("extrom", FUNC(generic_slot_device::read_rom));
+	map(0x8000, 0xffff).view(m_rombank);
+	m_rombank[0](0x8000, 0xffff).rom().region("maincpu", 0x0000);
+	m_rombank[1](0x8000, 0xffff).rom().region("maincpu", 0x8000);
+	m_rombank[2](0x8000, 0xffff).r("extrom", FUNC(generic_slot_device::read_rom));
+	m_rombank[3](0x8000, 0xffff).lr8(NAME([]() { return 0xff; }));
 }
 
 
@@ -274,8 +271,6 @@ void corona_state::corona(machine_config &config)
 	M65C02(config, m_maincpu, 5_MHz_XTAL); // see set_cpu_freq
 	m_maincpu->set_addrmap(AS_PROGRAM, &corona_state::main_map);
 	m_maincpu->set_periodic_int(FUNC(corona_state::irq0_line_hold), attotime::from_hz(183));
-
-	ADDRESS_MAP_BANK(config, "rombank").set_map(&corona_state::rombank_map).set_options(ENDIANNESS_LITTLE, 8, 17, 0x8000);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

@@ -31,7 +31,6 @@ TODO:
 
 #include "cpu/m6502/m65c02.h"
 #include "cpu/m6502/r65c02.h"
-#include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
@@ -79,7 +78,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<address_map_bank_device> m_rombank;
+	memory_view m_rombank;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<pwm_display_device> m_lcd_pwm;
@@ -88,9 +87,8 @@ private:
 	required_ioport_array<8+1> m_inputs;
 	output_finder<16, 34> m_out_lcd;
 
-	void main_map(address_map &map);
-	void simultano_rombank_map(address_map &map);
-	void cc2150_rombank_map(address_map &map);
+	void simultano_map(address_map &map);
+	void cc2150_map(address_map &map);
 
 	void power_off();
 	void lcd_pwm_w(offs_t offset, u8 data);
@@ -120,7 +118,8 @@ void simultano_state::machine_start()
 void simultano_state::machine_reset()
 {
 	m_power = true;
-	m_rombank->set_bank(0);
+	m_control = 0;
+	m_rombank.select(0);
 }
 
 
@@ -182,8 +181,8 @@ void simultano_state::select_w(u8 data)
 	// d0-d3: input/chessboard mux
 	// d6,d7: side panel led mux
 	// d4,d5: led data
-	m_display->matrix_partial(0, 2, data >> 4 & 3, 1 << (data & 0xf), false);
-	m_display->matrix_partial(2, 2, data >> 6 & 3, ~data >> 4 & 3, true);
+	m_display->matrix_partial(0, 2, data >> 4 & 3, 1 << (data & 0xf));
+	m_display->matrix_partial(2, 2, data >> 6 & 3, ~data >> 4 & 3);
 	m_select = data;
 }
 
@@ -211,7 +210,7 @@ void simultano_state::control_w(u8 data)
 	m_control = data;
 
 	// d0,d1: rombank
-	m_rombank->set_bank(bitswap<2>(data,0,1));
+	m_rombank.select(bitswap<2>(data,0,1));
 
 	// d6 falling edge: power-off request
 	if (~data & prev & 0x40)
@@ -224,7 +223,7 @@ void simultano_state::control_w(u8 data)
     Address Maps
 ******************************************************************************/
 
-void simultano_state::main_map(address_map &map)
+void simultano_state::cc2150_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
 	map(0x2000, 0x2000).w(FUNC(simultano_state::select_w));
@@ -233,19 +232,18 @@ void simultano_state::main_map(address_map &map)
 	map(0x2600, 0x2600).rw(FUNC(simultano_state::control_r), FUNC(simultano_state::control_w));
 	//map(0x4000, 0x5fff).noprw(); // tries to access RAM, unpopulated on PCB
 	map(0x6000, 0x607f).rw("lcd", FUNC(sed1502_device::read), FUNC(sed1502_device::write));
-	map(0x8000, 0xffff).m(m_rombank, FUNC(address_map_bank_device::amap8));
+
+	map(0x8000, 0xffff).view(m_rombank);
+	m_rombank[0](0x8000, 0xffff).rom().region("maincpu", 0x0000);
+	m_rombank[1](0x8000, 0xffff).rom().region("maincpu", 0x8000);
+	m_rombank[2](0x8000, 0xffff).lr8(NAME([]() { return 0xff; }));
+	m_rombank[3](0x8000, 0xffff).lr8(NAME([]() { return 0xff; }));
 }
 
-void simultano_state::cc2150_rombank_map(address_map &map)
+void simultano_state::simultano_map(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x00000, 0x0ffff).rom().region("maincpu", 0);
-}
-
-void simultano_state::simultano_rombank_map(address_map &map)
-{
-	cc2150_rombank_map(map);
-	map(0x10000, 0x17fff).r("extrom", FUNC(generic_slot_device::read_rom));
+	cc2150_map(map);
+	m_rombank[2](0x8000, 0xffff).r("extrom", FUNC(generic_slot_device::read_rom));
 }
 
 
@@ -322,12 +320,8 @@ void simultano_state::cc2150(machine_config &config)
 {
 	/* basic machine hardware */
 	R65C02(config, m_maincpu, 3_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &simultano_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &simultano_state::cc2150_map);
 	m_maincpu->set_periodic_int(FUNC(simultano_state::irq0_line_hold), attotime::from_hz(91.6)); // measured
-
-	ADDRESS_MAP_BANK(config, m_rombank);
-	m_rombank->set_map(&simultano_state::cc2150_rombank_map);
-	m_rombank->set_options(ENDIANNESS_LITTLE, 8, 17, 0x8000);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -361,10 +355,8 @@ void simultano_state::simultano(machine_config &config)
 
 	/* basic machine hardware */
 	M65C02(config.replace(), m_maincpu, 5_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &simultano_state::main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &simultano_state::simultano_map);
 	m_maincpu->set_periodic_int(FUNC(simultano_state::irq0_line_hold), attotime::from_hz(76)); // approximation
-
-	m_rombank->set_map(&simultano_state::simultano_rombank_map);
 
 	/* extension rom */
 	GENERIC_CARTSLOT(config, "extrom", generic_plain_slot, "saitek_egr");

@@ -31,112 +31,14 @@
             table from the UTILITIES menu.  It's best to do a FULL FACTORY RESTORE
 
 
+*************************************************************************
+
 Super High Impact
 Midway, 1991
 
 This game runs on (typical) Midway Y-Unit hardware. The PCB is a base
 board 'system' that can run other Y-Unit games by swapping ROMs and
 the protection chip.
-
-*************************************************************************
-
-Notes for NARC based on source code release:
-
-  DESIGNED BY: EUGENE P. JARVIS, GEORGE N. PETRO, TODD R. ALLEN & JACK E. HAEGER
-PROGRAMMED BY: EUGENE P. JARVIS, GEORGE N. PETRO, TODD R. ALLEN & LAWRENCE E. DEMAR
-   ARTWORK BY: JACK E. HAEGER, JOHN R. NEWCOMER, LIN YOUNG & TIMOTHY J. ELLIOT
-    Z-UNIT BY: MARK "THE LARGE ONE" LOFFREDO & GLENN A. MILLION (SHIPP)
-
-      STARTED:  8/1/87
-RELEASED 2.00:  1/16/89
-
-Revision history for NARC:
-
-1.0   Initial software for AMOA 1988 (11/3/88)
-1.1   Fixed driving wave. Fixed cars left behind is deleted & warped ahead (11/14/88)
-1.2   Initial On-Sight test software. Added coins & audits. Players hit by explosions & rockets (11/19/88)
-1.3   Fixed 2nd player buy-in. More audits & core dump software (11/21/88)
-1.8   First game release for PROTO run (250) games released for greed reasons. Not recommended by dev team (12/18/88)
-1.91  Used as location test, no other information, see below
-2.00  Production release number 1. Too much was added / changed from v1.8 for itemized. Considered starting point
-      for production revisions (1/16/89)
-3.00  More data structures initialized on secret bonus.
-      Bad trap jumps to secret bonus any time during gameplay.
-      Fixed Player cold start supplemental list knot bug.
-      Added sound for exploding Sgt. Skyghighs.
-      Wheel chairs and cards are no longer transferred.
-      Added more gameplay per attract mode cycle.
-      Fixed the endless buy-in music.
-      New and improved joystick Left/Right flip response
-      An unlocked card slot door lets either player out now.
-      Made both players walk through the safe doors. (2/5/89)
-3.10  Production run release number 2
-      If a cash card exists and only one player is active, then that player activates the cash machine regardless.
-      Made breakers and such in the drug lab easier to pop with bullets.
-      Factory Difficulty setting lowered to 3
-      German Factory Difficulty = 2, Buyin = Easy
-      Dumpster is much kinder (2/9/89)
-3.20  Added stupid pea brained idea to mark a ROM good if it only dropped 1 bit in a byte. This was for the ROM test.
-      This was done because the 512 parts there were purchased would lose bits over time. This decision was made by
-      Williams management, and is also a prime example of their infinite wisdom. Surely I jest. (2/13/89)
-3.30  Bad 27C512s are dropping more then 1 bit per byte in some cases. Williams management has now decided that then
-      ROM check change should be removed. There is a difference between production and development, they should not
-      be mixed (2/14/89)
-3.31  Same as 3.30, except is made to be burned on 1 Mbit ROMs (2/14/89)
-4.00  Same as 3.30, but Gurnee did not like our revision number. It was too hard to distinguish. (2/17/89)
-5.00  Same as 3.31, for the revision # reason. (2/17/89)
-6.00  Fixes Player Buy-in to invisibility bug. It was hard to find but we fingered it. (2/20/89)  - Yes! it was noted as "fingered"
-7.00  Same as 6.00 but for 1 Mbit ROMs. (2/20/89)
-
-  There was a location test report generated on Saturday afternoon 1/21/89 for a currently undumped
-    Version 1.91  4 locations: Chicago Game Co., Times Square, Alladin's Castle and Galaxy Game Center.
-
-  The following feedback was also documented:
-   Chicago Game Co. ( 527 Plays... 0 Dump of any kind ):
-     No Mr. Big Kills
-     Only 2 trips to the silver safe
-   Times Square ( 876 Plays... 2 "Survived Lockup" ):
-     No Mr. Big Kills
-     Continuous Buy-in observed in the silver safe and beyond
-   Alladin's Castle ( 704 Plays... 1 Watchdog ):
-     Mr. Big killed twice
-     Report that helicopter can be made to disappear by violent car action
-   Galaxy Game Center ( 617 plays... 1 Lockup ):
-     No Mr. Big kills
-     Players not able to find blue card in drug lab witnessed
-
-*************************************************************************
-
-TROG development based on notes in source code & dumped sets:
-
-TROG:
- STARTED:  6/5/89   INTERNATIONAL DUX DAY
-RELEASED:
-  1.00     6/20/90  FINAL VERSION OF ORIGINAL TROG
-  2.00     6/27/90  FIXED NASTY DINO SPACE BUG
-  3.00     7/9/90   A FEW CORRECTIONS
-  4.00     7/27/90
-
-PAC-TROG (prototype & release):
- STARTED:  7/10/90
-RELEASED:
-   PA3     8/15/90
-   PA5     8/28/90
-   PA6     9/27/90  PROTO PAC-TROG 10 DOMESTIC 10 ABROAD.
-   LA1     1/14/91  MANY CHANGES BEFORE PRODUCTION
-   LA2     2/6/91   FIRST TO BE MASS PRODUCED
-   LA3     2/14/91  HAPPY VALENTINES DAY!
-   LA4     3/11/91
-   LA5     3/29/91
-
-      DESIGN:  GEORGE N. PETRO & JACK E. HAEGER
-GAME PROGRAM:  GEORGE N. PETRO & J. KURT MAHAN
-    HARDWARE:  MARK LOFFREDO, GLENN SHIPP & CARY MEDNICK
-
-ARTWORK, ANIMATIONS, CLAY SCULPTING: JACK E. HAEGER
-
-*************************************************************************
-
 
 PCB Layout
 ----------
@@ -2190,17 +2092,6 @@ ROM_START( trogpa5 )
 ROM_END
 
 
-/*
-Trog's source code release documents an undumped PAC-TROG version PA3-PAC 8/15/90 set with the following unique ROMs:
-
-TROGU105.PP  checksum 2298  program ROM
-TROGU89.PP   checksum E999  program ROM
-TROGU97.PP   checksum 2E80  image ROM
-TROGU113.PP  checksum 737D  image ROM
-
-*/
-
-
 ROM_START( trogpa4 )
 	ROM_REGION( 0x90000, "cvsd:cpu", 0 )    /* sound CPU */
 	ROM_LOAD( "trog_ii_u-4_sl_1.u4",   0x10000, 0x10000, CRC(759d0bf4) SHA1(c4c3fa51c43cf7fd241ac1f33d7d220aa9f9edb3) )
@@ -2338,7 +2229,7 @@ ROM_START( smashtv5 )
 ROM_END
 
 
-ROM_START( smashtv4 ) // source docs states Smash TV Rev 4.00 released 5/4/90 to production.
+ROM_START( smashtv4 )
 	ROM_REGION( 0x90000, "cvsd:cpu", 0 )    /* sound CPU */
 	ROM_LOAD ( "sl2_smash_tv_sound_rom_u4.u4",   0x10000, 0x10000, CRC(29d3f6c8) SHA1(8a90cdff54f59ddb7dba521504d880515a59df08) )
 	ROM_RELOAD(                                  0x20000, 0x10000 )

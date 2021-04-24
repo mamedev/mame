@@ -35,19 +35,18 @@ public:
 	void set_bri_one(u8 i, double level) { m_levels[i] = level; }
 	void segmask_one(u8 y, u64 mask) { m_segmask[y] = mask; }
 
-	void matrix_partial(u8 start, u8 height, u64 rowsel, u64 rowdata, bool upd = true);
-	void matrix(u64 rowsel, u64 rowdata, bool upd = true) { matrix_partial(0, m_height, rowsel, rowdata, upd); }
-	void update(); // apply changes to m_rowdata
+	void matrix_partial(u8 start, u8 height, u64 rowsel, u64 rowdata);
+	void matrix(u64 rowsel, u64 rowdata) { matrix_partial(0, m_height, rowsel, rowdata); }
 	void clear() { matrix(0, 0); }
 
 	// directly handle individual element (does not affect m_rowsel), y = row num, x = row bit
 	int read_element(u8 y, u8 x) { return BIT(m_rowdata[y], x); }
-	void write_element(u8 y, u8 x, int state) { m_rowdata[y] = (m_rowdata[y] & ~(u64(1) << x)) | (u64(state ? 1 : 0) << x); }
+	void write_element(u8 y, u8 x, int state) { sync(); m_rowdata[y] = (m_rowdata[y] & ~(u64(1) << x)) | (u64(state ? 1 : 0) << x); }
 
 	// directly handle row data
 	u64 read_row(offs_t offset) { return m_rowdata[offset]; }
-	void write_row(offs_t offset, u64 data) { m_rowdata[offset] = data; m_rowsel |= u64(1) << offset; }
-	void clear_row(offs_t offset, u64 data = 0) { m_rowdata[offset] = 0; m_rowsel &= ~(u64(1) << offset); }
+	void write_row(offs_t offset, u64 data) { sync(); m_rowdata[offset] = data; m_rowsel |= u64(1) << offset; }
+	void clear_row(offs_t offset, u64 data = 0) { sync(); m_rowdata[offset] = 0; m_rowsel &= ~(u64(1) << offset); }
 
 	// directly handle element current brightness
 	double read_element_bri(u8 y, u8 x) { return m_bri[y][x]; }
@@ -81,17 +80,16 @@ private:
 
 	u64 m_segmask[0x40];
 	u64 m_rowsel;
-	u64 m_rowsel_prev;
 	u64 m_rowdata[0x40];
-	u64 m_rowdata_prev[0x40];
 
 	double m_bri[0x40][0x41];
-	attotime m_update_time;
+	attotime m_sync_time;
 	attotime m_acc[0x40][0x41];
 
 	emu_timer *m_frame_timer;
 	TIMER_CALLBACK_MEMBER(frame_tick);
 	void schedule_frame();
+	void sync();
 };
 
 

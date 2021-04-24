@@ -497,10 +497,13 @@ void arm_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 
-	if(m_program->endianness() == ENDIANNESS_LITTLE) {
+	if(m_program->endianness() == ENDIANNESS_LITTLE)
+	{
 		m_program->cache(m_cachele);
 		m_pr32 = [this](offs_t address) -> u32 { return m_cachele.read_dword(address); };
-	} else {
+	}
+	else
+	{
 		m_program->cache(m_cachebe);
 		m_pr32 = [this](offs_t address) -> u32 { return m_cachebe.read_dword(address); };
 	}
@@ -824,7 +827,7 @@ void arm_cpu_device::HandleALU( uint32_t insn )
 	{
 		op2 = decodeShift(insn, (insn & INSN_S) ? &sc : nullptr);
 
-			if (!(insn & INSN_S))
+		if (!(insn & INSN_S))
 			sc=0;
 	}
 

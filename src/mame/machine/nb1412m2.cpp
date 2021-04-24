@@ -14,8 +14,6 @@ It is unknown at current stage if inside the chip there's a MCU
 (with internal ROM).
 
 TODO:
-- main sound timer is "jumpy" (like BGM tempo gets screwy then fixes itself somehow),
-  fiddling with port 0x90 seems to improve things, why?
 - DAC timer is guessworked;
 
 Legacy notes from drivers:
@@ -104,7 +102,7 @@ void nb1412m2_device::nb1412m2_map(address_map &map)
 	map(0x42, 0x43).nopw(); // always 0x03
 
 	// DAC control
-	map(0x11, 0x11).nopw(); // - unknown (volume/channel control?)
+	map(0x11, 0x11).w(FUNC(nb1412m2_device::dac_control_w));
 	map(0x18, 0x18).w(FUNC(nb1412m2_device::dac_timer_w)); // timer frequency
 	map(0x19, 0x19).nopw(); // 2 written at POST
 	map(0x51, 0x52).w(FUNC(nb1412m2_device::dac_address_w)); //  start address
@@ -158,6 +156,7 @@ void nb1412m2_device::device_start()
 	save_item(NAME(m_dac_playback));
 	save_item(NAME(m_dac_frequency));
 	save_item(NAME(m_const90));
+	save_item(NAME(m_timer_rate));
 
 	m_timer = timer_alloc(TIMER_MAIN);
 	m_timer->adjust(attotime::never);
@@ -179,9 +178,9 @@ void nb1412m2_device::device_reset()
 	m_rom_op = 0;
 	m_const90 = 0x18; // fixes coin sample if inserted at first title screen
 	m_dac_current_address = m_dac_start_address = 0;
-	m_dac_frequency = 4000;
 	m_timer_reg = false;
 	m_dac_playback = false;
+	dac_timer_w(0xd0);
 	m_dac_timer->adjust(attotime::never);
 }
 
@@ -290,8 +289,10 @@ void nb1412m2_device::timer_w(uint8_t data)
 	if(data != 1)
 		logerror("nb1412m2: timer_w with data == %02x\n",data);
 
-	// TODO: timing of this, related to m_const90?
-	m_timer->adjust(attotime::from_hz(960));
+	// The DAC frequency and timer clock are linked.
+	// When the DAC clock changes, sound driver sets wait loop count ($C010)
+	// in the range of 2 to 4 in order to keep the tempo of BGM even if clock changed.
+	m_timer->adjust(attotime::from_hz(double(clock()) / (256 * 35) * m_timer_rate));
 }
 
 void nb1412m2_device::timer_ack_w(uint8_t data)
@@ -314,13 +315,22 @@ void nb1412m2_device::dac_address_w(offs_t offset, uint8_t data)
 	}
 }
 
+void nb1412m2_device::dac_control_w(uint8_t data)
+{
+	if (data == 0)
+	{
+		// Mighty Guy is uses this to stop psycho gun sound.
+		m_dac_playback = false;
+	}
+}
+
 // seems directly correlated to the DAC timer frequency
 // 0xd0 - 0xe0 - 0xf0 are the settings used
 void nb1412m2_device::dac_timer_w(uint8_t data)
 {
-//  popmessage("%02x",data);
-	// TODO: unknown algo, 0xe0*18 gives 4032 Hz which seems close enough for sample 36
-	m_dac_frequency = data*18;
+	// TODO: Algorithm is unknown
+	m_timer_rate = ((data & 0x30) >> 4) + 1;
+	m_dac_frequency = double(clock()) / (256 * 12) * m_timer_rate;
 }
 
 // controls music tempo

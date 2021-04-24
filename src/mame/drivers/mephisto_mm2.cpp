@@ -6,13 +6,14 @@ Mephisto 4 + 5 Chess Computer
 2007 Dirk V.
 
 TODO:
+- rebel5 unknown read from 0x4002, looks like leftover bookrom check
 - need to emulate TurboKit properly, also for mm5p (it's not as simple as a CPU
   overclock plus ROM patch)
 
 ===============================================================================
 
 Hardware notes:
-- CPU: G65SC02P-4 or R65C02P3/R65C02P4
+- CPU: R65C02P3/R65C02P4 or G65SC02P-4
 - Clock: 4.9152 MHz
 - NMI CLK: 600 Hz
 - IRQ Line is set to VSS
@@ -75,7 +76,7 @@ Mephisto 4 Turbo Kit 18mhz - (mm4tk)
 
 The MM V prototype was the program that Ed Schroeder participated with as "Rebel" at the
 1989 WMCCC in Portorose. It was used with the TK20 TurboKit.
-http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm
+For more information, see: http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm
 
 MM VI (Saitek, 1994) is on different hardware, H8 CPU.
 
@@ -85,7 +86,7 @@ MM VI (Saitek, 1994) is on different hardware, H8 CPU.
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "cpu/m6502/m65sc02.h"
+#include "cpu/m6502/r65c02.h"
 #include "machine/74259.h"
 #include "machine/mmboard.h"
 #include "sound/dac.h"
@@ -169,7 +170,7 @@ void mm2_state::lcd_irqack_w(u8 data)
 {
 	m_display->data_w(data);
 
-	// writing to 0x2800 also clears irq
+	// accessing 0x2800 also clears irq
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
@@ -205,9 +206,9 @@ void mm2_state::mm2_mem(address_map &map)
 void mm2_state::rebel5_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x2007).w("outlatch", FUNC(hc259_device::write_d7));
-	map(0x3000, 0x4000).r("board", FUNC(mephisto_board_device::input_r));
+	map(0x2000, 0x2007).w("outlatch", FUNC(hc259_device::write_d7)).nopr();
 	map(0x3000, 0x3007).r(FUNC(mm2_state::keys_r));
+	map(0x4000, 0x4000).r("board", FUNC(mephisto_board_device::input_r));
 	map(0x5000, 0x5000).w(m_display, FUNC(mephisto_display1_device::data_w));
 	map(0x6000, 0x6000).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x7000, 0x7000).w("board", FUNC(mephisto_board_device::mux_w));
@@ -218,7 +219,7 @@ void mm2_state::mm5p_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2000).w(m_display, FUNC(mephisto_display1_device::data_w));
-	map(0x2400, 0x2407).w("board", FUNC(mephisto_board_device::led_w)).nopr();
+	map(0x2400, 0x2400).w("board", FUNC(mephisto_board_device::led_w));
 	map(0x2800, 0x2800).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0x2c00, 0x2c07).r(FUNC(mm2_state::keys_r));
 	map(0x3000, 0x3000).r("board", FUNC(mephisto_board_device::input_r));
@@ -300,7 +301,7 @@ INPUT_PORTS_END
 void mm2_state::rebel5(machine_config &config)
 {
 	/* basic machine hardware */
-	M65SC02(config, m_maincpu, 9.8304_MHz_XTAL / 2);
+	R65C02(config, m_maincpu, 9.8304_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm2_state::rebel5_mem);
 
 	const attotime nmi_period = attotime::from_hz(9.8304_MHz_XTAL / 2 / 0x2000); // 600Hz
@@ -504,7 +505,7 @@ CONS( 1985, bup,     0,      0,      bup,      bup,   mm2_state, empty_init, "He
 CONS( 1985, bupa,    bup,    0,      bup,      bup,   mm2_state, empty_init, "Hegener + Glaser", u8"Mephisto Blitz- und Problemlösungs-Modul (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1986, rebel5,  0,      0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // aka MM III
-CONS( 1986, rebel5a, rebel5, 0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, rebel5a, rebel5, 0,      rebel5,   mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // "
 
 CONS( 1987, mm4,     0,      0,      mm4,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM IV (v7.10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, mm4a,    mm4,    0,      mm4,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM IV (v7.00)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
@@ -513,4 +514,4 @@ CONS( 1987, mm4tk,   mm4,    0,      mm4tk,    mm2,   mm2_state, empty_init, "ha
 
 CONS( 1990, mm5,     0,      0,      mm5,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1990, mm5a,    mm5,    0,      mm5,      mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1989, mm5p,    mm5,    0,      mm5p,     mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (Portorose TM version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1989, mm5p,    mm5,    0,      mm5p,     mm2,   mm2_state, empty_init, "Hegener + Glaser", "Mephisto MM V (Portorose TM version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING ) // aka Rebel

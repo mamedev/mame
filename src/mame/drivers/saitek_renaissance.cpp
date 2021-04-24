@@ -131,8 +131,8 @@ void ren_state::lcd_output_w(offs_t offset, u64 data)
 
 void ren_state::update_display()
 {
-	m_display->matrix_partial(0, 9, 1 << (m_inp_mux & 0xf), (m_inp_mux << 4 & 0x100) | m_led_data[0], false);
-	m_display->matrix_partial(9, 1, 1, (m_inp_mux >> 2 & 0x30) | m_led_data[1], true);
+	m_display->matrix_partial(0, 9, 1 << (m_inp_mux & 0xf), (m_inp_mux << 4 & 0x100) | m_led_data[0]);
+	m_display->matrix_partial(9, 1, 1, (m_inp_mux >> 2 & 0x30) | m_led_data[1]);
 }
 
 void ren_state::mux_w(u8 data)

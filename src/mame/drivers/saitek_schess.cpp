@@ -118,7 +118,6 @@ void schess_state::leds2_w(offs_t offset, u8 data)
 {
 	// button panel leds (direct)
 	m_display->write_row(8 + (offset ? 1 : 0), ~data);
-	m_display->update();
 }
 
 void schess_state::control_w(u8 data)

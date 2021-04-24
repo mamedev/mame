@@ -63,8 +63,11 @@
 #include "j6kungfu.lh"
 #include "j6kfc.lh"
 #include "j6megbck.lh"
-#include "j6montlkb.lh"
+#include "j6montlk.lh"
+#include "j6montlk6.lh"
 #include "j6mono60.lh"
+#include "j6mono608.lh"
+#include "j6mono6010.lh"
 #include "j6monst.lh"
 #include "j6oxobin.lh"
 #include "j6quick.lh"
@@ -11826,29 +11829,29 @@ GAME(  199?, j6mavrkd,     j6mavrk,    impact_nonvideo, j6mavrk, jpmimpct_state,
 
 GAME(  199?, j6monmad,     0,          impact_nonvideo, j6monmad, jpmimpct_state, empty_init, ROT0, "Ace", "Money Madness (Ace) (IMPACT)", GAME_FLAGS )
 
-GAMEL( 199?, j6montlk,     0,          impact_nonvideo, j6montlk, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6montlkb )
-GAMEL( 199?, j6montlka,    j6montlk,   impact_nonvideo, j6montlk, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6montlkb )
-GAMEL( 199?, j6montlkb,    j6montlk,   impact_nonvideo, j6montlk, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6montlkb )
-GAMEL( 199?, j6montlkc,    j6montlk,   impact_nonvideo, j6montlk, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 4)", GAME_FLAGS, layout_j6montlkb )
-GAMEL( 199?, j6montlkd,    j6montlk,   impact_nonvideo, j6montlk, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6montlkb )
-GAMEL( 199?, j6montlke,    j6montlk,   impact_nonvideo, j6montlk, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6montlkb )
-GAMEL( 199?, j6montlkf,    j6montlk,   impact_nonvideo, j6montlk, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6montlkb )
-GAMEL( 199?, j6montlkg,    j6montlk,   impact_nonvideo, j6montlk, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 8)", GAME_FLAGS, layout_j6montlkb )
-GAMEL( 199?, j6montlkh,    j6montlk,   impact_nonvideo, j6montlk, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 9)", GAME_FLAGS, layout_j6montlkb )
+GAMEL( 199?, j6montlk,     0,          impact_nonvideo, j6montlk, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (MT5 L17) (set 1)", GAME_FLAGS_WORKING, layout_j6montlk )
+GAMEL( 199?, j6montlka,    j6montlk,   impact_nonvideo, j6montlk, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (MT5 I L17) (set 2)", GAME_FLAGS_WORKING, layout_j6montlk )
+GAMEL( 199?, j6montlkb,    j6montlk,   impact_nonvideo, j6montlk, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (MT3 L12) (set 3)", GAME_FLAGS_WORKING, layout_j6montlk6 )
+GAMEL( 199?, j6montlkc,    j6montlk,   impact_nonvideo, j6montlk, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (MT3 P L12) (set 4, Protocol)", GAME_FLAGS_WORKING, layout_j6montlk6 )
+GAMEL( 199?, j6montlkd,    j6montlk,   impact_nonvideo, j6montlk, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (MT3 A L12) (set 5)", GAME_FLAGS_WORKING, layout_j6montlk6 )
+GAMEL( 199?, j6montlke,    j6montlk,   impact_nonvideo, j6montlk, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (MT3 P GL12) (set 6, Protocol)", GAME_FLAGS_WORKING, layout_j6montlk )
+GAMEL( 199?, j6montlkf,    j6montlk,   impact_nonvideo, j6montlk, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (MT7 L19) (set 7)", GAME_FLAGS_WORKING, layout_j6montlk )
+GAMEL( 199?, j6montlkg,    j6montlk,   impact_nonvideo, j6montlk, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (MT7 P L19) (set 8, Protocol)", GAME_FLAGS_WORKING, layout_j6montlk )
+GAMEL( 199?, j6montlkh,    j6montlk,   impact_nonvideo, j6montlk, jpmimpct_state, empty_init, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (MT7 A L19) (set 9)", GAME_FLAGS_WORKING, layout_j6montlk )
 
-GAMEL( 199?, j6mono60,     0,          impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 1)", GAME_FLAGS, layout_j6mono60 )
-GAMEL( 199?, j6mono60a,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 2)", GAME_FLAGS, layout_j6mono60 )
-GAMEL( 199?, j6mono60b,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 3)", GAME_FLAGS, layout_j6mono60 )
-GAMEL( 199?, j6mono60c,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 4, Whitbread)", GAME_FLAGS, layout_j6mono60 )
-GAMEL( 199?, j6mono60d,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 5)", GAME_FLAGS, layout_j6mono60 )
-GAMEL( 199?, j6mono60e,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 6)", GAME_FLAGS, layout_j6mono60 )
-GAMEL( 199?, j6mono60f,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 7)", GAME_FLAGS, layout_j6mono60 )
-GAMEL( 199?, j6mono60g,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 8, Whitbread)", GAME_FLAGS, layout_j6mono60 )
-GAMEL( 199?, j6mono60h,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 9)", GAME_FLAGS, layout_j6mono60 )
-GAMEL( 199?, j6mono60i,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 10)", GAME_FLAGS, layout_j6mono60 )
-GAMEL( 199?, j6mono60j,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 11)", GAME_FLAGS, layout_j6mono60 )
+GAMEL( 199?, j6mono60,     0,          impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (MO13 C24) (set 1)", GAME_FLAGS_WORKING, layout_j6mono60 )
+GAMEL( 199?, j6mono60a,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (MO13 C24) (set 2)", GAME_FLAGS_WORKING, layout_j6mono60 )
+GAMEL( 199?, j6mono60b,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (MO13 C24) (set 3)", GAME_FLAGS_WORKING, layout_j6mono60 )
+GAMEL( 199?, j6mono60c,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (MO13 C24) (set 4, Whitbread)", GAME_FLAGS_WORKING, layout_j6mono60 )
+GAMEL( 199?, j6mono60d,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (MO11 L22) (set 5)", GAME_FLAGS_WORKING, layout_j6mono608 )
+GAMEL( 199?, j6mono60e,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (MO11P L22)(set 6, Protocol)", GAME_FLAGS_WORKING, layout_j6mono608 )
+GAMEL( 199?, j6mono60f,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (MO11 AL22 (set 7)", GAME_FLAGS_WORKING, layout_j6mono608 )
+GAMEL( 199?, j6mono60g,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (MO11 L22) (set 8, Whitbread)", GAME_FLAGS_WORKING, layout_j6mono6010 )
+GAMEL( 199?, j6mono60h,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (MO11 IL22) (set 9)", GAME_FLAGS_WORKING, layout_j6mono608 )
+GAMEL( 199?, j6mono60i,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (MO11 IL22) (set 10)", GAME_FLAGS_WORKING, layout_j6mono608 )
+GAMEL( 199?, j6mono60j,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (MO8 L16) (set 11)", GAME_FLAGS_WORKING, layout_j6mono608 )
 GAMEL( 199?, j6mono60k,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 12)", GAME_FLAGS, layout_j6mono60 ) // incomplete pair
-GAMEL( 199?, j6mono60l,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 13)", GAME_FLAGS, layout_j6mono60 )
+GAMEL( 199?, j6mono60l,    j6mono60,   impact_nonvideo, j6mono60, jpmimpct_state, empty_init, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (MO3 L11) (set 13)", GAME_FLAGS_WORKING, layout_j6mono608 )
 
 GAME(  199?, j6outlaw,     0,          impact_nonvideo, j6outlaw, jpmimpct_state, empty_init, ROT0, "JPM", "Outlaw (JPM) (IMPACT, v3)", GAME_FLAGS )
 GAME(  199?, j6outlawd,    j6outlaw,   impact_nonvideo, j6outlaw, jpmimpct_state, empty_init, ROT0, "JPM", "Outlaw (JPM) (IMPACT, v3) (Protocol)", GAME_FLAGS )

@@ -589,6 +589,10 @@
 #include "thom_cas.h"
 #endif
 
+#ifdef HAS_FORMATS_THOM_DSK
+#include "thom_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_TI99_DSK
 #include "ti99_dsk.h"
 #endif
@@ -1201,6 +1205,10 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #ifdef HAS_FORMATS_THOM_CAS
 	en.add(to7_cassette_formats); // thom_cas.h
 	en.add(mo5_cassette_formats); // thom_cas.h
+#endif
+#ifdef HAS_FORMATS_THOM_DSK
+	en.add(FLOPPY_THOMSON_525_FORMAT); // thom_dsk.h
+	en.add(FLOPPY_THOMSON_35_FORMAT); // thom_dsk.h
 #endif
 
 	en.category("Texas Instruments");

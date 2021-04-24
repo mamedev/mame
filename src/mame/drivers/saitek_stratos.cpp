@@ -191,6 +191,7 @@ void stratos_state::machine_reset()
 {
 	saitek_stratos_state::machine_reset();
 
+	m_control = 0;
 	m_rombank->set_entry(0);
 	m_nvrambank->set_entry(0);
 }

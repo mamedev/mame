@@ -82,7 +82,8 @@ const mm2_format::format mm2_format::formats[] = {
 		512, {},
 		1, {},
 		80, 50, 22, 80
-	}
+	},
+	{}
 };
 
 const floppy_format_type FLOPPY_MM1_FORMAT = &floppy_image_format_creator<mm1_format>;

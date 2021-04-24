@@ -309,7 +309,6 @@ void travrusa_state::travrusa(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 4000000);   /* 4 MHz (?) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &travrusa_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(travrusa_state::irq0_line_hold));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -321,6 +320,8 @@ void travrusa_state::travrusa(machine_config &config)
 	screen.set_visarea(1*8, 31*8-1, 0*8, 32*8-1);
 	screen.set_screen_update(FUNC(travrusa_state::screen_update_travrusa));
 	screen.set_palette(m_palette);
+	// Race start countdown in shtrider needs multiple interrupts per frame to sync, mustache.cpp has the same, and is also a Seibu game
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_travrusa);
 	PALETTE(config, m_palette, FUNC(travrusa_state::travrusa_palette), 16*8+16*8, 128+16);

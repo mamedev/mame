@@ -355,6 +355,7 @@ Regular game cartridges
 |        | 80-092323(UK)     | The Wiggles - It's Wiggle Time!                                                                |
 +========+===================+================================================================================================+
 |   XX   | 80-092340(US)     | Thomas The Tank - Engines Working Together                                                     |
+|   XX   | 80-092340(US)     | Thomas The Tank - Engines Working Together (alt, 52-092340(US) on back label)                  |
 |        | 80-092340-101(US) | Thomas The Tank - Engines Working Together (rev. 101)                                          |
 |        | 80-092342(NL)     | Thomas de Stoomlocomotief' - Locomotieven Werken Somen (need pic, even the manual has -123 on cover)
 |        | 80-092342-123(NL) | Thomas de Stoomlocomotief' - Locomotieven Werken Somen (rev. 123)                              |
@@ -4068,6 +4069,21 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="vsmile92340.bin" size="8388608" crc="ff0d3dca" sha1="23a9a05289a9fc858bb7b91a6efad8c1ed54bced" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thomasa" cloneof="thomas">
+		<description>Thomas &amp; Friends - Engines Working Together (USA, alt)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092340(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Thomas and Friends - Engines Working Together 92340(US).bin" size="8388608" crc="58ba95fa" sha1="c6c4d5350dbbcd7dc458860171828e0273df1d7e" />
 			</dataarea>
 		</part>
 	</software>

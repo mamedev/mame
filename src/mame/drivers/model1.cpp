@@ -597,6 +597,7 @@ Notes:
 #include "machine/clock.h"
 #include "machine/model1io.h"
 #include "machine/model1io2.h"
+#include "machine/nvram.h"
 #include "speaker.h"
 
 #include "vr.lh"
@@ -609,7 +610,8 @@ Notes:
 u8 model1_state::dpram_r(offs_t offset)
 {
 	// insert waitstate
-	m_maincpu->adjust_icount(-1);
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-1);
 	return m_dpram->right_r(offset);
 }
 
@@ -893,7 +895,7 @@ void model1_state::model1_mem(address_map &map)
 	/* ROMO */ map(0x100000, 0x1fffff).bankr("bank1");
 	/* ROMX */ map(0x200000, 0x2fffff).rom();
 	/* ROMY */
-	/* RAMA */ map(0x400000, 0x40ffff).ram();
+	/* RAMA */ map(0x400000, 0x40ffff).ram().share("nvram");
 	/* RAMB */ map(0x500000, 0x53ffff).ram();
 
 	/* TGP  */ map(0x600000, 0x60ffff).ram().share("display_list0");
@@ -1711,6 +1713,8 @@ void model1_state::model1(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &model1_state::model1_mem);
 	m_maincpu->set_addrmap(AS_IO, &model1_state::model1_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(model1_state::irq_callback));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // exact type uncertain
 
 	GENERIC_FIFO_U32(config, "copro_fifo_in", 0);
 	GENERIC_FIFO_U32(config, "copro_fifo_out", 0);

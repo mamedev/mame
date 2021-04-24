@@ -49,8 +49,12 @@ void menu_control_floppy_image::do_load_create()
 			machine().popmessage("Error: %s", fd.error());
 			return;
 		}
-		if (create_fs)
-			fd.init_fs(create_fs);
+		if (create_fs) {
+			// HACK: ensure the floppy_image structure is created since device_image_interface may not otherwise do so during "init phase"
+			err = fd.finish_load();
+			if (err == image_init_result::PASS)
+				fd.init_fs(create_fs);
+		}
 	} else {
 		image_init_result err = fd.load(input_filename);
 		if ((err == image_init_result::PASS) && (output_filename.compare("") != 0))

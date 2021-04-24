@@ -4,20 +4,20 @@
 license:CC0
 -->
 
-<softwarelist name="cc40_cart" description="CC-40 cartridges">
-
 <!--
 
-    Not included in list:
-    - SS-1000 16KB RAM
-    - SS-2000 8KB RAM, battery backed
+Not yet emulated:
+- SS-1000 16KB RAM
+- SS-2000 8KB RAM, battery backed
 
-    Also, not sure if these exist, probably canceled:
-    - Business Graphics
-    - Games II
-    - Perspective Drawing
+Also, not sure if these exist, probably canceled:
+- Business Graphics
+- Games II
+- Perspective Drawing
 
 -->
+
+<softwarelist name="cc40_cart" description="CC-40 cartridges">
 
 	<software name="aee">
 		<description>Advanced Electrical Engineering</description>

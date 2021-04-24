@@ -9,8 +9,10 @@ but that part is emulated in the driver.
 *********************************************************************/
 
 #include "emu.h"
-
 #include "mmdisplay2.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 DEFINE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODULE2, mephisto_display2_device, "mdisplay2", "Mephisto Display Module 2")
@@ -19,7 +21,7 @@ DEFINE_DEVICE_TYPE(MEPHISTO_DISPLAY_MODULE2, mephisto_display2_device, "mdisplay
 //  constructor
 //-------------------------------------------------
 
-mephisto_display2_device::mephisto_display2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+mephisto_display2_device::mephisto_display2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MEPHISTO_DISPLAY_MODULE2, tag, owner, clock)
 	, m_lcd(*this, "hd44780")
 	, m_dac(*this, "dac")
@@ -93,12 +95,12 @@ void mephisto_display2_device::device_reset()
 //  I/O handlers
 //-------------------------------------------------
 
-void mephisto_display2_device::latch_w(uint8_t data)
+void mephisto_display2_device::latch_w(u8 data)
 {
 	m_latch = data;
 }
 
-void mephisto_display2_device::io_w(uint8_t data)
+void mephisto_display2_device::io_w(u8 data)
 {
 	if (BIT(data, 1) && !BIT(m_ctrl, 1))
 		m_lcd->write(BIT(data, 0), m_latch);
