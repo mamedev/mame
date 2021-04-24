@@ -97,6 +97,7 @@
 #include "imagedev/floppy.h"
 #include "formats/pc_dsk.h"
 
+#define VERBOSE 1
 // MAME infra includes
 #include "debugger.h"
 #include "logmacro.h"
@@ -184,6 +185,10 @@ protected:
     void irq_w(int state) { generic_irq_w(4, Number, state); }
     void int_check();
 
+    // this is temporary and will be moved to a device once I get it working
+    void fdc_fifo_irq_w(int state);
+    void fdc_fifo_drq_w(int state);
+
 #ifndef NO_MIPS3
     const int interrupt_map[6] = {MIPS3_IRQ0, MIPS3_IRQ1, MIPS3_IRQ2, MIPS3_IRQ3, MIPS3_IRQ4, MIPS3_IRQ5};
 #else
@@ -213,54 +218,70 @@ protected:
     // National Semiconductor PC8477B floppy controller
     required_device<pc8477a_device> m_fdc;
 
-    // NEWS keyboard and mouse
-    required_device<news_hid_hle_device> m_hid;
+    // this is temporary and will be moved to a device once I get it working
+    void fdc_fifo_mask_w(offs_t offset, uint32_t count);
+    void fdc_fifo_dmaen_w(offs_t offset, uint32_t state);
+    uint32_t fdc_fifo_data_r(uint32_t offset);
+    TIMER_CALLBACK_MEMBER(fdc_fifo_dma_execute);
+    bool fdc_fifo_dmaen = false;
+    uint32_t fdc_fifo_mask = 0;
+    int fdc_fifo_drq = 0;
+    int fdc_fifo_rawint = 0;
+    uint32_t fdc_fifo_count = 0;
+    uint32_t fdc_fifo_w_position = 0;
+    uint32_t fdc_fifo_r_position = 0;
+    std::unique_ptr<uint32_t[]> fdc_fifo_ram;
+    emu_timer *fdc_fifo_timer;
+    const int FIFO_RAM_SIZE = 524288; // supposedly the max FIFO ram size
 
-    // DMAC3 DMA controller
-    required_device<dmac3_device> m_dmac;
+        // NEWS keyboard and mouse
+        required_device<news_hid_hle_device> m_hid;
 
-    // HP SPIFI3 SCSI controller (2x)
-    required_device<spifi3_device> m_scsi0;
-    required_device<spifi3_device> m_scsi1;
-    required_device<nscsi_bus_device> m_scsibus0;
-    required_device<nscsi_bus_device> m_scsibus1;
+        // DMAC3 DMA controller
+        required_device<dmac3_device> m_dmac;
 
-    // LED control
-    output_finder<6> m_led;
-    void led_state_w(offs_t offset, uint32_t data);
-    const std::string LED_MAP[6] = {"LED_POWER", "LED_DISK", "LED_FLOPPY", "LED_SEC", "LED_NET", "LED_CD"};
+        // HP SPIFI3 SCSI controller (2x)
+        required_device<spifi3_device> m_scsi0;
+        required_device<spifi3_device> m_scsi1;
+        required_device<nscsi_bus_device> m_scsibus0;
+        required_device<nscsi_bus_device> m_scsibus1;
 
-    // Interrupts and other platform state
-    bool m_int_state[6] = {false, false, false, false, false, false};
-    uint32_t m_inten[6] = {0, 0, 0, 0, 0, 0};
-    uint32_t m_intst[6] = {0, 0, 0, 0, 0, 0};
+        // LED control
+        output_finder<6> m_led;
+        void led_state_w(offs_t offset, uint32_t data);
+        const std::string LED_MAP[6] = {"LED_POWER", "LED_DISK", "LED_FLOPPY", "LED_SEC", "LED_NET", "LED_CD"};
 
-    // Freerun timer (1us period)
-    // NetBSD source code corroborates the period (https://github.com/NetBSD/src/blob/229cf3aa2cda57ba5f0c244a75ae83090e59c716/sys/arch/newsmips/newsmips/news5000.c#L259)
-    emu_timer* m_freerun_timer;
-    uint32_t freerun_timer_val;
-    const int FREERUN_FREQUENCY = 1000000;
-    TIMER_CALLBACK_MEMBER(freerun_clock);
-    uint32_t freerun_r(offs_t offset);
-    void freerun_w(offs_t offset, uint32_t data);
+        // Interrupts and other platform state
+        bool m_int_state[6] = {false, false, false, false, false, false};
+        uint32_t m_inten[6] = {0, 0, 0, 0, 0, 0};
+        uint32_t m_intst[6] = {0, 0, 0, 0, 0, 0};
 
-    // APBus control (should be split into a device eventually)
-    uint8_t apbus_cmd_r(offs_t offset);
-    void apbus_cmd_w(offs_t offset, uint32_t data);
+        // Freerun timer (1us period)
+        // NetBSD source code corroborates the period (https://github.com/NetBSD/src/blob/229cf3aa2cda57ba5f0c244a75ae83090e59c716/sys/arch/newsmips/newsmips/news5000.c#L259)
+        emu_timer *m_freerun_timer;
+        uint32_t freerun_timer_val;
+        const int FREERUN_FREQUENCY = 1000000;
+        TIMER_CALLBACK_MEMBER(freerun_clock);
+        uint32_t freerun_r(offs_t offset);
+        void freerun_w(offs_t offset, uint32_t data);
 
-    // Other platform hardware emulation methods
-    u32 bus_error();
-    uint64_t front_panel_r(offs_t offset);
+        // APBus control (should be split into a device eventually)
+        uint8_t apbus_cmd_r(offs_t offset);
+        void apbus_cmd_w(offs_t offset, uint32_t data);
 
-    // Constants
-    const uint32_t ICACHE_SIZE = 16384;
-    const uint32_t DCACHE_SIZE = 16384;
-    const char *MAIN_MEMORY_DEFAULT = "64M";
+        // Other platform hardware emulation methods
+        u32 bus_error();
+        uint64_t front_panel_r(offs_t offset);
 
-    // RAM debug
-    bool map_shift = false;
-    uint8_t debug_ram_r(offs_t offset);
-    void debug_ram_w(offs_t offset, uint8_t data);
+        // Constants
+        const uint32_t ICACHE_SIZE = 16384;
+        const uint32_t DCACHE_SIZE = 16384;
+        const char *MAIN_MEMORY_DEFAULT = "64M";
+
+        // RAM debug
+        bool map_shift = false;
+        uint8_t debug_ram_r(offs_t offset);
+        void debug_ram_w(offs_t offset, uint8_t data);
 };
 
 /*
@@ -320,6 +341,9 @@ void news_r4k_state::machine_common(machine_config &config)
     // TODO: interrupts
     PC8477A(config, m_fdc, 24'000'000, pc8477a_device::mode_t::PS2);
     FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
+    //m_fdc->intrq_wr_callback().set(FUNC(news_r4k_state::irq_w<irq0_number::FDC>));
+    m_fdc->intrq_wr_callback().set(FUNC(news_r4k_state::fdc_fifo_irq_w));
+    m_fdc->drq_wr_callback().set(FUNC(news_r4k_state::fdc_fifo_drq_w));
 
     // DMA controller
     // TODO: interrupts, join bus, etc.
@@ -429,8 +453,33 @@ void news_r4k_state::cpu_map(address_map &map)
     // instead, they should be duplicated across each 32-bit segment to emulate the open address lines
     // (i.e. status register A and B values of 56 c0 look like 56565656 c0c0c0c0)
     map(0x1ed60000, 0x1ed6001f).m(m_fdc, FUNC(pc8477a_device::map)).umask32(0x000000ff);
-    map(0x1ed60200, 0x1ed6020f).noprw(); // TODO: Floppy aux registers
+    //map(0x1ed60200, 0x1ed60207).noprw(); // TODO: Floppy aux registers
+    map(0x1ed60200, 0x1ed60207).lr8(NAME([this](offs_t offset) { return 0x1; }));
+    map(0x1ed20000, 0x1ed20007).w(FUNC(news_r4k_state::fdc_fifo_mask_w));
+    map(0x1ed20008, 0x1ed2000f).w(FUNC(news_r4k_state::fdc_fifo_dmaen_w));
+    map(0x1ed20030, 0x1ed20037).r(FUNC(news_r4k_state::fdc_fifo_data_r));
 
+    // Questionable hack that just redirects the fd FIFO data register to the FDC's DMA read - this is sketch af
+    /*map(0x1ed20030, 0x1ed2003f).lr32(NAME([this](offs_t offset) {
+        LOG("here yo, offset = %d\n", offset);
+        uint32_t result = 0;
+        if (offset == 1) // FIFO data register = 0x34
+        {
+            // guessing here
+            for (int i = 0; i < 4; ++i) {
+                uint8_t byte = m_fdc->dma_r();
+                LOG("byte %d = 0x%x", i, byte);
+                result |= ((uint32_t)byte) << (8 * i);
+            }
+            result = m_fdc->fifo_r();
+            LOG("Got 0x%x from FDC\n", result);
+        }
+        return result;
+    }));*/
+
+    // need to map 8-b too
+    /*LOG("Offset 0x%x: Request for FDC IRQ or BTN IRQ - returning %d\n", offset, (m_intst[0] & 0x10) > 0 ? 0x2 : 0x0)*/
+    map(0x1ed60208, 0x1ed6020f).lr32(NAME([this](offs_t offset) { return fdc_fifo_rawint << 1; }));
     // Assign debug mappings
     cpu_map_debug(map);
 }
@@ -541,8 +590,23 @@ void news_r4k_state::machine_start()
     save_item(NAME(m_int_state));
     save_item(NAME(freerun_timer_val));
 
+    // FDC FIFO RAM
+    fdc_fifo_ram = std::make_unique<uint32_t[]>(FIFO_RAM_SIZE);
+    save_pointer(NAME(fdc_fifo_ram), FIFO_RAM_SIZE);
+    
+    // fdc fifo reset
+    fdc_fifo_dmaen = false;
+    fdc_fifo_mask = 0;
+    fdc_fifo_drq = 0;
+    fdc_fifo_rawint = 0;
+    fdc_fifo_count = 0;
+    fdc_fifo_w_position = 0;
+    fdc_fifo_r_position = 0;
+
     // Allocate freerunning clock
     m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
+
+    fdc_fifo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::fdc_fifo_dma_execute), this));
 }
 
 /*
@@ -715,7 +779,6 @@ uint32_t news_r4k_state::inten_r(offs_t offset)
  */
 uint32_t news_r4k_state::intst_r(offs_t offset)
 {
-    LOG("intst_r: INTST%d = 0x%x\n", offset, m_intst[offset]);
     return m_intst[offset];
 }
 
@@ -726,13 +789,15 @@ uint32_t news_r4k_state::intst_r(offs_t offset)
  */
 void news_r4k_state::generic_irq_w(uint32_t irq, uint32_t mask, int state)
 {
-    LOG("generic_irq_w: INTST%d IRQ %d set to %d\n", irq, mask, state);
+    // LOG("generic_irq_w: INTST%d IRQ %d set to %d\n", irq, mask, state);
     if (state)
     {
+        LOG("generic_irq_w: INTST%d IRQ %d set to %d\n", irq, mask, state);
         m_intst[irq] |= mask;
     }
     else
     {
+        LOG("generic_irq_w: INTST%d IRQ %d cleared to %d\n", irq, mask, state);
         m_intst[irq] &= ~mask;
     }
     int_check();
@@ -762,18 +827,126 @@ void news_r4k_state::int_check()
     // See https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/newsmips/news5000.c
     // and https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/apbus.c
     // This still needs to be tested - may or may not be fully accurate.
-
     for (int i = 0; i < 6; i++)
     {
-        bool state = m_intst[i] & m_inten[i];
+        int state = m_intst[i] & m_inten[i];
+        LOG("int_check: INTST%d current value: %d INTEN%d current value: %d -> computed state = %d\n", i, m_intst[i], i, m_inten[i], state);
         if (state != m_int_state[i]) // Interrupt changed state
         {
-            m_int_state[i] = state;
-            m_cpu->set_input_line(interrupt_map[i], state);
+            LOG("Setting CPU input line %d to %d\n", interrupt_map[i], state > 0 ? 1 : 0);
+            m_int_state[i] = state > 0;
+            m_cpu->set_input_line(interrupt_map[i], state > 0 ? 1 : 0);
         }
     }
 }
 
+    void news_r4k_state::fdc_fifo_mask_w(offs_t offset, uint32_t count)
+    {
+        if(offset == 0)
+        {
+            LOG("FDC FIFO: Setting mask to 0x%x\n", count);
+            fdc_fifo_mask = count;
+        }
+    }
+
+    void news_r4k_state::fdc_fifo_dmaen_w(offs_t offset, uint32_t state)
+    {
+        LOG("FDC FIFO: DMAEN region write to offset %d: 0x%x\n", offset, state);
+        if (offset == 1)
+        {
+            LOG("FDC FIFO: Setting DMAEN to 0x%x\n", state);
+            fdc_fifo_dmaen = (state & 0x1) > 0;
+            if (fdc_fifo_dmaen)
+            {
+                // reset counter and pointers - not sure if this is hw accurate though
+                fdc_fifo_count = 0;
+                fdc_fifo_w_position = 0;
+                fdc_fifo_r_position = 0;
+                
+                // kick off the DMA transfer cause we gotta
+                fdc_fifo_timer->adjust(attotime::zero, 0, attotime::from_usec(1)); // actual clock rate? this is a "guess" (read: I tried it and it happened to work)
+            }
+        }
+    }
+
+    void news_r4k_state::fdc_fifo_drq_w(int state)
+    {
+        if(!fdc_fifo_dmaen) {
+            LOG("FDC FIFO: Uh oh! DRQ set when we aren't doing a transfer. That's awkward. Hopefully the CPU will handle this one.\n");
+            fdc_fifo_drq = 0;
+        } else {
+            LOG("FDC FIFO: DRQ set to 0x%x!\n", state);
+            fdc_fifo_drq = state;
+        }
+    }
+
+    void news_r4k_state::fdc_fifo_irq_w(int state)
+    {
+        fdc_fifo_rawint = state > 0 ? 1 : 0; // FDCAUX seems to expose this, so we route the IRQ through this function
+        LOG("FDC FIFO: Setting IRQ to 0x%x\n", state);
+        this->irq_w<irq0_number::FDC>(state);
+    }
+
+    uint32_t news_r4k_state::fdc_fifo_data_r(uint32_t offset)
+    {
+        if(offset == 1) {
+            auto value = fdc_fifo_ram[fdc_fifo_r_position];
+            LOG("FDC FIFO: Count 0x%x, Returning 0x%x %s\n", fdc_fifo_r_position, value, machine().describe_context());
+            ++fdc_fifo_r_position; // todo: sanity checking of FIFO position
+            if(fdc_fifo_r_position > FIFO_RAM_SIZE)
+            {
+                LOG("FDC FIFO: FIFO read pointer rolled over\n");
+                fdc_fifo_r_position = 0;
+            }
+            if(fdc_fifo_r_position == fdc_fifo_w_position) {
+                LOG("FDC FIFO: FIFO read caught up to write\n");
+            }
+            return (value << 24) | (value << 16) | (value << 8) | value; // gotta make sure the r4k picks up the value regardless of the byte offset
+                                                                         // the monitor ROM uses `lb`, not sure yet if all FIFO configs match this
+                                                                         // if so, might make more sense to change how this works
+                                                                         // this is just a hack for testing right now anyways
+        } else {
+            LOG("you got the offset wrong!\n");
+            return 0;
+        }
+    }
+
+    TIMER_CALLBACK_MEMBER(news_r4k_state::fdc_fifo_dma_execute)
+    {
+        if (!fdc_fifo_dmaen)
+        {
+            LOG("FDC FIFO: DMA not active.\n");
+            fdc_fifo_timer->adjust(attotime::never);
+            return;
+        }
+
+        // ok now we have stuff to do... maybe
+        if(fdc_fifo_drq > 0) {
+            // we get data
+            // main FIFO turn on!!!
+            uint8_t nextByte = m_fdc->dma_r(); // TODO: actually save this lol
+            fdc_fifo_ram[fdc_fifo_w_position] = (uint32_t)nextByte; // TODO: safety check of FIFO position, just checking logs for now.
+            ++fdc_fifo_w_position;
+            --fdc_fifo_mask;
+            ++fdc_fifo_count;
+            LOG("FDC FIFO: Count %d, FIFO pos 0x%x: Got dbyte 0x%x\n", fdc_fifo_count, fdc_fifo_w_position, nextByte);
+            if(fdc_fifo_w_position > FIFO_RAM_SIZE)
+            {
+                LOG("FDC FIFO: FIFO write pointer rolled over\n");
+                fdc_fifo_w_position = 0;
+            }
+            if(fdc_fifo_w_position == fdc_fifo_r_position) {
+                // we caught up to the r pointer with this increment, no more room!
+                LOG("FDC FIFO: FIFO full\n");
+            }
+        }
+
+        bool done = fdc_fifo_mask == std::numeric_limits<uint32_t>::max();
+        if(done) // done with the initial mask
+        {
+            fdc_fifo_timer->adjust(attotime::never);
+        }
+    }
 /*
  * bus_error
  *
