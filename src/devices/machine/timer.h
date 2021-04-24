@@ -49,13 +49,13 @@ public:
 	{
 		m_type = TIMER_TYPE_PERIODIC;
 		m_callback.set(std::forward<F>(callback), name);
-		m_period = period;
+		m_initial_period = period;
 	}
 	template <typename T, typename F> void configure_periodic(T &&target, F &&callback, const char *name, const attotime &period)
 	{
 		m_type = TIMER_TYPE_PERIODIC;
 		m_callback.set(std::forward<T>(target), std::forward<F>(callback), name);
-		m_period = period;
+		m_initial_period = period;
 	}
 
 	template <typename F, typename U> void configure_scanline(F &&callback, const char *name, U &&screen, int first_vpos, int increment)
@@ -77,34 +77,34 @@ public:
 
 	template <typename... T> void set_callback(T &&... args) { m_callback.set(std::forward<T>(args)...); }
 
-	void set_start_delay(const attotime &delay) { m_start_delay = delay; }
-	void config_param(int param) { m_param = param; }
+	void set_start_delay(const attotime &delay) { m_initial_delay = delay; }
+	void config_param(int param) { m_timer.set_param(param); }
 
 	// property getters
-	int param() const { return m_timer->param(); }
-	void *ptr() const { return m_ptr; }
-	bool enabled() const { return m_timer->enabled(); }
+	int param() const { return m_timer.param(); }
+	void *ptr() const { return m_timer.ptr(); }
+	bool enabled() const { return m_timer.enabled(); }
 
 	// property setters
-	void set_param(int param) const { if(m_type != TIMER_TYPE_GENERIC) fatalerror("Cannot change parameter on a non-generic timer.\n"); m_timer->set_param(param); }
-	void set_ptr(void *ptr) { if (!machine().save().registration_allowed()) fatalerror("Timer device pointer must remain constant after creation."); m_ptr = ptr; }
-	void enable(bool enable = true) const { m_timer->enable(enable); }
+	void set_param(int param) { if (m_type == TIMER_TYPE_SCANLINE) fatalerror("Cannot change parameter on a scanline timer.\n"); m_timer.set_param(param); }
+	void set_ptr(void *ptr) { m_timer.set_ptr(ptr); }
+	void enable(bool enable = true) { m_timer.enable(enable); }
 
 	// adjustments
 	void reset() { adjust(attotime::never, 0, attotime::never); }
-	void adjust(const attotime &duration, s32 param = 0, const attotime &period = attotime::never) const
+	void adjust(const attotime &duration, s32 param = 0, const attotime &period = attotime::never)
 	{
-		if(m_type != TIMER_TYPE_GENERIC)
+		if (m_type != TIMER_TYPE_GENERIC)
 			fatalerror("Cannot adjust a non-generic timer.\n");
-		m_timer->adjust(duration, param, period);
+		m_timer.adjust(duration, param, period);
 	}
 
 	// timing information
-	attotime time_elapsed() const { return m_timer->elapsed(); }
-	attotime time_left() const { return m_timer->remaining(); }
-	attotime start_time() const { return m_timer->start(); }
-	attotime fire_time() const { return m_timer->expire(); }
-	attotime period() const { return m_timer ? m_timer->period() : m_period; }
+	attotime time_elapsed() const { return m_timer.elapsed(); }
+	attotime time_left() const { return m_timer.remaining(); }
+	attotime start_time() const { return m_timer.start(); }
+	attotime fire_time() const { return m_timer.expire(); }
+	attotime period() const { return m_timer.period(); }
 
 private:
 	// device-level overrides
@@ -124,12 +124,10 @@ private:
 	// configuration data
 	timer_type              m_type;             // type of timer
 	expired_delegate        m_callback;         // the timer's callback function
-	void *                  m_ptr;              // the pointer parameter passed to the timer callback
 
 	// periodic timers only
-	attotime                m_start_delay;      // delay before the timer fires for the first time
-	attotime                m_period;           // period of repeated timer firings
-	s32                     m_param;            // the integer parameter passed to the timer callback
+	attotime                m_initial_delay;    // delay before the timer fires for the first time
+	attotime                m_initial_period;   // period of repeated timer firings
 
 	// scanline timers only
 	optional_device<screen_device> m_screen;    // pointer to the screen device
@@ -137,7 +135,7 @@ private:
 	u32                     m_increment;        // the number of scanlines between firings
 
 	// internal state
-	emu_timer *             m_timer;            // the backing timer
+	device_persistent_timer m_timer;            // the backing timer
 	bool                    m_first_time;       // indicates that the system is starting (scanline timers only)
 };
 

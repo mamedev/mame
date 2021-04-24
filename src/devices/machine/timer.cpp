@@ -37,14 +37,9 @@ timer_device::timer_device(const machine_config &mconfig, const char *tag, devic
 	: device_t(mconfig, TIMER, tag, owner, clock),
 		m_type(TIMER_TYPE_GENERIC),
 		m_callback(*this),
-		m_ptr(nullptr),
-		m_start_delay(attotime::zero),
-		m_period(attotime::zero),
-		m_param(0),
 		m_screen(*this, finder_base::DUMMY_TAG),
 		m_first_vpos(0),
 		m_increment(0),
-		m_timer(nullptr),
 		m_first_time(true)
 {
 }
@@ -61,23 +56,23 @@ void timer_device::device_validity_check(validity_checker &valid) const
 	switch (m_type)
 	{
 		case TIMER_TYPE_GENERIC:
-			if (m_screen.finder_tag() != finder_base::DUMMY_TAG || m_first_vpos != 0 || m_start_delay != attotime::zero)
+			if (m_screen.finder_tag() != finder_base::DUMMY_TAG || m_first_vpos != 0 || m_initial_delay != attotime::zero)
 				osd_printf_warning("Generic timer specified parameters for a scanline timer\n");
-			if (m_period != attotime::zero || m_start_delay != attotime::zero)
+			if (m_initial_period != attotime::zero || m_initial_delay != attotime::zero)
 				osd_printf_warning("Generic timer specified parameters for a periodic timer\n");
 			break;
 
 		case TIMER_TYPE_PERIODIC:
 			if (m_screen.finder_tag() != finder_base::DUMMY_TAG || m_first_vpos != 0)
 				osd_printf_warning("Periodic timer specified parameters for a scanline timer\n");
-			if (m_period <= attotime::zero)
+			if (m_initial_period <= attotime::zero)
 				osd_printf_error("Periodic timer specified invalid period\n");
 			break;
 
 		case TIMER_TYPE_SCANLINE:
-			if (m_period != attotime::zero || m_start_delay != attotime::zero)
+			if (m_initial_period != attotime::zero || m_initial_delay != attotime::zero)
 				osd_printf_warning("Scanline timer specified parameters for a periodic timer\n");
-			if (m_param != 0)
+			if (m_timer.param() != 0)
 				osd_printf_warning("Scanline timer specified parameter which is ignored\n");
 			if (m_screen.finder_tag() == finder_base::DUMMY_TAG)
 				osd_printf_error("Scanline timer has no screen specified\n");
@@ -104,7 +99,7 @@ void timer_device::device_validity_check(validity_checker &valid) const
 void timer_device::device_start()
 {
 	// allocate the timer
-	m_timer = timer_alloc();
+	m_timer.init(*this, 0);
 
 	m_callback.resolve();
 
@@ -122,25 +117,14 @@ void timer_device::device_reset()
 	// type based configuration
 	switch (m_type)
 	{
+		// generic timers do nothing on reset
 		case TIMER_TYPE_GENERIC:
-		case TIMER_TYPE_PERIODIC:
-		{
-			// convert the period into attotime
-			attotime period;
-			if (m_period > attotime::zero)
-			{
-				period = m_period;
-
-				// convert the start_delay into attotime
-				attotime start_delay = attotime::zero;
-				if (m_start_delay > attotime::zero)
-					start_delay = m_start_delay;
-
-				// allocate and start the backing timer
-				m_timer->adjust(start_delay, m_param, period);
-			}
 			break;
-		}
+
+		// periodic timers start running
+		case TIMER_TYPE_PERIODIC:
+			m_timer.adjust(m_initial_delay, m_timer.param(), m_initial_period);
+			break;
 
 		case TIMER_TYPE_SCANLINE:
 			if (!m_screen)
@@ -148,7 +132,7 @@ void timer_device::device_reset()
 
 			// set the timer to fire immediately
 			m_first_time = true;
-			m_timer->adjust(attotime::zero, m_param);
+			m_timer.adjust(attotime::zero, m_timer.param());
 			break;
 	}
 }
@@ -166,7 +150,7 @@ void timer_device::device_timer(timer_instance const &timer, device_timer_id id,
 		case TIMER_TYPE_GENERIC:
 		case TIMER_TYPE_PERIODIC:
 			if (!m_callback.isnull())
-				(m_callback)(m_ptr, param);
+				m_callback(ptr, param);
 			break;
 
 		// scanline timers have to do some additional bookkeeping
@@ -181,7 +165,7 @@ void timer_device::device_timer(timer_instance const &timer, device_timer_id id,
 				// call the real callback
 				int vpos = m_screen->vpos();
 				if (!m_callback.isnull())
-					(m_callback)(m_ptr, vpos);
+					m_callback(ptr, vpos);
 
 				// advance by the increment only if we will still be within the screen bounds
 				if (m_increment != 0 && (vpos + m_increment) < m_screen->height())
@@ -190,7 +174,7 @@ void timer_device::device_timer(timer_instance const &timer, device_timer_id id,
 			m_first_time = false;
 
 			// adjust the timer
-			m_timer->adjust(m_screen->time_until_pos(next_vpos));
+			m_timer.adjust(m_screen->time_until_pos(next_vpos), m_timer.param());
 			break;
 		}
 	}
