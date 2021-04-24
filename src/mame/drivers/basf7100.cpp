@@ -40,7 +40,7 @@
     TODO:
     - Dump real character ROM
 	- Improve video emulation
-	- Find documentation for switches S2, S3, S4 (might app. specific)
+	- Find documentation for switches S2, S3, S4 (might be app. specific)
 	- Serial interrupts, flags, control
 
     Notes:
@@ -582,6 +582,7 @@ void basf7100_state::machine_start()
 	save_item(NAME(m_sod));
 	save_item(NAME(m_fdc_intrq_vector));
 	save_item(NAME(m_fdc_drq));
+	save_item(NAME(m_int_flags));
 }
 
 void basf7100_state::machine_reset()
@@ -693,6 +694,8 @@ void basf7100_state::basf7100(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", basf7100_floppies, "basf6106", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:2", basf7100_floppies, "basf6106", floppy_image_device::default_mfm_floppy_formats);
 
+	SOFTWARE_LIST(config, "floppy_list").set_original("basf7100");
+
 	// keyboard
 	basf7100_kbd_device &keyboard(BASF7100_KBD(config, "keyboard"));
 	keyboard.int_handler().set(m_ppi[0], FUNC(i8255_device::pc2_w));
@@ -730,4 +733,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY   FULLNAME  FLAGS
-COMP( 1982, basf7120, 0,      0,      basf7100, basf7100, basf7100_state, empty_init, "BASF",   "7120",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, basf7120, 0,      0,      basf7100, basf7100, basf7100_state, empty_init, "BASF",   "7120",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
