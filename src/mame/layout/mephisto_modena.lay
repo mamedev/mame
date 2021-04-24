@@ -367,23 +367,23 @@ license:CC0
 
 		<element ref="lcd_bg"><bounds x="31" y="90.3" width="22.5" height="7.4" /></element>
 
-		<element name="digit3" ref="digit"><bounds x="32" y="91" width="4" height="6" /></element>
-		<element name="digit2" ref="digit"><bounds x="37.5" y="91" width="4" height="6" /></element>
-		<element name="digit1" ref="digit"><bounds x="43" y="91" width="4" height="6" /></element>
-		<element name="digit0" ref="digit"><bounds x="48.5" y="91" width="4" height="6" /></element>
+		<element name="digit3" ref="digit"><bounds x="32.6" y="91" width="4" height="6" /></element>
+		<element name="digit2" ref="digit"><bounds x="37.7" y="91" width="4" height="6" /></element>
+		<element name="digit1" ref="digit"><bounds x="42.8" y="91" width="4" height="6" /></element>
+		<element name="digit0" ref="digit"><bounds x="47.9" y="91" width="4" height="6" /></element>
 
 		<!-- digits DP are different from normal 7seg -->
-		<element ref="ldot_hide"><bounds x="35.3" y="96.3" width="0.85" height="0.85" /></element>
-		<element ref="ldot_hide"><bounds x="40.8" y="96.3" width="0.85" height="0.85" /></element>
-		<element ref="ldot_hide"><bounds x="46.3" y="96.3" width="0.85" height="0.85" /></element>
-		<element ref="ldot_hide"><bounds x="51.8" y="96.3" width="0.85" height="0.85" /></element>
+		<element ref="ldot_hide"><bounds x="35.9" y="96.3" width="0.85" height="0.85" /></element>
+		<element ref="ldot_hide"><bounds x="41.0" y="96.3" width="0.85" height="0.85" /></element>
+		<element ref="ldot_hide"><bounds x="46.1" y="96.3" width="0.85" height="0.85" /></element>
+		<element ref="ldot_hide"><bounds x="51.2" y="96.3" width="0.85" height="0.85" /></element>
 
-		<element name="digit3" ref="ldot"><bounds x="36.22" y="96.42" width="0.6" height="0.6" /></element>
-		<element name="digit2" ref="ldot"><bounds x="41.72" y="96.42" width="0.6" height="0.6" /></element>
-		<element name="digit1" ref="ldot"><bounds x="47.22" y="96.42" width="0.6" height="0.6" /></element>
+		<element name="digit3" ref="ldot"><bounds x="36.59" y="96.42" width="0.6" height="0.6" /></element>
+		<element name="digit2" ref="ldot"><bounds x="41.69" y="96.42" width="0.6" height="0.6" /></element>
+		<element name="digit1" ref="ldot"><bounds x="46.79" y="96.42" width="0.6" height="0.6" /></element>
 
-		<element name="digit0" ref="ldot"><bounds x="42.07" y="92.75" width="0.6" height="0.6" /></element>
-		<element name="digit0" ref="ldot"><bounds x="41.92" y="94.55" width="0.6" height="0.6" /></element>
+		<element name="digit0" ref="ldot"><bounds x="42.06" y="92.30" width="0.6" height="0.6" /></element>
+		<element name="digit0" ref="ldot"><bounds x="41.80" y="95.12" width="0.6" height="0.6" /></element>
 	</group>
 
 
