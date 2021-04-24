@@ -117,8 +117,6 @@ void cforte_state::lcd_output_w(u64 data)
 		data = bitswap<8>(data,7,2,0,4,6,5,3,1);
 		m_display->write_row(dig+3, data);
 	}
-
-	m_display->update();
 }
 
 

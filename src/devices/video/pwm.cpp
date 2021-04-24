@@ -2,28 +2,28 @@
 // copyright-holders:hap
 /*
 
-This thing is a generic helper for PWM(strobed) display elements, to prevent flickering
-and optionally handle perceived brightness levels.
+This thing is a generic helper for PWM(strobed) display elements, to prevent
+flickering and optionally handle perceived brightness levels.
 
-Common usecase is to call matrix(selmask, datamask), a collision between the 2 masks
-implies a powered-on display element (eg. a LED, or VFD sprite). The maximum matrix
-size is 64 by 64, simply due to uint64_t constraints. If a larger size is needed,
-create an array of pwm_display_device.
+Common usecase is to call matrix(selmask, datamask), a collision between the
+2 masks implies a powered-on display element (eg. a LED, or VFD sprite).
+The maximum matrix size is 64 by 64, simply due to uint64_t constraints.
+If a larger size is needed, create an array of pwm_display_device.
 
-If display elements are directly addressable, you can also use write_element or write_row
-to set them. In this case it is required to call update() to apply the changes.
+If display elements are directly addressable, you can also use write_element
+or write_row to set them.
 
-Display element states are sent to output tags "y.x" where y is the matrix row number,
-x is the row bit. It is also sent to "y.a" for all rows. The output state is 0 for off,
-and >0 for on, depending on brightness level. If segmask is defined, it is also sent
-to "digity", for use with multi-state elements, eg. 7seg leds.
+Display element states are sent to output tags "y.x" where y is the matrix row
+number, x is the row bit. It is also sent to "y.a" for all rows. The output state
+is 0 for off, and >0 for on, depending on brightness level. If segmask is defined,
+it is also sent to "digity", for use with multi-state elements, eg. 7seg leds.
 
-If you use this device in a slot, or use multiple of them (or just don't want to use
-the default output tags), set a callback.
+If you use this device in a slot, or use multiple of them (or just don't want
+to use the default output tags), set a callback.
 
-Brightness tresholds (0.0 to 1.0) indicate how long an element was powered on in the last
-frame, eg. 0.01 means a minimum on-time for 1%. Some games use two levels of brightness
-by strobing elements longer.
+Brightness tresholds (0.0 to 1.0) indicate how long an element was powered on
+in the last frame, eg. 0.01 means a minimum on-time for 1%. Some games use two
+levels of brightness by strobing elements longer.
 
 
 TODO:
@@ -43,7 +43,7 @@ DEFINE_DEVICE_TYPE(PWM_DISPLAY, pwm_display_device, "pwm_display", "PWM Display"
 //  constructor
 //-------------------------------------------------
 
-pwm_display_device::pwm_display_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+pwm_display_device::pwm_display_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, PWM_DISPLAY, tag, owner, clock),
 	m_out_x(*this, "%u.%u", 0U, 0U),
 	m_out_a(*this, "%u.a", 0U),
@@ -61,7 +61,6 @@ pwm_display_device::pwm_display_device(const machine_config &mconfig, const char
 	set_size(0, 0);
 	reset_segmask();
 }
-
 
 
 //-------------------------------------------------
@@ -84,16 +83,14 @@ void pwm_display_device::device_start()
 	}
 
 	// initialize
+	m_rowsel = 0;
 	std::fill(std::begin(m_rowdata), std::end(m_rowdata), 0);
-	std::fill(std::begin(m_rowdata_prev), std::end(m_rowdata_prev), 0);
+
 	for (auto &bri : m_bri)
 		std::fill(std::begin(bri), std::end(bri), 0.0);
 
 	m_frame_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pwm_display_device::frame_tick),this));
-	m_update_time = machine().time();
-
-	m_rowsel = 0;
-	m_rowsel_prev = 0;
+	m_sync_time = machine().time();
 
 	// register for savestates
 	save_item(NAME(m_width));
@@ -107,12 +104,10 @@ void pwm_display_device::device_start()
 
 	save_item(NAME(m_segmask));
 	save_item(NAME(m_rowsel));
-	save_item(NAME(m_rowsel_prev));
 	save_item(NAME(m_rowdata));
-	save_item(NAME(m_rowdata_prev));
 
 	save_item(NAME(m_bri));
-	save_item(NAME(m_update_time));
+	save_item(NAME(m_sync_time));
 	save_item(NAME(m_acc));
 }
 
@@ -122,9 +117,8 @@ void pwm_display_device::device_reset()
 		fatalerror("%s: Invalid size %d*%d, maximum is 64*64!\n", tag(), m_height, m_width);
 
 	schedule_frame();
-	m_update_time = machine().time();
+	m_sync_time = machine().time();
 }
-
 
 
 //-------------------------------------------------
@@ -156,8 +150,10 @@ pwm_display_device &pwm_display_device::set_segmask(u64 digits, u64 mask)
 	return *this;
 }
 
-void pwm_display_device::matrix_partial(u8 start, u8 height, u64 rowsel, u64 rowdata, bool upd)
+void pwm_display_device::matrix_partial(u8 start, u8 height, u64 rowsel, u64 rowdata)
 {
+	sync();
+
 	u64 selmask = (u64(1) << height) - 1;
 	rowsel &= selmask;
 	selmask <<= start;
@@ -170,44 +166,7 @@ void pwm_display_device::matrix_partial(u8 start, u8 height, u64 rowsel, u64 row
 		m_rowdata[y] = (rowsel & 1) ? (rowdata & rowmask) : 0;
 		rowsel >>= 1;
 	}
-
-	if (upd)
-		update();
 }
-
-void pwm_display_device::update()
-{
-	// call this every time after m_rowdata is changed (automatic with matrix)
-	const attotime now = machine().time();
-	const attotime diff = (m_update_time >= now) ? attotime::zero : now - m_update_time;
-
-	u64 sel = m_rowsel_prev;
-	m_rowsel_prev = m_rowsel;
-
-	// accumulate active time
-	for (int y = 0; y < m_height; y++)
-	{
-		u64 row = m_rowdata_prev[y];
-		m_rowdata_prev[y] = m_rowdata[y];
-
-		if (diff != attotime::zero)
-		{
-			if (sel & 1)
-				m_acc[y][m_width] += diff;
-
-			for (int x = 0; x < m_width; x++)
-			{
-				if (row & 1)
-					m_acc[y][x] += diff;
-				row >>= 1;
-			}
-		}
-		sel >>= 1;
-	}
-
-	m_update_time = now;
-}
-
 
 
 //-------------------------------------------------
@@ -239,7 +198,7 @@ TIMER_CALLBACK_MEMBER(pwm_display_device::frame_tick)
 	if (cutoff > 1.0)
 		cutoff = 1.0;
 
-	update(); // final timeslice
+	sync(); // final timeslice
 
 	for (int y = 0; y < m_height; y++)
 	{
@@ -289,4 +248,34 @@ TIMER_CALLBACK_MEMBER(pwm_display_device::frame_tick)
 	}
 
 	schedule_frame();
+}
+
+void pwm_display_device::sync()
+{
+	const attotime now = machine().time();
+	const attotime last = m_sync_time;
+	m_sync_time = now;
+
+	if (last >= now)
+		return;
+
+	const attotime diff = now - last;
+	u64 sel = m_rowsel;
+
+	// accumulate active time
+	for (int y = 0; y < m_height; y++)
+	{
+		u64 row = m_rowdata[y];
+
+		if (sel & 1)
+			m_acc[y][m_width] += diff;
+
+		for (int x = 0; x < m_width; x++)
+		{
+			if (row & 1)
+				m_acc[y][x] += diff;
+			row >>= 1;
+		}
+		sel >>= 1;
+	}
 }
