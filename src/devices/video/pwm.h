@@ -41,7 +41,7 @@ public:
 
 	// directly handle individual element (does not affect m_rowsel), y = row num, x = row bit
 	int read_element(u8 y, u8 x) { return BIT(m_rowdata[y], x); }
-	void write_element(u8 y, u8 x, int state) { m_rowdata[y] = (m_rowdata[y] & ~(u64(1) << x)) | (u64(state ? 1 : 0) << x); }
+	void write_element(u8 y, u8 x, int state) { sync(); m_rowdata[y] = (m_rowdata[y] & ~(u64(1) << x)) | (u64(state ? 1 : 0) << x); }
 
 	// directly handle row data
 	u64 read_row(offs_t offset) { return m_rowdata[offset]; }
