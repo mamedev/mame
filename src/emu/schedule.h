@@ -186,7 +186,7 @@ public:
 
 	// form 5 constructor: void timer_callback(int param, int param2)
 	template<typename FuncDeviceType, typename DeviceType, typename IntType, typename IntType2, std::enable_if_t<std::is_integral<IntType>::value && std::is_integral<IntType2>::value, bool> = true>
-	timer_expired_delegate(void (FuncDeviceType::*cb)(u32, IntType), char const *name, DeviceType *bindto) :
+	timer_expired_delegate(void (FuncDeviceType::*cb)(IntType, IntType2), char const *name, DeviceType *bindto) :
 		timer_expired_delegate_native(&timer_expired_delegate::form5_callback<IntType, IntType2>, name, this)
 	{
 		static_assert(sizeof(timer_expired_delegate_form5<IntType, IntType2>) == sizeof(m_sub_delegate));
@@ -196,7 +196,7 @@ public:
 
 	// form 6 constructor: void timer_callback(int param, int param2, int param3)
 	template<typename FuncDeviceType, typename DeviceType, typename IntType, typename IntType2, typename IntType3, std::enable_if_t<std::is_integral<IntType>::value && std::is_integral<IntType2>::value && std::is_integral<IntType3>::value, bool> = true>
-	timer_expired_delegate(void (FuncDeviceType::*cb)(u32, IntType, IntType), char const *name, DeviceType *bindto) :
+	timer_expired_delegate(void (FuncDeviceType::*cb)(IntType, IntType2, IntType3), char const *name, DeviceType *bindto) :
 		timer_expired_delegate_native(timer_expired_delegate::form6_callback<IntType, IntType2, IntType3>, name, this)
 	{
 		static_assert(sizeof(timer_expired_delegate_form6<IntType, IntType2, IntType3>) == sizeof(m_sub_delegate));
@@ -364,7 +364,7 @@ public:
 	~timer_instance();
 
 	// allocation and re-use
-	timer_instance &init_transient(timer_callback &callback, attotime const &duration);
+	timer_instance &init_transient(timer_callback &callback, attotime const &duration, bool absolute);
 	timer_instance &init_persistent(timer_callback &callback);
 
 	// getters
@@ -442,6 +442,7 @@ public:
 
 	// create a new timer_instance that will fire after the given duration
 	void call_after(attotime const &duration, u64 param = 0, u64 param2 = 0, u64 param3 = 0);
+	void call_at(attotime const &abstime, u64 param = 0, u64 param2 = 0, u64 param3 = 0);
 
 	// create a new timer_instance that will fire as soon as possible
 	void synchronize(u64 param = 0, u64 param2 = 0, u64 param3 = 0)
@@ -502,7 +503,8 @@ public:
 	bool enable(bool enable = true);
 	bool disable() { return enable(false); }
 	persistent_timer &reset(attotime const &duration = attotime::never) { return adjust(duration, m_instance.param(), m_period); }
-	persistent_timer &adjust(attotime const &start_delay, s32 param = 0, attotime const &periodicity = attotime::never);
+	persistent_timer &adjust(attotime const &start_delay, s32 param = 0, attotime const &periodicity = attotime::never) { return adjust_internal(start_delay, param, periodicity, false); }
+	persistent_timer &adjust_absolute(attotime const &start_time, s32 param = 0, attotime const &periodicity = attotime::never) { return adjust_internal(start_time, param, periodicity, true); }
 
 	// save state
 	void register_save(save_manager &save, int index)
@@ -519,6 +521,7 @@ protected:
 	void periodic_callback(timer_instance const &timer);
 	persistent_timer &init_common();
 	persistent_timer &restore(timer_instance_save const &src, timer_callback &callback);
+	persistent_timer &adjust_internal(attotime const &delay, s32 param, attotime const &periodicity, bool absolute);
 
 	// internal state
 	attotime m_period;                  // the timer period, or attotime::never if not periodic
@@ -821,7 +824,21 @@ inline void transient_timer_factory::call_after(attotime const &duration, u64 pa
 {
 	scheduler_assert(!duration.is_never());
 	scheduler_assert(m_callback.is_initialized());
-	m_callback.scheduler().instance_alloc().init_transient(m_callback, duration)
+	m_callback.scheduler().instance_alloc().init_transient(m_callback, duration, false)
+		.set_params(param, param2, param3);
+}
+
+
+//-------------------------------------------------
+//  call_at - create a new timer that will call
+//  the callback at a specific time
+//-------------------------------------------------
+
+inline void transient_timer_factory::call_at(attotime const &abstime, u64 param, u64 param2, u64 param3)
+{
+	scheduler_assert(!duration.is_never());
+	scheduler_assert(m_callback.is_initialized());
+	m_callback.scheduler().instance_alloc().init_transient(m_callback, abstime, true)
 		.set_params(param, param2, param3);
 }
 

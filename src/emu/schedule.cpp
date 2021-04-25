@@ -261,7 +261,7 @@ timer_instance &timer_instance::init_persistent(timer_callback &callback)
 //  and expiration time from the outset
 //-------------------------------------------------
 
-timer_instance &timer_instance::init_transient(timer_callback &callback, attotime const &duration)
+timer_instance &timer_instance::init_transient(timer_callback &callback, attotime const &duration, bool absolute)
 {
 	scheduler_assert(callback.persistent() == nullptr);
 	m_callback = &callback;
@@ -273,7 +273,7 @@ timer_instance &timer_instance::init_transient(timer_callback &callback, attotim
 
 	// add immediately to the active queue
 	attotime start = callback.scheduler().time();
-	return insert(start, start + duration);
+	return insert(start, absolute ? duration : (start + duration));
 }
 
 
@@ -446,11 +446,11 @@ bool persistent_timer::enable(bool enable)
 
 
 //-------------------------------------------------
-//  adjust - change the timer's start time,
+//  adjust_internal - change the timer's start time,
 //  parameter, or period
 //-------------------------------------------------
 
-persistent_timer &persistent_timer::adjust(attotime const &start_delay, s32 param, attotime const &period)
+persistent_timer &persistent_timer::adjust_internal(attotime const &delay, s32 param, attotime const &period, bool absolute)
 {
 	// set the parameters first
 	m_instance.set_param(param);
@@ -467,9 +467,11 @@ persistent_timer &persistent_timer::adjust(attotime const &start_delay, s32 para
 
 	// compute start/expire times
 	attotime start = m_callback.scheduler().time();
-	attotime expire = start;
-	if (start_delay.seconds() >= 0)
-		expire += start_delay;
+	attotime expire;
+	if (absolute)
+		expire = delay;
+	else if (delay.seconds() >= 0)
+		expire = start + delay;
 
 	// then insert into the active list, removing first if previously active
 	if (m_instance.active())
