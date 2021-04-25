@@ -43,7 +43,6 @@ After boot, it copies ROM to RAM, probably to circumvent waitstates on slow ROM.
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
-#include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "machine/mmboard.h"
@@ -63,6 +62,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_rom(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
+		m_nvram(*this, "nvram", 0x2000, ENDIANNESS_BIG),
 		m_disable_bootrom(*this, "disable_bootrom"),
 		m_fake(*this, "FAKE")
 	{ }
@@ -83,13 +83,16 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u32> m_rom;
 	required_shared_ptr<u32> m_mainram;
+	memory_share_creator<u8> m_nvram;
 	required_device<timer_device> m_disable_bootrom;
 	optional_ioport m_fake;
 
 	// address maps
 	void mmtm_2m_map(address_map &map);
 	void mmtm_8m_map(address_map &map);
-	void nvram_map(address_map &map);
+
+	u8 nvram_r(offs_t offset) { return m_nvram[offset]; }
+	void nvram_w(offs_t offset, u8 data) { m_nvram[offset] = data; }
 
 	void install_bootrom(bool enable);
 	TIMER_DEVICE_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
@@ -145,18 +148,12 @@ void mmtm_state::set_cpu_freq()
     Address Maps
 ******************************************************************************/
 
-void mmtm_state::nvram_map(address_map &map)
-{
-	// nvram is 8-bit (8KB) - this makes sure that endianness is correct
-	map(0x0000, 0x1fff).ram().share("nvram");
-}
-
 void mmtm_state::mmtm_2m_map(address_map &map)
 {
 	map(0x00000000, 0x0003ffff).ram().share("mainram");
 	map(0x80000000, 0x801fffff).ram();
 	map(0xf0000000, 0xf003ffff).rom().region("maincpu", 0);
-	map(0xfc000000, 0xfc001fff).m("nvram_map", FUNC(address_map_bank_device::amap8));
+	map(0xfc000000, 0xfc001fff).rw(FUNC(mmtm_state::nvram_r), FUNC(mmtm_state::nvram_w)).umask32(0xffffffff);
 	map(0xfc020004, 0xfc020007).portr("KEY1");
 	map(0xfc020008, 0xfc02000b).portr("KEY2");
 	map(0xfc020010, 0xfc020013).portr("KEY3");
@@ -223,7 +220,6 @@ void mmtm_state::mmtm_v(machine_config &config)
 	TIMER(config, "disable_bootrom").configure_generic(FUNC(mmtm_state::disable_bootrom));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	ADDRESS_MAP_BANK(config, "nvram_map").set_map(&mmtm_state::nvram_map).set_options(ENDIANNESS_BIG, 8, 13);
 
 	MEPHISTO_SENSORS_BOARD(config, "board");
 	subdevice<sensorboard_device>("board:board")->set_nvram_enable(true);

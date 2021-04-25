@@ -59,7 +59,6 @@ TODO:
 #include "emu.h"
 
 #include "cpu/arm/arm.h"
-#include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
 #include "machine/smartboard.h"
@@ -83,6 +82,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_rom(*this, "maincpu"),
 		m_ram(*this, "ram"),
+		m_nvram(*this, "nvram", 0x20000, ENDIANNESS_LITTLE),
 		m_lcd(*this, "lcd"),
 		m_smartboard(*this, "smartboard"),
 		m_speaker(*this, "speaker"),
@@ -105,6 +105,7 @@ private:
 	required_device<arm_cpu_device> m_maincpu;
 	required_region_ptr<u32> m_rom;
 	required_device<ram_device> m_ram;
+	memory_share_creator<u8> m_nvram;
 	required_device<lm24014h_device> m_lcd;
 	required_device<tasc_sb30_device> m_smartboard;
 	required_device<speaker_sound_device> m_speaker;
@@ -113,12 +114,14 @@ private:
 	output_finder<2> m_out_leds;
 
 	void main_map(address_map &map);
-	void nvram_map(address_map &map);
 
 	// I/O handlers
 	u32 input_r();
 	u32 rom_r(offs_t offset);
 	void control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+
+	u8 nvram_r(offs_t offset) { return m_nvram[offset]; }
+	void nvram_w(offs_t offset, u8 data) { m_nvram[offset] = data; }
 
 	void set_cpu_freq();
 	void install_bootrom(bool enable);
@@ -261,13 +264,7 @@ void tasc_state::main_map(address_map &map)
 {
 	map(0x01000000, 0x01000003).rw(FUNC(tasc_state::input_r), FUNC(tasc_state::control_w));
 	map(0x02000000, 0x0203ffff).r(FUNC(tasc_state::rom_r));
-	map(0x03000000, 0x0307ffff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask32(0x000000ff);
-}
-
-void tasc_state::nvram_map(address_map &map)
-{
-	// nvram is 8-bit (128KB)
-	map(0x00000, 0x1ffff).ram().share("nvram");
+	map(0x03000000, 0x0307ffff).rw(FUNC(tasc_state::nvram_r), FUNC(tasc_state::nvram_w)).umask32(0x000000ff);
 }
 
 
@@ -326,7 +323,6 @@ void tasc_state::tasc(machine_config &config)
 	m_ram->set_default_value(0);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	ADDRESS_MAP_BANK(config, "nvram_map").set_map(&tasc_state::nvram_map).set_options(ENDIANNESS_LITTLE, 8, 17);
 
 	TASC_SB30(config, m_smartboard);
 	subdevice<sensorboard_device>("smartboard:board")->set_nvram_enable(true);
