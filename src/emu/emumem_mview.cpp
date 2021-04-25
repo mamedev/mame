@@ -664,7 +664,7 @@ void memory_view::disable()
 	m_handler_write->select_a(-1);
 
 	if(m_space)
-		m_space->invalidate_caches(read_or_write::READWRITE);	
+		m_space->invalidate_caches(read_or_write::READWRITE);
 }
 
 void memory_view::select(int slot)

@@ -630,7 +630,7 @@ protected:
 	required_device<nanoreseau_device> m_nanoreseau;
 	required_ioport m_nanoreseau_config;
 	memory_view m_extension_view;
-	
+
 	void mo5nr_map(address_map &map);
 
 	void mo5nr_game_init();

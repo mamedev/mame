@@ -23,7 +23,7 @@
     - A5105 has a FIFO bug with the RDAT, should be a lot larger when it scrolls up.
       Can be fixed with a DRDY mechanism for RDAT/WDAT;
     - Some later SWs on PC-98 throws "Invalid command byte 05" (zettmj on Epson logo),
-	  actual undocumented command to reset something?
+      actual undocumented command to reset something?
 
     - honor visible area
     - wide mode (32-bit access)

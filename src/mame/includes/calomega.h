@@ -83,11 +83,11 @@ private:
 	void lamps_903b_w(uint8_t data);
 	void lamps_905_w(uint8_t data);
 	void dummy_pia_w(uint8_t data);
-	
+
 	DECLARE_READ_LINE_MEMBER(timer_r);
 	DECLARE_READ_LINE_MEMBER(vblank_r);
-	DECLARE_READ_LINE_MEMBER(dummy_pia_line_r);	
-	
+	DECLARE_READ_LINE_MEMBER(dummy_pia_line_r);
+
 	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(vblank0_w);
 	DECLARE_WRITE_LINE_MEMBER(vblank1_w);
@@ -100,9 +100,9 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_0);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_1);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_2);
-	
+
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	
+
 	uint32_t screen_update_calomega(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void calomega_palette(palette_device &palette) const;
 
@@ -122,7 +122,7 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	
+
 	required_device<ticket_dispenser_device> m_hopper;
 
 	optional_ioport m_in0;

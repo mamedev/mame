@@ -82,7 +82,7 @@ void mc6843_device::map(address_map &map)
 	map(4, 4).rw(FUNC(mc6843_device::strb_r), FUNC(mc6843_device::sar_w));
 	map(5, 5).w (FUNC(mc6843_device::gcr_w));
 	map(6, 6).w (FUNC(mc6843_device::ccr_w));
-	map(7, 7).w (FUNC(mc6843_device::ltar_w));	
+	map(7, 7).w (FUNC(mc6843_device::ltar_w));
 }
 
 void mc6843_device::set_floppy(floppy_image_device *floppy)
@@ -396,7 +396,7 @@ void mc6843_device::run(bool timeout, bool ready, bool index)
 		case S_STZ_STEP:
 			if(m_floppy && !m_floppy->trk00_r()) {
 				m_floppy->stp_w(0);
-				m_floppy->stp_w(1);	
+				m_floppy->stp_w(1);
 			}
 			m_step_count --;
 			m_state = S_STZ_STEP_WAIT;
@@ -428,7 +428,7 @@ void mc6843_device::run(bool timeout, bool ready, bool index)
 		case S_SEEK_STEP:
 			if(m_floppy) {
 				m_floppy->stp_w(0);
-				m_floppy->stp_w(1);	
+				m_floppy->stp_w(1);
 			}
 			m_step_count --;
 			m_state = S_SEEK_STEP_WAIT;
@@ -467,7 +467,7 @@ void mc6843_device::run(bool timeout, bool ready, bool index)
 			} else
 				m_state = S_SRW_START;
 			break;
-			
+
 		case S_SRW_HEAD_SETTLING:
 			if(timeout) {
 				m_head_loaded = true;
@@ -490,7 +490,7 @@ void mc6843_device::run(bool timeout, bool ready, bool index)
 			} else
 				m_state = S_FFW_START;
 			break;
-			
+
 		case S_FFW_HEAD_SETTLING:
 			if(timeout) {
 				m_head_loaded = true;
@@ -508,14 +508,14 @@ void mc6843_device::run(bool timeout, bool ready, bool index)
 			m_stra &= ~SA_BUSY;
 			m_state = S_IDLE;
 			isr_raise(I_RWCE);
-			return;			
+			return;
 
 		case S_IDAM_BAD_CRC:
 			m_strb |= SB_CRC | SB_SAERR;
 			m_stra &= ~SA_BUSY;
 			m_state = S_IDLE;
 			isr_raise(I_RWCE | I_STRB);
-			return;			
+			return;
 
 		case S_IDAM_FOUND:
 			if(m_cmr & 0x20)
@@ -535,7 +535,7 @@ void mc6843_device::run(bool timeout, bool ready, bool index)
 			m_state = S_IDLE;
 			isr_raise(I_RWCE | I_STRB);
 			logerror("not found\n");
-			return;			
+			return;
 
 		case S_DAM_NOT_FOUND:
 			m_strb |= SB_DMERR;
@@ -738,7 +738,7 @@ void mc6843_device::live_run(attotime limit)
 					live_delay(L_IDLE);
 					return;
 
-				} else					
+				} else
 					m_cur_live.state = L_IDAM_CHECK_SECTOR;
 			}
 			break;
@@ -903,7 +903,7 @@ void mc6843_device::live_run(attotime limit)
 			}
 			m_cur_live.state = L_DAM_WRITE;
 			break;
-		}				
+		}
 
 		case L_FFW_BYTE:
 			if(!m_dor_loaded)

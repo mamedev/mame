@@ -62,7 +62,7 @@ private:
 		C2_STEP   = 0x10,
 		C2_MTON   = 0x04,
 		C2_DRS1   = 0x02,
-		C2_DRS0   = 0x01,		
+		C2_DRS0   = 0x01,
 	};
 
 	enum {

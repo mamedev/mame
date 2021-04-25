@@ -207,7 +207,7 @@ void flkatck_state::flkatck(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(600));
 
 	WATCHDOG_TIMER(config, m_watchdog);
-	
+
 	KONAMI_007452_MATH(config, "k007452");
 
 	/* video hardware */

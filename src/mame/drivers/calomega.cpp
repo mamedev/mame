@@ -446,33 +446,33 @@
     [2021-04-24]
 
     General improvements...
-	- The PIAs set for each MACHINE_CONFIG were made independent.
-	- All the PIAs lines were adapted according to the needs of each platform.
-	- All the interrupts were set/placed as indicated in the schematics (903/905).
-	- A global hopper was added, currently assigned to platform 906-III,
+    - The PIAs set for each MACHINE_CONFIG were made independent.
+    - All the PIAs lines were adapted according to the needs of each platform.
+    - All the interrupts were set/placed as indicated in the schematics (903/905).
+    - A global hopper was added, currently assigned to platform 906-III,
       but it can be used by other platforms.
-	- Worked proper inputs for system 903: Cal Omega - Game 15.7 (Double-Draw Poker).
-	  The game was promoted to WORKING.
-	- Worked proper inputs for system 905: Cal Omega - Game 15.9 (Wild Double-Up).
-	  The game was promoted to WORKING.
-	- Worked proper inputs for system 905: Cal Omega - Game 17.2 (Double Double Poker).
-	  The game was promoted to WORKING.
+    - Worked proper inputs for system 903: Cal Omega - Game 15.7 (Double-Draw Poker).
+      The game was promoted to WORKING.
+    - Worked proper inputs for system 905: Cal Omega - Game 15.9 (Wild Double-Up).
+      The game was promoted to WORKING.
+    - Worked proper inputs for system 905: Cal Omega - Game 17.2 (Double Double Poker).
+      The game was promoted to WORKING.
 
 
     [2021-04-21]
 
     906-III improvements...
-	- Proper inputs for the IWC poker games.
-	- Fixed/Improved the interrupts system.
-	- Preliminary button-lamps support.
-	- Simplified and partially cleaned the code.
-	- Added technical notes.
+    - Proper inputs for the IWC poker games.
+    - Fixed/Improved the interrupts system.
+    - Preliminary button-lamps support.
+    - Simplified and partially cleaned the code.
+    - Added technical notes.
 
 
     [2021-04-20]
 
     - Reworked a lot of things to get the 906-III platform playable.
-	- Switched to Rockwell R65C02 CPU.
+    - Switched to Rockwell R65C02 CPU.
     - Added missing 906-III inputs, timers, clocks and connections.
     - Renamed Game 51.08 to CEI 51.08 (CEI 906-III Poker).
       The game is promoted to WORKING.
@@ -679,7 +679,7 @@
     - 906-III: Proper PIATs 65C24 devices.
     - 906-III: GFX banks, proper banks selector.
     - 906-III: EX and Turbo+ platforms support.
-	- Hopper support.
+    - Hopper support.
     - Parent/clone relationship.
     - Fix lamps.
 
@@ -689,10 +689,10 @@
 #include "emu.h"
 #include "includes/calomega.h"
 
-#define MASTER_CLOCK		XTAL(10'000'000)
-#define CPU_CLOCK			(MASTER_CLOCK/16)
-#define UART_CLOCK			(MASTER_CLOCK/16)
-#define SND_CLOCK			(MASTER_CLOCK/8)
+#define MASTER_CLOCK        XTAL(10'000'000)
+#define CPU_CLOCK           (MASTER_CLOCK/16)
+#define UART_CLOCK          (MASTER_CLOCK/16)
+#define SND_CLOCK           (MASTER_CLOCK/8)
 
 
 /**************************************************
@@ -721,18 +721,18 @@ uint8_t calomega_state::s903_mux_port_r()
 
 void calomega_state::s903_mux_w(uint8_t data)
 {
-    // bit 7 - bit 6 -bit 5 -bit 4 -> Mux. Scan Lines
-	m_s903_mux_data = data ^ 0xf0;		// inverted
+	// bit 7 - bit 6 -bit 5 -bit 4 -> Mux. Scan Lines
+	m_s903_mux_data = data ^ 0xf0;      // inverted
 
-    // bit 0 - bit 1 -> Hopper
+	// bit 0 - bit 1 -> Hopper
 	m_hopper->motor_w(BIT(~data, 0) && BIT(~data, 1));
 
-    // bit2 - bit3 -> No connected
+	// bit2 - bit3 -> No connected
 }
 
 uint8_t calomega_state::s905_mux_port_r()
 {
-	switch( m_s905_mux_data & 0x0f )	// bits 0-3
+	switch( m_s905_mux_data & 0x0f )    // bits 0-3
 	{
 		case 0x01: return m_in0_0->read();
 		case 0x02: return m_in0_1->read();
@@ -746,13 +746,13 @@ uint8_t calomega_state::s905_mux_port_r()
 void calomega_state::s905_mux_w(uint8_t data)
 {
 //  Lower nibble
-	m_s905_mux_data = data ^ 0x0f;		// inverted
+	m_s905_mux_data = data ^ 0x0f;      // inverted
 
 /*  Upper nibble
-	PIA_1_PB_4 - N.C.
-	PIA_1_PB_5 - Hopper1.
-	PIA_1_PB_6 - Hopper2.
-	PIA_1_PB_7 - Lockout.
+    PIA_1_PB_4 - N.C.
+    PIA_1_PB_5 - Hopper1.
+    PIA_1_PB_6 - Hopper2.
+    PIA_1_PB_7 - Lockout.
 */
 	m_hopper->motor_w(BIT(~data, 5) && BIT(~data, 6));
 	m_lockout = BIT(data, 7);
@@ -783,7 +783,7 @@ void calomega_state::pia0_bout_w(uint8_t data)
 
 uint8_t calomega_state::pia1_ain_r()
 {
-    //popmessage("hopper out: %x", m_in0_1->read() & 0x80);
+	//popmessage("hopper out: %x", m_in0_1->read() & 0x80);
 	switch( m_s905_mux_data & 0x03 )    // bits 0-3
 	{
 		case 0x00: return m_in0_0->read();
@@ -884,7 +884,7 @@ WRITE_LINE_MEMBER(calomega_state::vblank1_w)
 WRITE_LINE_MEMBER(calomega_state::vblank2_w)
 {
 	m_vblank = state;
-	m_pia[1]->read(0); 
+	m_pia[1]->read(0);
 	m_pia[1]->read(0);
 	m_pia[1]->cb1_w(state);
 	// logerror("V_BLANK_2 event : state=%d\n", m_vblank);
@@ -1026,7 +1026,7 @@ void calomega_state::sys905_map(address_map &map)
 
 void calomega_state::sys906_map(address_map &map)
 {
-	map(0x0000, 0x1fff).ram().share("nvram"); 
+	map(0x0000, 0x1fff).ram().share("nvram");
 	map(0x280c, 0x280f).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x2810, 0x2811).rw(m_acia6850_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x2824, 0x2827).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -2298,11 +2298,11 @@ static INPUT_PORTS_START( comg159 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	// For System 905, SW1 uses the whole PIA1 portA.
 
 	PORT_START("SW1")    // settings (PIA1)
-	PORT_DIPNAME( 0x01, 0x01, "Game Type" )  		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, "Game Type" )         PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, "Hold" )
 	PORT_DIPSETTING(    0x00, "Discard" )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
@@ -2314,7 +2314,7 @@ static INPUT_PORTS_START( comg159 )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, "Pay Table" )  		PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x30, 0x30, "Pay Table" )         PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x30, "250/100/25/10/8/5/4/3/2/1" )
 	PORT_DIPSETTING(    0x20, "500/200/40/10/8/5/4/3/2/1" )
 	PORT_DIPSETTING(    0x00, "500/250/50/20/8/6/4/3/2/1" )
@@ -2366,11 +2366,11 @@ static INPUT_PORTS_START( comg172 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	// For System 905, SW1 uses the whole PIA1 portA.
 
 	PORT_START("SW1")    // settings (PIA1)
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	             PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )               PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )               PORT_DIPLOCATION("SW1:2")
@@ -2689,7 +2689,7 @@ static INPUT_PORTS_START( stand906 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )  PORT_NAME("Stand / DVTR")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-    
+
 	PORT_START("IN0-1")
 	//PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_IMPULSE(10)      PORT_NAME("Coin Out")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
@@ -2787,7 +2787,7 @@ static INPUT_PORTS_START( cas21iwc )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-    
+
 	PORT_START("IN0-1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_IMPULSE(2)      PORT_NAME("Coin Out (Fichas Salida)")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_H) PORT_NAME("Hopper Height (Peso Tolva)") PORT_TOGGLE
@@ -2810,7 +2810,7 @@ static INPUT_PORTS_START( cas21iwc )
 
 	PORT_START("IN0-3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_D) PORT_NAME("Drop Door (Cajon Abierto)") PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )	                        PORT_NAME("Bet (Apostar)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )                         PORT_NAME("Bet (Apostar)")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_8) PORT_NAME("Attendant (Asistente)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2883,7 +2883,7 @@ static INPUT_PORTS_START( pokeriwc )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )  PORT_NAME("Stand (Plantar)/ DVTR (Desviar)")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-    
+
 	PORT_START("IN0-1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_IMPULSE(2)      PORT_NAME("Coin Out (Fichas Salida)")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_H) PORT_NAME("Hopper Weight (Peso Tolva)") PORT_TOGGLE
@@ -2906,7 +2906,7 @@ static INPUT_PORTS_START( pokeriwc )
 
 	PORT_START("IN0-3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_D) PORT_NAME("Drop Door (Cajon Abierto)") PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )	                        PORT_NAME("Bet (Apostar)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )                         PORT_NAME("Bet (Apostar)")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_8) PORT_NAME("Attendant (Asistente)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_0) PORT_NAME("Prog Hit (Pozo Acumulado)")
@@ -3243,13 +3243,13 @@ void calomega_state::sys903(machine_config &config)
 
 	PIA6821(config, m_pia[1], 0);
 	m_pia[1]->readpa_handler().set_ioport("SW1");
-	m_pia[1]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: so much need to read?????  :) 
+	m_pia[1]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: so much need to read?????  :)
 	m_pia[1]->writepa_handler().set(FUNC(calomega_state::lamps_903b_w));
 	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s903_mux_w));        // Mux. Scan Lines.(Upper nibble) - Hopper b0-b1 (Lower Nibble).
-	m_pia[1]->ca2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // 
-	m_pia[1]->cb2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // 
+	m_pia[1]->ca2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      //
+	m_pia[1]->cb2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      //
 	m_pia[1]->readcb1_handler().set(FUNC(calomega_state::vblank_r));          // V_BLANK Interrupt Ack.   (CPU -> PIA)
-	m_pia[1]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // V_BLANK Interrupt Event. (PIA -> CPU)   
+	m_pia[1]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // V_BLANK Interrupt Event. (PIA -> CPU)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -3283,7 +3283,7 @@ void calomega_state::sys903(machine_config &config)
 	aciabaud.signal_handler().set(FUNC(calomega_state::write_acia_clock));
 
 	TIMER(config, "timer_0").configure_periodic(FUNC(calomega_state::timer_0), attotime::from_hz(550*2));  // (time*2) - Each timer pulse -> half period
-	
+
 	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
 }
 
@@ -3324,7 +3324,7 @@ void calomega_state::sys905(machine_config &config)
 
 	PIA6821(config.replace(), m_pia[0], 0);
 	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s905_mux_port_r));    // Mux. Button read.
-	m_pia[0]->writepa_handler().set(FUNC(calomega_state::dummy_pia_w));       // Bit 7 & 6 as output. (Watchdog & Bat. Test control) - Ignored 
+	m_pia[0]->writepa_handler().set(FUNC(calomega_state::dummy_pia_w));       // Bit 7 & 6 as output. (Watchdog & Bat. Test control) - Ignored
 	m_pia[0]->writepb_handler().set(FUNC(calomega_state::lamps_905_w));       // Full Lamps - OK.
 	m_pia[0]->readcb1_handler().set(FUNC(calomega_state::vblank_r));          // V_BLANK Interrupt Ack.   (CPU -> PIA)
 	m_pia[0]->cb2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // No connected (from schematics).
@@ -3332,7 +3332,7 @@ void calomega_state::sys905(machine_config &config)
 
 	PIA6821(config.replace(), m_pia[1], 0);
 	m_pia[1]->readpa_handler().set_ioport("SW1");                             // Full port.
-	//m_pia[1]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: so much need to read?????  :) 
+	//m_pia[1]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: so much need to read?????  :)
 	//m_pia[1]->writepa_handler().set(FUNC(calomega_state::dummy_pia_w));       // Debug: to assign lamps/counters/solenids/hopper????
 	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s905_mux_w));        // Mux. Scan Lines.(Lower Nibble). Hopper & Coin Lockout (Upper nibble).
 	m_pia[1]->readcb1_handler().set(FUNC(calomega_state::timer_r));           // Timer Interrupt Ack.      (CPU -> PIA)
@@ -3353,7 +3353,7 @@ void calomega_state::sys906(machine_config &config)
 	sys903(config);
 
 	// basic machine hardware
-	R65C02(config.replace(), m_maincpu, CPU_CLOCK);	// confirmed
+	R65C02(config.replace(), m_maincpu, CPU_CLOCK); // confirmed
 	m_maincpu->set_addrmap(AS_PROGRAM, &calomega_state::sys906_map);
 
 	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_RASTER));
@@ -3361,8 +3361,8 @@ void calomega_state::sys906(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(100));
 	screen.set_size((39+1)*8, (31+1)*8);             // Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1).
 	screen.set_visarea(0*8, 32*8-1, 0*8, 31*8-1);    // Taken from MC6845 init, registers 01 & 06.
-	screen.set_screen_update(FUNC(calomega_state::screen_update_calomega));	
-	
+	screen.set_screen_update(FUNC(calomega_state::screen_update_calomega));
+
 	screen.screen_vblank().set(FUNC(calomega_state::vblank2_w));
 	PIA6821(config.replace(), m_pia[0], 0);
 	m_pia[0]->readpa_handler().set_ioport("SW1");                             // Bit 7 - CGBANK ???? input?-output?
@@ -3386,8 +3386,8 @@ void calomega_state::sys906(machine_config &config)
 	m_gfxdecode->set_info(gfx_sys906);
 
 	// sound hardware
-	ay8912_device &ay8912(AY8912(config.replace(), "ay8912", SND_CLOCK));	// confirmed
-	ay8912.port_a_read_callback().set_ioport("SW2");						// from schematics
+	ay8912_device &ay8912(AY8912(config.replace(), "ay8912", SND_CLOCK));   // confirmed
+	ay8912.port_a_read_callback().set_ioport("SW2");                        // from schematics
 	ay8912.add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	TIMER(config.replace(), "timer_0").configure_periodic(FUNC(calomega_state::timer_2), attotime::from_hz(380*2));  // (time*2) - Each timer pulse -> half period
@@ -4478,14 +4478,14 @@ void calomega_state::init_cas21iwc()
 {
 	uint8_t *PRGROM = memregion( "maincpu" )->base();
 
-	PRGROM[0xB603] = 0xff;		// Checksum flag. No changes for now.
+	PRGROM[0xB603] = 0xff;      // Checksum flag. No changes for now.
 }
 
 void calomega_state::init_pokeriwc()
 {
 	uint8_t *PRGROM = memregion( "maincpu" )->base();
 
-	PRGROM[0x8000] = 0xa2;		// Checksum flag. No changes for now.
+	PRGROM[0x8000] = 0xa2;      // Checksum flag. No changes for now.
 }
 
 void calomega_state::init_any()
@@ -4493,32 +4493,32 @@ void calomega_state::init_any()
 	uint8_t *PRGROM = memregion( "maincpu" )->base();
 
 	PRGROM[0x2e30] = 0xe0;  //fix bad dump
-    PRGROM[0x2e31] = 0x12;
-    PRGROM[0x2e32] = 0x90;
-    PRGROM[0x2e33] = 0xf2;
-    PRGROM[0x2e34] = 0xad;
-    PRGROM[0x2e35] = 0xc4;
-    PRGROM[0x2e36] = 0x08;
-    PRGROM[0x2e37] = 0x29;
-    PRGROM[0x2e38] = 0x80;
-    PRGROM[0x2e39] = 0xd0;
-    PRGROM[0x2e3a] = 0x13;
-    PRGROM[0x2e3b] = 0xa0;
-    PRGROM[0x2e3c] = 0x00;
-    PRGROM[0x2e3d] = 0xa2;
-    PRGROM[0x2e3e] = 0x04;
-    PRGROM[0x2e3f] = 0xb9;
-    PRGROM[0x2e40] = 0x61;
-    
-    PRGROM[0x2dd6] = 0x10;
-    PRGROM[0x2dd7] = 0x99;
-    PRGROM[0x2dd8] = 0x60;
-    PRGROM[0x2dd9] = 0x11;
-    PRGROM[0x2ddd] = 0x99;
-    
-    
-    
-    
+	PRGROM[0x2e31] = 0x12;
+	PRGROM[0x2e32] = 0x90;
+	PRGROM[0x2e33] = 0xf2;
+	PRGROM[0x2e34] = 0xad;
+	PRGROM[0x2e35] = 0xc4;
+	PRGROM[0x2e36] = 0x08;
+	PRGROM[0x2e37] = 0x29;
+	PRGROM[0x2e38] = 0x80;
+	PRGROM[0x2e39] = 0xd0;
+	PRGROM[0x2e3a] = 0x13;
+	PRGROM[0x2e3b] = 0xa0;
+	PRGROM[0x2e3c] = 0x00;
+	PRGROM[0x2e3d] = 0xa2;
+	PRGROM[0x2e3e] = 0x04;
+	PRGROM[0x2e3f] = 0xb9;
+	PRGROM[0x2e40] = 0x61;
+
+	PRGROM[0x2dd6] = 0x10;
+	PRGROM[0x2dd7] = 0x99;
+	PRGROM[0x2dd8] = 0x60;
+	PRGROM[0x2dd9] = 0x11;
+	PRGROM[0x2ddd] = 0x99;
+
+
+
+
 }
 
 

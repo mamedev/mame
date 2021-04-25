@@ -17158,8 +17158,8 @@ but dumps still have to be confirmed.
 			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="prostrfs">
 		<description>Pro Striker Final Stage (Jpn)</description>
 		<year>1995</year>

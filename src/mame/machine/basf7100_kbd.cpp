@@ -4,17 +4,17 @@
 
     BASF 7100 Keyboard (HLE)
 
-	Keytronics keyboard hardware: A65-01966-003 PCB-201 F
-	BASF part number 19-4203-01
+    Keytronics keyboard hardware: A65-01966-003 PCB-201 F
+    BASF part number 19-4203-01
 
-	Hardware:
-	- 30293E-054 20-04592-054 (possibly PIC1650)
-	- 1 KB ROM (contains translation tables)
-	- Speaker
+    Hardware:
+    - 30293E-054 20-04592-054 (possibly PIC1650)
+    - 1 KB ROM (contains translation tables)
+    - Speaker
 
-	TODO:
-	- Extract internal ROM from MCU and convert to LLE
-	- Speaker
+    TODO:
+    - Extract internal ROM from MCU and convert to LLE
+    - Speaker
 
 ***************************************************************************/
 

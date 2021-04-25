@@ -6095,7 +6095,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="バランス オブ パワー" />
 		<info name="release" value="198810xx" />
-		<!-- 1988 game but runs DOS 6.20, lolwut? --> 
+		<!-- 1988 game but runs DOS 6.20, lolwut? -->
 		<!-- disk A may be just an user disk created with disk B via SETUP.EXE -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
@@ -26193,7 +26193,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 	</software>
 
 	<!-- boot OK -->
-	<software name="kingdung" supported="yes"	>
+	<software name="kingdung" supported="yes">
 		<description>King's Dungeon - The Story of Heroes</description>
 		<year>1992</year>
 		<publisher>ソフトプラン (Soft Plan)</publisher>

@@ -36,13 +36,13 @@ public:
 	auto io_write() { return m_io_write_handler.bind(); }
 
 	// read access
-	u8 status_r();	// A0=0
-	u8 data_r();	// A0=1
+	u8 status_r();  // A0=0
+	u8 data_r();    // A0=1
 	u8 read(offs_t offset);
 
 	// write access
-	void address_w(u8 data);	// A0=0
-	void data_w(u8 data);		// A0=1
+	void address_w(u8 data);    // A0=0
+	void data_w(u8 data);       // A0=1
 	void write(offs_t offset, u8 data);
 
 protected:
