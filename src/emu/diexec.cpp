@@ -42,24 +42,24 @@ const int TRIGGER_SUSPENDTIME   = -4000;
 //  device_execute_interface - constructor
 //-------------------------------------------------
 
-device_execute_interface::device_execute_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device, "execute")
-	, m_nextexec(nullptr)
-	, m_icountptr(nullptr)
-	, m_cycles_per_second(0)
-	, m_totalcycles(0)
-	, m_profiler(PROFILER_IDLE)
-	, m_scheduler(nullptr)
-	, m_suspend(0)
-	, m_nextsuspend(0)
-	, m_trigger(0)
-	, m_inttrigger(0)
-	, m_disabled(false)
-	, m_vblank_interrupt(device)
-	, m_vblank_interrupt_screen(nullptr)
-	, m_timed_interrupt(device)
-	, m_timed_interrupt_period(attotime::zero)
-	, m_driver_irq(device)
+device_execute_interface::device_execute_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "execute"),
+	m_nextexec(nullptr),
+	m_icountptr(nullptr),
+	m_cycles_per_second(0),
+	m_totalcycles(0),
+	m_profiler(PROFILER_IDLE),
+	m_scheduler(nullptr),
+	m_suspend(0),
+	m_nextsuspend(0),
+	m_trigger(0),
+	m_inttrigger(0),
+	m_disabled(false),
+	m_vblank_interrupt(device),
+	m_vblank_interrupt_screen(nullptr),
+	m_periodic_interrupt(device),
+	m_periodic_interrupt_period(attotime::zero),
+	m_driver_irq(device)
 {
 	m_cycles.combined = 0;
 
@@ -75,6 +75,30 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 
 device_execute_interface::~device_execute_interface()
 {
+}
+
+
+//-------------------------------------------------
+//  pulse_input_line - "pulse" an input line by
+//  asserting it and then clearing it later
+//-------------------------------------------------
+
+void device_execute_interface::pulse_input_line(int irqline, const attotime &duration)
+{
+	// treat instantaneous pulses as ASSERT+CLEAR
+	if (duration == attotime::zero)
+	{
+		if (irqline != INPUT_LINE_RESET && !input_edge_triggered(irqline))
+			throw emu_fatalerror("device '%s': zero-width pulse is not allowed for input line %d\n", device().tag(), irqline);
+
+		set_input_line(irqline, ASSERT_LINE);
+		set_input_line(irqline, CLEAR_LINE);
+	}
+	else
+	{
+		set_input_line(irqline, ASSERT_LINE);
+		m_set_input_line.call_at(local_time() + duration, irqline, CLEAR_LINE);
+	}
 }
 
 
@@ -156,7 +180,7 @@ void device_execute_interface::spin_until_time(const attotime &duration)
 	suspend_until_trigger(TRIGGER_SUSPENDTIME + timetrig, true);
 
 	// then set a timer for it
-	m_timed_trigger_callback.call_after(duration, TRIGGER_SUSPENDTIME + timetrig);
+	m_timed_trigger.call_after(duration, TRIGGER_SUSPENDTIME + timetrig);
 	timetrig = (timetrig + 1) % 256;
 }
 
@@ -349,9 +373,9 @@ void device_execute_interface::interface_validity_check(validity_checker &valid)
 			osd_printf_error("VBLANK interrupt references a nonexistent screen tag '%s'\n", m_vblank_interrupt_screen);
 	}
 
-	if (!m_timed_interrupt.isnull() && m_timed_interrupt_period == attotime::zero)
+	if (!m_periodic_interrupt.isnull() && m_periodic_interrupt_period == attotime::zero)
 		osd_printf_error("Timed interrupt handler specified with 0 period\n");
-	else if (m_timed_interrupt.isnull() && m_timed_interrupt_period != attotime::zero)
+	else if (m_periodic_interrupt.isnull() && m_periodic_interrupt_period != attotime::zero)
 		osd_printf_error("No timer interrupt handler specified, but has a non-0 period given\n");
 }
 
@@ -374,7 +398,7 @@ void device_execute_interface::interface_pre_start()
 
 	// bind delegates
 	m_vblank_interrupt.resolve();
-	m_timed_interrupt.resolve();
+	m_periodic_interrupt.resolve();
 	m_driver_irq.resolve();
 
 	// fill in the initial states
@@ -384,12 +408,12 @@ void device_execute_interface::interface_pre_start()
 	m_inttrigger = index + TRIGGER_INT;
 
 	// allocate timers if we need them
-	if (m_timed_interrupt_period != attotime::zero)
-		m_timedint_timer.init(*this, FUNC(device_execute_interface::trigger_periodic_interrupt));
+	if (m_periodic_interrupt_period != attotime::zero)
+		m_periodic_interrupt_timer.init(*this, FUNC(device_execute_interface::periodic_interrupt));
 
-	m_irq_pulse_clear.init(*this, FUNC(device_execute_interface::irq_pulse_clear));
-	m_timed_trigger_callback.init(*this, FUNC(device_execute_interface::trigger));
-	m_empty_event_queue.init(*this, FUNC(device_execute_interface::empty_event_queue));
+	m_set_input_line.init(*this, FUNC(device_execute_interface::set_input_line));
+	m_timed_trigger.init(*this, FUNC(device_execute_interface::trigger));
+	m_process_input_event.init(*this, FUNC(device_execute_interface::process_input_event));
 }
 
 
@@ -417,10 +441,6 @@ void device_execute_interface::interface_post_start()
 	device().save_item(STRUCT_MEMBER(m_input, m_stored_vector));
 	device().save_item(STRUCT_MEMBER(m_input, m_curvector));
 	device().save_item(STRUCT_MEMBER(m_input, m_curstate));
-
-	// fill in the input states and IRQ callback information
-	for (int line = 0; line < std::size(m_input); line++)
-		m_input[line].start(*this, line);
 }
 
 
@@ -449,9 +469,12 @@ void device_execute_interface::interface_pre_reset()
 
 void device_execute_interface::interface_post_reset()
 {
-	// reset the interrupt vectors and queues
-	for (auto & elem : m_input)
-		elem.reset();
+	// reset the interrupt vectors
+	for (int linenum = 0; linenum < std::size(m_input); linenum++)
+	{
+		auto &input = m_input[linenum];
+		input.m_curvector = input.m_stored_vector = default_irq_vector(linenum);
+	}
 
 	// reconfingure VBLANK interrupts
 	if (m_vblank_interrupt_screen != nullptr)
@@ -464,11 +487,8 @@ void device_execute_interface::interface_post_reset()
 	}
 
 	// reconfigure periodic interrupts
-	if (m_timed_interrupt_period != attotime::zero)
-	{
-		attotime timedint_period = m_timed_interrupt_period;
-		m_timedint_timer.adjust(timedint_period, 0, timedint_period);
-	}
+	if (!m_periodic_interrupt_period.is_zero())
+		m_periodic_interrupt_timer.adjust(m_periodic_interrupt_period, 0, m_periodic_interrupt_period);
 }
 
 
@@ -514,8 +534,15 @@ IRQ_CALLBACK_MEMBER( device_execute_interface::standard_irq_callback_member )
 
 int device_execute_interface::standard_irq_callback(int irqline)
 {
+	auto &input = m_input[irqline];
+
 	// get the default vector and acknowledge the interrupt if needed
-	int vector = m_input[irqline].default_irq_callback();
+	int vector = input.m_curvector;
+	if (input.m_curstate == HOLD_LINE)
+	{
+		execute_set_input(irqline, CLEAR_LINE);
+		input.m_curstate = CLEAR_LINE;
+	}
 
 	if (VERBOSE) device().logerror("standard_irq_callback('%s', %d) $%04x\n", device().tag(), irqline, vector);
 
@@ -573,223 +600,88 @@ void device_execute_interface::on_vblank(screen_device &screen, bool vblank_stat
 
 
 //-------------------------------------------------
-//  trigger_periodic_interrupt - timer
-//  callback for timed interrupts
+//  perodic_interrupt - timer callback for periodic
+//  interrupts
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER(device_execute_interface::trigger_periodic_interrupt)
+void device_execute_interface::periodic_interrupt(timer_instance const &timer)
 {
 	// bail if there is no routine
 	if (!suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE | SUSPEND_REASON_CLOCK))
-	{
-		if (!m_timed_interrupt.isnull())
-			m_timed_interrupt(device());
-	}
+		if (!m_periodic_interrupt.isnull())
+			m_periodic_interrupt(device());
 }
 
 
 //-------------------------------------------------
-//  pulse_input_line - "pulse" an input line by
-//  asserting it and then clearing it later
+//  process_input_event - timer callback to process
+//  an input event
 //-------------------------------------------------
 
-void device_execute_interface::pulse_input_line(int irqline, const attotime &duration)
+void device_execute_interface::process_input_event(timer_instance const &timer)
 {
-	// treat instantaneous pulses as ASSERT+CLEAR
-	if (duration == attotime::zero)
-	{
-		if (irqline != INPUT_LINE_RESET && !input_edge_triggered(irqline))
-			throw emu_fatalerror("device '%s': zero-width pulse is not allowed for input line %d\n", device().tag(), irqline);
+	int linenum = timer.param(0);
+	assert(linenum < MAX_INPUT_LINES);
+	auto &input = m_input[linenum];
 
-		set_input_line(irqline, ASSERT_LINE);
-		set_input_line(irqline, CLEAR_LINE);
-	}
-	else
-	{
-		set_input_line(irqline, ASSERT_LINE);
-
-		attotime target_time = local_time() + duration;
-		m_irq_pulse_clear.call_after(target_time - m_scheduler->time(), irqline);
-	}
-}
-
-
-
-//**************************************************************************
-//  DEVICE INPUT
-//**************************************************************************
-
-//-------------------------------------------------
-//  device_input - constructor
-//-------------------------------------------------
-
-device_execute_interface::device_input::device_input()
-	: m_execute(nullptr)
-	, m_linenum(0)
-	, m_stored_vector(0)
-	, m_curvector(0)
-	, m_curstate(CLEAR_LINE)
-	, m_qindex(0)
-{
-	std::fill(std::begin(m_queue), std::end(m_queue), 0);
-}
-
-
-//-------------------------------------------------
-//  start - called by interface_pre_start so we
-//  can set ourselves up
-//-------------------------------------------------
-
-void device_execute_interface::device_input::start(device_execute_interface &execute, int linenum)
-{
-	m_execute = &execute;
-	m_linenum = linenum;
-
-	reset();
-}
-
-
-//-------------------------------------------------
-//  reset - reset our input states
-//-------------------------------------------------
-
-void device_execute_interface::device_input::reset()
-{
-	m_curvector = m_stored_vector = m_execute->default_irq_vector(m_linenum);
-}
-
-
-//-------------------------------------------------
-//  set_state_synced - enqueue an event for later
-//  execution via timer
-//-------------------------------------------------
-
-void device_execute_interface::device_input::set_state_synced(int state, int vector)
-{
-	LOG(("set_state_synced('%s',%d,%d,%02x)\n", m_execute->device().tag(), m_linenum, state, vector));
-
-if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linenum, state, (vector == USE_STORED_VECTOR) ? 0 : vector);
+	int state = timer.param(1);
 	assert(state == ASSERT_LINE || state == HOLD_LINE || state == CLEAR_LINE);
 
-	// if we're full of events, flush the queue and log a message
-	int event_index = m_qindex++;
-	if (event_index >= std::size(m_queue))
+	input.m_curstate = state;
+	input.m_curvector = timer.param(2);
+
+	// special case: RESET
+	if (linenum == INPUT_LINE_RESET)
 	{
-		m_qindex--;
-		empty_event_queue();
-		event_index = m_qindex++;
-		m_execute->device().logerror("Exceeded pending input line event queue on device '%s'!\n", m_execute->device().tag());
-	}
+		// if we're asserting the line, just halt the device
+		// FIXME: outputs of onboard peripherals also need to be deactivated at this time
+		if (input.m_curstate == ASSERT_LINE)
+			suspend(SUSPEND_REASON_RESET);
 
-	// enqueue the event
-	if (event_index < std::size(m_queue))
-	{
-		if (vector == USE_STORED_VECTOR)
-			vector = m_stored_vector;
-		m_queue[event_index] = (state & 0xff) | (vector << 8);
-
-		// if this is the first one, set the timer
-		if (event_index == 0)
-			m_execute->synchronize_event_queue(m_linenum);
-	}
-}
-
-
-//-------------------------------------------------
-//  empty_event_queue - empty our event queue
-//-------------------------------------------------
-
-void device_execute_interface::device_input::empty_event_queue()
-{
-if (TEMPLOG) printf("empty_queue(%s,%d,%d)\n", m_execute->device().tag(), m_linenum, m_qindex);
-	// loop over all events
-	for (int curevent = 0; curevent < m_qindex; curevent++)
-	{
-		s32 input_event = m_queue[curevent];
-
-		// set the input line state and vector
-		m_curstate = input_event & 0xff;
-		m_curvector = input_event >> 8;
-if (TEMPLOG) printf(" (%d,%d)\n", m_curstate, m_curvector);
-
-		assert(m_curstate == ASSERT_LINE || m_curstate == HOLD_LINE || m_curstate == CLEAR_LINE);
-
-		// special case: RESET
-		if (m_linenum == INPUT_LINE_RESET)
+		// if we're clearing the line that was previously asserted, reset the device
+		else if (suspended(SUSPEND_REASON_RESET))
 		{
-			// if we're asserting the line, just halt the device
-			// FIXME: outputs of onboard peripherals also need to be deactivated at this time
-			if (m_curstate == ASSERT_LINE)
-				m_execute->suspend(SUSPEND_REASON_RESET);
-
-			// if we're clearing the line that was previously asserted, reset the device
-			else if (m_execute->suspended(SUSPEND_REASON_RESET))
-			{
-				m_execute->device().reset();
-				m_execute->resume(SUSPEND_REASON_RESET);
-			}
-		}
-
-		// special case: HALT
-		else if (m_linenum == INPUT_LINE_HALT)
-		{
-			// if asserting, halt the device
-			if (m_curstate == ASSERT_LINE)
-				m_execute->suspend(SUSPEND_REASON_HALT);
-
-			// if clearing, unhalt the device
-			else if (m_curstate == CLEAR_LINE)
-				m_execute->resume(SUSPEND_REASON_HALT);
-		}
-
-		// all other cases
-		else
-		{
-			// switch off the requested state
-			switch (m_curstate)
-			{
-				case HOLD_LINE:
-				case ASSERT_LINE:
-					m_execute->execute_set_input(m_linenum, ASSERT_LINE);
-					break;
-
-				case CLEAR_LINE:
-					m_execute->execute_set_input(m_linenum, CLEAR_LINE);
-					break;
-
-				default:
-					m_execute->device().logerror("empty_event_queue device '%s', line %d, unknown state %d\n", m_execute->device().tag(), m_linenum, m_curstate);
-					break;
-			}
-
-			// generate a trigger to unsuspend any devices waiting on the interrupt
-			if (m_curstate != CLEAR_LINE)
-				m_execute->signal_interrupt_trigger();
+			device().reset();
+			resume(SUSPEND_REASON_RESET);
 		}
 	}
 
-	// reset counter
-	m_qindex = 0;
-}
-
-
-//-------------------------------------------------
-//  default_irq_callback - the default IRQ
-//  callback for this input line
-//-------------------------------------------------
-
-int device_execute_interface::device_input::default_irq_callback()
-{
-	int const vector = m_curvector;
-
-	// if the IRQ state is HOLD_LINE, clear it
-	if (m_curstate == HOLD_LINE)
+	// special case: HALT
+	else if (linenum == INPUT_LINE_HALT)
 	{
-		LOG(("->set_irq_line('%s',%d,%d)\n", m_execute->device().tag(), m_linenum, CLEAR_LINE));
-		m_execute->execute_set_input(m_linenum, CLEAR_LINE);
-		m_curstate = CLEAR_LINE;
+		// if asserting, halt the device
+		if (input.m_curstate == ASSERT_LINE)
+			suspend(SUSPEND_REASON_HALT);
+
+		// if clearing, unhalt the device
+		else if (input.m_curstate == CLEAR_LINE)
+			resume(SUSPEND_REASON_HALT);
 	}
-	return vector;
+
+	// all other cases
+	else
+	{
+		// switch off the requested state
+		switch (input.m_curstate)
+		{
+			case HOLD_LINE:
+			case ASSERT_LINE:
+				execute_set_input(linenum, ASSERT_LINE);
+				break;
+
+			case CLEAR_LINE:
+				execute_set_input(linenum, CLEAR_LINE);
+				break;
+
+			default:
+				device().logerror("process_input_event device '%s', line %d, unknown state %d\n", device().tag(), linenum, input.m_curstate);
+				break;
+		}
+
+		// generate a trigger to unsuspend any devices waiting on the interrupt
+		if (input.m_curstate != CLEAR_LINE)
+			signal_interrupt_trigger();
+	}
 }
 
 
@@ -799,9 +691,9 @@ int device_execute_interface::device_input::default_irq_callback()
 
 void device_execute_interface::run_debug()
 {
-	debugger_start_cpu_hook(m_scheduler->basetime());
+	device().debug()->start_hook(m_scheduler->basetime());
 	execute_run();
-	debugger_stop_cpu_hook();
+	device().debug()->stop_hook();
 }
 
 

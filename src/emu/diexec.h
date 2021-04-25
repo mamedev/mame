@@ -86,7 +86,6 @@ enum
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-
 // interrupt callback for VBLANK and timed interrupts
 using device_interrupt_delegate = device_delegate<void (device_t &)>;
 
@@ -138,18 +137,18 @@ public:
 
 	template <typename F> void set_periodic_int(F &&cb, const char *name, const attotime &rate)
 	{
-		m_timed_interrupt.set(std::forward<F>(cb), name);
-		m_timed_interrupt_period = rate;
+		m_periodic_interrupt.set(std::forward<F>(cb), name);
+		m_periodic_interrupt_period = rate;
 	}
 	template <typename T, typename F> void set_periodic_int(T &&target, F &&cb, const char *name, const attotime &rate)
 	{
-		m_timed_interrupt.set(std::forward<T>(target), std::forward<F>(cb), name);
-		m_timed_interrupt_period = rate;
+		m_periodic_interrupt.set(std::forward<T>(target), std::forward<F>(cb), name);
+		m_periodic_interrupt_period = rate;
 	}
 	void remove_periodic_int()
 	{
-		m_timed_interrupt = device_interrupt_delegate(*this);
-		m_timed_interrupt_period = attotime();
+		m_periodic_interrupt = device_interrupt_delegate(*this);
+		m_periodic_interrupt_period = attotime();
 	}
 
 	template <typename... T> void set_irq_acknowledge_callback(T &&... args)
@@ -170,9 +169,9 @@ public:
 	void abort_timeslice() noexcept;
 
 	// input and interrupt management
-	void set_input_line(int linenum, int state) { m_input[linenum].set_state_synced(state); }
-	void set_input_line_vector(int linenum, int vector) { m_input[linenum].set_vector(vector); }
-	void set_input_line_and_vector(int linenum, int state, int vector) { m_input[linenum].set_state_synced(state, vector); }
+	void set_input_line(int linenum, int state) { m_process_input_event.synchronize(linenum, state, m_input[linenum].m_stored_vector); }
+	void set_input_line_vector(int linenum, int vector) { m_input[linenum].m_stored_vector = vector; }
+	void set_input_line_and_vector(int linenum, int state, int vector) { m_process_input_event.synchronize(linenum, state, vector); }
 	int input_state(int linenum) const { return m_input[linenum].m_curstate; }
 	void pulse_input_line(int irqline, const attotime &duration);
 
@@ -265,49 +264,16 @@ private:
 
 	void on_vblank(screen_device &screen, bool vblank_state);
 
-	TIMER_CALLBACK_MEMBER(trigger_periodic_interrupt);
-	TIMER_CALLBACK_MEMBER(irq_pulse_clear) { set_input_line(int(param), CLEAR_LINE); }
-	TIMER_CALLBACK_MEMBER(empty_event_queue) { m_input[param].empty_event_queue(); }
+	void periodic_interrupt(timer_instance const &timer);
+	void process_input_event(timer_instance const &timer);
 
 	// internal information about the state of inputs
-	class device_input
+	struct device_input
 	{
-		static constexpr int USE_STORED_VECTOR = 0xff000000;
-
-	public:
-		device_input();
-
-		void start(device_execute_interface &execute, int linenum);
-		void reset();
-
-		void set_state_synced(int state, int vector = USE_STORED_VECTOR);
-		void set_vector(int vector) { m_stored_vector = vector; }
-		int default_irq_callback();
-		void empty_event_queue();
-
-		device_execute_interface *m_execute;// pointer to the execute interface
-		int             m_linenum;          // which input line we are
-
-		s32             m_stored_vector;    // most recently written vector
-		s32             m_curvector;        // most recently processed vector
-		u8              m_curstate;         // most recently processed state
-		s32             m_queue[32];        // queue of pending events
-		int             m_qindex;           // index within the queue
+		s32 m_stored_vector;    // most recently written vector
+		s32 m_curvector;        // most recently processed vector
+		u8 m_curstate;          // most recently processed state
 	};
-
-	void synchronize_event_queue(int line) { m_empty_event_queue.synchronize(line); }
-
-	// internal debugger hooks
-	void debugger_start_cpu_hook(const attotime &endtime)
-	{
-		if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
-			device().debug()->start_hook(endtime);
-	}
-	void debugger_stop_cpu_hook()
-	{
-		if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
-			device().debug()->stop_hook();
-	}
 
 	// core execution state: keep all these members close to the top
 	// so they live within the first 128 bytes of the object; this helps
@@ -349,8 +315,8 @@ private:
 	bool                    m_disabled;                 // disabled from executing?
 	device_interrupt_delegate m_vblank_interrupt;       // for interrupts tied to VBLANK
 	const char *            m_vblank_interrupt_screen;  // the screen that causes the VBLANK interrupt
-	device_interrupt_delegate m_timed_interrupt;        // for interrupts not tied to VBLANK
-	attotime                m_timed_interrupt_period;   // period for periodic interrupts
+	device_interrupt_delegate m_periodic_interrupt;     // for interrupts not tied to VBLANK
+	attotime                m_periodic_interrupt_period;// period for periodic interrupts
 
 	// execution delegates
 	execute_delegate        m_run_fast_delegate;        // normal run delegate
@@ -358,12 +324,12 @@ private:
 	execute_delegate        m_suspend_delegate;         // suspend delegate
 
 	// timers
-	transient_timer_factory m_timed_trigger_callback;
-	transient_timer_factory m_irq_pulse_clear;
-	transient_timer_factory m_empty_event_queue;
+	transient_timer_factory m_timed_trigger;            // timer for signalling triggers
+	transient_timer_factory m_set_input_line;           // timer for setting input lines
+	transient_timer_factory m_process_input_event;      // timer for processing input events
+	persistent_timer        m_periodic_interrupt_timer; // timer for generating periodic interrupts
 
 	// input states and IRQ callbacks
-	persistent_timer        m_timedint_timer;           // reference to this device's periodic interrupt timer
 	device_irq_acknowledge_delegate m_driver_irq;       // driver-specific IRQ callback
 	device_input            m_input[MAX_INPUT_LINES];   // data about inputs
 };
