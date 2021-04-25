@@ -570,7 +570,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 			interrupt(NMI, m_pc, false);
 
 			// notify the debugger
-			if (debug_enabled())
+			if (machine().debug_enabled())
 				debug()->interrupt_hook(INPUT_LINE_NMI);
 		}
 		else if (m_int_line && (m_psr & PSR_I))

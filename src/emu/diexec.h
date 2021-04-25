@@ -202,6 +202,25 @@ public:
 	// just use it
 	device_execute_interface &execute() { return *this; }
 
+	// debugger hooks
+	bool debugger_enabled() const { return device().machine().debug_enabled(); }
+	void debugger_instruction_hook(offs_t curpc)
+	{
+		if (device().machine().debug_flags() & DEBUG_FLAG_CALL_HOOK)
+			device().debug()->instruction_hook(curpc);
+	}
+	void debugger_exception_hook(int exception)
+	{
+		if (device().machine().debug_enabled())
+			device().debug()->exception_hook(exception);
+	}
+
+	void debugger_privilege_hook()
+	{
+		if (device().machine().debug_enabled())
+			device().debug()->privilege_hook();
+	}
+
 protected:
 	// clock and cycle information getters
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept;
@@ -236,25 +255,6 @@ protected:
 	void set_icountptr(int &icount) { assert(!m_icountptr); m_icountptr = &icount; }
 	IRQ_CALLBACK_MEMBER(standard_irq_callback_member);
 	int standard_irq_callback(int irqline);
-
-	// debugger hooks
-	bool debugger_enabled() const { return device().machine().debug_enabled(); }
-	void debugger_instruction_hook(offs_t curpc)
-	{
-		if (device().machine().debug_flags() & DEBUG_FLAG_CALL_HOOK)
-			device().debug()->instruction_hook(curpc);
-	}
-	void debugger_exception_hook(int exception)
-	{
-		if (device().machine().debug_enabled())
-			device().debug()->exception_hook(exception);
-	}
-
-	void debugger_privilege_hook()
-	{
-		if (device().machine().debug_enabled())
-			device().debug()->privilege_hook();
-	}
 
 private:
 	void suspend_resume_changed();
