@@ -455,6 +455,8 @@
 	  The game was promoted to WORKING.
 	- Worked proper inputs for system 905: Cal Omega - Game 15.9 (Wild Double-Up).
 	  The game was promoted to WORKING.
+	- Worked proper inputs for system 905: Cal Omega - Game 17.2 (Double Double Poker).
+	  The game was promoted to WORKING.
 
 
     [2021-04-21]
@@ -2322,6 +2324,74 @@ static INPUT_PORTS_START( comg159 )
 	PORT_DIPSETTING(    0x80, "Queens" )
 	PORT_DIPSETTING(    0xc0, "Kings" )
 	PORT_DIPSETTING(    0x40, "Aces" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( comg172 )
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Discard 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Discard 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Discard 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Discard 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  PORT_NAME("Discard 5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_NAME("Play (Bet)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Learn")        PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Clr Data")     PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Audit")        PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) PORT_NAME("Stand")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )        PORT_NAME("Coin-In A")    PORT_IMPULSE(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )        PORT_NAME("Coin-In B")    PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Tilt")         PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )  PORT_NAME("Double")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )   PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	
+	// For System 905, SW1 uses the whole PIA1 portA.
+
+	PORT_START("SW1")    // settings (PIA1)
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	             PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )               PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Double Deal" )                    PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )               PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x00, "Lower Pair to Win + Pay Table" )  PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x00, "Jacks, 250/50/20/8/6/4/3/2/1" )
+	PORT_DIPSETTING(    0x20, "Queens, 200/40/10/8/5/4/3/2/1" )
+	PORT_DIPSETTING(    0x30, "Kings, 200/40/10/8/5/4/3/2/1" )
+	PORT_DIPSETTING(    0x10, "Aces, 250/50/25/10/8/5/3/2/1" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Coin Lockout" )                   PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0xc0, "No Lockout" )
+	PORT_DIPSETTING(    0x40, "No Lockout" )
+	PORT_DIPSETTING(    0x80, "1-Coin Lockout" )
+	PORT_DIPSETTING(    0x00, "2-Coin Lockout" )
 INPUT_PORTS_END
 
 
@@ -4473,7 +4543,7 @@ GAME( 1983, comg157,  0,        sys903,   comg157,  calomega_state, init_sys903,
 GAME( 1983, comg159,  0,        sys905,   comg159,  calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.9 (Wild Double-Up)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1983, comg164,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.4 (Keno)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* incomplete dump */
 GAME( 1983, comg168,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.8 (Keno)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg172,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.2 (Double Double Poker)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg172,  0,        sys905,   comg172,  calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.2 (Double Double Poker)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1984, comg175,  0,        sys903,   gdrwpkrd, calomega_state, init_sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 17.51 (Gaming Draw Poker)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1982, comg176,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.6 (Nudge Bingo)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, comg181,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.1 (Nudge Bingo)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
