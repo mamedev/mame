@@ -394,7 +394,7 @@ void device_execute_interface::interface_pre_start()
 	m_run_fast_delegate = execute_delegate(&device_execute_interface::execute_run, this);
 	m_run_debug_delegate = execute_delegate(&device_execute_interface::run_debug, this);
 	m_suspend_delegate = execute_delegate(&device_execute_interface::run_suspend, this);
-	m_run_delegate = m_run_fast_delegate;
+	m_run_delegate = debugger_enabled() ? m_run_debug_delegate : m_run_fast_delegate;
 
 	// bind delegates
 	m_vblank_interrupt.resolve();

@@ -545,7 +545,7 @@ void windows_osd_interface::init(running_machine &machine)
 	}
 
 	// thread priority
-	if (!(machine.debug_flags & DEBUG_FLAG_OSD_ENABLED))
+	if (!machine.osd_debug_enabled())
 		SetThreadPriority(GetCurrentThread(), options.priority());
 
 	// get number of processors

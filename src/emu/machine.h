@@ -210,6 +210,13 @@ public:
 	bool ui_active() const { return m_ui_active; }
 	const std::string &basename() const { return m_basename; }
 	int sample_rate() const { return m_sample_rate; }
+	u32 debug_flags() const { return m_debug_flags; }
+	u32 *debug_flags_ptr() { return &m_debug_flags; }
+	bool debug_enabled() const { return (m_debug_flags & DEBUG_FLAG_ENABLED) != 0; }
+	bool osd_debug_enabled() const { return (m_debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0; }
+
+	// setters
+	void set_debug_flags(u32 flags) { u32 const mask = DEBUG_FLAG_ENABLED | DEBUG_FLAG_OSD_ENABLED; m_debug_flags = (m_debug_flags & mask) | (flags & ~mask); }
 
 	// RAII-based side effect disable
 	// NOP-ed when passed false, to make it more easily conditional
@@ -273,10 +280,6 @@ private:
 	u32                     m_side_effects_disabled;
 
 public:
-	// debugger-related information
-	u32                     debug_flags;        // the current debug flags
-	bool debug_enabled() { return (debug_flags & DEBUG_FLAG_ENABLED) != 0; }
-
 	// used by debug_console to take ownership of the debug.log file
 	std::unique_ptr<emu_file> steal_debuglogfile() { return std::move(m_debuglogfile); }
 
@@ -331,6 +334,7 @@ private:
 	const machine_config &  m_config;               // reference to the constructed machine_config
 	const game_driver &     m_system;               // reference to the definition of the game machine
 	machine_manager &       m_manager;              // reference to machine manager system
+
 	// managers
 	std::unique_ptr<render_manager> m_render;          // internal data from render.cpp
 	std::unique_ptr<input_manager> m_input;            // internal data from input.cpp
@@ -355,6 +359,7 @@ private:
 	bool                    m_paused;               // paused?
 	persistent_timer        m_event_timer;          // timer used to schedule key events
 	persistent_timer        m_exit_timer;           // timer used to schedule timed exits
+	u32                     m_debug_flags;          // the current debug flags
 
 	// misc state
 	u32                     m_rand_seed;            // current random number seed

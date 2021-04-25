@@ -1325,7 +1325,7 @@ void drcbe_x64::op_debug(Assembler &a, const instruction &inst)
 		be_parameter pcp(*this, inst.param(0), PTYPE_MRI);
 
 		// test and branch
-		mov_r64_imm(a, rax, (uintptr_t)&m_device.machine().debug_flags);                // mov   rax,&debug_flags
+		mov_r64_imm(a, rax, (uintptr_t)m_device.machine().debug_flags_ptr());           // mov   rax,&debug_flags
 		a.test(dword_ptr(rax), DEBUG_FLAG_CALL_HOOK);                                   // test  [debug_flags],DEBUG_FLAG_CALL_HOOK
 		Label skip = a.newLabel();
 		a.short_().jz(skip);

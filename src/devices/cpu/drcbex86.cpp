@@ -2129,7 +2129,7 @@ void drcbe_x86::op_debug(Assembler &a, const instruction &inst)
 		be_parameter const pcp(*this, inst.param(0), PTYPE_MRI);
 
 		// test and branch
-		a.test(MABS(&m_device.machine().debug_flags, 4), DEBUG_FLAG_CALL_HOOK);         // test  [debug_flags],DEBUG_FLAG_CALL_HOOK
+		a.test(MABS(m_device.machine().debug_flags_ptr(), 4), DEBUG_FLAG_CALL_HOOK);    // test  [debug_flags],DEBUG_FLAG_CALL_HOOK
 		Label skip = a.newLabel();
 		a.short_().jz(skip);                                                            // jz    skip
 

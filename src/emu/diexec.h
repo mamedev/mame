@@ -238,10 +238,10 @@ protected:
 	int standard_irq_callback(int irqline);
 
 	// debugger hooks
-	bool debugger_enabled() const { return bool(device().machine().debug_enabled()); }
+	bool debugger_enabled() const { return device().machine().debug_enabled(); }
 	void debugger_instruction_hook(offs_t curpc)
 	{
-		if (device().machine().debug_flags & DEBUG_FLAG_CALL_HOOK)
+		if (device().machine().debug_flags() & DEBUG_FLAG_CALL_HOOK)
 			device().debug()->instruction_hook(curpc);
 	}
 	void debugger_exception_hook(int exception)
@@ -441,7 +441,7 @@ inline bool device_execute_interface::update_suspend()
 	{
 		if (m_suspend != 0)
 			m_run_delegate = m_suspend_delegate;
-		else if (!m_scheduler->machine().debug_enabled())
+		else if (!debugger_enabled())
 			m_run_delegate = m_run_fast_delegate;
 		else
 			m_run_delegate = m_run_debug_delegate;

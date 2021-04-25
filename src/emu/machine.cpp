@@ -112,12 +112,12 @@ osd_interface &running_machine::osd() const
 
 running_machine::running_machine(const machine_config &_config, machine_manager &manager)
 	: m_side_effects_disabled(0),
-		debug_flags(0),
 		m_config(_config),
 		m_system(_config.gamedrv()),
 		m_manager(manager),
 		m_current_phase(machine_phase::PREINIT),
 		m_paused(false),
+		m_debug_flags(0),
 		m_rand_seed(0x9d14abd7),
 		m_ui_active(_config.options().ui_active()),
 		m_basename(_config.gamedrv().name),
@@ -144,7 +144,7 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 
 	// fetch core options
 	if (options().debug())
-		debug_flags = DEBUG_FLAG_ENABLED | DEBUG_FLAG_CALL_HOOK | DEBUG_FLAG_OSD_ENABLED;
+		m_debug_flags = DEBUG_FLAG_ENABLED | DEBUG_FLAG_CALL_HOOK | DEBUG_FLAG_OSD_ENABLED;
 }
 
 

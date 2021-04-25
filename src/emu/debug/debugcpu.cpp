@@ -819,7 +819,7 @@ void device_debug::instruction_hook(offs_t curpc)
 
 			// clear the memory modified flag and wait
 			debugcpu.set_memory_modified(false);
-			if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
+			if (machine.osd_debug_enabled())
 				machine.osd().wait_for_debugger(m_device, firststop);
 			firststop = false;
 
@@ -1593,8 +1593,7 @@ void device_debug::compute_debug_flags()
 	debugger_cpu& debugcpu = machine.debugger().cpu();
 
 	// clear out global flags by default, keep DEBUG_FLAG_OSD_ENABLED
-	machine.debug_flags &= DEBUG_FLAG_OSD_ENABLED;
-	machine.debug_flags |= DEBUG_FLAG_ENABLED;
+	auto flags = machine.debug_flags();
 
 	// if we are ignoring this CPU, or if events are pending, we're done
 	if ((m_flags & DEBUG_FLAG_OBSERVING) == 0 || machine.exit_or_hard_reset_pending() || machine.save_or_load_pending())
@@ -1602,20 +1601,22 @@ void device_debug::compute_debug_flags()
 
 	// if we're stopped, keep calling the hook
 	if (debugcpu.is_stopped())
-		machine.debug_flags |= DEBUG_FLAG_CALL_HOOK;
+		flags |= DEBUG_FLAG_CALL_HOOK;
 
 	// if we're tracking history, or we're hooked, or stepping, or stopping at a breakpoint
 	// make sure we call the hook
 	if ((m_flags & (DEBUG_FLAG_HISTORY | DEBUG_FLAG_HOOKED | DEBUG_FLAG_STEPPING_ANY | DEBUG_FLAG_STOP_PC | DEBUG_FLAG_LIVE_BP)) != 0)
-		machine.debug_flags |= DEBUG_FLAG_CALL_HOOK;
+		flags |= DEBUG_FLAG_CALL_HOOK;
 
 	// also call if we are tracing
 	if (m_trace != nullptr)
-		machine.debug_flags |= DEBUG_FLAG_CALL_HOOK;
+		flags |= DEBUG_FLAG_CALL_HOOK;
 
 	// if we are stopping at a particular time and that time is within the current timeslice, we need to be called
 	if ((m_flags & DEBUG_FLAG_STOP_TIME) && m_endexectime <= m_stoptime)
-		machine.debug_flags |= DEBUG_FLAG_CALL_HOOK;
+		flags |= DEBUG_FLAG_CALL_HOOK;
+
+	machine.set_debug_flags(flags);
 }
 
 

@@ -519,7 +519,7 @@ int drcbe_c::execute(code_handle &entry)
 				fatalerror("Unexpected opcode\n");
 
 			case MAKE_OPCODE_SHORT(OP_DEBUG, 4, 0):     // DEBUG   pc
-				if (m_device.machine().debug_flags & DEBUG_FLAG_CALL_HOOK)
+				if (m_device.machine().debug_flags() & DEBUG_FLAG_CALL_HOOK)
 					m_device.debug()->instruction_hook(PARAM0);
 				break;
 

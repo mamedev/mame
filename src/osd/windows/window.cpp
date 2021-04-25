@@ -634,7 +634,7 @@ void winwindow_toggle_full_screen()
 
 	// if we are in debug mode, never go full screen
 	for (const auto &window : osd_common_t::s_window_list)
-		if (window->machine().debug_flags & DEBUG_FLAG_OSD_ENABLED)
+		if (window->machine().osd_debug_enabled())
 			return;
 
 	// toggle the window mode

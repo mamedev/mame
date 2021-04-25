@@ -728,7 +728,7 @@ public:
 
 	void input_init(running_machine &machine) override
 	{
-		if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
+		if (machine.osd_debug_enabled())
 		{
 			osd_printf_warning("Debug Build: Disabling input grab for -debug\n");
 			set_mouse_enabled(false);

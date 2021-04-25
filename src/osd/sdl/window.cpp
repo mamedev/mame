@@ -287,7 +287,7 @@ void sdl_window_info::notify_changed()
 void sdl_window_info::toggle_full_screen()
 {
 	// if we are in debug mode, never go full screen
-	if (machine().debug_flags & DEBUG_FLAG_OSD_ENABLED)
+	if (machine().osd_debug_enabled())
 		return;
 
 	// If we are going fullscreen (leaving windowed) remember our windowed size
@@ -371,7 +371,7 @@ void sdl_window_info::update_cursor_state()
 #else
 	// do not do mouse capture if the debugger's enabled to avoid
 	// the possibility of losing control
-	if (!(machine().debug_flags & DEBUG_FLAG_OSD_ENABLED))
+	if (!machine().osd_debug_enabled())
 	{
 		bool should_hide_mouse = downcast<sdl_osd_interface&>(machine().osd()).should_hide_mouse();
 
