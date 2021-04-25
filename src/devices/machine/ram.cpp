@@ -2,14 +2,17 @@
 // copyright-holders:Nathan Woods, Dirk Best
 /*************************************************************************
 
-    RAM device
+RAM device
 
-    Provides a configurable amount of RAM to drivers
+Provides a configurable amount of RAM to drivers
 
-    Limitations due to hardcoded RAM_TAG:
-    - *configurable* RAM device can only be added to root device
-      (that is the driver device)
-    - can only have one *configurable* RAM device per machine driver
+TODO:
+- default fill value of 0xCD makes no sense
+- add RAM size options to UI, eg. under Machine Configuration
+- remove limitations due to hardcoded RAM_TAG:
+  + *configurable* RAM device can only be added to root device
+    (that is the driver device)
+  + can only have one *configurable* RAM device per machine driver
 
 **************************************************************************/
 
