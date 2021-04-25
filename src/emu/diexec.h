@@ -169,10 +169,10 @@ public:
 	void abort_timeslice() noexcept;
 
 	// input and interrupt management
-	void set_input_line(int linenum, int state) { m_process_input_event.synchronize(linenum, state, m_input[linenum].m_stored_vector); }
+	void set_input_line(int linenum, int state) { enqueue_input_line_change(linenum, state, m_input[linenum].m_stored_vector); }
 	void set_input_line_vector(int linenum, int vector) { m_input[linenum].m_stored_vector = vector; }
-	void set_input_line_and_vector(int linenum, int state, int vector) { m_process_input_event.synchronize(linenum, state, vector); }
-	int input_state(int linenum) const { return m_input[linenum].m_curstate; }
+	void set_input_line_and_vector(int linenum, int state, int vector) { enqueue_input_line_change(linenum, state, vector); }
+	int input_state(int linenum) const { return m_input[linenum].m_live_state; }
 	void pulse_input_line(int irqline, const attotime &duration);
 
 	// suspend/resume
@@ -251,7 +251,7 @@ protected:
 	bool update_suspend();
 
 	// for use by devcpu for now...
-	int current_input_state(unsigned i) const { return m_input[i].m_curstate; }
+	int current_input_state(unsigned i) const { return m_input[i].m_live_state; }
 	void set_icountptr(int &icount) { assert(!m_icountptr); m_icountptr = &icount; }
 	IRQ_CALLBACK_MEMBER(standard_irq_callback_member);
 	int standard_irq_callback(int irqline);
@@ -267,12 +267,17 @@ private:
 	void periodic_interrupt(timer_instance const &timer);
 	void process_input_event(timer_instance const &timer);
 
+	void enqueue_input_line_change(int line, int state, int vector);
+
 	// internal information about the state of inputs
 	struct device_input
 	{
-		s32 m_stored_vector;    // most recently written vector
-		s32 m_curvector;        // most recently processed vector
-		u8 m_curstate;          // most recently processed state
+		attotime m_last_event_time; // time of last enqueued event
+		s32 m_stored_vector;        // most recently written vector
+		s32 m_enqueued_vector;      // most recently enqueued vector
+		s32 m_live_vector;          // most recently processed vector
+		u8 m_enqueued_state;        // most recently enqueued state
+		u8 m_live_state;            // most recently processed state
 	};
 
 	// core execution state: keep all these members close to the top

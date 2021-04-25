@@ -439,8 +439,13 @@ void device_execute_interface::interface_post_start()
 
 	// it's more efficient and causes less clutter to save these this way
 	device().save_item(STRUCT_MEMBER(m_input, m_stored_vector));
-	device().save_item(STRUCT_MEMBER(m_input, m_curvector));
-	device().save_item(STRUCT_MEMBER(m_input, m_curstate));
+	device().save_item(STRUCT_MEMBER(m_input, m_enqueued_vector));
+	device().save_item(STRUCT_MEMBER(m_input, m_live_vector));
+	device().save_item(STRUCT_MEMBER(m_input, m_enqueued_state));
+	device().save_item(STRUCT_MEMBER(m_input, m_live_state));
+
+	for (int index = 0; index < std::size(m_input); index++)
+		device().save_item(NAME(m_input[index].m_last_event_time), index);
 }
 
 
@@ -473,7 +478,8 @@ void device_execute_interface::interface_post_reset()
 	for (int linenum = 0; linenum < std::size(m_input); linenum++)
 	{
 		auto &input = m_input[linenum];
-		input.m_curvector = input.m_stored_vector = default_irq_vector(linenum);
+		input.m_last_event_time = attotime::zero;
+		input.m_stored_vector = input.m_live_vector = default_irq_vector(linenum);
 	}
 
 	// reconfingure VBLANK interrupts
@@ -537,11 +543,11 @@ int device_execute_interface::standard_irq_callback(int irqline)
 	auto &input = m_input[irqline];
 
 	// get the default vector and acknowledge the interrupt if needed
-	int vector = input.m_curvector;
-	if (input.m_curstate == HOLD_LINE)
+	int vector = input.m_live_vector;
+	if (input.m_live_state == HOLD_LINE)
 	{
 		execute_set_input(irqline, CLEAR_LINE);
-		input.m_curstate = CLEAR_LINE;
+		input.m_live_state = CLEAR_LINE;
 	}
 
 	if (VERBOSE) device().logerror("standard_irq_callback('%s', %d) $%04x\n", device().tag(), irqline, vector);
@@ -614,6 +620,32 @@ void device_execute_interface::periodic_interrupt(timer_instance const &timer)
 
 
 //-------------------------------------------------
+//  enqueue_input_line_change - enqueue a new input
+//  line state change; this needs to be done very
+//  carefully to avoid time travel
+//-------------------------------------------------
+
+void device_execute_interface::enqueue_input_line_change(int line, int state, int vector)
+{
+	auto &input = m_input[line];
+
+	// don't bother enqueuing redundant states
+	if (state == input.m_enqueued_state && vector == input.m_enqueued_vector)
+		return;
+	input.m_enqueued_state = state;
+	input.m_enqueued_vector = vector;
+
+	// the event should land now, but never enqueue events earlier than the last
+	// one we enqueued or else we'll get in a bad state
+	attotime time = std::max(input.m_last_event_time, device().machine().time());
+	input.m_last_event_time = time;
+
+	// now schedule the call
+	m_process_input_event.call_at(time, line, state, vector);
+}
+
+
+//-------------------------------------------------
 //  process_input_event - timer callback to process
 //  an input event
 //-------------------------------------------------
@@ -627,15 +659,15 @@ void device_execute_interface::process_input_event(timer_instance const &timer)
 	int state = timer.param(1);
 	assert(state == ASSERT_LINE || state == HOLD_LINE || state == CLEAR_LINE);
 
-	input.m_curstate = state;
-	input.m_curvector = timer.param(2);
+	input.m_live_state = state;
+	input.m_live_vector = timer.param(2);
 
 	// special case: RESET
 	if (linenum == INPUT_LINE_RESET)
 	{
 		// if we're asserting the line, just halt the device
 		// FIXME: outputs of onboard peripherals also need to be deactivated at this time
-		if (input.m_curstate == ASSERT_LINE)
+		if (input.m_live_state == ASSERT_LINE)
 			suspend(SUSPEND_REASON_RESET);
 
 		// if we're clearing the line that was previously asserted, reset the device
@@ -650,11 +682,11 @@ void device_execute_interface::process_input_event(timer_instance const &timer)
 	else if (linenum == INPUT_LINE_HALT)
 	{
 		// if asserting, halt the device
-		if (input.m_curstate == ASSERT_LINE)
+		if (input.m_live_state == ASSERT_LINE)
 			suspend(SUSPEND_REASON_HALT);
 
 		// if clearing, unhalt the device
-		else if (input.m_curstate == CLEAR_LINE)
+		else if (input.m_live_state == CLEAR_LINE)
 			resume(SUSPEND_REASON_HALT);
 	}
 
@@ -662,7 +694,7 @@ void device_execute_interface::process_input_event(timer_instance const &timer)
 	else
 	{
 		// switch off the requested state
-		switch (input.m_curstate)
+		switch (input.m_live_state)
 		{
 			case HOLD_LINE:
 			case ASSERT_LINE:
@@ -674,12 +706,12 @@ void device_execute_interface::process_input_event(timer_instance const &timer)
 				break;
 
 			default:
-				device().logerror("process_input_event device '%s', line %d, unknown state %d\n", device().tag(), linenum, input.m_curstate);
+				device().logerror("process_input_event device '%s', line %d, unknown state %d\n", device().tag(), linenum, input.m_live_state);
 				break;
 		}
 
 		// generate a trigger to unsuspend any devices waiting on the interrupt
-		if (input.m_curstate != CLEAR_LINE)
+		if (input.m_live_state != CLEAR_LINE)
 			signal_interrupt_trigger();
 	}
 }
