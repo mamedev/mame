@@ -345,7 +345,7 @@ uint8_t isa8_pgc_device::stateparam_r(offs_t offset)
 	uint8_t ret;
 
 	ret = m_stateparam[offset >> 1];
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (machine().debug_enabled())
 	{
 		LOG("stateparam R @ %02x == %02x\n", offset, ret);
 	}
@@ -354,7 +354,7 @@ uint8_t isa8_pgc_device::stateparam_r(offs_t offset)
 
 void isa8_pgc_device::stateparam_w(offs_t offset, uint8_t data)
 {
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (machine().debug_enabled())
 	{
 		LOG("stateparam W @ %02x <- %02x\n", offset, data);
 	}

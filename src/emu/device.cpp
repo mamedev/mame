@@ -586,7 +586,7 @@ void device_t::start()
 	notify_clock_changed();
 
 	// if we're debugging, create a device_debug object
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (machine().debug_enabled())
 	{
 		m_debug = std::make_unique<device_debug>(*this);
 		debug_setup();

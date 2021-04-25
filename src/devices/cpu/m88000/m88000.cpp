@@ -235,7 +235,7 @@ void mc88100_device::execute_run()
 			exception(E_INTERRUPT);
 
 			// notify debugger
-			if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+			if (machine().debug_enabled())
 				debug()->interrupt_hook(INPUT_LINE_IRQ0);
 		}
 
@@ -1379,7 +1379,7 @@ void mc88100_device::exception(unsigned vector, bool const trap)
 	m_fip = m_cr[VBR] | (vector << 3) | IP_V;
 
 	// notify debugger
-	if ((vector != E_INTERRUPT) && (machine().debug_flags & DEBUG_FLAG_ENABLED))
+	if ((vector != E_INTERRUPT) && machine().debug_enabled())
 		debug()->exception_hook(vector);
 }
 

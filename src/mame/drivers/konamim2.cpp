@@ -696,7 +696,7 @@ void konamim2_state::machine_start()
 	m_atapi_timer = machine().scheduler().timer_alloc( timer_expired_delegate( FUNC( konamim2_state::atapi_delay ),this ) );
 	m_atapi_timer->adjust( attotime::never );
 
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine().debug_enabled())
 	{
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("m2", CMDFLAG_NONE, 0, 1, 4, std::bind(&konamim2_state::debug_commands, this, _1, _2));

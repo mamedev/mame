@@ -144,7 +144,7 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 
 	// fetch core options
 	if (options().debug())
-		debug_flags = (DEBUG_FLAG_ENABLED | DEBUG_FLAG_CALL_HOOK) | (DEBUG_FLAG_OSD_ENABLED);
+		debug_flags = DEBUG_FLAG_ENABLED | DEBUG_FLAG_CALL_HOOK | DEBUG_FLAG_OSD_ENABLED;
 }
 
 
@@ -247,7 +247,7 @@ void running_machine::start()
 	m_network = std::make_unique<network_manager>(*this);
 
 	// initialize the debugger
-	if ((debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (debug_enabled())
 	{
 		m_debug_view = std::make_unique<debug_view_manager>(*this);
 		m_debugger = std::make_unique<debugger_manager>(*this);
@@ -748,7 +748,7 @@ void running_machine::strlog(const char *str) const
 
 void running_machine::debug_break()
 {
-	if ((debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (debug_enabled())
 		debugger().debug_break();
 }
 
@@ -1029,7 +1029,7 @@ void running_machine::reset_all_devices()
 void running_machine::stop_all_devices()
 {
 	// first let the debugger save comments
-	if ((debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (debug_enabled())
 		debugger().cpu().comment_save();
 
 	// iterate over devices and stop them

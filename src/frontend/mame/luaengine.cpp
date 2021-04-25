@@ -1286,7 +1286,7 @@ void lua_engine::initialize()
 	machine_type["debugger"] = sol::property(
 			[] (running_machine &m, sol::this_state s) -> sol::object
 			{
-				if (m.debug_flags & DEBUG_FLAG_ENABLED)
+				if (m.debug_enabled())
 					return sol::make_object(s, &m.debugger());
 				else
 					return sol::lua_nil;
@@ -1390,7 +1390,7 @@ void lua_engine::initialize()
 	device_type["debug"] = sol::property(
 			[] (device_t &dev, sol::this_state s) -> sol::object
 			{
-				if (!(dev.machine().debug_flags & DEBUG_FLAG_ENABLED) || !dynamic_cast<cpu_device *>(&dev)) // debugger not enabled or not CPU
+				if (!dev.machine().debug_enabled() || !dynamic_cast<cpu_device *>(&dev)) // debugger not enabled or not CPU
 					return sol::lua_nil;
 				return sol::make_object(s, dev.debug());
 			});

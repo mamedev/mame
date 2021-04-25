@@ -265,7 +265,7 @@ void video_manager::frame_update(bool from_debugger)
 	{
 		// reset partial updates if we're paused or if the debugger is active
 		screen_device *const screen = screen_device_enumerator(machine().root_device()).first();
-		bool const debugger_enabled = machine().debug_flags & DEBUG_FLAG_ENABLED;
+		bool const debugger_enabled = machine().debug_enabled();
 		bool const within_instruction_hook = debugger_enabled && machine().debugger().within_instruction_hook();
 		if (screen && ((machine().paused() && machine().options().update_in_pause()) || from_debugger || within_instruction_hook))
 			screen->reset_partial_updates();

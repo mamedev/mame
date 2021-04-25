@@ -904,7 +904,7 @@ inline void cosmac_device::run_state()
 
 inline void cosmac_device::debug()
 {
-	if ((device_t::machine().debug_flags & DEBUG_FLAG_ENABLED) && m_state == cosmac_state::STATE_0_FETCH)
+	if (machine().debug_enabled() && m_state == cosmac_state::STATE_0_FETCH)
 	{
 		debugger_instruction_hook(R[P]);
 	}

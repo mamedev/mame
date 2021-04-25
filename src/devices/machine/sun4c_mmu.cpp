@@ -148,7 +148,7 @@ void sun4_mmu_base_device::device_start()
 	save_item(NAME(m_memory_err_reg));
 	save_item(NAME(m_parity_err));
 
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine().debug_enabled())
 	{
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("l2p", CMDFLAG_NONE, 0, 1, 1, std::bind(&sun4_mmu_base_device::l2p_command, this, _1, _2));

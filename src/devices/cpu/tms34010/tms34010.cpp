@@ -883,7 +883,7 @@ void tms340x0_device::execute_run()
 	/* check interrupts first */
 	m_executing = true;
 	check_interrupt();
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	if (!machine().debug_enabled())
 	{
 		do
 		{

@@ -44,7 +44,7 @@ void debugger_manager::debug_break()
 
 bool debugger_manager::within_instruction_hook()
 {
-	if ((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (machine().debug_enabled())
 		return m_cpu->within_instruction_hook();
 	return false;
 }

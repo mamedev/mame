@@ -1765,7 +1765,7 @@ void esrip_device::execute_set_input(int inputnum, int state)
 
 void esrip_device::execute_run()
 {
-	int calldebugger = (machine().debug_flags & DEBUG_FLAG_ENABLED) != 0;
+	int calldebugger = machine().debug_enabled();
 	uint8_t status;
 
 	/* I think we can get away with placing this outside of the loop */

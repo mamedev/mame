@@ -629,7 +629,7 @@ void am29000_cpu_device::fetch_decode()
 
 void am29000_cpu_device::execute_run()
 {
-	uint32_t call_debugger = (machine().debug_flags & DEBUG_FLAG_ENABLED) != 0;
+	uint32_t call_debugger = machine().debug_enabled();
 
 	external_irq_check();
 

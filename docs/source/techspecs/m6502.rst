@@ -270,7 +270,7 @@ The execute main call ends up very simple:
 |         if(inst_state < 0x100) {
 |             PPC = NPC;
 |             inst_state = IR;
-|             if(machine().debug_flags & DEBUG_FLAG_ENABLED)
+|             if(machine().debug_enabled())
 |                 debugger_instruction_hook(this, NPC);
 |         }
 |         do_exec_full();
@@ -350,7 +350,7 @@ A modern try/catch costs nothing if an exception is not thrown. Using this the c
 |         if(inst_state < 0x100) {
 |             PPC = NPC;
 |             inst_state = IR;
-|             if(machine().debug_flags & DEBUG_FLAG_ENABLED)
+|             if(machine().debug_enabled())
 |                 debugger_instruction_hook(this, NPC);
 |         }
 |         do_exec_full();

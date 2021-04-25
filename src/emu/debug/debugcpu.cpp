@@ -604,7 +604,7 @@ void device_debug::reinstall_all(read_or_write mode)
 
 void device_debug::start_hook(const attotime &endtime)
 {
-	assert((m_device.machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
+	assert(m_device.machine().debug_enabled());
 
 	m_device.machine().debugger().cpu().start_hook(&m_device, (m_flags & DEBUG_FLAG_STOP_VBLANK) != 0);
 

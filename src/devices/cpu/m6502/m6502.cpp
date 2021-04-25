@@ -401,7 +401,7 @@ void m6502_device::execute_run()
 		if(inst_state < 0xff00) {
 			PPC = NPC;
 			inst_state = IR | inst_state_base;
-			if(machine().debug_flags & DEBUG_FLAG_ENABLED)
+			if(machine().debug_enabled())
 				debugger_instruction_hook(pc_to_external(NPC));
 		}
 		do_exec_full();
@@ -601,7 +601,7 @@ void m6502_mcu_device::execute_run()
 			if(inst_state < 0xff00) {
 				PPC = NPC;
 				inst_state = IR | inst_state_base;
-				if(machine().debug_flags & DEBUG_FLAG_ENABLED)
+				if(machine().debug_enabled())
 					debugger_instruction_hook(NPC);
 			}
 			do_exec_full();

@@ -1836,7 +1836,7 @@ void chihiro_state::machine_start()
 	if (m_dimmboard.found())
 		m_dimm_board_memory = m_dimmboard->memory(m_dimm_board_memory_size);
 
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine().debug_enabled())
 	{
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("chihiro", CMDFLAG_NONE, 0, 1, 4, std::bind(&chihiro_state::debug_commands, this, _1, _2));

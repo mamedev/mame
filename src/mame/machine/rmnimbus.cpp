@@ -214,7 +214,7 @@ void rmnimbus_state::machine_start()
 	m_nimbus_mouse.m_mouse_timer=timer_alloc(TIMER_MOUSE);
 
 	/* setup debug commands */
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine().debug_enabled())
 	{
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("nimbus_debug", CMDFLAG_NONE, 0, 0, 1, std::bind(&rmnimbus_state::debug_command, this, _1, _2));

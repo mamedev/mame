@@ -1319,7 +1319,7 @@ void drcbe_x64::op_debug(Assembler &a, const instruction &inst)
 	assert_no_condition(inst);
 	assert_no_flags(inst);
 
-	if ((m_device.machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (m_device.machine().debug_enabled())
 	{
 		// normalize parameters
 		be_parameter pcp(*this, inst.param(0), PTYPE_MRI);

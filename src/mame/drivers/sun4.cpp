@@ -828,7 +828,7 @@ INPUT_PORTS_END
 
 void sun4_base_state::machine_start()
 {
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine().debug_enabled())
 	{
 		using namespace std::placeholders;
 		#if SUN4_LOG_FCODES

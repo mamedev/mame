@@ -2123,7 +2123,7 @@ void drcbe_x86::op_debug(Assembler &a, const instruction &inst)
 	using debugger_hook_func = void (*)(device_debug *, offs_t);
 	static const debugger_hook_func debugger_inst_hook = [] (device_debug *dbg, offs_t pc) { dbg->instruction_hook(pc); }; // TODO: kill trampoline if possible
 
-	if ((m_device.machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (m_device.machine().debug_enabled())
 	{
 		// normalize parameters
 		be_parameter const pcp(*this, inst.param(0), PTYPE_MRI);

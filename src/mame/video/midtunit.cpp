@@ -69,7 +69,7 @@ midxunit_video_device::midxunit_video_device(const machine_config &mconfig, cons
 
 void midtunit_video_device::debug_init()
 {
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine().debug_enabled())
 	{
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("midblit", CMDFLAG_CUSTOM_HELP, 0, 1, 4, std::bind(&midtunit_video_device::debug_commands, this, _1, _2));

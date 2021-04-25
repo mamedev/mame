@@ -378,7 +378,7 @@ void sh34_base_device::sh4_exception_process(int exception, uint32_t vector)
 	//printf("stored m_spc %08x m_ssr %08x m_sgr %08x\n", m_spc, m_ssr, m_sgr);
 
 	m_sh2_state->sr |= MD;
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (machine().debug_enabled())
 		sh4_syncronize_register_bank((m_sh2_state->sr & sRB) >> 29);
 	if (!(m_sh2_state->sr & sRB))
 		sh4_change_register_bank(1);

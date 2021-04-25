@@ -794,7 +794,7 @@ void dgn_beta_state::machine_start()
 	logerror("MACHINE_START( dgnbeta )\n");
 
 	/* setup debug commands */
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine().debug_enabled())
 	{
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("beta_dat_log", CMDFLAG_NONE, 0, 0, 0, std::bind(&dgn_beta_state::execute_beta_dat_log, this, _1, _2));

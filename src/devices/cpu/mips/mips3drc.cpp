@@ -861,7 +861,7 @@ void mips3_device::static_generate_memory_accessor(int mode, int size, int iswri
 	UML_JMPc(block, COND_Z, tlbmiss = label++);                                     // jmp     tlbmiss,z
 	UML_ROLINS(block, I0, I3, 0, 0xfffff000);                   // rolins  i0,i3,0,0xfffff000
 
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	if (!machine().debug_enabled())
 		for (ramnum = 0; ramnum < m_fastram_select; ramnum++)
 			if (!(iswrite && m_fastram[ramnum].readonly))
 			{
@@ -1221,7 +1221,7 @@ void mips3_device::generate_sequence_instruction(drcuml_block &block, compiler_s
 	}
 
 	/* if we are debugging, call the debugger */
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (machine().debug_enabled())
 	{
 		UML_MOV(block, mem(&m_core->pc), desc->pc);                              // mov     [pc],desc->pc
 		save_fast_iregs(block);

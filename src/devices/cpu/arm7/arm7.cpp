@@ -1021,7 +1021,7 @@ void arm7_cpu_device::device_start()
 
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_r[eCPSR]).formatstr("%13s").noshow();
 
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine().debug_enabled())
 	{
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("translate_insn", CMDFLAG_NONE, 0, 1, 1, std::bind(&arm7_cpu_device::translate_insn_command, this, _1, _2));

@@ -128,7 +128,7 @@ static const int vector_elements_2[16][8] =
 void rsp_device::cop2_drc::cfunc_unimplemented_opcode()
 {
 	const uint32_t ppc = m_rsp.m_ppc;
-	if ((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (m_machine.debug_enabled())
 	{
 		rsp_disassembler rspd;
 		std::ostringstream stream;

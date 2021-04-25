@@ -461,7 +461,7 @@ void debugger_console::register_command(const char *command, u32 flags, int ref,
 {
 	if (m_machine.phase() != machine_phase::INIT)
 		throw emu_fatalerror("Can only call debugger_console::register_command() at init time!");
-	if (!(m_machine.debug_flags & DEBUG_FLAG_ENABLED))
+	if (!m_machine.debug_enabled())
 		throw emu_fatalerror("Cannot call debugger_console::register_command() when debugger is not running");
 
 	assert(strlen(command) < 32);

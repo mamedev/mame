@@ -189,7 +189,7 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 
 
 - (IBAction)debugBreak:(id)sender {
-	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine->debug_enabled())
 		machine->debugger().console().get_visible_cpu()->debug()->halt_on_next_instruction("User-initiated break\n");
 }
 

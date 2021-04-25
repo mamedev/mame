@@ -238,7 +238,7 @@ protected:
 	int standard_irq_callback(int irqline);
 
 	// debugger hooks
-	bool debugger_enabled() const { return bool(device().machine().debug_flags & DEBUG_FLAG_ENABLED); }
+	bool debugger_enabled() const { return bool(device().machine().debug_enabled()); }
 	void debugger_instruction_hook(offs_t curpc)
 	{
 		if (device().machine().debug_flags & DEBUG_FLAG_CALL_HOOK)
@@ -246,13 +246,13 @@ protected:
 	}
 	void debugger_exception_hook(int exception)
 	{
-		if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
+		if (device().machine().debug_enabled())
 			device().debug()->exception_hook(exception);
 	}
 
 	void debugger_privilege_hook()
 	{
-		if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
+		if (device().machine().debug_enabled())
 			device().debug()->privilege_hook();
 	}
 

@@ -411,7 +411,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 
 	// disable everything if we are using -str for 300 or fewer seconds, or if we're the empty driver,
 	// or if we are debugging, or if there's no mame window to send inputs to
-	if (!first_time || (str > 0 && str < 60*5) || &machine().system() == &GAME_NAME(___empty) || (machine().debug_flags & DEBUG_FLAG_ENABLED) != 0 || video_none)
+	if (!first_time || (str > 0 && str < 60*5) || &machine().system() == &GAME_NAME(___empty) || machine().debug_enabled() || video_none)
 		show_gameinfo = show_warnings = show_mandatory_fileman = false;
 
 #if defined(__EMSCRIPTEN__)
@@ -1284,7 +1284,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	}
 
 	// if the on-screen display isn't up and the user has toggled it, turn it on
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0 && machine().ui_input().pressed(IPT_UI_ON_SCREEN_DISPLAY))
+	if (!machine().debug_enabled() && machine().ui_input().pressed(IPT_UI_ON_SCREEN_DISPLAY))
 	{
 		using namespace std::placeholders;
 		set_handler(ui_callback_type::MENU, std::bind(&ui::menu_sliders::ui_handler, _1, std::ref(*this)));

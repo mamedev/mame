@@ -546,7 +546,7 @@ template <int Width> void ns32000_device<Width>::interrupt(unsigned const vector
 	// TODO: flush queue
 	m_sequential = false;
 
-	if (trap && (machine().debug_flags & DEBUG_FLAG_ENABLED))
+	if (trap && machine().debug_enabled())
 		debug()->exception_hook(vector);
 }
 
@@ -570,7 +570,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 			interrupt(NMI, m_pc, false);
 
 			// notify the debugger
-			if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+			if (debug_enabled())
 				debug()->interrupt_hook(INPUT_LINE_NMI);
 		}
 		else if (m_int_line && (m_psr & PSR_I))
@@ -590,7 +590,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 			interrupt(vector, m_pc, false);
 
 			// notify the debugger
-			if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+			if (machine().debug_enabled())
 				debug()->interrupt_hook(INPUT_LINE_IRQ0);
 		}
 

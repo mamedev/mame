@@ -541,7 +541,7 @@ void asap_device::execute_run()
 	check_irqs();
 
 	// core execution loop
-	if ((device_t::machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	if (!machine().debug_enabled())
 	{
 		do
 		{

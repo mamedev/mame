@@ -529,7 +529,7 @@ void mb86235_device::generate_sequence_instruction(drcuml_block &block, compiler
 	UML_MAPVAR(block, MAPVAR_CYCLES, compiler.cycles);                                      // mapvar  CYCLES,compiler.cycles
 
 																							/* if we are debugging, call the debugger */
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (machine().debug_enabled())
 	{
 		UML_MOV(block, mem(&m_core->pc), desc->pc);                                         // mov     [pc],desc->pc
 		save_fast_iregs(block);                                                             // <save fastregs>

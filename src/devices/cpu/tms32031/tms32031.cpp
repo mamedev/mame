@@ -920,7 +920,7 @@ void tms3203x_device::execute_run()
 	}
 
 	// non-debug case
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	if (!machine().debug_enabled())
 	{
 		while (m_icount > 0)
 		{

@@ -80,7 +80,7 @@ uint8_t ie15_device::mem_r()
 	uint8_t ret;
 
 	ret = m_p_videoram[m_video.ptr1];
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0 && m_video.ptr1 >= SCREEN_PAGE)
+	if (machine().debug_enabled() && m_video.ptr1 >= SCREEN_PAGE)
 	{
 		LOGM("memory R @ %03x == %02x\n", m_video.ptr1, ret);
 	}
@@ -94,7 +94,7 @@ void ie15_device::mem_w(uint8_t data)
 {
 	if ((m_latch ^= 1) == 0)
 	{
-		if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0 && m_video.ptr1 >= SCREEN_PAGE)
+		if (machine().debug_enabled() && m_video.ptr1 >= SCREEN_PAGE)
 		{
 			LOGM("memory W @ %03x <- %02x\n", m_video.ptr1, data);
 		}
@@ -105,7 +105,7 @@ void ie15_device::mem_w(uint8_t data)
 
 void ie15_device::mem_addr_inc_w(uint8_t data)
 {
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (machine().debug_enabled())
 	{
 		LOGM("memory addr ++ %03x\n", m_video.ptr1);
 	}
@@ -116,7 +116,7 @@ void ie15_device::mem_addr_inc_w(uint8_t data)
 
 void ie15_device::mem_addr_dec_w(uint8_t data)
 {
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (machine().debug_enabled())
 	{
 		LOGM("memory addr -- %03x\n", m_video.ptr1);
 	}
@@ -131,7 +131,7 @@ void ie15_device::mem_addr_lo_w(uint8_t data)
 
 	tmp &= 0xff0;
 	tmp |= ((data >> 4) & 0xf);
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (machine().debug_enabled())
 	{
 		LOGM("memory addr lo %03x <- %02x = %03x\n", m_video.ptr1, data, tmp);
 	}
@@ -145,7 +145,7 @@ void ie15_device::mem_addr_hi_w(uint8_t data)
 
 	tmp &= 0xf;
 	tmp |= (data << 4);
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (machine().debug_enabled())
 	{
 		LOGM("memory addr hi %03x <- %02x = %03x\n", m_video.ptr1, data, tmp);
 	}
@@ -162,7 +162,7 @@ void ie15_device::beep_w(uint8_t data)
 {
 	uint16_t length = (m_long_beep & IE_TRUE) ? 150 : 400;
 
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (machine().debug_enabled())
 	{
 		LOG("beep (%s)\n", m_long_beep ? "short" : "long");
 	}
@@ -340,7 +340,7 @@ uint8_t ie15_device::flag_r(offs_t offset)
 	default:
 		break;
 	}
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine().debug_enabled())
 	{
 		LOGCPU("flag read %d: ?\n", offset);
 	}
@@ -370,7 +370,7 @@ void ie15_device::flag_w(offs_t offset, uint8_t data)
 	default:
 		break;
 	}
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0 && !offset)
+	if (machine().debug_enabled() && !offset)
 	{
 		LOGCPU("flag %sset %d\n", data ? "" : "re", offset);
 	}

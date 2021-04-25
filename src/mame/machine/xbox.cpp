@@ -901,7 +901,7 @@ void xbox_base_state::machine_start()
 {
 	find_debug_params();
 	nvidia_nv2a = subdevice<nv2a_gpu_device>("pci:1e.0:00.0")->debug_get_renderer();
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine().debug_enabled())
 	{
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("xbox", CMDFLAG_CUSTOM_HELP, 0, 1, 4, std::bind(&xbox_base_state::xbox_debug_commands, this, _1, _2));

@@ -495,7 +495,7 @@ void rmnimbus_state::video_start()
 
 	m_screen->register_screen_bitmap(m_video_mem);
 
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine().debug_enabled())
 	{
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("nimbus_vid_debug", CMDFLAG_NONE, 0, 0, 1, std::bind(&rmnimbus_state::video_debug, this, _1, _2));

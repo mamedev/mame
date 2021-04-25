@@ -262,7 +262,7 @@ void i8008_device::execute_run()
 
 inline void i8008_device::illegal(uint8_t opcode)
 {
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (machine().debug_enabled())
 	{
 		logerror("I8008 illegal instruction %04X $%02X\n", m_PC.w.l, opcode);
 	}

@@ -1017,7 +1017,7 @@ void vgmplay_device::execute_run()
 				machine().sound().system_mute(0);
 			}
 
-			if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+			if (machine().debug_enabled())
 				debugger_instruction_hook(m_pc);
 
 			uint8_t code = m_file->read_byte(m_pc);
@@ -1929,7 +1929,7 @@ void vgmplay_device::execute_run()
 			default:
 				osd_printf_error("unhandled code %02x (%02x %02x %02x %02x)\n", code, m_file->read_byte(m_pc + 1), m_file->read_byte(m_pc + 2), m_file->read_byte(m_pc + 3), m_file->read_byte(m_pc + 4));
 
-				if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+				if (machine().debug_enabled())
 					debugger_instruction_hook(m_pc);
 
 				m_state = DONE;

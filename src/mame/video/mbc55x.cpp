@@ -194,7 +194,7 @@ void mbc55x_state::video_start()
 
 	logerror("video_start\n");
 
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if (machine().debug_enabled())
 	{
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("mbc55x_vid_debug", CMDFLAG_NONE, 0, 0, 1, std::bind(&mbc55x_state::video_debug, this, _1, _2));

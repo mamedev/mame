@@ -67,7 +67,7 @@ bool dsp16_device_base::frontend::describe(opcode_desc &desc, opcode_desc const 
 
 	case 0x06: // F1 ; Y
 		describe_f1(desc, op);
-		describe_y(desc, op, bool(m_host.machine().debug_flags & DEBUG_FLAG_ENABLED), false); // only read memory for watchpoints
+		describe_y(desc, op, m_host.machine().debug_enabled(), false); // only read memory for watchpoints
 		return true;
 
 	case 0x07: // F1 ; aT[l] = Y
@@ -423,7 +423,7 @@ bool dsp16_device_base::frontend::describe_do(opcode_desc &desc, u16 op)
 		case 0x06: // F1 ; Y
 			romcycles = cachecycles = 1U;
 			describe_f1(desc, op);
-			describe_y(desc, op, bool(m_host.machine().debug_flags & DEBUG_FLAG_ENABLED), false); // only read memory for watchpoints
+			describe_y(desc, op, m_host.machine().debug_enabled(), false); // only read memory for watchpoints
 			break;
 
 		case 0x07: // F1 ; aT[l] = Y

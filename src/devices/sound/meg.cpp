@@ -137,7 +137,7 @@ uint32_t meg_base_device::execute_input_lines() const noexcept
 
 void meg_base_device::execute_run()
 {
-	if(machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if(machine().debug_enabled())
 		debugger_instruction_hook(m_pc);
 	m_icount = 0;
 }

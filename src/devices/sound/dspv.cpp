@@ -139,7 +139,7 @@ uint32_t dspv_device::execute_input_lines() const noexcept
 
 void dspv_device::execute_run()
 {
-	if(machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if(machine().debug_enabled())
 		debugger_instruction_hook(m_pc);
 	m_icount = 0;
 }

@@ -321,7 +321,7 @@ void rsp_device::set_cop0_reg(int reg, uint32_t data)
 
 void rsp_device::unimplemented_opcode(uint32_t op)
 {
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (machine().debug_enabled())
 	{
 		std::ostringstream string;
 		rsp_disassembler rspd;
