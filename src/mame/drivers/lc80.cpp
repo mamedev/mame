@@ -31,17 +31,17 @@ Hardware notes (2-ROM version from schematics):
 - cassette port
 - 6*7seg display, 2 leds, piezo
 
-The PCB is literally inside a map that can be closed like a book.
-It has a nice calculator style keypad attached to it.
+The PCB is literally inside a map that can be closed like a book. It has a nice
+calculator style keypad attached to it.
 
-The memory can be expanded. There's an export version with more
-RAM/ROM by default, and it included a chess program called SC-80.
-SC-80 starts at ADR C800.
+The memory can be expanded. There's an export version with more RAM/ROM by
+default and a faster U880D CPU (3300.0kHz XTAL). It included a chess program
+called SC-80, that can be started by inputting ADR C800.
 
 
 TODO:
 - KSD11 switch
-- CTC clock inputs
+- CTC clock inputs ("user bus")
 - Most characters are lost when pasting (lc80, lc80e).
 - Add internal artwork for the clickable keypad, and an overlay for SC-80?
 
@@ -113,20 +113,19 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
-	void pio1_pa_w(uint8_t data);
-	uint8_t pio1_pb_r();
-	void pio1_pb_w(uint8_t data);
-	uint8_t pio2_pb_r();
+	void pio1_pa_w(u8 data);
+	u8 pio1_pb_r();
+	void pio1_pb_w(u8 data);
+	u8 pio2_pb_r();
 
 	void update_display();
 
-	// display state
-	uint8_t m_digit;
-	uint8_t m_segment;
+	u8 m_digit;
+	u8 m_segment;
 };
 
 
-/* Memory Maps */
+// Memory Maps
 
 void lc80_state::lc80_mem(address_map &map)
 {
@@ -163,7 +162,7 @@ void lc80_state::lc80_io(address_map &map)
 }
 
 
-/* Input Ports */
+// Input Ports
 
 INPUT_CHANGED_MEMBER( lc80_state::trigger_reset )
 {
@@ -214,7 +213,7 @@ static INPUT_PORTS_START( lc80 )
 INPUT_PORTS_END
 
 
-/* Z80-CTC Interface */
+// Z80-CTC Interface
 
 WRITE_LINE_MEMBER(lc80_state::ctc_z0_w)
 {
@@ -229,14 +228,14 @@ WRITE_LINE_MEMBER(lc80_state::ctc_z2_w)
 }
 
 
-/* Z80-PIO Interface */
+// Z80-PIO Interface
 
 void lc80_state::update_display()
 {
 	m_display->matrix(m_digit >> 1, m_segment);
 }
 
-void lc80_state::pio1_pa_w(uint8_t data)
+void lc80_state::pio1_pa_w(u8 data)
 {
 	/*
 
@@ -257,7 +256,7 @@ void lc80_state::pio1_pa_w(uint8_t data)
 	update_display();
 }
 
-uint8_t lc80_state::pio1_pb_r()
+u8 lc80_state::pio1_pb_r()
 {
 	/*
 
@@ -277,7 +276,7 @@ uint8_t lc80_state::pio1_pb_r()
 	return (m_cassette->input() < +0.0);
 }
 
-void lc80_state::pio1_pb_w(uint8_t data)
+void lc80_state::pio1_pb_w(u8 data)
 {
 	/*
 
@@ -294,18 +293,18 @@ void lc80_state::pio1_pb_w(uint8_t data)
 
 	*/
 
-	/* tape output */
+	// tape output
 	m_cassette->output(BIT(data, 1) ? +1.0 : -1.0);
 
-	/* speaker */
+	// speaker
 	m_speaker->level_w(!BIT(data, 1));
 
-	/* 7segs/led/keyboard */
+	// 7segs/led/keyboard
 	m_digit = ~data;
 	update_display();
 }
 
-uint8_t lc80_state::pio2_pb_r()
+u8 lc80_state::pio2_pb_r()
 {
 	/*
 
@@ -322,7 +321,7 @@ uint8_t lc80_state::pio2_pb_r()
 
 	*/
 
-	uint8_t data = 0xf0;
+	u8 data = 0xf0;
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -339,7 +338,7 @@ uint8_t lc80_state::pio2_pb_r()
 }
 
 
-/* Z80 Daisy Chain */
+// Z80 Daisy Chain
 
 static const z80_daisy_config lc80_daisy_chain[] =
 {
@@ -350,43 +349,45 @@ static const z80_daisy_config lc80_daisy_chain[] =
 };
 
 
-/* Machine Initialization */
+// Machine Initialization
 
 void lc80_state::machine_start()
 {
 	m_halt_led.resolve();
 
+	// install RAM
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	offs_t mirror = program.map()->m_globalmask & 0x5000;
-	program.install_ram(0x2000, 0x2000 + m_ram->size() - 1, mirror, m_ram->pointer());
+	const offs_t mirror = (program.map()->m_globalmask & 0xc000) | 0x1000;
+	const offs_t start = 0x2000;
+	program.install_ram(start, start + m_ram->size() - 1, mirror, m_ram->pointer());
 
-	/* register for state saving */
+	// register for state saving
 	save_item(NAME(m_digit));
 	save_item(NAME(m_segment));
 }
 
 
-/* Machine Driver */
+// Machine Driver
 
 void lc80_state::lc80(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 900000); /* UD880D */
+	// basic machine hardware
+	Z80(config, m_maincpu, 900000); // UD880D
 	m_maincpu->set_addrmap(AS_PROGRAM, &lc80_state::lc80_mem);
 	m_maincpu->set_addrmap(AS_IO, &lc80_state::lc80_io);
 	m_maincpu->halt_cb().set(FUNC(lc80_state::halt_w));
 	m_maincpu->set_daisy_config(lc80_daisy_chain);
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1+6, 8);
 	m_display->set_segmask(0x3f << 1, 0xff);
 	config.set_default_layout(layout_lc80);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	/* devices */
+	// devices
 	Z80CTC(config, m_ctc, 900000);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->zc_callback<0>().set(FUNC(lc80_state::ctc_z0_w));
@@ -433,15 +434,16 @@ void lc80_state::lc80e(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &lc80_state::lc80e_mem);
 	m_ram->set_default_size("4K");
 
-	// it is running twice as fast
-	m_maincpu->set_clock(1800000);
-	m_ctc->set_clock(1800000);
-	m_pio[0]->set_clock(1800000);
-	m_pio[1]->set_clock(1800000);
+	// it is running almost twice as fast
+	const XTAL clk = 3.3_MHz_XTAL / 2;
+	m_maincpu->set_clock(clk);
+	m_ctc->set_clock(clk);
+	m_pio[0]->set_clock(clk);
+	m_pio[1]->set_clock(clk);
 }
 
 
-/* ROMs */
+// ROMs
 
 ROM_START( lc80 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -469,7 +471,7 @@ ROM_END
 } // anonymous namespace
 
 
-/* System Drivers */
+// System Drivers
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
 COMP( 1984, lc80,   0,      0,      lc80,    lc80,  lc80_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Lerncomputer LC 80 (set 1)", MACHINE_SUPPORTS_SAVE )
