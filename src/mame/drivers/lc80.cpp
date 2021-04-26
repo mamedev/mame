@@ -4,8 +4,6 @@
 
 LC-80 by VEB Mikroelektronik "Karl Marx" Erfurt
 
-12/05/2009 Skeleton driver.
-
 When first started, the screen is blank. Wait about 8 seconds for
 it to introduce itself, then you may use it or paste to it.
 The decimal points indicate which side of the display you will
@@ -22,6 +20,23 @@ Pasting:
 Test Paste: (lc80_2 only)
     -2000=11^22^33^44^55^66^77^88^99^-2000
     Now press up-arrow to confirm the data has been entered.
+
+
+Hardware notes (2-ROM version from schematics):
+- UD880D CPU (Z80 clone) @ D201, ~900kHz no XTAL
+- 2KB ROM (2*U505D @ D202/D203)
+- 1KB RAM (2*U214D @ D204/D205)
+- 2*UD855D (Z80 PIO clone) @ D206/D207
+- UD857D (Z80 CTC clone) @ D208
+- cassette port
+- 6*7seg display, 2 leds, piezo
+
+The PCB is literally inside a map that can be closed like a book.
+It has a nice calculator style keypad attached to it.
+
+The memory can be expanded. There's an export version with more
+RAM/ROM by default, and it included a chess program called SC-80.
+SC-80 starts at ADR C8000.
 
 
 TODO:
@@ -48,25 +63,21 @@ TODO:
 
 #include "lc80.lh"
 
-namespace {
 
-#define Z80_TAG         "d201"
-#define Z80CTC_TAG      "d208"
-#define Z80PIO1_TAG     "d206"
-#define Z80PIO2_TAG     "d207"
-//#define SPEAKER_TAG       "b237"
+namespace {
 
 class lc80_state : public driver_device
 {
 public:
 	lc80_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, Z80_TAG),
-		m_pio2(*this, Z80PIO2_TAG),
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, "ram"),
+		m_pio(*this, "pio%u", 0),
+		m_ctc(*this, "ctc"),
 		m_cassette(*this, "cassette"),
 		m_speaker(*this, "speaker"),
-		m_ram(*this, RAM_TAG),
-		m_y(*this, "Y%u", 0U),
+		m_inputs(*this, "Y%u", 0U),
 		m_digits(*this, "digit%u", 0U),
 		m_out_led(*this, "led0")
 	{ }
@@ -82,11 +93,12 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<z80pio_device> m_pio2;
+	required_device<ram_device> m_ram;
+	required_device_array<z80pio_device, 2> m_pio;
+	required_device<z80ctc_device> m_ctc;
 	required_device<cassette_image_device> m_cassette;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<ram_device> m_ram;
-	required_ioport_array<4> m_y;
+	required_ioport_array<4> m_inputs;
 	output_finder<6> m_digits;
 	output_finder<> m_out_led;
 
@@ -132,9 +144,9 @@ void lc80_state::lc80e_mem(address_map &map)
 void lc80_state::lc80_io(address_map &map)
 {
 	map.global_mask(0x1f);
-	map(0x14, 0x17).rw(Z80PIO1_TAG, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0x18, 0x1b).rw(m_pio2, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0x0c, 0x0f).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x14, 0x17).rw(m_pio[0], FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x18, 0x1b).rw(m_pio[1], FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x0c, 0x0f).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
 
@@ -275,7 +287,7 @@ void lc80_state::pio1_pb_w(uint8_t data)
 	*/
 
 	/* tape output */
-	m_cassette->output( BIT(data, 1) ? +1.0 : -1.0);
+	m_cassette->output(BIT(data, 1) ? +1.0 : -1.0);
 
 	/* speaker */
 	m_speaker->level_w(!BIT(data, 1));
@@ -313,10 +325,10 @@ uint8_t lc80_state::pio2_pb_r()
 	{
 		if (!BIT(m_digit, i))
 		{
-			if (!BIT(m_y[0]->read(), i)) data &= ~0x10;
-			if (!BIT(m_y[1]->read(), i)) data &= ~0x20;
-			if (!BIT(m_y[2]->read(), i)) data &= ~0x40;
-			if (!BIT(m_y[3]->read(), i)) data &= ~0x80;
+			if (!BIT(m_inputs[0]->read(), i)) data &= ~0x10;
+			if (!BIT(m_inputs[1]->read(), i)) data &= ~0x20;
+			if (!BIT(m_inputs[2]->read(), i)) data &= ~0x40;
+			if (!BIT(m_inputs[3]->read(), i)) data &= ~0x80;
 		}
 	}
 
@@ -328,9 +340,9 @@ uint8_t lc80_state::pio2_pb_r()
 
 static const z80_daisy_config lc80_daisy_chain[] =
 {
-	{ Z80CTC_TAG },
-	{ Z80PIO2_TAG },
-	{ Z80PIO1_TAG },
+	{ "ctc" },
+	{ "pio1" },
+	{ "pio0" },
 	{ nullptr }
 };
 #endif
@@ -342,7 +354,7 @@ void lc80_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	uint8_t *ROM = memregion(Z80_TAG)->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	/* setup memory banking */
 	membank("bank1")->configure_entry(0, &ROM[0]); // TODO
@@ -412,21 +424,21 @@ void lc80_state::lc80(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, 900000));
-	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	ctc.zc_callback<0>().set(FUNC(lc80_state::ctc_z0_w));
-	ctc.zc_callback<1>().set(FUNC(lc80_state::ctc_z1_w));
-	ctc.zc_callback<2>().set(FUNC(lc80_state::ctc_z2_w));
+	Z80CTC(config, m_ctc, 900000);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(FUNC(lc80_state::ctc_z0_w));
+	m_ctc->zc_callback<1>().set(FUNC(lc80_state::ctc_z1_w));
+	m_ctc->zc_callback<2>().set(FUNC(lc80_state::ctc_z2_w));
 
-	z80pio_device& pio1(Z80PIO(config, Z80PIO1_TAG, 900000));
-	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	pio1.out_pa_callback().set(FUNC(lc80_state::pio1_pa_w));
-	pio1.in_pb_callback().set(FUNC(lc80_state::pio1_pb_r));
-	pio1.out_pb_callback().set(FUNC(lc80_state::pio1_pb_w));
+	Z80PIO(config, m_pio[0], 900000);
+	m_pio[0]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio[0]->out_pa_callback().set(FUNC(lc80_state::pio1_pa_w));
+	m_pio[0]->in_pb_callback().set(FUNC(lc80_state::pio1_pb_r));
+	m_pio[0]->out_pb_callback().set(FUNC(lc80_state::pio1_pb_w));
 
-	Z80PIO(config, m_pio2, 900000);
-	m_pio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_pio2->in_pb_callback().set(FUNC(lc80_state::pio2_pb_r));
+	Z80PIO(config, m_pio[1], 900000);
+	m_pio[1]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio[1]->in_pb_callback().set(FUNC(lc80_state::pio2_pb_r));
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
@@ -449,21 +461,21 @@ void lc80_state::lc80_2(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, 900000));
-	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	ctc.zc_callback<0>().set(FUNC(lc80_state::ctc_z0_w));
-	ctc.zc_callback<1>().set(FUNC(lc80_state::ctc_z1_w));
-	ctc.zc_callback<2>().set(FUNC(lc80_state::ctc_z2_w));
+	Z80CTC(config, m_ctc, 900000);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(FUNC(lc80_state::ctc_z0_w));
+	m_ctc->zc_callback<1>().set(FUNC(lc80_state::ctc_z1_w));
+	m_ctc->zc_callback<2>().set(FUNC(lc80_state::ctc_z2_w));
 
-	z80pio_device& pio1(Z80PIO(config, Z80PIO1_TAG, 900000));
-	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	pio1.out_pa_callback().set(FUNC(lc80_state::pio1_pa_w));
-	pio1.in_pb_callback().set(FUNC(lc80_state::pio1_pb_r));
-	pio1.out_pb_callback().set(FUNC(lc80_state::pio1_pb_w));
+	Z80PIO(config, m_pio[0], 900000);
+	m_pio[0]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio[0]->out_pa_callback().set(FUNC(lc80_state::pio1_pa_w));
+	m_pio[0]->in_pb_callback().set(FUNC(lc80_state::pio1_pb_r));
+	m_pio[0]->out_pb_callback().set(FUNC(lc80_state::pio1_pb_w));
 
-	Z80PIO(config, m_pio2, 900000);
-	m_pio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_pio2->in_pb_callback().set(FUNC(lc80_state::pio2_pb_r));
+	Z80PIO(config, m_pio[1], 900000);
+	m_pio[1]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio[1]->in_pb_callback().set(FUNC(lc80_state::pio2_pb_r));
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
@@ -486,23 +498,23 @@ void lc80_state::lc80e(machine_config &config)
 /* ROMs */
 
 ROM_START( lc80 )
-	ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lc80.d202", 0x0000, 0x0400, CRC(e754ef53) SHA1(044440b13e62addbc3f6a77369cfd16f99b39752) ) // U505
 	ROM_LOAD( "lc80.d203", 0x0800, 0x0400, CRC(2b544da1) SHA1(3a6cbd0c57c38eadb7055dca4b396c348567d1d5) ) // "
 ROM_END
 
 ROM_START( lc80a )
-	ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lc80_2716.bin", 0x0000, 0x0800, CRC(b3025934) SHA1(6fff953f0f1eee829fd774366313ab7e8053468c) ) // 2716
 ROM_END
 
 ROM_START( lc80_2 )
-	ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lc80_2.bin", 0x0000, 0x1000, CRC(2e06d768) SHA1(d9cddaf847831e4ab21854c0f895348b7fda20b8) )
 ROM_END
 
 ROM_START( lc80e )
-	ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lc80e-0000-schach.rom", 0x0000, 0x1000, CRC(e3cca61d) SHA1(f2be3f2a9d3780d59657e49b3abeffb0fc13db89) )
 	ROM_LOAD( "lc80e-1000-schach.rom", 0x1000, 0x1000, CRC(b0323160) SHA1(0ea019b0944736ae5b842bf9aa3537300f259b98) )
 	ROM_LOAD( "lc80e-c000-schach.rom", 0xc000, 0x1000, CRC(9c858d9c) SHA1(2f7b3fd046c965185606253f6cd9372da289ca6f) )
