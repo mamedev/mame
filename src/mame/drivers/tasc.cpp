@@ -227,13 +227,8 @@ u32 tasc_state::rom_r(offs_t offset)
 	if (!machine().side_effects_disabled())
 	{
 		// handle dynamic cpu clock divider when accessing rom
-		u64 cur_cycle = m_maincpu->total_cycles();
-		u64 prev_cycle = m_prev_cycle;
-		s64 diff = cur_cycle - prev_cycle;
-
+		s64 diff = m_maincpu->total_cycles() - m_prev_cycle;
 		u32 pc = m_maincpu->pc();
-		u32 prev_pc = m_prev_pc;
-		m_prev_pc = pc;
 
 		if (diff > 0)
 		{
@@ -242,13 +237,14 @@ u32 tasc_state::rom_r(offs_t offset)
 			static constexpr int divider = -7 + 1;
 
 			// this takes care of almost all cases, otherwise, total cycles taken can't be determined
-			if (diff <= arm_branch_cycles || (diff <= arm_max_cycles && (pc - prev_pc) == 4 && (pc & ~0x02000000) == (offset * 4)))
+			if (diff <= arm_branch_cycles || (diff <= arm_max_cycles && (pc - m_prev_pc) == 4 && (pc & ~0x02000000) == (offset * 4)))
 				m_maincpu->adjust_icount(divider * (int)diff);
 			else
 				m_maincpu->adjust_icount(divider);
 		}
 
 		m_prev_cycle = m_maincpu->total_cycles();
+		m_prev_pc = pc;
 	}
 
 	return m_rom[offset];
