@@ -3236,6 +3236,9 @@ fm_engine_base<RegisterType>::fm_engine_base(fm_interface &intf) :
 	m_modified_channels(ALL_CHANNELS),
 	m_prepare_count(0)
 {
+	// inform the interface of their engine
+	m_intf.m_callbacks = this;
+
 	// create the channels
 	for (int chnum = 0; chnum < CHANNELS; chnum++)
 		m_channel[chnum] = std::make_unique<fm_channel<RegisterType>>(*this, RegisterType::channel_offset(chnum));
@@ -3419,7 +3422,7 @@ void fm_engine_base<RegisterType>::write(uint16_t regnum, uint8_t data)
 	// schedule these writes to ensure ordering with timers
 	if (regnum == RegisterType::REG_MODE)
 	{
-		m_intf.synchronized_mode_write(*this, data);
+		m_intf.synchronized_mode_write(data);
 		return;
 	}
 

@@ -128,7 +128,7 @@ void ym2151_device::device_start()
 	device_clock_changed();
 
 	// start the engine up
-	m_fm_intf.start(m_fm);
+	m_fm_intf.start();
 
 	// save our data
 	save_item(YMFM_NAME(m_address));

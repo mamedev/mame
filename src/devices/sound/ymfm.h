@@ -7,20 +7,101 @@
 #pragma once
 
 
+namespace ymfm
+{
+
 
 //*********************************************************
-//  INTERFACE CLASS
+//  INTERFACE CLASSES
 //*********************************************************
+
+// forward declarations
+template<class RegisterType> class fm_engine_base;
+
+class fm_engine_callbacks
+{
+public:
+	// timer callback; called by the interface when a timer fires
+	virtual void intf_timer_expired(uint32_t tnum) = 0;
+
+	// check interrupts; called by the interface after synchronization
+	virtual void intf_check_interrupts() = 0;
+
+	// mode register write; called by the interface after synchronization
+	virtual void intf_mode_write(uint8_t data) = 0;
+};
+
+
+class fm_interface
+{
+	template<typename RegisterType> friend class fm_engine_base;
+
+public:
+	// constructor
+	fm_interface() { }
+
+	// destructor
+	virtual ~fm_interface() { }
+
+	// save types:
+	//  uint8_t
+	//  uint8_t[]
+	//  uint32_t
+	//  unique_ptr<fm_operator>[]
+	//  unique_ptr<fm_channel>[]
+
+	template<typename T>
+	void save_item(T &item, char const *name, int index = 0)
+	{
+	}
+
+	template<typename... Params>
+	void log(char const *fmt, Params &&... args)
+	{
+//		LOG("%s: ", m_device.tag());
+//		LOG(fmt, std::forward<Params>(args)...);
+	}
+
+protected:
+	// the engine calls this to set one of two timers which should fire after
+	// the given number of clocks; when the timer fires, it must call the
+	// m_callbacks->intf_timer_handler() method; a duration_in_clocks that is
+	// negative means to disable the timer
+	virtual void set_timer(uint32_t tnum, int32_t duration_in_clocks) = 0;
+
+	// the engine calls this when the external IRQ state changes; in
+	// response, the interface should perform any IRQ signaling that needs
+	// to happen as a result
+	virtual void update_irq(bool asserted) = 0;
+
+	// the engine calls this to schedule a synchronized write to the mode
+	// register with the provided data; in response, the interface should
+	// clock through any unprocessed stream data and then call the
+	// m_callbacks->intf_mode_write() method with the provided data
+	virtual void synchronized_mode_write(uint8_t data) = 0;
+
+	// the engine calls this to schedule a synchronized interrupt check;
+	// in response, the interface should clock through any unprocessed
+	// stream data and then call the m_callbacks->intf_check_interrupts() method
+	virtual void synchronized_check_interrupts() = 0;
+
+	// internal state
+	fm_engine_callbacks *m_callbacks;
+};
+
+}
+
+
 
 // ======================> fm_interface
 
 // this class abstracts out system-dependent behaviors and interfaces
 #ifdef __EMU_H__
-class fm_interface
+class mame_fm_interface : public ymfm::fm_interface
 {
 public:
 	// construction
-	fm_interface(device_t &device) :
+	mame_fm_interface(device_t &device) :
 		m_device(device),
 		m_irq_handler(device)
 	{
@@ -28,12 +109,11 @@ public:
 
 	// startup; this is not called by the engine, but by the owner of the
 	// interface, at device_start time
-	template<typename T>
-	void start(T &engine)
+	void start()
 	{
 		// allocate our timers
 		for (int tnum = 0; tnum < 2; tnum++)
-			m_timer[tnum] = m_device.machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm_interface::timer_handler<T>), this), &engine);
+			m_timer[tnum] = m_device.machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mame_fm_interface::timer_handler), this));
 
 		// resolve the IRQ handler while we're here
 		m_irq_handler.resolve();
@@ -44,7 +124,7 @@ public:
 
 	// set a timer to go off after the given number of clocks; when it fires,
 	// it must call timer_handler on the target object
-	void set_timer(uint32_t tnum, int32_t duration_in_clocks)
+	virtual void set_timer(uint32_t tnum, int32_t duration_in_clocks) override
 	{
 		if (duration_in_clocks >= 0)
 			m_timer[tnum]->adjust(attotime::from_ticks(duration_in_clocks, m_device.clock()), tnum);
@@ -52,9 +132,25 @@ public:
 			m_timer[tnum]->enable(false);
 	}
 
-	void update_irq(bool asserted)
+	virtual void update_irq(bool asserted) override
 	{
 		m_irq_handler(asserted ? ASSERT_LINE : CLEAR_LINE);
+	}
+
+	virtual void synchronized_mode_write(uint8_t data) override
+	{
+		m_device.machine().scheduler().synchronize(timer_expired_delegate(FUNC(mame_fm_interface::mode_write), this), data);
+	}
+
+	virtual void synchronized_check_interrupts() override
+	{
+		// if we're currently executing a CPU, schedule the interrupt check;
+		// otherwise, do it directly
+		auto &scheduler = m_device.machine().scheduler();
+		if (scheduler.currently_executing())
+			scheduler.synchronize(timer_expired_delegate(FUNC(mame_fm_interface::check_interrupts), this));
+		else
+			m_callbacks->intf_check_interrupts();
 	}
 
 	template<typename T>
@@ -70,47 +166,21 @@ public:
 //		LOG(fmt, std::forward<Params>(args)...);
 	}
 
-	template<typename T>
-	void synchronized_mode_write(T &engine, uint8_t data)
-	{
-		m_device.machine().scheduler().synchronize(timer_expired_delegate(FUNC(fm_interface::mode_write<T>), this), data, &engine);
-	}
-
-	template<typename T>
-	void synchronized_check_interrupts(T &engine)
-	{
-		// if we're currently executing a CPU, schedule the interrupt check;
-		// otherwise, do it directly
-		auto &scheduler = m_device.machine().scheduler();
-		if (scheduler.currently_executing())
-			scheduler.synchronize(timer_expired_delegate(FUNC(fm_interface::check_interrupts<T>), this), 0, &engine);
-		else
-			engine.intf_check_interrupts();
-	}
-
-	static inline uint8_t leading_zeros(uint32_t value)
-	{
-		return count_leading_zeros(value);
-	}
-
 private:
 	// timer handler
-	template<typename T>
 	void timer_handler(void *ptr, int param)
 	{
-		reinterpret_cast<T *>(ptr)->intf_timer_expired(param);
+		m_callbacks->intf_timer_expired(param);
 	}
 
-	template<typename T>
 	void mode_write(void *ptr, int param)
 	{
-		reinterpret_cast<T *>(ptr)->intf_mode_write(param);
+		m_callbacks->intf_mode_write(param);
 	}
 
-	template<typename T>
 	void check_interrupts(void *ptr, int param)
 	{
-		reinterpret_cast<T *>(ptr)->intf_check_interrupts();
+		m_callbacks->intf_check_interrupts();
 	}
 
 	device_t &m_device;
@@ -209,7 +279,7 @@ inline int16_t encode_fp(int32_t value)
 	int32_t scanvalue = value ^ (int32_t(value) >> 31);
 
 	// exponent is related to the number of leading bits starting from bit 14
-	int exponent = 7 - fm_interface::leading_zeros(scanvalue << 17);
+	int exponent = 7 - count_leading_zeros(scanvalue << 17);
 
 	// smallest exponent value allowed is 1
 	exponent = std::max(exponent, 1);
@@ -255,7 +325,7 @@ inline int16_t roundtrip_fp(int32_t value)
 	int32_t scanvalue = value ^ (int32_t(value) >> 31);
 
 	// exponent is related to the number of leading bits starting from bit 14
-	int exponent = 7 - fm_interface::leading_zeros(scanvalue << 17);
+	int exponent = 7 - count_leading_zeros(scanvalue << 17);
 
 	// smallest exponent value allowed is 1
 	exponent = std::max(exponent, 1);
@@ -269,6 +339,7 @@ inline int16_t roundtrip_fp(int32_t value)
 //*********************************************************
 //  REGISTER CLASSES
 //*********************************************************
+
 
 // ======================> opdata_cache
 
@@ -1407,9 +1478,6 @@ protected:
 //  CORE ENGINE CLASSES
 //*********************************************************
 
-// forward declarations
-template<class RegisterType> class fm_engine_base;
-
 // three different keyon sources; actual keyon is an OR over all of these
 enum keyon_type : uint32_t
 {
@@ -1484,16 +1552,16 @@ private:
 	uint32_t envelope_attenuation(uint32_t am_offset) const;
 
 	// internal state
-	uint32_t m_choffs;                    // channel offset in registers
-	uint32_t m_opoffs;                    // operator offset in registers
-	uint32_t m_phase;                     // current phase value (10.10 format)
-	uint16_t m_env_attenuation;           // computed envelope attenuation (4.6 format)
-	envelope_state m_env_state;      // current envelope state
-	uint8_t m_ssg_inverted;               // non-zero if the output should be inverted (bit 0)
-	uint8_t m_key_state;                  // current key state: on or off (bit 0)
-	uint8_t m_keyon_live;                 // live key on state (bit 0 = direct, bit 1 = rhythm, bit 2 = CSM)
-	opdata_cache m_cache;       // cached values for performance
-	RegisterType &m_regs;            // direct reference to registers
+	uint32_t m_choffs;                     // channel offset in registers
+	uint32_t m_opoffs;                     // operator offset in registers
+	uint32_t m_phase;                      // current phase value (10.10 format)
+	uint16_t m_env_attenuation;            // computed envelope attenuation (4.6 format)
+	envelope_state m_env_state;            // current envelope state
+	uint8_t m_ssg_inverted;                // non-zero if the output should be inverted (bit 0)
+	uint8_t m_key_state;                   // current key state: on or off (bit 0)
+	uint8_t m_keyon_live;                  // live key on state (bit 0 = direct, bit 1 = rhythm, bit 2 = CSM)
+	opdata_cache m_cache;                  // cached values for performance
+	RegisterType &m_regs;                  // direct reference to registers
 	fm_engine_base<RegisterType> &m_owner; // reference to the owning engine
 };
 
@@ -1571,12 +1639,12 @@ private:
 	}
 
 	// internal state
-	uint32_t m_choffs;                         // channel offset in registers
-	int16_t m_feedback[2];                    // feedback memory for operator 1
-	mutable int16_t m_feedback_in;            // next input value for op 1 feedback (set in output)
-	fm_operator<RegisterType> *m_op[4];   // up to 4 operators
-	RegisterType &m_regs;                 // direct reference to registers
-	fm_engine_base<RegisterType> &m_owner;// reference to the owning engine
+	uint32_t m_choffs;                     // channel offset in registers
+	int16_t m_feedback[2];                 // feedback memory for operator 1
+	mutable int16_t m_feedback_in;         // next input value for op 1 feedback (set in output)
+	fm_operator<RegisterType> *m_op[4];    // up to 4 operators
+	RegisterType &m_regs;                  // direct reference to registers
+	fm_engine_base<RegisterType> &m_owner; // reference to the owning engine
 };
 
 
@@ -1586,7 +1654,7 @@ private:
 // form a Yamaha FM core; chips that implement other engines (ADPCM, wavetable,
 // etc) take this output and combine it with the others externally
 template<class RegisterType>
-class fm_engine_base
+class fm_engine_base : public fm_engine_callbacks
 {
 public:
 	// expose some constants from the registers
@@ -1626,12 +1694,12 @@ public:
 	uint8_t set_reset_status(uint8_t set, uint8_t reset)
 	{
 		m_status = (m_status | set) & ~reset;
-		m_intf.synchronized_check_interrupts(*this);
+		m_intf.synchronized_check_interrupts();
 		return m_status;
 	}
 
 	// set the IRQ mask
-	void set_irq_mask(uint8_t mask) { m_irq_mask = mask; m_intf.synchronized_check_interrupts(*this); }
+	void set_irq_mask(uint8_t mask) { m_irq_mask = mask; m_intf.synchronized_check_interrupts(); }
 
 	// return the current clock prescale
 	uint32_t clock_prescale() const { return m_clock_prescale; }
@@ -1652,13 +1720,13 @@ public:
 	RegisterType &regs() { return m_regs; }
 
 	// timer callback; called by the interface when a timer fires
-	void intf_timer_expired(uint32_t tnum);
+	virtual void intf_timer_expired(uint32_t tnum) override;
 
 	// check interrupts; called by the interface after synchronization
-	void intf_check_interrupts();
+	virtual void intf_check_interrupts() override;
 
 	// mode register write; called by the interface after synchronization
-	void intf_mode_write(uint8_t data);
+	virtual void intf_mode_write(uint8_t data) override;
 
 protected:
 	// assign the current set of operators to channels
@@ -1669,15 +1737,15 @@ protected:
 
 	// internal state
 	fm_interface &m_intf;            // reference to the system interface
-	uint32_t m_env_counter;               // envelope counter; low 2 bits are sub-counter
-	uint8_t m_status;                     // current status register
-	uint8_t m_clock_prescale;             // prescale factor (2/3/6)
-	uint8_t m_irq_mask;                   // mask of which bits signal IRQs
-	uint8_t m_irq_state;                  // current IRQ state
-	uint8_t m_timer_running[2];           // current timer running state
-	uint32_t m_active_channels;           // mask of active channels (computed by prepare)
-	uint32_t m_modified_channels;         // mask of channels that have been modified
-	uint32_t m_prepare_count;             // counter to do periodic prepare sweeps
+	uint32_t m_env_counter;          // envelope counter; low 2 bits are sub-counter
+	uint8_t m_status;                // current status register
+	uint8_t m_clock_prescale;        // prescale factor (2/3/6)
+	uint8_t m_irq_mask;              // mask of which bits signal IRQs
+	uint8_t m_irq_state;             // current IRQ state
+	uint8_t m_timer_running[2];      // current timer running state
+	uint32_t m_active_channels;      // mask of active channels (computed by prepare)
+	uint32_t m_modified_channels;    // mask of channels that have been modified
+	uint32_t m_prepare_count;        // counter to do periodic prepare sweeps
 	RegisterType m_regs;             // register accessor
 	std::unique_ptr<fm_channel<RegisterType>> m_channel[CHANNELS]; // channel pointers
 	std::unique_ptr<fm_operator<RegisterType>> m_operator[OPERATORS]; // operator pointers

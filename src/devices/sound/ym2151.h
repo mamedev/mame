@@ -46,7 +46,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	// internal state
-	fm_interface m_fm_intf;          // core FM engine interface
+	mame_fm_interface m_fm_intf;     // core FM engine interface
 	fm_engine m_fm;                  // core FM engine
 	sound_stream *m_stream;          // sound stream
 	devcb_write8 m_port_w;           // port write handler
