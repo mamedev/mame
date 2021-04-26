@@ -1189,6 +1189,8 @@ if (SOUNDS["YM2151"]~=null) then
 		MAME_DIR .. "src/devices/sound/ym2151.h",
 		MAME_DIR .. "src/devices/sound/ymfm.cpp",
 		MAME_DIR .. "src/devices/sound/ymfm.h",
+		MAME_DIR .. "src/devices/sound/ymfm_opm.cpp",
+		MAME_DIR .. "src/devices/sound/ymfm_opm.h",
 	}
 end
 

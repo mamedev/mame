@@ -10,7 +10,6 @@
 namespace ymfm
 {
 
-
 //*********************************************************
 //  INTERFACE CLASSES
 //*********************************************************
@@ -18,6 +17,12 @@ namespace ymfm
 // forward declarations
 template<class RegisterType> class fm_engine_base;
 
+
+// ======================> fm_engine_callbacks
+
+// this class represents functions in the engine that the fm_interface
+// needs to be able to call; it is represented here as a separate
+// interface that is independent of the actual engine implementation
 class fm_engine_callbacks
 {
 public:
@@ -32,8 +37,14 @@ public:
 };
 
 
+// ======================> fm_interface
+
+// this class represents the interface between the fm_engine and the
+// outside world; it provides hooks for timers, synchronization, and
+// IRQ signaling
 class fm_interface
 {
+	// the engine is our friend
 	template<typename RegisterType> friend class fm_engine_base;
 
 public:
@@ -42,6 +53,10 @@ public:
 
 	// destructor
 	virtual ~fm_interface() { }
+
+	virtual void save()
+	{
+	}
 
 	// save types:
 	//  uint8_t
@@ -62,17 +77,7 @@ public:
 //		LOG(fmt, std::forward<Params>(args)...);
 	}
 
-protected:
-	// the engine calls this to set one of two timers which should fire after
-	// the given number of clocks; when the timer fires, it must call the
-	// m_callbacks->intf_timer_handler() method; a duration_in_clocks that is
-	// negative means to disable the timer
-	virtual void set_timer(uint32_t tnum, int32_t duration_in_clocks) = 0;
-
-	// the engine calls this when the external IRQ state changes; in
-	// response, the interface should perform any IRQ signaling that needs
-	// to happen as a result
-	virtual void update_irq(bool asserted) = 0;
+	// the following functions must be implemented by any derived classes
 
 	// the engine calls this to schedule a synchronized write to the mode
 	// register with the provided data; in response, the interface should
@@ -85,114 +90,34 @@ protected:
 	// stream data and then call the m_callbacks->intf_check_interrupts() method
 	virtual void synchronized_check_interrupts() = 0;
 
-	// internal state
+	// the engine calls this to set one of two timers which should fire after
+	// the given number of clocks; when the timer fires, it must call the
+	// m_callbacks->intf_timer_handler() method; a duration_in_clocks that is
+	// negative means to disable the timer
+	virtual void set_timer(uint32_t tnum, int32_t duration_in_clocks) = 0;
+
+	// the engine calls this to set the time when the busy signal will next
+	// be dropped, which is the current time plus the given number of clocks
+	virtual void set_busy_end(uint32_t clocks) = 0;
+
+	// the engine calls this to query whether the current time is before the
+	// last set end-of-busy time
+	virtual bool is_busy() = 0;
+
+	// the engine calls this when the external IRQ state changes; in
+	// response, the interface should perform any IRQ signaling that needs
+	// to happen as a result
+	virtual void update_irq(bool asserted) { }
+
+	// the engine calls this when a write to an output port is issued; only
+	// the OPM supports this at this time
+	virtual void output_port(uint8_t data) { }
+
+protected:
+	// pointer to engine callbacks -- this is set direclty by the engine at
+	// construction time
 	fm_engine_callbacks *m_callbacks;
 };
-
-}
-
-
-
-// ======================> fm_interface
-
-// this class abstracts out system-dependent behaviors and interfaces
-#ifdef __EMU_H__
-class mame_fm_interface : public ymfm::fm_interface
-{
-public:
-	// construction
-	mame_fm_interface(device_t &device) :
-		m_device(device),
-		m_irq_handler(device)
-	{
-	}
-
-	// startup; this is not called by the engine, but by the owner of the
-	// interface, at device_start time
-	void start()
-	{
-		// allocate our timers
-		for (int tnum = 0; tnum < 2; tnum++)
-			m_timer[tnum] = m_device.machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mame_fm_interface::timer_handler), this));
-
-		// resolve the IRQ handler while we're here
-		m_irq_handler.resolve();
-	}
-
-	// configuration helpers
-	auto irq_handler() { return m_irq_handler.bind(); }
-
-	// set a timer to go off after the given number of clocks; when it fires,
-	// it must call timer_handler on the target object
-	virtual void set_timer(uint32_t tnum, int32_t duration_in_clocks) override
-	{
-		if (duration_in_clocks >= 0)
-			m_timer[tnum]->adjust(attotime::from_ticks(duration_in_clocks, m_device.clock()), tnum);
-		else
-			m_timer[tnum]->enable(false);
-	}
-
-	virtual void update_irq(bool asserted) override
-	{
-		m_irq_handler(asserted ? ASSERT_LINE : CLEAR_LINE);
-	}
-
-	virtual void synchronized_mode_write(uint8_t data) override
-	{
-		m_device.machine().scheduler().synchronize(timer_expired_delegate(FUNC(mame_fm_interface::mode_write), this), data);
-	}
-
-	virtual void synchronized_check_interrupts() override
-	{
-		// if we're currently executing a CPU, schedule the interrupt check;
-		// otherwise, do it directly
-		auto &scheduler = m_device.machine().scheduler();
-		if (scheduler.currently_executing())
-			scheduler.synchronize(timer_expired_delegate(FUNC(mame_fm_interface::check_interrupts), this));
-		else
-			m_callbacks->intf_check_interrupts();
-	}
-
-	template<typename T>
-	void save_item(T &item, char const *name, int index = 0)
-	{
-		m_device.save_item(item, name, index);
-	}
-
-	template<typename... Params>
-	void log(char const *fmt, Params &&... args)
-	{
-//		LOG("%s: ", m_device.tag());
-//		LOG(fmt, std::forward<Params>(args)...);
-	}
-
-private:
-	// timer handler
-	void timer_handler(void *ptr, int param)
-	{
-		m_callbacks->intf_timer_expired(param);
-	}
-
-	void mode_write(void *ptr, int param)
-	{
-		m_callbacks->intf_mode_write(param);
-	}
-
-	void check_interrupts(void *ptr, int param)
-	{
-		m_callbacks->intf_check_interrupts();
-	}
-
-	device_t &m_device;
-	emu_timer *m_timer[2];
-	devcb_write_line m_irq_handler;
-};
-#endif
-
-
-
-namespace ymfm
-{
 
 
 //*********************************************************
@@ -424,1054 +349,6 @@ protected:
 	}
 };
 
-
-// ======================> opm_registers
-
-//
-// OPM register map:
-//
-//      System-wide registers:
-//           01 xxxxxxxx Test register
-//           08 x------- Key on/off operator 4
-//              -x------ Key on/off operator 3
-//              --x----- Key on/off operator 2
-//              ---x---- Key on/off operator 1
-//              -----xxx Channel select
-//           0F x------- NE
-//              ---xxxxx NFRQ
-//           10 xxxxxxxx Timer A value (upper 8 bits)
-//           11 ------xx Timer A value (lower 2 bits)
-//           12 xxxxxxxx Timer B value
-//           14 x------- CSM mode
-//              --x----- Reset timer B
-//              ---x---- Reset timer A
-//              ----x--- Enable timer B
-//              -----x-- Enable timer A
-//              ------x- Load timer B
-//              -------x Load timer A
-//           18 xxxxxxxx LFO frequency
-//           19 xxxxxxxx PM/AM LFO depth
-//           1B xx------ CT
-//              ------xx W
-//
-//     Per-channel registers (channel in address bits 0-2)
-//        20-27 x------- Pan right
-//              -x------ Pan left
-//              --xxx--- Feedback level for operator 1 (0-7)
-//              -----xxx Operator connection algorithm (0-7)
-//        28-2F -xxxxxxx Key code
-//        30-37 xxxxxx-- KF
-//        38-3F -xxx---- PM sensitivity
-//              ------xx AM shift
-//
-//     Per-operator registers (channel in address bits 0-2, operator in bits 3-4)
-//        40-5F -xxx---- Detune value (0-7)
-//              ----xxxx Multiple value (0-15)
-//        60-7F -xxxxxxx Total level (0-127)
-//        80-9F xx------ Key scale rate (0-3)
-//              ---xxxxx Attack rate (0-31)
-//        A0-BF x------- LFO AM enable
-//              ---xxxxx Decay rate (0-31)
-//        C0-DF xx------ Detune 2 value (0-3)
-//              ---xxxxx Sustain rate (0-31)
-//        E0-FF xxxx---- Sustain level (0-15)
-//              ----xxxx Release rate (0-15)
-//
-//     Internal (fake) registers:
-//           19 -xxxxxxx AM depth
-//           1A -xxxxxxx PM depth
-//
-
-class opm_registers : public fm_registers_base
-{
-	// LFO waveforms are 256 entries long
-	static constexpr uint32_t LFO_WAVEFORM_LENGTH = 256;
-
-public:
-	// constants
-	static constexpr uint32_t OUTPUTS = 2;
-	static constexpr uint32_t CHANNELS = 8;
-	static constexpr uint32_t ALL_CHANNELS = (1 << CHANNELS) - 1;
-	static constexpr uint32_t OPERATORS = CHANNELS * 4;
-	static constexpr bool DYNAMIC_OPS = false;
-	static constexpr uint32_t WAVEFORMS = 1;
-	static constexpr uint32_t REGISTERS = 0x100;
-	static constexpr uint32_t REG_MODE = 0x14;
-	static constexpr uint32_t DEFAULT_PRESCALE = 2;
-	static constexpr uint32_t EG_CLOCK_DIVIDER = 3;
-	static constexpr bool EG_HAS_DEPRESS = false;
-	static constexpr bool EG_HAS_SSG = false;
-	static constexpr bool MODULATOR_DELAY = false;
-	static constexpr uint32_t CSM_TRIGGER_MASK = ALL_CHANNELS;
-	static constexpr uint8_t STATUS_TIMERA = 0x01;
-	static constexpr uint8_t STATUS_TIMERB = 0x02;
-	static constexpr uint8_t STATUS_BUSY = 0x80;
-	static constexpr uint8_t STATUS_IRQ = 0;
-
-	// constructor
-	opm_registers();
-
-	// register for save states
-	void save(fm_interface &intf);
-
-	// reset to initial state
-	void reset();
-
-	// map channel number to register offset
-	static constexpr uint32_t channel_offset(uint32_t chnum)
-	{
-		assert(chnum < CHANNELS);
-		return chnum;
-	}
-
-	// map operator number to register offset
-	static constexpr uint32_t operator_offset(uint32_t opnum)
-	{
-		assert(opnum < OPERATORS);
-		return opnum;
-	}
-
-	// return an array of operator indices for each channel
-	struct operator_mapping { uint32_t chan[CHANNELS]; };
-	void operator_map(operator_mapping &dest) const;
-
-	// handle writes to the register array
-	bool write(uint16_t index, uint8_t data, uint32_t &chan, uint32_t &opmask);
-
-	// clock the noise and LFO, if present, returning LFO PM value
-	int32_t clock_noise_and_lfo();
-
-	// reset the LFO
-	void reset_lfo() { m_lfo_counter = 0; }
-
-	// return the AM offset from LFO for the given channel
-	uint32_t lfo_am_offset(uint32_t choffs) const;
-
-	// return the current noise state, gated by the noise clock
-	uint32_t noise_state() const { return m_noise_state; }
-
-	// caching helpers
-	void cache_operator_data(uint32_t choffs, uint32_t opoffs, opdata_cache &cache);
-
-	// compute the phase step, given a PM value
-	uint32_t compute_phase_step(uint32_t choffs, uint32_t opoffs, opdata_cache const &cache, int32_t lfo_raw_pm);
-
-	// log a key-on event
-	std::string log_keyon(uint32_t choffs, uint32_t opoffs);
-
-	// system-wide registers
-	uint32_t test() const                       { return byte(0x01, 0, 8); }
-	uint32_t noise_frequency() const            { return byte(0x0f, 0, 5); }
-	uint32_t noise_enable() const               { return byte(0x0f, 7, 1); }
-	uint32_t timer_a_value() const              { return word(0x10, 0, 8, 0x11, 0, 2); }
-	uint32_t timer_b_value() const              { return byte(0x12, 0, 8); }
-	uint32_t csm() const                        { return byte(0x14, 7, 1); }
-	uint32_t reset_timer_b() const              { return byte(0x14, 5, 1); }
-	uint32_t reset_timer_a() const              { return byte(0x14, 4, 1); }
-	uint32_t enable_timer_b() const             { return byte(0x14, 3, 1); }
-	uint32_t enable_timer_a() const             { return byte(0x14, 2, 1); }
-	uint32_t load_timer_b() const               { return byte(0x14, 1, 1); }
-	uint32_t load_timer_a() const               { return byte(0x14, 0, 1); }
-	uint32_t lfo_rate() const                   { return byte(0x18, 0, 8); }
-	uint32_t lfo_am_depth() const               { return byte(0x19, 0, 7); }
-	uint32_t lfo_pm_depth() const               { return byte(0x1a, 0, 7); }
-	uint32_t lfo_waveform() const               { return byte(0x1b, 0, 2); }
-
-	// per-channel registers
-	uint32_t ch_output_any(uint32_t choffs) const    { return byte(0x20, 6, 2, choffs); }
-	uint32_t ch_output_0(uint32_t choffs) const      { return byte(0x20, 6, 1, choffs); }
-	uint32_t ch_output_1(uint32_t choffs) const      { return byte(0x20, 7, 1, choffs); }
-	uint32_t ch_output_2(uint32_t choffs) const      { return 0; }
-	uint32_t ch_output_3(uint32_t choffs) const      { return 0; }
-	uint32_t ch_feedback(uint32_t choffs) const      { return byte(0x20, 3, 3, choffs); }
-	uint32_t ch_algorithm(uint32_t choffs) const     { return byte(0x20, 0, 3, choffs); }
-	uint32_t ch_block_freq(uint32_t choffs) const    { return word(0x28, 0, 7, 0x30, 2, 6, choffs); }
-	uint32_t ch_lfo_pm_sens(uint32_t choffs) const   { return byte(0x38, 4, 3, choffs); }
-	uint32_t ch_lfo_am_sens(uint32_t choffs) const   { return byte(0x38, 0, 2, choffs); }
-
-	// per-operator registers
-	uint32_t op_detune(uint32_t opoffs) const        { return byte(0x40, 4, 3, opoffs); }
-	uint32_t op_multiple(uint32_t opoffs) const      { return byte(0x40, 0, 4, opoffs); }
-	uint32_t op_total_level(uint32_t opoffs) const   { return byte(0x60, 0, 7, opoffs); }
-	uint32_t op_ksr(uint32_t opoffs) const           { return byte(0x80, 6, 2, opoffs); }
-	uint32_t op_attack_rate(uint32_t opoffs) const   { return byte(0x80, 0, 5, opoffs); }
-	uint32_t op_lfo_am_enable(uint32_t opoffs) const { return byte(0xa0, 7, 1, opoffs); }
-	uint32_t op_decay_rate(uint32_t opoffs) const    { return byte(0xa0, 0, 5, opoffs); }
-	uint32_t op_detune2(uint32_t opoffs) const       { return byte(0xc0, 6, 2, opoffs); }
-	uint32_t op_sustain_rate(uint32_t opoffs) const  { return byte(0xc0, 0, 5, opoffs); }
-	uint32_t op_sustain_level(uint32_t opoffs) const { return byte(0xe0, 4, 4, opoffs); }
-	uint32_t op_release_rate(uint32_t opoffs) const  { return byte(0xe0, 0, 4, opoffs); }
-
-protected:
-	// return a bitfield extracted from a byte
-	uint32_t byte(uint32_t offset, uint32_t start, uint32_t count, uint32_t extra_offset = 0) const
-	{
-		return bitfield(m_regdata[offset + extra_offset], start, count);
-	}
-
-	// return a bitfield extracted from a pair of bytes, MSBs listed first
-	uint32_t word(uint32_t offset1, uint32_t start1, uint32_t count1, uint32_t offset2, uint32_t start2, uint32_t count2, uint32_t extra_offset = 0) const
-	{
-		return (byte(offset1, start1, count1, extra_offset) << count2) | byte(offset2, start2, count2, extra_offset);
-	}
-
-	// internal state
-	uint32_t m_lfo_counter;               // LFO counter
-	uint32_t m_noise_lfsr;                // noise LFSR state
-	uint8_t m_noise_counter;              // noise counter
-	uint8_t m_noise_state;                // latched noise state
-	uint8_t m_noise_lfo;                  // latched LFO noise value
-	uint8_t m_lfo_am;                     // current LFO AM value
-	uint8_t m_regdata[REGISTERS];         // register data
-	int16_t m_lfo_waveform[4][LFO_WAVEFORM_LENGTH]; // LFO waveforms; AM in low 8, PM in upper 8
-	uint16_t m_waveform[WAVEFORMS][WAVEFORM_LENGTH]; // waveforms
-};
-
-
-// ======================> opn_registers_base
-
-//
-// OPN register map:
-//
-//      System-wide registers:
-//           21 xxxxxxxx Test register
-//           22 ----x--- LFO enable [OPNA+ only]
-//              -----xxx LFO rate [OPNA+ only]
-//           24 xxxxxxxx Timer A value (upper 8 bits)
-//           25 ------xx Timer A value (lower 2 bits)
-//           26 xxxxxxxx Timer B value
-//           27 xx------ CSM/Multi-frequency mode for channel #2
-//              --x----- Reset timer B
-//              ---x---- Reset timer A
-//              ----x--- Enable timer B
-//              -----x-- Enable timer A
-//              ------x- Load timer B
-//              -------x Load timer A
-//           28 x------- Key on/off operator 4
-//              -x------ Key on/off operator 3
-//              --x----- Key on/off operator 2
-//              ---x---- Key on/off operator 1
-//              ------xx Channel select
-//
-//     Per-channel registers (channel in address bits 0-1)
-//     Note that all these apply to address+100 as well on OPNA+
-//        A0-A3 xxxxxxxx Frequency number lower 8 bits
-//        A4-A7 --xxx--- Block (0-7)
-//              -----xxx Frequency number upper 3 bits
-//        B0-B3 --xxx--- Feedback level for operator 1 (0-7)
-//              -----xxx Operator connection algorithm (0-7)
-//        B4-B7 x------- Pan left [OPNA]
-//              -x------ Pan right [OPNA]
-//              --xx---- LFO AM shift (0-3) [OPNA+ only]
-//              -----xxx LFO PM depth (0-7) [OPNA+ only]
-//
-//     Per-operator registers (channel in address bits 0-1, operator in bits 2-3)
-//     Note that all these apply to address+100 as well on OPNA+
-//        30-3F -xxx---- Detune value (0-7)
-//              ----xxxx Multiple value (0-15)
-//        40-4F -xxxxxxx Total level (0-127)
-//        50-5F xx------ Key scale rate (0-3)
-//              ---xxxxx Attack rate (0-31)
-//        60-6F x------- LFO AM enable [OPNA]
-//              ---xxxxx Decay rate (0-31)
-//        70-7F ---xxxxx Sustain rate (0-31)
-//        80-8F xxxx---- Sustain level (0-15)
-//              ----xxxx Release rate (0-15)
-//        90-9F ----x--- SSG-EG enable
-//              -----xxx SSG-EG envelope (0-7)
-//
-//     Special multi-frequency registers (channel implicitly #2; operator in address bits 0-1)
-//        A8-AB xxxxxxxx Frequency number lower 8 bits
-//        AC-AF --xxx--- Block (0-7)
-//              -----xxx Frequency number upper 3 bits
-//
-//     Internal (fake) registers:
-//        B8-BB --xxxxxx Latched frequency number upper bits (from A4-A7)
-//        BC-BF --xxxxxx Latched frequency number upper bits (from AC-AF)
-//
-
-template<bool IsOpnA>
-class opn_registers_base : public fm_registers_base
-{
-public:
-	// constants
-	static constexpr uint32_t OUTPUTS = IsOpnA ? 2 : 1;
-	static constexpr uint32_t CHANNELS = IsOpnA ? 6 : 3;
-	static constexpr uint32_t ALL_CHANNELS = (1 << CHANNELS) - 1;
-	static constexpr uint32_t OPERATORS = CHANNELS * 4;
-	static constexpr bool DYNAMIC_OPS = false;
-	static constexpr uint32_t WAVEFORMS = 1;
-	static constexpr uint32_t REGISTERS = IsOpnA ? 0x200 : 0x100;
-	static constexpr uint32_t REG_MODE = 0x27;
-	static constexpr uint32_t DEFAULT_PRESCALE = 6;
-	static constexpr uint32_t EG_CLOCK_DIVIDER = 3;
-	static constexpr bool EG_HAS_DEPRESS = false;
-	static constexpr bool EG_HAS_SSG = true;
-	static constexpr bool MODULATOR_DELAY = false;
-	static constexpr uint32_t CSM_TRIGGER_MASK = 1 << 2;
-	static constexpr uint8_t STATUS_TIMERA = 0x01;
-	static constexpr uint8_t STATUS_TIMERB = 0x02;
-	static constexpr uint8_t STATUS_BUSY = 0x80;
-	static constexpr uint8_t STATUS_IRQ = 0;
-
-	// constructor
-	opn_registers_base();
-
-	// register for save states
-	void save(fm_interface &intf);
-
-	// reset to initial state
-	void reset();
-
-	// map channel number to register offset
-	static constexpr uint32_t channel_offset(uint32_t chnum)
-	{
-		assert(chnum < CHANNELS);
-		if (!IsOpnA)
-			return chnum;
-		else
-			return (chnum % 3) + 0x100 * (chnum / 3);
-	}
-
-	// map operator number to register offset
-	static constexpr uint32_t operator_offset(uint32_t opnum)
-	{
-		assert(opnum < OPERATORS);
-		if (!IsOpnA)
-			return opnum + opnum / 3;
-		else
-			return (opnum % 12) + ((opnum % 12) / 3) + 0x100 * (opnum / 12);
-	}
-
-	// return an array of operator indices for each channel
-	struct operator_mapping { uint32_t chan[CHANNELS]; };
-	void operator_map(operator_mapping &dest) const;
-
-	// handle writes to the register array
-	bool write(uint16_t index, uint8_t data, uint32_t &chan, uint32_t &opmask);
-
-	// clock the noise and LFO, if present, returning LFO PM value
-	int32_t clock_noise_and_lfo();
-
-	// reset the LFO
-	void reset_lfo() { m_lfo_counter = 0; }
-
-	// return the AM offset from LFO for the given channel
-	uint32_t lfo_am_offset(uint32_t choffs) const;
-
-	// return LFO/noise states
-	uint32_t noise_state() const { return 0; }
-
-	// caching helpers
-	void cache_operator_data(uint32_t choffs, uint32_t opoffs, opdata_cache &cache);
-
-	// compute the phase step, given a PM value
-	uint32_t compute_phase_step(uint32_t choffs, uint32_t opoffs, opdata_cache const &cache, int32_t lfo_raw_pm);
-
-	// log a key-on event
-	std::string log_keyon(uint32_t choffs, uint32_t opoffs);
-
-	// system-wide registers
-	uint32_t test() const                       { return byte(0x21, 0, 8); }
-	uint32_t lfo_enable() const                 { return IsOpnA ? byte(0x22, 3, 1) : 0; }
-	uint32_t lfo_rate() const                   { return IsOpnA ? byte(0x22, 0, 3) : 0; }
-	uint32_t timer_a_value() const              { return word(0x24, 0, 8, 0x25, 0, 2); }
-	uint32_t timer_b_value() const              { return byte(0x26, 0, 8); }
-	uint32_t csm() const                        { return (byte(0x27, 6, 2) == 2); }
-	uint32_t multi_freq() const                 { return (byte(0x27, 6, 2) != 0); }
-	uint32_t reset_timer_b() const              { return byte(0x27, 5, 1); }
-	uint32_t reset_timer_a() const              { return byte(0x27, 4, 1); }
-	uint32_t enable_timer_b() const             { return byte(0x27, 3, 1); }
-	uint32_t enable_timer_a() const             { return byte(0x27, 2, 1); }
-	uint32_t load_timer_b() const               { return byte(0x27, 1, 1); }
-	uint32_t load_timer_a() const               { return byte(0x27, 0, 1); }
-	uint32_t multi_block_freq(uint32_t num) const    { return word(0xac, 0, 6, 0xa8, 0, 8, num); }
-
-	// per-channel registers
-	uint32_t ch_block_freq(uint32_t choffs) const    { return word(0xa4, 0, 6, 0xa0, 0, 8, choffs); }
-	uint32_t ch_feedback(uint32_t choffs) const      { return byte(0xb0, 3, 3, choffs); }
-	uint32_t ch_algorithm(uint32_t choffs) const     { return byte(0xb0, 0, 3, choffs); }
-	uint32_t ch_output_any(uint32_t choffs) const    { return IsOpnA ? byte(0xb4, 6, 2, choffs) : 1; }
-	uint32_t ch_output_0(uint32_t choffs) const      { return IsOpnA ? byte(0xb4, 7, 1, choffs) : 1; }
-	uint32_t ch_output_1(uint32_t choffs) const      { return IsOpnA ? byte(0xb4, 6, 1, choffs) : 0; }
-	uint32_t ch_output_2(uint32_t choffs) const      { return 0; }
-	uint32_t ch_output_3(uint32_t choffs) const      { return 0; }
-	uint32_t ch_lfo_am_sens(uint32_t choffs) const   { return IsOpnA ? byte(0xb4, 4, 2, choffs) : 0; }
-	uint32_t ch_lfo_pm_sens(uint32_t choffs) const   { return IsOpnA ? byte(0xb4, 0, 3, choffs) : 0; }
-
-	// per-operator registers
-	uint32_t op_detune(uint32_t opoffs) const        { return byte(0x30, 4, 3, opoffs); }
-	uint32_t op_multiple(uint32_t opoffs) const      { return byte(0x30, 0, 4, opoffs); }
-	uint32_t op_total_level(uint32_t opoffs) const   { return byte(0x40, 0, 7, opoffs); }
-	uint32_t op_ksr(uint32_t opoffs) const           { return byte(0x50, 6, 2, opoffs); }
-	uint32_t op_attack_rate(uint32_t opoffs) const   { return byte(0x50, 0, 5, opoffs); }
-	uint32_t op_decay_rate(uint32_t opoffs) const    { return byte(0x60, 0, 5, opoffs); }
-	uint32_t op_lfo_am_enable(uint32_t opoffs) const { return IsOpnA ? byte(0x60, 7, 1, opoffs) : 0; }
-	uint32_t op_sustain_rate(uint32_t opoffs) const  { return byte(0x70, 0, 5, opoffs); }
-	uint32_t op_sustain_level(uint32_t opoffs) const { return byte(0x80, 4, 4, opoffs); }
-	uint32_t op_release_rate(uint32_t opoffs) const  { return byte(0x80, 0, 4, opoffs); }
-	uint32_t op_ssg_eg_enable(uint32_t opoffs) const { return byte(0x90, 3, 1, opoffs); }
-	uint32_t op_ssg_eg_mode(uint32_t opoffs) const   { return byte(0x90, 0, 3, opoffs); }
-
-protected:
-	// return a bitfield extracted from a byte
-	uint32_t byte(uint32_t offset, uint32_t start, uint32_t count, uint32_t extra_offset = 0) const
-	{
-		return bitfield(m_regdata[offset + extra_offset], start, count);
-	}
-
-	// return a bitfield extracted from a pair of bytes, MSBs listed first
-	uint32_t word(uint32_t offset1, uint32_t start1, uint32_t count1, uint32_t offset2, uint32_t start2, uint32_t count2, uint32_t extra_offset = 0) const
-	{
-		return (byte(offset1, start1, count1, extra_offset) << count2) | byte(offset2, start2, count2, extra_offset);
-	}
-
-	// internal state
-	uint32_t m_lfo_counter;               // LFO counter
-	uint8_t m_lfo_am;                     // current LFO AM value
-	uint8_t m_regdata[REGISTERS];         // register data
-	uint16_t m_waveform[WAVEFORMS][WAVEFORM_LENGTH]; // waveforms
-};
-
-using opn_registers = opn_registers_base<false>;
-using opna_registers = opn_registers_base<true>;
-
-
-// ======================> opl_registers_base
-
-//
-// OPL/OPL2/OPL3/OPL4 register map:
-//
-//      System-wide registers:
-//           01 xxxxxxxx Test register
-//              --x----- Enable OPL compatibility mode [OPL2 only] (1 = enable)
-//           02 xxxxxxxx Timer A value (4 * OPN)
-//           03 xxxxxxxx Timer B value
-//           04 x------- RST
-//              -x------ Mask timer A
-//              --x----- Mask timer B
-//              ------x- Load timer B
-//              -------x Load timer A
-//           08 x------- CSM mode [OPL/OPL2 only]
-//              -x------ Note select
-//           BD x------- AM depth
-//              -x------ PM depth
-//              --x----- Rhythm enable
-//              ---x---- Bass drum key on
-//              ----x--- Snare drum key on
-//              -----x-- Tom key on
-//              ------x- Top cymbal key on
-//              -------x High hat key on
-//          101 --xxxxxx Test register 2 [OPL3 only]
-//          104 --x----- Channel 6 4-operator mode [OPL3 only]
-//              ---x---- Channel 5 4-operator mode [OPL3 only]
-//              ----x--- Channel 4 4-operator mode [OPL3 only]
-//              -----x-- Channel 3 4-operator mode [OPL3 only]
-//              ------x- Channel 2 4-operator mode [OPL3 only]
-//              -------x Channel 1 4-operator mode [OPL3 only]
-//          105 -------x New [OPL3 only]
-//              ------x- New2 [OPL4 only]
-//
-//     Per-channel registers (channel in address bits 0-3)
-//     Note that all these apply to address+100 as well on OPL3+
-//        A0-A8 xxxxxxxx F-number (low 8 bits)
-//        B0-B8 --x----- Key on
-//              ---xxx-- Block (octvate, 0-7)
-//              ------xx F-number (high two bits)
-//        C0-C8 x------- CHD output (to DO0 pin) [OPL3+ only]
-//              -x------ CHC output (to DO0 pin) [OPL3+ only]
-//              --x----- CHB output (mixed right, to DO2 pin) [OPL3+ only]
-//              ---x---- CHA output (mixed left, to DO2 pin) [OPL3+ only]
-//              ----xxx- Feedback level for operator 1 (0-7)
-//              -------x Operator connection algorithm
-//
-//     Per-operator registers (operator in bits 0-5)
-//     Note that all these apply to address+100 as well on OPL3+
-//        20-35 x------- AM enable
-//              -x------ PM enable (VIB)
-//              --x----- EG type
-//              ---x---- Key scale rate
-//              ----xxxx Multiple value (0-15)
-//        40-55 xx------ Key scale level (0-3)
-//              --xxxxxx Total level (0-63)
-//        60-75 xxxx---- Attack rate (0-15)
-//              ----xxxx Decay rate (0-15)
-//        80-95 xxxx---- Sustain level (0-15)
-//              ----xxxx Release rate (0-15)
-//        E0-F5 ------xx Wave select (0-3) [OPL2 only]
-//              -----xxx Wave select (0-7) [OPL3+ only]
-//
-
-template<int Revision>
-class opl_registers_base : public fm_registers_base
-{
-	static constexpr bool IsOpl2 = (Revision == 2);
-	static constexpr bool IsOpl2Plus = (Revision >= 2);
-	static constexpr bool IsOpl3Plus = (Revision >= 3);
-	static constexpr bool IsOpl4Plus = (Revision >= 4);
-
-public:
-	// constants
-	static constexpr uint32_t OUTPUTS = IsOpl3Plus ? 4 : 1;
-	static constexpr uint32_t CHANNELS = IsOpl3Plus ? 18 : 9;
-	static constexpr uint32_t ALL_CHANNELS = (1 << CHANNELS) - 1;
-	static constexpr uint32_t OPERATORS = CHANNELS * 2;
-	static constexpr bool DYNAMIC_OPS = IsOpl3Plus;
-	static constexpr uint32_t WAVEFORMS = IsOpl3Plus ? 8 : (IsOpl2Plus ? 4 : 1);
-	static constexpr uint32_t REGISTERS = IsOpl3Plus ? 0x200 : 0x100;
-	static constexpr uint32_t REG_MODE = 0x04;
-	static constexpr uint32_t DEFAULT_PRESCALE = IsOpl4Plus ? 19 : (IsOpl3Plus ? 8 : 4);
-	static constexpr uint32_t EG_CLOCK_DIVIDER = 1;
-	static constexpr bool EG_HAS_DEPRESS = false;
-	static constexpr bool EG_HAS_SSG = false;
-	static constexpr bool MODULATOR_DELAY = !IsOpl3Plus;
-	static constexpr uint32_t CSM_TRIGGER_MASK = ALL_CHANNELS;
-	static constexpr uint8_t STATUS_TIMERA = 0x40;
-	static constexpr uint8_t STATUS_TIMERB = 0x20;
-	static constexpr uint8_t STATUS_BUSY = 0;
-	static constexpr uint8_t STATUS_IRQ = 0x80;
-
-	// constructor
-	opl_registers_base();
-
-	// register for save states
-	void save(fm_interface &intf);
-
-	// reset to initial state
-	void reset();
-
-	// map channel number to register offset
-	static constexpr uint32_t channel_offset(uint32_t chnum)
-	{
-		assert(chnum < CHANNELS);
-		if (!IsOpl3Plus)
-			return chnum;
-		else
-			return (chnum % 9) + 0x100 * (chnum / 9);
-	}
-
-	// map operator number to register offset
-	static constexpr uint32_t operator_offset(uint32_t opnum)
-	{
-		assert(opnum < OPERATORS);
-		if (!IsOpl3Plus)
-			return opnum + 2 * (opnum / 6);
-		else
-			return (opnum % 18) + 2 * ((opnum % 18) / 6) + 0x100 * (opnum / 18);
-	}
-
-	// return an array of operator indices for each channel
-	struct operator_mapping { uint32_t chan[CHANNELS]; };
-	void operator_map(operator_mapping &dest) const;
-
-	// OPL4 apparently can read back FM registers?
-	uint8_t read(uint16_t index) { return m_regdata[index]; }
-
-	// handle writes to the register array
-	bool write(uint16_t index, uint8_t data, uint32_t &chan, uint32_t &opmask);
-
-	// clock the noise and LFO, if present, returning LFO PM value
-	int32_t clock_noise_and_lfo();
-
-	// reset the LFO
-	void reset_lfo() { m_lfo_am_counter = m_lfo_pm_counter = 0; }
-
-	// return the AM offset from LFO for the given channel
-	// on OPL this is just a fixed value
-	uint32_t lfo_am_offset(uint32_t choffs) const { return m_lfo_am; }
-
-	// return LFO/noise states
-	uint32_t noise_state() const { return m_noise_lfsr >> 23; }
-
-	// caching helpers
-	void cache_operator_data(uint32_t choffs, uint32_t opoffs, opdata_cache &cache);
-
-	// compute the phase step, given a PM value
-	uint32_t compute_phase_step(uint32_t choffs, uint32_t opoffs, opdata_cache const &cache, int32_t lfo_raw_pm);
-
-	// log a key-on event
-	std::string log_keyon(uint32_t choffs, uint32_t opoffs);
-
-	// system-wide registers
-	uint32_t test() const                       { return byte(0x01, 0, 8); }
-	uint32_t waveform_enable() const            { return IsOpl2 ? byte(0x01, 5, 1) : (IsOpl3Plus ? 1 : 0); }
-	uint32_t timer_a_value() const              { return byte(0x02, 0, 8) * 4; } // 8->10 bits
-	uint32_t timer_b_value() const              { return byte(0x03, 0, 8); }
-	uint32_t status_mask() const                { return byte(0x04, 0, 8) & 0x78; }
-	uint32_t irq_reset() const                  { return byte(0x04, 7, 1); }
-	uint32_t reset_timer_b() const              { return byte(0x04, 7, 1) | byte(0x04, 5, 1); }
-	uint32_t reset_timer_a() const              { return byte(0x04, 7, 1) | byte(0x04, 6, 1); }
-	uint32_t enable_timer_b() const             { return 1; }
-	uint32_t enable_timer_a() const             { return 1; }
-	uint32_t load_timer_b() const               { return byte(0x04, 1, 1); }
-	uint32_t load_timer_a() const               { return byte(0x04, 0, 1); }
-	uint32_t csm() const                        { return IsOpl3Plus ? 0 : byte(0x08, 7, 1); }
-	uint32_t note_select() const                { return byte(0x08, 6, 1); }
-	uint32_t lfo_am_depth() const               { return byte(0xbd, 7, 1); }
-	uint32_t lfo_pm_depth() const               { return byte(0xbd, 6, 1); }
-	uint32_t rhythm_enable() const              { return byte(0xbd, 5, 1); }
-	uint32_t rhythm_keyon() const               { return byte(0xbd, 4, 0); }
-	uint32_t newflag() const                    { return IsOpl3Plus ? byte(0x105, 0, 1) : 0; }
-	uint32_t new2flag() const                   { return IsOpl4Plus ? byte(0x105, 1, 1) : 0; }
-	uint32_t fourop_enable() const              { return IsOpl3Plus ? byte(0x104, 0, 6) : 0; }
-
-	// per-channel registers
-	uint32_t ch_block_freq(uint32_t choffs) const    { return word(0xb0, 0, 5, 0xa0, 0, 8, choffs); }
-	uint32_t ch_feedback(uint32_t choffs) const      { return byte(0xc0, 1, 3, choffs); }
-	uint32_t ch_algorithm(uint32_t choffs) const     { return byte(0xc0, 0, 1, choffs) | (IsOpl3Plus ? (8 | (byte(0xc3, 0, 1, choffs) << 1)) : 0); }
-	uint32_t ch_output_any(uint32_t choffs) const    { return newflag() ? byte(0xc0 + choffs, 4, 4) : 1; }
-	uint32_t ch_output_0(uint32_t choffs) const      { return newflag() ? byte(0xc0 + choffs, 4, 1) : 1; }
-	uint32_t ch_output_1(uint32_t choffs) const      { return newflag() ? byte(0xc0 + choffs, 5, 1) : (IsOpl3Plus ? 1 : 0); }
-	uint32_t ch_output_2(uint32_t choffs) const      { return newflag() ? byte(0xc0 + choffs, 6, 1) : 0; }
-	uint32_t ch_output_3(uint32_t choffs) const      { return newflag() ? byte(0xc0 + choffs, 7, 1) : 0; }
-
-	// per-operator registers
-	uint32_t op_lfo_am_enable(uint32_t opoffs) const { return byte(0x20, 7, 1, opoffs); }
-	uint32_t op_lfo_pm_enable(uint32_t opoffs) const { return byte(0x20, 6, 1, opoffs); }
-	uint32_t op_eg_sustain(uint32_t opoffs) const    { return byte(0x20, 5, 1, opoffs); }
-	uint32_t op_ksr(uint32_t opoffs) const           { return byte(0x20, 4, 1, opoffs); }
-	uint32_t op_multiple(uint32_t opoffs) const      { return byte(0x20, 0, 4, opoffs); }
-	uint32_t op_ksl(uint32_t opoffs) const           { uint32_t temp = byte(0x40, 6, 2, opoffs); return bitfield(temp, 1) | (bitfield(temp, 0) << 1); }
-	uint32_t op_total_level(uint32_t opoffs) const   { return byte(0x40, 0, 6, opoffs); }
-	uint32_t op_attack_rate(uint32_t opoffs) const   { return byte(0x60, 4, 4, opoffs); }
-	uint32_t op_decay_rate(uint32_t opoffs) const    { return byte(0x60, 0, 4, opoffs); }
-	uint32_t op_sustain_level(uint32_t opoffs) const { return byte(0x80, 4, 4, opoffs); }
-	uint32_t op_release_rate(uint32_t opoffs) const  { return byte(0x80, 0, 4, opoffs); }
-	uint32_t op_waveform(uint32_t opoffs) const      { return IsOpl2Plus ? byte(0xe0, 0, newflag() ? 3 : 2, opoffs) : 0; }
-
-protected:
-	// return a bitfield extracted from a byte
-	uint32_t byte(uint32_t offset, uint32_t start, uint32_t count, uint32_t extra_offset = 0) const
-	{
-		return bitfield(m_regdata[offset + extra_offset], start, count);
-	}
-
-	// return a bitfield extracted from a pair of bytes, MSBs listed first
-	uint32_t word(uint32_t offset1, uint32_t start1, uint32_t count1, uint32_t offset2, uint32_t start2, uint32_t count2, uint32_t extra_offset = 0) const
-	{
-		return (byte(offset1, start1, count1, extra_offset) << count2) | byte(offset2, start2, count2, extra_offset);
-	}
-
-	// helper to determine if the this channel is an active rhythm channel
-	bool is_rhythm(uint32_t choffs) const
-	{
-		return rhythm_enable() && (choffs >= 6 && choffs <= 8);
-	}
-
-	// internal state
-	uint16_t m_lfo_am_counter;            // LFO AM counter
-	uint16_t m_lfo_pm_counter;            // LFO PM counter
-	uint32_t m_noise_lfsr;                // noise LFSR state
-	uint8_t m_lfo_am;                     // current LFO AM value
-	uint8_t m_regdata[REGISTERS];         // register data
-	uint16_t m_waveform[WAVEFORMS][WAVEFORM_LENGTH]; // waveforms
-};
-
-using opl_registers = opl_registers_base<1>;
-using opl2_registers = opl_registers_base<2>;
-using opl3_registers = opl_registers_base<3>;
-using opl4_registers = opl_registers_base<4>;
-
-
-// ======================> opll_registers
-
-//
-// OPLL register map:
-//
-//      System-wide registers:
-//           0E --x----- Rhythm enable
-//              ---x---- Bass drum key on
-//              ----x--- Snare drum key on
-//              -----x-- Tom key on
-//              ------x- Top cymbal key on
-//              -------x High hat key on
-//           0F xxxxxxxx Test register
-//
-//     Per-channel registers (channel in address bits 0-3)
-//        10-18 xxxxxxxx F-number (low 8 bits)
-//        20-28 --x----- Sustain on
-//              ---x---- Key on
-//              --- xxx- Block (octvate, 0-7)
-//              -------x F-number (high bit)
-//        30-38 xxxx---- Instrument selection
-//              ----xxxx Volume
-//
-//     User instrument registers (for carrier, modulator operators)
-//        00-01 x------- AM enable
-//              -x------ PM enable (VIB)
-//              --x----- EG type
-//              ---x---- Key scale rate
-//              ----xxxx Multiple value (0-15)
-//           02 xx------ Key scale level (carrier, 0-3)
-//              --xxxxxx Total level (modulator, 0-63)
-//           03 xx------ Key scale level (modulator, 0-3)
-//              ---x---- Rectified wave (carrier)
-//              ----x--- Rectified wave (modulator)
-//              -----xxx Feedback level for operator 1 (0-7)
-//        04-05 xxxx---- Attack rate (0-15)
-//              ----xxxx Decay rate (0-15)
-//        06-07 xxxx---- Sustain level (0-15)
-//              ----xxxx Release rate (0-15)
-//
-//     Internal (fake) registers:
-//        40-48 xxxxxxxx Current instrument base address
-//        4E-5F xxxxxxxx Current instrument base address + operator slot (0/1)
-//        70-FF xxxxxxxx Data for instruments (1-16 plus 3 drums)
-//
-
-class opll_registers : public fm_registers_base
-{
-public:
-	static constexpr uint32_t OUTPUTS = 2;
-	static constexpr uint32_t CHANNELS = 9;
-	static constexpr uint32_t ALL_CHANNELS = (1 << CHANNELS) - 1;
-	static constexpr uint32_t OPERATORS = CHANNELS * 2;
-	static constexpr bool DYNAMIC_OPS = false;
-	static constexpr uint32_t WAVEFORMS = 2;
-	static constexpr uint32_t REGISTERS = 0x40;
-	static constexpr uint32_t REG_MODE = 0x3f;
-	static constexpr uint32_t DEFAULT_PRESCALE = 4;
-	static constexpr uint32_t EG_CLOCK_DIVIDER = 1;
-	static constexpr bool EG_HAS_DEPRESS = true;
-	static constexpr bool EG_HAS_SSG = false;
-	static constexpr bool MODULATOR_DELAY = true;
-	static constexpr uint32_t CSM_TRIGGER_MASK = 0;
-	static constexpr uint8_t STATUS_TIMERA = 0;
-	static constexpr uint8_t STATUS_TIMERB = 0;
-	static constexpr uint8_t STATUS_BUSY = 0;
-	static constexpr uint8_t STATUS_IRQ = 0;
-
-	// OPLL-specific constants
-	static constexpr uint32_t INSTDATA_SIZE = 0x90;
-
-	// constructor
-	opll_registers();
-
-	// register for save states
-	void save(fm_interface &intf);
-
-	// reset to initial state
-	void reset();
-
-	// map channel number to register offset
-	static constexpr uint32_t channel_offset(uint32_t chnum)
-	{
-		assert(chnum < CHANNELS);
-		return chnum;
-	}
-
-	// map operator number to register offset
-	static constexpr uint32_t operator_offset(uint32_t opnum)
-	{
-		assert(opnum < OPERATORS);
-		return opnum;
-	}
-
-	// return an array of operator indices for each channel
-	struct operator_mapping { uint32_t chan[CHANNELS]; };
-	void operator_map(operator_mapping &dest) const;
-
-	// handle writes to the register array
-	bool write(uint16_t index, uint8_t data, uint32_t &chan, uint32_t &opmask);
-
-	// clock the noise and LFO, if present, returning LFO PM value
-	int32_t clock_noise_and_lfo();
-
-	// reset the LFO
-	void reset_lfo() { m_lfo_am_counter = m_lfo_pm_counter = 0; }
-
-	// return the AM offset from LFO for the given channel
-	// on OPL this is just a fixed value
-	uint32_t lfo_am_offset(uint32_t choffs) const { return m_lfo_am; }
-
-	// return LFO/noise states
-	uint32_t noise_state() const { return m_noise_lfsr >> 23; }
-
-	// caching helpers
-	void cache_operator_data(uint32_t choffs, uint32_t opoffs, opdata_cache &cache);
-
-	// compute the phase step, given a PM value
-	uint32_t compute_phase_step(uint32_t choffs, uint32_t opoffs, opdata_cache const &cache, int32_t lfo_raw_pm);
-
-	// log a key-on event
-	std::string log_keyon(uint32_t choffs, uint32_t opoffs);
-
-	// set the instrument data
-	void set_instrument_data(uint8_t const *data)
-	{
-		memcpy(&m_instdata[0], data, INSTDATA_SIZE);
-	}
-
-	// system-wide registers
-	uint32_t rhythm_enable() const              { return byte(0x0e, 5, 1); }
-	uint32_t rhythm_keyon() const               { return byte(0x0e, 4, 0); }
-	uint32_t test() const                       { return byte(0x0f, 0, 8); }
-	uint32_t waveform_enable() const            { return 1; }
-	uint32_t timer_a_value() const              { return 0; }
-	uint32_t timer_b_value() const              { return 0; }
-	uint32_t status_mask() const                { return 0; }
-	uint32_t irq_reset() const                  { return 0; }
-	uint32_t reset_timer_b() const              { return 0; }
-	uint32_t reset_timer_a() const              { return 0; }
-	uint32_t enable_timer_b() const             { return 0; }
-	uint32_t enable_timer_a() const             { return 0; }
-	uint32_t load_timer_b() const               { return 0; }
-	uint32_t load_timer_a() const               { return 0; }
-	uint32_t csm() const                        { return 0; }
-
-	// per-channel registers
-	uint32_t ch_block_freq(uint32_t choffs) const    { return word(0x20, 0, 4, 0x10, 0, 8, choffs); }
-	uint32_t ch_sustain(uint32_t choffs) const       { return byte(0x20, 5, 1, choffs); }
-	uint32_t ch_total_level(uint32_t choffs) const   { return instchbyte(0x02, 0, 6, choffs); }
-	uint32_t ch_feedback(uint32_t choffs) const      { return instchbyte(0x03, 0, 3, choffs); }
-	uint32_t ch_algorithm(uint32_t choffs) const     { return 0; }
-	uint32_t ch_instrument(uint32_t choffs) const    { return byte(0x30, 4, 4, choffs); }
-	uint32_t ch_output_any(uint32_t choffs) const    { return 1; }
-	uint32_t ch_output_0(uint32_t choffs) const      { return !is_rhythm(choffs); }
-	uint32_t ch_output_1(uint32_t choffs) const      { return is_rhythm(choffs); }
-	uint32_t ch_output_2(uint32_t choffs) const      { return 0; }
-	uint32_t ch_output_3(uint32_t choffs) const      { return 0; }
-
-	// per-operator registers
-	uint32_t op_lfo_am_enable(uint32_t opoffs) const { return instopbyte(0x00, 7, 1, opoffs); }
-	uint32_t op_lfo_pm_enable(uint32_t opoffs) const { return instopbyte(0x00, 6, 1, opoffs); }
-	uint32_t op_eg_sustain(uint32_t opoffs) const    { return instopbyte(0x00, 5, 1, opoffs); }
-	uint32_t op_ksr(uint32_t opoffs) const           { return instopbyte(0x00, 4, 1, opoffs); }
-	uint32_t op_multiple(uint32_t opoffs) const      { return instopbyte(0x00, 0, 4, opoffs); }
-	uint32_t op_ksl(uint32_t opoffs) const           { return instopbyte(0x02, 6, 2, opoffs); }
-	uint32_t op_waveform(uint32_t opoffs) const      { return instchbyte(0x03, 3 + bitfield(opoffs, 0), 1, opoffs >> 1); }
-	uint32_t op_attack_rate(uint32_t opoffs) const   { return instopbyte(0x04, 4, 4, opoffs); }
-	uint32_t op_decay_rate(uint32_t opoffs) const    { return instopbyte(0x04, 0, 4, opoffs); }
-	uint32_t op_sustain_level(uint32_t opoffs) const { return instopbyte(0x06, 4, 4, opoffs); }
-	uint32_t op_release_rate(uint32_t opoffs) const  { return instopbyte(0x06, 0, 4, opoffs); }
-	uint32_t op_volume(uint32_t opoffs) const        { return byte(0x30, 4 * bitfield(~opoffs, 0), 4, opoffs >> 1); }
-
-private:
-	// return a bitfield extracted from a byte
-	uint32_t byte(uint32_t offset, uint32_t start, uint32_t count, uint32_t extra_offset = 0) const
-	{
-		return bitfield(m_regdata[offset + extra_offset], start, count);
-	}
-
-	// return a bitfield extracted from a pair of bytes, MSBs listed first
-	uint32_t word(uint32_t offset1, uint32_t start1, uint32_t count1, uint32_t offset2, uint32_t start2, uint32_t count2, uint32_t extra_offset = 0) const
-	{
-		return (byte(offset1, start1, count1, extra_offset) << count2) | byte(offset2, start2, count2, extra_offset);
-	}
-
-	// helpers to read from instrument channel/operator data
-	uint32_t instchbyte(uint32_t offset, uint32_t start, uint32_t count, uint32_t choffs) const { return bitfield(m_chinst[choffs][offset], start, count); }
-	uint32_t instopbyte(uint32_t offset, uint32_t start, uint32_t count, uint32_t opoffs) const { return bitfield(m_opinst[opoffs][offset], start, count); }
-
-	// helper to determine if the this channel is an active rhythm channel
-	bool is_rhythm(uint32_t choffs) const
-	{
-		return rhythm_enable() && choffs >= 6;
-	}
-
-	// internal state
-	uint16_t m_lfo_am_counter;            // LFO AM counter
-	uint16_t m_lfo_pm_counter;            // LFO PM counter
-	uint32_t m_noise_lfsr;                // noise LFSR state
-	uint8_t m_lfo_am;                     // current LFO AM value
-	uint8_t const *m_chinst[CHANNELS];    // pointer to instrument data for each channel
-	uint8_t const *m_opinst[OPERATORS];   // pointer to instrument data for each operator
-	uint8_t m_regdata[REGISTERS];         // register data
-	uint8_t m_instdata[INSTDATA_SIZE];    // instrument data
-	uint16_t m_waveform[WAVEFORMS][WAVEFORM_LENGTH]; // waveforms
-};
-
-
-// ======================> opq_registers
-
-//
-// OPQ register map:
-//
-//      System-wide registers:
-//           03 xxxxxxxx Timer control (unknown; 0x71 causes interrupts at ~10ms)
-//           04 ----x--- LFO disable
-//              -----xxx LFO frequency (0=~4Hz, 6=~10Hz, 7=~47Hz)
-//           05 -x------ Key on/off operator 4
-//              --x----- Key on/off operator 3
-//              ---x---- Key on/off operator 2
-//              ----x--- Key on/off operator 1
-//              -----xxx Channel select
-//
-//     Per-channel registers (channel in address bits 0-2)
-//        10-17 x------- Pan right
-//              -x------ Pan left
-//              --xxx--- Feedback level for operator 1 (0-7)
-//              -----xxx Operator connection algorithm (0-7)
-//        18-1F x------- Echo
-//              -xxx---- PM sensitivity
-//              ------xx AM shift
-//        20-27 -xxx---- Block (0-7), Operator 2 & 4
-//              ----xxxx Frequency number upper 4 bits, Operator 2 & 4
-//        28-2F -xxx---- Block (0-7), Operator 1 & 3
-//              ----xxxx Frequency number upper 4 bits, Operator 1 & 3
-//        30-37 xxxxxxxx Frequency number lower 8 bits, Operator 2 & 4
-//        38-3F xxxxxxxx Frequency number lower 8 bits, Operator 1 & 3
-//
-//     Per-operator registers (channel in address bits 0-2, operator in bits 3-4)
-//        40-5F 0-xxxxxx Detune value (0-63)
-//              1---xxxx Multiple value (0-15)
-//        60-7F -xxxxxxx Total level (0-127)
-//        80-9F xxx----- Key scale rate (0-7)
-//              ---xxxxx Attack rate (0-31)
-//        A0-BF x------- LFO AM enable, retrigger disable
-//               x------ Waveform select
-//              ---xxxxx Decay rate (0-31)
-//        C0-DF ---xxxxx Sustain rate (0-31)
-//        E0-FF xxxx---- Sustain level (0-15)
-//              ----xxxx Release rate (0-15)
-//
-// Diffs from OPM:
-//  - 2 frequencies/channel
-//  - KSR is 3 bits?
-//  - retrigger disable
-//  - 2 waveforms
-//  - uses FNUM
-//  - echo behavior
-//  - larger detune range
-//
-// Questions:
-//  - timer information is pretty light
-//  - how does echo work?
-//  -
-
-class opq_registers : public fm_registers_base
-{
-public:
-	// constants
-	static constexpr uint32_t OUTPUTS = 2;
-	static constexpr uint32_t CHANNELS = 8;
-	static constexpr uint32_t ALL_CHANNELS = (1 << CHANNELS) - 1;
-	static constexpr uint32_t OPERATORS = CHANNELS * 4;
-	static constexpr bool DYNAMIC_OPS = false;
-	static constexpr uint32_t WAVEFORMS = 2;
-	static constexpr uint32_t REGISTERS = 0x120;
-	static constexpr uint32_t REG_MODE = 0x03;
-	static constexpr uint32_t DEFAULT_PRESCALE = 2;
-	static constexpr uint32_t EG_CLOCK_DIVIDER = 3;
-	static constexpr bool EG_HAS_DEPRESS = false;
-	static constexpr bool EG_HAS_SSG = false;
-	static constexpr bool MODULATOR_DELAY = false;
-	static constexpr uint32_t CSM_TRIGGER_MASK = ALL_CHANNELS;
-	static constexpr uint8_t STATUS_TIMERA = 0;
-	static constexpr uint8_t STATUS_TIMERB = 0x04;
-	static constexpr uint8_t STATUS_BUSY = 0x80;
-	static constexpr uint8_t STATUS_IRQ = 0;
-
-	// constructor
-	opq_registers();
-
-	// register for save states
-	void save(fm_interface &intf);
-
-	// reset to initial state
-	void reset();
-
-	// map channel number to register offset
-	static constexpr uint32_t channel_offset(uint32_t chnum)
-	{
-		assert(chnum < CHANNELS);
-		return chnum;
-	}
-
-	// map operator number to register offset
-	static constexpr uint32_t operator_offset(uint32_t opnum)
-	{
-		assert(opnum < OPERATORS);
-		return opnum;
-	}
-
-	// return an array of operator indices for each channel
-	struct operator_mapping { uint32_t chan[CHANNELS]; };
-	void operator_map(operator_mapping &dest) const;
-
-	// handle writes to the register array
-	bool write(uint16_t index, uint8_t data, uint32_t &chan, uint32_t &opmask);
-
-	// clock the noise and LFO, if present, returning LFO PM value
-	int32_t clock_noise_and_lfo();
-
-	// reset the LFO
-	void reset_lfo() { m_lfo_counter = 0; }
-
-	// return the AM offset from LFO for the given channel
-	uint32_t lfo_am_offset(uint32_t choffs) const;
-
-	// return the current noise state, gated by the noise clock
-	uint32_t noise_state() const { return 0; }
-
-	// caching helpers
-	void cache_operator_data(uint32_t choffs, uint32_t opoffs, opdata_cache &cache);
-
-	// compute the phase step, given a PM value
-	uint32_t compute_phase_step(uint32_t choffs, uint32_t opoffs, opdata_cache const &cache, int32_t lfo_raw_pm);
-
-	// log a key-on event
-	std::string log_keyon(uint32_t choffs, uint32_t opoffs);
-
-	// system-wide registers
-	uint32_t timer_a_value() const              { return 0; }
-	uint32_t timer_b_value() const              { return byte(0x03, 0, 8); }
-	uint32_t csm() const                        { return 0; }
-	uint32_t reset_timer_b() const              { return byte(0x14, 5, 1); }
-	uint32_t reset_timer_a() const              { return 0; }
-	uint32_t enable_timer_b() const             { return byte(0x14, 3, 1); }
-	uint32_t enable_timer_a() const             { return 0; }
-	uint32_t load_timer_b() const               { return byte(0x14, 1, 1); }
-	uint32_t load_timer_a() const               { return 0; }
-	uint32_t lfo_enable() const                 { return byte(0x04, 4, 1) ^ 1; }
-	uint32_t lfo_rate() const                   { return byte(0x04, 0, 3); }
-
-	// per-channel registers
-	uint32_t ch_output_any(uint32_t choffs) const    { return byte(0x10, 6, 2, choffs); }
-	uint32_t ch_output_0(uint32_t choffs) const      { return byte(0x10, 6, 1, choffs); }
-	uint32_t ch_output_1(uint32_t choffs) const      { return byte(0x10, 7, 1, choffs); }
-	uint32_t ch_output_2(uint32_t choffs) const      { return 0; }
-	uint32_t ch_output_3(uint32_t choffs) const      { return 0; }
-	uint32_t ch_feedback(uint32_t choffs) const      { return byte(0x10, 3, 3, choffs); }
-	uint32_t ch_algorithm(uint32_t choffs) const     { return byte(0x10, 0, 3, choffs); }
-	uint32_t ch_echo(uint32_t choffs) const          { return byte(0x18, 7, 1, choffs); }
-	uint32_t ch_lfo_pm_sens(uint32_t choffs) const   { return byte(0x18, 4, 3, choffs); }
-	uint32_t ch_lfo_am_sens(uint32_t choffs) const   { return byte(0x18, 0, 2, choffs); }
-	uint32_t ch_block_freq_24(uint32_t choffs) const { return word(0x20, 0, 6, 0x30, 0, 8, choffs); }
-	uint32_t ch_block_freq_13(uint32_t choffs) const { return word(0x28, 0, 6, 0x30, 0, 8, choffs); }
-
-	// per-operator registers
-	uint32_t op_detune(uint32_t opoffs) const        { return byte(0x40, 0, 6, opoffs); }
-	uint32_t op_multiple(uint32_t opoffs) const      { return byte(0x100, 0, 4, opoffs); }
-	uint32_t op_total_level(uint32_t opoffs) const   { return byte(0x60, 0, 7, opoffs); }
-	uint32_t op_ksr(uint32_t opoffs) const           { return byte(0x80, 5, 3, opoffs); }
-	uint32_t op_attack_rate(uint32_t opoffs) const   { return byte(0x80, 0, 5, opoffs); }
-	uint32_t op_lfo_am_enable(uint32_t opoffs) const { return byte(0xa0, 7, 1, opoffs); }
-	uint32_t op_waveform(uint32_t opoffs) const      { return byte(0xa0, 6, 1, opoffs); }
-	uint32_t op_decay_rate(uint32_t opoffs) const    { return byte(0xa0, 0, 5, opoffs); }
-	uint32_t op_sustain_rate(uint32_t opoffs) const  { return byte(0xc0, 0, 5, opoffs); }
-	uint32_t op_sustain_level(uint32_t opoffs) const { return byte(0xe0, 4, 4, opoffs); }
-	uint32_t op_release_rate(uint32_t opoffs) const  { return byte(0xe0, 0, 4, opoffs); }
-
-protected:
-	// return a bitfield extracted from a byte
-	uint32_t byte(uint32_t offset, uint32_t start, uint32_t count, uint32_t extra_offset = 0) const
-	{
-		return bitfield(m_regdata[offset + extra_offset], start, count);
-	}
-
-	// return a bitfield extracted from a pair of bytes, MSBs listed first
-	uint32_t word(uint32_t offset1, uint32_t start1, uint32_t count1, uint32_t offset2, uint32_t start2, uint32_t count2, uint32_t extra_offset = 0) const
-	{
-		return (byte(offset1, start1, count1, extra_offset) << count2) | byte(offset2, start2, count2, extra_offset);
-	}
-
-	// internal state
-	uint32_t m_lfo_counter;               // LFO counter
-	uint8_t m_lfo_am;                     // current LFO AM value
-	uint8_t m_regdata[REGISTERS];         // register data
-	uint16_t m_waveform[WAVEFORMS][WAVEFORM_LENGTH]; // waveforms
-};
 
 
 //*********************************************************
@@ -1751,46 +628,121 @@ protected:
 	std::unique_ptr<fm_operator<RegisterType>> m_operator[OPERATORS]; // operator pointers
 };
 
-// ======================> template instantiations
-
-extern template class fm_engine_base<opm_registers>;
-extern template class fm_engine_base<opn_registers>;
-extern template class fm_engine_base<opna_registers>;
-extern template class fm_engine_base<opl_registers>;
-extern template class fm_engine_base<opl2_registers>;
-extern template class fm_engine_base<opl3_registers>;
-
-// pull these out explicitly
-using opm_engine = fm_engine_base<opm_registers>;
-using opn_engine = fm_engine_base<opn_registers>;
-using opna_engine = fm_engine_base<opna_registers>;
-using opl_engine = fm_engine_base<opl_registers>;
-using opl2_engine = fm_engine_base<opl2_registers>;
-using opl3_engine = fm_engine_base<opl3_registers>;
-using opl4_engine = fm_engine_base<opl4_registers>;
-
-
-// ======================> ymopll_engine
-
-// ymopll_engine is a special case because instrument data needs to be
-// provided from an external source
-class opll_engine : public fm_engine_base<opll_registers>
-{
-public:
-	// constructor
-	opll_engine(fm_interface &intf) :
-		fm_engine_base(intf)
-	{
-	}
-
-	// set the instrument data
-	void set_instrument_data(uint8_t const *data)
-	{
-		m_regs.set_instrument_data(data);
-	}
-};
 
 }
+
+
+
+// ======================> mame_fm_interface
+
+// this class abstracts out system-dependent behaviors and interfaces
+#ifndef NOT_MAME
+class mame_fm_interface : public ymfm::fm_interface
+{
+public:
+	// construction
+	mame_fm_interface(device_t &device) :
+		m_device(device),
+		m_update_irq(device),
+		m_output_port(device)
+	{
+	}
+
+	// startup; this is not called by the engine, but by the owner of the
+	// interface, at device_start time
+	void start()
+	{
+		// allocate our timers
+		for (int tnum = 0; tnum < 2; tnum++)
+			m_timer[tnum] = m_device.machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mame_fm_interface::timer_handler), this));
+
+		// resolve the IRQ handler while we're here
+		m_update_irq.resolve();
+		m_output_port.resolve_safe();
+	}
+
+	// configuration helpers
+	auto update_irq_handler() { return m_update_irq.bind(); }
+	auto output_port_handler() { return m_output_port.bind(); }
+
+	virtual void save() override
+	{
+		m_device.save_item(NAME(m_busy_end));
+	}
+
+	virtual void synchronized_mode_write(uint8_t data) override
+	{
+		m_device.machine().scheduler().synchronize(timer_expired_delegate(FUNC(mame_fm_interface::mode_write), this), data);
+	}
+
+	virtual void synchronized_check_interrupts() override
+	{
+		// if we're currently executing a CPU, schedule the interrupt check;
+		// otherwise, do it directly
+		auto &scheduler = m_device.machine().scheduler();
+		if (scheduler.currently_executing())
+			scheduler.synchronize(timer_expired_delegate(FUNC(mame_fm_interface::check_interrupts), this));
+		else
+			m_callbacks->intf_check_interrupts();
+	}
+
+	virtual void set_timer(uint32_t tnum, int32_t duration_in_clocks) override
+	{
+		if (duration_in_clocks >= 0)
+			m_timer[tnum]->adjust(attotime::from_ticks(duration_in_clocks, m_device.clock()), tnum);
+		else
+			m_timer[tnum]->enable(false);
+	}
+
+	virtual void set_busy_end(uint32_t clocks) override
+	{
+		m_busy_end = m_device.machine().time() + attotime::from_ticks(clocks, m_device.clock());
+	}
+
+	virtual bool is_busy() override
+	{
+		return (m_device.machine().time() < m_busy_end);
+	}
+
+	virtual void update_irq(bool asserted) override
+	{
+		if (!m_update_irq.isnull())
+			m_update_irq(asserted ? ASSERT_LINE : CLEAR_LINE);
+	}
+
+	virtual void output_port(uint8_t data) override
+	{
+		if (!m_output_port.isnull())
+			m_output_port(data);
+	}
+
+	template<typename T>
+	void save_item(T &item, char const *name, int index = 0)
+	{
+		m_device.save_item(item, name, index);
+	}
+
+	template<typename... Params>
+	void log(char const *fmt, Params &&... args)
+	{
+//		LOG("%s: ", m_device.tag());
+//		LOG(fmt, std::forward<Params>(args)...);
+	}
+
+private:
+	// timer callbacks
+	void timer_handler(void *ptr, int param) { m_callbacks->intf_timer_expired(param); }
+	void mode_write(void *ptr, int param) { m_callbacks->intf_mode_write(param); }
+	void check_interrupts(void *ptr, int param) { m_callbacks->intf_check_interrupts(); }
+
+	// internal state
+	device_t &m_device;
+	attotime m_busy_end;
+	emu_timer *m_timer[2];
+	devcb_write_line m_update_irq;
+	devcb_write8 m_output_port;
+};
+#endif
 
 
 #endif // MAME_SOUND_YMFM_H
