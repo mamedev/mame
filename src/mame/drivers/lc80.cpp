@@ -149,8 +149,9 @@ void lc80_state::lc80_2_mem(address_map &map)
 
 void lc80_state::lc80e_mem(address_map &map)
 {
+	map.global_mask(0x7fff);
 	map(0x0000, 0x1fff).rom();
-	map(0xc000, 0xcfff).rom();
+	map(0x4000, 0x4fff).rom();
 }
 
 void lc80_state::lc80_io(address_map &map)
@@ -337,7 +338,7 @@ uint8_t lc80_state::pio2_pb_r()
 	return data;
 }
 
-#if 0
+
 /* Z80 Daisy Chain */
 
 static const z80_daisy_config lc80_daisy_chain[] =
@@ -347,7 +348,6 @@ static const z80_daisy_config lc80_daisy_chain[] =
 	{ "pio0" },
 	{ nullptr }
 };
-#endif
 
 
 /* Machine Initialization */
@@ -357,7 +357,8 @@ void lc80_state::machine_start()
 	m_halt_led.resolve();
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	program.install_ram(0x2000, 0x2000 + m_ram->size() - 1, 0x1000, m_ram->pointer());
+	offs_t mirror = program.map()->m_globalmask & 0x5000;
+	program.install_ram(0x2000, 0x2000 + m_ram->size() - 1, mirror, m_ram->pointer());
 
 	/* register for state saving */
 	save_item(NAME(m_digit));
@@ -374,6 +375,7 @@ void lc80_state::lc80(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &lc80_state::lc80_mem);
 	m_maincpu->set_addrmap(AS_IO, &lc80_state::lc80_io);
 	m_maincpu->halt_cb().set(FUNC(lc80_state::halt_w));
+	m_maincpu->set_daisy_config(lc80_daisy_chain);
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1+6, 8);
@@ -404,8 +406,9 @@ void lc80_state::lc80(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
-	RAM(config, m_ram).set_default_size("1K");
-	m_ram->set_extra_options("1K,2K,3K,4K");
+	RAM(config, m_ram).set_extra_options("1K,2K,3K,4K");
+	m_ram->set_default_size("1K");
+	m_ram->set_default_value(0xff);
 }
 
 void lc80_state::lc80a(machine_config &config)
@@ -460,7 +463,7 @@ ROM_START( lc80e )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lc80e-0000-schach.rom", 0x0000, 0x1000, CRC(e3cca61d) SHA1(f2be3f2a9d3780d59657e49b3abeffb0fc13db89) )
 	ROM_LOAD( "lc80e-1000-schach.rom", 0x1000, 0x1000, CRC(b0323160) SHA1(0ea019b0944736ae5b842bf9aa3537300f259b98) )
-	ROM_LOAD( "lc80e-c000-schach.rom", 0xc000, 0x1000, CRC(9c858d9c) SHA1(2f7b3fd046c965185606253f6cd9372da289ca6f) )
+	ROM_LOAD( "lc80e-c000-schach.rom", 0x4000, 0x1000, CRC(9c858d9c) SHA1(2f7b3fd046c965185606253f6cd9372da289ca6f) )
 ROM_END
 
 } // anonymous namespace
