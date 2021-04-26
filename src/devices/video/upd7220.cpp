@@ -18,7 +18,6 @@
         - read data
         - modify data
         - write data
-    - QX-10 diagnostic test misses the zooming factor (external pin);
     - compis2 SAD address for bitmap is 0x20000 for whatever reason (presumably missing banking);
     - A5105 has a FIFO bug with the RDAT, should be a lot larger when it scrolls up.
       Can be fixed with a DRDY mechanism for RDAT/WDAT;
@@ -1723,6 +1722,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 	int y = 0, tsy = 0, bsy = 0;
 	bool mixed = ((m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_MIXED);
 	uint8_t interlace = ((m_mode & UPD7220_MODE_INTERLACE_MASK) == UPD7220_MODE_INTERLACE_ON) ? 0 : 1;
+	uint8_t zoom = m_disp + 1;
 
 	for(int area = 0; area < 4; area++)
 	{
@@ -1743,9 +1743,12 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 				         Xevious (PC-98xx) wants the pitch to be fixed at 80, and wants bsy to be /1
 				         Dragon Buster (PC-98xx) contradicts with Xevious with regards of the pitch tho ... */
 				uint32_t const addr = ((sad << 1) & 0x3ffff) + ((y / (mixed ? 1 : m_lr)) * (m_pitch << (im ? 0 : 1)));
-
-				if (!m_display_cb.isnull())
-					draw_graphics_line(bitmap, addr, y + bsy + m_vbp, wd, (m_pitch << interlace));
+				for(int z = 0; z <= m_disp; ++z)
+				{
+					int yval = (y*zoom)+z + (bsy + m_vbp);
+					if(!m_display_cb.isnull() && yval <= cliprect.bottom())
+						draw_graphics_line(bitmap, addr, yval, wd, (m_pitch << interlace));
+				}
 			}
 		}
 		else
@@ -1755,16 +1758,16 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 				for(y = 0; y < len; y += m_lr)
 				{
 					uint32_t const addr = (sad & 0x3ffff) + ((y / m_lr) * m_pitch);
-
-					if(!m_draw_text_cb.isnull())
-						m_draw_text_cb(bitmap, addr, y + tsy + m_vbp, wd, m_pitch, m_lr, m_dc, m_ead);
+					int yval = y * zoom + (tsy + m_vbp);
+					if (!m_draw_text_cb.isnull() && yval <= cliprect.bottom())
+						m_draw_text_cb(bitmap, addr, yval, wd, m_pitch, m_lr, m_dc, m_ead);
 				}
 			}
 		}
 
 		if (m_lr)
-			tsy += y;
-		bsy += y;
+			tsy += y * zoom;
+		bsy += y * zoom;
 	}
 }
 
