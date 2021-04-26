@@ -1,6 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 
+#ifdef MAME_EMU_SAVE_H
+ALLOW_SAVE_TYPE(ymfm::envelope_state);
+#endif
+
 namespace ymfm
 {
 
@@ -201,23 +205,6 @@ fm_operator<RegisterType>::fm_operator(fm_engine_base<RegisterType> &owner, uint
 
 
 //-------------------------------------------------
-//  save - register for save states
-//-------------------------------------------------
-
-template<class RegisterType>
-void fm_operator<RegisterType>::save(fm_interface &intf, uint32_t index)
-{
-	// save our data
-	intf.save_item(YMFM_NAME(m_phase), index);
-	intf.save_item(YMFM_NAME(m_env_attenuation), index);
-	intf.save_item(YMFM_NAME(m_env_state), index);
-	intf.save_item(YMFM_NAME(m_ssg_inverted), index);
-	intf.save_item(YMFM_NAME(m_key_state), index);
-	intf.save_item(YMFM_NAME(m_keyon_live), index);
-}
-
-
-//-------------------------------------------------
 //  reset - reset the channel state
 //-------------------------------------------------
 
@@ -232,6 +219,41 @@ void fm_operator<RegisterType>::reset()
 	m_key_state = 0;
 	m_keyon_live = 0;
 }
+
+
+//-------------------------------------------------
+//  save_restore - save or restore the data
+//-------------------------------------------------
+
+template<class RegisterType>
+void fm_operator<RegisterType>::save_restore(fm_saved_state &state)
+{
+	state.save_restore(m_phase);
+	state.save_restore(m_env_attenuation);
+	state.save_restore(m_env_state);
+	state.save_restore(m_ssg_inverted);
+	state.save_restore(m_key_state);
+	state.save_restore(m_keyon_live);
+}
+
+
+//-------------------------------------------------
+//  register_save - register for save states
+//  (MAME-specific)
+//-------------------------------------------------
+
+#ifdef MAME_EMU_SAVE_H
+template<class RegisterType>
+void fm_operator<RegisterType>::register_save(device_t &device)
+{
+	device.save_item(YMFM_NAME(m_phase), m_opoffs);
+	device.save_item(YMFM_NAME(m_env_attenuation), m_opoffs);
+	device.save_item(YMFM_NAME(m_env_state), m_opoffs);
+	device.save_item(YMFM_NAME(m_ssg_inverted), m_opoffs);
+	device.save_item(YMFM_NAME(m_key_state), m_opoffs);
+	device.save_item(YMFM_NAME(m_keyon_live), m_opoffs);
+}
+#endif
 
 
 //-------------------------------------------------
@@ -610,19 +632,6 @@ fm_channel<RegisterType>::fm_channel(fm_engine_base<RegisterType> &owner, uint32
 
 
 //-------------------------------------------------
-//  save - register for save states
-//-------------------------------------------------
-
-template<class RegisterType>
-void fm_channel<RegisterType>::save(fm_interface &intf, uint32_t index)
-{
-	// save our data
-	intf.save_item(YMFM_NAME(m_feedback), index);
-	intf.save_item(YMFM_NAME(m_feedback_in), index);
-}
-
-
-//-------------------------------------------------
 //  reset - reset the channel state
 //-------------------------------------------------
 
@@ -633,6 +642,34 @@ void fm_channel<RegisterType>::reset()
 	m_feedback[0] = m_feedback[1] = 0;
 	m_feedback_in = 0;
 }
+
+
+//-------------------------------------------------
+//  save_restore - save or restore the data
+//-------------------------------------------------
+
+template<class RegisterType>
+void fm_channel<RegisterType>::save_restore(fm_saved_state &state)
+{
+	state.save_restore(m_feedback[0]);
+	state.save_restore(m_feedback[1]);
+	state.save_restore(m_feedback_in);
+}
+
+
+//-------------------------------------------------
+//  register_save - register for save states
+//  (MAME-specific)
+//-------------------------------------------------
+
+#ifdef MAME_EMU_SAVE_H
+template<class RegisterType>
+void fm_channel<RegisterType>::register_save(device_t &device)
+{
+	device.save_item(YMFM_NAME(m_feedback), m_choffs);
+	device.save_item(YMFM_NAME(m_feedback_in), m_choffs);
+}
+#endif
 
 
 //-------------------------------------------------
@@ -986,34 +1023,6 @@ fm_engine_base<RegisterType>::fm_engine_base(fm_interface &intf) :
 
 
 //-------------------------------------------------
-//  save - register for save states
-//-------------------------------------------------
-
-template<class RegisterType>
-void fm_engine_base<RegisterType>::save()
-{
-	// save our data
-	m_intf.save_item(YMFM_NAME(m_env_counter));
-	m_intf.save_item(YMFM_NAME(m_status));
-	m_intf.save_item(YMFM_NAME(m_clock_prescale));
-	m_intf.save_item(YMFM_NAME(m_irq_mask));
-	m_intf.save_item(YMFM_NAME(m_irq_state));
-	m_intf.save_item(YMFM_NAME(m_timer_running));
-
-	// save the register/family data
-	m_regs.save(m_intf);
-
-	// save channel data
-	for (int chnum = 0; chnum < CHANNELS; chnum++)
-		m_channel[chnum]->save(m_intf, chnum);
-
-	// save operator data
-	for (int opnum = 0; opnum < OPERATORS; opnum++)
-		m_operator[opnum]->save(m_intf, opnum);
-}
-
-
-//-------------------------------------------------
 //  reset - reset the overall state
 //-------------------------------------------------
 
@@ -1038,6 +1047,66 @@ void fm_engine_base<RegisterType>::reset()
 	for (auto &op : m_operator)
 		op->reset();
 }
+
+
+//-------------------------------------------------
+//  save_restore - save or restore the data
+//-------------------------------------------------
+
+template<class RegisterType>
+void fm_engine_base<RegisterType>::save_restore(fm_saved_state &state)
+{
+	// save our data
+	state.save_restore(m_env_counter);
+	state.save_restore(m_status);
+	state.save_restore(m_clock_prescale);
+	state.save_restore(m_irq_mask);
+	state.save_restore(m_irq_state);
+	state.save_restore(m_timer_running[0]);
+	state.save_restore(m_timer_running[1]);
+
+	// save the register/family data
+	m_regs.save_restore(state);
+
+	// save channel data
+	for (int chnum = 0; chnum < CHANNELS; chnum++)
+		m_channel[chnum]->save_restore(state);
+
+	// save operator data
+	for (int opnum = 0; opnum < OPERATORS; opnum++)
+		m_operator[opnum]->save_restore(state);
+}
+
+
+//-------------------------------------------------
+//  register_save - register for save states
+//  (MAME-specific)
+//-------------------------------------------------
+
+#ifdef MAME_EMU_SAVE_H
+template<class RegisterType>
+void fm_engine_base<RegisterType>::register_save(device_t &device)
+{
+	// save our data
+	device.save_item(YMFM_NAME(m_env_counter));
+	device.save_item(YMFM_NAME(m_status));
+	device.save_item(YMFM_NAME(m_clock_prescale));
+	device.save_item(YMFM_NAME(m_irq_mask));
+	device.save_item(YMFM_NAME(m_irq_state));
+	device.save_item(YMFM_NAME(m_timer_running));
+
+	// save the register/family data
+	m_regs.register_save(device);
+
+	// save channel data
+	for (int chnum = 0; chnum < CHANNELS; chnum++)
+		m_channel[chnum]->register_save(device);
+
+	// save operator data
+	for (int opnum = 0; opnum < OPERATORS; opnum++)
+		m_operator[opnum]->register_save(device);
+}
+#endif
 
 
 //-------------------------------------------------

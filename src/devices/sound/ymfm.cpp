@@ -8,8 +8,6 @@
 #define LOG(...) do { } while (0)
 
 
-ALLOW_SAVE_TYPE(ymfm::envelope_state);
-
 namespace ymfm
 {
 

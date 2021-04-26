@@ -30,15 +30,51 @@ public:
 	auto port_write_handler() { return m_fm_intf.output_port_handler(); }
 
 	// read access, handled by the chip implementation
-	u8 read(offs_t offset) { m_stream->update(); return m_fm.read(offset); }
-	u8 status_r() { m_stream->update(); return m_fm.read_status(); }
+	u8 read(offs_t offset)
+	{
+		m_stream->update();
+		return m_fm.read(offset);
+	}
+	u8 status_r()
+	{
+		m_stream->update();
+		return m_fm.read_status();
+	}
 
 	// write access, handled by the chip implementation
-	void write(offs_t offset, u8 data) { m_stream->update(); m_fm.write(offset, data); }
-	void register_w(u8 data) { m_stream->update(); m_fm.write_address(data); }
-	void data_w(u8 data) { m_stream->update(); m_fm.write_data(data); }
+	void write(offs_t offset, u8 data)
+	{
+		if (m_reset_state == 0)
+			return;
+		m_stream->update();
+		m_fm.write(offset, data);
+	}
+	void register_w(u8 data)
+	{
+		if (m_reset_state == 0)
+			return;
+		m_stream->update();
+		m_fm.write_address(data);
+	}
+	void data_w(u8 data)
+	{
+		if (m_reset_state == 0)
+			return;
+		m_stream->update();
+		m_fm.write_data(data);
+	}
 
-	DECLARE_WRITE_LINE_MEMBER(reset_w) { m_stream->update(); m_fm.set_reset_line(state ? true : false); }
+	// reset line, active LOW
+	DECLARE_WRITE_LINE_MEMBER(reset_w)
+	{
+		if (state != m_reset_state)
+		{
+			m_stream->update();
+			m_reset_state = state;
+			if (state != 0)
+				m_fm.reset();
+		}
+	}
 
 protected:
 	// device-level overrides
@@ -46,11 +82,16 @@ protected:
 	{
 		m_stream = stream_alloc(0, ChipClass::OUTPUTS, m_fm.sample_rate(clock()));
 		m_fm_intf.start();
-		m_fm.save();
+		m_fm.register_save(*this);
 	}
-
-	virtual void device_reset() override { m_fm.reset(); }
-	virtual void device_clock_changed() override { m_stream->set_sample_rate(m_fm.sample_rate(clock())); }
+	virtual void device_reset() override
+	{
+		m_fm.reset();
+	}
+	virtual void device_clock_changed() override
+	{
+		m_stream->set_sample_rate(m_fm.sample_rate(clock()));
+	}
 
 	// sound overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
@@ -67,6 +108,7 @@ protected:
 	// internal state
 	mame_fm_interface m_fm_intf;     // FM interface
 	sound_stream *m_stream;          // sound stream
+	uint8_t m_reset_state;           // reset line state
 	ChipClass m_fm;                  // core FM implementation
 };
 

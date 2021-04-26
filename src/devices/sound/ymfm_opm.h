@@ -101,11 +101,14 @@ public:
 	// constructor
 	opm_registers();
 
-	// register for save states
-	void save(fm_interface &intf);
-
 	// reset to initial state
 	void reset();
+
+	// save/restore
+	void save_restore(fm_saved_state &state);
+#ifdef MAME_EMU_SAVE_H
+	void register_save(device_t &save);
+#endif
 
 	// map channel number to register offset
 	static constexpr uint32_t channel_offset(uint32_t chnum)
@@ -234,15 +237,17 @@ public:
 	// constructor
 	ym2151(fm_interface &intf) : ym2151(intf, VARIANT_YM2151) { }
 
-	// sample rate computer
-	uint32_t sample_rate(uint32_t input_clock) const { return m_fm.sample_rate(input_clock); }
-
-	// startup/reset
-	void save();
+	// reset
 	void reset();
 
-	// reset line
-	void set_reset_line(bool assert);
+	// save/restore
+	void save_restore(fm_saved_state &state);
+#ifdef MAME_EMU_SAVE_H
+	void register_save(device_t &device);
+#endif
+
+	// sample rate computer
+	uint32_t sample_rate(uint32_t input_clock) const { return m_fm.sample_rate(input_clock); }
 
 	// read access
 	uint8_t read_status();
@@ -271,7 +276,6 @@ protected:
 	// internal state
 	opm_variant m_variant;           // chip variant
 	uint8_t m_address;               // address register
-	uint8_t m_reset_state;           // reset state
 	fm_engine m_fm;                  // core FM engine
 };
 

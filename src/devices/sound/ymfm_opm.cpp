@@ -9,7 +9,7 @@ namespace ymfm
 {
 
 //*********************************************************
-//  OPM SPECIFICS
+//  OPM REGISTERS
 //*********************************************************
 
 //-------------------------------------------------
@@ -178,22 +178,6 @@ opm_registers::opm_registers() :
 
 
 //-------------------------------------------------
-//  save - register for save states
-//-------------------------------------------------
-
-void opm_registers::save(fm_interface &intf)
-{
-	intf.save_item(YMFM_NAME(m_lfo_counter));
-	intf.save_item(YMFM_NAME(m_lfo_am));
-	intf.save_item(YMFM_NAME(m_noise_lfsr));
-	intf.save_item(YMFM_NAME(m_noise_counter));
-	intf.save_item(YMFM_NAME(m_noise_state));
-	intf.save_item(YMFM_NAME(m_noise_lfo));
-	intf.save_item(YMFM_NAME(m_regdata));
-}
-
-
-//-------------------------------------------------
 //  reset - reset to initial state
 //-------------------------------------------------
 
@@ -205,6 +189,42 @@ void opm_registers::reset()
 	m_regdata[0x20] = m_regdata[0x21] = m_regdata[0x22] = m_regdata[0x23] = 0xc0;
 	m_regdata[0x24] = m_regdata[0x25] = m_regdata[0x26] = m_regdata[0x27] = 0xc0;
 }
+
+
+//-------------------------------------------------
+//  save_restore - save or restore the data
+//-------------------------------------------------
+
+void opm_registers::save_restore(fm_saved_state &state)
+{
+	state.save_restore(m_lfo_counter);
+	state.save_restore(m_lfo_am);
+	state.save_restore(m_noise_lfsr);
+	state.save_restore(m_noise_counter);
+	state.save_restore(m_noise_state);
+	state.save_restore(m_noise_lfo);
+	for (int index = 0; index < std::size(m_regdata); index++)
+		state.save_restore(m_regdata[index]);
+}
+
+
+//-------------------------------------------------
+//  register_save - register for save states
+//  (MAME-specific)
+//-------------------------------------------------
+
+#ifdef MAME_EMU_SAVE_H
+void opm_registers::register_save(device_t &device)
+{
+	device.save_item(YMFM_NAME(m_lfo_counter));
+	device.save_item(YMFM_NAME(m_lfo_am));
+	device.save_item(YMFM_NAME(m_noise_lfsr));
+	device.save_item(YMFM_NAME(m_noise_counter));
+	device.save_item(YMFM_NAME(m_noise_state));
+	device.save_item(YMFM_NAME(m_noise_lfo));
+	device.save_item(YMFM_NAME(m_regdata));
+}
+#endif
 
 
 //-------------------------------------------------
@@ -496,24 +516,8 @@ std::string opm_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 ym2151::ym2151(fm_interface &intf, opm_variant variant) :
 	m_variant(variant),
 	m_address(0),
-	m_reset_state(1),
 	m_fm(intf)
 {
-}
-
-
-//-------------------------------------------------
-//  save - start of emulation
-//-------------------------------------------------
-
-void ym2151::save()
-{
-	// save our data
-	m_fm.intf().save_item(YMFM_NAME(m_address));
-	m_fm.intf().save_item(YMFM_NAME(m_reset_state));
-
-	// save the interface and the engine
-	m_fm.save();
 }
 
 
@@ -529,16 +533,28 @@ void ym2151::reset()
 
 
 //-------------------------------------------------
-//  set_reset_line - write to the reset line
+//  save_restore - save or restore the data
 //-------------------------------------------------
 
-void ym2151::set_reset_line(bool assert)
+void ym2151::save_restore(fm_saved_state &state)
 {
-	// reset the device upon going low
-	if (!assert && m_reset_state != 0)
-		reset();
-	m_reset_state = assert ? 1 : 0;
+	m_fm.save_restore(state);
+	state.save_restore(m_address);
 }
+
+
+//-------------------------------------------------
+//  register_save - register for save states
+//  (MAME-specific)
+//-------------------------------------------------
+
+#ifdef MAME_EMU_SAVE_H
+void ym2151::register_save(device_t &device)
+{
+	m_fm.register_save(device);
+	device.save_item(YMFM_NAME(m_address));
+}
+#endif
 
 
 //-------------------------------------------------
@@ -582,10 +598,6 @@ uint8_t ym2151::read(uint32_t offset)
 
 void ym2151::write_address(uint8_t data)
 {
-	// ignore writes when the reset is active (low)
-	if (m_reset_state == 0)
-		return;
-
 	// just set the address
 	m_address = data;
 }
@@ -598,10 +610,6 @@ void ym2151::write_address(uint8_t data)
 
 void ym2151::write_data(uint8_t data)
 {
-	// ignore writes when the reset is active (low)
-	if (m_reset_state == 0)
-		return;
-
 	// write the FM register
 	m_fm.write(m_address, data);
 

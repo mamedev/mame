@@ -11,11 +11,86 @@ namespace ymfm
 {
 
 //*********************************************************
+//  GLOBAL ENUMERATORS
+//*********************************************************
+
+enum envelope_state : uint32_t
+{
+	EG_DEPRESS = 0,
+	EG_ATTACK = 1,
+	EG_DECAY = 2,
+	EG_SUSTAIN = 3,
+	EG_RELEASE = 4,
+	EG_STATES = 5
+};
+
+
+//*********************************************************
 //  INTERFACE CLASSES
 //*********************************************************
 
 // forward declarations
 template<class RegisterType> class fm_engine_base;
+
+
+// ======================> fm_serialize_buffer
+
+// this class contains a managed vector of bytes that is used to
+// save and restore state
+class fm_saved_state
+{
+public:
+	// construction
+	fm_saved_state(bool saving) :
+		m_offset(saving ? -1 : 0)
+	{
+	}
+
+	// are we saving or restoring?
+	bool saving() const { return (m_offset < 0); }
+
+	// retrieve the buffer
+	std::vector<uint8_t> &buffer() { return m_buffer; }
+
+	// generic save/restore
+	template<typename DataType>
+	void save_restore(DataType &data)
+	{
+		if (saving())
+			save(data);
+		else
+			restore(data);
+	}
+
+public:
+	// save data to the buffer
+	void save(bool &data) { append(data ? 1 : 0); }
+	void save(int8_t &data) { append(data); }
+	void save(uint8_t &data) { append(data); }
+	void save(int16_t &data) { append(data).append(data >> 8); }
+	void save(uint16_t &data) { append(data).append(data >> 8); }
+	void save(int32_t &data) { append(data).append(data >> 8).append(data >> 16).append(data >> 24); }
+	void save(uint32_t &data) { append(data).append(data >> 8).append(data >> 16).append(data >> 24); }
+	void save(envelope_state &data) { append(uint8_t(data)); }
+
+	// restore data from the buffer
+	void restore(bool &data) { data = read() ? true : false; }
+	void restore(int8_t &data) { data = read(); }
+	void restore(uint8_t &data) { data = read(); }
+	void restore(int16_t &data) { data = read(); data |= read() << 8; }
+	void restore(uint16_t &data) { data = read(); data |= read() << 8; }
+	void restore(int32_t &data) { data = read(); data |= read() << 8; data |= read() << 16; data |= read() << 24; }
+	void restore(uint32_t &data) { data = read(); data |= read() << 8; data |= read() << 16; data |= read() << 24; }
+	void restore(envelope_state &data) { data = envelope_state(read()); }
+
+	// internal helper
+	fm_saved_state &append(uint8_t data) { m_buffer.push_back(data); return *this; }
+	uint8_t read() { return (m_offset < m_buffer.size()) ? m_buffer[m_offset++] : 0; }
+
+	// internal state
+	std::vector<uint8_t> m_buffer;
+	int32_t m_offset;
+};
 
 
 // ======================> fm_engine_callbacks
@@ -53,22 +128,6 @@ public:
 
 	// destructor
 	virtual ~fm_interface() { }
-
-	virtual void save()
-	{
-	}
-
-	// save types:
-	//  uint8_t
-	//  uint8_t[]
-	//  uint32_t
-	//  unique_ptr<fm_operator>[]
-	//  unique_ptr<fm_channel>[]
-
-	template<typename T>
-	void save_item(T &item, char const *name, int index = 0)
-	{
-	}
 
 	template<typename... Params>
 	void log(char const *fmt, Params &&... args)
@@ -129,21 +188,6 @@ protected:
 // for chips which derive from AY-8910 classes and may have clashing
 // names)
 #define YMFM_NAME(x) x, "ymfm." #x
-
-
-//*********************************************************
-//  GLOBAL ENUMERATORS
-//*********************************************************
-
-enum envelope_state : uint32_t
-{
-	EG_DEPRESS = 0,
-	EG_ATTACK = 1,
-	EG_DECAY = 2,
-	EG_SUSTAIN = 3,
-	EG_RELEASE = 4,
-	EG_STATES = 5
-};
 
 
 //*********************************************************
@@ -378,8 +422,11 @@ public:
 	// constructor
 	fm_operator(fm_engine_base<RegisterType> &owner, uint32_t opoffs);
 
-	// register for save states
-	void save(fm_interface &intf, uint32_t index);
+	// save/restore
+	void save_restore(fm_saved_state &state);
+#ifdef MAME_EMU_SAVE_H
+	void register_save(device_t &device);
+#endif
 
 	// reset the operator state
 	void reset();
@@ -454,8 +501,11 @@ public:
 	// constructor
 	fm_channel(fm_engine_base<RegisterType> &owner, uint32_t choffs);
 
-	// register for save states
-	void save(fm_interface &intf, uint32_t index);
+	// save/restore
+	void save_restore(fm_saved_state &state);
+#ifdef MAME_EMU_SAVE_H
+	void register_save(device_t &device);
+#endif
 
 	// reset the channel state
 	void reset();
@@ -549,8 +599,11 @@ public:
 	// constructor
 	fm_engine_base(fm_interface &intf);
 
-	// register for save states
-	void save();
+	// save/restore
+	void save_restore(fm_saved_state &state);
+#ifdef MAME_EMU_SAVE_H
+	void register_save(device_t &device);
+#endif
 
 	// reset the overall state
 	void reset();
@@ -664,11 +717,6 @@ public:
 	// configuration helpers
 	auto update_irq_handler() { return m_update_irq.bind(); }
 	auto output_port_handler() { return m_output_port.bind(); }
-
-	virtual void save() override
-	{
-		m_device.save_item(NAME(m_busy_end));
-	}
 
 	virtual void synchronized_mode_write(uint8_t data) override
 	{
