@@ -21,10 +21,11 @@ DEFINE_DEVICE_TYPE(YM2414, ym2414_device, "ym2414", "YM2414 OPZ")
 ym2151_device::ym2151_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
-	m_fm(*this),
+	m_fm_intf(*this),
+	m_fm(m_fm_intf),
 	m_stream(nullptr),
 	m_port_w(*this),
-	m_busy_duration(m_fm.compute_busy_duration()),
+	m_busy_duration(attotime::from_ticks(32 * m_fm.clock_prescale(), device_t::clock())),
 	m_address(0),
 	m_reset_state(1)
 {
@@ -46,6 +47,8 @@ u8 ym2151_device::read(offs_t offset)
 
 		case 1: // status port, YM2203 compatible
 			result = m_fm.status();
+			if (machine().time() < m_busy_end)
+				result |= fm_engine::STATUS_BUSY;
 			break;
 	}
 	return result;
@@ -90,7 +93,7 @@ void ym2151_device::write(offs_t offset, u8 value)
 			}
 
 			// mark busy for a bit
-			m_fm.set_busy_end(machine().time() + m_busy_duration);
+			m_busy_end = machine().time() + m_busy_duration;
 			break;
 	}
 }
@@ -124,12 +127,16 @@ void ym2151_device::device_start()
 	// call this for the variants that need to adjust the rate
 	device_clock_changed();
 
+	// start the engine up
+	m_fm_intf.start(m_fm);
+
 	// save our data
 	save_item(YMFM_NAME(m_address));
 	save_item(YMFM_NAME(m_reset_state));
+	save_item(YMFM_NAME(m_busy_end));
 
 	// save the engines
-	m_fm.save(*this);
+	m_fm.save();
 }
 
 
@@ -151,7 +158,7 @@ void ym2151_device::device_reset()
 void ym2151_device::device_clock_changed()
 {
 	m_stream->set_sample_rate(m_fm.sample_rate(clock()));
-	m_busy_duration = m_fm.compute_busy_duration();
+	m_busy_duration = attotime::from_ticks(32 * m_fm.clock_prescale(), clock());
 }
 
 
@@ -174,7 +181,7 @@ void ym2151_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		// convert to 10.3 floating point value for the DAC and back
 		// YM2151 is stereo
 		for (int index = 0; index < fm_engine::OUTPUTS; index++)
-			outputs[index].put_int(sampindex, ymfm_roundtrip_fp(sums[index]), 32768);
+			outputs[index].put_int(sampindex, ymfm::roundtrip_fp(sums[index]), 32768);
 	}
 }
 
@@ -223,7 +230,7 @@ void ym2164_device::write(offs_t offset, u8 value)
 				m_port_w(0, value >> 6, 0xff);
 
 			// mark busy for a bit
-			m_fm.set_busy_end(machine().time() + m_busy_duration);
+			m_busy_end = machine().time() + m_busy_duration;
 			break;
 	}
 }
