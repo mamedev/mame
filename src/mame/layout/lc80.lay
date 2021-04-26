@@ -34,7 +34,7 @@ license:CC0
 		</element>
 
 		<!-- HALT led -->
-		<element name="led1" ref="red_led">
+		<element name="halt" ref="red_led">
 			<bounds x="0" y="15" width="5" height="5" />
 		</element>
 

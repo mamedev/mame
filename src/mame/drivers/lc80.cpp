@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
+// copyright-holders:Curt Coder, hap
 /***************************************************************************
 
 LC-80 by VEB Mikroelektronik "Karl Marx" Erfurt
@@ -40,7 +40,6 @@ SC-80 starts at ADR C8000.
 
 
 TODO:
-- HALT led
 - KSD11 switch
 - CTC clock inputs
 - Most characters are lost when pasting (lc80, lc80e).
@@ -78,7 +77,7 @@ public:
 		m_cassette(*this, "cassette"),
 		m_speaker(*this, "speaker"),
 		m_inputs(*this, "Y%u", 0U),
-		m_out_led(*this, "led0")
+		m_halt_led(*this, "halt")
 	{ }
 
 	void lc80(machine_config &config);
@@ -93,7 +92,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device_array<z80pio_device, 2> m_pio;
 	required_device<z80ctc_device> m_ctc;
@@ -101,7 +100,7 @@ private:
 	required_device<cassette_image_device> m_cassette;
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<4> m_inputs;
-	output_finder<> m_out_led;
+	output_finder<> m_halt_led;
 
 	void lc80_mem(address_map &map);
 	void lc80a_mem(address_map &map);
@@ -109,9 +108,10 @@ private:
 	void lc80_2_mem(address_map &map);
 	void lc80_io(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
+	DECLARE_WRITE_LINE_MEMBER(halt_w) { m_halt_led = state; }
+	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
+	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
 	void pio1_pa_w(uint8_t data);
 	uint8_t pio1_pb_r();
 	void pio1_pb_w(uint8_t data);
@@ -214,15 +214,15 @@ INPUT_PORTS_END
 
 /* Z80-CTC Interface */
 
-WRITE_LINE_MEMBER( lc80_state::ctc_z0_w )
+WRITE_LINE_MEMBER(lc80_state::ctc_z0_w)
 {
 }
 
-WRITE_LINE_MEMBER( lc80_state::ctc_z1_w )
+WRITE_LINE_MEMBER(lc80_state::ctc_z1_w)
 {
 }
 
-WRITE_LINE_MEMBER( lc80_state::ctc_z2_w )
+WRITE_LINE_MEMBER(lc80_state::ctc_z2_w)
 {
 }
 
@@ -353,7 +353,7 @@ static const z80_daisy_config lc80_daisy_chain[] =
 
 void lc80_state::machine_start()
 {
-	m_out_led.resolve();
+	m_halt_led.resolve();
 
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.install_ram(0x2000, 0x2000 + m_ram->size() - 1, 0x1000, m_ram->pointer());
@@ -372,6 +372,7 @@ void lc80_state::lc80(machine_config &config)
 	Z80(config, m_maincpu, 900000); /* UD880D */
 	m_maincpu->set_addrmap(AS_PROGRAM, &lc80_state::lc80_mem);
 	m_maincpu->set_addrmap(AS_IO, &lc80_state::lc80_io);
+	m_maincpu->halt_cb().set(FUNC(lc80_state::halt_w));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(1+6, 8);
