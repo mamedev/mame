@@ -19601,6 +19601,7 @@ lbpc                            // Ampro Little Board/PC
 
 @source:lc80.cpp
 lc80                            //
+lc80a                           //
 lc80e                           //
 lc80_2                          //
 

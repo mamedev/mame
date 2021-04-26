@@ -431,7 +431,7 @@ void lc80_state::lc80(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
-	RAM(config, RAM_TAG).set_default_size("1K").set_extra_options("2K,3K,4K");
+	RAM(config, m_ram).set_default_size("1K").set_extra_options("2K,3K,4K");
 }
 
 void lc80_state::lc80_2(machine_config &config)
@@ -469,7 +469,7 @@ void lc80_state::lc80_2(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("4K");
+	RAM(config, m_ram).set_default_size("4K");
 }
 
 #if 0
@@ -487,11 +487,13 @@ void lc80_state::lc80e(machine_config &config)
 
 ROM_START( lc80 )
 	ROM_REGION( 0x10000, Z80_TAG, 0 )
-	ROM_SYSTEM_BIOS( 0, "u505", "LC 80 (2x U505)" )
-	ROMX_LOAD( "lc80.d202", 0x0000, 0x0400, CRC(e754ef53) SHA1(044440b13e62addbc3f6a77369cfd16f99b39752), ROM_BIOS(0) )
-	ROMX_LOAD( "lc80.d203", 0x0800, 0x0400, CRC(2b544da1) SHA1(3a6cbd0c57c38eadb7055dca4b396c348567d1d5), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "2716", "LC 80 (2716)" )
-	ROMX_LOAD( "lc80_2716.bin", 0x0000, 0x0800, CRC(b3025934) SHA1(6fff953f0f1eee829fd774366313ab7e8053468c), ROM_BIOS(1))
+	ROM_LOAD( "lc80.d202", 0x0000, 0x0400, CRC(e754ef53) SHA1(044440b13e62addbc3f6a77369cfd16f99b39752) ) // U505
+	ROM_LOAD( "lc80.d203", 0x0800, 0x0400, CRC(2b544da1) SHA1(3a6cbd0c57c38eadb7055dca4b396c348567d1d5) ) // "
+ROM_END
+
+ROM_START( lc80a )
+	ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_LOAD( "lc80_2716.bin", 0x0000, 0x0800, CRC(b3025934) SHA1(6fff953f0f1eee829fd774366313ab7e8053468c) ) // 2716
 ROM_END
 
 ROM_START( lc80_2 )
@@ -512,6 +514,7 @@ ROM_END
 /* System Drivers */
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1984, lc80,   0,      0,      lc80,    lc80,  lc80_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Lerncomputer LC 80", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, lc80,   0,      0,      lc80,    lc80,  lc80_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Lerncomputer LC 80 (set 1)", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, lc80a,  lc80,   0,      lc80,    lc80,  lc80_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Lerncomputer LC 80 (set 2)", MACHINE_SUPPORTS_SAVE )
 COMP( 1984, lc80e,  lc80,   0,      lc80_2,  lc80,  lc80_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Lerncomputer LC 80 (export)", MACHINE_SUPPORTS_SAVE )
 COMP( 1991, lc80_2, lc80,   0,      lc80_2,  lc80,  lc80_state, empty_init, "hack (Eckart Buschendorf)", "Lerncomputer LC 80.2", MACHINE_SUPPORTS_SAVE )
