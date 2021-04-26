@@ -452,6 +452,7 @@
        to make Cal Omega - Game 7.9 (Arcade Poker) playable.
     - Fixed inputs on Cal Omega - Game 7.6 (Arcade Poker). Now it's playable.
     - Created proper inputs from the scratch for Cal Omega - Game 12.5 (Bingo), and promoted to WORKING.
+    - Added hopper to the 906-III games.
     - Fixed docs / technical notes.
 
 
