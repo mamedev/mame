@@ -58,6 +58,7 @@ TODO:
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
 #include "sound/spkrdev.h"
+#include "video/pwm.h"
 
 #include "speaker.h"
 
@@ -75,10 +76,10 @@ public:
 		m_ram(*this, "ram"),
 		m_pio(*this, "pio%u", 0),
 		m_ctc(*this, "ctc"),
+		m_display(*this, "display"),
 		m_cassette(*this, "cassette"),
 		m_speaker(*this, "speaker"),
 		m_inputs(*this, "Y%u", 0U),
-		m_digits(*this, "digit%u", 0U),
 		m_out_led(*this, "led0")
 	{ }
 
@@ -96,10 +97,10 @@ private:
 	required_device<ram_device> m_ram;
 	required_device_array<z80pio_device, 2> m_pio;
 	required_device<z80ctc_device> m_ctc;
+	required_device<pwm_display_device> m_display;
 	required_device<cassette_image_device> m_cassette;
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<4> m_inputs;
-	output_finder<6> m_digits;
 	output_finder<> m_out_led;
 
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
@@ -220,11 +221,7 @@ WRITE_LINE_MEMBER( lc80_state::ctc_z2_w )
 
 void lc80_state::update_display()
 {
-	for (int i = 0; i < 6; i++)
-	{
-		if (!BIT(m_digit, i))
-			m_digits[5 - i] = m_segment;
-	}
+	m_display->matrix(m_digit, m_segment);
 }
 
 void lc80_state::pio1_pa_w(uint8_t data)
@@ -245,7 +242,6 @@ void lc80_state::pio1_pa_w(uint8_t data)
 	*/
 
 	m_segment = bitswap<8>(~data, 4, 3, 1, 6, 7, 5, 0, 2);
-
 	update_display();
 }
 
@@ -295,10 +291,8 @@ void lc80_state::pio1_pb_w(uint8_t data)
 	/* OUT led */
 	m_out_led = !BIT(data, 1);
 
-	/* keyboard */
-	m_digit = data >> 2;
-
-	/* display */
+	/* 7seg digits/keyboard */
+	m_digit = ~data >> 2;
 	update_display();
 }
 
@@ -323,7 +317,7 @@ uint8_t lc80_state::pio2_pb_r()
 
 	for (int i = 0; i < 6; i++)
 	{
-		if (!BIT(m_digit, i))
+		if (BIT(m_digit, i))
 		{
 			if (!BIT(m_inputs[0]->read(), i)) data &= ~0x10;
 			if (!BIT(m_inputs[1]->read(), i)) data &= ~0x20;
@@ -398,7 +392,6 @@ void lc80_state::machine_start()
 		break;
 	}
 
-	m_digits.resolve();
 	m_out_led.resolve();
 
 	/* register for state saving */
@@ -417,6 +410,8 @@ void lc80_state::lc80(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &lc80_state::lc80_io);
 
 	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(6, 8);
+	m_display->set_segmask(0x3f, 0xff);
 	config.set_default_layout(layout_lc80);
 
 	/* sound hardware */
@@ -454,6 +449,8 @@ void lc80_state::lc80_2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &lc80_state::lc80_io);
 
 	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(6, 8);
+	m_display->set_segmask(0x3f, 0xff);
 	config.set_default_layout(layout_lc80);
 
 	/* sound hardware */
