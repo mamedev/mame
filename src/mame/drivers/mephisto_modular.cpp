@@ -162,7 +162,6 @@ void mmodular_state::machine_start()
 
 void mmodular_state::machine_reset()
 {
-	m_bav_data = 0;
 	set_sbtype(m_fake.read_safe(0) & 1);
 }
 
@@ -176,6 +175,7 @@ void mmodular_state::machine_reset()
 
 void mmodular_state::set_sbtype(ioport_value newval)
 {
+	m_bav_data = 0;
 	m_board->get()->set_type(newval ? sensorboard_device::INDUCTIVE : sensorboard_device::MAGNETS);
 
 	if (machine().phase() == machine_phase::RUNNING)

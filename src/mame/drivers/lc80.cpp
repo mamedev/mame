@@ -2,49 +2,112 @@
 // copyright-holders:Curt Coder
 /***************************************************************************
 
-    LC-80
+LC-80 by VEB Mikroelektronik "Karl Marx" Erfurt
 
-    12/05/2009 Skeleton driver.
+12/05/2009 Skeleton driver.
 
-    When first started, the screen is blank. Wait about 8 seconds for
-    it to introduce itself, then you may use it or paste to it.
-    The decimal points indicate which side of the display you will
-    be updating.
+When first started, the screen is blank. Wait about 8 seconds for
+it to introduce itself, then you may use it or paste to it.
+The decimal points indicate which side of the display you will
+be updating.
 
-    Pasting:
-        0-F : as is
-        + (inc) : ^
-        - (dec) : V
-        ADR : -
-        DAT : =
-        GO : X
+Pasting:
+    0-F : as is
+    + (inc) : ^
+    - (dec) : V
+    ADR : -
+    DAT : =
+    GO : X
 
-    Test Paste: (lc80_2 only)
-        -2000=11^22^33^44^55^66^77^88^99^-2000
-        Now press up-arrow to confirm the data has been entered.
+Test Paste: (lc80_2 only)
+    -2000=11^22^33^44^55^66^77^88^99^-2000
+    Now press up-arrow to confirm the data has been entered.
 
 
-    ToDo:
-    - Most characters are lost when pasting (lc80, lc80e).
+TODO:
+- HALT led
+- KSD11 switch
+- banking for ROM 4-5
+- lc80e
+- CTC clock inputs
+- Most characters are lost when pasting (lc80, lc80e).
 
 ****************************************************************************/
 
-/*
-
-    TODO:
-
-    - HALT led
-    - KSD11 switch
-    - banking for ROM 4-5
-    - lc80e
-    - CTC clock inputs
-
-*/
-
 #include "emu.h"
-#include "includes/lc80.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/z80daisy.h"
+#include "imagedev/cassette.h"
+#include "machine/ram.h"
+#include "machine/z80pio.h"
+#include "machine/z80ctc.h"
+#include "sound/spkrdev.h"
+
 #include "speaker.h"
+
 #include "lc80.lh"
+
+namespace {
+
+#define Z80_TAG         "d201"
+#define Z80CTC_TAG      "d208"
+#define Z80PIO1_TAG     "d206"
+#define Z80PIO2_TAG     "d207"
+//#define SPEAKER_TAG       "b237"
+
+class lc80_state : public driver_device
+{
+public:
+	lc80_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, Z80_TAG),
+		m_pio2(*this, Z80PIO2_TAG),
+		m_cassette(*this, "cassette"),
+		m_speaker(*this, "speaker"),
+		m_ram(*this, RAM_TAG),
+		m_y(*this, "Y%u", 0U),
+		m_digits(*this, "digit%u", 0U),
+		m_out_led(*this, "led0")
+	{ }
+
+	void lc80_2(machine_config &config);
+	void lc80(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<z80pio_device> m_pio2;
+	required_device<cassette_image_device> m_cassette;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<ram_device> m_ram;
+	required_ioport_array<4> m_y;
+	output_finder<6> m_digits;
+	output_finder<> m_out_led;
+
+	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
+	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
+	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
+	void pio1_pa_w(uint8_t data);
+	uint8_t pio1_pb_r();
+	void pio1_pb_w(uint8_t data);
+	uint8_t pio2_pb_r();
+
+	void update_display();
+
+	// display state
+	uint8_t m_digit;
+	uint8_t m_segment;
+	void lc80_io(address_map &map);
+	void lc80_mem(address_map &map);
+	//void lc80e_mem(address_map &map);
+};
+
 
 /* Memory Maps */
 
@@ -73,6 +136,7 @@ void lc80_state::lc80_io(address_map &map)
 	map(0x18, 0x1b).rw(m_pio2, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x0c, 0x0f).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
+
 
 /* Input Ports */
 
@@ -124,6 +188,7 @@ static INPUT_PORTS_START( lc80 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("NMI") PORT_CODE(KEYCODE_ESC) PORT_CHANGED_MEMBER(DEVICE_SELF, lc80_state, trigger_nmi, 0)
 INPUT_PORTS_END
 
+
 /* Z80-CTC Interface */
 
 WRITE_LINE_MEMBER( lc80_state::ctc_z0_w )
@@ -137,6 +202,7 @@ WRITE_LINE_MEMBER( lc80_state::ctc_z1_w )
 WRITE_LINE_MEMBER( lc80_state::ctc_z2_w )
 {
 }
+
 
 /* Z80-PIO Interface */
 
@@ -242,9 +308,8 @@ uint8_t lc80_state::pio2_pb_r()
 	*/
 
 	uint8_t data = 0xf0;
-	int i;
 
-	for (i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 	{
 		if (!BIT(m_digit, i))
 		{
@@ -269,6 +334,7 @@ static const z80_daisy_config lc80_daisy_chain[] =
 	{ nullptr }
 };
 #endif
+
 
 /* Machine Initialization */
 
@@ -327,6 +393,7 @@ void lc80_state::machine_start()
 	save_item(NAME(m_digit));
 	save_item(NAME(m_segment));
 }
+
 
 /* Machine Driver */
 
@@ -415,6 +482,7 @@ void lc80_state::lc80e(machine_config &config)
 }
 #endif
 
+
 /* ROMs */
 
 ROM_START( lc80 )
@@ -437,6 +505,9 @@ ROM_START( lc80e )
 	ROM_LOAD( "lc80e-1000-schach.rom", 0x1000, 0x1000, CRC(b0323160) SHA1(0ea019b0944736ae5b842bf9aa3537300f259b98) )
 	ROM_LOAD( "lc80e-c000-schach.rom", 0xc000, 0x1000, CRC(9c858d9c) SHA1(2f7b3fd046c965185606253f6cd9372da289ca6f) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* System Drivers */
 
