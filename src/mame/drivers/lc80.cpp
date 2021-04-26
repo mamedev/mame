@@ -42,8 +42,6 @@ SC-80 starts at ADR C8000.
 TODO:
 - HALT led
 - KSD11 switch
-- banking for ROM 4-5
-- lc80e
 - CTC clock inputs
 - Most characters are lost when pasting (lc80, lc80e).
 
@@ -83,8 +81,10 @@ public:
 		m_out_led(*this, "led0")
 	{ }
 
-	void lc80_2(machine_config &config);
 	void lc80(machine_config &config);
+	void lc80a(machine_config &config);
+	void lc80e(machine_config &config);
+	void lc80_2(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
@@ -103,6 +103,12 @@ private:
 	required_ioport_array<4> m_inputs;
 	output_finder<> m_out_led;
 
+	void lc80_mem(address_map &map);
+	void lc80a_mem(address_map &map);
+	void lc80e_mem(address_map &map);
+	void lc80_2_mem(address_map &map);
+	void lc80_io(address_map &map);
+
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
@@ -116,9 +122,6 @@ private:
 	// display state
 	uint8_t m_digit;
 	uint8_t m_segment;
-	void lc80_io(address_map &map);
-	void lc80_mem(address_map &map);
-	//void lc80e_mem(address_map &map);
 };
 
 
@@ -127,20 +130,27 @@ private:
 void lc80_state::lc80_mem(address_map &map)
 {
 	map.global_mask(0x3fff);
-	map(0x0000, 0x07ff).bankr("bank1");
-	map(0x0800, 0x0fff).bankr("bank2");
-	map(0x1000, 0x17ff).bankr("bank3");
-	map(0x2000, 0x23ff).ram();
-	map(0x2400, 0x2fff).bankrw("bank4");
+	map(0x0000, 0x03ff).mirror(0x0400).rom();
+	map(0x0800, 0x0bff).mirror(0x0400).rom();
 }
 
-#if 0
+void lc80_state::lc80a_mem(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x07ff).rom();
+}
+
+void lc80_state::lc80_2_mem(address_map &map)
+{
+	map.global_mask(0x3fff);
+	map(0x0000, 0x0fff).rom();
+}
+
 void lc80_state::lc80e_mem(address_map &map)
 {
-	lc80_mem(map);
+	map(0x0000, 0x1fff).rom();
 	map(0xc000, 0xcfff).rom();
 }
-#endif
 
 void lc80_state::lc80_io(address_map &map)
 {
@@ -221,7 +231,7 @@ WRITE_LINE_MEMBER( lc80_state::ctc_z2_w )
 
 void lc80_state::update_display()
 {
-	m_display->matrix(m_digit, m_segment);
+	m_display->matrix(m_digit >> 1, m_segment);
 }
 
 void lc80_state::pio1_pa_w(uint8_t data)
@@ -288,11 +298,8 @@ void lc80_state::pio1_pb_w(uint8_t data)
 	/* speaker */
 	m_speaker->level_w(!BIT(data, 1));
 
-	/* OUT led */
-	m_out_led = !BIT(data, 1);
-
-	/* 7seg digits/keyboard */
-	m_digit = ~data >> 2;
+	/* 7segs/led/keyboard */
+	m_digit = ~data;
 	update_display();
 }
 
@@ -317,7 +324,7 @@ uint8_t lc80_state::pio2_pb_r()
 
 	for (int i = 0; i < 6; i++)
 	{
-		if (BIT(m_digit, i))
+		if (BIT(m_digit, i+2))
 		{
 			if (!BIT(m_inputs[0]->read(), i)) data &= ~0x10;
 			if (!BIT(m_inputs[1]->read(), i)) data &= ~0x20;
@@ -346,53 +353,10 @@ static const z80_daisy_config lc80_daisy_chain[] =
 
 void lc80_state::machine_start()
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	uint8_t *ROM = memregion("maincpu")->base();
-
-	/* setup memory banking */
-	membank("bank1")->configure_entry(0, &ROM[0]); // TODO
-	membank("bank1")->configure_entry(1, &ROM[0]);
-	membank("bank1")->set_entry(1);
-
-	membank("bank2")->configure_entry(0, &ROM[0x800]); // TODO
-	membank("bank2")->configure_entry(1, &ROM[0x800]);
-	membank("bank2")->set_entry(1);
-
-	membank("bank3")->configure_entry(0, &ROM[0x1000]); // TODO
-	membank("bank3")->configure_entry(1, &ROM[0x1000]);
-	membank("bank3")->set_entry(1);
-
-	membank("bank4")->configure_entry(0, &ROM[0x2000]);
-	membank("bank4")->set_entry(0);
-
-	program.install_readwrite_bank(0x0000, 0x07ff, membank("bank1"));
-	program.install_readwrite_bank(0x0800, 0x0fff, membank("bank2"));
-	program.install_readwrite_bank(0x1000, 0x17ff, membank("bank3"));
-
-	switch (m_ram->size())
-	{
-	case 1*1024:
-		program.install_readwrite_bank(0x2000, 0x23ff, membank("bank4"));
-		program.unmap_readwrite(0x2400, 0x2fff);
-		break;
-
-	case 2*1024:
-		program.install_readwrite_bank(0x2000, 0x27ff, membank("bank4"));
-		program.unmap_readwrite(0x2800, 0x2fff);
-		break;
-
-	case 3*1024:
-		program.install_readwrite_bank(0x2000, 0x2bff, membank("bank4"));
-		program.unmap_readwrite(0x2c00, 0x2fff);
-		break;
-
-	case 4*1024:
-		program.install_readwrite_bank(0x2000, 0x2fff, membank("bank4"));
-		break;
-	}
-
 	m_out_led.resolve();
+
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.install_ram(0x2000, 0x2000 + m_ram->size() - 1, 0x1000, m_ram->pointer());
 
 	/* register for state saving */
 	save_item(NAME(m_digit));
@@ -410,8 +374,8 @@ void lc80_state::lc80(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &lc80_state::lc80_io);
 
 	/* video hardware */
-	PWM_DISPLAY(config, m_display).set_size(6, 8);
-	m_display->set_segmask(0x3f, 0xff);
+	PWM_DISPLAY(config, m_display).set_size(1+6, 8);
+	m_display->set_segmask(0x3f << 1, 0xff);
 	config.set_default_layout(layout_lc80);
 
 	/* sound hardware */
@@ -438,58 +402,38 @@ void lc80_state::lc80(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
-	RAM(config, m_ram).set_default_size("1K").set_extra_options("2K,3K,4K");
+	RAM(config, m_ram).set_default_size("1K");
+	m_ram->set_extra_options("1K,2K,3K,4K");
+}
+
+void lc80_state::lc80a(machine_config &config)
+{
+	lc80(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &lc80_state::lc80a_mem);
 }
 
 void lc80_state::lc80_2(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 1800000); /* UD880D */
-	m_maincpu->set_addrmap(AS_PROGRAM, &lc80_state::lc80_mem);
-	m_maincpu->set_addrmap(AS_IO, &lc80_state::lc80_io);
+	lc80(config);
 
-	/* video hardware */
-	PWM_DISPLAY(config, m_display).set_size(6, 8);
-	m_display->set_segmask(0x3f, 0xff);
-	config.set_default_layout(layout_lc80);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-
-	/* devices */
-	Z80CTC(config, m_ctc, 900000);
-	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_ctc->zc_callback<0>().set(FUNC(lc80_state::ctc_z0_w));
-	m_ctc->zc_callback<1>().set(FUNC(lc80_state::ctc_z1_w));
-	m_ctc->zc_callback<2>().set(FUNC(lc80_state::ctc_z2_w));
-
-	Z80PIO(config, m_pio[0], 900000);
-	m_pio[0]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_pio[0]->out_pa_callback().set(FUNC(lc80_state::pio1_pa_w));
-	m_pio[0]->in_pb_callback().set(FUNC(lc80_state::pio1_pb_r));
-	m_pio[0]->out_pb_callback().set(FUNC(lc80_state::pio1_pb_w));
-
-	Z80PIO(config, m_pio[1], 900000);
-	m_pio[1]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_pio[1]->in_pb_callback().set(FUNC(lc80_state::pio2_pb_r));
-
-	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("4K");
+	m_maincpu->set_addrmap(AS_PROGRAM, &lc80_state::lc80_2_mem);
+	m_ram->set_default_size("4K");
 }
 
-#if 0
 void lc80_state::lc80e(machine_config &config)
 {
-	lc80_2(config);
+	lc80(config);
 
-	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &lc80_state::lc80e_mem);
+	m_ram->set_default_size("4K");
+
+	// it is running twice as fast
+	m_maincpu->set_clock(1800000);
+	m_ctc->set_clock(1800000);
+	m_pio[0]->set_clock(1800000);
+	m_pio[1]->set_clock(1800000);
 }
-#endif
 
 
 /* ROMs */
@@ -524,6 +468,6 @@ ROM_END
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
 COMP( 1984, lc80,   0,      0,      lc80,    lc80,  lc80_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Lerncomputer LC 80 (set 1)", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, lc80a,  lc80,   0,      lc80,    lc80,  lc80_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Lerncomputer LC 80 (set 2)", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, lc80e,  lc80,   0,      lc80_2,  lc80,  lc80_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Lerncomputer LC 80 (export)", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, lc80a,  lc80,   0,      lc80a,   lc80,  lc80_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Lerncomputer LC 80 (set 2)", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, lc80e,  lc80,   0,      lc80e,   lc80,  lc80_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Lerncomputer LC 80 (export)", MACHINE_SUPPORTS_SAVE )
 COMP( 1991, lc80_2, lc80,   0,      lc80_2,  lc80,  lc80_state, empty_init, "hack (Eckart Buschendorf)", "Lerncomputer LC 80.2", MACHINE_SUPPORTS_SAVE )
