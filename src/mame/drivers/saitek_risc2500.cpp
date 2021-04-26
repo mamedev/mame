@@ -329,7 +329,7 @@ u32 risc2500_state::rom_r(offs_t offset)
 		u32 prev_pc = m_prev_pc;
 		m_prev_pc = pc;
 
-		if (diff >= 0)
+		if (diff > 0)
 		{
 			static constexpr int arm_branch_cycles = 3;
 			static constexpr int arm_max_cycles = 17; // datablock transfer
