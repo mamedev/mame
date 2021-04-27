@@ -559,17 +559,7 @@ uint8_t gamegear_state::gg_input_port_00_r()
 
 uint8_t sms1_state::sscope_r(offs_t offset)
 {
-	int sscope = m_port_scope->read();
-
-	// On SMSJ, address $fffb also controls the built-in 3-D port, that works
-	// in parallel with the 3-D adapter that is inserted into the card slot.
-
-	if ( sscope )
-	{
-		// Scope is attached
-		return m_sscope_state;
-	}
-
+	// SegaScope is write-only and writes are mirrored in RAM, from where the values read come from.
 	return read_ram(0x3ff8 + offset);
 }
 
@@ -577,6 +567,9 @@ uint8_t sms1_state::sscope_r(offs_t offset)
 void sms1_state::sscope_w(offs_t offset, uint8_t data)
 {
 	write_ram(0x3ff8 + offset, data);
+
+	// On SMSJ, address $fffb also controls the built-in 3-D port, that can work
+	// in parallel with the 3-D adapter that is inserted into the card slot.
 
 	int sscope = m_port_scope->read();
 
