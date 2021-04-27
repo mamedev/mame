@@ -314,10 +314,11 @@ struct opdata_cache
 	uint32_t phase_step;              // phase step, or PHASE_STEP_DYNAMIC if PM is active
 	uint32_t total_level;             // total level * 8 + KSL
 	uint32_t block_freq;              // raw block frequency value (used to compute phase_step)
-	int32_t detune;                  // detuning value (used to compute phase_step)
+	int32_t detune;                   // detuning value (used to compute phase_step)
 	uint32_t multiple;                // multiple value (x.1, used to compute phase_step)
 	uint32_t eg_sustain;              // sustain level, shifted up to envelope values
 	uint8_t eg_rate[EG_STATES];       // envelope rate, including KSR
+	uint8_t eg_shift = 0;             // envelope shift amount
 };
 
 

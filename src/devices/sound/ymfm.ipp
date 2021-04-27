@@ -736,8 +736,8 @@ uint32_t fm_operator<RegisterType>::envelope_attenuation(uint32_t am_offset) con
 	// add in total level and KSL from the cache
 	result += m_cache.total_level;
 
-	// clamp to max and return
-	return (result < 0x400) ? result : 0x3ff;
+	// clamp to max, apply shift, and return
+	return std::min<uint32_t>(result, 0x3ff) >> m_cache.eg_shift;
 }
 
 

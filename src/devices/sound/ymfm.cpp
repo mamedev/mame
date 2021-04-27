@@ -710,7 +710,7 @@ void opn_registers_base<IsOpnA>::cache_operator_data(uint32_t choffs, uint32_t o
 	cache.eg_rate[EG_DECAY] = effective_rate(op_decay_rate(opoffs) * 2, ksrval);
 	cache.eg_rate[EG_SUSTAIN] = effective_rate(op_sustain_rate(opoffs) * 2, ksrval);
 	cache.eg_rate[EG_RELEASE] = effective_rate(op_release_rate(opoffs) * 4 + 2, ksrval);
-	cache.eg_rate[EG_DEPRESS] = 0x3f;
+	cache.eg_shift = 0;
 }
 
 
@@ -1083,7 +1083,7 @@ void opl_registers_base<Revision>::cache_operator_data(uint32_t choffs, uint32_t
 	cache.eg_rate[EG_DECAY] = effective_rate(op_decay_rate(opoffs) * 4, ksrval);
 	cache.eg_rate[EG_SUSTAIN] = op_eg_sustain(opoffs) ? 0 : effective_rate(op_release_rate(opoffs) * 4, ksrval);
 	cache.eg_rate[EG_RELEASE] = effective_rate(op_release_rate(opoffs) * 4, ksrval);
-	cache.eg_rate[EG_DEPRESS] = 0x3f;
+	cache.eg_shift = 0;
 }
 
 
@@ -1409,6 +1409,7 @@ void opll_registers::cache_operator_data(uint32_t choffs, uint32_t opoffs, opdat
 		cache.eg_rate[EG_SUSTAIN] = effective_rate(op_release_rate(opoffs) * 4, ksrval);
 		cache.eg_rate[EG_RELEASE] = ch_sustain(choffs) ? RS : RR;
 	}
+	cache.eg_shift = 0;
 }
 
 
@@ -1704,7 +1705,7 @@ void opq_registers::cache_operator_data(uint32_t choffs, uint32_t opoffs, opdata
 	cache.eg_rate[EG_DECAY] = effective_rate(op_decay_rate(opoffs) * 2, ksrval);
 	cache.eg_rate[EG_SUSTAIN] = effective_rate(op_sustain_rate(opoffs) * 2, ksrval);
 	cache.eg_rate[EG_RELEASE] = effective_rate(op_release_rate(opoffs) * 4 + 2, ksrval);
-	cache.eg_rate[EG_DEPRESS] = 0x3f;
+	cache.eg_shift = 0;
 }
 
 

@@ -13,24 +13,38 @@
 //
 //    http://sr4.sakura.ne.jp/fmsound/opz.html
 //
+// and from reading the TX81Z operator manual, which describes how a number
+// of these new features work.
+//
 // OPZ appears be bsaically OPM with a bunch of extra features.
 //
 // For starters, there are two LFO generators. I have presumed that they
 // operate identically since identical parameters are offered for each. I
 // have also presumed the effects are additive between them. The LFOs on
 // the OPZ have an extra "sync" option which apparently causes the LFO to
-// reset whenever a note on is received.
+// reset whenever a key on is received.
 //
-// At the channel level, there is an additional 8-bit volume control.
-// This might work as an addition to total level, or some other way.
-// Completely unknown, and unimplemented.
+// At the channel level, there is an additional 8-bit volume control. This
+// might work as an addition to total level, or some other way. Completely
+// unknown, and unimplemented.
+//
+// At the operator level, there are a number of extra features. First, there
+// are 8 different waveforms to choose from. These are different than the
+// waveforms introduced in the OPL2 and later chips.
+//
+// Second, there is an additional "reverb" stage added to the envelope
+// generator, which kicks in when the envelope reaches -18dB. It specifies
+// a slower decay rate to produce a sort of faux reverb effect.
+//
+// The envelope generator also supports a 2-bit shift value, which can be
+// used to reduce the effect of the envelope attenuation.
 //
 // OPZ supports a "fixed frequency" mode for each operator, with a 3-bit
 // range and 4-bit frequency value, plus a 1-bit enable. Not sure how that
 // works at all, so it's not implemented.
 //
 // There are also several mystery fields in the operators which I have no
-// clue about: "fine" (4 bits), "eg_shift" (2 bits), and "rev" (5 bits).
+// clue about: "fine" (4 bits), "eg_shift" (2 bits), and "rev" (3 bits).
 // eg_shift is some kind of envelope generator effect, but how it works is
 // unknown.
 //
@@ -62,17 +76,18 @@ opz_registers::opz_registers() :
 	for (int index = 0; index < WAVEFORM_LENGTH; index++)
 		m_waveform[0][index] = abs_sin_attenuation(index) | (bitfield(index, 9) << 15);
 
-	// TODO: this is just copied from OPL3; no idea what the actual waveforms are
 	uint16_t zeroval = m_waveform[0][0];
 	for (int index = 0; index < WAVEFORM_LENGTH; index++)
+		m_waveform[1][index] = (zeroval - m_waveform[0][(index & 0x1ff) ^ 0x100]) | (bitfield(index, 9) << 15);
+
+	for (int index = 0; index < WAVEFORM_LENGTH; index++)
 	{
-		m_waveform[1][index] = bitfield(index, 9) ? zeroval : m_waveform[0][index];
-		m_waveform[2][index] = m_waveform[0][index] & 0x7fff;
-		m_waveform[3][index] = bitfield(index, 8) ? zeroval : (m_waveform[0][index] & 0x7fff);
+		m_waveform[2][index] = bitfield(index, 9) ? zeroval : m_waveform[0][index];
+		m_waveform[3][index] = bitfield(index, 9) ? zeroval : m_waveform[1][index];
 		m_waveform[4][index] = bitfield(index, 9) ? zeroval : m_waveform[0][index * 2];
-		m_waveform[5][index] = bitfield(index, 9) ? zeroval : m_waveform[0][(index * 2) & 0x1ff];
-		m_waveform[6][index] = bitfield(index, 9) << 15;
-		m_waveform[7][index] = (zeroval - m_waveform[0][(index / 2)]) | (bitfield(index, 9) << 15);
+		m_waveform[5][index] = bitfield(index, 9) ? zeroval : m_waveform[1][index * 2];
+		m_waveform[6][index] = bitfield(index, 9) ? zeroval : m_waveform[0][(index * 2) & 0x1ff];
+		m_waveform[7][index] = bitfield(index, 9) ? zeroval : m_waveform[1][(index * 2) & 0x1ff];
 	}
 
 	// create the LFO waveforms; AM in the low 8 bits, PM in the upper 8
@@ -381,7 +396,13 @@ void opz_registers::cache_operator_data(uint32_t choffs, uint32_t opoffs, opdata
 	cache.eg_rate[EG_DECAY] = effective_rate(op_decay_rate(opoffs) * 2, ksrval);
 	cache.eg_rate[EG_SUSTAIN] = effective_rate(op_sustain_rate(opoffs) * 2, ksrval);
 	cache.eg_rate[EG_RELEASE] = effective_rate(op_release_rate(opoffs) * 4 + 2, ksrval);
-	cache.eg_rate[EG_REVERB] = std::min<uint32_t>(effective_rate(op_reverb_rate(opoffs) * 4 + 2, ksrval), cache.eg_rate[EG_RELEASE]);
+	cache.eg_rate[EG_REVERB] = cache.eg_rate[EG_RELEASE];
+	uint32_t reverb = op_reverb_rate(opoffs);
+	if (reverb != 0)
+		cache.eg_rate[EG_REVERB] = std::min<uint32_t>(effective_rate(reverb * 4 + 2, ksrval), cache.eg_rate[EG_REVERB]);
+
+	// set the envelope shift; TX81Z manual says operator 1 shift is fixed at "off"
+	cache.eg_shift = ((opoffs & 0x18) == 0) ? 0 : op_eg_shift(opoffs);
 }
 
 
