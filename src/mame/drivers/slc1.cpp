@@ -166,7 +166,7 @@ void slc1_state::io_map(address_map &map)
 
 INPUT_CHANGED_MEMBER(slc1_state::trigger_reset)
 {
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( slc1 )
@@ -205,8 +205,8 @@ void slc1_state::slc1(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &slc1_state::io_map);
 
 	/* video hardware */
-	PWM_DISPLAY(config, m_display).set_size(7, 7);
-	m_display->set_segmask(0x7b, 0x7f);
+	PWM_DISPLAY(config, m_display).set_size(7, 8);
+	m_display->set_segmask(0x7b, 0xff);
 	config.set_default_layout(layout_slc1);
 
 	/* sound hardware */
