@@ -84,14 +84,9 @@ protected:
 		m_fm_intf.start();
 		m_fm.register_save(*this);
 	}
-	virtual void device_reset() override
-	{
-		m_fm.reset();
-	}
-	virtual void device_clock_changed() override
-	{
-		m_stream->set_sample_rate(m_fm.sample_rate(clock()));
-	}
+	virtual void device_reset() override { m_fm.reset(); }
+	virtual void device_clock_changed() override { m_stream->set_sample_rate(m_fm.sample_rate(clock())); }
+	virtual void device_post_load() override { m_fm.invalidate_caches(); }
 
 	// sound overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override

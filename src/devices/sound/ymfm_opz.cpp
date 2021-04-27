@@ -420,6 +420,9 @@ uint32_t opz_registers::compute_phase_step(uint32_t choffs, uint32_t opoffs, opd
 	static const int16_t s_detune2_delta[4] = { 0, (600*64+50)/100, (781*64+50)/100, (950*64+50)/100 };
 	int32_t delta = s_detune2_delta[op_detune2(opoffs)];
 
+	// the fine detune parameter seems to add 1/16th of an octave per unit
+	delta += op_detune2_fine(opoffs) * (12*64)/16;
+
 	// add in the PM deltas
 	uint32_t pm_sensitivity = ch_lfo_pm_sens(choffs);
 	if (pm_sensitivity != 0)
@@ -615,7 +618,7 @@ void ym2414::write_data(uint8_t data)
 {
 	// write the FM register
 	m_fm.write(m_address, data);
-
+printf("%02X=%02X\n", m_address, data);
 	// special cases
 	if (m_address == 0x1b)
 	{

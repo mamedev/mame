@@ -210,8 +210,9 @@ public:
 	uint32_t op_detune(uint32_t opoffs) const        { return byte(0x40, 4, 3, opoffs); }
 	uint32_t op_multiple(uint32_t opoffs) const      { return byte(0x40, 0, 4, opoffs); }
 	uint32_t op_fix_range(uint32_t opoffs) const     { return byte(0x40, 4, 3, opoffs); }
-	uint32_t op_fix_frequency(uint32_t opoffs) const { return (byte(0x40, 0, 4, opoffs) << 4) | byte(0x100, 0, 4, opoffs); } // fake
+	uint32_t op_fix_frequency(uint32_t opoffs) const { return byte(0x40, 0, 4, opoffs); }
 	uint32_t op_waveform(uint32_t opoffs) const      { return byte(0x100, 4, 3, opoffs); } // fake
+	uint32_t op_detune2_fine(uint32_t opoffs) const  { return byte(0x100, 0, 4, opoffs); } // fake
 	uint32_t op_total_level(uint32_t opoffs) const   { return byte(0x60, 0, 7, opoffs); }
 	uint32_t op_ksr(uint32_t opoffs) const           { return byte(0x80, 6, 2, opoffs); }
 	uint32_t op_fix_mode(uint32_t opoffs) const      { return byte(0x80, 5, 1, opoffs); }
@@ -276,8 +277,9 @@ public:
 	void register_save(device_t &device);
 #endif
 
-	// sample rate computer
+	// pass-through helpers
 	uint32_t sample_rate(uint32_t input_clock) const { return m_fm.sample_rate(input_clock); }
+	void invalidate_caches() { m_fm.invalidate_caches(); }
 
 	// read access
 	uint8_t read_status();

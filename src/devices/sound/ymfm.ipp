@@ -1206,6 +1206,9 @@ void fm_engine_base<RegisterType>::save_restore(fm_saved_state &state)
 	// save operator data
 	for (int opnum = 0; opnum < OPERATORS; opnum++)
 		m_operator[opnum]->save_restore(state);
+
+	// invalidate any caches
+	invalidate_caches();
 }
 
 

@@ -140,6 +140,31 @@ namespace ymfm
 // needed.
 //
 //
+// ATTENUATION
+//
+// Most of the computations of the FM engines are done in terms of attenuation,
+// and thus are logarithmic in nature. The maximum resolution used intnerally
+// is 12 bits, as returned by the sin table:
+//
+//     Bit  11  10   9   8   7   6    5     4      3       2        1         0
+//      dB -96 -48 -24 -12  -6  -3 -1.5 -0.75 -0.375 -0.1875 -0.09375 -0.046875
+//
+// The envelope generator internally uses 10 bits:
+//
+//     Bit   9   8   7   6   5   4    3     2      1       0
+//      dB -96 -48 -24 -12  -6  -3 -1.5 -0.75 -0.375 -0.1875
+//
+// Total level for operators is usually represented by 7 bits:
+//
+//         Bit   6   5   4   3   2    1     0
+//          dB -48 -24 -12  -6  -3 -1.5 -0.75
+//
+// Sustain level in the envelope generator is usually represented by 4 bits:
+//
+//             Bit   3   2   1   0
+//              dB -24 -12  -6  -3
+//
+//
 // STATUS AND TIMERS
 //
 // Generically, all chips (except OPLL) support two timers that can be

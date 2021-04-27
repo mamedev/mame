@@ -645,6 +645,9 @@ public:
 	// return a reference to our registers
 	RegisterType &regs() { return m_regs; }
 
+	// invalidate any caches
+	void invalidate_caches() { m_modified_channels = RegisterType::ALL_CHANNELS; }
+
 	// timer callback; called by the interface when a timer fires
 	virtual void intf_timer_expired(uint32_t tnum) override;
 
