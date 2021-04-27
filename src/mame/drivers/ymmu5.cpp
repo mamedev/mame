@@ -234,10 +234,10 @@ void mu5_state::mu5(machine_config &config)
 
 	LC7985(config, m_lcd);
 
-	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set("maincpu:sci0", FUNC(h8_sci_device::rx_w));
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set("maincpu:sci1", FUNC(h8_sci_device::rx_w));
 
 	auto &mdout(MIDI_PORT(config, "mdout", midiout_slot, "midiout"));
-	m_maincpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
+	m_maincpu->subdevice<h8_sci_device>("sci1")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
 
 	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);
 	screen.set_refresh_hz(60);
