@@ -8,45 +8,49 @@
 http://www.jens-mueller.org/jkcemu/slc1.html
 
 This computer is both a Z80 trainer, and a chess computer.
-        The keyboard is different between the two, so
-        we redefine it for your convenience.
+    The keyboard is different between the two, so
+    we redefine it for your convenience.
 
-        There is no chess board attached. You supply your own
-        and you sync the pieces and the computer instructions.
-        The chess engine was copied from Fidelity's Sensory
-        Chess Challenger 8.
+    There is no chess board attached. You supply your own
+    and you sync the pieces and the computer instructions.
+    The chess engine was copied from Fidelity's Sensory
+    Chess Challenger 8.
 
-        When started, it is in Chess mode. Press 11111 to switch to
-        Trainer mode.
+    When started, it is in Chess mode. Press 11111 to switch to
+    Trainer mode.
 
 Hardware
-        4 Kbytes ROM in the address range 0000-0FFF
-        1 Kbyte RAM in the address range 5000-53ff (user area starts at 5100)
-        6-digit 7-segment display
-        Busy LED
-        Keyboard with 12 keys
+    4 Kbytes ROM in the address range 0000-0FFF
+    1 Kbyte RAM in the address range 5000-53ff (user area starts at 5100)
+    6-digit 7-segment display
+    Busy LED
+    Keyboard with 12 keys
 
 Keys:
-        0-7 : hexadecimal numbers
-        Shift then 0-7 : Hexadecimal 8-F (decimal points will appear)
-        ADR : enter an address to work with. After the 4 digits are entered,
-              the data at that address shows, and you can modify the data.
-        + (inc) : Enter the data into memory, and increment the address by 1.
+    0-7 : hexadecimal numbers
+    Shift then 0-7 : Hexadecimal 8-F (decimal points will appear)
+    ADR : enter an address to work with. After the 4 digits are entered,
+          the data at that address shows, and you can modify the data.
+    + (inc) : Enter the data into memory, and increment the address by 1.
 
 Pasting doesn't work, but if it did...
 
-    Pasting:
-        0-7 : as is
-        8-F : H, then 0-7
-        + : ^
-        - : H^
-        ADR : -
+Pasting:
+    0-7 : as is
+    8-F : H, then 0-7
+    + : ^
+    - : H^
+    ADR : -
 
-    Test Paste:
-        [[[[[-510011^22^33^44^55^66^77^H8H8^H9H9^-5100
-        Now press up-arrow to confirm the data has been entered.
+Test Paste:
+    [[[[[-510011^22^33^44^55^66^77^H8H8^H9H9^-5100
+    Now press up-arrow to confirm the data has been entered.
 
-
+TODO:
+    - Make emulation more faithful, io_w doesn't make much sense from
+      a TTL wiring point of view.
+    - Likewise, having 2 auto-switching input mappings is convenient,
+      but not at all how the hardware works.
 
 ***************************************************************************/
 
@@ -207,7 +211,6 @@ void slc1_state::machine_reset()
 
 void slc1_state::mem_map(address_map &map)
 {
-	map.unmap_value_high();
 	map.global_mask(0x4fff);
 	map(0x0000, 0x0fff).rom();
 	map(0x4000, 0x43ff).ram().mirror(0xc00);
@@ -215,7 +218,6 @@ void slc1_state::mem_map(address_map &map)
 
 void slc1_state::io_map(address_map &map)
 {
-	map.unmap_value_high();
 	map(0x0000, 0xffff).rw(FUNC(slc1_state::io_r), FUNC(slc1_state::io_w));
 }
 
