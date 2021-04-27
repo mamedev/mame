@@ -4,10 +4,9 @@
 
 LC-80 by VEB Mikroelektronik "Karl Marx" Erfurt
 
-When first started, the screen is blank. Wait about 8 seconds for
-it to introduce itself, then you may use it or paste to it.
-The decimal points indicate which side of the display you will
-be updating.
+When first started, the screen is blank. Wait about 8 seconds for it to
+introduce itself, then you may use it or paste to it. The decimal points
+indicate which side of the display you will be updating.
 
 Pasting:
     0-F : as is
@@ -30,12 +29,12 @@ Hardware notes (2-ROM version from schematics):
 - cassette port
 - 6*7seg display, 2 leds, piezo
 
-The PCB is literally inside a map that can be closed like a book. It has a nice
-calculator style keypad attached to it.
+The PCB is literally inside a leather map that can be closed like a book.
+It has a nice calculator style keypad attached to it.
 
 The memory can be expanded. There's an export version with more RAM/ROM by
 default and a faster U880D CPU (3300.0kHz XTAL). It included a chess program
-called SC-80, that can be started by executing ADR C800. Press ADR again for
+called SC-80 that can be started by executing ADR C800. Press ADR again for
 NEW GAME, and use the 1-8 number keys for A1-H8.
 
 

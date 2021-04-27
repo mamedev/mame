@@ -63,8 +63,8 @@ TODO:
 #include "machine/ram.h"
 #include "machine/smartboard.h"
 #include "machine/timer.h"
-#include "video/t6963c.h"
 #include "sound/spkrdev.h"
+#include "video/t6963c.h"
 
 #include "speaker.h"
 
