@@ -8,8 +8,8 @@ Poly-Computer 880
 
 http://www.kc85-museum.de/books/poly880/index.html
 
-Initially the screen is blank. The CTC causes a NMI, this autoboots the
-system, and then the PIO releases the NMI line.
+Initially the screen is blank. The CTC causes a NMI, this autoboots the system,
+and then the PIO releases the NMI line.
 
 Pasting:
         0-F : as is
@@ -22,12 +22,18 @@ Test Paste:
         -4000^11^22^33^44^55^66^77^88^99^-4000
         Now press up-arrow to confirm the data has been entered.
 
-TODO:
-    - MCYCL (activate single stepping)
-    - CYCL (single step)
-    - layout LEDs (address bus, data bus, command bus, MCYCL)
-    - RAM expansion
 
+The SC1 version is a modification that turns it into a chesscomputer.
+Not to be confused with the prequel to SC2, but more likely a different
+version of SLC1 without the "Lern" part.
+
+
+TODO:
+- MCYCL (activate single stepping)
+- CYCL (single step)
+- layout LEDs (address bus, data bus, command bus, MCYCL)
+- RAM expansion
+- who made poly880s? slc1 is very similar, it's by the same person?
 
 ****************************************************************************/
 
@@ -60,6 +66,13 @@ void poly880_state::poly880_mem(address_map &map)
 	map(0x1000, 0x13ff).mirror(0x0c00).rom();
 	map(0x2000, 0x23ff).mirror(0x0c00).rom();
 	map(0x3000, 0x33ff).mirror(0x0c00).rom();
+	map(0x4000, 0x43ff).mirror(0x3c00).ram();
+	map(0x8000, 0xffff).bankrw("bank1");
+}
+
+void poly880_state::poly880s_mem(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).mirror(0x3c00).ram();
 	map(0x8000, 0xffff).bankrw("bank1");
 }
@@ -288,6 +301,12 @@ void poly880_state::poly880(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("1K");
 }
 
+void poly880_state::poly880s(machine_config &config)
+{
+	poly880(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &poly880_state::poly880s_mem);
+}
+
 /* ROMs */
 
 ROM_START( poly880 )
@@ -296,7 +315,13 @@ ROM_START( poly880 )
 	ROM_LOAD( "poly880.i6", 0x1000, 0x0400, CRC(9efddf5b) SHA1(6ffa2f80b2c6f8ec9e22834f739c82f9754272b8) )
 ROM_END
 
+ROM_START( poly880s )
+	ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_LOAD( "sc1.rom", 0x0000, 0x1000, CRC(26965b23) SHA1(01568911446eda9f05ec136df53da147b7c6f2bf) )
+ROM_END
+
 /* System Drivers */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY            FULLNAME             FLAGS
-COMP( 1983, poly880, 0,      0,      poly880, poly880, poly880_state, empty_init, "VEB Polytechnik", "Poly-Computer 880", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
+COMP( 1983, poly880,  0,       0,      poly880,  poly880, poly880_state, empty_init, "VEB Polytechnik", "Poly-Computer 880", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, poly880s, poly880, 0,      poly880s, poly880, poly880_state, empty_init, "hack", "Poly-Computer 880 (SC1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

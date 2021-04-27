@@ -35,6 +35,7 @@ public:
 	{ }
 
 	void poly880(machine_config &config);
+	void poly880s(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
@@ -63,6 +64,7 @@ private:
 	bool m_nmi;
 	void poly880_io(address_map &map);
 	void poly880_mem(address_map &map);
+	void poly880s_mem(address_map &map);
 };
 
 #endif

@@ -60,6 +60,7 @@ TODO:
 
 #include "speaker.h"
 
+// internal artwork
 #include "lc80.lh"
 
 

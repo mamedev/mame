@@ -35063,6 +35063,7 @@ poly800mdk                      //
 
 @source:poly880.cpp
 poly880                         //
+poly880s                        //
 
 @source:polyplay.cpp
 polyplay                        //
@@ -38215,9 +38216,6 @@ slapshotj                       // D71 (c) 1994 Taito Corporation (Ver 2.2 J)
 
 @source:slc1.cpp
 slc1                            //
-
-@source:slc1a.cpp
-slc1a
 
 @source:sleic.cpp
 bikerace                        //
