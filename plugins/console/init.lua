@@ -9,10 +9,15 @@ exports.license = "The BSD 3-Clause License"
 exports.author = { name = "Carl" }
 
 local console = exports
+local history_file = "console_history"
+
+local history_fullpath = nil
 
 function console.startplugin()
 	local conth = emu.thread()
+	local ln_started = false
 	local started = false
+	local stopped = false
 	local ln = require("linenoise")
 	local preload = false
 	local matches = {}
@@ -45,14 +50,18 @@ function console.startplugin()
 	-- especially the completion callback
 	ln.historysetmaxlen(50)
 	local scr = [[
-local ln = require('linenoise')
-ln.setcompletion(function(c, str, pos)
-	status = str .. "\x01" .. tostring(pos)
-	yield()
-	ln.addcompletion(c, status:match("([^\x01]*)\x01(.*)"))
-end)
-return ln.linenoise('$PROMPT')
-]]
+		local ln = require('linenoise')
+		ln.setcompletion(function(c, str, pos)
+				status = str .. "\x01" .. tostring(pos)
+				yield()
+				ln.addcompletion(c, status:match("([^\x01]*)\x01(.*)"))
+		end)
+		local ret = ln.linenoise('$PROMPT')
+		if ret == nil then
+			return "\n"
+		end
+		return ret
+	]]
 	local keywords = {
 		'and', 'break', 'do', 'else', 'elseif', 'end', 'false', 'for',
 		'function', 'if', 'in', 'local', 'nil', 'not', 'or', 'repeat',
@@ -83,7 +92,7 @@ return ln.linenoise('$PROMPT')
 		end
 
 		if expr and expr ~= "" then
-			local v = loadstring("return " .. expr)
+			local v = load("return " .. expr)
 			if v then
 				err, v = pcall(v)
 				if (not err) or (not v) then
@@ -225,6 +234,16 @@ return ln.linenoise('$PROMPT')
 	emu.register_stop(function() consolebuf = nil end)
 
 	emu.register_periodic(function()
+		if stopped then
+			return
+		end
+		if (not started) then
+			-- options are not available in startplugin, so we load the history here
+			local historypath = emu.subst_env(manager.ui.options.entries.historypath:value():match("([^;]+)"))
+			history_fullpath = historypath .. '/console_history'
+			ln.loadhistory(history_fullpath)
+			started = true
+		end
 		local prompt = "\x1b[1;36m[MAME]\x1b[0m> "
 		if consolebuf and (#consolebuf > lastindex) then
 			local last = #consolebuf
@@ -240,9 +259,12 @@ return ln.linenoise('$PROMPT')
 			return
 		elseif conth.busy then
 			return
-		elseif started then
+		elseif ln_started then
 			local cmd = conth.result
-			if cmd == "" then
+			if cmd == "\n" then
+				stopped = true
+				return
+			elseif cmd == "" then
 				if cmdbuf ~= "" then
 					print("Incomplete command")
 					cmdbuf = ""
@@ -269,8 +291,16 @@ return ln.linenoise('$PROMPT')
 			end
 		end
 		conth:start(scr:gsub("$PROMPT", prompt))
-		started = true
+		ln_started = true
 	end)
 end
+
+setmetatable(console, {
+		     __gc = function ()
+			     if history_fullpath then
+				     ln = require("linenoise")
+				     ln.savehistory(history_fullpath)
+			     end
+end})
 
 return exports
