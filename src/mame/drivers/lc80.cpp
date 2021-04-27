@@ -86,8 +86,8 @@ public:
 	void lc80e(machine_config &config);
 	void lc80_2(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
 
 protected:
 	virtual void machine_start() override;
@@ -164,12 +164,12 @@ void lc80_state::lc80_io(address_map &map)
 
 // Input Ports
 
-INPUT_CHANGED_MEMBER( lc80_state::trigger_reset )
+INPUT_CHANGED_MEMBER(lc80_state::trigger_reset)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER( lc80_state::trigger_nmi )
+INPUT_CHANGED_MEMBER(lc80_state::trigger_nmi)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -211,7 +211,7 @@ static INPUT_PORTS_START( lc80 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("DAT") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ADR") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',')
 
-	PORT_START("IN.6")
+	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RES") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, lc80_state, trigger_reset, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("NMI") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, lc80_state, trigger_nmi, 0)
 INPUT_PORTS_END

@@ -1,9 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders:Robbbert, hap
 /***************************************************************************
 
 2011-JUL-16 SLC1 skeleton driver [Robbbert]
 2011-DEC-29 Working [Robbbert]
+2021-APR-27 And stuff [Stuff doer]
 
 reference: http://www.jens-mueller.org/jkcemu/slc1.html
 
@@ -43,15 +44,16 @@ Test Paste:
     Now press O to confirm the data has been entered.
 
 TODO:
-    - Make emulation more faithful, io_w doesn't make much sense from
-      a TTL wiring point of view.
     - Pasting doesn't work, probably too slow.
 
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/spkrdev.h"
+#include "video/pwm.h"
+
 #include "speaker.h"
 
 #include "slc1.lh"
@@ -67,106 +69,76 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
 		, m_inputs(*this, "IN.%u", 0U)
-		, m_display(*this, "digit%u", 0U)
+		, m_display(*this, "display")
 		, m_busyled(*this, "busyled")
 	{ }
 
 	void slc1(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
+
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 private:
-	u8 io_r(offs_t offset);
-	void io_w(offs_t offset, u8 data);
+	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
+	required_ioport_array<3> m_inputs;
+	required_device<pwm_display_device> m_display;
+	output_finder<> m_busyled;
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
-	u8 m_digit = 0;
+	u8 io_r(offs_t offset);
+	void io_w(offs_t offset, u8 data);
 
-	required_device<cpu_device> m_maincpu;
-	required_device<speaker_sound_device> m_speaker;
-	required_ioport_array<3> m_inputs;
-	output_finder<8> m_display;
-	output_finder<> m_busyled;
+	u8 m_select = 0;
+	u8 m_segment = 0;
 };
+
+void slc1_state::machine_start()
+{
+	m_busyled.resolve();
+
+	save_item(NAME(m_select));
+	save_item(NAME(m_segment));
+}
 
 
 /***************************************************************************
-    Display
+    I/O
 ***************************************************************************/
 
 void slc1_state::io_w(offs_t offset, u8 data)
 {
-	bool const segonoff = BIT(data, 7);
-	bool const busyled = BIT(data, 4);
-	data &= 15;
+	// d0-d3: 7442 or equivalent
+	m_select = data & 0xf;
+	u16 sel = 1 << m_select;
 
-	if (data < 8)
-		m_digit = data;
-	else if (data < 12)
-	{
-		m_speaker->level_w(BIT(data, 1));
-		return;
-	}
-	else if (offset == 0x2f07)
-		return;
+	// 7442 0-1,3-6: digit select
+	// 7442 3-5: keypad select
+	// 7442 9: speaker out
+	m_speaker->level_w(BIT(sel, 9));
 
-	u8 segdata = m_display[m_digit];
-	u8 const segnum  = offset & 7;
-	u8 const segmask = 1 << segnum;
+	// a0-a2+d7: digit segment data
+	u8 mask = 1 << (offset & 7);
+	m_segment = (m_segment & ~mask) | ((data & 0x80) ? mask : 0);
+	m_display->matrix(sel, m_segment);
 
-	if (segonoff)
-		segdata |= segmask;
-	else
-		segdata &= ~segmask;
-
-	m_display[m_digit] = segdata;
-
-	m_busyled = busyled;
+	// d4: busy led
+	m_busyled = BIT(data, 4);
 }
-
-
-/***************************************************************************
-    Keyboard
-***************************************************************************/
 
 u8 slc1_state::io_r(offs_t offset)
 {
-	u8 data = 0, upper = (offset >> 8) & 7;
+	u8 data = 0;
 
-	if (1)
-	{
-		if (upper == 3)
-			data = m_inputs[0]->read();
-		else
-		if (upper == 4)
-			data = m_inputs[1]->read();
-		else
-		if (upper == 5)
-			data = m_inputs[2]->read();
-	}
+	// read keypad
+	if (m_select >= 3 && m_select <= 5)
+		data |= m_inputs[m_select - 3]->read();
 
 	return data << 4 ^ 0xff;
-}
-
-
-/***************************************************************************
-    Machine
-***************************************************************************/
-
-void slc1_state::machine_start()
-{
-	m_display.resolve();
-	m_busyled.resolve();
-
-	save_item(NAME(m_digit));
-}
-
-void slc1_state::machine_reset()
-{
 }
 
 
@@ -183,13 +155,19 @@ void slc1_state::mem_map(address_map &map)
 
 void slc1_state::io_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(slc1_state::io_r), FUNC(slc1_state::io_w));
+	map.global_mask(0x07);
+	map(0x00, 0x07).rw(FUNC(slc1_state::io_r), FUNC(slc1_state::io_w));
 }
 
 
 /**************************************************************************
     Keyboard Layout
 ***************************************************************************/
+
+INPUT_CHANGED_MEMBER(slc1_state::trigger_reset)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+}
 
 static INPUT_PORTS_START( slc1 )
 	PORT_START("IN.0")
@@ -209,6 +187,9 @@ static INPUT_PORTS_START( slc1 )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A / +/- 1 / SS") PORT_CODE(KEYCODE_O) PORT_CHAR('O')
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("St / Fu / DP") PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_CHAR('S')
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z / ADR / BP") PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR('Z')
+
+	PORT_START("RESET")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, slc1_state, trigger_reset, 0)
 INPUT_PORTS_END
 
 
@@ -224,11 +205,13 @@ void slc1_state::slc1(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &slc1_state::io_map);
 
 	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(7, 7);
+	m_display->set_segmask(0x7b, 0x7f);
 	config.set_default_layout(layout_slc1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 
