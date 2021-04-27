@@ -44,7 +44,7 @@ public:
     };
 
     static const int FIFO_CH_TOTAL = 4;
-    static const int FIFO_MAX_RAM_SIZE = 524288;   // supposedly the max FIFO ram size
+    static const int FIFO_MAX_RAM_SIZE = 0x80000;   // supposedly the max FIFO ram size (512KiB)
     static const int FIFO_REGION_OFFSET = 0x10000; // offset from one region to the next
     static const int FIFO_RAM_OFFSET = 0x80000;    // offset from the channel 0 control register
 
