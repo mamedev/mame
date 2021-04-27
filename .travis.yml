@@ -31,6 +31,7 @@ jobs:
       env: SUBTARGET=ci   MAME=mameci64
   allow_failures:
     - arch: ppc64le
+    - arch: s390x
   fast_finish: true
 script:
   - if [ $CC == 'clang' ]; then
