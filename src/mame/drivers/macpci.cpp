@@ -87,6 +87,29 @@ void macpci_state::cdmcu_mem(address_map &map)
 	map(0x0000, 0xffff).rom().region("cdrom", 0);
 }
 
+void macpci_state::cdmcu_data(address_map &map)
+{
+	map(0x0000, 0x0001).noprw();
+	map(0x0003, 0x0003).noprw();
+	map(0x0004, 0x0008).nopw();
+	map(0x0008, 0x0008).nopr();
+	map(0x0009, 0x0009).noprw();
+	map(0x000f, 0x000f).noprw();
+	map(0x0012, 0x0013).ram();
+	map(0x0015, 0x0015).noprw();
+	map(0x001f, 0x0021).nopw();
+	map(0x0031, 0x0031).noprw();
+	map(0x0033, 0x0033).nopw();
+	map(0x0036, 0x0036).noprw();
+	map(0x0060, 0x031f).ram();
+	map(0x802a, 0x802a).nopw();
+	map(0x802f, 0x8034).nopw();
+	map(0x8032, 0x8032).nopr();
+	map(0x8035, 0x8035).lr8(NAME([]() { return 0x40; }));
+	map(0x8037, 0x8037).noprw();
+	map(0x8038, 0x8039).nopw();
+}
+
 /* Input ports */
 static INPUT_PORTS_START( pippin )
 INPUT_PORTS_END
@@ -149,6 +172,7 @@ void macpci_state::pippin(machine_config &config)
 
 	mn1880_device &cdmcu(MN1880(config, "cdmcu", 8388608)); // type and clock unknown
 	cdmcu.set_addrmap(AS_PROGRAM, &macpci_state::cdmcu_mem);
+	cdmcu.set_addrmap(AS_DATA, &macpci_state::cdmcu_data);
 }
 
 /* ROM definition */

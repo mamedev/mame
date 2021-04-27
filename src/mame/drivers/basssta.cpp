@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/mn1880/mn1880.h"
-//#include "machine/eeprompar.h"
+#include "machine/eeprompar.h"
 
 class basssta_state : public driver_device
 {
@@ -44,10 +44,34 @@ void basssta_state::sbasssta_prog(address_map &map)
 
 void basssta_state::bassstr_data(address_map &map)
 {
+	map(0x0001, 0x0001).noprw();
+	map(0x0003, 0x0003).noprw();
+	map(0x000f, 0x000f).noprw();
+	map(0x0015, 0x0015).noprw();
+	map(0x001f, 0x001f).noprw();
+	map(0x0060, 0x03cf).ram();
+	map(0x8000, 0x87ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
 }
 
 void basssta_state::sbasssta_data(address_map &map)
 {
+	map(0x0000, 0x0003).nopr();
+	map(0x0001, 0x0001).nopw();
+	map(0x0003, 0x0003).nopw();
+	map(0x000f, 0x000f).noprw();
+	map(0x0012, 0x0015).noprw();
+	map(0x001c, 0x001c).nopr();
+	map(0x001e, 0x001e).nopw();
+	map(0x001f, 0x001f).noprw();
+	map(0x0030, 0x0030).nopw();
+	map(0x0032, 0x0032).nopw();
+	map(0x0034, 0x0034).nopw();
+	map(0x0036, 0x0036).nopw();
+	map(0x005d, 0x005d).noprw();
+	map(0x0060, 0x07ff).ram(); // TODO: probably internal to CPU
+	map(0x6000, 0x7fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
+	map(0x8001, 0x8004).nopw();
+	map(0xc000, 0xc000).nopr();
 }
 
 
@@ -56,9 +80,11 @@ INPUT_PORTS_END
 
 void basssta_state::bassstr(machine_config &config)
 {
-	MN1880(config, m_maincpu, 8000000); // type and clock unknown (custom silkscreen)
+	MN1880(config, m_maincpu, 8000000); // type and clock unknown (custom silkscreen; might be MN18P83220)
 	m_maincpu->set_addrmap(AS_PROGRAM, &basssta_state::bassstr_prog);
 	m_maincpu->set_addrmap(AS_DATA, &basssta_state::bassstr_data);
+
+	EEPROM_2816(config, "eeprom");
 }
 
 void basssta_state::sbasssta(machine_config &config)
@@ -67,7 +93,7 @@ void basssta_state::sbasssta(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &basssta_state::sbasssta_prog);
 	m_maincpu->set_addrmap(AS_DATA, &basssta_state::sbasssta_data);
 
-	// TODO: Microchip 28C64AF EEPROM
+	EEPROM_2864(config, "eeprom"); // Microchip 28C64AF-15I/L
 }
 
 ROM_START(bassstr)
