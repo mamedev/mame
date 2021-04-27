@@ -129,7 +129,7 @@ void ymtx81z_state::tx81z(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5564PL-15/-20 + CR2032 battery
 
-	auto &midiclock(CLOCK(config, "midiclock", 31250*8));
+	auto &midiclock(CLOCK(config, "midiclock", 500_kHz_XTAL / 2)); // divider not verified
 	midiclock.signal_handler().set(FUNC(ymtx81z_state::midiclock_w));
 
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(FUNC(ymtx81z_state::midi_rx_r));
@@ -181,4 +181,3 @@ ROM_START(tx81z)
 ROM_END
 
 SYST(1987, tx81z, 0, 0, tx81z, tx81z, ymtx81z_state, empty_init, "Yamaha", "TX81Z FM Tone Generator", MACHINE_IS_SKELETON)
-//SYST(1988, dx11, 0, 0, dx11, dx11, ymtx81z_state, empty_init, "Yamaha", "DX11 Digital Programmable Algorithm Synthesizer", MACHINE_IS_SKELETON)
