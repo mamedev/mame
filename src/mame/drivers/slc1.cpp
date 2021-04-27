@@ -6,7 +6,12 @@
 2011-DEC-29 Working [Robbbert]
 2021-APR-27 And stuff [Stuff doer]
 
-reference: http://www.jens-mueller.org/jkcemu/slc1.html
+Schach- und Lerncomputer SLC 1 by Dr.Ing. Dieter Scheuschner, published in
+Schaltungssammlung für den Amateur, 5. Lieferung 1989 (East Germany).
+
+Reference:
+    - https://dr-scheuschner.de/start/schachcomputer-slc1/
+    - http://www.jens-mueller.org/jkcemu/slc1.html
 
 This computer is both a Z80 trainer, and a chess computer. The keyboard
     is different between the two. So by default, the chess number buttons
@@ -45,6 +50,8 @@ Test Paste:
 
 TODO:
     - Pasting doesn't work, probably too slow.
+    - The handwritten schematics and prototype by Dr.Scheuschner show 4 extra
+      keys (R, MEM, N, Y), but they aren't in the final version.
 
 ***************************************************************************/
 
