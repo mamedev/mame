@@ -4230,11 +4230,9 @@ files {
 	MAME_DIR .. "src/mame/machine/kc_keyb.h",
 	MAME_DIR .. "src/mame/video/kc.cpp",
 	MAME_DIR .. "src/mame/drivers/lc80.cpp",
-	MAME_DIR .. "src/mame/includes/lc80.h",
 	MAME_DIR .. "src/mame/drivers/mc8020.cpp",
 	MAME_DIR .. "src/mame/drivers/mc8030.cpp",
 	MAME_DIR .. "src/mame/drivers/poly880.cpp",
-	MAME_DIR .. "src/mame/includes/poly880.h",
 	MAME_DIR .. "src/mame/drivers/sc2.cpp",
 }
 
