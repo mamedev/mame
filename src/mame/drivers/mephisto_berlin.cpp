@@ -17,7 +17,6 @@ TODO:
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
-#include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "machine/mmboard.h"
 #include "video/mmdisplay2.h"
@@ -32,6 +31,7 @@ public:
 	berlin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_nvram(*this, "nvram", 0x2000, ENDIANNESS_BIG)
 		, m_board(*this, "board")
 		, m_display(*this, "display")
 		, m_keys(*this, "KEY")
@@ -42,13 +42,16 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	memory_share_creator<u8> m_nvram;
 	required_device<mephisto_board_device> m_board;
 	required_device<mephisto_display2_device> m_display;
 	required_ioport m_keys;
 
 	void berlin_mem(address_map &map);
 	void berlinp_mem(address_map &map);
-	void nvram_map(address_map &map);
+
+	u8 nvram_r(offs_t offset) { return m_nvram[offset]; }
+	void nvram_w(offs_t offset, u8 data) { m_nvram[offset] = data; }
 
 	u8 input_r();
 };
@@ -72,22 +75,17 @@ u8 berlin_state::input_r()
     Address Maps
 ******************************************************************************/
 
-void berlin_state::nvram_map(address_map &map)
-{
-	// nvram is 8-bit (8KB)
-	map(0x0000, 0x1fff).ram().share("nvram");
-}
-
 void berlin_state::berlin_mem(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x800000, 0x87ffff).ram();
-	map(0x900000, 0x903fff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask16(0xff00);
+	map(0x900000, 0x903fff).rw(FUNC(berlin_state::nvram_r), FUNC(berlin_state::nvram_w)).umask16(0xff00);
 	map(0xa00000, 0xa00000).r(FUNC(berlin_state::input_r));
 	map(0xb00000, 0xb00000).w(m_board, FUNC(mephisto_board_device::mux_w));
 	map(0xc00000, 0xc00000).w(m_display, FUNC(mephisto_display2_device::latch_w));
 	map(0xd00008, 0xd00008).w(m_display, FUNC(mephisto_display2_device::io_w));
 	map(0xe00000, 0xe00000).w(m_board, FUNC(mephisto_board_device::led_w));
+	map(0xe00000, 0xe00001).nopr(); // clr.b
 }
 
 void berlin_state::berlinp_mem(address_map &map)
@@ -99,7 +97,7 @@ void berlin_state::berlinp_mem(address_map &map)
 	map(0xa00000, 0xa00000).w(m_board, FUNC(mephisto_board_device::led_w));
 	map(0xb00000, 0xb00000).w(m_display, FUNC(mephisto_display2_device::io_w));
 	map(0xc00000, 0xc00000).w(m_display, FUNC(mephisto_display2_device::latch_w));
-	map(0xd00000, 0xd07fff).m("nvram_map", FUNC(address_map_bank_device::amap8)).umask32(0xff000000);
+	map(0xd00000, 0xd07fff).rw(FUNC(berlin_state::nvram_r), FUNC(berlin_state::nvram_w)).umask32(0xff000000);
 }
 
 
@@ -136,7 +134,6 @@ void berlin_state::berlin(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(berlin_state::irq2_line_hold), irq_period);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	ADDRESS_MAP_BANK(config, "nvram_map").set_map(&berlin_state::nvram_map).set_options(ENDIANNESS_BIG, 8, 13);
 
 	MEPHISTO_BUTTONS_BOARD(config, m_board); // internal
 	subdevice<sensorboard_device>("board:board")->set_nvram_enable(true);

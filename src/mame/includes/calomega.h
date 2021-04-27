@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: Roberto Fresca
+// copyright-holders: Roberto Fresca, Grull Osgo
 
 #ifndef MAME_INCLUDES_CALOMEGA_H
 #define MAME_INCLUDES_CALOMEGA_H
@@ -47,6 +47,7 @@ public:
 	}
 
 	void init_sys903();
+	void init_comg079();
 	void init_comg080();
 	void init_s903mod();
 	void init_sys905();

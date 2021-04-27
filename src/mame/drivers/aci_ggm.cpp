@@ -45,14 +45,15 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
+
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
-#include "video/pwm.h"
 #include "sound/dac.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+#include "video/pwm.h"
 
 #include "speaker.h"
 #include "softlist.h"
