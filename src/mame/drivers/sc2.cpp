@@ -30,12 +30,15 @@ Fidelity CC10 synonyms: RE, LV, RV, PB, ♪, CL, EN
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/z80pio.h"
-#include "video/pwm.h"
 #include "sound/dac.h"
+#include "video/pwm.h"
+
 #include "speaker.h"
 
+// internal artwork
 #include "sc2.lh"
 
 
@@ -71,8 +74,8 @@ private:
 	void main_io(address_map &map);
 	void main_map(address_map &map);
 
-	u8 m_inp_mux;
-	u8 m_digit_data;
+	u8 m_inp_mux = 0;
+	u8 m_digit_data = 0;
 
 	void update_display();
 	u8 pio_port_b_r();
@@ -83,10 +86,6 @@ private:
 
 void sc2_state::machine_start()
 {
-	// zerofill
-	m_inp_mux = 0;
-	m_digit_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_digit_data));

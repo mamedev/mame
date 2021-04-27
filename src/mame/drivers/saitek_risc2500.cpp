@@ -48,8 +48,8 @@ TODO:
 #include "machine/ram.h"
 #include "machine/sensorboard.h"
 #include "machine/timer.h"
-#include "video/sed1520.h"
 #include "sound/spkrdev.h"
+#include "video/sed1520.h"
 
 #include "emupal.h"
 #include "screen.h"
