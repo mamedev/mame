@@ -121,8 +121,8 @@ private:
 
 	void update_display();
 
-	u8 m_digit;
-	u8 m_segment;
+	u8 m_digit = 0;
+	u8 m_segment = 0;
 };
 
 

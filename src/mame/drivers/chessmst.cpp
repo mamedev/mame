@@ -8,6 +8,7 @@ Chess-Master Diamond (G-5004-500)
 
 TODO:
 - figure out why chessmsta won't work, u2616 is probably a bad dump or misplaced
+- use pwm_display for the leds
 
 ****************************************************************************/
 
@@ -87,13 +88,33 @@ private:
 	output_finder<> m_monitor_led;
 	output_finder<> m_playmode_led;
 
-	uint16_t m_matrix;
-	uint16_t m_led_sel;
-	uint8_t m_digit_matrix;
-	int m_digit_dot;
-	uint16_t m_digit;
+	uint16_t m_matrix = 0;
+	uint16_t m_led_sel = 0;
+	uint8_t m_digit_matrix = 0;
+	int m_digit_dot = 0;
+	uint16_t m_digit = 0;
 };
 
+void chessmst_state::machine_start()
+{
+	m_digits.resolve();
+	m_leds.resolve();
+	m_monitor_led.resolve();
+	m_playmode_led.resolve();
+
+	save_item(NAME(m_matrix));
+	save_item(NAME(m_led_sel));
+	save_item(NAME(m_digit_matrix));
+	save_item(NAME(m_digit_dot));
+	save_item(NAME(m_digit));
+}
+
+void chessmst_state::machine_reset()
+{
+}
+
+
+/* Address Maps */
 
 void chessmst_state::chessmst_mem(address_map &map)
 {
@@ -132,6 +153,9 @@ WRITE_LINE_MEMBER( chessmst_state::timer_555_w )
 	m_pio[1]->data_b_write(m_matrix);
 }
 
+
+/* Input ports */
+
 INPUT_CHANGED_MEMBER(chessmst_state::reset_button)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
@@ -148,17 +172,16 @@ INPUT_CHANGED_MEMBER(chessmst_state::view_monitor_button)
 	}
 }
 
-/* Input ports */
 static INPUT_PORTS_START( chessmst )
 	PORT_START("BUTTONS")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Hint     [7]")    PORT_CODE(KEYCODE_7)    PORT_CODE(KEYCODE_H)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Random   [6]")    PORT_CODE(KEYCODE_6)    PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Referee  [5]")    PORT_CODE(KEYCODE_5)    PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Selfplay [4]")    PORT_CODE(KEYCODE_4)    PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board    [3]")    PORT_CODE(KEYCODE_3)    PORT_CODE(KEYCODE_B)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Color    [2]")    PORT_CODE(KEYCODE_2)    PORT_CODE(KEYCODE_C)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Level    [1]")    PORT_CODE(KEYCODE_1)    PORT_CODE(KEYCODE_L)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("New Game [0]")    PORT_CODE(KEYCODE_0)    PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Hint / 7")        PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Random / 6")      PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Referee / 5")     PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Self Play / 4")   PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board / 3")       PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_B)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Color / 2")       PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Level / 1")       PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("New Game / 0")    PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(KEYCODE_N)
 
 	PORT_START("EXTRA")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Halt") PORT_CODE(KEYCODE_F2) PORT_WRITE_LINE_DEVICE_MEMBER("z80pio0", z80pio_device, strobe_a) // -> PIO(0) ASTB pin
@@ -174,31 +197,15 @@ static INPUT_PORTS_START( chessmstdm )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD)  PORT_NAME("Parameter / Information") PORT_CODE(KEYCODE_I)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD)  PORT_NAME("Selection / Dialogue")    PORT_CODE(KEYCODE_S)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD)  PORT_NAME("Function / Notation")     PORT_CODE(KEYCODE_F)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)  PORT_NAME("Enter")                   PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD)  PORT_NAME("Enter")                   PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD)
 
 	PORT_START("EXTRA")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Monitor")                 PORT_CODE(KEYCODE_F1)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, view_monitor_button, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("View")                    PORT_CODE(KEYCODE_F2)   PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, view_monitor_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Monitor")                 PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, view_monitor_button, 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("View")                    PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, chessmst_state, view_monitor_button, 0)
 INPUT_PORTS_END
 
 
-void chessmst_state::machine_start()
-{
-	m_digits.resolve();
-	m_leds.resolve();
-	m_monitor_led.resolve();
-	m_playmode_led.resolve();
-
-	save_item(NAME(m_matrix));
-	save_item(NAME(m_led_sel));
-	save_item(NAME(m_digit_matrix));
-	save_item(NAME(m_digit_dot));
-	save_item(NAME(m_digit));
-}
-
-void chessmst_state::machine_reset()
-{
-}
+/* I/O */
 
 void chessmst_state::update_display()
 {
@@ -264,7 +271,7 @@ uint8_t chessmst_state::pio2_port_a_r()
 
 	// The pieces position on the chessboard is identified by 64 Hall
 	// sensors, which are in a 8x8 matrix with the corresponding LEDs.
-	for (int i=0; i<8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		if (m_matrix & (1 << i))
 			data |= ~m_board->read_file(i);
@@ -281,6 +288,9 @@ void chessmst_state::pio2_port_b_w(uint8_t data)
 	m_matrix = (data & 0xff) | (m_matrix & 0x100);
 	m_led_sel = (data & 0xff) | (m_led_sel & 0x300);
 }
+
+
+/* Machine Configuration */
 
 static const z80_daisy_config chessmst_daisy_chain[] =
 {
@@ -320,7 +330,7 @@ void chessmst_state::chessmst(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void chessmst_state::chessmsta(machine_config &config)
@@ -349,7 +359,7 @@ void chessmst_state::chessmsta(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void chessmst_state::chessmstdm(machine_config &config)
@@ -382,7 +392,7 @@ void chessmst_state::chessmstdm(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 1000).add_route(ALL_OUTPUTS, "mono", 0.50);
+	BEEP(config, m_beeper, 1000).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "chessmstdm_cart");
 	SOFTWARE_LIST(config, "cart_list").set_original("chessmstdm");
@@ -390,6 +400,7 @@ void chessmst_state::chessmstdm(machine_config &config)
 
 
 /* ROM definition */
+
 ROM_START( chessmst )
 	ROM_REGION( 0x2800, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("056.bin", 0x0000, 0x0400, CRC(2b90e5d3) SHA1(c47445964b2e6cb11bd1f27e395cf980c97af196) )
@@ -422,4 +433,5 @@ ROM_END
 //    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY, FULLNAME, FLAGS
 COMP( 1984, chessmst,   0,        0,      chessmst,   chessmst,   chessmst_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 COMP( 1984, chessmsta,  chessmst, 0,      chessmsta,  chessmst,   chessmst_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+
 COMP( 1987, chessmstdm, 0,        0,      chessmstdm, chessmstdm, chessmst_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master Diamond", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
