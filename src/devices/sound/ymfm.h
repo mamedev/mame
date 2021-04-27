@@ -16,12 +16,13 @@ namespace ymfm
 
 enum envelope_state : uint32_t
 {
-	EG_DEPRESS = 0,
+	EG_DEPRESS = 0,		// OPLL only
 	EG_ATTACK = 1,
 	EG_DECAY = 2,
 	EG_SUSTAIN = 3,
 	EG_RELEASE = 4,
-	EG_STATES = 5
+	EG_REVERB = 5,		// OPZ only
+	EG_STATES = 6
 };
 
 
@@ -177,17 +178,6 @@ protected:
 	// construction time
 	fm_engine_callbacks *m_callbacks;
 };
-
-
-//*********************************************************
-//  MACROS
-//*********************************************************
-
-// special naming helper to keep our namespace isolated from other
-// same-named objects in the device's namespace (mostly necessary
-// for chips which derive from AY-8910 classes and may have clashing
-// names)
-#define YMFM_NAME(x) x, "ymfm." #x
 
 
 //*********************************************************
@@ -351,21 +341,29 @@ public:
 	//         uint32_t CHANNELS: The number of channels on the chip
 	//     uint32_t ALL_CHANNELS: A bitmask of all channels
 	//        uint32_t OPERATORS: The number of operators on the chip
-	//     bool DYNAMIC_OPS: True if ops/channel can be changed at runtime
 	//        uint32_t WAVEFORMS: The number of waveforms offered
 	//        uint32_t REGISTERS: The number of 8-bit registers allocated
-	//         uint32_t REG_MODE: The address of the "mode" register controlling timers
 	// uint32_t DEFAULT_PRESCALE: The starting clock prescale
 	// uint32_t EG_CLOCK_DIVIDER: The clock divider of the envelope generator
-	//  bool EG_HAS_DEPRESS: True if the chip has a DP ("depress"?) envelope stage
-	//      bool EG_HAS_SSG: True if the chip has SSG envelope support
-	// bool MODULATOR_DELAY: True if the modulator is delayed by 1 sample (OPL pre-OPL3)
 	// uint32_t CSM_TRIGGER_MASK: Mask of channels to trigger in CSM mode
+	//         uint32_t REG_MODE: The address of the "mode" register controlling timers
 	//     uint8_t STATUS_TIMERA: Status bit to set when timer A fires
 	//     uint8_t STATUS_TIMERB: Status bit to set when tiemr B fires
 	//       uint8_t STATUS_BUSY: Status bit to set when the chip is busy
 	//        uint8_t STATUS_IRQ: Status bit to set when an IRQ is signalled
 	//
+	// the following constants are uncommon:
+	//          bool DYNAMIC_OPS: True if ops/channel can be changed at runtime (OPL3+)
+	//       bool EG_HAS_DEPRESS: True if the chip has a DP ("depress"?) envelope stage (OPLL)
+	//        bool EG_HAS_REVERB: True if the chip has a faux reverb envelope stage (OPZ)
+	//           bool EG_HAS_SSG: True if the chip has SSG envelope support (OPN)
+	//      bool MODULATOR_DELAY: True if the modulator is delayed by 1 sample (OPL pre-OPL3)
+	//
+	static constexpr bool DYNAMIC_OPS = false;
+	static constexpr bool EG_HAS_DEPRESS = false;
+	static constexpr bool EG_HAS_REVERB = false;
+	static constexpr bool EG_HAS_SSG = false;
+	static constexpr bool MODULATOR_DELAY = false;
 
 	// system-wide register defaults
 	uint32_t status_mask() const                { return 0; } // OPL only
@@ -640,9 +638,6 @@ public:
 	// compute sample rate
 	uint32_t sample_rate(uint32_t baseclock) const { return baseclock / (m_clock_prescale * OPERATORS); }
 
-	// reset the LFO state
-	void reset_lfo() { m_regs.reset_lfo(); }
-
 	// return the owning device
 	fm_interface &intf() const { return m_intf; }
 
@@ -689,7 +684,18 @@ protected:
 // ======================> mame_fm_interface
 
 // this class abstracts out system-dependent behaviors and interfaces
-#ifndef NOT_MAME
+#ifdef MAME_EMU_SAVE_H
+
+//*********************************************************
+//  MACROS
+//*********************************************************
+
+// special naming helper to keep our namespace isolated from other
+// same-named objects in the device's namespace (mostly necessary
+// for chips which derive from AY-8910 classes and may have clashing
+// names)
+#define YMFM_NAME(x) x, "ymfm." #x
+
 class mame_fm_interface : public ymfm::fm_interface
 {
 public:

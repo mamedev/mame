@@ -138,18 +138,4 @@ public:
 	}
 };
 
-
-// ======================> ym2414_device
-
-DECLARE_DEVICE_TYPE(YM2414, ym2414_device);
-class ym2414_device : public opm_device_base<ymfm::ym2414>
-{
-public:
-	ym2414_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		opm_device_base(mconfig, tag, owner, clock, YM2414)
-	{
-	}
-};
-
-
 #endif // MAME_SOUND_YM2151_H

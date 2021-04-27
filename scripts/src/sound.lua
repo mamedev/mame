@@ -1170,6 +1170,7 @@ end
 ---------------------------------------------------
 -- Yamaha FM synthesizers
 --@src/devices/sound/ym2151.h,SOUNDS["YM2151"] = true
+--@src/devices/sound/ym2414.h,SOUNDS["YM2414"] = true
 --@src/devices/sound/ym2203.h,SOUNDS["YM2203"] = true
 --@src/devices/sound/ym2413.h,SOUNDS["YM2413"] = true
 --@src/devices/sound/ym2608.h,SOUNDS["YM2608"] = true
@@ -1183,7 +1184,7 @@ end
 --@src/devices/sound/y8950.h,SOUNDS["Y8950"] = true
 ---------------------------------------------------
 
-if (SOUNDS["YM2151"]~=null) then
+if (SOUNDS["YM2151"]~=null or SOUNDS["YM2164"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/ym2151.cpp",
 		MAME_DIR .. "src/devices/sound/ym2151.h",
@@ -1192,6 +1193,18 @@ if (SOUNDS["YM2151"]~=null) then
 		MAME_DIR .. "src/devices/sound/ymfm.ipp",
 		MAME_DIR .. "src/devices/sound/ymfm_opm.cpp",
 		MAME_DIR .. "src/devices/sound/ymfm_opm.h",
+	}
+end
+
+if (SOUNDS["YM2414"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/ym2414.cpp",
+		MAME_DIR .. "src/devices/sound/ym2414.h",
+		MAME_DIR .. "src/devices/sound/ymfm.cpp",
+		MAME_DIR .. "src/devices/sound/ymfm.h",
+		MAME_DIR .. "src/devices/sound/ymfm.ipp",
+		MAME_DIR .. "src/devices/sound/ymfm_opz.cpp",
+		MAME_DIR .. "src/devices/sound/ymfm_opz.h",
 	}
 end
 
