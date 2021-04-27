@@ -119,6 +119,7 @@ void psr60_state::machine_start()
 {
 	m_rom2bank->configure_entries(0, 2, memregion("rom2")->base(), 0x4000);
 	m_rom2bank->set_entry(0);
+	m_acia_irq = CLEAR_LINE;
 }
 
 void psr60_state::machine_reset()
@@ -161,4 +162,13 @@ ROM_START( psr60 )
 	ROM_LOAD("yamaha_psr60_pgm_ic110.bin", 0x000000, 0x008000, CRC(39db8c74) SHA1(7750104d1e5df3357aa553ac58768dbc34051cd8))
 ROM_END
 
+ROM_START(psr70)
+	ROM_REGION(0x8000, "rom1", 0)
+	ROM_LOAD("psr70-rom1.bin", 0x000000, 0x008000, CRC(bf134412) SHA1(318f33f8ef5e2d865e8ae657993763c9e032af8e))
+
+	ROM_REGION(0x8000, "rom2", 0)
+	ROM_LOAD("yamaha_psr60_pgm_ic110.bin", 0x000000, 0x008000, CRC(39db8c74) SHA1(7750104d1e5df3357aa553ac58768dbc34051cd8))
+ROM_END
+
 CONS(1985, psr60, 0, 0, psr60, psr60, psr60_state, empty_init, "Yamaha", "PSR-60 PortaSound", MACHINE_NOT_WORKING)
+CONS(1985, psr70, psr60, 0, psr60, psr60, psr60_state, empty_init, "Yamaha", "PSR-70 PortaSound", MACHINE_NOT_WORKING)

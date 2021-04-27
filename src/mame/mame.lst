@@ -43168,6 +43168,10 @@ mu100                           // 1997 MU-100
 mu100r                          // 1997 MU-100 Rackable version
 mu100b                          // 1998 MU-100B
 
+@source:ympsr60.cpp
+psr60							// 1985 PSR-60
+psr70							// 1985 PSR-70
+
 @source:ympsr340.cpp
 psr340                          // 1999 PSR-340
 
