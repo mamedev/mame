@@ -1455,7 +1455,7 @@ ROM_START( ccboot )
 	/* 0x1800-0xffff - empty */
 	ROM_LOAD( "m04.bin",      0x2000, 0x0800, CRC(6fb80538) SHA1(6ba5add5c0190e79191b3fa749a1b94e766e3950) )
 	/* 0x2800-0x2fff - empty */
-	ROM_LOAD( "m03.bin",      0x3800, 0x0800, CRC(67127253) SHA1(e27556ed74e73644a2578ce6645c312d64f484c6) )
+	ROM_LOAD( "m03.bin",      0x3000, 0x0800, CRC(67127253) SHA1(e27556ed74e73644a2578ce6645c312d64f484c6) )
 	/* 0x3800-0x3fff - empty */
 
 	ROM_REGION( 0x1000, "gfx2", 0 )
