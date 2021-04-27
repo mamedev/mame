@@ -16327,7 +16327,7 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- Sprites leave "trails" on screen -->
+	<!-- Sprites leave "trails" on screen (regression) -->
 	<software name="dbuster" supported="partial">
 		<description>Dragon Buster</description>
 		<year>1989</year>
@@ -28336,8 +28336,11 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- no bitmap GFXs during gameplay -->
-	<software name="madoum1" supported="no">
+	<!-- all three Madou Monogatari sports a "Madou Monogatari 1-2-3" title screen -->
+	<!-- verify if these were really released as stand alone. -->
+
+	<!-- boot OK, uses PCM1BIT samples -->
+	<software name="madoum1" supported="partial">
 		<description>Madou Monogatari 1</description>
 		<year>1991</year>
 		<publisher>コンパイル (Compile)</publisher>
@@ -28357,8 +28360,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<!-- no bitmap GFXs during gameplay -->
-	<software name="madoum2" supported="no">
+	<!-- boot OK, uses PCM1BIT samples -->
+	<software name="madoum2" supported="partial">
 		<description>Madou Monogatari 2</description>
 		<year>1991</year>
 		<publisher>コンパイル (Compile)</publisher>
@@ -28378,7 +28381,8 @@ only have some part of Windows file and a Video driver(CLGD?).
 		</part>
 	</software>
 
-	<software name="madoum3">
+	<!-- boot OK, uses PCM1BIT samples -->
+	<software name="madoum3" supported="partial">
 		<description>Madou Monogatari 3</description>
 		<year>1991</year>
 		<publisher>コンパイル (Compile)</publisher>
