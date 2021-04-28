@@ -58,8 +58,8 @@ HD44780_PIXEL_UPDATE(ymtx81z_state::lcd_pixel_update)
 void ymtx81z_state::palette_init(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); // background
-	palette.set_pen_color(1, rgb_t(0xd8, 0xf0, 0x18)); // lcd pixel on
-	palette.set_pen_color(2, rgb_t(0xd8/10, 0xf0/10, 0x18/10)); // lcd pixel off
+	palette.set_pen_color(1, rgb_t(0xd8, 0xff, 0x18)); // lcd pixel on
+	palette.set_pen_color(2, rgb_t(0xd8/10, 0xff/10, 0x18/10)); // lcd pixel off
 }
 
 void ymtx81z_state::machine_start()
