@@ -129,7 +129,7 @@ void menu_control_floppy_image::handle()
 			m_state = START_FILE;
 			handle();
 		} else {
-			const auto &fs = fd.get_fs();
+			const auto &fs = fd.get_create_fs();
 			output_filename = util::zippath_combine(m_current_directory, m_current_file);
 			output_format = format_array[m_submenu_result.i];
 			if(fs.size() == 1) {
@@ -149,7 +149,7 @@ void menu_control_floppy_image::handle()
 			m_state = START_FILE;
 			handle();
 		} else {
-			create_fs = &fd.get_fs()[m_submenu_result.i];
+			create_fs = &fd.get_create_fs()[m_submenu_result.i];
 			do_load_create();
 			stack_pop();
 		}

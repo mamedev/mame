@@ -7,7 +7,7 @@
 #include "fs_prodos.h"
 #include "ap_dsk35.h"
 
-const u8 fs_prodos::boot[512] = {
+const u8 fs_prodos::impl::boot[512] = {
 	0x01, 0x38, 0xb0, 0x03, 0x4c, 0x1c, 0x09, 0x78, 0x86, 0x43, 0xc9, 0x03, 0x08, 0x8a, 0x29, 0x70,
 	0x4a, 0x4a, 0x4a, 0x4a, 0x09, 0xc0, 0x85, 0x49, 0xa0, 0xff, 0x84, 0x48, 0x28, 0xc8, 0xb1, 0x48,
 	0xd0, 0x3a, 0xb0, 0x0e, 0xa9, 0x03, 0x8d, 0x00, 0x08, 0xe6, 0x3d, 0xa5, 0x49, 0x48, 0xa9, 0x5b,
@@ -44,49 +44,74 @@ const u8 fs_prodos::boot[512] = {
 
 void fs_prodos::enumerate(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
-	bool all = form_factor == floppy_image::FF_UNKNOWN;
-
-	if(all || (form_factor == floppy_image::FF_35 && has_variant(variants, floppy_image::DSDD)))
-		fe.add(this, FLOPPY_APPLE_GCR_FORMAT, 819200, "prodos_800k", 800, "Apple ProDOS 800K");
-	if(all || (form_factor == floppy_image::FF_35 && has_variant(variants, floppy_image::SSDD)))
-		fe.add(this, FLOPPY_APPLE_GCR_FORMAT, 409600, "prodos_400k", 400, "Apple ProDOS 400K");
+	if(has(form_factor, variants, floppy_image::FF_35, floppy_image::DSDD))
+		fe.add(this, FLOPPY_APPLE_GCR_FORMAT, 819200, "prodos_800k", "Apple ProDOS 800K");
+	if(has(form_factor, variants, floppy_image::FF_35, floppy_image::SSDD))
+		fe.add(this, FLOPPY_APPLE_GCR_FORMAT, 409600, "prodos_400k", "Apple ProDOS 400K");
 }
 
-void fs_prodos::floppy_instantiate(u32 key, std::vector<u8> &image) const
+std::unique_ptr<filesystem_t> fs_prodos::mount(fsblk_t &blockdev) const
+{
+	return std::make_unique<impl>(blockdev);
+}
+
+bool fs_prodos::can_format() const
+{
+	return true;
+}
+
+bool fs_prodos::can_read() const
+{
+	return false;
+}
+
+bool fs_prodos::can_write() const
+{
+	return false;
+}
+
+void fs_prodos::impl::format()
 {
 	std::string volume_name = "UNTITLED";
-	u32 blocks = key * 2;
+	m_blockdev.set_block_size(512);
+	u32 blocks = m_blockdev.block_count();
 
-	copy(image, 0x000, boot, 0x200);               // Standard ProDOS boot sector as written by a 2gs
+	m_blockdev.get(0).copy(0x000, boot, 0x200);               // Standard ProDOS boot sector as written by a 2gs
+	m_blockdev.get(1).fill(0x00);                             // No SOS boot sector
 
-	fill(image, 0x200, 0x00, 0x200);               // No SOS boot sector
+	auto kblk1 = m_blockdev.get(2);                           // key block first block
+	auto kblk2 = m_blockdev.get(3);                           // key block second block
+	auto kblk3 = m_blockdev.get(4);                           // key block third block
+	auto kblk4 = m_blockdev.get(5);                           // key block fourth block
 
-	w16l(image, 0x400, 0x0000);                    // Backwards key block pointer (null)
-	w16l(image, 0x402, 0x0003);                    // Forwards key block pointer
-	w8  (image, 0x404, 0xf0 | volume_name.size()); // Block type (f, key block) and name size
-	wstr(image, 0x405, volume_name);               // Volume name, up to 15 characters
-	w32b(image, 0x416, 0x642a250d);                // ??? date & time
-	w16b(image, 0x41a, 0x80ff);                    // ???
-	w32b(image, 0x41c, 0x642a250d);                // Creation date & time
-	w8  (image, 0x420, 0x05);                      // ProDOS version (2gs)
-	w8  (image, 0x421, 0x00);                      // ProDOS minimum version
-	w8  (image, 0x422, 0xc3);                      // Allowed access (destroy, rename, !backup, 3x0, write read)
-	w8  (image, 0x423, 0x27);                      // Directory entry length (fixed)
-	w8  (image, 0x424, 0x0d);                      // Entries per block (fixed)
-	w16l(image, 0x425, 0x0000);                    // Number of file entries in the directory
-	w16l(image, 0x427, 0x0006);                    // Bitmap block pointer
-	w16l(image, 0x429, blocks);                    // Number of blocks
+	kblk1.w16l(0x00, 0x0000);                                 // Backwards key block pointer (null)
+	kblk1.w16l(0x02, 0x0003);                                 // Forwards key block pointer
+	kblk1.w8  (0x04, 0xf0 | volume_name.size());              // Block type (f, key block) and name size
+	kblk1.wstr(0x05, volume_name);                            // Volume name, up to 15 characters
+	kblk1.w32b(0x16, 0x642a250d);                             // ??? date & time
+	kblk1.w16b(0x1a, 0x80ff);                                 // ???
+	kblk1.w32b(0x1c, 0x642a250d);                             // Creation date & time
+	kblk1.w8  (0x20, 0x05);                                   // ProDOS version (2gs)
+	kblk1.w8  (0x21, 0x00);                                   // ProDOS minimum version
+	kblk1.w8  (0x22, 0xc3);                                   // Allowed access (destroy, rename, !backup, 3x0, write read)
+	kblk1.w8  (0x23, 0x27);                                   // Directory entry length (fixed)
+	kblk1.w8  (0x24, 0x0d);                                   // Entries per block (fixed)
+	kblk1.w16l(0x25, 0x0000);                                 // Number of file entries in the directory
+	kblk1.w16l(0x27, 0x0006);                                 // Bitmap block pointer
+	kblk1.w16l(0x29, blocks);                                 // Number of blocks
 
-	w16l(image, 0x600, 0x0002);                    // Backwards block pointer of the second volume block
-	w16l(image, 0x602, 0x0004);                    // Forwards block pointer of the second volume block
-	w16l(image, 0x800, 0x0003);                    // Backwards block pointer of the third volume block
-	w16l(image, 0x802, 0x0005);                    // Forwards block pointer of the third volume block
-	w16l(image, 0xa00, 0x0004);                    // Backwards block pointer of the fourth volume block
-	w16l(image, 0xa02, 0x0000);                    // Forwards block pointer of the fourth volume block (nmull)
+	kblk2.w16l(0x00, 0x0002);                                 // Backwards block pointer of the second volume block
+	kblk2.w16l(0x02, 0x0004);                                 // Forwards block pointer of the second volume block
+	kblk3.w16l(0x00, 0x0003);                                 // Backwards block pointer of the third volume block
+	kblk3.w16l(0x02, 0x0005);                                 // Forwards block pointer of the third volume block
+	kblk4.w16l(0x00, 0x0004);                                 // Backwards block pointer of the fourth volume block
+	kblk4.w16l(0x02, 0x0000);                                 // Forwards block pointer of the fourth volume block (null)
 
+	auto fmap = m_blockdev.get(6);
+	u8 *fdata = fmap.data();
 	// Mark blocks 7 to max as free
 	for(u32 i = 7; i != blocks; i++)
-		image[0xc00 + (i >> 3)] |= 0x80 >> (i & 7);
+		fdata[i >> 3] |= 0x80 >> (i & 7);
 }
 
 const filesystem_manager_type FS_PRODOS = &filesystem_manager_creator<fs_prodos>;;

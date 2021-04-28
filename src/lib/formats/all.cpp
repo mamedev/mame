@@ -457,6 +457,10 @@
 #include "oric_tap.h"
 #endif
 
+#ifdef HAS_FORMATS_FS_ORIC_JASMIN
+#include "fs_oric_jasmin.h"
+#endif
+
 #ifdef HAS_FORMATS_IBMXDF_DSK
 #include "ibmxdf_dsk.h"
 #endif
@@ -1130,6 +1134,10 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 #ifdef HAS_FORMATS_ORIC_DSK
 	en.add(FLOPPY_ORIC_DSK_FORMAT); // oric_dsk.h
+	en.add(FLOPPY_ORIC_JASMIN_FORMAT); // oric_dsk.h
+#endif
+#ifdef HAS_FORMATS_FS_ORIC_JASMIN
+	en.add(FS_ORIC_JASMIN); // fs_oric_jasmin.h
 #endif
 
 	en.category("Atari");

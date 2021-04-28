@@ -56,17 +56,17 @@ public:
 		u32 m_key;
 		const char *m_description;
 
-		fs_info(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, u32 key, const char *description) :
+		fs_info(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, const char *description) :
 			m_manager(manager),
 			m_type(type),
 			m_image_size(image_size),
 			m_name(name),
-			m_key(key),
+			m_key(0),
 			m_description(description)
 		{}
 
-		fs_info(const filesystem_manager_t *manager, const char *name, u32 key, const char *description) :
-			m_manager(manager),
+		fs_info(const char *name, u32 key, const char *description) :
+			m_manager(nullptr),
 			m_type(nullptr),
 			m_image_size(0),
 			m_name(name),
@@ -80,7 +80,8 @@ public:
 
 	void set_formats(std::function<void (format_registration &fr)> formats);
 	floppy_image_format_t *get_formats() const;
-	const std::vector<fs_info> &get_fs() const { return m_fs; }
+	const std::vector<fs_info> &get_create_fs() const { return m_create_fs; }
+	const std::vector<fs_info> &get_io_fs() const { return m_io_fs; }
 	floppy_image_format_t *get_load_format() const;
 	floppy_image_format_t *identify(std::string filename);
 	void set_rpm(float rpm);
@@ -158,8 +159,8 @@ protected:
 		floppy_image_device *m_fid;
 		fs_enum(floppy_image_device *fid) : filesystem_manager_t::floppy_enumerator(), m_fid(fid) {};
 
-		virtual void add(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, u32 key, const char *description) override;
-		virtual void add_raw(const filesystem_manager_t *manager, const char *name, u32 key, const char *description) override;
+		virtual void add(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, const char *description) override;
+		virtual void add_raw(const char *name, u32 key, const char *description) override;
 	};
 
 	floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -186,7 +187,7 @@ protected:
 	std::unique_ptr<floppy_image> image;
 	char                  extension_list[256];
 	floppy_image_format_t *fif_list;
-	std::vector<fs_info>  m_fs;
+	std::vector<fs_info>  m_create_fs, m_io_fs;
 	std::vector<std::unique_ptr<filesystem_manager_t>> m_fs_managers;
 	emu_timer             *index_timer;
 

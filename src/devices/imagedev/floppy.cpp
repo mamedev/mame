@@ -21,6 +21,7 @@
 #include "formats/pc_dsk.h"
 
 #include "formats/fs_unformatted.h"
+#include "formats/fsblk_vec.h"
 
 #include "speaker.h"
 #include "formats/imageutl.h"
@@ -308,14 +309,17 @@ void floppy_image_device::setup_led_cb(led_cb cb)
 	cur_led_cb = cb;
 }
 
-void floppy_image_device::fs_enum::add(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, u32 key, const char *description)
+void floppy_image_device::fs_enum::add(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, const char *description)
 {
-	m_fid->m_fs.emplace_back(fs_info(manager, type, image_size, name, key, description));
+	if(manager->can_format())
+		m_fid->m_create_fs.emplace_back(fs_info(manager, type, image_size, name, description));
+	if(manager->can_read())
+		m_fid->m_io_fs.emplace_back(fs_info(manager, type, image_size, name, description));
 }
 
-void floppy_image_device::fs_enum::add_raw(const filesystem_manager_t *manager, const char *name, u32 key, const char *description)
+void floppy_image_device::fs_enum::add_raw(const char *name, u32 key, const char *description)
 {
-	m_fid->m_fs.emplace_back(fs_info(manager, name, key, description));
+	m_fid->m_create_fs.emplace_back(fs_info(name, key, description));
 }
 
 void floppy_image_device::register_formats()
@@ -718,14 +722,17 @@ void floppy_image_device::init_fs(const fs_info *fs)
 	if (fs->m_type)
 	{
 		std::vector<u8> img(fs->m_image_size);
-		fs->m_manager->floppy_instantiate(fs->m_key, img);
+		fsblk_vec_t blockdev(img);
+		auto cfs = fs->m_manager->mount(blockdev);
+		cfs->format();
+
 		auto iog = ram_open(img);
 		auto source_format = fs->m_type();
 		source_format->load(iog, floppy_image::FF_UNKNOWN, variants, image.get());
 		delete source_format;
 		delete iog;
 	} else
-		fs->m_manager->floppy_instantiate_raw(fs->m_key, image.get());
+		fs_unformatted::format(fs->m_key, image.get());
 }
 
 /* write protect, active high

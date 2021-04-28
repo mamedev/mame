@@ -19,6 +19,7 @@
 #include <cassert>
 #include <map>
 
+#include "../emu/emucore.h"
 #include "corestr.h"
 #include "osdcomm.h"
 
@@ -27,6 +28,19 @@ using u16 = uint16_t;
 using u32 = uint32_t;
 
 #include "formats/all.h"
+#include "formats/fs_unformatted.h"
+#include "formats/fsblk_vec.h"
+
+emu_fatalerror::emu_fatalerror(util::format_argument_pack<std::ostream> const &args)
+	: emu_fatalerror(0, args)
+{
+}
+
+emu_fatalerror::emu_fatalerror(int _exitcode, util::format_argument_pack<std::ostream> const &args)
+	: m_text(util::string_format(args))
+	, m_code(_exitcode)
+{
+}
 
 struct fs_info {
 	const filesystem_manager_t *m_manager;
@@ -36,17 +50,17 @@ struct fs_info {
 	u32 m_key;
 	const char *m_description;
 
-	fs_info(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, u32 key, const char *description) :
+	fs_info(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, const char *description) :
 		m_manager(manager),
 		m_type(type),
 		m_image_size(image_size),
 		m_name(name),
-		m_key(key),
+		m_key(0),
 		m_description(description)
 	{}
 
-	fs_info(const filesystem_manager_t *manager, const char *name, u32 key, const char *description) :
-		m_manager(manager),
+	fs_info(const char *name, u32 key, const char *description) :
+		m_manager(nullptr),
 		m_type(nullptr),
 		m_image_size(0),
 		m_name(name),
@@ -133,8 +147,8 @@ struct fs_enum : public filesystem_manager_t::floppy_enumerator {
 	fs_enum(enumerator *en) : filesystem_manager_t::floppy_enumerator(), m_en(en) {};
 
 	void reg(const fs_info &fsi) const;
-	virtual void add(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, u32 key, const char *description) override;
-	virtual void add_raw(const filesystem_manager_t *manager, const char *name, u32 key, const char *description) override;
+	virtual void add(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, const char *description) override;
+	virtual void add_raw(const char *name, u32 key, const char *description) override;
 };
 
 struct enumerator : public mame_formats_enumerator {
@@ -193,15 +207,15 @@ void fs_enum::reg(const fs_info &fsi) const
 	fs_by_key.emplace(key, fsi);
 }
 
-void fs_enum::add(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, u32 key, const char *description)
+void fs_enum::add(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, const char *description)
 {
-	fs_info fsi(manager, type, image_size, name, key, description);
+	fs_info fsi(manager, type, image_size, name, description);
 	reg(fsi);
 }
 
-void fs_enum::add_raw(const filesystem_manager_t *manager, const char *name, u32 key, const char *description)
+void fs_enum::add_raw(const char *name, u32 key, const char *description)
 {
-	fs_info fsi(manager, name, key, description);
+	fs_info fsi(name, key, description);
 	reg(fsi);
 }
 
@@ -280,7 +294,7 @@ static void display_formats()
 		if(!e.second.empty()) {
 			fprintf(stderr, "%s:\n", e.first.c_str());
 			for(floppy_image_format_t *fif : e.second)
-				fprintf(stderr, "  %-*s - %s [%s]\n", sk, fif->name(), fif->description(), fif->extensions());
+				fprintf(stderr, "  %-*s     - %s [%s]\n", sk, fif->name(), fif->description(), fif->extensions());
 		}
 
 	fprintf(stderr, "\n\n");
@@ -289,7 +303,13 @@ static void display_formats()
 		if(!e.second.empty()) {
 			fprintf(stderr, "%s:\n", e.first.c_str());
 			for(const fs_info &fs : e.second)
-				fprintf(stderr, "  %-*s - %s\n", sk, fs.m_name, fs.m_description);
+				fprintf(stderr, "  %-*s %c%c%c - %s\n",
+						sk,
+						fs.m_name,
+						!fs.m_manager || fs.m_manager->can_format() ? 'f' : '-',
+						fs.m_manager && fs.m_manager->can_read() ? 'r' : '-',
+						fs.m_manager && fs.m_manager->can_write() ? 'w' : '-',
+						fs.m_description);
 		}
 }
 
@@ -435,7 +455,10 @@ static int create(int argc, char *argv[])
 
 	if(source_fs->m_type) {
 		std::vector<u8> img(source_fs->m_image_size);
-		source_fs->m_manager->floppy_instantiate(source_fs->m_key, img);
+		fsblk_vec_t blockdev(img);
+		auto fs = source_fs->m_manager->mount(blockdev);
+		fs->format();
+
 		auto iog = ram_open(img);
 		auto source_format = source_fs->m_type();
 		source_format->load(iog, floppy_image::FF_UNKNOWN, variants, &image);
@@ -443,7 +466,7 @@ static int create(int argc, char *argv[])
 		delete iog;
 
 	} else
-		source_fs->m_manager->floppy_instantiate_raw(source_fs->m_key, &image);
+		fs_unformatted::format(source_fs->m_key, &image);
 
 	char msg[4096];
 	sprintf(msg, "Error opening %s for writing", argv[4]);
