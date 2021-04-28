@@ -52,13 +52,14 @@ private:
 HD44780_PIXEL_UPDATE(ymtx81z_state::lcd_pixel_update)
 {
 	if (x < 5 && y < 8 && line < 2 && pos < 16)
-		bitmap.pix(line * 8 + y, pos * 6 + x) = state;
+		bitmap.pix(line * 10 + y + 1 + ((y == 7) ? 1 : 0), pos * 6 + x + 1) = state ? 1 : 2;
 }
 
 void ymtx81z_state::palette_init(palette_device &palette)
 {
-	palette.set_pen_color(0, rgb_t(131, 136, 139));
-	palette.set_pen_color(1, rgb_t( 92,  83,  88));
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); // background
+	palette.set_pen_color(1, rgb_t(0xd8, 0xf0, 0x18)); // lcd pixel on
+	palette.set_pen_color(2, rgb_t(0xd8/10, 0xf0/10, 0x18/10)); // lcd pixel off
 }
 
 void ymtx81z_state::machine_start()
@@ -141,11 +142,11 @@ void ymtx81z_state::tx81z(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
-	screen.set_size(6*16, 8*2);
+	screen.set_size(6*16+1, 10*2+1);
 	screen.set_visarea_full();
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(ymtx81z_state::palette_init), 2);
+	PALETTE(config, "palette", FUNC(ymtx81z_state::palette_init), 3);
 
 	hd44780_device &lcdc(HD44780(config, "lcdc", 0));
 	lcdc.set_lcd_size(2, 16);
