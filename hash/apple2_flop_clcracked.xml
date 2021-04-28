@@ -6156,8 +6156,11 @@ license:CC0
 	<software name="caalgebb">
 		<description>Computer Assisted Problem Solving for Beginning Algebra (cleanly cracked)</description>
 		<year>1984</year>
-		<publisher>UNKNOWN</publisher>
+		<publisher>Unknown</publisher>
+		<info name="programmer" value="Chris W. Avery and Charles B. Barker"/>
 		<info name="release" value="2017-09-06"/>
+		<!-- Publisher is unknown. Authors are Chris W. Avery and Charles B.
+		Barker. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -6176,8 +6179,11 @@ license:CC0
 	<software name="caalgebi">
 		<description>Computer Assisted Problem Solving for Intermediate Algebra (cleanly cracked)</description>
 		<year>1984</year>
-		<publisher>UNKNOWN</publisher>
+		<publisher>Unknown</publisher>
+		<info name="programmer" value="Chris W. Avery and Charles B. Barker"/>
 		<info name="release" value="2017-09-06"/>
+		<!-- Publisher is unknown. Authors are Chris W. Avery and Charles B.
+		Barker. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -6196,8 +6202,11 @@ license:CC0
 	<software name="caalgebpa">
 		<description>Computer Assisted Problem Solving for Pre-Algebra (cleanly cracked)</description>
 		<year>1984</year>
-		<publisher>UNKNOWN</publisher>
+		<publisher>Unknown</publisher>
+		<info name="programmer" value="Chris W. Avery and Charles B. Barker"/>
 		<info name="release" value="2017-09-05"/>
+		<!-- Publisher is unknown. Authors are Chris W. Avery and Charles B.
+		Barker. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -10094,7 +10103,7 @@ license:CC0
 	</software>
 
 	<software name="graphmkr">
-		<description>Graph Maker (cleanly cracked)</description>
+		<description>Graph Maker: Introduction to Graphs and Charts (cleanly cracked)</description>
 		<year>1993</year>
 		<publisher>Troll Associates</publisher>
 		<info name="release" value="2015-12-18"/>
@@ -13196,7 +13205,7 @@ license:CC0
 	</software>
 
 	<software name="lgtmapsk">
-		<description>Let's Go There - Beginning Map and Geography Skills (cleanly cracked)</description>
+		<description>Let's Go There: Beginning Map and Geography Skills (cleanly cracked)</description>
 		<year>1993</year>
 		<publisher>Troll Associates</publisher>
 		<info name="release" value="2017-06-30"/>
@@ -36195,8 +36204,8 @@ license:CC0
 	<software name="capalgr2">
 		<description>Computer Assisted Problem Solving for Intermediate Algebra (Revision 2) (cleanly cracked)</description>
 		<year>1984</year>
-		<publisher>UNKNOWN</publisher>
-		<info name="author" value="Chris W. Avery, Charles B. Barker" />
+		<publisher>Unknown</publisher>
+		<info name="programmer" value="Chris W. Avery and Charles B. Barker"/>
 		<info name="release" value="2020-07-16"/>
 		<!-- Publisher is unknown. Authors are Chris W. Avery and Charles B.
 		Barker. -->
@@ -41967,6 +41976,116 @@ license:CC0
 			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="143360">
 				<rom name="the school tool (4am crack) disk 3.dsk" size="143360" crc="8b1b0641" sha1="65b78d70baab3cd4b04089eab8e8f9f21fdc86fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="algmix85">
+		<description>Alligator Mix (1985 Re-release) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Developmental Learning Materials</publisher>
+		<info name="release" value="2021-04-26"/>
+		<info name="programmer" value="Jerry Chaffin, Bill Maxwell, Barbara Thompson, and Allen Colebank"/>
+		<!--"Alligator Mix" is a 1982 educational program developed by Jerry Chaffin, Bill Maxwell, and Barbara Thompson. This 1985 re-release is developed by Allen Colebank. It is distributed by Developmental Learning Materials. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="alligator mix 1985 (4am crack).dsk" size="143360" crc="e6c484d4" sha1="583208338064143d656d4140f9f4f46db7750b77"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tdyply89">
+		<description>Teddy's Playground (1989 Re-release) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2021-04-26"/>
+		<info name="programmer" value="Donna Stanger and Lon Koenig"/>
+		<!--"Teddy's Playground" is a 1985 educational program developed by Donna Stanger and Lon Koenig, and distributed by Sunburst Communications. This is the 1989 re-release. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="teddy's playground 1989 (4am crack).dsk" size="143360" crc="80deccb7" sha1="bfa611ba323010c24b7c84c0311baf0bb95d6218"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alcircr0">
+		<description>Alphabet Circus (Revision 0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Developmental Learning Materials</publisher>
+		<info name="release" value="2021-04-28"/>
+		<!--"Alphabet Circus" is a 1984 educational program developed by Neosoft and distributed by Developmental Learning Materials. This appears to be an earlier release than other known copies. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="alphabet circus rev. 0 (4am crack).dsk" size="143360" crc="0be03a63" sha1="9f6e121a85f7f39b7c60ac53c5afafbda93de463"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kidwrtr0">
+		<description>Kidwriter (Revision 0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Spinnaker</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="Jim and Jack Pejsa"/>
+		<!--"Kidwriter" is a 1983 educational program developed by Jim and Jack Pejsa, and distributed by Spinnaker Software. This appears to be an earlier release than other known copies. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="kidwriter rev. 0 (4am crack).dsk" size="143360" crc="da97fb1c" sha1="3ae516b768b82d6e65e737fb9749f8733ad57e73"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="martgm12">
+		<description>Mastery Arithmetic Games (Version 1.2) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Mastery Development</publisher>
+		<info name="release" value="2021-04-28"/>
+		<!--"Mastery Arithmetic Games" is a 1986 educational program developed and distributed by Mastery Development. This is version 1.2. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mastery arithmetic games v1.2 (4am crack) side a.dsk" size="143360" crc="0ecd0a97" sha1="2fc35c78ab6bee6e57be26ecce9d2c74a07a0e30"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mastery arithmetic games v1.2 (4am crack) side b.dsk" size="143360" crc="827c0c00" sha1="1fd7dc613bb0274ab727a3daa508f2c57995742f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rtpropt">
+		<description>Ratios and Proportions (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Milton Bradley</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="usage" value="Due to programming bugs, it will only work on an Apple ][+" />
+		<!--"Ratios and Proportions" is a 1983 educational program developed and distributed by Milton Bradley. Due to programming bugs unrelated to copy protection, it will only work on an Apple ][+. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ratios and proportions (4am crack).dsk" size="143360" crc="e0222fb9" sha1="38d541db226104517918e14a6f512fc70bc63860"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smanalgy">
+		<description>SocMate Analogies Games (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>American Guidance Service</publisher>
+		<info name="release" value="2021-04-28"/>
+		<info name="programmer" value="B. Maxwell, B. Thompson, J. Chaffin, D. D. Smith, and J. O. Smith"/>
+		<!--"SocMate Analogies Games" is a 1985 educational program developed by B. Maxwell, B. Thompson, J. Chaffin, D. D. Smith, and J. O. Smith, and distributed by American Guidance Service. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="socmate analogies games (4am crack).dsk" size="143360" crc="0470999a" sha1="99e351816e7c5391f09b24f17d15efd2e3d27428"/>
 			</dataarea>
 		</part>
 	</software>
