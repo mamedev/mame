@@ -51,7 +51,7 @@ Test Paste:
 TODO:
     - Pasting doesn't work, probably too slow.
     - The handwritten schematics and prototype by Dr.Scheuschner show 4 extra
-      keys (R, MEM, N, Y), but they aren't in the final version.
+      keys (R, MEM, N, Y) and 8 7segs, but they aren't in the final version.
 
 ***************************************************************************/
 
@@ -78,7 +78,7 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_inputs(*this, "IN.%u", 0U)
 		, m_display(*this, "display")
-		, m_busyled(*this, "busyled")
+		, m_busyled(*this, "busy_led")
 	{ }
 
 	void slc1(machine_config &config);
