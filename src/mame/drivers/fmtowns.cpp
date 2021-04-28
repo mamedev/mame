@@ -2762,7 +2762,7 @@ void towns_state::machine_start()
 	if (m_flop[1]->get_device())
 		m_flop[1]->get_device()->set_rpm(360);
 
-	// unitialized PCM RAM filled with 0xff (fmtmarty chasehq relies on that)
+	// uninitialized PCM RAM filled with 0xff (fmtmarty chasehq relies on that)
 	address_space &space = subdevice<rf5c68_device>("pcm")->space(0);
 	for (int i = 0; i < 0x10000; i++)
 		space.write_byte(i, 0xff);
