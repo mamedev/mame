@@ -39,15 +39,15 @@ void fsblk_t::iblock_t::unref_weak()
 }
 
 
-void filesystem_manager_t::enumerate(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const
+void filesystem_manager_t::enumerate_f(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 }
 
-void filesystem_manager_t::enumerate(hd_enumerator &he) const
+void filesystem_manager_t::enumerate_h(hd_enumerator &he) const
 {
 }
 
-void filesystem_manager_t::enumerate(cdrom_enumerator &ce) const
+void filesystem_manager_t::enumerate_c(cdrom_enumerator &ce) const
 {
 }
 
@@ -71,14 +71,37 @@ bool filesystem_manager_t::has(uint32_t form_factor, const std::vector<uint32_t>
 	return false;
 }
 
-void filesystem_t::format()
+std::vector<fs_meta_description> filesystem_manager_t::volume_meta_description() const
 {
-	fatalerror("format called on filesystem not supporting it.\n");
+	std::vector<fs_meta_description> res;
+	return res;
+}
+
+std::vector<fs_meta_description> filesystem_manager_t::file_meta_description() const
+{
+	std::vector<fs_meta_description> res;
+	return res;
+}
+
+std::vector<fs_meta_description> filesystem_manager_t::directory_meta_description() const
+{
+	std::vector<fs_meta_description> res;
+	return res;
+}
+
+void filesystem_t::format(const fs_meta_data &meta)
+{
+	fatalerror("format called on a filesystem not supporting it.\n");
 }
 
 filesystem_t::dir_t filesystem_t::root()
 {
-	fatalerror("root called on filesystem not supporting it.\n");
+	fatalerror("root called on a filesystem not supporting it.\n");
+}
+
+fs_meta_data filesystem_t::metadata()
+{
+	fatalerror("filesystem_t::metadata called on a filesystem not supporting it.\n");
 }
 
 void fsblk_t::set_block_size(uint32_t block_size)
@@ -92,6 +115,13 @@ uint8_t *fsblk_t::iblock_t::offset(const char *function, uint32_t off, uint32_t 
 	if(off + size > m_size)
 		fatalerror("block_t::%s out-of-block access, offset=%d, size=%d, block size=%d\n", function, off, size, m_size);
 	return data() + off;
+}
+
+const uint8_t *fsblk_t::iblock_t::rooffset(const char *function, uint32_t off, uint32_t size)
+{
+	if(off + size > m_size)
+		fatalerror("block_t::%s out-of-block read access, offset=%d, size=%d, block size=%d\n", function, off, size, m_size);
+	return rodata() + off;
 }
 
 void fsblk_t::block_t::copy(u32 offset, const uint8_t *src, u32 size)
@@ -155,3 +185,37 @@ void fsblk_t::block_t::w32l(u32 offset, u32 data)
 	blk[2] = data >> 16;
 	blk[3] = data >> 24;
 }
+
+std::string fsblk_t::block_t::rstr(u32 offset, u32 size)
+{
+	const u8 *d = m_block->rooffset("rstr", offset, size);
+	std::string res;
+	for(u32 i=0; i != size; i++)
+		res += char(*d++);
+	return res;
+}
+
+const char *fs_meta_get_name(fs_meta_name name)
+{
+	switch(name) {
+	case fs_meta_name::creation_date: return "creation_date";
+	case fs_meta_name::length: return "length";
+	case fs_meta_name::loading_address: return "loading_address";
+	case fs_meta_name::locked: return "locked";
+	case fs_meta_name::sequential: return "sequential";
+	case fs_meta_name::modification_date: return "modification_date";
+	case fs_meta_name::name: return "name";
+	case fs_meta_name::size_in_blocks: return "size_in_blocks";
+	}
+}
+
+std::string fs_meta_to_string(fs_meta_type type, const fs_meta &m)
+{
+	switch(type) {
+	case fs_meta_type::string: return std::get<std::string>(m);
+	case fs_meta_type::number: return util::string_format("0x%x", std::get<uint64_t>(m));
+	case fs_meta_type::flag:   return std::get<bool>(m) ? "t" : "f";
+	case fs_meta_type::date:   abort();
+	}
+}
+

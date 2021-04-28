@@ -348,7 +348,7 @@ void floppy_image_device::register_formats()
 	for(filesystem_manager_type fmt : fr.m_fs)
 	{
 		auto ff = fmt();
-		ff->enumerate(fse, form_factor, variants);
+		ff->enumerate_f(fse, form_factor, variants);
 		m_fs_managers.push_back(std::unique_ptr<filesystem_manager_t>(ff));
 	}
 }
@@ -716,7 +716,7 @@ static io_generic *ram_open(std::vector<u8> &data)
 	return new io_generic({ &iop_ram, f });
 }
 
-void floppy_image_device::init_fs(const fs_info *fs)
+void floppy_image_device::init_fs(const fs_info *fs, const fs_meta_data &meta)
 {
 	assert(image);
 	if (fs->m_type)
@@ -724,7 +724,7 @@ void floppy_image_device::init_fs(const fs_info *fs)
 		std::vector<u8> img(fs->m_image_size);
 		fsblk_vec_t blockdev(img);
 		auto cfs = fs->m_manager->mount(blockdev);
-		cfs->format();
+		cfs->format(meta);
 
 		auto iog = ram_open(img);
 		auto source_format = fs->m_type();

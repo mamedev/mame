@@ -39,7 +39,7 @@
 //     offset 04-05: length of the file in bytes on the first sector, ffff otherwise
 //     offset 06+  : reference to data sectors, (ff, ff) when done
 
-void fs_oric_jasmin::enumerate(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const
+void fs_oric_jasmin::enumerate_f(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	if(has(form_factor, variants, floppy_image::FF_3, floppy_image::DSDD))
 		fe.add(this, FLOPPY_ORIC_JASMIN_FORMAT, 356864, "oric_jasmin_ds", "Oric Jasmin dual-sided");
@@ -59,7 +59,7 @@ bool fs_oric_jasmin::can_format() const
 
 bool fs_oric_jasmin::can_read() const
 {
-	return false;
+	return true;
 }
 
 bool fs_oric_jasmin::can_write() const
@@ -67,11 +67,56 @@ bool fs_oric_jasmin::can_write() const
 	return false;
 }
 
-
-void fs_oric_jasmin::impl::format()
+bool fs_oric_jasmin::has_subdirectories() const
 {
-	std::string volume_name = "UNTITLED";
-	m_blockdev.set_block_size(256);
+	return false;
+}
+
+std::vector<fs_meta_description> fs_oric_jasmin::volume_meta_description() const
+{
+	std::vector<fs_meta_description> res;
+	res.emplace_back(fs_meta_description(fs_meta_name::name, fs_meta_type::string, "UNTITLED", false, [](const fs_meta &m) { std::string n = std::get<std::string>(m); return n.size() <= 8; }, "Volume name, up to 8 characters"));
+
+	return res;
+}
+
+fs_meta_data fs_oric_jasmin::impl::metadata()
+{
+	fs_meta_data res;
+	auto bdir = m_blockdev.get(20*17);
+	int len = 8;
+	while(len > 0 && bdir.rodata()[0xf8 + len - 1] == ' ')
+		len--;
+
+	res[fs_meta_name::name] = bdir.rstr(0xf8, len);
+	return res;	
+}
+
+bool fs_oric_jasmin::validate_filename(std::string name)
+{
+	auto pos = name.find('.');
+	if(pos != std::string::npos)
+		return pos <= 8 && pos > 0 && name.size()-pos-1 <= 3;
+	else
+		return name.size() > 0 && name.size() <= 8;
+}
+
+std::vector<fs_meta_description> fs_oric_jasmin::file_meta_description() const
+{
+	std::vector<fs_meta_description> res;
+	res.emplace_back(fs_meta_description(fs_meta_name::name, fs_meta_type::string, "", false, [](const fs_meta &m) { std::string n = std::get<std::string>(m); return validate_filename(n); }, "File name, 8.3"));
+	res.emplace_back(fs_meta_description(fs_meta_name::loading_address, fs_meta_type::number, 0x501, false, [](const fs_meta &m) { uint64_t n = std::get<uint64_t>(m); return n < 0x10000; }, "Loading address of the file"));
+	res.emplace_back(fs_meta_description(fs_meta_name::length, fs_meta_type::number, 0, true, nullptr, "Size of the file in bytes"));
+	res.emplace_back(fs_meta_description(fs_meta_name::size_in_blocks, fs_meta_type::number, 0, true, nullptr, "Number of blocks used by the file"));
+	res.emplace_back(fs_meta_description(fs_meta_name::locked, fs_meta_type::flag, false, false, nullptr, "File locked"));
+	res.emplace_back(fs_meta_description(fs_meta_name::sequential, fs_meta_type::flag, true, false, nullptr, "File sequential"));
+	return res;
+}
+
+
+void fs_oric_jasmin::impl::format(const fs_meta_data &meta)
+{
+	std::string volume_name = std::get<std::string>(meta.find(fs_meta_name::name)->second);
 	u32 blocks = m_blockdev.block_count();
 
 	m_blockdev.fill(0x6c);

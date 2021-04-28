@@ -10,6 +10,52 @@
 
 #include "flopimg.h"
 
+#include <variant>
+#include <unordered_map>
+
+enum class fs_meta_name {
+	creation_date,
+	length,
+	loading_address,
+	locked,
+	sequential,
+	modification_date,
+	name,
+	size_in_blocks,
+};
+
+enum class fs_meta_type {
+	string,
+	number,
+	date,
+	flag,
+};
+
+using fs_meta = std::variant<std::string, uint64_t, bool>;
+using fs_meta_data = std::unordered_map<fs_meta_name, fs_meta>;
+
+const char *fs_meta_get_name(fs_meta_name name);
+std::string fs_meta_to_string(fs_meta_type type, const fs_meta &m);
+fs_meta fs_meta_from_string(fs_meta_type type, std::string value);
+
+
+struct fs_meta_description {
+	fs_meta_name m_name;
+	fs_meta_type m_type;
+	fs_meta m_default;
+	bool m_ro;
+	std::function<void (const fs_meta &)> m_validator;
+	const char *m_tooltip;
+
+	fs_meta_description(fs_meta_name name, fs_meta_type type, int def, bool ro, std::function<void (fs_meta)> validator, const char *tooltip) :
+		m_name(name), m_type(type), m_default(uint64_t(def)), m_ro(ro), m_validator(validator), m_tooltip(tooltip)
+	{}
+
+	template<typename T> fs_meta_description(fs_meta_name name, fs_meta_type type, T def, bool ro, std::function<void (fs_meta)> validator, const char *tooltip) :
+		m_name(name), m_type(type), m_default(def), m_ro(ro), m_validator(validator), m_tooltip(tooltip)
+	{}
+};
+
 class fsblk_t {
 protected:
 	class iblock_t {
@@ -29,6 +75,7 @@ protected:
 		virtual const uint8_t *rodata() = 0;
 		virtual uint8_t *data() = 0;
 		uint8_t *offset(const char *function, uint32_t off, uint32_t size);
+		const uint8_t *rooffset(const char *function, uint32_t off, uint32_t size);
 
 	protected:
 		uint32_t m_ref, m_weak_ref;
@@ -91,6 +138,8 @@ public:
 		void w16l(uint32_t offset, u16 data);
 		void w32l(uint32_t offset, uint32_t data);
 
+		std::string rstr(uint32_t offset, uint32_t size);
+
 	private:
 		iblock_t *m_block;
 		bool m_is_weak_ref;
@@ -114,7 +163,7 @@ public:
 		}
 	};
 
-	fsblk_t() = default;
+	fsblk_t() : m_block_size(0) {}
 	virtual ~fsblk_t() = default;
 	
 	virtual void set_block_size(uint32_t block_size);
@@ -272,13 +321,15 @@ public:
 		}
 	};
 
-	filesystem_t(fsblk_t &blockdev) : m_blockdev(blockdev) {}
+	filesystem_t(fsblk_t &blockdev, u32 size) : m_blockdev(blockdev) {
+		m_blockdev.set_block_size(size);
+	}
 
 	virtual ~filesystem_t() = default;
 
-	virtual void format();
+	virtual void format(const fs_meta_data &meta);
+	virtual fs_meta_data metadata();
 	virtual dir_t root();
-
 
 protected:
 	fsblk_t &m_blockdev;
@@ -310,13 +361,18 @@ public:
 
 	virtual ~filesystem_manager_t() = default;
 
-	virtual void enumerate(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const;
-	virtual void enumerate(hd_enumerator &he) const;
-	virtual void enumerate(cdrom_enumerator &ce) const;
+	virtual void enumerate_f(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const;
+	virtual void enumerate_h(hd_enumerator &he) const;
+	virtual void enumerate_c(cdrom_enumerator &ce) const;
 
 	virtual bool can_format() const = 0;
 	virtual bool can_read() const = 0;
 	virtual bool can_write() const = 0;
+	virtual bool has_subdirectories() const = 0;
+
+	virtual std::vector<fs_meta_description> volume_meta_description() const;
+	virtual std::vector<fs_meta_description> file_meta_description() const;
+	virtual std::vector<fs_meta_description> directory_meta_description() const;
 
 	// Create a filesystem object from a block device
 	virtual std::unique_ptr<filesystem_t> mount(fsblk_t &blockdev) const = 0;

@@ -42,7 +42,7 @@ const u8 fs_prodos::impl::boot[512] = {
 	0xf0, 0xf5, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
-void fs_prodos::enumerate(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const
+void fs_prodos::enumerate_f(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	if(has(form_factor, variants, floppy_image::FF_35, floppy_image::DSDD))
 		fe.add(this, FLOPPY_APPLE_GCR_FORMAT, 819200, "prodos_800k", "Apple ProDOS 800K");
@@ -70,10 +70,34 @@ bool fs_prodos::can_write() const
 	return false;
 }
 
-void fs_prodos::impl::format()
+bool fs_prodos::has_subdirectories() const
 {
-	std::string volume_name = "UNTITLED";
-	m_blockdev.set_block_size(512);
+	return true;
+}
+
+std::vector<fs_meta_description> fs_prodos::volume_meta_description() const
+{
+	std::vector<fs_meta_description> res;
+	res.emplace_back(fs_meta_description(fs_meta_name::name, fs_meta_type::string, "UNTITLED", false, [](const fs_meta &m) { std::string n = std::get<std::string>(m); return n.size() <= 15; }, "Volume name, up to 15 characters"));
+
+	return res;
+}
+
+std::vector<fs_meta_description> fs_prodos::file_meta_description() const
+{
+	std::vector<fs_meta_description> res;
+	return res;
+}
+
+std::vector<fs_meta_description> fs_prodos::directory_meta_description() const
+{
+	std::vector<fs_meta_description> res;
+	return res;
+}
+
+void fs_prodos::impl::format(const fs_meta_data &meta)
+{
+	std::string volume_name = std::get<std::string>(meta.find(fs_meta_name::name)->second);
 	u32 blocks = m_blockdev.block_count();
 
 	m_blockdev.get(0).copy(0x000, boot, 0x200);               // Standard ProDOS boot sector as written by a 2gs

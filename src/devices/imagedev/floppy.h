@@ -86,7 +86,7 @@ public:
 	floppy_image_format_t *identify(std::string filename);
 	void set_rpm(float rpm);
 
-	void init_fs(const fs_info *fs);
+	void init_fs(const fs_info *fs, const fs_meta_data &meta);
 
 	// image-level overrides
 	virtual image_init_result call_load() override;

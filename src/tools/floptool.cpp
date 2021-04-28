@@ -89,7 +89,10 @@ static int ram_seekproc(void *file, int64_t offset, int whence)
 	case SEEK_END: f->pos = f->data->size() + offset; break;
 	}
 
-	f->pos = std::clamp(f->pos, int64_t(0), int64_t(f->data->size()));
+	if(whence == SEEK_CUR)
+		f->pos = std::max(f->pos, int64_t(0));
+	else
+		f->pos = std::clamp(f->pos, int64_t(0), int64_t(f->data->size()));
 	return 0;
 }
 
@@ -104,9 +107,10 @@ static size_t ram_readproc(void *file, void *buffer, size_t length)
 static size_t ram_writeproc(void *file, const void *buffer, size_t length)
 {
 	auto f = (iofile_ram *)file;
-	size_t l = std::min(length, size_t(f->data->size() - f->pos));
-	memcpy(f->data->data() + f->pos, buffer, l);
-	return l;
+	size_t l = std::max(f->pos + length, f->data->size());
+	f->data->resize(l);
+	memcpy(f->data->data() + f->pos, buffer, length);
+	return length;
 }
 
 static uint64_t ram_filesizeproc(void *file)
@@ -188,7 +192,7 @@ struct enumerator : public mame_formats_enumerator {
 
 	virtual void add(filesystem_manager_type fs) {
 		auto ff = fs();
-		ff->enumerate(fse, floppy_image::FF_UNKNOWN, variants);
+		ff->enumerate_f(fse, floppy_image::FF_UNKNOWN, variants);
 	}
 };
 
@@ -273,6 +277,7 @@ static void display_usage()
 	fprintf(stderr, "       floptool.exe identify <inputfile> [<inputfile> ...]\n");
 	fprintf(stderr, "       floptool.exe convert [input_format|auto] output_format <inputfile> <outputfile>\n");
 	fprintf(stderr, "       floptool.exe create output_format filesystem <outputfile>\n");
+	fprintf(stderr, "       floptool.exe dir input_format filesystem <inputfile>\n");
 }
 
 static void display_formats()
@@ -454,10 +459,16 @@ static int create(int argc, char *argv[])
 	floppy_image image(84, 2, floppy_image::FF_UNKNOWN);
 
 	if(source_fs->m_type) {
+		auto metav = source_fs->m_manager->volume_meta_description();
+		fs_meta_data meta;
+		for(const auto &e : metav)
+			if(!e.m_ro)
+				meta[e.m_name] = e.m_default;
+
 		std::vector<u8> img(source_fs->m_image_size);
 		fsblk_vec_t blockdev(img);
 		auto fs = source_fs->m_manager->mount(blockdev);
-		fs->format();
+		fs->format(meta);
 
 		auto iog = ram_open(img);
 		auto source_format = source_fs->m_type();
@@ -491,6 +502,72 @@ static int create(int argc, char *argv[])
 	return 0;
 }
 
+static int dir(int argc, char *argv[])
+{
+	if (argc!=5) {
+		fprintf(stderr, "Incorrect number of arguments.\n\n");
+		display_usage();
+		return 1;
+	}
+
+	auto format = find_format_by_name(argv[2]);
+	if(!format) {
+		fprintf(stderr, "Error: Format '%s' unknown\n", argv[3]);
+		return 1;
+	}
+
+	auto fs = find_fs_by_name(argv[3]);
+	if(!fs) {
+		fprintf(stderr, "Error: Filesystem '%s' unknown\n", argv[2]);
+		return 1;
+	}
+
+	if(!fs->m_manager || !fs->m_manager->can_read()) {
+		fprintf(stderr, "Error: Filesystem '%s' does not implement reading\n", argv[2]);
+		return 1;
+	}
+
+	char msg[4096];
+	sprintf(msg, "Error opening %s for reading", argv[4]);
+	FILE *f = fopen(argv[4], "rb");
+	if (!f) {
+		perror(msg);
+		return 1;
+	}
+	io_generic io;
+	io.file = f;
+	io.procs = &stdio_ioprocs_noclose;
+	io.filler = 0xff;
+
+	floppy_image image(84, 2, floppy_image::FF_UNKNOWN);
+	if(!format->load(&io, floppy_image::FF_UNKNOWN, variants, &image)) {
+		fprintf(stderr, "Error: parsing input file as '%s' failed\n", format->name());
+		return 1;
+	}
+
+	std::vector<u8> img;
+	auto iog = ram_open(img);
+	auto load_format = fs->m_type();
+	load_format->save(iog, variants, &image);
+	delete load_format;
+	delete iog;
+
+	fsblk_vec_t blockdev(img);
+	auto load_fs = fs->m_manager->mount(blockdev);
+	auto vmetad = fs->m_manager->volume_meta_description();
+	auto vmeta = load_fs->metadata();
+
+	if(!vmeta.empty()) {
+		std::string vinf = "Volume:";
+		for(const auto &e : vmetad)
+			vinf += util::string_format(" %s=%s", fs_meta_get_name(e.m_name), fs_meta_to_string(e.m_type, vmeta[e.m_name]));
+		printf("%s\n", vinf.c_str());
+	}
+
+	return 0;
+}
+
+
 int CLIB_DECL main(int argc, char *argv[])
 {
 	init_formats();
@@ -506,6 +583,8 @@ int CLIB_DECL main(int argc, char *argv[])
 		return convert(argc, argv);
 	else if (!core_stricmp("create", argv[1]))
 		return create(argc, argv);
+	else if (!core_stricmp("dir", argv[1]))
+		return dir(argc, argv);
 	else {
 		fprintf(stderr, "Unknown command '%s'\n\n", argv[1]);
 		display_usage();

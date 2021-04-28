@@ -6,7 +6,7 @@
 #include "emu.h"
 #include "fs_unformatted.h"
 
-void fs_unformatted::enumerate(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const
+void fs_unformatted::enumerate_f(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	bool all = form_factor == floppy_image::FF_UNKNOWN;
 	u32 best_8 =
@@ -112,6 +112,11 @@ bool fs_unformatted::can_read() const
 }
 
 bool fs_unformatted::can_write() const
+{
+	return false;
+}
+
+bool fs_unformatted::has_subdirectories() const
 {
 	return false;
 }
