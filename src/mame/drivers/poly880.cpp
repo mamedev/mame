@@ -23,16 +23,22 @@ Test Paste:
 
 The SC1 version is a modification that turns it into a chesscomputer.
 Not to be confused with the prequel to SC2, but more likely a different
-version of SLC1 without the "Lern" part.
+version of SLC1, without the "Lern" part.
+
+SC1-SLC1 Keypad Reference:
+    1-8 = A1-H8
+    C = C (back)
+    D = O (option)
+    E = St (clear)
+    F = Z (enter)
 
 
 TODO:
 - MCYCL (activate single stepping)
 - CYCL (single step)
 - layout LEDs (address bus, data bus, command bus, MCYCL)
-- 32KB RAM expansion @ 0x8000
+- optional 32KB RAM expansion @ 0x8000
 - who made poly880s? slc1 is very similar, it's by the same person?
-- poly880s 7segs flicker
 
 ****************************************************************************/
 
@@ -43,8 +49,8 @@ TODO:
 #include "imagedev/cassette.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
-#include "machine/ram.h"
 #include "sound/spkrdev.h"
+#include "video/pwm.h"
 
 #include "speaker.h"
 
@@ -62,10 +68,10 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_pio(*this, "pio%u", 0)
 		, m_ctc(*this, "ctc")
+		, m_display(*this, "display")
 		, m_cassette(*this, "cassette")
 		, m_speaker(*this, "speaker")
 		, m_inputs(*this, "IN.%u", 0U)
-		, m_digits(*this, "digit%u", 0U)
 	{ }
 
 	void poly880(machine_config &config);
@@ -81,10 +87,10 @@ private:
 	required_device<z80_device> m_maincpu;
 	required_device_array<z80pio_device, 2> m_pio;
 	required_device<z80ctc_device> m_ctc;
+	required_device<pwm_display_device> m_display;
 	required_device<cassette_image_device> m_cassette;
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<3> m_inputs;
-	output_finder<8> m_digits;
 
 	void poly880_io(address_map &map);
 	void poly880_mem(address_map &map);
@@ -109,9 +115,7 @@ private:
 
 void poly880_state::update_display()
 {
-	for (int i = 0; i < 8; i++)
-		if (BIT(m_digit, i))
-			m_digits[7 - i] = m_segment;
+	m_display->matrix(m_digit, m_segment);
 }
 
 void poly880_state::cldig_w(u8 data)
@@ -316,9 +320,7 @@ static const z80_daisy_config poly880_daisy_chain[] =
 
 void poly880_state::machine_start()
 {
-	m_digits.resolve();
-
-	/* register for state saving */
+	// register for state saving
 	save_item(NAME(m_digit));
 	save_item(NAME(m_segment));
 }
@@ -328,16 +330,22 @@ void poly880_state::machine_start()
 
 void poly880_state::poly880(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(7'372'800)/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &poly880_state::poly880_mem);
 	m_maincpu->set_addrmap(AS_IO, &poly880_state::poly880_io);
 	m_maincpu->set_daisy_config(poly880_daisy_chain);
 
-	/* video hardware */
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(8, 8);
+	m_display->set_segmask(0xff, 0xff);
 	config.set_default_layout(layout_poly880);
 
-	/* devices */
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	// devices
 	Z80CTC(config, m_ctc, XTAL(7'372'800)/16);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->zc_callback<0>().set(FUNC(poly880_state::ctc_z0_w));
@@ -353,16 +361,9 @@ void poly880_state::poly880(machine_config &config)
 	Z80PIO(config, m_pio[1], XTAL(7'372'800)/16);
 	m_pio[1]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
-
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
-
-	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("1K");
 }
 
 void poly880_state::poly880s(machine_config &config)
@@ -392,4 +393,4 @@ ROM_END
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
 COMP( 1983, poly880,  0,       0,      poly880,  poly880, poly880_state, empty_init, "VEB Polytechnik", "Poly-Computer 880", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, poly880s, poly880, 0,      poly880s, poly880, poly880_state, empty_init, "hack", "Poly-Computer 880 (SC1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+COMP( 1983, poly880s, poly880, 0,      poly880s, poly880, poly880_state, empty_init, "hack", "Poly-Computer 880 (SC1)", MACHINE_SUPPORTS_SAVE )

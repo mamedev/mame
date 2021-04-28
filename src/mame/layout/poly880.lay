@@ -11,28 +11,28 @@ license:CC0
 
 	<view name="Internal Layout">
 		<!-- Led address display -->
-		<element name="digit0" ref="digit">
+		<element name="digit7" ref="digit">
 			<bounds x="0" y="0" width="18" height="26" />
 		</element>
-		<element name="digit1" ref="digit">
+		<element name="digit6" ref="digit">
 			<bounds x="18" y="0" width="18" height="26" />
 		</element>
-		<element name="digit2" ref="digit">
+		<element name="digit5" ref="digit">
 			<bounds x="36" y="0" width="18" height="26" />
 		</element>
-		<element name="digit3" ref="digit">
+		<element name="digit4" ref="digit">
 			<bounds x="54" y="0" width="18" height="26" />
 		</element>
-		<element name="digit4" ref="digit">
+		<element name="digit3" ref="digit">
 			<bounds x="72" y="0" width="18" height="26" />
 		</element>
-		<element name="digit5" ref="digit">
+		<element name="digit2" ref="digit">
 			<bounds x="90" y="0" width="18" height="26" />
 		</element>
-		<element name="digit6" ref="digit">
+		<element name="digit1" ref="digit">
 			<bounds x="108" y="0" width="18" height="26" />
 		</element>
-		<element name="digit7" ref="digit">
+		<element name="digit0" ref="digit">
 			<bounds x="126" y="0" width="18" height="26" />
 		</element>
 	</view>
