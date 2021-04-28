@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /***************************************************************************
 
-Poly-Computer 880
+VEB Polytechnik Poly-Computer 880
 
 http://www.kc85-museum.de/books/poly880/index.html
 
@@ -23,7 +23,8 @@ Test Paste:
 
 The SC1 version is a modification that turns it into a chesscomputer.
 Not to be confused with the prequel to SC2, but more likely a different
-version of SLC1, without the "Lern" part.
+version of SLC1, without the "Lern" part. Just like SLC1, the chess engine
+was copied from Fidelity's Sensory Chess Challenger 8.
 
 SC1-SLC1 Keypad Reference:
     1-8 = A1-H8
@@ -292,10 +293,10 @@ void poly880_state::pio1_pb_w(u8 data)
 
 	*/
 
-	m_speaker->level_w( BIT(data, 0));
+	m_speaker->level_w(BIT(data, 0));
 
 	// tape output
-	m_cassette->output( BIT(data, 2) ? +1.0 : -1.0);
+	m_cassette->output(BIT(data, 2) ? +1.0 : -1.0);
 
 	if (m_nmi && BIT(data, 6))
 	{
@@ -392,5 +393,5 @@ ROM_END
 // System Drivers
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1983, poly880,  0,       0,      poly880,  poly880, poly880_state, empty_init, "VEB Polytechnik", "Poly-Computer 880", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, poly880,  0,       0,      poly880,  poly880, poly880_state, empty_init, "VEB Polytechnik Karl-Marx-Stadt", "Poly-Computer 880", MACHINE_SUPPORTS_SAVE )
 COMP( 1983, poly880s, poly880, 0,      poly880s, poly880, poly880_state, empty_init, "hack", "Poly-Computer 880 (SC1)", MACHINE_SUPPORTS_SAVE )
