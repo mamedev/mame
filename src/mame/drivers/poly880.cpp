@@ -324,6 +324,7 @@ void poly880_state::machine_start()
 	// register for state saving
 	save_item(NAME(m_digit));
 	save_item(NAME(m_segment));
+	save_item(NAME(m_nmi));
 }
 
 
