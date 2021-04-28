@@ -423,7 +423,7 @@ uint32_t opz_registers::compute_phase_step(uint32_t choffs, uint32_t opoffs, opd
 		// the baseline frequency in hz comes from the fix frequency and fine
 		// registers, which can specify values 8-255Hz in 1Hz increments; that
 		// value is then shifted up by the 3-bit range
-		u32 freq = op_fix_frequency(opoffs) << 4;
+		uint32_t freq = op_fix_frequency(opoffs) << 4;
 		if (freq == 0)
 			freq = 8;
 		freq |= op_fine(opoffs);
