@@ -28,6 +28,8 @@ license:CC0
 	</element>
 
 	<view name="Internal Layout">
+		<bounds left="-7" right="120" top="-2" bottom="28" />
+
 		<!-- OUT led -->
 		<element name="0.a" ref="green_led">
 			<bounds x="-5" y="0" width="8" height="8" />
