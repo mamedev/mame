@@ -53,6 +53,7 @@ namespace ymfm
 //     Per-channel registers (channel in address bits 0-2)
 //        00-07 xxxxxxxx Channel volume
 //        20-27 x------- Pan right
+//              -x------ Key on (0)/off(1)
 //              --xxx--- Feedback level for operator 1 (0-7)
 //              -----xxx Operator connection algorithm (0-7)
 //        28-2F -xxxxxxx Key code
@@ -198,6 +199,7 @@ public:
 	uint32_t ch_output_1(uint32_t choffs) const      { return byte(0x20, 7, 1, choffs) | byte(0x30, 0, 1, choffs); }
 	uint32_t ch_output_2(uint32_t choffs) const      { return 0; }
 	uint32_t ch_output_3(uint32_t choffs) const      { return 0; }
+	uint32_t ch_key_on(uint32_t choffs) const        { return byte(0x20, 6, 1, choffs); }
 	uint32_t ch_feedback(uint32_t choffs) const      { return byte(0x20, 3, 3, choffs); }
 	uint32_t ch_algorithm(uint32_t choffs) const     { return byte(0x20, 0, 3, choffs); }
 	uint32_t ch_block_freq(uint32_t choffs) const    { return word(0x28, 0, 7, 0x30, 2, 6, choffs); }
@@ -212,7 +214,7 @@ public:
 	uint32_t op_fix_range(uint32_t opoffs) const     { return byte(0x40, 4, 3, opoffs); }
 	uint32_t op_fix_frequency(uint32_t opoffs) const { return byte(0x40, 0, 4, opoffs); }
 	uint32_t op_waveform(uint32_t opoffs) const      { return byte(0x100, 4, 3, opoffs); } // fake
-	uint32_t op_detune2_fine(uint32_t opoffs) const  { return byte(0x100, 0, 4, opoffs); } // fake
+	uint32_t op_fine(uint32_t opoffs) const          { return byte(0x100, 0, 4, opoffs); } // fake
 	uint32_t op_total_level(uint32_t opoffs) const   { return byte(0x60, 0, 7, opoffs); }
 	uint32_t op_ksr(uint32_t opoffs) const           { return byte(0x80, 6, 2, opoffs); }
 	uint32_t op_fix_mode(uint32_t opoffs) const      { return byte(0x80, 5, 1, opoffs); }
@@ -247,6 +249,7 @@ protected:
 	uint8_t m_noise_lfo;                  // latched LFO noise value
 	uint8_t m_lfo_am[2];                  // current LFO AM value
 	uint8_t m_regdata[REGISTERS];         // register data
+	uint16_t m_phase_substep[OPERATORS];  // phase substep for fixed frequency
 	int16_t m_lfo_waveform[4][LFO_WAVEFORM_LENGTH]; // LFO waveforms; AM in low 8, PM in upper 8
 	uint16_t m_waveform[WAVEFORMS][WAVEFORM_LENGTH]; // waveforms
 };

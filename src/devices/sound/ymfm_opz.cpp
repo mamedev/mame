@@ -144,6 +144,8 @@ void opz_registers::save_restore(fm_saved_state &state)
 	state.save_restore(m_noise_lfo);
 	for (int index = 0; index < std::size(m_regdata); index++)
 		state.save_restore(m_regdata[index]);
+	for (int index = 0; index < std::size(m_phase_substep); index++)
+		state.save_restore(m_phase_substep[index]);
 }
 
 
@@ -162,6 +164,7 @@ void opz_registers::register_save(device_t &device)
 	device.save_item(YMFM_NAME(m_noise_state));
 	device.save_item(YMFM_NAME(m_noise_lfo));
 	device.save_item(YMFM_NAME(m_regdata));
+	device.save_item(YMFM_NAME(m_phase_substep));
 }
 #endif
 
@@ -209,7 +212,7 @@ bool opz_registers::write(uint16_t index, uint8_t data, uint32_t &channel, uint3
 	//   0x38..0x3F -> 0x140..0x147 if bit 7 is set
 	//   0x40..0x5F -> 0x100..0x11F if bit 7 is set
 	//   0xC0..0xDF -> 0x120..0x13F if bit 5 is set
-	if (index == 0x16 && bitfield(data, 7) != 0)
+	if (index == 0x17 && bitfield(data, 7) != 0)
 		m_regdata[0x148] = data;
 	else if (index == 0x19 && bitfield(data, 7) != 0)
 		m_regdata[0x149] = data;
@@ -219,14 +222,14 @@ bool opz_registers::write(uint16_t index, uint8_t data, uint32_t &channel, uint3
 		m_regdata[0x100 + (index & 0x1f)] = data;
 	else if ((index & 0xe0) == 0xc0 && bitfield(data, 5) != 0)
 		m_regdata[0x120 + (index & 0x1f)] = data;
-	else
+	else if (index < 0x100)
 		m_regdata[index] = data;
 
 	// handle writes to the key on index
-	if (index == 0x08)
+	if ((index & 0xf8) == 0x20 && bitfield(index, 0, 3) == bitfield(m_regdata[0x08], 0, 3))
 	{
-		channel = bitfield(data, 0, 3);
-		opmask = bitfield(data, 3, 4);
+		channel = bitfield(index, 0, 3);
+		opmask = ch_key_on(channel) ? 0xf : 0; //bitfield(data, 3, 4);
 
 		// according to the TX81Z manual, the sync option causes the LFOs
 		// to reset at each note on; assume that's when operator 4 gets
@@ -347,8 +350,6 @@ void opz_registers::cache_operator_data(uint32_t choffs, uint32_t opoffs, opdata
 	// TODO: how does fixed frequency mode work? appears to be enabled by
 	// op_fix_mode(), and controlled by op_fix_range(), op_fix_frequency()
 
-	// TODO: what is op_eg_shift()?
-
 	// TODO: what is op_rev()?
 
 	// set up the easy stuff
@@ -375,8 +376,9 @@ void opz_registers::cache_operator_data(uint32_t choffs, uint32_t opoffs, opdata
 		cache.multiple = 1;
 
 	// phase step, or PHASE_STEP_DYNAMIC if PM is active; this depends on
-	// block_freq, detune, and multiple, so compute it after we've done those
-	if ((lfo_pm_depth() == 0 || ch_lfo_pm_sens(choffs) == 0) && (lfo2_pm_depth() == 0 || ch_lfo2_pm_sens(choffs) == 0))
+	// block_freq, detune, and multiple, so compute it after we've done those;
+	// note that fix frequency mode is also treated as dynamic
+	if (!op_fix_mode(opoffs) && (lfo_pm_depth() == 0 || ch_lfo_pm_sens(choffs) == 0) && (lfo2_pm_depth() == 0 || ch_lfo2_pm_sens(choffs) == 0))
 		cache.phase_step = compute_phase_step(choffs, opoffs, cache, 0);
 	else
 		cache.phase_step = opdata_cache::PHASE_STEP_DYNAMIC;
@@ -412,48 +414,72 @@ void opz_registers::cache_operator_data(uint32_t choffs, uint32_t opoffs, opdata
 
 uint32_t opz_registers::compute_phase_step(uint32_t choffs, uint32_t opoffs, opdata_cache const &cache, int32_t lfo_raw_pm)
 {
-	// OPZ logic is rather unique here, due to extra detune
-	// and the use of key codes (not to be confused with keycode)
+	// OPZ has a fixed frequency mode; it is unclear whether the
+	// detune and multiple parameters affect things
 
-	// start with coarse detune delta; table uses cents value from
-	// manual, converted into 1/64ths
-	static const int16_t s_detune2_delta[4] = { 0, (600*64+50)/100, (781*64+50)/100, (950*64+50)/100 };
-	int32_t delta = s_detune2_delta[op_detune2(opoffs)];
-
-	// the fine detune parameter seems to add 1/16th of an octave per unit
-	delta += op_detune2_fine(opoffs) * (12*64)/16;
-
-	// add in the PM deltas
-	uint32_t pm_sensitivity = ch_lfo_pm_sens(choffs);
-	if (pm_sensitivity != 0)
+	uint32_t phase_step;
+	if (op_fix_mode(opoffs))
 	{
-		// raw PM value is -127..128 which is +/- 200 cents
-		// manual gives these magnitudes in cents:
-		//    0, +/-5, +/-10, +/-20, +/-50, +/-100, +/-400, +/-700
-		// this roughly corresponds to shifting the 200-cent value:
-		//    0  >> 5,  >> 4,  >> 3,  >> 2,  >> 1,   << 1,   << 2
-		if (pm_sensitivity < 6)
-			delta += int8_t(lfo_raw_pm) >> (6 - pm_sensitivity);
-		else
-			delta += int8_t(lfo_raw_pm) << (pm_sensitivity - 5);
-	}
-	uint32_t pm_sensitivity2 = ch_lfo2_pm_sens(choffs);
-	if (pm_sensitivity2 != 0)
-	{
-		// raw PM value is -127..128 which is +/- 200 cents
-		// manual gives these magnitudes in cents:
-		//    0, +/-5, +/-10, +/-20, +/-50, +/-100, +/-400, +/-700
-		// this roughly corresponds to shifting the 200-cent value:
-		//    0  >> 5,  >> 4,  >> 3,  >> 2,  >> 1,   << 1,   << 2
-		if (pm_sensitivity2 < 6)
-			delta += int8_t(lfo_raw_pm >> 8) >> (6 - pm_sensitivity2);
-		else
-			delta += int8_t(lfo_raw_pm >> 8) << (pm_sensitivity2 - 5);
-	}
+		// the baseline frequency in hz comes from the fix frequency and fine
+		// registers, which can specify values 8-255Hz in 1Hz increments; that
+		// value is then shifted up by the 3-bit range
+		u32 freq = op_fix_frequency(opoffs) << 4;
+		if (freq == 0)
+			freq = 8;
+		freq |= op_fine(opoffs);
+		freq <<= op_fix_range(opoffs);
 
-	// apply delta and convert to a frequency number; this translation is
-	// the same as OPM so just re-use that helper
-	uint32_t phase_step = opm_key_code_to_phase_step(cache.block_freq, delta);
+		// there is not enough resolution in the plain phase step to track the
+		// full range of frequencies, so we keep a per-operator sub step with an
+		// additional 12 bits of resolution; this calculation gives us, for
+		// example, a frequency of 8.0009Hz when 8Hz is requested
+		uint32_t substep = m_phase_substep[opoffs];
+		substep += 75 * freq;
+		phase_step = substep >> 12;
+		m_phase_substep[opoffs] = substep & 0xfff;
+	}
+	else
+	{
+		// start with coarse detune delta; table uses cents value from
+		// manual, converted into 1/64ths
+		static const int16_t s_detune2_delta[4] = { 0, (600*64+50)/100, (781*64+50)/100, (950*64+50)/100 };
+		int32_t delta = s_detune2_delta[op_detune2(opoffs)];
+
+		// the fine parameter seems to add 1/16th of an octave per unit
+		delta += op_fine(opoffs) * (12*64)/16;
+
+		// add in the PM deltas
+		uint32_t pm_sensitivity = ch_lfo_pm_sens(choffs);
+		if (pm_sensitivity != 0)
+		{
+			// raw PM value is -127..128 which is +/- 200 cents
+			// manual gives these magnitudes in cents:
+			//    0, +/-5, +/-10, +/-20, +/-50, +/-100, +/-400, +/-700
+			// this roughly corresponds to shifting the 200-cent value:
+			//    0  >> 5,  >> 4,  >> 3,  >> 2,  >> 1,   << 1,   << 2
+			if (pm_sensitivity < 6)
+				delta += int8_t(lfo_raw_pm) >> (6 - pm_sensitivity);
+			else
+				delta += int8_t(lfo_raw_pm) << (pm_sensitivity - 5);
+		}
+		uint32_t pm_sensitivity2 = ch_lfo2_pm_sens(choffs);
+		if (pm_sensitivity2 != 0)
+		{
+			// raw PM value is -127..128 which is +/- 200 cents
+			// manual gives these magnitudes in cents:
+			//    0, +/-5, +/-10, +/-20, +/-50, +/-100, +/-400, +/-700
+			// this roughly corresponds to shifting the 200-cent value:
+			//    0  >> 5,  >> 4,  >> 3,  >> 2,  >> 1,   << 1,   << 2
+			if (pm_sensitivity2 < 6)
+				delta += int8_t(lfo_raw_pm >> 8) >> (6 - pm_sensitivity2);
+			else
+				delta += int8_t(lfo_raw_pm >> 8) << (pm_sensitivity2 - 5);
+		}
+
+		// apply delta and convert to a frequency number; this translation is
+		// the same as OPM so just re-use that helper
+		phase_step = opm_key_code_to_phase_step(cache.block_freq, delta);
+	}
 
 	// apply detune based on the keycode
 	phase_step += cache.detune;
@@ -479,10 +505,14 @@ std::string opz_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 	char buffer[256];
 	char *end = &buffer[0];
 
-	end += sprintf(end, "%d.%02d freq=%04X dt2=%d dt=%d fb=%d alg=%X mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X out=%c%c",
-		chnum, opnum,
-		ch_block_freq(choffs),
-		op_detune2(opoffs),
+	end += sprintf(end, "%d.%02d", chnum, opnum);
+
+	if (op_fix_mode(opoffs))
+		end += sprintf(end, " fixfreq=%X fine=%X shift=%X", op_fix_frequency(opoffs), op_fine(opoffs), op_fix_range(opoffs));
+	else
+		end += sprintf(end, " freq=%04X dt2=%d fine=%X", ch_block_freq(choffs), op_detune2(opoffs), op_fine(opoffs));
+
+	end += sprintf(end, " dt=%d fb=%d alg=%X mul=%X tl=%02X ksr=%d adsr=%02X/%02X/%02X/%X sl=%X out=%c%c",
 		op_detune(opoffs),
 		ch_feedback(choffs),
 		ch_algorithm(choffs),
@@ -497,6 +527,9 @@ std::string opz_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 		ch_output_0(choffs) ? 'L' : '-',
 		ch_output_1(choffs) ? 'R' : '-');
 
+	if (op_eg_shift(opoffs) != 0)
+		end += sprintf(end, " egshift=%d", op_eg_shift(opoffs));
+
 	bool am = (lfo_am_depth() != 0 && ch_lfo_am_sens(choffs) != 0 && op_lfo_am_enable(opoffs) != 0);
 	if (am)
 		end += sprintf(end, " am=%d/%02X", ch_lfo_am_sens(choffs), lfo_am_depth());
@@ -505,6 +538,20 @@ std::string opz_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 		end += sprintf(end, " pm=%d/%02X", ch_lfo_pm_sens(choffs), lfo_pm_depth());
 	if (am || pm)
 		end += sprintf(end, " lfo=%02X/%c", lfo_rate(), "WQTN"[lfo_waveform()]);
+
+	bool am2 = (lfo2_am_depth() != 0 && ch_lfo2_am_sens(choffs) != 0 && op_lfo_am_enable(opoffs) != 0);
+	if (am2)
+		end += sprintf(end, " am2=%d/%02X", ch_lfo2_am_sens(choffs), lfo2_am_depth());
+	bool pm2 = (lfo2_pm_depth() != 0 && ch_lfo2_pm_sens(choffs) != 0);
+	if (pm2)
+		end += sprintf(end, " pm2=%d/%02X", ch_lfo2_pm_sens(choffs), lfo2_pm_depth());
+	if (am2 || pm2)
+		end += sprintf(end, " lfo2=%02X/%c", lfo2_rate(), "WQTN"[lfo2_waveform()]);
+
+	if (op_reverb_rate(opoffs) != 0)
+		end += sprintf(end, " rev=%d", op_reverb_rate(opoffs));
+	if (op_waveform(opoffs) != 0)
+		end += sprintf(end, " wf=%d", op_waveform(opoffs));
 	if (noise_enable() && opoffs == 31)
 		end += sprintf(end, " noise=1");
 
@@ -618,7 +665,53 @@ void ym2414::write_data(uint8_t data)
 {
 	// write the FM register
 	m_fm.write(m_address, data);
-printf("%02X=%02X\n", m_address, data);
+	switch (m_address & 0xe0)
+	{
+		case 0x00:
+			printf("CTL %02X = %02X\n", m_address, data);
+			break;
+
+		case 0x20:
+			switch (m_address & 0xf8)
+			{
+				case 0x20:	printf("R/FBL/ALG %d = %02X\n", m_address & 7, data);	break;
+				case 0x28:	printf("KC %d = %02X\n", m_address & 7, data);	break;
+				case 0x30:	printf("KF/M %d = %02X\n", m_address & 7, data);	break;
+				case 0x38:	printf("PMS/AMS %d = %02X\n", m_address & 7, data); break;
+			}
+			break;
+
+		case 0x40:
+			if (bitfield(data, 7) == 0)
+				printf("DT1/MUL %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
+			else
+				printf("OW/FINE %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
+			break;
+
+		case 0x60:
+			printf("TL %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
+			break;
+
+		case 0x80:
+			printf("KRS/FIX/AR %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
+			break;
+
+		case 0xa0:
+			printf("A/D1R %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
+			break;
+
+		case 0xc0:
+			if (bitfield(data, 5) == 0)
+				printf("DT2/D2R %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
+			else
+				printf("EGS/REV %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
+			break;
+
+		case 0xf0:
+			printf("D1L/RR %d.%d = %02X\n", m_address & 7, (m_address >> 3) & 3, data);
+			break;
+	}
+
 	// special cases
 	if (m_address == 0x1b)
 	{

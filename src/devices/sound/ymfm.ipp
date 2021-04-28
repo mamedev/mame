@@ -398,7 +398,7 @@ bool fm_operator<RegisterType>::prepare()
 	m_keyon_live &= ~(1 << KEYON_CSM);
 
 	// we're active until we're quiet after the release
-	return (m_env_state != EG_RELEASE || m_env_attenuation < EG_QUIET);
+	return (m_env_state != (RegisterType::EG_HAS_REVERB ? EG_REVERB : EG_RELEASE) || m_env_attenuation < EG_QUIET);
 }
 
 
@@ -521,7 +521,7 @@ template<class RegisterType>
 void fm_operator<RegisterType>::start_release()
 {
 	// don't change anything if already in release state
-	if (m_env_state == EG_RELEASE)
+	if (m_env_state >= EG_RELEASE)
 		return;
 	m_env_state = EG_RELEASE;
 
@@ -1389,7 +1389,10 @@ void fm_engine_base<RegisterType>::write(uint16_t regnum, uint8_t data)
 	//  if ((m_regs.rhythm_enable() && m_regs.chnum() >= 6) ||
 	//      (m_regs.waveform_enable() && m_regs.waveform() != 0))
 		{
-//			m_intf.log("%s\n", m_regs.log_keyon(m_choffs, m_opoffs).c_str());
+
+		if (keyon_opmask != 0)
+			for (int index = 0; index < 4; index++)
+				printf("%s\n", m_regs.log_keyon(m_channel[keyon_channel]->choffs(), m_channel[keyon_channel]->choffs() + index * 8).c_str());
 		}
 	}
 }
