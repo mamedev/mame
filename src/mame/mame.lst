@@ -35826,6 +35826,9 @@ rf51w14cg                       // (c) 2003 Recreativos Franco
 @source:rfslots8085.cpp
 unkrfslt                        //
 
+@source:rfslotsmcs48.cpp
+ajofrin                         // (c) 198? Recreativos Franco
+
 @source:rfslotspcpent.cpp
 rfsantafeg                      // (c) 2014 Recreativos Franco
 
