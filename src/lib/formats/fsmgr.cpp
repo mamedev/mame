@@ -207,6 +207,7 @@ const char *fs_meta_get_name(fs_meta_name name)
 	case fs_meta_name::name: return "name";
 	case fs_meta_name::size_in_blocks: return "size_in_blocks";
 	}
+	return "";
 }
 
 std::string fs_meta_to_string(fs_meta_type type, const fs_meta &m)
