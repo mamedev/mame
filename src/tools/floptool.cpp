@@ -277,7 +277,8 @@ static void display_usage()
 	fprintf(stderr, "       floptool.exe identify <inputfile> [<inputfile> ...]\n");
 	fprintf(stderr, "       floptool.exe convert [input_format|auto] output_format <inputfile> <outputfile>\n");
 	fprintf(stderr, "       floptool.exe create output_format filesystem <outputfile>\n");
-	fprintf(stderr, "       floptool.exe dir input_format filesystem <inputfile>\n");
+	fprintf(stderr, "       floptool.exe dir input_format filesystem <image>\n");
+	fprintf(stderr, "       floptool.exe read input_format filesystem <image> <path> <outputfile>\n");
 }
 
 static void display_formats()
@@ -502,6 +503,51 @@ static int create(int argc, char *argv[])
 	return 0;
 }
 
+static void dir_scan(u32 depth, filesystem_t::dir_t dir, std::vector<std::vector<std::string>> &entries, const std::unordered_map<fs_meta_name, size_t> &nmap, size_t nc, const std::vector<fs_meta_description> &dmetad, const std::vector<fs_meta_description> &fmetad)
+{
+	std::string head;
+	for(u32 i = 0; i != depth; i++)
+		head += "  ";
+	auto contents = dir.contents();
+	for(const auto &c : contents) {
+		size_t id = entries.size();
+		entries.resize(id+1);
+		entries[id].resize(nc);
+		switch(c.m_type) {
+		case fs_dir_entry_type::dir: {
+			auto subdir = dir.dir_get(c.m_key);
+			auto meta = subdir.metadata();
+			for(const auto &m : dmetad) {
+				if(meta.find(m.m_name) == meta.end())
+					continue;
+				size_t slot = nmap.find(m.m_name)->second;
+				std::string val = fs_meta_to_string(m.m_type, meta.find(m.m_name)->second);
+				if(slot == 0)
+					val = head + "dir  " + val;
+				entries[id][slot] = val;
+			}
+			dir_scan(depth+1, subdir, entries, nmap, nc, dmetad, fmetad);
+			break;
+		}
+		case fs_dir_entry_type::file:
+		case fs_dir_entry_type::system_file: {
+			auto file = dir.file_get(c.m_key);
+			auto meta = file.metadata();
+			for(const auto &m : fmetad) {
+				if(meta.find(m.m_name) == meta.end())
+					continue;
+				size_t slot = nmap.find(m.m_name)->second;
+				std::string val = fs_meta_to_string(m.m_type, meta.find(m.m_name)->second);
+				if(slot == 0)
+					val = head + (c.m_type == fs_dir_entry_type::system_file ? "sys  " : "file ") + val;
+				entries[id][slot] = val;
+			}
+			break;
+		}
+		}
+	}
+}
+
 static int dir(int argc, char *argv[])
 {
 	if (argc!=5) {
@@ -555,14 +601,168 @@ static int dir(int argc, char *argv[])
 	fsblk_vec_t blockdev(img);
 	auto load_fs = fs->m_manager->mount(blockdev);
 	auto vmetad = fs->m_manager->volume_meta_description();
-	auto vmeta = load_fs->metadata();
+	auto fmetad = fs->m_manager->file_meta_description();
+	auto dmetad = fs->m_manager->directory_meta_description();
 
+	auto vmeta = load_fs->metadata();
 	if(!vmeta.empty()) {
 		std::string vinf = "Volume:";
 		for(const auto &e : vmetad)
 			vinf += util::string_format(" %s=%s", fs_meta_get_name(e.m_name), fs_meta_to_string(e.m_type, vmeta[e.m_name]));
-		printf("%s\n", vinf.c_str());
+		printf("%s\n\n", vinf.c_str());
 	}
+
+	std::vector<fs_meta_name> names;
+	names.push_back(fs_meta_name::name);
+	for(const auto &e : fmetad)
+		if(e.m_name != fs_meta_name::name)
+			names.push_back(e.m_name);
+	for(const auto &e : dmetad)
+		if(std::find(names.begin(), names.end(), e.m_name) == names.end())
+			names.push_back(e.m_name);
+
+	std::unordered_map<fs_meta_name, size_t> nmap;
+	for(size_t i = 0; i != names.size(); i++)
+		nmap[names[i]] = i;
+	
+	auto root = load_fs->root();
+	std::vector<std::vector<std::string>> entries;
+
+	entries.resize(1);
+	for(fs_meta_name n : names)
+		entries[0].push_back(fs_meta_get_name(n));
+
+	dir_scan(0, root, entries, nmap, names.size(), dmetad, fmetad);
+
+	std::vector<u32> sizes(names.size());
+
+	for(const auto &e : entries)
+		for(unsigned int i=0; i != names.size(); i++)
+			sizes[i] = std::max<u32>(sizes[i], e[i].size());
+
+	for(const auto &e : entries) {
+		std::string l;
+		for(unsigned int i=0; i != names.size(); i++) {
+			if(i)
+				l += ' ';
+			l += util::string_format("%-*s", sizes[i], e[i]);
+		}
+		printf("%s\n", l.c_str());
+	}
+	
+	return 0;
+}
+
+
+static int doread(int argc, char *argv[])
+{
+	if (argc!=7) {
+		fprintf(stderr, "Incorrect number of arguments.\n\n");
+		display_usage();
+		return 1;
+	}
+
+	auto format = find_format_by_name(argv[2]);
+	if(!format) {
+		fprintf(stderr, "Error: Format '%s' unknown\n", argv[3]);
+		return 1;
+	}
+
+	auto fs = find_fs_by_name(argv[3]);
+	if(!fs) {
+		fprintf(stderr, "Error: Filesystem '%s' unknown\n", argv[2]);
+		return 1;
+	}
+
+	if(!fs->m_manager || !fs->m_manager->can_read()) {
+		fprintf(stderr, "Error: Filesystem '%s' does not implement reading\n", argv[2]);
+		return 1;
+	}
+
+	char msg[4096];
+	sprintf(msg, "Error opening %s for reading", argv[4]);
+	FILE *f = fopen(argv[4], "rb");
+	if (!f) {
+		perror(msg);
+		return 1;
+	}
+	io_generic io;
+	io.file = f;
+	io.procs = &stdio_ioprocs_noclose;
+	io.filler = 0xff;
+
+	floppy_image image(84, 2, floppy_image::FF_UNKNOWN);
+	if(!format->load(&io, floppy_image::FF_UNKNOWN, variants, &image)) {
+		fprintf(stderr, "Error: parsing input file as '%s' failed\n", format->name());
+		return 1;
+	}
+
+	std::vector<u8> img;
+	auto iog = ram_open(img);
+	auto load_format = fs->m_type();
+	load_format->save(iog, variants, &image);
+	delete load_format;
+	delete iog;
+
+	fsblk_vec_t blockdev(img);
+	auto load_fs = fs->m_manager->mount(blockdev);
+
+	std::string opath = argv[5];
+	std::vector<std::string> path;
+	if(fs->m_manager->has_subdirectories()) {
+		abort();
+
+	} else
+		path.push_back(opath);
+
+	auto dir = load_fs->root();
+	std::string apath;
+	for(unsigned int i = 0; i < path.size() - 1; i++) {
+		auto c = dir.contents();
+		unsigned int j;
+		for(j = 0; j != c.size(); j++)
+			if(c[j].m_name == path[i])
+				break;
+		if(j == c.size()) {
+			fprintf(stderr, "Error: directory %s%c%s not found\n", apath.c_str(), fs->m_manager->directory_separator(), path[i].c_str());
+			return 1;
+		}
+		if(c[j].m_type != fs_dir_entry_type::dir) {
+			fprintf(stderr, "Error: %s%c%s is not a directory\n", apath.c_str(), fs->m_manager->directory_separator(), path[i].c_str());
+			return 1;
+		}
+		dir = dir.dir_get(c[j].m_key);
+		apath += fs->m_manager->directory_separator() + path[i];
+	}
+
+	auto c = dir.contents();
+	unsigned int j;
+	for(j = 0; j != c.size(); j++)
+		if(c[j].m_name == path.back())
+			break;
+	if(j == c.size()) {
+		fprintf(stderr, "Error: file %s%c%s not found\n", apath.c_str(), fs->m_manager->directory_separator(), path.back().c_str());
+		return 1;
+	}
+	auto file = dir.file_get(c[j].m_key);
+	auto meta = file.metadata();
+
+	if(meta.find(fs_meta_name::length) == meta.end()) {
+		fprintf(stderr, "Error: %s%c%s is not a readable file\n", apath.c_str(), fs->m_manager->directory_separator(), path.back().c_str());
+		return 1;
+	}
+
+	auto filedata = file.read_all();
+
+	sprintf(msg, "Error opening %s for writing", argv[6]);
+	auto fo = fopen(argv[6], "wb");
+	if (!fo) {
+		perror(msg);
+		return 1;
+	}
+
+	fwrite(filedata.data(), filedata.size(), 1, fo);
+	fclose(fo);
 
 	return 0;
 }
@@ -585,6 +785,8 @@ int CLIB_DECL main(int argc, char *argv[])
 		return create(argc, argv);
 	else if (!core_stricmp("dir", argv[1]))
 		return dir(argc, argv);
+	else if (!core_stricmp("read", argv[1]))
+		return doread(argc, argv);
 	else {
 		fprintf(stderr, "Unknown command '%s'\n\n", argv[1]);
 		display_usage();

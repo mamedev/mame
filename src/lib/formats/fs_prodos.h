@@ -31,7 +31,7 @@ public:
 	virtual bool can_format() const override;
 	virtual bool can_read() const override;
 	virtual bool can_write() const override;
-	virtual bool has_subdirectories() const override;
+	virtual char directory_separator() const override;
 
 	virtual std::vector<fs_meta_description> volume_meta_description() const override;
 	virtual std::vector<fs_meta_description> file_meta_description() const override;

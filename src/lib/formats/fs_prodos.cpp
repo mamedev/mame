@@ -70,9 +70,9 @@ bool fs_prodos::can_write() const
 	return false;
 }
 
-bool fs_prodos::has_subdirectories() const
+char fs_prodos::directory_separator() const
 {
-	return true;
+	return '/';
 }
 
 std::vector<fs_meta_description> fs_prodos::volume_meta_description() const

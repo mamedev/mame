@@ -8,17 +8,17 @@
 #include "emu.h"
 #include "fsmgr.h"
 
-void fsblk_t::iblock_t::ref()
+void fs_refcounted_inner::ref()
 {
 	m_ref ++;
 }
 
-void fsblk_t::iblock_t::ref_weak()
+void fs_refcounted_inner::ref_weak()
 {
 	m_weak_ref ++;
 }
 
-void fsblk_t::iblock_t::unref()
+void fs_refcounted_inner::unref()
 {
 	m_ref --;
 	if(m_ref == 0) {
@@ -31,12 +31,13 @@ void fsblk_t::iblock_t::unref()
 	}
 }
 
-void fsblk_t::iblock_t::unref_weak()
+void fs_refcounted_inner::unref_weak()
 {
 	m_weak_ref --;
 	if(m_weak_ref == 0 && m_ref == 0)
 		delete this;
 }
+
 
 
 void filesystem_manager_t::enumerate_f(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const
@@ -89,6 +90,11 @@ std::vector<fs_meta_description> filesystem_manager_t::directory_meta_descriptio
 	return res;
 }
 
+char filesystem_manager_t::directory_separator() const
+{
+	return 0; // Subdirectories not supported by default
+}
+
 void filesystem_t::format(const fs_meta_data &meta)
 {
 	fatalerror("format called on a filesystem not supporting it.\n");
@@ -126,44 +132,52 @@ const uint8_t *fsblk_t::iblock_t::rooffset(const char *function, uint32_t off, u
 
 void fsblk_t::block_t::copy(u32 offset, const uint8_t *src, u32 size)
 {
-	uint8_t *blk = m_block->offset("copy", offset, size);
+	uint8_t *blk = m_object->offset("copy", offset, size);
 	memcpy(blk, src, size);
 }
 
 void fsblk_t::block_t::fill(u32 offset, uint8_t data, u32 size)
 {
-	uint8_t *blk = m_block->offset("fill", offset, size);
+	uint8_t *blk = m_object->offset("fill", offset, size);
 	memset(blk, data, size);
 }
 
 void fsblk_t::block_t::fill(uint8_t data)
 {
-	uint8_t *blk = m_block->data();
-	memset(blk, data, m_block->size());
+	uint8_t *blk = m_object->data();
+	memset(blk, data, m_object->size());
 }
 
 void fsblk_t::block_t::wstr(u32 offset, const std::string &str)
 {
-	uint8_t *blk = m_block->offset("wstr", offset, str.size());
+	uint8_t *blk = m_object->offset("wstr", offset, str.size());
 	memcpy(blk, str.data(), str.size());
 }
 
 void fsblk_t::block_t::w8(u32 offset, uint8_t data)
 {
-	uint8_t *blk = m_block->offset("w8", offset, 1);
+	uint8_t *blk = m_object->offset("w8", offset, 1);
 	blk[0] = data;
 }
 
 void fsblk_t::block_t::w16b(u32 offset, u16 data)
 {
-	uint8_t *blk = m_block->offset("w16b", offset, 2);
+	uint8_t *blk = m_object->offset("w16b", offset, 2);
 	blk[0] = data >> 8;
 	blk[1] = data;
 }
 
+void fsblk_t::block_t::w24b(u32 offset, u32 data)
+{
+	uint8_t *blk = m_object->offset("w24b", offset, 3);
+	blk[0] = data >> 16;
+	blk[1] = data >> 8;
+	blk[2] = data;
+}
+
 void fsblk_t::block_t::w32b(u32 offset, u32 data)
 {
-	uint8_t *blk = m_block->offset("w32b", offset, 4);
+	uint8_t *blk = m_object->offset("w32b", offset, 4);
 	blk[0] = data >> 24;
 	blk[1] = data >> 16;
 	blk[2] = data >> 8;
@@ -172,14 +186,22 @@ void fsblk_t::block_t::w32b(u32 offset, u32 data)
 
 void fsblk_t::block_t::w16l(u32 offset, u16 data)
 {
-	uint8_t *blk = m_block->offset("w16l", offset, 2);
+	uint8_t *blk = m_object->offset("w16l", offset, 2);
 	blk[0] = data;
 	blk[1] = data >> 8;
 }
 
+void fsblk_t::block_t::w24l(u32 offset, u32 data)
+{
+	uint8_t *blk = m_object->offset("w24l", offset, 3);
+	blk[0] = data;
+	blk[1] = data >> 8;
+	blk[2] = data >> 16;
+}
+
 void fsblk_t::block_t::w32l(u32 offset, u32 data)
 {
-	uint8_t *blk = m_block->offset("w32l", offset, 4);
+	uint8_t *blk = m_object->offset("w32l", offset, 4);
 	blk[0] = data;
 	blk[1] = data >> 8;
 	blk[2] = data >> 16;
@@ -188,11 +210,53 @@ void fsblk_t::block_t::w32l(u32 offset, u32 data)
 
 std::string fsblk_t::block_t::rstr(u32 offset, u32 size)
 {
-	const u8 *d = m_block->rooffset("rstr", offset, size);
+	const u8 *d = m_object->rooffset("rstr", offset, size);
 	std::string res;
 	for(u32 i=0; i != size; i++)
 		res += char(*d++);
 	return res;
+}
+
+uint8_t fsblk_t::block_t::r8(u32 offset)
+{
+	const uint8_t *blk = m_object->offset("r8", offset, 1);
+	return blk[0];
+}
+
+uint16_t fsblk_t::block_t::r16b(u32 offset)
+{
+	const uint8_t *blk = m_object->offset("r16b", offset, 2);
+	return (blk[0] << 8) | blk[1];
+}
+
+uint32_t fsblk_t::block_t::r24b(u32 offset)
+{
+	const uint8_t *blk = m_object->offset("r24b", offset, 3);
+	return (blk[0] << 16) | (blk[1] << 8) | blk[2];
+}
+
+uint32_t fsblk_t::block_t::r32b(u32 offset)
+{
+	const uint8_t *blk = m_object->offset("r32b", offset, 4);
+	return (blk[0] << 24) | (blk[1] << 16) | (blk[2] << 8) | blk[3];
+}
+
+uint16_t fsblk_t::block_t::r16l(u32 offset)
+{
+	const uint8_t *blk = m_object->offset("r16l", offset, 2);
+	return blk[0] | (blk[1] << 8);
+}
+
+uint32_t fsblk_t::block_t::r24l(u32 offset)
+{
+	const uint8_t *blk = m_object->offset("r24l", offset, 3);
+	return blk[0] | (blk[1] << 8) | (blk[2] << 16);
+}
+
+uint32_t fsblk_t::block_t::r32l(u32 offset)
+{
+	const uint8_t *blk = m_object->offset("r32l", offset, 4);
+	return blk[0] | (blk[1] << 8) | (blk[2] << 16) | (blk[3] << 24);
 }
 
 const char *fs_meta_get_name(fs_meta_name name)

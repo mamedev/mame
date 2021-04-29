@@ -116,9 +116,4 @@ bool fs_unformatted::can_write() const
 	return false;
 }
 
-bool fs_unformatted::has_subdirectories() const
-{
-	return false;
-}
-
 const filesystem_manager_type FS_UNFORMATTED = &filesystem_manager_creator<fs_unformatted>;

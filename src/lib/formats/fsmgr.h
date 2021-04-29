@@ -31,12 +31,89 @@ enum class fs_meta_type {
 	flag,
 };
 
+enum class fs_dir_entry_type {
+	dir,
+	file,
+	system_file,
+};
+
 using fs_meta = std::variant<std::string, uint64_t, bool>;
 using fs_meta_data = std::unordered_map<fs_meta_name, fs_meta>;
 
 const char *fs_meta_get_name(fs_meta_name name);
 std::string fs_meta_to_string(fs_meta_type type, const fs_meta &m);
 fs_meta fs_meta_from_string(fs_meta_type type, std::string value);
+
+template<typename T> class fs_refcounted_outer {
+public:
+	fs_refcounted_outer(bool weak = false) :  m_object(nullptr), m_is_weak_ref(weak) {}
+	fs_refcounted_outer(T *object, bool weak = false) : m_object(object), m_is_weak_ref(weak) {
+		ref();
+	}
+
+	fs_refcounted_outer(const fs_refcounted_outer &cref) {
+		m_object = cref.m_object;
+		m_is_weak_ref = cref.m_is_weak_ref;
+		ref();
+	}
+
+	fs_refcounted_outer(fs_refcounted_outer &&cref) {
+		m_object = cref.m_object;
+		m_is_weak_ref = cref.m_is_weak_ref;
+		cref.m_object = nullptr;
+	}
+
+	~fs_refcounted_outer() {
+		unref();
+	}
+
+	fs_refcounted_outer<T> &operator =(T *dir) {
+		unref();
+		m_object = dir;
+		ref();
+		return *this;
+	}
+
+	fs_refcounted_outer<T> &operator =(const fs_refcounted_outer<T> &cref) {
+		unref();
+		m_object = cref.m_object;
+		m_is_weak_ref = cref.m_is_weak_ref;
+		ref();
+		return *this;
+	}
+
+	fs_refcounted_outer<T> &operator =(fs_refcounted_outer<T> &&cref) {
+		m_object = cref.m_object;
+		m_is_weak_ref = cref.m_is_weak_ref;
+		cref.m_object = nullptr;
+		return *this;
+	}
+
+	operator bool() const { return m_object != nullptr; }
+
+protected:
+	T *m_object;
+	bool m_is_weak_ref;
+
+private:
+	void ref() {
+		if(m_object) {
+			if(m_is_weak_ref)
+				m_object->ref_weak();
+			else
+				m_object->ref();
+		}
+	}
+	
+	void unref() {
+		if(m_object) {
+			if(m_is_weak_ref)
+				m_object->unref_weak();
+			else
+				m_object->unref();
+		}
+	}
+};
 
 
 struct fs_meta_description {
@@ -56,21 +133,38 @@ struct fs_meta_description {
 	{}
 };
 
+class fs_refcounted_inner {
+public:
+	fs_refcounted_inner() : m_ref(0), m_weak_ref(0) {}
+	virtual ~fs_refcounted_inner() = default;
+
+	void ref();
+	void ref_weak();
+	void unref();
+	void unref_weak();
+
+	virtual void drop_weak_references() = 0;
+
+private:
+	uint32_t m_ref, m_weak_ref;
+};
+
+struct fs_dir_entry {
+	std::string m_name;
+	fs_dir_entry_type m_type;
+	uint64_t m_key;
+
+	fs_dir_entry(const std::string &name, fs_dir_entry_type type, uint64_t key) : m_name(name), m_type(type), m_key(key) {}
+};
+
 class fsblk_t {
 protected:
-	class iblock_t {
+	class iblock_t : public fs_refcounted_inner {
 	public:
-		iblock_t(uint32_t size) : m_ref(0), m_weak_ref(0), m_size(size) {}
+		iblock_t(uint32_t size) : fs_refcounted_inner(), m_size(size) {}
 		virtual ~iblock_t() = default;
 
-		void ref();
-		void ref_weak();
-		void unref();
-		void unref_weak();
-
 		uint32_t size() const { return m_size; }
-
-		virtual void drop_weak_references() = 0;
 
 		virtual const uint8_t *rodata() = 0;
 		virtual uint8_t *data() = 0;
@@ -78,89 +172,43 @@ protected:
 		const uint8_t *rooffset(const char *function, uint32_t off, uint32_t size);
 
 	protected:
-		uint32_t m_ref, m_weak_ref;
 		uint32_t m_size;
 	};
 
 
 public:
-	class block_t {
+	class block_t : public fs_refcounted_outer<iblock_t> {
 	public:
-		block_t(iblock_t *block, bool weak = false) : m_block(block), m_is_weak_ref(weak) {
-			ref();
-		}
+		block_t(bool weak = false) :  fs_refcounted_outer<iblock_t>(weak) {}
+		block_t(iblock_t *block, bool weak = false) : fs_refcounted_outer(block, weak) {}
+		virtual ~block_t() = default;
 
-		block_t(const block_t &cref) {
-			m_block = cref.m_block;
-			m_is_weak_ref = cref.m_is_weak_ref;
-			ref();
-		}
+		block_t strong() { return block_t(m_object, false); }
+		block_t weak() { return block_t(m_object, true); }
 
-		block_t(block_t &&cref) {
-			m_block = cref.m_block;
-			m_is_weak_ref = cref.m_is_weak_ref;
-			cref.m_block = nullptr;
-		}
-
-		~block_t() {
-			unref();
-		}
-
-		block_t &operator =(const block_t &cref) {
-			m_block = cref.m_block;
-			m_is_weak_ref = cref.m_is_weak_ref;
-			ref();
-			return *this;
-		}
-
-		block_t &operator =(block_t &&cref) {
-			m_block = cref.m_block;
-			m_is_weak_ref = cref.m_is_weak_ref;
-			cref.m_block = nullptr;
-			return *this;
-		}
-
-		const uint8_t *rodata() {
-			return m_block ? m_block->rodata() : nullptr;
-		}
-
-		uint8_t *data() {
-			return m_block ? m_block->data() : nullptr;
-		}
+		const uint8_t *rodata() { return m_object->rodata(); }
+		uint8_t *data() { return m_object->data(); }
 
 		void copy(uint32_t offset, const uint8_t *src, uint32_t size);
-		void fill(            uint8_t data);
+		void fill(                 uint8_t data);
 		void fill(uint32_t offset, uint8_t data, uint32_t size);
 		void wstr(uint32_t offset, const std::string &str);
 		void w8(  uint32_t offset, uint8_t data);
-		void w16b(uint32_t offset, u16 data);
+		void w16b(uint32_t offset, uint16_t data);
+		void w24b(uint32_t offset, uint32_t data);
 		void w32b(uint32_t offset, uint32_t data);
-		void w16l(uint32_t offset, u16 data);
+		void w16l(uint32_t offset, uint16_t data);
+		void w24l(uint32_t offset, uint32_t data);
 		void w32l(uint32_t offset, uint32_t data);
 
 		std::string rstr(uint32_t offset, uint32_t size);
-
-	private:
-		iblock_t *m_block;
-		bool m_is_weak_ref;
-
-		void ref() {
-			if(m_block) {
-				if(m_is_weak_ref)
-					m_block->ref_weak();
-				else
-					m_block->ref();
-			}
-		}
-
-		void unref() {
-			if(m_block) {
-				if(m_is_weak_ref)
-					m_block->unref_weak();
-				else
-					m_block->unref();
-			}
-		}
+		uint8_t  r8(  uint32_t offset);
+		uint16_t r16b(uint32_t offset);
+		uint32_t r24b(uint32_t offset);
+		uint32_t r32b(uint32_t offset);
+		uint16_t r16l(uint32_t offset);
+		uint32_t r24l(uint32_t offset);
+		uint32_t r32l(uint32_t offset);
 	};
 
 	fsblk_t() : m_block_size(0) {}
@@ -177,148 +225,61 @@ protected:
 
 
 class filesystem_t {
+public:
+	class dir_t;
+	class file_t;
+
 protected:
-	class idir_t {
+	class idir_t : public fs_refcounted_inner {
 	public:
-		virtual ~idir_t();
+		idir_t() : fs_refcounted_inner() {}
+		virtual ~idir_t() = default;
 
-		void ref();
-		void ref_weak();
-		void unref();
-		void unref_weak();
-
-		virtual void drop_weak_references();
+		virtual fs_meta_data metadata() = 0;
+		virtual std::vector<fs_dir_entry> contents() = 0;
+		virtual file_t file_get(uint64_t key) = 0;
+		virtual dir_t dir_get(uint64_t key) = 0;
 	};
 
-	class ifile_t {
+	class ifile_t : public fs_refcounted_inner {
 	public:
-		virtual ~ifile_t();
+		ifile_t() : fs_refcounted_inner() {}
+		virtual ~ifile_t() = default;
 
-		void ref();
-		void ref_weak();
-		void unref();
-		void unref_weak();
-
-		virtual void drop_weak_references();
+		virtual fs_meta_data metadata() = 0;
+		virtual std::vector<u8> read_all() = 0;
+		virtual std::vector<u8> read(u64 start, u64 length) = 0;
 	};
 
 public:
-	class dir_t {
+	class dir_t : public fs_refcounted_outer<idir_t> {
 	public:
-		dir_t(idir_t *dir, bool weak = false) : m_dir(dir), m_is_weak_ref(weak) {
-			ref();
-		}
+		dir_t(bool weak = false) :  fs_refcounted_outer<idir_t>(weak) {}
+		dir_t(idir_t *dir, bool weak = false) : fs_refcounted_outer(dir, weak) {}
+		virtual ~dir_t() = default;
 
-		dir_t(const dir_t &cref) {
-			m_dir = cref.m_dir;
-			m_is_weak_ref = cref.m_is_weak_ref;
-			ref();
-		}
+		dir_t strong() { return dir_t(m_object, false); }
+		dir_t weak() { return dir_t(m_object, true); }
 
-		dir_t(dir_t &&cref) {
-			m_dir = cref.m_dir;
-			m_is_weak_ref = cref.m_is_weak_ref;
-			cref.m_dir = nullptr;
-		}
-
-		~dir_t() {
-			unref();
-		}
-
-		dir_t &operator =(const dir_t &cref) {
-			m_dir = cref.m_dir;
-			m_is_weak_ref = cref.m_is_weak_ref;
-			ref();
-			return *this;
-		}
-
-		dir_t &operator =(dir_t &&cref) {
-			m_dir = cref.m_dir;
-			m_is_weak_ref = cref.m_is_weak_ref;
-			cref.m_dir = nullptr;
-			return *this;
-		}
-
-	private:
-		idir_t *m_dir;
-		bool m_is_weak_ref;
-
-		void ref() {
-			if(m_dir) {
-				if(m_is_weak_ref)
-					m_dir->ref_weak();
-				else
-					m_dir->ref();
-			}
-		}
-
-		void unref() {
-			if(m_dir) {
-				if(m_is_weak_ref)
-					m_dir->unref_weak();
-				else
-					m_dir->unref();
-			}
-		}
+		fs_meta_data metadata() { return m_object->metadata(); }
+		std::vector<fs_dir_entry> contents() { return m_object->contents(); }
+		file_t file_get(uint64_t key) { return m_object->file_get(key); }
+		dir_t dir_get(uint64_t key)  { return m_object->dir_get(key); }
 	};
 
-	class file_t {
+	class file_t : public fs_refcounted_outer<ifile_t> {
 	public:
-		file_t(ifile_t *file, bool weak = false) : m_file(file), m_is_weak_ref(weak) {
-			ref();
-		}
+		file_t(bool weak = false) : fs_refcounted_outer<ifile_t>(weak) {}
+		file_t(ifile_t *file, bool weak = false) : fs_refcounted_outer(file, weak) {}
+		virtual ~file_t() = default;
 
-		file_t(const file_t &cref) {
-			m_file = cref.m_file;
-			m_is_weak_ref = cref.m_is_weak_ref;
-			ref();
-		}
+		file_t strong() { return file_t(m_object, false); }
+		file_t weak() { return file_t(m_object, true); }
 
-		file_t(file_t &&cref) {
-			m_file = cref.m_file;
-			m_is_weak_ref = cref.m_is_weak_ref;
-			cref.m_file = nullptr;
-		}
+		fs_meta_data metadata() { return m_object->metadata(); }
 
-		~file_t() {
-			unref();
-		}
-
-		file_t &operator =(const file_t &cref) {
-			m_file = cref.m_file;
-			m_is_weak_ref = cref.m_is_weak_ref;
-			ref();
-			return *this;
-		}
-
-		file_t &operator =(file_t &&cref) {
-			m_file = cref.m_file;
-			m_is_weak_ref = cref.m_is_weak_ref;
-			cref.m_file = nullptr;
-			return *this;
-		}
-
-	private:
-		ifile_t *m_file;
-		bool m_is_weak_ref;
-
-		void ref() {
-			if(m_file) {
-				if(m_is_weak_ref)
-					m_file->ref_weak();
-				else
-					m_file->ref();
-			}
-		}
-
-		void unref() {
-			if(m_file) {
-				if(m_is_weak_ref)
-					m_file->unref_weak();
-				else
-					m_file->unref();
-			}
-		}
+		std::vector<u8> read_all() { return m_object->read_all(); }
+		std::vector<u8> read(u32 start, u32 length) { return m_object->read(start, length); }
 	};
 
 	filesystem_t(fsblk_t &blockdev, u32 size) : m_blockdev(blockdev) {
@@ -368,7 +329,9 @@ public:
 	virtual bool can_format() const = 0;
 	virtual bool can_read() const = 0;
 	virtual bool can_write() const = 0;
-	virtual bool has_subdirectories() const = 0;
+	virtual char directory_separator() const;
+
+	bool has_subdirectories() const { return directory_separator() != 0; }
 
 	virtual std::vector<fs_meta_description> volume_meta_description() const;
 	virtual std::vector<fs_meta_description> file_meta_description() const;
