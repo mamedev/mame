@@ -217,5 +217,6 @@ std::string fs_meta_to_string(fs_meta_type type, const fs_meta &m)
 	case fs_meta_type::flag:   return std::get<bool>(m) ? "t" : "f";
 	case fs_meta_type::date:   abort();
 	}
+	return std::string("");
 }
 
