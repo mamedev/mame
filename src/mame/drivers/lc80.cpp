@@ -60,6 +60,7 @@ TODO:
 
 #include "speaker.h"
 
+// internal artwork
 #include "lc80.lh"
 
 
@@ -86,8 +87,8 @@ public:
 	void lc80e(machine_config &config);
 	void lc80_2(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
+	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
 
 protected:
 	virtual void machine_start() override;
@@ -164,14 +165,14 @@ void lc80_state::lc80_io(address_map &map)
 
 // Input Ports
 
-INPUT_CHANGED_MEMBER( lc80_state::trigger_reset )
+INPUT_CHANGED_MEMBER(lc80_state::trigger_reset)
 {
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-INPUT_CHANGED_MEMBER( lc80_state::trigger_nmi )
+INPUT_CHANGED_MEMBER(lc80_state::trigger_nmi)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( lc80 )
@@ -189,7 +190,7 @@ static INPUT_PORTS_START( lc80 )
 
 	PORT_START("IN.2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHAR('7')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("+") PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('+')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('+')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHAR('5')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR('4')
 
@@ -206,12 +207,12 @@ static INPUT_PORTS_START( lc80 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
 
 	PORT_START("IN.5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR('-')
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR('-')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('6')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("DAT") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ADR") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',')
 
-	PORT_START("IN.6")
+	PORT_START("SPECIAL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RES") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, lc80_state, trigger_reset, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("NMI") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, lc80_state, trigger_nmi, 0)
 INPUT_PORTS_END
@@ -262,21 +263,7 @@ void lc80_state::pio1_pa_w(u8 data)
 
 u8 lc80_state::pio1_pb_r()
 {
-	/*
-
-	    bit     description
-
-	    PB0     tape input
-	    PB1     tape output
-	    PB2     digit 0
-	    PB3     digit 1
-	    PB4     digit 2
-	    PB5     digit 3
-	    PB6     digit 4
-	    PB7     digit 5
-
-	*/
-
+	// PB0: tape input
 	return (m_cassette->input() < +0.0);
 }
 
@@ -286,7 +273,7 @@ void lc80_state::pio1_pb_w(u8 data)
 
 	    bit     description
 
-	    PB0     tape input
+	    PB0     tape input (pio1_pb_r)
 	    PB1     tape output, speaker output, OUT led
 	    PB2     digit 0
 	    PB3     digit 1
@@ -444,8 +431,8 @@ void lc80_state::lc80e(machine_config &config)
 
 ROM_START( lc80 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "lc80.d202", 0x0000, 0x0400, CRC(e754ef53) SHA1(044440b13e62addbc3f6a77369cfd16f99b39752) ) // U505
-	ROM_LOAD( "lc80.d203", 0x0800, 0x0400, CRC(2b544da1) SHA1(3a6cbd0c57c38eadb7055dca4b396c348567d1d5) ) // "
+	ROM_LOAD( "bm075.d202", 0x0000, 0x0400, CRC(e754ef53) SHA1(044440b13e62addbc3f6a77369cfd16f99b39752) ) // U505
+	ROM_LOAD( "bm076.d203", 0x0800, 0x0400, CRC(2b544da1) SHA1(3a6cbd0c57c38eadb7055dca4b396c348567d1d5) ) // "
 ROM_END
 
 ROM_START( lc80a )

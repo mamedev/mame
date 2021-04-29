@@ -21,6 +21,7 @@
 #include "cpu/h8/h8s2655.h"
 #include "sound/swp00.h"
 #include "video/hd44780.h"
+#include "bus/midi/midi.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -99,12 +100,14 @@ void psr340_state::psr340_map(address_map &map)
 
 	map(0x600000, 0x600000).lr8(NAME([]() -> uint8_t { return 0x80; }));    // FDC status
 
-	map(0xffe000, 0xffe7ff).ram();
+//	map(0xffe000, 0xffe7ff).ram();
 
 	map(0xffe027, 0xffe027).r(FUNC(psr340_state::matrix_r));
 
 	map(0xffe02a, 0xffe02a).w(FUNC(psr340_state::lcd_ctrl_w));
 	map(0xffe02b, 0xffe02b).w(FUNC(psr340_state::lcd_data_w));
+
+	map(0xffe02f, 0xffe02f).lr8(NAME([]() -> uint8_t { return 0xff; }));
 }
 
 void psr340_state::psr340_io_map(address_map &map)
@@ -284,6 +287,11 @@ void psr340_state::psr340(machine_config &config)
 	screen.set_size(800, 384);
 	screen.set_visarea_full();
 	screen.screen_vblank().set(FUNC(psr340_state::render_w));
+
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set("maincpu:sci0", FUNC(h8_sci_device::rx_w));
+
+	auto &mdout(MIDI_PORT(config, "mdout", midiout_slot, "midiout"));
+	m_maincpu->subdevice<h8_sci_device>("sci0")->tx_handler().set(mdout, FUNC(midi_port_device::write_txd));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

@@ -185,7 +185,7 @@ void snova_state::p2_w(u8 data)
 	if (m_rs232)
 		m_rs232->write_txd(BIT(~data, 4));
 
-	// P25-P27: 4051 S1-S2
+	// P25-P27: 4051 S0-S2
 	// 4051 Y0-Y7: multiplexed inputs
 	m_inp_mux = data >> 5 & 7;
 }

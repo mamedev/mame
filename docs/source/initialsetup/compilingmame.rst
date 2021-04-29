@@ -217,7 +217,7 @@ Fedora Linux
 You’ll need a few prerequisites from your Linux distribution.  Make sure you get
 SDL2 2.0.4 or later as earlier versions are buggy::
 
-    sudo dnf install gcc gcc-c++ SDL2-devel SDL2_ttf-devel libXi-devel libXinerama-devel qt5-qtbase-devel qt5-qttools expat-devel fontconfig-devel alsa-lib-devel
+    sudo dnf install gcc gcc-c++ SDL2-devel SDL2_ttf-devel libXi-devel libXinerama-devel qt5-qtbase-devel qt5-qttools expat-devel fontconfig-devel alsa-lib-devel pulseaudio-libs-devel
 
 Compilation is exactly as described above in All Platforms.
 
@@ -239,7 +239,7 @@ Debian and Ubuntu (including Raspberry Pi and ODROID devices)
 You’ll need a few prerequisites from your Linux distribution.  Make sure you get
 SDL2 2.0.4 or later as earlier versions are buggy::
 
-    sudo apt-get install git build-essential python libsdl2-dev libsdl2-ttf-dev libfontconfig-dev qt5-default
+    sudo apt-get install git build-essential python libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qt5-default
 
 Compilation is exactly as described above in All Platforms.  Note the Ubuntu
 Linux modifies GCC to enable the GNU C Library “fortify source” feature by

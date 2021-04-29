@@ -1505,7 +1505,7 @@ const char *lookup_trap(uint16_t opcode)
 		{ 0xA07F, "_InternalWait" },
 		{ 0xA080, "_GetVideoDefault" },
 		{ 0xA081, "_SetVideoDefault" },
-		{ 0xA082, "_`nstall" },
+		{ 0xA082, "_DTInstall" },
 		{ 0xA083, "_SetOSDefault" },
 		{ 0xA084, "_GetOSDefault" },
 		{ 0xA085, "_PMgrOp" },

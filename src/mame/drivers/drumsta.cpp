@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mn1880/mn1880.h"
-//#include "machine/eeprompar.h"
+#include "machine/eeprompar.h"
 
 class drumsta_state : public driver_device
 {
@@ -39,6 +39,12 @@ void drumsta_state::drumsta_prog(address_map &map)
 
 void drumsta_state::drumsta_data(address_map &map)
 {
+	map(0x0001, 0x0001).noprw();
+	map(0x0003, 0x0003).noprw();
+	map(0x000e, 0x000f).noprw();
+	map(0x0015, 0x0015).noprw();
+	map(0x0060, 0x031f).ram();
+	map(0xb000, 0xb7ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
 }
 
 
@@ -53,7 +59,7 @@ void drumsta_state::drumsta(machine_config &config)
 
 	ADSP2181(config, m_dsp, 16000000).set_disable(); // clock unknown
 
-	// TODO: Atmel AT28C64 EEPROM
+	EEPROM_2864(config, "eeprom"); // Atmel AT28C64
 }
 
 ROM_START(drumsta)
