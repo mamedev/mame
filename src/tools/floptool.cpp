@@ -90,16 +90,16 @@ static int ram_seekproc(void *file, int64_t offset, int whence)
 	}
 
 	if(whence == SEEK_CUR)
-		f->pos = std::max(f->pos, int64_t(0));
+		f->pos = std::max<int64_t>(f->pos, 0);
 	else
-		f->pos = std::clamp(f->pos, int64_t(0), int64_t(f->data->size()));
+		f->pos = std::clamp<int64_t>(f->pos, 0, f->data->size());
 	return 0;
 }
 
 static size_t ram_readproc(void *file, void *buffer, size_t length)
 {
 	auto f = (iofile_ram *)file;
-	size_t l = std::min(length, size_t(f->data->size() - f->pos));
+	size_t l = std::min<std::common_type_t<size_t, int64_t> >(length, f->data->size() - f->pos);
 	memcpy(buffer, f->data->data() + f->pos, l);
 	return l;
 }
@@ -107,7 +107,7 @@ static size_t ram_readproc(void *file, void *buffer, size_t length)
 static size_t ram_writeproc(void *file, const void *buffer, size_t length)
 {
 	auto f = (iofile_ram *)file;
-	size_t l = std::max(f->pos + length, f->data->size());
+	size_t l = std::max<std::common_type_t<size_t, int64_t> >(f->pos + length, f->data->size());
 	f->data->resize(l);
 	memcpy(f->data->data() + f->pos, buffer, length);
 	return length;
