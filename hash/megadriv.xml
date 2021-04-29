@@ -24984,6 +24984,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="sonicp" cloneof="sonic">
+		<description>Sonic the Hedgehog (Prototype)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="sonic the hedgehog (16-bit) (prototype).bin" size="524288" crc="917c9ca9" sha1="0b38a66d5e2ffa2394fccb41e4871419cd0a077d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sonic2a" cloneof="sonic2">
 		<description>Sonic the Hedgehog 2 (World)</description>
 		<year>1992</year>
