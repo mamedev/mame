@@ -5,8 +5,7 @@
     mame.lst
 
     This is not an automatically generated file, and it should be manually
-    updated when new driver is added. From time to time, we will auto-update
-    comments according to metadata from source files.
+    updated when new driver is added.
 
 ******************************************************************************/
 
