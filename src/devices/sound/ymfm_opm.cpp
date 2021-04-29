@@ -147,7 +147,7 @@ bool opm_registers::write(uint16_t index, uint8_t data, uint32_t &channel, uint3
 		m_regdata[index] = data;
 
 	// check test register writes for the LFO reset bit
-	if (m_address == 0x01 && bitfield(data, 1))
+	if (index == 0x01 && bitfield(data, 1))
 		m_lfo_counter = 0;
 
 	// handle writes to the key on index
@@ -533,13 +533,12 @@ void ym2151::generate(int32_t output[fm_engine::OUTPUTS])
 	m_fm.clock(fm_engine::ALL_CHANNELS);
 
 	// update the FM content; YM2151 is full 14-bit with no intermediate clipping
-	int32_t sums[fm_engine::OUTPUTS] = { 0 };
-	m_fm.output(sums, 0, 32767, fm_engine::ALL_CHANNELS);
+	m_fm.output(output, 0, 32767, fm_engine::ALL_CHANNELS);
 
 	// convert to 10.3 floating point value for the DAC and back
 	// YM2151 is stereo
 	for (int index = 0; index < fm_engine::OUTPUTS; index++)
-		output[index] = roundtrip_fp(sums[index]);
+		output[index] = roundtrip_fp(output[index]);
 }
 
 }

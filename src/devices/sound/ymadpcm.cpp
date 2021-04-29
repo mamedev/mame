@@ -4,10 +4,8 @@
 #include "emu.h"
 #include "ymadpcm.h"
 
-//#define VERBOSE 1
-#define LOG_OUTPUT_FUNC osd_printf_verbose
-#include "logmacro.h"
-
+namespace ymfm
+{
 
 //*********************************************************
 //  DEBUGGING
@@ -15,18 +13,7 @@
 
 // set this to only play certain channels: bits 0-5 are ADPCM-A
 // channels and bit 0x80 is the ADPCM-B channel
-constexpr u8 global_chanmask = 0xff;
-
-
-
-//*********************************************************
-//  MACROS
-//*********************************************************
-
-// special naming helper to keep our namespace isolated from other
-// same-named objects in the device's namespace
-#define ADPCM_A_NAME(x) x, "adpcma." #x
-#define ADPCM_B_NAME(x) x, "adpcmb." #x
+constexpr uint8_t global_chanmask = 0xff;
 
 
 
@@ -35,20 +22,10 @@ constexpr u8 global_chanmask = 0xff;
 //*********************************************************
 
 //-------------------------------------------------
-//  ymadpcm_a_registers - constructor
-//-------------------------------------------------
-
-void ymadpcm_a_registers::save(device_t &device)
-{
-	device.save_item(ADPCM_A_NAME(m_regdata));
-}
-
-
-//-------------------------------------------------
 //  reset - reset the register state
 //-------------------------------------------------
 
-void ymadpcm_a_registers::reset()
+void adpcm_a_registers::reset()
 {
 	std::fill_n(&m_regdata[0], REGISTERS, 0);
 
@@ -59,15 +36,38 @@ void ymadpcm_a_registers::reset()
 }
 
 
+//-------------------------------------------------
+//  save_restore - save or restore the data
+//-------------------------------------------------
+
+void adpcm_a_registers::save_restore(fm_saved_state &state)
+{
+	state.save_restore(m_regdata);
+}
+
+
+//-------------------------------------------------
+//  register_save - register for save states
+//  (MAME-specific)
+//-------------------------------------------------
+
+#ifdef MAME_EMU_SAVE_H
+void adpcm_a_registers::register_save(device_t &device)
+{
+	device.save_item(ADPCM_A_NAME(m_regdata));
+}
+#endif
+
+
 //*********************************************************
 // ADPCM "A" CHANNEL
 //*********************************************************
 
 //-------------------------------------------------
-//  ymadpcm_a_channel - constructor
+//  adpcm_a_channel - constructor
 //-------------------------------------------------
 
-ymadpcm_a_channel::ymadpcm_a_channel(ymadpcm_a_engine &owner, u32 choffs, read8sm_delegate reader, u32 addrshift) :
+adpcm_a_channel::adpcm_a_channel(adpcm_a_engine &owner, uint32_t choffs, uint32_t addrshift) :
 	m_choffs(choffs),
 	m_address_shift(addrshift),
 	m_playing(0),
@@ -76,24 +76,9 @@ ymadpcm_a_channel::ymadpcm_a_channel(ymadpcm_a_engine &owner, u32 choffs, read8s
 	m_curaddress(0),
 	m_accumulator(0),
 	m_step_index(0),
-	m_reader(std::move(reader)),
-	m_regs(owner.regs())
+	m_regs(owner.regs()),
+	m_owner(owner)
 {
-}
-
-
-//-------------------------------------------------
-//  save - register for save states
-//-------------------------------------------------
-
-void ymadpcm_a_channel::save(device_t &device, u32 index)
-{
-	device.save_item(ADPCM_A_NAME(m_playing), index);
-	device.save_item(ADPCM_A_NAME(m_curnibble), index);
-	device.save_item(ADPCM_A_NAME(m_curbyte), index);
-	device.save_item(ADPCM_A_NAME(m_curaddress), index);
-	device.save_item(ADPCM_A_NAME(m_accumulator), index);
-	device.save_item(ADPCM_A_NAME(m_step_index), index);
 }
 
 
@@ -101,7 +86,7 @@ void ymadpcm_a_channel::save(device_t &device, u32 index)
 //  reset - reset the channel state
 //-------------------------------------------------
 
-void ymadpcm_a_channel::reset()
+void adpcm_a_channel::reset()
 {
 	m_playing = 0;
 	m_curnibble = 0;
@@ -113,10 +98,43 @@ void ymadpcm_a_channel::reset()
 
 
 //-------------------------------------------------
+//  save_restore - save or restore the data
+//-------------------------------------------------
+
+void adpcm_a_channel::save_restore(fm_saved_state &state)
+{
+	state.save_restore(m_playing);
+	state.save_restore(m_curnibble);
+	state.save_restore(m_curbyte);
+	state.save_restore(m_curaddress);
+	state.save_restore(m_accumulator);
+	state.save_restore(m_step_index);
+}
+
+
+//-------------------------------------------------
+//  register_save - register for save states
+//  (MAME-specific)
+//-------------------------------------------------
+
+#ifdef MAME_EMU_SAVE_H
+void adpcm_a_channel::register_save(device_t &device)
+{
+	device.save_item(ADPCM_A_NAME(m_playing), m_choffs);
+	device.save_item(ADPCM_A_NAME(m_curnibble), m_choffs);
+	device.save_item(ADPCM_A_NAME(m_curbyte), m_choffs);
+	device.save_item(ADPCM_A_NAME(m_curaddress), m_choffs);
+	device.save_item(ADPCM_A_NAME(m_accumulator), m_choffs);
+	device.save_item(ADPCM_A_NAME(m_step_index), m_choffs);
+}
+#endif
+
+
+//-------------------------------------------------
 //  keyonoff - signal key on/off
 //-------------------------------------------------
 
-void ymadpcm_a_channel::keyonoff(bool on)
+void adpcm_a_channel::keyonoff(bool on)
 {
 	// QUESTION: repeated key ons restart the sample?
 	m_playing = on;
@@ -130,7 +148,7 @@ void ymadpcm_a_channel::keyonoff(bool on)
 
 		// don't log masked channels
 		if (((global_chanmask >> m_choffs) & 1) != 0)
-			LOG("KeyOn ADPCM-A%d: pan=%d%d start=%04X end=%04X level=%02X\n",
+			m_owner.intf().log("KeyOn ADPCM-A%d: pan=%d%d start=%04X end=%04X level=%02X\n",
 				m_choffs,
 				m_regs.ch_pan_left(m_choffs),
 				m_regs.ch_pan_right(m_choffs),
@@ -145,7 +163,7 @@ void ymadpcm_a_channel::keyonoff(bool on)
 //  clock - master clocking function
 //-------------------------------------------------
 
-bool ymadpcm_a_channel::clock()
+bool adpcm_a_channel::clock()
 {
 	// if not playing, just output 0
 	if (m_playing == 0)
@@ -165,10 +183,10 @@ bool ymadpcm_a_channel::clock()
 	}
 
 	// if we're about to read nibble 0, fetch the data
-	u8 data;
+	uint8_t data;
 	if (m_curnibble == 0)
 	{
-		m_curbyte = m_reader(m_curaddress++);
+		m_curbyte = m_owner.intf().adpcm_a_read(m_curaddress++);
 		data = m_curbyte >> 4;
 		m_curnibble = 1;
 	}
@@ -181,7 +199,7 @@ bool ymadpcm_a_channel::clock()
 	}
 
 	// compute the ADPCM delta
-	static u16 const s_steps[49] =
+	static uint16_t const s_steps[49] =
 	{
 		 16,  17,   19,   21,   23,   25,   28,
 		 31,  34,   37,   41,   45,   50,   55,
@@ -191,16 +209,16 @@ bool ymadpcm_a_channel::clock()
 		449, 494,  544,  598,  658,  724,  796,
 		876, 963, 1060, 1166, 1282, 1411, 1552
 	};
-	s32 delta = (2 * BIT(data, 0, 3) + 1) * s_steps[m_step_index] / 8;
-	if (BIT(data, 3))
+	int32_t delta = (2 * bitfield(data, 0, 3) + 1) * s_steps[m_step_index] / 8;
+	if (bitfield(data, 3))
 		delta = -delta;
 
 	// the 12-bit accumulator wraps on the ym2610 and ym2608 (like the msm5205)
 	m_accumulator = (m_accumulator + delta) & 0xfff;
 
 	// adjust ADPCM step
-	static s8 const s_step_inc[8] = { -1, -1, -1, -1, 2, 5, 7, 9 };
-	m_step_index = std::clamp(m_step_index + s_step_inc[BIT(data, 0, 3)], 0, 48);
+	static int8_t const s_step_inc[8] = { -1, -1, -1, -1, 2, 5, 7, 9 };
+	m_step_index = std::clamp(m_step_index + s_step_inc[bitfield(data, 0, 3)], 0, 48);
 
 	return false;
 }
@@ -211,9 +229,9 @@ bool ymadpcm_a_channel::clock()
 //  panning applied
 //-------------------------------------------------
 
-void ymadpcm_a_channel::output(s32 outputs[2]) const
+void adpcm_a_channel::output(int32_t outputs[2]) const
 {
-	// volume combined instrument and total levels
+	// volume combines instrument and total levels
 	int vol = (m_regs.ch_instrument_level(m_choffs) ^ 0x1f) + (m_regs.total_level() ^ 0x3f);
 
 	// if combined is maximum, don't add to outputs
@@ -222,12 +240,12 @@ void ymadpcm_a_channel::output(s32 outputs[2]) const
 
 	// convert into a shift and a multiplier
 	// QUESTION: verify this from other sources
-	s8 mul = 15 - (vol & 7);
-	u8 shift = 4 + 1 + (vol >> 3);
+	int8_t mul = 15 - (vol & 7);
+	uint8_t shift = 4 + 1 + (vol >> 3);
 
 	// m_accumulator is a 12-bit value; shift up to sign-extend;
 	// the downshift is incorporated into 'shift'
-	s16 value = ((s16(m_accumulator << 4) * mul) >> shift) & ~3;
+	int16_t value = ((int16_t(m_accumulator << 4) * mul) >> shift) & ~3;
 
 	// apply to left/right as appropriate
 	if (m_regs.ch_pan_left(m_choffs))
@@ -243,29 +261,15 @@ void ymadpcm_a_channel::output(s32 outputs[2]) const
 //*********************************************************
 
 //-------------------------------------------------
-//  ymadpcm_a_engine - constructor
+//  adpcm_a_engine - constructor
 //-------------------------------------------------
 
-ymadpcm_a_engine::ymadpcm_a_engine(device_t &device, read8sm_delegate reader, u32 addrshift)
+adpcm_a_engine::adpcm_a_engine(fm_interface &intf, uint32_t addrshift) :
+	m_intf(intf)
 {
 	// create the channels
 	for (int chnum = 0; chnum < CHANNELS; chnum++)
-		m_channel[chnum] = std::make_unique<ymadpcm_a_channel>(*this, chnum, reader, addrshift);
-}
-
-
-//-------------------------------------------------
-//  save - register for save states
-//-------------------------------------------------
-
-void ymadpcm_a_engine::save(device_t &device)
-{
-	// save register state
-	m_regs.save(device);
-
-	// save channel state
-	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
-		m_channel[chnum]->save(device, chnum);
+		m_channel[chnum] = std::make_unique<adpcm_a_channel>(*this, chnum, addrshift);
 }
 
 
@@ -273,7 +277,7 @@ void ymadpcm_a_engine::save(device_t &device)
 //  reset - reset the engine state
 //-------------------------------------------------
 
-void ymadpcm_a_engine::reset()
+void adpcm_a_engine::reset()
 {
 	// reset register state
 	m_regs.reset();
@@ -285,15 +289,48 @@ void ymadpcm_a_engine::reset()
 
 
 //-------------------------------------------------
+//  save_restore - save or restore the data
+//-------------------------------------------------
+
+void adpcm_a_engine::save_restore(fm_saved_state &state)
+{
+	// save register state
+	m_regs.save_restore(state);
+
+	// save channel state
+	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
+		m_channel[chnum]->save_restore(state);
+}
+
+
+//-------------------------------------------------
+//  register_save - register for save states
+//  (MAME-specific)
+//-------------------------------------------------
+
+#ifdef MAME_EMU_SAVE_H
+void adpcm_a_engine::register_save(device_t &device)
+{
+	// save register state
+	m_regs.save(device);
+
+	// save channel state
+	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
+		m_channel[chnum]->save(device, chnum);
+}
+#endif
+
+
+//-------------------------------------------------
 //  clock - master clocking function
 //-------------------------------------------------
 
-u32 ymadpcm_a_engine::clock(u32 chanmask)
+uint32_t adpcm_a_engine::clock(uint32_t chanmask)
 {
 	// clock each channel, setting a bit in result if it finished
-	u32 result = 0;
+	uint32_t result = 0;
 	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
-		if (BIT(chanmask, chnum))
+		if (bitfield(chanmask, chnum))
 			if (m_channel[chnum]->clock())
 				result |= 1 << chnum;
 
@@ -306,14 +343,14 @@ u32 ymadpcm_a_engine::clock(u32 chanmask)
 //  update - master update function
 //-------------------------------------------------
 
-void ymadpcm_a_engine::output(s32 outputs[2], u32 chanmask)
+void adpcm_a_engine::output(int32_t outputs[2], uint32_t chanmask)
 {
 	// mask out some channels for debug purposes
 	chanmask &= global_chanmask;
 
 	// compute the output of each channel
 	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
-		if (BIT(chanmask, chnum))
+		if (bitfield(chanmask, chnum))
 			m_channel[chnum]->output(outputs);
 }
 
@@ -322,7 +359,7 @@ void ymadpcm_a_engine::output(s32 outputs[2], u32 chanmask)
 //  write - handle writes to the ADPCM-A registers
 //-------------------------------------------------
 
-void ymadpcm_a_engine::write(u32 regnum, u8 data)
+void adpcm_a_engine::write(uint32_t regnum, uint8_t data)
 {
 	// store the raw value to the register array;
 	// most writes are passive, consumed only when needed
@@ -331,8 +368,8 @@ void ymadpcm_a_engine::write(u32 regnum, u8 data)
 	// actively handle writes to the control register
 	if (regnum == 0x00)
 		for (int chnum = 0; chnum < std::size(m_channel); chnum++)
-			if (BIT(data, chnum))
-				m_channel[chnum]->keyonoff(BIT(~data, 7));
+			if (bitfield(data, chnum))
+				m_channel[chnum]->keyonoff(bitfield(~data, 7));
 }
 
 
@@ -342,20 +379,10 @@ void ymadpcm_a_engine::write(u32 regnum, u8 data)
 //*********************************************************
 
 //-------------------------------------------------
-//  ymadpcm_b_registers - constructor
-//-------------------------------------------------
-
-void ymadpcm_b_registers::save(device_t &device)
-{
-	device.save_item(ADPCM_B_NAME(m_regdata));
-}
-
-
-//-------------------------------------------------
 //  reset - reset the register state
 //-------------------------------------------------
 
-void ymadpcm_b_registers::reset()
+void adpcm_b_registers::reset()
 {
 	std::fill_n(&m_regdata[0], REGISTERS, 0);
 
@@ -364,15 +391,39 @@ void ymadpcm_b_registers::reset()
 }
 
 
+//-------------------------------------------------
+//  save_restore - save or restore the data
+//-------------------------------------------------
+
+void adpcm_b_registers::save_restore(fm_saved_state &state)
+{
+	state.save_restore(m_regdata);
+}
+
+
+//-------------------------------------------------
+//  register_save - register for save states
+//  (MAME-specific)
+//-------------------------------------------------
+
+#ifdef MAME_EMU_SAVE_H
+void adpcm_b_registers::register_save(device_t &device)
+{
+	device.save_item(ADPCM_B_NAME(m_regdata));
+}
+#endif
+
+
+
 //*********************************************************
 // ADPCM "B" CHANNEL
 //*********************************************************
 
 //-------------------------------------------------
-//  ymadpcm_b_channel - constructor
+//  adpcm_b_channel - constructor
 //-------------------------------------------------
 
-ymadpcm_b_channel::ymadpcm_b_channel(ymadpcm_b_engine &owner, read8sm_delegate reader, write8sm_delegate writer, u32 addrshift) :
+adpcm_b_channel::adpcm_b_channel(adpcm_b_engine &owner, uint32_t addrshift) :
 	m_address_shift(addrshift),
 	m_status(STATUS_BRDY),
 	m_curnibble(0),
@@ -383,28 +434,9 @@ ymadpcm_b_channel::ymadpcm_b_channel(ymadpcm_b_engine &owner, read8sm_delegate r
 	m_accumulator(0),
 	m_prev_accum(0),
 	m_adpcm_step(STEP_MIN),
-	m_reader(reader),
-	m_writer(writer),
-	m_regs(owner.regs())
+	m_regs(owner.regs()),
+	m_owner(owner)
 {
-}
-
-
-//-------------------------------------------------
-//  save - register for save states
-//-------------------------------------------------
-
-void ymadpcm_b_channel::save(device_t &device, u32 index)
-{
-	device.save_item(ADPCM_B_NAME(m_status), index);
-	device.save_item(ADPCM_B_NAME(m_curnibble), index);
-	device.save_item(ADPCM_B_NAME(m_curbyte), index);
-	device.save_item(ADPCM_B_NAME(m_dummy_read), index);
-	device.save_item(ADPCM_B_NAME(m_position), index);
-	device.save_item(ADPCM_B_NAME(m_curaddress), index);
-	device.save_item(ADPCM_B_NAME(m_accumulator), index);
-	device.save_item(ADPCM_B_NAME(m_prev_accum), index);
-	device.save_item(ADPCM_B_NAME(m_adpcm_step), index);
 }
 
 
@@ -412,7 +444,7 @@ void ymadpcm_b_channel::save(device_t &device, u32 index)
 //  reset - reset the channel state
 //-------------------------------------------------
 
-void ymadpcm_b_channel::reset()
+void adpcm_b_channel::reset()
 {
 	m_status = STATUS_BRDY;
 	m_curnibble = 0;
@@ -427,10 +459,49 @@ void ymadpcm_b_channel::reset()
 
 
 //-------------------------------------------------
+//  save_restore - save or restore the data
+//-------------------------------------------------
+
+void adpcm_b_channel::save_restore(fm_saved_state &state)
+{
+	state.save_restore(m_status);
+	state.save_restore(m_curnibble);
+	state.save_restore(m_curbyte);
+	state.save_restore(m_dummy_read);
+	state.save_restore(m_position);
+	state.save_restore(m_curaddress);
+	state.save_restore(m_accumulator);
+	state.save_restore(m_prev_accum);
+	state.save_restore(m_adpcm_step);
+}
+
+
+//-------------------------------------------------
+//  register_save - register for save states
+//  (MAME-specific)
+//-------------------------------------------------
+
+#ifdef MAME_EMU_SAVE_H
+void adpcm_b_channel::register_save(device_t &device)
+{
+	device.save_item(ADPCM_B_NAME(m_status), index);
+	device.save_item(ADPCM_B_NAME(m_curnibble), index);
+	device.save_item(ADPCM_B_NAME(m_curbyte), index);
+	device.save_item(ADPCM_B_NAME(m_dummy_read), index);
+	device.save_item(ADPCM_B_NAME(m_position), index);
+	device.save_item(ADPCM_B_NAME(m_curaddress), index);
+	device.save_item(ADPCM_B_NAME(m_accumulator), index);
+	device.save_item(ADPCM_B_NAME(m_prev_accum), index);
+	device.save_item(ADPCM_B_NAME(m_adpcm_step), index);
+}
+#endif
+
+
+//-------------------------------------------------
 //  clock - master clocking function
 //-------------------------------------------------
 
-void ymadpcm_b_channel::clock()
+void adpcm_b_channel::clock()
 {
 	// only process if active and not recording (which we don't support)
 	if (!m_regs.execute() || m_regs.record() || (m_status & STATUS_PLAYING) == 0)
@@ -440,8 +511,8 @@ void ymadpcm_b_channel::clock()
 	}
 
 	// otherwise, advance the step
-	u32 position = m_position + m_regs.delta_n();
-	m_position = u16(position);
+	uint32_t position = m_position + m_regs.delta_n();
+	m_position = uint16_t(position);
 	if (position < 0x10000)
 		return;
 
@@ -465,7 +536,7 @@ void ymadpcm_b_channel::clock()
 				m_accumulator = 0;
 				m_prev_accum = 0;
 				m_status = (m_status & ~STATUS_PLAYING) | STATUS_EOS;
-				LOG("ADPCM EOS\n");
+				m_owner.intf().log("ADPCM EOS\n");
 				return;
 			}
 		}
@@ -473,13 +544,13 @@ void ymadpcm_b_channel::clock()
 		// if we're about to process nibble 0, fetch and increment
 		if (m_curnibble == 0)
 		{
-			m_curbyte = m_reader(m_curaddress++);
+			m_curbyte = m_owner.intf().adpcm_b_read(m_curaddress++);
 			m_curaddress &= 0xffffff;
 		}
 	}
 
 	// extract the nibble from our current byte
-	u8 data = u8(m_curbyte << (4 * m_curnibble)) >> 4;
+	uint8_t data = uint8_t(m_curbyte << (4 * m_curnibble)) >> 4;
 	m_curnibble ^= 1;
 
 	// if CPU-driven and we just processed the last nibble, copy the next byte and request more
@@ -493,16 +564,16 @@ void ymadpcm_b_channel::clock()
 	m_prev_accum = m_accumulator;
 
 	// forecast to next forecast: 1/8, 3/8, 5/8, 7/8, 9/8, 11/8, 13/8, 15/8
-	s32 delta = (2 * BIT(data, 0, 3) + 1) * m_adpcm_step / 8;
-	if (BIT(data, 3))
+	int32_t delta = (2 * bitfield(data, 0, 3) + 1) * m_adpcm_step / 8;
+	if (bitfield(data, 3))
 		delta = -delta;
 
 	// add and clamp to 16 bits
 	m_accumulator = std::clamp(m_accumulator + delta, -32768, 32767);
 
 	// scale the ADPCM step: 0.9, 0.9, 0.9, 0.9, 1.2, 1.6, 2.0, 2.4
-	static u8 const s_step_scale[8] = { 57, 57, 57, 57, 77, 102, 128, 153 };
-	m_adpcm_step = std::clamp((m_adpcm_step * s_step_scale[BIT(data, 0, 3)]) / 64, STEP_MIN, STEP_MAX);
+	static uint8_t const s_step_scale[8] = { 57, 57, 57, 57, 77, 102, 128, 153 };
+	m_adpcm_step = std::clamp((m_adpcm_step * s_step_scale[bitfield(data, 0, 3)]) / 64, STEP_MIN, STEP_MAX);
 }
 
 
@@ -511,17 +582,17 @@ void ymadpcm_b_channel::clock()
 //  panning applied
 //-------------------------------------------------
 
-void ymadpcm_b_channel::output(s32 outputs[2], u32 rshift) const
+void adpcm_b_channel::output(int32_t outputs[2], uint32_t rshift) const
 {
 	// mask out some channels for debug purposes
 	if ((global_chanmask & 0x80) == 0)
 		return;
 
 	// do a linear interpolation between samples
-	s32 result = (m_prev_accum * s32((m_position ^ 0xffff) + 1) + m_accumulator * s32(m_position)) >> 16;
+	int32_t result = (m_prev_accum * int32_t((m_position ^ 0xffff) + 1) + m_accumulator * int32_t(m_position)) >> 16;
 
 	// apply volume (level) in a linear fashion and reduce
-	result = (result * s32(m_regs.level())) >> (8 + rshift);
+	result = (result * int32_t(m_regs.level())) >> (8 + rshift);
 
 	// apply to left/right
 	if (m_regs.pan_left())
@@ -535,9 +606,9 @@ void ymadpcm_b_channel::output(s32 outputs[2], u32 rshift) const
 //  read - handle special register reads
 //-------------------------------------------------
 
-u8 ymadpcm_b_channel::read(u32 regnum)
+uint8_t adpcm_b_channel::read(uint32_t regnum)
 {
-	u8 result = 0;
+	uint8_t result = 0;
 
 	// register 8 reads over the bus under some conditions
 	if (regnum == 0x08 && !m_regs.execute() && !m_regs.record() && m_regs.external())
@@ -553,13 +624,13 @@ u8 ymadpcm_b_channel::read(u32 regnum)
 		if (at_end())
 		{
 			m_status = STATUS_EOS | STATUS_BRDY;
-			LOG("ADPCM EOS\n");
+			m_owner.intf().log("ADPCM EOS\n");
 		}
 
 		// otherwise, write the data and signal ready
 		else
 		{
-			result = m_reader(m_curaddress++);
+			result = m_owner.intf().adpcm_b_read(m_curaddress++);
 			m_status = STATUS_BRDY;
 		}
 	}
@@ -571,7 +642,7 @@ u8 ymadpcm_b_channel::read(u32 regnum)
 //  write - handle special register writes
 //-------------------------------------------------
 
-void ymadpcm_b_channel::write(u32 regnum, u8 value)
+void adpcm_b_channel::write(uint32_t regnum, uint8_t value)
 {
 	// register 0 can do a reset; also use writes here to reset the
 	// dummy read counter
@@ -583,7 +654,7 @@ void ymadpcm_b_channel::write(u32 regnum, u8 value)
 
 			// don't log masked channels
 			if ((global_chanmask & 0x80) != 0)
-				LOG("KeyOn ADPCM-B: rep=%d spk=%d pan=%d%d dac=%d 8b=%d rom=%d ext=%d rec=%d start=%04X end=%04X pre=%04X dn=%04X lvl=%02X lim=%04X\n",
+				m_owner.intf().log("KeyOn ADPCM-B: rep=%d spk=%d pan=%d%d dac=%d 8b=%d rom=%d ext=%d rec=%d start=%04X end=%04X pre=%04X dn=%04X lvl=%02X lim=%04X\n",
 					m_regs.repeat(),
 					m_regs.speaker(),
 					m_regs.pan_left(),
@@ -628,14 +699,14 @@ void ymadpcm_b_channel::write(u32 regnum, u8 value)
 			// did we hit the end? if so, signal EOS
 			if (at_end())
 			{
-				LOG("ADPCM EOS\n");
+				m_owner.intf().log("ADPCM EOS\n");
 				m_status = STATUS_EOS | STATUS_BRDY;
 			}
 
 			// otherwise, write the data and signal ready
 			else
 			{
-				m_writer(m_curaddress++, value);
+				m_owner.intf().adpcm_b_write(m_curaddress++, value);
 				m_status = STATUS_BRDY;
 			}
 		}
@@ -648,7 +719,7 @@ void ymadpcm_b_channel::write(u32 regnum, u8 value)
 //  shift amount based on register settings
 //-------------------------------------------------
 
-u32 ymadpcm_b_channel::address_shift() const
+uint32_t adpcm_b_channel::address_shift() const
 {
 	// if a constant address shift, just provide that
 	if (m_address_shift != 0)
@@ -670,7 +741,7 @@ u32 ymadpcm_b_channel::address_shift() const
 //  initialize the state
 //-------------------------------------------------
 
-void ymadpcm_b_channel::load_start()
+void adpcm_b_channel::load_start()
 {
 	m_status = (m_status & ~STATUS_EOS) | STATUS_PLAYING;
 	m_curaddress = m_regs.external() ? (m_regs.start() << address_shift()) : 0;
@@ -689,28 +760,14 @@ void ymadpcm_b_channel::load_start()
 //*********************************************************
 
 //-------------------------------------------------
-//  ymadpcm_b_engine - constructor
+//  adpcm_b_engine - constructor
 //-------------------------------------------------
 
-ymadpcm_b_engine::ymadpcm_b_engine(device_t &device, read8sm_delegate reader, write8sm_delegate writer, u32 addrshift)
+adpcm_b_engine::adpcm_b_engine(fm_interface &intf, uint32_t addrshift) :
+	m_intf(intf)
 {
 	// create the channel (only one supported for now, but leaving possibilities open)
-	m_channel[0] = std::make_unique<ymadpcm_b_channel>(*this, reader, writer, addrshift);
-}
-
-
-//-------------------------------------------------
-//  save - register for save states
-//-------------------------------------------------
-
-void ymadpcm_b_engine::save(device_t &device)
-{
-	// save our state
-	m_regs.save(device);
-
-	// save channel state
-	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
-		m_channel[chnum]->save(device, chnum);
+	m_channel[0] = std::make_unique<adpcm_b_channel>(*this, addrshift);
 }
 
 
@@ -718,7 +775,7 @@ void ymadpcm_b_engine::save(device_t &device)
 //  reset - reset the engine state
 //-------------------------------------------------
 
-void ymadpcm_b_engine::reset()
+void adpcm_b_engine::reset()
 {
 	// reset registers
 	m_regs.reset();
@@ -730,14 +787,47 @@ void ymadpcm_b_engine::reset()
 
 
 //-------------------------------------------------
+//  save_restore - save or restore the data
+//-------------------------------------------------
+
+void adpcm_b_engine::save_restore(fm_saved_state &state)
+{
+	// save our state
+	m_regs.save_restore(state);
+
+	// save channel state
+	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
+		m_channel[chnum]->save_restore(state);
+}
+
+
+//-------------------------------------------------
+//  register_save - register for save states
+//  (MAME-specific)
+//-------------------------------------------------
+
+#ifdef MAME_EMU_SAVE_H
+void adpcm_b_engine::register_save(device_t &device)
+{
+	// save our state
+	m_regs.save(device);
+
+	// save channel state
+	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
+		m_channel[chnum]->save(device, chnum);
+}
+#endif
+
+
+//-------------------------------------------------
 //  clock - master clocking function
 //-------------------------------------------------
 
-void ymadpcm_b_engine::clock(u32 chanmask)
+void adpcm_b_engine::clock(uint32_t chanmask)
 {
 	// clock each channel, setting a bit in result if it finished
 	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
-		if (BIT(chanmask, chnum))
+		if (bitfield(chanmask, chnum))
 			m_channel[chnum]->clock();
 }
 
@@ -746,11 +836,11 @@ void ymadpcm_b_engine::clock(u32 chanmask)
 //  output - master output function
 //-------------------------------------------------
 
-void ymadpcm_b_engine::output(s32 outputs[2], u32 rshift, u32 chanmask)
+void adpcm_b_engine::output(int32_t outputs[2], uint32_t rshift, uint32_t chanmask)
 {
 	// compute the output of each channel
 	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
-		if (BIT(chanmask, chnum))
+		if (bitfield(chanmask, chnum))
 			m_channel[chnum]->output(outputs, rshift);
 }
 
@@ -759,7 +849,7 @@ void ymadpcm_b_engine::output(s32 outputs[2], u32 rshift, u32 chanmask)
 //  write - handle writes to the ADPCM-B registers
 //-------------------------------------------------
 
-void ymadpcm_b_engine::write(u32 regnum, u8 data)
+void adpcm_b_engine::write(uint32_t regnum, uint8_t data)
 {
 	// store the raw value to the register array;
 	// most writes are passive, consumed only when needed
@@ -767,4 +857,6 @@ void ymadpcm_b_engine::write(u32 regnum, u8 data)
 
 	// let the channel handle any special writes
 	m_channel[0]->write(regnum, data);
+}
+
 }

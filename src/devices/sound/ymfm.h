@@ -6,6 +6,9 @@
 
 #pragma once
 
+#include <array>
+#include <vector>
+
 
 namespace ymfm
 {
@@ -73,6 +76,7 @@ public:
 	void save(int32_t &data) { append(data).append(data >> 8).append(data >> 16).append(data >> 24); }
 	void save(uint32_t &data) { append(data).append(data >> 8).append(data >> 16).append(data >> 24); }
 	void save(envelope_state &data) { append(uint8_t(data)); }
+	template<typename DataType, int Count> void save(DataType (&data)[Count]) { for (int index = 0; index < Count; index++) save(data[index]); }
 
 	// restore data from the buffer
 	void restore(bool &data) { data = read() ? true : false; }
@@ -83,6 +87,7 @@ public:
 	void restore(int32_t &data) { data = read(); data |= read() << 8; data |= read() << 16; data |= read() << 24; }
 	void restore(uint32_t &data) { data = read(); data |= read() << 8; data |= read() << 16; data |= read() << 24; }
 	void restore(envelope_state &data) { data = envelope_state(read()); }
+	template<typename DataType, int Count> void restore(DataType (&data)[Count]) { for (int index = 0; index < Count; index++) restore(data[index]); }
 
 	// internal helper
 	fm_saved_state &append(uint8_t data) { m_buffer.push_back(data); return *this; }
@@ -143,26 +148,26 @@ public:
 	// register with the provided data; in response, the interface should
 	// clock through any unprocessed stream data and then call the
 	// m_callbacks->intf_mode_write() method with the provided data
-	virtual void synchronized_mode_write(uint8_t data) = 0;
+	virtual void synchronized_mode_write(uint8_t data) { m_callbacks->intf_mode_write(data); }
 
 	// the engine calls this to schedule a synchronized interrupt check;
 	// in response, the interface should clock through any unprocessed
 	// stream data and then call the m_callbacks->intf_check_interrupts() method
-	virtual void synchronized_check_interrupts() = 0;
+	virtual void synchronized_check_interrupts() { m_callbacks->intf_check_interrupts(); }
 
 	// the engine calls this to set one of two timers which should fire after
 	// the given number of clocks; when the timer fires, it must call the
 	// m_callbacks->intf_timer_handler() method; a duration_in_clocks that is
 	// negative means to disable the timer
-	virtual void set_timer(uint32_t tnum, int32_t duration_in_clocks) = 0;
+	virtual void set_timer(uint32_t tnum, int32_t duration_in_clocks) { }
 
 	// the engine calls this to set the time when the busy signal will next
 	// be dropped, which is the current time plus the given number of clocks
-	virtual void set_busy_end(uint32_t clocks) = 0;
+	virtual void set_busy_end(uint32_t clocks) { }
 
 	// the engine calls this to query whether the current time is before the
 	// last set end-of-busy time
-	virtual bool is_busy() = 0;
+	virtual bool is_busy() { return false; }
 
 	// the engine calls this when the external IRQ state changes; in
 	// response, the interface should perform any IRQ signaling that needs
@@ -172,6 +177,13 @@ public:
 	// the engine calls this when a write to an output port is issued; only
 	// the OPM supports this at this time
 	virtual void output_port(uint8_t data) { }
+
+	// the engine calls this to read data for the ADPCM-A engine
+	virtual uint8_t adpcm_a_read(uint32_t offset) { return 0; }
+
+	// the engine calls this to read or write data for the APDCM-B engine
+	virtual uint8_t adpcm_b_read(uint32_t offset) { return 0; }
+	virtual void adpcm_b_write(uint32_t offset, uint8_t data) { }
 
 protected:
 	// pointer to engine callbacks -- this is set direclty by the engine at
@@ -622,7 +634,7 @@ public:
 	// set/reset bits in the status register, updating the IRQ status
 	uint8_t set_reset_status(uint8_t set, uint8_t reset)
 	{
-		m_status = (m_status | set) & ~reset;
+		m_status = (m_status | set) & ~(reset | STATUS_BUSY);
 		m_intf.synchronized_check_interrupts();
 		return m_status;
 	}
@@ -699,6 +711,8 @@ protected:
 // for chips which derive from AY-8910 classes and may have clashing
 // names)
 #define YMFM_NAME(x) x, "ymfm." #x
+#define ADPCM_A_NAME(x) x, "adpcma." #x
+#define ADPCM_B_NAME(x) x, "adpcmb." #x
 
 class mame_fm_interface : public ymfm::fm_interface
 {

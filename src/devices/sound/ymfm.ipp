@@ -306,6 +306,46 @@ inline uint32_t opm_key_code_to_phase_step(uint32_t block_freq, int32_t delta)
 }
 
 
+//-------------------------------------------------
+//  opn_lfo_pm_phase_adjustment - given the 7 most
+//  significant frequency number bits, plus a 3-bit
+//  PM depth value and a signed 5-bit raw PM value,
+//  return a signed PM adjustment to the frequency;
+//  algorithm written to match Nuked behavior
+//-------------------------------------------------
+
+inline int32_t opn_lfo_pm_phase_adjustment(uint32_t fnum_bits, uint32_t pm_sensitivity, int32_t lfo_raw_pm)
+{
+	// this table encodes 2 shift values to apply to the top 7 bits
+	// of fnum; it is effectively a cheap multiply by a constant
+	// value containing 0-2 bits
+	static uint8_t const s_lfo_pm_shifts[8][8] =
+	{
+		{ 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77 },
+		{ 0x77, 0x77, 0x77, 0x77, 0x72, 0x72, 0x72, 0x72 },
+		{ 0x77, 0x77, 0x77, 0x72, 0x72, 0x72, 0x17, 0x17 },
+		{ 0x77, 0x77, 0x72, 0x72, 0x17, 0x17, 0x12, 0x12 },
+		{ 0x77, 0x77, 0x72, 0x17, 0x17, 0x17, 0x12, 0x07 },
+		{ 0x77, 0x77, 0x17, 0x12, 0x07, 0x07, 0x02, 0x01 },
+		{ 0x77, 0x77, 0x17, 0x12, 0x07, 0x07, 0x02, 0x01 },
+		{ 0x77, 0x77, 0x17, 0x12, 0x07, 0x07, 0x02, 0x01 }
+	};
+
+	// look up the relevant shifts
+	int32_t abs_pm = (lfo_raw_pm < 0) ? -lfo_raw_pm : lfo_raw_pm;
+	uint32_t const shifts = s_lfo_pm_shifts[pm_sensitivity][bitfield(abs_pm, 0, 3)];
+
+	// compute the adjustment
+	int32_t adjust = (fnum_bits >> bitfield(shifts, 0, 4)) + (fnum_bits >> bitfield(shifts, 4, 4));
+	if (pm_sensitivity > 5)
+		adjust <<= pm_sensitivity - 5;
+	adjust >>= 2;
+
+	// every 16 cycles it inverts sign
+	return (lfo_raw_pm < 0) ? -adjust : adjust;
+}
+
+
 
 //*********************************************************
 //  FM OPERATOR
