@@ -9347,6 +9347,17 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="tengenwcp" cloneof="tengenwc">
+		<description>Tengen World Cup Soccer (prototype)</description>
+		<year>1993</year>
+		<publisher>Tengen</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="tengen world cup soccer [proto].bin" size="262144" crc="8e6818ae" sha1="69bb04a218d207a9a907a37970b6ac992a64b8cd"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="term2">
 		<description>Terminator 2 - Judgment Day (Euro, USA)</description>
 		<year>1993</year>
