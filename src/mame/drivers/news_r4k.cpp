@@ -58,7 +58,7 @@
  *   - Zilog Z8523010VSC ESCC serial interface: emulated (see following)
  *   - Sony CXD8421Q WSC-ESCC1 serial APbus interface controller: skeleton (ESCC connections, probably DMA, APbus interface, etc. handled by this chip)
  *   - 2x Sony CXD8442Q WSC-FIFO APbus FIFO/interface chips: partially emulated (handles APbus connections and probably DMA for sound, floppy, etc.)
- *   - National Semi DP83932B-VF SONIC Ethernet controller: not emulated (also, MAME only has the -C version currently)
+ *   - National Semi DP83932B-VF SONIC Ethernet controller: Not fully working yet (also, is using -C rather than -B version)
  *   - Sony CXD8452AQ WSC-SONIC3 SONIC Ethernet APbus interface controller: not emulated
  *   - Sony CXD8418Q WSC-PARK3: not emulated (most likely a gate array based on what the PARK2 was in older gen NEWS systems)
  *   - Sony CXD8403Q DMAC3Q DMA controller: skeleton
@@ -88,6 +88,7 @@
 #include "machine/upd765.h"
 #include "machine/cxd8442q.h"
 #include "machine/cxd8421q.h"
+#include "machine/dp83932c.h"
 
 // Buses
 #include "machine/nscsi_bus.h"
@@ -112,7 +113,8 @@ public:
           m_ram(*this, "ram"),
           m_rtc(*this, "rtc"),
           m_escc(*this, "escc1"),
-          m_fifo0(*this, "fifo0"),
+          m_fifo0(*this, "apfifo0"),
+          m_sonic(*this, "sonic"),
           m_fdc(*this, "fdc"),
           m_hid(*this, "hid"),
           m_dmac(*this, "dmac"),
@@ -212,9 +214,8 @@ protected:
     // Sony CXD8442Q APbus FIFO (2x, but only one set up so far)
     required_device<cxd8442q_device> m_fifo0;
 
-    // SONIC ethernet controller - a different rev, the DP83932C, is emulated in MAME
-    // so it hopefully will work with just a little modification.
-    // required_device<dp83932c_device> m_net;
+    // SONIC ethernet controller
+    required_device<dp83932c_device> m_sonic;
 
     // National Semiconductor PC8477B floppy controller
     required_device<pc8477a_device> m_fdc;
@@ -314,6 +315,11 @@ void news_r4k_state::machine_common(machine_config &config)
     // APbus FIFOs
     CXD8442Q(config, m_fifo0, 0);
 
+    // SONIC ethernet controller
+    DP83932C(config, m_sonic, 20'000'000); // TODO: real clock frequency? There is a 20MHz crystal nearby on the board, so this will do until I can confirm the traces
+    m_sonic->out_int_cb().set(FUNC(news_r4k_state::irq_w<irq0_number::SONIC>)); // TODO: WSC-SONIC might do some interrupt processing
+    m_sonic->set_bus(m_cpu, 0);
+
     // Keyboard and mouse
     // Unlike 68k and R3000 NEWS machines, the keyboard and mouse seem to share an interrupt
     // See https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/ms_ap.c#L103
@@ -381,8 +387,9 @@ void news_r4k_state::cpu_map(address_map &map)
     map.unmap_value_low();
 
     // NEWS firmware
-    map(0x1fc00000, 0x1fc3ffff).rom().region("mrom", 0);  // Monitor ROM
-    map(0x1f3c0000, 0x1f3c03ff).rom().region("idrom", 0); // IDROM
+    map(0x1fc00000, 0x1fc3ffff).rom().region("mrom", 0);  // Monitor ROM (system firmware)
+    map(0x1f3c0000, 0x1f3c03ff).rom().region("idrom", 0); // IDROM (system-specific information)
+    map(0x1e600000, 0x1e6003ff).rom().region("macrom", 0); // SONIC/Ethernet ROM
 
     // Front panel DIP switches - TODO: mirror length
     map(0x1f3d0000, 0x1f3d0007).r(FUNC(news_r4k_state::front_panel_r));
@@ -409,7 +416,11 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1e940000, 0x1e94000f).rw(m_escc, FUNC(cxd8421q_device::ch_read<cxd8421q_device::CHB>), FUNC(cxd8421q_device::ch_write<cxd8421q_device::CHB>));
     map(0x1e950000, 0x1e95000f).rw(m_escc, FUNC(cxd8421q_device::ch_read<cxd8421q_device::CHA>), FUNC(cxd8421q_device::ch_write<cxd8421q_device::CHA>));
 
-    // TODO: SONIC network controller (0x1e600000)
+    // SONIC network controller
+    // Right now, this doesn't work because nothing is mapping the SONIC's address lines to 0x1e620000 space so it just causes a bunch of unmapped reads
+    // map(0x1e500000, ???) // WSC-SONIC registers
+    map(0x1e610000, 0x1e6101ff).m(m_sonic, FUNC(dp83932c_device::map)).umask64(0x000000000000ffff); // SONIC registers - this doesn't fully match the hw
+    map(0x1e620000, 0x1e627fff).ram(); // dedicated network RAM
 
     // DMAC3 DMA Controller
     map(0x14c20000, 0x14c3ffff).m(m_dmac, FUNC(dmac3_device::map_dma_ram));
@@ -870,7 +881,10 @@ ROM_SYSTEM_BIOS(0, "nws5000x", "APbus System Monitor Release 3.201")
 ROMX_LOAD("mpu-33__ver3.201__1994_sony.rom", 0x00000, 0x40000, CRC(8a6ca2b7) SHA1(72d52e24a554c56938d69f7d279b2e65e284fd59), ROM_BIOS(0))
 
 ROM_REGION64_BE(0x400, "idrom", 0)
-ROM_LOAD("idrom.rom", 0x000, 0x400, CRC(89edfebe) SHA1(3f69ebfaf35610570693edf76aa94c10b30de627) BAD_DUMP)
+ROM_LOAD("idrom.rom", 0x000, 0x400, CRC(89edfebe) SHA1(3f69ebfaf35610570693edf76aa94c10b30de627) BAD_DUMP) // dump includes unmapped space
+
+ROM_REGION64_BE(0x400, "macrom", 0)
+ROM_LOAD("macrom.rom", 0x000, 0x400, CRC(c3c9f79c) SHA1(a430787b77604d72eb99773817e2405ba414d306) BAD_DUMP) // dump includes unmapped space
 ROM_END
 
 // Machine definitions
