@@ -12,7 +12,9 @@
        There are threads that say when running in VGA mode an original AA
        will play music etc. at half the expected speed, so it is likely
        that the way the timers work differs in this mode (25Hz instead of 50?)
-     - Sounds are being output as bleeps and bloops in the older games and New Zealand/touchscreen games.
+     - Sounds are being output as bleeps and bloops in the older games and New Zealand/touchscreen games,
+       the reel stop sound in jungjuic, and the card flip sound in multidrw. It seems to not be updating the
+       sound data thus repeating the previous sample in memory (in most cases, the POST beep hence bleeps and bloops)
      - Games occasionally give a coin diverter fault when inserting coins, mainly with US region games.
      - Early US games will lock up completely if a hand pay is performed, requiring a complete memory reset.
        To avoid this until the issue has been fixed, change the hopper and jackpot limits to a very large number
@@ -21,6 +23,8 @@
      - Venezuelan games give a note acceptor error on boot even if the note acceptor is disabled in the options
      - qnilebr (actually the 0301718V BIOS itself) won't accept coins on boot until the jackpot reset key is toggled (bug or not?)
      - Later games from NSW/ACT and Venezuela lock up (hang) after a while after a certain amount of spins (usually 50 spins)
+     - Comms protocols are not emulated
+     - Bill acceptor is not emulated yet - Venezuelan games tend to complain about it but the error can be cleared with the jackpot key
 
     US games which can completely freeze after exceeding $1199.99 and forcing a hand pay, requiring the SRAM to be wiped:
      - bumblbugu, bumblbugua, chickna5u, chickna5ua, eforsta5u, eforsta5ua, mgarden, minemineu, minemineua, pengpayu,
@@ -29,9 +33,9 @@
     Games which do *not* lock up after a certain amount of spins:
      - All games from Holland, New Zealand, USA, and Casino versions.
      - baddog, buttdeli, cashcham, chickna5, dmdfever, dolphntra, dolphntrb, drgneye, dstbloom, dstblooma,
-       eforsta5, jumpjoey, kgalaha, kgbirda5, locoloot, locoloota, lonewolf, luckyclo, mammothm, minemine,
-       mountmon, mountmona, mystgard, oscara5a, pengpaya, pengpayc, phantpay, przfight, qnileb, qtbird,
-       reelpwr, retrsama, retrsamb, rushrst, snowcat, swhr2a, thndh, thndha, thor, topbana,
+       eforsta5, jumpbean, jumpjoey, kgalaha, kgbirda5, locoloot, locoloota, lonewolf, luckyclo, mammothm,
+       minemine, mountmon, mountmona, mystgard, oscara5a, pengpaya, pengpayc, phantpay, przfight, qnileb,
+       qtbird, reelpwr, retrsama, retrsamb, rushrst, snowcat, swhr2a, thndh, thndha, thor, topbana,
        trpdlght, wamazona, wcougar, wildbill, wldangel
 
     BIOS ROMs are actually nowhere to be found on a regular MK5 system, as the BIOS code is at the start of game ROMs in U7 and U11.
@@ -41,14 +45,14 @@
     Casino versions actually do have a BIOS, otherwise known as a Base System, which is installed at U7/U11 at all times.
     Casino game EPROMs are loaded in U8/U12 and beyond.
 
-    Casino games (except qnilebr), as well as games from Queensland and Victoria, require a comms protocol to be emulated,
+    Casino games (except qnilebr), as well as games from Queensland and Victoria, require certain comms protocols to be emulated,
     otherwise they will remain in a disabled state and cannot be played.
     Only New Zealand (0700474V) and Brazilian (0301718V) casino BIOSes have been dumped so far.
 
     The Brazilian casino BIOS does not use comms, therefore qnilebr is playable. By swapping u7/u11 with the other
     casino games (goldpyrb/jungjuic/penpir2), these games also become playable.
 
-    Queensland games and the 0700474V casino BIOS all use QCOM, blackpnt uses VLC (Video Lottery Consultants) comms instead.
+    Queensland games use QCOM, the 0700474V casino BIOS uses ASP1000, while blackpnt uses VLC (Video Lottery Consultants).
 
     Diamond Touch, Dream Weaver, Magic Touch and the New Zealand games have an autoplay option.
     The New Zealand games have this enabled by default in the options, whereas on the NSW games it is disabled by default.
@@ -56,19 +60,20 @@
 
     Some Venezuelan games have a 'Play maximum lines' option, this will turn every play line button into maximum lines.
     For example, the default setup may have 1, 5, 10, 15 and 20 line buttons; this option will turn every play button into 20 lines.
+    Sets chariotcv and qnilev may actually be for Peru rather than Venezuela, as the region digit is different to the other games and denomination values are hard coded.
 
     The gamble (double up) feature can be enabled in the options on non-US machines. It is disabled by default.
     On US machines which don't use set chips, the gamble feature is enabled with dip switch 2-1.
     On US machines which use set chips, the gamble feature can be enabled in the set chip options, but only if the game's region allows it.
-    The gamble option can not be enabled at all in the Brazilian casino BIOS, although the code is still in place.
+    The gamble option can not be enabled at all in the Brazilian casino BIOS, although the program code for it still exists.
 
     The standard double up mode on Aristocrat games is the red/black card game, which is in fact the only option on US games.
     Some machines have different gamble features, such as being able to bet on the four card suits for 4:1 odds,
     or to spin a single slot reel which has 2:1, 3:1, 5:1, 10:1 or 100:1 odds of landing on the middle line.
     Other games replace the cards with animations, for example the double up game in Prize Fight bets on which
-    boxer will knock out the other, likewise in Sumo Spins one sumo wrestler will ring-out the other.
+    boxer will knock out the other, likewise in Sumo Spins one sumo wrestler will knock over the other.
     In both Prize Fight and Sumo Spins the two opponents are wearing either red or black just like the cards they replaced.
-    The gamble feature is not available if a win coincides with a jackpot pay such as a Hyperlink feature.
+    The gamble feature is not available if a win coincides with a jackpot pay such as a Hyperlink feature or a hand pay.
 
     Regional button layout differences:
     US games have the payline buttons on the top row, the player selects the number of lines to be played first before choosing the bet multiplier to spin.
@@ -76,7 +81,7 @@
     Non-US games have the bet buttons on the top row, the player selects the bet multiplier first before selecting the amount of lines to play.
     An exception to the non-US layout applies if the game only has one payline, for example wamazona. In this case, the bottom row is used for the bet multipliers.
     Some non-US games default to 1 credit per line when there are zero credits in the machine so that a player does not accidentally bet higher than intended.
-    The Chariot Challenge (both sets) also reverts to 1 credit per line after rebooting, regardless of the previous bet.
+    Chariot Challenge (both sets) and the 3-line Wild Amazon sets revert to 1 credit per line after rebooting, regardless of the previous bet.
 
     Some games can be set up to multiple bet and line configurations. Usually this applies to the US set chip games,
     however some non-US games also have this option, such as baddog, marmagic, trojhors and tritreat.
@@ -84,7 +89,7 @@
 
     Some early games such as swhr2a have an option to have either music or coin sounds to be played during a win.
     This option is in the Sound System setup rather than in Machine Options.
-    Selecting "Base" plays coin jingles while selecting "MK2.5" plays a small selection of prerecorded music taken from MK2.5 games.
+    Selecting "Base" plays coin jingles while selecting "MK2.5" plays a small selection of prerecorded win music taken from MK2.5 games.
 
     Later non-US games moved the collect limit from the Machine Options menu into its own menu.
 
@@ -99,7 +104,7 @@
 
     List of Hyperlink systems/themes on MK5 hardware:
     Cash Express - Train theme.
-    Penguin Pucks - Arctic/Antarctic theme, based on Cash Express.
+    Penguin Pucks - Antarctic theme, based on Cash Express.
     Maximillions - Game show style theme, stylized as Maximillion$. A similar game for the US market is Millioniser, stylized as Millioni$er, however this may only be on later hardware.
     Scorchin' Fortune - Sports car/racing theme, based on Cash Express.
     Fast Lane - Same theme as Scorchin' Fortune but the jackpot feature is slightly different.
@@ -114,10 +119,13 @@
 
     There is a discrepancy with some game names between the ROMs and the artwork or even official documents:
     For example, swhr2 is called Sweethearts II inside the ROM, however on the artwork it is called Sweet Hearts II.
-    Mountain Money displays "MOONSHINE MONEY" when a win with the wild Moonshine occurs. The game itself is not called Moonshine Money.
-    Chicken displays "Chicken Run Feature Completed" at the end of the feature. The game itself is not called Chicken Run.
+    Mountain Money displays "MOONSHINE MONEY" when a win with the wild Moonshine occurs, but the game is called Mountain Money.
+    Chicken displays "Chicken Run Feature Completed" at the end of the feature. The bonus game is called the Chicken Run Feature but the game itself is simply called Chicken.
     Thunder Heart is named Thunderheart on the artwork, as well as on the later Hyperlink jackpot games.
     Golden Pyramids is sometimes called Golden Pyramid (without the trailing 's') in the ROM.
+    Jumpin' Joeys is called Jumpin' Joey (without the trailing 's') in the ROM.
+    Chariot Challenge is called The Chariot Challenge in the ROM but lacks the "The" on the artwork and copyright text.
+    Thor is called "Thor: God of Thunder!" on the artwork but all references to the game seem to be simply Thor.
 
     Some games also have completely different artwork (using the same theme and paytable) but use the ROMs from another game. Examples are:
     Heart Throb = Sweethearts II (Heart Throb confirmed using 0200004V EPROMs)
@@ -145,7 +153,7 @@
     Sweet Liberty Deluxe = Koala Mint
     Cash Chameleon = Canyon Rose = Queens of Cash
     Green Lizard = King Galah
-    Penguin Pays = Jumping Beans = Jumpin' Joey = Fortune Fever = Honky Tonk
+    Penguin Pays = Jumping Beans = Jumpin' Joeys = Fortune Fever = Honky Tonk
     Top Banana = Black Panther
     Panther Magic = Black Rhino (undumped) = Wild Africa = K.G. Bird = Wild Cougar = Thor = Fantasy Fortune (undumped)
     Wild Thing = Return of the Samurai
@@ -154,13 +162,26 @@
     Prize Fight = Super Bucks II
     Silver Wolf = Lone Wolf
     Mystic Garden = Mountain Money (20 line) = Mammoth Money
-    Winning Post = The Chariot Challenge
+    Winning Post = Chariot Challenge (not quite identical but very similar)
     Rushin' Rooster = Chicken
     Yukon Gold = Margarita Magic
     Peacock Flutter = Treasure Trove = Trojan Horse
     Mine Mine Mine = 3 Bags Full (undumped) = Fortune Hunter (only released on MK4)
     Magic Touch = Dream Weaver
     Keep Your Hat On = Bachelorette Party
+
+    Known undumped games:
+    3 Bags Full
+    Beyond the Reef (Dolphin Treasure clone, may actually use the same ROMs but unconfirmed)
+    Black Rhino
+    Bring Home the Bacon
+    Diamonds & Hearts
+    Fantasy Fortune
+    Golden Canaries
+    Hearts of Venice (Venetian Nights/Venice clone, NSW version confirmed to exist)
+    Tequila Sunrise
+    Way To Go
+    White Tiger (original release without Classic Buy Feature)
 
 *****************************************************************************************************************
 
@@ -171,18 +192,19 @@
     Step 1: Audit key in (F2), press Reserve (A) and the fourth line button (G) together to clear the memory. Some games may require the main door to be open (press M) prior to clearing.
     Note: On 3-payline games, press Reserve (A) and Bet 1 Credit (E) to clear the memory.
 
-    If open, the main door can be closed from this point on (press M again).
+    If open, the main door can be closed from this point on (press M again), although on a real machine the main door would be the last door to close.
 
     Step 2: Enter Operator Setup -> Machine Options
 
-    Usually, the Machine ID can be set to anything, however some games complain if it set to zero.
+    Usually, the Machine ID can be set to anything, however some games complain if it's set to zero.
     Base Credit Value is the denomination e.g. $0.01 is a one cent machine; $1.00 is a one dollar machine. Some machines may not allow certain values, others may only have one setting.
     Token Value is the coin used. The default coin in Australian machines is $1.00 ($2.00 for New Zealand) but there are a number of options from 1 cent all the way to 100 dollars.
-    Percentage Variation is how loose or tight you want the machine to be, the higher the percentage, the better the game is to the players at the cost of the house edge. Usually the default is "Variation 99" or around 87%. Again, some machines may only have the one option.
-    CCCE is for communications in a gaming venue, and is not required for emulation.
+    Percentage Variation is how loose or tight you want the machine to be, the higher the percentage, the better the game is to the players at the cost of the house edge.
+    Usually, but not always, the default is "Variation 99" or around 87%. Again, some machines may only have the one option.
+    CCCE is for communications in a gaming venue, and is not required for emulation unless implemented in the future so that MAME can talk to real hardware.
     Collect limit is the highest amount of credits allowed to be cashed out before a hand pay is required.
     Hopper refill is the amount of coins the machine should receive every time when the hopper is empty (not required for emulation as the hopper has infinite coins!)
-    Gamble is the double up feature, and it is disabled by default as seen in the diagram. Change the setting to YES for the ability to bet against your wins; if disabled, the wins are automatically added to the credit meter.
+    Gamble is the double up feature, and it is disabled by default. Change the setting to YES for the ability to bet against your wins; if disabled, the wins are automatically added to the credit meter.
 
     Step 3: Once everything has been set up, open the Security Cage/Logic Door (L) and press (W) to save (or (R) on 3-payline games; (H) on single-line games), and close the logic door (L again).
     By now it should be safe to key out (F2) and the game should be ready to accept credits, if not, check whether the main door (M) is still open or if it needs another memory reset (if pressing F2 went to the main menu instead of going back to the game).
@@ -195,7 +217,11 @@
     Note: To disable both the hopper and forced hand pay on cashout, change both the Collect Limit and Hopper Refill to $0.00.
     Disabling this setting will allow hand pays but still allow the player to continue if they inadvertently hit Collect.
     To perform a hand pay or jackpot reset (e.g. after a Hyperlink feature), press (V) to allow the game to enter play mode.
-    Note that in some games such as Treasure Trove (trstrove), the collect options are moved to Operator Setup -> Set Collect Limit rather than in Machine Options.
+    Note that in some later games such as Treasure Trove (trstrove), the collect options are moved to Operator Setup -> Set Collect Limit rather than in Machine Options.
+
+    Note: wamazona will crash in Machine Options if Base Credit Value is changed before Token Value.
+    This is a bug in the menu code due to the game defaulting to $0.10 coin/credit settings, which are not valid for this game (the game is designed for 20c/50c/$1 denominations).
+    Change the Token Value to a higher amount before setting the Base Credit Value.
 
 
     New Zealand non-casino games, and most NSW/ACT touchscreen games:
@@ -242,7 +268,7 @@
     Step 1: Audit key in, press Service (A) and the fourth line button (G) together to clear the memory.
 
     Step 2: Enter Options Setup -> Machine Options and follow the same instructions as per the NSW/ACT games. The game should already have some default settings, but they can still be changed.
-    Note that like Queensland games, this casino base requires QCOM thus the games are not yet playable with these base EPROMs.
+    Note: As the ASP1000 protocol is not yet emulated, the games are not yet playable with these base EPROMs.
 
 
     Casino games using the Brazilian 0301718V base EPROMs:
@@ -260,8 +286,7 @@
     Note: To change settings, key in (F2) and enter the Operator Setup (Opcoes de Configuracao) -> Machine Options (Itens Gerais) as per the NSW/ACT games.
     Once the required settings have been changed, open the logic door (L), press Bet 1 (W) to save the settings, close the logic door and key out.
 
-    Running non-Brazilian casino games with the Brazil base may cause minor text errors due to the games not having accented characters in the fonts,
-    however they are still fully playable.
+    Running non-Brazilian casino games with the Brazil base may cause minor text errors due to the games not having accented characters in the fonts, however they are still fully playable.
 
     *************************************************************************************************************
 
@@ -380,13 +405,13 @@
     Payout Setup Menu: This menu is not required in MAME.
 
     Step 3c: Playline Setup Menu
-    Remember how qnilece only allowed 20 lines, with bets of 5, 10, 25 and 50 credits? It's time to tell the set chip that this game is not a three credit single line game.
+    Remember how qnilece only allowed 20 lines, with bets of 5, 10, 25 and 50 credits? It's time to tell the set chip that this game is not a three-credit single-line game.
     Of course, the higher the maximum bet, the larger the wins are at the cost of how much money you put through the machine.
     Most games also allow the button panel to be reversed, with the bet buttons on the top row and the playline buttons on the bottom, similar to non-US machines. This is toggled with G.
     Note that the intermediate bet values shown on the button display may not correspond perfectly with the actual bet values in the game itself; this information is not actually stored in the set chip and is up to the game's programming.
 
     Step 3d: Miscellaneous Options Menu
-    Variation Number is how loose or tight you want the machine to be. By default, it is variation 99, which is usually around 87%, give or take 1% depending on the machine.
+    Variation Number is how loose or tight you want the machine to be. By default, it is variation 99, which is usually around 87%, give or take 1% depending on the machine, however some games have different values.
     Variation 99: 87%
     Variation 1: 90%
     Variation 2: 92%
@@ -597,7 +622,7 @@
 // Non-US button layouts    Bet buttons       Lines Gamble     Other
 #include "aristmk5.lh"   // 1, 2, 3, 5, 10    20    suits      Take Win/Start Feature
 #include "adonisce.lh"   // 1, 2, 3, 5, 10    20    suits      TW/SF, Cash Express buttons
-#include "baddog.lh"     // Video Poker
+#include "baddog.lh"     // Video Poker       N/A   suits
 #include "cashcatnz.lh"  // 1, 2, 3, 4, 5     9     suits      TW/SF, 7L or Autoplay
 #include "cashcham.lh"   // 1, 5, 10, 20, 25  20    suits
 #include "cashchama.lh"  // 1, 2, 3, 4, 5     20    suits
@@ -624,7 +649,7 @@
 #include "marmagic.lh"   // multiple configs  9/20  suits      TW/SF (different bets to dynajack/fortellr)
 #include "montree.lh"    // 1, 2, 3, 5, 12    20    suits      15L or Autoplay
 #include "mountmon.lh"   // 1, 5, 10, 25, 50  20    red/black
-#include "multidrw.lh"   // Video Poker (different to baddog)
+#include "multidrw.lh"   // Video Poker       N/A   suits      Different to baddog
 #include "mystgard.lh"   // 1, 2, 3, 4, 5     20    red/black
 #include "one4all.lh"    // 1, 2, 3, 5, 6     20    suits      TW/SF, 15L or Autoplay
 #include "orchidms.lh"   // 1, 5, 10, 25, 50  10    suits
@@ -642,7 +667,8 @@
 #include "reelrock.lh"   // 1, 2, 3, 5, 8     243   suits
 #include "retrsam.lh"    // 1, 2, 3           3     odds
 #include "retrsamb.lh"   // 1, 2, 3, 5, 10    9     odds
-#include "sbuk2.lh"      // 1, 2, 3, 4, 5     1     red/black  Single line game
+#include "sbuk2.lh"      // 1, 2, 3, 4, 5     1     odds       Single line game
+#include "sbuk2a.lh"     // 1, 2, 3, 4, 5     1     red/black  Single line game
 #include "sbuk3.lh"      // 1, 2, 3           3     odds       TW/SF
 #include "snowcat.lh"    // 1, 2, 3, 5, 10    9     suits
 #include "swhr2.lh"      // 1, 2, 3, 5, 10    9     red/black
@@ -1271,13 +1297,13 @@ static INPUT_PORTS_START( aristmk5_usa )
 	/* This simulates the ROM swap */
 	PORT_START("ROM_LOAD")
 	PORT_CONFNAME( 0x07, 0x07, "System Mode" )
-	PORT_CONFSETTING(    0x00, "USA Set Chip v4.04.09 Mode" )
-	PORT_CONFSETTING(    0x01, "USA Set Chip v4.04.08 Mode" )
-	PORT_CONFSETTING(    0x02, "USA Set Chip v4.04.05 Mode" )
-	PORT_CONFSETTING(    0x03, "USA Set Chip v4.04.00 Mode" )
-	PORT_CONFSETTING(    0x04, "USA Set Chip v4.03.07 Mode" )
-	PORT_CONFSETTING(    0x05, "USA Set Chip v4.02.04 Mode" )
-	PORT_CONFSETTING(    0x06, "USA Set Chip v1.0 Mode" )
+	PORT_CONFSETTING(    0x00, "Set Chip v4.04.09" )
+	PORT_CONFSETTING(    0x01, "Set Chip v4.04.08" )
+	PORT_CONFSETTING(    0x02, "Set Chip v4.04.05" )
+	PORT_CONFSETTING(    0x03, "Set Chip v4.04.00" )
+	PORT_CONFSETTING(    0x04, "Set Chip v4.03.07" )
+	PORT_CONFSETTING(    0x05, "Set Chip v4.02.04" )
+	PORT_CONFSETTING(    0x06, "RAM Clear EPROM v1.0" )
 	PORT_CONFSETTING(    0x07, "Game Mode" )
 
 	PORT_START("DSW1")
@@ -1916,16 +1942,27 @@ static INPUT_PORTS_START(sbuk2)
 	PORT_INCLUDE(kgalah)
 
 	PORT_MODIFY("P1")
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CODE(KEYCODE_S) PORT_NAME("Bet 1 Credit / Red")
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CODE(KEYCODE_D) PORT_NAME("Bet 2 Credits")
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CODE(KEYCODE_F) PORT_NAME("Bet 3 Credits")
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Bet 4 Credits")
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Bet 5 Credits / Black")
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CODE(KEYCODE_S) PORT_NAME("Bet 1 Credit / x2")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CODE(KEYCODE_D) PORT_NAME("Bet 2 Credits / x3")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CODE(KEYCODE_F) PORT_NAME("Bet 3 Credits / x5")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Bet 4 Credits / x10")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Bet 5 Credits / x100")
 	PORT_BIT(0x00000200, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x00000400, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x00002000, IP_ACTIVE_HIGH, IPT_UNUSED)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(sbuk2a)
+	PORT_INCLUDE(sbuk2)
+
+	PORT_MODIFY("P1")
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_BUTTON8)  PORT_CODE(KEYCODE_S) PORT_NAME("Bet 1 Credit / Red")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CODE(KEYCODE_D) PORT_NAME("Bet 2 Credits")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_CODE(KEYCODE_F) PORT_NAME("Bet 3 Credits")
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_CODE(KEYCODE_G) PORT_NAME("Bet 4 Credits")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_H) PORT_NAME("Bet 5 Credits / Black")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(unicorndnz)
@@ -2056,6 +2093,7 @@ static INPUT_PORTS_START(pengpuck)
 	PORT_CONFNAME( 0x00000001, 0x00000000, "Control Panel Type" )
 	PORT_CONFSETTING(          0x00000000, "Normal" )
 	PORT_CONFSETTING(          0x00000001, "Alt" )
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(dolphntrce)
@@ -2366,25 +2404,25 @@ void aristmk5_state::aristmk5_usa_touch(machine_config &config)
 }
 
 #define ARISTOCRAT_MK5_USA_SETCHIPS \
-	ROM_REGION( 0x400000, "set_4.04.09", ROMREGION_ERASEFF ) /* setchip v4.04.09 4meg */ \
+	ROM_REGION( 0x400000, "set_4.04.09", ROMREGION_ERASEFF ) /* setchip v4.04.09 */ \
 	ROM_LOAD32_WORD( "setchip v4.04.09.u7",  0x000000, 0x80000, CRC(e8e8dc75) SHA1(201fe95256459ce34fdb6f7498135ab5016d07f3) ) \
 	ROM_LOAD32_WORD( "setchip v4.04.09.u11", 0x000002, 0x80000, CRC(ff7a9035) SHA1(4352c4336e61947c555fdc80c61f944076f64b64) ) \
-	ROM_REGION( 0x400000, "set_4.04.08", ROMREGION_ERASEFF ) /* setchip v4.04.08 4meg (27c4096) */ \
+	ROM_REGION( 0x400000, "set_4.04.08", ROMREGION_ERASEFF ) /* setchip v4.04.08 */ \
 	ROM_LOAD32_WORD( "setchip v4.04.08.u7",  0x000000, 0x80000, CRC(7c4b7fe4) SHA1(39dd39c794c0cb6abc1b7503650643a8131468d1) ) \
 	ROM_LOAD32_WORD( "setchip v4.04.08.u11", 0x000002, 0x80000, CRC(d3234a28) SHA1(8ff112ee4aadf1d359ca8ffe0cfa9c7400aa0595) ) \
-	ROM_REGION( 0x400000, "set_4.04.05", ROMREGION_ERASEFF ) /* setchip v4.04.05 4meg */ \
+	ROM_REGION( 0x400000, "set_4.04.05", ROMREGION_ERASEFF ) /* setchip v4.04.05 */ \
 	ROM_LOAD32_WORD( "setchip v4.04.05.u7",  0x000000, 0x80000, CRC(e7b39a73) SHA1(e826d717a0871383394e15634896fcb2e2bdeb75) ) \
 	ROM_LOAD32_WORD( "setchip v4.04.05.u11", 0x000002, 0x80000, CRC(2fc9b2a0) SHA1(89191f02c4ec8089e26989430806650d14e13e5a) ) \
-	ROM_REGION( 0x400000, "set_4.04.00", ROMREGION_ERASEFF ) /* setchip v4.04.00 4meg 42pin */ \
+	ROM_REGION( 0x400000, "set_4.04.00", ROMREGION_ERASEFF ) /* setchip v4.04.00 */ \
 	ROM_LOAD32_WORD( "setchip v4.04.00.u7",  0x000000, 0x80000, CRC(2453137e) SHA1(b59998e75ae3924da16faf47b9cfe9afd60d810c) ) \
 	ROM_LOAD32_WORD( "setchip v4.04.00.u11", 0x000002, 0x80000, CRC(82dfa12a) SHA1(86fd0f0ad8d5d1bc503392a40bbcdadb055b2765) ) \
-	ROM_REGION( 0x400000, "set_4.03.07", ROMREGION_ERASEFF ) /* setchip v4.03.07 4meg */ \
+	ROM_REGION( 0x400000, "set_4.03.07", ROMREGION_ERASEFF ) /* setchip v4.03.07 */ \
 	ROM_LOAD32_WORD( "setchip v4.03.07.u7",  0x000000, 0x80000, CRC(5cf56036) SHA1(ff11deb6f76627f4fb5a7ec789e4071887e3eae9) ) \
 	ROM_LOAD32_WORD( "setchip v4.03.07.u11", 0x000002, 0x80000, CRC(637de9b9) SHA1(4b5c974fd4c1d1a21f83bdc03d8bc5013d4a40ea) ) \
 	ROM_REGION( 0x400000, "set_4.02.04", ROMREGION_ERASEFF ) /* setchip v4.02.04 */ \
 	ROM_LOAD32_WORD( "setchip v4.02.04.u7",  0x000000, 0x80000, CRC(5a254b22) SHA1(8444f237b392df2a3cb42ea349e7af32f47dd544) ) \
 	ROM_LOAD32_WORD( "setchip v4.02.04.u11", 0x000002, 0x80000, CRC(def36617) SHA1(c7ba5b08e884a8fb36c9fb51c08e243e32c81f89) ) \
-	ROM_REGION( 0x400000, "set_1.0",     ROMREGION_ERASEFF ) /* setchip v1.0 4meg */ \
+	ROM_REGION( 0x400000, "set_1.0",     ROMREGION_ERASEFF ) /* setchip v1.0 */ \
 	ROM_LOAD32_WORD( "setchip v1.0.u7",      0x000000, 0x80000, CRC(16c2828d) SHA1(87218a76bb2791bce27b4b8ab341ba73cbbf6ffe) ) \
 	ROM_LOAD32_WORD( "setchip v1.0.u11",     0x000002, 0x80000, CRC(a969f12b) SHA1(fc6d234ce1f5c6b5aceb97b73aad60144352023b) )
 
@@ -2410,6 +2448,10 @@ ROM_END
 
 // 0200751V / 602/9 / 10 Credit Multiplier / 20 Line Multiline
 // ADONIS / NSW/ACT / A - 25/05/98
+// Variations (% and NO):
+//    87.87% 99
+//    90.31% 02
+//    92.26% 03
 ROM_START( adonis )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -2431,6 +2473,10 @@ ROM_END
 
 // 0100751V / 602/9 / 10 Credit Multiplier / 20 Line Multiline
 // ADONIS / NSW/ACT / A - 25/05/98
+// Variations (% and NO):
+//    87.87% 99
+//    90.31% 02
+//    92.26% 03
 ROM_START( adonisa )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -2452,7 +2498,13 @@ ROM_END
 
 // BHG1508 / MV4124/1 / 5,10,25,50 Credit Multiplier / 20 Line Multiline
 // ADONIS / Export / B - 31/07/01
-// Requires set chips 4.04.xx
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.928% 99
+//    90.511% 01
+//    92.161% 02
+//    94.941% 03
+//    97.325% 04
 ROM_START( adonisu )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -2476,6 +2528,7 @@ ROM_END
 // 0201005V / 602/9 / 10 Credit Multiplier/20 Line Multiline
 // ADONIS / NSW/ACT / C - 06/07/99
 // Cash Express Hyperlink game
+// Variations (% and NO): 82.06% 07
 ROM_START( adonisce )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -2502,6 +2555,10 @@ ROM_END
 // This game is downported from the MK6 version (Alchemy) and has MK6 style graphics
 // Venezuela is spelled as 'Venezuila' in the ROM
 // Game is in Spanish, however audit mode is in English
+// Variations (% and NO):
+//    87.99% 99
+//    90.10% 01
+//    92.18% 02
 ROM_START( alchemst )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -2525,6 +2582,70 @@ ROM_END
 
 // 0200428V / 386/56 / CARD POKER
 // BAD DOG POKER / NSW HOTEL / A 17/12/96
+// Variations (% and NO):
+//    87.00% 00 ($0.01, $0.02, $0.05)
+//       Bet 1:
+//          RF = 500     5K = 240     SF = 70     4K (JQKA) = 34     4K (2-10) = 20
+//          FH = 5       FL = 4       ST = 3      3K = 2             2P = 1
+//       High 200:
+//          RF = 100000  5K = 100000  SF = 48000  4K (JQKA) = 8000   4K (2-10) = 4800
+//          FH = 800     FL = 600     ST = 400    3K = 200           2P = 200
+//    87.00% 01 ($0.10, $0.20)
+//       Bet 1:
+//          RF = 500     5K = 240     SF = 70     4K (JQKA) = 34     4K (2-10) = 20
+//          FH = 5       FL = 4       ST = 3      3K = 2             2P = 1
+//       High 50:
+//          RF = 25000   5K = 25000   SF = 12000  4K (JQKA) = 2000   4K (2-10) = 1200
+//          FH = 200     FL = 150     ST = 100    3K = 50            2P = 50
+//    85.00% 02 ($0.01, $0.02, $0.05)
+//       Bet 1:
+//          RF = 500     5K = 200     SF = 60     4K (JQKA) = 30     4K (2-10) = 20
+//          FH = 5       FL = 4       ST = 3      3K = 2             2P = 1
+//       High 200:
+//          RF = 100000  5K = 100000  SF = 48000  4K (JQKA) = 7200   4K (2-10) = 4400
+//          FH = 800     FL = 600     ST = 400    3K = 200           2P = 200
+//    90.00% 03 ($0.01, $0.02, $0.05)
+//       Bet 1:
+//          RF = 500     5K = 250     SF = 100    4K (JQKA) = 42     4K (2-10) = 20
+//          FH = 5       FL = 4       ST = 3      3K = 2             2P = 1
+//       High 200:
+//          RF = 100000  5K = 100000  SF = 50000  4K (JQKA) = 10000  4K (2-10) = 4800
+//          FH = 800     FL = 600     ST = 400    3K = 200           2P = 200
+//    90.00% 04 ($0.10, $0.20)
+//       Bet 1:
+//          RF = 500     5K = 250     SF = 100    4K (JQKA) = 42     4K (2-10) = 20
+//          FH = 5       FL = 4       ST = 3      3K = 2             2P = 1
+//       High 50:
+//          RF = 25000   5K = 25000   SF = 12500  4K (JQKA) = 2500   4K (2-10) = 1200
+//          FH = 200     FL = 150     ST = 100    3K = 50            2P = 50
+//    90.00% 05 ($0.50, $1.00)
+//       Bet 1:
+//          RF = 500     5K = 250     SF = 100    4K (JQKA) = 42     4K (2-10) = 20
+//          FH = 5       FL = 4       ST = 3      3K = 2             2P = 1
+//       High 10:
+//          RF = 5000    5K = 5000    SF = 2500   4K (JQKA) = 500    4K (2-10) = 240
+//          FH = 40      FL = 30      ST = 20     3K = 10            2P = 10
+//    92.00% 06 ($0.10, $0.20)
+//       Bet 1:
+//          RF = 500     5K = 250     SF = 120    4K (JQKA) = 45     4K (2-10) = 20
+//          FH = 5       FL = 4       ST = 3      3K = 2             2P = 1
+//       High 50:
+//          RF = 25000   5K = 25000   SF = 13750  4K (JQKA) = 2500   4K (2-10) = 1200
+//          FH = 200     FL = 150     ST = 100    3K = 50            2P = 50
+//    92.00% 07 ($0.50, $1.00)
+//       Bet 1:
+//          RF = 500     5K = 250     SF = 120    4K (JQKA) = 45     4K (2-10) = 20
+//          FH = 5       FL = 4       ST = 3      3K = 2             2P = 1
+//       High 10:
+//          RF = 5000    5K = 5000    SF = 2750   4K (JQKA) = 500    4K (2-10) = 240
+//          FH = 40      FL = 30      ST = 20     3K = 10            2P = 10
+//    95.00% 08 ($0.50, $1.00)
+//       Bet 1:
+//          RF = 500     5K = 250     SF = 175    4K (JQKA) = 45     4K (2-10) = 20
+//          FH = 5       FL = 4       ST = 3      3K = 2             2P = 1
+//       High 10:
+//          RF = 5000    5K = 5000    SF = 3000   4K (JQKA) = 500    4K (2-10) = 240
+//          FH = 40      FL = 30      ST = 20     3K = 10            2P = 10
 ROM_START( baddog )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -2570,6 +2691,10 @@ ROM_END
 
 // 0100812V / 616/1 / 25 Credit Multiplier/20 Line Multiline
 // Boot Scootin' 500cm / NSW/ACT / B - 11/12/98
+// Variations (% and NO):
+//    86.92% 99
+//    90.01% 02
+//    92.07% 03
 ROM_START( bootsctn )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -2592,11 +2717,11 @@ ROM_START( bootsctn )
 ROM_END
 
 
-// MV4098 / 10 Credit Multiplier / 9 Line Multiline
+// GHG1012-02 / MV4098 / 10 Credit Multiplier / 9 Line Multiline
 // BOOT SCOOTIN' / Export / A - 25/08/99
-// All devices are 27c4002 instead of 27c4096
-// Marked as GHG101202 and 92.767%
 // No set chips required
+// Variations (% and NO): 92.767% 02
+// All devices are 27C4002 instead of 27C4096
 ROM_START( bootsctnu )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -2623,6 +2748,8 @@ ROM_END
 
 // GHG1008-03 / MV4098/1 / 10 Credit Multiplier/20 Line Multiline
 // BOOT SCOOTIN' / Export / A - 27/07/99
+// No set chips required
+// Variations (% and NO): 94.858% 03
 ROM_START( bootsctnua )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -2648,7 +2775,14 @@ ROM_END
 
 // AHG1547 / MV4098/1 / 10 Credit Multiplier / 20 Line Multiline
 // BOOT SCOOTIN' / Export / B - 22/03/01
-// Requires set chip version: 4.04.xx
+// ROM says '10 Credit Multiplier' but it can be set to either 5, 10, 25 or 50 credit multipliers
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    86.922% 99
+//    90.012% 01
+//    92.069% 02
+//    94.504% 03
+//    96.939% 04
 ROM_START( bootsctnub )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -2676,7 +2810,13 @@ ROM_END
 // Bachelorette Party / Export / B - 25/08/2000
 // ROM says '9 Line Multiline' but this is a 20 line game, it cannot be set to 9 lines at all
 // Touchscreen game
-// Game requires set chip version: 4.01.xx
+// Requires set chip version 4.01.xx
+// Variations (% and NO):
+//    87.976% 99
+//    90.201% 01
+//    92.132% 02
+//    94.968% 03
+//    97.256% 04
 ROM_START( bparty )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -2722,6 +2862,12 @@ ROM_END
 
 // 0200510V / 593 / 10 Credit Multiplier / 9 Line Multiline
 // Bumble Bugs / Local / D - 5/07/96
+// Variations (% and NO):
+//    87.01% 99
+//    85.11% 01
+//    89.96% 02
+//    92.69% 03
+//    94.62% 04
 ROM_START( bumblbug )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -2761,9 +2907,9 @@ ROM_END
 
 // CHG0479-03 / 593 / 10 Credit Multiplier / 9 Line Multiline
 // Bumble Bugs / Export / D - 05/07/97
-// All devices are 27c4002 instead of 27c4096
-// Marked as CHG047903 and 92.691%
 // No set chips required
+// Variations (% and NO): 92.691% 03
+// All devices are 27C4002 instead of 27C4096
 ROM_START( bumblbugu )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -2786,10 +2932,9 @@ ROM_END
 
 // CHG0479-99 / 593 / 10 Credit Multiplier / 9 Line Multiline
 // Bumble Bugs / Export / D - 05/07/97
-// All devices are 27c4002 instead of 27c4096
-// Marked as CHG047999 and 87.006%
-// Variation (% and NO): 87.006% 99
 // No set chips required
+// Variations (% and NO): 87.006% 99
+// All devices are 27C4002 instead of 27C4096
 ROM_START( bumblbugua )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -2812,6 +2957,12 @@ ROM_END
 
 // 0200143V / 571/4 / 10 Credit Multiplier/9 Line Multiline
 // Butterfly Delight / Local / A - 19/12/95
+// Variations (% and NO):
+//    90.237% 99
+//    92.913% 01
+//    87.774% 02
+//    95.375% 03
+//    85.339% 04
 ROM_START( buttdeli )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -2848,6 +2999,10 @@ ROM_END
 
 // 0100676V / 614/3 / 10 Credit Multiplier/20 Line Multiline
 // Cash Cat 200cm / NSW/ACT / A - 3/04/98
+// Variations (% and NO):
+//    87.14% 99
+//    90.13% 02
+//    92.21% 03
 ROM_START( cashcat )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -2869,6 +3024,10 @@ ROM_END
 
 // 0100557V / 614/1 / 10 Credit Multiplier/9 Line Multiline
 // Cash Cat 90cm / NSW/ACT / B - 1/12/97
+// Variations (% and NO):
+//    87.14% 99
+//    90.13% 02
+//    92.21% 03
 ROM_START( cashcata )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -2890,6 +3049,10 @@ ROM_END
 
 // 0300863V / MV4089 / 5 Credit Multiplier/9 Line Multiline
 // Cash Cat / New Zealand / A- 4/1/99
+// Variations (% and NO):
+//    87.82% 99
+//    90.08% 01
+//    91.78% 02
 ROM_START( cashcatnz )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -2904,6 +3067,11 @@ ROM_END
 
 // 0100438V / 603/1 / 25 Credit Multiplier / 20 Line Multiline
 // Cash Chameleon / NSW/ACT / C - 15/4/97
+// Variations (% and NO):
+//    87.78% 99
+//    85.15% 01
+//    90.42% 02
+//    92.13% 03
 ROM_START( cashcham )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -2925,6 +3093,11 @@ ROM_END
 
 // 0200437V / 603(a) / 5 Credit Multiplier / 20 Line Multiline
 // Cash Chameleon 100cm / NSW/ACT / D - 18/02/98
+// Variations (% and NO):
+//    87.78% 99
+//    85.15% 01
+//    90.42% 02
+//    92.13% 03
 ROM_START( cashchama )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -2946,6 +3119,10 @@ ROM_END
 
 // 0300781V / MV4067 / 5 Credit Multiplier/20 Line Multiline
 // Cash Chameleon / New Zealand / A - 31/08/98
+// Variations (% and NO):
+//    87.33% 99
+//    90.12% 01
+//    91.98% 02
 ROM_START( cashchamnz )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -2960,8 +3137,13 @@ ROM_END
 
 // DHG4078 / 603(a) / 3,5,10,25,50 Credit Multiplier / 20 Line Multiline
 // Cash Chameleon 100cm / Export / B - 06/12/96
-// Marked as DHG4078.
-// Game requires set chip version: 4.00.xx
+// Requires set chip version 4.00.xx
+// Variations (% and NO):
+//    87.697% 99
+//    90.151% 01
+//    91.995% 02
+//    94.817% 03
+//    97.144% 04
 ROM_START( cashchamu )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -2984,6 +3166,10 @@ ROM_END
 
 // 0300467V / 607 / 10 Credit Multiplier/20 Line Multiline
 // Cash Crop / Local / C - 14/07/97
+// Variations (% and NO):
+//    87.89% 99
+//    90.06% 02
+//    92.28% 03
 ROM_START( cashcra5 )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3019,6 +3205,10 @@ ROM_END
 
 // 0100787V / 630/1 / 10 Credit Multiplier / 20 Line Multiline
 // The Chariot Challenge / NSW/ACT / A - 10/08/98
+// Variations (% and NO):
+//    87.45% 99
+//    90.10% 01
+//    92.02% 02
 ROM_START( chariotc )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3040,8 +3230,12 @@ ROM_END
 
 // 04J00714 / 630 / 10 Credit Multiplier / 9 Line Multiline
 // The Chariot Challenge / NSW/ACT / A - 10/08/98
-// ROM contains unaltered NSW/ACT region string and date, but game is for the Venezuelan market
+// ROM contains unaltered NSW/ACT region string and date, but is for the South American market (Peru?)
 // Game is in Spanish, however audit mode is in English
+// Variations (% and NO):
+//    87.48% 99
+//    90.12% 01
+//    92.04% 02
 ROM_START( chariotcv )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3064,6 +3258,12 @@ ROM_END
 // 01J00681 / JB011 / Multi credit / Multi line
 // Ckeckmate / NSW/ACT / B - 06/07/01
 // Checkmate is misspelled as 'Ckeckmate' in the ROM
+// Variations (% and NO):
+//    90.49% 99 (1 line)    90.64% 99 (3 lines)
+//    92.16% 01 (1 line)    92.30% 01 (3 lines)
+//    93.43% 02 (1 line)    93.68% 02 (3 lines)
+//    94.88% 03 (1 line)    94.81% 03 (3 lines)
+//    87.71% 05 (1 line)    87.72% 05 (3 lines)
 ROM_START( checkma5 )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3087,6 +3287,13 @@ ROM_END
 
 // 0100351V / 596 / 10 Credit Multiplier/9 Line Multiline
 // Chicken / Local / A - 27/08/96
+// Variations (% and NO):
+//    87.95% 99
+//    85.11% 01
+//    90.27% 02
+//    92.60% 03
+//    94.74% 04
+//    97.32% 05
 ROM_START( chickna5 )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3135,11 +3342,11 @@ ROM_END
 // RHG0730-03 / 596 / 10 Credit Multiplier / 9 Line Multiline
 // Chicken / Export / C - 23/02/98
 // Marked as RHG0730, 92.588%
-// All devices are 27c4002 instead of 27c4096.
+// All devices are 27C4002 instead of 27C4096
 // (the following notes are from another identical set)
 // Game Eprom: RHG073003
 // No set chips required
-// Variation (% and NO): 92.588% 03
+// Variations (% and NO): 92.588% 03
 ROM_START( chickna5u )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -3166,9 +3373,9 @@ ROM_END
 // RHG0730-99 / 596 / 10 Credit Multiplier / 9 Line Multiline
 // Chicken / Export / C - 23/02/98
 // Marked as RHG0730 99.
-// Variation (% and NO): 87.938% 99
+// All devices are 27C4002 instead of 27C4096
 // No set chips required
-// All devices are 27c4002 instead of 27c4096.
+// Variations (% and NO): 87.938% 99
 ROM_START( chickna5ua )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -3194,7 +3401,7 @@ ROM_END
 
 // 01J01886 / 596/1 / 50 Credit Multiplier/9 Line Multiline
 // Chicken / Local / B - 23/12/96
-// ROM contains unaltered NSW/ACT "Local" region string, but game is for the Venezuelan market
+// ROM contains unaltered NSW/ACT "Local" region string, but is for the Venezuelan market
 // Game is in Spanish, however audit mode is in English
 ROM_START( chickna5v )
 	ARISTOCRAT_MK5_GALS
@@ -3219,6 +3426,10 @@ ROM_END
 
 // 0100919V / 577/7 / 25 Credit Multiplier/20 Line Multiline
 // Coral Riches II / Local / A - 29/12/98
+// Variations (% and NO):
+//    87.19% 99
+//    90.16% 01
+//    92.07% 02
 ROM_START( coralrc2 )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3240,6 +3451,10 @@ ROM_END
 
 // 0200753V / 615/1 / 10 Credit Multiplier / 20 Line Multiline
 // Cuckoo / Local / D - 03/07/98
+// Variations (% and NO):
+//    87.78% 99
+//    90.13% 02
+//    92.29% 03
 ROM_START( cuckoo )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3262,8 +3477,14 @@ ROM_END
 // CHG1195 / MV4104 / 3,5,10,20,25,50 Credit Multiplier / 9-20 Line Multiline
 // CUCKOO / Export C / 02/02/00
 // ROM says '9-20 Line Multiline', but game only has 9 Lines
-// All devices are 27c4002 instead of 27c4096
-// Requires set chips 4.01.xx
+// All devices are 27C4002 instead of 27C4096
+// Requires set chip version 4.01.xx
+// Variations (% and NO):
+//    87.165% 99
+//    90.175% 01
+//    92.024% 02
+//    94.930% 03
+//    97.456% 04
 ROM_START( cuckoou )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -3297,6 +3518,12 @@ ROM_END
 
 // 0300111V / 577/2 / 20 Credit Multiplier/9 Line Multiline
 // Desert Bloom / Local / A - 12/10/95
+// Variations (% and NO):
+//    87.185% 99
+//    85.271% 01
+//    90.156% 02
+//    92.257% 03
+//    95.227% 04
 ROM_START( dstbloom )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3319,6 +3546,12 @@ ROM_END
 // 0200111V / 577/2 / 20 Credit Multiplier/9 Line Multiline
 // Desert Bloom / Local / A - 12/10/95
 // Same strings as dstbloom but earlier version
+// Variations (% and NO):
+//    87.185% 99
+//    85.271% 01
+//    90.156% 02
+//    92.257% 03
+//    95.227% 04
 ROM_START( dstblooma )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3358,6 +3591,11 @@ ROM_END
 // 0101018V / 640 / 9 Credit Multiplier/3 Line Multiline
 // Diamond Dove / NSW/ACT / B - 19/05/99
 // ROM says '9 Credit Multiplier' but game has a 3 credit multiplier
+// Variations (% and NO):
+//    89.81% 99
+//    87.33% 01
+//    92.06% 02
+//    94.99% 03
 ROM_START( diamdove )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3381,6 +3619,11 @@ ROM_END
 
 // 0200302V / 483/7 / 3 Credit Multiplier/3 Line Multiline
 // Diamond Fever / Local / E - 05/09/96
+// Variations (% and NO):
+//    90.33% 99
+//    92.29% 01
+//    95.35% 02
+//    87.70% 03
 ROM_START( dmdfever )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3400,6 +3643,13 @@ ROM_END
 // 0400433V / 604 / 10 Credit Multiplier/9 Line Multiline
 // Diamond Touch / Local / E - 30/06/97
 // Touchscreen game
+// Variations (% and NO):
+//    87.79% 99
+//    85.01% 01
+//    90.03% 02
+//    92.12% 03
+//    94.81% 04
+//    96.87% 05
 ROM_START( dimtouch )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3414,6 +3664,13 @@ ROM_END
 
 // 0200424V / 602/1 / 10 Credit Multiplier / 20 Line Multiline
 // Dolphin Treasure / NSW/ACT / B - 06/12/96
+// Variations (% and NO):
+//    87.87% 99
+//    85.08% 01
+//    90.31% 02
+//    92.26% 03
+//    94.88% 04
+//    97.10% 05
 ROM_START( dolphntr )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3433,6 +3690,13 @@ ROM_END
 // 0100424V / 602/1 / 10 Credit Multiplier / 20 Line Multiline
 // Dolphin Treasure / NSW/ACT / B - 06/12/96
 // Same strings as dolphntr but earlier version
+// Variations (% and NO):
+//    87.87% 99
+//    85.08% 01
+//    90.31% 02
+//    92.26% 03
+//    94.88% 04
+//    97.10% 05
 ROM_START( dolphntra )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3454,6 +3718,13 @@ ROM_END
 
 // 0100388V / 602 / 10 Credit Multiplier / 9 Line Multiline
 // Dolphin Treasure / NSW/ACT / B - 10/12/96
+// Variations (% and NO):
+//    87.87% 99
+//    85.08% 01
+//    90.31% 02
+//    92.26% 03
+//    94.88% 04
+//    97.10% 05
 ROM_START( dolphntrb )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3477,7 +3748,14 @@ ROM_END
 // Dolphin Treasure / Export / D - 22/12/99
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
 // ROM says '9 & 20 Line Multiline' but game only has 20 lines with a 5, 10, 25 or 50 credit multiplier
-// Requires set chips 4.04.xx
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.928% 99
+//    90.511% 01
+//    92.161% 02
+//    94.941% 03
+//    97.325% 04
+//    82.070% 05 (Hyperlink)
 ROM_START( dolphntrce )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -3505,7 +3783,14 @@ ROM_END
 // Dolphin Treasure / Export / D - 22/12/99
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
 // ROM says '9 & 20 Line Multiline' but game only has 9 lines with a 5, 10 or 20 credit multiplier
-// Requires set chips 4.04.xx
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.928% 99
+//    90.511% 01
+//    92.161% 02
+//    94.941% 03
+//    97.325% 04
+//    82.070% 05 (Hyperlink)
 ROM_START( dolphntrcea )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -3533,7 +3818,14 @@ ROM_END
 // Dolphin Treasure / Export / D - 22/12/99
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
 // ROM says '9 & 20 Line Multiline' but game only has 20 lines
-// Requires set chips 4.04.xx
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.928% 99
+//    90.511% 01
+//    92.161% 02
+//    94.941% 03
+//    97.325% 04
+//    82.070% 05 (Hyperlink)
 ROM_START( dolphntrceb )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -3580,8 +3872,9 @@ ROM_END
 
 // FHG4077-02 / 602/1 / 10 Credit Multiplier / 9 Line Multiline
 // Dolphin Treasure / Export / B - 06/12/96
-// All devices are 27c4002 instead of 27c4096
+// All devices are 27C4002 instead of 27C4096
 // No set chips required
+// Variations (% and NO): 92.161% 02
 ROM_START( dolphntru )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -3616,6 +3909,10 @@ ROM_END
 // 0100521V / 610 / 10 Credit Multiplier/10 Line Multiline
 // Dragon's Eye / Local / A - 09/05/97
 // ROM says '10 Line Multiline' but game only has 9 lines
+// Variations (% and NO):
+//    87.86% 99
+//    90.30% 02
+//    92.29% 03
 ROM_START( drgneye )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3635,6 +3932,10 @@ ROM_END
 // 0200586V / 606/2 / 20 Credit Multiplier/9 Line Multiline
 // Dream Weaver / Local / A- 20/06/97
 // Touchscreen game
+// Variations (% and NO):
+//    87.20% 99
+//    90.06% 02
+//    91.61% 03
 ROM_START( dreamwv )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3649,6 +3950,10 @@ ROM_END
 
 // 01J00081 / JB004 / Multi credit / Multi line
 // Dynamite Jack / NSW/ACT / A - 12/07/2000
+// Variations (% and NO):
+//    87.90% 99 (9 lines)    87.98% 99 (20 lines)
+//    90.06% 01 (9 lines)    90.04% 01 (20 lines)
+//    92.17% 02 (9 lines)    92.09% 02 (20 lines)
 ROM_START( dynajack )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3689,6 +3994,10 @@ ROM_END
 
 // 0100652V / 623 / 8 Credit Multiplier / 25 Credit Multiway
 // El Dorado / Local / B - 24/03/98
+// Variations (% and NO):
+//    87.49% 99
+//    90.00% 02
+//    92.01% 03
 ROM_START( eldorda5 )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3707,6 +4016,13 @@ ROM_END
 
 // 0400122V / 570/3 / 10 Credit Multiplier/9 Line Multiline
 // Enchanted Forest / Local / E - 23/06/95
+// Variations (% and NO):
+//    87.876% 99
+//    85.379% 01
+//    90.483% 02
+//    92.275% 03
+//    95.389% 04
+//    85.075% 05
 ROM_START( eforsta5 )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3746,9 +4062,15 @@ ROM_END
 // AHG1615 / MV4108/6 / 3,5,10,20,25,50 Credit Multiplier / 9 Line Multiline
 // Enchanted Forest / Export / C - 17/01/00
 // Marked as SPC.
-// All devices are 27C4096.
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
-// Requires set chips 4.04.xx
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.394% 99
+//    90.178% 01
+//    92.268% 02
+//    94.716% 03
+//    97.089% 04
+//    82.100% 05 (Hyperlink)
 ROM_START( eforsta5cea )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -3774,9 +4096,9 @@ ROM_END
 
 // JHG0415-03 / MV4033 / 10 Credit Multiplier / 9 Line Multiline
 // Enchanted Forest / Export / B - 10/02/97
-// Marked as 94.97%
-// All devices are 27c4002 instead of 27c4096.
+// All devices are 27C4002 instead of 27C4096
 // No set chips required
+// Variations (% and NO): 94.97% 03
 ROM_START( eforsta5u )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -3799,9 +4121,9 @@ ROM_END
 
 // JHG0415-99 / MV4033 / 10 Credit Multiplier / 9 Line Multiline
 // Enchanted Forest / Export / B - 10/02/97
-// Variation (% and NO): 88.26% 99
-// All devices are 27c4002 instead of 27c4096.
+// All devices are 27C4002 instead of 27C4096
 // No set chips required
+// Variations (% and NO): 88.26% 99
 ROM_START( eforsta5ua )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -3815,8 +4137,8 @@ ROM_START( eforsta5ua )
 	    0x0a5234-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION32_LE( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	ROM_LOAD32_WORD( "jhg041599.u7",  0x000000, 0x80000, CRC(394d93a0) SHA1(5dd91ef55da4b6c8f0866c21d8d4ae9e18ab1bb0) )  // 88,26%
-	ROM_LOAD32_WORD( "jhg041599.u11", 0x000002, 0x80000, CRC(3f542a64) SHA1(36de7fc85f2424a62f322de2ef82e061d2335526) )  // 88,26%
+	ROM_LOAD32_WORD( "jhg041599.u7",  0x000000, 0x80000, CRC(394d93a0) SHA1(5dd91ef55da4b6c8f0866c21d8d4ae9e18ab1bb0) )  // 88.26%
+	ROM_LOAD32_WORD( "jhg041599.u11", 0x000002, 0x80000, CRC(3f542a64) SHA1(36de7fc85f2424a62f322de2ef82e061d2335526) )  // 88.26%
 	ROM_LOAD32_WORD( "jhg041599.u8",  0x100000, 0x80000, CRC(002dec6c) SHA1(fb3f4ce9cd8cd9e0e3133376ed014db83db041c5) )  // base
 	ROM_LOAD32_WORD( "jhg041599.u12", 0x100002, 0x80000, CRC(c968471f) SHA1(9d54a5c396e6f83690db2fcb7ddcc8a47a7dd777) )  // base
 ROM_END
@@ -3824,6 +4146,11 @@ ROM_END
 
 // 0100651V / 624 / 3 Credit Multiplier / 3 Line Multiline
 // Fast Fortune / Local / D - 07/05/98
+// Variations (% and NO):
+//    90.04% 99
+//    87.70% 01
+//    92.33% 03
+//    94.99% 04
 ROM_START( fastfort )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3845,6 +4172,10 @@ ROM_END
 
 // 01J00131 / JB006 / Multi credit / Multi line
 // Fortune Teller / NSW/ACT / D - 24/11/2000
+// Variations (% and NO):
+//    87.99% 99 (9 lines)    87.96% 99 (20 lines)
+//    90.16% 01 (9 lines)    90.06% 01 (20 lines)
+//    92.11% 02 (9 lines)    92.11% 02 (20 lines)
 ROM_START( fortellr )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3890,8 +4221,9 @@ ROM_END
 // EHG0916-02 / MV4084/1 / 10 Credit Multiplier / 9 Line Multiline
 // THE GAMBLER / Export / A - 30/10/98
 // Marked as EHG0916 and 92.268%
-// All devices are 27c4002 instead of 27c4096
+// All devices are 27C4002 instead of 27C4096
 // No set chips required
+// Variations (% and NO): 92.268% 02
 ROM_START( gambler )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -3915,6 +4247,10 @@ ROM_END
 // 0101408V / MV4127 / 12 Credit Multiplier/20 Line Multiline
 // Geisha / New Zealand / A- 05/03/01
 // This game is downported from the MK6 version for the New Zealand market only, no other MK5 version exists
+// Variations (% and NO):
+//    87.52% 99
+//    90.26% 01
+//    91.98% 02
 ROM_START( geisha )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3932,6 +4268,10 @@ ROM_END
 // 0200894V / 632/1 / 25 Credit Multiplier/20 Line Multiline
 // Genie Magic / Local / C- 15/02/99
 // Touchscreen game
+// Variations (% and NO):
+//    87.98% 99
+//    90.11% 01
+//    92.10% 02
 ROM_START( genmagi )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3950,8 +4290,15 @@ ROM_END
 
 // AHG1623 / MV4112/2 / 5,10,25,50 Credit Multiplier / 20 Line Multiline
 // Green Lizard [Reel Game] / Export / A - 05/01/01
-// Requires set chip version: 4.04.xx
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.812% 99
+//    90.285% 01
+//    92.372% 02
+//    94.748% 03
+//    97.175% 04
+//    82.205% 05 (Hyperlink)
 ROM_START( glizrdce )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -3977,6 +4324,10 @@ ROM_END
 
 // 0100767V / 625 / 10 Credit Multiplier/20 Line Multiline
 // Gnome Around The World 200cm / NSW/ACT / C - 18/12/98
+// Variations (% and NO):
+//    87.71% 99
+//    90.12% 02
+//    92.18% 03
 ROM_START( gnomeatw )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -3998,9 +4349,10 @@ ROM_END
 
 // AHG1205-03 / MV4091 / 10 Credit Multiplier / 9 Line Multiline
 // QUEEN OF THE NILE / NSW/ACT / B - 13/05/97
-// ROM contains unaltered Queen of the Nile NSW/ACT region string and date, but game is for the US market
+// ROM contains unaltered Queen of the Nile NSW/ACT region string and date, but game is for the USA platform
 // Marked as AHG1205-03, Golden Pyramids, and 94.941%
 // No set chips required
+// Variations (% and NO): 94.941% 03
 ROM_START( goldpyr )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -4023,9 +4375,10 @@ ROM_END
 
 // AHG1206-99 / 602/2 - 10 Credit Multiplier / 20 Line Multiline
 // QUEEN OF THE NILE - NSW/ACT - B - 13/05/97
-// ROM contains unaltered Queen of the Nile NSW/ACT region string and date, but game is for the US market
+// ROM contains unaltered Queen of the Nile NSW/ACT region string and date, but game is for the USA platform
 // Marked as AHG1206-99, Golden Pyramids, and 87.928%
 // No set chips required
+// Variations (% and NO): 87.928% 99
 ROM_START( goldpyra )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -4050,6 +4403,11 @@ ROM_END
 // Golden Pyramid / Crown Casino / C - 19/06/98
 // ROM says 'Golden Pyramid' with three trailing spaces, artwork says 'Golden Pyramids'
 // Original casino BIOS is not dumped, using New Zealand 0700474V BIOS until an Australian version is dumped
+// Variations (% and NO):
+//    87.870% 99
+//    90.310% 01
+//    92.260% 02
+//    94.880% 03
 ROM_START( goldpyrb )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4076,6 +4434,10 @@ ROM_END
 
 // 0101164V / 661 / 50 Credit Multiplier / 20 Line Multiline
 // Golden Ra / NSW/ACT / A - 10/04/00
+// Variations (% and NO):
+//    87.16% 99
+//    90.08% 01
+//    92.07% 02
 ROM_START( goldenra )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4099,6 +4461,10 @@ ROM_END
 
 // 03J00241 / JB008 / Multi credit / Multi line
 // Honey Pot / NSW/ACT / A - 21/11/2000
+// Variations (% and NO):
+//    87.98% 99
+//    90.15% 01
+//    92.08% 02
 ROM_START( honeypot )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4123,9 +4489,14 @@ ROM_END
 // BHG1455 / MV4122/3 / 5,10,20 Credit Multiplier / 9 Line Multiline
 // HONKY TONK / CASH EXPRESS / Export / A - 07/08/01
 // ROM says 'Cash Express' but this game is not a Hyperlink game
-// Requires set chips 4.04.xx
-// Variation (% and NO)
 // The game shares reel graphics with Boot Scootin', but the game plays identically to Penguin Pays therefore it doesn't have the double wild feature.
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.845% 99
+//    90.104% 01
+//    92.013% 02
+//    94.976% 03
+//    97.072% 04
 ROM_START( hnktonku )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -4149,6 +4520,10 @@ ROM_END
 
 // 0100872V / 631/3 B / 25 Credit Multiplier / 20 Line Multiline
 // INCA SUN / NSW/ACT / B- 03/05/99
+// Variations (% and NO):
+//    87.55% 99
+//    90.02% 03
+//    92.38% 04
 ROM_START( incasun )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4172,6 +4547,8 @@ ROM_END
 // 0100872V / 631/3 B / 25 Credit Multiplier / 20 Line Multiline
 // INCA SUN / NSW/ACT / B- 03/05/99
 // SHOW PROGRAM
+// Variations (% and NO): 87.55% 99
+// Despite being the same revision as the above set, it only allows variation 99
 ROM_START( incasunsp )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4183,7 +4560,7 @@ ROM_START( incasunsp )
 	        Calculated Checksum 0x1de6e2c7  (OK)
 	    0x05f710-0x235a13 is the non-Checksummed range (unusual endpoint)
 	*/
-	ROM_LOAD32_WORD( "sp__0100872v.u7",  0x000000, 0x80000, CRC(62919753) SHA1(0f0d186260a64b8b45671f68abf497586264793e) )
+	ROM_LOAD32_WORD( "sp__0100872v.u7",  0x000000, 0x80000, CRC(62919753) SHA1(0f0d186260a64b8b45671f68abf497586264793e) )  // ROM labels are unknown, "sp__" prefix has been added to differentiate the ROMs from the above set
 	ROM_LOAD32_WORD( "sp__0100872v.u11", 0x000002, 0x80000, CRC(f221ac71) SHA1(c2c1f8703e9a41e5c4d5ebfeac57e220a64e9657) )
 	ROM_LOAD32_WORD( "sp__0100872v.u8",  0x100000, 0x80000, CRC(6610599f) SHA1(6d787ae58e2de2b3379a25f394c15434d4e2a8c1) )
 	ROM_LOAD32_WORD( "sp__0100872v.u12", 0x100002, 0x80000, CRC(6633e701) SHA1(02e691c7d18901e70bf8c4e4aa6f856e153f05d4) )
@@ -4194,6 +4571,10 @@ ROM_END
 
 // 0101108V / MV4113 / 5 Credit Multiplier/20 Line Multiline
 // Inca Sun / New Zealand / A- 6/3/00
+// Variations (% and NO):
+//    87.55% 99
+//    90.02% 01
+//    91.92% 02
 ROM_START( incasunnz )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4210,7 +4591,13 @@ ROM_END
 
 // CHG1458 / MV4130/3 / 20 Line Multiline / 5, 10, 25, 50 Credit Multiplier
 // Inca Sun / Export / A - 05/09/00
-// Requires set chips 4.03.xx
+// Requires set chip version 4.03.xx
+// Variations (% and NO):
+//    87.546% 99
+//    90.017% 01
+//    92.375% 02
+//    94.984% 03
+//    97.061% 04
 ROM_START( incasunu )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -4245,8 +4632,14 @@ ROM_END
 
 // DHG1577 / MV4130/3 / 20 Line Multiline / 5, 10, 25, 50 Credit Multiplier
 // Inca Sun / Export / A - 05/09/00
-// Same strings as incasunu but different version
-// Requires set chips 4.04.xx
+// Same strings as incasunu but later version
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.546% 99
+//    90.017% 01
+//    92.375% 02
+//    94.984% 03
+//    97.061% 04
 ROM_START( incasunua )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -4271,6 +4664,10 @@ ROM_END
 // 01J01946 / 631/3 B / 25 Credit Multiplier / 20 Line Multiline
 // INCA SUN / VENEZUELA / B- 03/05/99
 // Game is in Spanish, however audit mode is in English
+// Variations (% and NO):
+//    87.55% 99
+//    90.02% 03
+//    92.38% 04
 ROM_START( incasunv )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4293,6 +4690,10 @@ ROM_END
 
 // 0100845V / 628/1 / 25 Credit Multiway / 20 Credit Multiplier
 // Indian Dreaming / Local / B - 15/12/98
+// Variations (% and NO):
+//    87.15% 99
+//    90.14% 02
+//    92.32% 03
 ROM_START( indrema5 )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4336,20 +4737,39 @@ ROM_END
 
 // 0100161V / 586/2 / 10 Credit Multiplier/9 Line Multiline
 // Jumping Beans / Local / A - 25/1/96
+// Variations (% and NO):
+//    87.59% 99
+//    85.05% 01
+//    90.40% 02
+//    92.08% 03
+//    95.01% 04
 ROM_START( jumpbean )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
-	// checksum code not found due to ROMs being corrupted, all files are missing bytes consisting of 0x0D
+	/*
+	    Checksum code found at 0x000adc
+	    0x000000-0x051dff is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x88afcc42
+	        Calculated Checksum 0x88afcc42  (OK)
+	    0x051e00-0x1e6313 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x051e00-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	*/
 	ROM_REGION32_LE( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	ROM_LOAD32_WORD( "0100161v.u7",  0x000000, 0x7fa4c, BAD_DUMP CRC(6994c968) SHA1(7896a93aeec9c2d815c49d203ca594644e5df8a6) )
-	ROM_LOAD32_WORD( "0100161v.u11", 0x000002, 0x7ffda, BAD_DUMP CRC(7776e753) SHA1(3d4753513b63f48500cb289bd0fcc28d0f4ad9d8) )
-	ROM_LOAD32_WORD( "0100161v.u8",  0x100000, 0x7fa52, BAD_DUMP CRC(7e69c6ba) SHA1(105bad21c78737b78f0f740a224b3f3e8b44c751) )
-	ROM_LOAD32_WORD( "0100161v.u12", 0x100002, 0x7fa54, BAD_DUMP CRC(d1d6cfba) SHA1(8c8ee5a97bc3c8cd21cd291701cebf214ca388f3) )
+	ROM_LOAD32_WORD( "0100161v.u7",  0x000000, 0x80000, CRC(96f620bb) SHA1(ab33dcb3069f31ff295545e8e9a96ff9db3d0314) )
+	ROM_LOAD32_WORD( "0100161v.u11", 0x000002, 0x80000, CRC(3826f198) SHA1(ca82339dc6a2b92ba8302a3b7b9a20c8ddf9b809) )
+	ROM_LOAD32_WORD( "0100161v.u8",  0x100000, 0x80000, CRC(b5fd6962) SHA1(6702f27c5364b8e37cefa3c9f62efd9c54cc2c47) )
+	ROM_LOAD32_WORD( "0100161v.u12", 0x100002, 0x80000, CRC(a0060f96) SHA1(45e7c4f6b35773142ca12c95ab2bbb2b43d7c7cd) )
 ROM_END
 
 
 // 0100383V / 586/6 / 25 Credit Multiplier / 20 Line Multiline
 // JUMPIN' JOEY 500cm / NSW/ACT / C - 13/11/96
+// Variations (% and NO):
+//    87.59% 99
+//    85.05% 01
+//    90.40% 02
+//    92.08% 03
+//    95.01% 04
 ROM_START( jumpjoey )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4372,6 +4792,7 @@ ROM_END
 // 0200240V / 566/3 / 5 Credit Multiplier/9 Line Multiline
 // Jungle Juice / Crown / F - 06/03/96
 // ROM says 'Crown' as region (Crown Casino), but game was from Dunedin Casino with New Zealand base chips
+// Variations (% and NO): 92.373% 06
 ROM_START( jungjuic )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4396,7 +4817,11 @@ ROM_END
 
 // 0200536V / 613/6 / 10 Credit Multiplier/20 Line Multiline
 // King Galah / Local / A - 21/07/95
-// ROM says 1995 but artwork says 1997; game has a 1998+ style denomination sign
+// ROM says 1995 but artwork says 1997; game has the newer style music introduced in 1997 and a 1998+ style denomination sign
+// Variations (% and NO):
+//    87.61% 99
+//    90.14% 02
+//    92.26% 03
 ROM_START( kgalah )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4419,6 +4844,10 @@ ROM_END
 // 0100536V / 613 / 10 Credit Multiplier/20 Line Multiline
 // King Galah / Local / A - 21/07/95
 // ROM says 1995 but artwork says 1997; game has the newer style music introduced in 1997
+// Variations (% and NO):
+//    87.61% 99
+//    90.14% 02
+//    92.26% 03
 ROM_START( kgalaha )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4440,9 +4869,15 @@ ROM_END
 
 // AHG1625 / MV4112/2 / 5,10,25,50 Credit Multiplier / 20 Line Multiline
 // KING GALAH / Export / B - 07/02/01
-// Requires set chips 4.04.xx
-// Variation (% and NO):
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.812% 99
+//    90.285% 01
+//    92.372% 02
+//    94.748% 03
+//    97.175% 04
+//    82.205% 05 (Hyperlink)
 ROM_START( kgalahce )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -4468,6 +4903,13 @@ ROM_END
 
 // 0200024V / 540/3 / 10 Credit Multiplier/5 Line Multiline
 // K. G. Bird / Local / D - 10/10/94
+// Variations (% and NO):
+//    87.836% 99
+//    82.947% 01
+//    85.853% 02
+//    90.167% 03
+//    91.488% 04
+//    95.015% 05
 ROM_START( kgbirda5 )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4489,7 +4931,13 @@ ROM_END
 
 // CHG1573 / MV4137 / 5,10,25,50 Credit Multiplier / 20 Line Multiline
 // Koala Mint / Export / A - 12/09/01
-// Requires set chips 4.04.xx
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.878% 99
+//    90.193% 01
+//    92.215% 02
+//    94.976% 03
+//    97.015% 04
 ROM_START( koalamnt )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -4515,6 +4963,10 @@ ROM_END
 
 // 0100677V / 614/2 / 10 Credit Multiplier/20 Line Multiline
 // Kooka Bucks 200cm / NSW/ACT / A - 03/04/98
+// Variations (% and NO):
+//    87.14% 99
+//    90.13% 02
+//    92.21% 03
 ROM_START( kookabuk )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4536,9 +4988,14 @@ ROM_END
 
 // BHG1204 / MV4114/1 / 3,5,10,20,25,50 Credit Multiplier / 20 Line Multiline
 // Keep Your Hat On / Export / B - 08/05/2000
-// Requires set chips 4.01.xx
-// Variation (% and NO)
 // Touchscreen game
+// Requires set chip version 4.01.xx
+// Variations (% and NO):
+//    87.259% 99
+//    90.038% 01
+//    92.184% 02
+//    94.953% 03
+//    97.239% 04
 ROM_START( kyhatonu )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -4564,6 +5021,10 @@ ROM_END
 
 // 0100473V / 599/3 / 25 Credit Multiplier / 20 Line Multiline
 // Loco Loot / Local / C - 17/06/97
+// Variations (% and NO):
+//    87.20% 99
+//    90.00% 02
+//    92.00% 03
 ROM_START( locoloot )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4582,6 +5043,10 @@ ROM_END
 
 // 0100472V / 599/2 / 20 Credit Multiplier / 9 Line Multiline
 // Loco Loot / Local / C - 17/06/97
+// Variations (% and NO):
+//    87.20% 99
+//    90.00% 02
+//    92.00% 03
 ROM_START( locoloota )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4600,6 +5065,10 @@ ROM_END
 
 // 0600725V / MV4064 / 5 Credit Multiplier / 20 Line Multiline
 // Loco Loot / New Zealand / A - 8/7/98
+// Variations (% and NO):
+//    87.19% 99
+//    90.19% 01
+//    91.98% 02
 ROM_START( locolootnz )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4614,7 +5083,13 @@ ROM_END
 
 // AHG1513 / MV4134 / 5,10,25,50 Credit Multiplier / 20 Line Multiline
 // Loco Loot / Export / A - 30/07/01
-// Requires set chips 4.04.xx
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.361% 99
+//    90.215% 01
+//    92.195% 02
+//    94.897% 03
+//    97.186% 04
 ROM_START( locolootu )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -4637,6 +5112,11 @@ ROM_END
 
 // 0100587V / 621 / 3 Credit Multiplier/3 Line Multiline
 // Lone Wolf / Local / A - 29/10/97
+// Variations (% and NO):
+//    90.18% 99
+//    87.65% 01
+//    92.31% 02
+//    94.84% 03
 ROM_START( lonewolf )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4655,6 +5135,15 @@ ROM_END
 
 // 0300109V / 570/6 / 20 Credit Multiplier/9 Line Multiline
 // Lucky Clover / Local / A - 12/10/95
+// Variations (% and NO):
+//    87.876% 99
+//    85.379% 01
+//    90.483% 02
+//    92.275% 03
+//    95.389% 04
+//    85.075% 05
+//    94.508% 06
+//    96.557% 07
 ROM_START( luckyclo )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4675,6 +5164,7 @@ ROM_END
 // Magic Garden / Export / B - 10/02/97
 // Marked as AHG1211 and 88.26%
 // No set chips required
+// Variations (% and NO): 88.26% 99
 ROM_START( mgarden )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -4697,8 +5187,14 @@ ROM_END
 
 // AHG1549 / MV4115_1 / 5, 10, 25, 50 Credit Multiplier / 20 Line Multiline
 // Magic Mask / Export / A - 09/05/2000
-// Requires set chips 4.04.xx
 // Touchscreen game
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.845% 99
+//    89.957% 01
+//    92.053% 02
+//    94.770% 03
+//    96.818% 04
 ROM_START( magimask )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -4721,8 +5217,14 @@ ROM_END
 
 // AHG1548 / MV4115 / 5,10,20 Credit Multiplier / 9 Line Multiline
 // Magic Mask / Export / A - 09/05/2000
-// Requires set chips 4.04.xx
 // Touchscreen game
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.845% 99
+//    89.957% 01
+//    92.053% 02
+//    94.770% 03
+//    96.818% 04
 ROM_START( magimaska )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -4756,10 +5258,16 @@ ROM_END
 
 // DHG1309 / MV4115 / 5,10,20 Credit Multiplier / 9 Line Multiline
 // Magic Mask / Export / A - 09/05/2000
-// Same strings as magimaska but different version
-// All devices are 27c4002 instead of 27c4096
-// Requires set chips 4.03.xx
+// Same strings as magimaska but earlier version
+// All devices are 27C4002 instead of 27C4096
 // Touchscreen game
+// Requires set chip version 4.03.xx
+// Variations (% and NO):
+//    87.845% 99
+//    89.957% 01
+//    92.053% 02
+//    94.770% 03
+//    96.818% 04
 ROM_START( magimaskb )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -4794,6 +5302,10 @@ ROM_END
 // 0300455V / 606 / 10 Credit Multiplier/9 Line Multiline
 // Magic Touch / Local / A- 06/03/97
 // Touchscreen game
+// Variations (% and NO):
+//    87.20% 99
+//    90.06% 02
+//    91.61% 03
 ROM_START( magtcha5 )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4812,6 +5324,10 @@ ROM_END
 // Magic Touch / Local / A- 06/03/97
 // Same strings as magtcha5 but earlier version
 // Touchscreen game
+// Variations (% and NO):
+//    87.20% 99
+//    90.06% 02
+//    91.61% 03
 ROM_START( magtcha5a )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4828,6 +5344,13 @@ ROM_END
 
 // 0100425V / 595/5 / 10 Credit Multiplier/20 Line Multiline
 // Mammoth Money / Local / D - 07/04/97
+// Variations (% and NO):
+//    87.59% 99
+//    85.16% 01
+//    90.33% 02
+//    92.41% 03
+//    94.97% 04
+//    97.62% 05
 ROM_START( mammothm )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4849,6 +5372,10 @@ ROM_END
 
 // 01J00101 / JB005 / Multi credit / Multi line
 // Margarita Magic / NSW/ACT / A - 07/07/2000
+// Variations (% and NO):
+//    87.91% 99 (9 lines)    87.93% 99 (20 lines)
+//    90.08% 01 (9 lines)    90.15% 01 (20 lines)
+//    92.04% 02 (9 lines)    92.11% 02 (20 lines)
 ROM_START( marmagic )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4872,8 +5399,15 @@ ROM_END
 
 // EHG1558 / US003 / Multi credit / Multi line
 // Margarita Magic / NSW/ACT / A - 07/07/2000
-// ROM has NSW/ACT strings but it is for US platform
-// Requires set chips 4.04.xx
+// ROM has NSW/ACT strings but it is for USA platform
+// 9 lines, 45/90/180 credits
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.965% 99
+//    90.123% 01
+//    92.158% 02
+//    94.930% 03
+//    97.020% 04
 ROM_START( marmagicu )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -4899,8 +5433,15 @@ ROM_END
 
 // EHG1559 / US003 / Multi credit / Multi line
 // Margarita Magic / NSW/ACT / A - 07/07/2000
-// ROM has NSW/ACT strings but it is for US platform
-// Requires set chips 4.04.xx
+// ROM has NSW/ACT strings but it is for USA platform
+// 20 lines, 100/200/500/1000 credits
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.935% 99
+//    90.146% 01
+//    92.195% 02
+//    94.991% 03
+//    97.073% 04
 ROM_START( marmagicua )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -4927,6 +5468,12 @@ ROM_END
 
 // 0400115V / 559/2 / 10 Credit Multiplier/9 Line Multiline
 // Mine, Mine, Mine / Local / D - 16/01/96
+// Variations (% and NO):
+//    87.408% 99
+//    90.018% 01
+//    92.047% 02
+//    95.471% 03
+//    85.148% 04
 ROM_START( minemine )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -4948,8 +5495,9 @@ ROM_END
 
 // VHG0416-99 / 559/2 / 10 Credit Multiplier / 9 Line Multiline
 // Mine, Mine, Mine / Export / E - 14/02/96
-// All devices are 27c4002 instead of 27c4096
+// All devices are 27C4002 instead of 27C4096
 // No set chips required
+// Variations (% and NO): 87.408% 99
 ROM_START( minemineu )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -4983,9 +5531,9 @@ ROM_END
 
 // NHG0416-99 / 559/2 / 10 Credit Multiplier / 9 Line Multiline
 // Mine, Mine, Mine / Export / E - 14/02/96
-// Variation (% and NO): 87.408% 99
-// All eproms are 27C4002.
+// All devices are 27C4002 instead of 27C4096
 // No set chips required
+// Variations (% and NO): 87.408% 99
 ROM_START( minemineua )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -5008,6 +5556,10 @@ ROM_END
 
 // 0400469V / 607/1 / 25 Credit Multiplier/20 Line Multiline
 // Money Mouse / Local / B - 08/04/97
+// Variations (% and NO):
+//    87.89% 99
+//    90.06% 02
+//    92.28% 03
 ROM_START( monmouse )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5030,6 +5582,10 @@ ROM_END
 // 0300469V / 607/1 / 25 Credit Multiplier/20 Line Multiline
 // Money Mouse / Local / B - 08/04/97
 // Same strings as monmouse but earlier version
+// Variations (% and NO):
+//    87.89% 99
+//    90.06% 02
+//    92.28% 03
 ROM_START( monmousea )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5051,6 +5607,10 @@ ROM_END
 
 // 0201397V / MV4126 / 12 Credit Multiplier/20 Line Multiline
 // Money Tree / New Zealand / C- 12/04/01
+// Variations (% and NO):
+//    87.96% 99
+//    90.04% 01
+//    91.73% 02
 ROM_START( montree )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5067,6 +5627,13 @@ ROM_END
 
 // 0100294V / 595/3 / 50 Credit Multiplier/20 Line Multiline
 // Mountain Money / Local / B - 11/06/96
+// Variations (% and NO):
+//    87.590% 99
+//    85.160% 01
+//    90.330% 02
+//    92.410% 03
+//    94.970% 04
+//    97.620% 05
 ROM_START( mountmon )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5085,6 +5652,13 @@ ROM_END
 
 // 0100289V / 595/2 / 5 Credit Multiplier/20 Line Multiline
 // Mountain Money / Local / C - 11/06/96
+// Variations (% and NO):
+//    87.590% 99
+//    85.160% 01
+//    90.330% 02
+//    92.410% 03
+//    94.970% 04
+//    97.620% 05
 ROM_START( mountmona )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5142,8 +5716,13 @@ ROM_END
 
 // BHG1464 / MV4108/5 / 5,10,20 Credit Multiplier / 9 Line Multiline
 // Mountain Money / Export / A - 10/03/01
-// Requires set chip version: 4.04.xx
-// Variation (% and NO):
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.394% 99
+//    90.178% 01
+//    92.268% 02
+//    94.716% 03
+//    97.089% 04
 ROM_START( mountmonua )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -5169,6 +5748,49 @@ ROM_END
 
 // 0200956V / 386/64 / 200 Credits per Draw / 3 Draws(1 cent) / 2 Credits per Draw / 3 Draws ($1.00)
 // MULTIDRAW - FREE GAMES / NSW/ACT / E - 08/05/00
+// Variations (% and NO):
+//    86% 99 ($0.01)
+//       Bet 10:
+//          RF = 5000    5K = 1200   SF = 400    4K = 110     RS = 60
+//          FH = 40      FL = 30     ST = 20     3K = 10      2P = 10
+//       High 200:
+//          RF = 160000  5K = 40000  SF = 12000  4K = 2600    RS = 800
+//          FH = 400     FL = 200    ST = 200    3K = 200     2P = 200
+//    86% 99 ($1.00)
+//       Bet 1:
+//          RF = 500     5K = 120    SF = 40     4K = 11      RS = 6
+//          FH = 4       FL = 3      ST = 2      3K = 1       2P = 1
+//       High 2:
+//          RF = 1600    5K = 400    SF = 120    4K = 26      RS = 8
+//          FH = 4       FL = 2      ST = 2      3K = 2       2P = 2
+//    89% 01 ($0.01)
+//       Bet 10:
+//          RF = 5000    5K = 1200   SF = 400    4K = 120     RS = 80
+//          FH = 40      FL = 30     ST = 20     3K = 10      2P = 10
+//       High 200:
+//          RF = 160000  5K = 40000  SF = 12000  4K = 2800    RS = 800
+//          FH = 400     FL = 400    ST = 200    3K = 200     2P = 200
+//    89% 01 ($1.00)
+//       Bet 1:
+//          RF = 500     5K = 120    SF = 40     4K = 12      RS = 8
+//          FH = 4       FL = 3      ST = 2      3K = 1       2P = 1
+//       High 2:
+//          RF = 1600    5K = 400    SF = 120    4K = 28      RS = 8
+//          FH = 4       FL = 4      ST = 2      3K = 2       2P = 2
+//    91% 02 ($0.01)
+//       Bet 10:
+//          RF = 5000    5K = 1200   SF = 500    4K = 130     RS = 80
+//          FH = 40      FL = 30     ST = 20     3K = 10      2P = 10
+//       High 200:
+//          RF = 160000  5K = 40000  SF = 16000  4K = 2800    RS = 800
+//          FH = 400     FL = 400    ST = 200    3K = 200     2P = 200
+//    91% 02 ($1.00)
+//       Bet 1:
+//          RF = 500     5K = 120    SF = 50     4K = 13      RS = 8
+//          FH = 4       FL = 3      ST = 2      3K = 1       2P = 1
+//       High 2:
+//          RF = 1600    5K = 400    SF = 160    4K = 28      RS = 8
+//          FH = 4       FL = 4      ST = 2      3K = 2       2P = 2
 ROM_START( multidrw )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5192,6 +5814,13 @@ ROM_END
 
 // 0100275V / 595/1 / 5 Credit Multiplier/20 Line Multiline
 // Mystic Garden / Local / B - 11/06/96
+// Variations (% and NO):
+//    87.590% 99
+//    85.160% 01
+//    90.330% 02
+//    92.410% 03
+//    94.970% 04
+//    97.620% 05
 ROM_START( mystgard )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5210,6 +5839,10 @@ ROM_END
 
 // 0101503V / MV4141 / 6 Credit Multiplier/20 Line Multiline
 // One For All / New Zealand / A- 28/05/01
+// Variations (% and NO):
+//    87.49% 99
+//    90.47% 01
+//    91.43% 02
 ROM_START( one4all )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5227,6 +5860,10 @@ ROM_END
 // 0200849V / 601/3 / 10 Credit Multiplier/10 Line Multiline
 // Orchid Mist 500cm / Local / C - 03/02/99
 // ROM says '10 Credit Multiplier' but game has a 50 credit multiplier
+// Variations (% and NO):
+//    87.65% 99
+//    89.93% 04
+//    92.71% 06
 ROM_START( orchidms )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5250,6 +5887,10 @@ ROM_END
 // Orchid Mist 500cm / Local / C - 03/02/99
 // Same strings as orchidms but earlier version
 // ROM says '10 Credit Multiplier' but game has a 50 credit multiplier
+// Variations (% and NO):
+//    87.65% 99
+//    89.93% 04
+//    92.71% 06
 ROM_START( orchidmsa )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5271,6 +5912,10 @@ ROM_END
 
 // 0101241V / MV4118 / 25 Credit Multiplier/10 Line Multiline
 // Orchid Mist / New Zealand / A- 3/7/00
+// Variations (% and NO):
+//    87.09% 99
+//    90.11% 01
+//    91.78% 02
 ROM_START( orchidmsnz )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5285,6 +5930,13 @@ ROM_END
 
 // 0200348V / 593/2 / 10 Credit Multiplier / 9 Line Multiline
 // Oscar / Local / C - 20/09/96
+// Variations (% and NO):
+//    87.01% 99
+//    85.11% 01
+//    89.96% 02
+//    92.69% 03
+//    94.62% 04
+//    97.02% 05
 ROM_START( oscara5 )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5304,6 +5956,13 @@ ROM_END
 // 0100348V / 593/2 / 10 Credit Multiplier / 9 Line Multiline
 // Oscar / Local / C - 20/09/96
 // Same strings as oscara5 but earlier version
+// Variations (% and NO):
+//    87.01% 99
+//    85.11% 01
+//    89.96% 02
+//    92.69% 03
+//    94.62% 04
+//    97.02% 05
 ROM_START( oscara5a )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5325,6 +5984,10 @@ ROM_END
 
 // 0101046V / 594/7 / 10 Credit Multiplier/9 && 20 Line Multiline
 // Panther Magic / NSW/ACT / A - 06/10/99
+// Variations (% and NO):
+//    90.14% 99
+//    87.36% 03
+//    92.08% 04
 ROM_START( pantmag )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5346,6 +6009,11 @@ ROM_END
 
 // 0100716V / 594/4 / 2 Credit Multiplier/5 Line Multiline
 // Panther Magic / Local / A - 13/05/98
+// Variations (% and NO):
+//    90.14% 99
+//    87.36% 03
+//    92.08% 04
+//    94.93% 05
 ROM_START( pantmaga )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5367,10 +6035,16 @@ ROM_END
 
 // AHG1567 / MV4115/6 / 9/20 Line Multiline Multiplier
 // Party Gras / Export / A - 10/11/2001
-// All devices are 27c4002 instead of 27c4096
+// All devices are 27C4002 instead of 27C4096
 // ROM says '9/20 Line Multiline' but game only has 9 lines
-// Requires set chips 4.04.xx
 // Touchscreen game
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.845% 99
+//    89.957% 01
+//    92.053% 02
+//    94.770% 03
+//    96.818% 04
 ROM_START( partygrs )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -5404,8 +6078,14 @@ ROM_END
 
 // BHG1284 / MV4115/3 / 20 Line Multiline / 3,5,10,20,25,50 Credit Multiplier
 // Party Gras / Export / B - 06/02/2001
-// Requires set chips 4.01.xx
 // Touchscreen game
+// Requires set chip version 4.01.xx
+// Variations (% and NO):
+//    87.845% 99
+//    89.957% 01
+//    92.053% 02
+//    94.770% 03
+//    96.818% 04
 ROM_START( partygrsa )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -5429,6 +6109,7 @@ ROM_END
 // AHG1568 / MV4115/6 / 9/20 Line Multiline Multiplier
 // Party Gras / Export / A - 10/11/2001
 // Touchscreen game
+// 20 lines
 ROM_START( partygrsb )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -5444,6 +6125,10 @@ ROM_END
 
 // 02J00011 / JB001 / 25 Credit Multiplier / 20 Line Multiline
 // Peacock Flutter / NSW/ACT / A - 10/03/00
+// Variations (% and NO):
+//    87.93% 99
+//    90.05% 01
+//    92.23% 02
 ROM_START( peaflut )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5465,6 +6150,12 @@ ROM_END
 
 // 0200460V / 586/4(a) / 5 Credit Multiplier / 20 Line Multiline
 // Penguin Pays 100cm / NSW/ACT / D - 03/06/97
+// Variations (% and NO):
+//    87.59% 99
+//    85.05% 01
+//    90.40% 02
+//    92.08% 03
+//    95.01% 04
 ROM_START( pengpay )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5486,6 +6177,12 @@ ROM_END
 
 // 0200357V / 586/4 / 5 Credit Multiplier / 20 Line Multiline
 // Penguin Pays 100cm / NSW/ACT / C - 12/11/96
+// Variations (% and NO):
+//    87.587% 99
+//    85.050% 01
+//    90.399% 02
+//    92.083% 03
+//    95.012% 04
 ROM_START( pengpaya )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5508,6 +6205,11 @@ ROM_END
 // 0200359V / 586/3(a) / 100 Credit Multiplier/9 Line Multiline
 // Penguin Pays 90cm / NSW/ACT / D - 03/06/97
 // ROM says '100 Credit Multiplier' but game has a 10 credit multiplier
+// Variations (% and NO):
+//    87.59% 99
+//    90.40% 02
+//    92.08% 03
+//    95.01% 04
 ROM_START( pengpayb )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5529,6 +6231,12 @@ ROM_END
 
 // 0200113V / 586 / 20 Credit Multiplier/9 Line Multiline
 // Penguin Pays / Local / A - 12/10/95
+// Variations (% and NO):
+//    87.587% 99
+//    85.050% 01
+//    90.399% 02
+//    92.083% 03
+//    95.012% 04
 ROM_START( pengpayc )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5564,9 +6272,9 @@ ROM_END
 
 // BHI0417-03 / 586/7(b) / 10 Credit Multiplier / 9 Line Multiline
 // Penguin Pays / Export / B - 14/07/97
-// All devices are 27c4002 instead of 27c4096
-// marked as 92.130%
+// All devices are 27C4002 instead of 27C4096
 // No set chips required
+// Variations (% and NO): 92.130% 03
 ROM_START( pengpayu )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -5600,9 +6308,9 @@ ROM_END
 
 // OHG0417-03 / 586/7(b) / 10 Credit Multiplier / 9 Line Multiline
 // Penguin Pays / Export / B - 14/07/97
-// All devices are 27c4002 instead of 27c4096
-// marked as 92.130%
+// All devices are 27C4002 instead of 27C4096
 // No set chips required
+// Variations (% and NO): 92.130% 03
 ROM_START( pengpayua )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -5624,9 +6332,9 @@ ROM_END
 
 // OHG0417-02 / 586/7(b) / 10 Credit Multiplier / 9 Line Multiline
 // Penguin Pays / Export / B - 14/07/97
-// All devices are 27c4002 instead of 27c4096
-// marked as 90.45%
+// All devices are 27C4002 instead of 27C4096
 // No set chips required
+// Variations (% and NO): 90.450% 02
 ROM_START( pengpayub )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -5649,9 +6357,15 @@ ROM_END
 // AHG1544 / MV4122 / 3,5,10,20,25,50 Credit Multiplier / 9 Line Multiline
 // PENGUIN PAYS / CASH EXPRESS / Export / C - 19/01/01
 // Marked SPC.
-// All eproms are 27C4096.
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
-// Requires set chips 4.04.xx
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.845% 99
+//    90.104% 01
+//    92.013% 02
+//    94.976% 03
+//    97.072% 04
+//    82.200% 05 (Hyperlink)
 ROM_START( pengpayce )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -5678,7 +6392,14 @@ ROM_END
 // EHG1257 / MV4122/1 / 3,5,10,20,25,50 Credit Multiplier / 20 Line Multiline
 // PENGUIN PAYS / PENGUIN PUCKS / Export / C - 19/01/01
 // Penguin Pucks Hyperlink game, but can also run standalone without progressive jackpot
-// Requires set chips 4.03.xx
+// Requires set chip version 4.03.xx
+// Variations (% and NO):
+//    87.845% 99
+//    90.104% 01
+//    92.013% 02
+//    94.976% 03
+//    97.072% 04
+//    82.200% 05 (Hyperlink)
 ROM_START( pengpuck )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -5704,6 +6425,10 @@ ROM_END
 
 // 0100674V / 619/1 / 10 Credit Multiplier/20 Line Multiline
 // Penguin Pirate 200cm / NSW/ACT / A - 31/03/98
+// Variations (% and NO):
+//    87.79% 99
+//    89.85% 02
+//    92.22% 03
 ROM_START( penpir )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5725,6 +6450,10 @@ ROM_END
 
 // 0200578V / 619 / 10 Credit Multiplier/9 Line Multiline
 // Penguin Pirate 90cm / NSW/ACT / C - 27/02/98
+// Variations (% and NO):
+//    87.64% 99
+//    90.20% 02
+//    92.21% 03
 ROM_START( penpira )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5748,6 +6477,11 @@ ROM_END
 // Penguin Pirate 2 / Crown / A - 17/12/98
 // ROM says 'Penguin Pirate 2', artwork says 'Penguin Pirate II'
 // Original casino BIOS is not dumped, using New Zealand 0700474V BIOS until an Australian version is dumped
+// Variations (% and NO):
+//    87.71% 99
+//    90.12% 02
+//    92.18% 03
+//    94.99% 04
 ROM_START( penpir2 )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5775,6 +6509,10 @@ ROM_END
 
 // 0100731V / 618/1 / 10 Credit Multiplier / 20 Line Multiline
 // Pet Shop / Local / A - 17/04/98
+// Variations (% and NO):
+//    87.78% 99
+//    90.01% 02
+//    92.00% 03
 ROM_START( petshop )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5809,6 +6547,12 @@ ROM_END
 
 // 0500005V / 570/1 / 10 Credit Multiplier/9 Line Multiline
 // Phantom Pays / Local / E - 12/09/95
+// Variations (% and NO):
+//    87.876% 99
+//    85.379% 01
+//    90.483% 02
+//    92.275% 03
+//    95.389% 04
 ROM_START( phantpay )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5830,6 +6574,11 @@ ROM_END
 
 // 0100299V / 578/4 / 3 Credit Multiplier/3 Line Multiline
 // Prize Fight / Local / B - 08/08/96
+// Variations (% and NO):
+//    90.52% 99
+//    92.57% 01
+//    95.46% 02
+//    87.78% 03
 ROM_START( przfight )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5853,6 +6602,10 @@ ROM_END
 
 // 0100706V / 603/6 / 10 Credit Multiplier / 20 Line Multiline
 // Queens of Cash / NSW/ACT / C  - 23/07/98
+// Variations (% and NO):
+//    87.70% 99
+//    90.15% 02
+//    91.99% 03
 ROM_START( qcash )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5875,6 +6628,10 @@ ROM_END
 // 0300439V / 602/4 / 25 Credit Multiplier / 20 Line Multiline
 // QUEEN OF THE NILE / NSW/ACT / B - 13/05/97
 // EPROM labels have "Golden Pyramid 500" (no trailing 's') and 2001 for the year
+// Variations (% and NO):
+//    87.87% 99
+//    90.31% 02
+//    92.26% 03
 ROM_START( qnile )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5887,16 +6644,20 @@ ROM_START( qnile )
 	    0x062914-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION32_LE( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	ROM_LOAD32_WORD( "0300439v.u7",  0x000000, 0x80000, CRC(63f9129e) SHA1(a513fd47d3ca4fe007730a06e5f6ffc2891dc74f) )
-	ROM_LOAD32_WORD( "0300439v.u11", 0x000002, 0x80000, CRC(7217c3af) SHA1(518c3d79758e3253f937cf73da9398fa812bf4bc) )
-	ROM_LOAD32_WORD( "0300439v.u8",  0x100000, 0x80000, CRC(90c92bf8) SHA1(bbc558ffb5a883c9f4ff9dc3362c4081990c970d) )
-	ROM_LOAD32_WORD( "0300439v.u12", 0x100002, 0x80000, CRC(eec01bb4) SHA1(146fdce6b32a21659dc775e4a5f3bb027bd09825) )
+	ROM_LOAD32_WORD( "0300439v.u7",  0x000000, 0x80000, CRC(63f9129e) SHA1(a513fd47d3ca4fe007730a06e5f6ffc2891dc74f) )  // 0300439V Golden Pyramid 500 1/4 602/4 512K (c) 2001 Aristocrat P U7
+	ROM_LOAD32_WORD( "0300439v.u11", 0x000002, 0x80000, CRC(7217c3af) SHA1(518c3d79758e3253f937cf73da9398fa812bf4bc) )  // 0300439V Golden Pyramid 500 3/4 602/4 512K (c) 2001 Aristocrat P U11
+	ROM_LOAD32_WORD( "0300439v.u8",  0x100000, 0x80000, CRC(90c92bf8) SHA1(bbc558ffb5a883c9f4ff9dc3362c4081990c970d) )  // 0300439V Golden Pyramid 500 2/4 602/4 512K (c) 2001 Aristocrat P U8
+	ROM_LOAD32_WORD( "0300439v.u12", 0x100002, 0x80000, CRC(eec01bb4) SHA1(146fdce6b32a21659dc775e4a5f3bb027bd09825) )  // 0300439V Golden Pyramid 500 4/4 602/4 512K (c) 2001 Aristocrat P U12
 ROM_END
 
 
 // 0200439V / 602/4 / 25 Credit Multiplier / 20 Line Multiline
 // QUEEN OF THE NILE / NSW/ACT / B - 13/05/97
 // Same strings as qnile but earlier version
+// Variations (% and NO):
+//    87.87% 99
+//    90.31% 02
+//    92.26% 03
 ROM_START( qnilea )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5919,6 +6680,10 @@ ROM_END
 // 0100439V / 602/4 / 25 Credit Multiplier / 20 Line Multiline
 // QUEEN OF THE NILE / NSW/ACT / B - 13/05/97
 // Same strings as qnile and qnilea but earlier version
+// Variations (% and NO):
+//    87.87% 99
+//    90.31% 02
+//    92.26% 03
 ROM_START( qnileb )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5943,6 +6708,11 @@ ROM_END
 // Game has lotto symbols in place of 9 through Ace, the lotto symbols are the same colour as the symbols they replaced
 // 3 = Nine, 4 = Ten, 5 = Jack, 6 = Queen, 7 = King, 8 = Ace
 // Game and BIOS are in Portuguese
+// Variations (% and NO):
+//    87.870% 99
+//    90.310% 01
+//    92.260% 02
+//    94.880% 04
 ROM_START( qnilebr )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5970,6 +6740,10 @@ ROM_END
 
 // 0300440V / 602/3 / 20 Credit Multiplier / 9 Line Multiline
 // QUEEN OF THE NILE / NSW/ACT / B - 13/05/97
+// Variations (% and NO):
+//    87.87% 99
+//    90.31% 02
+//    92.26% 03
 ROM_START( qnilec )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -5992,7 +6766,14 @@ ROM_END
 // AHG1609 / MV4091/1 / 5,10,25,50 Credit Multiplier / 20 Line Multiline
 // QUEEN OF THE NILE / Export / A - 17/01/01
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
-// Requires set chips 4.04.xx
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.928% 99
+//    90.511% 01
+//    92.161% 02
+//    94.941% 03
+//    97.325% 04
+//    82.070% 05 (Hyperlink)
 ROM_START( qnilece )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -6020,7 +6801,14 @@ ROM_END
 // QUEEN OF THE NILE / Export / F - 17/01/01
 // ROM says '10 Credit Multiplier / 20 Line Multiline' but it is a 9 line game with 3,5,10,20,25,50 credit multipliers
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
-// Requires set chips 4.04.xx
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.928% 99
+//    90.511% 01
+//    92.161% 02
+//    94.941% 03
+//    97.325% 04
+//    82.070% 05 (Hyperlink)
 ROM_START( qnilecea )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -6047,9 +6835,15 @@ ROM_END
 // AHG1608 / MV4091 / 5,10,20 Credit Multiplier / 9 Line Multiline
 // QUEEN OF THE NILE / Export / F - 17/01/01
 // Marked as SPC.
-// All eproms are 27C4096.
 // Cash Express Hyperlink game, but can also run standalone without progressive jackpot
-// Requires set chips 4.04.xx
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.928% 99
+//    90.511% 01
+//    92.161% 02
+//    94.941% 03
+//    97.325% 04
+//    82.070% 05 (Hyperlink)
 ROM_START( qnileceb )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -6075,6 +6869,12 @@ ROM_END
 
 // 0101139V / 602/16 / 3 Credit Multiplier / 3 Line Multiline
 // QUEEN OF THE NILE / NSW/ACT / A - 11/10/99
+// Variations (% and NO):
+//    90.13% 99
+//    87.13% 01
+//    92.15% 02
+//    94.92% 03
+//    93.38% 09
 ROM_START( qniled )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6122,6 +6922,7 @@ ROM_END
 // 0401072V / 602/4 / 25 Credit Multiplier / 20 Line Multiline
 // QUEEN OF THE NILE / NSW/ACT / D - 18/06/99
 // Maximillions Hyperlink game
+// Variations (% and NO): 82.06% 06
 ROM_START( qnilemax )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6146,6 +6947,7 @@ ROM_END
 
 // 0301059V / 602/5 / 10 Credit Multiplier / 9 Line Multiline
 // QUEEN OF THE NILE / HOLLAND / G - 10/04/00
+// Variations (% and NO): 92.26% 02
 ROM_START( qnilenl )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6168,6 +6970,10 @@ ROM_END
 // 0300785V / MV4068 / 5 Credit Multiplier/9 Line Multiline
 // Queen of the nile / New Zealand / A- 31/8/98
 // ROM has "nile" in lowercase
+// Variations (% and NO):
+//    87.55% 99
+//    90.15% 01
+//    91.92% 02
 ROM_START( qnilenz )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6205,9 +7011,10 @@ ROM_END
 
 // GHG4091-02 / MV4091 / 10 Credit Multiplier / 9 Line Multiline
 // QUEEN OF THE NILE / NSW/ACT / B - 13/05/97
-// All devices are 27c4002 instead of 27c4096
-// ROM contains unaltered NSW/ACT region string and date, but game is for the US platform
+// All devices are 27C4002 instead of 27C4096
+// ROM contains unaltered NSW/ACT region string and date, but game is for the USA platform
 // No set chips required
+// Variations (% and NO): 92.161% 02
 ROM_START( qnileu )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -6222,8 +7029,8 @@ ROM_START( qnileu )
 	ROM_REGION32_LE( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "ghg409102.u7",  0x000000, 0x80000, CRC(a00ab2cf) SHA1(eb3120fe4b1d0554c224c7646e727e86fd35975e) )
 	ROM_LOAD32_WORD( "ghg409102.u11", 0x000002, 0x80000, CRC(c4a35337) SHA1(d469ed154caed1f0a4cf89e67d852924c95172ed) )
-	ROM_LOAD32_WORD( "ghg409102.u8",  0x100000, 0x80000, CRC(16a629e1) SHA1(0dee11a2f1b2068a86b3e0b6c01d115555a657c9) )
-	ROM_LOAD32_WORD( "ghg409102.u12", 0x100002, 0x80000, CRC(7871a846) SHA1(ac1d741092afda842e1864f1a7a14137a9ee46d9) )
+	ROM_LOAD32_WORD( "ghg4091.u8",    0x100000, 0x80000, CRC(16a629e1) SHA1(0dee11a2f1b2068a86b3e0b6c01d115555a657c9) )
+	ROM_LOAD32_WORD( "ghg4091.u12",   0x100002, 0x80000, CRC(7871a846) SHA1(ac1d741092afda842e1864f1a7a14137a9ee46d9) )
 
 	ROM_REGION16_BE( 0x100, "eeprom0", 0 )
 	ROM_LOAD16_WORD_SWAP( "eeprom0", 0x000000, 0x000100, CRC(fea8a821) SHA1(c744cac6af7621524fc3a2b0a9a135a32b33c81b) )
@@ -6241,11 +7048,11 @@ ROM_END
 
 // GHG4091-03 / MV4091 / 10 Credit Multiplier / 9 Line Multiline
 // QUEEN OF THE NILE / NSW/ACT / B - 13/05/97
-// Marked as 94.941%
-// All devices are 27C4002.
-// ROM contains unaltered NSW/ACT region string and date, but game is for the US platform
+// All devices are 27C4002 instead of 27C4096
+// ROM contains unaltered NSW/ACT region string and date, but game is for the USA platform
 // Note: The game has GHG4090-03 in the stickers, but the strings inside are GHG4091-03 instead. Also the base is GHG4091.
 // No set chips required
+// Variations (% and NO): 94.941% 03
 ROM_START( qnileua )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -6268,8 +7075,12 @@ ROM_END
 
 // 04J00784 / 602/3 / 20 Credit Multiplier / 9 Line Multiline
 // QUEEN OF THE NILE / NSW/ACT / B - 13/05/97
-// ROM contains unaltered NSW/ACT region string and date, but game is for the Venezuelan market
+// ROM contains unaltered NSW/ACT region string and date, but is for the South American market (Peru?)
 // Game is in Spanish, however audit mode is in English
+// Variations (% and NO):
+//    87.87% 99
+//    90.31% 02
+//    92.26% 03
 ROM_START( qnilev )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6291,6 +7102,13 @@ ROM_END
 
 // 0500009V / 581 / 5 Credit Multiplier/9 Line Multiline
 // Q.T. Bird / Local / A - 27/10/94
+// Variations (% and NO):
+//    87.526% 99
+//    82.291% 01
+//    85.369% 02
+//    90.056% 03
+//    92.049% 04
+//    95.577% 05
 ROM_START( qtbird )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6313,6 +7131,7 @@ ROM_END
 // 0101332V / 655 / 10 Credit Multiplier/20 Line Multiline
 // Rainbow Warriors / NSW/ACT / B - 02/03/00
 // Cash Express Hyperlink game
+// Variations (% and NO): 82.14% 05
 ROM_START( rainwrce )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6338,6 +7157,13 @@ ROM_END
 
 // 0100400V / 598/2 / 20 Credit Multiplier / 25 Credit Multiway
 // Reel Power / Local / A - 01/11/96
+// Variations (% and NO):
+//    86.99% 99
+//    85.11% 01
+//    89.95% 02
+//    91.99% 03
+//    94.91% 04
+//    96.97% 05
 ROM_START( reelpwr )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6360,6 +7186,10 @@ ROM_END
 // 0100779V / 628 / 25 Credit Multiway / 8 Credit Multiplier
 // Reelin'n Rockin / Local / A - 13/07/98
 // ROM says 'Reelin'n Rockin', artwork says 'Reelin-n-Rockin'
+// Variations (% and NO):
+//    87.15% 99
+//    90.14% 02
+//    92.32% 03
 ROM_START( reelrock )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6404,6 +7234,11 @@ ROM_END
 
 // 0400549V / 608 / 3 Credit Multiplier/3 Line Multiline
 // Return of the Samurai / Local / A - 17/04/97
+// Variations (% and NO):
+//    90.150% 99
+//    87.580% 01
+//    92.430% 02
+//    94.840% 03
 ROM_START( retrsam )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6426,6 +7261,11 @@ ROM_END
 // 0200549V / 608 / 3 Credit Multiplier/3 Line Multiline
 // Return of the Samurai / Local / A - 17/04/97
 // Same strings as retrsam but earlier version
+// Variations (% and NO):
+//    90.150% 99
+//    87.580% 01
+//    92.430% 02
+//    94.840% 03
 ROM_START( retrsama )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6444,6 +7284,10 @@ ROM_END
 
 // 0200506V / 608/1 / 10 Credit Multiplier/9 Line Multiline
 // Return of the Samurai / Local / A - 28/04/97
+// Variations (% and NO):
+//    87.420% 99
+//    90.070% 02
+//    92.090% 03
 ROM_START( retrsamb )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6463,6 +7307,10 @@ ROM_END
 // 0200534V / 596/3 / 10 Credit Multiplier/20 Line Multiline
 // Rushin Rooster / Local / C - 25/06/97
 // ROM says '10 Credit Multiplier' but game has a 5 credit multiplier
+// Variations (% and NO):
+//    87.17% 99
+//    90.09% 02
+//    92.69% 03
 ROM_START( rushrst )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6485,7 +7333,12 @@ ROM_END
 
 // 0400501V / 578 / 5 COIN MULTIPLIER
 // SUPER BUCKS II / NSW/ACT / G 26/07/99
-// Sound data is damaged due to bad u8 ROM
+// Variations (% and NO):
+//    88.396% 99
+//    90.508% 01
+//    92.559% 02
+//    95.453% 03
+//    96.868% 04
 ROM_START( sbuk2 )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6500,7 +7353,7 @@ ROM_START( sbuk2 )
 	ROM_REGION32_LE( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0400501v.u7",  0x000000, 0x80000, CRC(f025775d) SHA1(71a94f6f17fa7cdcd997b0117b8f4afe21606a69) )
 	ROM_LOAD32_WORD( "0400501v.u11", 0x000002, 0x80000, CRC(f1b51a61) SHA1(8e9fcb071f704122e13333094828a41974646792) )
-	ROM_LOAD32_WORD( "0400501v.u8",  0x100000, 0x80000, BAD_DUMP CRC(03912f4e) SHA1(48bdcd2160e05261b7d834c53e1d483acaad098f) ) // bit 0x20 is stuck on for most of the ROM
+	ROM_LOAD32_WORD( "0400501v.u8",  0x100000, 0x80000, CRC(6bf9d767) SHA1(179e5d28c9a31fba55ba40d594b604e9d4e1bf9b) )
 	ROM_LOAD32_WORD( "0400501v.u12", 0x100002, 0x80000, CRC(f9b65d2b) SHA1(f519fc284aaa08d3619e4d88e92e690320cf5432) )
 ROM_END
 
@@ -6522,6 +7375,11 @@ ROM_END
 
 // 0200711V / 626 / 3 Credit Multiplier / 3 Line Multiline
 // Super Bucks III / NSW/ACT / A-22/04/98
+// Variations (% and NO):
+//    90.10% 99
+//    87.43% 03
+//    92.10% 04
+//    94.93% 05
 ROM_START( sbuk3 )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6544,6 +7402,11 @@ ROM_END
 // 0100711V / 626 / 3 Credit Multiplier / 3 Line Multiline
 // Super Bucks III / NSW/ACT / A-22/04/98
 // Same strings as sbuk3 but earlier version
+// Variations (% and NO):
+//    90.10% 99
+//    87.43% 03
+//    92.10% 04
+//    94.93% 05
 ROM_START( sbuk3a )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6565,7 +7428,13 @@ ROM_END
 
 // AHG1575 / MV4137 / 5,10,20 Credit Multiplier / 20 Line Multiline
 // Sweet Liberty Deluxe / Export / A - 11/02/01
-// Requires set chips 4.04.xx
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.878% 99
+//    90.193% 01
+//    92.215% 02
+//    94.976% 03
+//    97.015% 04
 ROM_START( sldeluxe )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -6591,6 +7460,11 @@ ROM_END
 
 // 0100673V / 621/2 / 10 Credit Multiplier
 // Silver Wolf / Local / A - 23/03/98
+// Variations (% and NO):
+//    90.13% 99
+//    92.15% 04
+//    94.76% 05
+//    97.33% 06
 ROM_START( slvrwolf )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6612,6 +7486,13 @@ ROM_END
 
 // 0100405V / 599 / 10 Credit Multiplier / 9 Line Multiline
 // Snow Cat / Local / B - 23/12/96
+// Variations (% and NO):
+//    87.20% 99
+//    85.20% 01
+//    90.00% 02
+//    92.00% 03
+//    94.93% 04
+//    96.95% 05
 ROM_START( snowcat )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6630,6 +7511,10 @@ ROM_END
 
 // 0200606V / 622 / 10 Credit Multiplier / 9 Line Multiline
 // Sumo Spins / Local / A - 08/12/97
+// Variations (% and NO):
+//    87.01% 99
+//    90.00% 02
+//    92.01% 03
 ROM_START( sumospin )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6651,6 +7536,13 @@ ROM_END
 
 // 0200465V / 577/1 / 10 Credit Multiplier/9 Line Multiline
 // Sweethearts II / Local / C - 07/09/95
+// Game has the newer style music introduced in 1997
+// Variations (% and NO):
+//    87.185% 99
+//    85.271% 01
+//    90.156% 02
+//    92.257% 03
+//    95.227% 04
 ROM_START( swhr2 )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6670,6 +7562,12 @@ ROM_END
 // 0200004V / 577/1 / 10 Credit Multiplier/9 Line Multiline
 // Sweethearts II / Local / C - 07/09/95
 // Same strings as swhr2 but earlier version
+// Variations (% and NO):
+//    87.185% 99
+//    85.271% 01
+//    90.156% 02
+//    92.257% 03
+//    95.227% 04
 ROM_START( swhr2a )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6689,8 +7587,9 @@ ROM_END
 // PHG0742-02 / MV4061 / 5 Credit Multiplier/5 Line Multiline
 // Sweethearts II / Export / A - 29/06/98
 // Marked as PHG0742 and 92.252%
-// All devices are 27c4002 instead of 27c4096
+// All devices are 27C4002 instead of 27C4096
 // No set chips required
+// Variations (% and NO): 92.252% 02
 ROM_START( swhr2u )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -6714,6 +7613,13 @@ ROM_END
 // 01J01986 / 577/1 / 10 Credit Multiplier/9 Line Multiline
 // Sweethearts II / VENEZUELA / C - 07/09/95
 // Game is in Spanish, however audit mode is in English
+// Game has the newer style music introduced in 1997
+// Variations (% and NO):
+//    87.185% 99
+//    85.271% 01
+//    90.156% 02
+//    92.257% 03
+//    95.227% 04
 ROM_START( swhr2v )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6732,6 +7638,13 @@ ROM_END
 
 // 0200319V / 569/12 / 25 Credit Multiplier / 20 Line Multiline
 // Thor / Local / B - 14/08/96
+// Variations (% and NO):
+//    87.84% 99
+//    82.95% 01
+//    85.06% 02
+//    90.17% 03
+//    92.41% 04
+//    94.98% 05
 ROM_START( thor )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6753,6 +7666,13 @@ ROM_END
 
 // 0200333V / 570/9 / 10 Credit Multiplier/9 Line Multiline
 // Thunder Heart / Local / A - 14/08/96
+// Variations (% and NO):
+//    87.79% 99
+//    85.16% 01
+//    90.48% 02
+//    92.78% 03
+//    94.97% 04
+//    97.18% 05
 ROM_START( thndh )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6774,6 +7694,11 @@ ROM_END
 
 // 0200334V / 597/1 / 3 Credit Multiplier/3 Line Multiline
 // Thunder Heart / Local / A - 14/08/96
+// Variations (% and NO):
+//    90.21% 99
+//    92.14% 01
+//    94.48% 02
+//    87.72% 03
 ROM_START( thndha )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6795,6 +7720,10 @@ ROM_END
 
 // 0100550V / 594/3 / 3 Credit Multiplier/3 Line Multiline
 // Top Banana / Local / A - 18/08/97
+// Variations (% and NO):
+//    90.103% 99
+//    92.036% 01
+//    95.026% 02
 ROM_START( topbana )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6813,6 +7742,10 @@ ROM_END
 
 // 0100782V / 616/1 / 10 Credit Multiplier/20 Line Multiline
 // Toucan Tango 200cm / NSW/ACT / A - 17/06/98
+// Variations (% and NO):
+//    86.92% 99
+//    90.01% 02
+//    92.07% 03
 ROM_START( toutango )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6838,6 +7771,7 @@ ROM_END
 
 // 0301388V / 616 / 10 Credit Multiplier / 9 Line Multiline
 // Toucan Tango 90cm / Holland / C - 11/05/99
+// Variations (% and NO): 91.79% 08
 ROM_START( toutangonl )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6862,6 +7796,10 @@ ROM_END
 
 // 01J00161 / JB001/3 / 25 Credit Multiplier / 20 Line Multiline
 // TREASURE TROVE / NSW/ACT / A - 5/10/00
+// Variations (% and NO):
+//    87.93% 99
+//    90.05% 01
+//    92.23% 02
 ROM_START( trstrove )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6883,6 +7821,10 @@ ROM_END
 
 // 0201692V / 692 / 10 or 25 Credit Multiplier/9 or 20 Line Multiline
 // Triple Treat / NSW/ACT / A - 17/05/02
+// Variations (% and NO):
+//    87.92% 99
+//    90.14% 01
+//    92.09% 02
 ROM_START( tritreat )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6906,6 +7848,10 @@ ROM_END
 
 // 01J00851 / JB001/5 / Multi credit / Multi line
 // TROJAN HORSE / NSW/ACT / A - 30/10/01
+// Variations (% and NO):
+//    87.93% 99
+//    90.05% 01
+//    92.23% 02
 ROM_START( trojhors )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6929,6 +7875,12 @@ ROM_END
 
 // 0100269V / 577/3 / 10 Credit Multiplier/9 Line Multiline
 // Tropical Delight / Local / B - 15/05/96
+// Variations (% and NO):
+//    87.19% 99
+//    85.27% 01
+//    90.16% 02
+//    92.26% 03
+//    95.23% 04
 ROM_START( trpdlght )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6951,8 +7903,9 @@ ROM_END
 // PHG0625-02 / 577/3 / 10 Credit Multiplier/9 Line Multiline
 // Tropical Delight / Export / D - 24/09/97
 // Marked as PHG062502 and 92.25%
-// All devices are 27c4002 instead of 27c4096
+// All devices are 27C4002 instead of 27C4096
 // No set chips required
+// Variations (% and NO): 92.252% 02
 ROM_START( trpdlghtu )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -6975,6 +7928,10 @@ ROM_END
 
 // 0100791V / 631/1 A / 10 Credit Multiplier / 20 Line Multiline
 // UNICORN DREAMING / NSW/ACT / A - 31/08/98
+// Variations (% and NO):
+//    87.55% 99
+//    90.02% 03
+//    92.38% 04
 ROM_START( unicornd )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -6996,6 +7953,10 @@ ROM_END
 
 // 0100813V / 631  A / 10 Credit Multiplier / 9 Line Multiline
 // UNICORN DREAMING / NSW/ACT / A - 02/09/98
+// Variations (% and NO):
+//    87.60% 99
+//    90.06% 03
+//    92.09% 04
 ROM_START( unicornda )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -7017,6 +7978,10 @@ ROM_END
 
 // 0101228V / MV4113/1 / 10 Credit Multiplier/20 Line Multiline
 // Unicorn Dreaming / New Zealand / A- 5/4/00
+// Variations (% and NO):
+//    87.55% 99
+//    90.02% 01
+//    91.92% 02
 ROM_START( unicorndnz )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -7031,7 +7996,13 @@ ROM_END
 
 // BHG1584 / MV4130/1 / 20 Line Multiline / 5, 10, 25, 50 Credit Multiplier
 // Unicorn Dreaming / Export / C - 10/17/01
-// Requires set chips 4.04.xx
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.546% 99
+//    90.017% 01
+//    92.375% 02
+//    94.984% 03
+//    97.061% 04
 ROM_START( unicorndu )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -7057,11 +8028,20 @@ ROM_END
 // This game is downported from the MK6 version
 // Venezuela is spelled as 'Venezuila' in the ROM
 // Game is in Spanish, however audit mode is in English
+// Variations (% and NO):
+//    87.93% 99
+//    90.04% 01
+//    92.17% 02
 ROM_START( venicea5 )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
 	/*
-	    Checksum code needs to be done
+	    Checksum code found at 0x000bb8
+	    0x000000-0x08e9c7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x41b6f345
+	        Calculated Checksum 0x41b6f345  (OK)
+	    0x08e9c8-0x33fbd3 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x08e9c8-0x3fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION32_LE( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "02j02056.u7",  0x000000, 0x80000, CRC(2a64d797) SHA1(a23322c38462052f4a892451e68a8c762bf157aa) )
@@ -7077,8 +8057,13 @@ ROM_END
 
 // AHG1535 / MV4076 / 9 Line / 5,10,20 Credit Multiplier
 // Wild Africa / Export / C - 17/07/01
-// All devices are 27c4096
-// Requires set chips 4.04.xx
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.836% 99
+//    90.167% 03
+//    92.412% 04
+//    94.982% 07
+//    97.313% 08
 ROM_START( wafricau )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -7101,6 +8086,11 @@ ROM_END
 
 // 0200507V / 506/8 / 3 Credit Multiplier/3 Line Multiline
 // Wild Amazon / Local / A - 10/10/96
+// Variations (% and NO):
+//    87.88% 99
+//    89.63% 02
+//    91.55% 03
+//    94.58% 04
 ROM_START( wamazon )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -7119,6 +8109,12 @@ ROM_END
 
 // 0200285V / 506/6 / 10 Credit Multiplier
 // Wild Amazon / Local / A - 7/5/96
+// Variations (% and NO):
+//    87.88% 99
+//    85.14% 01
+//    89.63% 02
+//    91.55% 03
+//    94.58% 04
 ROM_START( wamazona )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -7141,6 +8137,11 @@ ROM_END
 // 01J01996 / 506/8 / 3 Credit Multiplier/3 Line Multiline
 // Wild Amazon / VENEZUELA / A - 10/10/96
 // Game is in Spanish, however audit mode is in English
+// Variations (% and NO):
+//    87.88% 99
+//    89.63% 02
+//    91.55% 03
+//    94.58% 04
 ROM_START( wamazonv )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -7162,6 +8163,10 @@ ROM_END
 
 // 0100553V / 609 / 4 Credit Multiplier / 25 Credit Multiway
 // Wicked Winnings / Local / B - 01/07/97
+// Variations (% and NO):
+//    87.00% 99
+//    90.00% 02
+//    92.00% 03
 ROM_START( wikwin )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -7183,6 +8188,11 @@ ROM_END
 
 // 0100297V / 543/8 / 3 Credit Multiplier/3 Line Multiline
 // Wild Bill / Local / C - 15/08/96
+// Variations (% and NO):
+//    90.15% 99
+//    87.48% 01
+//    92.23% 02
+//    95.22% 03
 ROM_START( wildbill )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -7201,6 +8211,12 @@ ROM_END
 
 // 0100167V / 569/9 / 20 Credit Multiplier / 9 Line Multiline
 // Wild Cougar / Local / B - 27/2/96
+// Variations (% and NO):
+//    87.836% 99
+//    82.947% 01
+//    85.853% 02
+//    90.167% 03
+//    92.412% 04
 ROM_START( wcougar )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -7222,8 +8238,9 @@ ROM_END
 
 // NHG0296-04 / 569/8 / 10 Credit Multiplier / 9 Line Multiline
 // Wild Cougar / Export / D - 19/05/97
-// All devices are 27c4002 instead of 27c4096
+// All devices are 27C4002 instead of 27C4096
 // No set chips required
+// Variations (% and NO): 92.412% 04
 ROM_START( wcougaru )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -7236,10 +8253,10 @@ ROM_START( wcougaru )
 	    0x0b0d5c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION32_LE( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	ROM_LOAD32_WORD( "nhg029604.u7",  0x000000, 0x80000, CRC(7ada053f) SHA1(5102b0b9db505454624750a3fd6db455682538f3) )
-	ROM_LOAD32_WORD( "nhg029604.u11", 0x000002, 0x80000, CRC(69a78695) SHA1(1ed89cf38dc85f752449a858cd9558bed235af58) )
-	ROM_LOAD32_WORD( "nhg029604.u8",  0x100000, 0x80000, CRC(496b0295) SHA1(237183a192ad9b4bc133014cc83149d4a7062785) )
-	ROM_LOAD32_WORD( "nhg029604.u12", 0x100002, 0x80000, CRC(fe2bafdc) SHA1(e8b454db44a532d75b3aff323855340695688f0f) )
+	ROM_LOAD32_WORD( "nhg029604.u7",  0x000000, 0x80000, CRC(7ada053f) SHA1(5102b0b9db505454624750a3fd6db455682538f3) )  // 92.412%
+	ROM_LOAD32_WORD( "nhg029604.u11", 0x000002, 0x80000, CRC(69a78695) SHA1(1ed89cf38dc85f752449a858cd9558bed235af58) )  // 92.412%
+	ROM_LOAD32_WORD( "nhg029604.u8",  0x100000, 0x80000, CRC(496b0295) SHA1(237183a192ad9b4bc133014cc83149d4a7062785) )  // base
+	ROM_LOAD32_WORD( "nhg029604.u12", 0x100002, 0x80000, CRC(fe2bafdc) SHA1(e8b454db44a532d75b3aff323855340695688f0f) )  // base
 
 	ROM_REGION16_BE( 0x100, "eeprom0", 0 )
 	ROM_LOAD16_WORD_SWAP( "eeprom0", 0x000000, 0x000100, CRC(fea8a821) SHA1(c744cac6af7621524fc3a2b0a9a135a32b33c81b) )
@@ -7257,9 +8274,9 @@ ROM_END
 
 // NHG0296-07 / 569/8 / 10 Credit Multiplier / 9 Line Multiline
 // Wild Cougar / Export / D - 19/05/97
-// Marked 94.982%
 // All devices are 27C4002 instead of 27C4096
 // No set chips required
+// Variations (% and NO): 94.982% 07
 ROM_START( wcougarua )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -7282,8 +8299,8 @@ ROM_END
 
 // NHG0296-99 / 569/8 / 10 Credit Multiplier / 9 Line Multiline
 // Wild Cougar / Export / D - 19/05/97
-// Variation (% and NO): 87,836% 99
 // No set chips required
+// Variations (% and NO): 87.836% 99
 ROM_START( wcougarub )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -7297,8 +8314,8 @@ ROM_START( wcougarub )
 	    0x0b0d5c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION32_LE( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	ROM_LOAD32_WORD( "nhg029699.u7",  0x000000, 0x80000, CRC(cf6465f4) SHA1(ea12ecff7ac4846d09b42480d54bf8cf03ff4c44) )  // 87,836%
-	ROM_LOAD32_WORD( "nhg029699.u11", 0x000002, 0x80000, CRC(fd7aa4a1) SHA1(06e02df1b7ee33dff22ba6fcd46657d84fe8a519) )  // 87,836%
+	ROM_LOAD32_WORD( "nhg029699.u7",  0x000000, 0x80000, CRC(cf6465f4) SHA1(ea12ecff7ac4846d09b42480d54bf8cf03ff4c44) )  // 87.836%
+	ROM_LOAD32_WORD( "nhg029699.u11", 0x000002, 0x80000, CRC(fd7aa4a1) SHA1(06e02df1b7ee33dff22ba6fcd46657d84fe8a519) )  // 87.836%
 	ROM_LOAD32_WORD( "nhg029699.u8",  0x100000, 0x80000, CRC(496b0295) SHA1(237183a192ad9b4bc133014cc83149d4a7062785) )  // base
 	ROM_LOAD32_WORD( "nhg029699.u12", 0x100002, 0x80000, CRC(fe2bafdc) SHA1(e8b454db44a532d75b3aff323855340695688f0f) )  // base
 ROM_END
@@ -7308,7 +8325,14 @@ ROM_END
 // Wild Cougar / Export / B - 13/05/97
 // Marked as SPC.
 // ROM says '5 Line / 10 Credit Multiplier' but this game has 9 lines with a 5, 10 or 20 credit multiplier
-// Requires set chips 4.04.xx
+// Despite the earlier combination date, this is a much later release compared to the other versions
+// Requires set chip version 4.04.xx
+// Variations (% and NO):
+//    87.836% 99
+//    90.167% 03
+//    92.412% 04
+//    94.982% 07
+//    97.313% 08
 ROM_START( wcougaruc )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -7347,6 +8371,10 @@ ROM_END
 // 0200396V / 598/3 / 20 Credit Multiplier / 25 Credit Multiway
 // Wizard Ways / Local / A - 04/11/96
 // ROM says 1996 but game has newer style music and a 1998+ style denomination sign
+// Variations (% and NO):
+//    86.99% 99
+//    89.95% 02
+//    91.99% 03
 ROM_START( wizways )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -7368,6 +8396,13 @@ ROM_END
 
 // 0100337V / 600 / 10 Credit Multiplier/9 Line Multiline
 // Wild Angels / Local / B - 24/09/96
+// Variations (% and NO):
+//    87.70% 99
+//    85.02% 01
+//    90.18% 02
+//    92.10% 03
+//    94.87% 04
+//    97.32% 05
 ROM_START( wldangel )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -7390,6 +8425,7 @@ ROM_END
 // RHG0418-04 / 541/2 / 10 Credit Multiplier / 5 Line Multiline
 // Winning Post / Export / G - 11/02/97
 // No set chips required
+// Variations (% and NO): 92.435% 04
 ROM_START( wnpost )
 	ARISTOCRAT_MK5_USA_SETCHIPS
 	ARISTOCRAT_MK5_GALS
@@ -7412,6 +8448,12 @@ ROM_END
 
 // 0101158V / 608/4 / 3 Credit Multiplier/3 Line Multiline
 // Wild Thing / NSW/ACT / B - 14/12/99
+// Variations (% and NO):
+//    90.15% 99
+//    87.58% 01
+//    92.43% 02
+//    94.84% 03
+//    93.69% 07
 ROM_START( wthing )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -7449,6 +8491,10 @@ ROM_END
 
 // 0200954V / 638/1 / 10 Credit Multiplier / 20 Line Multiline
 // White Tiger Classic / NSW/ACT / B - 08/07/99
+// Variations (% and NO):
+//    87.79% 99
+//    90.02% 01
+//    92.02% 02
 ROM_START( wtiger )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -7467,6 +8513,10 @@ ROM_END
 
 // 03J00191 / JB005/1 / Multi credit / Multi line
 // Yukon Gold / NSW/ACT / A - 30/10/2000
+// Variations (% and NO):
+//    87.93% 99
+//    90.15% 01
+//    92.11% 02
 ROM_START( yukongl5 )
 	ARISTOCRAT_MK5_GALS
 	ARISTOCRAT_MK5_EEPROM
@@ -7519,8 +8569,8 @@ GAMEL( 1998, cashchama,   cashcham, aristmk5,           cashchama,    aristmk5_s
 GAMEL( 1998, cashchamnz,  cashcham, aristmk5,           cashchamnz,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cash Chameleon (0300781V, New Zealand)",               0,                   layout_cashchamnz )      // MV4067, A - 31/08/98, Rev 21
 GAMEL( 1996, cashchamu,   cashcham, aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cash Chameleon (DHG4078-99, US)",                      MACHINE_NOT_WORKING, layout_cashchamu )       // 603(a), B - 06/12/96
 GAMEL( 1997, cashcra5,    aristmk5, aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Cash Crop (0300467V, NSW/ACT)",                        MACHINE_NOT_WORKING, layout_aristmk5 )        // 607, C - 14/07/97, Rev 6
-GAMEL( 1998, chariotc,    aristmk5, aristmk5,           chariotc,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "The Chariot Challenge (0100787V, NSW/ACT)",            MACHINE_NOT_WORKING, layout_aristmk5 )        // 630/1, A - 10/08/98, Rev 11
-GAMEL( 1998, chariotcv,   chariotc, aristmk5,           chariotcv,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "The Chariot Challenge (04J00714, Venezuela)",          MACHINE_NOT_WORKING, layout_snowcat )         // 630, A - 10/08/98, Rev 12
+GAMEL( 1998, chariotc,    aristmk5, aristmk5,           chariotc,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Chariot Challenge (0100787V, NSW/ACT)",                MACHINE_NOT_WORKING, layout_aristmk5 )        // 630/1, A - 10/08/98, Rev 11
+GAMEL( 1998, chariotcv,   chariotc, aristmk5,           chariotcv,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Chariot Challenge (04J00714, Peru?)",                  MACHINE_NOT_WORKING, layout_snowcat )         // 630, A - 10/08/98, Rev 12
 GAMEL( 2001, checkma5,    aristmk5, aristmk5,           checkma5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Checkmate (01J00681, NSW/ACT)",                        MACHINE_NOT_WORKING, layout_checkma5 )        // JB011, B - 06/07/01, Rev 17
 GAMEL( 1996, chickna5,    aristmk5, aristmk5,           chickna5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Chicken (0100351V, NSW/ACT)",                          0,                   layout_snowcat )         // 596, A - 27/08/96, Rev 1.24
 GAMEL( 1998, chickna5u,   chickna5, aristmk5_usa,       chickna5u,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Chicken (RHG0730-03, US)",                             MACHINE_NOT_WORKING, layout_aristmk5_us )     // 596, C - 23/02/98
@@ -7567,7 +8617,8 @@ GAMEL( 2000, incasunu,    incasun,  aristmk5_usa,       dolphntrce,   aristmk5_s
 GAMEL( 2000, incasunua,   incasun,  aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Inca Sun (DHG1577, US)",                               MACHINE_NOT_WORKING, layout_adonisu )         // MV4130, A - 05/09/00
 GAMEL( 1999, incasunv,    incasun,  aristmk5,           incasun,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Inca Sun (01J01946, Venezuela)",                       MACHINE_NOT_WORKING, layout_incasun )         // 631/3 B, B- 03/05/99, Rev 15
 GAMEL( 1998, indrema5,    aristmk5, aristmk5,           indrema5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Indian Dreaming (0100845V, NSW/ACT)",                  MACHINE_NOT_WORKING, layout_indrema5 )        // 628/1, B - 15/12/98, Rev 7
-GAMEL( 1996, jumpjoey,    aristmk5, aristmk5,           cashcham,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Jumpin' Joey (0100383V, NSW/ACT)",                     0,                   layout_cashcham )        // 586/6, C - 13/11/96
+GAMEL( 1996, jumpbean,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Jumping Beans (0100161V, NSW/ACT)",                    0,                   layout_swhr2 )           // 586/2, A - 25/01/96
+GAMEL( 1996, jumpjoey,    aristmk5, aristmk5,           cashcham,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Jumpin' Joeys (0100383V, NSW/ACT)",                    0,                   layout_cashcham )        // 586/6, C - 13/11/96
 GAMEL( 1995, kgalah,      aristmk5, aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "King Galah (0200536V, NSW/ACT)",                       MACHINE_NOT_WORKING, layout_kgalah )          // 613/6, A - 21/07/95
 GAMEL( 1995, kgalaha,     kgalah,   aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "King Galah (0100536V, NSW/ACT)",                       0,                   layout_kgalah )          // 613, A - 21/07/95
 GAMEL( 2001, kgalahce,    kgalah,   aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "King Galah - Cash Express (AHG1625, US)",              MACHINE_NOT_WORKING, layout_adonisu )         // MV4112/2, B - 07/02/01
@@ -7628,7 +8679,7 @@ GAMEL( 1998, petshop,     aristmk5, aristmk5,           petshop,      aristmk5_s
 GAMEL( 1995, phantpay,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Phantom Pays (0500005V, NSW/ACT)",                     0,                   layout_swhr2 )           // 570/1, E - 12/09/95
 GAMEL( 1996, przfight,    aristmk5, aristmk5,           przfight,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Prize Fight (0100299V, NSW/ACT)",                      0,                   layout_przfight )        // 578/4, B - 08/08/96
 GAMEL( 1998, qcash,       aristmk5, aristmk5,           kgalah,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queens of Cash (0100706V, NSW/ACT)",                   MACHINE_NOT_WORKING, layout_kgalah )          // 603/6, C  - 23/07/98, Rev 6
-GAMEL( 1997, qnile,       aristmk5, aristmk5,           qnile,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0300439V, NSW/ACT)",                MACHINE_NOT_WORKING, layout_qnile )           // 602/4, B - 13/05/97, Rev 7
+GAMEL( 2001, qnile,       aristmk5, aristmk5,           qnile,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0300439V, NSW/ACT)",                MACHINE_NOT_WORKING, layout_qnile )           // 602/4, B - 13/05/97, Rev 7
 GAMEL( 1997, qnilea,      qnile,    aristmk5,           qnile,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0200439V, NSW/ACT)",                MACHINE_NOT_WORKING, layout_qnile )           // 602/4, B - 13/05/97, Rev 7
 GAMEL( 1997, qnileb,      qnile,    aristmk5,           qnile,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0100439V, NSW/ACT)",                0,                   layout_qnile )           // 602/4, B - 13/05/97, Rev 1.26.18.1
 GAMEL( 2002, qnilebr,     qnile,    aristmk5,           goldpyrb,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0101707V, Brazil)",                 0,                   layout_goldpyrb )        // MV4162, A - 21/08/02
@@ -7638,7 +8689,7 @@ GAMEL( 2000, qnilenl,     qnile,    aristmk5,           qnilenl,      aristmk5_s
 GAMEL( 1998, qnilenz,     qnile,    aristmk5,           cashcatnz,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (0300785V, New Zealand)",            0,                   layout_cashcatnz )       // MV4068, A - 31/8/98, Rev 20
 GAMEL( 1997, qnileu,      qnile,    aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (GHG4091-02, US)",                   MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4091, B - 13/05/97
 GAMEL( 1997, qnileua,     qnile,    aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (GHG4091-03, US)",                   MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4091, B - 13/05/97
-GAMEL( 1997, qnilev,      qnile,    aristmk5,           aristmk5_9,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (04J00784, Venezuela)",              MACHINE_NOT_WORKING, layout_dolphntrb )       // 602/3, B - 13/05/97, Rev 6
+GAMEL( 1997, qnilev,      qnile,    aristmk5,           aristmk5_9,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile (04J00784, Peru?)",                  MACHINE_NOT_WORKING, layout_dolphntrb )       // 602/3, B - 13/05/97, Rev 6
 GAMEL( 2001, qnilece,     qnile,    aristmk5_usa,       dolphntrce,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Cash Express (AHG1609, US)",       MACHINE_NOT_WORKING, layout_adonisu )         // MV4091/1, A - 17/01/01
 GAMEL( 2001, qnilecea,    qnile,    aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Cash Express (AHG1525, US)",       MACHINE_NOT_WORKING, layout_qnilecea )        // MV4091, F - 17/01/01
 GAMEL( 2001, qnileceb,    qnile,    aristmk5_usa,       dolphntru,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Queen of the Nile - Cash Express (AHG1608, US)",       MACHINE_NOT_WORKING, layout_magimaska )       // MV4091, F - 17/01/01
@@ -7655,6 +8706,7 @@ GAMEL( 2001, sldeluxe,    aristmk5, aristmk5_usa,       bootsctnua,   aristmk5_s
 GAMEL( 1998, slvrwolf,    aristmk5, aristmk5,           wamazona,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Silver Wolf (0100673V, NSW/ACT)",                      MACHINE_NOT_WORKING, layout_wamazona )        // 621/2, A - 23/03/98, Rev 3
 GAMEL( 1996, snowcat,     aristmk5, aristmk5,           snowcat,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Snow Cat (0100405V, NSW/ACT)",                         0,                   layout_snowcat )         // 599, B - 23/12/96, Rev 1.25.1.0
 GAMEL( 1997, sumospin,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Sumo Spins (0200606V, NSW/ACT)",                       MACHINE_NOT_WORKING, layout_swhr2 )           // 622, A - 08/12/97, Rev 4
+GAMEL( 1999, sbuk2,       aristmk5, aristmk5,           sbuk2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Super Bucks II (0400501V, NSW/ACT)",                   MACHINE_NOT_WORKING, layout_sbuk2 )           // 578, G - 26/07/99, Rev 7
 GAMEL( 1998, sbuk3,       aristmk5, aristmk5,           sbuk3,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Super Bucks III (0200711V, NSW/ACT)",                  MACHINE_NOT_WORKING, layout_sbuk3 )           // 626, A - 22/04/98, Rev 8
 GAMEL( 1998, sbuk3a,      sbuk3,    aristmk5,           sbuk3,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Super Bucks III (0100711V, NSW/ACT)",                  MACHINE_NOT_WORKING, layout_sbuk3 )           // 626, A - 22/04/98, Rev 7
 GAMEL( 1995, swhr2,       aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Sweethearts II (0200465V, NSW/ACT)",                   MACHINE_NOT_WORKING, layout_swhr2 )           // 577/1, C - 07/09/95, Rev 3
@@ -7713,8 +8765,6 @@ GAMEL( 1996, blackpnt,    aristmk5, aristmk5,           wildbill,     aristmk5_s
 GAMEL( 1996, canrose,     aristmk5, aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Canyon Rose (AHG1463, US)",                            MACHINE_NOT_WORKING, layout_cashchamu )       // 603(a), B - 06/12/96 (same as Cash Chameleon)
 GAMEL( 2000, diamdest,    aristmk5, aristmk5_usa,       bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Diamond Destiny (AHG1533, US)",                        MACHINE_NOT_WORKING, layout_aristmk5_us_200 ) // MV4115_5, A - 09/05/2000 (same as Magic Mask)
 GAMEL( 2001, fortfvr,     aristmk5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Fortune Fever (BHG1566, US)",                          MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4122/2, A - 13/05/01
-GAMEL( 1996, jumpbean,    aristmk5, aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Jumping Beans (0100161V, NSW/ACT)",                    MACHINE_NOT_WORKING, layout_swhr2 )           // 586/2, A - 25/01/96
-GAMEL( 1999, sbuk2,       aristmk5, aristmk5,           sbuk2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Super Bucks II (0400501V, NSW/ACT)",                   MACHINE_NOT_WORKING, layout_sbuk2 )           // 578, G - 26/07/99, Rev 7
 GAMEL( 2001, wcoyote,     aristmk5, aristmk5_usa,       aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Coyote (AHG1515, US)",                            MACHINE_NOT_WORKING, layout_aristmk5_us )     // MV4134, A - 30/07/01 (same as Loco Loot)
 
 // the following clone sets are known bad dumps, and do not boot (confirmed)
@@ -7729,5 +8779,5 @@ GAMEL( 2001, partygrsb,   partygrs, aristmk5_usa_touch, bootsctnua,   aristmk5_s
 GAMEL( 1995, pengpayd,    pengpay,  aristmk5,           wcougar,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (0300113V, NSW/ACT)",                     MACHINE_NOT_WORKING, layout_wcougar )         // 586, A - 12/10/95, Rev 4
 GAMEL( 1998, petshopa,    petshop,  aristmk5,           snowcat,      aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Pet Shop (0100679V, NSW/ACT)",                         MACHINE_NOT_WORKING, layout_snowcat )         // 618, A - 09/03/98, Rev 10
 GAMEL( 2000, reelrockql,  reelrock, aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Reelin-n-Rockin (0101460V, Queensland)",               MACHINE_NOT_WORKING, layout_trstrove )        // 628/2, E - 20/12/00
-GAMEL( 1995, sbuk2a,      sbuk2,    aristmk5,           sbuk2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Super Bucks II (0300006V, NSW/ACT)",                   MACHINE_NOT_WORKING, layout_sbuk2 )           // no data due to missing ROMs
+GAMEL( 1995, sbuk2a,      sbuk2,    aristmk5,           sbuk2a,       aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Super Bucks II (0300006V, NSW/ACT)",                   MACHINE_NOT_WORKING, layout_sbuk2a )          // no data due to missing ROMs
 GAMEL( 2000, wthinga,     wthing,   aristmk5,           aristmk5,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Wild Thing (0201176V, NSW/ACT)",                       MACHINE_NOT_WORKING, layout_aristmk5 )        // 608/5, B - 25/02/00, Rev 11
