@@ -200,7 +200,7 @@ void asterix_state::sound_map(address_map &map)
 	map(0xf801, 0xf801).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w));
 	map(0xfa00, 0xfa2f).rw("k053260", FUNC(k053260_device::read), FUNC(k053260_device::write));
 	map(0xfc00, 0xfc00).w(FUNC(asterix_state::sound_arm_nmi_w));
-	map(0xfe00, 0xfe00).w("ymsnd", FUNC(ym2151_device::register_w));
+	map(0xfe00, 0xfe00).w("ymsnd", FUNC(ym2151_device::address_w));
 }
 
 

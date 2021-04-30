@@ -4,6 +4,11 @@
 #include "emu.h"
 #include "ymadpcm.h"
 
+#ifdef MAME_EMU_SAVE_H
+#define ADPCM_A_NAME(x) x, "adpcma." #x
+#define ADPCM_B_NAME(x) x, "adpcmb." #x
+#endif
+
 namespace ymfm
 {
 
@@ -312,11 +317,11 @@ void adpcm_a_engine::save_restore(fm_saved_state &state)
 void adpcm_a_engine::register_save(device_t &device)
 {
 	// save register state
-	m_regs.save(device);
+	m_regs.register_save(device);
 
 	// save channel state
 	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
-		m_channel[chnum]->save(device, chnum);
+		m_channel[chnum]->register_save(device);
 }
 #endif
 
@@ -484,15 +489,15 @@ void adpcm_b_channel::save_restore(fm_saved_state &state)
 #ifdef MAME_EMU_SAVE_H
 void adpcm_b_channel::register_save(device_t &device)
 {
-	device.save_item(ADPCM_B_NAME(m_status), index);
-	device.save_item(ADPCM_B_NAME(m_curnibble), index);
-	device.save_item(ADPCM_B_NAME(m_curbyte), index);
-	device.save_item(ADPCM_B_NAME(m_dummy_read), index);
-	device.save_item(ADPCM_B_NAME(m_position), index);
-	device.save_item(ADPCM_B_NAME(m_curaddress), index);
-	device.save_item(ADPCM_B_NAME(m_accumulator), index);
-	device.save_item(ADPCM_B_NAME(m_prev_accum), index);
-	device.save_item(ADPCM_B_NAME(m_adpcm_step), index);
+	device.save_item(ADPCM_B_NAME(m_status));
+	device.save_item(ADPCM_B_NAME(m_curnibble));
+	device.save_item(ADPCM_B_NAME(m_curbyte));
+	device.save_item(ADPCM_B_NAME(m_dummy_read));
+	device.save_item(ADPCM_B_NAME(m_position));
+	device.save_item(ADPCM_B_NAME(m_curaddress));
+	device.save_item(ADPCM_B_NAME(m_accumulator));
+	device.save_item(ADPCM_B_NAME(m_prev_accum));
+	device.save_item(ADPCM_B_NAME(m_adpcm_step));
 }
 #endif
 
@@ -810,11 +815,11 @@ void adpcm_b_engine::save_restore(fm_saved_state &state)
 void adpcm_b_engine::register_save(device_t &device)
 {
 	// save our state
-	m_regs.save(device);
+	m_regs.register_save(device);
 
 	// save channel state
 	for (int chnum = 0; chnum < std::size(m_channel); chnum++)
-		m_channel[chnum]->save(device, chnum);
+		m_channel[chnum]->register_save(device);
 }
 #endif
 

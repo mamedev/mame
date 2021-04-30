@@ -1208,6 +1208,28 @@ if (SOUNDS["YM2414"]~=null) then
 	}
 end
 
+if (SOUNDS["YM2203"]~=null or SOUNDS["YM2608"]~=null or SOUNDS["YM2610"]~=null or SOUNDS["YM2610B"]~=null or SOUNDS["YM2612"]~=null or SOUNDS["YM3438"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/ay8910.cpp",
+		MAME_DIR .. "src/devices/sound/ay8910.h",
+		MAME_DIR .. "src/devices/sound/ym2203.cpp",
+		MAME_DIR .. "src/devices/sound/ym2203.h",
+		MAME_DIR .. "src/devices/sound/ym2608.cpp",
+		MAME_DIR .. "src/devices/sound/ym2608.h",
+		MAME_DIR .. "src/devices/sound/ym2610.cpp",
+		MAME_DIR .. "src/devices/sound/ym2610.h",
+		MAME_DIR .. "src/devices/sound/ym2612.cpp",
+		MAME_DIR .. "src/devices/sound/ym2612.h",
+		MAME_DIR .. "src/devices/sound/ymadpcm.cpp",
+		MAME_DIR .. "src/devices/sound/ymadpcm.h",
+		MAME_DIR .. "src/devices/sound/ymfm.cpp",
+		MAME_DIR .. "src/devices/sound/ymfm.h",
+		MAME_DIR .. "src/devices/sound/ymfm.ipp",
+		MAME_DIR .. "src/devices/sound/ymfm_opn.cpp",
+		MAME_DIR .. "src/devices/sound/ymfm_opn.h",
+	}
+end
+
 if (SOUNDS["YM2413"]~=null or SOUNDS["YM2423"]~=null or SOUNDS["YMF281"]~=null or SOUNDS["DS1001"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/ym2413.cpp",
@@ -1215,55 +1237,6 @@ if (SOUNDS["YM2413"]~=null or SOUNDS["YM2423"]~=null or SOUNDS["YMF281"]~=null o
 		MAME_DIR .. "src/devices/sound/ymfm.cpp",
 		MAME_DIR .. "src/devices/sound/ymfm.h",
 	}
-end
-
-if (SOUNDS["YM2203"]~=null or SOUNDS["YM2608"]~=null or SOUNDS["YM2610"]~=null or SOUNDS["YM2610B"]~=null or SOUNDS["YM2612"]~=null or SOUNDS["YM3438"]~=null) then
---if (SOUNDS["YM2203"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/ay8910.cpp",
-		MAME_DIR .. "src/devices/sound/ay8910.h",
-		MAME_DIR .. "src/devices/sound/ym2203.cpp",
-		MAME_DIR .. "src/devices/sound/ym2203.h",
-		MAME_DIR .. "src/devices/sound/ymfm.cpp",
-		MAME_DIR .. "src/devices/sound/ymfm.h",
-	}
---end
-
-
---if (SOUNDS["YM2608"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/ay8910.cpp",
-		MAME_DIR .. "src/devices/sound/ay8910.h",
-		MAME_DIR .. "src/devices/sound/ym2608.cpp",
-		MAME_DIR .. "src/devices/sound/ym2608.h",
-		MAME_DIR .. "src/devices/sound/ymadpcm.cpp",
-		MAME_DIR .. "src/devices/sound/ymadpcm.h",
-		MAME_DIR .. "src/devices/sound/ymfm.cpp",
-		MAME_DIR .. "src/devices/sound/ymfm.h",
-	}
---end
-
---if (SOUNDS["YM2610"]~=null or SOUNDS["YM2610B"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/ay8910.cpp",
-		MAME_DIR .. "src/devices/sound/ay8910.h",
-		MAME_DIR .. "src/devices/sound/ym2610.cpp",
-		MAME_DIR .. "src/devices/sound/ym2610.h",
-		MAME_DIR .. "src/devices/sound/ymadpcm.cpp",
-		MAME_DIR .. "src/devices/sound/ymadpcm.h",
-		MAME_DIR .. "src/devices/sound/ymfm.cpp",
-		MAME_DIR .. "src/devices/sound/ymfm.h",
-	}
---end
-
---if (SOUNDS["YM2612"]~=null or SOUNDS["YM3438"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/ym2612.cpp",
-		MAME_DIR .. "src/devices/sound/ym2612.h",
-		MAME_DIR .. "src/devices/sound/ymfm.cpp",
-		MAME_DIR .. "src/devices/sound/ymfm.h",
-	}
---end
 end
 
 if (SOUNDS["YM3812"]~=null or SOUNDS["YM3526"]~=null or SOUNDS["Y8950"]~=null) then

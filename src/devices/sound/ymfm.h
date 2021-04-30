@@ -19,12 +19,12 @@ namespace ymfm
 
 enum envelope_state : uint32_t
 {
-	EG_DEPRESS = 0,		// OPLL only
+	EG_DEPRESS = 0,		// OPLL only; set EG_HAS_DEPRESS to enable
 	EG_ATTACK = 1,
 	EG_DECAY = 2,
 	EG_SUSTAIN = 3,
 	EG_RELEASE = 4,
-	EG_REVERB = 5,		// OPZ only
+	EG_REVERB = 5,		// OPZ only; set EG_HAS_REVERB to enable
 	EG_STATES = 6
 };
 
@@ -37,7 +37,7 @@ enum envelope_state : uint32_t
 template<class RegisterType> class fm_engine_base;
 
 
-// ======================> fm_serialize_buffer
+// ======================> fm_saved_state
 
 // this class contains a managed vector of bytes that is used to
 // save and restore state
@@ -108,13 +108,13 @@ class fm_engine_callbacks
 {
 public:
 	// timer callback; called by the interface when a timer fires
-	virtual void intf_timer_expired(uint32_t tnum) = 0;
+	virtual void engine_timer_expired(uint32_t tnum) = 0;
 
 	// check interrupts; called by the interface after synchronization
-	virtual void intf_check_interrupts() = 0;
+	virtual void engine_check_interrupts() = 0;
 
 	// mode register write; called by the interface after synchronization
-	virtual void intf_mode_write(uint8_t data) = 0;
+	virtual void engine_mode_write(uint8_t data) = 0;
 };
 
 
@@ -147,36 +147,43 @@ public:
 	// the engine calls this to schedule a synchronized write to the mode
 	// register with the provided data; in response, the interface should
 	// clock through any unprocessed stream data and then call the
-	// m_callbacks->intf_mode_write() method with the provided data
-	virtual void synchronized_mode_write(uint8_t data) { m_callbacks->intf_mode_write(data); }
+	// m_callbacks->engine_mode_write() method with the provided data
+	virtual void ymfm_sync_mode_write(uint8_t data) { m_engine->engine_mode_write(data); }
 
 	// the engine calls this to schedule a synchronized interrupt check;
 	// in response, the interface should clock through any unprocessed
-	// stream data and then call the m_callbacks->intf_check_interrupts() method
-	virtual void synchronized_check_interrupts() { m_callbacks->intf_check_interrupts(); }
+	// stream data and then call the m_callbacks->engine_check_interrupts() method
+	virtual void ymfm_sync_check_interrupts() { m_engine->engine_check_interrupts(); }
 
 	// the engine calls this to set one of two timers which should fire after
 	// the given number of clocks; when the timer fires, it must call the
 	// m_callbacks->intf_timer_handler() method; a duration_in_clocks that is
 	// negative means to disable the timer
-	virtual void set_timer(uint32_t tnum, int32_t duration_in_clocks) { }
+	virtual void ymfm_set_timer(uint32_t tnum, int32_t duration_in_clocks) { }
 
 	// the engine calls this to set the time when the busy signal will next
 	// be dropped, which is the current time plus the given number of clocks
-	virtual void set_busy_end(uint32_t clocks) { }
+	virtual void ymfm_set_busy_end(uint32_t clocks) { }
 
 	// the engine calls this to query whether the current time is before the
 	// last set end-of-busy time
-	virtual bool is_busy() { return false; }
+	virtual bool ymfm_is_busy() { return false; }
 
 	// the engine calls this when the external IRQ state changes; in
 	// response, the interface should perform any IRQ signaling that needs
 	// to happen as a result
-	virtual void update_irq(bool asserted) { }
+	virtual void ymfm_update_irq(bool asserted) { }
 
-	// the engine calls this when a write to an output port is issued; only
-	// the OPM supports this at this time
-	virtual void output_port(uint8_t data) { }
+	// the engine calls this when the clock prescale factor changes; this means
+	// that the output frequency will be affected, and the output sample rate
+	// needs to be recomputed
+	virtual void ymfm_prescale_changed() { }
+
+	// the engine calls this when a write to an output port is issued
+	virtual void ymfm_io_write(uint8_t port, uint8_t data) { }
+
+	// the engine calls this when a read from an input port is issued
+	virtual uint8_t ymfm_io_read(uint8_t port) { return 0; }
 
 	// the engine calls this to read data for the ADPCM-A engine
 	virtual uint8_t adpcm_a_read(uint32_t offset) { return 0; }
@@ -188,7 +195,37 @@ public:
 protected:
 	// pointer to engine callbacks -- this is set direclty by the engine at
 	// construction time
-	fm_engine_callbacks *m_callbacks;
+	fm_engine_callbacks *m_engine;
+};
+
+
+// ======================> ssg_interface
+
+// this class represents an interface to an external SSG implementation; MAME
+// makes use of this for incorporating its own AY-8910 implementation
+class ssg_interface
+{
+public:
+	static constexpr uint32_t OUTPUTS = 3;
+
+	// default reset implementation
+	virtual void ssg_reset() { }
+
+	// save/restore
+	virtual void ssg_save_restore(fm_saved_state &state) { }
+#ifdef MAME_EMU_SAVE_H
+	virtual void ssg_register_save(device_t &device) { }
+#endif
+
+	// default prescale changer (SSG clock is 2*clock/clock_divider)
+	virtual void ssg_set_clock_prescale(uint8_t clock_divider) { }
+
+	// default register read/write implementation
+	virtual uint8_t ssg_read(uint8_t offset) { return 0; }
+	virtual void ssg_write(uint8_t offset, uint8_t data) { }
+
+	// default single sample generator
+	virtual void ssg_generate(int32_t output[OUTPUTS]) { }
 };
 
 
@@ -635,18 +672,18 @@ public:
 	uint8_t set_reset_status(uint8_t set, uint8_t reset)
 	{
 		m_status = (m_status | set) & ~(reset | STATUS_BUSY);
-		m_intf.synchronized_check_interrupts();
+		m_intf.ymfm_sync_check_interrupts();
 		return m_status;
 	}
 
 	// set the IRQ mask
-	void set_irq_mask(uint8_t mask) { m_irq_mask = mask; m_intf.synchronized_check_interrupts(); }
+	void set_irq_mask(uint8_t mask) { m_irq_mask = mask; m_intf.ymfm_sync_check_interrupts(); }
 
 	// return the current clock prescale
 	uint32_t clock_prescale() const { return m_clock_prescale; }
 
 	// set prescale factor (2/3/6)
-	void set_clock_prescale(uint32_t prescale) { m_clock_prescale = prescale; }
+	void set_clock_prescale(uint32_t prescale) { m_clock_prescale = prescale; m_intf.ymfm_prescale_changed(); }
 
 	// compute sample rate
 	uint32_t sample_rate(uint32_t baseclock) const { return baseclock / (m_clock_prescale * OPERATORS); }
@@ -661,13 +698,13 @@ public:
 	void invalidate_caches() { m_modified_channels = RegisterType::ALL_CHANNELS; }
 
 	// timer callback; called by the interface when a timer fires
-	virtual void intf_timer_expired(uint32_t tnum) override;
+	virtual void engine_timer_expired(uint32_t tnum) override;
 
 	// check interrupts; called by the interface after synchronization
-	virtual void intf_check_interrupts() override;
+	virtual void engine_check_interrupts() override;
 
 	// mode register write; called by the interface after synchronization
-	virtual void intf_mode_write(uint8_t data) override;
+	virtual void engine_mode_write(uint8_t data) override;
 
 protected:
 	// assign the current set of operators to channels
@@ -692,129 +729,6 @@ protected:
 	std::unique_ptr<fm_operator<RegisterType>> m_operator[OPERATORS]; // operator pointers
 };
 
-
 }
-
-
-
-// ======================> mame_fm_interface
-
-// this class abstracts out system-dependent behaviors and interfaces
-#ifdef MAME_EMU_SAVE_H
-
-//*********************************************************
-//  MACROS
-//*********************************************************
-
-// special naming helper to keep our namespace isolated from other
-// same-named objects in the device's namespace (mostly necessary
-// for chips which derive from AY-8910 classes and may have clashing
-// names)
-#define YMFM_NAME(x) x, "ymfm." #x
-#define ADPCM_A_NAME(x) x, "adpcma." #x
-#define ADPCM_B_NAME(x) x, "adpcmb." #x
-
-class mame_fm_interface : public ymfm::fm_interface
-{
-public:
-	// construction
-	mame_fm_interface(device_t &device) :
-		m_device(device),
-		m_update_irq(device),
-		m_output_port(device)
-	{
-	}
-
-	// startup; this is not called by the engine, but by the owner of the
-	// interface, at device_start time
-	void start()
-	{
-		// allocate our timers
-		for (int tnum = 0; tnum < 2; tnum++)
-			m_timer[tnum] = m_device.machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mame_fm_interface::timer_handler), this));
-
-		// resolve the IRQ handler while we're here
-		m_update_irq.resolve();
-		m_output_port.resolve_safe();
-	}
-
-	// configuration helpers
-	auto update_irq_handler() { return m_update_irq.bind(); }
-	auto output_port_handler() { return m_output_port.bind(); }
-
-	virtual void synchronized_mode_write(uint8_t data) override
-	{
-		m_device.machine().scheduler().synchronize(timer_expired_delegate(FUNC(mame_fm_interface::mode_write), this), data);
-	}
-
-	virtual void synchronized_check_interrupts() override
-	{
-		// if we're currently executing a CPU, schedule the interrupt check;
-		// otherwise, do it directly
-		auto &scheduler = m_device.machine().scheduler();
-		if (scheduler.currently_executing())
-			scheduler.synchronize(timer_expired_delegate(FUNC(mame_fm_interface::check_interrupts), this));
-		else
-			m_callbacks->intf_check_interrupts();
-	}
-
-	virtual void set_timer(uint32_t tnum, int32_t duration_in_clocks) override
-	{
-		if (duration_in_clocks >= 0)
-			m_timer[tnum]->adjust(attotime::from_ticks(duration_in_clocks, m_device.clock()), tnum);
-		else
-			m_timer[tnum]->enable(false);
-	}
-
-	virtual void set_busy_end(uint32_t clocks) override
-	{
-		m_busy_end = m_device.machine().time() + attotime::from_ticks(clocks, m_device.clock());
-	}
-
-	virtual bool is_busy() override
-	{
-		return (m_device.machine().time() < m_busy_end);
-	}
-
-	virtual void update_irq(bool asserted) override
-	{
-		if (!m_update_irq.isnull())
-			m_update_irq(asserted ? ASSERT_LINE : CLEAR_LINE);
-	}
-
-	virtual void output_port(uint8_t data) override
-	{
-		if (!m_output_port.isnull())
-			m_output_port(data);
-	}
-
-	template<typename T>
-	void save_item(T &item, char const *name, int index = 0)
-	{
-		m_device.save_item(item, name, index);
-	}
-
-	template<typename... Params>
-	void log(char const *fmt, Params &&... args)
-	{
-//		LOG("%s: ", m_device.tag());
-//		LOG(fmt, std::forward<Params>(args)...);
-	}
-
-private:
-	// timer callbacks
-	void timer_handler(void *ptr, int param) { m_callbacks->intf_timer_expired(param); }
-	void mode_write(void *ptr, int param) { m_callbacks->intf_mode_write(param); }
-	void check_interrupts(void *ptr, int param) { m_callbacks->intf_check_interrupts(); }
-
-	// internal state
-	device_t &m_device;
-	attotime m_busy_end;
-	emu_timer *m_timer[2];
-	devcb_write_line m_update_irq;
-	devcb_write8 m_output_port;
-};
-#endif
-
 
 #endif // MAME_SOUND_YMFM_H

@@ -383,6 +383,7 @@ std::string opm_registers::log_keyon(uint32_t choffs, uint32_t opoffs)
 }
 
 
+
 //*********************************************************
 //  YM2151
 //*********************************************************
@@ -442,7 +443,7 @@ void ym2151::register_save(device_t &device)
 uint8_t ym2151::read_status()
 {
 	uint8_t result = m_fm.status();
-	if (m_fm.intf().is_busy())
+	if (m_fm.intf().ymfm_is_busy())
 		result |= fm_engine::STATUS_BUSY;
 	return result;
 }
@@ -495,11 +496,11 @@ void ym2151::write_data(uint8_t data)
 	if (m_address == 0x1b)
 	{
 		// writes to register 0x1B send the upper 2 bits to the output lines
-		m_fm.intf().output_port(data >> 6);
+		m_fm.intf().ymfm_io_write(0, data >> 6);
 	}
 
 	// mark busy for a bit
-	m_fm.intf().set_busy_end(32 * m_fm.clock_prescale());
+	m_fm.intf().ymfm_set_busy_end(32 * m_fm.clock_prescale());
 }
 
 
@@ -533,6 +534,8 @@ void ym2151::generate(int32_t output[fm_engine::OUTPUTS])
 	m_fm.clock(fm_engine::ALL_CHANNELS);
 
 	// update the FM content; YM2151 is full 14-bit with no intermediate clipping
+	for (int index = 0; index < fm_engine::OUTPUTS; index++)
+		output[index] = 0;
 	m_fm.output(output, 0, 32767, fm_engine::ALL_CHANNELS);
 
 	// convert to 10.3 floating point value for the DAC and back

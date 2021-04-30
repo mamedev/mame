@@ -50,7 +50,7 @@ uint8_t md_base_state::megadriv_68k_YM2612_read(offs_t offset, uint8_t mem_mask)
 	//osd_printf_debug("megadriv_68k_YM2612_read %02x %04x\n",offset,mem_mask);
 	if ((m_genz80.z80_has_bus == 0) && (m_genz80.z80_is_reset == 0))
 	{
-		return m_ymsnd->read(offset);
+		return ymsnd_read(offset);
 	}
 	else
 	{
@@ -68,7 +68,7 @@ void md_base_state::megadriv_68k_YM2612_write(offs_t offset, uint8_t data, uint8
 	//osd_printf_debug("megadriv_68k_YM2612_write %02x %04x %04x\n",offset,data,mem_mask);
 	if ((m_genz80.z80_has_bus == 0) && (m_genz80.z80_is_reset == 0))
 	{
-		m_ymsnd->write(offset, data);
+		ymsnd_write(offset, data);
 	}
 	else
 	{
@@ -568,7 +568,10 @@ TIMER_CALLBACK_MEMBER(md_base_state::megadriv_z80_run_state)
 	{
 		m_z80snd->reset();
 		m_z80snd->suspend(SUSPEND_REASON_HALT, 1);
-		m_ymsnd->reset();
+		if (m_ymsnd_2612)
+			m_ymsnd_2612->reset();
+		if (m_ymsnd_3438)
+			m_ymsnd_3438->reset();
 	}
 	else
 	{
@@ -738,10 +741,28 @@ uint8_t md_base_state::megadriv_z80_unmapped_read()
 	return 0xff;
 }
 
+uint8_t md_base_state::ymsnd_read(offs_t offset)
+{
+	if (m_ymsnd_2612)
+		return m_ymsnd_2612->read(offset);
+	else if (m_ymsnd_3438)
+		return m_ymsnd_3438->read(offset);
+	else
+		return 0xff;
+}
+
+void md_base_state::ymsnd_write(offs_t offset, uint8_t data)
+{
+	if (m_ymsnd_2612)
+		m_ymsnd_2612->write(offset, data);
+	else if (m_ymsnd_3438)
+		m_ymsnd_3438->write(offset, data);
+}
+
 void md_base_state::megadriv_z80_map(address_map &map)
 {
 	map(0x0000, 0x1fff).bankrw("bank1").mirror(0x2000); // RAM can be accessed by the 68k
-	map(0x4000, 0x4003).rw(m_ymsnd, FUNC(ym2612_device::read), FUNC(ym2612_device::write));
+	map(0x4000, 0x4003).rw(FUNC(md_base_state::ymsnd_read), FUNC(md_base_state::ymsnd_write));
 
 	map(0x6000, 0x6000).w(FUNC(md_base_state::megadriv_z80_z80_bank_w));
 	map(0x6001, 0x6001).w(FUNC(md_base_state::megadriv_z80_z80_bank_w)); // wacky races uses this address
@@ -896,7 +917,7 @@ void md_base_state::megadriv_timers(machine_config &config)
 }
 
 
-void md_base_state::md_ntsc(machine_config &config)
+void md_base_state::md_ntsc(machine_config &config, bool ym3438)
 {
 	M68000(config, m_maincpu, MASTER_CLOCK_NTSC / 7); /* 7.67 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_map);
@@ -933,31 +954,36 @@ void md_base_state::md_ntsc(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2612(config, m_ymsnd, MASTER_CLOCK_NTSC/7); /* 7.67 MHz */
-	m_ymsnd->add_route(0, "lspeaker", 0.50);
-	m_ymsnd->add_route(1, "rspeaker", 0.50);
+	if (!ym3438)
+	{
+		YM2612(config, m_ymsnd_2612, MASTER_CLOCK_NTSC/7); /* 7.67 MHz */
+		m_ymsnd_2612->add_route(0, "lspeaker", 0.50);
+		m_ymsnd_2612->add_route(1, "rspeaker", 0.50);
+	}
+	else
+	{
+		YM3438(config, m_ymsnd_3438, MASTER_CLOCK_NTSC/7); /* 7.67 MHz */
+		m_ymsnd_3438->add_route(0, "lspeaker", 0.50);
+		m_ymsnd_3438->add_route(1, "rspeaker", 0.50);
+	}
 }
 
 void md_base_state::md2_ntsc(machine_config &config)
 {
-	md_ntsc(config);
-
 	// Internalized YM3438 in VDP ASIC
-	YM3438(config.replace(), m_ymsnd, MASTER_CLOCK_NTSC/7); /* 7.67 MHz */
-	m_ymsnd->add_route(0, "lspeaker", 0.50);
-	m_ymsnd->add_route(1, "rspeaker", 0.50);
+	md_ntsc(config, true);
 }
 
 void md_cons_state::dcat16_megadriv_base(machine_config &config)
 {
-	md_ntsc(config);
+	md_ntsc(config, false);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &md_base_state::dcat16_megadriv_map);
 }
 
 /************ PAL hardware has a different master clock *************/
 
-void md_base_state::md_pal(machine_config &config)
+void md_base_state::md_pal(machine_config &config, bool ym3438)
 {
 	M68000(config, m_maincpu, MASTER_CLOCK_PAL / 7); /* 7.67 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_map);
@@ -993,19 +1019,24 @@ void md_base_state::md_pal(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2612(config, m_ymsnd, MASTER_CLOCK_PAL / 7); /* 7.67 MHz */
-	m_ymsnd->add_route(0, "lspeaker", 0.50);
-	m_ymsnd->add_route(1, "rspeaker", 0.50);
+	if (!ym3438)
+	{
+		YM2612(config, m_ymsnd_2612, MASTER_CLOCK_PAL/7); /* 7.67 MHz */
+		m_ymsnd_2612->add_route(0, "lspeaker", 0.50);
+		m_ymsnd_2612->add_route(1, "rspeaker", 0.50);
+	}
+	else
+	{
+		YM3438(config, m_ymsnd_3438, MASTER_CLOCK_PAL/7); /* 7.67 MHz */
+		m_ymsnd_3438->add_route(0, "lspeaker", 0.50);
+		m_ymsnd_3438->add_route(1, "rspeaker", 0.50);
+	}
 }
 
 void md_base_state::md2_pal(machine_config &config)
 {
-	md_pal(config);
-
 	// Internalized YM3438 in VDP ASIC
-	YM3438(config.replace(), m_ymsnd, MASTER_CLOCK_PAL / 7); /* 7.67 MHz */
-	m_ymsnd->add_route(0, "lspeaker", 0.50);
-	m_ymsnd->add_route(1, "rspeaker", 0.50);
+	md_pal(config, true);
 }
 
 

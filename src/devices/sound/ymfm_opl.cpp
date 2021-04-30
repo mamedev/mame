@@ -66,8 +66,7 @@ void opn_registers_base<IsOpnA>::save_restore(fm_saved_state &state)
 //-------------------------------------------------
 
 #ifdef MAME_EMU_SAVE_H
-template<bool IsOpnA>
-void opn_registers_base<IsOpnA>::register_save(device_t &device)
+void opn_registers::register_save(device_t &device)
 {
 	if (IsOpnA)
 	{
@@ -575,7 +574,7 @@ void ym2203::write_data(uint8_t data)
 	}
 
 	// mark busy for a bit
-	m_fm.intf().ymfm_set_busy_end(32 * m_fm.clock_prescale());
+	m_fm.intf().set_busy_end(32 * m_fm.clock_prescale());
 }
 
 
@@ -609,8 +608,6 @@ void ym2203::generate(int32_t output[fm_engine::OUTPUTS])
 	m_fm.clock(fm_engine::ALL_CHANNELS);
 
 	// update the FM content; YM2151 is full 14-bit with no intermediate clipping
-	for (int index = 0; index < fm_engine::OUTPUTS; index++)
-		output[index] = 0;
 	m_fm.output(output, 0, 32767, fm_engine::ALL_CHANNELS);
 
 	// convert to 10.3 floating point value for the DAC and back
@@ -900,7 +897,7 @@ void ym2608::write_data(uint8_t data)
 	}
 
 	// mark busy for a bit
-	m_fm.intf().ymfm_set_busy_end(32 * m_fm.clock_prescale());
+	m_fm.intf().set_busy_end(32 * m_fm.clock_prescale());
 }
 
 
@@ -950,7 +947,7 @@ void ym2608::write_data_hi(uint8_t data)
 	}
 
 	// mark busy for a bit
-	m_fm.intf().ymfm_set_busy_end(32 * m_fm.clock_prescale());
+	m_fm.intf().set_busy_end(32 * m_fm.clock_prescale());
 }
 
 
@@ -1250,7 +1247,7 @@ void ym2610::write_data(uint8_t data)
 	}
 
 	// mark busy for a bit
-	m_fm.intf().ymfm_set_busy_end(32 * m_fm.clock_prescale());
+	m_fm.intf().set_busy_end(32 * m_fm.clock_prescale());
 }
 
 
@@ -1289,7 +1286,7 @@ void ym2610::write_data_hi(uint8_t data)
 	}
 
 	// mark busy for a bit
-	m_fm.intf().ymfm_set_busy_end(32 * m_fm.clock_prescale());
+	m_fm.intf().set_busy_end(32 * m_fm.clock_prescale());
 }
 
 
@@ -1489,7 +1486,7 @@ void ym2612::write_data(uint8_t data)
 	}
 
 	// mark busy for a bit
-	m_fm.intf().ymfm_set_busy_end(32 * m_fm.clock_prescale());
+	m_fm.intf().set_busy_end(32 * m_fm.clock_prescale());
 }
 
 
@@ -1520,7 +1517,7 @@ void ym2612::write_data_hi(uint8_t data)
 	m_fm.write(m_address, data);
 
 	// mark busy for a bit
-	m_fm.intf().ymfm_set_busy_end(32 * m_fm.clock_prescale());
+	m_fm.intf().set_busy_end(32 * m_fm.clock_prescale());
 }
 
 

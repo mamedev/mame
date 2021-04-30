@@ -2,6 +2,7 @@
 // copyright-holders:Aaron Giles
 
 #ifdef MAME_EMU_SAVE_H
+#include "ymfm_mame.h"
 ALLOW_SAVE_TYPE(ymfm::envelope_state);
 #endif
 
@@ -1178,7 +1179,7 @@ fm_engine_base<RegisterType>::fm_engine_base(fm_interface &intf) :
 	m_prepare_count(0)
 {
 	// inform the interface of their engine
-	m_intf.m_callbacks = this;
+	m_intf.m_engine = this;
 
 	// create the channels
 	for (int chnum = 0; chnum < CHANNELS; chnum++)
@@ -1398,7 +1399,7 @@ void fm_engine_base<RegisterType>::write(uint16_t regnum, uint8_t data)
 	// schedule these writes to ensure ordering with timers
 	if (regnum == RegisterType::REG_MODE)
 	{
-		m_intf.synchronized_mode_write(data);
+		m_intf.ymfm_sync_mode_write(data);
 		return;
 	}
 
@@ -1485,26 +1486,26 @@ void fm_engine_base<RegisterType>::update_timer(uint32_t tnum, uint32_t enable)
 		uint32_t period = (tnum == 0) ? (1024 - m_regs.timer_a_value()) : 16 * (256 - m_regs.timer_b_value());
 
 		// reset it
-		m_intf.set_timer(tnum, period * OPERATORS * m_clock_prescale);
+		m_intf.ymfm_set_timer(tnum, period * OPERATORS * m_clock_prescale);
 		m_timer_running[tnum] = 1;
 	}
 
 	// if the timer is not live, ensure it is not enabled
 	else if (!enable)
 	{
-		m_intf.set_timer(tnum, -1);
+		m_intf.ymfm_set_timer(tnum, -1);
 		m_timer_running[tnum] = 0;
 	}
 }
 
 
 //-------------------------------------------------
-//  intf_timer_expired - timer has expired - signal
+//  engine_timer_expired - timer has expired - signal
 //  status and possibly IRQs
 //-------------------------------------------------
 
 template<class RegisterType>
-void fm_engine_base<RegisterType>::intf_timer_expired(uint32_t tnum)
+void fm_engine_base<RegisterType>::engine_timer_expired(uint32_t tnum)
 {
 	// update status
 	if (tnum == 0 && m_regs.enable_timer_a())
@@ -1530,7 +1531,7 @@ void fm_engine_base<RegisterType>::intf_timer_expired(uint32_t tnum)
 //-------------------------------------------------
 
 template<class RegisterType>
-void fm_engine_base<RegisterType>::intf_check_interrupts()
+void fm_engine_base<RegisterType>::engine_check_interrupts()
 {
 	// update the state
 	uint8_t old_state = m_irq_state;
@@ -1544,17 +1545,17 @@ void fm_engine_base<RegisterType>::intf_check_interrupts()
 
 	// if changed, signal the new state
 	if (old_state != m_irq_state)
-		m_intf.update_irq(m_irq_state ? true : false);
+		m_intf.ymfm_update_irq(m_irq_state ? true : false);
 }
 
 
 //-------------------------------------------------
-//  intf_mode_write - handle a mode register write
+//  engine_mode_write - handle a mode register write
 //  via timer callback
 //-------------------------------------------------
 
 template<class RegisterType>
-void fm_engine_base<RegisterType>::intf_mode_write(uint8_t data)
+void fm_engine_base<RegisterType>::engine_mode_write(uint8_t data)
 {
 	// mark all channels as modified
 	m_modified_channels = ALL_CHANNELS;

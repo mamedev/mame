@@ -16,36 +16,6 @@ namespace ymfm
 //  SSG ENGINE
 //*********************************************************
 
-// ======================> ssg_interface
-
-// this class represents an interface to an external SSG implementation; MAME
-// makes use of this for incorporating its own AY-8910 implementation
-class ssg_interface
-{
-public:
-	static constexpr uint32_t OUTPUTS = 3;
-
-	// default reset implementation
-	virtual void reset() { }
-
-	// save/restore
-	virtual void save_restore(fm_saved_state &state) { }
-#ifdef MAME_EMU_SAVE_H
-	virtual void register_save(device_t &device) { }
-#endif
-
-	// default prescale changer (SSG clock is 2*clock/clock_divider)
-	virtual void set_clock_prescale(uint8_t clock_divider) { }
-
-	// default register read/write implementation
-	virtual uint8_t read(uint8_t offset) { return 0; }
-	virtual void write(uint8_t offset, uint8_t data) { }
-
-	// default single sample generator
-	virtual void generate(int32_t output[OUTPUTS]) { }
-};
-
-
 // ======================> ssg_engine
 
 // this class represents a built-in overridable SSG implementation; at this
@@ -61,25 +31,25 @@ public:
 	ssg_engine(ssg_interface &intf) : m_intf(intf) { }
 
 	// reset
-	void reset() { m_intf.reset(); }
+	void reset() { m_intf.ssg_reset(); }
 
 	// save/restore
-	void save_restore(fm_saved_state &state) { m_intf.save_restore(state); }
+	void save_restore(fm_saved_state &state) { m_intf.ssg_save_restore(state); }
 #ifdef MAME_EMU_SAVE_H
-	void register_save(device_t &device) { m_intf.register_save(device); }
+	void register_save(device_t &device) { m_intf.ssg_register_save(device); }
 #endif
 
 	// set the clock prescale value
-	void set_clock_prescale(uint8_t clock_divider) { m_intf.set_clock_prescale(clock_divider); }
+	void set_clock_prescale(uint8_t clock_divider) { m_intf.ssg_set_clock_prescale(clock_divider); }
 
 	// read access
-	uint8_t read(uint8_t offset) { return m_intf.read(offset); }
+	uint8_t read(uint8_t offset) { return m_intf.ssg_read(offset); }
 
 	// write access
-	void write(uint8_t offset, uint8_t data) { m_intf.write(offset, data); }
+	void write(uint8_t offset, uint8_t data) { m_intf.ssg_write(offset, data); }
 
 	// generate one sample
-	void generate(int32_t output[OUTPUTS]) { m_intf.generate(output); }
+	void generate(int32_t output[OUTPUTS]) { m_intf.ssg_generate(output); }
 
 private:
 	// internal state
@@ -371,7 +341,7 @@ class ym2608
 	static constexpr uint8_t STATUS_ADPCM_B_PLAYING = 0x20;
 
 public:
-	using fm_engine = fm_engine_base<opn_registers>;
+	using fm_engine = fm_engine_base<opna_registers>;
 	static constexpr uint32_t OUTPUTS = fm_engine::OUTPUTS;
 	static constexpr uint32_t SSG_OUTPUTS = ssg_engine::OUTPUTS;
 
@@ -431,8 +401,9 @@ protected:
 class ym2610
 {
 public:
-	using fm_engine = fm_engine_base<opn_registers>;
+	using fm_engine = fm_engine_base<opna_registers>;
 	static constexpr uint32_t OUTPUTS = fm_engine::OUTPUTS;
+	static constexpr uint32_t SSG_OUTPUTS = ssg_engine::OUTPUTS;
 
 	// constructor
 	ym2610(fm_interface &intf, uint8_t channel_mask = 0x36);
@@ -495,7 +466,7 @@ public:
 class ym2612
 {
 public:
-	using fm_engine = fm_engine_base<opn_registers>;
+	using fm_engine = fm_engine_base<opna_registers>;
 	static constexpr uint32_t OUTPUTS = fm_engine::OUTPUTS;
 
 	// constructor

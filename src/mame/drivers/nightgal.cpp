@@ -451,9 +451,9 @@ void nightgal_state::sgaltrop_io(address_map &map)
 	common_sexygal_io(map);
 
 	// not actually a YM2203?
-	map(0x01, 0x01).r("ymsnd", FUNC(ym2203_device::read_port_r));
-	map(0x02, 0x02).w("ymsnd", FUNC(ym2203_device::write_port_w));
-	map(0x03, 0x03).w("ymsnd", FUNC(ym2203_device::control_port_w));
+	map(0x01, 0x01).r("ymsnd", FUNC(ym2203_device::data_r));
+	map(0x02, 0x02).w("ymsnd", FUNC(ym2203_device::data_w));
+	map(0x03, 0x03).w("ymsnd", FUNC(ym2203_device::address_w));
 }
 
 void nightgal_state::sexygal_nsc_map(address_map &map)

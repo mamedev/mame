@@ -653,9 +653,9 @@ void md_cons_state::genesis_32x(machine_config &config)
 
 	// we need to remove and re-add the YM because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
-	m_ymsnd->reset_routes();
-	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
-	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
+	m_ymsnd_2612->reset_routes();
+	m_ymsnd_2612->add_route(0, "lspeaker", (0.50)/2);
+	m_ymsnd_2612->add_route(1, "rspeaker", (0.50)/2);
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin"));
 	cartslot.set_must_be_loaded(true);
@@ -685,9 +685,9 @@ void md_cons_state::mdj_32x(machine_config &config)
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
-	m_ymsnd->reset_routes();
-	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
-	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
+	m_ymsnd_2612->reset_routes();
+	m_ymsnd_2612->add_route(0, "lspeaker", (0.50)/2);
+	m_ymsnd_2612->add_route(1, "rspeaker", (0.50)/2);
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin"));
 	cartslot.set_must_be_loaded(true);
@@ -717,9 +717,9 @@ void md_cons_state::md_32x(machine_config &config)
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
-	m_ymsnd->reset_routes();
-	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
-	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
+	m_ymsnd_2612->reset_routes();
+	m_ymsnd_2612->add_route(0, "lspeaker", (0.50)/2);
+	m_ymsnd_2612->add_route(1, "rspeaker", (0.50)/2);
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin"));
 	cartslot.set_must_be_loaded(true);
