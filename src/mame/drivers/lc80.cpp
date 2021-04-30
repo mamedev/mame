@@ -35,7 +35,8 @@ It has a nice calculator style keypad attached to it.
 The memory can be expanded. There's an export version with more RAM/ROM by
 default and a faster U880D CPU (3300.0kHz XTAL). It included a chess program
 called SC-80 that can be started by executing ADR C800. Press ADR again for
-NEW GAME, and use the 1-8 number keys for A1-H8.
+NEW GAME, and use the 1-8 number keys for A1-H8. A keypad overlay was included.
+The SC-80 chess engine appears to be the same one as in Chess-Master.
 
 
 TODO:
