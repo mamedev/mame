@@ -682,8 +682,7 @@ void mbee_state::mbee(machine_config &config)
 	m_crtc->set_on_update_addr_change_callback(FUNC(mbee_state::crtc_update_addr));
 	m_crtc->out_vsync_callback().set(FUNC(mbee_state::crtc_vs));
 
-	QUICKLOAD(config, "quickload", "mwb,com,bee", attotime::from_seconds(3)).set_load_callback(FUNC(mbee_state::quickload_bee));
-	QUICKLOAD(config, "quickload2", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(mbee_state::quickload_bin));
+	QUICKLOAD(config, "quickload", "mwb,com,bee,bin", attotime::from_seconds(3)).set_load_callback(FUNC(mbee_state::quickload_cb));
 
 	CENTRONICS(config, m_centronics, centronics_devices, nullptr);
 	m_centronics->ack_handler().set(m_pio, FUNC(z80pio_device::strobe_a));
@@ -737,8 +736,7 @@ void mbee_state::mbeeic(machine_config &config)
 	m_crtc->set_on_update_addr_change_callback(FUNC(mbee_state::crtc_update_addr));
 	m_crtc->out_vsync_callback().set(FUNC(mbee_state::crtc_vs));
 
-	QUICKLOAD(config, "quickload", "mwb,com,bee", attotime::from_seconds(2)).set_load_callback(FUNC(mbee_state::quickload_bee));
-	QUICKLOAD(config, "quickload2", "bin", attotime::from_seconds(2)).set_load_callback(FUNC(mbee_state::quickload_bin));
+	QUICKLOAD(config, "quickload", "mwb,com,bee,bin", attotime::from_seconds(2)).set_load_callback(FUNC(mbee_state::quickload_cb));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(m_pio, FUNC(z80pio_device::strobe_a));
@@ -829,7 +827,6 @@ void mbee_state::mbeett(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbeett_mem);
 	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbeett_io);
 	config.device_remove("quickload");
-	config.device_remove("quickload2");
 	TIMER(config, "newkb_timer").configure_periodic(FUNC(mbee_state::newkb_timer), attotime::from_hz(50));
 	SCC8530(config, "scc", 4000000); // clock unknown
 }
