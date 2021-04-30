@@ -33,7 +33,7 @@ class ymfm_device_standalone_base : public device_t, public device_sound_interfa
 {
 public:
 	// constructor
-	ymfm_device_standalone_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
+	ymfm_device_standalone_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type, int aystreams = 0, int ayioports = 0) :
 		device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this)
 	{
@@ -42,6 +42,12 @@ public:
 protected:
 	// device overrides
 	virtual void device_start() override
+	{
+	}
+
+	// tell the chip we want to override the SSG (n/a in the standalone case)
+	template<class ChipClass>
+	void ssg_override(ChipClass &chip)
 	{
 	}
 };
@@ -54,8 +60,8 @@ class ymfm_device_ay8910_base : public ay8910_device, public ymfm::ssg_interface
 {
 public:
 	// constructor
-	ymfm_device_ay8910_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
-		ay8910_device(mconfig, type, tag, owner, clock, PSG_TYPE_YM, 3, 2)
+	ymfm_device_ay8910_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type, int aystreams, int ayioports) :
+		ay8910_device(mconfig, type, tag, owner, clock, PSG_TYPE_YM, aystreams, ayioports)
 	{
 	}
 
@@ -81,6 +87,14 @@ public:
 		ay8910_write_ym(0, offset);
 		ay8910_write_ym(1, data);
 	}
+
+protected:
+	// tell the chip we want to override
+	template<class ChipClass>
+	void ssg_override(ChipClass &chip)
+	{
+		chip.ssg_override(*this);
+	}
 };
 
 
@@ -97,8 +111,8 @@ class ymfm_device_base_common : public BaseClass, public ymfm::fm_interface
 {
 public:
 	// constructor
-	ymfm_device_base_common(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
-		BaseClass(mconfig, tag, owner, clock, type),
+	ymfm_device_base_common(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type, int aystreams = 0, int ayioports = 0) :
+		BaseClass(mconfig, tag, owner, clock, type, aystreams, ayioports),
 		m_stream(nullptr),
 		m_chip(*this),
 		m_timer{ nullptr, nullptr },
@@ -222,6 +236,9 @@ protected:
 	{
 		// call the parent
 		BaseClass::device_start();
+
+		// override the SSG, if there is one
+		BaseClass::ssg_override(m_chip);
 
 		// allocate our stream
 		m_stream = stream_alloc(0, ChipClass::OUTPUTS, m_chip.sample_rate(device_t::clock()));

@@ -435,13 +435,6 @@ ym2203::ym2203(fm_interface &intf) :
 {
 }
 
-ym2203::ym2203(fm_interface &intf, ssg_interface &ssg) :
-	m_address(0),
-	m_fm(intf),
-	m_ssg(ssg)
-{
-}
-
 
 //-------------------------------------------------
 //  reset - reset the system
@@ -650,17 +643,6 @@ ym2608::ym2608(fm_interface &intf) :
 	m_irq_enable(0x1f),
 	m_flag_control(0x1c),
 	m_fm(intf),
-	m_adpcm_a(intf, 0),
-	m_adpcm_b(intf)
-{
-}
-
-ym2608::ym2608(fm_interface &intf, ssg_interface &ssg) :
-	m_address(0),
-	m_irq_enable(0x1f),
-	m_flag_control(0x1c),
-	m_fm(intf),
-	m_ssg(ssg),
 	m_adpcm_a(intf, 0),
 	m_adpcm_b(intf)
 {
@@ -1044,18 +1026,6 @@ ym2610::ym2610(fm_interface &intf, uint8_t channel_mask) :
 	m_eos_status(0x00),
 	m_flag_mask(0xbf),
 	m_fm(intf),
-	m_adpcm_a(intf, 8),
-	m_adpcm_b(intf, 8)
-{
-}
-
-ym2610::ym2610(fm_interface &intf, ssg_interface &ssg, uint8_t channel_mask) :
-	m_address(0),
-	m_fm_mask(channel_mask),
-	m_eos_status(0x00),
-	m_flag_mask(0xbf),
-	m_fm(intf),
-	m_ssg(ssg),
 	m_adpcm_a(intf, 8),
 	m_adpcm_b(intf, 8)
 {

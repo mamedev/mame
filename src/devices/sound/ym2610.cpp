@@ -19,7 +19,7 @@ DEFINE_DEVICE_TYPE(YM2610B, ym2610b_device, "ym2610b", "YM2610B OPNB2")
 
 template<typename ChipClass>
 ym2610_device_base<ChipClass>::ym2610_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type) :
-	ymfm_device_ssg_base<ChipClass>(mconfig, tag, owner, clock, type),
+	ymfm_device_ssg_base<ChipClass>(mconfig, tag, owner, clock, type, 1, 0),
 	device_memory_interface(mconfig, *this),
 	m_adpcm_a_config("adpcm-a", ENDIANNESS_LITTLE, 8, 24, 0),
 	m_adpcm_b_config("adpcm-b", ENDIANNESS_LITTLE, 8, 24, 0),

@@ -27,33 +27,35 @@ public:
 	static constexpr uint32_t OUTPUTS = ssg_interface::OUTPUTS;
 
 	// constructor: if you pass an ssg_interface, that will override
-	ssg_engine() : m_intf(m_default_intf) { }
-	ssg_engine(ssg_interface &intf) : m_intf(intf) { }
+	ssg_engine() : m_intf(&m_default_intf) { }
+
+	// engine override
+	void override(ssg_interface &intf) { m_intf = &intf; }
 
 	// reset
-	void reset() { m_intf.ssg_reset(); }
+	void reset() { m_intf->ssg_reset(); }
 
 	// save/restore
-	void save_restore(fm_saved_state &state) { m_intf.ssg_save_restore(state); }
+	void save_restore(fm_saved_state &state) { m_intf->ssg_save_restore(state); }
 #ifdef MAME_EMU_SAVE_H
-	void register_save(device_t &device) { m_intf.ssg_register_save(device); }
+	void register_save(device_t &device) { m_intf->ssg_register_save(device); }
 #endif
 
 	// set the clock prescale value
-	void set_clock_prescale(uint8_t clock_divider) { m_intf.ssg_set_clock_prescale(clock_divider); }
+	void set_clock_prescale(uint8_t clock_divider) { m_intf->ssg_set_clock_prescale(clock_divider); }
 
 	// read access
-	uint8_t read(uint8_t offset) { return m_intf.ssg_read(offset); }
+	uint8_t read(uint8_t offset) { return m_intf->ssg_read(offset); }
 
 	// write access
-	void write(uint8_t offset, uint8_t data) { m_intf.ssg_write(offset, data); }
+	void write(uint8_t offset, uint8_t data) { m_intf->ssg_write(offset, data); }
 
 	// generate one sample
-	void generate(int32_t output[OUTPUTS]) { m_intf.ssg_generate(output); }
+	void generate(int32_t output[OUTPUTS]) { m_intf->ssg_generate(output); }
 
 private:
 	// internal state
-	ssg_interface &m_intf;
+	ssg_interface *m_intf;
 	ssg_interface m_default_intf;
 };
 
@@ -290,7 +292,9 @@ public:
 
 	// constructor
 	ym2203(fm_interface &intf);
-	ym2203(fm_interface &intf, ssg_interface &ssg);
+
+	// configuration
+	void ssg_override(ssg_interface &intf) { m_ssg.override(intf); }
 
 	// reset
 	void reset();
@@ -347,7 +351,9 @@ public:
 
 	// constructor
 	ym2608(fm_interface &intf);
-	ym2608(fm_interface &intf, ssg_interface &ssg);
+
+	// configuration
+	void ssg_override(ssg_interface &intf) { m_ssg.override(intf); }
 
 	// reset
 	void reset();
@@ -407,7 +413,9 @@ public:
 
 	// constructor
 	ym2610(fm_interface &intf, uint8_t channel_mask = 0x36);
-	ym2610(fm_interface &intf, ssg_interface &ssg, uint8_t channel_mask = 0x36);
+
+	// configuration
+	void ssg_override(ssg_interface &intf) { m_ssg.override(intf); }
 
 	// reset
 	void reset();

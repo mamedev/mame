@@ -17,6 +17,6 @@ DEFINE_DEVICE_TYPE(YM2203, ym2203_device, "ym2203", "YM2203 OPN")
 //-------------------------------------------------
 
 ym2203_device::ym2203_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	ymfm_device_ssg_base<ymfm::ym2203>(mconfig, tag, owner, clock, YM2203)
+	ymfm_device_ssg_base<ymfm::ym2203>(mconfig, tag, owner, clock, YM2203, 3, 2)
 {
 }
