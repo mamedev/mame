@@ -682,7 +682,9 @@ void mbee_state::mbee(machine_config &config)
 	m_crtc->set_on_update_addr_change_callback(FUNC(mbee_state::crtc_update_addr));
 	m_crtc->out_vsync_callback().set(FUNC(mbee_state::crtc_vs));
 
-	QUICKLOAD(config, "quickload", "mwb,com,bee,bin", attotime::from_seconds(3)).set_load_callback(FUNC(mbee_state::quickload_cb));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "mwb,com,bee,bin", attotime::from_seconds(3)));
+	quickload.set_load_callback(FUNC(mbee_state::quickload_cb));
+	quickload.set_interface("mbee_quik");
 
 	CENTRONICS(config, m_centronics, centronics_devices, nullptr);
 	m_centronics->ack_handler().set(m_pio, FUNC(z80pio_device::strobe_a));
@@ -694,6 +696,10 @@ void mbee_state::mbee(machine_config &config)
 	m_cassette->set_formats(mbee_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("mbee_cass");
+
+	SOFTWARE_LIST(config, "cass_list").set_original("mbee_cass").set_filter("1");
+	SOFTWARE_LIST(config, "quik_list").set_original("mbee_quik").set_filter("1");
 }
 
 
@@ -736,7 +742,9 @@ void mbee_state::mbeeic(machine_config &config)
 	m_crtc->set_on_update_addr_change_callback(FUNC(mbee_state::crtc_update_addr));
 	m_crtc->out_vsync_callback().set(FUNC(mbee_state::crtc_vs));
 
-	QUICKLOAD(config, "quickload", "mwb,com,bee,bin", attotime::from_seconds(2)).set_load_callback(FUNC(mbee_state::quickload_cb));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "mwb,com,bee,bin", attotime::from_seconds(3)));
+	quickload.set_load_callback(FUNC(mbee_state::quickload_cb));
+	quickload.set_interface("mbee_quik");
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(m_pio, FUNC(z80pio_device::strobe_a));
@@ -748,6 +756,10 @@ void mbee_state::mbeeic(machine_config &config)
 	m_cassette->set_formats(mbee_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("mbee_cass");
+
+	SOFTWARE_LIST(config, "cass_list").set_original("mbee_cass").set_filter("2");
+	SOFTWARE_LIST(config, "quik_list").set_original("mbee_quik").set_filter("2");
 }
 
 void mbee_state::mbeepc(machine_config &config)
@@ -768,6 +780,9 @@ void mbee_state::mbeeppc(machine_config &config)
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(FUNC(mbee_state::rtc_irq_w));
+
+	config.device_remove("quickload");
+	config.device_remove("quik_list");
 }
 
 void mbee_state::mbee56(machine_config &config)
@@ -782,6 +797,10 @@ void mbee_state::mbee56(machine_config &config)
 	m_fdc->enmf_rd_callback().set_constant(0);
 	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("mbee_flop").set_filter("1");
+	config.device_remove("quickload");
+	config.device_remove("quik_list");
 }
 
 void mbee_state::mbee128(machine_config &config)
@@ -792,6 +811,8 @@ void mbee_state::mbee128(machine_config &config)
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(FUNC(mbee_state::rtc_irq_w));
+
+	SOFTWARE_LIST(config.replace(), "flop_list").set_original("mbee_flop").set_filter("2");
 }
 
 void mbee_state::mbee128p(machine_config &config)
@@ -806,6 +827,8 @@ void mbee_state::mbee128p(machine_config &config)
 	m_fdc->enmf_rd_callback().set_constant(0);
 	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("mbee_flop").set_filter("3");
 }
 
 void mbee_state::mbee256(machine_config &config)
@@ -819,6 +842,8 @@ void mbee_state::mbee256(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy0, mbee_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy1, mbee_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	TIMER(config, "newkb_timer").configure_periodic(FUNC(mbee_state::newkb_timer), attotime::from_hz(50));
+
+	SOFTWARE_LIST(config.replace(), "flop_list").set_original("mbee_flop").set_filter("4");
 }
 
 void mbee_state::mbeett(machine_config &config)
@@ -826,9 +851,9 @@ void mbee_state::mbeett(machine_config &config)
 	mbeeppc(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mbee_state::mbeett_mem);
 	m_maincpu->set_addrmap(AS_IO, &mbee_state::mbeett_io);
-	config.device_remove("quickload");
 	TIMER(config, "newkb_timer").configure_periodic(FUNC(mbee_state::newkb_timer), attotime::from_hz(50));
 	SCC8530(config, "scc", 4000000); // clock unknown
+	config.device_remove("cass_list"); // mbeett is incompatible with the others
 }
 
 /* Unused roms:
