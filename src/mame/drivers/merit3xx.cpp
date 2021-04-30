@@ -377,6 +377,7 @@ U48
 MLT8
 ck:9daa
 
+NOTE: The above ROMs are also known to be labeled as Multi-Action 7556-WV U46 through Multi-Action 7556-WV U48
 
 
 Program ROMs on Expansion board:
@@ -387,7 +388,7 @@ U11 *Empty       U15
 
 U10              U14
 7556-01-r0       7556-01-r0
-7c21             dff2
+ef8f             dff2
 
 U9               U13
 7556-01-r0       7556-01-r0
@@ -416,6 +417,67 @@ According to U14:
 
 Dipswitch on CRT-350 main is labeled S1
 Dipswitch on CRT-352 MEM is labeled SW1
+
+-------------------------------------------------------------
+
+Merit MULTI-ACTION 7558-01-R0 DS - Touchscreen game
+
+MERIT CRT-350 REV B + MEMORY EXPANSION BOARD CRT-352 rev A
+
+Main PCB graphics roms (on main board):
+
+Multi-Action
+7556-WV
+U46
+
+Multi-Action
+7556-WV
+U47
+
+Multi-Action
+7556-WV
+U48
+
+
+
+Program ROMs on Expansion board:
+
+U11 *Empty       U15
+                 7558-01-R0 DS
+                 cfba
+
+U10              U14
+7558-01-R0 DS    7558-01-R0 DS
+88b5             a309
+
+U9               U13
+7558-01-R0 DS    7558-01-R0 DS
+e651             a833
+
+U8               U12
+7558-01-R0 DS    7558-01-R0 DS
+d27a             11ff
+
+
+According to U12:
+ INVALID DIPSW
+ ENABLE 2+ GAMES
+  CS1-1 ON =JOKER (Joker Poker)
+  CS1-2 ON =DEUCES (Deuces Wild)
+  CS1-3 ON =FEVER (Flush Fever)
+  CS1-4 ON =JACKS (Jacks or Better Poker)
+  CS1-5 ON =BJACK (Blackjack)
+  CS1-6 ON =KNO WLD (Wild Spot Keno)
+  CS1-7 ON =PWR KNO (Power Hit Keno)
+  CS1-8 ON =8 LINE (Super 8)
+ CSW1-1 ON =5 REEL (Five Reel)
+ CSW1-2 ON =$ DEUCE (Dollar Deuces)
+ CSW1-3 ON =D DOG (Dogs + Diamonds)
+ CSW1-4 ON =TR7 (Treasure Sevens)
+
+Dipswitch on CRT-350 main is labeled S1
+Dipswitch on CRT-352 MEM is labeled SW1
+
 */
 
 #include "emu.h"
@@ -518,13 +580,35 @@ ROM_START( ma7556 )
 	ROM_LOAD( "u15_7556-01-r0_add3.u15", 0x38000, 0x08000, CRC(83e5f4cd) SHA1(15b999169b28fb267ec8a265c915c1d366e57655) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
-	ROM_LOAD( "u46_mlt8_ck-8bbe.u46", 0x00000, 0x10000, CRC(32c11634) SHA1(26f3c5c220b45e8eedad940ff94dc5ef6f89e3fa) )
-	ROM_LOAD( "u47_mlt8_ck-0262.u47", 0x10000, 0x10000, CRC(5781bdd7) SHA1(e3f920dd1c247f92044100e28fc39d48b02b6a4b) )
-	ROM_LOAD( "u48_mlt8_ck-9daa.u48", 0x20000, 0x10000, CRC(52ac8411) SHA1(9941388b90b6b91c1dab9286db588f0032620ea4) )
+	ROM_LOAD( "multi-action_7556-wv_u46.u46", 0x00000, 0x10000, CRC(32c11634) SHA1(26f3c5c220b45e8eedad940ff94dc5ef6f89e3fa) ) // also known to labeled: U46  MLT8  cs:8bbe
+	ROM_LOAD( "multi-action_7556-wv_u47.u47", 0x10000, 0x10000, CRC(5781bdd7) SHA1(e3f920dd1c247f92044100e28fc39d48b02b6a4b) ) // also known to labeled: U47  MLT8  cs:0262
+	ROM_LOAD( "multi-action_7556-wv_u48.u48", 0x20000, 0x10000, CRC(52ac8411) SHA1(9941388b90b6b91c1dab9286db588f0032620ea4) ) // also known to labeled: U48  MLT8  cs:9daa
 
 	ROM_REGION( 0xa000, "nvram", 0 )
 	ROM_LOAD( "dallas_ds1225y-200.u7",  0x0000, 0x2000, BAD_DUMP CRC(5b635a95) SHA1(dd347258ba9e000963da75af5ac383c09b60be0b) )
 	ROM_LOAD( "dallas_ds1230y-200.u17", 0x2000, 0x8000, BAD_DUMP CRC(e0c07037) SHA1(c6674a79a51f5aacca4a9e9bd19a2ce475c98b47) )
+ROM_END
+
+
+ROM_START( ma7558 )
+	ROM_REGION(0x40000, "maincpu", 0)
+	ROM_LOAD( "u8_7558-01-r0_ds_d27a.u8",   0x00000, 0x08000, CRC(ff59d929) SHA1(902ba35967a49b73a6b7c1990c736ac922e25672) )
+	ROM_LOAD( "u9_7558-01-r0_ds_e651.u9",   0x08000, 0x08000, CRC(e02f8c98) SHA1(d04351535f86907129b97811a02a590f96f108b9) )
+	ROM_LOAD( "u10_7558-01-r0_ds_88b5.u10", 0x10000, 0x08000, CRC(33994802) SHA1(041190e01115abd7e629335486f7ba3070a29635) )
+	// u11 not populated
+	ROM_LOAD( "u12_7558-01-r0_ds_11ff.u12", 0x20000, 0x08000, CRC(9172a8a0) SHA1(b0ef6f8a706f48de9896929647ef30e3555c797b) )
+	ROM_LOAD( "u13_7558-01-r0_ds_a833.u13", 0x28000, 0x08000, CRC(55accddc) SHA1(33c845b3b730126a1e3e26483a05e2e186925199) )
+	ROM_LOAD( "u14_7558-01-r0_ds_a309.u14", 0x30000, 0x08000, CRC(25431b2b) SHA1(9ecd04b00d6531f41913f67fef848f2d1e6d7766) )
+	ROM_LOAD( "u15_7558-01-r0_ds_cfba.u15", 0x38000, 0x08000, CRC(fb698a84) SHA1(57d8ff484691b0227034815bac0c4d99bae7d067) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "multi-action_7556-wv_u46.u46", 0x00000, 0x10000, CRC(32c11634) SHA1(26f3c5c220b45e8eedad940ff94dc5ef6f89e3fa) ) // also known to labeled: U46  MLT8  cs:8bbe
+	ROM_LOAD( "multi-action_7556-wv_u47.u47", 0x10000, 0x10000, CRC(5781bdd7) SHA1(e3f920dd1c247f92044100e28fc39d48b02b6a4b) ) // also known to labeled: U47  MLT8  cs:0262
+	ROM_LOAD( "multi-action_7556-wv_u48.u48", 0x20000, 0x10000, CRC(52ac8411) SHA1(9941388b90b6b91c1dab9286db588f0032620ea4) ) // also known to labeled: U48  MLT8  cs:9daa
+
+	ROM_REGION( 0xa000, "nvram", 0 )
+	ROM_LOAD( "dallas_ds1225y-200.u7",  0x0000, 0x2000, CRC(142c5cea) SHA1(39d787109e0b782fda5a18ff3a56cf8428cb2437) )
+	ROM_LOAD( "dallas_ds1230y-200.u17", 0x2000, 0x8000, CRC(9d196d52) SHA1(21fd5acd7652ba10ae6b4ae520abcc7c34eb37d1) )
 ROM_END
 
 // CRT-300 games
@@ -533,3 +617,4 @@ GAME( 1989, ma6710, 0, merit3xx, merit3xx, merit3xx_state, empty_init, ROT0, "Me
 // CRT-350 games
 GAME( 199?, ma7551, 0, merit3xx, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7551", MACHINE_IS_SKELETON )
 GAME( 199?, ma7556, 0, merit3xx, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7556", MACHINE_IS_SKELETON )
+GAME( 199?, ma7558, 0, merit3xx, merit3xx, merit3xx_state, empty_init, ROT0, "Merit", "Multi-Action 7558", MACHINE_IS_SKELETON )
