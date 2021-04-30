@@ -15072,9 +15072,9 @@ GAME( 19??, scorpionmc,  scorpion, scorpnmc,   scorpnmc,   galaxian_state, init_
 GAME( 19??, aracnis,     scorpion, scorpnmc,   aracnis,    galaxian_state, init_batman2,    ROT90,  "bootleg",            "Aracnis (bootleg of Scorpion on Moon Cresta hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
 // SF-X hardware; based on Scramble with extra Z80 and 8255 driving a DAC-based sample player
-GAME( 1983, sfx,         0,        sfx,        sfx,        galaxian_state, init_sfx,        ORIENTATION_FLIP_X, "Nichibutsu",     "SF-X",         MACHINE_SUPPORTS_SAVE )
-GAME( 1983, skelagon,    sfx,      sfx,        sfx,        galaxian_state, init_sfx,        ORIENTATION_FLIP_X, "Nichibutsu USA", "Skelagon",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
-GAME( 1982, monsterz,    0,        monsterz,   sfx,        galaxian_state, init_sfx,        ORIENTATION_FLIP_X, "Nihon Game",     "Monster Zero", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1983, sfx,         0,        sfx,        sfx,        galaxian_state, init_sfx,        ORIENTATION_FLIP_X, "Taiyo System (Nichibutsu license)",     "SF-X",         MACHINE_SUPPORTS_SAVE )
+GAME( 1983, skelagon,    sfx,      sfx,        sfx,        galaxian_state, init_sfx,        ORIENTATION_FLIP_X, "Taiyo System (Nichibutsu USA license)", "Skelagon",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+GAME( 1982, monsterz,    0,        monsterz,   sfx,        galaxian_state, init_sfx,        ORIENTATION_FLIP_X, "Taiyo System",                          "Monster Zero", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 
 /*
