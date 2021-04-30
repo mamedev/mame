@@ -3,6 +3,7 @@
 /**********************************************************************
 
     Intel 82720 Graphics Display Controller emulation
+	also known as NEC uPD7220
 
 **********************************************************************/
 
@@ -22,7 +23,7 @@
     - A5105 has a FIFO bug with the RDAT, should be a lot larger when it scrolls up.
       Can be fixed with a DRDY mechanism for RDAT/WDAT;
     - Some later SWs on PC-98 throws "Invalid command byte 05" (zettmj on Epson logo),
-      actual undocumented command to reset something?
+      actual undocumented command to reset something or perhaps just check if upd7220 isn't really a upd72120 instead?
 
     - honor visible area
     - wide mode (32-bit access)
@@ -1730,18 +1731,29 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 
 		if(im || force_bitmap)
 		{
-			if(area >= 3) // TODO: most likely to be correct, Quarth (PC-98xx) definitely draws with area 2. We might see an area 3 someday ...
+			// according to documentation only areas 0-1-2 can be drawn in bitmap mode
+     		// PC98 Quarth definitely needs area 2 for player section.
+			// TODO: what happens if combined area size is smaller than display height?
+			// documentation suggests that it should repeat from area 0, needs real HW verification (no known SW do it).
+			if(area >= 3)
 				break;
+			
+			// PC98 madoum1-3 sets up ALL areas to a length of 0 after initial intro screen.
+			// madoum1: area 0 sad==0 on gameplay (PC=0x955e7), sad==0xaa0 on second intro screen (tower) then intentionally scrolls up and back to initial position.
+			// Suggests that length should be treated as max size if this occurs, this is also proven to be correct via real HW verification.
+			// TODO: check if text partition do the same.
+			if (len == 0)
+				len = 0x400;
 
 			if(!interlace)
 				len <<= 1;
 
 			for(y = 0; y < len; y++)
 			{
-				/* TODO: again correct?
-				         Quarth (PC-98xx) doesn't seem to use pitch here and it definitely wants bsy to be /2 to make scrolling to work.
-				         Xevious (PC-98xx) wants the pitch to be fixed at 80, and wants bsy to be /1
-				         Dragon Buster (PC-98xx) contradicts with Xevious with regards of the pitch tho ... */
+				// TODO: not completely correct, all is drawn half size with real HW tests on pc98 msdos by just changing PRAM values.
+				// pc98 quarth doesn't seem to use pitch here and it definitely wants bsy to be /2 to make scrolling to work.
+				// pc98 xevious wants the pitch to be fixed at 80, and wants bsy to be /1
+				// pc98 dbuster contradicts with Xevious with regards of the pitch tho ...
 				uint32_t const addr = ((sad << 1) & 0x3ffff) + ((y / (mixed ? 1 : m_lr)) * (m_pitch << (im ? 0 : 1)));
 				for(int z = 0; z <= m_disp; ++z)
 				{
