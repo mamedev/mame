@@ -378,13 +378,13 @@ void poly880_state::poly880s(machine_config &config)
 // ROMs
 
 ROM_START( poly880 )
-	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "poly880.i5", 0x0000, 0x0400, CRC(b1c571e8) SHA1(85bfe53d39d6690e79999a1e1240789497e72db0) )
 	ROM_LOAD( "poly880.i6", 0x1000, 0x0400, CRC(9efddf5b) SHA1(6ffa2f80b2c6f8ec9e22834f739c82f9754272b8) )
 ROM_END
 
 ROM_START( poly880s )
-	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "sc1.rom", 0x0000, 0x1000, CRC(26965b23) SHA1(01568911446eda9f05ec136df53da147b7c6f2bf) )
 ROM_END
 
