@@ -35,11 +35,11 @@ u8 ymf262_device::read(offs_t offset)
 	u8 result = 0x00;
 	switch (offset & 3)
 	{
-		case 0: 	// status port (A0=0, A1=0)
+		case 0:     // status port (A0=0, A1=0)
 			result = m_fm.status();
 			break;
 
-		default:	// datasheet says anything else is not guaranteed
+		default:    // datasheet says anything else is not guaranteed
 			logerror("Unexpected read from YMF262 offset %d\n", offset & 3);
 			break;
 	}
@@ -56,7 +56,7 @@ void ymf262_device::write(offs_t offset, u8 value)
 {
 	switch (offset & 1)
 	{
-		case 0:	// address ports - A1 references upper bank
+		case 0: // address ports - A1 references upper bank
 			m_address = value | (BIT(offset, 1) << 8);
 
 			// tests reveal that in compatibility mode, upper bit is masked

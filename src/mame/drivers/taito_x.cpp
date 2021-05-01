@@ -921,6 +921,8 @@ void taitox_state::gigandes(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(taitox_state,taitox)
 
 	SETA001_SPRITE(config, m_seta001, 16000000, m_palette, gfx_taito_x);
+	m_seta001->set_fg_yoffsets(-0xa, 0xe);
+	m_seta001->set_bg_yoffsets(0x1, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

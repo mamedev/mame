@@ -929,7 +929,6 @@ sitcom.cpp
 sk1.cpp
 sk101bl.cpp
 slc1.cpp
-slc1a.cpp
 slicer.cpp
 slsstars.cpp
 sm1800.cpp
@@ -1174,6 +1173,7 @@ ymmu100.cpp
 ymmu5.cpp
 ymmu50.cpp
 ymmu80.cpp
+ympsr60.cpp
 ympsr340.cpp
 ymtx81z.cpp
 ymvl70.cpp

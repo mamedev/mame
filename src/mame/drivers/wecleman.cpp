@@ -1057,7 +1057,7 @@ void wecleman_state::wecleman(machine_config &config)
 	adc.vin_callback().set(FUNC(wecleman_state::selected_ip_r));
 
 	KONAMI_007452_MATH(config, "k007452");
-	
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);

@@ -1156,6 +1156,7 @@ FORMATS["X1_TAP"] = true
 FORMATS["XDF_DSK"] = true
 FORMATS["ZX81_P"] = true
 FORMATS["FS_PRODOS"] = true
+FORMATS["FS_ORIC_JASMIN"] = true
 
 --------------------------------------------------
 -- this is the list of driver libraries that
@@ -2586,7 +2587,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/sbc6510.cpp",
 	MAME_DIR .. "src/mame/drivers/sitcom.cpp",
 	MAME_DIR .. "src/mame/drivers/slc1.cpp",
-	MAME_DIR .. "src/mame/drivers/slc1a.cpp",
 	MAME_DIR .. "src/mame/drivers/test_t400.cpp",
 	MAME_DIR .. "src/mame/drivers/uzebox.cpp",
 	MAME_DIR .. "src/mame/drivers/z80dev.cpp",
@@ -4231,11 +4231,9 @@ files {
 	MAME_DIR .. "src/mame/machine/kc_keyb.h",
 	MAME_DIR .. "src/mame/video/kc.cpp",
 	MAME_DIR .. "src/mame/drivers/lc80.cpp",
-	MAME_DIR .. "src/mame/includes/lc80.h",
 	MAME_DIR .. "src/mame/drivers/mc8020.cpp",
 	MAME_DIR .. "src/mame/drivers/mc8030.cpp",
 	MAME_DIR .. "src/mame/drivers/poly880.cpp",
-	MAME_DIR .. "src/mame/includes/poly880.h",
 	MAME_DIR .. "src/mame/drivers/sc2.cpp",
 }
 
@@ -4381,6 +4379,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ymmu50.cpp",
 	MAME_DIR .. "src/mame/drivers/ymmu80.cpp",
 	MAME_DIR .. "src/mame/drivers/ymmu100.cpp",
+	MAME_DIR .. "src/mame/drivers/ympsr60.cpp",
 	MAME_DIR .. "src/mame/drivers/ympsr340.cpp",
 	MAME_DIR .. "src/mame/drivers/ymtx81z.cpp",
 	MAME_DIR .. "src/mame/drivers/ymvl70.cpp",

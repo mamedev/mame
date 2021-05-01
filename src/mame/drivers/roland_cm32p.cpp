@@ -402,13 +402,13 @@ DEVICE_IMAGE_LOAD_MEMBER(cm32p_state::card_load)
 		return image_init_result::FAIL;
 	}
 
-	pcmcard->rom_alloc(0x080000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);	// cards are up to 512K
+	pcmcard->rom_alloc(0x080000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);    // cards are up to 512K
 	pcmcard->common_load_rom(pcmcard->get_rom_base(), size, "rom");
 	u8* base = pcmcard->get_rom_base();
 	if (size < 0x080000)
 	{
 		uint32_t mirror = (1 << (31 - count_leading_zeros(size)));
-		if (mirror < 0x020000)	// due to how address descrambling works, we can currently only do mirroring for 128K pages
+		if (mirror < 0x020000)  // due to how address descrambling works, we can currently only do mirroring for 128K pages
 			mirror = 0x020000;
 		for (uint32_t ofs = mirror; ofs < 0x080000; ofs += mirror)
 			memcpy(base + ofs, base, mirror);

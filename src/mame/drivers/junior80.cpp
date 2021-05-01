@@ -111,7 +111,7 @@ programmed in rom and from os like this: port A input with interrupt, port B - o
 - i8253 programmed in rom and from os like: channel 0 unprogrammed,
 channel 1: clock divider for 9600 bps clock
 channel 2: clock divider for sound generator
-when the os loads, channel 0 is programmed like channel 1 
+when the os loads, channel 0 is programmed like channel 1
 
 ***************************************************************************
 

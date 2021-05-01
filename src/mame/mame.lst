@@ -5,8 +5,7 @@
     mame.lst
 
     This is not an automatically generated file, and it should be manually
-    updated when new driver is added. From time to time, we will auto-update
-    comments according to metadata from source files.
+    updated when new driver is added.
 
 ******************************************************************************/
 
@@ -12216,6 +12215,7 @@ diablo              //
 
 @source:diamondking.cpp
 diamondking                     // (c) 1997 SegaSA / Sonic
+diamondkinp                     // (c) 1997 SegaSA / Sonic
 
 @source:didact.cpp
 md6802                          //
@@ -19601,6 +19601,7 @@ lbpc                            // Ampro Little Board/PC
 
 @source:lc80.cpp
 lc80                            //
+lc80a                           //
 lc80e                           //
 lc80_2                          //
 
@@ -22894,6 +22895,7 @@ trvwzv                          // (c) 1985 Merit
 ma6710                          // (c) 1989 Merit
 ma7551                          // (c) 199? Merit
 ma7556                          // (c) 199? Merit
+ma7558                          // (c) 199? Merit
 
 @source:meritm.cpp
 americna                        // (c) 1987 Merit
@@ -33087,6 +33089,7 @@ racingj2j                       // GX888 (c)1999 (JAE)
 thrilld                         // GX713 (c)1998 Japan JAE
 thrilldb                        // GX713 (c)1998 Japan JAB
 thrilldbe                       // GX713 (c)1998 Europe EAB
+thrilldbu                       // GX713 (c)1998 ?AB
 
 @source:nycaptor.cpp
 bronx                           // bootleg
@@ -35062,6 +35065,7 @@ poly800mdk                      //
 
 @source:poly880.cpp
 poly880                         //
+poly880s                        //
 
 @source:polyplay.cpp
 polyplay                        //
@@ -35643,6 +35647,7 @@ raiden2eg                       // (c) 1993 Seibu Kaihatsu + Tuning license
 raiden2es                       // (c) 1993 Seibu Kaihatsu
 raiden2eu                       // (c) 1993 Seibu Kaihatsu + Fabtek license
 raiden2eua                      // (c) 1993 Seibu Kaihatsu + Fabtek license
+raiden2eub                      // (c) 1993 Seibu Kaihatsu + Fabtek license
 raiden2f                        // (c) 1993 Seibu Kaihatsu
 raiden2g                        // (c) 1993 Seibu Kaihatsu + Tuning license
 raiden2hk                       // (c) 1993 Seibu Kaihatsu + Metrotainment license
@@ -35822,6 +35827,9 @@ rf51w14cg                       // (c) 2003 Recreativos Franco
 
 @source:rfslots8085.cpp
 unkrfslt                        //
+
+@source:rfslotsmcs48.cpp
+ajofrin                         // (c) 198? Recreativos Franco
 
 @source:rfslotspcpent.cpp
 rfsantafeg                      // (c) 2014 Recreativos Franco
@@ -38214,9 +38222,6 @@ slapshotj                       // D71 (c) 1994 Taito Corporation (Ver 2.2 J)
 
 @source:slc1.cpp
 slc1                            //
-
-@source:slc1a.cpp
-slc1a
 
 @source:sleic.cpp
 bikerace                        //
@@ -43166,6 +43171,10 @@ mu80                            // 1994 MU-80
 mu100                           // 1997 MU-100
 mu100r                          // 1997 MU-100 Rackable version
 mu100b                          // 1998 MU-100B
+
+@source:ympsr60.cpp
+psr60                           // 1985 PSR-60
+psr70                           // 1985 PSR-70
 
 @source:ympsr340.cpp
 psr340                          // 1999 PSR-340

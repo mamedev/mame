@@ -1798,5 +1798,5 @@ GAME( 1997, starswepj,  starswep, starswep,   namcos11,   namcos11_state, empty_
 GAME( 1998, myangel3,   0,        myangel3,   myangel3,   namcos11_state, empty_init, ROT0, "MOSS / Namco",  "Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)", 0 )
 GAME( 1999, ptblank2a,  ptblank2 ,ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (World, GNB2/VER.A)",            0 )
 GAME( 1999, ptblank2b,  ptblank2 ,ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (World, GNB2/VER.A alt)",        0 )
-GAME( 1999, ptblank2c,  ptblank2 ,ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (Unknown region)",               0 )
+GAME( 1999, ptblank2c,  ptblank2 ,ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (unknown region)",               0 )
 GAME( 1999, ptblank2ua, ptblank2, ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (US, GNB3/VER.A)",               0 )

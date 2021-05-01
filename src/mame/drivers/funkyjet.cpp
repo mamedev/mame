@@ -3,7 +3,7 @@
 /***************************************************************************
 
   All game use a DE-0372-0 PCB (see below for layout)
-  
+
   Funky Jet                               (c) 1992 Data East / Mitchell Corporation
   Sotsugyo Shousho                        (c) 1995 Mitchell Corporation
 

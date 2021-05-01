@@ -172,6 +172,7 @@ device_rs232_port_interface::~device_rs232_port_interface()
 #include "terminal.h"
 #include "ie15.h"
 #include "rs232_sync_io.h"
+#include "mboardd.h"
 
 void default_rs232_devices(device_slot_interface &device)
 {
@@ -187,4 +188,5 @@ void default_rs232_devices(device_slot_interface &device)
 	device.option_add("sunkbd", SUN_KBD_ADAPTOR);
 	device.option_add("swtpc8212", SERIAL_TERMINAL_SWTPC8212);
 	device.option_add("terminal", SERIAL_TERMINAL);
+	device.option_add("mockingboard", SERIAL_MOCKINGBOARD_D);
 }

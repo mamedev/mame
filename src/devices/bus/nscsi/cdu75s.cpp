@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /*******************************************************************************
 
-    Skeleton device for Sony/Apple CDU75S 2x cdrom reader
+    Skeleton device for Sony/Apple CDU75S 4x cdrom reader
 
 *******************************************************************************/
 

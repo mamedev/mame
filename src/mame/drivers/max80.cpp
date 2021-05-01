@@ -83,8 +83,8 @@ public:
 	max80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-//		, m_p_chargen(*this, "chargen")
-//		, m_vram(*this, "videoram")
+//      , m_p_chargen(*this, "chargen")
+//      , m_vram(*this, "videoram")
 		, m_palette(*this, "palette")
 		, m_pio(*this, "pio")
 		, m_crtc(*this, "crtc")
@@ -99,7 +99,7 @@ public:
 		, m_floppy2(*this, "fdc:2")
 		, m_floppy3(*this, "fdc:3")
 		, m_io_keyboard(*this, "LINE%u", 0)
-//		, m_mainram(*this, RAM_TAG)
+//      , m_mainram(*this, RAM_TAG)
 	{ }
 
 	void max80(machine_config &config);
@@ -149,7 +149,7 @@ private:
 	required_device<floppy_connector> m_floppy2;
 	required_device<floppy_connector> m_floppy3;
 	required_ioport_array<8> m_io_keyboard;
-//	optional_device<ram_device>                 m_mainram;
+//  optional_device<ram_device>                 m_mainram;
 };
 
 
@@ -379,10 +379,10 @@ void max80_state::pio_pb_w(offs_t offset, u8 data)
 
 void max80_state::machine_start()
 {
-//	save_item(NAME(m_irq));
-//	save_item(NAME(m_size_store));
-//	save_item(NAME(m_drq_off));
-//	save_item(NAME(m_intrq_off));
+//  save_item(NAME(m_irq));
+//  save_item(NAME(m_size_store));
+//  save_item(NAME(m_drq_off));
+//  save_item(NAME(m_intrq_off));
 
 }
 

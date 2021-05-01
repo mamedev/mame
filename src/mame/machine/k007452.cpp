@@ -38,7 +38,7 @@ u8 k007452_device::read(offs_t offset)
 		case 1: return u8((m_multiply_result >> 8) & 0xff);
 		case 2: return u8(m_divide_remainder & 0xff);
 		case 3: return u8((m_divide_remainder >> 8) & 0xff);
-		case 4:	return u8(m_divide_quotient & 0xff);
+		case 4: return u8(m_divide_quotient & 0xff);
 		case 5: return u8((m_divide_quotient >> 8) & 0xff);
 		default: return 0;
 	}

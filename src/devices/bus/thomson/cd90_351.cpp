@@ -60,7 +60,7 @@ const tiny_rom_entry *cd90_351_device::device_rom_region() const
 void cd90_351_device::floppy_drives(device_slot_interface &device)
 {
 	device.option_add("dd90_352", FLOPPY_35_DD);
-	//	device.option_add("qd90_280", FLOPPY_28_QDD);
+	//  device.option_add("qd90_280", FLOPPY_28_QDD);
 }
 
 void cd90_351_device::floppy_formats(format_registration &fr)
@@ -391,7 +391,7 @@ void cd90_351_device::sync()
 		case S_IDLE:
 			m_last_sync = next_sync;
 			break;
-			
+
 		case S_WAIT_HEADER_SYNC: {
 			if(read_one_bit(next_sync, next_flux_change))
 				return;
@@ -452,8 +452,8 @@ void cd90_351_device::sync()
 				m_state = S_WAIT_SECTOR_SYNC;
 			}
 			break;
-	
-			
+
+
 		case S_WAIT_SECTOR_SYNC: {
 			if(read_one_bit(next_sync, next_flux_change))
 				return;
@@ -471,7 +471,7 @@ void cd90_351_device::sync()
 				m_state = S_WAIT_HEADER_SYNC;
 			break;
 		}
-			
+
 		case S_READ_SECTOR:
 			if(read_one_bit(next_sync, next_flux_change))
 				return;

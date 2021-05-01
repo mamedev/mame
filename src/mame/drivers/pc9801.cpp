@@ -12,23 +12,23 @@
     - Finish DIP-Switches support;
     - text scrolling, upd52611 (cfr. clipping in edge & arcus2, madoum* too?);
     - AGDC emulation, upd72120;
-	- CMT support (-13/-36 cbus only, identify which models mounted it off the bat);
+    - CMT support (-13/-36 cbus only, identify which models mounted it off the bat);
     - Write a PC80S31K device for 2d type floppies
-	  (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
-    - Anything post-PC9801E/F/M should overwrite "speaker_device" to actually use a 
-	  dac_bit_interface instead (cfr. DAC1BIT in SW list);
-	- clean-ups & split into separate devices and driver flavours;
+      (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
+    - Anything post-PC9801E/F/M should overwrite "speaker_device" to actually use a
+      dac_bit_interface instead (cfr. DAC1BIT in SW list);
+    - clean-ups & split into separate devices and driver flavours;
     - derive romsets by default options (cfr. 3.5 2HD floppies vs. default 5.25, 2D/2DD etc.);
     - Remove kludge for POR bit in a20_ctrl_w fn;
-	- floppy sounds never silences when drive is idle (disabled for the time being);
+    - floppy sounds never silences when drive is idle (disabled for the time being);
 
-	TODO (PC-9801F)
-	- kanji port 0xa9 readback is broken for several games (balpower, lovelyho). 
+    TODO (PC-9801F)
+    - kanji port 0xa9 readback is broken for several games (balpower, lovelyho).
 
     TODO (PC-9801RS):
     - several unemulated extra f/f features;
     - keyboard shift doesn't seem to disable properly (fixed by now?);
-	- Several games hangs with stuck note by misfired/not catched up -26 / -86 irq;
+    - Several games hangs with stuck note by misfired/not catched up -26 / -86 irq;
     - clean-up duplicate code;
 
     TODO (PC-9821):
@@ -39,24 +39,24 @@
     TODO (PC-9821AS)
     - IPL ROM banking contradicts greatly from the other machines;
 
-	TODO (PC-386M):
+    TODO (PC-386M):
     - "ERR:BR" at boot (BIOS loader error).
-	  Executes some code in text VRAM area (PC=$a006e), trying to setup a writeable RAM bank
-	  (shadow RAM even?) to IPL window, I/O $c06 seems to be the control port for it;
+      Executes some code in text VRAM area (PC=$a006e), trying to setup a writeable RAM bank
+      (shadow RAM even?) to IPL window, I/O $c06 seems to be the control port for it;
 
-	TODO: (PC-486SE/PC-486MU):
-	- Verify ROM bankswitch;
-	  On PC-486SE sets up what is normally IPL bankswitch at PC=0xf5115, successive opcode 
-	  is a jmp 0xf8000, pretty unlikely it delays bankswitch so assume it reloads 
-	  the same bank.
-	- Fix POR/ROM bankswitch on soft resets.
-	- Eventually errors with a ERR:VR (GFX VRAM);
+    TODO: (PC-486SE/PC-486MU):
+    - Verify ROM bankswitch;
+      On PC-486SE sets up what is normally IPL bankswitch at PC=0xf5115, successive opcode
+      is a jmp 0xf8000, pretty unlikely it delays bankswitch so assume it reloads
+      the same bank.
+    - Fix POR/ROM bankswitch on soft resets.
+    - Eventually errors with a ERR:VR (GFX VRAM);
 
     TODO: (PC-9821AP)
     - No way to exit the initial loop. Code looks broken, bad dump?
 
-	TODO: (PC-9821Xa16/PC-9821Ra20/PC-9821Ra333)
-	- "MICON ERROR" at POST (generic HW fault, PCI?);
+    TODO: (PC-9821Xa16/PC-9821Ra20/PC-9821Ra333)
+    - "MICON ERROR" at POST (generic HW fault, PCI?);
 
 ===================================================================================================
 
@@ -240,8 +240,8 @@
 
     For more info (e.g. optional hardware), see http://www.geocities.jp/retro_zzz/machines/nec/9801/mdl98cpu.html
 
-	Epson Series
-	http://www.pc-9800.net/db_epson/desk_index.htm
+    Epson Series
+    http://www.pc-9800.net/db_epson/desk_index.htm
 
     PC-9821 Series
 
@@ -2566,13 +2566,13 @@ void pc9801_state::pc9821ra333(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-	
+
 	// 128KB CPU cache RAM
 	// Trident TGUI9682XGi + integrated 98 gfx card
 	// 3x cbus + 2x PCI slots
 	// 6GB HDD
 	// built-in ethernet 100BASE-TX/10BASE-T
-	
+
 }
 
 // Epson clones
@@ -2582,10 +2582,10 @@ void pc9801_state::pc9821ra333(machine_config &config)
 void pc9801_state::pc386m(machine_config &config)
 {
 	pc9801rs(config);
-//	I386SX(config.replace(), m_maincpu, 16000000); // i386SX 16MHz, switchable to 10/6 MHz
-//	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9801rs_map);
-//	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9801rs_io);
-//	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+//  I386SX(config.replace(), m_maincpu, 16000000); // i386SX 16MHz, switchable to 10/6 MHz
+//  m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9801rs_map);
+//  m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9801rs_io);
+//  m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 	// RAM: 640KB + 14.6MB max
 	// 2 3.5 floppy drives
 	// ...
@@ -2599,7 +2599,7 @@ void pc9801_state::pc486se(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821as_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-	
+
 	pc9801_pit_clock(config, xtal/8); // unknown, passes "ERR:TM" test
 
 	// RAM: 1.6 MB (!) + 17.6 max
@@ -2615,7 +2615,7 @@ void pc9801_state::pc486mu(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821as_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-	
+
 	pc9801_pit_clock(config, xtal/8); // unknown, passes "ERR:TM" test
 
 	// CL-GD5428
@@ -2888,7 +2888,7 @@ ROM_START( pc9821ap2 )
 	ROM_SYSTEM_BIOS(1, "phd0102",  "PHD0102")
 	ROMX_LOAD( "phd0102.rom",     0x000000, 0x80000, CRC(3036774c) SHA1(59856a348f156adf5eca06326f967aca54ff871c), ROM_BIOS(1) )
 
-	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF ) 
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
 	// TODO: identify ROM banks
 	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x08000 )
 	ROM_COPY( "biosrom", 0x30000, 0x18000, 0x18000 )
@@ -2996,7 +2996,7 @@ ROM_START( pc9821ra20 )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
-	
+
 	LOAD_KANJI_ROMS
 	LOAD_IDE_ROM
 ROM_END
@@ -3022,7 +3022,7 @@ ROM_START( pc9821ra333 )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
-	
+
 	LOAD_KANJI_ROMS
 	LOAD_IDE_ROM
 ROM_END
@@ -3099,7 +3099,7 @@ ROM_START( pc486se )
 	ROM_COPY( "biosrom", 0x08000, 0x00000, 0x08000 ) // tests this area at PC=0xf5149
 	ROM_COPY( "biosrom", 0x00000, 0x10000, 0x08000 )
 	ROM_COPY( "biosrom", 0x10000, 0x08000, 0x08000 )
-//	ROM_FILL(                     0x18000, 0x08000, 0x90) // untested by BIOS
+//  ROM_FILL(                     0x18000, 0x08000, 0x90) // untested by BIOS
 	ROM_COPY( "biosrom", 0x10000, 0x20000, 0x08000 ) // PC=f5113 bankswitch into same area, correct?
 	ROM_COPY( "biosrom", 0x18000, 0x28000, 0x08000 )
 
@@ -3115,20 +3115,20 @@ Epson PC-486MU
 i486SX-33 @ 33
 8MB RAM
 3.5'2DD/2HDx2, 2xCD-ROM
-CBus: 3 slots 
+CBus: 3 slots
 */
 
 ROM_START( pc486mu )
 	ROM_REGION16_LE( 0x20000, "biosrom", ROMREGION_ERASEFF )
 	ROM_LOAD( "pc-486mu_hn27c1024.bin", 0x00000, 0x20000, CRC(113268e1) SHA1(2a630abc825b2808f9f8fb65c6cb1fb7e7f6c710))
-//	ROM_LOAD( "bios_486mu.rom", 0x00000, 0x18000, BAD_DUMP CRC(57b5d701) SHA1(15029800842e93e07615b0fd91fb9f2bfe3e3c24))
+//  ROM_LOAD( "bios_486mu.rom", 0x00000, 0x18000, BAD_DUMP CRC(57b5d701) SHA1(15029800842e93e07615b0fd91fb9f2bfe3e3c24))
 
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
 	// backported from pc486se
 	ROM_COPY( "biosrom", 0x08000, 0x00000, 0x08000 )
 	ROM_COPY( "biosrom", 0x00000, 0x10000, 0x08000 )
 	ROM_COPY( "biosrom", 0x10000, 0x08000, 0x08000 )
-//	ROM_FILL(                     0x18000, 0x08000, 0x90) // untested by BIOS
+//  ROM_FILL(                     0x18000, 0x08000, 0x90) // untested by BIOS
 	ROM_COPY( "biosrom", 0x10000, 0x20000, 0x08000 )
 	ROM_COPY( "biosrom", 0x18000, 0x28000, 0x08000 )
 
@@ -3273,7 +3273,7 @@ void pc9801_state::init_pc9801vm_kanji()
 }
 
 // For simpilicity's sake we arbitrarily group those with whatever romset came first historically.
-// This is also repeated in SW list reports: you'd have to use an "On RS class xxx" format to indicate a bug report 
+// This is also repeated in SW list reports: you'd have to use an "On RS class xxx" format to indicate a bug report
 // specifically happening for a family group. This will be hopefully put into stone with driver splits at some point in future.
 
 // "vanilla" class (i86, E/F/M)
@@ -3311,7 +3311,7 @@ COMP( 1993, pc9801bx2,  pc9801rs, 0, pc9801bx2, pc9801rs, pc9801_state, init_pc9
 // Epson class
 COMP( 1990, pc386m,     0,        0, pc386m,    pc9801rs, pc9801_state, init_pc9801_kanji,   "Epson", "PC-386M",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1994, pc486mu,    0,        0, pc486mu,   pc9821,   pc9801_state, init_pc9801_kanji,   "Epson", "PC-486MU",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1993, pc486se,    pc486mu,  0, pc486se,   pc9801rs, pc9801_state, init_pc9801_kanji,   "Epson", "PC-486SE",					   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1993, pc486se,    pc486mu,  0, pc486se,   pc9801rs, pc9801_state, init_pc9801_kanji,   "Epson", "PC-486SE",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // PC9821 class
 // TODO: unknown real model of parent, given the BIOS rom size wrt the others it may be better suited as a "98Multi" or even a FA class?

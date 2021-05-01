@@ -56,7 +56,7 @@ u8 ym2610_device::read(offs_t offset)
 	u8 result = 0;
 	switch (offset & 3)
 	{
-		case 0:	// status port, YM2203 compatible
+		case 0: // status port, YM2203 compatible
 			result = m_fm.status() & (fm_engine::STATUS_TIMERA | fm_engine::STATUS_TIMERB | fm_engine::STATUS_BUSY);
 			break;
 
@@ -67,7 +67,7 @@ u8 ym2610_device::read(offs_t offset)
 				result = 1;  // ID code
 			break;
 
-		case 2:	// status port, extended
+		case 2: // status port, extended
 			m_stream->update();
 			result = m_eos_status & m_flag_mask;
 			break;

@@ -25,8 +25,8 @@ public:
 	// no read access present
 
 	// write access
-	void address_w(u8 data);	// A0=0
-	void data_w(u8 data);		// A0=1
+	void address_w(u8 data);    // A0=0
+	void data_w(u8 data);       // A0=1
 	void write(offs_t offset, u8 data);
 
 protected:
