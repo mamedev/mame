@@ -19,94 +19,20 @@ DEFINE_DEVICE_TYPE(DS1001, ds1001_device, "ds1001", "Yamaha DS1001 / Konami 0539
 //  ym2413_device - constructor
 //-------------------------------------------------
 
-ym2413_device::ym2413_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type, u8 const *instruments) :
-	device_t(mconfig, type, tag, owner, clock),
-	device_sound_interface(mconfig, *this),
-	m_address(0),
-	m_stream(nullptr),
-	m_internal(*this, "internal"),
-	m_fm(*this)
+ym2413_device::ym2413_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	ymfm_device_base<ymfm::ym2413>(mconfig, tag, owner, clock, YM2413),
+	m_internal(*this, "internal")
 {
 }
 
 
 //-------------------------------------------------
-//  address_w - write to the address port (A0=0)
-//-------------------------------------------------
-
-void ym2413_device::address_w(u8 value)
-{
-	m_address = value;
-}
-
-
-//-------------------------------------------------
-//  data_w - write to the data port (A0=1)
-//-------------------------------------------------
-
-void ym2413_device::data_w(u8 value)
-{
-	// force an update
-	m_stream->update();
-
-	// write to FM
-	m_fm.write(m_address, value);
-}
-
-
-//-------------------------------------------------
-//  write - handle a write to the register
-//  interface
-//-------------------------------------------------
-
-void ym2413_device::write(offs_t offset, u8 value)
-{
-	// A0 selects between address/data
-	if ((offset & 1) == 0)
-		address_w(value);
-	else
-		data_w(value);
-}
-
-
-//-------------------------------------------------
-//  device_start - start of emulation
+//  device_start - device startup
 //-------------------------------------------------
 
 void ym2413_device::device_start()
 {
-	// create our stream
-	m_stream = stream_alloc(0, fm_engine::OUTPUTS, m_fm.sample_rate(clock()));
-
-	// save our data
-	save_item(YMFM_NAME(m_address));
-
-	// save the engines
-	m_fm.save(*this);
-
-	// set up the instrument data
-	m_fm.set_instrument_data(m_internal);
-}
-
-
-//-------------------------------------------------
-//  device_reset - start of emulation
-//-------------------------------------------------
-
-void ym2413_device::device_reset()
-{
-	// reset the engines
-	m_fm.reset();
-}
-
-
-//-------------------------------------------------
-//  device_clock_changed - update if clock changes
-//-------------------------------------------------
-
-void ym2413_device::device_clock_changed()
-{
-	m_stream->set_sample_rate(m_fm.sample_rate(clock()));
+	m_chip.set_instrument_data(m_internal);
 }
 
 
@@ -129,30 +55,6 @@ const tiny_rom_entry *ym2413_device::device_rom_region() const
 }
 
 
-//-------------------------------------------------
-//  sound_stream_update - update the sound stream
-//-------------------------------------------------
-
-void ym2413_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
-{
-	// iterate over all target samples
-	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
-	{
-		// clock the system
-		m_fm.clock(fm_engine::ALL_CHANNELS);
-
-		// update the FM; YM3812 is 9-bit, unsure of clipping but guessing
-		// it is similar to YM2612
-		s32 sums[fm_engine::OUTPUTS] = { 0 };
-		m_fm.output(sums, 5, 256, fm_engine::ALL_CHANNELS);
-
-		// the YM3812 is time multiplexed; just simulate this by summing all the
-		// channels and dividing down
-		for (int outnum = 0; outnum < fm_engine::OUTPUTS; outnum++)
-			outputs[outnum].put_int(sampindex, sums[outnum], 256*6*2);
-	}
-}
-
 
 //*********************************************************
 //  YM2423 DEVICE (OPLL-X)
@@ -163,8 +65,19 @@ void ym2413_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 //-------------------------------------------------
 
 ym2423_device::ym2423_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	ym2413_device(mconfig, tag, owner, clock, YM2423)
+	ymfm_device_base<ymfm::ym2423>(mconfig, tag, owner, clock, YM2423),
+	m_internal(*this, "internal")
 {
+}
+
+
+//-------------------------------------------------
+//  device_start - device startup
+//-------------------------------------------------
+
+void ym2423_device::device_start()
+{
+	m_chip.set_instrument_data(m_internal);
 }
 
 
@@ -187,6 +100,7 @@ const tiny_rom_entry *ym2423_device::device_rom_region() const
 }
 
 
+
 //*********************************************************
 //  YMF281 DEVICE (OPLLP)
 //*********************************************************
@@ -196,8 +110,19 @@ const tiny_rom_entry *ym2423_device::device_rom_region() const
 //-------------------------------------------------
 
 ymf281_device::ymf281_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	ym2413_device(mconfig, tag, owner, clock, YMF281)
+	ymfm_device_base<ymfm::ymf281>(mconfig, tag, owner, clock, YMF281),
+	m_internal(*this, "internal")
 {
+}
+
+
+//-------------------------------------------------
+//  device_start - device startup
+//-------------------------------------------------
+
+void ymf281_device::device_start()
+{
+	m_chip.set_instrument_data(m_internal);
 }
 
 
@@ -220,6 +145,7 @@ const tiny_rom_entry *ymf281_device::device_rom_region() const
 }
 
 
+
 //*********************************************************
 //  DS1001 DEVICE (Konami VRC7)
 //*********************************************************
@@ -229,8 +155,19 @@ const tiny_rom_entry *ymf281_device::device_rom_region() const
 //-------------------------------------------------
 
 ds1001_device::ds1001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	ym2413_device(mconfig, tag, owner, clock, DS1001)
+	ymfm_device_base<ymfm::ds1001>(mconfig, tag, owner, clock, DS1001),
+	m_internal(*this, "internal")
 {
+}
+
+
+//-------------------------------------------------
+//  device_start - device startup
+//-------------------------------------------------
+
+void ds1001_device::device_start()
+{
+	m_chip.set_instrument_data(m_internal);
 }
 
 

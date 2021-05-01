@@ -111,11 +111,14 @@ public:
 	// constructor
 	opl_registers_base();
 
-	// register for save states
-	void save(fm_interface &intf);
-
 	// reset to initial state
 	void reset();
+
+	// save/restore
+	void save_restore(fm_saved_state &state);
+#ifdef MAME_EMU_SAVE_H
+	void register_save(device_t &device);
+#endif
 
 	// map channel number to register offset
 	static constexpr uint32_t channel_offset(uint32_t chnum)
@@ -322,11 +325,14 @@ public:
 	// constructor
 	opll_registers();
 
-	// register for save states
-	void save(fm_interface &intf);
-
 	// reset to initial state
 	void reset();
+
+	// save/restore
+	void save_restore(fm_saved_state &state);
+#ifdef MAME_EMU_SAVE_H
+	void register_save(device_t &device);
+#endif
 
 	// map channel number to register offset
 	static constexpr uint32_t channel_offset(uint32_t chnum)
@@ -459,7 +465,7 @@ private:
 
 
 //*********************************************************
-//  IMPLEMENTATION CLASSES
+//  OPL IMPLEMENTATION CLASSES
 //*********************************************************
 
 // ======================> ym3526
@@ -488,7 +494,6 @@ public:
 
 	// read access
 	uint8_t read_status();
-	uint8_t read_data();
 	uint8_t read(uint32_t offset);
 
 	// write access
@@ -557,6 +562,11 @@ protected:
 };
 
 
+
+//*********************************************************
+//  OPL2 IMPLEMENTATION CLASSES
+//*********************************************************
+
 // ======================> ym3812
 
 class ym3812
@@ -583,7 +593,6 @@ public:
 
 	// read access
 	uint8_t read_status();
-	uint8_t read_data();
 	uint8_t read(uint32_t offset);
 
 	// write access
@@ -601,145 +610,21 @@ protected:
 };
 
 
-// ======================> ym2608
 
-class ym2608
-{
-	static constexpr uint8_t STATUS_ADPCM_B_EOS = 0x04;
-	static constexpr uint8_t STATUS_ADPCM_B_BRDY = 0x08;
-	static constexpr uint8_t STATUS_ADPCM_B_ZERO = 0x10;
-	static constexpr uint8_t STATUS_ADPCM_B_PLAYING = 0x20;
+//*********************************************************
+//  OPL3 IMPLEMENTATION CLASSES
+//*********************************************************
 
-public:
-	using fm_engine = fm_engine_base<opn_registers>;
-	static constexpr uint32_t OUTPUTS = fm_engine::OUTPUTS;
-	static constexpr uint32_t SSG_OUTPUTS = ssg_engine::OUTPUTS;
+// ======================> ymf262
 
-	// constructor
-	ym2608(fm_interface &intf);
-	ym2608(fm_interface &intf, ssg_interface &ssg);
-
-	// reset
-	void reset();
-
-	// save/restore
-	void save_restore(fm_saved_state &state);
-#ifdef MAME_EMU_SAVE_H
-	void register_save(device_t &device);
-#endif
-
-	// pass-through helpers
-	uint32_t sample_rate(uint32_t input_clock) const { return m_fm.sample_rate(input_clock); }
-	uint32_t sample_rate_ssg(uint32_t input_clock) const { uint32_t scale = m_fm.clock_prescale() * 2 / 3; return input_clock * 2 / scale; }
-	void invalidate_caches() { m_fm.invalidate_caches(); }
-
-	// read access
-	uint8_t read_status();
-	uint8_t read_data();
-	uint8_t read_status_hi();
-	uint8_t read_data_hi();
-	uint8_t read(uint32_t offset);
-
-	// write access
-	void write_address(uint8_t data);
-	void write_data(uint8_t data);
-	void write_address_hi(uint8_t data);
-	void write_data_hi(uint8_t data);
-	void write(uint32_t offset, uint8_t data);
-
-	// generate one sample of sound
-	void generate(int32_t output[fm_engine::OUTPUTS]);
-	void generate_ssg(int32_t output[ssg_engine::OUTPUTS]) { m_ssg.generate(output); }
-
-protected:
-	// internal updates
-	void update_prescale(uint8_t prescale);
-
-	// internal state
-	uint16_t m_address;            // address register
-	uint8_t m_irq_enable;          // IRQ enable register
-	uint8_t m_flag_control;        // flag control register
-	fm_engine m_fm;                // core FM engine
-	ssg_engine m_ssg;              // SSG engine
-	adpcm_a_engine m_adpcm_a;      // ADPCM-A engine
-	adpcm_b_engine m_adpcm_b;      // ADPCM-B engine
-};
-
-
-// ======================> ym2610/ym2610b
-
-class ym2610
+class ymf262
 {
 public:
-	using fm_engine = fm_engine_base<opn_registers>;
+	using fm_engine = fm_engine_base<opl3_registers>;
 	static constexpr uint32_t OUTPUTS = fm_engine::OUTPUTS;
 
 	// constructor
-	ym2610(fm_interface &intf, uint8_t channel_mask = 0x36);
-	ym2610(fm_interface &intf, ssg_interface &ssg, uint8_t channel_mask = 0x36);
-
-	// reset
-	void reset();
-
-	// save/restore
-	void save_restore(fm_saved_state &state);
-#ifdef MAME_EMU_SAVE_H
-	void register_save(device_t &device);
-#endif
-
-	// pass-through helpers
-	uint32_t sample_rate(uint32_t input_clock) const { return m_fm.sample_rate(input_clock); }
-	uint32_t sample_rate_ssg(uint32_t input_clock) const { return input_clock / 4; }
-	void invalidate_caches() { m_fm.invalidate_caches(); }
-
-	// read access
-	uint8_t read_status();
-	uint8_t read_data();
-	uint8_t read_status_hi();
-	uint8_t read_data_hi();
-	uint8_t read(uint32_t offset);
-
-	// write access
-	void write_address(uint8_t data);
-	void write_data(uint8_t data);
-	void write_address_hi(uint8_t data);
-	void write_data_hi(uint8_t data);
-	void write(uint32_t offset, uint8_t data);
-
-	// generate one sample of sound
-	void generate(int32_t output[fm_engine::OUTPUTS]);
-	void generate_ssg(int32_t output[ssg_engine::OUTPUTS]) { m_ssg.generate(output); }
-
-protected:
-	// internal state
-	uint16_t m_address;            // address register
-	uint8_t const m_fm_mask;       // FM channel mask
-	uint8_t m_eos_status;          // end-of-sample signals
-	uint8_t m_flag_mask;           // flag mask control
-	fm_engine m_fm;                // core FM engine
-	ssg_engine m_ssg;              // core FM engine
-	adpcm_a_engine m_adpcm_a;      // ADPCM-A engine
-	adpcm_b_engine m_adpcm_b;      // ADPCM-B engine
-};
-
-class ym2610b : public ym2610
-{
-public:
-	// constructor
-	ym2610b(fm_interface &intf) : ym2610(intf, 0x3f) { }
-};
-
-
-// ======================> ym2612/ym3438/ymf276
-
-class ym2612
-{
-public:
-	using fm_engine = fm_engine_base<opn_registers>;
-	static constexpr uint32_t OUTPUTS = fm_engine::OUTPUTS;
-
-	// constructor
-	ym2612(fm_interface &intf);
+	ymf262(fm_interface &intf);
 
 	// reset
 	void reset();
@@ -770,29 +655,118 @@ public:
 
 protected:
 	// internal state
-	uint16_t m_address;              // address register
-	uint16_t m_dac_data;             // 9-bit DAC data
-	uint8_t m_dac_enable;            // DAC enabled?
+	uint8_t m_address;               // address register
 	fm_engine m_fm;                  // core FM engine
 };
 
-class ym3438 : public ym2612
+
+
+//*********************************************************
+//  OPLL IMPLEMENTATION CLASSES
+//*********************************************************
+
+// ======================> opll_base
+
+class opll_base
 {
 public:
-	ym3438(fm_interface &intf) : ym2612(intf) { }
+	using fm_engine = fm_engine_base<opll_registers>;
+	static constexpr uint32_t OUTPUTS = fm_engine::OUTPUTS;
+
+	// constructor
+	opll_base(fm_interface &intf, uint8_t const *data);
+
+	// configuration
+	void set_instrument_data(uint8_t const *data) { m_fm.regs().set_instrument_data(data); }
+
+	// reset
+	void reset();
+
+	// save/restore
+	void save_restore(fm_saved_state &state);
+#ifdef MAME_EMU_SAVE_H
+	void register_save(device_t &device);
+#endif
+
+	// pass-through helpers
+	uint32_t sample_rate(uint32_t input_clock) const { return m_fm.sample_rate(input_clock); }
+	void invalidate_caches() { m_fm.invalidate_caches(); }
+
+	// read access -- doesn't really have any, but provide these for consistency
+	uint8_t read_status() { return 0x00; }
+	uint8_t read(uint32_t offset) { return 0x00; }
+
+	// write access
+	void write_address(uint8_t data);
+	void write_data(uint8_t data);
+	void write(uint32_t offset, uint8_t data);
 
 	// generate one sample of sound
 	void generate(int32_t output[fm_engine::OUTPUTS]);
+
+protected:
+	// internal state
+	uint8_t m_address;               // address register
+	fm_engine m_fm;                  // core FM engine
 };
 
-class ymf276 : public ym2612
+
+// ======================> ym2413
+
+class ym2413 : public opll_base
 {
 public:
-	ymf276(fm_interface &intf) : ym2612(intf) { }
+	// constructor
+	ym2413(fm_interface &intf, uint8_t const *instrument_data = nullptr);
 
-	// generate one sample of sound
-	void generate(int32_t output[fm_engine::OUTPUTS]);
+private:
+	// internal state
+	static uint8_t const s_default_instruments[];
 };
+
+
+// ======================> ym2413
+
+class ym2423 : public opll_base
+{
+public:
+	// constructor
+	ym2423(fm_interface &intf, uint8_t const *instrument_data = nullptr);
+
+private:
+	// internal state
+	static uint8_t const s_default_instruments[];
+};
+
+
+// ======================> ymf281
+
+class ymf281 : public opll_base
+{
+public:
+	// constructor
+	ymf281(fm_interface &intf, uint8_t const *instrument_data = nullptr);
+
+private:
+	// internal state
+	static uint8_t const s_default_instruments[];
+};
+
+
+// ======================> ds1001
+
+class ds1001 : public opll_base
+{
+public:
+	// constructor
+	ds1001(fm_interface &intf, uint8_t const *instrument_data = nullptr);
+
+private:
+	// internal state
+	static uint8_t const s_default_instruments[];
+};
+
+
 
 }
 

@@ -278,7 +278,7 @@ using opna_registers = opn_registers_base<true>;
 
 
 //*********************************************************
-//  IMPLEMENTATION CLASSES
+//  OPN IMPLEMENTATION CLASSES
 //*********************************************************
 
 // ======================> ym2203
@@ -334,6 +334,11 @@ protected:
 	ssg_engine m_ssg;                // SSG engine
 };
 
+
+
+//*********************************************************
+//  OPNA IMPLEMENTATION CLASSES
+//*********************************************************
 
 // ======================> ym2608
 
@@ -469,7 +474,7 @@ public:
 };
 
 
-// ======================> ym2612/ym3438/ymf276
+// ======================> ym2612
 
 class ym2612
 {
@@ -515,6 +520,9 @@ protected:
 	fm_engine m_fm;                  // core FM engine
 };
 
+
+// ======================> ym3438
+
 class ym3438 : public ym2612
 {
 public:
@@ -523,6 +531,9 @@ public:
 	// generate one sample of sound
 	void generate(int32_t output[fm_engine::OUTPUTS]);
 };
+
+
+// ======================> ymf276
 
 class ymf276 : public ym2612
 {

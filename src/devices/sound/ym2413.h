@@ -6,44 +6,27 @@
 
 #pragma once
 
-#include "ymfm.h"
+#include "ymfm_mame.h"
+#include "ymfm_opl.h"
 
 
 // ======================> ym2413_device
 
 DECLARE_DEVICE_TYPE(YM2413, ym2413_device);
 
-class ym2413_device : public device_t, public device_sound_interface
+class ym2413_device : public ymfm_device_base<ymfm::ym2413>
 {
 public:
-	// YM2151 is OPLL
-	using fm_engine = ymopll_engine;
-
 	// constructor
-	ym2413_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type = YM2413, u8 const *instruments = nullptr);
-
-	// no read access present
-
-	// write access
-	void address_w(u8 data);    // A0=0
-	void data_w(u8 data);       // A0=1
-	void write(offs_t offset, u8 data);
+	ym2413_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_clock_changed() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	// sound overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
-
 	// internal state
-	u8 m_address;                       // address register
-	sound_stream *m_stream;             // sound stream
 	required_region_ptr<u8> m_internal; // internal memory region
-	fm_engine m_fm;                     // core FM engine
 };
 
 
@@ -51,7 +34,7 @@ protected:
 
 DECLARE_DEVICE_TYPE(YM2423, ym2423_device);
 
-class ym2423_device : public ym2413_device
+class ym2423_device : public ymfm_device_base<ymfm::ym2423>
 {
 public:
 	// constructor
@@ -59,7 +42,11 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_start() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	// internal state
+	required_region_ptr<u8> m_internal; // internal memory region
 };
 
 
@@ -67,7 +54,7 @@ protected:
 
 DECLARE_DEVICE_TYPE(YMF281, ymf281_device);
 
-class ymf281_device : public ym2413_device
+class ymf281_device : public ymfm_device_base<ymfm::ymf281>
 {
 public:
 	// constructor
@@ -75,7 +62,11 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_start() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	// internal state
+	required_region_ptr<u8> m_internal; // internal memory region
 };
 
 
@@ -83,7 +74,7 @@ protected:
 
 DECLARE_DEVICE_TYPE(DS1001, ds1001_device);
 
-class ds1001_device : public ym2413_device
+class ds1001_device : public ymfm_device_base<ymfm::ds1001>
 {
 public:
 	// constructor
@@ -91,7 +82,11 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_start() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	// internal state
+	required_region_ptr<u8> m_internal; // internal memory region
 };
 
 

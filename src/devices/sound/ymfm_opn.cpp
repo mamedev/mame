@@ -45,7 +45,7 @@ void opn_registers_base<IsOpnA>::reset()
 
 
 //-------------------------------------------------
-//  save - register for save states
+//  save_restore - save or restore the data
 //-------------------------------------------------
 
 template<bool IsOpnA>

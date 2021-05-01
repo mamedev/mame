@@ -1230,52 +1230,25 @@ if (SOUNDS["YM2203"]~=null or SOUNDS["YM2608"]~=null or SOUNDS["YM2610"]~=null o
 	}
 end
 
-if (SOUNDS["YM2413"]~=null or SOUNDS["YM2423"]~=null or SOUNDS["YMF281"]~=null or SOUNDS["DS1001"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/ym2413.cpp",
-		MAME_DIR .. "src/devices/sound/ym2413.h",
-		MAME_DIR .. "src/devices/sound/ymfm.cpp",
-		MAME_DIR .. "src/devices/sound/ymfm.h",
-	}
-end
-
-if (SOUNDS["YM3812"]~=null or SOUNDS["YM3526"]~=null or SOUNDS["Y8950"]~=null) then
---if (SOUNDS["YM3812"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/ym3812.cpp",
-		MAME_DIR .. "src/devices/sound/ym3812.h",
-		MAME_DIR .. "src/devices/sound/ymfm.cpp",
-		MAME_DIR .. "src/devices/sound/ymfm.h",
-	}
---end
-
---if (SOUNDS["YM3526"]~=null) then
+if (SOUNDS["YM3526"]~=null or SOUNDS["Y8950"]~=null or SOUNDS["YM3812"]~=null or SOUNDS["YMF262"]~=null or SOUNDS["YM2413"]~=null or SOUNDS["YM2423"]~=null or SOUNDS["YMF281"]~=null or SOUNDS["DS1001"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/ym3526.cpp",
 		MAME_DIR .. "src/devices/sound/ym3526.h",
-		MAME_DIR .. "src/devices/sound/ymfm.cpp",
-		MAME_DIR .. "src/devices/sound/ymfm.h",
-	}
---end
-
---if (SOUNDS["Y8950"]~=null) then
-	files {
 		MAME_DIR .. "src/devices/sound/y8950.cpp",
 		MAME_DIR .. "src/devices/sound/y8950.h",
-		MAME_DIR .. "src/devices/sound/ymfm.cpp",
-		MAME_DIR .. "src/devices/sound/ymfm.h",
-		MAME_DIR .. "src/devices/sound/ymadpcm.cpp",
-		MAME_DIR .. "src/devices/sound/ymadpcm.h",
-	}
---end
-end
-
-if (SOUNDS["YMF262"]~=null) then
-	files {
+		MAME_DIR .. "src/devices/sound/ym3812.cpp",
+		MAME_DIR .. "src/devices/sound/ym3812.h",
 		MAME_DIR .. "src/devices/sound/ymf262.cpp",
 		MAME_DIR .. "src/devices/sound/ymf262.h",
+		MAME_DIR .. "src/devices/sound/ym2413.cpp",
+		MAME_DIR .. "src/devices/sound/ym2413.h",
+		MAME_DIR .. "src/devices/sound/ymadpcm.cpp",
+		MAME_DIR .. "src/devices/sound/ymadpcm.h",
 		MAME_DIR .. "src/devices/sound/ymfm.cpp",
 		MAME_DIR .. "src/devices/sound/ymfm.h",
+		MAME_DIR .. "src/devices/sound/ymfm.ipp",
+		MAME_DIR .. "src/devices/sound/ymfm_opl.cpp",
+		MAME_DIR .. "src/devices/sound/ymfm_opl.h",
 	}
 end
 
