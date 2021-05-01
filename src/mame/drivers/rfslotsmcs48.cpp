@@ -79,4 +79,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME     PARENT MACHINE  INPUT    CLASS               INIT        ROT   COMPANY               FULLNAME        FLAGS
-GAME( 198?, ajofrin, 0,     ajofrin, ajofrin, rfslotsmcs48_state, empty_init, ROT0, "Recreativos Franco", "Ajofrin City", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1981, ajofrin, 0,     ajofrin, ajofrin, rfslotsmcs48_state, empty_init, ROT0, "Recreativos Franco", "Ajofrin City", MACHINE_IS_SKELETON_MECHANICAL )
