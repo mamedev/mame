@@ -63,4 +63,48 @@ Quickloads do not work on disk-based microbees, or on premium models.
 		</part>
 	</software>
 
+	<software name="alienc">
+		<description>Alien Cresta</description>
+		<year>1981</year><!-- year of port unknown-->
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2032">
+				<rom name="alien.bee" size="0x2032" crc="85d5dff6" sha1="59fcbf3880aafc6e9c8acfd383d708188cf3f16c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astplus">
+		<description>Asteroids Plus</description>
+		<year>198?</year>
+		<publisher>Mytek</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2e00">
+				<rom name="ast+r1.bin" size="0x2e00" crc="07b5596c" sha1="0fb7d4df5887481677368c58335c9a450bcaa8f4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteroids">
+		<description>Asteroids</description><!-- not the Atari game -->
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x07bc">
+				<rom name="asteroid.mwb" size="0x07bc" crc="4712292a" sha1="ec2e4c396fc19f6b44817a6e57cc3062ad208dcf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="azragor">
+		<description>Temple of Azragor</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x4200">
+				<rom name="azragor.mwb" size="0x4200" crc="5af884a2" sha1="d24bec4899d2d21b1bcbe325699cf9552f3b2786"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
