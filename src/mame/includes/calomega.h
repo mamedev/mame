@@ -47,10 +47,11 @@ public:
 	}
 
 	void init_sys903();
-	void init_comg079();
-	void init_comg080();
 	void init_s903mod();
 	void init_sys905();
+	void init_comg079();
+	void init_comg080();
+	void init_comg176();
 	void init_comg5108();
 	void init_cas21iwc();
 	void init_pokeriwc();

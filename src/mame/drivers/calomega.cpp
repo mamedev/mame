@@ -442,6 +442,17 @@
     DRIVER UPDATES
     --------------
 
+
+    [2021-05]
+
+    General improvements...
+    - Fixed inputs on Cal Omega - Game 12.5 (Bingo).
+	- Inputs for Cal Omega - Game 13.4 (Nudge). Promoted to WORKING.
+	- Inputs for Cal Omega - Game 17.6 (Nudge). Promoted to WORKING.
+	- Inputs for Cal Omega - Game 18.1 (Nudge). Promoted to WORKING.
+	- Fixed/added technical notes.
+
+
     [2021-04-26]
 
     General improvements...
@@ -2033,7 +2044,7 @@ static INPUT_PORTS_START( comg076 )
 	PORT_DIPSETTING(    0x00, "50Hz." )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( comg125 )	// nudge bingo
+static INPUT_PORTS_START( nudgensw )	// nudge bingo
 	PORT_START("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 1 Up") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 2 Up") PORT_CODE(KEYCODE_S)
@@ -2163,6 +2174,19 @@ static INPUT_PORTS_START( comg125 )	// nudge bingo
 	PORT_DIPSETTING(    0x80, "60Hz." )
 	PORT_DIPSETTING(    0x00, "50Hz." )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( nudgesw )
+
+	PORT_INCLUDE( nudgensw )
+
+	PORT_MODIFY("SW1")    // settings (PIA1), SW2 in schematics
+	PORT_DIPNAME( 0xc0, 0xc0, "Bet Options" )  			PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x00, "Play 1" )
+	PORT_DIPSETTING(    0x40, "Play 1 to 3" )
+	PORT_DIPSETTING(    0x80, "Play 1 to 4" )
+	PORT_DIPSETTING(    0xc0, "Play 1 to 8" )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( comg128 )
 	PORT_START("IN0-0")
@@ -4601,6 +4625,13 @@ void calomega_state::init_comg080()
 	PRGROM[0x3fff] = 0x26;
 }
 
+void calomega_state::init_comg176()
+{
+	uint8_t *PRGROM = memregion( "maincpu" )->base();
+
+	PRGROM[0x25df] = 0x00;    // patching the checksum flag.
+}
+
 void calomega_state::init_comg5108()
 {
 	uint8_t *PRGROM = memregion( "maincpu" )->base();
@@ -4754,6 +4785,7 @@ void calomega_state::init_comg079()
     PRGROM[0x2E6F] = 0x09;
 }
 
+// for debug purposes...
 void calomega_state::init_any()
 {
 	uint8_t *PRGROM = memregion( "maincpu" )->base();
@@ -4773,10 +4805,10 @@ GAME( 1981, comg080,  0,        sys903,   arcadebj, calomega_state, init_comg080
 GAME( 1981, comg094,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 9.4 (Keno)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, comg107,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 10.7c (Big Game)",                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, comg123,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.3 (Ticket Poker)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // bad dump
-GAME( 1982, comg125,  0,        sys903,   comg125,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.5 (Bingo)",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg125,  0,        sys903,   nudgesw,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.5 (Bingo)",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, comg127,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.7 (Keno)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, comg128,  0,        sys903,   comg128,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.8 (Arcade Game)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg134,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 13.4 (Nudge Bingo)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg134,  0,        sys903,   nudgensw, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 13.4 (Nudge)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1982, comg145,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 14.5 (Pixels)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, comg157,  0,        sys903,   comg157,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.7 (Double-Draw Poker)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1983, comg159,  0,        sys905,   comg159,  calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.9 (Wild Double-Up)",           MACHINE_SUPPORTS_SAVE )
@@ -4784,8 +4816,8 @@ GAME( 1983, comg164,  0,        sys903,   stand903, calomega_state, init_sys903,
 GAME( 1983, comg168,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.8 (Keno)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, comg172,  0,        sys905,   comg172,  calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.2 (Double Double Poker)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1984, comg175,  0,        sys903,   gdrwpkrd, calomega_state, init_sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 17.51 (Gaming Draw Poker)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg176,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.6 (Nudge Bingo)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg181,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.1 (Nudge Bingo)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg176,  0,        sys903,   nudgensw, calomega_state, init_comg176, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.6 (Nudge)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg181,  0,        sys903,   nudgesw,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.1 (Nudge)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1983, comg183,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.3 (Pixels)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, comg185,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.5 (Pixels)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, comg186,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.6 (Pixels)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
