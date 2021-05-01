@@ -155,6 +155,7 @@ static const float128 float128_one =
         packFloat_128(0x3fff000000000000U, 0x0000000000000000U);
 static const float128 float128_sqrt3 =
         packFloat_128(0x3fffbb67ae8584caU, 0xa73b25742d7078b8U);
+static const floatx80 floatx80_one = packFloatx80(0, 0x3fff, 0x8000000000000000U);
 static const floatx80 floatx80_pi  =
         packFloatx80(0, 0x4000, 0xc90fdaa22168c235U);
 
@@ -400,5 +401,5 @@ approximation_completed:
 // it by simply hardcoding one here.
 floatx80 floatx80_fatan(floatx80 a)
 {
-	return floatx80_fpatan(a, float128_one);
+	return floatx80_fpatan(a, floatx80_one);
 }
