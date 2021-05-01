@@ -441,7 +441,6 @@ MACHINES["TTL74259"] = true
 MACHINES["TTL7474"] = true
 MACHINES["KBDC8042"] = true
 MACHINES["I8257"] = true
-MACHINES["AAKARTDEV"] = true
 --MACHINES["ACIA6850"] = true
 MACHINES["ADC0804"] = true
 MACHINES["ADC0808"] = true
@@ -1045,8 +1044,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/ertictac.cpp",
 	MAME_DIR .. "src/mame/drivers/ssfindo.cpp",
 	MAME_DIR .. "src/mame/drivers/aristmk5.cpp",
-	MAME_DIR .. "src/mame/machine/archimds.cpp",
-	MAME_DIR .. "src/mame/includes/archimds.h",
 }
 
 createMAMEProjects(_target, _subtarget, "adp")
