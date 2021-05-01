@@ -23,7 +23,6 @@ public:
 	ym2151_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers, handled by the interface
-	auto irq_handler() { return update_irq_handler(); }
 	auto port_write_handler() { return io_write_handler(); }
 
 	// write access, handled by the chip implementation
@@ -51,7 +50,6 @@ public:
 	ym2164_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers, handled by the interface
-	auto irq_handler() { return update_irq_handler(); }
 	auto port_write_handler() { return io_write_handler(); }
 };
 

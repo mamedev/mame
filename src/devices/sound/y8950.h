@@ -22,7 +22,6 @@ public:
 	y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	auto irq_handler() { return update_irq_handler(); }
 	auto io_read() { return io_read_handler(0); }
 	auto io_write() { return io_write_handler(0); }
 	auto keyboard_read() { return io_read_handler(1); }

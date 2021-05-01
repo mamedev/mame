@@ -1265,6 +1265,9 @@ if (SOUNDS["YMF278B"]~=null) then
 		MAME_DIR .. "src/devices/sound/ymf278b.h",
 		MAME_DIR .. "src/devices/sound/ymfm.cpp",
 		MAME_DIR .. "src/devices/sound/ymfm.h",
+		MAME_DIR .. "src/devices/sound/ymfm.ipp",
+		MAME_DIR .. "src/devices/sound/ymfm_opl.cpp",
+		MAME_DIR .. "src/devices/sound/ymfm_opl.h",
 	}
 end
 

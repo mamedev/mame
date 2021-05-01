@@ -35,7 +35,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(ym2148_irq_w);
 
 	required_memory_region m_region_sfg;
-	required_device<ym2151_device> m_ym2151;
+	required_device<ymfm_device_standalone_base> m_ym2151;
 	required_device<msx_audio_kbdc_port_device> m_kbdc;
 	required_device<ym2148_device> m_ym2148;
 	int m_ym2151_irq_state;

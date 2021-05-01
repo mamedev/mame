@@ -39,6 +39,12 @@ public:
 	{
 	}
 
+	// read access, handled by the chip implementation
+	virtual u8 read(offs_t offset) = 0;
+
+	// write access, handled by the chip implementation
+	virtual void write(offs_t offset, u8 data) = 0;
+
 protected:
 	// device overrides
 	virtual void device_start() override
@@ -65,6 +71,13 @@ public:
 	{
 	}
 
+	// read access, handled by the chip implementation
+	virtual u8 read(offs_t offset) = 0;
+
+	// write access, handled by the chip implementation
+	virtual void write(offs_t offset, u8 data) = 0;
+
+protected:
 	// SSG overrides
 	virtual void ssg_reset() override
 	{
@@ -123,12 +136,12 @@ public:
 	}
 
 	// configuration helpers, handled by the interface
-	auto update_irq_handler() { return m_update_irq.bind(); }
+	auto irq_handler() { return m_update_irq.bind(); }
 	auto io_read_handler(int index = 0) { return m_io_read[index & 1].bind(); }
 	auto io_write_handler(int index = 0) { return m_io_write[index & 1].bind(); }
 
 	// read access, handled by the chip implementation
-	u8 read(offs_t offset)
+	virtual u8 read(offs_t offset) override
 	{
 		m_stream->update();
 		return m_chip.read(offset);
@@ -142,7 +155,7 @@ public:
 	}
 
 	// write access, handled by the chip implementation
-	void write(offs_t offset, u8 data)
+	virtual void write(offs_t offset, u8 data) override
 	{
 		m_stream->update();
 		m_chip.write(offset, data);

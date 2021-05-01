@@ -21,9 +21,6 @@ public:
 	// constructor
 	ym2610_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type);
 
-	// configuration helpers
-	auto irq_handler() { return parent::update_irq_handler(); }
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;

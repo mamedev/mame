@@ -64,7 +64,7 @@
 // number of extra FM samples we need to consume for each output sample,
 // as a 0.24 fixed point fraction.
 static constexpr double NOMINAL_CLOCK = 33868800;
-static constexpr double NOMINAL_FM_RATE = NOMINAL_CLOCK / double(ymopl4_registers::DEFAULT_PRESCALE * ymopl4_registers::OPERATORS);
+static constexpr double NOMINAL_FM_RATE = NOMINAL_CLOCK / double(ymfm::opl4_registers::DEFAULT_PRESCALE * ymfm::opl4_registers::OPERATORS);
 static constexpr double NOMINAL_OUTPUT_RATE = NOMINAL_CLOCK / 768.0;
 static constexpr uint32_t FM_STEP = uint32_t((NOMINAL_FM_RATE / NOMINAL_OUTPUT_RATE - 1.0) * double(1 << 24));
 
@@ -929,8 +929,18 @@ void ymf278b_device::device_start()
 	// Register state for saving
 	register_save_state();
 
-	// YMF262 related
-	m_fm.save(*this);
+	// YMF262 related -- cribbed from ymfm_device_base_common
+	{
+		// allocate our timers
+		for (int tnum = 0; tnum < 2; tnum++)
+			m_timer[tnum] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ymf278b_device::fm_timer_handler), this));
+
+		// resolve the handlers
+		m_update_irq.resolve();
+
+		// register for save states
+		m_fm.register_save(*this);
+	}
 }
 
 
@@ -941,5 +951,6 @@ ymf278b_device::ymf278b_device(const machine_config &mconfig, const char *tag, d
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)
 	, m_fm(*this)
+	, m_update_irq(*this)
 {
 }

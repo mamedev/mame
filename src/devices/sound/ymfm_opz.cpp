@@ -134,18 +134,14 @@ void opz_registers::reset()
 
 void opz_registers::save_restore(fm_saved_state &state)
 {
-	state.save_restore(m_lfo_counter[0]);
-	state.save_restore(m_lfo_counter[1]);
-	state.save_restore(m_lfo_am[0]);
-	state.save_restore(m_lfo_am[1]);
+	state.save_restore(m_lfo_counter);
+	state.save_restore(m_lfo_am);
 	state.save_restore(m_noise_lfsr);
 	state.save_restore(m_noise_counter);
 	state.save_restore(m_noise_state);
 	state.save_restore(m_noise_lfo);
-	for (int index = 0; index < std::size(m_regdata); index++)
-		state.save_restore(m_regdata[index]);
-	for (int index = 0; index < std::size(m_phase_substep); index++)
-		state.save_restore(m_phase_substep[index]);
+	state.save_restore(m_regdata);
+	state.save_restore(m_phase_substep);
 }
 
 

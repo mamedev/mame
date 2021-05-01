@@ -21,9 +21,6 @@ public:
 	// constructor
 	ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// configuration helpers
-	auto irq_handler() { return update_irq_handler(); }
-
 protected:
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

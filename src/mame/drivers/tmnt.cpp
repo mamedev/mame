@@ -235,7 +235,7 @@ SAMPLES_START_CB_MEMBER(tmnt_state::tmnt_decode_sample)
 	for (i = 0; i < 0x40000; i++)
 	{
 		int val = source[2 * i] + source[2 * i + 1] * 256;
-		m_sampledata[i] = ymfm_decode_fp(val >> 3);
+		m_sampledata[i] = ymfm::decode_fp(val >> 3);
 	}
 }
 

@@ -19,9 +19,6 @@ class ym3526_device : public ymfm_device_base<ymfm::ym3526>
 public:
 	// constructor
 	ym3526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// configuration helpers
-	auto irq_handler() { return update_irq_handler(); }
 };
 
 
