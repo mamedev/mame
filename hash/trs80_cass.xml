@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+Cassettes for the TRS-80 Model 1 Level 2, and clones.
+
+Compatibility flags:
+0 = trs80
+1 = trs80l2 and clones
+3 = trs80m3
+4 = trs80m4
+H = HT series
+M = meritum
+
+If no flag is specified, it's assumed it works on all of them.
+
+Baud rates: trs80 (250 baud), meritum (700 baud), lnw80 at HI speed (1000 baud), all others (500 baud).
+            Tapes meant for one baud cannot be used on a machine that expects a different baud.
+            trs80m3 and trs80m4 have a question at start, it says Cass? if you answer L the speed is 500,
+            otherwise it is 1500.
+
+Note that trs80m4p doesn't physically have a cassette interface, so no tapes can be used.
+
+-->
+<softwarelist name="trs80_cass" description="Radio Shack TRS-80 cassettes">
+
+	<software name="android">
+		<description>Android Nim</description>
+		<year>1978</year>
+		<publisher>80-NW Publishing Co</publisher>
+		<info name="author" value="Leo Christopherson" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt) CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="1,3,4,H" />
+		<part name="cass1" interface="trs80_cass">
+			<dataarea name="cass" size="0x3785">
+				<rom name="android1.cas" size="0x3785" crc="4f72e456" sha1="d53a619c8f3d734f08db6ade979cdb267097e2cf"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="meteor2">
+		<description>Meteor Mission 2</description>
+		<year>1982</year>
+		<publisher>Big Five Software</publisher>
+		<info name="author" value="Bill Hogue and Jeff Konyu" />
+		<info name="usage" value="(Model 3/4: Answer L at Cass? prompt) SYSTEM then METEOR then /" />
+		<sharedfeat name="compatibility" value="1,3,4,H" /><!-- Graphics are better on 3,4 -->
+		<part name="cass1" interface="trs80_cass">
+			<dataarea name="cass" size="0x2ff8">
+				<rom name="meteor2.cas" size="0x2ff8" crc="144417c0" sha1="26b441bd494ddbce478239c1727087e64a95e447"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="chess0">
+		<description>MicroChess 1.5 (L1)</description>
+		<year>1978</year>
+		<publisher>Micro-ware Limited</publisher>
+		<info name="usage" value="CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="0" />
+		<part name="cass1" interface="trs80_cass">
+			<dataarea name="cass" size="0x148b">
+				<rom name="chess0.cas" size="0x148b" crc="b8a1a3ae" sha1="937c25f5295edd00a90bfe828615ba5e2470b9dd"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="haunt0">
+		<description>Haunted House (L1)</description>
+		<year>1980</year>
+		<publisher>Tandy Corporation</publisher>
+		<info name="usage" value="CLOAD then when it says HAUNTED HOUSE hit Enter" />
+		<sharedfeat name="compatibility" value="0" />
+		<part name="cass1" interface="trs80_cass">
+			<dataarea name="cass" size="0x1ae3">
+				<rom name="haunt0.cas" size="0x1ae3" crc="40554978" sha1="d8d6c8a2f482bc1f7c6e6c49a510979f9f9139d9"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="invasion0">
+		<description>Invasion Force (L1)</description>
+		<year>1979</year>
+		<publisher>Tandy Corporation</publisher>
+		<info name="usage" value="CLOAD" />
+		<sharedfeat name="compatibility" value="0" />
+		<part name="cass1" interface="trs80_cass">
+			<dataarea name="cass" size="0x2287">
+				<rom name="invasion0.cas" size="0x2287" crc="d40c1134" sha1="aea9a587d9040cff153c8be219ed4591a794524c"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="marquee0">
+		<description>TRS-80 Marquee (L1)</description>
+		<year>1979</year>
+		<publisher>Tandy Corporation</publisher>
+		<info name="usage" value="CLOAD" />
+		<sharedfeat name="compatibility" value="0" />
+		<part name="cass1" interface="trs80_cass">
+			<dataarea name="cass" size="0x069f">
+				<rom name="marquee0.cas" size="0x069f" crc="46c8ba18" sha1="a1edef26cfb996d8f150e0ca9e5212a8de6c4aef"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="qwatson0">
+		<description>Quick Watson (L1)</description>
+		<year>1978</year>
+		<publisher>Radio Shack</publisher>
+		<info name="usage" value="CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="0" />
+		<part name="cass1" interface="trs80_cass">
+			<dataarea name="cass" size="0x0c5b">
+				<rom name="qwatson0.cas" size="0x0c5b" crc="196e5e75" sha1="a65fb3144b71d377632240548cdeb875e6537d8d"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="saucer0">
+		<description>Flying Saucers (L1)</description>
+		<year>1979</year>
+		<publisher>Radio Shack</publisher>
+		<info name="author" value="Robert Arnstein" />
+		<info name="usage" value="CLOAD then RUN" />
+		<sharedfeat name="compatibility" value="0" />
+		<part name="cass1" interface="trs80_cass">
+			<dataarea name="cass" size="0e8b">
+				<rom name="saucer0.cas" size="0x0e8b" crc="257f8f52" sha1="5c46fc89edab7f5a55706ab18c9315aa7b2f3d28"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

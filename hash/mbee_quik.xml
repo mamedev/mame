@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+Quickloads for the Microbee non-disk models. These extensions are supported: BEE, BIN, COM, MWB.
+
+Compatibility flags:
+1 = mbee
+2 = mbeeic, mbeepc, mbeepc85, mbeepc85a, mbeepc85s
+
+If no flag is specified, it's assumed it works on all of them.
+
+mbee runs at 2MHz and is monochrome. The others run almost twice as fast, and have colour. Since most programs
+are monochrome, the colour machines may exhibit coloured or black areas.
+
+Quickloads do not work on disk-based microbees, or on premium models.
+
+-->
+<softwarelist name="mbee_quik" description="Microbee quickload">
+
+	<software name="adv01">
+		<description>Adventureland</description>
+		<year>1978</year><!-- year of port unknown-->
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3d80">
+				<rom name="adv01.com" size="0x3d80" crc="321c9849" sha1="da30accbb27c96c7c6a0e16fc34559a1cb4046aa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adv02">
+		<description>Pirate Adventure</description>
+		<year>1979</year><!-- year of port unknown-->
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3ea0">
+				<rom name="adv02.bin" size="0x3ea0" crc="bd66e7ea" sha1="a0c11e1c5ec8ee34be00e97aca2ce8d08ef97773"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adv03">
+		<description>Mission Impossible</description>
+		<year>1979</year><!-- year of port unknown-->
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3d00">
+				<rom name="adv03.com" size="0x3d00" crc="aeb32e91" sha1="bf22b2aaf453714fd32c84e09f3bdd0c9e5cecd9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adv04">
+		<description>Voodoo Castle</description>
+		<year>1979</year><!-- year of port unknown-->
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3d80">
+				<rom name="adv04.bee" size="0x3d80" crc="fcb06f26" sha1="7f879ded1a88920ffea81aa03a58bc9ffdf1c1ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alienc">
+		<description>Alien Cresta</description>
+		<year>1981</year><!-- year of port unknown-->
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2032">
+				<rom name="alien.bee" size="0x2032" crc="85d5dff6" sha1="59fcbf3880aafc6e9c8acfd383d708188cf3f16c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astplus">
+		<description>Asteroids Plus</description>
+		<year>198?</year>
+		<publisher>Mytek</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2e00">
+				<rom name="ast+r1.bin" size="0x2e00" crc="07b5596c" sha1="0fb7d4df5887481677368c58335c9a450bcaa8f4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteroids">
+		<description>Asteroids</description><!-- not the Atari game -->
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x07bc">
+				<rom name="asteroid.mwb" size="0x07bc" crc="4712292a" sha1="ec2e4c396fc19f6b44817a6e57cc3062ad208dcf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="azragor">
+		<description>Temple of Azragor</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x4200">
+				<rom name="azragor.mwb" size="0x4200" crc="5af884a2" sha1="d24bec4899d2d21b1bcbe325699cf9552f3b2786"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

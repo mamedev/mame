@@ -1043,6 +1043,7 @@ renegade.cpp
 retofinv.cpp
 rf51w14cg.cpp
 rfslots8085.cpp
+rfslotsmcs48.cpp
 rfslotspcpent.cpp
 rgum.cpp
 rltennis.cpp

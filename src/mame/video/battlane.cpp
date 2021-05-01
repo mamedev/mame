@@ -79,11 +79,11 @@ void battlane_state::battlane_bitmap_w(offs_t offset, uint8_t data)
 void battlane_state::battlane_video_ctrl_w(uint8_t data)
 {
 	/*
-		Video control register
+	    Video control register
 
-			0x80    = low bit of blue component (taken when writing to palette)
-			0x0e    = Bitmap plane (bank?) select  (0-7)
-			0x01    = Scroll MSB
+	        0x80    = low bit of blue component (taken when writing to palette)
+	        0x0e    = Bitmap plane (bank?) select  (0-7)
+	        0x01    = Scroll MSB
 	*/
 
 	m_video_ctrl = data;

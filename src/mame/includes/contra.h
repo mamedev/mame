@@ -38,7 +38,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")
 	{ }
-	
+
 	/* memory pointers */
 	std::unique_ptr<uint8_t[]>       m_buffered_spriteram;
 	std::unique_ptr<uint8_t[]>       m_buffered_spriteram_2;

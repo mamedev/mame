@@ -268,6 +268,7 @@ elekscmp.cpp
 elektronmono.cpp
 elf.cpp
 elwro800.cpp
+elzet80.cpp
 emax.cpp
 emma2.cpp
 emu2.cpp
@@ -448,6 +449,7 @@ innotv_innotabmax.cpp
 instruct.cpp
 inteladv.cpp
 intellec4.cpp
+intellec8.cpp
 intellect02.cpp
 interpro.cpp
 intv.cpp
@@ -479,6 +481,7 @@ jtc.cpp
 juicebox.cpp
 juku.cpp
 junior.cpp
+junior80.cpp
 juno106.cpp
 juno6.cpp
 jupace.cpp
@@ -553,6 +556,7 @@ macquadra700.cpp
 magiceyes_pollux_vr3520f.cpp
 magnum.cpp
 mattelchess.cpp
+max80.cpp
 mbc020.cpp
 mbc200.cpp
 mbc55x.cpp
@@ -832,6 +836,7 @@ qvt70.cpp
 qx10.cpp
 r9751.cpp
 radio86.cpp
+radionic.cpp
 rainbow.cpp
 rambo.cpp
 ravens.cpp
@@ -853,6 +858,7 @@ roland_jx3p.cpp
 roland_jx8p.cpp
 roland_mc50.cpp
 roland_mt32.cpp
+roland_pr100.cpp
 roland_r8.cpp
 roland_ra30.cpp
 roland_s10.cpp
@@ -923,7 +929,6 @@ sitcom.cpp
 sk1.cpp
 sk101bl.cpp
 slc1.cpp
-slc1a.cpp
 slicer.cpp
 slsstars.cpp
 sm1800.cpp
@@ -1168,6 +1173,7 @@ ymmu100.cpp
 ymmu5.cpp
 ymmu50.cpp
 ymmu80.cpp
+ympsr60.cpp
 ympsr340.cpp
 ymtx81z.cpp
 ymvl70.cpp

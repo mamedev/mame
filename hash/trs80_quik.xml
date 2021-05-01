@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+CMD quickloads for the TRS-80 Model 1 Level 2, and clones.
+
+Compatibility flags:
+1 = trs80l2 and clones
+3 = trs80m3
+H = HT series
+M = meritum
+
+If no flag is specified, it's assumed it works on all of them.
+The increased speed of meritum machines generally makes these games unplayable.
+Quickloads cannot be used on trs80m4 due to memory issues.
+
+A CMD file is an executable file found on TRS-80 floppy disks. Some don't require a disk to work,
+simply needing a Level 2-based machine to run on. That is what you'll find in this list.
+
+-->
+<softwarelist name="trs80_quik" description="Radio Shack TRS-80 quickload">
+
+	<software name="frogger">
+		<description>Frogger</description>
+		<year>1981</year>
+		<publisher>Misosys</publisher>
+		<info name="usage" value="Skill 0 is easiest" />
+		<sharedfeat name="compatibility" value="1,3,H" /><!-- 3: some sounds missing -->
+		<part name="quik" interface="trs80_quik">
+			<dataarea name="quik" size="0x3000">
+				<rom name="frogger4.cmd" size="0x3000" crc="24c63f58" sha1="94397d54bd9a6aad7f59db2f0f854fa2dc3e1973"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

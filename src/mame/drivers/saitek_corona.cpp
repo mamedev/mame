@@ -104,6 +104,7 @@ void corona_state::machine_reset()
 {
 	saitek_stratos_state::machine_reset();
 
+	m_control2 = 0;
 	m_rombank.select(0);
 }
 
@@ -118,11 +119,11 @@ void corona_state::machine_reset()
 void corona_state::update_leds()
 {
 	// button leds
-	m_display->matrix_partial(0, 2, 1 << (m_control1 >> 5 & 1), ~m_led_data1 & 0xff, false);
+	m_display->matrix_partial(0, 2, 1 << (m_control1 >> 5 & 1), ~m_led_data1 & 0xff);
 	m_display->write_row(2, ~m_select1 >> 4 & 0xf);
 
 	// chessboard leds
-	m_display->matrix_partial(3, 8, 1 << (m_select1 & 0xf), m_led_data2, true);
+	m_display->matrix_partial(3, 8, 1 << (m_select1 & 0xf), m_led_data2);
 }
 
 void corona_state::leds1_w(u8 data)

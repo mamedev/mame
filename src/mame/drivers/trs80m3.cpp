@@ -376,16 +376,19 @@ void trs80m3_state::model3(machine_config &config)
 	m_cassette->set_formats(trs80l2_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("trs80_cass");
 
-	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(trs80m3_state::quickload_cb));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)));
+	quickload.set_load_callback(FUNC(trs80m3_state::quickload_cb));
+	quickload.set_interface("trs80_quik");
 
 	FD1793(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(FUNC(trs80m3_state::intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(trs80m3_state::drq_w));
 
 	// Internal drives
-	FLOPPY_CONNECTOR(config, "fdc:0", trs80_floppies, "40t_dd", trs80m3_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", trs80_floppies, "40t_dd", trs80m3_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], trs80_floppies, "40t_dd", trs80m3_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], trs80_floppies, "40t_dd", trs80m3_state::floppy_formats).enable_sound(true);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit7));
@@ -408,6 +411,10 @@ void trs80m3_state::model3(machine_config &config)
 	//MCFG_AY31015_WRITE_DAV_CB(WRITELINE( , , ))
 	m_uart->set_auto_rdav(true);
 	RS232_PORT(config, "rs232", default_rs232_devices, nullptr);
+
+	SOFTWARE_LIST(config, "cass_list").set_original("trs80_cass").set_filter("3");
+	SOFTWARE_LIST(config, "quik_list").set_original("trs80_quik").set_filter("3");
+	SOFTWARE_LIST(config, "flop_list").set_original("trs80_flop").set_filter("3");
 }
 
 void trs80m3_state::model4(machine_config &config)
@@ -427,7 +434,10 @@ void trs80m3_state::model4(machine_config &config)
 	m_m4_bank->set_addr_width(18);
 	m_m4_bank->set_stride(0x10000);
 
+	SOFTWARE_LIST(config.replace(), "cass_list").set_original("trs80_cass").set_filter("4");
+	SOFTWARE_LIST(config.replace(), "flop_list").set_original("trs80_flop").set_filter("4");
 	config.device_remove("quickload");  // removed because it crashes..
+	config.device_remove("quik_list");
 }
 
 void trs80m3_state::model4p(machine_config &config)
@@ -447,8 +457,11 @@ void trs80m3_state::model4p(machine_config &config)
 	m_m4p_bank->set_addr_width(19);
 	m_m4p_bank->set_stride(0x10000);
 
+	SOFTWARE_LIST(config.replace(), "flop_list").set_original("trs80_flop").set_filter("4");
 	config.device_remove("quickload");
 	config.device_remove("cassette");
+	config.device_remove("cass_list");
+	config.device_remove("quik_list");
 }
 
 void trs80m3_state::cp500(machine_config &config)

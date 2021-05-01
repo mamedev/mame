@@ -513,7 +513,7 @@ void amazon_state::amazon_1412m2(machine_config &config)
 	amazon_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &amazon_state::amazon_1412m2_map);
 
-	NB1412M2(config, m_prot, XTAL(16'000'000)); // divided by 4 maybe
+	NB1412M2(config, m_prot, XTAL(16'000'000)/4); // divided by 4 maybe
 }
 
 

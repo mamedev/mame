@@ -27,7 +27,7 @@ To Do:
 metlclsh:
 - Clocks are all unknown
 - Text on the title screen has wrong colors the first time around
- (unitialized foreground palette 1, will be initialized shortly)
+  (uninitialized foreground palette 1, will be initialized shortly)
 - The background tilemap ram is bankswitched with other (not understood) ram
 - There are a few unknown writes
 

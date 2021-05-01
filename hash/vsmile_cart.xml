@@ -355,6 +355,7 @@ Regular game cartridges
 |        | 80-092323(UK)     | The Wiggles - It's Wiggle Time!                                                                |
 +========+===================+================================================================================================+
 |   XX   | 80-092340(US)     | Thomas The Tank - Engines Working Together                                                     |
+|   XX   | 80-092340(US)     | Thomas The Tank - Engines Working Together (alt, 52-092340(US) on back label)                  |
 |        | 80-092340-101(US) | Thomas The Tank - Engines Working Together (rev. 101)                                          |
 |        | 80-092342(NL)     | Thomas de Stoomlocomotief' - Locomotieven Werken Somen (need pic, even the manual has -123 on cover)
 |        | 80-092342-123(NL) | Thomas de Stoomlocomotief' - Locomotieven Werken Somen (rev. 123)                              |
@@ -362,6 +363,7 @@ Regular game cartridges
 |        | 80-092343-103(UK) | Thomas and Friends: Engines Working Together (rev. 103)                                        |
 |        | 80-092343-203(UK) | Thomas and Friends: Engines Working Together (rev. 203)                                        |
 |   XX   | 80-092344(GE)     | Thomas and Seine Freunde - Freunde Halten Zusammen                                             |
+|   XX   | 80-092344(GE)     | Thomas and Seine Freunde - Freunde Halten Zusammen (alt)                                       |
 |   XX   | 80-092344-104(GE) | Thomas and Seine Freunde - Freunde Halten Zusammen (rev. 104)                                  |
 |   XX   | 80-092345(FR)     | Thomas et ses Amis - Les locomotives s'entraident                                              |
 |        | 80-092347(SP)     | Thomas and Friends - Juego de Aprendizaje                                                      |
@@ -4072,6 +4074,21 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
+	<software name="thomasa" cloneof="thomas">
+		<description>Thomas &amp; Friends - Engines Working Together (USA, alt)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092340(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Thomas and Friends - Engines Working Together 92340(US).bin" size="8388608" crc="58ba95fa" sha1="c6c4d5350dbbcd7dc458860171828e0273df1d7e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="thomasuk" cloneof="thomas">
 		<description>Thomas &amp; Friends - Engines Working Together (UK)</description>
 		<year>2005</year>
@@ -4130,6 +4147,21 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92344-1(3).u1" size="8388608" crc="f0a73961" sha1="2e043e131073ad27ca7cebc28c237ecd8c1271e8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thomasgea" cloneof="thomas">
+		<description>Thomas &amp; seine Freunde - Freunde Halten Zusammen (Germany, alt)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092344(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" />
+			<dataarea name="rom" size="8388608">
+				<rom name="92344 - Thomas and seine Freunde  - Freunde Halten Zusammen (Germany).bin" size="8388608" crc="5aeb37aa" sha1="0e7f870a2269e7ef0fa1b1fc15eb9b6b89952a06" />
 			</dataarea>
 		</part>
 	</software>

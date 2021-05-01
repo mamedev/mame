@@ -125,8 +125,8 @@ void leo_state::machine_start()
 
 void leo_state::update_display()
 {
-	m_display->matrix_partial(0, 8, 1 << (m_inp_mux & 0xf), m_led_data[0], false);
-	m_display->matrix_partial(8, 2, 1 << BIT(m_inp_mux, 5), (~m_inp_mux << 2 & 0x300) | m_led_data[1], true);
+	m_display->matrix_partial(0, 8, 1 << (m_inp_mux & 0xf), m_led_data[0]);
+	m_display->matrix_partial(8, 2, 1 << BIT(m_inp_mux, 5), (~m_inp_mux << 2 & 0x300) | m_led_data[1]);
 }
 
 void leo_state::mux_w(u8 data)

@@ -7,7 +7,9 @@ license:CC0
 <!-- define elements -->
 
 	<element name="black"><rect><color red="0.17" green="0.15" blue="0.15" /></rect></element>
+	<element name="blacka"><rect><color red="0.2" green="0.18" blue="0.18" /></rect></element>
 	<element name="white"><rect><color red="0.81" green="0.8" blue="0.79" /></rect></element>
+	<element name="whitew"><rect><color red="1" green="1" blue="1" /></rect></element>
 	<element name="disk_black"><disk><color red="0.17" green="0.15" blue="0.15" /></disk></element>
 	<element name="disk_white"><disk><color red="0.81" green="0.8" blue="0.79" /></disk></element>
 	<element name="lcd_bg"><rect><color red="0.54" green="0.57" blue="0.58" /></rect></element>
@@ -178,30 +180,12 @@ license:CC0
 		<text string="ALTERNATE"><color red="0.81" green="0.3" blue="0.29" /></text>
 	</element>
 
-	<element name="text_king">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="[K]"><color red="0.17" green="0.15" blue="0.15" /></text>
-	</element>
-	<element name="text_queen">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="[Q]"><color red="0.17" green="0.15" blue="0.15" /></text>
-	</element>
-	<element name="text_rook">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="[R]"><color red="0.17" green="0.15" blue="0.15" /></text>
-	</element>
-	<element name="text_bishop">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="[B]"><color red="0.17" green="0.15" blue="0.15" /></text>
-	</element>
-	<element name="text_knight">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="[N]"><color red="0.17" green="0.15" blue="0.15" /></text>
-	</element>
-	<element name="text_pawn">
-		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="[P]"><color red="0.17" green="0.15" blue="0.15" /></text>
-	</element>
+	<element name="text_p1"><image file="chess/bk.svg"/></element>
+	<element name="text_p2"><image file="chess/bq.svg"/></element>
+	<element name="text_p3"><image file="chess/br.svg"/></element>
+	<element name="text_p4"><image file="chess/bb.svg"/></element>
+	<element name="text_p5"><image file="chess/bn.svg"/></element>
+	<element name="text_p6"><image file="chess/bp.svg"/></element>
 
 
 <!-- sb board -->
@@ -494,8 +478,7 @@ license:CC0
 		<group ref="sb_board"><bounds x="3" y="3.5" width="80" height="80" /></group>
 		<group ref="sb_ui"><bounds x="-18" y="3.5" width="10" height="80" /></group>
 
-	<!-- chessboard coords -->
-
+		<!-- chessboard coords -->
 		<element ref="text_8"><bounds x="-2.75" y="7.5" width="2" height="2" /></element>
 		<element ref="text_7"><bounds x="-2.75" y="17.5" width="2" height="2" /></element>
 		<element ref="text_6"><bounds x="-2.75" y="27.5" width="2" height="2" /></element>
@@ -514,8 +497,7 @@ license:CC0
 		<element ref="text_g"><bounds x="65" y="85" width="2" height="2" /></element>
 		<element ref="text_h"><bounds x="75" y="85" width="2" height="2" /></element>
 
-	<!-- chessboard leds -->
-
+		<!-- chessboard leds -->
 		<element name="0.7" ref="led"><bounds x="-0.5" y="7.75" width="1.5" height="1.5" /></element>
 		<element name="0.6" ref="led"><bounds x="-0.5" y="17.75" width="1.5" height="1.5" /></element>
 		<element name="0.5" ref="led"><bounds x="-0.5" y="27.75" width="1.5" height="1.5" /></element>
@@ -534,7 +516,16 @@ license:CC0
 		<element name="1.6" ref="led"><bounds x="67.25" y="85.5" width="1.5" height="1.5" /></element>
 		<element name="1.7" ref="led"><bounds x="77.25" y="85.5" width="1.5" height="1.5" /></element>
 
-	<!-- bottom side -->
+		<!-- bottom side -->
+		<element ref="whitew"><bounds x="5" y="98.2" width="80" height="4" /></element>
+		<element ref="text_p1"><bounds x="6.25"  y="98.35" width="3.5" height="3.5" /></element>
+		<element ref="text_p2"><bounds x="15.25" y="98.35" width="3.5" height="3.5" /></element>
+		<element ref="text_p3"><bounds x="24.25" y="98.35" width="3.5" height="3.5" /></element>
+		<element ref="text_p4"><bounds x="58.25" y="98.35" width="3.5" height="3.5" /></element>
+		<element ref="text_p5"><bounds x="67.25" y="98.35" width="3.5" height="3.5" /></element>
+		<element ref="text_p6"><bounds x="76.25" y="98.35" width="3.5" height="3.5" /></element>
+		<element ref="blacka" blend="add"><bounds x="5" y="98.2" width="80" height="4" /></element>
+		<element ref="white" blend="multiply"><bounds x="5" y="98.2" width="80" height="4" /></element>
 
 		<element ref="text_white"><bounds x="33" y="87.5" width="10" height="2" /></element>
 		<element ref="text_black"><bounds x="43" y="87.5" width="10" height="2" /></element>
@@ -552,13 +543,6 @@ license:CC0
 		<element ref="text_u4"><bounds x="55" y="96.3" width="10" height="1.8" /></element>
 		<element ref="text_u5"><bounds x="64" y="96.3" width="10" height="1.8" /></element>
 		<element ref="text_u6"><bounds x="73" y="96.3" width="10" height="1.8" /></element>
-
-		<element ref="text_king"><bounds x="3" y="98.5" width="10" height="2.65" /></element>
-		<element ref="text_queen"><bounds x="12" y="98.5" width="10" height="2.65" /></element>
-		<element ref="text_rook"><bounds x="21" y="98.5" width="10" height="2.65" /></element>
-		<element ref="text_bishop"><bounds x="55" y="98.5" width="10" height="2.65" /></element>
-		<element ref="text_knight"><bounds x="64" y="98.5" width="10" height="2.65" /></element>
-		<element ref="text_pawn"><bounds x="73" y="98.5" width="10" height="2.65" /></element>
 
 		<element ref="disk_black"><bounds x="6" y="92" width="4" height="4" /></element>
 		<element ref="disk_black"><bounds x="15" y="92" width="4" height="4" /></element>
@@ -592,8 +576,7 @@ license:CC0
 		<element ref="text_clear"><bounds x="84" y="93" width="6" height="2" /></element>
 		<element ref="hlr" inputtag="IN.0" inputmask="0x01"><bounds x="83" y="91" width="8" height="6" /><color alpha="0.3" /></element>
 
-	<!-- lcd panel -->
-
+		<!-- lcd panel -->
 		<element ref="black"><bounds x="30.5" y="90" width="25" height="8" /></element>
 		<element ref="lcd_bg"><bounds x="31" y="90.5" width="24" height="7" /></element>
 

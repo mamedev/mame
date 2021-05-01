@@ -47,7 +47,7 @@ u8 ym2612_device::read(offs_t offset)
 	u8 result = 0;
 	switch (offset & 3)
 	{
-		case 0:	// status port, YM2203 compatible
+		case 0: // status port, YM2203 compatible
 			result = m_fm.status();
 			break;
 

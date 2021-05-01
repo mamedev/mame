@@ -35,7 +35,7 @@ u8 ym2203_device::read(offs_t offset)
 	u8 result = 0;
 	switch (offset & 1)
 	{
-		case 0:	// status port
+		case 0: // status port
 			result = m_fm.status();
 			break;
 

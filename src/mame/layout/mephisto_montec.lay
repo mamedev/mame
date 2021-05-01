@@ -396,6 +396,9 @@ license:CC0
 		<element ref="text_uiu3b"><bounds x="4" y="75" width="2" height="2" /></element>
 	</group>
 
+
+<!-- lcd/button panel -->
+
 	<group name="panel">
 		<bounds left="0" right="80" top="-0.5" bottom="13.5" />
 		<element ref="background"><bounds x="0" y="-0.5" width="80" height="13.5" /></element>
@@ -481,6 +484,7 @@ license:CC0
 		<element ref="hlb" inputtag="KEY.0" inputmask="0x40">     <bounds x="67" y="8" width="1.5" height="2.5" />    </element>
 		<element ref="hlbr" inputtag="KEY.0" inputmask="0x80">     <bounds x="76" y="8" width="1.5" height="2.5" />    </element>
 	</group>
+
 
 <!-- build screen -->
 

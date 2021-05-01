@@ -959,8 +959,16 @@ void lua_engine::initialize()
 							if (tmp != nullptr)
 								ctx.result = tmp;
 							else
-								exit(0);
+								osd_printf_error("[LUA ERROR] in thread: return value must be string\n");
 						}
+						else {
+							sol::error err = ret;
+							osd_printf_error("[LUA ERROR] in thread: %s\n", err.what());
+						}
+					}
+					else {
+						sol::error err = res;
+						osd_printf_error("[LUA ERROR] when loading script for thread: %s\n", err.what());
 					}
 					ctx.busy = false;
 				});

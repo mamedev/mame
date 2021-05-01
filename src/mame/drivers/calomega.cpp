@@ -1,21 +1,22 @@
 // license:BSD-3-Clause
-// copyright-holders:Roberto Fresca
+// copyright-holders: Roberto Fresca, Grull Osgo
 /**********************************************************************************
 
-    .----------------------------------------.
-    |                                        |
-    | CAL OMEGA - SYSTEMS 903/904/905/906III |
-    |                                        |
-    |        Driver by Roberto Fresca.       |
-    |                                        |
-    '----------------------------------------'
+    .-----------------------------------------.
+    |                                         |
+    |         CAL OMEGA / CEI / UCMC          |
+    |    SYSTEMS 903 / 904 / 905 / 906-III    |
+    |                                         |
+    |        Driver by Roberto Fresca.        |
+    |                                         |
+    '-----------------------------------------'
 
 
     --- Technical Notes ---
 
-    Name:    System 903, System 904, System 905 & System 906 III.
-    Company: Cal Omega / Omega Products / Casino Electronics Inc.
-    Year:    1981-1989
+    Name:    System 903, System 904, System 905 & System 906-III.
+    Company: Cal Omega / Casino Electronics Inc. (CEI) / United Coin Machine Co. (UCMC).
+    Year:    1981-1991
 
 
 ***********************************************************************************
@@ -75,7 +76,7 @@
 
 
 
-    System 906 III:
+    System 906-III:
     ---------------
 
     PCB silkscreened "CEI 906 III GAMEBOARD" "ASSY 4029063 REV"
@@ -130,137 +131,137 @@
 ***********************************************************************************
 
 
-   ++++ System 903/904/906III official list of games (not complete) ++++
+   ++++ System 903/904/905/906-III official list of games (not complete) ++++
 
-   -----+--------------------------+--------+---------+----------+---------+----------+---------+---------------+------+------+-------
-    VER |  NAME                    | SYSTEM | PROGRAM | CHAR GEN | CG P/N  | CLR PROM | CP P/N  | GAME TYPE     | DUMP | STAT | ADDED
-   -----+--------------------------+--------+---------+----------+---------+----------+---------+---------------+------+------+-------
- *  7.4 | Gaming Poker (w. export) |  903   | AUG/81  | PKCG     | 6300010 | unknown  | 6600020 | Gaming        | Yes  | OK   | Yes
-    7.6 | Poker                    |  903   | AUG/81  | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
- *  7.9 | Arcade Poker             |  903   | AUG/81  | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | BD   | Yes
- *  8.0 | Arcade Black Jack        |  903   | SEP/81  | CPKCG    | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | BD   | Yes
- *  9.4 | Keno                     |  903   | DEC/81  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
- * 10.7 | Big Game                 |  903   | MAR/82  | LOTCG    | unknown | BCLR     | unknown | Amusement?    | Yes  | OK   | Yes
- * 11.3 | Black Jack               |  903   |         | CPKCG?   | 6300010 | POKCLR   | 6600020 | Amusement?    | No   |      | No
- * 12.3 | Ticket Poker             |  903   | JUN/82  | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | BD   | Yes
- * 12.5 | Bingo                    |  903   | JUN/82  | NBCG     | unknown | BCLR     | unknown | Amusement     | Yes  | OK   | Yes
- * 12.7 | Keno                     | 903/4? | JUL/82  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
- * 12.8 | Arcade Game (Draw Poker) |  903   | JUL/82  | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
-   13.4 | Nudge Bingo              |  903   | SEP/82  | NBCG     | 6300040 | BCLR     | 6600040 | Amusement     | Yes  | OK   | Yes
-   14.5 | Pixels                   |  903   | DEC/82  | PIXCG    | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | OK   | Yes
-   14.7 | Nudge Bingo              |  903   |         | NBCG     | 6300040 | BCLR     | 6600040 | Amusement     | No   |      | No
-   15.0 | Punchboard               |  903   |         | PBCG     | 6300190 | PBCLR    | 6600130 | Gaming Wash   | No   |      | No
-   15.7 | Double-Draw Poker        |  903   | JAN/83  | CPKCG    | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
-   15.8 | Poker Montana            |   ?    |         | CPKCG    | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   15.9 | Wild Double-Up           |  905   | JAN/83  | JKR2CG   | 6300100 | WLDCLR   | 6600010 | Amusement     | Yes  | OK   | Yes
-   16.2 | Gaming Lottery           |   ?    |         | LCG      | 6300050 | LOTCLR   | 6600030 | Gaming        | No   |      | No
-   16.3 | Black Jack               |   ?    |         | CPKCG    | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
-   16.4 | K.I.S.S. Keno            |  904   | MAY/83  | KCG      | 6300060 | PCLR     | 6600020 | Amusement     | Yes  | IC   | Yes
-   16.5 | K.I.S.S. Poker           |   ?    |         | POKER    | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
-   16.6 | Nudge Bingo              |   ?    |         | NBCG     | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
-   16.7 | Poker                    |   ?    |         | PCG      | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
-   16.8 | Keno                     |  903   | MAR/83  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
-   17.0 | Poker                    |  905   |         | POKERCGs | 6300010 | PKRCLR   | 6600020 | Amusement     | No   |      | No
-   17.1 | Nudge Bingo              |   ?    |         | NBCG     | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
-   17.2 | Double/Double Poker      |  905   | MAY/83  | JKRPKR   | 6300100 | WLDCLR   | 6600010 | Amusement     | Yes  | OK   | Yes
-   17.3 | Casino Poker             |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   17.4 | Gin Gaming               |   ?    |         | GCG0.2   | 6300080 | GINCLR   | 6600060 | Nevada Gaming | No   |      | No
-   17.5 | Gaming Draw Poker        |  903   | DEC/84  | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | Yes  | OK   | Yes
-   17.6 | Nudge                    |  903   | SEP/82  | NBCG     | 6300040 | BCLR     | 6600040 | Amusement     | Yes  | OK   | Yes
-   17.7 | Keno                     |   ?    |         | KCG      | 6300060 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   17.9 | AWP Poker                |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
- * 18.0 | Gin                      |  905   |         | GCG2     | 6300110 | MLTCLR   | 6600070 | Amusement     | No   |      | No
-   18.1 | Nudge                    |   ?    | JUL/83  | NBCG     | 6300040 | BCLR     | 6600040 | Amusement     | Yes  | OK   | Yes
-   18.2 | Amusement Poker          |  905   |         | JKRCG02  | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
-   18.3 | Pixels                   |  905   | AUG/83  | PXCG     | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | OK   | Yes
-   18.4 | Double Draw-Lebanon      |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
-   18.5 | Pixels                   |  905   | AUG/83  | PXCG     | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | OK   | Yes
-   18.6 | Pixels                   |  905   | AUG/83  | PXCG     | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | OK   | Yes
-   18.7 | Amusement Poker (skill)  |  905   | AUG/83  | JKRTWO   | 6300100 | MLTCLR   | 6600070 | Amusement     | Yes  | BD   | Yes
-   18.8 | Poker-Lebanon            |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
-   18.9 | Pixels (french)          |   ?    |         | PIXCG    | 6300070 | PIXCLR   | 6600050 | Amusement     | No   |      | No
-   19.0 | Hi-Score Poker           |   ?    |         | JKRTWO   | 6300100 | WLDCLR   | 6600070 | Amusement     | No   |      | No
- * 19.1 | Super Blackjack          |  905   | AUG/83  | JKRTWO?  | 6300100 | MLTCLR   | 6600070 | Amusement     | No   |      | No
-   19.2 | AWP Poker                |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   19.3 | Gin                      |  905   |         | GCG2     | 6300110 | MLTCLR   | 6600070 | Amusement     | No   |      | No
-   19.4 | Pixels (french)          |   ?    |         | PIXCG    | 6300070 | PIXCLR   | 6600050 | Amusement     | No   |      | No
-   19.7 | Ind. Wild Double-Up      |   ?    |         | JKRCG    | 6300100 | WLDCLR   | 6600070 | Amusement     | No   |      | No
-   19.9 | Double-Up Nudge          |   ?    |         | NUDGE    | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
-   20.1 | Poker                    |   ?    |         | GPKCG    | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
-   20.4 | Super Blackjack          |  905   | FEB/84  | JKRTWO   | 6300100 | MLTCLR   | 6600070 | Amusement     | Yes  | OK   | Yes
- * 20.5 | Blackjack?               |  905   | FEB/84  | JKRTWO?  | 6300100 | MLTCLR   | 6600070 | Amusement     | No   |      | No
-   20.7 | Double-Up Nudge          |   ?    |         | NUDGECG  | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
-   20.8 | Winner's Choice          |   ?    | FEB/84  | MLT2CG   | 6300130 | MLTCLR   | 6600070 | Amusement     | Yes  | OK   | Yes
-   20.9 | Gaming Poker-Europe      |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   21.1 | AWP Poker                |   ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   21.2 | Video Slot               |   ?    |         | SL1CG    | 6300180 | SLC1     | 6600120 | Gaming        | No   |      | No
-   21.4 | Wild Double-Up Poker     |   ?    |         | WLDCG    | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
-   21.5 | Double/Double Poker      |   ?    |         | JKRTWO   | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
- * 21.6 | Wild Double-Up?          |  905   | JUN/84  | WLDCG    | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
- * 21.7 | Poker?                   |  905   | MAY/84  | GPKCG?   | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
-   21.9 | Amusement Poker          |   ?    |         | JKRCG    | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
-   22.1 | Poker                    |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   22.7 | Amusement Poker (dbl/dbl)|  905   | JUL/84  | JKRPKR   | 6300100 | WLDCLR   | 6600010 | Amusement     | Yes  | OK   | Yes
-   22.8 | Tennesee Wild Poker      |  905   |         | JKR2CG   | 6300100 | MLTCLR   | 6600070 | Amusement     | No   |      | No
-   22.9 | Double/Double Poker      |  905   |         | JKRTWO   | 6300100 | MLTCLR   | 6600010 | Amusement     | No   |      | No
-   23.0 | FC Bingo (4-card)        |  905   | JUN/84  | FCBCG    | 6300150 | FCBCLR   | 6600100 | Amusement     | Yes  | BD   | Yes
-   23.2 | Pixels                   |   ?    |         | PIXCG    | 6300070 | PIXCLR   | 6600050 | Amusement     | No   |      | No
- * 23.6 | Hotline                  |  905   | OCT/84  | HLCG     | 6300160 | HLCLR    | 6600110 | Amusement     | Yes  | OK   | Yes
-   23.7 | AWP Blackjack            |   ?    |         | POKER    | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   23.9 | G.Draw Poker (discard)   |  904   | JAN/85  | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | Yes  | OK   | Yes
-   24.0 | Gaming Draw Poker (hold) |  904   | MAY/85  | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | Yes  | OK   | Yes
-   24.2 | Export Poker             |   ?    |         | GPKCG    | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   24.3 | Gaming Blackjack         |   ?    |         | GPKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   24.5 | Wild Double-Up           |   ?    |         | JKPKCG   | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
-   24.6 | Hotline                  |  905   | JAN/85  | HLCG     | 6300160 | HLCLR    | 6600110 | Amusement     | Yes  | OK   | Yes
-   24.8 | Poker (discard)          |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   24.9 | Poker (hold)             |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   25.3 | 4-Card Bingo-Gaming      |   ?    |         | FCB1CG   | 6300150 | FCB1CLR  | 6600100 | Gaming        | No   |      | No
-   25.4 | Indian 4-Card Bingo      |   ?    |         | FCBCG    | 6300150 | FCB1CLR  | 6600100 | Amer-Indian   | No   |      | No
-   25.5 | Wild Double-Up Poker     |   ?    |         | JKRCG    | 6300100 | WILD     | 6600010 | Amusement     | No   |      | No
-   25.6 | Mr. Domino               |   ?    |         | DOMCG    | 6300140 | DOMCLR   | 6600080 | Amusement     | No   |      | No
-   25.7 | Mr. Domino               |   ?    |         | DOMCG    | 6300140 | DOMCLR   | 6600080 | Amusement     | No   |      | No
-   25.8 | Poker                    |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   26.3 | Wild Double-Up Poker     |   ?    |         | JKRCG    | 6300100 | WILD     | 6600010 | Amusement     | No   |      | No
-   26.5 | 4-Reel Slot              |   ?    |         | SLOT4CG  | 6300220 | SL4CLR   | 6600140 | Gaming        | No   |      | No
-   26.6 | Poker                    |   ?    |         | GPKCG    | 6300250 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   26.8 | Wild Double-Up Poker     |   ?    |         | JKRCG    | 6300260 | WILD     | 6600010 | Nevada Gaming | No   |      | No
-   27.1 | Tourney Gaming Poker     |   ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   27.2 | Arcade Keno              |   ?    | AUG/85  | KJCG     | 6300060 | POKCLR   | 6600020 | Montana       | Yes  | OK   | Yes
- * 27.2 | Arcade Keno              |   ?    | AUG/85  | KJCG     | 6300060 | POKCLR   | 6600020 | Gaming        | Yes  | OK   | Yes
-   27.3 | Export Poker             |   ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   27.4 | Keno II                  |   ?    |         | KJCG     | 6300060 | POKCLR   | 6600020 | Montana       | No   |      | No
-   27.5 | Keno (Austria)           |   ?    |         | KENOCG   | 6300060 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   27.6 | Slot 8                   |   ?    |         | SL8CG    | 6300290 | SLOT4CLR | 6600140 | Gaming        | No   |      | No
-   27.9 | 3-Reel Slot, Gaming      |   ?    |         | SL2CG    | 6300280 | SL2CLR   | 6600120 | Nevada Gaming | No   |      | No
-   28.0 | 3-Reel Slot              |   ?    |         | SL2CG    | 6300180 | SL2CLR   | 6600120 | Gaming        | No   |      | No
-   28.2 | Hotline                  |   ?    |         | HLCG     | 6300160 | HLCLR    | 6600110 | Amusement     | No   |      | No
-   28.5 | Hotline                  |   ?    |         | HLCG     | 6300130 | HLCLR    | 6600110 | Amusement     | No   |      | No
-   29.0x| Stand or Draw Poker      |   ?    |         | ST2CG    | 6300270 | ST2CLR   | 6600150 | Nevada Gaming | No   |      | No
-   30.0x| Casino 21                |   ?    |         | GPKCG    | 6300250 | WILD     | 6600010 | Nevada Gaming | No   |      | No
-   31.0x| Poker (discard)          |   ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   32.0x| Poker (hold)             |   ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   33.0x| Keno                     |   ?    |         | KJCG     | 6300060 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   34.0x| Keno (Austria)           |   ?    |         | KJCG     | 6300060 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   35.0x| 1-3 Sign Poker (discard) |   ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   36.0x| 1-3 Sign Poker (hold)    |   ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   37.0x| Amusement Keno           |   ?    |         | KJCG     | 6300060 | POKCLR   | 6600020 | Montana       | No   |      | No
-   39.0x| 3-Reel Slot              |   ?    |         | SBARCG   | 6300305 | JKRSLOT  | 6600170 | Nevada Gaming | No   |      | No
-   39.0x| 3-Reel Slot              |   ?    |         | PLAIN7CG | 6300309 | JKRSLOT  | 6600170 | Nevada Gaming | No   |      | No
-   39.0x| 3-Reel Slot              |   ?    |         | JWCG     | 6300313 | JKRSLOT  | 6600170 | Nevada Gaming | No   |      | No
-   40.0x| Poker w/Wild Card        |  903   |         | JKRCG    | 6300260 | WLDCLR   | 6600010 | Nevada Gaming | No   |      | No
-   41.0x| Do-it-yourself Bingo     |   ?    |         | KCG      | 6300060 | PKRCLR   | 6600020 | Amer-Indian   | No   |      | No
-   42.0x| Mr. Domino               |   ?    |         | NDMCG    | 6300300 | DOMCLR   | 6600080 | Amusement     | No   |      | No
-   43.0x| Export Poker             |   ?    |         | GPKCG    | 6300170 | POKCLR   | 6600020 | Gaming        | No   |      | No
-   44.0x| Tourney Poker (discard)  |   ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   45.0x| Tourney Poker (hold)     |   ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   46.0x| Gaming Poker             |   ?    |         | GPKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
-   47.0x| 4-Card Indian Bingo      |   ?    |         | FCB7CG   | 6300150 | FCB7CLR  | 6600100 | Amer-Indian   | No   |      | No
-   48.0x| Keno                     |   ?    |         | KJCG     | 6300060 | POKCLR   | 6600020 | Montana       | No   |      | No
-   51.08| Poker (906-III)          |  906   |         | GP2CG    | unknown | WILD     | unknown | Nevada Gaming | Yes  | OK   | Yes
-        |                          |        |         |          |         |          |         |               |      |      |
- * 903d | System 903 Diag.PROM     |  903   | unknown | any      | unknown | any      | unknown | Testing H/W   | Yes  | OK   | Yes
- * 905d | System 905 Diag.PROM     |  905   | unknown | any      | unknown | any      | unknown | Testing H/W   | Yes  | OK   | Yes
+   -----+--------------------------+---------+---------+----------+---------+----------+---------+---------------+------+------+-------
+    VER |  NAME                    | SYSTEM  | PROGRAM | CHAR GEN | CG P/N  | CLR PROM | CP P/N  | GAME TYPE     | DUMP | STAT | ADDED
+   -----+--------------------------+---------+---------+----------+---------+----------+---------+---------------+------+------+-------
+ *  7.4 | Gaming Poker (w. export) |   903   | AUG/81  | PKCG     | 6300010 | unknown  | 6600020 | Gaming        | Yes  | OK   | Yes
+    7.6 | Poker                    |   903   | AUG/81  | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
+ *  7.9 | Arcade Poker             |   903   | AUG/81  | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | BD   | Yes
+ *  8.0 | Arcade Black Jack        |   903   | SEP/81  | CPKCG    | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | BD   | Yes
+ *  9.4 | Keno                     |   903   | DEC/81  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
+ * 10.7 | Big Game                 |   903   | MAR/82  | LOTCG    | unknown | BCLR     | unknown | Amusement?    | Yes  | OK   | Yes
+ * 11.3 | Black Jack               |   903   |         | CPKCG?   | 6300010 | POKCLR   | 6600020 | Amusement?    | No   |      | No
+ * 12.3 | Ticket Poker             |   903   | JUN/82  | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | BD   | Yes
+ * 12.5 | Bingo                    |   903   | JUN/82  | NBCG     | unknown | BCLR     | unknown | Amusement     | Yes  | OK   | Yes
+ * 12.7 | Keno                     |  903/4? | JUL/82  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
+ * 12.8 | Arcade Game (Draw Poker) |   903   | JUL/82  | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
+   13.4 | Nudge Bingo              |   903   | SEP/82  | NBCG     | 6300040 | BCLR     | 6600040 | Amusement     | Yes  | OK   | Yes
+   14.5 | Pixels                   |   903   | DEC/82  | PIXCG    | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | OK   | Yes
+   14.7 | Nudge Bingo              |   903   |         | NBCG     | 6300040 | BCLR     | 6600040 | Amusement     | No   |      | No
+   15.0 | Punchboard               |   903   |         | PBCG     | 6300190 | PBCLR    | 6600130 | Gaming Wash   | No   |      | No
+   15.7 | Double-Draw Poker        |   903   | JAN/83  | CPKCG    | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
+   15.8 | Poker Montana            |    ?    |         | CPKCG    | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   15.9 | Wild Double-Up           |   905   | JAN/83  | JKR2CG   | 6300100 | WLDCLR   | 6600010 | Amusement     | Yes  | OK   | Yes
+   16.2 | Gaming Lottery           |    ?    |         | LCG      | 6300050 | LOTCLR   | 6600030 | Gaming        | No   |      | No
+   16.3 | Black Jack               |    ?    |         | CPKCG    | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
+   16.4 | K.I.S.S. Keno            |   904   | MAY/83  | KCG      | 6300060 | PCLR     | 6600020 | Amusement     | Yes  | IC   | Yes
+   16.5 | K.I.S.S. Poker           |    ?    |         | POKER    | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
+   16.6 | Nudge Bingo              |    ?    |         | NBCG     | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
+   16.7 | Poker                    |    ?    |         | PCG      | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
+   16.8 | Keno                     |   903   | MAR/83  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | Yes  | OK   | Yes
+   17.0 | Poker                    |   905   |         | POKERCGs | 6300010 | PKRCLR   | 6600020 | Amusement     | No   |      | No
+   17.1 | Nudge Bingo              |    ?    |         | NBCG     | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
+   17.2 | Double/Double Poker      |   905   | MAY/83  | JKRPKR   | 6300100 | WLDCLR   | 6600010 | Amusement     | Yes  | OK   | Yes
+   17.3 | Casino Poker             |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   17.4 | Gin Gaming               |    ?    |         | GCG0.2   | 6300080 | GINCLR   | 6600060 | Nevada Gaming | No   |      | No
+   17.5 | Gaming Draw Poker        |   903   | DEC/84  | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | Yes  | OK   | Yes
+   17.6 | Nudge                    |   903   | SEP/82  | NBCG     | 6300040 | BCLR     | 6600040 | Amusement     | Yes  | OK   | Yes
+   17.7 | Keno                     |    ?    |         | KCG      | 6300060 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   17.9 | AWP Poker                |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
+ * 18.0 | Gin                      |   905   |         | GCG2     | 6300110 | MLTCLR   | 6600070 | Amusement     | No   |      | No
+   18.1 | Nudge                    |    ?    | JUL/83  | NBCG     | 6300040 | BCLR     | 6600040 | Amusement     | Yes  | OK   | Yes
+   18.2 | Amusement Poker          |   905   |         | JKRCG02  | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
+   18.3 | Pixels                   |   905   | AUG/83  | PXCG     | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | OK   | Yes
+   18.4 | Double Draw-Lebanon      |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
+   18.5 | Pixels                   |   905   | AUG/83  | PXCG     | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | OK   | Yes
+   18.6 | Pixels                   |   905   | AUG/83  | PXCG     | 6300070 | PIXCLR   | 6600050 | Amusement     | Yes  | OK   | Yes
+   18.7 | Amusement Poker (skill)  |   905   | AUG/83  | JKRTWO   | 6300100 | MLTCLR   | 6600070 | Amusement     | Yes  | BD   | Yes
+   18.8 | Poker-Lebanon            |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
+   18.9 | Pixels (french)          |    ?    |         | PIXCG    | 6300070 | PIXCLR   | 6600050 | Amusement     | No   |      | No
+   19.0 | Hi-Score Poker           |    ?    |         | JKRTWO   | 6300100 | WLDCLR   | 6600070 | Amusement     | No   |      | No
+ * 19.1 | Super Blackjack          |   905   | AUG/83  | JKRTWO?  | 6300100 | MLTCLR   | 6600070 | Amusement     | No   |      | No
+   19.2 | AWP Poker                |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   19.3 | Gin                      |   905   |         | GCG2     | 6300110 | MLTCLR   | 6600070 | Amusement     | No   |      | No
+   19.4 | Pixels (french)          |    ?    |         | PIXCG    | 6300070 | PIXCLR   | 6600050 | Amusement     | No   |      | No
+   19.7 | Ind. Wild Double-Up      |    ?    |         | JKRCG    | 6300100 | WLDCLR   | 6600070 | Amusement     | No   |      | No
+   19.9 | Double-Up Nudge          |    ?    |         | NUDGE    | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
+   20.1 | Poker                    |    ?    |         | GPKCG    | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
+   20.4 | Super Blackjack          |   905   | FEB/84  | JKRTWO   | 6300100 | MLTCLR   | 6600070 | Amusement     | Yes  | OK   | Yes
+ * 20.5 | Blackjack?               |   905   | FEB/84  | JKRTWO?  | 6300100 | MLTCLR   | 6600070 | Amusement     | No   |      | No
+   20.7 | Double-Up Nudge          |    ?    |         | NUDGECG  | 6300040 | BCOLOR   | 6600040 | Amusement     | No   |      | No
+   20.8 | Winner's Choice          |    ?    | FEB/84  | MLT2CG   | 6300130 | MLTCLR   | 6600070 | Amusement     | Yes  | OK   | Yes
+   20.9 | Gaming Poker-Europe      |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   21.1 | AWP Poker                |    ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   21.2 | Video Slot               |    ?    |         | SL1CG    | 6300180 | SLC1     | 6600120 | Gaming        | No   |      | No
+   21.4 | Wild Double-Up Poker     |    ?    |         | WLDCG    | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
+   21.5 | Double/Double Poker      |    ?    |         | JKRTWO   | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
+ * 21.6 | Wild Double-Up?          |   905   | JUN/84  | WLDCG    | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
+ * 21.7 | Poker?                   |   905   | MAY/84  | GPKCG?   | 6300010 | POKCLR   | 6600020 | Amusement     | No   |      | No
+   21.9 | Amusement Poker          |    ?    |         | JKRCG    | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
+   22.1 | Poker                    |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   22.7 | Amusement Poker (dbl/dbl)|   905   | JUL/84  | JKRPKR   | 6300100 | WLDCLR   | 6600010 | Amusement     | Yes  | OK   | Yes
+   22.8 | Tennesee Wild Poker      |   905   |         | JKR2CG   | 6300100 | MLTCLR   | 6600070 | Amusement     | No   |      | No
+   22.9 | Double/Double Poker      |   905   |         | JKRTWO   | 6300100 | MLTCLR   | 6600010 | Amusement     | No   |      | No
+   23.0 | FC Bingo (4-card)        |   905   | JUN/84  | FCBCG    | 6300150 | FCBCLR   | 6600100 | Amusement     | Yes  | BD   | Yes
+   23.2 | Pixels                   |    ?    |         | PIXCG    | 6300070 | PIXCLR   | 6600050 | Amusement     | No   |      | No
+ * 23.6 | Hotline                  |   905   | OCT/84  | HLCG     | 6300160 | HLCLR    | 6600110 | Amusement     | Yes  | OK   | Yes
+   23.7 | AWP Blackjack            |    ?    |         | POKER    | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   23.9 | G.Draw Poker (discard)   |   904   | JAN/85  | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | Yes  | OK   | Yes
+   24.0 | Gaming Draw Poker (hold) | 903/904 | MAY/85  | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | Yes  | OK   | Yes
+   24.2 | Export Poker             |    ?    |         | GPKCG    | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   24.3 | Gaming Blackjack         |    ?    |         | GPKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   24.5 | Wild Double-Up           |    ?    |         | JKPKCG   | 6300100 | WLDCLR   | 6600010 | Amusement     | No   |      | No
+   24.6 | Hotline                  |   905   | JAN/85  | HLCG     | 6300160 | HLCLR    | 6600110 | Amusement     | Yes  | OK   | Yes
+   24.8 | Poker (discard)          |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   24.9 | Poker (hold)             |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   25.3 | 4-Card Bingo-Gaming      |    ?    |         | FCB1CG   | 6300150 | FCB1CLR  | 6600100 | Gaming        | No   |      | No
+   25.4 | Indian 4-Card Bingo      |    ?    |         | FCBCG    | 6300150 | FCB1CLR  | 6600100 | Amer-Indian   | No   |      | No
+   25.5 | Wild Double-Up Poker     |    ?    |         | JKRCG    | 6300100 | WILD     | 6600010 | Amusement     | No   |      | No
+   25.6 | Mr. Domino               |    ?    |         | DOMCG    | 6300140 | DOMCLR   | 6600080 | Amusement     | No   |      | No
+   25.7 | Mr. Domino               |    ?    |         | DOMCG    | 6300140 | DOMCLR   | 6600080 | Amusement     | No   |      | No
+   25.8 | Poker                    |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   26.3 | Wild Double-Up Poker     |    ?    |         | JKRCG    | 6300100 | WILD     | 6600010 | Amusement     | No   |      | No
+   26.5 | 4-Reel Slot              |    ?    |         | SLOT4CG  | 6300220 | SL4CLR   | 6600140 | Gaming        | No   |      | No
+   26.6 | Poker                    |    ?    |         | GPKCG    | 6300250 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   26.8 | Wild Double-Up Poker     |    ?    |         | JKRCG    | 6300260 | WILD     | 6600010 | Nevada Gaming | No   |      | No
+   27.1 | Tourney Gaming Poker     |    ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   27.2 | Arcade Keno              |    ?    | AUG/85  | KJCG     | 6300060 | POKCLR   | 6600020 | Montana       | Yes  | OK   | Yes
+ * 27.2 | Arcade Keno              |    ?    | AUG/85  | KJCG     | 6300060 | POKCLR   | 6600020 | Gaming        | Yes  | OK   | Yes
+   27.3 | Export Poker             |    ?    |         | PKCG     | 6300010 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   27.4 | Keno II                  |    ?    |         | KJCG     | 6300060 | POKCLR   | 6600020 | Montana       | No   |      | No
+   27.5 | Keno (Austria)           |    ?    |         | KENOCG   | 6300060 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   27.6 | Slot 8                   |    ?    |         | SL8CG    | 6300290 | SLOT4CLR | 6600140 | Gaming        | No   |      | No
+   27.9 | 3-Reel Slot, Gaming      |    ?    |         | SL2CG    | 6300280 | SL2CLR   | 6600120 | Nevada Gaming | No   |      | No
+   28.0 | 3-Reel Slot              |    ?    |         | SL2CG    | 6300180 | SL2CLR   | 6600120 | Gaming        | No   |      | No
+   28.2 | Hotline                  |    ?    |         | HLCG     | 6300160 | HLCLR    | 6600110 | Amusement     | No   |      | No
+   28.5 | Hotline                  |    ?    |         | HLCG     | 6300130 | HLCLR    | 6600110 | Amusement     | No   |      | No
+   29.0x| Stand or Draw Poker      |    ?    |         | ST2CG    | 6300270 | ST2CLR   | 6600150 | Nevada Gaming | No   |      | No
+   30.0x| Casino 21                |    ?    |         | GPKCG    | 6300250 | WILD     | 6600010 | Nevada Gaming | No   |      | No
+   31.0x| Poker (discard)          |    ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   32.0x| Poker (hold)             |    ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   33.0x| Keno                     |    ?    |         | KJCG     | 6300060 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   34.0x| Keno (Austria)           |    ?    |         | KJCG     | 6300060 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   35.0x| 1-3 Sign Poker (discard) |    ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   36.0x| 1-3 Sign Poker (hold)    |    ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   37.0x| Amusement Keno           |    ?    |         | KJCG     | 6300060 | POKCLR   | 6600020 | Montana       | No   |      | No
+   39.0x| 3-Reel Slot              |    ?    |         | SBARCG   | 6300305 | JKRSLOT  | 6600170 | Nevada Gaming | No   |      | No
+   39.0x| 3-Reel Slot              |    ?    |         | PLAIN7CG | 6300309 | JKRSLOT  | 6600170 | Nevada Gaming | No   |      | No
+   39.0x| 3-Reel Slot              |    ?    |         | JWCG     | 6300313 | JKRSLOT  | 6600170 | Nevada Gaming | No   |      | No
+   40.0x| Poker w/Wild Card        |   903   |         | JKRCG    | 6300260 | WLDCLR   | 6600010 | Nevada Gaming | No   |      | No
+   41.0x| Do-it-yourself Bingo     |    ?    |         | KCG      | 6300060 | PKRCLR   | 6600020 | Amer-Indian   | No   |      | No
+   42.0x| Mr. Domino               |    ?    |         | NDMCG    | 6300300 | DOMCLR   | 6600080 | Amusement     | No   |      | No
+   43.0x| Export Poker             |    ?    |         | GPKCG    | 6300170 | POKCLR   | 6600020 | Gaming        | No   |      | No
+   44.0x| Tourney Poker (discard)  |    ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   45.0x| Tourney Poker (hold)     |    ?    |         | POKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   46.0x| Gaming Poker             |    ?    |         | GPKCG    | 6300010 | POKCLR   | 6600020 | Nevada Gaming | No   |      | No
+   47.0x| 4-Card Indian Bingo      |    ?    |         | FCB7CG   | 6300150 | FCB7CLR  | 6600100 | Amer-Indian   | No   |      | No
+   48.0x| Keno                     |    ?    |         | KJCG     | 6300060 | POKCLR   | 6600020 | Montana       | No   |      | No
+   51.08| Poker (906-III)          | 906-III |         | GP2CG    | unknown | WILD     | unknown | Nevada Gaming | Yes  | OK   | Yes
+        |                          |         |         |          |         |          |         |               |      |      |
+ * 903d | System 903 Diag.PROM     |   903   | unknown | any      | unknown | any      | unknown | Testing H/W   | Yes  | OK   | Yes
+ * 905d | System 905 Diag.PROM     |   905   | unknown | any      | unknown | any      | unknown | Testing H/W   | Yes  | OK   | Yes
 
 
    (*) Not in the original list.
@@ -269,15 +270,18 @@
 
    ++++ Unofficial games ++++
 
-   -------------------------------+----------------------+------+-----------+-----------+------+------+-------
-    NAME                          | COMPANY              | YEAR | GAME TYPE |  SYSTEM   | DUMP | STAT | ADDED
-   -------------------------------+----------------------+------+-----------+-----------+------+------+-------
-    El Grande - 5 Card Draw (New) | Tuni Electro Service | 1982 | Amusement | 903 based | Yes  | BR   | Yes
-    Jackpot Joker Poker (set 1)   | Enter-Tech (ETL)     | 1983 | Amusement | 903 based | Yes  | OK   | Yes
-    Jackpot Joker Poker (set 2)   | Enter-Tech (ETL)     | 1983 | Amusement | 903 based | Yes  | OK   | Yes
-    SSI Poker (v2.4)              | SSI                  | 1988 | Amusement | 903 based | Yes  | IC   | Yes
-    SSI Poker (v3.0)              | SSI                  | 1988 | Amusement | 903 based | Yes  | IC   | Yes
-    SSI Poker (v4.0)              | SSI                  | 1990 | Amusement | 903 based | Yes  | IC   | Yes
+   -------------------------------------+----------------------+------+-----------+-----------+------+------+-------
+    NAME                                | COMPANY              | YEAR | GAME TYPE |  SYSTEM   | DUMP | STAT | ADDED
+   -------------------------------------+----------------------+------+-----------+-----------+------+------+-------
+    El Grande - 5 Card Draw (New)       | Tuni Electro Service | 1982 | Amusement | 903 based | Yes  | BR   | Yes
+    Jackpot Joker Poker (set 1)         | Enter-Tech (ETL)     | 1983 | Amusement | 903 based | Yes  | OK   | Yes
+    Jackpot Joker Poker (set 2)         | Enter-Tech (ETL)     | 1983 | Amusement | 903 based | Yes  | OK   | Yes
+    SSI Poker (v2.4)                    | SSI                  | 1988 | Amusement | 903 based | Yes  | IC   | Yes
+    SSI Poker (v3.0)                    | SSI                  | 1988 | Amusement | 903 based | Yes  | IC   | Yes
+    SSI Poker (v4.0)                    | SSI                  | 1990 | Amusement | 903 based | Yes  | IC   | Yes
+    Casino 21 UCMC/IWC (ver 30.08)      | UCMC/IWC             | 1990 | Gambling  |  906-III  | Yes  | OK   | Yes
+    Poker UCMC/IWC (ver 162.03)         | UCMC/IWC             | 1991 | Gambling  |  906-III  | Yes  | OK   | Yes
+    Poker UCMC/IWC (ver 162.03 20-6-91) | UCMC/IWC             | 1991 | Gambling  |  906-III  | Yes  | OK   | Yes
 
 
     STAT: OK = Good dump.
@@ -338,7 +342,7 @@
     This game was created by Tuni Electro Service and was licensed to E.T. Marketing,Inc.
     This is the new version. The old one is still undumped, but looks like Golden Poker D-Up.
 
-    Flyer: http://www.arcadeflyers.com/?page=thumbs&db=videodb&id=4542
+    Flyer: https://flyers.arcade-museum.com/?page=flyer&db=videodb&id=4542&image=1
 
     The AY8912 is mapped to 0x840/0x841 but the game lacks of credits and bet sounds.
     The rest of sounds are ok. Maybe the missing ones are generated by discrete circuitry.
@@ -394,20 +398,22 @@
     The whole map is mirrored to $8000-$FFFF.
 
 
-    --- System 906 III ---
+    --- System 906-III ---
 
-    $0000 - $07FF   NVRAM           ; All registers and settings.
-    $2C08 - $2C08   AY-8912         ; Read/Control.
-    $2C09 - $2C09   AY-8912         ; Write.
-    $280C - $280F   PIAT0           ; I/O unknown.
-    $2824 - $2827   PIAT1           ; I/O unknown.
+    $0000 - $1FFF   NVRAM           ; All registers and settings.
+    $280C - $280F   PIAT0           ; I/O functions.
+    $2810 - $2810   ACIA6850        ; ACIA read.
+    $2811 - $2811   ACIA6850        ; ACIA write.
+    $2824 - $2827   PIAT1           ; I/O functions.
     $2C04 - $2C04   CRTC6845        ; MC6845 addressing.
-    $2C05 - $2C05   CRTC6845        ; MC6845 Read/Write.
+    $2C05 - $2C05   CRTC6845        ; MC6845 read/write.
+    $2C08 - $2C08   AY-8912         ; Read/control.
+    $2C09 - $2C09   AY-8912         ; Write.
 
     $2000 - $23FF   VideoRAM
     $2400 - $27FF   ColorRAM
 
-    $6000 - $FFFF   ROM space.      ; System 906.
+    $6000 - $FFFF   ROM space.      ; System 906-III.
 
     No mirrors... Using the whole CPU addressing.
 
@@ -436,6 +442,53 @@
     DRIVER UPDATES
     --------------
 
+    [2021-04-26]
+
+    General improvements...
+    - Added support for extended graphics.
+    - Fixed cardbacks for 906-III games.
+    - Fixed Nudge Bingo graphics.
+    - Fixed rotten/bad bits from the program ROM with educated guess
+       to make Cal Omega - Game 7.9 (Arcade Poker) playable.
+    - Fixed inputs on Cal Omega - Game 7.6 (Arcade Poker). Now it's playable.
+    - Created proper inputs from the scratch for Cal Omega - Game 12.5 (Bingo), and promoted to WORKING.
+    - Added hopper to the 906-III games.
+    - Fixed docs / technical notes.
+
+
+    [2021-04-24]
+
+    General improvements...
+    - The PIAs set for each MACHINE_CONFIG were made independent.
+    - All the PIAs lines were adapted according to the needs of each platform.
+    - All the interrupts were set/placed as indicated in the schematics (903/905).
+    - A global hopper was added, currently assigned to platform 906-III, but it can be used by other platforms.
+    - Worked proper inputs for system 903: Cal Omega - Game 15.7 (Double-Draw Poker). The game was promoted to WORKING.
+    - Worked proper inputs for system 905: Cal Omega - Game 15.9 (Wild Double-Up). The game was promoted to WORKING.
+    - Worked proper inputs for system 905: Cal Omega - Game 17.2 (Double Double Poker). The game was promoted to WORKING.
+
+
+    [2021-04-21]
+
+    906-III improvements...
+    - Proper inputs for the IWC poker games.
+    - Fixed/Improved the interrupts system.
+    - Preliminary button-lamps support.
+    - Simplified and partially cleaned the code.
+    - Added technical notes.
+
+
+    [2021-04-20]
+
+    - Reworked a lot of things to get the 906-III platform playable.
+    - Switched to Rockwell R65C02 CPU.
+    - Added missing 906-III inputs, timers, clocks and connections.
+    - Renamed Game 51.08 to CEI 51.08 (CEI 906-III Poker).
+       The game is promoted to WORKING.
+    - Added Casino 21 UCMC/IWC (ver 30.08). The game is working.
+    - Added Poker UCMC/IWC (ver 162.03). The game is working.
+    - Added Poker UCMC/IWC (ver 162.03 20-6-91). The game is working.
+
 
     [2010-08-20]
 
@@ -451,14 +504,14 @@
     - Updated games list and technical notes.
     - Promoted comg080 (Arcade Black Jack) to working state.
 
-    - Added support for system 906III:
+    - Added support for system 906-III:
         - Accurate memory map, CRTC, and PIAs mapped.
         - Preliminary PIAs support (no multiplexion yet).
         - Added proper machine driver, with correct R65C02 CPU.
         - Documented the hardware specs.
         - Added Game 51.08 (CEI Video Poker, Jacks or Better),
-          running in CEI 906III hardware. The game is not working.
-        - Corrected docs about the 906III memory map.
+          running in CEI 906-III hardware. The game is not working.
+        - Corrected docs about the 906-III memory map.
         - Mapped the AY8912.
         - Added AY8912 proper interfase. Tied SW2 to AY8912 port.
         - PIA0, portA is polled constantly. Tied some debug handlers
@@ -632,7 +685,10 @@
     - Improve 903/905 inputs.
     - Interrupts for System 903/904 UART.
     - Complete the PIAs connection.
-    - 906III: PIAs & AY8912 ports, inputs, etc...
+    - 906-III: Proper PIATs 65C24 devices.
+    - 906-III: GFX banks, proper banks selector.
+    - 906-III: EX and Turbo+ platforms support.
+    - Hopper support.
     - Parent/clone relationship.
     - Fix lamps.
 
@@ -642,20 +698,10 @@
 #include "emu.h"
 #include "includes/calomega.h"
 
-#include "cpu/m6502/m6502.h"
-#include "cpu/m6502/m65c02.h"
-#include "machine/nvram.h"
-#include "sound/ay8910.h"
-#include "video/mc6845.h"
-
-#include "screen.h"
-#include "speaker.h"
-
-
-#define MASTER_CLOCK    XTAL(10'000'000)
-#define CPU_CLOCK   (MASTER_CLOCK/16)
-#define UART_CLOCK  (MASTER_CLOCK/16)
-#define SND_CLOCK   (MASTER_CLOCK/8)
+#define MASTER_CLOCK        XTAL(10'000'000)
+#define CPU_CLOCK           (MASTER_CLOCK/16)
+#define UART_CLOCK          (MASTER_CLOCK/16)
+#define SND_CLOCK           (MASTER_CLOCK/8)
 
 
 /**************************************************
@@ -671,7 +717,7 @@ WRITE_LINE_MEMBER(calomega_state::update_aciabaud_scale)
 
 uint8_t calomega_state::s903_mux_port_r()
 {
-	switch( m_s903_mux_data & 0xf0 )    /* bits 4-7 */
+	switch( m_s903_mux_data & 0xf0 )    // bits 4-7
 	{
 		case 0x10: return m_in0_0->read();
 		case 0x20: return m_in0_1->read();
@@ -679,19 +725,23 @@ uint8_t calomega_state::s903_mux_port_r()
 		case 0x80: return m_in0_3->read();
 	}
 
-	return m_frq->read();   /* bit7 used for 50/60 Hz selector */
+	return 0xff;
 }
 
 void calomega_state::s903_mux_w(uint8_t data)
 {
-	m_s903_mux_data = data ^ 0xff;  /* inverted */
+    // bit 7 - bit 6 -bit 5 -bit 4 -> Mux. Scan Lines
+	m_s903_mux_data = data ^ 0xf0;    // inverted
+
+    // bit 0 - bit 1 -> Hopper
+	m_hopper->motor_w(BIT(~data, 0) && BIT(~data, 1));
+
+    // bit2 - bit3 -> No connected
 }
-
-
 
 uint8_t calomega_state::s905_mux_port_r()
 {
-	switch( m_s905_mux_data & 0x0f )    /* bits 0-3 */
+	switch( m_s905_mux_data & 0x0f )	// bits 0-3
 	{
 		case 0x01: return m_in0_0->read();
 		case 0x02: return m_in0_1->read();
@@ -699,69 +749,188 @@ uint8_t calomega_state::s905_mux_port_r()
 		case 0x08: return m_in0_3->read();
 	}
 
-	return m_frq->read();   /* bit6 used for 50/60 Hz selector */
+	return 0xff;
 }
 
 void calomega_state::s905_mux_w(uint8_t data)
 {
-	m_s905_mux_data = data ^ 0xff;  /* inverted */
+//  Lower nibble
+	m_s905_mux_data = data ^ 0x0f;    // inverted
+
+/*  Upper nibble
+    PIA_1_PB_4 - Hopper1.
+    PIA_1_PB_5 - Hopper2.
+    PIA_1_PB_6 - Not Connected.
+    PIA_1_PB_7 - Lockout.
+*/
+	m_hopper->motor_w(BIT(~data, 4) && BIT(~data, 5));
+	m_lockout = BIT(data, 7);
 }
 
 
-/********* 906III PIAs debug *********/
-
-uint8_t calomega_state::pia0_ain_r()
-{
-	/* Valid input port. Each polled value is stored at $0538 */
-	logerror("PIA0: Port A in\n");
-	return m_in0->read();
-}
+/********* 906-III PIAs debug *********/
 
 uint8_t calomega_state::pia0_bin_r()
 {
-	logerror("PIA0: Port B in\n");
+    //logerror("PIA0: Port B in\n");
 	return 0xff;
 }
 
 void calomega_state::pia0_aout_w(uint8_t data)
 {
-	logerror("PIA0: Port A out: %02X\n", data);
+    //logerror("PIA0: Port A out: %02X\n", data);
 }
 
 void calomega_state::pia0_bout_w(uint8_t data)
 {
-	logerror("PIA0: Port B out: %02X\n", data);
+    // Meters???...M1-M5
+	m_diverter = BIT(data, 3);
+	m_lockout = BIT(data, 5);
+	m_hopper->motor_w(BIT(~data, 6) && BIT(~data, 7));
+    // if(m_hopper) popmessage("HOPPER : %x", data);
 }
-
-WRITE_LINE_MEMBER(calomega_state::pia0_ca2_w)
-{
-	/* Seems a kind of "heartbit" watchdog, switching 1's and 0's */
-	logerror("PIA0: CA2: %02X\n", state);
-}
-
-
 
 uint8_t calomega_state::pia1_ain_r()
 {
-	logerror("PIA1: Port A in\n");
+    //popmessage("hopper out: %x", m_in0_1->read() & 0x80);
+	switch( m_s905_mux_data & 0x03 )    // bits 0-3
+	{
+		case 0x00: return m_in0_0->read();
+		case 0x01: return m_in0_1->read();
+		case 0x02: return m_in0_2->read();
+		case 0x03: return m_in0_3->read();
+	}
+
 	return 0xff;
 }
 
 uint8_t calomega_state::pia1_bin_r()
 {
-	logerror("PIA1: Port B in\n");
+    // logerror("PIA1: Port B in\n");
 	return 0xff;
 }
 
 void calomega_state::pia1_aout_w(uint8_t data)
 {
-	logerror("PIA1: Port A out: %02X\n", data);
+	m_s905_mux_data = data >> 6;
+    // logerror("PIA1: Port A out (906-III mux): %02X\n", m_s905_mux_data);
 }
 
 void calomega_state::pia1_bout_w(uint8_t data)
 {
-	logerror("PIA1: Port B out: %02X\n", data);
+/* System 906-III Lamps...
+
+  7654 3210
+  ---- ---x  Hold 1 lamp.
+  ---- --x-  Hold 2 lamp.
+  ---- -x--  Hold 3 lamp.
+  ---- x---  Hold 4 lamp.
+  ---x ----  Hold 5 lamp.
+  --x- ----  (unknown)
+  -x-- ----  (unknown)
+  x--- ----  (unknown)
+
+*/
+	m_lamps[0] = BIT(~data, 0);  // L1 (Hold 1)
+	m_lamps[1] = BIT(~data, 1);  // L2 (Hold 2)
+	m_lamps[2] = BIT(~data, 2);  // L3 (Hold 3)
+	m_lamps[3] = BIT(~data, 3);  // L4 (Hold 4)
+	m_lamps[4] = BIT(~data, 4);  // L5 (Hold 5)
+	m_lamps[5] = BIT(~data, 5);  // L6 (unknown)
+	m_lamps[6] = BIT(~data, 6);  // L7 (unknown)
+	m_lamps[7] = BIT(~data, 7);  // L8 (unknown)
+
+    // logerror("PIA1: Port B out: %02X\n", data);
 }
+
+TIMER_DEVICE_CALLBACK_MEMBER( calomega_state::timer_0 )
+{
+	m_timer = !m_timer;
+	m_pia[0]->ca1_w(m_timer);
+	m_pia[0]->read(1);  //CRA
+    // logerror("Timer_0 event : state=%d\n", m_timer);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( calomega_state::timer_1 )
+{
+	m_timer = !m_timer;
+	m_pia[1]->cb1_w(m_timer);
+    // logerror("Timer_1 event (TIMER) : state=%d\n", m_timer);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( calomega_state::timer_2 )
+{
+	m_timer =! m_timer;
+	m_pia[1]->ca1_w(m_timer);
+	m_pia[1]->read(1);  // CRA
+    // logerror("Timer_2 event : state=%d\n", m_timer);
+}
+
+READ_LINE_MEMBER(calomega_state::timer_r)
+{
+    // logerror("timer_1 read : state=%d\n", m_timer);
+	return m_timer;
+}
+
+WRITE_LINE_MEMBER(calomega_state::vblank0_w)
+{
+	m_vblank = state;
+	m_pia[0]->read(0);
+	m_pia[0]->read(0);
+	m_pia[1]->cb1_w(state);
+    // m_pia[1]->read(3);  // CRB
+    // logerror("V_BLANK_0 event : state=%d\n", m_vblank);
+}
+
+WRITE_LINE_MEMBER(calomega_state::vblank1_w)
+{
+	m_vblank = state;
+	m_pia[0]->read(2);
+	m_pia[0]->cb1_w(state);
+    // logerror("V_BLANK_1 event (sale ): state=%d\n", m_vblank);
+}
+
+WRITE_LINE_MEMBER(calomega_state::vblank2_w)
+{
+	m_vblank = state;
+	m_pia[1]->read(0); 
+	m_pia[1]->read(0);
+	m_pia[1]->cb1_w(state);
+    // logerror("V_BLANK_2 event : state=%d\n", m_vblank);
+}
+
+READ_LINE_MEMBER(calomega_state::vblank_r)
+{
+    // logerror("V_BLANK read : state=%d\n", m_vblank);
+	return m_vblank;
+}
+
+WRITE_LINE_MEMBER(calomega_state::pia1_cb2_w)
+{
+    // Output to L9
+	m_lamps[8] = ~state;  // L9 (Door?)
+    // logerror("PIA1: CB2: %02X\n", state);
+}
+
+// Dummy callbacks
+uint8_t calomega_state::dummy_pia_r()
+{
+	return 0xff;
+}
+
+void calomega_state::dummy_pia_w(uint8_t data)
+{
+	m_pia_data = data;
+}
+
+READ_LINE_MEMBER(calomega_state::dummy_pia_line_r)
+{
+	return false;
+}
+WRITE_LINE_MEMBER(calomega_state::dummy_pia_line_w)
+{
+}
+
 
 
 /********  Lamps debug  ********
@@ -786,34 +955,34 @@ void calomega_state::pia1_bout_w(uint8_t data)
 */
 void calomega_state::lamps_903a_w(uint8_t data)
 {
-	/* First 5 bits of PIA0 port B */
-	m_lamps[0] = BIT(~data, 0);  /* L1 (Hold 1) */
-	m_lamps[1] = BIT(~data, 1);  /* L2 (Hold 2) */
-	m_lamps[2] = BIT(~data, 2);  /* L3 (Hold 3) */
-	m_lamps[3] = BIT(~data, 3);  /* L4 (Hold 4) */
-	m_lamps[4] = BIT(~data, 4);  /* L5 (Hold 5) */
+    // First 5 bits of PIA0 port B
+	m_lamps[0] = BIT(~data, 0);  // L1 (Hold 1)
+	m_lamps[1] = BIT(~data, 1);  // L2 (Hold 2)
+	m_lamps[2] = BIT(~data, 2);  // L3 (Hold 3)
+	m_lamps[3] = BIT(~data, 3);  // L4 (Hold 4)
+	m_lamps[4] = BIT(~data, 4);  // L5 (Hold 5)
 }
 
 void calomega_state::lamps_903b_w(uint8_t data)
 {
-	/* First 4 bits of PIA1 port A */
-	m_lamps[5] = BIT(~data, 0);  /* L6 (Cancel) */
-	m_lamps[6] = BIT(~data, 1);  /* L7 (Bet) */
-	m_lamps[7] = BIT(~data, 2);  /* L8 (Take) */
-	m_lamps[8] = BIT(~data, 3);  /* L9 (Door?) */
+    // First 4 bits of PIA1 port A
+	m_lamps[5] = BIT(~data, 0);  // L6 (Cancel)
+	m_lamps[6] = BIT(~data, 1);  // L7 (Bet)
+	m_lamps[7] = BIT(~data, 2);  // L8 (Take)
+	m_lamps[8] = BIT(~data, 3);  // L9 (Door?)
 }
 
 void calomega_state::lamps_905_w(uint8_t data)
 {
-	/* Whole 8 bits of PIA0 port B */
-	m_lamps[0] = BIT(~data, 0);  /* L1 (Hold 1) */
-	m_lamps[1] = BIT(~data, 1);  /* L2 (Hold 2) */
-	m_lamps[2] = BIT(~data, 2);  /* L3 (Hold 3) */
-	m_lamps[3] = BIT(~data, 3);  /* L4 (Hold 4) */
-	m_lamps[4] = BIT(~data, 4);  /* L5 (Hold 5) */
-	m_lamps[5] = BIT(~data, 5);  /* L6 (unknown) */
-	m_lamps[6] = BIT(~data, 6);  /* L7 (unknown) */
-	m_lamps[7] = BIT(~data, 7);  /* L8 (unknown) */
+    // Whole 8 bits of PIA0 port B
+	m_lamps[0] = BIT(~data, 0);  // L1 (Hold 1)
+	m_lamps[1] = BIT(~data, 1);  // L2 (Hold 2)
+	m_lamps[2] = BIT(~data, 2);  // L3 (Hold 3)
+	m_lamps[3] = BIT(~data, 3);  // L4 (Hold 4)
+	m_lamps[4] = BIT(~data, 4);  // L5 (Hold 5)
+	m_lamps[5] = BIT(~data, 5);  // L6 (unknown)
+	m_lamps[6] = BIT(~data, 6);  // L7 (unknown)
+	m_lamps[7] = BIT(~data, 7);  // L8 (unknown)
 }
 
 
@@ -866,8 +1035,9 @@ void calomega_state::sys905_map(address_map &map)
 
 void calomega_state::sys906_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x0000, 0x1fff).ram().share("nvram");
 	map(0x280c, 0x280f).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2810, 0x2811).rw(m_acia6850_0, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x2824, 0x2827).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x2c04, 0x2c04).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2c05, 0x2c05).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -890,7 +1060,7 @@ static INPUT_PORTS_START( stand903 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("0-4") PORT_CODE(KEYCODE_4)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("0-5") PORT_CODE(KEYCODE_5)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("0-6") PORT_CODE(KEYCODE_6)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* connected to SW2-5 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
@@ -900,7 +1070,7 @@ static INPUT_PORTS_START( stand903 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1-4") PORT_CODE(KEYCODE_R)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1-5") PORT_CODE(KEYCODE_T)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1-6") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* connected to SW2-5 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-2")
@@ -910,7 +1080,7 @@ static INPUT_PORTS_START( stand903 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("2-4") PORT_CODE(KEYCODE_F)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("2-5") PORT_CODE(KEYCODE_G)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("2-6") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* connected to SW2-5 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
@@ -920,18 +1090,18 @@ static INPUT_PORTS_START( stand903 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("3-4") PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("3-5") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("3-6") PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* connected to SW2-5 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 /*  SW1-5 should be wired to PIA0 portA, bit 6.
     SW1-6 should be wired to H-POL.
     SW1-7 should be wired to V-POL.
 */
-	PORT_START("SW1")   /* settings (PIA1), SW2 in schematics */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L6 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L7 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L8 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L9 */
+	PORT_START("SW1")    // settings (PIA1), SW2 in schematics
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L6
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L7
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L8
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L9
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -945,7 +1115,7 @@ static INPUT_PORTS_START( stand903 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("SW2")   /* baud (serial 6850-4024), SW1 in schematics */
+	PORT_START("SW2")   // baud (serial 6850-4024), SW1 in schematics...
 	PORT_DIPNAME( 0x3f, 0x08, "Baud Rate" )         PORT_DIPLOCATION("SW1:1,2,3,4,5,6")
 	PORT_DIPSETTING(    0x01, "300" )
 	PORT_DIPSETTING(    0x02, "600" )
@@ -960,7 +1130,7 @@ static INPUT_PORTS_START( stand903 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("SW3")   /* unknown (ay8912), SW3 in schematics */
+	PORT_START("SW3")   // unknown (ay8912), SW3 in schematics
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -986,7 +1156,7 @@ static INPUT_PORTS_START( stand903 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("FRQ")   /* settings (PIA0) */
+	PORT_START("FRQ")   // settings (PIA0)
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1022,7 +1192,7 @@ static INPUT_PORTS_START( stand904 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("0-4") PORT_CODE(KEYCODE_4)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("0-5") PORT_CODE(KEYCODE_5)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("0-6") PORT_CODE(KEYCODE_6)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* connected to SW2-5 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
@@ -1032,7 +1202,7 @@ static INPUT_PORTS_START( stand904 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1-4") PORT_CODE(KEYCODE_R)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1-5") PORT_CODE(KEYCODE_T)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("1-6") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* connected to SW2-5 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-2")
@@ -1042,7 +1212,7 @@ static INPUT_PORTS_START( stand904 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("2-4") PORT_CODE(KEYCODE_F)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("2-5") PORT_CODE(KEYCODE_G)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("2-6") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* connected to SW2-5 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
@@ -1052,18 +1222,18 @@ static INPUT_PORTS_START( stand904 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("3-4") PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("3-5") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("3-6") PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* connected to SW2-5 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 /*  SW1-5 should be wired to PIA0 portA, bit 6.
     SW1-6 should be wired to H-POL.
     SW1-7 should be wired to V-POL.
 */
-	PORT_START("SW1")   /* settings (PIA1), SW2 in schematics */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L6 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L7 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L8 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L9 */
+	PORT_START("SW1")    // settings (PIA1), SW2 in schematics
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L6
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L7
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L8
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L9
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1077,7 +1247,7 @@ static INPUT_PORTS_START( stand904 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("SW2")   /* baud (serial 6850-4024), SW1 in schematics */
+	PORT_START("SW2")    // baud (serial 6850-4024), SW1 in schematics
 	PORT_DIPNAME( 0x3f, 0x08, "Baud Rate" )         PORT_DIPLOCATION("SW1:1,2,3,4,5,6")
 	PORT_DIPSETTING(    0x01, "300" )
 	PORT_DIPSETTING(    0x02, "600" )
@@ -1092,7 +1262,7 @@ static INPUT_PORTS_START( stand904 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("FRQ")   /* settings (PIA0) */
+	PORT_START("FRQ")    // settings (PIA0)
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1161,9 +1331,9 @@ static INPUT_PORTS_START( stand905 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	/* For System 905, SW1 uses the whole PIA1 portA */
+	// For System 905, SW1 uses the whole PIA1 portA.
 
-	PORT_START("SW1")   /* settings (PIA1) */
+	PORT_START("SW1")    // settings (PIA1)
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1189,7 +1359,7 @@ static INPUT_PORTS_START( stand905 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("FRQ")   /* settings (PIA0) */
+	PORT_START("FRQ")    // settings (PIA0)
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1218,23 +1388,24 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gdrwpkrd )
 	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* credits */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Collect") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )        PORT_IMPULSE(2)    // credits
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Collect") PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Draw")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel Discards")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* connected to SW2-5 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )       // connected to SW2-5.
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	//PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Door Open")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode") /* in some games you need to open the door first */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_NAME("Door Open")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test Mode")  // in some games you need to open the door first
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hand Pay") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dispute") PORT_CODE(KEYCODE_0)    /* in some games you need to open the door first */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* connected to SW2-5 */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dispute")  PORT_CODE(KEYCODE_0)    // in some games you need to open the door first
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-2")
@@ -1244,7 +1415,7 @@ static INPUT_PORTS_START( gdrwpkrd )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Discard 4")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Discard 5")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* connected to SW2-5 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
@@ -1254,18 +1425,18 @@ static INPUT_PORTS_START( gdrwpkrd )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("WT.Switch") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* connected to SW2-5 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 /*  SW1-5 should be wired to PIA0 portA, bit 6.
     SW1-6 should be wired to H-POL.
     SW1-7 should be wired to V-POL.
 */
-	PORT_START("SW1")   /* settings (PIA1), SW2 in schematics */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L6 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L7 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L8 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L9 */
+	PORT_START("SW1")    // settings (PIA1), SW2 in schematics
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L6
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L7
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L8
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L9
 	PORT_DIPNAME( 0x30, 0x20, "Maximum Credits")    PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x00, "100" )
 	PORT_DIPSETTING(    0x10, "400" )
@@ -1277,7 +1448,7 @@ static INPUT_PORTS_START( gdrwpkrd )
 	PORT_DIPSETTING(    0x80, "40" )
 	PORT_DIPSETTING(    0xC0, "80" )
 
-	PORT_START("SW2")   /* baud (serial 6850-4024), SW1 in schematics */
+	PORT_START("SW2")   // baud (serial 6850-4024), SW1 in schematics
 	PORT_DIPNAME( 0x3f, 0x08, "Baud Rate" )         PORT_DIPLOCATION("SW1:1,2,3,4,5,6")
 	PORT_DIPSETTING(    0x01, "300" )
 	PORT_DIPSETTING(    0x02, "600" )
@@ -1292,7 +1463,7 @@ static INPUT_PORTS_START( gdrwpkrd )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("SW3")   /* unknown (ay8912), SW3 in schematics */
+	PORT_START("SW3")   // unknown (ay8912), SW3 in schematics
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1318,7 +1489,7 @@ static INPUT_PORTS_START( gdrwpkrd )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("FRQ")   /* settings (PIA0) */
+	PORT_START("FRQ")   // settings (PIA0)
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1347,23 +1518,23 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gdrwpkrh )
 	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* credits */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Collect") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )        PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Collect") PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Draw")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel Holds")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* connected to SW2-5 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Door Open")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode") /* in some games you need to open the door first */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hand Pay") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dispute") PORT_CODE(KEYCODE_0)    /* in some games you need to open the door first */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* connected to SW2-5 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_NAME("Door Open")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test Mode")  // in some games you need to open the door first
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Hand Pay")  PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Dispute")   PORT_CODE(KEYCODE_0)  // in some games you need to open the door first
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-2")
@@ -1373,7 +1544,7 @@ static INPUT_PORTS_START( gdrwpkrh )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* connected to SW2-5 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
@@ -1383,18 +1554,18 @@ static INPUT_PORTS_START( gdrwpkrh )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("WT.Switch") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* connected to SW2-5 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 /*  SW1-5 should be wired to PIA0 portA, bit 6.
     SW1-6 should be wired to H-POL.
     SW1-7 should be wired to V-POL.
 */
-	PORT_START("SW1")   /* settings (PIA1), SW2 in schematics */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L6 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L7 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L8 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L9 */
+	PORT_START("SW1")   // settings (PIA1), SW2 in schematics
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L6
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L7
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L8
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L9
 	PORT_DIPNAME( 0x30, 0x20, "Maximum Credits")    PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x00, "100" )
 	PORT_DIPSETTING(    0x10, "400" )
@@ -1406,7 +1577,7 @@ static INPUT_PORTS_START( gdrwpkrh )
 	PORT_DIPSETTING(    0x80, "40" )
 	PORT_DIPSETTING(    0xC0, "80" )
 
-	PORT_START("SW2")   /* baud (serial 6850-4024), SW1 in schematics */
+	PORT_START("SW2")    // baud (serial 6850-4024), SW1 in schematics
 	PORT_DIPNAME( 0x3f, 0x08, "Baud Rate" )         PORT_DIPLOCATION("SW1:1,2,3,4,5,6")
 	PORT_DIPSETTING(    0x01, "300" )
 	PORT_DIPSETTING(    0x02, "600" )
@@ -1421,7 +1592,7 @@ static INPUT_PORTS_START( gdrwpkrh )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("SW3")   /* unknown (ay8912), SW3 in schematics */
+	PORT_START("SW3")    // unknown (ay8912), SW3 in schematics
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1447,7 +1618,7 @@ static INPUT_PORTS_START( gdrwpkrh )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("FRQ")   /* settings (PIA0) */
+	PORT_START("FRQ")    // settings (PIA0)
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1476,23 +1647,23 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( arcadebj )
 	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2)    /* credits */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* connected to SW2-5 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(2)    /* credits */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Door Open") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* connected to SW2-5 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-2")
@@ -1502,7 +1673,7 @@ static INPUT_PORTS_START( arcadebj )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hit")         PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Stand")       PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* connected to SW2-5 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
@@ -1512,18 +1683,18 @@ static INPUT_PORTS_START( arcadebj )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* connected to SW2-5 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 /*  SW1-5 should be wired to PIA0 portA, bit 6.
     SW1-6 should be wired to H-POL.
     SW1-7 should be wired to V-POL.
 */
-	PORT_START("SW1")   /* settings (PIA1), SW2 in schematics */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L6 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L7 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L8 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L9 */
+	PORT_START("SW1")    // settings (PIA1), SW2 in schematics
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L6
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L7
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L8
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L9
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1536,7 +1707,7 @@ static INPUT_PORTS_START( arcadebj )
 	PORT_DIPSETTING(    0x80, "20" )
 	PORT_DIPSETTING(    0xC0, "50" )
 
-	PORT_START("SW2")   /* baud (serial 6850-4024), SW1 in schematics */
+	PORT_START("SW2")    // baud (serial 6850-4024), SW1 in schematics
 	PORT_DIPNAME( 0x3f, 0x08, "Baud Rate" )         PORT_DIPLOCATION("SW1:1,2,3,4,5,6")
 	PORT_DIPSETTING(    0x01, "300" )
 	PORT_DIPSETTING(    0x02, "600" )
@@ -1551,7 +1722,7 @@ static INPUT_PORTS_START( arcadebj )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("SW3")   /* unknown (ay8912), SW3 in schematics */
+	PORT_START("SW3")   // unknown (ay8912), SW3 in schematics
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1577,7 +1748,7 @@ static INPUT_PORTS_START( arcadebj )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("FRQ")   /* settings (PIA0) */
+	PORT_START("FRQ")   // settings (PIA0)
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1606,22 +1777,22 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( comg074 )
 	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2)    /* credits */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Collect") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )        PORT_IMPULSE(2)    // credits
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Collect") PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Draw")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel Discards")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN0-0-6")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )        PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN0-0-6")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hand Pay") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("IN0-1-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Door Open")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode") /* in some games you need to open the door first */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_3_PAD) PORT_NAME("IN0-1-5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN0-1-6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Hand Pay") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("IN0-1-2") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_NAME("Door Open")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test Mode")  // in some games you need to open the door first
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )        PORT_CODE(KEYCODE_3_PAD) PORT_NAME("IN0-1-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN0-1-6")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1649,11 +1820,11 @@ static INPUT_PORTS_START( comg074 )
     SW1-6 should be wired to H-POL.
     SW1-7 should be wired to V-POL.
 */
-	PORT_START("SW1")   /* settings (PIA1), SW2 in schematics */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L6 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L7 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L8 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L9 */
+	PORT_START("SW1")    // settings (PIA1), SW2 in schematics
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L6
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L7
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L8
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L9
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1666,7 +1837,7 @@ static INPUT_PORTS_START( comg074 )
 	PORT_DIPSETTING(    0x80, "40" )
 	PORT_DIPSETTING(    0xC0, "80" )
 
-	PORT_START("SW2")   /* baud (serial 6850-4024), SW1 in schematics */
+	PORT_START("SW2")    // baud (serial 6850-4024), SW1 in schematics
 	PORT_DIPNAME( 0x3f, 0x08, "Baud Rate" )         PORT_DIPLOCATION("SW1:1,2,3,4,5,6")
 	PORT_DIPSETTING(    0x01, "300" )
 	PORT_DIPSETTING(    0x02, "600" )
@@ -1681,7 +1852,7 @@ static INPUT_PORTS_START( comg074 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("SW3")   /* unknown (ay8912), SW3 in schematics */
+	PORT_START("SW3")    // unknown (ay8912), SW3 in schematics
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1707,7 +1878,7 @@ static INPUT_PORTS_START( comg074 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("FRQ")   /* settings (PIA0) */
+	PORT_START("FRQ")    // settings (PIA0)
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1736,22 +1907,22 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( comg076 )
 	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* credits */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  // credits
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Draw")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel Discards")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  /* credits */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )        PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test Mode")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1761,17 +1932,16 @@ static INPUT_PORTS_START( comg076 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Discard 3")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Discard 4")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Discard 5")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Clear Credits") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Small")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1779,11 +1949,11 @@ static INPUT_PORTS_START( comg076 )
     SW1-6 should be wired to H-POL.
     SW1-7 should be wired to V-POL.
 */
-	PORT_START("SW1")   /* settings (PIA1), SW2 in schematics */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L6 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L7 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L8 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L9 */
+	PORT_START("SW1")    // settings (PIA1), SW2 in schematics
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L6
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L7
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L8
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L9
 	PORT_DIPNAME( 0x30, 0x00, "Minimum Winning Hand") PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x00, "Jacks or Better" )
 	PORT_DIPSETTING(    0x20, "Queens or Better" )
@@ -1795,7 +1965,7 @@ static INPUT_PORTS_START( comg076 )
 	PORT_DIPSETTING(    0xC0, "20" )
 	PORT_DIPSETTING(    0x40, "50" )
 
-	PORT_START("SW2")   /* baud (serial 6850-4024), SW1 in schematics */
+	PORT_START("SW2")    // baud (serial 6850-4024), SW1 in schematics
 	PORT_DIPNAME( 0x3f, 0x08, "Baud Rate" )         PORT_DIPLOCATION("SW1:1,2,3,4,5,6")
 	PORT_DIPSETTING(    0x01, "300" )
 	PORT_DIPSETTING(    0x02, "600" )
@@ -1810,7 +1980,7 @@ static INPUT_PORTS_START( comg076 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("SW3")   /* unknown (ay8912), SW3 in schematics */
+	PORT_START("SW3")    // unknown (ay8912), SW3 in schematics
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1836,7 +2006,138 @@ static INPUT_PORTS_START( comg076 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("FRQ")   /* settings (PIA0) */
+	PORT_START("FRQ")    // settings (PIA0)
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Frequency" )         PORT_DIPLOCATION("FRQ:1")
+	PORT_DIPSETTING(    0x80, "60Hz." )
+	PORT_DIPSETTING(    0x00, "50Hz." )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( comg125 )	// nudge bingo
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 1 Up") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 2 Up") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 3 Up") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 4 Up") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 5 Up") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("Replay / Credits")  PORT_IMPULSE(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test / Diagnostics")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 1 Down") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 2 Down") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 3 Down") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 4 Down") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Nudge 5 Down") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("Clear Credits") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Play (Bet)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  // connected to SW2-5
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+/*  SW1-5 should be wired to PIA0 portA, bit 6.
+    SW1-6 should be wired to H-POL.
+    SW1-7 should be wired to V-POL.
+*/
+	PORT_START("SW1")    // settings (PIA1), SW2 in schematics
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L6
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L7
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L8
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L9
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW2")   // baud (serial 6850-4024), SW1 in schematics...
+	PORT_DIPNAME( 0x3f, 0x08, "Baud Rate" )         PORT_DIPLOCATION("SW1:1,2,3,4,5,6")
+	PORT_DIPSETTING(    0x01, "300" )
+	PORT_DIPSETTING(    0x02, "600" )
+	PORT_DIPSETTING(    0x04, "1200" )
+	PORT_DIPSETTING(    0x08, "2400" )
+	PORT_DIPSETTING(    0x10, "4800" )
+	PORT_DIPSETTING(    0x20, "9600" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW3")   // unknown (ay8912), SW3 in schematics
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("FRQ")   // settings (PIA0)
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1865,10 +2166,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( comg128 )
 	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* credits */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  // credits
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Draw")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel Discards")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1880,7 +2181,7 @@ static INPUT_PORTS_START( comg128 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Door Open")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Test Mode")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1899,7 +2200,7 @@ static INPUT_PORTS_START( comg128 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Small")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1908,11 +2209,11 @@ static INPUT_PORTS_START( comg128 )
     SW1-6 should be wired to H-POL.
     SW1-7 should be wired to V-POL.
 */
-	PORT_START("SW1")   /* settings (PIA1), SW2 in schematics */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L6 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L7 */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L8 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* L9 */
+	PORT_START("SW1")    // settings (PIA1), SW2 in schematics
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L6
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L7
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L8
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L9
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )   PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1925,7 +2226,7 @@ static INPUT_PORTS_START( comg128 )
 	PORT_DIPSETTING(    0x80, "4" )
 	PORT_DIPSETTING(    0xC0, "5" )
 
-	PORT_START("SW2")   /* baud (serial 6850-4024), SW1 in schematics */
+	PORT_START("SW2")    // baud (serial 6850-4024), SW1 in schematics
 	PORT_DIPNAME( 0x3f, 0x08, "Baud Rate" )         PORT_DIPLOCATION("SW1:1,2,3,4,5,6")
 	PORT_DIPSETTING(    0x01, "300" )
 	PORT_DIPSETTING(    0x02, "600" )
@@ -1940,7 +2241,7 @@ static INPUT_PORTS_START( comg128 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("SW3")   /* unknown (ay8912), SW3 in schematics */
+	PORT_START("SW3")    // unknown (ay8912), SW3 in schematics
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1966,7 +2267,7 @@ static INPUT_PORTS_START( comg128 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("FRQ")   /* settings (PIA0) */
+	PORT_START("FRQ")    // settings (PIA0)
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1993,19 +2294,259 @@ static INPUT_PORTS_START( comg128 )
 	PORT_DIPSETTING(    0x00, "50Hz." )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( comg157 )
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(2)      PORT_NAME("Coin-In A")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )                  PORT_NAME("Double")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )                  PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )                 PORT_NAME("Cancel")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(2)      PORT_NAME("Coin-In B")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Data / Audit")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )                      PORT_NAME("Test Mode")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )                  PORT_NAME("Discard 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )                  PORT_NAME("Discard 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )                  PORT_NAME("Discard 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )                  PORT_NAME("Discard 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )                  PORT_NAME("Discard 5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_T) PORT_NAME("Tilt")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )                   PORT_NAME("Play (Bet)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )                  PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )                   PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+/*  SW1-5 should be wired to PIA0 portA, bit 6.
+    SW1-6 should be wired to H-POL.
+    SW1-7 should be wired to V-POL.
+*/
+	PORT_START("SW1")    // settings (PIA1), SW2 in schematics
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L6
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L7
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L8
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        // L9
+	PORT_DIPNAME( 0x30, 0x00, "Minimum Winning Hand") PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x00, "Jacks or Better" )
+	PORT_DIPSETTING(    0x20, "Queens or Better" )
+	PORT_DIPSETTING(    0x30, "Kings or Better" )
+	PORT_DIPSETTING(    0x10, "Pair of Aces" )
+	PORT_DIPNAME( 0xC0, 0x80, "Maximum Bet")        PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x80, "10" )
+	PORT_DIPSETTING(    0xC0, "20" )
+	PORT_DIPSETTING(    0x40, "50" )
+
+	PORT_START("SW2")    // baud (serial 6850-4024), SW1 in schematics
+	PORT_DIPNAME( 0x3f, 0x08, "Baud Rate" )         PORT_DIPLOCATION("SW1:1,2,3,4,5,6")
+	PORT_DIPSETTING(    0x01, "300" )
+	PORT_DIPSETTING(    0x02, "600" )
+	PORT_DIPSETTING(    0x04, "1200" )
+	PORT_DIPSETTING(    0x08, "2400" )
+	PORT_DIPSETTING(    0x10, "4800" )
+	PORT_DIPSETTING(    0x20, "9600" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )   PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW3")    // unknown (ay8912), SW3 in schematics
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( comg159 )
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Discard 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Discard 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Discard 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Discard 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  PORT_NAME("Discard 5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_NAME("Play (Bet)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Settings (%)") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Clr Data")     PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Audit")        PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) PORT_NAME("Stand")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )        PORT_NAME("Coin-In A")    PORT_IMPULSE(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )        PORT_NAME("Coin-In B")    PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Tilt")         PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )  PORT_NAME("Double")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )   PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// For System 905, SW1 uses the whole PIA1 portA.
+
+	PORT_START("SW1")    // settings (PIA1)
+	PORT_DIPNAME( 0x01, 0x01, "Game Type" )         PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, "Hold" )
+	PORT_DIPSETTING(    0x00, "Discard" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, "Pay Table" )         PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x30, "250/100/25/10/8/5/4/3/2/1" )
+	PORT_DIPSETTING(    0x20, "500/200/40/10/8/5/4/3/2/1" )
+	PORT_DIPSETTING(    0x00, "500/250/50/20/8/6/4/3/2/1" )
+	PORT_DIPSETTING(    0x10, "500/250/50/25/10/8/5/3/2/1" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Low Winning Pair" )  PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0x00, "Jacks" )
+	PORT_DIPSETTING(    0x80, "Queens" )
+	PORT_DIPSETTING(    0xc0, "Kings" )
+	PORT_DIPSETTING(    0x40, "Aces" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( comg172 )
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Discard 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Discard 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Discard 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Discard 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  PORT_NAME("Discard 5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_NAME("Play (Bet)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Learn")        PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Clr Data")     PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Audit")        PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_STAND ) PORT_NAME("Stand")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )        PORT_NAME("Coin-In A")    PORT_IMPULSE(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )        PORT_NAME("Coin-In B")    PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Tilt")         PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )  PORT_NAME("Double")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )   PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// For System 905, SW1 uses the whole PIA1 portA.
+
+	PORT_START("SW1")    // settings (PIA1)
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )               PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )               PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Double Deal" )                    PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )               PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x00, "Lower Pair to Win + Pay Table" )  PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x00, "Jacks, 250/50/20/8/6/4/3/2/1" )
+	PORT_DIPSETTING(    0x20, "Queens, 200/40/10/8/5/4/3/2/1" )
+	PORT_DIPSETTING(    0x30, "Kings, 200/40/10/8/5/4/3/2/1" )
+	PORT_DIPSETTING(    0x10, "Aces, 250/50/25/10/8/5/3/2/1" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Coin Lockout" )                   PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0xc0, "No Lockout" )
+	PORT_DIPSETTING(    0x40, "No Lockout" )
+	PORT_DIPSETTING(    0x80, "1-Coin Lockout" )
+	PORT_DIPSETTING(    0x00, "2-Coin Lockout" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( elgrande )
 	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  /* credits */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Draw")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel Holds")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* credits */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Service")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2025,11 +2566,11 @@ static INPUT_PORTS_START( elgrande )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test Mode")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Odd")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Even")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_NAME("Odd")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )   PORT_NAME("Even")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2045,10 +2586,10 @@ static INPUT_PORTS_START( elgrande )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )           PORT_CONDITION("FRQ",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x08, "1 Coin/10 Credits" )        PORT_CONDITION("FRQ",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x00, "1 Coin/25 Credits" )        PORT_CONDITION("FRQ",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x08, "1 Coin/50 Credits" )        PORT_CONDITION("FRQ",0x40,EQUALS,0x40)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )           PORT_CONDITION("FRQ", 0x40, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x08, "1 Coin/10 Credits" )        PORT_CONDITION("FRQ", 0x40, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "1 Coin/25 Credits" )        PORT_CONDITION("FRQ", 0x40, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x08, "1 Coin/50 Credits" )        PORT_CONDITION("FRQ", 0x40, EQUALS, 0x40)
 	PORT_DIPNAME( 0x30, 0x20, "Minimum Winning Hand")
 	PORT_DIPSETTING(    0x20, "Jacks or Better" )
 	PORT_DIPSETTING(    0x30, "Queens or Better" )
@@ -2060,7 +2601,7 @@ static INPUT_PORTS_START( elgrande )
 	PORT_DIPSETTING(    0x80, "20" )
 	PORT_DIPSETTING(    0xC0, "50" )
 
-	PORT_START("FRQ")   /* settings (PIA0) */
+	PORT_START("FRQ")    // settings (PIA0)
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2089,17 +2630,17 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( jjpoker )
 	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  /* credits */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )        PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Deal / Draw")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL ) PORT_NAME("Cancel Discards")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* credits */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Service")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2109,21 +2650,21 @@ static INPUT_PORTS_START( jjpoker )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Discard 1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Discard 2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Discard 3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Discard 4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Discard 5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Discard 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Discard 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Discard 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Discard 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  PORT_NAME("Discard 5")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test Mode")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Odd")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Even")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )  PORT_NAME("Odd")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )   PORT_NAME("Even")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2139,10 +2680,10 @@ static INPUT_PORTS_START( jjpoker )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )           PORT_CONDITION("FRQ",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x08, "1 Coin/10 Credits" )        PORT_CONDITION("FRQ",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x00, "1 Coin/25 Credits" )        PORT_CONDITION("FRQ",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x08, "1 Coin/50 Credits" )        PORT_CONDITION("FRQ",0x40,EQUALS,0x40)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )           PORT_CONDITION("FRQ", 0x40, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x08, "1 Coin/10 Credits" )        PORT_CONDITION("FRQ", 0x40, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "1 Coin/25 Credits" )        PORT_CONDITION("FRQ", 0x40, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x08, "1 Coin/50 Credits" )        PORT_CONDITION("FRQ", 0x40, EQUALS, 0x40)
 	PORT_DIPNAME( 0x30, 0x20, "Minimum Winning Hand")
 	PORT_DIPSETTING(    0x20, "Jacks or Better" )
 	PORT_DIPSETTING(    0x30, "Queens or Better" )
@@ -2154,7 +2695,7 @@ static INPUT_PORTS_START( jjpoker )
 	PORT_DIPSETTING(    0x80, "20" )
 	PORT_DIPSETTING(    0xC0, "50" )
 
-	PORT_START("FRQ")   /* settings (PIA0) */
+	PORT_START("FRQ")    // settings (PIA0)
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2183,7 +2724,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ssipkr )
 	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)  /* credits */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
@@ -2193,7 +2734,7 @@ static INPUT_PORTS_START( ssipkr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)  /* credits */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Service")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2213,11 +2754,11 @@ static INPUT_PORTS_START( ssipkr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Mode")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Test Mode")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Odd")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Even")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Even")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2233,10 +2774,10 @@ static INPUT_PORTS_START( ssipkr )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x08, "1 Coin/1 Point" )          PORT_CONDITION("FRQ",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x08, "1 Coin/5 Points" )         PORT_CONDITION("FRQ",0x40,EQUALS,0x00)
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Points" )        PORT_CONDITION("FRQ",0x40,EQUALS,0x40)
-	PORT_DIPSETTING(    0x00, "1 Coin/25 Points" )        PORT_CONDITION("FRQ",0x40,EQUALS,0x00)
+	PORT_DIPSETTING(    0x08, "1 Coin/1 Point" )          PORT_CONDITION("FRQ", 0x40, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x08, "1 Coin/5 Points" )         PORT_CONDITION("FRQ", 0x40, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "1 Coin/10 Points" )        PORT_CONDITION("FRQ", 0x40, EQUALS, 0x40)
+	PORT_DIPSETTING(    0x00, "1 Coin/25 Points" )        PORT_CONDITION("FRQ", 0x40, EQUALS, 0x00)
 	PORT_DIPNAME( 0x30, 0x20, "Minimum Winning Hand")
 	PORT_DIPSETTING(    0x20, "Jacks or Better" )
 	PORT_DIPSETTING(    0x30, "Queens or Better" )
@@ -2248,7 +2789,7 @@ static INPUT_PORTS_START( ssipkr )
 	PORT_DIPSETTING(    0x80, "20" )
 	PORT_DIPSETTING(    0xc0, "50" )
 
-	PORT_START("FRQ")   /* settings (PIA0) */
+	PORT_START("FRQ")   // settings (PIA0)
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2275,41 +2816,291 @@ static INPUT_PORTS_START( ssipkr )
 	PORT_DIPSETTING(    0x00, "50Hz." )
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( stand906 )
 
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-1") PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-2") PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-3") PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-4") PORT_CODE(KEYCODE_4)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-5") PORT_CODE(KEYCODE_5)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-6") PORT_CODE(KEYCODE_6)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-7") PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-8") PORT_CODE(KEYCODE_8)
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )         PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )   PORT_NAME("Deal / LKOUT")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )  PORT_NAME("Cancel Discards")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )  PORT_NAME("Stand / DVTR")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW2")   /* Tied to AY8912 port. Covered with tape except SW2-8 */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )        PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_H) PORT_NAME("Hopper Weight") PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )                        PORT_NAME("Door")          PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_9) PORT_NAME("Menu")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                      PORT_NAME("Hand Pay")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE)        PORT_CODE(KEYCODE_R) PORT_NAME("Error Reset")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )   PORT_NAME("Discard 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )   PORT_NAME("Discard 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )   PORT_NAME("Discard 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )   PORT_NAME("Discard 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )   PORT_NAME("Discard 5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_D) PORT_NAME("Drop Door") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_8) PORT_NAME("Change")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_0) PORT_NAME("Prog Hit")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SW1")    // settings (PIAT1)
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW2")    // Tied to AY8912 port. Covered with tape except SW2-8
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( cas21iwc )
+
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )        PORT_IMPULSE(2) PORT_NAME("Coin In (Fichas Entrada)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )                  PORT_NAME("Take (Cobrar)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )        PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_H) PORT_NAME("Hopper Height (Peso Tolva)") PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )                        PORT_NAME("Door (Puerta)")              PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_9) PORT_NAME("Menu")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                      PORT_NAME("Hand Pay (Pago Manual)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE)        PORT_CODE(KEYCODE_R) PORT_NAME("Error Reset (Correccion Error)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")  // TODO: BJ predef inputs...
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )   PORT_CODE(KEYCODE_X) PORT_NAME("Deal (Dar) / Cierre")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )   PORT_CODE(KEYCODE_C) PORT_NAME("Double-Up (Doblar)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )   PORT_CODE(KEYCODE_V) PORT_NAME("Hit (Pedir)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )  PORT_CODE(KEYCODE_B) PORT_NAME("Stand (Plantar) / Desv")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_D) PORT_NAME("Drop Door (Cajon Abierto)") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )                         PORT_NAME("Bet (Apostar)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_8) PORT_NAME("Attendant (Asistente)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SW1")    // settings (PIAT1)
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW2")    // Tied to AY8912 port. Covered with tape except SW2-8
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( pokeriwc )
+
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )         PORT_NAME("Coin In (Fichas Entrada)")  PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )   PORT_NAME("Take (Cobrar)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )   PORT_NAME("Deal (Dar) / Lockout (Cierre)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )  PORT_NAME("Cancel (Cancelar)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )  PORT_NAME("Stand (Plantar)/ DVTR (Desviar)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )        PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_H) PORT_NAME("Hopper Weight (Peso Tolva)") PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )                        PORT_NAME("Door (Puerta Abierta)")      PORT_TOGGLE
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_9) PORT_NAME("Menu")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                      PORT_NAME("Hand Pay (Pago Manual)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE)        PORT_CODE(KEYCODE_R) PORT_NAME("Error Reset (Correccion de Errores)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )   PORT_NAME("Discard (Descartar) 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )   PORT_NAME("Discard (Descartar) 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )   PORT_NAME("Discard (Descartar) 3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )   PORT_NAME("Discard (Descartar) 4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )   PORT_NAME("Discard (Descartar) 5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_D) PORT_NAME("Drop Door (Cajon Abierto)") PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )                         PORT_NAME("Bet (Apostar)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_8) PORT_NAME("Attendant (Asistente)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_0) PORT_NAME("Prog Hit (Pozo Acumulado)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SW1")    // settings (PIAT1)
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW2")    // Tied to AY8912 port. Covered with tape except SW2-8
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2335,7 +3126,7 @@ static const gfx_layout tilelayout =
 	8, 8,
 	RGN_FRAC(1,3),
 	3,
-	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },    /* bitplanes are separated */
+	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },    // bitplanes are separated
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
@@ -2549,6 +3340,7 @@ GFXDECODE_END
 
 */
 
+
 /*************************************************
 *                 ACIA Interface                 *
 *************************************************/
@@ -2566,56 +3358,71 @@ WRITE_LINE_MEMBER(calomega_state::write_acia_clock)
 	update_aciabaud_scale(0);
 }
 
+
 /*************************************************
 *                Machine Drivers                 *
 *************************************************/
 
 void calomega_state::sys903(machine_config &config)
 {
-	/* basic machine hardware */
-	M6502(config, m_maincpu, CPU_CLOCK);   /* confirmed */
+	// basic machine hardware
+	M6502(config, m_maincpu, CPU_CLOCK);   // confirmed
 	m_maincpu->set_addrmap(AS_PROGRAM, &calomega_state::sys903_map);
-	m_maincpu->set_vblank_int("screen", FUNC(calomega_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	PIA6821(config, m_pia[0], 0);
 	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s903_mux_port_r));
+	m_pia[0]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: some dipsw maybe???
+	m_pia[0]->writepa_handler().set(FUNC(calomega_state::dummy_pia_w));       // Debug: to assign lamps/counters/solenids/hopper????
 	m_pia[0]->writepb_handler().set(FUNC(calomega_state::lamps_903a_w));
+	m_pia[0]->readca1_handler().set(FUNC(calomega_state::timer_r));           // Timer Interrupt Ack.     (CPU -> PIA)
+	m_pia[0]->irqa_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.   (PIA -> CPU)
 
 	PIA6821(config, m_pia[1], 0);
 	m_pia[1]->readpa_handler().set_ioport("SW1");
+	m_pia[1]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: so much need to read?????  :)
 	m_pia[1]->writepa_handler().set(FUNC(calomega_state::lamps_903b_w));
-	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s903_mux_w));
+	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s903_mux_w));        // Mux. Scan Lines.(Upper nibble) - Hopper b0-b1 (Lower Nibble).
+	m_pia[1]->ca2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      //
+	m_pia[1]->cb2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      //
+	m_pia[1]->readcb1_handler().set(FUNC(calomega_state::vblank_r));          // V_BLANK Interrupt Ack.   (CPU -> PIA)
+	m_pia[1]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // V_BLANK Interrupt Event. (PIA -> CPU)
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size((39+1)*8, (31+1)*8);                  /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
-	screen.set_visarea(0*8, 32*8-1, 0*8, 31*8-1);    /* Taken from MC6845 init, registers 01 & 06 */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(100));
+	screen.set_size((39+1)*8, (31+1)*8);             // Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1).
+	screen.set_visarea(0*8, 32*8-1, 0*8, 31*8-1);    // Taken from MC6845 init, registers 01 & 06.
 	screen.set_screen_update(FUNC(calomega_state::screen_update_calomega));
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_calomega);
-	PALETTE(config, m_palette, FUNC(calomega_state::calomega_palette), 256); // or 128? is the upper half of the PROMs really valid colors?
+	screen.screen_vblank().set(FUNC(calomega_state::vblank0_w));
 
-	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK)); /* 6845 @ CPU clock */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_calomega);
+	PALETTE(config, m_palette, FUNC(calomega_state::calomega_palette), 256);
+
+	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK));  // 6845 @ CPU clock
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	ay8912_device &ay8912(AY8912(config, "ay8912", SND_CLOCK)); /* confirmed */
-	ay8912.port_a_read_callback().set_ioport("SW3");                /* from schematics */
+	ay8912_device &ay8912(AY8912(config, "ay8912", SND_CLOCK));  // confirmed
+	ay8912.port_a_read_callback().set_ioport("SW3");             // from schematics
 	ay8912.add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	/* acia */
+	// acia
 	ACIA6850(config, m_acia6850_0, 0);
 	m_acia6850_0->txd_handler().set(FUNC(calomega_state::write_acia_tx));
 
 	clock_device &aciabaud(CLOCK(config, "aciabaud", UART_CLOCK));
 	aciabaud.signal_handler().set(FUNC(calomega_state::write_acia_clock));
+
+	TIMER(config, "timer_0").configure_periodic(FUNC(calomega_state::timer_0), attotime::from_hz(550*2));  // (time*2) - Each timer pulse -> half period
+
+	HOPPER(config, m_hopper, attotime::from_msec(50), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
 }
 
 
@@ -2623,15 +3430,14 @@ void calomega_state::s903mod(machine_config &config)
 {
 	sys903(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &calomega_state::s903mod_map);
 
-	/* sound hardware */
+	// sound hardware
 	subdevice<ay8912_device>("ay8912")->port_a_read_callback().set_constant(0);
 
 	config.device_remove("acia6850_0");
-
 	config.device_remove("aciabaud");
 }
 
@@ -2640,51 +3446,89 @@ void calomega_state::sys905(machine_config &config)
 {
 	sys903(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &calomega_state::sys905_map);
 
-	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s905_mux_port_r));
-	m_pia[0]->writepb_handler().set(FUNC(calomega_state::lamps_905_w));
+	// video hardware
+	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(100));
+	screen.set_size((39+1)*8, (31+1)*8);             // Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1).
+	screen.set_visarea(0*8, 32*8-1, 0*8, 31*8-1);    // Taken from MC6845 init, registers 01 & 06.
+	screen.set_screen_update(FUNC(calomega_state::screen_update_calomega));
 
-	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s905_mux_w));
+	screen.screen_vblank().set(FUNC(calomega_state::vblank1_w));
 
-	/* sound hardware */
+	PIA6821(config.replace(), m_pia[0], 0);
+	m_pia[0]->readpa_handler().set(FUNC(calomega_state::s905_mux_port_r));    // Mux. Button read.
+	m_pia[0]->writepa_handler().set(FUNC(calomega_state::dummy_pia_w));       // Bit 7 & 6 as output. (Watchdog & Bat. Test control) - Ignored
+	m_pia[0]->writepb_handler().set(FUNC(calomega_state::lamps_905_w));       // Full Lamps - OK.
+	m_pia[0]->readcb1_handler().set(FUNC(calomega_state::vblank_r));          // V_BLANK Interrupt Ack.   (CPU -> PIA)
+	m_pia[0]->cb2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // No connected (from schematics).
+	m_pia[0]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // V_BLANK Interrupt Event. (PIA -> CPU)
+
+	PIA6821(config.replace(), m_pia[1], 0);
+	m_pia[1]->readpa_handler().set_ioport("SW1");                             // Full port.
+	//m_pia[1]->readpb_handler().set(FUNC(calomega_state::dummy_pia_r));        // Debug: so much need to read?????  :)
+	//m_pia[1]->writepa_handler().set(FUNC(calomega_state::dummy_pia_w));       // Debug: to assign lamps/counters/solenids/hopper????
+	m_pia[1]->writepb_handler().set(FUNC(calomega_state::s905_mux_w));        // Mux. Scan Lines.(Lower Nibble). Hopper & Coin Lockout (Upper nibble).
+	m_pia[1]->readcb1_handler().set(FUNC(calomega_state::timer_r));           // Timer Interrupt Ack.      (CPU -> PIA)
+	m_pia[1]->cb2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // No connected (from schematics).
+	m_pia[1]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.    (PIA -> CPU)
+
+	// sound hardware
 	subdevice<ay8912_device>("ay8912")->port_a_read_callback().set_constant(0);
 
-	config.device_remove("acia6850_0");
+	TIMER(config.replace(), "timer_0").configure_periodic(FUNC(calomega_state::timer_1), attotime::from_hz(520*2)); // (time*2) - Each timer pulse -> half period
 
+	config.device_remove("acia6850_0");
 	config.device_remove("aciabaud");
 }
-
 
 void calomega_state::sys906(machine_config &config)
 {
 	sys903(config);
 
-	/* basic machine hardware */
-
-	M65C02(config.replace(), m_maincpu, CPU_CLOCK);   /* guess */
+	// basic machine hardware
+	R65C02(config.replace(), m_maincpu, CPU_CLOCK);  // confirmed
 	m_maincpu->set_addrmap(AS_PROGRAM, &calomega_state::sys906_map);
 
-	m_pia[0]->readpa_handler().set(FUNC(calomega_state::pia0_ain_r));
-	m_pia[0]->readpb_handler().set(FUNC(calomega_state::pia0_bin_r));
-	m_pia[0]->writepa_handler().set(FUNC(calomega_state::pia0_aout_w));
-	m_pia[0]->writepb_handler().set(FUNC(calomega_state::pia0_bout_w));
-	m_pia[0]->ca2_handler().set(FUNC(calomega_state::pia0_ca2_w));
+	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(100));
+	screen.set_size((39+1)*8, (31+1)*8);             // Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1).
+	screen.set_visarea(0*8, 32*8-1, 0*8, 31*8-1);    // Taken from MC6845 init, registers 01 & 06.
+	screen.set_screen_update(FUNC(calomega_state::screen_update_calomega));
 
-	m_pia[1]->readpa_handler().set(FUNC(calomega_state::pia1_ain_r));
+	screen.screen_vblank().set(FUNC(calomega_state::vblank2_w));
+	PIA6821(config.replace(), m_pia[0], 0);
+	m_pia[0]->readpa_handler().set_ioport("SW1");                             // Bit 7 - CGBANK ???? input?-output?
+	//m_pia[0]->readpb_handler().set(FUNC(calomega_state::pia0_bin_r));       // No inputs on port_B
+	m_pia[0]->ca2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // Ignored
+	m_pia[0]->cb2_handler().set(FUNC(calomega_state::dummy_pia_line_w));      // Diverter
+	m_pia[0]->writepa_handler().set(FUNC(calomega_state::pia0_aout_w));       // Bit 7 - CGBANK ???? input?-output?
+	m_pia[0]->writepb_handler().set(FUNC(calomega_state::pia0_bout_w));       // Meters ??? (M1-M5), coils, hopper
+
+	PIA6821(config.replace(), m_pia[1], 0);
+	m_pia[1]->readpa_handler().set(FUNC(calomega_state::pia1_ain_r));         // Mux. Button read.
 	m_pia[1]->readpb_handler().set(FUNC(calomega_state::pia1_bin_r));
-	m_pia[1]->writepa_handler().set(FUNC(calomega_state::pia1_aout_w));
-	m_pia[1]->writepb_handler().set(FUNC(calomega_state::pia1_bout_w));
+	m_pia[1]->readca1_handler().set(FUNC(calomega_state::timer_r));           // Timer Interrupt Ack.      (CPU -> PIA)
+	m_pia[1]->readcb1_handler().set(FUNC(calomega_state::vblank_r));          // V_BLANK Interrupt Ack.    (CPU -> PIA)
+	m_pia[1]->writepa_handler().set(FUNC(calomega_state::pia1_aout_w));       // Mux. Scan lines
+	m_pia[1]->writepb_handler().set(FUNC(calomega_state::pia1_bout_w));       // Lamps 1 to 8
+	m_pia[1]->cb2_handler().set(FUNC(calomega_state::pia1_cb2_w));            // V_BLANK interrupt line input (from Vertical Synch)
+	m_pia[1]->irqa_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // Timer Interrupt Event.    (PIA -> CPU)
+	m_pia[1]->irqb_handler().set_inputline("maincpu", M6502_IRQ_LINE);        // V_BLANK Interrupt Event.  (PIA -> CPU)
 
 	m_gfxdecode->set_info(gfx_sys906);
 
-	/* sound hardware */
-	subdevice<ay8912_device>("ay8912")->port_a_read_callback().set_ioport("SW2");    /* From PCB pic. Value is stored at $0539 */
+	// sound hardware
+	ay8912_device &ay8912(AY8912(config.replace(), "ay8912", SND_CLOCK));     // confirmed
+	ay8912.port_a_read_callback().set_ioport("SW2");                          // from schematics
+	ay8912.add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	config.device_remove("acia6850_0");
-	config.device_remove("aciabaud");
+	TIMER(config.replace(), "timer_0").configure_periodic(FUNC(calomega_state::timer_2), attotime::from_hz(380*2));  // (time*2) - Each timer pulse -> half period
 }
 
 
@@ -2699,9 +3543,9 @@ void calomega_state::sys906(machine_config &config)
 *
 *************************************************/
 
-ROM_START( comg074 )    /* Cal Omega v7.4 (Gaming Poker) */
+ROM_START( comg074 )  // Cal Omega v7.4 (Gaming Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1800.u5",    0x1800, 0x0800, CRC(69759432) SHA1(d64646476b4f67088bf5996ffc272d2571e62c53) )  /* Seems to be from v6.5. Unused. */
+	ROM_LOAD( "1800.u5",    0x1800, 0x0800, CRC(69759432) SHA1(d64646476b4f67088bf5996ffc272d2571e62c53) )  // Seems to be from v6.5. Unused.
 	ROM_LOAD( "2000.u6",    0x2000, 0x0800, CRC(bd9044f6) SHA1(9ebfc8379fe79a84982a0176a6b26267580272de) )
 	ROM_LOAD( "2800.u7",    0x2800, 0x0800, CRC(d1d2e111) SHA1(2e5b6fbaf04539851d0f0674f0fd86e9be90c0fd) )
 	ROM_LOAD( "3000.u8",    0x3000, 0x0800, CRC(cac4af01) SHA1(aed2986575b8d5539581515d818cb5bb9054c7c9) )
@@ -2715,13 +3559,13 @@ ROM_START( comg074 )    /* Cal Omega v7.4 (Gaming Poker) */
 	ROM_LOAD( "poker_cg2b.u69", 0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )
 	ROM_LOAD( "poker_cg2a.u68", 0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )
 
-	ROM_REGION( 0x100, "proms", 0 ) /* from other set */
+	ROM_REGION( 0x100, "proms", 0 ) // from other set
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, BAD_DUMP CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg076 )    /* Cal Omega v7.6 (Arcade Poker) */
+ROM_START( comg076 )  // Cal Omega v7.6 (Arcade Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "07-62.u6",   0x2000, 0x0800, CRC(99ffa2a4) SHA1(07fd182ff86f9ab09bbf09f51d655811a09ffa03) )
 	ROM_LOAD( "07-63.u7",   0x2800, 0x0800, CRC(9ed58bc5) SHA1(c545053847ec7585e4ac97c70cf33529ed0f1111) )
 	ROM_LOAD( "07-64.u8",   0x3000, 0x0800, CRC(95714680) SHA1(26938903600bd0920b1dd1c6900c56c6b749976a) )
@@ -2739,14 +3583,15 @@ ROM_START( comg076 )    /* Cal Omega v7.6 (Arcade Poker) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg079 )    /* Cal Omega v7.9 (Arcade Poker) */
+ROM_START( comg079 )  // Cal Omega v7.9 (Arcade Poker)
+/*  The original code jumps to $2e64 where there's an inexistent mnemonic 0x32! (kill).
+	Also writes to $axxx (inexistent) and $08fx-$09xx (supposed to be $0880-$0881).
+    Found damaged bits on this program ROM. Fix details on init().
+*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "07-91.u5",   0x1800, 0x0800, CRC(da415c27) SHA1(be42f1d36579ff8fafd6df4e30a64a6141a7a2ae) )
 	ROM_LOAD( "07-92.u6",   0x2000, 0x0800, CRC(31211ed3) SHA1(799bc4ca77ee01a4d45320263e4cc2d066ec26e5) )
 
-	/* code jumps to $2e64 where there's an inexistent mnemonic 0x32! (kill).
-	also writes to $axxx (inexistent) and $08fx-$09xx (supposed to be $0880-$0881).
-	*/
 	ROM_LOAD( "07-93.u7",   0x2800, 0x0800, BAD_DUMP CRC(52c84b9c) SHA1(569d6384b9084a11fe84e291f1c165bc0df3ab49) )
 	ROM_LOAD( "07-94.u8",   0x3000, 0x0800, CRC(ed0e7d4a) SHA1(72f512ca2da573e4571ca6f164fb055daa26dd3c) )
 	ROM_LOAD( "07-95.u9",   0x3800, 0x0800, CRC(3acc8f49) SHA1(1a193cc292f79da869caddd11478d6ad55466d7b) )
@@ -2763,13 +3608,13 @@ ROM_START( comg079 )    /* Cal Omega v7.9 (Arcade Poker) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg080 )    /* Cal Omega v8.0 (Arcade Black Jack) */
+ROM_START( comg080 )  // Cal Omega v8.0 (Arcade Black Jack)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "08-02.u6",   0x2000, 0x0800, CRC(abf8c48e) SHA1(fea059af900fd6d17725ccf7a5ff2eb0af5c8e0a) )
 	ROM_LOAD( "08-03.u7",   0x2800, 0x0800, CRC(e9ccb5af) SHA1(68a45d839afba3c6eafb7c75e5660de3a6be4eb5) )
 	ROM_LOAD( "08-04.u8",   0x3000, 0x0800, CRC(325bdae8) SHA1(5a94c96ec3980361570da58fb407a1dba38064b8) )
-	ROM_LOAD( "08-05.u9",   0x3800, 0x0800, BAD_DUMP CRC(71bd14d2) SHA1(00b3e2d965ac7ae1fc994b81246ad2c29ef4834c) ) /* bad dump. 2nd half is blank */
+	ROM_LOAD( "08-05.u9",   0x3800, 0x0800, BAD_DUMP CRC(71bd14d2) SHA1(00b3e2d965ac7ae1fc994b81246ad2c29ef4834c) )  // bad dump. 2nd half is blank
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "gpkcg0.u67", 0x0000, 0x0800, CRC(b626ad89) SHA1(551b75f4559d11a4f8f56e38982114a21c77d4e7) )
@@ -2783,16 +3628,16 @@ ROM_START( comg080 )    /* Cal Omega v8.0 (Arcade Black Jack) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg094 )    /* Cal Omega v9.4 (Keno) */
+ROM_START( comg094 )  // Cal Omega v9.4 (Keno)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "09-42.u6",   0x2000, 0x0800, CRC(1cff1319) SHA1(97b7ed54d398f36dc476028471784fc4e50bc378) )
 	ROM_LOAD( "09-43.u7",   0x2800, 0x0800, CRC(e6b123be) SHA1(f89df2dc6deeecff41be83d7a9040cfe5d872bad) )
 	ROM_LOAD( "09-44.u8",   0x3000, 0x0800, CRC(13939de9) SHA1(b2f97828808f6001846049cbf9af40e32908a58f) )
 	ROM_LOAD( "09-45.u9",   0x3800, 0x0800, CRC(7508de2e) SHA1(62faf65a1b815e11158cfb807090923ab368784d) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x0800, 0xff )  /* empty socket (requested by the manual) */
+	ROM_FILL(               0x0000, 0x0800, 0xff )  // empty socket (requested by the manual)
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
 	ROM_LOAD( "kcgc.u70",   0x0000, 0x0800, CRC(fb721236) SHA1(33ef355913b8acb5017a24ca1c46dec1c391a528) )
@@ -2803,9 +3648,9 @@ ROM_START( comg094 )    /* Cal Omega v9.4 (Keno) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg107 )    /* Cal Omega v10.7c (Big Game) */
+ROM_START( comg107 )  // Cal Omega v10.7c (Big Game)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "10-72.u6",   0x2000, 0x0800, CRC(dd0fbefb) SHA1(caed286ba1adb4d5c5c874c56339b9d71dd41bc6) )
 	ROM_LOAD( "10-73.u7",   0x2800, 0x0800, CRC(fcb7774d) SHA1(d3c89e0df0005e4bc4894156622b3d1e4cd09f2a) )
 	ROM_LOAD( "10-74.u8",   0x3000, 0x0800, CRC(d19ed885) SHA1(c41e59e87ce88a5b229e334b6a563a3b21d12b15) )
@@ -2819,14 +3664,14 @@ ROM_START( comg107 )    /* Cal Omega v10.7c (Big Game) */
 	ROM_LOAD( "lotcgb.u69", 0x1000, 0x1000, CRC(5bda0f42) SHA1(d4b3340e9c8ca49483fa846103f0bd81d57a5ab3) )
 	ROM_LOAD( "lotcga.u68", 0x2000, 0x1000, CRC(0975e360) SHA1(7b9dbbae50c43ad99ee11798ada0a44e71c611f9) )
 
-	ROM_REGION( 0x0800, "user1", 0 )    /* keyboard interfase ROM */
+	ROM_REGION( 0x0800, "user1", 0 )  // keyboard interfase ROM
 	ROM_LOAD( "lotkbd.sub", 0x0000, 0x0800, CRC(c1636ab5) SHA1(5a3ad24918751ca6a6640807e421e80f6b4cc844) )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "bclr.u28",   0x0000, 0x0100, CRC(0ec45d01) SHA1(da73ae7e1c74913921dc378a97795c6da47dcbfb) )
 ROM_END
 
-ROM_START( comg123 )    /* Cal Omega v12.3 (Ticket Poker) */
+ROM_START( comg123 )  // Cal Omega v12.3 (Ticket Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "12-31.u5",   0x1800, 0x0800, BAD_DUMP CRC(8a1e9b03) SHA1(d57548226a695eb43d491dd953ad0b9b8ff8eb82) )
 	ROM_LOAD( "12-32.u6",   0x2000, 0x0800, CRC(c30eb9c4) SHA1(bf3c2e069ecb9763028738c29054802b605cfa92) )
@@ -2846,9 +3691,9 @@ ROM_START( comg123 )    /* Cal Omega v12.3 (Ticket Poker) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg125 )    /* Cal Omega v12.5 (Bingo) */
+ROM_START( comg125 )  // Cal Omega v12.5 (Bingo)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "12-52.u6",   0x2000, 0x0800, CRC(ea0a6bd6) SHA1(f138d2f29252d95dea93a1e936725de99c714b35) )
 	ROM_LOAD( "12-53.u7",   0x2800, 0x0800, CRC(c888ee34) SHA1(2796c6ae196b046f12b75b1c095a430fa4be0da2) )
 	ROM_LOAD( "12-54.u8",   0x3000, 0x0800, CRC(4c7d11a6) SHA1(0131f077e204250d594c9baadc0596efeb7639cc) )
@@ -2866,16 +3711,16 @@ ROM_START( comg125 )    /* Cal Omega v12.5 (Bingo) */
 	ROM_LOAD( "bclr.u28",   0x0000, 0x0100, CRC(0ec45d01) SHA1(da73ae7e1c74913921dc378a97795c6da47dcbfb) )
 ROM_END
 
-ROM_START( comg127 )    /* Cal Omega v12.7 (Keno) */
+ROM_START( comg127 )  // Cal Omega v12.7 (Keno)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "12-72.u6",   0x2000, 0x0800, CRC(091a4b32) SHA1(3600854152482bf18d2377aa635a9fd7f3d4b2f7) )
 	ROM_LOAD( "12-73.u7",   0x2800, 0x0800, CRC(c1fb5293) SHA1(f20cdddb4c89cb2fc647ddfcff6bd6f5095a0a28) )
 	ROM_LOAD( "12-74.u8",   0x3000, 0x0800, CRC(de277137) SHA1(127b95616824dfb1025f3346c1335a8bf4835e68) )
 	ROM_LOAD( "12-75.u9",   0x3800, 0x0800, CRC(04485ba3) SHA1(ee22396fc23508635e43ca8b17fc1f23e670fe85) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x0800, 0xff )  /* empty socket (requested by the manual) */
+	ROM_FILL(               0x0000, 0x0800, 0xff )  // empty socket (requested by the manual)
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
 	ROM_LOAD( "kcgc.u70",   0x0000, 0x0800, CRC(fb721236) SHA1(33ef355913b8acb5017a24ca1c46dec1c391a528) )
@@ -2886,9 +3731,9 @@ ROM_START( comg127 )    /* Cal Omega v12.7 (Keno) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg128 )    /* Cal Omega v12.8 (Arcade Game) */
+ROM_START( comg128 )  // Cal Omega v12.8 (Arcade Game)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "12-82.u6",   0x2000, 0x0800, CRC(85f0c548) SHA1(f08e26a7acb883a92e73e564fb2b58422d1784c6) )
 	ROM_LOAD( "12-83.u7",   0x2800, 0x0800, CRC(57212e46) SHA1(d0bac63e0efcdb8ef4a1b6c4d53776447557e4d0) )
 	ROM_LOAD( "12-84.u8",   0x3000, 0x0800, CRC(00ab3cd8) SHA1(da00457c49d3a101dc31578d07b2e986f0d73919) )
@@ -2906,9 +3751,9 @@ ROM_START( comg128 )    /* Cal Omega v12.8 (Arcade Game) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg134 )    /* Cal Omega 13.4 (Nudge Keno) */
+ROM_START( comg134 )  // Cal Omega 13.4 (Nudge Keno)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "13-42.u6",   0x2000, 0x0800, CRC(3ff1e83d) SHA1(0c2d2faed1148909dd7d50e9eda76c6403181435) )
 	ROM_LOAD( "13-43.u7",   0x2800, 0x0800, CRC(cf2125f4) SHA1(32678f3ac82c76fb8116de77ce332fe098d5e8c0) )
 	ROM_LOAD( "13-44.u8",   0x3000, 0x0800, CRC(09a8d3c4) SHA1(60937b386a7fa8c30bd509633b5e98e79a1189d4) )
@@ -2926,7 +3771,7 @@ ROM_START( comg134 )    /* Cal Omega 13.4 (Nudge Keno) */
 	ROM_LOAD( "bclr.u28",   0x0000, 0x0100, CRC(0ec45d01) SHA1(da73ae7e1c74913921dc378a97795c6da47dcbfb) )
 ROM_END
 
-ROM_START( comg145 )    /* Cal Omega v14.5 (Pixels) */
+ROM_START( comg145 )  // Cal Omega v14.5 (Pixels)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "14-51.u5",   0x1800, 0x0800, CRC(b173af4b) SHA1(2fd7d391c765e8e5bf148d92223ffc2a2619dcfd) )
 	ROM_LOAD( "14-52.u6",   0x2000, 0x0800, CRC(f12434c5) SHA1(f957831867cc8c98fb479cd2d859790d19883d26) )
@@ -2946,7 +3791,7 @@ ROM_START( comg145 )    /* Cal Omega v14.5 (Pixels) */
 	ROM_LOAD( "pixclr.u28", 0x0000, 0x0100, CRC(67d23e76) SHA1(826cf77ca5a4d492d66e45ee96a7780a94fbe634) )
 ROM_END
 
-ROM_START( comg157 )    /* Cal Omega v15.7 (Double-Draw Poker) */
+ROM_START( comg157 )  // Cal Omega v15.7 (Double-Draw Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "15-71.u5",   0x1800, 0x0800, CRC(e0c89569) SHA1(68f32b00dd8ceb08e9677438c2bfec86e1a7fe6a) )
 	ROM_LOAD( "15-72.u6",   0x2000, 0x0800, CRC(a3ebd1af) SHA1(a31eff7fe205efeb5b6fe1adaed66d2f23f91844) )
@@ -2966,10 +3811,10 @@ ROM_START( comg157 )    /* Cal Omega v15.7 (Double-Draw Poker) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg159 )    /* Cal Omega v15.9 (Wild Double-Up) */
+ROM_START( comg159 )  // Cal Omega v15.9 (Wild Double-Up)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x3000, 0x1000, 0xff )  /* empty socket */
-	ROM_FILL(               0x4000, 0x1000, 0xff )  /* empty socket */
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
+	ROM_FILL(               0x4000, 0x1000, 0xff )  // empty socket
 	ROM_LOAD( "15-93.u7",   0x5000, 0x1000, CRC(a1ca1fc0) SHA1(a751dba148c818a25237c2ac95328b6a5643f4e0) )
 	ROM_LOAD( "15-94.u8",   0x6000, 0x1000, CRC(849595ea) SHA1(c28629de84b0c0d389c52490677ecb9139fd738d) )
 	ROM_LOAD( "15-95.u9",   0x7000, 0x1000, CRC(c858ea24) SHA1(c7ecaddd4064b352c061b9164f2f347c310fab39) )
@@ -2986,16 +3831,16 @@ ROM_START( comg159 )    /* Cal Omega v15.9 (Wild Double-Up) */
 	ROM_LOAD( "wldclr.u28", 0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
 ROM_END
 
-ROM_START( comg164 )    /* Cal Omega v16.4 (Keno) */
+ROM_START( comg164 )  // Cal Omega v16.4 (Keno)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "16-41.u5",   0x1800, 0x0800, CRC(fae6b065) SHA1(a123f98e4b4815a06d62d0429697cdce71756b94) )
-	ROM_LOAD( "16-42.u6",   0x2000, 0x0800, NO_DUMP )   /* missing ROM??? */
+	ROM_LOAD( "16-42.u6",   0x2000, 0x0800, NO_DUMP )   // missing ROM???
 	ROM_LOAD( "16-43.u7",   0x2800, 0x0800, CRC(15974dbc) SHA1(fe2979861b8021949c127b182b9b50975b77bdd1) )
 	ROM_LOAD( "16-44.u8",   0x3000, 0x0800, CRC(64f06a75) SHA1(1cf4d89d2ee60200f84d47a3a637471e0af9239c) )
 	ROM_LOAD( "16-45.u9",   0x3800, 0x0800, CRC(3a8bc80e) SHA1(a1fb58b30850b1fe2bf976b8b99c8c540d67534a) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x0800, 0xff )  /* empty socket (requested by the manual) */
+	ROM_FILL(               0x0000, 0x0800, 0xff )  // empty socket (requested by the manual)
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
 	ROM_LOAD( "kcgc.u70",   0x0000, 0x0800, CRC(fb721236) SHA1(33ef355913b8acb5017a24ca1c46dec1c391a528) )
@@ -3006,16 +3851,16 @@ ROM_START( comg164 )    /* Cal Omega v16.4 (Keno) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg168 )    /* Cal Omega v16.8 (Keno) */
+ROM_START( comg168 )  // Cal Omega v16.8 (Keno)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "16-82.u6",   0x2000, 0x0800, CRC(ba044cd6) SHA1(659ec979e61baf4e871af857b722bb6fd789ff75) )
 	ROM_LOAD( "16-83.u7",   0x2800, 0x0800, CRC(e3326b68) SHA1(7326f87319c363161ba8571dd983b070ef4f8694) )
 	ROM_LOAD( "16-84.u8",   0x3000, 0x0800, CRC(1f72acea) SHA1(26d0e5a36f14ccae22d216a13d0459f0389ea6c0) )
 	ROM_LOAD( "16-85.u9",   0x3800, 0x0800, CRC(4f38e3b3) SHA1(4d034959f665f0fdb5a4df85bae67dbd3d38077f) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x0800, 0xff )  /* empty socket (requested by the manual) */
+	ROM_FILL(               0x0000, 0x0800, 0xff )  // empty socket (requested by the manual)
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
 	ROM_LOAD( "kcgc.u70",   0x0000, 0x0800, CRC(fb721236) SHA1(33ef355913b8acb5017a24ca1c46dec1c391a528) )
@@ -3026,10 +3871,10 @@ ROM_START( comg168 )    /* Cal Omega v16.8 (Keno) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg172 )    /* Cal Omega v17.2 (Double Double Poker) */
+ROM_START( comg172 )  // Cal Omega v17.2 (Double Double Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x3000, 0x1000, 0xff )  /* empty socket */
-	ROM_FILL(               0x4000, 0x1000, 0xff )  /* empty socket */
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
+	ROM_FILL(               0x4000, 0x1000, 0xff )  // empty socket
 	ROM_LOAD( "17-23.u7",   0x5000, 0x1000, CRC(96efc8d1) SHA1(96836ca7188dc53e3a8af64f1fed9fe1c0c4e056) )
 	ROM_LOAD( "17-24.u8",   0x6000, 0x1000, CRC(08d31a98) SHA1(85e23ffeb8fa82ec0155f54d2193511517e6ec8c) )
 	ROM_LOAD( "17-25.u9",   0x7000, 0x1000, CRC(82508c71) SHA1(dd44e949f36e04ceaf1e527615c7003d0a9c0073) )
@@ -3046,7 +3891,7 @@ ROM_START( comg172 )    /* Cal Omega v17.2 (Double Double Poker) */
 	ROM_LOAD( "wldclr.u28", 0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
 ROM_END
 
-ROM_START( comg175 )    /* Cal Omega v17.5 (Gaming Draw Poker) */
+ROM_START( comg175 )  // Cal Omega v17.5 (Gaming Draw Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "17-51.u5",   0x1800, 0x0800, CRC(5450b90a) SHA1(4e67a17b2353bbe89fb6be4951efd09a948a987e) )
 	ROM_LOAD( "17-52.u6",   0x2000, 0x0800, CRC(29d787fd) SHA1(3f8c46f928c7fc3e68fe47efe23505f393bdb577) )
@@ -3066,7 +3911,7 @@ ROM_START( comg175 )    /* Cal Omega v17.5 (Gaming Draw Poker) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg176 )    /* Cal Omega 17.6 (Nudge Keno) */
+ROM_START( comg176 )  // Cal Omega 17.6 (Nudge Keno)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "17-61.u5",   0x1800, 0x0800, CRC(7b201d27) SHA1(142d25c424e6bfd4327bb796f8dc9d0e6cb21797) )
 	ROM_LOAD( "17-62.u6",   0x2000, 0x0800, CRC(0ce87971) SHA1(ad1fecf4ed34eccd2a5b09e8847cb4a011875b73) )
@@ -3086,9 +3931,9 @@ ROM_START( comg176 )    /* Cal Omega 17.6 (Nudge Keno) */
 	ROM_LOAD( "bclr.u28",   0x0000, 0x0100, CRC(0ec45d01) SHA1(da73ae7e1c74913921dc378a97795c6da47dcbfb) )
 ROM_END
 
-ROM_START( comg181 )    /* Cal Omega 18.1 (Nudge Keno) */
+ROM_START( comg181 )  // Cal Omega 18.1 (Nudge Keno)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "18-12.u6",   0x2000, 0x0800, CRC(dd867180) SHA1(caf703f45dea980e84fc29d2ea0d3f4e211aaa3f) )
 	ROM_LOAD( "18-13.u7",   0x2800, 0x0800, CRC(39ccbddd) SHA1(1c027957ad6a3346dd3bcc0b422d2e854c6f5439) )
 	ROM_LOAD( "18-14.u8",   0x3000, 0x0800, CRC(ddf23ef1) SHA1(8340a2b0125e42602045fea2a248f1ec9e9915c0) )
@@ -3106,9 +3951,9 @@ ROM_START( comg181 )    /* Cal Omega 18.1 (Nudge Keno) */
 	ROM_LOAD( "bclr.u28",   0x0000, 0x0100, CRC(0ec45d01) SHA1(da73ae7e1c74913921dc378a97795c6da47dcbfb) )
 ROM_END
 
-ROM_START( comg183 )    /* Cal Omega v18.3 (Pixels) */
+ROM_START( comg183 )  // Cal Omega v18.3 (Pixels)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x3000, 0x1000, 0xff )  /* empty socket */
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
 	ROM_LOAD( "18-32.u6",   0x4000, 0x1000, CRC(c793ffc1) SHA1(f2ef82f92a9e18128d28973bcf050d0c3e1819f3) )
 	ROM_LOAD( "18-33.u7",   0x5000, 0x1000, CRC(415a6599) SHA1(648986310a3864652897e5d18b8be06819cce7a8) )
 	ROM_LOAD( "18-34.u8",   0x6000, 0x1000, CRC(fc5d3b89) SHA1(3601401d00d7a0621eac4254da238e9c8929cac4) )
@@ -3126,9 +3971,9 @@ ROM_START( comg183 )    /* Cal Omega v18.3 (Pixels) */
 	ROM_LOAD( "pixclr.u28", 0x0000, 0x0100, CRC(67d23e76) SHA1(826cf77ca5a4d492d66e45ee96a7780a94fbe634) )
 ROM_END
 
-ROM_START( comg185 )    /* Cal Omega v18.5 (Pixels) */
+ROM_START( comg185 )  // Cal Omega v18.5 (Pixels)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x3000, 0x1000, 0xff )  /* empty socket */
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
 	ROM_LOAD( "18-52.u6",   0x4000, 0x1000, CRC(19225f7d) SHA1(73d713ee86886f935d9b2c2ca670d8e00d466b7f) )
 	ROM_LOAD( "18-53.u7",   0x5000, 0x1000, CRC(797e2b70) SHA1(83f974c6c1886eab5c90782766b72900c73045e1) )
 	ROM_LOAD( "18-54.u8",   0x6000, 0x1000, CRC(6becc802) SHA1(e72783db52bffd3fa2f7d35cd8a004415e37b004) )
@@ -3146,9 +3991,9 @@ ROM_START( comg185 )    /* Cal Omega v18.5 (Pixels) */
 	ROM_LOAD( "pixclr.u28", 0x0000, 0x0100, CRC(67d23e76) SHA1(826cf77ca5a4d492d66e45ee96a7780a94fbe634) )
 ROM_END
 
-ROM_START( comg186 )    /* Cal Omega v18.6 (Pixels) */
+ROM_START( comg186 )  // Cal Omega v18.6 (Pixels)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x3000, 0x1000, 0xff )  /* empty socket */
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
 	ROM_LOAD( "18-62.u6",   0x4000, 0x1000, CRC(025f4268) SHA1(750a5417fe2b077893d8252dd5eafc42fafd965e) )
 	ROM_LOAD( "18-63.u7",   0x5000, 0x1000, CRC(948a6ef1) SHA1(6aeb244209f3376042a32d9accb38e3f09cb192a) )
 	ROM_LOAD( "18-64.u8",   0x6000, 0x1000, CRC(9fb6e82b) SHA1(db38564e8060f1c67183f3f412a24439b2253e13) )
@@ -3166,10 +4011,10 @@ ROM_START( comg186 )    /* Cal Omega v18.6 (Pixels) */
 	ROM_LOAD( "pixclr.u28", 0x0000, 0x0100, CRC(67d23e76) SHA1(826cf77ca5a4d492d66e45ee96a7780a94fbe634) )
 ROM_END
 
-ROM_START( comg187 )    /* Cal Omega v18.7 (Amusement Poker) */
+ROM_START( comg187 )  // Cal Omega v18.7 (Amusement Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x3000, 0x1000, 0xff )  /* empty socket */
-	ROM_LOAD( "18-72.u6",   0x4000, 0x1000, BAD_DUMP CRC(1a4bd46a) SHA1(76101271ff9b98c3310e1666dfba34a01a0f0bcd) ) /* 1st half seems to be the 2nd one, and 2nd half is filled of 0xff */
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
+	ROM_LOAD( "18-72.u6",   0x4000, 0x1000, BAD_DUMP CRC(1a4bd46a) SHA1(76101271ff9b98c3310e1666dfba34a01a0f0bcd) )  // 1st half seems to be the 2nd one, and 2nd half is filled of 0xff
 	ROM_LOAD( "18-73.u7",   0x5000, 0x1000, CRC(ca374ecb) SHA1(113495afa88da97cb7239f645fabba7125ce2b4b) )
 	ROM_LOAD( "18-74.u8",   0x6000, 0x1000, CRC(5bb57ca8) SHA1(22dc6f0e2fee5408fa70e4bc60f1833534ee038f) )
 	ROM_LOAD( "18-75.u9",   0x7000, 0x1000, CRC(70a8ccb3) SHA1(b5b7d6a8262ab6e47a1400681c414fd3edd0d7a8) )
@@ -3186,7 +4031,7 @@ ROM_START( comg187 )    /* Cal Omega v18.7 (Amusement Poker) */
 	ROM_LOAD( "mltclr.u28", 0x0000, 0x0100, CRC(fefb0fa8) SHA1(66d86aa19d9d37ffd2840d6653fcec667bc716d4) )
 ROM_END
 
-ROM_START( comg204 )    /* Cal Omega v20.4 (Super Blackjack) */
+ROM_START( comg204 )  // Cal Omega v20.4 (Super Blackjack)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "20-41.u5",   0x3000, 0x1000, CRC(9c2203f7) SHA1(fd566683e887cf80cd0e6c82a413aebc378397f8) )
 	ROM_LOAD( "20-42.u6",   0x4000, 0x1000, CRC(31b37010) SHA1(c35ef77725c6c6dd9f369d50d9a8e55c2e3644af) )
@@ -3206,7 +4051,7 @@ ROM_START( comg204 )    /* Cal Omega v20.4 (Super Blackjack) */
 	ROM_LOAD( "mltclr.u28", 0x0000, 0x0100, CRC(fefb0fa8) SHA1(66d86aa19d9d37ffd2840d6653fcec667bc716d4) )
 ROM_END
 
-ROM_START( comg208 )    /* Cal Omega v20.8 (Winner's Choice) */
+ROM_START( comg208 )  // Cal Omega v20.8 (Winner's Choice)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "20-81.u5",   0x3000, 0x1000, CRC(938be03a) SHA1(606252b5160a7af340faa3d4ed6af9dff849c9ac) )
 	ROM_LOAD( "20-82.u6",   0x4000, 0x1000, CRC(7d42257c) SHA1(f1487bcc2475d1bcdfbc9bf866adcb0d510acef5) )
@@ -3226,10 +4071,10 @@ ROM_START( comg208 )    /* Cal Omega v20.8 (Winner's Choice) */
 	ROM_LOAD( "mltclr.u28", 0x0000, 0x0100, CRC(fefb0fa8) SHA1(66d86aa19d9d37ffd2840d6653fcec667bc716d4) )
 ROM_END
 
-ROM_START( comg227 )    /* Cal Omega v22.7 (Amusement Poker (Double Double)) */
+ROM_START( comg227 )  // Cal Omega v22.7 (Amusement Poker (Double Double))
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x3000, 0x1000, 0xff )  /* empty socket */
-	ROM_FILL(               0x4000, 0x1000, 0xff )  /* empty socket */
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
+	ROM_FILL(               0x4000, 0x1000, 0xff )  // empty socket
 	ROM_LOAD( "22-73.u7",   0x5000, 0x1000, CRC(152d1ff9) SHA1(8bbfea1bae9e4fe2a2ac52507dc8dd0e33fbbd06) )
 	ROM_LOAD( "22-74.u8",   0x6000, 0x1000, CRC(3af0f69d) SHA1(c34a0eab3ad4e4db310727805ba1ddc73533bfa6) )
 	ROM_LOAD( "22-75.u9",   0x7000, 0x1000, CRC(d1f3fe24) SHA1(8b43b521fb1be8ef4286b4bfee99b654c49cf9de) )
@@ -3246,9 +4091,9 @@ ROM_START( comg227 )    /* Cal Omega v22.7 (Amusement Poker (Double Double)) */
 	ROM_LOAD( "wldclr.u28", 0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
 ROM_END
 
-ROM_START( comg230 )    /* Cal Omega v23.0 (FC Bingo (4-card)) */
+ROM_START( comg230 )  // Cal Omega v23.0 (FC Bingo (4-card))
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x3000, 0x1000, 0xff )  /* empty socket */
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
 	ROM_LOAD( "23-02.u6",   0x4000, 0x1000, BAD_DUMP CRC(f154670a) SHA1(e0c66649d1434eca3435033a32634cb90cef0f31) )
 	ROM_LOAD( "23-03.u7",   0x5000, 0x1000, BAD_DUMP CRC(daf93757) SHA1(27d57007a24a5f892f7ee201072fcd5817373cad) )
 	ROM_LOAD( "23-04.u8",   0x6000, 0x1000, CRC(ebb5531a) SHA1(9fd003fcba5a5120332bcbd3c845d555c60875e9) )
@@ -3266,9 +4111,9 @@ ROM_START( comg230 )    /* Cal Omega v23.0 (FC Bingo (4-card)) */
 	ROM_LOAD( "fcbclr.u28", 0x0000, 0x0100, BAD_DUMP CRC(6db5a344) SHA1(5f1a81ac02a2a74252decd3bb95a5436cc943930) )
 ROM_END
 
-ROM_START( comg236 )    /* Cal Omega v23.6 (Hotline) */
+ROM_START( comg236 )  // Cal Omega v23.6 (Hotline)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x3000, 0x1000, 0xff )  /* empty socket */
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
 	ROM_LOAD( "23-62.u6",   0x4000, 0x1000, CRC(6f3dd409) SHA1(8112c3114609317fe5543bf26fa426d36d60c5e1) )
 	ROM_LOAD( "23-63.u7",   0x5000, 0x1000, CRC(76e96865) SHA1(03055751efa143cff0501aaa9b2beb9d533e13e7) )
 	ROM_LOAD( "23-64.u8",   0x6000, 0x1000, CRC(26a18d82) SHA1(1ca036c014f180fb1720150642be3986c053c1c9) )
@@ -3319,7 +4164,7 @@ ROM_END
 
 */
 
-ROM_START( comg239 )    /* Cal Omega v23.9 (Gaming Draw Poker) */
+ROM_START( comg239 )  // Cal Omega v23.9 (Gaming Draw Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "23-91.u5",   0x1800, 0x0800, CRC(b49035e2) SHA1(b94a0245ca64d15b1496d1b272ffc0ce80f85526) )
 	ROM_LOAD( "23-92.u6",   0x2000, 0x0800, CRC(d9ffaa73) SHA1(e39d10121e16f89cd8d30a5391a14dc3d4b13a46) )
@@ -3339,7 +4184,7 @@ ROM_START( comg239 )    /* Cal Omega v23.9 (Gaming Draw Poker) */
 	ROM_LOAD( "82s129n.u28",    0x0000, 0x0100, CRC(6db5a344) SHA1(5f1a81ac02a2a74252decd3bb95a5436cc943930) )
 ROM_END
 
-ROM_START( comg240 )    /* Cal Omega v24.0 (Gaming Draw Poker) */
+ROM_START( comg240 )  // Cal Omega v24.0 (Gaming Draw Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "24-01.u5",       0x1800, 0x0800, CRC(445e4e1e) SHA1(11f1b2652fce0e507bde66296f57d689a8460df5) )
 	ROM_LOAD( "24-02.u6",       0x2000, 0x0800, CRC(53ef572d) SHA1(14c99f94a22d93de998f6418ea9dc3eab5119a82) )
@@ -3355,13 +4200,13 @@ ROM_START( comg240 )    /* Cal Omega v24.0 (Gaming Draw Poker) */
 	ROM_LOAD( "cgb.u69",    0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )
 	ROM_LOAD( "cga.u68",    0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )
 
-	ROM_REGION( 0x100, "proms", 0 ) /* is this prom ok? */
+	ROM_REGION( 0x100, "proms", 0 )  // is this prom ok?
 	ROM_LOAD( "pok-6301.u28",   0x0000, 0x0100, CRC(56c2577b) SHA1(cb75882067e1e0d9f9369a37b5a829dd091d473e) )
 ROM_END
 
-ROM_START( comg246 )    /* Cal Omega v24.6 (Hotline) */
+ROM_START( comg246 )  // Cal Omega v24.6 (Hotline)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x3000, 0x1000, 0xff )  /* empty socket */
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket
 	ROM_LOAD( "24-62.u6",   0x4000, 0x1000, CRC(41f7b882) SHA1(4b532d70d5a7101952085a8fcdc0568c4266a72a) )
 	ROM_LOAD( "24-63.u7",   0x5000, 0x1000, CRC(226580b7) SHA1(07e6332ace45e0ced57aed6e348ab12c1f07ff34) )
 	ROM_LOAD( "24-64.u8",   0x6000, 0x1000, CRC(bf402e32) SHA1(436670b8f37caac14bb578a31dddbc0e2b0fd1ae) )
@@ -3379,16 +4224,16 @@ ROM_START( comg246 )    /* Cal Omega v24.6 (Hotline) */
 	ROM_LOAD( "hlclr.u28",  0x0000, 0x0100, CRC(1c994cda) SHA1(5c8698b4c5e43146106c9da8a306e3099b26ca2d) )
 ROM_END
 
-ROM_START( comg272a )   /* Cal Omega v27.2 (Keno (amusement)) */
+ROM_START( comg272a )  // Cal Omega v27.2 (Keno (amusement))
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "27-22.u6",   0x2000, 0x0800, CRC(db3e1918) SHA1(4b8f33103f093ddbe750b536abc4545cf262d2e5) )
 	ROM_LOAD( "27-23.u7",   0x2800, 0x0800, CRC(c9e9cfd8) SHA1(dd0615ac579331330bda070f9ed68d7972436781) )
 	ROM_LOAD( "27-24.u8",   0x3000, 0x0800, CRC(d3fbab7f) SHA1(805510356bd52cf698a838daeaf16096eedcfd37) )
 	ROM_LOAD( "27-25.u9",   0x3800, 0x0800, CRC(22dc5b5e) SHA1(4442b7ac0516fdad8c81687fa9683eeace5b6c2d) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x0800, 0xff )  /* empty socket (requested by the manual) */
+	ROM_FILL(               0x0000, 0x0800, 0xff )  // empty socket (requested by the manual)
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
 	ROM_LOAD( "kcgc.u70",   0x0000, 0x0800, CRC(fb721236) SHA1(33ef355913b8acb5017a24ca1c46dec1c391a528) )
@@ -3399,16 +4244,16 @@ ROM_START( comg272a )   /* Cal Omega v27.2 (Keno (amusement)) */
 	ROM_LOAD( "pokclr.u28", 0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg272b )   /* Cal Omega v27.2 (Keno (gaming)) */
+ROM_START( comg272b )  // Cal Omega v27.2 (Keno (gaming))
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "27-22m.u6",  0x2000, 0x0800, CRC(6dc6ec9c) SHA1(dd80d0e544ad51d1b950970e735d7ce1e05062e3) )
 	ROM_LOAD( "27-23m.u7",  0x2800, 0x0800, CRC(242ce2ed) SHA1(e114cec7eb7554de14561e7c0e6aed01d7e72ca6) )
 	ROM_LOAD( "27-24m.u8",  0x3000, 0x0800, CRC(e191b0e1) SHA1(cc476efa194c1b2cd0035e9b4725e81d3a6f381c) )
 	ROM_LOAD( "27-25m.u9",  0x3800, 0x0800, CRC(4152b53d) SHA1(6fe577045d03362b8b988c7a9cd0542c9a20d7a7) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_FILL(               0x0000, 0x0800, 0xff )  /* empty socket (requested by the manual) */
+	ROM_FILL(               0x0000, 0x0800, 0xff )  // empty socket (requested by the manual)
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
 	ROM_LOAD( "kcgc.u70",   0x0000, 0x0800, CRC(fb721236) SHA1(33ef355913b8acb5017a24ca1c46dec1c391a528) )
@@ -3425,14 +4270,14 @@ ROM_END
   Jacks or Better
   V 51.08
   Pay Schedule 05F Controled by EPR1- 50.081
-  906 board
+  906-III board
   PROMS 2764
 
 */
 
-ROM_START( comg5108 )   /* Cal Omega v51.08 (Gaming Poker) */
+ROM_START( comg5108 )  // Cal Omega v51.08 (Poker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr1.u28",   0x6000, 0x2000, CRC(3d6abca9) SHA1(54a802f89bd64380abf269a2b507513c8db5319b) )  /* checked in offset $8034 */
+	ROM_LOAD( "epr1.u28",   0x6000, 0x2000, CRC(3d6abca9) SHA1(54a802f89bd64380abf269a2b507513c8db5319b) )  // checked in offset $8034
 	ROM_LOAD( "epr2.u29",   0x8000, 0x2000, CRC(72cf8376) SHA1(fa1682244402e1b36164c670241f585bf4017ad9) )
 	ROM_LOAD( "epr3.u30",   0xa000, 0x2000, CRC(c79957e5) SHA1(64afdedf5369d56790e9ae7a8d3be5f52125ca1f) )
 	ROM_LOAD( "epr4.u31",   0xc000, 0x2000, CRC(eb0b0a86) SHA1(4fd29700db8fe183392cc66a54a128657c7e05e0) )
@@ -3443,7 +4288,7 @@ ROM_START( comg5108 )   /* Cal Omega v51.08 (Gaming Poker) */
 	ROM_LOAD( "cg2b.u5",    0x2000, 0x2000, CRC(1f79f76d) SHA1(b2bce60e24dd61977f7bf6ee4705ca7d104ab388) )
 	ROM_LOAD( "cg2a.u6",    0x4000, 0x2000, CRC(d5fd9fc2) SHA1(68472e7271f835656197109620bb3988fc52308a) )
 
-	ROM_REGION( 0x200, "proms", 0 ) /* from other set, upper half is empty */
+	ROM_REGION( 0x200, "proms", 0 )  // from other set, second half is empty
 	ROM_LOAD( "bprom.u16",  0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
 ROM_END
 
@@ -3451,37 +4296,37 @@ ROM_END
 
 /*********************** Diagnostic PROMs ***********************/
 
-ROM_START( comg903d )   /* Cal Omega 903d (System 903 diag.PROM) */
+ROM_START( comg903d )  // Cal Omega 903d (System 903 diag.PROM)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x1800, 0x0800, 0xff )  /* empty socket (requested by the manual) */
-	ROM_FILL(               0x2000, 0x0800, 0xff )  /* empty socket (requested by the manual) */
-	ROM_FILL(               0x2800, 0x0800, 0xff )  /* empty socket (requested by the manual) */
-	ROM_FILL(               0x3000, 0x0800, 0xff )  /* empty socket (requested by the manual) */
+	ROM_FILL(               0x1800, 0x0800, 0xff )  // empty socket (requested by the manual)
+	ROM_FILL(               0x2000, 0x0800, 0xff )  // empty socket (requested by the manual)
+	ROM_FILL(               0x2800, 0x0800, 0xff )  // empty socket (requested by the manual)
+	ROM_FILL(               0x3000, 0x0800, 0xff )  // empty socket (requested by the manual)
 	ROM_LOAD( "903diag.u9", 0x3800, 0x0800, CRC(f8092cea) SHA1(0c864419a4e1956c030b185739eca59313f20e8a) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "testcg0.u67",    0x0000, 0x0800, CRC(b626ad89) SHA1(551b75f4559d11a4f8f56e38982114a21c77d4e7) )
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_FILL(                   0x0000, 0x1800, 0xff )  /* removed all ROMs (requested by the manual) */
+	ROM_FILL(                   0x0000, 0x1800, 0xff )  // removed all ROMs (requested by the manual)
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "testclr.u28",    0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
 ROM_END
 
-ROM_START( comg905d )   /* Cal Omega 905d (System 905 diag.PROM) */
+ROM_START( comg905d )  // Cal Omega 905d (System 905 diag.PROM)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(               0x3000, 0x1000, 0xff )  /* empty socket (requested by the manual) */
-	ROM_FILL(               0x4000, 0x1000, 0xff )  /* empty socket (requested by the manual) */
-	ROM_FILL(               0x5000, 0x1000, 0xff )  /* empty socket (requested by the manual) */
-	ROM_FILL(               0x6000, 0x1000, 0xff )  /* empty socket (requested by the manual) */
+	ROM_FILL(               0x3000, 0x1000, 0xff )  // empty socket (requested by the manual)
+	ROM_FILL(               0x4000, 0x1000, 0xff )  // empty socket (requested by the manual)
+	ROM_FILL(               0x5000, 0x1000, 0xff )  // empty socket (requested by the manual)
+	ROM_FILL(               0x6000, 0x1000, 0xff )  // empty socket (requested by the manual)
 	ROM_LOAD( "905diag.u9", 0x7000, 0x1000, CRC(6c20dbc7) SHA1(dbab0d2cf07bade2e3619bd5f29d406f3498a278) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "testcg0.u67",    0x0000, 0x0800, CRC(b626ad89) SHA1(551b75f4559d11a4f8f56e38982114a21c77d4e7) )
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_FILL(                   0x0000, 0x1800, 0xff )  /* removed all ROMs (requested by the manual) */
+	ROM_FILL(                   0x0000, 0x1800, 0xff )  // removed all ROMs (requested by the manual)
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "testclr.u28",    0x0000, 0x0100, CRC(a8191ef7) SHA1(d6f777980179ab091e2713ee815d46bf9c0ac486) )
@@ -3520,7 +4365,7 @@ ROM_END
 
 ROM_START( elgrande )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_FILL(           0x1800, 0x0800, 0xff )  /* empty socket */
+	ROM_FILL(           0x1800, 0x0800, 0xff )  // empty socket
 	ROM_LOAD( "d1.u6",  0x2000, 0x0800, CRC(8b6b505c) SHA1(5f89bb1b50b9dfacf23c50e3016b9258b0e15084) )
 	ROM_LOAD( "d1.u7",  0x2800, 0x0800, CRC(d803a978) SHA1(682b73c968ef57007397d3e5eb0e78a97722da5e) )
 	ROM_LOAD( "d1.u8",  0x3000, 0x0800, CRC(291fa93b) SHA1(1d57f736b11ddc916effde78e2cd08c313a62901) )
@@ -3538,7 +4383,7 @@ ROM_START( elgrande )
 	ROM_LOAD( "d1.u28", 0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
 ROM_END
 
-ROM_START( jjpoker )    /* tuni-83 */
+ROM_START( jjpoker )  // tuni-83
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tuni-83.u5", 0x1800, 0x0800, CRC(46c542ee) SHA1(0b3832d8ab69427298de03d18984a220a9a35c30) )
 	ROM_LOAD( "tuni-83.u6", 0x2000, 0x0800, CRC(e24b392a) SHA1(3b705b5cc60d2b33375f52958b72e70ce36fa216) )
@@ -3558,7 +4403,7 @@ ROM_START( jjpoker )    /* tuni-83 */
 	ROM_LOAD( "tunipoker.u28",  0x0000, 0x0100, CRC(5101a33b) SHA1(a36bc421064d0ed96beb27b549f69adce0a553c2) )
 ROM_END
 
-ROM_START( jjpokerb )   /* pokr_j */
+ROM_START( jjpokerb )  // pokr_j
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pokr_j.01.u5",   0x1800, 0x0800, CRC(d0004eda) SHA1(2fd39213e3028066fd4f9b8db206f036b566e2f7) )
 	ROM_LOAD( "pokr_j.02.u6",   0x2000, 0x0800, CRC(6809ccd9) SHA1(2573194a13ddf0270bccd456bda84b822036c660) )
@@ -3578,7 +4423,7 @@ ROM_START( jjpokerb )   /* pokr_j */
 	ROM_LOAD( "tunipoker.u28",  0x0000, 0x0100, CRC(5101a33b) SHA1(a36bc421064d0ed96beb27b549f69adce0a553c2) )
 ROM_END
 
-ROM_START( ssipkr24 )   /* pokr02_4 (gfx and prom from jjpoker) */
+ROM_START( ssipkr24 )  // pokr02_4 (gfx and prom from jjpoker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pokr02_4.01.u5", 0x1800, 0x0800, CRC(8adf1d6d) SHA1(d83677eed9426841767d947919f6da671b5fbed4) )
 	ROM_LOAD( "pokr02_4.02.u6", 0x2000, 0x0800, CRC(5298a01c) SHA1(a0085498699bc15cc6ada9e4e9541bd84b97eeae) )
@@ -3598,7 +4443,7 @@ ROM_START( ssipkr24 )   /* pokr02_4 (gfx and prom from jjpoker) */
 	ROM_LOAD( "tunipoker.u28",  0x0000, 0x0100, BAD_DUMP CRC(5101a33b) SHA1(a36bc421064d0ed96beb27b549f69adce0a553c2) )
 ROM_END
 
-ROM_START( ssipkr30 )   /* pokr03_0 (gfx and prom from jjpoker) */
+ROM_START( ssipkr30 )  // pokr03_0 (gfx and prom from jjpoker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pokr03_0.01.u5", 0x1800, 0x0800, CRC(db9581fe) SHA1(605b254e0ebb96423eb522ce75242083d70f01ca) )
 	ROM_LOAD( "pokr03_0.02.u6", 0x2000, 0x0800, CRC(861243ad) SHA1(290eba5c820177669e5adeac1e2f172b73789542) )
@@ -3618,7 +4463,7 @@ ROM_START( ssipkr30 )   /* pokr03_0 (gfx and prom from jjpoker) */
 	ROM_LOAD( "tunipoker.u28",  0x0000, 0x0100, BAD_DUMP CRC(5101a33b) SHA1(a36bc421064d0ed96beb27b549f69adce0a553c2) )
 ROM_END
 
-ROM_START( ssipkr40 )   /* (gfx and prom from jjpoker) */
+ROM_START( ssipkr40 )  // (gfx and prom from jjpoker)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "40-1.903.u5",    0x1800, 0x0800, CRC(461eb68c) SHA1(54781670930c723c993ca9ad80e06e38ddd2f035) )
 	ROM_LOAD( "40-2.903.u6",    0x2000, 0x0800, CRC(099094a9) SHA1(c5a6ccb5ec0bebc79ef0b9c98595ef87c65ce361) )
@@ -3636,6 +4481,84 @@ ROM_START( ssipkr40 )   /* (gfx and prom from jjpoker) */
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "tunipoker.u28",  0x0000, 0x0100, BAD_DUMP CRC(5101a33b) SHA1(a36bc421064d0ed96beb27b549f69adce0a553c2) )
+ROM_END
+
+/*
+  Casino 21
+  UMCM / IWC
+  Ver 30.08
+
+  Black Jack game. Spanish language.
+  It seems to run in 906-III hardware
+
+*/
+ROM_START( cas21iwc )  // UCMC Casino 21
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",   0x6000, 0x2000, CRC(c6c60700) SHA1(8c613211a22f5c23a9971092b996d29a4e0ae83d) )  // just tables and data to be checked.
+	ROM_LOAD( "2.bin",   0x8000, 0x2000, CRC(c7bc884e) SHA1(e3a610362dc04d977b8bbd8549b9ce26a716867f) )
+	ROM_LOAD( "3.bin",   0xa000, 0x2000, CRC(2be52026) SHA1(8318b340e2a5b6127c459d140078d105f16d8f32) )
+	ROM_LOAD( "4.bin",   0xc000, 0x2000, CRC(0289aeac) SHA1(44bbbf4703c5dee460915e44839a53b97797f09d) )
+	ROM_LOAD( "5.bin",   0xe000, 0x2000, CRC(e53b0112) SHA1(cff4d2467a6e3d322cdf5ddd9034099c8a0b7a8c) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "cgc.bin",    0x0000, 0x2000, CRC(c69ab916) SHA1(316fabf35184007b29da91b3fec0a5c4ce8cded3) )
+	ROM_LOAD( "cgb.bin",    0x2000, 0x2000, CRC(62630d24) SHA1(88e89b41cae02b34767fac0a75506ee44f033422) )
+	ROM_LOAD( "cga.bin",    0x4000, 0x2000, CRC(ce444eb6) SHA1(3d8c6f047c141931e55ff9101832fa5cae73576d) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "n82s129n.u16",  0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
+ROM_END
+
+/*
+  Poker
+  UCMC / IWC
+  Ver 162.03
+
+  Poker game. Spanish language.
+  It seems to run in 906-III hardware
+
+*/
+ROM_START( pokeriwc )  // UCMC Poker (ver 162.03)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "numeral_1.bin",   0x6000, 0x2000, CRC(c099dc4c) SHA1(4eec1fb0d8f1d2b31ac397991594e02bd9156348) )  // just tables and data to be checked.
+	ROM_LOAD( "numeral_2.bin",   0x8000, 0x2000, CRC(20d42fb2) SHA1(aae6704719b80f3c8c994d91ceebaae070d1153f) )
+	ROM_LOAD( "numeral_3.bin",   0xa000, 0x2000, CRC(2cea3ba1) SHA1(c0edc7e9102744362bdca63a75c7ba344cbb0e6c) )
+	ROM_LOAD( "numeral_4.bin",   0xc000, 0x2000, CRC(742676b0) SHA1(28f565fe75120000e049fb099bced4297a0bab1f) )
+	ROM_LOAD( "numeral_5.bin",   0xe000, 0x2000, CRC(d9b7c85c) SHA1(bec03c0cef38d0d4a93a8ef4c4ddbed0b67ebaf3) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "cgc.bin",    0x0000, 0x2000, CRC(c69ab916) SHA1(316fabf35184007b29da91b3fec0a5c4ce8cded3) )
+	ROM_LOAD( "cgb.bin",    0x2000, 0x2000, CRC(62630d24) SHA1(88e89b41cae02b34767fac0a75506ee44f033422) )
+	ROM_LOAD( "cga.bin",    0x4000, 0x2000, CRC(ce444eb6) SHA1(3d8c6f047c141931e55ff9101832fa5cae73576d) )
+
+	ROM_REGION( 0x200, "proms", 0 )  // borrowed from other set, upper half is empty
+	ROM_LOAD( "n82s129n.u16",  0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
+ROM_END
+
+/*
+  Poker
+  UCMC / IWC
+  Ver 162  20-6-91
+
+  Poker game. Spanish language.
+  It seems to run in 906-III hardware
+
+*/
+ROM_START( pokiwc162 )  // UCMC Poker (ver 162.03) alt. Joker Wild?...
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "j_k.u28",                              0x6000, 0x2000, CRC(8a6e93b0) SHA1(a411cb4cd3980934cbc9b170b118348a9a4ac896) )  // just tables and data to be checked.
+	ROM_LOAD( "v162_n2_spanish_pok_20-6-91_iwc.u29",  0x8000, 0x2000, CRC(20d42fb2) SHA1(aae6704719b80f3c8c994d91ceebaae070d1153f) )
+	ROM_LOAD( "v162_n3_spanish_pok_20-6-91_iwc.u30",  0xa000, 0x2000, CRC(2cea3ba1) SHA1(c0edc7e9102744362bdca63a75c7ba344cbb0e6c) )
+	ROM_LOAD( "v162_n4_spanish_pok_20-6-91_iwc.u31",  0xc000, 0x2000, CRC(742676b0) SHA1(28f565fe75120000e049fb099bced4297a0bab1f) )
+	ROM_LOAD( "v162_n5_spanish_pok_20-6-91_iwc.u32",  0xe000, 0x2000, CRC(d9b7c85c) SHA1(bec03c0cef38d0d4a93a8ef4c4ddbed0b67ebaf3) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "v162_cgc_iwc_argentina.u4",  0x0000, 0x2000, CRC(c69ab916) SHA1(316fabf35184007b29da91b3fec0a5c4ce8cded3) )
+	ROM_LOAD( "v162_cgb_iwc_argentina.u5",  0x2000, 0x2000, CRC(62630d24) SHA1(88e89b41cae02b34767fac0a75506ee44f033422) )
+	ROM_LOAD( "v162_cga_iwc_argentina.u6",  0x4000, 0x2000, CRC(ce444eb6) SHA1(3d8c6f047c141931e55ff9101832fa5cae73576d) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "n82s129n.u16",  0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
 ROM_END
 
 
@@ -3669,13 +4592,172 @@ void calomega_state::init_comg080()
 	*/
 	uint8_t *PRGROM = memregion( "maincpu" )->base();
 
-	PRGROM[0x3ff8] = 0x8e; /* checked by code */
-	PRGROM[0x3ff9] = 0x97; /* checked by code */
+	PRGROM[0x3ff8] = 0x8e;  // checked by code
+	PRGROM[0x3ff9] = 0x97;  // checked by code
 
-	PRGROM[0x3ffc] = 0x42; /* Start vector */
+	PRGROM[0x3ffc] = 0x42;  // start vector
 	PRGROM[0x3ffd] = 0x20;
-	PRGROM[0x3ffe] = 0xf8; /* NMI vector */
+	PRGROM[0x3ffe] = 0xf8;  // NMI vector
 	PRGROM[0x3fff] = 0x26;
+}
+
+void calomega_state::init_comg5108()
+{
+	uint8_t *PRGROM = memregion( "maincpu" )->base();
+	PRGROM[0xc080] = 0xff;   // CHECKSUM ERROR FLAG - No changes for now.
+	// Debug
+	// PRGROM[0xc080] = 0x00; // CHECKSUM ERROR FLAG (at start)
+	// PRGROM[0xbf0e] = 0x00; // CHECKSUM ERROR FLAG (on the fly)
+	// PRGROM[0xbfb4] = 0x00; // RAM ERROR FLAG
+	// PRGROM[0xb6A0] = 0x00; // ERROR LOW BATTERY FLAG
+	// PRGROM[0xb6AA] = 0x00; // ERROR LOW BATTERY FLAG
+}
+
+void calomega_state::init_cas21iwc()
+{
+	uint8_t *PRGROM = memregion( "maincpu" )->base();
+
+	PRGROM[0xB603] = 0xff;    // Checksum flag. No changes for now.
+}
+
+void calomega_state::init_pokeriwc()
+{
+	uint8_t *PRGROM = memregion( "maincpu" )->base();
+
+	PRGROM[0x8000] = 0xa2;    // Checksum flag. No changes for now.
+}
+
+void calomega_state::init_comg079()
+{
+	uint8_t *PRGROM = memregion( "maincpu" )->base();
+
+	PRGROM[0x2ad2] = 0x00;  // checksum flag (0xe0)
+    PRGROM[0x2CD1] = 0x33;
+    PRGROM[0x2CD3] = 0x5A;
+    PRGROM[0x2CD5] = 0x76;
+    PRGROM[0x2CD9] = 0x13;
+    PRGROM[0x2CDB] = 0x30;
+    PRGROM[0x2CDD] = 0x06;
+    PRGROM[0x2D01] = 0x10;
+    PRGROM[0x2D06] = 0x36;
+    PRGROM[0x2D07] = 0x20;
+    PRGROM[0x2D08] = 0x7D;
+    PRGROM[0x2D09] = 0x3D;
+    PRGROM[0x2D0A] = 0x60;
+    PRGROM[0x2D30] = 0x26;
+    PRGROM[0x2D31] = 0x00;
+    PRGROM[0x2D33] = 0x00;
+    PRGROM[0x2D35] = 0x25;
+    PRGROM[0x2D36] = 0x00;
+    PRGROM[0x2D37] = 0x4C;
+    PRGROM[0x2D39] = 0x34;
+    PRGROM[0x2D3B] = 0x00;
+    PRGROM[0x2D3C] = 0x38;
+    PRGROM[0x2D3E] = 0x40;
+    PRGROM[0x2D3F] = 0x48;
+    PRGROM[0x2D41] = 0x01;
+    PRGROM[0x2D44] = 0x48;
+    PRGROM[0x2D46] = 0x02;
+    PRGROM[0x2D48] = 0x0F;
+    PRGROM[0x2D4A] = 0x0B;
+    PRGROM[0x2D4C] = 0x02;
+    PRGROM[0x2D4F] = 0x01;
+    PRGROM[0x2D50] = 0x68;
+    PRGROM[0x2D52] = 0x00;
+    PRGROM[0x2D53] = 0x4C;
+    PRGROM[0x2D54] = 0x3A;
+    PRGROM[0x2D55] = 0x2D;
+    PRGROM[0x2D56] = 0x68;
+    PRGROM[0x2D57] = 0x68;
+    PRGROM[0x2D58] = 0x60;
+    PRGROM[0x2D5A] = 0x00;
+    PRGROM[0x2D5C] = 0x06;
+    PRGROM[0x2D5E] = 0x01;
+    PRGROM[0x2D60] = 0x02;
+    PRGROM[0x2D62] = 0x02;
+    PRGROM[0x2D63] = 0x20;
+    PRGROM[0x2D64] = 0x3A;
+    PRGROM[0x2D65] = 0x2D;
+    PRGROM[0x2D66] = 0x60;
+    PRGROM[0x2D68] = 0x00;
+    PRGROM[0x2D6A] = 0x08;
+    PRGROM[0x2D6C] = 0x01;
+    PRGROM[0x2D6E] = 0x02;
+    PRGROM[0x2D79] = 0x0A;
+    PRGROM[0x2D7B] = 0x06;
+    PRGROM[0x2D80] = 0x78;
+    PRGROM[0x2D81] = 0x2D;
+    PRGROM[0x2D82] = 0x09;
+    PRGROM[0x2D84] = 0x60;
+    PRGROM[0x2D86] = 0x00;
+    PRGROM[0x2D87] = 0xBE;
+    PRGROM[0x2D88] = 0x97;
+    PRGROM[0x2D89] = 0x2D;
+    PRGROM[0x2D8C] = 0x97;
+    PRGROM[0x2D8F] = 0x9D;
+    PRGROM[0x2D90] = 0x00;
+    PRGROM[0x2D98] = 0x04;
+    PRGROM[0x2D9C] = 0x00;
+    PRGROM[0x2DAC] = 0x04;
+    PRGROM[0x2DB0] = 0x04;
+    PRGROM[0x2DB4] = 0x00;
+    PRGROM[0x2DB6] = 0x0F;
+    PRGROM[0x2DB8] = 0x04;
+    PRGROM[0x2DBC] = 0x04;
+    PRGROM[0x2DD1] = 0x20;
+    PRGROM[0x2DD3] = 0x00;
+    PRGROM[0x2DD5] = 0x00;
+    PRGROM[0x2DD6] = 0x10;
+    PRGROM[0x2DD7] = 0x99;
+    PRGROM[0x2DD9] = 0x11;
+    PRGROM[0x2DDB] = 0x00;
+    PRGROM[0x2DDD] = 0x99;
+    PRGROM[0x2DDE] = 0x00;
+    PRGROM[0x2DE3] = 0x8A;
+    PRGROM[0x2DE5] = 0x00;
+    PRGROM[0x2DE6] = 0x99;
+    PRGROM[0x2DE7] = 0x00;
+    PRGROM[0x2DE8] = 0x14;
+    PRGROM[0x2DE9] = 0x99;
+    PRGROM[0x2DEA] = 0x00;
+    PRGROM[0x2DEB] = 0x15;
+    PRGROM[0x2DED] = 0x00;
+    PRGROM[0x2DEE] = 0x16;
+    PRGROM[0x2DEF] = 0x99;
+    PRGROM[0x2E01] = 0x90;
+    PRGROM[0x2E03] = 0x45;
+    PRGROM[0x2E05] = 0x49;
+    PRGROM[0x2E06] = 0x01;
+    PRGROM[0x2E07] = 0x4A;
+    PRGROM[0x2E09] = 0x90;
+    PRGROM[0x2E0B] = 0x91;
+    PRGROM[0x2E0D] = 0x92;
+    PRGROM[0x2E0F] = 0x93;
+    PRGROM[0x2E30] = 0xE0;
+    PRGROM[0x2E31] = 0x12;
+    PRGROM[0x2E32] = 0x90;
+    PRGROM[0x2E34] = 0xAD;
+    PRGROM[0x2E35] = 0xC4;
+    PRGROM[0x2E36] = 0x08;
+    PRGROM[0x2E37] = 0x29;
+    PRGROM[0x2E38] = 0x80;
+    PRGROM[0x2E39] = 0xD0;
+    PRGROM[0x2E3A] = 0x13;
+    PRGROM[0x2E3B] = 0xA0;
+    PRGROM[0x2E3C] = 0x00;
+    PRGROM[0x2E3E] = 0x04;
+    PRGROM[0x2E67] = 0x2E;
+    PRGROM[0x2E68] = 0x8D;
+    PRGROM[0x2E69] = 0x08;
+    PRGROM[0x2E6A] = 0x00;
+    PRGROM[0x2E6E] = 0x8D;
+    PRGROM[0x2E6F] = 0x09;
+}
+
+void calomega_state::init_any()
+{
+	uint8_t *PRGROM = memregion( "maincpu" )->base();
+	PRGROM[0x0000] = 0x00;
 }
 
 
@@ -3683,51 +4765,58 @@ void calomega_state::init_comg080()
 *                  Game Drivers                  *
 *************************************************/
 
-/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT          ROT    COMPANY                                  FULLNAME                                                    FLAGS   */
-GAME( 1981, comg074,  0,        sys903,   comg074,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.4 (Gaming Poker, W.Export)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1981, comg076,  0,        sys903,   comg076,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.6 (Arcade Poker)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1981, comg079,  0,        sys903,   comg076,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.9 (Arcade Poker)",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
-GAME( 1981, comg080,  0,        sys903,   arcadebj, calomega_state, init_comg080, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 8.0 (Arcade Black Jack)",                  MACHINE_SUPPORTS_SAVE )                          /* bad dump */
-GAME( 1981, comg094,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 9.4 (Keno)",                               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg107,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 10.7c (Big Game)",                         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg123,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.3 (Ticket Poker)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
-GAME( 1982, comg125,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.5 (Bingo)",                             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg127,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.7 (Keno)",                              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg128,  0,        sys903,   comg128,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.8 (Arcade Game)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg134,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 13.4 (Nudge Bingo)",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg145,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 14.5 (Pixels)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg157,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.7 (Double-Draw Poker)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg159,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.9 (Wild Double-Up)",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg164,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.4 (Keno)",                              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* incomplete dump */
-GAME( 1983, comg168,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.8 (Keno)",                              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg172,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.2 (Double Double Poker)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, comg175,  0,        sys903,   gdrwpkrd, calomega_state, init_sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 17.51 (Gaming Draw Poker)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg176,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.6 (Nudge Bingo)",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, comg181,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.1 (Nudge Bingo)",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg183,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.3 (Pixels)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg185,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.5 (Pixels)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg186,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.6 (Pixels)",                            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, comg187,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.7 (Amusement Poker)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
-GAME( 1984, comg204,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.4 (Super Blackjack)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, comg208,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.8 (Winner's Choice)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, comg227,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 22.7 (Amusement Poker, d/d)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, comg230,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.0 (FC Bingo (4-card))",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
-GAME( 1984, comg236,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.6 (Hotline)",                           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, comg239,  0,        sys903,   gdrwpkrd, calomega_state, init_sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 23.9 (Gaming Draw Poker)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1985, comg240,  0,        sys903,   gdrwpkrh, calomega_state, init_sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 24.0 (Gaming Draw Poker, hold)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1985, comg246,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 24.6 (Hotline)",                           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, comg272a, 0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, amusement)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, comg272b, 0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, gaming)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 198?, comg5108, 0,        sys906,   stand906, calomega_state, empty_init,   ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 51.08 (CEI Video Poker, Jacks or Better)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT          ROT    COMPANY                                  FULLNAME                                           FLAGS   */
+GAME( 1981, comg074,  0,        sys903,   comg074,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.4 (Gaming Poker, W.Export)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1981, comg076,  0,        sys903,   comg076,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.6 (Arcade Poker)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1981, comg079,  0,        sys903,   comg076,  calomega_state, init_comg079, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.9 (Arcade Poker)",              MACHINE_SUPPORTS_SAVE )    // bad dump
+GAME( 1981, comg080,  0,        sys903,   arcadebj, calomega_state, init_comg080, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 8.0 (Arcade Black Jack)",         MACHINE_SUPPORTS_SAVE )    // bad dump
+GAME( 1981, comg094,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 9.4 (Keno)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg107,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 10.7c (Big Game)",                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg123,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.3 (Ticket Poker)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // bad dump
+GAME( 1982, comg125,  0,        sys903,   comg125,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.5 (Bingo)",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg127,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.7 (Keno)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg128,  0,        sys903,   comg128,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.8 (Arcade Game)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg134,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 13.4 (Nudge Bingo)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg145,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 14.5 (Pixels)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg157,  0,        sys903,   comg157,  calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.7 (Double-Draw Poker)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg159,  0,        sys905,   comg159,  calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 15.9 (Wild Double-Up)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg164,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.4 (Keno)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // incomplete dump
+GAME( 1983, comg168,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 16.8 (Keno)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg172,  0,        sys905,   comg172,  calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.2 (Double Double Poker)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1984, comg175,  0,        sys903,   gdrwpkrd, calomega_state, init_sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 17.51 (Gaming Draw Poker)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg176,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 17.6 (Nudge Bingo)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, comg181,  0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.1 (Nudge Bingo)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg183,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.3 (Pixels)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg185,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.5 (Pixels)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg186,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.6 (Pixels)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, comg187,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 18.7 (Amusement Poker)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // bad dump
+GAME( 1984, comg204,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.4 (Super Blackjack)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, comg208,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 20.8 (Winner's Choice)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, comg227,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 22.7 (Amusement Poker, d/d)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, comg230,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.0 (FC Bingo (4-card))",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    // bad dump
+GAME( 1984, comg236,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 23.6 (Hotline)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, comg239,  0,        sys903,   gdrwpkrd, calomega_state, init_sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 23.9 (Gaming Draw Poker)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1985, comg240,  0,        sys903,   gdrwpkrh, calomega_state, init_sys903,  ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 24.0 (Gaming Draw Poker, hold)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, comg246,  0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 24.6 (Hotline)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, comg272a, 0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, amusement)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, comg272b, 0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, gaming)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-/************ Diagnostic PROMs ************/
-GAME( 198?, comg903d, 0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - System 903 Diag.PROM",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 198?, comg905d, 0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - System 905 Diag.PROM",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//************ Diagnostic Sets ************
+GAME( 198?, comg903d, 0,        sys903,   stand903, calomega_state, init_sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - System 903 Diag.PROM",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, comg905d, 0,        sys905,   stand905, calomega_state, init_sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - System 905 Diag.PROM",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-/****** Unofficial / 3rd part games *******/
-GAME( 1982, elgrande, 0,        s903mod,  elgrande, calomega_state, init_s903mod, ROT0, "Enter-Tech, Ltd. / Tuni Electro Service", "El Grande - 5 Card Draw (New)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jjpoker,  0,        s903mod,  jjpoker,  calomega_state, init_s903mod, ROT0, "Enter-Tech, Ltd.",                        "Jackpot Joker Poker (set 1)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jjpokerb, jjpoker,  s903mod,  jjpoker,  calomega_state, init_s903mod, ROT0, "Enter-Tech, Ltd.",                        "Jackpot Joker Poker (set 2)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ssipkr24, 0,        s903mod,  ssipkr,   calomega_state, init_s903mod, ROT0, "SSI",                                     "SSI Poker (v2.4)",                                        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ssipkr30, ssipkr24, s903mod,  ssipkr,   calomega_state, init_s903mod, ROT0, "SSI",                                     "SSI Poker (v3.0)",                                        MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ssipkr40, ssipkr24, s903mod,  ssipkr,   calomega_state, init_s903mod, ROT0, "SSI",                                     "SSI Poker (v4.0)",                                        MACHINE_SUPPORTS_SAVE )
+//************* 906-III games **************
+GAME( 198?, comg5108, 0,        sys906,   stand906, calomega_state, init_comg5108, ROT0, "Casino Electronics Inc.",              "CEI 51.08 (CEI 906-III Poker)",                    MACHINE_SUPPORTS_SAVE )
+
+//****** Unofficial 903/904/905 3rd part games *******
+GAME( 1982, elgrande,  0,        s903mod,  elgrande, calomega_state, init_s903mod, ROT0, "Enter-Tech, Ltd. / Tuni Electro Service", "El Grande - 5 Card Draw (New)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jjpoker,   0,        s903mod,  jjpoker,  calomega_state, init_s903mod, ROT0, "Enter-Tech, Ltd.",                        "Jackpot Joker Poker (set 1)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jjpokerb,  jjpoker,  s903mod,  jjpoker,  calomega_state, init_s903mod, ROT0, "Enter-Tech, Ltd.",                        "Jackpot Joker Poker (set 2)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ssipkr24,  0,        s903mod,  ssipkr,   calomega_state, init_s903mod, ROT0, "SSI",                                     "SSI Poker (v2.4)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ssipkr30,  ssipkr24, s903mod,  ssipkr,   calomega_state, init_s903mod, ROT0, "SSI",                                     "SSI Poker (v3.0)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ssipkr40,  ssipkr24, s903mod,  ssipkr,   calomega_state, init_s903mod, ROT0, "SSI",                                     "SSI Poker (v4.0)",                              MACHINE_SUPPORTS_SAVE )
+
+//****** Unofficial 906-III family 3rd part games *******
+GAME( 1990, cas21iwc,  0,        sys906,   cas21iwc, calomega_state, init_cas21iwc, ROT0, "UCMC/IWC",                               "Casino 21 UCMC/IWC (ver 30.08)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pokeriwc,  0,        sys906,   pokeriwc, calomega_state, init_pokeriwc, ROT0, "UCMC/IWC",                               "Poker UCMC/IWC (ver 162.03)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pokiwc162, pokeriwc, sys906,   pokeriwc, calomega_state, init_pokeriwc, ROT0, "UCMC/IWC",                               "Poker UCMC/IWC (ver 162.03 20-6-91)",           MACHINE_SUPPORTS_SAVE )

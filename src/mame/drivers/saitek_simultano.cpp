@@ -118,6 +118,7 @@ void simultano_state::machine_start()
 void simultano_state::machine_reset()
 {
 	m_power = true;
+	m_control = 0;
 	m_rombank.select(0);
 }
 
@@ -180,8 +181,8 @@ void simultano_state::select_w(u8 data)
 	// d0-d3: input/chessboard mux
 	// d6,d7: side panel led mux
 	// d4,d5: led data
-	m_display->matrix_partial(0, 2, data >> 4 & 3, 1 << (data & 0xf), false);
-	m_display->matrix_partial(2, 2, data >> 6 & 3, ~data >> 4 & 3, true);
+	m_display->matrix_partial(0, 2, data >> 4 & 3, 1 << (data & 0xf));
+	m_display->matrix_partial(2, 2, data >> 6 & 3, ~data >> 4 & 3);
 	m_select = data;
 }
 

@@ -695,7 +695,7 @@ void combatsc_state::combatsc(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	KONAMI_007452_MATH(config, "k007452");
-	
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(60);

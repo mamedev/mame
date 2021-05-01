@@ -152,18 +152,15 @@ configuration::
 Building with Microsoft Visual Studio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* You can generate Visual Studio 2017 projects using **make vs2017**.  The
+* You can generate Visual Studio 2019 projects using **make vs2019**.  The
   solution and project files will be created in
-  ``build/projects/windows/mame/vs2017`` by default (the name of the ``build``
+  ``build/projects/windows/mame/vs2019`` by default (the name of the ``build``
   folder can be changed using the ``BUILDDIR`` option).  This will always
   regenerate the settings, so **REGENIE=1** is *not* needed.
-* Adding **MSBUILD=1** to the make options will build build the solution using
+* Adding **MSBUILD=1** to the make options will build the solution using
   the Microsoft Build Engine after generating the project files.  Note that this
   requires paths and environment variables to be configured so the correct
   Visual Studio tools can be located.
-* MAME can only be compiled with the Visual Studio 15.7.6 tools.  Bugs in newer
-  versions of the Microsoft Visual C/C++ compiler prevent it from compiling
-  MAME.
 * The MSYS2 environment is still required to generate the project files, convert
   built-in layouts, compile UI translations, etc.
 
@@ -220,7 +217,7 @@ Fedora Linux
 You’ll need a few prerequisites from your Linux distribution.  Make sure you get
 SDL2 2.0.4 or later as earlier versions are buggy::
 
-    sudo dnf install gcc gcc-c++ SDL2-devel SDL2_ttf-devel libXi-devel libXinerama-devel qt5-qtbase-devel qt5-qttools expat-devel fontconfig-devel alsa-lib-devel
+    sudo dnf install gcc gcc-c++ SDL2-devel SDL2_ttf-devel libXi-devel libXinerama-devel qt5-qtbase-devel qt5-qttools expat-devel fontconfig-devel alsa-lib-devel pulseaudio-libs-devel
 
 Compilation is exactly as described above in All Platforms.
 
@@ -242,7 +239,7 @@ Debian and Ubuntu (including Raspberry Pi and ODROID devices)
 You’ll need a few prerequisites from your Linux distribution.  Make sure you get
 SDL2 2.0.4 or later as earlier versions are buggy::
 
-    sudo apt-get install git build-essential python libsdl2-dev libsdl2-ttf-dev libfontconfig-dev qt5-default
+    sudo apt-get install git build-essential python libsdl2-dev libsdl2-ttf-dev libfontconfig-dev libpulse-dev qt5-default
 
 Compilation is exactly as described above in All Platforms.  Note the Ubuntu
 Linux modifies GCC to enable the GNU C Library “fortify source” feature by

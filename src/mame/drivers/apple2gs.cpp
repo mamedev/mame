@@ -836,7 +836,7 @@ WRITE_LINE_MEMBER(apple2gs_state::ay3600_data_ready_w)
 		trans |= (special & 0x01) ? 0x0000 : 0x0200;    // caps lock is bit 9 (active low)
 
 		// hack in keypad equals because we can't find it in the IIe keymap (Sather doesn't show it in the matrix, but it's clearly on real platinum IIes)
-		if (m_lastchar == 0x146)
+		if (m_lastchar == 0x106)
 		{
 			m_transchar = '=';
 		}
@@ -2180,31 +2180,12 @@ void apple2gs_state::do_io(int offset)
 	}
 }
 
-// apple2gs_get_vpos - return the correct vertical counter value for the current scanline,
-// keeping borders in mind.
-
+// apple2gs_get_vpos - return the correct vertical counter value for the current scanline.
 int apple2gs_state::get_vpos()
 {
-	int result, scan;
-	static const u8 top_border_vert[BORDER_TOP] =
-	{
-		0xfa, 0xfa, 0xfa, 0xfa, 0xfb, 0xfb, 0xfb, 0xfb,
-		0xfc, 0xfc, 0xfc, 0xfd, 0xfd, 0xfe, 0xfe, 0xff,
-
-	};
-
-	scan = m_screen->vpos();
-
-	if (scan < BORDER_TOP)
-	{
-		result = top_border_vert[scan];
-	}
-	else
-	{
-		result = scan - BORDER_TOP + 0x100 + 1;
-	}
-
-	return result;
+	// as per IIgs Tech Note #39, this is simply scanline + 250 on NTSC (262 lines),
+	// or scanline + 200 on PAL (312 lines)
+	return ((m_screen->vpos() + BORDER_TOP) % 262) + 250;
 }
 
 void apple2gs_state::process_clock()
@@ -2457,7 +2438,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 				{
 					ret |= 0x10;
 				}
-				else if ((m_lastchar >= 0x109 && m_lastchar <= 0x10a) || (m_lastchar == 0x146))
+				else if ((m_lastchar >= 0x109 && m_lastchar <= 0x10a) || (m_lastchar == 0x106))
 				{
 					ret |= 0x10;
 				}

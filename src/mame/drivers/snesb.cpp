@@ -15,11 +15,11 @@
     - Killer Instinct
     - Legend
     - Rushing Beat Shura
-    - Sonic Blast Man 2
+    - Sonic Blast Man II Special Turbo (2 sets)
     - Venom & Spider-Man - Separation Anxiety
     - Wild Guns
 
-    Not dumped:
+    Known to exist but not dumped:
     - Final Fight 3
 
 TODO:
@@ -30,7 +30,7 @@ TODO:
    so you are awarded 55 credits on a hard reset)
  - sblast2b : dipswitches
  - sblast2b : pressing start during gameplay changes the character used. Intentional?
- - sblast2ba: needs decryption
+ - sblast2ba: needs decryption, seems to use a slightly different scheme and ROM size doesn't match the one from the original SNES game
  - denseib,2: fix gfx glitches, missing texts
  - legendsb : unknown dipswitches
  - rushbets : dipswitches (stored at memory locations $785006 and $785008)
@@ -62,7 +62,7 @@ TODO:
     extra code for coin input, etc).
 
     256 bytes of RAM (mapped to reserved area) are shared with some
-    device (probably Lattice PLD) used for handle coin inputs and dips
+    device (probably Lattice PLD) used for handling coin inputs and dips
 
     Data lines of eproms are bitswapped.
 
@@ -165,11 +165,19 @@ class snesb_state : public snes_state
 {
 public:
 	snesb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: snes_state(mconfig, type, tag)
+		: snes_state(mconfig, type, tag),
+		m_shared_ram(*this, "shared_ram%u", 1U)
 	{ }
 
+	void base(machine_config &config);
+	void endless(machine_config &config);
+	void extrainp(machine_config &config);
 	void ffight2b(machine_config &config);
 	void kinstb(machine_config &config);
+	void rushbets(machine_config &config);
+	void sblast2b(machine_config &config);
+	void venom(machine_config &config);
+	void wldgunsb(machine_config &config);
 
 	void init_iron();
 	void init_denseib();
@@ -185,56 +193,46 @@ public:
 	void init_fatfurspb();
 
 private:
-	std::unique_ptr<int8_t[]> m_shared_ram;
+	optional_shared_ptr_array<int8_t, 2> m_shared_ram;
 	uint8_t m_cnt;
-	std::unique_ptr<int8_t[]> m_shared_ram2;
-	uint8_t sharedram_r(offs_t offset);
-	void sharedram_w(offs_t offset, uint8_t data);
-	uint8_t sb2b_75bd37_r();
+	uint8_t prot_cnt_r();
 	uint8_t sb2b_6a6xxx_r(offs_t offset);
 	uint8_t sb2b_7xxx_r(offs_t offset);
 	uint8_t endless_580xxx_r(offs_t offset);
-	uint8_t endless_624b7f_r();
 	uint8_t endless_800b_r(offs_t offset);
 	uint8_t rushbets_75axxx_r(offs_t offset);
-	uint8_t rushbets_5b8e3c_r();
-	uint8_t sharedram2_r(offs_t offset);
 	uint8_t wldgunsb_722262_r();
 	uint8_t wldgunsb_723364_r();
 	uint8_t wldgunsb_721197_r();
 	uint8_t wldgunsb_72553b_r();
 	uint8_t wldgunsb_72443a_r();
 
-	void sharedram2_w(offs_t offset, uint8_t data);
 	DECLARE_MACHINE_RESET(ffight2b);
-	void mcu_io_map(address_map &map);
 	void snesb_map(address_map &map);
 	void spc_map(address_map &map);
+	void endless_map(address_map &map);
+	void extrainp_map(address_map &map);
+	void kinstb_map(address_map &map);
+	void rushbets_map(address_map &map);
+	void sblast2b_map(address_map &map);
+	void venom_map(address_map &map);
+	void wldgunsb_map(address_map &map);
 };
 
 
-/* Killer Instinct */
-uint8_t snesb_state::sharedram_r(offs_t offset)
+uint8_t snesb_state::prot_cnt_r()
 {
-	return m_shared_ram[offset];
-}
-
-void snesb_state::sharedram_w(offs_t offset, uint8_t data)
-{
-	m_shared_ram[offset]=data;
-}
-
-/* Sonic Blast Man 2 Special Turbo */
-uint8_t snesb_state::sb2b_75bd37_r()
-{
-	/* protection check */
+	// protection check
 	return ++m_cnt;
 }
 
+
+// Sonic Blast Man II Special Turbo
+
 uint8_t snesb_state::sb2b_6a6xxx_r(offs_t offset)
 {
-	/* protection checks */
-	switch(offset)
+	// protection checks
+	switch (offset)
 	{
 		case 0x26f: return 0xb1;
 		case 0x3e0: return 0x9e;
@@ -244,22 +242,22 @@ uint8_t snesb_state::sb2b_6a6xxx_r(offs_t offset)
 		case 0xfb7: return 0x47;
 	}
 
-	logerror("Unknown protection read %x @ %x\n",offset, m_maincpu->pc());
+	logerror("Unknown protection read %x @ %x\n", offset, m_maincpu->pc());
 
 	return 0;
 }
 
-uint8_t snesb_state::sb2b_7xxx_r(offs_t offset)
+uint8_t snesb_state::sb2b_7xxx_r(offs_t offset) // handler to read boot code
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(0xc07000 + offset);
 }
 
 
-/* Endless Duel */
+// Endless Duel
 uint8_t snesb_state::endless_580xxx_r(offs_t offset)
 {
-	/* protection checks */
-	switch(offset)
+	// protection checks
+	switch (offset)
 	{
 		case 0x2bc: return 0xb4;
 		case 0x36a: return 0x8a;
@@ -268,19 +266,14 @@ uint8_t snesb_state::endless_580xxx_r(offs_t offset)
 		case 0xe83: return 0x6b;
 	}
 
-	logerror("Unknown protection read %x @ %x\n",offset, m_maincpu->pc());
+	logerror("Unknown protection read %x @ %x\n", offset, m_maincpu->pc());
 
 	return 0;
 }
 
-uint8_t snesb_state::endless_624b7f_r()
-{
-	/* protection check */
-	return ++m_cnt;
-}
-
 uint8_t snesb_state::endless_800b_r(offs_t offset)
 {
+	// work around missing content
 	if (!offset)
 	{
 		return 0x50;
@@ -289,21 +282,12 @@ uint8_t snesb_state::endless_800b_r(offs_t offset)
 	return 0xe8;
 }
 
-uint8_t snesb_state::sharedram2_r(offs_t offset)
-{
-	return m_shared_ram2[offset];
-}
 
-void snesb_state::sharedram2_w(offs_t offset, uint8_t data)
-{
-	m_shared_ram2[offset]=data;
-}
-
-/* Rushing Beat Shura */
+// Rushing Beat Shura
 uint8_t snesb_state::rushbets_75axxx_r(offs_t offset)
 {
-/* protection checks */
-	switch(offset)
+// protection checks
+	switch (offset)
 	{
 		case 0xf49: return 0xe3;
 		case 0x05a: return 0xf4;
@@ -312,43 +296,40 @@ uint8_t snesb_state::rushbets_75axxx_r(offs_t offset)
 		case 0x38d: return 0x27;
 	}
 
-	logerror("Unknown protection read %x @ %x\n",offset, m_maincpu->pc());
+	logerror("Unknown protection read %x @ %x\n", offset, m_maincpu->pc());
 
 	return 0;
 }
 
-uint8_t snesb_state::rushbets_5b8e3c_r()
-{
-	/* protection check */
-	return ++m_cnt;
-}
 
-/* Wild Guns */
-uint8_t snesb_state::wldgunsb_722262_r()
+// Wild Guns
+// these read with a LDA but discard the upper 8-bit values
+
+uint8_t snesb_state::wldgunsb_722262_r() // POST
 {
 	// PC 2e2f6
 	return 0x2b;
 }
 
-uint8_t snesb_state::wldgunsb_723364_r()
+uint8_t snesb_state::wldgunsb_723364_r() // POST
 {
 	// PC b983
 	return 0x93;
 }
 
-uint8_t snesb_state::wldgunsb_721197_r()
+uint8_t snesb_state::wldgunsb_721197_r() // in-game
 {
 	// PC 2e30c
 	return 0xe4;
 }
 
-uint8_t snesb_state::wldgunsb_72553b_r()
+uint8_t snesb_state::wldgunsb_72553b_r() // in-game
 {
 	// PC 2e216
 	return 0xbf;
 }
 
-uint8_t snesb_state::wldgunsb_72443a_r()
+uint8_t snesb_state::wldgunsb_72443a_r() // in-game
 {
 	// PC 2e322
 	return 0x66;
@@ -358,14 +339,84 @@ uint8_t snesb_state::wldgunsb_72443a_r()
 void snesb_state::snesb_map(address_map &map)
 {
 	map(0x000000, 0x7dffff).rw(FUNC(snesb_state::snes_r_bank1), FUNC(snesb_state::snes_w_bank1));
-	map(0x7e0000, 0x7fffff).ram().share("wram");                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
-	map(0x800000, 0xffffff).rw(FUNC(snesb_state::snes_r_bank2), FUNC(snesb_state::snes_w_bank2));    /* Mirror and ROM */
+	map(0x7e0000, 0x7fffff).ram().share(m_wram);                 // 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM
+	map(0x800000, 0xffffff).rw(FUNC(snesb_state::snes_r_bank2), FUNC(snesb_state::snes_w_bank2));    // Mirror and ROM
 }
 
 void snesb_state::spc_map(address_map &map)
 {
 	map(0x0000, 0xffff).ram().share("aram");
 }
+
+void snesb_state::extrainp_map(address_map &map)
+{
+	snesb_map(map);
+
+	map(0x770071, 0x770071).portr("DSW1");
+	map(0x770073, 0x770073).portr("DSW2");
+	map(0x770079, 0x770079).portr("COIN");
+}
+
+void snesb_state::kinstb_map(address_map &map)
+{
+	extrainp_map(map);
+
+	map(0x781000, 0x7810ff).ram().share(m_shared_ram[0]);
+}
+
+void snesb_state::sblast2b_map(address_map &map)
+{
+	extrainp_map(map);
+
+	map(0x007000, 0x007fff).r(FUNC(snesb_state::sb2b_7xxx_r));
+	map(0x6a6000, 0x6a6fff).r(FUNC(snesb_state::sb2b_6a6xxx_r));
+	map(0x75bd37, 0x75bd37).r(FUNC(snesb_state::prot_cnt_r));
+}
+
+void snesb_state::endless_map(address_map &map)
+{
+	venom_map(map);
+
+	map(0x00800b, 0x00800c).r(FUNC(snesb_state::endless_800b_r));
+	map(0x580000, 0x580fff).r(FUNC(snesb_state::endless_580xxx_r));
+	map(0x624b7f, 0x624b7f).r(FUNC(snesb_state::prot_cnt_r));
+}
+
+void snesb_state::rushbets_map(address_map &map)
+{
+	snesb_map(map);
+
+	map(0x5b8e3c, 0x5b8e3c).r(FUNC(snesb_state::prot_cnt_r));
+	map(0x75a000, 0x75afff).r(FUNC(snesb_state::rushbets_75axxx_r));
+	map(0x770071, 0x770071).portr("DSW1");
+	map(0x770079, 0x770079).portr("COIN");
+	map(0x785000, 0x78500f).ram().share(m_shared_ram[0]);
+}
+
+void snesb_state::venom_map(address_map &map)
+{
+	extrainp_map(map);
+
+	map(0x781000, 0x781021).ram().share(m_shared_ram[0]);
+	map(0x781200, 0x781221).ram().share(m_shared_ram[1]);
+}
+
+void snesb_state::wldgunsb_map(address_map &map)
+{
+	snesb_map(map);
+
+	map(0x721197, 0x721197).r(FUNC(snesb_state::wldgunsb_721197_r));
+	map(0x722262, 0x722262).r(FUNC(snesb_state::wldgunsb_722262_r));
+	map(0x723363, 0x723363).r(FUNC(snesb_state::wldgunsb_723364_r));
+	map(0x72443a, 0x72443a).r(FUNC(snesb_state::wldgunsb_72443a_r));
+	map(0x72553b, 0x72553b).r(FUNC(snesb_state::wldgunsb_72553b_r));
+	map(0x770071, 0x770071).portr("DSW1");
+	map(0x770072, 0x770072).portr("DSW2");
+	map(0x770079, 0x770079).portr("COIN");
+	map(0x781000, 0x781021).ram().share(m_shared_ram[0]);
+	map(0x7bf45b, 0x7bf45b).r(FUNC(snesb_state::prot_cnt_r));
+}
+
 
 static INPUT_PORTS_START( snes_common )
 
@@ -459,28 +510,28 @@ static INPUT_PORTS_START( snes_common )
 INPUT_PORTS_END
 
 
-/* verified from 5A22 code */
+// verified from 5A22 code
 static INPUT_PORTS_START( kinstb )
 	PORT_INCLUDE(snes_common)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, "0 (Easiest)" )               /* "EASY" (0 star) */
-	PORT_DIPSETTING(    0x01, "1" )                         /* (1 star) */
-	PORT_DIPSETTING(    0x02, "2" )                         /* (2 stars) */
-	PORT_DIPSETTING(    0x03, "3" )                         /* (3 stars) */
-	PORT_DIPSETTING(    0x04, "4" )                         /* (4 stars) */
-	PORT_DIPSETTING(    0x05, "5" )                         /* "HARD" (5 stars) */
-	PORT_DIPSETTING(    0x06, "6" )                         /* undefined */
-	PORT_DIPSETTING(    0x07, "7" )                         /* undefined */
-	PORT_DIPSETTING(    0x08, "8" )                         /* undefined */
-	PORT_DIPSETTING(    0x09, "9" )                         /* undefined */
-	PORT_DIPSETTING(    0x0a, "10" )                        /* undefined */
-	PORT_DIPSETTING(    0x0b, "11" )                        /* undefined */
-	PORT_DIPSETTING(    0x0c, "12" )                        /* undefined */
-	PORT_DIPSETTING(    0x0d, "13" )                        /* undefined */
-	PORT_DIPSETTING(    0x0e, "14" )                        /* undefined */
-	PORT_DIPSETTING(    0x0f, "15 (Hardest)" )              /* undefined */
+	PORT_DIPSETTING(    0x00, "0 (Easiest)" )               // "EASY" (0 star)
+	PORT_DIPSETTING(    0x01, "1" )                         // (1 star)
+	PORT_DIPSETTING(    0x02, "2" )                         // (2 stars)
+	PORT_DIPSETTING(    0x03, "3" )                         // (3 stars)
+	PORT_DIPSETTING(    0x04, "4" )                         // (4 stars)
+	PORT_DIPSETTING(    0x05, "5" )                         // "HARD" (5 stars)
+	PORT_DIPSETTING(    0x06, "6" )                         // undefined
+	PORT_DIPSETTING(    0x07, "7" )                         // undefined
+	PORT_DIPSETTING(    0x08, "8" )                         // undefined
+	PORT_DIPSETTING(    0x09, "9" )                         // undefined
+	PORT_DIPSETTING(    0x0a, "10" )                        // undefined
+	PORT_DIPSETTING(    0x0b, "11" )                        // undefined
+	PORT_DIPSETTING(    0x0c, "12" )                        // undefined
+	PORT_DIPSETTING(    0x0d, "13" )                        // undefined
+	PORT_DIPSETTING(    0x0e, "14" )                        // undefined
+	PORT_DIPSETTING(    0x0f, "15 (Hardest)" )              // undefined
 	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
@@ -514,7 +565,7 @@ static INPUT_PORTS_START( kinstb )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
-/* verified from 5A22 code */
+// verified from 5A22 code
 static INPUT_PORTS_START( ffight2b )
 	PORT_INCLUDE(snes_common)
 
@@ -524,7 +575,7 @@ static INPUT_PORTS_START( ffight2b )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            /* duplicate setting */
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            // duplicate setting
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
@@ -533,11 +584,11 @@ static INPUT_PORTS_START( ffight2b )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )       /* "GAME LEVEL" */
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )       // "GAME LEVEL"
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )          /* "EXPERT" */
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )          // "EXPERT"
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "100k 300k 200k+" )
 	PORT_DIPSETTING(    0x80, DEF_STR( None ) )
@@ -557,7 +608,7 @@ static INPUT_PORTS_START( ffight2b )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
-/* verified from 5A22 code */
+// verified from 5A22 code
 static INPUT_PORTS_START( iron )
 	PORT_INCLUDE(snes_common)
 
@@ -567,7 +618,7 @@ static INPUT_PORTS_START( iron )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            /* duplicate setting */
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            // duplicate setting
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
@@ -577,15 +628,15 @@ static INPUT_PORTS_START( iron )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )       /* "LEVEL" */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )       // "LEVEL"
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )           /* "MEDIUM" */
+	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )           // "MEDIUM"
 	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )             /* duplicate setting */
-	PORT_DIPNAME( 0x04, 0x04, "Suffered Damages" )          /* code at 0x(8)082d0 */
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )             // duplicate setting
+	PORT_DIPNAME( 0x04, 0x04, "Suffered Damages" )          // code at 0x(8)082d0
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "More" )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )            /* table at 0x(8)3ffda (4 * 1 word) gives 02 03 04 05 (add 1) but extra LSRA before TAY at 0x(8)3ffcf */
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )            // table at 0x(8)3ffda (4 * 1 word) gives 02 03 04 05 (add 1) but extra LSRA before TAY at 0x(8)3ffcf
 	PORT_DIPSETTING(    0x18, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x10, "769 (Bug)" )
@@ -601,7 +652,7 @@ static INPUT_PORTS_START( iron )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
-/* verified from 5A22 code */
+// verified from 5A22 code
 static INPUT_PORTS_START( denseib )
 	PORT_INCLUDE(snes_common)
 
@@ -611,15 +662,15 @@ static INPUT_PORTS_START( denseib )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            /* duplicate setting */
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            // duplicate setting
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Difficulty ) )       /* "RANK" */
+	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Difficulty ) )       // "RANK"
 	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )             /* duplicate setting */
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )             // duplicate setting
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x80, 0x00, "Mode" )
@@ -627,7 +678,7 @@ static INPUT_PORTS_START( denseib )
 	PORT_DIPSETTING(    0x80, "Battle" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x07, 0x07, "Suffered Damages" )          /* code at 0x(8)0f810 */
+	PORT_DIPNAME( 0x07, 0x07, "Suffered Damages" )          // code at 0x(8)0f810
 	PORT_DIPSETTING(    0x07, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x06, "x1.5" )
 	PORT_DIPSETTING(    0x05, "x2.5" )
@@ -646,7 +697,7 @@ static INPUT_PORTS_START( denseib )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
-/* verified from 5A22 code */
+// verified from 5A22 code
 static INPUT_PORTS_START( sblast2b )
 	PORT_INCLUDE(snes_common)
 
@@ -656,19 +707,19 @@ static INPUT_PORTS_START( sblast2b )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            /* duplicate setting */
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            // duplicate setting
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Difficulty ) )       /* "LEVEL" */
-	PORT_DIPSETTING(    0x38, "0 (Easiest)" )               /* "NORMAL" */
-	PORT_DIPSETTING(    0x30, "1" )                         /* "HARD" */
-	PORT_DIPSETTING(    0x28, "2" )                         /* undefined */
-	PORT_DIPSETTING(    0x20, "3" )                         /* undefined */
-	PORT_DIPSETTING(    0x18, "4" )                         /* undefined */
-	PORT_DIPSETTING(    0x10, "5" )                         /* undefined */
-	PORT_DIPSETTING(    0x08, "6" )                         /* undefined */
-	PORT_DIPSETTING(    0x00, "7 (Hardest)" )               /* undefined */
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Difficulty ) )       // "LEVEL"
+	PORT_DIPSETTING(    0x38, "0 (Easiest)" )               // "NORMAL"
+	PORT_DIPSETTING(    0x30, "1" )                         // "HARD"
+	PORT_DIPSETTING(    0x28, "2" )                         // undefined
+	PORT_DIPSETTING(    0x20, "3" )                         // undefined
+	PORT_DIPSETTING(    0x18, "4" )                         // undefined
+	PORT_DIPSETTING(    0x10, "5" )                         // undefined
+	PORT_DIPSETTING(    0x08, "6" )                         // undefined
+	PORT_DIPSETTING(    0x00, "7 (Hardest)" )               // undefined
 	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "2" )
@@ -705,24 +756,24 @@ static INPUT_PORTS_START( endless )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            /* duplicate setting */
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            // duplicate setting
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Difficulty ) )       /* "LEVEL" */
-	PORT_DIPSETTING(    0x38, "0 (Easiest)" )               /* "EASY" */
-	PORT_DIPSETTING(    0x30, "1" )                         /* "NORMAL" */
-	PORT_DIPSETTING(    0x28, "2" )                         /* "HARD" */
-	PORT_DIPSETTING(    0x20, "3" )                         /* undefined */
-	PORT_DIPSETTING(    0x18, "4" )                         /* undefined */
-	PORT_DIPSETTING(    0x10, "5" )                         /* undefined */
-	PORT_DIPSETTING(    0x08, "6" )                         /* undefined */
-	PORT_DIPSETTING(    0x00, "7 (Hardest)" )               /* undefined */
-	PORT_DIPNAME( 0xc0, 0xc0, "Time" )                      /* "TIME" */
-	PORT_DIPSETTING(    0xc0, "99" )                        /* "LIMIT" */
-	PORT_DIPSETTING(    0x80, "60" )                        /* undefined */
-	PORT_DIPSETTING(    0x40, "30" )                        /* undefined */
-	PORT_DIPSETTING(    0x00, "Infinite" )                  /* "NO LIMIT" */
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Difficulty ) )       // "LEVEL"
+	PORT_DIPSETTING(    0x38, "0 (Easiest)" )               // "EASY"
+	PORT_DIPSETTING(    0x30, "1" )                         // "NORMAL"
+	PORT_DIPSETTING(    0x28, "2" )                         // "HARD"
+	PORT_DIPSETTING(    0x20, "3" )                         // undefined
+	PORT_DIPSETTING(    0x18, "4" )                         // undefined
+	PORT_DIPSETTING(    0x10, "5" )                         // undefined
+	PORT_DIPSETTING(    0x08, "6" )                         // undefined
+	PORT_DIPSETTING(    0x00, "7 (Hardest)" )               // undefined
+	PORT_DIPNAME( 0xc0, 0xc0, "Time" )                      // "TIME"
+	PORT_DIPSETTING(    0xc0, "99" )                        // "LIMIT"
+	PORT_DIPSETTING(    0x80, "60" )                        // undefined
+	PORT_DIPSETTING(    0x40, "30" )                        // undefined
+	PORT_DIPSETTING(    0x00, "Infinite" )                  // "NO LIMIT"
 
 	PORT_START("DSW2")
 	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
@@ -748,7 +799,7 @@ static INPUT_PORTS_START( rushbets )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            /* duplicate setting */
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            // duplicate setting
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
@@ -781,7 +832,7 @@ static INPUT_PORTS_START( venom )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            /* duplicate setting */
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )            // duplicate setting
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
@@ -838,14 +889,13 @@ static INPUT_PORTS_START( wldgunsb )
 	PORT_DIPSETTING(    0x00, "4" )
 INPUT_PORTS_END
 
-void snesb_state::kinstb(machine_config &config)
+void snesb_state::base(machine_config &config)
 {
-	/* basic machine hardware */
-	_5A22(config, m_maincpu, 3580000*6);   /* 2.68Mhz, also 3.58Mhz */
+	// basic machine hardware
+	_5A22(config, m_maincpu, 3580000 * 6);   // 2.68Mhz, also 3.58Mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &snesb_state::snesb_map);
 
-	/* audio CPU */
-	// runs at 24.576 MHz / 12 = 2.048 MHz
+	// audio CPU, runs at 24.576 MHz / 12 = 2.048 MHz
 	S_SMP(config, m_soundcpu, XTAL(24'576'000) / 12);
 	m_soundcpu->set_addrmap(AS_DATA, &snesb_state::spc_map);
 	m_soundcpu->dsp_io_read_callback().set(m_s_dsp, FUNC(s_dsp_device::dsp_io_r));
@@ -853,7 +903,7 @@ void snesb_state::kinstb(machine_config &config)
 
 	config.set_perfect_quantum(m_maincpu);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, SNES_SCR_WIDTH * 2, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC);
 	m_screen->set_video_attributes(VIDEO_VARIABLE_WIDTH);
@@ -863,7 +913,7 @@ void snesb_state::kinstb(machine_config &config)
 	m_ppu->open_bus_callback().set([this] { return snes_open_bus_r(); }); // lambda because overloaded function name
 	m_ppu->set_screen("screen");
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
@@ -873,37 +923,79 @@ void snesb_state::kinstb(machine_config &config)
 	m_s_dsp->add_route(1, "rspeaker", 1.00);
 }
 
+void snesb_state::extrainp(machine_config &config)
+{
+	base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &snesb_state::extrainp_map);
+}
+
+void snesb_state::kinstb(machine_config &config)
+{
+	base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &snesb_state::kinstb_map);
+}
+
 MACHINE_RESET_MEMBER( snesb_state, ffight2b )
 {
 	address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
 	snes_state::machine_reset();
 
-	/* Hack: avoid starting with 55 credits. It's either a work RAM init fault or MCU clears it by his own, hard to tell ... */
+	// Hack: avoid starting with 55 credits. It's either a work RAM init fault or MCU clears it by his own, hard to tell ...
 	cpu0space.write_byte(0x7eadce, 0x00);
 }
 
 void snesb_state::ffight2b(machine_config &config)
 {
-	kinstb(config);
+	extrainp(config);
+
 	MCFG_MACHINE_RESET_OVERRIDE( snesb_state, ffight2b )
+}
+
+void snesb_state::sblast2b(machine_config &config)
+{
+	base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &snesb_state::sblast2b_map);
+}
+
+void snesb_state::endless(machine_config &config)
+{
+	base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &snesb_state::endless_map);
+}
+
+void snesb_state::rushbets(machine_config &config)
+{
+	base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &snesb_state::rushbets_map);
+}
+
+void snesb_state::venom(machine_config &config)
+{
+	base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &snesb_state::venom_map);
+}
+
+void snesb_state::wldgunsb(machine_config &config)
+{
+	base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &snesb_state::wldgunsb_map);
 }
 
 void snesb_state::init_kinstb()
 {
 	uint8_t *rom = memregion("user3")->base();
 
-	for (int32_t i = 0; i < 0x400000; i++)
+	for (uint32_t i = 0; i < 0x400000; i++)
 	{
 		rom[i] = bitswap<8>(rom[i], 5, 0, 6, 1, 7, 4, 3, 2);
 	}
-
-	m_shared_ram = std::make_unique<int8_t[]>(0x100);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781000, 0x7810ff, read8sm_delegate(*this, FUNC(snesb_state::sharedram_r)), write8sm_delegate(*this, FUNC(snesb_state::sharedram_w)));
-
-	/* extra inputs */
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770071, 0x770071, "DSW1");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770073, 0x770073, "DSW2");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770079, 0x770079, "COIN");
 
 	init_snes_hirom();
 }
@@ -912,7 +1004,7 @@ void snesb_state::init_fatfurspb()
 {
 	uint8_t *rom = memregion("user3")->base();
 
-	for (int32_t i = 0; i < 0x400000; i++)
+	for (uint32_t i = 0; i < 0x400000; i++)
 	{
 		rom[i] = bitswap<8>(rom[i], 5, 0, 6, 1, 7, 4, 3, 2); // Same as kinstb
 	}
@@ -926,40 +1018,25 @@ void snesb_state::init_ffight2b()
 {
 	uint8_t *rom = memregion("user3")->base();
 
-	for (int32_t i = 0; i < 0x200000; i++)
+	for (uint32_t i = 0; i < 0x140000; i++)
 	{
 		rom[i] = rom[i] ^ 0xff;
 
-		if (i < 0x10000) /* 0x00000 - 0x0ffff */
-		{
-			rom[i] = bitswap<8>(rom[i],3,1,6,4,7,0,2,5);
-		}
-		else if (i < 0x20000) /* 0x10000 - 0x1ffff */
-		{
-			rom[i] = bitswap<8>(rom[i],3,7,0,5,1,6,2,4);
-		}
-		else if (i < 0x30000) /* 0x20000 - 0x2ffff */
-		{
-			rom[i] = bitswap<8>(rom[i],1,7,6,4,5,2,3,0);
-		}
-		else if (i < 0x40000) /* 0x30000 - 0x3ffff */
-		{
-			rom[i] = bitswap<8>(rom[i],0,3,2,5,4,6,7,1);
-		}
-		else if (i < 0x150000)
-		{
-			rom[i] = bitswap<8>(rom[i],6,4,0,5,1,3,2,7);
-		}
+		if (i < 0x10000)
+			rom[i] = bitswap<8>(rom[i], 3, 1, 6, 4, 7, 0, 2, 5);
+		else if (i < 0x20000)
+			rom[i] = bitswap<8>(rom[i],3, 7, 0, 5, 1, 6, 2, 4);
+		else if (i < 0x30000)
+			rom[i] = bitswap<8>(rom[i], 1, 7, 6, 4, 5, 2, 3, 0);
+		else if (i < 0x40000)
+			rom[i] = bitswap<8>(rom[i], 0, 3, 2, 5, 4, 6, 7, 1);
+		else if (i < 0x140000)
+			rom[i] = bitswap<8>(rom[i], 6, 4, 0, 5, 1, 3, 2, 7);
 	}
 
-	/* boot vector */
+	// boot vector
 	rom[0x7ffd] = 0x89;
 	rom[0x7ffc] = 0x54;
-
-	/* extra inputs */
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770071, 0x770071, "DSW1");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770073, 0x770073, "DSW2");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770079, 0x770079, "COIN");
 
 	init_snes();
 }
@@ -968,22 +1045,13 @@ void snesb_state::init_iron()
 {
 	uint8_t *rom = memregion("user3")->base();
 
-	for (int32_t i = 0; i < 0x140000; i++)
+	for (uint32_t i = 0; i < 0x140000; i++)
 	{
 		if (i < 0x80000)
-		{
-			rom[i] = bitswap<8>(rom[i]^0xff,2,7,1,6,3,0,5,4);
-		}
+			rom[i] = bitswap<8>(rom[i] ^ 0xff, 2, 7, 1, 6, 3, 0, 5, 4);
 		else
-		{
-			rom[i] = bitswap<8>(rom[i],6,3,0,5,1,4,7,2);
-		}
+			rom[i] = bitswap<8>(rom[i], 6, 3, 0, 5, 1, 4, 7, 2);
 	}
-
-	/* extra inputs */
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770071, 0x770071, "DSW1");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770073, 0x770073, "DSW2");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770079, 0x770079, "COIN");
 
 	init_snes();
 }
@@ -992,28 +1060,23 @@ void snesb_state::init_denseib()
 {
 	uint8_t *rom = memregion("user3")->base();
 
-	for (int32_t i = 0; i < 0x200000; i++)
+	for (uint32_t i = 0; i < 0x200000; i++)
 	{
 		rom[i] = rom[i] ^ 0xff;
 		switch (i >> 16)
 		{
-			case 0x00: rom[i] = bitswap<8>(rom[i],1,7,0,6,3,4,5,2); break;
-			case 0x01: rom[i] = bitswap<8>(rom[i],3,4,7,2,0,6,5,1); break;
-			case 0x02: rom[i] = bitswap<8>(rom[i],5,4,2,1,7,0,6,3); break;
-			case 0x03: rom[i] = bitswap<8>(rom[i],0,1,3,7,2,6,5,4); break;
+			case 0x00: rom[i] = bitswap<8>(rom[i], 1, 7, 0, 6, 3, 4, 5, 2); break;
+			case 0x01: rom[i] = bitswap<8>(rom[i], 3, 4, 7, 2, 0, 6, 5, 1); break;
+			case 0x02: rom[i] = bitswap<8>(rom[i], 5, 4, 2, 1, 7, 0, 6, 3); break;
+			case 0x03: rom[i] = bitswap<8>(rom[i], 0, 1, 3, 7, 2, 6, 5, 4); break;
 
-			default:   rom[i] = bitswap<8>(rom[i],4,5,1,0,2,3,7,6); break;
+			default:   rom[i] = bitswap<8>(rom[i], 4, 5, 1, 0, 2, 3, 7, 6); break;
 		}
 	}
 
-	/* boot vector */
+	// boot vector
 	rom[0xfffc] = 0x40;
 	rom[0xfffd] = 0xf7;
-
-	/* extra inputs */
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770071, 0x770071, "DSW1");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770073, 0x770073, "DSW2");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770079, 0x770079, "COIN");
 
 	init_snes_hirom();
 }
@@ -1049,65 +1112,51 @@ void snesb_state::init_denseib2()
 	{
 		int j = (address_tab_high[i >> 15] << 15) + (i & 0x7fc0) + address_tab_low[i & 0x3f];
 
-		dst[i] = data_high[src[j]>>4] | data_low[src[j]&0xf];
+		dst[i] = data_high[src[j] >> 4] | data_low[src[j] & 0xf];
 
-		if (i >= 0x00000 && i < 0x10000) {
-			dst[i] = bitswap<8>(dst[i],2,1,3,0,7,4,5,6) ^ 0xff;
-		}
+		if (i >= 0x00000 && i < 0x10000)
+			dst[i] = bitswap<8>(dst[i], 2, 1, 3, 0, 7, 4, 5, 6) ^ 0xff;
 
-		if (i >= 0x10000 && i < 0x20000) {
-			dst[i] = bitswap<8>(dst[i],1,7,4,5,6,0,3,2);
-		}
+		if (i >= 0x10000 && i < 0x20000)
+			dst[i] = bitswap<8>(dst[i], 1, 7, 4, 5, 6, 0, 3, 2);
 
-		if (i >= 0x20000 && i < 0x30000) {
-			dst[i] = bitswap<8>(dst[i],0,2,6,7,5,3,4,1) ^ 0xff;
-		}
+		if (i >= 0x20000 && i < 0x30000)
+			dst[i] = bitswap<8>(dst[i], 0, 2, 6, 7, 5, 3, 4, 1) ^ 0xff;
 
-		if (i >= 0x30000 && i < 0x40000) {
-			dst[i] = bitswap<8>(dst[i],6,5,0,3,1,7,2,4) ^ 0xff;
-		}
+		if (i >= 0x30000 && i < 0x40000)
+			dst[i] = bitswap<8>(dst[i], 6, 5, 0, 3, 1, 7, 2, 4) ^ 0xff;
 	}
 
-	/* boot vector */
+	// boot vector
 	dst[0xfffc] = 0x40;
 	dst[0xfffd] = 0xf7;
-
-	/* extra inputs */
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770071, 0x770071, "DSW1");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770073, 0x770073, "DSW2");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770079, 0x770079, "COIN");
 
 	init_snes_hirom();
 }
 
 void snesb_state::init_legendsb()
 {
-	u8 *rom = memregion("user3")->base();
+	uint8_t *rom = memregion("user3")->base();
 
-	for(int i = 0; i < 0x100000; i++)
+	for (int i = 0; i < 0x100000; i++)
 	{
-		u8 val = rom[i] ^ 0xff;
+		uint8_t val = rom[i] ^ 0xff;
 
 		if (i < 0x10000)
-			rom[i] = bitswap<8>(val,6,5,4,2,1,0,3,7); // 0x00000 - 0x0ffff
+			rom[i] = bitswap<8>(val, 6, 5, 4, 2, 1, 0, 3, 7);
 		else if (i < 0x20000)
-			rom[i] = bitswap<8>(val,6,1,3,5,2,0,7,4); // 0x10000 - 0x1ffff
+			rom[i] = bitswap<8>(val, 6, 1, 3, 5, 2, 0, 7, 4);
 		else if (i < 0x30000)
-			rom[i] = bitswap<8>(val,2,6,3,0,4,5,7,1); // 0x20000 - 0x2ffff
+			rom[i] = bitswap<8>(val, 2, 6, 3, 0, 4, 5, 7, 1);
 		else if (i < 0x40000)
-			rom[i] = bitswap<8>(val,5,4,2,7,0,3,6,1); // 0x30000 - 0x3ffff
+			rom[i] = bitswap<8>(val, 5, 4, 2, 7, 0, 3, 6, 1);
 		else
-			rom[i] = bitswap<8>(val,3,6,0,5,1,4,7,2); // 0x40000 - 0xfffff
+			rom[i] = bitswap<8>(val, 3, 6, 0, 5, 1, 4, 7, 2);
 	}
 
 	// boot vector
 	rom[0x7ffc] = 0x19;
 	rom[0x7ffd] = 0x80;
-
-	// extra inputs
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770071, 0x770071, "DSW1");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770073, 0x770073, "DSW2");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770079, 0x770079, "COIN");
 
 	init_snes();
 }
@@ -1138,43 +1187,30 @@ void snesb_state::init_sblast2b()
 		0x88, 0x02, 0x2a, 0x08, 0x28, 0xaa, 0x8a, 0x0a, 0xa2, 0x00, 0x80, 0xa0, 0x22, 0xa8, 0x82, 0x20
 	};
 
-	for (int i = 0; i < 0x180000; i++) {
+	for (int i = 0; i < 0x180000; i++)
+	{
 		int j = (address_tab_high[i >> 15] << 15) + (i & 0x7fc0) + address_tab_low[i & 0x3f];
 
-		dst[i] = data_high[src[j]>>4] | data_low[src[j]&0xf];
+		dst[i] = data_high[src[j] >> 4] | data_low[src[j] & 0xf];
 
-		if (i >= 0x00000 && i < 0x10000) {
+		if (i >= 0x00000 && i < 0x10000)
 			dst[i] = bitswap<8>(dst[i], 6, 3, 5, 4, 2, 0, 7, 1) ^ 0xff;
-		}
 
-		if (i >= 0x10000 && i < 0x20000) {
+		if (i >= 0x10000 && i < 0x20000)
 			dst[i] = bitswap<8>(dst[i], 4, 0, 7, 6, 3, 1, 2, 5) ^ 0xff;
-		}
 
-		if (i >= 0x20000 && i < 0x30000) {
+		if (i >= 0x20000 && i < 0x30000)
 			dst[i] = bitswap<8>(dst[i], 5, 7, 6, 1, 4, 3, 0, 2);
-		}
 
-		if (i >= 0x30000 && i < 0x40000) {
+		if (i >= 0x30000 && i < 0x40000)
 			dst[i] = bitswap<8>(dst[i], 3, 1, 2, 0, 5, 6, 4, 7) ^ 0xff;
-		}
 	}
 
-	/*  boot vector */
+	//  boot vector
 	dst[0xfffc] = 0xc0;
 	dst[0xfffd] = 0x7a;
 
-	/*  protection checks */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x75bd37, 0x75bd37, read8smo_delegate(*this, FUNC(snesb_state::sb2b_75bd37_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6a6000, 0x6a6fff, read8sm_delegate(*this, FUNC(snesb_state::sb2b_6a6xxx_r)));
-
-	/* handler to read boot code */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x007000, 0x007fff, read8sm_delegate(*this, FUNC(snesb_state::sb2b_7xxx_r)));
-
-	/* extra inputs */
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770071, 0x770071, "DSW1");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770073, 0x770073, "DSW2");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770079, 0x770079, "COIN");
+	save_item(NAME(m_cnt));
 
 	init_snes_hirom();
 }
@@ -1206,48 +1242,30 @@ void snesb_state::init_endless()
 		0x41, 0x46, 0x02, 0x43, 0x03, 0x00, 0x40, 0x42, 0x04, 0x47, 0x45, 0x05, 0x06, 0x01, 0x44, 0x07
 	};
 
-	for (int i = 0; i < 0x200000; i++) {
+	for (int i = 0; i < 0x200000; i++)
+	{
 		int j = (address_tab_high[i >> 15] << 15) + (i & 0x7fc0) + address_tab_low[i & 0x3f];
 
-		dst[i] = data_high[src[j]>>4] | data_low[src[j]&0xf];
+		dst[i] = data_high[src[j] >> 4] | data_low[src[j] & 0xf];
 
-		if (i >= 0x00000 && i < 0x10000) {
-			dst[i] = bitswap<8>(dst[i],2,3,4,1,7,0,6,5);
-		}
+		if (i >= 0x00000 && i < 0x10000)
+			dst[i] = bitswap<8>(dst[i], 2, 3, 4, 1, 7, 0, 6, 5);
 
-		if (i >= 0x10000 && i < 0x20000) {
-			dst[i] = bitswap<8>(dst[i],1,5,6,0,2,4,7,3) ^ 0xff;
-		}
+		if (i >= 0x10000 && i < 0x20000)
+			dst[i] = bitswap<8>(dst[i], 1, 5, 6, 0, 2, 4, 7, 3) ^ 0xff;
 
-		if (i >= 0x20000 && i < 0x30000) {
-			dst[i] = bitswap<8>(dst[i],3,0,1,6,4,5,2,7);
-		}
+		if (i >= 0x20000 && i < 0x30000)
+			dst[i] = bitswap<8>(dst[i], 3, 0, 1, 6, 4, 5, 2, 7);
 
-		if (i >= 0x30000 && i < 0x40000) {
-			dst[i] = bitswap<8>(dst[i],0,4,2,3,5,6,7,1) ^ 0xff;
-		}
+		if (i >= 0x30000 && i < 0x40000)
+			dst[i] = bitswap<8>(dst[i], 0, 4, 2, 3, 5, 6, 7, 1) ^ 0xff;
 	}
 
-	/*  boot vector */
+	//  boot vector
 	dst[0x7ffc] = 0x00;
 	dst[0x7ffd] = 0x80;
 
-	/* protection checks */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x580000, 0x580fff, read8sm_delegate(*this, FUNC(snesb_state::endless_580xxx_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x624b7f, 0x624b7f, read8smo_delegate(*this, FUNC(snesb_state::endless_624b7f_r)));
-
-	/* work around missing content */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800b, 0x800c, read8sm_delegate(*this, FUNC(snesb_state::endless_800b_r)));
-
-	m_shared_ram = std::make_unique<int8_t[]>(0x22);
-	m_shared_ram2 = std::make_unique<int8_t[]>(0x22);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781000, 0x781021, read8sm_delegate(*this, FUNC(snesb_state::sharedram_r)), write8sm_delegate(*this, FUNC(snesb_state::sharedram_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781200, 0x781221, read8sm_delegate(*this, FUNC(snesb_state::sharedram2_r)), write8sm_delegate(*this, FUNC(snesb_state::sharedram2_w)));
-
-	/* extra inputs */
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770071, 0x770071, "DSW1");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770073, 0x770073, "DSW2");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770079, 0x770079, "COIN");
+	save_item(NAME(m_cnt));
 
 	init_snes();
 }
@@ -1277,42 +1295,30 @@ void snesb_state::init_rushbets()
 		0x28, 0x01, 0x61, 0x20, 0x60, 0x69, 0x29, 0x21, 0x49, 0x00, 0x08, 0x48, 0x41, 0x68, 0x09, 0x40
 	};
 
-	for (int i = 0; i < 0x200000; i++) {
+	for (int i = 0; i < 0x200000; i++)
+	{
 		int j = (address_tab_high[(i >> 15) & 0x1f] << 15) + (i & 0x107fc0) + address_tab_low[i & 0x3f];
 
-		dst[i] = data_high[src[j]>>4] | data_low[src[j]&0xf];
+		dst[i] = data_high[src[j] >> 4] | data_low[src[j] & 0xf];
 
-		if (i >= 0x00000 && i < 0x10000) {
+		if (i >= 0x00000 && i < 0x10000)
 			dst[i] = bitswap<8>(dst[i], 0, 7, 6, 3, 5, 4, 1, 2) ^ 0xff;
-		}
 
-		if (i >= 0x10000 && i < 0x20000) {
+		if (i >= 0x10000 && i < 0x20000)
 			dst[i] = bitswap<8>(dst[i], 2, 1, 3, 7, 6, 5, 4, 0) ^ 0xff;
-		}
 
-		if (i >= 0x20000 && i < 0x30000) {
+		if (i >= 0x20000 && i < 0x30000)
 			dst[i] = bitswap<8>(dst[i], 4, 6, 0, 2, 7, 3, 5, 1);
-		}
 
-		if (i >= 0x30000 && i < 0x40000) {
+		if (i >= 0x30000 && i < 0x40000)
 			dst[i] = bitswap<8>(dst[i], 5, 4, 7, 1, 0, 6, 2, 3) ^ 0xff;
-		}
 	}
-
-	/* protection checks */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x75a000, 0x75afff, read8sm_delegate(*this, FUNC(snesb_state::rushbets_75axxx_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5b8e3c, 0x5b8e3c, read8smo_delegate(*this, FUNC(snesb_state::rushbets_5b8e3c_r)));
-
-	m_shared_ram = std::make_unique<int8_t[]>(0x10);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x785000, 0x78500f, read8sm_delegate(*this, FUNC(snesb_state::sharedram_r)), write8sm_delegate(*this, FUNC(snesb_state::sharedram_w)));
-
-	/* extra inputs */
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770071, 0x770071, "DSW1");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770079, 0x770079, "COIN");
 
 	// boot vector
 	dst[0xfffc] = 0xec;
 	dst[0xfffd] = 0x80;
+
+	save_item(NAME(m_cnt));
 
 	init_snes_hirom();
 }
@@ -1350,38 +1356,24 @@ void snesb_state::init_venom()
 	{
 		int j = (address_tab_high[i >> 15] << 15) + (i & 0x7fc0) + address_tab_low[i & 0x3f];
 
-		dst[i] = data_high[src[j]>>4] | data_low[src[j]&0xf];
+		dst[i] = data_high[src[j] >> 4] | data_low[src[j] & 0xf];
 
-		if (i >= 0x00000 && i < 0x10000) {
+		if (i >= 0x00000 && i < 0x10000)
 			dst[i] = bitswap<8>(dst[i], 6, 7, 0, 3, 1, 4, 2, 5) ^ 0xff;
-		}
 
-		if (i >= 0x10000 && i < 0x20000) {
+		if (i >= 0x10000 && i < 0x20000)
 			dst[i] = bitswap<8>(dst[i], 0, 1, 4, 5, 3, 7, 6, 2);
-		}
 
-		if (i >= 0x20000 && i < 0x30000) {
+		if (i >= 0x20000 && i < 0x30000)
 			dst[i] = bitswap<8>(dst[i], 1, 3, 2, 6, 5, 4, 0, 7) ^ 0xff;
-		}
 
-		if (i >= 0x30000 && i < 0x40000) {
+		if (i >= 0x30000 && i < 0x40000)
 			dst[i] = bitswap<8>(dst[i], 4, 0, 7, 6, 2, 1, 5, 3);
-		}
 	}
 
 	// boot vector
 	dst[0x7ffc] = 0x98;
 	dst[0x7ffd] = 0xff;
-
-	m_shared_ram = std::make_unique<int8_t[]>(0x22);
-	m_shared_ram2 = std::make_unique<int8_t[]>(0x22);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781000, 0x781021, read8sm_delegate(*this, FUNC(snesb_state::sharedram_r)), write8sm_delegate(*this, FUNC(snesb_state::sharedram_w)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781200, 0x781221, read8sm_delegate(*this, FUNC(snesb_state::sharedram2_r)), write8sm_delegate(*this, FUNC(snesb_state::sharedram2_w)));
-
-	/* extra inputs */
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770071, 0x770071, "DSW1");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770073, 0x770073, "DSW2");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770079, 0x770079, "COIN");
 
 	init_snes();
 }
@@ -1415,50 +1407,26 @@ void snesb_state::init_wldgunsb()
 	{
 		int j = (address_tab_high[i >> 15] << 15) + (i & 0x7fc0) + address_tab_low[i & 0x3f];
 
-		dst[i] = data_high[src[j]>>4] | data_low[src[j]&0xf];
+		dst[i] = data_high[src[j] >> 4] | data_low[src[j] & 0xf];
 
-		if (i >= 0x00000 && i < 0x10000) {
+		if (i >= 0x00000 && i < 0x10000)
 			dst[i] = bitswap<8>(dst[i], 3, 1, 7, 0, 6, 4, 5, 2) ^ 0xff;
-		}
 
-		if (i >= 0x10000 && i < 0x20000) {
+		if (i >= 0x10000 && i < 0x20000)
 			dst[i] = bitswap<8>(dst[i], 4, 7, 3, 2, 0, 1, 6, 5);
-		}
 
-		if (i >= 0x20000 && i < 0x30000) {
+		if (i >= 0x20000 && i < 0x30000)
 			dst[i] = bitswap<8>(dst[i], 6, 0, 7, 1, 4, 3, 5, 2) ^ 0xff;
-		}
 
-		if (i >= 0x30000 && i < 0x40000) {
+		if (i >= 0x30000 && i < 0x40000)
 			dst[i] = bitswap<8>(dst[i], 0, 2, 6, 4, 1, 5, 7, 3);
-		}
 	}
 
 	// boot vector
 	dst[0x7ffc] = 0x40;
 	dst[0x7ffd] = 0x80;
 
-	m_shared_ram = std::make_unique<int8_t[]>(0x22);
-	//m_shared_ram2 = std::make_unique<int8_t[]>(0x22);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781000, 0x781021, read8sm_delegate(*this, FUNC(snesb_state::sharedram_r)), write8sm_delegate(*this, FUNC(snesb_state::sharedram_w)));
-	//m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x781200, 0x781221, read8sm_delegate(*this, FUNC(snesb_state::sharedram2_r)), write8sm_delegate(*this, FUNC(snesb_state::sharedram2_w)));
-
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770071, 0x770071, "DSW1");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770072, 0x770072, "DSW2");
-	m_maincpu->space(AS_PROGRAM).install_read_port(0x770079, 0x770079, "COIN");
-
-	// protection overlays
-	// counter (PC=0x2dfe7 / 0x2dfee)
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7bf45b, 0x7bf45b, read8smo_delegate(*this, FUNC(snesb_state::sb2b_75bd37_r)));
-
-	// these reads with a LDA but discards the upper 8-bit values
-	// POST
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x722262, 0x722262, read8smo_delegate(*this, FUNC(snesb_state::wldgunsb_722262_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x723363, 0x723363, read8smo_delegate(*this, FUNC(snesb_state::wldgunsb_723364_r)));
-	// in-game
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x721197, 0x721197, read8smo_delegate(*this, FUNC(snesb_state::wldgunsb_721197_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x72553b, 0x72553b, read8smo_delegate(*this, FUNC(snesb_state::wldgunsb_72553b_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x72443a, 0x72443a, read8smo_delegate(*this, FUNC(snesb_state::wldgunsb_72443a_r)));
+	save_item(NAME(m_cnt));
 
 	init_snes();
 }
@@ -1470,13 +1438,11 @@ ROM_START( kinstb )
 	ROM_LOAD( "2.u15", 0x100000, 0x100000, CRC(e4a5d1da) SHA1(6ae566bd2f740a251d7a81b8ebb92a651cfaac8d) )
 	ROM_LOAD( "3.u16", 0x200000, 0x100000, CRC(7a40f7dd) SHA1(cebe632e8d2d68d0619077cc1e931af73c9a723b) )
 	ROM_LOAD( "4.u17", 0x300000, 0x100000, CRC(3d7564c1) SHA1(392b513991897668d5dd469ac84a34f785895774) )
-
-	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START( ffight2b )
-	ROM_REGION( 0x400000, "user3", 0 )
-	ROM_LOAD( "ff2_3.u6", 0x000000, 0x008000, CRC(343bf582) SHA1(cc6b7219bb2fe61f0b377b606ad28b0e5a78be0b) )
+	ROM_REGION( 0x140000, "user3", 0 )
+	ROM_LOAD( "ff2_3.u6",  0x000000, 0x008000, CRC(343bf582) SHA1(cc6b7219bb2fe61f0b377b606ad28b0e5a78be0b) )
 	ROM_CONTINUE(          0x088000, 0x008000 )
 	ROM_CONTINUE(          0x010000, 0x008000 )
 	ROM_CONTINUE(          0x098000, 0x008000 )
@@ -1492,7 +1458,7 @@ ROM_START( ffight2b )
 	ROM_CONTINUE(          0x0e8000, 0x008000 )
 	ROM_CONTINUE(          0x070000, 0x008000 )
 	ROM_CONTINUE(          0x0f8000, 0x008000 )
-	ROM_LOAD( "ff2_2.u7", 0x080000, 0x008000, CRC(b2078ae5) SHA1(e7bc3ad26ed672707d0dcfcaff238aad74986532) )
+	ROM_LOAD( "ff2_2.u7",  0x080000, 0x008000, CRC(b2078ae5) SHA1(e7bc3ad26ed672707d0dcfcaff238aad74986532) )
 	ROM_CONTINUE(          0x008000, 0x008000 )
 	ROM_CONTINUE(          0x090000, 0x008000 )
 	ROM_CONTINUE(          0x018000, 0x008000 )
@@ -1508,18 +1474,14 @@ ROM_START( ffight2b )
 	ROM_CONTINUE(          0x068000, 0x008000 )
 	ROM_CONTINUE(          0x0f0000, 0x008000 )
 	ROM_CONTINUE(          0x078000, 0x008000 )
-	ROM_LOAD( "ff2_1.u8", 0x100000, 0x040000, CRC(ea315ac1) SHA1(a85de091882d35bc77dc99677511828ff7c20350) )
-
-	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
+	ROM_LOAD( "ff2_1.u8",  0x100000, 0x040000, CRC(ea315ac1) SHA1(a85de091882d35bc77dc99677511828ff7c20350) )
 ROM_END
 
 ROM_START( iron )
-	ROM_REGION( 0x400000, "user3", 0 )
+	ROM_REGION( 0x140000, "user3", 0 )
 	ROM_LOAD( "6.c09.bin", 0x000000, 0x080000, CRC(50ea1457) SHA1(092f9a0e34deeb090b8c88553be3b1596ded60ef) )
 	ROM_LOAD( "5.c10.bin", 0x080000, 0x080000, CRC(0c3a0b5b) SHA1(1e8ab860689137e0e94731f1af2cfc561492b5bd) )
 	ROM_LOAD( "4.c11.bin", 0x100000, 0x040000, CRC(2aa417c7) SHA1(24b375e5bbd4be5dcd31b63ea98fbbadd53d543e) )
-
-	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START( denseib )
@@ -1528,14 +1490,10 @@ ROM_START( denseib )
 	ROM_LOAD( "dj.u15", 0x080000, 0x0080000, CRC(5932a440) SHA1(6048372268a097b08d9f56ad30f083267d798165) )
 	ROM_LOAD( "dj.u16", 0x100000, 0x0080000, CRC(7cb71fd7) SHA1(7673e9dcaabe804e2d637e67eabca1683dad4245) )
 	ROM_LOAD( "dj.u17", 0x180000, 0x0080000, CRC(de29dd89) SHA1(441aefbc7ee64515ee66431ef504e76dc8dc5ca3) )
-
-	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START( denseib2 )
 	ROM_REGION( 0x200000, "user3", ROMREGION_ERASEFF )
-
-	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
 
 	ROM_REGION( 0x200000, "user7", 0 )
 	ROM_LOAD( "u31.bin", 0x000000, 0x080000, CRC(834723a8) SHA1(3f56bba5017f77147e7d52618678f1e2eff4991b) )
@@ -1547,8 +1505,6 @@ ROM_END
 ROM_START( sblast2b )
 	ROM_REGION( 0x180000, "user3", ROMREGION_ERASEFF )
 
-	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
-
 	ROM_REGION( 0x180000, "user7", 0 )
 	ROM_LOAD( "1.bin", 0x000000, 0x0080000, CRC(bea10c40) SHA1(d9cc65267b9b57145d714f2c17b436c1fb21513f) )
 	ROM_LOAD( "2.bin", 0x080000, 0x0080000, CRC(57d2b6e9) SHA1(1a7b347101f67b254e2f86294d501b0669431644) )
@@ -1556,11 +1512,9 @@ ROM_START( sblast2b )
 ROM_END
 
 ROM_START( sblast2ba) // all 27c4000
-	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "user3", ROMREGION_ERASEFF )
 
-	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
-
-	ROM_REGION( 0x400000, "user7", 0 )
+	ROM_REGION( 0x200000, "user7", 0 )
 	ROM_LOAD( "u14", 0x000000, 0x080000, CRC(d2bdc126) SHA1(fa8f03b73f2f9b7a159699b764e2c46b5f8a8190) )
 	ROM_LOAD( "u15", 0x080000, 0x080000, CRC(50f9acb1) SHA1(a86bc98f81dc2c9443fbcd9b5f4880b8d5851ed6) )
 	ROM_LOAD( "u16", 0x100000, 0x080000, CRC(2a7f40f3) SHA1(e0db49969880af1edbadd8bc5a1bc59a55777d23) )
@@ -1603,14 +1557,10 @@ ROM_START( legendsb )
 	ROM_CONTINUE(      0x068000, 0x008000 )
 	ROM_CONTINUE(      0x0f0000, 0x008000 )
 	ROM_CONTINUE(      0x078000, 0x008000 )
-
-	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START( endless )
 	ROM_REGION( 0x200000, "user3", ROMREGION_ERASEFF )
-
-	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
 
 	ROM_REGION( 0x200000, "user7", 0 )
 	ROM_LOAD( "endlessduel.unknownposition1", 0x000000, 0x80000, CRC(e49acd29) SHA1(ac137261fe7a7691738ac812bea9591256eb9038) )
@@ -1622,8 +1572,6 @@ ROM_END
 ROM_START( endlessa )
 	ROM_REGION( 0x200000, "user3", ROMREGION_ERASEFF )
 
-	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
-
 	ROM_REGION( 0x200000, "user7", 0 )
 	ROM_LOAD( "gundam wing endless duel.c23", 0x000000, 0x80000, CRC(e49acd29) SHA1(ac137261fe7a7691738ac812bea9591256eb9038) )
 	ROM_LOAD( "gundam wing endless duel.c20", 0x080000, 0x80000, CRC(cf22a554) SHA1(86a31c83a1d28038c334949e82182c07010ccb3c) )
@@ -1633,8 +1581,6 @@ ROM_END
 
 ROM_START( rushbets )
 	ROM_REGION( 0x200000, "user3", ROMREGION_ERASEFF )
-
-	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
 
 	ROM_REGION( 0x200000, "user7", 0 )
 	ROM_LOAD( "ic19.bin", 0x000000, 0x80000, CRC(8aa0ad59) SHA1(83facb65c53ade99f1f057a8de27bee4a9c2efd8) )
@@ -1646,8 +1592,6 @@ ROM_END
 ROM_START( venom )
 	ROM_REGION( 0x300000, "user3", ROMREGION_ERASEFF )
 
-	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
-
 	ROM_REGION( 0x300000, "user7", 0 )
 	ROM_LOAD( "u31.bin", 0x000000, 0x0100000, CRC(d1034a76) SHA1(541dd92197ca2e4eb686e426c840aad847d02be8) )
 	ROM_LOAD( "u32.bin", 0x100000, 0x0100000, CRC(fbe865b0) SHA1(25467a6faa912bf180c5dd7aecee77c3b5f207f8) )
@@ -1657,8 +1601,6 @@ ROM_END
 
 ROM_START( wldgunsb )
 	ROM_REGION( 0x100000, "user3", ROMREGION_ERASEFF )
-
-	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
 
 	ROM_REGION( 0x100000, "user7", 0 )
 	ROM_LOAD( "c19.bin", 0x000000, 0x080000, CRC(59df0dc8) SHA1(d18b7f204ad4e0fcd64c2e2a25d60b64930419e7) )
@@ -1676,17 +1618,17 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 199?, kinstb,       0,        kinstb,         kinstb,   snesb_state, init_kinstb,    ROT0, "bootleg",  "Killer Instinct (SNES bootleg)",                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, ffight2b,     0,        ffight2b,       ffight2b, snesb_state, init_ffight2b,  ROT0, "bootleg",  "Final Fight 2 (SNES bootleg)",                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, iron,         0,        kinstb,         iron,     snesb_state, init_iron,      ROT0, "bootleg",  "Iron (SNES bootleg)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, denseib,      0,        kinstb,         denseib,  snesb_state, init_denseib,   ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg, set 1)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, denseib2,     denseib,  kinstb,         denseib,  snesb_state, init_denseib2,  ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg, set 2)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, sblast2b,     0,        kinstb,         sblast2b, snesb_state, init_sblast2b,  ROT0, "bootleg",  "Sonic Blast Man 2 Special Turbo (SNES bootleg, set 1)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS)
-GAME( 1997, sblast2ba,    sblast2b, kinstb,         sblast2b, snesb_state, empty_init,     ROT0, "bootleg",  "Sonic Blast Man 2 Special Turbo (SNES bootleg, set 2)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad dump, needs to be descrambled, too
-GAME( 1996, endless,      0,        kinstb,         endless,  snesb_state, init_endless,   ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg, set 1)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, endlessa,     endless,  kinstb,         endless,  snesb_state, init_endless,   ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg, set 2)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, legendsb,     0,        kinstb,         kinstb,   snesb_state, init_legendsb,  ROT0, "bootleg",  "Legend (SNES bootleg)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, rushbets,     0,        kinstb,         rushbets, snesb_state, init_rushbets,  ROT0, "bootleg",  "Rushing Beat Shura (SNES bootleg)",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, venom,        0,        kinstb,         venom,    snesb_state, init_venom,     ROT0, "bootleg",  "Venom & Spider-Man - Separation Anxiety (SNES bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, wldgunsb,     0,        kinstb,         wldgunsb, snesb_state, init_wldgunsb,  ROT0, "bootleg",  "Wild Guns (SNES bootleg)",                               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based off Japanese version
-GAME( 199?, fatfurspb,    0,        kinstb,         venom,    snesb_state, init_fatfurspb, ROT0, "bootleg",  "Fatal Fury Special (SNES bootleg)",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // coinage, etc. handled by protection device
+GAME( 199?, kinstb,       0,        kinstb,       kinstb,   snesb_state, init_kinstb,    ROT0, "bootleg",  "Killer Instinct (SNES bootleg)",                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, ffight2b,     0,        ffight2b,     ffight2b, snesb_state, init_ffight2b,  ROT0, "bootleg",  "Final Fight 2 (SNES bootleg)",                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, iron,         0,        extrainp,     iron,     snesb_state, init_iron,      ROT0, "bootleg",  "Iron (SNES bootleg)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, denseib,      0,        extrainp,     denseib,  snesb_state, init_denseib,   ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg, set 1)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, denseib2,     denseib,  extrainp,     denseib,  snesb_state, init_denseib2,  ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg, set 2)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, sblast2b,     0,        sblast2b,     sblast2b, snesb_state, init_sblast2b,  ROT0, "bootleg",  "Sonic Blast Man II Special Turbo (SNES bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, sblast2ba,    sblast2b, base,         sblast2b, snesb_state, empty_init,     ROT0, "bootleg",  "Sonic Blast Man II Special Turbo (SNES bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs to be descrambled
+GAME( 1996, endless,      0,        endless,      endless,  snesb_state, init_endless,   ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg, set 1)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, endlessa,     endless,  endless,      endless,  snesb_state, init_endless,   ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg, set 2)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, legendsb,     0,        extrainp,     kinstb,   snesb_state, init_legendsb,  ROT0, "bootleg",  "Legend (SNES bootleg)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rushbets,     0,        rushbets,     rushbets, snesb_state, init_rushbets,  ROT0, "bootleg",  "Rushing Beat Shura (SNES bootleg)",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, venom,        0,        venom,        venom,    snesb_state, init_venom,     ROT0, "bootleg",  "Venom & Spider-Man - Separation Anxiety (SNES bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, wldgunsb,     0,        wldgunsb,     wldgunsb, snesb_state, init_wldgunsb,  ROT0, "bootleg",  "Wild Guns (SNES bootleg)",                               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based off Japanese version
+GAME( 199?, fatfurspb,    0,        base,         venom,    snesb_state, init_fatfurspb, ROT0, "bootleg",  "Fatal Fury Special (SNES bootleg)",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // coinage, etc. handled by protection device

@@ -112,8 +112,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( qx10_upd765_interrupt );
 	void fdd_motor_w(uint8_t data);
 	uint8_t qx10_30_r();
-	uint8_t gdc_dack_r();
-	void gdc_dack_w(uint8_t data);
+	void zoom_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER( tc_w );
 	uint8_t mc146818_r(offs_t offset);
 	void mc146818_w(offs_t offset, uint8_t data);
@@ -182,13 +181,13 @@ private:
 	uint8_t   m_cmosram[0x800];
 
 	uint8_t m_color_mode;
+	uint8_t m_zoom;
 };
 
 UPD7220_DISPLAY_PIXELS_MEMBER( qx10_state::hgdc_display_pixels )
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	int gfx[3];
-
 	if(m_color_mode)
 	{
 		gfx[0] = m_video_ram[((address) + 0x00000) >> 1];
@@ -208,8 +207,13 @@ UPD7220_DISPLAY_PIXELS_MEMBER( qx10_state::hgdc_display_pixels )
 		pen = ((gfx[0] >> xi) & 1) ? 1 : 0;
 		pen|= ((gfx[1] >> xi) & 1) ? 2 : 0;
 		pen|= ((gfx[2] >> xi) & 1) ? 4 : 0;
-
-		bitmap.pix(y, x + xi) = palette[pen];
+		for (int z = 0; z <= m_zoom; ++z)
+		{
+			int xval = ((x+xi)*(m_zoom+1))+z;
+			if (xval >= bitmap.cliprect().width() * 2)
+				continue;
+			bitmap.pix(y, xval) = palette[pen];
+		}
 	}
 }
 
@@ -239,8 +243,8 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 
 			for (int xi = 0; xi < 8; xi++)
 			{
-				int res_x = x * 8 + xi;
-				int res_y = y + yi;
+				int res_x = ((x * 8) + xi) * (m_zoom + 1);
+				int res_y = y + (yi * (m_zoom + 1));
 
 				if(!m_screen->visible_area().contains(res_x, res_y))
 					continue;
@@ -251,8 +255,14 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( qx10_state::hgdc_draw_text )
 				else
 					pen = ((tile_data >> xi) & 1) ? color : 0;
 
-				if(pen)
-					bitmap.pix(res_y, res_x) = palette[pen];
+				for (int zx = 0; zx <= m_zoom; ++zx)
+				{
+					for (int zy = 0; zy <= m_zoom; ++zy)
+					{
+						if(pen)
+							bitmap.pix(res_y+zy, res_x+zx) = palette[pen];
+					}
+				}
 			}
 		}
 	}
@@ -280,7 +290,7 @@ void qx10_state::update_speaker()
 	 * !enable   -----
 	 */
 
-	uint8_t level = (!((!((!m_spkr_enable) && m_pit1_out0)) && m_spkr_freq)) ? 1 : 0;
+	uint8_t level = ((!m_spkr_enable && m_pit1_out0) || !m_spkr_freq) ? 1 : 0;
 	m_speaker->level_w(level);
 }
 
@@ -345,6 +355,11 @@ void qx10_state::cmos_sel_w(uint8_t data)
 {
 	m_memcmos = data & 1;
 	update_memory_mapping();
+}
+
+void qx10_state::zoom_w(uint8_t data)
+{
+	m_zoom = data & 0x0f;
 }
 
 /***********************************************************
@@ -443,17 +458,6 @@ WRITE_LINE_MEMBER(qx10_state::dma_hrq_changed)
 {
 	/* Assert HLDA */
 	m_dma_1->hack_w(state);
-}
-
-uint8_t qx10_state::gdc_dack_r()
-{
-	logerror("GDC DACK read\n");
-	return 0;
-}
-
-void qx10_state::gdc_dack_w(uint8_t data)
-{
-	logerror("GDC DACK write %02x\n", data);
 }
 
 WRITE_LINE_MEMBER( qx10_state::tc_w )
@@ -609,7 +613,7 @@ void qx10_state::qx10_io(address_map &map)
 	map(0x30, 0x33).rw(FUNC(qx10_state::qx10_30_r), FUNC(qx10_state::fdd_motor_w));
 	map(0x34, 0x35).m(m_fdc, FUNC(upd765a_device::map));
 	map(0x38, 0x39).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
-//  map(0x3a, 0x3a) GDC zoom
+	map(0x3a, 0x3a).w(FUNC(qx10_state::zoom_w));
 //  map(0x3b, 0x3b) GDC light pen req
 	map(0x3c, 0x3d).rw(FUNC(qx10_state::mc146818_r), FUNC(qx10_state::mc146818_w));
 	map(0x40, 0x4f).rw(m_dma_1, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
@@ -674,9 +678,12 @@ void qx10_state::machine_start()
 void qx10_state::machine_reset()
 {
 	m_dma_1->dreq0_w(1);
+	m_dma_1->dreq1_w(1);
 
 	m_spkr_enable = 0;
 	m_pit1_out0 = 1;
+
+	m_zoom = 0;
 
 	m_memprom = 0;
 	m_memcmos = 0;
@@ -727,7 +734,7 @@ GFXDECODE_END
 void qx10_state::video_start()
 {
 	// allocate memory
-	m_video_ram = make_unique_clear<uint16_t[]>(0x30000);
+	m_video_ram = make_unique_clear<uint16_t[]>(0x60000);
 }
 
 void qx10_state::qx10_palette(palette_device &palette) const
@@ -836,11 +843,9 @@ void qx10_state::qx10(machine_config &config)
 	m_dma_1->in_memr_callback().set(FUNC(qx10_state::memory_read_byte));
 	m_dma_1->out_memw_callback().set(FUNC(qx10_state::memory_write_byte));
 	m_dma_1->in_ior_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_r));
-	m_dma_1->in_ior_callback<1>().set(FUNC(qx10_state::gdc_dack_r));
-	//m_dma_1->in_ior_callback<2>().set(m_hgdc, FUNC(upd7220_device::dack_r));
+	m_dma_1->in_ior_callback<1>().set(m_hgdc, FUNC(upd7220_device::dack_r));
 	m_dma_1->out_iow_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_w));
-	m_dma_1->out_iow_callback<1>().set(FUNC(qx10_state::gdc_dack_w));
-	//m_dma_1->out_iow_callback<2>().set(m_hgdc, FUNC(upd7220_device::dack_w));
+	m_dma_1->out_iow_callback<1>().set(m_hgdc, FUNC(upd7220_device::dack_w));
 	AM9517A(config, m_dma_2, MAIN_CLK/4);
 
 	I8255(config, m_ppi, 0);
@@ -849,6 +854,7 @@ void qx10_state::qx10(machine_config &config)
 	m_hgdc->set_addrmap(0, &qx10_state::upd7220_map);
 	m_hgdc->set_display_pixels(FUNC(qx10_state::hgdc_display_pixels));
 	m_hgdc->set_draw_text(FUNC(qx10_state::hgdc_draw_text));
+	m_hgdc->drq_wr_callback().set(m_dma_1, FUNC(am9517a_device::dreq1_w)).invert();
 	m_hgdc->set_screen("screen");
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);

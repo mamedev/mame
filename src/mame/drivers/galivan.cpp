@@ -481,7 +481,7 @@ void dangarj_state::dangarj(machine_config &config)
 	galivan(config);
 	m_maincpu->set_addrmap(AS_IO, &dangarj_state::dangarj_io_map);
 
-	NB1412M2(config, m_prot, XTAL(8'000'000)); // divided by 2 maybe
+	NB1412M2(config, m_prot, XTAL(8'000'000)/2); // divided by 2 maybe
 }
 
 void galivan_state::ninjemak(machine_config &config)

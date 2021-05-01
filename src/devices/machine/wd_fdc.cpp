@@ -23,7 +23,7 @@
 #define LOG_LIVE    (1U << 13) // Live states
 #define LOG_FUNC    (1U << 14) // Function calls
 
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (LOG_DESC)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"

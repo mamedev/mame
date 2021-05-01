@@ -10,18 +10,18 @@
     Special thanks to Fujix for his documentation translation help
 
     TODO:
-    - Does this system have one or two CPUs? I'm prone to think that the V30 does all the job
-      and then enters into z80 compatible mode for PC-8801 emulation.
     - What exact kind of garbage happens if you try to enable both direct and palette color
       modes to a graphic layer?
+    - unemulated upd71071 demand mode;
     - What is exactly supposed to be a "bus slot"?
     - fdc "intelligent mode" has 0x7f as irq vector ... 0x7f is ld a,a and it IS NOT correctly
       hooked up by the current z80 core
     - PC-88VA stock version has two bogus opcodes. One is at 0xf0b15, another at 0xf0b31.
       Making a patch for the latter makes the system to jump into a "DIP-Switch" display.
       bp f0b31,pc=0xf0b36,g
-    - unemulated upd71071 demand mode.
-    - Fix floppy motor hook-up;
+      Update: it never reaches latter with V30->V50 CPU switch fix;
+    - Fix floppy motor hook-up (floppy believes to be always in even if empty drive);
+    - Support for PC8801 compatible mode & PC80S31K (floppy interface);
 
 ********************************************************************************************/
 
@@ -1573,7 +1573,7 @@ void pc88va_state::dma_memw_cb(offs_t offset, uint8_t data)
 
 void pc88va_state::pc88va(machine_config &config)
 {
-	V30(config, m_maincpu, 8000000);        /* 8 MHz */
+	V50(config, m_maincpu, 8000000); // μPD9002, aka V30 + μPD70008AC (for PC8801 compatibility mode)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc88va_state::pc88va_map);
 	m_maincpu->set_addrmap(AS_IO, &pc88va_state::pc88va_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(pc88va_state::pc88va_vrtc_irq));

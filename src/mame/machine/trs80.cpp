@@ -203,8 +203,8 @@ INTERRUPT_GEN_MEMBER(trs80_state::rtc_interrupt)
 //  {
 //      m_timeout--;
 //      if (m_timeout == 0)
-//          if (m_floppy)
-//              m_floppy->mon_w(1);  // motor off
+//          if (m_fdd)
+//              m_fdd->mon_w(1);  // motor off
 //  }
 }
 
@@ -279,19 +279,18 @@ uint8_t trs80_state::irq_status_r()
 
 void trs80_state::motor_w(uint8_t data)
 {
-	m_floppy = nullptr;
+	m_fdd = nullptr;
 
-	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
-	if (BIT(data, 1)) m_floppy = m_floppy1->get_device();
-	if (BIT(data, 2)) m_floppy = m_floppy2->get_device();
-	if (BIT(data, 3)) m_floppy = m_floppy3->get_device();
+	for (u8 i = 0; i < 4; i++)
+	if (BIT(data, i))
+		m_fdd = m_floppy[i]->get_device();
 
-	m_fdc->set_floppy(m_floppy);
+	m_fdc->set_floppy(m_fdd);
 
-	if (m_floppy)
+	if (m_fdd)
 	{
-		m_floppy->mon_w(0);
-		m_floppy->ss_w(BIT(data, 4));
+		m_fdd->mon_w(0);
+		m_fdd->ss_w(BIT(data, 4));
 		m_timeout = 200;
 	}
 

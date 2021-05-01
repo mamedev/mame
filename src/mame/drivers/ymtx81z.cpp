@@ -13,6 +13,7 @@
 #include "machine/nvram.h"
 #include "sound/ym2151.h"
 #include "video/hd44780.h"
+#include "bus/midi/midi.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -23,6 +24,7 @@ public:
 	ymtx81z_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_port2(*this, "P2")
 	{
 	}
 
@@ -37,34 +39,51 @@ private:
 
 	void mem_map(address_map &map);
 
+	u8 p2_r();
+	WRITE_LINE_MEMBER(midi_rx_r) { m_rx_data = state; }
+	WRITE_LINE_MEMBER(midiclock_w) { if (state == ASSERT_LINE) m_maincpu->m6801_clock_serial();}
+
 	required_device<hd6303x_cpu_device> m_maincpu;
+	required_ioport m_port2;
+
+	int m_rx_data;
 };
 
 HD44780_PIXEL_UPDATE(ymtx81z_state::lcd_pixel_update)
 {
 	if (x < 5 && y < 8 && line < 2 && pos < 16)
-		bitmap.pix(line * 8 + y, pos * 6 + x) = state;
+		bitmap.pix(line * 10 + y + 1 + ((y == 7) ? 1 : 0), pos * 6 + x + 1) = state ? 1 : 2;
 }
 
 void ymtx81z_state::palette_init(palette_device &palette)
 {
-	palette.set_pen_color(0, rgb_t(131, 136, 139));
-	palette.set_pen_color(1, rgb_t( 92,  83,  88));
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); // background
+	palette.set_pen_color(1, rgb_t(0xd8, 0xff, 0x18)); // lcd pixel on
+	palette.set_pen_color(2, rgb_t(0xd8/10, 0xff/10, 0x18/10)); // lcd pixel off
 }
 
 void ymtx81z_state::machine_start()
 {
 	membank("rombank")->configure_entries(0, 2, memregion("program")->base(), 0x8000);
+	m_rx_data = ASSERT_LINE;
 }
 
 void ymtx81z_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x001f).m(m_maincpu, FUNC(hd6303x_cpu_device::hd6301x_io));
+	map(0x001b, 0x001b).noprw();
 	map(0x0040, 0x00ff).ram(); // internal RAM
 	map(0x2000, 0x2001).mirror(0x1ffe).rw("ymsnd", FUNC(ym2414_device::read), FUNC(ym2414_device::write));
 	map(0x4000, 0x4001).mirror(0x1ffe).rw("lcdc", FUNC(hd44780_device::read), FUNC(hd44780_device::write));
 	map(0x6000, 0x7fff).ram().share("nvram");
 	map(0x8000, 0xffff).bankr("rombank");
+}
+
+u8 ymtx81z_state::p2_r()
+{
+	u8 result = m_port2->read() & 0xf7;
+	result |= (m_rx_data << 3);
+	return result;
 }
 
 static INPUT_PORTS_START(tx81z)
@@ -100,7 +119,7 @@ void ymtx81z_state::tx81z(machine_config &config)
 {
 	HD6303X(config, m_maincpu, 7.15909_MHz_XTAL); // HD63B03XP
 	m_maincpu->set_addrmap(AS_PROGRAM, &ymtx81z_state::mem_map);
-	m_maincpu->in_p2_cb().set_ioport("P2");
+	m_maincpu->in_p2_cb().set(FUNC(ymtx81z_state::p2_r));
 	m_maincpu->in_p5_cb().set_ioport("P5");
 	m_maincpu->in_p6_cb().set_ioport("P6");
 	m_maincpu->out_p6_cb().set_membank("rombank").bit(3);
@@ -111,17 +130,23 @@ void ymtx81z_state::tx81z(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5564PL-15/-20 + CR2032 battery
 
-	CLOCK(config, "midiclock", 500_kHz_XTAL);
+	auto &midiclock(CLOCK(config, "midiclock", 500_kHz_XTAL / 2)); // divider not verified
+	midiclock.signal_handler().set(FUNC(ymtx81z_state::midiclock_w));
+
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(FUNC(ymtx81z_state::midi_rx_r));
+
+	auto &mdout(MIDI_PORT(config, "mdout", midiout_slot, "midiout"));
+	m_maincpu->out_ser_tx_cb().set(mdout, FUNC(midi_port_device::write_txd));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
-	screen.set_size(6*16, 8*2);
+	screen.set_size(6*16+1, 10*2+1);
 	screen.set_visarea_full();
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(ymtx81z_state::palette_init), 2);
+	PALETTE(config, "palette", FUNC(ymtx81z_state::palette_init), 3);
 
 	hd44780_device &lcdc(HD44780(config, "lcdc", 0));
 	lcdc.set_lcd_size(2, 16);
@@ -157,4 +182,3 @@ ROM_START(tx81z)
 ROM_END
 
 SYST(1987, tx81z, 0, 0, tx81z, tx81z, ymtx81z_state, empty_init, "Yamaha", "TX81Z FM Tone Generator", MACHINE_IS_SKELETON)
-//SYST(1988, dx11, 0, 0, dx11, dx11, ymtx81z_state, empty_init, "Yamaha", "DX11 Digital Programmable Algorithm Synthesizer", MACHINE_IS_SKELETON)

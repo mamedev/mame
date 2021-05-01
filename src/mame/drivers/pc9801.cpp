@@ -1,126 +1,64 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese,Carl
-/***************************************************************************************************
+/**************************************************************************************************
 
     PC-9801 (c) 1981 NEC
 
     driver by Angelo Salese
 
     TODO:
-    - move sound bios ROMs into pc9801_26 / pc9801_86 devices
-    - proper 8251 uart hook-up on keyboard
+    - proper 8251 uart hook-up on keyboard;
     - SASI/SCSI support;
-    - Write a PC80S31K device (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
-    - Finish DIP-Switches support
-    - text scrolling
-    - GRCG+
-    - rewrite using slot devices
-    - some later SWs put "Invalid command byte 05" (Absolutely Mahjong on Epson logo)
-    - investigate on POR bit
-    - test 2dd more
-    - clean-ups/split into devices.
+    - Finish DIP-Switches support;
+    - text scrolling, upd52611 (cfr. clipping in edge & arcus2, madoum* too?);
+    - AGDC emulation, upd72120;
+    - CMT support (-13/-36 cbus only, identify which models mounted it off the bat);
+    - Write a PC80S31K device for 2d type floppies
+      (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
+    - Anything post-PC9801E/F/M should overwrite "speaker_device" to actually use a
+      dac_bit_interface instead (cfr. DAC1BIT in SW list);
+    - clean-ups & split into separate devices and driver flavours;
+    - derive romsets by default options (cfr. 3.5 2HD floppies vs. default 5.25, 2D/2DD etc.);
+    - Remove kludge for POR bit in a20_ctrl_w fn;
+    - floppy sounds never silences when drive is idle (disabled for the time being);
+
+    TODO (PC-9801F)
+    - kanji port 0xa9 readback is broken for several games (balpower, lovelyho).
 
     TODO (PC-9801RS):
-    - extra features;
-    - keyboard shift doesn't seem to disable properly;
+    - several unemulated extra f/f features;
+    - keyboard shift doesn't seem to disable properly (fixed by now?);
+    - Several games hangs with stuck note by misfired/not catched up -26 / -86 irq;
     - clean-up duplicate code;
 
     TODO (PC-9821):
     - fix CPU for some clones;
     - "cache error"
-    - undumped IDE ROM, kludged to work
-    - Compatibility is untested;
+    - undumped IDE ROM, kludged to work;
 
     TODO (PC-9821AS)
     - IPL ROM banking contradicts greatly from the other machines;
 
-    TODO: (PC-486MU)
-    - Tries to read port C of i8255_sys (-> 0x35) at boot without setting up the control
-      port. This causes a jump to invalid program area;
-    - Dies on ARTIC check;
-    - Presumably one ROM is undumped?
+    TODO (PC-386M):
+    - "ERR:BR" at boot (BIOS loader error).
+      Executes some code in text VRAM area (PC=$a006e), trying to setup a writeable RAM bank
+      (shadow RAM even?) to IPL window, I/O $c06 seems to be the control port for it;
+
+    TODO: (PC-486SE/PC-486MU):
+    - Verify ROM bankswitch;
+      On PC-486SE sets up what is normally IPL bankswitch at PC=0xf5115, successive opcode
+      is a jmp 0xf8000, pretty unlikely it delays bankswitch so assume it reloads
+      the same bank.
+    - Fix POR/ROM bankswitch on soft resets.
+    - Eventually errors with a ERR:VR (GFX VRAM);
 
     TODO: (PC-9821AP)
-    - No way to exit the initial loop. Code looks broken/bad dump?
+    - No way to exit the initial loop. Code looks broken, bad dump?
 
-    floppy issues TODO (* denotes actually fixed, to be moved into specific sheet)
-    - 46okunen (DOS not booting / disk swap);
-    * ckrynn
-    - aishogi: (asserts upon loading, 3'5 image?)
-    - akitsuka: (works in PC-9801RS only)
-    * alice
-    * genghis
-    * arcshu
-    * arcus2
-    * artjigs1 / artjigs2 / artjigs3
-    * Atlantia (disk swap?)
-    - azusa108 (disk i/o error)
-    * bacta2
-    - btech (disk swap?)
-    - baycity
-    - beast (keeps reading command sense)
-    * beast2
-    * bellsave (disk swap? select B on config menu)
-    * biblems2 (at new game loading)
-    * birdywld
+    TODO: (PC-9821Xa16/PC-9821Ra20/PC-9821Ra333)
+    - "MICON ERROR" at POST (generic HW fault, PCI?);
 
-    * Bokosuka Wars
-    * jangou2: floppy fails to load after the title screen;
-    - runners (size assert)
-    - Sorcerian (2dd image)
-    - Twilight Zone 3 (2dd image)
-
-    List of per-game TODO:
-    - 4dboxing: inputs are unresponsive;
-    - 4dboxing: crashes after user disk creation (regression);
-    - agumixsl: non-interlace mode doesn't resize graphics, has rectangle selection bugs (note: needs GDC = 5 MHz to boot);
-    - agenesis: fails loading, attempting to read IDE RAM switch port;
-    - alice: doesn't set bitmap interlace properly, can't do disk swaps via the File Manager;
-    - applecl1: can't pass hands apparently;
-    - arctic, fsmoon: Doesn't detect sound board (tied to 0x00ec ports);
-    - arcus2: has intro glitches;
-    - artjigs*: some text doesn't appear? Namely under the puzzles and when you clear one;
-    - atragon: HDD install disk swap doesn't work?
-    - asokokof: black screen with BGM, executes invalid opcode (previous note "waits at 0x225f6");
-    - arquelph: beeps out at initial sound check,  no voice samples, extra sound board tested;
-    - akitsuka: could not setup "initial data" (regression);
-    - bandkun: can't install to HDD, has unemulated sound boards in settings (Roland MT-32 & D-10/D-110, Kawai MSB-98, Korg M1, MIDI);
-    - biblems2: initial GLODIA logo uses raster effects?
-    - bishohzx: Soft House logo uses pseudo-ROZ effect (?), no title screen graphics?
-    - bishotsu: beeps out before game (missing sound board?), doesn't draw some text?
-
-    - deflektr: no sound, moans about a DIP-SW setting during loading, has timing issues (keyboard being too fast on PC-9801RS);
-    - edge: has gfx glitch when intro scrolls to top-left;
-    - edge: user disk creation screen is offset?
-    - idolsaga: Moans with a "(program) ended. remove the floppy disk and turn off the power."
-    - karateka: no sound;
-    - lovelyho: Doesn't show kanjis in PC-9801F version (tries to read them thru the 0xa9 port);
-    - madoum1, madoum2, madoum3: doesn't display bitmap gfxs during gameplay;
-    - quarth: sound cuts off at title screen, doesn't work on 9801rs (bogus "corrupt .exe" detected);
-    - prinmak2, tim: cursor stays stuck when using mouse (works with keyboard);
-    - puyopuyo: beeps out when it's supposed to play samples, Not supposed to use ADPCM, is it a PIT issue?
-    - runners: wrong double height on the title screen;
-    - rusty: black stripes when scrolling;
-    - rusty: voice pitches are too slow (tested with -26 and -86);
-    - win211: EGC drawing issue (byte wide writes?)
-    - win31: doesn't boot at
-
-    per-game TODO (Dounjishi SW):
-    - Absolutely Mahjong: Transitions are too fast.
-
-    per-game TODO (PC-9821):
-    - Battle Skin Panic: gfx bugs at the Gainax logo, it crashes after it;
-    - Policenauts: CD-ROM drive not found;
-
-    Notes:
-    - annivers: GRPH (ALT) key cycles through different color schemes (normal, b&w, legacy);
-    - Animahjong V3 makes advantage of the possibility of installing 2 sound boards, where SFX and BGMs are played on separate chips.
-    - Apple Club 1/2 needs data disks to load properly;
-    - Beast Lord: needs a titan.fnt, in MS-DOS
-    - fhtag2: product key is 001J0283TA 100001
-    - To deprotect BASIC modules set 0xcd7 in ram to 0
-
-========================================================================================
+===================================================================================================
 
     This series features a huge number of models released between 1982 and 1997. They
     were not IBM PC-compatible, but they had similar hardware (and software: in the
@@ -302,6 +240,8 @@
 
     For more info (e.g. optional hardware), see http://www.geocities.jp/retro_zzz/machines/nec/9801/mdl98cpu.html
 
+    Epson Series
+    http://www.pc-9800.net/db_epson/desk_index.htm
 
     PC-9821 Series
 
@@ -312,7 +252,7 @@
     PC-9821Es (1994) - aka 98FINE, desktop computer with integrated LCD, successor of the PC-98T
     PC-9821X series (1994->1995) - aka 98MATE X, desktop computers, Pentium based
     PC-9821V series (1995) - aka 98MATE Valuestar, desktop computers, Pentium based
-    PC-9821S series (1995->2996) - aka 98Pro, tower computers, PentiumPro based
+    PC-9821S series (1995->1996) - aka 98Pro, tower computers, PentiumPro based
     PC-9821R series (1996->2000) - aka 98MATE R, desktop & tower & server computers, various CPU
     PC-9821C200 (1997) - aka CEREB, desktop computer, Pentium MMX based
     PC-9821 Ne/Ns/Np/Nm (1993->1995) - aka 98NOTE, laptops, 486 based
@@ -387,7 +327,7 @@ Keyboard TX commands:
 0x9d keyboard LED settings
 0x9f keyboard ID
 
-****************************************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "includes/pc9801.h"
@@ -984,10 +924,12 @@ void pc9801_state::pc9801rs_a0_w(offs_t offset, uint8_t data)
 			case 0x0e: m_analog16.b[m_analog16.pal_entry] = data & 0xf; break;
 		}
 
-		m_palette->set_pen_color((m_analog16.pal_entry)+0x10,
-												pal4bit(m_analog16.r[m_analog16.pal_entry]),
-												pal4bit(m_analog16.g[m_analog16.pal_entry]),
-												pal4bit(m_analog16.b[m_analog16.pal_entry]));
+		m_palette->set_pen_color(
+			m_analog16.pal_entry + 0x10,
+			pal4bit(m_analog16.r[m_analog16.pal_entry]),
+			pal4bit(m_analog16.g[m_analog16.pal_entry]),
+			pal4bit(m_analog16.b[m_analog16.pal_entry])
+		);
 		return;
 	}
 
@@ -1175,10 +1117,12 @@ void pc9801_state::pc9821_a0_w(offs_t offset, uint8_t data)
 			case 0x0e: m_analog256.b[m_analog256.pal_entry] = data & 0xff; break;
 		}
 
-		m_palette->set_pen_color((m_analog256.pal_entry)+0x20,
-												m_analog256.r[m_analog256.pal_entry],
-												m_analog256.g[m_analog256.pal_entry],
-												m_analog256.b[m_analog256.pal_entry]);
+		m_palette->set_pen_color(
+			m_analog256.pal_entry + 0x20,
+			m_analog256.r[m_analog256.pal_entry],
+			m_analog256.g[m_analog256.pal_entry],
+			m_analog256.b[m_analog256.pal_entry]
+		);
 		return;
 	}
 
@@ -1673,10 +1617,10 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("MOUSE_X")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_RESET PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
 
 	PORT_START("MOUSE_Y")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_RESET PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
 
 	PORT_START("MOUSE_B")
 	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1938,20 +1882,45 @@ void pc9801_state::ppi_sys_portc_w(uint8_t data)
 	m_beeper->set_state(!(data & 0x08));
 }
 
+/*
+ * Mouse 8255 I/F
+ *
+ * Port A:
+ * x--- ---- LEFT mouse button
+ * -x-- ---- MIDDLE mouse button
+ *           \- Undocumented, most PC98 mice don't have it
+ * --x- ---- RIGHT mouse button
+ * ---? ---- <unused>
+ * ---- xxxx MD3-0 mouse direction latch
+ *
+ * Port C:
+ *
+ * x--- ---- HC Latch Mode (1=read latch, 0=read delta)
+ *           \- on 0->1 transition reset delta
+ * -x-- ---- SXY Axis select (1=Y 0=X)
+ * --x- ---- SHL Read nibble select (1) upper (0) lower
+ * ---x ---- INT # (1) disable (0) enable
+ *
+ * Reading Port B and Port C low nibble are misc DIPSW selectors,
+ * their meaning diverges on XA/XL/RL classes vs. the rest.
+ *
+ */
+
 uint8_t pc9801_state::ppi_mouse_porta_r()
 {
-	uint8_t res;
-	uint8_t isporthi;
-	const char *const mousenames[] = { "MOUSE_X", "MOUSE_Y" };
+	uint8_t res = ioport("MOUSE_B")->read() & 0xf0;
+	const uint8_t isporthi = ((m_mouse.control & 0x20) >> 5)*4;
 
-	res = ioport("MOUSE_B")->read() & 0xf0;
-	isporthi = ((m_mouse.control & 0x20) >> 5)*4;
-
-	if((m_mouse.control & 0x80) == 0)
-		res |= ioport(mousenames[(m_mouse.control & 0x40) >> 6])->read() >> (isporthi) & 0xf;
+	if ((m_mouse.control & 0x80) == 0)
+	{
+		if (m_mouse.control & 0x40)
+			res |= (m_mouse.dy >> isporthi) & 0xf;
+		else
+			res |= (m_mouse.dx >> isporthi) & 0xf;
+	}
 	else
 	{
-		if(m_mouse.control & 0x40)
+		if (m_mouse.control & 0x40)
 			res |= (m_mouse.ly >> isporthi) & 0xf;
 		else
 			res |= (m_mouse.lx >> isporthi) & 0xf;
@@ -1973,10 +1942,24 @@ void pc9801_state::ppi_mouse_portb_w(uint8_t data)
 
 void pc9801_state::ppi_mouse_portc_w(uint8_t data)
 {
-	if((m_mouse.control & 0x80) == 0 && data & 0x80)
+	// fsmoon:   0x00 -> 0x80 -> 0xa0 -> 0xc0 -> 0xf0
+	//           (read latch as relative)
+	// prinmak2: 0x00 -> 0x20 -> 0x40 -> 0x60 -> 0x60
+	//           (keeps reading "delta" but never reset it, absolute mode)
+	// biblems2: 0x0f -> 0x2f -> 0x4f -> 0x6f -> 0xef
+	//           (latches a delta reset then reads delta diff, relative mode)
+
+	const u8 mouse_x = ioport("MOUSE_X")->read();
+	const u8 mouse_y = ioport("MOUSE_Y")->read();
+	m_mouse.dx = (mouse_x - m_mouse.prev_dx) & 0xff;
+	m_mouse.dy = (mouse_y - m_mouse.prev_dy) & 0xff;
+
+	if ((m_mouse.control & 0x80) == 0 && data & 0x80)
 	{
-		m_mouse.lx = ioport("MOUSE_X")->read();
-		m_mouse.ly = ioport("MOUSE_Y")->read();
+		m_mouse.lx = m_mouse.dx & 0xff;
+		m_mouse.ly = m_mouse.dy & 0xff;
+		m_mouse.prev_dx = mouse_x;
+		m_mouse.prev_dy = mouse_y;
 	}
 
 	m_mouse.control = data;
@@ -2135,6 +2118,7 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 	m_mouse.control = 0xff;
 	m_mouse.freq_reg = 0;
 	m_mouse.freq_index = 0;
+	m_mouse.lx = m_mouse.ly = m_mouse.prev_dx = m_mouse.prev_dy = m_mouse.dx = m_mouse.dy = 0;
 	m_dma_autoinc[0] = m_dma_autoinc[1] = m_dma_autoinc[2] = m_dma_autoinc[3] = 0;
 	memset(&m_egc, 0, sizeof(m_egc));
 }
@@ -2231,6 +2215,13 @@ void pc9801_state::pc9801_keyboard(machine_config &config)
 {
 	PC9801_KBD(config, m_keyb, 53);
 	m_keyb->irq_wr_callback().set(m_pic1, FUNC(pic8259_device::ir1_w));
+}
+
+void pc9801_state::pc9801_pit_clock(machine_config &config, const XTAL clock)
+{
+	m_pit8253->set_clk<0>(clock);
+	m_pit8253->set_clk<1>(clock);
+	m_pit8253->set_clk<2>(clock);
 }
 
 void pc9801_state::pc9801_mouse(machine_config &config)
@@ -2436,7 +2427,6 @@ void pc9801_state::pc9801(machine_config &config)
 	PALETTE(config, m_palette, FUNC(pc9801_state::pc9801_palette), 16);
 }
 
-
 void pc9801_state::pc9801rs(machine_config &config)
 {
 	I386SX(config, m_maincpu, MAIN_CLOCK_X1*8); // unknown clock.
@@ -2499,6 +2489,8 @@ void pc9801_state::pc9801bx2(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state, pc9801bx2)
 }
 
+// TODO: setter for DMAC clock should follow up whatever is the CPU clock
+
 void pc9801_state::pc9821(machine_config &config)
 {
 	pc9801rs(config);
@@ -2542,11 +2534,95 @@ void pc9801_state::pc9821ap2(machine_config &config)
 void pc9801_state::pc9821v20(machine_config &config)
 {
 	pc9821(config);
-	PENTIUM(config.replace(), m_maincpu, 32000000); // unknown clock
+	PENTIUM(config.replace(), m_maincpu, 32000000); // unknown clock, definitely not 32 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 }
+
+void pc9801_state::pc9821xa16(machine_config &config)
+{
+	pc9821(config);
+	PENTIUM(config.replace(), m_maincpu, 166000000); // Pentium P54C
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+}
+
+void pc9801_state::pc9821ra20(machine_config &config)
+{
+	pc9821(config);
+	PENTIUM_PRO(config.replace(), m_maincpu, XTAL(200'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+}
+
+void pc9801_state::pc9821ra333(machine_config &config)
+{
+	pc9821(config);
+	const double xtal = 333000000;
+	PENTIUM2(config.replace(), m_maincpu, xtal); // actually a Celeron
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	// 128KB CPU cache RAM
+	// Trident TGUI9682XGi + integrated 98 gfx card
+	// 3x cbus + 2x PCI slots
+	// 6GB HDD
+	// built-in ethernet 100BASE-TX/10BASE-T
+
+}
+
+// Epson clones
+// TODO: definitely runs on their own state machine
+// (verify if for instance they need EGC and what kind of FM board they needs up)
+
+void pc9801_state::pc386m(machine_config &config)
+{
+	pc9801rs(config);
+//  I386SX(config.replace(), m_maincpu, 16000000); // i386SX 16MHz, switchable to 10/6 MHz
+//  m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9801rs_map);
+//  m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9801rs_io);
+//  m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+	// RAM: 640KB + 14.6MB max
+	// 2 3.5 floppy drives
+	// ...
+}
+
+void pc9801_state::pc486se(machine_config &config)
+{
+	pc9821(config);
+	const XTAL xtal = XTAL(25'000'000);
+	I486(config.replace(), m_maincpu, xtal); // i486SX, switchable to 10/5 MHz, supports overdrive
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821as_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	pc9801_pit_clock(config, xtal/8); // unknown, passes "ERR:TM" test
+
+	// RAM: 1.6 MB (!) + 17.6 max
+	// "dedicated internal memory slot x 1"
+	// "dedicated video board" slot
+}
+
+void pc9801_state::pc486mu(machine_config &config)
+{
+	pc9821(config);
+	const XTAL xtal = XTAL(33'000'000);
+	I486(config.replace(), m_maincpu, xtal); // i486SX, switchable to I386DX 10MHz/5MHz, Pentium ODP compatible
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801_state::pc9821as_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	pc9801_pit_clock(config, xtal/8); // unknown, passes "ERR:TM" test
+
+	// CL-GD5428
+	// RAM: 5.6 + 61.6MB max
+	// 2 x 3.5 floppy drives
+}
+
 
 /* took from "raw" memory dump, uncomment ROM_FILL if you want to play with it */
 #define LOAD_IDE_ROM \
@@ -2649,7 +2725,7 @@ ROM_START( pc9801rs )
 	ROM_LOAD( "itf_rs.rom",  0x10000, 0x08000, CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
 	ROM_LOAD( "bios_rs.rom", 0x18000, 0x18000, BAD_DUMP CRC(315d2703) SHA1(4f208d1dbb68373080d23bff5636bb6b71eb7565) )
 
-	/* following is an emulator memory dump, should be checked and nuked */
+	/* following is an emulator memory dump, should be checked and eventually nuked if nothing worth is there */
 	ROM_REGION( 0x100000, "memory", 0 )
 	ROM_LOAD( "00000.rom", 0x00000, 0x8000, CRC(6e299128) SHA1(d0e7d016c005cdce53ea5ecac01c6f883b752b80) )
 	ROM_LOAD( "c0000.rom", 0xc0000, 0x8000, CRC(1b43eabd) SHA1(ca711c69165e1fa5be72993b9a7870ef6d485249) )  // 0xff everywhere
@@ -2669,7 +2745,7 @@ ROM_END
 /*
 BX2/U2 - 486SX - (should be 33, but "dumper" note says it's 25 MHz)
 
-Yet another franken-dump done with a lame program, shrug
+Yet another franken-romset done with direct memory dump, shrug
 
 */
 
@@ -2812,7 +2888,8 @@ ROM_START( pc9821ap2 )
 	ROM_SYSTEM_BIOS(1, "phd0102",  "PHD0102")
 	ROMX_LOAD( "phd0102.rom",     0x000000, 0x80000, CRC(3036774c) SHA1(59856a348f156adf5eca06326f967aca54ff871c), ROM_BIOS(1) )
 
-	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF ) // TODO: identify ROM banks
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// TODO: identify ROM banks
 	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x08000 )
 	ROM_COPY( "biosrom", 0x30000, 0x18000, 0x18000 )
 
@@ -2841,32 +2918,16 @@ ROM_START( pc9821ne )
 ROM_END
 
 /*
-Epson PC-486MU - 486 based, unknown clock
-*/
-
-ROM_START( pc486mu )
-	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "bios_486mu.rom", 0x00000, 0x18000, BAD_DUMP CRC(57b5d701) SHA1(15029800842e93e07615b0fd91fb9f2bfe3e3c24))
-	ROM_RELOAD(                 0x18000, 0x18000 ) // missing rom?
-
-	ROM_REGION( 0x80000, "chargen", 0 )
-	ROM_LOAD( "font_486mu.rom", 0x0000, 0x46800, CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff))
-
-	LOAD_KANJI_ROMS
-	LOAD_IDE_ROM
-ROM_END
-
-/*
 98MULTi Ce2 - 80486SX 25
 */
 
 ROM_START( pc9821ce2 )
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf_ce2.rom",  0x10000, 0x08000, CRC(273e9e88) SHA1(9bca7d5116788776ed0f297bccb4dfc485379b41) )
+	ROM_LOAD( "itf_ce2.rom",  0x10000, 0x008000, CRC(273e9e88) SHA1(9bca7d5116788776ed0f297bccb4dfc485379b41) )
 	ROM_LOAD( "bios_ce2.rom", 0x18000, 0x018000, BAD_DUMP CRC(76affd90) SHA1(910fae6763c0cd59b3957b6cde479c72e21f33c1) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
-	ROM_LOAD( "font_ce2.rom",     0x000000, 0x046800, CRC(d1c2702a) SHA1(e7781e9d35b6511d12631641d029ad2ba3f7daef) )
+	ROM_LOAD( "font_ce2.rom", 0x00000, 0x046800, BAD_DUMP CRC(d1c2702a) SHA1(e7781e9d35b6511d12631641d029ad2ba3f7daef) )
 
 	LOAD_KANJI_ROMS
 	LOAD_IDE_ROM
@@ -2878,11 +2939,89 @@ ROM_END
 
 ROM_START( pc9821xs )
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf.rom",  0x10000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+	ROM_LOAD( "itf.rom",         0x10000, 0x008000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
 	ROM_LOAD( "bios_xs.rom",     0x18000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
-	ROM_LOAD( "font_xs.rom",     0x000000, 0x046800, BAD_DUMP CRC(c9a77d8f) SHA1(deb8563712eb2a634a157289838b95098ba0c7f2) )
+	ROM_LOAD( "font_xs.rom",     0x00000, 0x046800, BAD_DUMP CRC(c9a77d8f) SHA1(deb8563712eb2a634a157289838b95098ba0c7f2) )
+
+	LOAD_KANJI_ROMS
+	LOAD_IDE_ROM
+ROM_END
+
+
+/*
+9821Xa16
+
+Pentium P54C @ 166
+32MB
+3.5"2DD/2HDx1, 8xCD-ROM
+CBus: 3 slots
+
+*/
+
+ROM_START( pc9821xa16 )
+	ROM_REGION16_LE( 0x40000, "biosrom", ROMREGION_ERASEFF )
+	ROM_LOAD( "pc-9821xa16_g8yewa_a1_wsg8b01_ab28f200b5-t.bin", 0x00000, 0x040000, CRC(f99c8ce2) SHA1(2bc328d2c496046f6f4f39b0637e90b713a63155) ) // SOP44
+
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// TODO: all of the 256k space seems valid
+	ROM_COPY( "biosrom", 0x28000, 0x00000, 0x18000 )
+	ROM_COPY( "biosrom", 0x00000, 0x18000, 0x18000 )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
+
+	LOAD_KANJI_ROMS
+	LOAD_IDE_ROM
+ROM_END
+
+/*
+pc-9821Ra20 (98MATE R)
+
+Pentium Pro @ 200
+32MB
+3.5"2DD/2HDx1, 8xCD-ROM
+CBus: 3 slots
+*/
+
+ROM_START( pc9821ra20 )
+	ROM_REGION16_LE( 0x40000, "biosrom", ROMREGION_ERASEFF )
+	ROM_LOAD( "g8wtp_a13_wtp8b01_ab28f200b5-t.bin", 0x00000, 0x040000, CRC(cd3acc5c) SHA1(746490d7f3d8d0e8df865315adaaae65f3fd0425) ) // SOP44
+
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// TODO: all of the 256k space seems valid
+	ROM_COPY( "biosrom", 0x28000, 0x00000, 0x18000 )
+	ROM_COPY( "biosrom", 0x00000, 0x18000, 0x18000 )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
+
+	LOAD_KANJI_ROMS
+	LOAD_IDE_ROM
+ROM_END
+
+/*
+pc-9821Ra333 (98MATE R)
+
+Celeron @ 333
+32MB, max 256 MB (ECC EDO RAM)
+3.5x1, 24xCD-ROM
+CBus: 3 slots, PCI: 2 slots
+*/
+
+
+ROM_START( pc9821ra333 )
+	ROM_REGION16_LE( 0x40000, "biosrom", ROMREGION_ERASEFF )
+	ROM_LOAD( "g8ykkw.bin", 0x00000, 0x040000, CRC(c605ef31) SHA1(3779aed757f21eb75093c1bfcbf18a232c198ee6) )
+
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// TODO: all of the 256k space seems valid
+	ROM_COPY( "biosrom", 0x28000, 0x00000, 0x18000 )
+	ROM_COPY( "biosrom", 0x00000, 0x18000, 0x18000 )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
 	LOAD_KANJI_ROMS
 	LOAD_IDE_ROM
@@ -2899,7 +3038,7 @@ ROM_START( pc9821v13 )
 	ROM_LOAD( "bios_v13.rom", 0x18000, 0x18000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
-	ROM_LOAD( "font_a.rom", 0x00000, 0x46800, BAD_DUMP CRC(c9a77d8f) SHA1(deb8563712eb2a634a157289838b95098ba0c7f2) )
+	ROM_LOAD( "font_a.rom",   0x00000, 0x46800, BAD_DUMP CRC(c9a77d8f) SHA1(deb8563712eb2a634a157289838b95098ba0c7f2) )
 
 	LOAD_KANJI_ROMS
 	LOAD_IDE_ROM
@@ -2915,13 +3054,91 @@ ROM_START( pc9821v20 )
 	ROM_LOAD( "bios_v20.rom", 0x18000, 0x18000, BAD_DUMP CRC(d5d1f13b) SHA1(bf44b5f4e138e036f1b848d6616fbd41b5549764) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
-	ROM_LOAD( "font_v20.rom",     0x000000, 0x046800, BAD_DUMP CRC(6244c4c0) SHA1(9513cac321e89b4edb067b30e9ecb1adae7e7be7) )
+	ROM_LOAD( "font_v20.rom", 0x00000, 0x046800, BAD_DUMP CRC(6244c4c0) SHA1(9513cac321e89b4edb067b30e9ecb1adae7e7be7) )
 
 	LOAD_KANJI_ROMS
 	LOAD_IDE_ROM
 ROM_END
 
+/*
+Epson PC-386M
 
+i386SX-16 @ 16
+1MB
+3.5"2DD/2HDx2
+CBus: 3slots
+*/
+
+ROM_START( pc386m )
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "cwma-a02.bin", 0x10000, 0x08000,  CRC(d2c357a4) SHA1(819c9a1fc92124a8d6a85339c74651add7efaf92) )
+	ROM_CONTINUE(             0x18000, 0x18000 )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font_486mu.rom", 0x0000, 0x46800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff))
+
+	LOAD_KANJI_ROMS
+	LOAD_IDE_ROM
+ROM_END
+
+/*
+Epson PC-486SE
+
+i486SX @ 25 MHz
+1.6 MB of conventional memory (???)
+17.6 MB
+CBus: 2slots
+*/
+
+ROM_START( pc486se )
+	ROM_REGION16_LE( 0x20000, "biosrom", ROMREGION_ERASEFF )
+	ROM_LOAD( "1699ma_cw99-a03.bin", 0x00000, 0x20000,   CRC(f03df711) SHA1(88614746e01c7d3cff9f3b8ce0a598830a77d1dc) )
+
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// this looks convoluted
+	ROM_COPY( "biosrom", 0x08000, 0x00000, 0x08000 ) // tests this area at PC=0xf5149
+	ROM_COPY( "biosrom", 0x00000, 0x10000, 0x08000 )
+	ROM_COPY( "biosrom", 0x10000, 0x08000, 0x08000 )
+//  ROM_FILL(                     0x18000, 0x08000, 0x90) // untested by BIOS
+	ROM_COPY( "biosrom", 0x10000, 0x20000, 0x08000 ) // PC=f5113 bankswitch into same area, correct?
+	ROM_COPY( "biosrom", 0x18000, 0x28000, 0x08000 )
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font_486mu.rom", 0x0000, 0x46800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff))
+
+	LOAD_KANJI_ROMS
+	LOAD_IDE_ROM
+ROM_END
+
+/*
+Epson PC-486MU
+i486SX-33 @ 33
+8MB RAM
+3.5'2DD/2HDx2, 2xCD-ROM
+CBus: 3 slots
+*/
+
+ROM_START( pc486mu )
+	ROM_REGION16_LE( 0x20000, "biosrom", ROMREGION_ERASEFF )
+	ROM_LOAD( "pc-486mu_hn27c1024.bin", 0x00000, 0x20000, CRC(113268e1) SHA1(2a630abc825b2808f9f8fb65c6cb1fb7e7f6c710))
+//  ROM_LOAD( "bios_486mu.rom", 0x00000, 0x18000, BAD_DUMP CRC(57b5d701) SHA1(15029800842e93e07615b0fd91fb9f2bfe3e3c24))
+
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// backported from pc486se
+	ROM_COPY( "biosrom", 0x08000, 0x00000, 0x08000 )
+	ROM_COPY( "biosrom", 0x00000, 0x10000, 0x08000 )
+	ROM_COPY( "biosrom", 0x10000, 0x08000, 0x08000 )
+//  ROM_FILL(                     0x18000, 0x08000, 0x90) // untested by BIOS
+	ROM_COPY( "biosrom", 0x10000, 0x20000, 0x08000 )
+	ROM_COPY( "biosrom", 0x18000, 0x28000, 0x08000 )
+
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font_486mu.rom", 0x0000, 0x46800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff))
+
+	LOAD_KANJI_ROMS
+	LOAD_IDE_ROM
+ROM_END
 
 void pc9801_state::init_pc9801_kanji()
 {
@@ -3055,22 +3272,65 @@ void pc9801_state::init_pc9801vm_kanji()
 	}
 }
 
-/* Genuine dumps */
-COMP( 1983, pc9801f,    0,        0, pc9801,    pc9801,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801F",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1985, pc9801vm,   pc9801ux, 0, pc9801vm,  pc9801rs, pc9801_state, init_pc9801vm_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// For simpilicity's sake we arbitrarily group those with whatever romset came first historically.
+// This is also repeated in SW list reports: you'd have to use an "On RS class xxx" format to indicate a bug report
+// specifically happening for a family group. This will be hopefully put into stone with driver splits at some point in future.
 
-/* TODO: ANYTHING below there needs REDUMPING! */
-COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801RS",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) //TODO: not sure about the exact model
+// "vanilla" class (i86, E/F/M)
+COMP( 1983, pc9801f,    0,        0, pc9801,    pc9801,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801F",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // genuine dump
+
+// N5200 (started as a vanilla PC-98 business line derivative, eventually diverged into its own thing and incorporated various Hyper 98 features. Runs proprietary PTOS)
+// APC III (US version of either vanilla PC9801 or N5200, aimed at business market. Runs MS-DOS 2.11/3.xx or PC-UX)
+// ...
+
+// VM class (V30 and/or i286)
+COMP( 1985, pc9801vm,   pc9801ux, 0, pc9801vm,  pc9801rs, pc9801_state, init_pc9801vm_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // genuine dump
 COMP( 1985, pc9801vm11, pc9801ux, 0, pc9801vm,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801VM11",                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// VX class (first model using an EGC)
+// ...
+
+// XA/XL class (1120 x 750 true color, nicknamed "High-reso")
+// ...
+
+// PC-H98 (Hyper 98, '90-'93 high end line with High-reso, proprietary NESA bus, E²GC)
+// PC-H98T (LCD Hyper 98)
+// SV-H98 (Later Hyper 98 revision, up to Pentium CPU)
+// ...
+
+// RS class (i386SX)
 COMP( 1988, pc9801rx,   pc9801rs, 0, pc9801rs,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801RX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1989, pc9801rs,   0,        0, pc9801rs,  pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801RS",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// FA class (i486SX)
 COMP( 1993, pc9801bx2,  pc9801rs, 0, pc9801bx2, pc9801rs, pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9801BX2/U2",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1994, pc9821,     0,        0, pc9821,    pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) //TODO: not sure about the exact model
-COMP( 1993, pc9821as,   pc9821,   0, pc9821as,  pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE A)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1993, pc9821ap2,  pc9821,   0, pc9821ap2, pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821AP2/U8W (98MATE A)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1994, pc9821xs,   pc9821,   0, pc9821,    pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE Xs)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1994, pc9821ce2,  pc9821,   0, pc9821,    pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MULTi Ce2)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1994, pc9821ne,   pc9821,   0, pc9821,    pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98NOTE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1994, pc486mu,    pc9821,   0, pc9821,    pc9821,   pc9801_state, init_pc9801_kanji,   "Epson", "PC-486MU",                      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1998, pc9821v13,  pc9821,   0, pc9821,    pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE VALUESTAR 13)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-COMP( 1998, pc9821v20,  pc9821,   0, pc9821v20, pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE VALUESTAR 20)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// PC-98GS (Multimedia PC, exclusive video mode "Extended Screen Graphics", -73 sound board (a superset of later -86), superimposition)
+// ...
+
+// Epson class
+COMP( 1990, pc386m,     0,        0, pc386m,    pc9801rs, pc9801_state, init_pc9801_kanji,   "Epson", "PC-386M",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1994, pc486mu,    0,        0, pc486mu,   pc9821,   pc9801_state, init_pc9801_kanji,   "Epson", "PC-486MU",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1993, pc486se,    pc486mu,  0, pc486se,   pc9801rs, pc9801_state, init_pc9801_kanji,   "Epson", "PC-486SE",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// PC9821 class
+// TODO: unknown real model of parent, given the BIOS rom size wrt the others it may be better suited as a "98Multi" or even a FA class?
+// investigate by making genuine BIOS dumps to boot
+COMP( 1994, pc9821,      0,        0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1993, pc9821as,    pc9821,   0, pc9821as,    pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE A)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1993, pc9821ap2,   pc9821,   0, pc9821ap2,   pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821AP2/U8W (98MATE A)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1994, pc9821xs,    pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE Xs)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1994, pc9821ce2,   pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MULTi Ce2)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1994, pc9821ne,    pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98NOTE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1996, pc9821xa16,  pc9821,   0, pc9821xa16,  pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Xa16",                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1996, pc9821ra20,  pc9821,   0, pc9821ra20,  pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra20 (98MATE R)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1998, pc9821ra333, pc9821,   0, pc9821ra333, pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra333 (98MATE R)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1998, pc9821v13,   pc9821,   0, pc9821,      pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE VALUESTAR 13)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+COMP( 1998, pc9821v20,   pc9821,   0, pc9821v20,   pc9821,   pc9801_state, init_pc9801_kanji,   "NEC",   "PC-9821 (98MATE VALUESTAR 20)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// PC98DO (PC88+PC98, V33 + μPD70008AC)
+
+// PC-98LT (laptop b&w LCD version V50, no upd7220, just one single bitmap layer)
+// PC-98HA aka HANDY98 (portable b&w LCD version, V50, apparently compatible with LT)
+// RC-9801 (portable (color?) LCD, i386SX, wireless 9600bps modem)
+// PC-9801P (LCD with light pen)

@@ -2921,6 +2921,24 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="cpanel">
+		<description>Control Panel</description>
+		<year>1988</year>
+		<publisher>Promark</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Installation Disk" />
+			<dataarea name="flop" size = "368640">
+				<rom name="control_panel_disk1.img" size="368640" crc="089953f7" sha1="3febb682ac08e13f6812ad296dcb95e89e0eb229"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Installation Disk 2" />
+			<dataarea name="flop" size = "368640">
+				<rom name="control_panel_disk2.img" size="368640" crc="093cfa2a" sha1="a7c42bf78997a7b568d82555fabeb817050a9b02"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="croschex">
 		<description>Cross-chex</description>
 		<year>198?</year>
@@ -7912,7 +7930,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="batcet" cloneof="bat">
-		<description>B.A.T. (CGA/EGA/Tandy versions) (Quest &amp; Glory Compilation)</description>
+		<description>B.A.T. (CGA/EGA/Tandy versions) (Quest &amp; Glory compilation)</description>
 		<year>1990</year>
 		<publisher>Ubi Soft Entertainment Software</publisher>
 		<info name="developer" value="Computer's Dream" />
@@ -8234,6 +8252,19 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="bcauldrn">
+		<description>The Black Cauldron</description>
+		<year>1988</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="Version 2.10, 11/10/88" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="The Black Cauldron [Sierra] [1988] [3.5DD] [Disk 1 of 1].img" size="737280" crc="2d0d37f8" sha1="406d2979f0a3629b15c39d38eaa6976c1edabef4"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bladestl">
 		<description>Blades of Steel</description>
 		<year>1990</year>
@@ -8288,7 +8319,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="bloodwyca" cloneof="bloodwyc">
-		<description>Bloodwych (Quest &amp; Glory Compilation) (Euro)</description>
+		<description>Bloodwych (Quest &amp; Glory compilation) (Euro)</description>
 		<year>1991</year>
 		<publisher>Ubi Soft</publisher>
 		<info name="developer" value="Mirrorsoft" />
@@ -8451,7 +8482,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="cadaver35" cloneof="cadaver">
-		<description>Cadaver (3.5", Quest &amp; Glory Compilation)</description>
+		<description>Cadaver (3.5", Quest &amp; Glory compilation)</description>
 		<year>1991</year>
 		<publisher>Image Works</publisher>
 		<info name="developer" value="The Bitmap Brothers" />
@@ -9289,6 +9320,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="dspirit">
+		<description>Dragon Spirit</description>
+		<year>1991</year>
+		<publisher>Domark</publisher>
+		<info name="developer" value="Namco" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Dragon Spirit [Domark] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="c3b23955" sha1="d522e3c56ae41ccca55f6acd22fecf8cf372666d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dlair">
 		<description>Dragon's Lair (5.25")</description>
 		<year>1989</year>
@@ -10066,6 +10109,28 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="hypspeed">
+		<description>Hyperspeed</description>
+		<year>1991</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="MPS Labs" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Hyperspeed [Microprose] [1991] [3.5DD] [Disk 1 of 3].img" size="737280" crc="8c8f9a94" sha1="433dbddc7ca7ba2609aa02531e0e8437eefb5608"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Hyperspeed [Microprose] [1991] [3.5DD] [Disk 2 of 3].img" size="737280" crc="6c1bc667" sha1="bd973ce3922ea28622a4d55fa91bed15fd41b2ce"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Hyperspeed [Microprose] [1991] [3.5DD] [Disk 3 of 3].img" size="737280" crc="398f7753" sha1="a1a5af101c842f6e603a5bb279e29ad477745e02"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="armorik">
 		<description>Les 8 Conquêtes d'Armorik le Viking</description>
 		<year>1987</year>
@@ -10260,6 +10325,24 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="International Karate (Prism Leisure release) [System 3] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="e8b3d837" sha1="a469f0bb4bdd27b7c72366dbc9223d532f9031de"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- black square glitches behind sprites -->
+	<software name="intsocch" supported="partial">
+		<description>International Soccer Challenge (Virtual Reality Vol. 1 compilation)</description>
+		<year>1990</year>
+		<publisher>Elite</publisher>
+		<info name="developer" value="Red Rat Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="International Soccer Challenge [Elite] [1990] [5.25DD] [Disk 1 of 2].img" size="368640" crc="5d3df9ca" sha1="ed8ab95aeda1c9d0bb29c4bf0225b403387b1bdf"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="International Soccer Challenge [Elite] [1990] [5.25DD] [Disk 2 of 2].img" size="368640" crc="1853c17a" sha1="5f4e2c7fad1a1c25441b8d820992347385ba0590"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14244,7 +14327,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="xenon2a" cloneof="xenon2">
-		<description>Xenon 2: Megablast (Power Pack Compilation)</description>
+		<description>Xenon 2: Megablast (Power Pack compilation)</description>
 		<year>1990</year>
 		<publisher>Beau Jolly - Mirrorsoft</publisher>
 		<info name="developer" value="The Assembly Line - The Bitmap Brothers" />

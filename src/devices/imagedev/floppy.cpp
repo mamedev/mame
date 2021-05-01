@@ -21,6 +21,7 @@
 #include "formats/pc_dsk.h"
 
 #include "formats/fs_unformatted.h"
+#include "formats/fsblk_vec.h"
 
 #include "speaker.h"
 #include "formats/imageutl.h"
@@ -308,14 +309,17 @@ void floppy_image_device::setup_led_cb(led_cb cb)
 	cur_led_cb = cb;
 }
 
-void floppy_image_device::fs_enum::add(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, u32 key, const char *description)
+void floppy_image_device::fs_enum::add(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, const char *description)
 {
-	m_fid->m_fs.emplace_back(fs_info(manager, type, image_size, name, key, description));
+	if(manager->can_format())
+		m_fid->m_create_fs.emplace_back(fs_info(manager, type, image_size, name, description));
+	if(manager->can_read())
+		m_fid->m_io_fs.emplace_back(fs_info(manager, type, image_size, name, description));
 }
 
-void floppy_image_device::fs_enum::add_raw(const filesystem_manager_t *manager, const char *name, u32 key, const char *description)
+void floppy_image_device::fs_enum::add_raw(const char *name, u32 key, const char *description)
 {
-	m_fid->m_fs.emplace_back(fs_info(manager, name, key, description));
+	m_fid->m_create_fs.emplace_back(fs_info(name, key, description));
 }
 
 void floppy_image_device::register_formats()
@@ -344,7 +348,7 @@ void floppy_image_device::register_formats()
 	for(filesystem_manager_type fmt : fr.m_fs)
 	{
 		auto ff = fmt();
-		ff->enumerate(fse, form_factor, variants);
+		ff->enumerate_f(fse, form_factor, variants);
 		m_fs_managers.push_back(std::unique_ptr<filesystem_manager_t>(ff));
 	}
 }
@@ -377,7 +381,8 @@ void floppy_image_device::set_rpm(float _rpm)
 void floppy_image_device::setup_write(floppy_image_format_t *_output_format)
 {
 	output_format = _output_format;
-	commit_image();
+	if(image)
+		commit_image();
 }
 
 void floppy_image_device::commit_image()
@@ -711,20 +716,23 @@ static io_generic *ram_open(std::vector<u8> &data)
 	return new io_generic({ &iop_ram, f });
 }
 
-void floppy_image_device::init_fs(const fs_info *fs)
+void floppy_image_device::init_fs(const fs_info *fs, const fs_meta_data &meta)
 {
+	assert(image);
 	if (fs->m_type)
 	{
 		std::vector<u8> img(fs->m_image_size);
-		fs->m_manager->floppy_instantiate(fs->m_key, img);
+		fsblk_vec_t blockdev(img);
+		auto cfs = fs->m_manager->mount(blockdev);
+		cfs->format(meta);
+
 		auto iog = ram_open(img);
 		auto source_format = fs->m_type();
 		source_format->load(iog, floppy_image::FF_UNKNOWN, variants, image.get());
 		delete source_format;
 		delete iog;
-
 	} else
-		fs->m_manager->floppy_instantiate_raw(fs->m_key, image.get());
+		fs_unformatted::format(fs->m_key, image.get());
 }
 
 /* write protect, active high

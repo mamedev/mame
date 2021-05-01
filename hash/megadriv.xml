@@ -2102,7 +2102,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 	<software name="doublecl">
 		<description>Double Clutch (Euro)</description>
-		<year>1992</year>
+		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
@@ -3707,7 +3707,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 	<software name="hook">
 		<description>Hook (Euro)</description>
-		<year>1992</year>
+		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
@@ -4663,7 +4663,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 	<software name="lostvik">
 		<description>The Lost Vikings (Euro)</description>
-		<year>1993</year>
+		<year>1994</year>
 		<publisher>Interplay</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA"/>
@@ -5338,7 +5338,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 <!-- Both Euro & USA are confirmed -->
 	<software name="nbaallst">
 		<description>NBA All-Star Challenge (Euro, USA)</description>
-		<year>1992</year>
+		<year>1993</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="670115 REV 3 [EUR] ~ 670100 REV 8 [USA]"/>
@@ -6479,7 +6479,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 	<software name="ppersia">
 		<description>Prince of Persia (Euro)</description>
-		<year>1993</year>
+		<year>1994</year>
 		<publisher>Domark</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B"/>
@@ -7062,7 +7062,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 	<software name="sensibie">
 		<description>Sensible Soccer - International Edition (Euro)</description>
-		<year>1993</year>
+		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="alt_title" value="International Sensible Soccer - Limited Edition: World Champions (Box)"/>
 		<part name="cart" interface="megadriv_cart">
@@ -7682,7 +7682,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 	<software name="renstim">
 		<description>Stimpy's Invention Starring Starring Ren Hoëk &amp; Stimpy (Euro)</description>
-		<year>1993</year>
+		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="The Ren &amp; Stimpy Show Presents Stimpy's Invention (Box)"/>
 		<part name="cart" interface="megadriv_cart">
@@ -8036,7 +8036,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 	<software name="skickoff">
 		<description>Super Kick Off (Euro)</description>
-		<year>1992</year>
+		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -12477,7 +12477,7 @@ but dumps still have to be confirmed.
 
 	<software name="chaoseng">
 		<description>The Chaos Engine (Euro)</description>
-		<year>1992</year>
+		<year>1994</year>
 		<publisher>Microprose</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1572864">
@@ -15486,7 +15486,7 @@ but dumps still have to be confirmed.
 
 	<software name="fantdizz">
 		<description>Fantastic Dizzy (Euro, USA)</description>
-		<year>1991</year>
+		<year>1993</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -16795,7 +16795,7 @@ but dumps still have to be confirmed.
 
 	<software name="hooku" cloneof="hook">
 		<description>Hook (USA)</description>
-		<year>1992</year>
+		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -17158,8 +17158,8 @@ but dumps still have to be confirmed.
 			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="prostrfs">
 		<description>Pro Striker Final Stage (Jpn)</description>
 		<year>1995</year>
@@ -18317,7 +18317,7 @@ but dumps still have to be confirmed.
 
 	<software name="lostviku" cloneof="lostvik">
 		<description>The Lost Vikings (USA)</description>
-		<year>1992</year>
+		<year>1994</year>
 		<publisher>Interplay</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -18327,7 +18327,7 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="lotus2">
-		<description>Lotus II (Euro, USA)</description>
+		<description>Lotus II: RECS (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -22463,7 +22463,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="ppersiau" cloneof="ppersia">
 		<description>Prince of Persia (USA)</description>
-		<year>1993</year>
+		<year>1994</year>
 		<publisher>Tengen</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -24980,6 +24980,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="sonic the hedgehog (euro, usa) (pirate).bin" size="524288" crc="7a093f0b" sha1="ad7502fa15b1819eeb4089783b4a850d898bc71e" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonicp" cloneof="sonic">
+		<description>Sonic the Hedgehog (Prototype)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="524288">
+				<rom name="sonic the hedgehog (16-bit) (prototype).bin" size="524288" crc="917c9ca9" sha1="0b38a66d5e2ffa2394fccb41e4871419cd0a077d"/>
 			</dataarea>
 		</part>
 	</software>

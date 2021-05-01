@@ -804,8 +804,8 @@ void swp30_device::snd_w(offs_t offset, u16 data)
 		preg = util::string_format("lf%02x", (slot-0x3e) + 2*chan);
 	else
 		preg = util::string_format("%02x.%02x", chan, slot);
-	//	if((slot >= 0xa && slot <= 0xd) || (slot >= 0x2c && slot <= 0x2f))
-	//		machine().debug_break();
+	//  if((slot >= 0xa && slot <= 0xd) || (slot >= 0x2c && slot <= 0x2f))
+	//      machine().debug_break();
 
 	logerror("snd_w [%04x %04x] %-5s, %04x\n", offset, offset*2, preg, data);
 }
@@ -869,7 +869,7 @@ void swp30_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 				}
 				break;
 			}
-				
+
 			case 2:   // 8-bits linear
 				samp = read_byte(base_address + spos) << 8;
 				break;

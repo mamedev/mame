@@ -16628,4 +16628,90 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="sdwsnkrs">
+		<description>Sidewalk Sneakers</description>
+		<year>1991</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2021-04-23"/>
+		<info name="programmer" value="Bonnie Seiler and Michael Sweet"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!--"Sidewalk Sneakers" is a 1991 educational game developed by Bonnie Seiler and Michael Sweet, and distributed by Sunburst Communications. It requires a 128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234815">
+				<rom name="sidewalk sneakers.woz" size="234815" crc="eca45646" sha1="29f5f8fd6e748f2a31b370bf5fdc24f68ac9c39f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anmrescu">
+		<description>Animal Rescue</description>
+		<year>1991</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2021-04-24"/>
+		<info name="programmer" value="S. Hosler, Mark Wharton, and Philip Wharton"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+		<!--"Animal Rescue" is a 1991 educational game developed by S. Hosler, Mark Wharton, and Philip Wharton, and distributed by Sunburst Communications. It requires a 128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234821">
+				<rom name="animal rescue.woz" size="234821" crc="a9f9ad80" sha1="8ae4d857d2742d087be18ba941e5b13da3509005"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mckmgrdr">
+		<description>Mickey's Magic Reader</description>
+		<year>1989</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2021-04-24"/>
+		<info name="programmer" value="Neil Larimer and Mary Anne Hermann"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Mickey's Magic Reader" is a 1989 educational game developed by Neil Larimer and Mary Anne Hermann, and distributed by Sunburst Communications. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234824">
+				<rom name="mickey's magic reader.woz" size="234824" crc="e8373ccf" sha1="ff7126fe65a08b88f1b4c59db8bcb74e44558c94"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mdbiogen">
+		<description>Modern Biology: Genetics</description>
+		<year>1989</year>
+		<publisher>Holt, Rinehart and Winston</publisher>
+		<info name="release" value="2021-04-24"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Modern Biology: Genetics" is a 1989 educational program developed by Prentice Associates and distributed by Holt, Rinehart and Winston. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="234826">
+				<rom name="modern biology - genetics side 1.woz" size="234826" crc="6c624a41" sha1="7d83b4a3fd6b4ad04628e9bf3e51b2f121f74416"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="234826">
+				<rom name="modern biology - genetics side 2.woz" size="234826" crc="67b915cf" sha1="137f8e247de3d5e9052e7301507f82c7a47b95ac"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="234826">
+				<rom name="modern biology - genetics side 3.woz" size="234826" crc="0a18ba83" sha1="cc3dbac28c15ffc2faa20cbfb88bbe673b86e511"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side 4"/>
+			<dataarea name="flop" size="234826">
+				<rom name="modern biology - genetics side 4.woz" size="234826" crc="9406020a" sha1="817e6ea052ae32a20ca4e231413d1f9076307f61"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

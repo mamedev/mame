@@ -5,8 +5,7 @@
     mame.lst
 
     This is not an automatically generated file, and it should be manually
-    updated when new driver is added. From time to time, we will auto-update
-    comments according to metadata from source files.
+    updated when new driver is added.
 
 ******************************************************************************/
 
@@ -1399,6 +1398,7 @@ apple1                          // Jul 1976 Apple 1
 
 @source:apple2.cpp
 ace100                          // ??? 1982 Franklin Ace 100
+ace1000                         // 1982 Franklin ACE 1000
 am64                            // 1985 ASEM AM 64 (motherboard is marked AM-100 but it boots as "AM 64")
 apple2                          // Apr 1977 Apple ][
 apple2jp                        // ??? ???? Apple ][j+
@@ -9810,6 +9810,7 @@ hostinv                         // (c) 1998 The Game Room
 calcune
 
 @source:calomega.cpp
+cas21iwc                        // (c) 1990 UCMC / IWC
 comg074                         // (c) 1981 Cal Omega Inc.
 comg076                         // (c) 1981 Cal Omega Inc.
 comg079                         // (c) 1981 Cal Omega Inc.
@@ -9844,12 +9845,14 @@ comg240                         // (c) 1985 Cal Omega / Casino Electronics Inc.
 comg246                         // (c) 1985 Cal Omega Inc.
 comg272a                        // (c) 1985 Cal Omega Inc.
 comg272b                        // (c) 1985 Cal Omega Inc.
-comg5108                        // (c) 1985 Cal Omega Inc.
+comg5108                        // (c) 1985 Casino Electronics Inc.
 comg903d                        // (c) 198? Cal Omega Inc.
 comg905d                        // (c) 198? Cal Omega Inc.
 elgrande                        // (c) 1982 Tuni Electro Service / E.T. Marketing
 jjpoker                         // (c) 1983 Enter-Tech
 jjpokerb                        // (c) 1983 Enter-Tech
+pokeriwc                        // (c) 1991 UCMC / IWC
+pokiwc162                       // (c) 1991 UCMC / IWC
 ssipkr24                        // (c) 1988 SSI
 ssipkr30                        // (c) 1988 SSI
 ssipkr40                        // (c) 1990 SSI
@@ -10054,6 +10057,7 @@ twocrudea                       // MAB (c) 1990 Data East USA (US)
 
 @source:cc40.cpp
 cc40                            // 1983 TI CC-40
+cc40p                           // 1983 TI CC-40+
 
 @source:ccastles.cpp
 ccastles                        // 136022           (c) 1983
@@ -11311,6 +11315,9 @@ cps3booto2                      // bootleg
 cps3bs32                        //
 cps3bs32a                       //
 jojo                            // 28/01/1999 (c) 1998 (Euro)
+jojoa                           // 28/01/1999 (c) 1998 (Asia)
+jojoar1                         // 08/01/1999 (c) 1998 (Asia)
+jojoar2                         // 02/12/1998 (c) 1998 (Asia)
 jojoba                          // 27/09/1999 (c) 1999 (Euro)
 jojobaj                         // 27/09/1999 (c) 1999 (Japan)
 jojobajr1                       // 13/09/1999 (c) 1999 (Japan)
@@ -12208,6 +12215,7 @@ diablo              //
 
 @source:diamondking.cpp
 diamondking                     // (c) 1997 SegaSA / Sonic
+diamondkinp                     // (c) 1997 SegaSA / Sonic
 
 @source:didact.cpp
 md6802                          //
@@ -13163,6 +13171,10 @@ elf2                            //
 @source:elwro800.cpp
 elwro800                        //
 
+@source:elzet80.cpp
+elzet80k                        //
+elzet80p                        //
+
 @source:emax.cpp
 emax                            //
 emax2                           //
@@ -13992,6 +14004,7 @@ skylancre                       // (c) 1983 Orca + Esco Trading Co license
 @source:funkyjet.cpp
 funkyjet                        // MAT (c) 1992 Data East (Mitchell license) (World, Rev 1)
 funkyjeta                       // MAT (c) 1992 Data East (Mitchell license) (World) - Rev unverified
+funkyjeta2                      // MAT (c) 1992 Data East (Mitchell license) (World) - Rev unverified - alternative demo
 funkyjetj                       // MAT (c) 1992 Data East (Mitchell license) (Japan, Rev 2)
 sotsugyo                        // (c) 1995 Mitchell (Atlus license)
 
@@ -16981,6 +16994,9 @@ inteladv
 intlc44                         //
 intlc440                        //
 
+@source:intellec8.cpp
+intlc8                          //
+
 @source:intellect02.cpp
 intel02                         //
 
@@ -18907,6 +18923,9 @@ jungleyo
 @source:junior.cpp
 junior                          //
 
+@source:junior80.cpp
+junior80                        //
+
 @source:juno106.cpp
 juno106                         //
 mks7                            //
@@ -19582,6 +19601,7 @@ lbpc                            // Ampro Little Board/PC
 
 @source:lc80.cpp
 lc80                            //
+lc80a                           //
 lc80e                           //
 lc80_2                          //
 
@@ -20388,6 +20408,9 @@ matrix                          //
 
 @source:mattelchess.cpp
 mchess
+
+@source:max80.cpp
+max80
 
 @source:maxaflex.cpp
 maxaflex                        //
@@ -22872,6 +22895,7 @@ trvwzv                          // (c) 1985 Merit
 ma6710                          // (c) 1989 Merit
 ma7551                          // (c) 199? Merit
 ma7556                          // (c) 199? Merit
+ma7558                          // (c) 199? Merit
 
 @source:meritm.cpp
 americna                        // (c) 1987 Merit
@@ -31410,6 +31434,7 @@ pocketrc                        // 1997.03 Pocket Racer (Japan, PKR1/VER.B)
 primglex                        // 1996.03 Prime Goal EX (Japan, PG1/VER.A)
 ptblank2a                       // 1999.?? Point Blank 2 (World, GNB2/VER.A)
 ptblank2b                       // 1999.?? Point Blank 2 (World, GNB2/VER.A alt)
+ptblank2c                       // 1999.?? Point Blank 2 (Unknown region)
 ptblank2ua                      // 1999.?? Point Blank 2 (US, GNB3/VER.A)
 souledge                        // 1996.05 Soul Edge Ver. II (Asia, SO4/VER.C)
 souledgea                       // 1996.02 Soul Edge (World, SO2/VER.A)
@@ -33067,6 +33092,7 @@ racingj2j                       // GX888 (c)1999 (JAE)
 thrilld                         // GX713 (c)1998 Japan JAE
 thrilldb                        // GX713 (c)1998 Japan JAB
 thrilldbe                       // GX713 (c)1998 Europe EAB
+thrilldbu                       // GX713 (c)1998 ?AB
 
 @source:nycaptor.cpp
 bronx                           // bootleg
@@ -33610,21 +33636,26 @@ pc88va                          //
 pc88va2                         //
 
 @source:pc9801.cpp
+pc386m                          //
 pc486mu                         //
+pc486se                         // 1993
 pc9801bx2                       // 1993
 pc9801f                         // 1983
 pc9801rs                        // 1989
 pc9801rx                        // 1988
 pc9801ux                        // 1987
 pc9801vm                        // 1985
-pc9801vm11
+pc9801vm11                      //
 pc9821                          //
 pc9821ap2                       //
 pc9821as                        //
 pc9821ce2                       //
 pc9821ne                        //
+pc9821ra20                      //
+pc9821ra333                     //
 pc9821v13                       //
 pc9821v20                       //
+pc9821xa16                      //
 pc9821xs                        //
 
 @source:pcat_dyn.cpp
@@ -35037,6 +35068,7 @@ poly800mdk                      //
 
 @source:poly880.cpp
 poly880                         //
+poly880s                        //
 
 @source:polyplay.cpp
 polyplay                        //
@@ -35591,6 +35623,9 @@ rk7007                          //
 rk700716                        //
 spektr01                        //
 
+@source:radionic.cpp
+radionic                        // Komtek 1
+
 @source:raiden.cpp
 raiden                          // (c) 1990 Seibu Kaihatsu
 raidena                         // (c) 1990 Seibu Kaihatsu
@@ -35615,6 +35650,7 @@ raiden2eg                       // (c) 1993 Seibu Kaihatsu + Tuning license
 raiden2es                       // (c) 1993 Seibu Kaihatsu
 raiden2eu                       // (c) 1993 Seibu Kaihatsu + Fabtek license
 raiden2eua                      // (c) 1993 Seibu Kaihatsu + Fabtek license
+raiden2eub                      // (c) 1993 Seibu Kaihatsu + Fabtek license
 raiden2f                        // (c) 1993 Seibu Kaihatsu
 raiden2g                        // (c) 1993 Seibu Kaihatsu + Tuning license
 raiden2hk                       // (c) 1993 Seibu Kaihatsu + Metrotainment license
@@ -35795,6 +35831,9 @@ rf51w14cg                       // (c) 2003 Recreativos Franco
 @source:rfslots8085.cpp
 unkrfslt                        //
 
+@source:rfslotsmcs48.cpp
+ajofrin                         // (c) 198? Recreativos Franco
+
 @source:rfslotspcpent.cpp
 rfsantafeg                      // (c) 2014 Recreativos Franco
 
@@ -35895,6 +35934,9 @@ mc50mk2                         //
 @source:roland_mt32.cpp
 cm32l                           //
 mt32                            //
+
+@source:roland_pr100.cpp
+pr100                           //
 
 @source:roland_r8.cpp
 r8                              //
@@ -36972,8 +37014,10 @@ outrunb                         // 1986 (protected beta bootleg)
 outrundx                        // Deluxe version
 outrundxa                       // Deluxe version (ealier??)
 outrundxeh                      // hack
+outrundxeha                     // hack
 outrundxj                       // 1986.09 Deluxe version (Japan, FD1089A)
 outruneh                        // hack
+outruneha                       // hack
 outrunra                        // Revision A (added support for Standard and Mini cabinets)
 shangon                         // 1987 (unprotected)
 shangon1                        // 1987 (FD1089B)
@@ -37331,6 +37375,7 @@ titlefj                         // 1993.03 Title Fight (Japan)
 titlefu                         // 1993.04 Title Fight (US)
 
 @source:segasp.cpp
+aminosan                        // 2010.?? Aminosan (satellite)
 bingogal                        // 2009.05 Bingo Galaxy (main)
 bingogals                       // 2009.05 Bingo Galaxy (satellite)
 brickppl                        //
@@ -37540,6 +37585,7 @@ daioh                           // (C) 1993 Athena
 daioha                          // (C) 1993 Athena
 daiohc                          // (C) 1993 Athena (93111A PCB conversion)
 daiohp                          // (C) 1993 Athena (prototype)
+daiohp2                         // (C) 1993 Athena (prototype, earlier)
 downtown                        // UD-2 (c) 1989 + Romstar or Taito license (DSW)
 downtown2                       // UD-2 (c) 1989 + Romstar or Taito license (DSW)
 downtownj                       // UD-2 (c) 1989 + Romstar or Taito license (DSW)
@@ -38179,9 +38225,6 @@ slapshotj                       // D71 (c) 1994 Taito Corporation (Ver 2.2 J)
 
 @source:slc1.cpp
 slc1                            //
-
-@source:slc1a.cpp
-slc1a
 
 @source:sleic.cpp
 bikerace                        //
@@ -41108,10 +41151,10 @@ abl4play
 shtscore
 
 @source:trs80.cpp
+eg3003                          //
 ht108064                        // Hradstechnika Szvetkezet HT-1080Z/64
 ht1080z                         // Hradstechnika Szvetkezet HT-1080Z
 ht1080z2                        // Hradstechnika Szvetkezet HT-1080Z Series II
-radionic                        // Radionic
 sys80                           // EACA System 80
 sys80p                          // EACA System 80
 trs80                           // TRS-80 Model I - Level I BASIC
@@ -43131,6 +43174,10 @@ mu80                            // 1994 MU-80
 mu100                           // 1997 MU-100
 mu100r                          // 1997 MU-100 Rackable version
 mu100b                          // 1998 MU-100B
+
+@source:ympsr60.cpp
+psr60                           // 1985 PSR-60
+psr70                           // 1985 PSR-70
 
 @source:ympsr340.cpp
 psr340                          // 1999 PSR-340

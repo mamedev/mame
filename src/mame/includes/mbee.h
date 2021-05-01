@@ -115,8 +115,7 @@ private:
 	void premium_palette(palette_device &palette) const;
 	uint32_t screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(newkb_timer);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_bee);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_bin);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	WRITE_LINE_MEMBER(rtc_irq_w);
 	WRITE_LINE_MEMBER(fdc_intrq_w);
 	WRITE_LINE_MEMBER(fdc_drq_w);

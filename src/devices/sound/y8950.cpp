@@ -53,16 +53,16 @@ u8 y8950_device::data_r()
 	u8 result = 0xff;
 	switch (m_address)
 	{
-		case 0x05:	// keyboard in
+		case 0x05:  // keyboard in
 			result = m_keyboard_read_handler(0);
 			break;
 
-		case 0x09:	// ADPCM data
+		case 0x09:  // ADPCM data
 		case 0x1a:
 			result = m_adpcm_b.read(m_address - 0x07);
 			break;
 
-		case 0x19:	// I/O data
+		case 0x19:  // I/O data
 			result = m_io_read_handler(0);
 			break;
 
@@ -107,21 +107,21 @@ void y8950_device::data_w(u8 value)
 	// handle special addresses
 	switch (m_address)
 	{
-		case 0x04:	// IRQ control
+		case 0x04:  // IRQ control
 			m_fm.write(m_address, value);
 			combine_status();
 			break;
 
-		case 0x06:	// keyboard out
+		case 0x06:  // keyboard out
 			m_keyboard_write_handler(0, value);
 			break;
 
-		case 0x08:	// split FM/ADPCM-B
+		case 0x08:  // split FM/ADPCM-B
 			m_adpcm_b.write(m_address - 0x07, (value & 0x0f) | 0x80);
 			m_fm.write(m_address, value & 0xc0);
 			break;
 
-		case 0x07:	// ADPCM-B registers
+		case 0x07:  // ADPCM-B registers
 		case 0x09:
 		case 0x0a:
 		case 0x0b:
@@ -138,15 +138,15 @@ void y8950_device::data_w(u8 value)
 			m_adpcm_b.write(m_address - 0x07, value);
 			break;
 
-		case 0x18:	// I/O direction
+		case 0x18:  // I/O direction
 			m_io_ddr = value & 0x0f;
 			break;
 
-		case 0x19:	// I/O data
+		case 0x19:  // I/O data
 			m_io_write_handler(0, value & m_io_ddr);
 			break;
 
-		default:	// everything else to FM
+		default:    // everything else to FM
 			m_fm.write(m_address, value);
 			break;
 	}

@@ -169,7 +169,7 @@ ROM_END
 
 
 /***************************************************************************
-    Game Drivers
+    Drivers
 ***************************************************************************/
 
 /*    YEAR  NAME       PARENT   COMPAT  MACHINE   INPUT   CLASS         INIT        COMPANY             FULLNAME                   FLAGS */

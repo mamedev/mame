@@ -76,9 +76,6 @@
 
 #include "emu.h"
 #include "includes/mac.h"
-#include "machine/sonydriv.h"
-#include "machine/iwm.h"
-#include "machine/swim1.h"
 
 #define INTS_RBV    ((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIVI)) || ((m_model >= MODEL_MAC_LC) && (m_model <= MODEL_MAC_LC_580))
 
@@ -97,12 +94,6 @@
 #define LOG_KEYBOARD    0
 #define LOG_MEMORY      0
 #endif
-
-// handle disk enable lines
-void mac_fdc_set_enable_lines(device_t *device, int enable_mask)
-{
-	sony_set_enable_lines(device, enable_mask);
-}
 
 void mac_state::mac_install_memory(offs_t memory_begin, offs_t memory_end,
 	offs_t memory_size, void *memory_data, int is_rom)
@@ -1200,8 +1191,6 @@ uint32_t mac_state::mac_read_id()
 	}
 }
 
-#include "cpu/powerpc/ppc.h"
-
 void mac_state::mac_driver_init(model_t model)
 {
 	m_overlay = 1;
@@ -1516,7 +1505,7 @@ const char *lookup_trap(uint16_t opcode)
 		{ 0xA07F, "_InternalWait" },
 		{ 0xA080, "_GetVideoDefault" },
 		{ 0xA081, "_SetVideoDefault" },
-		{ 0xA082, "_`nstall" },
+		{ 0xA082, "_DTInstall" },
 		{ 0xA083, "_SetOSDefault" },
 		{ 0xA084, "_GetOSDefault" },
 		{ 0xA085, "_PMgrOp" },

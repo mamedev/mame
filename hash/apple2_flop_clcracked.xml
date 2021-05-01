@@ -6224,6 +6224,11 @@ license:CC0
 				<rom name="computer baseball (4am and san inc crack).dsk" size="143360" crc="1e13b893" sha1="6417e6a78c821c6d6c8ac344f5acd3ce5aaa4e7d" />
 			</dataarea>
 		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="computer baseball 1983 teams disk (4am and san inc crack).dsk" size="143360" crc="9d4d81fc" sha1="9343d764c844459f2e6c42a539505619c9d567e7"/>
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="cmpdiscv">
@@ -40650,7 +40655,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mcmthr10">
+	<software name="mcmusthry10">
 		<description>MECC-A712 Music Theory: Music Fundamentals (Version 1.0) (cleanly cracked)</description>
 		<year>1979</year>
 		<publisher>MECC</publisher>
@@ -40664,7 +40669,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mcev5p15">
+	<software name="mcev5lap15">
 		<description>MECC-A719 Elementary Volume 5: Language Arts: Prefixes (Version 1.5) (cleanly cracked)</description>
 		<year>1980</year>
 		<publisher>MECC</publisher>
@@ -40678,7 +40683,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mcev5p17">
+	<software name="mcev5lap17">
 		<description>MECC-A719 Elementary Volume 5: Language Arts: Prefixes (Version 1.7) (cleanly cracked)</description>
 		<year>1980</year>
 		<publisher>MECC</publisher>
@@ -40692,7 +40697,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mcbv3a18">
+	<software name="mcbv3acc18">
 		<description>MECC-A721 Business Volume 3: Accounting (Version 1.8) (cleanly cracked)</description>
 		<year>1981</year>
 		<publisher>MECC</publisher>
@@ -40706,7 +40711,78 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mcsv1p20">
+	<software name="kampfg10">
+		<description>Kampfgruppe (Version 1.0) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2021-04-07"/>
+		<!--"Kampfgruppe" is a 1985 strategy game developed and distributed by Strategic Simulations, Inc. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Game disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="kampfgruppe v1.0 (4am and san inc crack) disk 1 - game disk.dsk" size="143360" crc="daa30896" sha1="031d68b8a2beee66421bf042064400fa94b22d2c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Historical scenarios"/>
+			<dataarea name="flop" size="143360">
+				<rom name="kampfgruppe v1.0 (4am and san inc crack) disk 2 - historical scenarios.dsk" size="143360" crc="a516177e" sha1="5960e7169c9709546931597c969d8b8182e8a93c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wras4zig">
+		<description>Warriors of RAS Volume IV: Ziggurat (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Screenplay</publisher>
+		<info name="release" value="2021-04-07"/>
+		<!--"Warriors of RAS Volume IV: Ziggurat" is a 1982 adventure game developed by Randall Don Masteller and distributed by Screenplay.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="warriors of ras volume iv- ziggurat (4am crack).dsk" size="143360" crc="ee6d693b" sha1="b6a78df0aeb38ed8a4fd3c73628d95c2e967200c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gato12">
+		<description>GATO (Version 1.2) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<info name="release" value="2021-04-07"/>
+		<info name="programmer" value="J.A. Yandrofski, Timothy Reese, Paul Artlton, and Ed Dawson "/>
+		<!--"GATO" is a 1985 simulation game developed by J.A. Yandrofski, Timothy Reese, Paul Artlton, and Ed Dawson, and distributed by Spectrum Holobyte. This is version 1.2.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="gato v1.2 (4am crack).dsk" size="143360" crc="e18bc8e5" sha1="27b97930b71445b05cd1b9eab00cd46245f486c8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trvfever">
+		<description>Trivia Fever (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Professional Software</publisher>
+		<info name="release" value="2021-04-07"/>
+		<!--"Trivia Fever" is a 1984 game developed and distributed by Professional Software.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="trivia fever (4am crack) side a.dsk" size="143360" crc="8b4c3319" sha1="0e333105a58b8ba4cfdc4644b74f2dc69ebdf3a5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="trivia fever (4am crack) side b.dsk" size="143360" crc="23b4edf4" sha1="4c5e49180bcd25d1c72acef66b37e52c5fd44781"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsv1pri20">
 		<description>MECC-A726 Spelling Volume 1: Primary (Version 2.0) (cleanly cracked)</description>
 		<year>1980</year>
 		<publisher>MECC</publisher>
@@ -40716,6 +40792,1181 @@ license:CC0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="mecc-a726 spelling volume 1- primary v2.0 (4am crack).dsk" size="143360" crc="0b75f4e8" sha1="75b0ac33e13209b7db7c248184642ea4f629a340"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsv1pri31">
+		<description>MECC-A726 Spelling Volume 1: Primary (Version 3.1) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-27"/>
+		<!--"Spelling Volume 1: Primary" is a 1980 educational program developed and distributed by MECC. This is version 3.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a726 spelling volume 1 v3.1 (4am crack).dsk" size="143360" crc="e80a2c33" sha1="a1f8d956c2e78d72884139baf52acec9f9519ca9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsv2sec20">
+		<description>MECC-A728 Spelling Volume 2: Secondary (Version 2.0) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-27"/>
+		<!--"Spelling Volume 2: Secondary" is a 1980 educational program developed and distributed by MECC. This is version 2.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a728 spelling volume 2- secondary v2.0 (4am crack).dsk" size="143360" crc="28f1e707" sha1="f04478d198db9e692bab902648db91e8297b2cff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcsv2sec31">
+		<description>MECC-A728 Spelling Volume 2: Secondary (Version 3.1) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-27"/>
+		<!--"Spelling Volume 2: Secondary" is a 1980 educational program developed and distributed by MECC. This is version 3.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a728 spelling volume 2- secondary v3.1 (4am crack).dsk" size="143360" crc="f9619661" sha1="0a3d3ec46484681198cf54c930849c21903f7f0b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcev7prer10">
+		<description>MECC-A731 Elementary Volume 7: Pre-Reading and Counting (Version 1.0) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-27"/>
+		<!--"Elementary Volume 7: Pre-Reading and Counting" is a 1981 educational program developed by Mike Fish and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a731 elementary volume 7 - pre-reading and counting v1.0 (4am crack).dsk" size="143360" crc="21f5868b" sha1="dc4d2ea2026c754a382aa0fd8413cc5f547edc59"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcev7prer11">
+		<description>MECC-A731 Elementary Volume 7: Pre-Reading and Counting (Version 1.1) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-27"/>
+		<!--"Elementary Volume 7: Pre-Reading and Counting" is a 1981 educational program developed by Mike Fish and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a731 elementary volume 7 - pre-reading and counting v1.1 (4am crack).dsk" size="143360" crc="a1e40a3a" sha1="78354f820ec816d182e3c3c31b6d4e22c448c4c9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcev9geo10">
+		<description>MECC-A733 Elementary Volume 9: Geometry (Version 1.0) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-27"/>
+		<!--"Elementary Volume 9: Geometry" is a 1981 educational program developed and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a733 elementary volume 9- geometry v1.0 (4am crack).dsk" size="143360" crc="d14015b9" sha1="37f06440e57c48b2d3f14dc36275581e02fc0734"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcev9geo21">
+		<description>MECC-A733 Elementary Volume 9: Geometry (Version 2.1) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-27"/>
+		<!--"Elementary Volume 9: Geometry" is a 1981 educational program developed and distributed by MECC. This is version 2.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a733 elementary volume 9- geometry v2.1 (4am crack).dsk" size="143360" crc="69999da9" sha1="4efa17eb567b62f8e80fb0ee4a4b06fcb72cec1e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcev10geo11">
+		<description>MECC-A734 Elementary Volume 10: Geometry (Version 1.1) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-27"/>
+		<!--"Elementary Volume 10: Geometry" is a 1981 educational program developed and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a734 elementary volume 10- geometry v1.1 (4am crack).dsk" size="143360" crc="5331711d" sha1="0d0e228ed2b61bc744acf1f666c1c500e75db19e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="algvl411">
+		<description>Algebra Volume 4 (Version 1.1) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Peachtree Software</publisher>
+		<info name="release" value="2021-04-07"/>
+		<!--"Algebra Volume 4" is a 1984 educational program developed and distributed by Peachtree Software (formerly EduWare).-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="algebra volume 4 v1.1 (4am crack).dsk" size="143360" crc="6e31db75" sha1="1fb34a385b6fce375287d075311628d814883c91"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcev11lang11">
+		<description>MECC-A735 Elementary Volume 11: Language Arts (Version 1.1) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-27"/>
+		<info name="programmer" value="Daniel M. Forde, James A. Henke, and David E. Laden "/>
+		<!--"Elementary Volume 11: Language Arts" is a 1981 educational program developed by Daniel M. Forde, James A. Henke, and David E. Laden, and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a735 elementary volume 11- language arts v1.1 (4am crack).dsk" size="143360" crc="a51a4606" sha1="45da46901ccba1f4734f88ef8d4569c84d1027cd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcev12lang10">
+		<description>MECC-A736 Elementary Volume 12: Language Arts (Version 1.0) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-27"/>
+		<info name="programmer" value="Daniel M. Forde, Scott Costello, R. Christiansen, David E. Laden, L. Dixson, S. Costello, J. Cook, L. Borry, and R. Alberti "/>
+		<!--"Elementary Volume 12: Language Arts (SIMS)" is a 1980 educational program developed by Daniel M. Forde, Scott Costello, R. Christiansen, David E. Laden, L. Dixson, S. Costello, J. Cook, L. Borry, and R. Alberti, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a736 elementary volume 12- language arts (sims) v1.0 (4am crack).dsk" size="143360" crc="721e324a" sha1="f1f6294ce13866412608672021703e3a933410b8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcev12lang20">
+		<description>MECC-A736 Elementary Volume 12: Language Arts (Version 2.0) (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-27"/>
+		<info name="programmer" value="Daniel M. Forde, Scott Costello, R. Christiansen, David E. Laden, L. Dixson, S. Costello, J. Cook, L. Borry, and R. Alberti "/>
+		<!--"Elementary Volume 12: Language Arts (SIMS)" is a 1980 educational program developed by Daniel M. Forde, Scott Costello, R. Christiansen, David E. Laden, L. Dixson, S. Costello, J. Cook, L. Borry, and R. Alberti, and distributed by MECC. This is version 2.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a736 elementary volume 12- language arts (sims) v2.0 (4am crack).dsk" size="143360" crc="367ed575" sha1="5ed86c59a1b645296e07baca5c2db0b9748e67f6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmathv2m12">
+		<description>MECC-A737 Mathematics Volume 2: Measurement (Version 1.2) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-27"/>
+		<info name="programmer" value="Tom Boe and Russ Erickson "/>
+		<!--"Mathematics Volume 2: Measurement" is a 1981 educational program developed by Tom Boe and Russ Erickson, and distributed by MECC. This is version 1.2.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a737 mathematics volume 2- measurement v1.2 (4am crack).dsk" size="143360" crc="1cb515c8" sha1="0d8b311aa1d01d5b5d1e44ac1966070a3682e995"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmathv3g13">
+		<description>MECC-A738 Mathematics Volume 3: Geometry (Version 1.3) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-27"/>
+		<!--"Mathematics Volume 3: Geometry" is a 1981 educational program developed and distributed by MECC. This is version 1.3.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a738 mathematics volume 3- geometry v1.3 (4am crack).dsk" size="143360" crc="b1fa1ef3" sha1="88b127b699a399e45c3d178f9de742c91b798642"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmathv3gl13">
+		<description>MECC-A738 Mathematics Volume 3: Geometry - (Limited Boot Backup) (Version 1.3) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-27"/>
+		<info name="usage" value="Originally a limited 50 boot backup, restriction has been removed"/>
+		<!--"Mathematics Volume 3: Geometry" is a 1981 educational program developed and distributed by MECC. This disk was originally a "limited boot backup" that could only be booted 50 times before self-destructing. (Obviously this is no longer true.) It is version 1.3.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a738 mathematics volume 3- geometry- limited boot backup v1.3 (4am crack).dsk" size="143360" crc="093c9464" sha1="a0daf717408cf82036b0e44c4c5e8e91b7807e6f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcev13nut10">
+		<description>MECC-A743 Elementary Volume 13: Nutrition (Version 1.0) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-27"/>
+		<info name="programmer" value="Shane Mccarron and Todd Bailey "/>
+		<!--"Elementary Volume 13: Nutrition" is a 1981 educational program developed by Shane Mccarron and Todd Bailey, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a743 elementary volume 13- nutrition v1.0 (4am crack).dsk" size="143360" crc="eb2ccece" sha1="c25e5eeece426c4cb2c1397f7468d34c246a6a0b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcengv1pos13">
+		<description>MECC-A746 English Volume 1: Parts of Speech (Version 1.3) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-27"/>
+		<info name="programmer" value="A. McCarthy and Darrel Ricke "/>
+		<!--"English Volume 1: Parts of Speech" is a 1981 educational program developed by A. McCarthy and Darrel Ricke, and distributed by MECC. This is version 1.3.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a746 english volume 1- parts of speech v1.3 (4am crack).dsk" size="143360" crc="d3066591" sha1="455263c41014c238b4c8ff33b8731dda7a12998e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcengv1pos14">
+		<description>MECC-A746 English Volume 1: Parts of Speech (Version 1.4) (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-27"/>
+		<info name="programmer" value="A. McCarthy and Darrel Ricke "/>
+		<!--"English Volume 1: Parts of Speech" is a 1981 educational program developed by A. McCarthy and Darrel Ricke, and distributed by MECC. This is version 1.4.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a746 english volume 1- parts of speech v1.4 (4am crack).dsk" size="143360" crc="1598ccc3" sha1="7b768321bdb8ba72c261372bdda6db107bddec95"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcschutlv2rd">
+		<description>MECC-A749 School Utilities Volume 2: Readability (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-28"/>
+		<!--"School Utilities Volume 2: Readability" is a 1982 educational program developed by A. McCarthy and distributed by MECC. This is version 1.3.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a749 school utilities volume 2 - readability v1.3 (4am crack).dsk" size="143360" crc="eb9fc421" sha1="393de81b294412618336f85d394fa20c69e94cad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="algv3rev0">
+		<description>Algebra Volume 3 (Revision 0) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>EduWare</publisher>
+		<info name="release" value="2021-04-07"/>
+		<!--"Algebra Volume 3" is a 1984 educational program developed and distributed by EduWare.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="algebra volume 3 rev. 0 (4am crack).dsk" size="143360" crc="44d97f66" sha1="f3f7e35ba0af4a96c37cd4650a1662af60ce2e43"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mchlthv2as10">
+		<description>MECC-A751 Health Maintenance Volume 2: Assessment (Version 1.0) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-28"/>
+		<info name="programmer" value="Shane McCarron and Craig W. Copley "/>
+		<!--"Health Maintenance Volume 2: Assessment" is a 1982 educational program developed by Shane McCarron and Craig W. Copley, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a751 health maintenance volume 2 - assessment v1.0 (4am crack).dsk" size="143360" crc="5bc251cf" sha1="b35a6b6cc1171f3d0468f80507639ec0ffbe3d3a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcnutv1v12">
+		<description>MECC-A752 Nutrition Volume 1 (Version 1.2) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-28"/>
+		<!--"Nutrition Volume 1" is a 1982 educational program developed by Shane McCarron and distributed by MECC. This is version 1.2.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a752 nutrition volume 1 v1.2 (4am crack).dsk" size="143360" crc="6da02706" sha1="3ff2d9b0a20fc5e083598f7159d9a1d70e5ad58c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcnutv2v15">
+		<description>MECC-A753 Nutrition Volume 2 (Version 1.5) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-28"/>
+		<!--"Nutrition Volume 2" is a 1982 educational program developed by Willis Jokela and distributed by MECC. This is version 1.5.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a753 nutrition volume 2 v1.5 (4am crack).dsk" size="143360" crc="5d6d3d9b" sha1="d1799b68a1a945f0105f0e56fb7056c97fe052c9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccgmthv1v11">
+		<description>MECC-A757 Computer Generated Mathematics Materials Volume 1: Problem Solving (Version 1.1) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-28"/>
+		<!--"Computer Generated Mathematics Materials Volume 1- Problem Solving" is a 1983 educational program developed and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a757 computer generated mathematics materials volume 1- problem solving v1.1 (4am crack).dsk" size="143360" crc="0e4f4b8b" sha1="4d93c6508d618fbb7f5ef2b86df25d28e2b34837"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mccgmthv2v11">
+		<description>MECC-A758 Computer Generated Mathematics Materials Volume 2: Problem Solving (Version 1.1) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-28"/>
+		<!--"Computer Generated Mathematics Materials Volume 2- Problem Solving" is a 1983 educational program developed and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a758 computer generated mathematics materials volume 2- problem solving v1.1 (4am crack).dsk" size="143360" crc="534261ba" sha1="e57663688efac0bbd80426186c09b367724ed6d9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcgrademng10">
+		<description>MECC-A771 Grade Manager (Version 1.0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-28"/>
+		<!--"Grade Manager" is a 1983 educational program developed by Shane McCarron and distributed by MECC. This is version 1.0. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a771 grade manager v1.0 (4am crack).dsk" size="143360" crc="1f0cceb8" sha1="94ed0423a501d08c79fcd2a6b5ace54011a3ebbb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcgrademng11">
+		<description>MECC-A771 Grade Manager (Version 1.1) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-28"/>
+		<!--"Grade Manager" is a 1983 educational program developed by Shane McCarron and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a771 grade manager v1.1 (4am crack).dsk" size="143360" crc="097881f2" sha1="2dfe3d73f9af3382c2c799f2883942e08706d80a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcgrademr21">
+		<description>MECC-A771 Grade Manager Revised Edition (Version 2.1) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-28"/>
+		<!--"Grade Manager Revised Edition" is a 1985 educational program developed by Shane McCarron and distributed by MECC. This is version 2.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a771 grade manager revised edition v2.1 (4am crack).dsk" size="143360" crc="216edff1" sha1="bc7366747266e64bb458f22586f9483db00a9030"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcgrademr22">
+		<description>MECC-A771 Grade Manager Revised Edition (Version 2.2) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-28"/>
+		<!--"Grade Manager Revised Edition" is a 1985 educational program developed by Shane McCarron and distributed by MECC. This is version 2.2.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a771 grade manager revised edition v2.2 (4am crack).dsk" size="143360" crc="dae6b6d6" sha1="c31e60aab48a8a9a48cc2832a320a03cb4c0b252"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcgrademr23">
+		<description>MECC-A771 Grade Manager Revised Edition (Version 2.3) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-28"/>
+		<!--"Grade Manager Revised Edition" is a 1985 educational program developed by Shane McCarron and distributed by MECC. This is version 2.3.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a771 grade manager revised edition v2.3 (4am crack).dsk" size="143360" crc="47e2cf7e" sha1="3ee1d263b2a77416b5324d1385bd242fa224d229"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spoker">
+		<description>Strip Poker (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Artworx</publisher>
+		<info name="release" value="2021-04-08"/>
+		<info name="programmer" value="Roger Harnish and Joanne Adams"/>
+		<!--"Strip Poker" is a 1982 card game developed by Roger Harnish and Joanne Adams, and distributed by Artworx. This release includes the master disk and two add-on disks with additional opponents.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Master disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="strip poker (4am crack) disk 1 - master disk.dsk" size="143360" crc="36f1ccba" sha1="fd510e704c4d71e8756edb762fcb0389183b639b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Marlena and Candi"/>
+			<dataarea name="flop" size="143360">
+				<rom name="strip poker (4am crack) disk 2 - marlena and candi.dsk" size="143360" crc="7bc99eab" sha1="71fde25fa96a99a5e8af8f86a45fa0a4dd77e398"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Tony and David"/>
+			<dataarea name="flop" size="143360">
+				<rom name="strip poker (4am crack) disk 3 - tony and david.dsk" size="143360" crc="1c0c1dc9" sha1="35a7c323ced1af32d9e8ffa80f6a5ef6fa44db6f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcgrowgfr10">
+		<description>MECC-A773 Growgins' Fractions (Version 1.0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-28"/>
+		<info name="programmer" value="H. Bill Way and Mike Boucher"/>
+		<!--"Growgins' Fractions" is a 1983 educational program developed by H. Bill Way and Mike Boucher, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a773 growgins' fractions v1.0 (4am crack).dsk" size="143360" crc="71152c63" sha1="10d2b34c53346e714bbb7ebf5874d5ca8196cd8f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcgrowgfr11">
+		<description>MECC-A773 Growgins' Fractions (Version 1.1) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-28"/>
+		<info name="programmer" value="H. Bill Way and Mike Boucher"/>
+		<!--"Growgins' Fractions" is a 1983 educational program developed by H. Bill Way and Mike Boucher, and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a773 growgins' fractions v1.1 (4am crack).dsk" size="143360" crc="854d84b5" sha1="d70f6b66ea586afd0b7ea44b03dba3f29c7927a8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcadvfrac11">
+		<description>MECC-A774 Adventures with Fractions (Version 1.1) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-28"/>
+		<info name="programmer" value="H. Bill Way and Mike Boucher "/>
+		<!--"Adventures with Fractions" is a 1983 educational program developed by H. Bill Way and Mike Boucher, and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a774 adventures with fractions v1.1 (4am crack).dsk" size="143360" crc="2b79d5a9" sha1="60eeee6d535f82c26008f1c4a3ab4553411989d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcezlogo20">
+		<description>MECC-A775 EZ Logo (Version 2.0) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-29"/>
+		<!--"EZ Logo" is a 1985 educational program developed by Steve Splinter and distributed by MECC. This is version 2.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a775 ez logo v2.0 (4am crack).dsk" size="143360" crc="ed3d4b95" sha1="988033b7d18e536115c4bc4dddf689c8d2f436ad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwrtnar10">
+		<description>MECC-A776 Writing a Narrative (Version 1.0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-29"/>
+		<!--"Writing a Narrative" is a 1983 educational program developed by Rich M. Childers and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a776 writing a narrative v1.0 (4am crack).dsk" size="143360" crc="3e443154" sha1="3bf54021f807ab5694917d8a3cbbb594539ba340"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwrtnar11">
+		<description>MECC-A776 Writing a Narrative (Version 1.1) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-29"/>
+		<!--"Writing a Narrative" is a 1983 educational program developed by Rich M. Childers and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a776 writing a narrative v1.1 (4am crack).dsk" size="143360" crc="be1a9d16" sha1="8a78040212d39899fd91ac07f4e483d2dcbe862b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcblisss11">
+		<description>MECC-A777 Blissymbolics: Blissymbol Concepts (Version 1.1) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-29"/>
+		<!--"Blissymbolics: Blissymbol Concepts" is a 1983 educational program developed by R. J. Granvin and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a777 blissymbolics - blissymbol concepts v1.1 (4am crack).dsk" size="143360" crc="38aaa53e" sha1="b35b75f88edd71d9a4733d8f2352888c22ce1d66"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcfrndcomp15">
+		<description>MECC-A779 The Friendly Computer (Version 1.5) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-29"/>
+		<info name="programmer" value="H. Bill Way and Craig Solmonson "/>
+		<!--"The Friendly Computer" is a 1983 educational program developed by H. Bill Way and Craig Solmonson, and distributed by MECC. This is version 1.5.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a779 the friendly computer v1.5 (4am crack).dsk" size="143360" crc="8dab5713" sha1="a39c4ac0d9282766ddaa1331847ad6660d269bed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcmindpzl10">
+		<description>MECC-A780 Mind Puzzles (Version 1.0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-29"/>
+		<!--"Mind Puzzles" is a 1983 educational program developed by Shane McCarron and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a780 mind puzzles v1.0 (4am crack).dsk" size="143360" crc="91bc793b" sha1="c57cfc44bdf619912e66e3707ae148281fe9ecaa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcfrndcomp13">
+		<description>MECC-A780 Mind Puzzles (Version 1.3) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-29"/>
+		<!--"Mind Puzzles" is a 1983 educational program developed by Shane McCarron and distributed by MECC. This is version 1.3.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a780 mind puzzles v1.3 (4am crack).dsk" size="143360" crc="339fd3c0" sha1="17ee44c6b6b63192681b7742e6b71fde06fe75a2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="playwmys">
+		<description>PlayWriter: Mystery (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Woodbury Software</publisher>
+		<info name="release" value="2021-04-09"/>
+		<!--"PlayWriter: Mystery" is a 1985 productivity program developed and distributed by Woodbury Software. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="playwriter- mystery (4am crack) disk 1 - program.dsk" size="143360" crc="0a9e5cfe" sha1="26d30404dcecfe3c0cd4775090b54746f40d1e72"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Story disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="playwriter- mystery (4am crack) disk 2 - story disk.dsk" size="143360" crc="96262cb6" sha1="6daef1cf7080a569e89921efb52221a61be40b05"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcohdeer11">
+		<description>MECC-A781 Oh, Deer! (Version 1.1) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-29"/>
+		<info name="programmer" value="Cynthia L. Schroeder and R. Philip Bouchard "/>
+		<!--"Oh, Deer!" is a 1983 educational program developed by Cynthia L. Schroeder and R. Philip Bouchard, and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a781 oh, deer v1.1 (4am crack).dsk" size="143360" crc="e771b33f" sha1="bd943da8c19277218c2351193f0630740ef05f96"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcprobslvs10">
+		<description>MECC-A784 Problem-Solving Strategies (Version 1.0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-29"/>
+		<info name="programmer" value="Lois Edwards and Russ Erickson "/>
+		<!--"Problem-Solving Strategies" is a 1983 educational program developed by Lois Edwards and Russ Erickson, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a784 problem solving strategies v1.0 (4am crack).dsk" size="143360" crc="ae4c0ffb" sha1="cd51d2073660a4746a91e65d3800d2c7ef102cd6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcprobslvs13">
+		<description>MECC-A784 Problem-Solving Strategies (Version 1.3) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-29"/>
+		<info name="programmer" value="Lois Edwards and Russ Erickson "/>
+		<!--"Problem-Solving Strategies" is a 1983 educational program developed by Lois Edwards and Russ Erickson, and distributed by MECC. This is version 1.3.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a784 problem-solving strategies v1.3 (4am crack).dsk" size="143360" crc="d5a3f0cc" sha1="a44c34859e439c01e3895e11d57d927a1ca1c687"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwrtchrsk11">
+		<description>MECC-A785 Writing a Character Sketch (Version 1.1) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-29"/>
+		<!--"Writing a Character Sketch" is a 1983 educational program developed by Rich M. Childers and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a785 writing a character sketch v1.1 (4am crack).dsk" size="143360" crc="64a7744d" sha1="a34b509bf6211f74267473b65ba758f97f3b66b2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcwrtchrsk12">
+		<description>MECC-A785 Writing a Character Sketch (Version 1.2) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-29"/>
+		<!--"Writing a Character Sketch" is a 1983 educational program developed by Rich M. Childers and distributed by MECC. This is version 1.2.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a785 writing a character sketch v1.2 (4am crack).dsk" size="143360" crc="b53c6aa9" sha1="1ed91a5f421b071b9728652c1840f1dbaacff42b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcearlyadd11">
+		<description>MECC-A788 Early Addition (Version 1.1) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-29"/>
+		<info name="programmer" value="Frederick Steinmann and Peter Fuglstad "/>
+		<!--"Early Addition" is a 1983 educational program developed by Frederick Steinmann and Peter Fuglstad, and distributed by MECC. This is version 1.1.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a788 early addition v1.1 (4am crack).dsk" size="143360" crc="4e5efd49" sha1="16927ca2c2f3e0cca3010d63a43ce87604acdc91"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcearlyadd13">
+		<description>MECC-A788 Early Addition (Version 1.3) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-29"/>
+		<info name="programmer" value="Frederick Steinmann and Peter Fuglstad "/>
+		<!--"Early Addition" is a 1983 educational program developed by Frederick Steinmann and Peter Fuglstad, and distributed by MECC. This is version 1.3.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a788 early addition v1.3 (4am crack).dsk" size="143360" crc="118ba4a0" sha1="da0b06ea52fe0e8f12f9e2805f005ca1afecd21a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcexpproc10">
+		<description>MECC-A810 Experiencing Procedures (Version 1.0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-29"/>
+		<info name="programmer" value="Wendell Ruotsi and Andy Hollenbeck "/>
+		<!--"Experiencing Procedures" is a 1983 educational program developed by Wendell Ruotsi and Andy Hollenbeck, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a810 experiencing procedures v1.0 (4am crack).dsk" size="143360" crc="10ebecbd" sha1="b385b46aaef87848dbe68e129e0dac7c511610ab"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc3rmiccmp10">
+		<description>MECC-A811 The Three R's of Microcomputing (Version 1.0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-29"/>
+		<!--"The Three R's of Microcomputing" is a 1983 educational program developed by Kent Carlson and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a811 the three r's of microcomputing v1.0 (4am crack).dsk" size="143360" crc="8730e040" sha1="9cdbb5dbcd340779b9ce921e6e1b2681229c1853"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcprocwrds10">
+		<description>MECC-A813 Processing Words (Version 1.0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-29"/>
+		<info name="programmer" value="Jeff Jorgensen, Dan Pelowski, and Wendell Ruotsi "/>
+		<!--"Processing Words" is a 1983 educational program developed by Jeff Jorgensen, Dan Pelowski, and Wendell Ruotsi, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a813 processing words v1.0 (4am crack).dsk" size="143360" crc="68b391fe" sha1="848aee2a6c0c894fae7eb891f63839ab4e2ecf43"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drgkeep84">
+		<description>Dragon's Keep (Version 1984-06-05) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2021-04-09"/>
+		<info name="programmer" value="Al Lowe, Mike Macchesney, Margaret Lowe, and Rae Lynn Macchesney "/>
+		<!--"Dragon's Keep" is a 1983 adventure game developed by Al Lowe, Mike Macchesney, Margaret Lowe, and Rae Lynn Macchesney, and distributed by Sierra On-Line. This update is dated 1984-06-05 according to program comments. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="dragon's keep 1984 (4am crack).dsk" size="143360" crc="e573e6c6" sha1="b32b8fc3bcdf3f8f09aca058648ed612f3d4eb76"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcnutri10">
+		<description>MECC-A822 Nutrition (Version 1.0) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2021-03-29"/>
+		<info name="programmer" value="Tim Heap and Seth A. Rosenblatt "/>
+		<!--"Nutrition" is a 1983 educational program developed by Tim Heap and Seth A. Rosenblatt, and distributed by MECC. This is version 1.0.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a822 nutrition v1.0 (4am crack).dsk" size="143360" crc="a006e95a" sha1="bcd43af6365e4e96be0cebc8cf282c81f4b657f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quizagon">
+		<description>Quizagon (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Springboard Software</publisher>
+		<info name="release" value="2021-04-02"/>
+		<!--"Quizagon" is a 1983 board game developed and distributed by Springboard Software.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="quizagon (4am crack) side 1.dsk" size="143360" crc="5e9a1837" sha1="eb4d5893d04a84d314d6ce584a7e469ac6856702"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="quizagon (4am crack) side 2.dsk" size="143360" crc="b88b09b6" sha1="95d7d8336732eeac2e56f40868e767e40c340eb1"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="quizagon (4am crack) side 3.dsk" size="143360" crc="700ea21d" sha1="3506d5fd08fec76277ab3256782663f81aeb577f"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="quizagon (4am crack) side 4.dsk" size="143360" crc="aa649aba" sha1="1b915b4569efde8123a3510479eae55384270436"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pensate">
+		<description>Pensate (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Penguin Software</publisher>
+		<info name="release" value="2021-04-03"/>
+		<!--"Pensate" is a 1983 board game developed and distributed by Penguin Software.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pensate (4am crack).dsk" size="143360" crc="c7681fa5" sha1="4353b479a2d43e852b22a995afb2f2d0e5db9522"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="risk14">
+		<description>Risk (Version 1.4) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Leisure Genius</publisher>
+		<info name="release" value="2021-04-04"/>
+		<!--"Risk" is a 1988 board game developed by Casablanca Software and distributed by Leisure Genius. This is version 1.4.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="risk v1.4 (4am crack).dsk" size="143360" crc="49d17549" sha1="05aef425e962d3ada8294e9eb7674446a51bb8cb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clue15">
+		<description>Clue (Version 1.5) (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Leisure Genius</publisher>
+		<info name="release" value="2021-04-05"/>
+		<!--"Clue" is a 1989 board game developed by Casablanca Software and distributed by Leisure Genius. This is version 1.5.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="clue master detective v1.5 (4am crack).dsk" size="143360" crc="e46f9fa8" sha1="e73ec6e7dec7e14d791d63dc53cd7a3a8797f7e1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmpscrbl">
+		<description>The Computer Edition of Scrabble (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Leisure Genius</publisher>
+		<info name="release" value="2021-04-05"/>
+		<!--"The Computer Edition of Scrabble" is a 1987 board game distributed by Leisure Genius.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the computer edition of scrabble (4am crack).dsk" size="143360" crc="2a27b3fe" sha1="92dc008a31710c01eba33edb9d511ae18874ea64"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="voyvalk">
+		<description>The Voyage of the Valkyrie (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Advanced Operating Systems</publisher>
+		<info name="release" value="2021-04-05"/>
+		<info name="usage" value="Will only run on 2+ and unenhanced 2E models" />
+		<!--"The Voyage of the Valkyrie" is a 1980 roleplaying game developed by Leo Christopherson and distributed by Advanced Operating Systems. Due to compatibility issues unrelated to copy protection, it only runs on an Apple ][+ or unenhanced Apple ][e.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the voyage of the valkyrie (4am crack).dsk" size="143360" crc="1e759d2a" sha1="dd5509f8bb05400a6e382f7934ad2cfcb1815b34"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cytrmast">
+		<description>Cytron Masters (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2021-04-07"/>
+		<info name="usage" value="Will only run on 2+ and unenhanced 2E models" />
+		<!--"Cytron Masters" is a 1982 strategy game developed by Dan Bunten and distributed by Strategic Simulations, Inc. Due to compatibility issues unrelated to copy protection, it only runs on an Apple ][+ or unenhanced Apple ][e.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="cytron masters (4am and san inc crack).dsk" size="143360" crc="60a49b83" sha1="fbd8a8d6672c0228e10fea064aa64958d55bc90b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sixgunsh">
+		<description>Six-Gun Shootout (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2021-04-07"/>
+		<!--"Six-Gun Shootout" is a 1985 strategy game developed and distributed by Strategic Simulations, Inc.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="six-gun shootout (4am and san inc crack).dsk" size="143360" crc="de053043" sha1="3424be7108be30d5738a04e1cb3580f646f9e86d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compuzlr">
+		<description>Compuzzler (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Uptown Software</publisher>
+		<info name="release" value="2021-04-09"/>
+		<!--"Compuzzler" is a 1984 board game developed and distributed by Uptown Software. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="compuzzler (4am crack).dsk" size="143360" crc="60cda369" sha1="a32614f326e5640ec6dca39f75dd133838ae5e39"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="algactn">
+		<description>Algebra Action (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Houghton Mifflin</publisher>
+		<info name="release" value="2021-04-10"/>
+		<!--"Algebra Action" is a 1986 educational program developed by Prentice Associates and distributed by Houghton Mifflin. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="algebra action (4am crack) disk 1.dsk" size="143360" crc="1247633a" sha1="6f775f772644236108493147a4f89e703f7d6359"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="algebra action (4am crack) disk 2.dsk" size="143360" crc="807ee772" sha1="3557fd5ce713b2627ed79cdd5de7b7f556edd1ec"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="algebra action (4am crack) disk 3.dsk" size="143360" crc="cc7d795e" sha1="20172162c015199bf995e39bcae04be619900ec3"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="algebra action (4am crack) disk 4.dsk" size="143360" crc="fb2d4df3" sha1="240a9f8f0fcb5a8cd4b673250b44412b3991e1fa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wzcrwn12">
+		<description>Wizard's Crown (Version 1.2) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2021-04-10"/>
+		<!--"Wizard's Crown" is a 1986 roleplaying game developed by Paul Murray and Keith Brors, and distributed by Strategic Simulations, Inc. This is version 1.2. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - Game disk front"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wizard's crown v1.2 (4am crack) disk 1a - game disk front.dsk" size="143360" crc="3198d3fe" sha1="348fdaeb55c447c40e2e9bfefc364ac37210cd59"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - Game disk back"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wizard's crown v1.2 (4am crack) disk 1b - game disk back.dsk" size="143360" crc="cb8fee67" sha1="4be497844d0a8a4fcfb70d9629ceddab8c45ea3a"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Data disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wizard's crown v1.2 (4am crack) disk 2a - data disk 1.dsk" size="143360" crc="fcc7fdac" sha1="7afa03981c62de9b0deaedd2a6788baae12a54f6"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Data disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="wizard's crown v1.2 (4am crack) disk 2b - data disk 2.dsk" size="143360" crc="8b82a2f5" sha1="6186061a89bbcace9fe4c5a7d55c4740ea15a550"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="odystime">
+		<description>Odyssey in Time (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Krell Software</publisher>
+		<info name="release" value="2021-04-10"/>
+		<!--"Odyssey in Time" is a 1981 adventure game developed and distributed by Krell Software. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="odyssey in time (4am crack).dsk" size="143360" crc="77492bd5" sha1="f7770162bfd239fba1e2fd6f260e262bc607e41a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frbdnqst">
+		<description>Forbidden Quest (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Pryority Software</publisher>
+		<info name="release" value="2021-04-10"/>
+		<!--"Forbidden Quest" is a 1983 adventure game developed and distributed by Pryority Software. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="forbidden quest (4am crack).dsk" size="143360" crc="5dc072c2" sha1="f885fbdb12fb2dcb6dd3aedd96b1562d3028d5bb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ftiger13">
+		<description>Flying Tigers (Version 1.3) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Discovery Games</publisher>
+		<info name="release" value="2021-04-10"/>
+		<!--"Flying Tigers" is a 1982 strategy game developed by Ross W. Maker, David A. Wesley, and Stephen Goss and distributed by Discovery Games. This is version 1.3. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="flying tigers (4am crack).dsk" size="143360" crc="c0f8837a" sha1="bb1c2ad481a429dee7f5bd9b297fdcc8f92aa502"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ahtlicac">
+		<description>Apple How To: Lessons in Computing and Calculating (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Apple Computer</publisher>
+		<info name="release" value="2021-04-10"/>
+		<info name="usage" value="Will only run on 2, 2+, and unenhanced 2E models" />
+		<!--"Apple How To: Lessons in Computing and Calculating" is a 1980 educational program developed by Bruce Tognazzini and distributed by Apple Computer. This is version 1.0. It is preserved here for the first time. Due to compatibility issues unrelated to copy protection, it only runs on an original Apple ][, ][+, or unenhanced //e.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="apple how to- lessons in computing and calculating (4am crack).dsk" size="143360" crc="d56fe616" sha1="d8460587c267eac7a0f688d1a0164b61f01e0896"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="descratn">
+		<description>The Desecration (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Mind Games</publisher>
+		<info name="release" value="2021-04-12"/>
+		<!--"The Desecration" is a 1982 adventure game developed and distributed by Mind Games.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the desecration (4am crack).dsk" size="143360" crc="7ea09a12" sha1="b243196d0ca654e775691e89b4aedc5adebf6e66"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jatblock">
+		<description>Just Around The Block (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>D.C. Heath</publisher>
+		<info name="release" value="2021-04-18"/>
+		<info name="programmer" value="Rob Shaver and Peter Andrews "/>
+		<!--"Just Around The Block" is a 1987 educational game developed by Rob Shaver and Peter Andrews, and distributed by D.C. Heath. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="just around the block (4am crack) disk 1 - program disk.dsk" size="143360" crc="c0a419d5" sha1="fd2f7948968b90edb492e71bc28ce9cb9221d71f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Student disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="just around the block (4am crack) disk 2 - student disk.dsk" size="143360" crc="0fde4d61" sha1="c50ecec8a66db902e062ca65da1810d81c4b5386"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deplog">
+		<description>Depreciation Log (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Harvest Computer Systems</publisher>
+		<info name="release" value="2021-04-22"/>
+		<!--"Depreciation Log" is a 1985 productivity program developed by Gary Randolph and distributed by Harvest Computer Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="depreciation log (4am crack).dsk" size="143360" crc="408a78da" sha1="5692f9a325d2920c6d783f5312aff40059e4b400"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advinspc">
+		<description>Adventures in Space (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Intellectual Software</publisher>
+		<info name="release" value="2021-04-22"/>
+		<!--"Adventures in Space" is a 1983 educational program developed and distributed by Intellectual Software. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="adventures in space (4am crack).dsk" size="143360" crc="e0c1bf7b" sha1="34c02fa6158c91faa1525d72ecf3d64bf1aae44b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ugtabsys">
+		<description>Utopia Graphics Tablet System (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Utopia Software Development</publisher>
+		<info name="release" value="2021-04-22"/>
+		<info name="usage" value="Requires an Apple Graphics Tablet or compatible hardware" />
+		<!--"Utopia Graphics Tablet System" is a 1980 graphics program developed and distributed by Utopia Software Development. It requires an Apple Graphics Tablet or compatible hardware. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="utopia graphics tablet system (4am and san inc crack).dsk" size="143360" crc="b29b01c0" sha1="e92de955703d05316208cd19fefa72566e8fa5c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="schltool">
+		<description>The School Tool (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Encyclopaedia Britannica</publisher>
+		<info name="release" value="2021-04-22"/>
+		<!--"The School Tool" is a 1983 educational program developed and distributed by Encyclopaedia Britannica Educational Corporation. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the school tool (4am crack) disk 1.dsk" size="143360" crc="87c7f19c" sha1="57c6d5cfdb053e650c7835773813795b6a636365"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Boot"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the school tool (4am crack) disk 2 (boot).dsk" size="143360" crc="fef65f33" sha1="4209c6c2df974f6ec05db07c3871d0705395ef14"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the school tool (4am crack) disk 3.dsk" size="143360" crc="8b1b0641" sha1="65b78d70baab3cd4b04089eab8e8f9f21fdc86fe"/>
 			</dataarea>
 		</part>
 	</software>

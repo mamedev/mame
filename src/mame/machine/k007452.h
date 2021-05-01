@@ -33,14 +33,14 @@ protected:
 
 private:
 	// internal state
-	u32 m_math_regs[6];
+	u8 m_math_regs[6];
 	u16 m_multiply_result;
 	u16 m_divide_quotient;
 	u16 m_divide_remainder;
 };
 
-// device type definition
-DECLARE_DEVICE_TYPE(KONAMI_007452_MATH, k007452_device)
 
+// device type declaration
+DECLARE_DEVICE_TYPE(KONAMI_007452_MATH, k007452_device)
 
 #endif // MAME_MACHINE_K007452_H
