@@ -22,10 +22,9 @@
       some other important ways. Many have been guessed at.
     * Some instruction behavior, especially for repeated cases, has been
       guessed at and may not be strictly correct.
-    * No interrupts have been emulated. It remains unclear exactly how
-      MN1880 interrupts are enabled and prioritized, or what their sources
-      might be, though they are obviously internally vectored through the
-      table at the start of the program space.
+    * No interrupts have been emulated, though some interrupt registers
+      have been tentatively identified. Obviously they must be internally
+      vectored through the table at the start of the program space.
     * The PI (software interrupt) instruction is likewise unemulated,
       since its vector is uncertain; though possibly implicitly inserted
       when an interrupt is acknowledged, explicit uses of it are
@@ -44,6 +43,8 @@
       when both addresses are external since there is at most one external
       address bus. Contention should slow prefetching and execution down.
     * Additional wait states for external memory, if any, are not emulated.
+    * The LP register likely defines some sort of stack limit. This has not
+      been implemented.
     * When execution is stopped in the debugger, IP already points to the
       byte following the opcode which has been loaded into IR. This at
       least seems consistent with the prefetch model and the handling of
@@ -54,6 +55,11 @@
     * The debugger will not single-step through repeated instructions.
       Making MAME's context-insensitive disassembler produce any sensible
       output for these would be very difficult.
+    * When the debugger is stopped after an instruction, its execution may
+      have loaded the output queue but not emptied it yet. Examining the
+      contents of locations about to be written to may show misleading
+      values. Likewise, PCs at which watchpoint hits occur may be
+      incorrectly reported for writes.
 
 ***************************************************************************/
 
@@ -78,12 +84,33 @@ mn1880_device::mn1880_device(const machine_config &mconfig, device_type type, co
 	, m_tmp2(0)
 	, m_output_queued(false)
 	, m_icount(0)
+	, m_ie{0, 0}
 {
 }
 
 mn1880_device::mn1880_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: mn1880_device(mconfig, MN1880, tag, owner, clock, address_map_constructor(FUNC(mn1880_device::internal_data_map), this))
 {
+}
+
+u8 mn1880_device::ie0_r()
+{
+	return m_ie[0];
+}
+
+void mn1880_device::ie0_w(u8 data)
+{
+	m_ie[0] = data;
+}
+
+u8 mn1880_device::ie1_r()
+{
+	return m_ie[1];
+}
+
+void mn1880_device::ie1_w(u8 data)
+{
+	m_ie[1] = data;
 }
 
 u8 mn1880_device::cpum_r()
@@ -98,6 +125,8 @@ void mn1880_device::cpum_w(u8 data)
 
 void mn1880_device::internal_data_map(address_map &map)
 {
+	map(0x0012, 0x0012).rw(FUNC(mn1880_device::ie0_r), FUNC(mn1880_device::ie0_w));
+	map(0x0015, 0x0015).rw(FUNC(mn1880_device::ie1_r), FUNC(mn1880_device::ie1_w));
 	map(0x0016, 0x0016).rw(FUNC(mn1880_device::cpum_r), FUNC(mn1880_device::cpum_w));
 }
 
@@ -190,6 +219,8 @@ void mn1880_device::device_start()
 		state_add_divider(MN1880_DIVIDER1 + i);
 	}
 
+	state_add(MN1880_IE0, "IE0", m_ie[0]);
+	state_add(MN1880_IE1, "IE1", m_ie[1]);
 	state_add(MN1880_CPUM, "CPUM", m_cpum);
 
 	save_item(STRUCT_MEMBER(m_cpu, ip));
@@ -207,6 +238,7 @@ void mn1880_device::device_start()
 	save_item(NAME(m_tmp1));
 	save_item(NAME(m_tmp2));
 	save_item(NAME(m_output_queued));
+	save_item(NAME(m_ie));
 }
 
 void mn1880_device::device_reset()
@@ -227,6 +259,8 @@ void mn1880_device::device_reset()
 	m_cpu[1].sp = 0x0200;
 	m_cpu[1].lp = 0x0160;
 
+	m_ie[0] = 0x30;
+	m_ie[1] = 0x00;
 	m_cpum = 0x0c;
 	m_ustate = microstate::NEXT;
 	m_output_queued = false;
