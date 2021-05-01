@@ -107,4 +107,147 @@ Quickloads do not work on disk-based microbees, or on premium models.
 		</part>
 	</software>
 
+	<software name="baboon">
+		<description>Baboon</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3200">
+				<rom name="baboon.mwb" size="0x3200" crc="de03b803" sha1="79ab4c6f24fd9d8e6823f9dd1877d7c36bc32016"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battle">
+		<description>Battle Station</description>
+		<year>1981</year><!-- year of port unknown-->
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0d99">
+				<rom name="battle.bee" size="0x0d99" crc="3bda1a0c" sha1="2e88b696b037221578693f9606f151a1857e713a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beedemo">
+		<description>Microbee Demo</description>
+		<year>2009</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3a00">
+				<rom name="beedemo.mwb" size="0x3a00" crc="40eeebf3" sha1="115c3305799ac02bf7b7b9244c71957b62e927ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beetleb">
+		<description>Beetle Basher</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0980">
+				<rom name="bbasher.bin" size="0x0980" crc="5abd47aa" sha1="d3e5355715367e982bdcea59631693fb7e3f5de8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bmanor">
+		<description>Broadey Manor</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3d80">
+				<rom name="bmanor.bee" size="0x3d80" crc="4de5fd13" sha1="627082bcd3cb0f4b7c742ea4d4a7882d7814f2d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bomber">
+		<description>Bomber Raid</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1f80">
+				<rom name="bomber.mwb" size="0x1f80" crc="0780fda4" sha1="78bd606acd5e0e9bd10686ef0a2c067982121956"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bounce">
+		<description>Bounce</description><!-- colour version -->
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1c80">
+				<rom name="bounce2.mwb" size="0x1c80" crc="6cdca176" sha1="eb117f73bdb1414a8f40effd1e7d845605c72dcd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakin">
+		<description>Break In</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0580">
+				<rom name="breakin.mwb" size="0x0580" crc="22bc30b5" sha1="504999999a4a7f0e64dc56c1de1db79993c9086b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakout">
+		<description>Break Out</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0680">
+				<rom name="breakout.bee" size="0x0680" crc="7d05dcc3" sha1="8520c49ecd46aa2e75c05e8e571ea2a6be9b5001"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brickball">
+		<description>Brick Ball</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1000">
+				<rom name="brickball.bee" size="0x1000" crc="cdf2bf08" sha1="817d967c508fd87eea0ab1b4cd835e15560606e8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="briney">
+		<description>Briney Deep Adventure</description>
+		<year>1985</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2680">
+				<rom name="briney.mwb" size="0x2680" crc="29de410a" sha1="a98322974d44e18d6e09a7e23ce7bd40936c8f0c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bships">
+		<description>Battleships</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1b00">
+				<rom name="bships.mwb" size="0x1b00" crc="d07a14e7" sha1="2b9318741ff36c5cd4c84d3643288988252098b4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bunyip">
+		<description>Bunyip Adventure</description>
+		<year>1984</year>
+		<publisher>Grotnik</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x6d20">
+				<rom name="bunyip.bin" size="0x6d20" crc="f433a6bb" sha1="18dde6c1f7a48fa8d57902d55636c7ed6572b800"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
