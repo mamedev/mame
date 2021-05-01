@@ -93,7 +93,7 @@ INLINE floatx80 propagateFloatx80NaNOneArg(floatx80 a)
 | `zSigPtr', respectively.
 *----------------------------------------------------------------------------*/
 
-void normalizeFloatx80Subnormal(uint64_t aSig, int32_t *zExpPtr, uint64_t *zSigPtr)
+INLINE void normalizeFloatx80Subnormal(uint64_t aSig, int32_t *zExpPtr, uint64_t *zSigPtr)
 {
 	int shiftCount = countLeadingZeros64(aSig);
 	*zSigPtr = aSig<<shiftCount;
@@ -116,7 +116,7 @@ INLINE int floatx80_is_nan(floatx80 a)
 | `b' is a signaling NaN, the invalid exception is raised.
 *----------------------------------------------------------------------------*/
 
-floatx80 propagateFloatx80NaN( floatx80 a, floatx80 b )
+INLINE floatx80 propagateFloatx80NaN( floatx80 a, floatx80 b )
 {
     flag aIsNaN, aIsSignalingNaN, bIsNaN, bIsSignalingNaN;
 
@@ -181,7 +181,7 @@ static float128 atan_arr[FPATAN_ARR_SIZE] =
     PACK_FLOAT_128(0x3ffa861861861861, 0x8618618618618618)  /* 21 */
 };
 
-extern float128 OddPoly(float128 x, float128 *arr, int n);
+extern float128 OddPoly(float128 x, float128 *arr, unsigned n);
 
 /* |x| < 1/4 */
 static float128 poly_atan(float128 x1)
