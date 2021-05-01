@@ -1430,10 +1430,6 @@ void fm_engine_base<RegisterType>::write(uint16_t regnum, uint8_t data)
 	//  if ((m_regs.rhythm_enable() && m_regs.chnum() >= 6) ||
 	//      (m_regs.waveform_enable() && m_regs.waveform() != 0))
 		{
-
-		if (keyon_opmask != 0)
-			for (int index = 0; index < 4; index++)
-				printf("%s\n", m_regs.log_keyon(m_channel[keyon_channel]->choffs(), m_channel[keyon_channel]->choffs() + index * 8).c_str());
 		}
 	}
 }

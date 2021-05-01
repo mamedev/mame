@@ -16,6 +16,8 @@ DECLARE_DEVICE_TYPE(YM2413, ym2413_device);
 
 class ym2413_device : public ymfm_device_base<ymfm::ym2413>
 {
+	using parent = ymfm_device_base<ymfm::ym2413>;
+
 public:
 	// constructor
 	ym2413_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -36,6 +38,8 @@ DECLARE_DEVICE_TYPE(YM2423, ym2423_device);
 
 class ym2423_device : public ymfm_device_base<ymfm::ym2423>
 {
+	using parent = ymfm_device_base<ymfm::ym2423>;
+
 public:
 	// constructor
 	ym2423_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -56,6 +60,8 @@ DECLARE_DEVICE_TYPE(YMF281, ymf281_device);
 
 class ymf281_device : public ymfm_device_base<ymfm::ymf281>
 {
+	using parent = ymfm_device_base<ymfm::ymf281>;
+
 public:
 	// constructor
 	ymf281_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -76,6 +82,8 @@ DECLARE_DEVICE_TYPE(DS1001, ds1001_device);
 
 class ds1001_device : public ymfm_device_base<ymfm::ds1001>
 {
+	using parent = ymfm_device_base<ymfm::ds1001>;
+
 public:
 	// constructor
 	ds1001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

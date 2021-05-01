@@ -32,6 +32,7 @@ ym2413_device::ym2413_device(const machine_config &mconfig, const char *tag, dev
 
 void ym2413_device::device_start()
 {
+	parent::device_start();
 	m_chip.set_instrument_data(m_internal);
 }
 
@@ -77,6 +78,7 @@ ym2423_device::ym2423_device(const machine_config &mconfig, const char *tag, dev
 
 void ym2423_device::device_start()
 {
+	parent::device_start();
 	m_chip.set_instrument_data(m_internal);
 }
 
@@ -122,6 +124,7 @@ ymf281_device::ymf281_device(const machine_config &mconfig, const char *tag, dev
 
 void ymf281_device::device_start()
 {
+	parent::device_start();
 	m_chip.set_instrument_data(m_internal);
 }
 
@@ -167,6 +170,7 @@ ds1001_device::ds1001_device(const machine_config &mconfig, const char *tag, dev
 
 void ds1001_device::device_start()
 {
+	parent::device_start();
 	m_chip.set_instrument_data(m_internal);
 }
 
