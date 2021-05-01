@@ -50,7 +50,6 @@ TODO:
 #include "imagedev/cassette.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
-#include "sound/spkrdev.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
@@ -71,7 +70,6 @@ public:
 		, m_ctc(*this, "ctc")
 		, m_display(*this, "display")
 		, m_cassette(*this, "cassette")
-		, m_speaker(*this, "speaker")
 		, m_inputs(*this, "IN.%u", 0U)
 	{ }
 
@@ -90,7 +88,6 @@ private:
 	required_device<z80ctc_device> m_ctc;
 	required_device<pwm_display_device> m_display;
 	required_device<cassette_image_device> m_cassette;
-	required_device<speaker_sound_device> m_speaker;
 	required_ioport_array<3> m_inputs;
 
 	void poly880_io(address_map &map);
@@ -282,7 +279,7 @@ void poly880_state::pio1_pb_w(u8 data)
 
 	    bit     signal  description
 
-	    PB0     TTY     speaker
+	    PB0     TTY     teletype
 	    PB1
 	    PB2     MOUT    tape output
 	    PB3
@@ -292,8 +289,6 @@ void poly880_state::pio1_pb_w(u8 data)
 	    PB7
 
 	*/
-
-	m_speaker->level_w(BIT(data, 0));
 
 	// tape output
 	m_cassette->output(BIT(data, 2) ? +1.0 : -1.0);
@@ -343,10 +338,6 @@ void poly880_state::poly880(machine_config &config)
 	m_display->set_segmask(0xff, 0xff);
 	config.set_default_layout(layout_poly880);
 
-	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
-
 	// devices
 	Z80CTC(config, m_ctc, XTAL(7'372'800)/16);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -365,7 +356,8 @@ void poly880_state::poly880(machine_config &config)
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	SPEAKER(config, "cass_output").front_center(); // on data recorder
+	m_cassette->add_route(ALL_OUTPUTS, "cass_output", 0.05);
 }
 
 void poly880_state::poly880s(machine_config &config)
