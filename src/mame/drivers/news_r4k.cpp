@@ -88,6 +88,7 @@
 #include "machine/upd765.h"
 #include "machine/cxd8442q.h"
 #include "machine/cxd8421q.h"
+#include "machine/cxd8452aq.h"
 #include "machine/dp83932c.h"
 
 // Buses
@@ -114,6 +115,7 @@ public:
           m_rtc(*this, "rtc"),
           m_escc(*this, "escc1"),
           m_fifo0(*this, "apfifo0"),
+          m_sonic3(*this, "sonic3"),
           m_sonic(*this, "sonic"),
           m_fdc(*this, "fdc"),
           m_hid(*this, "hid"),
@@ -135,6 +137,7 @@ protected:
 
     // address maps
     void cpu_map(address_map &map);
+    void sonic3_map(address_map &map);
     void cpu_map_debug(address_map &map);
 
     // machine config
@@ -214,6 +217,9 @@ protected:
     // Sony CXD8442Q APbus FIFO (2x, but only one set up so far)
     required_device<cxd8442q_device> m_fifo0;
 
+    // Sony CXD8452AQ WSC-SONIC3 APbus interface
+    required_device<cxd8452aq_device> m_sonic3;
+
     // SONIC ethernet controller
     required_device<dp83932c_device> m_sonic;
 
@@ -240,14 +246,16 @@ protected:
     // Interrupts and other platform state
     bool m_int_state[6] = {false, false, false, false, false, false};
     uint32_t m_inten[6] = {0, 0, 0, 0, 0, 0};
-    uint32_t m_intst[6] = {0, 0, 0, 0, 0, 0};
+    uint32_t m_intst[6] = {0, 0, 3, 0, 0, 0}; // test
 
     // Freerun timer (1us period)
     // NetBSD source code corroborates the period (https://github.com/NetBSD/src/blob/229cf3aa2cda57ba5f0c244a75ae83090e59c716/sys/arch/newsmips/newsmips/news5000.c#L259)
     emu_timer *m_freerun_timer;
+    emu_timer *m_timer0_timer;
     uint32_t freerun_timer_val;
     const int FREERUN_FREQUENCY = 1000000;
     TIMER_CALLBACK_MEMBER(freerun_clock);
+    TIMER_CALLBACK_MEMBER(timer0_clock);
     uint32_t freerun_r(offs_t offset);
     void freerun_w(offs_t offset, uint32_t data);
 
@@ -316,9 +324,11 @@ void news_r4k_state::machine_common(machine_config &config)
     CXD8442Q(config, m_fifo0, 0);
 
     // SONIC ethernet controller
+    CXD8452AQ(config, m_sonic3, 0);
+    m_sonic3->set_addrmap(0, &news_r4k_state::sonic3_map);
     DP83932C(config, m_sonic, 20'000'000); // TODO: real clock frequency? There is a 20MHz crystal nearby on the board, so this will do until I can confirm the traces
     m_sonic->out_int_cb().set(FUNC(news_r4k_state::irq_w<irq0_number::SONIC>)); // TODO: WSC-SONIC might do some interrupt processing
-    m_sonic->set_bus(m_cpu, 0);
+    m_sonic->set_bus(m_sonic3, 1);
 
     // Keyboard and mouse
     // Unlike 68k and R3000 NEWS machines, the keyboard and mouse seem to share an interrupt
@@ -395,7 +405,7 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1f3d0000, 0x1f3d0007).r(FUNC(news_r4k_state::front_panel_r));
 
     // Hardware timers
-    // map(0x1f800000, 0x1f800000); // TIMER0
+    map(0x1f800000, 0x1f800003).lw32(NAME([this](offs_t offset, uint32_t data) { m_intst[2] = 0x0; int_check(); })); // TIMER0
     map(0x1f840000, 0x1f840003).rw(FUNC(news_r4k_state::freerun_r), FUNC(news_r4k_state::freerun_w)); // FREERUN
 
     // Timekeeper NVRAM and RTC
@@ -418,20 +428,20 @@ void news_r4k_state::cpu_map(address_map &map)
 
     // SONIC network controller
     // Right now, this doesn't work because nothing is mapping the SONIC's address lines to 0x1e620000 space so it just causes a bunch of unmapped reads
-    // map(0x1e500000, ???) // WSC-SONIC registers
+    map(0x1e500000, 0x1e50003f).m(m_sonic3, FUNC(cxd8452aq_device::map)); // WSC-SONIC3 registers
     map(0x1e610000, 0x1e6101ff).m(m_sonic, FUNC(dp83932c_device::map)).umask64(0x000000000000ffff); // SONIC registers - this doesn't fully match the hw
-    map(0x1e620000, 0x1e627fff).ram(); // dedicated network RAM
+    map(0x1e620000, 0x1e627fff).rw(m_sonic3, FUNC(cxd8452aq_device::cpu_r), FUNC(cxd8452aq_device::cpu_w)); // dedicated network RAM
 
     // DMAC3 DMA Controller
-    map(0x14c20000, 0x14c3ffff).m(m_dmac, FUNC(dmac3_device::map_dma_ram));
-    map(0x1e200000, 0x1e200017).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL0>));
-    map(0x1e300000, 0x1e300017).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL1>));
+    //map(0x14c20000, 0x14c3ffff).m(m_dmac, FUNC(dmac3_device::map_dma_ram));
+    //map(0x1e200000, 0x1e200017).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL0>));
+    //map(0x1e300000, 0x1e300017).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL1>));
 
     // SPIFI SCSI controllers
     // This mapping should probably go through the DMAC3 to match the platform setup.
     // The DMAC has to swap modes when talking to the SPIFI.
-    map(0x1e280000, 0x1e2800ff).m(m_scsi0, FUNC(spifi3_device::map)); // TODO: actual end address, need command buffer space too
-    map(0x1e380000, 0x1e3800ff).m(m_scsi1, FUNC(spifi3_device::map)); // TODO: actual end address, need command buffer space too
+    //map(0x1e280000, 0x1e2800ff).m(m_scsi0, FUNC(spifi3_device::map)); // TODO: actual end address, need command buffer space too
+    //map(0x1e380000, 0x1e3800ff).m(m_scsi1, FUNC(spifi3_device::map)); // TODO: actual end address, need command buffer space too
 
     // TODO: DSC-39 xb framebuffer/video card (0x14900000)
 
@@ -463,6 +473,11 @@ void news_r4k_state::cpu_map(address_map &map)
 
     // Assign debug mappings
     cpu_map_debug(map);
+}
+
+void news_r4k_state::sonic3_map(address_map &map)
+{
+    map(0x0, 0x7fff).ram(); // dedicated network RAM
 }
 
 /*
@@ -582,6 +597,7 @@ void news_r4k_state::machine_start()
 
     // Allocate freerunning clock
     m_freerun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::freerun_clock), this));
+    m_timer0_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(news_r4k_state::timer0_clock), this));
 }
 
 /*
@@ -594,6 +610,12 @@ TIMER_CALLBACK_MEMBER(news_r4k_state::freerun_clock)
     freerun_timer_val++;
 }
 
+TIMER_CALLBACK_MEMBER(news_r4k_state::timer0_clock)
+{
+    m_intst[2] = 0x1;
+    int_check();
+}
+
 /*
  * machine_reset
  *
@@ -603,6 +625,7 @@ void news_r4k_state::machine_reset()
 {
     freerun_timer_val = 0;
     m_freerun_timer->adjust(attotime::zero, 0, attotime::from_hz(FREERUN_FREQUENCY));
+    m_timer0_timer->adjust(attotime::zero, 0, attotime::from_hz(100)); // THIS IS WRONG
 }
 
 /*
@@ -679,7 +702,7 @@ uint8_t news_r4k_state::apbus_cmd_r(offs_t offset)
         value = 0x32;
     }
 
-    LOG("APBus read triggered at offset 0x%x, returing 0x%x\n", offset, value);
+    // LOG("APBus read triggered at offset 0x%x, returing 0x%x\n", offset, value);
     return value;
 }
 
@@ -805,10 +828,10 @@ void news_r4k_state::int_check()
     for (int i = 0; i < 6; i++)
     {
         int state = m_intst[i] & m_inten[i];
-        LOG("int_check: INTST%d current value: %d INTEN%d current value: %d -> computed state = %d\n", i, m_intst[i], i, m_inten[i], state);
+        //LOG("int_check: INTST%d current value: %d INTEN%d current value: %d -> computed state = %d\n", i, m_intst[i], i, m_inten[i], state);
         if (state != m_int_state[i]) // Interrupt changed state
         {
-            LOG("Setting CPU input line %d to %d\n", interrupt_map[i], state > 0 ? 1 : 0);
+            //LOG("Setting CPU input line %d to %d\n", interrupt_map[i], state > 0 ? 1 : 0);
             m_int_state[i] = state > 0;
             m_cpu->set_input_line(interrupt_map[i], state > 0 ? 1 : 0);
         }
@@ -881,12 +904,12 @@ ROM_SYSTEM_BIOS(0, "nws5000x", "APbus System Monitor Release 3.201")
 ROMX_LOAD("mpu-33__ver3.201__1994_sony.rom", 0x00000, 0x40000, CRC(8a6ca2b7) SHA1(72d52e24a554c56938d69f7d279b2e65e284fd59), ROM_BIOS(0))
 
 ROM_REGION64_BE(0x400, "idrom", 0)
-ROM_LOAD("idrom.rom", 0x000, 0x400, CRC(89edfebe) SHA1(3f69ebfaf35610570693edf76aa94c10b30de627) BAD_DUMP) // dump includes unmapped space
+ROM_LOAD("idrom.rom", 0x000, 0x400, CRC(89edfebe) SHA1(3f69ebfaf35610570693edf76aa94c10b30de627) BAD_DUMP) // dump includes unmapped space that would ideally be umasked
 
 ROM_REGION64_BE(0x400, "macrom", 0)
-ROM_LOAD("macrom.rom", 0x000, 0x400, CRC(c3c9f79c) SHA1(a430787b77604d72eb99773817e2405ba414d306) BAD_DUMP) // dump includes unmapped space
+ROM_LOAD("macrom.rom", 0x000, 0x400, CRC(c3c9f79c) SHA1(a430787b77604d72eb99773817e2405ba414d306) BAD_DUMP) // dump includes unmapped space that would ideally be umasked
 ROM_END
 
 // Machine definitions
 //   YEAR  NAME      PARENT COMPAT MACHINE   INPUT    CLASS           INIT           COMPANY FULLNAME                      FLAGS
-COMP(1994, nws5000x, 0, 0, nws5000x, nws5000, news_r4k_state, init_nws5000x, "Sony", "NET WORK STATION NWS-5000X", MACHINE_TYPE_COMPUTER | MACHINE_IS_INCOMPLETE | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+COMP(1994, nws5000x, 0,     0,     nws5000x, nws5000, news_r4k_state, init_nws5000x, "Sony", "NET WORK STATION NWS-5000X", MACHINE_TYPE_COMPUTER | MACHINE_IS_INCOMPLETE | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
