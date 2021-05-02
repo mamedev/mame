@@ -19633,6 +19633,8 @@ ltleappad
 
 @source:leapster.cpp
 leapster                        //
+leapster2                       //
+leapsterlmx                     //
 leapstertv                      //
 
 @source:learnwin.cpp
