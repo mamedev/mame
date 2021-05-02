@@ -558,4 +558,147 @@ Quickloads do not work on disk-based microbees, or on premium models.
 		</part>
 	</software>
 
+	<software name="egypt">
+		<description>Egyptian Adventure</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x4100">
+				<rom name="egypt.mwb" size="0x4100" crc="9a288c09" sha1="bf78157ad99e5360eca0817bd28a0fa96381206a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="emujoust">
+		<description>Emu Joust</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3200">
+				<rom name="emujoust.bee" size="0x3200" crc="dccea5b3" sha1="609803b98b34d2bbde66d4babf5c38946732edb8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="engineer">
+		<description>Engineer</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2f00">
+				<rom name="engineer.mwb" size="0x2f00" crc="44bfd530" sha1="e2065bb7170032f8c2f85dd9d28e885f566de069"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="estate">
+		<description>Estate of Doom</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x4300">
+				<rom name="estate.mwb" size="0x4300" crc="a4b0a43d" sha1="63d2c7874bf2ff51499550a163f1ef7cf278a99d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eureka">
+		<description>Eureka</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0d80">
+				<rom name="eureka.bee" size="0x0d80" crc="e4507be8" sha1="42aed4311b0becb7347635216eece299ba2f84a7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swamp">
+		<description>Swamp of Evil</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2b00">
+				<rom name="swamp.mwb" size="0x2b00" crc="437c9bd9" sha1="9da84437a85f6152ebd74161ac35d99c6a2e70f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eyeofmin">
+		<description>Eye of Min</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x4480">
+				<rom name="eyeofmin.mwb" size="0x4480" crc="3eaa6497" sha1="b8eb43eecc6b2cc91125291c5574d65a75d1915d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fishing">
+		<description>Fishing</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3280">
+				<rom name="fishing.mwb" size="0x3280" crc="f959c0d5" sha1="b918c2f72bc28f4f34f4bf9dafe502804cbed624"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fmstck">
+		<description>Farming Management - Stocking</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3280">
+				<rom name="fmstck.mwb" size="0x3280" crc="35e961c0" sha1="2b873a1211ecc9620ca1e5d3908cbd07e71b3bb1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4inarow">
+		<description>Four in a Row</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0f00">
+				<rom name="four.mwb" size="0x0f00" crc="48b967ac" sha1="a5858c6cbefcf7f7877f10d4f269597b788ceb34"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frank">
+		<description>House of Frankenstein</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x4c00">
+				<rom name="frank.mwb" size="0x4c00" crc="a3270064" sha1="5bb76b08d6f50f998ddb19d9864ecd10dde1a10e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="froghop">
+		<description>Frog Hop</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2400">
+				<rom name="froghop.mwb" size="0x2400" crc="1d5c9c2e" sha1="406671aca3572f7e4e2df1e042b9a1db57a60509"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fs1">
+		<description>Flight Simulator</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3501">
+				<rom name="fs1.bee" size="0x3501" crc="369a823e" sha1="a187fcf939a76bca72b3283968a6e22cab8bd3f9"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
