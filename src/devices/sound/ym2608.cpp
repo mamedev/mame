@@ -17,7 +17,7 @@ DEFINE_DEVICE_TYPE(YM2608, ym2608_device, "ym2608", "YM2608 OPNA")
 //-------------------------------------------------
 
 ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	ymfm_device_ssg_base<ymfm::ym2608>(mconfig, tag, owner, clock, YM2608, 1, 2),
+	ymfm_device_base<ymfm::ym2608, 1>(mconfig, tag, owner, clock, YM2608, 1, 2),
 	device_rom_interface(mconfig, *this),
 	m_internal(*this, "internal")
 {

@@ -15,11 +15,17 @@
 
 DECLARE_DEVICE_TYPE(YM2608, ym2608_device);
 
-class ym2608_device : public ymfm_device_ssg_base<ymfm::ym2608>, public device_rom_interface<21>
+class ym2608_device : public ymfm_device_base<ymfm::ym2608, 1>, public device_rom_interface<21>
 {
 public:
 	// constructor
 	ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// configuration helpers, handled by the interface
+	auto port_a_read_callback() { return io_write_handler(0); }
+	auto port_b_read_callback() { return io_write_handler(1); }
+	auto port_a_write_callback() { return io_write_handler(0); }
+	auto port_b_write_callback() { return io_write_handler(1); }
 
 protected:
 	// device-level overrides

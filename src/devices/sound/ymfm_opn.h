@@ -371,7 +371,7 @@ public:
 
 	// pass-through helpers
 	uint32_t sample_rate(uint32_t input_clock) const { return m_fm.sample_rate(input_clock); }
-	uint32_t sample_rate_ssg(uint32_t input_clock) const { uint32_t scale = m_fm.clock_prescale() * 2 / 3; return input_clock * 2 / scale; }
+	uint32_t sample_rate_ssg(uint32_t input_clock) const { uint32_t scale = m_fm.clock_prescale() * 2 / 3; return input_clock / scale; }
 	void invalidate_caches() { m_fm.invalidate_caches(); }
 
 	// read access

@@ -13,9 +13,9 @@
 // ======================> ym2610_device_base
 
 template<typename ChipClass>
-class ym2610_device_base : public ymfm_device_ssg_base<ChipClass>, public device_memory_interface
+class ym2610_device_base : public ymfm_device_base<ChipClass, 1>, public device_memory_interface
 {
-	using parent = ymfm_device_ssg_base<ChipClass>;
+	using parent = ymfm_device_base<ChipClass, 1>;
 
 public:
 	// constructor

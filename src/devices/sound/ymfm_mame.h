@@ -59,59 +59,7 @@ protected:
 };
 
 
-// ======================> ymfm_device_ay8910_base
-
-// inner base class for an AY-8910-derived FM device
-class ymfm_device_ay8910_base : public ay8910_device, public ymfm::ssg_interface
-{
-public:
-	// constructor
-	ymfm_device_ay8910_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type, int aystreams, int ayioports) :
-		ay8910_device(mconfig, type, tag, owner, clock, PSG_TYPE_YM, aystreams, ayioports)
-	{
-	}
-
-	// read access, handled by the chip implementation
-	virtual u8 read(offs_t offset) = 0;
-
-	// write access, handled by the chip implementation
-	virtual void write(offs_t offset, u8 data) = 0;
-
-protected:
-	// SSG overrides
-	virtual void ssg_reset() override
-	{
-		ay8910_reset_ym();
-	}
-
-	virtual void ssg_set_clock_prescale(uint8_t clock_divider) override
-	{
-		ay_set_clock(clock() * 2 / clock_divider);
-	}
-
-	virtual uint8_t ssg_read(uint8_t offset) override
-	{
-		ay8910_write_ym(0, offset);
-		return ay8910_read_ym();
-	}
-
-	virtual void ssg_write(uint8_t offset, uint8_t data) override
-	{
-		ay8910_write_ym(0, offset);
-		ay8910_write_ym(1, data);
-	}
-
-protected:
-	// tell the chip we want to override
-	template<class ChipClass>
-	void ssg_override(ChipClass &chip)
-	{
-		chip.ssg_override(*this);
-	}
-};
-
-
-// ======================> ymfm_device_base_common
+// ======================> ymfm_device_base
 
 // this template provides most of the basics used by device objects in MAME
 // that wrap ymfm chips; it implements the fm_interface, offers binding to
@@ -119,19 +67,21 @@ protected:
 // class is not intended to be used directly -- rather, devices should inherit
 // from eitehr ymfm_device_base or ymfm_ssg_device_base, depending on whether
 // they include an SSG or not
-template<typename BaseClass, typename ChipClass>
-class ymfm_device_base_common : public BaseClass, public ymfm::fm_interface
+template<typename ChipClass, int SSGStreams = 0>
+class ymfm_device_base : public ymfm_device_standalone_base, public ymfm::fm_interface, public ymfm::ssg_interface
 {
 public:
 	// constructor
-	ymfm_device_base_common(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type, int aystreams = 0, int ayioports = 0) :
-		BaseClass(mconfig, tag, owner, clock, type, aystreams, ayioports),
+	ymfm_device_base(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type, int aystreams = 0, int ayioports = 0) :
+		ymfm_device_standalone_base(mconfig, tag, owner, clock, type, aystreams, ayioports),
 		m_stream(nullptr),
+		m_ssg_stream(nullptr),
 		m_chip(*this),
 		m_timer{ nullptr, nullptr },
 		m_update_irq(*this),
 		m_io_read{ *this, *this },
-		m_io_write{ *this, *this }
+		m_io_write{ *this, *this },
+		m_ssg(*this, "ssg")
 	{
 	}
 
@@ -175,14 +125,14 @@ public:
 		m_chip.write_data(data);
 	}
 
-	using BaseClass::machine;
-	using BaseClass::stream_alloc;
+	using ymfm_device_standalone_base::machine;
+	using ymfm_device_standalone_base::stream_alloc;
 
 protected:
 	// perform a synchronized write
 	virtual void ymfm_sync_mode_write(uint8_t data) override
 	{
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(ymfm_device_base_common::fm_mode_write), this), data);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(ymfm_device_base::fm_mode_write), this), data);
 	}
 
 	// perform a synchronized interrupt check
@@ -192,7 +142,7 @@ protected:
 		// otherwise, do it directly
 		auto &scheduler = machine().scheduler();
 		if (scheduler.currently_executing())
-			scheduler.synchronize(timer_expired_delegate(FUNC(ymfm_device_base_common::fm_check_interrupts), this));
+			scheduler.synchronize(timer_expired_delegate(FUNC(ymfm_device_base::fm_check_interrupts), this));
 		else
 			m_engine->engine_check_interrupts();
 	}
@@ -244,21 +194,60 @@ protected:
 		return m_io_read[port & 1].isnull() ? 0 : m_io_read[port & 1]();
 	}
 
+	// SSG overrides
+	virtual void ssg_reset() override
+	{
+		m_ssg->reset();
+	}
+
+	virtual uint8_t ssg_read(uint8_t offset) override
+	{
+		m_ssg->address_w(offset);
+		return m_ssg->data_r();
+	}
+
+	virtual void ssg_write(uint8_t offset, uint8_t data) override
+	{
+		m_ssg->address_w(offset);
+		m_ssg->data_w(data);
+	}
+
 	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override
+	{
+		if (SSGStreams > 0)
+		{
+			AY8910(config, m_ssg, device_t::clock());
+			m_ssg->set_psg_type(ay8910_device::PSG_TYPE_YM);
+			if (SSGStreams == 1)
+				m_ssg->set_flags(AY8910_SINGLE_OUTPUT);
+			m_ssg->port_a_read_callback().set([this] () { return m_io_read[0].isnull() ? 0 : m_io_read[0](0); });
+			m_ssg->port_a_write_callback().set([this] (uint8_t data) { if (!m_io_write[0].isnull()) m_io_write[0](0, data); });
+			m_ssg->port_b_read_callback().set([this] () { return m_io_read[1].isnull() ? 0 : m_io_read[1](1); });
+			m_ssg->port_b_write_callback().set([this] (uint8_t data) { if (!m_io_write[1].isnull()) m_io_write[1](1, data); });
+			m_ssg->add_route(0, *this, 1.0, 0);
+			if (SSGStreams > 1)
+			{
+				m_ssg->add_route(1, *this, 1.0, 1);
+				m_ssg->add_route(2, *this, 1.0, 2);
+			}
+		}
+	}
+
 	virtual void device_start() override
 	{
 		// call the parent
-		BaseClass::device_start();
+		ymfm_device_standalone_base::device_start();
 
-		// override the SSG, if there is one
-		BaseClass::ssg_override(m_chip);
+		// allocate an SSG stream if needed
+		device_start_ssg();
 
 		// allocate our stream
 		m_stream = stream_alloc(0, ChipClass::OUTPUTS, m_chip.sample_rate(device_t::clock()));
 
 		// allocate our timers
 		for (int tnum = 0; tnum < 2; tnum++)
-			m_timer[tnum] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ymfm_device_base_common::fm_timer_handler), this));
+			m_timer[tnum] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ymfm_device_base::fm_timer_handler), this));
 
 		// resolve the handlers
 		m_update_irq.resolve();
@@ -271,37 +260,66 @@ protected:
 		m_chip.register_save(*this);
 	}
 
+	template<bool SSGPresent = (SSGStreams != 0)>
+	std::enable_if_t<!SSGPresent, void> device_start_ssg()
+	{
+	}
+
+	template<bool SSGPresent = (SSGStreams != 0)>
+	std::enable_if_t<SSGPresent, void> device_start_ssg()
+	{
+		m_ssg_stream = stream_alloc(SSGStreams, SSGStreams, SAMPLE_RATE_INPUT_ADAPTIVE);
+		m_chip.ssg_override(*this);
+	}
+
 	virtual void device_reset() override
 	{
-		BaseClass::device_reset();
+		ymfm_device_standalone_base::device_reset();
 		m_chip.reset();
 	}
 
 	virtual void device_clock_changed() override
 	{
-		BaseClass::device_clock_changed();
+		ymfm_device_standalone_base::device_clock_changed();
 		m_stream->set_sample_rate(m_chip.sample_rate(device_t::clock()));
+		device_clock_changed_ssg();
+	}
+
+	template<bool SSGPresent = (SSGStreams != 0)>
+	std::enable_if_t<!SSGPresent, void> device_clock_changed_ssg()
+	{
+	}
+
+	template<bool SSGPresent = (SSGStreams != 0)>
+	std::enable_if_t<SSGPresent, void> device_clock_changed_ssg()
+	{
+		m_ssg->set_unscaled_clock(m_chip.sample_rate_ssg(device_t::clock()));
 	}
 
 	virtual void device_post_load() override
 	{
-		BaseClass::device_post_load();
+		ymfm_device_standalone_base::device_post_load();
 		m_chip.invalidate_caches();
 	}
 
 	// sound overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override
 	{
-		// for AY8910-derived classes, pass on their stream updates
-		if (&stream != m_stream)
-			return BaseClass::sound_stream_update(stream, inputs, outputs);
-
-		int32_t output[ChipClass::OUTPUTS];
-		for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
+		if (&stream == m_stream)
 		{
-			m_chip.generate(output);
-			for (int index = 0; index < ChipClass::OUTPUTS; index++)
-				outputs[index].put_int(sampindex, output[index], 32768);
+			// generate the FM/ADPCM stream
+			int32_t output[ChipClass::OUTPUTS];
+			for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
+			{
+				m_chip.generate(output);
+				for (int index = 0; index < ChipClass::OUTPUTS; index++)
+					outputs[index].put_int(sampindex, output[index], 32768);
+			}
+		}
+		else if (&stream == m_ssg_stream)
+		{
+			for (int index = 0; index < SSGStreams; index++)
+				outputs[index] = inputs[index];
 		}
 	}
 
@@ -312,25 +330,15 @@ protected:
 
 	// internal state
 	sound_stream *m_stream;          // sound stream
+	sound_stream *m_ssg_stream;      // SSG sound stream
 	ChipClass m_chip;                // core chip implementation
 	attotime m_busy_end;             // busy end time
 	emu_timer *m_timer[2];           // two timers
 	devcb_write_line m_update_irq;   // IRQ update callback
 	devcb_read8 m_io_read[2];        // up to 2 input port handlers
 	devcb_write8 m_io_write[2];      // up to 2 output port handlers
+	optional_device<ay8910_device> m_ssg; // our embedded SSG device
 };
-
-
-// ======================> ymfm_device_base
-
-template<typename ChipClass>
-using ymfm_device_base = ymfm_device_base_common<ymfm_device_standalone_base, ChipClass>;
-
-
-// ======================> ymfm_device_ssg_base
-
-template<typename ChipClass>
-using ymfm_device_ssg_base = ymfm_device_base_common<ymfm_device_ay8910_base, ChipClass>;
 
 
 #endif // MAME_SOUND_YMFM_H
