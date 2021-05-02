@@ -1004,7 +1004,7 @@ Quickloads do not work on disk-based microbees, or on premium models.
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x2c80">
-				<rom name="jungle.bee" size="0x2c80" crc="29814d07" sha1="2164505d1a06d7b7290c42f0ef2301eace85bc18"/>
+				<rom name="kungfu.mwb" size="0x2c80" crc="29814d07" sha1="2164505d1a06d7b7290c42f0ef2301eace85bc18"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1071,6 +1071,160 @@ Quickloads do not work on disk-based microbees, or on premium models.
 		<part name="quik" interface="mbee_quik">
 			<dataarea name="quik" size="0x0dd2">
 				<rom name="lunarl.bin" size="0x0dd2" crc="c941d173" sha1="cb90c4ddc619afee683a71e8e0f7f2e5f8db380d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="merlin">
+		<description>Merlin</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x7300">
+				<rom name="merlin.mwb" size="0x7300" crc="5fb22cd7" sha1="e356f19691dd17e59d4fbb5a5ddb9fcd34780e71"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meteor1">
+		<description>Meteor Mission</description>
+		<year>1980</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0d22">
+				<rom name="meteor1.bee" size="0x0d22" crc="c7c8ee5e" sha1="b09647d0bbddfcb0078186f9bde2e254580def02"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meteor2">
+		<description>Meteor Mission 2</description>
+		<year>1981</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2e41">
+				<rom name="meteor2.bee" size="0x2e41" crc="e705e1b0" sha1="da2449c4b6548e56af03d731f4bbdf51ebed9ecc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mgolf">
+		<description>Micro-Golf</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2080">
+				<rom name="mgolf.bin" size="0x2080" crc="f3d3ff74" sha1="3c7973e958a0c875de0753761d024a39e838213e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mgolfmp">
+		<description>Micro-Golf Match Play</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2980">
+				<rom name="mgolfmp.bin" size="0x2980" crc="e5ddbe07" sha1="92c8b50e8b8d241a5f96c62ad9611ee5037ad5f8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msinv">
+		<description>Microspace Invaders</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x2680">
+				<rom name="msinv.bee" size="0x2680" crc="556d2f48" sha1="d3a8fdc7461593f02dac603233254b78b1bbffad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minedrop">
+		<description>Mine Drop</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3400">
+				<rom name="minedrop.bee" size="0x3400" crc="d067a3de" sha1="d1ea4bf5cb47b8d4473f54b8a4b1b5ba3d8e635f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minedrop2">
+		<description>Mine Drop II</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3980">
+				<rom name="minedrop2.bin" size="0x3980" crc="80a2922f" sha1="0ff8e13ca9edf93de0212ea3aa821efd1d2498f2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minefld">
+		<description>Minefields</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x0d00">
+				<rom name="minefld.mwb" size="0x0d00" crc="e0ea6922" sha1="f710f85072d5ec6ca05d3a33ab4bb3e4af9ba106"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="missilew">
+		<description>Missile Wars</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1980">
+				<rom name="missilewars.bin" size="0x1980" crc="0fa84b91" sha1="4467b5218f9bd42efa0afaaec933b6114e670648"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monopoly">
+		<description>Monopoly</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x5480">
+				<rom name="monopoly.mwb" size="0x5480" crc="e270322b" sha1="b1b4feefad6c0ffbc91a399f609779de0ff5da46"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monopolyi">
+		<description>Monopoly Instructions</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1200">
+				<rom name="monopolyi.bin" size="0x1200" crc="16df1b07" sha1="c0e7860589bf63ecd09be867ad7523525cd9c189"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mugwump">
+		<description>Mugwump Hunt</description>
+		<year>1985</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x1700">
+				<rom name="mugwump.mwb" size="0x1700" crc="31ead953" sha1="a9819447260d0f1724b9ab1b6425faba3a470bee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="museum">
+		<description>Museum Mystery</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="quik" interface="mbee_quik">
+			<dataarea name="quik" size="0x3f00">
+				<rom name="museum.mwb" size="0x3f00" crc="4e33c686" sha1="fa835d604638162b912edb6aab17bd47fc79d722"/>
 			</dataarea>
 		</part>
 	</software>
